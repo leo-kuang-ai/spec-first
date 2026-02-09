@@ -1,0 +1,250 @@
+# Spec-First v7.1 — CLI 命令体系
+
+> **模块**: 辅助功能模块 #2 | **拆分自**: spec-first-v7.md L1188-1354
+> **版本**: v7.1 | **更新**: 2026-02-09
+
+---
+
+## 设计理念
+
+CLI 是 Spec-First 双层架构中的 **能力层**，以 TypeScript ESM 模块实现，提供相同输入必定产生相同输出的确定性操作。CLI 负责 ID 生成、Gate 校验、状态变更执行、度量计算等不应由 AI 推理完成的操作。CLI 不主动编排流程，仅响应 Skill 或人的调用。
+
+## 安装与分发模式（强制）
+
+> 使用人员仅保留 **npm 安装模式**，不提供其他安装方式。
+
+### 使用人员安装方式
+
+- 全局安装：`npm install -g <package-name>`
+- 项目内安装：`npm install --save-dev <package-name>`
+- 执行方式：安装后使用 `spec-first ...`（或在 npm script 中调用）
+
+### npm 仓库策略
+
+- **内网环境**：发布到公司内网 npm 私有仓库（如 Nexus/Verdaccio/Artifactory 的 npm registry）。
+- **外网环境**：发布到自建外网 npm 仓库（独立 registry）。
+- 同一版本号在内外网仓库保持一致，避免跨环境协作时版本漂移。
+- 仓库切换通过 `.npmrc` 的 `registry` 配置完成，不改变命令签名。
+
+---
+
+## 用户入口与路由（强制）
+
+- 用户统一入口：`/spec-first:xxxx`
+- `/spec-first:init` 仅保留无参交互模式：`/spec-first:init`
+- `stage/rfc/id/gate/matrix/defect` 等命令通过 `/spec-first:*` 入口路由到 CLI Runtime
+
+| 用户入口 | 路由目标（CLI） |
+|------|------|
+| `/spec-first:stage ...` | `spec-first stage ...` |
+| `/spec-first:rfc ...` | `spec-first rfc ...` |
+| `/spec-first:id ...` | `spec-first id ...` |
+| `/spec-first:gate ...` | `spec-first gate ...` |
+| `/spec-first:matrix ...` | `spec-first matrix ...` |
+| `/spec-first:defect ...` | `spec-first defect ...` |
+
+`/spec-first:rfc` 入口支持语义化子命令映射：
+
+- `/spec-first:rfc approve <rfcId> --feature <featureId>` → `spec-first rfc transition <rfcId> approved --feature <featureId>`
+- `/spec-first:rfc reject <rfcId> --feature <featureId>` → `spec-first rfc transition <rfcId> rejected --feature <featureId>`
+
+---
+
+## 7 个核心模块
+
+| 模块 | 名称 | 职责 | 状态 |
+|------|------|------|------|
+| **M1** | ProcessEngine（流程引擎） | 阶段状态机、三层规范合并、裁剪引擎 | ✅ Implemented |
+| **M2** | TraceEngine（追踪引擎） | ID 注册/校验、追踪矩阵管理、覆盖率计算 | ✅ Implemented |
+| **M3** | GateEngine（质量门禁引擎） | Gate 条件评估、SCA 校验、Hook 调度 | 🔧 Partial（自动条件解析链路未完成） |
+| **M4** | ChangeMgr（变更管理） | RFC 状态机、缺陷管理、影响分析 | ✅ Implemented |
+| **M5** | AIOrchestrator（AI 编排） | Context Pack 生成、Session Catchup、AI 统计 | 🔧 Partial（类型签名漂移） |
+| **M6** | MetricsEngine（度量引擎） | 12 项指标计算、健康分、瓶颈分析 | ✅ Implemented |
+| **M7** | ToolIntegration（工具集成） | Git Hook 安装、CI 模板生成 | 📋 Planned |
+
+---
+
+## 11 个命令组
+
+> **命名规范**：所有命令统一使用 `spec-first <group> <subcommand>` 格式。
+> 文档中 `spec-id`、`spec-gate` 等简写仅为阅读便利，实际执行必须使用 `spec-first id`、`spec-first gate` 等完整形式。
+> bin 入口唯一：`spec-first`（来自 `package.json:bin`）。
+
+### 1. `spec-first init` ✅ Implemented
+
+初始化 Feature 工作区。
+
+> 用户入口：`/spec-first:init`（无参数，交互引导）。
+> Skill 在交互中采集 `feat/mode/size/platforms` 后调用下列 CLI 命令。
+
+```bash
+spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>]
+```
+
+- `--feat <abbr>`（必填）：Feature 缩写，大写字母开头，1-16 字符
+- `--mode <N|I>`（默认 N）：开发模式
+- `--size <S|M|L>`（默认 M）：项目规模
+- `--platforms <p1,p2,...>`（必填）：技术端平台列表（逗号分隔），如 `h5,java-backend`
+- `--feature-id <id>`（可选）：指定 Feature ID，默认自动生成
+
+**Feature ID 规范**：
+
+- 格式：`FSREQ-YYYYMMDD-<FEAT>-NNN`
+- 正则：`^FSREQ-\d{8}-[A-Z][A-Z0-9]{1,15}-\d{3}$`
+- 示例：`FSREQ-20260209-AUTH-001`
+
+**产出**：创建 `specs/<featureId>/` 目录、`stage-state.json`、`constitution.md` 模板、注册 FEAT 缩写。
+
+### 2. `spec-first id` ✅ Implemented
+
+ID 生成与校验（M2 TraceEngine）。
+
+```bash
+spec-first id next <type> <featAbbr> --feature <featureId>   # 生成下一个 ID（--feature 运行时必填）
+spec-first id validate <id>                                   # 校验 ID 格式（<10ms SLA）
+spec-first id list --feature <featureId> [--type <type>]      # 列出已注册 ID（--feature 运行时必填）
+```
+
+支持 8 种 ID 类型：FR / NFR / DS / API / TASK / TC / ADR / RFC。
+
+### 3. `spec-first gate` 🔧 Partial
+
+Gate 条件评估（M3 GateEngine）。
+
+```bash
+spec-first gate check <featureId> [--stage <stageId>]   # 校验当前阶段 Gate
+spec-first gate conditions <stageId>                      # 查看 Gate 条件定义
+spec-first gate history <featureId>                       # 查看评估历史
+```
+
+评估结果：`PASS`（通过）| `FAIL`（阻断）| `WARN`（警告但放行）。
+
+> ⚠️ Gate 自动条件解析器注入链路未完成，Gate 自动评估存在已知缺口。
+
+### 4. `spec-first stage` ✅ Implemented
+
+阶段生命周期管理（M1 ProcessEngine）。
+
+```bash
+spec-first stage current <featureId>                      # 查看当前阶段
+spec-first stage advance <featureId>                      # 推进到下一阶段（需 Gate PASS）
+spec-first stage cancel <featureId> --reason "<reason>"   # 取消 Feature
+```
+
+> 阶段流转由 Skill 编排触发，CLI 负责原子执行。
+
+### 5. `spec-first matrix` ✅ Implemented
+
+追踪矩阵管理（M2 TraceEngine）。
+
+```bash
+spec-first matrix check <featureId>                                # 校验矩阵完整性
+spec-first matrix export <featureId> [--format <markdown|yaml>]    # 导出追踪矩阵
+```
+
+> ⚠️ `--format` 可选值为 `markdown | yaml`（非 `md | yaml`）。
+
+### 6. `spec-first metrics` ✅ Implemented
+
+覆盖率与度量（M2 + M6）。
+
+```bash
+spec-first metrics coverage <featureId>                   # 计算 9 项覆盖率指标（12 项中的 A 类）
+spec-first metrics report <featureId>                     # 生成度量报告
+```
+
+### 7. `spec-first ai` 🔧 Partial
+
+AI 辅助工具（M5 AIOrchestrator）。
+
+```bash
+spec-first ai context <featureId>                         # 生成 Context Pack（<2KB YAML）
+spec-first ai catchup <featureId>                         # 会话恢复（7 步恢复）
+spec-first ai stats <featureId>                           # AI 调用统计
+```
+
+> ⚠️ 命令签名存在与核心模块的类型漂移，`npm run typecheck` 当前不通过。
+
+### 8. `spec-first rfc` ✅ Implemented
+
+变更请求管理（M4 ChangeMgr）。
+
+```bash
+spec-first rfc create <featureId> --title "<title>" [--level <Minor|Major|Critical>] [--by <submittedBy>] [--motivation "<motivation>"] [--description "<description>"]
+spec-first rfc submit <rfcId> --feature <featureId>
+spec-first rfc transition <rfcId> <status> --feature <featureId>
+spec-first rfc list <featureId>
+spec-first rfc get <rfcId> --feature <featureId>
+```
+
+> ⚠️ 参数为 `--title`/`--level`/`--motivation`，**无** `--impact` 参数。
+
+RFC 11 状态 FSM：`draft → submitted → reviewing → approved → planning → executing → verifying → closing → closed`，可从任意状态 → `rejected` / `withdrawn`。
+
+### 9. `spec-first defect` ✅ Implemented
+
+缺陷管理（M4 ChangeMgr）。
+
+```bash
+spec-first defect register <featureId> --title "<title>" --severity <S1|S2|S3|S4> --reporter "<reporter>" [--description "<desc>"] [--discovered-in <stage>]
+spec-first defect update <defectId> <status> [--actor <actor>]
+spec-first defect list <featureId>
+spec-first defect get <defectId>
+spec-first defect escape-rate <featureId>
+```
+
+> ⚠️ 严重级别为 `S1/S2/S3/S4`（非 `critical/major/minor`）。
+
+### 10. `spec-first doctor` ✅ Implemented
+
+环境诊断。
+
+```bash
+spec-first doctor
+```
+
+检查项：Node.js 版本（≥20）、npm 可用性、Git 配置、`specs/` 目录状态、CLI 版本。
+
+---
+
+### 11. `spec-first feature` 📋 Planned
+
+Feature 工作区管理（跨 Feature 切换与概览）。
+
+```bash
+spec-first feature list                          # 列出所有 Feature 及阶段状态
+spec-first feature switch <featureId>            # 切换当前工作 Feature
+spec-first feature current                       # 显示当前 Feature
+```
+
+**`list` 输出示例**：
+
+```text
+  ID                          Stage         Health
+  FSREQ-20260209-AUTH-001     04_implement  ██████░░ 72%
+▸ FSREQ-20260209-PAY-001      01_specify    ██░░░░░░ 25%
+  FSREQ-20260208-NOTIFY-001   08_done       ████████ 100%
+```
+
+`▸` 标记当前 Feature。
+
+**状态文件**：`.spec-first/current`（纯文本，存储当前 Feature ID，纳入 `.gitignore`）。
+
+---
+
+## Exit Code 规范
+
+> 以 `src/shared/types.ts` ExitCode enum 为准。
+
+| Code | 常量名 | 含义 |
+|------|--------|------|
+| 0 | `SUCCESS` | 成功 |
+| 1 | `GATE_FAILED` | Gate 校验失败 |
+| 2 | `VALIDATION_ERROR` | 参数/ID 校验失败 |
+| 3 | `CONFIG_ERROR` | 配置错误 |
+| 4 | `IO_ERROR` | 文件 I/O 错误 |
+| 5 | `UNKNOWN_ERROR` | 未知错误 |
+
+---
+
+*aux-02-cli-system.md 完成 — 下一篇：[aux-03-multi-platform.md](aux-03-multi-platform.md)*
