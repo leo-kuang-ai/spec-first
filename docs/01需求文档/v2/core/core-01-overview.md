@@ -19,15 +19,15 @@
 
 > Skill 是"指挥官"，CLI 是"执行者"，人是"决策者"。
 
-**用户入口约束**：用户（人类 + AI Agent）恒通过 `/spec-first:*` Skill 入口操作，**不直接调用 CLI 命令**。CLI 仅作为 Skill 内部实现和 Git/CI Hook 的底层调用目标。纯自动化场景（Hook、CI Pipeline）可直接调用 CLI。
+**用户入口约束**：用户（人类 + AI Agent）恒通过 `/spec-first:*` 统一入口操作（含 Skill 路由与 Runtime 路由），**不直接裸调 CLI 命令**。CLI 仅作为 Skill 内部实现和 Git/CI Hook 的底层调用目标。纯自动化场景（Hook、CI Pipeline）可直接调用 CLI。
 
 ### 变更总览
 
 | 变更类型 | 内容 | 价值 |
 |---------|------|------|
 | **架构升级** | 双层架构：Skill 驱动编排 + CLI 确定性执行 | Skill 负责流程推进，CLI 保证可回放 |
-| **新增** | Skill 指令体系：15 个 Skill 定义（统一 `/spec-first:xxxx`）、5 阶段执行模型、跨平台兼容 | 回答"AI 怎么协作" |
-| **新增** | CLI 命令体系：11 个命令组、7 个核心模块（M1-M7） | 回答"工具怎么用" |
+| **新增** | Skill 指令体系：16 个 Skill 定义（统一 `/spec-first:xxxx`）、6 阶段执行模型（Phase 0-5）、跨平台兼容 | 回答"AI 怎么协作" |
+| **新增** | CLI 命令体系：13 个命令组、7 个核心模块（M1-M7） | 回答"工具怎么用" |
 | **重构** | 主流程 8+2 阶段与 Skill/CLI 的映射关系 | 每个阶段有明确的工具支撑 |
 | **精简** | 产品用例体系从 21 个详述精简为用例清单 + 关键用例详述 | 降低文档维护成本 |
 | **继承** | v6.0 全部冻结决策 + v5.0 核心能力 | 基线一致性 |
@@ -48,7 +48,7 @@
 
 | # | 问题 | 现状痛点 | Spec-First 解法 |
 |---|------|---------|----------------|
-| 1 | **AI 使用能力参差不齐** | 80+ 人团队中约 20% 能熟练使用 AI，剩余 80% 要么不用、要么引入更多 bug；效率差异达 3-5 倍 | **Skill 指令体系**（15 个标准化 `/spec-first:xxxx` Skill）统一 AI 协作入口，将个人能力差异收敛为流程标准化 |
+| 1 | **AI 使用能力参差不齐** | 80+ 人团队中约 20% 能熟练使用 AI，剩余 80% 要么不用、要么引入更多 bug；效率差异达 3-5 倍 | **Skill 指令体系**（16 个标准化 `/spec-first:xxxx` Skill）统一 AI 协作入口，将个人能力差异收敛为流程标准化 |
 | 2 | **团队 AI 使用缺乏标准化** | 5+ 种 AI 使用模式并存，prompt 复用率不足 10%，新人上手周期 2-4 周 | **Skill 指令 + Context Pack**：封装最佳 prompt 和执行流程，自动注入项目上下文 |
 
 **B. 研发质量（3 项）**
@@ -106,8 +106,8 @@
 |------|------|--------|
 | 流程定义 | 8 主阶段 + 2 终态、Gate、横切机制 | 项目管理（排期、资源分配） |
 | 规范标准 | 产出物模板、ID 体系、追踪矩阵 | 具体业务领域建模 |
-| 工具实现 | CLI（11 命令组）+ Skill（15 个） | IDE 插件、Jira 深度定制 |
-| AI 协作 | Skill 执行模型、Context Pack、Session Catchup | AI 模型训练、私有化部署 |
+| 工具实现 | CLI（13 命令组）+ Skill（16 个） | IDE 插件（v7.1 不含，vNext 可选扩展）、Jira 深度定制 |
+| AI 协作 | Skill 执行模型、Context Pack、Session Catchup、confirm_policy（三档确认） | AI 模型训练、私有化部署 |
 | 度量体系 | 覆盖率、合规率、返工率、Gate 通过率 | 人效评估、绩效考核 |
 
 ### 流程适用边界
@@ -155,7 +155,7 @@
 
 ### 产品用例清单
 
-#### A. 主流程用例（8 个）
+#### A. 主流程用例（9 个）
 
 | 用例 ID | 名称 | 主 Actor | 对应阶段 | 对应 Skill/CLI |
 |---------|------|---------|---------|---------------|
@@ -165,6 +165,7 @@
 | UC-004 | 技术调研 | A2 + A6 | 02. Design | `/spec-first:research` |
 | UC-005 | 任务拆解 | A2 + A6 | 03. Plan | `/spec-first:task` + CLI: `spec-first id next TASK <abbr>` |
 | UC-006 | 规范驱动开发 | A3 + A6 | 04. Implement | `/spec-first:code` + CLI: `spec-first matrix check` |
+| UC-020 | 代码评审 | A2 + A3 + A6 | 04. Implement | `/spec-first:code-review` + CLI: `spec-first gate check` |
 | UC-007 | 测试验证 | A4 + A6 | 05. Verify | `/spec-first:test` + CLI: `spec-first metrics coverage` |
 | UC-008 | 归档复盘 | A2 + A6 | 06. Wrap-up | `/spec-first:archive` + CLI: `spec-first gate check` |
 

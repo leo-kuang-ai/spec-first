@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: Auth SMS APIs
+  version: 1.0.0
+paths:
+  /api/auth/sms/send-otp:
+    post:
+      summary: Send OTP
+      responses:
+        '200':
+          description: Sent
+  /api/auth/sms/login:
+    post:
+      summary: Login with OTP
+      responses:
+        '200':
+          description: Logged in

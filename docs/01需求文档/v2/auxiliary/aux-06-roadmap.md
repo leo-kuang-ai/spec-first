@@ -17,9 +17,9 @@
 | M2 TraceEngine | ✅ | ID 注册/校验、追踪矩阵管理、覆盖率计算 |
 | M4 ChangeMgr | ✅ | RFC 状态机 + 缺陷管理（rfc/defect 命令） |
 | M6 MetricsEngine | ✅ | 覆盖率计算 + 度量报告 |
-| CLI 11 个命令组 | ✅ (10/11) | init/id/gate/stage/matrix/metrics/ai/rfc/defect/doctor 已交付，feature 规划中（个别子命令有类型漂移） |
-| 15 个 Skill（统一命名空间） | ✅ | `/spec-first:plan`、`/spec-first:verify`、`/spec-first:orchestrate`、`/spec-first:sync` 等 15 个 Skill 统一 `/spec-first:xxxx` 入口 |
-| Handlebars 模板系统 | ✅ | 6 个模板文件就位 |
+| CLI 13 个命令组 | ✅ (10/13) | init/id/gate/stage/matrix/metrics/ai/rfc/defect/doctor 已交付，feature/commit/golive 规划中（个别子命令有类型漂移） |
+| 16 个 Skill（统一命名空间） | 🟡 | 指令定义已完成；`/spec-first:xxxx` 联调验收进行中 |
+| Handlebars 模板系统 | ✅ | 6+1 个模板文件就位（code-review-report.md.hbs 待创建） |
 | Session hooks + CI 校验 | ✅ | `npm run validate:ai-assets` 可运行 |
 
 ### 在修复（Known Issues）
@@ -34,14 +34,33 @@
 
 | 模块/能力 | 优先级 | 说明 |
 |----------|--------|------|
-| 15 个 `/spec-first:xxxx` Skill 联调验收 | P0 | Skill 初版指令已编写，待联调验收并统一接入 `.claude/commands/spec-first/` 入口 |
+| 16 个 `/spec-first:xxxx` Skill 联调验收 | P0 | Skill 初版指令已编写，待联调验收并统一接入 `.claude/commands/spec-first/` 入口 |
 | npm 仓库分发体系 | P0 | 使用人员仅 npm 安装；内网发布到内网 npm 私有仓库，外网发布到自建外网 npm 仓库 |
 | CLI `feature` 命令组 | P1 | `feature list/switch/current`，支持多 Feature 切换与 `.spec-first/current` 状态管理 |
 | M7 ToolIntegration | P1 | Git Hook 安装 + CI 模板生成 |
 | Hook 化 Gate 双层体系 | P1 | Layer A（AI Runtime）+ Layer B（Git/CI） |
-| Layer 2 多端扩展 | P2 | Azure DevOps 适配、GitLab CI 模板 |
+| CI/CD 平台适配 | P2 | Azure DevOps 适配、GitLab CI 模板（归属 M7 ToolIntegration） |
 | 性能优化 SLA 达标 | P2 | `validateId` < 10ms, `getCoverage` < 50ms, `evaluateGate` < 200ms |
 | 端到端集成测试 | P2 | 核心流程自动化验证 |
+| IDE 插件：ID 自动补全 | P2 | 开发者在 IDE 中输入追踪注释时，模糊搜索并自动补全 FR/TASK/API ID，降低心流中断 |
+
+---
+
+## 公司级上线准入门槛（Go-Live Gates）
+
+> 以下门槛用于判断“是否允许全公司范围推广”，未全部通过前仅允许试点范围使用。
+
+| Gate ID | 准入条件 | 验收标准 | 未达标策略 |
+|---------|---------|---------|-----------|
+| GL-01 | M3 GateEngine 就绪 | Gate 自动条件解析链路完成，`gate check` 在主流程场景通过率达标 | 限制为人工 Gate Owner 放行，禁止自动推进 |
+| GL-02 | M5 AIOrchestrator 稳定 | `ai context/catchup/stats` 命令签名与核心模块一致，`npm run typecheck` 归零 | 降级为 `strict` 确认策略，禁止 `auto` |
+| GL-03 | Context Pack 引用机制可用 | Control + References 协议可用，复杂 Feature 可按需读取并完成恢复 | L 规模 Feature 限制试点，不纳入全面推广 |
+| GL-04 | 端到端质量门禁闭环 | `plan → code → code-review → verify` 核心链路 E2E 通过且可审计 | 仅允许分团队灰度，不允许全量启用 |
+
+**执行规则**：
+
+1. GL-01~GL-04 全部通过，才可进入“公司级默认流程”。
+2. 任一 Gate 回退失败，自动降级到“试点模式 + 人工审查兜底”。
 
 ---
 
@@ -60,7 +79,7 @@
 ### 风险应对原则
 
 1. **渐进式推行** — 先在 1-2 个试点 Feature 验证，再逐步推广
-2. **裁剪优先** — 默认使用最轻量配置（S + I），按需升级
+2. **裁剪优先** — 默认使用最轻量配置（S + N），按需升级
 3. **工具兜底** — 所有人工判断环节都有 CLI 自动化兜底
 4. **快速反馈** — Gate 校验失败时给出明确修复建议，而非仅报错
 
@@ -75,10 +94,10 @@
 | 定位 | 需求规范模板 | CLI 工具链规范 | CLI + Skill 协同基线 | Skill 驱动 + CLI 底层能力 |
 | 架构 | 无 | CLI 单层 | CLI + Skill 双层（明确主权） | 双层架构（Skill 驱动 + CLI 执行）+ M1-M7 模块细化 |
 | 阶段 | 6 阶段 | 8+2 阶段 | 8+2（继承 v5） | 8+2（继承，补终态定义） |
-| ID 体系 | 4 种 | 8 种 | 8 种（继承 v5） | 8 种（继承） |
+| ID 体系 | 4 种 | 8 种 | 8 种（继承 v5） | 6 种（合并 NFR/API/ADR） |
 | 追踪 | 手动矩阵 | 自动化矩阵 + 9 覆盖率 | 继承 v5 | 继承 + 健康分 |
 | Gate | 无 | 8 Gate + SCA | 继承 v5 | 继承 + Hook 化双层体系 |
-| AI 协作 | 无 | Context Pack + Catchup | 3 协同 Skill | 15 Skill（统一 `/spec-first:xxxx`） |
+| AI 协作 | 无 | Context Pack + Catchup | 3 协同 Skill | 16 Skill（统一 `/spec-first:xxxx`） |
 | 变更管理 | 无 | RFC + Defect FSM | 继承 v5 | 继承 |
 | 度量 | 无 | 9 覆盖率 | 继承 v5 | 12 指标 + 健康分 + 瓶颈分析 |
 | 多端 | 无 | 技术端平台规范 | 继承 v5 | 继承 + Layer 2 技术端规范合并 |
@@ -86,11 +105,11 @@
 
 ### v7.1 相对 v6 的核心增量
 
-1. **15 个 Skill 统一命名空间**（全新）— 阶段 ×8 + 编排 ×3 + 工具 ×4（含 `sync`），统一 `/spec-first:xxxx` 入口 + 5 阶段执行模型
+1. **16 个 Skill 统一命名空间**（全新）— 阶段 ×9 + 编排 ×3 + 工具 ×4（含 `code-review`、`sync`），统一 `/spec-first:xxxx` 入口 + 6 阶段执行模型（Phase 0-5）
 2. **双层架构细化** — 在 v6 主权定义基础上，细化 7 个核心模块（M1-M7）和职责边界
 3. **度量体系增强** — 从 9 项覆盖率扩展到 12 项指标 + 健康分 + 瓶颈分析
 4. **Hook 化 Gate 体系**（细化）— Layer A（AI Runtime）+ Layer B（Git/CI）双层 Hook
-5. **Context Pack 标准化**（细化）— YAML 格式定义 + <2KB 约束
+5. **Context Pack 标准化**（细化）— Control + References 协议（`control <2KB` + 按需读取）
 6. **终态定义补全** — 08_done / 09_cancelled 的进入条件、审计要求、不可逆规则
 7. **As-Is/To-Be 标签** — 每项能力标注实际状态，避免预期失真
 
@@ -118,7 +137,7 @@
 - `docs/01需求文档/spec-first-v7.md` — v7.1 完整规范（本拆分文档的源文件）
 - `docs/01需求文档/spec-first-v5.md` — v5 完整规范（前序版本）
 - `docs/02技术方案/` — 技术设计文档
-- `.claude/commands/spec-first/` — 15 个 Skill 指令文件（统一 `/spec-first:xxxx` 入口）
+- `.claude/commands/spec-first/` — 16 个 Skill 指令文件（统一 `/spec-first:xxxx` 入口）
 
 ---
 

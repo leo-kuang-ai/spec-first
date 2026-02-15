@@ -1,9 +1,26 @@
-# Spec-First 研发流程规范 v4.1
+# Spec-First 研发流程规范 v4.2
 
-> **版本**: v4.1 | **更新**: 2026-02-07 | **作用域**: Feature 级别
+> **版本**: v4.2 | **更新**: 2026-02-08 | **作用域**: Feature 级别
 > **参考标准**: Spec-Kit、Autospec、SpecifyPlus、TypeSpec、ISO/IEC 12207、V-Model、SAFe、CMMI REQM
 > **核心理念**: 规范即契约、规范即真理、全链路可追踪
-> **基于**: v3.0 + v2.0 内容补回 + 架构完善 + 实操落地增强
+> **基于**: v4.1 + 优先集成清单（四工程能力融合）
+
+---
+
+## v4.2 变更摘要
+
+> 基于优先集成清单，融合四工程能力（planning-with-files / omo-skills / myclaude / everything-claude-code），将"纸面规范"升级为"可执行运行时"。
+
+| 变更类型 | 内容 | 集成项 | 优先级 |
+|---------|------|--------|-------|
+| **新增** | 三文件运行态：`task_plan.md` / `findings.md` / `progress.md` 纳入产出物标准 | P0-三文件 | P0 |
+| **新增** | Hook 化 Gate：PreToolUse / PostToolUse / Stop 三类 Hook 实现 Gate 自动阻断 | P0-Hook Gate | P0 |
+| **新增** | 会话恢复机制：Session Catchup 确保 AI 会话中断后可恢复上下文和追踪产物 | P0-Session Catchup | P0 |
+| **新增** | AI 协作编排规范（附录）：代理路由矩阵 + Context Pack 标准 | P1-代理路由/Context Pack | P1 |
+| **增强** | 并行执行 + Worktree 隔离：03 Plan 和 04 Implement 阶段补充执行模型 | P1-并行执行 | P1 |
+| **增强** | 落地路线图：三步与 P0/P1/P2 集成优先级对齐 | — | — |
+| **新增** | 度量体系增强：新增返工率、Gate 首次通过率、缺陷逃逸率 | 流程监控 | P1 |
+| **预留** | 规则分层（common + language/platform）、Hook/插件回归测试 | P2 | P2 |
 
 ---
 
@@ -59,6 +76,7 @@
 - [产出物标准化](#产出物标准化)
 - [流程裁剪指南](#流程裁剪指南v4-新增)
 - [工具链映射](#工具链映射)
+- [AI 协作编排规范（v4.2 新增）](#ai-协作编排规范v42-新增)
 - [落地路线图](#落地路线图3-步)
 - [版本演进映射](#版本演进映射v2--v3--v4)
 - [风险提醒](#风险提醒)
@@ -406,6 +424,18 @@ paths:
 
 **解读**：孤儿项率 > 0% = 存在未与需求关联的产物，是反向合规率的综合视角补充。
 
+#### 流程健康度指标 (v4.2 新增)
+
+| 指标 | 公式 | 采集方式 | 目标 |
+|------|------|---------|------|
+| **返工率** | (Gate 驳回次数 + PR Request Changes 次数) / (Gate 触发总数 + PR 总数) × 100% | CI/CD 流水线统计 | < 10% |
+| **Gate 首次通过率** | 首次触发即通过的 Gate 次数 / Gate 触发总数 × 100% | 流程引擎统计 | > 85% |
+| **缺陷逃逸率** | 生产环境发现的 Bug 数 / (生产 Bug + 测试 Bug) × 100% | Bug 跟踪系统 | < 2% |
+
+**解读**：
+- **返工率**：反映上游（Specify/Design/Plan）的质量。如果 Implement 阶段返工高，通常是 Specify 或 Design 没做好。
+- **Gate 首次通过率**：反映团队对准出标准的理解和执行力。低通过率意味着"碰运气"心态严重。
+
 ### 追踪链路全景
 
 ```
@@ -431,8 +461,8 @@ paths:
 | 维度 | 内容 |
 |------|------|
 | **目标** | 启动 Feature，确定 Mode/Size/涉及端，创建工作空间 |
-| **活动** | 读取 Constitution → 确定 Mode（N/I）→ 确定 Size（S/M/L）→ 确定涉及端 → 创建 Feature 目录 |
-| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms） |
+| **活动** | 读取 Constitution → 确定 Mode（N/I）→ 确定 Size（S/M/L）→ 确定涉及端 → 创建 Feature 目录 → **初始化运行态三文件** |
+| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `progress.md`（初始化） |
 | **Exit Gate** | 目录结构就绪，Mode/Size/涉及端已确认并记录 |
 
 **Mode I 额外活动**：定位历史 Feature 产物，读取已有 spec/plan/contracts。
@@ -596,6 +626,18 @@ paths:
 - Git Commit 格式：`[TASK-<FEAT>-NNN] 提交描述`
 - PR 描述必须包含：`Implements: TASK-<FEAT>-NNN, TASK-<FEAT>-NNN`
 
+**并行执行与隔离**（v4.2 新增）：
+
+- 标记 `[P]` 的 TASK 可并行开发，每个并行 TASK 使用独立 Git 分支
+- 高风险并行任务（涉及共享模块或数据模型变更）推荐使用 Git Worktree 隔离，避免工作区冲突
+- 并行 TASK 合并前必须通过增量 Spec-Consistency-Analysis
+- AI 辅助场景下，可通过 codeagent-wrapper 等工具实现多 Agent 并行执行
+
+**过程记录**（v4.2 新增）：
+
+- 每个 TASK 完成后更新 `progress.md`，记录完成状态和关键决策
+- 开发过程中的技术发现记录到 `findings.md`
+
 **Code Review 标准**：
 
 - 功能正确性：是否满足 AC
@@ -681,6 +723,9 @@ paths:
 | 05 Verify | `reports/uat-signoff.md` | 验收签核记录已归档 |
 | 横切 C | `rfc/*.rfc.md` | 所有变更请求已闭合 |
 | 06 Wrap-up | `retro.md` | 复盘完成，Action Items 已提炼 |
+| 全阶段（v4.2） | `task_plan.md` | 规划记录完整，与 tasks.md 一致 |
+| 全阶段（v4.2） | `findings.md` | 过程发现已归档，关键发现已反馈到产出物 |
+| 全阶段（v4.2） | `progress.md` | 进度记录完整，所有阶段有连续记录 |
 
 **完成后** → 交由 DevOps 系统执行发布流程
 
@@ -709,6 +754,18 @@ paths:
 - **Gate 与 SCA 的关系**：Quality Gate 的"追踪校验项"通过调用 Spec-Consistency-Analysis（横切机制 B）执行，校验结果纳入 Gate 放行判定。两者是调用关系而非独立并行
 - 追踪覆盖率校验可由工具自动化执行
 - Gate Owner 负责最终放行决策；角色到人的映射见 `constitution.md`
+
+**Hook 化 Gate 自动执行**（v4.2 新增）：
+
+Gate 校验通过 Claude Code Hooks 实现自动阻断，分三类 Hook：
+
+| Hook 类型 | 触发时机 | Gate 校验内容 | 阻断行为 |
+|----------|---------|-------------|---------|
+| PreToolUse | AI 执行写操作前 | 当前阶段 Gate 前置条件是否满足 | 条件不满足时阻止写操作 |
+| PostToolUse | AI 执行写操作后 | 产出物是否符合当前阶段规范 | 不符合时提示修正 |
+| Stop | AI 会话结束时 | 完成度校验（三文件 + 追踪产物同步） | 输出完成度报告 |
+
+**执行层次**：Hook 自动校验 → 不通过则阻断 → Gate Owner 人工终审放行。Hook 是 Gate 的"自动化执行层"，不替代人工审核。
 
 ---
 
@@ -842,6 +899,9 @@ API 契约（`contracts/`）是前后端协作的唯一真理源：
 | 变更请求 | `rfc/NNN-*.rfc.md` | `rfc/001-add-mfa.rfc.md` |
 | 回归报告 | `regression-report.md` | Mode I 专属 |
 | 复盘报告 | `retro.md` | — |
+| **过程规划**（v4.2） | `task_plan.md` | 运行态三文件之一 |
+| **过程发现**（v4.2） | `findings.md` | 运行态三文件之一 |
+| **过程进度**（v4.2） | `progress.md` | 运行态三文件之一 |
 
 ### 目录结构
 
@@ -877,7 +937,10 @@ project-root/
         ├── rfc/                       # 变更请求
         │   └── NNN-*.rfc.md
         ├── regression-report.md       # Mode I 专属
-        └── retro.md                   # 复盘报告
+        ├── retro.md                   # 复盘报告
+        ├── task_plan.md               # v4.2: 过程规划（运行态三文件）
+        ├── findings.md                # v4.2: 过程发现（运行态三文件）
+        └── progress.md                # v4.2: 过程进度（运行态三文件）
 ```
 
 ---
@@ -1036,6 +1099,68 @@ Docs:  2 files  +89   -12
 2. 分支命名遵循 `feature/<FR-ID>-<description>` 规范，确保需求 ID 可自动解析
 3. `.spec-first/.baseline` 应加入 `.gitignore`
 
+### Claude Code Hooks — Gate 自动化（v4.2 新增）
+
+> 将 Quality Gate 从"人工检查"升级为"Hook 自动阻断 + 人工终审"双轨制。
+
+**Hook 配置总览**：
+
+| Hook 类型 | 触发时机 | 校验内容 | 对应 Gate |
+|----------|---------|---------|----------|
+| PreToolUse | AI 执行文件写入前 | 当前阶段是否已完成前置 Gate | 全阶段 |
+| PostToolUse | AI 执行文件写入后 | 产出物 ID 格式、traces 完整性 | 01-05 |
+| Stop | AI 会话结束时 | 三文件完成度 + 追踪产物同步状态 | 全阶段 |
+
+**PreToolUse 校验规则示例**：
+
+```yaml
+# 阻止在 Specify 阶段未完成时直接写 design.md
+- hook: PreToolUse
+  condition: "tool == 'Write' && path.endsWith('design.md')"
+  check: "spec.md exists && all FR have IDs"
+  action: block_with_message
+```
+
+**Stop Hook 完成度校验**：
+
+```text
+AI 会话结束时自动执行：
+1. 检查 task_plan.md 是否与 tasks.md 同步
+2. 检查 progress.md 是否记录了本次会话的工作内容
+3. 检查 findings.md 是否记录了新发现（如有）
+4. 计算当前阶段追踪覆盖率
+5. 输出完成度报告到终端
+```
+
+### 会话恢复机制 — Session Catchup（v4.2 新增）
+
+> AI 辅助开发中，会话中断是常态（上下文窗口限制、`/clear`、IDE 重启）。恢复后必须同步追踪产物。
+
+**触发条件**：
+
+- `/clear` 命令执行后
+- AI 会话因上下文窗口限制被截断
+- IDE 重启或网络中断后重新连接
+
+**恢复流程**：
+
+```text
+会话恢复触发
+  → 读取 task_plan.md（当前规划状态）
+  → 读取 progress.md（已完成进度）
+  → 读取 findings.md（已有发现）
+  → 读取 traceability-matrix.md（追踪状态）
+  → 定位当前阶段和当前 TASK
+  → 输出恢复摘要到终端
+  → 继续执行
+```
+
+**恢复后强制校验**：
+
+- 三文件与实际产出物是否一致（如 progress.md 记录已完成但代码未提交）
+- 追踪矩阵是否与最新代码同步
+- 不一致项必须在恢复后立即修正
+
 ### Spec-as-Code 实践
 
 > 补回 v2 内容。所有规范文档存放在 Git 仓库中，变更可通过 `git diff` 追溯。
@@ -1050,41 +1175,125 @@ git diff specs/001-user-auth/contracts/user-api.yaml
 
 ---
 
+## AI 协作编排规范（v4.2 新增）
+
+> 将四工程能力（planning-with-files / omo-skills / myclaude / everything-claude-code）与 7+3 流程对齐，定义 AI Agent 在各阶段的角色、输入输出和协作模式。
+
+### 代理路由矩阵
+
+不同任务类型由不同 AI Agent 承担，避免"万能 Agent"导致的质量下降。
+
+| 阶段 | 任务类型 | 推荐 Agent | 输入 | 输出 | 来源工程 |
+|------|---------|-----------|------|------|---------|
+| 01 Specify | 需求分析 | oracle | 业务意图描述 | `spec.md` + ID 分配 | omo-skills |
+| 02 Design | 架构设计 | sisyphus | `spec.md` + `constitution.md` | `design.md` + `contracts/` | omo-skills |
+| 02 Design | 外部调研 | librarian | 技术选型问题 | `findings.md` 更新 | omo-skills |
+| 03 Plan | 任务编排 | do | `spec.md` + `design.md` | `tasks.md` + 追踪矩阵 | myclaude |
+| 04 Implement | 代码生成 | codeagent-wrapper | 单个 TASK + Context Pack | 代码 + 单元测试 | myclaude |
+| 04 Implement | 代码搜索 | explore | 代码库查询 | 搜索结果 + 上下文 | omo-skills |
+| 05 Verify | 测试生成 | 默认 Agent | `spec.md` AC + 代码 | TC + 测试报告 | — |
+| 06 Wrap-up | 文档生成 | document-writer | 全阶段产出物 | README + API 文档 | omo-skills |
+
+**路由规则**：
+
+1. **默认最小集**：Size S 场景仅使用默认 Agent，不启用多代理路由
+2. **按需升级**：Size M/L 或跨端场景启用专业 Agent 分工
+3. **人类终审**：所有 Agent 产出物必须经人类 Sign-off 后方可进入下一阶段
+
+### Context Pack 标准
+
+跨 Agent 委派时，必须携带统一格式的上下文包，确保任意 Agent 可恢复完整语境。
+
+```yaml
+# context-pack.yaml — 跨 Agent 统一输入格式
+context_pack:
+  version: "1.0"
+  feature_meta:
+    id: "001-user-auth"
+    title: "用户认证模块"
+    mode: N            # N=新建 / I=迭代
+    size: S            # S/M/L
+    platforms: [H5, Backend]
+  artifacts:
+    spec: "specs/001-user-auth/spec.md"
+    design: "specs/001-user-auth/design.md"
+    tasks: "specs/001-user-auth/tasks.md"
+    matrix: "specs/001-user-auth/traceability-matrix.md"
+    task_plan: "specs/001-user-auth/task_plan.md"
+    progress: "specs/001-user-auth/progress.md"
+    findings: "specs/001-user-auth/findings.md"
+  constitution: "constitution.md"
+  current_phase: "04-implement"
+  current_task: "TASK-AUTH-001"
+```
+
+**强制约束**：
+
+- 每次 Agent 委派必须生成 Context Pack，禁止口头传递上下文
+- Context Pack 中的 `artifacts` 路径必须指向实际存在的文件
+- `current_phase` 和 `current_task` 必须与 `progress.md` 记录一致
+
+### 并行执行模型
+
+Size M/L 场景下，独立 TASK 可并行执行以缩短周期。
+
+| 条件 | 执行模式 | 隔离方式 |
+|------|---------|---------|
+| TASK 间无依赖 + 无文件交叉 | 并行执行 | Git Worktree 隔离 |
+| TASK 间无依赖 + 有文件交叉 | 串行执行 | 主分支顺序提交 |
+| TASK 间有依赖 | 按依赖顺序串行 | 主分支顺序提交 |
+
+**并行执行前置条件**：
+
+1. `tasks.md` 中已标记 `parallel: true` 且 `depends_on` 为空
+2. 文件变更范围无交叉（通过 `git diff --stat` 预判）
+3. 每个并行 TASK 在独立 Worktree 中执行，完成后合并回主分支
+
+---
+
 ## 落地路线图（3 步）
 
 > v4 从 v3 的 5 步精简为 3 步，降低推行阻力。
 
-### 第一步：MVP — 跑通 7 阶段 + ID 体系 + 追踪矩阵
+### 第一步：MVP — 跑通 7 阶段 + ID 体系 + 追踪矩阵（对应 P0，1-2 周）
 
-用一个真实 S 规模 Feature 走完 00-06 全流程，验证流程骨架可行性。
+用一个真实 S 规模 Feature 走完 00-06 全流程，验证流程骨架 + 运行态机制可行性。
 
-| 动作 | 验证点 |
-|------|-------|
-| 选择一个 S 规模 Feature | 覆盖所有 7 个阶段，试错成本低 |
-| 按阶段产出标准化文档 | 产出物模板可用 |
-| 为 FR/NFR/TASK/TC 分配 ID | ID 命名规则可执行 |
-| 手动维护追踪矩阵 | 矩阵格式合理、维护成本可接受 |
-| 在 Plan/Verify Gate 试行覆盖率校验 | 能发现遗漏需求和过度实现 |
+| 动作 | 验证点 | 集成项 |
+|------|-------|-------|
+| 选择一个 S 规模 Feature | 覆盖所有 7 个阶段，试错成本低 | — |
+| 按阶段产出标准化文档 | 产出物模板可用 | — |
+| 为 FR/NFR/TASK/TC 分配 ID | ID 命名规则可执行 | — |
+| 手动维护追踪矩阵 | 矩阵格式合理、维护成本可接受 | — |
+| 在 Plan/Verify Gate 试行覆盖率校验 | 能发现遗漏需求和过度实现 | — |
+| **初始化三文件运行态** | 每个 Feature 目录含 `task_plan.md` / `findings.md` / `progress.md` | P0 三文件 |
+| **部署最小 Hook Gate** | Pre-commit ID 格式校验 + Stop 完成度校验可自动执行 | P0 Hook 化 Gate |
+| **验证会话恢复** | `/clear` 后可通过 Session Catchup 恢复上下文 | P0 Session Catchup |
 
-### 第二步：增强 — 自动化校验 + Change-Management
+### 第二步：增强 — 自动化校验 + Change-Management + AI 协作（对应 P1，3-4 周）
 
-| 动作 | 验证点 |
-|------|-------|
-| 基于 ID 体系编写校验脚本 | 脚本可稳定执行 |
-| 在 5 个时机试运行一致性校验 | 能发现真实不一致问题 |
-| 集成到 CI Pipeline | 自动化校验可用 |
-| 定义 RFC 模板和变更分级 | 变更流程标准化 |
-| 基于追踪矩阵做 Impact Analysis | 能自动定位受影响产物 |
+| 动作 | 验证点 | 集成项 |
+|------|-------|-------|
+| 基于 ID 体系编写校验脚本 | 脚本可稳定执行 | — |
+| 在 5 个时机试运行一致性校验 | 能发现真实不一致问题 | — |
+| 集成到 CI Pipeline | 自动化校验可用 | — |
+| 定义 RFC 模板和变更分级 | 变更流程标准化 | — |
+| 基于追踪矩阵做 Impact Analysis | 能自动定位受影响产物 | — |
+| **定义 Context Pack 标准** | 跨 Agent 委派携带统一上下文包，可复现同等结果 | P1 Context Pack |
+| **建立代理路由矩阵** | 研究/架构/实现/文档四类任务有明确 Agent 选择规则 | P1 代理路由 |
+| **启用并行执行 + Worktree 隔离** | 可并行 TASK 默认并行，高风险 TASK 默认 Worktree | P1 并行执行 |
 
-### 第三步：全量 — 多端扩展 + 双模式 + AI 统计
+### 第三步：全量 — 多端扩展 + 双模式 + 治理深化（对应 P2，5-8 周）
 
-| 动作 | 验证点 |
-|------|-------|
-| 各端 Tech Lead 补录 platform-rules | 端规范模板可用 |
-| 试跑 Mode I + 多端 Feature | 合并流程可行 |
-| 追踪矩阵在多端场景下可用 | 跨端 FR 追踪无遗漏 |
-| 部署 AI 编码统计 Hook | 统计数据可采集 |
-| 全团队推行 | 流程成为日常 |
+| 动作 | 验证点 | 集成项 |
+|------|-------|-------|
+| 各端 Tech Lead 补录 platform-rules | 端规范模板可用 | — |
+| 试跑 Mode I + 多端 Feature | 合并流程可行 | — |
+| 追踪矩阵在多端场景下可用 | 跨端 FR 追踪无遗漏 | — |
+| 部署 AI 编码统计 Hook | 统计数据可采集 | — |
+| 全团队推行 | 流程成为日常 | — |
+| **规则分层体系** | 规则可按端/语言复用，冲突规则可定位 | P2 规则分层 |
+| **Hook/插件回归测试** | hooks 与 plugin schema 变更具备自动化回归测试 | P2 回归测试 |
 
 ---
 
@@ -1193,13 +1402,15 @@ v4 内容量进一步增加，切忌一次性全量推行。
 |------|------|------|
 | `dual-mode-design.md` | 双模式 + 多端扩展详细设计 | 已完成 |
 | `review-spec-first-v2.md` | v2.0 深度审查报告（13 项改进） | 已完成 |
+| `spec-first-v4-优先集成清单.md` | 四工程集成优先级与验收标准 | 已完成 |
+| `../02技术方案/sdd-benchmark-analysis.md` | SDD 业界对标分析与端到端可行性评估 | 已完成 |
 | `spec-first-v2.md` | v2.0 原始文档（历史参考） | 归档 |
 | `spec-first-v3.md` | v3.0 文档（历史参考） | 归档 |
 
 ---
 
 **作者**: Leo (况雨平)
-**文档版本**: v4.1
-**创建日期**: 2026-02-07
-**基于版本**: v3.0 + v2.0
-**关联文档**: dual-mode-design.md, review-spec-first-v2.md
+**文档版本**: v4.2
+**创建日期**: 2026-02-08
+**基于版本**: v3.0 + v2.0 + 优先集成清单
+**关联文档**: dual-mode-design.md, review-spec-first-v2.md, spec-first-v4-优先集成清单.md, sdd-benchmark-analysis.md

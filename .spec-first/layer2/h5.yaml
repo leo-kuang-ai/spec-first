@@ -1,0 +1,27 @@
+platform: h5
+name: H5 / Web Mobile
+description: Mobile web application standard
+gate_conditions:
+  04_implement:
+    - id: G-H5-LINT
+      description: ESLint & Stylelint pass
+      command: npm run lint
+    - id: G-H5-COMPAT
+      description: Browser compatibility check
+      command: npm run compat-check
+  05_verify:
+    - id: G-H5-LIGHTHOUSE
+      description: Lighthouse score > 80
+      command: npm run lighthouse
+extra_deliverables:
+  02_design:
+    - contracts/api-schema.yaml
+  07_release:
+    - reports/bundle-analysis.md
+quality_thresholds:
+  bundle_size_main:
+    value: 200kb
+    direction: lower_is_better
+  fcp_time:
+    value: 1500ms
+    direction: lower_is_better

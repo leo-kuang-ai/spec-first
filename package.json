@@ -1,0 +1,55 @@
+{
+  "name": "spec-first",
+  "version": "0.1.0",
+  "description": "Specification-driven development process engine for AI-era software development",
+  "type": "module",
+  "bin": {
+    "spec-first": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "tsc --noEmit",
+    "bench": "vitest bench"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "spec-first",
+    "specification",
+    "traceability",
+    "development-process"
+  ],
+  "license": "MIT",
+  "files": [
+    "dist",
+    "skills",
+    "templates",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^1.6.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.1"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.0",
+    "js-yaml": "^4.1.0"
+  }
+}

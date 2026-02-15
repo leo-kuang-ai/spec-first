@@ -1,0 +1,30 @@
+{
+  "name": "vscode-spec-first",
+  "displayName": "Spec-First ID Completion",
+  "description": "ID auto-completion and navigation for Spec-First projects",
+  "version": "0.1.0",
+  "publisher": "spec-first",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": [
+    "workspaceContains:.spec-first/config.yaml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "specFirst.refreshIds",
+        "title": "Spec-First: Refresh ID Cache"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,172 @@
+/**
+ * 追踪矩阵管理
+ * 矩阵的读取、解析、完整性校验、导出
+ */
+import { join } from 'node:path';
+import type { MatrixRow, MatrixStatus, IdType } from '../../shared/types.js';
+import { readMarkdown, writeMarkdown, exists } from '../../shared/fs-utils.js';
+import { validateId } from './id-validator.js';
+
+/** 矩阵校验结果 */
+export interface MatrixCheckResult {
+  total: number;
+  orphans: MatrixRow[];
+  brokenChains: Array<{ frId: string; missing: string[] }>;
+  warnings: string[];
+}
+
+/** 解析矩阵 Markdown 表格为结构化数据 */
+export function parseMatrix(featureId: string, projectRoot: string): MatrixRow[] {
+  const matrixPath = getMatrixPath(projectRoot, featureId);
+  if (!exists(matrixPath)) return [];
+
+  const content = readMarkdown(matrixPath);
+  return parseMatrixContent(content);
+}
+
+/** 校验矩阵完整性：孤儿项 + 断链 */
+export function checkMatrix(featureId: string, projectRoot: string): MatrixCheckResult {
+  const rows = parseMatrix(featureId, projectRoot);
+  const idSet = new Set(rows.map(r => r.id));
+  const warnings: string[] = [];
+
+  // 孤儿项：非 FR/Feature 类型且无 upstream
+  const orphans = rows.filter(r =>
+    r.type !== 'Feature' && r.type !== 'FR' && (!r.upstream || r.upstream.length === 0),
+  );
+  for (const o of orphans) {
+    warnings.push(`Orphan: ${o.id} has no upstream reference`);
+  }
+
+  // 断链：FR 无 DS/TASK/TC downstream
+  const frRows = rows.filter(r => r.type === 'FR');
+  const brokenChains: MatrixCheckResult['brokenChains'] = [];
+  for (const fr of frRows) {
+    const missing: string[] = [];
+    const hasDs = rows.some(r => r.type === 'DS' && r.upstream?.includes(fr.id));
+    const hasTask = rows.some(r => r.type === 'TASK' && r.upstream?.includes(fr.id));
+    const hasTc = rows.some(r => r.type === 'TC' && r.upstream?.includes(fr.id));
+    if (!hasDs) missing.push('DS');
+    if (!hasTask) missing.push('TASK');
+    if (!hasTc) missing.push('TC');
+    if (missing.length > 0) {
+      brokenChains.push({ frId: fr.id, missing });
+      warnings.push(`Broken chain: ${fr.id} missing ${missing.join(', ')} mapping`);
+    }
+  }
+
+  return { total: rows.length, orphans, brokenChains, warnings };
+}
+
+/** 导出矩阵为 Markdown 或 YAML */
+export function exportMatrix(
+  featureId: string,
+  projectRoot: string,
+  format: 'markdown' | 'yaml' = 'markdown',
+): string {
+  const rows = parseMatrix(featureId, projectRoot);
+
+  if (format === 'yaml') {
+    return exportAsYaml(rows);
+  }
+  return exportAsMarkdown(rows);
+}
+
+/** 更新矩阵中某行的状态 */
+export function updateMatrixRow(
+  featureId: string,
+  projectRoot: string,
+  id: string,
+  updates: Partial<Pick<MatrixRow, 'status' | 'title' | 'upstream' | 'downstream'>>,
+): void {
+  const matrixPath = getMatrixPath(projectRoot, featureId);
+  const rows = parseMatrix(featureId, projectRoot);
+  const idx = rows.findIndex(r => r.id === id);
+  if (idx === -1) throw new Error(`ID not found in matrix: ${id}`);
+
+  if (updates.status) rows[idx].status = updates.status;
+  if (updates.title) rows[idx].title = updates.title;
+  if (updates.upstream) rows[idx].upstream = updates.upstream;
+  if (updates.downstream) rows[idx].downstream = updates.downstream;
+
+  writeMarkdown(matrixPath, rowsToMarkdown(rows));
+}
+
+// ─── 私有辅助函数 ─────────────────────────────────────────
+
+function getMatrixPath(projectRoot: string, featureId: string): string {
+  return join(projectRoot, 'specs', featureId, 'traceability-matrix.md');
+}
+
+/** 解析 Markdown 表格内容为 MatrixRow[] */
+function parseMatrixContent(content: string): MatrixRow[] {
+  const rows: MatrixRow[] = [];
+
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| ID')) {
+      continue;
+    }
+
+    // slice(1, -1) 去掉首尾空串，保留中间空单元格
+    const cells = trimmed.split('|').map(c => c.trim()).slice(1, -1);
+    if (cells.length < 4) continue;
+
+    const id = cells[0];
+    const validation = validateId(id);
+    const type: IdType = validation.type ?? 'Feature';
+    const title = cells[2] ?? '';
+    const status = (cells[3] ?? 'Planned') as MatrixStatus;
+    const upstream = parseRefList(cells[4]);
+    const downstream = parseRefList(cells[5]);
+
+    // 提取 NFR 标签
+    let nfrTag: string | undefined;
+    const nfrMatch = title.match(/\[NFR:(\w+)\]/);
+    if (nfrMatch) nfrTag = nfrMatch[1];
+
+    rows.push({ id, type, title, status, upstream, downstream, nfrTag });
+  }
+
+  return rows;
+}
+
+/** 解析引用列表（逗号分隔） */
+function parseRefList(cell: string | undefined): string[] | undefined {
+  if (!cell || !cell.trim()) return undefined;
+  return cell.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+/** MatrixRow[] → Markdown 表格 */
+function rowsToMarkdown(rows: MatrixRow[]): string {
+  const header = '| ID | Type | Title | Status | Upstream | Downstream |\n'
+    + '|----|------|-------|--------|----------|------------|\n';
+
+  const body = rows.map(r => {
+    const up = r.upstream?.join(', ') ?? '';
+    const down = r.downstream?.join(', ') ?? '';
+    return `| ${r.id} | ${r.type} | ${r.title} | ${r.status} | ${up} | ${down} |`;
+  }).join('\n');
+
+  return header + body + '\n';
+}
+
+/** MatrixRow[] → YAML 格式 */
+function exportAsYaml(rows: MatrixRow[]): string {
+  const lines: string[] = ['matrix:'];
+  for (const r of rows) {
+    lines.push(`  - id: "${r.id}"`);
+    lines.push(`    type: "${r.type}"`);
+    lines.push(`    title: "${r.title}"`);
+    lines.push(`    status: "${r.status}"`);
+    if (r.upstream?.length) lines.push(`    upstream: [${r.upstream.map(u => `"${u}"`).join(', ')}]`);
+    if (r.downstream?.length) lines.push(`    downstream: [${r.downstream.map(d => `"${d}"`).join(', ')}]`);
+    if (r.nfrTag) lines.push(`    nfrTag: "${r.nfrTag}"`);
+  }
+  return lines.join('\n') + '\n';
+}
+
+/** MatrixRow[] → Markdown（导出用，同 rowsToMarkdown） */
+function exportAsMarkdown(rows: MatrixRow[]): string {
+  return rowsToMarkdown(rows);
+}

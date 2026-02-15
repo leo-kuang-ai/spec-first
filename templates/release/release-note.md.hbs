@@ -1,0 +1,30 @@
+# Release Note — {{featureId}}
+
+> **版本**: {{version}}
+> **发布时间**: {{timestamp}}
+> **负责人**: {{author}}
+
+## 变更摘要
+
+{{summary}}
+
+## 影响范围
+
+- **平台**: {{#each platforms}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+- **模块**: {{#each modules}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+
+## 变更列表
+
+{{#each changes}}
+- [{{this.type}}] {{this.description}}{{#if this.id}} ({{this.id}}){{/if}}
+{{/each}}
+
+## 已知问题
+
+{{#if knownIssues}}
+{{#each knownIssues}}
+- {{this}}
+{{/each}}
+{{else}}
+无
+{{/if}}

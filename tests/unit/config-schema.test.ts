@@ -1,0 +1,46 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadConfig, resetConfigCache, getConfigValue } from '../../src/shared/config-schema.js';
+
+const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-config');
+const SPEC_DIR = join(TMP, '.spec-first');
+
+beforeEach(() => {
+  mkdirSync(SPEC_DIR, { recursive: true });
+  resetConfigCache();
+});
+
+afterEach(() => {
+  rmSync(TMP, { recursive: true, force: true });
+  resetConfigCache();
+});
+
+describe('loadConfig', () => {
+  it('should return defaults when config.yaml missing', () => {
+    const cfg = loadConfig(TMP);
+    expect(cfg.catchup.trigger).toBe('prompt');
+    expect(cfg.context.token_budget).toBe(16000);
+    expect(cfg.gate.pilot_mode).toBe(false);
+  });
+
+  it('should merge user values with defaults', () => {
+    writeFileSync(join(SPEC_DIR, 'config.yaml'), 'gate:\n  pilot_mode: false\n', 'utf-8');
+    const cfg = loadConfig(TMP);
+    expect(cfg.gate.pilot_mode).toBe(false);
+    expect(cfg.catchup.trigger).toBe('prompt');
+  });
+
+  it('should reject out-of-range token_budget', () => {
+    writeFileSync(join(SPEC_DIR, 'config.yaml'), 'context:\n  token_budget: 100\n', 'utf-8');
+    expect(() => loadConfig(TMP)).toThrow('token_budget must be 8000-64000');
+  });
+});
+
+describe('getConfigValue', () => {
+  it('should return typed config section', () => {
+    const cfg = loadConfig(TMP);
+    const gate = getConfigValue(cfg, 'gate');
+    expect(gate.pilot_mode).toBe(false);
+  });
+});

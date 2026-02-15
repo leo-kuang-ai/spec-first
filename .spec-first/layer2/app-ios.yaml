@@ -1,0 +1,24 @@
+platform: app-ios
+name: iOS Native
+description: Native iOS application standard
+gate_conditions:
+  04_implement:
+    - id: G-IOS-LINT
+      description: SwiftLint pass
+      command: swiftlint
+  05_verify:
+    - id: G-IOS-TEST
+      description: XCTest pass
+      command: xcodebuild test
+extra_deliverables:
+  02_design:
+    - ui-design.sketch
+  07_release:
+    - reports/ipa-size.md
+quality_thresholds:
+  app_size_download:
+    value: 50mb
+    direction: lower_is_better
+  startup_time:
+    value: 800ms
+    direction: lower_is_better

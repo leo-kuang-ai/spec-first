@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.4.3 2026-02-14 Leo: FSREQ-20260209-AUTH-001 邮箱登录扩展（RFC-002）— FR-AUTH-003 + DS-AUTH-005/006 + API-AUTH-003/004 + 6 任务 + 3 测试用例 + OpenAPI 契约 + 追踪矩阵更新
+- v0.4.2 2026-02-14 Leo: Skill 审查报告 P0~P2 全量修复 — P0-4 legacy 隔离至 _legacy/、P0-5 dispatcher 移除 init/doctor、P0-1 五个 Skill id generate→id next、P0-2 matrix update CLI 命令补齐、P0-3 AGENTS.md 26 处命令名修正、P1-1~P1-5 执行模型 6 阶段/Stage×Skill 映射/ID 类型/Gate 结果/defect 语义映射修正、P2-1~P2-3 init 参数格式/tasks.md→task_plan.md/4 个 Skill 产出物路径对齐 (user-visible)
+
+- v0.4.1 2026-02-14 Leo: Skill 审查报告合并 — 交叉验证 review-skills-2026-02-14.md，新增 P0-4（3 个 skillName 冲突致 Skill 不可达）+ P0-5（2 个 Skill 被 RUNTIME_COMMANDS 覆盖），综合可用率 38%
+- v0.4.1 2026-02-14 Leo: 开发任务文档 P2 修复 — Phase B CLI 命令数区分 14 个 CLI 命令 + 1 个 Skill Runtime 入口（头部+总览标题同步）
+- v0.4.1 2026-02-14 Leo: 开发任务文档 P1 修复 — README 命令组数 13→12、模板数 7→12、Skill 目录补充 legacy 说明；T-AM1-002/T-AM1-004 补充软依赖标注；T-BSK-004 补充 legacy Skill 处置说明
+- v0.4.1 2026-02-14 Leo: 开发任务文档 P0 修复 — 5 处产出物文件名与实际代码对齐（gate-evaluator/golive/rollback/context-pack/context-slicing）+ golive CLI 归属修正（集成在 gate.ts）+ Phase A CLI 命令数标题 20→22
+- v0.4.0 2026-02-11 Leo: P0 稳定性修复 — rollback SHA 校验、Layer2 YAML schema/字段校验、Git Hook 非覆写安装、JSONL 逐行容错、Phase 归档原子写入（含单测补齐）(user-visible)
+- v0.4.0 2026-02-11 Leo: T-CNPM-001 npm 分发配置 — package.json files/exports/publishConfig + templates/npmrc.template + scripts/publish.sh (user-visible)
+- v0.4.0 2026-02-11 Leo: T-CIDE-001 VS Code 插件 — packages/vscode-spec-first（ID 自动补全+跳转到定义+缓存刷新）(user-visible)
+- v0.4.0 2026-02-11 Leo: T-CCI-001 CI Pipeline 模板 — templates/ci/ GitHub Actions + GitLab CI + Azure Pipelines 三平台 Handlebars 模板
+- v0.4.0 2026-02-11 Leo: T-CE2E-002 异常路径 E2E 测试 — tests/e2e/error-paths.test.ts（Gate 阻断/pilot_mode/force 审计/cancel/RFC/Defect 7 测试）
+- v0.4.0 2026-02-11 Leo: T-CE2E-001 核心流程 E2E 测试 — tests/e2e/core-flow.test.ts（init→08_done 全阶段推进+gate+coverage+findings 8 测试）
+- v0.4.0 2026-02-11 Leo: T-CSLA-001 性能基准测试 — tests/benchmark/performance.bench.ts（4 SLA 指标全部达标）
+- v0.4.0 2026-02-11 Leo: T-CL2-002 Layer 2 多端合并集成测试 — tests/integration/layer2-merge.test.ts（双端/三端合并+冲突检测+方向推断 13 测试）
+- v0.4.0 2026-02-11 Leo: T-CL2-001 Layer 2 端规范 YAML — .spec-first/layer2/ h5/java-backend/app-ios/app-android/pc 5 平台模板
+- v0.3.0 2026-02-11 Leo: T-BSK-006 Skill Build Script — scripts/build-skills.ts（Dev→Deploy 扁平化+references 复制）
+- v0.3.0 2026-02-11 Leo: T-BSK-005 Skill Integration E2E 测试 — tests/integration/skill-integration.test.ts（Dispatch→PhaseMachine→ConfirmPolicy 集成路径 5 测试）
+- v0.3.0 2026-02-11 Leo: T-BSK-004 16 Skill 文件 — skills/spec-first/ 01-init~16-sync SKILL.md + 4 code-review reference checklists
+- v0.3.0 2026-02-11 Leo: T-BSK-003 confirm_policy 评估器 — src/core/skill-runtime/confirm-policy.ts（auto/assisted/strict 四维判定矩阵+审计日志）
+- v0.3.0 2026-02-11 Leo: T-BSK-002 6-Phase 状态机 — src/core/skill-runtime/phase-machine.ts（P0~P5+DONE/ABORTED 转换表+修订计数+preWriteArchive）
+- v0.3.0 2026-02-11 Leo: T-BSK-001 命令解析与路由分发 — src/core/skill-runtime/dispatcher.ts（语义映射+runtime/skill 双路由+本地优先解析）
+- v0.2.0 2026-02-11 Leo: T-BM7-005 AI Runtime Hook — src/core/tool-integration/ai-runtime-hook.ts（PreToolUse/PostToolUse/Stop 3 hook 配置+注册+执行）
+- v0.2.0 2026-02-11 Leo: T-BM7-004 Feature CLI — src/cli/commands/feature.ts（list/current/switch 3 子命令）
+- v0.2.0 2026-02-11 Leo: T-BM7-003 Doctor 完善 — doctor.ts 扩展 Hook 状态检查+Gate 降级检测+运行时文件膨胀检测
+- v0.2.0 2026-02-11 Leo: T-BM7-002 Commit 命令 — src/cli/commands/commit.ts（TASK ID 自动注入+traces trailer）
+- v0.2.0 2026-02-11 Leo: T-BM7-001 Git Hook 安装器 — src/core/tool-integration/hook-installer.ts（4 hook 安装/卸载/检查）
+- v0.2.0 2026-02-11 Leo: T-BM4-002 逆向同步回填 — src/core/change-mgr/sync.ts（矩阵行更新+审计日志写入）
+- v0.2.0 2026-02-11 Leo: T-BM4-001 影响分析 — src/core/change-mgr/impact.ts（BFS 上下游遍历+邻居收集）
+- v0.2.0 2026-02-11 Leo: T-BM6-001/002/003 MetricsEngine 测试 — tests/unit/metrics-engine.test.ts（21 测试全通过）
+- v0.2.0 2026-02-11 Leo: T-BM5-001~005 AIOrchestrator — context-pack/context-slicing/catchup/ai-stats/ai CLI（20 测试）
+- v0.2.0 2026-02-11 Leo: T-BM3-001~006 GateEngine — gate-evaluator/sca/security/golive/rollback/gate CLI（44 测试）
+- v0.1.0 2026-02-11 Leo: T-AS-001 项目工程初始化 — package.json/tsconfig/tsup/vitest/目录骨架
+- v0.1.0 2026-02-11 Leo: T-AS-002 共享类型定义 — src/shared/types.ts 全局类型
+- v0.1.0 2026-02-11 Leo: T-AS-003 文件 I/O 封装层 — src/shared/fs-utils.ts
+- v0.1.0 2026-02-11 Leo: T-AS-004 JSONL 日志工具 — src/shared/logger.ts
+- v0.1.0 2026-02-11 Leo: T-AS-005 CLI 入口与命令路由 — src/cli/router.ts + index.ts 重构
+- v0.1.0 2026-02-11 Leo: T-AS-006 config.yaml Schema — src/shared/config-schema.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-002 ID 格式校验 — src/core/trace-engine/id-validator.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-001 ID 生成与注册 — src/core/trace-engine/id-generator.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-003 ID 模糊搜索 — src/core/trace-engine/id-search.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-004 追踪矩阵管理 — src/core/trace-engine/matrix.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-005 覆盖率计算 — src/core/trace-engine/coverage.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-006 Known Exception 校验 — src/core/trace-engine/exception-validator.ts
+- v0.1.0 2026-02-11 Leo: T-AM2-007 ID/Matrix CLI 命令 — src/cli/commands/id.ts + matrix.ts
+- v0.1.0 2026-02-11 Leo: T-AM1-001 阶段状态机核心 — src/core/process-engine/stage-machine.ts（8+2阶段转换表+终态判定+26测试）
+- v0.1.0 2026-02-11 Leo: T-AM1-004 阶段推进 advance — src/core/process-engine/advance.ts（Gate校验+pilot_mode降级+force跳过+8测试）
+- v0.1.0 2026-02-11 Leo: T-AM1-005 Feature 取消 cancel — 集成在 advance.ts（任意非终态→cancelled+reason必填+5测试）
+- v0.1.0 2026-02-11 Leo: T-AM1-006 Feature 管理基础 — src/core/process-engine/feature.ts（currentFeature/switchFeature/listFeatures+9测试）
+- v0.1.0 2026-02-11 Leo: T-AM1-002 三层合并逻辑 — src/core/process-engine/layer-merger.ts（Layer0基线+Layer1裁剪+Layer2平台YAML合并+10测试）
+- v0.1.0 2026-02-11 Leo: T-ATP-001 Handlebars 模板渲染引擎 — src/core/template/renderer.ts（renderTemplate/renderToString+跳过已存在+4测试）
+- v0.1.0 2026-02-11 Leo: T-AM1-003 Feature 初始化 init — src/core/process-engine/init.ts（ID生成+目录创建+状态写入+骨架文件+FEAT注册+幂等+10测试）
+- v0.1.0 2026-02-11 Leo: T-AM1-007 Stage CLI 命令 — src/cli/commands/init.ts + stage.ts（init/stage current/advance/cancel 4命令+参数校验+ExitCode+13测试）
+- v0.1.0 2026-02-11 Leo: T-AM4-001 RFC 状态机 — src/core/change-mgr/rfc-machine.ts（4合法转换+终态判定+14测试）
+- v0.1.0 2026-02-11 Leo: T-AM4-003 缺陷状态机 — src/core/change-mgr/defect-machine.ts（6合法转换+回退路径+终态判定+18测试）
+- v0.1.0 2026-02-11 Leo: T-AM4-002 RFC CRUD 操作 — src/core/change-mgr/rfc.ts（create/get/transition/submit/list+自增ID RFC-NNN+9测试）
+- v0.1.0 2026-02-11 Leo: T-AM4-004 缺陷 CRUD 操作 — src/core/change-mgr/defect.ts（register/get/transition/list/escapeRate+自增seq+过滤+12测试）
+- v0.1.0 2026-02-11 Leo: T-AM4-005 RFC/Defect CLI 命令 — src/cli/commands/rfc.ts + defect.ts（rfc 5子命令+defect 5子命令+index.ts注册+20测试）
+- v0.1.0 2026-02-11 Leo: T-ATP-002 Handlebars 模板文件 — 9个模板（init×2+matrix×2+gate×1+review×1+metrics×1+release×2）+9测试
+- v0.1.0 2026-02-11 Leo: T-ATP-003 产出物完整性检查 — src/core/template/artifact-checker.ts（21产出物定义+Mode×Size跳过规则+ensureArtifacts/listArtifacts+12测试）
+- v0.1.0 2026-02-11 Leo: T-ACL-001 Metrics Coverage CLI — src/cli/commands/metrics.ts（C1-C9指标表格输出+PASS/FAIL判定+4测试）
+- v0.1.0 2026-02-11 Leo: T-ACL-002 Doctor 诊断 CLI — src/cli/commands/doctor.ts（7项检查+项目级/Feature级+printReport+5测试）
 - v0.7.15 2026-02-09 Leo: v7.1 需求文档三轮审查修复（P2×5 一致性修复 + 审查报告 4 项最佳实践方案落地 + Skill 15 化全文档同步）
   - P2 修复：Gate 编号映射表、CLI 命令组数量口径、Context Pack 平台值 kebab-case、RFC 入口统一 /spec-first:rfc、AI 用例裸 CLI 消除
   - 审查报告方案：Phase 3 交互协议（5 轮上限+审计记录）、逆向变更快速通道（内联修正+/spec-first:sync）、Session Catchup 自动触发（auto/prompt/off 三策略）、Context Pack 动态剪裁（L1/L2/L3 三层+8K 预算）

@@ -1,0 +1,3 @@
+{"timestamp":"2026-02-09T09:30:00Z","featureId":"FSREQ-20260209-AUTH-001","stage":"01_specify","verdict":"PASS","attempt":1}
+{"timestamp":"2026-02-09T11:20:00Z","featureId":"FSREQ-20260209-AUTH-001","stage":"02_design","verdict":"PASS","attempt":1}
+{"timestamp":"2026-02-09T14:00:00Z","featureId":"FSREQ-20260209-AUTH-001","stage":"03_plan","verdict":"PASS","attempt":1}

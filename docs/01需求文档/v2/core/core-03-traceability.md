@@ -19,25 +19,31 @@
 - **可解析**：统一前缀和序号位数，支持正则校验
 - **全局可识别**：ID 携带 Feature/Domain 缩写，脱离目录上下文仍可识别来源
 
-### ID 类型定义
+### ID 类型定义（6 种）
+
+> 本节为 ID 体系的权威定义；技术实现见 v2-05-追踪矩阵与ID引擎。NFR、API、ADR 不再独立编号，分别合入 FR（标签）、DS（属性）、RFC（子类型）。
 
 | 前缀 | 全称 | 格式 | 示例 | 正则 | 定义阶段 |
 |------|------|------|------|------|---------|
+| `Feature` | Feature ID | `FSREQ-YYYYMMDD-<FEAT>-NNN` | `FSREQ-20260210-AUTH-001` | — | 00 Init |
 | `FR` | Functional Requirement | `FR-<FEAT>-NNN` | `FR-AUTH-001` | `^FR-[A-Z][A-Z0-9]{1,15}-\d{3}$` | 01 Specify |
-| `NFR` | Non-Functional Req | `NFR-<DIM>-NNN` | `NFR-SEC-001` | `^NFR-[A-Z][A-Z0-9]{1,7}-\d{3}$` | 01 Specify |
 | `DS` | Design Section | `DS-<FEAT>-NNN` | `DS-AUTH-001` | `^DS-[A-Z][A-Z0-9]{1,15}-\d{3}$` | 02 Design |
-| `API` | API Endpoint | `API-<SVC>-NNN` | `API-AUTH-001` | `^API-[A-Z][A-Z0-9]{1,15}-\d{3}$` | 02 Design |
 | `TASK` | Implementation Task | `TASK-<FEAT>-NNN` | `TASK-AUTH-001` | `^TASK-[A-Z][A-Z0-9]{1,15}-\d{3}$` | 03 Plan |
 | `TC` | Test Case | `TC-<LVL>-<FEAT>-NNN` | `TC-E2E-AUTH-001` | `^TC-(UT\|IT\|E2E\|ST)-[A-Z][A-Z0-9]{1,15}-\d{3}$` | 05 Verify |
-| `ADR` | Architecture Decision | `ADR-NNN` | `ADR-001` | `^ADR-\d{3}$` | 02 Design |
 | `RFC` | Request for Change | `RFC-NNN` | `RFC-001` | `^RFC-\d{3}$` | 横切机制 C |
+
+**合并说明**：
+
+| 原独立类型 | 合入目标 | 方式 | 示例 |
+|-----------|---------|------|------|
+| NFR | FR | 加 `[NFR:DIM]` 标签 | `FR-AUTH-003 [NFR:PERF]` |
+| API | DS | `api_ref` 属性字段 | DS 记录中引用 `contracts/*.yaml` |
+| ADR | RFC | `type: ADR` 子类型 | RFC 记录中标注 `type: ADR` |
 
 **说明**：
 
 - `<FEAT>` 为 Feature 缩写（2-16 位大写字母+数字，首位必须为字母），如 AUTH、PAY、ORDER。**FEAT 缩写必须全局唯一**，通过 FEAT 注册表治理
-- `<DIM>` 为 2-8 位维度缩写。推荐枚举：`PERF`（性能）、`SEC`（安全）、`REL`（可靠性）、`AVAIL`（可用性）、`OBS`（可观测性）
 - `<LVL>` 固定枚举：`UT`（单元测试）、`IT`（集成测试）、`E2E`（端到端测试）、`ST`（静态分析测试）
-- `<SVC>` 为服务/模块缩写，与 `<FEAT>` 规则相同
 - NNN 为三位数字，从 001 开始递增
 - **ID 生成**：通过 CLI 命令 `spec-first id next <type> <featAbbr>` 自动生成，禁止手动编造
 
@@ -83,10 +89,12 @@
 ```markdown
 # 追踪矩阵 — <Feature Name>
 
-| 需求 ID | Design Ref | API/Data Ref | Task Ref | Test Case Ref | PR Ref | Status |
-|---------|-----------|-------------|----------|--------------|--------|--------|
-| FR-AUTH-001 | DS-AUTH-001 | API-AUTH-001 | TASK-AUTH-001 | TC-E2E-AUTH-001 | #123 | Accepted |
+| 需求 ID | Design Ref | Task Ref | Test Case Ref | PR Ref | Status |
+|---------|-----------|----------|--------------|--------|--------|
+| FR-AUTH-001 | DS-AUTH-001 | TASK-AUTH-001 | TC-E2E-AUTH-001 | #123 | Accepted |
 ```
+
+> API 契约引用已合入 DS 记录的 `api_ref` 属性，不再作为矩阵独立列。
 
 **Status 状态枚举**：
 
@@ -105,7 +113,7 @@
 | 阶段 | 矩阵操作 | 填充列 |
 |------|---------|--------|
 | 01 Specify | 创建矩阵，填入所有 FR/NFR | 需求 ID |
-| 02 Design | 填充设计引用和 API/Data 引用 | Design Ref, API/Data Ref |
+| 02 Design | 填充设计引用（含 API 契约） | Design Ref |
 | 03 Plan | 填充任务引用 | Task Ref |
 | 04 Implement | 填充 PR 引用 | PR Ref |
 | 05 Verify | 填充测试用例引用，更新 Status | Test Case Ref, Status |
@@ -114,6 +122,8 @@
 ---
 
 ## 覆盖率算法
+
+> 覆盖率公式（C1-C6）的权威定义见本节下方表格；合规率（C7-C9）、健康分权重与计算公式的权威定义见 aux-05-metrics。技术实现见 v2-11-度量与健康分。
 
 ### Gate 编号与阶段映射
 
@@ -127,11 +137,12 @@
 
 | 指标 | 公式 | 校验阶段 | Gate 阈值 |
 |------|------|---------|----------|
+| **Design 覆盖率** | Active FR∪NFR with ≥1 DS / Active FR+NFR × 100% | Gate 1 | = 100% |
+| **API 覆盖率** | FR(需API) with ≥1 API / Total FR(需API) × 100% | Gate 1 | = 100% |
 | **Task 覆盖率** | Active FR∪NFR with ≥1 TASK / Active FR+NFR × 100% | Gate 2 | = 100% |
 | **Test 覆盖率(FR级)** | Active FR∪NFR with ≥1 TC / Active FR+NFR × 100% | Gate 3 | = 100% |
 | **Test 覆盖率(AC级)** | Active AC with ≥1 TC / Active AC 总数 × 100% | Gate 3 | ≥ 90%（M/L） |
 | **实现覆盖率** | Active FR∪NFR with ≥1 PR / Active FR+NFR × 100% | Gate 3 | = 100% |
-| **API 覆盖率** | FR(需API) with ≥1 API / Total FR(需API) × 100% | Gate 1 | = 100% |
 
 **Active 定义**：Active FR+NFR = Total FR+NFR 中排除 Status 为 Deferred、Cancelled 和 Exception 的条目。
 
@@ -141,7 +152,7 @@
 
 | 指标 | 公式 | 校验阶段 | Gate 阈值 |
 |------|------|---------|----------|
-| **Task 合规率** | TASK with ≥1 FR/NFR ref / Total TASK × 100% | Gate 2 | = 100% |
+| **Task 合规率** | TASK with ≥1 FR/NFR/DS ref / Total TASK × 100% | Gate 2 | = 100% |
 | **TC 合规率** | TC with ≥1 FR/NFR ref / Total TC × 100% | Gate 3 | = 100% |
 | **PR 合规率** | PR with ≥1 TASK ref / Total PR × 100% | Gate 2 | = 100% |
 
@@ -157,10 +168,35 @@
 
 当某些 FR/NFR 因客观原因无法在当前版本实现或测试时，可通过豁免机制处理：
 
-1. 在 `specs/known-exceptions.md` 中登记豁免条目，包含：豁免 ID、原因、风险评估、解除时间
+1. 在 `specs/<featureId>/known-exceptions.md` 中登记豁免条目
 2. 豁免条目在追踪矩阵中标记 Status = `Exception`
 3. Gate 校验时，Exception 条目从覆盖率分母中排除
 4. 每个 Sprint/迭代结束时复审豁免清单，过期未解除的豁免升级为 P0 风险
+
+**豁免条目必填字段**：
+
+| 字段 | 说明 |
+|------|------|
+| `waiver_id` | Feature 内唯一豁免编号（如 `WVR-001`） |
+| `rfc_id` | 关联 RFC（必填，禁止无 RFC 豁免） |
+| `scope_ids` | 受影响 ID 列表（仅限 6-ID 模型中的合法 ID：`FR-*`、`DS-*`、`TASK-*`、`TC-*`；NFR 通过 `FR-*[NFR:DIM]` 引用，API 通过 `DS-*.api_ref` 引用） |
+| `reason` | 豁免原因与业务背景 |
+| `risk_level` | 风险等级（Low/Medium/High） |
+| `mitigation` | 临时缓解措施 |
+| `rollback_point` | 回滚点（commit/tag/发布批次） |
+| `owner` | 责任人 |
+| `approved_by` | 审批人（角色+姓名） |
+| `created_at` | 创建时间（ISO 8601） |
+| `expires_at` | 失效时间（必填） |
+| `closure_evidence` | 关闭证据（修复 PR、回归报告、UAT 记录） |
+
+**豁免生命周期（紧急发布闭环）**：
+
+1. 创建/审批 RFC（不得绕过）
+2. 登记 `known-exceptions.md` 并绑定 `scope_ids + rollback_point + expires_at`
+3. `gate check` 输出 `PASS_WITH_WAIVER` 后，允许 `stage advance`
+4. 到期前必须完成修复并补齐 `closure_evidence`，将条目标记 Closed
+5. 逾期未关闭自动升级为 P0 风险，后续 Gate 强制 `FAIL`
 
 **约束**：
 
@@ -190,8 +226,9 @@
 01. Specify          02. Design           03. Plan          04. Implement      05. Verify
 ┌──────────┐     ┌──────────────┐     ┌───────────┐     ┌────────────┐    ┌──────────┐
 │FR-AUTH-001│────▶│ DS-AUTH-001 │────▶│TASK-AUTH-001────▶│ PR #123    │    │TC-E2E-AUTH-001
-│FR-AUTH-002│────▶│ API-AUTH-001 │────▶│TASK-AUTH-002────▶│ PR #123    │    │TC-IT-AUTH-001
-│NFR-PERF-001───▶│ DS-AUTH-003 │────▶│TASK-AUTH-003────▶│ PR #124    │    │TC-IT-AUTH-002
+│FR-AUTH-002│────▶│ DS-AUTH-002 │────▶│TASK-AUTH-002────▶│ PR #123    │    │TC-IT-AUTH-001
+│FR-AUTH-003│────▶│ DS-AUTH-003 │────▶│TASK-AUTH-003────▶│ PR #124    │    │TC-IT-AUTH-002
+│ [NFR:PERF]│     │              │     │             │     │            │    │
 └──────────┘     └──────────────┘     └───────────┘     └────────────┘    └──────────┘
      │                                      │                                   │
      └──────────────────────────────────────┴───────────────────────────────────┘

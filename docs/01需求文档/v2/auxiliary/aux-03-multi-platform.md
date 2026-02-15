@@ -53,6 +53,7 @@ Layer 2 = 技术端规范（端特有质量标准）
 ```yaml
 # .spec-first/layer2/h5.yaml
 # Layer 2 端规范 — H5 前端
+platform: h5
 name: H5 前端
 description: H5/移动端 Web 特有的质量标准与检查清单
 
@@ -70,16 +71,17 @@ gate_conditions:
       threshold: 500
   05_verify:
     - id: L2-H5-VERIFY-001
-      description: "Lighthouse Performance ≥ 80"
+      description: "Lighthouse Performance ≥ 90"
       type: auto
       command: "lighthouse --output json"
-      threshold: 80
+      threshold: 90
     - id: L2-H5-VERIFY-002
       description: "浏览器兼容性验证（Chrome/Safari/Firefox 最新 2 版本）"
       type: manual
     - id: L2-H5-VERIFY-003
       description: "Lighthouse Accessibility ≥ 90"
       type: auto
+      command: "lighthouse --output json"
       threshold: 90
 
 # ── 额外产出物 ──
@@ -95,15 +97,24 @@ extra_deliverables:
 
 # ── 质量阈值 ──
 quality_thresholds:
-  code_coverage_min: 80
-  lighthouse_performance: 80
-  lighthouse_accessibility: 90
-  bundle_size_kb: 500
+  code_coverage_min:
+    value: 80
+    direction: higher_is_better
+  lighthouse_performance:
+    value: 90
+    direction: higher_is_better
+  lighthouse_accessibility:
+    value: 90
+    direction: higher_is_better
+  bundle_size_kb:
+    value: 500
+    direction: lower_is_better
 ```
 
 ```yaml
 # .spec-first/layer2/java-backend.yaml
 # Layer 2 端规范 — Java Backend
+platform: java-backend
 name: Java 后端
 description: Java/Spring Boot 后端特有的质量标准与检查清单
 
@@ -134,11 +145,23 @@ extra_deliverables:
       description: "API 性能预算（P50/P99 目标值）"
 
 quality_thresholds:
-  code_coverage_min: 80
-  api_p99_ms: 200
-  sonarqube_gate: pass
-  critical_violations: 0
+  code_coverage_min:
+    value: 80
+    direction: higher_is_better
+  api_p99_ms:
+    value: 200
+    direction: lower_is_better
+  sonarqube_gate:
+    value: pass
+    direction: higher_is_better
+  critical_violations:
+    value: 0
+    direction: lower_is_better
 ```
+
+### quality_thresholds 语义字段说明
+
+`quality_thresholds` 每项阈值采用 `{value, direction}` 结构，`direction` 取值为 `higher_is_better` 或 `lower_is_better`，用于 GateEngine 程序化比较（无需硬编码"大于/小于"逻辑）。完整推断规则与合并冲突解决策略见 [v2-09-多端规范合并 §quality_thresholds 合并](../../02技术方案/V2/v2-09-多端规范合并.md)。
 
 ### 合并机制
 
