@@ -27,3 +27,8 @@
 
 ## confirm_policy
 - Recommended: assisted (review findings need human judgment)
+
+## Success Criteria
+- 审查报告已生成，覆盖 4 维度（SOLID/安全/性能/测试）
+- 审查发现已写入 `findings.md`
+- 通过审查的 TASK 状态已更新

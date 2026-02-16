@@ -23,6 +23,10 @@
 ## confirm_policy
 - Recommended: assisted (plans benefit from review)
 
+## Success Criteria
+- 执行计划已生成，包含下一步骤、风险评估、资源分配
+- 用户确认后计划已写入 `progress.md`
+
 ## Orchestration
 - Schedules phase Skills based on current stage
 - Identifies blocked tasks and suggests resolution

@@ -20,3 +20,6 @@
 
 ## confirm_policy
 - Recommended: auto (read-only diagnostics)
+
+## Success Criteria
+- 诊断报告已展示（Node/Git/Hook/Config/Gate/文件膨胀检测结果）

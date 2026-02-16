@@ -46,7 +46,6 @@ specs/                          # Feature 工作区根目录
     ├── traceability-matrix.md  # 追踪矩阵
     ├── progress.md             # 进度记录（运行态）
     ├── findings.md             # 过程发现（运行态）
-    ├── task_plan.md            # 当前任务计划（运行态）
     ├── gate-history.jsonl      # Gate 评估历史
     ├── ai-stats.jsonl          # AI 调用统计
     └── metrics.jsonl           # 度量数据
@@ -74,14 +73,18 @@ ID 生成与校验。
 
 ```bash
 # 生成下一个 ID
-spec-first id next <type> <featAbbr>
+spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]
 # type: FR | DS | TASK | TC | RFC
+# --level 仅 TC 类型需要
 
 # 校验 ID 格式
 spec-first id validate <id>
 
+# 搜索 ID
+spec-first id search <query> --feature <featureId> [--type <type>]
+
 # 列出已注册 ID
-spec-first id list [--type <type>] [--feature <featureId>]
+spec-first id list --feature <featureId> [--type <type>]
 ```
 
 **ID 格式规则**：
@@ -103,7 +106,7 @@ Gate 条件评估（质量门禁）。
 spec-first gate check <featureId> [--stage <stageId>]
 
 # 查看阶段 Gate 条件定义
-spec-first gate conditions <stageId>
+spec-first gate conditions <featureId>
 
 # 查看 Gate 评估历史
 spec-first gate history <featureId>
@@ -157,6 +160,9 @@ spec-first metrics coverage <featureId>
 
 # 生成度量报告
 spec-first metrics report <featureId>
+
+# 健康分（加权综合评分）
+spec-first metrics health <featureId>
 ```
 
 **9 项覆盖率指标**：
@@ -194,19 +200,19 @@ spec-first ai stats <featureId>
 
 ```bash
 # 创建 RFC
-spec-first rfc create <featureId> --title "<title>" --impact "<impact>"
+spec-first rfc create <featureId> --title "<title>" [--level <Minor|Major|Critical>] [--by <author>]
 
 # 提交 RFC 进入评审
-spec-first rfc submit <rfcId>
+spec-first rfc submit <rfcId> --feature <featureId>
 
-# RFC 状态流转
-spec-first rfc transition <rfcId> <status>
+# RFC 状态流转（status: draft | approved | closed | rejected）
+spec-first rfc transition <rfcId> <status> --feature <featureId>
 
 # 列出 Feature 下所有 RFC
 spec-first rfc list <featureId>
 
 # 查看 RFC 详情
-spec-first rfc get <rfcId>
+spec-first rfc get <rfcId> --feature <featureId>
 ```
 
 ### spec-first defect
@@ -214,20 +220,56 @@ spec-first rfc get <rfcId>
 缺陷管理。
 
 ```bash
-# 登记缺陷
-spec-first defect register <featureId> --title "<title>" --severity <critical|major|minor>
+# 登记缺陷（severity: S1 | S2 | S3 | S4）
+spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" [--reporter "<name>"] [--discovered-in <stage>] [--linked-fr <id>]
 
-# 更新缺陷状态
-spec-first defect update <defectId> <status>
+# 更新缺陷状态（status: open | fixing | fixed | verified | wontfix）
+spec-first defect update <featureId> <seq> --status <status>
 
 # 列出缺陷
-spec-first defect list <featureId>
+spec-first defect list <featureId> [--status <status>] [--severity <severity>]
 
 # 查看缺陷详情
-spec-first defect get <defectId>
+spec-first defect get <featureId> <seq>
 
 # 计算缺陷逃逸率
 spec-first defect escape-rate <featureId>
+```
+
+### spec-first golive
+
+上线前检查。
+
+```bash
+spec-first golive check <featureId>
+```
+
+校验 Feature 是否满足上线条件（Gate 全通过、覆盖率达标、无未关闭缺陷）。
+
+### spec-first commit
+
+Git 提交（自动注入 traces trailer）。
+
+```bash
+spec-first commit -m "<message>" [--task <taskId>]
+```
+
+- `--task` 可选，未指定时自动从 task_plan.md 中查找 In Progress 的 TASK
+- 自动在 commit message 中注入 `traces: <taskId>` trailer
+
+### spec-first feature
+
+Feature 管理。
+
+```bash
+# 列出所有 Feature
+spec-first feature list
+
+# 查看当前活跃 Feature
+spec-first feature current
+
+# 切换活跃 Feature
+spec-first feature switch <featureId>
 ```
 
 ### spec-first doctor
@@ -235,10 +277,10 @@ spec-first defect escape-rate <featureId>
 环境诊断。
 
 ```bash
-spec-first doctor
+spec-first doctor [featureId]
 ```
 
-检查：Node.js 版本、pnpm 可用性、Git 配置、specs/ 目录状态。
+检查：Node.js 版本、Git 配置、.spec-first/ 目录、specs/ 目录、config.yaml、Git Hook 状态、Gate 降级检测、运行时文件膨胀检测。指定 featureId 时额外检查 Feature 级状态。
 
 ---
 
@@ -271,6 +313,35 @@ P5_SIDE_EFFECT — 副作用执行
   └── 更新运行态三文件（progress.md / findings.md / task_plan.md）
 ```
 
+### confirm_policy 执行语义
+
+每个 Skill 声明一种 confirm_policy，决定 P3 阶段的交互模式：
+
+| policy | P3 行为 | 适用场景 |
+| --- | --- | --- |
+| auto | 跳过用户确认，P2 完成后直接进入 P4 | 只读/低风险操作（status、doctor、verify） |
+| assisted | 展示生成内容摘要，用户可确认、修改或拒绝 | 中等风险操作（task、test、code-review、sync） |
+| strict | 展示完整生成内容，用户必须逐项审阅后确认 | 高风险操作（init、spec、design、code、archive、orchestrate） |
+
+- `auto` 的 Skill 不应写入关键交付物（spec.md/design.md/task_plan.md），仅允许写入运行态文件（progress.md/findings.md）或不写入
+- `assisted` 和 `strict` 的 Skill 在用户拒绝时必须回退至 P2 重新生成
+
+### 错误处理规则
+
+所有 Skill 遵循统一的错误处理策略：
+
+| 阶段 | 错误场景 | 处理方式 |
+| --- | --- | --- |
+| P0 | 阶段不匹配（如在 01_specify 执行 06-task） | 终止执行，告知用户当前阶段和 Skill 要求的阶段 |
+| P0 | Feature 不存在 | 终止执行，建议用户先执行 `spec-first init` |
+| P1 | 上下文文件缺失（如 spec.md 不存在） | 警告用户缺失文件，询问是否继续（降级执行） |
+| P2 | 生成内容为空或不完整 | 告知用户生成失败，建议检查输入上下文 |
+| P3 | 用户拒绝 | 回退至 P2，根据用户反馈修改后重新展示 |
+| P3 | 用户连续拒绝 3 次 | 终止执行，建议用户手动完成或调整需求 |
+| P4 | 文件写入失败 | 终止执行，不执行 P5，告知用户错误原因 |
+| P4 | CLI 命令失败（如 id next 返回错误） | 终止执行，展示 CLI 错误输出 |
+| P5 | 副作用执行失败（如 matrix check 报错） | 不回滚 P4 已写入的文件，但警告用户副作用未完成 |
+
 ## Stage × Skill 映射
 
 | 阶段 | Skill | 主要交付物 |
@@ -296,7 +367,7 @@ P5_SIDE_EFFECT — 副作用执行
 
 ### 阶段纪律
 
-- 不得跨阶段执行 Skill（如在 01_specify 阶段执行 04-task-decompose）
+- 不得跨阶段执行 Skill（如在 01_specify 阶段执行 06-task）
 - 阶段推进必须通过 `spec-first stage advance`，不得直接修改 stage-state.json
 - Gate 未通过时不得推进阶段，除非用户明确使用 `--force`
 

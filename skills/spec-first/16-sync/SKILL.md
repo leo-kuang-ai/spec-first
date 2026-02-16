@@ -23,3 +23,9 @@
 
 ## confirm_policy
 - Recommended: assisted (sync modifies matrix)
+
+## Success Criteria
+- 同步计划已生成并经用户确认
+- `traceability-matrix.md` 已回填更新
+- `matrix check` 无 orphan 项
+- 审计日志已写入 `findings.md`

@@ -22,3 +22,6 @@
 
 ## confirm_policy
 - Recommended: auto (read-only status)
+
+## Success Criteria
+- 状态仪表盘已展示（阶段、覆盖率、健康分、任务进度、风险）

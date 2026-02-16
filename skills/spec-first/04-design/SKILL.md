@@ -23,3 +23,21 @@
 
 ## confirm_policy
 - Recommended: strict (design decisions are critical)
+
+## Success Criteria
+- `design.md` 已写入，包含模块划分、API 设计、数据模型
+- 所有 DS 已通过 `id next DS` 注册
+- `traceability-matrix.md` 已更新，每个 FR 有对应 DS 引用
+- `metrics coverage` C1 (Design Coverage) > 0%
+
+## Example (P2 Output Format)
+
+```markdown
+### DS-AUTH-001: 短信验证码发送服务
+
+**映射**: FR-AUTH-001
+**模块**: auth-service / otp-sender
+**接口**: POST /api/auth/sms/send-otp
+**数据模型**: otp_sessions (phone, code, expires_at, attempts)
+**关键约束**: 单号 60s 冷却、单号日限 10 次、验证码 5min 过期
+```

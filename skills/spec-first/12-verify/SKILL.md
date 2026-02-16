@@ -23,5 +23,10 @@
 ## confirm_policy
 - Recommended: auto (read-only verification)
 
+## Success Criteria
+- 校验报告已生成，包含 Gate 评估、矩阵完整性、覆盖率缺口
+- 校验结果已写入 `findings.md`
+- 若所有条件满足，已建议执行 `stage advance`
+
 ## Orchestration
 - Can be called by orchestrate Skill as pre-advance check

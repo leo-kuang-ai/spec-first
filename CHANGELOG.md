@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.4.7 2026-02-14 Leo: Skill 命令参考手册 v1.0→v2.0 全量重写 — 对齐当前代码实现（legacy 8 Skill→16 Skill、5 阶段→6 阶段执行模型、补齐 golive/commit/feature/metrics health 4 命令组、修正 defect/rfc/gate/id 参数签名、新增 Dispatcher 路由规则 + confirm_policy 语义 + orchestrate 调度协议）(user-visible)
+- v0.4.6 2026-02-14 Leo: Skill 提示词审查报告 P0~P2 全量修复 — P0×3 AGENTS.md CLI 参数修正（rfc 5 处/defect 3 处/补充 golive+commit+feature+metrics health 4 命令组）+ P1×6 歧义消除（catchup/research confirm_policy 修正、test 输出路径、目录重复行、legacy 名称、id next/gate conditions 参数）+ P2×7 提示词质量提升（5 核心 Skill 补示例、16 Skill 补成功标准、AGENTS.md 补 confirm_policy 语义+错误处理规则、orchestrate 补调度协议），综合可用率 60%→95%
+- v0.4.5 2026-02-14 Leo: Skill 提示词审查报告 — AGENTS.md + 16 SKILL.md 作为 AI 提示词的有效性评估（P0×3 CLI 参数错误 + P1×6 歧义/遗漏 + P2×7 质量提升项，综合可用率 ~60%）
+- v0.4.4 2026-02-14 Leo: 使用手册 v2.0→v3.0 全量重写 — 对齐当前代码实现（13 命令组 38 子命令 + 16 Skill + 6 阶段执行模型 + Dispatcher 路由 + Feature 目录结构）(user-visible)
 - v0.4.3 2026-02-14 Leo: FSREQ-20260209-AUTH-001 邮箱登录扩展（RFC-002）— FR-AUTH-003 + DS-AUTH-005/006 + API-AUTH-003/004 + 6 任务 + 3 测试用例 + OpenAPI 契约 + 追踪矩阵更新
 - v0.4.2 2026-02-14 Leo: Skill 审查报告 P0~P2 全量修复 — P0-4 legacy 隔离至 _legacy/、P0-5 dispatcher 移除 init/doctor、P0-1 五个 Skill id generate→id next、P0-2 matrix update CLI 命令补齐、P0-3 AGENTS.md 26 处命令名修正、P1-1~P1-5 执行模型 6 阶段/Stage×Skill 映射/ID 类型/Gate 结果/defect 语义映射修正、P2-1~P2-3 init 参数格式/tasks.md→task_plan.md/4 个 Skill 产出物路径对齐 (user-visible)
 

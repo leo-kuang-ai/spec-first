@@ -20,4 +20,8 @@
 - `specs/{featureId}/progress.md`
 
 ## confirm_policy
-- Recommended: auto (read-only analysis)
+- Recommended: assisted (writes catchup summary to progress.md)
+
+## Success Criteria
+- 7 步恢复报告已生成（阶段、任务、进度、发现、缺失文件、风险、建议）
+- 用户确认后恢复摘要已追加到 `progress.md`

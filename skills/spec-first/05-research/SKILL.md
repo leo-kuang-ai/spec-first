@@ -19,4 +19,8 @@
 - `specs/{featureId}/research.md`
 
 ## confirm_policy
-- Recommended: auto (read-only research)
+- Recommended: assisted (writes research notes to research.md)
+
+## Success Criteria
+- `research.md` 已写入，包含方案对比、优劣分析、推荐结论
+- 用户已确认研究结论

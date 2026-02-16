@@ -22,3 +22,10 @@
 
 ## confirm_policy
 - Recommended: strict (new Feature creation is significant)
+
+## Success Criteria
+- `specs/{featureId}/` 目录已创建
+- `stage-state.json` 存在且 stage 为 `00_init`
+- `constitution.md` 已生成
+- `traceability-matrix.md` 已生成（空表头）
+- `.spec-first/current` 已更新为新 featureId

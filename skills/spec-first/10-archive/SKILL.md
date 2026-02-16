@@ -23,3 +23,8 @@
 
 ## confirm_policy
 - Recommended: strict (archive is a milestone)
+
+## Success Criteria
+- `retro.md` 已写入，包含覆盖率报告和经验教训
+- 运行态文件（>500 行）已归档
+- `gate check` 通过后 `stage advance` 已执行，阶段推进至 07_release
