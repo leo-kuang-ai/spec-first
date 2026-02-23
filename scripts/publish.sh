@@ -49,11 +49,11 @@ pnpm run build
 echo ""
 echo "▸ 验证构建产物..."
 
-if [[ ! -f "dist/index.js" ]]; then
-  echo "✗ dist/index.js 不存在"
+if [[ ! -f "dist/cli/index.js" ]]; then
+  echo "✗ dist/cli/index.js 不存在"
   exit 1
 fi
-echo "✓ dist/index.js 存在"
+echo "✓ dist/cli/index.js 存在"
 
 if [[ ! -d "skills" ]]; then
   echo "✗ skills/ 目录不存在"

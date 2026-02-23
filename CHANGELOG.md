@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.2 2026-02-24 Leo: publish.sh 产物校验路径修正 dist/index.js→dist/cli/index.js + 开发任务文档验收标准对齐
 - v0.5.1 2026-02-24 Leo: 多Agent审查修复 — P0 发布入口 bin/exports 对齐 dist/cli/index.js + postinstall fallback 路径修正 + execSync→execFileSync 消除命令注入 + handlebars ^4.7.8 消除 CVE + setup --global 参数转发修复 + update-notifier ESM 兼容 + viewer help 补 --background + 文档 dist/index.js 残留清零 + 冒烟测试脚本 + 补齐 --skip-hooks/错误路径单测 (user-visible)
 - v0.5.0 2026-02-23 Leo: 新增 update 命令 + postinstall 自动注册 + SessionStart Hook 全局注册 + registerAIHooks 格式修正 + viewer --background 非阻塞 + 5 函数 dryRun 支持 + setup deprecated 转发 (user-visible)
 - v0.4.20 2026-02-23 Leo: CLAUDE.md 移除"个人协作协议"章节 + "角色定位"，"质疑与挑战授权"精简合并至核心理念，协议优先级去个人化
