@@ -98,7 +98,7 @@ const CLAUDE_REQUIRED_MCP: Readonly<Record<string, McpServerEntry>> = {
   },
 };
 
-export function ensureHostBootstrap(): BootstrapSummary {
+export function ensureHostBootstrap(options?: { dryRun?: boolean }): BootstrapSummary {
   if (process.env.SPEC_FIRST_SKIP_BOOTSTRAP === '1') {
     return { ok: true, results: [] };
   }
@@ -106,12 +106,13 @@ export function ensureHostBootstrap(): BootstrapSummary {
     return { ok: true, results: [] };
   }
 
+  const dryRun = options?.dryRun ?? false;
   const hostPaths = detectHostPaths();
   const results: BootstrapResult[] = [];
   results.push(...collectPathResolutionWarnings(hostPaths, process.env));
 
   try {
-    results.push(...ensureCodexMcpConfig(hostPaths));
+    results.push(...ensureCodexMcpConfig(hostPaths, dryRun));
   } catch (e) {
     results.push({
       host: 'Codex',
@@ -123,7 +124,7 @@ export function ensureHostBootstrap(): BootstrapSummary {
   }
 
   try {
-    results.push(...ensureClaudeMcpConfig(hostPaths));
+    results.push(...ensureClaudeMcpConfig(hostPaths, dryRun));
   } catch (e) {
     results.push({
       host: 'Claude Code',
@@ -134,7 +135,7 @@ export function ensureHostBootstrap(): BootstrapSummary {
     });
   }
 
-  results.push(...ensureRequiredSkills(hostPaths));
+  results.push(...ensureRequiredSkills(hostPaths, dryRun));
   results.push(...ensureMcpBinaries());
 
   const ok = !results.some((item) => item.level === 'ERROR');
@@ -177,9 +178,9 @@ function collectPathResolutionWarnings(paths: HostPaths, env: NodeJS.ProcessEnv)
   return warnings;
 }
 
-function ensureCodexMcpConfig(paths: HostPaths): BootstrapResult[] {
+function ensureCodexMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
   const codexConfig = paths.codexConfigPath;
-  mkdirSync(dirname(codexConfig), { recursive: true });
+  if (!dryRun) mkdirSync(dirname(codexConfig), { recursive: true });
 
   const original = existsSync(codexConfig) ? readFileSync(codexConfig, 'utf-8') : '';
   let content = original;
@@ -210,20 +211,20 @@ function ensureCodexMcpConfig(paths: HostPaths): BootstrapResult[] {
     }
   }
 
-  if (content !== original) {
+  if (content !== original && !dryRun) {
     writeFileSync(codexConfig, content, 'utf-8');
   }
 
   return results;
 }
 
-function ensureClaudeMcpConfig(paths: HostPaths): BootstrapResult[] {
+function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
   const files = paths.claudeConfigFiles;
   const fixedNames = new Set<string>();
   const results: BootstrapResult[] = [];
 
   for (const filePath of files) {
-    mkdirSync(dirname(filePath), { recursive: true });
+    if (!dryRun) mkdirSync(dirname(filePath), { recursive: true });
     const root = readJsonObject(filePath);
     const currentServers = root.mcpServers;
     const mcpServers =
@@ -244,7 +245,7 @@ function ensureClaudeMcpConfig(paths: HostPaths): BootstrapResult[] {
       }
     }
 
-    if (changed) {
+    if (changed && !dryRun) {
       root.mcpServers = mcpServers;
       writeFileSync(filePath, `${JSON.stringify(root, null, 2)}\n`, 'utf-8');
     }
@@ -263,15 +264,15 @@ function ensureClaudeMcpConfig(paths: HostPaths): BootstrapResult[] {
   return results;
 }
 
-function ensureRequiredSkills(paths: HostPaths): BootstrapResult[] {
+function ensureRequiredSkills(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
   const results: BootstrapResult[] = [];
-  const findSkillsSource = resolveSkillSource(paths, SKILL_FIND) ?? cloneSkillSource(paths, SKILL_FIND, results);
-  const creatorSource = resolveSkillSource(paths, SKILL_CREATOR) ?? cloneSkillSource(paths, SKILL_CREATOR, results);
+  const findSkillsSource = resolveSkillSource(paths, SKILL_FIND) ?? cloneSkillSource(paths, SKILL_FIND, results, dryRun);
+  const creatorSource = resolveSkillSource(paths, SKILL_CREATOR) ?? cloneSkillSource(paths, SKILL_CREATOR, results, dryRun);
 
-  results.push(copySkill(findSkillsSource, join(paths.codexSkillsDir, SKILL_FIND), 'Codex', SKILL_FIND));
-  results.push(copySkill(findSkillsSource, join(paths.claudeSkillsDir, SKILL_FIND), 'Claude Code', SKILL_FIND));
-  results.push(copySkill(creatorSource, join(paths.codexSystemSkillsDir, SKILL_CREATOR), 'Codex', SKILL_CREATOR));
-  results.push(copySkill(creatorSource, join(paths.claudeSkillsDir, SKILL_CREATOR), 'Claude Code', SKILL_CREATOR));
+  results.push(copySkill(findSkillsSource, join(paths.codexSkillsDir, SKILL_FIND), 'Codex', SKILL_FIND, dryRun));
+  results.push(copySkill(findSkillsSource, join(paths.claudeSkillsDir, SKILL_FIND), 'Claude Code', SKILL_FIND, dryRun));
+  results.push(copySkill(creatorSource, join(paths.codexSystemSkillsDir, SKILL_CREATOR), 'Codex', SKILL_CREATOR, dryRun));
+  results.push(copySkill(creatorSource, join(paths.claudeSkillsDir, SKILL_CREATOR), 'Claude Code', SKILL_CREATOR, dryRun));
 
   return results;
 }
@@ -281,6 +282,7 @@ function copySkill(
   target: string,
   host: 'Codex' | 'Claude Code',
   skillName: string,
+  dryRun: boolean = false,
 ): BootstrapResult {
   if (!source || !existsSync(source)) {
     return {
@@ -301,8 +303,10 @@ function copySkill(
     };
   }
 
-  mkdirSync(dirname(target), { recursive: true });
-  cpSync(source, target, { recursive: true });
+  if (!dryRun) {
+    mkdirSync(dirname(target), { recursive: true });
+    cpSync(source, target, { recursive: true });
+  }
   return {
     host,
     category: 'Skill',
@@ -332,7 +336,10 @@ function cloneSkillSource(
   paths: HostPaths,
   skillName: string,
   results: BootstrapResult[],
+  dryRun: boolean = false,
 ): string | undefined {
+  if (dryRun) return undefined;
+
   const cacheRoot = paths.bootstrapCacheDir;
   mkdirSync(cacheRoot, { recursive: true });
 

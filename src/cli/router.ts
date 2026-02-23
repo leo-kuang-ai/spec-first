@@ -70,7 +70,7 @@ function printVersion(): void {
   console.log(getCliVersion());
 }
 
-function getCliVersion(): string {
+export function getCliVersion(): string {
   const fromEnv = process.env.npm_package_version?.trim();
   if (fromEnv) return fromEnv;
 

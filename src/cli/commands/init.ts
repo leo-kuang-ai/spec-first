@@ -13,6 +13,7 @@ import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { detectHostPaths, formatHostPathSummary } from '../../shared/host-paths.js';
 import { ensureSkillCommands } from '../../shared/skill-commands.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
+import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
 
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
 const VALID_SIZES: ReadonlySet<string> = new Set(['S', 'M', 'L']);
@@ -114,6 +115,16 @@ export async function handleInit(args: string[]): Promise<number> {
   }
 
   ensureProjectHooks(process.cwd());
+
+  try {
+    const aiResult = registerAIHooks(process.cwd());
+    if (aiResult.registered.length > 0) {
+      console.log('AI Runtime Hooks 已注册：' + aiResult.registered.join(', '));
+    }
+    for (const w of aiResult.warnings) console.warn('警告：' + w);
+  } catch (e) {
+    console.warn('警告：AI Runtime Hooks 注册失败：' + (e as Error).message);
+  }
 
   try {
     const cmds = ensureSkillCommands(process.cwd());

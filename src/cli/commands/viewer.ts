@@ -2,7 +2,7 @@
  * viewer CLI 命令
  * spec-first viewer [start|open|url] [--host <host>] [--port <port>] [--project-root <path>] [--open] [--print-url]
  */
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -51,6 +51,7 @@ function printHelp(): void {
   console.log('  --port <port>          指定端口（默认自动分配）');
   console.log('  --open                 自动打开浏览器');
   console.log('  --print-url            输出可视化地址');
+  console.log('  --background           非阻塞模式（用于 SessionStart Hook）');
 }
 
 export function handleViewer(args: string[]): number {
@@ -78,6 +79,20 @@ export function handleViewer(args: string[]): number {
   }
   if (parsed.subcommand === 'url' && !passthrough.includes('--print-url')) {
     passthrough.unshift('--print-url');
+  }
+
+  // --background: detached non-blocking mode
+  if (passthrough.includes('--background')) {
+    const idx = passthrough.indexOf('--background');
+    passthrough.splice(idx, 1);
+    const child = spawn(process.execPath, [bootstrapScript, ...passthrough], {
+      cwd: process.cwd(),
+      detached: true,
+      stdio: 'ignore',
+      env: process.env,
+    });
+    child.unref();
+    return ExitCode.SUCCESS;
   }
 
   const result = spawnSync(process.execPath, [bootstrapScript, ...passthrough], {

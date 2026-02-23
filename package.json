@@ -4,7 +4,7 @@
   "description": "Specification-driven development process engine for AI-era software development",
   "type": "module",
   "bin": {
-    "spec-first": "./dist/index.js"
+    "spec-first": "./dist/cli/index.js"
   },
   "scripts": {
     "build": "tsup",
@@ -16,7 +16,9 @@
     "bench": "vitest bench",
     "viewer:start": "node scripts/stage-viewer/server.js --project-root . --port 0",
     "viewer:bootstrap": "node scripts/stage-viewer/bootstrap.js --open",
-    "codex:autostart:install": "bash scripts/codex/install-codex-autostart.sh"
+    "codex:autostart:install": "bash scripts/codex/install-codex-autostart.sh",
+    "prepublishOnly": "npm run build",
+    "postinstall": "node dist/postinstall.js || true"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -38,8 +40,8 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/cli/index.js",
+      "types": "./dist/cli/index.d.ts"
     }
   },
   "publishConfig": {
@@ -54,7 +56,8 @@
     "vitest": "^1.6.1"
   },
   "dependencies": {
-    "handlebars": "^4.7.0",
-    "js-yaml": "^4.1.0"
+    "handlebars": "^4.7.8",
+    "js-yaml": "^4.1.0",
+    "update-notifier": "^7.0.0"
   }
 }

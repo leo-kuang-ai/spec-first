@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/cli/index.ts'],
+  entry: ['src/cli/index.ts', 'src/postinstall.ts'],
   format: ['esm'],
   target: 'es2022',
   outDir: 'dist',

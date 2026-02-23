@@ -44,7 +44,7 @@ export function generateAIHookConfigs(_projectRoot: string): AIHookConfig[] {
 }
 
 /** 注册 AI Hook 到宿主环境配置 */
-export function registerAIHooks(projectRoot: string): { registered: string[]; warnings: string[] } {
+export function registerAIHooks(projectRoot: string, options?: { dryRun?: boolean }): { registered: string[]; warnings: string[] } {
   const configs = generateAIHookConfigs(projectRoot);
   const registered: string[] = [];
   const warnings: string[] = [];
@@ -68,23 +68,18 @@ export function registerAIHooks(projectRoot: string): { registered: string[]; wa
     }
   }
 
-  const hooksValue = settings.hooks;
-  const hooks: Record<string, Array<{ matcher?: string; command: string }>> =
-    (hooksValue && typeof hooksValue === 'object')
-      ? hooksValue as Record<string, Array<{ matcher?: string; command: string }>>
-      : {};
-
   for (const config of configs) {
-    const existing = Array.isArray(hooks[config.type]) ? hooks[config.type] : [];
-    const filtered = existing.filter((item) =>
-      !(item && typeof item.command === 'string' && item.command.includes('npx spec-first')),
+    const existing = Array.isArray(settings[config.type]) ? settings[config.type] as any[] : [];
+    const filtered = existing.filter((item: any) =>
+      !(item?.hooks?.some((h: any) => typeof h.command === 'string' && h.command.includes('npx spec-first'))),
     );
-    hooks[config.type] = [...filtered, { matcher: config.matcher, command: config.command }];
+    settings[config.type] = [...filtered, { matcher: config.matcher, hooks: [{ type: 'command' as const, command: config.command }] }];
     registered.push(config.type);
   }
 
-  settings.hooks = hooks;
-  writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf-8');
+  if (!options?.dryRun) {
+    writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + '\n', 'utf-8');
+  }
 
   return { registered, warnings };
 }

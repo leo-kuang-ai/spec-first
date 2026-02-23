@@ -20,6 +20,7 @@ import { handleFeature } from './commands/feature.js';
 import { handleSetup } from './commands/setup.js';
 import { handleHooks } from './commands/hooks.js';
 import { handleViewer } from './commands/viewer.js';
+import { handleUpdate } from './commands/update.js';
 
 registerCommand('id', 'ID 生成、校验与检索', handleId);
 registerCommand('matrix', '追踪矩阵管理', handleMatrix);
@@ -37,6 +38,7 @@ registerCommand('feature', 'Feature 列表、当前项与切换', handleFeature)
 registerCommand('setup', '注册 Claude Code + Codex Skill 命令', handleSetup);
 registerCommand('hooks', 'Git hooks 安装与状态管理', handleHooks);
 registerCommand('viewer', '可视化面板启动与地址输出', handleViewer);
+registerCommand('update', '升级后刷新 Skill/MCP/Hooks', handleUpdate);
 
 const code = await dispatch(process.argv.slice(2));
 process.exit(code);

@@ -40,7 +40,7 @@ function removeSpecFirstBlock(content: string): string {
 }
 
 /** 安装 4 个 Git Hook 到 .git/hooks/ */
-export function installHooks(projectRoot: string): string[] {
+export function installHooks(projectRoot: string, options?: { dryRun?: boolean }): string[] {
   const hooksDir = join(projectRoot, '.git', 'hooks');
   const installed: string[] = [];
 
@@ -49,8 +49,10 @@ export function installHooks(projectRoot: string): string[] {
     const generated = generateHookScript(name);
     const existing = exists(hookPath) ? readFileSync(hookPath, 'utf-8') : '';
     const content = mergeHookContent(existing, generated);
-    writeFileSync(hookPath, content, 'utf-8');
-    chmodSync(hookPath, 0o755);
+    if (!options?.dryRun) {
+      writeFileSync(hookPath, content, 'utf-8');
+      chmodSync(hookPath, 0o755);
+    }
     installed.push(name);
   }
 

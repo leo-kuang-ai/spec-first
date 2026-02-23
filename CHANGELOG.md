@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.1 2026-02-24 Leo: 多Agent审查修复 — P0 发布入口 bin/exports 对齐 dist/cli/index.js + postinstall fallback 路径修正 + execSync→execFileSync 消除命令注入 + handlebars ^4.7.8 消除 CVE + setup --global 参数转发修复 + update-notifier ESM 兼容 + viewer help 补 --background + 文档 dist/index.js 残留清零 + 冒烟测试脚本 + 补齐 --skip-hooks/错误路径单测 (user-visible)
+- v0.5.0 2026-02-23 Leo: 新增 update 命令 + postinstall 自动注册 + SessionStart Hook 全局注册 + registerAIHooks 格式修正 + viewer --background 非阻塞 + 5 函数 dryRun 支持 + setup deprecated 转发 (user-visible)
+- v0.4.20 2026-02-23 Leo: CLAUDE.md 移除"个人协作协议"章节 + "角色定位"，"质疑与挑战授权"精简合并至核心理念，协议优先级去个人化
 - v0.4.19 2026-02-23 Leo: 删除根目录 code-review/（v0.4.0 遗留审查产出物，12 文件，与 08-code-review Skill 无关）
 - v0.4.18 2026-02-23 Leo: 删除 legacy Skill 目录（8 个已废弃旧 Skill）+ 清理相关路由/文档引用
 

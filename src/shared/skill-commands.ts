@@ -128,35 +128,49 @@ export interface SkillCommandResult {
 export interface SkillCommandOptions {
   /** true = 全局（~/.claude/commands/ + ~/.codex/skills/），false = 项目级（仅 .claude/commands/） */
   global?: boolean;
+  /** true = 仅收集待注册列表，不执行任何文件写入 */
+  dryRun?: boolean;
 }
 
 /**
  * 注册 Claude Code 命令入口文件。
  * 幂等覆盖：始终写入最新内容。
  */
-function ensureClaudeCommands(commandsDir: string, skills: SkillEntry[]): string[] {
-  mkdirSync(commandsDir, { recursive: true });
-  cleanupLegacyClaudeCommands(commandsDir, skills);
+function ensureClaudeCommands(commandsDir: string, skills: SkillEntry[], dryRun?: boolean): string[] {
+  if (!dryRun) {
+    mkdirSync(commandsDir, { recursive: true });
+    cleanupLegacyClaudeCommands(commandsDir, skills);
+  }
   const created: string[] = [];
 
   for (const entry of skills) {
-    const target = join(commandsDir, 'spec-first', `${entry.skillName}.md`);
-    mkdirSync(dirname(target), { recursive: true });
-    writeFileSync(target, renderCommandFile(entry), 'utf-8');
+    if (!dryRun) {
+      const target = join(commandsDir, 'spec-first', `${entry.skillName}.md`);
+      mkdirSync(dirname(target), { recursive: true });
+      writeFileSync(target, renderCommandFile(entry), 'utf-8');
+    }
     created.push(`spec-first:${entry.skillName}`);
   }
 
   return created;
 }
 
-function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string): string[] {
-  mkdirSync(codexSkillsDir, { recursive: true });
-  cleanupLegacyCodexSkills(codexSkillsDir, skills);
+function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?: boolean): string[] {
+  if (!dryRun) {
+    mkdirSync(codexSkillsDir, { recursive: true });
+    cleanupLegacyCodexSkills(codexSkillsDir, skills);
+  }
   const namespaceDir = join(codexSkillsDir, 'spec-first');
-  mkdirSync(namespaceDir, { recursive: true });
+  if (!dryRun) {
+    mkdirSync(namespaceDir, { recursive: true });
+  }
   const created: string[] = [];
 
   for (const entry of skills) {
+    if (dryRun) {
+      created.push(`spec-first:${entry.skillName}`);
+      continue;
+    }
     const target = join(namespaceDir, entry.skillName);
     try {
       const st = lstatSync(target);
@@ -214,14 +228,15 @@ function cleanupLegacyCodexSkills(codexSkillsDir: string, skills: SkillEntry[]):
 export function ensureSkillCommands(projectRoot: string, options?: SkillCommandOptions): SkillCommandResult {
   const skills = discoverSkills();
   const isGlobal = options?.global ?? false;
+  const dryRun = options?.dryRun;
   const hostPaths = detectHostPaths();
 
   const claudeDir = isGlobal
     ? hostPaths.claudeCommandsDir
     : join(projectRoot, '.claude', 'commands');
 
-  const claude = ensureClaudeCommands(claudeDir, skills);
-  const codex = isGlobal ? ensureCodexSkills(skills, hostPaths.codexSkillsDir) : [];
+  const claude = ensureClaudeCommands(claudeDir, skills, dryRun);
+  const codex = isGlobal ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun) : [];
 
   return { claude, codex };
 }
