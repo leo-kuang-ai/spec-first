@@ -15,7 +15,7 @@ import { assertTransitionAllowed, isTerminal } from './stage-machine.js';
 import { evaluateGate } from '../gate-engine/gate-evaluator.js';
 
 export class GateUnavailableError extends Error {
-  constructor(message = 'GateEngine not available') {
+  constructor(message = 'GateEngine 不可用') {
     super(message);
     this.name = 'GateUnavailableError';
   }
@@ -58,14 +58,14 @@ function getFindingsPath(featureId: string, root: string): string {
 
 function loadState(featureId: string, root: string): StageState {
   const p = getStatePath(featureId, root);
-  if (!exists(p)) throw new Error(`Feature ${featureId} not found`);
+  if (!exists(p)) throw new Error(`未找到 Feature：${featureId}`);
   return readJson<StageState>(p);
 }
 
 function nextStageInChain(current: Stage): Stage {
   const idx = STAGE_ORDER.indexOf(current);
   if (idx === -1 || idx >= STAGE_ORDER.length - 1) {
-    throw new Error(`No next stage after ${current}`);
+    throw new Error(`阶段 ${current} 之后不存在下一阶段`);
   }
   return STAGE_ORDER[idx + 1];
 }
@@ -95,7 +95,7 @@ export function advance(
   const from = state.currentStage;
 
   if (isTerminal(from)) {
-    throw new Error(`Feature ${featureId} is in terminal stage ${from}`);
+    throw new Error(`Feature ${featureId} 已处于终态阶段 ${from}`);
   }
 
   const to = nextStageInChain(from);
@@ -115,7 +115,7 @@ export function advance(
       gateResult = gate.status;
       if (gate.status === 'FAIL') {
         throw new GateFailedError(
-          `Gate failed at ${from}. Fix failed conditions before advancing ${from} → ${to}.`,
+          `阶段 ${from} 的 Gate 未通过。请先修复失败条件，再推进 ${from} → ${to}。`,
         );
       }
     } catch (e) {
@@ -130,8 +130,8 @@ export function advance(
             `PILOT_PASS: ${from} → ${to} (gate unavailable, pilot_mode=true)`);
         } else {
           throw new GateUnavailableError(
-            `Gate check unavailable and pilot_mode=false. ` +
-            `Cannot advance ${from} → ${to}. Enable pilot_mode or use --force.`
+            `Gate 检查不可用且 pilot_mode=false。` +
+            `无法推进 ${from} → ${to}。请开启 pilot_mode 或使用 --force。`
           );
         }
       } else {
@@ -143,8 +143,8 @@ export function advance(
             `PILOT_PASS: ${from} → ${to} (gate runtime error, pilot_mode=true)`);
         } else {
           throw new GateUnavailableError(
-            `Gate runtime error and pilot_mode=false. ` +
-            `Cannot advance ${from} → ${to}. Enable pilot_mode or use --force.`
+            `Gate 运行异常且 pilot_mode=false。` +
+            `无法推进 ${from} → ${to}。请开启 pilot_mode 或使用 --force。`
           );
         }
       }
@@ -182,14 +182,14 @@ export function cancel(
   reason: string,
 ): AdvanceResult {
   if (!reason) {
-    throw new Error('Cancel reason is required');
+    throw new Error('取消原因不能为空');
   }
 
   const state = loadState(featureId, projectRoot);
   const from = state.currentStage;
 
   if (isTerminal(from)) {
-    throw new Error(`Feature ${featureId} is in terminal stage ${from}`);
+    throw new Error(`Feature ${featureId} 已处于终态阶段 ${from}`);
   }
 
   const to = Stage.CANCELLED;

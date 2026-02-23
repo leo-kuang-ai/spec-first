@@ -15,7 +15,7 @@ export function handleAi(args: string[]): number {
     case 'stats': return handleStats(args.slice(1));
     default:
       printAiHelp();
-      if (sub) console.error(`Unknown ai subcommand: ${sub}`);
+      if (sub) console.error(`未知 ai 子命令：${sub}`);
       return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -23,7 +23,7 @@ export function handleAi(args: string[]): number {
 function handleContext(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first ai context <featureId>');
+    console.error('用法：spec-first ai context <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -31,13 +31,13 @@ function handleContext(args: string[]): number {
     const pack = buildContextPack(featureId, process.cwd());
     const valid = validateControlSize(pack);
 
-    console.log(`Context Pack — ${featureId} (v${pack.version})\n`);
-    console.log(`Phase: ${pack.control.current_phase}`);
-    console.log(`Control size: ${pack.budget.controlSize} bytes ${valid ? '(OK)' : '(EXCEEDED 2KB!)'}`);
-    console.log(`References: ${pack.budget.refsCount}`);
+    console.log(`上下文包 — ${featureId} (v${pack.version})\n`);
+    console.log(`阶段：${pack.control.current_phase}`);
+    console.log(`控制区大小：${pack.budget.controlSize} bytes ${valid ? '(通过)' : '(超出 2KB!)'}`);
+    console.log(`引用数：${pack.budget.refsCount}`);
 
     if (pack.references.length > 0) {
-      console.log('\nReferences:');
+      console.log('\n引用列表：');
       for (const ref of pack.references) {
         console.log(`  ${ref.path} [${ref.reason}] ${ref.checksum.slice(0, 8)}...`);
       }
@@ -45,7 +45,7 @@ function handleContext(args: string[]): number {
 
     return valid ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
   } catch {
-    console.error(`Failed to build context pack for ${featureId}`);
+    console.error(`构建上下文包失败：${featureId}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -53,7 +53,7 @@ function handleContext(args: string[]): number {
 function handleCatchup(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first ai catchup <featureId>');
+    console.error('用法：spec-first ai catchup <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -62,7 +62,7 @@ function handleCatchup(args: string[]): number {
     console.log(result.summary);
     return ExitCode.SUCCESS;
   } catch {
-    console.error(`Failed to run catchup for ${featureId}`);
+    console.error(`执行会话恢复失败：${featureId}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -70,34 +70,34 @@ function handleCatchup(args: string[]): number {
 function handleStats(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first ai stats <featureId>');
+    console.error('用法：spec-first ai stats <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const entries = readStats(featureId, process.cwd());
   if (entries.length === 0) {
-    console.log('No AI statistics recorded.');
+    console.log('暂无 AI 统计记录。');
     return ExitCode.SUCCESS;
   }
 
   const summary = summarizeStats(entries);
-  console.log(`AI Statistics — ${featureId}\n`);
-  console.log(`Total calls: ${summary.totalCalls}`);
-  console.log(`Total tokens: ${summary.totalTokensIn} in / ${summary.totalTokensOut} out`);
-  console.log(`Total duration: ${summary.totalDuration}s\n`);
+  console.log(`AI 统计 — ${featureId}\n`);
+  console.log(`总调用次数：${summary.totalCalls}`);
+  console.log(`总 Token：输入 ${summary.totalTokensIn} / 输出 ${summary.totalTokensOut}`);
+  console.log(`总耗时：${summary.totalDuration}s\n`);
 
-  console.log('By Skill:');
+  console.log('按 Skill 统计：');
   for (const [skill, data] of Object.entries(summary.bySkill)) {
-    console.log(`  ${skill.padEnd(20)} ${data.calls} calls  ${data.tokensIn}/${data.tokensOut} tokens`);
+    console.log(`  ${skill.padEnd(20)} ${data.calls} 次  ${data.tokensIn}/${data.tokensOut} tokens`);
   }
 
   return ExitCode.SUCCESS;
 }
 
 function printAiHelp(): void {
-  console.log('Usage: spec-first ai <subcommand>\n');
-  console.log('Subcommands:');
-  console.log('  context   Build and display Context Pack');
-  console.log('  catchup   Execute 7-step session recovery');
-  console.log('  stats     View AI call statistics');
+  console.log('用法：spec-first ai <subcommand>\n');
+  console.log('子命令：');
+  console.log('  context   生成并展示上下文包');
+  console.log('  catchup   执行 7 步会话恢复');
+  console.log('  stats     查看 AI 调用统计');
 }

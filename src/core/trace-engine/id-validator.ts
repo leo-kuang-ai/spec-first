@@ -17,7 +17,7 @@ const ID_PATTERNS: ReadonlyArray<{ type: IdType; regex: RegExp }> = [
 /** 校验 ID 格式，返回 { valid, type?, error? } */
 export function validateId(id: string): IdValidationResult {
   if (!id || typeof id !== 'string') {
-    return { valid: false, error: 'ID must be a non-empty string' };
+    return { valid: false, error: 'ID 必须是非空字符串' };
   }
 
   for (const { type, regex } of ID_PATTERNS) {
@@ -26,7 +26,7 @@ export function validateId(id: string): IdValidationResult {
     }
   }
 
-  return { valid: false, error: `Unknown ID format: "${id}"` };
+  return { valid: false, error: `未知 ID 格式："${id}"` };
 }
 
 /** 导出正则供其他模块使用 */

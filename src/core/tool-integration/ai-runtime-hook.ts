@@ -29,12 +29,12 @@ export function generateAIHookConfigs(_projectRoot: string): AIHookConfig[] {
     {
       type: 'PreToolUse',
       matcher: 'write|edit|create',
-      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} gate check "$FEAT" || echo "spec-first: skip gate check (no current feature)"'`,
+      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} gate check "$FEAT" || echo "spec-first: 跳过 gate 检查（无当前 feature）"'`,
     },
     {
       type: 'PostToolUse',
       matcher: 'write|edit|create',
-      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} matrix check "$FEAT" || echo "spec-first: skip matrix check (no current feature)"'`,
+      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} matrix check "$FEAT" || echo "spec-first: 跳过 matrix 检查（无当前 feature）"'`,
     },
     {
       type: 'Stop',
@@ -52,8 +52,8 @@ export function registerAIHooks(projectRoot: string): { registered: string[]; wa
   // 检查宿主环境是否支持 AI Hook
   const claudeDir = join(projectRoot, '.claude');
   if (!exists(claudeDir)) {
-    warnings.push('No .claude/ directory found — AI Hooks require Claude Code environment');
-    warnings.push('Graceful degradation: Gate validation falls back to Layer B CLI commands');
+    warnings.push('未找到 .claude/ 目录 —— AI Hooks 需要 Claude Code 环境');
+    warnings.push('已降级：Gate 校验回退为 Layer B CLI 命令');
     return { registered, warnings };
   }
 
@@ -63,7 +63,7 @@ export function registerAIHooks(projectRoot: string): { registered: string[]; wa
     try {
       settings = JSON.parse(readFileSync(settingsPath, 'utf-8')) as Record<string, unknown>;
     } catch {
-      warnings.push('Invalid .claude/settings.json detected — overwrite with spec-first hooks only');
+      warnings.push('检测到无效 .claude/settings.json —— 将仅覆盖 spec-first hooks');
       settings = {};
     }
   }
@@ -100,7 +100,7 @@ export function executePreToolUse(
     return {
       type: 'PreToolUse',
       success: false,
-      message: 'No stage-state.json found — initialize Feature first',
+      message: '未找到 stage-state.json —— 请先初始化 Feature',
       softBlock: true,
     };
   }
@@ -108,7 +108,7 @@ export function executePreToolUse(
   return {
     type: 'PreToolUse',
     success: true,
-    message: 'Gate pre-check passed',
+    message: 'Gate 预检查通过',
   };
 }
 
@@ -124,8 +124,8 @@ export function executeStopHook(
 
   try {
     appendFileSync(progressPath, entry);
-    return { type: 'Stop', success: true, message: 'Progress updated' };
+    return { type: 'Stop', success: true, message: 'progress.md 已更新' };
   } catch {
-    return { type: 'Stop', success: false, message: 'Failed to update progress.md' };
+    return { type: 'Stop', success: false, message: '更新 progress.md 失败' };
   }
 }

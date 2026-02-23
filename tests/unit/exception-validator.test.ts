@@ -53,7 +53,7 @@ describe('validateExceptions', () => {
     const rfcMap = new Map<string, string>();
     const result = validateExceptions(FEAT_ID, TMP, rfcMap);
     expect(result.invalid).toHaveLength(1);
-    expect(result.invalid[0].reason).toContain('not found');
+    expect(result.invalid[0].reason).toContain('未找到');
   });
 
   it('should reject expired exception', () => {
@@ -63,7 +63,7 @@ describe('validateExceptions', () => {
     const rfcMap = new Map([['RFC-001', 'approved']]);
     const result = validateExceptions(FEAT_ID, TMP, rfcMap);
     expect(result.invalid).toHaveLength(1);
-    expect(result.invalid[0].reason).toContain('Expired');
+    expect(result.invalid[0].reason).toContain('已过期');
   });
 });
 

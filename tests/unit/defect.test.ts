@@ -40,7 +40,7 @@ describe('Defect CRUD', () => {
   });
 
   it('should throw when defect not found', () => {
-    expect(() => getDefect(FEAT, 999, TMP)).toThrow(/not found/);
+    expect(() => getDefect(FEAT, 999, TMP)).toThrow(/未找到缺陷/);
   });
 
   it('should transition defect status', () => {

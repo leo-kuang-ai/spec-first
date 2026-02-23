@@ -27,7 +27,7 @@ describe('readJson / writeJson', () => {
   it('should throw on invalid JSON', () => {
     const p = join(TMP, 'bad.json');
     writeFileSync(p, 'not json', 'utf-8');
-    expect(() => readJson(p)).toThrow('Invalid JSON');
+    expect(() => readJson(p)).toThrow('无效 JSON');
   });
 
   it('should throw on missing file', () => {

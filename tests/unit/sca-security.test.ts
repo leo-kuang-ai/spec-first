@@ -42,7 +42,7 @@ describe('runSca', () => {
     );
     const result = runSca(FEAT, TMP, Stage.SPECIFY);
     expect(result.pass).toBe(false);
-    expect(result.checks[0].rule).toContain('uniqueness');
+    expect(result.checks[0].rule).toContain('唯一性');
   });
 
   it('should fail Design when FR has no DS mapping', () => {

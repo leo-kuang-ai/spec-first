@@ -35,7 +35,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
       completedTasks: 0,
       totalTasks: 0,
       missingFiles: [],
-      summary: `Catchup skipped: last run ${Math.round((now - lastRun) / 1000)}s ago (< 60s)`,
+      summary: `已跳过会话恢复：距离上次仅 ${Math.round((now - lastRun) / 1000)}s（< 60s）`,
     };
   }
   catchupLocks.set(featureId, now);
@@ -137,15 +137,15 @@ function buildSummary(
   completed: number, total: number, missing: string[],
 ): string {
   const lines = [
-    `Session Catchup — ${featureId}`,
-    `Phase: ${phase}`,
-    task ? `Current Task: ${task}` : 'Current Task: none',
-    `Progress: ${completed}/${total} tasks`,
+    `会话恢复 — ${featureId}`,
+    `阶段：${phase}`,
+    task ? `当前任务：${task}` : '当前任务：无',
+    `进度：${completed}/${total} 个任务`,
   ];
   if (missing.length > 0) {
-    lines.push(`Missing Files (${missing.length}): ${missing.join(', ')}`);
+    lines.push(`缺失文件（${missing.length}）：${missing.join(', ')}`);
   } else {
-    lines.push('Missing Files: none');
+    lines.push('缺失文件：无');
   }
   return lines.join('\n');
 }

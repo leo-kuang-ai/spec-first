@@ -13,7 +13,10 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "tsc --noEmit",
-    "bench": "vitest bench"
+    "bench": "vitest bench",
+    "viewer:start": "node scripts/stage-viewer/server.js --project-root . --port 0",
+    "viewer:bootstrap": "node scripts/stage-viewer/bootstrap.js --open",
+    "codex:autostart:install": "bash scripts/codex/install-codex-autostart.sh"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -29,7 +32,9 @@
     "dist",
     "skills",
     "templates",
-    "README.md"
+    "README.md",
+    "scripts/stage-viewer",
+    "scripts/codex"
   ],
   "exports": {
     ".": {

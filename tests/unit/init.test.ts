@@ -60,7 +60,28 @@ describe('init', () => {
   it('should write .spec-first/current', () => {
     const result = init(baseOpts());
     const current = readFileSync(join(TMP, '.spec-first', 'current'), 'utf-8');
-    expect(current).toBe(result.featureId);
+    expect(current).toBe(`${result.featureId}\n`);
+  });
+
+  it('should create default .spec-first/config.yaml when missing', () => {
+    init(baseOpts());
+    const configPath = join(TMP, '.spec-first', 'config.yaml');
+    expect(existsSync(configPath)).toBe(true);
+    const content = readFileSync(configPath, 'utf-8');
+    expect(content).toContain('pilot_mode: false');
+    expect(content).toContain('token_budget: 16000');
+    expect(content).toContain('trigger: prompt');
+  });
+
+  it('should not overwrite existing .spec-first/config.yaml', () => {
+    const specFirstDir = join(TMP, '.spec-first');
+    const configPath = join(specFirstDir, 'config.yaml');
+    mkdirSync(specFirstDir, { recursive: true });
+    const custom = 'gate:\n  pilot_mode: true\n';
+    writeFileSync(configPath, custom, 'utf-8');
+
+    init(baseOpts());
+    expect(readFileSync(configPath, 'utf-8')).toBe(custom);
   });
 
   it('should register FEAT abbreviation', () => {
@@ -84,12 +105,12 @@ describe('init', () => {
   it('should reject duplicate FEAT abbreviation for different feature', () => {
     init(baseOpts());
     expect(() => init(baseOpts({ featureId: 'FSREQ-20260211-AUTH-999' })))
-      .toThrow(/already registered/);
+      .toThrow(/已被注册/);
   });
 
   it('should reject invalid FEAT abbreviation', () => {
-    expect(() => init(baseOpts({ feat: 'auth' }))).toThrow(/Invalid FEAT/);
-    expect(() => init(baseOpts({ feat: '123' }))).toThrow(/Invalid FEAT/);
+    expect(() => init(baseOpts({ feat: 'auth' }))).toThrow(/无效 FEAT 缩写/);
+    expect(() => init(baseOpts({ feat: '123' }))).toThrow(/无效 FEAT 缩写/);
   });
 
   it('should auto-increment sequence number', () => {

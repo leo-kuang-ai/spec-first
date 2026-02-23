@@ -282,6 +282,26 @@ spec-first doctor [featureId]
 
 检查：Node.js 版本、Git 配置、.spec-first/ 目录、specs/ 目录、config.yaml、Git Hook 状态、Gate 降级检测、运行时文件膨胀检测。指定 featureId 时额外检查 Feature 级状态。
 
+MCP/skills 诊断与修复（与 doctor Skill 一致）：
+
+- 双宿主检查范围：
+  - `Codex`：`~/.codex/config.toml`、`~/.codex/skills/`
+  - `Claude Code`：`~/.config/claude-code/mcp.json`、`~/.config/claude-code/settings.json`、`~/.claude/skills/`
+- 安装范围：
+  - MCP 与第三方 skills 统一安装到用户级全局目录（home 路径），不写入项目局部目录
+- 必检 MCP：
+  - `sequential-thinking`
+  - `context7`
+  - `serena`（优先 `uvx --from git+https://github.com/oraios/serena serena start-mcp-server`，兼容回退 `serena-mcp-server`/`npx -y mcp-server-serena`）
+  - `fetch`（固定为 `uvx mcp-server-fetch`）
+  - `playwright-mcp`
+- 必检 skills：
+  - `find-skills`
+  - `skill-creator`
+- 处理策略：
+  - 缺失或配置错误时，自动安装/自动修复（不等待用户确认）
+  - 修复后必须复检，并在输出中给出修复前后状态差异
+
 ---
 
 ## Skill 统一执行模型

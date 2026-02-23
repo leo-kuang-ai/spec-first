@@ -138,6 +138,6 @@ describe('Core Flow E2E', () => {
       advance(featureId, TMP, { force: true });
     }
     expect(() => advance(featureId, TMP, { force: true }))
-      .toThrow(/terminal stage/);
+      .toThrow(/终态阶段/);
   });
 });

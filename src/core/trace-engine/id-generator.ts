@@ -28,7 +28,7 @@ export interface NextIdResult {
 export function nextId(opts: NextIdOptions): NextIdResult {
   validateAbbr(opts.abbr);
   if (opts.type === 'TC' && !opts.tcLevel) {
-    throw new Error('TC type requires tcLevel (UT|IT|E2E|ST)');
+    throw new Error('TC 类型必须提供 tcLevel（UT|IT|E2E|ST）');
   }
 
   const matrixPath = getMatrixPath(opts.projectRoot, opts.featureId);
@@ -39,7 +39,7 @@ export function nextId(opts: NextIdOptions): NextIdResult {
 
   const validation = validateId(id);
   if (!validation.valid) {
-    throw new Error(`Generated invalid ID: ${id} — ${validation.error}`);
+    throw new Error(`生成了无效 ID：${id} — ${validation.error}`);
   }
 
   appendToMatrix(matrixPath, { id, type: opts.type, title: '', status: 'Planned' });
@@ -51,7 +51,7 @@ export function nextId(opts: NextIdOptions): NextIdResult {
 function validateAbbr(abbr: string): void {
   if (!/^[A-Z][A-Z0-9]{0,15}$/.test(abbr)) {
     throw new Error(
-      `Invalid abbreviation "${abbr}": must be 1-16 chars, start with A-Z, contain only A-Z0-9`,
+      `无效缩写 "${abbr}"：必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`,
     );
   }
 }

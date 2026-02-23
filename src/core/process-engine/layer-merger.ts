@@ -144,15 +144,15 @@ function applyLayer1(
 interface PlatformYaml {
   platform: string;
   gate_conditions?: Record<string, GateCondition[]>;
-  extra_deliverables?: Record<string, Deliverable[]>;
-  quality_thresholds?: Record<string, { value: number; direction?: ThresholdEntry['direction'] }>;
+  extra_deliverables?: Record<string, unknown[]>;
+  quality_thresholds?: Record<string, unknown>;
 }
 
 const THRESHOLD_DIRECTIONS: ThresholdEntry['direction'][] = ['higher_is_better', 'lower_is_better'];
 
 function asObject(v: unknown): Record<string, unknown> {
   if (!v || typeof v !== 'object' || Array.isArray(v)) {
-    throw new Error('Platform YAML must be an object');
+    throw new Error('平台 YAML 必须是对象');
   }
   return v as Record<string, unknown>;
 }
@@ -160,13 +160,13 @@ function asObject(v: unknown): Record<string, unknown> {
 function loadPlatformYaml(platform: string, projectRoot: string): PlatformYaml {
   const p = join(projectRoot, '.spec-first', 'layer2', `${platform}.yaml`);
   if (!exists(p)) {
-    throw new Error(`Platform YAML not found: ${p}`);
+    throw new Error(`未找到平台 YAML：${p}`);
   }
   const raw = readFileSync(p, 'utf-8');
   const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
   const root = asObject(parsed);
   if (typeof root.platform !== 'string' || root.platform.trim() === '') {
-    throw new Error(`Invalid platform YAML (${platform}): "platform" is required`);
+    throw new Error(`无效平台 YAML（${platform}）："platform" 为必填`);
   }
   return root as unknown as PlatformYaml;
 }
@@ -177,6 +177,75 @@ function inferDirection(key: string): 'higher_is_better' | 'lower_is_better' | u
   if (/max|size|latency|time|error|violation|anr|bug/.test(lower)) return 'lower_is_better';
   if (/coverage|score|rate|pass|availability/.test(lower)) return 'higher_is_better';
   return undefined;
+}
+
+function normalizeDeliverable(raw: unknown, stage: string, platform: string): Deliverable {
+  if (typeof raw === 'string' && raw.trim() !== '') {
+    return { name: raw.trim(), required: false };
+  }
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    throw new Error(`平台 "${platform}" 的阶段 "${stage}" 存在无效 deliverable`);
+  }
+  const entry = raw as Record<string, unknown>;
+  if (typeof entry.name !== 'string' || entry.name.trim() === '') {
+    throw new Error(`平台 "${platform}" 的阶段 "${stage}" 缺少 deliverable 名称`);
+  }
+  return {
+    name: entry.name.trim(),
+    required: typeof entry.required === 'boolean' ? entry.required : false,
+    description: typeof entry.description === 'string' ? entry.description : undefined,
+  };
+}
+
+function parseThresholdNumber(raw: unknown): number | undefined {
+  if (typeof raw === 'number' && !Number.isNaN(raw)) return raw;
+  if (typeof raw !== 'string') return undefined;
+  const trimmed = raw.trim();
+  const matched = trimmed.match(/^([+-]?\d+(?:\.\d+)?)/);
+  if (!matched) return undefined;
+  const value = Number.parseFloat(matched[1]);
+  const hasUnitSuffix = matched[1].length < trimmed.length;
+  if (hasUnitSuffix && !(process.env.VITEST || process.env.NODE_ENV === 'test')) {
+    console.warn(`[layer-merger] threshold "${raw}" 包含单位后缀；已按数值 ${value} 解析`);
+  }
+  return Number.isNaN(value) ? undefined : value;
+}
+
+function normalizeThresholdEntry(
+  raw: unknown,
+  key: string,
+  platform: string,
+): ThresholdEntry {
+  const asObjectEntry = raw && typeof raw === 'object' && !Array.isArray(raw)
+    ? (raw as Record<string, unknown>)
+    : undefined;
+
+  const parsedValue = asObjectEntry
+    ? parseThresholdNumber(asObjectEntry.value)
+    : parseThresholdNumber(raw);
+
+  if (parsedValue === undefined) {
+    throw new Error(
+      `平台 "${platform}" 的阈值 "${key}" 数值无效。`
+      + '请使用数字或可解析的数字字符串（如 500、500ms、80%）。',
+    );
+  }
+
+  const explicitDirection = asObjectEntry?.direction;
+  if (explicitDirection !== undefined
+      && (typeof explicitDirection !== 'string'
+        || !THRESHOLD_DIRECTIONS.includes(explicitDirection as ThresholdEntry['direction']))) {
+    throw new Error(`平台 "${platform}" 的阈值 "${key}" direction 无效："${String(explicitDirection)}"`);
+  }
+
+  const direction = (explicitDirection as ThresholdEntry['direction'] | undefined) || inferDirection(key);
+  if (!direction) {
+    throw new Error(
+      `无法推断平台 "${platform}" 的阈值 "${key}" direction，请显式配置 direction 字段。`,
+    );
+  }
+
+  return { value: parsedValue, direction };
 }
 
 function applyLayer2(
@@ -197,7 +266,7 @@ function applyLayer2(
           const conflict = gates[stage].find((g) => g.id === cond.id);
           if (conflict) {
             throw new Error(
-              `Gate ID conflict: ${cond.id} in stage ${stage} (platform: ${platform})`,
+              `Gate ID 冲突：阶段 ${stage} 中存在重复 ID ${cond.id}（平台：${platform}）`,
             );
           }
           gates[stage].push(cond);
@@ -209,7 +278,11 @@ function applyLayer2(
     if (py.extra_deliverables) {
       for (const [stage, items] of Object.entries(py.extra_deliverables)) {
         deliverables[stage] = deliverables[stage] ?? [];
-        for (const item of items) {
+        if (!Array.isArray(items)) {
+          throw new Error(`平台 "${platform}" 的阶段 "${stage}" 中 extra_deliverables 必须是数组`);
+        }
+        for (const rawItem of items) {
+          const item = normalizeDeliverable(rawItem, stage, platform);
           const dup = deliverables[stage].some((d) => d.name === item.name);
           if (!dup) deliverables[stage].push(item);
         }
@@ -218,27 +291,14 @@ function applyLayer2(
 
     // quality_thresholds: 取更严格值
     if (py.quality_thresholds) {
-      for (const [key, entry] of Object.entries(py.quality_thresholds)) {
-        if (typeof entry.value !== 'number' || Number.isNaN(entry.value)) {
-          throw new Error(`Invalid threshold value for "${key}" in platform "${platform}"`);
-        }
-
-        const explicit = entry.direction;
-        if (explicit && !THRESHOLD_DIRECTIONS.includes(explicit)) {
-          throw new Error(`Invalid threshold direction "${explicit}" for "${key}" in platform "${platform}"`);
-        }
-        const dir = explicit || inferDirection(key);
-        if (!dir) {
-          throw new Error(
-            `Cannot infer direction for threshold "${key}" in platform "${platform}". Add explicit direction field.`,
-          );
-        }
+      for (const [key, rawEntry] of Object.entries(py.quality_thresholds)) {
+        const entry = normalizeThresholdEntry(rawEntry, key, platform);
         const existing = thresholds[key];
         if (!existing) {
-          thresholds[key] = { value: entry.value, direction: dir };
+          thresholds[key] = entry;
         } else {
           // 取更严格值
-          if (dir === 'higher_is_better') {
+          if (entry.direction === 'higher_is_better') {
             thresholds[key].value = Math.max(existing.value, entry.value);
           } else {
             thresholds[key].value = Math.min(existing.value, entry.value);

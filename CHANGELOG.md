@@ -7,12 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.4.19 2026-02-23 Leo: 删除根目录 code-review/（v0.4.0 遗留审查产出物，12 文件，与 08-code-review Skill 无关）
+- v0.4.18 2026-02-23 Leo: 删除 legacy Skill 目录（8 个已废弃旧 Skill）+ 清理相关路由/文档引用
+
+- v0.4.17 2026-02-23 Leo: Gate 引擎接入 Layer2 命令 Gate — gate-evaluator.ts 新增 mergedRules.gateConditions 命令执行能力（execSync + 120s 超时 + ID 去重），python-backend.yaml 覆盖率 Gate 从全量 pytest --cov 改为增量 diff-cover --fail-under=80 (user-visible)
+
+- v0.4.16 2026-02-16 Leo: setup 命令补齐 `--help` 支持 + 安装文档增加「首次使用」「验证 Skill 注册」「常见问题」三节（基于 init 实测日志审查） (user-visible)
+- v0.4.15 2026-02-16 Leo: Skill 双宿主全局注册 — 新增 `setup` CLI 命令（`--global` 写入 `~/.claude/commands/` + `~/.codex/skills/` 符号链接），`skill-commands.ts` 重构为双宿主注册器，安装/卸载文档全量更新 (user-visible)
+- v0.4.14 2026-02-16 Leo: 安装文档补齐 `spec-first init` 步骤，确保 Skill 命令注册；卸载命令修正为 `pnpm remove --global` (user-visible)
+- v0.4.13 2026-02-16 Leo: 卸载文档补齐 Skill 命令入口清理步骤（rm .claude/commands/spec-first-*.md）(user-visible)
+- v0.4.12 2026-02-16 Leo: Skill 命令注册自动化 — 新增 `src/shared/skill-commands.ts` 模块（动态扫描 skills/spec-first/ 生成 .claude/commands/ 入口文件），init CLI 成功后自动调用，01-init SKILL.md 新增 P5 阶段 + Success Criteria 补齐 (user-visible)
+- v0.4.11 2026-02-16 Leo: 批量创建 13 个 .claude/commands/ 入口文件，补齐 spec-first 全量 Skill 的 Claude Code 命令注册（init/catchup/spec/design/research/task/code/code-review/test/archive/status/doctor/sync）(user-visible)
+- v0.4.10 2026-02-16 Leo: 环境自举能力模块化并下沉到命令层（新增 `src/shared/host-bootstrap.ts`，`init` 启动即执行 Codex+Claude 双宿主 MCP/skills 自动检查与缺失自动安装：sequential-thinking/context7/serena/fetch/playwright-mcp + find-skills/skill-creator）；`doctor` CLI 接入同一模块并输出自动修复结果；AGENTS.md 的 `spec-first doctor` 规则与 `15-doctor/SKILL.md` 全量对齐 (user-visible)
+- v0.4.9 2026-02-14 Leo: 01-init SKILL.md 深度审查报告 — P0×2（Preflight Bootstrap 职责越界 47% 篇幅与 CLI 零交集 + auto-install 与 strict 矛盾）+ P1×5（config.yaml 引用错误/三层合并缺失/幂等缺失/FEAT 校验缺失/Success Criteria 错位）+ P2×5，综合可用率 ~35%
+- v0.4.8 2026-02-14 Leo: 新增安装与更新文档（全局安装模式 pnpm link）(user-visible)
 - v0.4.7 2026-02-14 Leo: Skill 命令参考手册 v1.0→v2.0 全量重写 — 对齐当前代码实现（legacy 8 Skill→16 Skill、5 阶段→6 阶段执行模型、补齐 golive/commit/feature/metrics health 4 命令组、修正 defect/rfc/gate/id 参数签名、新增 Dispatcher 路由规则 + confirm_policy 语义 + orchestrate 调度协议）(user-visible)
 - v0.4.6 2026-02-14 Leo: Skill 提示词审查报告 P0~P2 全量修复 — P0×3 AGENTS.md CLI 参数修正（rfc 5 处/defect 3 处/补充 golive+commit+feature+metrics health 4 命令组）+ P1×6 歧义消除（catchup/research confirm_policy 修正、test 输出路径、目录重复行、legacy 名称、id next/gate conditions 参数）+ P2×7 提示词质量提升（5 核心 Skill 补示例、16 Skill 补成功标准、AGENTS.md 补 confirm_policy 语义+错误处理规则、orchestrate 补调度协议），综合可用率 60%→95%
 - v0.4.5 2026-02-14 Leo: Skill 提示词审查报告 — AGENTS.md + 16 SKILL.md 作为 AI 提示词的有效性评估（P0×3 CLI 参数错误 + P1×6 歧义/遗漏 + P2×7 质量提升项，综合可用率 ~60%）
 - v0.4.4 2026-02-14 Leo: 使用手册 v2.0→v3.0 全量重写 — 对齐当前代码实现（13 命令组 38 子命令 + 16 Skill + 6 阶段执行模型 + Dispatcher 路由 + Feature 目录结构）(user-visible)
 - v0.4.3 2026-02-14 Leo: FSREQ-20260209-AUTH-001 邮箱登录扩展（RFC-002）— FR-AUTH-003 + DS-AUTH-005/006 + API-AUTH-003/004 + 6 任务 + 3 测试用例 + OpenAPI 契约 + 追踪矩阵更新
-- v0.4.2 2026-02-14 Leo: Skill 审查报告 P0~P2 全量修复 — P0-4 legacy 隔离至 _legacy/、P0-5 dispatcher 移除 init/doctor、P0-1 五个 Skill id generate→id next、P0-2 matrix update CLI 命令补齐、P0-3 AGENTS.md 26 处命令名修正、P1-1~P1-5 执行模型 6 阶段/Stage×Skill 映射/ID 类型/Gate 结果/defect 语义映射修正、P2-1~P2-3 init 参数格式/tasks.md→task_plan.md/4 个 Skill 产出物路径对齐 (user-visible)
+- v0.4.2 2026-02-14 Leo: Skill 审查报告 P0~P2 全量修复 — P0-4 legacy 隔离到独立遗留目录（后续已删除）、P0-5 dispatcher 移除 init/doctor、P0-1 五个 Skill id generate→id next、P0-2 matrix update CLI 命令补齐、P0-3 AGENTS.md 26 处命令名修正、P1-1~P1-5 执行模型 6 阶段/Stage×Skill 映射/ID 类型/Gate 结果/defect 语义映射修正、P2-1~P2-3 init 参数格式/tasks.md→task_plan.md/4 个 Skill 产出物路径对齐 (user-visible)
 
 - v0.4.1 2026-02-14 Leo: Skill 审查报告合并 — 交叉验证 review-skills-2026-02-14.md，新增 P0-4（3 个 skillName 冲突致 Skill 不可达）+ P0-5（2 个 Skill 被 RUNTIME_COMMANDS 覆盖），综合可用率 38%
 - v0.4.1 2026-02-14 Leo: 开发任务文档 P2 修复 — Phase B CLI 命令数区分 14 个 CLI 命令 + 1 个 Skill Runtime 入口（头部+总览标题同步）

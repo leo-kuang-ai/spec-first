@@ -47,7 +47,7 @@ describe('nextId', () => {
 
   it('should throw when TC missing tcLevel', () => {
     expect(() => nextId({ type: 'TC', abbr: 'AUTH', featureId: FEAT_ID, projectRoot: TMP }))
-      .toThrow('TC type requires tcLevel');
+      .toThrow('TC 类型必须提供 tcLevel');
   });
 
   it('should generate RFC ID (no abbr in ID)', () => {
@@ -57,9 +57,9 @@ describe('nextId', () => {
 
   it('should reject invalid abbreviation', () => {
     expect(() => nextId({ type: 'FR', abbr: 'auth', featureId: FEAT_ID, projectRoot: TMP }))
-      .toThrow('Invalid abbreviation');
+      .toThrow('无效缩写');
     expect(() => nextId({ type: 'FR', abbr: '', featureId: FEAT_ID, projectRoot: TMP }))
-      .toThrow('Invalid abbreviation');
+      .toThrow('无效缩写');
   });
 
   it('should write to matrix file', () => {

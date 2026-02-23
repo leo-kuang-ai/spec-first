@@ -17,7 +17,7 @@ const DEFECT_TERMINAL: ReadonlySet<DefectStatus> = new Set(['verified', 'wontfix
 
 export class DefectTransitionError extends Error {
   constructor(from: DefectStatus, to: DefectStatus) {
-    super(`Invalid defect transition: ${from} → ${to}`);
+    super(`无效缺陷状态流转：${from} → ${to}`);
     this.name = 'DefectTransitionError';
   }
 }

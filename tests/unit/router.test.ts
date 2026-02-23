@@ -1,9 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { registerCommand, dispatch, getRegisteredCommands } from '../../src/cli/router.js';
+import { describe, it, expect } from 'vitest';
+import { registerCommand, dispatch } from '../../src/cli/router.js';
 
 describe('CLI Router', () => {
   it('should return SUCCESS for --help', async () => {
     const code = await dispatch(['--help']);
+    expect(code).toBe(0);
+  });
+
+  it('should return SUCCESS for --version', async () => {
+    const code = await dispatch(['--version']);
     expect(code).toBe(0);
   });
 

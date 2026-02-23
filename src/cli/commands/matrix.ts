@@ -14,8 +14,8 @@ export function handleMatrix(args: string[]): number {
     case 'export': return handleExport(rest);
     case 'update': return handleUpdate(rest);
     default:
-      console.error(`Unknown matrix subcommand: ${sub}`);
-      console.log('Subcommands: check, export, update');
+      console.error(`未知 matrix 子命令：${sub}`);
+      console.log('子命令：check, export, update');
       return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -23,25 +23,25 @@ export function handleMatrix(args: string[]): number {
 function handleCheck(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first matrix check <featureId>');
+    console.error('用法：spec-first matrix check <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const result = checkMatrix(featureId, process.cwd());
-    console.log(`Matrix check for ${featureId}:`);
-    console.log(`  Total items: ${result.total}`);
-    console.log(`  Orphans: ${result.orphans.length}`);
-    console.log(`  Broken chains: ${result.brokenChains.length}`);
+    console.log(`矩阵检查：${featureId}`);
+    console.log(`  总条目：${result.total}`);
+    console.log(`  孤儿项：${result.orphans.length}`);
+    console.log(`  断链数：${result.brokenChains.length}`);
     if (result.warnings.length > 0) {
-      console.log('\nWarnings:');
+      console.log('\n警告：');
       for (const w of result.warnings) {
         console.log(`  - ${w}`);
       }
     }
     return result.warnings.length > 0 ? ExitCode.GATE_FAILED : ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -49,7 +49,7 @@ function handleCheck(args: string[]): number {
 function handleExport(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first matrix export <featureId> [--format markdown|yaml]');
+    console.error('用法：spec-first matrix export <featureId> [--format markdown|yaml]');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -61,7 +61,7 @@ function handleExport(args: string[]): number {
     console.log(output);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -70,7 +70,7 @@ function handleUpdate(args: string[]): number {
   const featureId = args[0];
   const id = args[1];
   if (!featureId || !id) {
-    console.error('Usage: spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]');
+    console.error('用法：spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -88,16 +88,16 @@ function handleUpdate(args: string[]): number {
   }
 
   if (Object.keys(updates).length === 0) {
-    console.error('At least one update flag required: --status, --title, --upstream, --downstream');
+    console.error('至少需要一个更新参数：--status、--title、--upstream、--downstream');
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     updateMatrixRow(featureId, process.cwd(), id, updates);
-    console.log(`Updated ${id} in matrix for ${featureId}`);
+    console.log(`已更新矩阵条目：${id}（${featureId}）`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }

@@ -20,7 +20,7 @@ export function handleRfc(args: string[]): number {
     case 'list':       return handleList(rest);
     case 'get':        return handleGet(rest);
     default:
-      console.error(`Unknown rfc subcommand: ${sub}`);
+      console.error(`未知 rfc 子命令：${sub}`);
       printRfcHelp();
       return ExitCode.VALIDATION_ERROR;
   }
@@ -35,12 +35,12 @@ function handleCreate(args: string[]): number {
   const description = parseFlag(args, '--description');
 
   if (!featureId || !title) {
-    console.error('Usage: spec-first rfc create <featureId> --title "<title>" [--level <Minor|Major|Critical>] [--by <by>]');
+    console.error('用法：spec-first rfc create <featureId> --title "<title>" [--level <Minor|Major|Critical>] [--by <by>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
   if (level && !VALID_LEVELS.has(level)) {
-    console.error(`Invalid level "${level}": must be Minor, Major, or Critical`);
+    console.error(`无效 level "${level}"：必须是 Minor、Major 或 Critical`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -52,10 +52,10 @@ function handleCreate(args: string[]): number {
       motivation: motivation ?? undefined,
       description: description ?? undefined,
     }, process.cwd());
-    console.log(`Created: ${r.id} (${r.status})`);
+    console.log(`已创建：${r.id}（${r.status}）`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -65,16 +65,16 @@ function handleSubmit(args: string[]): number {
   const featureId = parseFlag(args, '--feature');
 
   if (!rfcId || !featureId) {
-    console.error('Usage: spec-first rfc submit <rfcId> --feature <featureId>');
+    console.error('用法：spec-first rfc submit <rfcId> --feature <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const r = submitRfc(rfcId, featureId, process.cwd());
-    console.log(`Submitted: ${r.id} → ${r.status}`);
+    console.log(`已提交：${r.id} → ${r.status}`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -85,21 +85,21 @@ function handleTransition(args: string[]): number {
   const featureId = parseFlag(args, '--feature');
 
   if (!rfcId || !status || !featureId) {
-    console.error('Usage: spec-first rfc transition <rfcId> <status> --feature <featureId>');
+    console.error('用法：spec-first rfc transition <rfcId> <status> --feature <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   if (!VALID_STATUSES.has(status)) {
-    console.error(`Invalid status "${status}": must be draft, approved, closed, or rejected`);
+    console.error(`无效状态 "${status}"：必须是 draft、approved、closed 或 rejected`);
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const r = transitionRfc(rfcId, status as RfcStatus, featureId, process.cwd());
-    console.log(`Transitioned: ${r.id} → ${r.status}`);
+    console.log(`已流转：${r.id} → ${r.status}`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -107,13 +107,13 @@ function handleTransition(args: string[]): number {
 function handleList(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first rfc list <featureId>');
+    console.error('用法：spec-first rfc list <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const list = listRfc(featureId, process.cwd());
   if (list.length === 0) {
-    console.log('No RFCs found.');
+    console.log('未找到 RFC。');
     return ExitCode.SUCCESS;
   }
   for (const r of list) {
@@ -127,7 +127,7 @@ function handleGet(args: string[]): number {
   const featureId = parseFlag(args, '--feature');
 
   if (!rfcId || !featureId) {
-    console.error('Usage: spec-first rfc get <rfcId> --feature <featureId>');
+    console.error('用法：spec-first rfc get <rfcId> --feature <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -136,20 +136,20 @@ function handleGet(args: string[]): number {
     console.log(JSON.stringify(r, null, 2));
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
 
 function printRfcHelp(): void {
-  console.log(`Usage: spec-first rfc <subcommand>
+  console.log(`用法：spec-first rfc <subcommand>
 
-Subcommands:
-  create      Create a new RFC
-  submit      Submit RFC (draft → approved)
-  transition  Transition RFC status
-  list        List all RFCs
-  get         Get RFC details`);
+子命令：
+  create      创建 RFC
+  submit      提交 RFC（draft → approved）
+  transition  流转 RFC 状态
+  list        列出 RFC
+  get         查看 RFC 详情`);
 }
 
 function parseFlag(args: string[], flag: string): string | undefined {

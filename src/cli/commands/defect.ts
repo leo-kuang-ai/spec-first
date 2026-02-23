@@ -26,7 +26,7 @@ export function handleDefect(args: string[]): number {
     case 'get':         return handleGet(rest);
     case 'escape-rate': return handleEscapeRate(rest);
     default:
-      console.error(`Unknown defect subcommand: ${sub}`);
+      console.error(`未知 defect 子命令：${sub}`);
       printDefectHelp();
       return ExitCode.VALIDATION_ERROR;
   }
@@ -42,12 +42,12 @@ function handleRegister(args: string[]): number {
   const linkedFr = parseFlag(args, '--linked-fr');
 
   if (!featureId || !severity || !title) {
-    console.error('Usage: spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" --reporter "<name>"');
+    console.error('用法：spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" --reporter "<name>"');
     return ExitCode.VALIDATION_ERROR;
   }
 
   if (!VALID_SEVERITIES.has(severity)) {
-    console.error(`Invalid severity "${severity}": must be S1, S2, S3, or S4`);
+    console.error(`无效严重级别 "${severity}"：必须是 S1、S2、S3 或 S4`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -60,10 +60,10 @@ function handleRegister(args: string[]): number {
       discoveredIn,
       linkedFr: linkedFr ?? undefined,
     }, process.cwd());
-    console.log(`Registered: defect #${d.seq} (${d.severity})`);
+    console.log(`已登记：缺陷 #${d.seq} (${d.severity})`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -75,27 +75,27 @@ function handleUpdate(args: string[]): number {
   const _actor = parseFlag(args, '--actor'); // 阶段 A 暂不持久化 actor，仅保留参数兼容
 
   if (!featureId || !seqStr || !status) {
-    console.error('Usage: spec-first defect update <featureId> <seq> --status <status> [--actor <actor>]');
+    console.error('用法：spec-first defect update <featureId> <seq> --status <status> [--actor <actor>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const seq = parseInt(seqStr, 10);
   if (Number.isNaN(seq) || seq <= 0) {
-    console.error(`Invalid seq "${seqStr}": must be a positive integer`);
+    console.error(`无效序号 "${seqStr}"：必须是正整数`);
     return ExitCode.VALIDATION_ERROR;
   }
 
   if (!VALID_STATUSES.has(status)) {
-    console.error(`Invalid status "${status}": must be open, fixing, fixed, verified, or wontfix`);
+    console.error(`无效状态 "${status}"：必须是 open、fixing、fixed、verified 或 wontfix`);
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const d = transitionDefect(featureId, seq, status as DefectStatus, process.cwd());
-    console.log(`Updated: defect #${d.seq} → ${d.status}`);
+    console.log(`已更新：缺陷 #${d.seq} → ${d.status}`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -103,7 +103,7 @@ function handleUpdate(args: string[]): number {
 function handleList(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first defect list <featureId> [--status <status>] [--severity <severity>]');
+    console.error('用法：spec-first defect list <featureId> [--status <status>] [--severity <severity>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -116,7 +116,7 @@ function handleList(args: string[]): number {
   });
 
   if (list.length === 0) {
-    console.log('No defects found.');
+    console.log('未找到缺陷。');
     return ExitCode.SUCCESS;
   }
   for (const d of list) {
@@ -130,13 +130,13 @@ function handleGet(args: string[]): number {
   const seqStr = args[1];
 
   if (!featureId || !seqStr) {
-    console.error('Usage: spec-first defect get <featureId> <seq>');
+    console.error('用法：spec-first defect get <featureId> <seq>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const seq = parseInt(seqStr, 10);
   if (Number.isNaN(seq) || seq <= 0) {
-    console.error(`Invalid seq "${seqStr}": must be a positive integer`);
+    console.error(`无效序号 "${seqStr}"：必须是正整数`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -145,7 +145,7 @@ function handleGet(args: string[]): number {
     console.log(JSON.stringify(d, null, 2));
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -153,24 +153,24 @@ function handleGet(args: string[]): number {
 function handleEscapeRate(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first defect escape-rate <featureId>');
+    console.error('用法：spec-first defect escape-rate <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const result = getEscapeRate(featureId, process.cwd());
-  console.log(`Total: ${result.total}, Escaped: ${result.escaped}, Rate: ${(result.rate * 100).toFixed(1)}%`);
+  console.log(`总数：${result.total}，逃逸：${result.escaped}，逃逸率：${(result.rate * 100).toFixed(1)}%`);
   return ExitCode.SUCCESS;
 }
 
 function printDefectHelp(): void {
-  console.log(`Usage: spec-first defect <subcommand>
+  console.log(`用法：spec-first defect <subcommand>
 
-Subcommands:
-  register     Register a new defect
-  update       Transition defect status
-  list         List defects (with optional filters)
-  get          Get defect details
-  escape-rate  Calculate defect escape rate`);
+子命令：
+  register     登记新缺陷
+  update       变更缺陷状态
+  list         列出缺陷（可筛选）
+  get          查看缺陷详情
+  escape-rate  计算缺陷逃逸率`);
 }
 
 function parseFlag(args: string[], flag: string): string | undefined {

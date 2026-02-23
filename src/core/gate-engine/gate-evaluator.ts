@@ -4,6 +4,7 @@
  */
 import { join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import type {
   Stage, GateStatus, GateResult, ConditionResult, WaiverRef,
   CoverageMetrics, StageState, IdType,
@@ -286,6 +287,22 @@ export function evaluateGate(featureId: string, projectRoot: string): GateResult
     });
   }
 
+  // Layer2 命令 Gate：从 mergedRules.gateConditions 读取带 command 的条件并执行
+  const l2Conditions = (state.mergedRules?.gateConditions?.[stage] ?? []) as Array<{
+    id: string; description: string; command?: string;
+  }>;
+  const evaluatedIds = new Set(conditions.map(c => c.id));
+  for (const l2 of l2Conditions) {
+    if (!l2.command || evaluatedIds.has(l2.id)) continue;
+    const cmdResult = runCommandGate(l2.command, projectRoot);
+    conditions.push({
+      id: l2.id,
+      description: l2.description,
+      status: cmdResult.pass ? 'PASS' : 'FAIL',
+      detail: cmdResult.detail,
+    });
+  }
+
   // 检查豁免：将 FAIL 条件与 valid exceptions 匹配
   const waivers: WaiverRef[] = [];
   const failedIds = conditions.filter(c => c.status === 'FAIL').map(c => c.id);
@@ -415,4 +432,15 @@ function getUncoveredFrIds(
   }
 
   return frRows.filter((fr) => !covered.has(fr.id)).map((fr) => fr.id);
+}
+
+/** 执行 Layer2 命令 Gate，返回 pass/fail + 输出摘要 */
+function runCommandGate(command: string, cwd: string): { pass: boolean; detail: string } {
+  try {
+    const stdout = execSync(command, { cwd, timeout: 120_000, stdio: ['pipe', 'pipe', 'pipe'] });
+    return { pass: true, detail: stdout.toString().trim().slice(-200) || 'OK' };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? (err as { stderr?: Buffer }).stderr?.toString().trim().slice(-200) || err.message : String(err);
+    return { pass: false, detail: msg };
+  }
 }

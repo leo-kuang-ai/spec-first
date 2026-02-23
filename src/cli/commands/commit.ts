@@ -2,11 +2,13 @@
  * commit CLI 命令
  * spec-first commit [--message "<msg>"] [--task <taskId>]
  */
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { exists } from '../../shared/fs-utils.js';
+
+const GIT_COMMIT_TIMEOUT_MS = 30_000;
 
 /** 解析 --flag value 参数 */
 function parseFlag(args: string[], flag: string): string | undefined {
@@ -21,12 +23,12 @@ export function handleCommit(args: string[]): number {
   const taskId = parseFlag(args, '--task') ?? inferTaskId(projectRoot);
 
   if (!message) {
-    console.error('Usage: spec-first commit --message "<msg>" [--task <taskId>]');
+    console.error('用法：spec-first commit --message "<msg>" [--task <taskId>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
   if (taskId && !isValidTaskId(taskId)) {
-    console.error(`Invalid TASK ID: ${taskId}`);
+    console.error(`无效的 TASK ID：${taskId}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -36,19 +38,20 @@ export function handleCommit(args: string[]): number {
   const fullMessage = subject + trailer;
 
   try {
-    execSync(`git commit -m ${JSON.stringify(fullMessage)}`, {
+    execFileSync('git', ['commit', '-m', fullMessage], {
       cwd: projectRoot,
       encoding: 'utf-8',
       stdio: 'pipe',
+      timeout: GIT_COMMIT_TIMEOUT_MS,
     });
-    console.log(`Committed: ${subject}`);
+    console.log(`已提交：${subject}`);
     return ExitCode.SUCCESS;
   } catch (e) {
     const msg = (e as Error).message;
     if (msg.includes('nothing to commit')) {
-      console.error('Nothing to commit (working tree clean)');
+      console.error('没有可提交内容（工作区干净）');
     } else {
-      console.error(`Commit failed: ${msg.split('\n')[0]}`);
+      console.error(`提交失败：${msg.split('\n')[0]}`);
     }
     return ExitCode.IO_ERROR;
   }

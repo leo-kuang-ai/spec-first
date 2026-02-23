@@ -15,13 +15,16 @@ gate_conditions:
       command: ./mvnw verify
 extra_deliverables:
   02_design:
-    - data-model.md
-    - contracts/openapi.yaml
+    - name: data-model.md
+      required: false
+    - name: contracts/openapi.yaml
+      required: false
   05_verify:
-    - reports/load-test.jtl
+    - name: reports/load-test.jtl
+      required: false
 quality_thresholds:
   api_p99_latency:
-    value: 500ms
+    value: 500
     direction: lower_is_better
   code_coverage:
     value: 80

@@ -15,13 +15,15 @@ gate_conditions:
       command: npm run lighthouse
 extra_deliverables:
   02_design:
-    - contracts/api-schema.yaml
+    - name: contracts/api-schema.yaml
+      required: false
   07_release:
-    - reports/bundle-analysis.md
+    - name: reports/bundle-analysis.md
+      required: false
 quality_thresholds:
   bundle_size_main:
-    value: 200kb
+    value: 200
     direction: lower_is_better
   fcp_time:
-    value: 1500ms
+    value: 1500
     direction: lower_is_better

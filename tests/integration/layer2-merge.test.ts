@@ -124,7 +124,7 @@ describe('Layer 2 Merge Integration', () => {
   it('should detect gate ID conflicts', () => {
     expect(() => {
       mergeLayerRules(mode, size, ['platform-a', 'platform-c'], TMP_DIR);
-    }).toThrow(/Gate ID conflict/);
+    }).toThrow(/Gate ID 冲突/);
   });
 
   it('should infer direction for known metrics', () => {
@@ -135,6 +135,6 @@ describe('Layer 2 Merge Integration', () => {
   it('should throw error for unknown direction', () => {
     expect(() => {
       mergeLayerRules(mode, size, ['platform-e'], TMP_DIR);
-    }).toThrow(/Cannot infer direction/);
+    }).toThrow(/无法推断.*direction/);
   });
 });

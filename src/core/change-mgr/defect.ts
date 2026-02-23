@@ -92,7 +92,7 @@ export function getDefect(
 ): DefectRecord {
   const p = defectPath(projectRoot, featureId, seq);
   if (!exists(p)) {
-    throw new Error(`Defect #${seq} not found in ${featureId}`);
+    throw new Error(`未找到缺陷 #${seq}（${featureId}）`);
   }
   return readJson<DefectRecord>(p);
 }

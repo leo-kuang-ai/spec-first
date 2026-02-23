@@ -67,16 +67,16 @@ describe('advance', () => {
 
   it('should reject advance from terminal stage', () => {
     writeState(makeState({ currentStage: Stage.DONE, terminal: true }));
-    expect(() => advance(FEAT_ID, TMP)).toThrow(/terminal/);
+    expect(() => advance(FEAT_ID, TMP)).toThrow(/终态阶段/);
   });
 
   it('should reject when feature not found', () => {
-    expect(() => advance('NONEXISTENT', TMP)).toThrow(/not found/);
+    expect(() => advance('NONEXISTENT', TMP)).toThrow(/未找到 Feature/);
   });
 
   it('should block when gate result is FAIL', () => {
     writeState(makeState({ currentStage: Stage.SPECIFY }));
-    expect(() => advance(FEAT_ID, TMP)).toThrow(/Gate failed/);
+    expect(() => advance(FEAT_ID, TMP)).toThrow(/Gate 未通过/);
   });
 
   it('should write gate-history.jsonl on advance', () => {
@@ -130,12 +130,12 @@ describe('cancel', () => {
 
   it('should reject cancel without reason', () => {
     writeState(makeState());
-    expect(() => cancel(FEAT_ID, TMP, '')).toThrow(/reason is required/);
+    expect(() => cancel(FEAT_ID, TMP, '')).toThrow(/取消原因不能为空/);
   });
 
   it('should reject cancel from terminal stage', () => {
     writeState(makeState({ currentStage: Stage.DONE, terminal: true }));
-    expect(() => cancel(FEAT_ID, TMP, 'too late')).toThrow(/terminal/);
+    expect(() => cancel(FEAT_ID, TMP, 'too late')).toThrow(/终态阶段/);
   });
 
   it('should write gate-history.jsonl on cancel', () => {

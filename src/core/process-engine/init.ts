@@ -13,6 +13,7 @@ import {
   ensureDir,
   exists,
 } from '../../shared/fs-utils.js';
+import { renderDefaultConfigYaml, resetConfigCache } from '../../shared/config-schema.js';
 import { mergeLayerRules } from './layer-merger.js';
 import type { MergedRules } from './layer-merger.js';
 
@@ -41,7 +42,7 @@ export interface InitResult {
 function validateFeat(feat: string): void {
   if (!/^[A-Z][A-Z0-9]{0,15}$/.test(feat)) {
     throw new Error(
-      `Invalid FEAT abbreviation "${feat}": must be 1-16 chars, start with A-Z, contain only A-Z0-9`,
+      `无效 FEAT 缩写 "${feat}"：必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`,
     );
   }
 }
@@ -165,6 +166,20 @@ function skeletonConstitution(featureId: string, projectRoot: string): string {
     + `> 项目宪法副本。请在 .spec-first/constitution.md 中维护主版本。\n`;
 }
 
+function ensureProjectConfig(projectRoot: string): void {
+  const specFirstDir = join(projectRoot, '.spec-first');
+  const configPath = join(specFirstDir, 'config.yaml');
+  ensureDir(specFirstDir);
+  let wroteConfig = false;
+  if (!exists(configPath)) {
+    writeMarkdown(configPath, renderDefaultConfigYaml());
+    wroteConfig = true;
+  }
+  if (wroteConfig) {
+    resetConfigCache();
+  }
+}
+
 // ─── 主逻辑 ──────────────────────────────────────────────
 
 /**
@@ -176,6 +191,7 @@ export function init(opts: InitOptions): InitResult {
 
   const specsDir = join(opts.projectRoot, 'specs');
   ensureDir(specsDir);
+  ensureProjectConfig(opts.projectRoot);
 
   // FEAT 缩写唯一性检查
   const registry = loadRegistry(specsDir);
@@ -194,7 +210,7 @@ export function init(opts: InitOptions): InitResult {
   // FEAT 已被其他 Feature 注册
   if (existingId && existingId !== featureId) {
     throw new Error(
-      `FEAT abbreviation "${opts.feat}" already registered to ${existingId}`,
+      `FEAT 缩写 "${opts.feat}" 已被注册到 ${existingId}`,
     );
   }
 
@@ -243,7 +259,7 @@ export function init(opts: InitOptions): InitResult {
   // .spec-first/current
   const currentPath = join(opts.projectRoot, '.spec-first', 'current');
   ensureDir(join(opts.projectRoot, '.spec-first'));
-  writeMarkdown(currentPath, featureId);
+  writeMarkdown(currentPath, `${featureId}\n`);
 
   // 注册 FEAT 缩写
   if (!existingId) {

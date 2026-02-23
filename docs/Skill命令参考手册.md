@@ -2,7 +2,7 @@
 
 > **版本**: v2.0 | **日期**: 2026-02-14
 > **基准**: 当前代码实现（src/cli/commands/*.ts + skills/spec-first/*.md）
-> **总览**: 3 协同命令 + 16 Skill（6 阶段执行模型） + 13 CLI 命令组（38 子命令）
+> **总览**: 3 协同命令 + 19 Skill（6 阶段执行模型） + 13 CLI 命令组（38 子命令）
 
 ---
 
@@ -18,7 +18,7 @@
 
 ---
 
-## 二、16 个 Skill
+## 二、19 个 Skill
 
 所有 Skill 调用格式：`/spec-first:<skillName>`（如 `/spec-first:spec`、`/spec-first:catchup`）。
 
@@ -52,7 +52,7 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 
 | # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
 |---|-------|------|---------|------|---------|
-| 11 | plan | `/spec-first:plan` | assisted | 生成执行计划（下一步骤 + 风险评估），写入 progress.md | `metrics health`, `stage current`, `doctor` |
+| 11 | plan | `/spec-first:plan` | assisted | 生成执行计划（支持多需求切换），写入 progress.md | `feature list`, `feature switch`, `feature current`, `stage current`, `metrics health`, `doctor` |
 | 12 | verify | `/spec-first:verify` | auto | 校验报告（Gate + 矩阵 + 覆盖率缺口），写入 findings.md | `gate check`, `matrix check`, `metrics coverage` |
 | 13 | orchestrate | `/spec-first:orchestrate` | strict | 主编排器：plan → 阶段 Skill → verify → advance | `stage current/advance`, `gate check`, `metrics health` |
 
@@ -69,13 +69,16 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 
 子 Skill 失败时 orchestrate 终止，已完成的产出物保留不回滚。
 
-### 2.3 辅助 Skill（3 条）
+### 2.3 辅助 Skill（6 条）
 
 | # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
 |---|-------|------|---------|------|---------|
 | 14 | status | `/spec-first:status` | auto | 状态仪表盘（只读，不写文件） | `stage current`, `metrics health`, `feature current` |
 | 15 | doctor | `/spec-first:doctor` | auto | 环境诊断（只读，不写文件） | `spec-first doctor` |
 | 16 | sync | `/spec-first:sync` | assisted | 矩阵同步回填，审计日志写入 findings.md | `matrix update`, `matrix check`, `rfc list` |
+| 17 | feature-list | `/spec-first:feature-list` | auto | 列出当前项目全部 Feature（只读） | `feature list` |
+| 18 | feature-switch | `/spec-first:feature-switch <featureId>` | assisted | 切换当前 Feature 上下文（更新 .spec-first/current） | `feature list`, `feature switch`, `feature current` |
+| 19 | feature-current | `/spec-first:feature-current` | auto | 查看当前 Feature 与阶段信息（只读） | `feature current`, `stage current` |
 
 ### 2.4 confirm_policy 语义
 
@@ -98,7 +101,7 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 | 06_wrap_up | 10-archive | retro.md |
 | 任意阶段 | 02-catchup, 05-research | 恢复报告, 调研报告 |
 | 编排层 | 11-plan, 12-verify, 13-orchestrate | 执行计划, 校验报告 |
-| 辅助层 | 14-status, 15-doctor, 16-sync | 状态查询, 诊断, 矩阵同步 |
+| 辅助层 | 14-status, 15-doctor, 16-sync, 17-feature-list, 18-feature-switch, 19-feature-current | 状态查询, 诊断, 矩阵同步, Feature 上下文切换 |
 
 ---
 
@@ -267,7 +270,7 @@ Skill 调用时，Dispatcher 按以下优先级路由：
 | 编排 Skill | 3 |
 | 辅助 Skill | 3 |
 | CLI 命令组 | 13（38 子命令） |
-| **合计** | **16 Skill + 38 CLI 子命令 + 3 协同命令 = 57** |
+| **合计** | **19 Skill + 38 CLI 子命令 + 3 协同命令 = 60** |
 
 使用优先级：协同命令（`/plan` `/verify` `/orchestrate`）→ Skill（`/spec-first:<name>`）→ CLI 原子命令（`spec-first <cmd>`）。
 

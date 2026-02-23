@@ -15,7 +15,7 @@ const RFC_TERMINAL: ReadonlySet<RfcStatus> = new Set(['rejected', 'closed']);
 
 export class RfcTransitionError extends Error {
   constructor(from: RfcStatus, to: RfcStatus) {
-    super(`Invalid RFC transition: ${from} → ${to}`);
+    super(`无效 RFC 状态流转：${from} → ${to}`);
     this.name = 'RfcTransitionError';
   }
 }

@@ -125,7 +125,7 @@ describe('buildRollbackPlan', () => {
 
   it('should throw for invalid commit sha', () => {
     expect(() => buildRollbackPlan(FEAT, 'L2', 'bad;rm -rf /'))
-      .toThrow(/Invalid commit SHA/);
+      .toThrow(/无效 commit SHA/);
   });
 });
 

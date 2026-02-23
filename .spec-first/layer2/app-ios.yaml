@@ -12,13 +12,15 @@ gate_conditions:
       command: xcodebuild test
 extra_deliverables:
   02_design:
-    - ui-design.sketch
+    - name: ui-design.sketch
+      required: false
   07_release:
-    - reports/ipa-size.md
+    - name: reports/ipa-size.md
+      required: false
 quality_thresholds:
   app_size_download:
-    value: 50mb
+    value: 50
     direction: lower_is_better
   startup_time:
-    value: 800ms
+    value: 800
     direction: lower_is_better

@@ -39,24 +39,24 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
   const lastGate = getLastGateResult(featureId, projectRoot);
   checks.push({
     id: 'GL-01',
-    description: 'Latest Gate result is PASS or PASS_WITH_WAIVER',
+    description: '最近一次 Gate 结果为 PASS 或 PASS_WITH_WAIVER',
     pass: lastGate !== null && (lastGate.status === 'PASS' || lastGate.status === 'PASS_WITH_WAIVER'),
-    detail: lastGate ? `Last gate: ${lastGate.status} at ${lastGate.stage}` : 'No gate history',
+    detail: lastGate ? `最近 Gate：${lastGate.status}（阶段 ${lastGate.stage}）` : '暂无 Gate 历史',
   });
 
   // GL-02: 最终 SCA 通过
   const sca = runSca(featureId, projectRoot, '05_verify' as Stage);
   checks.push({
     id: 'GL-02',
-    description: 'Final SCA pass',
+    description: '最终 SCA 通过',
     pass: sca.pass,
-    detail: sca.pass ? 'SCA passed' : `${sca.checks.filter(c => !c.pass).length} SCA failures`,
+    detail: sca.pass ? 'SCA 已通过' : `${sca.checks.filter(c => !c.pass).length} 项 SCA 失败`,
   });
 
   // GL-03: 安全扫描无 critical
   const secReport = join(projectRoot, 'specs', featureId, 'reports', 'security-scan.md');
   let secPass = true;
-  let secDetail = 'No security report found (assumed pass)';
+  let secDetail = '未找到安全报告（按通过处理）';
   if (exists(secReport)) {
     const content = readFileSync(secReport, 'utf-8');
     const findings = parseSecurityReport(content);
@@ -66,7 +66,7 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
   }
   checks.push({
     id: 'GL-03',
-    description: 'Security no critical (no S1, no unwaived S2)',
+    description: '安全检查无严重项（无 S1，且无未豁免 S2）',
     pass: secPass,
     detail: secDetail,
   });
@@ -77,11 +77,11 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
   const nonTerminal = rows.filter(r => !terminal.has(r.status));
   checks.push({
     id: 'GL-04',
-    description: 'All matrix entries in terminal status',
+    description: '追踪矩阵全部处于终态',
     pass: nonTerminal.length === 0,
     detail: nonTerminal.length > 0
-      ? `${nonTerminal.length} non-terminal entries`
-      : 'All entries terminal',
+      ? `${nonTerminal.length} 条非终态条目`
+      : '全部条目已终态',
   });
 
   const pass = checks.every(c => c.pass);

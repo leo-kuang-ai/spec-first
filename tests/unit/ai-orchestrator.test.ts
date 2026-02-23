@@ -120,7 +120,7 @@ describe('catchup', () => {
     writeState('00_init');
     catchup(FEAT, TMP);
     const result2 = catchup(FEAT, TMP);
-    expect(result2.summary).toContain('skipped');
+    expect(result2.summary).toContain('跳过');
   });
 
   it('should report missing stage-state.json', () => {

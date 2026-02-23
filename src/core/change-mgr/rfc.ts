@@ -102,7 +102,7 @@ export function getRfc(
 ): RfcRecord {
   const p = rfcPath(projectRoot, featureId, rfcId);
   if (!exists(p)) {
-    throw new Error(`RFC not found: ${rfcId} in ${featureId}`);
+    throw new Error(`未找到 RFC：${rfcId}（${featureId}）`);
   }
   return readJson<RfcRecord>(p);
 }

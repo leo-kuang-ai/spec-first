@@ -65,6 +65,40 @@ describe('handleDoctor', () => {
     expect(code).toBe(ExitCode.SUCCESS);
   });
 
+  it('should mention built-in defaults when config is missing', () => {
+    const lines: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([]));
+    } finally {
+      console.log = originalLog;
+    }
+    expect(lines.join('\n')).toContain('未找到（使用内置默认值）');
+  });
+
+  it('should parse pilot_mode via yaml instead of string matching', () => {
+    writeFileSync(
+      join(TMP, '.spec-first', 'config.yaml'),
+      'gate:\n  pilot_mode: false\n# pilot_mode: true\n',
+      'utf-8',
+    );
+    const lines: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([FEAT]));
+    } finally {
+      console.log = originalLog;
+    }
+    expect(lines.join('\n')).toContain('Gate Degradation');
+    expect(lines.join('\n')).toContain('强校验模式');
+  });
+
   it('should return SUCCESS with feature checks when feature exists', () => {
     writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'version: 1');
     writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), '{}');
@@ -84,5 +118,20 @@ describe('handleDoctor', () => {
     // Feature dir exists (from beforeEach) but no stage-state.json
     const code = withCwd(TMP, () => handleDoctor([FEAT]));
     expect(code).toBe(ExitCode.CONFIG_ERROR);
+  });
+
+  it('should skip hook warnings when no git repository', () => {
+    const lines: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([]));
+    } finally {
+      console.log = originalLog;
+    }
+    expect(lines.join('\n')).toContain('Git Hooks');
+    expect(lines.join('\n')).toContain('已跳过');
   });
 });

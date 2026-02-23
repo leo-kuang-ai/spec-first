@@ -12,12 +12,14 @@ gate_conditions:
       command: ./gradlew test
 extra_deliverables:
   02_design:
-    - ui-design.figma
+    - name: ui-design.figma
+      required: false
   07_release:
-    - reports/apk-size.md
+    - name: reports/apk-size.md
+      required: false
 quality_thresholds:
   apk_size:
-    value: 40mb
+    value: 40
     direction: lower_is_better
   anr_rate:
     value: 0.1

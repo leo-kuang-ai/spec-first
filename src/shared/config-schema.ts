@@ -20,7 +20,7 @@ export interface SpecFirstConfig {
   };
 }
 
-const DEFAULTS: SpecFirstConfig = {
+export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
   catchup: { trigger: 'prompt' },
   context: { token_budget: 16000 },
   gate: { pilot_mode: false },
@@ -35,13 +35,17 @@ const DEFAULTS: SpecFirstConfig = {
 
 let cachedConfig: SpecFirstConfig | null = null;
 
+export function renderDefaultConfigYaml(): string {
+  return yaml.dump(DEFAULT_SPEC_FIRST_CONFIG, { noRefs: true });
+}
+
 /** 加载并校验 config.yaml，返回合并后的配置 */
 export function loadConfig(projectRoot: string): SpecFirstConfig {
   if (cachedConfig) return cachedConfig;
 
   const configPath = join(projectRoot, '.spec-first', 'config.yaml');
   if (!exists(configPath)) {
-    cachedConfig = { ...DEFAULTS };
+    cachedConfig = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
     return cachedConfig;
   }
 
@@ -49,7 +53,7 @@ export function loadConfig(projectRoot: string): SpecFirstConfig {
   const parsed = yaml.load(raw) as Record<string, unknown> | null;
 
   if (!parsed || typeof parsed !== 'object') {
-    cachedConfig = { ...DEFAULTS };
+    cachedConfig = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
     return cachedConfig;
   }
 
@@ -72,7 +76,7 @@ export function resetConfigCache(): void {
 }
 
 function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
-  const cfg = structuredClone(DEFAULTS);
+  const cfg = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
 
   // catchup.trigger
   const catchup = parsed.catchup as Record<string, unknown> | undefined;

@@ -35,7 +35,7 @@ function getStageSca(stage: Stage, rows: MatrixRow[]): ScaCheckItem[] {
     case '03_plan' as Stage: return checkPlan(rows);
     case '04_implement' as Stage: return checkImplement(rows);
     case '05_verify' as Stage: return checkVerify(rows);
-    default: return [{ rule: 'SCA-SKIP', pass: true, detail: `No SCA rules for stage ${stage}` }];
+    default: return [{ rule: 'SCA-SKIP', pass: true, detail: `阶段 ${stage} 无 SCA 规则` }];
   }
 }
 
@@ -49,17 +49,17 @@ function checkSpecify(rows: MatrixRow[]): ScaCheckItem[] {
   const ids = rows.filter(r => r.type === 'FR').map(r => r.id);
   const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
   checks.push({
-    rule: 'SCA-SPEC-01: FR/NFR ID uniqueness',
+    rule: 'SCA-SPEC-01: FR/NFR ID 唯一性',
     pass: dupes.length === 0,
-    detail: dupes.length > 0 ? `Duplicates: ${dupes.join(', ')}` : `${ids.length} unique IDs`,
+    detail: dupes.length > 0 ? `重复 ID：${dupes.join(', ')}` : `${ids.length} 个唯一 ID`,
   });
 
   // 每个 FR 必须有 title
   const noTitle = frRows.filter(r => !r.title || r.title.trim() === '');
   checks.push({
-    rule: 'SCA-SPEC-02: FR title completeness',
+    rule: 'SCA-SPEC-02: FR 标题完整性',
     pass: noTitle.length === 0,
-    detail: noTitle.length > 0 ? `Missing title: ${noTitle.map(r => r.id).join(', ')}` : 'All FRs have titles',
+    detail: noTitle.length > 0 ? `缺少标题：${noTitle.map(r => r.id).join(', ')}` : '全部 FR 均有标题',
   });
 
   return checks;
@@ -76,11 +76,11 @@ function checkDesign(rows: MatrixRow[]): ScaCheckItem[] {
   // 每个 FR 必须有对应 DS
   const unmapped = frRows.filter(r => !dsUpstreams.has(r.id));
   checks.push({
-    rule: 'SCA-DESIGN-01: FR→DS mapping completeness',
+    rule: 'SCA-DESIGN-01: FR→DS 映射完整性',
     pass: unmapped.length === 0,
     detail: unmapped.length > 0
-      ? `Unmapped FRs: ${unmapped.map(r => r.id).join(', ')}`
-      : `${frRows.length} FRs all mapped to DS`,
+      ? `未映射 FR：${unmapped.map(r => r.id).join(', ')}`
+      : `${frRows.length} 个 FR 全部映射到 DS`,
   });
 
   return checks;
@@ -97,11 +97,11 @@ function checkPlan(rows: MatrixRow[]): ScaCheckItem[] {
   // 每个 FR 必须有对应 TASK
   const unmapped = frRows.filter(r => !taskUpstreams.has(r.id));
   checks.push({
-    rule: 'SCA-PLAN-01: FR→TASK mapping completeness',
+    rule: 'SCA-PLAN-01: FR→TASK 映射完整性',
     pass: unmapped.length === 0,
     detail: unmapped.length > 0
-      ? `Unmapped FRs: ${unmapped.map(r => r.id).join(', ')}`
-      : `${frRows.length} FRs all mapped to TASKs`,
+      ? `未映射 FR：${unmapped.map(r => r.id).join(', ')}`
+      : `${frRows.length} 个 FR 全部映射到 TASK`,
   });
 
   return checks;
@@ -117,11 +117,11 @@ function checkImplement(rows: MatrixRow[]): ScaCheckItem[] {
   const implemented = new Set(['Implemented', 'Verified', 'Accepted']);
   const incomplete = taskRows.filter(r => !implemented.has(r.status));
   checks.push({
-    rule: 'SCA-IMPL-01: TASK implementation completeness',
+    rule: 'SCA-IMPL-01: TASK 实现完整性',
     pass: incomplete.length === 0,
     detail: incomplete.length > 0
-      ? `Incomplete: ${incomplete.map(r => `${r.id}(${r.status})`).join(', ')}`
-      : `${taskRows.length} TASKs all implemented`,
+      ? `未完成：${incomplete.map(r => `${r.id}(${r.status})`).join(', ')}`
+      : `${taskRows.length} 个 TASK 全部实现`,
   });
 
   return checks;
@@ -138,11 +138,11 @@ function checkVerify(rows: MatrixRow[]): ScaCheckItem[] {
   // 每个 FR 必须有对应 TC
   const untested = frRows.filter(r => !tcUpstreams.has(r.id));
   checks.push({
-    rule: 'SCA-VERIFY-01: FR→TC test coverage',
+    rule: 'SCA-VERIFY-01: FR→TC 测试覆盖',
     pass: untested.length === 0,
     detail: untested.length > 0
-      ? `Untested FRs: ${untested.map(r => r.id).join(', ')}`
-      : `${frRows.length} FRs all have TCs`,
+      ? `未测试 FR：${untested.map(r => r.id).join(', ')}`
+      : `${frRows.length} 个 FR 全部有 TC`,
   });
 
   return checks;

@@ -17,7 +17,7 @@ export function handleFeature(args: string[]): number {
     case 'current': return handleCurrent();
     case 'switch': return handleSwitch(rest);
     default:
-      if (sub) console.error(`Unknown feature subcommand: ${sub}`);
+      if (sub) console.error(`未知 feature 子命令：${sub}`);
       printFeatureHelp();
       return ExitCode.VALIDATION_ERROR;
   }
@@ -27,7 +27,7 @@ function handleList(): number {
   const projectRoot = process.cwd();
   const specsDir = join(projectRoot, 'specs');
   if (!exists(specsDir)) {
-    console.log('No specs/ directory found.');
+    console.log('未找到 specs/ 目录。');
     return ExitCode.SUCCESS;
   }
 
@@ -35,12 +35,12 @@ function handleList(): number {
     .filter(e => e.isDirectory() && e.name.startsWith('FSREQ-'));
 
   if (entries.length === 0) {
-    console.log('No Features found.');
+    console.log('未找到 Feature。');
     return ExitCode.SUCCESS;
   }
 
-  console.log('Features:\n');
-  console.log('ID'.padEnd(35) + 'Title'.padEnd(25) + 'Stage'.padEnd(18) + 'Updated');
+  console.log('Feature 列表：\n');
+  console.log('ID'.padEnd(35) + '标题'.padEnd(25) + '阶段'.padEnd(18) + '更新时间');
   console.log('-'.repeat(90));
 
   for (const entry of entries) {
@@ -63,7 +63,7 @@ function handleCurrent(): number {
   const currentFile = join(projectRoot, '.spec-first', 'current');
 
   if (!exists(currentFile)) {
-    console.log('No current Feature set. Use: spec-first feature switch <featureId>');
+    console.log('尚未设置当前 Feature。请使用：spec-first feature switch <featureId>');
     return ExitCode.SUCCESS;
   }
 
@@ -71,16 +71,16 @@ function handleCurrent(): number {
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
 
   if (!exists(statePath)) {
-    console.log(`Current: ${featureId} (stage-state.json not found)`);
+    console.log(`当前 Feature：${featureId}（未找到 stage-state.json）`);
     return ExitCode.SUCCESS;
   }
 
   const state = readJson<StageState>(statePath);
-  console.log(`Current Feature: ${state.featureId}`);
-  console.log(`  Title: ${state.title ?? 'N/A'}`);
-  console.log(`  Stage: ${state.currentStage}`);
-  console.log(`  Mode: ${state.mode}  Size: ${state.size}`);
-  console.log(`  Platforms: ${state.platforms.join(', ')}`);
+  console.log(`当前 Feature：${state.featureId}`);
+  console.log(`  标题：${state.title ?? 'N/A'}`);
+  console.log(`  阶段：${state.currentStage}`);
+  console.log(`  模式：${state.mode}  规模：${state.size}`);
+  console.log(`  平台：${state.platforms.join(', ')}`);
 
   return ExitCode.SUCCESS;
 }
@@ -88,7 +88,7 @@ function handleCurrent(): number {
 function handleSwitch(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first feature switch <featureId>');
+    console.error('用法：spec-first feature switch <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -96,23 +96,23 @@ function handleSwitch(args: string[]): number {
   const specsDir = join(projectRoot, 'specs', featureId);
 
   if (!exists(specsDir)) {
-    console.error(`Feature not found: ${featureId}`);
+    console.error(`未找到 Feature：${featureId}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
   const configDir = join(projectRoot, '.spec-first');
   ensureDir(configDir);
   writeFileSync(join(configDir, 'current'), featureId, 'utf-8');
-  console.log(`Switched to: ${featureId}`);
+  console.log(`已切换到：${featureId}`);
 
   return ExitCode.SUCCESS;
 }
 
 function printFeatureHelp(): void {
-  console.log(`Usage: spec-first feature <subcommand>
+  console.log(`用法：spec-first feature <subcommand>
 
-Subcommands:
-  list      List all Features
-  current   Show current Feature details
-  switch    Switch current Feature`);
+子命令：
+  list      列出所有 Feature
+  current   查看当前 Feature 详情
+  switch    切换当前 Feature`);
 }

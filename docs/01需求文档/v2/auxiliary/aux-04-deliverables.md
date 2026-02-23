@@ -15,6 +15,7 @@
 └── layer2/                         # Layer 2 端规范目录
     ├── h5.yaml                     # H5 前端端规范
     ├── java-backend.yaml           # Java 后端端规范
+    ├── go-backend.yaml             # Go 后端端规范
     └── ...                         # 各端独立维护，按需补录
 
 specs/                              # Feature 工作区根目录

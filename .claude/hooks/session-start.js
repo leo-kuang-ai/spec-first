@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 function readHookInput() {
   try {
@@ -25,17 +26,45 @@ function countFeatureStates(specsDir) {
   return count;
 }
 
+function startStageViewer(cwd) {
+  const bootstrapPath = path.join(cwd, 'scripts', 'stage-viewer', 'bootstrap.js');
+  if (!fs.existsSync(bootstrapPath)) return null;
+
+  const result = spawnSync(
+    process.execPath,
+    [bootstrapPath, '--source', 'claude', '--open', '--print-url'],
+    {
+      cwd,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        SPEC_FIRST_VIEWER_AUTO_OPEN: process.env.SPEC_FIRST_VIEWER_AUTO_OPEN ?? '1',
+      },
+    },
+  );
+
+  if (result.error) return null;
+  const url = String(result.stdout ?? '').trim();
+  return url.startsWith('http://') || url.startsWith('https://') ? url : null;
+}
+
 function main() {
   readHookInput();
 
   const cwd = process.cwd();
   const specsDir = path.join(cwd, 'specs');
   const featureCount = countFeatureStates(specsDir);
+  const viewerUrl = startStageViewer(cwd);
 
   console.error('[Spec-First][SessionStart] Ready.');
   console.error(
     `[Spec-First][SessionStart] Detected ${featureCount} feature(s) with stage state under ./specs`,
   );
+  if (viewerUrl) {
+    console.error(`[Spec-First][SessionStart] Viewer: auto-start at ${viewerUrl}`);
+  } else {
+    console.error('[Spec-First][SessionStart] Viewer: skipped (not a spec-first project or bootstrap unavailable).');
+  }
   console.error(
     '[Spec-First][SessionStart] Suggested next step: /plan <featureId> "<task>" or spec-first stage current <featureId>',
   );

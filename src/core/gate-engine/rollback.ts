@@ -30,7 +30,7 @@ export function buildRollbackPlan(
   commitSha?: string,
 ): RollbackPlan {
   if (commitSha !== undefined && !/^[0-9a-f]{7,40}$/i.test(commitSha)) {
-    throw new Error(`Invalid commit SHA: ${commitSha}`);
+    throw new Error(`无效 commit SHA：${commitSha}`);
   }
 
   const actions: RollbackAction[] = [];
@@ -38,14 +38,14 @@ export function buildRollbackPlan(
   // L1 始终包含
   actions.push({
     level: 'L1',
-    description: 'Disable feature flag / revert config',
+    description: '关闭 feature flag / 回滚配置',
     command: `spec-first config set ${featureId} --enabled=false`,
   });
 
   if (level === 'L2' || level === 'L3') {
     actions.push({
       level: 'L2',
-      description: 'Revert to previous version',
+      description: '回退到上一版本',
       command: commitSha ? `git revert ${commitSha}` : 'git revert HEAD',
     });
   }
@@ -53,7 +53,7 @@ export function buildRollbackPlan(
   if (level === 'L3') {
     actions.push({
       level: 'L3',
-      description: 'Database migration rollback (requires manual confirmation)',
+      description: '数据库迁移回滚（需人工确认）',
       manual: true,
     });
   }

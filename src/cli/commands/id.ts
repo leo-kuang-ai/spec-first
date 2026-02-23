@@ -18,7 +18,7 @@ export function handleId(args: string[]): number {
     case 'search':  return handleSearch(rest);
     case 'list':    return handleList(rest);
     default:
-      console.error(`Unknown id subcommand: ${sub}`);
+      console.error(`未知 id 子命令：${sub}`);
       printIdHelp();
       return ExitCode.VALIDATION_ERROR;
   }
@@ -31,16 +31,16 @@ function handleNext(args: string[]): number {
   const tcLevel = parseFlag(args, '--level') as TcLevel | undefined;
 
   if (!type || !abbr || !feature) {
-    console.error('Usage: spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]');
+    console.error('用法：spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const result = nextId({ type, abbr, featureId: feature, projectRoot: process.cwd(), tcLevel });
-    console.log(`Generated: ${result.id}`);
+    console.log(`已生成：${result.id}`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -48,16 +48,16 @@ function handleNext(args: string[]): number {
 function handleValidate(args: string[]): number {
   const id = args[0];
   if (!id) {
-    console.error('Usage: spec-first id validate <id>');
+    console.error('用法：spec-first id validate <id>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const result = validateId(id);
   if (result.valid) {
-    console.log(`Valid ${result.type} ID: ${id}`);
+    console.log(`有效的 ${result.type} ID：${id}`);
     return ExitCode.SUCCESS;
   }
-  console.error(`Invalid: ${result.error}`);
+  console.error(`无效：${result.error}`);
   return ExitCode.VALIDATION_ERROR;
 }
 
@@ -67,13 +67,13 @@ function handleSearch(args: string[]): number {
   const type = parseFlag(args, '--type') as IdType | undefined;
 
   if (!query || !feature) {
-    console.error('Usage: spec-first id search <query> --feature <featureId> [--type <type>]');
+    console.error('用法：spec-first id search <query> --feature <featureId> [--type <type>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const results = searchId(query, feature, process.cwd(), type);
   if (results.length === 0) {
-    console.log('No matching IDs found.');
+    console.log('未找到匹配的 ID。');
     return ExitCode.SUCCESS;
   }
   for (const r of results) {
@@ -87,13 +87,13 @@ function handleList(args: string[]): number {
   const type = parseFlag(args, '--type') as IdType | undefined;
 
   if (!feature) {
-    console.error('Usage: spec-first id list --feature <featureId> [--type <type>]');
+    console.error('用法：spec-first id list --feature <featureId> [--type <type>]');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const results = listIds(feature, process.cwd(), type);
   if (results.length === 0) {
-    console.log('No IDs found.');
+    console.log('未找到 ID。');
     return ExitCode.SUCCESS;
   }
   for (const r of results) {
@@ -103,13 +103,13 @@ function handleList(args: string[]): number {
 }
 
 function printIdHelp(): void {
-  console.log(`Usage: spec-first id <subcommand>
+  console.log(`用法：spec-first id <subcommand>
 
-Subcommands:
-  next      Generate next ID
-  validate  Validate ID format
-  search    Search IDs by query
-  list      List all IDs`);
+子命令：
+  next      生成下一个 ID
+  validate  校验 ID 格式
+  search    按关键字搜索 ID
+  list      列出全部 ID`);
 }
 
 function parseFlag(args: string[], flag: string): string | undefined {

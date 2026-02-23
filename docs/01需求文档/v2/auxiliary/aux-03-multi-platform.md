@@ -41,12 +41,13 @@ Layer 2 = 技术端规范（端特有质量标准）
 └── layer2/                        # 端规范目录
     ├── h5.yaml                    # H5 前端端规范
     ├── java-backend.yaml          # Java 后端端规范
+    ├── go-backend.yaml            # Go 后端端规范
     ├── app-android.yaml           # Android 端规范
     ├── app-ios.yaml               # iOS 端规范
     └── pc.yaml                    # PC 桌面端规范
 ```
 
-**命名规则**：文件名即端标识（kebab-case），与 `spec-first init --platforms h5,java-backend` 参数对应。
+**命名规则**：文件名即端标识（kebab-case），与 `spec-first init --platforms h5,java-backend,go-backend` 参数对应。
 
 ### 端规范文件标准格式
 
@@ -168,7 +169,7 @@ quality_thresholds:
 ```text
 Feature Init 时的三层合并流程：
 
-spec-first init --feat AUTH --mode N --size M --platforms h5,java-backend
+spec-first init --feat AUTH --mode N --size M --platforms h5,go-backend
      │
      ▼
 ┌─ Layer 0 ──────────────────────────────┐
@@ -182,7 +183,7 @@ spec-first init --feat AUTH --mode N --size M --platforms h5,java-backend
                    │
 ┌─ Layer 2 ────────▼─────────────────────┐
 │  读取 .spec-first/layer2/h5.yaml       │
-│  读取 .spec-first/layer2/java-backend.yaml │
+│  读取 .spec-first/layer2/go-backend.yaml │
 │  ┌──────────────────────────────────┐  │
 │  │ 合并策略：                        │  │
 │  │ 1. gate_conditions → 叠加到阶段   │  │
@@ -200,9 +201,9 @@ spec-first init --feat AUTH --mode N --size M --platforms h5,java-backend
 
 | 字段 | 合并策略 | 示例 |
 |------|---------|------|
-| `gate_conditions` | 各端条件**叠加**到同一阶段（AND 关系） | H5 的 Lighthouse + Java 的 SonarQube 同时出现在 05_verify |
+| `gate_conditions` | 各端条件**叠加**到同一阶段（AND 关系） | H5 的 Lighthouse + Go 后端质量检查同时出现在 05_verify |
 | `extra_deliverables` | **追加**到阶段产出物列表 | 02_design 多出 responsive-spec.md 和 api-performance-budget.md |
-| `quality_thresholds` | 多端冲突时**取较严格值** | H5 要求覆盖率 80%，Java 要求 85% → 最终 85% |
+| `quality_thresholds` | 多端冲突时**取较严格值** | H5 要求覆盖率 80%，Go 要求 85% → 最终 85% |
 
 **CLI 实现锚点**：`SpecMerger.applyPlatformRules()`（`src/core/process-engine/spec-merger.ts:86`，当前为 TODO）。
 

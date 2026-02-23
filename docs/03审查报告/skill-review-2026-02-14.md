@@ -19,7 +19,7 @@
 ## 二、审查范围
 
 - Skill 定义：`skills/spec-first/01-init` ~ `16-sync`（16 个当前 Skill）
-- Legacy 区：`skills/spec-first/_legacy`（8 个遗留 Skill，隔离态）
+- Legacy 区：历史遗留 Skill 已移除（2026-02-23）
 - 共享上下文：`skills/spec-first/AGENTS.md`
 - 路由：`src/core/skill-runtime/dispatcher.ts`
 - CLI 实现：`src/cli/commands/{id,matrix,gate,rfc,defect,metrics,init,stage,feature}.ts`
@@ -36,7 +36,7 @@
 | P0-1 | v2 Skill 使用 `id generate` | 已修复 | 当前 Skill 已改为 `spec-first id next ... --feature ...`（`skills/spec-first/03-spec/SKILL.md:16` 等） |
 | P0-2 | `matrix update` 不存在 | 已修复 | CLI 已实现 `matrix update`（`src/cli/commands/matrix.ts:15`、`src/cli/commands/matrix.ts:69`） |
 | P0-3 | AGENTS 大量 `spec-*` 命令名错误 | 已修复（命令名前缀） | `skills/spec-first/AGENTS.md` 现为 `spec-first ...` 命名；`spec-id/spec-ai/spec-matrix` 已消失 |
-| P0-4 | legacy 遮蔽 `catchup/research/archive` | 已修复 | 顶层仅 16 个当前 Skill；legacy 已迁入 `_legacy`，不参与 `endsWith(-skillName)` 顶层匹配 |
+| P0-4 | legacy 遮蔽 `catchup/research/archive` | 已修复 | 顶层仅 16 个当前 Skill；legacy 已下线并删除，不参与当前 Skill 路由匹配 |
 | P0-5 | `init/doctor` 被 runtime 覆盖 | 已修复 | `RUNTIME_COMMANDS` 不含 `init/doctor`（`src/core/skill-runtime/dispatcher.ts:28`） |
 
 ### 3.2 P1（5 项）
@@ -56,7 +56,7 @@
 | P2-1 | init 参数文档与 CLI 不一致 | 已修复 | AGENTS 与 CLI 都是 `--feat --mode --size --platforms`（`skills/spec-first/AGENTS.md:64`，`src/cli/commands/init.ts:21`） |
 | P2-2 | `tasks.md` / `task_plan.md` 混用 | 已修复 | AGENTS 与 Skill 均以 `task_plan.md` 为准 |
 | P2-3 | 产出物路径命名偏差（`fr-spec.md` 等） | 已修复 | 当前 Skill 已对齐 `spec.md/design.md/research.md/retro.md` |
-| P2-4 | legacy Skill 全量过时且会误加载 | 风险降级 | legacy 仍存在但已隔离在 `_legacy`；当前路由不可达，不构成运行阻断 |
+| P2-4 | legacy Skill 全量过时且会误加载 | 风险降级 | legacy 已删除；当前路由不存在旧目录误匹配风险 |
 
 ---
 
@@ -131,3 +131,111 @@
 2026-02-14 版本报告已不再反映当前代码状态；其核心“系统性不可用”判断失效。  
 当前代码主链路可用，剩余问题集中在 **AGENTS.md 命令签名文档漂移**，属于可快速收敛的中优先级问题。  
 后续优化应从文档契约一致性开始，而非继续修复已失效的旧 P0 问题。
+
+---
+
+## 八、2026-02-16 复审增补（第一个 Skill：init）
+
+### 8.1 目标与范围
+
+- 目标：将“环境检查/自动安装”从 `01-init/SKILL.md` 下沉到 `init` 命令，确保命令级自动执行。  
+- 范围：同时覆盖 `doctor` 命令与 `skills/spec-first/AGENTS.md` 的 `spec-first doctor` 小节，保证规则一致。
+
+### 8.2 落地结果
+
+1. 已新增共享自举模块：`src/shared/host-bootstrap.ts`，统一执行双宿主检查与修复。  
+2. 已在 `src/cli/commands/init.ts` 启动时接入自举逻辑，失败时返回 `ExitCode.CONFIG_ERROR`。  
+3. 已在 `src/cli/commands/doctor.ts` 接入相同自举逻辑，并在报告中输出 `PASS/FIXED/ERROR`。  
+4. 已更新 `skills/spec-first/AGENTS.md` 的 `spec-first doctor` 小节，规则与 `15-doctor/SKILL.md` 对齐。
+
+### 8.3 覆盖清单（按本次需求）
+
+- MCP（Codex + Claude Code）：`sequential-thinking`、`context7`、`serena`、`fetch`、`playwright-mcp`  
+- Skills（Codex + Claude Code）：`find-skills`、`skill-creator`  
+- 策略：缺失/配置错误时自动修复；修复结果进入 doctor 输出可审计。
+
+### 8.4 验证记录
+
+- `pnpm -s vitest run tests/unit/cli-init-stage.test.ts tests/unit/init.test.ts tests/unit/cli-metrics-doctor.test.ts tests/unit/router.test.ts`：通过（37 tests passed）  
+- `pnpm -s typecheck`：通过
+
+### 8.5 对旧结论的影响
+
+- 本增补已消解“init 仅文档声明、未命令级保证”的执行风险。  
+- 旧报告中与“第一个 Skill 环境检查/安装机制缺失”相关的问题可判定为**已修复**。  
+- 仍需继续逐项推进其余 Skill 的契约一致性复审与防回归验证。
+
+---
+
+## 九、2026-02-16 安全复审增补（commit 命令）
+
+### 9.1 新发现问题
+
+- 编号：`P1-5`（新增）
+- 位置：`src/cli/commands/commit.ts`
+- 问题：`git commit` 通过 shell 字符串执行，提交信息包含 `$()` 等特殊字符时存在命令解释风险。
+
+### 9.2 修复结果
+
+1. 执行方式由 shell 字符串改为参数化调用：`execFileSync('git', ['commit', '-m', fullMessage], ...)`。  
+2. 保留超时控制：`timeout: 30000`，避免异常阻塞。  
+3. 结论：该风险点已收敛，状态为**已修复**。
+
+### 9.3 回归验证
+
+- 新增测试：`tests/unit/commit.test.ts`  
+  - 用例1：提交信息包含 `$(...)`，验证以 argv 传参而非 shell 展开。  
+  - 用例2：`git commit` 失败时返回 `IO_ERROR`。
+- 执行结果：  
+  - `pnpm -s vitest run tests/unit/commit.test.ts`：通过（2 passed）  
+  - `pnpm -s test`：通过（43 files, 461 passed）  
+  - `pnpm -s typecheck`：通过
+
+### 9.4 本报告最终口径更新
+
+- 本报告中的“代码级高风险问题”新增项 `P1-5` 已闭环。  
+- 截至 2026-02-16，本次代码修复范围内无未关闭的 P0/P1 代码安全阻断项。  
+- 后续重点继续回到 Skill/AGENTS 命令契约一致性与流程体验优化。
+
+---
+
+## 十、2026-02-17 复审增补（命名空间收敛 + 中文化 + 兼容修复）
+
+### 10.1 新增复核结论
+
+1. Skill 命令入口已统一为命名空间风格：`/spec-first:<skill>`，并在 `setup --global` 中自动清理旧扁平别名（`/spec-first-init` 等）。  
+2. 你反馈的边界问题“非 symlink 占位导致 `EEXIST`”已实质修复：占位目录/文件会被替换为正确 symlink。  
+3. CLI 与核心报错文案、交互引导、技能描述已完成中文化，符合中文环境使用习惯。
+
+### 10.2 代码修复点
+
+- `src/shared/skill-commands.ts`
+  - 新增旧别名清理：`cleanupLegacyClaudeCommands`、`cleanupLegacyCodexSkills`。  
+  - 修复 `lstatSync` 命中但非 symlink 的边界：改为 `rmSync(..., { recursive: true, force: true })` 后重建 symlink。  
+- `tests/unit/skill-commands.test.ts`
+  - 新增 2 个用例：  
+    1) 旧扁平命令别名自动清理；  
+    2) 非 symlink 占位自动替换为 symlink。  
+- `docs/安装与更新.md`
+  - 卸载命令收敛为 `pnpm unlink --global spec-first`，移除误导性 `remove` 口径；  
+  - 文档继续保持 `/spec-first:<skill>` 统一口径。
+
+### 10.3 本机验证结果（用户环境）
+
+- 执行：`spec-first setup --global`  
+  - 结果：`Claude Code` 与 `Codex` 均注册 16 个命令/技能（命名空间风格）。  
+  - 验证：  
+    - `~/.claude/commands` 下仅保留 `spec-first/` 目录；  
+    - `~/.codex/skills` 下仅保留 `spec-first/` 目录；  
+    - 子项均为 `archive/init/doctor/...`，无 `spec-first-init` 类旧别名残留。  
+
+### 10.4 回归验证
+
+- `pnpm -s typecheck`：通过  
+- `pnpm -s test`：通过（43 files，464 passed）
+
+### 10.5 报告口径更新
+
+- 原“残留观察 P2-2（非 symlink 占位）”可更新为**已修复**。  
+- 命令入口一致性（命名空间）已从“文档约束”升级为“代码强制 + 安装时自动清理”。  
+- 当前审查范围内未发现新增 P0/P1 阻断项。

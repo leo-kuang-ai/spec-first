@@ -34,7 +34,7 @@ describe('RFC CRUD', () => {
   });
 
   it('should throw when RFC not found', () => {
-    expect(() => getRfc('RFC-999', FEAT, TMP)).toThrow(/not found/);
+    expect(() => getRfc('RFC-999', FEAT, TMP)).toThrow(/未找到 RFC/);
   });
 
   it('should transition RFC status', () => {

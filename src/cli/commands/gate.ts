@@ -17,7 +17,7 @@ export function handleGate(args: string[]): number {
     case 'conditions': return handleConditions(args.slice(1));
     default:
       printGateHelp();
-      if (sub) console.error(`Unknown gate subcommand: ${sub}`);
+      if (sub) console.error(`未知 gate 子命令：${sub}`);
       return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -25,7 +25,7 @@ export function handleGate(args: string[]): number {
 export function handleGoLive(args: string[]): number {
   const sub = args[0];
   if (sub !== 'check') {
-    console.log('Usage: spec-first golive check [featureId]');
+    console.log('用法：spec-first golive check [featureId]');
     return ExitCode.VALIDATION_ERROR;
   }
   return handleGoLiveCheck(args.slice(1));
@@ -36,15 +36,15 @@ export function handleGoLive(args: string[]): number {
 function handleCheck(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first gate check <featureId>');
+    console.error('用法：spec-first gate check <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const cwd = process.cwd();
   try {
     const result = evaluateGate(featureId, cwd);
-    console.log(`Gate Check — ${featureId} (${result.stage})\n`);
-    console.log(`Result: ${result.status}\n`);
+    console.log(`Gate 检查 — ${featureId} (${result.stage})\n`);
+    console.log(`结果：${result.status}\n`);
 
     for (const c of result.conditions) {
       const icon = c.status === 'PASS' ? '[OK]' : c.status === 'WAIVER' ? '[WVR]' : '[FAIL]';
@@ -53,13 +53,13 @@ function handleCheck(args: string[]): number {
     }
 
     if (result.suggestions && result.suggestions.length > 0) {
-      console.log('\nSuggestions:');
+      console.log('\n建议：');
       for (const s of result.suggestions) console.log(`  - ${s}`);
     }
 
     return result.status === 'FAIL' ? ExitCode.VALIDATION_ERROR : ExitCode.SUCCESS;
   } catch {
-    console.error(`Failed to evaluate gate for ${featureId}`);
+    console.error(`Gate 评估失败：${featureId}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -67,17 +67,17 @@ function handleCheck(args: string[]): number {
 function handleHistory(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first gate history <featureId>');
+    console.error('用法：spec-first gate history <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const history = getGateHistory(featureId, process.cwd());
   if (history.length === 0) {
-    console.log('No gate history found.');
+    console.log('未找到 gate 历史记录。');
     return ExitCode.SUCCESS;
   }
 
-  console.log(`Gate History — ${featureId}\n`);
+  console.log(`Gate 历史 — ${featureId}\n`);
   for (const entry of history) {
     const icon = entry.status === 'PASS' ? '✓' : entry.status === 'PASS_WITH_WAIVER' ? '~' : '✗';
     console.log(`  ${icon} ${entry.timestamp}  ${entry.stage}  ${entry.status}`);
@@ -89,27 +89,27 @@ function handleHistory(args: string[]): number {
 function handleConditions(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first gate conditions <featureId>');
+    console.error('用法：spec-first gate conditions <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const cwd = process.cwd();
   const statePath = join(cwd, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) {
-    console.error(`stage-state.json not found for ${featureId}`);
+    console.error(`未找到 stage-state.json：${featureId}`);
     return ExitCode.IO_ERROR;
   }
 
   const state = readJson<StageState>(statePath);
   const defs = getConditions(state.currentStage);
 
-  console.log(`Gate Conditions — ${featureId} (${state.currentStage})\n`);
+  console.log(`Gate 条件 — ${featureId} (${state.currentStage})\n`);
   for (const d of defs) {
     console.log(`  ${d.id}  ${d.description}`);
   }
 
   if (defs.length === 0) {
-    console.log('  No conditions defined for this stage.');
+    console.log('  当前阶段未定义条件。');
   }
 
   return ExitCode.SUCCESS;
@@ -118,37 +118,37 @@ function handleConditions(args: string[]): number {
 function handleGoLiveCheck(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first golive check <featureId>');
+    console.error('用法：spec-first golive check <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const cwd = process.cwd();
   try {
     const result = checkGoLive(featureId, cwd);
-    console.log(`GoLive Check — ${featureId}\n`);
+    console.log(`上线检查 — ${featureId}\n`);
 
     for (const c of result.checks) {
-      const icon = c.pass ? '[PASS]' : '[FAIL]';
+      const icon = c.pass ? '[通过]' : '[失败]';
       console.log(`  ${icon.padEnd(7)} ${c.id}: ${c.description}`);
       if (c.detail) console.log(`          ${c.detail}`);
     }
 
-    console.log(`\nResult: ${result.pass ? 'READY' : 'NOT READY'}`);
+    console.log(`\n结果：${result.pass ? '可上线' : '未就绪'}`);
     if (result.degraded) {
-      console.log(`confirm_policy degraded to: ${result.confirmPolicy}`);
+      console.log(`confirm_policy 已降级为：${result.confirmPolicy}`);
     }
 
     return result.pass ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
   } catch {
-    console.error(`Failed to run GoLive check for ${featureId}`);
+    console.error(`上线检查执行失败：${featureId}`);
     return ExitCode.IO_ERROR;
   }
 }
 
 function printGateHelp(): void {
-  console.log('Usage: spec-first gate <subcommand>\n');
-  console.log('Subcommands:');
-  console.log('  check       Evaluate Gate conditions for current stage');
-  console.log('  history     View gate evaluation history');
-  console.log('  conditions  List Gate conditions for current stage');
+  console.log('用法：spec-first gate <subcommand>\n');
+  console.log('子命令：');
+  console.log('  check       校验当前阶段 Gate 条件');
+  console.log('  history     查看 Gate 评估历史');
+  console.log('  conditions  列出当前阶段 Gate 条件');
 }

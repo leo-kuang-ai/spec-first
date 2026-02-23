@@ -86,7 +86,7 @@ spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...
 - `--feat <abbr>`（必填）：Feature 缩写，大写字母开头，1-16 字符
 - `--mode <N|I>`（默认 N）：开发模式
 - `--size <S|M|L>`（默认 M）：项目规模
-- `--platforms <p1,p2,...>`（必填）：技术端平台列表（逗号分隔），如 `h5,java-backend`
+- `--platforms <p1,p2,...>`（必填）：技术端平台列表（逗号分隔），如 `h5,java-backend`、`h5,go-backend`
 - `--feature-id <id>`（可选）：指定 Feature ID，默认自动生成
 
 **Feature ID 规范**：

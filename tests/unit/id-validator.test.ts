@@ -33,13 +33,13 @@ describe('validateId', () => {
   });
 
   it('should reject empty/invalid input', () => {
-    expect(validateId('')).toEqual({ valid: false, error: 'ID must be a non-empty string' });
+    expect(validateId('')).toEqual({ valid: false, error: 'ID 必须是非空字符串' });
   });
 
   it('should reject unknown format', () => {
     const r = validateId('UNKNOWN-001');
     expect(r.valid).toBe(false);
-    expect(r.error).toContain('Unknown ID format');
+    expect(r.error).toContain('未知 ID 格式');
   });
 
   it('should reject malformed IDs', () => {

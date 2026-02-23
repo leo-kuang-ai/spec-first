@@ -2,6 +2,9 @@
  * CLI 子命令路由分发
  * 注册命令处理器，统一分发与错误处理
  */
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ExitCode } from '../shared/types.js';
 
 export type CommandHandler = (args: string[]) => Promise<number> | number;
@@ -34,11 +37,15 @@ export async function dispatch(args: string[]): Promise<number> {
     printHelp();
     return ExitCode.SUCCESS;
   }
+  if (cmd === '--version' || cmd === '-v') {
+    printVersion();
+    return ExitCode.SUCCESS;
+  }
 
   const entry = commands.get(cmd);
   if (!entry) {
-    console.error(`Unknown command: ${cmd}`);
-    console.error('Run "spec-first --help" for usage information.');
+    console.error(`未知命令：${cmd}`);
+    console.error('请运行 `spec-first --help` 查看帮助。');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -46,15 +53,44 @@ export async function dispatch(args: string[]): Promise<number> {
     return await entry.handler(args.slice(1));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`Error: ${msg}`);
+    console.error(`错误：${msg}`);
     return ExitCode.UNKNOWN_ERROR;
   }
 }
 
 function printHelp(): void {
-  console.log('Usage: spec-first <command> <subcommand> [args] [--flags]\n');
-  console.log('Commands:');
+  console.log('用法：spec-first <command> <subcommand> [args] [--flags]\n');
+  console.log('命令：');
   for (const [name, entry] of commands) {
     console.log(`  ${name.padEnd(14)} ${entry.description}`);
   }
+}
+
+function printVersion(): void {
+  console.log(getCliVersion());
+}
+
+function getCliVersion(): string {
+  const fromEnv = process.env.npm_package_version?.trim();
+  if (fromEnv) return fromEnv;
+
+  const baseDir = dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    join(baseDir, '../package.json'),
+    join(baseDir, '../../package.json'),
+  ];
+
+  for (const filePath of candidates) {
+    if (!existsSync(filePath)) continue;
+    try {
+      const parsed = JSON.parse(readFileSync(filePath, 'utf-8')) as Record<string, unknown>;
+      if (typeof parsed.version === 'string' && parsed.version.trim() !== '') {
+        return parsed.version;
+      }
+    } catch {
+      // ignore and fallback
+    }
+  }
+
+  return 'unknown';
 }

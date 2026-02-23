@@ -16,7 +16,7 @@ export function handleStage(args: string[]): number {
     case 'advance': return handleAdvance(rest);
     case 'cancel':  return handleCancel(rest);
     default:
-      console.error(`Unknown stage subcommand: ${sub}`);
+      console.error(`未知 stage 子命令：${sub}`);
       printStageHelp();
       return ExitCode.VALIDATION_ERROR;
   }
@@ -25,19 +25,19 @@ export function handleStage(args: string[]): number {
 function handleCurrent(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first stage current <featureId>');
+    console.error('用法：spec-first stage current <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const state = getFeatureState(featureId, process.cwd());
-    console.log(`Feature: ${state.featureId}`);
-    console.log(`Stage:   ${state.currentStage}`);
-    console.log(`Mode:    ${state.mode}  Size: ${state.size}`);
-    console.log(`Terminal: ${state.terminal}`);
+    console.log(`Feature：${state.featureId}`);
+    console.log(`阶段：   ${state.currentStage}`);
+    console.log(`模式：   ${state.mode}  规模：${state.size}`);
+    console.log(`终态：${state.terminal}`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -45,7 +45,7 @@ function handleCurrent(args: string[]): number {
 function handleAdvance(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first stage advance <featureId> [--force]');
+    console.error('用法：spec-first stage advance <featureId> [--force]');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -53,19 +53,19 @@ function handleAdvance(args: string[]): number {
 
   try {
     const result = advance(featureId, process.cwd(), { force });
-    console.log(`Advanced: ${result.from} → ${result.to}`);
-    console.log(`Gate: ${result.gateResult}`);
+    console.log(`已推进：${result.from} → ${result.to}`);
+    console.log(`Gate：${result.gateResult}`);
     return ExitCode.SUCCESS;
   } catch (e) {
     if (e instanceof GateFailedError) {
-      console.error(`Gate blocked: ${e.message}`);
+      console.error(`Gate 阻断：${e.message}`);
       return ExitCode.GATE_FAILED;
     }
     if (e instanceof GateUnavailableError) {
-      console.error(`Gate blocked: ${e.message}`);
+      console.error(`Gate 阻断：${e.message}`);
       return ExitCode.GATE_FAILED;
     }
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
@@ -75,27 +75,27 @@ function handleCancel(args: string[]): number {
   const reason = parseFlag(args, '--reason');
 
   if (!featureId || !reason) {
-    console.error('Usage: spec-first stage cancel <featureId> --reason "<reason>"');
+    console.error('用法：spec-first stage cancel <featureId> --reason "<reason>"');
     return ExitCode.VALIDATION_ERROR;
   }
 
   try {
     const result = cancel(featureId, process.cwd(), reason);
-    console.log(`Cancelled: ${result.from} → ${result.to}`);
+    console.log(`已取消：${result.from} → ${result.to}`);
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.VALIDATION_ERROR;
   }
 }
 
 function printStageHelp(): void {
-  console.log(`Usage: spec-first stage <subcommand>
+  console.log(`用法：spec-first stage <subcommand>
 
-Subcommands:
-  current   Show current stage
-  advance   Advance to next stage
-  cancel    Cancel feature`);
+子命令：
+  current   查看当前阶段
+  advance   推进到下一阶段
+  cancel    取消 Feature`);
 }
 
 function parseFlag(args: string[], flag: string): string | undefined {

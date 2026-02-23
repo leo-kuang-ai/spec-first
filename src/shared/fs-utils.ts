@@ -10,7 +10,7 @@ export function readJson<T>(path: string): T {
   try {
     return JSON.parse(raw) as T;
   } catch {
-    throw new Error(`Invalid JSON in ${path}`);
+    throw new Error(`${path} 中存在无效 JSON`);
   }
 }
 

@@ -11,15 +11,15 @@ import { join } from 'node:path';
 
 /** C1-C9 指标名称与目标值 */
 const METRIC_DEFS: readonly { key: string; name: string; target: number }[] = [
-  { key: 'C1', name: 'Design Coverage', target: 0.8 },
-  { key: 'C2', name: 'API Coverage', target: 0.8 },
-  { key: 'C3', name: 'Task Coverage', target: 0.8 },
-  { key: 'C4', name: 'Test Coverage (FR)', target: 0.8 },
-  { key: 'C5', name: 'Test Coverage (AC)', target: 0.6 },
-  { key: 'C6', name: 'Impl Coverage', target: 0.8 },
-  { key: 'C7', name: 'PR Compliance', target: 0.9 },
-  { key: 'C8', name: 'Task Compliance', target: 0.8 },
-  { key: 'C9', name: 'TC Compliance', target: 0.8 },
+  { key: 'C1', name: '设计覆盖率', target: 0.8 },
+  { key: 'C2', name: 'API 覆盖率', target: 0.8 },
+  { key: 'C3', name: '任务覆盖率', target: 0.8 },
+  { key: 'C4', name: '测试覆盖率 (FR)', target: 0.8 },
+  { key: 'C5', name: '测试覆盖率 (AC)', target: 0.6 },
+  { key: 'C6', name: '实现覆盖率', target: 0.8 },
+  { key: 'C7', name: 'PR 合规率', target: 0.9 },
+  { key: 'C8', name: '任务合规率', target: 0.8 },
+  { key: 'C9', name: 'TC 合规率', target: 0.8 },
 ];
 
 export function handleMetrics(args: string[]): number {
@@ -31,7 +31,7 @@ export function handleMetrics(args: string[]): number {
     case 'report': return handleReport(rest);
     case 'health': return handleHealth(rest);
     default:
-      if (sub) console.error(`Unknown metrics subcommand: ${sub}`);
+      if (sub) console.error(`未知 metrics 子命令：${sub}`);
       printMetricsHelp();
       return ExitCode.VALIDATION_ERROR;
   }
@@ -40,11 +40,11 @@ export function handleMetrics(args: string[]): number {
 function handleCoverage(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first metrics coverage <featureId>');
+    console.error('用法：spec-first metrics coverage <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
   if (!featureExists(featureId, process.cwd())) {
-    console.error(`Feature not found: ${featureId}`);
+    console.error(`未找到 Feature：${featureId}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -52,8 +52,8 @@ function handleCoverage(args: string[]): number {
     const metrics = getCoverage(featureId, process.cwd());
     const record = metrics as unknown as Record<string, number>;
 
-    console.log(`Coverage Report — ${featureId}\n`);
-    console.log('Metric'.padEnd(25) + 'Current'.padEnd(10) + 'Target'.padEnd(10) + 'Status');
+    console.log(`覆盖率报告 — ${featureId}\n`);
+    console.log('指标'.padEnd(25) + '当前值'.padEnd(10) + '目标值'.padEnd(10) + '状态');
     console.log('-'.repeat(55));
 
     let allPass = true;
@@ -61,7 +61,7 @@ function handleCoverage(args: string[]): number {
       const current = record[def.key] ?? 0;
       const pass = current >= def.target;
       if (!pass) allPass = false;
-      const status = pass ? 'PASS' : 'FAIL *';
+      const status = pass ? '通过' : '失败 *';
       console.log(
         `${def.key} ${def.name}`.padEnd(25) +
         `${(current * 100).toFixed(1)}%`.padEnd(10) +
@@ -75,28 +75,28 @@ function handleCoverage(args: string[]): number {
     }
     return ExitCode.SUCCESS;
   } catch (e) {
-    console.error(`Error: ${(e as Error).message}`);
+    console.error(`错误：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
 
 function printMetricsHelp(): void {
-  console.log(`Usage: spec-first metrics <subcommand>
+  console.log(`用法：spec-first metrics <subcommand>
 
-Subcommands:
-  coverage  Show C1-C9 coverage metrics for a Feature
-  report    Generate complete metrics report
-  health    Show health score and key risks`);
+子命令：
+  coverage  展示 Feature 的 C1-C9 覆盖率
+  report    生成完整度量报告
+  health    展示健康分与关键风险`);
 }
 
 function handleReport(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first metrics report <featureId>');
+    console.error('用法：spec-first metrics report <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
   if (!featureExists(featureId, process.cwd())) {
-    console.error(`Feature not found: ${featureId}`);
+    console.error(`未找到 Feature：${featureId}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -104,10 +104,10 @@ function handleReport(args: string[]): number {
   const health = calcHealthScore(coverage, 0, 0);
   const bottlenecks = detectBottlenecks(coverage);
 
-  console.log(`Metrics Report — ${featureId}\n`);
-  console.log(`Health Score: ${health.H1} (${health.grade})\n`);
+  console.log(`度量报告 — ${featureId}\n`);
+  console.log(`健康分：${health.H1}（${health.grade}）\n`);
 
-  console.log('Coverage:');
+  console.log('覆盖率：');
   const record = coverage as unknown as Record<string, number>;
   for (const def of METRIC_DEFS) {
     const val = record[def.key] ?? 0;
@@ -115,13 +115,13 @@ function handleReport(args: string[]): number {
   }
 
   if (bottlenecks.length > 0) {
-    console.log(`\nBottlenecks (${bottlenecks.length}):`);
+    console.log(`\n瓶颈项（${bottlenecks.length}）：`);
     for (const b of bottlenecks) {
       console.log(`  [${b.severity.toUpperCase()}] ${b.rule}: ${b.description}`);
       console.log(`         → ${b.suggestion}`);
     }
   } else {
-    console.log('\nNo bottlenecks detected.');
+    console.log('\n未检测到瓶颈。');
   }
 
   return ExitCode.SUCCESS;
@@ -130,11 +130,11 @@ function handleReport(args: string[]): number {
 function handleHealth(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('Usage: spec-first metrics health <featureId>');
+    console.error('用法：spec-first metrics health <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
   if (!featureExists(featureId, process.cwd())) {
-    console.error(`Feature not found: ${featureId}`);
+    console.error(`未找到 Feature：${featureId}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -142,16 +142,16 @@ function handleHealth(args: string[]): number {
   const health = calcHealthScore(coverage, 0, 0);
   const bottlenecks = detectBottlenecks(coverage);
 
-  console.log(`Health — ${featureId}\n`);
-  console.log(`Score: ${health.H1} / 100  Grade: ${health.grade}`);
+  console.log(`健康分 — ${featureId}\n`);
+  console.log(`分数：${health.H1} / 100  等级：${health.grade}`);
 
   if (bottlenecks.length > 0) {
-    console.log(`\nKey Risks (${bottlenecks.length}):`);
+    console.log(`\n关键风险（${bottlenecks.length}）：`);
     for (const b of bottlenecks) {
       console.log(`  ${b.rule}: ${b.description}`);
     }
   } else {
-    console.log('\nNo risks identified.');
+    console.log('\n未识别到风险。');
   }
 
   return ExitCode.SUCCESS;

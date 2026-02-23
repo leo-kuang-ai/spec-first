@@ -40,7 +40,7 @@ describe('Gate FAIL blocking', () => {
     });
     advance(featureId, TMP); // 00_init -> 01_specify（此时无 spec.md）
     expect(() => advance(featureId, TMP))
-      .toThrow(/Gate failed/);
+      .toThrow(/Gate 未通过/);
   });
 
   it('should allow advance with gate PASS', () => {
@@ -103,7 +103,7 @@ describe('Cancel flow', () => {
     });
     cancel(featureId, TMP, '取消');
     expect(() => advance(featureId, TMP, { force: true }))
-      .toThrow(/terminal stage/);
+      .toThrow(/终态阶段/);
   });
 });
 

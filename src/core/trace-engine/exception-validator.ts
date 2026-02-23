@@ -48,24 +48,24 @@ function checkException(ex: KnownException, rfcStatuses: Map<string, string>): s
   // RFC 必须存在且已审批
   const rfcStatus = rfcStatuses.get(ex.rfcId);
   if (!rfcStatus) {
-    reasons.push(`RFC ${ex.rfcId} not found`);
+    reasons.push(`未找到 RFC ${ex.rfcId}`);
   } else if (rfcStatus !== 'approved') {
-    reasons.push(`RFC ${ex.rfcId} status is "${rfcStatus}", expected "approved"`);
+    reasons.push(`RFC ${ex.rfcId} 当前状态为 "${rfcStatus}"，预期 "approved"`);
   }
 
   // 必须有 expiresAt
   if (!ex.expiresAt) {
-    reasons.push('Missing expires_at');
+    reasons.push('缺少 expires_at');
   } else {
     const expires = new Date(ex.expiresAt);
     if (expires.getTime() < Date.now()) {
-      reasons.push(`Expired at ${ex.expiresAt}`);
+      reasons.push(`已过期：${ex.expiresAt}`);
     }
   }
 
   // 必须有 rollbackPoint
   if (!ex.rollbackPoint) {
-    reasons.push('Missing rollback_point');
+    reasons.push('缺少 rollback_point');
   }
 
   return reasons;

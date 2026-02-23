@@ -12,13 +12,15 @@ gate_conditions:
       command: npm run test:e2e
 extra_deliverables:
   02_design:
-    - system-architecture.md
+    - name: system-architecture.md
+      required: false
   07_release:
-    - reports/memory-profile.md
+    - name: reports/memory-profile.md
+      required: false
 quality_thresholds:
   installer_size:
-    value: 100mb
+    value: 100
     direction: lower_is_better
   memory_usage_idle:
-    value: 200mb
+    value: 200
     direction: lower_is_better

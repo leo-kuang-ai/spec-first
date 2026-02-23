@@ -113,8 +113,8 @@ fi
 # Validate commit message contains at least one valid ID
 MSG=$(cat "$1")
 if ! echo "$MSG" | grep -qE '(TASK|FR|DS|TC|RFC|FSREQ)-'; then
-  echo "ERROR: Commit message must reference at least one valid ID (TASK-xxx, FR-xxx, etc.)"
-  echo "Available format: [TASK-FEAT-NNN] <message>"
+  echo "错误：commit message 必须至少引用一个有效 ID（TASK-xxx、FR-xxx 等）"
+  echo "可用格式：[TASK-FEAT-NNN] <message>"
   exit 1
 fi
 `;
@@ -131,13 +131,13 @@ if command -v npx >/dev/null 2>&1; then
   fi
 
   if [ -z "$FEAT_ID" ]; then
-    echo "spec-first: skip matrix check (no current feature set)"
+    echo "spec-first: 跳过 matrix 检查（未设置当前 feature）"
     exit 0
   fi
 
   npx spec-first matrix check "$FEAT_ID"
   if [ $? -ne 0 ]; then
-    echo "ERROR: spec-first matrix check failed for $FEAT_ID. Push blocked."
+    echo "错误：$FEAT_ID 的 spec-first matrix check 失败，已阻止 push。"
     exit 1
   fi
 fi
@@ -147,7 +147,7 @@ fi
       // 基本格式校验
       return header + `
 # Pre-commit validation
-echo "spec-first: pre-commit check passed"
+echo "spec-first: pre-commit 检查通过"
 `;
   }
 }

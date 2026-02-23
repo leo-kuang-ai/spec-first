@@ -37,8 +37,8 @@ export function validateSecurity(findings: SecurityFinding[]): SecurityResult {
   const pass = noCritical;
 
   const parts: string[] = [];
-  if (s1Count > 0) parts.push(`S1×${s1Count} (forced FAIL, no waiver)`);
-  if (unwaivedS2 > 0) parts.push(`S2×${unwaivedS2} unwaived (FAIL)`);
+  if (s1Count > 0) parts.push(`S1×${s1Count}（强制失败，不可豁免）`);
+  if (unwaivedS2 > 0) parts.push(`S2×${unwaivedS2}（未豁免，失败）`);
   if (summary.S3 > 0) parts.push(`S3×${summary.S3}`);
   if (summary.S4 > 0) parts.push(`S4×${summary.S4}`);
 
@@ -47,7 +47,7 @@ export function validateSecurity(findings: SecurityFinding[]): SecurityResult {
     noCritical,
     findings,
     summary,
-    detail: parts.length > 0 ? parts.join('; ') : 'No security findings',
+    detail: parts.length > 0 ? parts.join('；') : '无安全发现',
   };
 }
 
