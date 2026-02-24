@@ -2,7 +2,7 @@
  * viewer CLI 命令
  * spec-first viewer [start|open|url] [--host <host>] [--port <port>] [--project-root <path>] [--open] [--print-url]
  */
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -81,18 +81,20 @@ export function handleViewer(args: string[]): number {
     passthrough.unshift('--print-url');
   }
 
-  // --background: detached non-blocking mode
+  // --background: strip flag and run bootstrap synchronously (hook-friendly).
+  // Bootstrap handles browser opening via python webbrowser module.
   if (passthrough.includes('--background')) {
     const idx = passthrough.indexOf('--background');
     passthrough.splice(idx, 1);
-    const child = spawn(process.execPath, [bootstrapScript, ...passthrough], {
+
+    const result = spawnSync(process.execPath, [bootstrapScript, ...passthrough], {
       cwd: process.cwd(),
-      detached: true,
-      stdio: 'ignore',
+      stdio: 'inherit',
       env: process.env,
+      timeout: 8000,
     });
-    child.unref();
-    return ExitCode.SUCCESS;
+
+    return typeof result.status === 'number' ? result.status : ExitCode.SUCCESS;
   }
 
   const result = spawnSync(process.execPath, [bootstrapScript, ...passthrough], {

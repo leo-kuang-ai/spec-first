@@ -1,27 +1,34 @@
+---
+name: "spec-first:feature-current"
+description: "查看当前 Feature 与阶段信息"
+---
+
 # Skill: feature-current
 
-## Trigger
-- Stage: any (independent of stage)
+查看当前活跃 Feature 的 ID、标题与阶段信息。
+
+## 触发条件
+- 阶段: 任意（不限阶段）
 - Command: `/spec-first:feature-current`
 
-## Phases
-- P0: Locate project root and current feature pointer
-- P1: Load current feature state
-- P2: Execute current feature query
-- P3: Present current feature details to user
-- P4: No writes
-- P5: No side effects
+## 执行阶段
+- P0: 定位项目根目录和当前 Feature 指针
+- P1: 加载当前 Feature 状态
+- P2: 执行当前 Feature 查询
+- P3: 向用户展示当前 Feature 详情
+- P4: 无写入
+- P5: 无副作用
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first feature current`
 - `spec-first stage current <featureId>`
 
-## Output Paths
-- None (display only)
+## 输出路径
+- 无（仅展示）
 
-## confirm_policy
-- Recommended: auto (read-only status)
+## 确认策略
+- 推荐: auto（只读状态查询）
 
-## Success Criteria
+## 成功标准
 - 已展示当前 featureId、标题与阶段
 - 当未设置 current 时给出下一步引导

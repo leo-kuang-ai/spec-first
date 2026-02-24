@@ -5,10 +5,12 @@
  * 升级后刷新 Skill/MCP/Hooks，合并原 setup --global 功能。
  */
 import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { getCliVersion } from '../router.js';
 import { ensureSkillCommands } from '../../shared/skill-commands.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
+import { detectHostPaths } from '../../shared/host-paths.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
 import { registerSessionHooks } from '../../core/tool-integration/session-hook.js';
@@ -59,9 +61,14 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
   // 2. 输出当前版本号
   log(`spec-first v${getCliVersion()}`);
 
-  // 3. 刷新 Skill 命令
+  // 3. 同步 Skills 到用户级目录并刷新命令入口
+  const hostPaths = detectHostPaths();
   const skills = ensureSkillCommands(cwd, { global: true, dryRun });
-  log(`${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex`);
+  log(`${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex → ${hostPaths.specFirstSkillsDir}`);
+  if (skills.codexWarnings.length > 0) {
+    log(`  ⚠ Codex skill 验证失败 (${skills.codexWarnings.length}):`);
+    for (const w of skills.codexWarnings) log(`    - ${w}`);
+  }
 
   // 4. MCP 配置补齐
   if (!skipMcp) {
@@ -87,7 +94,10 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
   for (const w of ai.warnings) log(`  ⚠ ${w}`);
 
   // 7. SessionStart Hook
-  const session = registerSessionHooks({ dryRun });
+  const sessionProjectRoot = existsSync(join(cwd, '.spec-first')) && existsSync(join(cwd, 'specs'))
+    ? cwd
+    : undefined;
+  const session = registerSessionHooks({ dryRun, projectRoot: sessionProjectRoot });
   log(`${prefix}Session Hook: ${session.registered.length} registered`);
   for (const w of session.warnings) log(`  ⚠ ${w}`);
 

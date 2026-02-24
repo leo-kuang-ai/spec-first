@@ -1,26 +1,33 @@
+---
+name: "spec-first:feature-list"
+description: "列出当前项目全部 Feature"
+---
+
 # Skill: feature-list
 
-## Trigger
-- Stage: any (independent of stage)
+列出当前项目所有 Feature 及其阶段状态。
+
+## 触发条件
+- 阶段: 任意（不限阶段）
 - Command: `/spec-first:feature-list`
 
-## Phases
-- P0: Locate project root and validate specs directory
-- P1: Load feature registry and feature directories
-- P2: Execute feature list query
-- P3: Present feature list to user
-- P4: No writes
-- P5: No side effects
+## 执行阶段
+- P0: 定位项目根目录，校验 specs 目录存在
+- P1: 加载 Feature 注册表和 Feature 目录
+- P2: 执行 Feature 列表查询
+- P3: 向用户展示 Feature 列表
+- P4: 无写入
+- P5: 无副作用
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first feature list`
 
-## Output Paths
-- None (display only)
+## 输出路径
+- 无（仅展示）
 
-## confirm_policy
-- Recommended: auto (read-only list)
+## 确认策略
+- 推荐: auto（只读列表）
 
-## Success Criteria
+## 成功标准
 - 已展示当前项目 Feature 列表
 - 输出包含 featureId、标题、阶段与更新时间

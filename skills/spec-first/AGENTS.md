@@ -333,7 +333,7 @@ P5_SIDE_EFFECT — 副作用执行
   └── 更新运行态三文件（progress.md / findings.md / task_plan.md）
 ```
 
-### confirm_policy 执行语义
+### 确认策略执行语义
 
 每个 Skill 声明一种 confirm_policy，决定 P3 阶段的交互模式：
 
@@ -362,7 +362,7 @@ P5_SIDE_EFFECT — 副作用执行
 | P4 | CLI 命令失败（如 id next 返回错误） | 终止执行，展示 CLI 错误输出 |
 | P5 | 副作用执行失败（如 matrix check 报错） | 不回滚 P4 已写入的文件，但警告用户副作用未完成 |
 
-## Stage × Skill 映射
+## 阶段 × Skill 映射
 
 | 阶段 | Skill | 主要交付物 |
 | --- | --- | --- |
@@ -377,7 +377,7 @@ P5_SIDE_EFFECT — 副作用执行
 | 编排层 | 11-plan, 12-verify, 13-orchestrate | 执行计划 / 校验报告 |
 | 辅助 | 14-status, 15-doctor, 16-sync | 状态查询 / 环境诊断 / 矩阵同步 |
 
-## Guardrails（全局约束）
+## 全局约束
 
 ### 人在回路
 

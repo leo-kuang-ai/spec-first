@@ -2,12 +2,13 @@
  * Spec-First Skill dual-host registrar
  *
  * - Claude Code: <detected claude commands dir>/spec-first/<skill>.md  (=> /spec-first:<skill>)
- * - Codex: <detected codex skills dir>/spec-first/<skill> (symlinks to package skill dirs)
+ * - Codex: <detected codex skills dir>/spec-first/<skill> (copy from user-level dir)
  * - Project-level: {projectRoot}/.claude/commands/ (Claude Code only)
  *
- * Command files reference absolute SKILL.md paths inside the spec-first package.
+ * Skills 先从 npm 包同步到用户级固定目录 ~/.spec-first/skills/spec-first/，
+ * 命令文件和 Codex skills 统一引用该固定路径，避免 npm 全局路径漂移。
  */
-import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { detectHostPaths } from './host-paths.js';
@@ -21,6 +22,38 @@ function resolveSkillsRoot(): string | undefined {
     join(PKG_ROOT, '..', 'skills', 'spec-first'),
   ];
   return candidates.find((candidate) => existsSync(candidate));
+}
+
+/**
+ * 将 skills 从 npm 包目录同步到用户级固定目录。
+ * 幂等覆盖：每次 update 时用包内最新版本覆盖。
+ * 返回用户级 skills 根目录路径（如 ~/.spec-first/skills/spec-first）。
+ */
+function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | undefined {
+  const pkgSkillsRoot = resolveSkillsRoot();
+  if (!pkgSkillsRoot) return undefined;
+
+  const targetRoot = join(userSkillsDir, 'spec-first');
+  if (dryRun) return targetRoot;
+
+  mkdirSync(targetRoot, { recursive: true });
+
+  for (const dir of readdirSync(pkgSkillsRoot, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    const src = join(pkgSkillsRoot, dir.name);
+    const dest = join(targetRoot, dir.name);
+    // 覆盖式复制，确保与包内版本一致
+    rmSync(dest, { recursive: true, force: true });
+    cpSync(src, dest, { recursive: true });
+  }
+
+  // 同步 AGENTS.md（如存在）
+  const agentsMd = join(pkgSkillsRoot, 'AGENTS.md');
+  if (existsSync(agentsMd)) {
+    cpSync(agentsMd, join(targetRoot, 'AGENTS.md'));
+  }
+
+  return targetRoot;
 }
 
 const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
@@ -45,12 +78,25 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   'feature-current': '查看当前 Feature 与阶段信息',
 };
 
+/** 验证 Codex SKILL.md 是否包含有效 YAML frontmatter（name + description） */
+function validateCodexFrontmatter(skillMdPath: string): string | undefined {
+  if (!existsSync(skillMdPath)) return `SKILL.md 不存在: ${skillMdPath}`;
+  const content = readFileSync(skillMdPath, 'utf-8');
+  if (!content.startsWith('---')) return `缺少 YAML frontmatter 起始分隔符 ---`;
+  const endIdx = content.indexOf('---', 3);
+  if (endIdx < 0) return `缺少 YAML frontmatter 结束分隔符 ---`;
+  const yaml = content.slice(3, endIdx);
+  if (!/name\s*:/.test(yaml)) return `frontmatter 缺少 name 字段`;
+  if (!/description\s*:/.test(yaml)) return `frontmatter 缺少 description 字段`;
+  return undefined; // 验证通过
+}
+
 interface SkillEntry {
   /** 命令文件名（兼容旧逻辑） */
   commandName: string;
   /** SKILL.md 绝对路径 */
   skillPath: string;
-  /** skill 目录绝对路径（用于 Codex 符号链接） */
+  /** skill 目录绝对路径（用于 Codex 复制） */
   skillDir: string;
   /** 从 SKILL.md 第一行提取的 Skill 名称 */
   skillName: string;
@@ -69,7 +115,7 @@ function quoteYamlString(value: string): string {
   return `"${escaped}"`;
 }
 
-/** 从 SKILL.md 提取简短描述：取 Phases 第一条作为摘要 */
+/** 从 SKILL.md 提取简短描述：取执行阶段第一条（P0）作为摘要 */
 function extractDescription(content: string): string {
   const match = content.match(/^- P0:\s*(.+)$/m);
   if (match) return match[1].trim();
@@ -77,10 +123,10 @@ function extractDescription(content: string): string {
   return trigger ? trigger[1] : 'Spec-First Skill';
 }
 
-/** 扫描 skills/spec-first/ 目录，返回需要生成命令入口的 Skill 列表 */
-export function discoverSkills(): SkillEntry[] {
-  const skillsRoot = resolveSkillsRoot();
-  if (!skillsRoot) return [];
+/** 扫描 skills 目录，返回需要生成命令入口的 Skill 列表 */
+export function discoverSkills(overrideRoot?: string): SkillEntry[] {
+  const skillsRoot = overrideRoot ?? resolveSkillsRoot();
+  if (!skillsRoot || !existsSync(skillsRoot)) return [];
 
   const entries: SkillEntry[] = [];
 
@@ -123,6 +169,8 @@ description: ${description}
 export interface SkillCommandResult {
   claude: string[];
   codex: string[];
+  /** Codex skill 验证警告（frontmatter 缺失或无效） */
+  codexWarnings: string[];
 }
 
 export interface SkillCommandOptions {
@@ -155,7 +203,12 @@ function ensureClaudeCommands(commandsDir: string, skills: SkillEntry[], dryRun?
   return created;
 }
 
-function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?: boolean): string[] {
+interface CodexSkillResult {
+  created: string[];
+  warnings: string[];
+}
+
+function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?: boolean): CodexSkillResult {
   if (!dryRun) {
     mkdirSync(codexSkillsDir, { recursive: true });
     cleanupLegacyCodexSkills(codexSkillsDir, skills);
@@ -165,6 +218,7 @@ function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?
     mkdirSync(namespaceDir, { recursive: true });
   }
   const created: string[] = [];
+  const warnings: string[] = [];
 
   for (const entry of skills) {
     if (dryRun) {
@@ -172,35 +226,28 @@ function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?
       continue;
     }
     const target = join(namespaceDir, entry.skillName);
+    // 清理旧的 symlink 或目录，统一用 copy 覆盖
     try {
       const st = lstatSync(target);
       if (st.isSymbolicLink()) {
-        if (readlinkSync(target) === entry.skillDir) {
-          created.push(`spec-first:${entry.skillName}`);
-          continue;
-        }
         unlinkSync(target);
       } else {
         rmSync(target, { recursive: true, force: true });
       }
     } catch {
-      // target path does not exist
+      // target 不存在，忽略
     }
-
-    try {
-      symlinkSync(entry.skillDir, target);
-    } catch (e) {
-      const error = e as NodeJS.ErrnoException;
-      if (error.code === 'EEXIST') {
-        created.push(`spec-first:${entry.skillName}`);
-        continue;
-      }
-      throw e;
-    }
+    cpSync(entry.skillDir, target, { recursive: true });
     created.push(`spec-first:${entry.skillName}`);
+
+    // 验证复制后的 SKILL.md frontmatter
+    const err = validateCodexFrontmatter(join(target, 'SKILL.md'));
+    if (err) {
+      warnings.push(`${entry.skillName}: ${err}`);
+    }
   }
 
-  return created;
+  return { created, warnings };
 }
 
 function cleanupLegacyClaudeCommands(commandsDir: string, skills: SkillEntry[]): void {
@@ -222,21 +269,33 @@ function cleanupLegacyCodexSkills(codexSkillsDir: string, skills: SkillEntry[]):
 /**
  * 将 spec-first Skill 注册到 Claude Code 和 Codex。
  *
+ * 流程：先将 skills 从 npm 包同步到 ~/.spec-first/skills/，
+ * 再从该固定目录发现 skills 并注册命令入口。
+ *
  * - global=true：写入 ~/.claude/commands/ + ~/.codex/skills/（全局安装）
  * - global=false：仅写入 {projectRoot}/.claude/commands/（项目 init）
  */
 export function ensureSkillCommands(projectRoot: string, options?: SkillCommandOptions): SkillCommandResult {
-  const skills = discoverSkills();
   const isGlobal = options?.global ?? false;
   const dryRun = options?.dryRun;
   const hostPaths = detectHostPaths();
+
+  // 同步 skills 到用户级固定目录
+  const userSkillsRoot = syncSkillsToUserDir(hostPaths.specFirstSkillsDir, dryRun);
+
+  // dry-run 不执行实际复制，用户目录可能为空，回退到包源目录发现
+  const skills = discoverSkills(
+    dryRun && userSkillsRoot && !existsSync(userSkillsRoot) ? undefined : userSkillsRoot,
+  );
 
   const claudeDir = isGlobal
     ? hostPaths.claudeCommandsDir
     : join(projectRoot, '.claude', 'commands');
 
   const claude = ensureClaudeCommands(claudeDir, skills, dryRun);
-  const codex = isGlobal ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun) : [];
+  const codexResult = isGlobal
+    ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun)
+    : { created: [], warnings: [] };
 
-  return { claude, codex };
+  return { claude, codex: codexResult.created, codexWarnings: codexResult.warnings };
 }

@@ -68,12 +68,26 @@ export function registerAIHooks(projectRoot: string, options?: { dryRun?: boolea
     }
   }
 
+  // Claude Code requires hooks nested under "hooks" key: {"hooks":{"PreToolUse":[...]}}
+  if (!settings.hooks || typeof settings.hooks !== 'object') {
+    settings.hooks = {} as Record<string, unknown>;
+  }
+  const hooksObj = settings.hooks as Record<string, unknown>;
+
   for (const config of configs) {
-    const existing = Array.isArray(settings[config.type]) ? settings[config.type] as any[] : [];
+    // Migrate legacy top-level entries into hooks wrapper
+    if (Array.isArray(settings[config.type])) {
+      const legacy = settings[config.type] as unknown[];
+      const existingInHooks = Array.isArray(hooksObj[config.type]) ? hooksObj[config.type] as unknown[] : [];
+      hooksObj[config.type] = [...existingInHooks, ...legacy];
+      delete settings[config.type];
+    }
+
+    const existing = Array.isArray(hooksObj[config.type]) ? hooksObj[config.type] as any[] : [];
     const filtered = existing.filter((item: any) =>
       !(item?.hooks?.some((h: any) => typeof h.command === 'string' && h.command.includes('npx spec-first'))),
     );
-    settings[config.type] = [...filtered, { matcher: config.matcher, hooks: [{ type: 'command' as const, command: config.command }] }];
+    hooksObj[config.type] = [...filtered, { matcher: config.matcher, hooks: [{ type: 'command' as const, command: config.command }] }];
     registered.push(config.type);
   }
 

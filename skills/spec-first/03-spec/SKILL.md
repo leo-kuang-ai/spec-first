@@ -1,36 +1,43 @@
+---
+name: "spec-first:spec"
+description: "定位 Feature 并校验阶段为需求规格（01_specify）"
+---
+
 # Skill: spec
 
-## Trigger
-- Stage: 01_specify
+定义需求规格，生成 FR 功能需求与验收标准（AC）。
+
+## 触发条件
+- 阶段: 01_specify
 - Command: `/spec-first:spec`
 
-## Phases
-- P0: Locate Feature, verify stage is 01_specify
-- P1: Load constitution.md, existing FRs from matrix
-- P2: Generate FR definitions with ID, title, acceptance criteria
-- P3: Confirm FR list with user (allow revision)
-- P4: Write FRs to traceability-matrix.md, update spec documents
-- P5: Run matrix check for orphan detection
+## 执行阶段
+- P0: 定位 Feature，校验阶段为 01_specify
+- P1: 加载 constitution.md 及矩阵中已有 FR
+- P2: 生成 FR 定义（ID、标题、验收标准）
+- P3: 与用户确认 FR 列表（允许修订）
+- P4: 将 FR 写入 traceability-matrix.md，更新 spec 文档
+- P5: 执行 matrix check 检测 orphan 项
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first id next FR <abbr> --feature <featureId>`
 - `spec-first matrix update`
 - `spec-first matrix check`
 
-## Output Paths
+## 输出路径
 - `specs/{featureId}/traceability-matrix.md`
 - `specs/{featureId}/spec.md`
 
-## confirm_policy
-- Recommended: strict (Mode N) / assisted (Mode I, Size M+)
+## 确认策略
+- 推荐: strict（Mode N）/ assisted（Mode I, Size M+）
 
-## Success Criteria
+## 成功标准
 - `spec.md` 已写入，包含所有 FR 定义和验收标准（AC）
 - 所有 FR 已通过 `id next FR` 注册
 - `traceability-matrix.md` 已更新，每个 FR 有对应行
 - `matrix check` 无 orphan 项
 
-## Example (P2 Output Format)
+## 示例（P2 输出格式）
 
 ```markdown
 ### FR-AUTH-001: 短信验证码登录

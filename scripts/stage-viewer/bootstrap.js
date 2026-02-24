@@ -123,16 +123,12 @@ function isPortOpen(host, port, timeoutMs = 450) {
 }
 
 function openBrowser(url) {
-  const platform = process.platform;
-  if (platform === 'darwin') {
-    spawn('open', [url], { stdio: 'ignore', detached: true }).unref();
-    return;
-  }
-  if (platform === 'win32') {
-    spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref();
-    return;
-  }
-  spawn('xdg-open', [url], { stdio: 'ignore', detached: true }).unref();
+  // Use python webbrowser module (same as serena) — reliable across all environments
+  // including Claude hook subprocess chains where macOS 'open' command fails silently.
+  spawn('python3', ['-c', `import webbrowser; webbrowser.open(${JSON.stringify(url)})`], {
+    stdio: ['ignore', 'ignore', 'ignore'],
+    detached: true,
+  }).unref();
 }
 
 function launchServer(projectRoot, host, port, stateFile, source) {

@@ -1,36 +1,45 @@
+---
+name: "spec-first:design"
+description: "定位 Feature 并校验阶段为技术设计（02_design）"
+---
+
 # Skill: design
 
-## Trigger
-- Stage: 02_design
+生成技术设计方案，将 FR 映射为 DS 设计规格。
+
+## 触发条件
+- 阶段: 02_design
 - Command: `/spec-first:design`
 
-## Phases
-- P0: Locate Feature, verify stage is 02_design
-- P1: Load FRs from matrix, constitution.md
-- P2: Generate DS (Design Spec) entries mapped to FRs
-- P3: Confirm design decisions with user
-- P4: Write DS entries to matrix, create design documents
-- P5: Run matrix check for FR→DS coverage
+## 执行阶段
+- P0: 定位 Feature，校验阶段为 02_design
+- P1: 从矩阵加载 FR，读取 constitution.md
+- P2: 生成 DS（设计规格）条目，映射到 FR
+- P3: 与用户确认设计决策
+- P4: 将 DS 写入矩阵，创建设计文档
+- P5: 执行 metrics coverage 检查 FR→DS 覆盖率，执行 matrix check 检测 orphan 项
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first id next DS <abbr> --feature <featureId>`
 - `spec-first matrix update`
+- `spec-first matrix check`
 - `spec-first metrics coverage`
 
-## Output Paths
+## 输出路径
 - `specs/{featureId}/traceability-matrix.md`
 - `specs/{featureId}/design.md`
+- `specs/{featureId}/contracts/*.yaml`（按需）
 
-## confirm_policy
-- Recommended: strict (design decisions are critical)
+## 确认策略
+- 推荐: strict（设计决策属高风险操作）
 
-## Success Criteria
+## 成功标准
 - `design.md` 已写入，包含模块划分、API 设计、数据模型
 - 所有 DS 已通过 `id next DS` 注册
 - `traceability-matrix.md` 已更新，每个 FR 有对应 DS 引用
 - `metrics coverage` C1 (Design Coverage) > 0%
 
-## Example (P2 Output Format)
+## 示例（P2 输出格式）
 
 ```markdown
 ### DS-AUTH-001: 短信验证码发送服务

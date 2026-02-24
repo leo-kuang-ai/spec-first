@@ -1,30 +1,37 @@
+---
+name: "spec-first:feature-switch"
+description: "切换当前 Feature 上下文（更新 .spec-first/current）"
+---
+
 # Skill: feature-switch
 
-## Trigger
-- Stage: any (independent of stage)
+切换当前活跃 Feature 上下文指针。
+
+## 触发条件
+- 阶段: 任意（不限阶段）
 - Command: `/spec-first:feature-switch <featureId>`
 
-## Phases
-- P0: Locate project root and parse target featureId from user input
-- P1: Load feature list and validate target feature exists
-- P2: Generate switch plan (target feature and expected stage)
-- P3: Ask user to confirm switch target
-- P4: Execute switch and write current pointer
-- P5: Verify switched context and report current stage
+## 执行阶段
+- P0: 定位项目根目录，从用户输入解析目标 featureId
+- P1: 加载 Feature 列表，校验目标 Feature 存在
+- P2: 生成切换计划（目标 Feature 及预期阶段）
+- P3: 请用户确认切换目标
+- P4: 执行切换，写入 current 指针
+- P5: 验证切换后上下文，报告当前阶段
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first feature list`
 - `spec-first feature switch <featureId>`
 - `spec-first feature current`
 - `spec-first stage current <featureId>`
 
-## Output Paths
+## 输出路径
 - `.spec-first/current`
 
-## confirm_policy
-- Recommended: assisted (updates current feature pointer)
+## 确认策略
+- 推荐: assisted（更新当前 Feature 指针）
 
-## Success Criteria
+## 成功标准
 - 目标 featureId 校验通过
 - `.spec-first/current` 已切换到目标 featureId
 - 已输出切换后的当前阶段信息

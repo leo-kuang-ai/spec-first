@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.7 2026-02-24 Leo: feat: 新增 uninstall 命令 + preuninstall 自动清理 — `spec-first uninstall` 清理全局 Skills/Claude 命令/Codex skills/SessionStart Hook/AI Runtime Hooks/Git hooks；`npm uninstall -g` 自动触发 preuninstall 脚本；安装与更新文档卸载章节重写 (user-visible)
+- v0.5.6 2026-02-24 Leo: fix: hooks 注册格式修正 — session-hook/ai-runtime-hook 写入 settings.hooks 而非顶层 key（Claude Code 要求 {"hooks":{...}} 嵌套格式）+ 旧格式自动迁移 + viewer openBrowser 改用 python webbrowser + 测试对齐 (user-visible)
+- v0.5.5 2026-02-24 Leo: 安装链路健壮性增强 — postinstall isGlobalInstall() 扩展 yarn global/volta/npm prefix 检测；ensureCodexSkills 复制后增加 YAML frontmatter 验证（name+description）；update 输出 Codex skill 验证警告 (user-visible)
+- v0.5.4 2026-02-24 Leo: Skill 路径稳定性优化 — skills 从 npm 包同步到用户级固定目录 ~/.spec-first/skills/，命令文件和 Codex skills 统一引用该路径，消除 nvm/pnpm/npm upgrade 导致的绝对路径断裂；Codex 侧从 symlink 改为 copy 模式；19 个 SKILL.md 补齐 YAML frontmatter 修复 Codex 加载校验 (user-visible)
 - v0.5.3 2026-02-24 Leo: 使用手册 v3.0→v3.1 同步更新 — 命令组 13→17（补齐 update/setup/hooks/viewer）、子命令 38→44、viewer --background 示例、FAQ 升级流程补充 postinstall 说明 (user-visible)
 - v0.5.2 2026-02-24 Leo: publish.sh 产物校验路径修正 dist/index.js→dist/cli/index.js + 开发任务文档验收标准对齐
 - v0.5.1 2026-02-24 Leo: 多Agent审查修复 — P0 发布入口 bin/exports 对齐 dist/cli/index.js + postinstall fallback 路径修正 + execSync→execFileSync 消除命令注入 + handlebars ^4.7.8 消除 CVE + setup --global 参数转发修复 + update-notifier ESM 兼容 + viewer help 补 --background + 文档 dist/index.js 残留清零 + 冒烟测试脚本 + 补齐 --skip-hooks/错误路径单测 (user-visible)

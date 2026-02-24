@@ -1,8 +1,29 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { detectHostPaths } from '../../shared/host-paths.js';
 
-export function registerSessionHooks(options?: { dryRun?: boolean }): {
+function shellQuote(value: string): string {
+  return `'${value.replace(/'/g, `"'"'"`)}'`;
+}
+
+function resolveSpecFirstBin(): string {
+  const fromEnv = process.env.SPEC_FIRST_BIN?.trim();
+  if (fromEnv) return fromEnv;
+
+  try {
+    const output = execFileSync('which', ['spec-first'], {
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).toString().trim();
+    if (output) return output;
+  } catch {
+    // ignore
+  }
+
+  return 'spec-first';
+}
+
+export function registerSessionHooks(options?: { dryRun?: boolean; projectRoot?: string }): {
   registered: string[];
   warnings: string[];
 } {
@@ -21,22 +42,42 @@ export function registerSessionHooks(options?: { dryRun?: boolean }): {
     }
   }
 
-  // Filter existing spec-first viewer entries from SessionStart
-  const existing = Array.isArray(settings.SessionStart) ? settings.SessionStart : [];
+  if (!settings.hooks || typeof settings.hooks !== 'object') {
+    settings.hooks = {} as Record<string, unknown>;
+  }
+  const hooks = settings.hooks as Record<string, unknown>;
+
+  // 兼容历史写法：将 top-level SessionStart 迁移到 hooks.SessionStart
+  if (Array.isArray(settings.SessionStart)) {
+    const legacyEntries = settings.SessionStart as unknown[];
+    const existingInHooks = Array.isArray(hooks.SessionStart) ? hooks.SessionStart as unknown[] : [];
+    hooks.SessionStart = [...existingInHooks, ...legacyEntries];
+    delete settings.SessionStart;
+  }
+
+  const existing = Array.isArray(hooks.SessionStart) ? hooks.SessionStart : [];
   const filtered = existing.filter((item: any) =>
-    !item?.hooks?.some((h: any) => typeof h.command === 'string' && h.command.includes('spec-first viewer'))
+    !item?.hooks?.some((h: any) =>
+      typeof h.command === 'string' && h.command.includes('viewer open')
+    )
   );
+
+  const configuredProjectRoot = options?.projectRoot?.trim()
+    || process.env.SPEC_FIRST_VIEWER_PROJECT_ROOT?.trim()
+    || '';
+  const projectRootArg = configuredProjectRoot ? ` --project-root ${shellQuote(configuredProjectRoot)}` : '';
+  const specFirstBin = resolveSpecFirstBin();
 
   filtered.push({
     matcher: '*',
     hooks: [{
       type: 'command' as const,
-      command: 'spec-first viewer open --print-url --background 2>/dev/null || true',
-      timeout: 10,
+      command: `${shellQuote(specFirstBin)} viewer open${projectRootArg} --print-url --background 2>/dev/null || true`,
+      timeout: 15,
     }],
   });
 
-  settings.SessionStart = filtered;
+  hooks.SessionStart = filtered;
   registered.push('SessionStart');
 
   if (!options?.dryRun) {

@@ -1,38 +1,45 @@
+---
+name: "spec-first:orchestrate"
+description: "定位 Feature 并加载当前状态执行编排"
+---
+
 # Skill: orchestrate
 
-## Trigger
-- Stage: any (master orchestration Skill)
+编排调度器，驱动 plan → skill → verify → advance 全流程。
+
+## 触发条件
+- 阶段: 任意（主编排 Skill）
 - Command: `/spec-first:orchestrate`
 
-## Phases
-- P0: Locate Feature, load current stage and state
-- P1: Load stage-state, coverage, gate history, task plan
-- P2: Generate orchestration plan: plan → skill execution → verify → stage advance
-- P3: Confirm orchestration sequence with user
-- P4: Execute scheduled Skills in sequence
-- P5: Advance stage if gate passes
+## 执行阶段
+- P0: 定位 Feature，加载当前阶段与状态
+- P1: 加载 stage-state、覆盖率、Gate 历史、任务计划
+- P2: 生成编排计划：plan → skill 执行 → verify → stage advance
+- P3: 与用户确认编排序列
+- P4: 按序执行调度的子 Skill
+- P5: Gate 通过后推进阶段
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first stage current`
 - `spec-first stage advance`
 - `spec-first gate check`
 - `spec-first metrics health`
 
-## Output Paths
+## 输出路径
 - `specs/{featureId}/progress.md`
 
-## confirm_policy
-- Recommended: strict (orchestration drives stage transitions)
+## 确认策略
+- 推荐: strict（编排驱动阶段转换）
 
-## Success Criteria
+## 成功标准
 - 编排计划已生成并经用户确认
 - 所有调度的子 Skill 执行成功
 - `verify` 校验通过
 - `stage advance` 已执行，阶段已推进
 
-## Orchestration
-- Master scheduler: dispatches phase Skills based on current stage
-- Sequence: plan → (spec|design|task|code|test|archive) → verify → advance
+## 编排规则
+- 主调度器：根据当前阶段分派对应 Skill
+- 序列：plan → (spec|design|task|code|test|archive) → verify → advance
 
 ### 调度协议
 

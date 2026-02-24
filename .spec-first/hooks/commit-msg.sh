@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 HOOK_VERSION="0.1.0"
-SCRIPT_DIR="$(cd "$(dirname "$0")/../../.spec-first/scripts" 2>/dev/null && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")/../../.spec-first/scripts" 2>/dev/null && pwd || echo "")"
 COMMIT_MSG_FILE="$1"
 if [[ "${1:-}" == "--version" ]]; then
   echo "spec-first commit-msg hook v${HOOK_VERSION}"

@@ -9,20 +9,21 @@ beforeEach(() => mkdirSync(join(TMP, '.claude'), { recursive: true }));
 afterEach(() => rmSync(TMP, { recursive: true, force: true }));
 
 describe('registerAIHooks', () => {
-  it('should write settings without hooks wrapper layer', () => {
+  it('should write settings with hooks wrapper layer', () => {
     registerAIHooks(TMP);
     const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
-    // No "hooks" wrapper — event names are top-level keys
-    expect(settings).not.toHaveProperty('hooks');
-    expect(settings).toHaveProperty('PreToolUse');
-    expect(settings).toHaveProperty('PostToolUse');
-    expect(settings).toHaveProperty('Stop');
+    // Claude Code requires hooks nested under "hooks" key
+    expect(settings).toHaveProperty('hooks');
+    expect(settings.hooks).toHaveProperty('PreToolUse');
+    expect(settings.hooks).toHaveProperty('PostToolUse');
+    expect(settings.hooks).toHaveProperty('Stop');
+    expect(settings).not.toHaveProperty('PreToolUse');
   });
 
   it('should use official nested format { matcher, hooks: [{ type, command }] }', () => {
     registerAIHooks(TMP);
     const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
-    const entry = settings.PreToolUse[0];
+    const entry = settings.hooks.PreToolUse[0];
     expect(entry).toHaveProperty('matcher');
     expect(entry).toHaveProperty('hooks');
     expect(Array.isArray(entry.hooks)).toBe(true);
@@ -35,20 +36,34 @@ describe('registerAIHooks', () => {
     registerAIHooks(TMP);
     registerAIHooks(TMP);
     const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
-    expect(settings.PreToolUse).toHaveLength(1);
-    expect(settings.PostToolUse).toHaveLength(1);
-    expect(settings.Stop).toHaveLength(1);
+    expect(settings.hooks.PreToolUse).toHaveLength(1);
+    expect(settings.hooks.PostToolUse).toHaveLength(1);
+    expect(settings.hooks.Stop).toHaveLength(1);
   });
 
   it('should preserve non-spec-first entries', () => {
     const existing = {
-      PreToolUse: [{ matcher: 'Bash', hooks: [{ type: 'command', command: 'echo custom' }] }],
+      hooks: {
+        PreToolUse: [{ matcher: 'Bash', hooks: [{ type: 'command', command: 'echo custom' }] }],
+      },
     };
     writeFileSync(join(TMP, '.claude', 'settings.json'), JSON.stringify(existing));
     registerAIHooks(TMP);
     const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
-    expect(settings.PreToolUse).toHaveLength(2);
-    expect(settings.PreToolUse[0].hooks[0].command).toBe('echo custom');
+    expect(settings.hooks.PreToolUse).toHaveLength(2);
+    expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('echo custom');
+  });
+
+  it('should migrate legacy top-level hook entries into hooks wrapper', () => {
+    const legacy = {
+      PreToolUse: [{ matcher: 'Bash', hooks: [{ type: 'command', command: 'echo legacy' }] }],
+    };
+    writeFileSync(join(TMP, '.claude', 'settings.json'), JSON.stringify(legacy));
+    registerAIHooks(TMP);
+    const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
+    expect(settings).not.toHaveProperty('PreToolUse');
+    expect(settings.hooks.PreToolUse).toHaveLength(2);
+    expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('echo legacy');
   });
 
   it('should not write files when dryRun is true', () => {

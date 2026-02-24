@@ -18,7 +18,8 @@
     "viewer:bootstrap": "node scripts/stage-viewer/bootstrap.js --open",
     "codex:autostart:install": "bash scripts/codex/install-codex-autostart.sh",
     "prepublishOnly": "npm run build",
-    "postinstall": "node dist/postinstall.js || true"
+    "postinstall": "node dist/postinstall.js || true",
+    "preuninstall": "node dist/preuninstall.js || true"
   },
   "engines": {
     "node": ">=20.0.0"

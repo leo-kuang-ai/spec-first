@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ExitCode } from '../../src/shared/types.js';
 
 vi.mock('../../src/shared/skill-commands.js', () => ({
-  ensureSkillCommands: vi.fn(() => ({ claude: ['a', 'b'], codex: ['a'] })),
+  ensureSkillCommands: vi.fn(() => ({ claude: ['a', 'b'], codex: ['a'], codexWarnings: [] })),
 }));
 vi.mock('../../src/shared/host-bootstrap.js', () => ({
   ensureHostBootstrap: vi.fn(() => ({ ok: true, results: [] })),

@@ -1,30 +1,37 @@
+---
+name: "spec-first:sync"
+description: "定位 Feature 并同步追踪矩阵与状态"
+---
+
 # Skill: sync
 
-## Trigger
-- Stage: any (independent of stage)
+同步追踪矩阵，回填缺失关联并检测 orphan 项。
+
+## 触发条件
+- 阶段: 任意（不限阶段）
 - Command: `/spec-first:sync`
 
-## Phases
-- P0: Locate Feature, detect changed files
-- P1: Load matrix, RFC status, defect status
-- P2: Generate sync plan (backfill matrix, update statuses)
-- P3: Confirm sync changes with user
-- P4: Execute backfill, update matrix rows
-- P5: Write audit log to findings.md
+## 执行阶段
+- P0: 定位 Feature，检测变更文件
+- P1: 加载矩阵、RFC 状态、缺陷状态
+- P2: 生成同步计划（回填矩阵、更新状态）
+- P3: 与用户确认同步变更
+- P4: 执行回填，更新矩阵行
+- P5: 将审计日志写入 findings.md
 
-## CLI Dependencies
+## CLI 依赖
 - `spec-first matrix update`
 - `spec-first matrix check`
 - `spec-first rfc list`
 
-## Output Paths
+## 输出路径
 - `specs/{featureId}/traceability-matrix.md`
 - `specs/{featureId}/findings.md`
 
-## confirm_policy
-- Recommended: assisted (sync modifies matrix)
+## 确认策略
+- 推荐: assisted（同步会修改矩阵）
 
-## Success Criteria
+## 成功标准
 - 同步计划已生成并经用户确认
 - `traceability-matrix.md` 已回填更新
 - `matrix check` 无 orphan 项
