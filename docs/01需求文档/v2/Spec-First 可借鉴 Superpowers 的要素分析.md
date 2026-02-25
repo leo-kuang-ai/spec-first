@@ -1,0 +1,310 @@
+# Spec-First 可借鉴 Superpowers 的要素分析
+
+> **版本**: v1.0 | **日期**: 2026-02-25 | **作者**: Leo (况雨平)
+> **输入**: Superpowers v4.3.1 + Spec-First v7.1 可行性评估
+> **目标**: 识别 Superpowers 中可直接借鉴到 Spec-First 的机制，映射到 v7.1 的 Gap/Risk，给出落地建议
+
+---
+
+## 目录
+
+- [核心结论](#核心结论)
+- [项目对比概览](#项目对比概览)
+- [可借鉴要素详析](#可借鉴要素详析)
+  - [1. 反合理化设计（Anti-Rationalization）](#1-反合理化设计anti-rationalization)
+  - [2. 证据优先于声明（Evidence Before Claims）](#2-证据优先于声明evidence-before-claims)
+  - [3. 批量执行 + 人工检查点（Batch + Checkpoint）](#3-批量执行--人工检查点batch--checkpoint)
+  - [4. 两阶段审查（Spec Compliance → Code Quality）](#4-两阶段审查spec-compliance--code-quality)
+  - [5. Session Hook 自动注入元技能](#5-session-hook-自动注入元技能)
+  - [6. 新鲜上下文隔离（Fresh Context Per Task）](#6-新鲜上下文隔离fresh-context-per-task)
+  - [7. 系统化调试流程（Systematic Debugging）](#7-系统化调试流程systematic-debugging)
+- [总结映射表](#总结映射表)
+- [不适用 / 无需借鉴的部分](#不适用--无需借鉴的部分)
+- [落地建议](#落地建议)
+
+---
+
+## 核心结论
+
+**Superpowers 的最大价值不在流程设计（Spec-First 的 8+2 阶段已更完备），而在对 AI 行为的约束工程。**
+
+它深刻理解 AI 会怎样"合理化"地跳过纪律，并用 Red Flags 表、Rationalization Tables、Iron Laws 系统性地封堵逃逸路径。这恰好是 Spec-First 从"规范完备"走向"交付可靠"最需要补齐的一环。
+
+| 维度 | Superpowers | Spec-First v7.1 | 互补关系 |
+|------|-------------|------------------|----------|
+| 流程完整性 | 轻量（brainstorm→plan→execute→finish） | 重量级（8+2 阶段 + Gate + GL） | Spec-First 更强 |
+| 追踪与度量 | 无 ID 体系、无覆盖率 | 八类 ID + C1-C9 + H1 | Spec-First 更强 |
+| AI 行为约束 | 极强（反合理化 + 证据铁律 + Red Flags） | 弱（指令式 skill，缺乏逃逸封堵） | **Superpowers 更强** |
+| 子代理编排 | 成熟（两阶段审查 + 新鲜上下文） | 有框架但联调未完成（Gap 4） | Superpowers 可借鉴 |
+| 跨平台支持 | Claude Code / Cursor / Codex / OpenCode | Claude Code 为主 | Superpowers 更广 |
+
+---
+
+## 项目对比概览
+
+### Superpowers（v4.3.1）
+
+- **定位**: AI 编码助手的插件/技能框架，强制 AI 遵循纪律化开发流程
+- **作者**: Jesse Vincent | **协议**: MIT
+- **核心理念**: Skills 是强制的，不是建议；即使 1% 可能相关也必须加载
+- **14 个技能**: 流程 7 + 质量 3 + 协作 3 + 元 1
+- **技术栈**: Markdown（技能文档）+ JS/ES Modules（工具）+ Bash（钩子）
+- **无 npm 依赖，纯文本驱动**
+
+### Spec-First（v7.1）
+
+- **定位**: 规范驱动研发流程引擎（Skill 编排 + CLI 执行）
+- **核心理念**: 先规范、再生成、后验证；Gate 驱动生成（GDG）
+- **8+2 阶段**: Init → Specify → Design → Plan → Implement → Verify → Wrap-up → Release → done/cancelled
+- **19 个 Skill**: 阶段 10 + 编排 3 + 辅助 6
+- **技术栈**: TypeScript CLI + Markdown Skills + YAML Front Matter + JSONL 运行数据
+
+---
+
+## 可借鉴要素详析
+
+### 1. 反合理化设计（Anti-Rationalization）
+
+**对应 Superpowers 机制**: `using-superpowers` 元技能 + 各 skill 内置的 Red Flags 表与 Rationalization Prevention 表
+
+**解决 Spec-First 问题**: Risk 4（迁移成本过高导致团队绕过流程）
+
+#### Superpowers 做法
+
+Superpowers 每个 skill 都内置两类防御表：
+
+**Red Flags 表** — 当 AI 产生以下念头时，立即停止并回到流程：
+
+| AI 的念头 | 现实 |
+|-----------|------|
+| "这只是个简单问题" | 问题也是任务，检查 skill |
+| "我先需要更多上下文" | Skill 检查在澄清问题之前 |
+| "让我先探索一下代码库" | Skill 告诉你如何探索，先检查 |
+| "这不需要正式的 skill" | 如果 skill 存在，就使用它 |
+| "这个 skill 太重了" | 简单的事情会变复杂，使用它 |
+| "我先做这一件事" | 做任何事之前先检查 |
+
+**Rationalization Prevention 表** — 针对 TDD skill 的示例：
+
+| 借口 | 现实 |
+|------|------|
+| "太简单不需要测试" | 简单代码也会出错，测试只需 30 秒 |
+| "我之后再测试" | 事后测试立即通过，什么都证明不了 |
+| "删除 X 小时的工作太浪费" | 沉没成本谬误，保留未验证代码才是技术债 |
+| "TDD 太教条了，我更务实" | TDD 本身就是务实的：比事后调试更快 |
+| "先保留作参考，再写测试" | 你会适配它，那就是事后测试，删除就是删除 |
+
+#### Spec-First 当前状态
+
+Spec-First 的 skill 更偏"指令式"——告诉 AI 该做什么，但没有预防 AI 不做什么。例如 `/spec-first:verify` 告诉 AI 执行验证，但没有封堵"这个改动太小不需要 verify"的逃逸路径。
+
+#### 落地建议
+
+在以下关键 skill 中加入反合理化表：
+
+**`/spec-first:code` 反合理化表**:
+
+| AI 的借口 | 封堵 |
+|-----------|------|
+| "这个改动太小，不需要走 code-review" | 小改动也有回归风险，review 耗时 < 2 分钟 |
+| "我已经手动检查过了" | 手动检查 ≠ 自动校验证据 |
+| "先写完再补测试" | 事后测试证明不了什么，TDD 先行 |
+| "这只是重构，不影响功能" | 重构不改行为 ≠ 重构不引入 bug |
+
+**`/spec-first:verify` 反合理化表**:
+
+| AI 的借口 | 封堵 |
+|-----------|------|
+| "Gate 已经人工确认过了" | 人工确认 ≠ 自动校验证据链 |
+| "上一轮 verify 通过了，这次只改了一点" | 增量改动需要增量验证 |
+| "测试全绿就够了" | 测试通过 ≠ 覆盖率达标 ≠ 合规率达标 |
+
+**`/spec-first:spec` 反合理化表**:
+
+| AI 的借口 | 封堵 |
+|-----------|------|
+| "需求很清楚，不需要澄清" | 你认为清楚 ≠ 无歧义，检查 NEEDS CLARIFICATION 项 |
+| "AC 用自然语言就够了" | 自然语言 AC 无法自动转化为测试用例 |
+
+---
+
+### 2. 证据优先于声明（Evidence Before Claims）
+
+**对应 Superpowers 机制**: `verification-before-completion` skill
+
+**解决 Spec-First 问题**: Gap 1（M3 GateEngine 自动条件解析未闭合）+ Risk 2（Gate 缺口导致误放行）
+
+#### Superpowers 做法
+
+铁律（Iron Law）：
+
+```
+NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+```
+
+五步 Gate Function：
+
+1. **IDENTIFY**: 什么命令能证明这个声明？
+2. **RUN**: 执行完整命令（新鲜的、完整的）
+3. **READ**: 完整输出，检查退出码，计数失败项
+4. **VERIFY**: 输出是否确认了声明？
+5. **ONLY THEN**: 发出声明
+
+配套 Common Failures 表：
+
+| 声明 | 需要的证据 | 不充分的证据 |
+|------|-----------|-------------|
+| 测试通过 | 测试命令输出: 0 failures | 上一次运行、"应该通过" |
+| Linter 干净 | Linter 输出: 0 errors | 部分检查、外推 |
+| 构建成功 | 构建命令: exit 0 | Linter 通过、日志看起来没问题 |
+| Bug 已修复 | 测试原始症状: 通过 | 代码改了、假设修好了 |
+| 需求满足 | 逐行检查清单 | 测试通过 |
+
+#### Spec-First 当前状态
+
+M3 GateEngine 自动条件解析未完全闭合，AI 可能"声称 Gate 通过"而没有实际执行 `spec-first gate check`。可行性评估已识别此风险为 🔴 高。
+
+#### 落地建议
+
+在 `/spec-first:verify` 和阶段推进相关 skill 中强制要求：**先执行 `spec-first gate check`，贴出完整输出，再声称阶段通过**。禁止使用 "should pass"、"looks good"、"已完成" 等无证据表述。
+
+适配 Spec-First 的 Common Failures 表：
+
+| 声明 | 需要的证据 | 不充分的证据 |
+|------|-----------|-------------|
+| Gate 通过 | `spec-first gate check` 输出: PASS | "我检查过了"、"应该没问题" |
+| 覆盖率达标 | `spec-first metrics coverage` 输出: C1-C9 ≥ 阈值 | "所有 FR 都有对应 TASK" |
+| 阶段可推进 | `spec-first verify full` 输出: 全部条件满足 | "上一轮通过了" |
+| TASK 完成 | 测试命令输出 + code-review 通过 | "代码写完了" |
+| Feature 可归档 | `spec-first gate check` + 矩阵闭环证据 | "所有 TASK 都标记完成了" |
+
+在 Gate 输出中强制展示"判定证据链"（失败条目映射到具体 ID + 修复建议），与可行性评估 P0 行动项 #4 对齐。
+
+---
+
+### 3. 批量执行 + 人工检查点（Batch + Checkpoint）
+
+**对应 Superpowers 机制**: `executing-plans` skill
+
+**解决 Spec-First 问题**: 04 Implement 阶段节奏控制，对齐 `confirm_policy=strict`
+
+#### Superpowers 做法
+
+`executing-plans` 采用明确的批量 + 检查点节奏：
+
+```
+Step 1: 加载计划，批判性审查，有疑问先提出
+Step 2: 执行批次（默认前 3 个任务）
+Step 3: 报告（已实现内容 + 验证输出 + "Ready for feedback."）
+Step 4: 根据反馈调整，执行下一批次
+Step 5: 全部完成后，调用 finishing-a-development-branch skill
+```
+
+关键设计：
+- **默认 3 个任务一批**，不是全部一口气执行
+- 批次间**强制暂停等待反馈**，不自行继续
+- 遇到阻塞**立即停止并求助**，不猜测
+
+#### Spec-First 当前状态
+
+`/spec-first:code` 是逐 TASK 执行，`/spec-first:orchestrate` 负责编排，但缺少明确的"批量 + 检查点"节奏定义。对于 Size M/L 的 Feature（多 TASK），人类容易失去对进度的掌控感。
+
+#### 落地建议
+
+1. 在 `/spec-first:orchestrate` 中引入 batch checkpoint 机制：
+   - Size S: 每 2-3 个 TASK 暂停报告
+   - Size M: 每 2 个 TASK 暂停报告
+   - Size L: 每个 TASK 暂停报告
+2. 每次暂停时输出：已完成 TASK 列表 + 验证结果 + 覆盖率变化 + 下一批次预览
+3. 与 `confirm_policy=strict` 策略天然对齐：批次间的暂停就是 strict 确认点
+4. 加入"遇到阻塞立即停止"规则：缺少依赖 → 停止；测试反复失败 → 停止；指令不清 → 停止；**不猜测，不强行推进**
+
+---
+
+### 4. 两阶段审查（Spec Compliance → Code Quality）
+
+**对应 Superpowers 机制**: `subagent-driven-development` skill 的两阶段 review
+
+**解决 Spec-First 问题**: 强化 `/spec-first:code-review` 审查效率与合规率
+
+#### Superpowers 做法
+
+每个 TASK 完成后，依次经过两个独立审查者：
+
+```
+实现者完成 + 自审
+    ↓
+Stage 1: Spec Compliance Reviewer（规格合规审查）
+  - 独立读取实际代码（不信任实现者报告）
+  - 检查：是否匹配 spec？是否多做了？是否少做了？
+  - 不通过 → 实现者修复 → 重新审查
+    ↓ 通过后才进入
+Stage 2: Code Quality Reviewer（代码质量审查）
+  - 检查：代码是否干净、可测试、可维护？
+  - 不通过 → 实现者修复 → 重新审查
+    ↓ 通过
+标记 TASK 完成
+```
+
+关键设计：
+- **Stage 1 不通过，不进入 Stage 2** — 在不合规的代码上做质量审查是浪费
+- **审查者显式不信任实现者的自审报告** — 独立验证
+- **审查循环直到通过** — 不接受"差不多就行"
+
+#### Spec-First 当前状态
+
+`/spec-first:code-review` 当前是 A/B 九维度一次性审查（准确性、性能、安全性、可维护性等），没有区分"合规性"和"质量"两个层次。
+
+#### 落地建议
+
+1. 将 code-review 拆为两轮：
+   - **第一轮（合规审查）**: 对照 `spec.md` + `task_plan.md` 的 AC，逐条校验实现是否匹配
+   - **第二轮（质量审查）**: 仅在合规通过后执行九维度质量审查
+2. 第一轮不通过则不进入第二轮，节省审查资源
+3. 这与可行性评估中"C7/C8/C9 未达 100% 时不讨论提速"的原则一致：先确保"做对了"，再确保"做好了"
+
+---
+
+### 5. Session Hook 自动注入元技能
+
+**对应 Superpowers 机制**: `hooks/session-start` + `using-superpowers` 元技能 + Graphviz 决策流程图
+
+**解决 Spec-First 问题**: Gap 4（Skill 体系"定义完成"与"联调完成"仍有差距）
+
+#### Superpowers 做法
+
+通过 `hooks/session-start` 在每次会话启动时自动注入 `using-superpowers` 元技能，包裹在 `<EXTREMELY_IMPORTANT>` 标签中。该元技能包含一个 Graphviz 决策流程图：
+
+```
+用户消息到达
+    ↓
+是否有 skill 可能适用？ ──(即使 1%)──→ 调用 Skill 工具
+    │                                      ↓
+    │                              宣布："使用 [skill] 来 [目的]"
+    │                                      ↓
+    │                              有检查清单？→ 创建 TodoWrite
+    │                                      ↓
+    │                              严格遵循 skill
+    ↓ (绝对不适用)
+直接响应
+```
+
+确保 AI **从第一条消息起就知道必须检查 skill**，而不是靠 AI 自行判断。
+
+#### Spec-First 当前状态
+
+Spec-First 已有类似机制（skill 体系 + hooks），但可行性评估 Gap 4 指出"19 个 Skill 定义完成与联调完成仍有差距"。当前 AI 在收到消息时，skill 路由依赖 AI 自行判断，缺少强制性的决策树。
+
+#### 落地建议
+
+1. 确保 session hook 注入的 bootstrap 内容包含 **skill 优先级路由表**
+2. 路由表应覆盖常见意图到 skill 的映射：
+   - "开始新 Feature" → `/spec-first:init`
+   - "写需求" → `/spec-first:spec`
+   - "设计" → `/spec-first:design`
+   - "拆任务" → `/spec-first:task`
+   - "写代码" → `/spec-first:code`
+   - "审查" → `/spec-first:code-review`
+   - "验证" → `/spec-first:verify`
+   - "恢复上下文" → `/spec-first:catchup`
+3. 加入 Superpowers 的"1% 规则"：即使只有 1% 可能相关，也必须先调用 skill 检查

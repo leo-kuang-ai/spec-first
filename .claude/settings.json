@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "write|edit|create",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n \"$FEAT\" ] && npx spec-first gate check \"$FEAT\" || echo \"spec-first: 跳过 gate 检查（无当前 feature）\"'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "write|edit|create",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n \"$FEAT\" ] && npx spec-first matrix check \"$FEAT\" || echo \"spec-first: 跳过 matrix 检查（无当前 feature）\"'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n \"$FEAT\" ] && npx spec-first ai stats \"$FEAT\" >/dev/null || true'"
+          }
+        ]
+      }
+    ]
+  }
+}
