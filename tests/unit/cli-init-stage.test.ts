@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, readdirSync, writeFileSync } from 'node:fs';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { existsSync, mkdirSync, rmSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
@@ -14,6 +14,11 @@ beforeEach(() => {
   writeFileSync(
     join(TMP, '.spec-first', 'layer2', 'h5.yaml'),
     'platform: h5\n',
+    'utf-8',
+  );
+  writeFileSync(
+    join(TMP, '.spec-first', 'layer2', 'api.yaml'),
+    'platform: api\n',
     'utf-8',
   );
   process.cwd = () => TMP;
@@ -36,6 +41,14 @@ describe('handleInit', () => {
     const specsDir = join(TMP, 'specs');
     const entries = readdirSync(specsDir).filter((e) => e.startsWith('FSREQ-'));
     expect(entries.length).toBe(1);
+  });
+
+  it('should create .claude/settings.json scaffold when missing', async () => {
+    const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+    expect(code).toBe(0);
+    const settingsPath = join(TMP, '.claude', 'settings.json');
+    expect(existsSync(settingsPath)).toBe(true);
+    expect(readFileSync(settingsPath, 'utf-8')).toContain('"hooks"');
   });
 
   it('should return VALIDATION_ERROR for missing --feat', async () => {
@@ -66,6 +79,31 @@ describe('handleInit', () => {
   it('should return VALIDATION_ERROR for unknown platform name', async () => {
     const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'claude-code']);
     expect(code).toBe(2);
+  });
+
+  it('should dedupe duplicate platforms from --platforms', async () => {
+    const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5,h5']);
+    expect(code).toBe(0);
+    const specsDir = join(TMP, 'specs');
+    const entries = readdirSync(specsDir).filter((e) => e.startsWith('FSREQ-'));
+    const state = JSON.parse(
+      readFileSync(join(specsDir, entries[0], 'stage-state.json'), 'utf-8'),
+    ) as { platforms: string[] };
+    expect(state.platforms).toEqual(['h5']);
+  });
+
+  it('should sort platforms and warn when duplicates are detected', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5,api,h5']);
+    expect(code).toBe(0);
+    const specsDir = join(TMP, 'specs');
+    const entries = readdirSync(specsDir).filter((e) => e.startsWith('FSREQ-'));
+    const state = JSON.parse(
+      readFileSync(join(specsDir, entries[0], 'stage-state.json'), 'utf-8'),
+    ) as { platforms: string[] };
+    expect(state.platforms).toEqual(['api', 'h5']);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('检测到重复 platforms'));
+    warn.mockRestore();
   });
 
   it('should return VALIDATION_ERROR when no layer2 template exists', async () => {

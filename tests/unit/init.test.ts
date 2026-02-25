@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { init } from '../../src/core/process-engine/init.js';
 import type { InitOptions } from '../../src/core/process-engine/init.js';
@@ -102,6 +102,29 @@ describe('init', () => {
     expect(readFileSync(join(r1.featureDir, 'progress.md'), 'utf-8')).toBe('custom content');
   });
 
+  it('should self-heal .spec-first/current on idempotent init', () => {
+    const r1 = init(baseOpts());
+    writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20990101-OTHER-999\n', 'utf-8');
+
+    init(baseOpts({ featureId: r1.featureId }));
+    const current = readFileSync(join(TMP, '.spec-first', 'current'), 'utf-8');
+    expect(current).toBe(`${r1.featureId}\n`);
+  });
+
+  it('should backfill FEAT registry on idempotent init when missing', () => {
+    const r1 = init(baseOpts());
+    const registryPath = join(TMP, 'specs', '.feat-registry.md');
+    writeFileSync(
+      registryPath,
+      '# FEAT 缩写注册表\n\n| FEAT | Feature ID |\n|------|------------|\n',
+      'utf-8',
+    );
+
+    init(baseOpts({ featureId: r1.featureId }));
+    const registry = readFileSync(registryPath, 'utf-8');
+    expect(registry).toContain(`| AUTH | ${r1.featureId} |`);
+  });
+
   it('should reject duplicate FEAT abbreviation for different feature', () => {
     init(baseOpts());
     expect(() => init(baseOpts({ featureId: 'FSREQ-20260211-AUTH-999' })))
@@ -150,5 +173,32 @@ describe('init', () => {
     expect(existsSync(join(result.featureDir, 'reports'))).toBe(true);
     expect(existsSync(join(result.featureDir, 'contracts'))).toBe(true);
     expect(existsSync(join(result.featureDir, 'tests'))).toBe(true);
+  });
+
+  it('should not leave temporary init directories after successful init', () => {
+    init(baseOpts());
+    const entries = readFileSync(join(TMP, 'specs', '.feat-registry.md'), 'utf-8');
+    expect(entries).toContain('| AUTH |');
+    const dirs = existsSync(join(TMP, 'specs'))
+      ? readdirSync(join(TMP, 'specs'))
+      : [];
+    expect(dirs.some((name: string) => name.includes('.tmp-'))).toBe(false);
+  });
+
+  it('should recover stale FEAT registry lock and continue init', () => {
+    const specsDir = join(TMP, 'specs');
+    mkdirSync(specsDir, { recursive: true });
+    writeFileSync(
+      join(specsDir, '.feat-registry.lock'),
+      JSON.stringify({
+        pid: 999999,
+        createdAt: Date.now() - 60_000,
+      }),
+      'utf-8',
+    );
+
+    const result = init(baseOpts());
+    expect(result.featureId).toMatch(/^FSREQ-\d{8}-AUTH-001$/);
+    expect(existsSync(join(specsDir, '.feat-registry.lock'))).toBe(false);
   });
 });

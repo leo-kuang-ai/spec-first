@@ -4,7 +4,7 @@
  *
  * 升级后刷新 Skill/MCP/Hooks，合并原 setup --global 功能。
  */
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { getCliVersion } from '../router.js';
@@ -14,6 +14,7 @@ import { detectHostPaths } from '../../shared/host-paths.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
 import { registerSessionHooks } from '../../core/tool-integration/session-hook.js';
+import { renderDefaultConfigYaml } from '../../shared/config-schema.js';
 
 export function handleUpdate(args: string[]): number {
   const dryRun = args.includes('--dry-run');
@@ -61,7 +62,10 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
   // 2. 输出当前版本号
   log(`spec-first v${getCliVersion()}`);
 
-  // 3. 同步 Skills 到用户级目录并刷新命令入口
+  // 3. 安装场景补齐项目基础配置（仅缺失时创建）
+  ensureProjectInstallScaffold({ cwd, dryRun, log, prefix });
+
+  // 4. 同步 Skills 到用户级目录并刷新命令入口
   const hostPaths = detectHostPaths();
   const skills = ensureSkillCommands(cwd, { global: true, dryRun });
   log(`${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex → ${hostPaths.specFirstSkillsDir}`);
@@ -70,7 +74,7 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
     for (const w of skills.codexWarnings) log(`    - ${w}`);
   }
 
-  // 4. MCP 配置补齐
+  // 5. MCP 配置补齐
   if (!skipMcp) {
     const mcp = ensureHostBootstrap({ dryRun });
     const fixed = mcp.results.filter(r => r.level === 'FIXED').length;
@@ -80,7 +84,7 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
     log(`${prefix}MCP: skipped`);
   }
 
-  // 5. Git hooks
+  // 6. Git hooks
   if (!skipHooks && existsSync('.git')) {
     const hooks = installHooks(cwd, { dryRun });
     log(`${prefix}Git Hooks: ${hooks.length} installed`);
@@ -88,12 +92,12 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
     log(`${prefix}Git Hooks: skipped${!skipHooks ? '（非 Git 仓库）' : ''}`);
   }
 
-  // 6. AI Runtime Hooks
+  // 7. AI Runtime Hooks
   const ai = registerAIHooks(cwd, { dryRun });
   log(`${prefix}AI Hooks: ${ai.registered.length} registered`);
   for (const w of ai.warnings) log(`  ⚠ ${w}`);
 
-  // 7. SessionStart Hook
+  // 8. SessionStart Hook
   const sessionProjectRoot = existsSync(join(cwd, '.spec-first')) && existsSync(join(cwd, 'specs'))
     ? cwd
     : undefined;
@@ -101,12 +105,43 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
   log(`${prefix}Session Hook: ${session.registered.length} registered`);
   for (const w of session.warnings) log(`  ⚠ ${w}`);
 
-  // 8. 摘要
+  // 9. 摘要
   if (dryRun) {
     console.log('\n（dry-run 模式，未写入任何文件）');
   }
 
   return ExitCode.SUCCESS;
+}
+
+function ensureProjectInstallScaffold(options: {
+  cwd: string;
+  dryRun: boolean;
+  log: (...args: string[]) => void;
+  prefix: string;
+}): void {
+  const { cwd, dryRun, log, prefix } = options;
+  const hasProjectSignals = existsSync(join(cwd, '.spec-first')) || existsSync(join(cwd, 'specs'));
+  if (!hasProjectSignals) return;
+
+  const specFirstDir = join(cwd, '.spec-first');
+  const configPath = join(specFirstDir, 'config.yaml');
+  if (!existsSync(configPath)) {
+    if (!dryRun) {
+      mkdirSync(specFirstDir, { recursive: true });
+      writeFileSync(configPath, renderDefaultConfigYaml(), 'utf-8');
+    }
+    log(`${prefix}Project Scaffold: created .spec-first/config.yaml`);
+  }
+
+  const claudeDir = join(cwd, '.claude');
+  const settingsPath = join(claudeDir, 'settings.json');
+  if (!existsSync(settingsPath)) {
+    if (!dryRun) {
+      mkdirSync(claudeDir, { recursive: true });
+      writeFileSync(settingsPath, `${JSON.stringify({ hooks: {} }, null, 2)}\n`, 'utf-8');
+    }
+    log(`${prefix}Project Scaffold: created .claude/settings.json`);
+  }
 }
 
 async function checkForUpdates(): Promise<void> {

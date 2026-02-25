@@ -222,10 +222,25 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
   const files = paths.claudeConfigFiles;
   const fixedNames = new Set<string>();
   const results: BootstrapResult[] = [];
+  let validConfigCount = 0;
 
   for (const filePath of files) {
     if (!dryRun) mkdirSync(dirname(filePath), { recursive: true });
-    const root = readJsonObject(filePath);
+    const loaded = readJsonObject(filePath, { dryRun });
+    if (!loaded.ok) {
+      results.push({
+        host: 'Claude Code',
+        category: 'MCP',
+        name: filePath,
+        level: 'ERROR',
+        detail: loaded.backupPath
+          ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}`
+          : loaded.error,
+      });
+      continue;
+    }
+    validConfigCount += 1;
+    const root = loaded.value;
     const currentServers = root.mcpServers;
     const mcpServers =
       typeof currentServers === 'object' && currentServers && !Array.isArray(currentServers)
@@ -249,6 +264,10 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
       root.mcpServers = mcpServers;
       writeFileSync(filePath, `${JSON.stringify(root, null, 2)}\n`, 'utf-8');
     }
+  }
+
+  if (validConfigCount === 0 && results.some((item) => item.level === 'ERROR')) {
+    return results;
   }
 
   for (const name of Object.keys(CLAUDE_REQUIRED_MCP)) {
@@ -460,20 +479,41 @@ function checkBinary(
   };
 }
 
-function readJsonObject(filePath: string): Record<string, unknown> {
-  if (!existsSync(filePath)) return {};
+function readJsonObject(
+  filePath: string,
+  options?: { dryRun?: boolean },
+): { ok: true; value: Record<string, unknown> } | { ok: false; error: string; backupPath?: string } {
+  if (!existsSync(filePath)) return { ok: true, value: {} };
   const content = readFileSync(filePath, 'utf-8').trim();
-  if (!content) return {};
+  if (!content) return { ok: true, value: {} };
 
   try {
     const parsed = JSON.parse(content) as unknown;
     if (typeof parsed === 'object' && parsed && !Array.isArray(parsed)) {
-      return parsed as Record<string, unknown>;
+      return { ok: true, value: parsed as Record<string, unknown> };
     }
-    return {};
+    const backupPath = backupInvalidJson(filePath, content, options?.dryRun);
+    return {
+      ok: false,
+      error: `${filePath} 顶层必须是 JSON 对象`,
+      backupPath,
+    };
   } catch {
-    return {};
+    const backupPath = backupInvalidJson(filePath, content, options?.dryRun);
+    return {
+      ok: false,
+      error: `${filePath} 包含无效 JSON`,
+      backupPath,
+    };
   }
+}
+
+function backupInvalidJson(filePath: string, content: string, dryRun?: boolean): string | undefined {
+  const backupPath = `${filePath}.invalid-${Date.now()}.bak`;
+  if (!dryRun) {
+    writeFileSync(backupPath, `${content}\n`, 'utf-8');
+  }
+  return backupPath;
 }
 
 function sameStringArray(a: unknown, b: readonly string[]): boolean {

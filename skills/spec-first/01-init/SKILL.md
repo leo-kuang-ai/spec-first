@@ -12,8 +12,8 @@ description: "定位项目根目录并初始化 Feature 工作区"
 - Command: `/spec-first:init`（无参数，引导式交互）
 
 ## 原则
-- `spec-first init` 已内置 Preflight Bootstrap（MCP + skills 检查/自动修复）。
-- Skill 不应重复手工执行宿主安装脚本；仅在 CLI 返回错误时展示修复建议。
+- `spec-first init` 默认只做项目内初始化；仅在显式 `--bootstrap` 时执行宿主 Preflight（MCP + skills 检查/自动修复）。
+- 日常建议将宿主自修复放在 `spec-first update`，Skill 不应重复手工执行宿主安装脚本；仅在 CLI 返回错误时展示修复建议。
 
 ## 执行阶段
 - P0: 定位项目根目录，确认为目标仓库
@@ -21,7 +21,7 @@ description: "定位项目根目录并初始化 Feature 工作区"
 - P2: 收集初始化参数（`feat/mode/size/platforms/title/feature-id`）
 - P3: 参数确认（必须先过约束再确认）
 - P4: 执行 `spec-first init ...`
-- P5: 执行 `spec-first stage current <featureId>` 验证阶段，输出摘要（featureId、目录、平台、bootstrap 与 hooks 状态）
+- P5: 执行 `spec-first stage current <featureId>` 验证阶段，输出摘要（featureId、目录、平台、hooks/AI hooks/Skill 命令状态；仅显式 `--bootstrap` 时包含 bootstrap 状态）
 
 ## 参数约束（强制）
 - `feat` 必须匹配：`^[A-Z][A-Z0-9]{0,15}$`
@@ -29,14 +29,15 @@ description: "定位项目根目录并初始化 Feature 工作区"
   - 禁止：`user-report`、`report_v2`、中文
 - `platforms` 必须来自 `.spec-first/layer2/*.yaml` 文件名
   - 例如存在 `h5.yaml`、`java-backend.yaml`，则仅可选 `h5,java-backend`
+  - CLI 会对 `platforms` 自动去重并稳定排序；若输入重复值，CLI 会给出警告提示
   - 禁止把宿主/工具名当平台：`claude-code`、`codex`、`mcp`
 - 当 `.spec-first/layer2/` 不存在或为空时，必须中止并提示先创建平台 YAML，再继续 init
 
 ## CLI 依赖
-- `spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>]`
+- `spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>] [--bootstrap]`
 - `spec-first stage current <featureId>`
-- CLI 可用性探测使用：`command -v spec-first >/dev/null && spec-first --help >/dev/null`
-- 禁止使用：`which spec-first && spec-first --version || echo CLI_NOT_FOUND`（`--version` 失败会误判为未安装）
+- CLI 可用性探测建议：`command -v spec-first >/dev/null && spec-first --help >/dev/null`
+- `spec-first --version` 为合法探测路径，可作为补充诊断信息
 
 ## 输出路径
 - `specs/{featureId}/stage-state.json`
@@ -47,6 +48,8 @@ description: "定位项目根目录并初始化 Feature 工作区"
 - `specs/{featureId}/task_plan.md`
 - `specs/.feat-registry.md`
 - `.spec-first/current`
+- `.spec-first/config.yaml`（缺失时补齐）
+- `.claude/settings.json`（缺失时补齐）
 
 ## 确认策略
 - 推荐: strict
@@ -54,7 +57,11 @@ description: "定位项目根目录并初始化 Feature 工作区"
 ## 成功标准
 - CLI init 成功退出（exit code = 0）
 - 生成目录 `specs/{featureId}/`
-- `stage-state.json` 存在且阶段为 `00_init`
-- `.spec-first/current` 指向新 featureId
-- `.claude/commands/spec-first/*.md` 入口文件已刷新
-- 若为 Git 仓库：hooks 已安装/更新（`prepare-commit-msg`、`commit-msg`、`pre-push`、`pre-commit`）
+- 新建场景：`stage-state.json` 存在且阶段为 `00_init`
+- 幂等场景：不重置既有阶段状态，且 `.spec-first/current` 已修复指向目标 featureId
+- `.spec-first/config.yaml` 存在（若缺失则已补齐）
+- `.claude/settings.json` 存在（若缺失则已补齐）
+- 非阻断副作用（允许告警但不影响 init 成功）：
+  - Skill 命令刷新（`.claude/commands/spec-first/*.md`）
+  - 若为 Git 仓库：hooks 安装/更新（`prepare-commit-msg`、`commit-msg`、`pre-push`、`pre-commit`）
+  - AI Runtime Hooks 注册

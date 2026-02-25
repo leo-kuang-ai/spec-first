@@ -2,7 +2,7 @@
  * init CLI 命令
  * spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>]
  */
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -24,12 +24,16 @@ export async function handleInit(args: string[]): Promise<number> {
     return ExitCode.SUCCESS;
   }
 
-  const bootstrap = ensureHostBootstrap();
-  if (!bootstrap.ok) {
-    for (const item of bootstrap.results.filter((entry) => entry.level === 'ERROR')) {
-      console.error(`[bootstrap] [${item.host}] ${item.category}/${item.name}: ${item.detail}`);
+  const shouldBootstrap = args.includes('--bootstrap')
+    || process.env.SPEC_FIRST_INIT_BOOTSTRAP === '1';
+  if (shouldBootstrap) {
+    const bootstrap = ensureHostBootstrap();
+    if (!bootstrap.ok) {
+      for (const item of bootstrap.results.filter((entry) => entry.level === 'ERROR')) {
+        console.error(`[bootstrap] [${item.host}] ${item.category}/${item.name}: ${item.detail}`);
+      }
+      return ExitCode.CONFIG_ERROR;
     }
-    return ExitCode.CONFIG_ERROR;
   }
 
   const feat = parseFlag(args, '--feat');
@@ -85,10 +89,14 @@ export async function handleInit(args: string[]): Promise<number> {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const platformList = parsePlatforms(finalPlatforms);
+  const parsedPlatforms = parsePlatforms(finalPlatforms);
+  const platformList = parsedPlatforms.values;
   if (platformList.length === 0) {
     console.error('无效 platforms：至少需要一个平台（使用 --platforms p1,p2,...）');
     return ExitCode.VALIDATION_ERROR;
+  }
+  if (parsedPlatforms.hadDuplicates) {
+    console.warn(`警告：检测到重复 platforms，已自动去重并排序：${platformList.join(', ')}`);
   }
 
   const platformValidationError = validatePlatformSelection(platformList, process.cwd());
@@ -115,6 +123,7 @@ export async function handleInit(args: string[]): Promise<number> {
   }
 
   ensureProjectHooks(process.cwd());
+  ensureProjectClaudeSettings(process.cwd());
 
   try {
     const aiResult = registerAIHooks(process.cwd());
@@ -152,8 +161,22 @@ function ensureProjectHooks(projectRoot: string): void {
   }
 }
 
+function ensureProjectClaudeSettings(projectRoot: string): void {
+  const claudeDir = join(projectRoot, '.claude');
+  const settingsPath = join(claudeDir, 'settings.json');
+  if (existsSync(settingsPath)) return;
+  try {
+    mkdirSync(claudeDir, { recursive: true });
+    if (!existsSync(settingsPath)) {
+      writeFileSync(settingsPath, `${JSON.stringify({ hooks: {} }, null, 2)}\n`, 'utf-8');
+    }
+  } catch (e) {
+    console.warn('警告：无法创建 .claude/settings.json：' + (e as Error).message);
+  }
+}
+
 function printInitHelp(): void {
-  console.log('用法：spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>]\n');
+  console.log('用法：spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>] [--bootstrap]\n');
   console.log('参数说明：');
   console.log('  --feat       FEAT 缩写（必须匹配 ^[A-Z][A-Z0-9]{0,15}$，例如 AUTH、REPORT）');
   console.log('  --mode       开发模式：N（新功能）| I（增量迭代）');
@@ -161,6 +184,7 @@ function printInitHelp(): void {
   console.log('  --platforms  平台列表（逗号分隔），必须来自 .spec-first/layer2/*.yaml');
   console.log('  --title      Feature 标题（可选）');
   console.log('  --feature-id 指定 Feature ID（可选，默认自动生成）');
+  console.log('  --bootstrap  执行宿主环境自修复（MCP/skills/binaries）');
 }
 
 function parseFlag(args: string[], flag: string): string | undefined {
@@ -169,9 +193,12 @@ function parseFlag(args: string[], flag: string): string | undefined {
   return args[idx + 1];
 }
 
-function parsePlatforms(platforms: string | undefined): string[] {
-  if (!platforms) return [];
-  return platforms.split(',').map((p) => p.trim()).filter(Boolean);
+function parsePlatforms(platforms: string | undefined): { values: string[]; hadDuplicates: boolean } {
+  if (!platforms) return { values: [], hadDuplicates: false };
+  const list = platforms.split(',').map((p) => p.trim()).filter(Boolean);
+  const deduped = [...new Set(list)];
+  const values = deduped.sort((a, b) => a.localeCompare(b));
+  return { values, hadDuplicates: deduped.length !== list.length };
 }
 
 function isInteractiveTerminal(): boolean {
@@ -231,7 +258,8 @@ function normalizeSizeInput(value: string): 'S' | 'M' | 'L' | undefined {
 }
 
 function uniquePlatforms(items: string[]): string[] {
-  return [...new Set(items.map((item) => item.trim()).filter(Boolean))];
+  const deduped = [...new Set(items.map((item) => item.trim()).filter(Boolean))];
+  return deduped.sort((a, b) => a.localeCompare(b));
 }
 
 function normalizePlatformsInput(value: string, discovered: string[]): string[] {
@@ -251,7 +279,7 @@ function normalizePlatformsInput(value: string, discovered: string[]): string[] 
     return uniquePlatforms(indexes.map((idx) => discovered[idx - 1]));
   }
 
-  const selected = uniquePlatforms(parsePlatforms(raw));
+  const selected = parsePlatforms(raw).values;
   if (selected.length === 0) return [];
   if (selected.some((item) => !discovered.includes(item))) return [];
   return selected;

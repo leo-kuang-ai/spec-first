@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { existsSync, lstatSync, mkdirSync, readFileSync, readlinkSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ensureSkillCommands } from '../../src/shared/skill-commands.js';
 
@@ -38,7 +38,7 @@ afterEach(() => {
 });
 
 describe('ensureSkillCommands', () => {
-  it('should recreate broken codex symlink in global mode', () => {
+  it('should replace broken codex symlink with copied skill directory in global mode', () => {
     const first = ensureSkillCommands(TMP, { global: true });
     expect(first.codex.length).toBeGreaterThan(0);
 
@@ -47,16 +47,16 @@ describe('ensureSkillCommands', () => {
     const target = join(process.env.CODEX_SKILLS_DIR as string, 'spec-first', skillName);
     expect(existsSync(target)).toBe(true);
 
-    unlinkSync(target);
+    rmSync(target, { recursive: true, force: true });
     symlinkSync(join(TMP, 'missing-target'), target);
-    const brokenLinkTarget = readlinkSync(target);
-    expect(brokenLinkTarget).toContain('missing-target');
+    expect(lstatSync(target).isSymbolicLink()).toBe(true);
 
     const second = ensureSkillCommands(TMP, { global: true });
     expect(second.codex).toContain(commandName);
-    expect(lstatSync(target).isSymbolicLink()).toBe(true);
-    const repairedLinkTarget = readlinkSync(target);
-    expect(repairedLinkTarget).not.toContain('missing-target');
+    expect(lstatSync(target).isSymbolicLink()).toBe(false);
+    expect(existsSync(join(target, 'SKILL.md'))).toBe(true);
+    const repairedSkill = readFileSync(join(target, 'SKILL.md'), 'utf-8');
+    expect(repairedSkill).not.toContain('missing-target');
   });
 
   it('should write safe Claude frontmatter descriptions', () => {
@@ -84,18 +84,19 @@ describe('ensureSkillCommands', () => {
     expect(existsSync(legacyCodex)).toBe(false);
   });
 
-  it('should replace non-symlink codex skill directory with symlink', () => {
+  it('should replace stale codex skill directory with fresh copied content', () => {
     ensureSkillCommands(TMP, { global: true });
     const skillName = 'doctor';
     const target = join(process.env.CODEX_SKILLS_DIR as string, 'spec-first', skillName);
-    const src = readlinkSync(target);
 
-    unlinkSync(target);
+    rmSync(target, { recursive: true, force: true });
     mkdirSync(target, { recursive: true });
     writeFileSync(join(target, 'SKILL.md'), '# stale', 'utf-8');
 
     ensureSkillCommands(TMP, { global: true });
-    expect(lstatSync(target).isSymbolicLink()).toBe(true);
-    expect(readlinkSync(target)).toBe(src);
+    expect(lstatSync(target).isSymbolicLink()).toBe(false);
+    const skill = readFileSync(join(target, 'SKILL.md'), 'utf-8');
+    expect(skill).toContain('name: "spec-first:doctor"');
+    expect(skill).not.toContain('# stale');
   });
 });

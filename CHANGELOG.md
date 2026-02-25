@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.14 2026-02-25 Leo: init 一致性与并发健壮性增强 — `init` 提交阶段改为“临时目录生成 + 持锁短临界区提交”（提交内二次唯一性校验、原子 rename、current 切换、FEAT 注册）；FEAT 注册表锁新增 stale-lock 自愈（基于 pid/createdAt 与锁龄回收）；`--platforms` 入口改为去重+稳定排序并在重复输入时提示；补充 stale-lock 与 platforms 规范化单测 (user-visible)
+- v0.5.13 2026-02-25 Leo: init 安装场景补齐 `.claude/settings.json` — `spec-first init` 在项目内缺失时自动创建 `.claude/settings.json` 基础骨架（`{"hooks":{}}`），确保 AI Runtime Hooks 可直接写入；创建失败降级为警告不阻断初始化；补充 CLI 单测 (user-visible)
+- v0.5.12 2026-02-25 Leo: init 可靠性增强（第二批）— `init` 采用临时目录写入后原子 `rename`，失败自动清理并在并发创建场景回退幂等自愈；FEAT 注册表增加轻量文件锁与去重校验；`--platforms` 输入去重；补充去重与原子落盘相关单测 (user-visible)
+- v0.5.11 2026-02-25 Leo: 可行性评估文档 As-Is 对齐 — `docs/01需求文档/v2/可行性评估.md` 收敛规范/交付双轨表述，修正 M7 状态为 Partial、Skill 数量 16→19、Design 阶段 CLI 能力口径（`id next DS`）、联调行动项同步更新 (user-visible)
+- v0.5.10 2026-02-25 Leo: init 幂等自愈增强 — `init()` 在目标 Feature 已存在时不再仅返回；新增 `.spec-first/current` 指针修复与 FEAT 注册表缺失回填（不覆盖现有产物内容），补充对应单测 (user-visible)
+- v0.5.9 2026-02-24 Leo: bootstrap 配置安全性增强 + 安装脚手架补齐 — host-bootstrap 读取 Claude 配置 JSON 失败时改为“备份原文件并返回 ERROR”（不再吞错写回覆盖）；`spec-first update` 在项目目录下补齐 `.spec-first/config.yaml` 与 `.claude/settings.json`（仅缺失时创建）(user-visible)
+- v0.5.8 2026-02-24 Leo: init 解耦宿主自修复 — `spec-first init` 默认不再执行 host bootstrap（MCP/skills/binaries）；新增 `--bootstrap` 显式开关与 `SPEC_FIRST_INIT_BOOTSTRAP=1` 环境变量兼容；01-init SKILL 说明同步更新 (user-visible)
 - v0.5.7 2026-02-24 Leo: feat: 新增 uninstall 命令 + preuninstall 自动清理 — `spec-first uninstall` 清理全局 Skills/Claude 命令/Codex skills/SessionStart Hook/AI Runtime Hooks/Git hooks；`npm uninstall -g` 自动触发 preuninstall 脚本；安装与更新文档卸载章节重写 (user-visible)
 - v0.5.6 2026-02-24 Leo: fix: hooks 注册格式修正 — session-hook/ai-runtime-hook 写入 settings.hooks 而非顶层 key（Claude Code 要求 {"hooks":{...}} 嵌套格式）+ 旧格式自动迁移 + viewer openBrowser 改用 python webbrowser + 测试对齐 (user-visible)
 - v0.5.5 2026-02-24 Leo: 安装链路健壮性增强 — postinstall isGlobalInstall() 扩展 yarn global/volta/npm prefix 检测；ensureCodexSkills 复制后增加 YAML frontmatter 验证（name+description）；update 输出 Codex skill 验证警告 (user-visible)
