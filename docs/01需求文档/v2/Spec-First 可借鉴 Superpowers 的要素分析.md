@@ -422,3 +422,27 @@ Spec-First 当前没有专门的 debugging skill。在 04 Implement 和 05 Verif
 | Finishing-a-development-branch skill | Superpowers 的分支收尾是 4 选项（merge/PR/keep/discard） | Spec-First 06 Wrap-up + 07 Release 更完整，有归档 + 复盘 + 矩阵闭环 |
 | Writing-skills skill（TDD for skills） | Superpowers 用 TDD 方法论写新 skill | Spec-First 的 skill 体系已有自己的设计规范和联调验收流程 |
 | 跨平台插件系统 | Superpowers 支持 Cursor/Codex/OpenCode | Spec-First 当前聚焦 Claude Code，跨平台是 P2+ 优先级 |
+
+---
+
+## 落地建议
+
+### 实施路径（对齐可行性评估行动清单）
+
+```text
+Week 1-2 (P0):  反合理化表 + 证据铁律 → 嵌入 /spec-first:code、verify、spec skill
+                 ↓ 最小改动，最大约束力提升
+Week 3-4 (P1):  批量检查点 + 两阶段审查 + skill 路由表 → 升级 orchestrate、code-review
+                 ↓ 流程节奏与审查质量提升
+Week 5-8 (P2):  上下文隔离 + 调试流程 → 优化 subagent 模式、补充调试指导
+                 ↓ 规模化执行稳定性提升
+```
+
+### P0 具体行动项
+
+| # | 行动项 | 改动范围 | 工作量 | 预期效果 |
+|---|--------|---------|--------|---------|
+| 1 | 在 `/spec-first:code` skill 中加入反合理化表 | 1 个 skill 文件 | 0.5 天 | 封堵"跳过 review/测试"的逃逸路径 |
+| 2 | 在 `/spec-first:verify` skill 中加入证据铁律 | 1 个 skill 文件 | 0.5 天 | Gate 声明必须附带执行证据 |
+| 3 | 在 `/spec-first:spec` skill 中加入反合理化表 | 1 个 skill 文件 | 0.5 天 | 封堵"跳过澄清/AC 结构化"的逃逸路径 |
+| 4 | 制定 Spec-First Common Failures 表 | 新增文档片段 | 0.5 天 | 统一"什么算证据、什么不算"的标准 |
