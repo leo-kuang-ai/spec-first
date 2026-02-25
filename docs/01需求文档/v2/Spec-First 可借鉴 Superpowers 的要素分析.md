@@ -308,3 +308,117 @@ Spec-First 已有类似机制（skill 体系 + hooks），但可行性评估 Gap
    - "验证" → `/spec-first:verify`
    - "恢复上下文" → `/spec-first:catchup`
 3. 加入 Superpowers 的"1% 规则"：即使只有 1% 可能相关，也必须先调用 skill 检查
+
+---
+
+### 6. 新鲜上下文隔离（Fresh Context Per Task）
+
+**对应 Superpowers 机制**: `subagent-driven-development` 的 fresh subagent per task 模式
+
+**解决 Spec-First 问题**: Risk 3（上下文恢复不稳定导致重复劳动）
+
+#### Superpowers 做法
+
+每个 TASK 启动全新的 subagent，由控制器（orchestrator）提供：
+- TASK 全文（从计划中提取，不让 subagent 自己读文件）
+- 必要的场景上下文（当前 TASK 在整体计划中的位置）
+- 不传递前一个 TASK 的执行历史
+
+优势：
+- 无上下文污染（前一个 TASK 的错误假设不会传播）
+- 控制器精确策展上下文（而非让 subagent 自己摸索）
+- 并行安全（subagent 之间不干扰）
+
+#### Spec-First 当前状态
+
+Risk 3 指出 M5 漂移导致 `catchup/context` 不稳定，AI 重复分析与遗漏追踪链。运行态三文件（`task_plan.md/findings.md/progress.md`）是上下文连续性的最小集合，但在多 TASK 执行中，上下文膨胀仍是问题。
+
+#### 落地建议
+
+1. 对于 Size M/L 的多 TASK 执行，每个 TASK 的 subagent 只接收：
+   - 当前 TASK 全文（从 `task_plan.md` 提取）
+   - 相关 spec 片段（仅与当前 TASK traces 关联的 FR/NFR）
+   - 必要的设计上下文（仅相关的 DS/API 定义）
+2. 不传递前一个 TASK 的完整执行日志
+3. 这与 Spec-First 的 Context Pack "control < 2KB + references 按需读取" 原则天然对齐
+
+---
+
+### 7. 系统化调试流程（Systematic Debugging）
+
+**对应 Superpowers 机制**: `systematic-debugging` skill（四阶段根因分析）
+
+**解决 Spec-First 问题**: 04 Implement / 05 Verify 阶段遇到问题时的调试质量
+
+#### Superpowers 做法
+
+铁律：
+
+```
+NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
+```
+
+四阶段流程：
+
+| 阶段 | 关键活动 | 成功标准 |
+|------|---------|---------|
+| 1. 根因调查 | 读错误信息、复现、检查近期变更、追踪数据流 | 理解 WHAT 和 WHY |
+| 2. 模式分析 | 找到工作的类似代码、对比差异 | 识别差异点 |
+| 3. 假设验证 | 形成单一假设、最小化测试、一次只改一个变量 | 假设确认或新假设 |
+| 4. 实现修复 | 创建失败测试、实现单一修复、验证 | Bug 解决、测试通过 |
+
+硬规则：**3 次修复失败 → 停止修复，质疑架构**
+
+```
+修复次数 < 3: 返回阶段 1，用新信息重新分析
+修复次数 ≥ 3: 停止！这不是失败的假设，这是错误的架构
+              → 与人类讨论后再继续
+```
+
+#### Spec-First 当前状态
+
+Spec-First 当前没有专门的 debugging skill。在 04 Implement 和 05 Verify 阶段遇到测试失败或构建问题时，AI 的调试行为是无约束的——可能随机尝试修复、跳过根因分析、或在同一个错误方向上反复尝试。
+
+#### 落地建议
+
+1. 在 `/spec-first:code` 的异常处理路径中嵌入轻量级调试指导：
+   - 测试失败 → 先读完整错误信息 → 复现 → 根因分析 → 再修复
+   - 不允许在没有根因分析的情况下提交修复
+2. 引入"3 次修复失败"硬规则：连续 3 次修复同一问题失败 → 停止，向人类报告，讨论是否需要调整设计
+3. 配套反合理化表：
+
+| AI 的借口 | 封堵 |
+|-----------|------|
+| "快速修一下，之后再调查" | 快速修复掩盖根因，系统化调试更快 |
+| "我看到问题了，让我直接修" | 看到症状 ≠ 理解根因 |
+| "同时改多处，一起测试" | 无法隔离哪个改动有效，会引入新 bug |
+| "再试一次修复" (已失败 2+ 次) | 3 次失败 = 架构问题，停止修复，质疑设计 |
+
+---
+
+## 总结映射表
+
+| # | Superpowers 机制 | 映射到 Spec-First 位置 | 解决的 Gap/Risk | 优先级 |
+|---|-----------------|----------------------|----------------|--------|
+| 1 | 反合理化设计（Red Flags + Rationalization Tables） | 各阶段 skill 内嵌 | Risk 4: 绕流程 | P0 |
+| 2 | 证据优先于声明（Iron Law + Common Failures） | `/spec-first:verify` + Gate 流程 | Gap 1 + Risk 2: Gate 可信度 | P0 |
+| 3 | 批量执行 + 检查点（Batch 3 + Checkpoint） | `/spec-first:orchestrate` | 04 阶段节奏控制 | P1 |
+| 4 | 两阶段审查（Spec Compliance → Code Quality） | `/spec-first:code-review` | 审查效率与合规率 | P1 |
+| 5 | Session Hook 决策树（元技能 + 1% 规则） | bootstrap + skill 路由 | Gap 4: Skill 联调一致性 | P1 |
+| 6 | 新鲜上下文隔离（Fresh Context Per Task） | 多 TASK subagent 模式 | Risk 3: 上下文不稳定 | P2 |
+| 7 | 系统化调试（四阶段 + 3 次失败硬规则） | `/spec-first:code` 异常路径 | 04/05 阶段调试质量 | P2 |
+
+---
+
+## 不适用 / 无需借鉴的部分
+
+以下 Superpowers 机制在 Spec-First 中已有更好的替代方案，无需借鉴：
+
+| Superpowers 机制 | 不借鉴原因 | Spec-First 已有替代 |
+|-----------------|-----------|-------------------|
+| Brainstorming skill | Superpowers 的头脑风暴是轻量级的自由讨论 | Spec-First 01 Specify 阶段更结构化，有 FR/NFR ID + AC + 追踪矩阵 |
+| Writing-plans skill | Superpowers 的计划是 Markdown 自由格式 | Spec-First 03 Plan 有 YAML Front Matter + 依赖/并行调度 + TASK ID 体系 |
+| Using-git-worktrees skill | Superpowers 用 worktree 做隔离 | Spec-First 可按需使用，但不是核心流程依赖 |
+| Finishing-a-development-branch skill | Superpowers 的分支收尾是 4 选项（merge/PR/keep/discard） | Spec-First 06 Wrap-up + 07 Release 更完整，有归档 + 复盘 + 矩阵闭环 |
+| Writing-skills skill（TDD for skills） | Superpowers 用 TDD 方法论写新 skill | Spec-First 的 skill 体系已有自己的设计规范和联调验收流程 |
+| 跨平台插件系统 | Superpowers 支持 Cursor/Codex/OpenCode | Spec-First 当前聚焦 Claude Code，跨平台是 P2+ 优先级 |
