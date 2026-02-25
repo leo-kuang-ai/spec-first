@@ -21,12 +21,12 @@ function isGlobalInstall(): boolean {
 }
 
 if (isGlobalInstall()) {
+  const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
   try {
-    execSync('spec-first update --from-postinstall', { stdio: 'inherit' });
+    execFileSync(process.execPath, [entry, 'update', '--from-postinstall'], { stdio: 'inherit' });
   } catch {
     try {
-      const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
-      execFileSync(process.execPath, [entry, 'update', '--from-postinstall'], { stdio: 'inherit' });
+      execSync('spec-first update --from-postinstall', { stdio: 'inherit' });
     } catch {
       console.error('提示：请手动执行 spec-first update 完成注册。');
     }

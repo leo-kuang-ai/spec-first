@@ -79,7 +79,7 @@ updatedAt: 2026-02-10
 
 1. 代码、文档、测试均有更新记录。
 2. `traces` 完整，能映射到 FR/NFR。
-3. `progress.md` 与 `task_plan.md` 同步更新。
+3. `stage-state.json` 与 `task_plan.md` 同步更新。
 4. 通过对应阶段的 quick/full 校验。
 
 ## 5. 风险与阻塞项
@@ -95,7 +95,7 @@ updatedAt: 2026-02-10
 
 ## 6. 执行节拍（轻量）
 
-1. Phase 完成时必须同步更新 `task_plan.md` 与 `progress.md`。
+1. Phase 完成时必须同步更新 `task_plan.md` 与 `stage-state.json`。
 2. 关键决策/风险才写入 `findings.md`。
 3. 会话中断后先执行 `catchup + status` 再继续。
 

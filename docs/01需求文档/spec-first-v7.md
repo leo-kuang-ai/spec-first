@@ -701,7 +701,7 @@ Mode I 相比 Mode N 多出 3 个必须处理的环节：
 |------|------|
 | **目标** | 启动 Feature，确定 Mode/Size/涉及端，创建工作空间 |
 | **活动** | 读取 Constitution → 确定 Mode（N/I）→ 确定 Size（S/M/L）→ 确定涉及端 → 创建 Feature 目录 → 初始化运行态三文件 |
-| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `progress.md`（初始化） |
+| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `stage-state.json`（初始化） |
 | **Exit Gate** | 目录结构就绪，Mode/Size/涉及端已确认并记录 |
 | **工具支撑** | CLI: `spec-first init <featureId> --mode <N|I> --size <S|M|L>` |
 
@@ -901,7 +901,7 @@ Mode I 相比 Mode N 多出 3 个必须处理的环节：
 | 06 Wrap-up | `retro.md` | 复盘完成，Action Items 已提炼 |
 | 全阶段 | `task_plan.md` | 规划记录完整 |
 | 全阶段 | `findings.md` | 过程发现已归档 |
-| 全阶段 | `progress.md` | 进度记录完整 |
+| 全阶段 | `stage-state.json` | 进度记录完整 |
 
 ---
 
@@ -1086,7 +1086,7 @@ Phase 4 — 写入交付物
 Phase 5 — 副作用执行
   ├── spec-matrix check <featureId>（更新追踪矩阵）
   ├── spec-gate check <featureId>（校验 Gate）
-  └── 更新运行态三文件（progress.md / findings.md / task_plan.md）
+  └── 更新运行态三文件（stage-state.json / findings.md / task_plan.md）
 ```
 
 **强制约束**：
@@ -1165,7 +1165,7 @@ context_pack:
 
 - 每次 Agent 委派必须生成 Context Pack，禁止口头传递上下文
 - Context Pack 中的 `artifacts` 路径必须指向实际存在的文件
-- `current_phase` 和 `current_task` 必须与 `progress.md` 记录一致
+- `current_phase` 和 `current_task` 必须与 `stage-state.json` 记录一致
 
 ### Session Catchup 机制
 
@@ -1175,7 +1175,7 @@ context_pack:
 
 1. 读取 `stage-state.json`（当前阶段）
 2. 读取 `task_plan.md`（当前规划状态）
-3. 读取 `progress.md`（已完成进度）
+3. 读取 `stage-state.json`（已完成进度）
 4. 读取 `findings.md`（已有发现）
 5. 读取 `traceability-matrix.md`（追踪状态）
 6. 定位当前阶段和当前 TASK
@@ -1619,7 +1619,7 @@ specs/                              # Feature 工作区根目录
     │   └── uat-signoff.md          # 验收签核记录
     ├── retro.md                    # 复盘报告（06_wrap_up）
     ├── traceability-matrix.md      # 追踪矩阵（或 .yaml）
-    ├── progress.md                 # 进度记录（运行态）
+    ├── stage-state.json                 # 进度记录（运行态）
     ├── findings.md                 # 过程发现（运行态）
     ├── gate-history.jsonl          # Gate 评估历史
     ├── ai-stats.jsonl              # AI 调用统计
@@ -1644,7 +1644,7 @@ Skill 执行过程中持续更新的 3 个文件，用于 Session Catchup 和进
 
 | 文件 | 用途 | 更新时机 |
 |------|------|----------|
-| `progress.md` | 记录每个阶段的完成状态和关键里程碑 | 每个 Step 完成后 |
+| `stage-state.json` | 记录每个阶段的完成状态和关键里程碑 | 每个 Step 完成后 |
 | `findings.md` | 记录过程中的发现、决策、风险 | 发现问题时随时追加 |
 | `task_plan.md` | 当前正在执行的任务计划和进度 | 任务开始/完成时 |
 

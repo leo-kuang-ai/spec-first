@@ -91,7 +91,7 @@ Phase 4 — 写入产出物
 Phase 5 — 副作用执行
   ├── CLI: spec-first matrix check <featureId>
   ├── CLI: spec-first gate check <featureId>
-  └── 更新运行态三文件（progress.md / findings.md / task_plan.md）
+  └── 更新运行态三文件（stage-state.json / findings.md / task_plan.md）
 ```
 
 **强制约束**：

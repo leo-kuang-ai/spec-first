@@ -37,7 +37,7 @@
 | 文件名 | 属性 | 职责 | 更新频率 |
 | :--- | :--- | :--- | :--- |
 | **`task_plan.md`** | **规划态** | 记录当前的任务编排、依赖关系、执行顺序。是 `tasks.md` 的实例化快照。 | 阶段切换时 |
-| **`progress.md`** | **执行态** | 记录流水账日志：已完成步骤、失败尝试、下一步计划。用于 Session 恢复。 | 每个操作后 |
+| **`stage-state.json`** | **执行态** | 记录流水账日志：已完成步骤、失败尝试、下一步计划。用于 Session 恢复。 | 每个操作后 |
 | **`findings.md`** | **知识态** | 记录开发过程中的技术发现、坑点、临时决策。用于更新 Design 或作为复盘输入。 | 随时 |
 
 ### 2.2 结构化协议 (YAML Front Matter)
@@ -134,12 +134,12 @@ tasks:
 *   **Gate**：Task 覆盖率 100%，反向合规率 100% (无无主任务)。
 
 ### 04. Implement (实现)
-*   **核心产出**：代码, 单元测试, `progress.md`。
+*   **核心产出**：代码, 单元测试, `stage-state.json`。
 *   **AI 动作**：
     1.  **CodeAgent** 领取 Task。
     2.  (可选) 创建 Git Worktree 进行并行开发。
     3.  TDD：先生成测试，后实现代码。
-    4.  实时更新 `progress.md`。
+    4.  实时更新 `stage-state.json`。
 *   **Gate**：PR 合规率 100% (Commit 包含 Task ID)，CI 通过，Hook 校验通过。
 
 ### 05. Verify (验证)
@@ -180,8 +180,8 @@ tasks:
     *   Task 2: API Implementation.
     *   Task 3: Unit Tests.
 8.  **Agent (Implement)**:
-    *   读取 `task_plan.md`，执行 Task 1。更新 `progress.md`: "DB migration created."
-    *   执行 Task 2。更新 `progress.md`: "API endpoints scaffolding done."
+    *   读取 `task_plan.md`，执行 Task 1。更新 `stage-state.json`: "DB migration created."
+    *   执行 Task 2。更新 `stage-state.json`: "API endpoints scaffolding done."
     *   *Hook*: 提交代码时自动检查 Commit Message 是否包含 `[TASK-FAV-02]`。
 9.  **Agent (Verify)**: 运行测试，更新矩阵状态为 `✅ Verified`。
 10. **Result**: 用户获得功能完整、文档齐全、可维护的代码。
@@ -220,7 +220,7 @@ tasks:
 | **孤儿项率** | 无 ID 关联的代码/任务占比 | 0% | SCA Hook |
 | **返工率** | Gate 驳回次数 / 总提交数 | < 10% | CI Pipeline |
 | **Gate 首次通过率** | 一次性通过 Gate 的比例 | > 85% | 流程引擎 |
-| **AI 完成度** | AI 独立完成的 Task 占比 | > 70% | `progress.md` 统计 |
+| **AI 完成度** | AI 独立完成的 Task 占比 | > 70% | `stage-state.json` 统计 |
 
 ---
 

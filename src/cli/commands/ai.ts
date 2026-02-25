@@ -98,6 +98,6 @@ function printAiHelp(): void {
   console.log('用法：spec-first ai <subcommand>\n');
   console.log('子命令：');
   console.log('  context   生成并展示上下文包');
-  console.log('  catchup   执行 7 步会话恢复');
+  console.log('  catchup   执行 6 步会话恢复');
   console.log('  stats     查看 AI 调用统计');
 }

@@ -175,7 +175,7 @@ Phase 4 — 写入交付物
 Phase 5 — 副作用执行
   调用: spec-matrix check <featureId> (更新追踪矩阵)
   调用: spec-gate check <featureId> --stage <stage> (校验 Gate)
-  AI Agent 更新运行态三文件 (progress.md / findings.md / task_plan.md)
+  AI Agent 更新运行态三文件 (stage-state.json / findings.md / task_plan.md)
 ```
 
 **与 v1 执行模型的关键差异**：
@@ -320,7 +320,7 @@ description: 辅助用户编写 spec.md 需求规格文档
 
 ```text
 Step 1: specs/<featureId>/task_plan.md       → 定位当前任务（最高优先级）
-Step 2: specs/<featureId>/progress.md        → 整体进度
+Step 2: specs/<featureId>/stage-state.json        → 整体进度
 Step 3: specs/<featureId>/findings.md        → 已知问题
 Step 4: specs/<featureId>/constitution.md    → 项目原则
 Step 5: specs/<featureId>/spec.md            → 需求上下文
@@ -376,7 +376,7 @@ Step 4: 生成 spec.md 完整内容，展示给用户确认
 Step 5: 用户确认后写入文件
 Step 6: 为每个 FR/NFR 调用 spec-id next 注册 ID
 Step 7: 调用 spec-matrix check 更新追踪矩阵
-Step 8: 更新 progress.md 记录 01_specify 进度
+Step 8: 更新 stage-state.json 记录 01_specify 进度
 ```
 
 **输出交付物**（对齐 v5 文件命名）：
@@ -432,7 +432,7 @@ Step 4: 生成 design.md + contracts/*.yaml + data-model.md，展示给用户
 Step 5: 用户确认后写入文件
 Step 6: 为每个 DS/API 调用 spec-id next 注册 ID
 Step 7: 调用 spec-matrix check 更新追踪矩阵
-Step 8: 更新 progress.md 记录 02_design 进度
+Step 8: 更新 stage-state.json 记录 02_design 进度
 ```
 
 **输出交付物**（对齐 v5 文件命名）：
@@ -489,7 +489,7 @@ Step 3: AI 基于调研主题搜索相关技术文档和最佳实践
 Step 4: 生成 research.md，展示给用户确认
 Step 5: 用户确认后写入文件
 Step 6: 更新 findings.md 追加调研结论摘要
-Step 7: 更新 progress.md 记录调研完成
+Step 7: 更新 stage-state.json 记录调研完成
 ```
 
 **输出交付物**（对齐 v5 文件命名）：
@@ -536,7 +536,7 @@ Step 6: 生成 tasks.md + checklist.md，展示给用户确认
 Step 7: 用户确认后写入文件
 Step 8: 为每个 TASK 调用 spec-id next 注册 ID
 Step 9: 调用 spec-matrix check 更新追踪矩阵
-Step 10: 更新 progress.md 记录 03_plan 进度
+Step 10: 更新 stage-state.json 记录 03_plan 进度
 ```
 
 **输出交付物**（对齐 v5 文件命名）：
@@ -590,7 +590,7 @@ Step 4: 开发者完成后，校验 PR 合规率：
         - 变更文件与 TASK 关联的模块一致
 Step 5: 更新 tasks.md 中该 TASK 状态为 Implemented
 Step 6: 调用 spec-matrix check 更新追踪矩阵
-Step 7: 更新 progress.md 记录实现进度
+Step 7: 更新 stage-state.json 记录实现进度
 ```
 
 **输出交付物**：无新文件（更新已有 tasks.md 状态）。
@@ -641,7 +641,7 @@ Step 5: 生成 tests/*.test.md，展示给用户确认
 Step 6: 用户确认后写入文件
 Step 7: 为每个 TC 调用 spec-id next 注册 ID
 Step 8: 调用 spec-matrix check 更新追踪矩阵
-Step 9: 更新 progress.md 记录 05_verify 进度
+Step 9: 更新 stage-state.json 记录 05_verify 进度
 ```
 
 **输出交付物**（对齐 v5 文件命名）：
@@ -704,7 +704,7 @@ Step 4: 生成复盘报告 retro.md：
 Step 5: 展示归档审计结果 + retro.md 给用户确认
 Step 6: 用户确认后写入文件
 Step 7: 调用 spec-gate check 校验 06_wrap_up Exit Gate
-Step 8: 更新 progress.md 记录 06_wrap_up 完成
+Step 8: 更新 stage-state.json 记录 06_wrap_up 完成
 ```
 
 **输出交付物**（对齐 v5 文件命名）：

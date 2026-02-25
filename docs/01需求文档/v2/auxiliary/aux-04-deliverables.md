@@ -45,7 +45,7 @@ specs/                              # Feature 工作区根目录
     │   └── smoke-test-report.md    # 冒烟测试报告（07_release）
     ├── retro.md                    # 复盘报告（06_wrap_up）
     ├── traceability-matrix.md      # 追踪矩阵（或 .yaml）
-    ├── progress.md                 # 进度记录（运行态）
+    ├── stage-state.json                 # 进度记录（运行态）
     ├── findings.md                 # 过程发现（运行态）
     ├── gate-history.jsonl          # Gate 评估历史
     ├── ai-stats.jsonl              # AI 调用统计
@@ -74,13 +74,13 @@ Skill 执行过程中持续更新的 3 个文件，用于 Session Catchup 和进
 
 | 文件 | 用途 | 更新时机 |
 |------|------|----------|
-| `progress.md` | 记录阶段完成状态和关键里程碑 | Phase 完成时必须更新；其余步骤按需更新 |
+| `stage-state.json` | 记录阶段完成状态和关键里程碑 | Phase 完成时必须更新；其余步骤按需更新 |
 | `findings.md` | 记录关键发现、决策、风险 | 出现关键决策/风险/取舍时更新（建议） |
 | `task_plan.md` | 当前任务计划和进度状态 | 任务开始/完成时更新；Phase 完成时必须标记 `complete` |
 
 ### 轻量更新约束（v2 默认）
 
-- `MUST`：Phase 标记为 `complete` 时，`task_plan.md` 与 `progress.md` 在同一会话内同步更新。
+- `MUST`：Phase 标记为 `complete` 时，`task_plan.md` 与 `stage-state.json` 在同一会话内同步更新。
 - `SHOULD`：`findings.md` 仅记录关键内容，不要求高频更新。
 - `MUST NOT`：因 `findings.md` 未更新而单独阻断阶段推进。
 

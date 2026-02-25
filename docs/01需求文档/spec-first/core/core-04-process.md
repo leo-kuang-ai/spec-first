@@ -11,7 +11,7 @@
 |------|------|
 | **目标** | 启动 Feature，确定 Mode/Size/涉及端，创建工作空间 |
 | **活动** | 读取 Constitution → 确定 Mode（N/I）→ 确定 Size（S/M/L）→ 确定涉及端 → 创建 Feature 目录 → 初始化运行态三文件 |
-| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `progress.md`（初始化） |
+| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `stage-state.json`（初始化） |
 | **Exit Gate** | 目录结构就绪，Mode/Size/涉及端已确认并记录 |
 | **工具支撑** | Skill: `/spec-first:init`（交互引导） / CLI: `spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...>` |
 
@@ -274,7 +274,7 @@
 | 06 Wrap-up | `retro.md` | 复盘完成，Action Items 已提炼 |
 | 全阶段 | `task_plan.md` | 规划记录完整 |
 | 全阶段 | `findings.md` | 过程发现已归档 |
-| 全阶段 | `progress.md` | 进度记录完整 |
+| 全阶段 | `stage-state.json` | 进度记录完整 |
 
 ---
 

@@ -25,6 +25,7 @@ describe('registerSessionHooks', () => {
     expect(entry.matcher).toBe('*');
     expect(entry.hooks[0].type).toBe('command');
     expect(entry.hooks[0].command).toContain('viewer open');
+    expect(entry.hooks[0].command).not.toContain('--project-root');
     expect(entry.hooks[0].timeout).toBe(15);
   });
 
@@ -60,5 +61,21 @@ describe('registerSessionHooks', () => {
     const settings = JSON.parse(readFileSync(join(CLAUDE_HOME, 'settings.json'), 'utf-8'));
     expect(settings.customKey).toBe('value');
     expect(settings.hooks.SessionStart).toHaveLength(1);
+  });
+
+  it('should not remove non-spec-first viewer hooks', () => {
+    writeFileSync(join(CLAUDE_HOME, 'settings.json'), JSON.stringify({
+      hooks: {
+        SessionStart: [
+          { matcher: '*', hooks: [{ type: 'command', command: 'other-tool viewer open --background' }] },
+        ],
+      },
+    }));
+
+    registerSessionHooks();
+    const settings = JSON.parse(readFileSync(join(CLAUDE_HOME, 'settings.json'), 'utf-8'));
+    expect(settings.hooks.SessionStart).toHaveLength(2);
+    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('other-tool viewer open --background');
+    expect(settings.hooks.SessionStart[1].hooks[0].command).toContain('spec-first');
   });
 });

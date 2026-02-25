@@ -23,7 +23,13 @@ function resolveSpecFirstBin(): string {
   return 'spec-first';
 }
 
-export function registerSessionHooks(options?: { dryRun?: boolean; projectRoot?: string }): {
+function isSpecFirstViewerCommand(command: unknown): boolean {
+  if (typeof command !== 'string') return false;
+  const normalized = command.toLowerCase();
+  return normalized.includes('spec-first') && normalized.includes('viewer open');
+}
+
+export function registerSessionHooks(options?: { dryRun?: boolean }): {
   registered: string[];
   warnings: string[];
 } {
@@ -58,21 +64,17 @@ export function registerSessionHooks(options?: { dryRun?: boolean; projectRoot?:
   const existing = Array.isArray(hooks.SessionStart) ? hooks.SessionStart : [];
   const filtered = existing.filter((item: any) =>
     !item?.hooks?.some((h: any) =>
-      typeof h.command === 'string' && h.command.includes('viewer open')
+      isSpecFirstViewerCommand(h?.command)
     )
   );
 
-  const configuredProjectRoot = options?.projectRoot?.trim()
-    || process.env.SPEC_FIRST_VIEWER_PROJECT_ROOT?.trim()
-    || '';
-  const projectRootArg = configuredProjectRoot ? ` --project-root ${shellQuote(configuredProjectRoot)}` : '';
   const specFirstBin = resolveSpecFirstBin();
 
   filtered.push({
     matcher: '*',
     hooks: [{
       type: 'command' as const,
-      command: `${shellQuote(specFirstBin)} viewer open${projectRootArg} --print-url --background 2>/dev/null || true`,
+      command: `${shellQuote(specFirstBin)} viewer open --print-url --background 2>/dev/null || true`,
       timeout: 15,
     }],
   });

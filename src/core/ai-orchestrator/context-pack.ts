@@ -99,7 +99,6 @@ export function buildContextPack(featureId: string, projectRoot: string): Contex
     current_phase: state.currentStage,
     artifacts: {
       matrix: `specs/${featureId}/traceability-matrix.md`,
-      progress: `specs/${featureId}/progress.md`,
     },
   };
 

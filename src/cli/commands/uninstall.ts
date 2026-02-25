@@ -11,6 +11,12 @@ import { ExitCode } from '../../shared/types.js';
 import { detectHostPaths } from '../../shared/host-paths.js';
 import { uninstallHooks } from '../../core/tool-integration/hook-installer.js';
 
+function isSpecFirstViewerCommand(command: unknown): boolean {
+  if (typeof command !== 'string') return false;
+  const normalized = command.toLowerCase();
+  return normalized.includes('spec-first') && normalized.includes('viewer open');
+}
+
 export function handleUninstall(args: string[]): number {
   if (args.includes('--help') || args.includes('-h')) {
     console.log('用法: spec-first uninstall [--dry-run] [--keep-mcp]\n');
@@ -118,7 +124,7 @@ function removeSessionHook(claudeHomeDir: string, dryRun: boolean, prefix: strin
     const before = hooks.SessionStart.length;
     hooks.SessionStart = hooks.SessionStart.filter((item: any) =>
       !item?.hooks?.some((h: any) =>
-        typeof h.command === 'string' && h.command.includes('viewer open'),
+        isSpecFirstViewerCommand(h?.command),
       ),
     );
     const removed = before - hooks.SessionStart.length;

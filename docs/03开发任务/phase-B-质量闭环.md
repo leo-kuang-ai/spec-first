@@ -193,7 +193,7 @@ spec-first golive check
 - `catchup(featureId)` — 7 步恢复流程:
   1. 读取 stage-state.json（当前阶段）
   2. 读取 task_plan.md（任务规划状态）
-  3. 读取 progress.md（已完成进度）
+  3. 读取 stage-state.json（已完成进度）
   4. 读取 findings.md（已有发现）
   5. 定位当前阶段 + 当前 TASK
   6. 扫描必需文件缺失项
@@ -538,7 +538,7 @@ spec-first feature switch <featureId>
 - `registerAIHooks()` — 注册三种 AI Runtime Hook 到宿主环境
 - PreToolUse: 写操作前自动校验当前阶段 Gate 条件，不满足时软阻断并输出提示
 - PostToolUse: 写操作后自动更新追踪矩阵（traces 注入）
-- Stop: 会话结束时自动追加 progress.md 摘要
+- Stop: 会话结束时自动追加 stage-state.json 摘要
 - Hook 不存在时降级: 所有 Gate 校验由 Layer B 承载，输出 warning
 
 **验收标准**:
@@ -595,7 +595,7 @@ spec-first feature switch <featureId>
 - Phase 状态定义: P0_LOCATE → P1_CONTEXT → P2_GENERATE → P3_CONFIRM → P4_WRITE → P5_SIDE_EFFECT → DONE / ABORTED
 - 合法转换表（含 P3→P2 修改意见回退、P3→ABORTED 用户拒绝）
 - `confirmationGuard` — Phase 3 确认守卫，未收到确认口令时阻断向 P4 转换
-- P4_WRITE 前置守卫: 进入 P4 前自动检查运行态三文件（progress.md / findings.md / task_plan.md）行数，超 500 行时自动保留最近 200 行、历史归档到 `<filename>-YYYY-MM.md`（对齐 v2-10 §6.4 容量治理）
+- P4_WRITE 前置守卫: 进入 P4 前自动检查运行态三文件（stage-state.json / findings.md / task_plan.md）行数，超 500 行时自动保留最近 200 行、历史归档到 `<filename>-YYYY-MM.md`（对齐 v2-10 §6.4 容量治理）
 - 最大修订轮次: 5 轮，超过提示二选一
 
 **验收标准**:

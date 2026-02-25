@@ -121,20 +121,20 @@ export function executePreToolUse(
   };
 }
 
-/** 模拟 Stop Hook 执行：追加 progress.md 摘要 */
+/** 模拟 Stop Hook 执行：追加 findings.md 会话摘要 */
 export function executeStopHook(
   featureId: string,
   projectRoot: string,
   summary: string,
 ): AIHookResult {
-  const progressPath = join(projectRoot, 'specs', featureId, 'progress.md');
+  const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
   const timestamp = new Date().toISOString();
-  const entry = `\n## Session ${timestamp}\n\n${summary}\n`;
+  const entry = `\n- [${timestamp}] Session summary: ${summary}\n`;
 
   try {
-    appendFileSync(progressPath, entry);
-    return { type: 'Stop', success: true, message: 'progress.md 已更新' };
+    appendFileSync(findingsPath, entry);
+    return { type: 'Stop', success: true, message: 'findings.md 已更新' };
   } catch {
-    return { type: 'Stop', success: false, message: '更新 progress.md 失败' };
+    return { type: 'Stop', success: false, message: '更新 findings.md 失败' };
   }
 }

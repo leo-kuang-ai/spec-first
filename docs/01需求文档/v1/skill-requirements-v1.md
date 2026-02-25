@@ -60,7 +60,7 @@ Spec-First CLI（当前仓库版本 v0.1.0）已实现 **流程调度层**（状
 | 1 | **用户无法"做事"** | CLI 只能"记账"（状态管理）和"查账"（覆盖率查询），不能辅助产出交付物 |
 | 2 | **Gate 自动条件跑不通** | `GateEvaluator` 构造函数缺 `resolver` 参数，4 道 Gate 的 auto 条件全部失效 |
 | 3 | **交付物模板缺失** | 16 个交付物中仅 2 个有模板（constitution.md、traceability-matrix），其余无模板 |
-| 4 | **运行态三文件无工具支撑** | `task_plan.md` / `findings.md` / `progress.md` 需手动维护，无自动更新机制 |
+| 4 | **运行态三文件无工具支撑** | `task_plan.md` / `findings.md` / `stage-state.json` 需手动维护，无自动更新机制 |
 | 5 | **Context Pack 可用性不足** | 已有实现入口，但命令层与模块签名存在漂移，稳定性不足 |
 | 6 | **Session Catchup 可用性不足** | 已有实现入口，但接口对齐和恢复质量仍需补强 |
 
@@ -128,7 +128,7 @@ Gate 条件                   →  SK-SYS-02 gate-check（接入 AutoConditionRe
 │  8. 自动更新追踪矩阵（调用 MatrixManager.addRow）      │
 │     ↓                                                │
 │  9. 自动更新运行态三文件                               │
-│     - progress.md: 记录完成状态                       │
+│     - stage-state.json: 记录完成状态                       │
 │     - findings.md: 记录过程发现                       │
 │     - task_plan.md: 更新规划状态                      │
 │                                                      │
@@ -407,7 +407,7 @@ Gate 4 — Go Live（06_wrap_up → 07_release）
 **输出**：
 - 终端：Gate 评估报告（条件 × 结果表格）
 - 文件：`gate-history.jsonl` 追加一条记录
-- 运行态：`progress.md` 更新 Gate 状态
+- 运行态：`stage-state.json` 更新 Gate 状态
 
 **验收标准**：
 - 4 道 Gate 的 auto 条件全部可自动评估
@@ -435,7 +435,7 @@ Gate 4 — Go Live（06_wrap_up → 07_release）
 ```text
 Step 1: 读取 stage-state.json → 确定 current_stage
 Step 2: 读取 constitution.md → 加载项目原则
-Step 3: 读取 progress.md → 了解整体进度
+Step 3: 读取 stage-state.json → 了解整体进度
 Step 4: 读取 findings.md → 了解已知问题
 Step 5: 按 current_stage 动态加载交付物（见下方矩阵）
 Step 6: 读取 task_plan.md → 定位当前任务
@@ -477,7 +477,7 @@ Step 8: 生成恢复摘要 → 输出给用户确认
 
 **功能描述**：
 
-提供运行态三文件（`task_plan.md` / `findings.md` / `progress.md`）的程序化读写 API，供所有 Skill 在执行过程中自动更新。当前这三个文件需手动维护，本 Skill 将其升级为自动化。
+提供运行态三文件（`task_plan.md` / `findings.md` / `stage-state.json`）的程序化读写 API，供所有 Skill 在执行过程中自动更新。当前这三个文件需手动维护，本 Skill 将其升级为自动化。
 
 **三文件职责**（对齐 v5 §5.2）：
 
@@ -485,7 +485,7 @@ Step 8: 生成恢复摘要 → 输出给用户确认
 |------|------|---------|
 | `task_plan.md` | 任务规划与状态追踪 | SK-04 生成、SK-05/06 更新状态 |
 | `findings.md` | 过程发现与决策记录 | 任意 Skill 执行中发现问题时追加 |
-| `progress.md` | 整体进度与里程碑 | 每个 Skill 完成时更新 |
+| `stage-state.json` | 整体进度与里程碑 | 每个 Skill 完成时更新 |
 
 **API 设计**：
 
@@ -500,7 +500,7 @@ class RuntimeFiles {
   addFinding(featureId: string, finding: FindingEntry): void;
   getFindings(featureId: string, filter?: FindingFilter): FindingEntry[];
 
-  // progress.md 操作
+  // stage-state.json 操作
   updateProgress(featureId: string, update: ProgressUpdate): void;
   getProgress(featureId: string): ProgressSummary;
   addMilestone(featureId: string, milestone: MilestoneEntry): void;
@@ -509,7 +509,7 @@ class RuntimeFiles {
 
 **文件格式规范**：
 
-`progress.md` 结构：
+`stage-state.json` 结构：
 ```markdown
 # Progress — {featureId}
 ## 当前状态
@@ -529,7 +529,7 @@ class RuntimeFiles {
 - 三文件读写 API 全部实现
 - Markdown 格式解析/生成正确（表格、列表、checkbox）
 - 并发写入安全（文件锁或原子写入）
-- 每个 Skill 完成后 progress.md 自动更新
+- 每个 Skill 完成后 stage-state.json 自动更新
 
 ### 3.3 校验类 Skill（2 个）
 
@@ -673,7 +673,7 @@ Gate 条件注册：
 **自动副作用**：
 - IdRegistry: 注册所有 FR-xxx、NFR-xxx ID
 - MatrixManager: 为每个 FR/NFR 添加追踪矩阵行（status=Planned）
-- RuntimeFiles: progress.md 更新 01_specify 完成状态
+- RuntimeFiles: stage-state.json 更新 01_specify 完成状态
 - RuntimeFiles: findings.md 记录需求澄清过程中的发现
 
 **满足的 Gate 条件**：
@@ -733,7 +733,7 @@ Gate 条件注册：
 **自动副作用**：
 - IdRegistry: 注册所有 DS-xxx、API-xxx ID
 - MatrixManager: 为每个 DS/API 添加追踪矩阵行，关联对应 FR
-- RuntimeFiles: progress.md 更新 02_design 完成状态
+- RuntimeFiles: stage-state.json 更新 02_design 完成状态
 
 **满足的 Gate 条件**：
 - Gate 1: `design.md 存在` ✅（部分，Gate 1 还需 SCA_design PASS）
@@ -788,7 +788,7 @@ Gate 条件注册：
 
 **自动副作用**：
 - RuntimeFiles: findings.md 追加调研结论摘要
-- RuntimeFiles: progress.md 记录调研完成
+- RuntimeFiles: stage-state.json 记录调研完成
 
 **满足的 Gate 条件**：
 - 无直接 Gate 条件（调研为可选活动，但其结论支撑 design.md 质量）
@@ -843,7 +843,7 @@ Gate 条件注册：
 **自动副作用**：
 - IdRegistry: 注册所有 TASK-xxx ID
 - MatrixManager: 为每个 TASK 添加追踪矩阵行，关联对应 DS/FR
-- RuntimeFiles: progress.md 更新 03_plan 完成状态
+- RuntimeFiles: stage-state.json 更新 03_plan 完成状态
 - CoverageCalculator: 计算并输出 C1 任务覆盖率
 
 **满足的 Gate 条件**：
@@ -901,7 +901,7 @@ Gate 条件注册：
 **自动副作用**：
 - RuntimeFiles: task_plan.md 更新 TASK 状态（Planned → Implemented）
 - MatrixManager: 更新追踪矩阵行 status
-- RuntimeFiles: progress.md 更新实现进度百分比
+- RuntimeFiles: stage-state.json 更新实现进度百分比
 
 **满足的 Gate 条件**：
 - Gate 3 前置：所有 TASK 状态为 Implemented（间接条件）
@@ -961,7 +961,7 @@ Gate 条件注册：
 **自动副作用**：
 - IdRegistry: 注册所有 TC-xxx ID
 - MatrixManager: 为每个 TC 添加追踪矩阵行，关联对应 FR/AC
-- RuntimeFiles: progress.md 更新 05_verify 完成状态
+- RuntimeFiles: stage-state.json 更新 05_verify 完成状态
 - CoverageCalculator: 计算并输出 C2/C3 测试覆盖率
 
 **满足的 Gate 条件**：
@@ -1025,7 +1025,7 @@ Gate 条件注册：
 **自动副作用**：
 - MatrixManager: 执行追踪矩阵审计，输出审计报告
 - CoverageCalculator: 计算 C9 孤儿项率
-- RuntimeFiles: progress.md 更新 06_wrap_up 完成状态
+- RuntimeFiles: stage-state.json 更新 06_wrap_up 完成状态
 
 **满足的 Gate 条件**：
 - Gate 4: `归档清单完整` ✅

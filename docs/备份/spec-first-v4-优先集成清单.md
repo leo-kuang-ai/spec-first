@@ -5,7 +5,7 @@
 
 | 优先级 | 集成项 | 来源工程 | 集成到 v4 的位置 | 验收标准 |
 |-------|-------|---------|------------------|---------|
-| P0 | 三文件运行态（`task_plan.md` / `findings.md` / `progress.md`） | planning-with-files | 主流程 00-06、产出物标准化、Wrap-up 归档清单 | 每个 Feature 至少 1 份三文件；关键阶段有连续记录 |
+| P0 | 三文件运行态（`task_plan.md` / `findings.md` / `stage-state.json`） | planning-with-files | 主流程 00-06、产出物标准化、Wrap-up 归档清单 | 每个 Feature 至少 1 份三文件；关键阶段有连续记录 |
 | P0 | Hook 化 Gate（PreToolUse / PostToolUse / Stop） | planning-with-files + everything-claude-code | 横切机制 A、工具链映射 | Gate 关键规则可自动阻断；Stop 时自动完成度校验 |
 | P0 | 会话恢复（Session Catchup） | planning-with-files | 04 Implement、05 Verify、06 Wrap-up | /clear 或会话中断后可恢复上下文；恢复后必须同步追踪产物 |
 | P1 | 代理路由矩阵（研究/架构/实现/文档） | omo-skills | 新增附录：AI 协作编排规范 | 不同任务类型有明确代理选择规则；默认最小代理集 |
@@ -86,7 +86,7 @@
 
 ### 1) planning-with-files
 
-- 定位：Manus 风格“三文件持续规划”插件/技能体系（`task_plan.md`、`findings.md`、`progress.md`），核心是用 hooks 约束执行纪律。  
+- 定位：Manus 风格“三文件持续规划”插件/技能体系（`task_plan.md`、`findings.md`、`stage-state.json`），核心是用 hooks 约束执行纪律。  
   参考：`/Users/kuang/xiaobu/planning-with-files/README.md:13`，`/Users/kuang/xiaobu/planning-with-files/docs/quickstart.md:7`
 - 关键机制：PreToolUse / PostToolUse / Stop + 2-Action Rule + session catchup。  
   参考：`/Users/kuang/xiaobu/planning-with-files/docs/workflow.md:32`，`/Users/kuang/xiaobu/planning-with-files/scripts/check-complete.sh:2`，`/Users/kuang/xiaobu/planning-with-files/scripts/session-catchup.py:236`

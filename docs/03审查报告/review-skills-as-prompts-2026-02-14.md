@@ -72,11 +72,11 @@
 **位置**: `skills/spec-first/02-catchup/SKILL.md` L12, L23
 
 - L23: `confirm_policy: auto (read-only analysis)` — 声明只读
-- L12: `P4: Write catchup results to progress.md` — 实际写文件
+- L12: `P4: Write catchup results to stage-state.json` — 实际写文件
 
 **后果**: AI 可能因 "auto (read-only)" 标注而跳过用户确认直接写入，或反过来因 "read-only" 而不执行 P4 写入。
 
-**建议**: 改为 `assisted`（因为写入 progress.md 不是只读），或将 P4 改为 "Display catchup results (no file write)"。
+**建议**: 改为 `assisted`（因为写入 stage-state.json 不是只读），或将 P4 改为 "Display catchup results (no file write)"。
 
 ### P1-2: 09-test 输出路径不明确
 
@@ -172,7 +172,7 @@ spec-first gate conditions <stageId>
 
 无任何 Skill 定义"执行成功"的判定条件。例如：
 - 03-spec 成功 = spec.md 已写入 + 所有 FR 已注册到矩阵 + matrix check 无 orphan
-- 07-code 成功 = 代码已提交 + TASK 状态更新为 Done + progress.md 已更新
+- 07-code 成功 = 代码已提交 + TASK 状态更新为 Done + stage-state.json 已更新
 
 **影响**: AI 无法自我判断任务是否完成，可能提前结束或过度执行。
 

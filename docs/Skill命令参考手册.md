@@ -12,7 +12,7 @@
 
 | 命令 | 参数 | 说明 | 产出物 |
 |------|------|------|--------|
-| `/plan` | `<featureId> "<task>"` | 阶段规划：识别当前阶段，调用对应 Skill 生成交付物，执行 Gate 校验 | 执行计划 + progress.md |
+| `/plan` | `<featureId> "<task>"` | 阶段规划：识别当前阶段，调用对应 Skill 生成交付物，执行 Gate 校验 | 执行计划 + stage-state.json |
 | `/verify` | `<featureId> [quick\|full]` | 质量校验：矩阵完整性 + 覆盖率 + Gate 条件检查 | 校验报告（findings.md） |
 | `/orchestrate` | `<featureId> "<task>"` | 全流程编排：plan → skill → verify → stage advance 循环 | 全阶段交付物 + 阶段推进 |
 
@@ -38,12 +38,12 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 | # | Skill | 命令 | 阶段 | confirm | 产出物 | CLI 依赖 |
 |---|-------|------|------|---------|--------|---------|
 | 01 | init | `/spec-first:init` | any | strict | stage-state.json, constitution.md, traceability-matrix.md | `spec-first init` |
-| 02 | catchup | `/spec-first:catchup` | any | assisted | progress.md（恢复摘要追加） | `ai catchup`, `stage current` |
+| 02 | catchup | `/spec-first:catchup` | any | assisted | stage-state.json（恢复摘要追加） | `ai catchup`, `stage current` |
 | 03 | spec | `/spec-first:spec` | 01_specify | strict/assisted | spec.md, traceability-matrix.md | `id next FR`, `matrix update`, `matrix check` |
 | 04 | design | `/spec-first:design` | 02_design | strict | design.md, traceability-matrix.md | `id next DS`, `matrix update`, `metrics coverage` |
 | 05 | research | `/spec-first:research` | any | assisted | research.md | `ai context` |
 | 06 | task | `/spec-first:task` | 03_plan | assisted | task_plan.md, traceability-matrix.md | `id next TASK`, `matrix update`, `metrics coverage` |
-| 07 | code | `/spec-first:code` | 04_implement | strict/assisted | 源代码, task_plan.md, progress.md | `commit`, `matrix update`, `ai context` |
+| 07 | code | `/spec-first:code` | 04_implement | strict/assisted | 源代码, task_plan.md, stage-state.json | `commit`, `matrix update`, `ai context` |
 | 08 | code-review | `/spec-first:code-review` | 04_implement | assisted | findings.md | `metrics coverage`, `matrix check` |
 | 09 | test | `/spec-first:test` | 05_verify | assisted | tests/*.test.md, traceability-matrix.md | `id next TC`, `matrix update`, `metrics coverage` |
 | 10 | archive | `/spec-first:archive` | 06_wrap_up | strict | retro.md | `metrics report`, `gate check`, `stage advance` |
@@ -52,7 +52,7 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 
 | # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
 |---|-------|------|---------|------|---------|
-| 11 | plan | `/spec-first:plan` | assisted | 生成执行计划（支持多需求切换），写入 progress.md | `feature list`, `feature switch`, `feature current`, `stage current`, `metrics health`, `doctor` |
+| 11 | plan | `/spec-first:plan` | assisted | 生成执行计划（支持多需求切换），写入 stage-state.json | `feature list`, `feature switch`, `feature current`, `stage current`, `metrics health`, `doctor` |
 | 12 | verify | `/spec-first:verify` | auto | 校验报告（Gate + 矩阵 + 覆盖率缺口），写入 findings.md | `gate check`, `matrix check`, `metrics coverage` |
 | 13 | orchestrate | `/spec-first:orchestrate` | strict | 主编排器：plan → 阶段 Skill → verify → advance | `stage current/advance`, `gate check`, `metrics health` |
 

@@ -26,7 +26,7 @@ description: "定位 Feature 并加载当前状态执行编排"
 - `spec-first metrics health`
 
 ## 输出路径
-- `specs/{featureId}/progress.md`
+- `specs/{featureId}/findings.md`
 
 ## 确认策略
 - 推荐: strict（编排驱动阶段转换）

@@ -223,7 +223,7 @@ if (result.exitCode !== 0 || result.stateInconsistent) {
 ```text
 编排 Skill Phase 1（Context 加载）
   ├── 读取 stage-state.json
-  ├── 读取 progress.md
+  ├── 读取 stage-state.json
   ├── 比对两者一致性
   ├── 一致 → 正常继续
   └── 不一致 → 自动调用 catchup 7 步恢复 → 恢复后继续

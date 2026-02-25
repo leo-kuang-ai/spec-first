@@ -201,11 +201,11 @@ describe('executePreToolUse', () => {
 });
 
 describe('executeStopHook', () => {
-  it('should append to progress.md', () => {
+  it('should append to findings.md', () => {
     writeFeatureState();
     const result = executeStopHook(FEAT, TMP, 'Session summary');
     expect(result.success).toBe(true);
-    const content = readFileSync(join(TMP, 'specs', FEAT, 'progress.md'), 'utf-8');
+    const content = readFileSync(join(TMP, 'specs', FEAT, 'findings.md'), 'utf-8');
     expect(content).toContain('Session summary');
   });
 });

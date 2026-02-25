@@ -287,7 +287,7 @@
 | 4 | A2 | 确定涉及端：APP / PC / H5 / Backend | Feature 元数据 |
 | 5 | A2 | 注册 FEAT 缩写：在 `specs/.feat-registry.md` 中登记，校验全局唯一性 | 注册表更新 |
 | 6 | A2 | 创建 Feature 目录 `specs/<feishu-demand-id>-<feature-name>/` | 目录结构 |
-| 7 | A2 | 初始化运行态三文件：`task_plan.md` / `findings.md` / `progress.md` | 三文件 |
+| 7 | A2 | 初始化运行态三文件：`task_plan.md` / `findings.md` / `stage-state.json` | 三文件 |
 
 **备选流程**：
 - **2a. Mode I**：额外执行"历史产物定位"——找到并理解已有 spec/plan/contracts/code
@@ -473,7 +473,7 @@
 | 3 | A3 | 代码关键位置标注：`// implements: TASK-FEAT-NNN, traces: FR-FEAT-NNN` | 追踪注释 |
 | 4 | A3 | Git Commit：`[TASK-FEAT-NNN] 提交描述` | Commit |
 | 5 | A3 | 创建 PR：描述含 `Implements: TASK-FEAT-NNN` | PR |
-| 6 | A3 | 更新 `progress.md`：记录完成状态和关键决策 | 过程记录 |
+| 6 | A3 | 更新 `stage-state.json`：记录完成状态和关键决策 | 过程记录 |
 | 7 | A2/A3 | Code Review：功能正确性 + 契约一致性 + 追踪合规 | CR Report |
 | 8 | A2 | 更新追踪矩阵：填充 PR Ref 列 | 矩阵更新 |
 
@@ -495,7 +495,7 @@
 - [ ] 每个 PR 描述含至少 1 个 TASK ID
 - [ ] PR 合规率 = 100%
 - [ ] 代码关键位置有追踪注释
-- [ ] `progress.md` 已更新本阶段工作记录
+- [ ] `stage-state.json` 已更新本阶段工作记录
 
 ---
 
@@ -1018,7 +1018,7 @@ New → Confirmed → Assigned → Fixing → Fixed → Verified → Closed
 **验收标准**：
 - [ ] 每次委派携带完整 Context Pack
 - [ ] Context Pack 中路径指向实际存在的文件
-- [ ] `current_phase` 与 `progress.md` 一致
+- [ ] `current_phase` 与 `stage-state.json` 一致
 
 ---
 
@@ -1041,7 +1041,7 @@ New → Confirmed → Assigned → Fixing → Fixed → Verified → Closed
 | 步骤 | Actor | 动作 | 产出物 |
 |------|-------|------|--------|
 | 1 | A6 | 读取 `task_plan.md`（当前规划状态） | 规划上下文 |
-| 2 | A6 | 读取 `progress.md`（已完成进度） | 进度上下文 |
+| 2 | A6 | 读取 `stage-state.json`（已完成进度） | 进度上下文 |
 | 3 | A6 | 读取 `findings.md`（已有发现） | 发现上下文 |
 | 4 | A6 | 读取 `traceability-matrix.md`（追踪状态） | 追踪上下文 |
 | 5 | A6 | 定位当前阶段（`current_phase`）和当前 TASK | 恢复定位 |
@@ -1061,7 +1061,7 @@ New → Confirmed → Assigned → Fixing → Fixed → Verified → Closed
 | 06 Wrap-up | `spec.md` | 全部产出物 |
 
 **异常流程**：
-- **7x. 不一致**：如 progress.md 记录已完成但代码未提交 → 立即修正
+- **7x. 不一致**：如 stage-state.json 记录已完成但代码未提交 → 立即修正
 
 **验收标准**：
 - [ ] 恢复后可准确定位当前阶段和 TASK
@@ -1738,7 +1738,7 @@ requirements:
 |------|------|
 | **目标** | 启动 Feature，确定 Mode/Size/涉及端，创建工作空间 |
 | **活动** | 读取 Constitution → 确定 Mode（N/I）→ 确定 Size（S/M/L）→ 确定涉及端 → 创建 Feature 目录 → **初始化运行态三文件** |
-| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `progress.md`（初始化） |
+| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `stage-state.json`（初始化） |
 | **Exit Gate** | 目录结构就绪，Mode/Size/涉及端已确认并记录 |
 
 **Mode I 额外活动**：定位历史 Feature 产物，读取已有 spec/plan/contracts。
@@ -1891,7 +1891,7 @@ requirements:
 
 **过程记录**：
 
-- 每个 TASK 完成后更新 `progress.md`，记录完成状态和关键决策
+- 每个 TASK 完成后更新 `stage-state.json`，记录完成状态和关键决策
 - 开发过程中的技术发现记录到 `findings.md`
 
 **Code Review 标准**：
@@ -1990,7 +1990,7 @@ requirements:
 | 06 Wrap-up | `retro.md` | 复盘完成，Action Items 已提炼 |
 | 全阶段 | `task_plan.md` | 规划记录完整，与 tasks.md 一致 |
 | 全阶段 | `findings.md` | 过程发现已归档 |
-| 全阶段 | `progress.md` | 进度记录完整，所有阶段有连续记录 |
+| 全阶段 | `stage-state.json` | 进度记录完整，所有阶段有连续记录 |
 
 **完成后** → 进入 07. Release 阶段
 
@@ -2226,7 +2226,7 @@ API 契约（`contracts/`）是前后端协作的唯一真理源：
 | 复盘报告 | `retro.md` | — |
 | 过程规划 | `task_plan.md` | 运行态三文件之一 |
 | 过程发现 | `findings.md` | 运行态三文件之一 |
-| 过程进度 | `progress.md` | 运行态三文件之一 |
+| 过程进度 | `stage-state.json` | 运行态三文件之一 |
 
 ### Feature 目录命名规范（手动输入）
 
@@ -2283,7 +2283,7 @@ project-root/
         ├── retro.md                   # 复盘报告
         ├── task_plan.md               # 过程规划（运行态三文件）
         ├── findings.md                # 过程发现（运行态三文件）
-        └── progress.md                # 过程进度（运行态三文件）
+        └── stage-state.json                # 过程进度（运行态三文件）
 ```
 
 ---
@@ -2401,7 +2401,7 @@ feature/<FR-ID>-<description>
 ```text
 会话恢复触发
   → 读取 task_plan.md（当前规划状态）
-  → 读取 progress.md（已完成进度）
+  → 读取 stage-state.json（已完成进度）
   → 读取 findings.md（已有发现）
   → 读取 traceability-matrix.md（追踪状态）
   → 定位当前阶段和当前 TASK
@@ -2460,7 +2460,7 @@ context_pack:
     tasks: "specs/FSREQ-123456-user-auth/tasks.md"
     matrix: "specs/FSREQ-123456-user-auth/traceability-matrix.md"
     task_plan: "specs/FSREQ-123456-user-auth/task_plan.md"
-    progress: "specs/FSREQ-123456-user-auth/progress.md"
+    progress: "specs/FSREQ-123456-user-auth/stage-state.json"
     findings: "specs/FSREQ-123456-user-auth/findings.md"
   constitution: "constitution.md"
   current_phase: "04-implement"
@@ -2471,7 +2471,7 @@ context_pack:
 
 - 每次 Agent 委派必须生成 Context Pack，禁止口头传递上下文
 - Context Pack 中的 `artifacts` 路径必须指向实际存在的文件
-- `current_phase` 和 `current_task` 必须与 `progress.md` 记录一致
+- `current_phase` 和 `current_task` 必须与 `stage-state.json` 记录一致
 
 ### 并行执行模型
 
@@ -2491,7 +2491,7 @@ Size M/L 场景下，独立 TASK 可并行执行以缩短周期。
 
 **运行态三文件并发写入保护**：
 
-并行 Agent 同时操作 `task_plan.md` / `findings.md` / `progress.md` 时，采用 **append-only + 合并** 策略：
+并行 Agent 同时操作 `task_plan.md` / `findings.md` / `stage-state.json` 时，采用 **append-only + 合并** 策略：
 
 | 策略 | 说明 |
 |------|------|
@@ -2584,7 +2584,7 @@ Size M/L 场景下，独立 TASK 可并行执行以缩短周期。
 
 | 动作 | 验证点 | 集成项 |
 |------|-------|-------|
-| **初始化三文件运行态** | 每个 Feature 目录含 `task_plan.md` / `findings.md` / `progress.md` | P0 三文件 |
+| **初始化三文件运行态** | 每个 Feature 目录含 `task_plan.md` / `findings.md` / `stage-state.json` | P0 三文件 |
 | **部署最小 Hook Gate** | Pre-commit ID 格式校验 + Stop 完成度校验可自动执行 | P0 Hook 化 Gate |
 | **验证会话恢复** | `/clear` 后可通过 Session Catchup 恢复上下文 | P0 Session Catchup |
 

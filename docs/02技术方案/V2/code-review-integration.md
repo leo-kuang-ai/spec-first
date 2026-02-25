@@ -353,7 +353,7 @@ code-review 的 Phase 3 与生成类 Skill 有本质区别：
    → 校验 04_implement Gate（CR 通过是前置条件之一）
 2. 追加审查记录到 gate-history.jsonl
    → { type: "code-review", assessment: "APPROVE|REQUEST_CHANGES", p0: N, p1: N, ... }
-3. 更新 progress.md
+3. 更新 stage-state.json
    → 记录 code-review 完成状态
 4. 更新 findings.md
    → 追加本轮审查摘要（轮次、发现项数、判定结果）

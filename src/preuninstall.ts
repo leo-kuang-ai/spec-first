@@ -16,12 +16,12 @@ function isGlobalInstall(): boolean {
 }
 
 if (isGlobalInstall()) {
+  const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
   try {
-    execSync('spec-first uninstall --keep-mcp', { stdio: 'inherit' });
+    execFileSync(process.execPath, [entry, 'uninstall', '--keep-mcp'], { stdio: 'inherit' });
   } catch {
     try {
-      const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
-      execFileSync(process.execPath, [entry, 'uninstall', '--keep-mcp'], { stdio: 'inherit' });
+      execSync('spec-first uninstall --keep-mcp', { stdio: 'inherit' });
     } catch {
       console.error('提示：请手动执行 spec-first uninstall 完成清理。');
     }

@@ -273,7 +273,7 @@ Phase 4 — 写入交付物
 Phase 5 — 副作用执行
   ├── spec-first matrix check <featureId>（更新追踪矩阵）
   ├── spec-first gate check <featureId>（校验 Gate）
-  └── 更新运行态三文件（progress.md / findings.md / task_plan.md）
+  └── 更新运行态三文件（stage-state.json / findings.md / task_plan.md）
 ```
 
 **强制约束**：
@@ -379,7 +379,7 @@ context_pack:
     current_task: "TASK-AUTH-001"
     artifacts:
       matrix: "specs/<featureId>/traceability-matrix.md"
-      progress: "specs/<featureId>/progress.md"
+      progress: "specs/<featureId>/stage-state.json"
   references:
     - path: "specs/<featureId>/spec.md"
       selector: "FR-AUTH-*"
@@ -397,7 +397,7 @@ context_pack:
 
 - 每次 Agent 委派必须生成 Context Pack，禁止口头传递上下文
 - `control.artifacts` 路径必须指向实际存在的文件
-- `control.current_phase` 和 `control.current_task` 必须与 `progress.md` 记录一致
+- `control.current_phase` 和 `control.current_task` 必须与 `stage-state.json` 记录一致
 - `platforms` 必须与 `--platforms` 参数共享同一枚举，使用 kebab-case 并按字典序输出
 - `references` 中每个条目必须包含 `path`、`selector`、`reason`、`checksum`、`mtime`
 
@@ -480,7 +480,7 @@ context_pack:
 
 1. 读取 `stage-state.json`（当前阶段）
 2. 读取 `task_plan.md`（当前规划状态）
-3. 读取 `progress.md`（已完成进度）
+3. 读取 `stage-state.json`（已完成进度）
 4. 读取 `findings.md`（关键发现）
 5. 定位当前阶段 + 当前 TASK
 6. 扫描必需文件缺失项（spec/design/tasks/tests/matrix）

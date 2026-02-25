@@ -44,8 +44,7 @@ specs/                          # Feature 工作区根目录
     │   └── uat-signoff.md
     ├── retro.md                # 复盘报告（06_wrap_up）
     ├── traceability-matrix.md  # 追踪矩阵
-    ├── progress.md             # 进度记录（运行态）
-    ├── findings.md             # 过程发现（运行态）
+    ├── findings.md             # 过程发现与会话摘要（运行态）
     ├── gate-history.jsonl      # Gate 评估历史
     ├── ai-stats.jsonl          # AI 调用统计
     └── metrics.jsonl           # 度量数据
@@ -330,7 +329,7 @@ P4_WRITE — 写入交付物
 P5_SIDE_EFFECT — 副作用执行
   ├── spec-first matrix check <featureId>（校验追踪矩阵）
   ├── spec-first gate check <featureId>（校验 Gate）
-  └── 更新运行态三文件（progress.md / findings.md / task_plan.md）
+  └── 更新运行态文件（findings.md / task_plan.md）
 ```
 
 ### 确认策略执行语义
@@ -343,7 +342,7 @@ P5_SIDE_EFFECT — 副作用执行
 | assisted | 展示生成内容摘要，用户可确认、修改或拒绝 | 中等风险操作（task、test、code-review、sync） |
 | strict | 展示完整生成内容，用户必须逐项审阅后确认 | 高风险操作（init、spec、design、code、archive、orchestrate） |
 
-- `auto` 的 Skill 不应写入关键交付物（spec.md/design.md/task_plan.md），仅允许写入运行态文件（progress.md/findings.md）或不写入
+- `auto` 的 Skill 不应写入关键交付物（spec.md/design.md/task_plan.md），仅允许写入运行态文件（findings.md）或不写入
 - `assisted` 和 `strict` 的 Skill 在用户拒绝时必须回退至 P2 重新生成
 
 ### 错误处理规则

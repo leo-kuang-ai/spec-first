@@ -98,10 +98,7 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
   for (const w of ai.warnings) log(`  ⚠ ${w}`);
 
   // 8. SessionStart Hook
-  const sessionProjectRoot = existsSync(join(cwd, '.spec-first')) && existsSync(join(cwd, 'specs'))
-    ? cwd
-    : undefined;
-  const session = registerSessionHooks({ dryRun, projectRoot: sessionProjectRoot });
+  const session = registerSessionHooks({ dryRun });
   log(`${prefix}Session Hook: ${session.registered.length} registered`);
   for (const w of session.warnings) log(`  ⚠ ${w}`);
 

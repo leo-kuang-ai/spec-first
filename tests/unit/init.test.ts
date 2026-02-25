@@ -45,8 +45,7 @@ describe('init', () => {
     expect(state.mergedRules.gateConditions).toBeDefined();
     expect(state.mergedRules.deliverables).toBeDefined();
 
-    // 运行态三文件
-    expect(readFileSync(join(result.featureDir, 'progress.md'), 'utf-8')).toContain('Progress');
+    // 运行态文件
     expect(readFileSync(join(result.featureDir, 'findings.md'), 'utf-8')).toContain('Findings');
     expect(readFileSync(join(result.featureDir, 'task_plan.md'), 'utf-8')).toContain('Task Plan');
 
@@ -93,13 +92,13 @@ describe('init', () => {
 
   it('should be idempotent — existing feature not overwritten', () => {
     const r1 = init(baseOpts());
-    // 修改 progress.md 内容
-    writeFileSync(join(r1.featureDir, 'progress.md'), 'custom content', 'utf-8');
+    // 修改 findings.md 内容
+    writeFileSync(join(r1.featureDir, 'findings.md'), 'custom content', 'utf-8');
 
     const r2 = init(baseOpts({ featureId: r1.featureId }));
     expect(r2.featureId).toBe(r1.featureId);
     // 内容未被覆盖
-    expect(readFileSync(join(r1.featureDir, 'progress.md'), 'utf-8')).toBe('custom content');
+    expect(readFileSync(join(r1.featureDir, 'findings.md'), 'utf-8')).toBe('custom content');
   });
 
   it('should self-heal .spec-first/current on idempotent init', () => {

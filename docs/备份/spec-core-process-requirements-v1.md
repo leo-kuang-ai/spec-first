@@ -172,7 +172,7 @@
 ## 8. 产出物与数据规范（P0）
 
 - `FR-ART-001` 必须采用标准目录：`specs/<featureId>/...`。
-- `FR-ART-002` 运行态三文件必须持续更新：`progress.md`、`findings.md`、`task_plan.md`。
+- `FR-ART-002` 运行态三文件必须持续更新：`stage-state.json`、`findings.md`、`task_plan.md`。
 - `FR-ART-003` Gate 历史数据必须采用 JSONL 存储（`gate-history.jsonl`）。
 - `FR-ART-004` 模板化初始化必须支持 `stage-state`、`constitution`、`matrix`、`gate-report`、`health-report`。
 

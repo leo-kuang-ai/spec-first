@@ -430,7 +430,7 @@ spec-first matrix export <featureId> [--format markdown|yaml]
 - 生成 Feature ID: `FSREQ-YYYYMMDD-<FEAT>-NNN`
 - 创建 `specs/<featureId>/` 目录结构
 - 渲染 `stage-state.json`（含三层合并结果）
-- 初始化运行态三文件: progress.md / findings.md / task_plan.md（骨架）
+- 初始化运行态三文件: stage-state.json / findings.md / task_plan.md（骨架）
 - 复制 constitution.md 副本
 - 初始化 traceability-matrix.md
 - 写入 `.spec-first/current`

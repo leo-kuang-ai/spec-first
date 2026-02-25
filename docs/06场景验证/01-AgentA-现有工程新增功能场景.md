@@ -84,7 +84,7 @@ spec-gate status FSREQ-123456-user-auth
 说明：
 
 1. `specs/FSREQ-123456-user-auth/` 目录（与 `FSREQ-000000-legacy-baseline` 并存）。
-2. 运行态三文件：`task_plan.md`、`findings.md`、`progress.md`。
+2. 运行态三文件：`task_plan.md`、`findings.md`、`stage-state.json`。
 3. `stage-state.json`（当前阶段 `00_init`）。
 4. FEAT 注册表写入（如 `AUTH`）。
 
@@ -265,7 +265,7 @@ spec-metrics report FSREQ-123456-user-auth --format markdown --output specs/FSRE
 
 ## 4. 场景验收标准
 
-1. 00-07 全阶段有连续记录（`progress.md` 可追溯）。
+1. 00-07 全阶段有连续记录（`stage-state.json` 可追溯）。
 2. Gate 历史可追溯（含失败与重试记录）。
 3. 追踪矩阵链路完整（需求->设计->任务->代码->测试）。
 4. 发布后无阻断级异常，具备回滚证据。

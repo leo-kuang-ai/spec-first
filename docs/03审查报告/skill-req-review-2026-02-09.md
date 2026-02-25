@@ -160,7 +160,7 @@ context_pack:
     tasks: "specs/FSREQ-.../tasks.md"
     matrix: "specs/FSREQ-.../traceability-matrix.md"
     task_plan: "specs/FSREQ-.../task_plan.md"
-    progress: "specs/FSREQ-.../progress.md"
+    progress: "specs/FSREQ-.../stage-state.json"
     findings: "specs/FSREQ-.../findings.md"
   constitution: "constitution.md"   # 路径字符串
   current_phase: "04-implement"     # 字符串
@@ -216,7 +216,7 @@ skill-req 遗漏了 #1（Specify 后 spec 内部一致性）和 #3（Plan 后 sp
 ```
 Step 1: 读取 stage-state.json → 确定 current_stage
 Step 2: 读取 constitution.md → 加载项目原则
-Step 3: 读取 progress.md → 了解整体进度
+Step 3: 读取 stage-state.json → 了解整体进度
 Step 4: 读取 findings.md → 了解已知问题
 Step 5: 按 current_stage 动态加载交付物
 Step 6: 读取 task_plan.md → 定位当前任务
@@ -227,7 +227,7 @@ Step 8: 生成恢复摘要
 **v5 原文**（UC-024，L1025-1070）的恢复顺序：
 ```
 Step 1: 读取 task_plan.md → 定位当前任务（优先级最高）
-Step 2: 读取 progress.md → 了解整体进度
+Step 2: 读取 stage-state.json → 了解整体进度
 Step 3: 读取 findings.md → 了解已知问题
 Step 4: 读取 constitution.md → 加载项目原则
 Step 5: 读取 spec.md → 需求上下文
@@ -409,7 +409,7 @@ Step 8: 生成恢复摘要 → 输出给用户确认
 **v5 原文**（L2492-2501）：
 - 运行态三文件采用 **append-only + merge** 策略
 - `findings.md`：仅追加，不修改已有条目
-- `progress.md`：按阶段分区追加，同一阶段内覆盖写入
+- `stage-state.json`：按阶段分区追加，同一阶段内覆盖写入
 - `task_plan.md`：状态字段原子更新，其余字段 append-only
 - 并发冲突解决：**最后写入者胜（Last Writer Wins）+ 冲突标记**
 

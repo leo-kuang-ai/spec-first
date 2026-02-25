@@ -242,15 +242,6 @@ function isProcessAlive(pid: number): boolean {
 
 // ─── 骨架文件生成 ────────────────────────────────────────
 
-function skeletonProgress(featureId: string, title: string, author: string): string {
-  return `# Progress — ${featureId}\n\n`
-    + `> ${title}\n\n`
-    + `## 进度记录\n\n`
-    + `| 日期 | 阶段 | 事项 | 作者 |\n`
-    + `|------|------|------|------|\n`
-    + `| ${new Date().toISOString().slice(0, 10)} | 00_init | Feature 初始化 | ${author} |\n`;
-}
-
 function skeletonFindings(featureId: string): string {
   return `# Findings — ${featureId}\n\n`
     + `## 过程发现\n\n`
@@ -390,8 +381,7 @@ export function init(opts: InitOptions): InitResult {
     };
     writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
 
-    // 运行态三文件
-    writeMarkdown(join(tmpFeatureDir, 'progress.md'), skeletonProgress(featureId, opts.title, opts.author));
+    // 运行态文件
     writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
     writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
 

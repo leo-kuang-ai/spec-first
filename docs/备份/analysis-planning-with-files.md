@@ -40,7 +40,7 @@ Filesystem = Disk（持久、无限）
 |------|------|----------|
 | `task_plan.md` | 阶段跟踪、进度管理、决策记录 | 每个阶段完成后 |
 | `findings.md` | 研究发现、技术决策、参考资料 | 任何发现时立即更新 |
-| `progress.md` | 会话日志、操作记录、测试结果 | 贯穿整个会话 |
+| `stage-state.json` | 会话日志、操作记录、测试结果 | 贯穿整个会话 |
 
 ### 文件关系图
 
@@ -61,7 +61,7 @@ Filesystem = Disk（持久、无限）
           │                    │                    │
           ▼                    │                    ▼
 ┌─────────────────┐            │          ┌─────────────────┐
-│   findings.md   │            │          │   progress.md   │
+│   findings.md   │            │          │   stage-state.json   │
 │                 │            │          │                 │
 │  研究发现       │◄───────────┘          │  会话日志        │
 │  技术决策       │                       │  操作记录        │
@@ -168,7 +168,7 @@ AFTER 3: 升级给用户
 1. **3-文件模式** → Spec-First 可采用类似结构
    - `spec.md`（规范定义）
    - `findings.md`（研究发现）
-   - `progress.md`（实现进度）
+   - `stage-state.json`（实现进度）
 
 2. **Hooks 机制** → 规范校验可集成到 Git Hooks
    - Pre-commit: 规范格式检查
@@ -217,7 +217,7 @@ AFTER 3: 升级给用户
 ## Visual/Browser Findings（多模态发现）
 ```
 
-### progress.md 结构
+### stage-state.json 结构
 ```markdown
 ## Session [DATE]
 ### Phase N: [Title]（每个阶段的详细日志）

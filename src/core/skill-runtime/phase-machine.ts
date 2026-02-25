@@ -89,10 +89,10 @@ export function confirmPhase(state: PhaseState): PhaseState {
   return { ...state, confirmed: true };
 }
 
-/** P4 预守卫：检查运行时三文件行数，超限自动归档 */
+/** P4 预守卫：检查运行态文件行数，超限自动归档 */
 export function preWriteArchive(featureId: string, projectRoot: string): string[] {
   const archived: string[] = [];
-  const files = ['progress.md', 'findings.md', 'task_plan.md'];
+  const files = ['findings.md', 'task_plan.md'];
   const now = new Date();
   const suffix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}-${now.getTime()}`;
 

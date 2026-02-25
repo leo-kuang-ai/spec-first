@@ -41,7 +41,7 @@ spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> \
 
 - 创建 `specs/<featureId>/` 目录结构
 - 生成 `stage-state.json`（含三层合并结果）
-- 初始化运行态三文件（progress.md / findings.md / task_plan.md）
+- 初始化运行态三文件（stage-state.json / findings.md / task_plan.md）
 - 写入 `.spec-first/current`
 
 ### 2.2 stage — 阶段管理

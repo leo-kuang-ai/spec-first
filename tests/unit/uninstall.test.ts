@@ -43,6 +43,7 @@ function setupFixtures(): void {
     hooks: {
       SessionStart: [
         { matcher: '*', hooks: [{ type: 'command', command: 'spec-first viewer open --print-url --background' }] },
+        { matcher: '*', hooks: [{ type: 'command', command: 'other-tool viewer open --background' }] },
         { matcher: '*', hooks: [{ type: 'command', command: 'echo other-tool' }] },
       ],
     },
@@ -101,8 +102,9 @@ describe('handleUninstall', () => {
   it('should remove spec-first SessionStart hook but keep others', () => {
     handleUninstall([]);
     const settings = JSON.parse(readFileSync(join(CLAUDE_HOME, 'settings.json'), 'utf-8'));
-    expect(settings.hooks.SessionStart).toHaveLength(1);
-    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('echo other-tool');
+    expect(settings.hooks.SessionStart).toHaveLength(2);
+    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('other-tool viewer open --background');
+    expect(settings.hooks.SessionStart[1].hooks[0].command).toBe('echo other-tool');
   });
 
   it('should remove AI runtime hooks from project settings', () => {

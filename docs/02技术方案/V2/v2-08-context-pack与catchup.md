@@ -37,7 +37,7 @@ context_pack:
     current_task: "TASK-AUTH-001"
     artifacts:
       matrix: "specs/<featureId>/traceability-matrix.md"
-      progress: "specs/<featureId>/progress.md"
+      progress: "specs/<featureId>/stage-state.json"
 ```
 
 ### 2.3 references 区格式
@@ -113,7 +113,7 @@ catchup(featureId)
   │
   ├── 1. 读取 stage-state.json（当前阶段）
   ├── 2. 读取 task_plan.md（任务规划状态）
-  ├── 3. 读取 progress.md（已完成进度）
+  ├── 3. 读取 stage-state.json（已完成进度）
   ├── 4. 读取 findings.md（已有发现）
   ├── 5. 定位当前阶段 + 当前 TASK
   ├── 6. 扫描必需文件缺失项（spec/design/tasks/tests/matrix）

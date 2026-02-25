@@ -178,7 +178,7 @@ spec-first ai stats <featureId>                           # AI 调用统计
 
 > `ai context` 输出采用 Control + References 协议：`control`（<2KB）+ `references`（按需读取）。
 
-> `ai catchup` 采用文件单通道恢复：读取 `stage-state.json` + `task_plan.md` + `progress.md` + `findings.md`，不扫描 transcript/会话日志。
+> `ai catchup` 采用文件单通道恢复：读取 `stage-state.json` + `task_plan.md` + `findings.md`，不扫描 transcript/会话日志。
 
 > ⚠️ 命令签名存在与核心模块的类型漂移，`npm run typecheck` 当前不通过。
 

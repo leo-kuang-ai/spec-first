@@ -13,7 +13,7 @@
 
 | 变更类型 | 内容 | 集成项 | 优先级 |
 |---------|------|--------|-------|
-| **新增** | 三文件运行态：`task_plan.md` / `findings.md` / `progress.md` 纳入产出物标准 | P0-三文件 | P0 |
+| **新增** | 三文件运行态：`task_plan.md` / `findings.md` / `stage-state.json` 纳入产出物标准 | P0-三文件 | P0 |
 | **新增** | Hook 化 Gate：PreToolUse / PostToolUse / Stop 三类 Hook 实现 Gate 自动阻断 | P0-Hook Gate | P0 |
 | **新增** | 会话恢复机制：Session Catchup 确保 AI 会话中断后可恢复上下文和追踪产物 | P0-Session Catchup | P0 |
 | **新增** | AI 协作编排规范（附录）：代理路由矩阵 + Context Pack 标准 | P1-代理路由/Context Pack | P1 |
@@ -462,7 +462,7 @@ paths:
 |------|------|
 | **目标** | 启动 Feature，确定 Mode/Size/涉及端，创建工作空间 |
 | **活动** | 读取 Constitution → 确定 Mode（N/I）→ 确定 Size（S/M/L）→ 确定涉及端 → 创建 Feature 目录 → **初始化运行态三文件** |
-| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `progress.md`（初始化） |
+| **产出物** | Feature 目录结构、Feature 元数据（mode, size, platforms）、`task_plan.md` / `findings.md` / `stage-state.json`（初始化） |
 | **Exit Gate** | 目录结构就绪，Mode/Size/涉及端已确认并记录 |
 
 **Mode I 额外活动**：定位历史 Feature 产物，读取已有 spec/plan/contracts。
@@ -635,7 +635,7 @@ paths:
 
 **过程记录**（v4.2 新增）：
 
-- 每个 TASK 完成后更新 `progress.md`，记录完成状态和关键决策
+- 每个 TASK 完成后更新 `stage-state.json`，记录完成状态和关键决策
 - 开发过程中的技术发现记录到 `findings.md`
 
 **Code Review 标准**：
@@ -725,7 +725,7 @@ paths:
 | 06 Wrap-up | `retro.md` | 复盘完成，Action Items 已提炼 |
 | 全阶段（v4.2） | `task_plan.md` | 规划记录完整，与 tasks.md 一致 |
 | 全阶段（v4.2） | `findings.md` | 过程发现已归档，关键发现已反馈到产出物 |
-| 全阶段（v4.2） | `progress.md` | 进度记录完整，所有阶段有连续记录 |
+| 全阶段（v4.2） | `stage-state.json` | 进度记录完整，所有阶段有连续记录 |
 
 **完成后** → 交由 DevOps 系统执行发布流程
 
@@ -901,7 +901,7 @@ API 契约（`contracts/`）是前后端协作的唯一真理源：
 | 复盘报告 | `retro.md` | — |
 | **过程规划**（v4.2） | `task_plan.md` | 运行态三文件之一 |
 | **过程发现**（v4.2） | `findings.md` | 运行态三文件之一 |
-| **过程进度**（v4.2） | `progress.md` | 运行态三文件之一 |
+| **过程进度**（v4.2） | `stage-state.json` | 运行态三文件之一 |
 
 ### 目录结构
 
@@ -940,7 +940,7 @@ project-root/
         ├── retro.md                   # 复盘报告
         ├── task_plan.md               # v4.2: 过程规划（运行态三文件）
         ├── findings.md                # v4.2: 过程发现（运行态三文件）
-        └── progress.md                # v4.2: 过程进度（运行态三文件）
+        └── stage-state.json                # v4.2: 过程进度（运行态三文件）
 ```
 
 ---
@@ -1126,7 +1126,7 @@ Docs:  2 files  +89   -12
 ```text
 AI 会话结束时自动执行：
 1. 检查 task_plan.md 是否与 tasks.md 同步
-2. 检查 progress.md 是否记录了本次会话的工作内容
+2. 检查 stage-state.json 是否记录了本次会话的工作内容
 3. 检查 findings.md 是否记录了新发现（如有）
 4. 计算当前阶段追踪覆盖率
 5. 输出完成度报告到终端
@@ -1147,7 +1147,7 @@ AI 会话结束时自动执行：
 ```text
 会话恢复触发
   → 读取 task_plan.md（当前规划状态）
-  → 读取 progress.md（已完成进度）
+  → 读取 stage-state.json（已完成进度）
   → 读取 findings.md（已有发现）
   → 读取 traceability-matrix.md（追踪状态）
   → 定位当前阶段和当前 TASK
@@ -1157,7 +1157,7 @@ AI 会话结束时自动执行：
 
 **恢复后强制校验**：
 
-- 三文件与实际产出物是否一致（如 progress.md 记录已完成但代码未提交）
+- 三文件与实际产出物是否一致（如 stage-state.json 记录已完成但代码未提交）
 - 追踪矩阵是否与最新代码同步
 - 不一致项必须在恢复后立即修正
 
@@ -1220,7 +1220,7 @@ context_pack:
     tasks: "specs/001-user-auth/tasks.md"
     matrix: "specs/001-user-auth/traceability-matrix.md"
     task_plan: "specs/001-user-auth/task_plan.md"
-    progress: "specs/001-user-auth/progress.md"
+    progress: "specs/001-user-auth/stage-state.json"
     findings: "specs/001-user-auth/findings.md"
   constitution: "constitution.md"
   current_phase: "04-implement"
@@ -1231,7 +1231,7 @@ context_pack:
 
 - 每次 Agent 委派必须生成 Context Pack，禁止口头传递上下文
 - Context Pack 中的 `artifacts` 路径必须指向实际存在的文件
-- `current_phase` 和 `current_task` 必须与 `progress.md` 记录一致
+- `current_phase` 和 `current_task` 必须与 `stage-state.json` 记录一致
 
 ### 并行执行模型
 
@@ -1266,7 +1266,7 @@ Size M/L 场景下，独立 TASK 可并行执行以缩短周期。
 | 为 FR/NFR/TASK/TC 分配 ID | ID 命名规则可执行 | — |
 | 手动维护追踪矩阵 | 矩阵格式合理、维护成本可接受 | — |
 | 在 Plan/Verify Gate 试行覆盖率校验 | 能发现遗漏需求和过度实现 | — |
-| **初始化三文件运行态** | 每个 Feature 目录含 `task_plan.md` / `findings.md` / `progress.md` | P0 三文件 |
+| **初始化三文件运行态** | 每个 Feature 目录含 `task_plan.md` / `findings.md` / `stage-state.json` | P0 三文件 |
 | **部署最小 Hook Gate** | Pre-commit ID 格式校验 + Stop 完成度校验可自动执行 | P0 Hook 化 Gate |
 | **验证会话恢复** | `/clear` 后可通过 Session Catchup 恢复上下文 | P0 Session Catchup |
 

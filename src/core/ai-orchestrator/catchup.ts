@@ -1,6 +1,6 @@
 /**
- * Session Catchup — 7步恢复流程
- * 读取 stage-state → task_plan → progress → findings → 定位 → 扫描缺失 → 输出摘要
+ * Session Catchup — 6步恢复流程
+ * 读取 stage-state → task_plan → findings → 定位 → 扫描缺失 → 输出摘要
  */
 import { join } from 'node:path';
 import type { StageState } from '../../shared/types.js';
@@ -23,7 +23,7 @@ export type TriggerStrategy = 'auto' | 'prompt' | 'off';
 const catchupLocks = new Map<string, number>();
 const LOCK_TTL = 60_000;
 
-/** 执行 7 步恢复流程 */
+/** 执行 6 步恢复流程 */
 export function catchup(featureId: string, projectRoot: string): CatchupResult {
   // 并发保护
   const now = Date.now();
@@ -67,19 +67,13 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     missingFiles.push('task_plan.md');
   }
 
-  // Step 3: Read progress.md
-  const progressPath = join(specDir, 'progress.md');
-  if (!exists(progressPath)) {
-    missingFiles.push('progress.md');
-  }
-
-  // Step 4: Read findings.md
+  // Step 3: Read findings.md
   const findingsPath = join(specDir, 'findings.md');
   if (!exists(findingsPath)) {
     missingFiles.push('findings.md');
   }
 
-  // Step 5: Locate current task
+  // Step 4: Locate current task
   let currentTask: string | undefined;
   if (exists(taskPlanPath)) {
     const content = readMarkdown(taskPlanPath);
@@ -92,7 +86,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     }
   }
 
-  // Step 6: Scan required files for current stage
+  // Step 5: Scan required files for current stage
   const requiredFiles = getRequiredFiles(currentPhase);
   for (const f of requiredFiles) {
     const fullPath = join(specDir, f);
@@ -101,7 +95,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     }
   }
 
-  // Step 7: Output summary
+  // Step 6: Output summary
   const summary = buildSummary(featureId, currentPhase, currentTask, completedTasks, totalTasks, missingFiles);
 
   return {

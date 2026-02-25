@@ -75,7 +75,7 @@ specs/FSREQ-20260210-AUTH-001/
 关键产出：
 
 - `specs/FSREQ-20260209-AUTH-001/stage-state.json`
-- `specs/FSREQ-20260209-AUTH-001/progress.md`
+- `specs/FSREQ-20260209-AUTH-001/stage-state.json`
 - `specs/FSREQ-20260209-AUTH-001/findings.md`
 - `specs/FSREQ-20260209-AUTH-001/task_plan.md`
 
@@ -90,7 +90,7 @@ Gate 要点：Mode/Size/Platforms 已确认，历史产物定位完成，Constit
 
 在后续所有阶段执行中，统一采用轻量更新规则：
 
-- `MUST`：当 Phase 标记为 `complete` 时，同一会话内同步更新 `task_plan.md` 与 `progress.md`。
+- `MUST`：当 Phase 标记为 `complete` 时，同一会话内同步更新 `task_plan.md` 与 `stage-state.json`。
 - `SHOULD`：`findings.md` 仅记录关键决策、风险、取舍，不要求高频记录。
 - `MUST NOT`：仅因 `findings.md` 未更新而阻断阶段推进。
 
@@ -222,7 +222,7 @@ Gate 要点：Task 覆盖率 = 100%，Task 合规率 = 100%。
 
 恢复边界：
 
-- 仅从 `stage-state.json` + `task_plan.md` + `progress.md` + `findings.md` 恢复。
+- 仅从 `stage-state.json` + `task_plan.md` + `findings.md` 恢复。
 - 不扫描 transcript/会话日志。
 - 恢复摘要必须包含缺失文件清单。
 
@@ -261,7 +261,7 @@ Gate 要点：Task 覆盖率 = 100%，Task 合规率 = 100%。
 最佳实践要点：
 
 - 切换后第一件事是 `catchup + status`，再开始编码或改文档。
-- 同一会话只处理一个 Feature，避免交叉写入 `progress.md/task_plan.md`。
+- 同一会话只处理一个 Feature，避免交叉写入 `stage-state.json/task_plan.md`。
 - 提交前再次确认当前 Feature，防止将变更写入错误需求目录。
 
 ### Step 4: 实现开发（04_implement）
@@ -294,7 +294,7 @@ Gate 要点：Task 覆盖率 = 100%，Task 合规率 = 100%。
 - 保持与 API 契约一致。
 - 关键逻辑位置保留追踪注释。
 - `/spec-first:code` 完成后必须执行 `/spec-first:code-review`，产出评审报告。
-- 每个 TASK 达到完成状态时，同步更新 `task_plan.md` 与 `progress.md`。
+- 每个 TASK 达到完成状态时，同步更新 `task_plan.md` 与 `stage-state.json`。
 
 关键产出补充：
 
@@ -427,7 +427,7 @@ Gate 要点：矩阵状态闭合（Accepted/Cancelled）。
 | 10 | `reports/test-report.md` | 记录新增用例执行与结果 | 失败用例闭环 |
 | 11 | `reports/security-scan.md` | 补充邮箱验证码相关安全验证 | 无高危遗留 |
 | 12 | `reports/uat-signoff.md` | 补充业务验收结论 | UAT 对新增需求签核 |
-| 13 | `progress.md` / `findings.md` | 记录变更决策、风险与里程碑 | 审计轨迹完整 |
+| 13 | `stage-state.json` / `findings.md` | 记录变更决策、风险与里程碑 | 审计轨迹完整 |
 
 ### 4.4 变更执行后的流程推进
 
@@ -477,7 +477,7 @@ Gate 要点：矩阵状态闭合（Accepted/Cancelled）。
 - `AC-CASE-005` 最终状态进入 `08_done`，审计轨迹完整。
 - `AC-CASE-006` 开发中途需求变更已完成 RFC 审批与迭代文档更新清单闭环。
 - `AC-CASE-007` 发生会话中断时，可通过 `/spec-first:catchup` 在单通道文件恢复下继续执行。
-- `AC-CASE-008` 每次阶段完成后，`task_plan.md` 与 `progress.md` 同步更新，`status` 告警不阻断推进。
+- `AC-CASE-008` 每次阶段完成后，`task_plan.md` 与 `stage-state.json` 同步更新，`status` 告警不阻断推进。
 - `AC-CASE-009` 多需求并行时，可先查看需求列表并切换目标需求后继续恢复执行。
 
 ---
@@ -511,7 +511,7 @@ Gate 要点：矩阵状态闭合（Accepted/Cancelled）。
 | 阶段完整性 | 00→07 顺序执行并逐段 `verify` | 无阶段跳跃，Gate 条件可解释 |
 | 追踪闭环 | 检查 `spec/design/task/tests/matrix` | FR/NFR→TASK→TC→报告链路完整 |
 | 轻量恢复 | 执行 `/spec-first:catchup` | 可恢复当前阶段/TASK，输出缺失文件清单 |
-| 轻量节拍 | 检查 `task_plan.md` + `progress.md` | 每个完成 Phase 均有同步更新记录 |
+| 轻量节拍 | 检查 `task_plan.md` + `stage-state.json` | 每个完成 Phase 均有同步更新记录 |
 | 告警策略 | 执行 `/spec-first:status` | 缺文件/阶段不一致/过旧仅告警，不阻断 |
 | 需求切换 | 执行 `feature list/switch/current`（或显式 `--feature`） | 切换后恢复到正确 Feature，不发生串线 |
 | 变更治理 | 执行 RFC 流程并回退校验 | 先审批后改动，重走受影响阶段 Gate |

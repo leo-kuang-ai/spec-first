@@ -170,10 +170,10 @@ function checkGateDegradation(root: string, _featureId: string): CheckResult {
   }
 }
 
-/** 运行时三文件容量检查 (>500行提示归档) */
+/** 运行态文件容量检查 (>500行提示归档) */
 function checkRuntimeFiles(root: string, featureId: string): CheckResult[] {
   const results: CheckResult[] = [];
-  const files = ['progress.md', 'findings.md', 'task_plan.md'];
+  const files = ['findings.md', 'task_plan.md'];
   const THRESHOLD = 500;
 
   for (const file of files) {

@@ -141,7 +141,7 @@
 
 - Entry：业务目标明确，已指派 PM 与 TL。
 - Activity：初始化目录、读取 Constitution、确定 Mode/Size/Platforms。
-- Deliverable：`stage-state.json`、`constitution.md`、`progress.md`、`findings.md`、`task_plan.md`。
+- Deliverable：`stage-state.json`、`constitution.md`、`findings.md`、`task_plan.md`。
 - Exit Gate：Feature 元数据完整且可解析。
 - 命令：`/spec-first:init`、`/spec-first:stage current`。
 
@@ -355,4 +355,3 @@
 
 - `V1 核心流程版`：主流程、追踪、Gate、RFC、审计闭环。
 - `V2 数据运营版`：健康分、趋势分析、组织级治理看板。
-

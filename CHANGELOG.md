@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.15 2026-02-25 Leo: refactor: 移除冗余进度产出物 — 阶段推进记录统一由 stage-state.json history 承载，Stop Hook 会话摘要改写 findings.md；清理 init/advance/catchup/context-pack/doctor/phase-machine/artifact-checker 共 8 处引用及 4 个测试文件 (user-visible)
 - v0.5.14 2026-02-25 Leo: init 一致性与并发健壮性增强 — `init` 提交阶段改为“临时目录生成 + 持锁短临界区提交”（提交内二次唯一性校验、原子 rename、current 切换、FEAT 注册）；FEAT 注册表锁新增 stale-lock 自愈（基于 pid/createdAt 与锁龄回收）；`--platforms` 入口改为去重+稳定排序并在重复输入时提示；补充 stale-lock 与 platforms 规范化单测 (user-visible)
 - v0.5.13 2026-02-25 Leo: init 安装场景补齐 `.claude/settings.json` — `spec-first init` 在项目内缺失时自动创建 `.claude/settings.json` 基础骨架（`{"hooks":{}}`），确保 AI Runtime Hooks 可直接写入；创建失败降级为警告不阻断初始化；补充 CLI 单测 (user-visible)
 - v0.5.12 2026-02-25 Leo: init 可靠性增强（第二批）— `init` 采用临时目录写入后原子 `rename`，失败自动清理并在并发创建场景回退幂等自愈；FEAT 注册表增加轻量文件锁与去重校验；`--platforms` 输入去重；补充去重与原子落盘相关单测 (user-visible)

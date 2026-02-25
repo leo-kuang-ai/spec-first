@@ -43,7 +43,6 @@ description: "定位项目根目录并初始化 Feature 工作区"
 - `specs/{featureId}/stage-state.json`
 - `specs/{featureId}/constitution.md`
 - `specs/{featureId}/traceability-matrix.md`
-- `specs/{featureId}/progress.md`
 - `specs/{featureId}/findings.md`
 - `specs/{featureId}/task_plan.md`
 - `specs/.feat-registry.md`

@@ -132,19 +132,19 @@ describe('Phase Machine', () => {
   });
 
   it('should archive oversized runtime file and keep tail lines', () => {
-    const progressPath = join(TMP, 'specs', FEAT, 'progress.md');
+    const findingsPath = join(TMP, 'specs', FEAT, 'findings.md');
     const lines = Array.from({ length: 550 }, (_, i) => `line-${i + 1}`).join('\n');
-    writeFileSync(progressPath, lines, 'utf-8');
+    writeFileSync(findingsPath, lines, 'utf-8');
 
     const archived = preWriteArchive(FEAT, TMP);
-    expect(archived).toContain('progress.md');
+    expect(archived).toContain('findings.md');
 
-    const kept = readFileSync(progressPath, 'utf-8').split('\n');
+    const kept = readFileSync(findingsPath, 'utf-8').split('\n');
     expect(kept.length).toBeLessThanOrEqual(200);
     expect(kept[0]).toBe('line-351');
 
     const files = readdirSync(join(TMP, 'specs', FEAT));
-    expect(files.some((f) => /^progress-\d{4}-\d{2}-\d{2}-\d+\.md$/.test(f))).toBe(true);
+    expect(files.some((f) => /^findings-\d{4}-\d{2}-\d{2}-\d+\.md$/.test(f))).toBe(true);
   });
 });
 
