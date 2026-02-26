@@ -5,8 +5,9 @@
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import yaml from 'js-yaml';
-import type { Mode, Size, Stage } from '../../shared/types.js';
+import type { Mode, Size } from '../../shared/types.js';
 import { exists } from '../../shared/fs-utils.js';
+import { loadEnabledExtensions } from './extensions.js';
 
 // ─── 合并结果类型 ─────────────────────────────────────────
 
@@ -36,6 +37,7 @@ export interface MergedRules {
   gateConditions: Record<string, GateCondition[]>;
   deliverables: Record<string, Deliverable[]>;
   thresholds: Record<string, ThresholdEntry>;
+  extensions?: Array<{ namespace: string; version: string }>;
 }
 
 // ─── Layer 0 基线 ─────────────────────────────────────────
@@ -309,6 +311,98 @@ function applyLayer2(
   }
 }
 
+function namespacedExtensionGateId(namespace: string, id: string): string {
+  const prefix = `EXT-${namespace.toUpperCase()}-`;
+  if (id.startsWith(prefix)) return id;
+  return `${prefix}${id}`;
+}
+
+function namespacedThresholdKey(namespace: string, key: string): string {
+  if (key.startsWith(`${namespace}.`)) return key;
+  return `${namespace}.${key}`;
+}
+
+function applyExtensionRules(
+  gates: Record<string, GateCondition[]>,
+  deliverables: Record<string, Deliverable[]>,
+  thresholds: Record<string, ThresholdEntry>,
+  projectRoot: string,
+): Array<{ namespace: string; version: string }> {
+  const loaded = loadEnabledExtensions(projectRoot);
+  const applied: Array<{ namespace: string; version: string }> = [];
+
+  for (const ext of loaded) {
+    const rules = ext.rules;
+    if (!rules) {
+      applied.push({ namespace: ext.namespace, version: ext.version });
+      continue;
+    }
+
+    const gateConditionsRaw = rules.gate_conditions;
+    if (gateConditionsRaw && typeof gateConditionsRaw === 'object' && !Array.isArray(gateConditionsRaw)) {
+      for (const [stage, conditions] of Object.entries(gateConditionsRaw as Record<string, unknown>)) {
+        if (!Array.isArray(conditions)) {
+          throw new Error(`扩展 "${ext.namespace}" 的 gate_conditions.${stage} 必须为数组`);
+        }
+        gates[stage] = gates[stage] ?? [];
+        for (const rawCond of conditions) {
+          if (!rawCond || typeof rawCond !== 'object' || Array.isArray(rawCond)) {
+            throw new Error(`扩展 "${ext.namespace}" 的 gate_conditions.${stage} 含无效项`);
+          }
+          const cond = rawCond as GateCondition;
+          if (typeof cond.id !== 'string' || !cond.id.trim()) {
+            throw new Error(`扩展 "${ext.namespace}" 的 gate_conditions.${stage} 缺少 id`);
+          }
+          const merged: GateCondition = {
+            ...cond,
+            id: namespacedExtensionGateId(ext.namespace, cond.id.trim()),
+          };
+          const conflict = gates[stage].find((g) => g.id === merged.id);
+          if (conflict) {
+            throw new Error(`扩展 Gate ID 冲突：${merged.id}（namespace=${ext.namespace}）`);
+          }
+          gates[stage].push(merged);
+        }
+      }
+    }
+
+    const deliverablesRaw = rules.extra_deliverables;
+    if (deliverablesRaw && typeof deliverablesRaw === 'object' && !Array.isArray(deliverablesRaw)) {
+      for (const [stage, items] of Object.entries(deliverablesRaw as Record<string, unknown>)) {
+        if (!Array.isArray(items)) {
+          throw new Error(`扩展 "${ext.namespace}" 的 extra_deliverables.${stage} 必须为数组`);
+        }
+        deliverables[stage] = deliverables[stage] ?? [];
+        for (const rawItem of items) {
+          const item = normalizeDeliverable(rawItem, stage, `ext:${ext.namespace}`);
+          const dup = deliverables[stage].some((d) => d.name === item.name);
+          if (!dup) deliverables[stage].push(item);
+        }
+      }
+    }
+
+    const thresholdsRaw = rules.quality_thresholds;
+    if (thresholdsRaw && typeof thresholdsRaw === 'object' && !Array.isArray(thresholdsRaw)) {
+      for (const [key, rawEntry] of Object.entries(thresholdsRaw as Record<string, unknown>)) {
+        const namespacedKey = namespacedThresholdKey(ext.namespace, key);
+        const entry = normalizeThresholdEntry(rawEntry, namespacedKey, `ext:${ext.namespace}`);
+        const existing = thresholds[namespacedKey];
+        if (!existing) {
+          thresholds[namespacedKey] = entry;
+        } else if (entry.direction === 'higher_is_better') {
+          thresholds[namespacedKey].value = Math.max(existing.value, entry.value);
+        } else {
+          thresholds[namespacedKey].value = Math.min(existing.value, entry.value);
+        }
+      }
+    }
+
+    applied.push({ namespace: ext.namespace, version: ext.version });
+  }
+
+  return applied;
+}
+
 /**
  * 三层合并主逻辑
  * Layer 0 基线 → Layer 1 Mode×Size → Layer 2 平台 YAML
@@ -332,5 +426,15 @@ export function mergeLayerRules(
     applyLayer2(gates, deliverables, thresholds, platforms, projectRoot);
   }
 
-  return { mode, size, platforms, gateConditions: gates, deliverables, thresholds };
+  const extensions = applyExtensionRules(gates, deliverables, thresholds, projectRoot);
+
+  return {
+    mode,
+    size,
+    platforms,
+    gateConditions: gates,
+    deliverables,
+    thresholds,
+    extensions,
+  };
 }

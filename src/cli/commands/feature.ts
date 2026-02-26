@@ -7,6 +7,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { ExitCode } from '../../shared/types.js';
 import { exists, ensureDir, readJson } from '../../shared/fs-utils.js';
 import type { StageState } from '../../shared/types.js';
+import { resolveFeatureId } from '../../core/process-engine/feature.js';
 
 export function handleFeature(args: string[]): number {
   const sub = args[0];
@@ -93,17 +94,18 @@ function handleSwitch(args: string[]): number {
   }
 
   const projectRoot = process.cwd();
-  const specsDir = join(projectRoot, 'specs', featureId);
-
-  if (!exists(specsDir)) {
-    console.error(`未找到 Feature：${featureId}`);
+  let resolved: { featureId: string; source: 'exact' | 'prefix' | 'env' };
+  try {
+    resolved = resolveFeatureId(featureId, projectRoot);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
     return ExitCode.VALIDATION_ERROR;
   }
 
   const configDir = join(projectRoot, '.spec-first');
   ensureDir(configDir);
-  writeFileSync(join(configDir, 'current'), featureId, 'utf-8');
-  console.log(`已切换到：${featureId}`);
+  writeFileSync(join(configDir, 'current'), resolved.featureId, 'utf-8');
+  console.log(`已切换到：${resolved.featureId}${resolved.source === 'exact' ? '' : `（来源: ${resolved.source}）`}`);
 
   return ExitCode.SUCCESS;
 }

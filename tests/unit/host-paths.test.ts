@@ -23,6 +23,8 @@ describe('detectHostPaths', () => {
         CLAUDE_COMMANDS_DIR: join(TMP, 'custom-claude-commands'),
         CLAUDE_SKILLS_DIR: join(TMP, 'custom-claude-skills'),
         AGENTS_HOME: join(TMP, 'custom-agents'),
+        SPEC_FIRST_GENERIC_HOME: join(TMP, 'custom-generic-home'),
+        SPEC_FIRST_GENERIC_SKILLS_DIR: join(TMP, 'custom-generic-skills'),
         SPEC_FIRST_BOOTSTRAP_CACHE: join(TMP, 'custom-cache'),
       } as NodeJS.ProcessEnv,
     });
@@ -34,6 +36,8 @@ describe('detectHostPaths', () => {
     expect(paths.claudeCommandsDir).toBe(join(TMP, 'custom-claude-commands'));
     expect(paths.claudeSkillsDir).toBe(join(TMP, 'custom-claude-skills'));
     expect(paths.agentsSkillsDir).toBe(join(TMP, 'custom-agents', 'skills'));
+    expect(paths.genericHomeDir).toBe(join(TMP, 'custom-generic-home'));
+    expect(paths.genericSkillsDir).toBe(join(TMP, 'custom-generic-skills'));
     expect(paths.bootstrapCacheDir).toBe(join(TMP, 'custom-cache'));
   });
 
@@ -81,5 +85,6 @@ describe('detectHostPaths', () => {
     expect(lines).toContain(`Claude 配置目录: ${join(TMP, 'claude-code')}`);
     expect(lines).toContain(`Claude 命令目录: ${join(TMP, 'claude', 'commands')}`);
     expect(lines).toContain(`Claude skills: ${join(TMP, 'claude', 'skills')}`);
+    expect(lines).toContain(`Generic skills: ${join(TMP, 'home', '.spec-first', 'generic', 'skills')}`);
   });
 });

@@ -7,7 +7,7 @@ import { evaluateGate, getConditions, getGateHistory } from '../../core/gate-eng
 import { checkGoLive } from '../../core/gate-engine/golive.js';
 import { readJson, exists } from '../../shared/fs-utils.js';
 import { join } from 'node:path';
-import type { StageState, Stage } from '../../shared/types.js';
+import type { StageState } from '../../shared/types.js';
 
 export function handleGate(args: string[]): number {
   const sub = args[0];

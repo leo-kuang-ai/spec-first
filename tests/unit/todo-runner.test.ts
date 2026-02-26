@@ -6,6 +6,7 @@ import {
   loadTodoState,
   saveTodoState,
   pickNextTodo,
+  pickReadyTodos,
   updateTodoStatus,
   advanceTodoIteration,
   summarizeTodoState,
@@ -41,6 +42,40 @@ describe('todo runner', () => {
 
     const next = pickNextTodo(state);
     expect(next?.id).toBe('TASK-2');
+  });
+
+  it('should pick contiguous parallel-ready batch when first ready todo is [P]', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'TASK-1', title: 'A', status: 'done' },
+      { id: 'TASK-2', title: '[P] B', status: 'pending', dependsOn: ['TASK-1'] },
+      { id: 'TASK-3', title: '[P] C', status: 'pending', dependsOn: ['TASK-1'] },
+      { id: 'TASK-4', title: 'D', status: 'pending', dependsOn: ['TASK-1'] },
+    ]);
+
+    const ready = pickReadyTodos(state, { maxParallel: 4 });
+    expect(ready.map((item) => item.id)).toEqual(['TASK-2', 'TASK-3']);
+  });
+
+  it('should treat sequential todo as barrier for parallel scheduling', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'TASK-1', title: 'A', status: 'done' },
+      { id: 'TASK-2', title: 'B', status: 'pending', dependsOn: ['TASK-1'] },
+      { id: 'TASK-3', title: '[P] C', status: 'pending', dependsOn: ['TASK-1'] },
+    ]);
+
+    const ready = pickReadyTodos(state, { maxParallel: 4 });
+    expect(ready.map((item) => item.id)).toEqual(['TASK-2']);
+  });
+
+  it('should prioritize resuming in_progress todos before picking new pending tasks', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'TASK-1', title: 'A', status: 'in_progress' },
+      { id: 'TASK-2', title: '[P] B', status: 'pending' },
+      { id: 'TASK-3', title: '[P] C', status: 'pending' },
+    ]);
+
+    const ready = pickReadyTodos(state, { maxParallel: 2 });
+    expect(ready.map((item) => item.id)).toEqual(['TASK-1']);
   });
 
   it('should persist and resume todo state', () => {

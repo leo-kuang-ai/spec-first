@@ -42,8 +42,18 @@ function setupFixtures(): void {
   writeFileSync(join(CLAUDE_HOME, 'settings.json'), JSON.stringify({
     hooks: {
       SessionStart: [
+        {
+          matcher: '*',
+          hooks: [{
+            type: 'command',
+            command: "SPEC_FIRST_MANAGED_SESSION=1 SPEC_FIRST_BIN_FALLBACK='/tmp/sf' sh -c '\"$SPEC_FIRST_BIN_FALLBACK\" viewer open --print-url --background 2>/dev/null || true'",
+          }],
+        },
         { matcher: '*', hooks: [{ type: 'command', command: 'spec-first viewer open --print-url --background' }] },
+        { matcher: '*', hooks: [{ type: 'command', command: "'/tmp/sf' viewer open --print-url --background >/dev/null 2>&1 || true", timeout: 15 }] },
         { matcher: '*', hooks: [{ type: 'command', command: 'other-tool viewer open --background' }] },
+        { matcher: '*', hooks: [{ type: 'command', command: "'/tmp/other-tool' viewer open --print-url --background >/dev/null 2>&1 || true" }] },
+        { matcher: '*', hooks: [{ type: 'command', command: 'other-tool viewer open --print-url --background' }] },
         { matcher: '*', hooks: [{ type: 'command', command: 'echo other-tool' }] },
       ],
     },
@@ -56,6 +66,10 @@ function setupFixtures(): void {
       PreToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first gate check' }] }],
       PostToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first matrix check' }] }],
       Stop: [{ hooks: [{ type: 'command', command: 'npx spec-first ai stats' }] }],
+      SessionStart: [
+        { matcher: '*', hooks: [{ type: 'command', command: "SPEC_FIRST_MANAGED_SESSION=1 '/tmp/sf' viewer open --print-url --background 2>/dev/null || true" }] },
+        { matcher: '*', hooks: [{ type: 'command', command: 'echo project-other' }] },
+      ],
     },
   }));
 }
@@ -102,9 +116,11 @@ describe('handleUninstall', () => {
   it('should remove spec-first SessionStart hook but keep others', () => {
     handleUninstall([]);
     const settings = JSON.parse(readFileSync(join(CLAUDE_HOME, 'settings.json'), 'utf-8'));
-    expect(settings.hooks.SessionStart).toHaveLength(2);
+    expect(settings.hooks.SessionStart).toHaveLength(4);
     expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('other-tool viewer open --background');
-    expect(settings.hooks.SessionStart[1].hooks[0].command).toBe('echo other-tool');
+    expect(settings.hooks.SessionStart[1].hooks[0].command).toBe("'/tmp/other-tool' viewer open --print-url --background >/dev/null 2>&1 || true");
+    expect(settings.hooks.SessionStart[2].hooks[0].command).toBe('other-tool viewer open --print-url --background');
+    expect(settings.hooks.SessionStart[3].hooks[0].command).toBe('echo other-tool');
   });
 
   it('should remove AI runtime hooks from project settings', () => {
@@ -113,5 +129,7 @@ describe('handleUninstall', () => {
     expect(settings.hooks.PreToolUse).toBeUndefined();
     expect(settings.hooks.PostToolUse).toBeUndefined();
     expect(settings.hooks.Stop).toBeUndefined();
+    expect(settings.hooks.SessionStart).toHaveLength(1);
+    expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('echo project-other');
   });
 });

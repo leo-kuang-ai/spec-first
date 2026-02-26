@@ -8,9 +8,12 @@ import {
   switchFeature,
   getFeatureState,
   listFeatures,
+  resolveFeatureId,
 } from '../../src/core/process-engine/feature.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-feature');
+const FEATURE_ENV_KEYS = ['SPEC_FIRST_FEATURE', 'SPEC_FIRST_CURRENT_FEATURE', 'FEATURE_ID'] as const;
+const envBackup = Object.fromEntries(FEATURE_ENV_KEYS.map((key) => [key, process.env[key]]));
 
 function writeState(featureId: string, overrides: Partial<StageState> = {}): void {
   const dir = join(TMP, 'specs', featureId);
@@ -33,9 +36,15 @@ function writeState(featureId: string, overrides: Partial<StageState> = {}): voi
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs'), { recursive: true });
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  for (const key of FEATURE_ENV_KEYS) delete process.env[key];
 });
 
 afterEach(() => {
+  for (const key of FEATURE_ENV_KEYS) {
+    const value = envBackup[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
   rmSync(TMP, { recursive: true, force: true });
 });
 
@@ -96,5 +105,35 @@ describe('listFeatures', () => {
   it('should return empty when specs dir missing', () => {
     rmSync(join(TMP, 'specs'), { recursive: true, force: true });
     expect(listFeatures(TMP)).toEqual([]);
+  });
+});
+
+describe('resolveFeatureId', () => {
+  it('should resolve exact feature id first', () => {
+    writeState('FSREQ-20260211-EXACT-001');
+    writeState('FSREQ-20260211-EXTRA-001');
+    const resolved = resolveFeatureId('FSREQ-20260211-EXACT-001', TMP, { env: {} as NodeJS.ProcessEnv });
+    expect(resolved).toEqual({ featureId: 'FSREQ-20260211-EXACT-001', source: 'exact' });
+  });
+
+  it('should fallback to unique prefix match', () => {
+    writeState('FSREQ-20260211-PREFIX-001');
+    const resolved = resolveFeatureId('FSREQ-20260211-PRE', TMP, { env: {} as NodeJS.ProcessEnv });
+    expect(resolved).toEqual({ featureId: 'FSREQ-20260211-PREFIX-001', source: 'prefix' });
+  });
+
+  it('should reject ambiguous prefix matches', () => {
+    writeState('FSREQ-20260211-AB-001');
+    writeState('FSREQ-20260211-AB-002');
+    expect(() => resolveFeatureId('FSREQ-20260211-AB-', TMP, { env: {} as NodeJS.ProcessEnv }))
+      .toThrow(/歧义/);
+  });
+
+  it('should fallback to env override when request cannot resolve', () => {
+    writeState('FSREQ-20260211-ENV-001');
+    const resolved = resolveFeatureId('MISSING', TMP, {
+      env: { SPEC_FIRST_FEATURE: 'FSREQ-20260211-ENV-001' } as NodeJS.ProcessEnv,
+    });
+    expect(resolved).toEqual({ featureId: 'FSREQ-20260211-ENV-001', source: 'env' });
   });
 });

@@ -10,6 +10,8 @@ const ENV_KEYS = [
   'CLAUDE_COMMANDS_DIR',
   'CLAUDE_SKILLS_DIR',
   'CLAUDE_CODE_CONFIG_DIR',
+  'SPEC_FIRST_GENERIC_SKILLS_DIR',
+  'SPEC_FIRST_SKILLS_DIR',
 ];
 
 const envBackup: Record<string, string | undefined> = {};
@@ -23,6 +25,8 @@ beforeEach(() => {
   process.env.CLAUDE_COMMANDS_DIR = join(TMP, 'claude-commands');
   process.env.CLAUDE_SKILLS_DIR = join(TMP, 'claude-skills');
   process.env.CLAUDE_CODE_CONFIG_DIR = join(TMP, 'claude-code-config');
+  process.env.SPEC_FIRST_GENERIC_SKILLS_DIR = join(TMP, 'generic-skills');
+  process.env.SPEC_FIRST_SKILLS_DIR = join(TMP, 'spec-first-skills');
 });
 
 afterEach(() => {
@@ -98,5 +102,16 @@ describe('ensureSkillCommands', () => {
     const skill = readFileSync(join(target, 'SKILL.md'), 'utf-8');
     expect(skill).toContain('name: "spec-first:doctor"');
     expect(skill).not.toContain('# stale');
+  });
+
+  it('should support generic host target only', () => {
+    const result = ensureSkillCommands(TMP, { global: true, hosts: ['generic'] });
+    expect(result.generic.length).toBeGreaterThan(0);
+    expect(result.claude).toHaveLength(0);
+    expect(result.codex).toHaveLength(0);
+
+    const skillName = result.generic[0].split(':')[1];
+    const target = join(process.env.SPEC_FIRST_GENERIC_SKILLS_DIR as string, 'spec-first', skillName, 'SKILL.md');
+    expect(existsSync(target)).toBe(true);
   });
 });

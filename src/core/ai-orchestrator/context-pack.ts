@@ -6,10 +6,10 @@
 import { join } from 'node:path';
 import { readFileSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import type { StageState, Size } from '../../shared/types.js';
+import type { StageState } from '../../shared/types.js';
 import { readJson, exists, readMarkdown } from '../../shared/fs-utils.js';
-import { parseMatrix } from '../trace-engine/matrix.js';
 import { sliceContext, type SliceResult } from './context-slicing.js';
+import { loadConfig } from '../../shared/config-schema.js';
 
 // ─── 类型定义 ─────────────────────────────────────────────
 
@@ -19,6 +19,8 @@ export interface ContextRef {
   reason: string;
   checksum: string;
   mtime: string;
+  granularity?: 'summary' | 'detail';
+  estimatedTokens?: number;
 }
 
 export interface ControlZone {
@@ -39,9 +41,21 @@ export interface ContextPack {
   version: string;
   control: ControlZone;
   references: ContextRef[];
-  budget: { total: number; controlSize: number; refsCount: number };
+  budget: {
+    total: number;
+    controlSize: number;
+    refsCount: number;
+    tokenBudget: number;
+    estimatedTokens: number;
+    estimatedTokensRaw: number;
+  };
   /** 分层压缩结果（Planning-with-Files P1-1） */
-  slicing?: SliceResult;
+  slicing: SliceResult;
+}
+
+export interface ContextPackOptions {
+  fullDetail?: boolean;
+  expandPaths?: string[];
 }
 
 const CONTROL_LIMIT = 2048; // 2KB hard limit
@@ -85,10 +99,15 @@ const STAGE_LAYERS: Partial<Record<string, LayerDef>> = {
 // ─── 核心构建函数 ─────────────────────────────────────────
 
 /** 构建 Context Pack */
-export function buildContextPack(featureId: string, projectRoot: string): ContextPack {
+export function buildContextPack(
+  featureId: string,
+  projectRoot: string,
+  options?: ContextPackOptions,
+): ContextPack {
   const specDir = join(projectRoot, 'specs', featureId);
   const statePath = join(specDir, 'stage-state.json');
   const state = readJson<StageState>(statePath);
+  const cfg = loadConfig(projectRoot);
 
   // 构建 control zone
   const control: ControlZone = {
@@ -110,30 +129,49 @@ export function buildContextPack(featureId: string, projectRoot: string): Contex
   const controlSize = Buffer.byteLength(controlJson, 'utf-8');
 
   // 构建 references
-  const rawRefs = buildReferences(featureId, projectRoot, state);
+  const rawRefs = buildReferences(featureId, projectRoot, state, options);
 
   // Planning-with-Files P1-1: 接入 sliceContext 分层压缩
-  const sliceResult = sliceContext(rawRefs);
+  const sliceResult = sliceContext(rawRefs, {
+    budgetTokens: cfg.context.token_budget,
+    l1Ratio: 0.2,
+    l2Ratio: 0.3,
+    l3Ratio: 0.5,
+  });
 
   return {
     version: '2.0',
     control,
     references: sliceResult.refs,
     budget: {
-      total: controlSize + sliceResult.refs.length * 100,
+      total: controlSize + sliceResult.tokensAfter * 4,
       controlSize,
       refsCount: sliceResult.refs.length,
+      tokenBudget: cfg.context.token_budget,
+      estimatedTokens: sliceResult.tokensAfter,
+      estimatedTokensRaw: sliceResult.tokensBefore,
     },
-    slicing: sliceResult.degradationLevel > 0 ? sliceResult : undefined,
+    slicing: sliceResult,
   };
 }
 
 /** 根据阶段构建 references 列表 */
-function buildReferences(featureId: string, projectRoot: string, state: StageState): ContextRef[] {
+function buildReferences(
+  featureId: string,
+  projectRoot: string,
+  state: StageState,
+  options?: ContextPackOptions,
+): ContextRef[] {
   const specDir = join(projectRoot, 'specs', featureId);
   const layers = STAGE_LAYERS[state.currentStage] ?? { l1: ['constitution.md'], l2: [], l3: [] };
   const refs: ContextRef[] = [];
   const seen = new Set<string>();
+  const expandPaths = new Set((options?.expandPaths ?? []).map((item) => item.trim()).filter(Boolean));
+  const isExpanded = (relPath: string): boolean => {
+    if (options?.fullDetail) return true;
+    if (expandPaths.has(relPath)) return true;
+    return Array.from(expandPaths).some((path) => relPath.startsWith(path));
+  };
 
   // L1 + L2 + L3 合并
   const allPaths = [...layers.l1, ...layers.l2, ...layers.l3];
@@ -145,26 +183,57 @@ function buildReferences(featureId: string, projectRoot: string, state: StageSta
 
     if (!exists(fullPath)) continue;
 
-    const ref = buildRef(fullPath, relPath, 'stage_context');
-    if (ref) refs.push(ref);
+    const summaryRef = buildRef(fullPath, relPath, 'stage_context_summary', 'summary');
+    if (summaryRef) refs.push(summaryRef);
+    if (isExpanded(relPath)) {
+      const detailRef = buildRef(fullPath, relPath, 'stage_context_detail', 'detail');
+      if (detailRef) refs.push(detailRef);
+    }
   }
 
   return refs;
 }
 
-function buildRef(fullPath: string, relPath: string, reason: string): ContextRef | null {
+function estimateTokens(input: string): number {
+  return Math.max(1, Math.ceil(Buffer.byteLength(input, 'utf-8') / 4));
+}
+
+function summarizeContent(content: string): string {
+  const lines = content.split('\n');
+  const headings = lines.filter((line) => /^#{1,3}\s+/.test(line.trim())).slice(0, 8);
+  if (headings.length > 0) {
+    return headings.join('\n').slice(0, 1200);
+  }
+  return lines
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 24)
+    .join('\n')
+    .slice(0, 1200);
+}
+
+function buildRef(
+  fullPath: string,
+  relPath: string,
+  reason: string,
+  granularity: 'summary' | 'detail',
+): ContextRef | null {
   try {
     const stat = statSync(fullPath);
     if (stat.isDirectory()) return null;
 
     const content = readFileSync(fullPath, 'utf-8');
-    const checksum = createHash('sha256').update(content).digest('hex').slice(0, 16);
+    const payload = granularity === 'summary' ? summarizeContent(content) : content;
+    const checksum = createHash('sha256').update(payload).digest('hex').slice(0, 16);
 
     return {
       path: relPath,
+      selector: granularity,
       reason,
       checksum,
       mtime: stat.mtime.toISOString(),
+      granularity,
+      estimatedTokens: estimateTokens(payload),
     };
   } catch {
     return null;

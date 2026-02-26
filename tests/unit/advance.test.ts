@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Stage } from '../../src/shared/types.js';
 import type { StageState } from '../../src/shared/types.js';
@@ -107,6 +107,20 @@ describe('advance', () => {
     const state = readState();
     expect(state.currentStage).toBe(Stage.DONE);
     expect(state.terminal).toBe(true);
+  });
+
+  it('should auto-sync context file when advancing DESIGN → PLAN', () => {
+    writeState(makeState({ currentStage: Stage.DESIGN }));
+    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n## API\n', 'utf-8');
+    writeFileSync(join(TMP, 'CLAUDE.md'), '# CLAUDE\n', 'utf-8');
+
+    const result = advance(FEAT_ID, TMP, { force: true });
+    expect(result.from).toBe(Stage.DESIGN);
+    expect(result.to).toBe(Stage.PLAN);
+
+    const content = readFileSync(join(TMP, 'CLAUDE.md'), 'utf-8');
+    expect(content).toContain('SPEC-FIRST:BEGIN AUTO-CONTEXT');
+    expect(content).toContain('Spec-First Context Snapshot');
   });
 });
 

@@ -72,7 +72,7 @@ function handleUpdate(args: string[]): number {
   const featureId = args[0];
   const seqStr = args[1];
   const status = parseFlag(args, '--status') ?? args[2];
-  const _actor = parseFlag(args, '--actor'); // 阶段 A 暂不持久化 actor，仅保留参数兼容
+  parseFlag(args, '--actor'); // 阶段 A 暂不持久化 actor，仅保留参数兼容
 
   if (!featureId || !seqStr || !status) {
     console.error('用法：spec-first defect update <featureId> <seq> --status <status> [--actor <actor>]');

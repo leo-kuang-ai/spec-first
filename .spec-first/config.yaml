@@ -2,6 +2,9 @@ catchup:
   trigger: prompt
 context:
   token_budget: 16000
+runtime:
+  max_iterations: 5
+  max_self_corrections: 3
 gate:
   pilot_mode: false
 health:

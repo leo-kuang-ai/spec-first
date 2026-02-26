@@ -5,8 +5,10 @@
 import { join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
 import { exists } from '../../shared/fs-utils.js';
-import { assemblePrompt, resolvePromptAssemblyContext } from './prompt-assembler.js';
+import { loadConfig } from '../../shared/config-schema.js';
+import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability } from './prompt-assembler.js';
 import { buildHardGateRuntimeNotice } from './hard-gate.js';
+import { loadEnabledExtensions } from '../process-engine/extensions.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -32,6 +34,27 @@ const RUNTIME_COMMANDS = new Set([
   'metrics', 'gate', 'golive', 'ai',
   'commit', 'feature',
 ]);
+
+const NEXT_STEPS_POLICY_MARKER = '## Next Steps（Required Handoff）';
+
+function ensureNextStepsPolicy(content: string): string {
+  if (content.includes(NEXT_STEPS_POLICY_MARKER) || /##\s*Next Steps/i.test(content)) {
+    return content;
+  }
+  return `${content.trimEnd()}\n\n${NEXT_STEPS_POLICY_MARKER}
+
+输出时必须包含 \`Next Steps\` 小节，且至少给出：
+- 下一条可执行命令（1 条，含完整命令）
+- 触发条件（何时执行）
+- 若存在阻塞项，先决修复命令
+`;
+}
+
+function parseExtensionSkillName(skillName: string): { namespace: string; skill: string } | undefined {
+  const match = skillName.match(/^ext\.([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/);
+  if (!match) return undefined;
+  return { namespace: match[1], skill: match[2] };
+}
 
 /**
  * 解析并分发命令
@@ -105,6 +128,21 @@ export function resolveSkillPath(
   skillName: string,
   projectRoot: string,
 ): string | undefined {
+  const extReq = parseExtensionSkillName(skillName);
+  if (extReq) {
+    const ext = loadEnabledExtensions(projectRoot).find((item) => item.namespace === extReq.namespace);
+    if (!ext) return undefined;
+
+    const direct = join(ext.skillsDir, extReq.skill, 'SKILL.md');
+    if (exists(direct)) return direct;
+
+    const prefixed = join(ext.skillsDir, 'spec-first');
+    const byPrefixed = findSkillFile(prefixed, extReq.skill);
+    if (byPrefixed) return byPrefixed;
+
+    return findSkillFile(ext.skillsDir, extReq.skill);
+  }
+
   // 项目本地 skills/ 优先
   const localPattern = join(projectRoot, 'skills', 'spec-first');
   const localPath = findSkillFile(localPattern, skillName);
@@ -143,13 +181,25 @@ export function loadSkill(
   skillPath: string,
   options?: { projectRoot?: string; enableAssembly?: boolean },
 ): string {
-  let content = readFileSync(skillPath, 'utf-8');
+  let content = ensureNextStepsPolicy(readFileSync(skillPath, 'utf-8'));
   const projectRoot = options?.projectRoot;
   const enableAssembly = options?.enableAssembly ?? Boolean(projectRoot);
 
   if (enableAssembly && projectRoot) {
     const ctx = resolvePromptAssemblyContext(projectRoot);
     content = assemblePrompt(content, ctx);
+  }
+
+  if (projectRoot) {
+    const kvCheck = validateKvCacheStability(content);
+    if (!kvCheck.stable) {
+      const cfg = loadConfig(projectRoot);
+      const issueSummary = kvCheck.issues.join('; ');
+      if (cfg.runtime.kv_cache_hard_gate) {
+        throw new Error(`KV-CACHE-HARD-GATE: ${issueSummary}`);
+      }
+      console.warn(`[spec-first] KV-Cache 稳定性告警: ${issueSummary}`);
+    }
   }
 
   if (!projectRoot) return content;

@@ -2,14 +2,15 @@
  * doctor CLI 命令
  * spec-first doctor [featureId]
  */
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { ExitCode } from '../../shared/types.js';
 import { checkHooks } from '../../core/tool-integration/hook-installer.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
+import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
 
 type Level = 'PASS' | 'WARNING' | 'ERROR';
 
@@ -18,6 +19,20 @@ interface CheckResult {
   level: Level;
   message: string;
   fix?: string;
+}
+
+interface SessionHookCommandEntry {
+  command?: unknown;
+}
+
+interface SessionHookEntry {
+  hooks?: unknown;
+}
+
+interface ClaudeSettingsShape {
+  hooks?: {
+    SessionStart?: unknown;
+  };
 }
 
 export function handleDoctor(args: string[]): number {
@@ -73,7 +88,11 @@ function checkNodeVersion(): CheckResult {
 
 function checkGit(): CheckResult {
   try {
-    const ver = execSync('git --version', { encoding: 'utf-8' }).trim();
+    const ver = execFileSync('git', ['--version'], {
+      encoding: 'utf-8',
+      timeout: 5_000,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
     return { name: 'Git', level: 'PASS', message: ver };
   } catch {
     return { name: 'Git', level: 'ERROR', message: '未找到', fix: '请安装 Git' };
@@ -153,7 +172,8 @@ function checkHookStatus(root: string): CheckResult[] {
 
 /** Session Hook 可达性检查（Superpowers P1-4） */
 function checkSessionHook(): CheckResult {
-  const claudeSettingsPath = join(homedir(), '.claude', 'settings.json');
+  const homeDir = process.env.HOME?.trim() || homedir();
+  const claudeSettingsPath = join(homeDir, '.claude', 'settings.json');
 
   if (!existsSync(claudeSettingsPath)) {
     return {
@@ -165,10 +185,12 @@ function checkSessionHook(): CheckResult {
   }
 
   try {
-    const settings = JSON.parse(readFileSync(claudeSettingsPath, 'utf-8'));
-    const sessionStart = settings?.hooks?.SessionStart;
+    const settings = JSON.parse(readFileSync(claudeSettingsPath, 'utf-8')) as ClaudeSettingsShape;
+    const sessionStart = Array.isArray(settings?.hooks?.SessionStart)
+      ? settings.hooks.SessionStart
+      : [];
 
-    if (!Array.isArray(sessionStart) || sessionStart.length === 0) {
+    if (sessionStart.length === 0) {
       return {
         name: 'Session Hook',
         level: 'WARNING',
@@ -177,34 +199,49 @@ function checkSessionHook(): CheckResult {
       };
     }
 
-    // 查找包含 spec-first 的条目
-    const specFirstEntry = sessionStart.find((entry: any) => {
-      const hooks = entry?.hooks;
+    // 1) 优先复用统一托管识别，避免与注册/卸载逻辑漂移
+    // 2) 诊断场景允许降级到 "spec-first" 字面量匹配，以识别“条目存在但内容缺失”的历史配置
+    const managedEntry = sessionStart.find((entry: unknown) => isManagedSessionStartEntry(entry));
+    const fallbackEntry = sessionStart.find((entry: unknown) => {
+      const hooks = (entry as SessionHookEntry | undefined)?.hooks;
       if (!Array.isArray(hooks)) return false;
-      return hooks.some((h: any) =>
-        typeof h?.command === 'string' && h.command.includes('spec-first'),
-      );
+      return hooks.some((hook) => {
+        const command = (hook as SessionHookCommandEntry | undefined)?.command;
+        return typeof command === 'string' && command.includes('spec-first');
+      });
     });
+    const specFirstEntry = managedEntry ?? fallbackEntry;
 
     if (!specFirstEntry) {
       return {
         name: 'Session Hook',
         level: 'WARNING',
-        message: '未找到 spec-first SessionStart 条目',
-        fix: '运行 spec-first update 安装 Session Hook',
+        message: 'Session Hook 内容不完整（缺少：技能路由表、1%规则、catchup 提示、viewer 启动）',
+        fix: '未找到 spec-first SessionStart 条目；运行 spec-first update 重新安装 Session Hook',
       };
     }
 
-    // 检查是否包含关键内容
-    const command = specFirstEntry.hooks[0]?.command || '';
-    const hasCatchup = command.includes('catchup') || command.includes('技能路由表');
-    const hasViewer = command.includes('viewer');
+    // 检查首轮注入关键内容（路由表 + 1% 规则 + catchup + viewer）
+    const entry = specFirstEntry as SessionHookEntry;
+    const firstHook = Array.isArray(entry.hooks) ? entry.hooks[0] as SessionHookCommandEntry | undefined : undefined;
+    const firstCommand = firstHook?.command;
+    const command = typeof firstCommand === 'string' ? firstCommand : '';
+    const hasRouteMap = command.includes('技能路由表') || command.includes('route');
+    const hasOnePercentRule = command.includes('1%规则') || command.includes('1%');
+    const hasCatchup = command.includes('catchup');
+    const hasViewer = command.includes('viewer open');
 
-    if (!hasCatchup && !hasViewer) {
+    const missingParts: string[] = [];
+    if (!hasRouteMap) missingParts.push('技能路由表');
+    if (!hasOnePercentRule) missingParts.push('1%规则');
+    if (!hasCatchup) missingParts.push('catchup 提示');
+    if (!hasViewer) missingParts.push('viewer 启动');
+
+    if (missingParts.length > 0) {
       return {
         name: 'Session Hook',
         level: 'WARNING',
-        message: 'Session Hook 内容不完整（缺少 catchup/viewer）',
+        message: `Session Hook 内容不完整（缺少：${missingParts.join('、')}）`,
         fix: '运行 spec-first update 重新安装 Session Hook',
       };
     }
@@ -212,7 +249,7 @@ function checkSessionHook(): CheckResult {
     return {
       name: 'Session Hook',
       level: 'PASS',
-      message: `已配置 (${hasCatchup ? '路由表+恢复' : 'viewer'})`,
+      message: '已配置 (路由表+1%规则+恢复+viewer)',
     };
   } catch (e) {
     return {

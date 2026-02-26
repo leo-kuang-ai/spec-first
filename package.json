@@ -1,6 +1,6 @@
 {
   "name": "spec-first",
-  "version": "0.1.0",
+  "version": "0.5.45",
   "description": "Specification-driven development process engine for AI-era software development",
   "type": "module",
   "bin": {
@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "tsc --noEmit",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
     "bench": "vitest bench",
     "viewer:start": "node scripts/stage-viewer/server.js --project-root . --port 0",
     "viewer:bootstrap": "node scripts/stage-viewer/bootstrap.js --open",
@@ -49,16 +51,26 @@
     "access": "public"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^1.6.1",
+    "@eslint/js": "^10.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.11.0",
-    "tsup": "^8.0.0",
+    "@vitest/coverage-v8": "^1.6.1",
+    "eslint": "^10.0.2",
+    "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
     "typescript": "^5.4.0",
+    "typescript-eslint": "^8.56.1",
     "vitest": "^1.6.1"
   },
   "dependencies": {
     "handlebars": "^4.7.8",
     "js-yaml": "^4.1.0",
     "update-notifier": "^7.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "rollup": "^4.59.0",
+      "minimatch": "^3.1.3"
+    }
   }
 }

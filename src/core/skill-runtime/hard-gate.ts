@@ -1,13 +1,13 @@
 import { join } from 'node:path';
 import { exists, readJson, readMarkdown } from '../../shared/fs-utils.js';
 import type { StageState } from '../../shared/types.js';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = {
   design: '02_design',
   code: '04_implement',
-  orchestrate: '04_implement', // Superpowers P1-3: orchestrate 也需要 code 阶段守卫
 };
+const GIT_COMMAND_TIMEOUT_MS = 5_000;
 
 /** 高风险变更判定（Superpowers P1-3） */
 export interface HighRiskAssessment {
@@ -18,6 +18,7 @@ export interface HighRiskAssessment {
 
 export interface HardGateDecision {
   allowed: boolean;
+  severity: 'PASS' | 'WARN' | 'BLOCKED';
   reason: string;
   remediation: string;
   /** 高风险评估（Worktree First，Superpowers P1-3） */
@@ -77,15 +78,34 @@ function hasInProgressTask(taskPlan: string): boolean {
   return false;
 }
 
+function hasLocalGitRepo(projectRoot: string): boolean {
+  return exists(join(projectRoot, '.git'));
+}
+
+function runGit(projectRoot: string, args: string[]): string {
+  return execFileSync('git', args, {
+    cwd: projectRoot,
+    encoding: 'utf-8',
+    timeout: GIT_COMMAND_TIMEOUT_MS,
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim();
+}
+
 /** 检测当前 Git 分支（Superpowers P1-3） */
 function getCurrentGitBranch(projectRoot: string): string | undefined {
+  if (!hasLocalGitRepo(projectRoot)) return undefined;
   try {
-    const output = execSync('git rev-parse --abbrev-ref HEAD', {
-      cwd: projectRoot,
-      encoding: 'utf-8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-    return output || undefined;
+    const symbolic = runGit(projectRoot, ['symbolic-ref', '--short', 'HEAD']);
+    if (symbolic && symbolic.toLowerCase() !== 'head') {
+      return symbolic;
+    }
+  } catch {
+    // fallback below
+  }
+
+  try {
+    const output = runGit(projectRoot, ['rev-parse', '--abbrev-ref', 'HEAD']);
+    return output && output.toLowerCase() !== 'head' ? output : undefined;
   } catch {
     return undefined;
   }
@@ -94,45 +114,61 @@ function getCurrentGitBranch(projectRoot: string): string | undefined {
 /** 判断是否为保护分支（main/master） */
 function isProtectedBranch(branch: string | undefined): boolean {
   if (!branch) return false;
-  const protectedBranches = ['main', 'master', 'mainline', 'production', 'prod'];
+  const protectedBranches = ['main', 'master', 'mainline', 'production', 'prod', 'head'];
   return protectedBranches.includes(branch.toLowerCase());
+}
+
+function isLinkedWorktree(projectRoot: string): boolean {
+  if (!hasLocalGitRepo(projectRoot)) return false;
+  try {
+    const gitDir = runGit(projectRoot, ['rev-parse', '--git-dir']);
+    return /[\\/]worktrees[\\/]/.test(gitDir);
+  } catch {
+    return false;
+  }
+}
+
+function hasWorktreeConfirmed(specDir: string): boolean {
+  const taskPlanPath = join(specDir, 'task_plan.md');
+  if (!exists(taskPlanPath)) return false;
+  const content = readMarkdown(taskPlanPath).toUpperCase();
+  return content.includes('[WORKTREE-CONFIRMED]');
 }
 
 /** 高风险变更评估（Superpowers P1-3） */
 function assessHighRiskChanges(projectRoot: string, featureId: string): HighRiskAssessment {
   const reasons: string[] = [];
   let requiresWorktree = false;
+  const hasGitRepo = hasLocalGitRepo(projectRoot);
 
   // 检查是否有跨目录重构信号
-  try {
-    const diffOutput = execSync('git diff --name-only HEAD~5 2>/dev/null || echo ""', {
-      cwd: projectRoot,
-      encoding: 'utf-8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
+  if (hasGitRepo) {
+    try {
+      const diffOutput = runGit(projectRoot, ['diff', '--name-only', 'HEAD~5']);
 
-    if (diffOutput) {
-      const changedFiles = diffOutput.split('\n').filter(f => f.trim());
-      const dirs = new Set(changedFiles.map(f => f.split('/')[0] ?? 'root'));
+      if (diffOutput) {
+        const changedFiles = diffOutput.split('\n').filter(f => f.trim());
+        const dirs = new Set(changedFiles.map(f => f.split('/')[0] ?? 'root'));
 
-      // 跨 3+ 目录视为高风险
-      if (dirs.size >= 3) {
-        reasons.push(`跨目录变更: ${dirs.size} 个目录`);
-        requiresWorktree = true;
+        // 跨 3+ 目录视为高风险
+        if (dirs.size >= 3) {
+          reasons.push(`跨目录变更: ${dirs.size} 个目录`);
+          requiresWorktree = true;
+        }
+
+        // 检查是否修改核心文件
+        const corePatterns = ['src/core/', 'src/shared/', 'config.'];
+        const hasCoreChanges = changedFiles.some(f =>
+          corePatterns.some(p => f.includes(p)),
+        );
+        if (hasCoreChanges) {
+          reasons.push('涉及核心模块变更');
+          requiresWorktree = true;
+        }
       }
-
-      // 检查是否修改核心文件
-      const corePatterns = ['src/core/', 'src/shared/', 'config.'];
-      const hasCoreChanges = changedFiles.some(f =>
-        corePatterns.some(p => f.includes(p)),
-      );
-      if (hasCoreChanges) {
-        reasons.push('涉及核心模块变更');
-        requiresWorktree = true;
-      }
+    } catch {
+      // Git 不可用时跳过
     }
-  } catch {
-    // Git 不可用时跳过
   }
 
   // 检查 task_plan.md 中是否有并行修复标记
@@ -154,14 +190,22 @@ function assessHighRiskChanges(projectRoot: string, featureId: string): HighRisk
 
 export function evaluateSkillHardGate(skillName: string, projectRoot: string): HardGateDecision {
   const expectedStage = HARD_GATE_STAGE_REQUIREMENTS[skillName];
-  if (!expectedStage) {
-    return { allowed: true, reason: 'skill does not require HARD-GATE', remediation: 'none' };
+  const requiresContext = Boolean(expectedStage) || skillName === 'orchestrate';
+
+  if (!requiresContext) {
+    return {
+      allowed: true,
+      severity: 'PASS',
+      reason: 'skill does not require HARD-GATE',
+      remediation: 'none',
+    };
   }
 
   const featureId = readCurrentFeature(projectRoot);
   if (!featureId) {
     return {
       allowed: false,
+      severity: 'BLOCKED',
       reason: `skill=${skillName} requires current feature pointer (.spec-first/current)`,
       remediation: '先在 P0 定位当前 Feature，再继续执行 HARD-GATE 校验',
     };
@@ -171,14 +215,16 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
   if (!currentStage) {
     return {
       allowed: false,
+      severity: 'BLOCKED',
       reason: `skill=${skillName} requires stage-state.json`,
       remediation: '补齐 stage-state.json 或重新初始化 Feature',
     };
   }
 
-  if (currentStage !== expectedStage) {
+  if (expectedStage && currentStage !== expectedStage) {
     return {
       allowed: false,
+      severity: 'BLOCKED',
       reason: `skill=${skillName} requires stage=${expectedStage}, current=${currentStage}`,
       remediation: `返回目标阶段 ${expectedStage}，禁止直接进入实施动作`,
     };
@@ -188,6 +234,7 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
   if (skillName === 'design' && !exists(join(specDir, 'spec.md'))) {
     return {
       allowed: false,
+      severity: 'BLOCKED',
       reason: 'design requires specs/{featureId}/spec.md',
       remediation: '先补齐需求规格产物 spec.md，再继续设计阶段',
     };
@@ -197,6 +244,7 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
     if (!exists(join(specDir, 'design.md'))) {
       return {
         allowed: false,
+        severity: 'BLOCKED',
         reason: 'code requires specs/{featureId}/design.md',
         remediation: '先完成 design 产物并通过相关校验',
       };
@@ -206,6 +254,7 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
     if (!exists(taskPlanPath)) {
       return {
         allowed: false,
+        severity: 'BLOCKED',
         reason: 'code requires specs/{featureId}/task_plan.md',
         remediation: '先补齐 task_plan.md 并标记当前执行任务',
       };
@@ -215,6 +264,7 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
     if (!hasInProgressTask(taskPlan)) {
       return {
         allowed: false,
+        severity: 'BLOCKED',
         reason: 'code requires an in_progress TASK',
         remediation: '先在 task_plan.md 标记 1 条 in_progress TASK，再进入实现',
       };
@@ -225,13 +275,28 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
   if (skillName === 'code' || skillName === 'orchestrate') {
     const currentBranch = getCurrentGitBranch(projectRoot);
     const highRiskAssessment = assessHighRiskChanges(projectRoot, featureId);
+    const inLinkedWorktree = isLinkedWorktree(projectRoot);
+    const worktreeConfirmed = hasWorktreeConfirmed(specDir);
 
-    // 在保护分支 + 高风险变更 → 建议使用 worktree
+    // 在保护分支 + 高风险变更 → 强制要求 worktree 或显式确认
     if (isProtectedBranch(currentBranch) && highRiskAssessment.requiresWorktree) {
+      if (!inLinkedWorktree && !worktreeConfirmed) {
+        return {
+          allowed: false,
+          severity: 'BLOCKED',
+          reason: `高风险操作检测: 当前在 ${currentBranch} 分支，${highRiskAssessment.reasons.join('; ')}`,
+          remediation: '请切换到 git worktree 后重试，或在 task_plan.md 添加 [WORKTREE-CONFIRMED] 明确确认',
+          highRiskAssessment,
+        };
+      }
+
       return {
-        allowed: true, // 不阻断，但给出强警告
-        reason: `高风险操作检测: 当前在 ${currentBranch} 分支，${highRiskAssessment.reasons.join('; ')}`,
-        remediation: '建议使用 git worktree 创建独立工作区，或在 task_plan.md 中添加 [WORKTREE-CONFIRMED] 标记',
+        allowed: true,
+        severity: 'WARN',
+        reason: `高风险操作已确认: 分支=${currentBranch}，${highRiskAssessment.reasons.join('; ')}`,
+        remediation: inLinkedWorktree
+          ? '已在 git worktree 中执行，请继续保持隔离工作区'
+          : '检测到 [WORKTREE-CONFIRMED]，请确保后续变更具备可回滚策略',
         highRiskAssessment,
       };
     }
@@ -239,34 +304,46 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
     // 普通情况也返回风险评估
     return {
       allowed: true,
+      severity: highRiskAssessment.isHighRisk ? 'WARN' : 'PASS',
       reason: `stage and prerequisites satisfied for ${skillName}`,
-      remediation: 'none',
+      remediation: highRiskAssessment.isHighRisk
+        ? `检测到高风险信号：${highRiskAssessment.reasons.join('; ')}。建议使用 worktree。`
+        : 'none',
       highRiskAssessment,
     };
   }
 
   return {
     allowed: true,
+    severity: 'PASS',
     reason: `stage and prerequisites satisfied for ${skillName}`,
     remediation: 'none',
   };
 }
 
 export function buildHardGateRuntimeNotice(skillName: string, projectRoot: string): string | undefined {
-  if (!HARD_GATE_STAGE_REQUIREMENTS[skillName]) return undefined;
+  if (!HARD_GATE_STAGE_REQUIREMENTS[skillName] && skillName !== 'orchestrate') return undefined;
 
   const decision = evaluateSkillHardGate(skillName, projectRoot);
-  const status = decision.allowed ? 'PASS' : 'BLOCKED';
-  const action = decision.allowed
-    ? '可以继续执行实现相关动作。'
-    : '当前仅允许执行定位与补齐动作，禁止实施写入。';
+  const status = decision.severity;
+  const action = status === 'BLOCKED'
+    ? '当前仅允许执行定位与补齐动作，禁止实施写入。'
+    : status === 'WARN'
+      ? '允许继续，但需优先处理风险提示后再实施写入。'
+      : '可以继续执行实现相关动作。';
 
-  return [
+  const lines = [
     '## HARD-GATE 运行时检查（自动）',
     `- Skill: ${skillName}`,
     `- 检查结果: ${status}`,
     `- 详情: ${decision.reason}`,
     `- 处置: ${decision.remediation}`,
     `- 约束: ${action}`,
-  ].join('\n');
+  ];
+
+  if (decision.highRiskAssessment?.isHighRisk) {
+    lines.push(`- 风险: ${decision.highRiskAssessment.reasons.join('; ')}`);
+  }
+
+  return lines.join('\n');
 }

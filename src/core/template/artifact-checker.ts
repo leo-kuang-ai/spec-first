@@ -3,7 +3,6 @@
  * 按 Mode×Size 检查并补全阶段产出物
  */
 import { join } from 'node:path';
-import { existsSync } from 'node:fs';
 import type { Mode, Size, StageState } from '../../shared/types.js';
 import { Stage } from '../../shared/types.js';
 import { readJson, exists } from '../../shared/fs-utils.js';

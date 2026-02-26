@@ -35,7 +35,7 @@ const TRANSITIONS: Record<Phase, Phase[]> = {
   ABORTED: [],
 };
 
-const MAX_REVISIONS = 5;
+const MAX_REVISIONS = 3;
 const ARCHIVE_THRESHOLD = 500;
 const KEEP_LINES = 200;
 const RISK_ARCHIVE_THRESHOLD = 200;
@@ -55,12 +55,13 @@ function shouldArchiveRuntimeFile(content: string, lines: string[]): boolean {
 }
 
 /** 创建初始状态 */
-export function createPhaseState(): PhaseState {
+export function createPhaseState(options?: { maxRevisions?: number }): PhaseState {
+  const maxRevisions = options?.maxRevisions ?? MAX_REVISIONS;
   return {
     current: 'P0_LOCATE',
     confirmed: false,
     revisionCount: 0,
-    maxRevisions: MAX_REVISIONS,
+    maxRevisions: maxRevisions > 0 ? maxRevisions : MAX_REVISIONS,
   };
 }
 
@@ -81,8 +82,11 @@ export function transition(state: PhaseState, to: Phase): PhaseState {
   if (state.current === 'P3_CONFIRM' && to === 'P2_GENERATE') {
     next.revisionCount = state.revisionCount + 1;
     next.confirmed = false;
-    if (next.revisionCount > MAX_REVISIONS) {
-      throw new Error(`Max revision rounds (${MAX_REVISIONS}) exceeded`);
+    if (next.revisionCount >= next.maxRevisions) {
+      throw new Error(
+        `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. `
+        + '必须升级到架构审查或方案重设计，禁止继续“再试一次”。',
+      );
     }
   }
 

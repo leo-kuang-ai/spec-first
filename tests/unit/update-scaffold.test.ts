@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { ExitCode } from '../../src/shared/types.js';
 
 vi.mock('../../src/shared/skill-commands.js', () => ({
-  ensureSkillCommands: vi.fn(() => ({ claude: [], codex: [], codexWarnings: [] })),
+  ensureSkillCommands: vi.fn(() => ({ claude: [], codex: [], generic: [], codexWarnings: [] })),
 }));
 vi.mock('../../src/shared/host-bootstrap.js', () => ({
   ensureHostBootstrap: vi.fn(() => ({ ok: true, results: [] })),
@@ -47,6 +47,7 @@ describe('update project scaffold', () => {
     expect(existsSync(configPath)).toBe(true);
     expect(existsSync(settingsPath)).toBe(true);
     expect(readFileSync(configPath, 'utf-8')).toContain('pilot_mode: false');
+    expect(readFileSync(configPath, 'utf-8')).toContain('kv_cache_hard_gate: false');
     expect(readFileSync(settingsPath, 'utf-8')).toContain('"hooks"');
   });
 

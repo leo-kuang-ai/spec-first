@@ -3,9 +3,37 @@ set -eu
 
 FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
 FILE="specs/$FEAT/task_plan.md"
+STAGE_FILE="specs/$FEAT/stage-state.json"
 [ -n "$FEAT" ] && [ -f "$FILE" ] || exit 0
 
 echo "=== TASK 上下文刷新 ==="
+if [ -f "$STAGE_FILE" ]; then
+  STAGE="$(awk -F'"' '/"currentStage"[[:space:]]*:/ {print $4; exit}' "$STAGE_FILE" 2>/dev/null || true)"
+  [ -n "$STAGE" ] && echo "Current Stage: $STAGE"
+fi
+
+OPEN_TASKS="$(
+  awk -F'|' '
+    BEGIN { count=0 }
+    /^\|/ {
+      taskid=""; last=""
+      for (i=1; i<=NF; i++) {
+        c=$i
+        gsub(/^[ \t]+|[ \t]+$/, "", c)
+        if (c != "") {
+          if (c ~ /^TASK-/ && taskid == "") taskid=c
+          last=c
+        }
+      }
+      if (taskid == "") next
+      s=tolower(last)
+      if (s != "complete" && s != "done" && s != "verified") count++
+    }
+    END { print count + 0 }
+  ' "$FILE"
+)"
+echo "Open TASKs: $OPEN_TASKS"
+
 awk -F'|' '
   BEGIN { found=0 }
   /^\|/ {

@@ -3,8 +3,16 @@
  * PreToolUse / PostToolUse / Stop 三个 Hook
  */
 import { join } from 'node:path';
-import { appendFileSync, chmodSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'node:fs';
 import { exists } from '../../shared/fs-utils.js';
+import { loadEnabledExtensions } from '../process-engine/extensions.js';
+import {
+  TASK_CONTEXT_SCRIPT,
+  STOP_GUARD_SCRIPT,
+  PROGRESS_SYNC_SCRIPT,
+  MANAGED_HOOK_COMMAND_MARKERS,
+  ensureManagedHookScripts,
+} from './ai-runtime-hook-scripts.js';
 
 export type AIHookType = 'PreToolUse' | 'PostToolUse' | 'Stop';
 
@@ -21,144 +29,34 @@ export interface AIHookResult {
   softBlock?: boolean;
 }
 
-const TASK_CONTEXT_SCRIPT = '.spec-first/hooks/task-context.sh';
-const STOP_GUARD_SCRIPT = '.spec-first/hooks/stop-guard.sh';
-const PROGRESS_SYNC_SCRIPT = '.spec-first/hooks/progress-sync.sh';
-const MANAGED_HOOK_COMMAND_MARKERS = [
-  'npx spec-first gate check',
-  'npx spec-first matrix check',
-  'npx spec-first ai stats',
-  `sh ${TASK_CONTEXT_SCRIPT}`,
-  `sh ${STOP_GUARD_SCRIPT}`,
-  `sh ${PROGRESS_SYNC_SCRIPT}`,
-] as const;
-
-const TASK_CONTEXT_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
-set -eu
-
-FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
-FILE="specs/$FEAT/task_plan.md"
-[ -n "$FEAT" ] && [ -f "$FILE" ] || exit 0
-
-echo "=== TASK 上下文刷新 ==="
-awk -F'|' '
-  BEGIN { found=0 }
-  /^\|/ {
-    n=0; taskid=""; title=""; last=""
-    for (i=1; i<=NF; i++) {
-      c=$i
-      gsub(/^[ \t]+|[ \t]+$/, "", c)
-      if (c != "") {
-        n++
-        if (c ~ /^TASK-/ && taskid == "") taskid=c
-        if (n==1 || n==2) { if (taskid != "" && title == "") { title=c } }
-        last=c
-      }
-    }
-    if (taskid == "") next
-    if (title == taskid) title=""
-    s=tolower(last)
-    if (s=="in_progress" || s=="in progress") {
-      printf("Current TASK: %s | %s | %s\n", taskid, title, last)
-      found=1
-    }
-  }
-  END {
-    if (!found) print "Current TASK: (no in_progress task found)"
-  }
-' "$FILE"
-`;
-
-const STOP_GUARD_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
-set -eu
-
-FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
-FILE="specs/$FEAT/task_plan.md"
-if [ -z "$FEAT" ] || [ ! -f "$FILE" ]; then
-  exit 0
-fi
-
-PENDING_IDS="$(
-  awk -F'|' '
-    /^\|/ {
-      taskid=""; last=""
-      for (i=1; i<=NF; i++) {
-        c=$i
-        gsub(/^[ \t]+|[ \t]+$/, "", c)
-        if (c != "") {
-          if (c ~ /^TASK-/ && taskid == "") taskid=c
-          last=c
-        }
-      }
-      if (taskid == "") next
-      s=tolower(last)
-      if (s != "complete" && s != "done" && s != "verified") print taskid
-    }
-  ' "$FILE"
-)"
-
-if [ -n "$PENDING_IDS" ]; then
-  echo "⚠️ 仍有未完成 TASK：" >&2
-  echo "$PENDING_IDS" >&2
-  exit 2
-fi
-`;
-
-// Planning-with-Files P1-2: PostToolUse 进度同步提醒脚本
-const PROGRESS_SYNC_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
-set -eu
-
-FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
-FILE="specs/$FEAT/task_plan.md"
-[ -n "$FEAT" ] && [ -f "$FILE" ] || exit 0
-
-echo "=== 进度同步提醒 ==="
-echo "文件已修改。如果此次修改完成了一个 TASK 或 AC，请检查是否需要更新 task_plan.md 中的完成状态。"
-echo "当前 in_progress TASK:"
-awk -F'|' '
-  /^\|/ && !/---/ {
-    taskid=""; title=""; status=""
-    for (i=1; i<=NF; i++) {
-      c=$i; gsub(/^[ \t]+|[ \t]+$/, "", c)
-      if (c ~ /^TASK-/ && taskid == "") { taskid=c; next }
-      if (c ~ /in_progress/i) status=c
-      if (title=="" && c!~/^TASK-/ && c!~/status/i && c!="") title=c
-    }
-    if (taskid!="") {
-      printf("  - %s | %s | %s\n", taskid, title, status)
-      exit
-    }
-  }
-' "$FILE" || echo "  (无 in_progress TASK)"
-`;
+const WRITE_INTENT_MATCHER = 'write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append';
 
 function wrapSoftHook(command: string, hookName: string): string {
   return `sh -c '${command} || echo "spec-first: ${hookName} hook 执行失败（已降级）" >&2'`;
 }
 
 /** 生成 AI Runtime Hook 配置（用于写入 .claude/settings.json） */
-export function generateAIHookConfigs(_projectRoot: string): AIHookConfig[] {
+export function generateAIHookConfigs(projectRoot: string): AIHookConfig[] {
   const bin = 'npx spec-first';
-
-  return [
+  const builtins: AIHookConfig[] = [
     {
       type: 'PreToolUse',
-      matcher: 'write|edit|create',
+      matcher: WRITE_INTENT_MATCHER,
       command: wrapSoftHook(`sh ${TASK_CONTEXT_SCRIPT}`, 'task-context'),
     },
     {
       type: 'PreToolUse',
-      matcher: 'write|edit|create',
+      matcher: WRITE_INTENT_MATCHER,
       command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} gate check "$FEAT" || echo "spec-first: 跳过 gate 检查（无当前 feature）"'`,
     },
     {
       type: 'PostToolUse',
-      matcher: 'write|edit|create',
+      matcher: WRITE_INTENT_MATCHER,
       command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n "$FEAT" ]; then ${bin} matrix check "$FEAT" || echo "spec-first: matrix check 执行失败（已降级）" >&2; else echo "spec-first: 跳过 matrix 检查（无当前 feature）"; fi'`,
     },
     {
       type: 'PostToolUse',
-      matcher: 'write|edit|create',
+      matcher: WRITE_INTENT_MATCHER,
       command: wrapSoftHook(`sh ${PROGRESS_SYNC_SCRIPT}`, 'progress-sync'),
     },
     {
@@ -170,6 +68,16 @@ export function generateAIHookConfigs(_projectRoot: string): AIHookConfig[] {
       command: `sh ${STOP_GUARD_SCRIPT}`,
     },
   ];
+
+  const extHooks: AIHookConfig[] = loadEnabledExtensions(projectRoot)
+    .flatMap((ext) => ext.hooks.map((hook) => ({
+      type: hook.type,
+      matcher: hook.matcher,
+      // 命名空间注入用于审计定位（不改变 hook 本体语义）
+      command: `sh -c 'SPEC_FIRST_EXTENSION_NAMESPACE=${ext.namespace}; ${hook.command}'`,
+    })));
+
+  return [...builtins, ...extHooks];
 }
 
 function groupHookConfigs(configs: AIHookConfig[]): Map<AIHookType, AIHookConfig[]> {
@@ -184,6 +92,7 @@ function groupHookConfigs(configs: AIHookConfig[]): Map<AIHookType, AIHookConfig
 
 function buildHookEntry(config: AIHookConfig): Record<string, unknown> {
   const entry: Record<string, unknown> = {
+    specFirstManaged: true,
     hooks: [{ type: 'command', command: config.command }],
   };
   if (config.matcher) entry.matcher = config.matcher;
@@ -192,36 +101,12 @@ function buildHookEntry(config: AIHookConfig): Record<string, unknown> {
 
 function isManagedHookEntry(item: unknown): boolean {
   const entry = item as Record<string, unknown> | undefined;
+  if (entry?.specFirstManaged === true) return true;
   const hooks = entry?.hooks;
   if (!Array.isArray(hooks)) return false;
   return hooks.some((hook: Record<string, unknown>) =>
     typeof hook.command === 'string'
     && MANAGED_HOOK_COMMAND_MARKERS.some((marker) => (hook.command as string).includes(marker)));
-}
-
-function ensureManagedHookScripts(projectRoot: string, dryRun: boolean): void {
-  if (dryRun) return;
-
-  const scriptSpecs = [
-    {
-      path: join(projectRoot, TASK_CONTEXT_SCRIPT),
-      content: TASK_CONTEXT_SCRIPT_CONTENT,
-    },
-    {
-      path: join(projectRoot, STOP_GUARD_SCRIPT),
-      content: STOP_GUARD_SCRIPT_CONTENT,
-    },
-    {
-      path: join(projectRoot, PROGRESS_SYNC_SCRIPT),
-      content: PROGRESS_SYNC_SCRIPT_CONTENT,
-    },
-  ];
-
-  mkdirSync(join(projectRoot, '.spec-first', 'hooks'), { recursive: true });
-  for (const script of scriptSpecs) {
-    writeFileSync(script.path, `${script.content.trimEnd()}\n`, 'utf-8');
-    chmodSync(script.path, 0o755);
-  }
 }
 
 /** 注册 AI Hook 到宿主环境配置 */

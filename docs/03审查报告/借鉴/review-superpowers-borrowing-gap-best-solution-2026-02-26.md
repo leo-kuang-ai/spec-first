@@ -4,6 +4,35 @@
 > 输入文档：`docs/01需求文档/v2/优势借鉴分析/Spec-First 可借鉴 Superpowers 的要素分析.md`  
 > 结论基线：13 项要素中，8 项完成，5 项部分完成
 
+## 修复进度更新（2026-02-26）
+
+> 本节为最新修复状态；上方“结论基线”保留为初审快照。
+
+### 总体进度
+
+- 已完成：5/5
+- 部分完成：0/5
+- 未启动：0/5
+
+### 分项进度
+
+| 问题ID | 问题 | 最新状态 | 关键落地点 |
+|---|---|---|---|
+| P0-1 | Session Hook 路由表 + 1% 规则 | ✅ 已完成 | `src/core/tool-integration/session-hook.ts`、`tests/unit/session-hook.test.ts` |
+| P1-2 | Graphviz 决策图覆盖不足 | ✅ 已完成 | `skills/spec-first/03-spec/SKILL.md`、`skills/spec-first/04-design/SKILL.md`、`skills/spec-first/13-orchestrate/SKILL.md` |
+| P1-3 | Worktree First 运行时守卫不足 | ✅ 已完成 | `src/core/skill-runtime/hard-gate.ts`、`tests/unit/hard-gate.test.ts` |
+| P1-4 | Hook Hardening 缺少 doctor 可达性诊断 | ✅ 已完成 | `src/cli/commands/doctor.ts`、`tests/unit/cli-metrics-doctor.test.ts` |
+| P2-5 | Fresh Context Per Task 执行闭环不足 | ✅ 已完成 | `src/core/ai-orchestrator/todo-runner.ts`、`src/core/ai-orchestrator/context-pack.ts`、`tests/unit/todo-runner.test.ts` |
+
+### 验证结果
+
+- `npm run -s typecheck`：通过
+- `npm test`：通过（58 个测试文件，596/596 用例通过）
+
+### 备注
+
+- 本轮最后收口项为 P1-4：`doctor` 在 SessionStart 条目缺失时统一输出“内容不完整 + 缺失片段”，消除诊断分支不稳定问题。
+
 ## 1. 问题总览
 
 | 优先级 | 问题 | 当前状态 | 目标状态 |

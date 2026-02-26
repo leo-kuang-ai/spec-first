@@ -88,4 +88,11 @@ describe('nextId', () => {
     const r = nextId({ type: 'DS', abbr: 'AUTH', featureId: FEAT_ID, projectRoot: TMP });
     expect(r.id).toBe('DS-AUTH-001');
   });
+
+  it('should generate V-Model IDs via nextId', () => {
+    const req = nextId({ type: 'REQ', abbr: 'AUTH', featureId: FEAT_ID, projectRoot: TMP });
+    const atp = nextId({ type: 'ATP', abbr: 'AUTH', featureId: FEAT_ID, projectRoot: TMP });
+    expect(req.id).toBe('REQ-AUTH-001');
+    expect(atp.id).toBe('ATP-AUTH-001');
+  });
 });

@@ -76,6 +76,8 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   'feature-list': '列出当前项目全部 Feature',
   'feature-switch': '切换当前 Feature 上下文（更新 .spec-first/current）',
   'feature-current': '查看当前 Feature 与阶段信息',
+  'spec-review': '定位 Feature 并执行需求规格质量审查（C10）',
+  analyze: '执行跨产物一致性分析并生成分析报告',
 };
 
 /** 验证 Codex SKILL.md 是否包含有效 YAML frontmatter（name + description） */
@@ -169,15 +171,20 @@ description: ${description}
 export interface SkillCommandResult {
   claude: string[];
   codex: string[];
+  generic: string[];
   /** Codex skill 验证警告（frontmatter 缺失或无效） */
   codexWarnings: string[];
 }
+
+export type SkillHostTarget = 'claude' | 'codex' | 'generic' | 'all';
 
 export interface SkillCommandOptions {
   /** true = 全局（~/.claude/commands/ + ~/.codex/skills/），false = 项目级（仅 .claude/commands/） */
   global?: boolean;
   /** true = 仅收集待注册列表，不执行任何文件写入 */
   dryRun?: boolean;
+  /** 指定要刷新的宿主。默认：global=claude+codex，local=claude */
+  hosts?: SkillHostTarget[];
 }
 
 /**
@@ -250,6 +257,46 @@ function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?
   return { created, warnings };
 }
 
+function ensureGenericSkills(skills: SkillEntry[], genericSkillsDir: string, dryRun?: boolean): string[] {
+  if (!dryRun) {
+    mkdirSync(genericSkillsDir, { recursive: true });
+  }
+  const namespaceDir = join(genericSkillsDir, 'spec-first');
+  if (!dryRun) {
+    mkdirSync(namespaceDir, { recursive: true });
+  }
+
+  const created: string[] = [];
+  for (const entry of skills) {
+    if (!dryRun) {
+      const target = join(namespaceDir, entry.skillName);
+      rmSync(target, { recursive: true, force: true });
+      cpSync(entry.skillDir, target, { recursive: true });
+    }
+    created.push(`spec-first:${entry.skillName}`);
+  }
+
+  return created;
+}
+
+function resolveHosts(isGlobal: boolean, hosts?: SkillHostTarget[]): Set<'claude' | 'codex' | 'generic'> {
+  if (!hosts || hosts.length === 0) {
+    return new Set(isGlobal ? ['claude', 'codex'] : ['claude']);
+  }
+
+  const resolved = new Set<'claude' | 'codex' | 'generic'>();
+  for (const host of hosts) {
+    if (host === 'all') {
+      resolved.add('claude');
+      resolved.add('codex');
+      resolved.add('generic');
+      continue;
+    }
+    resolved.add(host);
+  }
+  return resolved;
+}
+
 function cleanupLegacyClaudeCommands(commandsDir: string, skills: SkillEntry[]): void {
   for (const entry of skills) {
     const legacy = join(commandsDir, `${entry.commandName}.md`);
@@ -279,6 +326,7 @@ export function ensureSkillCommands(projectRoot: string, options?: SkillCommandO
   const isGlobal = options?.global ?? false;
   const dryRun = options?.dryRun;
   const hostPaths = detectHostPaths();
+  const hosts = resolveHosts(isGlobal, options?.hosts);
 
   // 同步 skills 到用户级固定目录
   const userSkillsRoot = syncSkillsToUserDir(hostPaths.specFirstSkillsDir, dryRun);
@@ -292,10 +340,22 @@ export function ensureSkillCommands(projectRoot: string, options?: SkillCommandO
     ? hostPaths.claudeCommandsDir
     : join(projectRoot, '.claude', 'commands');
 
-  const claude = ensureClaudeCommands(claudeDir, skills, dryRun);
-  const codexResult = isGlobal
+  const claude = hosts.has('claude')
+    ? ensureClaudeCommands(claudeDir, skills, dryRun)
+    : [];
+
+  const codexResult = (isGlobal && hosts.has('codex'))
     ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun)
     : { created: [], warnings: [] };
 
-  return { claude, codex: codexResult.created, codexWarnings: codexResult.warnings };
+  const generic = (isGlobal && hosts.has('generic'))
+    ? ensureGenericSkills(skills, hostPaths.genericSkillsDir, dryRun)
+    : [];
+
+  return {
+    claude,
+    codex: codexResult.created,
+    generic,
+    codexWarnings: codexResult.warnings,
+  };
 }

@@ -98,6 +98,26 @@ function sleepMs(ms: number): void {
   Atomics.wait(lock, 0, 0, ms);
 }
 
+function releaseRegistryLock(lockFd: number, lockPath: string): void {
+  closeSync(lockFd);
+  try {
+    unlinkSync(lockPath);
+  } catch {
+    // ignore unlock cleanup failure
+  }
+}
+
+function shouldRetryRegistryLock(error: unknown, lockPath: string, startAt: number): boolean {
+  const err = error as NodeJS.ErrnoException;
+  if (err.code !== 'EEXIST') throw error;
+  if (tryRecoverStaleRegistryLock(lockPath)) return true;
+  if (Date.now() - startAt >= REGISTRY_LOCK_TIMEOUT_MS) {
+    throw new Error(`获取 FEAT 注册表锁超时：${lockPath}`);
+  }
+  sleepMs(REGISTRY_LOCK_RETRY_MS);
+  return true;
+}
+
 function withRegistryLock<T>(specsDir: string, action: () => T): T {
   const lockPath = join(specsDir, REGISTRY_LOCK_FILE);
   const start = Date.now();
@@ -109,22 +129,10 @@ function withRegistryLock<T>(specsDir: string, action: () => T): T {
         writeRegistryLockPayload(lockPath);
         return action();
       } finally {
-        closeSync(lockFd);
-        try {
-          unlinkSync(lockPath);
-        } catch {
-          // ignore unlock cleanup failure
-        }
+        releaseRegistryLock(lockFd, lockPath);
       }
     } catch (error) {
-      const err = error as NodeJS.ErrnoException;
-      if (err.code !== 'EEXIST') throw error;
-      if (tryRecoverStaleRegistryLock(lockPath)) continue;
-
-      if (Date.now() - start >= REGISTRY_LOCK_TIMEOUT_MS) {
-        throw new Error(`获取 FEAT 注册表锁超时：${lockPath}`);
-      }
-      sleepMs(REGISTRY_LOCK_RETRY_MS);
+      shouldRetryRegistryLock(error, lockPath, start);
     }
   }
 }
@@ -272,10 +280,42 @@ function skeletonMatrix(): string {
 function skeletonConstitution(featureId: string, projectRoot: string): string {
   const globalPath = join(projectRoot, '.spec-first', 'constitution.md');
   if (exists(globalPath)) {
-    return readMarkdown(globalPath);
+    return ensureConstitutionMeta(readMarkdown(globalPath));
   }
-  return `# Constitution — ${featureId}\n\n`
-    + `> 项目宪法副本。请在 .spec-first/constitution.md 中维护主版本。\n`;
+  return ensureConstitutionMeta(
+    `# Constitution — ${featureId}\n\n`
+    + `> 项目宪法副本。请在 .spec-first/constitution.md 中维护主版本。\n\n`
+    + `## Core Principles\n\n`
+    + `1. 规范先行（Specification First）\n`
+    + `2. 全链路追踪（Traceability）\n`
+    + `3. 质量门禁（Quality Gates）\n\n`,
+  );
+}
+
+function ensureConstitutionMeta(content: string): string {
+  const today = new Date().toISOString().slice(0, 10);
+  let next = content.trimEnd();
+
+  const hasVersion = /(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*[vV]?\d+\.\d+\.\d+/i.test(next);
+  const hasRatified = /(?:\*\*)?\s*(?:ratified|批准日期|通过日期|生效日期)\s*(?:\*\*)?\s*[:：]\s*\d{4}-\d{2}-\d{2}/i.test(next);
+  const hasLastAmended = /(?:\*\*)?\s*(?:last[_\s-]*amended|最近修订|最后修订)\s*(?:\*\*)?\s*[:：]\s*\d{4}-\d{2}-\d{2}/i.test(next);
+  const hasAmendmentHistory = /(?:^|\n)##\s*(amendment history|修订历史)\b/i.test(next);
+
+  if (!hasVersion || !hasRatified || !hasLastAmended) {
+    next += '\n\n## Meta\n';
+    if (!hasVersion) next += '\n- Version: 1.0.0';
+    if (!hasRatified) next += `\n- Ratified: ${today}`;
+    if (!hasLastAmended) next += `\n- Last Amended: ${today}`;
+  }
+
+  if (!hasAmendmentHistory) {
+    next += '\n\n## Amendment History\n\n'
+      + '| Version | Date | Summary |\n'
+      + '|---------|------|---------|\n'
+      + `| 1.0.0 | ${today} | Initial constitution |`;
+  }
+
+  return `${next.trimEnd()}\n`;
 }
 
 function writeCurrentFeature(projectRoot: string, featureId: string): void {
@@ -314,6 +354,152 @@ function ensureProjectConfig(projectRoot: string): void {
   }
 }
 
+interface FeatureInitTargets {
+  specsDir: string;
+  featureId: string;
+  featureDir: string;
+  tmpFeatureDir: string;
+}
+
+function resolveFeatureInitTargets(opts: InitOptions): FeatureInitTargets {
+  const specsDir = join(opts.projectRoot, 'specs');
+  const featureId = opts.featureId ?? generateFeatureId(opts.feat, specsDir);
+  const featureDir = join(specsDir, featureId);
+  const tmpFeatureDir = join(specsDir, `.${featureId}.tmp-${process.pid}-${Date.now()}`);
+  return { specsDir, featureId, featureDir, tmpFeatureDir };
+}
+
+function assertFeatNotOccupied(existingId: string | undefined, feat: string, featureId: string): void {
+  if (existingId && existingId !== featureId) {
+    throw new Error(`FEAT 缩写 "${feat}" 已被注册到 ${existingId}`);
+  }
+}
+
+function recoverExistingFeature(
+  opts: InitOptions,
+  specsDir: string,
+  featureId: string,
+  featureDir: string,
+  existingId: string | undefined,
+  mergedRules: MergedRules,
+): InitResult {
+  if (!existingId) {
+    registerFeat(specsDir, opts.feat, featureId);
+  }
+  writeCurrentFeature(opts.projectRoot, featureId);
+  return { featureId, featureDir, mergedRules };
+}
+
+function createInitialStageState(
+  opts: InitOptions,
+  featureId: string,
+  mergedRules: MergedRules,
+): StageState {
+  const now = new Date().toISOString();
+  return {
+    featureId,
+    mode: opts.mode,
+    size: opts.size,
+    platforms: opts.platforms,
+    mergedRules: {
+      gateConditions: mergedRules.gateConditions as Record<string, unknown[]>,
+      deliverables: mergedRules.deliverables as Record<string, unknown[]>,
+      thresholds: mergedRules.thresholds,
+    },
+    currentStage: Stage.INIT,
+    history: [],
+    terminal: false,
+    title: opts.title,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+function writeFeatureSkeleton(
+  tmpFeatureDir: string,
+  opts: InitOptions,
+  featureId: string,
+  mergedRules: MergedRules,
+): void {
+  ensureDir(tmpFeatureDir);
+  ensureDir(join(tmpFeatureDir, 'reports'));
+  ensureDir(join(tmpFeatureDir, 'contracts'));
+  ensureDir(join(tmpFeatureDir, 'tests'));
+
+  const state = createInitialStageState(opts, featureId, mergedRules);
+  writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
+  writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
+  writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
+  writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
+  writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(featureId, opts.projectRoot));
+}
+
+function commitFeatureInit(
+  opts: InitOptions,
+  specsDir: string,
+  featureId: string,
+  featureDir: string,
+  tmpFeatureDir: string,
+): 'created' | 'idempotent' {
+  return withRegistryLock(specsDir, () => {
+    const latest = loadRegistry(specsDir);
+    const latestExistingId = latest.get(opts.feat);
+
+    if (exists(featureDir)) {
+      if (!latestExistingId) {
+        registerFeatUnlocked(specsDir, opts.feat, featureId);
+      }
+      writeCurrentFeature(opts.projectRoot, featureId);
+      return 'idempotent';
+    }
+
+    if (latestExistingId && latestExistingId !== featureId) {
+      throw new Error(`FEAT 缩写 "${opts.feat}" 已被注册到 ${latestExistingId}`);
+    }
+
+    const currentSnapshot = snapshotCurrentFeature(opts.projectRoot);
+    let renamed = false;
+    try {
+      renameSync(tmpFeatureDir, featureDir);
+      renamed = true;
+      writeCurrentFeature(opts.projectRoot, featureId);
+      if (!latestExistingId) {
+        registerFeatUnlocked(specsDir, opts.feat, featureId);
+      }
+      return 'created';
+    } catch (error) {
+      if (renamed) {
+        rmSync(featureDir, { recursive: true, force: true });
+      }
+      restoreCurrentFeature(opts.projectRoot, currentSnapshot);
+      throw error;
+    }
+  });
+}
+
+function recoverFromInitError(
+  error: unknown,
+  opts: InitOptions,
+  specsDir: string,
+  featureId: string,
+  featureDir: string,
+  tmpFeatureDir: string,
+  mergedRules: MergedRules,
+): InitResult {
+  rmSync(tmpFeatureDir, { recursive: true, force: true });
+  if (!exists(featureDir)) {
+    throw error;
+  }
+  return recoverExistingFeature(
+    opts,
+    specsDir,
+    featureId,
+    featureDir,
+    loadRegistry(specsDir).get(opts.feat),
+    mergedRules,
+  );
+}
+
 // ─── 主逻辑 ──────────────────────────────────────────────
 
 /**
@@ -323,130 +509,53 @@ function ensureProjectConfig(projectRoot: string): void {
 export function init(opts: InitOptions): InitResult {
   validateFeat(opts.feat);
 
-  const specsDir = join(opts.projectRoot, 'specs');
-  ensureDir(specsDir);
+  const targets = resolveFeatureInitTargets(opts);
+  ensureDir(targets.specsDir);
   ensureProjectConfig(opts.projectRoot);
 
-  // FEAT 缩写唯一性检查
-  const registry = loadRegistry(specsDir);
-  const existingId = registry.get(opts.feat);
+  const existingId = loadRegistry(targets.specsDir).get(opts.feat);
+  const mergedRules = mergeLayerRules(opts.mode, opts.size, opts.platforms, opts.projectRoot);
 
-  // 生成或使用指定的 Feature ID
-  const featureId = opts.featureId ?? generateFeatureId(opts.feat, specsDir);
-  const featureDir = join(specsDir, featureId);
-
-  // 幂等：已存在则直接返回
-  if (exists(featureDir)) {
-    // 幂等自愈：修复 current 指针与 FEAT 注册表缺失
-    if (!existingId) {
-      registerFeat(specsDir, opts.feat, featureId);
-    }
-    writeCurrentFeature(opts.projectRoot, featureId);
-    const mergedRules = mergeLayerRules(opts.mode, opts.size, opts.platforms, opts.projectRoot);
-    return { featureId, featureDir, mergedRules };
-  }
-
-  // FEAT 已被其他 Feature 注册
-  if (existingId && existingId !== featureId) {
-    throw new Error(
-      `FEAT 缩写 "${opts.feat}" 已被注册到 ${existingId}`,
+  if (exists(targets.featureDir)) {
+    return recoverExistingFeature(
+      opts,
+      targets.specsDir,
+      targets.featureId,
+      targets.featureDir,
+      existingId,
+      mergedRules,
     );
   }
 
-  // 三层合并
-  const mergedRules = mergeLayerRules(opts.mode, opts.size, opts.platforms, opts.projectRoot);
+  assertFeatNotOccupied(existingId, opts.feat, targets.featureId);
 
-  const tmpFeatureDir = join(specsDir, `.${featureId}.tmp-${process.pid}-${Date.now()}`);
   try {
-    // 阶段一：创建临时目录并写入全部产物
-    ensureDir(tmpFeatureDir);
-    ensureDir(join(tmpFeatureDir, 'reports'));
-    ensureDir(join(tmpFeatureDir, 'contracts'));
-    ensureDir(join(tmpFeatureDir, 'tests'));
-
-    const now = new Date().toISOString();
-
-    // stage-state.json
-    const state: StageState = {
-      featureId,
-      mode: opts.mode,
-      size: opts.size,
-      platforms: opts.platforms,
-      mergedRules: {
-        gateConditions: mergedRules.gateConditions as Record<string, unknown[]>,
-        deliverables: mergedRules.deliverables as Record<string, unknown[]>,
-        thresholds: mergedRules.thresholds,
-      },
-      currentStage: Stage.INIT,
-      history: [],
-      terminal: false,
-      title: opts.title,
-      createdAt: now,
-      updatedAt: now,
-    };
-    writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
-
-    // 运行态文件
-    writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
-    writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
-
-    // traceability-matrix.md
-    writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
-
-    // constitution.md 副本
-    writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(featureId, opts.projectRoot));
-
-    // 阶段二：在短临界区内做提交（唯一性校验/原子落盘/注册/current）
-    const commitResult = withRegistryLock(specsDir, () => {
-      const latest = loadRegistry(specsDir);
-      const latestExistingId = latest.get(opts.feat);
-
-      if (exists(featureDir)) {
-        if (!latestExistingId) {
-          registerFeatUnlocked(specsDir, opts.feat, featureId);
-        }
-        writeCurrentFeature(opts.projectRoot, featureId);
-        return 'idempotent' as const;
-      }
-
-      if (latestExistingId && latestExistingId !== featureId) {
-        throw new Error(`FEAT 缩写 "${opts.feat}" 已被注册到 ${latestExistingId}`);
-      }
-
-      const currentSnapshot = snapshotCurrentFeature(opts.projectRoot);
-      let renamed = false;
-      try {
-        renameSync(tmpFeatureDir, featureDir);
-        renamed = true;
-        writeCurrentFeature(opts.projectRoot, featureId);
-        if (!latestExistingId) {
-          registerFeatUnlocked(specsDir, opts.feat, featureId);
-        }
-        return 'created' as const;
-      } catch (error) {
-        if (renamed) {
-          rmSync(featureDir, { recursive: true, force: true });
-        }
-        restoreCurrentFeature(opts.projectRoot, currentSnapshot);
-        throw error;
-      }
-    });
-
+    writeFeatureSkeleton(targets.tmpFeatureDir, opts, targets.featureId, mergedRules);
+    const commitResult = commitFeatureInit(
+      opts,
+      targets.specsDir,
+      targets.featureId,
+      targets.featureDir,
+      targets.tmpFeatureDir,
+    );
     if (commitResult === 'idempotent') {
-      rmSync(tmpFeatureDir, { recursive: true, force: true });
+      rmSync(targets.tmpFeatureDir, { recursive: true, force: true });
     }
   } catch (error) {
-    rmSync(tmpFeatureDir, { recursive: true, force: true });
-    if (exists(featureDir)) {
-      // 并发场景：其他进程已完成初始化，走幂等自愈返回
-      if (!loadRegistry(specsDir).get(opts.feat)) {
-        registerFeat(specsDir, opts.feat, featureId);
-      }
-      writeCurrentFeature(opts.projectRoot, featureId);
-      return { featureId, featureDir, mergedRules };
-    }
-    throw error;
+    return recoverFromInitError(
+      error,
+      opts,
+      targets.specsDir,
+      targets.featureId,
+      targets.featureDir,
+      targets.tmpFeatureDir,
+      mergedRules,
+    );
   }
 
-  return { featureId, featureDir, mergedRules };
+  return {
+    featureId: targets.featureId,
+    featureDir: targets.featureDir,
+    mergedRules,
+  };
 }

@@ -20,6 +20,8 @@ export interface HostPaths {
   claudeConfigDir: string;
   claudeConfigFiles: string[];
   agentsSkillsDir: string;
+  genericHomeDir: string;
+  genericSkillsDir: string;
   specFirstSkillsDir: string;
   bootstrapCacheDir: string;
 }
@@ -31,6 +33,7 @@ export function formatHostPathSummary(paths: HostPaths): string[] {
     `Claude 配置目录: ${paths.claudeConfigDir}`,
     `Claude 命令目录: ${paths.claudeCommandsDir}`,
     `Claude skills: ${paths.claudeSkillsDir}`,
+    `Generic skills: ${paths.genericSkillsDir}`,
     `spec-first skills: ${paths.specFirstSkillsDir}`,
   ];
 }
@@ -143,6 +146,10 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
   const agentsSkillsDir = env.AGENTS_HOME?.trim()
     ? join(env.AGENTS_HOME.trim(), 'skills')
     : join(homeDir, '.agents', 'skills');
+  const genericHomeDir = env.SPEC_FIRST_GENERIC_HOME?.trim()
+    || join(homeDir, '.spec-first', 'generic');
+  const genericSkillsDir = env.SPEC_FIRST_GENERIC_SKILLS_DIR?.trim()
+    || join(genericHomeDir, 'skills');
   const specFirstSkillsDir = env.SPEC_FIRST_SKILLS_DIR?.trim()
     || join(homeDir, '.spec-first', 'skills');
   const bootstrapCacheDir = env.SPEC_FIRST_BOOTSTRAP_CACHE?.trim()
@@ -160,6 +167,8 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
     claudeConfigDir,
     claudeConfigFiles,
     agentsSkillsDir,
+    genericHomeDir,
+    genericSkillsDir,
     specFirstSkillsDir,
     bootstrapCacheDir,
   };

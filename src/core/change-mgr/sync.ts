@@ -4,7 +4,7 @@
  */
 import { join } from 'node:path';
 import { appendFileSync } from 'node:fs';
-import type { MatrixRow, MatrixStatus } from '../../shared/types.js';
+import type { MatrixStatus } from '../../shared/types.js';
 import { parseMatrix, updateMatrixRow } from '../trace-engine/matrix.js';
 import { exists } from '../../shared/fs-utils.js';
 

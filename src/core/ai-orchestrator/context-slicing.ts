@@ -3,7 +3,7 @@
  * 默认预算 16K tokens，L1≤20% / L2≤30% / L3≥50%
  * 降级顺序：L2非关键 → L3 Top-N → control ID-only
  */
-import type { ContextPack, ContextRef } from './context-pack.js';
+import type { ContextRef } from './context-pack.js';
 import type { Size } from '../../shared/types.js';
 
 export interface SliceConfig {
@@ -16,6 +16,8 @@ export interface SliceConfig {
 export interface SliceResult {
   refs: ContextRef[];
   degradationLevel: number; // 0=none, 1=L2 trimmed, 2=L3 top-N, 3=control ID-only
+  tokensBefore: number;
+  tokensAfter: number;
   warning?: string;
 }
 
@@ -41,32 +43,68 @@ export function sliceContext(
   refs: ContextRef[],
   config: SliceConfig = DEFAULT_CONFIG,
 ): SliceResult {
-  // 粗略估算：每个 ref 约 200 tokens
-  const estimatedTokens = refs.length * 200;
+  const estimate = (ref: ContextRef): number => (
+    typeof ref.estimatedTokens === 'number' && ref.estimatedTokens > 0
+      ? ref.estimatedTokens
+      : 200
+  );
+  const estimatedTokens = refs.reduce((sum, ref) => sum + estimate(ref), 0);
+  const order = new Map(refs.map((ref, idx) => [`${ref.path}::${ref.selector ?? ''}::${ref.checksum}`, idx]));
+  const sortBySourceOrder = (items: ContextRef[]): ContextRef[] => (
+    [...items].sort((a, b) => (
+      (order.get(`${a.path}::${a.selector ?? ''}::${a.checksum}`) ?? 0)
+      - (order.get(`${b.path}::${b.selector ?? ''}::${b.checksum}`) ?? 0)
+    ))
+  );
 
   if (estimatedTokens <= config.budgetTokens) {
-    return { refs, degradationLevel: 0 };
-  }
-
-  // Level 1: 裁剪 L2 非关键（保留 reason=stage_context 的前 N 个）
-  const maxRefs = Math.floor(config.budgetTokens / 200);
-  let trimmed = refs.slice(0, maxRefs);
-
-  if (trimmed.length * 200 <= config.budgetTokens) {
     return {
-      refs: trimmed,
-      degradationLevel: 1,
-      warning: `CONTEXT_BUDGET_EXCEEDED: Degraded to Level 1 (${refs.length} → ${trimmed.length} refs)`,
+      refs,
+      degradationLevel: 0,
+      tokensBefore: estimatedTokens,
+      tokensAfter: estimatedTokens,
     };
   }
 
-  // Level 2: Top-N by relevance
-  const topN = Math.floor(maxRefs * 0.5);
-  trimmed = refs.slice(0, topN);
+  const summaryRefs = refs.filter((ref) => ref.granularity === 'summary');
+  const detailRefs = refs.filter((ref) => ref.granularity !== 'summary');
+  const summaryTokens = summaryRefs.reduce((sum, ref) => sum + estimate(ref), 0);
 
+  if (summaryTokens > config.budgetTokens) {
+    const keptSummary: ContextRef[] = [];
+    let used = 0;
+    for (const ref of summaryRefs) {
+      const next = estimate(ref);
+      if (keptSummary.length > 0 && used + next > config.budgetTokens) break;
+      keptSummary.push(ref);
+      used += next;
+    }
+    const refsAfter = sortBySourceOrder(keptSummary);
+    return {
+      refs: refsAfter,
+      degradationLevel: 3,
+      tokensBefore: estimatedTokens,
+      tokensAfter: used,
+      warning: `CONTEXT_BUDGET_EXCEEDED: Degraded to Level 3 (summary truncated, ${refs.length} → ${refsAfter.length} refs)`,
+    };
+  }
+
+  const keptDetails: ContextRef[] = [];
+  let usedTokens = summaryTokens;
+  for (const ref of detailRefs) {
+    const next = estimate(ref);
+    if (usedTokens + next > config.budgetTokens) break;
+    keptDetails.push(ref);
+    usedTokens += next;
+  }
+
+  const refsAfter = sortBySourceOrder([...summaryRefs, ...keptDetails]);
+  const level = keptDetails.length === 0 ? 2 : 1;
   return {
-    refs: trimmed,
-    degradationLevel: 2,
-    warning: `CONTEXT_BUDGET_EXCEEDED: Degraded to Level 2 (${refs.length} → ${trimmed.length} refs)`,
+    refs: refsAfter,
+    degradationLevel: level,
+    tokensBefore: estimatedTokens,
+    tokensAfter: usedTokens,
+    warning: `CONTEXT_BUDGET_EXCEEDED: Degraded to Level ${level} (${refs.length} → ${refsAfter.length} refs)`,
   };
 }

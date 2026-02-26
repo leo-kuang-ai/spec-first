@@ -12,7 +12,11 @@ beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
 
   writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
-  writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'context:\n  token_budget: 12000\nruntime:\n  max_iterations: 7\n', 'utf-8');
+  writeFileSync(
+    join(TMP, '.spec-first', 'config.yaml'),
+    'context:\n  token_budget: 12000\nruntime:\n  max_iterations: 7\n  max_self_corrections: 4\n',
+    'utf-8',
+  );
   writeFileSync(
     join(TMP, 'specs', FEAT, 'stage-state.json'),
     JSON.stringify({ currentStage: '04_implement' }),
@@ -37,15 +41,17 @@ describe('prompt assembler', () => {
     expect(ctx.currentTask).toBe('TASK-AUTH-001');
     expect(ctx.tokenBudget).toBe(12000);
     expect(ctx.maxIterations).toBe(7);
+    expect(ctx.maxSelfCorrection).toBe(4);
   });
 
   it('should replace supported placeholders', () => {
-    const out = assemblePrompt('feat={{FEATURE_ID}} stage={{CURRENT_STAGE}} task={{CURRENT_TASK}} max={{MAX_ITERATIONS}}', {
+    const out = assemblePrompt('feat={{FEATURE_ID}} stage={{CURRENT_STAGE}} task={{CURRENT_TASK}} max={{MAX_ITERATIONS}} self={{MAX_SELF_CORRECTION}}', {
       featureId: FEAT,
       currentStage: '04_implement',
       currentTask: 'TASK-AUTH-001',
       tokenBudget: 12000,
       maxIterations: 7,
+      maxSelfCorrection: 4,
       dateIso: '2026-02-26T00:00:00.000Z',
     });
 
@@ -53,6 +59,7 @@ describe('prompt assembler', () => {
     expect(out).toContain('stage=04_implement');
     expect(out).toContain('task=TASK-AUTH-001');
     expect(out).toContain('max=7');
+    expect(out).toContain('self=4');
   });
 
   it('should assemble placeholders when loading skill with projectRoot', () => {

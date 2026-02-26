@@ -9,17 +9,23 @@ echo "=== 进度同步提醒 ==="
 echo "文件已修改。如果此次修改完成了一个 TASK 或 AC，请检查是否需要更新 task_plan.md 中的完成状态。"
 echo "当前 in_progress TASK:"
 awk -F'|' '
+  BEGIN { found=0 }
   /^\|/ && !/---/ {
     taskid=""; title=""; status=""
     for (i=1; i<=NF; i++) {
       c=$i; gsub(/^[ \t]+|[ \t]+$/, "", c)
-      if (c ~ /^TASK-/ && taskid == "") { taskid=c; next }
-      if (c ~ /in_progress/i) status=c
-      if (title=="" && c!~/^TASK-/ && c!~/status/i && c!="") title=c
+      s=tolower(c)
+      if (c ~ /^TASK-/ && taskid == "") taskid=c
+      if (s=="in_progress" || s=="in progress") status=c
+      if (title=="" && c!~/^TASK-/ && s!="status" && s!="in_progress" && s!="in progress" && c!="") title=c
     }
-    if (taskid!="") {
+    if (taskid!="" && status!="") {
       printf("  - %s | %s | %s\n", taskid, title, status)
+      found=1
       exit
     }
   }
-' "$FILE" || echo "  (无 in_progress TASK)"
+  END {
+    if (!found) print "  (无 in_progress TASK)"
+  }
+' "$FILE"

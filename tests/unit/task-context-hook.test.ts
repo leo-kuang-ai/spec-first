@@ -20,6 +20,11 @@ function writeTaskPlan(rows: string[]): void {
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'stage-state.json'),
+    JSON.stringify({ currentStage: '04_implement' }),
+    'utf-8',
+  );
   writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), content, 'utf-8');
 }
 
@@ -42,6 +47,8 @@ describe('task-context hook', () => {
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('=== TASK 上下文刷新 ===');
+    expect(result.stdout).toContain('Current Stage: 04_implement');
+    expect(result.stdout).toContain('Open TASKs: 1');
     expect(result.stdout).toContain('TASK-AUTH-002');
     expect(result.stdout).toContain('in_progress');
   });
@@ -55,6 +62,7 @@ describe('task-context hook', () => {
     const result = spawnSync('sh', [SCRIPT], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
+    expect(result.stdout).toContain('Open TASKs: 1');
     expect(result.stdout).toContain('Current TASK: (no in_progress task found)');
   });
 });

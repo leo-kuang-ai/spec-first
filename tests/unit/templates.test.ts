@@ -38,6 +38,9 @@ describe('init templates', () => {
     expect(out).toContain('User Auth');
     expect(out).toContain('Leo');
     expect(out).toContain('规范先行');
+    expect(out).toContain('Version');
+    expect(out).toContain('Ratified');
+    expect(out).toContain('Amendment History');
   });
 });
 

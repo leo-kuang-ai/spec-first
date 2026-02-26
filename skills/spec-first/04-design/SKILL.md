@@ -20,6 +20,26 @@ description: "定位 Feature 并校验阶段为技术设计（02_design）"
 | "实质重于形式" | 在流程守卫上，形式（字面规则）= 实质（精神） |
 | "具体情况具体分析" | 规则已考虑常见情况，例外需明确讨论而非自行变通 |
 
+## 模板驱动约束（P1-03）
+
+design 阶段输出系统级 HOW，不输出实现级 HOW：
+- 必须写：模块边界、接口契约、数据模型、一致性/回滚策略
+- 禁止写：类/函数级实现、具体代码片段、与需求无关的库细节
+- 自我修正上限：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）
+- 当设计依据不足时必须标记 `[NEEDS CLARIFICATION][TYPE]`（每轮最多 3 项）
+
+## Agent 上下文自动同步（P2-05）
+
+- design 结束并推进阶段后，必须触发宿主上下文同步（`CLAUDE.md` / `AGENTS.md` 的托管区块）
+- 托管区块可覆盖更新；`[MANUAL]` 手工区块不可覆盖
+- 若同步失败，必须在 `findings.md` 记录 warning，不得静默
+
+## 文件系统即外部记忆（统一约束）
+
+- 每连续 2 个关键动作（设计决策、接口定义、回滚策略确认）后，必须更新 `findings.md`。
+- 中断前至少落盘：当前设计决策、未决问题、下一步命令。
+- 最小落盘字段：当前结论、证据路径（`design.md`/契约文件位置）、下一步动作。
+
 ## 触发条件
 - 阶段: 02_design
 - Command: `/spec-first:design`
@@ -35,6 +55,11 @@ NO implementation code until design artifacts are complete and approved.
 
 任一前置条件失败即停止：返回阻断原因，不得继续生成设计。
 </HARD-GATE>
+
+## Plan Mode 协同（P1-08）
+
+- 对架构分层、接口边界、数据一致性策略等关键设计决策，优先在 Plan Mode 中先收敛再落文档
+- Plan Mode 的关键结论必须同步到 `findings.md`，并在 `design.md` 中保留可追溯引用
 
 ## HARD-GATE 与产物完整性决策图（Superpowers P1-2）
 

@@ -10,6 +10,7 @@ export interface PromptAssemblyContext {
   currentTask: string;
   tokenBudget: number;
   maxIterations: number;
+  maxSelfCorrection: number;
   dateIso: string;
 }
 
@@ -19,6 +20,7 @@ const PLACEHOLDER_REPLACERS: Record<string, (ctx: PromptAssemblyContext) => stri
   CURRENT_TASK: (ctx) => ctx.currentTask,
   TOKEN_BUDGET: (ctx) => String(ctx.tokenBudget),
   MAX_ITERATIONS: (ctx) => String(ctx.maxIterations),
+  MAX_SELF_CORRECTION: (ctx) => String(ctx.maxSelfCorrection),
   DATE_ISO: (ctx) => ctx.dateIso,
 };
 
@@ -49,7 +51,7 @@ const PLACEHOLDER_REPLACERS: Record<string, (ctx: PromptAssemblyContext) => stri
  * Feature: {{FEATURE_ID}}
  * ```
  */
-const STATIC_PREFIX_FIELDS = ['FEATURE_ID', 'CURRENT_STAGE', 'CURRENT_TASK', 'TOKEN_BUDGET', 'MAX_ITERATIONS'] as const;
+const STATIC_PREFIX_FIELDS = ['FEATURE_ID', 'CURRENT_STAGE', 'CURRENT_TASK', 'TOKEN_BUDGET', 'MAX_ITERATIONS', 'MAX_SELF_CORRECTION'] as const;
 const DYNAMIC_FIELDS = ['DATE_ISO'] as const;
 
 /** 提取模板的静态前缀部分（用于 KV-Cache 稳定性检查） */
@@ -160,6 +162,7 @@ export function resolvePromptAssemblyContext(projectRoot: string): PromptAssembl
     currentTask: readCurrentTask(projectRoot, featureId),
     tokenBudget: cfg.context.token_budget,
     maxIterations: cfg.runtime.max_iterations,
+    maxSelfCorrection: cfg.runtime.max_self_corrections,
     dateIso: new Date().toISOString(),
   };
 }

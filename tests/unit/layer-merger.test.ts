@@ -192,4 +192,54 @@ quality_thresholds:
         .toThrow(/direction 无效/);
     });
   });
+
+  describe('Extension rules', () => {
+    it('should merge enabled extension rules with namespaced IDs and versions', () => {
+      const extDir = join(TMP, '.spec-first', 'extensions', 'qa-pack');
+      mkdirSync(extDir, { recursive: true });
+      writeFileSync(join(extDir, 'extension.yaml'), `
+namespace: qa
+version: 1.2.0
+enabled: true
+rules:
+  gate_conditions:
+    05_verify:
+      - id: CHECK-001
+        description: "QA regression report exists"
+  extra_deliverables:
+    05_verify:
+      - name: reports/qa-regression.md
+        required: true
+  quality_thresholds:
+    defect_escape_rate:
+      value: 0.01
+      direction: lower_is_better
+`, 'utf-8');
+
+      const result = mergeLayerRules('N', 'S', [], TMP);
+      expect(result.extensions?.some((ext) => ext.namespace === 'qa' && ext.version === '1.2.0')).toBe(true);
+      expect(result.gateConditions['05_verify'].some((gate) => gate.id === 'EXT-QA-CHECK-001')).toBe(true);
+      expect(result.deliverables['05_verify'].some((d) => d.name === 'reports/qa-regression.md')).toBe(true);
+      expect(result.thresholds['qa.defect_escape_rate'].value).toBe(0.01);
+    });
+
+    it('should ignore disabled extension', () => {
+      const extDir = join(TMP, '.spec-first', 'extensions', 'disabled-pack');
+      mkdirSync(extDir, { recursive: true });
+      writeFileSync(join(extDir, 'extension.yaml'), `
+namespace: disabled
+version: 1.0.0
+enabled: false
+rules:
+  gate_conditions:
+    05_verify:
+      - id: CHECK-001
+        description: "should not load"
+`, 'utf-8');
+
+      const result = mergeLayerRules('N', 'S', [], TMP);
+      expect(result.extensions?.some((ext) => ext.namespace === 'disabled')).toBe(false);
+      expect(result.gateConditions['05_verify'].some((gate) => gate.id.includes('DISABLED'))).toBe(false);
+    });
+  });
 });

@@ -2,7 +2,9 @@
  * SCA — Specification Consistency Audit
  * 5阶段规范一致性检查：Specify→Design→Plan→Implement→Verify
  */
-import type { Stage, MatrixRow, IdType } from '../../shared/types.js';
+import { join } from 'node:path';
+import type { Stage, MatrixRow } from '../../shared/types.js';
+import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 
 export interface ScaCheckItem {
@@ -15,6 +17,29 @@ export interface ScaResult {
   stage: Stage;
   pass: boolean;
   checks: ScaCheckItem[];
+}
+
+export type AnalyzeSeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+
+export interface AnalyzeFinding {
+  severity: AnalyzeSeverity;
+  type: string;
+  location: string;
+  detail: string;
+  suggestion: string;
+}
+
+export interface AnalyzeResult {
+  featureId: string;
+  generatedAt: string;
+  findings: AnalyzeFinding[];
+  summary: {
+    CRITICAL: number;
+    HIGH: number;
+    MEDIUM: number;
+    LOW: number;
+    total: number;
+  };
 }
 
 /** 执行当前阶段的 SCA 检查 */
@@ -146,4 +171,161 @@ function checkVerify(rows: MatrixRow[]): ScaCheckItem[] {
   });
 
   return checks;
+}
+
+/** 跨产物一致性分析（只读） */
+export function analyzeArtifacts(featureId: string, projectRoot: string): AnalyzeResult {
+  const featureDir = join(projectRoot, 'specs', featureId);
+  const findings: AnalyzeFinding[] = [];
+
+  const requiredArtifacts = [
+    { file: 'spec.md', label: 'spec' },
+    { file: 'design.md', label: 'design' },
+    { file: 'task_plan.md', label: 'task-plan' },
+    { file: 'traceability-matrix.md', label: 'matrix' },
+  ];
+
+  for (const artifact of requiredArtifacts) {
+    const fullPath = join(featureDir, artifact.file);
+    if (!exists(fullPath)) {
+      findings.push({
+        severity: 'CRITICAL',
+        type: 'ARTIFACT_MISSING',
+        location: artifact.file,
+        detail: `缺少必需产物: ${artifact.file}`,
+        suggestion: `补齐 ${artifact.file} 后重新执行 analyze`,
+      });
+    }
+  }
+
+  const rows = parseMatrix(featureId, projectRoot);
+  const frRows = rows.filter((r) => r.type === 'FR');
+  if (rows.length === 0) {
+    findings.push({
+      severity: 'HIGH',
+      type: 'TRACEABILITY_EMPTY',
+      location: 'traceability-matrix.md',
+      detail: '追踪矩阵为空，无法完成跨产物一致性分析',
+      suggestion: '先补齐 FR/DS/TASK/TC 基础行',
+    });
+  } else if (frRows.length > 0) {
+    const dsUpstream = new Set(rows.filter((r) => r.type === 'DS').flatMap((r) => r.upstream ?? []));
+    const taskUpstream = new Set(rows.filter((r) => r.type === 'TASK').flatMap((r) => r.upstream ?? []));
+
+    const uncoveredByDs = frRows.filter((r) => !dsUpstream.has(r.id)).map((r) => r.id);
+    if (uncoveredByDs.length > 0) {
+      findings.push({
+        severity: 'HIGH',
+        type: 'COVERAGE_GAP_DS',
+        location: 'traceability-matrix.md',
+        detail: `FR 未被 DS 覆盖: ${uncoveredByDs.slice(0, 8).join(', ')}${uncoveredByDs.length > 8 ? ' ...' : ''}`,
+        suggestion: '补充 DS 条目并建立 upstream 关联',
+      });
+    }
+
+    const uncoveredByTask = frRows.filter((r) => !taskUpstream.has(r.id)).map((r) => r.id);
+    if (uncoveredByTask.length > 0) {
+      findings.push({
+        severity: 'HIGH',
+        type: 'COVERAGE_GAP_TASK',
+        location: 'traceability-matrix.md',
+        detail: `FR 未被 TASK 覆盖: ${uncoveredByTask.slice(0, 8).join(', ')}${uncoveredByTask.length > 8 ? ' ...' : ''}`,
+        suggestion: '补充 TASK 条目并建立 upstream 关联',
+      });
+    }
+  }
+
+  const ambiguousTerms = ['适当', '合理', '尽快', '等等', '可能', '大概', 'as needed', 'etc', 'user-friendly'];
+  for (const file of ['spec.md', 'design.md', 'task_plan.md']) {
+    const fullPath = join(featureDir, file);
+    if (!exists(fullPath)) continue;
+    const content = readMarkdown(fullPath);
+    const hits = ambiguousTerms.filter((term) => content.toLowerCase().includes(term.toLowerCase()));
+    if (hits.length === 0) continue;
+    findings.push({
+      severity: 'MEDIUM',
+      type: 'AMBIGUOUS_LANGUAGE',
+      location: file,
+      detail: `检测到模糊词汇: ${hits.slice(0, 6).join(', ')}${hits.length > 6 ? ' ...' : ''}`,
+      suggestion: '将模糊描述改为可验证的量化标准',
+    });
+  }
+
+  if (findings.length === 0) {
+    findings.push({
+      severity: 'LOW',
+      type: 'NO_SIGNIFICANT_ISSUE',
+      location: 'all',
+      detail: '未发现显著一致性问题',
+      suggestion: '可继续推进并在后续变更后复检',
+    });
+  }
+
+  const summary = summarizeFindings(findings);
+  return {
+    featureId,
+    generatedAt: new Date().toISOString(),
+    findings: sortFindings(findings),
+    summary,
+  };
+}
+
+export function renderAnalysisReport(result: AnalyzeResult): string {
+  const lines: string[] = [];
+  lines.push(`# Analysis Report — ${result.featureId}`);
+  lines.push('');
+  lines.push(`> Generated At: ${result.generatedAt}`);
+  lines.push('');
+  lines.push('## Summary');
+  lines.push('');
+  lines.push(`- CRITICAL: ${result.summary.CRITICAL}`);
+  lines.push(`- HIGH: ${result.summary.HIGH}`);
+  lines.push(`- MEDIUM: ${result.summary.MEDIUM}`);
+  lines.push(`- LOW: ${result.summary.LOW}`);
+  lines.push(`- Total: ${result.summary.total}`);
+  lines.push('');
+  lines.push('## Findings');
+  lines.push('');
+  lines.push('| Severity | Type | Location | Detail | Suggestion |');
+  lines.push('|----------|------|----------|--------|------------|');
+  for (const finding of result.findings) {
+    lines.push(`| ${finding.severity} | ${finding.type} | ${escapeCell(finding.location)} | ${escapeCell(finding.detail)} | ${escapeCell(finding.suggestion)} |`);
+  }
+  lines.push('');
+  return lines.join('\n');
+}
+
+export function getCriticalCountFromAnalysisReport(content: string): number {
+  const summaryMatch = content.match(/-+\s*CRITICAL\s*:\s*(\d+)/i);
+  if (summaryMatch?.[1]) {
+    return Number.parseInt(summaryMatch[1], 10) || 0;
+  }
+  const tableMatch = content.match(/\|\s*CRITICAL\s*\|\s*(\d+)\s*\|/i);
+  if (tableMatch?.[1]) {
+    return Number.parseInt(tableMatch[1], 10) || 0;
+  }
+  const rowCount = content.split('\n').filter((line) => /\|\s*CRITICAL\s*\|/i.test(line)).length;
+  return rowCount;
+}
+
+function summarizeFindings(findings: AnalyzeFinding[]): AnalyzeResult['summary'] {
+  const summary = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, total: findings.length };
+  for (const finding of findings) {
+    summary[finding.severity] += 1;
+  }
+  return summary;
+}
+
+function sortFindings(findings: AnalyzeFinding[]): AnalyzeFinding[] {
+  const priority: Record<AnalyzeSeverity, number> = {
+    CRITICAL: 0,
+    HIGH: 1,
+    MEDIUM: 2,
+    LOW: 3,
+  };
+  return [...findings].sort((a, b) => priority[a.severity] - priority[b.severity]);
+}
+
+function escapeCell(value: string): string {
+  return value.replace(/\|/g, '\\|').replace(/\n/g, '<br>');
 }

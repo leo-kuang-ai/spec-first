@@ -55,6 +55,18 @@ describe('buildContextPack', () => {
     const pack = buildContextPack(FEAT, TMP);
     expect(pack.references.length).toBeGreaterThan(0);
     expect(pack.references[0].checksum).toBeDefined();
+    expect(pack.references[0].selector).toBe('summary');
+  });
+
+  it('should include detail refs only when expanded', () => {
+    writeState('04_implement');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n## FR\n- A\n', 'utf-8');
+
+    const summaryOnly = buildContextPack(FEAT, TMP);
+    expect(summaryOnly.references.some((ref) => ref.selector === 'detail')).toBe(false);
+
+    const expanded = buildContextPack(FEAT, TMP, { expandPaths: ['spec.md'] });
+    expect(expanded.references.some((ref) => ref.path === 'spec.md' && ref.selector === 'detail')).toBe(true);
   });
 
   it('should validate control size under 2KB', () => {
@@ -81,6 +93,33 @@ describe('sliceContext', () => {
     const result = sliceContext(refs, { budgetTokens: 1000, l1Ratio: 0.2, l2Ratio: 0.3, l3Ratio: 0.5 });
     expect(result.degradationLevel).toBeGreaterThan(0);
     expect(result.warning).toContain('CONTEXT_BUDGET_EXCEEDED');
+    expect(result.tokensBefore).toBeGreaterThan(result.tokensAfter);
+  });
+
+  it('should preserve summary refs before detail refs when over budget', () => {
+    const refs = [
+      {
+        path: 'spec.md',
+        selector: 'summary',
+        reason: 'stage_context_summary',
+        checksum: 'sum-1',
+        mtime: '2026-01-01',
+        granularity: 'summary' as const,
+        estimatedTokens: 100,
+      },
+      {
+        path: 'spec.md',
+        selector: 'detail',
+        reason: 'stage_context_detail',
+        checksum: 'det-1',
+        mtime: '2026-01-01',
+        granularity: 'detail' as const,
+        estimatedTokens: 1200,
+      },
+    ];
+    const result = sliceContext(refs, { budgetTokens: 200, l1Ratio: 0.2, l2Ratio: 0.3, l3Ratio: 0.5 });
+    expect(result.refs.some((ref) => ref.selector === 'summary')).toBe(true);
+    expect(result.refs.some((ref) => ref.selector === 'detail')).toBe(false);
   });
 });
 
@@ -116,6 +155,28 @@ describe('catchup', () => {
     expect(result.currentTask).toBe('TASK-AUTH-001');
   });
 
+  it('should include task context summary for current task', () => {
+    writeState('04_implement');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| ID | Title | Status |\n|---|---|---|\n| TASK-AUTH-001 | Login API | In Progress |\n',
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'traceability-matrix.md'),
+      '| ID | Type | Title | Status | Upstream | Downstream |\n'
+      + '|---|---|---|---|---|---|\n'
+      + '| TASK-AUTH-001 | TASK | Login API | in_progress | FR-AUTH-001,DS-AUTH-001 | /api/auth/login |\n',
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'constitution.md'), '# Constitution');
+
+    const result = catchup(FEAT, TMP);
+    expect(result.taskContextSummary?.taskId).toBe('TASK-AUTH-001');
+    expect(result.taskContextSummary?.relatedFRCount).toBeGreaterThan(0);
+    expect(result.summary).toContain('TaskContextPack: TASK-AUTH-001');
+  });
+
   it('should include todo runner summary when todo-state exists', () => {
     writeState('04_implement');
     writeFileSync(
@@ -147,6 +208,23 @@ describe('catchup', () => {
     const result = catchup(FEAT, TMP);
     expect(result.currentPhase).toBe('unknown');
     expect(result.missingFiles).toContain('stage-state.json');
+  });
+
+  it('should build Q4 blocker from final required-file scan result', () => {
+    writeState('04_implement');
+    // task_plan/findings/constitution/matrix are all missing
+    const result = catchup(FEAT, TMP);
+
+    expect(result.fiveQuestions.currentBlocker.gap).toBe(true);
+    expect(result.fiveQuestions.currentBlocker.answer).toContain('缺失文件');
+    expect(result.fiveQuestions.currentBlocker.answer).toContain('task_plan.md');
+  });
+
+  it('should deduplicate missingFiles entries', () => {
+    writeState('04_implement');
+    const result = catchup(FEAT, TMP);
+    const taskPlanMissingCount = result.missingFiles.filter((f) => f === 'task_plan.md').length;
+    expect(taskPlanMissingCount).toBe(1);
   });
 });
 
@@ -208,6 +286,13 @@ describe('handleAi', () => {
   it('should return SUCCESS for ai context', () => {
     writeState('04_implement');
     const code = withCwd(TMP, () => handleAi(['context', FEAT]));
+    expect(code).toBe(ExitCode.SUCCESS);
+  });
+
+  it('should return SUCCESS for ai context with --expand', () => {
+    writeState('04_implement');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
+    const code = withCwd(TMP, () => handleAi(['context', FEAT, '--expand', 'spec.md']));
     expect(code).toBe(ExitCode.SUCCESS);
   });
 

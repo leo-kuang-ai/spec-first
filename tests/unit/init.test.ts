@@ -55,7 +55,10 @@ describe('init', () => {
     expect(readFileSync(join(result.featureDir, 'traceability-matrix.md'), 'utf-8')).toContain('| ID |');
 
     // constitution.md
-    expect(readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8')).toContain('Constitution');
+    const constitution = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
+    expect(constitution).toContain('Constitution');
+    expect(constitution).toContain('Version: 1.0.0');
+    expect(constitution).toContain('Amendment History');
   });
 
   it('should write .spec-first/current', () => {
@@ -72,6 +75,8 @@ describe('init', () => {
     expect(content).toContain('pilot_mode: false');
     expect(content).toContain('token_budget: 16000');
     expect(content).toContain('trigger: prompt');
+    expect(content).toContain('max_self_corrections: 3');
+    expect(content).toContain('kv_cache_hard_gate: false');
   });
 
   it('should not overwrite existing .spec-first/config.yaml', () => {
@@ -158,6 +163,8 @@ describe('init', () => {
     const content = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
     expect(content).toContain('Global Constitution');
     expect(content).toContain('Project rules here');
+    expect(content).toContain('Version: 1.0.0');
+    expect(content).toContain('Amendment History');
   });
 
   it('should include merged rules in result', () => {

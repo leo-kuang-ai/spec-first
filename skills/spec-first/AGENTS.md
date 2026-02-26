@@ -19,6 +19,17 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
   - Claude 侧以 Hook 返回码阻断。
   - Codex 侧以流程规则拒绝“已完成/可推进”声明并回退到修复步骤。
 
+## 文件系统即外部记忆（全 Skill 统一约束）
+
+- Context Window = RAM（易失），Filesystem = Disk（持久）。
+- 未落盘的信息一律视为不可靠上下文，不得作为“已完成/已验证”依据。
+- 每连续 2 个关键动作（读外部信息、改文档/代码、跑验证）后，必须更新 `findings.md`。
+- 最小落盘字段（跨 Skill 通用）：
+  - 当前结论
+  - 证据路径（文件路径/命令输出位置）
+  - 下一步动作（含阻塞项）
+- 会话中断前，至少写入：当前 TASK、阻塞点、下一步命令。
+
 ## Skill 评审清单（含 Description Trap）
 
 - Front Matter `description` 仅描述触发条件（Use when X）。
@@ -38,7 +49,7 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 
 ## 动态 Prompt 组装规则（P1-09）
 
-- Skill 加载时通过 `prompt-assembler` 自动替换 `{{ PLACEHOLDER }}` 占位符（白名单：`FEATURE_ID`、`CURRENT_STAGE`、`CURRENT_TASK`、`TOKEN_BUDGET`、`MAX_ITERATIONS`、`DATE_ISO`）。
+- Skill 加载时通过 `prompt-assembler` 自动替换 `{{ PLACEHOLDER }}` 占位符（白名单：`FEATURE_ID`、`CURRENT_STAGE`、`CURRENT_TASK`、`TOKEN_BUDGET`、`MAX_ITERATIONS`、`MAX_SELF_CORRECTION`、`DATE_ISO`）。
 - 同源参数变更一次生效：所有占位符从项目运行态文件（`stage-state.json`、`task_plan.md`、`config.yaml`）统一读取，无需手动同步。
 - Context Pack 大小建议控制在 2KB 以内；超出时 `prompt-assembler` 输出警告但不阻断。
 - 未识别的占位符保留原文，不做静默删除。
@@ -236,6 +247,18 @@ spec-first ai catchup <featureId>
 # AI 调用统计
 spec-first ai stats <featureId>
 ```
+
+### spec-first analyze
+
+跨产物一致性分析（只读，输出报告）。
+
+```bash
+spec-first analyze <featureId> [--out <path>]
+```
+
+- 读取 `spec.md` / `design.md` / `task_plan.md` / `traceability-matrix.md`
+- 产出 `reports/analysis-report.md`（默认路径）
+- 发现 `CRITICAL` 时返回非 0（可用于 gate 阻断）
 
 ### spec-first rfc
 
@@ -439,6 +462,13 @@ P5_SIDE_EFFECT — 副作用执行
 - `auto` 的 Skill 不应写入关键交付物（spec.md/design.md/task_plan.md），仅允许写入运行态文件（findings.md）或不写入
 - `assisted` 和 `strict` 的 Skill 在用户拒绝时必须回退至 P2 重新生成
 
+### Handoff Next Steps（P2-06）
+
+每个 Skill 在结束输出时必须追加 `Next Steps` 小节，至少包含：
+- 下一条建议命令（如 `spec-first stage advance <featureId>` 或下阶段 Skill）
+- 触发条件（何时执行该命令）
+- 若存在阻塞项，给出先决修复命令
+
 ### 错误处理规则
 
 所有 Skill 遵循统一的错误处理策略：
@@ -460,9 +490,9 @@ P5_SIDE_EFFECT — 副作用执行
 | 阶段 | Skill | 主要交付物 |
 | --- | --- | --- |
 | 00_init | 01-init（CLI `spec-first init`） | stage-state.json, constitution.md |
-| 01_specify | 03-spec | spec.md |
+| 01_specify | 03-spec, 20-spec-review | spec.md, checklists/spec-review.md |
 | 02_design | 04-design, 05-research | design.md, contracts/, research.md |
-| 03_plan | 06-task | task_plan.md, checklist.md |
+| 03_plan | 06-task, 21-analyze（建议） | task_plan.md, checklist.md, reports/analysis-report.md |
 | 04_implement | 07-code, 08-code-review | task_plan.md 状态更新 |
 | 05_verify | 09-test | tests/*.test.md |
 | 06_wrap_up | 10-archive | retro.md |

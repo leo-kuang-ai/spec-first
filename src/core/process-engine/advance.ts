@@ -7,12 +7,12 @@ import { join } from 'node:path';
 import { appendFileSync } from 'node:fs';
 import { Stage } from '../../shared/types.js';
 import type { StageState, StageHistoryEntry } from '../../shared/types.js';
-import { TERMINAL_STAGES } from '../../shared/types.js';
 import { readJson, writeJson, exists } from '../../shared/fs-utils.js';
 import { writeLog } from '../../shared/logger.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { assertTransitionAllowed, isTerminal } from './stage-machine.js';
 import { evaluateGate } from '../gate-engine/gate-evaluator.js';
+import { syncAgentContextFromDesign } from '../tool-integration/context-sync.js';
 
 export class GateUnavailableError extends Error {
   constructor(message = 'GateEngine 不可用') {
@@ -169,6 +169,16 @@ export function advance(
     gateStatus: gateResult,
     featureId,
   });
+
+  if (from === Stage.DESIGN) {
+    const sync = syncAgentContextFromDesign(featureId, projectRoot);
+    if (sync.updated.length > 0) {
+      appendFindings(featureId, projectRoot, `Context Sync: ${sync.updated.join(', ')}`);
+    }
+    for (const warning of sync.warnings) {
+      appendFindings(featureId, projectRoot, `Context Sync Warning: ${warning}`);
+    }
+  }
 
   return { from, to, gateResult };
 }

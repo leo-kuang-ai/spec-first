@@ -32,6 +32,7 @@ function handleNext(args: string[]): number {
 
   if (!type || !abbr || !feature) {
     console.error('用法：spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]');
+    console.error('  <type>: FR|DS|TASK|TC|RFC|REQ|SYS|ARCH|MOD|ATP|STP|ITP|UTP');
     return ExitCode.VALIDATION_ERROR;
   }
 

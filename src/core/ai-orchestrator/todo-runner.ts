@@ -10,6 +10,7 @@ export interface TodoItem {
   title: string;
   status: TodoStatus;
   dependsOn?: string[];
+  parallel?: boolean;
 }
 
 export interface TodoRunnerState {
@@ -61,20 +62,49 @@ export function initTodoState(
 }
 
 export function pickNextTodo(state: TodoRunnerState): TodoItem | undefined {
-  if (state.halted) return undefined;
+  return pickReadyTodos(state, { maxParallel: 1 })[0];
+}
 
-  const inProgress = state.items.find((item) => item.status === 'in_progress');
-  if (inProgress) return inProgress;
+function isParallelTodo(item: TodoItem): boolean {
+  if (item.parallel === true) return true;
+  const title = item.title.toLowerCase();
+  return title.includes('[p]') || title.includes('[parallel]');
+}
+
+export function pickReadyTodos(
+  state: TodoRunnerState,
+  options?: { maxParallel?: number },
+): TodoItem[] {
+  if (state.halted) return [];
+  const maxParallel = Math.max(1, options?.maxParallel ?? 4);
+
+  const inProgress = state.items.filter((item) => item.status === 'in_progress');
+  if (inProgress.length > 0) return inProgress.slice(0, maxParallel);
 
   const doneSet = new Set(
     state.items.filter((item) => item.status === 'done').map((item) => item.id),
   );
 
-  return state.items.find((item) => {
+  const readyPending = state.items.filter((item) => {
     if (item.status !== 'pending') return false;
     const deps = item.dependsOn ?? [];
     return deps.every((dep) => doneSet.has(dep));
   });
+
+  if (readyPending.length === 0) return [];
+
+  // 顺序任务是天然屏障；仅当首个可执行项标记为并行时，才开启同层并行批次。
+  if (!isParallelTodo(readyPending[0])) {
+    return [readyPending[0]];
+  }
+
+  const batch: TodoItem[] = [];
+  for (const item of readyPending) {
+    if (!isParallelTodo(item)) break;
+    batch.push(item);
+    if (batch.length >= maxParallel) break;
+  }
+  return batch;
 }
 
 export function updateTodoStatus(

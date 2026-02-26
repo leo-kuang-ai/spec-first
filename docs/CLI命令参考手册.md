@@ -167,7 +167,7 @@ spec-first id list --feature <featureId> [--type <type>]
 ### 4.1 执行 Gate 校验
 
 ```bash
-spec-first gate check <featureId> [--stage <stageId>] [--ci]
+spec-first gate check <featureId>
 ```
 
 ### 4.2 查看阶段 Gate 条件

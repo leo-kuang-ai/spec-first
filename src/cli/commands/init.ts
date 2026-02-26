@@ -18,115 +18,123 @@ import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js'
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
 const VALID_SIZES: ReadonlySet<string> = new Set(['S', 'M', 'L']);
 
-export async function handleInit(args: string[]): Promise<number> {
-  if (args.includes('--help') || args.includes('-h')) {
-    printInitHelp();
-    return ExitCode.SUCCESS;
-  }
+interface InitCliInput {
+  feat?: string;
+  mode?: string;
+  size?: string;
+  platforms?: string;
+  featureId?: string;
+  title?: string;
+}
 
+interface NormalizedInitInput {
+  feat: string;
+  mode: Mode;
+  size: Size;
+  platforms: string[];
+  featureId?: string;
+  title: string;
+}
+
+function parseInitCliInput(args: string[]): InitCliInput {
+  return {
+    feat: parseFlag(args, '--feat'),
+    mode: parseFlag(args, '--mode'),
+    size: parseFlag(args, '--size'),
+    platforms: parseFlag(args, '--platforms'),
+    featureId: parseFlag(args, '--feature-id'),
+    title: parseFlag(args, '--title'),
+  };
+}
+
+function runBootstrapIfEnabled(args: string[]): number | undefined {
   const shouldBootstrap = args.includes('--bootstrap')
     || process.env.SPEC_FIRST_INIT_BOOTSTRAP === '1';
-  if (shouldBootstrap) {
-    const bootstrap = ensureHostBootstrap();
-    if (!bootstrap.ok) {
-      for (const item of bootstrap.results.filter((entry) => entry.level === 'ERROR')) {
-        console.error(`[bootstrap] [${item.host}] ${item.category}/${item.name}: ${item.detail}`);
-      }
-      return ExitCode.CONFIG_ERROR;
-    }
+  if (!shouldBootstrap) return undefined;
+
+  const bootstrap = ensureHostBootstrap();
+  if (bootstrap.ok) return undefined;
+
+  for (const item of bootstrap.results.filter((entry) => entry.level === 'ERROR')) {
+    console.error(`[bootstrap] [${item.host}] ${item.category}/${item.name}: ${item.detail}`);
   }
+  return ExitCode.CONFIG_ERROR;
+}
 
-  const feat = parseFlag(args, '--feat');
-  const mode = parseFlag(args, '--mode');
-  const size = parseFlag(args, '--size');
-  const platforms = parseFlag(args, '--platforms');
-  const featureId = parseFlag(args, '--feature-id');
-  const title = parseFlag(args, '--title');
+async function resolveInitCliInput(args: string[], initial: InitCliInput): Promise<InitCliInput | undefined> {
+  const hasRequiredArgs = Boolean(initial.feat && initial.mode && initial.size);
+  if (hasRequiredArgs) return initial;
 
-  const hasRequiredArgs = !!(feat && mode && size);
-  const interactive = isInteractiveTerminal();
-
-  let finalFeat = feat;
-  let finalMode = mode;
-  let finalSize = size;
-  let finalPlatforms = platforms;
-  let finalFeatureId = featureId;
-  let finalTitle = title;
-
-  if (!hasRequiredArgs) {
-    if (!interactive) {
-      printInitHelp();
-      return ExitCode.VALIDATION_ERROR;
-    }
-    const hostPaths = detectHostPaths();
-    console.log('检测到宿主路径：');
-    for (const line of formatHostPathSummary(hostPaths)) {
-      console.log(`  ${line}`);
-    }
-    console.log('');
-    const guided = await runGuidedInit();
-    if (!guided) return ExitCode.VALIDATION_ERROR;
-    finalFeat = guided.feat;
-    finalMode = guided.mode;
-    finalSize = guided.size;
-    finalPlatforms = guided.platforms;
-    finalFeatureId = guided.featureId;
-    finalTitle = guided.title;
-  }
-
-  if (!finalFeat || !finalMode || !finalSize) {
+  if (!isInteractiveTerminal()) {
     printInitHelp();
-    return ExitCode.VALIDATION_ERROR;
+    return undefined;
   }
 
-  if (!VALID_MODES.has(finalMode)) {
-    console.error(`无效 mode "${finalMode}"：必须是 N 或 I`);
-    return ExitCode.VALIDATION_ERROR;
+  const hostPaths = detectHostPaths();
+  console.log('检测到宿主路径：');
+  for (const line of formatHostPathSummary(hostPaths)) {
+    console.log(`  ${line}`);
+  }
+  console.log('');
+
+  const guided = await runGuidedInit();
+  if (!guided) return undefined;
+  return {
+    feat: guided.feat,
+    mode: guided.mode,
+    size: guided.size,
+    platforms: guided.platforms,
+    featureId: guided.featureId,
+    title: guided.title,
+  };
+}
+
+function normalizeInitInput(input: InitCliInput, cwd: string): NormalizedInitInput | undefined {
+  if (!input.feat || !input.mode || !input.size) {
+    printInitHelp();
+    return undefined;
   }
 
-  if (!VALID_SIZES.has(finalSize)) {
-    console.error(`无效 size "${finalSize}"：必须是 S、M 或 L`);
-    return ExitCode.VALIDATION_ERROR;
+  if (!VALID_MODES.has(input.mode)) {
+    console.error(`无效 mode "${input.mode}"：必须是 N 或 I`);
+    return undefined;
+  }
+  if (!VALID_SIZES.has(input.size)) {
+    console.error(`无效 size "${input.size}"：必须是 S、M 或 L`);
+    return undefined;
   }
 
-  const parsedPlatforms = parsePlatforms(finalPlatforms);
-  const platformList = parsedPlatforms.values;
-  if (platformList.length === 0) {
+  const parsedPlatforms = parsePlatforms(input.platforms);
+  if (parsedPlatforms.values.length === 0) {
     console.error('无效 platforms：至少需要一个平台（使用 --platforms p1,p2,...）');
-    return ExitCode.VALIDATION_ERROR;
+    return undefined;
   }
   if (parsedPlatforms.hadDuplicates) {
-    console.warn(`警告：检测到重复 platforms，已自动去重并排序：${platformList.join(', ')}`);
+    console.warn(`警告：检测到重复 platforms，已自动去重并排序：${parsedPlatforms.values.join(', ')}`);
   }
 
-  const platformValidationError = validatePlatformSelection(platformList, process.cwd());
+  const platformValidationError = validatePlatformSelection(parsedPlatforms.values, cwd);
   if (platformValidationError) {
     console.error(platformValidationError);
-    return ExitCode.VALIDATION_ERROR;
+    return undefined;
   }
 
-  let result: ReturnType<typeof init>;
-  try {
-    result = init({
-      feat: finalFeat,
-      title: finalTitle ?? finalFeat,
-      mode: finalMode as Mode,
-      size: finalSize as Size,
-      platforms: platformList,
-      author: 'cli',
-      featureId: finalFeatureId ?? undefined,
-      projectRoot: process.cwd(),
-    });
-  } catch (e) {
-    console.error(`错误：${(e as Error).message}`);
-    return ExitCode.VALIDATION_ERROR;
-  }
+  return {
+    feat: input.feat,
+    mode: input.mode as Mode,
+    size: input.size as Size,
+    platforms: parsedPlatforms.values,
+    featureId: input.featureId ?? undefined,
+    title: input.title ?? input.feat,
+  };
+}
 
-  ensureProjectHooks(process.cwd());
-  ensureProjectClaudeSettings(process.cwd());
+function runPostInitSetup(cwd: string): void {
+  ensureProjectHooks(cwd);
+  ensureProjectClaudeSettings(cwd);
 
   try {
-    const aiResult = registerAIHooks(process.cwd());
+    const aiResult = registerAIHooks(cwd);
     if (aiResult.registered.length > 0) {
       console.log('AI Runtime Hooks 已注册：' + aiResult.registered.join(', '));
     }
@@ -136,14 +144,50 @@ export async function handleInit(args: string[]): Promise<number> {
   }
 
   try {
-    const cmds = ensureSkillCommands(process.cwd());
+    const cmds = ensureSkillCommands(cwd);
     if (cmds.claude.length > 0) {
       console.log(`Skill 命令已注册：${cmds.claude.length} 个（${cmds.claude.join(', ')}）`);
     }
   } catch (e) {
     console.warn(`警告：Feature 已初始化，但 Skill 命令注册失败：${(e as Error).message}`);
   }
+}
 
+export async function handleInit(args: string[]): Promise<number> {
+  if (args.includes('--help') || args.includes('-h')) {
+    printInitHelp();
+    return ExitCode.SUCCESS;
+  }
+
+  const bootstrapCode = runBootstrapIfEnabled(args);
+  if (typeof bootstrapCode === 'number') return bootstrapCode;
+
+  const cwd = process.cwd();
+  const parsedInput = parseInitCliInput(args);
+  const resolvedInput = await resolveInitCliInput(args, parsedInput);
+  if (!resolvedInput) return ExitCode.VALIDATION_ERROR;
+
+  const normalized = normalizeInitInput(resolvedInput, cwd);
+  if (!normalized) return ExitCode.VALIDATION_ERROR;
+
+  let result: ReturnType<typeof init>;
+  try {
+    result = init({
+      feat: normalized.feat,
+      title: normalized.title,
+      mode: normalized.mode,
+      size: normalized.size,
+      platforms: normalized.platforms,
+      author: 'cli',
+      featureId: normalized.featureId,
+      projectRoot: cwd,
+    });
+  } catch (e) {
+    console.error(`错误：${(e as Error).message}`);
+    return ExitCode.VALIDATION_ERROR;
+  }
+
+  runPostInitSetup(cwd);
   console.log(`Feature 初始化完成：${result.featureId}`);
   console.log(`目录：${result.featureDir}`);
   return ExitCode.SUCCESS;

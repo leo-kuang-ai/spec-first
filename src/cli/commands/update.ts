@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { getCliVersion } from '../router.js';
-import { ensureSkillCommands } from '../../shared/skill-commands.js';
+import { ensureSkillCommands, type SkillHostTarget } from '../../shared/skill-commands.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { detectHostPaths } from '../../shared/host-paths.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
@@ -30,12 +30,15 @@ export function handleUpdate(args: string[]): number {
     console.log('  --dry-run         仅输出将发生的变更，不写文件');
     console.log('  --skip-mcp        跳过 MCP 配置补齐');
     console.log('  --skip-hooks      跳过 Git hooks 刷新');
+    console.log('  --host <target>   仅刷新指定宿主（claude|codex|generic|all，可多次/逗号分隔）');
     console.log('  --from-postinstall  静默模式（postinstall 调用）');
     return ExitCode.SUCCESS;
   }
 
+  const hosts = parseHostTargets(args);
+
   try {
-    return runUpdate({ dryRun, skipMcp, skipHooks, quiet });
+    return runUpdate({ dryRun, skipMcp, skipHooks, quiet, hosts });
   } catch (err) {
     if (fromPostinstall) return ExitCode.SUCCESS;
     const msg = err instanceof Error ? err.message : String(err);
@@ -49,9 +52,10 @@ interface UpdateOptions {
   skipMcp: boolean;
   skipHooks: boolean;
   quiet: boolean;
+  hosts?: SkillHostTarget[];
 }
 
-function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number {
+function runUpdate({ dryRun, skipMcp, skipHooks, quiet, hosts }: UpdateOptions): number {
   const cwd = process.cwd();
   const log = quiet ? () => {} : console.log.bind(console);
   const prefix = dryRun ? '[dry-run] ' : '';
@@ -67,8 +71,9 @@ function runUpdate({ dryRun, skipMcp, skipHooks, quiet }: UpdateOptions): number
 
   // 4. 同步 Skills 到用户级目录并刷新命令入口
   const hostPaths = detectHostPaths();
-  const skills = ensureSkillCommands(cwd, { global: true, dryRun });
-  log(`${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex → ${hostPaths.specFirstSkillsDir}`);
+  const skills = ensureSkillCommands(cwd, { global: true, dryRun, hosts });
+  const genericCount = skills.generic?.length ?? 0;
+  log(`${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex, ${genericCount} generic → ${hostPaths.specFirstSkillsDir}`);
   if (skills.codexWarnings.length > 0) {
     log(`  ⚠ Codex skill 验证失败 (${skills.codexWarnings.length}):`);
     for (const w of skills.codexWarnings) log(`    - ${w}`);
@@ -144,10 +149,32 @@ function ensureProjectInstallScaffold(options: {
 async function checkForUpdates(): Promise<void> {
   try {
     // update-notifier 为可选依赖，动态 import 避免 ESM/CJS 混用
-    const mod = await (import('update-notifier' as string) as Promise<{ default: Function }>);
+    const mod = await import('update-notifier' as string) as { default: (options: unknown) => { notify: () => void } };
     const pkg = { name: 'spec-first', version: getCliVersion() };
     mod.default({ pkg, updateCheckInterval: 1000 * 60 * 60 * 24 }).notify();
   } catch {
     // update-notifier 不可用，静默跳过
   }
+}
+
+const HOST_TARGETS = new Set<SkillHostTarget>(['claude', 'codex', 'generic', 'all']);
+
+function parseHostTargets(args: string[]): SkillHostTarget[] | undefined {
+  const values: SkillHostTarget[] = [];
+  for (let i = 0; i < args.length; i += 1) {
+    if (args[i] !== '--host') continue;
+    const raw = args[i + 1];
+    if (!raw || raw.startsWith('--')) {
+      throw new Error('参数错误：--host 需要一个目标值（claude|codex|generic|all）');
+    }
+    i += 1;
+    const targets = raw.split(',').map((item) => item.trim()).filter(Boolean);
+    for (const target of targets) {
+      if (!HOST_TARGETS.has(target as SkillHostTarget)) {
+        throw new Error(`参数错误：未知 host "${target}"，可选值: claude|codex|generic|all`);
+      }
+      values.push(target as SkillHostTarget);
+    }
+  }
+  return values.length > 0 ? values : undefined;
 }

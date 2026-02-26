@@ -10,7 +10,7 @@ import { exists } from './fs-utils.js';
 export interface SpecFirstConfig {
   catchup: { trigger: 'auto' | 'prompt' | 'off' };
   context: { token_budget: number };
-  runtime: { max_iterations: number };
+  runtime: { max_iterations: number; max_self_corrections: number; kv_cache_hard_gate: boolean };
   gate: { pilot_mode: boolean };
   health: {
     weights: {
@@ -24,7 +24,7 @@ export interface SpecFirstConfig {
 export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
   catchup: { trigger: 'prompt' },
   context: { token_budget: 16000 },
-  runtime: { max_iterations: 5 },
+  runtime: { max_iterations: 5, max_self_corrections: 3, kv_cache_hard_gate: false },
   gate: { pilot_mode: false },
   health: {
     weights: {
@@ -103,6 +103,12 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
   if (typeof runtime?.max_iterations === 'number') {
     cfg.runtime.max_iterations = runtime.max_iterations;
   }
+  if (typeof runtime?.max_self_corrections === 'number') {
+    cfg.runtime.max_self_corrections = runtime.max_self_corrections;
+  }
+  if (typeof runtime?.kv_cache_hard_gate === 'boolean') {
+    cfg.runtime.kv_cache_hard_gate = runtime.kv_cache_hard_gate;
+  }
 
   // health.weights
   const health = parsed.health as Record<string, unknown> | undefined;
@@ -127,6 +133,9 @@ function validate(cfg: SpecFirstConfig): void {
 
   if (cfg.runtime.max_iterations < 1 || cfg.runtime.max_iterations > 20) {
     errors.push(`runtime.max_iterations must be 1-20, got ${cfg.runtime.max_iterations}`);
+  }
+  if (cfg.runtime.max_self_corrections < 1 || cfg.runtime.max_self_corrections > 10) {
+    errors.push(`runtime.max_self_corrections must be 1-10, got ${cfg.runtime.max_self_corrections}`);
   }
 
   const wSum = Object.values(cfg.health.weights).reduce((a, b) => a + b, 0);

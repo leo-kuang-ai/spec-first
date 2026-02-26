@@ -2,10 +2,12 @@
  * Skill Runtime 单元测试
  * Dispatcher + Phase Machine + confirm_policy
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { execSync } from 'node:child_process';
 import { dispatchCommand, loadSkill, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
+import { resetConfigCache } from '../../src/shared/config-schema.js';
 import {
   createPhaseState, canTransition, transition, confirmPhase,
   preWriteArchive, getValidTransitions,
@@ -17,6 +19,7 @@ const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-skill-runtime')
 const FEAT = 'FSREQ-20260211-AUTH-001';
 
 beforeEach(() => {
+  resetConfigCache();
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
   mkdirSync(join(TMP, 'skills', 'spec-first', '07-code'), { recursive: true });
@@ -24,6 +27,7 @@ beforeEach(() => {
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
+  resetConfigCache();
 });
 
 // ─── Dispatcher Tests ───────────────────────────────────
@@ -99,6 +103,17 @@ describe('dispatchCommand', () => {
     const result = dispatchCommand(':', TMP);
     expect(result.route).toBe('error');
   });
+
+  it('should resolve namespaced extension skill route', () => {
+    const extDir = join(TMP, '.spec-first', 'extensions', 'qa-pack');
+    mkdirSync(join(extDir, 'skills', 'review'), { recursive: true });
+    writeFileSync(join(extDir, 'extension.yaml'), 'namespace: qa\nversion: 1.0.0\nenabled: true\n', 'utf-8');
+    writeFileSync(join(extDir, 'skills', 'review', 'SKILL.md'), '# QA Review Skill\n', 'utf-8');
+
+    const result = dispatchCommand('ext.qa.review', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.skillPath).toContain('.spec-first/extensions/qa-pack');
+  });
 });
 
 describe('loadSkill hard-gate notice', () => {
@@ -172,6 +187,89 @@ describe('loadSkill hard-gate notice', () => {
     const content = loadSkill(skillPath, { projectRoot: TMP });
     expect(content).toContain('检查结果: PASS');
   });
+
+  it('should allow orchestrate in non-implement stage when context exists', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md');
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '02_design' }),
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Orchestrate Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('HARD-GATE 运行时检查（自动）');
+    expect(content).toContain('检查结果: PASS');
+  });
+
+  it('should block high-risk code execution on protected branch without worktree confirmation', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login [P] | in_progress |\n',
+      'utf-8',
+    );
+
+    execSync('git init', { cwd: TMP, stdio: 'ignore' });
+    execSync('git config user.email "test@example.com"', { cwd: TMP, stdio: 'ignore' });
+    execSync('git config user.name "test"', { cwd: TMP, stdio: 'ignore' });
+    writeFileSync(join(TMP, 'README.md'), 'seed\n', 'utf-8');
+    execSync('git add README.md', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
+    execSync('git checkout -b main || git checkout main', { cwd: TMP, stdio: 'ignore' });
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('检查结果: BLOCKED');
+    expect(content).toContain('WORKTREE-CONFIRMED');
+  });
+
+  it('should block unstable template when kv_cache_hard_gate is enabled', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
+    writeFileSync(
+      join(TMP, '.spec-first', 'config.yaml'),
+      'runtime:\n  kv_cache_hard_gate: true\n',
+      'utf-8',
+    );
+
+    expect(() => loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false }))
+      .toThrow('KV-CACHE-HARD-GATE');
+  });
+
+  it('should only warn unstable template when kv_cache_hard_gate is disabled', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
+    writeFileSync(
+      join(TMP, '.spec-first', 'config.yaml'),
+      'runtime:\n  kv_cache_hard_gate: false\n',
+      'utf-8',
+    );
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
+    expect(content).toContain('HARD-GATE 运行时检查（自动）');
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('should append Next Steps handoff requirement when missing', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
+    expect(content).toContain('## Next Steps（Required Handoff）');
+    expect(content).toContain('下一条可执行命令');
+  });
 });
 
 // ─── Phase Machine Tests ────────────────────────────────
@@ -224,6 +322,19 @@ describe('Phase Machine', () => {
     state = transition(state, 'P2_GENERATE');
     expect(state.revisionCount).toBe(1);
     expect(state.current).toBe('P2_GENERATE');
+  });
+
+  it('should trigger 3-strike escalation after 3 consecutive revisions', () => {
+    let state = createPhaseState();
+    state = transition(state, 'P1_CONTEXT');
+    state = transition(state, 'P2_GENERATE');
+    state = transition(state, 'P3_CONFIRM');
+    state = transition(state, 'P2_GENERATE'); // 1
+    state = transition(state, 'P3_CONFIRM');
+    state = transition(state, 'P2_GENERATE'); // 2
+    state = transition(state, 'P3_CONFIRM');
+
+    expect(() => transition(state, 'P2_GENERATE')).toThrow('3-Strike triggered');
   });
 
   it('should throw on illegal transition', () => {

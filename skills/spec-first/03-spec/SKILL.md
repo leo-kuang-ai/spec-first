@@ -39,6 +39,8 @@ spec 阶段只定义 WHAT，不定义 HOW：
 - 必须写：业务目标、边界、验收标准、NFR、风险与约束
 - 禁止写：模块实现细节、类/函数级算法、具体库选型
 - 若出现实现细节，必须重写为可验证的需求或约束条款
+- 自我修正上限：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）；超过上限必须停止并请求用户澄清
+- `[NEEDS CLARIFICATION]` 同一轮最多 3 项；优先级：范围 > 安全 > 合规 > UX > 技术偏好
 
 ## 结构化歧义消解（P1-02）
 
@@ -48,6 +50,11 @@ spec 阶段只定义 WHAT，不定义 HOW：
 - 优先级冲突
 - 多种可能解释
 - 依赖外部系统但接口缺失
+- 成功标准缺失可量化指标
+- 术语未定义或同词多义
+- 角色/权限边界不清晰
+- 时间/时序约束不明确
+- 数据来源与可信度未定义
 
 歧义分类标签：
 - `BOUNDARY`（边界值）
@@ -55,9 +62,28 @@ spec 阶段只定义 WHAT，不定义 HOW：
 - `PRIORITY`（优先级冲突）
 - `SEMANTIC`（语义多解）
 - `DEPENDENCY`（外部依赖缺失）
+- `METRIC`（成功指标缺失）
+- `TERM`（术语未定义）
+- `ROLE`（角色/权限不清）
+- `TEMPORAL`（时序/时限不清）
+- `DATA`（数据来源/质量不清）
 
 标记格式：
 `[NEEDS CLARIFICATION][<TYPE>] FR-XXX-001: 具体问题？候选范围 A/B/C`
+
+澄清轮次约束：
+- 最多 5 轮澄清，每轮最多 3 个问题
+- 每轮结束必须把确认结果回写 `spec.md`
+- 若 5 轮后仍存在阻断级歧义，停止推进并标记为 `[BLOCKED]`
+
+## Dynamic Clarification Questions（P2-07）
+
+每轮澄清问题必须按以下 5 步动态生成，禁止固定模板硬问：
+1. 读取当前轮未闭环的 `[NEEDS CLARIFICATION]`，按风险排序（范围/安全/合规优先）
+2. 仅保留“会改变 FR/AC/NFR 结果”的问题，删除不会影响输出的问题
+3. 每个问题提供 2-3 个可执行候选（A/B/C），避免开放式泛问
+4. 合并重复语义问题，保证一轮最多 3 问
+5. 本轮结束后把答案写回 `spec.md`，并更新剩余歧义列表再进入下一轮
 
 ## AC ID 规范（P1-02）
 
@@ -70,6 +96,16 @@ spec 阶段只定义 WHAT，不定义 HOW：
 在输出前必须按以下清单复核：
 - `references/spec-review-checklist.md`
 - `references/test-level-glossary.md`（UT/IT/E2E/ST 术语）
+
+## Plan Mode 协同（P1-08）
+
+- 当需求边界复杂或存在多方约束冲突时，优先进入 Plan Mode 做澄清与方案收敛
+- Plan Mode 的结论必须回填 `findings.md`，至少包含：
+  - 目标阶段
+  - 下一步动作
+  - 阻塞项
+  - 风险等级
+  - 建议命令
 
 ## 2-Action Rule（Planning-with-Files P0-1）
 

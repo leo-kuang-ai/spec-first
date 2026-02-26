@@ -21,6 +21,7 @@ function writeState(stage: string, mode = 'N', size = 'M') {
     featureId: FEAT, mode, size, platforms: ['h5'],
     currentStage: stage, history: [], terminal: false,
     createdAt: '2026-02-11T00:00:00Z',
+    updatedAt: '2026-02-11T00:00:00Z',
   }));
 }
 
@@ -29,6 +30,11 @@ function writeMatrix(rows: string) {
     '| ID | Type | Title | Status | Upstream | Downstream |\n' +
     '|----|------|-------|--------|----------|------------|\n' + rows,
   );
+}
+
+function writeSpecReview(content: string) {
+  mkdirSync(join(TMP, 'specs', FEAT, 'checklists'), { recursive: true });
+  writeFileSync(join(TMP, 'specs', FEAT, 'checklists', 'spec-review.md'), content, 'utf-8');
 }
 
 beforeEach(() => {
@@ -78,8 +84,20 @@ describe('evaluateGate', () => {
     writeState('01_specify');
     writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
     writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] 完整性\n- [x] 清晰度\n- [x] 可测量\n- [x] 一致性\n- [ ] 风险\n');
     const result = evaluateGate(FEAT, TMP);
     expect(result.status).toBe('PASS');
+  });
+
+  it('should FAIL for 01_specify when C10 is below threshold', () => {
+    writeState('01_specify');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] 完整性\n- [ ] 清晰度\n- [ ] 可测量\n- [ ] 一致性\n');
+    const result = evaluateGate(FEAT, TMP);
+    const c10 = result.conditions.find(c => c.id === 'G-SPEC-03');
+    expect(c10?.status).toBe('FAIL');
+    expect(c10?.detail).toContain('C10=25.0%');
   });
 
   it('should FAIL for 02_design when design.md missing', () => {
@@ -88,6 +106,40 @@ describe('evaluateGate', () => {
     const result = evaluateGate(FEAT, TMP);
     expect(result.status).toBe('FAIL');
     expect(result.suggestions).toBeDefined();
+  });
+
+  it('should PASS C11 when constitution metadata exists and design references constitution clause', () => {
+    writeState('02_design');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.0.0) is applied.', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.0.0\n- Ratified: 2026-02-26\n- Last Amended: 2026-02-26\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('PASS');
+  });
+
+  it('should FAIL C11 when design has no constitution reference', () => {
+    writeState('02_design');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\nNo governance section', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.0.0\n- Ratified: 2026-02-26\n- Last Amended: 2026-02-26\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('FAIL');
   });
 
   it('should write gate-history.jsonl on evaluation', () => {
@@ -120,6 +172,174 @@ describe('evaluateGate', () => {
     const result = evaluateGate(FEAT, TMP);
     const wrapCond = result.conditions.find(c => c.id === 'G-WRAP-02');
     expect(wrapCond?.status).toBe('PASS');
+  });
+
+  it('should FAIL for 03_plan when analysis-report.md is missing', () => {
+    writeState('03_plan');
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-001 |  |\n',
+    );
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'G-PLAN-03');
+    expect(cond?.status).toBe('FAIL');
+    expect(cond?.detail).toContain('Analyze report missing');
+  });
+
+  it('should FAIL for 03_plan when analysis-report.md has CRITICAL findings', () => {
+    writeState('03_plan');
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-001 |  |\n',
+    );
+    mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'reports', 'analysis-report.md'),
+      '# Analysis Report\n\n## Summary\n- CRITICAL: 2\n- HIGH: 0\n- MEDIUM: 0\n- LOW: 0\n',
+      'utf-8',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'G-PLAN-03');
+    expect(cond?.status).toBe('FAIL');
+    expect(cond?.detail).toContain('CRITICAL=2');
+  });
+
+  it('should PASS for 03_plan when analysis-report.md has zero CRITICAL', () => {
+    writeState('03_plan');
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-001 |  |\n',
+    );
+    mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'reports', 'analysis-report.md'),
+      '# Analysis Report\n\n## Summary\n- CRITICAL: 0\n- HIGH: 1\n- MEDIUM: 0\n- LOW: 0\n',
+      'utf-8',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'G-PLAN-03');
+    expect(cond?.status).toBe('PASS');
+  });
+
+  it('should PASS Layer2 command gate with allowed command', () => {
+    writeState('00_init');
+    writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), JSON.stringify({
+      featureId: FEAT,
+      mode: 'N',
+      size: 'M',
+      platforms: ['h5'],
+      currentStage: '00_init',
+      history: [],
+      terminal: false,
+      createdAt: '2026-02-11T00:00:00Z',
+      updatedAt: '2026-02-11T00:00:00Z',
+      mergedRules: {
+        gateConditions: {
+          '00_init': [{
+            id: 'L2-CMD-001',
+            description: 'node command should pass',
+            command: 'node -e "process.stdout.write(\'ok\')"',
+          }],
+        },
+        deliverables: {},
+        thresholds: {},
+      },
+    }), 'utf-8');
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'L2-CMD-001');
+    expect(cond?.status).toBe('PASS');
+  });
+
+  it('should FAIL Layer2 command gate with blocked operator', () => {
+    writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), JSON.stringify({
+      featureId: FEAT,
+      mode: 'N',
+      size: 'M',
+      platforms: ['h5'],
+      currentStage: '00_init',
+      history: [],
+      terminal: false,
+      createdAt: '2026-02-11T00:00:00Z',
+      updatedAt: '2026-02-11T00:00:00Z',
+      mergedRules: {
+        gateConditions: {
+          '00_init': [{
+            id: 'L2-CMD-002',
+            description: 'unsafe operator should fail',
+            command: 'node -e "process.stdout.write(\'ok\')"; echo hacked',
+          }],
+        },
+        deliverables: {},
+        thresholds: {},
+      },
+    }), 'utf-8');
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'L2-CMD-002');
+    expect(cond?.status).toBe('FAIL');
+    expect(cond?.detail).toContain('Blocked command');
+  });
+
+  it('should FAIL Layer2 command gate with disallowed executable', () => {
+    writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), JSON.stringify({
+      featureId: FEAT,
+      mode: 'N',
+      size: 'M',
+      platforms: ['h5'],
+      currentStage: '00_init',
+      history: [],
+      terminal: false,
+      createdAt: '2026-02-11T00:00:00Z',
+      updatedAt: '2026-02-11T00:00:00Z',
+      mergedRules: {
+        gateConditions: {
+          '00_init': [{
+            id: 'L2-CMD-004',
+            description: 'disallowed executable should fail',
+            command: 'rm -rf ./tmp',
+          }],
+        },
+        deliverables: {},
+        thresholds: {},
+      },
+    }), 'utf-8');
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'L2-CMD-004');
+    expect(cond?.status).toBe('FAIL');
+    expect(cond?.detail).toContain('not allowed');
+  });
+
+  it('should PASS Layer2 command gate with logical and chain', () => {
+    writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), JSON.stringify({
+      featureId: FEAT,
+      mode: 'N',
+      size: 'M',
+      platforms: ['h5'],
+      currentStage: '00_init',
+      history: [],
+      terminal: false,
+      createdAt: '2026-02-11T00:00:00Z',
+      updatedAt: '2026-02-11T00:00:00Z',
+      mergedRules: {
+        gateConditions: {
+          '00_init': [{
+            id: 'L2-CMD-003',
+            description: 'and chain should pass',
+            command: 'node -e "process.stdout.write(\'a\')" && node -e "process.stdout.write(\'b\')"',
+          }],
+        },
+        deliverables: {},
+        thresholds: {},
+      },
+    }), 'utf-8');
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find(c => c.id === 'L2-CMD-003');
+    expect(cond?.status).toBe('PASS');
   });
 });
 

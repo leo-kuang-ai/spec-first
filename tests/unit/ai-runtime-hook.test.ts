@@ -28,7 +28,9 @@ describe('registerAIHooks', () => {
     const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
     const preEntries = settings.hooks.PreToolUse;
     expect(preEntries).toHaveLength(2);
-    expect(preEntries[0]).toHaveProperty('matcher', 'write|edit|create');
+    expect(preEntries[0].matcher).toContain('write');
+    expect(preEntries[0].matcher).toContain('multi_edit');
+    expect(preEntries[1].matcher).toBe(preEntries[0].matcher);
     expect(preEntries[0].hooks[0]).toHaveProperty('type', 'command');
     expect(preEntries[0].hooks[0].command).toContain('task-context.sh');
     expect(preEntries[1].hooks[0].command).toContain('npx spec-first gate check');
@@ -86,5 +88,24 @@ describe('registerAIHooks', () => {
     const result = registerAIHooks(TMP);
     expect(result.registered).toHaveLength(0);
     expect(result.warnings.length).toBeGreaterThan(0);
+  });
+
+  it('should merge enabled extension hook configs', () => {
+    const extDir = join(TMP, '.spec-first', 'extensions', 'qa-pack');
+    mkdirSync(extDir, { recursive: true });
+    writeFileSync(join(extDir, 'extension.yaml'), `
+namespace: qa
+version: 1.0.0
+enabled: true
+hooks:
+  - type: Stop
+    command: echo ext-stop
+`, 'utf-8');
+
+    registerAIHooks(TMP);
+    const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
+    const stopEntries = settings.hooks.Stop;
+    expect(stopEntries.some((entry: { hooks: Array<{ command: string }> }) =>
+      entry.hooks[0].command.includes('SPEC_FIRST_EXTENSION_NAMESPACE=qa'))).toBe(true);
   });
 });

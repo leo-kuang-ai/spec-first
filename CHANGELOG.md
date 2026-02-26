@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.48 2026-02-26 Leo: docs: 文档准确性修正 — CLI参考手册删除 gate check 不存在的 --stage/--ci 参数；安装与更新方案 Skill 数量统计修正 19→21
+- v0.5.47 2026-02-26 Leo: docs: 更新开发任务文档修复进度 — `落地清单-开发任务.md` 升级至 v1.12；同步回写本轮回归收口（doctor SessionStart 诊断修复、skill-runtime 测试稳健性修复、T009 验收勾选完成）与最新文档状态口径 (user-visible)
+- v0.5.46 2026-02-26 Leo: fix: 收口剩余回归与稳定性问题 — `doctor` 复用 `session-hook-managed` 统一托管识别并修复 SessionStart 检查类型错误（`pnpm tsc --noEmit` 通过）；`skill-runtime` 测试提交步骤显式关闭 `commit.gpgsign` 以消除环境签名差异导致的失败；同步回写 T009 验收清单勾选状态 (user-visible)
+- v0.5.45 2026-02-26 Leo: feat: 清单收口第三批 — 新增 Extension System 底座（`.spec-first/extensions/*/extension.yaml`，支持 namespace/version/enabled，装载 Rule+Skill+Hook）；`layer-merger` 接入扩展规则（Gate ID 命名空间隔离、阈值 key 命名空间化）；`dispatcher` 支持 `ext.<namespace>.<skill>` 路由并统一注入 Next Steps 交接约束；`ai-runtime-hook` 支持扩展 Hook 装载；追踪体系新增 V-Model 四层 ID（REQ/SYS/ARCH/MOD/ATP/STP/ITP/UTP）与双向配对检查；新增 `.spec-first/layer2/v-model.yaml` 与对应单测 (user-visible)
+- v0.5.44 2026-02-26 Leo: fix: SessionStart legacy 识别防误删强化 — 兜底短格式匹配新增 entry 指纹约束（`matcher='*'` + `type='command'` + `timeout=15`）后才判定托管；保留强信号快速识别；补充 quoted other-tool 保留用例，避免清理非托管 SessionStart (user-visible)
+- v0.5.43 2026-02-26 Leo: feat: 补齐剩余清单关键项 — `todo-runner` 新增依赖就绪并行批次调度（`pickReadyTodos`，顺序屏障 + in_progress 恢复优先）；Feature 定位支持“精确→前缀→环境变量”降级链；`ai context` 接入 Progressive Disclosure（默认 summary、`--expand/--full` 增量明细、token 预算/估算可观测）；`update`/skill 注册支持 `--host` 与 generic 目标；设计阶段推进后自动同步宿主上下文托管区块并保留手动块；补充对应单测 (user-visible)
+- v0.5.42 2026-02-26 Leo: fix: SessionStart legacy 托管识别稳健性增强 — `session-hook-managed` 从固定整段签名改为组合特征匹配（`viewer open` + `--print-url` + `--background` + quoted bin）；兼容重定向变体；新增非托管 `other-tool viewer open --print-url --background` 保留用例，防止误删 (user-visible)
+- v0.5.41 2026-02-26 Leo: fix: 删除 orchestrate SKILL.md 重复标题 — 移除第109行空的"批量执行与检查点（P1-13）"标题，保留第125行完整章节 (user-visible)
+- v0.5.40 2026-02-26 Leo: docs: 功能完整性与Skill逻辑审查报告 — 2个并发Agent审查42个CLI命令/39个核心模块/21个Skills；功能完整性100%、Skill逻辑准确性通过；发现1个Low问题（orchestrate SKILL.md重复内容）；输出 `docs/function-skill-review-report-2026-02-26.md`
+- v0.5.39 2026-02-26 Leo: fix: SessionStart 托管识别统一为显式标记 + 兼容旧规则 — 新增共享识别模块 `session-hook-managed`，注册命令注入 `SPEC_FIRST_MANAGED_SESSION=1`，`registerSessionHooks` 与 `uninstall` 共用同一识别函数；补充无 `spec-first` 字面量 legacy 命令迁移与清理回归测试 (user-visible)
+- v0.5.38 2026-02-26 Leo: docs: 全链路代码审查报告 — 5个并发Agent（安全/性能/质量/最佳实践/测试覆盖）审查67个TS源文件；发现Critical×1（命令注入）、High×7（路径遍历/I/O阻塞/函数过长）、Medium×40+、Low×28+；输出 `docs/code-review-report-2026-02-26.md`
 - v0.5.37 2026-02-26 Leo: fix: Planning-with-Files P1-2 PostToolUse 进度同步提醒 — 新增 `progress-sync.sh` 脚本；PostToolUse Hook 增加"进度同步提醒"与 matrix check 并存；每次文件修改后提醒 AI 检查是否需要更新 task_plan.md 状态；补充对应单测；修复 tool-integration.test.ts 断言（5→6 hook configs）(user-visible)
 - v0.5.36 2026-02-26 Leo: fix: Superpowers P0-1/P1-2/P1-3/P1-4 + Planning-with-Files P0-1/P0-2/P1-1/P2-1/P2-2 问题修复 — Session Hook 注入技能路由表+1%规则；03-spec/05-research 补充 2-Action Rule；catchup 输出 5-Question Reboot Test 结构化答案；spec/design/orchestrate 添加 Graphviz 决策图；hard-gate 增加 Worktree First 运行时守卫（分支检测+高风险评估）；doctor 增加 Session Hook 可达性诊断；context-pack 接入 sliceContext 分层压缩 + buildTaskContextPack (TASK 级独立上下文); prompt-assembler 增加 KV-Cache 稳定性规则文档与校验函数 (user-visible)
 - v0.5.35 2026-02-26 Leo: fix: SessionStart Hook 路径回退稳健性增强 — 使用注册阶段解析到的 CLI 绝对路径作为 `SPEC_FIRST_BIN_FALLBACK` 注入；运行时优先 `SPEC_FIRST_BIN`，否则回退到已解析路径；补充单测覆盖路径注入与命令执行变量展开

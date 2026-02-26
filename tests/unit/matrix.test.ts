@@ -68,6 +68,36 @@ describe('checkMatrix', () => {
     const result = checkMatrix(FEAT_ID, TMP);
     expect(result.warnings.length).toBeGreaterThan(0);
   });
+
+  it('should detect missing V-Model forward/backward mappings', () => {
+    const vModelMatrix = `| ID | Type | Title | Status | Upstream | Downstream |
+|----|------|-------|--------|----------|------------|
+| REQ-AUTH-001 | REQ | Requirement | Planned |  |  |
+| ATP-AUTH-001 | ATP | Acceptance Test | Planned |  |  |
+`;
+    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), vModelMatrix, 'utf-8');
+    const result = checkMatrix(FEAT_ID, TMP);
+    expect(result.vModelPairs.length).toBe(2);
+    expect(result.vModelPairs.some((p) => p.id === 'REQ-AUTH-001' && p.direction === 'forward')).toBe(true);
+    expect(result.vModelPairs.some((p) => p.id === 'ATP-AUTH-001' && p.direction === 'backward')).toBe(true);
+  });
+
+  it('should pass V-Model pairing when bidirectional links exist', () => {
+    const vModelMatrix = `| ID | Type | Title | Status | Upstream | Downstream |
+|----|------|-------|--------|----------|------------|
+| REQ-AUTH-001 | REQ | Requirement | Planned |  | ATP-AUTH-001 |
+| ATP-AUTH-001 | ATP | Acceptance Test | Planned | REQ-AUTH-001 |  |
+| SYS-AUTH-001 | SYS | System Design | Planned | REQ-AUTH-001 | STP-AUTH-001 |
+| STP-AUTH-001 | STP | System Test | Planned | SYS-AUTH-001 |  |
+| ARCH-AUTH-001 | ARCH | Architecture | Planned | SYS-AUTH-001 | ITP-AUTH-001 |
+| ITP-AUTH-001 | ITP | Integration Test | Planned | ARCH-AUTH-001 |  |
+| MOD-AUTH-001 | MOD | Module | Planned | ARCH-AUTH-001 | UTP-AUTH-001 |
+| UTP-AUTH-001 | UTP | Unit Test Plan | Planned | MOD-AUTH-001 |  |
+`;
+    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), vModelMatrix, 'utf-8');
+    const result = checkMatrix(FEAT_ID, TMP);
+    expect(result.vModelPairs).toHaveLength(0);
+  });
 });
 
 describe('exportMatrix', () => {

@@ -10,12 +10,7 @@ import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { detectHostPaths } from '../../shared/host-paths.js';
 import { uninstallHooks } from '../../core/tool-integration/hook-installer.js';
-
-function isSpecFirstViewerCommand(command: unknown): boolean {
-  if (typeof command !== 'string') return false;
-  const normalized = command.toLowerCase();
-  return normalized.includes('spec-first') && normalized.includes('viewer open');
-}
+import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
 
 export function handleUninstall(args: string[]): number {
   if (args.includes('--help') || args.includes('-h')) {
@@ -42,6 +37,14 @@ export function handleUninstall(args: string[]): number {
 interface UninstallOptions {
   dryRun: boolean;
   keepMcp: boolean;
+}
+
+interface HookCommand {
+  command?: unknown;
+}
+
+interface HookEntry {
+  hooks?: HookCommand[];
 }
 
 function runUninstall({ dryRun, keepMcp }: UninstallOptions): number {
@@ -122,11 +125,7 @@ function removeSessionHook(claudeHomeDir: string, dryRun: boolean, prefix: strin
     }
 
     const before = hooks.SessionStart.length;
-    hooks.SessionStart = hooks.SessionStart.filter((item: any) =>
-      !item?.hooks?.some((h: any) =>
-        isSpecFirstViewerCommand(h?.command),
-      ),
-    );
+    hooks.SessionStart = hooks.SessionStart.filter((item: unknown) => !isManagedSessionStartEntry(item));
     const removed = before - hooks.SessionStart.length;
 
     if (removed === 0) {
@@ -169,19 +168,20 @@ function removeAIHooks(projectRoot: string, dryRun: boolean, prefix: string): vo
 
     for (const hookType of hookTypes) {
       if (!Array.isArray(hooks[hookType])) continue;
-      const before = hooks[hookType].length;
-      hooks[hookType] = hooks[hookType].filter((item: any) =>
-        !item?.hooks?.some((h: any) =>
+      const currentEntries = hooks[hookType] as HookEntry[];
+      const before = currentEntries.length;
+      hooks[hookType] = currentEntries.filter((item: HookEntry) =>
+        !item?.hooks?.some((h: HookCommand) =>
           typeof h.command === 'string' && (
             h.command.includes('npx spec-first')
             || h.command.includes('sh .spec-first/hooks/')
           ),
         ),
       );
-      const removed = before - hooks[hookType].length;
+      const removed = before - (hooks[hookType] as HookEntry[]).length;
       totalRemoved += removed;
 
-      if (hooks[hookType].length === 0) {
+      if ((hooks[hookType] as HookEntry[]).length === 0) {
         delete hooks[hookType];
       }
     }
@@ -189,16 +189,17 @@ function removeAIHooks(projectRoot: string, dryRun: boolean, prefix: string): vo
     // 同时清理 SessionStart/SessionEnd
     for (const hookType of ['SessionStart', 'SessionEnd'] as const) {
       if (!Array.isArray(hooks[hookType])) continue;
-      const before = hooks[hookType].length;
-      hooks[hookType] = hooks[hookType].filter((item: any) =>
-        !item?.hooks?.some((h: any) =>
-          typeof h.command === 'string' && (
-            h.command.includes('spec-first') || h.command.includes('session-end')
-          ),
-        ),
-      );
-      totalRemoved += before - hooks[hookType].length;
-      if (hooks[hookType].length === 0) {
+      const currentEntries = hooks[hookType] as HookEntry[];
+      const before = currentEntries.length;
+      hooks[hookType] = currentEntries.filter((item: unknown) => {
+        if (hookType === 'SessionStart') return !isManagedSessionStartEntry(item);
+        return !(item as HookEntry | undefined)?.hooks?.some((hook) =>
+          typeof hook?.command === 'string'
+          && hook.command.includes('session-end'),
+        );
+      });
+      totalRemoved += before - (hooks[hookType] as HookEntry[]).length;
+      if ((hooks[hookType] as HookEntry[]).length === 0) {
         delete hooks[hookType];
       }
     }

@@ -7,6 +7,7 @@ import { ExitCode } from '../../src/shared/types.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-metrics-doctor');
 const FEAT = 'FSREQ-20260211-AUTH-001';
+const ORIGINAL_HOME = process.env.HOME;
 
 function withCwd(dir: string, fn: () => number): number {
   const orig = process.cwd;
@@ -22,6 +23,11 @@ beforeEach(() => {
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
+  if (ORIGINAL_HOME === undefined) {
+    delete process.env.HOME;
+  } else {
+    process.env.HOME = ORIGINAL_HOME;
+  }
 });
 
 describe('handleMetrics', () => {
@@ -133,5 +139,41 @@ describe('handleDoctor', () => {
     }
     expect(lines.join('\n')).toContain('Git Hooks');
     expect(lines.join('\n')).toContain('已跳过');
+  });
+
+  it('should warn when Session Hook misses required bootstrap segments', () => {
+    const fakeHome = join(TMP, 'fake-home');
+    mkdirSync(join(fakeHome, '.claude'), { recursive: true });
+    writeFileSync(
+      join(fakeHome, '.claude', 'settings.json'),
+      JSON.stringify({
+        hooks: {
+          SessionStart: [{
+            matcher: '*',
+            hooks: [{ type: 'command', command: 'spec-first viewer open --background' }],
+          }],
+        },
+      }),
+      'utf-8',
+    );
+    process.env.HOME = fakeHome;
+
+    const lines: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([]));
+    } finally {
+      console.log = originalLog;
+    }
+
+    const joined = lines.join('\n');
+    expect(joined).toContain('Session Hook');
+    expect(joined).toContain('内容不完整');
+    expect(joined).toContain('技能路由表');
+    expect(joined).toContain('1%规则');
+    expect(joined).toContain('catchup 提示');
   });
 });

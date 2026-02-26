@@ -12,8 +12,23 @@ export interface MatrixCheckResult {
   total: number;
   orphans: MatrixRow[];
   brokenChains: Array<{ frId: string; missing: string[] }>;
+  vModelPairs: Array<{ id: string; direction: 'forward' | 'backward'; expected: string; detail: string }>;
   warnings: string[];
 }
+
+const V_MODEL_FORWARD: Readonly<Record<'REQ' | 'SYS' | 'ARCH' | 'MOD', 'ATP' | 'STP' | 'ITP' | 'UTP'>> = {
+  REQ: 'ATP',
+  SYS: 'STP',
+  ARCH: 'ITP',
+  MOD: 'UTP',
+};
+
+const V_MODEL_BACKWARD: Readonly<Record<'ATP' | 'STP' | 'ITP' | 'UTP', 'REQ' | 'SYS' | 'ARCH' | 'MOD'>> = {
+  ATP: 'REQ',
+  STP: 'SYS',
+  ITP: 'ARCH',
+  UTP: 'MOD',
+};
 
 /** 解析矩阵 Markdown 表格为结构化数据 */
 export function parseMatrix(featureId: string, projectRoot: string): MatrixRow[] {
@@ -27,12 +42,11 @@ export function parseMatrix(featureId: string, projectRoot: string): MatrixRow[]
 /** 校验矩阵完整性：孤儿项 + 断链 */
 export function checkMatrix(featureId: string, projectRoot: string): MatrixCheckResult {
   const rows = parseMatrix(featureId, projectRoot);
-  const idSet = new Set(rows.map(r => r.id));
   const warnings: string[] = [];
 
-  // 孤儿项：非 FR/Feature 类型且无 upstream
+  // 孤儿项：非 FR/Feature/REQ 类型且无 upstream
   const orphans = rows.filter(r =>
-    r.type !== 'Feature' && r.type !== 'FR' && (!r.upstream || r.upstream.length === 0),
+    r.type !== 'Feature' && r.type !== 'FR' && r.type !== 'REQ' && (!r.upstream || r.upstream.length === 0),
   );
   for (const o of orphans) {
     warnings.push(`Orphan: ${o.id} has no upstream reference`);
@@ -55,7 +69,12 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
     }
   }
 
-  return { total: rows.length, orphans, brokenChains, warnings };
+  const vModelPairs = checkVModelPairs(rows);
+  for (const issue of vModelPairs) {
+    warnings.push(`V-Model ${issue.direction}: ${issue.id} missing ${issue.expected} (${issue.detail})`);
+  }
+
+  return { total: rows.length, orphans, brokenChains, vModelPairs, warnings };
 }
 
 /** 导出矩阵为 Markdown 或 YAML */
@@ -169,4 +188,54 @@ function exportAsYaml(rows: MatrixRow[]): string {
 /** MatrixRow[] → Markdown（导出用，同 rowsToMarkdown） */
 function exportAsMarkdown(rows: MatrixRow[]): string {
   return rowsToMarkdown(rows);
+}
+
+function checkVModelPairs(rows: MatrixRow[]): MatrixCheckResult['vModelPairs'] {
+  const issues: MatrixCheckResult['vModelPairs'] = [];
+  const byId = new Map(rows.map((row) => [row.id, row]));
+
+  const hasTypeLink = (source: MatrixRow, expectedType: string): boolean => {
+    const byDownstream = (source.downstream ?? []).some((id) => byId.get(id)?.type === expectedType);
+    if (byDownstream) return true;
+    return rows.some((row) => row.type === expectedType && (row.upstream ?? []).includes(source.id));
+  };
+
+  for (const row of rows) {
+    if (row.type === 'REQ' || row.type === 'SYS' || row.type === 'ARCH' || row.type === 'MOD') {
+      const expected = V_MODEL_FORWARD[row.type];
+      if (!hasTypeLink(row, expected)) {
+        issues.push({
+          id: row.id,
+          direction: 'forward',
+          expected,
+          detail: `${row.type} -> ${expected}`,
+        });
+      }
+      continue;
+    }
+
+    if (row.type === 'ATP' || row.type === 'STP' || row.type === 'ITP' || row.type === 'UTP') {
+      const expected = V_MODEL_BACKWARD[row.type];
+      const linkedUpstreamTypes = new Set<string>();
+      for (const upstreamId of row.upstream ?? []) {
+        const upstream = byId.get(upstreamId);
+        if (upstream) linkedUpstreamTypes.add(upstream.type);
+      }
+      for (const candidate of rows) {
+        if ((candidate.downstream ?? []).includes(row.id)) {
+          linkedUpstreamTypes.add(candidate.type);
+        }
+      }
+      if (!linkedUpstreamTypes.has(expected)) {
+        issues.push({
+          id: row.id,
+          direction: 'backward',
+          expected,
+          detail: `${row.type} <- ${expected}`,
+        });
+      }
+    }
+  }
+
+  return issues;
 }

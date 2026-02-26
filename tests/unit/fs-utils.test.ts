@@ -34,6 +34,10 @@ describe('readJson / writeJson', () => {
     expect(() => readJson(join(TMP, 'nope.json'))).toThrow();
   });
 
+  it('should block path traversal for readJson', () => {
+    expect(() => readJson('../secrets.json')).toThrow('路径遍历');
+  });
+
   it('should create parent dirs if missing', () => {
     const p = join(TMP, 'deep/nested/test.json');
     writeJson(p, { ok: true });
@@ -47,6 +51,10 @@ describe('readMarkdown / writeMarkdown', () => {
     const p = join(TMP, 'test.md');
     writeMarkdown(p, md);
     expect(readMarkdown(p)).toBe(md);
+  });
+
+  it('should block path traversal for writeMarkdown', () => {
+    expect(() => writeMarkdown('../escape.md', '# blocked')).toThrow('路径遍历');
   });
 });
 

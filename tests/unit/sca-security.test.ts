@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runSca } from '../../src/core/gate-engine/sca.js';
+import { analyzeArtifacts, getCriticalCountFromAnalysisReport, renderAnalysisReport, runSca } from '../../src/core/gate-engine/sca.js';
 import { validateSecurity, parseSecurityReport } from '../../src/core/gate-engine/security.js';
 import { Stage } from '../../src/shared/types.js';
 
@@ -86,6 +86,28 @@ describe('runSca', () => {
     const result = runSca(FEAT, TMP, Stage.INIT);
     expect(result.pass).toBe(true);
     expect(result.checks[0].rule).toContain('SKIP');
+  });
+});
+
+describe('analyzeArtifacts', () => {
+  it('should report CRITICAL when required artifact is missing', () => {
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    const result = analyzeArtifacts(FEAT, TMP);
+    expect(result.summary.CRITICAL).toBeGreaterThan(0);
+    expect(result.findings.some((f) => f.type === 'ARTIFACT_MISSING')).toBe(true);
+  });
+
+  it('should render report and parse critical count', () => {
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# spec', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), '# tasks', 'utf-8');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+
+    const result = analyzeArtifacts(FEAT, TMP);
+    const report = renderAnalysisReport(result);
+    const critical = getCriticalCountFromAnalysisReport(report);
+    expect(critical).toBe(result.summary.CRITICAL);
+    expect(report).toContain('Analysis Report');
   });
 });
 

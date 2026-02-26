@@ -8,6 +8,9 @@
 - **标题**: {{title}}
 - **模式**: {{mode}} | **规模**: {{size}}
 - **目标平台**: {{#each platforms}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+- **Version**: 1.0.0
+- **Ratified**: {{timestamp}}
+- **Last Amended**: {{timestamp}}
 - **创建时间**: {{timestamp}}
 - **负责人**: {{author}}
 
@@ -36,3 +39,9 @@
 | 日期 | 变更内容 | 变更人 |
 |------|----------|--------|
 | {{timestamp}} | 初始化 | {{author}} |
+
+## Amendment History
+
+| Version | Date | Summary | Author |
+|---------|------|---------|--------|
+| 1.0.0 | {{timestamp}} | 初始版本 | {{author}} |

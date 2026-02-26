@@ -24,7 +24,10 @@ export const TERMINAL_STAGES: ReadonlySet<Stage> = new Set([
 ]);
 
 // ─── ID 类型 ──────────────────────────────────────────────
-export type NextIdType = 'FR' | 'DS' | 'TASK' | 'TC' | 'RFC';
+export type NextIdType =
+  | 'FR' | 'DS' | 'TASK' | 'TC' | 'RFC'
+  | 'REQ' | 'SYS' | 'ARCH' | 'MOD'
+  | 'ATP' | 'STP' | 'ITP' | 'UTP';
 export type IdType = NextIdType | 'Feature';
 
 /** TC 级别前缀 */

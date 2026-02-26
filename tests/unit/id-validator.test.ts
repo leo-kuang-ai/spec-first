@@ -20,6 +20,20 @@ describe('validateId', () => {
     expect(validateId('TASK-AUTH-001')).toEqual({ valid: true, type: 'TASK' });
   });
 
+  it('should validate V-Model requirement side IDs', () => {
+    expect(validateId('REQ-AUTH-001')).toEqual({ valid: true, type: 'REQ' });
+    expect(validateId('SYS-AUTH-001')).toEqual({ valid: true, type: 'SYS' });
+    expect(validateId('ARCH-AUTH-001')).toEqual({ valid: true, type: 'ARCH' });
+    expect(validateId('MOD-AUTH-001')).toEqual({ valid: true, type: 'MOD' });
+  });
+
+  it('should validate V-Model test side IDs', () => {
+    expect(validateId('ATP-AUTH-001')).toEqual({ valid: true, type: 'ATP' });
+    expect(validateId('STP-AUTH-001')).toEqual({ valid: true, type: 'STP' });
+    expect(validateId('ITP-AUTH-001')).toEqual({ valid: true, type: 'ITP' });
+    expect(validateId('UTP-AUTH-001')).toEqual({ valid: true, type: 'UTP' });
+  });
+
   it('should validate TC ID with level prefix', () => {
     expect(validateId('TC-UT-AUTH-001')).toEqual({ valid: true, type: 'TC' });
     expect(validateId('TC-IT-AUTH-002')).toEqual({ valid: true, type: 'TC' });

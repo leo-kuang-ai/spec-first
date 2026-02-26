@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ExitCode } from '../../src/shared/types.js';
 
 vi.mock('../../src/shared/skill-commands.js', () => ({
-  ensureSkillCommands: vi.fn(() => ({ claude: ['a', 'b'], codex: ['a'], codexWarnings: [] })),
+  ensureSkillCommands: vi.fn(() => ({ claude: ['a', 'b'], codex: ['a'], generic: [], codexWarnings: [] })),
 }));
 vi.mock('../../src/shared/host-bootstrap.js', () => ({
   ensureHostBootstrap: vi.fn(() => ({ ok: true, results: [] })),
@@ -72,17 +72,27 @@ describe('handleUpdate', () => {
     vi.restoreAllMocks();
   });
 
+  it('should pass selected hosts to ensureSkillCommands', () => {
+    vi.spyOn(console, 'log').mockImplementation(() => {});
+    handleUpdate(['--host', 'generic,codex']);
+    expect(ensureSkillCommands).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ hosts: ['generic', 'codex'] }),
+    );
+    vi.restoreAllMocks();
+  });
+
   it('should return UNKNOWN_ERROR on throw without --from-postinstall', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(ensureSkillCommands).mockImplementation(() => { throw new Error('boom'); });
     expect(handleUpdate([])).toBe(ExitCode.UNKNOWN_ERROR);
-    vi.mocked(ensureSkillCommands).mockReturnValue({ claude: [], codex: [] });
+    vi.mocked(ensureSkillCommands).mockReturnValue({ claude: [], codex: [], generic: [], codexWarnings: [] });
     vi.restoreAllMocks();
   });
 
   it('should return SUCCESS in --from-postinstall even on error', () => {
     vi.mocked(ensureSkillCommands).mockImplementation(() => { throw new Error('fail'); });
     expect(handleUpdate(['--from-postinstall'])).toBe(ExitCode.SUCCESS);
-    vi.mocked(ensureSkillCommands).mockReturnValue({ claude: [], codex: [] });
+    vi.mocked(ensureSkillCommands).mockReturnValue({ claude: [], codex: [], generic: [], codexWarnings: [] });
   });
 });

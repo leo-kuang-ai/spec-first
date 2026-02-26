@@ -4,7 +4,6 @@
  */
 import { join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
-import { execSync } from 'node:child_process';
 import type {
   Stage, GateStatus, GateResult, ConditionResult, WaiverRef,
   CoverageMetrics, StageState, IdType,
@@ -13,6 +12,8 @@ import { readJson, appendJsonl, exists } from '../../shared/fs-utils.js';
 import { getCoverage } from '../trace-engine/coverage.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 import { validateExceptions } from '../trace-engine/exception-validator.js';
+import { getCriticalCountFromAnalysisReport } from './sca.js';
+import { runCommandGate } from './command-gate.js';
 
 // ─── Gate 条件定义 ─────────────────────────────────────────
 
@@ -82,6 +83,14 @@ GATE_CONDITIONS['01_specify' as Stage] = [
       return { pass: frCount > 0, detail: `FR count: ${frCount}` };
     },
   },
+  {
+    id: 'G-SPEC-03',
+    description: 'Spec quality score (C10) ≥ 80%',
+    evaluate: (ctx) => {
+      const c10 = evaluateSpecQualityScore(ctx.featureId, ctx.projectRoot);
+      return { pass: c10.pass, detail: c10.detail };
+    },
+  },
 ];
 
 // ─── 02_design 条件 ──────────────────────────────────────
@@ -109,6 +118,14 @@ GATE_CONDITIONS['02_design' as Stage] = [
       };
     },
   },
+  {
+    id: 'G-DESIGN-03',
+    description: 'Constitution compliance (C11)',
+    evaluate: (ctx) => {
+      const c11 = evaluateConstitutionCompliance(ctx.featureId, ctx.projectRoot);
+      return { pass: c11.pass, detail: c11.detail };
+    },
+  },
 ];
 
 // ─── 03_plan 条件 ────────────────────────────────────────
@@ -134,6 +151,14 @@ GATE_CONDITIONS['03_plan' as Stage] = [
     evaluate: (ctx) => {
       const val = ctx.coverage.C8;
       return { pass: val >= 1.0, detail: `C8=${(val * 100).toFixed(1)}%` };
+    },
+  },
+  {
+    id: 'G-PLAN-03',
+    description: 'Analyze CRITICAL findings = 0',
+    evaluate: (ctx) => {
+      const analyze = evaluateAnalyzeCriticalFindings(ctx.featureId, ctx.projectRoot);
+      return { pass: analyze.pass, detail: analyze.detail };
     },
   },
 ];
@@ -414,6 +439,158 @@ interface RfcStatusFile {
   status: string;
 }
 
+function evaluateSpecQualityScore(featureId: string, projectRoot: string): { pass: boolean; detail: string } {
+  const specDir = join(projectRoot, 'specs', featureId);
+  const candidates = [
+    join(specDir, 'checklists', 'spec-review.md'),
+    join(specDir, 'spec-review.md'),
+    join(specDir, 'checklist.md'),
+  ];
+  const source = candidates.find((filePath) => exists(filePath));
+  if (!source) {
+    return {
+      pass: false,
+      detail: 'C10 unavailable: missing checklists/spec-review.md',
+    };
+  }
+
+  const content = readFileSync(source, 'utf-8');
+  const totalChecks = (content.match(/^\s*[-*]\s*\[[ xX]\]\s+/gm) ?? []).length;
+  const passedChecks = (content.match(/^\s*[-*]\s*\[[xX]\]\s+/gm) ?? []).length;
+
+  if (totalChecks > 0) {
+    const score = passedChecks / totalChecks;
+    return {
+      pass: score >= 0.8,
+      detail: `C10=${(score * 100).toFixed(1)}% (${passedChecks}/${totalChecks}) source=${toFeatureRelativePath(featureId, projectRoot, source)}`,
+    };
+  }
+
+  const explicitScore = parseExplicitPercent(content, 'C10');
+  if (explicitScore !== undefined) {
+    return {
+      pass: explicitScore >= 0.8,
+      detail: `C10=${(explicitScore * 100).toFixed(1)}% source=${toFeatureRelativePath(featureId, projectRoot, source)} (from explicit score)`,
+    };
+  }
+
+  return {
+    pass: false,
+    detail: `C10 unavailable: no checklist items parsed in ${toFeatureRelativePath(featureId, projectRoot, source)}`,
+  };
+}
+
+function evaluateConstitutionCompliance(featureId: string, projectRoot: string): { pass: boolean; detail: string } {
+  const constitutionPath = join(projectRoot, 'specs', featureId, 'constitution.md');
+  if (!exists(constitutionPath)) {
+    return { pass: false, detail: 'C11 FAIL: constitution.md missing' };
+  }
+
+  const designPath = join(projectRoot, 'specs', featureId, 'design.md');
+  if (!exists(designPath)) {
+    return { pass: false, detail: 'C11 FAIL: design.md missing' };
+  }
+
+  const constitution = readFileSync(constitutionPath, 'utf-8');
+  const design = readFileSync(designPath, 'utf-8');
+
+  const meta = parseConstitutionMeta(constitution);
+  const failures: string[] = [];
+
+  if (!meta.version) {
+    failures.push('missing version');
+  } else if (!/^\d+\.\d+\.\d+$/.test(meta.version.replace(/^v/i, ''))) {
+    failures.push(`invalid version (${meta.version})`);
+  }
+  if (!meta.ratified) failures.push('missing ratified date');
+  if (!meta.lastAmended) failures.push('missing last_amended date');
+  if (!meta.hasAmendmentHistory) failures.push('missing amendment history section');
+  if (!hasConstitutionReference(design, meta.version)) {
+    failures.push('design.md missing constitution clause reference');
+  }
+
+  if (failures.length > 0) {
+    return { pass: false, detail: `C11 FAIL: ${failures.join('; ')}` };
+  }
+
+  return {
+    pass: true,
+    detail: `C11 PASS: version=${meta.version}, ratified=${meta.ratified}, last_amended=${meta.lastAmended}`,
+  };
+}
+
+function evaluateAnalyzeCriticalFindings(featureId: string, projectRoot: string): { pass: boolean; detail: string } {
+  const reportPath = join(projectRoot, 'specs', featureId, 'reports', 'analysis-report.md');
+  if (!exists(reportPath)) {
+    return {
+      pass: false,
+      detail: 'Analyze report missing: run `spec-first analyze <featureId>` first',
+    };
+  }
+
+  const content = readFileSync(reportPath, 'utf-8');
+  const critical = getCriticalCountFromAnalysisReport(content);
+  return {
+    pass: critical === 0,
+    detail: `Analyze CRITICAL=${critical} (source=reports/analysis-report.md)`,
+  };
+}
+
+function parseConstitutionMeta(content: string): {
+  version?: string;
+  ratified?: string;
+  lastAmended?: string;
+  hasAmendmentHistory: boolean;
+} {
+  const versionMatch = content.match(/(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*([vV]?\d+\.\d+\.\d+)/i);
+  const ratifiedMatch = content.match(/(?:\*\*)?\s*(?:ratified|批准日期|通过日期|生效日期)\s*(?:\*\*)?\s*[:：]\s*(\d{4}-\d{2}-\d{2})/i);
+  const amendedMatch = content.match(/(?:\*\*)?\s*(?:last[_\s-]*amended|最近修订|最后修订)\s*(?:\*\*)?\s*[:：]\s*(\d{4}-\d{2}-\d{2})/i);
+  const hasAmendmentHistory = /(?:^|\n)##\s*(amendment history|修订历史)\b/i.test(content)
+    || /(?:amendment history|修订历史)/i.test(content);
+  return {
+    version: versionMatch?.[1],
+    ratified: ratifiedMatch?.[1],
+    lastAmended: amendedMatch?.[1],
+    hasAmendmentHistory,
+  };
+}
+
+function hasConstitutionReference(designContent: string, version?: string): boolean {
+  const lines = designContent.split('\n');
+  const hasClauseStyleRef = lines.some((line) =>
+    /(constitution|宪法)/i.test(line)
+    && /(clause|条款|principle|原则|version|版本|v\d+\.\d+\.\d+)/i.test(line),
+  );
+  if (hasClauseStyleRef) return true;
+
+  if (version) {
+    const normalized = version.replace(/^v/i, '');
+    const byVersion = new RegExp(`(constitution|宪法)[^\\n]{0,48}(v)?${escapeRegExp(normalized)}`, 'i');
+    if (byVersion.test(designContent)) return true;
+  }
+
+  return false;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseExplicitPercent(content: string, metric: string): number | undefined {
+  const pattern = new RegExp(`${escapeRegExp(metric)}\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\s*%?`, 'i');
+  const match = content.match(pattern);
+  if (!match?.[1]) return undefined;
+  const raw = Number.parseFloat(match[1]);
+  if (Number.isNaN(raw)) return undefined;
+  if (raw > 1) return raw / 100;
+  return raw;
+}
+
+function toFeatureRelativePath(featureId: string, projectRoot: string, absolutePath: string): string {
+  const prefix = `${join(projectRoot, 'specs', featureId)}/`;
+  return absolutePath.startsWith(prefix) ? absolutePath.slice(prefix.length) : absolutePath;
+}
+
 function getUncoveredFrIds(
   featureId: string,
   projectRoot: string,
@@ -432,15 +609,4 @@ function getUncoveredFrIds(
   }
 
   return frRows.filter((fr) => !covered.has(fr.id)).map((fr) => fr.id);
-}
-
-/** 执行 Layer2 命令 Gate，返回 pass/fail + 输出摘要 */
-function runCommandGate(command: string, cwd: string): { pass: boolean; detail: string } {
-  try {
-    const stdout = execSync(command, { cwd, timeout: 120_000, stdio: ['pipe', 'pipe', 'pipe'] });
-    return { pass: true, detail: stdout.toString().trim().slice(-200) || 'OK' };
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? (err as { stderr?: Buffer }).stderr?.toString().trim().slice(-200) || err.message : String(err);
-    return { pass: false, detail: msg };
-  }
 }

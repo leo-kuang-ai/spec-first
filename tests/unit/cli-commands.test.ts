@@ -3,6 +3,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleId } from '../../src/cli/commands/id.js';
 import { handleMatrix } from '../../src/cli/commands/matrix.js';
+import { handleAnalyze } from '../../src/cli/commands/analyze.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-cmd');
 const FEAT_ID = 'FSREQ-20260211-AUTH-001';
@@ -79,5 +80,20 @@ describe('handleMatrix', () => {
 
   it('should return error for unknown subcommand', () => {
     expect(handleMatrix(['unknown'])).toBe(2);
+  });
+});
+
+describe('handleAnalyze', () => {
+  it('should return GATE_FAILED when CRITICAL findings exist', () => {
+    const code = handleAnalyze([FEAT_ID]);
+    expect(code).toBe(1);
+  });
+
+  it('should return SUCCESS when no CRITICAL findings', () => {
+    writeFileSync(join(SPEC_DIR, 'spec.md'), '# Spec\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\nConstitution Clause P1\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'task_plan.md'), '# Task Plan\n', 'utf-8');
+    const code = handleAnalyze([FEAT_ID]);
+    expect(code).toBe(0);
   });
 });

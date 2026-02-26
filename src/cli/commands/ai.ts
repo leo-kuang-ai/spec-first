@@ -21,26 +21,40 @@ export function handleAi(args: string[]): number {
 }
 
 function handleContext(args: string[]): number {
-  const featureId = args[0];
+  const featureId = args.find((arg) => !arg.startsWith('--'));
   if (!featureId) {
     console.error('用法：spec-first ai context <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
+  const fullDetail = args.includes('--full');
+  const expandArg = readOptionValue(args, '--expand');
+  const expandPaths = expandArg
+    ? expandArg.split(',').map((item) => item.trim()).filter(Boolean)
+    : [];
 
   try {
-    const pack = buildContextPack(featureId, process.cwd());
+    const pack = buildContextPack(featureId, process.cwd(), { fullDetail, expandPaths });
     const valid = validateControlSize(pack);
 
     console.log(`上下文包 — ${featureId} (v${pack.version})\n`);
     console.log(`阶段：${pack.control.current_phase}`);
     console.log(`控制区大小：${pack.budget.controlSize} bytes ${valid ? '(通过)' : '(超出 2KB!)'}`);
     console.log(`引用数：${pack.budget.refsCount}`);
+    console.log(`Token 预算：${pack.budget.tokenBudget}`);
+    console.log(`Token 估算：${pack.budget.estimatedTokensRaw} -> ${pack.budget.estimatedTokens}`);
+    if (pack.slicing.degradationLevel > 0 && pack.slicing.warning) {
+      console.log(`裁剪级别：L${pack.slicing.degradationLevel} (${pack.slicing.warning})`);
+    }
 
     if (pack.references.length > 0) {
       console.log('\n引用列表：');
       for (const ref of pack.references) {
-        console.log(`  ${ref.path} [${ref.reason}] ${ref.checksum.slice(0, 8)}...`);
+        console.log(`  ${ref.path}#${ref.selector ?? 'n/a'} [${ref.reason}] ${ref.checksum.slice(0, 8)}...`);
       }
+    }
+
+    if (!fullDetail && expandPaths.length === 0) {
+      console.log('\n提示：默认摘要模式。需要详细上下文时可用 `--expand spec.md,design.md` 或 `--full`。');
     }
 
     return valid ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
@@ -97,7 +111,13 @@ function handleStats(args: string[]): number {
 function printAiHelp(): void {
   console.log('用法：spec-first ai <subcommand>\n');
   console.log('子命令：');
-  console.log('  context   生成并展示上下文包');
+  console.log('  context   生成并展示上下文包（支持 --full / --expand <path1,path2>）');
   console.log('  catchup   执行 6 步会话恢复');
   console.log('  stats     查看 AI 调用统计');
+}
+
+function readOptionValue(args: string[], key: string): string | undefined {
+  const idx = args.indexOf(key);
+  if (idx < 0) return undefined;
+  return args[idx + 1];
 }
