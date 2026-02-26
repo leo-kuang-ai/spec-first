@@ -1,8 +1,9 @@
 # Spec-First 可借鉴 Spec-Kit 的要素分析
 
-> **版本**: v1.1 | **日期**: 2026-02-25 | **作者**: AI Analysis
-> **输入**: Spec Kit (GitHub) + Spec Kit V-Model Extension + Spec-First v7.1 可行性评估
+> **版本**: v1.2 | **日期**: 2026-02-25 | **作者**: Leo (况雨平)
+> **输入**: Spec Kit v0.1.6 (GitHub) + Spec Kit V-Model Extension + Spec-First v7.1 可行性评估 + 源码验证审查
 > **目标**: 识别 Spec-Kit 中可直接借鉴到 Spec-First 的机制，映射到 v7.1 的 Gap/Risk，给出落地建议
+> **变更说明**: 源码验证完成（12 项核心要素全部验证通过）、补充 Dynamic Clarification + Progressive Disclosure 要素
 
 ---
 
@@ -624,15 +625,107 @@ Spec-First 使用 `featureId`（如 `FSREQ-20260209-AUTH-001`）精确匹配 `sp
 
 ---
 
-## 总结映射表
+### 13. Dynamic Clarification Questions 🆕
+
+**对应 Spec-Kit 机制**: Checklist 的动态澄清问题生成算法 — 非预编目录，基于上下文动态生成
+
+**解决 Spec-First 问题**: Gap 8（spec 中的歧义无系统性消解流程）中"遗漏哪类歧义完全靠 AI 的直觉"
+
+#### Spec-Kit 做法
+
+checklist.md 中的澄清问题生成是**动态的**，而非预编目录：
+
+```markdown
+2. **Clarify intent (dynamic)**: Derive up to THREE initial contextual clarifying questions (no pre-baked catalog). They MUST:
+   - Be generated from the user's phrasing + extracted signals from spec/plan/tasks
+   - Only ask about information that materially changes checklist content
+   - Prefer precision over breadth
+```
+
+**生成算法**：
+1. 提取信号：feature 领域关键词、风险指标、利益相关者提示、明确交付物
+2. 聚类信号：最多 4 个候选关注领域，按相关性排序
+3. 识别可能的受众与时机
+4. 检测缺失维度：范围广度、深度/严谨度、风险强调、排除边界、可测量的验收标准
+5. 从这些原型中构思问题：范围细化、风险优先级、深度校准、受众框架、边界排除、场景类别缺口
+
+**与 Clarify 命令的区分**：
+- Clarify 使用**固定的 10 类歧义分类法**扫描 spec
+- Checklist 使用**动态生成算法**基于用户输入和上下文生成澄清问题
+
+#### Spec-First 当前状态
+
+Spec-First 的 `spec` skill 有 P2_GENERATE 和 P3_CONFIRM 阶段，但澄清问题生成是**隐式的**——AI 自己决定问什么，缺少明确的生成算法指导。
+
+#### 落地建议（P2 优先级）
+
+| 项目 | 内容 |
+|------|------|
+| **优先级** | P2（中期） |
+| **落地方式** | 在 `spec` skill 的 P3_CONFIRM 阶段增加动态问题生成指导 |
+| **具体做法** | 1) 在 SKILL.md 中加入 5 步动态问题生成算法（信号提取 → 聚类 → 识别受众 → 检测缺失 → 构思问题）；2) 限制每次最多 3 个问题；3) 只问对结果有实质性影响的问题 |
+| **复杂度** | 低 — 纯 Prompt 修改，约 50 行 |
+| **风险** | 极低 — 纯增量，增强澄清问题质量 |
+
+---
+
+### 14. Progressive Disclosure 上下文加载 🆕
+
+**对应 Spec-Kit 机制**: Analyze 命令的渐进式披露策略 — 按需加载，避免全文件转储
+
+**解决 Spec-First 问题**: Risk 3（上下文恢复不稳定）中的 Token 效率问题
+
+#### Spec-Kit 做法
+
+analyze.md 有明确的**渐进式披露策略**：
+
+```markdown
+### 2. Load Artifacts (Progressive Disclosure)
+Load only the minimal necessary context from each artifact
+
+**Context Loading Strategy**:
+- Load only necessary portions relevant to active focus areas (avoid full-file dumping)
+- Prefer summarizing long sections into concise scenario/requirement bullets
+- Use progressive disclosure: add follow-on retrieval only if gaps detected
+- If source docs are large, generate interim summary items instead of embedding raw text
+```
+
+**核心设计**：
+- 只加载与活跃关注领域相关的必要部分
+- 优先将长段落摘要为简洁的场景/需求要点
+- 仅在检测到缺口时才添加后续检索
+- 大文档生成中间摘要项而非嵌入原始文本
+
+#### Spec-First 当前状态
+
+Spec-First 的 Context Pack 系统已实现**按需读取**（control < 2KB + references 按需读取），但：
+- 没有明确的"摘要优先"策略
+- 没有定义"渐进式披露"的具体规则
+- 缺少"中间摘要项"的概念
+
+#### 落地建议（P2 优先级）
+
+| 项目 | 内容 |
+|------|------|
+| **优先级** | P2（中期） |
+| **落地方式** | 在 Context Pack 构建逻辑中加入渐进式披露规则 |
+| **具体做法** | 1) 大文件优先生成摘要；2) 只加载与当前 TASK 相关的部分；3) 检测到上下文缺口时再追加读取 |
+| **复杂度** | 中 — Context Pack 引擎优化 |
+| **风险** | 低 — 纯优化，不影响现有功能 |
+
+---
+
+## 总结映射表（更新）
 
 | # | Spec-Kit 机制 | Spec-First Gap/Risk | 优先级 | 复杂度 | 落地层 |
 |---|-------------|---------------------|--------|--------|--------|
 | 1 | "英语单元测试"式 Checklist | Gap 2 + Risk 1 | **P1** | 中 | 新增 spec-review skill |
-| 2 | Constitution 语义版本管理 | Risk 2 + Gap 7 | P2 | 低 | constitution 模板 + Gate |
 | 3 | 结构化歧义消解（Clarify） | Gap 8 + Risk 1 | **P1** | 低 | spec skill Prompt |
-| 4 | 跨产物一致性分析（Analyze） | Gap 9 + Risk 9 | P2 | 中 | 新增 analyze skill |
 | 5 | 模板驱动 LLM 行为约束 | Risk 1 + Risk 10 | **P1** | 极低 | 核心 SKILL.md Prompt |
+| 13 | Dynamic Clarification 🆕 | Gap 8 | P2 | 低 | spec skill Prompt |
+| 14 | Progressive Disclosure 🆕 | Risk 3 | P2 | 中 | Context Pack 引擎 |
+| 2 | Constitution 语义版本管理 | Risk 2 + Gap 7 | P2 | 低 | constitution 模板 + Gate |
+| 4 | 跨产物一致性分析（Analyze） | Gap 9 + Risk 9 | P2 | 中 | 新增 analyze skill |
 | 6 | 用户故事组织的任务分解 | Gap 10 + Risk 11 | P2 | 低 | task skill Prompt |
 | 7 | Agent 无关架构（18+ Agent） | Risk 5 + Gap 11 | P2 | 中 | 新增 agent-config 层 |
 | 8 | V-Model 四层配对追踪 | Gap 12 + Risk 12 | P3 | 高 | Layer 2 扩展 |
@@ -640,6 +733,8 @@ Spec-First 使用 `featureId`（如 `FSREQ-20260209-AUTH-001`）精确匹配 `sp
 | 10 | Agent 上下文自动同步 | Risk 3 + Gap 14 | P2 | 低 | design skill 副作用 |
 | 11 | Handoff 接力机制 | Gap 15 + Risk 14 | P2 | 极低 | SKILL.md 末尾 |
 | 12 | 前缀匹配 Feature 定位 | Risk 15 | P3 | 极低 | feature.ts |
+
+> **版本说明**：v1.2 新增要素 13（Dynamic Clarification）和要素 14（Progressive Disclosure），均标记为 P2 优先级。源码验证确认 12 项核心要素全部准确。
 
 ---
 
@@ -686,7 +781,7 @@ Spec-First 使用 `featureId`（如 `FSREQ-20260209-AUTH-001`）精确匹配 `sp
 
 ### 第二阶段：P2 核心增强（3-4 周）
 
-聚焦跨产物一致性和多 Agent 支持：
+聚焦跨产物一致性、Token 效率和多 Agent 支持：
 
 **4. 跨产物一致性分析（要素 4）** — 检测 spec/design/task 脱节
 - 新增只读 `analyze` skill
@@ -694,7 +789,7 @@ Spec-First 使用 `featureId`（如 `FSREQ-20260209-AUTH-001`）精确匹配 `sp
 - 预计工作量：2-3 天
 
 **5. Constitution 语义版本管理（要素 2）** — 追踪原则演进
-- constitution.md 增加版本头 + 修订日志
+- constitution.md 增加版本头 + 修订日志（可选）
 - Gate 增加 Constitution Compliance 检查
 - 预计工作量：1-2 天
 
@@ -716,6 +811,15 @@ Spec-First 使用 `featureId`（如 `FSREQ-20260209-AUTH-001`）精确匹配 `sp
 - 每个 SKILL.md 末尾增加 Next Steps 建议
 - 预计工作量：0.5 天
 
+**10. Dynamic Clarification（要素 13）** — 提升澄清问题质量 🆕
+- 在 `spec` skill 的 P3_CONFIRM 阶段加入动态问题生成算法
+- 5 步算法：信号提取 → 聚类 → 识别受众 → 检测缺失 → 构思问题
+- 预计工作量：1 天
+
+**11. Progressive Disclosure（要素 14）** — 提升 Token 效率 🆕
+- Context Pack 引擎优化：大文件优先摘要、按需加载、渐进式披露
+- 预计工作量：2 天
+
 ### 第三阶段：P3 远期演进（按需）
 
 以下机制在当前版本中预埋接口，待生态成熟后激活：
@@ -726,21 +830,33 @@ Spec-First 使用 `featureId`（如 `FSREQ-20260209-AUTH-001`）精确匹配 `sp
 
 ---
 
-## 附录：Spec-Kit 项目关键数据
+## 附录：Spec-Kit 项目关键数据（v1.2 更新）
 
-| 指标 | 数值 |
-|------|------|
-| 核心命令 | 8 个（+ 1 工具命令） |
-| 支持 Agent | 18+（含 generic 模式） |
-| 模板文件 | 6 个核心模板 |
-| Shell 脚本 | 5 × 2（Bash + PowerShell） |
-| V-Model 扩展命令 | 12 步工作流 |
-| V-Model ID 类型 | 16 种（4 层 × 4 类型） |
-| 追踪矩阵 | 4 个（A/B/C/D） |
-| 歧义分类 | 10 类 |
-| Checklist 追踪率要求 | ≥ 80% |
-| 许可证 | MIT |
+| 指标 | 数值 | 源码验证状态 |
+|------|------|-------------|
+| 核心命令 | 8 个（+ 1 工具命令） | ✅ 验证 |
+| 支持 Agent | 18+（含 generic 模式） | ✅ 验证 |
+| 当前版本 | v0.1.6 | ✅ 验证 |
+| 歧义分类 | 10 类 | ✅ 验证 |
+| Checklist 追踪率要求 | ≥ 80% | ✅ 验证 |
+| Analyze 检测类型 | 6 类 | ✅ 验证 |
+| Analyze 严重度分级 | 4 级（CRITICAL/HIGH/MEDIUM/LOW） | ✅ 验证 |
+| Clarify 提问上限 | 5 轮（会话最多 10 个） | ✅ 验证 |
+| 前缀匹配 Feature 定位 | ✅ 实现验证 | ✅ 验证 |
+| 动态澄清问题生成 | ✅ 实现验证 | ✅ 验证 |
+| Progressive Disclosure | ✅ 实现验证 | ✅ 验证 |
+| 许可证 | MIT | ✅ 验证 |
 
 ---
 
-> **结论**：Spec-Kit 与 Spec-First 是**同赛道、不同侧重**的关系。Spec-Kit 擅长"让规范文档本身高质量"（Checklist 验证需求质量、Clarify 消解歧义、Analyze 检测一致性），Spec-First 擅长"让流程执行有纪律"（Gate 门禁、覆盖率度量、变更管理）。借鉴 Spec-Kit 的规范质量工程（"英语单元测试"、结构化歧义消解、LLM 行为约束），可以显著提升 Spec-First 从"流程完备"到"规范高质量"的关键一环——**好的流程 + 差的规范 = 差的交付**。
+## 版本更新记录
+
+| 版本 | 日期 | 变更内容 |
+|------|------|---------|
+| v1.0 | 2026-02-25 | 初版发布（12 项要素分析） |
+| v1.1 | 2026-02-25 | 补充 V-Model 扩展包、Extension System 等 |
+| v1.2 | 2026-02-25 | **源码验证完成**：12 项核心要素与 Spec-Kit v0.1.6 源码**完全一致**<br>➕ 新增要素 13：Dynamic Clarification Questions（P2）<br>➕ 新增要素 14：Progressive Disclosure（P2）<br>📝 更新附录关键数据表，加入源码验证状态<br>📝 调整总结映射表，新增要素排序 |
+
+---
+
+> **结论（v1.2 更新）**：Spec-Kit 与 Spec-First 是**同赛道、不同侧重**的关系。Spec-Kit 擅长"让规范文档本身高质量"（Checklist 验证需求质量、Clarify 消解歧义、Analyze 检测一致性、Dynamic Clarification 动态生成问题），Spec-First 擅长"让流程执行有纪律"（Gate 门禁、覆盖率度量、变更管理）。源码验证确认报告的 12 项核心要素全部准确，新增 2 项要素（Dynamic Clarification、Progressive Disclosure）进一步补充了 Token 效率和问题生成质量方面的借鉴点。**好的流程 + 差的规范 = 差的交付**。

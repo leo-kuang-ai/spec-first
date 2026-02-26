@@ -5,6 +5,7 @@
 import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { ExitCode } from '../../shared/types.js';
 import { checkHooks } from '../../core/tool-integration/hook-installer.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
@@ -36,6 +37,9 @@ export function handleDoctor(args: string[]): number {
 
   // Hook 状态检查
   results.push(...checkHookStatus(projectRoot));
+
+  // Session Hook 可达性检查（Superpowers P1-4）
+  results.push(checkSessionHook());
 
   // Feature 级检查
   if (featureId) {
@@ -144,6 +148,79 @@ function checkHookStatus(root: string): CheckResult[] {
     });
   } catch {
     return [{ name: 'Git Hooks', level: 'WARNING', message: '无法检查（缺少 .git?）', fix: '请先初始化 Git 仓库' }];
+  }
+}
+
+/** Session Hook 可达性检查（Superpowers P1-4） */
+function checkSessionHook(): CheckResult {
+  const claudeSettingsPath = join(homedir(), '.claude', 'settings.json');
+
+  if (!existsSync(claudeSettingsPath)) {
+    return {
+      name: 'Session Hook',
+      level: 'WARNING',
+      message: '~/.claude/settings.json 不存在',
+      fix: '运行 spec-first update 安装 Session Hook',
+    };
+  }
+
+  try {
+    const settings = JSON.parse(readFileSync(claudeSettingsPath, 'utf-8'));
+    const sessionStart = settings?.hooks?.SessionStart;
+
+    if (!Array.isArray(sessionStart) || sessionStart.length === 0) {
+      return {
+        name: 'Session Hook',
+        level: 'WARNING',
+        message: 'hooks.SessionStart 为空',
+        fix: '运行 spec-first update 安装 Session Hook',
+      };
+    }
+
+    // 查找包含 spec-first 的条目
+    const specFirstEntry = sessionStart.find((entry: any) => {
+      const hooks = entry?.hooks;
+      if (!Array.isArray(hooks)) return false;
+      return hooks.some((h: any) =>
+        typeof h?.command === 'string' && h.command.includes('spec-first'),
+      );
+    });
+
+    if (!specFirstEntry) {
+      return {
+        name: 'Session Hook',
+        level: 'WARNING',
+        message: '未找到 spec-first SessionStart 条目',
+        fix: '运行 spec-first update 安装 Session Hook',
+      };
+    }
+
+    // 检查是否包含关键内容
+    const command = specFirstEntry.hooks[0]?.command || '';
+    const hasCatchup = command.includes('catchup') || command.includes('技能路由表');
+    const hasViewer = command.includes('viewer');
+
+    if (!hasCatchup && !hasViewer) {
+      return {
+        name: 'Session Hook',
+        level: 'WARNING',
+        message: 'Session Hook 内容不完整（缺少 catchup/viewer）',
+        fix: '运行 spec-first update 重新安装 Session Hook',
+      };
+    }
+
+    return {
+      name: 'Session Hook',
+      level: 'PASS',
+      message: `已配置 (${hasCatchup ? '路由表+恢复' : 'viewer'})`,
+    };
+  } catch (e) {
+    return {
+      name: 'Session Hook',
+      level: 'WARNING',
+      message: `解析失败: ${(e as Error).message}`,
+      fix: '检查 ~/.claude/settings.json 格式或重新运行 spec-first update',
+    };
   }
 }
 

@@ -10,6 +10,7 @@ import { exists } from './fs-utils.js';
 export interface SpecFirstConfig {
   catchup: { trigger: 'auto' | 'prompt' | 'off' };
   context: { token_budget: number };
+  runtime: { max_iterations: number };
   gate: { pilot_mode: boolean };
   health: {
     weights: {
@@ -23,6 +24,7 @@ export interface SpecFirstConfig {
 export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
   catchup: { trigger: 'prompt' },
   context: { token_budget: 16000 },
+  runtime: { max_iterations: 5 },
   gate: { pilot_mode: false },
   health: {
     weights: {
@@ -96,6 +98,12 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
     cfg.gate.pilot_mode = gate.pilot_mode;
   }
 
+  // runtime.max_iterations
+  const runtime = parsed.runtime as Record<string, unknown> | undefined;
+  if (typeof runtime?.max_iterations === 'number') {
+    cfg.runtime.max_iterations = runtime.max_iterations;
+  }
+
   // health.weights
   const health = parsed.health as Record<string, unknown> | undefined;
   const weights = health?.weights as Record<string, number> | undefined;
@@ -115,6 +123,10 @@ function validate(cfg: SpecFirstConfig): void {
 
   if (cfg.context.token_budget < 8000 || cfg.context.token_budget > 64000) {
     errors.push(`context.token_budget must be 8000-64000, got ${cfg.context.token_budget}`);
+  }
+
+  if (cfg.runtime.max_iterations < 1 || cfg.runtime.max_iterations > 20) {
+    errors.push(`runtime.max_iterations must be 1-20, got ${cfg.runtime.max_iterations}`);
   }
 
   const wSum = Object.values(cfg.health.weights).reduce((a, b) => a + b, 0);

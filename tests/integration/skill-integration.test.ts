@@ -16,8 +16,21 @@ const FEAT = 'FSREQ-20260211-AUTH-001';
 
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
   mkdirSync(join(TMP, 'skills', 'spec-first', '07-code'), { recursive: true });
   writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
+  writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'stage-state.json'),
+    JSON.stringify({ currentStage: '04_implement' }),
+    'utf-8',
+  );
+  writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design', 'utf-8');
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'task_plan.md'),
+    '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+    'utf-8',
+  );
 });
 
 afterEach(() => {

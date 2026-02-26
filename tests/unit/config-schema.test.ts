@@ -27,6 +27,7 @@ describe('loadConfig', () => {
     const cfg = loadConfig(TMP);
     expect(cfg.catchup.trigger).toBe('prompt');
     expect(cfg.context.token_budget).toBe(16000);
+    expect(cfg.runtime.max_iterations).toBe(5);
     expect(cfg.gate.pilot_mode).toBe(false);
   });
 
@@ -40,6 +41,11 @@ describe('loadConfig', () => {
   it('should reject out-of-range token_budget', () => {
     writeFileSync(join(SPEC_DIR, 'config.yaml'), 'context:\n  token_budget: 100\n', 'utf-8');
     expect(() => loadConfig(TMP)).toThrow('token_budget must be 8000-64000');
+  });
+
+  it('should reject out-of-range runtime.max_iterations', () => {
+    writeFileSync(join(SPEC_DIR, 'config.yaml'), 'runtime:\n  max_iterations: 100\n', 'utf-8');
+    expect(() => loadConfig(TMP)).toThrow('runtime.max_iterations must be 1-20');
   });
 });
 

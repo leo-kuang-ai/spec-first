@@ -253,10 +253,15 @@ function skeletonFindings(featureId: string): string {
 function skeletonTaskPlan(featureId: string, title: string): string {
   return `# Task Plan — ${featureId}\n\n`
     + `> ${title}\n\n`
-    + `## 任务列表\n\n`
-    + `> 03_plan 阶段完成拆解。\n\n`
-    + `| # | Task ID | 标题 | 状态 | 负责人 |\n`
-    + `|---|---------|------|------|--------|\n`;
+    + `## Phase 1: Setup（基础设置）\n\n`
+    + `- [ ] TASK-XXX-001 [P] [US1] 初始化基础骨架\n\n`
+    + `## Phase 2: User Stories - P1（核心价值）\n\n`
+    + `### US1 — Core Flow (P1)\n\n`
+    + `- [ ] TASK-XXX-002 [P] [US1] 实现核心接口\n`
+    + `- [ ] TASK-XXX-003 [US1] 完成核心交互与验证\n\n`
+    + `## 任务明细\n\n`
+    + `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |\n`
+    + `|---|---|---|---|---|---|---|---|\n`;
 }
 
 function skeletonMatrix(): string {

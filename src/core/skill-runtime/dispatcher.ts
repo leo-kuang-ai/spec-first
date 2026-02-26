@@ -5,6 +5,8 @@
 import { join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
 import { exists } from '../../shared/fs-utils.js';
+import { assemblePrompt, resolvePromptAssemblyContext } from './prompt-assembler.js';
+import { buildHardGateRuntimeNotice } from './hard-gate.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -136,7 +138,34 @@ function findSkillFile(baseDir: string, skillName: string): string | undefined {
   return undefined;
 }
 
-/** 加载 Skill 文件内容 */
-export function loadSkill(skillPath: string): string {
-  return readFileSync(skillPath, 'utf-8');
+/** 加载 Skill 文件内容（可选动态组装） */
+export function loadSkill(
+  skillPath: string,
+  options?: { projectRoot?: string; enableAssembly?: boolean },
+): string {
+  let content = readFileSync(skillPath, 'utf-8');
+  const projectRoot = options?.projectRoot;
+  const enableAssembly = options?.enableAssembly ?? Boolean(projectRoot);
+
+  if (enableAssembly && projectRoot) {
+    const ctx = resolvePromptAssemblyContext(projectRoot);
+    content = assemblePrompt(content, ctx);
+  }
+
+  if (!projectRoot) return content;
+
+  const skillName = inferSkillNameFromPath(skillPath);
+  const hardGateNotice = buildHardGateRuntimeNotice(skillName, projectRoot);
+  if (hardGateNotice) {
+    content = `${hardGateNotice}\n\n${content}`;
+  }
+
+  return content;
+}
+
+function inferSkillNameFromPath(skillPath: string): string {
+  const normalized = skillPath.replace(/\\/g, '/');
+  const match = normalized.match(/\/\d+-([^/]+)\/SKILL\.md$/);
+  if (!match) return '';
+  return match[1] ?? '';
 }

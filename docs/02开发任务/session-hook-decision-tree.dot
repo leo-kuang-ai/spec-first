@@ -1,0 +1,21 @@
+digraph session_hook_decision_tree {
+  rankdir=TB;
+  node [shape=box];
+
+  Start [label="SessionStart"];
+  CheckCurrent [label="检查 .spec-first/current 是否存在"];
+  RecoveryHint [label="输出恢复提示: spec-first ai catchup <featureId>"];
+  OpenViewer [label="启动 viewer open --background"];
+  ViewerFail [label="viewer 启动失败"];
+  SilentDegrade [label="静默降级，不阻断会话"];
+  End [label="结束"];
+
+  Start -> CheckCurrent;
+  CheckCurrent -> RecoveryHint [label="存在 featureId"];
+  CheckCurrent -> OpenViewer [label="不存在 featureId"];
+  RecoveryHint -> OpenViewer;
+  OpenViewer -> ViewerFail [label="失败"];
+  OpenViewer -> End [label="成功"];
+  ViewerFail -> SilentDegrade;
+  SilentDegrade -> End;
+}

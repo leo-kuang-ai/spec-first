@@ -3,10 +3,6 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { detectHostPaths } from '../../shared/host-paths.js';
 
-function shellQuote(value: string): string {
-  return `'${value.replace(/'/g, `"'"'"`)}'`;
-}
-
 function resolveSpecFirstBin(): string {
   const fromEnv = process.env.SPEC_FIRST_BIN?.trim();
   if (fromEnv) return fromEnv;
@@ -27,6 +23,36 @@ function isSpecFirstViewerCommand(command: unknown): boolean {
   if (typeof command !== 'string') return false;
   const normalized = command.toLowerCase();
   return normalized.includes('spec-first') && normalized.includes('viewer open');
+}
+
+function shellQuote(value: string): string {
+  if (value.length === 0) return "''";
+  return `'${value.replace(/'/g, `'\"'\"'`)}'`;
+}
+
+function buildSessionStartCommand(specFirstBin: string): string {
+  const fallbackBin = shellQuote(specFirstBin);
+  // Session Hook 决策树（P1-15 + Superpowers P0-1）：
+  // 1) 输出技能路由表 + 1% 规则
+  // 2) 若检测到 .spec-first/current，先输出恢复提示（P1-07）
+  // 3) 再启动 viewer，失败静默，不阻断会话
+  return [
+    `SPEC_FIRST_BIN_FALLBACK=${fallbackBin} sh -c '`,
+    // 技能路由表 + 1% 规则（Superpowers P0-1）
+    'echo \"[spec-first] 技能路由表: init→spec→design→task→code→code-review→verify→catchup\"; ',
+    'echo \"[spec-first] 1%规则: 有1%相关性也先走skill检查，不要直接执行\"; ',
+    // 恢复提示
+    'if [ -f .spec-first/current ]; then ',
+    '  FEAT=$(head -1 .spec-first/current 2>/dev/null || true); ',
+    '  if [ -n \"$FEAT\" ]; then ',
+    '    echo \"[spec-first] 检测到可恢复会话，建议执行: spec-first ai catchup \\\"$FEAT\\\"\"; ',
+    '  fi; ',
+    'fi; ',
+    // viewer 启动（静默降级）
+    'SPEC_FIRST_BIN_RESOLVED=${SPEC_FIRST_BIN:-$SPEC_FIRST_BIN_FALLBACK}; ',
+    '"$SPEC_FIRST_BIN_RESOLVED" viewer open --print-url --background 2>/dev/null || true',
+    "'",
+  ].join('');
 }
 
 export function registerSessionHooks(options?: { dryRun?: boolean }): {
@@ -74,7 +100,7 @@ export function registerSessionHooks(options?: { dryRun?: boolean }): {
     matcher: '*',
     hooks: [{
       type: 'command' as const,
-      command: `${shellQuote(specFirstBin)} viewer open --print-url --background 2>/dev/null || true`,
+      command: buildSessionStartCommand(specFirstBin),
       timeout: 15,
     }],
   });

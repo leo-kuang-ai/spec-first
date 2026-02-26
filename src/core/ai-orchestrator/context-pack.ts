@@ -1,13 +1,15 @@
 /**
  * Context Pack Builder
  * 双区结构：control (<2KB) + references，三层上下文 L1/L2/L3
+ * Planning-with-Files P1-1: 接入 sliceContext 分层压缩
  */
 import { join } from 'node:path';
 import { readFileSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import type { Stage, StageState, Size } from '../../shared/types.js';
-import { readJson, exists } from '../../shared/fs-utils.js';
+import type { StageState, Size } from '../../shared/types.js';
+import { readJson, exists, readMarkdown } from '../../shared/fs-utils.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
+import { sliceContext, type SliceResult } from './context-slicing.js';
 
 // ─── 类型定义 ─────────────────────────────────────────────
 
@@ -38,6 +40,8 @@ export interface ContextPack {
   control: ControlZone;
   references: ContextRef[];
   budget: { total: number; controlSize: number; refsCount: number };
+  /** 分层压缩结果（Planning-with-Files P1-1） */
+  slicing?: SliceResult;
 }
 
 const CONTROL_LIMIT = 2048; // 2KB hard limit
@@ -106,13 +110,21 @@ export function buildContextPack(featureId: string, projectRoot: string): Contex
   const controlSize = Buffer.byteLength(controlJson, 'utf-8');
 
   // 构建 references
-  const refs = buildReferences(featureId, projectRoot, state);
+  const rawRefs = buildReferences(featureId, projectRoot, state);
+
+  // Planning-with-Files P1-1: 接入 sliceContext 分层压缩
+  const sliceResult = sliceContext(rawRefs);
 
   return {
     version: '2.0',
     control,
-    references: refs,
-    budget: { total: controlSize + refs.length * 100, controlSize, refsCount: refs.length },
+    references: sliceResult.refs,
+    budget: {
+      total: controlSize + sliceResult.refs.length * 100,
+      controlSize,
+      refsCount: sliceResult.refs.length,
+    },
+    slicing: sliceResult.degradationLevel > 0 ? sliceResult : undefined,
   };
 }
 
@@ -162,4 +174,127 @@ function buildRef(fullPath: string, relPath: string, reason: string): ContextRef
 /** 验证 control zone 大小不超过 2KB */
 export function validateControlSize(pack: ContextPack): boolean {
   return pack.budget.controlSize <= CONTROL_LIMIT;
+}
+
+// ─── Fresh Context Per Task（Planning-with-Files P2-1） ───────────────────────────
+
+export interface TaskContextPack {
+  taskId: string;
+  featureId: string;
+  taskContent: string;
+  relatedFR: string[];
+  relatedDS: string[];
+  relatedAPI: string[];
+  contextSize: number;
+}
+
+/** 构建 TASK 级独立上下文包（Planning-with-Files P2-1） */
+export function buildTaskContextPack(
+  taskId: string,
+  featureId: string,
+  projectRoot: string,
+): TaskContextPack | null {
+  const specDir = join(projectRoot, 'specs', featureId);
+  const taskPlanPath = join(specDir, 'task_plan.md');
+
+  if (!exists(taskPlanPath)) {
+    return null;
+  }
+
+  // 1. 提取当前 TASK 内容
+  const taskPlan = readMarkdown(taskPlanPath);
+  const taskContent = extractTaskContent(taskPlan, taskId);
+  if (!taskContent) {
+    return null;
+  }
+
+  // 2. 从 traceability-matrix 提取关联的 FR/DS/API
+  const matrixPath = join(specDir, 'traceability-matrix.md');
+  const { relatedFR, relatedDS, relatedAPI } = exists(matrixPath)
+    ? extractTaskTraces(readMarkdown(matrixPath), taskId)
+    : { relatedFR: [], relatedDS: [], relatedAPI: [] };
+
+  const pack: TaskContextPack = {
+    taskId,
+    featureId,
+    taskContent,
+    relatedFR,
+    relatedDS,
+    relatedAPI,
+    contextSize: taskContent.length + JSON.stringify({ relatedFR, relatedDS, relatedAPI }).length,
+  };
+
+  // 3. 大小检查
+  if (pack.contextSize > 2048) {
+    console.warn(`[spec-first] TaskContextPack 超出建议大小（${pack.contextSize} > 2048 bytes）`);
+  }
+
+  return pack;
+}
+
+/** 从 task_plan.md 提取指定 TASK 的内容 */
+function extractTaskContent(taskPlan: string, taskId: string): string | null {
+  const lines = taskPlan.split('\n');
+  let inTask = false;
+  const contentLines: string[] = [];
+
+  for (const line of lines) {
+    // 检测 TASK 行开始
+    if (line.includes(taskId)) {
+      inTask = true;
+      contentLines.push(line);
+      continue;
+    }
+
+    // 收集内容直到遇到下一个 TASK- 行
+    if (inTask) {
+      // 检测是否到达下一个 TASK 行
+      if (/TASK-[A-Z0-9-]+/.test(line) && !line.includes(taskId)) {
+        break;
+      }
+      // 跳过表格分隔符行
+      if (/^\|[-:\s|]+\|$/.test(line.trim())) {
+        continue;
+      }
+      if (line.trim()) {
+        contentLines.push(line);
+      }
+    }
+  }
+
+  return contentLines.length > 0 ? contentLines.join('\n') : null;
+}
+
+/** 从 traceability-matrix 提取 TASK 关联的 FR/DS/API */
+function extractTaskTraces(
+  matrix: string,
+  taskId: string,
+): { relatedFR: string[]; relatedDS: string[]; relatedAPI: string[] } {
+  const relatedFR: string[] = [];
+  const relatedDS: string[] = [];
+  const relatedAPI: string[] = [];
+
+  // 简化实现：按行查找包含 taskId 的行，并提取 upstream/downstream
+  const lines = matrix.split('\n');
+  for (const line of lines) {
+    if (line.includes(taskId)) {
+      // 提取 FR 引用
+      const frMatches = line.match(/FR-[A-Z0-9-]+/g);
+      if (frMatches) relatedFR.push(...frMatches);
+
+      // 提取 DS 引用
+      const dsMatches = line.match(/DS-[A-Z0-9-]+/g);
+      if (dsMatches) relatedDS.push(...dsMatches);
+
+      // 提取 API 引用（假设格式为 /api/xxx 或 API-XXX）
+      const apiMatches = line.match(/\/api\/[a-zA-Z0-9-/]+|API-[A-Z0-9-]+/g);
+      if (apiMatches) relatedAPI.push(...apiMatches);
+    }
+  }
+
+  return {
+    relatedFR: [...new Set(relatedFR)],
+    relatedDS: [...new Set(relatedDS)],
+    relatedAPI: [...new Set(relatedAPI)],
+  };
 }

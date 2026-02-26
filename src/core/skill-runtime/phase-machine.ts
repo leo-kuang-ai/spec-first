@@ -38,6 +38,21 @@ const TRANSITIONS: Record<Phase, Phase[]> = {
 const MAX_REVISIONS = 5;
 const ARCHIVE_THRESHOLD = 500;
 const KEEP_LINES = 200;
+const RISK_ARCHIVE_THRESHOLD = 200;
+const ARCHIVE_RISK_MARKERS = [
+  'FORCE_SKIPPED',
+  'PASS_WITH_WAIVER',
+  'Exception',
+  '阻塞',
+  '风险',
+];
+
+function shouldArchiveRuntimeFile(content: string, lines: string[]): boolean {
+  if (lines.length > ARCHIVE_THRESHOLD) return true;
+  if (lines.length <= RISK_ARCHIVE_THRESHOLD) return false;
+
+  return ARCHIVE_RISK_MARKERS.some((marker) => content.includes(marker));
+}
 
 /** 创建初始状态 */
 export function createPhaseState(): PhaseState {
@@ -102,7 +117,7 @@ export function preWriteArchive(featureId: string, projectRoot: string): string[
 
     const content = readFileSync(filePath, 'utf-8');
     const lines = content.split('\n');
-    if (lines.length <= ARCHIVE_THRESHOLD) continue;
+    if (!shouldArchiveRuntimeFile(content, lines)) continue;
 
     // 归档：重命名为 filename-YYYY-MM-DD-ts.md
     const archiveName = file.replace('.md', `-${suffix}.md`);

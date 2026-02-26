@@ -159,9 +159,9 @@ describe('handleCommit', () => {
 // ─── AI Runtime Hook Tests ──────────────────────────────
 
 describe('generateAIHookConfigs', () => {
-  it('should generate 3 hook configs', () => {
+  it('should generate 6 hook configs', () => {
     const configs = generateAIHookConfigs(TMP);
-    expect(configs).toHaveLength(3);
+    expect(configs).toHaveLength(6);
     const types = configs.map(c => c.type);
     expect(types).toContain('PreToolUse');
     expect(types).toContain('PostToolUse');

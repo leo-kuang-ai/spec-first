@@ -172,7 +172,10 @@ function removeAIHooks(projectRoot: string, dryRun: boolean, prefix: string): vo
       const before = hooks[hookType].length;
       hooks[hookType] = hooks[hookType].filter((item: any) =>
         !item?.hooks?.some((h: any) =>
-          typeof h.command === 'string' && h.command.includes('npx spec-first'),
+          typeof h.command === 'string' && (
+            h.command.includes('npx spec-first')
+            || h.command.includes('sh .spec-first/hooks/')
+          ),
         ),
       );
       const removed = before - hooks[hookType].length;

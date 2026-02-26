@@ -116,6 +116,25 @@ describe('catchup', () => {
     expect(result.currentTask).toBe('TASK-AUTH-001');
   });
 
+  it('should include todo runner summary when todo-state exists', () => {
+    writeState('04_implement');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'todo-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        iteration: 1,
+        maxIterations: 3,
+        halted: false,
+        items: [{ id: 'TASK-AUTH-001', title: 'Login', status: 'pending' }],
+      }),
+      'utf-8',
+    );
+
+    const result = catchup(FEAT, TMP);
+    expect(result.todoSummary).toContain('Todo续航');
+    expect(result.summary).toContain('Todo续航');
+  });
+
   it('should skip if called within 60s (concurrency protection)', () => {
     writeState('00_init');
     catchup(FEAT, TMP);

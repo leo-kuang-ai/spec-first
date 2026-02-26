@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { dispatchCommand, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
+import { dispatchCommand, loadSkill, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
 import {
   createPhaseState, canTransition, transition, confirmPhase,
   preWriteArchive, getValidTransitions,
@@ -18,6 +18,7 @@ const FEAT = 'FSREQ-20260211-AUTH-001';
 
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
   mkdirSync(join(TMP, 'skills', 'spec-first', '07-code'), { recursive: true });
 });
 
@@ -49,11 +50,43 @@ describe('dispatchCommand', () => {
   });
 
   it('should dispatch to skill route', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      'utf-8',
+    );
     writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
     const result = dispatchCommand('code', TMP);
     expect(result.route).toBe('skill');
     expect(result.skillName).toBe('code');
     expect(result.skillPath).toBeDefined();
+  });
+
+  it('should not hard-block code skill at dispatch layer when prerequisites are missing', () => {
+    writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
+    const result = dispatchCommand('code', TMP);
+    expect(result.route).toBe('skill');
+  });
+
+  it('should not hard-block design skill at dispatch layer on stage mismatch', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), '# Design Skill');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+
+    const result = dispatchCommand('design', TMP);
+    expect(result.route).toBe('skill');
   });
 
   it('should return error for unknown command', () => {
@@ -65,6 +98,79 @@ describe('dispatchCommand', () => {
   it('should return error for empty command', () => {
     const result = dispatchCommand(':', TMP);
     expect(result.route).toBe('error');
+  });
+});
+
+describe('loadSkill hard-gate notice', () => {
+  it('should inject BLOCKED hard-gate notice for code when prerequisites are missing', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
+    expect(content).toContain('HARD-GATE 运行时检查（自动）');
+    expect(content).toContain('检查结果: BLOCKED');
+    expect(content).toContain('禁止实施写入');
+  });
+
+  it('should inject PASS hard-gate notice for code when prerequisites are satisfied', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('HARD-GATE 运行时检查（自动）');
+    expect(content).toContain('检查结果: PASS');
+  });
+
+  it('should detect in_progress TASK without trailing table delimiter', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress\n',
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('检查结果: PASS');
+  });
+
+  it('should detect in_progress TASK when Task ID column is not first', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| 标题 | 状态 | Task ID |\n|---|---|---|\n| Login | in_progress | TASK-AUTH-001 |\n',
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('检查结果: PASS');
   });
 });
 
@@ -145,6 +251,16 @@ describe('Phase Machine', () => {
 
     const files = readdirSync(join(TMP, 'specs', FEAT));
     expect(files.some((f) => /^findings-\d{4}-\d{2}-\d{2}-\d+\.md$/.test(f))).toBe(true);
+  });
+
+  it('should archive medium runtime file when risk markers exist', () => {
+    const findingsPath = join(TMP, 'specs', FEAT, 'findings.md');
+    const lines = Array.from({ length: 220 }, (_, i) => `line-${i + 1}`);
+    lines[30] = '状态: PASS_WITH_WAIVER';
+    writeFileSync(findingsPath, lines.join('\n'), 'utf-8');
+
+    const archived = preWriteArchive(FEAT, TMP);
+    expect(archived).toContain('findings.md');
   });
 });
 

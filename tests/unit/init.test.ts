@@ -47,7 +47,9 @@ describe('init', () => {
 
     // 运行态文件
     expect(readFileSync(join(result.featureDir, 'findings.md'), 'utf-8')).toContain('Findings');
-    expect(readFileSync(join(result.featureDir, 'task_plan.md'), 'utf-8')).toContain('Task Plan');
+    const taskPlan = readFileSync(join(result.featureDir, 'task_plan.md'), 'utf-8');
+    expect(taskPlan).toContain('Task Plan');
+    expect(taskPlan).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |');
 
     // traceability-matrix.md
     expect(readFileSync(join(result.featureDir, 'traceability-matrix.md'), 'utf-8')).toContain('| ID |');
