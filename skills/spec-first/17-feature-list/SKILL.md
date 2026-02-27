@@ -1,6 +1,9 @@
 ---
 name: "spec-first:feature-list"
 description: "列出当前项目全部 Feature"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: feature-list

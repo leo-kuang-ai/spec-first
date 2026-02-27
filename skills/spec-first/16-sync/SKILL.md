@@ -1,6 +1,9 @@
 ---
 name: "spec-first:sync"
 description: "定位 Feature 并同步追踪矩阵与状态"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: sync

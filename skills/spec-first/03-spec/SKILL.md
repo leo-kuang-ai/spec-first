@@ -1,6 +1,9 @@
 ---
 name: "spec-first:spec"
 description: "定位 Feature 并校验阶段为需求规格（01_specify）"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: spec

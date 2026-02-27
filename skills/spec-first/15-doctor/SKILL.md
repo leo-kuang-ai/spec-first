@@ -1,6 +1,9 @@
 ---
 name: "spec-first:doctor"
 description: "定位项目与宿主配置并执行环境诊断"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: doctor

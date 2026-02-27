@@ -1,6 +1,9 @@
 ---
 name: "spec-first:status"
 description: "定位当前 Feature 并输出状态概览"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: status

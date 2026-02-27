@@ -1,0 +1,13 @@
+{
+  "seq": 1,
+  "featureId": "FSREQ-20260209-AUTH-001",
+  "severity": "S2",
+  "title": "验证码输入框未限制长度",
+  "description": "用户可以输入超过6位的验证码，导致后端验证失败时错误信息不友好",
+  "reporter": "QA",
+  "discoveredIn": "05_verify",
+  "linkedFr": "FR-AUTH-002",
+  "status": "open",
+  "createdAt": "2026-02-10T10:00:00Z",
+  "updatedAt": "2026-02-10T10:00:00Z"
+}

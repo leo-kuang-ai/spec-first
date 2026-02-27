@@ -1,6 +1,9 @@
 ---
 name: "spec-first:test"
 description: "定位 Feature 并校验阶段为验证测试（05_verify）"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: test

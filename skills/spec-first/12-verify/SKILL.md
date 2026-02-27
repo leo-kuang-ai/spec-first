@@ -1,6 +1,9 @@
 ---
 name: "spec-first:verify"
 description: "定位 Feature 并执行阶段验收校验"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: verify

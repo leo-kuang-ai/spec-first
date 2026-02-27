@@ -1,4 +1,7 @@
 ---
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 ---
 

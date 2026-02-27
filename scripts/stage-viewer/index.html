@@ -4,214 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Spec-First Stage Viewer</title>
-  <style>
-    :root {
-      --bg: #0b1220;
-      --panel: #121b2e;
-      --panel-2: #17233c;
-      --text: #e6edf7;
-      --muted: #8ea1c2;
-      --accent: #4ea1ff;
-      --ok: #2ec27e;
-      --warn: #f5c451;
-      --danger: #ef5c6b;
-      --border: #2a3857;
-    }
-    body {
-      margin: 0;
-      background: radial-gradient(circle at 20% 10%, #1b2a47, #0b1220 50%);
-      color: var(--text);
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
-    }
-    .layout {
-      display: grid;
-      grid-template-columns: 330px 1fr;
-      min-height: 100vh;
-    }
-    .sidebar {
-      border-right: 1px solid var(--border);
-      padding: 16px;
-      background: rgba(18, 27, 46, 0.85);
-      backdrop-filter: blur(8px);
-      overflow: auto;
-    }
-    .main {
-      padding: 18px;
-      overflow: auto;
-    }
-    h1 { margin: 0 0 8px; font-size: 18px; }
-    h2 { margin: 16px 0 10px; font-size: 15px; }
-    .muted { color: var(--muted); font-size: 12px; }
-    .input {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--panel-2);
-      color: var(--text);
-      padding: 8px 10px;
-      box-sizing: border-box;
-      margin: 10px 0;
-    }
-    .feature {
-      border: 1px solid var(--border);
-      background: var(--panel);
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-    .feature.active { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(78,161,255,0.3) inset; }
-    .feature .title { font-size: 13px; margin-bottom: 6px; }
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      font-size: 11px;
-      color: var(--muted);
-      padding: 2px 8px;
-      background: #10192c;
-    }
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(140px, 1fr));
-      gap: 10px;
-    }
-    .card {
-      border: 1px solid var(--border);
-      background: rgba(18, 27, 46, 0.9);
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .value { margin-top: 6px; font-size: 13px; }
-    .ok { color: var(--ok); }
-    .warn { color: var(--warn); }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid var(--border);
-      background: rgba(18,27,46,0.8);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      border-bottom: 1px solid var(--border);
-      padding: 8px 10px;
-      text-align: left;
-      font-size: 12px;
-      vertical-align: top;
-    }
-    th { color: var(--muted); font-weight: 600; background: #10192c; }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; }
-    .flow-help {
-      margin-top: 4px;
-      line-height: 1.5;
-    }
-    .flow-wrap {
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      background: rgba(18, 27, 46, 0.9);
-      border-radius: 10px;
-      padding: 12px;
-      overflow-x: auto;
-    }
-    .flow-track {
-      display: grid;
-      grid-template-columns: repeat(13, minmax(80px, 1fr));
-      gap: 8px;
-      min-width: 980px;
-      align-items: stretch;
-    }
-    .flow-step {
-      border: 1px solid var(--border);
-      background: #10192c;
-      border-radius: 10px;
-      padding: 8px;
-      cursor: pointer;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-    }
-    .flow-step:hover {
-      transform: translateY(-1px);
-      border-color: rgba(78, 161, 255, 0.45);
-    }
-    .flow-step.done {
-      border-color: rgba(46, 194, 126, 0.55);
-      background: rgba(46, 194, 126, 0.12);
-    }
-    .flow-step.current {
-      border-color: rgba(78, 161, 255, 0.85);
-      box-shadow: 0 0 0 1px rgba(78, 161, 255, 0.35) inset;
-      background: rgba(78, 161, 255, 0.12);
-    }
-    .flow-step.selected {
-      border-color: rgba(245, 196, 81, 0.9);
-      box-shadow: 0 0 0 2px rgba(245, 196, 81, 0.25) inset;
-    }
-    .flow-step.todo {
-      opacity: 0.85;
-    }
-    .flow-step-title {
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 4px;
-      white-space: nowrap;
-    }
-    .flow-step-meta {
-      font-size: 11px;
-      color: var(--muted);
-      min-height: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .flow-link {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      font-size: 11px;
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 8px 4px;
-      text-align: center;
-      background: rgba(16, 25, 44, 0.5);
-    }
-    .flow-stage-desc {
-      margin-top: 8px;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(180px, 1fr));
-      gap: 6px;
-    }
-    .flow-stage-desc-item {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 8px;
-      font-size: 12px;
-      color: var(--muted);
-      background: rgba(16, 25, 44, 0.6);
-    }
-    #historyTable tr[data-flow-stage] {
-      cursor: pointer;
-    }
-    #historyTable tr[data-flow-stage]:hover {
-      background: rgba(78, 161, 255, 0.12);
-    }
-    #historyTable tr.selected {
-      background: rgba(245, 196, 81, 0.18);
-    }
-    @media (max-width: 1200px) {
-      .flow-stage-desc { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
-    }
-    @media (max-width: 1100px) {
-      .layout { grid-template-columns: 1fr; }
-      .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
-      .summary { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
-      .row { grid-template-columns: 1fr; }
-      .flow-stage-desc { grid-template-columns: 1fr; }
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  
 </head>
 <body>
 <div class="layout">
@@ -226,6 +20,91 @@
     <div id="detail" style="display:none;">
       <h2 id="detailTitle"></h2>
       <div class="summary" id="summary"></div>
+
+      <!-- Health Dashboard -->
+      <section id="healthDashboard" class="health-dashboard" style="display:none;">
+        <div class="health-score-card">
+          <div class="health-score-ring">
+            <svg width="90" height="90" viewBox="0 0 90 90">
+              <circle class="bg" cx="45" cy="45" r="38" fill="none" stroke-width="8"/>
+              <circle id="healthRingProgress" class="progress" cx="45" cy="45" r="38" fill="none" stroke-width="8" stroke-dasharray="238.76" stroke-dashoffset="238.76"/>
+            </svg>
+            <div class="health-score-value">
+              <div id="healthScoreValue" class="score">--</div>
+              <div id="healthGrade" class="grade">-</div>
+            </div>
+          </div>
+          <div class="health-score-label">健康分</div>
+        </div>
+        <div class="coverage-bars" id="coverageBars"></div>
+        <div class="defect-stats">
+          <div class="defect-stats-title">缺陷统计</div>
+          <div class="defect-severity-grid" id="defectSeverityGrid"></div>
+          <div class="defect-summary" id="defectSummary">
+            <span class="count">0</span> 个缺陷待处理
+          </div>
+          <div class="defect-list" id="defectList">
+            <div class="defect-list-header">
+              <span>缺陷列表</span>
+              <span class="defect-list-close" id="defectListClose">×</span>
+            </div>
+            <div id="defectListContent"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Task Progress Section -->
+      <section id="taskProgressSection" class="task-progress-section" style="display:none;">
+        <div class="task-progress-header">
+          <h3>任务进度</h3>
+        </div>
+        <div class="task-stats-grid" id="taskStatsGrid">
+          <div class="task-stat-card">
+            <div class="task-stat-value ok" id="completedCount">0</div>
+            <div class="task-stat-label">已完成</div>
+          </div>
+          <div class="task-stat-card">
+            <div class="task-stat-value accent" id="inProgressCount">0</div>
+            <div class="task-stat-label">进行中</div>
+          </div>
+          <div class="task-stat-card">
+            <div class="task-stat-value" id="pendingCount">0</div>
+            <div class="task-stat-label">待处理</div>
+          </div>
+        </div>
+        <div class="task-progress-bar-container">
+          <div class="task-progress-bar-fill" id="taskProgressFill"></div>
+        </div>
+        <div class="current-tasks-panel" id="currentTasksPanel" style="display:none;">
+          <div class="current-tasks-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="6" cy="6" r="5"/>
+              <polyline points="12,12 16,14"/>
+            </svg>
+            当前进行中
+          </div>
+          <div id="currentTasksList"></div>
+        </div>
+        <div class="phase-grid" id="phaseGrid"></div>
+      </section>
+
+      <!-- Timeline Section -->
+      <section id="timelineSection" class="timeline-section" style="display:none;">
+        <div class="timeline-header">
+          <h3>时间线视图</h3>
+          <div class="timeline-summary" id="timelineSummary"></div>
+        </div>
+        <div class="timeline-container">
+          <div class="timeline-axis"></div>
+          <div class="timeline-stages" id="timelineStages"></div>
+        </div>
+        <div class="timeline-legend">
+          <span class="timeline-legend-item"><span class="timeline-dot complete"></span> 已完成</span>
+          <span class="timeline-legend-item"><span class="timeline-dot in-progress"></span> 进行中</span>
+          <span class="timeline-legend-item"><span class="timeline-dot pending"></span> 待开始</span>
+        </div>
+      </section>
+
       <section>
         <h2>阶段流转图（00→06）</h2>
         <div class="muted flow-help">说明：绿色为已完成，蓝色为当前阶段，灰色为待开始；点击某个阶段可联动查看该阶段的 Gate 与产物。</div>
@@ -258,452 +137,7 @@
   </main>
 </div>
 
-<script>
-  const state = {
-    features: [],
-    selectedFeatureId: null,
-    selectedFlowStage: null,
-    selectedHistoryKey: null,
-    projectRoot: '',
-  };
 
-  const featureListEl = document.getElementById('featureList');
-  const searchEl = document.getElementById('search');
-  const projectRootEl = document.getElementById('projectRoot');
-  const detailEl = document.getElementById('detail');
-  const emptyEl = document.getElementById('empty');
-  const FLOW_STAGES = [
-    { id: '00_init', label: '初始化', desc: '创建 Feature 目录与基础上下文文件。' },
-    { id: '01_specify', label: '需求分析', desc: '明确需求范围、FR/NFR 与验收标准。' },
-    { id: '02_design', label: '技术方案', desc: '输出技术方案、接口契约与关键设计。' },
-    { id: '03_plan', label: '开发任务', desc: '拆分任务并确定执行顺序与优先级。' },
-    { id: '04_implement', label: '编码', desc: '完成编码并通过实现阶段质量门禁。' },
-    { id: '05_verify', label: '测试', desc: '执行测试与回归，确认需求达成。' },
-    { id: '06_wrap_up', label: '收尾', desc: '沉淀追踪矩阵、归档交付物与结论。' },
-  ];
-  const STAGE_ORDER = [
-    '00_init',
-    '01_specify',
-    '02_design',
-    '03_plan',
-    '04_implement',
-    '05_verify',
-    '06_wrap_up',
-    '07_release',
-    '08_done',
-    '09_cancelled',
-  ];
-  const STAGE_LABEL_MAP = {
-    ...Object.fromEntries(FLOW_STAGES.map((item) => [item.id, item.label])),
-    '07_release': '发布',
-    '08_done': '完成',
-    '09_cancelled': '取消',
-  };
-  const MODE_LABEL_MAP = {
-    N: '新建',
-    I: '迭代',
-  };
-  const SIZE_LABEL_MAP = {
-    S: '小型',
-    M: '中型',
-    L: '大型',
-  };
-
-  function escapeHtml(input) {
-    return String(input)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  function normalizeStageId(stageId) {
-    if (stageId === null || stageId === undefined) return '';
-    return String(stageId).trim();
-  }
-
-  function stageLabel(stageId) {
-    const normalized = normalizeStageId(stageId);
-    return STAGE_LABEL_MAP[normalized] || normalized;
-  }
-
-  function formatStageIdWithLabel(stageId) {
-    const normalized = normalizeStageId(stageId);
-    if (!normalized || normalized === '-') return '-';
-    const label = STAGE_LABEL_MAP[normalized];
-    if (!label) return normalized;
-    const labelWithoutPrefix = label.replace(/^\d{2}\s*/, '').trim() || label;
-    return `${normalized}（${labelWithoutPrefix}）`;
-  }
-
-  function formatFlowStageLabel(stage) {
-    const id = typeof stage === 'string' ? stage : stage?.id;
-    const rawLabel = typeof stage === 'string' ? stageLabel(stage) : stage?.label;
-    const label = String(rawLabel || '').replace(/^\d{2}\s*/, '').trim();
-    const number = normalizeStageId(id).match(/^(\d{2})_/)?.[1];
-    if (number && label) return `${number} ${label}`;
-    return label || normalizeStageId(id) || '-';
-  }
-
-  function formatCodeWithLabel(value, labelMap) {
-    const normalized = normalizeStageId(value).toUpperCase();
-    if (!normalized || normalized === '-') return '-';
-    const label = labelMap[normalized];
-    return label ? `${normalized}（${label}）` : normalized;
-  }
-
-  function formatModeSize(mode, size) {
-    return `${formatCodeWithLabel(mode, MODE_LABEL_MAP)} / ${formatCodeWithLabel(size, SIZE_LABEL_MAP)}`;
-  }
-
-  function isFlowStage(stageId) {
-    const normalized = normalizeStageId(stageId);
-    return FLOW_STAGES.some((item) => item.id === normalized);
-  }
-
-  function toFlowStage(stageId) {
-    const normalized = normalizeStageId(stageId);
-    if (!normalized) return null;
-    if (isFlowStage(normalized)) return normalized;
-    const rank = STAGE_ORDER.indexOf(normalized);
-    if (rank < 0) return null;
-    const maxFlowRank = STAGE_ORDER.indexOf(FLOW_STAGES[FLOW_STAGES.length - 1].id);
-    return STAGE_ORDER[Math.min(rank, maxFlowRank)] || null;
-  }
-
-  function resolveHistoryFlowStage(historyItem) {
-    if (!historyItem) return null;
-    return toFlowStage(historyItem.to) || toFlowStage(historyItem.from);
-  }
-
-  function getHistoryKey(item, index) {
-    const from = normalizeStageId(item?.from || '-');
-    const to = normalizeStageId(item?.to || '-');
-    const at = item?.at || item?.timestamp || String(index);
-    return `${from}->${to}@${at}`;
-  }
-
-  function resolveActiveStage(currentStage) {
-    const selectedFlowStage = toFlowStage(state.selectedFlowStage);
-    if (selectedFlowStage) {
-      return selectedFlowStage;
-    }
-    const currentFlowStage = toFlowStage(currentStage);
-    if (currentFlowStage) {
-      return currentFlowStage;
-    }
-    return FLOW_STAGES[FLOW_STAGES.length - 1].id;
-  }
-
-  function selectStage(stageState, stageId, options = {}) {
-    const { historyKey = undefined } = options;
-    const mappedStage = toFlowStage(stageId);
-    if (mappedStage) {
-      state.selectedFlowStage = mappedStage;
-    }
-    if (historyKey !== undefined) {
-      state.selectedHistoryKey = historyKey;
-    }
-
-    const activeStage = resolveActiveStage(stageState.currentStage || '00_init');
-    renderStageFlow(stageState, activeStage);
-    renderStageTables(stageState, activeStage);
-
-    const flowEl = document.getElementById('stageFlow');
-    const selectedNode = Array.from(flowEl.querySelectorAll('.flow-step'))
-      .find((node) => node.getAttribute('data-stage') === activeStage);
-    if (selectedNode) {
-      selectedNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
-
-    const historyEl = document.getElementById('historyTable');
-    const candidateRows = Array.from(historyEl.querySelectorAll('tr[data-flow-stage]'));
-    for (const row of candidateRows) {
-      const byHistoryKey = state.selectedHistoryKey && row.getAttribute('data-history-key') === state.selectedHistoryKey;
-      const byFlowStage = !state.selectedHistoryKey && row.getAttribute('data-flow-stage') === activeStage;
-      row.classList.toggle('selected', Boolean(byHistoryKey || byFlowStage));
-    }
-
-    if (state.selectedHistoryKey && !candidateRows.some((row) => row.classList.contains('selected'))) {
-      state.selectedHistoryKey = null;
-      for (const row of candidateRows) {
-        row.classList.toggle('selected', row.getAttribute('data-flow-stage') === activeStage);
-      }
-    }
-  }
-
-  function renderFeatureList() {
-    const q = searchEl.value.trim().toLowerCase();
-    const list = state.features.filter((item) => {
-      if (!q) return true;
-      return String(item.featureId).toLowerCase().includes(q)
-        || String(item.title || '').toLowerCase().includes(q);
-    });
-
-    featureListEl.innerHTML = list.map((item) => {
-      const active = item.featureId === state.selectedFeatureId ? 'active' : '';
-      return `
-      <div class="feature ${active}" data-id="${escapeHtml(item.featureId)}">
-        <div class="title mono">${escapeHtml(item.featureId)}</div>
-        <div>${escapeHtml(item.title || '(untitled)')}</div>
-        <div class="chips" style="margin-top:6px;">
-          <span class="chip">${escapeHtml(item.currentStage)}</span>
-          <span class="chip">${escapeHtml(formatModeSize(item.mode, item.size))}</span>
-          <span class="chip">${item.terminal ? 'terminal' : 'active'}</span>
-        </div>
-      </div>`;
-    }).join('');
-
-    for (const node of featureListEl.querySelectorAll('.feature')) {
-      node.addEventListener('click', () => {
-        state.selectedFeatureId = node.getAttribute('data-id');
-        state.selectedFlowStage = null;
-        state.selectedHistoryKey = null;
-        renderFeatureList();
-        loadDetail();
-      });
-    }
-  }
-
-  function kvCard(key, value, cls = '') {
-    return `<div class="card"><div class="muted">${escapeHtml(key)}</div><div class="value ${cls}">${escapeHtml(value)}</div></div>`;
-  }
-
-  function renderTable(id, headers, rows) {
-    const el = document.getElementById(id);
-    const thead = `<tr>${headers.map((h) => `<th>${escapeHtml(h)}</th>`).join('')}</tr>`;
-    const tbody = rows.length
-      ? rows.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`).join('')
-      : `<tr><td colspan="${headers.length}" class="muted">暂无数据</td></tr>`;
-    el.innerHTML = thead + tbody;
-  }
-
-  function renderStageDesc() {
-    const descEl = document.getElementById('stageDesc');
-    descEl.innerHTML = FLOW_STAGES.map((item) => {
-      return `<div class="flow-stage-desc-item"><span class="mono">${escapeHtml(formatFlowStageLabel(item))}</span>：${escapeHtml(item.desc)}</div>`;
-    }).join('');
-  }
-
-  function parseTimestamp(value) {
-    if (value === null || value === undefined || value === '') return null;
-    if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
-
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      const ms = value < 1e12 ? value * 1000 : value;
-      const date = new Date(ms);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    if (typeof value === 'string') {
-      const text = value.trim();
-      if (!text) return null;
-      if (/^\d+$/.test(text)) {
-        const raw = Number(text);
-        if (Number.isFinite(raw)) {
-          const ms = raw < 1e12 ? raw * 1000 : raw;
-          const date = new Date(ms);
-          if (!Number.isNaN(date.getTime())) return date;
-        }
-      }
-      const date = new Date(text);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    return null;
-  }
-
-  function formatTimestamp(value, compact = false) {
-    const date = parseTimestamp(value);
-    if (!date) return value ? String(value) : '-';
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(date.getHours()).padStart(2, '0');
-    const minute = String(date.getMinutes()).padStart(2, '0');
-    const second = String(date.getSeconds()).padStart(2, '0');
-
-    if (compact) return `${month}-${day} ${hour}:${minute}`;
-    return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-  }
-
-  function toShortTime(value) {
-    return formatTimestamp(value, true);
-  }
-
-  function renderStageFlow(stageState, activeStage) {
-    const flowEl = document.getElementById('stageFlow');
-    const history = Array.isArray(stageState.history) ? stageState.history : [];
-    const currentStage = stageState.currentStage || '00_init';
-    const stageRank = new Map(STAGE_ORDER.map((value, index) => [value, index]));
-    const currentRank = stageRank.has(currentStage) ? stageRank.get(currentStage) : 0;
-    const transitionMap = new Map();
-
-    for (const item of history) {
-      const key = `${item.from || ''}->${item.to || ''}`;
-      transitionMap.set(key, item);
-    }
-
-    const chunks = [];
-    for (let index = 0; index < FLOW_STAGES.length; index += 1) {
-      const step = FLOW_STAGES[index];
-      const stepRank = stageRank.get(step.id);
-      const status = stepRank < currentRank ? 'done' : (step.id === currentStage ? 'current' : 'todo');
-      const selectedClass = step.id === activeStage ? 'selected' : '';
-      const atCurrent = step.id === currentStage ? toShortTime(stageState.updatedAt) : '';
-      const marker = status === 'done' ? '已完成' : (status === 'current' ? '当前阶段' : '待开始');
-
-      chunks.push(`
-        <div class="flow-step ${status} ${selectedClass}" data-stage="${escapeHtml(step.id)}" title="点击查看 ${escapeHtml(step.label)} 的 Gate 与产物">
-          <div class="flow-step-title mono">${escapeHtml(formatFlowStageLabel(step))}</div>
-          <div class="flow-step-meta">${escapeHtml(marker)}</div>
-          <div class="flow-step-meta">${escapeHtml(atCurrent)}</div>
-        </div>
-      `);
-
-      if (index < FLOW_STAGES.length - 1) {
-        const from = step.id;
-        const to = FLOW_STAGES[index + 1].id;
-        const link = transitionMap.get(`${from}->${to}`);
-        const linkText = link ? `${toShortTime(link.at || link.timestamp)} · ${link.by || '-'}` : '未流转';
-        chunks.push(`<div class="flow-link">→ ${escapeHtml(linkText)}</div>`);
-      }
-    }
-
-    flowEl.innerHTML = `<div class="flow-track">${chunks.join('')}</div>`;
-
-    for (const node of flowEl.querySelectorAll('.flow-step')) {
-      node.addEventListener('click', () => {
-        selectStage(stageState, node.getAttribute('data-stage'), { historyKey: null });
-      });
-    }
-  }
-
-  function renderStageTables(stageState, activeStage) {
-    const gates = (((stageState.mergedRules || {}).gateConditions || {})[activeStage]) || [];
-    const deliverables = (((stageState.mergedRules || {}).deliverables || {})[activeStage]) || [];
-
-    document.getElementById('gateTitle').textContent = `${stageLabel(activeStage)} Gate`;
-    document.getElementById('deliverableTitle').textContent = `${stageLabel(activeStage)} 产物`;
-
-    renderTable('gateTable', ['id', 'description', 'command'], gates.map((item) => [
-      `<span class="mono">${escapeHtml(item.id || '-')}</span>`,
-      escapeHtml(item.description || '-'),
-      item.command ? `<span class="mono">${escapeHtml(item.command)}</span>` : '<span class="muted">manual</span>',
-    ]));
-
-    renderTable('deliverableTable', ['name', 'required', 'description'], deliverables.map((item) => [
-      `<span class="mono">${escapeHtml(item.name || '-')}</span>`,
-      item.required ? '<span class="ok">yes</span>' : '<span class="muted">no</span>',
-      escapeHtml(item.description || ''),
-    ]));
-  }
-
-  async function loadFeatures() {
-    const res = await fetch('/api/features', { cache: 'no-store' });
-    const data = await res.json();
-    state.features = data.features || [];
-    state.projectRoot = data.projectRoot || '';
-    projectRootEl.textContent = state.projectRoot;
-
-    if (!state.selectedFeatureId && state.features.length > 0) {
-      state.selectedFeatureId = state.features[0].featureId;
-    }
-
-    if (state.selectedFeatureId && !state.features.find((item) => item.featureId === state.selectedFeatureId)) {
-      state.selectedFeatureId = state.features[0]?.featureId || null;
-      state.selectedFlowStage = null;
-      state.selectedHistoryKey = null;
-    }
-
-    renderFeatureList();
-  }
-
-  async function loadDetail() {
-    if (!state.selectedFeatureId) {
-      detailEl.style.display = 'none';
-      emptyEl.style.display = 'block';
-      return;
-    }
-
-    const res = await fetch(`/api/feature/${encodeURIComponent(state.selectedFeatureId)}`, { cache: 'no-store' });
-    if (!res.ok) {
-      detailEl.style.display = 'none';
-      emptyEl.style.display = 'block';
-      emptyEl.textContent = '无法读取该 Feature 的 stage-state.json';
-      return;
-    }
-
-    const data = await res.json();
-    const s = data.state || {};
-    const currentStage = s.currentStage || 'unknown';
-
-    document.getElementById('detailTitle').textContent = `${s.featureId || state.selectedFeatureId} · ${s.title || '(untitled)'}`;
-
-    document.getElementById('summary').innerHTML = [
-      kvCard('当前阶段', currentStage, s.terminal ? 'warn' : 'ok'),
-      kvCard('模式 / 规模', formatModeSize(s.mode, s.size)),
-      kvCard('平台', Array.isArray(s.platforms) ? s.platforms.join(', ') : '-'),
-      kvCard('更新时间', formatTimestamp(s.updatedAt)),
-    ].join('');
-
-    renderStageDesc();
-    const activeStage = resolveActiveStage(currentStage);
-
-    const history = Array.isArray(s.history) ? s.history : [];
-    renderTable('historyTable', ['from', 'to', 'at', 'by'], history.map((item) => {
-      const toStage = item.to || '';
-      return [
-        `<span class="mono">${escapeHtml(formatStageIdWithLabel(item.from || '-'))}</span>`,
-        `<span class="mono">${escapeHtml(formatStageIdWithLabel(toStage || '-'))}</span>`,
-        escapeHtml(formatTimestamp(item.at || item.timestamp)),
-        escapeHtml(item.by || '-'),
-      ];
-    }));
-
-    const historyTableEl = document.getElementById('historyTable');
-    const rows = Array.from(historyTableEl.querySelectorAll('tr')).slice(1);
-    rows.forEach((row, index) => {
-      const historyItem = history[index];
-      const flowStage = resolveHistoryFlowStage(historyItem);
-      if (!flowStage) return;
-      const historyKey = getHistoryKey(historyItem, index);
-      row.setAttribute('data-flow-stage', flowStage);
-      row.setAttribute('data-history-key', historyKey);
-      row.addEventListener('click', () => {
-        selectStage(s, flowStage, { historyKey });
-      });
-    });
-
-    selectStage(s, activeStage);
-
-    const thresholds = (s.mergedRules || {}).thresholds || {};
-    renderTable('thresholdTable', ['metric', 'value', 'direction'], Object.entries(thresholds).map(([key, item]) => [
-      `<span class="mono">${escapeHtml(key)}</span>`,
-      escapeHtml(item?.value ?? '-'),
-      escapeHtml(item?.direction ?? '-'),
-    ]));
-
-    emptyEl.style.display = 'none';
-    detailEl.style.display = 'block';
-  }
-
-  async function refreshAll() {
-    try {
-      await loadFeatures();
-      await loadDetail();
-    } catch (e) {
-      emptyEl.style.display = 'block';
-      detailEl.style.display = 'none';
-      emptyEl.textContent = `加载失败：${e?.message || e}`;
-    }
-  }
-
-  searchEl.addEventListener('input', () => renderFeatureList());
-  refreshAll();
-  setInterval(refreshAll, 5000);
-</script>
+  <script src="app.js"></script>
 </body>
 </html>

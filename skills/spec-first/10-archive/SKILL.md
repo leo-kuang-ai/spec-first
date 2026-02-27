@@ -1,6 +1,9 @@
 ---
 name: "spec-first:archive"
 description: "定位 Feature 并校验阶段为归档复盘（06_wrap_up）"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: archive

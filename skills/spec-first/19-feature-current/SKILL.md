@@ -1,6 +1,9 @@
 ---
 name: "spec-first:feature-current"
 description: "查看当前 Feature 与阶段信息"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: feature-current

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.62 2026-02-27 Leo: feat: Stage Viewer Feature 列表进度条 — 侧边栏 Feature 列表新增进度条与百分比徽章，基于当前阶段计算完成进度（00_init=0% → 06_wrap_up=100%）；支持多 Feature 并行进度对比 (user-visible)
+- v0.5.61 2026-02-27 Leo: feat: Stage Viewer 时间线视图 — 按时间轴展示阶段流转历史，可视化各阶段耗时（甘特图样式）；新增 /api/feature/:id/timeline API 计算阶段持续时间；支持已完成/进行中/待开始三种状态；显示总时长与开始时间 (user-visible)
+- v0.5.60 2026-02-27 Leo: refactor: Stage Viewer 模块化重构 — 将 index.html 中的 CSS/JS 解耦为独立文件（styles.css + app.js）；更新 server.js 添加静态文件服务路由；清理 HTML 重复结构 (user-visible)
+- v0.5.59 2026-02-27 Leo: feat: Stage Viewer 缺陷列表详情 — 点击缺陷统计面板展开缺陷列表，显示严重级别(S1-S4)、状态(待处理/修复中/已修复)、标题、更新时间；新增 getDefects() 后端函数；更新 /api/feature/:id/defects API 返回缺陷列表 (user-visible)
+- v0.5.58 2026-02-27 Leo: feat: Stage Viewer Gate 实时状态 — 阶段流转图显示各阶段 Gate 状态（✓ PASS / ~ 豁免 / ✗ FAIL）；新增 /api/feature/:id/gate-status API；CSS 样式支持状态徽章；更新测试数据为新格式 (user-visible)
+- v0.5.57 2026-02-27 Leo: fix: Stage Viewer 三元表达式语法错误 — 修复 renderTaskProgress 中 progressColor 三元表达式缺少闭合括号导致的页面报错 (user-visible)
+- v0.5.56 2026-02-27 Leo: test: Stage Viewer 单元测试 — 新增 `tests/unit/stage-viewer.test.ts` 覆盖 normalizeTaskStatus/parseTaskPlan/getDefaultMetrics/calcHealthScore 四个核心函数（21 个测试用例）；提取 `scripts/stage-viewer/task-parser.ts` 为可测试模块；修复 calcHealthScore 四舍五入后 grade 计算不一致问题
+- v0.5.55 2026-02-27 Leo: feat: Stage Viewer 任务进度可视化 — 新增任务统计卡片（已完成/进行中/待处理）、总体进度条、当前进行中任务面板、阶段卡片网格（Phase 1-5 进度与状态）；新增 /api/feature/:id/tasks API 端点解析 task_plan.md；修复 CSS 语法错误（phase-grid 闭合括号） (user-visible)
+- v0.5.54 2026-02-27 Leo: docs: README.md 新增名词说明章节 — 添加 8 个分类（核心概念/追踪ID体系/Gate相关/覆盖率指标/变更与缺陷/Skill相关/CLI相关/文件与目录/V-Model追踪/架构模块）共 50+ 术语定义；覆盖 Feature/Stage/Gate/Skill/CLI/FR/DS/TASK/TC/C1-C9 等核心概念 (user-visible)
+- v0.5.53 2026-02-27 Leo: feat: Stage Viewer 健康仪表盘 — 新增健康分圆形进度条（H1 综合评分 + 等级 A-F）、覆盖率条形图（C1-C9 九项指标含中文说明，通过/警告/失败三级状态）、缺陷统计面板（S1-S4 分级统计 + 待处理数量）；新增 /api/feature/:id/metrics 和 /api/feature/:id/defects API 端点；从追踪矩阵推断覆盖率的兜底逻辑 (user-visible)
+- v0.5.52 2026-02-27 Leo: docs: README.md 详细功能对比模块同步更新 — 新增 6 个对比维度（AI行为约束/扩展系统/调试流程/工作区隔离/规范质量）；同步 V-Model 四层ID、HARD-GATE、[P]/[US] 标记、Extension System 等已集成功能；对比维度从 15+ 项扩展至 19 项 (user-visible)
+- v0.5.51 2026-02-27 Leo: docs: README.md 生态对比深度细化 — 基于 Context7 深度研究 OpenSpec/Spec Kit/Superpowers/Planning-with-Files 框架；新增框架概览图、详细功能对比表、框架深度解析、核心差异分析、场景化选型指南、组合方案、技术栈兼容性；对比维度从 9 项扩展至 15+ 项 (user-visible)
+- v0.5.50 2026-02-27 Leo: docs: README.md 全面更新 — 基于项目代码与 Skill 深度理解更新 README.md；完善目录结构、快速开始指南、Skill 体系说明、CLI 命令详解、技术栈与目录结构、核心类型定义；更新版本号至 v0.5.45；添加阶段×Skill 映射表与 Skill 依赖关系图 (user-visible)
+- v0.5.49 2026-02-27 Leo: docs: Skills 测试策略与覆盖评估报告 — 评估 Spec-First Skills 目录测试策略与覆盖情况；发现 Critical×2（变更回归检测缺失）、High×5（模板验证、CLI 依赖完整性、交叉引用一致性）、Medium×8（示例质量、引用可解析性）、Low×3；输出 `docs/testing-strategy-coverage-skills-assessment-2026-02-27.md`
 - v0.5.48 2026-02-26 Leo: docs: 文档准确性修正 — CLI参考手册删除 gate check 不存在的 --stage/--ci 参数；安装与更新方案 Skill 数量统计修正 19→21
 - v0.5.47 2026-02-26 Leo: docs: 更新开发任务文档修复进度 — `落地清单-开发任务.md` 升级至 v1.12；同步回写本轮回归收口（doctor SessionStart 诊断修复、skill-runtime 测试稳健性修复、T009 验收勾选完成）与最新文档状态口径 (user-visible)
 - v0.5.46 2026-02-26 Leo: fix: 收口剩余回归与稳定性问题 — `doctor` 复用 `session-hook-managed` 统一托管识别并修复 SessionStart 检查类型错误（`pnpm tsc --noEmit` 通过）；`skill-runtime` 测试提交步骤显式关闭 `commit.gpgsign` 以消除环境签名差异导致的失败；同步回写 T009 验收清单勾选状态 (user-visible)

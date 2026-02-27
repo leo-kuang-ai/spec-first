@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const DEFAULT_HOST = process.env.SPEC_FIRST_VIEWER_HOST ?? '127.0.0.1';
 const DEFAULT_PORT = parsePort(process.env.SPEC_FIRST_VIEWER_PORT, 0);
@@ -111,6 +112,441 @@ function loadFeature(projectRoot, featureId) {
   return safeReadJson(statePath);
 }
 
+// ─── Metrics API ─────────────────────────────────────────────────────
+
+const METRIC_DEFS = [
+  { key: 'C1', name: '设计覆盖率', target: 0.8 },
+  { key: 'C2', name: 'API 覆盖率', target: 0.8 },
+  { key: 'C3', name: '任务覆盖率', target: 0.8 },
+  { key: 'C4', name: '测试覆盖率 (FR)', target: 0.8 },
+  { key: 'C5', name: '测试覆盖率 (AC)', target: 0.6 },
+  { key: 'C6', name: '实现覆盖率', target: 0.8 },
+  { key: 'C7', name: 'PR 合规率', target: 0.9 },
+  { key: 'C8', name: '任务合规率', target: 0.8 },
+  { key: 'C9', name: 'TC 合规率', target: 0.8 },
+];
+
+const WEIGHTS = {
+  C1: 0.12, C2: 0.10, C3: 0.10, C4: 0.15,
+  C5: 0.10, C6: 0.13, C7: 0.10, C8: 0.10, C9: 0.10,
+};
+
+function getGrade(score) {
+  if (score >= 90) return 'A';
+  if (score >= 80) return 'B';
+  if (score >= 70) return 'C';
+  if (score >= 60) return 'D';
+  return 'F';
+}
+
+function getMetrics(projectRoot, featureId) {
+  try {
+    // 尝试调用 CLI 命令获取覆盖率数据
+    const output = execSync(
+      `npx spec-first metrics coverage ${featureId} --json 2>/dev/null || echo '{}'`,
+      { cwd: projectRoot, encoding: 'utf-8', timeout: 10000 }
+    );
+    const parsed = JSON.parse(output);
+    return parsed;
+  } catch {
+    // CLI 不可用时返回模拟数据（从 stage-state.json 推断）
+    return getDefaultMetrics(featureId, projectRoot);
+  }
+}
+
+function getDefaultMetrics(featureId, projectRoot) {
+  // 从追踪矩阵推断覆盖率（简化版本）
+  const matrixPath = join(projectRoot, 'specs', featureId, 'traceability-matrix.md');
+  const metrics = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0, C6: 0, C7: 1, C8: 1, C9: 1 };
+
+  if (existsSync(matrixPath)) {
+    const content = readFileSync(matrixPath, 'utf-8');
+    // 统计 FR/DS/TASK/TC 数量
+    const frCount = (content.match(/\| FR-/g) || []).length;
+    const dsCount = (content.match(/\| DS-/g) || []).length;
+    const taskCount = (content.match(/\| TASK-/g) || []).length;
+    const tcCount = (content.match(/\| TC-/g) || []).length;
+
+    if (frCount > 0) {
+      metrics.C1 = Math.min(dsCount / frCount, 1);
+      metrics.C2 = metrics.C1;
+      metrics.C3 = Math.min(taskCount / frCount, 1);
+      metrics.C4 = Math.min(tcCount / frCount, 1);
+      metrics.C5 = metrics.C4;
+    }
+    if (taskCount > 0) {
+      // 检查实现状态
+      const implemented = (content.match(/Implemented|Verified|Accepted/g) || []).length;
+      metrics.C6 = Math.min(implemented / taskCount, 1);
+    }
+  }
+
+  return metrics;
+}
+
+function calcHealthScore(coverage, escapeRate = 0) {
+  let weighted = 0;
+  const breakdown = {};
+
+  for (const [key, weight] of Object.entries(WEIGHTS)) {
+    const val = Math.min(coverage[key] ?? 0, 1.0);
+    breakdown[key] = val * weight * 100;
+    weighted += val * weight;
+  }
+
+  const penalty = Math.min(escapeRate * 200, 50);
+  const rawH1 = Math.max(0, Math.min(100, weighted * 100 - penalty));
+  const H1 = Math.round(rawH1 * 10) / 10;
+
+  return {
+    H1,
+    grade: getGrade(H1),
+    breakdown,
+  };
+}
+
+function getDefectStats(projectRoot, featureId) {
+  const defectsDir = join(projectRoot, 'specs', featureId, 'defects');
+  const stats = { total: 0, S1: 0, S2: 0, S3: 0, S4: 0, open: 0, fixing: 0, fixed: 0 };
+
+  if (!existsSync(defectsDir)) return stats;
+
+  for (const entry of readdirSync(defectsDir)) {
+    if (!entry.endsWith('.json')) continue;
+    const defect = safeReadJson(join(defectsDir, entry));
+    if (!defect) continue;
+
+    stats.total += 1;
+    if (defect.severity && stats[defect.severity] !== undefined) {
+      stats[defect.severity] += 1;
+    }
+    if (defect.status === 'open') stats.open += 1;
+    else if (defect.status === 'fixing') stats.fixing += 1;
+    else if (defect.status === 'fixed' || defect.status === 'verified') stats.fixed += 1;
+  }
+
+  return stats;
+}
+
+function getDefects(projectRoot, featureId) {
+  const defectsDir = join(projectRoot, 'specs', featureId, 'defects');
+  const defects = [];
+
+  if (!existsSync(defectsDir)) return defects;
+
+  for (const entry of readdirSync(defectsDir)) {
+    if (!entry.endsWith('.json')) continue;
+    const defect = safeReadJson(join(defectsDir, entry));
+    if (!defect) continue;
+
+    defects.push({
+      seq: defect.seq,
+      severity: defect.severity,
+      title: defect.title,
+      description: defect.description,
+      status: defect.status,
+      reporter: defect.reporter,
+      discoveredIn: defect.discoveredIn,
+      createdAt: defect.createdAt,
+      updatedAt: defect.updatedAt,
+    });
+  }
+
+  // 按严重级别排序，然后按序号排序
+  const severityOrder = { S1: 1, S2: 2, S3: 3, S4: 4 };
+  defects.sort((a, b) => {
+    const sevA = severityOrder[a.severity] || 5;
+    const sevB = severityOrder[b.severity] || 5;
+    if (sevA !== sevB) return sevA - sevB;
+    return (a.seq || 0) - (b.seq || 0);
+  });
+
+  return defects;
+}
+
+// ─── Gate Status API ─────────────────────────────────────────────────
+
+function getGateStatus(projectRoot, featureId) {
+  const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
+  if (!existsSync(historyPath)) {
+    return { currentStage: null, status: null, conditions: [], lastCheck: null };
+  }
+
+  try {
+    const content = readFileSync(historyPath, 'utf-8');
+    const lines = content.trim().split('\n').filter(Boolean);
+    if (lines.length === 0) {
+      return { currentStage: null, status: null, conditions: [], lastCheck: null };
+    }
+
+    // 获取最新的 Gate 检查结果
+    const lastEntry = JSON.parse(lines[lines.length - 1]);
+    return {
+      currentStage: lastEntry.stage || null,
+      status: lastEntry.status || null,
+      conditions: (lastEntry.conditions || []).map(c => ({
+        id: c.id,
+        description: c.description,
+        status: c.status,
+        detail: c.detail,
+      })),
+      lastCheck: lastEntry.timestamp || null,
+    };
+  } catch {
+    return { currentStage: null, status: null, conditions: [], lastCheck: null };
+  }
+}
+
+// 获取所有阶段的历史 Gate 状态
+function getAllStageGateStatus(projectRoot, featureId) {
+  const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
+  const stageStatus = {};
+
+  if (!existsSync(historyPath)) {
+    return stageStatus;
+  }
+
+  try {
+    const content = readFileSync(historyPath, 'utf-8');
+    const lines = content.trim().split('\n').filter(Boolean);
+
+    // 从最新到最旧遍历，保留每个阶段最新的状态
+    for (let i = lines.length - 1; i >= 0; i--) {
+      try {
+        const entry = JSON.parse(lines[i]);
+        const stage = entry.stage;
+        if (stage && !stageStatus[stage]) {
+          // 支持 status 和 verdict 两种格式
+          const status = entry.status || entry.verdict || 'UNKNOWN';
+          const conditions = entry.conditions || [];
+          stageStatus[stage] = {
+            status,
+            timestamp: entry.timestamp || null,
+            passCount: conditions.filter(c => c.status === 'PASS').length || (status === 'PASS' ? 1 : 0),
+            totalCount: conditions.length || 1,
+          };
+        }
+      } catch {
+        // 跳过损坏行
+      }
+    }
+  } catch {
+    // 忽略读取错误
+  }
+
+  return stageStatus;
+}
+
+// ─── Timeline API ──────────────────────────────────────────────────────
+
+function getTimelineData(projectRoot, featureId) {
+  const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
+  if (!existsSync(historyPath)) {
+    return { stages: [], totalDuration: 0 };
+  }
+
+  try {
+    const content = readFileSync(historyPath, 'utf-8');
+    const lines = content.trim().split('\n').filter(Boolean);
+    if (lines.length === 0) {
+      return { stages: [], totalDuration: 0 };
+    }
+
+    // 解析所有 Gate 事件
+    const events = lines.map(line => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    }).filter(Boolean);
+
+    // 按时间排序
+    events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    // 计算每个阶段的时间
+    const stageTimeline = [];
+    const stageOrder = ['00_init', '01_specify', '02_design', '03_plan', '04_implement', '05_verify', '06_wrap_up'];
+    const stageNames = {
+      '00_init': '初始化',
+      '01_specify': '需求规格',
+      '02_design': '技术设计',
+      '03_plan': '任务拆解',
+      '04_implement': '代码实现',
+      '05_verify': '验证测试',
+      '06_wrap_up': '归档复盘'
+    };
+
+    // 按阶段分组，取每个阶段的第一个 PASS 事件作为进入时间
+    const stageEntries = {};
+    for (const event of events) {
+      if (event.stage && !stageEntries[event.stage]) {
+        stageEntries[event.stage] = {
+          stage: event.stage,
+          stageName: stageNames[event.stage] || event.stage,
+          startTime: event.timestamp,
+          status: event.status || 'UNKNOWN',
+          conditions: event.conditions || []
+        };
+      }
+    }
+
+    // 按预定义顺序构建时间线
+    for (const stage of stageOrder) {
+      if (stageEntries[stage]) {
+        stageTimeline.push(stageEntries[stage]);
+      }
+    }
+
+    // 计算每个阶段的持续时间
+    let totalDuration = 0;
+    for (let i = 0; i < stageTimeline.length; i++) {
+      const current = stageTimeline[i];
+      const startTime = new Date(current.startTime);
+
+      let endTime;
+      if (i < stageTimeline.length - 1) {
+        endTime = new Date(stageTimeline[i + 1].startTime);
+      } else {
+        endTime = new Date();
+      }
+
+      const durationMs = endTime - startTime;
+      const durationHours = Math.round(durationMs / (1000 * 60 * 60) * 10) / 10;
+      const durationDays = Math.round(durationMs / (1000 * 60 * 60 * 24) * 10) / 10;
+
+      current.durationMs = durationMs;
+      current.durationHours = durationHours;
+      current.durationDays = durationDays;
+      current.endTime = endTime.toISOString();
+
+      totalDuration += durationMs;
+    }
+
+    // 计算总时长
+    const totalHours = Math.round(totalDuration / (1000 * 60 * 60) * 10) / 10;
+    const totalDays = Math.round(totalDuration / (1000 * 60 * 60 * 24) * 10) / 10;
+
+    return {
+      stages: stageTimeline,
+      totalDuration,
+      totalHours,
+      totalDays,
+      startTime: stageTimeline.length > 0 ? stageTimeline[0].startTime : null,
+      endTime: stageTimeline.length > 0 ? stageTimeline[stageTimeline.length - 1].endTime : null
+    };
+  } catch {
+    return { stages: [], totalDuration: 0 };
+  }
+}
+
+// ─── Tasks API ──────────────────────────────────────────────────────
+
+function parseTaskPlan(projectRoot, featureId) {
+  const taskPath = join(projectRoot, 'specs', featureId, 'task_plan.md');
+  if (!existsSync(taskPath)) return null;
+
+  const content = readFileSync(taskPath, 'utf-8');
+  const tasks = [];
+  const phases = [];
+
+  // 解析阶段 (### Phase N: Title)
+  const phaseRegex = /### (Phase \d+):\s*(.+?)\n([\s\S]*?)(?=### Phase|\n## |$)/g;
+  let phaseMatch;
+  while ((phaseMatch = phaseRegex.exec(content)) !== null) {
+    const phaseId = phaseMatch[1];
+    const phaseTitle = phaseMatch[2].trim();
+    const phaseContent = phaseMatch[3];
+
+    // 提取阶段状态
+    const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
+    const phaseStatus = statusMatch ? statusMatch[1] : 'pending';
+
+    // 提取阶段内的任务
+    const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(.+)/g;
+    let taskMatch;
+    const phaseTasks = [];
+    while ((taskMatch = taskRegex.exec(phaseContent)) !== null) {
+      const checked = taskMatch[1] === 'x';
+      const taskId = taskMatch[2];
+      const taskTitle = taskMatch[3].trim();
+      phaseTasks.push({
+        id: taskId,
+        title: taskTitle,
+        status: checked ? 'complete' : 'pending',
+      });
+    }
+
+    phases.push({
+      id: phaseId,
+      title: phaseTitle,
+      status: phaseStatus,
+      tasks: phaseTasks,
+    });
+  }
+
+  // 解析任务明细表格
+  const tableRegex = /\|\s*TASK ID\s*\|[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/;
+  const tableMatch = content.match(tableRegex);
+  if (tableMatch) {
+    const rows = tableMatch[1].trim().split('\n').filter(row => row.includes('TASK-'));
+    for (const row of rows) {
+      const cols = row.split('|').map(c => c.trim()).filter(c => c);
+      if (cols.length >= 8) {
+        const taskId = cols[0];
+        const title = cols[1];
+        const owner = cols[2];
+        const effort = cols[3];
+        const traces = cols[4];
+        const dependsOn = cols[5];
+        const acceptance = cols[6];
+        const status = cols[7] || 'pending';
+
+        tasks.push({
+          id: taskId,
+          title,
+          owner,
+          effort,
+          traces: traces ? traces.split(',').map(t => t.trim()) : [],
+          dependsOn: dependsOn && dependsOn !== '-' ? dependsOn.split(',').map(d => d.trim()) : [],
+          acceptance,
+          status: normalizeTaskStatus(status),
+        });
+      }
+    }
+  }
+
+  // 计算统计
+  const total = tasks.length;
+  const completed = tasks.filter(t => t.status === 'complete').length;
+  const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+  const pending = tasks.filter(t => t.status === 'pending').length;
+  const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  // 找出当前进行中的任务
+  const currentTasks = tasks.filter(t => t.status === 'in_progress');
+
+  return {
+    phases,
+    tasks,
+    stats: {
+      total,
+      completed,
+      inProgress,
+      pending,
+      progress,
+    },
+    currentTasks,
+  };
+}
+
+function normalizeTaskStatus(status) {
+  const s = status.toLowerCase().trim();
+  if (s === 'complete' || s === 'completed' || s === 'done') return 'complete';
+  if (s === 'in_progress' || s === 'in-progress' || s === 'in progress' || s === 'wip') return 'in_progress';
+  return 'pending';
+}
+
 function sendJson(res, code, data) {
   res.writeHead(code, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -158,6 +594,95 @@ const server = createServer((req, res) => {
     return;
   }
 
+  // Metrics API - 必须在 feature 详情路由之前匹配
+  if (url.pathname.match(/^\/api\/feature\/[^/]+\/metrics$/)) {
+    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const coverage = getMetrics(projectRoot, featureId);
+    const defectStats = getDefectStats(projectRoot, featureId);
+    const escapeRate = defectStats.total > 0 ? 0 : 0; // 简化：实际应从缺陷发现阶段计算
+    const health = calcHealthScore(coverage, escapeRate);
+
+    sendJson(res, 200, {
+      featureId,
+      coverage,
+      health,
+      metricDefs: METRIC_DEFS,
+      now: new Date().toISOString(),
+    });
+    return;
+  }
+
+  // Timeline API - 必须在 feature 详情路由之前匹配
+  if (url.pathname.match(/^\/api\/feature\/[^/]+\/timeline$/)) {
+    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const timeline = getTimelineData(projectRoot, featureId);
+
+    sendJson(res, 200, {
+      featureId,
+      ...timeline,
+      now: new Date().toISOString(),
+    });
+    return;
+  }
+
+  // Defects API - 必须在 feature 详情路由之前匹配
+  if (url.pathname.match(/^\/api\/feature\/[^/]+\/defects$/)) {
+    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const stats = getDefectStats(projectRoot, featureId);
+    const defects = getDefects(projectRoot, featureId);
+
+    sendJson(res, 200, {
+      featureId,
+      stats,
+      defects,
+      now: new Date().toISOString(),
+    });
+    return;
+  }
+
+  // Tasks API - 必须在 feature 详情路由之前匹配
+  if (url.pathname.match(/^\/api\/feature\/[^/]+\/tasks$/)) {
+    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const taskData = parseTaskPlan(projectRoot, featureId);
+
+    if (!taskData) {
+      sendJson(res, 200, {
+        featureId,
+        phases: [],
+        tasks: [],
+        stats: { total: 0, completed: 0, inProgress: 0, pending: 0, progress: 0 },
+        currentTasks: [],
+        now: new Date().toISOString(),
+      });
+      return;
+    }
+
+    sendJson(res, 200, {
+      featureId,
+      phases: taskData.phases,
+      tasks: taskData.tasks,
+      stats: taskData.stats,
+      currentTasks: taskData.currentTasks,
+      now: new Date().toISOString(),
+    });
+    return;
+  }
+
+  // Gate Status API - 必须在 feature 详情路由之前匹配
+  if (url.pathname.match(/^\/api\/feature\/[^/]+\/gate-status$/)) {
+    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const currentGate = getGateStatus(projectRoot, featureId);
+    const allStageGates = getAllStageGateStatus(projectRoot, featureId);
+
+    sendJson(res, 200, {
+      featureId,
+      current: currentGate,
+      stages: allStageGates,
+      now: new Date().toISOString(),
+    });
+    return;
+  }
+
   if (url.pathname.startsWith('/api/feature/')) {
     const featureId = decodeURIComponent(url.pathname.replace('/api/feature/', ''));
     const state = loadFeature(projectRoot, featureId);
@@ -186,6 +711,40 @@ const server = createServer((req, res) => {
       'Cache-Control': 'no-store',
     });
     res.end(html);
+    return;
+  }
+
+  // Serve CSS file
+  if (url.pathname === '/styles.css') {
+    const cssPath = join(__dirname, 'styles.css');
+    if (!existsSync(cssPath)) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('CSS file not found');
+      return;
+    }
+    const css = readFileSync(cssPath, 'utf-8');
+    res.writeHead(200, {
+      'Content-Type': 'text/css; charset=utf-8',
+      'Cache-Control': 'no-store',
+    });
+    res.end(css);
+    return;
+  }
+
+  // Serve JavaScript file
+  if (url.pathname === '/app.js') {
+    const jsPath = join(__dirname, 'app.js');
+    if (!existsSync(jsPath)) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('JavaScript file not found');
+      return;
+    }
+    const js = readFileSync(jsPath, 'utf-8');
+    res.writeHead(200, {
+      'Content-Type': 'application/javascript; charset=utf-8',
+      'Cache-Control': 'no-store',
+    });
+    res.end(js);
     return;
   }
 

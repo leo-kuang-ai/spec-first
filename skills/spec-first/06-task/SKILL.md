@@ -1,6 +1,9 @@
 ---
 name: "spec-first:task"
 description: "定位 Feature 并校验阶段为任务拆解（03_plan）"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: task

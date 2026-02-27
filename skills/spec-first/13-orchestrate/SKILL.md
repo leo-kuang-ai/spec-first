@@ -1,6 +1,9 @@
 ---
 name: "spec-first:orchestrate"
 description: "定位 Feature 并加载当前状态执行编排"
+version: 1.0.0
+last_updated: 2026-02-27
+changelog: Initial version with standardized metadata
 ---
 
 # Skill: orchestrate
