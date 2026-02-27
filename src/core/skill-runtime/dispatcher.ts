@@ -9,6 +9,7 @@ import { loadConfig } from '../../shared/config-schema.js';
 import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability } from './prompt-assembler.js';
 import { buildHardGateRuntimeNotice } from './hard-gate.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
+import { validateOrchestrateArgs, type OrchestrateArgs } from './orchestrate-args.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -17,6 +18,8 @@ export interface DispatchResult {
   args?: string[];
   skillPath?: string;
   error?: string;
+  /** orchestrate 专用：解析后的参数（仅 skillName=orchestrate 时存在） */
+  orchestrateArgs?: OrchestrateArgs;
 }
 
 /** 语义子命令映射表 */
@@ -109,6 +112,25 @@ export function dispatchCommand(
   // Skill 路由：查找 Skill 文件
   const skillPath = resolveSkillPath(skillName, projectRoot);
   if (skillPath) {
+    // orchestrate 专用参数校验（V2-13§4.5）
+    if (skillName === 'orchestrate') {
+      try {
+        const orchestrateArgs = validateOrchestrateArgs(rest);
+        return {
+          route: 'skill',
+          skillName,
+          args: rest,
+          skillPath,
+          orchestrateArgs,
+        };
+      } catch (e) {
+        return {
+          route: 'error',
+          error: e instanceof Error ? e.message : String(e),
+        };
+      }
+    }
+
     return {
       route: 'skill',
       skillName,

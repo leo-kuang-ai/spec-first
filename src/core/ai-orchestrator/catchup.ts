@@ -7,10 +7,18 @@ import { join } from 'node:path';
 import type { StageState } from '../../shared/types.js';
 import { readJson, exists, readMarkdown } from '../../shared/fs-utils.js';
 import { loadTodoState, summarizeTodoState } from './todo-runner.js';
+import { loadConfig } from '../../shared/config-schema.js';
 import { buildTaskContextPack } from './context-pack.js';
 import { buildCatchupSummary, extractFiveQuestions } from './catchup-summary.js';
 import type { FiveQuestions } from './catchup-summary.js';
 export type { FiveQuestions } from './catchup-summary.js';
+
+/** auto-loop 运行时摘要（ORCH-008） */
+export interface AutoLoopSummary {
+  currentTaskId: string | null;
+  heartbeatAt: string | null;
+  retryBudgetRemaining: number;
+}
 
 export interface CatchupResult {
   featureId: string;
@@ -29,6 +37,8 @@ export interface CatchupResult {
   missingFiles: string[];
   /** 5-Question Reboot Test 结果（Planning-with-Files P0-2） */
   fiveQuestions: FiveQuestions;
+  /** auto-loop 运行时摘要（ORCH-008），运行中时非空 */
+  autoLoopSummary?: AutoLoopSummary;
   summary: string;
 }
 
@@ -154,6 +164,19 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   const todoState = loadTodoState(featureId, projectRoot);
   const todoSummary = todoState ? summarizeTodoState(todoState) : undefined;
 
+  // Step 5.6: auto-loop runtime 摘要（ORCH-008）
+  let autoLoopSummary: AutoLoopSummary | undefined;
+  const autoLoop = todoState?.runtime?.autoLoop;
+  if (autoLoop) {
+    const aoConfig = loadConfig(projectRoot).runtime.auto_orchestrate;
+    autoLoopSummary = {
+      currentTaskId: autoLoop.currentTaskId,
+      heartbeatAt: autoLoop.heartbeatAt,
+      retryBudgetRemaining: Math.max(0,
+        aoConfig.max_total_retry_duration_ms - (autoLoop.retry?.totalRetryDurationMs ?? 0)),
+    };
+  }
+
   // Step 6: Output summary
   const summary = buildCatchupSummary(
     featureId,
@@ -177,6 +200,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     todoSummary,
     missingFiles: uniqueMissingFiles,
     fiveQuestions,
+    autoLoopSummary,
     summary,
   };
 }

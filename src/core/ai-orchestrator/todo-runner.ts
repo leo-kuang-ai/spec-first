@@ -1,9 +1,19 @@
 import { join } from 'node:path';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, renameSync } from 'node:fs';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 
 export type TodoStatus = 'pending' | 'in_progress' | 'blocked' | 'done';
+
+/** run-level haltReason 规范码（用于解析/聚合） @see V2-13§7.5 */
+export type HaltReasonCode =
+  | 'completed'
+  | 'max_iterations_reached'
+  | 'blocked'
+  | 'stalled_timeout'
+  | 'task_timeout'
+  | 'permanent_error'
+  | 'retry_budget_exhausted';
 
 export interface TodoItem {
   id: string;
@@ -13,18 +23,87 @@ export interface TodoItem {
   parallel?: boolean;
 }
 
+/** auto-loop 重试状态 @see V2-13§4.3 */
+export interface AutoLoopRetry {
+  regenerateCount: number;
+  autoRetryCount: number;
+  manualRevisionCount: number;
+  totalRetryDurationMs: number;
+  lastFailureReason: string | null;
+}
+
+/** auto-loop 上一轮结果 */
+export interface AutoLoopLastResult {
+  taskId: string;
+  outcome: TodoStatus;
+  message: string;
+}
+
+/** runtime.autoLoop 命名空间 @see V2-13§4.3 */
+export interface AutoLoopState {
+  currentTaskId: string | null;
+  taskStartedAt: string | null;
+  heartbeatAt: string | null;
+  watchdogCheckedAt: string | null;
+  retry: AutoLoopRetry;
+  lastResult: AutoLoopLastResult | null;
+}
+
 export interface TodoRunnerState {
   featureId: string;
   iteration: number;
   maxIterations: number;
   halted: boolean;
   haltReason?: string;
+  runtime?: {
+    autoLoop?: AutoLoopState;
+  };
   items: TodoItem[];
   updatedAt: string;
 }
 
 function getTodoStatePath(featureId: string, projectRoot: string): string {
   return join(projectRoot, 'specs', featureId, 'todo-state.json');
+}
+
+// ─── 状态词汇归一化 @see V2-13§7.5 ────────────────────
+
+const STATUS_NORMALIZE_MAP: Record<string, TodoStatus> = {
+  done: 'done',
+  complete: 'done',
+  verified: 'done',
+  'in progress': 'in_progress',
+  in_progress: 'in_progress',
+  pending: 'pending',
+  blocked: 'blocked',
+};
+
+/** 将 legacy 状态词汇归一为 TodoStatus */
+export function normalizeTodoStatus(input: string): TodoStatus {
+  return STATUS_NORMALIZE_MAP[input.toLowerCase()] ?? (input as TodoStatus);
+}
+
+/** 创建空的 autoLoop 初始状态 */
+export function createAutoLoopState(): AutoLoopState {
+  return {
+    currentTaskId: null,
+    taskStartedAt: null,
+    heartbeatAt: null,
+    watchdogCheckedAt: null,
+    retry: {
+      regenerateCount: 0,
+      autoRetryCount: 0,
+      manualRevisionCount: 0,
+      totalRetryDurationMs: 0,
+      lastFailureReason: null,
+    },
+    lastResult: null,
+  };
+}
+
+/** 从 state 中读取 autoLoop，兼容 legacy 缺失场景 */
+export function getAutoLoopState(state: TodoRunnerState): AutoLoopState | undefined {
+  return state.runtime?.autoLoop;
 }
 
 export function loadTodoState(featureId: string, projectRoot: string): TodoRunnerState | undefined {
@@ -37,9 +116,12 @@ export function loadTodoState(featureId: string, projectRoot: string): TodoRunne
   }
 }
 
+/** 原子写入：write-tmp-then-rename，防止中途 kill 导致文件损坏 */
 export function saveTodoState(state: TodoRunnerState, projectRoot: string): void {
   const statePath = getTodoStatePath(state.featureId, projectRoot);
-  writeFileSync(statePath, `${JSON.stringify(state, null, 2)}\n`, 'utf-8');
+  const tmpPath = `${statePath}.tmp`;
+  writeFileSync(tmpPath, `${JSON.stringify(state, null, 2)}\n`, 'utf-8');
+  renameSync(tmpPath, statePath);
 }
 
 export function initTodoState(

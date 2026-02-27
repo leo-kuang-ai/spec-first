@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.65 2026-02-28 Leo: feat: V2-13 Orchestrate Auto Loop — `/spec-first:orchestrate --auto/--resume` 自动迭代（23 TASK 完成）：Phase A 主循环+watchdog+超时+审计hash链+配置schema+P4→P2回退；Phase B 完成检测+重试backoff+幂等写入+Front Matter；Phase C ContextProvider+_context审核+required_mcps+slop检查；Phase T 101 tests覆盖（88 unit + 13 e2e），857 passed (user-visible)
+- v0.5.64 2026-02-28 Leo: docs: README 大重写 — 消除四章节重复、合并架构+流程+追踪章节、修正核心模块数(7→9)、对齐代码实际状态(19 CLI/21 Skill/9 Module)，1385→761 行 (user-visible)
 - v0.5.63 2026-02-28 Leo: docs: V2-13 开发任务文档 v1.2 — 多 Agent 审查修正（补齐原子写入/Fresh Context/错误分类验收标准；修正 008/016/018/021 依赖链；修正 012 优先级 P0→P1；修正 022 悬空 traces；消除 009↔016 循环依赖）
 - v0.5.62 2026-02-27 Leo: feat: Stage Viewer Feature 列表进度条 — 侧边栏 Feature 列表新增进度条与百分比徽章，基于当前阶段计算完成进度（00_init=0% → 06_wrap_up=100%）；支持多 Feature 并行进度对比 (user-visible)
 - v0.5.61 2026-02-27 Leo: feat: Stage Viewer 时间线视图 — 按时间轴展示阶段流转历史，可视化各阶段耗时（甘特图样式）；新增 /api/feature/:id/timeline API 计算阶段持续时间；支持已完成/进行中/待开始三种状态；显示总时长与开始时间 (user-visible)

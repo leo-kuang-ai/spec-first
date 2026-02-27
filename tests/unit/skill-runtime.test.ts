@@ -104,6 +104,40 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('error');
   });
 
+  // ─── Orchestrate 参数校验集成 ─────────────────────────
+
+  it('should dispatch orchestrate --auto with parsed args', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    const result = dispatchCommand('orchestrate --auto', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.orchestrateArgs).toEqual({ mode: 'auto', resume: false });
+  });
+
+  it('should dispatch orchestrate --auto --resume with parsed args', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    const result = dispatchCommand('orchestrate --auto --resume', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.orchestrateArgs).toEqual({ mode: 'auto', resume: true });
+  });
+
+  it('should reject orchestrate with unknown flag', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    const result = dispatchCommand('orchestrate --verbose', TMP);
+    expect(result.route).toBe('error');
+    expect(result.error).toContain('Unknown orchestrate flag');
+  });
+
+  it('should reject orchestrate --resume without --auto', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    const result = dispatchCommand('orchestrate --resume', TMP);
+    expect(result.route).toBe('error');
+    expect(result.error).toContain('--resume requires --auto');
+  });
+
   it('should resolve namespaced extension skill route', () => {
     const extDir = join(TMP, '.spec-first', 'extensions', 'qa-pack');
     mkdirSync(join(extDir, 'skills', 'review'), { recursive: true });

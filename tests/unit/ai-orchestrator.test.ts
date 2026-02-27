@@ -196,6 +196,50 @@ describe('catchup', () => {
     expect(result.summary).toContain('Todo续航');
   });
 
+  it('should include autoLoopSummary when runtime.autoLoop exists (ORCH-008)', () => {
+    writeState('04_implement');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'todo-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        iteration: 0,
+        maxIterations: 3,
+        halted: false,
+        items: [],
+        updatedAt: '2026-02-28T00:00:00Z',
+        runtime: {
+          autoLoop: {
+            currentTaskId: 'TASK-AUTH-001',
+            taskStartedAt: '2026-02-28T00:00:00Z',
+            heartbeatAt: '2026-02-28T00:01:00Z',
+            watchdogCheckedAt: null,
+            retry: {
+              regenerateCount: 1,
+              autoRetryCount: 0,
+              manualRevisionCount: 0,
+              totalRetryDurationMs: 2000,
+              lastFailureReason: 'timeout',
+            },
+            lastResult: null,
+          },
+        },
+      }),
+      'utf-8',
+    );
+    const result = catchup(FEAT, TMP);
+    expect(result.autoLoopSummary).toBeDefined();
+    expect(result.autoLoopSummary!.currentTaskId).toBe('TASK-AUTH-001');
+    expect(result.autoLoopSummary!.heartbeatAt).toBe('2026-02-28T00:01:00Z');
+    // default budget 900_000 - 2000 used = 898_000
+    expect(result.autoLoopSummary!.retryBudgetRemaining).toBe(898_000);
+  });
+
+  it('should not include autoLoopSummary when no autoLoop state', () => {
+    writeState('04_implement');
+    const result = catchup(FEAT, TMP);
+    expect(result.autoLoopSummary).toBeUndefined();
+  });
+
   it('should skip if called within 60s (concurrency protection)', () => {
     writeState('00_init');
     catchup(FEAT, TMP);

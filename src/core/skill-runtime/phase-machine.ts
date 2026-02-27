@@ -29,7 +29,7 @@ const TRANSITIONS: Record<Phase, Phase[]> = {
   P1_CONTEXT: ['P2_GENERATE'],
   P2_GENERATE: ['P3_CONFIRM'],
   P3_CONFIRM: ['P4_WRITE', 'P2_GENERATE', 'ABORTED'],
-  P4_WRITE: ['P5_SIDE_EFFECT'],
+  P4_WRITE: ['P5_SIDE_EFFECT', 'P2_GENERATE'],
   P5_SIDE_EFFECT: ['DONE'],
   DONE: [],
   ABORTED: [],
@@ -86,6 +86,18 @@ export function transition(state: PhaseState, to: Phase): PhaseState {
       throw new Error(
         `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. `
         + '必须升级到架构审查或方案重设计，禁止继续“再试一次”。',
+      );
+    }
+  }
+
+  // P4 → P2 完成检测失败回退（auto-loop retry）
+  if (state.current === 'P4_WRITE' && to === 'P2_GENERATE') {
+    next.revisionCount = state.revisionCount + 1;
+    next.confirmed = false;
+    if (next.revisionCount >= next.maxRevisions) {
+      throw new Error(
+        `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. `
+        + '必须升级到架构审查或方案重设计，禁止继续"再试一次"。',
       );
     }
   }

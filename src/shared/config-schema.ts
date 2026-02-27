@@ -7,10 +7,36 @@ import { join } from 'node:path';
 import yaml from 'js-yaml';
 import { exists } from './fs-utils.js';
 
+export interface AutoOrchestrateConfig {
+  enabled: boolean;
+  stop_on_blocked: boolean;
+  max_task_duration_ms: number;
+  heartbeat_timeout_ms: number;
+  watchdog_interval_ms: number;
+  max_retry_per_task: number;
+  retry_backoff_ms: number;
+  max_total_retry_duration_ms: number;
+  max_parallel: number;
+}
+
+export type AuditTamperProof = 'none' | 'hash_chain';
+
+export interface AuditLogConfig {
+  enabled: boolean;
+  tamper_proof: AuditTamperProof;
+  rotation_size_mb: number;
+}
+
 export interface SpecFirstConfig {
   catchup: { trigger: 'auto' | 'prompt' | 'off' };
   context: { token_budget: number };
-  runtime: { max_iterations: number; max_self_corrections: number; kv_cache_hard_gate: boolean };
+  runtime: {
+    max_iterations: number;
+    max_self_corrections: number;
+    kv_cache_hard_gate: boolean;
+    auto_orchestrate: AutoOrchestrateConfig;
+    audit_log: AuditLogConfig;
+  };
   gate: { pilot_mode: boolean };
   health: {
     weights: {
@@ -24,7 +50,27 @@ export interface SpecFirstConfig {
 export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
   catchup: { trigger: 'prompt' },
   context: { token_budget: 16000 },
-  runtime: { max_iterations: 5, max_self_corrections: 3, kv_cache_hard_gate: false },
+  runtime: {
+    max_iterations: 5,
+    max_self_corrections: 3,
+    kv_cache_hard_gate: false,
+    auto_orchestrate: {
+      enabled: false,
+      stop_on_blocked: true,
+      max_task_duration_ms: 600_000,
+      heartbeat_timeout_ms: 300_000,
+      watchdog_interval_ms: 10_000,
+      max_retry_per_task: 3,
+      retry_backoff_ms: 2_000,
+      max_total_retry_duration_ms: 900_000,
+      max_parallel: 1,
+    },
+    audit_log: {
+      enabled: true,
+      tamper_proof: 'hash_chain',
+      rotation_size_mb: 10,
+    },
+  },
   gate: { pilot_mode: false },
   health: {
     weights: {
@@ -110,6 +156,30 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
     cfg.runtime.kv_cache_hard_gate = runtime.kv_cache_hard_gate;
   }
 
+  // runtime.auto_orchestrate
+  const ao = runtime?.auto_orchestrate as Record<string, unknown> | undefined;
+  if (ao) {
+    if (typeof ao.enabled === 'boolean') cfg.runtime.auto_orchestrate.enabled = ao.enabled;
+    if (typeof ao.stop_on_blocked === 'boolean') cfg.runtime.auto_orchestrate.stop_on_blocked = ao.stop_on_blocked;
+    if (typeof ao.max_task_duration_ms === 'number') cfg.runtime.auto_orchestrate.max_task_duration_ms = ao.max_task_duration_ms;
+    if (typeof ao.heartbeat_timeout_ms === 'number') cfg.runtime.auto_orchestrate.heartbeat_timeout_ms = ao.heartbeat_timeout_ms;
+    if (typeof ao.watchdog_interval_ms === 'number') cfg.runtime.auto_orchestrate.watchdog_interval_ms = ao.watchdog_interval_ms;
+    if (typeof ao.max_retry_per_task === 'number') cfg.runtime.auto_orchestrate.max_retry_per_task = ao.max_retry_per_task;
+    if (typeof ao.retry_backoff_ms === 'number') cfg.runtime.auto_orchestrate.retry_backoff_ms = ao.retry_backoff_ms;
+    if (typeof ao.max_total_retry_duration_ms === 'number') cfg.runtime.auto_orchestrate.max_total_retry_duration_ms = ao.max_total_retry_duration_ms;
+    if (typeof ao.max_parallel === 'number') cfg.runtime.auto_orchestrate.max_parallel = ao.max_parallel;
+  }
+
+  // runtime.audit_log
+  const al = runtime?.audit_log as Record<string, unknown> | undefined;
+  if (al) {
+    if (typeof al.enabled === 'boolean') cfg.runtime.audit_log.enabled = al.enabled;
+    if (typeof al.tamper_proof === 'string' && ['none', 'hash_chain'].includes(al.tamper_proof)) {
+      cfg.runtime.audit_log.tamper_proof = al.tamper_proof as AuditTamperProof;
+    }
+    if (typeof al.rotation_size_mb === 'number') cfg.runtime.audit_log.rotation_size_mb = al.rotation_size_mb;
+  }
+
   // health.weights
   const health = parsed.health as Record<string, unknown> | undefined;
   const weights = health?.weights as Record<string, number> | undefined;
@@ -136,6 +206,36 @@ function validate(cfg: SpecFirstConfig): void {
   }
   if (cfg.runtime.max_self_corrections < 1 || cfg.runtime.max_self_corrections > 10) {
     errors.push(`runtime.max_self_corrections must be 1-10, got ${cfg.runtime.max_self_corrections}`);
+  }
+
+  // auto_orchestrate 范围校验
+  const ao = cfg.runtime.auto_orchestrate;
+  if (ao.max_task_duration_ms < 60_000 || ao.max_task_duration_ms > 3_600_000) {
+    errors.push(`auto_orchestrate.max_task_duration_ms must be 60000-3600000, got ${ao.max_task_duration_ms}`);
+  }
+  if (ao.heartbeat_timeout_ms < 10_000 || ao.heartbeat_timeout_ms > 600_000) {
+    errors.push(`auto_orchestrate.heartbeat_timeout_ms must be 10000-600000, got ${ao.heartbeat_timeout_ms}`);
+  }
+  if (ao.watchdog_interval_ms < 1_000 || ao.watchdog_interval_ms > 60_000) {
+    errors.push(`auto_orchestrate.watchdog_interval_ms must be 1000-60000, got ${ao.watchdog_interval_ms}`);
+  }
+  if (ao.max_retry_per_task < 0 || ao.max_retry_per_task > 10) {
+    errors.push(`auto_orchestrate.max_retry_per_task must be 0-10, got ${ao.max_retry_per_task}`);
+  }
+  if (ao.retry_backoff_ms < 100 || ao.retry_backoff_ms > 30_000) {
+    errors.push(`auto_orchestrate.retry_backoff_ms must be 100-30000, got ${ao.retry_backoff_ms}`);
+  }
+  if (ao.max_total_retry_duration_ms < 60_000 || ao.max_total_retry_duration_ms > 7_200_000) {
+    errors.push(`auto_orchestrate.max_total_retry_duration_ms must be 60000-7200000, got ${ao.max_total_retry_duration_ms}`);
+  }
+  if (ao.max_parallel < 1 || ao.max_parallel > 4) {
+    errors.push(`auto_orchestrate.max_parallel must be 1-4, got ${ao.max_parallel}`);
+  }
+
+  // audit_log 范围校验
+  const al = cfg.runtime.audit_log;
+  if (al.rotation_size_mb < 1 || al.rotation_size_mb > 100) {
+    errors.push(`audit_log.rotation_size_mb must be 1-100, got ${al.rotation_size_mb}`);
   }
 
   const wSum = Object.values(cfg.health.weights).reduce((a, b) => a + b, 0);
