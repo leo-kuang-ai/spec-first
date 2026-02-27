@@ -61,7 +61,7 @@ describe('handleCommit', () => {
       throw new Error('nothing to commit, working tree clean');
     });
 
-    const code = withCwd(TMP, () => handleCommit(['--message', 'test', '--task', 'TASK-123']));
+    const code = withCwd(TMP, () => handleCommit(['--message', 'test', '--task', 'TASK-ABC-1']));
 
     expect(code).toBe(ExitCode.IO_ERROR);
     expect(execFileSyncMock).toHaveBeenCalledTimes(1);

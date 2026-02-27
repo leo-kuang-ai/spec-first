@@ -6,6 +6,7 @@ import { ExitCode } from '../../shared/types.js';
 import { advance, GateUnavailableError, GateFailedError } from '../../core/process-engine/advance.js';
 import { cancel } from '../../core/process-engine/advance.js';
 import { getFeatureState } from '../../core/process-engine/feature.js';
+import { parseFlag } from '../parse-utils.js';
 
 export function handleStage(args: string[]): number {
   const sub = args[0];
@@ -96,10 +97,4 @@ function printStageHelp(): void {
   current   查看当前阶段
   advance   推进到下一阶段
   cancel    取消 Feature`);
-}
-
-function parseFlag(args: string[], flag: string): string | undefined {
-  const idx = args.indexOf(flag);
-  if (idx === -1 || idx + 1 >= args.length) return undefined;
-  return args[idx + 1];
 }

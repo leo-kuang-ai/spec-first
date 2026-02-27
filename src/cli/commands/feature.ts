@@ -102,6 +102,14 @@ function handleSwitch(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
+  // 验证 feature 目录存在且包含必要文件
+  const statePath = join(projectRoot, 'specs', resolved.featureId, 'stage-state.json');
+  if (!exists(statePath)) {
+    console.error(`错误：feature "${resolved.featureId}" 不存在或未初始化`);
+    console.error(`  预期路径：${statePath}`);
+    return ExitCode.VALIDATION_ERROR;
+  }
+
   const configDir = join(projectRoot, '.spec-first');
   ensureDir(configDir);
   writeFileSync(join(configDir, 'current'), resolved.featureId, 'utf-8');

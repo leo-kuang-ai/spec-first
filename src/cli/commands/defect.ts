@@ -11,6 +11,7 @@ import {
   listDefects,
   getEscapeRate,
 } from '../../core/change-mgr/defect.js';
+import { parseFlag } from '../parse-utils.js';
 
 const VALID_SEVERITIES: ReadonlySet<string> = new Set(['S1', 'S2', 'S3', 'S4']);
 const VALID_STATUSES: ReadonlySet<string> = new Set(['open', 'fixing', 'fixed', 'verified', 'wontfix']);
@@ -171,10 +172,4 @@ function printDefectHelp(): void {
   list         列出缺陷（可筛选）
   get          查看缺陷详情
   escape-rate  计算缺陷逃逸率`);
-}
-
-function parseFlag(args: string[], flag: string): string | undefined {
-  const idx = args.indexOf(flag);
-  if (idx === -1 || idx + 1 >= args.length) return undefined;
-  return args[idx + 1];
 }

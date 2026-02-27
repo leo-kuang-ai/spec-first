@@ -7,15 +7,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { exists } from '../../shared/fs-utils.js';
+import { parseFlag } from '../parse-utils.js';
 
 const GIT_COMMIT_TIMEOUT_MS = 30_000;
-
-/** 解析 --flag value 参数 */
-function parseFlag(args: string[], flag: string): string | undefined {
-  const idx = args.indexOf(flag);
-  if (idx === -1 || idx + 1 >= args.length) return undefined;
-  return args[idx + 1];
-}
 
 export function handleCommit(args: string[]): number {
   const projectRoot = process.cwd();
@@ -79,5 +73,8 @@ function inferTaskId(projectRoot: string): string | undefined {
 }
 
 function isValidTaskId(id: string): boolean {
-  return /^TASK-[\w-]+$/.test(id);
+  // TASK-<ABBR>-<SEQ> 格式
+  // ABBR: 1-20 个大写字母或数字（任务缩写）
+  // SEQ: 至少 1 位数字（序号）
+  return /^TASK-[A-Z0-9]{1,20}-\d{1,}$/.test(id);
 }

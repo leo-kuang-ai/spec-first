@@ -58,8 +58,9 @@ function handleCheck(args: string[]): number {
     }
 
     return result.status === 'FAIL' ? ExitCode.VALIDATION_ERROR : ExitCode.SUCCESS;
-  } catch {
+  } catch (e) {
     console.error(`Gate 评估失败：${featureId}`);
+    console.error(`  原因：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -139,8 +140,9 @@ function handleGoLiveCheck(args: string[]): number {
     }
 
     return result.pass ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
-  } catch {
+  } catch (e) {
     console.error(`上线检查执行失败：${featureId}`);
+    console.error(`  原因：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }

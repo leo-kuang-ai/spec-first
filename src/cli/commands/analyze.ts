@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { exists, writeMarkdown } from '../../shared/fs-utils.js';
 import { analyzeArtifacts, renderAnalysisReport } from '../../core/gate-engine/sca.js';
+import { parseFlag } from '../parse-utils.js';
 
 export function handleAnalyze(args: string[]): number {
   if (args.includes('--help') || args.includes('-h')) {
@@ -37,12 +38,6 @@ export function handleAnalyze(args: string[]): number {
   console.log(`CRITICAL=${result.summary.CRITICAL}, HIGH=${result.summary.HIGH}, MEDIUM=${result.summary.MEDIUM}, LOW=${result.summary.LOW}`);
 
   return result.summary.CRITICAL > 0 ? ExitCode.GATE_FAILED : ExitCode.SUCCESS;
-}
-
-function parseFlag(args: string[], flag: string): string | undefined {
-  const idx = args.indexOf(flag);
-  if (idx === -1 || idx + 1 >= args.length) return undefined;
-  return args[idx + 1];
 }
 
 function isAbsolutePath(input: string): boolean {

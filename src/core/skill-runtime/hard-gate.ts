@@ -144,7 +144,13 @@ function assessHighRiskChanges(projectRoot: string, featureId: string): HighRisk
   // 检查是否有跨目录重构信号
   if (hasGitRepo) {
     try {
-      const diffOutput = runGit(projectRoot, ['diff', '--name-only', 'HEAD~5']);
+      // 先获取实际提交数，避免在浅克隆或新仓库中失败
+      const commitCountOutput = runGit(projectRoot, ['rev-list', '--count', 'HEAD']);
+      const commitCount = parseInt(commitCountOutput.trim(), 10) || 0;
+
+      // 使用实际提交数和5的较小值作为深度
+      const depth = Math.max(1, Math.min(commitCount, 5));
+      const diffOutput = runGit(projectRoot, ['diff', '--name-only', `HEAD~${depth}`]);
 
       if (diffOutput) {
         const changedFiles = diffOutput.split('\n').filter(f => f.trim());
@@ -166,8 +172,9 @@ function assessHighRiskChanges(projectRoot: string, featureId: string): HighRisk
           requiresWorktree = true;
         }
       }
-    } catch {
-      // Git 不可用时跳过
+    } catch (e) {
+      // Git 不可用时记录警告，安全退化为"无风险"
+      console.warn(`hard-gate: 无法检查高风险变更 - ${(e as Error).message}`);
     }
   }
 

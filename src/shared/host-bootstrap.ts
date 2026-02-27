@@ -1,6 +1,7 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, renameSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { detectHostPaths, type HostPaths } from './host-paths.js';
 
 export type BootstrapLevel = 'PASS' | 'FIXED' | 'WARNING' | 'ERROR';
@@ -16,6 +17,28 @@ export interface BootstrapResult {
 export interface BootstrapSummary {
   ok: boolean;
   results: BootstrapResult[];
+}
+
+/**
+ * 原子写入 JSON 文件
+ * 通过写入临时文件然后重命名来确保原子性，避免崩溃时损坏原文件
+ */
+function atomicWriteJson(filePath: string, data: unknown): void {
+  const dir = dirname(filePath);
+  mkdirSync(dir, { recursive: true });
+
+  // 在系统临时目录创建临时文件（跨平台）
+  const randomSuffix = Math.random().toString(36).substring(2, 10);
+  const tmpPath = join(tmpdir(), `spec-first-atomic-${randomSuffix}.tmp`);
+
+  try {
+    writeFileSync(tmpPath, `${JSON.stringify(data, null, 2)}\n`, 'utf-8');
+    renameSync(tmpPath, filePath); // 原子操作
+  } catch (e) {
+    // 失败时清理临时文件
+    try { unlinkSync(tmpPath); } catch {}
+    throw e;
+  }
 }
 
 interface McpServerEntry {
@@ -262,7 +285,7 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
 
     if (changed && !dryRun) {
       root.mcpServers = mcpServers;
-      writeFileSync(filePath, `${JSON.stringify(root, null, 2)}\n`, 'utf-8');
+      atomicWriteJson(filePath, root);
     }
   }
 

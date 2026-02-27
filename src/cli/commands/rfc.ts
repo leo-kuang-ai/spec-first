@@ -5,6 +5,7 @@
 import { ExitCode } from '../../shared/types.js';
 import type { RfcStatus, RfcLevel } from '../../shared/types.js';
 import { createRfc, submitRfc, transitionRfc, listRfc, getRfc } from '../../core/change-mgr/rfc.js';
+import { parseFlag } from '../parse-utils.js';
 
 const VALID_LEVELS: ReadonlySet<string> = new Set(['Minor', 'Major', 'Critical']);
 const VALID_STATUSES: ReadonlySet<string> = new Set(['draft', 'approved', 'closed', 'rejected']);
@@ -150,10 +151,4 @@ function printRfcHelp(): void {
   transition  流转 RFC 状态
   list        列出 RFC
   get         查看 RFC 详情`);
-}
-
-function parseFlag(args: string[], flag: string): string | undefined {
-  const idx = args.indexOf(flag);
-  if (idx === -1 || idx + 1 >= args.length) return undefined;
-  return args[idx + 1];
 }

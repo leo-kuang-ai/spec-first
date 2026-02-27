@@ -4,7 +4,7 @@ import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 const DEFAULT_HOST = process.env.SPEC_FIRST_VIEWER_HOST ?? '127.0.0.1';
 const DEFAULT_PORT = parsePort(process.env.SPEC_FIRST_VIEWER_PORT, 0);
@@ -112,6 +112,26 @@ function loadFeature(projectRoot, featureId) {
   return safeReadJson(statePath);
 }
 
+// ─── Security: featureId 校验 ─────────────────────────────────────────────
+// FSREQ-YYYY-MM-DD-XXX 格式或纯字母数字下划线短横线
+const FEATURE_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+/**
+ * 安全地提取并校验 featureId
+ * @param {string} raw - 从 URL 解析的原始字符串
+ * @returns {string|null} 校验通过的 featureId，或 null（校验失败）
+ */
+function sanitizeFeatureId(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  const decoded = decodeURIComponent(raw);
+  if (!FEATURE_ID_PATTERN.test(decoded)) return null;
+  // 额外检查：拒绝包含路径遍历模式的字符串
+  if (decoded.includes('..') || decoded.includes('/') || decoded.includes('\\')) {
+    return null;
+  }
+  return decoded;
+}
+
 // ─── Metrics API ─────────────────────────────────────────────────────
 
 const METRIC_DEFS = [
@@ -140,13 +160,21 @@ function getGrade(score) {
 }
 
 function getMetrics(projectRoot, featureId) {
+  // 先校验 featureId 格式（防御命令注入）
+  if (!FEATURE_ID_PATTERN.test(featureId)) {
+    return getDefaultMetrics(featureId, projectRoot);
+  }
+
   try {
-    // 尝试调用 CLI 命令获取覆盖率数据
-    const output = execSync(
-      `npx spec-first metrics coverage ${featureId} --json 2>/dev/null || echo '{}'`,
-      { cwd: projectRoot, encoding: 'utf-8', timeout: 10000 }
-    );
-    const parsed = JSON.parse(output);
+    // 使用 execFileSync + 参数数组，避免 shell 注入
+    const output = execFileSync('npx', ['spec-first', 'metrics', 'coverage', featureId, '--json'], {
+      cwd: projectRoot,
+      encoding: 'utf-8',
+      timeout: 10000,
+      // npx 可能不存在，优雅降级
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const parsed = JSON.parse(String(output));
     return parsed;
   } catch {
     // CLI 不可用时返回模拟数据（从 stage-state.json 推断）
@@ -596,7 +624,12 @@ const server = createServer((req, res) => {
 
   // Metrics API - 必须在 feature 详情路由之前匹配
   if (url.pathname.match(/^\/api\/feature\/[^/]+\/metrics$/)) {
-    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const rawFeatureId = url.pathname.split('/')[3];
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
     const coverage = getMetrics(projectRoot, featureId);
     const defectStats = getDefectStats(projectRoot, featureId);
     const escapeRate = defectStats.total > 0 ? 0 : 0; // 简化：实际应从缺陷发现阶段计算
@@ -614,7 +647,12 @@ const server = createServer((req, res) => {
 
   // Timeline API - 必须在 feature 详情路由之前匹配
   if (url.pathname.match(/^\/api\/feature\/[^/]+\/timeline$/)) {
-    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const rawFeatureId = url.pathname.split('/')[3];
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
     const timeline = getTimelineData(projectRoot, featureId);
 
     sendJson(res, 200, {
@@ -627,7 +665,12 @@ const server = createServer((req, res) => {
 
   // Defects API - 必须在 feature 详情路由之前匹配
   if (url.pathname.match(/^\/api\/feature\/[^/]+\/defects$/)) {
-    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const rawFeatureId = url.pathname.split('/')[3];
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
     const stats = getDefectStats(projectRoot, featureId);
     const defects = getDefects(projectRoot, featureId);
 
@@ -642,7 +685,12 @@ const server = createServer((req, res) => {
 
   // Tasks API - 必须在 feature 详情路由之前匹配
   if (url.pathname.match(/^\/api\/feature\/[^/]+\/tasks$/)) {
-    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const rawFeatureId = url.pathname.split('/')[3];
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
     const taskData = parseTaskPlan(projectRoot, featureId);
 
     if (!taskData) {
@@ -670,7 +718,12 @@ const server = createServer((req, res) => {
 
   // Gate Status API - 必须在 feature 详情路由之前匹配
   if (url.pathname.match(/^\/api\/feature\/[^/]+\/gate-status$/)) {
-    const featureId = decodeURIComponent(url.pathname.split('/')[3]);
+    const rawFeatureId = url.pathname.split('/')[3];
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
     const currentGate = getGateStatus(projectRoot, featureId);
     const allStageGates = getAllStageGateStatus(projectRoot, featureId);
 
@@ -684,7 +737,12 @@ const server = createServer((req, res) => {
   }
 
   if (url.pathname.startsWith('/api/feature/')) {
-    const featureId = decodeURIComponent(url.pathname.replace('/api/feature/', ''));
+    const rawFeatureId = url.pathname.replace('/api/feature/', '');
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
     const state = loadFeature(projectRoot, featureId);
     if (!state) {
       sendJson(res, 404, { error: `feature not found: ${featureId}` });

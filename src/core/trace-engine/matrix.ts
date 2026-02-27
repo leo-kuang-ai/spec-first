@@ -103,10 +103,11 @@ export function updateMatrixRow(
   const idx = rows.findIndex(r => r.id === id);
   if (idx === -1) throw new Error(`ID not found in matrix: ${id}`);
 
-  if (updates.status) rows[idx].status = updates.status;
-  if (updates.title) rows[idx].title = updates.title;
-  if (updates.upstream) rows[idx].upstream = updates.upstream;
-  if (updates.downstream) rows[idx].downstream = updates.downstream;
+  // 使用 !== undefined 而非 truthiness，允许设置空字符串或空数组
+  if (updates.status !== undefined) rows[idx].status = updates.status;
+  if (updates.title !== undefined) rows[idx].title = updates.title;
+  if (updates.upstream !== undefined) rows[idx].upstream = updates.upstream;
+  if (updates.downstream !== undefined) rows[idx].downstream = updates.downstream;
 
   writeMarkdown(matrixPath, rowsToMarkdown(rows));
 }

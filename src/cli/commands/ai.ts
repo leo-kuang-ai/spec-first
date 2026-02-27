@@ -6,6 +6,7 @@ import { ExitCode } from '../../shared/types.js';
 import { buildContextPack, validateControlSize } from '../../core/ai-orchestrator/context-pack.js';
 import { catchup } from '../../core/ai-orchestrator/catchup.js';
 import { readStats, summarizeStats } from '../../core/ai-orchestrator/ai-stats.js';
+import { parseFlag } from '../parse-utils.js';
 
 export function handleAi(args: string[]): number {
   const sub = args[0];
@@ -27,7 +28,7 @@ function handleContext(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
   const fullDetail = args.includes('--full');
-  const expandArg = readOptionValue(args, '--expand');
+  const expandArg = parseFlag(args, '--expand');
   const expandPaths = expandArg
     ? expandArg.split(',').map((item) => item.trim()).filter(Boolean)
     : [];
@@ -58,8 +59,9 @@ function handleContext(args: string[]): number {
     }
 
     return valid ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
-  } catch {
+  } catch (e) {
     console.error(`构建上下文包失败：${featureId}`);
+    console.error(`  原因：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -75,8 +77,9 @@ function handleCatchup(args: string[]): number {
     const result = catchup(featureId, process.cwd());
     console.log(result.summary);
     return ExitCode.SUCCESS;
-  } catch {
+  } catch (e) {
     console.error(`执行会话恢复失败：${featureId}`);
+    console.error(`  原因：${(e as Error).message}`);
     return ExitCode.IO_ERROR;
   }
 }
@@ -114,10 +117,4 @@ function printAiHelp(): void {
   console.log('  context   生成并展示上下文包（支持 --full / --expand <path1,path2>）');
   console.log('  catchup   执行 6 步会话恢复');
   console.log('  stats     查看 AI 调用统计');
-}
-
-function readOptionValue(args: string[], key: string): string | undefined {
-  const idx = args.indexOf(key);
-  if (idx < 0) return undefined;
-  return args[idx + 1];
 }

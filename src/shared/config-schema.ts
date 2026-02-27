@@ -3,7 +3,7 @@
  * 统一各模块配置项命名和类型
  */
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import yaml from 'js-yaml';
 import { exists } from './fs-utils.js';
 
@@ -81,7 +81,8 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
   },
 };
 
-let cachedConfig: SpecFirstConfig | null = null;
+// 按 projectRoot 缓存的配置 Map，避免多项目场景下配置串用
+const configCache = new Map<string, SpecFirstConfig>();
 
 export function renderDefaultConfigYaml(): string {
   return yaml.dump(DEFAULT_SPEC_FIRST_CONFIG, { noRefs: true });
@@ -89,25 +90,32 @@ export function renderDefaultConfigYaml(): string {
 
 /** 加载并校验 config.yaml，返回合并后的配置 */
 export function loadConfig(projectRoot: string): SpecFirstConfig {
-  if (cachedConfig) return cachedConfig;
+  // 规范化路径，避免 /a/b 和 /a/b/ 被视为不同 key
+  const normalizedRoot = resolve(projectRoot);
+
+  const cached = configCache.get(normalizedRoot);
+  if (cached) return cached;
 
   const configPath = join(projectRoot, '.spec-first', 'config.yaml');
   if (!exists(configPath)) {
-    cachedConfig = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
-    return cachedConfig;
+    const result = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
+    configCache.set(normalizedRoot, result);
+    return result;
   }
 
   const raw = readFileSync(configPath, 'utf-8');
   const parsed = yaml.load(raw) as Record<string, unknown> | null;
 
   if (!parsed || typeof parsed !== 'object') {
-    cachedConfig = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
-    return cachedConfig;
+    const result = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
+    configCache.set(normalizedRoot, result);
+    return result;
   }
 
-  cachedConfig = mergeWithDefaults(parsed);
-  validate(cachedConfig);
-  return cachedConfig;
+  const result = mergeWithDefaults(parsed);
+  validate(result);
+  configCache.set(normalizedRoot, result);
+  return result;
 }
 
 /** 类型安全的配置读取 */
@@ -118,9 +126,16 @@ export function getConfigValue<K extends keyof SpecFirstConfig>(
   return config[key];
 }
 
-/** 重置缓存（测试用） */
-export function resetConfigCache(): void {
-  cachedConfig = null;
+/** 重置缓存
+ * @param projectRoot - 指定项目路径时仅删除该项目的缓存，否则清空全部
+ */
+export function resetConfigCache(projectRoot?: string): void {
+  if (projectRoot) {
+    const normalizedRoot = resolve(projectRoot);
+    configCache.delete(normalizedRoot);
+  } else {
+    configCache.clear();
+  }
 }
 
 function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {

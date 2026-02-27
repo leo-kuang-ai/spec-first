@@ -13,6 +13,7 @@ import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { detectHostPaths, formatHostPathSummary } from '../../shared/host-paths.js';
 import { ensureSkillCommands } from '../../shared/skill-commands.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
+import { parseFlag } from '../parse-utils.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
 
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
@@ -229,12 +230,6 @@ function printInitHelp(): void {
   console.log('  --title      Feature 标题（可选）');
   console.log('  --feature-id 指定 Feature ID（可选，默认自动生成）');
   console.log('  --bootstrap  执行宿主环境自修复（MCP/skills/binaries）');
-}
-
-function parseFlag(args: string[], flag: string): string | undefined {
-  const idx = args.indexOf(flag);
-  if (idx === -1 || idx + 1 >= args.length) return undefined;
-  return args[idx + 1];
 }
 
 function parsePlatforms(platforms: string | undefined): { values: string[]; hadDuplicates: boolean } {

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.66 2026-02-28 Leo: fix: Stage Viewer 安全漏洞修复（C1/C2）— 修复命令注入漏洞（execSync→execFileSync 参数数组）+ 路径遍历漏洞（新增 sanitizeFeatureId 校验）；所有 API 路由（/metrics、/timeline、/defects、/tasks、/gate-status、/）应用 featureId 白名单校验；修复 Hook 死代码（C3）+ commit-msg.sh 空值保护（I12）— 清理 commit-msg.sh/pre-push.sh 死代码段；调整 --version 检查顺序避免 $1 为空时报错；增加 perf 到 conventional commits 列表；修复 Config 缓存（C4）— 改用 Map<string, SpecFirstConfig> 按 projectRoot 分别缓存，避免多项目场景配置串用；resetConfigCache 支持选择性删除单个项目缓存；提取 parseFlag 工具函数（I1）— 创建 src/cli/parse-utils.ts 统一参数解析逻辑；更新 7 个命令文件（id/stage/rfc/defect/commit/analyze/init）和 ai.ts 的 readOptionValue 改用 parseFlag；新增 parseFlagAll 和 hasFlag 辅助函数
 - v0.5.65 2026-02-28 Leo: feat: V2-13 Orchestrate Auto Loop — `/spec-first:orchestrate --auto/--resume` 自动迭代（23 TASK 完成）：Phase A 主循环+watchdog+超时+审计hash链+配置schema+P4→P2回退；Phase B 完成检测+重试backoff+幂等写入+Front Matter；Phase C ContextProvider+_context审核+required_mcps+slop检查；Phase T 101 tests覆盖（88 unit + 13 e2e），857 passed (user-visible)
 - v0.5.64 2026-02-28 Leo: docs: README 大重写 — 消除四章节重复、合并架构+流程+追踪章节、修正核心模块数(7→9)、对齐代码实际状态(19 CLI/21 Skill/9 Module)，1385→761 行 (user-visible)
 - v0.5.63 2026-02-28 Leo: docs: V2-13 开发任务文档 v1.2 — 多 Agent 审查修正（补齐原子写入/Fresh Context/错误分类验收标准；修正 008/016/018/021 依赖链；修正 012 优先级 P0→P1；修正 022 悬空 traces；消除 009↔016 循环依赖）
