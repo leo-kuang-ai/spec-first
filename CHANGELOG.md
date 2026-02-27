@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.63 2026-02-28 Leo: docs: V2-13 开发任务文档 v1.2 — 多 Agent 审查修正（补齐原子写入/Fresh Context/错误分类验收标准；修正 008/016/018/021 依赖链；修正 012 优先级 P0→P1；修正 022 悬空 traces；消除 009↔016 循环依赖）
 - v0.5.62 2026-02-27 Leo: feat: Stage Viewer Feature 列表进度条 — 侧边栏 Feature 列表新增进度条与百分比徽章，基于当前阶段计算完成进度（00_init=0% → 06_wrap_up=100%）；支持多 Feature 并行进度对比 (user-visible)
 - v0.5.61 2026-02-27 Leo: feat: Stage Viewer 时间线视图 — 按时间轴展示阶段流转历史，可视化各阶段耗时（甘特图样式）；新增 /api/feature/:id/timeline API 计算阶段持续时间；支持已完成/进行中/待开始三种状态；显示总时长与开始时间 (user-visible)
 - v0.5.60 2026-02-27 Leo: refactor: Stage Viewer 模块化重构 — 将 index.html 中的 CSS/JS 解耦为独立文件（styles.css + app.js）；更新 server.js 添加静态文件服务路由；清理 HTML 重复结构 (user-visible)
