@@ -10,6 +10,12 @@ description: Spec-First AI Agent Skills 目录索引
 
 ## 目录导航
 
+### 项目认知 Skills
+
+| Skill | 说明 | 确认策略 |
+|-------|------|----------|
+| [00-first](./00-first/SKILL.md) | 项目快速认知：生成技术栈、代码结构、架构、API、调用链等 10 份文档 | assisted |
+
 ### 核心工作流 Skills
 
 | Skill | 阶段 | 说明 | 确认策略 |
@@ -65,7 +71,8 @@ description: Spec-First AI Agent Skills 目录索引
 
 ### 按工作流程查找
 
-1. **新建 Feature** → [01-init](./01-init/SKILL.md)
+1. **认知项目** → [00-first](./00-first/SKILL.md)
+2. **新建 Feature** → [01-init](./01-init/SKILL.md)
 2. **定义需求** → [03-spec](./03-spec/SKILL.md)
 3. **技术设计** → [04-design](./04-design/SKILL.md)
 4. **任务拆解** → [06-task](./06-task/SKILL.md)
