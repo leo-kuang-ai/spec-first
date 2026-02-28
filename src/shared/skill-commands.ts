@@ -57,6 +57,7 @@ function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | 
 }
 
 const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
+  first: '项目快速认知：分析技术栈、代码结构、架构、API、调用链等，生成 10 份认知文档',
   init: '定位项目根目录并执行初始化预检（MCP 与 skills 检查/安装）',
   catchup: '定位当前 Feature 并恢复上下文',
   spec: '定位 Feature 并校验阶段为需求规格（01_specify）',
