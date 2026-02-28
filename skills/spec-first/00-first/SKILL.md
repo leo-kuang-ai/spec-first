@@ -1,10 +1,10 @@
 ---
 name: "spec-first:first"
-description: "快速认知项目：分析技术栈、代码结构、架构、API、规范等，生成 9 份认知文档"
-version: 1.2.0
+description: "快速认知项目：分析技术栈、代码结构、架构、API、规范、调用链等，生成 10 份认知文档"
+version: 1.3.0
 last_updated: 2026-02-28
 confirm_policy: assisted
-changelog: 新增任务计划展示功能
+changelog: 新增依赖调用链分析（call-graph.md），集成 Serena MCP
 ---
 
 # Skill: first
@@ -30,6 +30,7 @@ changelog: 新增任务计划展示功能
 | `--depth` | `overview` | `overview`（结构概览）/ `deep`（深度分析） |
 | `--skip-db` | `false` | 跳过数据库分析 |
 | `--db-url` | 无 | 手动指定数据库连接串，跳过自动检测 |
+| `--skip-call-graph` | `false` | 跳过调用链分析 |
 
 ## 产物清单
 
@@ -58,7 +59,7 @@ P0 主线程: 定位 + 幂等检测
     │
 P1 主线程: 技术栈识别 → tech-stack.md（基础上下文 + Context7 映射 + 项目名）
     │
-    ├─ Agent A: codebase-overview.md → architecture.md（串行，架构依赖概览）
+    ├─ Agent A: codebase-overview.md → architecture.md → call-graph.md（串行，架构和调用链依赖概览）
     ├─ Agent B: api-docs.md
     ├─ Agent C: external-deps.md → development-guidelines.md → local-setup.md（串行，环境依赖外部服务和研发规范）
     └─ Agent D: 数据库检测 → database-er.md（如 --skip-db 则不派发）
@@ -69,7 +70,7 @@ P5 主线程: 收集结果 → 生成 README.md → 汇总输出
 **子 agent 规则：**
 - 每个子 agent 接收 P1 的 tech-stack 识别结果作为输入上下文
 - 子 agent 之间无依赖，完全并行
-- Agent A 内部 architecture.md 依赖 codebase-overview.md，须串行
+- Agent A 内部 architecture.md 和 call-graph.md 依赖 codebase-overview.md，须串行
 - Agent C 内部 local-setup.md 依赖 external-deps.md，须串行
 - 主线程等待所有子 agent 完成后进入 P5
 - 任一子 agent 失败不阻塞其他 agent，主线程在 P5 汇总时标注失败项
@@ -81,8 +82,13 @@ P5 主线程: 收集结果 → 生成 README.md → 汇总输出
 1. 检测项目根目录（存在以下任一文件即确认）：
    - `package.json`、`pom.xml`、`build.gradle`、`go.mod`、`Cargo.toml`
    - `composer.json`、`Gemfile`、`CMakeLists.txt`、`*.csproj`、`.git`
-2. 解析参数（`--depth`、`--skip-db`、`--db-url`）
-3. **幂等检测**：检查 `docs/first/` 是否已存在产物
+2. 解析参数（`--depth`、`--skip-db`、`--db-url`、`--skip-call-graph`）
+3. **激活 Serena 项目**：
+   - 使用 `serena:activate_project` 激活目标项目
+   - 等待 LSP 语言服务器就绪
+   - 验证符号分析能力（`serena:get_current_config`）
+   - 如激活失败，降级到静态分析模式
+4. **幂等检测**：检查 `docs/first/` 是否已存在产物
    - **首次运行**（目录不存在或为空）：创建 `docs/first/` 目录，进入全量生成流程
    - **增量更新**（产物已存在）：
      1. 读取已有产物头部 `last_updated` 字段
@@ -108,10 +114,11 @@ P5 主线程: 收集结果 → 生成 README.md → 汇总输出
   3. external-deps.md         外部依赖
   4. codebase-overview.md     代码库概览
   5. architecture.md          架构图
-  6. api-docs.md              API 文档
-  7. development-guidelines.md 研发规范
-  8. local-setup.md           本地环境
-  9. database-er.md           数据库 ER（如有 DB）
+  6. call-graph.md            依赖调用链分析
+  7. api-docs.md              API 文档
+  8. development-guidelines.md 研发规范
+  9. local-setup.md           本地环境
+  10. database-er.md          数据库 ER（如有 DB）
 
 ⚙️ 并发策略: 4 个子 agent 并发分析
 ⏱️ 预估时间: ~30 秒
@@ -240,6 +247,30 @@ deep 模式（`--depth=deep`）追加：
 - 部署拓扑（如检测到 `Dockerfile`、`docker-compose.yml`、`k8s/`、`helm/`）
 
 输出 → `docs/first/architecture.md`
+
+**依赖调用链分析（call-graph.md）：**
+
+基于 Serena MCP 的 LSP 符号分析，生成模块依赖关系图：
+
+**Level 1（默认 overview）**：
+- 使用 `serena:get_symbols_overview` 获取各模块符号概览
+- 分析模块间的 import 依赖关系
+- 生成模块依赖矩阵（哪些模块依赖哪些模块）
+- 生成 Mermaid 依赖关系图
+- 核心模块职责说明
+- 常见调用路径列举
+
+**Level 2（--depth=deep）**：
+- 使用 `serena:find_referencing_symbols` 追踪符号引用
+- 生成文件级调用图
+- 检测循环依赖
+- 生成详细的调用路径
+
+**降级策略**：
+- Serena 不可用 → 降级为静态 import 扫描
+- 标注 `[依赖分析: 静态模式，未使用 LSP]`
+
+输出 → `docs/first/call-graph.md`
 
 **API 接口文档（api-docs.md）：**
 
@@ -418,6 +449,7 @@ detected_at: 2026-02-28
 
 - [代码库概览](./codebase-overview.md) — 目录结构与模块划分
 - [架构图](./architecture.md) — 系统架构与依赖关系
+- [调用链分析](./call-graph.md) — 模块依赖与调用路径
 - [API 文档](./api-docs.md) — 接口端点列表
 
 ### 开发规范
@@ -452,9 +484,11 @@ detected_at: 2026-02-28
 ## 成功标准
 
 - `docs/first/` 目录存在
-- 必须生成：`tech-stack.md`、`external-deps.md`、`codebase-overview.md`、`architecture.md`、`api-docs.md`、`development-guidelines.md`、`local-setup.md`、`README.md`
+- 必须生成：`tech-stack.md`、`external-deps.md`、`codebase-overview.md`、`architecture.md`、`call-graph.md`、`api-docs.md`、`development-guidelines.md`、`local-setup.md`、`README.md`
 - 如检测到 DB，`database-er.md` 存在且包含 Mermaid 图（关系型）或 Collection 结构（NoSQL）
 - `development-guidelines.md` 包含至少 1 个规范模块（代码风格/提交规范/测试要求/文档规范/错误处理/依赖管理）
 - `README.md` 索引文档包含所有已生成产物的链接
+- `call-graph.md` 包含模块依赖矩阵和 Mermaid 依赖图
+- `call-graph.md` 标注分析模式（LSP/静态）
 - 所有文档为合法 Markdown，头部包含 `last_updated` 字段
 - 所有内容严格基于代码证据，无捏造内容，不确定项标注 `[待确认]`
