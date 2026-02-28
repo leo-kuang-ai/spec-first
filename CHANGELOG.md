@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.73 2026-02-28 Leo: feat: 00-first Skill 优化 — 新增任务计划展示，执行前输出即将生成的文档列表和并发策略，提升用户体验 (user-visible)
 - v0.5.72 2026-02-28 Leo: feat: 00-first Skill 增强 — 新增研发规范文档（development-guidelines.md，含 6 模块 + Context7 最佳实践对比）和索引导航（README.md），产物从 7 个扩展为 9 个 (user-visible)
 - v0.5.71 2026-02-28 Leo: feat: 新增 00-first Skill — 项目快速认知，自动生成技术栈/代码概览/架构图/API文档/外部依赖/本地环境/数据库ER共7份文档，支持9语言14框架7端7种数据库，4子agent并发生成，幂等增量更新 (user-visible)
 - v0.5.70 2026-02-28 Leo: docs: 安装与更新 + README 文档修正 — Skills 数量 19→21、补充 update --host 选项、FEAT 格式描述精确化、版本徽章同步、setup 标注废弃

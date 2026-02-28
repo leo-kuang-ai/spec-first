@@ -1,10 +1,10 @@
 ---
 name: "spec-first:first"
-description: "识别当前工作空间，生成代码库概览、数据库 ER 文档与研发规范"
-version: 1.1.0
+description: "快速认知项目：分析技术栈、代码结构、架构、API、规范等，生成 9 份认知文档"
+version: 1.2.0
 last_updated: 2026-02-28
 confirm_policy: assisted
-changelog: 新增 development-guidelines.md 和 README.md
+changelog: 新增任务计划展示功能
 ---
 
 # Skill: first
@@ -91,6 +91,38 @@ P5 主线程: 收集结果 → 生成 README.md → 汇总输出
      4. 仅重新生成有变化的文档，未变化的保持不动
 
 ### P1: 技术栈识别 + 外部依赖扫描
+
+**输出执行计划**：
+
+在 P1 开始时，先输出执行计划：
+
+```
+📋 First Skill 执行计划
+
+项目: [从 package.json/pom.xml/go.mod 等提取项目名称]
+语言: [检测到的主要语言]
+
+📦 将生成 [N] 个文档:
+  1. README.md                索引导航
+  2. tech-stack.md            技术栈摘要
+  3. external-deps.md         外部依赖
+  4. codebase-overview.md     代码库概览
+  5. architecture.md          架构图
+  6. api-docs.md              API 文档
+  7. development-guidelines.md 研发规范
+  8. local-setup.md           本地环境
+  9. database-er.md           数据库 ER（如有 DB）
+
+⚙️ 并发策略: 4 个子 agent 并发分析
+⏱️ 预估时间: ~30 秒
+
+开始生成...
+```
+
+注意：
+- 如检测到数据库，包含 database-er.md
+- 如 --skip-db 或未检测到 DB，不包含 database-er.md
+- 文档数量根据实际情况动态调整
 
 **项目名称识别**：
 - 从 `package.json` name / `pom.xml` artifactId / `go.mod` module / `Cargo.toml` package.name 等提取
