@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.75 2026-02-28 Claude: docs: 统一 CLI 命令与 README Skill 中文描述 — 对齐 19 个 CLI 命令描述与 skills/spec-first/README.md 中的 Skill 说明，确保用户在不同场景（CLI help/README/AGENTS.md）看到一致的术语与表述 (user-visible)
 - v0.5.74 2026-02-28 Leo: feat: 00-first Skill 新增依赖调用链分析 — 集成 Serena MCP 进行 LSP 级别符号分析，生成模块依赖矩阵和调用关系图，帮助新人快速理解模块间调用关系 (user-visible)
 - v0.5.73 2026-02-28 Leo: feat: 00-first Skill 优化 — 新增任务计划展示，执行前输出即将生成的文档列表和并发策略，提升用户体验 (user-visible)
 - v0.5.72 2026-02-28 Leo: feat: 00-first Skill 增强 — 新增研发规范文档（development-guidelines.md，含 6 模块 + Context7 最佳实践对比）和索引导航（README.md），产物从 7 个扩展为 9 个 (user-visible)

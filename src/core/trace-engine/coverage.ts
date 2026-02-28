@@ -3,12 +3,10 @@
  * 基于追踪矩阵计算 C1-C9 九项指标
  * 指标值统一为 0~1（比例）
  */
-import { join } from 'node:path';
-import { readdirSync } from 'node:fs';
 import type { CoverageMetrics, MatrixRow, MatrixStatus } from '../../shared/types.js';
 import { parseMatrix } from './matrix.js';
 import { validateExceptions } from './exception-validator.js';
-import { exists, readJson } from '../../shared/fs-utils.js';
+import { loadRfcStatuses } from '../change-mgr/rfc.js';
 
 /** 排除状态：不计入有效分母 */
 const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set([
@@ -16,9 +14,14 @@ const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set([
 ]);
 
 /** 计算 C1-C9 覆盖率指标 */
-export function getCoverage(featureId: string, projectRoot: string): CoverageMetrics {
-  const rows = parseMatrix(featureId, projectRoot);
-  const validExceptionFrIds = loadValidExceptionFrIds(featureId, projectRoot);
+export function getCoverage(
+  featureId: string,
+  projectRoot: string,
+  preRows?: MatrixRow[],
+  preRfcStatuses?: Map<string, string>,
+): CoverageMetrics {
+  const rows = preRows ?? parseMatrix(featureId, projectRoot);
+  const validExceptionFrIds = loadValidExceptionFrIds(featureId, projectRoot, preRfcStatuses);
   const active = rows.filter((r) => {
     if (EXCLUDED_STATUSES.has(r.status)) return false;
     if (r.status !== 'Exception') return true;
@@ -125,32 +128,13 @@ function calcUpstreamCoverage(frRows: MatrixRow[], downstreamRows: MatrixRow[]):
 
 /** 比例（0~1，保留 4 位小数） */
 function pct(numerator: number, denominator: number): number {
-  if (denominator === 0) return 1;
+  // S3: 分母为 0 返回 0（无 FR 不应报 100% 覆盖率）
+  if (denominator === 0) return 0;
   return Math.round((numerator / denominator) * 10000) / 10000;
 }
 
-interface RfcStatusFile {
-  id: string;
-  status: string;
-}
-
-function loadValidExceptionFrIds(featureId: string, projectRoot: string): Set<string> {
-  const rfcStatuses = loadRfcStatuses(featureId, projectRoot);
+function loadValidExceptionFrIds(featureId: string, projectRoot: string, preRfcStatuses?: Map<string, string>): Set<string> {
+  const rfcStatuses = preRfcStatuses ?? loadRfcStatuses(featureId, projectRoot);
   const { valid } = validateExceptions(featureId, projectRoot, rfcStatuses);
   return new Set(valid.map((ex) => ex.frId));
-}
-
-function loadRfcStatuses(featureId: string, projectRoot: string): Map<string, string> {
-  const rfcDir = join(projectRoot, 'specs', featureId, 'rfc');
-  if (!exists(rfcDir)) return new Map();
-
-  const statuses = new Map<string, string>();
-  for (const entry of readdirSync(rfcDir)) {
-    if (!entry.endsWith('.rfc.json')) continue;
-    const fullPath = join(rfcDir, entry);
-    const rfc = readJson<RfcStatusFile>(fullPath);
-    if (!rfc.id || !rfc.status) continue;
-    statuses.set(rfc.id, rfc.status);
-  }
-  return statuses;
 }

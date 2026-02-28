@@ -3,17 +3,19 @@
  * 读取 stage-state → 评估当前阶段 Gate 条件 → 检查豁免 → 输出三态结果
  */
 import { join } from 'node:path';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import type {
   Stage, GateStatus, GateResult, ConditionResult, WaiverRef,
-  CoverageMetrics, StageState, IdType,
+  CoverageMetrics, StageState, IdType, MatrixRow,
 } from '../../shared/types.js';
-import { readJson, appendJsonl, exists } from '../../shared/fs-utils.js';
+import { readJsonChecked, appendJsonl, exists } from '../../shared/fs-utils.js';
+import { isStageState } from '../../shared/validators.js';
 import { getCoverage } from '../trace-engine/coverage.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 import { validateExceptions } from '../trace-engine/exception-validator.js';
 import { getCriticalCountFromAnalysisReport } from './sca.js';
 import { runCommandGate } from './command-gate.js';
+import { loadRfcStatuses } from '../change-mgr/rfc.js';
 
 // ─── Gate 条件定义 ─────────────────────────────────────────
 
@@ -30,6 +32,8 @@ export interface EvalContext {
   stage: Stage;
   state: StageState;
   coverage: CoverageMetrics;
+  rows: MatrixRow[];
+  rfcStatuses: Map<string, string>;
 }
 
 /** 每个阶段的 Gate 条件表 */
@@ -78,8 +82,7 @@ GATE_CONDITIONS['01_specify' as Stage] = [
     id: 'G-SPEC-02',
     description: 'FR/NFR IDs assigned (matrix has FR rows)',
     evaluate: (ctx) => {
-      const rows = parseMatrix(ctx.featureId, ctx.projectRoot);
-      const frCount = rows.filter(r => r.type === 'FR').length;
+      const frCount = ctx.rows.filter(r => r.type === 'FR').length;
       return { pass: frCount > 0, detail: `FR count: ${frCount}` };
     },
   },
@@ -108,7 +111,7 @@ GATE_CONDITIONS['02_design' as Stage] = [
     description: 'API coverage (C2) = 100%',
     evaluate: (ctx) => {
       const val = ctx.coverage.C2;
-      const uncovered = getUncoveredFrIds(ctx.featureId, ctx.projectRoot, 'DS');
+      const uncovered = getUncoveredFrIds(ctx.rows, 'DS');
       return {
         pass: val >= 1.0,
         detail: uncovered.length > 0
@@ -135,7 +138,7 @@ GATE_CONDITIONS['03_plan' as Stage] = [
     description: 'Task coverage (C3) = 100%',
     evaluate: (ctx) => {
       const val = ctx.coverage.C3;
-      const uncovered = getUncoveredFrIds(ctx.featureId, ctx.projectRoot, 'TASK');
+      const uncovered = getUncoveredFrIds(ctx.rows, 'TASK');
       return {
         pass: val >= 1.0,
         detail: uncovered.length > 0
@@ -170,7 +173,7 @@ GATE_CONDITIONS['04_implement' as Stage] = [
     description: 'Unit test coverage (C4) ≥ 80%',
     evaluate: (ctx) => {
       const val = ctx.coverage.C4;
-      const uncovered = getUncoveredFrIds(ctx.featureId, ctx.projectRoot, 'TC');
+      const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
       return {
         pass: val >= 0.8,
         detail: uncovered.length > 0
@@ -197,7 +200,7 @@ GATE_CONDITIONS['05_verify' as Stage] = [
     description: 'Test coverage FR (C4) = 100%',
     evaluate: (ctx) => {
       const val = ctx.coverage.C4;
-      const uncovered = getUncoveredFrIds(ctx.featureId, ctx.projectRoot, 'TC');
+      const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
       return {
         pass: val >= 1.0,
         detail: uncovered.length > 0
@@ -213,7 +216,7 @@ GATE_CONDITIONS['05_verify' as Stage] = [
     evaluate: (ctx) => {
       const threshold = (ctx.state.size === 'S') ? 0.6 : 0.9;
       const val = ctx.coverage.C5;
-      const uncovered = getUncoveredFrIds(ctx.featureId, ctx.projectRoot, 'TC');
+      const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
       return {
         pass: val >= threshold,
         detail: uncovered.length > 0
@@ -247,9 +250,8 @@ GATE_CONDITIONS['06_wrap_up' as Stage] = [
     id: 'G-WRAP-02',
     description: 'All matrix entries in terminal status',
     evaluate: (ctx) => {
-      const rows = parseMatrix(ctx.featureId, ctx.projectRoot);
       const terminal = new Set(['Accepted', 'Cancelled', 'Exception']);
-      const nonTerminal = rows.filter(r => !terminal.has(r.status));
+      const nonTerminal = ctx.rows.filter(r => !terminal.has(r.status));
       return {
         pass: nonTerminal.length === 0,
         detail: nonTerminal.length > 0
@@ -290,12 +292,14 @@ export function getConditions(stage: Stage): GateConditionDef[] {
 /** 评估 Gate：条件检查 + 豁免匹配 → 三态结果 */
 export function evaluateGate(featureId: string, projectRoot: string): GateResult {
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
-  const state = readJson<StageState>(statePath);
+  const state = readJsonChecked(statePath, isStageState);
   const stage = state.currentStage;
 
-  // 构建评估上下文
-  const coverage = getCoverage(featureId, projectRoot);
-  const ctx: EvalContext = { featureId, projectRoot, stage, state, coverage };
+  // 构建评估上下文（一次解析，全程复用）
+  const rows = parseMatrix(featureId, projectRoot);
+  const rfcStatuses = loadRfcStatuses(featureId, projectRoot);
+  const coverage = getCoverage(featureId, projectRoot, rows, rfcStatuses);
+  const ctx: EvalContext = { featureId, projectRoot, stage, state, coverage, rows, rfcStatuses };
 
   // 评估所有条件
   const defs = getConditions(stage);
@@ -333,8 +337,7 @@ export function evaluateGate(featureId: string, projectRoot: string): GateResult
   const failedIds = conditions.filter(c => c.status === 'FAIL').map(c => c.id);
 
   if (failedIds.length > 0) {
-    const rfcStatuses = loadRfcStatuses(featureId, projectRoot);
-    const { valid } = validateExceptions(featureId, projectRoot, rfcStatuses);
+    const { valid } = validateExceptions(featureId, projectRoot, ctx.rfcStatuses);
 
     const usedExceptions = new Set<string>();
     for (const ex of valid) {
@@ -417,27 +420,6 @@ export function getGateHistory(featureId: string, projectRoot: string): GateResu
 }
 
 // ─── 辅助函数 ─────────────────────────────────────────────
-
-/** 加载 Feature 下所有 RFC 的状态 */
-function loadRfcStatuses(featureId: string, projectRoot: string): Map<string, string> {
-  const rfcDir = join(projectRoot, 'specs', featureId, 'rfc');
-  if (!exists(rfcDir)) return new Map();
-
-  const statuses = new Map<string, string>();
-  for (const entry of readdirSync(rfcDir)) {
-    if (!entry.endsWith('.rfc.json')) continue;
-    const p = join(rfcDir, entry);
-    const rfc = readJson<RfcStatusFile>(p);
-    if (!rfc.id || !rfc.status) continue;
-    statuses.set(rfc.id, rfc.status);
-  }
-  return statuses;
-}
-
-interface RfcStatusFile {
-  id: string;
-  status: string;
-}
 
 function evaluateSpecQualityScore(featureId: string, projectRoot: string): { pass: boolean; detail: string } {
   const specDir = join(projectRoot, 'specs', featureId);
@@ -592,11 +574,9 @@ function toFeatureRelativePath(featureId: string, projectRoot: string, absoluteP
 }
 
 function getUncoveredFrIds(
-  featureId: string,
-  projectRoot: string,
+  rows: MatrixRow[],
   downstreamType: IdType,
 ): string[] {
-  const rows = parseMatrix(featureId, projectRoot);
   const frRows = rows.filter((r) => r.type === 'FR');
   if (frRows.length === 0) return [];
 

@@ -4,8 +4,9 @@
  */
 import { join } from 'node:path';
 import type { IdType } from '../../shared/types.js';
-import { readMarkdown, exists } from '../../shared/fs-utils.js';
+import { exists } from '../../shared/fs-utils.js';
 import { validateId } from './id-validator.js';
+import { parseMatrixIds } from './matrix.js';
 
 export interface SearchResult {
   id: string;
@@ -65,23 +66,4 @@ export function listIds(
   }
 
   return results;
-}
-
-/** 从矩阵 Markdown 表格中解析所有 ID */
-function parseMatrixIds(matrixPath: string): string[] {
-  const content = readMarkdown(matrixPath);
-  const ids: string[] = [];
-
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| ID')) {
-      continue;
-    }
-    const cells = trimmed.split('|').map(c => c.trim()).filter(Boolean);
-    if (cells.length > 0 && cells[0]) {
-      ids.push(cells[0]);
-    }
-  }
-
-  return ids;
 }

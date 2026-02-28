@@ -1,6 +1,6 @@
 import { join } from 'node:path';
-import { exists, readJson, readMarkdown } from '../../shared/fs-utils.js';
-import type { StageState } from '../../shared/types.js';
+import { exists, readJsonChecked, readMarkdown, parseMarkdownTable } from '../../shared/fs-utils.js';
+import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 
 const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = {
@@ -36,45 +36,23 @@ function readCurrentStage(projectRoot: string, featureId: string): string | unde
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) return undefined;
   try {
-    const state = readJson<StageState>(statePath);
+    const state = readJsonChecked(statePath, isStageState);
     return state.currentStage;
   } catch {
     return undefined;
   }
 }
 
-function parseMarkdownTableCells(line: string): string[] {
-  const trimmed = line.trim();
-  if (!trimmed.includes('|')) return [];
-
-  const rawCells = trimmed.split('|').map(cell => cell.trim());
-  // 兼容有无首尾分隔符的 Markdown 表格行
-  if (rawCells[0] === '') rawCells.shift();
-  if (rawCells[rawCells.length - 1] === '') rawCells.pop();
-  return rawCells;
-}
-
-function isSeparatorRow(cells: string[]): boolean {
-  if (cells.length === 0) return false;
-  return cells.every(cell => /^:?-{3,}:?$/.test(cell));
-}
-
 function hasInProgressTask(taskPlan: string): boolean {
-  const lines = taskPlan.split('\n');
-  for (const line of lines) {
-    const cells = parseMarkdownTableCells(line);
-    if (cells.length === 0 || isSeparatorRow(cells)) continue;
-
+  for (const cells of parseMarkdownTable(taskPlan)) {
     const hasTaskId = cells.some(cell => /^TASK-/i.test(cell));
     if (!hasTaskId) continue;
-
     const hasInProgress = cells.some((cell) => {
       const normalized = cell.toLowerCase();
       return normalized === 'in_progress' || normalized === 'in progress' || normalized === '进行中';
     });
     if (hasInProgress) return true;
   }
-
   return false;
 }
 

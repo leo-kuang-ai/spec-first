@@ -7,7 +7,8 @@ import { join } from 'node:path';
 import { appendFileSync } from 'node:fs';
 import { Stage } from '../../shared/types.js';
 import type { StageState, StageHistoryEntry } from '../../shared/types.js';
-import { readJson, writeJson, exists } from '../../shared/fs-utils.js';
+import { readJsonChecked, writeJson, exists } from '../../shared/fs-utils.js';
+import { isStageState } from '../../shared/validators.js';
 import { writeLog } from '../../shared/logger.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { assertTransitionAllowed, isTerminal } from './stage-machine.js';
@@ -59,7 +60,7 @@ function getFindingsPath(featureId: string, root: string): string {
 function loadState(featureId: string, root: string): StageState {
   const p = getStatePath(featureId, root);
   if (!exists(p)) throw new Error(`未找到 Feature：${featureId}`);
-  return readJson<StageState>(p);
+  return readJsonChecked(p, isStageState);
 }
 
 function nextStageInChain(current: Stage): Stage {

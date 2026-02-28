@@ -25,7 +25,7 @@ description: Spec-First AI Agent Skills 目录索引
 | [04-design](./04-design/SKILL.md) | 02_design | 技术设计与 API 契约 | strict |
 | [05-research](./05-research/SKILL.md) | 02_design | 技术调研（可选）| assisted |
 | [06-task](./06-task/SKILL.md) | 03_plan | 任务拆解与验收标准 | strict |
-| [07-code](./07-code/SKILL.md) | 04_implement | 按 TASK 实现代码 | strict/assisted |
+| [07-code](./07-code/SKILL.md) | 04_implement | 代码实现 | strict/assisted |
 | [08-code-review](./08-code-review/SKILL.md) | 04_implement | 代码审查 | assisted |
 | [09-test](./09-test/SKILL.md) | 05_verify | 测试用例定义 | strict |
 | [10-archive](./10-archive/SKILL.md) | 06_wrap_up | 归档复盘 | assisted |
@@ -36,14 +36,14 @@ description: Spec-First AI Agent Skills 目录索引
 |-------|------|----------|
 | [11-plan](./11-plan/SKILL.md) | 生成阶段执行计划 | assisted |
 | [12-verify](./12-verify/SKILL.md) | 阶段验收校验 | auto |
-| [13-orchestrate](./13-orchestrate/SKILL.md) | 编排调度器（主编排）| strict |
+| [13-orchestrate](./13-orchestrate/SKILL.md) | 编排调度器 | strict |
 
 ### 会话管理 Skills
 
 | Skill | 说明 | 确认策略 |
 |-------|------|----------|
 | [02-catchup](./02-catchup/SKILL.md) | 会话恢复与上下文摘要 | auto |
-| [14-status](./14-status/SKILL.md) | 查看当前状态 | auto |
+| [14-status](./14-status/SKILL.md) | 输出当前状态概览 | auto |
 | [15-doctor](./15-doctor/SKILL.md) | 环境诊断与修复 | auto |
 | [16-sync](./16-sync/SKILL.md) | 同步追踪矩阵 | auto |
 
