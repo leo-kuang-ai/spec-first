@@ -42,6 +42,7 @@ docs/
     ├── external-deps.md         # 外部依赖与第三方服务
     ├── codebase-overview.md     # 代码库概览
     ├── architecture.md          # 架构图（Mermaid）
+    ├── call-graph.md            # 依赖调用链分析
     ├── api-docs.md              # API 接口文档
     ├── development-guidelines.md # 研发规范（代码风格、提交规范、测试要求等）
     ├── local-setup.md           # 本地环境搭建指南
