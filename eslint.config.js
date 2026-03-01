@@ -10,7 +10,7 @@ export default tseslint.config(
       'node_modules/**',
       'coverage/**',
       'packages/**',
-      'scripts/**',
+      'scripts/**/*.js',
       'templates/**',
       'skills/**',
       '*.js',

@@ -1,169 +1,129 @@
 # Phase 2: Security & Performance Review
 
-**审查日期**: 2026-02-27
-**审查范围**: Spec-First Skills 目录 (28 个 Markdown 文件)
-
-**注意**: 由于审查对象是 Markdown 文档（非可执行代码），安全和性能分析侧重于文档安全性和维护效率。
+**Review Date**: 2026-02-28
 
 ---
 
 ## Security Findings
 
-### Critical Issues
+### High (2)
 
-**无关键问题**
+| # | Issue | CWE | Location | Description |
+|---|-------|-----|----------|-------------|
+| S-H1 | Database Credential Exposure Risk | CWE-200 | `agent-database.md` | Security constraint is declarative without technical enforcement |
+| S-H2 | Context7 API Key Handling | CWE-798 | `detection-rules.md` | No documentation on API key provisioning or protection |
 
-### High Priority Issues
+### Medium (4)
 
-**无高危问题**
+| # | Issue | CWE | Location | Description |
+|---|-------|-----|----------|-------------|
+| S-M1 | Information Disclosure in Evidence | CWE-532 | `SKILL.md:26-38` | Evidence annotations may capture sensitive values |
+| S-M2 | Path Traversal Risk | CWE-22 | File operations | No project boundary validation |
+| S-M3 | Access Control Undefined | CWE-284 | Skill invocation | No permission documentation |
+| S-M4 | Subagent Isolation | CWE-668 | Agent dispatch | Unclear context sharing between subagents |
 
-### Medium Priority Issues
+### Low (3)
 
-#### 1. 外部包管理命令未指定版本锁定
-- **文件**: `AGENTS.md` (行 362-363)
-- **问题**: uvx/npx 外部工具引用未使用固定版本
-- **风险**: 供应链攻击风险
-- **修复建议**: 使用固定版本引用，如 `uvx ...@v1.2.3`
+| # | Issue | CWE | Location | Description |
+|---|-------|-----|----------|-------------|
+| S-L1 | External Service Security | CWE-918 | Context7, DB | No TLS/SSL verification requirements documented for external connections. |
+| S-L2 | Integrity Verification | CWE-353 | Skill files | No checksum/signature verification for skill definition files. |
+| S-L3 | Timeout Cleanup | CWE-404 | Agent dispatch | No explicit cleanup on timeout may leave sensitive data in memory. |
 
-#### 2. Worktree 路径建议可能覆盖敏感文件
-- **文件**: `07-code/SKILL.md` (行 69-72)
-- **问题**: `../worktree-<TASK-ID>` 相对路径未验证目标
-- **修复建议**: 添加路径安全检查，使用项目根目录下的固定路径
+### Positive Security Observations
 
-### Low Priority Issues
+1. Explicit security constraint prohibiting credential output (`agent-database.md:34`)
+2. Evidence-based approach reduces hallucination risks
+3. Confirmation policy for database connections (`SKILL.md:369`)
+4. Environment variable sanitization requirement (`agent-guidelines-setup.md:80`)
+5. Graceful degradation patterns prevent crash-based leaks
 
-#### 3. 缺少 CLI 命令参数白名单验证指导
-- **文件**: 多个 SKILL.md
-- **建议**: 添加参数约束说明
-
-#### 4. `findings.md` 落盘内容未包含敏感信息过滤指导
-- **文件**: 多个 SKILL.md
-- **建议**: 在 AGENTS.md 添加敏感数据过滤规则
-
-#### 5. Git 提交 trailer 注入未考虑格式安全
-- **文件**: `AGENTS.md` (行 320-326)
-- **建议**: 说明 taskId 必须符合 ID 格式校验
-
-#### 6. MCP 配置路径可预测性
-- **文件**: `AGENTS.md` (行 355-357)
-- **建议**: 提示用户检查文件权限
-
-#### 7. 测试用例中的示例数据可能被误用
-- **文件**: `09-test/SKILL.md` (行 47-52)
-- **建议**: 使用明显无效的示例数据
+**Overall Security Risk Level: MEDIUM**
 
 ---
 
 ## Performance Findings
 
-### Critical Issues
+### Critical (1)
 
-#### 1. 25% 内容存在重复
-- **影响**: 约 19,100 字节重复内容（占总目录 25%）
-- **重复模式**:
-  - 字面即精神原则: 4 个文件，~2,500 字节
-  - 文件系统即外部记忆: 5 个文件，~1,800 字节
-  - 模板结构（触发条件/执行阶段等）: 21 个文件，~12,600 字节
-- **修复建议**: 创建 `shared/constraints.md`，各 Skill 使用引用
+| # | Issue | Impact | Location | Description |
+|---|-------|--------|----------|-------------|
+| P-C1 | No Incremental Analysis | Full re-scan every invocation | `SKILL.md` P0 | While git diff fast path exists, no file-level change tracking. All agents re-process scope even if 1 file changed. |
 
-#### 2. AGENTS.md 文件过大
-- **文件**: `AGENTS.md` (18KB, 521 行, ~13,900 tokens)
-- **影响**: 占总目录 Token ~20%，每次 Skill 调用都需完整加载
-- **修复建议**:
-  - 拆分 CLI 命令参考到独立文件
-  - 将通用约束提取到 `shared/` 目录
+### High (6)
 
-### High Priority Issues
+| # | Issue | Impact | Location | Description |
+|---|-------|--------|----------|-------------|
+| P-H1 | Wave Synchronization Bottleneck | 30-50% latency increase | `SKILL.md:100-127` | C2 waits idle for C1 even after P1b Context7 finishes. |
+| P-H2 | Agent Timeout Granularity Mismatch | False-positive timeouts | `subagent-architecture.md:176-184` | Single 60s/120s timeout regardless of project size (100 vs 10,000 files). |
+| P-H3 | Synchronous I/O Throughout | 20-40% I/O overhead | `fs-utils.ts` | All file operations use blocking APIs. |
+| P-H4 | Context Pack Token Budget | Context overflow risk | `config-schema.ts:52` | Default 16K tokens insufficient for deep mode (15-35K needed). |
+| P-H5 | Monorepo Scalability | O(n*p) complexity | `agents-code-analysis.md:10-13` | 50-package monorepo may take 5+ minutes. |
+| P-H6 | LSP Memory Footprint | 500MB-2GB per server | `SKILL.md` P0 | Multi-language projects can exceed 3GB memory. |
 
-#### 3. 版本管理完全缺失
-- **问题**: 无版本号、变更历史、兼容性声明
-- **影响**: 无法追溯变更、难以兼容旧版本
-- **修复建议**: 在 Front Matter 添加 `version`, `spec_first_min`, `changelog` 字段
+### Medium (8)
 
-#### 4. 大文件影响加载
-- **文件**: 03-spec (7.8KB), 13-orchestrate (6.6KB), 07-code (5.9KB)
-- **影响**: 加载慢，AI 上下文压缩风险
-- **修复建议**: 将图表/状态机定义移到独立文件
+| # | Issue | Impact | Location |
+|---|-------|--------|----------|
+| P-M1 | Serena LSP Activation Overhead | 5-15s startup latency | `SKILL.md:161-166` |
+| P-M2 | Parallel Execution Limit | Underutilization | `config-schema.ts:66` (max_parallel: 1) |
+| P-M3 | No File Read Caching | Redundant I/O | Multiple agents read same files |
+| P-M4 | Directory Tree Recursion | O(n) scanning | `agents-code-analysis.md:10-13` |
+| P-M5 | Reference File Duplication | 7x memory overhead | `SKILL.md:151` |
+| P-M6 | Large File Handling | Memory pressure | `fs-utils.ts` |
+| P-M7 | Context7 Query Latency | 10-30s for 5 libraries | `detection-rules.md:79-81` |
+| P-M8 | Database Query Timeout | Undefined behavior | `agent-database.md` |
 
-#### 5. 规则编号手动管理
-- **问题**: P1-01 到 P1-19 编号缺乏中央定义
-- **影响**: 难以追溯规则来源，未来可能冲突
-- **修复建议**: 创建规则编号注册表
+### Low (3)
 
-### Medium Priority Issues
-
-#### 6. 缺少根目录索引文件
-- **问题**: 新用户难以快速定位所需 Skill
-- **修复建议**: 创建 README.md 索引
-
-#### 7. 引用效率中等
-- **问题**: 相对路径引用、规则编号引用不精确
-- **修复建议**: 统一引用格式，添加规则注册表
-
-### Low Priority Issues
-
-#### 8. 目录结构可优化
-- **问题**: 编排类 Skill 与阶段类 Skill 混放
-- **修复建议**: 考虑按类型分目录 (core/orchestration/utilities)
+| # | Issue | Impact | Location |
+|---|-------|--------|----------|
+| P-L1 | Sequential Task Execution | Minor latency | `auto-loop.ts:129-204` |
+| P-L2 | Agent Context Duplication | ~14KB overhead | Agent input contexts |
+| P-L3 | Subagent Spawning Overhead | 7-14s total | Claude Code infrastructure |
 
 ---
 
-## Summary by Severity
+## Critical Path Analysis
 
-### Security
-| 严重程度 | 数量 | 主要类别 |
-|----------|------|----------|
-| Critical | 0 | - |
-| High | 0 | - |
-| Medium | 2 | 版本锁定、路径安全 |
-| Low | 5 | 参数验证、敏感数据过滤 |
+**Current Critical Path Duration**: 210-435 seconds (3.5-7.25 minutes)
 
-### Performance
-| 严重程度 | 数量 | 主要类别 |
-|----------|------|----------|
-| Critical | 2 | 内容重复、大文件 |
-| High | 3 | 版本管理、加载效率 |
-| Medium | 2 | 索引、引用效率 |
-| Low | 1 | 目录结构 |
+```
+P0 (Serena) → P1a (tech-stack) → Wave1(A1) → A2 → A4 → P5
+```
+
+**Bottlenecks on Critical Path**:
+1. P0 Serena activation: 5-15s
+2. Wave1 A1 codebase scan: 30-120s
+3. A2 architecture generation: 20-60s
+4. A4 domain model (waits for A2+B+D): 40-120s
+
+**Optimization Opportunities**:
+- Speculative A4 execution: -60s (18% improvement)
+- A1→A2 streaming: -30s
+- C2 parallel sub-modules: -40s
+- Context7 batch query: -20s
 
 ---
 
-## Positive Findings
+## Scalability Limits
 
-### 优势
-1. **无敏感信息泄露**: 未发现 API 密钥、密码、Token
-2. **无不当指令**: 不包含可被滥用的系统命令
-3. **路径遍历防护良好**: 大部分路径使用模板格式
-4. **输入验证规则明确**: AGENTS.md 定义了参数格式验证
+| Project Size | Files | Expected Duration | Risk Level |
+|--------------|-------|-------------------|------------|
+| Small | <1,000 | 60-120s | Low |
+| Medium | 1,000-5,000 | 120-240s | Low |
+| Large | 5,000-10,000 | 240-400s | Medium |
+| XL | 10,000-50,000 | 400-600s | High |
+| XXL | 50,000+ | Timeout likely | Critical |
 
 ---
 
 ## Critical Issues for Phase 3 Context
 
-### 文档相关
-1. **25% 内容重复**: 影响维护成本和 Token 使用
-2. **版本管理缺失**: 需要建立版本控制机制
-3. **示例不足**: 多个 Skill 缺少使用示例
+These findings affect testing and documentation requirements:
 
----
-
-## Optimization Roadmap
-
-| 优先级 | 类型 | 工作量 | Token 节省 |
-|--------|------|--------|------------|
-| P0 | 去重关键约束 | 4h | ~15% |
-| P1 | 拆分 AGENTS.md | 2h | ~10% |
-| P1 | 添加版本管理 | 3h | 0% |
-| P2 | 创建规则注册表 | 2h | 0% |
-| P2 | SKILL 模板标准化 | 2h | ~5% |
-| P3 | 创建 README 索引 | 1h | 0% |
-
-**预期收益**:
-- Token 使用减少 20-25%
-- 维护成本降低 40%
-- 新增 Skill 时间从 13 分钟降至 5 分钟
-
----
-
-**审查人员**: AI Security & Performance Agents
-**完成时间**: 2026-02-27 01:05
+1. **P-C1 (No Incremental Analysis)** - Need tests for idempotent update behavior
+2. **P-H4 (Token Budget)** - Deep mode tests may exceed context limits
+3. **S-H1 (Credential Exposure)** - Security tests required for evidence annotation sanitization
+4. **P-H2 (Timeout)** - Need timeout handling tests for various project sizes
+5. **S-M2 (Path Traversal)** - Security tests for boundary validation

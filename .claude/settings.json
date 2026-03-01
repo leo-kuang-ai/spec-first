@@ -2,46 +2,51 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append",
+        "specFirstManaged": true,
         "hooks": [
           {
             "type": "command",
             "command": "sh -c 'sh .spec-first/hooks/task-context.sh || echo \"spec-first: task-context hook 执行失败（已降级）\" >&2'"
           }
-        ]
+        ],
+        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"
       },
       {
-        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append",
+        "specFirstManaged": true,
         "hooks": [
           {
             "type": "command",
             "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n \"$FEAT\" ] && npx spec-first gate check \"$FEAT\" || echo \"spec-first: 跳过 gate 检查（无当前 feature）\"'"
           }
-        ]
+        ],
+        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append",
+        "specFirstManaged": true,
         "hooks": [
           {
             "type": "command",
             "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n \"$FEAT\" ]; then npx spec-first matrix check \"$FEAT\" || echo \"spec-first: matrix check 执行失败（已降级）\" >&2; else echo \"spec-first: 跳过 matrix 检查（无当前 feature）\"; fi'"
           }
-        ]
+        ],
+        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"
       },
       {
-        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append",
+        "specFirstManaged": true,
         "hooks": [
           {
             "type": "command",
             "command": "sh -c 'sh .spec-first/hooks/progress-sync.sh || echo \"spec-first: progress-sync hook 执行失败（已降级）\" >&2'"
           }
-        ]
+        ],
+        "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"
       }
     ],
     "Stop": [
       {
+        "specFirstManaged": true,
         "hooks": [
           {
             "type": "command",
@@ -50,6 +55,7 @@
         ]
       },
       {
+        "specFirstManaged": true,
         "hooks": [
           {
             "type": "command",

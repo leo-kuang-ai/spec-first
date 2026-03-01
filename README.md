@@ -1,6 +1,6 @@
 # Spec-First — AI 时代的规范驱动研发流程引擎
 
-![Status](https://img.shields.io/badge/状态-活跃维护-brightgreen) ![Version](https://img.shields.io/badge/版本-v0.5.45-blue) ![Node](https://img.shields.io/badge/Node.js-≥20_LTS-green) ![TypeScript](https://img.shields.io/badge/TypeScript-≥5.4-3178c6)
+![Status](https://img.shields.io/badge/状态-活跃维护-brightgreen) ![Version](https://img.shields.io/badge/版本-v0.5.70-blue) ![Node](https://img.shields.io/badge/Node.js-≥20_LTS-green) ![TypeScript](https://img.shields.io/badge/TypeScript-≥5.4-3178c6)
 
 **Spec-First 是面向 AI 时代的规范驱动研发流程引擎**——以结构化规范为单一真理源，通过全链路追踪 + AI 辅助 + 自动化门禁，将"需求→设计→编码→测试→交付"从人工驱动升级为规范驱动。
 
@@ -1124,7 +1124,7 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | `commit` | 规范化提交 | M7 |
 | `doctor` | 环境诊断 | M7 |
 | `hooks` | Git Hook 管理 | M7 |
-| `setup` | 全局注册 | M7 |
+| `setup` | 全局注册（已废弃，转发到 update） | M7 |
 | `update` | 升级刷新 | M7 |
 | `uninstall` | 清理配置 | M7 |
 | `viewer` | 可视化面板 | Tool |
@@ -1248,7 +1248,7 @@ spec-first doctor [featureId]
 升级后刷新 Skill/MCP/Hooks。
 
 ```bash
-spec-first update [--dry-run] [--skip-mcp] [--skip-hooks]
+spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>]
 ```
 
 ---

@@ -39,6 +39,8 @@ export interface CatchupResult {
   fiveQuestions: FiveQuestions;
   /** auto-loop 运行时摘要（ORCH-008），运行中时非空 */
   autoLoopSummary?: AutoLoopSummary;
+  /** 是否因节流而跳过（I5: 区分真实结果与伪造数据） */
+  skipped: boolean;
   summary: string;
 }
 
@@ -51,8 +53,16 @@ const LOCK_TTL = 60_000;
 
 /** 执行 6 步恢复流程 */
 export function catchup(featureId: string, projectRoot: string): CatchupResult {
-  // 并发保护
   const now = Date.now();
+
+  // I5: 清理过期锁，防止 Map 无界增长
+  for (const [fid, timestamp] of catchupLocks.entries()) {
+    if (now - timestamp >= LOCK_TTL) {
+      catchupLocks.delete(fid);
+    }
+  }
+
+  // 并发保护
   const lastRun = catchupLocks.get(featureId) ?? 0;
   if (now - lastRun < LOCK_TTL) {
     // 即使跳过也需要提供 fiveQuestions
@@ -70,6 +80,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
       totalTasks: 0,
       missingFiles: [],
       fiveQuestions: skipQuestions,
+      skipped: true,  // I5: 标记为节流跳过
       summary: `已跳过会话恢复：距离上次仅 ${Math.round((now - lastRun) / 1000)}s（< 60s）`,
     };
   }
@@ -201,6 +212,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     missingFiles: uniqueMissingFiles,
     fiveQuestions,
     autoLoopSummary,
+    skipped: false,  // I5: 正常执行，非节流跳过
     summary,
   };
 }

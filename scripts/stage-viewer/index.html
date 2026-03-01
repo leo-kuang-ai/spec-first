@@ -53,7 +53,27 @@
         </div>
       </section>
 
-      <!-- Task Progress Section -->
+      <!-- Stage Flow（主导航：点击阶段联动下方 Gate/产物） -->
+      <section>
+        <h2>阶段流转图（00→06）</h2>
+        <div class="muted flow-help">说明：绿色为已完成，蓝色为当前阶段，灰色为待开始；点击某个阶段可联动查看该阶段的 Gate 与产物。</div>
+        <div id="stageFlow" class="flow-wrap"></div>
+        <div id="stageDesc" class="flow-stage-desc"></div>
+      </section>
+
+      <!-- Gate + Deliverables（阶段联动详情） -->
+      <div class="row">
+        <section>
+          <h2 id="gateTitle">阶段 Gate</h2>
+          <table id="gateTable"></table>
+        </section>
+        <section>
+          <h2 id="deliverableTitle">阶段产物</h2>
+          <table id="deliverableTable"></table>
+        </section>
+      </div>
+
+      <!-- Task Progress -->
       <section id="taskProgressSection" class="task-progress-section" style="display:none;">
         <div class="task-progress-header">
           <h3>任务进度</h3>
@@ -88,7 +108,7 @@
         <div class="phase-grid" id="phaseGrid"></div>
       </section>
 
-      <!-- Timeline Section -->
+      <!-- Timeline -->
       <section id="timelineSection" class="timeline-section" style="display:none;">
         <div class="timeline-header">
           <h3>时间线视图</h3>
@@ -105,28 +125,11 @@
         </div>
       </section>
 
-      <section>
-        <h2>阶段流转图（00→06）</h2>
-        <div class="muted flow-help">说明：绿色为已完成，蓝色为当前阶段，灰色为待开始；点击某个阶段可联动查看该阶段的 Gate 与产物。</div>
-        <div id="stageFlow" class="flow-wrap"></div>
-        <div id="stageDesc" class="flow-stage-desc"></div>
-      </section>
-
+      <!-- History + Thresholds（参考数据） -->
       <div class="row">
         <section>
           <h2>阶段历史</h2>
           <table id="historyTable"></table>
-        </section>
-        <section>
-          <h2 id="gateTitle">阶段 Gate</h2>
-          <table id="gateTable"></table>
-        </section>
-      </div>
-
-      <div class="row">
-        <section>
-          <h2 id="deliverableTitle">阶段产物</h2>
-          <table id="deliverableTable"></table>
         </section>
         <section>
           <h2>质量阈值</h2>

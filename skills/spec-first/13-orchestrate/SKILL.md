@@ -120,12 +120,12 @@ Context Pack control：每个 TASK 的上下文包建议控制在 2KB 以内。
 TASK 执行由 `todo-runner` 驱动，状态流转如下：
 
 - `pending` → `in_progress`：依赖全部满足时自动拾取
-- `in_progress` → `complete`：TASK 验收通过
+- `in_progress` → `done`：TASK 验收通过（`complete/verified` 作为 legacy alias 在读取时归一）
 - `in_progress` → `blocked`：遇到阻塞，暂停并上报
 - 中断恢复：重启后优先恢复 `in_progress` 项，再按依赖拓扑拾取 `pending` 项
 
 终止条件：
-- 所有 TASK 达到 `complete`/`verified` → 正常结束
+- 所有 TASK 达到 `done` → 正常结束（legacy `complete/verified` 会先归一到 `done`）
 - 达到 `max_iterations`（来自 `config.yaml` 的 `runtime.max_iterations`）→ 自动 halt 并输出未完成摘要
 - 持久化文件：`specs/{featureId}/todo-state.json`，支持跨会话恢复
 

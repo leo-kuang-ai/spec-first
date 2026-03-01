@@ -48,6 +48,9 @@ const state = {
     M: '中型',
     L: '大型',
   };
+  const EMPTY_DEFECT_DATA = { stats: { total: 0, S1: 0, S2: 0, S3: 0, S4: 0, open: 0, fixing: 0, fixed: 0 }, defects: [] };
+  const FLOW_STATUS_LABEL = { done: '已完成', current: '当前阶段', todo: '待开始' };
+  const PHASE_STATUS_LABEL = { complete: '已完成', in_progress: '进行中', pending: '待处理' };
 
   function escapeHtml(input) {
     return String(input)
@@ -180,6 +183,10 @@ const state = {
     return Math.round((stageIndex / (FLOW_STAGES.length - 1)) * 100);
   }
 
+  function progressColor(percent) {
+    return percent >= 100 ? 'var(--ok)' : (percent >= 50 ? 'var(--accent)' : 'var(--warn)');
+  }
+
   function renderFeatureList() {
     const q = searchEl.value.trim().toLowerCase();
     const list = state.features.filter((item) => {
@@ -191,7 +198,6 @@ const state = {
     featureListEl.innerHTML = list.map((item) => {
       const active = item.featureId === state.selectedFeatureId ? 'active' : '';
       const progress = calcStageProgress(item.currentStage);
-      const progressColor = progress >= 100 ? 'var(--ok)' : (progress >= 50 ? 'var(--accent)' : 'var(--warn)');
       return `
       <div class="feature ${active}" data-id="${escapeHtml(item.featureId)}">
         <div class="feature-header">
@@ -200,7 +206,7 @@ const state = {
         </div>
         <div>${escapeHtml(item.title || '(untitled)')}</div>
         <div class="feature-progress-bar">
-          <div class="feature-progress-fill" style="width:${progress}%; background:${progressColor}"></div>
+          <div class="feature-progress-fill" style="width:${progress}%; background:${progressColor(progress)}"></div>
         </div>
         <div class="chips" style="margin-top:6px;">
           <span class="chip">${escapeHtml(item.currentStage)}</span>
@@ -307,8 +313,11 @@ const state = {
       const stepRank = stageRank.get(step.id);
       const status = stepRank < currentRank ? 'done' : (step.id === currentStage ? 'current' : 'todo');
       const selectedClass = step.id === activeStage ? 'selected' : '';
-      const atCurrent = step.id === currentStage ? toShortTime(stageState.updatedAt) : '';
-      const marker = status === 'done' ? '已完成' : (status === 'current' ? '当前阶段' : '待开始');
+      // 从 history 或 gateStatus 中查找该阶段的时间
+      const historyItem = history.find(h => normalizeStageId(h.to) === step.id);
+      const gateTime = state.gateStatus.stages?.[step.id]?.timestamp;
+      const stageTime = historyItem ? toShortTime(historyItem.at || historyItem.timestamp) : (gateTime ? toShortTime(gateTime) : (step.id === currentStage ? toShortTime(stageState.updatedAt) : ''));
+      const marker = FLOW_STATUS_LABEL[status] || '待开始';
 
       // 获取该阶段的 Gate 状态
       const gateInfo = renderGateStatusBadge(step.id);
@@ -317,17 +326,15 @@ const state = {
         <div class="flow-step ${status} ${selectedClass}" data-stage="${escapeHtml(step.id)}" title="点击查看 ${escapeHtml(step.label)} 的 Gate 与产物">
           <div class="flow-step-title mono">${escapeHtml(formatFlowStageLabel(step))}</div>
           <div class="flow-step-meta">${escapeHtml(marker)}</div>
-          <div class="flow-step-meta">${escapeHtml(atCurrent)}</div>
+          <div class="flow-step-meta">${escapeHtml(stageTime)}</div>
           ${gateInfo}
         </div>
       `);
 
       if (index < FLOW_STAGES.length - 1) {
-        const from = step.id;
-        const to = FLOW_STAGES[index + 1].id;
-        const link = transitionMap.get(`${from}->${to}`);
-        const linkText = link ? `${toShortTime(link.at || link.timestamp)} · ${link.by || '-'}` : '未流转';
-        chunks.push(`<div class="flow-link">→ ${escapeHtml(linkText)}</div>`);
+        const nextRank = stageRank.get(FLOW_STAGES[index + 1].id);
+        const arrowStatus = stepRank < currentRank && nextRank <= currentRank ? 'done' : (stepRank < currentRank || step.id === currentStage ? 'current' : 'todo');
+        chunks.push(`<div class="flow-link ${arrowStatus}"><svg viewBox="0 0 24 12"><line class="arrow-line" x1="0" y1="6" x2="16" y2="6"/><polygon class="arrow-head" points="14,2 24,6 14,10"/></svg></div>`);
       }
     }
 
@@ -485,7 +492,7 @@ const state = {
     // Load Health Dashboard, Task Progress and Gate Status
     loadHealthDashboard();
     loadTaskProgress();
-    loadGateStatus();
+    loadGateStatus(s);
     loadTimeline();
 
     emptyEl.style.display = 'none';
@@ -494,7 +501,7 @@ const state = {
 
   // ─── Gate Status API ─────────────────────────────────────────────────
 
-  async function loadGateStatus() {
+  async function loadGateStatus(stageState) {
     if (!state.selectedFeatureId) {
       state.gateStatus = {};
       return;
@@ -506,28 +513,15 @@ const state = {
         state.gateStatus = {};
         return;
       }
-      const data = await res.json();
-      state.gateStatus = data;
+      state.gateStatus = await res.json();
 
       // 重新渲染阶段流转图以显示 Gate 状态
-      const stageState = await loadStageState(state.selectedFeatureId);
       if (stageState) {
         renderStageFlow(stageState, state.selectedFlowStage || stageState.currentStage);
       }
     } catch (e) {
       console.error('Failed to load gate status:', e);
       state.gateStatus = {};
-    }
-  }
-
-  async function loadStageState(featureId) {
-    try {
-      const res = await fetch(`/api/feature/${encodeURIComponent(featureId)}`, { cache: 'no-store' });
-      if (!res.ok) return null;
-      const data = await res.json();
-      return data.state;
-    } catch {
-      return null;
     }
   }
 
@@ -613,11 +607,11 @@ const state = {
 
   // ─── Defect Details API ─────────────────────────────────────────────
 
-  let defectData = { stats: { total: 0, S1: 0, S2: 0, S3: 0, S4: 0, open: 0, fixing: 0, fixed: 0 }, defects: [] };
+  let defectData = { ...EMPTY_DEFECT_DATA };
 
   async function loadDefectDetails() {
     if (!state.selectedFeatureId) {
-      defectData = { stats: { total: 0, S1: 0, S2: 0, S3: 0, S4: 0, open: 0, fixing: 0, fixed: 0 }, defects: [] };
+      defectData = { ...EMPTY_DEFECT_DATA };
       renderDefectStats();
       return;
     }
@@ -625,7 +619,7 @@ const state = {
     try {
       const res = await fetch(`/api/feature/${encodeURIComponent(state.selectedFeatureId)}/defects`, { cache: 'no-store' });
       if (!res.ok) {
-        defectData = { stats: { total: 0, S1: 0, S2: 0, S3: 0, S4: 0, open: 0, fixing: 0, fixed: 0 }, defects: [] };
+        defectData = { ...EMPTY_DEFECT_DATA };
         renderDefectStats();
         return;
       }
@@ -634,7 +628,7 @@ const state = {
       renderDefectStats();
     } catch (e) {
       console.error('Failed to load defect details:', e);
-      defectData = { stats: { total: 0, S1: 0, S2: 0, S3: 0, S4: 0, open: 0, fixing: 0, fixed: 0 }, defects: [] };
+      defectData = { ...EMPTY_DEFECT_DATA };
       renderDefectStats();
     }
   }
@@ -766,9 +760,6 @@ const state = {
     const progressFill = document.getElementById('taskProgressFill');
     const progress = stats.progress || 0;
     progressFill.style.width = `${progress}%`;
-    const progressColor = progress >= 100 ? 'var(--ok)' : (progress >= 50 ? 'var(--accent)' : 'var(--warn)');
-    progressFill.style.background = progressColor;
-
     progressFill.style.background = `linear-gradient(90deg, var(--ok), var(--accent))`;
 
     // Current Tasks Panel
@@ -802,7 +793,7 @@ const state = {
       const statusClass = phase.status || 'pending';
       const progressColor = phase.status === 'complete' ? 'var(--ok)' : (phase.status === 'in_progress' ? 'var(--accent)' : 'var(--muted)');
 
-      const statusText = phase.status === 'complete' ? '已完成' : (phase.status === 'in_progress' ? '进行中' : '待处理');
+      const statusText = PHASE_STATUS_LABEL[phase.status] || '待处理';
 
       return `
         <div class="phase-card">
@@ -894,11 +885,13 @@ const state = {
     const stageState = state.features.find(f => f.featureId === state.selectedFeatureId);
     const currentStageIndex = stageState ? FLOW_STAGES.findIndex(fs => fs.id === stageState.currentStage) : -1;
 
-    // Update status for stages after current
+    // Update status based on current stage position
     for (let i = 0; i < allStages.length; i++) {
-      if (i === currentStageIndex && allStages[i].status === 'pending') {
+      if (currentStageIndex >= 0 && i < currentStageIndex) {
+        allStages[i].status = 'complete';
+      } else if (i === currentStageIndex) {
         allStages[i].status = 'in-progress';
-      } else if (i > currentStageIndex && currentStageIndex >= 0) {
+      } else if (currentStageIndex >= 0) {
         allStages[i].status = 'pending';
       }
     }

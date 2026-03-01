@@ -27,7 +27,8 @@ OPEN_TASKS="$(
       }
       if (taskid == "") next
       s=tolower(last)
-      if (s != "complete" && s != "done" && s != "verified") count++
+      if (s == "complete" || s == "verified") s="done"
+      if (s != "done") count++
     }
     END { print count + 0 }
   ' "$FILE"

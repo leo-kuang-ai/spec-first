@@ -195,7 +195,8 @@ function buildReferences(
 }
 
 function estimateTokens(input: string): number {
-  return Math.max(1, Math.ceil(Buffer.byteLength(input, 'utf-8') / 4));
+  // S2: 中文字符 ~3 bytes/1-2 token，混合内容用 3 bytes/token 更准确
+  return Math.max(1, Math.ceil(Buffer.byteLength(input, 'utf-8') / 3));
 }
 
 function summarizeContent(content: string): string {

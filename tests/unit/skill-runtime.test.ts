@@ -254,12 +254,12 @@ describe('loadSkill hard-gate notice', () => {
       'utf-8',
     );
 
-    execSync('git init', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null init', { cwd: TMP, stdio: 'ignore' });
     execSync('git config user.email "test@example.com"', { cwd: TMP, stdio: 'ignore' });
     execSync('git config user.name "test"', { cwd: TMP, stdio: 'ignore' });
     writeFileSync(join(TMP, 'README.md'), 'seed\n', 'utf-8');
-    execSync('git add README.md', { cwd: TMP, stdio: 'ignore' });
-    execSync('git -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null add README.md', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
     execSync('git checkout -b main || git checkout main', { cwd: TMP, stdio: 'ignore' });
 
     const content = loadSkill(skillPath, { projectRoot: TMP });

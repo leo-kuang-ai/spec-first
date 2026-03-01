@@ -2,7 +2,24 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-TARGET_PROFILE="${1:-$HOME/.zshrc}"
+
+# 根据 $SHELL 环境变量选择正确的 rc 文件
+case "$SHELL" in
+  */zsh)
+    TARGET_PROFILE="${1:-$HOME/.zshrc}"
+    ;;
+  */bash)
+    TARGET_PROFILE="${1:-$HOME/.bashrc}"
+    ;;
+  *)
+    echo "Unsupported shell: $SHELL"
+    echo "Please manually specify target profile:"
+    echo "  $0 ~/.zshrc"
+    echo "  $0 ~/.bashrc"
+    exit 1
+    ;;
+esac
+
 START_MARK="# >>> spec-first codex stage-viewer autostart >>>"
 END_MARK="# <<< spec-first codex stage-viewer autostart <<<"
 

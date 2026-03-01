@@ -7,13 +7,16 @@ import { readdirSync } from 'node:fs';
 import type { RfcStatus, RfcLevel, RfcRecord, RfcWaiver } from '../../shared/types.js';
 import {
   readJson,
+  readJsonChecked,
   writeJson,
   exists,
   ensureDir,
   readMarkdown,
   writeMarkdown,
+  parseMarkdownTable,
 } from '../../shared/fs-utils.js';
 import { assertRfcTransition } from './rfc-machine.js';
+import { isRfcRecord } from '../../shared/validators.js';
 
 // ─── 类型 ────────────────────────────────────────────────
 
@@ -104,7 +107,7 @@ export function getRfc(
   if (!exists(p)) {
     throw new Error(`未找到 RFC：${rfcId}（${featureId}）`);
   }
-  return readJson<RfcRecord>(p);
+  return readJsonChecked(p, isRfcRecord);
 }
 
 /** RFC 状态流转 */
@@ -153,6 +156,31 @@ export function listRfc(
   return records.sort((a, b) => a.id.localeCompare(b.id));
 }
 
+/**
+ * 加载 Feature 下所有 RFC 的状态
+ * 提取为共享函数，避免在 coverage.ts 和 gate-evaluator.ts 中重复实现
+ */
+export function loadRfcStatuses(featureId: string, projectRoot: string): Map<string, string> {
+  const dir = rfcDir(projectRoot, featureId);
+  if (!exists(dir)) return new Map();
+
+  const statuses = new Map<string, string>();
+  for (const entry of readdirSync(dir)) {
+    if (!entry.endsWith('.rfc.json')) continue;
+    const p = join(dir, entry);
+    try {
+      const record = readJson<RfcRecord>(p);
+      if (record.status) {
+        const rfcId = entry.replace('.rfc.json', '');
+        statuses.set(rfcId, record.status);
+      }
+    } catch {
+      // 跳过损坏的 RFC 文件
+    }
+  }
+  return statuses;
+}
+
 function syncKnownExceptionsFromWaivers(record: RfcRecord, projectRoot: string): void {
   const waivers = record.waivers ?? [];
   if (waivers.length === 0) return;
@@ -163,16 +191,10 @@ function syncKnownExceptionsFromWaivers(record: RfcRecord, projectRoot: string):
   }
 
   const content = readMarkdown(path);
-  const rows = content.split('\n');
   const existingPairs = new Set<string>();
   let maxSeq = 0;
 
-  for (const line of rows) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| ID')) {
-      continue;
-    }
-    const cells = trimmed.split('|').slice(1, -1).map((c) => c.trim());
+  for (const cells of parseMarkdownTable(content)) {
     if (cells.length < 3) continue;
     const id = cells[0];
     const match = id.match(/^EX-(\d{3})$/);

@@ -4,7 +4,7 @@
  */
 import { join } from 'node:path';
 import type { KnownException } from '../../shared/types.js';
-import { readMarkdown, exists } from '../../shared/fs-utils.js';
+import { readMarkdown, exists, parseMarkdownTable } from '../../shared/fs-utils.js';
 
 /** 校验结果 */
 export interface ExceptionValidationResult {
@@ -76,15 +76,8 @@ function parseExceptions(path: string): KnownException[] {
   const content = readMarkdown(path);
   const exceptions: KnownException[] = [];
 
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| ID')) {
-      continue;
-    }
-
-    const cells = trimmed.split('|').map(c => c.trim()).slice(1, -1);
+  for (const cells of parseMarkdownTable(content)) {
     if (cells.length < 7) continue;
-
     exceptions.push({
       id: cells[0],
       rfcId: cells[1],

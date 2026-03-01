@@ -12,6 +12,7 @@ import {
   readMarkdown,
   ensureDir,
   exists,
+  parseMarkdownTable,
 } from '../../shared/fs-utils.js';
 import { renderDefaultConfigYaml, resetConfigCache } from '../../shared/config-schema.js';
 import { mergeLayerRules } from './layer-merger.js';
@@ -143,12 +144,7 @@ function loadRegistry(specsDir: string): Map<string, string> {
   if (!exists(regPath)) return map;
 
   const content = readMarkdown(regPath);
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| FEAT')) {
-      continue;
-    }
-    const cells = trimmed.split('|').slice(1, -1).map((c) => c.trim());
+  for (const cells of parseMarkdownTable(content)) {
     if (cells.length >= 2 && cells[0]) {
       map.set(cells[0], cells[1]);
     }

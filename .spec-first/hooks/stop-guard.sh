@@ -21,7 +21,8 @@ PENDING_IDS="$(
       }
       if (taskid == "") next
       s=tolower(last)
-      if (s != "complete" && s != "done" && s != "verified") print taskid
+      if (s == "complete" || s == "verified") s="done"
+      if (s != "done") print taskid
     }
   ' "$FILE"
 )"

@@ -1,203 +1,150 @@
 # Phase 1: Code Quality & Architecture Review
 
-**审查日期**: 2026-02-27
-**审查范围**: Spec-First Skills 目录 (28 个 Markdown 文件)
+**Review Date**: 2026-02-28
+**Target**: `skills/spec-first/00-first/` (~1,558 lines across 8 files)
 
 ---
 
 ## Code Quality Findings
 
-### Critical Issues
+### Critical (3)
 
-**无关键问题**
+| # | Issue | Location | Description |
+|---|-------|----------|-------------|
+| C1 | Phase Numbering Inconsistency | `SKILL.md:153-257` vs `agent-database.md:8-54` | Main file uses P0-P1a-P1b-P2-P5, but agent-database.md uses P3/P4 for internal phases |
+| C2 | Agent Count Mismatch | `SKILL.md:106` vs `subagent-architecture.md:76-86` | SKILL.md says "最多 7 个子 agent", but subagent-architecture.md describes 14+ splits |
+| C3 | Evidence Format Inconsistency | `SKILL.md:26-38` vs `SKILL.md:382` | Two different evidence annotation formats used: `(file:line — snippet)` vs `(证据: file:line)` |
 
-### High Priority Issues
+### High (4)
 
-#### 1. 20-spec-review 和 21-analyze 缺少 CLI 依赖章节
-- **文件**: `skills/spec-first/20-spec-review/SKILL.md`, `skills/spec-first/21-analyze/SKILL.md`
-- **问题**: 两个 Skill 都缺少 `CLI 依赖` 章节
-- **影响**: 无法确定 Skill 执行所需的 CLI 命令
-- **修复建议**:
-  ```markdown
-  ## CLI 依赖
-  - `spec-first spec-review` (隐式命令，通过 Skill 执行)
-  - `spec-first metrics coverage`
-  ```
+| # | Issue | Location | Description |
+|---|-------|----------|-------------|
+| H1 | QA Rules Duplication | All 5 agent spec files | Quality assurance section duplicated verbatim (~30 lines each) |
+| H2 | Serena Degradation Undefined | `SKILL.md:166`; various specs | Each agent describes different degradation behaviors without unified pattern |
+| H3 | A4 Dependency Chain Incomplete | `SKILL.md:141-143` vs `agent-domain-model.md:119-128` | SKILL.md says A4 waits for A2+D, but it also needs B's output |
+| H4 | Timeout Values Inconsistency | `SKILL.md:149` vs `subagent-architecture.md:177-183` | SKILL.md: 120s/300s; subagent-architecture.md: 40-60s/120s |
 
-#### 2. P1-XX 编号引用不一致
-- **文件**: 多个 SKILL.md
-- **问题**: 引用了 AGENTS.md 中定义的规则 (如 P1-XX)，但编号可能与源文档不同步
-- **影响**: 引用可能指向错误或不存在的内容
-- **修复建议**:
-  - 在 AGENTS.md 中建立编号索引
-  - 或者移除编号，改为语义化引用
+### Medium (4)
 
-#### 3. CLI 命令可能与实现不一致
-- **文件**: 多处 CLI 依赖章节
-- **问题**: 文档中的 CLI 命令可能与实际实现不一致
-- **影响**: 文档与实际行为不符
-- **修复建议**: 添加自动化测试验证 CLI 命令与文档一致性
+| # | Issue | Location | Description |
+|---|-------|----------|-------------|
+| M1 | Monorepo Detection Failure | `agents-code-analysis.md:10-14` | No fallback if detection files are malformed |
+| M2 | HTML Comments in Template | `SKILL.md:290-293` | May confuse users viewing raw Markdown |
+| M3 | Cross-Validation Incomplete | `SKILL.md:339-346` vs `agent-domain-model.md:386-392` | V-D1/V-D2/V-D3 not in main orchestration |
+| M4 | Inter-Agent Data Format Undocumented | `subagent-architecture.md:100-151` | JSON schemas shown but not committed to by agent specs |
 
-### Medium Priority Issues
+### Low (4)
 
-#### 4. description 字段不符合 "Description Trap" 规则
-- **文件**: 多个 SKILL.md
-- **问题**: `description` 字段内容风格不一致，部分混入了阶段校验信息
-- **违反**: AGENTS.md 第 33-37 行的 "Description Trap" 规则
-- **修复建议**: 统一 `description` 格式为: `"<动词> + <核心动作>"`，不包含阶段名称
+| # | Issue | Location | Description |
+|---|-------|----------|-------------|
+| L1 | Changelog Growth | `SKILL.md:7-14` | Unbounded growth over time |
+| L2 | Hardcoded Verbs | `agent-domain-model.md:233-238` | State transition verbs may miss domain-specific terms |
+| L3 | Framework Count Mismatch | `SKILL.md:231` vs `detection-rules.md:22-46` | Says "20 种框架" but only 17 listed |
+| L4 | Context7 Priority Undefined | `detection-rules.md:81` | "按依赖重要性排序" is vague |
 
-#### 5. "字面即精神原则" 重复
-- **文件**: 03-spec, 04-design, 07-code, 12-verify
-- **问题**: 完整的"字面即精神反合理化表"在多个 Skill 中重复
-- **影响**: 修改时容易遗漏某处导致不一致
-- **修复建议**: 将内容完全收敛到 AGENTS.md，Skill 使用引用标记
+### Unhandled Edge Cases (6)
 
-#### 6. "文件系统即外部记忆" 重复
-- **文件**: 多个 SKILL.md
-- **问题**: "2-Action Rule" 在多个 Skill 中重复定义
-- **修复建议**: 统一引用 AGENTS.md 定义
-
-#### 7. "反合理化守卫" 表格重复
-- **文件**: 03-spec, 04-design, 07-code, 08-code-review, 13-orchestrate
-- **问题**: 反合理化表格重复
-- **修复建议**: 应统一引用 AGENTS.md
-
-#### 8. Next Steps 章节缺失
-- **文件**: 多个 SKILL.md
-- **问题**: 部分文件缺少 Next Steps 章节
-- **影响**: 用户不知道下一步操作
-- **修复建议**: 补充 Next Steps 章节
-
-#### 9. 歧义表述
-- **文件**: 03-spec (P2), 07-code, 多处
-- **问题**: "生成 FR 定义"、"按规格约束生成实现代码" 等表述不够具体
-- **修复建议**: 添加更具体的格式要求和示例
-
-#### 10. 示例不足
-- **文件**: 多个 SKILL.md
-- **问题**: 02-catchup, 05-research, 07-code, 08-code-review 等 15+ 个文件缺少示例
-- **影响**: 理解成本高
-- **修复建议**: 补充示例内容
-
-### Low Priority Issues
-
-#### 11. 部分代码块缺少语言标识
-- **文件**: 多处
-- **问题**: 部分代码块未指定语言类型
-
-#### 12. 确认方式未明确
-- **文件**: 多处
-- **问题**: "与用户确认" 未明确确认方式 (输入/选择)
-
-#### 13. Graphviz 图表渲染依赖
-- **文件**: 多处
-- **问题**: Graphviz DOT 图的渲染依赖工具支持
-
-#### 14. 示例格式不统一
-- **文件**: 有示例的文件
-- **问题**: 示例格式不统一
-
-#### 15. 引用不够精确
-- **文件**: 多处
-- **问题**: AGENTS.md 引用不够精确
+1. Multiple package managers (npm + pnpm lock files)
+2. New git repo with < N commits
+3. DB connection requires SSL/TLS certificates
+4. Conflicting module lists from parallel agents
+5. Multiple project root indicators (package.json + pom.xml)
+6. A1 produces empty module list
 
 ---
 
 ## Architecture Findings
 
-### 整体架构 ⭐⭐⭐⭐ (7.6/10)
+### Critical (1)
 
-Spec-First Skills 目录架构设计整体成熟，执行模型统一，CLI 依赖清晰。
+| # | Issue | Impact |
+|---|-------|--------|
+| A-C1 | **Documentation Structural Inconsistency** - SKILL.md and subagent-architecture.md have conflicting agent definitions. Current vs proposed split unclear. | Confusion for implementers |
 
-### Component Boundaries
+### High (2)
 
-| 评估 | 结果 | 说明 |
-|------|------|------|
-| 模块边界清晰度 | ✅ 良好 | 职责划分清晰，存在少量边界模糊 |
-| 单一职责原则 | ✅ 遵循 | AGENTS.md 负责共享上下文，Skill 负责具体流程 |
+| # | Issue | Impact |
+|---|-------|--------|
+| A-H1 | **Phase Naming Confusion** - Orchestration phases (P0-P5) collide with Agent D's internal phases (P3/P4) | Maintenance burden |
+| A-H2 | **A4 Fan-in Bottleneck** - Agent A4 depends on A2 + B + D outputs, creating synchronization bottleneck on critical path | Performance impact |
 
-### Dependency Management
+### Medium (4)
 
-| 评估 | 结果 | 说明 |
-|------|------|------|
-| Skill 依赖方向 | ✅ 正向 | 所有 Skill 依赖 AGENTS.md |
-| 循环依赖 | ✅ 无 | 存在软依赖链但无硬循环 |
-| Orchestrate 集成 | ⚠️ 需改进 | 新增 Skill 需手动修改 orchestrate |
+| # | Issue | Impact |
+|---|-------|--------|
+| A-M1 | Missing JSON Schema for intermediate data | Validation gap |
+| A-M2 | Data passing mechanism undefined (memory vs file vs context) | Implementation ambiguity |
+| A-M3 | Wave boundary conditions unclear - race condition risk between P1b and C1 | Reliability risk |
+| A-M4 | No retry mechanism for transient failures (Context7 API, DB connection) | Resilience gap |
 
-### Abstraction Level
+### Low (3)
 
-| 共享内容 | 提取位置 | 覆盖率 | 评估 |
-|----------|----------|--------|------|
-| CLI 命令参考 | AGENTS.md | 100% | 优秀 |
-| 统一执行模型 (P0-P5) | AGENTS.md | 100% | 优秀 |
-| 确认策略 | AGENTS.md | 100% | 优秀 |
-| 字面即精神原则 | AGENTS.md | ~20% (重复定义) | 需改进 |
-| 文件系统即外部记忆 | AGENTS.md | ~35% (重复定义) | 需改进 |
+| # | Issue | Impact |
+|---|-------|--------|
+| A-L1 | No plugin/extension mechanism | Customization requires code modification |
+| A-L2 | Centralized rule management | Single file for all detection rules |
+| A-L3 | No checkpoint/recovery | Long-running tasks cannot resume |
 
-### Naming Conventions
+---
 
-| 评估 | 结果 | 说明 |
-|------|------|------|
-| Skill 编号 | ✅ 一致 | 01-21 连续编号 |
-| Skill 名称 | ✅ 一致 | kebab-case 命名 |
-| Front Matter | ⚠️ 部分不一致 | description 字段需修正 |
+## Architectural Strengths
 
-### Extensibility
+1. **Subagent-Driven Pattern** - Well-suited for parallel analysis workloads
+2. **Lightweight JSON Intermediate Format** - Minimal overhead for data passing
+3. **Degradation Strategies** - Serena LSP → static analysis fallback is robust
+4. **Quality Assurance Rules** - Evidence annotation and sampling verification are thorough
+5. **Security Consideration** - DB credentials explicitly excluded from output
+6. **Clear Version History** - Changelog provides good traceability
 
-| 评估 | 结果 | 说明 |
-|------|------|------|
-| 新增 Skill 难度 | ⚠️ 中等 | 需要手动更新 orchestrate |
-| 参数化占位符 | ✅ 良好 | 白名单机制完善 |
-| 模板支持 | ❌ 缺失 | 无 Skill 创建模板 |
+---
 
-### Version Management
+## Quality Attribute Scores
 
-| 评估 | 结果 | 说明 |
-|------|------|------|
-| Skill 版本号 | ❌ 缺失 | 无版本控制 |
-| 修订历史 | ❌ 缺失 | 无变更追踪 |
-| 兼容性声明 | ❌ 缺失 | 无版本兼容策略 |
+| Attribute | Score | Notes |
+|-----------|-------|-------|
+| Understandability | 7/10 | Detailed docs but naming confusion |
+| Maintainability | 7/10 | Good modularity, lacks extension points |
+| Extensibility | 5/10 | No plugin mechanism |
+| Scalability | 6/10 | Large project handling limited |
+| Resilience | 7/10 | Good degradation, missing retry |
+| Performance | 8/10 | Reasonable parallelization |
+| Security | 8/10 | DB credentials not persisted |
 
-### Architecture Consistency
-
-| 维度 | 评分 | 说明 |
-|------|------|------|
-| 执行模型遵循度 | 9/10 | P0-P5 遵循度高 |
-| 确认策略分配 | 10/10 | 策略与风险等级匹配 |
-| 章节结构一致性 | 8/10 | 基本一致，少量缺失 |
+**Overall Architecture Maturity: 3/5**
 
 ---
 
 ## Critical Issues for Phase 2 Context
 
-无关键问题需要在后续审查中特别关注。
+These findings should inform security and performance review:
+
+1. **A4 Fan-in Bottleneck** (A-H2) - May cause timeout issues for large projects
+2. **Serena Degradation** (H2) - Static analysis mode may miss security-relevant patterns
+3. **No Retry Mechanism** (A-M4) - DB connection failures may expose credentials in logs
+4. **Timeout Inconsistency** (H4) - Unclear which values are authoritative for SLA
+5. **Data Passing Undefined** (A-M2) - In-memory JSON may expose sensitive data
 
 ---
 
-## Summary by Severity
+## Recommendations Summary
 
-| 严重程度 | 数量 | 主要类别 |
-|----------|------|----------|
-| Critical | 0 | - |
-| High | 3 | CLI 依赖缺失、编号引用不一致 |
-| Medium | 7 | 内容重复、格式不一致 |
-| Low | 5 | 示例、引用精确度 |
+### Immediate (P0)
 
----
+| Action | Effort |
+|--------|--------|
+| Reconcile phase numbering | Low |
+| Clarify agent count and split status | Medium |
+| Standardize evidence format | Low |
+| Unify SKILL.md and subagent-architecture.md | Medium |
 
-## Recommendations
+### Short-term (P1)
 
-### P1 (短期处理)
-1. **收敛重复定义**: "字面即精神"、"文件系统即外部记忆" 收到 AGENTS.md
-2. **完善缺失章节**: 为 20-spec-review 和 21-analyze 补充 CLI 依赖
-3. **统一编号引用**: 建立 AGENTS.md 编号索引或改用语义化引用
+| Action | Effort |
+|--------|--------|
+| Extract QA rules to shared file | Medium |
+| Document Serena degradation matrix | Medium |
+| Fix A4 dependency documentation | Low |
+| Reconcile timeout values | Low |
+| Split A4 into smaller independent tasks | High |
 
-### P2 (中期处理)
-1. **版本管理**: 添加版本号和修订历史
-2. **扩展性优化**: Orchestrate 自动发现机制
-3. **模板化**: 创建 Skill 模板
-
----
-
-**审查人员**: AI Code Quality & Architecture Agents
-**完成时间**: 2026-02-27 01:00
+**Estimated remediation effort**: 4-8 hours for Critical/High issues

@@ -1,254 +1,474 @@
 ---
 last_updated: 2026-02-28
-analysis_depth: module
-analysis_method: serena-mcp
 ---
 
-# 依赖调用链分析
+# Spec-First 调用链分析
 
-> 本文档由 Serena MCP 驱动的 LSP 分析生成
+> 分析范围: `src/core/`, `src/shared/`, `src/cli/`
+> 工具: Serena MCP
 
-## 模块依赖关系
+## 1. 模块依赖矩阵
 
-### 依赖矩阵
+### 1.1 模块依赖关系表
 
-| 被依赖 → | cli | core | shared | tests |
-|----------|-----|------|--------|-------|
-| **cli** ↓ | - | ❌ | ✅ | ❌ |
-| **core** ↓ | ❌ | ✅ | ✅ | ❌ |
-| **shared** ↓ | ❌ | ❌ | - | ❌ |
-| **tests** ↓ | ❌ | ✅ | ✅ | - |
+| 模块 | 依赖的 shared 模块 | 依赖的 core 模块 |
+|------|-------------------|------------------|
+| `process-engine` | `types`, `fs-utils`, `validators`, `logger`, `config-schema` | `gate-engine`, `tool-integration` (内部) |
+| `skill-runtime` | `types`, `fs-utils`, `validators`, `config-schema` | `process-engine`, `ai-orchestrator` (间接) |
+| `ai-orchestrator` | `types`, `fs-utils`, `config-schema` | `skill-runtime`, `trace-engine` (间接) |
+| `gate-engine` | `types`, `fs-utils`, `validators` | `trace-engine`, `change-mgr` |
+| `trace-engine` | `types`, `fs-utils`, `validators` | `change-mgr` (部分函数) |
+| `change-mgr` | `types`, `fs-utils`, `validators` | `trace-engine` (matrix) |
+| `metrics-engine` | `types` | `trace-engine` (coverage) |
+| `template` | `types`, `fs-utils` | - |
+| `tool-integration` | `types`, `fs-utils`, `host-paths` | `process-engine` (extensions) |
+| `cli/commands` | `types`, `fs-utils`, `config-schema`, `host-paths`, `skill-commands`, `host-bootstrap`, `logger`, `validators` | 所有 core 模块 (按需调用) |
 
-**说明**：
-- ✅ = 存在依赖
-- ❌ = 无依赖
-- 核心原则：外层依赖内层，内层不依赖外层
-- cli 和 tests 共同依赖 core 和 shared
+### 1.2 依赖层级
 
-### 模块依赖图
+```
+Level 0 (基础层): shared/*
+         ├── types.ts (核心类型定义)
+         ├── fs-utils.ts (文件系统工具)
+         ├── validators.ts (运行时类型校验)
+         ├── logger.ts (日志工具)
+         ├── config-schema.ts (配置解析)
+         ├── host-paths.ts (宿主路径检测)
+         ├── skill-commands.ts (技能命令管理)
+         └── host-bootstrap.ts (宿主引导)
+
+Level 1 (核心引擎层):
+         ├── trace-engine/* (追溯引擎)
+         ├── change-mgr/* (变更管理)
+         ├── process-engine/* (流程引擎)
+         └── template/* (模板渲染)
+
+Level 2 (编排与门禁层):
+         ├── gate-engine/* (门禁评估)
+         ├── skill-runtime/* (技能运行时)
+         ├── ai-orchestrator/* (AI 编排)
+         └── metrics-engine/* (健康度评估)
+
+Level 3 (集成层):
+         ├── tool-integration/* (工具集成)
+         └── cli/commands/* (命令处理器)
+```
+
+## 2. Mermaid 依赖关系图
 
 ```mermaid
 graph TD
-    cli[cli 入口层] --> shared[shared 共享层]
-    cli --> core[core 核心层]
+    %% 入口层
+    CLI[cli/index.ts] --> Router[cli/router.ts]
+    Router --> Cmds[cli/commands/*]
 
-    tests[tests 测试层] --> shared
-    tests --> core
+    %% 命令层到核心模块
+    Cmds --> PE[process-engine]
+    Cmds --> SR[skill-runtime]
+    Cmds --> GE[gate-engine]
+    Cmds --> TE[trace-engine]
+    Cmds --> CM[change-mgr]
+    Cmds --> AO[ai-orchestrator]
+    Cmds --> ME[metrics-engine]
+    Cmds --> TI[tool-integration]
 
-    core --> shared
+    %% 核心模块内部依赖
+    PE --> SM[stage-machine.ts]
+    PE --> GE
+    PE --> TI_ContextSync[context-sync.ts]
 
-    core2[core 内部]
-    process_engine[process-engine]
-    trace_engine[trace-engine]
-    skill_runtime[skill-runtime]
-    ai_orchestrator[ai-orchestrator]
-    gate_engine[gate-engine]
-    change_mgr[change-mgr]
-    template[template]
-    tool_integration[tool-integration]
-    metrics_engine[metrics-engine]
+    GE --> TE_Coverage[coverage.ts]
+    GE --> TE_Matrix[matrix.ts]
+    GE --> TE_Exception[exception-validator.ts]
+    GE --> CM_Rfc[rfc.ts]
+    GE --> SCA[sca.ts]
+    GE --> CmdGate[command-gate.ts]
 
-    core --> core2
-    core2 --> process_engine
-    core2 --> trace_engine
-    core2 --> skill_runtime
-    core2 --> ai_orchestrator
-    core2 --> gate_engine
-    core2 --> change_mgr
-    core2 --> template
-    core2 --> tool_integration
-    core2 --> metrics_engine
+    SR --> PA[prompt-assembler.ts]
+    SR --> HG[hard-gate.ts]
+    SR --> PE_Extensions[extensions.ts]
+
+    AO --> TR[todo-runner.ts]
+    AO --> AL[auto-loop.ts]
+    AO --> CP[context-pack.ts]
+    AO --> CC[catchup.ts]
+
+    TE_Coverage --> TE_Matrix
+    TE_Coverage --> TE_Exception
+    TE_Coverage --> CM_Rfc
+    TE_Matrix --> TE_Validator[id-validator.ts]
+
+    CM_Rfc --> RM[rfc-machine.ts]
+    CM_Defect[defect.ts] --> DM[defect-machine.ts]
+    CM_Sync[sync.ts] --> TE_Matrix
+
+    %% 共享层
+    PE --> ST[shared/types.ts]
+    PE --> SF[shared/fs-utils.ts]
+    PE --> SV[shared/validators.ts]
+    PE --> SL[shared/logger.ts]
+    PE --> SC[shared/config-schema.ts]
+
+    SR --> ST
+    SR --> SF
+    SR --> SC
+
+    GE --> ST
+    GE --> SF
+    GE --> SV
+
+    TE --> ST
+    TE --> SF
+    TE --> SV
+
+    CM --> ST
+    CM --> SF
+    CM --> SV
+
+    AO --> ST
+    AO --> SF
+    AO --> SC
+
+    TI --> ST
+    TI --> SF
+    TI --> HP[shared/host-paths.ts]
+
+    %% 样式定义
+    classDef shared fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef core fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef cli fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef gate fill:#ffebee,stroke:#b71c1c,stroke-width:2px
+
+    class ST,SF,SV,SL,SC,HP shared
+    class PE,SR,AO,GE,TE,CM,ME,TI core
+    class CLI,Router,Cmds cli
+    class GE,SCA,CmdGate gate
 ```
 
-## 核心模块说明
+## 3. 关键调用路径
 
-### cli/ - 入口层
-- **职责**: CLI 命令注册与路由
-- **入度**: 0 (无其他模块依赖)
-- **出度**: 2 (依赖 core, shared)
-- **子模块**:
-  - `commands/` - 19 个命令处理器
-  - `router.ts` - 命令路由表
-  - `index.ts` - 主入口
-
-### core/ - 核心层
-- **职责**: 业务逻辑核心
-- **入度**: 2 (被 cli, tests 依赖)
-- **出度**: 1 (依赖 shared)
-- **子模块**:
-  - `process-engine` - 阶段状态机 (init, advance, stage-machine, feature, extensions, layer-merger)
-  - `trace-engine` - 追溯引擎 (id-generator, id-validator, id-search, matrix, coverage, exception-validator)
-  - `skill-runtime` - Skill 分发 (dispatcher, prompt-assembler, hard-gate, front-matter, idempotent-write)
-  - `ai-orchestrator` - AI 编排 (auto-loop, catchup, context-pack, watchdog, completion-detector)
-  - `gate-engine` - 质量门禁 (gate-evaluator, security, sca, golive, command-gate)
-  - `change-mgr` - 变更管理 (rfc, defect, rfc-machine, defect-machine, sync, impact)
-  - `template` - 模板渲染 (renderer, artifact-checker)
-  - `tool-integration` - 工具集成 (hook-installer, ai-runtime-hook, session-hook, context-sync)
-  - `metrics-engine` - 指标引擎 (health-score, bottleneck)
-
-### shared/ - 共享层
-- **职责**: 跨层共享类型定义和工具函数
-- **入度**: 2 (被 cli, core 依赖)
-- **出度**: 0 (最底层，不依赖其他业务模块)
-- **核心文件**:
-  - `types.ts` - 核心类型定义 (Stage, ExitCode, ID types)
-  - `fs-utils.ts` - 文件系统工具
-  - `config-schema.ts` - 配置管理
-  - `host-*.ts` - 宿主相关 (host-bootstrap, host-paths)
-
-### tests/ - 测试层
-- **职责**: 单元测试和集成测试
-- **入度**: 0 (无其他模块依赖)
-- **出度**: 2 (依赖 core, shared)
-- **子目录**: unit/, integration/, e2e/
-
-## 循环依赖检测
-
-### ✅ 无循环依赖
-
-当前模块结构符合单向依赖原则：
-- cli → core → shared ✓
-- tests → core → shared ✓
-- core 内部模块间存在依赖，但整体方向清晰
-
-## 常见调用路径
-
-### 路径1: 命令执行流
+### 3.1 阶段推进调用链
 
 ```
-用户输入 CLI 命令
-  ↓
-cli/index.ts (入口)
-  ↓
-cli/router.ts (路由分发)
-  ↓
-cli/commands/[command].ts (命令处理)
-  ↓
-core/[module]/ (核心业务逻辑)
-  ↓
-core/process-engine/advance.ts (状态流转)
+cli/commands/stage.ts (handleStage)
+  └──> process-engine/advance.ts (advance)
+        ├─> process-engine/stage-machine.ts (assertTransitionAllowed, isTerminal)
+        ├─> gate-engine/gate-evaluator.ts (evaluateGate)
+        │     ├─> trace-engine/matrix.ts (parseMatrix)
+        │     ├─> trace-engine/coverage.ts (getCoverage)
+        │     │     ├─> trace-engine/exception-validator.ts (validateExceptions)
+        │     │     └─> change-mgr/rfc.ts (loadRfcStatuses)
+        │     ├─> gate-engine/command-gate.ts (runCommandGate)
+        │     └─> change-mgr/rfc.ts (loadRfcStatuses)
+        ├─> shared/config-schema.ts (loadConfig)
+        ├─> shared/logger.ts (writeLog)
+        └─> tool-integration/context-sync.ts (syncAgentContextFromDesign)
+              └─> shared/fs-utils.ts (readJson, exists)
 ```
 
-### 路径2: 追溯 ID 生成
+### 3.2 技能分发调用链
 
 ```
-core/trace-engine/id-generator.ts (生成)
-  ↓
-core/trace-engine/matrix.ts (记录)
-  ↓
-shared/types.ts (类型定义)
+skill-runtime/dispatcher.ts (dispatchCommand)
+  ├─> 检查 SEMANTIC_MAP (语义映射)
+  ├─> 检查 RUNTIME_COMMANDS (Runtime 路由)
+  └─> resolveSkillPath (Skill 路由)
+        ├─> process-engine/extensions.ts (loadEnabledExtensions)
+        └─> shared/fs-utils.ts (exists)
+
+skill-runtime/dispatcher.ts (loadSkill)
+  ├─> skill-runtime/prompt-assembler.ts (assemblePrompt)
+  │     ├─> shared/config-schema.ts (loadConfig)
+  │     ├─> shared/fs-utils.ts (readJson, readMarkdown)
+  │     └─> shared/types.ts (StageState)
+  ├─> skill-runtime/hard-gate.ts (buildHardGateRuntimeNotice)
+  │     ├─> shared/fs-utils.ts (readJsonChecked, readMarkdown, parseMarkdownTable)
+  │     └─> shared/validators.ts (isStageState)
+  └─> shared/config-schema.ts (loadConfig)
 ```
 
-### 路径3: AI 自动循环
+### 3.3 AI 自动循环调用链
 
 ```
-core/ai-orchestrator/auto-loop.ts (主循环)
-  ↓
-core/ai-orchestrator/context-pack.ts (上下文打包)
-  ↓
-core/skill-runtime/prompt-assembler.ts (Prompt 组装)
-  ↓
-core/skill-runtime/dispatcher.ts (Skill 分发)
+ai-orchestrator/auto-loop.ts (runAutoLoop)
+  ├─> ai-orchestrator/todo-runner.ts (loadTodoState, pickReadyTodos, updateTodoStatus)
+  │     └─> shared/config-schema.ts (loadConfig)
+  ├─> ai-orchestrator/watchdog.ts (runWatchdogCheck, updateHeartbeat)
+  ├─> ai-orchestrator/completion-detector.ts (loadCompletionMarkers, runFullCompletionDetection)
+  ├─> ai-orchestrator/slop-checker.ts (loadSlopRules, runSlopCheck)
+  ├─> ai-orchestrator/mcp-checker.ts (checkRequiredMcps)
+  ├─> ai-orchestrator/audit-log.ts (writeAuditLog)
+  │     └─> shared/fs-utils.ts (appendJsonl)
+  └─> skill-runtime/idempotent-write.ts (idempotentWrite)
+        └─> shared/fs-utils.ts (writeJson, exists)
 ```
 
-### 路径4: 质量门禁评估
+### 3.4 门禁评估调用链
 
 ```
-core/gate-engine/gate-evaluator.ts (评估)
-  ↓
-core/trace-engine/coverage.ts (覆盖率)
-  ↓
-core/trace-engine/matrix.ts (矩阵检查)
-  ↓
-core/gate-engine/security.ts (安全扫描)
+gate-engine/gate-evaluator.ts (evaluateGate)
+  ├─> shared/validators.ts (isStageState)
+  ├─> trace-engine/matrix.ts (parseMatrix)
+  │     ├─> shared/fs-utils.ts (readMarkdown, parseMarkdownTable)
+  │     └─> trace-engine/id-validator.ts (validateId)
+  ├─> change-mgr/rfc.ts (loadRfcStatuses)
+  │     └─> change-mgr/rfc-machine.ts (assertRfcTransition)
+  ├─> trace-engine/coverage.ts (getCoverage)
+  │     ├─> trace-engine/matrix.ts (parseMatrix)
+  │     ├─> trace-engine/exception-validator.ts (validateExceptions)
+  │     └─> change-mgr/rfc.ts (loadRfcStatuses)
+  ├─> trace-engine/exception-validator.ts (validateExceptions)
+  │     └─> shared/fs-utils.ts (readMarkdown, parseMarkdownTable)
+  ├─> gate-engine/sca.ts (getCriticalCountFromAnalysisReport)
+  ├─> gate-engine/command-gate.ts (runCommandGate)
+  └─> shared/logger.ts (appendJsonl)
 ```
 
-## 模块间依赖详情
-
-### cli 依赖
-
-| 依赖模块 | 引用次数 | 主要用途 |
-|----------|----------|----------|
-| shared/types.js | 20+ | 类型定义 (ExitCode, Stage, etc.) |
-| shared/fs-utils.js | 10+ | 文件操作 |
-| shared/config-schema.js | 5+ | 配置管理 |
-| core/process-engine | 8+ | Feature 初始化、阶段流转 |
-| core/trace-engine | 5+ | ID 生成、查询、矩阵 |
-| core/change-mgr | 3+ | RFC、缺陷管理 |
-| core/gate-engine | 3+ | 门禁评估 |
-| core/tool-integration | 8+ | Hook 安装、AI 集成 |
-
-### core 内部依赖
-
-| 模块 | 主要依赖 | 被依赖 |
-|------|----------|--------|
-| process-engine | shared | cli, gate-engine, tool-integration |
-| trace-engine | shared | cli, gate-engine, change-mgr |
-| skill-runtime | shared, process-engine | ai-orchestrator, tool-integration |
-| ai-orchestrator | shared, skill-runtime | cli |
-| gate-engine | shared, trace-engine | cli, process-engine |
-| change-mgr | shared, trace-engine | cli, gate-engine |
-
-## 入口代码索引
-
-| 我想... | 入口文件 | 入口函数 | 调用路径 |
-|---------|----------|----------|----------|
-| 添加新命令 | cli/router.ts | registerCommand() | 路径1 |
-| 添加新 Stage | shared/types.ts | Stage enum | → process-engine/stage-machine.ts |
-| 执行 AI 编排 | core/ai-orchestrator/auto-loop.ts | autoLoop() | 路径3 |
-| 添加质量门禁 | core/gate-engine/gate-evaluator.ts | evaluateGate() | 路径4 |
-| 生成追溯 ID | core/trace-engine/id-generator.ts | nextId() | 路径2 |
-| 添加新 Skill | skills/spec-first/NN-name/SKILL.md | - | → skill-runtime/dispatcher.ts |
-
-## 技术栈依赖
-
-### 外部依赖（核心）
-
-| 包名 | 版本 | 用途 | 被依赖位置 |
-|------|------|------|------------|
-| typescript | ^5.4.2 | 类型系统 | 全项目 |
-- vitest | ^3.0.0 | 测试框架 | tests/ |
-- handlebars | ^4.7.8 | 模板引擎 | core/template/ |
-- js-yaml | ^4.1.0 | YAML 解析 | shared/config-schema.ts |
-- chalk | ^5.3.0 | 终端颜色 | cli/ |
-
-### 内部依赖（共享类型）
+### 3.5 上下文组装调用链
 
 ```
-shared/types.ts (核心类型定义)
-  ├── 被 cli 的所有命令引用
-  ├── 被 core 的所有模块引用
-  ├── 定义了 Stage 枚举 (00_init → 08_done/09_cancelled)
-  ├── 定义了 ID 类型 (FR, DS, TASK, TC, RFC, REQ, etc.)
-  ├── 定义了 ExitCode (成功/失败码)
-  └── 定义了 Feature, StageState 等核心数据结构
+skill-runtime/prompt-assembler.ts (assemblePrompt)
+  ├─> shared/config-schema.ts (loadConfig)
+  ├─> shared/fs-utils.ts (readMarkdown, exists)
+  ├─> shared/types.ts (StageState)
+  └─> readCurrentFeature, readCurrentStage, readCurrentTask
+        └─> shared/fs-utils.ts (readJson)
+
+ai-orchestrator/context-pack.ts (buildContextPack)
+  ├─> shared/types.ts (StageState)
+  ├─> shared/fs-utils.ts (readJson, readMarkdown)
+  ├─> shared/config-schema.ts (loadConfig)
+  └─> ai-orchestrator/context-slicing.ts (sliceContext)
+
+ai-orchestrator/catchup.ts (catchup)
+  ├─> shared/types.ts (StageState)
+  ├─> shared/fs-utils.ts (readJson, exists, readMarkdown)
+  ├─> shared/config-schema.ts (loadConfig)
+  ├─> ai-orchestrator/todo-runner.ts (loadTodoState, summarizeTodoState)
+  └─> ai-orchestrator/context-pack.ts (buildTaskContextPack)
 ```
 
-## 架构分层
+## 4. 模块符号概览
 
+### 4.1 process-engine
+
+| 文件 | 导出函数/类 |
+|------|-----------|
+| `init.ts` | `init`, `createInitialStageState`, `generateFeatureId`, `registerFeat`, `skeletonConstitution`, `skeletonMatrix`, `skeletonTaskPlan` |
+| `advance.ts` | `advance`, `cancel`, `GateFailedError`, `GateUnavailableError` |
+| `stage-machine.ts` | `assertTransitionAllowed`, `getNextStages`, `isTerminal`, `TransitionError` |
+| `feature.ts` | `getFeatureState`, `resolveFeatureId` |
+| `extensions.ts` | `loadEnabledExtensions` |
+| `layer-merger.ts` | `mergeLayerRules` |
+
+### 4.2 skill-runtime
+
+| 文件 | 导出函数/类 |
+|------|-----------|
+| `dispatcher.ts` | `dispatchCommand`, `resolveSkillPath`, `loadSkill` |
+| `prompt-assembler.ts` | `assemblePrompt`, `resolvePromptAssemblyContext`, `validateKvCacheStability` |
+| `hard-gate.ts` | `buildHardGateRuntimeNotice`, `evaluateSkillHardGate`, `assessHighRiskChanges` |
+| `orchestrate-args.ts` | `validateOrchestrateArgs` (类型: `OrchestrateArgs`) |
+| `idempotent-write.ts` | `idempotentWrite` |
+| `confirm-policy.ts` | `getConfirmPolicy` |
+| `phase-machine.ts` | `assertPhaseTransition`, `getNextPhases` |
+| `front-matter.ts` | `parseSkillFrontMatter`, `resolveWriteMode` |
+
+### 4.3 ai-orchestrator
+
+| 文件 | 导出函数/类 |
+|------|-----------|
+| `auto-loop.ts` | `runAutoLoop`, `checkpoint`, `haltState` (类型: `TaskExecutor`, `AutoLoopOptions`, `AutoLoopResult`) |
+| `catchup.ts` | `catchup`, `getRequiredFiles`, `resetLocks` |
+| `context-pack.ts` | `buildContextPack`, `buildTaskContextPack`, `validateControlSize` (类型: `ContextPack`, `ContextRef`) |
+| `todo-runner.ts` | `loadTodoState`, `pickReadyTodos`, `updateTodoStatus`, `createAutoLoopState` |
+| `completion-detector.ts` | `loadCompletionMarkers`, `runFullCompletionDetection` |
+| `slop-checker.ts` | `loadSlopRules`, `runSlopCheck` |
+| `mcp-checker.ts` | `checkRequiredMcps` |
+| `watchdog.ts` | `runWatchdogCheck`, `updateHeartbeat` |
+| `audit-log.ts` | `writeAuditLog`, `readAuditLog` |
+| `context-slicing.ts` | `sliceContext` |
+| `context-provider.ts` | `provideContext` |
+| `ai-stats.ts` | `readStats`, `summarizeStats`, `appendStats` |
+| `retry-controller.ts` | `shouldRetry`, `calculateBackoff` |
+| `catchup-summary.ts` | `buildCatchupSummary`, `extractFiveQuestions` |
+
+### 4.4 gate-engine
+
+| 文件 | 导出函数/类 |
+|------|-----------|
+| `gate-evaluator.ts` | `evaluateGate`, `getConditions`, `getGateHistory` (类型: `GateConditionDef`, `EvalContext`) |
+| `command-gate.ts` | `runCommandGate` |
+| `security.ts` | `validateSecurity`, `parseSecurityReport` |
+| `sca.ts` | `runSca`, `analyzeArtifacts`, `getCriticalCountFromAnalysisReport` |
+| `golive.ts` | `checkGoLive` |
+| `rollback.ts` | `executeRollback` |
+
+### 4.5 trace-engine
+
+| 文件 | 导出函数/类 |
+|------|-----------|
+| `id-generator.ts` | `nextId`, `assembleId`, `validateAbbr`, `findNextSeq` (类型: `NextIdOptions`, `NextIdResult`) |
+| `id-validator.ts` | `validateId` |
+| `id-search.ts` | `searchId`, `listIds` |
+| `matrix.ts` | `parseMatrix`, `checkMatrix`, `exportMatrix`, `updateMatrixRow`, `parseMatrixIds` |
+| `coverage.ts` | `getCoverage` |
+| `exception-validator.ts` | `validateExceptions`, `parseExceptionTable` |
+
+### 4.6 change-mgr
+
+| 文件 | 导出函数/类 |
+|------|-----------|
+| `rfc.ts` | `createRfc`, `submitRfc`, `transitionRfc`, `listRfc`, `getRfc`, `loadRfcStatuses`, `nextRfcSeq` |
+| `rfc-machine.ts` | `assertRfcTransition`, `getNextRfcStatuses`, `isRfcTerminal`, `RfcTransitionError` |
+| `defect.ts` | `createDefect`, `updateDefect`, `transitionDefect`, `getDefect`, `listDefects` |
+| `defect-machine.ts` | `assertDefectTransition`, `getNextDefectStatuses` |
+| `sync.ts` | `syncWaiversToMatrix`, `syncDefectsToMatrix` |
+| `impact.ts` | `analyzeImpact` |
+
+### 4.7 shared
+
+| 文件 | 导出函数/类型 |
+|------|--------------|
+| `types.ts` | `Stage`, `ExitCode`, `StageState`, `GateResult`, `MatrixRow`, `RfcRecord`, `DefectRecord`, `CoverageMetrics`, 各种枚举 |
+| `fs-utils.ts` | `readJson`, `writeJson`, `readMarkdown`, `writeMarkdown`, `exists`, `ensureDir`, `appendJsonl`, `parseMarkdownTable` |
+| `validators.ts` | `isStageState`, `isRfcRecord`, `isDefectRecord`, `isMatrixRow` |
+| `logger.ts` | `writeLog` |
+| `config-schema.ts` | `loadConfig`, `renderDefaultConfigYaml`, `resetConfigCache` |
+| `host-paths.ts` | `detectHostPaths` |
+| `skill-commands.ts` | `ensureSkillCommands` |
+| `host-bootstrap.ts` | `ensureHostBootstrap` |
+
+## 5. 循环依赖分析
+
+### 5.1 已识别的循环依赖
+
+当前设计中的准循环依赖（通过接口解耦）：
+
+1. **gate-engine <-> trace-engine <-> change-mgr**
+   - `gate-evaluator.ts` 依赖 `trace-engine/coverage.ts` 和 `change-mgr/rfc.ts`
+   - `trace-engine/coverage.ts` 依赖 `change-mgr/rfc.ts`
+   - 解耦方式：通过函数参数传递数据，而非模块间直接引用
+
+2. **process-engine <-> gate-engine**
+   - `advance.ts` 依赖 `gate-evaluator.ts`
+   - 解耦方式：单向依赖，无反向引用
+
+### 5.2 潜在风险点
+
+1. **skill-runtime 与 process-engine**
+   - `dispatcher.ts` 依赖 `process-engine/extensions.ts`
+   - 建议：考虑将 extensions 独立为 shared 模块
+
+2. **ai-orchestrator 与 skill-runtime**
+   - `auto-loop.ts` 依赖多个 `skill-runtime` 模块
+   - 建议：定义清晰的接口边界
+
+## 6. 数据流图
+
+```mermaid
+flowchart LR
+    User[用户输入] --> CLI[CLI 命令]
+    CLI --> Router[命令路由]
+    Router --> Runtime[Runtime 处理器]
+    Router --> Skill[Skill 分发器]
+
+    Runtime --> PE[Process Engine]
+    PE --> GE[Gate Engine]
+    GE --> TE[Trace Engine]
+    GE --> CM[Change Manager]
+
+    Skill --> SR[Skill Runtime]
+    SR --> PA[Prompt Assembler]
+    SR --> HG[Hard Gate]
+    SR --> AO[AI Orchestrator]
+
+    AO --> AL[Auto Loop]
+    AO --> CP[Context Pack]
+    AO --> CC[Catchup]
+
+    PE --> FS[文件系统]
+    GE --> FS
+    TE --> FS
+    CM --> FS
+    SR --> FS
+    AO --> FS
+
+    subgraph Shared
+        ST[types]
+        SF[fs-utils]
+        SV[validators]
+        SC[config-schema]
+    end
+
+    FS --> SF
+    PE --> ST
+    GE --> ST
+    SR --> ST
+    AO --> ST
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        cli / tests                          │  入口/测试层
-│  (用户命令、单元测试)                                        │
-└─────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────┐
-│                          core                               │  核心业务层
-│  ┌───────────┬───────────┬───────────┬─────────────────────┐ │
-│  │  process  │   trace   │   skill   │  ai-orchestrate     │ │
-│  │  -engine  │  -engine  │ -runtime  │                     │ │
-│  ├───────────┼───────────┼───────────┼─────────────────────┤ │
-│  │    gate   │  change   │  template │  tool-integration   │ │
-│  │  -engine  │    -mgr   │           │                     │ │
-│  └───────────┴───────────┴───────────┴─────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────┐
-│                         shared                              │  共享基础层
-│  (类型定义、工具函数、配置管理)                               │
-└─────────────────────────────────────────────────────────────┘
+
+## 7. 关键接口契约
+
+### 7.1 StageState
+
+```typescript
+interface StageState {
+  featureId: string;
+  currentStage: Stage;
+  mode: Mode;
+  size: Size;
+  platforms: string[];
+  terminal: boolean;
+  createdAt: string;
+  updatedAt: string;
+  history: StageHistoryEntry[];
+  mergedRules?: MergedRules;  // Layer2 扩展规则
+}
 ```
 
----
+### 7.2 GateResult
 
-*分析时间: 2026-02-28 | 分析方法: Serena MCP LSP + 静态 import 分析 | 深度: module*
+```typescript
+interface GateResult {
+  status: GateStatus;  // 'PASS' | 'FAIL' | 'PASS_WITH_WAIVER'
+  stage: Stage;
+  timestamp: string;
+  conditions: ConditionResult[];
+  waivers?: WaiverRef[];
+  suggestions?: string[];
+}
+```
+
+### 7.3 ContextPack
+
+```typescript
+interface ContextPack {
+  control: ControlZone[];
+  context: ContextRef[];
+  estimatedTokens: number;
+}
+```
+
+## 8. 总结
+
+### 8.1 架构特点
+
+1. **分层清晰**：shared → core → cli 的三层架构
+2. **模块独立**：每个核心引擎模块（trace-engine, gate-engine, process-engine 等）职责明确
+3. **弱耦合**：通过函数参数传递数据，避免紧密耦合
+4. **可扩展**：支持 Layer2 扩展规则机制
+
+### 8.2 改进建议
+
+1. **extensions.ts 定位**：考虑将 `process-engine/extensions.ts` 移至 `shared/` 或独立的 `extensions/` 模块
+2. **context-sync 定位**：考虑将 `tool-integration/context-sync.ts` 的功能整合到更合适的模块
+3. **类型导出**：考虑将核心接口定义集中到 `shared/interfaces.ts` 中
+4. **测试覆盖**：建议为每个关键调用路径添加集成测试
+
+### 8.3 维护建议
+
+1. 保持 `shared/` 模块对 `core/` 的零依赖
+2. 新增模块时优先参考现有模块的依赖模式
+3. 修改接口时同步更新对应文档
+4. 定期运行循环依赖检测工具

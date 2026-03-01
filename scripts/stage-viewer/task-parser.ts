@@ -150,35 +150,6 @@ export interface CoverageMetrics {
   C9: number;
 }
 
-export function getDefaultMetrics(featureId: string, projectRoot: string): CoverageMetrics {
-  const matrixPath = join(projectRoot, 'specs', featureId, 'traceability-matrix.md');
-  const metrics: CoverageMetrics = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0, C6: 0, C7: 1, C8: 1, C9: 1 };
-
-  if (existsSync(matrixPath)) {
-    const content = readFileSync(matrixPath, 'utf-8');
-    // 统计 FR/DS/TASK/TC 数量
-    const frCount = (content.match(/\| FR-/g) || []).length;
-    const dsCount = (content.match(/\| DS-/g) || []).length;
-    const taskCount = (content.match(/\| TASK-/g) || []).length;
-    const tcCount = (content.match(/\| TC-/g) || []).length;
-
-    if (frCount > 0) {
-      metrics.C1 = Math.min(dsCount / frCount, 1);
-      metrics.C2 = metrics.C1;
-      metrics.C3 = Math.min(taskCount / frCount, 1);
-      metrics.C4 = Math.min(tcCount / frCount, 1);
-      metrics.C5 = metrics.C4;
-    }
-    if (taskCount > 0) {
-      // 检查实现状态
-      const implemented = (content.match(/Implemented|Verified|Accepted/g) || []).length;
-      metrics.C6 = Math.min(implemented / taskCount, 1);
-    }
-  }
-
-  return metrics;
-}
-
 /**
  * 健康分数计算
  */
@@ -188,36 +159,5 @@ export interface HealthResult {
   breakdown: Record<string, number>;
 }
 
-const WEIGHTS: Record<string, number> = {
-  C1: 0.12, C2: 0.10, C3: 0.10, C4: 0.15,
-  C5: 0.10, C6: 0.13, C7: 0.10, C8: 0.10, C9: 0.10,
-};
-
-function getGrade(score: number): string {
-  if (score >= 90) return 'A';
-  if (score >= 80) return 'B';
-  if (score >= 70) return 'C';
-  if (score >= 60) return 'D';
-  return 'F';
-}
-
-export function calcHealthScore(coverage: Partial<CoverageMetrics>, escapeRate = 0): HealthResult {
-  let weighted = 0;
-  const breakdown: Record<string, number> = {};
-
-  for (const [key, weight] of Object.entries(WEIGHTS)) {
-    const val = Math.min(coverage[key as keyof CoverageMetrics] ?? 0, 1.0);
-    breakdown[key] = val * weight * 100;
-    weighted += val * weight;
-  }
-
-  const penalty = Math.min(escapeRate * 200, 50);
-  const rawH1 = Math.max(0, Math.min(100, weighted * 100 - penalty));
-  const H1 = Math.round(rawH1 * 10) / 10;
-
-  return {
-    H1,
-    grade: getGrade(H1),
-    breakdown,
-  };
-}
+// S5: 从共享模块 re-export，消除重复实现
+export { getDefaultMetrics, calcHealthScore } from './health-utils.js';

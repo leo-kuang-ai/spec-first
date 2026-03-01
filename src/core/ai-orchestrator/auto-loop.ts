@@ -3,6 +3,7 @@
  * pick → execute → checkpoint → iteration
  * @see TASK-ORCH-003, V2-13§5.1
  */
+import { readFileSync } from 'node:fs';
 import {
   loadTodoState,
   saveTodoState,
@@ -17,7 +18,14 @@ import type {
   HaltReasonCode,
 } from './todo-runner.js';
 import { loadConfig } from '../../shared/config-schema.js';
+import { exists } from '../../shared/fs-utils.js';
 import type { OrchestrateArgs } from '../skill-runtime/orchestrate-args.js';
+import { parseSkillFrontMatter, resolveWriteMode } from '../skill-runtime/front-matter.js';
+import type { SkillFrontMatter } from '../skill-runtime/front-matter.js';
+import { idempotentWrite } from '../skill-runtime/idempotent-write.js';
+import { loadCompletionMarkers, runFullCompletionDetection } from './completion-detector.js';
+import { checkRequiredMcps } from './mcp-checker.js';
+import { loadSlopRules, runSlopCheck } from './slop-checker.js';
 import { writeAuditLog } from './audit-log.js';
 import { runWatchdogCheck, updateHeartbeat, updateWatchdogCheckedAt } from './watchdog.js';
 
@@ -28,6 +36,14 @@ export type TaskExecutor = (task: TodoItem, state: TodoRunnerState) => Promise<T
 export interface TaskResult {
   success: boolean;
   message: string;
+  /** 产出关联 Skill 文件路径（用于 front matter 解析） */
+  skillPath?: string;
+  /** 生成内容（优先级高于 outputPath） */
+  outputContent?: string;
+  /** 生成内容文件路径（用于 completion/slop 检测） */
+  outputPath?: string;
+  /** 幂等写入目标路径（结合 write_mode） */
+  writePath?: string;
 }
 
 export interface AutoLoopOptions {
@@ -44,6 +60,11 @@ export interface AutoLoopResult {
   haltReason?: string;
   iterations: number;
   completedTasks: string[];
+}
+
+interface GuardResult {
+  passed: boolean;
+  reason?: string;
 }
 
 // ─── 状态初始化 ─────────────────────────────────────────
@@ -143,6 +164,25 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
       }
 
       if (result.success) {
+        const guard = runPostWriteGuards(task, result, featureId, projectRoot);
+        if (!guard.passed) {
+          state = updateTodoStatus(state, task.id, 'blocked');
+          state = updateAutoLoopLastResult(state, task.id, 'blocked', guard.reason ?? 'post-write guard failed');
+          writeAuditLog({
+            event: 'task_blocked',
+            featureId,
+            taskId: task.id,
+            detail: { message: guard.reason ?? 'post-write guard failed' },
+          }, projectRoot);
+
+          if (cfg.runtime.auto_orchestrate.stop_on_blocked) {
+            state = haltState(state, 'blocked', task.id);
+            checkpoint(state, projectRoot, onCheckpoint);
+            return buildResult(state, startIteration, completedTasks);
+          }
+          continue;
+        }
+
         state = updateTodoStatus(state, task.id, 'done');
         state = updateAutoLoopLastResult(state, task.id, 'done', result.message);
         completedTasks.push(task.id);
@@ -196,6 +236,113 @@ function checkpoint(
 ): void {
   saveTodoState(state, projectRoot);
   onCheckpoint?.(state);
+}
+
+function resolveTaskOutput(result: TaskResult): string | undefined {
+  if (typeof result.outputContent === 'string') {
+    return result.outputContent;
+  }
+  if (!result.outputPath || !exists(result.outputPath)) {
+    return undefined;
+  }
+  try {
+    return readFileSync(result.outputPath, 'utf-8');
+  } catch {
+    return undefined;
+  }
+}
+
+function runPostWriteGuards(
+  task: TodoItem,
+  result: TaskResult,
+  featureId: string,
+  projectRoot: string,
+): GuardResult {
+  const skillMeta: SkillFrontMatter = result.skillPath
+    ? parseSkillFrontMatter(result.skillPath)
+    : {};
+
+  const requiredMcps = skillMeta.required_mcps ?? [];
+  if (requiredMcps.length > 0) {
+    const mcpReport = checkRequiredMcps(requiredMcps);
+    writeAuditLog({
+      event: 'required_mcps_checked',
+      featureId,
+      taskId: task.id,
+      detail: {
+        required: requiredMcps,
+        missing: mcpReport.missing,
+      },
+    }, projectRoot);
+
+    if (!mcpReport.passed) {
+      return {
+        passed: false,
+        reason: `missing required_mcps: ${mcpReport.missing.join(', ')}`,
+      };
+    }
+  }
+
+  const output = resolveTaskOutput(result);
+  if (output == null) {
+    return { passed: true };
+  }
+
+  if (result.writePath) {
+    const writeMode = resolveWriteMode(skillMeta);
+    const writeResult = idempotentWrite(result.writePath, output, writeMode);
+    writeAuditLog({
+      event: 'idempotent_write',
+      featureId,
+      taskId: task.id,
+      detail: {
+        path: writeResult.path,
+        mode: writeResult.mode,
+        written: writeResult.written,
+      },
+    }, projectRoot);
+  }
+
+  const markers = loadCompletionMarkers(skillMeta, projectRoot);
+  const completion = runFullCompletionDetection(output, markers);
+  writeAuditLog({
+    event: 'completion_checked',
+    featureId,
+    taskId: task.id,
+    detail: {
+      passed: completion.passed,
+      failureReasons: completion.failureReasons,
+    },
+  }, projectRoot);
+  if (!completion.passed) {
+    return {
+      passed: false,
+      reason: `completion guard failed: ${completion.failureReasons.join('; ') || 'unknown reason'}`,
+    };
+  }
+
+  const slopReport = runSlopCheck(output, loadSlopRules(projectRoot));
+  writeAuditLog({
+    event: 'slop_checked',
+    featureId,
+    taskId: task.id,
+    detail: {
+      passed: slopReport.passed,
+      errorCount: slopReport.errorCount,
+      warningCount: slopReport.warningCount,
+    },
+  }, projectRoot);
+  if (!slopReport.passed) {
+    const firstError = slopReport.hits.find((hit) => hit.severity === 'error');
+    return {
+      passed: false,
+      reason: firstError
+        ? `slop error L${firstError.line}: ${firstError.message}`
+        : 'slop checker failed',
+    };
+  }
+
+  return { passed: true };
 }
 
 function markTaskStarted(state: TodoRunnerState, taskId: string): TodoRunnerState {

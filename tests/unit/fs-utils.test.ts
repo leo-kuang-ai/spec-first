@@ -3,7 +3,7 @@ import { mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   readJson, writeJson, readMarkdown, writeMarkdown,
-  appendJsonl, ensureDir, exists,
+  appendJsonl, ensureDir, exists, readJsonChecked,
 } from '../../src/shared/fs-utils.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-fs');
@@ -90,5 +90,36 @@ describe('ensureDir / exists', () => {
     ensureDir(d);
     ensureDir(d);
     expect(exists(d)).toBe(true);
+  });
+});
+
+describe('I2: assertSafePath improvements', () => {
+  it('should allow absolute paths with .. segments (resolve them)', () => {
+    const p = join(TMP, 'sub/../test-resolve.json');
+    writeJson(p, { resolved: true });
+    // resolve 后 sub/.. 消除，文件写入 TMP/test-resolve.json
+    expect(readJson(join(TMP, 'test-resolve.json'))).toEqual({ resolved: true });
+  });
+
+  it('should reject relative paths', () => {
+    expect(() => readJson('relative/path.json')).toThrow('路径遍历');
+    expect(() => readJson('./local.json')).toThrow('路径遍历');
+  });
+});
+
+describe('I3: readJsonChecked', () => {
+  const isObj = (d: unknown): d is { name: string } =>
+    typeof d === 'object' && d !== null && typeof (d as Record<string, unknown>).name === 'string';
+
+  it('should return data when guard passes', () => {
+    const p = join(TMP, 'valid.json');
+    writeJson(p, { name: 'test', extra: 1 });
+    expect(readJsonChecked(p, isObj)).toEqual({ name: 'test', extra: 1 });
+  });
+
+  it('should throw when guard fails', () => {
+    const p = join(TMP, 'invalid.json');
+    writeJson(p, { wrong: 'shape' });
+    expect(() => readJsonChecked(p, isObj)).toThrow('不符合预期');
   });
 });

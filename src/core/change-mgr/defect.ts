@@ -5,7 +5,8 @@
 import { join } from 'node:path';
 import { readdirSync } from 'node:fs';
 import type { DefectStatus, SecuritySeverity, DefectRecord, Stage } from '../../shared/types.js';
-import { readJson, writeJson, exists, ensureDir } from '../../shared/fs-utils.js';
+import { readJson, readJsonChecked, writeJson, exists, ensureDir } from '../../shared/fs-utils.js';
+import { isDefectRecord } from '../../shared/validators.js';
 import { assertDefectTransition } from './defect-machine.js';
 
 // ─── 类型 ────────────────────────────────────────────────
@@ -94,7 +95,7 @@ export function getDefect(
   if (!exists(p)) {
     throw new Error(`未找到缺陷 #${seq}（${featureId}）`);
   }
-  return readJson<DefectRecord>(p);
+  return readJsonChecked(p, isDefectRecord);
 }
 
 /** 缺陷状态流转 */

@@ -4,7 +4,7 @@
  */
 import { join } from 'node:path';
 import type { MatrixRow, MatrixStatus, IdType } from '../../shared/types.js';
-import { readMarkdown, writeMarkdown, exists } from '../../shared/fs-utils.js';
+import { readMarkdown, writeMarkdown, exists, parseMarkdownTable } from '../../shared/fs-utils.js';
 import { validateId } from './id-validator.js';
 
 /** 矩阵校验结果 */
@@ -118,20 +118,26 @@ function getMatrixPath(projectRoot: string, featureId: string): string {
   return join(projectRoot, 'specs', featureId, 'traceability-matrix.md');
 }
 
+/**
+ * 从矩阵 Markdown 表格中解析所有 ID
+ * 提取为共享函数，避免在 id-generator.ts 和 id-search.ts 中重复实现
+ */
+export function parseMatrixIds(matrixPath: string): string[] {
+  if (!exists(matrixPath)) return [];
+
+  const content = readMarkdown(matrixPath);
+  const ids: string[] = [];
+  for (const cells of parseMarkdownTable(content)) {
+    if (cells.length > 0 && cells[0]) ids.push(cells[0]);
+  }
+  return ids;
+}
+
 /** 解析 Markdown 表格内容为 MatrixRow[] */
 function parseMatrixContent(content: string): MatrixRow[] {
   const rows: MatrixRow[] = [];
-
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| ID')) {
-      continue;
-    }
-
-    // slice(1, -1) 去掉首尾空串，保留中间空单元格
-    const cells = trimmed.split('|').map(c => c.trim()).slice(1, -1);
+  for (const cells of parseMarkdownTable(content)) {
     if (cells.length < 4) continue;
-
     const id = cells[0];
     const validation = validateId(id);
     const type: IdType = validation.type ?? 'Feature';
@@ -140,14 +146,12 @@ function parseMatrixContent(content: string): MatrixRow[] {
     const upstream = parseRefList(cells[4]);
     const downstream = parseRefList(cells[5]);
 
-    // 提取 NFR 标签
     let nfrTag: string | undefined;
     const nfrMatch = title.match(/\[NFR:(\w+)\]/);
     if (nfrMatch) nfrTag = nfrMatch[1];
 
     rows.push({ id, type, title, status, upstream, downstream, nfrTag });
   }
-
   return rows;
 }
 

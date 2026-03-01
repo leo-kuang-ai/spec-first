@@ -2,6 +2,7 @@
  * Security Severity Validation
  * S1-S4 安全扫描结果聚合与 Gate 判定
  */
+import { parseMarkdownTable } from '../../shared/fs-utils.js';
 
 export type Severity = 'S1' | 'S2' | 'S3' | 'S4';
 
@@ -54,16 +55,10 @@ export function validateSecurity(findings: SecurityFinding[]): SecurityResult {
 /** 从安全扫描报告文件解析 findings（简化版：按行解析 Markdown 表格） */
 export function parseSecurityReport(content: string): SecurityFinding[] {
   const findings: SecurityFinding[] = [];
-  for (const line of content.split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || trimmed.startsWith('|--') || trimmed.startsWith('| ID')) continue;
-
-    const cells = trimmed.split('|').map(c => c.trim()).slice(1, -1);
+  for (const cells of parseMarkdownTable(content)) {
     if (cells.length < 3) continue;
-
     const severity = cells[1] as Severity;
     if (!['S1', 'S2', 'S3', 'S4'].includes(severity)) continue;
-
     findings.push({
       id: cells[0],
       severity,

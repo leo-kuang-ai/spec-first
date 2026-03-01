@@ -245,6 +245,13 @@ describe('catchup', () => {
     catchup(FEAT, TMP);
     const result2 = catchup(FEAT, TMP);
     expect(result2.summary).toContain('跳过');
+    expect(result2.skipped).toBe(true);  // I5: verify skipped flag
+  });
+
+  it('should set skipped to false for normal calls', () => {
+    writeState('00_init');
+    const result = catchup(FEAT, TMP);
+    expect(result.skipped).toBe(false);  // I5: normal execution is not skipped
   });
 
   it('should report missing stage-state.json', () => {

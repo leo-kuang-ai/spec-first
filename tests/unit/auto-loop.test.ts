@@ -3,7 +3,7 @@
  * @see TASK-ORCH-003 auto-loop 主循环接入
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, rmSync, readFileSync } from 'node:fs';
+import { mkdirSync, rmSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   initTodoState,
@@ -14,18 +14,21 @@ import type { TodoItem, TodoRunnerState } from '../../src/core/ai-orchestrator/t
 import { runAutoLoop } from '../../src/core/ai-orchestrator/auto-loop.js';
 import type { TaskExecutor } from '../../src/core/ai-orchestrator/auto-loop.js';
 import { resetConfigCache } from '../../src/shared/config-schema.js';
+import { clearAvailableMcps, registerAvailableMcp } from '../../src/core/ai-orchestrator/mcp-checker.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-auto-loop');
 const FEAT = 'FSREQ-AUTO-001';
 
 beforeEach(() => {
   resetConfigCache();
+  clearAvailableMcps();
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
 });
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
+  clearAvailableMcps();
   resetConfigCache();
 });
 
@@ -215,5 +218,105 @@ describe('auto-loop blocked & halt', () => {
     expect(result.halted).toBe(true);
     expect(result.haltReason).toBe('no_state_file');
     expect(result.iterations).toBe(0);
+  });
+});
+
+// ─── (e) post-write guards 集成（ORCH-009/010/015/019/020） ───
+
+describe('auto-loop post-write guards', () => {
+  it('required_mcps 缺失时应阻断并 halt', async () => {
+    seedState(makeItems(['T1']));
+    const skillDir = join(TMP, 'skills', 'spec-first', '99-guard');
+    const skillPath = join(skillDir, 'SKILL.md');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(skillPath, '---\nrequired_mcps:\n  - missing-mcp\n---\n# Guard Skill\n', 'utf-8');
+
+    const result = await runAutoLoop({
+      featureId: FEAT,
+      projectRoot: TMP,
+      args: autoArgs,
+      executor: async () => ({
+        success: true,
+        message: 'ok',
+        skillPath,
+      }),
+    });
+
+    expect(result.halted).toBe(true);
+    expect(result.haltReason).toContain('blocked');
+    expect(loadTodoState(FEAT, TMP)!.items[0].status).toBe('blocked');
+  });
+
+  it('completion/slop 通过时写入成功并完成 TASK', async () => {
+    seedState(makeItems(['T1']));
+    registerAvailableMcp('mcp-a');
+
+    const skillDir = join(TMP, 'skills', 'spec-first', '99-guard');
+    const skillPath = join(skillDir, 'SKILL.md');
+    const outputPath = join(TMP, 'specs', FEAT, 'delivery.md');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(
+      skillPath,
+      [
+        '---',
+        'required_mcps:',
+        '  - mcp-a',
+        'write_mode: overwrite',
+        'completion_markers:',
+        '  - contains_pattern: "## Summary"',
+        '  - min_entities: 1',
+        '---',
+        '# Guard Skill',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    const result = await runAutoLoop({
+      featureId: FEAT,
+      projectRoot: TMP,
+      args: autoArgs,
+      executor: async () => ({
+        success: true,
+        message: 'ok',
+        skillPath,
+        outputContent: '## Summary\n\nDelivery content',
+        writePath: outputPath,
+      }),
+    });
+
+    expect(result.halted).toBe(true);
+    expect(result.haltReason).toBe('completed');
+    expect(loadTodoState(FEAT, TMP)!.items[0].status).toBe('done');
+    expect(readFileSync(outputPath, 'utf-8')).toContain('## Summary');
+  });
+
+  it('completion marker 不满足时应阻断', async () => {
+    seedState(makeItems(['T1']));
+
+    const skillDir = join(TMP, 'skills', 'spec-first', '99-guard');
+    const skillPath = join(skillDir, 'SKILL.md');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(
+      skillPath,
+      '---\ncompletion_markers:\n  - contains_pattern: "MUST-HIT"\n---\n# Guard Skill\n',
+      'utf-8',
+    );
+
+    const result = await runAutoLoop({
+      featureId: FEAT,
+      projectRoot: TMP,
+      args: autoArgs,
+      executor: async () => ({
+        success: true,
+        message: 'ok',
+        skillPath,
+        outputContent: 'no marker here',
+      }),
+    });
+
+    expect(result.halted).toBe(true);
+    expect(result.haltReason).toContain('blocked');
+    expect(loadTodoState(FEAT, TMP)!.items[0].status).toBe('blocked');
   });
 });

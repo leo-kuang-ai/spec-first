@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.79 2026-02-28 Claude: feat: 00-first Skill 质量保障强化 — 核心约束增加强制证据标注格式（file:line + 代码片段）、5 个 agent 规格文件补齐证据协议与抽样验证规则、P5 新增交叉一致性验证（V1-V4 四项校验 + 证据抽检）、成功标准同步更新 (user-visible)
+- v0.5.78 2026-02-28 Claude: fix: 00-first Skill 审查修复 — README 模板对齐实际产出、条件产物改为条件渲染、call-graph frontmatter 补全、P3 阶段引用消歧、Serena 工具名修正、description 措辞修正
+- v0.5.77 2026-02-28 Claude: docs: 新增调用链分析文档 — 使用 Serena MCP 分析项目调用链，生成 `docs/first/call-graph.md`，包含模块依赖矩阵、Mermaid 依赖关系图、关键调用路径、模块符号概览、循环依赖分析、数据流图和改进建议 (user-visible)
 - v0.5.76 2026-02-28 Claude: fix: 修复 first Skill 中文描述缺失 — 在 skill-commands.ts 的 SKILL_DESCRIPTION_ZH 映射表中添加 first 描述，确保 `/spec-first:first` 命令在 Claude/Codex 中显示正确的中文说明 (user-visible)
 - v0.5.75 2026-02-28 Claude: docs: 统一 CLI 命令与 README Skill 中文描述 — 对齐 19 个 CLI 命令描述与 skills/spec-first/README.md 中的 Skill 说明，确保用户在不同场景（CLI help/README/AGENTS.md）看到一致的术语与表述 (user-visible)
 - v0.5.74 2026-02-28 Leo: feat: 00-first Skill 新增依赖调用链分析 — 集成 Serena MCP 进行 LSP 级别符号分析，生成模块依赖矩阵和调用关系图，帮助新人快速理解模块间调用关系 (user-visible)

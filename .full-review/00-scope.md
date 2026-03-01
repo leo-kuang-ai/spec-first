@@ -2,75 +2,40 @@
 
 ## Target
 
-**Spec-First Skills Directory** - AI Agent 技能定义与共享上下文
+**00-first Skill** - 项目快速认知 Skill
 
-### Description
-
-包含 21 个 Skill 定义文件和共享的 AGENTS.md 上下文，每个 Skill 定义了 AI Agent 在研发流程各阶段的执行规范。
-
-### Content Type
-
-- Markdown 格式的 Skill 定义 (SKILL.md)
-- 参考文档 (references/)
-- 共享 Agent 指令 (AGENTS.md)
-
----
+该 Skill 用于快速认知一个项目：自动分析目标项目的技术栈、代码结构、架构、API、外部依赖、本地环境、研发规范和数据库，生成结构化文档到 `docs/first/`。
 
 ## Files
 
-### 目录结构
+| 文件 | 行数 | 说明 |
+|------|------|------|
+| `SKILL.md` | ~396 | 主编排文件，定义执行阶段、并发策略、产物清单、成功标准 |
+| `references/detection-rules.md` | ~82 | 12 种语言、20 种框架、多端技术栈、Context7 映射检测规则 |
+| `references/agents-code-analysis.md` | ~122 | Agent A1/A2/A3 规格（代码分析链） |
+| `references/agents-api-deps.md` | ~93 | Agent B/C1 规格（API 与外部依赖） |
+| `references/agent-guidelines-setup.md` | ~119 | Agent C2 规格（研发规范 + 本地环境） |
+| `references/agent-database.md` | ~103 | Agent D 规格（DB 检测 + ER 生成） |
+| `references/agent-domain-model.md` | ~417 | Agent A4 规格（领域模型分析） |
+| `references/subagent-architecture.md` | ~226 | Subagent-Driven 架构设计 |
 
-```
-skills/spec-first/
-├── AGENTS.md (共享上下文，522 行)
-├── 01-init/SKILL.md
-├── 02-catchup/SKILL.md
-├── 03-spec/SKILL.md + references/
-│   ├── spec-review-checklist.md
-│   └── test-level-glossary.md
-├── 04-design/SKILL.md
-├── 05-research/SKILL.md
-├── 06-task/SKILL.md
-├── 07-code/SKILL.md
-├── 08-code-review/SKILL.md + references/
-│   ├── solid-checklist.md
-│   ├── security-checklist.md
-│   ├── performance-checklist.md
-│   └── testing-checklist.md
-├── 09-test/SKILL.md
-├── 10-archive/SKILL.md
-├── 11-plan/SKILL.md
-├── 12-verify/SKILL.md
-├── 13-orchestrate/SKILL.md
-├── 14-status/SKILL.md
-├── 15-doctor/SKILL.md
-├── 16-sync/SKILL.md
-├── 17-feature-list/SKILL.md
-├── 18-feature-switch/SKILL.md
-├── 19-feature-current/SKILL.md
-├── 20-spec-review/SKILL.md
-└── 21-analyze/SKILL.md
-```
-
-### 文件统计
-
-| 类型 | 数量 |
-|------|------|
-| SKILL.md 文件 | 21 |
-| 参考文档 | 6 |
-| AGENTS.md | 1 |
-| **总计** | **28 个 Markdown 文件** |
-
----
+**总代码量**: ~1,558 行 Markdown
 
 ## Flags
 
-- **Security Focus**: no
-- **Performance Critical**: no
-- **Strict Mode**: no
-- **Framework**: Markdown/Documentation-based
+- Security Focus: no
+- Performance Critical: no
+- Strict Mode: no
+- Framework: skill (Claude Code Skill 格式)
 
----
+## Review Dimensions
+
+1. **Architecture** - 架构设计、模块拆分、Agent 协作模式
+2. **Security** - 数据库凭证安全、外部服务访问安全
+3. **Performance** - 并发执行效率、超时控制、降级策略
+4. **Testing** - 成功标准可验证性、边界条件覆盖
+5. **Documentation** - 文档完整性、示例清晰度、可读性
+6. **Best Practices** - Skill 设计模式、可维护性、可扩展性
 
 ## Review Phases
 
@@ -79,22 +44,3 @@ skills/spec-first/
 3. Testing & Documentation
 4. Best Practices & Standards
 5. Consolidated Report
-
----
-
-## 特殊考虑
-
-### Skill 定义文件特点
-
-1. **格式**: Markdown with YAML frontmatter
-2. **目的**: 定义 AI Agent 执行流程和约束
-3. **结构**: 通常包含 P0-P5 阶段、确认策略、Next Steps
-4. **依赖**: 所有 Skill 依赖 AGENTS.md 的共享上下文
-
-### 审查重点
-
-1. **一致性**: Skill 间结构是否一致
-2. **完整性**: 是否遗漏必要章节
-3. **准确性**: CLI 命令引用是否正确
-4. **可维护性**: 更新成本、重复内容
-5. **安全性**: 是否包含敏感信息或不当指令

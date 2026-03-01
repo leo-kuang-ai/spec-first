@@ -1,16 +1,30 @@
 {
-  "target": "Spec-First Skills Directory",
+  "target": "skills/spec-first/00-first/",
   "status": "complete",
   "flags": {
     "security_focus": false,
     "performance_critical": false,
     "strict_mode": false,
-    "framework": "Markdown/Documentation"
+    "framework": "skill"
   },
-  "current_step": 5,
+  "current_step": "5",
   "current_phase": 5,
-  "completed_steps": ["0-scope", "1A-code-quality", "1B-architecture", "2A-security", "2B-performance", "3A-testing", "3B-documentation", "4A-markdown", "4B-devops", "5-final-report"],
-  "files_created": ["00-scope.md", "01-quality-architecture.md", "02-security-performance.md", "03-testing-documentation.md", "04-best-practices.md", "05-final-report-skills.md"],
-  "started_at": "2026-02-27T00:50:00Z",
-  "last_updated": "2026-02-27T01:20:00Z"
+  "completed_steps": ["0", "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5"],
+  "files_created": [
+    "00-scope.md",
+    "01-quality-architecture.md",
+    "02-security-performance.md",
+    "03-testing-documentation.md",
+    "04-best-practices.md",
+    "05-final-report.md"
+  ],
+  "started_at": "2026-02-28T10:30:00Z",
+  "last_updated": "2026-02-28T17:00:00Z",
+  "summary": {
+    "total_findings": 87,
+    "critical": 5,
+    "high": 24,
+    "medium": 34,
+    "low": 24
+  }
 }
