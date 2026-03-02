@@ -10,6 +10,9 @@ import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability 
 import { buildHardGateRuntimeNotice } from './hard-gate.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
 import { validateOrchestrateArgs, type OrchestrateArgs } from './orchestrate-args.js';
+import { validateFirstArgs, resolveFirstConfirmPolicy, resolveFirstModePolicy, type FirstArgs } from './first-args.js';
+import { generateResumeRecommendation, formatResumePrompt, formatProductSummary } from './first-resume.js';
+import { formatHealthStatus, formatChangeAnalysis, checkFirstUpdateContext } from './first-change-detector.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -20,6 +23,12 @@ export interface DispatchResult {
   error?: string;
   /** orchestrate 专用：解析后的参数（仅 skillName=orchestrate 时存在） */
   orchestrateArgs?: OrchestrateArgs;
+  /** first 专用：解析后的参数（仅 skillName=first 时存在） */
+  firstArgs?: FirstArgs;
+  /** first 专用：确认策略（仅 skillName=first 时存在） */
+  firstConfirmPolicy?: 'skip' | 'require';
+  /** first 专用：模式策略（仅 skillName=first 时存在） */
+  firstModePolicy?: 'auto' | 'manual';
 }
 
 /** 语义子命令映射表 */
@@ -131,6 +140,29 @@ export function dispatchCommand(
       }
     }
 
+    // first 专用参数校验（quick/deep 模式）
+    if (skillName === 'first') {
+      try {
+        const firstArgs = validateFirstArgs(rest);
+        const firstConfirmPolicy = resolveFirstConfirmPolicy(firstArgs);
+        const firstModePolicy = resolveFirstModePolicy(firstArgs);
+        return {
+          route: 'skill',
+          skillName,
+          args: rest,
+          skillPath,
+          firstArgs,
+          firstConfirmPolicy,
+          firstModePolicy,
+        };
+      } catch (e) {
+        return {
+          route: 'error',
+          error: e instanceof Error ? e.message : String(e),
+        };
+      }
+    }
+
     return {
       route: 'skill',
       skillName,
@@ -232,7 +264,56 @@ export function loadSkill(
     content = `${hardGateNotice}\n\n${content}`;
   }
 
+  // first skill: 注入会话恢复 + 变更检测上下文
+  if (skillName === 'first') {
+    const firstNotice = buildFirstRuntimeNotice(projectRoot);
+    if (firstNotice) {
+      content = `${firstNotice}\n\n${content}`;
+    }
+  }
+
   return content;
+}
+
+/**
+ * 构建 first skill 运行时上下文通知
+ * 检测已有产物、变更状态、会话恢复建议，注入到 skill prompt 前部
+ */
+function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
+  const firstDir = join(projectRoot, 'docs', 'first');
+  const resume = generateResumeRecommendation(firstDir, projectRoot);
+
+  if (!resume.hasExistingProducts) return undefined;
+
+  const parts: string[] = [];
+  parts.push('<!-- first-runtime-context -->');
+
+  // 会话恢复提示
+  parts.push(formatResumePrompt(resume));
+
+  // 变更分析（如有已有产物）
+  const ctx = checkFirstUpdateContext(projectRoot);
+  if (ctx.hasExistingOutput) {
+    parts.push('');
+    parts.push(formatHealthStatus(ctx));
+    if (ctx.changeAnalysis && ctx.changeAnalysis.changedFiles > 0) {
+      parts.push(formatChangeAnalysis(ctx.changeAnalysis));
+    }
+  }
+
+  // 产物摘要
+  const summary = formatProductSummary(firstDir);
+  if (summary && !summary.startsWith('❌')) {
+    parts.push('');
+    parts.push(summary);
+  }
+
+  parts.push('<!-- /first-runtime-context -->');
+  return parts.join('\n');
+}
+
+export function getFirstRuntimeNotice(projectRoot: string): string | undefined {
+  return buildFirstRuntimeNotice(projectRoot);
 }
 
 function inferSkillNameFromPath(skillPath: string): string {

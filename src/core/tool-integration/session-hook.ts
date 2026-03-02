@@ -42,8 +42,11 @@ function buildSessionStartCommand(specFirstBin: string): string {
     'echo "[spec-first] 1%规则: 有1%相关性也先走skill检查，不要直接执行"; ',
     // 自动恢复策略（默认 prompt）
     'TRIGGER=prompt; ',
-    'if [ -f .spec-first/config.yaml ]; then ',
-    '  CFG_TRIGGER=$(awk "BEGIN{inCatchup=0} /^[[:space:]]*catchup:[[:space:]]*$/ {inCatchup=1; next} inCatchup && /^[^[:space:]]/ {inCatchup=0} inCatchup && /^[[:space:]]*trigger:[[:space:]]*/ {sub(/^[[:space:]]*trigger:[[:space:]]*/, "", $0); gsub(/[[\\][:space:]]/, "", $0); print $0; exit}" .spec-first/config.yaml 2>/dev/null || true); ',
+    'CFG_FILE=""; ',
+    'if [ -f .spec-first/meta/config.yaml ]; then CFG_FILE=.spec-first/meta/config.yaml; ',
+    'elif [ -f .spec-first/config.yaml ]; then CFG_FILE=.spec-first/config.yaml; fi; ',
+    'if [ -n "$CFG_FILE" ]; then ',
+    '  CFG_TRIGGER=$(awk "BEGIN{inCatchup=0} /^[[:space:]]*catchup:[[:space:]]*$/ {inCatchup=1; next} inCatchup && /^[^[:space:]]/ {inCatchup=0} inCatchup && /^[[:space:]]*trigger:[[:space:]]*/ {sub(/^[[:space:]]*trigger:[[:space:]]*/, "", $0); gsub(/[[\\][:space:]]/, "", $0); print $0; exit}" "$CFG_FILE" 2>/dev/null || true); ',
     '  case "$CFG_TRIGGER" in auto|prompt|off) TRIGGER=$CFG_TRIGGER ;; esac; ',
     'fi; ',
     'if [ -f .spec-first/current ]; then ',

@@ -7,6 +7,7 @@ import { buildContextPack, validateControlSize } from '../../core/ai-orchestrato
 import { catchup } from '../../core/ai-orchestrator/catchup.js';
 import { readStats, summarizeStats } from '../../core/ai-orchestrator/ai-stats.js';
 import { parseFlag } from '../parse-utils.js';
+import { getFirstRuntimeNotice } from '../../core/skill-runtime/dispatcher.js';
 
 export function handleAi(args: string[]): number {
   const sub = args[0];
@@ -76,6 +77,17 @@ function handleCatchup(args: string[]): number {
   try {
     const result = catchup(featureId, process.cwd());
     console.log(result.summary);
+
+    const firstNotice = getFirstRuntimeNotice(process.cwd());
+    if (firstNotice) {
+      const cleaned = firstNotice
+        .replace(/<!--\s*\/?first-runtime-context\s*-->/g, '')
+        .trim();
+      if (cleaned) {
+        console.log(`\n${cleaned}`);
+      }
+    }
+
     return ExitCode.SUCCESS;
   } catch (e) {
     console.error(`执行会话恢复失败：${featureId}`);

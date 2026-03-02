@@ -82,39 +82,108 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
 };
 
 // 按 projectRoot 缓存的配置 Map，避免多项目场景下配置串用
-const configCache = new Map<string, SpecFirstConfig>();
+interface CacheEntry {
+  config: SpecFirstConfig;
+  cachedAt: number;
+}
+const CONFIG_CACHE_TTL_MS = 30_000; // 30 秒过期
+const configCache = new Map<string, CacheEntry>();
 
 export function renderDefaultConfigYaml(): string {
   return yaml.dump(DEFAULT_SPEC_FIRST_CONFIG, { noRefs: true });
 }
 
-/** 加载并校验 config.yaml，返回合并后的配置 */
+/**
+ * 深度合并两个对象（source 覆盖 target 的同名属性）
+ * 用于 meta → local → config.yaml 的配置合并
+ */
+function deepMerge(
+  target: Record<string, unknown>,
+  source: unknown,
+): Record<string, unknown> {
+  if (!source || typeof source !== 'object') return target;
+  if (Array.isArray(source)) return target; // 不合并数组，保持原样
+
+  const result = structuredClone(target);
+  const src = source as Record<string, unknown>;
+
+  for (const key of Object.keys(src)) {
+    const srcValue = src[key];
+    const targetValue = result[key];
+
+    if (srcValue === undefined) continue;
+
+    if (
+      srcValue &&
+      typeof srcValue === 'object' &&
+      !Array.isArray(srcValue) &&
+      targetValue &&
+      typeof targetValue === 'object' &&
+      !Array.isArray(targetValue)
+    ) {
+      // 递归合并嵌套对象
+      result[key] = deepMerge(
+        targetValue as Record<string, unknown>,
+        srcValue as Record<string, unknown>,
+      );
+    } else {
+      // 直接覆盖（包括数组）
+      result[key] = srcValue;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * 加载并校验 config.yaml，返回合并后的配置
+ * 合并顺序：DEFAULT → meta/config.yaml → local/config.yaml → config.yaml（兼容旧版本）
+ */
 export function loadConfig(projectRoot: string): SpecFirstConfig {
   // 规范化路径，避免 /a/b 和 /a/b/ 被视为不同 key
   const normalizedRoot = resolve(projectRoot);
 
   const cached = configCache.get(normalizedRoot);
-  if (cached) return cached;
+  if (cached && (Date.now() - cached.cachedAt) < CONFIG_CACHE_TTL_MS) return cached.config;
 
+  // 从三个层级加载配置，local 覆盖 meta，meta 覆盖默认
+  const metaPath = join(projectRoot, '.spec-first', 'meta', 'config.yaml');
+  const localPath = join(projectRoot, '.spec-first', 'local', 'config.yaml');
   const configPath = join(projectRoot, '.spec-first', 'config.yaml');
-  if (!exists(configPath)) {
-    const result = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
-    configCache.set(normalizedRoot, result);
-    return result;
+
+  let merged: Record<string, unknown> = structuredClone(DEFAULT_SPEC_FIRST_CONFIG) as unknown as Record<string, unknown>;
+
+  // Layer 1: meta/config.yaml（包级基线）
+  if (exists(metaPath)) {
+    const raw = readFileSync(metaPath, 'utf-8');
+    const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as Record<string, unknown> | null;
+    if (parsed && typeof parsed === 'object') {
+      merged = deepMerge(merged, parsed);
+    }
   }
 
-  const raw = readFileSync(configPath, 'utf-8');
-  const parsed = yaml.load(raw) as Record<string, unknown> | null;
-
-  if (!parsed || typeof parsed !== 'object') {
-    const result = structuredClone(DEFAULT_SPEC_FIRST_CONFIG);
-    configCache.set(normalizedRoot, result);
-    return result;
+  // Layer 2: local/config.yaml（用户定制）
+  if (exists(localPath)) {
+    const raw = readFileSync(localPath, 'utf-8');
+    const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as Record<string, unknown> | null;
+    if (parsed && typeof parsed === 'object') {
+      merged = deepMerge(merged, parsed);
+    }
   }
 
-  const result = mergeWithDefaults(parsed);
+  // Layer 3: config.yaml（兼容旧版本，优先级最高）
+  if (exists(configPath)) {
+    const raw = readFileSync(configPath, 'utf-8');
+    const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as Record<string, unknown> | null;
+    if (parsed && typeof parsed === 'object') {
+      merged = deepMerge(merged, parsed);
+    }
+  }
+
+  // 使用现有的 mergeWithDefaults 进行类型安全的合并（确保所有必需字段存在）
+  const result = mergeWithDefaults(merged);
   validate(result);
-  configCache.set(normalizedRoot, result);
+  configCache.set(normalizedRoot, { config: result, cachedAt: Date.now() });
   return result;
 }
 

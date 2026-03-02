@@ -2,7 +2,7 @@
 name: "spec-first:design"
 description: "定位 Feature 并校验阶段为技术设计（02_design）"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

@@ -2,7 +2,7 @@
 name: "spec-first:catchup"
 description: "定位当前 Feature 并恢复上下文"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

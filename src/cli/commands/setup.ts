@@ -9,7 +9,7 @@
 import { handleUpdate } from './update.js';
 
 /** @deprecated 使用 spec-first update 替代 */
-export function handleSetup(args: string[]): number {
+export async function handleSetup(args: string[]): Promise<number> {
   console.warn('⚠️ setup 已废弃，请使用 spec-first update');
   return handleUpdate(args.filter(a => a !== '--global'));
 }

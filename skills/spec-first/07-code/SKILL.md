@@ -2,7 +2,7 @@
 name: "spec-first:code"
 description: "定位进行中的 TASK 并执行代码实现"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

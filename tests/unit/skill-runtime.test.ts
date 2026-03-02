@@ -138,6 +138,38 @@ describe('dispatchCommand', () => {
     expect(result.error).toContain('--resume requires --auto');
   });
 
+  // ─── First 参数校验集成 (B5) ─────────────────────────
+
+  it('should dispatch first --deep with parsed firstArgs', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
+    const result = dispatchCommand('first --deep', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.firstArgs).toBeDefined();
+    expect(result.firstArgs!.mode).toBe('deep');
+    expect(result.firstArgs!.modeExplicit).toBe(true);
+    expect(result.firstConfirmPolicy).toBe('skip');
+    expect(result.firstModePolicy).toBe('manual');
+  });
+
+  it('should dispatch first --quick --force with parsed firstArgs', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
+    const result = dispatchCommand('first --quick --force', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.firstArgs!.mode).toBe('quick');
+    expect(result.firstArgs!.force).toBe(true);
+    expect(result.firstConfirmPolicy).toBe('skip');
+    expect(result.firstModePolicy).toBe('manual');
+  });
+
+  it('should reject first with unknown flag', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
+    const result = dispatchCommand('first --verbose', TMP);
+    expect(result.route).toBe('error');
+  });
+
   it('should resolve namespaced extension skill route', () => {
     const extDir = join(TMP, '.spec-first', 'extensions', 'qa-pack');
     mkdirSync(join(extDir, 'skills', 'review'), { recursive: true });

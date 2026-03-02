@@ -1,6 +1,6 @@
 ---
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 description: Spec-First AI Agent Skills 目录索引
 ---
 
@@ -14,7 +14,7 @@ description: Spec-First AI Agent Skills 目录索引
 
 | Skill | 说明 | 确认策略 |
 |-------|------|----------|
-| [00-first](./00-first/SKILL.md) | 项目快速认知：生成技术栈、代码结构、架构、API、调用链等 10 份文档 | assisted |
+| [00-first](./00-first/SKILL.md) | 项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式追加至 10-11 份（含条件产物） | assisted |
 
 ### 核心工作流 Skills
 
@@ -44,7 +44,7 @@ description: Spec-First AI Agent Skills 目录索引
 |-------|------|----------|
 | [02-catchup](./02-catchup/SKILL.md) | 会话恢复与上下文摘要 | auto |
 | [14-status](./14-status/SKILL.md) | 输出当前状态概览 | auto |
-| [15-doctor](./15-doctor/SKILL.md) | 环境诊断与修复 | auto |
+| [15-doctor](./15-doctor/SKILL.md) | 环境诊断与修复（MCP/skills 清单由 manifest 驱动） | auto |
 | [16-sync](./16-sync/SKILL.md) | 同步追踪矩阵 | auto |
 
 ### Feature 管理 Skills
@@ -108,5 +108,5 @@ description: Spec-First AI Agent Skills 目录索引
 ## 维护信息
 
 - **版本**: 1.0.0
-- **最后更新**: 2026-02-27
+- **最后更新**: 2026-03-02
 - **维护者**: Spec-First Team

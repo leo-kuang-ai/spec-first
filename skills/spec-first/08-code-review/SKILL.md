@@ -2,7 +2,7 @@
 name: "spec-first:code-review"
 description: "定位变更范围并执行代码审查"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

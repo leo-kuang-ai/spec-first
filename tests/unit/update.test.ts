@@ -27,13 +27,13 @@ import { registerSessionHooks } from '../../src/core/tool-integration/session-ho
 beforeEach(() => vi.clearAllMocks());
 
 describe('handleUpdate', () => {
-  it('should return SUCCESS for --help', () => {
-    expect(handleUpdate(['--help'])).toBe(ExitCode.SUCCESS);
+  it('should return SUCCESS for --help', async () => {
+    expect(await handleUpdate(['--help'])).toBe(ExitCode.SUCCESS);
   });
 
-  it('should call all 5 core functions', () => {
+  it('should call all 5 core functions', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    handleUpdate([]);
+    await handleUpdate([]);
     expect(ensureSkillCommands).toHaveBeenCalled();
     expect(ensureHostBootstrap).toHaveBeenCalled();
     expect(registerAIHooks).toHaveBeenCalled();
@@ -41,9 +41,9 @@ describe('handleUpdate', () => {
     vi.restoreAllMocks();
   });
 
-  it('should pass dryRun to core functions with --dry-run', () => {
+  it('should pass dryRun to core functions with --dry-run', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    handleUpdate(['--dry-run']);
+    await handleUpdate(['--dry-run']);
     expect(ensureSkillCommands).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({ dryRun: true }),
@@ -58,23 +58,23 @@ describe('handleUpdate', () => {
     vi.restoreAllMocks();
   });
 
-  it('should skip MCP with --skip-mcp', () => {
+  it('should skip MCP with --skip-mcp', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    handleUpdate(['--skip-mcp']);
+    await handleUpdate(['--skip-mcp']);
     expect(ensureHostBootstrap).not.toHaveBeenCalled();
     vi.restoreAllMocks();
   });
 
-  it('should skip hooks with --skip-hooks', () => {
+  it('should skip hooks with --skip-hooks', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    handleUpdate(['--skip-hooks']);
+    await handleUpdate(['--skip-hooks']);
     expect(installHooks).not.toHaveBeenCalled();
     vi.restoreAllMocks();
   });
 
-  it('should pass selected hosts to ensureSkillCommands', () => {
+  it('should pass selected hosts to ensureSkillCommands', async () => {
     vi.spyOn(console, 'log').mockImplementation(() => {});
-    handleUpdate(['--host', 'generic,codex']);
+    await handleUpdate(['--host', 'generic,codex']);
     expect(ensureSkillCommands).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({ hosts: ['generic', 'codex'] }),
@@ -82,17 +82,17 @@ describe('handleUpdate', () => {
     vi.restoreAllMocks();
   });
 
-  it('should return UNKNOWN_ERROR on throw without --from-postinstall', () => {
+  it('should return UNKNOWN_ERROR on throw without --from-postinstall', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(ensureSkillCommands).mockImplementation(() => { throw new Error('boom'); });
-    expect(handleUpdate([])).toBe(ExitCode.UNKNOWN_ERROR);
+    expect(await handleUpdate([])).toBe(ExitCode.UNKNOWN_ERROR);
     vi.mocked(ensureSkillCommands).mockReturnValue({ claude: [], codex: [], generic: [], codexWarnings: [] });
     vi.restoreAllMocks();
   });
 
-  it('should return SUCCESS in --from-postinstall even on error', () => {
+  it('should return SUCCESS in --from-postinstall even on error', async () => {
     vi.mocked(ensureSkillCommands).mockImplementation(() => { throw new Error('fail'); });
-    expect(handleUpdate(['--from-postinstall'])).toBe(ExitCode.SUCCESS);
+    expect(await handleUpdate(['--from-postinstall'])).toBe(ExitCode.SUCCESS);
     vi.mocked(ensureSkillCommands).mockReturnValue({ claude: [], codex: [], generic: [], codexWarnings: [] });
   });
 });

@@ -74,8 +74,14 @@ describe('ensureHostBootstrap', () => {
     expect(result.ok).toBe(true);
     expect(result.results.some((item) => item.category === 'MCP')).toBe(true);
     expect(result.results.some((item) => item.category === 'Skill')).toBe(true);
+    expect(result.results.some((item) => item.category === 'Binary')).toBe(false);
+    expect(vi.mocked(execFileSync).mock.calls.length).toBe(0);
+  });
+
+  it('should run binary checks only when checkBinaries=true', () => {
+    const result = ensureHostBootstrap({ dryRun: true, checkBinaries: true });
+    expect(result.ok).toBe(true);
     expect(result.results.some((item) => item.category === 'Binary')).toBe(true);
     expect(vi.mocked(execFileSync).mock.calls.length).toBeGreaterThan(0);
   });
 });
-

@@ -2,7 +2,7 @@
 name: "spec-first:analyze"
 description: "执行跨产物一致性分析并生成分析报告"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

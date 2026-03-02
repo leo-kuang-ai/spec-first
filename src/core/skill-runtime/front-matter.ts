@@ -46,7 +46,7 @@ export function extractRawFrontMatter(content: string): string | null {
  * 对 write_mode 做枚举校验，非法值回退 overwrite
  */
 export function parseFrontMatter(raw: string): SkillFrontMatter {
-  const parsed = yaml.load(raw);
+  const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
   if (!parsed || typeof parsed !== 'object') return {};
 
   const obj = parsed as Record<string, unknown>;

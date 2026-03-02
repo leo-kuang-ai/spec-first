@@ -128,7 +128,7 @@ function loadMarkersFromYaml(filePath: string): CompletionMarker[] {
   if (!exists(filePath)) return [];
   try {
     const raw = readFileSync(filePath, 'utf-8');
-    const parsed = yaml.load(raw);
+    const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
     if (!Array.isArray(parsed)) return [];
     return parsed as CompletionMarker[];
   } catch {

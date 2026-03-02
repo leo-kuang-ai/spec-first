@@ -6,6 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ExitCode } from '../shared/types.js';
+import { evaluatePolicy } from '../core/skill-runtime/confirm-policy.js';
 
 export type CommandHandler = (args: string[]) => Promise<number> | number;
 
@@ -47,6 +48,21 @@ export async function dispatch(args: string[]): Promise<number> {
     console.error(`未知命令：${cmd}`);
     console.error('请运行 `spec-first --help` 查看帮助。');
     return ExitCode.VALIDATION_ERROR;
+  }
+
+  // 确认策略评估（confirm-1 集成）
+  // 使用默认保守策略（Mode N）进行确认检查
+  const policy = evaluatePolicy({
+    mode: 'N',
+    size: 'M',
+    hasNfrSec: false,
+    hasNewExternalApi: false,
+  });
+
+  // 非 auto 模式下提示用户确认
+  if (policy !== 'auto') {
+    // 暂不进行交互式确认，完整实现需要在更上层集成
+    // 未来可以在这里添加用户确认逻辑
   }
 
   try {

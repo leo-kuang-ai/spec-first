@@ -116,15 +116,16 @@ function checkSpecsDir(root: string): CheckResult {
 }
 
 function checkConfig(root: string): CheckResult {
-  const p = join(root, '.spec-first', 'config.yaml');
-  if (existsSync(p)) {
+  const metaPath = join(root, '.spec-first', 'meta', 'config.yaml');
+  const legacyPath = join(root, '.spec-first', 'config.yaml');
+  if (existsSync(metaPath) || existsSync(legacyPath)) {
     return { name: 'config.yaml', level: 'PASS', message: '已找到' };
   }
   return {
     name: 'config.yaml',
     level: 'WARNING',
     message: '未找到（使用内置默认值）',
-    fix: '可选：创建 .spec-first/config.yaml 自定义 gate/context/health 设置',
+    fix: '可选：创建 .spec-first/meta/config.yaml 自定义 gate/context/health 设置',
   };
 }
 
@@ -279,7 +280,7 @@ function checkGateDegradation(root: string, _featureId: string): CheckResult {
       name: 'Gate Degradation',
       level: 'WARNING',
       message: `配置解析失败（${(e as Error).message}）`,
-      fix: '修复 .spec-first/config.yaml 或重新运行 spec-first init',
+      fix: '修复 .spec-first/meta/config.yaml 或重新运行 spec-first init',
     };
   }
 }

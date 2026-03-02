@@ -2,8 +2,8 @@
 name: "spec-first:doctor"
 description: "定位项目与宿主配置并执行环境诊断"
 version: 1.0.0
-last_updated: 2026-02-27
-changelog: Initial version with standardized metadata
+last_updated: {{DATE}}
+changelog: Aligned with manifest-driven bootstrap checks (MCP/skills from config)
 ---
 
 # Skill: doctor
@@ -27,10 +27,9 @@ changelog: Initial version with standardized metadata
   - `Codex`: `~/.codex/config.toml`, `~/.codex/skills/`
   - `Claude Code`: `~/.config/claude-code/mcp.json`, `~/.config/claude-code/settings.json`, `~/.claude/skills/`
 - 安装范围必须为用户级全局目录（home 路径），不写入项目局部目录
-- 必检 MCP（双宿主）: `sequential-thinking`, `context7`, `serena`, `fetch`, `playwright-mcp`
-- 必检 skills（双宿主）: `find-skills`, `skill-creator`
-- `serena` 优先使用 `uvx --from git+https://github.com/oraios/serena serena start-mcp-server`；兼容回退 `serena-mcp-server` / `npx -y mcp-server-serena`
-- `fetch` 固定为 `uvx mcp-server-fetch`
+- 必检 MCP / skills 不在本文件硬编码，统一以 `src/config/bootstrap-manifest.ts` 为准
+- `doctor` 通过 `ensureHostBootstrap` 读取 manifest 并执行检查/补齐（与 `update` 复用同一规则）
+- 若开启深度诊断（binary probe），探测命令与超时同样由 manifest 提供
 - 缺失或配置错误时，P4 自动安装/修复后必须复检并报告最终状态
 
 ## CLI 依赖

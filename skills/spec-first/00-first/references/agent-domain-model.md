@@ -1,6 +1,6 @@
 # Agent A4 — 领域模型分析
 
-> 输入上下文: P1a tech-stack 结果 + Agent A1 的模块清单 + Agent A2 的架构图 + Agent B 的 api-docs + Agent D 的 database-er.md（如有） + `serena_available` 状态
+> 输入上下文: P1a tech-stack 结果 + Agent A2 的架构图 + Agent B 的 api-docs + Agent D 的 database-er.md（如有） + `serena_available` 状态
 >
 > 派发时机: 第三波（等待 A2 + B + D 完成后）
 > 内部串行: 概念识别 → 关系推断 → 状态机提取 → 规则挖掘 → 流程图生成
@@ -13,7 +13,7 @@
 
 ```markdown
 ---
-last_updated: YYYY-MM-DD
+last_updated: {{DATE}}
 project: [项目名称]
 analysis_mode: [静态/LSP]
 ---
@@ -110,7 +110,7 @@ flowchart TD
 
 ---
 
-*生成时间: YYYY-MM-DD | 分析模式: [静态/LSP]*
+*生成时间: {{DATE}} | 分析模式: [静态/LSP]*
 ```
 
 ---

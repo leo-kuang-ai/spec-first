@@ -37,21 +37,17 @@ Append the following content to `references/detection-rules.md` after the existi
 6. **Web 前端** - Admin/H5
 7. **后台服务** - 默认兜底
 
-### 10 种端类型检测规则
+### 7 种端类型检测规则（含子类型）
 
 | 端类型 | 检测特征 | 优先级 |
 |--------|----------|--------|
 | **后台服务** | `pom.xml`/`build.gradle`/`go.mod`/`requirements.txt`/`Cargo.toml` + 无前端目录 | 7 |
-| **Admin 后台** | `package.json` + `antd`/`ant-design`/`element-plus`/`arco-design`/`@alifd/next` | 6 |
-| **H5/移动Web** | `package.json` + `vant`/`@nutui/nutui`/`mint-ui` + 移动端适配代码 | 6 |
-| **iOS** | `*.xcodeproj`/`*.xcworkspace`/`Podfile`/`Package.swift` + iOS target | 4 |
-| **Android** | `AndroidManifest.xml`/`build.gradle` + `com.android.application` | 4 |
+| **前端 Web** | `package.json` + `antd`/`element-plus`(Admin子类型) 或 `vant`/`nutui`(H5子类型) 或 `react`/`vue`(通用) | 6 |
+| **移动端 App** | iOS: `*.xcodeproj`/`Podfile`; Android: `AndroidManifest.xml` + `com.android` | 4 |
 | **跨平台** | `pubspec.yaml`(Flutter) / `react-native` / `manifest.json`+`uni` / `kotlin("multiplatform")` | 3 |
-| **PC-Windows** | `*.csproj`/`*.sln` / `CMakeLists.txt` + WinAPI/MSVC | 5 |
-| **PC-macOS** | `*.xcodeproj` + macOS target / `Package.swift` + macOS | 5 |
-| **PC-Linux** | `CMakeLists.txt`/`Makefile` + GTK/Qt/SDL | 5 |
+| **PC 桌面** | Win: `*.csproj`/`*.sln`; Mac: `*.xcodeproj`+macOS; Linux: GTK/Qt/SDL; 跨平台: Electron/Tauri | 5 |
 | **Monorepo** | `turbo.json`/`nx.json`/`lerna.json`/`pnpm-workspace.yaml` | 1 |
-| **后端+Admin混合** | 同时检测到后端特征 + Admin 前端特征 | 2 |
+| **后端+前端混合** | 同时检测到后台服务特征 + 前端 Web 特征 | 2 |
 
 ### 复合类型检测
 
@@ -60,8 +56,8 @@ Append the following content to `references/detection-rules.md` after the existi
 ```yaml
 检测结果:
   主类型: Monorepo
-  子类型: [后端+Admin, Admin, H5]
-  产物策略: 根级产物(9个) + packages/admin/(12个) + packages/h5/(11个)
+  子类型: [后端+前端混合, 前端 Web(Admin), 前端 Web(H5)]
+  产物策略: 根级产物(9个) + packages/admin/(12个) + packages/h5/(12个)
 ```
 
 ### 检测失败降级
@@ -83,7 +79,7 @@ Expected: File content displayed without errors
 
 ```bash
 git add skills/spec-first/00-first/references/detection-rules.md
-git commit -m "feat(00-first): add end-type detection rules for 10 platform types"
+git commit -m "feat(00-first): add end-type detection rules for 7 platform types with subtypes"
 ```
 
 ---
@@ -261,7 +257,7 @@ git commit -m "feat(00-first): add end-type detection rules for 10 platform type
 
 | 版本 | 日期 | 变更 |
 |------|------|------|
-| v1.0.0 | 2026-03-02 | 初始版本，定义 10 种端类型的产物映射 |
+| v1.0.0 | 2026-03-02 | 初始版本，定义 7 种端类型（含子类型）的产物映射 |
 ```
 
 **Step 2: Verify file creation**
@@ -303,7 +299,7 @@ version: 1.12.0
 Find the `changelog:` section and add new entry at top:
 ```yaml
 changelog: |
-  1.12.0: 双模式架构 — 新增 quick 模式（秒级入户）、端类型智能检测（10 种）、分层产物策略（Layer 0/1/2）、置信度追踪、交互式选项简化
+  1.12.0: 双模式架构 — 新增 quick 模式（秒级入户）、端类型智能检测（7 种 + 子类型）、分层产物策略（Layer 0/1/2）
   1.11.1: 文档一致性与治理增强 — 统一证据格式描述、修复 A4 波次依赖冲突、统一超时口径、抽取共享 QA 规则、补充 Context7 密钥治理/DB 凭证技术防护、新增测试策略矩阵
 ```
 
@@ -471,11 +467,12 @@ git commit -m "feat(00-first): add quick mode success criteria"
 
 ## Phase 2: Enhanced Features (P1)
 
-### Task 6: Add Confidence Tracking Types
+### Task 6: ~~Add Confidence Tracking Types~~ (Deferred to Future Backlog)
 
-**Files:**
-- Modify: `skills/spec-first/00-first/references/quality-assurance-rules.md`
-- Test: Manual verification
+> **状态**：⏳ 延后实施。当前证据标注 + 交叉验证已提供质量保证，置信度追踪投入产出比低。
+> 待 quick/deep 双模式和端类型检测稳定后再考虑引入。
+>
+> 原计划内容保留供后续参考，但不在本次迭代中实施。
 
 **Step 1: Add confidence tracking section**
 
@@ -685,62 +682,128 @@ git commit -m "feat(00-first): add quick mode and end-type detection test cases"
 
 ---
 
-### Task 9.5: Add Command Line Parameter Support
+### Task 9.5: Update Interactive Options for Quick/Deep Mode
 
 **Files:**
 - Modify: `skills/spec-first/00-first/SKILL.md`
 
-**Step 1: Add command line parameters section**
+**Step 1: Replace Q1-Q4 with new interactive options**
 
-Add after the "触发条件" section:
+Find the "交互式选项" section and replace with:
 
 ```markdown
-## 命令行参数
+## 交互式选项
 
-| 参数 | 说明 | 示例 |
+技能启动后，通过交互式提问收集用户选项（使用 `AskUserQuestion`）：
+
+**Q1: 执行模式**
+
+| 选项 | 说明 |
+|------|------|
+| `quick`（默认） | 秒级入户：3 个核心文档，主线程执行，<30s |
+| `deep` | 企业级分析：按端类型 7-16 个文档，8 Agent 并发，<5min |
+
+> 内部变量：`mode`（quick/deep）
+
+**Q2: 更新策略**（仅产物已存在时展示）
+
+| 选项 | 说明 |
+|------|------|
+| `增量更新`（默认） | 仅更新受变更影响的产物（基于 git diff） |
+| `全量重新生成` | 重新生成所有产物 |
+| `跳过` | 使用现有产物，不更新 |
+
+> 内部变量：`update_mode`（incremental/full/skip）
+
+**Q3: 端类型确认**（自动检测后展示）
+
+| 选项 | 说明 |
+|------|------|
+| `确认（X）`（默认） | 使用自动检测到的端类型 X |
+| `手动指定` | 从列表中选择端类型 |
+
+**端类型可选值**（7 种主类型）：
+- `后台服务` - Java/Go/Python/Rust 后端
+- `前端 Web` - Vue/React 管理后台、H5 移动端 Web、通用前端
+- `移动端 App` - 原生 iOS/Android
+- `跨平台` - Flutter/RN/UniApp/KMP
+- `PC 桌面` - Windows/macOS/Linux/Electron/Tauri
+- `Monorepo` - 多包仓库
+- `后端+前端混合` - 后端 + 前端在同一仓库
+
+> 内部变量：`端类型`
+
+**Q4: 数据库分析**（仅 deep 模式）
+
+| 选项 | 说明 |
+|------|------|
+| `自动检测`（默认） | 从配置自动发现 DB 连接 |
+| `手动指定` | 用户输入连接串 |
+| `跳过` | 不生成 database-er.md |
+
+> 内部变量：`db_mode`/`db_url`
+
+**Q5: 扩展产物**（仅 deep 模式，多选）
+
+| 选项 | 说明 | 默认 |
 |------|------|------|
-| `--deep` | 执行 deep 模式（默认 quick） | `/spec-first:first --deep` |
-| `--force` | 强制全量更新 | `/spec-first:first --force` |
-| `--端类型=<类型>` | 手动指定端类型 | `/spec-first:first --端类型=后台服务` |
-| `--interactive` | 启用交互式选项 | `/spec-first:first --interactive` |
-| `--with-call-graph` | 生成调用链（deep 模式） | `/spec-first:first --deep --with-call-graph` |
-| `--with-monitoring` | 生成监控配置（deep 模式） | `/spec-first:first --deep --with-monitoring` |
-| `--with-i18n` | 生成国际化配置（deep 模式） | `/spec-first:first --deep --with-i18n` |
-| `--full` | 生成所有扩展产物（deep 模式） | `/spec-first:first --deep --full` |
+| `call-graph` | 调用链分析 | 按需（复杂度 > 中等） |
+| `monitoring` | 监控配置 | 按需（检测到监控） |
+| `i18n` | 国际化配置 | 按需（检测到多语言） |
+| `full` | 生成所有扩展产物 | 否 |
 
-**端类型可选值**：
-- `后台服务`
-- `Admin后台`
-- `H5`
-- `iOS`
-- `Android`
-- `跨平台`
-- `PC-Windows`
-- `PC-macOS`
-- `PC-Linux`
-- `Monorepo`
-- `后端+Admin混合`
+> 内部变量：`extensions`（数组）
 ```
 
-**Step 2: Update internal variable mapping**
+**Step 2: Add smart defaults note**
 
-Find the "内部变量映射" note after Q3/Q4 and update:
+After the interactive options section, add:
 
 ```markdown
-> 内部变量映射：
-> - Q1 → `mode`（quick/deep，默认 quick）
-> - Q2 → `db_mode`（自动检测/手动指定/跳过）
-> - Q3 → `include_call_graph`（仅 deep 模式展示）
-> - Q4 → `端类型`（可选，自动检测后确认）
->
-> 命令行参数优先于交互式选项，指定参数后跳过对应问题。
+## 智能默认值
+
+为减少用户决策负担，以下场景自动使用默认值（跳过对应问题）：
+
+| 场景 | 自动行为 |
+|------|----------|
+| 首次运行 | 跳过 Q2（无产物可更新） |
+| 端类型检测置信度高 | 跳过 Q3（直接使用检测结果） |
+| quick 模式 | 跳过 Q4、Q5（仅 deep 模式需要） |
+| 无数据库配置 | 跳过 Q4 中的 DB 选项 |
+
+**渐进式升级**：
+
+quick 模式完成后，检测到以下情况时提示升级：
+
+```markdown
+检测到项目包含 50+ API 端点，是否生成完整 API 文档？[Y/n]
+检测到数据库配置，是否生成 ER 图？[Y/n]
+检测到监控配置，是否生成监控文档？[Y/n]
 ```
 
-**Step 3: Commit**
+用户选择 `Y` 后，自动切换到 deep 模式继续生成。
+```
+
+**Step 3: Update internal variable mapping note**
+
+Find and update the variable mapping note:
+
+```markdown
+> **内部变量汇总**：
+> | 变量 | 来源 | 默认值 |
+> |------|------|--------|
+> | `mode` | Q1 | quick |
+> | `update_mode` | Q2（条件） | incremental |
+> | `端类型` | Q3 | 自动检测 |
+> | `db_mode` | Q4（deep） | auto |
+> | `extensions` | Q5（deep） | [] |
+```
+
+**Step 4: Commit**
 
 ```bash
 git add skills/spec-first/00-first/SKILL.md
-git commit -m "feat(00-first): add command line parameter support (--deep, --force, --端类型)"
+git commit -m "feat(00-first): update interactive options for quick/deep mode with smart defaults"
 ```
 
 ---
@@ -943,9 +1006,10 @@ Quick 模式不使用 Subagent 架构，由主线程直接执行：
 
 当用户先运行 quick 后运行 deep 时：
 1. 检测 `docs/first/.quick-meta.yaml` 存在
-2. 读取已有的 `tech-stack.md` 和 `codebase-overview.md`
-3. 复用技术栈识别结果，跳过 P1a 部分工作
-4. 扩展产物而非重新生成
+2. **复用中间数据**：端类型检测结果、语言/框架检测结果（加速 P1a）
+3. **重新生成 Layer 0 产物**：deep 模式要求 ≥90% 证据标注覆盖率，quick 产物无证据标注，不可直接复用
+4. Layer 1/2 产物全新生成
+5. 删除 `.quick-meta.yaml`，生成 `.index.yaml`
 
 ---
 
@@ -963,6 +1027,231 @@ Quick 模式不使用 Subagent 架构，由主线程直接执行：
 git add skills/spec-first/00-first/references/subagent-architecture.md
 git commit -m "docs(00-first): add quick mode architecture documentation"
 ```
+
+---
+
+### Task 11.5: Add Skill-Runtime Parameter Parsing Support
+
+**Files:**
+- Create: `src/core/skill-runtime/first-args.ts`
+- Modify: `src/core/skill-runtime/dispatcher.ts`
+- Test: `tests/unit/first-args.test.ts`
+
+**Step 1: Create first-args.ts**
+
+参照 `orchestrate-args.ts` 的模式，新增 first skill 参数解析器：
+
+```typescript
+// src/core/skill-runtime/first-args.ts
+import type { ExitCode } from '../../shared/types.js';
+
+export interface FirstArgs {
+  mode: 'quick' | 'deep';
+  force: boolean;
+  endType?: string;          // --端类型=X
+  interactive: boolean;      // --interactive
+  extensions: string[];      // --with-call-graph, --with-monitoring, --with-i18n, --full
+}
+
+// 允许的 flag
+const ALLOWED_FLAGS = new Set([
+  '--deep',
+  '--force',
+  '--interactive',
+  '--with-call-graph',
+  '--with-monitoring',
+  '--with-i18n',
+  '--full',
+]);
+
+// --端类型= 前缀
+const END_TYPE_PREFIX = '--端类型=';
+
+export function parseFirstArgs(rawArgs: string[]): { args: FirstArgs } | { error: string; code: ExitCode } {
+  const result: FirstArgs = {
+    mode: 'quick',
+    force: false,
+    interactive: false,
+    extensions: [],
+  };
+
+  for (const arg of rawArgs) {
+    if (arg === '--deep') {
+      result.mode = 'deep';
+    } else if (arg === '--force') {
+      result.force = true;
+    } else if (arg === '--interactive') {
+      result.interactive = true;
+    } else if (arg.startsWith(END_TYPE_PREFIX)) {
+      result.endType = arg.slice(END_TYPE_PREFIX.length);
+    } else if (arg === '--with-call-graph') {
+      result.extensions.push('call-graph');
+    } else if (arg === '--with-monitoring') {
+      result.extensions.push('monitoring');
+    } else if (arg === '--with-i18n') {
+      result.extensions.push('i18n');
+    } else if (arg === '--full') {
+      result.extensions = ['call-graph', 'monitoring', 'i18n'];
+    } else {
+      return { error: `Unknown flag: ${arg}`, code: 1 as ExitCode };
+    }
+  }
+
+  return { args: result };
+}
+```
+
+**Step 2: Update dispatcher.ts Skill route to pass args**
+
+在 `dispatcher.ts` 的 `loadSkill()` 调用处，检测技能名为 `first` 时调用 `parseFirstArgs()`，并将解析结果注入 SKILL.md 模板变量：
+
+```typescript
+// dispatcher.ts — 在 Skill Route 分支中
+if (skillName === 'first') {
+  const parsed = parseFirstArgs(remainingArgs);
+  if ('error' in parsed) {
+    return { code: parsed.code, message: parsed.error };
+  }
+  // 注入模板变量供 SKILL.md 使用
+  ctx.firstArgs = parsed.args;
+}
+```
+
+**Step 3: Add template variables to SKILL.md**
+
+在 SKILL.md 头部 metadata 区域新增变量接收：
+
+```yaml
+# 运行时参数（由 skill-runtime 注入）
+# {{FIRST_MODE}}     — quick | deep
+# {{FIRST_FORCE}}    — true | false
+# {{FIRST_END_TYPE}} — 自动检测 | 用户指定值
+# {{FIRST_INTERACTIVE}} — true | false
+# {{FIRST_EXTENSIONS}}  — [] | ['call-graph', ...]
+```
+
+**Step 4: Create unit tests**
+
+```typescript
+// tests/unit/first-args.test.ts
+import { describe, it, expect } from 'vitest';
+import { parseFirstArgs } from '../../src/core/skill-runtime/first-args.js';
+
+describe('parseFirstArgs', () => {
+  it('should default to quick mode', () => {
+    const result = parseFirstArgs([]);
+    expect(result).toEqual({ args: { mode: 'quick', force: false, interactive: false, extensions: [] } });
+  });
+
+  it('should parse --deep flag', () => {
+    const result = parseFirstArgs(['--deep']);
+    expect('args' in result && result.args.mode).toBe('deep');
+  });
+
+  it('should parse --端类型=后台服务', () => {
+    const result = parseFirstArgs(['--端类型=后台服务']);
+    expect('args' in result && result.args.endType).toBe('后台服务');
+  });
+
+  it('should parse --full as all extensions', () => {
+    const result = parseFirstArgs(['--full']);
+    expect('args' in result && result.args.extensions).toEqual(['call-graph', 'monitoring', 'i18n']);
+  });
+
+  it('should reject unknown flags', () => {
+    const result = parseFirstArgs(['--unknown']);
+    expect('error' in result).toBe(true);
+  });
+
+  it('should combine multiple flags', () => {
+    const result = parseFirstArgs(['--deep', '--force', '--端类型=Admin']);
+    expect('args' in result && result.args).toMatchObject({ mode: 'deep', force: true, endType: 'Admin' });
+  });
+});
+```
+
+**Step 5: Commit**
+
+```bash
+git add src/core/skill-runtime/first-args.ts src/core/skill-runtime/dispatcher.ts tests/unit/first-args.test.ts
+git commit -m "feat(skill-runtime): add first skill parameter parsing (--deep/--force/--端类型)"
+```
+
+---
+
+### Task 11.6: Review All Reference Files for Consistency
+
+**Files:**
+- Review: `skills/spec-first/00-first/references/agents-code-analysis.md`
+- Review: `skills/spec-first/00-first/references/agents-api-deps.md`
+- Review: `skills/spec-first/00-first/references/agent-guidelines-setup.md`
+- Review: `skills/spec-first/00-first/references/agent-database.md`
+- Review: `skills/spec-first/00-first/references/agent-domain-model.md`
+
+**背景**：quick 模式引入后，现有 reference 文件需要与新方案对齐。
+
+**Step 1: 检查并更新以下内容**
+
+| Reference 文件 | 检查点 | 预期更新 |
+|---------------|--------|----------|
+| `agents-code-analysis.md` | A1 在 quick 模式下的行为 | 补充：quick 模式下 A1 不派发，主线程直接生成简化版 codebase-overview |
+| `agents-api-deps.md` | 端类型影响 api-docs 视角 | 补充：按端类型选择暴露方/调用方视角 |
+| `agent-guidelines-setup.md` | quick 模式不生成 | 补充：仅 deep 模式派发 C2 |
+| `agent-database.md` | quick 模式不生成 | 补充：仅 deep 模式且 db_mode≠跳过时派发 D |
+| `agent-domain-model.md` | quick 模式不生成 | 补充：仅 deep 模式派发 A4 |
+
+**Step 2: 确保所有 reference 文件头部版本号更新**
+
+**Step 3: Commit**
+
+```bash
+git add skills/spec-first/00-first/references/
+git commit -m "docs(00-first): update all reference files for quick/deep mode consistency"
+```
+
+---
+
+### Task 11.7: E2E Verification on Real Project
+
+**目标**：在 spec-first 项目自身上跑一次 quick 模式端到端验证。
+
+**Step 1: 验证 quick 模式路由**
+
+确认 `/spec-first:first` 能正确路由到 SKILL.md，且参数解析正确：
+
+```bash
+# 验证参数解析
+npx vitest run tests/unit/first-args.test.ts
+```
+
+**Step 2: 验证端类型检测**
+
+在 spec-first 项目根目录手动验证端类型检测：
+- 预期：检测到 `package.json` + TypeScript → 后台服务（Node.js CLI 工具）
+- 验证：检测结果是否合理
+
+**Step 3: 验证 quick 模式产物生成**
+
+手动运行 `/spec-first:first`，验证：
+- [ ] `docs/first/` 目录创建成功
+- [ ] `tech-stack.md` 内容正确（TypeScript, Node.js, ESM, tsup, Vitest）
+- [ ] `codebase-overview.md` 内容正确（core/, cli/, shared/ 模块）
+- [ ] `quick-commands.md` 内容正确（npm run build, npm test, npm run lint）
+- [ ] `.quick-meta.yaml` 存在
+- [ ] 执行时间 < 30s
+
+**Step 4: 验证 deep 模式升级路径**
+
+运行 `/spec-first:first --deep`，验证：
+- [ ] 检测到 `.quick-meta.yaml`，复用端类型检测结果
+- [ ] Layer 0 产物被重新生成（包含证据标注）
+- [ ] Layer 1 产物正常生成
+- [ ] `.quick-meta.yaml` 被删除
+- [ ] `.index.yaml` 生成
+
+**Step 5: 记录验证结果**
+
+将验证结果记录到实施计划或 tasks/todo.md 中。
 
 ---
 
@@ -987,7 +1276,7 @@ Expected: All tests pass
 Add entry to `CHANGELOG.md`:
 
 ```markdown
-- v1.12.0 2026-03-02 Claude: 00-first Skill 双模式架构优化 — 新增 quick 模式（秒级入户）、端类型智能检测（10 种）、分层产物策略（Layer 0/1/2）、置信度追踪、交互式选项简化 (user-visible)
+- v1.12.0 2026-03-02 Claude: 00-first Skill 双模式架构优化 — 新增 quick 模式（秒级入户）、端类型智能检测（7 种 + 子类型）、分层产物策略（Layer 0/1/2） (user-visible)
 ```
 
 **Step 4: Final commit**
@@ -1003,21 +1292,23 @@ git commit -m "chore: update CHANGELOG for 00-first v1.12.0"
 
 | Phase | Tasks | Estimated Time |
 |-------|-------|----------------|
-| Phase 1: Core Infrastructure | 5 tasks | 4 hours |
-| Phase 2: Enhanced Features | 7 tasks | 4 hours |
-| Phase 3: Documentation | 3 tasks | 1 hour |
-| **Total** | **15 tasks** | **9 hours** |
+| Phase 1: Core Infrastructure | Task 1-5 | 4 hours |
+| Phase 2: Enhanced Features | Task 7-9.7 (Task 6 deferred) | 3 hours |
+| Phase 3: Documentation & Integration | Task 10-11.7 (含 skill-runtime, reference review, E2E) | 3 hours |
+| Phase 4: Finalization | Task 12 | 0.5 hours |
+| **Total** | **~16 tasks** | **~10.5 hours** |
 
 ### Key Deliverables
 
-1. **End-type detection rules** for 10 platform types
+1. **End-type detection rules** for 7 platform types with subtypes
 2. **Product mapping configuration** (Layer 0/1/2)
 3. **Quick mode execution path** (< 30s)
-4. **Confidence tracking** for deep mode
+4. ~~**Confidence tracking** for deep mode~~ (deferred to future backlog)
 5. **Product index** for session recovery
 6. **Greenfield/Brownfield detection**
 7. **Updated test matrix** for quick mode
-8. **Command line parameter support** (--deep, --force, --端类型)
+8. **Interactive options with smart defaults** (Q1-Q5 渐进式交互)
 9. **Detection failure handling** with fallback options
 10. **Unit test structure** for quick mode (后续迭代)
+11. **Skill-runtime parameter parsing** (`first-args.ts` + dispatcher integration)
 

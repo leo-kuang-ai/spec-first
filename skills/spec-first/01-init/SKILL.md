@@ -2,7 +2,7 @@
 name: "spec-first:init"
 description: "定位项目根目录并初始化 Feature 工作区"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

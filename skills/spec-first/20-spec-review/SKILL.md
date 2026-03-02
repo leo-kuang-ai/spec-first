@@ -2,7 +2,7 @@
 name: "spec-first:spec-review"
 description: "定位 Feature 并执行需求规格质量审查（C10）"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

@@ -1,12 +1,16 @@
 /**
  * Handlebars 模板渲染引擎
  * 加载模板 → 编译 → 渲染 → 写入文件
+ *
+ * 模板查找顺序（优先级从高到低）：
+ * 1. .spec-first/local/templates/（用户定制）
+ * 2. .spec-first/meta/templates/（包级基线）
+ * 3. templates/（包内默认）
  */
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { readFileSync } from 'node:fs';
 import Handlebars from 'handlebars';
 import { exists, ensureDir, writeMarkdown } from '../../shared/fs-utils.js';
-import { dirname } from 'node:path';
 
 export interface TemplateContext {
   featureId: string;
@@ -19,8 +23,37 @@ export interface TemplateContext {
   [key: string]: unknown;
 }
 
-/** 模板根目录（相对于项目根） */
+/** 模板根目录（相对于项目根）- 包内默认模板 */
 const TEMPLATE_DIR = 'templates';
+
+/** 本地定制模板目录 */
+const LOCAL_TEMPLATE_DIR = '.spec-first/local/templates';
+
+/** 包级基线模板目录 */
+const META_TEMPLATE_DIR = '.spec-first/meta/templates';
+
+/**
+ * 查找模板文件的完整路径
+ * 按优先级查找：local → meta → 包内 templates
+ * @returns 找到的模板路径，若都不存在则返回 null
+ */
+function findTemplatePath(templateName: string, projectRoot: string): string | null {
+  const fileName = `${templateName}.hbs`;
+
+  // 1. 优先查找 local 定制
+  const localPath = join(projectRoot, LOCAL_TEMPLATE_DIR, fileName);
+  if (exists(localPath)) return localPath;
+
+  // 2. 其次查找 meta 基线
+  const metaPath = join(projectRoot, META_TEMPLATE_DIR, fileName);
+  if (exists(metaPath)) return metaPath;
+
+  // 3. 最后查找包内默认
+  const defaultPath = join(projectRoot, TEMPLATE_DIR, fileName);
+  if (exists(defaultPath)) return defaultPath;
+
+  return null;
+}
 
 /**
  * 渲染模板并写入目标文件
@@ -39,9 +72,11 @@ export function renderTemplate(
   // 文件已存在则跳过
   if (exists(outputPath)) return false;
 
-  const tplPath = join(projectRoot, TEMPLATE_DIR, `${templateName}.hbs`);
-  if (!exists(tplPath)) {
-    throw new Error(`Template not found: ${tplPath}`);
+  const tplPath = findTemplatePath(templateName, projectRoot);
+  if (!tplPath) {
+    throw new Error(
+      `Template not found: ${templateName}.hbs (searched in: ${LOCAL_TEMPLATE_DIR}, ${META_TEMPLATE_DIR}, ${TEMPLATE_DIR})`,
+    );
   }
 
   const source = readFileSync(tplPath, 'utf-8');
@@ -61,9 +96,11 @@ export function renderToString(
   context: TemplateContext,
   projectRoot: string,
 ): string {
-  const tplPath = join(projectRoot, TEMPLATE_DIR, `${templateName}.hbs`);
-  if (!exists(tplPath)) {
-    throw new Error(`Template not found: ${tplPath}`);
+  const tplPath = findTemplatePath(templateName, projectRoot);
+  if (!tplPath) {
+    throw new Error(
+      `Template not found: ${templateName}.hbs (searched in: ${LOCAL_TEMPLATE_DIR}, ${META_TEMPLATE_DIR}, ${TEMPLATE_DIR})`,
+    );
   }
 
   const source = readFileSync(tplPath, 'utf-8');

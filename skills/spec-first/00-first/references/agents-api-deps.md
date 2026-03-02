@@ -55,7 +55,7 @@
 | 注册中心/配置中心 | Nacos/Consul/Eureka/Apollo 配置 |
 | 监控 | Prometheus/Grafana/Sentry SDK |
 
-输出 → `docs/first/external-deps.md`（头部包含 `last_updated: YYYY-MM-DD`）
+输出 → `docs/first/external-deps.md`（头部包含 `last_updated: {{DATE}}`）
 
 ---
 

@@ -25,7 +25,7 @@
 
 ```markdown
 ---
-last_updated: 2026-02-28
+last_updated: {{DATE}}
 context7_sources: [...]
 ---
 

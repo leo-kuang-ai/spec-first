@@ -1,7 +1,7 @@
 ---
 version: 1.0.0
-last_updated: 2026-02-27
-changelog: Initial version with standardized metadata
+last_updated: {{DATE}}
+changelog: Aligned doctor MCP/skills checks with manifest-driven source of truth
 description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 ---
 
@@ -359,15 +359,9 @@ MCP/skills 诊断与修复（与 doctor Skill 一致）：
   - `Claude Code`：`~/.config/claude-code/mcp.json`、`~/.config/claude-code/settings.json`、`~/.claude/skills/`
 - 安装范围：
   - MCP 与第三方 skills 统一安装到用户级全局目录（home 路径），不写入项目局部目录
-- 必检 MCP：
-  - `sequential-thinking`
-  - `context7`
-  - `serena`（优先 `uvx --from git+https://github.com/oraios/serena serena start-mcp-server`，兼容回退 `serena-mcp-server`/`npx -y mcp-server-serena`）
-  - `fetch`（固定为 `uvx mcp-server-fetch`）
-  - `playwright-mcp`
-- 必检 skills：
-  - `find-skills`
-  - `skill-creator`
+- 必检 MCP / skills：
+  - 不在本文件硬编码，统一以 `src/config/bootstrap-manifest.ts` 为准
+  - `doctor` / `update` 通过 `ensureHostBootstrap` 复用同一套清单规则
 - 处理策略：
   - 直接 CLI 调用 `spec-first doctor` 时：缺失或配置错误会自动安装/自动修复
   - 通过 `spec-first:doctor` Skill 执行时：先展示修复计划并确认，再执行修复

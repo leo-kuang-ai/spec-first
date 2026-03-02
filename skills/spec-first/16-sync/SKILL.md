@@ -2,7 +2,7 @@
 name: "spec-first:sync"
 description: "定位 Feature 并同步追踪矩阵与状态"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

@@ -1,0 +1,35 @@
+catchup:
+  trigger: prompt
+context:
+  token_budget: 16000
+runtime:
+  max_iterations: 5
+  max_self_corrections: 3
+  kv_cache_hard_gate: false
+  auto_orchestrate:
+    enabled: false
+    stop_on_blocked: true
+    max_task_duration_ms: 600000
+    heartbeat_timeout_ms: 300000
+    watchdog_interval_ms: 10000
+    max_retry_per_task: 3
+    retry_backoff_ms: 2000
+    max_total_retry_duration_ms: 900000
+    max_parallel: 1
+  audit_log:
+    enabled: true
+    tamper_proof: hash_chain
+    rotation_size_mb: 10
+gate:
+  pilot_mode: false
+health:
+  weights:
+    w1: 0.1
+    w2: 0.1
+    w3: 0.1
+    w4: 0.15
+    w5: 0.1
+    w6: 0.15
+    w7: 0.1
+    w8: 0.1
+    w9: 0.1

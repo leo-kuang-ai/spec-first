@@ -38,11 +38,11 @@ afterEach(() => {
 });
 
 describe('update project scaffold', () => {
-  it('should create .spec-first/config.yaml and .claude/settings.json when missing', () => {
-    const code = handleUpdate(['--skip-mcp', '--skip-hooks']);
+  it('should create .spec-first/meta/config.yaml and .claude/settings.json when missing', async () => {
+    const code = await handleUpdate(['--skip-mcp', '--skip-hooks']);
     expect(code).toBe(ExitCode.SUCCESS);
 
-    const configPath = join(TMP, '.spec-first', 'config.yaml');
+    const configPath = join(TMP, '.spec-first', 'meta', 'config.yaml');
     const settingsPath = join(TMP, '.claude', 'settings.json');
     expect(existsSync(configPath)).toBe(true);
     expect(existsSync(settingsPath)).toBe(true);
@@ -51,10 +51,10 @@ describe('update project scaffold', () => {
     expect(readFileSync(settingsPath, 'utf-8')).toContain('"hooks"');
   });
 
-  it('should not create scaffold files in dry-run mode', () => {
-    const code = handleUpdate(['--dry-run', '--skip-mcp', '--skip-hooks']);
+  it('should not create scaffold files in dry-run mode', async () => {
+    const code = await handleUpdate(['--dry-run', '--skip-mcp', '--skip-hooks']);
     expect(code).toBe(ExitCode.SUCCESS);
-    expect(existsSync(join(TMP, '.spec-first', 'config.yaml'))).toBe(false);
+    expect(existsSync(join(TMP, '.spec-first', 'meta', 'config.yaml'))).toBe(false);
     expect(existsSync(join(TMP, '.claude', 'settings.json'))).toBe(false);
   });
 });

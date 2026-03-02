@@ -1,6 +1,6 @@
 /**
- * 三层合并逻辑
- * Layer 0 基线 → Layer 1 Mode×Size 裁剪 → Layer 2 平台 YAML 合并
+ * 四层合并逻辑
+ * Layer 0 基线 → Layer 1 Mode×Size 裁剪 → Layer 2 平台 YAML 合并 → Layer 3 用户级覆盖
  */
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
@@ -403,9 +403,112 @@ function applyExtensionRules(
   return applied;
 }
 
+// ─── Layer 3 用户级覆盖 ────────────────────────────────────
+
+interface LocalYaml {
+  version?: string;
+  gate_conditions?: Record<string, unknown[]>;
+  extra_deliverables?: Record<string, unknown[]>;
+  quality_thresholds?: Record<string, unknown>;
+  override_deliverables?: Record<string, unknown[]>; // 完全覆盖，非追加
+}
+
 /**
- * 三层合并主逻辑
- * Layer 0 基线 → Layer 1 Mode×Size → Layer 2 平台 YAML
+ * 加载本地用户级配置 .spec-first/local/layer3.yaml
+ * 若不存在则返回空对象（无覆盖）
+ */
+function loadLocalYaml(projectRoot: string): LocalYaml {
+  const p = join(projectRoot, '.spec-first', 'local', 'layer3.yaml');
+  if (!exists(p)) {
+    return {};
+  }
+  const raw = readFileSync(p, 'utf-8');
+  const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
+  return (parsed as LocalYaml) ?? {};
+}
+
+/**
+ * 应用 Layer 3 用户级覆盖
+ * - gate_conditions: 追加（同名 ID 冲突时抛出错误，避免静默覆盖）
+ * - extra_deliverables: 追加去重
+ * - quality_thresholds: 覆盖（用户值优先）
+ * - override_deliverables: 完全覆盖（替换阶段所有交付物）
+ */
+function applyLayer3(
+  gates: Record<string, GateCondition[]>,
+  deliverables: Record<string, Deliverable[]>,
+  thresholds: Record<string, ThresholdEntry>,
+  projectRoot: string,
+): void {
+  const local = loadLocalYaml(projectRoot);
+
+  // gate_conditions: 追加（同名 ID 冲突时报错）
+  if (local.gate_conditions) {
+    for (const [stage, conditions] of Object.entries(local.gate_conditions)) {
+      if (!Array.isArray(conditions)) {
+        throw new Error(`本地 layer3.yaml 的阶段 "${stage}" gate_conditions 必须是数组`);
+      }
+      gates[stage] = gates[stage] ?? [];
+      for (const rawCond of conditions) {
+        if (!rawCond || typeof rawCond !== 'object' || Array.isArray(rawCond)) {
+          throw new Error(`本地 layer3.yaml 的 gate_conditions.${stage} 含无效项`);
+        }
+        const cond = rawCond as GateCondition;
+        if (typeof cond.id !== 'string' || !cond.id.trim()) {
+          throw new Error(`本地 layer3.yaml 的 gate_conditions.${stage} 缺少 id`);
+        }
+        const conflict = gates[stage].find((g) => g.id === cond.id);
+        if (conflict) {
+          throw new Error(
+            `本地 layer3.yaml 的 Gate ID 冲突：${cond.id}（阶段 ${stage}）。若意图覆盖，请使用唯一 ID 或先删除原规则。`,
+          );
+        }
+        gates[stage].push(cond);
+      }
+    }
+  }
+
+  // override_deliverables: 完全覆盖（替换阶段所有交付物）
+  if (local.override_deliverables) {
+    for (const [stage, items] of Object.entries(local.override_deliverables)) {
+      if (!Array.isArray(items)) {
+        throw new Error(`本地 layer3.yaml 的阶段 "${stage}" override_deliverables 必须是数组`);
+      }
+      deliverables[stage] = [];
+      for (const rawItem of items) {
+        const item = normalizeDeliverable(rawItem, stage, 'local');
+        deliverables[stage].push(item);
+      }
+    }
+  }
+
+  // extra_deliverables: 追加去重
+  if (local.extra_deliverables) {
+    for (const [stage, items] of Object.entries(local.extra_deliverables)) {
+      if (!Array.isArray(items)) {
+        throw new Error(`本地 layer3.yaml 的阶段 "${stage}" extra_deliverables 必须是数组`);
+      }
+      deliverables[stage] = deliverables[stage] ?? [];
+      for (const rawItem of items) {
+        const item = normalizeDeliverable(rawItem, stage, 'local');
+        const dup = deliverables[stage].some((d) => d.name === item.name);
+        if (!dup) deliverables[stage].push(item);
+      }
+    }
+  }
+
+  // quality_thresholds: 覆盖（用户值优先，不与扩展值取更严）
+  if (local.quality_thresholds) {
+    for (const [key, rawEntry] of Object.entries(local.quality_thresholds)) {
+      const entry = normalizeThresholdEntry(rawEntry, key, 'local');
+      thresholds[key] = entry; // 直接覆盖
+    }
+  }
+}
+
+/**
+ * 四层合并主逻辑
+ * Layer 0 基线 → Layer 1 Mode×Size → Layer 2 平台 YAML → Layer 3 用户级覆盖
  */
 export function mergeLayerRules(
   mode: Mode,
@@ -413,20 +516,24 @@ export function mergeLayerRules(
   platforms: string[],
   projectRoot: string,
 ): MergedRules {
-  // Layer 0
+  // Layer 0: 基线
   const gates = layer0Gates();
   const deliverables = layer0Deliverables();
   const thresholds: Record<string, ThresholdEntry> = {};
 
-  // Layer 1
+  // Layer 1: Mode×Size 裁剪
   applyLayer1(gates, deliverables, mode, size);
 
-  // Layer 2
+  // Layer 2: 平台 YAML 合并
   if (platforms.length > 0) {
     applyLayer2(gates, deliverables, thresholds, platforms, projectRoot);
   }
 
+  // Extension 规则（在 Layer 2 和 Layer 3 之间应用）
   const extensions = applyExtensionRules(gates, deliverables, thresholds, projectRoot);
+
+  // Layer 3: 用户级覆盖（local/layer3.yaml，优先级最高）
+  applyLayer3(gates, deliverables, thresholds, projectRoot);
 
   return {
     mode,

@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.94 2026-03-03 Claude: docs(agent-database): 多数据库支持 — 添加配置优先检测、自动检测降级、CLI 验证流程，支持多数据库场景（索引+子文档产物），新增 database-config.md 配置指南 (user-visible)
+- v0.5.93 2026-03-02 Claude: docs: 完成项目全面代码审查 — 生成 4 阶段审查报告（代码质量与架构 B+、安全与性能 B、测试与文档 B-、最佳实践 A-/D*）+ 最终综合报告（05-final-report.md），识别 52 项问题（9 项 P0 关键、11 项 P1 高优先、14 项 P2 中等、18 项 P3 低），总体评级 B+，附 4 周修复行动计划
+- v0.5.92 2026-03-02 Claude: docs: 创建 3 个 ADR 文档 — ADR-001 meta/local 目录分离（四层配置合并架构）、ADR-002 模板哈希注册表（SHA-256 变更检测）、ADR-003 Manifest 迁移引擎（声明式 YAML 迁移）
+- v0.5.91 2026-03-02 Claude: refactor: CQ-002 update.ts runUpdate 职责拆分 — 提取 refreshHostIntegrations 函数（Skills/MCP/Hooks 刷新），runUpdate 从 ~65 行降至 ~30 行（1032 tests passed）
+- v0.5.90 2026-03-02 Claude: refactor: BP-LI-002 version-matcher.ts 改用 semver 包 — compareVersions 从手动 split/map/Number 改为 semver.compare + semver.coerce，消除手动版本比较逻辑（1032 tests passed）
+- v0.5.89 2026-03-02 Claude: fix: PERF-002 配置缓存添加 30s TTL 过期机制 — configCache 从 Map<string, Config> 改为带 cachedAt 时间戳的 CacheEntry，读取时检查过期（1032 tests passed）
+- v0.5.88 2026-03-02 Claude: refactor: PERF-001 hash-registry.ts 异步化 — computeTemplateHashes/loadHashRegistry/saveHashRegistry 改用 fs/promises，消除同步递归遍历阻塞事件循环；update.ts/setup.ts 调用链同步升级 async/await（1032 tests passed）
+- v0.5.87 2026-03-02 Claude: fix: 修复三处遗留问题 — testing-strategy.md 删除重复旧版段落、agents-code-analysis.md overview→quick 语义修正、配置路径统一为 .spec-first/meta/config.yaml（doctor.ts/session-hook.ts/update-scaffold.test.ts）
+- v0.5.86 2026-03-02 Claude: feat: 00-first Skill 会话恢复与产物索引 — 产物索引文件（.index.yaml，基于 js-yaml）、会话恢复提示（generateResumeRecommendation、formatResumePrompt、formatProductSummary）、产物过期检测（7 天阈值/Git commit 不匹配）、新增 first-index.ts 和 first-resume.ts 模块、测试覆盖 33 个用例（24 + 9）、总测试覆盖 104 个（first-args 54 + change-detector 17 + index 24 + resume 9） (user-visible)
+- v0.5.85 2026-03-02 Claude: feat: 00-first Skill 增量更新边界条件 — 变更文件→受影响产物映射（FILE_TO_ARTIFACT_MAP）、30% 变更阈值策略、产物健康检查（last_updated/git_commit/file_hash/格式校验）、选择性更新参数（--update/--since/--check-health）、新增 first-change-detector.ts 模块、测试覆盖 71 个用例（54 + 17） (user-visible)
+- v0.5.84 2026-03-02 Claude: feat: 00-first Skill 交互模式优化 — SKILL.md 新增"模式选择与交互策略"（默认交互式、展示 quick/deep 选项对比）、first-args.ts 支持 --auto/--quick 标志（新增 auto 字段、resolveFirstModePolicy 函数）、测试覆盖 39 个用例（新增 11 个）、更新文档一致性测试 (user-visible)
+- v0.5.83 2026-03-02 Claude: feat: T1+U5+T2+confirm 实现 — U5 meta/local 目录分离（四层架构 L0→L1→L2→L3、配置三级合并、模板三级查找链、迁移脚本、update 只写 meta）；T1 模板哈希与变更分级更新（哈希注册表、变更分类器、决策矩阵、集成 update）；T2 Manifest 迁移引擎（schema/loader/matcher/engine 六文件、集成 update、迁移模板目录）；confirm-policy 接入路由；新建 10 个文件，修改 5 个文件 (user-visible)
+  - **BREAKING**: 配置文件目录从 `.spec-first/config.yaml` 迁移至 `.spec-first/meta/config.yaml`（旧路径仍兼容但优先级最低）；`update` 命令写入目标从项目根改为 `.spec-first/meta/`；升级后首次运行 `spec-first update` 会自动创建新目录结构
+- v0.5.82 2026-03-02 Claude: feat: 00-first Skill Phase 3 高级特性 — 模板按端定制（backend/frontend/mobile 架构模板、api-docs 视角差异）、复合类型检测优化（Monorepo 子包识别、Flutter Web 混合）、智能模式推荐（代码量/API 端点判断）、渐进式升级（quick→deep 追加提示）、默认无交互模式、测试策略新增 15 个 Phase 3 用例 (user-visible)
+- v0.5.81 2026-03-02 Claude: feat: 00-first Skill Phase 2 端类型智能检测 — 新增 7 种端类型检测规则（backend/frontend/mobile/cross-platform/desktop/monorepo/mixed）、创建端类型产物映射配置、增强 Greenfield/Brownfield 判断、新增检测失败降级策略、测试策略新增 13 个用例 (user-visible)
+- v0.5.80 2026-03-02 Claude: feat: 00-first Skill quick/deep 双模式重构 — Layer 0 (quick: 4-5 个核心产物)、Layer 1 (deep追加: 6 个完整产物)、新增 CLI 参数支持 (--deep/--type/--force)、SKILL.md 升级至 v2.0.0、测试策略新增 quick 模式用例、skill-commands.ts 同步 first 描述 (user-visible)
 - v0.5.79 2026-02-28 Claude: feat: 00-first Skill 质量保障强化 — 核心约束增加强制证据标注格式（file:line + 代码片段）、5 个 agent 规格文件补齐证据协议与抽样验证规则、P5 新增交叉一致性验证（V1-V4 四项校验 + 证据抽检）、成功标准同步更新 (user-visible)
 - v0.5.78 2026-02-28 Claude: fix: 00-first Skill 审查修复 — README 模板对齐实际产出、条件产物改为条件渲染、call-graph frontmatter 补全、P3 阶段引用消歧、Serena 工具名修正、description 措辞修正
 - v0.5.77 2026-02-28 Claude: docs: 新增调用链分析文档 — 使用 Serena MCP 分析项目调用链，生成 `docs/first/call-graph.md`，包含模块依赖矩阵、Mermaid 依赖关系图、关键调用路径、模块符号概览、循环依赖分析、数据流图和改进建议 (user-visible)

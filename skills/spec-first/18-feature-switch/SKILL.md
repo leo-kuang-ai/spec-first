@@ -2,7 +2,7 @@
 name: "spec-first:feature-switch"
 description: "切换当前 Feature 上下文（更新 .spec-first/current）"
 version: 1.0.0
-last_updated: 2026-02-27
+last_updated: {{DATE}}
 changelog: Initial version with standardized metadata
 ---
 

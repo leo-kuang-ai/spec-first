@@ -2,7 +2,7 @@
 
 > **版本**: v2.0 | **日期**: 2026-02-14
 > **基准**: 当前代码实现（src/cli/commands/*.ts + skills/spec-first/*.md）
-> **总览**: 3 协同命令 + 19 Skill（6 阶段执行模型） + 13 CLI 命令组（38 子命令）
+> **总览**: 3 协同命令 + 22 Skill（6 阶段执行模型） + 13 CLI 命令组（38 子命令）
 
 ---
 
@@ -18,7 +18,7 @@
 
 ---
 
-## 二、19 个 Skill
+## 二、22 个 Skill
 
 所有 Skill 调用格式：`/spec-first:<skillName>`（如 `/spec-first:spec`、`/spec-first:catchup`）。
 
@@ -266,11 +266,12 @@ Skill 调用时，Dispatcher 按以下优先级路由：
 | 类别 | 数量 |
 |------|------|
 | 协同命令 | 3 |
+| 项目认知/专项 Skill | 3（first/spec-review/analyze） |
 | 阶段 Skill | 10 |
 | 编排 Skill | 3 |
-| 辅助 Skill | 3 |
+| 辅助 Skill | 6 |
 | CLI 命令组 | 13（38 子命令） |
-| **合计** | **19 Skill + 38 CLI 子命令 + 3 协同命令 = 60** |
+| **合计** | **22 Skill + 38 CLI 子命令 + 3 协同命令 = 63** |
 
 使用优先级：协同命令（`/plan` `/verify` `/orchestrate`）→ Skill（`/spec-first:<name>`）→ CLI 原子命令（`spec-first <cmd>`）。
 

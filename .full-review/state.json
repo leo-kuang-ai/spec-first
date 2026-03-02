@@ -1,15 +1,15 @@
 {
-  "target": "skills/spec-first/00-first/",
-  "status": "complete",
+  "target": "Spec-First 项目全面审查（重点 first skill）",
+  "status": "completed",
   "flags": {
-    "security_focus": false,
+    "security_focus": true,
     "performance_critical": false,
-    "strict_mode": false,
-    "framework": "skill"
+    "strict_mode": true,
+    "framework": "TypeScript/Node.js"
   },
-  "current_step": "5",
+  "current_step": 5,
   "current_phase": 5,
-  "completed_steps": ["0", "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5"],
+  "completed_steps": ["0", "1A", "1B", "2", "3", "4", "5"],
   "files_created": [
     "00-scope.md",
     "01-quality-architecture.md",
@@ -18,13 +18,14 @@
     "04-best-practices.md",
     "05-final-report.md"
   ],
-  "started_at": "2026-02-28T10:30:00Z",
-  "last_updated": "2026-02-28T17:00:00Z",
+  "started_at": "2026-03-02T14:16:37Z",
+  "last_updated": "2026-03-02T19:00:00Z",
   "summary": {
-    "total_findings": 87,
-    "critical": 5,
-    "high": 24,
-    "medium": 34,
-    "low": 24
+    "overall_grade": "B+",
+    "total_issues": 52,
+    "critical": 9,
+    "high": 11,
+    "medium": 14,
+    "low": 18
   }
 }
