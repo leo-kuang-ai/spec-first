@@ -11,6 +11,7 @@ const origCwd = process.cwd;
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
   mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });
+  mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
   writeFileSync(
     join(TMP, '.spec-first', 'layer2', 'h5.yaml'),
     'platform: h5\n',
@@ -21,6 +22,15 @@ beforeEach(() => {
     'platform: api\n',
     'utf-8',
   );
+  writeFileSync(
+    join(TMP, 'docs', 'first', '.index.yaml'),
+    "version: 1.0.0\nlast_run: '2026-03-03T00:00:00.000Z'\nmode: quick\nproducts: {}\nstatus: current\n",
+    'utf-8',
+  );
+  writeFileSync(join(TMP, 'docs', 'first', 'tech-stack.md'), '# Tech Stack\n', 'utf-8');
+  writeFileSync(join(TMP, 'docs', 'first', 'codebase-overview.md'), '# Codebase Overview\n', 'utf-8');
+  writeFileSync(join(TMP, 'docs', 'first', 'domain-model.md'), '# Domain Model\n', 'utf-8');
+  writeFileSync(join(TMP, 'docs', 'first', 'api-docs.md'), '# API Docs\n', 'utf-8');
   process.cwd = () => TMP;
 });
 
@@ -41,6 +51,23 @@ describe('handleInit', () => {
     const specsDir = join(TMP, 'specs');
     const entries = readdirSync(specsDir).filter((e) => e.startsWith('FSREQ-'));
     expect(entries.length).toBe(1);
+  });
+
+  it('should print first-check success summary before init', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+      const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+      expect(code).toBe(0);
+      expect(output).toContain('✅ 前置检查通过');
+      expect(output).toContain('00-first Skill 已完成 (quick 模式)');
+      expect(output).toContain('- 技术栈:');
+      expect(output).toContain('- 代码量:');
+      expect(output).toContain('- API 端点:');
+      expect(output).toContain('继续初始化需求工作区...');
+    } finally {
+      logSpy.mockRestore();
+    }
   });
 
   it('should create .claude/settings.json scaffold when missing', async () => {
@@ -112,6 +139,37 @@ describe('handleInit', () => {
     expect(code).toBe(2);
   });
 
+  it('should return VALIDATION_ERROR when 00-first artifacts are missing', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    rmSync(join(TMP, 'docs', 'first'), { recursive: true, force: true });
+    try {
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+      const output = errSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+      expect(code).toBe(2);
+      expect(output).toContain('⚠️  前置检查失败');
+      expect(output).toContain('00-first Skill 尚未执行');
+      expect(output).toContain('/spec-first:first --quick');
+      expect(output).toContain('/spec-first:first --deep');
+      expect(output).toContain('完成后再运行 /spec-first:init');
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
+  it('should warn when project scaffold files are incomplete', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+      const output = warnSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+      expect(code).toBe(0);
+      expect(output).toContain('警告：检测到项目初始化文件不完整');
+      expect(output).toContain('.spec-first/meta/config.yaml');
+      expect(output).toContain('specs/');
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
   it('should keep init success when skill command registration fails', async () => {
     const claudeFile = join(TMP, '.claude');
     writeFileSync(claudeFile, 'occupied', 'utf-8');
@@ -144,6 +202,59 @@ describe('handleStage', () => {
     expect(code).toBe(0);
   });
 
+  it('should detect registered AI hooks from nested claude settings', async () => {
+    const fid = await setupFeature();
+    const settingsPath = join(TMP, '.claude', 'settings.json');
+    writeFileSync(settingsPath, `${JSON.stringify({
+      hooks: {
+        PreToolUse: [
+          { hooks: [{ type: 'command', command: 'echo custom' }] },
+          { hooks: [{ type: 'command', command: 'npx spec-first gate check "$FEAT"' }] },
+        ],
+        PostToolUse: [
+          { hooks: [{ type: 'command', command: 'npx spec-first matrix check "$FEAT"' }] },
+        ],
+        Stop: [
+          { hooks: [{ type: 'command', command: 'npx spec-first ai stats "$FEAT"' }] },
+        ],
+      },
+    }, null, 2)}\n`, 'utf-8');
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const code = handleStage(['current', fid]);
+      const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+
+      expect(code).toBe(0);
+      expect(output).toContain('AI Hooks：');
+      expect(output).toContain('已注册: PreToolUse, PostToolUse, Stop');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
+  it('should ignore top-level legacy AI hooks without hooks wrapper', async () => {
+    const fid = await setupFeature();
+    const settingsPath = join(TMP, '.claude', 'settings.json');
+    writeFileSync(settingsPath, `${JSON.stringify({
+      PreToolUse: [{ hooks: [{ type: 'command', command: 'npx spec-first gate check "$FEAT"' }] }],
+      PostToolUse: [{ hooks: [{ type: 'command', command: 'npx spec-first matrix check "$FEAT"' }] }],
+      Stop: [{ hooks: [{ type: 'command', command: 'npx spec-first ai stats "$FEAT"' }] }],
+    }, null, 2)}\n`, 'utf-8');
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const code = handleStage(['current', fid]);
+      const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+
+      expect(code).toBe(0);
+      expect(output).toContain('AI Hooks：');
+      expect(output).toContain('已注册: (无)');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
   it('should advance successfully when init gate conditions are satisfied', async () => {
     const fid = await setupFeature();
     const code = handleStage(['advance', fid]);
@@ -173,10 +284,18 @@ describe('handleStage', () => {
   });
 
   it('should return error for current with missing featureId', () => {
-    expect(handleStage(['current'])).toBe(2);
+    const mockError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const code = handleStage(['current']);
+    expect(code).toBe(2);  // ExitCode.VALIDATION_ERROR
+    expect(mockError).toHaveBeenCalledWith(expect.stringContaining('stage current'));
+    mockError.mockRestore();
   });
 
   it('should return error for advance with missing featureId', () => {
-    expect(handleStage(['advance'])).toBe(2);
+    const mockError = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const code = handleStage(['advance']);
+    expect(code).toBe(2);  // ExitCode.VALIDATION_ERROR
+    expect(mockError).toHaveBeenCalledWith(expect.stringContaining('stage advance'));
+    mockError.mockRestore();
   });
 });

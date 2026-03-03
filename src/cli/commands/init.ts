@@ -2,7 +2,7 @@
  * init CLI 命令
  * spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>]
  */
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -36,6 +36,27 @@ interface NormalizedInitInput {
   featureId?: string;
   title: string;
 }
+
+interface InitReadinessStatus {
+  firstCompleted: boolean;
+  firstMissing: string[];
+  projectInitialized: boolean;
+  projectMissing: string[];
+}
+
+interface FirstSummary {
+  mode: 'quick' | 'deep' | 'unknown';
+  techStack: string;
+  codeVolume: string;
+  apiSurface: string;
+}
+
+const FIRST_REQUIRED_PRODUCTS = [
+  'tech-stack.md',
+  'codebase-overview.md',
+  'domain-model.md',
+  'api-docs.md',
+] as const;
 
 function parseInitCliInput(args: string[]): InitCliInput {
   return {
@@ -154,6 +175,104 @@ function runPostInitSetup(cwd: string): void {
   }
 }
 
+function checkInitReadiness(projectRoot: string): InitReadinessStatus {
+  const firstDir = join(projectRoot, 'docs', 'first');
+  const firstMissing: string[] = [];
+  if (!existsSync(firstDir)) {
+    firstMissing.push('docs/first/');
+  } else {
+    const indexPath = join(firstDir, '.index.yaml');
+    if (!existsSync(indexPath)) {
+      firstMissing.push('docs/first/.index.yaml');
+    }
+    for (const name of FIRST_REQUIRED_PRODUCTS) {
+      if (!existsSync(join(firstDir, name))) {
+        firstMissing.push(`docs/first/${name}`);
+      }
+    }
+  }
+
+  // 项目初始化状态检查（提示用途，不阻断 init）
+  const projectMissing: string[] = [];
+  if (!existsSync(join(projectRoot, '.spec-first'))) {
+    projectMissing.push('.spec-first/');
+  }
+  if (!existsSync(join(projectRoot, '.spec-first', 'layer2'))) {
+    projectMissing.push('.spec-first/layer2/');
+  }
+  if (!existsSync(join(projectRoot, '.spec-first', 'meta', 'config.yaml'))) {
+    projectMissing.push('.spec-first/meta/config.yaml');
+  }
+  if (!existsSync(join(projectRoot, 'specs'))) {
+    projectMissing.push('specs/');
+  }
+
+  return {
+    firstCompleted: firstMissing.length === 0,
+    firstMissing,
+    projectInitialized: projectMissing.length === 0,
+    projectMissing,
+  };
+}
+
+function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
+  const firstDir = join(projectRoot, 'docs', 'first');
+
+  const readIfExists = (path: string): string => {
+    if (!existsSync(path)) return '';
+    try {
+      return readFileSync(path, 'utf-8');
+    } catch {
+      return '';
+    }
+  };
+
+  const indexRaw = readIfExists(join(firstDir, '.index.yaml'));
+  const techStackRaw = readIfExists(join(firstDir, 'tech-stack.md'));
+  const overviewRaw = readIfExists(join(firstDir, 'codebase-overview.md'));
+  const apiRaw = readIfExists(join(firstDir, 'api-docs.md'));
+
+  const modeMatch = indexRaw.match(/^\s*mode:\s*(quick|deep)\s*$/m);
+  const mode = (modeMatch?.[1] as FirstSummary['mode'] | undefined) ?? 'unknown';
+
+  const lowerStack = techStackRaw.toLowerCase();
+  let techStack = '待确认';
+  if (lowerStack.includes('node.js') && lowerStack.includes('typescript')) {
+    techStack = 'Node.js + TypeScript';
+  } else if (lowerStack.includes('java') && lowerStack.includes('spring')) {
+    techStack = 'Java + Spring';
+  } else if (lowerStack.includes('python') && lowerStack.includes('django')) {
+    techStack = 'Python + Django';
+  } else if (lowerStack.includes('go') && lowerStack.includes('gin')) {
+    techStack = 'Go + Gin';
+  } else if (lowerStack.includes('typescript')) {
+    techStack = 'TypeScript';
+  }
+
+  const codeVolumeMatch = overviewRaw.match(/代码量\s*[:：]\s*[~约]?\s*([0-9][0-9,]*)(\+)?\s*行?/);
+  const codeVolume = codeVolumeMatch
+    ? `~${codeVolumeMatch[1]}${codeVolumeMatch[2] ? '+' : ''} 行`
+    : '待确认';
+
+  const apiCountMatch = apiRaw.match(/([0-9][0-9,]*)\+?\s*个\s*API/);
+  let apiSurface = apiCountMatch
+    ? `${apiCountMatch[1]}+ 个`
+    : '待确认';
+  if (apiSurface === '待确认') {
+    const sectionCount = (apiRaw.match(/^###\s+/gm) || []).length;
+    if (sectionCount > 0) {
+      apiSurface = `${sectionCount}+ 个`;
+    }
+  }
+
+  return {
+    mode,
+    techStack,
+    codeVolume,
+    apiSurface,
+  };
+}
+
 export async function handleInit(args: string[]): Promise<number> {
   if (args.includes('--help') || args.includes('-h')) {
     printInitHelp();
@@ -165,11 +284,50 @@ export async function handleInit(args: string[]): Promise<number> {
 
   const cwd = process.cwd();
   const parsedInput = parseInitCliInput(args);
+
+  // 在交互式收集参数前先检查 00-first 是否完成（避免用户填完问题后才被告知需要先运行 first）
+  const readiness = checkInitReadiness(cwd);
+  if (!readiness.firstCompleted) {
+    console.error('⚠️  前置检查失败');
+    console.error('');
+    console.error('00-first Skill 尚未执行，无法初始化需求工作区。');
+    console.error('');
+    console.error('建议操作：');
+    console.error('  1. 运行 /spec-first:first --quick    快速认知项目（<5min）');
+    console.error('  2. 运行 /spec-first:first --deep     完整分析项目（<10min）');
+    console.error('');
+    console.error('缺失项：');
+    for (const item of readiness.firstMissing) console.error(`  - ${item}`);
+    console.error('');
+    console.error('完成后再运行 /spec-first:init');
+    return ExitCode.VALIDATION_ERROR;
+  }
+
   const resolvedInput = await resolveInitCliInput(args, parsedInput);
   if (!resolvedInput) return ExitCode.VALIDATION_ERROR;
 
+  // 先校验参数，再检查前置依赖（避免参数非法时先显示成功）
   const normalized = normalizeInitInput(resolvedInput, cwd);
   if (!normalized) return ExitCode.VALIDATION_ERROR;
+
+  // 00-first 已确认完成，显示摘要信息
+  const summary = summarizeFirstArtifacts(cwd);
+  const modeLabel = summary.mode === 'unknown' ? 'unknown' : summary.mode;
+  console.log('✅ 前置检查通过');
+  console.log('');
+  console.log(`00-first Skill 已完成 (${modeLabel} 模式)`);
+  console.log(`- 技术栈: ${summary.techStack}`);
+  console.log(`- 代码量: ${summary.codeVolume}`);
+  console.log(`- API 端点: ${summary.apiSurface}`);
+  console.log('');
+  console.log('继续初始化需求工作区...');
+
+  if (readiness.projectMissing.length > 0) {
+    console.warn('警告：检测到项目初始化文件不完整（建议先运行 spec-first setup）：');
+    for (const item of readiness.projectMissing) {
+      console.warn(`  - ${item}`);
+    }
+  }
 
   let result: ReturnType<typeof init>;
   try {

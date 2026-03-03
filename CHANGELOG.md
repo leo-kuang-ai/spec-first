@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.99 2026-03-03 Claude: fix: 修复 stage 文案错误与 init 前置检查时机 — (1) `handleCurrent/handleAdvance` 缺参时显示正确的用法提示（current/advance 而非 cancel）；(2) 交互式 init 在参数采集前先检查 00-first 是否完成；(3) 测试添加 console.error 内容断言 (user-visible)
+- v0.5.98 2026-03-03 Claude: feat: 01-init 添加 00-first 前置检查 — 执行 `spec-first init` 前检查 00-first Skill 是否完成（docs/first/ 目录及必需文档），未完成时提示用户先运行 `/spec-first:first` (user-visible)
+- v0.5.97 2026-03-03 Claude: refactor: stage.ts 代码质量优化 — 提取 AI_HOOK_TYPES 常量、checkAIHooksStatus/countSkillCommands 独立函数、catch 块添加警告日志（handleCurrent 从 ~65 行降至 ~45 行）
+- v0.5.96 2026-03-03 Claude: docs: First Skill deep 模式全量更新 — 重新生成 10 个项目认知文档（tech-stack/codebase-overview/architecture/call-graph/api-docs/external-deps/development-guidelines/local-setup/domain-model/README），deep 模式强制证据标注，Serena LSP 辅助分析 (user-visible)
+- v0.5.95 2026-03-03 Claude: fix: 01-init Skill P5 输出完整性 — `spec-first stage current` 现在输出完整信息（目录、平台、Hooks 状态、AI Hooks 状态、Skill 命令状态），与 SKILL.md 规格对齐 (user-visible)
 - v0.5.94 2026-03-03 Claude: docs(agent-database): 多数据库支持 — 添加配置优先检测、自动检测降级、CLI 验证流程，支持多数据库场景（索引+子文档产物），新增 database-config.md 配置指南 (user-visible)
 - v0.5.93 2026-03-02 Claude: docs: 完成项目全面代码审查 — 生成 4 阶段审查报告（代码质量与架构 B+、安全与性能 B、测试与文档 B-、最佳实践 A-/D*）+ 最终综合报告（05-final-report.md），识别 52 项问题（9 项 P0 关键、11 项 P1 高优先、14 项 P2 中等、18 项 P3 低），总体评级 B+，附 4 周修复行动计划
 - v0.5.92 2026-03-02 Claude: docs: 创建 3 个 ADR 文档 — ADR-001 meta/local 目录分离（四层配置合并架构）、ADR-002 模板哈希注册表（SHA-256 变更检测）、ADR-003 Manifest 迁移引擎（声明式 YAML 迁移）
