@@ -243,7 +243,7 @@ changelog: |
 docs/
 └── first/
     ├── tech-stack.md            # 技术栈摘要 [quick]
-    ├── codebase-overview.md     # 代码结构概览 [quick]
+    ├── codebase-overview.md     # 代码结构概览 + 开发入口 [quick]
     ├── domain-model.md          # 业务领域模型 [quick]
     ├── api-docs.md              # API 接口文档 [quick]
     ├── database-er.md           # ER 图 + 字段详情 [quick, 如有 DB]
