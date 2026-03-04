@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.46 2026-03-04 Claude: First Skill 新手引导增强 — README 新增新手必读章节、codebase-overview 新增开发入口章节 (user-visible)
 - v0.5.99 2026-03-03 Claude: fix: 修复 stage 文案错误与 init 前置检查时机 — (1) `handleCurrent/handleAdvance` 缺参时显示正确的用法提示（current/advance 而非 cancel）；(2) 交互式 init 在参数采集前先检查 00-first 是否完成；(3) 测试添加 console.error 内容断言 (user-visible)
 - v0.5.98 2026-03-03 Claude: feat: 01-init 添加 00-first 前置检查 — 执行 `spec-first init` 前检查 00-first Skill 是否完成（docs/first/ 目录及必需文档），未完成时提示用户先运行 `/spec-first:first` (user-visible)
 - v0.5.97 2026-03-03 Claude: refactor: stage.ts 代码质量优化 — 提取 AI_HOOK_TYPES 常量、checkAIHooksStatus/countSkillCommands 独立函数、catch 块添加警告日志（handleCurrent 从 ~65 行降至 ~45 行）
