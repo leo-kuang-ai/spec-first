@@ -17,6 +17,7 @@
 - 模块划分与职责说明
 - 入口文件识别
 - 构建/运行命令
+- **开发入口章节**（常见任务 → 文件路径映射）
 
 **Serena 辅助**（如 P0 激活成功）：
 - 使用 `serena:get_symbols_overview` 获取顶层模块的类/函数符号列表，辅助模块职责判定
@@ -27,6 +28,51 @@
 - API 路由列表（如有）
 - 关键业务流程梳理
 - 依赖关系图（Mermaid）
+
+### 开发入口章节模板
+
+A1 在 codebase-overview.md 末尾必须包含「开发入口」章节：
+
+```markdown
+## 开发入口
+
+> 告诉你"改什么功能 → 改哪个文件"（按当前项目技术栈自适应）
+
+### 常见开发任务
+
+| 任务 | 文件/目录（按实际项目填写） | 说明 |
+|------|-----------------------------|------|
+| 新增 API 端点 | `<api-layer-dir>` | 如 `src/api/` / `app/controllers/` / `internal/transport/http/` |
+| 新增业务逻辑 | `<service-or-domain-dir>` | 如 `src/services/` / `app/services/` / `internal/domain/` |
+| 新增页面/组件 | `<ui-dir>` | 如 `src/pages/` / `src/components/` / `web/src/views/` |
+| 修改数据模型 | `<data-model-file-or-dir>` | 如 `prisma/schema.prisma` / `models/` / `pkg/model/` |
+| 修改配置 | `<config-file-or-dir>` | 如 `config/` / `.env` / `application.yml` |
+| 添加测试 | `<test-dir>` | 如 `tests/` / `__tests__/` / `test/` |
+| 修改定时任务 | `<job-or-cron-dir>` | 如 `src/jobs/` / `cron/` / `cmd/scheduler/` |
+
+### 快速定位
+
+- **应用入口**：`<entry-file-or-command>`
+- **路由注册**：`<routing-file-or-dir>`
+- **数据访问层**：`<db-or-repository-dir>`
+- **中间件/拦截器**：`<middleware-or-filter-dir>`
+
+> 规则：优先填写仓库中真实存在的路径；若未检测到对应目录，标注 `[待确认: 未检测到对应目录]`，禁止虚构。
+```
+
+**按端类型调整映射**：
+
+| 端类型 | 开发入口重点 |
+|--------|-------------|
+| backend | API 路由、服务层、数据库模型、定时任务 |
+| frontend | 页面组件、API 调用、状态管理、样式文件 |
+| mobile | 屏幕/导航、API 客户端、本地存储 |
+| cross-platform | 按子目录区分（如 web/、mobile/） |
+| monorepo | 按 package 区分，逐包列出开发入口 |
+
+**降级策略**：
+- 无法识别端类型时，使用通用模板（包含所有常见目录）
+- 检测到的目录不存在时，标注 `[待确认: 目录不存在]`
 
 输出 → `docs/first/codebase-overview.md`
 
