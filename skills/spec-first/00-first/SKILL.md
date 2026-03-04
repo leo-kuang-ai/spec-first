@@ -271,6 +271,37 @@ project_type: auto-detected  # 或用户指定
 ---
 ```
 
+### README.md 新手必读章节模板（deep 模式）
+
+README.md 开头必须包含「新手必读」章节：
+
+```markdown
+## 新手必读
+
+### 快速入门路径（预计 15-20 分钟）
+
+**Step 1: 了解项目**（5 分钟）
+→ 先读 `tech-stack.md` 了解技术栈
+→ 再读 `domain-model.md` 了解业务核心概念
+
+**Step 2: 理解结构**（5 分钟）
+→ 读 `codebase-overview.md` 了解代码组织
+→ 读 `architecture.md` 了解系统架构
+
+**Step 3: 开始开发**（5 分钟）
+→ 读 `local-setup.md` 搭建本地环境
+→ 读 `development-guidelines.md` 了解开发规范
+→ 参考 `codebase-overview.md` 的「开发入口」章节找到改动的文件
+
+### 按角色推荐
+
+| 角色 | 重点文档 |
+|------|----------|
+| 后端开发 | domain-model → api-docs → database-er → codebase-overview |
+| 前端开发 | tech-stack → api-docs → codebase-overview → development-guidelines |
+| 全栈开发 | 按快速入门路径顺序 |
+```
+
 ## 并发执行策略
 
 > **quick/deep 双模式**：quick 模式聚焦核心产物（4-5 个），deep 模式提供完整分析（10-11 个）。
