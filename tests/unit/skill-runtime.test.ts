@@ -21,7 +21,7 @@ const FEAT = 'FSREQ-20260211-AUTH-001';
 beforeEach(() => {
   resetConfigCache();
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
-  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
   mkdirSync(join(TMP, 'skills', 'spec-first', '07-code'), { recursive: true });
 });
 
@@ -102,6 +102,38 @@ describe('dispatchCommand', () => {
   it('should return error for empty command', () => {
     const result = dispatchCommand(':', TMP);
     expect(result.route).toBe('error');
+  });
+
+  it('should default code-review layer to cross when --layer is omitted', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '# Code Review');
+    const result = dispatchCommand('code-review', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.args).toEqual(['--layer', 'cross']);
+  });
+
+  it('should default verify layer to completion when --layer is omitted', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '12-verify'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '12-verify', 'SKILL.md'), '# Verify');
+    const result = dispatchCommand('verify', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.args).toEqual(['--layer', 'completion']);
+  });
+
+  it('should reject code-review with invalid layer value', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '# Code Review');
+    const result = dispatchCommand('code-review --layer bad', TMP);
+    expect(result.route).toBe('error');
+    expect(result.error).toContain('Invalid --layer');
+  });
+
+  it('should reject verify with non-completion layer', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '12-verify'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '12-verify', 'SKILL.md'), '# Verify');
+    const result = dispatchCommand('verify --layer single', TMP);
+    expect(result.route).toBe('error');
+    expect(result.error).toContain('Allowed: completion');
   });
 
   // ─── Orchestrate 参数校验集成 ─────────────────────────
@@ -207,6 +239,21 @@ describe('loadSkill hard-gate notice', () => {
       '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
       'utf-8',
     );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
+        '- reason: function not implemented',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
@@ -228,6 +275,21 @@ describe('loadSkill hard-gate notice', () => {
       '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress\n',
       'utf-8',
     );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
+        '- reason: function not implemented',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
@@ -246,6 +308,21 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
       '| 标题 | 状态 | Task ID |\n|---|---|---|\n| Login | in_progress | TASK-AUTH-001 |\n',
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
+        '- reason: function not implemented',
+        '',
+      ].join('\n'),
       'utf-8',
     );
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
@@ -285,6 +362,21 @@ describe('loadSkill hard-gate notice', () => {
       '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login [P] | in_progress |\n',
       'utf-8',
     );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
+        '- reason: function not implemented',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
 
     execSync('git -c core.hooksPath=/dev/null init', { cwd: TMP, stdio: 'ignore' });
     execSync('git config user.email "test@example.com"', { cwd: TMP, stdio: 'ignore' });
@@ -303,7 +395,7 @@ describe('loadSkill hard-gate notice', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
     writeFileSync(
-      join(TMP, '.spec-first', 'config.yaml'),
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'runtime:\n  kv_cache_hard_gate: true\n',
       'utf-8',
     );
@@ -316,7 +408,7 @@ describe('loadSkill hard-gate notice', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
     writeFileSync(
-      join(TMP, '.spec-first', 'config.yaml'),
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'runtime:\n  kv_cache_hard_gate: false\n',
       'utf-8',
     );

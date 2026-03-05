@@ -5,6 +5,22 @@
 
 ---
 
+## 质量保障规则（Agent D 通用）
+
+- 通用证据格式、抽样流程、违规判定：见 `references/quality-assurance-rules.md`
+- Agent D 的“必须标注证据内容”与“抽样规模”：见统一规则文档中的 Agent 矩阵
+- 无法验证项必须显式标记 `[待确认]`
+
+## 凭证防护执行规则（技术性，强制）
+
+- 最小暴露：仅在执行即时连接探测时读取凭证，不写入产物正文、不写入长期缓存。
+- 日志脱敏：日志中若出现连接串或口令字段，必须替换敏感片段为 `***`。
+- 输出约束：禁止输出密码、完整连接串、长期访问令牌、私钥内容。
+- 失败兜底：当 CLI 不可用或鉴权失败时，降级为结构化提示，不回显原始凭证内容。
+- 会话清理：探测结束后清理临时环境变量与内存中的明文凭证引用。
+
+---
+
 ## Step 1: 数据库配置检测
 
 ### 检测优先级
@@ -19,7 +35,7 @@
 ```
 开始
   │
-  ├─ 检查 .spec-first/config.yaml 是否存在 databases 配置段？
+  ├─ 检查 .spec-first/meta/config.yaml 是否存在 databases 配置段？
   │   │
   │   ├─ YES → 读取配置列表作为基准，跳过自动检测
   │   │        │
@@ -37,7 +53,7 @@
   ├─ 显示检测结果列表
   │   │
   │   └─ 询问用户: "是否将检测结果写入配置文件？"
-  │        ├─ YES → 写入 .spec-first/config.yaml
+  │        ├─ YES → 写入 .spec-first/meta/config.yaml
   │        └─ NO  → 跳过
   │
   └─ 生成产物
@@ -50,7 +66,7 @@
 | 优先级 | 来源 | 说明 |
 |--------|------|------|
 | 1 | 用户显式传入 | `db_url` 参数（最高优先级） |
-| 2 | 配置文件 | `.spec-first/config.yaml` 中的 `databases.list` |
+| 2 | 配置文件 | `.spec-first/meta/config.yaml` 中的 `databases.list` |
 | 3 | 环境变量 | `.env`, `.env.local` |
 | 4 | ORM 配置 | Prisma, Drizzle, TypeORM, Sequelize, Mongoose |
 | 5 | 框架配置 | application.yml, settings.py, database.yml |
@@ -65,7 +81,7 @@
 
 ### 配置写入（可选）
 
-检测完成后，如果用户选择写入配置，将以下内容追加到 `.spec-first/config.yaml`：
+检测完成后，如果用户选择写入配置，将以下内容追加到 `.spec-first/meta/config.yaml`：
 
 ```yaml
 databases:

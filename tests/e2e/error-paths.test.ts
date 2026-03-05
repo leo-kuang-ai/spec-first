@@ -3,12 +3,13 @@
  * Gate FAIL 阻断 / Force 推进 / Cancel 流程 / RFC 变更 / 缺陷闭环
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
 import { init } from '../../src/core/process-engine/init.js';
 import { advance, cancel } from '../../src/core/process-engine/advance.js';
 import { getFeatureState } from '../../src/core/process-engine/feature.js';
+import { preWriteArchive } from '../../src/core/skill-runtime/phase-machine.js';
 import { createRfc, getRfc, transitionRfc } from '../../src/core/change-mgr/rfc.js';
 import { registerDefect, getDefect, transitionDefect } from '../../src/core/change-mgr/defect.js';
 
@@ -74,6 +75,57 @@ describe('Force advance with audit', () => {
     );
     expect(findings).toContain('FORCE_SKIPPED');
     expect(findings).toContain('00_init');
+  });
+});
+
+describe('Archive composite threshold', () => {
+  it('should archive medium task_plan.md when risk markers exist', () => {
+    writeFileSync(join(TMP, '.spec-first', 'config.yaml'), yaml.dump({
+      version: '1.0', gate: { pilot_mode: true },
+    }));
+    const { featureId } = init({
+      feat: 'ARC', mode: 'N', size: 'M', platforms: ['h5'], projectRoot: TMP,
+    });
+
+    const findingsLines = Array.from({ length: 220 }, (_, i) => `finding-${i + 1}`);
+    writeFileSync(join(TMP, 'specs', featureId, 'findings.md'), findingsLines.join('\n'), 'utf-8');
+
+    const taskLines = Array.from({ length: 220 }, (_, i) => `task-${i + 1}`);
+    taskLines[40] = '状态: 阻塞（等待外部依赖）';
+    writeFileSync(join(TMP, 'specs', featureId, 'task_plan.md'), taskLines.join('\n'), 'utf-8');
+
+    const archived = preWriteArchive(featureId, TMP);
+    expect(archived).toContain('task_plan.md');
+    expect(archived).not.toContain('findings.md');
+
+    const keptTaskPlan = readFileSync(join(TMP, 'specs', featureId, 'task_plan.md'), 'utf-8');
+    expect(keptTaskPlan.split('\n').length).toBeLessThanOrEqual(200);
+
+    const archiveFiles = readdirSync(join(TMP, 'specs', featureId))
+      .filter((file) => /^task_plan-\d{4}-\d{2}-\d{2}-\d+\.md$/.test(file));
+    expect(archiveFiles.length).toBeGreaterThan(0);
+  });
+
+  it('should not archive medium task_plan.md without risk markers', () => {
+    writeFileSync(join(TMP, '.spec-first', 'config.yaml'), yaml.dump({
+      version: '1.0', gate: { pilot_mode: true },
+    }));
+    const { featureId } = init({
+      feat: 'ARN', mode: 'N', size: 'M', platforms: ['h5'], projectRoot: TMP,
+    });
+
+    const taskLines = Array.from({ length: 220 }, (_, i) => `task-${i + 1}`);
+    writeFileSync(join(TMP, 'specs', featureId, 'task_plan.md'), taskLines.join('\n'), 'utf-8');
+
+    const archived = preWriteArchive(featureId, TMP);
+    expect(archived).not.toContain('task_plan.md');
+
+    const archiveFiles = readdirSync(join(TMP, 'specs', featureId))
+      .filter((file) => /^task_plan-\d{4}-\d{2}-\d{2}-\d+\.md$/.test(file));
+    expect(archiveFiles.length).toBe(0);
+
+    const currentTaskPlan = readFileSync(join(TMP, 'specs', featureId, 'task_plan.md'), 'utf-8');
+    expect(currentTaskPlan.split('\n').length).toBe(220);
   });
 });
 

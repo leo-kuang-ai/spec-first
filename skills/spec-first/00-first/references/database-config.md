@@ -2,7 +2,7 @@
 
 > 版本: 1.0.0 | 日期: 2026-03-03
 
-本文档说明如何通过 `.spec-first/config.yaml` 配置数据库，用于 Spec-First 数据库检测。
+本文档说明如何通过 `.spec-first/meta/config.yaml` 配置数据库，用于 Spec-First 数据库检测。
 
 ---
 
@@ -13,9 +13,8 @@
 ```
 your-project/
 ├── .spec-first/
-│   ├── config.yaml          # 项目级配置（可提交）
 │   ├── meta/
-│   │   └── config.yaml      # 包级基线
+│   │   └── config.yaml      # 项目级基线（可提交）
 │   └── local/
 │       └── config.yaml      # 本地覆盖（不提交）
 ```
@@ -24,7 +23,7 @@ your-project/
 
 ## 显式配置（推荐）
 
-在 `.spec-first/config.yaml` 中添加 `databases` 配置段：
+在 `.spec-first/meta/config.yaml` 中添加 `databases` 配置段：
 
 ```yaml
 databases:

@@ -156,15 +156,29 @@ describe('handleInit', () => {
     }
   });
 
-  it('should warn when project scaffold files are incomplete', async () => {
+  it('should auto create meta config and avoid scaffold warning', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
       const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
       const output = warnSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
       expect(code).toBe(0);
+      expect(existsSync(join(TMP, '.spec-first', 'meta', 'config.yaml'))).toBe(true);
+      expect(output).not.toContain('警告：检测到项目初始化文件不完整');
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it('should warn when meta config auto-create fails', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    writeFileSync(join(TMP, '.spec-first', 'meta'), 'occupied', 'utf-8');
+    try {
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+      const output = warnSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+      expect(code).toBe(0);
+      expect(output).toContain('无法创建 .spec-first/meta/config.yaml');
       expect(output).toContain('警告：检测到项目初始化文件不完整');
       expect(output).toContain('.spec-first/meta/config.yaml');
-      expect(output).toContain('specs/');
     } finally {
       warnSpy.mockRestore();
     }

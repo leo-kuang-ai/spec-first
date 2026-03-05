@@ -37,6 +37,34 @@ function writeSpecReview(content: string) {
   writeFileSync(join(TMP, 'specs', FEAT, 'checklists', 'spec-review.md'), content, 'utf-8');
 }
 
+function writeConstitutionAuthorityMappingArtifacts() {
+  const authorityDir = join(TMP, 'skills', 'spec-first', '03-spec', 'references');
+  mkdirSync(authorityDir, { recursive: true });
+  writeFileSync(
+    join(authorityDir, 'constitution-authority.md'),
+    [
+      '# Constitution 权威层级',
+      'Level 0: Constitution',
+      'Level 1: Spec',
+      'Level 2: Design',
+      'Level 3: Code',
+      '',
+      '任意与 Constitution 冲突：阻断推进，先修复违规项',
+      '',
+    ].join('\n'),
+    'utf-8',
+  );
+
+  mkdirSync(join(TMP, 'skills', 'spec-first', '03-spec'), { recursive: true });
+  writeFileSync(join(TMP, 'skills', 'spec-first', '03-spec', 'SKILL.md'), '- references/constitution-authority.md\n', 'utf-8');
+
+  mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
+  writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), '- ../03-spec/references/constitution-authority.md\n', 'utf-8');
+
+  mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
+  writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '- ../03-spec/references/constitution-authority.md\n', 'utf-8');
+}
+
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
 });
@@ -110,6 +138,7 @@ describe('evaluateGate', () => {
 
   it('should PASS C11 when constitution metadata exists and design references constitution clause', () => {
     writeState('02_design');
+    writeConstitutionAuthorityMappingArtifacts();
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.0.0) is applied.', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'constitution.md'),
@@ -123,6 +152,27 @@ describe('evaluateGate', () => {
     const result = evaluateGate(FEAT, TMP);
     const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
     expect(c11?.status).toBe('PASS');
+  });
+
+  it('should FAIL C11 when constitution-authority mapping artifacts are missing', () => {
+    writeState('02_design');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.0.0) is applied.', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.0.0\n- Ratified: 2026-02-26\n- Last Amended: 2026-02-26\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('FAIL');
+    expect(c11?.detail).toContain('constitution-authority.md missing');
+    expect(c11?.detail).toContain('fix:');
+    expect(c11?.detail).toContain('skills/spec-first/03-spec/references/constitution-authority.md');
   });
 
   it('should FAIL C11 when design has no constitution reference', () => {
@@ -140,6 +190,24 @@ describe('evaluateGate', () => {
     const result = evaluateGate(FEAT, TMP);
     const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
     expect(c11?.status).toBe('FAIL');
+    expect(c11?.detail).toContain('specs/FSREQ-20260211-AUTH-001/design.md');
+    expect(c11?.detail).toContain('fix:');
+  });
+
+  it('should FAIL C11 with file-level fix hint when constitution.md is missing', () => {
+    writeState('02_design');
+    writeConstitutionAuthorityMappingArtifacts();
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.0.0) is applied.', 'utf-8');
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('FAIL');
+    expect(c11?.detail).toContain('constitution.md missing');
+    expect(c11?.detail).toContain('fix: create specs/FSREQ-20260211-AUTH-001/constitution.md');
   });
 
   it('should write gate-history.jsonl on evaluation', () => {

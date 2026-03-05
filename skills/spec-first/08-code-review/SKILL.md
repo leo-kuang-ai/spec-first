@@ -16,6 +16,7 @@ changelog: Initial version with standardized metadata
 - traces 是否完整（TASK/FR/DS 映射）
 - 验证证据是否新鲜且可复现
 - 变更是否符合阶段与流程守卫
+- 宪法合规（是否违反 constitution 原则，违规按 CRITICAL 处理）
 
 ### Stage 2: 质量审查（在 Stage 1 通过后执行）
 - 4 维度：SOLID / 安全 / 性能 / 测试
@@ -55,6 +56,8 @@ changelog: Initial version with standardized metadata
 - `references/security-checklist.md`
 - `references/performance-checklist.md`
 - `references/testing-checklist.md`
+- `references/cross-layer-checklist.md`
+- `../03-spec/references/constitution-authority.md`
 
 ## 确认策略
 - 推荐: assisted（审查发现需人工判断）

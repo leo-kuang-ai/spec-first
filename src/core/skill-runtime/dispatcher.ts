@@ -48,6 +48,8 @@ const RUNTIME_COMMANDS = new Set([
 ]);
 
 const NEXT_STEPS_POLICY_MARKER = '## Next Steps（Required Handoff）';
+const REVIEW_LAYERS = new Set(['single', 'cross', 'completion']);
+const VERIFY_LAYERS = new Set(['completion']);
 
 function ensureNextStepsPolicy(content: string): string {
   if (content.includes(NEXT_STEPS_POLICY_MARKER) || /##\s*Next Steps/i.test(content)) {
@@ -66,6 +68,49 @@ function parseExtensionSkillName(skillName: string): { namespace: string; skill:
   const match = skillName.match(/^ext\.([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/);
   if (!match) return undefined;
   return { namespace: match[1], skill: match[2] };
+}
+
+function normalizeLayerArgs(args: string[], layer: string): string[] {
+  const normalized: string[] = [];
+  for (let i = 0; i < args.length; i++) {
+    const token = args[i];
+    if (token === '--layer') {
+      i++;
+      continue;
+    }
+    normalized.push(token);
+  }
+  normalized.push('--layer', layer);
+  return normalized;
+}
+
+function validateLayerArgs(
+  skillName: string,
+  args: string[],
+): { ok: true; args: string[] } | { ok: false; error: string } {
+  if (skillName !== 'code-review' && skillName !== 'verify') {
+    return { ok: true, args };
+  }
+
+  const idx = args.indexOf('--layer');
+  const defaultLayer = skillName === 'code-review' ? 'cross' : 'completion';
+  if (idx === -1) {
+    return { ok: true, args: normalizeLayerArgs(args, defaultLayer) };
+  }
+
+  const value = args[idx + 1];
+  if (!value || value.startsWith('--')) {
+    return { ok: false, error: `Invalid --layer value for ${skillName}: missing layer name` };
+  }
+  const layer = value.toLowerCase();
+  const allowed = skillName === 'code-review' ? REVIEW_LAYERS : VERIFY_LAYERS;
+  if (!allowed.has(layer)) {
+    return {
+      ok: false,
+      error: `Invalid --layer "${value}" for ${skillName}. Allowed: ${[...allowed].join(', ')}`,
+    };
+  }
+  return { ok: true, args: normalizeLayerArgs(args, layer) };
 }
 
 /**
@@ -121,14 +166,23 @@ export function dispatchCommand(
   // Skill 路由：查找 Skill 文件
   const skillPath = resolveSkillPath(skillName, projectRoot);
   if (skillPath) {
+    const layerValidation = validateLayerArgs(skillName, rest);
+    if (!layerValidation.ok) {
+      return {
+        route: 'error',
+        error: layerValidation.error,
+      };
+    }
+    const normalizedRest = layerValidation.args;
+
     // orchestrate 专用参数校验（V2-13§4.5）
     if (skillName === 'orchestrate') {
       try {
-        const orchestrateArgs = validateOrchestrateArgs(rest);
+        const orchestrateArgs = validateOrchestrateArgs(normalizedRest);
         return {
           route: 'skill',
           skillName,
-          args: rest,
+          args: normalizedRest,
           skillPath,
           orchestrateArgs,
         };
@@ -143,13 +197,13 @@ export function dispatchCommand(
     // first 专用参数校验（quick/deep 模式）
     if (skillName === 'first') {
       try {
-        const firstArgs = validateFirstArgs(rest);
+        const firstArgs = validateFirstArgs(normalizedRest);
         const firstConfirmPolicy = resolveFirstConfirmPolicy(firstArgs);
         const firstModePolicy = resolveFirstModePolicy(firstArgs);
         return {
           route: 'skill',
           skillName,
-          args: rest,
+          args: normalizedRest,
           skillPath,
           firstArgs,
           firstConfirmPolicy,
@@ -166,7 +220,7 @@ export function dispatchCommand(
     return {
       route: 'skill',
       skillName,
-      args: rest,
+      args: normalizedRest,
       skillPath,
     };
   }

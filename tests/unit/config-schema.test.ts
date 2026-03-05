@@ -11,9 +11,10 @@ import {
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-config');
 const SPEC_DIR = join(TMP, '.spec-first');
+const META_DIR = join(SPEC_DIR, 'meta');
 
 beforeEach(() => {
-  mkdirSync(SPEC_DIR, { recursive: true });
+  mkdirSync(META_DIR, { recursive: true });
   resetConfigCache();
 });
 
@@ -35,7 +36,7 @@ describe('loadConfig', () => {
 
   it('should merge user values with defaults', () => {
     writeFileSync(
-      join(SPEC_DIR, 'config.yaml'),
+      join(META_DIR, 'config.yaml'),
       'gate:\n  pilot_mode: false\nruntime:\n  kv_cache_hard_gate: true\n',
       'utf-8',
     );
@@ -46,17 +47,17 @@ describe('loadConfig', () => {
   });
 
   it('should reject out-of-range token_budget', () => {
-    writeFileSync(join(SPEC_DIR, 'config.yaml'), 'context:\n  token_budget: 100\n', 'utf-8');
+    writeFileSync(join(META_DIR, 'config.yaml'), 'context:\n  token_budget: 100\n', 'utf-8');
     expect(() => loadConfig(TMP)).toThrow('token_budget must be 8000-64000');
   });
 
   it('should reject out-of-range runtime.max_iterations', () => {
-    writeFileSync(join(SPEC_DIR, 'config.yaml'), 'runtime:\n  max_iterations: 100\n', 'utf-8');
+    writeFileSync(join(META_DIR, 'config.yaml'), 'runtime:\n  max_iterations: 100\n', 'utf-8');
     expect(() => loadConfig(TMP)).toThrow('runtime.max_iterations must be 1-20');
   });
 
   it('should reject out-of-range runtime.max_self_corrections', () => {
-    writeFileSync(join(SPEC_DIR, 'config.yaml'), 'runtime:\n  max_self_corrections: 20\n', 'utf-8');
+    writeFileSync(join(META_DIR, 'config.yaml'), 'runtime:\n  max_self_corrections: 20\n', 'utf-8');
     expect(() => loadConfig(TMP)).toThrow('runtime.max_self_corrections must be 1-10');
   });
 });

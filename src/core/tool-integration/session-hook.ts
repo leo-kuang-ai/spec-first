@@ -43,8 +43,7 @@ function buildSessionStartCommand(specFirstBin: string): string {
     // 自动恢复策略（默认 prompt）
     'TRIGGER=prompt; ',
     'CFG_FILE=""; ',
-    'if [ -f .spec-first/meta/config.yaml ]; then CFG_FILE=.spec-first/meta/config.yaml; ',
-    'elif [ -f .spec-first/config.yaml ]; then CFG_FILE=.spec-first/config.yaml; fi; ',
+    'if [ -f .spec-first/meta/config.yaml ]; then CFG_FILE=.spec-first/meta/config.yaml; fi; ',
     'if [ -n "$CFG_FILE" ]; then ',
     '  CFG_TRIGGER=$(awk "BEGIN{inCatchup=0} /^[[:space:]]*catchup:[[:space:]]*$/ {inCatchup=1; next} inCatchup && /^[^[:space:]]/ {inCatchup=0} inCatchup && /^[[:space:]]*trigger:[[:space:]]*/ {sub(/^[[:space:]]*trigger:[[:space:]]*/, "", $0); gsub(/[[\\][:space:]]/, "", $0); print $0; exit}" "$CFG_FILE" 2>/dev/null || true); ',
     '  case "$CFG_TRIGGER" in auto|prompt|off) TRIGGER=$CFG_TRIGGER ;; esac; ',

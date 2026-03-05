@@ -8,12 +8,12 @@ const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-prompt-assemble
 const FEAT = 'FSREQ-20260226-AUTH-001';
 
 beforeEach(() => {
-  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
 
   writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
   writeFileSync(
-    join(TMP, '.spec-first', 'config.yaml'),
+    join(TMP, '.spec-first', 'meta', 'config.yaml'),
     'context:\n  token_budget: 12000\nruntime:\n  max_iterations: 7\n  max_self_corrections: 4\n',
     'utf-8',
   );

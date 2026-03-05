@@ -64,6 +64,11 @@ NO implementation code until design artifacts are complete and approved.
 - 对架构分层、接口边界、数据一致性策略等关键设计决策，优先在 Plan Mode 中先收敛再落文档
 - Plan Mode 的关键结论必须同步到 `findings.md`，并在 `design.md` 中保留可追溯引用
 
+## 宪法权威参考（P1-CON）
+
+- 设计评审时必须对照 `../03-spec/references/constitution-authority.md`
+- 若 Design 与 Constitution 冲突，优先修正 Design，不得带冲突推进
+
 ## HARD-GATE 与产物完整性决策图（Superpowers P1-2）
 
 ```dot

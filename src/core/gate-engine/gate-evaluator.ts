@@ -465,12 +465,18 @@ function evaluateSpecQualityScore(featureId: string, projectRoot: string): { pas
 function evaluateConstitutionCompliance(featureId: string, projectRoot: string): { pass: boolean; detail: string } {
   const constitutionPath = join(projectRoot, 'specs', featureId, 'constitution.md');
   if (!exists(constitutionPath)) {
-    return { pass: false, detail: 'C11 FAIL: constitution.md missing' };
+    return {
+      pass: false,
+      detail: `C11 FAIL: constitution.md missing; fix: create specs/${featureId}/constitution.md with Version/Ratified/Last Amended/Amendment History`,
+    };
   }
 
   const designPath = join(projectRoot, 'specs', featureId, 'design.md');
   if (!exists(designPath)) {
-    return { pass: false, detail: 'C11 FAIL: design.md missing' };
+    return {
+      pass: false,
+      detail: `C11 FAIL: design.md missing; fix: create specs/${featureId}/design.md and add Constitution Clause references`,
+    };
   }
 
   const constitution = readFileSync(constitutionPath, 'utf-8');
@@ -491,14 +497,130 @@ function evaluateConstitutionCompliance(featureId: string, projectRoot: string):
     failures.push('design.md missing constitution clause reference');
   }
 
+  const authorityMapping = evaluateConstitutionAuthorityMapping(projectRoot);
+  if (!authorityMapping.pass) {
+    failures.push(...authorityMapping.failures);
+  }
+
   if (failures.length > 0) {
-    return { pass: false, detail: `C11 FAIL: ${failures.join('; ')}` };
+    const fixes = getC11FailureFixHints(featureId, failures);
+    return {
+      pass: false,
+      detail: `C11 FAIL: ${failures.join('; ')}; fix: ${fixes.join(' | ')}`,
+    };
   }
 
   return {
     pass: true,
-    detail: `C11 PASS: version=${meta.version}, ratified=${meta.ratified}, last_amended=${meta.lastAmended}`,
+    detail: `C11 PASS: version=${meta.version}, ratified=${meta.ratified}, last_amended=${meta.lastAmended}, authority_mapping=ok`,
   };
+}
+
+function evaluateConstitutionAuthorityMapping(projectRoot: string): { pass: boolean; failures: string[] } {
+  const failures: string[] = [];
+  const authorityRefPath = join(projectRoot, 'skills', 'spec-first', '03-spec', 'references', 'constitution-authority.md');
+  const specSkillPath = join(projectRoot, 'skills', 'spec-first', '03-spec', 'SKILL.md');
+  const designSkillPath = join(projectRoot, 'skills', 'spec-first', '04-design', 'SKILL.md');
+  const codeReviewSkillPath = join(projectRoot, 'skills', 'spec-first', '08-code-review', 'SKILL.md');
+
+  if (!exists(authorityRefPath)) {
+    failures.push('constitution-authority.md missing');
+  } else {
+    const authorityRef = readFileSync(authorityRefPath, 'utf-8');
+    const hasLevels = /Level\s*0[\s\S]*Level\s*1[\s\S]*Level\s*2[\s\S]*Level\s*3/i.test(authorityRef);
+    const hasArbitrationRule = /(任意与\s*Constitution\s*冲突|any.*Constitution.*conflict)/i.test(authorityRef);
+    if (!hasLevels) failures.push('constitution-authority.md missing Level 0-3 hierarchy');
+    if (!hasArbitrationRule) failures.push('constitution-authority.md missing conflict arbitration rule');
+  }
+
+  if (!exists(specSkillPath)) {
+    failures.push('03-spec/SKILL.md missing');
+  } else if (!/constitution-authority\.md/i.test(readFileSync(specSkillPath, 'utf-8'))) {
+    failures.push('03-spec/SKILL.md missing constitution-authority reference');
+  }
+
+  if (!exists(designSkillPath)) {
+    failures.push('04-design/SKILL.md missing');
+  } else if (!/constitution-authority\.md/i.test(readFileSync(designSkillPath, 'utf-8'))) {
+    failures.push('04-design/SKILL.md missing constitution-authority reference');
+  }
+
+  if (!exists(codeReviewSkillPath)) {
+    failures.push('08-code-review/SKILL.md missing');
+  } else if (!/constitution-authority\.md/i.test(readFileSync(codeReviewSkillPath, 'utf-8'))) {
+    failures.push('08-code-review/SKILL.md missing constitution-authority reference');
+  }
+
+  return { pass: failures.length === 0, failures };
+}
+
+function getC11FailureFixHints(featureId: string, failures: string[]): string[] {
+  const hints: string[] = [];
+  const push = (hint: string) => {
+    if (!hints.includes(hint)) hints.push(hint);
+  };
+
+  for (const failure of failures) {
+    if (failure === 'missing version' || failure.startsWith('invalid version')) {
+      push(`specs/${featureId}/constitution.md: set semantic Version (e.g. 1.0.0)`);
+      continue;
+    }
+    if (failure === 'missing ratified date') {
+      push(`specs/${featureId}/constitution.md: add Ratified date (YYYY-MM-DD)`);
+      continue;
+    }
+    if (failure === 'missing last_amended date') {
+      push(`specs/${featureId}/constitution.md: add Last Amended date (YYYY-MM-DD)`);
+      continue;
+    }
+    if (failure === 'missing amendment history section') {
+      push(`specs/${featureId}/constitution.md: add '## Amendment History' section`);
+      continue;
+    }
+    if (failure === 'design.md missing constitution clause reference') {
+      push(`specs/${featureId}/design.md: add 'Constitution Clause <id> (v<version>)' references`);
+      continue;
+    }
+    if (failure === 'constitution-authority.md missing') {
+      push('skills/spec-first/03-spec/references/constitution-authority.md: create authority mapping doc');
+      continue;
+    }
+    if (failure === 'constitution-authority.md missing Level 0-3 hierarchy') {
+      push('skills/spec-first/03-spec/references/constitution-authority.md: add Level 0-3 hierarchy');
+      continue;
+    }
+    if (failure === 'constitution-authority.md missing conflict arbitration rule') {
+      push('skills/spec-first/03-spec/references/constitution-authority.md: add conflict arbitration rule');
+      continue;
+    }
+    if (failure === '03-spec/SKILL.md missing') {
+      push('skills/spec-first/03-spec/SKILL.md: restore skill doc and reference constitution-authority.md');
+      continue;
+    }
+    if (failure === '03-spec/SKILL.md missing constitution-authority reference') {
+      push('skills/spec-first/03-spec/SKILL.md: add reference to references/constitution-authority.md');
+      continue;
+    }
+    if (failure === '04-design/SKILL.md missing') {
+      push('skills/spec-first/04-design/SKILL.md: restore skill doc and reference constitution-authority.md');
+      continue;
+    }
+    if (failure === '04-design/SKILL.md missing constitution-authority reference') {
+      push('skills/spec-first/04-design/SKILL.md: add reference to ../03-spec/references/constitution-authority.md');
+      continue;
+    }
+    if (failure === '08-code-review/SKILL.md missing') {
+      push('skills/spec-first/08-code-review/SKILL.md: restore skill doc and reference constitution-authority.md');
+      continue;
+    }
+    if (failure === '08-code-review/SKILL.md missing constitution-authority reference') {
+      push('skills/spec-first/08-code-review/SKILL.md: add reference to ../03-spec/references/constitution-authority.md');
+      continue;
+    }
+    push(`manual check required for: ${failure}`);
+  }
+
+  return hints.length > 0 ? hints : ['manual check required'];
 }
 
 function evaluateAnalyzeCriticalFindings(featureId: string, projectRoot: string): { pass: boolean; detail: string } {

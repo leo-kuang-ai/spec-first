@@ -17,7 +17,7 @@ function withCwd(dir: string, fn: () => number): number {
 
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
-  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
   writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), '{}');
 });
 
@@ -60,7 +60,7 @@ describe('handleMetrics', () => {
 
 describe('handleDoctor', () => {
   it('should return SUCCESS when project structure is valid', () => {
-    writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'version: 1');
+    writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1');
     const code = withCwd(TMP, () => handleDoctor([]));
     expect(code).toBe(ExitCode.SUCCESS);
   });
@@ -87,7 +87,7 @@ describe('handleDoctor', () => {
 
   it('should parse pilot_mode via yaml instead of string matching', () => {
     writeFileSync(
-      join(TMP, '.spec-first', 'config.yaml'),
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'gate:\n  pilot_mode: false\n# pilot_mode: true\n',
       'utf-8',
     );
@@ -106,20 +106,20 @@ describe('handleDoctor', () => {
   });
 
   it('should return SUCCESS with feature checks when feature exists', () => {
-    writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'version: 1');
+    writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1');
     writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), '{}');
     const code = withCwd(TMP, () => handleDoctor([FEAT]));
     expect(code).toBe(ExitCode.SUCCESS);
   });
 
   it('should return CONFIG_ERROR when feature dir not found', () => {
-    writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'version: 1');
+    writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1');
     const code = withCwd(TMP, () => handleDoctor(['NONEXISTENT']));
     expect(code).toBe(ExitCode.CONFIG_ERROR);
   });
 
   it('should return CONFIG_ERROR when stage-state.json missing', () => {
-    writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'version: 1');
+    writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1');
     rmSync(join(TMP, 'specs', FEAT, 'stage-state.json'), { force: true });
     // Feature dir exists (from beforeEach) but no stage-state.json
     const code = withCwd(TMP, () => handleDoctor([FEAT]));

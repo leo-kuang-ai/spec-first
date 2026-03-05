@@ -11,7 +11,7 @@ const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-config-ext');
 
 beforeEach(() => {
   resetConfigCache();
-  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
 });
 
 afterEach(() => {
@@ -48,7 +48,7 @@ describe('audit_log defaults', () => {
 describe('auto_orchestrate merge', () => {
   it('部分覆盖保留其余默认值', () => {
     writeFileSync(
-      join(TMP, '.spec-first', 'config.yaml'),
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'runtime:\n  auto_orchestrate:\n    enabled: true\n    max_parallel: 2\n',
     );
     const cfg = loadConfig(TMP);
@@ -63,7 +63,7 @@ describe('auto_orchestrate merge', () => {
 describe('audit_log merge', () => {
   it('tamper_proof 可设为 none', () => {
     writeFileSync(
-      join(TMP, '.spec-first', 'config.yaml'),
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'runtime:\n  audit_log:\n    tamper_proof: none\n',
     );
     const cfg = loadConfig(TMP);
@@ -72,7 +72,7 @@ describe('audit_log merge', () => {
 
   it('非法 tamper_proof 值保持默认', () => {
     writeFileSync(
-      join(TMP, '.spec-first', 'config.yaml'),
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'runtime:\n  audit_log:\n    tamper_proof: invalid\n',
     );
     const cfg = loadConfig(TMP);

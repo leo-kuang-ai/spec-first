@@ -35,7 +35,7 @@ changelog: Initial version with standardized metadata
   - `docs/first/domain-model.md`
   - `docs/first/api-docs.md`
 - 若缺失任一项，必须中止并提示先执行 `/spec-first:first`
-- 同时检查项目初始化文件状态（用于提示）：`.spec-first/`、`.spec-first/layer2/`、`.spec-first/meta/config.yaml`（或 `.spec-first/config.yaml`）、`specs/`
+- 同时检查项目初始化文件状态（用于提示）：`.spec-first/`、`.spec-first/layer2/`、`.spec-first/meta/config.yaml`
 
 ## 参数约束（强制）
 - `feat` 必须匹配：`^[A-Z][A-Z0-9]{0,15}$`
@@ -61,7 +61,7 @@ changelog: Initial version with standardized metadata
 - `specs/{featureId}/task_plan.md`
 - `specs/.feat-registry.md`
 - `.spec-first/current`
-- `.spec-first/config.yaml`（缺失时补齐）
+- `.spec-first/meta/config.yaml`（缺失时补齐）
 - `.claude/settings.json`（缺失时补齐）
 
 ## 确认策略
@@ -72,7 +72,7 @@ changelog: Initial version with standardized metadata
 - 生成目录 `specs/{featureId}/`
 - 新建场景：`stage-state.json` 存在且阶段为 `00_init`
 - 幂等场景：不重置既有阶段状态，且 `.spec-first/current` 已修复指向目标 featureId
-- `.spec-first/config.yaml` 存在（若缺失则已补齐）
+- `.spec-first/meta/config.yaml` 存在（若缺失则已补齐）
 - `.claude/settings.json` 存在（若缺失则已补齐）
 - 非阻断副作用（允许告警但不影响 init 成功）：
   - Skill 命令刷新（`.claude/commands/spec-first/*.md`）

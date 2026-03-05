@@ -12,6 +12,7 @@ import { init } from '../../core/process-engine/init.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { detectHostPaths, formatHostPathSummary } from '../../shared/host-paths.js';
 import { ensureSkillCommands } from '../../shared/skill-commands.js';
+import { renderDefaultConfigYaml } from '../../shared/config-schema.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { parseFlag } from '../parse-utils.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
@@ -175,6 +176,20 @@ function runPostInitSetup(cwd: string): void {
   }
 }
 
+function ensureProjectMetaConfig(projectRoot: string): void {
+  const metaDir = join(projectRoot, '.spec-first', 'meta');
+  const metaConfigPath = join(metaDir, 'config.yaml');
+  if (existsSync(metaConfigPath)) return;
+  try {
+    mkdirSync(metaDir, { recursive: true });
+    if (!existsSync(metaConfigPath)) {
+      writeFileSync(metaConfigPath, renderDefaultConfigYaml(), 'utf-8');
+    }
+  } catch (e) {
+    console.warn('警告：无法创建 .spec-first/meta/config.yaml：' + (e as Error).message);
+  }
+}
+
 function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   const firstDir = join(projectRoot, 'docs', 'first');
   const firstMissing: string[] = [];
@@ -202,9 +217,6 @@ function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   }
   if (!existsSync(join(projectRoot, '.spec-first', 'meta', 'config.yaml'))) {
     projectMissing.push('.spec-first/meta/config.yaml');
-  }
-  if (!existsSync(join(projectRoot, 'specs'))) {
-    projectMissing.push('specs/');
   }
 
   return {
@@ -309,6 +321,8 @@ export async function handleInit(args: string[]): Promise<number> {
   // 先校验参数，再检查前置依赖（避免参数非法时先显示成功）
   const normalized = normalizeInitInput(resolvedInput, cwd);
   if (!normalized) return ExitCode.VALIDATION_ERROR;
+  ensureProjectMetaConfig(cwd);
+  const postFixReadiness = checkInitReadiness(cwd);
 
   // 00-first 已确认完成，显示摘要信息
   const summary = summarizeFirstArtifacts(cwd);
@@ -322,9 +336,9 @@ export async function handleInit(args: string[]): Promise<number> {
   console.log('');
   console.log('继续初始化需求工作区...');
 
-  if (readiness.projectMissing.length > 0) {
+  if (postFixReadiness.projectMissing.length > 0) {
     console.warn('警告：检测到项目初始化文件不完整（建议先运行 spec-first setup）：');
-    for (const item of readiness.projectMissing) {
+    for (const item of postFixReadiness.projectMissing) {
       console.warn(`  - ${item}`);
     }
   }

@@ -1,8 +1,8 @@
 /**
  * Gate CLI + GoLive + Rollback 单元测试
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleGate, handleGoLive } from '../../src/cli/commands/gate.js';
 import { checkGoLive } from '../../src/core/gate-engine/golive.js';
@@ -72,6 +72,54 @@ describe('handleGate', () => {
   it('should return IO_ERROR for conditions when state missing', () => {
     const code = withCwd(TMP, () => handleGate(['conditions', FEAT]));
     expect(code).toBe(ExitCode.IO_ERROR);
+  });
+
+  it('should print actionable fix steps for C11 failures', () => {
+    writeState('02_design');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'design.md'),
+      '## Governance\nConstitution Clause P1 (v1.0.0) is applied.',
+      'utf-8',
+    );
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = withCwd(TMP, () => handleGate(['check', FEAT]));
+      const output = logSpy.mock.calls.flat().join('\n');
+      expect(code).toBe(ExitCode.VALIDATION_ERROR);
+      expect(output).toContain('可执行修复步骤：');
+      expect(output).toContain(`create specs/${FEAT}/constitution.md`);
+    } finally {
+      logSpy.mockRestore();
+      errSpy.mockRestore();
+    }
+  });
+
+  it('should persist C11 fix steps to findings.md for audit', () => {
+    writeState('02_design');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'design.md'),
+      '## Governance\nConstitution Clause P1 (v1.0.0) is applied.',
+      'utf-8',
+    );
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = withCwd(TMP, () => handleGate(['check', FEAT]));
+      expect(code).toBe(ExitCode.VALIDATION_ERROR);
+    } finally {
+      logSpy.mockRestore();
+      errSpy.mockRestore();
+    }
+
+    const findingsPath = join(TMP, 'specs', FEAT, 'findings.md');
+    expect(existsSync(findingsPath)).toBe(true);
+    const findings = readFileSync(findingsPath, 'utf-8');
+    expect(findings).toContain('Gate Check Remediation');
+    expect(findings).toContain('G-DESIGN-03: Constitution compliance (C11)');
+    expect(findings).toContain(`create specs/${FEAT}/constitution.md`);
   });
 });
 

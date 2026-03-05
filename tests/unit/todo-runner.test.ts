@@ -16,9 +16,9 @@ const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-todo-runner');
 const FEAT = 'FSREQ-20260226-AUTH-001';
 
 beforeEach(() => {
-  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
-  writeFileSync(join(TMP, '.spec-first', 'config.yaml'), 'runtime:\n  max_iterations: 3\n', 'utf-8');
+  writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'runtime:\n  max_iterations: 3\n', 'utf-8');
 });
 
 afterEach(() => {

@@ -44,14 +44,53 @@ function readCurrentStage(projectRoot: string, featureId: string): string | unde
 }
 
 function hasInProgressTask(taskPlan: string): boolean {
+  return Boolean(findInProgressTaskId(taskPlan));
+}
+
+function findInProgressTaskId(taskPlan: string): string | undefined {
   for (const cells of parseMarkdownTable(taskPlan)) {
-    const hasTaskId = cells.some(cell => /^TASK-/i.test(cell));
-    if (!hasTaskId) continue;
+    const taskCell = cells.find(cell => /^TASK-/i.test(cell));
+    if (!taskCell) continue;
     const hasInProgress = cells.some((cell) => {
       const normalized = cell.toLowerCase();
       return normalized === 'in_progress' || normalized === 'in progress' || normalized === '进行中';
     });
-    if (hasInProgress) return true;
+    if (!hasInProgress) continue;
+    const match = taskCell.match(/TASK-[A-Z0-9-]+/i);
+    if (match?.[0]) return match[0];
+  }
+  return undefined;
+}
+
+function hasTddWaiver(findings: string, taskId?: string): boolean {
+  const blocks = findings.split(/\n{2,}/);
+  return blocks.some((block) => {
+    const marker = /\[TDD-WAIVER\]|TDD豁免|TDD waiver/i.test(block);
+    if (!marker) return false;
+    if (taskId && !block.includes(taskId)) return false;
+    return /(场景|scenario)\s*[:：]/i.test(block)
+      && /(理由|reason)\s*[:：]/i.test(block)
+      && /(批准人|approver|approved by)\s*[:：]/i.test(block)
+      && /(时间|timestamp|time)\s*[:：]/i.test(block);
+  });
+}
+
+function hasTddRedEvidence(findings: string, taskId?: string): boolean {
+  const blocks = findings.split(/\n{2,}/);
+  for (const block of blocks) {
+    if (taskId && !block.includes(taskId)) continue;
+    if (!/(TDD[-_\s]?RED|Verify RED|RED 证据|失败测试证据|failing test)/i.test(block)) continue;
+
+    const exitCodePattern = /(exit\s*code|退出码)\s*[:=：]\s*(-?\d+)/ig;
+    let match: RegExpExecArray | null = exitCodePattern.exec(block);
+    while (match) {
+      const code = Number.parseInt(match[2] ?? '0', 10);
+      if (!Number.isNaN(code) && code !== 0) return true;
+      match = exitCodePattern.exec(block);
+    }
+
+    // 兼容仅记录结论的场景：仍要求体现测试失败语义
+    if (/(test|测试)/i.test(block) && /(fail|failed|失败)/i.test(block)) return true;
   }
   return false;
 }
@@ -252,6 +291,31 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
         severity: 'BLOCKED',
         reason: 'code requires an in_progress TASK',
         remediation: '先在 task_plan.md 标记 1 条 in_progress TASK，再进入实现',
+      };
+    }
+
+    const activeTaskId = findInProgressTaskId(taskPlan);
+    const findingsPath = join(specDir, 'findings.md');
+    if (!exists(findingsPath)) {
+      return {
+        allowed: false,
+        severity: 'BLOCKED',
+        reason: 'code requires TDD RED evidence in findings.md',
+        remediation: '先执行 RED 测试并在 findings.md 记录命令、退出码与失败原因，或记录结构化 [TDD-WAIVER] 豁免',
+      };
+    }
+
+    const findings = readMarkdown(findingsPath);
+    const waived = hasTddWaiver(findings, activeTaskId);
+    const hasRedEvidence = hasTddRedEvidence(findings, activeTaskId);
+    if (!waived && !hasRedEvidence) {
+      return {
+        allowed: false,
+        severity: 'BLOCKED',
+        reason: activeTaskId
+          ? `code requires TDD RED evidence for ${activeTaskId}`
+          : 'code requires TDD RED evidence for in_progress TASK',
+        remediation: '先补齐 RED 失败测试证据（建议标记 TDD-RED + 退出码非 0）或记录结构化 [TDD-WAIVER] 豁免',
       };
     }
   }

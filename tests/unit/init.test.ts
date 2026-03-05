@@ -67,9 +67,9 @@ describe('init', () => {
     expect(current).toBe(`${result.featureId}\n`);
   });
 
-  it('should create default .spec-first/config.yaml when missing', () => {
+  it('should create default .spec-first/meta/config.yaml when missing', () => {
     init(baseOpts());
-    const configPath = join(TMP, '.spec-first', 'config.yaml');
+    const configPath = join(TMP, '.spec-first', 'meta', 'config.yaml');
     expect(existsSync(configPath)).toBe(true);
     const content = readFileSync(configPath, 'utf-8');
     expect(content).toContain('pilot_mode: false');
@@ -79,10 +79,10 @@ describe('init', () => {
     expect(content).toContain('kv_cache_hard_gate: false');
   });
 
-  it('should not overwrite existing .spec-first/config.yaml', () => {
-    const specFirstDir = join(TMP, '.spec-first');
-    const configPath = join(specFirstDir, 'config.yaml');
-    mkdirSync(specFirstDir, { recursive: true });
+  it('should not overwrite existing .spec-first/meta/config.yaml', () => {
+    const metaDir = join(TMP, '.spec-first', 'meta');
+    const configPath = join(metaDir, 'config.yaml');
+    mkdirSync(metaDir, { recursive: true });
     const custom = 'gate:\n  pilot_mode: true\n';
     writeFileSync(configPath, custom, 'utf-8');
 

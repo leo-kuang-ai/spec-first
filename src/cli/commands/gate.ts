@@ -7,7 +7,8 @@ import { evaluateGate, getConditions, getGateHistory } from '../../core/gate-eng
 import { checkGoLive } from '../../core/gate-engine/golive.js';
 import { readJson, exists } from '../../shared/fs-utils.js';
 import { join } from 'node:path';
-import type { StageState } from '../../shared/types.js';
+import { appendFileSync, writeFileSync } from 'node:fs';
+import type { ConditionResult, StageState } from '../../shared/types.js';
 
 export function handleGate(args: string[]): number {
   const sub = args[0];
@@ -55,6 +56,19 @@ function handleCheck(args: string[]): number {
     if (result.suggestions && result.suggestions.length > 0) {
       console.log('\n建议：');
       for (const s of result.suggestions) console.log(`  - ${s}`);
+    }
+
+    const fixSteps = collectFixSteps(result.conditions);
+    if (fixSteps.length > 0) {
+      console.log('\n可执行修复步骤：');
+      for (let i = 0; i < fixSteps.length; i++) {
+        console.log(`  ${i + 1}. ${fixSteps[i]}`);
+      }
+    }
+
+    if (result.status === 'FAIL' && fixSteps.length > 0) {
+      appendFixStepsToFindings(featureId, cwd, result.conditions, fixSteps);
+      console.log(`\n审计留痕：已同步修复步骤到 specs/${featureId}/findings.md`);
     }
 
     return result.status === 'FAIL' ? ExitCode.VALIDATION_ERROR : ExitCode.SUCCESS;
@@ -153,4 +167,57 @@ function printGateHelp(): void {
   console.log('  check       校验当前阶段 Gate 条件');
   console.log('  history     查看 Gate 评估历史');
   console.log('  conditions  列出当前阶段 Gate 条件');
+}
+
+function collectFixSteps(conditions: ConditionResult[]): string[] {
+  const steps: string[] = [];
+  for (const condition of conditions) {
+    if (condition.status !== 'FAIL' || !condition.detail) continue;
+    const match = condition.detail.match(/fix:\s*(.+)$/i);
+    if (!match) continue;
+
+    const candidates = match[1]
+      .split('|')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    for (const candidate of candidates) {
+      if (!steps.includes(candidate)) {
+        steps.push(candidate);
+      }
+    }
+  }
+  return steps;
+}
+
+function appendFixStepsToFindings(
+  featureId: string,
+  projectRoot: string,
+  conditions: ConditionResult[],
+  fixSteps: string[],
+): void {
+  const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
+  const failedConditions = conditions
+    .filter((condition) => condition.status === 'FAIL')
+    .map((condition) => `${condition.id}: ${condition.description}${condition.detail ? ` (${condition.detail})` : ''}`);
+
+  const section = [
+    '',
+    `## Gate Check Remediation (${new Date().toISOString()})`,
+    '',
+    '### Failed Conditions',
+    ...(failedConditions.length > 0 ? failedConditions.map((item) => `- ${item}`) : ['- (none)']),
+    '',
+    '### Actionable Fix Steps',
+    ...fixSteps.map((step, index) => `${index + 1}. ${step}`),
+    '',
+  ].join('\n');
+
+  if (exists(findingsPath)) {
+    appendFileSync(findingsPath, section, 'utf-8');
+    return;
+  }
+
+  const initial = ['# Findings', section, ''].join('\n');
+  writeFileSync(findingsPath, initial, 'utf-8');
 }

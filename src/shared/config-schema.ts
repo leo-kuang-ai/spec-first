@@ -137,7 +137,7 @@ function deepMerge(
 
 /**
  * 加载并校验 config.yaml，返回合并后的配置
- * 合并顺序：DEFAULT → meta/config.yaml → local/config.yaml → config.yaml（兼容旧版本）
+ * 合并顺序：DEFAULT → meta/config.yaml → local/config.yaml
  */
 export function loadConfig(projectRoot: string): SpecFirstConfig {
   // 规范化路径，避免 /a/b 和 /a/b/ 被视为不同 key
@@ -146,10 +146,9 @@ export function loadConfig(projectRoot: string): SpecFirstConfig {
   const cached = configCache.get(normalizedRoot);
   if (cached && (Date.now() - cached.cachedAt) < CONFIG_CACHE_TTL_MS) return cached.config;
 
-  // 从三个层级加载配置，local 覆盖 meta，meta 覆盖默认
+  // 从两个层级加载配置，local 覆盖 meta，meta 覆盖默认
   const metaPath = join(projectRoot, '.spec-first', 'meta', 'config.yaml');
   const localPath = join(projectRoot, '.spec-first', 'local', 'config.yaml');
-  const configPath = join(projectRoot, '.spec-first', 'config.yaml');
 
   let merged: Record<string, unknown> = structuredClone(DEFAULT_SPEC_FIRST_CONFIG) as unknown as Record<string, unknown>;
 
@@ -165,15 +164,6 @@ export function loadConfig(projectRoot: string): SpecFirstConfig {
   // Layer 2: local/config.yaml（用户定制）
   if (exists(localPath)) {
     const raw = readFileSync(localPath, 'utf-8');
-    const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as Record<string, unknown> | null;
-    if (parsed && typeof parsed === 'object') {
-      merged = deepMerge(merged, parsed);
-    }
-  }
-
-  // Layer 3: config.yaml（兼容旧版本，优先级最高）
-  if (exists(configPath)) {
-    const raw = readFileSync(configPath, 'utf-8');
     const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA }) as Record<string, unknown> | null;
     if (parsed && typeof parsed === 'object') {
       merged = deepMerge(merged, parsed);

@@ -338,12 +338,18 @@ function restoreCurrentFeature(projectRoot: string, snapshot: { existed: boolean
 
 function ensureProjectConfig(projectRoot: string): void {
   const specFirstDir = join(projectRoot, '.spec-first');
-  const configPath = join(specFirstDir, 'config.yaml');
-  ensureDir(specFirstDir);
+  const metaDir = join(specFirstDir, 'meta');
+  const configPath = join(metaDir, 'config.yaml');
   let wroteConfig = false;
-  if (!exists(configPath)) {
-    writeMarkdown(configPath, renderDefaultConfigYaml());
-    wroteConfig = true;
+  try {
+    ensureDir(metaDir);
+    if (!exists(configPath)) {
+      writeMarkdown(configPath, renderDefaultConfigYaml());
+      wroteConfig = true;
+    }
+  } catch {
+    // 配置文件补齐属于非阻断副作用，失败时退回默认配置继续执行
+    return;
   }
   if (wroteConfig) {
     resetConfigCache();

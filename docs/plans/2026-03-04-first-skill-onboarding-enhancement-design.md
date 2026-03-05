@@ -86,26 +86,28 @@ First Skill 作为项目快速认知工具，当前产物（quick 模式 4-5 个
 ```markdown
 ## 开发入口
 
-> 告诉你"改什么功能 → 改哪个文件"
+> 告诉你"改什么功能 → 改哪个文件"（按当前项目技术栈自适应）
 
 ### 常见开发任务
 
-| 任务 | 文件/目录 | 说明 |
-|------|-----------|------|
-| 新增 API 端点 | `src/api/` 或 `src/routes/` | 按模块组织，新增路由文件 |
-| 新增业务逻辑 | `src/services/` 或 `src/domain/` | 核心业务代码 |
-| 新增页面/组件 | `src/pages/` 或 `src/components/` | 前端页面和组件 |
-| 修改数据模型 | `prisma/schema.prisma` 或 `src/models/` | 数据库 Schema |
-| 修改配置 | `config/` 或 `.env` | 环境变量和配置 |
-| 添加测试 | `tests/` 或 `__tests__/` | 单元测试和集成测试 |
-| 修改定时任务 | `src/jobs/` 或 `src/cron/` | 后台任务 |
+| 任务 | 文件/目录（按实际项目填写） | 说明 |
+|------|-----------------------------|------|
+| 新增 API 端点 | `<api-layer-dir>` | 如 `src/api/` / `app/controllers/` / `internal/transport/http/` |
+| 新增业务逻辑 | `<service-or-domain-dir>` | 如 `src/services/` / `app/services/` / `internal/domain/` |
+| 新增页面/组件 | `<ui-dir>` | 如 `src/pages/` / `src/components/` / `web/src/views/` |
+| 修改数据模型 | `<data-model-file-or-dir>` | 如 `prisma/schema.prisma` / `models/` / `pkg/model/` |
+| 修改配置 | `<config-file-or-dir>` | 如 `config/` / `.env` / `application.yml` |
+| 添加测试 | `<test-dir>` | 如 `tests/` / `__tests__/` / `test/` |
+| 修改定时任务 | `<job-or-cron-dir>` | 如 `src/jobs/` / `cron/` / `cmd/scheduler/` |
 
 ### 快速定位
 
-- **入口文件**：`src/index.ts`（项目启动入口）
-- **路由注册**：`src/router.ts`（API 路由注册）
-- **数据库连接**：`src/db/`（数据库初始化）
-- **中间件**：`src/middleware/`（请求处理中间件）
+- **应用入口**：`<entry-file-or-command>`
+- **路由注册**：`<routing-file-or-dir>`
+- **数据访问层**：`<db-or-repository-dir>`
+- **中间件/拦截器**：`<middleware-or-filter-dir>`
+
+> 规则：优先填写仓库中真实存在的路径；若未检测到对应目录，标注 `[待确认: 未检测到对应目录]`，禁止虚构。
 ```
 
 ---

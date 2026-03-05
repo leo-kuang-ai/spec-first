@@ -117,8 +117,7 @@ function checkSpecsDir(root: string): CheckResult {
 
 function checkConfig(root: string): CheckResult {
   const metaPath = join(root, '.spec-first', 'meta', 'config.yaml');
-  const legacyPath = join(root, '.spec-first', 'config.yaml');
-  if (existsSync(metaPath) || existsSync(legacyPath)) {
+  if (existsSync(metaPath)) {
     return { name: 'config.yaml', level: 'PASS', message: '已找到' };
   }
   return {
@@ -264,8 +263,9 @@ function checkSessionHook(): CheckResult {
 
 /** Gate 降级状态检测 */
 function checkGateDegradation(root: string, _featureId: string): CheckResult {
-  const configPath = join(root, '.spec-first', 'config.yaml');
-  if (!existsSync(configPath)) {
+  const metaConfigPath = join(root, '.spec-first', 'meta', 'config.yaml');
+  const localConfigPath = join(root, '.spec-first', 'local', 'config.yaml');
+  if (!existsSync(metaConfigPath) && !existsSync(localConfigPath)) {
     return { name: 'Gate Degradation', level: 'PASS', message: '无配置（默认模式）' };
   }
   try {

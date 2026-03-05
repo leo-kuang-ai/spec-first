@@ -99,6 +99,7 @@ spec 阶段只定义 WHAT，不定义 HOW：
 在输出前必须按以下清单复核：
 - `references/spec-review-checklist.md`
 - `references/test-level-glossary.md`（UT/IT/E2E/ST 术语）
+- `references/constitution-authority.md`（宪法权威层级与冲突仲裁）
 
 ## Plan Mode 协同（P1-08）
 
