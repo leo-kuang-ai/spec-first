@@ -47,6 +47,13 @@ changelog: Initial version with standardized metadata
   - 禁止把宿主/工具名当平台：`claude-code`、`codex`、`mcp`
 - 当 `.spec-first/layer2/` 不存在或为空时，必须中止并提示先创建平台 YAML，再继续 init
 
+## 交互引导要求（强制）
+- P2 必须使用**逐步交互式引导**，禁止一次性要求用户提交全部字段。
+- 推荐顺序：`feat -> mode(单选) -> size(单选) -> platforms(多选) -> title -> feature-id -> bootstrap(是/否)`。
+- `mode/size` 必须给出编号选项与默认值（支持直接回车采用默认）。
+- `platforms` 必须展示 `.spec-first/layer2/*.yaml` 解析出的可选列表，并以多选交互收集结果（可切换勾选、可全选、可清空、完成前至少选 1 项）。
+- 参数确认阶段（P3）必须回显最终选择（含是否启用 `--bootstrap`）后再执行。
+
 ## CLI 依赖
 - `spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>] [--bootstrap]`
 - `spec-first stage current <featureId>`

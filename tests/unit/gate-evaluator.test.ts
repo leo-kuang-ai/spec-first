@@ -110,6 +110,7 @@ describe('evaluateGate', () => {
 
   it('should PASS for 01_specify when spec.md exists and matrix has FR', () => {
     writeState('01_specify');
+    writeFileSync(join(TMP, 'specs', FEAT, 'prd.md'), '# PRD\n');
     writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
     writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
     writeSpecReview('- [x] 完整性\n- [x] 清晰度\n- [x] 可测量\n- [x] 一致性\n- [ ] 风险\n');

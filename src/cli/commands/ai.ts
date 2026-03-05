@@ -15,6 +15,10 @@ export function handleAi(args: string[]): number {
     case 'context': return handleContext(args.slice(1));
     case 'catchup': return handleCatchup(args.slice(1));
     case 'stats': return handleStats(args.slice(1));
+    case 'task':
+      console.error('提示：任务拆解请使用 Skill 命令');
+      console.error('  执行：/spec-first:task <featureId>');
+      return ExitCode.VALIDATION_ERROR;
     default:
       printAiHelp();
       if (sub) console.error(`未知 ai 子命令：${sub}`);

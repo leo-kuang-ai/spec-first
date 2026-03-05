@@ -57,8 +57,9 @@ function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | 
 }
 
 const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
+  onboarding: '新手引导 - 交互式场景识别与学习路径推荐',
   first: '项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式生成 10-11 份完整文档（支持 --deep/--type/--force 参数）',
-  init: '定位项目根目录并执行初始化预检（MCP 与 skills 检查/安装）',
+  init: '定位项目根目录并通过交互式引导初始化 Feature 工作区（可选 --bootstrap 执行宿主检查/安装）',
   catchup: '定位当前 Feature 并恢复上下文',
   spec: '定位 Feature 并校验阶段为需求规格（01_specify）',
   design: '定位 Feature 并校验阶段为技术设计（02_design）',

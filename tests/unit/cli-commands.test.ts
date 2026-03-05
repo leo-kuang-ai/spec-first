@@ -91,6 +91,7 @@ describe('handleAnalyze', () => {
 
   it('should return SUCCESS when no CRITICAL findings', () => {
     writeFileSync(join(SPEC_DIR, 'spec.md'), '# Spec\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'prd.md'), '# PRD\n', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\nConstitution Clause P1\n', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'task_plan.md'), '# Task Plan\n', 'utf-8');
     const code = handleAnalyze([FEAT_ID]);

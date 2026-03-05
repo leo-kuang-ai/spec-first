@@ -123,7 +123,36 @@ function calcUpstreamCoverage(frRows: MatrixRow[], downstreamRows: MatrixRow[]):
     }
   }
   const covered = frRows.filter(r => coveredFrIds.has(r.id));
+
+  // 检测 ID 格式不匹配
+  if (covered.length === 0 && frRows.length > 0 && downstreamRows.length > 0) {
+    const uncovered = frRows.filter(r => !coveredFrIds.has(r.id));
+    const allUpstreamIds = downstreamRows.flatMap(r => r.upstream || []);
+    const mismatches = detectIdFormatMismatch(uncovered.map(r => r.id), allUpstreamIds);
+    if (mismatches.length > 0) {
+      console.warn('⚠️  检测到 ID 格式不匹配（可能包含多余连字符）:');
+      mismatches.slice(0, 3).forEach(m => console.warn(`   ${m.expected} ≠ ${m.actual}`));
+      if (mismatches.length > 3) console.warn(`   ... 还有 ${mismatches.length - 3} 个`);
+    }
+  }
+
   return pct(covered.length, frRows.length);
+}
+
+/** 检测 ID 格式不匹配（如 FR-SPECOPT-001 vs FR-SPEC-OPT-001） */
+function detectIdFormatMismatch(expectedIds: string[], actualIds: string[]): Array<{expected: string, actual: string}> {
+  const mismatches: Array<{expected: string, actual: string}> = [];
+  for (const expected of expectedIds) {
+    const normalized = expected.replace(/-/g, '');
+    for (const actual of actualIds) {
+      const actualNormalized = actual.replace(/-/g, '');
+      if (normalized === actualNormalized && expected !== actual) {
+        mismatches.push({ expected, actual });
+        break;
+      }
+    }
+  }
+  return mismatches;
 }
 
 /** 比例（0~1，保留 4 位小数） */

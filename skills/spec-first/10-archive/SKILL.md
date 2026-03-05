@@ -10,6 +10,15 @@ changelog: Initial version with standardized metadata
 
 归档 Feature 交付物，生成复盘报告与覆盖率总结。
 
+## break-loop 核心理念（P1-BL）
+
+> 调试的价值不在于修复这个 bug，而在于让这类 bug 不再重复发生。
+
+复盘输出至少覆盖三层洞察：
+1. 战术层：如何修复本次问题
+2. 战略层：如何预防同类问题
+3. 哲学层：如何沉淀可复用的方法论
+
 ## 触发条件
 - 阶段: 06_wrap_up
 - Command: `/spec-first:archive`
@@ -27,9 +36,18 @@ changelog: Initial version with standardized metadata
 - P0: 定位 Feature，校验阶段为 06_wrap_up
 - P1: 加载全部交付物、矩阵、Gate 历史
 - P2: 生成归档摘要（覆盖率报告、经验教训）
+- P2.5: 输出 break-loop 分析与 Immediate Actions（必须可执行）
 - P3: 与用户确认归档内容
 - P4: 写入归档文档并执行组合门槛归档
 - P5: Gate 通过后推进阶段至 07_release
+
+## Immediate Actions（P1-BL-ACTION）
+
+完成失败分析后，必须立即输出并执行行动项（禁止只留 TODO）：
+1. 至少 3 条动作，且每条包含：目标文件路径 + 具体动作 + 责任人 + 状态
+2. 至少 1 条动作必须是“更新规范/清单”（如 `references/*.md`）
+3. 至少 1 条动作必须是“验证闭环”（如新增/更新测试）
+4. 未完成动作必须记录阻塞原因与下一步命令
 
 ## Constitution 主副本回写策略（P1-CON）
 

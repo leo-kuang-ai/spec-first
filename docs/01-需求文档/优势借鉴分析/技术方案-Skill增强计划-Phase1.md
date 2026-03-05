@@ -930,12 +930,20 @@ break-loop ────└──→ archive 模板
 | P2-5: 归档组合门槛集成示例测试 | ✅ 已完成 | `tests/e2e/error-paths.test.ts` |
 | P2-6: 归档组合门槛负向回归 | ✅ 已完成 | `tests/e2e/error-paths.test.ts` |
 | P2-7: C11 修复步骤同步 findings 审计 | ✅ 已完成 | `src/cli/commands/gate.ts` + `tests/unit/gate-cli.test.ts` |
+| P2-8: Gate 运行时回归修复（`loadRfcStatuses` 导入缺失） | ✅ 已完成 | `src/core/gate-engine/gate-evaluator.ts` + E2E 全流程复测 |
+| P2-9: break-loop Immediate Actions 补齐 | ✅ 已完成 | `skills/spec-first/10-archive/SKILL.md` + `skills/spec-first/10-archive/references/retro-template.md` + `tests/unit/archive-skill-docs.test.ts` |
+| P2-10: break-loop 核心理念补齐 | ✅ 已完成 | `skills/spec-first/10-archive/SKILL.md` + `skills/spec-first/10-archive/references/retro-template.md` + `tests/unit/archive-skill-docs.test.ts` |
+| P2-11: TDD 测试命令探测策略补齐 | ✅ 已完成 | `skills/spec-first/07-code/SKILL.md` + `tests/unit/code-skill-docs.test.ts` |
 
 ### 10.2 剩余任务列表（本轮）
 
-1. 无（`spec-first worktree` 命令化入口评估已按当前决策暂缓，后续按需重启；本轮优化项已完成）。
+1. 无（本轮审查差距 #1/#3/#10 已全部修复）。
 
-### 10.3 下一步建议（P1）
+### 10.3 待确认修复方案（请确认后实施）
+
+1. 已完成并验证（见 10.1 的 P2-9 / P2-10 / P2-11）。
+
+### 10.4 下一步建议（P1）
 
 1. `spec-first worktree` 命令化入口评估（当前暂缓，后续按需恢复）。  
 2. 评估是否为 `findings.md` 新增“Gate 修复建议”标准模板段，统一跨阶段落盘格式。  

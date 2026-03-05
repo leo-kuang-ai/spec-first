@@ -3,7 +3,7 @@
  * 读取 stage-state → 评估当前阶段 Gate 条件 → 检查豁免 → 输出三态结果
  */
 import { join } from 'node:path';
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import type {
   Stage, GateStatus, GateResult, ConditionResult, WaiverRef,
   CoverageMetrics, StageState, IdType, MatrixRow,
@@ -13,9 +13,10 @@ import { isStageState } from '../../shared/validators.js';
 import { getCoverage } from '../trace-engine/coverage.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 import { validateExceptions } from '../trace-engine/exception-validator.js';
-import { getCriticalCountFromAnalysisReport } from './sca.js';
+import { getCriticalCountFromAnalysisReport, analyzeArtifacts } from './sca.js';
 import { runCommandGate } from './command-gate.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
+import { validatePrd } from './prd-validator.js';
 
 // ─── Gate 条件定义 ─────────────────────────────────────────
 
@@ -70,6 +71,21 @@ GATE_CONDITIONS['00_init' as Stage] = [
 
 // ─── 01_specify 条件 ─────────────────────────────────────
 GATE_CONDITIONS['01_specify' as Stage] = [
+  {
+    id: 'G-SPEC-00',
+    description: 'PRD exists and C-PRD ≥ 85%',
+    evaluate: (ctx) => {
+      const prdPath = join(ctx.projectRoot, 'specs', ctx.featureId, 'prd.md');
+      if (!exists(prdPath)) {
+        return { pass: false, detail: 'prd.md not found' };
+      }
+      const result = validatePrd(prdPath);
+      return {
+        pass: result.valid && result.score >= 85,
+        detail: `C-PRD=${result.score}% errors=${result.errors.length}`,
+      };
+    },
+  },
   {
     id: 'G-SPEC-01',
     description: 'spec.md exists',
@@ -625,7 +641,16 @@ function getC11FailureFixHints(featureId: string, failures: string[]): string[] 
 
 function evaluateAnalyzeCriticalFindings(featureId: string, projectRoot: string): { pass: boolean; detail: string } {
   const reportPath = join(projectRoot, 'specs', featureId, 'reports', 'analysis-report.md');
-  if (!exists(reportPath)) {
+
+  // 检查报告是否过期（5分钟）
+  if (exists(reportPath)) {
+    const mtime = statSync(reportPath).mtime;
+    const age = Date.now() - mtime.getTime();
+    if (age > 5 * 60 * 1000) {
+      console.log('⚠️  分析报告过期，自动刷新...');
+      analyzeArtifacts(featureId, projectRoot);
+    }
+  } else {
     return {
       pass: false,
       detail: 'Analyze report missing: run `spec-first analyze <featureId>` first',

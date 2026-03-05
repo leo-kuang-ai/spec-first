@@ -27,6 +27,7 @@ interface InitCliInput {
   platforms?: string;
   featureId?: string;
   title?: string;
+  bootstrap?: boolean;
 }
 
 interface NormalizedInitInput {
@@ -67,12 +68,11 @@ function parseInitCliInput(args: string[]): InitCliInput {
     platforms: parseFlag(args, '--platforms'),
     featureId: parseFlag(args, '--feature-id'),
     title: parseFlag(args, '--title'),
+    bootstrap: args.includes('--bootstrap'),
   };
 }
 
-function runBootstrapIfEnabled(args: string[]): number | undefined {
-  const shouldBootstrap = args.includes('--bootstrap')
-    || process.env.SPEC_FIRST_INIT_BOOTSTRAP === '1';
+function runBootstrapIfEnabled(shouldBootstrap: boolean): number | undefined {
   if (!shouldBootstrap) return undefined;
 
   const bootstrap = ensureHostBootstrap();
@@ -85,7 +85,7 @@ function runBootstrapIfEnabled(args: string[]): number | undefined {
 }
 
 async function resolveInitCliInput(args: string[], initial: InitCliInput): Promise<InitCliInput | undefined> {
-  const hasRequiredArgs = Boolean(initial.feat && initial.mode && initial.size);
+  const hasRequiredArgs = Boolean(initial.feat && initial.mode && initial.size && initial.platforms);
   if (hasRequiredArgs) return initial;
 
   if (!isInteractiveTerminal()) {
@@ -109,6 +109,7 @@ async function resolveInitCliInput(args: string[], initial: InitCliInput): Promi
     platforms: guided.platforms,
     featureId: guided.featureId,
     title: guided.title,
+    bootstrap: guided.bootstrap,
   };
 }
 
@@ -291,9 +292,6 @@ export async function handleInit(args: string[]): Promise<number> {
     return ExitCode.SUCCESS;
   }
 
-  const bootstrapCode = runBootstrapIfEnabled(args);
-  if (typeof bootstrapCode === 'number') return bootstrapCode;
-
   const cwd = process.cwd();
   const parsedInput = parseInitCliInput(args);
 
@@ -317,6 +315,12 @@ export async function handleInit(args: string[]): Promise<number> {
 
   const resolvedInput = await resolveInitCliInput(args, parsedInput);
   if (!resolvedInput) return ExitCode.VALIDATION_ERROR;
+
+  const shouldBootstrap = Boolean(
+    resolvedInput.bootstrap || process.env.SPEC_FIRST_INIT_BOOTSTRAP === '1',
+  );
+  const bootstrapCode = runBootstrapIfEnabled(shouldBootstrap);
+  if (typeof bootstrapCode === 'number') return bootstrapCode;
 
   // 先校验参数，再检查前置依赖（避免参数非法时先显示成功）
   const normalized = normalizeInitInput(resolvedInput, cwd);
@@ -447,6 +451,7 @@ interface GuidedInitInput {
   platforms: string;
   featureId?: string;
   title?: string;
+  bootstrap: boolean;
 }
 
 function normalizeModeInput(value: string): 'N' | 'I' | undefined {
@@ -473,27 +478,96 @@ function uniquePlatforms(items: string[]): string[] {
   return deduped.sort((a, b) => a.localeCompare(b));
 }
 
-function normalizePlatformsInput(value: string, discovered: string[]): string[] {
-  const raw = value.trim();
-  if (!raw) return [];
-  if (discovered.length === 0) return [];
+interface PlatformActionResult {
+  done: boolean;
+  error?: string;
+}
 
-  if (/^[\d,\s]+$/.test(raw)) {
-    const indexes = raw.split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map((item) => Number.parseInt(item, 10));
-    if (indexes.length === 0) return [];
-    if (indexes.some((idx) => !Number.isInteger(idx) || idx < 1 || idx > discovered.length)) {
-      return [];
+function applyPlatformAction(rawInput: string, discovered: string[], selected: Set<string>): PlatformActionResult {
+  const raw = rawInput.trim();
+  const normalized = raw.toLowerCase();
+
+  const isDone = raw === '' || normalized === 'd' || normalized === 'done' || normalized === 'ok' || normalized === '完成';
+  if (isDone) {
+    if (selected.size === 0) {
+      return { done: false, error: '至少选择一个平台后才能继续（可输入 a 全选）' };
     }
-    return uniquePlatforms(indexes.map((idx) => discovered[idx - 1]));
+    return { done: true };
   }
 
-  const selected = parsePlatforms(raw).values;
-  if (selected.length === 0) return [];
-  if (selected.some((item) => !discovered.includes(item))) return [];
-  return selected;
+  if (normalized === 'a' || normalized === 'all' || normalized === '*' || normalized === '全选') {
+    discovered.forEach((item) => selected.add(item));
+    return { done: false };
+  }
+  if (normalized === 'n' || normalized === 'none' || normalized === 'clear' || normalized === '清空') {
+    selected.clear();
+    return { done: false };
+  }
+
+  const tokens = raw.split(',').map((item) => item.trim()).filter(Boolean);
+  if (tokens.length === 0) {
+    return { done: false, error: '平台输入为空，请输入编号/平台名，或输入 d 完成' };
+  }
+
+  const resolved: string[] = [];
+  for (const token of tokens) {
+    if (/^\d+$/.test(token)) {
+      const idx = Number.parseInt(token, 10);
+      if (!Number.isInteger(idx) || idx < 1 || idx > discovered.length) {
+        return { done: false, error: `平台编号超出范围：${token}（有效范围 1-${discovered.length}）` };
+      }
+      resolved.push(discovered[idx - 1]);
+      continue;
+    }
+
+    if (!discovered.includes(token)) {
+      return { done: false, error: `无效平台：${token}（可选：${discovered.join(', ')}）` };
+    }
+    resolved.push(token);
+  }
+
+  for (const item of uniquePlatforms(resolved)) {
+    if (selected.has(item)) {
+      selected.delete(item);
+    } else {
+      selected.add(item);
+    }
+  }
+
+  return { done: false };
+}
+
+function formatSelectedPlatforms(selected: Set<string>): string {
+  if (selected.size === 0) return '(空)';
+  return uniquePlatforms([...selected]).join(', ');
+}
+
+async function askPlatformsInteractively(
+  rl: ReturnType<typeof createInterface>,
+  discovered: string[],
+): Promise<string[] | null> {
+  const selected = new Set<string>();
+  console.log('4) 请选择平台（多选）:');
+  console.log('   - 输入编号或平台名切换选中，支持逗号分隔（例如 1,3 或 h5,backend）');
+  console.log('   - 输入 a 全选，n 清空，直接回车或输入 d 完成\n');
+
+  while (true) {
+    discovered.forEach((platform, idx) => {
+      const marker = selected.has(platform) ? '[x]' : '[ ]';
+      console.log(`   ${idx + 1}. ${marker} ${platform}`);
+    });
+    const answer = await rl.question(`选择操作（当前：${formatSelectedPlatforms(selected)}）: `);
+    const action = applyPlatformAction(answer, discovered, selected);
+    if (action.error) {
+      console.error(action.error);
+      console.log('');
+      continue;
+    }
+    if (action.done) {
+      return uniquePlatforms([...selected]);
+    }
+    console.log(`当前选择：${formatSelectedPlatforms(selected)}\n`);
+  }
 }
 
 function isConfirmed(value: string): boolean {
@@ -512,6 +586,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  4. 平台（可多选）');
     console.log('  5. 标题（可选）');
     console.log('  6. Feature ID（可选）\n');
+    console.log('  7. bootstrap（可选）\n');
 
     const feat = await askUntilValid(rl, '1) FEAT 缩写（例如 AUTH）: ', (value) =>
       /^[A-Z][A-Z0-9]{0,15}$/.test(value) ? null : 'FEAT 格式错误：需匹配 ^[A-Z][A-Z0-9]{0,15}$',
@@ -539,21 +614,17 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
       return null;
     }
 
-    console.log('4) 可选平台列表（必须从以下列表选择）:');
-    discovered.forEach((platform, idx) => {
-      console.log(`   ${idx + 1}. ${platform}`);
-    });
-    console.log('   输入示例：1,3 或 web-admin,api');
-
-    const platformsInput = await askUntilValid(
-      rl,
-      '请输入平台（编号或名称，逗号分隔）: ',
-      (value) => normalizePlatformsInput(value, discovered).length > 0 ? null : '平台无效：必须从可选平台列表中选择',
-    );
-    const platforms = normalizePlatformsInput(platformsInput, discovered).join(',');
+    const selectedPlatforms = await askPlatformsInteractively(rl, discovered);
+    if (!selectedPlatforms || selectedPlatforms.length === 0) {
+      console.error('未选择任何平台，已取消初始化。');
+      return null;
+    }
+    const platforms = selectedPlatforms.join(',');
 
     const titleInput = (await rl.question(`5) 标题（可选，默认 ${feat}）: `)).trim();
     const featureIdInput = (await rl.question('6) Feature ID（可选，留空自动生成）: ')).trim();
+    const bootstrapInput = (await rl.question('7) 需要执行 bootstrap（宿主检查/修复）吗？[y/N]: ')).trim();
+    const bootstrap = isConfirmed(bootstrapInput);
     const title = titleInput || feat;
 
     console.log('\n参数确认（列表）:');
@@ -563,6 +634,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log(`  - platforms: ${platforms}`);
     console.log(`  - title: ${title}`);
     console.log(`  - feature-id: ${featureIdInput || '(auto)'}`);
+    console.log(`  - bootstrap: ${bootstrap ? 'yes (--bootstrap)' : 'no'}`);
     const confirm = await rl.question('确认执行初始化？[y/N]: ');
     if (!isConfirmed(confirm)) {
       console.error('已取消初始化。');
@@ -576,6 +648,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
       platforms,
       title,
       featureId: featureIdInput || undefined,
+      bootstrap,
     };
   } finally {
     rl.close();

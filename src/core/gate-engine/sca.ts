@@ -70,6 +70,18 @@ function checkSpecify(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
   const frRows = rows.filter(r => r.type === 'FR');
 
+  // PRD→FR 映射完整性
+  const unmappedFr = frRows.filter(r =>
+    !(r.upstream ?? []).some(u => u.startsWith('REQ-PRD-'))
+  );
+  checks.push({
+    rule: 'SCA-SPEC-00: PRD→FR 映射完整性',
+    pass: unmappedFr.length === 0,
+    detail: unmappedFr.length > 0
+      ? `未映射 PRD 的 FR：${unmappedFr.map(r => r.id).join(', ')}`
+      : `${frRows.length} 个 FR 全部映射到 PRD`,
+  });
+
   // FR ID 唯一性（NFR 暂未纳入 IdType，按 FR 检查）
   const ids = rows.filter(r => r.type === 'FR').map(r => r.id);
   const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
@@ -179,6 +191,7 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
   const findings: AnalyzeFinding[] = [];
 
   const requiredArtifacts = [
+    { file: 'prd.md', label: 'prd' },
     { file: 'spec.md', label: 'spec' },
     { file: 'design.md', label: 'design' },
     { file: 'task_plan.md', label: 'task-plan' },
@@ -209,6 +222,19 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       suggestion: '先补齐 FR/DS/TASK/TC 基础行',
     });
   } else if (frRows.length > 0) {
+    const unmappedPrd = frRows.filter((r) =>
+      !(r.upstream ?? []).some((u) => u.startsWith('REQ-PRD-'))
+    ).map((r) => r.id);
+    if (unmappedPrd.length > 0) {
+      findings.push({
+        severity: 'HIGH',
+        type: 'COVERAGE_GAP_PRD',
+        location: 'traceability-matrix.md',
+        detail: `FR 未映射 PRD: ${unmappedPrd.slice(0, 8).join(', ')}${unmappedPrd.length > 8 ? ' ...' : ''}`,
+        suggestion: '每个 FR 至少需要 1 条 REQ-PRD-* upstream 引用',
+      });
+    }
+
     const dsUpstream = new Set(rows.filter((r) => r.type === 'DS').flatMap((r) => r.upstream ?? []));
     const taskUpstream = new Set(rows.filter((r) => r.type === 'TASK').flatMap((r) => r.upstream ?? []));
 

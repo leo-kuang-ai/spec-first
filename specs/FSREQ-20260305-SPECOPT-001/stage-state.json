@@ -1,0 +1,180 @@
+{
+  "featureId": "FSREQ-20260305-SPECOPT-001",
+  "mode": "I",
+  "size": "M",
+  "platforms": [
+    "backend"
+  ],
+  "mergedRules": {
+    "gateConditions": {
+      "01_specify": [
+        {
+          "id": "L0-SPEC-001",
+          "description": "FR/NFR 列表存在且非空"
+        },
+        {
+          "id": "L1-MODE-I-001",
+          "description": "impact-analysis.md 存在且非空"
+        }
+      ],
+      "02_design": [
+        {
+          "id": "L0-DESIGN-001",
+          "description": "设计文档存在"
+        }
+      ],
+      "03_plan": [
+        {
+          "id": "L0-PLAN-001",
+          "description": "task_plan.md 存在且非空"
+        }
+      ],
+      "04_implement": [
+        {
+          "id": "L0-IMPL-001",
+          "description": "追踪矩阵覆盖率 ≥ 基线"
+        },
+        {
+          "id": "G-BE-LINT",
+          "description": "Lint pass",
+          "command": "npm run lint"
+        },
+        {
+          "id": "G-BE-UNIT",
+          "description": "Unit test pass",
+          "command": "npm test"
+        }
+      ],
+      "05_verify": [
+        {
+          "id": "L0-VERIFY-001",
+          "description": "测试用例存在且通过"
+        },
+        {
+          "id": "G-BE-CONTRACT",
+          "description": "API contract check pass",
+          "command": "npm run contract:check"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "id": "L0-WRAP-001",
+          "description": "归档清单完整"
+        }
+      ]
+    },
+    "deliverables": {
+      "01_specify": [
+        {
+          "name": "spec.md",
+          "required": true,
+          "description": "FR/NFR 列表"
+        },
+        {
+          "name": "impact-analysis.md",
+          "required": true,
+          "description": "变更影响分析"
+        },
+        {
+          "name": "user-stories.md",
+          "required": false,
+          "description": "用户故事"
+        }
+      ],
+      "02_design": [
+        {
+          "name": "design.md",
+          "required": true,
+          "description": "技术设计文档"
+        },
+        {
+          "name": "api-contract.yaml",
+          "required": true,
+          "description": "API 契约"
+        },
+        {
+          "name": "data-model.md",
+          "required": false,
+          "description": "数据模型"
+        },
+        {
+          "name": "contracts/openapi.yaml",
+          "required": true
+        }
+      ],
+      "03_plan": [
+        {
+          "name": "task_plan.md",
+          "required": true,
+          "description": "任务计划"
+        }
+      ],
+      "05_verify": [
+        {
+          "name": "reports/test-report.md",
+          "required": true,
+          "description": "测试报告"
+        },
+        {
+          "name": "reports/regression-report.md",
+          "required": true,
+          "description": "回归验证报告"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "name": "traceability-matrix.md",
+          "required": true,
+          "description": "追踪矩阵"
+        }
+      ],
+      "07_release": [
+        {
+          "name": "reports/api-change-log.md",
+          "required": false
+        }
+      ]
+    },
+    "thresholds": {
+      "api_p95_latency": {
+        "value": 300,
+        "direction": "lower_is_better"
+      },
+      "error_rate": {
+        "value": 1,
+        "direction": "lower_is_better"
+      }
+    }
+  },
+  "currentStage": "04_implement",
+  "history": [
+    {
+      "from": "00_init",
+      "to": "01_specify",
+      "timestamp": "2026-03-05T04:24:11.145Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "01_specify",
+      "to": "02_design",
+      "timestamp": "2026-03-05T04:51:10.616Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "02_design",
+      "to": "03_plan",
+      "timestamp": "2026-03-05T05:16:51.018Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "03_plan",
+      "to": "04_implement",
+      "timestamp": "2026-03-05T05:51:12.106Z",
+      "gateResult": "PASS"
+    }
+  ],
+  "terminal": false,
+  "title": "spec-first-spec-command-optimization",
+  "createdAt": "2026-03-05T01:51:33.434Z",
+  "updatedAt": "2026-03-05T05:51:12.106Z"
+}

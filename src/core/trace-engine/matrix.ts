@@ -52,14 +52,16 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
     warnings.push(`Orphan: ${o.id} has no upstream reference`);
   }
 
-  // 断链：FR 无 DS/TASK/TC downstream
+  // 断链：FR 无 DS/TASK/TC downstream 或无 PRD upstream
   const frRows = rows.filter(r => r.type === 'FR');
   const brokenChains: MatrixCheckResult['brokenChains'] = [];
   for (const fr of frRows) {
     const missing: string[] = [];
+    const hasPrd = (fr.upstream ?? []).some(u => u.startsWith('REQ-PRD-'));
     const hasDs = rows.some(r => r.type === 'DS' && r.upstream?.includes(fr.id));
     const hasTask = rows.some(r => r.type === 'TASK' && r.upstream?.includes(fr.id));
     const hasTc = rows.some(r => r.type === 'TC' && r.upstream?.includes(fr.id));
+    if (!hasPrd) missing.push('REQ-PRD-*');
     if (!hasDs) missing.push('DS');
     if (!hasTask) missing.push('TASK');
     if (!hasTc) missing.push('TC');

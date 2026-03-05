@@ -59,14 +59,15 @@ function validateAbbr(abbr: string): void {
 
 /** 组装 ID 字符串 */
 function assembleId(type: NextIdType, abbr: string, seq: number, tcLevel?: TcLevel): string {
+  const normalizedAbbr = abbr.replace(/-/g, '');
   const seqStr = String(seq).padStart(3, '0');
   if (type === 'TC') {
-    return `TC-${tcLevel!}-${abbr}-${seqStr}`;
+    return `TC-${tcLevel!}-${normalizedAbbr}-${seqStr}`;
   }
   if (type === 'RFC') {
     return `RFC-${seqStr}`;
   }
-  return `${type}-${abbr}-${seqStr}`;
+  return `${type}-${normalizedAbbr}-${seqStr}`;
 }
 
 /** 从矩阵中提取匹配的最大序号，返回下一个序号 */

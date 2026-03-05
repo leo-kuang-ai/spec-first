@@ -273,6 +273,84 @@ function skeletonMatrix(): string {
     + '|----|------|-------|--------|----------|------------|\n';
 }
 
+function skeletonPrd(featureId: string, title: string): string {
+  const today = new Date().toISOString();
+  return `---
+scenario: "待判定"
+scenario_reason: ""
+evidence_paths: []
+complexity: "待判定"
+created_at: "${today}"
+last_updated: "${today}"
+---
+
+# PRD — ${featureId}
+
+> ${title}
+
+## 1. 业务目标
+
+### 1.1 问题陈述
+
+**当前痛点**：
+[描述用户当前遇到的问题或痛点]
+
+**目标用户**：
+[描述目标用户群体]
+
+**使用场景**：
+[描述用户在什么场景下会使用这个功能]
+
+### 1.2 业务价值
+
+**预期收益**：
+- [收益 1]
+- [收益 2]
+
+**成功指标**：
+- [指标 1]: [目标值]
+- [指标 2]: [目标值]
+
+## 2. 功能边界
+
+### 2.1 范围内（In Scope）
+
+**核心功能**：
+- [功能 1]
+- [功能 2]
+
+### 2.2 范围外（Out of Scope）
+
+**本期不做**：
+- [不做的功能 1]
+- [不做的功能 2]
+
+## 3. 约束条件
+
+### 3.1 技术约束
+
+- [约束 1]
+- [约束 2]
+
+### 3.2 业务约束
+
+- [约束 1]
+- [约束 2]
+
+## 4. 成功标准
+
+- [ ] 所有核心功能已实现
+- [ ] 质量标准达标
+- [ ] 业务指标达标
+
+## 5. 开放问题
+
+| 问题 | 优先级 | 负责人 | 状态 |
+|------|--------|--------|------|
+| [问题 1] | High/Medium/Low | [姓名] | Open/Resolved |
+`;
+}
+
 function skeletonConstitution(featureId: string, projectRoot: string): string {
   const globalPath = join(projectRoot, '.spec-first', 'constitution.md');
   if (exists(globalPath)) {
@@ -434,6 +512,9 @@ function writeFeatureSkeleton(
   writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
   writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
   writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(featureId, opts.projectRoot));
+
+  // 可选预置 PRD 骨架（不替代 Phase 0 完整产出）
+  writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));
 }
 
 function commitFeatureInit(

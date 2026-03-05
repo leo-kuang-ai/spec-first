@@ -14,7 +14,10 @@ describe('10-archive skill docs consistency', () => {
   it('should keep retro template file and link from SKILL.md', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(RETRO_TEMPLATE)).toBe(true);
-    expect(read(SKILL_MD)).toContain('references/retro-template.md');
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('references/retro-template.md');
+    expect(skill).toContain('break-loop 核心理念');
+    expect(skill).toContain('Immediate Actions（P1-BL-ACTION）');
   });
 
   it('should keep coverage metrics wording aligned with current implementation', () => {
@@ -30,11 +33,13 @@ describe('10-archive skill docs consistency', () => {
 
   it('should keep break-loop five-dimension sections in retro template', () => {
     const retro = read(RETRO_TEMPLATE);
+    expect(retro).toContain('## 零、核心理念（break-loop）');
     expect(retro).toContain('## 三、5 维度失败分析');
     expect(retro).toContain('### 3.1 根因分类');
     expect(retro).toContain('### 3.2 修复失败分析');
     expect(retro).toContain('### 3.3 预防机制');
     expect(retro).toContain('### 3.4 系统性扩展');
     expect(retro).toContain('### 3.5 知识捕获');
+    expect(retro).toContain('## 四、Immediate Actions（分析后立即行动）');
   });
 });

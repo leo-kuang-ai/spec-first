@@ -39,6 +39,15 @@ export interface CatchupResult {
   fiveQuestions: FiveQuestions;
   /** auto-loop 运行时摘要（ORCH-008），运行中时非空 */
   autoLoopSummary?: AutoLoopSummary;
+  /** Step 级恢复状态（TASK-SPECOPT-015） */
+  stepRecovery?: {
+    currentStep: string;
+    completedSteps: string[];
+    skippedSteps: string[];
+    nextStep: string;
+    complexity: string;
+    scenario: string;
+  };
   /** 是否因节流而跳过（I5: 区分真实结果与伪造数据） */
   skipped: boolean;
   summary: string;
@@ -116,10 +125,33 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   // Step 3: Read findings.md
   const findingsPath = join(specDir, 'findings.md');
   let findingsContent = '';
+  let stepRecovery: CatchupResult['stepRecovery'];
   if (!exists(findingsPath)) {
     missingFiles.push('findings.md');
   } else {
     findingsContent = readMarkdown(findingsPath);
+    // 解析 Step 级状态头（TASK-SPECOPT-015）
+    const yamlMatch = findingsContent.match(/^---\n([\s\S]*?)\n---/);
+    if (yamlMatch && currentPhase === '01_specify') {
+      const yaml = yamlMatch[1];
+      const currentStepMatch = yaml.match(/current_step:\s*"([^"]*)"/);
+      const completedMatch = yaml.match(/completed_steps:\s*\[(.*?)\]/);
+      const skippedMatch = yaml.match(/skipped_steps:\s*\[(.*?)\]/);
+      const nextStepMatch = yaml.match(/next_step:\s*"([^"]*)"/);
+      const complexityMatch = yaml.match(/complexity:\s*"([^"]*)"/);
+      const scenarioMatch = yaml.match(/scenario:\s*"([^"]*)"/);
+
+      if (currentStepMatch) {
+        stepRecovery = {
+          currentStep: currentStepMatch[1],
+          completedSteps: completedMatch ? completedMatch[1].split(',').map(s => s.trim().replace(/"/g, '')).filter(Boolean) : [],
+          skippedSteps: skippedMatch ? skippedMatch[1].split(',').map(s => s.trim().replace(/"/g, '')).filter(Boolean) : [],
+          nextStep: nextStepMatch?.[1] ?? '',
+          complexity: complexityMatch?.[1] ?? '待判定',
+          scenario: scenarioMatch?.[1] ?? '待判定',
+        };
+      }
+    }
   }
 
   // Step 4: Locate current task
@@ -212,6 +244,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     missingFiles: uniqueMissingFiles,
     fiveQuestions,
     autoLoopSummary,
+    stepRecovery,
     skipped: false,  // I5: 正常执行，非节流跳过
     summary,
   };

@@ -281,6 +281,17 @@ NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.
 
 未完成闭环会导致 C4/C5 在阶段推进时不达标。
 
+### 测试命令探测策略（P1-TDD-CMD）
+
+为保证跨技术栈可执行，测试命令需按下列顺序探测：
+
+`pnpm test` → `npm test` → `yarn test` → `pytest` → `go test`
+
+约束：
+1. 探测仅用于选择命令，不作为 RED/GREEN 证据
+2. RED 与 GREEN 必须使用同一条最终命令
+3. 证据必须包含该最终命令的完整输出与退出码
+
 ## Code Review 前检查清单
 
 在提交代码前，必须完成以下检查：
@@ -291,7 +302,7 @@ NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.
 |--------|------|----------|
 | Lint 通过 | `npm run lint` | 退出码 0，无警告 |
 | Typecheck 通过 | `npm run typecheck` | 退出码 0，无类型错误 |
-| 单元测试通过 | `npm test` | 退出码 0，覆盖率达标 |
+| 单元测试通过 | `按探测策略选择的测试命令` | 退出码 0，覆盖率达标 |
 | Build 通过 | `npm run build` | 退出码 0，产物生成 |
 
 ### 追踪完整性检查
@@ -465,8 +476,14 @@ npm run lint
 # Typecheck
 npm run typecheck
 
-# Test
-npm test
+# Step 1: 探测测试命令（仅用于选择，不计入 RED/GREEN 证据）
+# 探测顺序: pnpm test → npm test → yarn test → pytest → go test
+
+# Step 2: 使用选定命令执行 RED（保留完整输出与退出码）
+# <selected_test_cmd> <path/to/test>
+
+# Step 3: 使用同一命令执行 GREEN（保留完整输出与退出码）
+# <selected_test_cmd> <path/to/test>
 
 # Build
 npm run build

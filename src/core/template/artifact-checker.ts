@@ -51,6 +51,7 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   { relativePath: 'findings.md', stage: Stage.INIT },
   { relativePath: 'task_plan.md', stage: Stage.INIT },
   // 01_specify
+  { relativePath: 'prd.md', stage: Stage.SPECIFY },
   { relativePath: 'spec.md', stage: Stage.SPECIFY },
   // 02_design
   { relativePath: 'design.md', stage: Stage.DESIGN },

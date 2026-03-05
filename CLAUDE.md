@@ -266,3 +266,26 @@ npm run format             # prettier 格式化
 - v1.2.0 2026-02-28 Claude: 新增工作流编排、任务管理章节；核心理念补充追根溯源/最小影响
 - v1.1.0 2026-02-28 Claude: 补充技术栈、常用命令、架构概览；移除硬编码路径
 - v1.0.0 2026-02-06 Leo: 初始化 Spec-First 项目规范文档
+
+<!-- SPEC-FIRST:BEGIN MANUAL -->
+<!-- 手动补充上下文，请保留此块 -->
+<!-- SPEC-FIRST:END MANUAL -->
+
+<!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
+> Auto-synced at 2026-03-05T05:16:51.019Z
+
+## Spec-First Context Snapshot
+- Feature: FSREQ-20260305-SPECOPT-001
+- Stage: 03_plan
+- Design: specs/FSREQ-20260305-SPECOPT-001/design.md
+
+### Design Highlights
+- 技术设计：spec-first:spec 命令优化
+- 1. 架构概览
+- 1.1 设计目标
+- 1.2 模块划分
+- 2. 设计规格（DS）
+- DS-SPECOPT-001: 四档复杂度分流机制
+- DS-SPECOPT-002: Question Gate 问题门禁
+- DS-SPECOPT-003: 一问一答收敛机制
+<!-- SPEC-FIRST:END AUTO-CONTEXT -->

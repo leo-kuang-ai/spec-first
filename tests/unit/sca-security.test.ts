@@ -30,30 +30,30 @@ afterEach(() => {
 
 describe('runSca', () => {
   it('should pass Specify when FR IDs are unique and have titles', () => {
-    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
     const result = runSca(FEAT, TMP, Stage.SPECIFY);
     expect(result.pass).toBe(true);
   });
 
   it('should fail Specify when FR IDs are duplicated', () => {
     writeMatrix(
-      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n' +
+      '| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n' +
       '| FR-AUTH-001 | FR | Login2 | Planned |  |  |\n',
     );
     const result = runSca(FEAT, TMP, Stage.SPECIFY);
     expect(result.pass).toBe(false);
-    expect(result.checks[0].rule).toContain('唯一性');
+    expect(result.checks.some(c => c.rule.includes('唯一性'))).toBe(true);
   });
 
   it('should fail Design when FR has no DS mapping', () => {
-    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
     const result = runSca(FEAT, TMP, Stage.DESIGN);
     expect(result.pass).toBe(false);
   });
 
   it('should pass Design when all FRs mapped to DS', () => {
     writeMatrix(
-      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n' +
+      '| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n' +
       '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 |  |\n',
     );
     const result = runSca(FEAT, TMP, Stage.DESIGN);
@@ -61,14 +61,14 @@ describe('runSca', () => {
   });
 
   it('should fail Plan when FR has no TASK mapping', () => {
-    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
     const result = runSca(FEAT, TMP, Stage.PLAN);
     expect(result.pass).toBe(false);
   });
 
   it('should pass Plan when all FRs mapped to TASKs', () => {
     writeMatrix(
-      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n' +
+      '| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n' +
       '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-001 |  |\n',
     );
     const result = runSca(FEAT, TMP, Stage.PLAN);
@@ -76,7 +76,7 @@ describe('runSca', () => {
   });
 
   it('should fail Verify when FR has no TC', () => {
-    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
     const result = runSca(FEAT, TMP, Stage.VERIFY);
     expect(result.pass).toBe(false);
   });
@@ -91,7 +91,7 @@ describe('runSca', () => {
 
 describe('analyzeArtifacts', () => {
   it('should report CRITICAL when required artifact is missing', () => {
-    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
     const result = analyzeArtifacts(FEAT, TMP);
     expect(result.summary.CRITICAL).toBeGreaterThan(0);
     expect(result.findings.some((f) => f.type === 'ARTIFACT_MISSING')).toBe(true);
@@ -101,7 +101,7 @@ describe('analyzeArtifacts', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# spec', 'utf-8');
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), '# tasks', 'utf-8');
-    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
 
     const result = analyzeArtifacts(FEAT, TMP);
     const report = renderAnalysisReport(result);
