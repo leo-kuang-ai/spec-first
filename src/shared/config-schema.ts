@@ -21,6 +21,20 @@ export interface AutoOrchestrateConfig {
 
 export type AuditTamperProof = 'none' | 'hash_chain';
 
+/** 阶段依赖配置 */
+export interface StageDependencyConfig {
+  npmScripts?: string[];
+  files?: string[];
+  envVars?: string[];
+}
+
+export interface DependenciesConfig {
+  /** 各阶段的依赖检查配置，key 为阶段名（如 '02_design', '03_plan） */
+  stages?: Record<string, StageDependencyConfig>;
+  /** 是否在 stage advance 时自动检查依赖 */
+  autoCheck?: boolean;
+}
+
 export interface AuditLogConfig {
   enabled: boolean;
   tamper_proof: AuditTamperProof;
@@ -45,6 +59,7 @@ export interface SpecFirstConfig {
       w7: number; w8: number; w9: number;
     };
   };
+  dependencies?: DependenciesConfig;
 }
 
 export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
@@ -72,6 +87,29 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
     },
   },
   gate: { pilot_mode: false },
+  dependencies: {
+    autoCheck: true,
+    stages: {
+      '02_design': {
+        files: ['specs/{featureId}/prd.md', 'specs/{featureId}/spec.md'],
+      },
+      '03_plan': {
+        files: ['specs/{featureId}/design.md'],
+      },
+      '04_implement': {
+        npmScripts: ['test', 'build'],
+      },
+      '05_verify': {
+        npmScripts: ['test'],
+      },
+      '06_wrap_up': {
+        files: ['specs/{featureId}/reports/smoke-test-report.md'],
+      },
+      '07_release': {
+        npmScripts: ['contract:check'],
+      },
+    },
+  },
   health: {
     weights: {
       w1: 0.10, w2: 0.10, w3: 0.10,

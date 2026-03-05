@@ -39,6 +39,9 @@ beforeEach(() => {
   mkdirSync(SPEC_DIR, { recursive: true });
   // findings.md 需要存在才能追加
   writeFileSync(join(SPEC_DIR, 'findings.md'), '# Findings\n', 'utf-8');
+  // 为 DESIGN 阶段准备必需的依赖文件
+  writeFileSync(join(SPEC_DIR, 'prd.md'), '# PRD\n', 'utf-8');
+  writeFileSync(join(SPEC_DIR, 'spec.md'), '# Spec\n', 'utf-8');
 });
 
 afterEach(() => {

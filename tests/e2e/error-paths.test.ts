@@ -39,7 +39,10 @@ describe('Gate FAIL blocking', () => {
     const { featureId } = init({
       feat: 'BLK', mode: 'N', size: 'S', platforms: ['h5'], projectRoot: TMP,
     });
-    advance(featureId, TMP); // 00_init -> 01_specify（此时无 spec.md）
+    advance(featureId, TMP); // 00_init -> 01_specify
+    // 为 DESIGN 阶段准备必需的依赖文件
+    writeFileSync(join(TMP, 'specs', featureId, 'prd.md'), '# PRD');
+    writeFileSync(join(TMP, 'specs', featureId, 'spec.md'), '# Spec');
     expect(() => advance(featureId, TMP))
       .toThrow(/Gate 未通过/);
   });

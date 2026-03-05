@@ -1,9 +1,9 @@
 ---
 name: "spec-first:design"
 description: "定位 Feature 并校验阶段为技术设计（02_design）"
-version: 1.0.0
-last_updated: {{DATE}}
-changelog: Initial version with standardized metadata
+version: 1.1.0
+last_updated: 2026-03-05
+changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
 # Skill: design
@@ -45,7 +45,34 @@ design 阶段输出系统级 HOW，不输出实现级 HOW：
 
 ## 触发条件
 - 阶段: 02_design
-- Command: `/spec-first:design`
+- Command: `/spec-first:design [featureId]`
+
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 的阶段不匹配 → 报错并终止
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 的阶段不匹配 → 报错并终止
 
 ## HARD-GATE 入口守卫（P1-19）
 
@@ -64,10 +91,21 @@ NO implementation code until design artifacts are complete and approved.
 - 对架构分层、接口边界、数据一致性策略等关键设计决策，优先在 Plan Mode 中先收敛再落文档
 - Plan Mode 的关键结论必须同步到 `findings.md`，并在 `design.md` 中保留可追溯引用
 
-## 宪法权威参考（P1-CON）
+## 宪法权威检查（P1-CON）
 
-- 设计评审时必须对照 `../03-spec/references/constitution-authority.md`
-- 若 Design 与 Constitution 冲突，优先修正 Design，不得带冲突推进
+### P2.5: 设计宪法检查
+
+生成 DS 后、进入用户确认前，必须执行宪法一致性检查：
+
+1. 加载 `specs/{featureId}/constitution.md`
+2. 对照 `../03-spec/references/constitution-authority.md`
+3. 检查每条 DS 是否违反宪法约束
+4. 发现冲突时：
+   - 标记 `[CONSTITUTION_VIOLATION]`
+   - 记录冲突条款与受影响 DS
+   - 先修正 Design，再继续后续步骤
+
+若 Design 与 Constitution 冲突，优先修正 Design，不得带冲突推进。
 
 ## HARD-GATE 与产物完整性决策图（Superpowers P1-2）
 
@@ -119,7 +157,7 @@ digraph design_flow {
 ```
 
 ## 执行阶段
-- P0: 定位 Feature，校验阶段为 02_design
+- P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），校验阶段为 02_design
 - P1: 从矩阵加载 FR，读取 constitution.md
 - P2: 生成 DS（设计规格）条目，映射到 FR
 - P3: 与用户确认设计决策
@@ -145,6 +183,16 @@ digraph design_flow {
 - 所有 DS 已通过 `id next DS` 注册
 - `traceability-matrix.md` 已更新，每个 FR 有对应 DS 引用
 - `metrics coverage` C1 (Design Coverage) > 0%
+
+**格式校验（P4 落盘后自动执行）**:
+```bash
+spec-first validate format <featureId>
+```
+
+- 检查 PRD 章节格式
+- 检查 ID 格式（无多余连字符）
+- 检查文件路径完整性
+- 校验失败时需修复
 
 ## 示例（P2 输出格式）
 

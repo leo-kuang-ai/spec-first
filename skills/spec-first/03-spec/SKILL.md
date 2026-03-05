@@ -1,9 +1,9 @@
 ---
 name: "spec-first:spec"
 description: "定位 Feature 并校验阶段为需求规格（01_specify）"
-version: 2.0.0
-last_updated: {{DATE}}
-changelog: "v2.0.0: 重构为 Phase 0 + Step 0-8 流程，新增四档复杂度分流、PRD 必产物、findings.md 状态头"
+version: 2.1.0
+last_updated: 2026-03-05
+changelog: "v2.1.0: 新增自动 Feature 定位（优先读取 .spec-first/current）; v2.0.0: 重构为 Phase 0 + Step 0-8 流程"
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash"
 ---
@@ -107,6 +107,20 @@ spec 阶段只定义 WHAT，不定义 HOW：
 ## 触发条件
 - 阶段: 01_specify
 - Command: `/spec-first:spec`
+
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 的阶段不匹配 → 报错并终止
 
 ## 执行流程：Phase 0 + Step 0-8
 
@@ -306,6 +320,30 @@ spec 阶段只定义 WHAT，不定义 HOW：
 
 ---
 
+## 宪法权威检查（P1-CON）
+
+### P1.5: 宪法一致性检查
+
+在 FR/AC 收敛后、进入 Step 7 前，必须执行宪法一致性检查：
+
+1. 加载 `specs/{featureId}/constitution.md`
+2. 逐条检查 FR/AC 是否违反宪法原则
+3. 发现违反时，必须：
+   - 标记 `[CONSTITUTION_VIOLATION]`
+   - 输出违反的具体宪法条款
+   - 给出可执行修改建议
+4. 未完成修正或未获用户确认前，不得推进后续步骤
+
+### 宪法违反示例
+
+| FR/AC 内容 | 宪法条款 | 判定 |
+|-----------|---------|------|
+| “密码明文存储” | “敏感数据必须加密存储” | ❌ 违反 |
+| “API 返回全量用户敏感字段” | “最小权限原则” | ❌ 违反 |
+| “核心域模型使用 any 绕过类型约束” | “类型安全优先” | ❌ 违反 |
+
+---
+
 ### Step 7: Propose Approaches + Record Decisions
 
 **目标**: 记录技术决策，生成 ADR-lite。
@@ -389,6 +427,17 @@ spec 阶段只定义 WHAT，不定义 HOW：
 - `spec.md` 最终版本
 - `traceability-matrix.md` 注册所有 FR
 - `findings.md` 记录 Step 8 完成
+
+**格式校验（P4 落盘后自动执行）**:
+```bash
+spec-first validate format <featureId>
+```
+
+- 检查 PRD 章节格式（1. 业务目标/2. 功能需求/3. 非功能需求）
+- 检查 ID 格式（无多余连字符）
+- 检查文件路径完整性
+- 检查必需字段（Feature ID）
+- 校验失败时阻断，需修复后重新确认
 
 ---
 

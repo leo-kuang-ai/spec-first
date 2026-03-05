@@ -14,6 +14,7 @@ import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { assertTransitionAllowed, isTerminal } from './stage-machine.js';
 import { evaluateGate } from '../gate-engine/gate-evaluator.js';
 import { syncAgentContextFromDesign } from '../tool-integration/context-sync.js';
+import { checkDependencies } from './dependency-checker.js';
 
 export class GateUnavailableError extends Error {
   constructor(message = 'GateEngine 不可用') {
@@ -105,12 +106,21 @@ export function advance(
   let gateResult: string;
 
   if (options.force) {
-    // --force 路径：跳过 Gate
+    // --force 路径：跳过 Gate 和依赖检查
     gateResult = 'FORCE_SKIPPED';
     appendFindings(featureId, projectRoot,
       `FORCE_SKIPPED: ${from} → ${to} (gate check bypassed)`);
   } else {
-    // 正常路径：执行 Gate 校验
+    // 正常路径：先执行依赖检查，再执行 Gate 校验
+    const depCheck = checkDependencies(featureId, to, projectRoot);
+    if (!depCheck.pass) {
+      appendFindings(featureId, projectRoot,
+        `DEPENDENCY_CHECK_FAIL: 缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`);
+      throw new GateFailedError(
+        `阶段 ${to} 的依赖检查未通过。缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`
+      );
+    }
+
     try {
       const gate = evaluateGate(featureId, projectRoot);
       gateResult = gate.status;

@@ -2,7 +2,7 @@
 name: "spec-first:task"
 description: "定位 Feature 并校验阶段为任务拆解（03_plan）"
 version: 1.2.0
-last_updated: {{DATE}}
+last_updated: 2026-03-05
 changelog: |
   v1.2.0: 新增 Execution Handoff、Hooks 行为规范、中断恢复策略、Error Log Pattern、Decision Log Pattern、Operation Types
   v1.1.0: 新增 Announce at Start、字面即精神原则、Bite-Sized Granularity、Task Structure Detail、决策流程图、When to Stop and Ask、references/ 目录、hooks 配置
@@ -307,6 +307,20 @@ task 阶段只输出执行计划，不输出实现代码：
 - **阶段**：03_plan
 - **Command**：`/spec-first:task`
 
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 的阶段不匹配 → 报错并终止
+
 ## 执行阶段
 
 - **P0**: 定位 Feature，校验阶段为 03_plan
@@ -341,6 +355,16 @@ task 阶段只输出执行计划，不输出实现代码：
 - `traceability-matrix.md` 已更新，每个 FR 有对应 TASK 引用
 - `metrics coverage` C3 (Task Coverage) > 0%
 - Review Checklist 已通过自检
+
+**格式校验（P4 落盘后自动执行）**:
+```bash
+spec-first validate format <featureId>
+```
+
+- 检查 PRD 章节格式
+- 检查 ID 格式（无多余连字符）
+- 检查文件路径完整性
+- 校验失败时需修复
 
 ## Review Checklist
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.88 2026-03-05 Claude: feat(robustness): 集成测试/Skills集成/配置化依赖 — 新增集成测试 tests/integration/validate-command.test.ts（7 个测试用例）；03-spec/04-design/06-task Skills 在 P4 落盘后自动调用格式校验；config.yaml 新增 dependencies 配置段支持自定义各阶段依赖项（autoCheck 开关 + stages 映射），dependency-checker.ts 优先读取配置回退到内置默认值 (user-visible)
+- v0.5.87 2026-03-05 Claude: feat(robustness): P0-3.1/3.3 健壮性优化 — 新增 validate 命令（format/matrix/all 子命令）校验产物格式；format-validator.ts 支持 PRD 章节格式/ID 格式（连字符检测）/文件路径/必需字段校验；dependency-checker.ts 在 stage advance 前自动检查依赖（npm scripts/文件/环境变量），force 模式下跳过检查；新增 2 个测试文件共 9 个测试用例全部通过 (user-visible)
+- v0.5.86 2026-03-05 Claude: docs(robustness): 修复技术方案文档章节编号 — spec-first-robustness-optimization.md 修正全部章节编号（P1方案5.1-5.6/P2方案6.1-6.4/实施路线图7.1-7.3/风险与缓解8.1-8.2/成功指标9.1-9.2/总结10.1-10.3），修复交叉引用（P1-4.2→P1-5.2），消除章节跳跃与重复编号问题
+- v0.5.85 2026-03-05 Claude: docs(robustness): 整合全链路一致性审查问题到优化方案 — spec-first-robustness-optimization.md 新增第4章"全链路一致性问题"，整合 skills-consistency-audit.md 识别的4个问题（A1:阶段编号不一致/A2:前置产物检查缺失/A3:追溯验证不完整/A4:findings更新规则不统一），建立与现有P0/P1/P2方案的关联映射，A2纳入P0-3.3依赖检查、A3扩展P1-5.2追溯保护
+- v0.5.84 2026-03-05 Claude: feat(spec): 03-spec Skill 补齐 Feature 自动定位 — v2.0.0→v2.1.0，新增"Feature定位规则"章节，P0阶段优先读取.spec-first/current自动定位，完成全部核心workflow skills的定位逻辑统一 (user-visible)
+- v0.5.83 2026-03-05 Claude: feat(skills): C类2个编排skills统一Feature自动定位 — 13-orchestrate/16-sync 升级到v1.1.0，新增"Feature定位规则"章节，P0阶段优先读取.spec-first/current自动定位；11-plan保持现状（支持多Feature规划场景，已有完善的交互式选择逻辑） (user-visible)
+- v0.5.82 2026-03-05 Claude: feat(skills): B类4个辅助skills统一Feature自动定位 — 05-research/08-code-review/10-archive/21-analyze 全部升级到v1.1.0+，新增"Feature定位规则"章节，P0阶段统一优先读取.spec-first/current自动定位，实现零参数启动 (user-visible)
+- v0.5.81 2026-03-05 Claude: feat(skills): A类5个核心skills统一Feature自动定位 — 04-design/06-task/07-code/09-test/12-verify 全部升级到v1.1.0+，新增"Feature定位规则"章节（显式参数>自动定位.spec-first/current>交互式），P0阶段统一为"定位Feature（优先读取.spec-first/current，无则交互式提示）"，实现零参数启动 (user-visible)
 - v0.5.80 2026-03-05 Claude: feat(spec-review): 新增自动 Feature 定位机制 — SKILL.md v1.0.0→v1.1.0，P0 阶段优先读取 .spec-first/current 自动定位当前激活 Feature，无则降级到交互式选择，新增 Feature 定位规则章节（显式参数>自动定位>交互式），补充 references/feature-location.md 和 optimization-proposal.md 文档 (user-visible)
 - v0.5.79 2026-03-05 Claude: docs(skills): 补充 5 个核心 skills 的 references/ 文档 — 01-init（已存在 4 个）、04-design（新建 design-constraints/ds-format/gate-rules/sync-rules.md）、13-orchestrate（新建 orchestration-rules/skill-mapping/output-format.md）、16-sync（新建 sync-rules/output-format.md）、20-spec-review（新建 review-rules/output-format.md），共新建 11 个 reference 文档约 29KB，完善 skills 文档结构
 - v0.5.78 2026-03-05 Claude: fix(metrics): metrics coverage 命令支持 --json 输出 — handleCoverage() 新增 --json 参数解析，输出标准 JSON 格式（C1-C9 指标对象），修复 Stage Viewer UI 数据同步问题（server.js 依赖 JSON 格式解析覆盖率数据）(user-visible)

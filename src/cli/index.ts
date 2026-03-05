@@ -24,6 +24,7 @@ import { handleUpdate } from './commands/update.js';
 import { handleUninstall } from './commands/uninstall.js';
 import { handleAnalyze } from './commands/analyze.js';
 import { handleTrace } from './commands/trace.js';
+import { handleValidate } from './commands/validate.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
 registerCommand('matrix', '同步追踪矩阵', handleMatrix);
@@ -45,6 +46,7 @@ registerCommand('update', '升级后刷新 Skill/MCP/Hooks', handleUpdate);
 registerCommand('uninstall', '清理宿主配置（卸载前执行）', handleUninstall);
 registerCommand('analyze', '跨产物一致性分析', handleAnalyze);
 registerCommand('trace', '追溯链修复与校验', handleTrace);
+registerCommand('validate', '产物格式校验', handleValidate);
 
 const code = await dispatch(process.argv.slice(2));
 process.exit(code);
