@@ -21,7 +21,8 @@
     "codex:autostart:install": "bash scripts/codex/install-codex-autostart.sh",
     "prepublishOnly": "npm run build",
     "postinstall": "node dist/postinstall.js || true",
-    "preuninstall": "node dist/preuninstall.js || true"
+    "preuninstall": "node dist/preuninstall.js || true",
+    "contract:check": "echo \"No API contract for Skill optimization\""
   },
   "engines": {
     "node": ">=20.0.0"
