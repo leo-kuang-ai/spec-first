@@ -564,3 +564,18 @@ spec-first stage advance FSREQ-20260305-SPECOPT-001
 |---------|----------|--------|--------|------|
 | G-BE-CONTRACT | 本 Feature 为 Skill 优化，无 API contract 产物 | Tech Lead | 2026-12-31 | ACTIVE |
 
+
+### Batch 2: 修复完成 (2026-03-05T06:30:00Z)
+
+**已修复**:
+1. ✅ C4 = 100% (补充 TC-016)
+2. ✅ C5 = 100%
+3. ✅ C9 = 100% (删除空 TC 条目)
+4. ✅ contract:check (添加 npm script)
+
+**Gate 结果**: PASS
+
+**阶段推进**: 05_verify → 06_wrap_up
+
+---
+

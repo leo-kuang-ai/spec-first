@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.80 2026-03-05 Claude: feat(spec-review): 新增自动 Feature 定位机制 — SKILL.md v1.0.0→v1.1.0，P0 阶段优先读取 .spec-first/current 自动定位当前激活 Feature，无则降级到交互式选择，新增 Feature 定位规则章节（显式参数>自动定位>交互式），补充 references/feature-location.md 和 optimization-proposal.md 文档 (user-visible)
+- v0.5.79 2026-03-05 Claude: docs(skills): 补充 5 个核心 skills 的 references/ 文档 — 01-init（已存在 4 个）、04-design（新建 design-constraints/ds-format/gate-rules/sync-rules.md）、13-orchestrate（新建 orchestration-rules/skill-mapping/output-format.md）、16-sync（新建 sync-rules/output-format.md）、20-spec-review（新建 review-rules/output-format.md），共新建 11 个 reference 文档约 29KB，完善 skills 文档结构
+- v0.5.78 2026-03-05 Claude: fix(metrics): metrics coverage 命令支持 --json 输出 — handleCoverage() 新增 --json 参数解析，输出标准 JSON 格式（C1-C9 指标对象），修复 Stage Viewer UI 数据同步问题（server.js 依赖 JSON 格式解析覆盖率数据）(user-visible)
 - v0.5.77 2026-03-05 Claude: fix(test): 修复 gate-evaluator 测试 PRD 格式 — 章节标题改为标准格式（## 1. 业务目标），补充完整元信息，添加 REQ-PRD 条目到追溯矩阵，增加章节内容避免占位符扣分
 - v0.5.76 2026-03-05 Claude: feat(trace): 新增 trace 命令 + ID 生成器同步修复 — 新增 spec-first trace fix/validate 命令（自动修复 TASK downstream 断裂 + 校验 C3/C8 覆盖率）；id-generator.ts 同步修复 extractSeq() 标准化 abbr、validateAbbr() 明确连字符移除规则，确保序号计算正确 (user-visible)
 - v0.5.75 2026-03-05 Claude: feat(gate): 分析报告自动刷新 + AI 命令路由增强 — gate-evaluator.ts 检测报告过期（>5分钟）时自动执行 analyzeArtifacts() 刷新，避免 CRITICAL findings 误报；ai.ts 新增 task 子命令友好提示（引导用户使用 /spec-first:task），提升命令发现性 (user-visible)

@@ -38,9 +38,11 @@ export function handleMetrics(args: string[]): number {
 }
 
 function handleCoverage(args: string[]): number {
-  const featureId = args[0];
+  const jsonFlag = args.includes('--json');
+  const featureId = args.find(a => !a.startsWith('--'));
+
   if (!featureId) {
-    console.error('用法：spec-first metrics coverage <featureId>');
+    console.error('用法：spec-first metrics coverage <featureId> [--json]');
     return ExitCode.VALIDATION_ERROR;
   }
   if (!featureExists(featureId, process.cwd())) {
@@ -51,6 +53,11 @@ function handleCoverage(args: string[]): number {
   try {
     const metrics = getCoverage(featureId, process.cwd());
     const record = metrics as unknown as Record<string, number>;
+
+    if (jsonFlag) {
+      console.log(JSON.stringify(metrics, null, 2));
+      return ExitCode.SUCCESS;
+    }
 
     console.log(`覆盖率报告 — ${featureId}\n`);
     console.log('指标'.padEnd(25) + '当前值'.padEnd(10) + '目标值'.padEnd(10) + '状态');

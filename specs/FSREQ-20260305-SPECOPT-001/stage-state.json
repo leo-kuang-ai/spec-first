@@ -146,7 +146,7 @@
       }
     }
   },
-  "currentStage": "05_verify",
+  "currentStage": "08_done",
   "history": [
     {
       "from": "00_init",
@@ -177,10 +177,28 @@
       "to": "05_verify",
       "timestamp": "2026-03-05T06:16:45.376Z",
       "gateResult": "PASS"
+    },
+    {
+      "from": "05_verify",
+      "to": "06_wrap_up",
+      "timestamp": "2026-03-05T06:33:44.838Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "06_wrap_up",
+      "to": "07_release",
+      "timestamp": "2026-03-05T06:52:09.936Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "07_release",
+      "to": "08_done",
+      "timestamp": "2026-03-05T06:53:46.785Z",
+      "gateResult": "PASS"
     }
   ],
-  "terminal": false,
+  "terminal": true,
   "title": "spec-first-spec-command-optimization",
   "createdAt": "2026-03-05T01:51:33.434Z",
-  "updatedAt": "2026-03-05T06:16:45.376Z"
+  "updatedAt": "2026-03-05T06:53:46.785Z"
 }
