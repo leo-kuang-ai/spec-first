@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.77 2026-03-05 Claude: fix(test): 修复 gate-evaluator 测试 PRD 格式 — 章节标题改为标准格式（## 1. 业务目标），补充完整元信息，添加 REQ-PRD 条目到追溯矩阵，增加章节内容避免占位符扣分
+- v0.5.76 2026-03-05 Claude: feat(trace): 新增 trace 命令 + ID 生成器同步修复 — 新增 spec-first trace fix/validate 命令（自动修复 TASK downstream 断裂 + 校验 C3/C8 覆盖率）；id-generator.ts 同步修复 extractSeq() 标准化 abbr、validateAbbr() 明确连字符移除规则，确保序号计算正确 (user-visible)
 - v0.5.75 2026-03-05 Claude: feat(gate): 分析报告自动刷新 + AI 命令路由增强 — gate-evaluator.ts 检测报告过期（>5分钟）时自动执行 analyzeArtifacts() 刷新，避免 CRITICAL findings 误报；ai.ts 新增 task 子命令友好提示（引导用户使用 /spec-first:task），提升命令发现性 (user-visible)
 - v0.5.74 2026-03-05 Claude: fix(trace): ID 格式一致性 + 覆盖率诊断增强 — id-generator.ts 自动移除 abbr 中的连字符（FR-SPEC-OPT-001 → FR-SPECOPT-001），修复追溯链断裂；coverage.ts 新增 detectIdFormatMismatch() 检测 ID 格式不匹配并输出警告，解决 C3/C8 覆盖率误报 0% 问题 (user-visible)
 - v0.5.73 2026-03-05 Claude: feat(onboarding): 按角色生成中文命名文档 + 支持自定义角色 + 自动保存 — Phase 3 改为自动保存（无需询问），按角色独立文档（开发者/产品经理/测试工程师/架构师/自定义角色学习路径.md），Phase 1 支持 Other 自定义角色输入（如运维工程师、技术经理），多次执行只更新对应角色文档不覆盖其他角色；scenario-mapping.md 补充角色/任务/规模映射表 (user-visible)

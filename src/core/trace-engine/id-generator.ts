@@ -48,11 +48,12 @@ export function nextId(opts: NextIdOptions): NextIdResult {
   return { id, seq };
 }
 
-/** 校验缩写格式：1-16 位大写字母+数字，首字符必须是字母 */
+/** 校验缩写格式：1-16 位大写字母+数字，首字符必须是字母（连字符会被自动移除） */
 function validateAbbr(abbr: string): void {
-  if (!/^[A-Z][A-Z0-9]{0,15}$/.test(abbr)) {
+  const normalized = abbr.replace(/-/g, '');
+  if (!/^[A-Z][A-Z0-9]{0,15}$/.test(normalized)) {
     throw new Error(
-      `无效缩写 "${abbr}"：必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`,
+      `无效缩写 "${abbr}"：移除连字符后必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`,
     );
   }
 }
@@ -86,13 +87,14 @@ function findNextSeq(ids: string[], type: NextIdType, abbr: string, tcLevel?: Tc
 
 /** 从 ID 中提取序号（匹配类型+缩写时） */
 function extractSeq(id: string, type: NextIdType, abbr: string, tcLevel?: TcLevel): number | null {
+  const normalizedAbbr = abbr.replace(/-/g, '');
   let prefix: string;
   if (type === 'TC') {
-    prefix = `TC-${tcLevel!}-${abbr}-`;
+    prefix = `TC-${tcLevel!}-${normalizedAbbr}-`;
   } else if (type === 'RFC') {
     prefix = 'RFC-';
   } else {
-    prefix = `${type}-${abbr}-`;
+    prefix = `${type}-${normalizedAbbr}-`;
   }
 
   if (!id.startsWith(prefix)) return null;
