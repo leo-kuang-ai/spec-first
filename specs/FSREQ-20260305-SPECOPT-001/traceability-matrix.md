@@ -46,3 +46,33 @@
 | DS-SPECOPT-013 | DS | PRD 门禁（G-SPEC-00） | Planned | FR-SPECOPT-013 |  |
 | DS-SPECOPT-014 | DS | PRD 清晰度评分（C-PRD） | Planned | FR-SPECOPT-014 |  |
 | DS-SPECOPT-015 | DS | PRD→FR 追溯映射 | Planned | FR-SPECOPT-015 |  |
+| TC-UT-SPECOPT-001 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-002 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-003 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-004 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-005 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-001 | TC | 复杂度判定 - Complex | Planned | FR-SPECOPT-001 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-002 | TC | Question Gate - 可推导检查 | Planned | FR-SPECOPT-002 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-003 | TC | 收敛阶段单问限制 | Planned | FR-SPECOPT-003 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-004 | TC | PRD 章节完整性检查 | Planned | FR-SPECOPT-011 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-005 | TC | C-PRD 评分计算 | Planned | FR-SPECOPT-014 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-006 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-007 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-008 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-009 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-010 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-011 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-012 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-013 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-014 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-015 | TC |  | Planned |  |  |
+| TC-UT-SPECOPT-006 | TC | Expansion Sweep 三类检查 | Planned | FR-SPECOPT-005 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-007 | TC | 最终确认包字段完整性 | Planned | FR-SPECOPT-006 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-008 | TC | G-SPEC-03 门禁保持 | Planned | FR-SPECOPT-007 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-009 | TC | 反模式检测 | Planned | FR-SPECOPT-008 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-010 | TC | 阶段衔接包结构 | Planned | FR-SPECOPT-009 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-011 | TC | 交互模式唯一化 | Planned | FR-SPECOPT-010 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-012 | TC | PRD 场景判定 greenfield | Planned | FR-SPECOPT-012 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-013 | TC | PRD 场景判定 iteration | Planned | FR-SPECOPT-012 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-014 | TC | G-SPEC-00 门禁检查 | Planned | FR-SPECOPT-013 | tests/spec-opt.test.md |
+| TC-UT-SPECOPT-015 | TC | PRD→FR 追溯映射 | Planned | FR-SPECOPT-015 | tests/spec-opt.test.md |
