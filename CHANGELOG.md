@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.107 2026-03-06 Claude: feat(first): 新增 quick→deep 升级策略文档 — 识别当前升级策略缺陷（只更新 frontmatter 未增强内容），新增 upgrade-strategy.md 定义 minimal/enhance/regenerate 三种升级模式，更新 interaction-guide.md 添加升级策略交互提示，为后续实现 Evidence Injection Agent 奠定基础 (user-visible)
+- v0.5.106 2026-03-06 Claude: refactor(first): 00-first Skill 代码结构优化 — SKILL.md 从 714 行精简至 209 行（减少 70%），提取交互逻辑到 interaction-guide.md、模式对比到 mode-comparison.md，提升可维护性与可读性 (user-visible)
 - v0.5.105 2026-03-06 Claude: feat(init): 交互式引导流程优化 — runGuidedInit 改造为分步引导模式（Step 1/7 进度提示+✅实时确认反馈）；新增 printGuidedHeader/printStepHeader/printStepConfirm 等辅助函数；增强各步骤提示信息（格式要求+示例+建议值）；平台选择简化为单次输入（移除多轮切换逻辑）；最终确认展示完整参数清单 (user-visible)
 - v0.5.104 2026-03-06 Claude: feat(viewer): 优化仪表盘数据可视化 — 健康仪表盘渐变色环形图+悬停提示+阴影效果；整体布局侧边栏宽度优化+间距统一；交互动画节点悬停+点击反馈+平滑滚动 (user-visible)
 - v0.5.103 2026-03-05 Claude: feat(spec): spec-first:spec 新增 Phase 0.0/0.2/0.5 增强功能（零代码方案） — Phase 0.0 Feature 快速初始化防止信息丢失；Phase 0.2 质量扫描+自动上下文收集（先做后问原则）；Phase 0.5 PRD 补全对话（三道门禁：可推导性/影响性/优先级 + 一问一答规则）；findings.md 新增 quality_score 字段；成功标准更新为 Phase 0.0-0.6 全部完成 (user-visible)
@@ -395,3 +397,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - 审查原有 11 节点流程，识别 10 个缺口节点
 - 建议补充 P0 级节点：Test-Design, Test-Execution, UAT, Deployment, API-Design (user-visible)
+- v0.5.46 2026-03-06 Claude: feat(gate): 项目类型感知的 Gate 规则，CSS-only/frontend 项目豁免测试覆盖率检查 (user-visible)

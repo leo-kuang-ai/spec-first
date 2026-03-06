@@ -302,29 +302,9 @@ GATE_CONDITIONS['07_release' as Stage] = [
 
 // ─── 核心评估函数 ─────────────────────────────────────────
 
-function getProjectTypeFromConstitution(featureId: string, projectRoot: string): string {
-  try {
-    const constitutionPath = join(projectRoot, 'specs', featureId, 'constitution.md');
-    const content = readFileSync(constitutionPath, 'utf-8');
-    const match = /项目类型[*\s]*[:：]\s*(\S+)/i.exec(content);
-    return match?.[1] || 'fullstack';
-  } catch {
-    return 'fullstack';
-  }
-}
-
-function shouldSkipCondition(conditionId: string, projectType: string): boolean {
-  if (projectType === 'css-only' || projectType === 'frontend') {
-    return ['C4', 'C5', 'PYTEST', 'DIFF-COV'].some(id => conditionId.includes(id));
-  }
-  return false;
-}
-
 /** 获取指定阶段的 Gate 条件定义 */
-export function getConditions(stage: Stage, projectType?: string): GateConditionDef[] {
-  const conditions = GATE_CONDITIONS[stage] ?? [];
-  if (!projectType) return conditions;
-  return conditions.filter(c => !shouldSkipCondition(c.id, projectType));
+export function getConditions(stage: Stage): GateConditionDef[] {
+  return GATE_CONDITIONS[stage] ?? [];
 }
 
 /** 评估 Gate：条件检查 + 豁免匹配 → 三态结果 */
@@ -339,8 +319,8 @@ export function evaluateGate(featureId: string, projectRoot: string): GateResult
   const coverage = getCoverage(featureId, projectRoot, rows, rfcStatuses);
   const ctx: EvalContext = { featureId, projectRoot, stage, state, coverage, rows, rfcStatuses };
 
-  const projectType = getProjectTypeFromConstitution(featureId, projectRoot);
-  const defs = getConditions(stage, projectType);
+  // 评估所有条件
+  const defs = getConditions(stage);
   const conditions: ConditionResult[] = [];
 
   for (const def of defs) {

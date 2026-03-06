@@ -1171,11 +1171,11 @@ P5_SIDE_EFFECT — 副作用执行
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐    │
 │  │目录结构  │    │ spec.md  │    │design.md │    │task_plan │    │ 代码     │    │
 │  │mode/size │    │ FR/NFR   │    │contracts │    │ TASK-xxx │    │ 单元测试 │    │
-│  │platforms │    │ 追踪矩阵 │    │data-model│    │checklist │    │ CR Report│    │
+│  │platforms │    │ 追踪矩阵 │    │data-model│    │checklist │    │ TASK 状态│    │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘    └──────────┘    │
 │       │               │               │               │               │           │
 │       ▼               ▼               ▼               ▼               ▼           │
-│  [Gate:就绪]    [Gate:DoR]    [Gate:Design]   [Gate:Task]    [Gate:Code]         │
+│  [Gate:Init]    [Gate:Specify] [Gate:Design] [Gate:Plan]    [Gate:Implement]    │
 │                                                                                     │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐                     │
 │  │05_verify │───►│06_wrap_up│───►│07_release│───►│ 08_done  │                     │
@@ -1185,13 +1185,14 @@ P5_SIDE_EFFECT — 副作用执行
 │       │               │               │               │                           │
 │       ▼               ▼               ▼               ▼                           │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐                    │
-│  │Test Report   │retro.md  │    │Release   │    │ 全部     │                    │
-│  │Security  │    │ 归档清单 │    │ Note     │    │ Accepted │                    │
-│  │UAT签核   │    │ Spec同步 │    │Smoke Test│    │          │                    │
-│  └──────────┘    └──────────┘    └──────────┘    └──────────┘                    │
+│  │tests/*.  │    │retro.md  │    │release-  │    │ 全部     │                    │
+│  │test.md   │    │矩阵终态  │    │note.md   │    │ Accepted │                    │
+│  │reports/* │    │C6=100%   │    │smoke-test│    │Cancelled │                    │
+│  └──────────┘    └──────────┘    └──────────┘    │Exception │                    │
+│                                                  └──────────┘                    │
 │       │               │               │                                           │
 │       ▼               ▼               ▼                                           │
-│  [Gate:UAT]    [Gate:Archive]  [Gate:Smoke]                                      │
+│  [Gate:Verify] [Gate:Wrap_up] [Gate:Release]                                     │
 │                                                                                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -1203,17 +1204,17 @@ P5_SIDE_EFFECT — 副作用执行
 │                              需求到交付追踪链路                                        │
 ├─────────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                     │
-│  需求          设计          任务          代码          测试                        │
-│  ────          ────          ────          ────          ────                        │
+│  需求          设计          任务                      测试                           │
+│  ────          ────          ────                      ────                           │
 │                                                                                     │
-│  FR-AUTH-001 ──► DS-AUTH-001 ──► TASK-AUTH-001 ──► PR #123 ──► TC-E2E-AUTH-001    │
-│       │              │              │              │              │                 │
-│       ▼              ▼              ▼              ▼              ▼                 │
-│  ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐              │
-│  │ 用户    │   │ API     │   │ 登录    │   │ auth.   │   │ E2E     │              │
-│  │ 登录    │   │ 契约    │   │ 模块    │   │ ts      │   │ 测试    │              │
-│  │ 功能    │   │ 定义    │   │ 实现    │   │         │   │ 用例    │              │
-│  └─────────┘   └─────────┘   └─────────┘   └─────────┘   └─────────┘              │
+│  FR-AUTH-001 ──► DS-AUTH-001 ──► TASK-AUTH-001 ──► TC-E2E-AUTH-001                │
+│       │              │              │                            │                 │
+│       ▼              ▼              ▼                            ▼                 │
+│  ┌─────────┐   ┌─────────┐   ┌─────────┐                  ┌─────────┐              │
+│  │ 用户    │   │ API     │   │ 登录    │                  │ E2E     │              │
+│  │ 登录    │   │ 契约    │   │ 模块    │                  │ 测试    │              │
+│  │ 功能    │   │ 定义    │   │ 实现    │                  │ 用例    │              │
+│  └─────────┘   └─────────┘   └─────────┘                  └─────────┘              │
 │                                                                                     │
 │                              │                                                      │
 │                              ▼                                                      │
@@ -1251,14 +1252,14 @@ P5_SIDE_EFFECT — 副作用执行
 
 | 阶段 | Skill | Exit Gate | 产出物 |
 |------|-------|-----------|--------|
-| 00_init | `/spec-first:init` | 目录就绪 | Feature 目录 |
-| 01_specify | `/spec-first:spec` | DoR Sign-off | spec.md |
-| 02_design | `/spec-first:design` | Design Review | design.md, contracts/ |
-| 03_plan | `/spec-first:task` | Task Review | task_plan.md |
-| 04_implement | `/spec-first:code` | Code CR | 代码, 单元测试 |
-| 05_verify | `/spec-first:test` | UAT Sign-off | Test Report |
-| 06_wrap_up | `/spec-first:archive` | 归档完成 | retro.md |
-| 07_release | — | Smoke Test | Release Note |
+| 00_init | `/spec-first:init` | Feature 目录 + `stage-state.json` 就绪 | `stage-state.json`, Feature 目录 |
+| 01_specify | `/spec-first:spec` | `prd.md` / `spec.md` / FR 行 / C10 达标 | `prd.md`, `spec.md` |
+| 02_design | `/spec-first:design` | `design.md` + C2=100% + C11 | `design.md`, `contracts/` |
+| 03_plan | `/spec-first:task` | C3=100% + C8=100% + Analyze 无 CRITICAL | `task_plan.md`, `checklist.md`, `reports/analysis-report.md` |
+| 04_implement | `/spec-first:code` | C4>=80% + C7=100% | 代码, 单元测试 |
+| 05_verify | `/spec-first:test` | C4=100% + C5 达阈值 + C9=100% | `tests/*.test.md`, `reports/test-report.md` |
+| 06_wrap_up | `/spec-first:archive` | C6=100% + 矩阵进入终态 | retro.md |
+| 07_release | — | Smoke Report + Release Note | `reports/smoke-test-report.md`, `reports/release-note.md` |
 
 ---
 
@@ -1270,19 +1271,30 @@ P5_SIDE_EFFECT — 副作用执行
 |------|------|------|
 | Feature | `FSREQ-YYYYMMDD-<FEAT>-NNN` | `FSREQ-20260306-AUTH-001` |
 | FR | `FR-<FEAT>-NNN` | `FR-AUTH-001` |
+| REQ | `REQ-<FEAT>-NNN` | `REQ-AUTH-001` |
 | DS | `DS-<FEAT>-NNN` | `DS-AUTH-001` |
+| SYS | `SYS-<FEAT>-NNN` | `SYS-AUTH-001` |
+| ARCH | `ARCH-<FEAT>-NNN` | `ARCH-AUTH-001` |
+| MOD | `MOD-<FEAT>-NNN` | `MOD-AUTH-001` |
 | TASK | `TASK-<FEAT>-NNN` | `TASK-AUTH-001` |
+| ATP | `ATP-<FEAT>-NNN` | `ATP-AUTH-001` |
+| STP | `STP-<FEAT>-NNN` | `STP-AUTH-001` |
+| ITP | `ITP-<FEAT>-NNN` | `ITP-AUTH-001` |
+| UTP | `UTP-<FEAT>-NNN` | `UTP-AUTH-001` |
 | TC | `TC-<LVL>-<FEAT>-NNN` | `TC-E2E-AUTH-001` |
+| RFC | `RFC-NNN` | `RFC-001` |
 
 ### 追踪链路
 
 ```text
-  FR-AUTH-001 ──► DS-AUTH-001 ──► TASK-AUTH-001 ──► PR #123 ──► TC-E2E-AUTH-001
-       │                │                │              │              │
-       └────────────────┴────────────────┴──────────────┴──────────────┘
-                                    │
-                                    ▼
-                         traceability-matrix.md
+  FR-AUTH-001 ──► DS-AUTH-001 ──► TASK-AUTH-001 ──► TC-E2E-AUTH-001
+       │                │                │                    │
+       └────────────────┴────────────────┴────────────────────┘
+                                │
+                                ▼
+                     traceability-matrix.md
+
+  补充证据链：TASK 可关联 commit / 文件变更 / 测试报告，但这些不是矩阵中的 ID 类型
 ```
 
 ### MatrixStatus
@@ -1302,18 +1314,25 @@ P5_SIDE_EFFECT — 副作用执行
 ### Gate 流程
 
 ```text
-  stage advance ──► evaluateGate() ──► 遍历条件 ──► 汇总结果 ──┬──► PASS ──────► 允许 advance
-                                                               ├──► PASS_WITH_WAIVER ─► 允许 advance
-                                                               └──► FAIL ──────► 阻断
+  stage advance ──► checkDependencies(toStage) ──► evaluateGate(currentStage) ──► 汇总结果 ──┬──► PASS ─────────► 允许 advance
+                                                                                              ├──► PASS_WITH_WAIVER ─► 允许 advance
+                                                                                              └──► FAIL / 依赖缺失 ─► 阻断
 ```
+
+> `stage advance` 的真实顺序是“目标阶段依赖检查 → 当前阶段 Gate 评估”。依赖项来自 `config.yaml`，默认配置可被项目覆盖。
 
 ### Gate 条件
 
 | 阶段 | Gate 条件 |
 |------|----------|
-| Design | Design Coverage = 100%, API Coverage = 100%, DoR Sign-off |
-| Implement | Task Coverage = 100%, Task Compliance = 100%, PR Compliance = 100%, Code CR Passed |
-| Verify | Test Coverage = 100%, TC Compliance = 100%, Impl Coverage = 100%, UAT Sign-off |
+| Init | Feature 目录存在，Mode/Size/Platforms 完整，`stage-state.json` 存在 |
+| Specify | `prd.md` 存在且 C-PRD ≥ 85%，`spec.md` 存在，矩阵存在 FR，C10 ≥ 80% |
+| Design | `design.md` 存在，C2 = 100%，Constitution Compliance（C11）通过 |
+| Plan | C3 = 100%，C8 = 100%，`analyze` 的 CRITICAL = 0 |
+| Implement | C4 ≥ 80%，C7 = 100% |
+| Verify | C4 = 100%，C5 达阈值，C9 = 100% |
+| Wrap_up | C6 = 100%，所有矩阵项进入终态 |
+| Release | `reports/smoke-test-report.md` 与 `reports/release-note.md` 存在 |
 
 ### GateStatus
 
@@ -1651,16 +1670,18 @@ spec-first/
 │   ├── cli/                  # CLI (21 命令)
 │   │   ├── index.ts          # CLI 入口
 │   │   └── commands/         # 各命令实现
-│   ├── core/                 # 核心模块 (9 目录)
+│   ├── core/                 # 核心模块 (11 目录)
 │   │   ├── process-engine/   # M1: 阶段状态机
 │   │   ├── trace-engine/     # M2: ID + 矩阵
 │   │   ├── gate-engine/      # M3: Gate + SCA
 │   │   ├── change-mgr/       # M4: RFC + Defect
 │   │   ├── ai-orchestrator/  # M5: Context Pack
 │   │   ├── metrics-engine/   # M6: 度量
+│   │   ├── migrations/       # 升级迁移
 │   │   ├── skill-runtime/    # Skill 运行时
 │   │   ├── template/         # 模板系统
-│   │   └── tool-integration/ # M7: Hook + CI
+│   │   ├── tool-integration/ # M7: Hook + CI
+│   │   └── validators/       # 格式与结构校验
 │   └── shared/               # 共享类型 (types, constants, utils)
 ├── skills/spec-first/        # 23 个 Skill
 │   ├── AGENTS.md             # 全局 Agent 指令
@@ -1749,9 +1770,9 @@ type DefectSeverity = 'S1' | 'S2' | 'S3' | 'S4';
 | [`skills/spec-first/README.md`](skills/spec-first/README.md) | Skill 目录索引 |
 | [`skills/spec-first/AGENTS.md`](skills/spec-first/AGENTS.md) | 全局 Agent 指令 |
 | [`skills/spec-first/SHARED.md`](skills/spec-first/SHARED.md) | 跨 Skill 共享约束 |
-| [`docs/01需求文档/`](docs/01需求文档/) | 需求规格文档 |
-| [`docs/02技术方案/`](docs/02技术方案/) | 技术设计文档 |
-| [Trellis 可借鉴要素分析](docs/01-需求文档/优势借鉴分析/01-跨项目借鉴/Spec-First%20可借鉴%20Trellis%20的要素分析.md) | 9 项可借鉴要素详析 + 落地建议 |
+| [`docs/01-需求文档/`](docs/01-需求文档/) | 需求规格文档 |
+| [`docs/02-技术方案/`](docs/02-技术方案/) | 技术设计文档 |
+| [Trellis 可借鉴要素分析](docs/01-需求文档/优势借鉴分析/01-跨项目借鉴/Spec-First 可借鉴 Trellis 的要素分析.md) | 9 项可借鉴要素详析 + 落地建议 |
 | [P0-落地清单（五篇整合）](docs/01-需求文档/优势借鉴分析/01-跨项目借鉴/P0-落地清单-五篇整合.md) | A 轨 + T 轨双轨实施清单 |
 
 ---
@@ -1778,7 +1799,7 @@ Copyright © 2025-2026 Spec-First Contributors
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
 5. 开启 Pull Request
 
-详细贡献指南请参阅 [`CONTRIBUTING.md`](CONTRIBUTING.md)（如有）
+详细贡献指南当前未单独维护 `CONTRIBUTING.md`，以仓库内现有文档和提交规范为准。
 
 ### 行为准则
 

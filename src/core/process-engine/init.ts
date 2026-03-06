@@ -351,6 +351,13 @@ last_updated: "${today}"
 `;
 }
 
+function detectProjectType(platforms: string[]): string {
+  if (platforms.length === 0) return 'fullstack';
+  if (platforms.every(p => p.includes('frontend'))) return 'frontend';
+  if (platforms.every(p => p.includes('backend'))) return 'backend';
+  return 'fullstack';
+}
+
 function buildConstitutionTemplateContext(opts: InitOptions, featureId: string): TemplateContext {
   return {
     featureId,
@@ -358,6 +365,7 @@ function buildConstitutionTemplateContext(opts: InitOptions, featureId: string):
     mode: opts.mode,
     size: opts.size,
     platforms: opts.platforms,
+    projectType: detectProjectType(opts.platforms),
     timestamp: new Date().toISOString(),
     author: opts.author,
   };
