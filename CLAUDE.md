@@ -272,20 +272,21 @@ npm run format             # prettier 格式化
 <!-- SPEC-FIRST:END MANUAL -->
 
 <!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-> Auto-synced at 2026-03-05T05:16:51.019Z
+> Auto-synced at 2026-03-06T01:17:21.280Z
 
 ## Spec-First Context Snapshot
-- Feature: FSREQ-20260305-SPECOPT-001
+- Feature: FSREQ-20260306-DASHBOARD-001
 - Stage: 03_plan
-- Design: specs/FSREQ-20260305-SPECOPT-001/design.md
+- Design: specs/FSREQ-20260306-DASHBOARD-001/design.md
 
 ### Design Highlights
-- 技术设计：spec-first:spec 命令优化
-- 1. 架构概览
-- 1.1 设计目标
-- 1.2 模块划分
-- 2. 设计规格（DS）
-- DS-SPECOPT-001: 四档复杂度分流机制
-- DS-SPECOPT-002: Question Gate 问题门禁
-- DS-SPECOPT-003: 一问一答收敛机制
+- Design - 仪表盘数据可视化优化
+- DS-DASHBOARD-001: 健康仪表盘样式设计
+- 1. 健康分环形图渐变色
+- 2. 覆盖率柱状图悬停提示
+- 3. 缺陷统计卡片阴影
+- DS-DASHBOARD-002: 整体布局样式设计
+- 1. 侧边栏优化
+- 2. 主区域间距统一
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
+

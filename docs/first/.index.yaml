@@ -1,0 +1,59 @@
+---
+# First Skill 产物索引
+# 自动生成于 2026-03-05
+
+mode: quick
+last_updated: 2026-03-05
+project_type: backend
+
+artifacts:
+  - name: tech-stack.md
+    status: completed
+    last_updated: 2026-03-05
+
+  - name: codebase-overview.md
+    status: completed
+    last_updated: 2026-03-05
+
+  - name: domain-model.md
+    status: completed
+    last_updated: 2026-03-05
+
+  - name: api-docs.md
+    status: completed
+    last_updated: 2026-03-05
+
+  - name: architecture.md
+    status: completed
+    last_updated: 2026-03-05
+    mode: deep
+
+  - name: call-graph.md
+    status: completed
+    last_updated: 2026-03-05
+    mode: deep
+
+  - name: external-deps.md
+    status: completed
+    last_updated: 2026-03-05
+    mode: deep
+
+  - name: local-setup.md
+    status: completed
+    last_updated: 2026-03-05
+    mode: deep
+
+  - name: development-guidelines.md
+    status: completed
+    last_updated: 2026-03-05
+    mode: deep
+
+  - name: README.md
+    status: completed
+    last_updated: 2026-03-05
+    mode: deep
+
+summary:
+  total_artifacts: 11
+  quick_artifacts: 4
+  deep_artifacts: 7

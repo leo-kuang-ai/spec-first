@@ -924,3 +924,74 @@
         gap: 8px;
       }
     }
+
+/* TASK-DASHBOARD-001: 健康仪表盘样式优化 */
+.health-score-ring .progress {
+  stroke: var(--ok);
+  transition: stroke 0.3s ease;
+}
+.health-score-ring .progress[data-score="low"] { stroke: var(--danger); }
+.health-score-ring .progress[data-score="medium"] { stroke: var(--warn); }
+.health-score-ring .progress[data-score="high"] { stroke: var(--ok); }
+
+.coverage-item {
+  position: relative;
+}
+.coverage-item:hover::after {
+  content: attr(data-value);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.defect-stats {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* TASK-DASHBOARD-002: 整体布局样式优化 */
+.sidebar {
+  width: 300px;
+  padding: 24px;
+}
+
+.main > #detail > section,
+.main > #detail > .row {
+  margin-bottom: 24px;
+}
+
+section {
+  padding: 20px;
+}
+
+/* TASK-DASHBOARD-003: 交互动画优化 */
+.flow-wrap .stage-node {
+  transition: transform 0.2s ease;
+}
+.flow-wrap .stage-node:hover {
+  transform: scale(1.05);
+}
+
+.task-stat-card {
+  transition: transform 0.1s ease;
+}
+.task-stat-card:active {
+  transform: scale(0.98);
+}
+
+.timeline-container {
+  scroll-behavior: smooth;
+}
+
+/* Related: FR-DASHBOARD-001, FR-DASHBOARD-002, FR-DASHBOARD-003 */
+/* Tasks: TASK-DASHBOARD-001, TASK-DASHBOARD-002, TASK-DASHBOARD-003 */
+/* Author: Claude Code (spec-first:code) */
+/* Date: 2026-03-06 */

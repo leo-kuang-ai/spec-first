@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.104 2026-03-06 Claude: feat(viewer): 优化仪表盘数据可视化 — 健康仪表盘渐变色环形图+悬停提示+阴影效果；整体布局侧边栏宽度优化+间距统一；交互动画节点悬停+点击反馈+平滑滚动 (user-visible)
+- v0.5.103 2026-03-05 Claude: feat(spec): spec-first:spec 新增 Phase 0.0/0.2/0.5 增强功能（零代码方案） — Phase 0.0 Feature 快速初始化防止信息丢失；Phase 0.2 质量扫描+自动上下文收集（先做后问原则）；Phase 0.5 PRD 补全对话（三道门禁：可推导性/影响性/优先级 + 一问一答规则）；findings.md 新增 quality_score 字段；成功标准更新为 Phase 0.0-0.6 全部完成 (user-visible)
+- v0.5.102 2026-03-05 Codex: fix(governance): 修复 4 个合规缺口 — `commit`/`pre-commit` 将删除文件纳入源码变更治理（`--diff-filter=ACMRD`）；pre-commit 改为逐行安全读取暂存文件以兼容含空格路径；已有 spec-first hook 安装时会自动升级为最新模板；C11 新增主 Constitution 内容哈希一致性校验（版本一致但内容漂移时阻断，支持显式 override）(user-visible)
+- v0.5.101 2026-03-05 Codex: feat(governance): 强化 Constitution 执行融合度 — commit CLI 与 Git pre-commit hook 新增源码变更时的 CHANGELOG.md/CLAUDE.md 暂存校验；C11 新增 `.spec-first/constitution.md` 主副本版本一致性检查（允许显式 override 说明）；hard-gate 在 constitution>=1.1.0 时强制要求 `[PLAN-APPROVED]` 审核证据后方可进入 code 阶段 (user-visible)
+- v0.5.100 2026-03-05 Codex: docs(constitution): 将 KISS/事实为本/中文输出/构思-审核-拆任务-实现强制流程/代码变动铁律固化到项目级 Constitution；同步 init 默认 constitution 模板，确保初始化自动写入上述协作规范 (user-visible)
 - v0.5.88 2026-03-05 Claude: feat(robustness): 集成测试/Skills集成/配置化依赖 — 新增集成测试 tests/integration/validate-command.test.ts（7 个测试用例）；03-spec/04-design/06-task Skills 在 P4 落盘后自动调用格式校验；config.yaml 新增 dependencies 配置段支持自定义各阶段依赖项（autoCheck 开关 + stages 映射），dependency-checker.ts 优先读取配置回退到内置默认值 (user-visible)
 - v0.5.87 2026-03-05 Claude: feat(robustness): P0-3.1/3.3 健壮性优化 — 新增 validate 命令（format/matrix/all 子命令）校验产物格式；format-validator.ts 支持 PRD 章节格式/ID 格式（连字符检测）/文件路径/必需字段校验；dependency-checker.ts 在 stage advance 前自动检查依赖（npm scripts/文件/环境变量），force 模式下跳过检查；新增 2 个测试文件共 9 个测试用例全部通过 (user-visible)
 - v0.5.86 2026-03-05 Claude: docs(robustness): 修复技术方案文档章节编号 — spec-first-robustness-optimization.md 修正全部章节编号（P1方案5.1-5.6/P2方案6.1-6.4/实施路线图7.1-7.3/风险与缓解8.1-8.2/成功指标9.1-9.2/总结10.1-10.3），修复交叉引用（P1-4.2→P1-5.2），消除章节跳跃与重复编号问题

@@ -1,0 +1,197 @@
+{
+  "featureId": "FSREQ-20260306-DASHBOARD-001",
+  "mode": "I",
+  "size": "S",
+  "platforms": [
+    "admin-frontend",
+    "python-backend"
+  ],
+  "mergedRules": {
+    "gateConditions": {
+      "01_specify": [
+        {
+          "id": "L0-SPEC-001",
+          "description": "FR/NFR 列表存在且非空"
+        },
+        {
+          "id": "L1-MODE-I-001",
+          "description": "impact-analysis.md 存在且非空"
+        }
+      ],
+      "02_design": [
+        {
+          "id": "L0-DESIGN-001",
+          "description": "设计文档存在"
+        }
+      ],
+      "03_plan": [
+        {
+          "id": "L0-PLAN-001",
+          "description": "task_plan.md 存在且非空"
+        }
+      ],
+      "04_implement": [
+        {
+          "id": "L0-IMPL-001",
+          "description": "追踪矩阵覆盖率 ≥ 基线"
+        },
+        {
+          "id": "G-ADMIN-FE-LINT",
+          "description": "ESLint pass",
+          "command": "pnpm lint"
+        },
+        {
+          "id": "G-ADMIN-FE-TYPECHECK",
+          "description": "TypeScript typecheck pass",
+          "command": "pnpm typecheck"
+        },
+        {
+          "id": "G-PY-BE-RUFF",
+          "description": "Ruff lint pass",
+          "command": "ruff check ."
+        },
+        {
+          "id": "G-PY-BE-PYTEST",
+          "description": "Pytest pass",
+          "command": "pytest"
+        }
+      ],
+      "05_verify": [
+        {
+          "id": "L0-VERIFY-001",
+          "description": "测试用例存在且通过"
+        },
+        {
+          "id": "G-ADMIN-FE-BUILD",
+          "description": "Production build pass",
+          "command": "pnpm build"
+        },
+        {
+          "id": "G-PY-BE-DIFF-COV",
+          "description": "Diff coverage ≥ 80%",
+          "command": "pytest --cov --cov-report=json && diff-cover coverage.json --compare-branch=main --fail-under=80"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "id": "L0-WRAP-001",
+          "description": "归档清单完整"
+        }
+      ]
+    },
+    "deliverables": {
+      "01_specify": [
+        {
+          "name": "spec.md",
+          "required": true,
+          "description": "FR/NFR 列表"
+        },
+        {
+          "name": "impact-analysis.md",
+          "required": true,
+          "description": "变更影响分析"
+        }
+      ],
+      "02_design": [
+        {
+          "name": "design.md",
+          "required": true,
+          "description": "技术设计文档"
+        },
+        {
+          "name": "api-contract.yaml",
+          "required": true,
+          "description": "API 契约"
+        },
+        {
+          "name": "ui-information-architecture.md",
+          "required": false
+        },
+        {
+          "name": "contracts/openapi.yaml",
+          "required": true
+        }
+      ],
+      "03_plan": [
+        {
+          "name": "task_plan.md",
+          "required": true,
+          "description": "任务计划"
+        }
+      ],
+      "05_verify": [
+        {
+          "name": "reports/test-report.md",
+          "required": true,
+          "description": "测试报告"
+        },
+        {
+          "name": "reports/regression-report.md",
+          "required": true,
+          "description": "回归验证报告"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "name": "traceability-matrix.md",
+          "required": true,
+          "description": "追踪矩阵"
+        }
+      ],
+      "07_release": [
+        {
+          "name": "reports/admin-bundle-analysis.md",
+          "required": false
+        },
+        {
+          "name": "reports/python-service-slo.md",
+          "required": false
+        }
+      ]
+    },
+    "thresholds": {
+      "bundle_size_main": {
+        "value": 400,
+        "direction": "lower_is_better"
+      },
+      "first_screen_time": {
+        "value": 2500,
+        "direction": "lower_is_better"
+      },
+      "diff_coverage": {
+        "value": 80,
+        "direction": "higher_is_better"
+      },
+      "api_p95_latency": {
+        "value": 350,
+        "direction": "lower_is_better"
+      }
+    }
+  },
+  "currentStage": "03_plan",
+  "history": [
+    {
+      "from": "00_init",
+      "to": "01_specify",
+      "timestamp": "2026-03-05T16:19:05.704Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "01_specify",
+      "to": "02_design",
+      "timestamp": "2026-03-06T01:07:03.604Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "02_design",
+      "to": "03_plan",
+      "timestamp": "2026-03-06T01:17:21.278Z",
+      "gateResult": "PASS"
+    }
+  ],
+  "terminal": false,
+  "title": "仪表盘数据可视化优化",
+  "createdAt": "2026-03-05T16:16:51.243Z",
+  "updatedAt": "2026-03-06T01:17:21.278Z",
+  "current_stage": "04_implement"
+}
