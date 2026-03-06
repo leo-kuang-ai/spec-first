@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import type { Stage, MatrixRow } from '../../shared/types.js';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
-import { buildRowIndex, collectUpstreamAncestors } from '../trace-engine/upstream-lineage.js';
+import { createUpstreamLineage } from '../trace-engine/upstream-lineage.js';
 
 export interface ScaCheckItem {
   rule: string;
@@ -130,15 +130,9 @@ function checkPlan(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
   const frRows = rows.filter(r => r.type === 'FR');
   const taskRows = rows.filter(r => r.type === 'TASK');
-  const rowIndex = buildRowIndex(rows);
-  const mappedFr = new Set<string>();
   const frIds = new Set(frRows.map((r) => r.id));
-  for (const task of taskRows) {
-    const ancestors = collectUpstreamAncestors(task.id, rowIndex);
-    for (const ancestorId of ancestors) {
-      if (frIds.has(ancestorId)) mappedFr.add(ancestorId);
-    }
-  }
+  const lineage = createUpstreamLineage(rows);
+  const mappedFr = lineage.collectCoveredTargetIds(taskRows.map((task) => task.id), frIds);
 
   // 每个 FR 必须有对应 TASK
   const unmapped = frRows.filter(r => !mappedFr.has(r.id));
@@ -245,15 +239,12 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
     }
 
     const dsUpstream = new Set(rows.filter((r) => r.type === 'DS').flatMap((r) => r.upstream ?? []));
-    const rowIndex = buildRowIndex(rows);
+    const lineage = createUpstreamLineage(rows);
     const frIds = new Set(frRows.map((r) => r.id));
-    const taskMappedFr = new Set<string>();
-    for (const task of rows.filter((r) => r.type === 'TASK')) {
-      const ancestors = collectUpstreamAncestors(task.id, rowIndex);
-      for (const ancestorId of ancestors) {
-        if (frIds.has(ancestorId)) taskMappedFr.add(ancestorId);
-      }
-    }
+    const taskMappedFr = lineage.collectCoveredTargetIds(
+      rows.filter((r) => r.type === 'TASK').map((task) => task.id),
+      frIds,
+    );
 
     const uncoveredByDs = frRows.filter((r) => !dsUpstream.has(r.id)).map((r) => r.id);
     if (uncoveredByDs.length > 0) {

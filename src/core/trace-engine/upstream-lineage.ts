@@ -1,61 +1,70 @@
 import type { MatrixRow } from '../../shared/types.js';
 
+export interface UpstreamLineage {
+  rowIndex: ReadonlyMap<string, MatrixRow>;
+  getAncestors(id: string): ReadonlySet<string>;
+  hasAnyAncestor(id: string, targetIds: ReadonlySet<string>): boolean;
+  collectCoveredTargetIds(startIds: Iterable<string>, targetIds: ReadonlySet<string>): Set<string>;
+}
+
 /** 构建 ID → MatrixRow 索引 */
 export function buildRowIndex(rows: MatrixRow[]): Map<string, MatrixRow> {
   return new Map(rows.map((row) => [row.id, row]));
 }
 
-/** 收集某个条目的全部上游祖先 ID（传递闭包） */
-export function collectUpstreamAncestors(
-  startId: string,
-  rowIndex: ReadonlyMap<string, MatrixRow>,
-): Set<string> {
-  const ancestors = new Set<string>();
-  const queue: string[] = [startId];
-  const visited = new Set<string>([startId]);
+/** 创建带缓存的上游传递链解析器 */
+export function createUpstreamLineage(rows: MatrixRow[]): UpstreamLineage {
+  const rowIndex = buildRowIndex(rows);
+  const cache = new Map<string, ReadonlySet<string>>();
 
-  while (queue.length > 0) {
-    const currentId = queue.shift();
-    if (!currentId) break;
-    const row = rowIndex.get(currentId);
-    if (!row?.upstream?.length) continue;
+  const getAncestors = (id: string, stack = new Set<string>()): ReadonlySet<string> => {
+    const cached = cache.get(id);
+    if (cached) return cached;
+    if (stack.has(id)) return new Set<string>();
 
-    for (const upstreamId of row.upstream) {
+    stack.add(id);
+    const ancestors = new Set<string>();
+    const row = rowIndex.get(id);
+
+    for (const upstreamId of row?.upstream ?? []) {
+      if (upstreamId === id) continue;
       ancestors.add(upstreamId);
-      if (!visited.has(upstreamId)) {
-        visited.add(upstreamId);
-        queue.push(upstreamId);
+      const upstreamAncestors = getAncestors(upstreamId, stack);
+      for (const ancestorId of upstreamAncestors) {
+        if (ancestorId !== id) ancestors.add(ancestorId);
       }
     }
-  }
 
-  return ancestors;
-}
+    stack.delete(id);
+    cache.set(id, ancestors);
+    return ancestors;
+  };
 
-/** 判断某条目是否可追溯到目标 ID 集合（支持传递上游） */
-export function hasAnyUpstreamAncestor(
-  startId: string,
-  targetIds: ReadonlySet<string>,
-  rowIndex: ReadonlyMap<string, MatrixRow>,
-): boolean {
-  if (targetIds.size === 0) return false;
-  const queue: string[] = [startId];
-  const visited = new Set<string>([startId]);
-
-  while (queue.length > 0) {
-    const currentId = queue.shift();
-    if (!currentId) break;
-    const row = rowIndex.get(currentId);
-    if (!row?.upstream?.length) continue;
-
-    for (const upstreamId of row.upstream) {
-      if (targetIds.has(upstreamId)) return true;
-      if (!visited.has(upstreamId)) {
-        visited.add(upstreamId);
-        queue.push(upstreamId);
+  return {
+    rowIndex,
+    getAncestors(id: string): ReadonlySet<string> {
+      return getAncestors(id);
+    },
+    hasAnyAncestor(id: string, targetIds: ReadonlySet<string>): boolean {
+      if (targetIds.size === 0) return false;
+      const ancestors = getAncestors(id);
+      for (const ancestorId of ancestors) {
+        if (targetIds.has(ancestorId)) return true;
       }
-    }
-  }
+      return false;
+    },
+    collectCoveredTargetIds(startIds: Iterable<string>, targetIds: ReadonlySet<string>): Set<string> {
+      const covered = new Set<string>();
+      if (targetIds.size === 0) return covered;
 
-  return false;
+      for (const startId of startIds) {
+        const ancestors = getAncestors(startId);
+        for (const ancestorId of ancestors) {
+          if (targetIds.has(ancestorId)) covered.add(ancestorId);
+        }
+      }
+
+      return covered;
+    },
+  };
 }

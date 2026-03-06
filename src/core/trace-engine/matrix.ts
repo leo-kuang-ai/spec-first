@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import type { MatrixRow, MatrixStatus, IdType } from '../../shared/types.js';
 import { readMarkdown, writeMarkdown, exists, parseMarkdownTable } from '../../shared/fs-utils.js';
 import { validateId } from './id-validator.js';
-import { buildRowIndex, hasAnyUpstreamAncestor } from './upstream-lineage.js';
+import { createUpstreamLineage } from './upstream-lineage.js';
 
 /** 矩阵校验结果 */
 export interface MatrixCheckResult {
@@ -44,7 +44,7 @@ export function parseMatrix(featureId: string, projectRoot: string): MatrixRow[]
 export function checkMatrix(featureId: string, projectRoot: string): MatrixCheckResult {
   const rows = parseMatrix(featureId, projectRoot);
   const warnings: string[] = [];
-  const rowIndex = buildRowIndex(rows);
+  const lineage = createUpstreamLineage(rows);
 
   // 孤儿项：非 FR/Feature/REQ 类型且无 upstream
   const orphans = rows.filter(r =>
@@ -63,7 +63,7 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
     const hasDs = rows.some(r => r.type === 'DS' && r.upstream?.includes(fr.id));
     const hasTask = rows.some((r) => {
       if (r.type !== 'TASK') return false;
-      return hasAnyUpstreamAncestor(r.id, new Set([fr.id]), rowIndex);
+      return lineage.hasAnyAncestor(r.id, new Set([fr.id]));
     });
     const hasTc = rows.some(r => r.type === 'TC' && r.upstream?.includes(fr.id));
     if (!hasPrd) missing.push('REQ-PRD-*');

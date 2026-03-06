@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.108 2026-03-06 Claude: feat(first): 创建证据注入模板与优化路线图 — 新增 evidence-templates/ 目录（tech-stack/api-docs 模板），创建 optimization-roadmap.md 定义 4 阶段优化计划（快速修复/证据注入/智能增强/架构重构），为实现 enhance 升级模式提供技术方案 (user-visible)
 - v0.5.107 2026-03-06 Claude: feat(first): 新增 quick→deep 升级策略文档 — 识别当前升级策略缺陷（只更新 frontmatter 未增强内容），新增 upgrade-strategy.md 定义 minimal/enhance/regenerate 三种升级模式，更新 interaction-guide.md 添加升级策略交互提示，为后续实现 Evidence Injection Agent 奠定基础 (user-visible)
 - v0.5.106 2026-03-06 Claude: refactor(first): 00-first Skill 代码结构优化 — SKILL.md 从 714 行精简至 209 行（减少 70%），提取交互逻辑到 interaction-guide.md、模式对比到 mode-comparison.md，提升可维护性与可读性 (user-visible)
 - v0.5.105 2026-03-06 Claude: feat(init): 交互式引导流程优化 — runGuidedInit 改造为分步引导模式（Step 1/7 进度提示+✅实时确认反馈）；新增 printGuidedHeader/printStepHeader/printStepConfirm 等辅助函数；增强各步骤提示信息（格式要求+示例+建议值）；平台选择简化为单次输入（移除多轮切换逻辑）；最终确认展示完整参数清单 (user-visible)
@@ -398,3 +399,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 审查原有 11 节点流程，识别 10 个缺口节点
 - 建议补充 P0 级节点：Test-Design, Test-Execution, UAT, Deployment, API-Design (user-visible)
 - v0.5.46 2026-03-06 Claude: feat(gate): 项目类型感知的 Gate 规则，CSS-only/frontend 项目豁免测试覆盖率检查 (user-visible)
+- v0.5.47 2026-03-06 Claude: fix(gate): Matrix 终态检查支持 done 状态，修复 upstream-lineage API 调用 (user-visible)

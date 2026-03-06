@@ -239,7 +239,7 @@
 | **宿主支持** | Claude Code + Codex | 多 AI 工具 | 18+ AI 工具 | Claude Code 优先 | 15+ IDE | Claude Code 优先 |
 | **流程模型** | 8+2 阶段状态机 | proposal→specs→design→tasks | constitution→specify→plan→tasks | brainstorm→plan→implement | 3-file 模式 | start→brainstorm→finish |
 | **阶段覆盖** | init→release→done | changes 生命周期 | feature 完整周期 | 开发迭代周期 | 任务执行周期 | 任务生命周期 |
-| **追踪体系** | FR→DS→TASK→PR→TC + V-Model 四层 | dependsOn + provides | 规范→任务 + V-Model 扩展 | 计划→执行 | task_plan + findings | workspace 记录 |
+| **追踪体系** | FR→DS→TASK→TC + V-Model 四层（提交/文件/PR 作为补充证据链） | dependsOn + provides | 规范→任务 + V-Model 扩展 | 计划→执行 | task_plan + findings | workspace 记录 |
 | **ID 系统** | 13 种生成类型 + Feature 校验 | 变更依赖图 | 自动编号分支 + V-Model ID | 任务清单 | Phase 标记 | 目录命名 |
 | **质量门禁** | Gate (3态) + HARD-GATE | 栈感知校验 | checklist + spec-review | 两阶段 Code Review | 3-strike 协议 | check-* 命令 |
 | **变更管理** | RFC 分级 + 审批 | proposal→approved→closed | — | — | — | — |
@@ -256,6 +256,8 @@
 | **规范质量** | Checklist + 歧义分类法 ✅ | — | Checklist + Clarify | — | — | update-spec 强制深度 |
 | **升级安全** | 基础 update 命令 | — | — | — | — | 哈希分级+备份回滚 ✅ |
 | **规范分层** | Skill + 技术方案 | — | — | — | — | Code-Spec vs Guide ✅ |
+
+> 口径说明：Spec-First 的正式矩阵主链为 `FR -> DS -> TASK -> TC`；commit、文件变更、PR 属于补充证据链，不是正式 `IdType`。
 
 ### Trellis 补充维度（工程治理 + 规范工程）
 
@@ -852,6 +854,7 @@ spec-first init --feat AUTH --mode N --size M --platforms h5,backend
 
 # 6. 查看状态
 spec-first feature list
+spec-first feature current
 spec-first stage current FSREQ-20260306-AUTH-001
 spec-first matrix check FSREQ-20260306-AUTH-001
 ```
@@ -969,9 +972,11 @@ spec-first update                             # 升级刷新 Skill/MCP/Hooks
 | **C4** | 正向 | Test Coverage (FR)：有 TC 关联的 FR / 总 FR | Implement 阶段 ≥80%，Verify 阶段 100% |
 | **C5** | 正向 | Test Coverage (AC)：同 C4（当前实现） | S:≥60%，M/L:≥90%（Verify Gate） |
 | **C6** | 正向 | Implementation Coverage：状态为 Implemented/Verified/Accepted 的 TASK / 总 TASK | 目标 100%（Wrap-up Gate） |
-| **C7** | 反向 | PR Compliance：有上游关联的 TASK / 总 TASK | 目标 100%（Implement Gate） |
+| **C7** | 反向 | PR Compliance（历史命名）：有上游关联的 TASK / 总 TASK | 目标 100%（Implement Gate） |
 | **C8** | 反向 | Task Compliance：有 FR/DS 上游祖先的 TASK / 总 TASK | 目标 100%（Plan Gate） |
 | **C9** | 反向 | TC Compliance：有 FR 上游关联的 TC / 总 TC | 目标 100%（Verify Gate） |
+
+> 说明：`C7 PR Compliance` 是历史命名，当前实现语义是“TASK 上游关联合规率”，并不表示 GitHub/GitLab 的 Pull Request 节点。
 
 ### 变更与缺陷
 
@@ -1320,6 +1325,8 @@ P5_SIDE_EFFECT — 副作用执行
 ```
 
 > `stage advance` 的真实顺序是“目标阶段依赖检查 → 当前阶段 Gate 评估”。依赖项来自 `config.yaml`，默认配置可被项目覆盖。
+>
+> 依赖检查、Gate 阈值、Metrics 目标值是三套不同口径：依赖检查决定“下一阶段是否具备前置条件”，Gate 决定“当前阶段是否允许推进”，Metrics/Health 用于持续度量与瓶颈分析。
 
 ### Gate 条件
 
@@ -1402,6 +1409,8 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | C8 Task Compliance | 有 FR/DS 上游祖先的 TASK / 总 TASK | = 100% |
 | C9 TC Compliance | 有 FR 的 TC / 总 TC | = 100% |
 
+> Metrics 命令中的目标值和 Health Score 权重用于日常质量观测，不等同于阶段 Gate 阈值；阶段推进以 Gate + 依赖检查结果为准。
+
 ---
 
 ## Skill 体系
@@ -1470,7 +1479,7 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | --- | --- | --- |
 | — | 00-first | docs/first/*.md（项目认知文档集）|
 | — | 00-onboarding | 无文件（交互式引导） |
-| 00_init | 01-init | stage-state.json, constitution.md |
+| 00_init | 01-init | stage-state.json, constitution.md, traceability-matrix.md, findings.md, task_plan.md |
 | 01_specify | 03-spec, 20-spec-review | spec.md, checklists/spec-review.md |
 | 02_design | 04-design, 05-research | design.md, contracts/, research.md |
 | 03_plan | 06-task, 21-analyze | task_plan.md, checklist.md |
@@ -1525,6 +1534,8 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | `uninstall` | 清理配置 | M7 |
 | `viewer` | 可视化面板 | Tool |
 
+> 说明：`setup` 当前为废弃兼容入口，会直接转发到 `update`；`validate matrix` 仍是占位实现，现阶段以 `matrix check` / `trace validate` 为主。
+
 ### CLI 命令详解
 
 #### spec-first init
@@ -1549,9 +1560,11 @@ spec-first id validate <id>
 
 # 搜索 ID
 spec-first id search <query> --feature <featureId> [--type <type>]
+type 当前支持: FR | DS | TASK | TC | RFC | Feature
 
 # 列出已注册 ID
 spec-first id list --feature <featureId> [--type <type>]
+type 当前支持: FR | DS | TASK | TC | RFC | Feature
 ```
 
 #### spec-first gate
@@ -1710,6 +1723,12 @@ specs/                          # Feature 工作区根目录
     ├── checklist.md            # 验证清单（03_plan）
     ├── tests/*.test.md         # 测试用例（05_verify）
     ├── reports/                # 报告目录
+    │   ├── test-report.md      # 测试报告（05_verify）
+    │   ├── security-scan.md    # 安全扫描报告（05_verify，可选）
+    │   ├── regression-report.md # 回归验证报告（05_verify，迭代场景）
+    │   ├── uat-signoff.md      # UAT 签核（05_verify，模板产物）
+    │   ├── smoke-test-report.md # 冒烟测试报告（07_release Gate）
+    │   └── release-note.md     # 发布说明（07_release Gate）
     ├── retro.md                # 复盘报告（06_wrap_up）
     ├── traceability-matrix.md  # 追踪矩阵
     ├── findings.md             # 过程发现（运行态）
