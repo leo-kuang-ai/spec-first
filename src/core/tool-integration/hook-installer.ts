@@ -25,7 +25,12 @@ const MARKER = '# spec-first-hook';
 
 function mergeHookContent(existing: string, generated: string): string {
   if (!existing.trim()) return generated;
-  if (existing.includes(MARKER)) return existing;
+  if (existing.includes(MARKER)) {
+    const cleaned = removeSpecFirstBlock(existing);
+    if (!cleaned.trim()) return generated;
+    const suffix = cleaned.endsWith('\n') ? '' : '\n';
+    return `${cleaned}${suffix}\n${generated}`;
+  }
   const suffix = existing.endsWith('\n') ? '' : '\n';
   return `${existing}${suffix}\n${generated}`;
 }
@@ -149,6 +154,48 @@ fi
       // 基本格式校验
       return header + `
 # Pre-commit validation
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMRD 2>/dev/null || true)
+if [ -z "$STAGED_FILES" ]; then
+  exit 0
+fi
+
+SOURCE_CHANGED=0
+while IFS= read -r FILE; do
+  [ -z "$FILE" ] && continue
+  case "$FILE" in
+    src/*|scripts/*|templates/*|skills/*|.spec-first/hooks/*|package.json|tsconfig.json|eslint.config.js|vitest.config.ts|tsup.config.ts)
+      SOURCE_CHANGED=1
+      break
+      ;;
+  esac
+done <<__SPEC_FIRST_STAGED_FILES__
+$STAGED_FILES
+__SPEC_FIRST_STAGED_FILES__
+
+if [ "$SOURCE_CHANGED" -eq 0 ]; then
+  exit 0
+fi
+
+HAS_CHANGELOG=0
+HAS_CLAUDE=0
+while IFS= read -r FILE; do
+  [ -z "$FILE" ] && continue
+  [ "$FILE" = "CHANGELOG.md" ] && HAS_CHANGELOG=1
+  [ "$FILE" = "CLAUDE.md" ] && HAS_CLAUDE=1
+done <<__SPEC_FIRST_STAGED_FILES_2__
+$STAGED_FILES
+__SPEC_FIRST_STAGED_FILES_2__
+
+if [ "$HAS_CHANGELOG" -ne 1 ]; then
+  echo "错误：检测到源码变更，但暂存区缺少 CHANGELOG.md 记录"
+  exit 1
+fi
+
+if [ "$HAS_CLAUDE" -ne 1 ]; then
+  echo "错误：检测到源码变更，但暂存区缺少 CLAUDE.md 同步变更"
+  exit 1
+fi
+
 echo "spec-first: pre-commit 检查通过"
 `;
   }

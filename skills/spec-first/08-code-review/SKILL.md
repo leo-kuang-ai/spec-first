@@ -1,9 +1,9 @@
 ---
 name: "spec-first:code-review"
 description: "定位变更范围并执行代码审查"
-version: 1.0.0
-last_updated: {{DATE}}
-changelog: Initial version with standardized metadata
+version: 1.1.0
+last_updated: 2026-03-05
+changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
 # Skill: code-review
@@ -36,13 +36,42 @@ changelog: Initial version with standardized metadata
 - 阶段: 04_implement（code Skill 之后）
 - Command: `/spec-first:code-review`
 
-## 执行阶段
-- P0: 定位 Feature，校验阶段为 04_implement，从 git diff 或 TASK 范围定位变更文件
-- P1: 加载 references 审查清单、FR/DS 约束
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 不存在 → 报错并终止
+
+## 执行阶段（增强）
+- P0: 定位 Feature，确定检查层级（single/cross/completion）
+- P1: 根据层级加载对应检查清单（含 cross-layer-checklist）
 - P2: 执行 Stage 1（合规）并输出结论
-- P3: Stage 1 通过后执行 Stage 2（质量）
+- P3: Stage 1 通过后执行 Stage 2（质量 + 跨层检查）
 - P4: 与用户确认审查发现并写入 findings.md
 - P5: 审查通过则更新 TASK 状态
+
+## Layer 参数约定
+
+- 支持：`/spec-first:code-review --layer <single|cross|completion>`
+- 默认：未传 `--layer` 时按 `cross` 执行
+- 限制：非法 layer 值由 runtime 参数校验直接拒绝
+
+## 检查层级选择
+
+| 场景 | 推荐层级 |
+|------|---------|
+| 单文件小改动 | single |
+| 多文件/跨模块改动 | cross |
+| 功能完成/阶段推进 | completion |
+| 不确定 | cross（更安全） |
 
 ## CLI 依赖
 - `spec-first metrics coverage`

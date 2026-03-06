@@ -2,7 +2,7 @@
 name: "spec-first:verify"
 description: "定位 Feature 并执行阶段验收校验"
 version: 1.1.0
-last_updated: {{DATE}}
+last_updated: 2026-03-05
 changelog: |
   v1.1.0: 新增 Announce at Start、When to Use、Gate 条件映射（8 阶段 25+ 条件）、WAIVER 机制详解、失败处理流程、verify 报告格式、覆盖率指标详解（C1-C11）、决策流程图、references/ 目录、hooks 配置、user-invocable 标记
   v1.0.0: Initial version with standardized metadata
@@ -381,6 +381,39 @@ digraph verify_flow {
 
 - **阶段**：任意（编排层 Skill）
 - **Command**：`/spec-first:verify`
+
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 的阶段不匹配 → 报错并终止
+
+## 三层检查体系（P1-LAYER）
+
+### Layer 1: 单层检查（Single-Layer）
+
+- 目标：对单层产物做局部质量检查（SOLID/安全/性能/测试）
+- 推荐入口：`/spec-first:code-review --layer single`
+
+### Layer 2: 跨层检查（Cross-Layer）
+
+- 目标：核查跨层数据流、依赖路径、同层一致性与批量修改完整性
+- 推荐入口：`/spec-first:code-review --layer cross`
+
+### Layer 3: 完成检查（Completion）
+
+- 目标：阶段推进前统一验收（gate check + matrix check + 覆盖率判定）
+- 推荐入口：`/spec-first:verify --layer completion`
+
+> 说明：当前 runtime 仅开放 verify 的 completion 层；single/cross 由 code-review 承载。
 
 ## Layer 参数约定
 

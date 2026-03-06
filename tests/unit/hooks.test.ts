@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, existsSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, existsSync, writeFileSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleHooks } from '../../src/cli/commands/hooks.js';
 import { ExitCode } from '../../src/shared/types.js';
@@ -32,6 +32,12 @@ describe('handleHooks', () => {
     expect(code).toBe(ExitCode.SUCCESS);
     expect(existsSync(join(TMP, '.git', 'hooks', 'pre-commit'))).toBe(true);
     expect(existsSync(join(TMP, '.git', 'hooks', 'commit-msg'))).toBe(true);
+
+    const preCommit = readFileSync(join(TMP, '.git', 'hooks', 'pre-commit'), 'utf-8');
+    expect(preCommit).toContain('CHANGELOG.md');
+    expect(preCommit).toContain('CLAUDE.md');
+    expect(preCommit).toContain('--diff-filter=ACMRD');
+    expect(preCommit).toContain('while IFS= read -r FILE');
   });
 
   it('should return SUCCESS for status without .git', () => {

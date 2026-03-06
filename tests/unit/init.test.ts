@@ -57,8 +57,11 @@ describe('init', () => {
     // constitution.md
     const constitution = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
     expect(constitution).toContain('Constitution');
-    expect(constitution).toContain('Version: 1.0.0');
+    expect(constitution).toContain('1.0.0');
     expect(constitution).toContain('Amendment History');
+    expect(constitution).toContain('User Authentication');
+    expect(constitution).toContain('角色映射');
+    expect(constitution).toContain('Leo');
   });
 
   it('should write .spec-first/current', () => {
@@ -165,6 +168,32 @@ describe('init', () => {
     expect(content).toContain('Project rules here');
     expect(content).toContain('Version: 1.0.0');
     expect(content).toContain('Amendment History');
+  });
+
+  it('should render constitution from local init template when global constitution is missing', () => {
+    const localTplDir = join(TMP, '.spec-first', 'local', 'templates', 'init');
+    mkdirSync(localTplDir, { recursive: true });
+    writeFileSync(
+      join(localTplDir, 'constitution.md.hbs'),
+      [
+        '# Local Constitution {{featureId}}',
+        '',
+        '- owner: {{author}}',
+        '- title: {{title}}',
+        '- mode: {{mode}}',
+        '- size: {{size}}',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    const result = init(baseOpts({ mode: 'I', size: 'L' }));
+    const content = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
+    expect(content).toContain('Local Constitution');
+    expect(content).toContain('owner: Leo');
+    expect(content).toContain('title: User Authentication');
+    expect(content).toContain('mode: I');
+    expect(content).toContain('size: L');
   });
 
   it('should include merged rules in result', () => {

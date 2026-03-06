@@ -65,6 +65,11 @@ function writeConstitutionAuthorityMappingArtifacts() {
   writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '- ../03-spec/references/constitution-authority.md\n', 'utf-8');
 }
 
+function writeGlobalConstitution(content: string) {
+  mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+  writeFileSync(join(TMP, '.spec-first', 'constitution.md'), content, 'utf-8');
+}
+
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
 });
@@ -120,12 +125,10 @@ describe('evaluateGate', () => {
       '# PRD',
       '## 1. 业务目标',
       'Implement test feature for authentication',
-      '## 2. 功能边界',
+      '## 2. 功能需求',
       'Login and logout functionality',
-      '## 3. 约束条件',
+      '## 3. 非功能需求',
       'Must use existing auth service',
-      '## 4. 成功标准',
-      'Users can login successfully',
     ].join('\n'));
     writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
     writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n| REQ-PRD-001 | REQ-PRD | Req | Planned |  |  |\n');
@@ -166,6 +169,74 @@ describe('evaluateGate', () => {
       '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
       + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
     );
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('PASS');
+  });
+
+  it('should FAIL C11 when feature constitution version mismatches global main copy', () => {
+    writeState('02_design');
+    writeConstitutionAuthorityMappingArtifacts();
+    writeGlobalConstitution(
+      '# Project Constitution\n\n## Meta\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\n## Amendment History\n- init\n',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.0.0) is applied.', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.0.0\n- Ratified: 2026-02-26\n- Last Amended: 2026-02-26\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('FAIL');
+    expect(c11?.detail).toContain('global constitution');
+  });
+
+  it('should FAIL C11 when version is same but constitution content mismatches global main copy', () => {
+    writeState('02_design');
+    writeConstitutionAuthorityMappingArtifacts();
+    writeGlobalConstitution(
+      '# Project Constitution\n\n## Meta\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\n## Principles\n1. Simplicity first.\n\n## Amendment History\n- init\n',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.1.0) is applied.', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\n## Principles\n1. Simplicity first.\n2. Facts first.\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
+    expect(c11?.status).toBe('FAIL');
+    expect(c11?.detail).toContain('content mismatch');
+  });
+
+  it('should PASS C11 when constitution mismatch has explicit override reason', () => {
+    writeState('02_design');
+    writeConstitutionAuthorityMappingArtifacts();
+    writeGlobalConstitution(
+      '# Project Constitution\n\n## Meta\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\n## Principles\n1. Simplicity first.\n\n## Amendment History\n- init\n',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '## Governance\nConstitution Clause P1 (v1.1.0) is applied.', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\nFeature override reason: this feature requires stricter policy.\n\n## Principles\n1. Simplicity first.\n2. Facts first.\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
+      + '| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 |  |\n',
+    );
+
     const result = evaluateGate(FEAT, TMP);
     const c11 = result.conditions.find(c => c.id === 'G-DESIGN-03');
     expect(c11?.status).toBe('PASS');
@@ -306,6 +377,27 @@ describe('evaluateGate', () => {
     const result = evaluateGate(FEAT, TMP);
     const cond = result.conditions.find(c => c.id === 'G-PLAN-03');
     expect(cond?.status).toBe('PASS');
+  });
+
+  it('should PASS C3/C8 in 03_plan for FR→DS→TASK chain', () => {
+    writeState('03_plan');
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned |  | DS-AUTH-001,TASK-AUTH-001 |\n'
+      + '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 | TASK-AUTH-001 |\n'
+      + '| TASK-AUTH-001 | TASK | Impl | Planned | DS-AUTH-001 |  |\n',
+    );
+    mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'reports', 'analysis-report.md'),
+      '# Analysis Report\n\n## Summary\n- CRITICAL: 0\n- HIGH: 0\n- MEDIUM: 0\n- LOW: 0\n',
+      'utf-8',
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const c3 = result.conditions.find(c => c.id === 'G-PLAN-01');
+    const c8 = result.conditions.find(c => c.id === 'G-PLAN-02');
+    expect(c3?.status).toBe('PASS');
+    expect(c8?.status).toBe('PASS');
   });
 
   it('should PASS Layer2 command gate with allowed command', () => {

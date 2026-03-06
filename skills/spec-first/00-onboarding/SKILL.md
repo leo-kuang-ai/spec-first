@@ -119,7 +119,7 @@ user-invocable: true
 💡 **提示**：
 - 每步完成后运行 `/spec-first:status` 查看进度
 - 遇到问题运行 `/spec-first:doctor` 诊断环境
-- 查看详细文档：`docs/quick-start.md`
+- 查看详细文档：`docs/用户文档/quick-start.md`
 
 🎯 **下一步**：复制上面第一个命令开始吧！
 ```
@@ -164,7 +164,7 @@ user-invocable: true
 
 - 每步完成后运行 `/spec-first:status` 查看进度
 - 遇到问题运行 `/spec-first:doctor` 诊断环境
-- 查看详细文档：`docs/quick-start.md`
+- 查看详细文档：`docs/用户文档/quick-start.md`
 
 ---
 

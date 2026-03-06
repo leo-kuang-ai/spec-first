@@ -75,6 +75,16 @@ describe('runSca', () => {
     expect(result.pass).toBe(true);
   });
 
+  it('should pass Plan when FR is mapped to TASK through DS', () => {
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 | DS-AUTH-001,TASK-AUTH-001 |\n' +
+      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 | TASK-AUTH-001 |\n' +
+      '| TASK-AUTH-001 | TASK | Impl | Planned | DS-AUTH-001 |  |\n',
+    );
+    const result = runSca(FEAT, TMP, Stage.PLAN);
+    expect(result.pass).toBe(true);
+  });
+
   it('should fail Verify when FR has no TC', () => {
     writeMatrix('| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 |  |\n');
     const result = runSca(FEAT, TMP, Stage.VERIFY);
@@ -108,6 +118,21 @@ describe('analyzeArtifacts', () => {
     const critical = getCriticalCountFromAnalysisReport(report);
     expect(critical).toBe(result.summary.CRITICAL);
     expect(report).toContain('Analysis Report');
+  });
+
+  it('should not report COVERAGE_GAP_TASK for FR→DS→TASK chain', () => {
+    writeFileSync(join(TMP, 'specs', FEAT, 'prd.md'), '# prd', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# spec', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), '# tasks', 'utf-8');
+    writeMatrix(
+      '| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 | DS-AUTH-001,TASK-AUTH-001 |\n' +
+      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 | TASK-AUTH-001 |\n' +
+      '| TASK-AUTH-001 | TASK | Impl | Planned | DS-AUTH-001 |  |\n',
+    );
+
+    const result = analyzeArtifacts(FEAT, TMP);
+    expect(result.findings.some((f) => f.type === 'COVERAGE_GAP_TASK')).toBe(false);
   });
 });
 

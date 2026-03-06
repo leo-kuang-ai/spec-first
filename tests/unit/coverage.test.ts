@@ -43,6 +43,21 @@ describe('getCoverage', () => {
     expect(c.C9).toBe(1); // TC linked to FR
   });
 
+  it('should calculate C3/C8 through DS upstream chain', () => {
+    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
+      '| ID | Type | Title | Status | Upstream | Downstream |',
+      '|----|------|-------|--------|----------|------------|',
+      '| FR-AUTH-001 | FR | Login | Planned |  | DS-AUTH-001,TASK-AUTH-001 |',
+      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 | TASK-AUTH-001 |',
+      '| TASK-AUTH-001 | TASK | Impl | Implemented | DS-AUTH-001 |  |',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const c = getCoverage(FEAT_ID, TMP);
+    expect(c.C3).toBe(1); // TASK transitively linked to FR via DS
+    expect(c.C8).toBe(1); // TASK has upstream FR/DS lineage
+  });
+
   it('should detect uncovered FR', () => {
     writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
       '| ID | Type | Title | Status | Upstream | Downstream |',

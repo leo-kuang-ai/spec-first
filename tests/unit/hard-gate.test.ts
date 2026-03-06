@@ -110,6 +110,40 @@ describe('evaluateSkillHardGate', () => {
     expect(result.severity).toBe('PASS');
   });
 
+  it('should BLOCK code when findings has fail text but no non-zero exit code', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- result: test failed because function is missing',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('code', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('TDD RED');
+  });
+
   it('should PASS code when structured TDD waiver exists', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
@@ -134,6 +168,87 @@ describe('evaluateSkillHardGate', () => {
         '- 理由: 不涉及业务逻辑',
         '- 批准人: product-owner',
         '- 时间: 2026-03-04T00:00:00Z',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('code', TMP);
+    expect(result.allowed).toBe(true);
+    expect(result.severity).toBe('PASS');
+  });
+
+  it('should BLOCK code when constitution v1.1.0 requires plan approval evidence', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('code', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('plan approval');
+  });
+
+  it('should PASS code when constitution v1.1.0 has plan approval evidence and TDD RED', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'constitution.md'),
+      '# Constitution\n- Version: 1.1.0\n- Ratified: 2026-03-05\n- Last Amended: 2026-03-05\n\n## Amendment History\n- init\n',
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## [PLAN-APPROVED]',
+        '- reviewer: tech-lead',
+        '- timestamp: 2026-03-05T10:00:00Z',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
         '',
       ].join('\n'),
       'utf-8',

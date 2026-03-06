@@ -2,7 +2,7 @@
 name: "spec-first:research"
 description: "定位 Feature 上下文并生成调研结论"
 version: 1.4.0
-last_updated: {{DATE}}
+last_updated: 2026-03-05
 changelog: |
   v1.4.0: 新增 Operation Types 章节、模板引用路径、metadata.version 分离
   v1.3.0: 新增 hooks 配置（PreToolUse/PostToolUse/Stop）、allowed-tools 约束、user-invocable 标记
@@ -301,6 +301,20 @@ digraph research_flow {
   - 架构方案评估
   - 性能瓶颈分析
   - 安全方案调研
+
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 不存在 → 报错并终止
 
 ## 执行阶段
 

@@ -1,6 +1,6 @@
 # Spec-First — AI 时代的规范驱动研发流程引擎
 
-![Status](https://img.shields.io/badge/状态-活跃维护-brightgreen) ![Version](https://img.shields.io/badge/版本-v0.5.79-blue) ![Node](https://img.shields.io/badge/Node.js-≥20_LTS-green) ![TypeScript](https://img.shields.io/badge/TypeScript-≥5.4-3178c6)
+![Status](https://img.shields.io/badge/状态-活跃维护-brightgreen) ![Version](https://img.shields.io/badge/版本-v0.5.45-blue) ![Node](https://img.shields.io/badge/Node.js-≥20_LTS-green) ![TypeScript](https://img.shields.io/badge/TypeScript-≥5.4-3178c6)
 
 **Spec-First 是面向 AI 时代的规范驱动研发流程引擎**——以结构化规范为单一真理源，通过全链路追踪 + AI 辅助 + 自动化门禁，将"需求→设计→编码→测试→交付"从人工驱动升级为规范驱动。
 
@@ -166,8 +166,8 @@
 │                                                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐   │
 │  │  6️⃣ 双层架构                                                                 │   │
-│  │  Skill 层：流程编排、交互引导、内容生成（22 个 Skill）                        │   │
-│  │  CLI 层：确定性原子能力、状态管理（19 个命令）                                │   │
+│  │  Skill 层：流程编排、交互引导、内容生成（23 个 Skill）                        │   │
+│  │  CLI 层：确定性原子能力、状态管理（21 个命令）                                │   │
 │  └─────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
@@ -178,14 +178,14 @@
 | 指标 | 数值 | 说明 |
 |------|------|------|
 | 阶段覆盖 | 10 个 | 8 个主阶段 + 2 个终态 |
-| CLI 命令 | 19 个 | 确定性原子能力 |
-| Skill 数量 | 21 个 | 流程编排能力 |
+| CLI 命令 | 21 个 | 确定性原子能力 |
+| Skill 数量 | 23 个 | 流程编排能力 |
 | 覆盖率指标 | 9 项 | C1-C9 双向追踪 |
-| Gate 状态 | 3 种 | PASS / WAIVER / FAIL |
+| Gate 状态 | 3 种 | PASS / PASS_WITH_WAIVER / FAIL |
 | RFC 级别 | 3 级 | Critical / Major / Minor |
 | 缺陷等级 | 4 级 | S1-S4 分级响应 |
-| 追踪 ID | 5 种 | FR / DS / TASK / TC / RFC |
-| 归档清单 | 19 项 | 完整验收标准 |
+| 追踪 ID | 13 种生成类型 + Feature 校验 | FR / DS / TASK / TC / RFC / REQ / SYS / ARCH / MOD / ATP / STP / ITP / UTP |
+| 归档清单 | 可执行清单 | 归档阶段验收标准 |
 
 ### ROI 分析
 
@@ -240,7 +240,7 @@
 | **流程模型** | 8+2 阶段状态机 | proposal→specs→design→tasks | constitution→specify→plan→tasks | brainstorm→plan→implement | 3-file 模式 | start→brainstorm→finish |
 | **阶段覆盖** | init→release→done | changes 生命周期 | feature 完整周期 | 开发迭代周期 | 任务执行周期 | 任务生命周期 |
 | **追踪体系** | FR→DS→TASK→PR→TC + V-Model 四层 | dependsOn + provides | 规范→任务 + V-Model 扩展 | 计划→执行 | task_plan + findings | workspace 记录 |
-| **ID 系统** | 5 种类型 + V-Model ID (REQ/SYS/ARCH/MOD) | 变更依赖图 | 自动编号分支 + V-Model ID | 任务清单 | Phase 标记 | 目录命名 |
+| **ID 系统** | 13 种生成类型 + Feature 校验 | 变更依赖图 | 自动编号分支 + V-Model ID | 任务清单 | Phase 标记 | 目录命名 |
 | **质量门禁** | Gate (3态) + HARD-GATE | 栈感知校验 | checklist + spec-review | 两阶段 Code Review | 3-strike 协议 | check-* 命令 |
 | **变更管理** | RFC 分级 + 审批 | proposal→approved→closed | — | — | — | — |
 | **缺陷管理** | S1-S4 分级 + SLA | — | — | 系统调试 | 错误日志 | — |
@@ -265,26 +265,27 @@
 |------|-------------|---------------------------|----------|
 | **规范分层设计** | Code-Spec（可执行契约）vs Guide（思维指南）分离 | 让 AI 清晰区分"如何安全实现"与"写之前要考虑什么" | 评估中 |
 | **上下文注入** | JSONL 分层注入（implement/check/debug）+ Hook 自动化 | 补齐任务级声明式精确注入模型 | 评估中 |
-| **升级安全链路** | 模板哈希分级 + manifest 迁移 + 更新前备份回滚 | 降低升级失败率与冲突成本 | T1-T3 待落地 |
-| **运行时治理** | HostRegistry + worktree 命令化 | 收敛多宿主分叉，提升高风险任务隔离执行率 | T4-T5 待落地 |
+| **升级安全链路** | 模板哈希分级 + manifest 迁移 + 更新前备份回滚 | 降低升级失败率与冲突成本 | T1/T2 已落地基础版，T3 待落地 |
+| **运行时治理** | HostRegistry + worktree 命令化 | 收敛多宿主分叉，提升高风险任务隔离执行率 | T4 已落地基础版，T5 待落地 |
 | **调试与验证** | Break-the-Loop 五维分析 + Cross-Layer Check 多维度 | 强化复杂问题根因定位与跨层一致性验证 | 已集成 |
 | **任务分流** | 四级复杂度分类（Trivial/Simple/Moderate/Complex） | 按复杂度选择不同的执行深度和澄清策略 | 评估中 |
 | **新人引导** | Onboard 命令（核心概念 + 真实示例 + 定制引导） | 补充轻量入门路径（相对于现有深度认知能力） | 已集成 |
+
 
 ### 框架版本与仓库信息
 
 | 框架 | 最新版本 | 语言 | 仓库地址 | 许可证 | 状态 |
 |------|----------|------|----------|--------|------|
-| **Spec-First** | v0.5.79 | TypeScript | [spec-first](https://github.com/your-org/spec-first) | MIT | ✅ 活跃维护 |
+| **Spec-First** | v0.5.45 | TypeScript | [spec-first](https://github.com/your-org/spec-first) | MIT | ✅ 活跃维护 |
 | **OpenSpec** | - | TypeScript | [open-spec](https://github.com/open-spec-dev/open-spec) | MIT | ✅ 活跃 |
 | **Spec Kit** | - | TypeScript | [spec-kit](https://github.com/spec-kit/spec-kit) | MIT | ✅ 活跃 |
 | **Superpowers** | v4.3.1 | Markdown Skill | [superpowers](https://github.com/richard1798/superpowers) | MIT | ✅ 活跃 |
 | **Planning-with-Files** | v2.16.0 | Markdown Skill | [planning-with-files](https://github.com/sisyphus-ean/planning-with-files) | MIT | ✅ 活跃 |
 | **Trellis** | v0.3.0 | TypeScript + Python | [trellis](https://github.com/karpathy/trellis) | MIT | ✅ 活跃 |
 
-> 注：版本信息基于 2026-03-02 的公开文档分析，实际版本以各仓库为准。
+> 注：Spec-First 版本基于本仓库 `package.json`（2026-03-06）；其余框架版本基于公开文档，实际以各仓库为准。
 
-### 状态判定口径（2026-03-02）
+### 状态判定口径（2026-03-06）
 
 - 已集成：代码中存在可执行实现，且链路闭合。
 - 部分集成：已有规则或局部实现，但缺少关键执行闭环。
@@ -303,7 +304,7 @@
 ├── Gate 三态门禁（PASS / PASS_WITH_WAIVER / FAIL）
 ├── RFC 分级变更管理（Critical/Major/Minor）
 ├── 缺陷 S1-S4 分级响应（立即→4h→24h→下迭代）
-└── 22 Skill + 19 CLI 命令
+└── 23 Skill + 21 CLI 命令
 
 适用场景:
 • 企业级研发流程标准化
@@ -456,7 +457,7 @@ AI 既有约束又有上下文，执行更可靠
 │  Planning-Files: ████████████████████ 100% (7/7 项核心要素已集成)                      │
 │  Spec Kit:     ████████████████░░░░  86% (6/7 项核心要素已集成)                      │
 │  OpenSpec:     ████████░░░░░░░░░░░░  29% (2/7 项核心要素已集成)                      │
-│  Trellis:      ███████████░░░░░░░░░  43% (3/7 项核心要素已集成)                      │
+│  Trellis:      █████████████░░░░░░░  57% (4/7 项核心要素已集成，持续更新)             │
 │                                                                                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -469,7 +470,7 @@ AI 既有约束又有上下文，执行更可靠
 | **Planning-Files** | 2-Action Rule、Read/Write 矩阵、文件系统即内存、Stop Hook、PreToolUse 注意力、5-Question、Session Recovery | — | Context Reduction 分层压缩 | **100%** |
 | **Spec Kit** | Checklist、歧义消解、跨产物一致性、动态 Prompt、用户故事组织、V-Model 追踪 | Progressive Disclosure | 18+ Agent 无关架构 | **86%** |
 | **OpenSpec** | Context Pack、扩展系统底座 | — | 变更依赖图、栈感知校验、OPSX Schema | **29%** |
-| **Trellis** | Break-Loop、Cross-Layer Check、Onboard | 模板哈希、manifest 迁移、备份回滚、HostRegistry、worktree 命令 | Code-Spec 分层、JSONL 注入、任务分类、meta/local 分离、Brainstorm 九步 | **43%** |
+| **Trellis** | Break-Loop、Cross-Layer Check、Onboard、模板哈希、manifest 迁移、HostRegistry | 备份回滚、worktree 命令 | Code-Spec 分层、JSONL 注入、任务分类、meta/local 分离、Brainstorm 九步 | **57%** |
 
 > 注：集成率 = (P0 已集成 + P1 集成中) / (P0 + P1 + P2) × 100%
 
@@ -482,8 +483,8 @@ AI 既有约束又有上下文，执行更可靠
    └─ Spec Kit: 6 项核心要素集成
 
 🚧 Sprint 1 (进行中): 工程治理基线
-   ├─ Trellis T1-T3: 模板哈希、manifest 迁移、备份回滚
-   └─ Trellis T4-T5: HostRegistry、worktree 命令
+   ├─ Trellis T1/T2/T4: 已落地（模板哈希、manifest 迁移、HostRegistry）
+   └─ Trellis T3/T5: 进行中（备份回滚、worktree 命令）
 
 📋 Sprint 2 (规划中): 规范工程深化
    ├─ Trellis: Code-Spec 分离、JSONL 注入
@@ -521,7 +522,7 @@ AI 既有约束又有上下文，执行更可靠
 | **OpenSpec** | Context Pack 上下文注入 | ai context 命令 | ✅ 已实现 |
 | **Trellis** | Break-the-Loop 调试闭环 | 07-code SKILL.md + retry/watchdog | ✅ 已实现 |
 | **Trellis** | Cross-Layer Check 多维验证 | layer-merger + matrix + gate | ✅ 已实现 |
-| **Trellis** | Onboard 新人引导机制 | 00-first SKILL.md | ✅ 已实现 |
+| **Trellis** | Onboard 新人引导机制 | 00-onboarding SKILL.md | ✅ 已实现 |
 
 #### 🚧 集成中的优势
 
@@ -531,20 +532,20 @@ AI 既有约束又有上下文，执行更可靠
 | **OpenSpec** | 栈感知校验 | M3 gate-engine | P2 |
 | **OpenSpec** | OPSX 动态 Schema | skill-runtime | P3 |
 | **Spec Kit** | 18+ Agent 无关架构 | agent-config 层 | P2 |
-| **Spec Kit** | Progressive Disclosure | context-pack 引擎 | P2 |
-| **Superpowers** | Fresh Context Per Task | orchestrate subagent | P2 |
-| **Trellis** | 模板哈希 + 变更分级更新（T1） | update-engine | P0 |
-| **Trellis** | Manifest 迁移引擎 + 冲突策略（T2） | migrations + update --migrate | P0 |
-| **Trellis** | 更新前快照备份 + 回滚演练（T3） | update 备份链路 | P0 |
-| **Trellis** | HostRegistry 单一真理源（T4） | host-paths / host-bootstrap | P1 |
+| **Spec Kit** | Progressive Disclosure（摘要/细节按需展开） | context-pack 引擎 | 已集成（基础版） |
+| **Superpowers** | Fresh Context Per Task | context-pack + catchup | 已集成（基础版） |
+| **Trellis** | 模板哈希 + 变更分级更新（T1） | update hash-registry + update-decision | 已集成（基础版） |
+| **Trellis** | Manifest 迁移引擎 + 冲突策略（T2） | migrations + update 自动执行 manifest | 已集成（基础版） |
+| **Trellis** | 更新前快照备份 + 回滚演练（T3） | update 备份链路 | 未集成 |
+| **Trellis** | HostRegistry 单一真理源（T4） | host-paths / host-bootstrap | 已集成（基础版） |
 | **Trellis** | Worktree 命令化 + Context Cost 报告（T5） | worktree command | P1/P2 |
 
 #### 工程治理缺口（T1/T2/T3/T5）与实施关口
 
 | 工程项 | 当前状态 | 关键缺口 | 实施关口 |
 |--------|----------|----------|----------|
-| T1 模板哈希 + 变更分级更新 | 未落地 | 无 update-engine 哈希分析与变更分级实现 | 在 `spec-first update` 引入变更分析阶段与风险等级输出 |
-| T2 Manifest 迁移引擎 + 冲突策略 | 未落地 | 无 `src/migrations`、无 `update --migrate` | 增加版本迁移入口、冲突策略与 dry-run 校验 |
+| T1 模板哈希 + 变更分级更新 | 已落地（基础版） | 已支持哈希比对/分级摘要；尚缺自动回滚联动 | 增补与 T3 的快照回滚联动策略 |
+| T2 Manifest 迁移引擎 + 冲突策略 | 已落地（基础版） | 已有 `src/core/migrations` 与自动执行；冲突策略当前固定 Skip | 增加显式冲突策略选项与执行审计输出 |
 | T3 更新前快照备份 + 回滚演练 | 未落地 | 无项目级快照与回滚执行链路 | 在 update 前创建快照并提供可验证 rollback 命令 |
 | T5 Worktree 命令化 + 上下文成本报告 | 未落地 | 无 `worktree` CLI、无 context cost 报告产物 | 增加命令化入口并沉淀 `.spec-first/worktree.yaml` 报告 |
 
@@ -587,8 +588,8 @@ AI 既有约束又有上下文，执行更可靠
 │  ✓ Gate 三态门禁（PASS / PASS_WITH_WAIVER / FAIL）                                  │
 │  ✓ RFC 分级变更管理（Critical/Major/Minor）                                         │
 │  ✓ 缺陷 S1-S4 分级响应（立即→4h→24h→下迭代）                                        │
-│  ✓ 22 项归档验收清单                                                                │
-│  ✓ 22 Skill + 19 CLI 命令完整工具链                                                 │
+│  ✓ 可执行归档验收清单                                                               │
+│  ✓ 23 Skill + 21 CLI 命令完整工具链                                                 │
 │                                                                                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -833,10 +834,9 @@ spec-first --version
 
 ```bash
 # 1. 创建新 Feature（用户认证功能）
-spec-first init --feat AUTH --mode N --size M --platforms app,h5
+spec-first init --feat AUTH --mode N --size M --platforms h5,backend
 
-# 2. 进入项目目录
-cd specs/FSREQ-20260227-AUTH-001
+# 2. 在项目根目录继续操作（无需 cd 进入 feature 目录）
 
 # 3. 启动需求规格化（在 Claude Code 中）
 # 执行: /spec-first:spec
@@ -851,8 +851,9 @@ cd specs/FSREQ-20260227-AUTH-001
 # 将生成 task_plan.md，包含 TASK 列表
 
 # 6. 查看状态
-spec-first stage current FSREQ-20260227-AUTH-001
-spec-first matrix check FSREQ-20260227-AUTH-001
+spec-first feature list
+spec-first stage current FSREQ-20260306-AUTH-001
+spec-first matrix check FSREQ-20260306-AUTH-001
 ```
 
 ### 使用 Skill 驱动开发
@@ -897,9 +898,9 @@ spec-first matrix check FSREQ-20260227-AUTH-001
 
 ```bash
 # ID 生成与校验
-spec-first id next FR AUTH                    # 生成下一个 FR ID
-spec-first id next TASK AUTH                  # 生成下一个 TASK ID
-spec-first id list --feature AUTH-20260227-001
+spec-first id next FR AUTH --feature <featureId>    # 生成下一个 FR ID
+spec-first id next TASK AUTH --feature <featureId>  # 生成下一个 TASK ID
+spec-first id list --feature <featureId>
 
 # Gate 校验
 spec-first gate check <featureId>             # 校验当前阶段 Gate
@@ -930,22 +931,24 @@ spec-first update                             # 升级刷新 Skill/MCP/Hooks
 
 | 术语 | 英文 | 定义 | 示例 |
 |------|------|------|------|
-| **Feature** | Feature | 一个独立的功能单元，是 Spec-First 管理的基本单位 | `FSREQ-20260227-AUTH-001`（用户认证功能） |
+| **Feature** | Feature | 一个独立的功能单元，是 Spec-First 管理的基本单位 | `FSREQ-20260306-AUTH-001`（用户认证功能） |
 | **Stage** | Stage | 研发流程的阶段，共 8+2 个阶段 | `01_specify`（需求规格化阶段） |
-| **Gate** | Gate | 阶段质量门禁，控制是否可以推进到下一阶段 | `gate check` 返回 `PASS` 才能推进 |
+| **Gate** | Gate | 阶段质量门禁，控制是否可以推进到下一阶段 | `gate check` 返回 `PASS` 或 `PASS_WITH_WAIVER` 才能推进 |
 | **Skill** | Skill | AI 驱动的流程编排能力，负责内容生成和交互引导 | `/spec-first:code` 执行代码实现 |
-| **CLI** | Command Line Interface | 命令行工具，提供确定性原子能力 | `spec-first id next FR AUTH` |
+| **CLI** | Command Line Interface | 命令行工具，提供确定性原子能力 | `spec-first id next FR AUTH --feature <featureId>` |
 
 ### 追踪 ID 体系
 
 | 术语 | 格式 | 用途 | 示例 |
 |------|------|------|------|
 | **FR** | `FR-<ABBR>-NNN` | 功能需求（Functional Requirement） | `FR-AUTH-001`：短信登录功能 |
-| **NFR** | `NFR-<ABBR>-NNN` | 非功能需求（Non-Functional Requirement） | `NFR-AUTH-001`：登录响应时间 < 3s |
+| **REQ** | `REQ-<ABBR>-NNN` | 需求分析层（V-Model） | `REQ-AUTH-001`：登录时延要求 |
 | **DS** | `DS-<ABBR>-NNN` | 设计规格（Design Specification） | `DS-AUTH-001`：短信验证 API 设计 |
 | **TASK** | `TASK-<ABBR>-NNN` | 实现任务 | `TASK-AUTH-001`：实现短信发送 API |
 | **TC** | `TC-<LVL>-<ABBR>-NNN` | 测试用例（Test Case） | `TC-E2E-AUTH-001`：E2E 登录测试 |
-| **RFC** | `RFC-<ABBR>-NNN` | 变更请求（Request For Change） | `RFC-AUTH-001`：增加邮箱登录 |
+| **RFC** | `RFC-NNN` | 变更请求（Request For Change） | `RFC-001`：增加邮箱登录 |
+| **SYS / ARCH / MOD** | `<TYPE>-<ABBR>-NNN` | 系统/架构/模块层（V-Model） | `SYS-AUTH-001` |
+| **ATP / STP / ITP / UTP** | `<TYPE>-<ABBR>-NNN` | 测试层（V-Model） | `ITP-AUTH-001` |
 
 ### Gate 相关
 
@@ -960,15 +963,15 @@ spec-first update                             # 升级刷新 Skill/MCP/Hooks
 
 | 术语 | 类型 | 定义 | 阈值 |
 |------|------|------|------|
-| **C1** | 正向 | Design Coverage：有 DS 的 FR / 总 FR | = 100% |
-| **C2** | 正向 | API Coverage：有 API 的 FR / 需 API 的 FR | = 100% |
-| **C3** | 正向 | Task Coverage：有 TASK 的 FR / 总 FR | = 100% |
-| **C4** | 正向 | Test Coverage (FR)：有 TC 的 FR / 总 FR | = 100% |
-| **C5** | 正向 | Test Coverage (AC)：有 TC 的 AC / 总 AC | ≥ 90% |
-| **C6** | 正向 | Implementation Coverage：有 PR 的 FR / 总 FR | = 100% |
-| **C7** | 反向 | PR Compliance：有 TASK 的 PR / 总 PR | = 100% |
-| **C8** | 反向 | Task Compliance：有 FR 的 TASK / 总 TASK | = 100% |
-| **C9** | 反向 | TC Compliance：有 FR 的 TC / 总 TC | = 100% |
+| **C1** | 正向 | Design Coverage：有 DS 祖先关联的 FR / 总 FR | 目标 100%（Design Gate） |
+| **C2** | 正向 | API Coverage：同 C1（DS 覆盖） | 目标 100%（Design Gate） |
+| **C3** | 正向 | Task Coverage：有 TASK 祖先关联的 FR / 总 FR | 目标 100%（Plan Gate） |
+| **C4** | 正向 | Test Coverage (FR)：有 TC 关联的 FR / 总 FR | Implement 阶段 ≥80%，Verify 阶段 100% |
+| **C5** | 正向 | Test Coverage (AC)：同 C4（当前实现） | S:≥60%，M/L:≥90%（Verify Gate） |
+| **C6** | 正向 | Implementation Coverage：状态为 Implemented/Verified/Accepted 的 TASK / 总 TASK | 目标 100%（Wrap-up Gate） |
+| **C7** | 反向 | PR Compliance：有上游关联的 TASK / 总 TASK | 目标 100%（Implement Gate） |
+| **C8** | 反向 | Task Compliance：有 FR/DS 上游祖先的 TASK / 总 TASK | 目标 100%（Plan Gate） |
+| **C9** | 反向 | TC Compliance：有 FR 上游关联的 TC / 总 TC | 目标 100%（Verify Gate） |
 
 ### 变更与缺陷
 
@@ -1070,11 +1073,11 @@ spec-first update                             # 升级刷新 Skill/MCP/Hooks
                              │  /spec-first:*
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Skill 层（流程编排 · 22 个 Skill）                              │
+│  Skill 层（流程编排 · 23 个 Skill）                              │
 │  职责: 流程编排、阶段流转触发、交互引导、内容生成                │
 │  宿主: Claude Code / Codex CLI                                   │
 ├─────────────────────────────────────────────────────────────────┤
-│  CLI 层（确定性原子能力 · 19 命令）                              │
+│  CLI 层（确定性原子能力 · 21 命令）                              │
 │  职责: ID 生成、Gate 校验、状态推进、度量计算                    │
 │  约束: 相同输入 = 相同输出                                       │
 ├─────────────────────────────────────────────────────────────────┤
@@ -1265,7 +1268,7 @@ P5_SIDE_EFFECT — 副作用执行
 
 | 类型 | 格式 | 示例 |
 |------|------|------|
-| Feature | `FSREQ-YYYYMMDD-<FEAT>-NNN` | `FSREQ-20260226-AUTH-001` |
+| Feature | `FSREQ-YYYYMMDD-<FEAT>-NNN` | `FSREQ-20260306-AUTH-001` |
 | FR | `FR-<FEAT>-NNN` | `FR-AUTH-001` |
 | DS | `DS-<FEAT>-NNN` | `DS-AUTH-001` |
 | TASK | `TASK-<FEAT>-NNN` | `TASK-AUTH-001` |
@@ -1365,31 +1368,31 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 
 | 指标 | 公式 | 阈值 |
 |------|------|------|
-| C1 Design | 有 DS 的 FR / 总 FR | = 100% |
-| C2 API | 有 API 的 FR / 需 API 的 FR | = 100% |
-| C3 Task | 有 TASK 的 FR / 总 FR | = 100% |
-| C4 Test(FR) | 有 TC 的 FR / 总 FR | = 100% |
-| C5 Test(AC) | 有 TC 的 AC / 总 AC | ≥ 90% |
-| C6 Impl | 有 PR 的 FR / 总 FR | = 100% |
+| C1 Design | 有 DS 祖先关联的 FR / 总 FR | = 100%（Design Gate） |
+| C2 API | 同 C1（当前实现） | = 100%（Design Gate） |
+| C3 Task | 有 TASK 祖先关联的 FR / 总 FR | = 100%（Plan Gate） |
+| C4 Test(FR) | 有 TC 关联的 FR / 总 FR | Implement 阶段 ≥80%，Verify 阶段 =100% |
+| C5 Test(AC) | 同 C4（当前实现） | S: ≥60%，M/L: ≥90% |
+| C6 Impl | Implemented/Verified/Accepted TASK / 总 TASK | = 100%（Wrap-up Gate） |
 
 ### 反向合规率（实现是否有需求依据）
 
 | 指标 | 公式 | 阈值 |
 |------|------|------|
-| C7 PR Compliance | 有 TASK 的 PR / 总 PR | = 100% |
-| C8 Task Compliance | 有 FR 的 TASK / 总 TASK | = 100% |
+| C7 PR Compliance | 有上游关联的 TASK / 总 TASK | = 100% |
+| C8 Task Compliance | 有 FR/DS 上游祖先的 TASK / 总 TASK | = 100% |
 | C9 TC Compliance | 有 FR 的 TC / 总 TC | = 100% |
 
 ---
 
 ## Skill 体系
 
-### 22 个 Skill 分类
+### 23 个 Skill 分类
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
-│  项目认知 Skills (1)                                             │
-│  00-first                                                       │
+│  项目认知 Skills (2)                                             │
+│  00-first | 00-onboarding                                       │
 ├─────────────────────────────────────────────────────────────────┤
 │  核心工作流 Skills (9)                                          │
 │  01-init | 03-spec | 04-design | 05-research | 06-task         │
@@ -1412,7 +1415,7 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 ### Skill 依赖关系
 
 ```text
-    00-first (项目认知，独立使用)
+    00-first / 00-onboarding (项目认知，独立使用)
 
                     13-orchestrate (主编排器)
                            │
@@ -1447,6 +1450,7 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | 阶段 | Skill | 主要交付物 |
 | --- | --- | --- |
 | — | 00-first | docs/first/*.md（项目认知文档集）|
+| — | 00-onboarding | 无文件（交互式引导） |
 | 00_init | 01-init | stage-state.json, constitution.md |
 | 01_specify | 03-spec, 20-spec-review | spec.md, checklists/spec-review.md |
 | 02_design | 04-design, 05-research | design.md, contracts/, research.md |
@@ -1476,7 +1480,7 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 
 ## CLI 命令
 
-### 19 个命令
+### 21 个命令
 
 | 命令 | 功能 | 模块 |
 |------|------|------|
@@ -1488,6 +1492,8 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | `gate` | Gate 评估 | M3 |
 | `golive` | 上线检查 | M3 |
 | `analyze` | 一致性分析 | M3 |
+| `trace` | 追溯链修复与校验 | M2 |
+| `validate` | 产物格式校验 | M3 |
 | `rfc` | RFC 管理 | M4 |
 | `defect` | 缺陷管理 | M4 |
 | `ai` | AI 上下文/恢复 | M5 |
@@ -1517,7 +1523,7 @@ ID 生成与校验。
 ```bash
 # 生成下一个 ID
 spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]
-# type: FR | DS | TASK | TC | RFC
+# type: FR | DS | TASK | TC | RFC | REQ | SYS | ARCH | MOD | ATP | STP | ITP | UTP
 
 # 校验 ID 格式
 spec-first id validate <id>
@@ -1642,7 +1648,7 @@ spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>]
 ```text
 spec-first/
 ├── src/
-│   ├── cli/                  # CLI (19 命令)
+│   ├── cli/                  # CLI (21 命令)
 │   │   ├── index.ts          # CLI 入口
 │   │   └── commands/         # 各命令实现
 │   ├── core/                 # 核心模块 (9 目录)
@@ -1656,7 +1662,7 @@ spec-first/
 │   │   ├── template/         # 模板系统
 │   │   └── tool-integration/ # M7: Hook + CI
 │   └── shared/               # 共享类型 (types, constants, utils)
-├── skills/spec-first/        # 22 个 Skill
+├── skills/spec-first/        # 23 个 Skill
 │   ├── AGENTS.md             # 全局 Agent 指令
 │   ├── SHARED.md             # 跨 Skill 共享约束
 │   └── */SKILL.md            # 各 Skill 定义
@@ -1716,7 +1722,8 @@ enum ExitCode {
 type MatrixStatus = 'Planned' | 'Implemented' | 'Verified' | 'Accepted' | 'Deferred' | 'Cancelled' | 'Exception';
 
 // ID 类型
-type IdType = 'FR' | 'DS' | 'TASK' | 'TC' | 'RFC';
+type NextIdType = 'FR' | 'DS' | 'TASK' | 'TC' | 'RFC' | 'REQ' | 'SYS' | 'ARCH' | 'MOD' | 'ATP' | 'STP' | 'ITP' | 'UTP';
+type IdType = NextIdType | 'Feature';
 
 // Feature Mode
 type FeatureMode = 'N' | 'I';  // N: 新功能, I: 迭代
@@ -1781,4 +1788,4 @@ Copyright © 2025-2026 Spec-First Contributors
 
 ---
 
-*本文档基于代码生成 | 更新: 2026-03-02 | 版本: v0.5.79*
+*本文档基于代码生成 | 更新: 2026-03-06 | 版本: v0.5.45*

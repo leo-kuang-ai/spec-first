@@ -69,6 +69,22 @@ describe('checkMatrix', () => {
     expect(result.warnings.length).toBeGreaterThan(0);
   });
 
+  it('should not mark TASK as missing when FR is linked via DS->TASK chain', () => {
+    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
+      '| ID | Type | Title | Status | Upstream | Downstream |',
+      '|----|------|-------|--------|----------|------------|',
+      '| FR-AUTH-001 | FR | Login | Planned |  | DS-AUTH-001,TASK-AUTH-001 |',
+      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 | TASK-AUTH-001 |',
+      '| TASK-AUTH-001 | TASK | Impl | Implemented | DS-AUTH-001 |  |',
+      '',
+    ].join('\n'), 'utf-8');
+
+    const result = checkMatrix(FEAT_ID, TMP);
+    const broken = result.brokenChains.find((b) => b.frId === 'FR-AUTH-001');
+    expect(broken).toBeDefined();
+    expect(broken!.missing).not.toContain('TASK');
+  });
+
   it('should detect missing V-Model forward/backward mappings', () => {
     const vModelMatrix = `| ID | Type | Title | Status | Upstream | Downstream |
 |----|------|-------|--------|----------|------------|

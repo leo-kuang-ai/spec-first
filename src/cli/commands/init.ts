@@ -578,78 +578,97 @@ function isConfirmed(value: string): boolean {
 async function runGuidedInit(): Promise<GuidedInitInput | null> {
   const rl = createInterface({ input, output });
   try {
-    console.log('初始化向导（交互模式）');
-    console.log('请按清单填写参数：');
-    console.log('  1. FEAT 缩写');
-    console.log('  2. 模式（新功能/增量）');
-    console.log('  3. 规模（S/M/L）');
-    console.log('  4. 平台（可多选）');
-    console.log('  5. 标题（可选）');
-    console.log('  6. Feature ID（可选）\n');
-    console.log('  7. bootstrap（可选）\n');
+    console.log('\n╔════════════════════════════════════════════════════════════════╗');
+    console.log('║          Spec-First Feature 初始化                             ║');
+    console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    const feat = await askUntilValid(rl, '1) FEAT 缩写（例如 AUTH）: ', (value) =>
-      /^[A-Z][A-Z0-9]{0,15}$/.test(value) ? null : 'FEAT 格式错误：需匹配 ^[A-Z][A-Z0-9]{0,15}$',
+    // Step 1/7: FEAT 缩写
+    printStepHeader(1, 7, 'Feature 缩写');
+    console.log('  格式：大写字母开头，仅包含大写字母和数字，长度 1-16 字符');
+    console.log('  示例：DASHBOARD、AUTH、REPORT');
+    const feat = await askUntilValid(rl, '\n你的输入: ', (value) =>
+      /^[A-Z][A-Z0-9]{0,15}$/.test(value) ? null : '❌ FEAT 格式错误：需匹配 ^[A-Z][A-Z0-9]{0,15}$',
     );
-    console.log('2) 请选择模式:');
-    console.log('   1. N（新功能，默认）');
-    console.log('   2. I（增量迭代）');
-    const modeInput = await askUntilValid(rl, '请输入 1/2 或 N/I（默认 1）: ', (value) =>
-      normalizeModeInput(value) ? null : '模式无效，请输入 1/2 或 N/I',
+    printStepConfirm('Feature 缩写', feat);
+
+    // Step 2/7: 开发模式
+    printStepHeader(2, 7, '开发模式');
+    console.log('  1. N (New) - 全新功能开发');
+    console.log('  2. I (Iteration) - 迭代优化现有功能');
+    const modeInput = await askUntilValid(rl, '\n请输入 [1/2]（默认：1）: ', (value) =>
+      normalizeModeInput(value) ? null : '❌ 模式无效，请输入 1/2 或 N/I',
     );
     const mode = normalizeModeInput(modeInput) as 'N' | 'I';
+    printStepConfirm('开发模式', mode === 'N' ? 'N (New)' : 'I (Iteration)');
 
-    console.log('3) 请选择规模:');
-    console.log('   1. S（小变更）');
-    console.log('   2. M（中等，默认）');
-    console.log('   3. L（大规模）');
-    const sizeInput = await askUntilValid(rl, '请输入 1/2/3 或 S/M/L（默认 2）: ', (value) =>
-      normalizeSizeInput(value) ? null : '规模无效，请输入 1/2/3 或 S/M/L',
+    // Step 3/7: 项目规模
+    printStepHeader(3, 7, '项目规模');
+    console.log('  1. S (Small) - 小型改动（1-3 天）');
+    console.log('  2. M (Medium) - 中型功能（1-2 周）');
+    console.log('  3. L (Large) - 大型项目（2+ 周）');
+    const sizeInput = await askUntilValid(rl, '\n请输入 [1/2/3]（默认：2）: ', (value) =>
+      normalizeSizeInput(value) ? null : '❌ 规模无效，请输入 1/2/3 或 S/M/L',
     );
     const size = normalizeSizeInput(sizeInput) as 'S' | 'M' | 'L';
+    printStepConfirm('项目规模', `${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`);
 
+    // Step 4/7: 平台选择
     const discovered = discoverPlatforms(process.cwd());
     if (discovered.length === 0) {
-      console.error('未发现 .spec-first/layer2 平台模板。请先创建 *.yaml 后再执行初始化。');
+      console.error('\n❌ 未发现 .spec-first/layer2 平台模板。请先创建 *.yaml 后再执行初始化。');
       return null;
     }
-
+    printStepHeader(4, 7, '平台选择');
+    console.log('  检测到以下可用平台（来自 .spec-first/layer2/*.yaml）：\n');
     const selectedPlatforms = await askPlatformsInteractively(rl, discovered);
     if (!selectedPlatforms || selectedPlatforms.length === 0) {
-      console.error('未选择任何平台，已取消初始化。');
+      console.error('\n❌ 未选择任何平台，已取消初始化。');
       return null;
     }
     const platforms = selectedPlatforms.join(',');
+    printStepConfirm('平台选择', selectedPlatforms.join(', '));
 
-    const titleInput = (await rl.question(`5) 标题（可选，默认 ${feat}）: `)).trim();
-    const featureIdInput = (await rl.question('6) Feature ID（可选，留空自动生成）: ')).trim();
-    const bootstrapInput = (await rl.question('7) 需要执行 bootstrap（宿主检查/修复）吗？[y/N]: ')).trim();
-    const bootstrap = isConfirmed(bootstrapInput);
+    // Step 5/7: Feature 标题
+    printStepHeader(5, 7, 'Feature 标题');
+    console.log('  示例：仪表盘数据可视化优化、Dashboard Data Visualization Enhancement');
+    console.log(`  默认：${feat}`);
+    const titleInput = (await rl.question('\n你的输入: ')).trim();
     const title = titleInput || feat;
+    printStepConfirm('Feature 标题', title);
 
-    console.log('\n参数确认（列表）:');
-    console.log(`  - feat: ${feat}`);
-    console.log(`  - mode: ${mode}`);
-    console.log(`  - size: ${size}`);
-    console.log(`  - platforms: ${platforms}`);
-    console.log(`  - title: ${title}`);
-    console.log(`  - feature-id: ${featureIdInput || '(auto)'}`);
-    console.log(`  - bootstrap: ${bootstrap ? 'yes (--bootstrap)' : 'no'}`);
-    const confirm = await rl.question('确认执行初始化？[y/N]: ');
+    // Step 6/7: Feature ID（可选）
+    printStepHeader(6, 7, 'Feature ID（可选）');
+    console.log('  系统将自动生成 Feature ID，格式：FSREQ-YYYYMMDD-<FEAT>-NNN');
+    console.log('  可输入自定义 ID 或直接回车使用自动生成');
+    const featureIdInput = (await rl.question('\n你的输入（回车=自动生成）: ')).trim();
+    printStepConfirm('Feature ID', featureIdInput || '自动生成');
+
+    // Step 7/7: Bootstrap 选项
+    printStepHeader(7, 7, 'Bootstrap 选项');
+    console.log('  是否需要执行宿主环境检查（MCP + skills 检查/自动修复）？');
+    console.log('  1. 否 - 仅项目内初始化（推荐）');
+    console.log('  2. 是 - 包含宿主环境检查');
+    const bootstrapInput = (await rl.question('\n请输入 [1/2]（默认：1）: ')).trim();
+    const bootstrap = bootstrapInput === '2' || isConfirmed(bootstrapInput);
+    printStepConfirm('Bootstrap', bootstrap ? '是 - 包含宿主环境检查' : '否（仅项目内初始化）');
+
+    // 最终确认
+    console.log('\n  ---');
+    console.log('  参数确认\n');
+    console.log(`  Feature 缩写:    ${feat}`);
+    console.log(`  开发模式:        ${mode} (${mode === 'N' ? 'New' : 'Iteration'})`);
+    console.log(`  项目规模:        ${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`);
+    console.log(`  平台:            ${platforms}`);
+    console.log(`  标题:            ${title}`);
+    console.log(`  Feature ID:      ${featureIdInput || '自动生成'}`);
+    console.log(`  Bootstrap:       ${bootstrap ? '是' : '否'}`);
+    const confirm = await rl.question('\n是否继续？[y/n]: ');
     if (!isConfirmed(confirm)) {
-      console.error('已取消初始化。');
+      console.error('\n❌ 已取消初始化。');
       return null;
     }
 
-    return {
-      feat,
-      mode,
-      size,
-      platforms,
-      title,
-      featureId: featureIdInput || undefined,
-      bootstrap,
-    };
+    return { feat, mode, size, platforms, title, featureId: featureIdInput || undefined, bootstrap };
   } finally {
     rl.close();
   }
@@ -666,4 +685,14 @@ async function askUntilValid(
     if (!error) return value;
     console.error(error);
   }
+}
+
+// ─── 引导式交互辅助函数 ──────────────────────────────────
+
+function printStepHeader(current: number, total: number, title: string): void {
+  console.log(`\n  Step ${current}/${total}: ${title}\n`);
+}
+
+function printStepConfirm(label: string, value: string): void {
+  console.log(`\n✅ ${label}：${value}\n`);
 }

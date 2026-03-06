@@ -1,9 +1,9 @@
 ---
 name: "spec-first:archive"
 description: "定位 Feature 并校验阶段为归档复盘（06_wrap_up）"
-version: 1.0.0
-last_updated: {{DATE}}
-changelog: Initial version with standardized metadata
+version: 1.1.0
+last_updated: 2026-03-05
+changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
 # Skill: archive
@@ -23,6 +23,20 @@ changelog: Initial version with standardized metadata
 - 阶段: 06_wrap_up
 - Command: `/spec-first:archive`
 
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 不存在 → 报错并终止
+
 ## 归档组合门槛（P1-19）
 
 归档判定不再只看行数，改为三要素组合：
@@ -33,7 +47,7 @@ changelog: Initial version with standardized metadata
 满足组合门槛即触发归档。
 
 ## 执行阶段
-- P0: 定位 Feature，校验阶段为 06_wrap_up
+- P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），校验阶段为 06_wrap_up
 - P1: 加载全部交付物、矩阵、Gate 历史
 - P2: 生成归档摘要（覆盖率报告、经验教训）
 - P2.5: 输出 break-loop 分析与 Immediate Actions（必须可执行）

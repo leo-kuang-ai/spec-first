@@ -3,6 +3,7 @@
  * 章节完整性 + 场景校验 + C-PRD 评分
  */
 import { readMarkdown } from '../../shared/fs-utils.js';
+import yaml from 'js-yaml';
 
 // ─── 类型 ────────────────────────────────────────────────
 
@@ -27,23 +28,22 @@ export interface PrdValidationResult {
 
 const REQUIRED_SECTIONS = [
   '## 1. 业务目标',
-  '## 2. 功能边界',
-  '## 3. 约束条件',
-  '## 4. 成功标准',
+  '## 2. 功能需求',
+  '## 3. 非功能需求',
 ];
 
 const GREENFIELD_SECTIONS = [
   '### 1.1 问题陈述',
   '### 1.2 业务价值',
-  '### 2.1 范围内',
-  '### 2.2 范围外',
+  '### 2.1 核心功能',
+  '### 2.2 用户旅程',
 ];
 
 const ITERATION_SECTIONS = [
-  '### 1.1 当前问题',
-  '### 1.2 改进目标',
-  '### 2.1 变更范围',
-  '### 2.2 影响分析',
+  '### 1.1 现有功能',
+  '### 1.2 存在问题',
+  '### 2.1 改进方向',
+  '### 2.2 成功指标',
 ];
 
 // ─── 元信息解析 ──────────────────────────────────────────
@@ -52,31 +52,40 @@ function parseMetadata(content: string): PrdMetadata {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) return {};
 
-  const yaml = match[1];
-  const meta: PrdMetadata = {};
-
-  const scenarioMatch = yaml.match(/scenario:\s*"([^"]*)"/);
-  if (scenarioMatch) meta.scenario = scenarioMatch[1];
-
-  const reasonMatch = yaml.match(/scenario_reason:\s*"([^"]*)"/);
-  if (reasonMatch) meta.scenario_reason = reasonMatch[1];
-
-  const pathsMatch = yaml.match(/evidence_paths:\s*\[(.*?)\]/);
-  if (pathsMatch) {
-    meta.evidence_paths = pathsMatch[1]
-      .split(',')
-      .map(p => p.trim().replace(/"/g, ''))
-      .filter(Boolean);
+  let parsed: Record<string, unknown>;
+  try {
+    const loaded = yaml.load(match[1], { schema: yaml.JSON_SCHEMA });
+    if (!loaded || typeof loaded !== 'object' || Array.isArray(loaded)) return {};
+    parsed = loaded as Record<string, unknown>;
+  } catch {
+    return {};
   }
 
-  const complexityMatch = yaml.match(/complexity:\s*"([^"]*)"/);
-  if (complexityMatch) meta.complexity = complexityMatch[1];
+  const meta: PrdMetadata = {};
 
-  const createdMatch = yaml.match(/created_at:\s*"([^"]*)"/);
-  if (createdMatch) meta.created_at = createdMatch[1];
-
-  const updatedMatch = yaml.match(/last_updated:\s*"([^"]*)"/);
-  if (updatedMatch) meta.last_updated = updatedMatch[1];
+  if (typeof parsed.scenario === 'string') {
+    meta.scenario = parsed.scenario;
+  }
+  if (typeof parsed.scenario_reason === 'string') {
+    meta.scenario_reason = parsed.scenario_reason;
+  }
+  if (Array.isArray(parsed.evidence_paths)) {
+    meta.evidence_paths = parsed.evidence_paths
+      .filter((item): item is string => typeof item === 'string')
+      .map(item => item.trim())
+      .filter(Boolean);
+  } else if (typeof parsed.evidence_paths === 'string' && parsed.evidence_paths.trim().length > 0) {
+    meta.evidence_paths = [parsed.evidence_paths.trim()];
+  }
+  if (typeof parsed.complexity === 'string') {
+    meta.complexity = parsed.complexity;
+  }
+  if (typeof parsed.created_at === 'string') {
+    meta.created_at = parsed.created_at;
+  }
+  if (typeof parsed.last_updated === 'string') {
+    meta.last_updated = parsed.last_updated;
+  }
 
   return meta;
 }

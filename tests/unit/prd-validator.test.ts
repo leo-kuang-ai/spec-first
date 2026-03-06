@@ -33,16 +33,13 @@ last_updated: "2026-03-05T00:00:00Z"
 ### 1.2 业务价值
 测试内容
 
-## 2. 功能边界
-### 2.1 范围内
+## 2. 功能需求
+### 2.1 核心功能
 测试内容
-### 2.2 范围外
-测试内容
-
-## 3. 约束条件
+### 2.2 用户故事
 测试内容
 
-## 4. 成功标准
+## 3. 非功能需求
 测试内容
 `;
     writeFileSync(prdPath, content, 'utf-8');
@@ -69,7 +66,7 @@ complexity: "Simple"
     const result = validatePrd(prdPath);
     expect(result.valid).toBe(false);
     expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors.some(e => e.includes('功能边界'))).toBe(true);
+    expect(result.errors.some(e => e.includes('功能需求'))).toBe(true);
   });
 
   it('scenario not determined', () => {
@@ -83,9 +80,8 @@ complexity: "待判定"
 # PRD — TEST-001
 
 ## 1. 业务目标
-## 2. 功能边界
-## 3. 约束条件
-## 4. 成功标准
+## 2. 功能需求
+## 3. 非功能需求
 `;
     writeFileSync(prdPath, content, 'utf-8');
     const result = validatePrd(prdPath);
@@ -106,11 +102,10 @@ complexity: "Simple"
 
 ## 1. 业务目标
 [placeholder]
-## 2. 功能边界
+## 2. 功能需求
 [placeholder]
-## 3. 约束条件
+## 3. 非功能需求
 [placeholder]
-## 4. 成功标准
 [placeholder]
 `;
     writeFileSync(prdPath, content, 'utf-8');

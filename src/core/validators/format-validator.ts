@@ -39,7 +39,7 @@ function validatePrdFormat(featureId: string, projectRoot: string): string[] {
   const content = readMarkdown(prdPath);
   const errors: string[] = [];
 
-  // 检查必需章节格式：## 1. 业务目标
+  // 与 prd-validator 统一：检查 PRD 必需章节
   const requiredChapters = [
     { pattern: /^## 1\. 业务目标/m, name: '1. 业务目标' },
     { pattern: /^## 2\. 功能需求/m, name: '2. 功能需求' },

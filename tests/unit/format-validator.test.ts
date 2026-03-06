@@ -41,6 +41,8 @@ describe('format-validator', () => {
   });
 
   it('should detect invalid ID format with extra hyphens', () => {
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'),
+      '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
       'Feature ID: TEST-FEAT-001\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'traceability-matrix.md'),

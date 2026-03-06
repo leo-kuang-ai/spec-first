@@ -7,6 +7,7 @@ import type { CoverageMetrics, MatrixRow, MatrixStatus } from '../../shared/type
 import { parseMatrix } from './matrix.js';
 import { validateExceptions } from './exception-validator.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
+import { buildRowIndex, collectUpstreamAncestors, hasAnyUpstreamAncestor } from './upstream-lineage.js';
 
 /** 排除状态：不计入有效分母 */
 const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set([
@@ -32,16 +33,17 @@ export function getCoverage(
   const dsRows = active.filter(r => r.type === 'DS');
   const taskRows = active.filter(r => r.type === 'TASK');
   const tcRows = active.filter(r => r.type === 'TC');
+  const rowIndex = buildRowIndex(active);
 
   return {
     C1: calcDesignCoverage(frRows, dsRows),
     C2: calcApiCoverage(frRows, dsRows),
-    C3: calcTaskCoverage(frRows, taskRows),
+    C3: calcTaskCoverage(frRows, taskRows, rowIndex),
     C4: calcTestCoverageFR(frRows, tcRows),
     C5: calcTestCoverageAC(frRows, tcRows),
     C6: calcImplCoverage(taskRows),
     C7: calcPrCompliance(taskRows),
-    C8: calcTaskCompliance(taskRows, frRows),
+    C8: calcTaskCompliance(taskRows, frRows, dsRows, rowIndex),
     C9: calcTcCompliance(tcRows, frRows),
   };
 }
@@ -59,8 +61,25 @@ function calcApiCoverage(frRows: MatrixRow[], dsRows: MatrixRow[]): number {
 }
 
 /** C3: Task Coverage — FR 中有 TASK 映射的比例 */
-function calcTaskCoverage(frRows: MatrixRow[], taskRows: MatrixRow[]): number {
-  return calcUpstreamCoverage(frRows, taskRows);
+function calcTaskCoverage(
+  frRows: MatrixRow[],
+  taskRows: MatrixRow[],
+  rowIndex: ReadonlyMap<string, MatrixRow>,
+): number {
+  if (frRows.length === 0) return 1;
+  if (taskRows.length === 0) return 0;
+
+  const frIds = new Set(frRows.map((r) => r.id));
+  const coveredFrIds = new Set<string>();
+
+  for (const task of taskRows) {
+    const ancestors = collectUpstreamAncestors(task.id, rowIndex);
+    for (const ancestorId of ancestors) {
+      if (frIds.has(ancestorId)) coveredFrIds.add(ancestorId);
+    }
+  }
+
+  return pct(coveredFrIds.size, frRows.length);
 }
 
 /** C4: Test Coverage (FR) — FR 中有 TC 映射的比例 */
@@ -91,12 +110,23 @@ function calcPrCompliance(taskRows: MatrixRow[]): number {
   return pct(linked.length, taskRows.length);
 }
 
-/** C8: Task Compliance — TASK 有上游 FR 的比例（反向：无孤儿 TASK） */
-function calcTaskCompliance(taskRows: MatrixRow[], frRows: MatrixRow[]): number {
+/** C8: Task Compliance — TASK 有上游 FR/NFR/DS 的比例（反向：无孤儿 TASK） */
+function calcTaskCompliance(
+  taskRows: MatrixRow[],
+  frRows: MatrixRow[],
+  dsRows: MatrixRow[],
+  rowIndex: ReadonlyMap<string, MatrixRow>,
+): number {
   if (taskRows.length === 0) return 1;
-  const frIds = new Set(frRows.map(r => r.id));
+
+  // C8 定义：TASK 关联 FR/NFR/DS 即视为合规
+  const allowedUpstreamIds = new Set<string>([
+    ...frRows.map((r) => r.id),
+    ...dsRows.map((r) => r.id),
+  ]);
+
   const compliant = taskRows.filter(r =>
-    r.upstream?.some(u => frIds.has(u)),
+    hasAnyUpstreamAncestor(r.id, allowedUpstreamIds, rowIndex),
   );
   return pct(compliant.length, taskRows.length);
 }

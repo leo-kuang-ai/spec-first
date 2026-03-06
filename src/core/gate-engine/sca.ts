@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import type { Stage, MatrixRow } from '../../shared/types.js';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
+import { buildRowIndex, collectUpstreamAncestors } from '../trace-engine/upstream-lineage.js';
 
 export interface ScaCheckItem {
   rule: string;
@@ -129,10 +130,18 @@ function checkPlan(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
   const frRows = rows.filter(r => r.type === 'FR');
   const taskRows = rows.filter(r => r.type === 'TASK');
-  const taskUpstreams = new Set(taskRows.flatMap(r => r.upstream ?? []));
+  const rowIndex = buildRowIndex(rows);
+  const mappedFr = new Set<string>();
+  const frIds = new Set(frRows.map((r) => r.id));
+  for (const task of taskRows) {
+    const ancestors = collectUpstreamAncestors(task.id, rowIndex);
+    for (const ancestorId of ancestors) {
+      if (frIds.has(ancestorId)) mappedFr.add(ancestorId);
+    }
+  }
 
   // 每个 FR 必须有对应 TASK
-  const unmapped = frRows.filter(r => !taskUpstreams.has(r.id));
+  const unmapped = frRows.filter(r => !mappedFr.has(r.id));
   checks.push({
     rule: 'SCA-PLAN-01: FR→TASK 映射完整性',
     pass: unmapped.length === 0,
@@ -236,7 +245,15 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
     }
 
     const dsUpstream = new Set(rows.filter((r) => r.type === 'DS').flatMap((r) => r.upstream ?? []));
-    const taskUpstream = new Set(rows.filter((r) => r.type === 'TASK').flatMap((r) => r.upstream ?? []));
+    const rowIndex = buildRowIndex(rows);
+    const frIds = new Set(frRows.map((r) => r.id));
+    const taskMappedFr = new Set<string>();
+    for (const task of rows.filter((r) => r.type === 'TASK')) {
+      const ancestors = collectUpstreamAncestors(task.id, rowIndex);
+      for (const ancestorId of ancestors) {
+        if (frIds.has(ancestorId)) taskMappedFr.add(ancestorId);
+      }
+    }
 
     const uncoveredByDs = frRows.filter((r) => !dsUpstream.has(r.id)).map((r) => r.id);
     if (uncoveredByDs.length > 0) {
@@ -249,7 +266,7 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       });
     }
 
-    const uncoveredByTask = frRows.filter((r) => !taskUpstream.has(r.id)).map((r) => r.id);
+    const uncoveredByTask = frRows.filter((r) => !taskMappedFr.has(r.id)).map((r) => r.id);
     if (uncoveredByTask.length > 0) {
       findings.push({
         severity: 'HIGH',

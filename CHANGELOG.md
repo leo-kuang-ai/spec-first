@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.105 2026-03-06 Claude: feat(init): 交互式引导流程优化 — runGuidedInit 改造为分步引导模式（Step 1/7 进度提示+✅实时确认反馈）；新增 printGuidedHeader/printStepHeader/printStepConfirm 等辅助函数；增强各步骤提示信息（格式要求+示例+建议值）；平台选择简化为单次输入（移除多轮切换逻辑）；最终确认展示完整参数清单 (user-visible)
 - v0.5.104 2026-03-06 Claude: feat(viewer): 优化仪表盘数据可视化 — 健康仪表盘渐变色环形图+悬停提示+阴影效果；整体布局侧边栏宽度优化+间距统一；交互动画节点悬停+点击反馈+平滑滚动 (user-visible)
 - v0.5.103 2026-03-05 Claude: feat(spec): spec-first:spec 新增 Phase 0.0/0.2/0.5 增强功能（零代码方案） — Phase 0.0 Feature 快速初始化防止信息丢失；Phase 0.2 质量扫描+自动上下文收集（先做后问原则）；Phase 0.5 PRD 补全对话（三道门禁：可推导性/影响性/优先级 + 一问一答规则）；findings.md 新增 quality_score 字段；成功标准更新为 Phase 0.0-0.6 全部完成 (user-visible)
 - v0.5.102 2026-03-05 Codex: fix(governance): 修复 4 个合规缺口 — `commit`/`pre-commit` 将删除文件纳入源码变更治理（`--diff-filter=ACMRD`）；pre-commit 改为逐行安全读取暂存文件以兼容含空格路径；已有 spec-first hook 安装时会自动升级为最新模板；C11 新增主 Constitution 内容哈希一致性校验（版本一致但内容漂移时阻断，支持显式 override）(user-visible)

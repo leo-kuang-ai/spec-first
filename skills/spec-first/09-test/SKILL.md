@@ -2,7 +2,7 @@
 name: "spec-first:test"
 description: "定位 Feature 并校验阶段为验证测试（05_verify）"
 version: 1.1.0
-last_updated: {{DATE}}
+last_updated: 2026-03-05
 changelog: |
   v1.1.0: 新增 Announce at Start、字面即精神原则、When to Use、TDD 原则、测试层级详解、测试用例结构规范、决策流程图、references/ 目录、hooks 配置
   v1.0.0: Initial version with standardized metadata
@@ -289,6 +289,20 @@ digraph test_generation_flow {
 
 - **阶段**：05_verify
 - **Command**：`/spec-first:test`
+
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 的阶段不匹配 → 报错并终止
 
 ## 执行阶段
 

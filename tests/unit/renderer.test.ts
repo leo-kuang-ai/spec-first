@@ -59,4 +59,11 @@ describe('renderToString', () => {
     const result = renderToString('init/inline', CTX, TMP);
     expect(result).toBe('Hello Leo!');
   });
+
+  it('should fallback to package built-in templates when project templates are missing', () => {
+    const result = renderToString('init/constitution.md', CTX, TMP);
+    expect(result).toContain('Constitution');
+    expect(result).toContain('User Auth');
+    expect(result).toContain('Leo');
+  });
 });

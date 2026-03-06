@@ -9,6 +9,7 @@
  */
 import { join, dirname } from 'node:path';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import Handlebars from 'handlebars';
 import { exists, ensureDir, writeMarkdown } from '../../shared/fs-utils.js';
 
@@ -32,6 +33,21 @@ const LOCAL_TEMPLATE_DIR = '.spec-first/local/templates';
 /** 包级基线模板目录 */
 const META_TEMPLATE_DIR = '.spec-first/meta/templates';
 
+/** 当前模块所在目录（用于定位包内默认模板） */
+const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
+
+function findBuiltInTemplatePath(fileName: string): string | null {
+  let current = MODULE_DIR;
+  for (let i = 0; i < 8; i += 1) {
+    const candidate = join(current, TEMPLATE_DIR, fileName);
+    if (exists(candidate)) return candidate;
+    const parent = dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  return null;
+}
+
 /**
  * 查找模板文件的完整路径
  * 按优先级查找：local → meta → 包内 templates
@@ -48,9 +64,13 @@ function findTemplatePath(templateName: string, projectRoot: string): string | n
   const metaPath = join(projectRoot, META_TEMPLATE_DIR, fileName);
   if (exists(metaPath)) return metaPath;
 
-  // 3. 最后查找包内默认
-  const defaultPath = join(projectRoot, TEMPLATE_DIR, fileName);
-  if (exists(defaultPath)) return defaultPath;
+  // 3. 项目目录下的 templates（兼容测试场景与项目内模板覆盖）
+  const projectTemplatePath = join(projectRoot, TEMPLATE_DIR, fileName);
+  if (exists(projectTemplatePath)) return projectTemplatePath;
+
+  // 4. 最后查找包内默认（从当前模块目录向上回溯）
+  const builtInPath = findBuiltInTemplatePath(fileName);
+  if (builtInPath) return builtInPath;
 
   return null;
 }

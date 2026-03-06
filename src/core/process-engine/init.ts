@@ -17,6 +17,8 @@ import {
 import { renderDefaultConfigYaml, resetConfigCache } from '../../shared/config-schema.js';
 import { mergeLayerRules } from './layer-merger.js';
 import type { MergedRules } from './layer-merger.js';
+import { renderToString } from '../template/renderer.js';
+import type { TemplateContext } from '../template/renderer.js';
 
 // ─── 类型 ────────────────────────────────────────────────
 
@@ -311,33 +313,31 @@ last_updated: "${today}"
 - [指标 1]: [目标值]
 - [指标 2]: [目标值]
 
-## 2. 功能边界
+## 2. 功能需求
 
-### 2.1 范围内（In Scope）
+### 2.1 核心功能
 
-**核心功能**：
 - [功能 1]
 - [功能 2]
 
-### 2.2 范围外（Out of Scope）
+### 2.2 用户故事
 
-**本期不做**：
-- [不做的功能 1]
-- [不做的功能 2]
+- 作为 [角色]，我希望 [能力]，以便 [价值]
+- 作为 [角色]，我希望 [能力]，以便 [价值]
 
-## 3. 约束条件
+## 3. 非功能需求
 
-### 3.1 技术约束
+### 3.1 性能需求
 
-- [约束 1]
-- [约束 2]
+- [性能要求 1]
+- [性能要求 2]
 
-### 3.2 业务约束
+### 3.2 安全与合规
 
-- [约束 1]
-- [约束 2]
+- [安全要求 1]
+- [合规要求 1]
 
-## 4. 成功标准
+## 4. 验收与成功标准
 
 - [ ] 所有核心功能已实现
 - [ ] 质量标准达标
@@ -351,28 +351,56 @@ last_updated: "${today}"
 `;
 }
 
-function skeletonConstitution(featureId: string, projectRoot: string): string {
-  const globalPath = join(projectRoot, '.spec-first', 'constitution.md');
-  if (exists(globalPath)) {
-    return ensureConstitutionMeta(readMarkdown(globalPath));
-  }
-  return ensureConstitutionMeta(
-    `# Constitution — ${featureId}\n\n`
+function buildConstitutionTemplateContext(opts: InitOptions, featureId: string): TemplateContext {
+  return {
+    featureId,
+    title: opts.title,
+    mode: opts.mode,
+    size: opts.size,
+    platforms: opts.platforms,
+    timestamp: new Date().toISOString(),
+    author: opts.author,
+  };
+}
+
+function fallbackConstitution(featureId: string): string {
+  return `# Constitution — ${featureId}\n\n`
     + `> 项目宪法副本。请在 .spec-first/constitution.md 中维护主版本。\n\n`
     + `## Core Principles\n\n`
     + `1. 规范先行（Specification First）\n`
     + `2. 全链路追踪（Traceability）\n`
-    + `3. 质量门禁（Quality Gates）\n\n`,
-  );
+    + `3. 质量门禁（Quality Gates）\n\n`;
+}
+
+function skeletonConstitution(opts: InitOptions, featureId: string): string {
+  const globalPath = join(opts.projectRoot, '.spec-first', 'constitution.md');
+  if (exists(globalPath)) {
+    return ensureConstitutionMeta(readMarkdown(globalPath));
+  }
+
+  const ctx = buildConstitutionTemplateContext(opts, featureId);
+  try {
+    return ensureConstitutionMeta(renderToString('init/constitution.md', ctx, opts.projectRoot));
+  } catch {
+    // 模板缺失/损坏时降级到内置骨架，避免 init 失败
+    return ensureConstitutionMeta(fallbackConstitution(featureId));
+  }
 }
 
 function ensureConstitutionMeta(content: string): string {
   const today = new Date().toISOString().slice(0, 10);
   let next = content.trimEnd();
+  const dateOrDateTime = '\\d{4}-\\d{2}-\\d{2}(?:[T\\s]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})?)?';
 
   const hasVersion = /(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*[vV]?\d+\.\d+\.\d+/i.test(next);
-  const hasRatified = /(?:\*\*)?\s*(?:ratified|批准日期|通过日期|生效日期)\s*(?:\*\*)?\s*[:：]\s*\d{4}-\d{2}-\d{2}/i.test(next);
-  const hasLastAmended = /(?:\*\*)?\s*(?:last[_\s-]*amended|最近修订|最后修订)\s*(?:\*\*)?\s*[:：]\s*\d{4}-\d{2}-\d{2}/i.test(next);
+  const hasRatified = new RegExp(
+    `(?:\\*\\*)?\\s*(?:ratified|批准日期|通过日期|生效日期)\\s*(?:\\*\\*)?\\s*[:：]\\s*${dateOrDateTime}`,
+    'i',
+  ).test(next);
+  const hasLastAmended = new RegExp(
+    `(?:\\*\\*)?\\s*(?:last[_\\s-]*amended|最近修订|最后修订)\\s*(?:\\*\\*)?\\s*[:：]\\s*${dateOrDateTime}`,
+    'i',
+  ).test(next);
   const hasAmendmentHistory = /(?:^|\n)##\s*(amendment history|修订历史)\b/i.test(next);
 
   if (!hasVersion || !hasRatified || !hasLastAmended) {
@@ -511,7 +539,7 @@ function writeFeatureSkeleton(
   writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
   writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
   writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
-  writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(featureId, opts.projectRoot));
+  writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(opts, featureId));
 
   // 可选预置 PRD 骨架（不替代 Phase 0 完整产出）
   writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));

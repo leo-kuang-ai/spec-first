@@ -1,9 +1,9 @@
 ---
 name: "spec-first:analyze"
 description: "执行跨产物一致性分析并生成分析报告"
-version: 1.0.0
-last_updated: {{DATE}}
-changelog: Initial version with standardized metadata
+version: 1.1.0
+last_updated: 2026-03-05
+changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
 # Skill: analyze
@@ -14,8 +14,22 @@ changelog: Initial version with standardized metadata
 - 阶段: 建议在 03_plan 前后执行（任意阶段可读分析）
 - Command: `/spec-first:analyze`
 
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 不存在 → 报错并终止
+
 ## 执行阶段
-- P0: 定位 Feature，收集基础产物路径
+- P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），收集基础产物路径
 - P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`
 - P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突）
 - P3: 与用户确认高严重度项（CRITICAL/HIGH）

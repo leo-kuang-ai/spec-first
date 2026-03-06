@@ -56,6 +56,23 @@ describe('installHooks', () => {
     expect(content).toContain('echo custom-pre-commit');
     expect(content).toContain('spec-first-hook');
   });
+
+  it('should refresh existing spec-first hook block to latest template', () => {
+    const preCommitPath = join(TMP, '.git', 'hooks', 'pre-commit');
+    writeFileSync(
+      preCommitPath,
+      '#!/bin/sh\necho custom-pre-commit\n\n#!/bin/sh\n# spec-first-hook\necho OLD_PRECOMMIT_TEMPLATE\n',
+      'utf-8',
+    );
+
+    installHooks(TMP);
+    const content = readFileSync(preCommitPath, 'utf-8');
+
+    expect(content).toContain('echo custom-pre-commit');
+    expect(content).not.toContain('OLD_PRECOMMIT_TEMPLATE');
+    expect(content).toContain('--diff-filter=ACMRD');
+    expect(content).toContain('while IFS= read -r FILE');
+  });
 });
 
 describe('uninstallHooks', () => {

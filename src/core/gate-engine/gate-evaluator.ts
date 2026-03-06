@@ -3,6 +3,7 @@
  * 读取 stage-state → 评估当前阶段 Gate 条件 → 检查豁免 → 输出三态结果
  */
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { readFileSync, statSync } from 'node:fs';
 import type {
   Stage, GateStatus, GateResult, ConditionResult, WaiverRef,
@@ -17,6 +18,7 @@ import { getCriticalCountFromAnalysisReport, analyzeArtifacts } from './sca.js';
 import { runCommandGate } from './command-gate.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
 import { validatePrd } from './prd-validator.js';
+import { buildRowIndex, collectUpstreamAncestors } from '../trace-engine/upstream-lineage.js';
 
 // ─── Gate 条件定义 ─────────────────────────────────────────
 
@@ -513,6 +515,11 @@ function evaluateConstitutionCompliance(featureId: string, projectRoot: string):
     failures.push('design.md missing constitution clause reference');
   }
 
+  const mainCopy = evaluateConstitutionMainCopyConsistency(projectRoot, constitution, meta);
+  if (!mainCopy.pass) {
+    failures.push(...mainCopy.failures);
+  }
+
   const authorityMapping = evaluateConstitutionAuthorityMapping(projectRoot);
   if (!authorityMapping.pass) {
     failures.push(...authorityMapping.failures);
@@ -597,6 +604,18 @@ function getC11FailureFixHints(featureId: string, failures: string[]): string[] 
       push(`specs/${featureId}/design.md: add 'Constitution Clause <id> (v<version>)' references`);
       continue;
     }
+    if (failure === 'global constitution missing version') {
+      push('.spec-first/constitution.md: set semantic Version (e.g. 1.1.0)');
+      continue;
+    }
+    if (failure.startsWith('global constitution version mismatch')) {
+      push(`specs/${featureId}/constitution.md: sync Version with .spec-first/constitution.md or add explicit override reason`);
+      continue;
+    }
+    if (failure.startsWith('global constitution content mismatch')) {
+      push(`specs/${featureId}/constitution.md: sync content with .spec-first/constitution.md or add explicit override reason`);
+      continue;
+    }
     if (failure === 'constitution-authority.md missing') {
       push('skills/spec-first/03-spec/references/constitution-authority.md: create authority mapping doc');
       continue;
@@ -672,8 +691,15 @@ function parseConstitutionMeta(content: string): {
   hasAmendmentHistory: boolean;
 } {
   const versionMatch = content.match(/(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*([vV]?\d+\.\d+\.\d+)/i);
-  const ratifiedMatch = content.match(/(?:\*\*)?\s*(?:ratified|批准日期|通过日期|生效日期)\s*(?:\*\*)?\s*[:：]\s*(\d{4}-\d{2}-\d{2})/i);
-  const amendedMatch = content.match(/(?:\*\*)?\s*(?:last[_\s-]*amended|最近修订|最后修订)\s*(?:\*\*)?\s*[:：]\s*(\d{4}-\d{2}-\d{2})/i);
+  const dateOrDateTime = '(\\d{4}-\\d{2}-\\d{2}(?:[T\\s]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})?)?)';
+  const ratifiedMatch = content.match(new RegExp(
+    `(?:\\*\\*)?\\s*(?:ratified|批准日期|通过日期|生效日期)\\s*(?:\\*\\*)?\\s*[:：]\\s*${dateOrDateTime}`,
+    'i',
+  ));
+  const amendedMatch = content.match(new RegExp(
+    `(?:\\*\\*)?\\s*(?:last[_\\s-]*amended|最近修订|最后修订)\\s*(?:\\*\\*)?\\s*[:：]\\s*${dateOrDateTime}`,
+    'i',
+  ));
   const hasAmendmentHistory = /(?:^|\n)##\s*(amendment history|修订历史)\b/i.test(content)
     || /(?:amendment history|修订历史)/i.test(content);
   return {
@@ -682,6 +708,63 @@ function parseConstitutionMeta(content: string): {
     lastAmended: amendedMatch?.[1],
     hasAmendmentHistory,
   };
+}
+
+function evaluateConstitutionMainCopyConsistency(
+  projectRoot: string,
+  featureConstitution: string,
+  featureMeta: { version?: string },
+): { pass: boolean; failures: string[] } {
+  const globalPath = join(projectRoot, '.spec-first', 'constitution.md');
+  if (!exists(globalPath)) return { pass: true, failures: [] };
+
+  const globalContent = readFileSync(globalPath, 'utf-8');
+  const globalMeta = parseConstitutionMeta(globalContent);
+  const failures: string[] = [];
+
+  if (!globalMeta.version) {
+    failures.push('global constitution missing version');
+    return { pass: false, failures };
+  }
+
+  const globalVersion = normalizeSemver(globalMeta.version);
+  const featureVersion = normalizeSemver(featureMeta.version);
+  if (!globalVersion || !featureVersion) return { pass: failures.length === 0, failures };
+
+  const hasOverrideReason = hasConstitutionOverrideReason(featureConstitution);
+
+  if (globalVersion !== featureVersion) {
+    if (!hasOverrideReason) {
+      failures.push(`global constitution version mismatch (global=${globalVersion}, feature=${featureVersion})`);
+    }
+  }
+
+  const globalHash = hashNormalizedConstitution(globalContent);
+  const featureHash = hashNormalizedConstitution(featureConstitution);
+  if (globalHash !== featureHash && !hasOverrideReason) {
+    failures.push(`global constitution content mismatch (global_sha256=${globalHash}, feature_sha256=${featureHash})`);
+  }
+
+  return { pass: failures.length === 0, failures };
+}
+
+function normalizeSemver(version?: string): string | undefined {
+  return version?.trim().replace(/^v/i, '');
+}
+
+function hasConstitutionOverrideReason(content: string): boolean {
+  return /(feature\s*override|特例覆盖|覆盖原因|override\s*reason)/i.test(content);
+}
+
+function hashNormalizedConstitution(content: string): string {
+  const normalized = content
+    .replace(/^\uFEFF/, '')
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => line.replace(/[ \t]+$/g, ''))
+    .join('\n')
+    .trim();
+  return createHash('sha256').update(normalized).digest('hex');
 }
 
 function hasConstitutionReference(designContent: string, version?: string): boolean {
@@ -729,9 +812,19 @@ function getUncoveredFrIds(
 
   const covered = new Set<string>();
   const downstreamRows = rows.filter((r) => r.type === downstreamType);
+  const rowIndex = buildRowIndex(rows);
+  const frIds = new Set(frRows.map((fr) => fr.id));
   for (const row of downstreamRows) {
-    for (const up of row.upstream ?? []) {
-      covered.add(up);
+    if (downstreamType === 'TASK') {
+      const ancestors = collectUpstreamAncestors(row.id, rowIndex);
+      for (const ancestorId of ancestors) {
+        if (frIds.has(ancestorId)) covered.add(ancestorId);
+      }
+      continue;
+    }
+
+    for (const upstreamId of row.upstream ?? []) {
+      covered.add(upstreamId);
     }
   }
 

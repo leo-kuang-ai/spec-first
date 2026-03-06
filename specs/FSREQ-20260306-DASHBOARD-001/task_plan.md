@@ -14,9 +14,9 @@ Phase 3: Planning
 
 | Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |
 |---------|------|-------|----------|--------|------------|----------|------|
-| TASK-DASHBOARD-001 | 健康仪表盘样式优化 | FE | 0.3d | FR-DASHBOARD-001 | - | 环形图渐变色、柱状图tooltip、卡片阴影生效 | complete |
-| TASK-DASHBOARD-002 | 整体布局样式优化 | FE | 0.2d | FR-DASHBOARD-002 | - | 侧边栏、间距、响应式优化生效 | complete |
-| TASK-DASHBOARD-003 | 交互动画优化 | FE | 0.2d | FR-DASHBOARD-003 | TASK-DASHBOARD-001,TASK-DASHBOARD-002 | 悬停动画、点击反馈、平滑滚动生效 | complete |
+| TASK-DASHBOARD-001 | 健康仪表盘样式优化 | FE | 0.3d | FR-DASHBOARD-001 | - | 环形图渐变色、柱状图tooltip、卡片阴影生效 | verified |
+| TASK-DASHBOARD-002 | 整体布局样式优化 | FE | 0.2d | FR-DASHBOARD-002 | - | 侧边栏、间距、响应式优化生效 | verified |
+| TASK-DASHBOARD-003 | 交互动画优化 | FE | 0.2d | FR-DASHBOARD-003 | TASK-DASHBOARD-001,TASK-DASHBOARD-002 | 悬停动画、点击反馈、平滑滚动生效 | verified |
 
 ---
 ## 任务详细定义

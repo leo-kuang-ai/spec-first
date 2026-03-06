@@ -1,5 +1,7 @@
 # Agent C2 — 研发规范与本地环境
 
+> **适用模式**: deep 模式专用（quick 模式不生成这两个文档）
+
 > 第二波派发（P1b 完成后）。依赖 P1b Context7 映射结果 + C1 完成。
 > 内部串行：development-guidelines.md → local-setup.md
 > 输出被使用：local-setup.md 被 A4 使用（如 A4 需要外部服务信息）

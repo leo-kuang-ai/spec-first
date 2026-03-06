@@ -1,9 +1,9 @@
 ---
 name: "spec-first:sync"
 description: "定位 Feature 并同步追踪矩阵与状态"
-version: 1.0.0
-last_updated: {{DATE}}
-changelog: Initial version with standardized metadata
+version: 1.1.0
+last_updated: 2026-03-05
+changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
 # Skill: sync
@@ -14,8 +14,22 @@ changelog: Initial version with standardized metadata
 - 阶段: 任意（不限阶段）
 - Command: `/spec-first:sync`
 
+
+## Feature 定位规则
+
+### 优先级
+
+1. **显式参数**: 用户提供 featureId 参数时直接使用
+2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
+3. **交互式**: 列出可用 Feature 供用户选择
+
+### 错误处理
+
+- `.spec-first/current` 不存在或为空 → 降级到交互式
+- 指定 Feature 不存在 → 报错并终止
+
 ## 执行阶段
-- P0: 定位 Feature，检测变更文件
+- P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），检测变更文件
 - P1: 加载矩阵、RFC 状态、缺陷状态
 - P2: 生成同步计划（回填矩阵、更新状态）
 - P3: 与用户确认同步变更
