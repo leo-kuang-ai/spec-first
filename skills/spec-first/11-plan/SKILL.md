@@ -43,6 +43,10 @@ metadata:
 I'm using the plan skill to generate an execution plan for [Feature].
 ```
 
+## 触发条件
+
+- Command: `/spec-first:plan [featureId]`
+
 ## 字面即精神原则
 
 **Violating the letter of these rules is violating the spirit of these rules.**

@@ -29,7 +29,7 @@ hooks:
         - type: checkpoint
           message: "[task] 检查清单：任务粒度？依赖完整？验收标准？references 已引用？"
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   phase: "stable"
   category: "spec-phase"
 ---
@@ -567,4 +567,3 @@ Phase 2: Implementation
 - 验收标准补充
 - 执行方式选择
 ```
-

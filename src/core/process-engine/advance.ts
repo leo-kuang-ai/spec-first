@@ -30,8 +30,8 @@ export class GateFailedError extends Error {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AdvanceOptions {
-  force?: boolean;
 }
 
 export interface AdvanceResult {
@@ -90,7 +90,7 @@ function saveState(featureId: string, root: string, state: StageState): void {
 export function advance(
   featureId: string,
   projectRoot: string,
-  options: AdvanceOptions = {},
+  _options: AdvanceOptions = {},
 ): AdvanceResult {
   resetConfigCache();
   const state = loadState(featureId, projectRoot);
@@ -105,59 +105,52 @@ export function advance(
 
   let gateResult: string;
 
-  if (options.force) {
-    // --force 路径：跳过 Gate 和依赖检查
-    gateResult = 'FORCE_SKIPPED';
+  // 正常路径：先执行依赖检查，再执行 Gate 校验
+  const depCheck = checkDependencies(featureId, to, projectRoot);
+  if (!depCheck.pass) {
     appendFindings(featureId, projectRoot,
-      `FORCE_SKIPPED: ${from} → ${to} (gate check bypassed)`);
-  } else {
-    // 正常路径：先执行依赖检查，再执行 Gate 校验
-    const depCheck = checkDependencies(featureId, to, projectRoot);
-    if (!depCheck.pass) {
-      appendFindings(featureId, projectRoot,
-        `DEPENDENCY_CHECK_FAIL: 缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`);
+      `DEPENDENCY_CHECK_FAIL: 缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`);
+    throw new GateFailedError(
+      `阶段 ${to} 的依赖检查未通过。缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`
+    );
+  }
+
+  try {
+    const gate = evaluateGate(featureId, projectRoot);
+    gateResult = gate.status;
+    if (gate.status === 'FAIL') {
       throw new GateFailedError(
-        `阶段 ${to} 的依赖检查未通过。缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`
+        `阶段 ${from} 的 Gate 未通过。请先修复失败条件，再推进 ${from} → ${to}。`,
       );
     }
-
-    try {
-      const gate = evaluateGate(featureId, projectRoot);
-      gateResult = gate.status;
-      if (gate.status === 'FAIL') {
-        throw new GateFailedError(
-          `阶段 ${from} 的 Gate 未通过。请先修复失败条件，再推进 ${from} → ${to}。`,
+  } catch (e) {
+    if (e instanceof GateFailedError) {
+      throw e;
+    }
+    if (e instanceof GateUnavailableError) {
+      const config = loadConfig(projectRoot);
+      if (config.gate.pilot_mode) {
+        gateResult = 'PILOT_PASS';
+        appendFindings(featureId, projectRoot,
+          `PILOT_PASS: ${from} → ${to} (gate unavailable, pilot_mode=true)`);
+      } else {
+        throw new GateUnavailableError(
+          `Gate 检查不可用且 pilot_mode=false。` +
+          `无法推进 ${from} → ${to}。请开启 pilot_mode。`
         );
       }
-    } catch (e) {
-      if (e instanceof GateFailedError) {
-        throw e;
-      }
-      if (e instanceof GateUnavailableError) {
-        const config = loadConfig(projectRoot);
-        if (config.gate.pilot_mode) {
-          gateResult = 'PILOT_PASS';
-          appendFindings(featureId, projectRoot,
-            `PILOT_PASS: ${from} → ${to} (gate unavailable, pilot_mode=true)`);
-        } else {
-          throw new GateUnavailableError(
-            `Gate 检查不可用且 pilot_mode=false。` +
-            `无法推进 ${from} → ${to}。请开启 pilot_mode 或使用 --force。`
-          );
-        }
+    } else {
+      // Gate 执行异常时，按不可用降级策略处理
+      const config = loadConfig(projectRoot);
+      if (config.gate.pilot_mode) {
+        gateResult = 'PILOT_PASS';
+        appendFindings(featureId, projectRoot,
+          `PILOT_PASS: ${from} → ${to} (gate runtime error, pilot_mode=true)`);
       } else {
-        // Gate 执行异常时，按不可用降级策略处理
-        const config = loadConfig(projectRoot);
-        if (config.gate.pilot_mode) {
-          gateResult = 'PILOT_PASS';
-          appendFindings(featureId, projectRoot,
-            `PILOT_PASS: ${from} → ${to} (gate runtime error, pilot_mode=true)`);
-        } else {
-          throw new GateUnavailableError(
-            `Gate 运行异常且 pilot_mode=false。` +
-            `无法推进 ${from} → ${to}。请开启 pilot_mode 或使用 --force。`
-          );
-        }
+        throw new GateUnavailableError(
+          `Gate 运行异常且 pilot_mode=false。` +
+          `无法推进 ${from} → ${to}。请开启 pilot_mode。`
+        );
       }
     }
   }

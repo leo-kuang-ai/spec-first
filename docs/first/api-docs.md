@@ -14,6 +14,8 @@ spec-first 提供 19 个 CLI 命令，作为主要的 API 接口。
 
 #### init - 初始化 Feature 工作区
 
+(`src/cli/commands/init.ts:288` — `export async function handleInit()` — `[显式]`)
+
 ```bash
 spec-first init [options]
 ```
@@ -21,6 +23,8 @@ spec-first init [options]
 初始化新的 Feature 工作区，创建目录结构和配置文件。
 
 #### stage - 阶段流转管理
+
+(`src/cli/commands/stage.ts:22` — `export async function handleStage()` — `[显式]`)
 
 ```bash
 spec-first stage <subcommand>
@@ -32,6 +36,8 @@ spec-first stage <subcommand>
 - `cancel` - 取消 Feature
 
 #### id - 追溯 ID 管理
+
+(`src/cli/commands/id.ts:25` — `export async function handleId()` — `[显式]`)
 
 ```bash
 spec-first id <subcommand>
@@ -47,6 +53,8 @@ spec-first id <subcommand>
 
 #### gate - 质量门禁评估
 
+(`src/cli/commands/gate.ts:12` — `export async function handleGate()` — `[显式]`)
+
 ```bash
 spec-first gate [stage]
 ```
@@ -55,6 +63,8 @@ spec-first gate [stage]
 
 #### matrix - 追踪矩阵同步
 
+(`src/cli/commands/matrix.ts:7` — `export async function handleMatrix()` — `[显式]`)
+
 ```bash
 spec-first matrix
 ```
@@ -62,6 +72,8 @@ spec-first matrix
 同步追踪矩阵，计算覆盖率指标（C1-C9）。
 
 #### rfc - RFC 变更管理
+
+(`src/cli/commands/rfc.ts:12` — `export async function handleRfc()` — `[显式]`)
 
 ```bash
 spec-first rfc <subcommand>
@@ -74,6 +86,8 @@ spec-first rfc <subcommand>
 - `list` - 列出所有 RFC
 
 #### defect - 缺陷管理
+
+(`src/cli/commands/defect.ts:18` — `export async function handleDefect()` — `[显式]`)
 
 ```bash
 spec-first defect <subcommand>
@@ -88,6 +102,8 @@ spec-first defect <subcommand>
 
 #### feature - Feature 管理
 
+(`src/cli/commands/feature.ts:11` — `export async function handleFeature()` — `[显式]`)
+
 ```bash
 spec-first feature <subcommand>
 ```
@@ -99,6 +115,8 @@ spec-first feature <subcommand>
 
 #### ai - AI 上下文管理
 
+(`src/cli/commands/ai.ts:11` — `export async function handleAi()` — `[显式]`)
+
 ```bash
 spec-first ai <subcommand>
 ```
@@ -109,6 +127,8 @@ spec-first ai <subcommand>
 
 #### doctor - 环境诊断
 
+(`src/cli/commands/doctor.ts:37` — `export async function handleDoctor()` — `[显式]`)
+
 ```bash
 spec-first doctor
 ```
@@ -116,6 +136,8 @@ spec-first doctor
 诊断项目环境配置，检查依赖和配置完整性。
 
 #### metrics - 度量指标
+
+(`src/cli/commands/metrics.ts:24` — `export async function handleMetrics()` — `[显式]`)
 
 ```bash
 spec-first metrics
@@ -125,6 +147,8 @@ spec-first metrics
 
 #### commit - 规范提交
 
+(`src/cli/commands/commit.ts:15` — `export async function handleCommit()` — `[显式]`)
+
 ```bash
 spec-first commit
 ```
@@ -132,6 +156,8 @@ spec-first commit
 执行规范化 git commit，自动关联追溯 ID。
 
 #### analyze - 一致性分析
+
+(`src/cli/commands/analyze.ts:10` — `export async function handleAnalyze()` — `[显式]`)
 
 ```bash
 spec-first analyze
@@ -143,6 +169,8 @@ spec-first analyze
 
 #### setup - 注册 Skill 命令
 
+(`src/cli/commands/setup.ts:11` — `export async function handleSetup()` — `[显式]`)
+
 ```bash
 spec-first setup
 ```
@@ -150,6 +178,8 @@ spec-first setup
 注册 Claude Code 和 Codex Skill 命令。
 
 #### hooks - Git Hooks 管理
+
+(`src/cli/commands/hooks.ts:9` — `export async function handleHooks()` — `[显式]`)
 
 ```bash
 spec-first hooks <subcommand>
@@ -161,6 +191,8 @@ spec-first hooks <subcommand>
 
 #### viewer - Stage Viewer
 
+(`src/cli/commands/viewer.ts:56` — `export async function handleViewer()` — `[显式]`)
+
 ```bash
 spec-first viewer
 ```
@@ -169,6 +201,8 @@ spec-first viewer
 
 #### update - 升级刷新
 
+(`src/cli/commands/update.ts:30` — `export async function handleUpdate()` — `[显式]`)
+
 ```bash
 spec-first update
 ```
@@ -176,6 +210,8 @@ spec-first update
 升级后刷新 Skill/MCP/Hooks 配置。
 
 #### uninstall - 清理配置
+
+(`src/cli/commands/uninstall.ts:14` — `export async function handleUninstall()` — `[显式]`)
 
 ```bash
 spec-first uninstall

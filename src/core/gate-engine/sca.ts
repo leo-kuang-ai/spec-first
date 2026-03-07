@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import type { Stage, MatrixRow } from '../../shared/types.js';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
-import { createUpstreamLineage } from '../trace-engine/upstream-lineage.js';
+import { createTraceContext } from '../trace-engine/trace-context.js';
 
 export interface ScaCheckItem {
   rule: string;
@@ -128,20 +128,20 @@ function checkDesign(rows: MatrixRow[]): ScaCheckItem[] {
 
 function checkPlan(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
-  const frRows = rows.filter(r => r.type === 'FR');
-  const taskRows = rows.filter(r => r.type === 'TASK');
-  const frIds = new Set(frRows.map((r) => r.id));
-  const lineage = createUpstreamLineage(rows);
-  const mappedFr = lineage.collectCoveredTargetIds(taskRows.map((task) => task.id), frIds);
+  const trace = createTraceContext(rows);
+  const mappedFr = trace.lineage.collectCoveredTargetIds(
+    trace.taskRows.map((task) => task.id),
+    trace.frIds,
+  );
 
   // 每个 FR 必须有对应 TASK
-  const unmapped = frRows.filter(r => !mappedFr.has(r.id));
+  const unmapped = trace.frRows.filter(r => !mappedFr.has(r.id));
   checks.push({
     rule: 'SCA-PLAN-01: FR→TASK 映射完整性',
     pass: unmapped.length === 0,
     detail: unmapped.length > 0
       ? `未映射 FR：${unmapped.map(r => r.id).join(', ')}`
-      : `${frRows.length} 个 FR 全部映射到 TASK`,
+      : `${trace.frRows.length} 个 FR 全部映射到 TASK`,
   });
 
   return checks;
@@ -215,7 +215,7 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
   }
 
   const rows = parseMatrix(featureId, projectRoot);
-  const frRows = rows.filter((r) => r.type === 'FR');
+  const trace = createTraceContext(rows);
   if (rows.length === 0) {
     findings.push({
       severity: 'HIGH',
@@ -224,8 +224,8 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       detail: '追踪矩阵为空，无法完成跨产物一致性分析',
       suggestion: '先补齐 FR/DS/TASK/TC 基础行',
     });
-  } else if (frRows.length > 0) {
-    const unmappedPrd = frRows.filter((r) =>
+  } else if (trace.frRows.length > 0) {
+    const unmappedPrd = trace.frRows.filter((r) =>
       !(r.upstream ?? []).some((u) => u.startsWith('REQ-PRD-'))
     ).map((r) => r.id);
     if (unmappedPrd.length > 0) {
@@ -238,15 +238,13 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       });
     }
 
-    const dsUpstream = new Set(rows.filter((r) => r.type === 'DS').flatMap((r) => r.upstream ?? []));
-    const lineage = createUpstreamLineage(rows);
-    const frIds = new Set(frRows.map((r) => r.id));
-    const taskMappedFr = lineage.collectCoveredTargetIds(
-      rows.filter((r) => r.type === 'TASK').map((task) => task.id),
-      frIds,
+    const dsUpstream = new Set(trace.dsRows.flatMap((r) => r.upstream ?? []));
+    const taskMappedFr = trace.lineage.collectCoveredTargetIds(
+      trace.taskRows.map((task) => task.id),
+      trace.frIds,
     );
 
-    const uncoveredByDs = frRows.filter((r) => !dsUpstream.has(r.id)).map((r) => r.id);
+    const uncoveredByDs = trace.frRows.filter((r) => !dsUpstream.has(r.id)).map((r) => r.id);
     if (uncoveredByDs.length > 0) {
       findings.push({
         severity: 'HIGH',
@@ -257,7 +255,7 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       });
     }
 
-    const uncoveredByTask = frRows.filter((r) => !taskMappedFr.has(r.id)).map((r) => r.id);
+    const uncoveredByTask = trace.frRows.filter((r) => !taskMappedFr.has(r.id)).map((r) => r.id);
     if (uncoveredByTask.length > 0) {
       findings.push({
         severity: 'HIGH',

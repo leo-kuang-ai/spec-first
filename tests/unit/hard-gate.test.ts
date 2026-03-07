@@ -16,6 +16,34 @@ afterEach(() => {
 });
 
 describe('evaluateSkillHardGate', () => {
+  it('should BLOCK spec when stage is not 01_specify', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '02_design' }),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('spec', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('spec');
+  });
+
+  it('should BLOCK spec-review when stage is not 01_specify', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '02_design' }),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('spec-review', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('spec-review');
+  });
+
   it('should BLOCK code when current feature pointer is missing', () => {
     const result = evaluateSkillHardGate('code', TMP);
     expect(result.allowed).toBe(false);
@@ -33,6 +61,62 @@ describe('evaluateSkillHardGate', () => {
     const result = evaluateSkillHardGate('orchestrate', TMP);
     expect(result.allowed).toBe(true);
     expect(result.severity).toBe('PASS');
+  });
+
+  it('should BLOCK code-review when stage is not 04_implement', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '02_design' }),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('code-review', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('code-review');
+  });
+
+  it('should BLOCK research when stage is not 02_design', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '03_plan' }),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('research', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('research');
+  });
+
+  it('should BLOCK task when stage is not 03_plan', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('task', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('task');
+  });
+
+  it('should BLOCK test when stage is not 05_verify', () => {
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+
+    const result = evaluateSkillHardGate('test', TMP);
+    expect(result.allowed).toBe(false);
+    expect(result.severity).toBe('BLOCKED');
+    expect(result.reason).toContain('test');
   });
 
   it('should BLOCK code when no in_progress task exists', () => {

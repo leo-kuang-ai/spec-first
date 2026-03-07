@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.115 2026-03-06 Claude: docs(first): 创建证据注入实施总结 — 新增 evidence-injection-summary.md 记录完整实施过程（5 个文档/118 处证据/281% 达标率）、技术方案验证（Serena MCP/证据格式/模板化流程）、3 个关键发现、优化建议（P0-P2）、下一步行动计划，为自动化 Evidence Injection Agent 提供实践依据 (user-visible)
+- v0.5.114 2026-03-06 Claude: feat(first): 完成全部 5 个文档证据注入 — tech-stack.md (14/5)、api-docs.md (19/19)、local-setup.md (5/3)、domain-model.md (5/5)、architecture.md (75/10)，全部达到 deep 模式最低标准，验证 Evidence Injection 方案完整可行性，为后续自动化证据注入奠定基础 (user-visible)
+- v0.5.113 2026-03-06 Claude: feat(first): 为 domain-model.md 补充证据标注 — 添加 5 处证据标注（Stage 枚举/IdType/GateStatus/RfcStatus/DefectStatus），达到 deep 模式最低标准（5/5），完成 domain-model.md 证据注入 (user-visible)
+- v0.5.112 2026-03-06 Claude: feat(first): 为 local-setup.md 补充证据标注 — 添加 4 处证据标注（构建工具 tsup/测试框架 Vitest/代码检查 ESLint+Prettier/包管理器），达到 deep 模式最低标准（5/3），完成 local-setup.md 证据注入 (user-visible)
+- v0.5.111 2026-03-06 Claude: feat(first): 为 api-docs.md 补充 19 处证据标注 — 使用 Serena MCP 定位全部 19 个 CLI 命令实现位置（init/stage/id/gate/matrix/rfc/defect/metrics/doctor/golive/ai/commit/feature/setup/hooks/viewer/update/uninstall/analyze），添加完整证据标注（文件路径+行号+函数签名），达到 deep 模式最低标准（19/19），验证模板方案有效性 (user-visible)
+- v0.5.110 2026-03-06 Claude: feat(first): 创建 CLI 命令证据注入模板 — 新增 cli-commands-template.md（19 个命令映射表 + Serena 搜索策略），更新 api-docs-template.md 补齐全部 19 个命令（init/stage/id/gate/matrix/rfc/defect/metrics/doctor/golive/ai/commit/feature/setup/hooks/viewer/update/uninstall/analyze），为 api-docs.md 证据注入提供完整实施方案 (user-visible)
+- v0.5.109 2026-03-06 Claude: feat(first): 为 tech-stack.md 补充证据标注 — 添加 14 处证据标注（Node.js/TypeScript/ESM/tsup/Vitest/核心依赖等），符合 deep 模式要求（最低标准 5 处），验证 Evidence Injection 方案可行性 (user-visible)
 - v0.5.108 2026-03-06 Claude: feat(first): 创建证据注入模板与优化路线图 — 新增 evidence-templates/ 目录（tech-stack/api-docs 模板），创建 optimization-roadmap.md 定义 4 阶段优化计划（快速修复/证据注入/智能增强/架构重构），为实现 enhance 升级模式提供技术方案 (user-visible)
 - v0.5.107 2026-03-06 Claude: feat(first): 新增 quick→deep 升级策略文档 — 识别当前升级策略缺陷（只更新 frontmatter 未增强内容），新增 upgrade-strategy.md 定义 minimal/enhance/regenerate 三种升级模式，更新 interaction-guide.md 添加升级策略交互提示，为后续实现 Evidence Injection Agent 奠定基础 (user-visible)
 - v0.5.106 2026-03-06 Claude: refactor(first): 00-first Skill 代码结构优化 — SKILL.md 从 714 行精简至 209 行（减少 70%），提取交互逻辑到 interaction-guide.md、模式对比到 mode-comparison.md，提升可维护性与可读性 (user-visible)

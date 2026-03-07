@@ -13,6 +13,8 @@ user-invocable: true
 
 ## 执行流程
 
+- Command: `/spec-first:onboarding`
+
 ### Phase 0: 欢迎与说明
 
 **输出格式**：

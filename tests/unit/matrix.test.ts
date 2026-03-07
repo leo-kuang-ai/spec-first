@@ -47,6 +47,17 @@ describe('parseMatrix', () => {
   it('should return empty for missing matrix', () => {
     expect(parseMatrix('FSREQ-20260211-NOPE-001', TMP)).toEqual([]);
   });
+
+  it('should reject undocumented matrix status values', () => {
+    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
+      '| ID | Type | Title | Status | Upstream | Downstream |',
+      '|----|------|-------|--------|----------|------------|',
+      '| FR-AUTH-001 | FR | Login | done |  |  |',
+      '',
+    ].join('\n'), 'utf-8');
+
+    expect(() => parseMatrix(FEAT_ID, TMP)).toThrow(/Invalid matrix status/);
+  });
 });
 
 describe('checkMatrix', () => {

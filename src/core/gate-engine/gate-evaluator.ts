@@ -13,12 +13,12 @@ import { readJsonChecked, appendJsonl, exists } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
 import { getCoverage } from '../trace-engine/coverage.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
+import { createTraceContext } from '../trace-engine/trace-context.js';
 import { validateExceptions } from '../trace-engine/exception-validator.js';
 import { getCriticalCountFromAnalysisReport, analyzeArtifacts } from './sca.js';
 import { runCommandGate } from './command-gate.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
 import { validatePrd } from './prd-validator.js';
-import { createUpstreamLineage } from '../trace-engine/upstream-lineage.js';
 
 // ─── Gate 条件定义 ─────────────────────────────────────────
 
@@ -268,7 +268,7 @@ GATE_CONDITIONS['06_wrap_up' as Stage] = [
     id: 'G-WRAP-02',
     description: 'All matrix entries in terminal status',
     evaluate: (ctx) => {
-      const terminal = new Set(['done', 'Accepted', 'Cancelled', 'Exception']);
+      const terminal = new Set(['Accepted', 'Cancelled', 'Exception']);
       const nonTerminal = ctx.rows.filter(r => !terminal.has(r.status));
       return {
         pass: nonTerminal.length === 0,
@@ -827,22 +827,18 @@ function getUncoveredFrIds(
   rows: MatrixRow[],
   downstreamType: IdType,
 ): string[] {
-  const frRows = rows.filter((r) => r.type === 'FR');
-  if (frRows.length === 0) return [];
+  const trace = createTraceContext(rows);
+  if (trace.frRows.length === 0) return [];
 
   const covered = new Set<string>();
-  const downstreamRows = rows.filter((r) => r.type === downstreamType);
-  const frIds = new Set(frRows.map((fr) => fr.id));
-  
   if (downstreamType === 'TASK') {
-    const lineage = createUpstreamLineage(rows);
-    for (const row of downstreamRows) {
-      const ancestors = lineage.getAncestors(row.id);
-      for (const ancestorId of ancestors) {
-        if (frIds.has(ancestorId)) covered.add(ancestorId);
-      }
-    }
+    const coveredFrIds = trace.lineage.collectCoveredTargetIds(
+      trace.rows.filter((row) => row.type === 'TASK').map((row) => row.id),
+      trace.frIds,
+    );
+    for (const frId of coveredFrIds) covered.add(frId);
   } else {
+    const downstreamRows = rows.filter((r) => r.type === downstreamType);
     for (const row of downstreamRows) {
       for (const upstreamId of row.upstream ?? []) {
         covered.add(upstreamId);
@@ -850,5 +846,5 @@ function getUncoveredFrIds(
     }
   }
 
-  return frRows.filter((fr) => !covered.has(fr.id)).map((fr) => fr.id);
+  return trace.frRows.filter((fr) => !covered.has(fr.id)).map((fr) => fr.id);
 }

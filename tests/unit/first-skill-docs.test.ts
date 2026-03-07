@@ -32,7 +32,7 @@ describe('00-first skill docs consistency', () => {
     expect(existsSync(PLATFORM_MAPPING)).toBe(true); // Phase 2 新增
 
     const skill = read(SKILL_MD);
-    expect(skill).toContain('version: 2.0.0');
+    expect(skill).toContain('version: 2.1.0');
   });
 
   it('should not use deprecated evidence marker format', () => {

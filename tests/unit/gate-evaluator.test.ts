@@ -330,6 +330,12 @@ describe('evaluateGate', () => {
     expect(wrapCond?.status).toBe('PASS');
   });
 
+  it('should reject undocumented terminal aliases such as done at 06_wrap_up', () => {
+    writeState('06_wrap_up');
+    writeMatrix('| FR-AUTH-001 | FR | Login | done |  |  |\n');
+    expect(() => evaluateGate(FEAT, TMP)).toThrow(/Invalid matrix status/);
+  });
+
   it('should FAIL for 03_plan when analysis-report.md is missing', () => {
     writeState('03_plan');
     writeMatrix(

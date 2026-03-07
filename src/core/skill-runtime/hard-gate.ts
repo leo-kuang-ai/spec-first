@@ -4,8 +4,16 @@ import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 
 const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = {
+  spec: '01_specify',
+  'spec-review': '01_specify',
   design: '02_design',
+  research: '02_design',
+  task: '03_plan',
   code: '04_implement',
+  'code-review': '04_implement',
+  test: '05_verify',
+  verify: '05_verify',
+  archive: '06_wrap_up',
 };
 const GIT_COMMAND_TIMEOUT_MS = 5_000;
 
@@ -23,6 +31,16 @@ export interface HardGateDecision {
   remediation: string;
   /** 高风险评估（Worktree First，Superpowers P1-3） */
   highRiskAssessment?: HighRiskAssessment;
+}
+
+export class HardGateBlockedError extends Error {
+  decision: HardGateDecision;
+
+  constructor(skillName: string, decision: HardGateDecision) {
+    super(`HARD-GATE BLOCKED for ${skillName}: ${decision.reason}. ${decision.remediation}`);
+    this.name = 'HardGateBlockedError';
+    this.decision = decision;
+  }
 }
 
 function readCurrentFeature(projectRoot: string): string | undefined {

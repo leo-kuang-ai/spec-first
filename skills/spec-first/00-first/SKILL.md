@@ -34,6 +34,8 @@ changelog: |
 
   **证据类型**：`[显式]`（代码明确声明）、`[推断]`（从行为分析）、`[待确认]`（无法确定）
 
+  **证据抽检**：deep 模式汇总前至少抽检 3 条跨文档证据，确保结论与引用文件一致。
+
 ---
 
 ## 触发条件
@@ -95,6 +97,10 @@ docs/
 | D | database-er.md（如有 DB） | `references/agent-database.md` |
 | A4 | domain-model.md（等待 A2+B+D） | `references/agent-domain-model.md` |
 
+**第三波（A2 + B + D 完成后）**：
+- A4 必须在 architecture、api-docs、database-er 三类输入稳定后再启动
+- 若 D 未派发，则 A4 退化为等待 A2 + B 完成，并在输出中标记 DB 证据缺失
+
 ---
 
 ## 执行流程
@@ -108,8 +114,24 @@ docs/
 
 **核心策略**：
 - Agent 独立并行，降低总时间
-- 超时控制：单 agent 60s，整体 300s
+- 超时控制：单个子 agent 60s，单阶段总超时 120s，整体并行阶段最大 300s
 - 降级机制：Serena 不可用时降级到静态分析
+
+详细并发/超时规则见 `references/subagent-architecture.md`。
+
+## 模式选择与交互策略
+
+### 智能模式推荐（Phase 3）
+
+- 默认优先 `quick`
+- 当仓库规模大、语言/端类型复杂、或用户明确要求完整审查时，升级到 `deep`
+- 推荐理由必须落到可观测信号：目录规模、依赖数量、端类型数量、外部系统数量
+
+### 渐进式升级（Phase 3）
+
+- 允许先跑 `quick` 形成项目骨架认知
+- 当用户需要架构、调用链、外部依赖、研发规范时，再升级到 `deep`
+- 升级时必须复用已生成产物，避免重复分析
 
 ---
 
@@ -134,7 +156,9 @@ docs/
 | 文件 | 内容 | 消费者 |
 |------|------|--------|
 | `references/execution-flow.md` | 详细执行流程（P0-P3） | 主线程编排 |
+| `references/subagent-architecture.md` | 并行波次、依赖链、超时策略 | 主线程编排 |
 | `references/detection-rules.md` | 语言/框架/端类型检测表 | P1a 主线程 |
+| `references/testing-strategy.md` | 最小测试矩阵与 Phase 2/3 回归清单 | 文档治理 |
 | `references/agents-code-analysis.md` | A1/A2/A3 规格（代码分析链） | Agent A1、A2、A3 |
 | `references/agents-api-deps.md` | B/C1 规格（API 与外部依赖） | Agent B、C1 |
 | `references/agent-guidelines-setup.md` | C2 规格（研发规范 + 本地环境） | Agent C2 |

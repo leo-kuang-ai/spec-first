@@ -8,8 +8,8 @@ project_type: backend
 
 ## 环境要求
 
-- Node.js: ≥20.0.0 (`package.json:27` — `"node": ">=20.0.0"` — `[显式]`)
-- 包管理器: npm 或 pnpm
+- Node.js: ≥20.0.0 (`package.json:28` — `"node": ">=20.0.0"` — `[显式]`)
+- 包管理器: npm 或 pnpm (`package.json:10` — `"build": "tsup"` — `[推断]`)
 
 ## 安装步骤
 
@@ -107,9 +107,9 @@ spec-first --version
 本项目使用 TypeScript + ESM 模式开发：
 
 - 源码位于 `src/` 目录
-- 构建工具: tsup
-- 测试框架: Vitest
-- 代码检查: ESLint + Prettier
+- 构建工具: tsup (`package.json:10` — `"build": "tsup"` — `[显式]`)
+- 测试框架: Vitest (`package.json:12` — `"test": "vitest run"` — `[显式]`)
+- 代码检查: ESLint + Prettier (`package.json:15-17` — `"lint"/"format"` — `[显式]`)
 
 修改代码后需重新运行 `npm run build` 生成新的构建产物。
 

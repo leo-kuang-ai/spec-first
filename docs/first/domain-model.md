@@ -21,6 +21,8 @@ project_type: backend
 
 ### Stage（阶段）
 
+(`src/shared/types.ts:6` — `export enum Stage` — `[显式]`)
+
 Feature 生命周期的 8 个活跃阶段 + 2 个终态：
 
 | 阶段 | 代码 | 说明 |
@@ -37,6 +39,8 @@ Feature 生命周期的 8 个活跃阶段 + 2 个终态：
 | **已取消** | 09_cancelled | 终态：取消 |
 
 ### 追溯 ID 体系
+
+(`src/shared/types.ts:30` — `export const IdType` — `[显式]`)
 
 | ID 类型 | 说明 | 示例 |
 |---------|------|------|
@@ -69,6 +73,9 @@ Feature 生命周期的 8 个活跃阶段 + 2 个终态：
 每个阶段流转前必须通过质量门禁检查。
 
 **Gate 状态**:
+
+(`src/shared/types.ts:77` — `export const GateStatus` — `[显式]`)
+
 - PASS: 通过
 - PASS_WITH_WAIVER: 豁免通过
 - FAIL: 失败
@@ -80,6 +87,8 @@ Feature 生命周期的 8 个活跃阶段 + 2 个终态：
 - 安全扫描（SCA）
 
 ### 3. RFC 变更管理
+
+(`src/shared/types.ts:105` — `export const RfcStatus` — `[显式]`)
 
 **RFC 状态流转**:
 ```
@@ -94,6 +103,8 @@ draft（草稿）→ approved（已批准）→ closed（已关闭）
 - Critical: 关键变更（需豁免）
 
 ### 4. 缺陷管理
+
+(`src/shared/types.ts:134` — `export const DefectStatus` — `[显式]`)
 
 **Defect 状态流转**:
 ```

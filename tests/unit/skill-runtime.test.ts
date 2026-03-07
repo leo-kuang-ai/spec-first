@@ -215,14 +215,12 @@ describe('dispatchCommand', () => {
 });
 
 describe('loadSkill hard-gate notice', () => {
-  it('should inject BLOCKED hard-gate notice for code when prerequisites are missing', () => {
+  it('should throw when code hard-gate is BLOCKED', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
-    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
-    expect(content).toContain('HARD-GATE 运行时检查（自动）');
-    expect(content).toContain('检查结果: BLOCKED');
-    expect(content).toContain('禁止实施写入');
+    expect(() => loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false }))
+      .toThrow(/HARD-GATE/);
   });
 
   it('should inject PASS hard-gate notice for code when prerequisites are satisfied', () => {
@@ -347,6 +345,22 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('检查结果: PASS');
   });
 
+  it('should throw when code-review hard-gate is BLOCKED by stage mismatch', () => {
+    const skillDir = join(TMP, 'skills', 'spec-first', '08-code-review');
+    const skillPath = join(skillDir, 'SKILL.md');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '02_design' }),
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Code Review', 'utf-8');
+
+    expect(() => loadSkill(skillPath, { projectRoot: TMP }))
+      .toThrow(/code-review/);
+  });
+
   it('should block high-risk code execution on protected branch without worktree confirmation', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
@@ -386,9 +400,8 @@ describe('loadSkill hard-gate notice', () => {
     execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
     execSync('git checkout -b main || git checkout main', { cwd: TMP, stdio: 'ignore' });
 
-    const content = loadSkill(skillPath, { projectRoot: TMP });
-    expect(content).toContain('检查结果: BLOCKED');
-    expect(content).toContain('WORKTREE-CONFIRMED');
+    expect(() => loadSkill(skillPath, { projectRoot: TMP }))
+      .toThrow(/WORKTREE-CONFIRMED/);
   });
 
   it('should block unstable template when kv_cache_hard_gate is enabled', () => {
@@ -407,6 +420,32 @@ describe('loadSkill hard-gate notice', () => {
   it('should only warn unstable template when kv_cache_hard_gate is disabled', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/auth/login.test.ts',
+        '- exit code: 1',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
     writeFileSync(
       join(TMP, '.spec-first', 'meta', 'config.yaml'),
       'runtime:\n  kv_cache_hard_gate: false\n',
@@ -424,7 +463,7 @@ describe('loadSkill hard-gate notice', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
-    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
+    const content = loadSkill(skillPath, { enableAssembly: false });
     expect(content).toContain('## Next Steps（Required Handoff）');
     expect(content).toContain('下一条可执行命令');
   });

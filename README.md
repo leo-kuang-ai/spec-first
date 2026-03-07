@@ -609,25 +609,47 @@ AI 既有约束又有上下文，执行更可靠
 
 #### 框架能力雷达图（文字描述）
 
-```text
-                流程完整性
-                   ▲
-                  ╱ ╲
-     追踪度量   ╱     ╲  AI 约束
-        ▲     ╱       ╱     ▲
-       ╱   ╱         ╱   ╱
-    可扩展性 ╱         ╱ 易用性
-       ╱   ╱         ╱   ╱
-        ╱ ╱         ╱ ╱
-         ▼         ▼
-    工程治理   升级保障
+> 为了兼容 README 渲染器，这里改为双图方案：上图看 7 个维度的能力轮廓，下图看综合均分。若宿主不支持 Mermaid，下面的评分矩阵可作为等价文本视图。
 
-Spec-First:  流程9 追踪9 AI9 可扩展9 工程7 升级8 易用7
-OpenSpec:    流程8 追踪6 AI6 可扩展8 工程5 升级5 易用8
-Spec Kit:    流程7 追踪7 AI8 可扩展9 工程6 升级7 易用9
-Superpowers: 流程6 追踪4 AI9 可扩展5 工程5 升级6 易用7
-Trellis:     流程5 追踪4 AI7 可扩展6 工程9 升级9 易用6
+```mermaid
+xychart-beta
+    title "框架能力对比（0-10）"
+    x-axis ["流程", "追踪", "AI", "扩展", "治理", "升级", "易用"]
+    y-axis "分数" 0 --> 10
+    line "Spec-First" [9, 9, 9, 9, 7, 8, 7]
+    line "OpenSpec" [8, 6, 6, 8, 5, 5, 8]
+    line "Spec Kit" [7, 7, 8, 9, 6, 7, 9]
+    line "Superpowers" [6, 4, 9, 5, 5, 6, 7]
+    line "Trellis" [5, 4, 7, 6, 9, 9, 6]
 ```
+
+| 维度缩写 | 含义 |
+|----------|------|
+| `流程` | 流程完整性 |
+| `追踪` | 追踪度量 |
+| `AI` | AI 约束 |
+| `扩展` | 可扩展性 |
+| `治理` | 工程治理 |
+| `升级` | 升级保障 |
+| `易用` | 易用性 |
+
+```mermaid
+xychart-beta
+    title "框架综合均分（7 维平均）"
+    x-axis ["Spec-First", "Spec Kit", "OpenSpec", "Trellis", "Superpowers"]
+    y-axis "平均分" 0 --> 10
+    bar [8.3, 7.6, 6.6, 6.6, 6.0]
+```
+
+> 综合均分只用于快速比较，不代表单项能力优先级。比如 Trellis 在工程治理与升级保障上更强，Superpowers 在 AI 约束上更强。
+
+| 框架 | 流程完整性 | 追踪度量 | AI 约束 | 可扩展性 | 工程治理 | 升级保障 | 易用性 |
+|------|------------|----------|---------|----------|----------|----------|--------|
+| **Spec-First** | 9 | 9 | 9 | 9 | 7 | 8 | 7 |
+| **OpenSpec** | 8 | 6 | 6 | 8 | 5 | 5 | 8 |
+| **Spec Kit** | 7 | 7 | 8 | 9 | 6 | 7 | 9 |
+| **Superpowers** | 6 | 4 | 9 | 5 | 5 | 6 | 7 |
+| **Trellis** | 5 | 4 | 7 | 6 | 9 | 9 | 6 |
 
 ### 集成策略
 
@@ -922,7 +944,7 @@ spec-first metrics coverage <featureId>       # 计算覆盖率
 spec-first metrics health <featureId>         # 健康分评估
 
 # 环境诊断
-spec-first doctor                             # 环境诊断与修复
+spec-first doctor                             # 环境诊断与修复建议
 spec-first update                             # 升级刷新 Skill/MCP/Hooks
 ```
 
@@ -1043,13 +1065,13 @@ spec-first update                             # 升级刷新 Skill/MCP/Hooks
 |------|------|--------|
 | **Mode** | Feature 类型 | `N`（新功能）/ `I`（迭代） |
 | **Size** | Feature 规模 | `S`（小型）/ `M`（中型）/ `L`（大型） |
-| **Platforms** | 目标平台 | `app` / `h5` / `pc` / `backend` 等 |
+| **Platforms** | 目标平台 | 来自 `.spec-first/layer2/*.yaml` 的平台标识（如 `h5` / `java-backend`） |
 
 ### AI 协作相关
 
 | 术语 | 定义 |
 |------|------|
-| **Context Pack** | 结构化上下文包（<2KB），包含 spec/design/task/contracts 等关键信息 |
+| **Context Pack** | 结构化上下文包（control 区 <2KB + references），包含 spec/design/task/contracts 等关键信息 |
 | **Subagent** | 子代理，用于并行执行独立任务 |
 | **Catchup** | 会话恢复机制，自动加载上下文摘要 |
 | **HARD-GATE** | 硬守卫模式，入口阻断不符合前置条件的操作 |
@@ -1479,9 +1501,9 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | --- | --- | --- |
 | — | 00-first | docs/first/*.md（项目认知文档集）|
 | — | 00-onboarding | 无文件（交互式引导） |
-| 00_init | 01-init | stage-state.json, constitution.md, traceability-matrix.md, findings.md, task_plan.md |
+| 00_init | 01-init | stage-state.json, constitution.md, traceability-matrix.md, findings.md, task_plan.md, prd.md |
 | 01_specify | 03-spec, 20-spec-review | spec.md, checklists/spec-review.md |
-| 02_design | 04-design, 05-research | design.md, contracts/, research.md |
+| 02_design | 04-design, 05-research | design.md, contracts/, research.md, impact-analysis.md（迭代场景） |
 | 03_plan | 06-task, 21-analyze | task_plan.md, checklist.md |
 | 04_implement | 07-code, 08-code-review | task_plan.md 状态更新 |
 | 05_verify | 09-test | tests/*.test.md |
@@ -1632,7 +1654,7 @@ spec-first metrics health <featureId>
 AI 辅助工具。
 
 ```bash
-# 生成 Context Pack（<2KB YAML）
+# 生成 Context Pack（control 区 <2KB，支持 --full / --expand）
 spec-first ai context <featureId>
 
 # 会话恢复
@@ -1644,7 +1666,7 @@ spec-first ai stats <featureId>
 
 #### spec-first doctor
 
-环境诊断与修复。
+环境诊断与修复建议。
 
 ```bash
 spec-first doctor [featureId]
@@ -1713,9 +1735,11 @@ specs/                          # Feature 工作区根目录
 └── <featureId>/                # 单个 Feature 目录
     ├── stage-state.json        # 阶段状态机
     ├── constitution.md         # 项目原则
+    ├── prd.md                  # 产品需求文档（01_specify，init 预置骨架）
     ├── spec.md                 # 需求规格（01_specify）
     ├── design.md               # 技术设计（02_design）
     ├── research.md             # 技术调研（02_design 可选）
+    ├── impact-analysis.md      # 变更影响分析（02_design，迭代场景）
     ├── contracts/*.yaml        # API 契约（02_design）
     ├── data-model.md           # 数据模型（02_design M/L）
     ├── adr/*.adr.md            # 架构决策记录

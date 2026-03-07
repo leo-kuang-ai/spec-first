@@ -138,14 +138,17 @@ function handleCurrent(args: string[]): number {
 function handleAdvance(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('用法：spec-first stage advance <featureId> [--force]');
+    console.error('用法：spec-first stage advance <featureId>');
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const force = args.includes('--force');
+  if (args.includes('--force')) {
+    console.error('错误：`stage advance --force` 已移除；请修复 Gate/依赖问题后再推进。');
+    return ExitCode.VALIDATION_ERROR;
+  }
 
   try {
-    const result = advance(featureId, process.cwd(), { force });
+    const result = advance(featureId, process.cwd());
     console.log(`已推进：${result.from} → ${result.to}`);
     console.log(`Gate：${result.gateResult}`);
     return ExitCode.SUCCESS;

@@ -275,10 +275,10 @@ describe('handleStage', () => {
     expect(code).toBe(0);
   });
 
-  it('should advance with --force', async () => {
+  it('should reject legacy --force for stage advance', async () => {
     const fid = await setupFeature();
     const code = handleStage(['advance', fid, '--force']);
-    expect(code).toBe(0);
+    expect(code).toBe(2);
   });
 
   it('should cancel feature with reason', async () => {

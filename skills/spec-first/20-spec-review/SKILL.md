@@ -36,8 +36,8 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - P5: 输出 Spec Quality Score（C10）并提示 gate 校验
 
 ## 审查清单来源
-- `skills/spec-first/03-spec/references/spec-review-checklist.md`
-- `skills/spec-first/03-spec/references/test-level-glossary.md`
+- `../03-spec/references/spec-review-checklist.md`
+- `../03-spec/references/test-level-glossary.md`
 
 ## 输出路径
 - `specs/{featureId}/checklists/spec-review.md`

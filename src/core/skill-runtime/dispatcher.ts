@@ -7,7 +7,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { exists } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability } from './prompt-assembler.js';
-import { buildHardGateRuntimeNotice } from './hard-gate.js';
+import { buildHardGateRuntimeNotice, evaluateSkillHardGate, HardGateBlockedError } from './hard-gate.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
 import { validateOrchestrateArgs, type OrchestrateArgs } from './orchestrate-args.js';
 import { validateFirstArgs, resolveFirstConfirmPolicy, resolveFirstModePolicy, type FirstArgs } from './first-args.js';
@@ -313,6 +313,10 @@ export function loadSkill(
   if (!projectRoot) return content;
 
   const skillName = inferSkillNameFromPath(skillPath);
+  const hardGateDecision = evaluateSkillHardGate(skillName, projectRoot);
+  if (hardGateDecision.severity === 'BLOCKED') {
+    throw new HardGateBlockedError(skillName, hardGateDecision);
+  }
   const hardGateNotice = buildHardGateRuntimeNotice(skillName, projectRoot);
   if (hardGateNotice) {
     content = `${hardGateNotice}\n\n${content}`;

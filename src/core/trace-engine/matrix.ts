@@ -6,7 +6,17 @@ import { join } from 'node:path';
 import type { MatrixRow, MatrixStatus, IdType } from '../../shared/types.js';
 import { readMarkdown, writeMarkdown, exists, parseMarkdownTable } from '../../shared/fs-utils.js';
 import { validateId } from './id-validator.js';
-import { createUpstreamLineage } from './upstream-lineage.js';
+import { createTraceContext } from './trace-context.js';
+
+const VALID_MATRIX_STATUSES: ReadonlySet<MatrixStatus> = new Set([
+  'Planned',
+  'Implemented',
+  'Verified',
+  'Accepted',
+  'Deferred',
+  'Cancelled',
+  'Exception',
+]);
 
 /** 矩阵校验结果 */
 export interface MatrixCheckResult {
@@ -44,7 +54,7 @@ export function parseMatrix(featureId: string, projectRoot: string): MatrixRow[]
 export function checkMatrix(featureId: string, projectRoot: string): MatrixCheckResult {
   const rows = parseMatrix(featureId, projectRoot);
   const warnings: string[] = [];
-  const lineage = createUpstreamLineage(rows);
+  const trace = createTraceContext(rows);
 
   // 孤儿项：非 FR/Feature/REQ 类型且无 upstream
   const orphans = rows.filter(r =>
@@ -55,7 +65,7 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
   }
 
   // 断链：FR 无 DS/TASK/TC downstream 或无 PRD upstream
-  const frRows = rows.filter(r => r.type === 'FR');
+  const frRows = trace.frRows;
   const brokenChains: MatrixCheckResult['brokenChains'] = [];
   for (const fr of frRows) {
     const missing: string[] = [];
@@ -63,7 +73,7 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
     const hasDs = rows.some(r => r.type === 'DS' && r.upstream?.includes(fr.id));
     const hasTask = rows.some((r) => {
       if (r.type !== 'TASK') return false;
-      return lineage.hasAnyAncestor(r.id, new Set([fr.id]));
+      return trace.lineage.hasAnyAncestor(r.id, new Set([fr.id]));
     });
     const hasTc = rows.some(r => r.type === 'TC' && r.upstream?.includes(fr.id));
     if (!hasPrd) missing.push('REQ-PRD-*');
@@ -149,7 +159,11 @@ function parseMatrixContent(content: string): MatrixRow[] {
     const validation = validateId(id);
     const type: IdType = validation.type ?? 'Feature';
     const title = cells[2] ?? '';
-    const status = (cells[3] ?? 'Planned') as MatrixStatus;
+    const rawStatus = (cells[3] ?? 'Planned').trim();
+    if (!VALID_MATRIX_STATUSES.has(rawStatus as MatrixStatus)) {
+      throw new Error(`Invalid matrix status "${rawStatus}" for ${id}`);
+    }
+    const status = rawStatus as MatrixStatus;
     const upstream = parseRefList(cells[4]);
     const downstream = parseRefList(cells[5]);
 

@@ -61,23 +61,18 @@ describe('Gate FAIL blocking', () => {
   });
 });
 
-// ─── Force 推进 + 审计记录 ───────────────────────────────
+// ─── Strict advance semantics ───────────────────────────
 
-describe('Force advance with audit', () => {
-  it('should write FORCE_SKIPPED to findings.md', () => {
+describe('Strict advance semantics', () => {
+  it('should ignore legacy force option and keep normal gate semantics', () => {
     writeFileSync(join(TMP, '.spec-first', 'config.yaml'), yaml.dump({
       version: '1.0', gate: { pilot_mode: false },
     }));
     const { featureId } = init({
       feat: 'FRC', mode: 'N', size: 'S', platforms: ['h5'], projectRoot: TMP,
     });
-    const result = advance(featureId, TMP, { force: true });
-    expect(result.gateResult).toBe('FORCE_SKIPPED');
-    const findings = readFileSync(
-      join(TMP, 'specs', featureId, 'findings.md'), 'utf-8',
-    );
-    expect(findings).toContain('FORCE_SKIPPED');
-    expect(findings).toContain('00_init');
+    const result = advance(featureId, TMP, { force: true } as never);
+    expect(result.gateResult).toBe('PASS');
   });
 });
 

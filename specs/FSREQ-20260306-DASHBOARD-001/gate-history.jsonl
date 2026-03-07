@@ -37,3 +37,4 @@
 {"event":"gate_eval","featureId":"FSREQ-20260306-DASHBOARD-001","status":"FAIL","stage":"07_release","timestamp":"2026-03-06T01:59:33.681Z","conditions":[{"id":"G-REL-01","description":"Smoke test report exists","status":"PASS"},{"id":"G-REL-02","description":"Release note exists","status":"FAIL"}],"suggestions":["Fix: Release note exists ()"]}
 {"event":"stage_advance","action":"advance","from":"07_release","to":"08_done","gateStatus":"FORCE_SKIPPED","featureId":"FSREQ-20260306-DASHBOARD-001","timestamp":"2026-03-06T01:59:59.221Z"}
 {"event":"gate_eval","featureId":"FSREQ-20260306-DASHBOARD-001","status":"PASS","stage":"08_done","timestamp":"2026-03-06T05:36:50.209Z","conditions":[]}
+{"event":"gate_eval","featureId":"FSREQ-20260306-DASHBOARD-001","status":"PASS","stage":"08_done","timestamp":"2026-03-06T06:05:17.067Z","conditions":[]}

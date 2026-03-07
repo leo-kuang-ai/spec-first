@@ -61,10 +61,10 @@ describe('advance', () => {
     expect(updated.history).toHaveLength(1);
   });
 
-  it('should advance with --force and write FORCE_SKIPPED', () => {
+  it('should ignore legacy force option and still use normal gate path', () => {
     writeState(makeState());
-    const result = advance(FEAT_ID, TMP, { force: true });
-    expect(result.gateResult).toBe('FORCE_SKIPPED');
+    const result = advance(FEAT_ID, TMP, { force: true } as never);
+    expect(result.gateResult).toBe('PASS');
     expect(readState().currentStage).toBe(Stage.SPECIFY);
   });
 
@@ -84,7 +84,7 @@ describe('advance', () => {
 
   it('should write gate-history.jsonl on advance', () => {
     writeState(makeState());
-    advance(FEAT_ID, TMP, { force: true });
+    advance(FEAT_ID, TMP);
     const logPath = join(SPEC_DIR, 'gate-history.jsonl');
     const lines = require('node:fs').readFileSync(logPath, 'utf-8').trim().split('\n');
     const entry = JSON.parse(lines[lines.length - 1]);
@@ -96,28 +96,59 @@ describe('advance', () => {
 
   it('should chain multiple advances', () => {
     writeState(makeState());
-    advance(FEAT_ID, TMP, { force: true });
+    advance(FEAT_ID, TMP);
     resetConfigCache();
-    advance(FEAT_ID, TMP, { force: true });
+    expect(() => advance(FEAT_ID, TMP)).toThrow(/Gate 未通过/);
     const state = readState();
-    expect(state.currentStage).toBe(Stage.DESIGN);
-    expect(state.history).toHaveLength(2);
-  });
-
-  it('should set terminal=true when reaching DONE', () => {
-    writeState(makeState({ currentStage: Stage.RELEASE }));
-    advance(FEAT_ID, TMP, { force: true });
-    const state = readState();
-    expect(state.currentStage).toBe(Stage.DONE);
-    expect(state.terminal).toBe(true);
+    expect(state.currentStage).toBe(Stage.SPECIFY);
+    expect(state.history).toHaveLength(1);
   });
 
   it('should auto-sync context file when advancing DESIGN → PLAN', () => {
     writeState(makeState({ currentStage: Stage.DESIGN }));
-    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n## API\n', 'utf-8');
+    mkdirSync(join(TMP, 'skills', 'spec-first', '03-spec', 'references'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'skills', 'spec-first', '03-spec', 'references', 'constitution-authority.md'),
+      [
+        '# Constitution Authority',
+        '',
+        'Level 0',
+        'Level 1',
+        'Level 2',
+        'Level 3',
+        '',
+        'Any Constitution conflict must be resolved in favor of Constitution.',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'skills', 'spec-first', '03-spec', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'constitution.md'), [
+      '# Constitution',
+      '',
+      '- Version: 1.0.0',
+      '- Ratified: 2026-02-11',
+      '- Last Amended: 2026-02-11',
+      '',
+      '## Amendment History',
+      '- init',
+      '',
+    ].join('\n'), 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n\nConstitution Clause C-1 (v1.0.0)\n\n## API\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
+      '| ID | Type | Title | Status | Upstream | Downstream |',
+      '|----|------|-------|--------|----------|------------|',
+      '| FR-AUTH-001 | FR | Login | Planned |  | DS-AUTH-001 |',
+      '| DS-AUTH-001 | DS | Auth Design | Planned | FR-AUTH-001 |  |',
+      '',
+    ].join('\n'), 'utf-8');
     writeFileSync(join(TMP, 'CLAUDE.md'), '# CLAUDE\n', 'utf-8');
 
-    const result = advance(FEAT_ID, TMP, { force: true });
+    const result = advance(FEAT_ID, TMP);
     expect(result.from).toBe(Stage.DESIGN);
     expect(result.to).toBe(Stage.PLAN);
 

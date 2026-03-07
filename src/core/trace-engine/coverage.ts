@@ -7,7 +7,9 @@ import type { CoverageMetrics, MatrixRow, MatrixStatus } from '../../shared/type
 import { parseMatrix } from './matrix.js';
 import { validateExceptions } from './exception-validator.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
-import { createUpstreamLineage } from './upstream-lineage.js';
+import type { UpstreamLineage } from './upstream-lineage.js';
+import { createTraceContext } from './trace-context.js';
+import { pct } from './ratio.js';
 
 /** 排除状态：不计入有效分母 */
 const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set([
@@ -28,23 +30,18 @@ export function getCoverage(
     if (r.status !== 'Exception') return true;
     return !validExceptionFrIds.has(r.id);
   });
-
-  const frRows = active.filter(r => r.type === 'FR');
-  const dsRows = active.filter(r => r.type === 'DS');
-  const taskRows = active.filter(r => r.type === 'TASK');
-  const tcRows = active.filter(r => r.type === 'TC');
-  const lineage = createUpstreamLineage(active);
+  const trace = createTraceContext(active);
 
   return {
-    C1: calcDesignCoverage(frRows, dsRows),
-    C2: calcApiCoverage(frRows, dsRows),
-    C3: calcTaskCoverage(frRows, taskRows, lineage),
-    C4: calcTestCoverageFR(frRows, tcRows),
-    C5: calcTestCoverageAC(frRows, tcRows),
-    C6: calcImplCoverage(taskRows),
-    C7: calcPrCompliance(taskRows),
-    C8: calcTaskCompliance(taskRows, frRows, dsRows, lineage),
-    C9: calcTcCompliance(tcRows, frRows),
+    C1: calcDesignCoverage(trace.frRows, trace.dsRows),
+    C2: calcApiCoverage(trace.frRows, trace.dsRows),
+    C3: calcTaskCoverage(trace.frRows, trace.taskRows, trace.lineage),
+    C4: calcTestCoverageFR(trace.frRows, trace.tcRows),
+    C5: calcTestCoverageAC(trace.frRows, trace.tcRows),
+    C6: calcImplCoverage(trace.taskRows),
+    C7: calcPrCompliance(trace.taskRows),
+    C8: calcTaskCompliance(trace.taskRows, trace.frRows, trace.dsRows, trace.lineage),
+    C9: calcTcCompliance(trace.tcRows, trace.frRows),
   };
 }
 
@@ -64,7 +61,7 @@ function calcApiCoverage(frRows: MatrixRow[], dsRows: MatrixRow[]): number {
 function calcTaskCoverage(
   frRows: MatrixRow[],
   taskRows: MatrixRow[],
-  lineage: ReturnType<typeof createUpstreamLineage>,
+  lineage: UpstreamLineage,
 ): number {
   if (frRows.length === 0) return 1;
   if (taskRows.length === 0) return 0;
@@ -108,7 +105,7 @@ function calcTaskCompliance(
   taskRows: MatrixRow[],
   frRows: MatrixRow[],
   dsRows: MatrixRow[],
-  lineage: ReturnType<typeof createUpstreamLineage>,
+  lineage: UpstreamLineage,
 ): number {
   if (taskRows.length === 0) return 1;
 
@@ -176,13 +173,6 @@ function detectIdFormatMismatch(expectedIds: string[], actualIds: string[]): Arr
     }
   }
   return mismatches;
-}
-
-/** 比例（0~1，保留 4 位小数） */
-function pct(numerator: number, denominator: number): number {
-  // S3: 分母为 0 返回 0（无 FR 不应报 100% 覆盖率）
-  if (denominator === 0) return 0;
-  return Math.round((numerator / denominator) * 10000) / 10000;
 }
 
 function loadValidExceptionFrIds(featureId: string, projectRoot: string, preRfcStatuses?: Map<string, string>): Set<string> {

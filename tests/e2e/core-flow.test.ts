@@ -73,31 +73,27 @@ describe('Core Flow E2E', () => {
     expect(existsSync(join(TMP, 'specs', featureId, 'stage-state.json'))).toBe(true);
   });
 
-  it('should advance through all stages to 08_done', () => {
-    // 从 00_init 推进到 08_done（共 8 步）
-    for (let i = 0; i < STAGE_CHAIN.length - 1; i++) {
-      const from = STAGE_CHAIN[i];
-      const to = STAGE_CHAIN[i + 1];
-      const result = advance(featureId, TMP, { force: true });
-      expect(result.from).toBe(from);
-      expect(result.to).toBe(to);
-    }
+  it('should only advance while gate requirements are actually satisfied', () => {
+    const result = advance(featureId, TMP);
+    expect(result.from).toBe('00_init');
+    expect(result.to).toBe('01_specify');
+
     const finalState = getFeatureState(featureId, TMP);
-    expect(finalState.currentStage).toBe('08_done');
-    expect(finalState.terminal).toBe(true);
+    expect(finalState.currentStage).toBe('01_specify');
+    expect(finalState.terminal).toBe(false);
   });
 
   it('should record stage history for each advance', () => {
     // 推进 3 步
-    advance(featureId, TMP, { force: true }); // 00→01
-    advance(featureId, TMP, { force: true }); // 01→02
-    advance(featureId, TMP, { force: true }); // 02→03
+    advance(featureId, TMP); // 00→01
+    writeFileSync(join(TMP, 'specs', featureId, 'prd.md'), '# PRD\n', 'utf-8');
+    writeFileSync(join(TMP, 'specs', featureId, 'spec.md'), '# Spec\n', 'utf-8');
+    expect(() => advance(featureId, TMP)).toThrow(/Gate 未通过/);
     const state = getFeatureState(featureId, TMP);
-    expect(state.currentStage).toBe('03_plan');
-    expect(state.history).toHaveLength(3);
+    expect(state.currentStage).toBe('01_specify');
+    expect(state.history).toHaveLength(1);
     expect(state.history[0].from).toBe('00_init');
     expect(state.history[0].to).toBe('01_specify');
-    expect(state.history[2].to).toBe('03_plan');
   });
 
   it('should evaluate gate at each stage', () => {
@@ -114,30 +110,25 @@ describe('Core Flow E2E', () => {
     expect(typeof cov.C6).toBe('number');
   });
 
-  it('should write findings.md on force advance', () => {
-    advance(featureId, TMP, { force: true });
+  it('should write findings.md on normal advance', () => {
+    advance(featureId, TMP);
     const findingsPath = join(TMP, 'specs', featureId, 'findings.md');
     expect(existsSync(findingsPath)).toBe(true);
-    const content = readFileSync(findingsPath, 'utf-8');
-    expect(content).toContain('FORCE_SKIPPED');
   });
 
   it('should write gate-history.jsonl on advance', () => {
-    advance(featureId, TMP, { force: true });
+    advance(featureId, TMP);
     const histPath = join(TMP, 'specs', featureId, 'gate-history.jsonl');
     expect(existsSync(histPath)).toBe(true);
     const lines = readFileSync(histPath, 'utf-8').trim().split('\n');
     expect(lines.length).toBeGreaterThanOrEqual(1);
-    const entry = JSON.parse(lines[0]);
+    const entry = lines.map((line) => JSON.parse(line)).find((item) => item.action === 'advance');
     expect(entry.action).toBe('advance');
   });
 
-  it('should reject advance from terminal stage', () => {
-    // 推进到 08_done
-    for (let i = 0; i < STAGE_CHAIN.length - 1; i++) {
-      advance(featureId, TMP, { force: true });
-    }
-    expect(() => advance(featureId, TMP, { force: true }))
-      .toThrow(/终态阶段/);
+  it('should ignore legacy force option and keep normal behavior', () => {
+    const result = advance(featureId, TMP, { force: true } as never);
+    expect(result.from).toBe('00_init');
+    expect(result.to).toBe('01_specify');
   });
 });
