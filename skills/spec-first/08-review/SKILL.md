@@ -1,12 +1,12 @@
 ---
-name: "spec-first:code-review"
+name: "spec-first:review"
 description: "定位变更范围并执行代码审查"
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
-# Skill: code-review
+# Skill: review
 
 对代码变更执行两阶段审查：先合规，再质量。
 
@@ -34,7 +34,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 ## 触发条件
 - 阶段: 04_implement（code Skill 之后）
-- Command: `/spec-first:code-review`
+- Command: `/spec-first:review`
 
 
 ## Feature 定位规则
@@ -60,7 +60,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 ## Layer 参数约定
 
-- 支持：`/spec-first:code-review --layer <single|cross|completion>`
+- 支持：`/spec-first:review --layer <single|cross|completion>`
 - 默认：未传 `--layer` 时按 `cross` 执行
 - 限制：非法 layer 值由 runtime 参数校验直接拒绝
 

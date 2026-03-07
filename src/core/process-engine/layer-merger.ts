@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import yaml from 'js-yaml';
 import type { Mode, Size } from '../../shared/types.js';
+import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 import { exists } from '../../shared/fs-utils.js';
 import { loadEnabledExtensions } from './extensions.js';
 
@@ -83,8 +84,13 @@ function layer0Deliverables(): Record<string, Deliverable[]> {
       { name: 'reports/test-report.md', required: true, description: '测试报告' },
     ],
     '06_wrap_up': [
-      { name: 'traceability-matrix.md', required: true, description: '追踪矩阵' },
+      { name: 'retro.md', required: true, description: '归档复盘记录' },
     ],
+    '07_release': RELEASE_REQUIRED_ARTIFACTS.map((name) => ({
+      name,
+      required: true,
+      description: name.endsWith('release-note.md') ? '发布说明' : '冒烟验证报告',
+    })),
   };
 }
 

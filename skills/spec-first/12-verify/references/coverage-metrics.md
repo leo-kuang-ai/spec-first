@@ -348,8 +348,8 @@ C11 = count(design decisions compliant with constitution) / count(all design dec
 | C1 < 阈值 | `/spec-first:spec` |
 | C2 < 阈值 | `/spec-first:design` |
 | C3 < 阈值 | `/spec-first:task` |
-| C4 < 阈值 | `/spec-first:test` |
-| C5 < 阈值 | `/spec-first:test`（补充 TC） |
+| C4 < 阈值 | 回到 `task/code` 补齐测试设计与 TDD 证据 |
+| C5 < 阈值 | 回到 `task/code` 补齐测试设计与 TDD 证据 |
 | C6 < 阈值 | 继续实现 TASK |
 | C7 < 阈值 | 修复 PR |
 | C8 < 阈值 | 修正 TASK 字段 |

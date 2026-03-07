@@ -273,7 +273,7 @@ Owner: {owner}
 
 | 缺口类型 | 检测条件 | 补齐方案 |
 |---------|----------|----------|
-| **Feature 未定位** | `.spec-first/current` 不存在 | 执行 `/spec-first:feature-list` 选择 Feature |
+| **Feature 未定位** | `.spec-first/current` 不存在 | 执行 `/spec-first:feature list` 选择 Feature |
 | **阶段状态缺失** | `stage-state.json` 不存在 | 执行 `/spec-first:init` 初始化 |
 | **任务计划缺失** | `task_plan.md` 不存在 | 执行 `/spec-first:task` 拆解任务 |
 | **发现记录为空** | `findings.md` 为空 | 执行 `/spec-first:status` 生成当前状态 |
@@ -307,7 +307,7 @@ digraph catchup_flow {
   CheckCurrent -> GapFeature [label="否"];
 
   GapFeature [label="标记缺口：Feature 未定位"];
-  GapFeature -> SuggestList [label="建议 feature-list"];
+  GapFeature -> SuggestList [label="建议 feature list"];
 
   LoadStage [label="加载阶段状态"];
   LoadStage -> CheckStage [label="读取 stage-state.json"];

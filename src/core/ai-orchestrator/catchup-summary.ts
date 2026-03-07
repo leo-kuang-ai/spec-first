@@ -1,3 +1,5 @@
+import { getSuggestedCommandForStage } from '../rules/truth-source.js';
+
 /** 5-Question Reboot Test 结构（Planning-with-Files P0-2） */
 export interface FiveQuestions {
   /** Q1: 当前 Feature 与阶段是什么？ */
@@ -122,31 +124,13 @@ export function extractFiveQuestions(
   const currentBlockerQ = { answer: blocker, gap: blockerGap };
 
   // Q5: 下一步命令（必须给出有效可执行命令）
-  let nextAction = `执行 spec-first stage current ${featureId} 确认当前阶段`;
-  let nextActionGap = true;
+  let nextAction = getSuggestedCommandForStage(phase, featureId);
+  let nextActionGap = !task && !['01_specify', '02_design', '03_plan', '04_implement', '05_verify', '06_wrap_up', '07_release', '08_done'].includes(phase);
   if (task) {
-    nextAction = `执行 /spec-first:code --task ${task}`;
-    nextActionGap = false;
-  } else if (phase === '01_specify') {
-    nextAction = '执行 /spec-first:spec';
-    nextActionGap = false;
-  } else if (phase === '02_design') {
-    nextAction = '执行 /spec-first:design';
-    nextActionGap = false;
-  } else if (phase === '03_plan') {
-    nextAction = '执行 /spec-first:task';
-    nextActionGap = false;
-  } else if (phase === '04_implement') {
-    nextAction = '执行 /spec-first:code';
-    nextActionGap = false;
-  } else if (phase === '05_verify') {
-    nextAction = '执行 /spec-first:test';
-    nextActionGap = false;
-  } else if (phase === '06_wrap_up') {
-    nextAction = '执行 /spec-first:archive';
+    nextAction = `/spec-first:code --task ${task}`;
     nextActionGap = false;
   }
-  const nextActionQ = { answer: nextAction, gap: nextActionGap };
+  const nextActionQ = { answer: `执行 ${nextAction}`, gap: nextActionGap };
 
   return {
     featureAndStage,

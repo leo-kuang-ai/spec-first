@@ -8,6 +8,8 @@
 
 优化健康仪表盘模块的视觉呈现效果。
 
+**upstream**: REQ-PRD-001
+
 **Acceptance Criteria**:
 
 - **AC-DASHBOARD-001-01**: 健康分环形图采用渐变色，根据分数显示不同颜色（0-59红色，60-79黄色，80-100绿色）
@@ -20,6 +22,8 @@
 
 优化页面整体布局和导航体验。
 
+**upstream**: REQ-PRD-002
+
 **Acceptance Criteria**:
 
 - **AC-DASHBOARD-002-01**: 侧边栏宽度优化，增加视觉呼吸感
@@ -31,6 +35,8 @@
 ## FR-DASHBOARD-003: 模块交互优化
 
 优化各模块的交互反馈效果。
+
+**upstream**: REQ-PRD-003
 
 **Acceptance Criteria**:
 

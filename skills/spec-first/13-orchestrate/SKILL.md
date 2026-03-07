@@ -195,8 +195,8 @@ Stage -> Skill 映射（P4 按此表调度）：
 | 01_specify | 03-spec | 需求定义 |
 | 02_design | 04-design | 技术设计（05-research 按需） |
 | 03_plan | 06-task | 任务拆解 |
-| 04_implement | 07-code | 代码实现（08-code-review 按需） |
-| 05_verify | 09-test | 测试用例 |
+| 04_implement | 07-code | 代码实现（08-review 按需） |
+| 05_verify | 12-verify | 阶段验收 |
 | 06_wrap_up | 10-archive | 归档总结 |
 
 ### 子 Skill 失败处理

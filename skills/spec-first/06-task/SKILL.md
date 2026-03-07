@@ -567,3 +567,9 @@ Phase 2: Implementation
 - 验收标准补充
 - 执行方式选择
 ```
+
+
+## 测试设计前置要求（v2）
+
+- 每个 TASK 都必须显式给出测试设计输入：`target_fr_ids`、`target_ac_ids`、`recommended_test_levels`、`failure_cases`、`definition_of_done`、`test_intent`。
+- 这些字段是 `/spec-first:code` 执行 TDD 的前置输入，不允许留到 `verify` 再补。

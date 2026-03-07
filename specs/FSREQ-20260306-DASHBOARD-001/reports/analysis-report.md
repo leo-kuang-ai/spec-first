@@ -1,17 +1,17 @@
 # Analysis Report — FSREQ-20260306-DASHBOARD-001
 
-> Generated At: 2026-03-06T01:58:24.755Z
+> Generated At: 2026-03-07T17:08:07.143Z
 
 ## Summary
 
 - CRITICAL: 0
-- HIGH: 1
+- HIGH: 0
 - MEDIUM: 0
-- LOW: 0
+- LOW: 1
 - Total: 1
 
 ## Findings
 
 | Severity | Type | Location | Detail | Suggestion |
 |----------|------|----------|--------|------------|
-| HIGH | COVERAGE_GAP_PRD | traceability-matrix.md | FR 未映射 PRD: FR-DASHBOARD-001, FR-DASHBOARD-002, FR-DASHBOARD-003 | 每个 FR 至少需要 1 条 REQ-PRD-* upstream 引用 |
+| LOW | NO_SIGNIFICANT_ISSUE | all | 未发现显著一致性问题 | 可继续推进并在后续变更后复检 |

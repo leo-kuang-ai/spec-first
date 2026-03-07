@@ -19,6 +19,7 @@ import { getCriticalCountFromAnalysisReport, analyzeArtifacts } from './sca.js';
 import { runCommandGate } from './command-gate.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
 import { validatePrd } from './prd-validator.js';
+import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 
 // ─── Gate 条件定义 ─────────────────────────────────────────
 
@@ -281,24 +282,13 @@ GATE_CONDITIONS['06_wrap_up' as Stage] = [
 ];
 
 // ─── 07_release 条件 ─────────────────────────────────────
-GATE_CONDITIONS['07_release' as Stage] = [
-  {
-    id: 'G-REL-01',
-    description: 'Smoke test report exists',
-    evaluate: (ctx) => {
-      const p = join(ctx.projectRoot, 'specs', ctx.featureId, 'reports', 'smoke-test-report.md');
-      return { pass: exists(p) };
-    },
-  },
-  {
-    id: 'G-REL-02',
-    description: 'Release note exists',
-    evaluate: (ctx) => {
-      const p = join(ctx.projectRoot, 'specs', ctx.featureId, 'reports', 'release-note.md');
-      return { pass: exists(p) };
-    },
-  },
-];
+GATE_CONDITIONS['07_release' as Stage] = RELEASE_REQUIRED_ARTIFACTS.map((relativePath, index) => ({
+  id: index === 0 ? 'G-REL-01' : 'G-REL-02',
+  description: relativePath.endsWith('release-note.md') ? 'Release note exists' : 'Smoke test report exists',
+  evaluate: (ctx) => ({
+    pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, relativePath)),
+  }),
+}));
 
 // ─── 核心评估函数 ─────────────────────────────────────────
 
@@ -564,7 +554,7 @@ function evaluateConstitutionAuthorityMapping(projectRoot: string): { pass: bool
   const authorityRefPath = join(projectRoot, 'skills', 'spec-first', '03-spec', 'references', 'constitution-authority.md');
   const specSkillPath = join(projectRoot, 'skills', 'spec-first', '03-spec', 'SKILL.md');
   const designSkillPath = join(projectRoot, 'skills', 'spec-first', '04-design', 'SKILL.md');
-  const codeReviewSkillPath = join(projectRoot, 'skills', 'spec-first', '08-code-review', 'SKILL.md');
+  const codeReviewSkillPath = join(projectRoot, 'skills', 'spec-first', '08-review', 'SKILL.md');
 
   if (!exists(authorityRefPath)) {
     failures.push('constitution-authority.md missing');
@@ -589,9 +579,9 @@ function evaluateConstitutionAuthorityMapping(projectRoot: string): { pass: bool
   }
 
   if (!exists(codeReviewSkillPath)) {
-    failures.push('08-code-review/SKILL.md missing');
+    failures.push('08-review/SKILL.md missing');
   } else if (!/constitution-authority\.md/i.test(readFileSync(codeReviewSkillPath, 'utf-8'))) {
-    failures.push('08-code-review/SKILL.md missing constitution-authority reference');
+    failures.push('08-review/SKILL.md missing constitution-authority reference');
   }
 
   return { pass: failures.length === 0, failures };
@@ -664,12 +654,12 @@ function getC11FailureFixHints(featureId: string, failures: string[]): string[] 
       push('skills/spec-first/04-design/SKILL.md: add reference to ../03-spec/references/constitution-authority.md');
       continue;
     }
-    if (failure === '08-code-review/SKILL.md missing') {
-      push('skills/spec-first/08-code-review/SKILL.md: restore skill doc and reference constitution-authority.md');
+    if (failure === '08-review/SKILL.md missing') {
+      push('skills/spec-first/08-review/SKILL.md: restore skill doc and reference constitution-authority.md');
       continue;
     }
-    if (failure === '08-code-review/SKILL.md missing constitution-authority reference') {
-      push('skills/spec-first/08-code-review/SKILL.md: add reference to ../03-spec/references/constitution-authority.md');
+    if (failure === '08-review/SKILL.md missing constitution-authority reference') {
+      push('skills/spec-first/08-review/SKILL.md: add reference to ../03-spec/references/constitution-authority.md');
       continue;
     }
     push(`manual check required for: ${failure}`);

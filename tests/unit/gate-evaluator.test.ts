@@ -61,8 +61,8 @@ function writeConstitutionAuthorityMappingArtifacts() {
   mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
   writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), '- ../03-spec/references/constitution-authority.md\n', 'utf-8');
 
-  mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
-  writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '- ../03-spec/references/constitution-authority.md\n', 'utf-8');
+  mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
+  writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), '- ../03-spec/references/constitution-authority.md\n', 'utf-8');
 }
 
 function writeGlobalConstitution(content: string) {

@@ -26,8 +26,7 @@ description: Spec-First AI Agent Skills 目录索引
 | [05-research](./05-research/SKILL.md) | 02_design | 技术调研（可选）| assisted |
 | [06-task](./06-task/SKILL.md) | 03_plan | 任务拆解与验收标准 | strict |
 | [07-code](./07-code/SKILL.md) | 04_implement | 代码实现 | strict/assisted |
-| [08-code-review](./08-code-review/SKILL.md) | 04_implement | 代码审查 | assisted |
-| [09-test](./09-test/SKILL.md) | 05_verify | 测试用例定义 | strict |
+| [08-review](./08-review/SKILL.md) | 04_implement | 代码审查 | assisted |
 | [10-archive](./10-archive/SKILL.md) | 06_wrap_up | 归档复盘 | assisted |
 
 ### 编排与验证 Skills
@@ -51,9 +50,7 @@ description: Spec-First AI Agent Skills 目录索引
 
 | Skill | 说明 | 确认策略 |
 |-------|------|----------|
-| [17-feature-list](./17-feature-list/SKILL.md) | 列出全部 Feature | auto |
-| [18-feature-switch](./18-feature-switch/SKILL.md) | 切换当前 Feature | auto |
-| [19-feature-current](./19-feature-current/SKILL.md) | 查看当前 Feature | auto |
+| [17-feature](./17-feature/SKILL.md) | 统一 Feature 管理入口（list/current/switch） | auto |
 
 ### 扩展 Skills
 
@@ -77,7 +74,7 @@ description: Spec-First AI Agent Skills 目录索引
 3. **技术设计** → [04-design](./04-design/SKILL.md)
 4. **任务拆解** → [06-task](./06-task/SKILL.md)
 5. **实现代码** → [07-code](./07-code/SKILL.md)
-6. **编写测试** → [09-test](./09-test/SKILL.md)
+6. **阶段验收** → [12-verify](./12-verify/SKILL.md)
 7. **自动编排** → [13-orchestrate](./13-orchestrate/SKILL.md)
 
 ### 按阶段查找
@@ -88,8 +85,8 @@ description: Spec-First AI Agent Skills 目录索引
 | 01_specify | 03-spec, 20-spec-review |
 | 02_design | 04-design, 05-research |
 | 03_plan | 06-task, 21-analyze |
-| 04_implement | 07-code, 08-code-review |
-| 05_verify | 09-test, 12-verify |
+| 04_implement | 07-code, 08-review |
+| 05_verify | 12-verify |
 | 06_wrap_up | 10-archive |
 
 ## 技术栈
@@ -110,3 +107,8 @@ description: Spec-First AI Agent Skills 目录索引
 - **版本**: 1.0.0
 - **最后更新**: 2026-03-02
 - **维护者**: Spec-First Team
+
+## Canonical Flow
+
+- 阶段流：`05_verify → 06_wrap_up → 07_release → 08_done`
+- 命令流：`verify → archive → golive → done`

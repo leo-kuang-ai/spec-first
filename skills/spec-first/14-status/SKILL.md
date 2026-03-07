@@ -149,7 +149,7 @@ I'm using the status skill to show the current state of [Feature].
 
 2. **测试用例未生成** — C4/C5 为 0，无法验证功能
    - 影响: 质量无保障
-   - 建议: 执行 `/spec-first:test` 生成测试用例
+   - 建议: 回到 `/spec-first:task` 或 `/spec-first:code` 补齐测试设计与 TDD 证据
 
 ### 🟢 低风险 (1)
 1. **任务进度略慢** — 预计剩余 1.5 天，可能延期 0.5 天
@@ -163,7 +163,7 @@ I'm using the status skill to show the current state of [Feature].
 基于当前状态，建议：
 
 1. **补充 TASK 拆解** — 执行 `/spec-first:task` 完成 C3 覆盖
-2. **生成测试用例** — 执行 `/spec-first:test` 提升 C4/C5
+2. **补齐测试设计与 TDD 证据** — 回到 `/spec-first:task` / `/spec-first:code` 收口 C4/C5
 3. **继续实现任务** — 完成剩余 2 个 in_progress 任务
 
 **可推进阶段？** ❌ 否（C3 未达标）

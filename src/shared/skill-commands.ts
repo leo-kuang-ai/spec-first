@@ -11,6 +11,7 @@
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { REMOVED_SKILLS } from '../core/rules/truth-source.js';
 import { detectHostPaths } from './host-paths.js';
 
 /** spec-first 包根目录（兼容 dist 产物路径与 src 源码路径） */
@@ -37,6 +38,7 @@ function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | 
   if (dryRun) return targetRoot;
 
   mkdirSync(targetRoot, { recursive: true });
+  pruneRemovedUserSkills(pkgSkillsRoot, targetRoot);
 
   for (const dir of readdirSync(pkgSkillsRoot, { withFileTypes: true })) {
     if (!dir.isDirectory()) continue;
@@ -56,6 +58,23 @@ function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | 
   return targetRoot;
 }
 
+
+function pruneRemovedUserSkills(pkgSkillsRoot: string, targetRoot: string): void {
+  if (!existsSync(targetRoot)) return;
+
+  const validEntries = new Set(
+    readdirSync(pkgSkillsRoot, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name),
+  );
+
+  for (const entry of readdirSync(targetRoot, { withFileTypes: true })) {
+    if (entry.name === 'AGENTS.md') continue;
+    if (validEntries.has(entry.name)) continue;
+    rmSync(join(targetRoot, entry.name), { recursive: true, force: true });
+  }
+}
+
 const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   onboarding: '新手引导 - 交互式场景识别与学习路径推荐',
   first: '项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式生成 10-11 份完整文档（支持 --deep/--type/--force 参数）',
@@ -66,8 +85,7 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   research: '定位 Feature 上下文并生成调研结论',
   task: '定位 Feature 并校验阶段为任务拆解（03_plan）',
   code: '定位进行中的 TASK 并执行代码实现',
-  'code-review': '定位变更范围并执行代码审查',
-  test: '定位 Feature 并校验阶段为验证测试（05_verify）',
+  review: '定位变更范围并执行实现质量审查',
   archive: '定位 Feature 并校验阶段为归档复盘（06_wrap_up）',
   plan: '定位 Feature 并加载当前阶段计划',
   verify: '定位 Feature 并执行阶段验收校验',
@@ -75,9 +93,7 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   status: '定位当前 Feature 并输出状态概览',
   doctor: '定位项目与宿主配置并执行环境诊断',
   sync: '定位 Feature 并同步追踪矩阵与状态',
-  'feature-list': '列出当前项目全部 Feature',
-  'feature-switch': '切换当前 Feature 上下文（更新 .spec-first/current）',
-  'feature-current': '查看当前 Feature 与阶段信息',
+  feature: 'Feature 查询/切换命令族',
   'spec-review': '定位 Feature 并执行需求规格质量审查（C10）',
   analyze: '执行跨产物一致性分析并生成分析报告',
 };
@@ -144,6 +160,7 @@ export function discoverSkills(overrideRoot?: string): SkillEntry[] {
     const content = readFileSync(skillMd, 'utf-8');
     const nameMatch = content.match(/^#\s*Skill:\s*(\S+)/m);
     const skillName = nameMatch ? nameMatch[1] : dir.name.replace(/^\d+-/, '');
+    if (REMOVED_SKILLS.includes(skillName as typeof REMOVED_SKILLS[number])) continue;
 
     entries.push({
       commandName: `spec-first-${skillName}`,
@@ -302,16 +319,30 @@ function resolveHosts(isGlobal: boolean, hosts?: SkillHostTarget[]): Set<'claude
 function cleanupLegacyClaudeCommands(commandsDir: string, skills: SkillEntry[]): void {
   for (const entry of skills) {
     const legacy = join(commandsDir, `${entry.commandName}.md`);
-    if (!existsSync(legacy)) continue;
-    rmSync(legacy, { force: true });
+    if (existsSync(legacy)) rmSync(legacy, { force: true });
+  }
+
+  const namespaceDir = join(commandsDir, 'spec-first');
+  for (const removed of REMOVED_SKILLS) {
+    const nested = join(namespaceDir, `${removed}.md`);
+    const flat = join(commandsDir, `spec-first-${removed}.md`);
+    if (existsSync(nested)) rmSync(nested, { force: true });
+    if (existsSync(flat)) rmSync(flat, { force: true });
   }
 }
 
 function cleanupLegacyCodexSkills(codexSkillsDir: string, skills: SkillEntry[]): void {
   for (const entry of skills) {
     const legacy = join(codexSkillsDir, entry.commandName);
-    if (!existsSync(legacy)) continue;
-    rmSync(legacy, { recursive: true, force: true });
+    if (existsSync(legacy)) rmSync(legacy, { recursive: true, force: true });
+  }
+
+  const namespaceDir = join(codexSkillsDir, 'spec-first');
+  for (const removed of REMOVED_SKILLS) {
+    const nested = join(namespaceDir, removed);
+    const flat = join(codexSkillsDir, `spec-first-${removed}`);
+    if (existsSync(nested)) rmSync(nested, { recursive: true, force: true });
+    if (existsSync(flat)) rmSync(flat, { recursive: true, force: true });
   }
 }
 

@@ -132,7 +132,7 @@ I'm using the verify skill to validate [Feature] stage completion.
 | Gate 通过 | `spec-first gate check <featureId>` 输出: `PASS` 或 `PASS_WITH_WAIVER` | "我检查过了"、"应该没问题" |
 | 覆盖率达标 | `spec-first metrics coverage <featureId>` + 当前阶段 `gate check` 判定通过 | "所有 FR 都有对应 TASK" |
 | 阶段可推进 | `gate check` 退出码 0（`PASS/PASS_WITH_WAIVER`）+ `matrix check` 满足当前阶段策略 | "上一轮通过了" |
-| TASK 完成 | 测试命令输出 + code-review 通过 | "代码写完了" |
+| TASK 完成 | 测试命令输出 + review 通过 | "代码写完了" |
 | Feature 可归档 | `spec-first gate check <featureId>` + `spec-first matrix check <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
 
 ## Gate 状态
@@ -295,8 +295,8 @@ digraph verify_failure_flow {
 | C1 < 阈值 | `/spec-first:spec` |
 | C2 < 阈值 | `/spec-first:design` |
 | C3 < 阈值 | `/spec-first:task` |
-| C4 < 阈值 | `/spec-first:test` |
-| C5 < 阈值 | `/spec-first:test`（补充 TC） |
+| C4 < 阈值 | 回到 `task/code` 补齐测试设计与 TDD 证据 |
+| C5 < 阈值 | 回到 `task/code` 补齐测试设计与 TDD 证据 |
 | C6 < 阈值 | 继续实现 TASK |
 | C7 < 阈值 | 修复 PR |
 | C8 < 阈值 | 修正 TASK 字段 |
@@ -401,19 +401,19 @@ digraph verify_flow {
 ### Layer 1: 单层检查（Single-Layer）
 
 - 目标：对单层产物做局部质量检查（SOLID/安全/性能/测试）
-- 推荐入口：`/spec-first:code-review --layer single`
+- 推荐入口：`/spec-first:review --layer single`
 
 ### Layer 2: 跨层检查（Cross-Layer）
 
 - 目标：核查跨层数据流、依赖路径、同层一致性与批量修改完整性
-- 推荐入口：`/spec-first:code-review --layer cross`
+- 推荐入口：`/spec-first:review --layer cross`
 
 ### Layer 3: 完成检查（Completion）
 
 - 目标：阶段推进前统一验收（gate check + matrix check + 覆盖率判定）
 - 推荐入口：`/spec-first:verify --layer completion`
 
-> 说明：当前 runtime 仅开放 verify 的 completion 层；single/cross 由 code-review 承载。
+> 说明：当前 runtime 仅开放 verify 的 completion 层；single/cross 由 review 承载。
 
 ## Layer 参数约定
 

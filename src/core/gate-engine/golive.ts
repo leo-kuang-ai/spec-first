@@ -1,6 +1,6 @@
 /**
  * GoLive 检查 + 降级策略
- * GL-01~GL-04 上线前检查，失败时降级 confirm_policy 为 strict
+ * GL-01~GL-05 上线前检查，失败时降级 confirm_policy 为 strict
  */
 import { join } from 'node:path';
 import type { Stage, GateResult } from '../../shared/types.js';
@@ -9,6 +9,7 @@ import { runSca } from './sca.js';
 import { validateSecurity, parseSecurityReport } from './security.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 import { readFileSync } from 'node:fs';
+import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 
 export interface GoLiveCheck {
   id: string;
@@ -26,11 +27,12 @@ export interface GoLiveResult {
 }
 
 /**
- * 执行 GL-01~GL-04 上线前检查
+ * 执行 GL-01~GL-05 上线前检查
  * GL-01: 所有阶段 Gate 已通过
  * GL-02: 最终 SCA 通过
  * GL-03: 安全扫描无 critical
  * GL-04: 追踪矩阵全部终态
+ * GL-05: Release 证据齐备（release-note + smoke-test-report）
  */
 export function checkGoLive(featureId: string, projectRoot: string): GoLiveResult {
   const checks: GoLiveCheck[] = [];
@@ -82,6 +84,18 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
     detail: nonTerminal.length > 0
       ? `${nonTerminal.length} 条非终态条目`
       : '全部条目已终态',
+  });
+
+  // GL-05: Release evidence exists
+  const missingArtifacts = RELEASE_REQUIRED_ARTIFACTS
+    .filter((relativePath) => !exists(join(projectRoot, 'specs', featureId, relativePath)));
+  checks.push({
+    id: 'GL-05',
+    description: 'Release 证据齐备（release-note + smoke-test-report）',
+    pass: missingArtifacts.length === 0,
+    detail: missingArtifacts.length === 0
+      ? 'release evidence complete'
+      : `missing: ${missingArtifacts.join(', ')}`,
   });
 
   const pass = checks.every(c => c.pass);

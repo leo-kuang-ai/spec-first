@@ -5,6 +5,7 @@
 import { join } from 'node:path';
 import type { Mode, Size, StageState } from '../../shared/types.js';
 import { Stage } from '../../shared/types.js';
+import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 import { readJson, exists } from '../../shared/fs-utils.js';
 import { renderTemplate, type TemplateContext } from './renderer.js';
 
@@ -71,8 +72,11 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   // 06_wrap_up
   { relativePath: 'retro.md', stage: Stage.WRAP_UP },
   // 07_release
-  { relativePath: 'reports/release-note.md', stage: Stage.RELEASE, template: 'release/release-note.md' },
-  { relativePath: 'reports/smoke-test-report.md', stage: Stage.RELEASE, template: 'release/smoke-test-report.md' },
+  ...RELEASE_REQUIRED_ARTIFACTS.map((relativePath) => ({
+    relativePath,
+    stage: Stage.RELEASE,
+    template: relativePath.endsWith('release-note.md') ? 'release/release-note.md' : 'release/smoke-test-report.md',
+  })),
 ];
 
 // ─── 阶段顺序（用于判定"当前阶段及之前"） ─────────────

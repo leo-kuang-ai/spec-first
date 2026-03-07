@@ -79,8 +79,24 @@ function appendFindings(featureId: string, root: string, msg: string): void {
   }
 }
 
+function sanitizeStageState(state: StageState): StageState {
+  return {
+    featureId: state.featureId,
+    mode: state.mode,
+    size: state.size,
+    platforms: state.platforms,
+    mergedRules: state.mergedRules,
+    currentStage: state.currentStage,
+    history: state.history,
+    terminal: state.terminal,
+    title: state.title,
+    createdAt: state.createdAt,
+    updatedAt: state.updatedAt,
+  };
+}
+
 function saveState(featureId: string, root: string, state: StageState): void {
-  writeJson(getStatePath(featureId, root), state);
+  writeJson(getStatePath(featureId, root), sanitizeStageState(state));
 }
 
 /**

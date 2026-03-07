@@ -6,6 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Stage } from '../../shared/types.js';
+import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 import { loadConfig } from '../../shared/config-schema.js';
 
 export interface StageDependency {
@@ -35,8 +36,13 @@ const DEFAULT_STAGE_DEPENDENCIES: StageDependency[] = [
     npmScripts: ['test'],
   },
   {
+    stage: Stage.WRAP_UP,
+    files: ['specs/{featureId}/retro.md'],
+  },
+  {
     stage: Stage.RELEASE,
-    files: ['specs/{featureId}/reports/smoke-test-report.md'],
+    files: RELEASE_REQUIRED_ARTIFACTS.map((item) => `specs/{featureId}/${item}`),
+    npmScripts: ['contract:check'],
   },
 ];
 

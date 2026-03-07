@@ -369,3 +369,6 @@ Gate 检查 — FSREQ-20260306-DASHBOARD-001 (03_plan)
 **推进决策**：PASS_WITH_WAIVER → 强制推进到 08_done
 
 - [2026-03-06T01:59:59.220Z] FORCE_SKIPPED: 07_release → 08_done (gate check bypassed)
+
+- [2026-03-07T17:05:48.468218Z] SYNC: 回填 PRD→FR 追踪关系（REQ-PRD-001/002/003），清理遗留 current_stage 字段并刷新运行态一致性。
+- [2026-03-07T17:08:44.891882Z] SYNC: traceability-matrix.md 状态统一为 Accepted，补齐 TC/ATP 验证链；matrix check=0 orphan/0 broken，analyze=0 critical/0 high。

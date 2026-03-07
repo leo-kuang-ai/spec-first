@@ -25,6 +25,7 @@ import { handleUninstall } from './commands/uninstall.js';
 import { handleAnalyze } from './commands/analyze.js';
 import { handleTrace } from './commands/trace.js';
 import { handleValidate } from './commands/validate.js';
+import { handleDone } from './commands/done.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
 registerCommand('matrix', '同步追踪矩阵', handleMatrix);
@@ -36,6 +37,7 @@ registerCommand('metrics', '覆盖率度量与健康评分', handleMetrics);
 registerCommand('doctor', '环境诊断与修复', handleDoctor);
 registerCommand('gate', '阶段质量门禁评估', handleGate);
 registerCommand('golive', '上线就绪检查与批准', handleGoLive);
+registerCommand('done', '将 Feature 从 07_release 收口到 08_done', handleDone);
 registerCommand('ai', '会话恢复与上下文摘要', handleAi);
 registerCommand('commit', '规范提交并关联追溯 ID', handleCommit);
 registerCommand('feature', 'Feature 列表、切换与查看', handleFeature);

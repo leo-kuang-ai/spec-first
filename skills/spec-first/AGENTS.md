@@ -452,8 +452,8 @@ P5_SIDE_EFFECT — 副作用执行
 
 | policy | P3 行为 | 适用场景 |
 | --- | --- | --- |
-| auto | 跳过用户确认，P2 完成后直接进入 P4 | 只读/低风险操作（status、verify、feature-list、feature-current） |
-| assisted | 展示生成内容摘要，用户可确认、修改或拒绝 | 中等风险操作（catchup、task、test、code-review、sync、doctor、feature-switch） |
+| auto | 跳过用户确认，P2 完成后直接进入 P4 | 只读/低风险操作（status、verify、feature） |
+| assisted | 展示生成内容摘要，用户可确认、修改或拒绝 | 中等风险操作（catchup、task、review、sync、doctor、feature） |
 | strict | 展示完整生成内容，用户必须逐项审阅后确认 | 高风险操作（init、spec、design、code、archive、orchestrate） |
 
 - `auto` 的 Skill 不应写入关键交付物（spec.md/design.md/task_plan.md），仅允许写入运行态文件（findings.md）或不写入
@@ -490,12 +490,12 @@ P5_SIDE_EFFECT — 副作用执行
 | 01_specify | 03-spec, 20-spec-review | spec.md, checklists/spec-review.md |
 | 02_design | 04-design, 05-research | design.md, contracts/, research.md |
 | 03_plan | 06-task, 21-analyze（建议） | task_plan.md, checklist.md, reports/analysis-report.md |
-| 04_implement | 07-code, 08-code-review | task_plan.md 状态更新 |
-| 05_verify | 09-test | tests/*.test.md |
+| 04_implement | 07-code, 08-review | task_plan.md 状态更新 |
+| 05_verify | 12-verify | findings.md / gate evidence |
 | 06_wrap_up | 10-archive | retro.md |
 | 任意阶段 | 02-catchup | 无文件（恢复摘要） |
 | 编排层 | 11-plan, 12-verify, 13-orchestrate | 执行计划 / 校验报告 |
-| 辅助 | 14-status, 15-doctor, 16-sync, 17-feature-list, 18-feature-switch, 19-feature-current | 状态查询 / 环境诊断 / 矩阵同步 / Feature 管理 |
+| 辅助 | 14-status, 15-doctor, 16-sync, 17-feature | 状态查询 / 环境诊断 / 矩阵同步 / Feature 管理 |
 
 ## 全局约束
 

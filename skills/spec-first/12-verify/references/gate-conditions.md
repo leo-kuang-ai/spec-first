@@ -141,4 +141,4 @@ def evaluate_gate(feature_id, stage):
 | G-DESIGN-02 (C2 < 100%) | 部分 FR 缺少 DS | 运行 `/spec-first:design` 补充 DS |
 | G-PLAN-01 (C3 < 100%) | 部分 FR 缺少 TASK | 运行 `/spec-first:task` 拆解任务 |
 | G-IMPL-01 (C4 < 80%) | 单测覆盖不足 | 补充单元测试 |
-| G-VERIFY-01 (C4 < 100%) | 部分 FR 缺少 TC | 运行 `/spec-first:test` 生成 TC |
+| G-VERIFY-01 (C4 < 100%) | 部分 FR 缺少 TC | 回到 `task/code` 补齐测试设计与 TDD 证据 |

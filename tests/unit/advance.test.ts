@@ -82,6 +82,20 @@ describe('advance', () => {
     expect(() => advance(FEAT_ID, TMP)).toThrow(/Gate 未通过/);
   });
 
+
+  it('should drop legacy current_stage field when persisting advanced state', () => {
+    const legacy = { ...makeState(), current_stage: Stage.IMPLEMENT } as StageState & { current_stage: Stage };
+    writeFileSync(join(SPEC_DIR, 'stage-state.json'), JSON.stringify(legacy, null, 2), 'utf-8');
+
+    advance(FEAT_ID, TMP);
+
+    const raw = readFileSync(join(SPEC_DIR, 'stage-state.json'), 'utf-8');
+    expect(raw).not.toContain('"current_stage"');
+    const updated = JSON.parse(raw) as StageState & { current_stage?: string };
+    expect(updated.currentStage).toBe(Stage.SPECIFY);
+    expect(updated.current_stage).toBeUndefined();
+  });
+
   it('should write gate-history.jsonl on advance', () => {
     writeState(makeState());
     advance(FEAT_ID, TMP);
@@ -108,7 +122,7 @@ describe('advance', () => {
     writeState(makeState({ currentStage: Stage.DESIGN }));
     mkdirSync(join(TMP, 'skills', 'spec-first', '03-spec', 'references'), { recursive: true });
     mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
     writeFileSync(
       join(TMP, 'skills', 'spec-first', '03-spec', 'references', 'constitution-authority.md'),
       [
@@ -126,7 +140,7 @@ describe('advance', () => {
     );
     writeFileSync(join(TMP, 'skills', 'spec-first', '03-spec', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
     writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'constitution.md'), [
       '# Constitution',
       '',

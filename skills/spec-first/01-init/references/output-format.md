@@ -137,7 +137,7 @@ Feature ID: FSREQ-20260305-AUTH-001
 - 未重置阶段状态
 
 💡 提示:
-使用 /spec-first:feature-switch 切换到其他 Feature
+使用 /spec-first:feature switch 切换到其他 Feature
 ```
 
 ---

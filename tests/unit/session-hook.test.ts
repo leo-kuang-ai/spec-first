@@ -43,7 +43,7 @@ describe('registerSessionHooks', () => {
     // Superpowers P0-1: 技能路由表 + 1% 规则
     expect(entry.hooks[0].command).toContain('技能路由表');
     expect(entry.hooks[0].command).toContain('1%规则');
-    expect(entry.hooks[0].command).toContain('init→spec→design→task→code→code-review→verify→catchup');
+    expect(entry.hooks[0].command).toContain('init→spec→design→task→code→review→verify→archive→feature→catchup');
   });
 
   it('should be idempotent — no duplicates on second call', () => {

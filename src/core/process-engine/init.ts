@@ -249,25 +249,91 @@ function isProcessAlive(pid: number): boolean {
 // ─── 骨架文件生成 ────────────────────────────────────────
 
 function skeletonFindings(featureId: string): string {
-  return `# Findings — ${featureId}\n\n`
-    + `## 过程发现\n\n`
-    + `> 记录 Gate 校验、Force 跳过、Pilot 降级等过程事件。\n\n`
-    + `| 时间 | 阶段 | 类型 | 描述 |\n`
-    + `|------|------|------|------|\n`;
+  return `# Findings & Decisions — ${featureId}
+
+`
+    + `## Plan Summary
+
+`
+    + `| Field | Value |
+`
+    + `|------|-------|
+`
+    + `| Target Stage | 01_specify |
+`
+    + `| Next Action | 补齐规格并推进当前阶段 |
+`
+    + `| Blockers | none |
+`
+    + `| Risk Level | LOW |
+`
+    + `| Suggested Command | /spec-first:spec |
+
+`
+    + `## Decision Log
+
+`
+    + `| Time | Stage | Decision | Rationale |
+`
+    + `|------|-------|----------|-----------|
+
+`
+    + `## Execution Evidence
+
+`
+    + `| Time | Type | Evidence | Result |
+`
+    + `|------|------|----------|--------|
+
+`
+    + `## Risks & Blockers
+
+`
+    + `- None
+
+`
+    + `## Next Steps
+
+`
+    + `1. 执行 /spec-first:spec
+`;
 }
 
 function skeletonTaskPlan(featureId: string, title: string): string {
-  return `# Task Plan — ${featureId}\n\n`
-    + `> ${title}\n\n`
-    + `## Phase 1: Setup（基础设置）\n\n`
-    + `- [ ] TASK-XXX-001 [P] [US1] 初始化基础骨架\n\n`
-    + `## Phase 2: User Stories - P1（核心价值）\n\n`
-    + `### US1 — Core Flow (P1)\n\n`
-    + `- [ ] TASK-XXX-002 [P] [US1] 实现核心接口\n`
-    + `- [ ] TASK-XXX-003 [US1] 完成核心交互与验证\n\n`
-    + `## 任务明细\n\n`
-    + `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |\n`
-    + `|---|---|---|---|---|---|---|---|\n`;
+  return `# Task Plan — ${featureId}
+
+`
+    + `> ${title}
+
+`
+    + `## 任务明细
+
+`
+    + `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+`
+    + `|---|---|---|---|---|---|---|---|---|
+`
+    + `| TASK-XXX-001 | 初始化基础骨架 | dev | 0.5d | FR-XXX-001 | - | CLI 可初始化并生成骨架 | pnpm test -- tests/unit/init.test.ts | todo |
+
+`
+    + `## 实施步骤
+
+`
+    + `### TASK-XXX-001 — 初始化基础骨架
+
+`
+    + `1. 建立最小骨架与目录
+`
+    + `2. 补齐追踪关系与必要文档
+`
+    + `3. 记录关键结论到 findings.md
+
+`
+    + `## 验证命令
+
+`
+    + `- pnpm test -- tests/unit/init.test.ts
+`;
 }
 
 function skeletonMatrix(): string {

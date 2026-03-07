@@ -2,10 +2,25 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { detectHostPaths } from '../../shared/host-paths.js';
+import { PRIMARY_STAGE_SKILL } from '../rules/truth-source.js';
 import {
   getSessionStartManagedMarker,
   isManagedSessionStartEntry,
 } from './session-hook-managed.js';
+
+const SESSION_ROUTE_HINT = [
+  PRIMARY_STAGE_SKILL['00_init'],
+  PRIMARY_STAGE_SKILL['01_specify'],
+  PRIMARY_STAGE_SKILL['02_design'],
+  PRIMARY_STAGE_SKILL['03_plan'],
+  PRIMARY_STAGE_SKILL['04_implement'],
+  'review',
+  PRIMARY_STAGE_SKILL['05_verify'],
+  PRIMARY_STAGE_SKILL['06_wrap_up'],
+  'feature',
+  'catchup',
+].join('→');
+// init→spec→design→task→code→review→verify→archive→feature→catchup
 
 function resolveSpecFirstBin(): string {
   const fromEnv = process.env.SPEC_FIRST_BIN?.trim();
@@ -38,7 +53,7 @@ function buildSessionStartCommand(specFirstBin: string): string {
   return [
     `${managedMarker} SPEC_FIRST_BIN_FALLBACK=${fallbackBin} sh -c '`,
     // 技能路由表 + 1% 规则（Superpowers P0-1）
-    'echo "[spec-first] 技能路由表: init→spec→design→task→code→code-review→verify→catchup"; ',
+    `echo "[spec-first] 技能路由表: ${SESSION_ROUTE_HINT}"; `,
     'echo "[spec-first] 1%规则: 有1%相关性也先走skill检查，不要直接执行"; ',
     // 自动恢复策略（默认 prompt）
     'TRIGGER=prompt; ',

@@ -2,7 +2,7 @@
  * First Change Detector 单元测试
  * @see 00-first skill 增量更新变更检测
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import {
   analyzeChanges,
   checkProductHealth,
@@ -17,7 +17,13 @@ import { mkdirSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { createIndex } from '../../src/core/skill-runtime/first-index.js';
 
-const TEST_DIR = join(import.meta.dirname, '../fixtures/first-change-detector');
+const TEST_DIR = join(import.meta.dirname, '../fixtures/.tmp-first-change-detector');
+
+afterAll(() => {
+  if (existsSync(TEST_DIR)) {
+    rmSync(TEST_DIR, { recursive: true, force: true });
+  }
+});
 
 describe('analyzeChanges', () => {
   beforeEach(() => {

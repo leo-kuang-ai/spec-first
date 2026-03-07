@@ -21,7 +21,7 @@ description: Spec-First Skills 共享约束与规则（消除重复）
 | "实质重于形式" | 在流程守卫上，形式（字面规则）= 实质（精神） |
 | "具体情况具体分析" | 规则已考虑常见情况，例外需明确讨论而非自行变通 |
 
-**应用 Skills**: 03-spec, 04-design, 06-task, 07-code, 09-test
+**应用 Skills**: 03-spec, 04-design, 06-task, 07-code, 12-verify
 
 ---
 
@@ -41,7 +41,7 @@ description: Spec-First Skills 共享约束与规则（消除重复）
 
 | AI 的借口 | 封堵 |
 |-----------|------|
-| "这个改动太小，不需要走 code-review" | 小改动也有回归风险，review 耗时 < 2 分钟 |
+| "这个改动太小，不需要走 review" | 小改动也有回归风险，review 耗时 < 2 分钟 |
 | "我已经手动检查过了" | 手动检查 != 自动校验证据 |
 | "先写完再补测试" | 事后测试证明不了什么，测试应与改动配套 |
 | "这只是重构，不影响功能" | 重构不改行为 != 重构不引入 bug |
@@ -184,7 +184,7 @@ P5_SIDE_EFFECT — 副作用执行
 - 主工作区仅用于稳定路径与结果汇总，减少上下文与改动污染
 - 最小流程：`git worktree add ../worktree-<TASK-ID> <branch>` → 在独立 worktree 中实现与验证 → 合并回主工作区
 
-**应用 Skills**: 07-code, 08-code-review
+**应用 Skills**: 07-code, 08-review
 
 ---
 

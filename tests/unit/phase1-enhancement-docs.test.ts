@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const SPEC_SKILL = join(import.meta.dirname, '../../skills/spec-first/03-spec/SKILL.md');
 const DESIGN_SKILL = join(import.meta.dirname, '../../skills/spec-first/04-design/SKILL.md');
-const CODE_REVIEW_SKILL = join(import.meta.dirname, '../../skills/spec-first/08-code-review/SKILL.md');
+const CODE_REVIEW_SKILL = join(import.meta.dirname, '../../skills/spec-first/08-review/SKILL.md');
 const VERIFY_SKILL = join(import.meta.dirname, '../../skills/spec-first/12-verify/SKILL.md');
 
 function read(path: string): string {
@@ -28,7 +28,7 @@ describe('phase1 enhancement docs consistency', () => {
     expect(content).toContain('不得带冲突推进');
   });
 
-  it('code-review skill should define layer-selection workflow', () => {
+  it('review skill should define layer-selection workflow', () => {
     const content = read(CODE_REVIEW_SKILL);
     expect(content).toContain('## 执行阶段（增强）');
     expect(content).toContain('确定检查层级（single/cross/completion）');

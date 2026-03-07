@@ -104,10 +104,10 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('error');
   });
 
-  it('should default code-review layer to cross when --layer is omitted', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '# Code Review');
-    const result = dispatchCommand('code-review', TMP);
+  it('should default review layer to cross when --layer is omitted', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), '# Review');
+    const result = dispatchCommand('review', TMP);
     expect(result.route).toBe('skill');
     expect(result.args).toEqual(['--layer', 'cross']);
   });
@@ -120,10 +120,10 @@ describe('dispatchCommand', () => {
     expect(result.args).toEqual(['--layer', 'completion']);
   });
 
-  it('should reject code-review with invalid layer value', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-code-review'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-code-review', 'SKILL.md'), '# Code Review');
-    const result = dispatchCommand('code-review --layer bad', TMP);
+  it('should reject review with invalid layer value', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), '# Review');
+    const result = dispatchCommand('review --layer bad', TMP);
     expect(result.route).toBe('error');
     expect(result.error).toContain('Invalid --layer');
   });
@@ -345,8 +345,8 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('检查结果: PASS');
   });
 
-  it('should throw when code-review hard-gate is BLOCKED by stage mismatch', () => {
-    const skillDir = join(TMP, 'skills', 'spec-first', '08-code-review');
+  it('should throw when review hard-gate is BLOCKED by stage mismatch', () => {
+    const skillDir = join(TMP, 'skills', 'spec-first', '08-review');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -355,10 +355,10 @@ describe('loadSkill hard-gate notice', () => {
       JSON.stringify({ currentStage: '02_design' }),
       'utf-8',
     );
-    writeFileSync(skillPath, '# Code Review', 'utf-8');
+    writeFileSync(skillPath, '# Review', 'utf-8');
 
     expect(() => loadSkill(skillPath, { projectRoot: TMP }))
-      .toThrow(/code-review/);
+      .toThrow(/review/);
   });
 
   it('should block high-risk code execution on protected branch without worktree confirmation', () => {

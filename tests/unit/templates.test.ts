@@ -88,8 +88,8 @@ describe('gate template', () => {
 });
 
 describe('review template', () => {
-  it('code-review-report.md.hbs should render review report', () => {
-    const tpl = compile('review/code-review-report.md.hbs');
+  it('review-report.md.hbs should render review report', () => {
+    const tpl = compile('review/review-report.md.hbs');
     const out = tpl({
       ...BASE_CTX,
       reviewer: 'Leo',

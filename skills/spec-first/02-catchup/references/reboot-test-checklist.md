@@ -245,7 +245,7 @@ digraph next_command {
 | 补充需求 | `/spec-first:spec` | 补充需求规格 |
 | 补充设计 | `/spec-first:design` | 补充技术设计 |
 | 拆解任务 | `/spec-first:task` | 拆解任务计划 |
-| 补充测试 | `/spec-first:test` | 补充测试用例 |
+| 补齐测试设计/TDD 证据 | `/spec-first:task` / `/spec-first:code` | 补齐测试设计与执行证据 |
 | 验证质量 | `/spec-first:verify` | 验证质量门禁 |
 | 查看状态 | `/spec-first:status` | 查看当前状态 |
 

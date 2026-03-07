@@ -14,8 +14,8 @@
 | 01_specify | 03-spec | 需求定义 | - |
 | 02_design | 04-design | 技术设计 | 05-research |
 | 03_plan | 06-task | 任务拆解 | - |
-| 04_implement | 07-code | 代码实现 | 08-code-review |
-| 05_verify | 09-test | 测试用例 | - |
+| 04_implement | 07-code | 代码实现 | 08-review |
+| 05_verify | 12-verify | 阶段验收 | - |
 | 06_wrap_up | 10-archive | 归档总结 | - |
 
 ---
@@ -184,7 +184,7 @@ orchestrate 检测到当前阶段: 04_implement
 code 执行 P0-P5
   ↓
 用户选择: 是否需要代码审查？
-  ├─ 是 → 调度 08-code-review
+  ├─ 是 → 调度 08-review
   └─ 否 → 跳过
   ↓
 verify 校验代码

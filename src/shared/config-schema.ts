@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import yaml from 'js-yaml';
+import { RELEASE_REQUIRED_ARTIFACTS } from '../core/rules/truth-source.js';
 import { exists } from './fs-utils.js';
 
 export interface AutoOrchestrateConfig {
@@ -103,9 +104,10 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
         npmScripts: ['test'],
       },
       '06_wrap_up': {
-        files: ['specs/{featureId}/reports/smoke-test-report.md'],
+        files: ['specs/{featureId}/retro.md'],
       },
       '07_release': {
+        files: RELEASE_REQUIRED_ARTIFACTS.map((item) => `specs/{featureId}/${item}`),
         npmScripts: ['contract:check'],
       },
     },

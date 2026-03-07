@@ -2,19 +2,9 @@ import { join } from 'node:path';
 import { exists, readJsonChecked, readMarkdown, parseMarkdownTable } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
+import { SKILL_STAGE_REQUIREMENTS } from '../rules/truth-source.js';
 
-const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = {
-  spec: '01_specify',
-  'spec-review': '01_specify',
-  design: '02_design',
-  research: '02_design',
-  task: '03_plan',
-  code: '04_implement',
-  'code-review': '04_implement',
-  test: '05_verify',
-  verify: '05_verify',
-  archive: '06_wrap_up',
-};
+const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = { ...SKILL_STAGE_REQUIREMENTS };
 const GIT_COMMAND_TIMEOUT_MS = 5_000;
 
 /** 高风险变更判定（Superpowers P1-3） */

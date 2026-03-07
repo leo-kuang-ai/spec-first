@@ -8,7 +8,7 @@
 
 | 文件 | 包含内容 | 读取目的 | 失败处理 |
 |------|----------|----------|----------|
-| `.spec-first/current` | 当前 Feature ID | 定位 Feature | 执行 feature-list 选择 |
+| `.spec-first/current` | 当前 Feature ID | 定位 Feature | 执行 feature list 选择 |
 | `stage-state.json` | 阶段、状态、时间戳 | 确定当前阶段 | 执行 init 初始化 |
 
 ### P1 - 重要（工作状态）

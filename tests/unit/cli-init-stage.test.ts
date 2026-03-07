@@ -3,10 +3,12 @@ import { existsSync, mkdirSync, rmSync, readdirSync, readFileSync, writeFileSync
 import { join } from 'node:path';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
+import { handleDone } from '../../src/cli/commands/done.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-init-stage');
 
 const origCwd = process.cwd;
+const origSpecFirstSkillsDir = process.env.SPEC_FIRST_SKILLS_DIR;
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
@@ -31,11 +33,17 @@ beforeEach(() => {
   writeFileSync(join(TMP, 'docs', 'first', 'codebase-overview.md'), '# Codebase Overview\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'domain-model.md'), '# Domain Model\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'api-docs.md'), '# API Docs\n', 'utf-8');
+  process.env.SPEC_FIRST_SKILLS_DIR = join(TMP, '.host', 'spec-first-skills');
   process.cwd = () => TMP;
 });
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
+  if (origSpecFirstSkillsDir === undefined) {
+    delete process.env.SPEC_FIRST_SKILLS_DIR;
+  } else {
+    process.env.SPEC_FIRST_SKILLS_DIR = origSpecFirstSkillsDir;
+  }
   process.cwd = origCwd;
 });
 
@@ -311,5 +319,39 @@ describe('handleStage', () => {
     expect(code).toBe(2);  // ExitCode.VALIDATION_ERROR
     expect(mockError).toHaveBeenCalledWith(expect.stringContaining('stage advance'));
     mockError.mockRestore();
+  });
+});
+
+
+describe('handleDone', () => {
+  async function setupReleasableFeature(): Promise<string> {
+    await handleInit(['--feat', 'DON', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+    const entries = readdirSync(join(TMP, 'specs')).filter((e) => e.startsWith('FSREQ-'));
+    const fid = entries.find((e) => e.includes('-DON-')) ?? entries[entries.length - 1];
+    const featDir = join(TMP, 'specs', fid);
+    writeFileSync(join(featDir, 'reports', 'smoke-test-report.md'), '# smoke\n', 'utf-8');
+    writeFileSync(join(featDir, 'reports', 'release-note.md'), '# release\n', 'utf-8');
+    writeFileSync(join(featDir, 'retro.md'), '# retro\n', 'utf-8');
+    const state = JSON.parse(readFileSync(join(featDir, 'stage-state.json'), 'utf-8'));
+    state.currentStage = '07_release';
+    state.history = [];
+    state.terminal = false;
+    writeFileSync(join(featDir, 'stage-state.json'), JSON.stringify(state, null, 2));
+    writeFileSync(
+      join(featDir, 'gate-history.jsonl'),
+      `${JSON.stringify({ event: 'gate_eval', stage: '07_release', status: 'PASS', conditions: [] })}\n`,
+      'utf-8',
+    );
+    return fid;
+  }
+
+  it('should advance release feature to done via runtime alias', async () => {
+    const fid = await setupReleasableFeature();
+    const code = handleDone([fid]);
+    expect(code).toBe(0);
+
+    const state = JSON.parse(readFileSync(join(TMP, 'specs', fid, 'stage-state.json'), 'utf-8')) as { currentStage: string; terminal: boolean };
+    expect(state.currentStage).toBe('08_done');
+    expect(state.terminal).toBe(true);
   });
 });

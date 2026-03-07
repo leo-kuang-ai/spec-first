@@ -13,6 +13,7 @@ import { validateOrchestrateArgs, type OrchestrateArgs } from './orchestrate-arg
 import { validateFirstArgs, resolveFirstConfirmPolicy, resolveFirstModePolicy, type FirstArgs } from './first-args.js';
 import { generateResumeRecommendation, formatResumePrompt, formatProductSummary } from './first-resume.js';
 import { formatHealthStatus, formatChangeAnalysis, checkFirstUpdateContext } from './first-change-detector.js';
+import { REMOVED_SKILLS } from '../rules/truth-source.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -88,12 +89,12 @@ function validateLayerArgs(
   skillName: string,
   args: string[],
 ): { ok: true; args: string[] } | { ok: false; error: string } {
-  if (skillName !== 'code-review' && skillName !== 'verify') {
+  if (skillName !== 'review' && skillName !== 'verify') {
     return { ok: true, args };
   }
 
   const idx = args.indexOf('--layer');
-  const defaultLayer = skillName === 'code-review' ? 'cross' : 'completion';
+  const defaultLayer = skillName === 'review' ? 'cross' : 'completion';
   if (idx === -1) {
     return { ok: true, args: normalizeLayerArgs(args, defaultLayer) };
   }
@@ -103,7 +104,7 @@ function validateLayerArgs(
     return { ok: false, error: `Invalid --layer value for ${skillName}: missing layer name` };
   }
   const layer = value.toLowerCase();
-  const allowed = skillName === 'code-review' ? REVIEW_LAYERS : VERIFY_LAYERS;
+  const allowed = skillName === 'review' ? REVIEW_LAYERS : VERIFY_LAYERS;
   if (!allowed.has(layer)) {
     return {
       ok: false,
@@ -137,6 +138,10 @@ export function dispatchCommand(
 
   if (!skillName) {
     return { route: 'error', error: 'Empty command' };
+  }
+
+  if (REMOVED_SKILLS.includes(skillName as typeof REMOVED_SKILLS[number])) {
+    return { route: 'error', error: `REMOVED_SKILL: ${skillName}` };
   }
 
   // 检查语义映射

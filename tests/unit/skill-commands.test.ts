@@ -104,6 +104,19 @@ describe('ensureSkillCommands', () => {
     expect(skill).not.toContain('# stale');
   });
 
+
+  it('should prune removed skills from user-level spec-first skills root', () => {
+    const userRoot = join(process.env.SPEC_FIRST_SKILLS_DIR as string, 'spec-first');
+    mkdirSync(join(userRoot, '09-test'), { recursive: true });
+    mkdirSync(join(userRoot, '08-code-review'), { recursive: true });
+    writeFileSync(join(userRoot, '09-test', 'SKILL.md'), '# legacy', 'utf-8');
+
+    ensureSkillCommands(TMP, { global: true });
+
+    expect(existsSync(join(userRoot, '09-test'))).toBe(false);
+    expect(existsSync(join(userRoot, '08-code-review'))).toBe(false);
+  });
+
   it('should support generic host target only', () => {
     const result = ensureSkillCommands(TMP, { global: true, hosts: ['generic'] });
     expect(result.generic.length).toBeGreaterThan(0);

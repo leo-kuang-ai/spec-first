@@ -287,7 +287,7 @@ digraph plan_flow {
 | 01_specify | 进入设计阶段 | `/spec-first:design` |
 | 02_design | 进入任务拆解 | `/spec-first:task` |
 | 03_plan | 进入实现阶段 | `/spec-first:code` |
-| 04_implement | 进入验证阶段 | `/spec-first:test` |
+| 04_implement | 继续实现并补齐 TDD 证据 | `/spec-first:code` |
 | 05_verify | Gate 通过后推进 | `stage advance` |
 | 06_wrap_up | 进入归档 | `/spec-first:archive` |
 
