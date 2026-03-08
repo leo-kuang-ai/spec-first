@@ -8,7 +8,7 @@
 优化 Stage Viewer 页面展示效果，提升视觉美观度、信息密度和交互体验。
 
 ## 当前阶段
-Phase 3: Planning
+08_done (Completed)
 
 ## 任务明细
 
@@ -32,9 +32,9 @@ Phase 3: Planning
 优化健康仪表盘模块的视觉呈现效果。
 
 **验收标准**：
-- [ ] 健康分环形图根据分数显示渐变色（0-59红、60-79黄、80-100绿）
-- [ ] 覆盖率柱状图悬停显示具体数值
-- [ ] 缺陷统计卡片有阴影效果
+- [x] 健康分环形图根据分数显示渐变色（0-59红、60-79黄、80-100绿）
+- [x] 覆盖率柱状图悬停显示具体数值
+- [x] 缺陷统计卡片有阴影效果
 
 **文件清单**：
 - Modify: `scripts/stage-viewer/styles.css`
@@ -68,7 +68,7 @@ cd scripts/stage-viewer && node server.js
 # 浏览器访问 http://localhost:8080
 ```
 
-**状态**: planned
+**状态**: verified
 
 ---
 ### TASK-DASHBOARD-002: 整体布局样式优化
@@ -82,9 +82,9 @@ cd scripts/stage-viewer && node server.js
 优化页面整体布局和导航体验。
 
 **验收标准**：
-- [ ] 侧边栏宽度和内边距优化
-- [ ] 主区域内容间距统一
-- [ ] 响应式适配 1280px+
+- [x] 侧边栏宽度和内边距优化
+- [x] 主区域内容间距统一
+- [x] 响应式适配 1280px+
 
 **文件清单**：
 - Modify: `scripts/stage-viewer/styles.css`
@@ -105,7 +105,7 @@ git add scripts/stage-viewer/styles.css
 git commit -m "feat(viewer): 优化整体布局样式"
 ```
 
-**状态**: planned
+**状态**: verified
 
 ---
 ### TASK-DASHBOARD-003: 交互动画优化
@@ -119,9 +119,9 @@ git commit -m "feat(viewer): 优化整体布局样式"
 优化各模块的交互反馈效果。
 
 **验收标准**：
-- [ ] 阶段流转图节点悬停有动画
-- [ ] 任务进度卡片点击有反馈
-- [ ] 时间线视图平滑滚动
+- [x] 阶段流转图节点悬停有动画
+- [x] 任务进度卡片点击有反馈
+- [x] 时间线视图平滑滚动
 
 **文件清单**：
 - Modify: `scripts/stage-viewer/styles.css`
@@ -146,4 +146,4 @@ git add scripts/stage-viewer/styles.css
 git commit -m "feat(viewer): 优化交互动画"
 ```
 
-**状态**: planned
+**状态**: verified
