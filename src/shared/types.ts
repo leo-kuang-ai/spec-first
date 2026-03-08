@@ -37,6 +37,8 @@ export type TcLevel = 'UT' | 'IT' | 'E2E' | 'ST';
 export type Mode = 'N' | 'I';
 export type Size = 'S' | 'M' | 'L';
 
+export type BackgroundInputStatus = 'full' | 'degraded' | 'blind';
+
 // ─── ExitCode ─────────────────────────────────────────────
 export enum ExitCode {
   SUCCESS = 0,
@@ -61,6 +63,7 @@ export interface StageState {
   mode: Mode;
   size: Size;
   platforms: string[];
+  backgroundInputStatus?: BackgroundInputStatus;
   mergedRules?: {
     gateConditions: Record<string, unknown[]>;
     deliverables: Record<string, unknown[]>;

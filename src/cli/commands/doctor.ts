@@ -11,6 +11,7 @@ import { checkHooks } from '../../core/tool-integration/hook-installer.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
+import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
 
 type Level = 'PASS' | 'WARNING' | 'ERROR';
 
@@ -43,28 +44,24 @@ export function handleDoctor(args: string[]): number {
   const bootstrap = ensureHostBootstrap();
   results.push(...bootstrap.results.map(mapBootstrapResult));
 
-  // 项目级检查
   results.push(checkNodeVersion());
   results.push(checkGit());
   results.push(checkSpecFirstDir(projectRoot));
   results.push(checkSpecsDir(projectRoot));
   results.push(checkConfig(projectRoot));
 
-  // Hook 状态检查
   results.push(...checkHookStatus(projectRoot));
-
-  // Session Hook 可达性检查（Superpowers P1-4）
   results.push(checkSessionHook());
 
-  // Feature 级检查
   if (featureId) {
     results.push(checkFeatureDir(projectRoot, featureId));
     results.push(checkStageState(projectRoot, featureId));
     results.push(checkGateDegradation(projectRoot, featureId));
+    results.push(checkBackgroundInput(projectRoot, featureId));
+    results.push(...checkFirstRuntimeProjection(projectRoot));
     results.push(...checkRuntimeFiles(projectRoot, featureId));
   }
 
-  // 输出报告
   printReport(results);
 
   const hasError = results.some((r) => r.level === 'ERROR');
@@ -142,6 +139,81 @@ function checkStageState(root: string, featureId: string): CheckResult {
     return { name: 'stage-state.json', level: 'PASS', message: '已找到' };
   }
   return { name: 'stage-state.json', level: 'ERROR', message: '缺失', fix: '请重新初始化 Feature' };
+}
+
+function checkBackgroundInput(root: string, featureId: string): CheckResult {
+  const stageStatePath = join(root, 'specs', featureId, 'stage-state.json');
+  if (!existsSync(stageStatePath)) {
+    return {
+      name: 'Background Input',
+      level: 'WARNING',
+      message: 'stage-state 缺失，无法诊断 background_input_status',
+      fix: '先补齐 stage-state.json 后再执行 doctor',
+    };
+  }
+
+  try {
+    const state = JSON.parse(readFileSync(stageStatePath, 'utf-8')) as { backgroundInputStatus?: string };
+    const status = state.backgroundInputStatus;
+    if (status === 'full') {
+      return { name: 'Background Input', level: 'PASS', message: 'full' };
+    }
+    if (status === 'degraded' || status === 'blind') {
+      return {
+        name: 'Background Input',
+        level: 'WARNING',
+        message: status,
+        fix: '建议先执行 /spec-first:first 补齐 runtime 真源背景，再继续关键阶段操作',
+      };
+    }
+    return {
+      name: 'Background Input',
+      level: 'WARNING',
+      message: 'background_input_status 缺失',
+      fix: '重新执行 init / stage 同步，确保 stage-state.json 写入 background_input_status',
+    };
+  } catch {
+    return {
+      name: 'Background Input',
+      level: 'WARNING',
+      message: 'stage-state 解析失败',
+      fix: '检查 stage-state.json 格式并重新生成',
+    };
+  }
+}
+
+function checkFirstRuntimeProjection(root: string): CheckResult[] {
+  const index = readFirstRuntimeIndex(root);
+  if (!index) {
+    return [{
+      name: 'First Stage Views',
+      level: 'WARNING',
+      message: '未找到 runtime index',
+      fix: '先执行 /spec-first:first 生成 .spec-first/runtime/first/index.json',
+    }];
+  }
+
+  const results: CheckResult[] = [];
+  const stageViewIssues = index.stageViews.issues?.join('; ');
+  results.push({
+    name: 'First Stage Views',
+    level: index.stageViews.healthy ? 'PASS' : 'WARNING',
+    message: index.stageViews.healthy ? 'healthy' : (stageViewIssues ? `异常: ${stageViewIssues}` : 'unhealthy'),
+    fix: index.stageViews.healthy ? undefined : '重新执行 /spec-first:first，修复 stage-views 产物健康状态',
+  });
+
+  const driftDocs = Object.entries(index.docsProjection)
+    .filter(([, entry]) => !entry.healthy)
+    .map(([doc, entry]) => `${doc}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
+
+  results.push({
+    name: 'Docs Projection Sync',
+    level: driftDocs.length === 0 ? 'PASS' : 'WARNING',
+    message: driftDocs.length === 0 ? '已同步' : `失同步: ${driftDocs.join(', ')}`,
+    fix: driftDocs.length === 0 ? undefined : '重新生成 docs 投影视图，确保 runtime 真源与 docs 投影视图保持同步',
+  });
+
+  return results;
 }
 
 /** Hook 安装状态检查 */

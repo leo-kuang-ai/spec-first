@@ -448,3 +448,9 @@ export async function createUser(input: unknown): Promise<User> {
 - [ ] 无注释掉的代码块
 - [ ] traces trailer 已注入
 - [ ] findings.md 已更新
+
+## code-view 对齐要求
+- `entryPoints`：明确本轮改动入口
+- `likelyChangeAreas`：列出高概率变更模块
+- `changeHazards`：列出回归与风险点
+- 若背景不足，需同时输出 `backgroundInputStatus`

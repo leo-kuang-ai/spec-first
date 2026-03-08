@@ -1852,4 +1852,11 @@ Copyright © 2025-2026 Spec-First Contributors
 
 ---
 
+## 仓库地址
+
+- **GitHub**: https://github.com/sunrain520/spec-first
+- **Gitee**: https://gitee.com/sunnyrain/spec-first
+
+---
+
 *本文档基于代码生成 | 更新: 2026-03-06 | 版本: v0.5.45*

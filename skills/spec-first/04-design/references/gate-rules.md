@@ -198,3 +198,8 @@ C1 (Design Coverage): 80% (8/10 FR)
 | FR 覆盖率为 0 | 所有 FR 都无 DS | 补充 DS 映射 |
 | 存在孤立 DS | DS 无 FR 映射 | 删除或关联 DS |
 | design.md 不完整 | 缺少必需章节 | 补充模块/API/数据模型 |
+
+## design-view 评审门槛
+- 设计前优先读取 `design-view`
+- 正式设计评审属于高依赖场景，可提升为 `L3`
+- 报告中必须标注 `backgroundInputStatus`

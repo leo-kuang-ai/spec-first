@@ -200,3 +200,8 @@
 - 建议性优化
 
 **处理**: 仅提示，不强制修复
+
+## 背景质量规则
+- 分析 `background_input_status`
+- 检测 runtime 真源与 docs 投影视图漂移
+- 将背景缺失、失同步、健康度异常纳入 findings

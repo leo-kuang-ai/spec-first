@@ -4,11 +4,50 @@ import { join } from 'node:path';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
 import { handleDone } from '../../src/cli/commands/done.js';
+import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-init-stage');
 
 const origCwd = process.cwd;
 const origSpecFirstSkillsDir = process.env.SPEC_FIRST_SKILLS_DIR;
+
+
+function seedHealthyRuntimeFirst(projectRoot: string): void {
+  writeFirstRuntimeIndex(projectRoot, {
+    version: '1.0.0',
+    lastRun: '2026-03-08T12:00:00.000Z',
+    mode: 'quick',
+    summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    docsProjection: {},
+    status: 'current',
+  });
+  writeFirstRuntimeSummary(projectRoot, {
+    generatedAt: '2026-03-08T12:00:00.000Z',
+    mode: 'quick',
+    project: { name: 'spec-first', platformType: 'backend', overview: 'runtime init' },
+    modules: ['src/core/process-engine/init.ts'],
+    capabilities: ['feature initialization'],
+    entryPoints: ['src/cli/commands/init.ts'],
+    dataModels: ['Feature'],
+    apiSurface: ['spec-first init'],
+    risks: [],
+    evidence: [],
+  });
+  writeFirstRoleViews(projectRoot, {
+    product: { role: 'product', summary: 'product', focus: ['capabilities'], warnings: [] },
+    dev: { role: 'dev', summary: 'dev', focus: ['modules'], warnings: [] },
+    qa: { role: 'qa', summary: 'qa', focus: ['validation'], warnings: [] },
+    architect: { role: 'architect', summary: 'architect', focus: ['entrypoints'], warnings: [] },
+  });
+  writeFirstStageViews(projectRoot, {
+    spec: { stage: 'spec', summary: 'spec', businessCapabilities: ['feature initialization'], coreEntities: ['Feature'], dependencies: ['spec-first init'], warnings: [] },
+    design: { stage: 'design', summary: 'design', moduleBoundaries: ['src/core/process-engine'], integrationPoints: ['src/cli/commands/init.ts'], technicalConstraints: ['runtime truth source'], risks: [] },
+    code: { stage: 'code', summary: 'code', entryPoints: ['src/cli/commands/init.ts'], likelyChangeAreas: ['src/core/process-engine/init.ts'], changeHazards: [], verificationHooks: ['tests/unit/cli-init-stage.test.ts'] },
+    verify: { stage: 'verify', summary: 'verify', testFocus: ['runtime readiness'], riskAreas: [], validationHooks: ['pnpm vitest run tests/unit/cli-init-stage.test.ts'], releaseBlockers: [] },
+  });
+}
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
@@ -24,15 +63,11 @@ beforeEach(() => {
     'platform: api\n',
     'utf-8',
   );
-  writeFileSync(
-    join(TMP, 'docs', 'first', '.index.yaml'),
-    "version: 1.0.0\nlast_run: '2026-03-03T00:00:00.000Z'\nmode: quick\nproducts: {}\nstatus: current\n",
-    'utf-8',
-  );
   writeFileSync(join(TMP, 'docs', 'first', 'tech-stack.md'), '# Tech Stack\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'codebase-overview.md'), '# Codebase Overview\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'domain-model.md'), '# Domain Model\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'api-docs.md'), '# API Docs\n', 'utf-8');
+  seedHealthyRuntimeFirst(TMP);
   process.env.SPEC_FIRST_SKILLS_DIR = join(TMP, '.host', 'spec-first-skills');
   process.cwd = () => TMP;
 });
@@ -73,6 +108,97 @@ describe('handleInit', () => {
       expect(output).toContain('- 代码量:');
       expect(output).toContain('- API 端点:');
       expect(output).toContain('继续初始化需求工作区...');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
+  it('should accept runtime first assets without docs first', async () => {
+    rmSync(join(TMP, 'docs'), { recursive: true, force: true });
+
+    writeFirstRuntimeIndex(TMP, {
+      version: '1.0.0',
+      lastRun: '2026-03-08T12:00:00.000Z',
+      mode: 'quick',
+      summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      docsProjection: {},
+      status: 'current',
+    });
+    writeFirstRuntimeSummary(TMP, {
+      generatedAt: '2026-03-08T12:00:00.000Z',
+      mode: 'quick',
+      project: { name: 'spec-first', platformType: 'backend', overview: 'runtime-only init' },
+      modules: ['src/core/process-engine/init.ts'],
+      capabilities: ['feature initialization'],
+      entryPoints: ['src/cli/commands/init.ts'],
+      dataModels: ['Feature'],
+      apiSurface: ['spec-first init'],
+      risks: ['legacy docs coupling'],
+      evidence: ['src/cli/commands/init.ts'],
+    });
+    writeFirstRoleViews(TMP, {
+      product: { role: 'product', summary: 'product', focus: ['capabilities'], warnings: [] },
+      dev: { role: 'dev', summary: 'dev', focus: ['modules'], warnings: [] },
+      qa: { role: 'qa', summary: 'qa', focus: ['risks'], warnings: [] },
+      architect: { role: 'architect', summary: 'architect', focus: ['entrypoints'], warnings: [] },
+    });
+    writeFirstStageViews(TMP, {
+      spec: { stage: 'spec', summary: 'spec', businessCapabilities: ['feature initialization'], coreEntities: ['Feature'], dependencies: ['spec-first init'], warnings: [] },
+      design: { stage: 'design', summary: 'design', moduleBoundaries: ['src/core/process-engine'], integrationPoints: ['src/cli/commands/init.ts'], technicalConstraints: ['runtime truth source'], risks: [] },
+      code: { stage: 'code', summary: 'code', entryPoints: ['src/cli/commands/init.ts'], likelyChangeAreas: ['src/core/process-engine/init.ts'], changeHazards: ['legacy docs coupling'], verificationHooks: ['tests/unit/cli-init-stage.test.ts'] },
+      verify: { stage: 'verify', summary: 'verify', testFocus: ['runtime readiness'], riskAreas: ['legacy docs coupling'], validationHooks: ['pnpm vitest run tests/unit/cli-init-stage.test.ts'], releaseBlockers: [] },
+    });
+
+    const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+    expect(code).toBe(0);
+  });
+
+  it('should print background_input_status in init summary', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      rmSync(join(TMP, 'docs'), { recursive: true, force: true });
+      writeFirstRuntimeIndex(TMP, {
+        version: '1.0.0',
+        lastRun: '2026-03-08T12:00:00.000Z',
+        mode: 'quick',
+        summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        docsProjection: {},
+        status: 'current',
+      });
+      writeFirstRuntimeSummary(TMP, {
+        generatedAt: '2026-03-08T12:00:00.000Z',
+        mode: 'quick',
+        project: { name: 'spec-first', platformType: 'backend', overview: 'runtime-only init' },
+        modules: ['src/core/process-engine/init.ts'],
+        capabilities: ['feature initialization'],
+        entryPoints: ['src/cli/commands/init.ts'],
+        dataModels: ['Feature'],
+        apiSurface: ['spec-first init'],
+        risks: [],
+        evidence: [],
+      });
+      writeFirstRoleViews(TMP, {
+        product: { role: 'product', summary: 'product', focus: [], warnings: [] },
+        dev: { role: 'dev', summary: 'dev', focus: [], warnings: [] },
+        qa: { role: 'qa', summary: 'qa', focus: [], warnings: [] },
+        architect: { role: 'architect', summary: 'architect', focus: [], warnings: [] },
+      });
+      writeFirstStageViews(TMP, {
+        spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
+        design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
+        code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
+        verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
+      });
+
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+      const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+
+      expect(code).toBe(0);
+      expect(output).toContain('background_input_status: full');
     } finally {
       logSpy.mockRestore();
     }
@@ -149,7 +275,7 @@ describe('handleInit', () => {
 
   it('should return VALIDATION_ERROR when 00-first artifacts are missing', async () => {
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    rmSync(join(TMP, 'docs', 'first'), { recursive: true, force: true });
+    rmSync(join(TMP, '.spec-first', 'runtime', 'first'), { recursive: true, force: true });
     try {
       const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
       const output = errSpy.mock.calls.map(([msg]) => String(msg)).join('\n');

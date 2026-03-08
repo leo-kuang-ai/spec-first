@@ -84,6 +84,12 @@ I'm using the verify skill to validate [Feature] stage completion.
 - 需要获取可执行的修复建议
 - 需要生成验证报告
 
+## verify-view 背景输入
+
+- 主背景输入：`verify-view`
+- 必查字段：`critical_flows`、`validation_focus`、`recommended_checks`、`validation_hooks`、`release_blockers`
+- 高风险验证场景必须优先核对 `critical_flows` 与 pre-release-verification 相关阻断项
+
 ## Don't Skip Verification When
 
 | 场景 | 常见借口 | 实际风险 |
@@ -531,3 +537,9 @@ Gate 已通过，可以推进到下一阶段。
 - 输出记录？
 - 退出码验证？
 - 失败项修复建议？
+
+## 背景输入
+- 优先读取 `verify-view`
+- 核对 `criticalFlows`、`validationFocus`、`recommendedChecks`
+- 高风险验证 / 上线前验证属于 `pre-release-verification` 场景
+- 高风险验证可提升背景依赖强度

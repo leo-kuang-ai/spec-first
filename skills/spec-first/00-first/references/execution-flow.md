@@ -13,7 +13,7 @@
    - `package.json`、`pom.xml`、`build.gradle`、`go.mod`、`Cargo.toml`
    - `composer.json`、`Gemfile`、`CMakeLists.txt`、`*.csproj`、`.git`
 
-2. **Greenfield/Brownfield 判断**（Phase 2 增强）：
+2. **Greenfield/Brownfield 判断**：
 
    **检测指标**：
 
@@ -85,7 +85,7 @@
 
 ### P1a: 技术栈识别（快速，完成后立即派发 Agent）
 
-**端类型检测**（Phase 2）：
+**端类型检测**：
 
 按 `references/detection-rules.md` § 端类型检测规则执行：
 

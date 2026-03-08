@@ -35,3 +35,28 @@ describe('first-artifact-mapping', () => {
     expect(result).toEqual([...DEFAULT_AFFECTED_ARTIFACTS]);
   });
 });
+
+
+describe('first runtime projection mapping', () => {
+  it('declares runtime artifacts and docs projection targets', async () => {
+    const mapping = await import('../../src/core/skill-runtime/first-artifact-mapping.js');
+
+    expect(mapping.FIRST_RUNTIME_ARTIFACTS).toEqual(['summary.json', 'role-views.json', 'stage-views.json']);
+    expect(mapping.getProjectionDocsForRuntimeArtifact('summary.json')).toContain('docs/first/README.md');
+    expect(mapping.getProjectionDocsForRuntimeArtifact('summary.json')).toContain('docs/first/summary.md');
+    expect(mapping.getProjectionDocsForRuntimeArtifact('role-views.json')).toContain('docs/first/role-views.md');
+    expect(mapping.getProjectionDocsForRuntimeArtifact('stage-views.json')).toContain('docs/first/README.md');
+    expect(mapping.getProjectionDocsForRuntimeArtifact('stage-views.json')).toContain('docs/first/stage-views.md');
+  });
+
+  it('treats projection source changes as docs refresh triggers', async () => {
+    const mapping = await import('../../src/core/skill-runtime/first-artifact-mapping.js');
+
+    expect(mapping.matchRuntimeArtifactsByChangedFile('src/core/skill-runtime/first-doc-projection.ts')).toEqual([
+      'summary.json',
+      'role-views.json',
+      'stage-views.json',
+    ]);
+    expect(mapping.collectProjectionDocsForChangedFiles(['src/core/skill-runtime/first-doc-projection.ts'])).toContain('docs/first/README.md');
+  });
+});

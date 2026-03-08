@@ -46,7 +46,7 @@
 
 ## 端类型检测规则（7 种主类型）
 
-> **Phase 2 新增**：用于智能调整产物组合和 Agent 派发策略。
+> 用于智能调整产物组合和 Agent 派发策略。
 > **检测优先级**：Monorepo → 混合 → backend → frontend → mobile → cross-platform → desktop
 > **降级策略**：详见文末「端类型检测失败处理」
 

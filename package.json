@@ -1,10 +1,10 @@
 {
   "name": "spec-first",
-  "version": "0.5.45",
+  "version": "0.5.46",
   "description": "Specification-driven development process engine for AI-era software development",
   "type": "module",
   "bin": {
-    "spec-first": "./dist/cli/index.js"
+    "spec-first": "dist/cli/index.js"
   },
   "scripts": {
     "build": "tsup",

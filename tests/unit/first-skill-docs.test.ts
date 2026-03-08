@@ -201,3 +201,49 @@ describe('00-first skill docs consistency', () => {
     expect(apiTpl).toContain('前端/App（调用方视角）');
   });
 });
+
+
+const INIT_SKILL = join(import.meta.dirname, '../../skills/spec-first/01-init/SKILL.md');
+const INIT_PREREQ = join(import.meta.dirname, '../../skills/spec-first/01-init/references/prerequisites.md');
+const INIT_OUTPUT = join(import.meta.dirname, '../../skills/spec-first/01-init/references/output-format.md');
+const FIRST_README = join(import.meta.dirname, '../../docs/first/README.md');
+
+describe('runtime truth source and docs projection model', () => {
+  it('documents runtime truth source in 00-first skill', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('.spec-first/runtime/first/index.json');
+    expect(skill).toContain('docs/first/');
+    expect(skill).toContain('投影视图');
+    expect(skill).not.toContain('.index.yaml');
+  });
+
+  it('documents init readiness against runtime truth source', () => {
+    const initSkill = read(INIT_SKILL);
+    const prereq = read(INIT_PREREQ);
+    const output = read(INIT_OUTPUT);
+
+    expect(initSkill).toContain('.spec-first/runtime/first/index.json');
+    expect(initSkill).toContain('.spec-first/runtime/first/summary.json');
+    expect(initSkill).not.toContain('.index.yaml');
+    expect(prereq).not.toContain('.index.yaml');
+    expect(prereq).toContain('.spec-first/runtime/first/');
+    expect(output).toContain('.spec-first/runtime/first/index.json');
+  });
+
+  it('keeps docs/first README as projection-layer documentation', () => {
+    expect(existsSync(FIRST_README)).toBe(true);
+    const readme = read(FIRST_README);
+    expect(readme).toContain('投影视图');
+    expect(readme).toContain('.spec-first/runtime/first/');
+  });
+});
+
+
+describe('refresh mode docs', () => {
+  it('documents the three refresh modes in 00-first skill', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('refresh-runtime-only');
+    expect(skill).toContain('refresh-docs-from-runtime');
+    expect(skill).toContain('refresh-all');
+  });
+});

@@ -141,6 +141,51 @@ describe('handleDoctor', () => {
     expect(lines.join('\n')).toContain('已跳过');
   });
 
+  it('should report background input and projection sync checks', () => {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '05_verify', backgroundInputStatus: 'degraded' }),
+      'utf-8',
+    );
+    mkdirSync(join(TMP, '.spec-first', 'runtime', 'first'), { recursive: true });
+    writeFileSync(
+      join(TMP, '.spec-first', 'runtime', 'first', 'index.json'),
+      JSON.stringify({
+        version: '1.0.0',
+        lastRun: '2026-03-08T12:00:00.000Z',
+        mode: 'quick',
+        summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['hash mismatch'] },
+        docsProjection: {
+          'docs/first/README.md': { path: 'docs/first/README.md', fileHash: 'readme', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['stale projection'] },
+        },
+        status: 'stale',
+        staleReason: 'projection drift',
+      }),
+      'utf-8',
+    );
+
+    const lines = [];
+    const originalLog = console.log;
+    console.log = (...args) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([FEAT]));
+    } finally {
+      console.log = originalLog;
+    }
+
+    const joined = lines.join('\n');
+    expect(joined).toContain('Background Input');
+    expect(joined).toContain('degraded');
+    expect(joined).toContain('First Stage Views');
+    expect(joined).toContain('hash mismatch');
+    expect(joined).toContain('Docs Projection Sync');
+    expect(joined).toContain('失同步');
+  });
+
   it('should warn when Session Hook misses required bootstrap segments', () => {
     const fakeHome = join(TMP, 'fake-home');
     mkdirSync(join(fakeHome, '.claude'), { recursive: true });

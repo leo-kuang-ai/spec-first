@@ -5,7 +5,7 @@
 import { join } from 'node:path';
 import { closeSync, openSync, readFileSync, readdirSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { Stage } from '../../shared/types.js';
-import type { Mode, Size, StageState } from '../../shared/types.js';
+import type { BackgroundInputStatus, Mode, Size, StageState } from '../../shared/types.js';
 import {
   writeJson,
   writeMarkdown,
@@ -19,6 +19,7 @@ import { mergeLayerRules } from './layer-merger.js';
 import type { MergedRules } from './layer-merger.js';
 import { renderToString } from '../template/renderer.js';
 import type { TemplateContext } from '../template/renderer.js';
+import { detectBackgroundInputStatus } from '../skill-runtime/first-context.js';
 
 // ─── 类型 ────────────────────────────────────────────────
 
@@ -38,6 +39,7 @@ export interface InitResult {
   featureId: string;
   featureDir: string;
   mergedRules: MergedRules;
+  backgroundInputStatus: BackgroundInputStatus;
 }
 
 // ─── FEAT 缩写校验 ──────────────────────────────────────
@@ -565,17 +567,24 @@ function recoverExistingFeature(
   existingId: string | undefined,
   mergedRules: MergedRules,
 ): InitResult {
+  const backgroundInputStatus = detectBackgroundInputStatus(opts.projectRoot);
   if (!existingId) {
     registerFeat(specsDir, opts.feat, featureId);
   }
   writeCurrentFeature(opts.projectRoot, featureId);
-  return { featureId, featureDir, mergedRules };
+  return {
+    featureId,
+    featureDir,
+    mergedRules,
+    backgroundInputStatus,
+  };
 }
 
 function createInitialStageState(
   opts: InitOptions,
   featureId: string,
   mergedRules: MergedRules,
+  backgroundInputStatus: BackgroundInputStatus,
 ): StageState {
   const now = new Date().toISOString();
   return {
@@ -583,6 +592,7 @@ function createInitialStageState(
     mode: opts.mode,
     size: opts.size,
     platforms: opts.platforms,
+    backgroundInputStatus,
     mergedRules: {
       gateConditions: mergedRules.gateConditions as Record<string, unknown[]>,
       deliverables: mergedRules.deliverables as Record<string, unknown[]>,
@@ -603,12 +613,13 @@ function writeFeatureSkeleton(
   featureId: string,
   mergedRules: MergedRules,
 ): void {
+  const backgroundInputStatus = detectBackgroundInputStatus(opts.projectRoot);
   ensureDir(tmpFeatureDir);
   ensureDir(join(tmpFeatureDir, 'reports'));
   ensureDir(join(tmpFeatureDir, 'contracts'));
   ensureDir(join(tmpFeatureDir, 'tests'));
 
-  const state = createInitialStageState(opts, featureId, mergedRules);
+  const state = createInitialStageState(opts, featureId, mergedRules, backgroundInputStatus);
   writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
   writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
   writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
@@ -700,6 +711,7 @@ export function init(opts: InitOptions): InitResult {
 
   const existingId = loadRegistry(targets.specsDir).get(opts.feat);
   const mergedRules = mergeLayerRules(opts.mode, opts.size, opts.platforms, opts.projectRoot);
+  const backgroundInputStatus = detectBackgroundInputStatus(opts.projectRoot);
 
   if (exists(targets.featureDir)) {
     return recoverExistingFeature(
@@ -742,5 +754,6 @@ export function init(opts: InitOptions): InitResult {
     featureId: targets.featureId,
     featureDir: targets.featureDir,
     mergedRules,
+    backgroundInputStatus,
   };
 }

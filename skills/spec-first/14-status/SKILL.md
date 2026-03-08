@@ -366,3 +366,8 @@ digraph status_flow {
 - 健康分已解读？
 - 风险项已标注？
 - 下一步建议已提供？
+
+## 背景状态展示
+- 状态面板必须展示 `background_input_status`
+- 明确区分 `runtime 真源` 与 `docs 投影视图`
+- 若两层状态不一致，需标记同步状态与建议动作

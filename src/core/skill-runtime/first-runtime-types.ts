@@ -1,0 +1,107 @@
+export const FIRST_RUNTIME_STAGES = ['spec', 'design', 'code', 'verify'] as const;
+export const FIRST_RUNTIME_ROLES = ['product', 'dev', 'qa', 'architect'] as const;
+
+export type FirstRuntimeMode = 'quick' | 'deep';
+export type FirstRuntimeStage = (typeof FIRST_RUNTIME_STAGES)[number];
+export type FirstRuntimeRole = (typeof FIRST_RUNTIME_ROLES)[number];
+export type FirstRuntimeStatus = 'current' | 'stale';
+
+export interface FirstRuntimeAssetIndexEntry {
+  path: string;
+  fileHash: string;
+  lastUpdated: string;
+  healthy: boolean;
+  issues?: string[];
+}
+
+export interface FirstRuntimeIndex {
+  version: string;
+  lastRun: string;
+  sourceCommit?: string;
+  mode: FirstRuntimeMode;
+  summary: FirstRuntimeAssetIndexEntry;
+  roleViews: FirstRuntimeAssetIndexEntry;
+  stageViews: FirstRuntimeAssetIndexEntry;
+  docsProjection: Record<string, FirstRuntimeAssetIndexEntry>;
+  status: FirstRuntimeStatus;
+  staleReason?: string;
+}
+
+export interface FirstRuntimeSummary {
+  generatedAt: string;
+  mode: FirstRuntimeMode;
+  project: {
+    name: string;
+    platformType?: string;
+    overview?: string;
+  };
+  modules: string[];
+  capabilities: string[];
+  entryPoints: string[];
+  dataModels: string[];
+  apiSurface: string[];
+  risks: string[];
+  evidence: string[];
+}
+
+export interface FirstRoleView {
+  role: FirstRuntimeRole;
+  summary: string;
+  focus: string[];
+  warnings: string[];
+}
+
+export interface FirstRoleViews {
+  product: FirstRoleView;
+  dev: FirstRoleView;
+  qa: FirstRoleView;
+  architect: FirstRoleView;
+}
+
+export interface FirstSpecView {
+  stage: 'spec';
+  summary: string;
+  businessCapabilities: string[];
+  coreEntities: string[];
+  dependencies: string[];
+  warnings: string[];
+}
+
+export interface FirstDesignView {
+  stage: 'design';
+  summary: string;
+  moduleBoundaries: string[];
+  integrationPoints: string[];
+  technicalConstraints: string[];
+  risks: string[];
+}
+
+export interface FirstCodeView {
+  stage: 'code';
+  summary: string;
+  entryPoints: string[];
+  likelyChangeAreas: string[];
+  callPathHints?: string[];
+  couplingPoints?: string[];
+  changeHazards: string[];
+  verificationHooks: string[];
+}
+
+export interface FirstVerifyView {
+  stage: 'verify';
+  summary: string;
+  criticalFlows?: string[];
+  validationFocus?: string[];
+  testFocus: string[];
+  riskAreas: string[];
+  recommendedChecks?: string[];
+  validationHooks: string[];
+  releaseBlockers: string[];
+}
+
+export interface FirstStageViews {
+  spec: FirstSpecView;
+  design: FirstDesignView;
+  code: FirstCodeView;
+  verify: FirstVerifyView;
+}

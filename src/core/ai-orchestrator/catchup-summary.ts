@@ -30,6 +30,7 @@ export function buildCatchupSummary(
     relatedDSCount: number;
     relatedAPICount: number;
   },
+  backgroundInputStatus?: 'full' | 'degraded' | 'blind',
 ): string {
   const lines = [
     `会话恢复 — ${featureId}`,
@@ -37,6 +38,9 @@ export function buildCatchupSummary(
     task ? `当前任务：${task}` : '当前任务：无',
     `进度：${completed}/${total} 个任务`,
   ];
+  if (backgroundInputStatus) {
+    lines.push(`背景状态：${backgroundInputStatus}`);
+  }
   if (missing.length > 0) {
     lines.push(`缺失文件（${missing.length}）：${missing.join(', ')}`);
   } else {

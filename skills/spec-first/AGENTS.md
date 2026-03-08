@@ -17,6 +17,7 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
   - `Stop` 中 `ai stats` 与完成度守门并存，禁止替换已有统计 Hook。
 - Codex 路径（Skill 证据链路）：
   - 不依赖宿主 Hook 阻断，依赖 `code/verify/orchestrate` 的证据铁律防止提前收工。
+  - orchestrate 需显式暴露背景治理信号（`background_status / dependency_strength / risk_category / risk_signals`），不得静默吞掉高风险提示。
   - 声称通过前必须提供新鲜命令输出与退出码。
 - 失败处理差异：
   - Claude 侧以 Hook 返回码阻断。

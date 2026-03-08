@@ -185,3 +185,16 @@ TASK-003: [P] 实现找回密码接口
 - 当前批次
 - 未完成 TASK
 - 恢复入口命令
+
+
+## 背景状态与依赖强度
+- `full`: 存在并成功读取匹配背景
+- `degraded`: 存在部分背景，但 stage-view / role-view 不完整
+- `blind`: 缺少足够背景输入
+- `L1`: 推荐
+- `L2`: 强烈推荐
+- `L3`: 事实门槛；仅当 `02_design / 04_implement / 05_verify` 检测到高风险信号时触发
+- 高风险信号复用 `hard-gate` 评估：并行任务标记、跨目录变更、核心模块变更
+- `risk_category` 与阶段绑定：`02_design -> formal-design-review`、`04_implement -> high-risk-implementation`、`05_verify -> pre-release-verification`
+- `blind` + `L2/L3` 时，优先动作必须是 `backfill-first`
+- 检测到高风险信号时，运行时上下文追加 `risk_category` 与 `risk_signals`

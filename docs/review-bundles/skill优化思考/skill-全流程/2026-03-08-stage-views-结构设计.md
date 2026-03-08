@@ -50,9 +50,48 @@
 
 ---
 
-## 3. 总体模型
+## 3. As-Is / To-Be / Migration Assumptions
 
-### 3.1 runtime 真源层
+### 3.1 As-Is（当前仓库现状）
+
+当前仓库里，consumer 侧还不能假定 runtime 真源已经落地完成。
+
+至少仍存在以下旧口径或迁移中状态：
+
+- `01-init` 文档与前置检查仍以 `docs/first/`、`docs/first/.index.yaml` 为强前置
+- 入口 / readiness / notice 相关节点可能仍残留对 `docs/first` 的直接依赖
+- `00-first` 的 runtime 真源切换属于 `first-skill` 的 P0 范围，而不是本文档的实现范围
+
+因此，本文档描述的 consumer 接入逻辑，不能被误读为“当前仓库已经默认具备这些前提”。
+
+### 3.2 To-Be（目标态）
+
+当 `first-skill` 的 P0 完成后，全流程的目标 truth-source 应为：
+
+- `.spec-first/runtime/first/index.json`
+- `.spec-first/runtime/first/summary.json` 或 `summary/`
+- `.spec-first/runtime/first/role-views.json` 或 `role-views/`
+- `.spec-first/runtime/first/stage-views.json` 或 `stage-views/`
+
+同时：
+
+- `docs/first/*.md` 继续保留，但只承担长期维护的人类可读投影视图职责
+- 入口 / 编排 / 主链 / 治理节点都以 runtime 真源为准，不再把 `docs/first` 当主链真相来源
+
+### 3.3 Migration Assumptions（迁移前提）
+
+本文档后续所有 consumer 接入设计，都建立在以下迁移前提上：
+
+- `first-skill` 的 Gate 0 / P0 已完成
+- `loadStageView(projectRoot, stage)` 已可用
+- `dispatcher / resume / init readiness / change-detector` 已切到 runtime 真源
+- 如果上述条件未满足，必须先回到 `first-skill` 方案补齐 producer 切换，再执行本文档中的任务
+
+---
+
+## 4. 总体模型（To-Be）
+
+### 4.1 runtime 真源层
 
 统一真源维护在：
 
@@ -67,7 +106,7 @@
 - 作为主链流程的机器真源
 - 支持局部刷新与增量维护
 
-### 3.2 阶段主输入层
+### 4.2 阶段主输入层
 
 阶段主输入统一来自 `stage-views`：
 
@@ -81,7 +120,7 @@
 - 为每个阶段提供“刚好够用”的背景输入
 - 避免整份 summary 直接透传
 
-### 3.3 角色辅助输入层
+### 4.3 角色辅助输入层
 
 角色辅助输入统一来自 `role-views`。
 
@@ -91,7 +130,7 @@
 - 服务非研发角色的背景裁剪
 - 不替代 stage views
 
-### 3.4 docs 投影视图层
+### 4.4 docs 投影视图层
 
 - `docs/first/*.md`
 
@@ -103,9 +142,9 @@
 
 ---
 
-## 4. 各阶段应该读什么
+## 5. 各阶段应该读什么
 
-### 4.1 `03-spec` 读 `spec-view`
+### 5.1 `03-spec` 读 `spec-view`
 
 关注：
 
@@ -115,7 +154,7 @@
 - 上下游关系
 - 需求切入点
 
-### 4.2 `04-design` 读 `design-view`
+### 5.2 `04-design` 读 `design-view`
 
 关注：
 
@@ -125,7 +164,7 @@
 - 技术约束
 - 设计风险
 
-### 4.3 `07-code` 读 `code-view`
+### 5.3 `07-code` 读 `code-view`
 
 关注：
 
@@ -136,7 +175,7 @@
 - 风险点
 - 验证钩子
 
-### 4.4 `12-verify` 读 `verify-view`
+### 5.4 `12-verify` 读 `verify-view`
 
 关注：
 
@@ -148,11 +187,11 @@
 
 ---
 
-## 5. 角色降级设计
+## 6. 角色降级设计
 
 这是全方案的关键。
 
-### 5.1 背景状态
+### 6.1 背景状态
 
 建议所有节点都统一感知以下状态之一：
 
@@ -160,25 +199,25 @@
 - `degraded`：没有匹配 stage view，但有其他可用背景材料
 - `blind`：缺少足够背景输入
 
-### 5.2 产品角色
+### 6.2 产品角色
 
 - 优先读 `spec-view`
 - 无 `first` 时允许降级到业务材料、现有 spec、人工补充背景
 - 通常不需要直接读 `code-view`
 
-### 5.3 测试角色
+### 6.3 测试角色
 
 - 优先读 `verify-view`
 - 无 `first` 时允许降级到 `spec/design/change diff`
 - 高风险验证或上线前验证不应长期停留在 `blind`
 
-### 5.4 研发角色
+### 6.4 研发角色
 
 - `04-design` 和 `07-code` 默认应强依赖 stage view
 - 无 `first` 时可临时推进，但必须显式风险
 - 正式设计、复杂实现、高风险改动可升为更强门槛
 
-### 5.5 架构 / TL
+### 6.5 架构 / TL
 
 - `design-view` 价值最高
 - 设计评审前应尽量达到 `full`
@@ -186,7 +225,7 @@
 
 ---
 
-## 6. 依赖强度模型
+## 7. 依赖强度模型
 
 统一使用三档：
 
@@ -203,47 +242,47 @@
 
 ---
 
-## 7. 各流程节点的职责
+## 8. 各流程节点的职责
 
-### 7.1 `00-onboarding`
+### 8.1 `00-onboarding`
 
 - 优先读取 `role-views`
 - 没有 role view 时退化为场景导向入口建议
 - 不生成背景真源
 
-### 7.2 `01-init`
+### 8.2 `01-init`
 
 - 检测 runtime `first` 资产是否存在
 - 记录当前 feature 的背景输入状态
 - 为后续阶段提供“这次 feature 从什么背景起步”的上下文
 
-### 7.3 `13-orchestrate`
+### 8.3 `13-orchestrate`
 
 - 根据阶段、角色、背景状态推荐执行路径
 - 统一处理依赖强度与降级策略
 - 不直接重新拼装背景
 
-### 7.4 `14-status`
+### 8.4 `14-status`
 
 - 展示当前 feature / 当前阶段的背景输入状态
 - 展示是否存在匹配的 stage view
 
-### 7.5 `15-doctor`
+### 8.5 `15-doctor`
 
 - 诊断 `.spec-first/runtime/first/summary` 与 `stage-views`
 - 诊断 docs 投影视图是否与 runtime 失同步
 - 识别 `blind` 状态和缺失资产
 
-### 7.6 `21-analyze`
+### 8.6 `21-analyze`
 
 - 在一致性分析中纳入背景输入质量
 - 识别“背景不足导致设计 / 实现 / 验证偏差”的问题
 
 ---
 
-## 8. 长期维护机制
+## 9. 长期维护机制
 
-### 8.1 默认不是全量重生成
+### 9.1 默认不是全量重生成
 
 `00-first` 默认应采用：
 
@@ -253,7 +292,7 @@
 4. 按需刷新 `docs/first/*.md`
 5. 更新索引与健康状态
 
-### 8.2 推荐刷新模式
+### 9.2 推荐刷新模式
 
 建议长期支持：
 
@@ -261,7 +300,7 @@
 - `refresh-docs-from-runtime`
 - `refresh-all`
 
-### 8.3 为什么这很重要
+### 9.3 为什么这很重要
 
 如果没有这一层：
 
@@ -277,7 +316,7 @@
 
 ---
 
-## 9. 为什么这个方案能提升流程质量
+## 10. 为什么这个方案能提升流程质量
 
 因为它把过去隐含、分散、重复的背景理解过程，收敛成了统一机制：
 
@@ -297,9 +336,15 @@
 
 ---
 
-## 10. 与 `first-skill` 的边界
+## 11. 与 `first-skill` 的边界
 
 - `first-skill` 负责生产 runtime 真源与 docs 投影视图
 - `skill-全流程` 负责定义谁读、何时读、缺失时怎么降级、何时升为门槛
 
 这是两套文档长期不漂移的前提。
+
+## 实现补充（2026-03-08）
+
+- `12-verify` 文档现已明确消费 `verify-view`
+- `14-status` 文档现已展示 `background_input_status` 与 runtime/docs 双层状态
+- `13-orchestrate` 的 `L3` 已细分为设计评审 / 高风险实现 / 上线前验证三类 risk category

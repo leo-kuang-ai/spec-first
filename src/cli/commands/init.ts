@@ -2,7 +2,7 @@
  * init CLI 命令
  * spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>]
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -16,6 +16,13 @@ import { renderDefaultConfigYaml } from '../../shared/config-schema.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { parseFlag } from '../parse-utils.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
+import {
+  getFirstRuntimeDir,
+  readFirstRoleViews,
+  readFirstRuntimeIndex,
+  readFirstRuntimeSummary,
+  readFirstStageViews,
+} from '../../core/skill-runtime/first-runtime-store.js';
 
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
 const VALID_SIZES: ReadonlySet<string> = new Set(['S', 'M', 'L']);
@@ -52,13 +59,6 @@ interface FirstSummary {
   codeVolume: string;
   apiSurface: string;
 }
-
-const FIRST_REQUIRED_PRODUCTS = [
-  'tech-stack.md',
-  'codebase-overview.md',
-  'domain-model.md',
-  'api-docs.md',
-] as const;
 
 function parseInitCliInput(args: string[]): InitCliInput {
   return {
@@ -191,24 +191,31 @@ function ensureProjectMetaConfig(projectRoot: string): void {
   }
 }
 
-function checkInitReadiness(projectRoot: string): InitReadinessStatus {
-  const firstDir = join(projectRoot, 'docs', 'first');
+export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   const firstMissing: string[] = [];
-  if (!existsSync(firstDir)) {
-    firstMissing.push('docs/first/');
+  const runtimeDir = getFirstRuntimeDir(projectRoot);
+  if (!existsSync(runtimeDir)) {
+    firstMissing.push('.spec-first/runtime/first/');
   } else {
-    const indexPath = join(firstDir, '.index.yaml');
-    if (!existsSync(indexPath)) {
-      firstMissing.push('docs/first/.index.yaml');
+    const runtimeIndex = readFirstRuntimeIndex(projectRoot);
+    const runtimeSummary = readFirstRuntimeSummary(projectRoot);
+    const runtimeRoleViews = readFirstRoleViews(projectRoot);
+    const runtimeStageViews = readFirstStageViews(projectRoot);
+
+    if (!runtimeIndex) {
+      firstMissing.push('.spec-first/runtime/first/index.json');
     }
-    for (const name of FIRST_REQUIRED_PRODUCTS) {
-      if (!existsSync(join(firstDir, name))) {
-        firstMissing.push(`docs/first/${name}`);
-      }
+    if (!runtimeSummary || !runtimeIndex?.summary.healthy) {
+      firstMissing.push('.spec-first/runtime/first/summary.json');
+    }
+    if (!runtimeRoleViews || !runtimeIndex?.roleViews.healthy) {
+      firstMissing.push('.spec-first/runtime/first/role-views.json');
+    }
+    if (!runtimeStageViews || !runtimeIndex?.stageViews.healthy) {
+      firstMissing.push('.spec-first/runtime/first/stage-views.json');
     }
   }
 
-  // 项目初始化状态检查（提示用途，不阻断 init）
   const projectMissing: string[] = [];
   if (!existsSync(join(projectRoot, '.spec-first'))) {
     projectMissing.push('.spec-first/');
@@ -228,63 +235,26 @@ function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   };
 }
 
-function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
-  const firstDir = join(projectRoot, 'docs', 'first');
-
-  const readIfExists = (path: string): string => {
-    if (!existsSync(path)) return '';
-    try {
-      return readFileSync(path, 'utf-8');
-    } catch {
-      return '';
-    }
-  };
-
-  const indexRaw = readIfExists(join(firstDir, '.index.yaml'));
-  const techStackRaw = readIfExists(join(firstDir, 'tech-stack.md'));
-  const overviewRaw = readIfExists(join(firstDir, 'codebase-overview.md'));
-  const apiRaw = readIfExists(join(firstDir, 'api-docs.md'));
-
-  const modeMatch = indexRaw.match(/^\s*mode:\s*(quick|deep)\s*$/m);
-  const mode = (modeMatch?.[1] as FirstSummary['mode'] | undefined) ?? 'unknown';
-
-  const lowerStack = techStackRaw.toLowerCase();
-  let techStack = '待确认';
-  if (lowerStack.includes('node.js') && lowerStack.includes('typescript')) {
-    techStack = 'Node.js + TypeScript';
-  } else if (lowerStack.includes('java') && lowerStack.includes('spring')) {
-    techStack = 'Java + Spring';
-  } else if (lowerStack.includes('python') && lowerStack.includes('django')) {
-    techStack = 'Python + Django';
-  } else if (lowerStack.includes('go') && lowerStack.includes('gin')) {
-    techStack = 'Go + Gin';
-  } else if (lowerStack.includes('typescript')) {
-    techStack = 'TypeScript';
-  }
-
-  const codeVolumeMatch = overviewRaw.match(/代码量\s*[:：]\s*[~约]?\s*([0-9][0-9,]*)(\+)?\s*行?/);
-  const codeVolume = codeVolumeMatch
-    ? `~${codeVolumeMatch[1]}${codeVolumeMatch[2] ? '+' : ''} 行`
-    : '待确认';
-
-  const apiCountMatch = apiRaw.match(/([0-9][0-9,]*)\+?\s*个\s*API/);
-  let apiSurface = apiCountMatch
-    ? `${apiCountMatch[1]}+ 个`
-    : '待确认';
-  if (apiSurface === '待确认') {
-    const sectionCount = (apiRaw.match(/^###\s+/gm) || []).length;
-    if (sectionCount > 0) {
-      apiSurface = `${sectionCount}+ 个`;
-    }
+export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
+  const runtimeIndex = readFirstRuntimeIndex(projectRoot);
+  const runtimeSummary = readFirstRuntimeSummary(projectRoot);
+  if (runtimeIndex && runtimeSummary) {
+    return {
+      mode: runtimeIndex.mode,
+      techStack: runtimeSummary.project.platformType ?? '待确认',
+      codeVolume: runtimeSummary.modules.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
+      apiSurface: runtimeSummary.apiSurface.length > 0 ? `${runtimeSummary.apiSurface.length}+ 个` : '待确认',
+    };
   }
 
   return {
-    mode,
-    techStack,
-    codeVolume,
-    apiSurface,
+    mode: 'unknown',
+    techStack: '待确认',
+    codeVolume: '待确认',
+    apiSurface: '待确认',
   };
 }
+
 
 export async function handleInit(args: string[]): Promise<number> {
   if (args.includes('--help') || args.includes('-h')) {
@@ -365,6 +335,7 @@ export async function handleInit(args: string[]): Promise<number> {
   }
 
   runPostInitSetup(cwd);
+  console.log(`background_input_status: ${result.backgroundInputStatus}`);
   console.log(`Feature 初始化完成：${result.featureId}`);
   console.log(`目录：${result.featureDir}`);
   return ExitCode.SUCCESS;

@@ -670,3 +670,9 @@ SKIPPED — Moderate 复杂度，无多方案权衡
 - `references/prd-template-greenfield.md`
 - `references/prd-template-iteration.md`
 - `references/adr-lite-template.md`
+
+## 背景输入
+- 优先读取 `spec-view`
+- 建议从 `.spec-first/runtime/first/stage-views.json` 的 spec-view 获取摘要
+- 执行前应显式声明 `background_input_status`
+- 当背景不足时进入 `degraded` 降级模式，不得静默假设上下文完整

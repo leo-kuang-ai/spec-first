@@ -193,19 +193,15 @@ function hasWorktreeConfirmed(specDir: string): boolean {
 }
 
 /** 高风险变更评估（Superpowers P1-3） */
-function assessHighRiskChanges(projectRoot: string, featureId: string): HighRiskAssessment {
+export function assessHighRiskChanges(projectRoot: string, featureId: string): HighRiskAssessment {
   const reasons: string[] = [];
   let requiresWorktree = false;
   const hasGitRepo = hasLocalGitRepo(projectRoot);
 
-  // 检查是否有跨目录重构信号
   if (hasGitRepo) {
     try {
-      // 先获取实际提交数，避免在浅克隆或新仓库中失败
       const commitCountOutput = runGit(projectRoot, ['rev-list', '--count', 'HEAD']);
       const commitCount = parseInt(commitCountOutput.trim(), 10) || 0;
-
-      // 使用实际提交数和5的较小值作为深度
       const depth = Math.max(1, Math.min(commitCount, 5));
       const diffOutput = runGit(projectRoot, ['diff', '--name-only', `HEAD~${depth}`]);
 
@@ -213,13 +209,11 @@ function assessHighRiskChanges(projectRoot: string, featureId: string): HighRisk
         const changedFiles = diffOutput.split('\n').filter(f => f.trim());
         const dirs = new Set(changedFiles.map(f => f.split('/')[0] ?? 'root'));
 
-        // 跨 3+ 目录视为高风险
         if (dirs.size >= 3) {
           reasons.push(`跨目录变更: ${dirs.size} 个目录`);
           requiresWorktree = true;
         }
 
-        // 检查是否修改核心文件
         const corePatterns = ['src/core/', 'src/shared/', 'config.'];
         const hasCoreChanges = changedFiles.some(f =>
           corePatterns.some(p => f.includes(p)),
@@ -230,12 +224,10 @@ function assessHighRiskChanges(projectRoot: string, featureId: string): HighRisk
         }
       }
     } catch (e) {
-      // Git 不可用时记录警告，安全退化为"无风险"
       console.warn(`hard-gate: 无法检查高风险变更 - ${(e as Error).message}`);
     }
   }
 
-  // 检查 task_plan.md 中是否有并行修复标记
   const taskPlanPath = join(projectRoot, 'specs', featureId, 'task_plan.md');
   if (exists(taskPlanPath)) {
     const content = readMarkdown(taskPlanPath).toLowerCase();

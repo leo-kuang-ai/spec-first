@@ -46,3 +46,8 @@ changelog: Aligned with manifest-driven bootstrap checks (MCP/skills from config
 - MCP required set 在 `Codex` + `Claude Code` 均通过
 - skills required set 在 `Codex` + `Claude Code` 均通过
 - 如发生自动修复，已输出修复前后差异
+
+## 背景诊断范围
+- 诊断 `stage-views` 健康状态
+- 诊断 `background_input_status`
+- 对比 `runtime 真源` 与 `docs 投影视图` 是否失同步

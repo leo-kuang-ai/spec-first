@@ -14,9 +14,28 @@ const API_MODEL_ARTIFACTS = ['api-docs.md', 'domain-model.md'] as const;
 const DB_MODEL_ARTIFACTS = ['database-er.md', 'domain-model.md'] as const;
 
 export const DEFAULT_AFFECTED_ARTIFACTS = ['codebase-overview.md', 'architecture.md'] as const;
+export const FIRST_RUNTIME_ARTIFACTS = ['summary.json', 'role-views.json', 'stage-views.json'] as const;
+
+export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<(typeof FIRST_RUNTIME_ARTIFACTS)[number], readonly string[]> = {
+  'summary.json': [
+    'docs/first/README.md',
+    'docs/first/summary.md',
+    'docs/first/tech-stack.md',
+    'docs/first/codebase-overview.md',
+    'docs/first/architecture.md',
+    'docs/first/api-docs.md',
+    'docs/first/domain-model.md',
+    'docs/first/development-guidelines.md',
+    'docs/first/external-deps.md',
+    'docs/first/local-setup.md',
+    'docs/first/database-er.md',
+    'docs/first/call-graph.md',
+  ],
+  'role-views.json': ['docs/first/README.md', 'docs/first/role-views.md'],
+  'stage-views.json': ['docs/first/README.md', 'docs/first/stage-views.md'],
+};
 
 export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
-  // 包管理文件
   'package.json': DEPENDENCY_ARTIFACTS,
   'package-lock.json': DEPENDENCY_ARTIFACTS,
   'yarn.lock': DEPENDENCY_ARTIFACTS,
@@ -35,8 +54,6 @@ export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
   'composer.json': DEPENDENCY_ARTIFACTS,
   'Gemfile': DEPENDENCY_ARTIFACTS,
   'Gemfile.lock': DEPENDENCY_ARTIFACTS,
-
-  // 配置文件
   '.eslintrc': DEV_GUIDELINE_ARTIFACTS,
   '.eslintrc.js': DEV_GUIDELINE_ARTIFACTS,
   '.eslintrc.cjs': DEV_GUIDELINE_ARTIFACTS,
@@ -54,19 +71,15 @@ export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
   'tsconfig.json': DEV_GUIDELINE_ARTIFACTS,
   'tsconfig.base.json': DEV_GUIDELINE_ARTIFACTS,
   'tsconfig.build.json': DEV_GUIDELINE_ARTIFACTS,
-
-  // 容器/部署
-  Dockerfile: ARCH_SETUP_ARTIFACTS,
+  'Dockerfile': ARCH_SETUP_ARTIFACTS,
   'docker-compose.yml': ARCH_SETUP_ARTIFACTS,
   'docker-compose.yaml': ARCH_SETUP_ARTIFACTS,
   'Dockerfile.prod': ARCH_SETUP_ARTIFACTS,
-  Makefile: LOCAL_SETUP_ARTIFACTS,
-  makefile: LOCAL_SETUP_ARTIFACTS,
+  'Makefile': LOCAL_SETUP_ARTIFACTS,
+  'makefile': LOCAL_SETUP_ARTIFACTS,
   '.env.example': LOCAL_SETUP_ARTIFACTS,
   '.env.sample': LOCAL_SETUP_ARTIFACTS,
   '.env.example.local': LOCAL_SETUP_ARTIFACTS,
-
-  // 数据库
   'prisma/schema.prisma': DB_MODEL_ARTIFACTS,
   'schema.prisma': DB_MODEL_ARTIFACTS,
   'knexfile.js': ['database-er.md', 'local-setup.md'],
@@ -100,9 +113,6 @@ export const PREFIX_FILE_TO_ARTIFACT_MAP: ReadonlyArray<readonly [string, readon
   ['seeds/', ['database-er.md']],
 ];
 
-/**
- * 根据变更文件匹配受影响产物
- */
 export function matchArtifactsByChangedFile(changedFile: string): string[] {
   const exact = EXACT_FILE_TO_ARTIFACT_MAP[changedFile];
   if (exact) return [...exact];
@@ -114,4 +124,55 @@ export function matchArtifactsByChangedFile(changedFile: string): string[] {
   }
 
   return [...DEFAULT_AFFECTED_ARTIFACTS];
+}
+
+export function getProjectionDocsForRuntimeArtifact(runtimeArtifact: (typeof FIRST_RUNTIME_ARTIFACTS)[number]): string[] {
+  return [...FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP[runtimeArtifact]];
+}
+
+export function matchRuntimeArtifactsByChangedFile(changedFile: string): string[] {
+  if (changedFile.endsWith('/first-summary.ts') || changedFile === 'src/core/skill-runtime/first-summary.ts') {
+    return ['summary.json'];
+  }
+  if (changedFile.endsWith('/first-role-views.ts') || changedFile === 'src/core/skill-runtime/first-role-views.ts') {
+    return ['role-views.json'];
+  }
+  if (changedFile.endsWith('/first-stage-views.ts') || changedFile === 'src/core/skill-runtime/first-stage-views.ts') {
+    return ['stage-views.json'];
+  }
+  if (
+    changedFile.endsWith('/first-context.ts')
+    || changedFile.endsWith('/first-runtime-store.ts')
+    || changedFile.endsWith('/first-doc-projection.ts')
+    || changedFile.endsWith('/first-artifact-mapping.ts')
+  ) {
+    return [...FIRST_RUNTIME_ARTIFACTS];
+  }
+  if (changedFile.startsWith('.spec-first/runtime/first/')) {
+    const artifact = changedFile.split('/').at(-1);
+    return artifact && FIRST_RUNTIME_ARTIFACTS.includes(artifact as (typeof FIRST_RUNTIME_ARTIFACTS)[number])
+      ? [artifact]
+      : [];
+  }
+  return [];
+}
+
+export function collectProjectionDocsForChangedFiles(changedFiles: string[]): string[] {
+  const docs = new Set<string>();
+  for (const file of changedFiles) {
+    const shouldRefreshDocs = file.startsWith('.spec-first/runtime/first/')
+      || file.endsWith('/first-doc-projection.ts')
+      || file.endsWith('/first-artifact-mapping.ts');
+
+    if (!shouldRefreshDocs) {
+      continue;
+    }
+
+    for (const artifact of matchRuntimeArtifactsByChangedFile(file)) {
+      for (const doc of getProjectionDocsForRuntimeArtifact(artifact as (typeof FIRST_RUNTIME_ARTIFACTS)[number])) {
+        docs.add(doc);
+      }
+    }
+  }
+  return Array.from(docs);
 }

@@ -162,3 +162,8 @@ Step 3 Question Gate 的提问策略与分类规则。
 
 - 主文档：`03-spec/SKILL.md` Step 3
 - 歧义消解：`03-spec/SKILL.md` 结构化歧义消解章节
+
+## spec-view 背景门槛
+- 问题收敛前优先读取 `spec-view`
+- 输出中应包含 `background_input_status`
+- 若处于 `degraded`，需先补充缺失背景再进入关键问题收敛

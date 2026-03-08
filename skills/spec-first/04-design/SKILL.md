@@ -205,3 +205,9 @@ spec-first validate format <featureId>
 **数据模型**: otp_sessions (phone, code, expires_at, attempts)
 **关键约束**: 单号 60s 冷却、单号日限 10 次、验证码 5min 过期
 ```
+
+## 背景输入
+- 优先读取 `design-view`
+- 输出中必须包含 `backgroundInputStatus`
+- 正式设计评审前应尽量达到 `full`
+- 若命中高依赖阶段，可提升到 `L3` 设计门槛

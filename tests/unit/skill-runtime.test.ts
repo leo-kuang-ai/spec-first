@@ -154,6 +154,145 @@ describe('dispatchCommand', () => {
     expect(result.orchestrateArgs).toEqual({ mode: 'auto', resume: true });
   });
 
+  it('should attach orchestrate background guidance from current feature state', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
+    mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
+    writeFileSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'stage-state.json'), JSON.stringify({
+      featureId: 'FSREQ-20260308-AUTH-001',
+      currentStage: '02_design',
+      history: [],
+      terminal: false,
+      mode: 'N',
+      size: 'S',
+      platforms: ['h5'],
+      backgroundInputStatus: 'blind',
+      createdAt: '2026-03-08T12:00:00.000Z',
+      updatedAt: '2026-03-08T12:00:00.000Z'
+    }), 'utf-8');
+
+    const result = dispatchCommand('orchestrate --auto', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.orchestrateBackgroundGuidance).toEqual({
+      backgroundStatus: 'blind',
+      dependencyStrength: 'L2',
+      warning: '缺少足够背景输入，建议先执行 /spec-first:first 补齐 runtime 真源',
+      recommendedAction: 'backfill-first',
+    });
+  });
+
+
+  it('should upgrade orchestrate dependency strength to L3 when implementation stage has high-risk signals', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
+    mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
+    writeFileSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'stage-state.json'), JSON.stringify({
+      featureId: 'FSREQ-20260308-AUTH-001',
+      currentStage: '04_implement',
+      history: [],
+      terminal: false,
+      mode: 'N',
+      size: 'S',
+      platforms: ['h5'],
+      backgroundInputStatus: 'degraded',
+      createdAt: '2026-03-08T12:00:00.000Z',
+      updatedAt: '2026-03-08T12:00:00.000Z'
+    }), 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'task_plan.md'),
+      '# Task Plan\n\n- [parallel] TASK-AUTH-001 风险改造\n',
+      'utf-8',
+    );
+
+    const result = dispatchCommand('orchestrate --auto', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.orchestrateBackgroundGuidance).toEqual({
+      backgroundStatus: 'degraded',
+      dependencyStrength: 'L3',
+      riskSignals: ['存在并行任务标记'],
+      riskCategory: 'high-risk-implementation',
+      warning: '背景输入不完整，且当前属于高风险改动门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      recommendedAction: 'review-risk',
+    });
+  });
+
+
+  it('should tag design-stage L3 as formal-design-review', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
+    mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
+    writeFileSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'stage-state.json'), JSON.stringify({
+      featureId: 'FSREQ-20260308-AUTH-001',
+      currentStage: '02_design',
+      history: [],
+      terminal: false,
+      mode: 'N',
+      size: 'S',
+      platforms: ['h5'],
+      backgroundInputStatus: 'degraded',
+      createdAt: '2026-03-08T12:00:00.000Z',
+      updatedAt: '2026-03-08T12:00:00.000Z'
+    }), 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'task_plan.md'),
+      '# Task Plan\n\n- [parallel] TASK-AUTH-001 设计评审准备\n',
+      'utf-8',
+    );
+
+    const result = dispatchCommand('orchestrate --auto', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.orchestrateBackgroundGuidance).toEqual({
+      backgroundStatus: 'degraded',
+      dependencyStrength: 'L3',
+      riskSignals: ['存在并行任务标记'],
+      riskCategory: 'formal-design-review',
+      warning: '背景输入不完整，且当前属于正式设计评审门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      recommendedAction: 'review-risk',
+    });
+  });
+
+  it('should tag verify-stage L3 as pre-release-verification', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
+    mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
+    writeFileSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'stage-state.json'), JSON.stringify({
+      featureId: 'FSREQ-20260308-AUTH-001',
+      currentStage: '05_verify',
+      history: [],
+      terminal: false,
+      mode: 'N',
+      size: 'S',
+      platforms: ['h5'],
+      backgroundInputStatus: 'degraded',
+      createdAt: '2026-03-08T12:00:00.000Z',
+      updatedAt: '2026-03-08T12:00:00.000Z'
+    }), 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', 'FSREQ-20260308-AUTH-001', 'task_plan.md'),
+      '# Task Plan\n\n- [parallel] TASK-AUTH-001 上线前验证\n',
+      'utf-8',
+    );
+
+    const result = dispatchCommand('orchestrate --auto', TMP);
+    expect(result.route).toBe('skill');
+    expect(result.orchestrateBackgroundGuidance).toEqual({
+      backgroundStatus: 'degraded',
+      dependencyStrength: 'L3',
+      riskSignals: ['存在并行任务标记'],
+      riskCategory: 'pre-release-verification',
+      warning: '背景输入不完整，且当前属于上线前 / 高风险验证门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      recommendedAction: 'review-risk',
+    });
+  });
+
   it('should reject orchestrate with unknown flag', () => {
     mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
     writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
@@ -343,6 +482,33 @@ describe('loadSkill hard-gate notice', () => {
     const content = loadSkill(skillPath, { projectRoot: TMP });
     expect(content).toContain('HARD-GATE 运行时检查（自动）');
     expect(content).toContain('检查结果: PASS');
+  });
+
+  it('should prepend orchestrate background notice when guidance exists', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md');
+    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        currentStage: '02_design',
+        backgroundInputStatus: 'blind',
+        history: [],
+        terminal: false,
+        mode: 'N',
+        size: 'S',
+        platforms: ['h5'],
+        createdAt: '2026-03-08T12:00:00.000Z',
+        updatedAt: '2026-03-08T12:00:00.000Z'
+      }),
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Orchestrate Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('orchestrate-runtime-context');
+    expect(content).toContain('background_status: blind');
+    expect(content).toContain('recommended_action: backfill-first');
   });
 
   it('should throw when review hard-gate is BLOCKED by stage mismatch', () => {

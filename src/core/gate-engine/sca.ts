@@ -4,7 +4,8 @@
  */
 import { join } from 'node:path';
 import type { Stage, MatrixRow } from '../../shared/types.js';
-import { exists, readMarkdown } from '../../shared/fs-utils.js';
+import { exists, readJson, readMarkdown } from '../../shared/fs-utils.js';
+import { readFirstRuntimeIndex } from '../skill-runtime/first-runtime-store.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 import { createTraceContext } from '../trace-engine/trace-context.js';
 
@@ -41,6 +42,80 @@ export interface AnalyzeResult {
     LOW: number;
     total: number;
   };
+}
+
+function collectBackgroundQualityFindings(featureId: string, projectRoot: string): AnalyzeFinding[] {
+  const findings: AnalyzeFinding[] = [];
+  const featureDir = join(projectRoot, 'specs', featureId);
+  const stageStatePath = join(featureDir, 'stage-state.json');
+
+  if (exists(stageStatePath)) {
+    try {
+      const stageState = readJson<{ currentStage?: string; backgroundInputStatus?: string }>(stageStatePath);
+      if (stageState.currentStage === '05_verify' && stageState.backgroundInputStatus && stageState.backgroundInputStatus !== 'full') {
+        findings.push({
+          severity: 'HIGH',
+          type: 'BACKGROUND_INPUT_DEGRADED',
+          location: 'stage-state.json',
+          detail: `验证阶段 background_input_status=${stageState.backgroundInputStatus}`,
+          suggestion: '补齐 verify-view / first runtime 背景后重新执行 analyze 与 verify',
+        });
+      } else if (!stageState.backgroundInputStatus) {
+        findings.push({
+          severity: 'MEDIUM',
+          type: 'BACKGROUND_INPUT_MISSING',
+          location: 'stage-state.json',
+          detail: 'stage-state.json 缺少 background_input_status',
+          suggestion: '执行 init / stage 同步，补齐 background_input_status 字段',
+        });
+      }
+    } catch {
+      findings.push({
+        severity: 'MEDIUM',
+        type: 'BACKGROUND_INPUT_INVALID',
+        location: 'stage-state.json',
+        detail: 'stage-state.json 解析失败，无法分析背景质量',
+        suggestion: '修复 stage-state.json 格式后重新执行 analyze',
+      });
+    }
+  }
+
+  const runtimeIndex = readFirstRuntimeIndex(projectRoot);
+  if (!runtimeIndex) {
+    findings.push({
+      severity: 'MEDIUM',
+      type: 'FIRST_RUNTIME_MISSING',
+      location: '.spec-first/runtime/first/index.json',
+      detail: '缺少 first runtime index，无法判断 runtime 真源健康状态',
+      suggestion: '先执行 /spec-first:first 生成 runtime 真源层',
+    });
+    return findings;
+  }
+
+  if (!runtimeIndex.stageViews.healthy) {
+    findings.push({
+      severity: 'MEDIUM',
+      type: 'STAGE_VIEWS_UNHEALTHY',
+      location: runtimeIndex.stageViews.path,
+      detail: `stage-views 健康状态异常: ${(runtimeIndex.stageViews.issues ?? ['unknown']).join('; ')}`,
+      suggestion: '重新执行 /spec-first:first 修复 stage-views 健康状态',
+    });
+  }
+
+  const driftDocs = Object.entries(runtimeIndex.docsProjection)
+    .filter(([, entry]) => !entry.healthy)
+    .map(([doc, entry]) => `${doc}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
+  if (driftDocs.length > 0) {
+    findings.push({
+      severity: 'MEDIUM',
+      type: 'DOCS_PROJECTION_DRIFT',
+      location: '.spec-first/runtime/first/index.json',
+      detail: `docs 投影视图漂移: ${driftDocs.join(', ')}`,
+      suggestion: '重新生成 docs 投影视图，并校验 runtime 真源与 docs 投影视图同步状态',
+    });
+  }
+
+  return findings;
 }
 
 /** 执行当前阶段的 SCA 检查 */
@@ -282,6 +357,8 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       suggestion: '将模糊描述改为可验证的量化标准',
     });
   }
+
+  findings.push(...collectBackgroundQualityFindings(featureId, projectRoot));
 
   if (findings.length === 0) {
     findings.push({

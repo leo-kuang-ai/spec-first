@@ -193,3 +193,11 @@ gate check 通过
   ↓
 stage advance → 05_verify
 ```
+
+
+## 背景驱动推荐
+- `full` + `L1/L2/L3` → `proceed`（若存在高风险信号，需在上下文中显式展示 `risk_category` 与 `risk_signals`）
+- `degraded` + `L2/L3` → `review-risk`
+- `blind` + `L2/L3` → `backfill-first`，优先推荐 `/spec-first:first`
+- `L3` 的判定复用 `hard-gate` 高风险评估，不单独维护第二套风险源
+- `L3` 的输出需按阶段细分：设计评审 / 高风险改动 / 上线前验证

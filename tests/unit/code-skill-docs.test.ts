@@ -26,4 +26,15 @@ describe('07-code skill docs consistency', () => {
     expect(skill).toContain('使用选定命令执行 RED');
     expect(skill).toContain('使用同一命令执行 GREEN');
   });
+
+  it('should document code-view background fields', () => {
+    const skill = read(SKILL_MD);
+    const standards = read(join(CODE_ROOT, 'references/code-standards.md'));
+
+    expect(skill).toContain('code-view');
+    expect(skill).toContain('backgroundInputStatus');
+    expect(standards).toContain('entryPoints');
+    expect(standards).toContain('likelyChangeAreas');
+    expect(standards).toContain('changeHazards');
+  });
 });

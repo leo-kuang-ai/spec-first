@@ -182,3 +182,39 @@ Feature: FSREQ-20260305-AUTH-001
 
 是否继续执行？[Y/n]
 ```
+
+
+## 背景治理输出
+
+当 orchestrate 检测到背景治理信号时，输出应包含：
+
+```
+background_status: blind
+dependency_strength: L2
+recommended_action: backfill-first
+warning: 缺少足够背景输入，建议先执行 /spec-first:first 补齐 runtime 真源
+```
+
+当高依赖阶段叠加高风险信号时，应输出：
+
+```
+background_status: degraded
+dependency_strength: L3
+recommended_action: review-risk
+risk_category: formal-design-review
+risk_signals: 存在并行任务标记
+warning: 背景输入不完整，且当前属于正式设计评审门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段
+```
+
+其中 `risk_category` 取值按阶段细分：
+- `formal-design-review`：正式设计评审前
+- `high-risk-implementation`：复杂实现 / 高风险改动
+- `pre-release-verification`：上线前 / 高风险验证
+
+当背景完整且仅为 `L1` 场景时，可输出：
+
+```
+background_status: full
+dependency_strength: L1
+recommended_action: proceed
+```

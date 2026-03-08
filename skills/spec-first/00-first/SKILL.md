@@ -16,9 +16,28 @@ changelog: |
 - **quick 模式**（默认）：生成 4-5 个核心文档，聚焦"快速了解项目 + 承载的业务流程 + 数据模型"
 - **deep 模式**（完整分析）：生成 10-11 个文档，包含调用链、架构、外部依赖、环境搭建、研发规范等
 
-所有产物生成到 `docs/first/` 目录，产物 frontmatter 标注 `mode: quick` 或 `mode: deep`。
+运行时真源维护在 `.spec-first/runtime/first/`，其中 `.spec-first/runtime/first/index.json` 是正式真索引；`docs/first/` 保留为长期维护的人类可读投影视图层。
 
 ---
+
+
+## Runtime 分层模型
+
+- **机器真源层**：`.spec-first/runtime/first/`
+  - `.spec-first/runtime/first/index.json`
+  - `.spec-first/runtime/first/summary.json`
+  - `.spec-first/runtime/first/role-views.json`
+  - `.spec-first/runtime/first/stage-views.json`
+- **文档投影视图层**：`docs/first/`
+- 不存在额外 YAML 真索引；runtime 真源仅为上述 4 个 JSON 文件
+- 默认采用**增量更新**，而不是每次全量重生成
+
+
+## 刷新模式
+
+- `refresh-runtime-only`：只刷新 `.spec-first/runtime/first/` 真源层
+- `refresh-docs-from-runtime`：不重建真源，只从 runtime 刷新 `docs/first/`
+- `refresh-all`：同时刷新 runtime 真源与 docs 投影视图
 
 ## 核心约束
 

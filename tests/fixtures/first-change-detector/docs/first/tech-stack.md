@@ -1,2 +1,0 @@
-# Tech Stack
-manual change

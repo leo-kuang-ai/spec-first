@@ -35,6 +35,8 @@ export interface CatchupResult {
   totalTasks: number;
   todoSummary?: string;
   missingFiles: string[];
+  /** 背景输入状态（由 init 写入 stage-state.json） */
+  backgroundInputStatus?: 'full' | 'degraded' | 'blind';
   /** 5-Question Reboot Test 结果（Planning-with-Files P0-2） */
   fiveQuestions: FiveQuestions;
   /** auto-loop 运行时摘要（ORCH-008），运行中时非空 */
@@ -231,6 +233,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     todoSummary,
     fiveQuestions,
     taskContextSummary,
+    state?.backgroundInputStatus,
   );
 
   return {
@@ -242,6 +245,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     totalTasks,
     todoSummary,
     missingFiles: uniqueMissingFiles,
+    backgroundInputStatus: state?.backgroundInputStatus,
     fiveQuestions,
     autoLoopSummary,
     stepRecovery,

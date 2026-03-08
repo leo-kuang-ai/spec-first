@@ -356,3 +356,8 @@ C11 = count(design decisions compliant with constitution) / count(all design dec
 | C9 < 阈值 | 修正 TC 字段 |
 | C10 < 阈值 | 完善 spec.md |
 | C11 < 阈值 | 修正 design.md |
+
+## verify-view 指标补充
+- `validation_focus`：本轮验证重点
+- `critical_flows`：必须覆盖的关键链路
+- `recommended_checks`：建议执行的补充检查

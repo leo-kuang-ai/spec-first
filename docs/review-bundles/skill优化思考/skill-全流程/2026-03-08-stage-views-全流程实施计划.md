@@ -89,6 +89,11 @@ P0 完成标志：
 - `dispatcher` / `resume` / `init readiness` / `change-detector` 已不再直连 `docs/first`
 - 默认支持增量更新
 
+执行约束：
+
+- `stage-views-开发执行任务表` 必须先执行 Gate 0 / Readiness
+- 未满足上述完成标志前，不得进入 `00-onboarding / 01-init / 13-orchestrate` 等 consumer 接入任务
+
 ## P1：入口 / 编排节点接入
 
 ### P1-1 `00-onboarding`
@@ -254,15 +259,15 @@ P0 完成标志：
 1. 完成 producer 分层维护能力
 2. 确认主链 truth-source 入口已全部切换
 3. 接入 `00-onboarding`
-3. 接入 `01-init`
-4. 接入 `13-orchestrate`
-5. 接入 `03-spec`
-6. 接入 `04-design`
-7. 接入 `07-code`
-8. 接入 `12-verify`
-9. 接入 `14-status`
-10. 接入 `15-doctor`
-11. 接入 `21-analyze`
+4. 接入 `01-init`
+5. 接入 `13-orchestrate`
+6. 接入 `03-spec`
+7. 接入 `04-design`
+8. 接入 `07-code`
+9. 接入 `12-verify`
+10. 接入 `14-status`
+11. 接入 `15-doctor`
+12. 接入 `21-analyze`
 
 这样安排的原因：
 
@@ -282,3 +287,9 @@ P0 完成标志：
 4. `03-spec / 04-design / 07-code / 12-verify` 已读取对应 stage view
 5. `14-status / 15-doctor / 21-analyze` 已把背景质量纳入治理
 6. 降级不是隐式发生，而是通过 `background_input_status` 被显式记录
+
+## 最新实现同步（2026-03-08）
+
+- 已完成：`00-onboarding / 01-init / 13-orchestrate`
+- 已完成文档接入：`03-spec / 04-design / 07-code / 12-verify / 14-status / 15-doctor / 21-analyze`
+- 已完成治理实现：`doctor` 输出背景质量检查，`analyze` 输出背景质量 findings

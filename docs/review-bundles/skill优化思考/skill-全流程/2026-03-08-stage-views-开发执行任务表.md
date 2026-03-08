@@ -1,6 +1,6 @@
 # Stage Views 全流程接入 Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **For Implementer:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** 在 `00-first` producer 分层能力完成后，让入口节点、主链节点、治理节点按顺序接入 `role-views`、`stage-views` 与 `background_input_status`，形成完整的全流程背景输入机制。
 
@@ -8,7 +8,34 @@
 
 **Tech Stack:** TypeScript、Node.js、Vitest、Spec-First Skill Docs、CLI Commands
 
-**Repo Facts:** 当前仓库存在 `skills/spec-first/00-onboarding`、`01-init`、`03-spec`、`04-design`、`07-code`、`12-verify`、`13-orchestrate`、`14-status`、`15-doctor`、`21-analyze`；不存在独立的 `09-test` skill。当前已存在 `tests/unit/code-skill-docs.test.ts` 与 `tests/unit/init.test.ts`、`tests/unit/orchestrate-args-parser.test.ts`、`tests/unit/cli-metrics-doctor.test.ts` 等可复用测试入口。
+**Repo Facts:** 当前仓库存在 `skills/spec-first/00-onboarding`、`01-init`、`03-spec`、`04-design`、`07-code`、`12-verify`、`13-orchestrate`、`14-status`、`15-doctor`、`21-analyze`；不存在独立的 `09-test` skill。当前已存在 `tests/unit/code-skill-docs.test.ts` 与 `tests/unit/init.test.ts`、`tests/unit/orchestrate-args-parser.test.ts`、`tests/unit/cli-metrics-doctor.test.ts` 等可复用测试入口。**As-Is** 仍有部分入口以 `docs/first` / `docs/first/.index.yaml` 作为真相来源，因此本计划必须先通过 Gate 0，确认 `first-skill` 的 P0 切换已落地，再进入 consumer 接入。
+
+---
+
+### Gate 0: Readiness / P0 前置门槛校验
+
+**Files:**
+- Check: `docs/review-bundles/skill优化思考/first-skill/2026-03-08-first-skill-一次切换实施清单.md`
+- Check: `docs/review-bundles/skill优化思考/first-skill/2026-03-08-first-skill-开发执行任务表.md`
+- Check: `docs/review-bundles/skill优化思考/first-skill/2026-03-08-first-skill-最佳实践重构设计.md`
+
+**Step 1: Verify producer readiness before any consumer work**
+
+确认以下条件已经满足：
+- `.spec-first/runtime/first/` 已成为 `00-first` 的主 truth-source
+- `loadStageView(projectRoot, stage)` 已可用
+- `dispatcher / resume / init readiness / change-detector` 已不再直连 `docs/first`
+- `docs/first/*.md` 已收口为投影视图层
+
+**Step 2: Stop if Gate 0 is not satisfied**
+
+如果任一条件未满足：
+- 不进入 Task 1+
+- 回到 `first-skill` 方案先完成 P0
+
+**Step 3: Only after Gate 0 passes, continue to Task 1**
+
+将 Gate 0 视为阻断门，不允许跳过。
 
 ---
 
@@ -45,6 +72,8 @@ Expected: PASS
 ### Task 2: `01-init` 接入 `background_input_status`
 
 **Files:**
+- Modify: `src/core/process-engine/init.ts`
+- Modify: `src/cli/commands/init.ts`
 - Modify: `skills/spec-first/01-init/SKILL.md`
 - Modify: `skills/spec-first/01-init/references/output-format.md`
 - Modify: `skills/spec-first/01-init/references/interaction-guide.md`
@@ -63,6 +92,8 @@ Expected: FAIL with outdated init behavior or docs
 
 **Step 3: Update docs and implementation**
 
+- 在 `src/core/process-engine/init.ts` 中写入 `background_input_status` 所需字段
+- 在 `src/cli/commands/init.ts` 中对外输出新的背景状态摘要
 - 在 `SKILL.md` 中加入背景状态判断
 - 在输出格式中加入 `background_input_status`
 - 在交互说明中加入降级提示
@@ -77,6 +108,7 @@ Expected: PASS
 ### Task 3: `13-orchestrate` 接入依赖强度与降级编排
 
 **Files:**
+- Modify: `src/core/skill-runtime/orchestrate-args.ts`
 - Modify: `skills/spec-first/13-orchestrate/SKILL.md`
 - Modify: `skills/spec-first/13-orchestrate/references/orchestration-rules.md`
 - Modify: `skills/spec-first/13-orchestrate/references/skill-mapping.md`
@@ -95,6 +127,7 @@ Expected: FAIL with missing stage-view governance rules
 
 **Step 3: Update docs and implementation**
 
+- 在 `src/core/skill-runtime/orchestrate-args.ts` 中补齐背景状态 / 依赖强度口径
 - 在 `SKILL.md` 中加入背景依赖强度说明
 - 在 `orchestration-rules.md` 中加入降级路径规则
 - 在 `skill-mapping.md` 中加入 stage-view 驱动的推荐逻辑
@@ -232,51 +265,101 @@ Expected: PASS
 
 ---
 
-### Task 8: 治理节点接入背景状态
+### Task 8: `14-status` 接入背景状态展示
 
 **Files:**
 - Modify: `skills/spec-first/14-status/SKILL.md`
 - Modify: `skills/spec-first/14-status/references/status-dashboard-template.md`
-- Modify: `skills/spec-first/15-doctor/SKILL.md`
-- Modify: `skills/spec-first/15-doctor/references/diagnostic-rules.md`
-- Modify: `skills/spec-first/21-analyze/SKILL.md`
-- Modify: `skills/spec-first/21-analyze/references/analysis-rules.md`
-- Modify: `src/cli/commands/doctor.ts`
-- Modify: `src/cli/commands/analyze.ts`
-- Modify: `tests/unit/cli-metrics-doctor.test.ts`
 - Test: `tests/unit/status-skill-docs.test.ts`
-- Test: `tests/unit/doctor-skill-docs.test.ts`
-- Test: `tests/unit/analyze-skill-docs.test.ts`
 
-**Step 1: Write the failing tests**
+**Step 1: Write the failing test**
 
-在测试中覆盖：
+在 `tests/unit/status-skill-docs.test.ts` 中断言：
 - `14-status` 展示 `background_input_status`
-- `15-doctor` 诊断 `stage-views`
-- `15-doctor` 诊断 docs 投影视图与 runtime 是否失同步
-- `21-analyze` 将背景输入状态纳入分析
-- doctor CLI 输出理解新的 background checks
+- `14-status` 明确区分 runtime 真源与 docs 投影视图状态
 
-**Step 2: Run tests to verify they fail**
+**Step 2: Run test to verify it fails**
 
-Run: `pnpm vitest run tests/unit/status-skill-docs.test.ts tests/unit/doctor-skill-docs.test.ts tests/unit/analyze-skill-docs.test.ts tests/unit/cli-metrics-doctor.test.ts`
-Expected: FAIL with missing docs or stale CLI expectations
+Run: `pnpm vitest run tests/unit/status-skill-docs.test.ts`
+Expected: FAIL with missing background status display rules
 
-**Step 3: Update docs and implementations**
+**Step 3: Update docs**
 
 - 在 `14-status` 中增加背景状态展示说明
-- 在 `15-doctor` 中增加 runtime 背景诊断规则
-- 在 `21-analyze` 中增加背景质量分析口径
-- 更新 `doctor.ts` 与 `analyze.ts`
+- 在 dashboard template 中增加 runtime / docs 双层状态展示口径
 
 **Step 4: Run test to verify it passes**
 
-Run: `pnpm vitest run tests/unit/status-skill-docs.test.ts tests/unit/doctor-skill-docs.test.ts tests/unit/analyze-skill-docs.test.ts tests/unit/cli-metrics-doctor.test.ts`
+Run: `pnpm vitest run tests/unit/status-skill-docs.test.ts`
 Expected: PASS
 
 ---
 
-### Task 9: 文档总览与口径收口
+### Task 9: `15-doctor` 接入 runtime 背景诊断
+
+**Files:**
+- Modify: `skills/spec-first/15-doctor/SKILL.md`
+- Modify: `skills/spec-first/15-doctor/references/diagnostic-rules.md`
+- Modify: `src/cli/commands/doctor.ts`
+- Modify: `tests/unit/cli-metrics-doctor.test.ts`
+- Test: `tests/unit/doctor-skill-docs.test.ts`
+
+**Step 1: Write the failing tests**
+
+在测试中覆盖：
+- `15-doctor` 诊断 `stage-views`
+- `15-doctor` 诊断 docs 投影视图与 runtime 是否失同步
+- doctor CLI 输出理解新的 background checks
+
+**Step 2: Run tests to verify they fail**
+
+Run: `pnpm vitest run tests/unit/doctor-skill-docs.test.ts tests/unit/cli-metrics-doctor.test.ts`
+Expected: FAIL with missing docs or stale CLI expectations
+
+**Step 3: Update docs and implementations**
+
+- 在 `15-doctor` 中增加 runtime 背景诊断规则
+- 更新 `doctor.ts`
+
+**Step 4: Run test to verify it passes**
+
+Run: `pnpm vitest run tests/unit/doctor-skill-docs.test.ts tests/unit/cli-metrics-doctor.test.ts`
+Expected: PASS
+
+---
+
+### Task 10: `21-analyze` 接入背景质量分析
+
+**Files:**
+- Modify: `skills/spec-first/21-analyze/SKILL.md`
+- Modify: `skills/spec-first/21-analyze/references/analysis-rules.md`
+- Modify: `src/cli/commands/analyze.ts`
+- Test: `tests/unit/analyze-skill-docs.test.ts`
+
+**Step 1: Write the failing test**
+
+在 `tests/unit/analyze-skill-docs.test.ts` 中断言：
+- `21-analyze` 将背景输入状态纳入分析
+- 分析结果能够识别 runtime 真源与 docs 投影视图漂移问题
+
+**Step 2: Run test to verify it fails**
+
+Run: `pnpm vitest run tests/unit/analyze-skill-docs.test.ts`
+Expected: FAIL with missing background quality analysis rules
+
+**Step 3: Update docs and implementation**
+
+- 在 `21-analyze` 中增加背景质量分析口径
+- 更新 `analyze.ts`
+
+**Step 4: Run test to verify it passes**
+
+Run: `pnpm vitest run tests/unit/analyze-skill-docs.test.ts`
+Expected: PASS
+
+---
+
+### Task 11: 文档总览与口径收口
 
 **Files:**
 - Modify: `docs/review-bundles/skill优化思考/README.md`
@@ -307,15 +390,18 @@ Expected: PASS
 
 ## Suggested Execution Order
 
-1. Task 1
-2. Task 2
-3. Task 3
-4. Task 4
-5. Task 5
-6. Task 6
-7. Task 7
-8. Task 8
-9. Task 9
+1. Gate 0
+2. Task 1
+3. Task 2
+4. Task 3
+5. Task 4
+6. Task 5
+7. Task 6
+8. Task 7
+9. Task 8
+10. Task 9
+11. Task 10
+12. Task 11
 
 ## Definition of Done
 

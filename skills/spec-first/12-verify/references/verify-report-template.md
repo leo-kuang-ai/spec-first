@@ -66,6 +66,12 @@ verify 报告标准格式，确保输出一致性。
 
 {基于 Gate 结果的建议}
 
+## verify-view 字段映射
+
+- `recommended_checks`: 来自 verify-view 的建议补充检查
+- `critical_flows`: 来自 verify-view 的关键链路
+- `validation_focus`: 来自 verify-view 的验证重点
+
 ## 执行证据
 
 ### 命令输出
@@ -229,3 +235,10 @@ Gate 已通过，可以推进到下一阶段。
 5. **WAIVER 时必须包含豁免记录** — 理由、批准人、有效期
 6. **必须包含执行证据** — 命令输出、退出码
 7. **必须包含建议下一步** — 基于结果的可执行建议
+
+## 背景输入字段
+- verify-view
+- criticalFlows
+- validationFocus
+- recommendedChecks
+- background_input_status

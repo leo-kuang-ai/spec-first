@@ -35,7 +35,7 @@ description: Spec-First AI Agent Skills 目录索引
 |-------|------|----------|
 | [11-plan](./11-plan/SKILL.md) | 生成阶段执行计划 | assisted |
 | [12-verify](./12-verify/SKILL.md) | 阶段验收校验 | auto |
-| [13-orchestrate](./13-orchestrate/SKILL.md) | 编排调度器 | strict |
+| [13-orchestrate](./13-orchestrate/SKILL.md) | 编排调度器（含背景治理 / L3 风险分级） | strict |
 
 ### 会话管理 Skills
 

@@ -1,0 +1,35 @@
+import { describe, expect, it } from 'vitest';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const DOCTOR_ROOT = join(import.meta.dirname, '../../skills/spec-first/15-doctor');
+const SKILL_MD = join(DOCTOR_ROOT, 'SKILL.md');
+const RULES = join(DOCTOR_ROOT, 'references/diagnostic-rules.md');
+
+function read(path: string): string {
+  return readFileSync(path, 'utf-8');
+}
+
+describe('15-doctor skill docs consistency', () => {
+  it('should diagnose runtime stage-views and projection sync', () => {
+    expect(existsSync(SKILL_MD)).toBe(true);
+    expect(existsSync(RULES)).toBe(true);
+
+    const skill = read(SKILL_MD);
+    const rules = read(RULES);
+
+    expect(skill).toContain('stage-views');
+    expect(skill).toContain('docs 投影视图');
+    expect(rules).toContain('stage-views');
+    expect(rules).toContain('失同步');
+  });
+
+  it('should include background checks in doctor guidance', () => {
+    const skill = read(SKILL_MD);
+    const rules = read(RULES);
+
+    expect(skill).toContain('background_input_status');
+    expect(rules).toContain('background checks');
+    expect(rules).toContain('runtime 真源');
+  });
+});

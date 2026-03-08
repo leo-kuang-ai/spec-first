@@ -50,6 +50,12 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - `.spec-first/current` 不存在或为空 → 降级到交互式
 - 指定 Feature 不存在 → 报错并终止
 
+## 背景输入
+
+- 优先读取 `code-view` 获取变更上下文
+- 输出中必须包含 `backgroundInputStatus`
+- 高风险场景需关注 `riskCategory` 和 `riskSignals`
+
 ## 执行阶段（增强）
 - P0: 定位 Feature，确定检查层级（single/cross/completion）
 - P1: 根据层级加载对应检查清单（含 cross-layer-checklist）

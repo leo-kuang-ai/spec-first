@@ -4,16 +4,18 @@
  */
 import { join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
-import { exists } from '../../shared/fs-utils.js';
+import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability } from './prompt-assembler.js';
-import { buildHardGateRuntimeNotice, evaluateSkillHardGate, HardGateBlockedError } from './hard-gate.js';
+import { assessHighRiskChanges, buildHardGateRuntimeNotice, evaluateSkillHardGate, HardGateBlockedError, type HighRiskAssessment } from './hard-gate.js';
+import { readFirstRuntimeIndex, readFirstRoleViews, readFirstStageViews } from './first-runtime-store.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
-import { validateOrchestrateArgs, type OrchestrateArgs } from './orchestrate-args.js';
+import { buildBackgroundInputGuidance, validateOrchestrateArgs, type BackgroundInputGuidance, type DependencyStrength, type OrchestrateArgs } from './orchestrate-args.js';
 import { validateFirstArgs, resolveFirstConfirmPolicy, resolveFirstModePolicy, type FirstArgs } from './first-args.js';
 import { generateResumeRecommendation, formatResumePrompt, formatProductSummary } from './first-resume.js';
 import { formatHealthStatus, formatChangeAnalysis, checkFirstUpdateContext } from './first-change-detector.js';
 import { REMOVED_SKILLS } from '../rules/truth-source.js';
+import type { BackgroundInputStatus as OrchestrateBackgroundInputStatus, StageState } from '../../shared/types.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -24,6 +26,8 @@ export interface DispatchResult {
   error?: string;
   /** orchestrate 专用：解析后的参数（仅 skillName=orchestrate 时存在） */
   orchestrateArgs?: OrchestrateArgs;
+  /** orchestrate 专用：按当前 Feature 阶段推导的背景治理建议 */
+  orchestrateBackgroundGuidance?: BackgroundInputGuidance;
   /** first 专用：解析后的参数（仅 skillName=first 时存在） */
   firstArgs?: FirstArgs;
   /** first 专用：确认策略（仅 skillName=first 时存在） */
@@ -120,6 +124,97 @@ function validateLayerArgs(
  * 例: spec-first:code → Skill 路由
  * 例: spec-first:rfc approve RFC-001 → 语义映射 → Runtime 路由
  */
+function resolveOrchestrateDependencyStrength(
+  currentStage?: string,
+  highRiskAssessment?: HighRiskAssessment,
+): DependencyStrength {
+  let baseStrength: DependencyStrength;
+
+  switch (currentStage) {
+    case '02_design':
+    case '04_implement':
+    case '05_verify':
+      baseStrength = 'L2';
+      break;
+    case '01_specify':
+    case '03_plan':
+    case '06_wrap_up':
+    case '07_release':
+    case '08_done':
+    case '09_cancelled':
+    case '00_init':
+    default:
+      baseStrength = 'L1';
+      break;
+  }
+
+  if (baseStrength === 'L2' && highRiskAssessment?.isHighRisk) {
+    return 'L3';
+  }
+
+  return baseStrength;
+}
+
+function resolveOrchestrateRiskCategory(
+  currentStage?: string,
+  highRiskAssessment?: HighRiskAssessment,
+): BackgroundInputGuidance['riskCategory'] {
+  if (!highRiskAssessment?.isHighRisk) return undefined;
+
+  switch (currentStage) {
+    case '02_design':
+      return 'formal-design-review';
+    case '04_implement':
+      return 'high-risk-implementation';
+    case '05_verify':
+      return 'pre-release-verification';
+    default:
+      return undefined;
+  }
+}
+
+function resolveOrchestrateHighRiskAssessment(
+  projectRoot: string,
+  featureId: string,
+): HighRiskAssessment | undefined {
+  try {
+    return assessHighRiskChanges(projectRoot, featureId);
+  } catch {
+    return undefined;
+  }
+}
+
+function readCurrentFeatureId(projectRoot: string): string | undefined {
+  const currentPath = join(projectRoot, '.spec-first', 'current');
+  if (!exists(currentPath)) return undefined;
+  const featureId = readFileSync(currentPath, 'utf-8').trim();
+  return featureId || undefined;
+}
+
+function resolveOrchestrateBackgroundGuidance(projectRoot: string) {
+  const featureId = readCurrentFeatureId(projectRoot);
+  if (!featureId) return undefined;
+
+  const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
+  if (!exists(statePath)) return undefined;
+
+  try {
+    const state = readJson<StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }>(statePath);
+    const backgroundStatus = state.backgroundInputStatus ?? 'blind';
+    const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+    const dependencyStrength = resolveOrchestrateDependencyStrength(state.currentStage, highRiskAssessment);
+    const riskCategory = resolveOrchestrateRiskCategory(state.currentStage, highRiskAssessment);
+    return buildBackgroundInputGuidance(
+      backgroundStatus,
+      dependencyStrength,
+      highRiskAssessment?.reasons ?? [],
+      riskCategory,
+    );
+  } catch {
+    return undefined;
+  }
+}
+
 export function dispatchCommand(
   input: string,
   projectRoot: string,
@@ -128,7 +223,6 @@ export function dispatchCommand(
   const first = parts[0];
   const rest = parts.slice(1);
 
-  // 解析 namespace:subcommand
   let skillName: string;
   if (first.includes(':')) {
     skillName = first.split(':')[1];
@@ -144,7 +238,6 @@ export function dispatchCommand(
     return { route: 'error', error: `REMOVED_SKILL: ${skillName}` };
   }
 
-  // 检查语义映射
   const semanticKey = `${skillName} ${rest[0] ?? ''}`.trim();
   if (SEMANTIC_MAP[semanticKey]) {
     const mapping = SEMANTIC_MAP[semanticKey];
@@ -159,7 +252,6 @@ export function dispatchCommand(
     };
   }
 
-  // 检查 Runtime 路由
   if (RUNTIME_COMMANDS.has(skillName)) {
     return {
       route: 'runtime',
@@ -168,7 +260,6 @@ export function dispatchCommand(
     };
   }
 
-  // Skill 路由：查找 Skill 文件
   const skillPath = resolveSkillPath(skillName, projectRoot);
   if (skillPath) {
     const layerValidation = validateLayerArgs(skillName, rest);
@@ -180,16 +271,17 @@ export function dispatchCommand(
     }
     const normalizedRest = layerValidation.args;
 
-    // orchestrate 专用参数校验（V2-13§4.5）
     if (skillName === 'orchestrate') {
       try {
         const orchestrateArgs = validateOrchestrateArgs(normalizedRest);
+        const orchestrateBackgroundGuidance = resolveOrchestrateBackgroundGuidance(projectRoot);
         return {
           route: 'skill',
           skillName,
           args: normalizedRest,
           skillPath,
           orchestrateArgs,
+          orchestrateBackgroundGuidance,
         };
       } catch (e) {
         return {
@@ -199,7 +291,6 @@ export function dispatchCommand(
       }
     }
 
-    // first 专用参数校验（quick/deep 模式）
     if (skillName === 'first') {
       try {
         const firstArgs = validateFirstArgs(normalizedRest);
@@ -327,11 +418,59 @@ export function loadSkill(
     content = `${hardGateNotice}\n\n${content}`;
   }
 
-  // first skill: 注入会话恢复 + 变更检测上下文
   if (skillName === 'first') {
     const firstNotice = buildFirstRuntimeNotice(projectRoot);
     if (firstNotice) {
       content = `${firstNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'orchestrate') {
+    const orchestrateNotice = buildOrchestrateRuntimeNotice(projectRoot);
+    if (orchestrateNotice) {
+      content = `${orchestrateNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'onboarding') {
+    const onboardingNotice = buildOnboardingRuntimeNotice(projectRoot);
+    if (onboardingNotice) {
+      content = `${onboardingNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'spec') {
+    const specNotice = buildSpecRuntimeNotice(projectRoot);
+    if (specNotice) {
+      content = `${specNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'design') {
+    const designNotice = buildDesignRuntimeNotice(projectRoot);
+    if (designNotice) {
+      content = `${designNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'task') {
+    const taskNotice = buildTaskRuntimeNotice(projectRoot);
+    if (taskNotice) {
+      content = `${taskNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'code') {
+    const codeNotice = buildCodeRuntimeNotice(projectRoot);
+    if (codeNotice) {
+      content = `${codeNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'review') {
+    const reviewNotice = buildReviewRuntimeNotice(projectRoot);
+    if (reviewNotice) {
+      content = `${reviewNotice}\n\n${content}`;
     }
   }
 
@@ -342,9 +481,36 @@ export function loadSkill(
  * 构建 first skill 运行时上下文通知
  * 检测已有产物、变更状态、会话恢复建议，注入到 skill prompt 前部
  */
+function buildOrchestrateRuntimeNotice(projectRoot: string): string | undefined {
+  const guidance = resolveOrchestrateBackgroundGuidance(projectRoot);
+  if (!guidance) return undefined;
+
+  const parts = [
+    '<!-- orchestrate-runtime-context -->',
+    '## Orchestrate Background Guidance',
+    `background_status: ${guidance.backgroundStatus}`,
+    `dependency_strength: ${guidance.dependencyStrength}`,
+    `recommended_action: ${guidance.recommendedAction}`,
+  ];
+
+  if (guidance.riskCategory) {
+    parts.push(`risk_category: ${guidance.riskCategory}`);
+  }
+
+  if (guidance.riskSignals?.length) {
+    parts.push(`risk_signals: ${guidance.riskSignals.join('；')}`);
+  }
+
+  if (guidance.warning) {
+    parts.push(`warning: ${guidance.warning}`);
+  }
+
+  parts.push('<!-- /orchestrate-runtime-context -->');
+  return parts.join('\n');
+}
+
 function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
-  const firstDir = join(projectRoot, 'docs', 'first');
-  const resume = generateResumeRecommendation(firstDir, projectRoot);
+  const resume = generateResumeRecommendation(projectRoot);
 
   if (!resume.hasExistingProducts) return undefined;
 
@@ -365,7 +531,7 @@ function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
   }
 
   // 产物摘要
-  const summary = formatProductSummary(firstDir);
+  const summary = formatProductSummary(projectRoot);
   if (summary && !summary.startsWith('❌')) {
     parts.push('');
     parts.push(summary);
@@ -375,8 +541,242 @@ function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
   return parts.join('\n');
 }
 
+function buildOnboardingRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    if (!index?.roleViews) return undefined;
+
+    const roleViews = readFirstRoleViews(projectRoot);
+    if (!roleViews) return undefined;
+
+    const roles = Object.keys(roleViews);
+    return [
+      '<!-- onboarding-runtime-context -->',
+      '## Role Views Available',
+      `data_source: role-views (${roles.length} roles)`,
+      `available_roles: ${roles.join(', ')}`,
+      'recommendation_mode: project-based',
+      '<!-- /onboarding-runtime-context -->',
+    ].join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildSpecRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    const stageViews = readFirstStageViews(projectRoot);
+
+    if (!index || !stageViews?.spec) return undefined;
+
+    const parts = [
+      '<!-- spec-runtime-context -->',
+      '## Spec View Available',
+    ];
+
+    // 背景状态
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`background_input_status: ${backgroundStatus}`);
+
+    // spec-view 摘要
+    if (stageViews.spec.summary) {
+      parts.push(`spec_view_summary: ${stageViews.spec.summary}`);
+    }
+
+    // P1: degraded 模式列出缺失源
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /spec-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildDesignRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    const stageViews = readFirstStageViews(projectRoot);
+
+    if (!index || !stageViews?.design) return undefined;
+
+    const parts = [
+      '<!-- design-runtime-context -->',
+      '## Design View Available',
+    ];
+
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`background_input_status: ${backgroundStatus}`);
+
+    if (stageViews.design.summary) {
+      parts.push(`design_view_summary: ${stageViews.design.summary}`);
+    }
+
+    const featureId = readCurrentFeatureId(projectRoot);
+    if (featureId) {
+      const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+      if (highRiskAssessment?.isHighRisk) {
+        parts.push('risk_category: formal-design-review');
+        parts.push(`risk_signals: ${highRiskAssessment.reasons.join('；')}`);
+      }
+    }
+
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /design-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildTaskRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    if (!index) return undefined;
+
+    const parts = [
+      '<!-- task-runtime-context -->',
+      '## Task Planning Context',
+    ];
+
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
+    parts.push('required_inputs: spec.md + design.md + traceability-matrix.md');
+
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /task-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildCodeRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    const stageViews = readFirstStageViews(projectRoot);
+
+    if (!index || !stageViews?.code) return undefined;
+
+    const parts = [
+      '<!-- code-runtime-context -->',
+      '## Code View Available',
+    ];
+
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
+
+    if (stageViews.code.summary) {
+      parts.push(`codeViewSummary: ${stageViews.code.summary}`);
+    }
+
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /code-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildReviewRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    const stageViews = readFirstStageViews(projectRoot);
+
+    if (!index || !stageViews?.code) return undefined;
+
+    const parts = [
+      '<!-- review-runtime-context -->',
+      '## Review Context',
+    ];
+
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
+
+    if (stageViews.code.summary) {
+      parts.push(`codeViewSummary: ${stageViews.code.summary}`);
+    }
+
+    const featureId = readCurrentFeatureId(projectRoot);
+    if (featureId) {
+      const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+      if (highRiskAssessment?.isHighRisk) {
+        const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
+        if (exists(statePath)) {
+          const state = readJson<StageState>(statePath);
+          const riskCategory = resolveOrchestrateRiskCategory(state.currentStage, highRiskAssessment);
+          if (riskCategory) {
+            parts.push(`riskCategory: ${riskCategory}`);
+            parts.push(`riskSignals: ${highRiskAssessment.reasons.join('；')}`);
+          }
+        }
+      }
+    }
+
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /review-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
 export function getFirstRuntimeNotice(projectRoot: string): string | undefined {
   return buildFirstRuntimeNotice(projectRoot);
+}
+
+export function getOrchestrateRuntimeNotice(projectRoot: string): string | undefined {
+  return buildOrchestrateRuntimeNotice(projectRoot);
 }
 
 function inferSkillNameFromPath(skillPath: string): string {

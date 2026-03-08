@@ -142,3 +142,8 @@ def evaluate_gate(feature_id, stage):
 | G-PLAN-01 (C3 < 100%) | 部分 FR 缺少 TASK | 运行 `/spec-first:task` 拆解任务 |
 | G-IMPL-01 (C4 < 80%) | 单测覆盖不足 | 补充单元测试 |
 | G-VERIFY-01 (C4 < 100%) | 部分 FR 缺少 TC | 回到 `task/code` 补齐测试设计与 TDD 证据 |
+
+## verify-view Gate 输入
+- Gate 条件校验前优先读取 `verify-view`
+- 输出中必须声明 `background_input_status`
+- 高风险验证或上线前验证可提升到 `L3`

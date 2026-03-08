@@ -321,6 +321,12 @@ task 阶段只输出执行计划，不输出实现代码：
 - `.spec-first/current` 不存在或为空 → 降级到交互式
 - 指定 Feature 的阶段不匹配 → 报错并终止
 
+## 背景输入
+
+- 必须读取 `spec.md` + `design.md` + `traceability-matrix.md`
+- 输出中必须包含 `backgroundInputStatus`
+- 任务拆解依赖完整的 FR 和 DS 映射
+
 ## 执行阶段
 
 - **P0**: 定位 Feature，校验阶段为 03_plan

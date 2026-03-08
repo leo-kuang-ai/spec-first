@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.126 2026-03-08 Claude: feat(review): 添加 review runtime notice 和风险上下文 — dispatcher 自动注入 code-view 摘要、背景状态、riskCategory 和 riskSignals
+- v0.5.125 2026-03-08 Claude: feat(code): 添加 code-view runtime notice 和字段命名统一 — dispatcher 自动注入 code-view 摘要和背景状态，统一字段命名为 camelCase (entryPoints/likelyChangeAreas/changeHazards)
+- v0.5.124 2026-03-08 Claude: feat(task): 添加背景输入契约和 runtime notice — 显式声明依赖 spec.md + design.md + traceability-matrix.md，自动注入 backgroundInputStatus
+- v0.5.123 2026-03-08 Claude: feat(design): 添加 design-view runtime notice 自动注入 — dispatcher 自动注入 design-view 摘要、背景状态和 risk_category (formal-design-review)，统一字段命名为 camelCase
+- v0.5.122 2026-03-08 Claude: feat(spec): 添加 spec-view runtime notice 自动注入 — dispatcher 自动注入 spec-view 摘要和背景状态，degraded 模式列出缺失资产并提供修复建议
+- v0.5.121 2026-03-08 Claude: feat(catchup): 添加 backgroundInputStatus 到恢复报告 — 从 stage-state.json 读取并显示背景状态（full/degraded/blind），帮助用户了解上下文质量
+- v0.5.120 2026-03-08 Claude: refactor(init): 提取 detectBackgroundInputStatus 为共享函数 — 从 init.ts 移至 first-context.ts，供其他 skill 复用背景状态检测逻辑
+- v0.5.119 2026-03-08 Claude: feat(onboarding): 添加 runtime notice 自动注入与数据来源标注 — dispatcher 自动注入 role-views 可用性，skill 输出显式标注推荐来源（项目分析/通用推荐）
+- v0.5.120 2026-03-08 Codex: refactor(first): 删除 first legacy shim / legacy index 体系，统一 first-resume 与 change-detector 为 runtime-only，并清理 `.index.yaml` 测试与文档残留
+- v0.5.118 2026-03-08 Claude: fix(verify): 修正 verify-view 字段命名 — 统一使用 camelCase（criticalFlows/validationFocus/recommendedChecks）与 TypeScript 类型定义对齐
+- v0.5.117 2026-03-08 Codex: refactor(first): 显式隔离 legacy .index.yaml 兼容层为 `first-legacy-index`，收紧 first-refresh 测试夹具隔离，并补齐 Phase 2/3 文档契约缺口
+- v0.5.116 2026-03-08 Codex: fix(first): 修复 docs projection 刷新遗漏与 runtime 健康门禁不一致 —— projection 源码变更现在可触发 docs/first 刷新，loadFirstContext/loadFirstRoleView 会阻断 unhealthy 的 summary/role-views，并补齐回归单测 (user-visible)
 - v0.5.115 2026-03-06 Claude: docs(first): 创建证据注入实施总结 — 新增 evidence-injection-summary.md 记录完整实施过程（5 个文档/118 处证据/281% 达标率）、技术方案验证（Serena MCP/证据格式/模板化流程）、3 个关键发现、优化建议（P0-P2）、下一步行动计划，为自动化 Evidence Injection Agent 提供实践依据 (user-visible)
 - v0.5.114 2026-03-06 Claude: feat(first): 完成全部 5 个文档证据注入 — tech-stack.md (14/5)、api-docs.md (19/19)、local-setup.md (5/3)、domain-model.md (5/5)、architecture.md (75/10)，全部达到 deep 模式最低标准，验证 Evidence Injection 方案完整可行性，为后续自动化证据注入奠定基础 (user-visible)
 - v0.5.113 2026-03-06 Claude: feat(first): 为 domain-model.md 补充证据标注 — 添加 5 处证据标注（Stage 枚举/IdType/GateStatus/RfcStatus/DefectStatus），达到 deep 模式最低标准（5/5），完成 domain-model.md 证据注入 (user-visible)

@@ -19,22 +19,22 @@ changelog: Initial version with standardized metadata
 - 日常建议将宿主自修复放在 `spec-first update`，Skill 不应重复手工执行宿主安装脚本；仅在 CLI 返回错误时展示修复建议。
 
 ## 执行阶段
-- P0: 定位项目根目录，确认为目标仓库；校验 `00-first` 已完成（`docs/first/.index.yaml` + quick 核心产物）
+- P0: 定位项目根目录，确认为目标仓库；校验 `00-first` 已完成（`.spec-first/runtime/first/index.json` + `summary.json` + `role-views.json` + `stage-views.json`）
 - P1: 读取 `.spec-first/layer2/*.yaml` 平台模板（仅文件名，不读宿主名）
 - P2: 收集初始化参数（`feat/mode/size/platforms/title/feature-id`）
 - P3: 参数确认（必须先过约束再确认）
 - P4: 执行 `spec-first init ...`
-- P5: 执行 `spec-first stage current <featureId>` 验证阶段，输出摘要（featureId、目录、平台、hooks/AI hooks/Skill 命令状态；仅显式 `--bootstrap` 时包含 bootstrap 状态）
+- P5: 执行 `spec-first stage current <featureId>` 验证阶段，输出摘要（featureId、目录、平台、background_input_status、hooks/AI hooks/Skill 命令状态；仅显式 `--bootstrap` 时包含 bootstrap 状态）
 
 ## 00-first 前置检查（强制）
-- 必须存在目录：`docs/first/`
-- 必须存在索引：`docs/first/.index.yaml`
-- quick 核心产物至少包含：
-  - `docs/first/tech-stack.md`
-  - `docs/first/codebase-overview.md`
-  - `docs/first/domain-model.md`
-  - `docs/first/api-docs.md`
-- 若缺失任一项，必须中止并提示先执行 `/spec-first:first`
+- 必须存在目录：`.spec-first/runtime/first/`
+- 必须存在索引：`.spec-first/runtime/first/index.json`
+- 必须存在 runtime 真源：
+  - `.spec-first/runtime/first/summary.json`
+  - `.spec-first/runtime/first/role-views.json`
+  - `.spec-first/runtime/first/stage-views.json`
+- `docs/first/` 属于投影视图层，可缺失或滞后，不作为 readiness 真相
+- 若缺失任一 runtime 真源项，必须中止并提示先执行 `/spec-first:first`
 - 同时检查项目初始化文件状态（用于提示）：`.spec-first/`、`.spec-first/layer2/`、`.spec-first/meta/config.yaml`
 
 ## 参数约束（强制）
@@ -73,6 +73,11 @@ changelog: Initial version with standardized metadata
 
 ## 确认策略
 - 推荐: strict
+
+## 背景状态
+- `background_input_status=full`：runtime 真源完整且健康
+- `background_input_status=degraded`：存在可用背景，但 runtime 真源不完整
+- `background_input_status=blind`：缺少足够背景输入，需优先补跑 `/spec-first:first`
 
 ## 成功标准
 - CLI init 成功退出（exit code = 0）

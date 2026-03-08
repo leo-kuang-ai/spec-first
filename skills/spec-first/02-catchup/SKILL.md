@@ -109,6 +109,7 @@ I'm using the catchup skill to restore context for [Feature].
 | **当前阶段** | {stage} |
 | **阶段状态** | {stage_status} |
 | **停留时间** | {duration} |
+| **背景状态** | {background_input_status} |
 
 ---
 

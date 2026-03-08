@@ -8,6 +8,7 @@ import {
   OrchestrateArgsError,
   E_ORCH_ARGS_UNKNOWN,
   E_ORCH_ARGS_RESUME_WITHOUT_AUTO,
+  buildBackgroundInputGuidance,
 } from '../../src/core/skill-runtime/orchestrate-args.js';
 
 describe('validateOrchestrateArgs', () => {
@@ -100,5 +101,49 @@ describe('validateOrchestrateArgs', () => {
   it('未知 flag 在合法 flag 之后仍报错', () => {
     expect(() => validateOrchestrateArgs(['--auto', '--verbose']))
       .toThrow(OrchestrateArgsError);
+  });
+});
+
+
+describe('buildBackgroundInputGuidance', () => {
+  it('blind + L2 should require explicit warning and first backfill', () => {
+    expect(buildBackgroundInputGuidance('blind', 'L2')).toEqual({
+      backgroundStatus: 'blind',
+      dependencyStrength: 'L2',
+      warning: '缺少足够背景输入，建议先执行 /spec-first:first 补齐 runtime 真源',
+      recommendedAction: 'backfill-first',
+    });
+  });
+
+  it('full + L1 should allow direct orchestration without warning', () => {
+    expect(buildBackgroundInputGuidance('full', 'L1')).toEqual({
+      backgroundStatus: 'full',
+      dependencyStrength: 'L1',
+      warning: undefined,
+      recommendedAction: 'proceed',
+    });
+  });
+
+
+  it('degraded + L3 should surface high-risk signals before orchestration', () => {
+    expect(buildBackgroundInputGuidance('degraded', 'L3', ['存在并行任务标记'])).toEqual({
+      backgroundStatus: 'degraded',
+      dependencyStrength: 'L3',
+      riskSignals: ['存在并行任务标记'],
+      warning: '背景输入不完整，且存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      recommendedAction: 'review-risk',
+    });
+  });
+
+
+  it('degraded + L3 should expose stage-specific risk category', () => {
+    expect(buildBackgroundInputGuidance('degraded', 'L3', ['存在并行任务标记'], 'formal-design-review')).toEqual({
+      backgroundStatus: 'degraded',
+      dependencyStrength: 'L3',
+      riskSignals: ['存在并行任务标记'],
+      riskCategory: 'formal-design-review',
+      warning: '背景输入不完整，且当前属于正式设计评审门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      recommendedAction: 'review-risk',
+    });
   });
 });

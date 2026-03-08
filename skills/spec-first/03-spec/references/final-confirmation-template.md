@@ -336,3 +336,8 @@ Step 8 最终确认包格式，用于向用户展示完整需求规格。
 
 - 主文档：`03-spec/SKILL.md` Step 8
 - FR/AC 规范：`03-spec/SKILL.md` AC ID 规范章节
+
+## 背景确认
+- 已读取 `spec-view`
+- 已声明当前 `background_input_status`
+- 若为降级路径，需说明缺失背景与补齐计划

@@ -53,3 +53,8 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - 发现项包含类型、位置、建议
 - 报告可被后续 gate 读取并识别 CRITICAL 数量
 
+
+## 背景质量分析
+- 将 `background_input_status` 纳入分析范围
+- 识别 `runtime 真源` 与 `docs 投影视图` 的漂移
+- 产出背景质量结论与修复建议

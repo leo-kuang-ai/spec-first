@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { init } from '../../src/core/process-engine/init.js';
 import type { InitOptions } from '../../src/core/process-engine/init.js';
 import { Stage } from '../../src/shared/types.js';
+import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-init');
 
@@ -68,6 +69,68 @@ describe('init', () => {
     const result = init(baseOpts());
     const current = readFileSync(join(TMP, '.spec-first', 'current'), 'utf-8');
     expect(current).toBe(`${result.featureId}\n`);
+  });
+
+  it('should record full background input status when runtime first assets are healthy', () => {
+    writeFirstRuntimeIndex(TMP, {
+      version: '1.0.0',
+      lastRun: '2026-03-08T12:00:00.000Z',
+      mode: 'quick',
+      summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      docsProjection: {},
+      status: 'current',
+    });
+    writeFirstRuntimeSummary(TMP, {
+      generatedAt: '2026-03-08T12:00:00.000Z',
+      mode: 'quick',
+      project: { name: 'spec-first' },
+      modules: [],
+      capabilities: [],
+      entryPoints: [],
+      dataModels: [],
+      apiSurface: [],
+      risks: [],
+      evidence: [],
+    });
+    writeFirstRoleViews(TMP, {
+      product: { role: 'product', summary: 'product', focus: [], warnings: [] },
+      dev: { role: 'dev', summary: 'dev', focus: [], warnings: [] },
+      qa: { role: 'qa', summary: 'qa', focus: [], warnings: [] },
+      architect: { role: 'architect', summary: 'architect', focus: [], warnings: [] },
+    });
+    writeFirstStageViews(TMP, {
+      spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
+      design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
+      code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
+      verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
+    });
+
+    const result = init(baseOpts());
+    const state = JSON.parse(readFileSync(join(result.featureDir, 'stage-state.json'), 'utf-8')) as { backgroundInputStatus?: string };
+
+    expect(result.backgroundInputStatus).toBe('full');
+    expect(state.backgroundInputStatus).toBe('full');
+  });
+
+  it('should record degraded background input status when runtime truth source is incomplete but first docs exist', () => {
+    mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    writeFileSync(join(TMP, 'docs', 'first', 'README.md'), '# projected docs\n', 'utf-8');
+
+    const result = init(baseOpts({ feat: 'DOCS', title: 'Docs only' }));
+    const state = JSON.parse(readFileSync(join(result.featureDir, 'stage-state.json'), 'utf-8')) as { backgroundInputStatus?: string };
+
+    expect(result.backgroundInputStatus).toBe('degraded');
+    expect(state.backgroundInputStatus).toBe('degraded');
+  });
+
+  it('should record blind background input status when first assets are absent', () => {
+    const result = init(baseOpts({ feat: 'BLIND', title: 'Blind init' }));
+    const state = JSON.parse(readFileSync(join(result.featureDir, 'stage-state.json'), 'utf-8')) as { backgroundInputStatus?: string };
+
+    expect(result.backgroundInputStatus).toBe('blind');
+    expect(state.backgroundInputStatus).toBe('blind');
   });
 
   it('should create default .spec-first/meta/config.yaml when missing', () => {

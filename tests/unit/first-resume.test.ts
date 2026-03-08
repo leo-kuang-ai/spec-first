@@ -1,36 +1,74 @@
 /**
- * First Resume 单元测试
- * @see 00-first skill 会话恢复逻辑
+ * First Resume 单元测试（runtime-only）
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { rmSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
-  generateResumeRecommendation,
-  formatResumePrompt,
   formatProductSummary,
-  updateIndexAfterGeneration,
+  formatResumePrompt,
+  generateResumeRecommendation,
   type ResumeRecommendation,
 } from '../../src/core/skill-runtime/first-resume.js';
-import { createIndex, readIndex, INDEX_FILE_NAME } from '../../src/core/skill-runtime/first-index.js';
+import {
+  getFirstRuntimeDir,
+  writeFirstRoleViews,
+  writeFirstRuntimeIndex,
+  writeFirstRuntimeSummary,
+  writeFirstStageViews,
+} from '../../src/core/skill-runtime/first-runtime-store.js';
 
 const TEST_DIR = join(import.meta.dirname, '../fixtures/first-resume');
 
+function seedHealthyRuntime(projectRoot: string, overrides?: { mode?: 'quick' | 'deep'; platformType?: string }) {
+  const now = '2026-03-08T12:00:00.000Z';
+  writeFirstRuntimeIndex(projectRoot, {
+    version: '1.0.0',
+    lastRun: now,
+    mode: overrides?.mode ?? 'quick',
+    summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: now, healthy: true },
+    roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: now, healthy: true },
+    stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: now, healthy: true },
+    docsProjection: {},
+    status: 'current',
+  });
+  writeFirstRuntimeSummary(projectRoot, {
+    generatedAt: now,
+    mode: overrides?.mode ?? 'quick',
+    project: { name: 'spec-first', platformType: overrides?.platformType, overview: 'runtime-only' },
+    modules: ['src/core/skill-runtime'],
+    capabilities: ['runtime truth source'],
+    entryPoints: ['src/cli/commands/init.ts'],
+    dataModels: ['Feature'],
+    apiSurface: ['spec-first init'],
+    risks: [],
+    evidence: ['tests/unit/first-resume.test.ts'],
+  });
+  writeFirstRoleViews(projectRoot, {
+    product: { role: 'product', summary: 'product', focus: [], warnings: [] },
+    dev: { role: 'dev', summary: 'dev', focus: [], warnings: [] },
+    qa: { role: 'qa', summary: 'qa', focus: [], warnings: [] },
+    architect: { role: 'architect', summary: 'architect', focus: [], warnings: [] },
+  });
+  writeFirstStageViews(projectRoot, {
+    spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
+    design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
+    code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
+    verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
+  });
+}
+
 describe('generateResumeRecommendation', () => {
   beforeEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true });
-    }
+    rmSync(TEST_DIR, { recursive: true, force: true });
     mkdirSync(TEST_DIR, { recursive: true });
   });
 
   afterEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true });
-    }
+    rmSync(TEST_DIR, { recursive: true, force: true });
   });
 
-  it('无产物时返回首次运行建议', () => {
+  it('无 runtime 资产时返回首次运行建议', () => {
     const nonExistentDir = join(TEST_DIR, 'nonexistent');
     const result = generateResumeRecommendation(nonExistentDir);
 
@@ -40,24 +78,18 @@ describe('generateResumeRecommendation', () => {
     expect(result.message).toContain('首次运行');
   });
 
-  it('无产物 + Greenfield 项目时提示先创建代码', () => {
+  it('无 runtime 资产 + Greenfield 项目时提示先创建代码', () => {
     const projectRoot = join(TEST_DIR, 'greenfield');
     mkdirSync(projectRoot, { recursive: true });
     writeFileSync(join(projectRoot, 'README.md'), '# empty project', 'utf-8');
 
-    const result = generateResumeRecommendation(join(projectRoot, 'docs/first'), projectRoot);
+    const result = generateResumeRecommendation(projectRoot);
     expect(result.recommendedOption).toBe('skip');
     expect(result.message).toContain('建议先创建代码');
   });
 
-  it('有产物时返回会话恢复选项', () => {
-    createIndex({
-      firstDir: TEST_DIR,
-      mode: 'quick',
-      platformType: 'backend',
-      projectName: 'test-project',
-      products: [],
-    });
+  it('仅基于 runtime 真源返回会话恢复选项', () => {
+    seedHealthyRuntime(TEST_DIR, { mode: 'quick', platformType: 'backend' });
 
     const result = generateResumeRecommendation(TEST_DIR);
 
@@ -65,41 +97,41 @@ describe('generateResumeRecommendation', () => {
     expect(result.lastMode).toBe('quick');
     expect(result.options).toContain('view_summary');
     expect(result.options).toContain('upgrade_deep');
+    expect(result.message).toContain('00-first runtime 产物');
   });
 
-  it('传入 projectRoot 时触发 Git 状态检测路径 (B4)', () => {
-    createIndex({
-      firstDir: TEST_DIR,
-      mode: 'deep',
-      platformType: 'backend',
-      projectName: 'test-project',
-      products: [{ name: 'tech-stack.md', fileHash: 'h1', mode: 'deep' }],
-    });
+  it('runtime 索引缺失时提示全量重建', () => {
+    mkdirSync(getFirstRuntimeDir(TEST_DIR), { recursive: true });
 
-    // 使用 TEST_DIR 的父目录作为 projectRoot（非 Git 仓库，但会走 projectRoot 分支）
-    const result = generateResumeRecommendation(TEST_DIR, TEST_DIR);
+    const result = generateResumeRecommendation(TEST_DIR);
 
     expect(result.hasExistingProducts).toBe(true);
-    expect(result.lastMode).toBe('deep');
-    // projectRoot 传入后不应提供 upgrade_deep（已是 deep）
-    expect(result.options).not.toContain('upgrade_deep');
+    expect(result.isStale).toBe(true);
+    expect(result.recommendedOption).toBe('full_regenerate');
+    expect(result.staleReason).toContain('runtime 索引文件缺失');
   });
 
-  it('索引未记录端类型时，基于 projectRoot 自动补充检测结果', () => {
-    createIndex({
-      firstDir: TEST_DIR,
-      mode: 'quick',
-      projectName: 'web-admin',
-      products: [],
-    });
+  it('runtime 摘要缺失端类型时，基于 projectRoot 自动补充检测结果', () => {
+    seedHealthyRuntime(TEST_DIR);
     writeFileSync(
       join(TEST_DIR, 'package.json'),
       JSON.stringify({ dependencies: { react: '^18.0.0', antd: '^5.0.0' } }),
       'utf-8',
     );
 
-    const result = generateResumeRecommendation(TEST_DIR, TEST_DIR);
-    expect(result.message).toContain('端类型: frontend/admin');
+    const result = generateResumeRecommendation(TEST_DIR);
+    expect(result.message).toContain('端类型: frontend');
+  });
+
+  it('忽略 docs/first 历史文件，仅以 runtime 真源为准', () => {
+    const docsFirst = join(TEST_DIR, 'docs', 'first');
+    mkdirSync(docsFirst, { recursive: true });
+    writeFileSync(join(docsFirst, 'tech-stack.md'), '# legacy docs\n', 'utf-8');
+
+    const result = generateResumeRecommendation(TEST_DIR);
+
+    expect(result.hasExistingProducts).toBe(false);
+    expect(result.message).toContain('首次运行');
   });
 });
 
@@ -115,7 +147,6 @@ describe('formatResumePrompt', () => {
     };
 
     const prompt = formatResumePrompt(recommendation);
-
     expect(prompt).toContain('首次运行');
   });
 
@@ -132,7 +163,6 @@ describe('formatResumePrompt', () => {
     };
 
     const prompt = formatResumePrompt(recommendation);
-
     expect(prompt).toContain('检测到已有产物');
     expect(prompt).toContain('选项');
   });
@@ -151,106 +181,33 @@ describe('formatResumePrompt', () => {
     };
 
     const prompt = formatResumePrompt(recommendation);
-
     expect(prompt).toContain('full_regenerate');
   });
 });
 
 describe('formatProductSummary', () => {
   beforeEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true });
-    }
+    rmSync(TEST_DIR, { recursive: true, force: true });
     mkdirSync(TEST_DIR, { recursive: true });
   });
 
   afterEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true });
-    }
+    rmSync(TEST_DIR, { recursive: true, force: true });
   });
 
-  it('格式化产物摘要', () => {
-    createIndex({
-      firstDir: TEST_DIR,
-      mode: 'quick',
-      platformType: 'backend',
-      projectName: 'test-project',
-      gitCommit: 'abc1234',
-      products: [
-        { name: 'tech-stack.md', fileHash: 'h1', mode: 'quick' },
-        { name: 'api-docs.md', fileHash: 'h2', mode: 'quick' },
-      ],
-    });
+  it('格式化 runtime 摘要', () => {
+    seedHealthyRuntime(TEST_DIR, { mode: 'quick', platformType: 'backend' });
 
     const summary = formatProductSummary(TEST_DIR);
 
-    expect(summary).toContain('产物摘要');
-    expect(summary).toContain('quick');
-    expect(summary).toContain('backend');
-    expect(summary).toContain('test-project');
-    expect(summary).toContain('abc1234');
-    expect(summary).toContain('2 个');
+    expect(summary).toContain('runtime 摘要');
+    expect(summary).toContain('.spec-first/runtime/first/summary.json');
+    expect(summary).toContain('.spec-first/runtime/first/role-views.json');
+    expect(summary).toContain('.spec-first/runtime/first/stage-views.json');
   });
 
-  it('无索引时返回错误提示', () => {
+  it('无 runtime 索引时返回错误提示', () => {
     const summary = formatProductSummary(TEST_DIR);
-
-    expect(summary).toContain('未找到产物索引');
-  });
-});
-
-describe('updateIndexAfterGeneration', () => {
-  beforeEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true });
-    }
-    mkdirSync(TEST_DIR, { recursive: true });
-  });
-
-  afterEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true });
-    }
-  });
-
-  it('首次生成后创建新索引', () => {
-    updateIndexAfterGeneration(TEST_DIR, {
-      mode: 'quick',
-      platformType: 'backend',
-      projectName: 'test-project',
-      gitCommit: 'abc1234',
-      generatedProducts: [
-        { name: 'tech-stack.md', content: '# Tech Stack\n\nContent.' },
-        { name: 'api-docs.md', content: '# API Docs\n\nContent.' },
-      ],
-    });
-
-    const index = readIndex(TEST_DIR);
-    expect(index).toBeDefined();
-    expect(index?.mode).toBe('quick');
-    expect(index?.products['tech-stack.md']).toBeDefined();
-    expect(index?.products['api-docs.md']).toBeDefined();
-  });
-
-  it('后续生成时更新现有索引', () => {
-    // 先创建索引
-    createIndex({
-      firstDir: TEST_DIR,
-      mode: 'quick',
-      products: [],
-    });
-
-    // 更新索引
-    updateIndexAfterGeneration(TEST_DIR, {
-      mode: 'deep',
-      generatedProducts: [
-        { name: 'call-graph.md', content: '# Call Graph' },
-      ],
-    });
-
-    const index = readIndex(TEST_DIR);
-    expect(index?.mode).toBe('deep');
-    expect(index?.products['call-graph.md']).toBeDefined();
+    expect(summary).toContain('未找到 runtime 索引文件');
   });
 });

@@ -1,0 +1,40 @@
+import { describe, expect, it } from 'vitest';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const SPEC_ROOT = join(import.meta.dirname, '../../skills/spec-first/03-spec');
+const SKILL_MD = join(SPEC_ROOT, 'SKILL.md');
+const QUESTION_GATE = join(SPEC_ROOT, 'references/question-gate-rules.md');
+const FINAL_CONFIRM = join(SPEC_ROOT, 'references/final-confirmation-template.md');
+
+function read(path: string): string {
+  return readFileSync(path, 'utf-8');
+}
+
+describe('03-spec skill docs consistency', () => {
+  it('should declare spec-view as primary background input', () => {
+    expect(existsSync(SKILL_MD)).toBe(true);
+    expect(existsSync(QUESTION_GATE)).toBe(true);
+    expect(existsSync(FINAL_CONFIRM)).toBe(true);
+
+    const skill = read(SKILL_MD);
+    const gate = read(QUESTION_GATE);
+    const finalConfirm = read(FINAL_CONFIRM);
+
+    expect(skill).toContain('spec-view');
+    expect(skill).toContain('优先读取');
+    expect(skill).toContain('background_input_status');
+    expect(gate).toContain('spec-view');
+    expect(finalConfirm).toContain('spec-view');
+  });
+
+  it('should document degraded handling when spec-view is unavailable', () => {
+    const skill = read(SKILL_MD);
+    const gate = read(QUESTION_GATE);
+
+    expect(skill).toContain('degraded');
+    expect(skill).toContain('降级');
+    expect(gate).toContain('degraded');
+    expect(gate).toContain('background_input_status');
+  });
+});

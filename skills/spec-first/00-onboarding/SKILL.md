@@ -28,6 +28,17 @@ user-invocable: true
 
 ---
 
+### Phase 0.5: 背景输入检查
+
+- 优先读取 `.spec-first/runtime/first/role-views.json`（role-views 优先）
+- 若存在 role-views，则按角色给出更贴近产品 / 开发 / 测试 / 架构的入口建议
+- 若无 first 资产，则进入 `degraded` onboarding：仍可继续推荐通用路径，但必须显式告知”无 first 资产”与”当前为降级模式”
+- onboarding 只负责入口裁剪，不生成 runtime 真源
+
+**数据来源标注规则**：
+- 正常模式：`📊 数据来源：基于项目分析（role-views）`
+- 降级模式：`⚠️ 数据来源：通用推荐（无 first 资产，建议先运行 /spec-first:first）`
+
 ### Phase 1: 场景识别（交互式）
 
 使用 `AskUserQuestion` 工具收集用户信息：
@@ -73,6 +84,7 @@ user-invocable: true
 ```
 ✨ 为你推荐以下学习路径
 
+📊 数据来源：基于项目分析（role-views）
 📌 场景：开发者 + 新功能 + 小型项目
 ⏱️  预计时间：30-60 分钟（不含编码）
 
@@ -217,3 +229,4 @@ user-invocable: true
 
 - 用户跳过问题 → 使用默认场景（开发者 + 新功能 + 小型）
 - 无匹配场景 → 推荐通用路径（first → init → spec）
+- 无 first 资产 → 明确提示当前为 `degraded` onboarding，并建议优先补跑 `/spec-first:first`

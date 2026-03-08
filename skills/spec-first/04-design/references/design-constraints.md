@@ -211,3 +211,7 @@ def send_sms(phone, code):
 
 详见 findings.md § 2026-03-05 架构讨论
 ```
+
+## design-view 约束输入
+- 约束分析需基于 `design-view`
+- 若背景不完整，应显式列出受影响约束与假设边界

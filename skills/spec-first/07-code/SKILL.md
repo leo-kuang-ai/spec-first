@@ -596,3 +596,8 @@ export async function sendOtpHandler(req: Request, res: Response) {
 - TC 注册？
 - TASK 状态更新？
 - findings.md 记录？
+
+## 背景输入
+- 优先读取 `code-view`
+- 输出中必须包含 `backgroundInputStatus`
+- 重点关注 `entryPoints`、`likelyChangeAreas`、`changeHazards`

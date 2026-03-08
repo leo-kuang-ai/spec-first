@@ -210,3 +210,14 @@ Stage -> Skill 映射（P4 按此表调度）：
 
 - 所有子 Skill 继承 orchestrate 的 featureId
 - 子 Skill 的 confirm_policy 保持各自定义（不被 orchestrate 覆盖）
+
+
+## 背景治理口径
+- 背景状态：`full / degraded / blind`
+- 依赖强度：`L1 / L2 / L3`
+- `L3` 由高依赖阶段（`02_design / 04_implement / 05_verify`）叠加 `hard-gate` 高风险信号推导得出
+- 高风险信号复用运行时评估结果，例如：并行任务标记、跨目录变更、核心模块变更
+- 检测到 `L3` 时，还需给出阶段化 `risk_category`：`formal-design-review / high-risk-implementation / pre-release-verification`
+- `blind` 状态下必须显式警告，并优先建议补跑 `/spec-first:first`
+- `degraded` + `L2/L3` 时，应提示风险评估，不得静默推进
+- 若检测到高风险信号，运行时上下文应额外输出 `risk_category` 与 `risk_signals`
