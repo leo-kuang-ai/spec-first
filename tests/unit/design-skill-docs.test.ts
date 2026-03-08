@@ -12,6 +12,37 @@ function read(path: string): string {
 }
 
 describe('04-design skill docs consistency', () => {
+  it('should define a simplicity guard for speculative design', () => {
+    expect(existsSync(SKILL_MD)).toBe(true);
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('## Simplicity First - 设计简洁性守卫');
+    expect(skill).toContain('不引入与当前交付无关的投机性层次');
+    expect(skill).toContain('多租户 / 插件 / 多实现');
+    expect(skill).toContain('记录到 `findings.md`');
+  });
+
+  it('should keep feature resolution rules single-sourced', () => {
+    const skill = read(SKILL_MD);
+    const matches = skill.match(/^## Feature 定位规则$/gm) ?? [];
+
+    expect(matches).toHaveLength(1);
+  });
+
+  it('should validate design artifact wording instead of prd wording', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('检查 design.md 章节格式');
+    expect(skill).not.toContain('检查 PRD 章节格式');
+  });
+
+  it('should enforce simplicity checks in design execution flow', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('P2: 生成 DS（设计规格）条目，映射到 FR，并逐条执行“设计简洁性守卫”自检');
+    expect(skill).toContain('P3: 与用户确认设计决策，仅保留直接支撑当前交付的必要设计');
+  });
+
   it('should declare design-view as primary background input', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(GATE_RULES)).toBe(true);

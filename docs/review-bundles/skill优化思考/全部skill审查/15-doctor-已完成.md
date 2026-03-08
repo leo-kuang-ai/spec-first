@@ -17,5 +17,14 @@
 
 ## 主要优化点
 
-- P1：如果后续需要机器消费 doctor 结果，可把 `Background Input` / `First Stage Views` / `Docs Projection Sync` 输出做成结构化 JSON 选项。
+- ~~P1：如果后续需要机器消费 doctor 结果，可把 `Background Input` / `First Stage Views` / `Docs Projection Sync` 输出做成结构化 JSON 选项。~~ ✅ **无需修改** — 当前人类可读输出符合诊断工具定位，未来如需机器消费应通过导出函数而非改变 CLI 输出
+
+## 完成总结
+
+doctor skill 的设计已完整：
+- SKILL.md 和 diagnostic-rules.md 已包含 background_input_status 诊断要求
+- doctor.ts 已实现 background_input_status 检查（L150-173）
+- doctor.ts 已实现 stage-views 健康检查和 docs 投影视图同步检查（L188-213）
+- 作为诊断层，已真正承担背景诊断职责
+- 当前输出格式适合人类阅读，符合 KISS 原则
 

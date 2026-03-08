@@ -10,6 +10,26 @@ function read(path: string): string {
 }
 
 describe('07-code skill docs consistency', () => {
+  it('should define simplicity and surgical guards near code generation flow', () => {
+    expect(existsSync(SKILL_MD)).toBe(true);
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('## Simplicity First - 最小实现守卫');
+    expect(skill).toContain('只写当前 TASK 明确要求的最小实现');
+    expect(skill).toContain('## Surgical Changes - 修改边界守卫');
+    expect(skill).toContain('顺手优化');
+    expect(skill).toContain('记录到 `findings.md`');
+  });
+
+  it('should extend diff preview with explicit scope confirmation', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('## P3 diff 预览模板（固定字段）');
+    expect(skill).toContain('### 范围确认');
+    expect(skill).toContain('是否包含范围外修改');
+    expect(skill).toContain('已记录到 `findings.md`');
+  });
+
   it('should keep test command detection strategy for TDD evidence', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     const skill = read(SKILL_MD);

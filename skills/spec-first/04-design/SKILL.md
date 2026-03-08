@@ -31,6 +31,22 @@ design 阶段输出系统级 HOW，不输出实现级 HOW：
 - 自我修正上限：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）
 - 当设计依据不足时必须标记 `[NEEDS CLARIFICATION][TYPE]`（每轮最多 3 项）
 
+## Simplicity First - 设计简洁性守卫
+
+核心原则：design 只覆盖当前 FR / NFR / 约束明确需要的系统级 HOW，不引入与当前交付无关的投机性层次。
+
+生成 DS 前必须自检：
+- 这个模块、分层或基础设施是否直接服务于当前 FR / NFR / 约束？
+- 这个扩展点是否在当前阶段立即需要？
+- 如果删掉这层设计，是否会影响当前交付或宪法合规？
+
+默认禁止：
+- 为“将来可能支持多租户 / 插件 / 多实现”提前加层
+- 为单一实现强行加入策略模式、适配层、事件总线、缓存层
+- 引入与当前 FR 无直接关系的服务拆分或基础设施
+
+若识别到后续可能有价值的设计方向：记录到 `findings.md` 或 ADR 候选，不在当前 design 中强制落地。
+
 ## Agent 上下文自动同步（P2-05）
 
 - design 结束并推进阶段后，必须触发宿主上下文同步（`CLAUDE.md` / `AGENTS.md` 的托管区块）
@@ -47,19 +63,6 @@ design 阶段输出系统级 HOW，不输出实现级 HOW：
 - 阶段: 02_design
 - Command: `/spec-first:design [featureId]`
 
-
-## Feature 定位规则
-
-### 优先级
-
-1. **显式参数**: 用户提供 featureId 参数时直接使用
-2. **自动定位**: 读取 `.spec-first/current` 获取当前激活 Feature
-3. **交互式**: 列出可用 Feature 供用户选择
-
-### 错误处理
-
-- `.spec-first/current` 不存在或为空 → 降级到交互式
-- 指定 Feature 的阶段不匹配 → 报错并终止
 
 ## Feature 定位规则
 
@@ -159,8 +162,8 @@ digraph design_flow {
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），校验阶段为 02_design
 - P1: 从矩阵加载 FR，读取 constitution.md
-- P2: 生成 DS（设计规格）条目，映射到 FR
-- P3: 与用户确认设计决策
+- P2: 生成 DS（设计规格）条目，映射到 FR，并逐条执行“设计简洁性守卫”自检
+- P3: 与用户确认设计决策，仅保留直接支撑当前交付的必要设计
 - P4: 将 DS 写入矩阵，创建设计文档
 - P5: 执行 metrics coverage 检查 FR→DS 覆盖率，执行 matrix check 检测 orphan 项
 
@@ -189,7 +192,7 @@ digraph design_flow {
 spec-first validate format <featureId>
 ```
 
-- 检查 PRD 章节格式
+- 检查 design.md 章节格式
 - 检查 ID 格式（无多余连字符）
 - 检查文件路径完整性
 - 校验失败时需修复

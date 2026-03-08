@@ -15,5 +15,12 @@
 
 ## 主要优化点
 
-- P2（可选）：在 `feature current` 输出中追加只读 `background_input_status`，帮助用户切换 Feature 后快速判断上下文健康度。
+- ~~P2（可选）：在 `feature current` 输出中追加只读 `background_input_status`，帮助用户切换 Feature 后快速判断上下文健康度。~~ ✅ **无需修改** — feature 是薄壳工具，如需查看背景健康度应使用 status 或 doctor
+
+## 完成总结
+
+feature skill 的设计已完整：
+- 职责明确：管理 Feature 指针（list/current/switch）
+- 保持薄壳定位，不消费背景数据
+- 当前简洁设计符合单一职责原则
 

@@ -474,6 +474,27 @@ export function loadSkill(
     }
   }
 
+  if (skillName === 'plan') {
+    const planNotice = buildPlanRuntimeNotice(projectRoot);
+    if (planNotice) {
+      content = `${planNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'verify') {
+    const verifyNotice = buildVerifyRuntimeNotice(projectRoot);
+    if (verifyNotice) {
+      content = `${verifyNotice}\n\n${content}`;
+    }
+  }
+
+  if (skillName === 'spec-review') {
+    const specReviewNotice = buildSpecReviewRuntimeNotice(projectRoot);
+    if (specReviewNotice) {
+      content = `${specReviewNotice}\n\n${content}`;
+    }
+  }
+
   return content;
 }
 
@@ -765,6 +786,133 @@ function buildReviewRuntimeNotice(projectRoot: string): string | undefined {
     }
 
     parts.push('<!-- /review-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildPlanRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const featureId = readCurrentFeatureId(projectRoot);
+    if (!featureId) return undefined;
+
+    const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
+    if (!exists(statePath)) return undefined;
+
+    const state = readJson<StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }>(statePath);
+    const index = readFirstRuntimeIndex(projectRoot);
+
+    const parts = [
+      '<!-- plan-runtime-context -->',
+      '## Plan Context',
+    ];
+
+    const backgroundStatus = state.backgroundInputStatus ?? (index?.summary.healthy && index?.stageViews.healthy ? 'full' : 'degraded');
+    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
+
+    const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+    const dependencyStrength = resolveOrchestrateDependencyStrength(state.currentStage, highRiskAssessment);
+    parts.push(`dependencyStrength: ${dependencyStrength}`);
+
+    if (highRiskAssessment?.isHighRisk) {
+      const riskCategory = resolveOrchestrateRiskCategory(state.currentStage, highRiskAssessment);
+      if (riskCategory) {
+        parts.push(`riskCategory: ${riskCategory}`);
+        parts.push(`riskSignals: ${highRiskAssessment.reasons.join('；')}`);
+      }
+    }
+
+    parts.push('<!-- /plan-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildVerifyRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    const stageViews = readFirstStageViews(projectRoot);
+
+    if (!index || !stageViews?.verify) return undefined;
+
+    const parts = [
+      '<!-- verify-runtime-context -->',
+      '## Verify View Available',
+    ];
+
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
+
+    if (stageViews.verify.summary) {
+      parts.push(`verifyViewSummary: ${stageViews.verify.summary}`);
+    }
+
+    const featureId = readCurrentFeatureId(projectRoot);
+    if (featureId) {
+      const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+      if (highRiskAssessment?.isHighRisk) {
+        const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
+        if (exists(statePath)) {
+          const state = readJson<StageState>(statePath);
+          if (state.currentStage === '05_verify') {
+            parts.push('riskCategory: pre-release-verification');
+            parts.push(`riskSignals: ${highRiskAssessment.reasons.join('；')}`);
+          }
+        }
+      }
+    }
+
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /verify-runtime-context -->');
+    return parts.join('\n');
+  } catch {
+    return undefined;
+  }
+}
+
+function buildSpecReviewRuntimeNotice(projectRoot: string): string | undefined {
+  try {
+    const index = readFirstRuntimeIndex(projectRoot);
+    const stageViews = readFirstStageViews(projectRoot);
+
+    if (!index || !stageViews?.spec) return undefined;
+
+    const parts = [
+      '<!-- spec-review-runtime-context -->',
+      '## Spec Review Context',
+    ];
+
+    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
+    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
+
+    if (stageViews.spec.summary) {
+      parts.push(`specViewSummary: ${stageViews.spec.summary}`);
+    }
+
+    if (backgroundStatus === 'degraded') {
+      const missing: string[] = [];
+      if (!index.summary.healthy) missing.push('summary');
+      if (!index.roleViews.healthy) missing.push('role-views');
+      if (!index.stageViews.healthy) missing.push('stage-views');
+      if (missing.length > 0) {
+        parts.push(`missing_assets: ${missing.join(', ')}`);
+        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+      }
+    }
+
+    parts.push('<!-- /spec-review-runtime-context -->');
     return parts.join('\n');
   } catch {
     return undefined;

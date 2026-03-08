@@ -16,6 +16,6 @@
 
 ## 主要优化点
 
-- P1：把 `background_input_status` 和目标阶段的 `dependency_strength` 写进 plan/findings schema。
-- P1：复用 orchestrate 已有的背景治理口径，而不是在 plan 里再定义第二套风险语言。
+- ~~P1：把 `backgroundInputStatus` 和目标阶段的 `dependencyStrength` 写进 plan/findings schema。~~ ✅ **已完成** (v0.5.127) — dispatcher 自动注入 backgroundInputStatus 和 dependencyStrength
+- ~~P1：复用 orchestrate 已有的背景治理口径，而不是在 plan 里再定义第二套风险语言。~~ ✅ **已完成** (v0.5.127) — 复用 orchestrate 的 riskCategory 和 riskSignals
 

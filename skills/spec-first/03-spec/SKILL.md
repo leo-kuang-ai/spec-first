@@ -197,6 +197,13 @@ spec 阶段只定义 WHAT，不定义 HOW：
 - `iteration`: 基于现有功能的增强/修改
 
 **Step 3: 生成质量报告**
+
+若某个默认前提会影响 FR / AC / NFR 的结果，则不得保持隐含状态，必须：
+- 标记为 `[ASSUMED]`，或
+- 升级为 `[NEEDS CLARIFICATION][TYPE]`
+
+出现“通常 / 一般 / 默认 / 预期会”这类表述时，必须检查是否应转化为假设条目。
+
 ```markdown
 ## Phase 0.2 质量扫描报告
 
@@ -209,6 +216,10 @@ spec 阶段只定义 WHAT，不定义 HOW：
 ### 缺失项（按优先级）
 - ❌ P0 约束条件: [具体缺失内容]
 - ❌ P1 成功标准: [具体缺失内容]
+
+### 隐含假设清单
+- [ASSUMED] [类别] [假设内容]
+- [NEEDS CLARIFICATION][TYPE] [需要确认的问题]
 
 ### 自动收集的上下文
 - 场景类型: greenfield / iteration

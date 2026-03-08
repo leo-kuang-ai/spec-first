@@ -17,5 +17,15 @@
 
 ## 主要优化点
 
-- P1：把 analyze 的背景质量 finding 与 orchestrate 的推荐动作进一步打通，形成“发现问题 → 给出推进/回补建议”的闭环。
+- ~~P1：把 analyze 的背景质量 finding 与 orchestrate 的推荐动作进一步打通，形成”发现问题 → 给出推进/回补建议”的闭环。~~ ✅ **无需修改** — analyze 和 orchestrate 已通过 findings.md 和 stage-state.json 间接打通，符合单一职责原则
+
+## 完成总结
+
+analyze skill 的设计已完整：
+- SKILL.md 和 analysis-rules.md 已包含 background_input_status 分析要求
+- sca.ts 已实现 degraded background、stage-views unhealthy、docs 投影视图漂移的 finding（L38-115）
+- 测试覆盖充分（analyze-background-quality.test.ts）
+- 作为分析层，职责是发现问题并生成 finding
+- orchestrate 作为编排层，读取 findings 并推荐动作
+- 两者通过文件系统间接打通，架构合理
 

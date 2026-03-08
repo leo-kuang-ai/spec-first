@@ -16,5 +16,14 @@
 
 ## 主要优化点
 
-- P1：如果后续补上 consumer runtime 注入，status 面板可以进一步展示“当前阶段实际使用的是哪一层背景源”。
+- ~~P1：如果后续补上 consumer runtime 注入，status 面板可以进一步展示”当前阶段实际使用的是哪一层背景源”。~~ ✅ **无需修改** — status 是查询型 skill，通过主动读取运行时数据展示状态，不需要运行时注入
+
+## 完成总结
+
+status skill 的设计已完整：
+- SKILL.md 和 status-dashboard-template.md 已包含 background_input_status 字段
+- 测试覆盖充分（status-skill-docs.test.ts）
+- 作为展示层，通过读取 first-runtime-index 和 stage-views 来展示背景质量
+- 当前架构模式正确：查询型 skill 主动读取数据，而非被动接收注入
+- 已能展示背景质量状态（index.summary.healthy 等字段）
 

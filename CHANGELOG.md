@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.129 2026-03-09 Claude: feat(spec-review): 添加运行时背景注入 — dispatcher 自动注入 backgroundInputStatus 和 specViewSummary (user-visible)
+- v0.5.128 2026-03-08 Claude: feat(verify): 添加 verify-view runtime notice 自动注入 — dispatcher 自动注入 verify-view 摘要、背景状态和 pre-release-verification 风险分类
+- v0.5.127 2026-03-08 Claude: feat(plan): 添加背景输入和依赖强度注入 — dispatcher 自动注入 backgroundInputStatus、dependencyStrength、riskCategory 和 riskSignals，复用 orchestrate 背景治理口径
 - v0.5.126 2026-03-08 Claude: feat(review): 添加 review runtime notice 和风险上下文 — dispatcher 自动注入 code-view 摘要、背景状态、riskCategory 和 riskSignals
 - v0.5.125 2026-03-08 Claude: feat(code): 添加 code-view runtime notice 和字段命名统一 — dispatcher 自动注入 code-view 摘要和背景状态，统一字段命名为 camelCase (entryPoints/likelyChangeAreas/changeHazards)
 - v0.5.124 2026-03-08 Claude: feat(task): 添加背景输入契约和 runtime notice — 显式声明依赖 spec.md + design.md + traceability-matrix.md，自动注入 backgroundInputStatus

@@ -38,6 +38,15 @@ describe('phase1 enhancement docs consistency', () => {
     expect(content).toContain('| 功能完成/阶段推进 | completion |');
   });
 
+  it('review skill should classify stage 2 findings by delivery scope', () => {
+    const content = read(CODE_REVIEW_SKILL);
+
+    expect(content).toContain('Stage 2 输出分级');
+    expect(content).toContain('MUST FIX');
+    expect(content).toContain('SHOULD FIX');
+    expect(content).toContain('OUT_OF_SCOPE');
+  });
+
   it('verify skill should define three-layer check model and completion constraint', () => {
     const content = read(VERIFY_SKILL);
     expect(content).toContain('## 三层检查体系（P1-LAYER）');

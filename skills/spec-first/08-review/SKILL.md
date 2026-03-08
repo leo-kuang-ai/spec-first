@@ -22,6 +22,19 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - 4 维度：SOLID / 安全 / 性能 / 测试
 - 输出风险等级与修复建议
 
+#### Stage 2 输出分级
+
+Stage 2 的发现必须分为以下三类：
+
+- `MUST FIX`：违反 TASK / FR / DS / Constitution / 新鲜证据要求，或会阻断当前交付的问题
+- `SHOULD FIX`：不阻断当前交付，但明显影响质量、可维护性、性能或测试完备性的事项
+- `OUT_OF_SCOPE`：与本次 TASK 无直接关系、适合后续单独处理的问题
+
+输出要求：
+- 不得把 `OUT_OF_SCOPE` 问题包装成当前阻断项
+- `OUT_OF_SCOPE` 问题应记录到 `findings.md` 或审查结论中
+- Stage 2 结论必须可被复核为“阻断 / 建议 / 范围外”三类
+
 硬规则：禁止跳过 Stage 1 直接进入 Stage 2。
 
 ## 审查反合理化守卫（P1-14）

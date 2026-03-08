@@ -178,6 +178,13 @@ digraph plan_flow {
   - 建议命令
 - orchestrate 必须引用最近一次 plan 摘要作为输入
 
+## 背景输入
+
+- 输出中必须包含 `backgroundInputStatus`
+- 根据目标阶段显示 `dependencyStrength` (L1/L2/L3)
+- 高风险场景关注 `riskCategory` 和 `riskSignals`
+- 复用 orchestrate 的背景治理口径
+
 ## 风险评估详解
 
 ### 风险类别

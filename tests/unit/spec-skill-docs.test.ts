@@ -37,4 +37,13 @@ describe('03-spec skill docs consistency', () => {
     expect(gate).toContain('degraded');
     expect(gate).toContain('background_input_status');
   });
+
+  it('should surface assumptions during phase 0.2 quality scan', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('### 隐含假设清单');
+    expect(skill).toContain('[ASSUMED]');
+    expect(skill).toContain('[NEEDS CLARIFICATION]');
+    expect(skill).toContain('通常 / 一般 / 默认 / 预期会');
+  });
 });
