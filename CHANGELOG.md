@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.51 2026-03-09 Claude: fix(hooks): 修复 stop-guard.sh 死循环问题 - 改为 exit 0 避免 AI 误判，添加 awk 错误保护
+- v0.5.51 2026-03-09 Claude: feat(init): 添加断点续传机制和保护规则，防止中断后自动删除 Feature 目录
 - v0.5.50 2026-03-09 Claude: docs(first): 强制要求使用 buildRoleViews/buildStageViews 函数生成 JSON，禁止手动构造，确保格式与类型定义一致
 - v0.5.50 2026-03-09 Claude: docs(first): 添加 P3 阶段 runtime 真源生成指令，明确 summary.json/index.json 完整结构与必需字段，防止 AI 生成不完整 JSON
 - v0.5.50 2026-03-09 Claude: fix(init): 添加 summary.json 字段安全访问，防止 platformType/modules/apiSurface 未定义时崩溃

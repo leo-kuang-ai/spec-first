@@ -15,9 +15,11 @@
 - test_framework: Vitest
 
 ## Capabilities
-- project type: cli-tool
-- commands: 19
-- database: not detected
+- Feature lifecycle management
+- Stage state machine
+- Traceability matrix
+- Quality gates
+- RFC and defect tracking
 
 ## Modules
 - cli
@@ -35,24 +37,29 @@
 
 ## Entry Points
 - src/cli/index.ts
-- src/core/
-- specs/
-- docs/
-- tests/
-- src/core/gate-engine/
-- CLAUDE.md
+- src/core/process-engine/stage-machine.ts
+- src/core/skill-runtime/dispatcher.ts
 
 ## Data Models
-- docs/first/domain-model.md
+- Feature
+- Stage
+- Task
+- RFC
+- Defect
+- Gate
+- TraceabilityMatrix
 
 ## API Surface
-- docs/first/api-docs.md
+- spec-first init
+- spec-first stage
+- spec-first id
+- spec-first matrix
+- spec-first rfc
+- spec-first defect
+- spec-first gate
 
 ## Risks
-- database: No database dependencies found
+- 无
 
 ## Evidence
-- .spec-first/runtime/first/index.json
-- .spec-first/runtime/first/summary.json
-- .spec-first/runtime/first/role-views.json
-- .spec-first/runtime/first/stage-views.json
+- 无

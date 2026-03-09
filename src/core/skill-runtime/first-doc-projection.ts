@@ -351,7 +351,7 @@ function loadProjectionContext(projectRoot: string): ProjectionContext {
       artifactDocs: legacyHints.artifactDocs.length > 0
         ? legacyHints.artifactDocs
         : Object.keys(context.index.docsProjection ?? {}).sort(),
-      techStack: legacyHints.techStack,
+      techStack: context.summary.techStack ?? legacyHints.techStack,
     };
   } catch (error) {
     const legacyContext = loadLegacyProjectionContext(projectRoot);
@@ -425,7 +425,7 @@ function renderSummaryDoc(context: ProjectionContext): string {
     `- 平台: ${context.summary.project.platformType ?? 'unknown'}`,
     `- 生成时间: ${context.summary.generatedAt}`,
     `- 概述: ${context.summary.project.overview ?? '未提供'}`,
-    ...renderSection('Tech Stack', context.techStack),
+    ...renderSection('Tech Stack', context.techStack.length > 0 ? context.techStack : (context.summary.techStack ?? [])),
     ...renderSection('Capabilities', context.summary.capabilities),
     ...renderSection('Modules', context.summary.modules),
     ...renderSection('Entry Points', context.summary.entryPoints),

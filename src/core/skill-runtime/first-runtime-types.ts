@@ -35,6 +35,7 @@ export interface FirstRuntimeSummary {
     platformType?: string;
     overview?: string;
   };
+  techStack?: string[];
   modules: string[];
   capabilities: string[];
   entryPoints: string[];

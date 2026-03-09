@@ -13,15 +13,16 @@
 - docs/first/stage-views.md
 
 ## Skill 初始化文档
-- docs/first/tech-stack.md
+- docs/first/README.md
 - docs/first/api-docs.md
-- docs/first/codebase-overview.md
-- docs/first/domain-model.md
-- docs/first/call-graph.md
 - docs/first/architecture.md
+- docs/first/call-graph.md
+- docs/first/codebase-overview.md
+- docs/first/development-guidelines.md
+- docs/first/domain-model.md
 - docs/first/external-deps.md
 - docs/first/local-setup.md
-- docs/first/development-guidelines.md
+- docs/first/tech-stack.md
 
 ## Runtime 真源
 - .spec-first/runtime/first/index.json

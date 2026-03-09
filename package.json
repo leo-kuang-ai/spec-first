@@ -1,6 +1,6 @@
 {
   "name": "spec-first",
-  "version": "0.5.50",
+  "version": "0.5.51",
   "description": "Specification-driven development process engine for AI-era software development",
   "type": "module",
   "bin": {

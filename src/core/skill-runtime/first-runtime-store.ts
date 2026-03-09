@@ -256,6 +256,7 @@ function normalizeLegacyRuntimeSummary(
       platformType: rawSummary.project_type ?? rawIndex?.project?.type,
       overview: rawIndex?.project?.description,
     },
+    techStack: Object.entries(rawSummary.tech_stack ?? {}).map(([key, value]) => `${key}: ${value}`),
     modules: asStringArray(rawSummary.core_modules),
     capabilities,
     entryPoints,

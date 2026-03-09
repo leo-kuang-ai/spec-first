@@ -34,7 +34,7 @@ IN_PROGRESS_IDS="$(
       s=tolower(last)
       if (s == "in_progress" || s == "in progress") print taskid
     }
-  ' "$FILE"
+  ' "$FILE" 2>/dev/null || true
 )"
 
 # 只输出提醒，不返回错误码（避免触发 AI 死循环）

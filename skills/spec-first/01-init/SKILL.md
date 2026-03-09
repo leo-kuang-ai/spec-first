@@ -22,6 +22,9 @@ changelog: Initial version with standardized metadata
 - P0: 定位项目根目录，确认为目标仓库；校验 `00-first` 已完成（`.spec-first/runtime/first/index.json` + `summary.json` + `role-views.json` + `stage-views.json`）
 - P1: 读取 `.spec-first/layer2/*.yaml` 平台模板（仅文件名，不读宿主名）
 - P2: 收集初始化参数（`feat/mode/size/platforms/title/feature-id`）
+  - **断点续传**：如果 `.spec-first/current` 存在且指向有效 Feature，检查其 `stage-state.json`
+  - 如果阶段为 `00_init` 且参数已收集，跳过 P2-P3，直接进入 P5 验证
+  - 如果参数不完整，从缺失的参数开始继续收集
 - P3: 参数确认（必须先过约束再确认）
 - P4: 执行 `spec-first init ...`
 - P5: 执行 `spec-first stage current <featureId>` 验证阶段，输出摘要（featureId、目录、平台、background_input_status、hooks/AI hooks/Skill 命令状态；仅显式 `--bootstrap` 时包含 bootstrap 状态）
@@ -93,3 +96,9 @@ changelog: Initial version with standardized metadata
   - Skill 命令刷新（`.claude/commands/spec-first/*.md`）
   - 若为 Git 仓库：hooks 安装/更新（`prepare-commit-msg`、`commit-msg`、`pre-push`、`pre-commit`）
   - AI Runtime Hooks 注册
+
+## 保护规则（强制）
+- **禁止删除 Feature 目录**：AI 不得执行 `rm -rf specs/{featureId}` 或类似删除操作
+- **中断恢复**：如果 init 中断后重新进入，应继续完成初始化，而非删除已有内容
+- **空 PRD 处理**：PRD 为空模板是正常的初始状态，应引导用户填充，而非判定为"无用 Feature"
+- **用户确认删除**：只有在用户明确要求删除 Feature 时，才能建议使用 `spec-first feature switch` 或手动删除

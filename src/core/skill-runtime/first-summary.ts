@@ -6,6 +6,7 @@ export interface FirstSummarySource {
   projectName?: string;
   platformType?: string;
   overview?: string;
+  techStack?: string[];
   modules?: string[];
   capabilities?: string[];
   entryPoints?: string[];
@@ -24,6 +25,7 @@ export function buildFirstSummary(source: FirstSummarySource): FirstRuntimeSumma
       platformType: source.platformType,
       overview: source.overview,
     },
+    techStack: source.techStack ?? [],
     modules: source.modules ?? [],
     capabilities: source.capabilities ?? [],
     entryPoints: source.entryPoints ?? [],

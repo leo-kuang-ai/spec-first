@@ -262,6 +262,7 @@ function rewriteRuntimeArtifacts(projectRoot: string, artifacts: FirstRuntimeArt
       projectName: summary.project.name,
       platformType: summary.project.platformType,
       overview: summary.project.overview,
+      techStack: summary.techStack,
       modules: summary.modules,
       capabilities: summary.capabilities,
       entryPoints: summary.entryPoints,

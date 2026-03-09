@@ -2,68 +2,58 @@
 
 ## Product
 
-- Summary: Prioritize docs/first/domain-model.md
+- Summary: Specification-driven development process engine
 
 ### Focus
-- docs/first/domain-model.md
-- docs/first/api-docs.md
-- entry: specs/
-- entry: docs/
-- Feature
-- RFC
-- Stage
-- Gate
+- Feature lifecycle management
+- Stage state machine
+- Traceability matrix
+- Quality gates
+- RFC and defect tracking
 
 ### Warnings
 - 无
 
 ## Developer
 
-- Summary: Prioritize docs/first/codebase-overview.md
+- Summary: Specification-driven development process engine
 
 ### Focus
-- docs/first/codebase-overview.md
-- docs/first/tech-stack.md
-- docs/first/domain-model.md
-- entry: src/cli/index.ts
-- entry: src/core/
-- Stage
-- Feature
-- Task
-- Traceability
+- cli
+- process-engine
+- skill-runtime
+- ai-orchestrator
+- gate-engine
+- trace-engine
+- change-mgr
+- template
+- tool-integration
+- metrics-engine
+- shared
+- config
 
 ### Warnings
 - 无
 
 ## QA
 
-- Summary: Prioritize docs/first/domain-model.md
+- Summary: Specification-driven development process engine
 
 ### Focus
-- docs/first/domain-model.md
-- docs/first/codebase-overview.md
-- entry: tests/
-- entry: src/core/gate-engine/
-- Gate
-- Coverage
-- Traceability Matrix
+- 无
 
 ### Warnings
 - 无
 
 ## Architect
 
-- Summary: Prioritize docs/first/tech-stack.md
+- Summary: Specification-driven development process engine
 
 ### Focus
-- docs/first/tech-stack.md
-- docs/first/codebase-overview.md
-- docs/first/domain-model.md
-- entry: src/core/
-- entry: CLAUDE.md
-- Process Engine
-- Trace Engine
-- Change Management
+- cli-tool
+- src/cli/index.ts
+- src/core/process-engine/stage-machine.ts
+- src/core/skill-runtime/dispatcher.ts
 
 ### Warnings
 - 无
