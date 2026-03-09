@@ -604,9 +604,9 @@ const server = createServer((req, res) => {
     return;
   }
 
-  // Serve JavaScript file
-  if (url.pathname === '/app.js') {
-    const jsPath = join(__dirname, 'app.js');
+  // Serve JavaScript files
+  if (url.pathname.endsWith('.js')) {
+    const jsPath = join(__dirname, url.pathname);
     if (!existsSync(jsPath)) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('JavaScript file not found');
