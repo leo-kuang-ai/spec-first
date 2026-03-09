@@ -601,25 +601,32 @@ C. [具体方案 C]
 [下一步：执行 /spec-first:design]
 ```
 
+5. **执行 Gate Check（阻断门禁）**:
+   ```bash
+   spec-first gate check <featureId>
+   ```
+
+   **检查项**:
+   - PRD 存在且 C-PRD ≥ 85%
+   - spec.md 存在且包含所有 FR/AC
+   - FR 已注册到追溯矩阵
+   - spec-review.md 存在（如需要）
+
+   **失败处理**:
+   - C-PRD < 85%: 返回 Phase 0.3 修正 PRD，重新执行 Phase 0.4-0.6
+   - 缺少文件: 补齐后重新执行 gate check
+   - FR 未注册: 执行注册后重新执行 gate check
+   - **不得跳过 gate check 进入下一阶段**
+
+   **通过后**:
+   - 更新 `stage-state.json` 为 `02_design`
+   - 记录 gate check 通过时间到 `findings.md`
+   - 提示用户："Gate check 通过，可执行 /spec-first:design"
+
 **输出**:
 - `spec.md` 最终版本
 - `traceability-matrix.md` 注册所有 FR
-- `findings.md` 记录 Step 8 完成
-
-**Gate Check（Step 8 完成后立即执行）**:
-```bash
-spec-first gate check <featureId>
-```
-
-检查项：
-- PRD 存在且 C-PRD ≥ 85%
-- spec.md 存在
-- FR 已注册到矩阵
-- spec-review.md 存在（如需要）
-
-**失败处理**：
-- C-PRD < 85%：返回 Phase 0.3 修正 PRD
-- 缺少文件：补齐后重新执行 gate check
+- `findings.md` 记录 Step 8 完成 + gate check 通过
 
 **格式校验（P4 落盘后自动执行）**:
 ```bash
