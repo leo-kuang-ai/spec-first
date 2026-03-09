@@ -1,9 +1,10 @@
 ---
 name: onboarding
 description: 新手引导 - 交互式场景识别与学习路径推荐
-version: 1.2.0
+version: 1.3.0
 user-invocable: true
 changelog: |
+  1.3.0: 交互体验优化 - 支持命令行参数（--role/--task/--size），CLI 参数检测与提示
   1.2.0: 文档结构优化 - 拆分输出模板到 references/output-templates.md，精简 SKILL.md
   1.1.0: 补充场景匹配算法、role-views 使用策略、完整错误处理矩阵
   1.0.0: 初始版本 - 3 问题交互式引导、场景推荐、学习路径保存
@@ -18,6 +19,14 @@ changelog: |
 ## 执行流程
 
 - Command: `/spec-first:onboarding`
+- 支持参数（可选）：`--role=<role> --task=<task> --size=<size>`
+
+**参数说明**：
+- `--role`: developer | pm | qa | architect | <自定义>
+- `--task`: new_feature | fix_bug | refactor | learn
+- `--size`: small | medium | large
+
+**注意**：参数仅用于 AI 内部传递，CLI 不支持参数化启动
 
 ### Phase 0: 欢迎与说明
 
