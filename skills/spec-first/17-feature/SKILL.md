@@ -19,17 +19,16 @@ Feature 管理命令族，支持列表查询、查看当前、切换 Feature。
 
 ## 执行逻辑
 
-1. 从用户输入提取子命令（list/current/switch）
-2. 直接执行对应的 CLI 命令：
+从用户输入提取子命令，直接执行对应的 CLI 命令：
 
 ```bash
 # 用户输入 → CLI 命令
-/spec-first:feature list    → spec-first feature list
-/spec-first:feature current → spec-first feature current
-/spec-first:feature switch FEAT-001 → spec-first feature switch FEAT-001 --yes
+list    → spec-first feature list
+current → spec-first feature current
+switch <id> → spec-first feature switch <id> --yes
 ```
 
-**注意**：switch 子命令需要添加 `--yes` 确认标志。
+**注意**：switch 自动添加 `--yes`，用户无需手动指定。
 
 ## 子命令
 
