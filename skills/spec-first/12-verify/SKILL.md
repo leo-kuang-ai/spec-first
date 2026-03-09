@@ -430,9 +430,9 @@ digraph verify_flow {
 ## 执行阶段
 
 - **P0**: 定位 Feature，加载当前阶段
-- **P1**: 加载矩阵、覆盖率指标、Gate 条件
-- **P2**: 执行 gate check，获取验证结果
-- **P3**: 生成校验报告（Gate 评估、覆盖率缺口、修复建议）
+- **P1**: 加载 `verify-view`、矩阵、覆盖率指标、Gate 条件
+- **P2**: 执行 `gate check`、`matrix check`、`metrics coverage`，获取验证结果
+- **P3**: 生成校验报告（Gate 评估、矩阵完整性、覆盖率缺口、verify-view 重点、修复建议）
 - **P4**: 将校验结果写入 findings.md
 - **P5**: 若所有条件满足，建议执行 stage advance
 
@@ -457,6 +457,7 @@ digraph verify_flow {
 - 声称通过时必须附带本次执行命令输出与退出码
 - 若所有条件满足，已建议执行 `stage advance`
 - FAIL 时必须包含可执行的修复建议
+- 已核对 `verify-view` 必查字段并纳入校验结论
 
 ## Verify 报告格式
 
@@ -540,6 +541,6 @@ Gate 已通过，可以推进到下一阶段。
 
 ## 背景输入
 - 优先读取 `verify-view`
-- 核对 `criticalFlows`、`validationFocus`、`recommendedChecks`
+- 核对 `critical_flows`、`validation_focus`、`recommended_checks`、`validation_hooks`、`release_blockers`
 - 高风险验证 / 上线前验证属于 `pre-release-verification` 场景
-- 高风险验证可提升背景依赖强度
+- 高风险验证可提升背景依赖强度，并显式声明 `background_input_status`

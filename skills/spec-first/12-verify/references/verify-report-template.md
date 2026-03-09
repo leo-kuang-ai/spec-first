@@ -71,6 +71,8 @@ verify 报告标准格式，确保输出一致性。
 - `recommended_checks`: 来自 verify-view 的建议补充检查
 - `critical_flows`: 来自 verify-view 的关键链路
 - `validation_focus`: 来自 verify-view 的验证重点
+- `validation_hooks`: 来自 verify-view 的验证钩子建议
+- `release_blockers`: 来自 verify-view 的发布阻断项
 
 ## 执行证据
 
@@ -238,7 +240,9 @@ Gate 已通过，可以推进到下一阶段。
 
 ## 背景输入字段
 - verify-view
-- criticalFlows
-- validationFocus
-- recommendedChecks
+- critical_flows
+- validation_focus
+- recommended_checks
+- validation_hooks
+- release_blockers
 - background_input_status

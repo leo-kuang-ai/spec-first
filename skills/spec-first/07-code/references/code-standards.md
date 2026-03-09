@@ -449,6 +449,11 @@ export async function createUser(input: unknown): Promise<User> {
 - [ ] traces trailer 已注入
 - [ ] findings.md 已更新
 
+## 最小实现与范围边界
+- 只实现当前 TASK 直接需要的逻辑
+- 不为未来需求预埋抽象、配置或扩展点
+- 范围外问题记录到 `findings.md`，不在本次 TASK 中一并处理
+
 ## code-view 对齐要求
 - `entryPoints`：明确本轮改动入口
 - `likelyChangeAreas`：列出高概率变更模块

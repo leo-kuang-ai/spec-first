@@ -346,7 +346,8 @@ Stage 2 的发现必须分为以下三类：
 
 暂不实施，原因：
 
-- 当前没有证据表明 runtime 自动拼装 `SHARED.md` 到各 Skill prompt
+- 当前仓库中存在 `skills/spec-first/SHARED.md`，README 也将其标为共享上下文
+- 但现有 runtime 的 `loadSkill()` 只加载目标 `SKILL.md` 并追加 runtime notice，未自动拼装 `SHARED.md`
 - 共享层治理应等 runtime 接线策略明确后再推进
 
 ---

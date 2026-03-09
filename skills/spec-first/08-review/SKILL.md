@@ -73,8 +73,8 @@ Stage 2 的发现必须分为以下三类：
 - P0: 定位 Feature，确定检查层级（single/cross/completion）
 - P1: 根据层级加载对应检查清单（含 cross-layer-checklist）
 - P2: 执行 Stage 1（合规）并输出结论
-- P3: Stage 1 通过后执行 Stage 2（质量 + 跨层检查）
-- P4: 与用户确认审查发现并写入 findings.md
+- P3: Stage 1 通过后执行 Stage 2（质量 + 跨层检查），并按 MUST FIX / SHOULD FIX / OUT_OF_SCOPE 分类
+- P4: 与用户确认审查发现，范围外问题单独标注并写入 findings.md
 - P5: 审查通过则更新 TASK 状态
 
 ## Layer 参数约定
@@ -105,6 +105,7 @@ Stage 2 的发现必须分为以下三类：
 - `references/performance-checklist.md`
 - `references/testing-checklist.md`
 - `references/cross-layer-checklist.md`
+- `references/review-output-template.md`
 - `../03-spec/references/constitution-authority.md`
 
 ## 确认策略
@@ -115,3 +116,5 @@ Stage 2 的发现必须分为以下三类：
 - 审查顺序可复核（先合规后质量）
 - 审查发现已写入 `findings.md`
 - 通过审查的 TASK 状态已更新
+- Stage 2 发现已按 MUST FIX / SHOULD FIX / OUT_OF_SCOPE 分类
+- `OUT_OF_SCOPE` 未被包装为当前阻断项

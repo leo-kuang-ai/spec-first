@@ -490,8 +490,8 @@ digraph rollback_flow {
 
 - **P0**: 定位 Feature，校验阶段为 04_implement，从 task_plan.md 定位当前进行中的 TASK
 - **P1**: 加载 TASK 上下文、关联的 FR/DS、constitution 约束，验证 TDD 入口守卫
-- **P2**: 按规格约束生成实现代码
-- **P3**: 与用户确认代码变更（diff 预览，必须包含固定字段）
+- **P2**: 按规格约束生成最小实现代码
+- **P3**: 与用户确认代码变更（diff 预览 + 范围确认，必须包含固定字段）
 - **P4**: 写入代码文件，注入 traces trailer
 - **P5**: 更新 task_plan.md 中 TASK 状态，更新 findings.md
 
@@ -564,6 +564,7 @@ npm run build
 - `findings.md` 已记录 RED/GREEN 证据（命令 + 退出码）
 - 若新增测试：已完成 `TC` 注册与 `matrix` 追踪关联
 - 代码质量门禁通过（lint / typecheck / test）
+- 无与当前 TASK 无关的预埋抽象、配置或范围外修改
 
 ## 示例（P2 输出格式）
 

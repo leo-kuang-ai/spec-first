@@ -1,6 +1,6 @@
 # Spec-First CLI 命令参考手册
 
-> **版本**: v2.0 | **日期**: 2026-02-11 | **作者**: Leo (况雨平)
+> **版本**: v2.1 | **日期**: 2026-03-09 | **作者**: Leo (况雨平)
 > **校准基线**: `src/cli/index.ts` + `src/cli/commands/*.ts`
 > **状态**: 与当前代码实现对齐（As-Is）
 
@@ -33,15 +33,24 @@ CLI 命令层（本文档）: spec-first init, spec-first id next, ...
 | 3 | `spec-first id` | 4 | ID 管理 | ✅ |
 | 4 | `spec-first gate` | 3 | Gate 校验 | ✅ |
 | 5 | `spec-first golive` | 1 | 上线检查 | ✅ |
-| 6 | `spec-first matrix` | 2 | 追踪矩阵 | ✅ |
-| 7 | `spec-first metrics` | 3 | 覆盖率与度量 | ✅ |
-| 8 | `spec-first rfc` | 5 | RFC 变更管理 | ✅ |
-| 9 | `spec-first defect` | 5 | 缺陷追踪 | ✅ |
-| 10 | `spec-first ai` | 3 | AI 编排 | ✅ |
-| 11 | `spec-first commit` | 1 | 标准化提交 | ✅ |
-| 12 | `spec-first feature` | 3 | Feature 切换 | ✅ |
-| 13 | `spec-first doctor` | 1 | 环境诊断 | ✅ |
-| | **合计** | **35** | | **100%** |
+| 6 | `spec-first done` | 1 | 收口到 08_done | ✅ |
+| 7 | `spec-first matrix` | 3 | 追踪矩阵 | ✅ |
+| 8 | `spec-first metrics` | 3 | 覆盖率与度量 | ✅ |
+| 9 | `spec-first rfc` | 5 | RFC 变更管理 | ✅ |
+| 10 | `spec-first defect` | 5 | 缺陷追踪 | ✅ |
+| 11 | `spec-first ai` | 3 | AI 编排 | ✅ |
+| 12 | `spec-first commit` | 1 | 标准化提交 | ✅ |
+| 13 | `spec-first feature` | 3 | Feature 切换 | ✅ |
+| 14 | `spec-first hooks` | 3 | Git Hooks 管理 | ✅ |
+| 15 | `spec-first viewer` | 3 | 可视化面板 | ✅ |
+| 16 | `spec-first update` | 1 | 刷新配置 | ✅ |
+| 17 | `spec-first setup` | 1 | 已废弃 | ⚠️ |
+| 18 | `spec-first uninstall` | 1 | 清理配置 | ✅ |
+| 19 | `spec-first analyze` | 1 | 一致性分析 | ✅ |
+| 20 | `spec-first trace` | 1 | 追溯链修复 | ✅ |
+| 21 | `spec-first validate` | 1 | 产物校验 | ✅ |
+| 22 | `spec-first doctor` | 1 | 环境诊断 | ✅ |
+| | **合计** | **47** | | **100%** |
 
 ## 全局选项
 
@@ -345,7 +354,103 @@ spec-first ai stats <featureId>
 ### 10.1 运行诊断
 
 ```bash
-spec-first doctor
+spec-first doctor [featureId]
+```
+
+---
+
+## 11. `spec-first done`
+
+### 11.1 收口到 08_done
+
+```bash
+spec-first done <featureId>
+```
+
+将 Feature 从 `07_release` 阶段推进到终态 `08_done`。
+
+---
+
+## 12. `spec-first hooks`
+
+### 12.1 安装 Git Hooks
+
+```bash
+spec-first hooks install
+```
+
+### 12.2 卸载 Git Hooks
+
+```bash
+spec-first hooks uninstall
+```
+
+### 12.3 查看 Hooks 状态
+
+```bash
+spec-first hooks status
+```
+
+---
+
+## 13. `spec-first viewer`
+
+### 13.1 启动可视化面板
+
+```bash
+spec-first viewer start
+spec-first viewer open          # 启动并打开浏览器
+spec-first viewer url           # 输出当前地址
+```
+
+---
+
+## 14. `spec-first update`
+
+### 14.1 刷新配置
+
+```bash
+spec-first update [--dry-run] [--skip-mcp] [--skip-hooks]
+```
+
+---
+
+## 15. `spec-first uninstall`
+
+### 15.1 清理配置
+
+```bash
+spec-first uninstall [--dry-run] [--keep-mcp]
+```
+
+---
+
+## 16. `spec-first analyze`
+
+### 16.1 一致性分析
+
+```bash
+spec-first analyze <featureId>
+```
+
+---
+
+## 17. `spec-first trace`
+
+### 17.1 追溯链修复
+
+```bash
+spec-first trace <featureId>
+```
+
+---
+
+## 18. `spec-first validate`
+
+### 18.1 产物校验
+
+```bash
+spec-first validate <featureId>
 ```
 
 ---

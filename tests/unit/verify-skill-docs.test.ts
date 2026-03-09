@@ -31,6 +31,28 @@ describe('12-verify skill docs consistency', () => {
     expect(report).toContain('recommended_checks');
   });
 
+  it('should keep verify-view required fields consistent in snake_case', () => {
+    const skill = read(SKILL_MD);
+    const report = read(TEMPLATE);
+
+    expect(skill).toContain('validation_hooks');
+    expect(skill).toContain('release_blockers');
+    expect(skill).toContain('critical_flows');
+    expect(skill).toContain('validation_focus');
+    expect(skill).toContain('recommended_checks');
+
+    expect(report).toContain('critical_flows');
+    expect(report).toContain('validation_focus');
+    expect(report).toContain('recommended_checks');
+    expect(report).toContain('validation_hooks');
+    expect(report).toContain('release_blockers');
+    expect(report).toContain('background_input_status');
+
+    expect(report).not.toContain('criticalFlows');
+    expect(report).not.toContain('validationFocus');
+    expect(report).not.toContain('recommendedChecks');
+  });
+
   it('should document stronger dependency for high-risk verification', () => {
     const skill = read(SKILL_MD);
     const gate = read(GATE_CONDITIONS);
@@ -39,5 +61,14 @@ describe('12-verify skill docs consistency', () => {
     expect(skill).toContain('pre-release-verification');
     expect(gate).toContain('L3');
     expect(gate).toContain('background_input_status');
+  });
+
+  it('should make completion verification flow explicit', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('**P1**: 加载 `verify-view`、矩阵、覆盖率指标、Gate 条件');
+    expect(skill).toContain('**P2**: 执行 `gate check`、`matrix check`、`metrics coverage`，获取验证结果');
+    expect(skill).toContain('**P3**: 生成校验报告（Gate 评估、矩阵完整性、覆盖率缺口、verify-view 重点、修复建议）');
+    expect(skill).toContain('已核对 `verify-view` 必查字段并纳入校验结论');
   });
 });

@@ -53,11 +53,7 @@ npm run build
 ### 4. 发布到 npm
 
 ```bash
-# 发布
 npm publish
-
-# 如果是 scoped package 首次发布
-npm publish --access public
 ```
 
 ### 5. 提交代码
