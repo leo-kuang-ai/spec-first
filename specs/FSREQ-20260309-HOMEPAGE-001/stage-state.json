@@ -181,10 +181,17 @@
       }
     }
   },
-  "currentStage": "00_init",
-  "history": [],
+  "currentStage": "01_specify",
+  "history": [
+    {
+      "from": "00_init",
+      "to": "01_specify",
+      "timestamp": "2026-03-09T07:10:26.597Z",
+      "gateResult": "PASS"
+    }
+  ],
   "terminal": false,
   "title": "首页美化与交互优化",
   "createdAt": "2026-03-09T05:08:24.433Z",
-  "updatedAt": "2026-03-09T05:08:24.433Z"
+  "updatedAt": "2026-03-09T07:10:26.597Z"
 }
