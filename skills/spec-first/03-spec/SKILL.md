@@ -32,7 +32,7 @@ I'm using the spec skill to define requirements for [Feature].
 - **Phase 0.2**: 质量扫描 + 自动上下文收集
 - **Phase 0.3**: PRD 生成（文档提取 or 口述）
 - **Phase 0.4**: PRD 自检（C-PRD >= 85%）
-- **Phase 0.5**: PRD 补全对话（三道门禁 + 一问一答）
+- **Phase 0.5**: PRD 补全对话（两道门禁 + 一问一答）
 - **Phase 0.6**: PRD 用户确认
 
 **门禁**: C-PRD >= 85%
