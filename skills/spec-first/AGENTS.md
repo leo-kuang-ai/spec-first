@@ -11,10 +11,10 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 
 ## 双宿主核心约束摘要
 
-- Claude 路径（Hook 阻断链路）：
-  - `PreToolUse` 在写操作前刷新当前 TASK 上下文。
-  - `Stop` 必须执行完成度守门；存在未完成 TASK 时返回非 0 并阻断会话正常结束。
-  - `Stop` 中 `ai stats` 与完成度守门并存，禁止替换已有统计 Hook。
+- Claude 路径（Hook 提醒链路）：
+  - `PreToolUse` 在写操作前刷新当前 TASK 上下文，并执行 gate check 守门。
+  - `Stop` 提供完成度提醒；存在未完成 TASK 时输出 stderr 提示，但允许会话正常结束（exit 0，避免 AI 死循环）。
+  - `Stop` 中 `ai stats` 与完成度提醒并存，禁止替换已有统计 Hook。
 - Codex 路径（Skill 证据链路）：
   - 不依赖宿主 Hook 阻断，依赖 `code/verify/orchestrate` 的证据铁律防止提前收工。
   - orchestrate 需显式暴露背景治理信号（`background_status / dependency_strength / risk_category / risk_signals`），不得静默吞掉高风险提示。
@@ -61,7 +61,9 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 ## Hook 跨平台稳健性（P1-17）
 
 - Hook 脚本必须兼容 macOS `/usr/bin/awk` 与 Linux `awk`。
-- 阻断型 Hook（如 `stop-guard.sh`）必须输出 stderr + 非 0 退出。
+- Hook 分为两类：
+  - **阻断型 Hook**：失败时必须输出 stderr + 非 0 退出（如 gate check）
+  - **提醒型 Hook**：输出 stderr 提示，但必须 exit 0（如 stop-guard.sh）
 - 非阻断型 Hook 失败必须可降级，避免单点故障拖垮主流程。
 
 ## 项目概述

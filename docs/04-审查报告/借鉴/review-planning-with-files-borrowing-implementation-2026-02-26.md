@@ -1,5 +1,7 @@
 # Spec-First 对《Planning-with-Files 可借鉴要素分析》实现完成度审查报告（复审终版）
 
+> **⚠️ 部分内容已过期**: 第53行关于 stop-guard 的"阻断未完成 TASK 结束"描述已过期。当前 stop-guard 为提醒型（exit 0），详见 `docs/03-开发任务/stop-guard-contract.md`
+
 - 初审日期: 2026-02-26
 - 复审日期: 2026-02-26
 - 审查对象文档: `docs/01需求文档/v2/优势借鉴分析/Spec-First 可借鉴 Planning-with-Files 的要素分析.md`

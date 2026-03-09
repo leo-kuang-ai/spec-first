@@ -108,4 +108,40 @@ hooks:
     expect(stopEntries.some((entry: { hooks: Array<{ command: string }> }) =>
       entry.hooks[0].command.includes('SPEC_FIRST_EXTENSION_NAMESPACE=qa'))).toBe(true);
   });
+
+  it('should generate stop-guard with reminder-only semantics', () => {
+    const featureId = 'TEST-001';
+    const specsDir = join(TMP, 'specs', featureId);
+    mkdirSync(specsDir, { recursive: true });
+
+    writeFileSync(join(specsDir, 'stage-state.json'), JSON.stringify({
+      currentStage: '04_implement'
+    }), 'utf-8');
+
+    writeFileSync(join(specsDir, 'task_plan.md'), `
+| TASK-001 | Test Task | in_progress |
+`, 'utf-8');
+
+    mkdirSync(join(TMP, '.spec-first'), { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), featureId, 'utf-8');
+
+    registerAIHooks(TMP);
+
+    const scriptPath = join(TMP, '.spec-first', 'hooks', 'stop-guard.sh');
+    const scriptContent = readFileSync(scriptPath, 'utf-8');
+
+    expect(scriptContent).toContain('04_implement');
+    expect(scriptContent).toContain('in_progress');
+    expect(scriptContent).toContain('exit 0');
+    expect(scriptContent).not.toContain('exit 2');
+  });
+
+  it('should generate stop-guard that uses correct variable names', () => {
+    registerAIHooks(TMP);
+    const scriptContent = readFileSync(join(TMP, '.spec-first', 'hooks', 'stop-guard.sh'), 'utf-8');
+
+    expect(scriptContent).toContain('STAGE_FILE=');
+    expect(scriptContent).toContain('TASK_FILE=');
+    expect(scriptContent).toContain('IN_PROGRESS_IDS=');
+  });
 });

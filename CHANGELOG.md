@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.6.1 2026-03-10 Claude: docs(init): 删除断点续传描述 - 与代码实现保持一致，默认创建新 Feature
+- v0.6.0 2026-03-09 Claude: feat(code): 完全重写为批量模式 - 支持依赖解析、拓扑排序、并发执行、失败率控制，三层守卫架构，上下文包 < 2KB，降级策略，checkpoint 机制 (user-visible)
+- v0.6.0 2026-03-09 Claude: feat(cli): 新增 batch-test 命令 - 集成批量执行器到 CLI，支持从 task_plan.md 解析任务并执行
+- v0.6.0 2026-03-09 Claude: feat(batch-executor): 实现阶段 3 - 上下文打包器（< 2KB）、并发执行器、max_parallel 控制，7 个测试全部通过
+- v0.6.0 2026-03-09 Claude: feat(batch-executor): 实现阶段 2 - Checkpoint 机制、执行报告生成、进度追踪器、失败率控制，集成测试通过
+- v0.6.0 2026-03-09 Claude: feat(batch-executor): 实现阶段 1 - 依赖图解析、循环依赖检测、拓扑排序分层、TDD 预检、文件冲突检测、串行执行器，测试通过
+- v0.5.58 2026-03-09 Claude: fix(hooks): 统一 stop-guard 为提醒型 - 修复真源/治理文档/测试一致性，补充行为契约文档
 - v0.5.57 2026-03-09 Claude: feat(feature): 优化无参数调用 - 自动显示当前 Feature、列表和命令帮助
 - v0.5.56 2026-03-09 Claude: fix(postinstall): 自动添加 --yes 确保 update 命令执行成功
 - v0.5.55 2026-03-09 Claude: feat(feature): 使用 argument-hint 实现参数传递 - 支持 /spec-first:feature list/current/switch

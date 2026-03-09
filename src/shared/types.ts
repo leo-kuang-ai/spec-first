@@ -49,6 +49,8 @@ export enum ExitCode {
   CONFIG_ERROR = 3,
   IO_ERROR = 4,
   UNKNOWN_ERROR = 5,
+  INVALID_ARGS = 6,
+  GENERAL_ERROR = 7,
 }
 
 // ─── StageState（stage-state.json 结构）─────────────────

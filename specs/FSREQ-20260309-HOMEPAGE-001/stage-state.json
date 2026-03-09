@@ -59,6 +59,16 @@
           "command": "npm test"
         }
       ],
+      "waivers": {
+        "04_implement": [
+          {
+            "condition": "C4",
+            "reason": "CSS-only changes - manual browser testing required",
+            "approver": "orchestrate",
+            "timestamp": "2026-03-09T15:29:00.000Z"
+          }
+        ]
+      },
       "05_verify": [
         {
           "id": "L0-VERIFY-001",

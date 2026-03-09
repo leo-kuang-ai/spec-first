@@ -7,9 +7,9 @@
 | Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
 |---|---|---|---|---|---|---|---|---|
 | TASK-VIS-001 | 视觉层次优化 | dev | 0.5d | DS-VIS-001 | - | 字号、颜色、间距符合设计 | 浏览器目视检查 | done |
-| TASK-INT-001 | 交互体验提升 | dev | 0.5d | DS-INT-001 | TASK-VIS-001 | 悬停、焦点效果符合设计 | 浏览器交互测试 | todo |
-| TASK-VIZ-001 | 数据可视化增强 | dev | 0.5d | DS-VIZ-001 | TASK-VIS-001 | 图表样式符合设计 | 浏览器目视检查 | todo |
-| TASK-LAY-001 | 整体布局优化 | dev | 0.5d | DS-LAY-001 | TASK-VIS-001 | 布局间距符合设计 | 浏览器目视检查 | todo |
+| TASK-INT-001 | 交互体验提升 | dev | 0.5d | DS-INT-001 | TASK-VIS-001 | 悬停、焦点效果符合设计 | 浏览器交互测试 | done |
+| TASK-VIZ-001 | 数据可视化增强 | dev | 0.5d | DS-VIZ-001 | TASK-VIS-001 | 图表样式符合设计 | 浏览器目视检查 | done |
+| TASK-LAY-001 | 整体布局优化 | dev | 0.5d | DS-LAY-001 | TASK-VIS-001 | 布局间距符合设计 | 浏览器目视检查 | done |
 
 ## 实施步骤
 

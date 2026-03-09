@@ -28,6 +28,7 @@ import { handleValidate } from './commands/validate.js';
 import { handleDone } from './commands/done.js';
 import { handleOrchestrate } from './commands/orchestrate.js';
 import { handleFirst } from './commands/first.js';
+import { handleBatchTest } from './commands/batch-test.js';
 import { resolveFirstConfirmPolicy, validateFirstArgs } from '../core/skill-runtime/first-args.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
@@ -90,6 +91,7 @@ registerCommand('first', '项目首轮认知 runtime/docs 刷新', handleFirst, 
     }
   },
 });
+registerCommand('batch-test', '批量执行测试（临时命令）', handleBatchTest);
 
 const code = await dispatch(process.argv.slice(2));
 process.exit(code);

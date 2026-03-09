@@ -69,7 +69,7 @@
       padding: 12px;
       margin-bottom: 8px;
       cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s;
     }
     .feature:hover {
       background: var(--panel-2);
@@ -327,12 +327,13 @@
       text-align: center;
     }
     .health-score-value .score {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
       line-height: 1;
     }
     .health-score-value .grade {
-      font-size: 11px;
+      font-size: 14px;
+      font-weight: 600;
       color: var(--muted);
       margin-top: 2px;
     }
@@ -376,7 +377,7 @@
     }
     .coverage-bar-fill {
       height: 100%;
-      border-radius: 3px;
+      border-radius: 4px;
       transition: width 0.5s ease;
     }
     .coverage-bar-fill.pass { background: var(--ok); }

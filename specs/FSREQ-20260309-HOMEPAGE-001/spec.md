@@ -88,6 +88,62 @@
 
 ---
 
+## 测试用例 (TC)
+
+### TC-VIS-001: 视觉层次手动验证
+
+**类型**: Manual Test
+**关联**: FR-VIS-001
+**步骤**:
+1. 启动 Viewer: `node dist/cli/index.js viewer start`
+2. 访问 http://127.0.0.1:3000
+3. 验证 h1 字号为 20px，h2 字号为 16px
+4. 验证 `--muted` 颜色为 #9babc9
+5. 验证 section 间距为 20px
+
+**预期结果**: 所有 AC-VIS-001-* 验收标准通过
+
+---
+
+### TC-INT-001: 交互体验手动验证
+
+**类型**: Manual Test
+**关联**: FR-INT-001
+**步骤**:
+1. 悬停 Feature 列表项，验证位移动画
+2. 验证过渡时长为 150ms
+3. 验证焦点 outline 为 2px
+
+**预期结果**: 所有 AC-INT-001-* 验收标准通过
+
+---
+
+### TC-VIZ-001: 数据可视化手动验证
+
+**类型**: Manual Test
+**关联**: FR-VIZ-001
+**步骤**:
+1. 验证健康分字号为 24px
+2. 验证等级标识字号为 14px，加粗
+3. 验证柱状图圆角为 4px
+
+**预期结果**: 所有 AC-VIZ-001-* 验收标准通过
+
+---
+
+### TC-LAY-001: 整体布局手动验证
+
+**类型**: Manual Test
+**关联**: FR-LAY-001
+**步骤**:
+1. 验证滚动条宽度为 6px
+2. 验证 Feature 列表项间距为 8px
+3. 验证 section 间距为 20px
+
+**预期结果**: 所有 AC-LAY-001-* 验收标准通过
+
+---
+
 ## Definition of Done
 
 - [ ] 所有 FR 已实现（FR-VIS-001, FR-INT-001, FR-VIZ-001, FR-LAY-001）
