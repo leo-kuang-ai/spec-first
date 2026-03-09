@@ -555,7 +555,10 @@ C. [具体方案 C]
 1. 生成确认包（Goal/Requirements/AC/DoD/OOS）
 2. 向用户展示完整确认包
 3. 用户确认后生成实施计划
-4. 注册所有 FR 到追踪矩阵
+4. 注册所有 FR 到追踪矩阵（参考 `references/id-types-and-status.md`）
+   - 使用 `spec-first id next FR <abbr> --feature <featureId>` 生成 FR ID
+   - 使用 `spec-first matrix update <featureId> <id> --title "标题" --yes` 注册到矩阵
+   - 注意：matrix update 需要 `--yes` 确认（policy=strict）
 
 **确认包格式**:
 ```markdown
@@ -586,6 +589,21 @@ C. [具体方案 C]
 - `spec.md` 最终版本
 - `traceability-matrix.md` 注册所有 FR
 - `findings.md` 记录 Step 8 完成
+
+**Gate Check（Step 8 完成后立即执行）**:
+```bash
+spec-first gate check <featureId>
+```
+
+检查项：
+- PRD 存在且 C-PRD ≥ 85%
+- spec.md 存在
+- FR 已注册到矩阵
+- spec-review.md 存在（如需要）
+
+**失败处理**：
+- C-PRD < 85%：返回 Phase 0.3 修正 PRD
+- 缺少文件：补齐后重新执行 gate check
 
 **格式校验（P4 落盘后自动执行）**:
 ```bash
