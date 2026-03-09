@@ -406,11 +406,18 @@ export function refreshFirstArtifacts(
     : changedFiles === null
       ? [...FIRST_RUNTIME_ARTIFACTS]
       : determineRebuildArtifacts(changedFiles, index);
-  const docsArtifacts = mode === 'refresh-runtime-only'
-    ? []
-    : mode === 'refresh-docs-from-runtime'
-      ? [...FIRST_RUNTIME_ARTIFACTS]
-      : Array.from(new Set<FirstRuntimeArtifact>([...impactedRuntimeArtifacts, ...rebuildArtifacts]));
+
+  let docsArtifacts: FirstRuntimeArtifact[];
+  if (mode === 'refresh-runtime-only') {
+    docsArtifacts = [];
+  } else if (mode === 'refresh-docs-from-runtime') {
+    docsArtifacts = [...FIRST_RUNTIME_ARTIFACTS];
+  } else {
+    // refresh-all: 合并 impacted + rebuild，并检查 docs 健康度
+    const baseArtifacts = Array.from(new Set<FirstRuntimeArtifact>([...impactedRuntimeArtifacts, ...rebuildArtifacts]));
+    const hasUnhealthyDocs = Object.values(index.docsProjection).some(doc => !doc.healthy);
+    docsArtifacts = hasUnhealthyDocs ? [...FIRST_RUNTIME_ARTIFACTS] : baseArtifacts;
+  }
 
   if (rebuildArtifacts.length === 0 && docsArtifacts.length === 0) {
     return {
@@ -441,6 +448,36 @@ export function refreshFirstArtifacts(
     runtimeArtifacts,
     docsProjections,
   };
+}
+
+function hasHealthyRuntimeTruth(projectRoot: string): boolean {
+  const index = readFirstRuntimeIndex(projectRoot);
+  if (!index?.summary.healthy || !index.roleViews.healthy || !index.stageViews.healthy) {
+    return false;
+  }
+
+  return Boolean(
+    readFirstRuntimeSummary(projectRoot)
+    && readFirstRoleViews(projectRoot)
+    && readFirstStageViews(projectRoot),
+  );
+}
+
+export interface ExecuteFirstResult {
+  runtimeArtifacts: string[];
+  docsProjections: string[];
+}
+
+export function executeFirst(projectRoot: string): ExecuteFirstResult {
+  if (hasHealthyRuntimeTruth(projectRoot)) {
+    const result = refreshFirstArtifacts(projectRoot, 'refresh-all');
+    return {
+      runtimeArtifacts: result.runtimeArtifacts,
+      docsProjections: result.docsProjections,
+    };
+  }
+
+  throw new Error('No healthy runtime truth found. Use bootstrap instead.');
 }
 
 export function detectBackgroundInputStatus(projectRoot: string): BackgroundInputStatus {

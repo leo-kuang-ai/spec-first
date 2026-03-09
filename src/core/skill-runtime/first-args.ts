@@ -218,3 +218,14 @@ export function resolveFirstConfirmPolicy(args: FirstArgs): 'skip' | 'require' {
 export function resolveFirstModePolicy(args: FirstArgs): 'auto' | 'manual' {
   return args.auto ? 'auto' : 'manual';
 }
+
+/**
+ * 判断 first 命令是否需要确认（供 CLI 路由层使用）
+ */
+export function shouldConfirmFirst(args: string[]): boolean {
+  try {
+    return resolveFirstConfirmPolicy(validateFirstArgs(args)) === 'require';
+  } catch {
+    return false;
+  }
+}

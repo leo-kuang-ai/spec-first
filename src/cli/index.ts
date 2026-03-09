@@ -29,7 +29,7 @@ import { handleDone } from './commands/done.js';
 import { handleOrchestrate } from './commands/orchestrate.js';
 import { handleFirst } from './commands/first.js';
 import { handleBatchTest } from './commands/batch-test.js';
-import { resolveFirstConfirmPolicy, validateFirstArgs } from '../core/skill-runtime/first-args.js';
+import { shouldConfirmFirst } from '../core/skill-runtime/first-args.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
 registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
@@ -83,13 +83,7 @@ registerCommand('trace', '追溯链修复与校验', handleTrace, {
 });
 registerCommand('validate', '产物格式校验', handleValidate);
 registerCommand('first', '项目首轮认知 runtime/docs 刷新', handleFirst, {
-  requiresConfirmation: (args) => {
-    try {
-      return resolveFirstConfirmPolicy(validateFirstArgs(args)) === 'require';
-    } catch {
-      return false;
-    }
-  },
+  requiresConfirmation: shouldConfirmFirst,
 });
 registerCommand('batch-test', '批量执行测试（临时命令）', handleBatchTest);
 

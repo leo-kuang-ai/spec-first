@@ -1,28 +1,12 @@
 import { ExitCode } from '../../shared/types.js';
 import { formatHealthStatus, checkFirstUpdateContext } from '../../core/skill-runtime/first-change-detector.js';
 import { bootstrapFirstRuntime } from '../../core/skill-runtime/first-bootstrap.js';
-import { refreshFirstArtifacts } from '../../core/skill-runtime/first-context.js';
+import { executeFirst } from '../../core/skill-runtime/first-context.js';
 import { FirstArgsError, validateFirstArgs } from '../../core/skill-runtime/first-args.js';
 import { formatProductSummary } from '../../core/skill-runtime/first-resume.js';
 import {
-  readFirstRoleViews,
   readFirstRuntimeIndex,
-  readFirstRuntimeSummary,
-  readFirstStageViews,
 } from '../../core/skill-runtime/first-runtime-store.js';
-
-function hasHealthyRuntimeTruth(projectRoot: string): boolean {
-  const index = readFirstRuntimeIndex(projectRoot);
-  if (!index?.summary.healthy || !index.roleViews.healthy || !index.stageViews.healthy) {
-    return false;
-  }
-
-  return Boolean(
-    readFirstRuntimeSummary(projectRoot)
-    && readFirstRoleViews(projectRoot)
-    && readFirstStageViews(projectRoot),
-  );
-}
 
 function printFirstHelp(): void {
   console.log('用法：spec-first first [--quick|--deep] [--type=<value>] [--force] [--skip] [--check-health]');
@@ -46,13 +30,17 @@ function handleCheckHealth(projectRoot: string): number {
 }
 
 function handleSkip(projectRoot: string): number {
-  if (!hasHealthyRuntimeTruth(projectRoot)) {
-    console.error('未找到可复用的 first runtime 真源，无法执行 --skip。');
+  try {
+    const result = executeFirst(projectRoot);
+    if (result.docsProjections.length > 0) {
+      console.log(`✓ 已从 runtime 恢复 docs 投影 (${result.docsProjections.length} 项)`);
+    }
+    console.log(formatProductSummary(projectRoot));
+    return ExitCode.SUCCESS;
+  } catch (error) {
+    console.error(`--skip 执行失败：${error instanceof Error ? error.message : String(error)}`);
     return ExitCode.VALIDATION_ERROR;
   }
-
-  console.log(formatProductSummary(projectRoot));
-  return ExitCode.SUCCESS;
 }
 
 export function handleFirst(args: string[]): number {
@@ -84,10 +72,10 @@ export function handleFirst(args: string[]): number {
   }
 
   try {
-    if (hasHealthyRuntimeTruth(projectRoot)) {
-      const runtimeRefresh = refreshFirstArtifacts(projectRoot, 'refresh-all');
-      const docsRefresh = refreshFirstArtifacts(projectRoot, 'refresh-docs-from-runtime');
-      console.log(`✓ 已刷新 first runtime (${runtimeRefresh.runtimeArtifacts.length} 项) 与 docs 投影 (${docsRefresh.docsProjections.length} 项)`);
+    const index = readFirstRuntimeIndex(projectRoot);
+    if (index?.summary.healthy && index.roleViews.healthy && index.stageViews.healthy) {
+      const result = executeFirst(projectRoot);
+      console.log(`✓ 已刷新 first runtime (${result.runtimeArtifacts.length} 项) 与 docs 投影 (${result.docsProjections.length} 项)`);
     } else {
       const bootstrap = bootstrapFirstRuntime(projectRoot, {
         mode: firstArgs.mode,

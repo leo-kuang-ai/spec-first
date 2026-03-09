@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { registerCommand, dispatch } from '../../src/cli/router.js';
+import { shouldConfirmFirst } from '../../src/core/skill-runtime/first-args.js';
 
 describe('CLI Router', () => {
   it('should return SUCCESS for --help', async () => {
@@ -67,5 +68,40 @@ describe('CLI Router', () => {
     });
     const code = await dispatch(['fail-cmd']);
     expect(code).toBe(5);
+  });
+
+  describe('first command confirmation policy', () => {
+    it('should require confirmation by default (no flags)', async () => {
+      const handler = vi.fn(() => 0);
+      registerCommand('first-test-1', 'Test first', handler, {
+        requiresConfirmation: shouldConfirmFirst,
+      });
+
+      const code = await dispatch(['first-test-1']);
+      expect(code).toBe(2);
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it('should skip confirmation with --quick', async () => {
+      const handler = vi.fn(() => 0);
+      registerCommand('first-test-2', 'Test first', handler, {
+        requiresConfirmation: shouldConfirmFirst,
+      });
+
+      const code = await dispatch(['first-test-2', '--quick']);
+      expect(code).toBe(0);
+      expect(handler).toHaveBeenCalledWith(['--quick']);
+    });
+
+    it('should skip confirmation with --force', async () => {
+      const handler = vi.fn(() => 0);
+      registerCommand('first-test-3', 'Test first', handler, {
+        requiresConfirmation: shouldConfirmFirst,
+      });
+
+      const code = await dispatch(['first-test-3', '--force']);
+      expect(code).toBe(0);
+      expect(handler).toHaveBeenCalledWith(['--force']);
+    });
   });
 });
