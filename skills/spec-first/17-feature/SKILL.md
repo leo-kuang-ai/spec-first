@@ -1,20 +1,25 @@
 ---
 name: "spec-first:feature"
 description: "Feature 查询/切换命令族"
-version: 1.3.0
+version: 1.4.0
 last_updated: {{DATE}}
 ---
 
 # Skill: feature
 
-**直接执行 CLI，无需读完本文件**
+**用户输入格式**：
+- `/spec-first:feature list`
+- `/spec-first:feature current`
+- `/spec-first:feature switch <featureId>`
 
-```bash
-# 从用户输入提取子命令并执行
-list    → spec-first feature list
-current → spec-first feature current
-switch <id> → spec-first feature switch <id> --yes
-```
+**执行逻辑**：
+1. 检查用户输入中的子命令（list/current/switch）
+2. 执行对应的 CLI 命令：
+   - `list` → `spec-first feature list`
+   - `current` → `spec-first feature current`
+   - `switch <id>` → `spec-first feature switch <id> --yes`
+
+**注意**：switch 自动添加 `--yes`
 
 ## 子命令
 
