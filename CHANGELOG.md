@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.57 2026-03-09 Claude: feat(feature): 优化无参数调用 - 自动显示当前 Feature、列表和命令帮助
 - v0.5.56 2026-03-09 Claude: fix(postinstall): 自动添加 --yes 确保 update 命令执行成功
 - v0.5.55 2026-03-09 Claude: feat(feature): 使用 argument-hint 实现参数传递 - 支持 /spec-first:feature list/current/switch
 - v0.5.54 2026-03-09 Claude: docs(feature): 优化 feature skill - 支持带参数调用、自动添加 --yes

@@ -3,7 +3,7 @@
       --panel: #121b2e;
       --panel-2: #17233c;
       --text: #e6edf7;
-      --muted: #8ea1c2;
+      --muted: #9babc9;
       --accent: #4ea1ff;
       --ok: #2ec27e;
       --warn: #f5c451;
@@ -43,8 +43,8 @@
     }
     .main > #detail > section,
     .main > #detail > .row { margin-bottom: 20px; }
-    h1 { margin: 0 0 8px; font-size: 18px; }
-    h2 { margin: 16px 0 12px; font-size: 15px; border-left: 3px solid var(--accent); padding-left: 12px; }
+    h1 { margin: 0 0 8px; font-size: 20px; }
+    h2 { margin: 16px 0 12px; font-size: 16px; border-left: 3px solid var(--accent); padding-left: 12px; }
     .muted { color: var(--muted); font-size: 12px; }
     .input {
       width: 100%;

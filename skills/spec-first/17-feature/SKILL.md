@@ -24,7 +24,7 @@ $IF($1,
       )
     )
   ),
-  ERROR: 缺少子命令。用法: /spec-first:feature [list|current|switch] [featureId]
+  !`spec-first feature current && echo "" && spec-first feature list && echo "" && echo "可用命令：" && echo "  /spec-first:feature list      - 列出所有 Feature" && echo "  /spec-first:feature current   - 查看当前 Feature" && echo "  /spec-first:feature switch <id> - 切换 Feature"`
 )
 
 ## 子命令
