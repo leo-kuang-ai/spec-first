@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.47 2026-03-09 Claude: docs(npm): 添加 npm 发布指引文档 (user-visible)
 - v0.5.129 2026-03-09 Claude: feat(spec-review): 添加运行时背景注入 — dispatcher 自动注入 backgroundInputStatus 和 specViewSummary (user-visible)
 - v0.5.128 2026-03-08 Claude: feat(verify): 添加 verify-view runtime notice 自动注入 — dispatcher 自动注入 verify-view 摘要、背景状态和 pre-release-verification 风险分类
 - v0.5.127 2026-03-08 Claude: feat(plan): 添加背景输入和依赖强度注入 — dispatcher 自动注入 backgroundInputStatus、dependencyStrength、riskCategory 和 riskSignals，复用 orchestrate 背景治理口径

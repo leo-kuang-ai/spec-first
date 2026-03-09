@@ -50,6 +50,8 @@
 - `prompt-assembler` 存在前缀稳定性要求
 - `context-pack` 存在 2KB control zone 约束
 - `traceability-matrix.md` 当前只维护 ID 追踪关系，不维护文件清单
+- `06-task` / `task_plan.md` 已存在 TASK 级“文件清单”，可作为变更范围参考，但不是 runtime 强制 allowlist
+- `07-code` 已要求关注 `entryPoints`、`likelyChangeAreas`、`changeHazards` 作为范围信号
 
 ### 2.4 测试联动优先于文档扩张
 
@@ -115,6 +117,7 @@
 
 - 边界守卫最适合在“写入前确认”阶段再次显性化
 - 可以直接把“是否超出范围”纳入 diff review
+- 可与现有 TASK 文件清单及 `code-view` 的范围信号对齐
 - 不需要新增新的阶段或命令
 
 ### 4.4 计划新增内容
@@ -149,6 +152,7 @@
 核心原则：只修改当前 TASK 直接需要改动的代码，不做顺手优化。
 
 提交前必须自检：
+- 本次修改是否与当前 TASK 的文件清单、`entryPoints` / `likelyChangeAreas` / `changeHazards` 大体一致？
 - diff 中每个文件是否都能追溯到当前 TASK / FR / DS？
 - 是否出现了与本次交付无关的重命名、重构、格式统一？
 - 是否删除了与本次改动无关的历史遗留代码？
@@ -179,6 +183,7 @@
 
 - 不新增基于文件列表的“TASK 允许修改文件集”规则
 - 不要求从 `traceability-matrix.md` 推导文件清单
+- 不把现有 TASK 文件清单或 `code-view` 范围信号升级为 runtime 强制 allowlist
 - 不新增 `tech-debt.md`
 - 不引入大量示例代码块
 - 不改 hooks / front matter / runtime notice
@@ -372,8 +377,10 @@ Stage 2 的发现必须分为以下三类：
 
 ### 9.1 定向测试
 
+使用 `pnpm exec vitest run`，避免 `pnpm test -- ...` 被当前脚本解析为全量回归。
+
 ```bash
-pnpm test -- tests/unit/code-skill-docs.test.ts tests/unit/phase1-enhancement-docs.test.ts tests/unit/spec-skill-docs.test.ts tests/unit/skill-catalog.test.ts tests/unit/doc-governance-cleanup.test.ts
+pnpm exec vitest run tests/unit/code-skill-docs.test.ts tests/unit/phase1-enhancement-docs.test.ts tests/unit/spec-skill-docs.test.ts tests/unit/skill-catalog.test.ts tests/unit/doc-governance-cleanup.test.ts
 ```
 
 ### 9.2 全量回归
@@ -447,7 +454,7 @@ git revert <commit_sha>
 ### 12.3 回滚后验证
 
 ```bash
-pnpm test -- tests/unit/code-skill-docs.test.ts tests/unit/phase1-enhancement-docs.test.ts tests/unit/spec-skill-docs.test.ts tests/unit/skill-catalog.test.ts
+pnpm exec vitest run tests/unit/code-skill-docs.test.ts tests/unit/phase1-enhancement-docs.test.ts tests/unit/spec-skill-docs.test.ts tests/unit/skill-catalog.test.ts tests/unit/doc-governance-cleanup.test.ts
 ```
 
 ---

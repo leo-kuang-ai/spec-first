@@ -186,6 +186,7 @@ digraph design_flow {
 - 所有 DS 已通过 `id next DS` 注册
 - `traceability-matrix.md` 已更新，每个 FR 有对应 DS 引用
 - `metrics coverage` C1 (Design Coverage) > 0%
+- 无与当前交付无关的投机性架构层
 
 **格式校验（P4 落盘后自动执行）**:
 ```bash
