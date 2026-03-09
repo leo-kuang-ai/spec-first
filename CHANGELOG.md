@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.62 2026-03-10 Claude: refactor(init): Skill 优化 - 修复 description 触发条件、清理 frontmatter、精简 SKILL.md、增强交互示例 (user-visible)
+- v0.5.61 2026-03-10 Claude: refactor(first): 收口型优化 F1/F2/F3/F7 - 命令层瘦身，业务编排下沉到 executeFirst()，确认策略抽取为 shouldConfirmFirst() helper，refresh-all 自动检测并恢复不健康的 docs 投影，补充 router 级确认策略测试
 - v0.5.60 2026-03-10 Claude: fix(init): 移除 --yes 确认要求 - init 命令直接执行，无需额外确认 (user-visible)
 - v0.6.2 2026-03-10 Claude: feat(init): 增强 feat 参数交互 - 支持中文输入自动生成英文缩写候选项，保持逐步引导流程 (user-visible)
 - v0.6.1 2026-03-10 Claude: docs(init): 删除断点续传描述 - 与代码实现保持一致，默认创建新 Feature
