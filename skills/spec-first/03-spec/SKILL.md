@@ -62,7 +62,7 @@ I'm using the spec skill to define requirements for [Feature].
 |--------|---------|
 | Trivial | Phase 0 + Step 0 + Step 2 + Step 8 |
 | Simple | Phase 0 + Step 0 + Step 2-3 + Step 6 + Step 8 |
-| Moderate | Phase 0 + Step 0 + Step 2-6 + Step 8 |
+| Moderate | Phase 0 + Step 0 + Step 2-6 + Step 8（可选 Step 7） |
 | Complex | Phase 0 + Step 0 + Step 2-8 |
 
 **注**: Step 1 已合并到 Phase 0.2，所有路径都不再单独执行 Step 1。
