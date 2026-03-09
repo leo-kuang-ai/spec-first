@@ -8,6 +8,8 @@ last_updated: {{DATE}}
 
 # Skill: feature
 
+- Command: `/spec-first:feature [list|current|switch] [featureId]`
+
 $IF($1,
   $IF($1 == "list",
     !`spec-first feature list`,
