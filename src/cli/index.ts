@@ -34,7 +34,7 @@ registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
 registerCommand('init', '初始化 Feature 工作区', handleInit, {
   requiresConfirmation: true,
 });
-registerCommand('stage', '阶段流转管理（current/advance/cancel）', handleStage, {
+registerCommand('stage', '阶段流转管理（current/suggest/advance/cancel）', handleStage, {
   requiresConfirmation: (args) => args[0] === 'advance' || args[0] === 'cancel',
 });
 registerCommand('rfc', 'RFC 变更请求与状态管理', handleRfc, {

@@ -174,9 +174,10 @@ function getDefectStats(projectRoot, featureId) {
     if (defect.severity && stats[defect.severity] !== undefined) {
       stats[defect.severity] += 1;
     }
-    if (defect.status === 'open') stats.open += 1;
-    else if (defect.status === 'fixing') stats.fixing += 1;
-    else if (defect.status === 'fixed' || defect.status === 'verified') stats.fixed += 1;
+    const status = defect.status?.toLowerCase().trim();
+    if (status === 'open') stats.open += 1;
+    else if (status === 'fixing') stats.fixing += 1;
+    else if (status === 'fixed' || status === 'verified') stats.fixed += 1;
   }
 
   return stats;
@@ -414,7 +415,7 @@ function parseTaskPlan(projectRoot, featureId) {
 
     // 提取阶段状态
     const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
-    const phaseStatus = statusMatch ? statusMatch[1] : 'pending';
+    const phaseStatus = statusMatch ? normalizeTaskStatus(statusMatch[1]) : 'pending';
 
     // 提取阶段内的任务
     const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(.+)/g;
@@ -446,14 +447,14 @@ function parseTaskPlan(projectRoot, featureId) {
     const rows = tableMatch[1].trim().split('\n').filter(row => row.includes('TASK-'));
     for (const row of rows) {
       const cols = row.split('|').map(c => c.trim()).filter(c => c);
-      if (cols.length >= 8) {
+      if (cols.length >= 7) {
         const taskId = cols[0];
         const title = cols[1];
-        const owner = cols[2];
-        const effort = cols[3];
-        const traces = cols[4];
-        const dependsOn = cols[5];
-        const acceptance = cols[6];
+        const owner = cols[2] || '-';
+        const effort = cols[3] || '-';
+        const traces = cols[4] || '';
+        const dependsOn = cols[5] || '-';
+        const acceptance = cols[6] || '-';
         const status = cols[7] || 'pending';
 
         tasks.push({
@@ -497,7 +498,8 @@ function parseTaskPlan(projectRoot, featureId) {
 function normalizeTaskStatus(status) {
   const s = status.toLowerCase().trim();
   if (s === 'complete' || s === 'completed' || s === 'done') return 'complete';
-  if (s === 'in_progress' || s === 'in-progress' || s === 'in progress' || s === 'wip') return 'in_progress';
+  if (s === 'in_progress' || s === 'in-progress' || s === 'in progress' || s === 'wip' || s === 'doing') return 'in_progress';
+  if (s === 'blocked' || s === 'skipped' || s === 'cancelled') return 'pending';
   return 'pending';
 }
 

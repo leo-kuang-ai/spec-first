@@ -40,6 +40,17 @@ describe('normalizeTaskStatus', () => {
     expect(normalizeTaskStatus(' In_Progress ')).toBe('in_progress');
   });
 
+  it('should normalize doing to in_progress', () => {
+    expect(normalizeTaskStatus('doing')).toBe('in_progress');
+    expect(normalizeTaskStatus('DOING')).toBe('in_progress');
+  });
+
+  it('should normalize blocked/skipped/cancelled to pending', () => {
+    expect(normalizeTaskStatus('blocked')).toBe('pending');
+    expect(normalizeTaskStatus('skipped')).toBe('pending');
+    expect(normalizeTaskStatus('cancelled')).toBe('pending');
+  });
+
   it('should default to pending for unknown status', () => {
     expect(normalizeTaskStatus('pending')).toBe('pending');
     expect(normalizeTaskStatus('todo')).toBe('pending');
@@ -175,6 +186,22 @@ No tasks defined yet.
     expect(result!.phases).toHaveLength(0);
     expect(result!.stats.total).toBe(0);
     expect(result!.stats.progress).toBe(0);
+  });
+
+  it('should parse table with 7 columns (missing status)', () => {
+    const taskPlan = `---
+featureId: ${FEAT}
+---
+
+| TASK ID | Title | Owner | Effort | Traces | Depends | Acceptance |
+|---|---|---|---|---|---|---|
+| TASK-TEST-001 | Task One | FE | 1d | FR-001 | - | AC1 |
+`;
+    writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), taskPlan, 'utf-8');
+
+    const result = parseTaskPlan(TMP, FEAT);
+    expect(result!.tasks).toHaveLength(1);
+    expect(result!.tasks[0].status).toBe('pending');
   });
 });
 
