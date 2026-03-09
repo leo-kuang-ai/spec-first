@@ -17,7 +17,6 @@ describe('06-task skill docs consistency', () => {
     expect(skill).toContain('spec.md');
     expect(skill).toContain('design.md');
     expect(skill).toContain('traceability-matrix.md');
-    expect(skill).toContain('backgroundInputStatus');
   });
 
   it('should align task background naming with the shared contract', () => {

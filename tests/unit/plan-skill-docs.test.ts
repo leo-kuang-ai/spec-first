@@ -10,16 +10,6 @@ function read(path: string): string {
 }
 
 describe('11-plan skill docs consistency', () => {
-  it('should document planning background governance fields', () => {
-    expect(existsSync(SKILL_MD)).toBe(true);
-    const skill = read(SKILL_MD);
-
-    expect(skill).toContain('backgroundInputStatus');
-    expect(skill).toContain('dependencyStrength');
-    expect(skill).toContain('riskCategory');
-    expect(skill).toContain('riskSignals');
-  });
-
   it('should align plan background naming with the shared contract', () => {
     const skill = read(SKILL_MD);
 

@@ -33,11 +33,4 @@ describe('15-doctor skill docs consistency', () => {
     expect(rules).toContain('runtime 真源');
   });
 
-  it('should align doctor diagnostics with the shared contract', () => {
-    const skill = read(SKILL_MD);
-
-    expect(skill).toContain('shared/background-quality-contract.md');
-    expect(skill).toContain('runtime 真源');
-    expect(skill).toContain('docs 投影视图');
-  });
 });

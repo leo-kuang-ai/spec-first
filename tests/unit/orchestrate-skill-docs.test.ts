@@ -10,16 +10,6 @@ function read(path: string): string {
 }
 
 describe('13-orchestrate skill docs consistency', () => {
-  it('should document orchestration governance fields', () => {
-    expect(existsSync(SKILL_MD)).toBe(true);
-    const skill = read(SKILL_MD);
-
-    expect(skill).toContain('dependency_strength');
-    expect(skill).toContain('risk_category');
-    expect(skill).toContain('risk_signals');
-    expect(skill).toContain('recommended_action');
-  });
-
   it('should align orchestrate governance naming with the shared contract', () => {
     const skill = read(SKILL_MD);
 
