@@ -1,7 +1,7 @@
 ---
 name: "spec-first:feature"
 description: "Feature 查询/切换命令族"
-version: 1.0.0
+version: 1.1.0
 last_updated: {{DATE}}
 ---
 
@@ -9,28 +9,17 @@ last_updated: {{DATE}}
 
 Feature 管理命令族，支持列表查询、查看当前、切换 Feature。
 
-## 强制约束（必读）
+## 快速执行（推荐）
 
-**禁止读取本文件** - 你已经在读这个文件了，不要再读一遍
-**直接执行 CLI** - 立即执行 `spec-first feature <subcommand>`，无需任何准备
+这是一个简单的 CLI 透传命令，直接执行即可：
 
-## 触发条件
-- Command: `/spec-first:feature <subcommand>`
-- 子命令：`list` | `current` | `switch <featureId>`
-
-## 执行流程
-
-**立即执行**：
 ```bash
-spec-first feature list
-spec-first feature current
-spec-first feature switch <featureId> --yes
+spec-first feature list                      # 列出所有 Feature
+spec-first feature current                   # 查看当前 Feature
+spec-first feature switch <featureId> --yes  # 切换 Feature
 ```
 
-**禁止**：
-- ❌ 读取 Skill 文件（你正在读的这个）
-- ❌ 使用 `spec-first ai feature`（错误格式）
-- ❌ 使用 `npm run cli`（不存在）
+**提示**：无需读取本文件内容，上面的命令就是全部用法。
 
 ## 子命令
 
