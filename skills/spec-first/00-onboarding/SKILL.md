@@ -1,8 +1,11 @@
 ---
 name: onboarding
 description: 新手引导 - 交互式场景识别与学习路径推荐
-version: 1.0.0
+version: 1.1.0
 user-invocable: true
+changelog: |
+  1.1.0: 补充场景匹配算法、role-views 使用策略、完整错误处理矩阵
+  1.0.0: 初始版本 - 3 问题交互式引导、场景推荐、学习路径保存
 ---
 
 # 00-onboarding — 新手引导
@@ -30,14 +33,31 @@ user-invocable: true
 
 ### Phase 0.5: 背景输入检查
 
-- 优先读取 `.spec-first/runtime/first/role-views.json`（role-views 优先）
-- 若存在 role-views，则按角色给出更贴近产品 / 开发 / 测试 / 架构的入口建议
-- 若无 first 资产，则进入 `degraded` onboarding：仍可继续推荐通用路径，但必须显式告知”无 first 资产”与”当前为降级模式”
-- onboarding 只负责入口裁剪，不生成 runtime 真源
+**role-views 数据使用策略**：
 
-**数据来源标注规则**：
-- 正常模式：`📊 数据来源：基于项目分析（role-views）`
-- 降级模式：`⚠️ 数据来源：通用推荐（无 first 资产，建议先运行 /spec-first:first）`
+1. **检测 role-views**：
+   - 读取 `.spec-first/runtime/first/role-views.json`
+   - 检查文件是否存在且格式正确
+
+2. **正常模式**（存在 role-views）：
+   - 根据用户角色调整推荐内容：
+     - **开发者**：突出 `codebase-overview.md`、`architecture.md`、开发入口
+     - **产品经理**：突出 `domain-model.md`、`api-docs.md`、业务流程
+     - **测试工程师**：突出 `api-docs.md`、测试策略、验收标准
+     - **架构师**：突出 `architecture.md`、`call-graph.md`、技术决策
+   - 在推荐路径中插入”建议先阅读”提示
+   - 标注：`📊 数据来源：基于项目分析（role-views）`
+
+3. **降级模式**（无 role-views）：
+   - 使用通用推荐路径
+   - 第一步强制推荐：`/spec-first:first`
+   - 标注：`⚠️ 数据来源：通用推荐（无 first 资产，建议先运行 /spec-first:first）`
+
+4. **错误处理**：
+   - role-views.json 格式错误 → 降级模式 + 警告
+   - 文件读取失败 → 降级模式
+
+**注意**：onboarding 只负责入口裁剪，不生成 runtime 真源
 
 ### Phase 1: 场景识别（交互式）
 
@@ -76,9 +96,16 @@ user-invocable: true
 - 格式：`{role}_{task}_{size}`
 - 示例：`developer_new_feature_small`
 
+**场景匹配算法**：
+1. **精确匹配**：`{role}_{task}_{size}` 完全匹配（如 `developer_new_feature_small`）
+2. **部分通配**：`{role}_{task}_*` 匹配任意规模（如 `developer_fix_bug_*`）
+3. **任务通配**：`*_{task}_*` 匹配任意角色（如 `*_learn_*`）
+4. **默认场景**：无匹配时使用 `default`
+
 **查询映射表**：
 - 读取 `references/scenario-mapping.md`
-- 匹配对应场景的推荐路径
+- 按优先级顺序匹配场景
+- 返回第一个匹配的推荐路径
 
 **输出格式**：
 ```
@@ -227,6 +254,31 @@ user-invocable: true
 
 ## 错误处理
 
-- 用户跳过问题 → 使用默认场景（开发者 + 新功能 + 小型）
-- 无匹配场景 → 推荐通用路径（first → init → spec）
-- 无 first 资产 → 明确提示当前为 `degraded` onboarding，并建议优先补跑 `/spec-first:first`
+### 错误处理矩阵
+
+| 错误场景 | 处理策略 | 用户提示 |
+|---------|---------|---------|
+| role-views.json 不存在 | 降级模式 | ⚠️ 无 first 资产，建议先运行 /spec-first:first |
+| role-views.json 格式错误 | 降级模式 + 警告 | ⚠️ role-views 数据异常，使用通用推荐 |
+| 无匹配场景 | 使用 default | ℹ️ 使用通用学习路径 |
+| 文档保存失败 | 仅输出到终端 | ⚠️ 无法保存文档，请手动记录 |
+| 用户跳过所有问题 | 使用默认配置 | ℹ️ 使用默认配置：开发者 + 新功能 + 小型 |
+| docs/onboarding/ 目录不存在 | 自动创建 | - |
+| 文件写入权限错误 | 降级到终端输出 | ⚠️ 无写入权限，路径已输出到终端 |
+
+### 降级策略
+
+1. **role-views 降级**：
+   - 检测失败 → 使用通用路径
+   - 格式错误 → 记录警告 + 通用路径
+   - 读取超时 → 跳过 role-views
+
+2. **文档保存降级**：
+   - 目录创建失败 → 终端输出
+   - 文件写入失败 → 终端输出
+   - 权限错误 → 终端输出 + 提示
+
+3. **场景匹配降级**：
+   - 无精确匹配 → 尝试通配匹配
+   - 无通配匹配 → 使用 default
+   - default 缺失 → 使用内置最小路径
