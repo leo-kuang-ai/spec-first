@@ -905,10 +905,10 @@ spec-first matrix check FSREQ-20260306-AUTH-001
 /spec-first:code
 
 # 代码审查
-/spec-first:code-review
+/spec-first:review
 
 # 测试验证
-/spec-first:test
+/spec-first:verify
 
 # 归档复盘
 /spec-first:archive
@@ -1703,7 +1703,7 @@ spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>]
 ```text
 spec-first/
 ├── src/
-│   ├── cli/                  # CLI (21 命令)
+│   ├── cli/                  # CLI (22 命令组)
 │   │   ├── index.ts          # CLI 入口
 │   │   └── commands/         # 各命令实现
 │   ├── core/                 # 核心模块 (12 目录)
