@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.54 2026-03-09 Claude: docs(feature): 优化 feature skill - 支持带参数调用、自动添加 --yes
 - v0.5.53 2026-03-09 Claude: docs(spec): 优化 spec skill 执行指导 - 补充 ID 类型、状态值和 CLI 硬约束
 - v0.5.52 2026-03-09 Claude: fix(hooks): 恢复 stop-guard.sh 正确版本 - 仅在 04_implement 阶段检查 in_progress 任务
 - v0.5.51 2026-03-09 Claude: fix(hooks): 修复 stop-guard.sh 死循环问题 - 改为 exit 0 避免 AI 误判，添加 awk 错误保护

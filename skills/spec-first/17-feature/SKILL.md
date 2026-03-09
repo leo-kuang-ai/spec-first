@@ -9,6 +9,11 @@ last_updated: {{DATE}}
 
 Feature 管理命令族，支持列表查询、查看当前、切换 Feature。
 
+## 触发条件
+
+- Command: `/spec-first:feature <subcommand>`
+- 子命令：`list` | `current` | `switch <featureId>`
+
 ## 用法
 
 ```
