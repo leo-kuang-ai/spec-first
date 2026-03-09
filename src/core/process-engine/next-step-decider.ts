@@ -1,8 +1,40 @@
 import { Stage } from '../../shared/types.js';
 import type { AutoAdvancePolicy, GateStatus, StageStatus } from '../../shared/types.js';
 import type { TodoRunnerState } from '../ai-orchestrator/todo-runner.js';
+import type { AutoLoopStatus } from '../ai-orchestrator/auto-loop.js';
 import type { DependencyCheckResult } from './dependency-checker.js';
 import { describeDependencyIssues } from './dependency-checker.js';
+
+/**
+ * 决策阻塞原因码
+ *
+ * 用途：
+ * - 测试断言：提供稳定的错误码，避免依赖中文字符串
+ * - 脚本集成：可编程化判断阻塞原因
+ * - 审计日志：结构化记录决策过程
+ *
+ * @example
+ * ```typescript
+ * const decision = decideNextStep({ ... });
+ * if (decision.reasonCodes.includes(ReasonCode.GATE_FAILED)) {
+ *   // 处理 Gate 失败场景
+ * }
+ * ```
+ */
+export const ReasonCode = {
+  NO_NEXT_STAGE: 'NO_NEXT_STAGE',
+  AUTO_LOOP_HAS_BLOCKED: 'AUTO_LOOP_HAS_BLOCKED',
+  AUTO_LOOP_TIMEOUT: 'AUTO_LOOP_TIMEOUT',
+  AUTO_LOOP_NO_STATE_FILE: 'AUTO_LOOP_NO_STATE_FILE',
+  AUTO_LOOP_MAX_ITERATIONS: 'AUTO_LOOP_MAX_ITERATIONS',
+  AUTO_LOOP_INCOMPLETE: 'AUTO_LOOP_INCOMPLETE',
+  DEPENDENCY_FAILED: 'DEPENDENCY_FAILED',
+  GATE_FAILED: 'GATE_FAILED',
+  TODO_BLOCKED: 'TODO_BLOCKED',
+  TODO_PENDING: 'TODO_PENDING',
+} as const;
+
+export type ReasonCodeValue = typeof ReasonCode[keyof typeof ReasonCode];
 
 export type NextStepDecisionType =
   | 'BLOCKED'
@@ -21,6 +53,7 @@ export interface NextStepDecisionInput {
   gateStatus?: DeciderGateStatus;
   dependencyCheck?: DependencyCheckResult;
   todoState?: Pick<TodoRunnerState, 'halted' | 'haltReason' | 'items'>;
+  autoLoopStatus?: AutoLoopStatus;
 }
 
 export interface NextStepDecision {
@@ -29,6 +62,7 @@ export interface NextStepDecision {
   nextStage?: Stage;
   suggestedCommand?: string;
   reasons: string[];
+  reasonCodes: ReasonCodeValue[];
 }
 
 export interface TodoProgress {
@@ -57,6 +91,14 @@ const SUGGESTED_SKILL_COMMANDS: Partial<Record<Stage, string>> = {
   [Stage.IMPLEMENT]: '/spec-first:verify',
 };
 
+const AUTO_LOOP_STATUS_TO_REASON_CODE: Record<Exclude<AutoLoopStatus, 'all_done'>, ReasonCodeValue> = {
+  has_blocked: ReasonCode.AUTO_LOOP_HAS_BLOCKED,
+  timeout: ReasonCode.AUTO_LOOP_TIMEOUT,
+  no_state_file: ReasonCode.AUTO_LOOP_NO_STATE_FILE,
+  max_iterations: ReasonCode.AUTO_LOOP_MAX_ITERATIONS,
+  incomplete: ReasonCode.AUTO_LOOP_INCOMPLETE,
+};
+
 export function getNextStage(currentStage: Stage): Stage | undefined {
   const index = STAGE_ORDER.indexOf(currentStage);
   if (index === -1 || index >= STAGE_ORDER.length - 1) return undefined;
@@ -68,7 +110,7 @@ export function summarizeTodoProgress(
 ): TodoProgress {
   if (!todoState) {
     return {
-      allDone: true,
+      allDone: false,
       hasBlocked: false,
       pendingCount: 0,
       blockedCount: 0,
@@ -93,6 +135,17 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
       decision: 'BLOCKED',
       currentStage: input.currentStage,
       reasons: [`阶段 ${input.currentStage} 之后不存在下一阶段`],
+      reasonCodes: [ReasonCode.NO_NEXT_STAGE],
+    };
+  }
+
+  if (input.autoLoopStatus && input.autoLoopStatus !== 'all_done') {
+    return {
+      decision: 'BLOCKED',
+      currentStage: input.currentStage,
+      nextStage,
+      reasons: [`auto-loop 未完成: ${input.autoLoopStatus}`],
+      reasonCodes: [AUTO_LOOP_STATUS_TO_REASON_CODE[input.autoLoopStatus]],
     };
   }
 
@@ -103,21 +156,26 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
       nextStage,
       suggestedCommand: SUGGESTED_SKILL_COMMANDS[input.currentStage],
       reasons: [],
+      reasonCodes: [],
     };
   }
 
   const reasons: string[] = [];
+  const reasonCodes: ReasonCodeValue[] = [];
   if (input.dependencyCheck && !input.dependencyCheck.pass) {
     reasons.push(...describeDependencyIssues(input.dependencyCheck));
+    reasonCodes.push(ReasonCode.DEPENDENCY_FAILED);
   }
 
   if (input.gateStatus && input.gateStatus !== 'PASS' && input.gateStatus !== 'PILOT_PASS') {
     reasons.push('Gate 未通过，需先修复失败条件后再推进阶段');
+    reasonCodes.push(ReasonCode.GATE_FAILED);
   }
 
   const todoProgress = summarizeTodoProgress(input.todoState);
   if (todoProgress.hasBlocked) {
     reasons.push('存在 blocked todo，需先清除阻塞后再推进阶段');
+    reasonCodes.push(ReasonCode.TODO_BLOCKED);
   }
 
   if (reasons.length > 0) {
@@ -126,6 +184,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
       currentStage: input.currentStage,
       nextStage,
       reasons,
+      reasonCodes,
     };
   }
 
@@ -136,6 +195,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
       nextStage,
       suggestedCommand: buildAdvanceCommand(input.featureId),
       reasons: [],
+      reasonCodes: [],
     };
   }
 
@@ -146,6 +206,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
       nextStage,
       suggestedCommand: buildAdvanceCommand(input.featureId),
       reasons: [],
+      reasonCodes: [],
     };
   }
 
@@ -157,6 +218,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
         nextStage,
         suggestedCommand: buildAdvanceCommand(input.featureId),
         reasons: [],
+        reasonCodes: [],
       };
     }
 
@@ -167,6 +229,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
         nextStage,
         suggestedCommand: SUGGESTED_SKILL_COMMANDS[input.currentStage],
         reasons: [],
+        reasonCodes: [ReasonCode.TODO_PENDING],
       };
     }
 
@@ -176,6 +239,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
       nextStage,
       suggestedCommand: buildAdvanceCommand(input.featureId),
       reasons: [],
+      reasonCodes: [],
     };
   }
 
@@ -187,16 +251,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
         nextStage,
         suggestedCommand: '/spec-first:code',
         reasons: [],
-      };
-    }
-
-    if (input.autoAdvancePolicy === 'auto_run') {
-      return {
-        decision: 'AUTO_RUN_NEXT_SKILL',
-        currentStage: input.currentStage,
-        nextStage,
-        suggestedCommand: '/spec-first:verify',
-        reasons: [],
+        reasonCodes: [ReasonCode.TODO_PENDING],
       };
     }
 
@@ -207,6 +262,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
         nextStage,
         suggestedCommand: buildAdvanceCommand(input.featureId),
         reasons: [],
+        reasonCodes: [],
       };
     }
   }
@@ -217,6 +273,7 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
     nextStage,
     suggestedCommand: buildAdvanceCommand(input.featureId),
     reasons: [],
+    reasonCodes: [],
   };
 }
 

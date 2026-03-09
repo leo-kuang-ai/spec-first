@@ -3,12 +3,21 @@ import { currentFeature, getFeatureState, resolveFeatureId } from '../../core/pr
 import { validateOrchestrateArgs, OrchestrateArgsError } from '../../core/skill-runtime/orchestrate-args.js';
 import { loadTodoState } from '../../core/ai-orchestrator/todo-runner.js';
 import { runAutoLoop } from '../../core/ai-orchestrator/auto-loop.js';
-import type { TaskExecutor, AutoLoopResult } from '../../core/ai-orchestrator/auto-loop.js';
+import type { TaskExecutor, AutoLoopResult, AutoLoopStatus } from '../../core/ai-orchestrator/auto-loop.js';
 import { evaluateGate } from '../../core/gate-engine/gate-evaluator.js';
 import { checkDependencies } from '../../core/process-engine/dependency-checker.js';
 import { advance, GateFailedError, GateUnavailableError } from '../../core/process-engine/advance.js';
 import { decideNextStep, getNextStage } from '../../core/process-engine/next-step-decider.js';
 import { resetConfigCache } from '../../shared/config-schema.js';
+
+const AUTO_LOOP_STATUS_MESSAGES: Record<AutoLoopStatus, string> = {
+  all_done: '✅ 所有任务完成',
+  has_blocked: '❌ 存在阻塞任务',
+  timeout: '⏱️ 任务执行超时',
+  no_state_file: '📄 状态文件缺失',
+  max_iterations: '🔄 达到最大迭代次数',
+  incomplete: '⚠️ 任务未完成',
+};
 
 export interface OrchestrateCommandOptions {
   executor?: TaskExecutor;
@@ -67,9 +76,9 @@ export async function handleOrchestrate(
         args: orchestrateArgs,
         executor: options.executor,
       });
-      console.log(`auto_loop_status: ${autoLoopResult.status}`);
+      console.log(`auto-loop: ${AUTO_LOOP_STATUS_MESSAGES[autoLoopResult.status]}`);
       if (autoLoopResult.haltReason) {
-        console.log(`auto_loop_halt_reason: ${autoLoopResult.haltReason}`);
+        console.log(`halt_reason: ${autoLoopResult.haltReason}`);
       }
     }
 
@@ -85,12 +94,14 @@ export async function handleOrchestrate(
         : undefined,
       dependencyCheck: upcomingStage ? checkDependencies(featureId, upcomingStage, projectRoot) : undefined,
       todoState: loadTodoState(featureId, projectRoot),
+      autoLoopStatus: autoLoopResult?.status,
     });
 
     printDecision(featureId, state.currentStage, state.stageStatus, decision);
 
     if (orchestrateArgs.autoAdvance === true
-      && (decision.decision === 'READY_TO_ADVANCE' || decision.decision === 'AUTO_ADVANCE')) {
+      && (decision.decision === 'READY_TO_ADVANCE' || decision.decision === 'AUTO_ADVANCE')
+      && (!autoLoopResult || autoLoopResult.status === 'all_done')) {
       const advanceResult = advance(featureId, projectRoot);
       console.log(`已推进：${advanceResult.from} → ${advanceResult.to}`);
       console.log(`Gate：${advanceResult.gateResult}`);

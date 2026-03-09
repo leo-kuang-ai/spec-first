@@ -13,6 +13,15 @@ export type OrchestrateMode = 'single' | 'auto';
 export interface OrchestrateArgs {
   mode: OrchestrateMode;
   resume: boolean;
+  /**
+   * 自动推进阶段标志
+   *
+   * 语义：当决策为 READY_TO_ADVANCE 或 AUTO_ADVANCE 且所有安全条件满足时，
+   * 自动调用 advance() 推进到下一阶段
+   *
+   * 注意：此标志只控制"阶段推进"，不控制"skill 执行"
+   * 不会自动执行 /spec-first:code 或 /spec-first:verify
+   */
   autoAdvance?: true;
 }
 

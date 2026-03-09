@@ -110,7 +110,7 @@ describe('handleOrchestrate stage integration', () => {
       const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
 
       expect(code).toBe(0);
-      expect(output).toContain('auto_loop_status: all_done');
+      expect(output).toContain('auto-loop: ✅ 所有任务完成');
       expect(output).toContain('决策：READY_TO_ADVANCE');
       expect(output).toContain(`建议命令：spec-first stage advance ${featureId}`);
 
@@ -136,7 +136,7 @@ describe('handleOrchestrate stage integration', () => {
       const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
 
       expect(code).toBe(0);
-      expect(output).toContain('auto_loop_status: all_done');
+      expect(output).toContain('auto-loop: ✅ 所有任务完成');
       expect(output).toContain('已推进：00_init → 01_specify');
 
       const state = JSON.parse(readFileSync(join(TMP, 'specs', featureId, 'stage-state.json'), 'utf-8')) as StageState;
@@ -161,9 +161,9 @@ describe('handleOrchestrate stage integration', () => {
       const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
 
       expect(code).toBe(0);
-      expect(output).toContain('auto_loop_status: has_blocked');
+      expect(output).toContain('auto-loop: ❌ 存在阻塞任务');
       expect(output).toContain('决策：BLOCKED');
-      expect(output).toContain('存在 blocked todo，需先清除阻塞后再推进阶段');
+      expect(output).toContain('auto-loop 未完成: has_blocked');
 
       const state = JSON.parse(readFileSync(join(TMP, 'specs', featureId, 'stage-state.json'), 'utf-8')) as StageState;
       expect(state.currentStage).toBe(Stage.INIT);

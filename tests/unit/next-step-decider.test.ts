@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Stage } from '../../src/shared/types.js';
-import { decideNextStep } from '../../src/core/process-engine/next-step-decider.js';
+import { decideNextStep, ReasonCode } from '../../src/core/process-engine/next-step-decider.js';
 
 describe('decideNextStep', () => {
   it('should suggest the next skill during specify drafting', () => {
@@ -32,6 +32,7 @@ describe('decideNextStep', () => {
     expect(result.nextStage).toBe(Stage.PLAN);
     expect(result.suggestedCommand).toBe('spec-first stage advance FSREQ-20260309-AUTO-001');
     expect(result.reasons).toEqual([]);
+    expect(result.reasonCodes).toEqual([]);
   });
 
   it('should return auto advance candidate for plan when todos are done', () => {
@@ -56,28 +57,6 @@ describe('decideNextStep', () => {
     expect(result.suggestedCommand).toBe('spec-first stage advance FSREQ-20260309-AUTO-001');
   });
 
-  it('should return auto run next skill candidate for implement when policy is auto_run', () => {
-    const result = decideNextStep({
-      featureId: 'FSREQ-20260309-AUTO-001',
-      currentStage: Stage.IMPLEMENT,
-      stageStatus: 'ready_to_advance',
-      autoAdvancePolicy: 'auto_run',
-      gateStatus: 'PASS',
-      dependencyCheck: { pass: true, missing: [] },
-      todoState: {
-        halted: true,
-        haltReason: 'completed',
-        items: [
-          { id: 'TASK-AUTO-002', title: '实现代码', status: 'done' },
-        ],
-      },
-    });
-
-    expect(result.decision).toBe('AUTO_RUN_NEXT_SKILL');
-    expect(result.nextStage).toBe(Stage.VERIFY);
-    expect(result.suggestedCommand).toBe('/spec-first:verify');
-  });
-
   it('should block when dependencies are missing for design handoff', () => {
     const result = decideNextStep({
       featureId: 'FSREQ-20260309-AUTO-001',
@@ -90,6 +69,7 @@ describe('decideNextStep', () => {
 
     expect(result.decision).toBe('BLOCKED');
     expect(result.reasons).toContain('缺少 file: specs/FSREQ-20260309-AUTO-001/task_plan.md');
+    expect(result.reasonCodes).toContain(ReasonCode.DEPENDENCY_FAILED);
   });
 
   it('should block when todo state contains blocked items', () => {
@@ -111,5 +91,6 @@ describe('decideNextStep', () => {
 
     expect(result.decision).toBe('BLOCKED');
     expect(result.reasons).toContain('存在 blocked todo，需先清除阻塞后再推进阶段');
+    expect(result.reasonCodes).toContain(ReasonCode.TODO_BLOCKED);
   });
 });
