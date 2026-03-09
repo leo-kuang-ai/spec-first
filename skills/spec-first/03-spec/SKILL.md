@@ -683,7 +683,7 @@ SKIPPED — Moderate 复杂度，无多方案权衡
 
 ## CLI 依赖
 - `spec-first id next FR <abbr> --feature <featureId>`
-- `spec-first id next REQ-PRD <abbr> --feature <featureId>`
+- `spec-first id next REQ <abbr> --feature <featureId>`
 - `spec-first matrix update <featureId> <id> --title "<title>" [--status <status>] [--upstream <ids>] [--downstream <ids>]`
 - `spec-first gate check <featureId>`
 
@@ -702,7 +702,7 @@ SKIPPED — Moderate 复杂度，无多方案权衡
 - `prd.md` 已生成，C-PRD >= 85%
 - `spec.md` 已写入，包含所有 FR 定义和验收标准（AC）
 - 所有 FR 已通过 `id next FR` 注册
-- 所有 FR 至少有 1 条 `REQ-PRD-*` upstream 引用
+- 所有 FR 至少有 1 条 `REQ-*` upstream 引用
 - 所有 AC 使用统一 AC ID 规范
 - `traceability-matrix.md` 已更新
 - `findings.md` 包含完整 Phase 0.0-0.6 + Step 0-8 记录
