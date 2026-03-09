@@ -272,21 +272,21 @@ npm run format             # prettier 格式化
 <!-- SPEC-FIRST:END MANUAL -->
 
 <!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-> Auto-synced at 2026-03-06T01:17:21.280Z
+> Auto-synced at 2026-03-09T07:32:01.974Z
 
 ## Spec-First Context Snapshot
-- Feature: FSREQ-20260306-DASHBOARD-001
+- Feature: FSREQ-20260309-HOMEPAGE-001
 - Stage: 03_plan
-- Design: specs/FSREQ-20260306-DASHBOARD-001/design.md
+- Design: specs/FSREQ-20260309-HOMEPAGE-001/design.md
 
 ### Design Highlights
-- Design - 仪表盘数据可视化优化
-- DS-DASHBOARD-001: 健康仪表盘样式设计
-- 1. 健康分环形图渐变色
-- 2. 覆盖率柱状图悬停提示
-- 3. 缺陷统计卡片阴影
-- DS-DASHBOARD-002: 整体布局样式设计
-- 1. 侧边栏优化
-- 2. 主区域间距统一
+- Design — FSREQ-20260309-HOMEPAGE-001
+- Constitution 合规性
+- 设计概述
+- DS-VIS-001: 视觉层次优化设计
+- DS-INT-001: 交互体验提升设计
+- DS-VIZ-001: 数据可视化增强设计
+- DS-LAY-001: 整体布局优化设计
+- 数据模型
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
 

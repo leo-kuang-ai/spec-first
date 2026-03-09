@@ -219,3 +219,13 @@ SKIPPED — Trivial 复杂度，无需 ADR
 - ✅ gate check 通过（C10 = 100%）
 
 **Spec 阶段完成！下一步：执行 `/spec-first:design` 进行技术设计**
+
+## Gate Check Remediation (2026-03-09T07:30:29.743Z)
+
+### Failed Conditions
+- G-DESIGN-03: Constitution compliance (C11) (C11 FAIL: design.md missing constitution clause reference; fix: specs/FSREQ-20260309-HOMEPAGE-001/design.md: add 'Constitution Clause <id> (v<version>)' references)
+
+### Actionable Fix Steps
+1. specs/FSREQ-20260309-HOMEPAGE-001/design.md: add 'Constitution Clause <id> (v<version>)' references
+
+- [2026-03-09T07:32:01.976Z] Context Sync: /Users/kuang/xiaobu/spec-first/CLAUDE.md

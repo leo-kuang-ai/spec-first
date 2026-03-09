@@ -27,6 +27,8 @@ import { handleTrace } from './commands/trace.js';
 import { handleValidate } from './commands/validate.js';
 import { handleDone } from './commands/done.js';
 import { handleOrchestrate } from './commands/orchestrate.js';
+import { handleFirst } from './commands/first.js';
+import { resolveFirstConfirmPolicy, validateFirstArgs } from '../core/skill-runtime/first-args.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
 registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
@@ -79,6 +81,15 @@ registerCommand('trace', '追溯链修复与校验', handleTrace, {
   requiresConfirmation: (args) => args[0] === 'repair',
 });
 registerCommand('validate', '产物格式校验', handleValidate);
+registerCommand('first', '项目首轮认知 runtime/docs 刷新', handleFirst, {
+  requiresConfirmation: (args) => {
+    try {
+      return resolveFirstConfirmPolicy(validateFirstArgs(args)) === 'require';
+    } catch {
+      return false;
+    }
+  },
+});
 
 const code = await dispatch(process.argv.slice(2));
 process.exit(code);

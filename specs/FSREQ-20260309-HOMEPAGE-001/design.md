@@ -2,6 +2,12 @@
 
 > Spec-First Viewer 首页样式优化 - 技术设计
 
+## Constitution 合规性
+
+本设计遵循以下宪法条款：
+- Constitution Clause P1 (v1.1.0) - 简洁至上（KISS）：仅修改 CSS，无过度工程化
+- Constitution Clause P2 (v1.1.0) - 事实为本：设计基于现有代码结构
+
 ## 设计概述
 
 本设计针对 Viewer 可视化面板的 CSS 样式优化，不涉及 HTML 结构和 JavaScript 逻辑变更。所有优化通过修改 `scripts/stage-viewer/styles.css` 实现。
