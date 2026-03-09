@@ -55,6 +55,22 @@ spec 阶段只定义 WHAT，不定义 HOW：
 - 自我修正上限：3 轮；超过上限必须停止并请求用户澄清
 - `[NEEDS CLARIFICATION]` 同一轮最多 3 项；优先级：范围 > 安全 > 合规 > UX > 技术偏好
 
+## CLI 硬约束（强制）
+
+**ID 类型**：
+- ✅ 使用 `FR`, `DS`, `TASK`, `TC`, `REQ` 等有效类型
+- ❌ 禁止使用 `REQ-PRD`（不存在此类型，应使用 `REQ`）
+
+**Matrix 状态**：
+- ✅ 使用 `Planned`, `InProgress`, `Completed`, `Verified`, `Blocked`
+- ❌ 禁止使用 `pending`（应使用 `Planned`）
+
+**确认策略**：
+- `matrix update` 必须添加 `--yes`（policy=strict）
+- 串行执行 matrix 操作，避免并行失败级联
+
+详见 `references/id-types-and-status.md`
+
 ## 结构化歧义消解
 
 出现以下任一情况必须标记 `[NEEDS CLARIFICATION]`：
