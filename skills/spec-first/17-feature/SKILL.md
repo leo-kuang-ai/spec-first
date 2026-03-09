@@ -1,25 +1,29 @@
 ---
 name: "spec-first:feature"
 description: "Feature 查询/切换命令族"
-version: 1.4.0
+argument-hint: [subcommand] [featureId]
+version: 2.0.0
 last_updated: {{DATE}}
 ---
 
 # Skill: feature
 
-**用户输入格式**：
-- `/spec-first:feature list`
-- `/spec-first:feature current`
-- `/spec-first:feature switch <featureId>`
-
-**执行逻辑**：
-1. 检查用户输入中的子命令（list/current/switch）
-2. 执行对应的 CLI 命令：
-   - `list` → `spec-first feature list`
-   - `current` → `spec-first feature current`
-   - `switch <id>` → `spec-first feature switch <id> --yes`
-
-**注意**：switch 自动添加 `--yes`
+$IF($1,
+  $IF($1 == "list",
+    !`spec-first feature list`,
+    $IF($1 == "current",
+      !`spec-first feature current`,
+      $IF($1 == "switch",
+        $IF($2,
+          !`spec-first feature switch $2 --yes`,
+          ERROR: switch 需要 featureId 参数。用法: /spec-first:feature switch [featureId]
+        ),
+        ERROR: 未知子命令 "$1"。可用: list, current, switch
+      )
+    )
+  ),
+  ERROR: 缺少子命令。用法: /spec-first:feature [list|current|switch] [featureId]
+)
 
 ## 子命令
 
