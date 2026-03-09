@@ -7,6 +7,16 @@ description: "初始化 Feature 工作区，收集参数并生成阶段状态文
 
 初始化 Feature 工作区，收集参数并生成阶段状态文件。
 
+- Command: `/spec-first:init`
+
+## 背景质量契约
+
+本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)。
+
+初始化完成后输出：
+- `backgroundInputStatus`: 背景输入完整度（full/degraded/blind）
+- `background_input_status`: 文档输出字段名
+
 ## 执行流程
 
 - **P0**: 前置检查 - 详见 [prerequisites.md](references/prerequisites.md)

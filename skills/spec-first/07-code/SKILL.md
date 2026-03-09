@@ -14,6 +14,14 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
 
 按 TASK 规格批量实现代码，自动关联追踪链路。
 
+## 背景质量契约
+
+本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)。
+
+执行前检查：
+- `backgroundInputStatus`: 背景输入完整度
+- `background_input_status`: 文档输出字段名
+
 ## Announce at Start
 
 ```

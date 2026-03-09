@@ -415,7 +415,8 @@ export function refreshFirstArtifacts(
   } else {
     // refresh-all: 合并 impacted + rebuild，并检查 docs 健康度
     const baseArtifacts = Array.from(new Set<FirstRuntimeArtifact>([...impactedRuntimeArtifacts, ...rebuildArtifacts]));
-    const hasUnhealthyDocs = Object.values(index.docsProjection).some(doc => !doc.healthy);
+    const docsProjectionEntries = Object.values(index.docsProjection);
+    const hasUnhealthyDocs = docsProjectionEntries.length === 0 || docsProjectionEntries.some(doc => !doc.healthy);
     docsArtifacts = hasUnhealthyDocs ? [...FIRST_RUNTIME_ARTIFACTS] : baseArtifacts;
   }
 
