@@ -303,9 +303,9 @@ digraph status_flow {
 ## 执行阶段
 
 - **P0**: 定位当前 Feature
-- **P1**: 加载 stage-state、指标、任务计划、Gate 历史
-- **P2**: 计算健康分、识别风险
-- **P3**: 生成状态仪表盘（阶段、覆盖率、健康分、任务、风险）
+- **P1**: 加载 stage-state、指标、任务计划、Gate 历史，并读取 `background_input_status` 与 runtime/docs 分层状态
+- **P2**: 计算健康分、识别风险、判断 runtime 真源与 docs 投影视图是否漂移
+- **P3**: 生成状态仪表盘（阶段、覆盖率、健康分、任务、风险、背景状态卡片）
 - **P4**: 解读健康分、标注风险、建议下一步
 - **P5**: 向用户展示状态（无需确认）
 
@@ -332,6 +332,7 @@ digraph status_flow {
 - 风险项已识别并分级
 - 建议下一步已提供
 - 可推进阶段判断已给出
+- 状态面板已展示 `background_input_status`、`runtime 真源`、`docs 投影视图`、`同步状态`
 
 ## 模板引用路径
 

@@ -7,6 +7,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability } from './prompt-assembler.js';
+import { buildScopeGuardRuntimeNotice, evaluateRuntimeScopeGuard, ScopeGuardBlockedError } from './scope-guard.js';
 import { assessHighRiskChanges, buildHardGateRuntimeNotice, evaluateSkillHardGate, HardGateBlockedError, type HighRiskAssessment } from './hard-gate.js';
 import { readFirstRuntimeIndex, readFirstRoleViews, readFirstStageViews } from './first-runtime-store.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
@@ -385,7 +386,7 @@ export function loadSkill(
   skillPath: string,
   options?: { projectRoot?: string; enableAssembly?: boolean },
 ): string {
-  let content = ensureNextStepsPolicy(readFileSync(skillPath, 'utf-8'));
+  let content = ensureNextStepsPolicy(loadSkillTemplate(skillPath));
   const projectRoot = options?.projectRoot;
   const enableAssembly = options?.enableAssembly ?? Boolean(projectRoot);
 
@@ -413,6 +414,17 @@ export function loadSkill(
   if (hardGateDecision.severity === 'BLOCKED') {
     throw new HardGateBlockedError(skillName, hardGateDecision);
   }
+
+  const scopeGuardDecision = evaluateRuntimeScopeGuard(skillName, projectRoot);
+  if (scopeGuardDecision.blocked) {
+    throw new ScopeGuardBlockedError(skillName, scopeGuardDecision.unmatchedFiles);
+  }
+
+  const scopeGuardNotice = buildScopeGuardRuntimeNotice(scopeGuardDecision);
+  if (scopeGuardNotice) {
+    content = `${scopeGuardNotice}\n\n${content}`;
+  }
+
   const hardGateNotice = buildHardGateRuntimeNotice(skillName, projectRoot);
   if (hardGateNotice) {
     content = `${hardGateNotice}\n\n${content}`;
@@ -925,6 +937,25 @@ export function getFirstRuntimeNotice(projectRoot: string): string | undefined {
 
 export function getOrchestrateRuntimeNotice(projectRoot: string): string | undefined {
   return buildOrchestrateRuntimeNotice(projectRoot);
+}
+
+function loadSkillTemplate(skillPath: string): string {
+  const content = readFileSync(skillPath, 'utf-8').trimEnd();
+  const sharedPath = resolveSharedSkillPath(skillPath);
+  if (!sharedPath) return content;
+
+  const shared = readFileSync(sharedPath, 'utf-8').trimEnd();
+  if (!shared) return content;
+  return `${shared}\n\n${content}`;
+}
+
+function resolveSharedSkillPath(skillPath: string): string | undefined {
+  const normalized = skillPath.replace(/\\/g, '/');
+  if (normalized.endsWith('/SHARED.md')) return undefined;
+  const match = normalized.match(/^(.*\/skills\/spec-first)\/\d+-[^/]+\/SKILL\.md$/);
+  if (!match) return undefined;
+  const sharedPath = join(match[1], 'SHARED.md');
+  return exists(sharedPath) ? sharedPath : undefined;
 }
 
 function inferSkillNameFromPath(skillPath: string): string {

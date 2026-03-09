@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { dispatchCommand, loadSkill, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
 import { resetConfigCache } from '../../src/shared/config-schema.js';
+import { writeFirstRuntimeIndex, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
 import {
   createPhaseState, canTransition, transition, confirmPhase,
   preWriteArchive, getValidTransitions,
@@ -632,6 +633,139 @@ describe('loadSkill hard-gate notice', () => {
     const content = loadSkill(skillPath, { enableAssembly: false });
     expect(content).toContain('## Next Steps（Required Handoff）');
     expect(content).toContain('下一条可执行命令');
+  });
+
+  it('should block code when changed files exceed task file list and code-view scope', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    mkdirSync(join(TMP, 'src'), { recursive: true });
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      [
+        '| Task ID | 标题 | 状态 |',
+        '|---|---|---|',
+        '| TASK-AUTH-001 | Login | in_progress |',
+        '',
+        '### TASK-AUTH-001 — Login',
+        '',
+        '**文件清单**：',
+        '- Modify: `src/allowed.ts`',
+        '- Reference: `tests/unit/allowed.test.ts`',
+      ].join('\n'),
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/unit/auth.test.ts',
+        '- exit code: 1',
+        '- reason: function not implemented',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    execSync('git -c core.hooksPath=/dev/null init', { cwd: TMP, stdio: 'ignore' });
+    execSync('git config user.email "test@example.com"', { cwd: TMP, stdio: 'ignore' });
+    execSync('git config user.name "test"', { cwd: TMP, stdio: 'ignore' });
+    writeFileSync(join(TMP, 'README.md'), 'seed\n', 'utf-8');
+    writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = true;\n', 'utf-8');
+    writeFileSync(join(TMP, 'src', 'out-of-scope.ts'), 'export const other = true;\n', 'utf-8');
+    execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/out-of-scope.ts skills/spec-first/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
+    writeFileSync(join(TMP, 'src', 'out-of-scope.ts'), 'export const other = false;\n', 'utf-8');
+
+    expect(() => loadSkill(skillPath, { projectRoot: TMP }))
+      .toThrow(/SCOPE-GUARD-BLOCKED|out-of-scope\.ts/);
+  });
+
+  it('should allow code when changed files stay within task file list or code-view scope', () => {
+    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    mkdirSync(join(TMP, 'src', 'feature'), { recursive: true });
+    writeFileSync(skillPath, '# Code Skill', 'utf-8');
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({ currentStage: '04_implement' }),
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      [
+        '| Task ID | 标题 | 状态 |',
+        '|---|---|---|',
+        '| TASK-AUTH-001 | Login | in_progress |',
+        '',
+        '### TASK-AUTH-001 — Login',
+        '',
+        '**文件清单**：',
+        '- Modify: `src/allowed.ts`',
+      ].join('\n'),
+      'utf-8',
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'findings.md'),
+      [
+        '# Findings',
+        '',
+        '## TDD Evidence',
+        '- TASK: TASK-AUTH-001',
+        '- TDD-RED',
+        '- command: pnpm test -- tests/unit/auth.test.ts',
+        '- exit code: 1',
+        '- reason: function not implemented',
+      ].join('\n'),
+      'utf-8',
+    );
+
+    writeFirstRuntimeIndex(TMP, {
+      version: '1.0.0',
+      lastRun: '2026-03-09T00:00:00.000Z',
+      mode: 'quick',
+      summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      docsProjection: {},
+      status: 'current',
+    });
+    writeFirstStageViews(TMP, {
+      spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
+      design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
+      code: {
+        stage: 'code',
+        summary: 'code',
+        entryPoints: ['src/allowed.ts'],
+        likelyChangeAreas: ['src/feature'],
+        changeHazards: [],
+        verificationHooks: [],
+      },
+      verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
+    });
+
+    execSync('git -c core.hooksPath=/dev/null init', { cwd: TMP, stdio: 'ignore' });
+    execSync('git config user.email "test@example.com"', { cwd: TMP, stdio: 'ignore' });
+    execSync('git config user.name "test"', { cwd: TMP, stdio: 'ignore' });
+    writeFileSync(join(TMP, 'README.md'), 'seed\n', 'utf-8');
+    writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = true;\n', 'utf-8');
+    writeFileSync(join(TMP, 'src', 'feature', 'helper.ts'), 'export const helper = true;\n', 'utf-8');
+    execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/feature/helper.ts skills/spec-first/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
+    writeFileSync(join(TMP, 'src', 'feature', 'helper.ts'), 'export const helper = false;\n', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('HARD-GATE 运行时检查（自动）');
   });
 });
 

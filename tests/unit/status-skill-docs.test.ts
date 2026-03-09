@@ -5,6 +5,7 @@ import { join } from 'node:path';
 const STATUS_ROOT = join(import.meta.dirname, '../../skills/spec-first/14-status');
 const SKILL_MD = join(STATUS_ROOT, 'SKILL.md');
 const DASHBOARD = join(STATUS_ROOT, 'references/status-dashboard-template.md');
+const RISK = join(STATUS_ROOT, 'references/risk-indicators.md');
 
 function read(path: string): string {
   return readFileSync(path, 'utf-8');
@@ -31,5 +32,28 @@ describe('14-status skill docs consistency', () => {
     expect(skill).toContain('docs 投影视图');
     expect(dashboard).toContain('runtime 真源');
     expect(dashboard).toContain('同步状态');
+  });
+
+  it('should make layered status collection explicit in execution flow', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('**P1**: 加载 stage-state、指标、任务计划、Gate 历史，并读取 `background_input_status` 与 runtime/docs 分层状态');
+    expect(skill).toContain('**P2**: 计算健康分、识别风险、判断 runtime 真源与 docs 投影视图是否漂移');
+    expect(skill).toContain('**P3**: 生成状态仪表盘（阶段、覆盖率、健康分、任务、风险、背景状态卡片）');
+  });
+
+  it('should include background state and sync status in success criteria', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('状态面板已展示 `background_input_status`、`runtime 真源`、`docs 投影视图`、`同步状态`');
+  });
+
+  it('should treat runtime/docs drift as an explicit status risk', () => {
+    expect(existsSync(RISK)).toBe(true);
+    const risk = read(RISK);
+
+    expect(risk).toContain('docs 投影视图漂移');
+    expect(risk).toContain('runtime 真源异常');
+    expect(risk).toContain('同步状态异常');
   });
 });

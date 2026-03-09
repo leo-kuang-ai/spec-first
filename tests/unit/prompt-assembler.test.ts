@@ -34,6 +34,20 @@ afterEach(() => {
 });
 
 describe('prompt assembler', () => {
+  it('should prepend SHARED.md when loading a spec-first skill', () => {
+    const skillsRoot = join(TMP, 'skills', 'spec-first');
+    const skillPath = join(skillsRoot, '00-first', 'SKILL.md');
+
+    mkdirSync(join(skillsRoot, '00-first'), { recursive: true });
+    writeFileSync(join(skillsRoot, 'SHARED.md'), '# Shared Rules\nshared-marker\n', 'utf-8');
+    writeFileSync(skillPath, '# First Skill\nskill-marker\n', 'utf-8');
+
+    const loaded = loadSkill(skillPath, { enableAssembly: false });
+    expect(loaded).toContain('shared-marker');
+    expect(loaded).toContain('skill-marker');
+    expect(loaded.indexOf('shared-marker')).toBeLessThan(loaded.indexOf('skill-marker'));
+  });
+
   it('should resolve assembly context from project files', () => {
     const ctx = resolvePromptAssemblyContext(TMP);
     expect(ctx.featureId).toBe(FEAT);
