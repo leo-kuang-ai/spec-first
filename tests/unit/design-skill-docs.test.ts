@@ -94,4 +94,13 @@ describe('04-design skill docs consistency', () => {
     expect(gate).toContain('L3');
     expect(gate).toContain('backgroundInputStatus');
   });
+
+  it('should align design background naming with the shared contract', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('shared/background-quality-contract.md');
+    expect(skill).toContain('backgroundInputStatus');
+    expect(skill).toContain('background_input_status');
+    expect(skill).toContain('输入层');
+  });
 });

@@ -683,6 +683,7 @@ SKIPPED — Moderate 复杂度，无多方案权衡
 - `references/adr-lite-template.md`
 
 ## 背景输入
+- 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 优先读取 `spec-view`
 - 建议从 `.spec-first/runtime/first/stage-views.json` 的 spec-view 获取摘要
 - 执行前应显式声明 `background_input_status`

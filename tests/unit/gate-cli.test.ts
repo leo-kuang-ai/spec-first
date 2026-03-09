@@ -147,6 +147,38 @@ describe('checkGoLive', () => {
     expect(result.degraded).toBe(true);
     expect(result.confirmPolicy).toBe('strict');
   });
+
+  it('should fail GL-03 when security evidence is missing', () => {
+    writeState('05_verify');
+    const result = checkGoLive(FEAT, TMP);
+    const securityCheck = result.checks.find((item) => item.id === 'GL-03');
+
+    expect(securityCheck?.pass).toBe(false);
+    expect(securityCheck?.detail).toContain('missing: reports/security-scan.md');
+  });
+
+  it('should pass GL-03 and GL-05 when security and release evidence exist', () => {
+    writeState('05_verify');
+    mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'reports', 'security-scan.md'),
+      [
+        '| ID | Severity | Title | Waived |',
+        '|----|----------|-------|--------|',
+        '| SEC-001 | S3 | informational finding | no |',
+      ].join('\n') + '\n',
+      'utf-8',
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'reports', 'release-note.md'), '# release', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'reports', 'smoke-test-report.md'), '# smoke', 'utf-8');
+
+    const result = checkGoLive(FEAT, TMP);
+    const securityCheck = result.checks.find((item) => item.id === 'GL-03');
+    const releaseCheck = result.checks.find((item) => item.id === 'GL-05');
+
+    expect(securityCheck?.pass).toBe(true);
+    expect(releaseCheck?.pass).toBe(true);
+  });
 });
 
 // ─── Rollback Tests ──────────────────────────────────────

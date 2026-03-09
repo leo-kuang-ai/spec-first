@@ -93,6 +93,10 @@ function getStageDependencies(
   return DEFAULT_STAGE_DEPENDENCIES.find(d => d.stage === targetStage) ?? null;
 }
 
+export function describeDependencyIssues(result: DependencyCheckResult): string[] {
+  return result.missing.map((item) => `缺少 ${item}`);
+}
+
 export function checkDependencies(
   featureId: string,
   targetStage: Stage,

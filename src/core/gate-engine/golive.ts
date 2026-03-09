@@ -57,8 +57,8 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
 
   // GL-03: 安全扫描无 critical
   const secReport = join(projectRoot, 'specs', featureId, 'reports', 'security-scan.md');
-  let secPass = true;
-  let secDetail = '未找到安全报告（按通过处理）';
+  let secPass = false;
+  let secDetail = 'missing: reports/security-scan.md';
   if (exists(secReport)) {
     const content = readFileSync(secReport, 'utf-8');
     const findings = parseSecurityReport(content);

@@ -7,12 +7,19 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ExitCode } from '../shared/types.js';
 import { evaluatePolicy } from '../core/skill-runtime/confirm-policy.js';
+import { parseFlag } from './parse-utils.js';
 
 export type CommandHandler = (args: string[]) => Promise<number> | number;
+type ConfirmationRequirement = boolean | ((args: string[]) => boolean);
 
 interface CommandEntry {
   description: string;
   handler: CommandHandler;
+  requiresConfirmation?: ConfirmationRequirement;
+}
+
+interface RegisterCommandOptions {
+  requiresConfirmation?: ConfirmationRequirement;
 }
 
 const commands = new Map<string, CommandEntry>();
@@ -22,13 +29,39 @@ export function registerCommand(
   name: string,
   description: string,
   handler: CommandHandler,
+  options?: RegisterCommandOptions,
 ): void {
-  commands.set(name, { description, handler });
+  commands.set(name, { description, handler, requiresConfirmation: options?.requiresConfirmation });
 }
 
 /** 获取所有已注册命令（用于 help 输出） */
 export function getRegisteredCommands(): Map<string, CommandEntry> {
   return commands;
+}
+
+function shouldRequireConfirmation(requirement: ConfirmationRequirement | undefined, args: string[]): boolean {
+  if (typeof requirement === 'function') return requirement(args);
+  return requirement ?? false;
+}
+
+function isMode(value: string | undefined): value is 'N' | 'I' {
+  return value === 'N' || value === 'I';
+}
+
+function isSize(value: string | undefined): value is 'S' | 'M' | 'L' {
+  return value === 'S' || value === 'M' || value === 'L';
+}
+
+function resolveConfirmPolicy(args: string[]) {
+  const mode = parseFlag(args, '--mode');
+  const size = parseFlag(args, '--size');
+
+  return evaluatePolicy({
+    mode: isMode(mode) ? mode : 'N',
+    size: isSize(size) ? size : 'M',
+    hasNfrSec: false,
+    hasNewExternalApi: false,
+  });
 }
 
 /** 分发命令，返回 ExitCode */
@@ -50,23 +83,20 @@ export async function dispatch(args: string[]): Promise<number> {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  // 确认策略评估（confirm-1 集成）
-  // 使用默认保守策略（Mode N）进行确认检查
-  const policy = evaluatePolicy({
-    mode: 'N',
-    size: 'M',
-    hasNfrSec: false,
-    hasNewExternalApi: false,
-  });
+  const rawSubArgs = args.slice(1);
+  const confirmed = rawSubArgs.includes('--yes');
+  const subArgs = rawSubArgs.filter((arg) => arg !== '--yes');
 
-  // 非 auto 模式下提示用户确认
-  if (policy !== 'auto') {
-    // 暂不进行交互式确认，完整实现需要在更上层集成
-    // 未来可以在这里添加用户确认逻辑
+  if (shouldRequireConfirmation(entry.requiresConfirmation, subArgs)) {
+    const policy = resolveConfirmPolicy(subArgs);
+    if (policy !== 'auto' && !confirmed) {
+      console.error(`命令 ${cmd} 需要确认：policy=${policy}。请追加 --yes 重试。`);
+      return ExitCode.VALIDATION_ERROR;
+    }
   }
 
   try {
-    return await entry.handler(args.slice(1));
+    return await entry.handler(subArgs);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`错误：${msg}`);

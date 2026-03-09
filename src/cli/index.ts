@@ -28,26 +28,52 @@ import { handleValidate } from './commands/validate.js';
 import { handleDone } from './commands/done.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
-registerCommand('matrix', '同步追踪矩阵', handleMatrix);
-registerCommand('init', '初始化 Feature 工作区', handleInit);
-registerCommand('stage', '阶段流转管理（current/advance/cancel）', handleStage);
-registerCommand('rfc', 'RFC 变更请求与状态管理', handleRfc);
-registerCommand('defect', '缺陷跟踪与状态管理', handleDefect);
+registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
+  requiresConfirmation: (args) => args[0] === 'update',
+});
+registerCommand('init', '初始化 Feature 工作区', handleInit, {
+  requiresConfirmation: true,
+});
+registerCommand('stage', '阶段流转管理（current/advance/cancel）', handleStage, {
+  requiresConfirmation: (args) => args[0] === 'advance' || args[0] === 'cancel',
+});
+registerCommand('rfc', 'RFC 变更请求与状态管理', handleRfc, {
+  requiresConfirmation: true,
+});
+registerCommand('defect', '缺陷跟踪与状态管理', handleDefect, {
+  requiresConfirmation: true,
+});
 registerCommand('metrics', '覆盖率度量与健康评分', handleMetrics);
 registerCommand('doctor', '环境诊断与修复', handleDoctor);
 registerCommand('gate', '阶段质量门禁评估', handleGate);
 registerCommand('golive', '上线就绪检查与批准', handleGoLive);
-registerCommand('done', '将 Feature 从 07_release 收口到 08_done', handleDone);
+registerCommand('done', '将 Feature 从 07_release 收口到 08_done', handleDone, {
+  requiresConfirmation: true,
+});
 registerCommand('ai', '会话恢复与上下文摘要', handleAi);
-registerCommand('commit', '规范提交并关联追溯 ID', handleCommit);
-registerCommand('feature', 'Feature 列表、切换与查看', handleFeature);
-registerCommand('setup', '注册 Claude Code + Codex Skill 命令', handleSetup);
-registerCommand('hooks', 'Git Hooks 安装与状态管理', handleHooks);
+registerCommand('commit', '规范提交并关联追溯 ID', handleCommit, {
+  requiresConfirmation: true,
+});
+registerCommand('feature', 'Feature 列表、切换与查看', handleFeature, {
+  requiresConfirmation: (args) => args[0] === 'switch',
+});
+registerCommand('setup', '注册 Claude Code + Codex Skill 命令', handleSetup, {
+  requiresConfirmation: true,
+});
+registerCommand('hooks', 'Git Hooks 安装与状态管理', handleHooks, {
+  requiresConfirmation: (args) => args[0] === 'install' || args[0] === 'uninstall',
+});
 registerCommand('viewer', 'Stage Viewer 可视化面板', handleViewer);
-registerCommand('update', '升级后刷新 Skill/MCP/Hooks', handleUpdate);
-registerCommand('uninstall', '清理宿主配置（卸载前执行）', handleUninstall);
+registerCommand('update', '升级后刷新 Skill/MCP/Hooks', handleUpdate, {
+  requiresConfirmation: true,
+});
+registerCommand('uninstall', '清理宿主配置（卸载前执行）', handleUninstall, {
+  requiresConfirmation: true,
+});
 registerCommand('analyze', '跨产物一致性分析', handleAnalyze);
-registerCommand('trace', '追溯链修复与校验', handleTrace);
+registerCommand('trace', '追溯链修复与校验', handleTrace, {
+  requiresConfirmation: (args) => args[0] === 'repair',
+});
 registerCommand('validate', '产物格式校验', handleValidate);
 
 const code = await dispatch(process.argv.slice(2));

@@ -323,8 +323,11 @@ task 阶段只输出执行计划，不输出实现代码：
 
 ## 背景输入
 
+- 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 必须读取 `spec.md` + `design.md` + `traceability-matrix.md`
-- 输出中必须包含 `backgroundInputStatus`
+- 输入元数据字段使用 `backgroundInputStatus`
+- 若需输出用户可见背景字段，统一使用 `background_input_status`
+- `backgroundInputStatus` 属于输入层字段，不替代文档输出字段命名
 - 任务拆解依赖完整的 FR 和 DS 映射
 
 ## 执行阶段

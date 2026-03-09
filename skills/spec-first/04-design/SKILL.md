@@ -211,7 +211,10 @@ spec-first validate format <featureId>
 ```
 
 ## 背景输入
+- 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 优先读取 `design-view`
-- 输出中必须包含 `backgroundInputStatus`
+- 输入元数据字段使用 `backgroundInputStatus`
+- 若需输出用户可见背景字段，统一使用 `background_input_status`
+- `backgroundInputStatus` 属于输入层字段，不替代文档输出字段命名
 - 正式设计评审前应尽量达到 `full`
 - 若命中高依赖阶段，可提升到 `L3` 设计门槛

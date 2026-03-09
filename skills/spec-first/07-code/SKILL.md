@@ -635,6 +635,9 @@ export async function sendOtpHandler(req: Request, res: Response) {
 - findings.md 记录？
 
 ## 背景输入
+- 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 优先读取 `code-view`
-- 输出中必须包含 `backgroundInputStatus`
+- 输入元数据字段使用 `backgroundInputStatus`
+- 若需输出用户可见背景字段，统一使用 `background_input_status`
+- `backgroundInputStatus` 属于输入层字段，不替代文档输出字段命名
 - 重点关注 `entryPoints`、`likelyChangeAreas`、`changeHazards`

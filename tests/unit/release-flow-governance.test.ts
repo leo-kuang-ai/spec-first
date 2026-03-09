@@ -23,10 +23,11 @@ describe('release flow governance', () => {
     expect(readme).toContain('verify → archive → golive → done');
   });
 
-  it('blocks golive when release evidence is missing', () => {
+  it('blocks golive when release and security evidence are missing', () => {
     const { featureId } = init({ feat: 'REL', mode: 'N', size: 'S', platforms: ['h5'], projectRoot: TMP });
     const result = checkGoLive(featureId, TMP);
     expect(result.pass).toBe(false);
+    expect(result.checks.some((item) => item.id === 'GL-03' && item.pass === false)).toBe(true);
     expect(result.checks.some((item) => item.id === 'GL-05' && item.pass === false)).toBe(true);
   });
 });

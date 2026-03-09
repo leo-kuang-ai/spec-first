@@ -29,7 +29,7 @@ CLI 命令层（本文档）: spec-first init, spec-first id next, ...
 | # | 命令组 | 子命令数 | 功能域 | 实现状态 |
 |---|---|---:|---|---|
 | 1 | `spec-first init` | 1 | Feature 初始化 | ✅ |
-| 2 | `spec-first stage` | 3 | 阶段管理 | ✅ |
+| 2 | `spec-first stage` | 4 | 阶段管理 | ✅ |
 | 3 | `spec-first id` | 4 | ID 管理 | ✅ |
 | 4 | `spec-first gate` | 3 | Gate 校验 | ✅ |
 | 5 | `spec-first golive` | 1 | 上线检查 | ✅ |
@@ -44,13 +44,13 @@ CLI 命令层（本文档）: spec-first init, spec-first id next, ...
 | 14 | `spec-first hooks` | 3 | Git Hooks 管理 | ✅ |
 | 15 | `spec-first viewer` | 3 | 可视化面板 | ✅ |
 | 16 | `spec-first update` | 1 | 刷新配置 | ✅ |
-| 17 | `spec-first setup` | 1 | 宿主注册 | ✅ |
+| 17 | `spec-first setup` | 1 | 宿主注册（兼容入口） | ✅ |
 | 18 | `spec-first uninstall` | 1 | 清理配置 | ✅ |
 | 19 | `spec-first analyze` | 1 | 一致性分析 | ✅ |
-| 20 | `spec-first trace` | 1 | 追溯链修复 | ✅ |
-| 21 | `spec-first validate` | 1 | 产物校验 | ✅ |
+| 20 | `spec-first trace` | 2 | 追溯链修复与校验 | ✅ |
+| 21 | `spec-first validate` | 3 | 产物校验 | ✅ |
 | 22 | `spec-first doctor` | 1 | 环境诊断 | ✅ |
-| | **合计** | **47** | | **100%** |
+| | **合计** | **53** | | **100%** |
 
 ## 全局选项
 
@@ -103,13 +103,15 @@ spec-first init --feat <abbr> [options]
 | `--feat <abbr>` | 是 | Feature 缩写（大写字母开头，1-16 字符） |
 | `--mode <N\|I>` | 否 | 开发模式，默认 `N` |
 | `--size <S\|M\|L>` | 否 | 项目规模，默认 `M` |
-| `--platform <github\|gitlab>` | 否 | 平台，默认 `github` |
-| `--feature-id <id>` | 否 | 指定 Feature ID，默认 `FEAT-<abbr>-001` |
+| `--platforms <p1,p2,...>` | 是 | 平台列表（逗号分隔），必须来自 `.spec-first/layer2/*.yaml` |
+| `--feature-id <id>` | 否 | 指定 Feature ID |
+| `--title <title>` | 否 | Feature 标题，默认等于 `--feat` |
+| `--bootstrap` | 否 | 先执行宿主 bootstrap 检查 |
 
 示例：
 
 ```bash
-spec-first init --feat AUTH --mode N --size M --platform github --feature-id FEAT-AUTH-001
+spec-first init --feat AUTH --mode N --size M --platforms h5,java-backend --title "用户认证"
 ```
 
 ---
@@ -122,16 +124,22 @@ spec-first init --feat AUTH --mode N --size M --platform github --feature-id FEA
 spec-first stage current <featureId>
 ```
 
-### 2.2 推进下一阶段
+### 2.2 建议下一步动作
+
+```bash
+spec-first stage suggest <featureId>
+```
+
+### 2.3 推进下一阶段
 
 ```bash
 spec-first stage advance <featureId> [--force]
 ```
 
-### 2.3 取消 Feature
+### 2.4 取消 Feature
 
 ```bash
-spec-first stage cancel <featureId> [--reason "原因"]
+spec-first stage cancel <featureId> --reason "原因"
 ```
 
 ---
@@ -146,7 +154,7 @@ spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]
 
 | 参数/选项 | 必填 | 说明 |
 |---|---|---|
-| `<type>` | 是 | `FR`/`NFR`/`DS`/`API`/`TASK`/`TC`/`ADR`/`RFC` |
+| `<type>` | 是 | `FR`/`DS`/`TASK`/`TC`/`RFC`/`REQ`/`SYS`/`ARCH`/`MOD`/`ATP`/`STP`/`ITP`/`UTP` |
 | `<abbr>` | 是 | FEAT 缩写 |
 | `--feature <featureId>` | 是 | Feature ID |
 | `--level <UT\|IT\|E2E\|ST>` | 否 | TC 级别（仅 type=TC 时需要） |
@@ -230,7 +238,7 @@ spec-first matrix update <featureId> <rowId> [options]
 ### 7.1 查看覆盖率
 
 ```bash
-spec-first metrics coverage <featureId> [--type C1|C2|...|C9]
+spec-first metrics coverage <featureId> [--json]
 ```
 
 ### 7.2 生成度量报告
@@ -263,25 +271,25 @@ spec-first rfc create <featureId> --title <title> [options]
 | `--motivation <motivation>` | 否 | 变更动机 |
 | `--description <description>` | 否 | 变更描述 |
 
-### 7.2 提交 RFC（draft -> submitted）
+### 8.2 提交 RFC（draft -> approved）
 
 ```bash
 spec-first rfc submit <rfcId> --feature <featureId>
 ```
 
-### 7.3 RFC 状态转换
+### 8.3 RFC 状态转换
 
 ```bash
-spec-first rfc transition <rfcId> <status> --feature <featureId> [--actor <actor>]
+spec-first rfc transition <rfcId> <status> --feature <featureId>
 ```
 
-### 7.4 列出 RFC
+### 8.4 列出 RFC
 
 ```bash
-spec-first rfc list <featureId> [--status <status>]
+spec-first rfc list <featureId>
 ```
 
-### 7.5 查看 RFC 详情
+### 8.5 查看 RFC 详情
 
 ```bash
 spec-first rfc get <rfcId> --feature <featureId>
@@ -308,21 +316,21 @@ spec-first defect register <featureId> --title <title> --severity <S1|S2|S3|S4> 
 ### 8.2 更新缺陷状态
 
 ```bash
-spec-first defect update <defectId> <status> [--actor <actor>]
+spec-first defect update <featureId> <seq> --status <status> [--actor <actor>]
 ```
 
-状态可选：`new`、`confirmed`、`assigned`、`fixing`、`fixed`、`verified`、`closed`、`duplicate`、`not_a_bug`、`cannot_reproduce`、`needs_info`、`wont_fix`、`deferred`。
+状态可选：`open`、`fixing`、`fixed`、`verified`、`wontfix`。
 
-### 8.3 列出未关闭缺陷
+### 8.3 列出缺陷
 
 ```bash
-spec-first defect list <featureId>
+spec-first defect list <featureId> [--status <status>] [--severity <severity>]
 ```
 
 ### 8.4 查看缺陷详情
 
 ```bash
-spec-first defect get <defectId>
+spec-first defect get <featureId> <seq>
 ```
 
 ### 8.5 计算缺陷逃逸率
@@ -338,7 +346,7 @@ spec-first defect escape-rate <featureId>
 ### 9.1 生成 ContextPack
 
 ```bash
-spec-first ai context <featureId> [--stage <stageId>] [--validate]
+spec-first ai context <featureId> [--full] [--expand <path1,path2>]
 ```
 
 ### 9.2 执行 Session Catchup
@@ -443,20 +451,38 @@ spec-first analyze <featureId>
 
 ## 17. `spec-first trace`
 
-### 17.1 追溯链修复
+### 17.1 修复追溯链
 
 ```bash
-spec-first trace <featureId>
+spec-first trace fix <featureId>
+```
+
+### 17.2 校验追溯链
+
+```bash
+spec-first trace validate <featureId>
 ```
 
 ---
 
 ## 18. `spec-first validate`
 
-### 18.1 产物校验
+### 18.1 格式校验
 
 ```bash
-spec-first validate <featureId>
+spec-first validate format <featureId>
+```
+
+### 18.2 矩阵校验
+
+```bash
+spec-first validate matrix
+```
+
+### 18.3 执行全部校验
+
+```bash
+spec-first validate all <featureId>
 ```
 
 ---

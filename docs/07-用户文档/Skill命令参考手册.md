@@ -2,7 +2,7 @@
 
 > **版本**: v2.1 | **日期**: 2026-03-09
 > **基准**: 当前代码实现（src/cli/commands/*.ts + skills/spec-first/*.md）
-> **总览**: 20 个 Skill（6 阶段执行模型） + 22 个 CLI 命令组（47 子命令）
+> **总览**: 20 个 Skill（6 阶段执行模型） + 22 个 CLI 命令组（53 子命令）
 
 ---
 
@@ -86,7 +86,7 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 
 ---
 
-## 二、CLI 原子命令（22 组 47 子命令）
+## 二、CLI 原子命令（22 组 53 子命令）
 
 底层确定性执行层，由 Skill 编排调用或用户直接使用。详见《CLI命令参考手册.md》。
 
@@ -95,7 +95,7 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 | # | 命令组 | 子命令数 | 功能域 |
 |---|---|---:|---|
 | 1 | `spec-first init` | 1 | Feature 初始化 |
-| 2 | `spec-first stage` | 3 | 阶段管理 |
+| 2 | `spec-first stage` | 4 | 阶段管理 |
 | 3 | `spec-first id` | 4 | ID 管理 |
 | 4 | `spec-first gate` | 3 | Gate 校验 |
 | 5 | `spec-first golive` | 1 | 上线检查 |
@@ -110,13 +110,13 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 | 14 | `spec-first hooks` | 3 | Git Hooks 管理 |
 | 15 | `spec-first viewer` | 3 | 可视化面板 |
 | 16 | `spec-first update` | 1 | 刷新配置 |
-| 17 | `spec-first setup` | 1 | 宿主注册 |
+| 17 | `spec-first setup` | 1 | 宿主注册（兼容入口） |
 | 18 | `spec-first uninstall` | 1 | 清理配置 |
 | 19 | `spec-first analyze` | 1 | 一致性分析 |
-| 20 | `spec-first trace` | 1 | 追溯链修复 |
-| 21 | `spec-first validate` | 1 | 产物校验 |
+| 20 | `spec-first trace` | 2 | 追溯链修复与校验 |
+| 21 | `spec-first validate` | 3 | 产物校验 |
 | 22 | `spec-first doctor` | 1 | 环境诊断 |
-| | **合计** | **47** | |
+| | **合计** | **53** | |
 
 ---
 

@@ -1,6 +1,6 @@
 /**
  * stage CLI 命令组
- * spec-first stage current|advance|cancel
+ * spec-first stage current|suggest|advance|cancel
  */
 import { join } from 'node:path';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -8,7 +8,12 @@ import { ExitCode } from '../../shared/types.js';
 import { advance, GateUnavailableError, GateFailedError } from '../../core/process-engine/advance.js';
 import { cancel } from '../../core/process-engine/advance.js';
 import { getFeatureState } from '../../core/process-engine/feature.js';
+import { checkDependencies } from '../../core/process-engine/dependency-checker.js';
+import { decideNextStep, getNextStage } from '../../core/process-engine/next-step-decider.js';
+import { evaluateGate } from '../../core/gate-engine/gate-evaluator.js';
+import { loadTodoState } from '../../core/ai-orchestrator/todo-runner.js';
 import { checkHooks } from '../../core/tool-integration/hook-installer.js';
+import { resetConfigCache } from '../../shared/config-schema.js';
 import { parseFlag } from '../parse-utils.js';
 
 /** AI Runtime Hook 类型常量 */
@@ -26,6 +31,7 @@ export function handleStage(args: string[]): number {
 
   switch (sub) {
     case 'current': return handleCurrent(rest);
+    case 'suggest': return handleSuggest(rest);
     case 'advance': return handleAdvance(rest);
     case 'cancel':  return handleCancel(rest);
     default:
@@ -108,7 +114,6 @@ function handleCurrent(args: string[]): number {
     console.log(`模式：   ${state.mode}  规模：${state.size}`);
     console.log(`终态：${state.terminal}`);
 
-    // Hooks 状态
     const hookStatuses = checkHooks(projectRoot);
     const installedHooks = hookStatuses.filter((h) => h.installed && h.isSpecFirst).map((h) => h.name);
     const missingHooks = hookStatuses.filter((h) => !h.installed || !h.isSpecFirst).map((h) => h.name);
@@ -118,15 +123,61 @@ function handleCurrent(args: string[]): number {
       console.log(`  未安装: ${missingHooks.join(', ')}`);
     }
 
-    // AI Hooks 状态
     const aiHooksStatus = checkAIHooksStatus(projectRoot);
     console.log(`\nAI Hooks：`);
     console.log(`  已注册: ${aiHooksStatus.registered.length > 0 ? aiHooksStatus.registered.join(', ') : '(无)'}`);
 
-    // Skill 命令状态
     const skillCount = countSkillCommands(projectRoot);
     console.log(`\nSkill 命令：`);
     console.log(`  已注册: ${skillCount > 0 ? `${skillCount} 个` : '(无)'}`);
+
+    return ExitCode.SUCCESS;
+  } catch (e) {
+    console.error(`错误：${(e as Error).message}`);
+    return ExitCode.IO_ERROR;
+  }
+}
+
+function handleSuggest(args: string[]): number {
+  const featureId = args[0];
+  if (!featureId) {
+    console.error('用法：spec-first stage suggest <featureId>');
+    return ExitCode.VALIDATION_ERROR;
+  }
+
+  try {
+    const projectRoot = process.cwd();
+    resetConfigCache();
+    const state = getFeatureState(featureId, projectRoot);
+    const upcomingStage = getNextStage(state.currentStage);
+    const nextStep = decideNextStep({
+      featureId,
+      currentStage: state.currentStage,
+      stageStatus: state.stageStatus,
+      autoAdvancePolicy: state.autoAdvancePolicy,
+      gateStatus: state.stageStatus === 'ready_to_advance'
+        ? evaluateGate(featureId, projectRoot, { persist: false }).status
+        : undefined,
+      dependencyCheck: upcomingStage ? checkDependencies(featureId, upcomingStage, projectRoot) : undefined,
+      todoState: loadTodoState(featureId, projectRoot),
+    });
+
+    console.log(`Feature：${state.featureId}`);
+    console.log(`当前阶段：${state.currentStage}`);
+    console.log(`阶段子状态：${state.stageStatus ?? 'drafting'}`);
+    if (nextStep.nextStage) {
+      console.log(`下一阶段：${nextStep.nextStage}`);
+    }
+    console.log(`决策：${nextStep.decision}`);
+    if (nextStep.suggestedCommand) {
+      console.log(`建议命令：${nextStep.suggestedCommand}`);
+    }
+    if (nextStep.reasons.length > 0) {
+      console.log('阻塞原因：');
+      for (const reason of nextStep.reasons) {
+        console.log(`  - ${reason}`);
+      }
+    }
 
     return ExitCode.SUCCESS;
   } catch (e) {
@@ -190,6 +241,7 @@ function printStageHelp(): void {
 
 子命令：
   current   查看当前阶段
+  suggest   输出当前阶段建议与阻塞原因
   advance   推进到下一阶段
   cancel    取消 Feature`);
 }

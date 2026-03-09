@@ -48,6 +48,7 @@ changelog: Aligned with manifest-driven bootstrap checks (MCP/skills from config
 - 如发生自动修复，已输出修复前后差异
 
 ## 背景诊断范围
+- 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 诊断 `stage-views` 健康状态
 - 诊断 `background_input_status`
 - 对比 `runtime 真源` 与 `docs 投影视图` 是否失同步

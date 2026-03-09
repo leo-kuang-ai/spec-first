@@ -82,4 +82,13 @@ describe('07-code skill docs consistency', () => {
     expect(standards).toContain('likelyChangeAreas');
     expect(standards).toContain('changeHazards');
   });
+
+  it('should align code background naming with the shared contract', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('shared/background-quality-contract.md');
+    expect(skill).toContain('backgroundInputStatus');
+    expect(skill).toContain('background_input_status');
+    expect(skill).toContain('输入层');
+  });
 });

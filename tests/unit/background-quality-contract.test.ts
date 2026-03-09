@@ -96,4 +96,25 @@ describe('background quality shared contract', () => {
     expect(specSkill).toContain('background_input_status');
     expect(specSkill).toContain('degraded');
   });
+
+  it('should keep design code and task aligned with the shared contract', () => {
+    const designSkill = read(join(import.meta.dirname, '../../skills/spec-first/04-design/SKILL.md'));
+    const codeSkill = read(join(import.meta.dirname, '../../skills/spec-first/07-code/SKILL.md'));
+    const taskSkill = read(join(import.meta.dirname, '../../skills/spec-first/06-task/SKILL.md'));
+
+    expect(designSkill).toContain('shared/background-quality-contract.md');
+    expect(designSkill).toContain('backgroundInputStatus');
+    expect(designSkill).toContain('background_input_status');
+    expect(designSkill).toContain('输入层');
+
+    expect(codeSkill).toContain('shared/background-quality-contract.md');
+    expect(codeSkill).toContain('backgroundInputStatus');
+    expect(codeSkill).toContain('background_input_status');
+    expect(codeSkill).toContain('输入层');
+
+    expect(taskSkill).toContain('shared/background-quality-contract.md');
+    expect(taskSkill).toContain('backgroundInputStatus');
+    expect(taskSkill).toContain('background_input_status');
+    expect(taskSkill).toContain('输入层');
+  });
 });

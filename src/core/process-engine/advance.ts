@@ -15,6 +15,7 @@ import { assertTransitionAllowed, isTerminal } from './stage-machine.js';
 import { evaluateGate } from '../gate-engine/gate-evaluator.js';
 import { syncAgentContextFromDesign } from '../tool-integration/context-sync.js';
 import { checkDependencies } from './dependency-checker.js';
+import { getNextStage } from './next-step-decider.js';
 
 export class GateUnavailableError extends Error {
   constructor(message = 'GateEngine 不可用') {
@@ -40,11 +41,6 @@ export interface AdvanceResult {
   gateResult: string;
 }
 
-/** 顺序阶段链（不含 CANCELLED） */
-const STAGE_ORDER: readonly Stage[] = [
-  Stage.INIT, Stage.SPECIFY, Stage.DESIGN, Stage.PLAN,
-  Stage.IMPLEMENT, Stage.VERIFY, Stage.WRAP_UP, Stage.RELEASE, Stage.DONE,
-];
 
 function getStatePath(featureId: string, root: string): string {
   return join(root, 'specs', featureId, 'stage-state.json');
@@ -65,11 +61,11 @@ function loadState(featureId: string, root: string): StageState {
 }
 
 function nextStageInChain(current: Stage): Stage {
-  const idx = STAGE_ORDER.indexOf(current);
-  if (idx === -1 || idx >= STAGE_ORDER.length - 1) {
+  const next = getNextStage(current);
+  if (!next) {
     throw new Error(`阶段 ${current} 之后不存在下一阶段`);
   }
-  return STAGE_ORDER[idx + 1];
+  return next;
 }
 
 function appendFindings(featureId: string, root: string, msg: string): void {

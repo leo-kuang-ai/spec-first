@@ -431,6 +431,18 @@ describe('handleStage', () => {
     expect(handleStage(['unknown'])).toBe(2);
   });
 
+
+  it('should include suggest in stage help output', () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const code = handleStage(['unknown']);
+      const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+      expect(code).toBe(2);
+      expect(output).toContain('suggest');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
   it('should return error for current with missing featureId', () => {
     const mockError = vi.spyOn(console, 'error').mockImplementation(() => {});
     const code = handleStage(['current']);

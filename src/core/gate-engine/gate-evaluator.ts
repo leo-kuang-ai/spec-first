@@ -318,7 +318,11 @@ export function getConditions(stage: Stage, projectType?: string): GateCondition
 }
 
 /** 评估 Gate：条件检查 + 豁免匹配 → 三态结果 */
-export function evaluateGate(featureId: string, projectRoot: string): GateResult {
+export interface EvaluateGateOptions {
+  persist?: boolean;
+}
+
+export function evaluateGate(featureId: string, projectRoot: string, options: EvaluateGateOptions = {}): GateResult {
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   const state = readJsonChecked(statePath, isStageState);
   const stage = state.currentStage;
@@ -414,12 +418,14 @@ export function evaluateGate(featureId: string, projectRoot: string): GateResult
   };
 
   // 写入 gate-history.jsonl
-  const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
-  appendJsonl(historyPath, {
-    event: 'gate_eval',
-    featureId,
-    ...gateResult,
-  });
+  if (options.persist !== false) {
+    const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
+    appendJsonl(historyPath, {
+      event: 'gate_eval',
+      featureId,
+      ...gateResult,
+    });
+  }
 
   return gateResult;
 }
