@@ -4,6 +4,10 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { join } from 'node:path';
 import { refreshFirstArtifacts } from '../../src/core/skill-runtime/first-context.js';
 import {
+  getFirstRoleViewsPath,
+  getFirstRuntimeIndexPath,
+  getFirstRuntimeSummaryPath,
+  getFirstStageViewsPath,
   readFirstRuntimeIndex,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
@@ -147,6 +151,128 @@ describe('refreshFirstArtifacts', () => {
 
     const refreshedIndex = readFirstRuntimeIndex(TEST_ROOT);
     expect(refreshedIndex?.docsProjection['docs/first/README.md']?.healthy).toBe(true);
+  });
+
+  it('refreshes docs from legacy runtime truth source without crashing', () => {
+    writeFileSync(getFirstRuntimeIndexPath(TEST_ROOT), JSON.stringify({
+      version: '2.1.0',
+      mode: 'quick',
+      generated_at: '2026-03-09T04:43:27.542Z',
+      project: {
+        name: 'spec-first',
+        type: 'cli-tool',
+        description: 'Specification-driven development process engine',
+      },
+      artifacts: [
+        { id: 'tech-stack', path: 'docs/first/tech-stack.md', type: 'tech-stack', status: 'generated' },
+        { id: 'api-docs', path: 'docs/first/api-docs.md', type: 'api-specification', status: 'generated' },
+      ],
+      database: { detected: false, reason: 'No database dependencies found' },
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstRuntimeSummaryPath(TEST_ROOT), JSON.stringify({
+      mode: 'quick',
+      generated_at: '2026-03-09T04:43:27.542Z',
+      tech_stack: { runtime: 'Node.js ≥20.0.0', language: 'TypeScript 5.4+' },
+      project_type: 'cli-tool',
+      core_modules: ['skill-runtime', 'gate-engine'],
+      commands_count: 19,
+      has_database: false,
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstRoleViewsPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      roles: {
+        developer: { priority_docs: ['codebase-overview.md'], entry_points: ['src/cli/index.ts'], key_concepts: ['Feature'] },
+        product_manager: { priority_docs: ['domain-model.md'], entry_points: ['specs/'], key_concepts: ['RFC'] },
+        tester: { priority_docs: ['domain-model.md'], entry_points: ['tests/'], key_concepts: ['Coverage'] },
+        architect: { priority_docs: ['tech-stack.md'], entry_points: ['src/core/'], key_concepts: ['Process Engine'] },
+      },
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstStageViewsPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      stages: {
+        '00_init': { relevant_docs: ['codebase-overview.md'], key_files: ['src/cli/index.ts'] },
+        '01_specify': { relevant_docs: ['domain-model.md', 'api-docs.md'], key_files: ['specs/'] },
+        '02_design': { relevant_docs: ['tech-stack.md'], key_files: ['src/core/skill-runtime/'] },
+        '03_plan': { relevant_docs: ['codebase-overview.md'], key_files: ['src/core/change-mgr/'] },
+        '04_implement': { relevant_docs: ['tech-stack.md'], key_files: ['src/', 'tests/'] },
+        '05_verify': { relevant_docs: ['domain-model.md'], key_files: ['src/core/gate-engine/', 'tests/'] },
+      },
+    }, null, 2), 'utf-8');
+
+    const result = refreshFirstArtifacts(TEST_ROOT, 'refresh-docs-from-runtime');
+
+    expect(result.runtimeArtifacts).toEqual([]);
+    expect(result.docsProjections).toEqual(expect.arrayContaining([
+      'docs/first/README.md',
+      'docs/first/summary.md',
+      'docs/first/role-views.md',
+      'docs/first/stage-views.md',
+    ]));
+    expect(readFileSync(join(TEST_ROOT, 'docs', 'first', 'summary.md'), 'utf-8')).toContain('## Tech Stack');
+    expect(readFirstRuntimeIndex(TEST_ROOT)?.docsProjection['docs/first/summary.md']?.healthy).toBe(true);
+  });
+
+  it('refreshes docs when legacy runtime files drift in the working tree', () => {
+    writeFileSync(getFirstRuntimeIndexPath(TEST_ROOT), JSON.stringify({
+      version: '2.1.0',
+      mode: 'quick',
+      generated_at: '2026-03-09T04:43:27.542Z',
+      project: {
+        name: 'spec-first',
+        type: 'cli-tool',
+        description: 'Specification-driven development process engine',
+      },
+      artifacts: [
+        { id: 'tech-stack', path: 'docs/first/tech-stack.md', type: 'tech-stack', status: 'generated' },
+      ],
+      database: { detected: false, reason: 'No database dependencies found' },
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstRuntimeSummaryPath(TEST_ROOT), JSON.stringify({
+      mode: 'quick',
+      generated_at: '2026-03-09T04:43:27.542Z',
+      tech_stack: { runtime: 'Node.js ≥20.0.0' },
+      project_type: 'cli-tool',
+      core_modules: ['skill-runtime'],
+      commands_count: 19,
+      has_database: false,
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstRoleViewsPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      roles: {
+        developer: { priority_docs: ['codebase-overview.md'], entry_points: ['src/cli/index.ts'], key_concepts: ['Feature'] },
+        product_manager: { priority_docs: ['domain-model.md'], entry_points: ['specs/'], key_concepts: ['RFC'] },
+        tester: { priority_docs: ['domain-model.md'], entry_points: ['tests/'], key_concepts: ['Coverage'] },
+        architect: { priority_docs: ['tech-stack.md'], entry_points: ['src/core/'], key_concepts: ['Process Engine'] },
+      },
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstStageViewsPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      stages: {
+        '00_init': { relevant_docs: ['codebase-overview.md'], key_files: ['src/cli/index.ts'] },
+        '01_specify': { relevant_docs: ['domain-model.md'], key_files: ['specs/'] },
+        '02_design': { relevant_docs: ['tech-stack.md'], key_files: ['src/core/skill-runtime/'] },
+        '03_plan': { relevant_docs: ['codebase-overview.md'], key_files: ['src/core/change-mgr/'] },
+        '04_implement': { relevant_docs: ['tech-stack.md'], key_files: ['src/', 'tests/'] },
+        '05_verify': { relevant_docs: ['domain-model.md'], key_files: ['src/core/gate-engine/', 'tests/'] },
+      },
+    }, null, 2), 'utf-8');
+
+    const result = refreshFirstArtifacts(TEST_ROOT, 'refresh-all');
+
+    expect(result.runtimeArtifacts).toEqual([]);
+    expect(result.docsProjections).toEqual(expect.arrayContaining([
+      'docs/first/README.md',
+      'docs/first/summary.md',
+      'docs/first/role-views.md',
+      'docs/first/stage-views.md',
+    ]));
+    expect(readFirstRuntimeIndex(TEST_ROOT)?.docsProjection['docs/first/README.md']?.healthy).toBe(true);
   });
 
   it('refreshes runtime artifacts when relevant source drift was already committed', () => {

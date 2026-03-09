@@ -184,6 +184,9 @@ digraph plan_flow {
 - 输入层 / metadata / runtime 内部字段使用 `backgroundInputStatus`
 - 用户可见输出、计划摘要与状态展示层字段使用 `background_input_status`
 - `backgroundInputStatus` 仅用于输入层，不替代输出层命名
+- 治理信号命名遵循 `../shared/orchestration-governance-contract.md`
+- `dependencyStrength`、`riskCategory`、`riskSignals` 属于输入层治理字段
+- plan 负责承接输入层治理信号，不把这些字段改写成展示层 snake_case 协议
 - 根据目标阶段显示 `dependencyStrength` (L1/L2/L3)
 - 高风险场景关注 `riskCategory` 和 `riskSignals`
 - 复用 orchestrate 的背景治理口径

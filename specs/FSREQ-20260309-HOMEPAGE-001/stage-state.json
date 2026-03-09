@@ -1,0 +1,190 @@
+{
+  "featureId": "FSREQ-20260309-HOMEPAGE-001",
+  "mode": "I",
+  "size": "S",
+  "platforms": [
+    "admin-frontend",
+    "backend"
+  ],
+  "backgroundInputStatus": "full",
+  "stageStatus": "drafting",
+  "autoAdvancePolicy": "suggest",
+  "mergedRules": {
+    "gateConditions": {
+      "01_specify": [
+        {
+          "id": "L0-SPEC-001",
+          "description": "FR/NFR 列表存在且非空"
+        },
+        {
+          "id": "L1-MODE-I-001",
+          "description": "impact-analysis.md 存在且非空"
+        }
+      ],
+      "02_design": [
+        {
+          "id": "L0-DESIGN-001",
+          "description": "设计文档存在"
+        }
+      ],
+      "03_plan": [
+        {
+          "id": "L0-PLAN-001",
+          "description": "task_plan.md 存在且非空"
+        }
+      ],
+      "04_implement": [
+        {
+          "id": "L0-IMPL-001",
+          "description": "追踪矩阵覆盖率 ≥ 基线"
+        },
+        {
+          "id": "G-ADMIN-FE-LINT",
+          "description": "ESLint pass",
+          "command": "pnpm lint"
+        },
+        {
+          "id": "G-ADMIN-FE-TYPECHECK",
+          "description": "TypeScript typecheck pass",
+          "command": "pnpm typecheck"
+        },
+        {
+          "id": "G-BE-LINT",
+          "description": "Lint pass",
+          "command": "npm run lint"
+        },
+        {
+          "id": "G-BE-UNIT",
+          "description": "Unit test pass",
+          "command": "npm test"
+        }
+      ],
+      "05_verify": [
+        {
+          "id": "L0-VERIFY-001",
+          "description": "测试用例存在且通过"
+        },
+        {
+          "id": "G-ADMIN-FE-BUILD",
+          "description": "Production build pass",
+          "command": "pnpm build"
+        },
+        {
+          "id": "G-BE-CONTRACT",
+          "description": "API contract check pass",
+          "command": "npm run contract:check"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "id": "L0-WRAP-001",
+          "description": "归档清单完整"
+        }
+      ]
+    },
+    "deliverables": {
+      "01_specify": [
+        {
+          "name": "spec.md",
+          "required": true,
+          "description": "FR/NFR 列表"
+        },
+        {
+          "name": "impact-analysis.md",
+          "required": true,
+          "description": "变更影响分析"
+        }
+      ],
+      "02_design": [
+        {
+          "name": "design.md",
+          "required": true,
+          "description": "技术设计文档"
+        },
+        {
+          "name": "api-contract.yaml",
+          "required": true,
+          "description": "API 契约"
+        },
+        {
+          "name": "ui-information-architecture.md",
+          "required": false
+        },
+        {
+          "name": "contracts/openapi.yaml",
+          "required": true
+        }
+      ],
+      "03_plan": [
+        {
+          "name": "task_plan.md",
+          "required": true,
+          "description": "任务计划"
+        }
+      ],
+      "05_verify": [
+        {
+          "name": "reports/test-report.md",
+          "required": true,
+          "description": "测试报告"
+        },
+        {
+          "name": "reports/regression-report.md",
+          "required": true,
+          "description": "回归验证报告"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "name": "retro.md",
+          "required": true,
+          "description": "归档复盘记录"
+        }
+      ],
+      "07_release": [
+        {
+          "name": "reports/smoke-test-report.md",
+          "required": true,
+          "description": "冒烟验证报告"
+        },
+        {
+          "name": "reports/release-note.md",
+          "required": true,
+          "description": "发布说明"
+        },
+        {
+          "name": "reports/admin-bundle-analysis.md",
+          "required": false
+        },
+        {
+          "name": "reports/api-change-log.md",
+          "required": false
+        }
+      ]
+    },
+    "thresholds": {
+      "bundle_size_main": {
+        "value": 400,
+        "direction": "lower_is_better"
+      },
+      "first_screen_time": {
+        "value": 2500,
+        "direction": "lower_is_better"
+      },
+      "api_p95_latency": {
+        "value": 300,
+        "direction": "lower_is_better"
+      },
+      "error_rate": {
+        "value": 1,
+        "direction": "lower_is_better"
+      }
+    }
+  },
+  "currentStage": "00_init",
+  "history": [],
+  "terminal": false,
+  "title": "首页美化与交互优化",
+  "createdAt": "2026-03-09T05:08:24.433Z",
+  "updatedAt": "2026-03-09T05:08:24.433Z"
+}

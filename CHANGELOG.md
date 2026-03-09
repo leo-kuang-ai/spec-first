@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.50 2026-03-09 Claude: docs(first): 强制要求使用 buildRoleViews/buildStageViews 函数生成 JSON，禁止手动构造，确保格式与类型定义一致
+- v0.5.50 2026-03-09 Claude: docs(first): 添加 P3 阶段 runtime 真源生成指令，明确 summary.json/index.json 完整结构与必需字段，防止 AI 生成不完整 JSON
+- v0.5.50 2026-03-09 Claude: fix(init): 添加 summary.json 字段安全访问，防止 platformType/modules/apiSurface 未定义时崩溃
+- v0.5.50 2026-03-09 Claude: docs(first): 完成 deep 模式项目认知 — 生成 10 个完整文档（tech-stack/api-docs/codebase-overview/domain-model/call-graph/architecture/external-deps/local-setup/development-guidelines/README），更新 runtime 真源（index.json/summary.json），全部标注证据源 (user-visible)
+- v0.5.50 2026-03-09 Claude: docs(first): 升级 domain-model.md 为 deep 版本 — 添加详细属性定义表、4 个状态转换图（Stage/RFC/Defect/MatrixStatus）、9 个领域事件流、完整 ER 图、5 个业务流程时序图、8 个领域服务定义、25+ 条约束规则，全部标注证据源，符合 A4 deep 模式规格 (user-visible)
+- v0.5.50 2026-03-09 Claude: fix(uninstall): 新增 CC Switch skills 清理逻辑，修正步骤编号
+- v0.5.50 2026-03-09 Claude: docs(first): 生成 deep 模式代码库概览 codebase-overview.md（含符号分析、依赖关系图、开发入口映射）+ 模块清单 JSON
+- v0.5.50 2026-03-09 Claude: refactor(install): 统一 postinstall 和 preuninstall 的全局检测逻辑，删除未使用函数
+- v0.5.50 2026-03-09 Claude: docs: 更新版本号至 v0.5.49
+- v0.5.50 2026-03-09 Claude: feat(host-paths): 支持 CC Switch 路径检测，增强多工具管理兼容性 (user-visible)
+- v0.5.50 2026-03-09 Claude: docs(first): 生成研发规范文档 development-guidelines.md（deep 模式，10 个规范模块，完整证据标注）
+- v0.5.50 2026-03-09 Claude: docs(first): 生成本地环境搭建文档 local-setup.md（deep 模式，12 个章节，完整证据标注）
+- v0.5.50 2026-03-09 Claude: docs(first): 生成外部依赖分析文档 external-deps.md（deep 模式）
+- v0.5.50 2026-03-09 Claude: refactor(viewer): 统一前后端 FLOW_STAGES 常量定义，消除重复代码 (user-visible)
+- v0.5.50 2026-03-09 Claude: refactor(viewer): 消除 server.js 与 task-parser.ts 代码重复，提取共享模块
+- v0.5.50 2026-03-09 Claude: test(viewer): 添加 sanitizeFeatureId 和 escapeHtml 安全测试，覆盖路径遍历和 XSS 攻击
+- v0.5.49 2026-03-09 Claude: fix(postinstall): 增强全局安装检测可靠性，解决新电脑安装后 skills 不注册的问题 (user-visible)
 - v0.5.48 2026-03-09 Claude: fix(viewer): 修复任务状态解析与归一化逻辑 (user-visible)
 - v0.5.48 2026-03-09 Claude: refactor: 优化命令路由与阶段推进逻辑，增强测试覆盖
 - v0.5.48 2026-03-09 Claude: docs: 审查并更新文档，增强 analyze skill 背景质量分析 (user-visible)

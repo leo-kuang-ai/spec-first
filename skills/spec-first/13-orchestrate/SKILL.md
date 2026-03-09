@@ -15,6 +15,13 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - Command: `/spec-first:orchestrate`
 
 
+## 参数模式
+- `/spec-first:orchestrate`：默认只做协调与建议，不自动推进阶段
+- `/spec-first:orchestrate --auto`：运行 todo auto-loop，并在批次结束后进入统一决策层
+- `/spec-first:orchestrate --auto --resume`：基于最近 checkpoint 恢复 auto-loop
+- `/spec-first:orchestrate --auto-advance`：仅当决策层返回 `READY_TO_ADVANCE / AUTO_ADVANCE` 时才执行 `stage advance`
+- 未启用 `--auto-advance` 时，即使满足推进条件也只输出建议，不自动写入阶段状态
+
 ## Feature 定位规则
 
 ### 优先级
@@ -213,6 +220,9 @@ Stage -> Skill 映射（P4 按此表调度）：
 
 
 ## 背景治理口径
+- orchestrate 治理信号命名遵循 `../shared/orchestration-governance-contract.md`
+- 展示层 / user-visible guidance 字段统一使用 `background_status`、`dependency_strength`、`risk_category`、`risk_signals`、`recommended_action`
+- orchestrate 内部 runtime 结构允许继续使用 camelCase，但输出给用户时必须投影为展示层 snake_case 字段
 - 背景状态：`full / degraded / blind`
 - 依赖强度：`L1 / L2 / L3`
 - `L3` 由高依赖阶段（`02_design / 04_implement / 05_verify`）叠加 `hard-gate` 高风险信号推导得出
@@ -221,3 +231,4 @@ Stage -> Skill 映射（P4 按此表调度）：
 - `blind` 状态下必须显式警告，并优先建议补跑 `/spec-first:first`
 - `degraded` + `L2/L3` 时，应提示风险评估，不得静默推进
 - 若检测到高风险信号，运行时上下文应额外输出 `risk_category` 与 `risk_signals`
+- orchestrate 负责投影已有治理信号，不在展示层发明新的风险语义

@@ -55,9 +55,12 @@ export interface AutoLoopOptions {
   onIteration?: (iteration: number, state: TodoRunnerState) => void;
 }
 
+export type AutoLoopStatus = 'all_done' | 'has_blocked' | 'timeout' | 'no_state_file' | 'max_iterations' | 'incomplete';
+
 export interface AutoLoopResult {
   halted: boolean;
   haltReason?: string;
+  status: AutoLoopStatus;
   iterations: number;
   completedTasks: string[];
 }
@@ -100,7 +103,7 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
   // 加载或恢复状态
   let state = loadTodoState(featureId, projectRoot);
   if (!state) {
-    return { halted: true, haltReason: 'no_state_file', iterations: 0, completedTasks: [] };
+    return { halted: true, haltReason: 'no_state_file', status: 'no_state_file', iterations: 0, completedTasks: [] };
   }
 
   state = ensureAutoLoopState(state);
@@ -390,7 +393,17 @@ function buildResult(
   return {
     halted: state.halted,
     haltReason: state.haltReason,
+    status: classifyAutoLoopStatus(state.haltReason),
     iterations: state.iteration - startIteration,
     completedTasks,
   };
+}
+
+function classifyAutoLoopStatus(haltReason: string | undefined): AutoLoopStatus {
+  if (haltReason === 'completed') return 'all_done';
+  if (haltReason === 'no_state_file') return 'no_state_file';
+  if (haltReason?.startsWith('blocked')) return 'has_blocked';
+  if (haltReason?.startsWith('task_timeout') || haltReason?.startsWith('stalled_timeout')) return 'timeout';
+  if (haltReason?.startsWith('max_iterations')) return 'max_iterations';
+  return 'incomplete';
 }

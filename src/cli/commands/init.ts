@@ -241,9 +241,9 @@ export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
   if (runtimeIndex && runtimeSummary) {
     return {
       mode: runtimeIndex.mode,
-      techStack: runtimeSummary.project.platformType ?? '待确认',
-      codeVolume: runtimeSummary.modules.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
-      apiSurface: runtimeSummary.apiSurface.length > 0 ? `${runtimeSummary.apiSurface.length}+ 个` : '待确认',
+      techStack: runtimeSummary.project?.platformType ?? '待确认',
+      codeVolume: runtimeSummary.modules?.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
+      apiSurface: runtimeSummary.apiSurface?.length > 0 ? `${runtimeSummary.apiSurface.length}+ 个` : '待确认',
     };
   }
 

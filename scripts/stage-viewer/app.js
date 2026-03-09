@@ -1,4 +1,6 @@
-const state = {
+import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js';
+
+  const state = {
     features: [],
     selectedFeatureId: null,
     selectedFlowStage: null,
@@ -12,33 +14,6 @@ const state = {
   const projectRootEl = document.getElementById('projectRoot');
   const detailEl = document.getElementById('detail');
   const emptyEl = document.getElementById('empty');
-  const FLOW_STAGES = [
-    { id: '00_init', label: '初始化', desc: '创建 Feature 目录与基础上下文文件。' },
-    { id: '01_specify', label: '需求分析', desc: '明确需求范围、FR/NFR 与验收标准。' },
-    { id: '02_design', label: '技术方案', desc: '输出技术方案、接口契约与关键设计。' },
-    { id: '03_plan', label: '开发任务', desc: '拆分任务并确定执行顺序与优先级。' },
-    { id: '04_implement', label: '编码', desc: '完成编码并通过实现阶段质量门禁。' },
-    { id: '05_verify', label: '测试', desc: '执行测试与回归，确认需求达成。' },
-    { id: '06_wrap_up', label: '收尾', desc: '沉淀追踪矩阵、归档交付物与结论。' },
-  ];
-  const STAGE_ORDER = [
-    '00_init',
-    '01_specify',
-    '02_design',
-    '03_plan',
-    '04_implement',
-    '05_verify',
-    '06_wrap_up',
-    '07_release',
-    '08_done',
-    '09_cancelled',
-  ];
-  const STAGE_LABEL_MAP = {
-    ...Object.fromEntries(FLOW_STAGES.map((item) => [item.id, item.label])),
-    '07_release': '发布',
-    '08_done': '完成',
-    '09_cancelled': '取消',
-  };
   const MODE_LABEL_MAP = {
     N: '新建',
     I: '迭代',

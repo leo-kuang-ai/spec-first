@@ -26,6 +26,7 @@ import { handleAnalyze } from './commands/analyze.js';
 import { handleTrace } from './commands/trace.js';
 import { handleValidate } from './commands/validate.js';
 import { handleDone } from './commands/done.js';
+import { handleOrchestrate } from './commands/orchestrate.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
 registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
@@ -48,6 +49,9 @@ registerCommand('doctor', '环境诊断与修复', handleDoctor);
 registerCommand('gate', '阶段质量门禁评估', handleGate);
 registerCommand('golive', '上线就绪检查与批准', handleGoLive);
 registerCommand('done', '将 Feature 从 07_release 收口到 08_done', handleDone, {
+  requiresConfirmation: true,
+});
+registerCommand('orchestrate', '受控编排协调入口（支持 --auto/--resume/--auto-advance）', handleOrchestrate, {
   requiresConfirmation: true,
 });
 registerCommand('ai', '会话恢复与上下文摘要', handleAi);

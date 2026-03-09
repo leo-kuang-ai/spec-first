@@ -63,16 +63,21 @@ function runUninstall({ dryRun, keepMcp }: UninstallOptions): number {
   // 3. 清理 Codex skills
   removeDir(`${prefix}Codex skills`, join(paths.codexSkillsDir, 'spec-first'), dryRun);
 
-  // 4. 清理全局 SessionStart Hook
+  // 4. 清理 CC Switch skills
+  if (paths.ccSwitchInstalled) {
+    removeDir(`${prefix}CC Switch skills`, join(paths.ccSwitchSkillsDir, 'spec-first'), dryRun);
+  }
+
+  // 5. 清理全局 SessionStart Hook
   removeSessionHook(paths.claudeHomeDir, dryRun, prefix);
 
-  // 5. 清理项目 AI Runtime Hooks
+  // 6. 清理项目 AI Runtime Hooks
   removeAIHooks(cwd, dryRun, prefix);
 
-  // 6. 清理 Git hooks
+  // 7. 清理 Git hooks
   removeGitHooks(cwd, dryRun, prefix);
 
-  // 7. MCP 配置提示
+  // 8. MCP 配置提示
   if (keepMcp) {
     console.log(`${prefix}MCP 配置: 已保留（--keep-mcp）`);
   } else {

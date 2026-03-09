@@ -24,6 +24,12 @@ export interface HostPaths {
   genericSkillsDir: string;
   specFirstSkillsDir: string;
   bootstrapCacheDir: string;
+  /** CC Switch 安装检测 */
+  ccSwitchInstalled: boolean;
+  /** CC Switch 数据目录 */
+  ccSwitchDataDir: string;
+  /** CC Switch skills 目录 */
+  ccSwitchSkillsDir: string;
 }
 
 export function formatHostPathSummary(paths: HostPaths): string[] {
@@ -35,6 +41,7 @@ export function formatHostPathSummary(paths: HostPaths): string[] {
     `Claude skills: ${paths.claudeSkillsDir}`,
     `Generic skills: ${paths.genericSkillsDir}`,
     `spec-first skills: ${paths.specFirstSkillsDir}`,
+    `CC Switch: ${paths.ccSwitchInstalled ? '已安装' : '未安装'} (${paths.ccSwitchDataDir})`,
   ];
 }
 
@@ -117,6 +124,11 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
   const homeDir = options?.homeDir ?? homedir();
   const platform = options?.platform ?? process.platform;
 
+  // CC Switch 检测（优先级最高）
+  const ccSwitchDataDir = env.CC_SWITCH_DATA_DIR?.trim() || join(homeDir, '.cc-switch');
+  const ccSwitchSkillsDir = env.CC_SWITCH_SKILLS_DIR?.trim() || join(ccSwitchDataDir, 'skills');
+  const ccSwitchInstalled = existsSync(join(ccSwitchDataDir, 'cc-switch.db'));
+
   const codexRoot = pickDirectoryByMarkers(
     buildCodexRootCandidates(env, homeDir, platform),
     ['config.toml', 'skills'],
@@ -171,5 +183,8 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
     genericSkillsDir,
     specFirstSkillsDir,
     bootstrapCacheDir,
+    ccSwitchInstalled,
+    ccSwitchDataDir,
+    ccSwitchSkillsDir,
   };
 }

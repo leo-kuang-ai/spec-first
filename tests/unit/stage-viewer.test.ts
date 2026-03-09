@@ -4,10 +4,8 @@ import { join } from 'node:path';
 import {
   parseTaskPlan,
   normalizeTaskStatus,
-  getDefaultMetrics,
-  calcHealthScore,
-  type TaskItem,
 } from '../../scripts/stage-viewer/task-parser.js';
+import { getDefaultMetrics, calcHealthScore } from '../../scripts/stage-viewer/health-utils.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-stage-viewer');
 const FEAT = 'FSREQ-TEST-001';

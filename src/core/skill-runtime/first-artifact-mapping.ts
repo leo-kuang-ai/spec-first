@@ -17,20 +17,7 @@ export const DEFAULT_AFFECTED_ARTIFACTS = ['codebase-overview.md', 'architecture
 export const FIRST_RUNTIME_ARTIFACTS = ['summary.json', 'role-views.json', 'stage-views.json'] as const;
 
 export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<(typeof FIRST_RUNTIME_ARTIFACTS)[number], readonly string[]> = {
-  'summary.json': [
-    'docs/first/README.md',
-    'docs/first/summary.md',
-    'docs/first/tech-stack.md',
-    'docs/first/codebase-overview.md',
-    'docs/first/architecture.md',
-    'docs/first/api-docs.md',
-    'docs/first/domain-model.md',
-    'docs/first/development-guidelines.md',
-    'docs/first/external-deps.md',
-    'docs/first/local-setup.md',
-    'docs/first/database-er.md',
-    'docs/first/call-graph.md',
-  ],
+  'summary.json': ['docs/first/README.md', 'docs/first/summary.md'],
   'role-views.json': ['docs/first/README.md', 'docs/first/role-views.md'],
   'stage-views.json': ['docs/first/README.md', 'docs/first/stage-views.md'],
 };

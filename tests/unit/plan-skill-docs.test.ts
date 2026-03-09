@@ -28,4 +28,14 @@ describe('11-plan skill docs consistency', () => {
     expect(skill).toContain('background_input_status');
     expect(skill).toContain('输入层');
   });
+
+  it('should align plan governance naming with the orchestration contract', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('shared/orchestration-governance-contract.md');
+    expect(skill).toContain('dependencyStrength');
+    expect(skill).toContain('riskCategory');
+    expect(skill).toContain('riskSignals');
+    expect(skill).toContain('输入层');
+  });
 });

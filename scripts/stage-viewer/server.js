@@ -6,6 +6,8 @@ import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { METRIC_DEFS, getDefaultMetrics, calcHealthScore } from './health-utils.js';
+import { parseTaskPlan, normalizeTaskStatus } from './task-parser.js';
+import { STAGE_ORDER, STAGE_NAMES } from './stage-constants.js';
 
 const DEFAULT_HOST = process.env.SPEC_FIRST_VIEWER_HOST ?? '127.0.0.1';
 const DEFAULT_PORT = parsePort(process.env.SPEC_FIRST_VIEWER_PORT, 0);
@@ -321,16 +323,6 @@ function getTimelineData(projectRoot, featureId) {
 
     // 计算每个阶段的时间
     const stageTimeline = [];
-    const stageOrder = ['00_init', '01_specify', '02_design', '03_plan', '04_implement', '05_verify', '06_wrap_up'];
-    const stageNames = {
-      '00_init': '初始化',
-      '01_specify': '需求规格',
-      '02_design': '技术设计',
-      '03_plan': '任务拆解',
-      '04_implement': '代码实现',
-      '05_verify': '验证测试',
-      '06_wrap_up': '归档复盘'
-    };
 
     // 按阶段分组，取每个阶段的第一个 PASS 事件作为进入时间
     const stageEntries = {};
@@ -396,112 +388,7 @@ function getTimelineData(projectRoot, featureId) {
 }
 
 // ─── Tasks API ──────────────────────────────────────────────────────
-
-function parseTaskPlan(projectRoot, featureId) {
-  const taskPath = join(projectRoot, 'specs', featureId, 'task_plan.md');
-  if (!existsSync(taskPath)) return null;
-
-  const content = readFileSync(taskPath, 'utf-8');
-  const tasks = [];
-  const phases = [];
-
-  // 解析阶段 (### Phase N: Title)
-  const phaseRegex = /### (Phase \d+):\s*(.+?)\n([\s\S]*?)(?=### Phase|\n## |$)/g;
-  let phaseMatch;
-  while ((phaseMatch = phaseRegex.exec(content)) !== null) {
-    const phaseId = phaseMatch[1];
-    const phaseTitle = phaseMatch[2].trim();
-    const phaseContent = phaseMatch[3];
-
-    // 提取阶段状态
-    const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
-    const phaseStatus = statusMatch ? normalizeTaskStatus(statusMatch[1]) : 'pending';
-
-    // 提取阶段内的任务
-    const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(.+)/g;
-    let taskMatch;
-    const phaseTasks = [];
-    while ((taskMatch = taskRegex.exec(phaseContent)) !== null) {
-      const checked = taskMatch[1] === 'x';
-      const taskId = taskMatch[2];
-      const taskTitle = taskMatch[3].trim();
-      phaseTasks.push({
-        id: taskId,
-        title: taskTitle,
-        status: checked ? 'complete' : 'pending',
-      });
-    }
-
-    phases.push({
-      id: phaseId,
-      title: phaseTitle,
-      status: phaseStatus,
-      tasks: phaseTasks,
-    });
-  }
-
-  // 解析任务明细表格
-  const tableRegex = /\|\s*TASK ID\s*\|[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/;
-  const tableMatch = content.match(tableRegex);
-  if (tableMatch) {
-    const rows = tableMatch[1].trim().split('\n').filter(row => row.includes('TASK-'));
-    for (const row of rows) {
-      const cols = row.split('|').map(c => c.trim()).filter(c => c);
-      if (cols.length >= 7) {
-        const taskId = cols[0];
-        const title = cols[1];
-        const owner = cols[2] || '-';
-        const effort = cols[3] || '-';
-        const traces = cols[4] || '';
-        const dependsOn = cols[5] || '-';
-        const acceptance = cols[6] || '-';
-        const status = cols[7] || 'pending';
-
-        tasks.push({
-          id: taskId,
-          title,
-          owner,
-          effort,
-          traces: traces ? traces.split(',').map(t => t.trim()) : [],
-          dependsOn: dependsOn && dependsOn !== '-' ? dependsOn.split(',').map(d => d.trim()) : [],
-          acceptance,
-          status: normalizeTaskStatus(status),
-        });
-      }
-    }
-  }
-
-  // 计算统计
-  const total = tasks.length;
-  const completed = tasks.filter(t => t.status === 'complete').length;
-  const inProgress = tasks.filter(t => t.status === 'in_progress').length;
-  const pending = tasks.filter(t => t.status === 'pending').length;
-  const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-  // 找出当前进行中的任务
-  const currentTasks = tasks.filter(t => t.status === 'in_progress');
-
-  return {
-    phases,
-    tasks,
-    stats: {
-      total,
-      completed,
-      inProgress,
-      pending,
-      progress,
-    },
-    currentTasks,
-  };
-}
-
-function normalizeTaskStatus(status) {
-  const s = status.toLowerCase().trim();
-  if (s === 'complete' || s === 'completed' || s === 'done') return 'complete';
-  if (s === 'in_progress' || s === 'in-progress' || s === 'in progress' || s === 'wip' || s === 'doing') return 'in_progress';
-  if (s === 'blocked' || s === 'skipped' || s === 'cancelled') return 'pending';
-  return 'pending';
-}
+// parseTaskPlan 和 normalizeTaskStatus 已移至 task-parser.js
 
 function sendJson(res, code, data) {
   res.writeHead(code, {

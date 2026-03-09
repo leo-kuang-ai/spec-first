@@ -70,6 +70,7 @@ describe('auto-loop happy path', () => {
     expect(result.completedTasks).toEqual(['T1', 'T2']);
     expect(result.halted).toBe(true);
     expect(result.haltReason).toBe('completed');
+    expect(result.status).toBe('all_done');
 
     const final = loadTodoState(FEAT, TMP)!;
     expect(final.items.every((i) => i.status === 'done')).toBe(true);
@@ -184,6 +185,7 @@ describe('auto-loop blocked & halt', () => {
 
     expect(result.halted).toBe(true);
     expect(result.haltReason).toContain('blocked');
+    expect(result.status).toBe('has_blocked');
     expect(result.completedTasks).toEqual([]);
 
     const final = loadTodoState(FEAT, TMP)!;

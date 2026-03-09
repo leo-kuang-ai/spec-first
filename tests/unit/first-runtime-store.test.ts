@@ -170,6 +170,92 @@ describe('first runtime store', () => {
     expect(readFirstRuntimeIndex(TEST_ROOT)).toBeNull();
   });
 
+  it('normalizes legacy runtime assets into canonical runtime models', () => {
+    const runtimeDir = getFirstRuntimeDir(TEST_ROOT);
+    mkdirSync(runtimeDir, { recursive: true });
+
+    writeFileSync(getFirstRuntimeIndexPath(TEST_ROOT), JSON.stringify({
+      version: '2.1.0',
+      mode: 'quick',
+      generated_at: '2026-03-09T04:43:27.542Z',
+      project: {
+        name: 'spec-first',
+        type: 'cli-tool',
+        description: 'Specification-driven development process engine',
+      },
+      artifacts: [
+        { id: 'api-docs', path: 'docs/first/api-docs.md', type: 'api-specification', status: 'generated' },
+        { id: 'domain-model', path: 'docs/first/domain-model.md', type: 'domain-model', status: 'generated' },
+      ],
+      database: {
+        detected: false,
+        reason: 'No database dependencies found',
+      },
+    }, null, 2), 'utf8');
+
+    writeFileSync(getFirstRuntimeSummaryPath(TEST_ROOT), JSON.stringify({
+      mode: 'quick',
+      generated_at: '2026-03-09T04:43:27.542Z',
+      tech_stack: { runtime: 'Node.js ≥20.0.0', language: 'TypeScript 5.4+' },
+      project_type: 'cli-tool',
+      core_modules: ['skill-runtime', 'gate-engine'],
+      commands_count: 19,
+      has_database: false,
+    }, null, 2), 'utf8');
+
+    writeFileSync(getFirstRoleViewsPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      roles: {
+        developer: {
+          priority_docs: ['codebase-overview.md', 'tech-stack.md'],
+          entry_points: ['src/cli/index.ts'],
+          key_concepts: ['Feature', 'Traceability'],
+        },
+        product_manager: {
+          priority_docs: ['domain-model.md'],
+          entry_points: ['specs/'],
+          key_concepts: ['RFC'],
+        },
+        tester: {
+          priority_docs: ['domain-model.md'],
+          entry_points: ['tests/'],
+          key_concepts: ['Coverage'],
+        },
+        architect: {
+          priority_docs: ['tech-stack.md'],
+          entry_points: ['src/core/'],
+          key_concepts: ['Process Engine'],
+        },
+      },
+    }, null, 2), 'utf8');
+
+    writeFileSync(getFirstStageViewsPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      stages: {
+        '00_init': { relevant_docs: ['codebase-overview.md'], key_files: ['src/cli/index.ts'] },
+        '01_specify': { relevant_docs: ['domain-model.md', 'api-docs.md'], key_files: ['specs/'] },
+        '02_design': { relevant_docs: ['tech-stack.md'], key_files: ['src/core/skill-runtime/'] },
+        '03_plan': { relevant_docs: ['codebase-overview.md'], key_files: ['src/core/change-mgr/'] },
+        '04_implement': { relevant_docs: ['tech-stack.md'], key_files: ['src/', 'tests/'] },
+        '05_verify': { relevant_docs: ['domain-model.md'], key_files: ['src/core/gate-engine/', 'tests/'] },
+      },
+    }, null, 2), 'utf8');
+
+    expect(readFirstRuntimeIndex(TEST_ROOT)).toMatchObject({
+      version: '2.1.0',
+      mode: 'quick',
+      status: 'current',
+      summary: { healthy: true, path: '.spec-first/runtime/first/summary.json' },
+    });
+    expect(readFirstRuntimeSummary(TEST_ROOT)).toMatchObject({
+      project: { name: 'spec-first', platformType: 'cli-tool' },
+      modules: ['skill-runtime', 'gate-engine'],
+      apiSurface: ['docs/first/api-docs.md'],
+    });
+    expect(readFirstRoleViews(TEST_ROOT)?.dev.focus).toContain('docs/first/codebase-overview.md');
+    expect(readFirstStageViews(TEST_ROOT)?.verify.testFocus).toContain('src/core/gate-engine/');
+  });
+
   it('creates runtime directories on write', () => {
     writeFirstRuntimeSummary(TEST_ROOT, makeSummary());
 

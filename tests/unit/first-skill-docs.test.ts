@@ -236,6 +236,20 @@ describe('runtime truth source and docs projection model', () => {
     expect(readme).toContain('投影视图');
     expect(readme).toContain('.spec-first/runtime/first/');
   });
+
+  it('keeps canonical docs/first projection files available', () => {
+    const summaryDoc = join(import.meta.dirname, '../../docs/first/summary.md');
+    const roleViewsDoc = join(import.meta.dirname, '../../docs/first/role-views.md');
+    const stageViewsDoc = join(import.meta.dirname, '../../docs/first/stage-views.md');
+
+    expect(existsSync(summaryDoc)).toBe(true);
+    expect(existsSync(roleViewsDoc)).toBe(true);
+    expect(existsSync(stageViewsDoc)).toBe(true);
+    expect(read(summaryDoc)).toContain('## 项目概览');
+    expect(read(summaryDoc)).not.toContain('等待 runtime 真源刷新后重建');
+    expect(read(roleViewsDoc)).toContain('## Developer');
+    expect(read(stageViewsDoc)).toContain('## Verify View');
+  });
 });
 
 

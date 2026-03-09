@@ -29,6 +29,16 @@ describe('validateOrchestrateArgs', () => {
     expect(result).toEqual({ mode: 'auto', resume: true });
   });
 
+
+  it('--auto-advance → mode=single, autoAdvance=true', () => {
+    const result = validateOrchestrateArgs(['--auto-advance']);
+    expect(result).toEqual({ mode: 'single', resume: false, autoAdvance: true });
+  });
+
+  it('--auto --auto-advance → mode=auto, autoAdvance=true', () => {
+    const result = validateOrchestrateArgs(['--auto', '--auto-advance']);
+    expect(result).toEqual({ mode: 'auto', resume: false, autoAdvance: true });
+  });
   it('--resume --auto（顺序无关）→ mode=auto, resume=true', () => {
     const result = validateOrchestrateArgs(['--resume', '--auto']);
     expect(result).toEqual({ mode: 'auto', resume: true });

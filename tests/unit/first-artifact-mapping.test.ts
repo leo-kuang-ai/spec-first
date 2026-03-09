@@ -44,6 +44,7 @@ describe('first runtime projection mapping', () => {
     expect(mapping.FIRST_RUNTIME_ARTIFACTS).toEqual(['summary.json', 'role-views.json', 'stage-views.json']);
     expect(mapping.getProjectionDocsForRuntimeArtifact('summary.json')).toContain('docs/first/README.md');
     expect(mapping.getProjectionDocsForRuntimeArtifact('summary.json')).toContain('docs/first/summary.md');
+    expect(mapping.getProjectionDocsForRuntimeArtifact('summary.json')).not.toContain('docs/first/tech-stack.md');
     expect(mapping.getProjectionDocsForRuntimeArtifact('role-views.json')).toContain('docs/first/role-views.md');
     expect(mapping.getProjectionDocsForRuntimeArtifact('stage-views.json')).toContain('docs/first/README.md');
     expect(mapping.getProjectionDocsForRuntimeArtifact('stage-views.json')).toContain('docs/first/stage-views.md');

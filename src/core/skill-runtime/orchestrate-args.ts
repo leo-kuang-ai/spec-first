@@ -13,6 +13,7 @@ export type OrchestrateMode = 'single' | 'auto';
 export interface OrchestrateArgs {
   mode: OrchestrateMode;
   resume: boolean;
+  autoAdvance?: true;
 }
 
 // ─── 错误码 ─────────────────────────────────────────────
@@ -32,7 +33,7 @@ export class OrchestrateArgsError extends Error {
 
 // ─── 参数白名单 ─────────────────────────────────────────
 
-const ALLOWED_FLAGS = new Set(['--auto', '--resume']);
+const ALLOWED_FLAGS = new Set(['--auto', '--resume', '--auto-advance']);
 
 // ─── 校验函数 ───────────────────────────────────────────
 
@@ -75,6 +76,7 @@ export function validateOrchestrateArgs(
 
   const hasAuto = flags.includes('--auto');
   const hasResume = flags.includes('--resume');
+  const hasAutoAdvance = flags.includes('--auto-advance');
 
   // --resume 必须搭配 --auto
   if (hasResume && !hasAuto) {
@@ -87,6 +89,7 @@ export function validateOrchestrateArgs(
   return {
     mode: hasAuto ? 'auto' : 'single',
     resume: hasResume,
+    ...(hasAutoAdvance ? { autoAdvance: true as const } : {}),
   };
 }
 

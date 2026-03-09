@@ -188,3 +188,111 @@
 
 ### P1b: Context7 映射收集（仅 deep 模式）
 
+
+---
+
+### P3: Runtime 真源生成与汇总
+
+**执行时机**：所有 Agent 完成后
+
+**必须生成的 Runtime 真源**：
+
+1. **`.spec-first/runtime/first/summary.json`**（必需）
+
+   使用 TypeScript 类型定义生成，确保字段完整：
+
+   ```typescript
+   interface FirstRuntimeSummary {
+     generatedAt: string;           // ISO 8601 时间戳
+     mode: 'quick' | 'deep';
+     project: {
+       name: string;                // 从 package.json/pom.xml 等提取
+       platformType?: string;       // 如 "cli-tool", "web-app", "backend-api"
+       overview?: string;           // 项目简介
+     };
+     modules: string[];             // 核心模块列表（从 codebase-overview 提取）
+     capabilities: string[];        // 核心能力列表（从 domain-model 提取）
+     entryPoints: string[];         // 入口文件路径（从 codebase-overview 提取）
+     dataModels: string[];          // 数据模型列表（从 domain-model 提取）
+     apiSurface: string[];          // API 端点列表（从 api-docs 提取）
+     risks: string[];               // 风险项（可选）
+     evidence: string[];            // 证据源（可选）
+   }
+   ```
+
+   **生成步骤**：
+   - 从已生成的文档中提取信息
+   - 所有数组字段必须初始化（至少为空数组 `[]`）
+   - `project.name` 必须有值（从包管理文件提取或使用目录名）
+   - 使用 `writeJson()` 写入，确保格式化
+
+2. **`.spec-first/runtime/first/index.json`**（必需）
+
+   索引文件，记录所有 runtime 资产的健康状态：
+
+   ```typescript
+   interface FirstRuntimeIndex {
+     version: string;               // 固定 "2.1.0"
+     lastRun: string;               // ISO 8601 时间戳
+     mode: 'quick' | 'deep';
+     summary: {
+       path: string;                // ".spec-first/runtime/first/summary.json"
+       fileHash: string;            // SHA-256 哈希
+       lastUpdated: string;         // ISO 8601 时间戳
+       healthy: boolean;            // true
+     };
+     roleViews: { /* 同上结构 */ };
+     stageViews: { /* 同上结构 */ };
+     docsProjection: {
+       [docName: string]: {         // 如 "tech-stack.md"
+         path: string;              // "docs/first/tech-stack.md"
+         fileHash: string;
+         lastUpdated: string;
+         healthy: boolean;
+       };
+     };
+     status: 'current';
+   }
+   ```
+
+3. **`.spec-first/runtime/first/role-views.json`**（必需）
+
+   **生成方式**：使用 `buildRoleViews(summary)` 函数生成，不得手动构造
+
+   ```typescript
+   // 从 summary 自动生成，确保结构一致
+   const roleViews = buildRoleViews(summary);
+   writeFirstRoleViews(projectRoot, roleViews);
+   ```
+
+   **结构要求**：
+   - 顶层直接是 4 个角色：`product`、`dev`、`qa`、`architect`
+   - 不得有 `generated_at`、`healthy`、`roles` 等包裹字段
+   - 每个角色包含：`role`、`summary`、`focus`、`warnings`
+
+4. **`.spec-first/runtime/first/stage-views.json`**（必需）
+
+   **生成方式**：使用 `buildStageViews(summary)` 函数生成，不得手动构造
+
+   ```typescript
+   // 从 summary 自动生成，确保结构一致
+   const stageViews = buildStageViews(summary);
+   writeFirstStageViews(projectRoot, stageViews);
+   ```
+
+   **结构要求**：
+   - 顶层直接是 4 个阶段：`spec`、`design`、`code`、`verify`
+   - 不得有 `generated_at`、`healthy`、`stages` 等包裹字段
+   - 每个阶段包含特定字段（见 TypeScript 类型定义）
+
+**关键约束**：
+- 所有 JSON 文件必须符合 TypeScript 类型定义
+- 数组字段不得为 `undefined`，必须至少为 `[]`
+- 对象字段如 `project` 不得为 `undefined`
+- 使用 `buildFirstSummary()` 函数生成 summary（如果在代码中调用）
+
+**验证步骤**：
+- 生成后读取 JSON 文件验证可解析
+- 检查必需字段是否存在
+- 输出生成的 runtime 资产路径
+
