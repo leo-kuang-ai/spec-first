@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.64 2026-03-10 Claude: fix(onboarding): 修复 CLI 命令未注册问题 - 创建 onboarding.ts handler，注册命令，支持 first 资产检测提示 (user-visible)
 - v0.5.63 2026-03-10 Claude: refactor(first): Skill 方案 A 优化 - 精简 SKILL.md（删除重复内容、优化 description、添加 reference 导航、放宽证据覆盖率要求）+ quick 模式生成 README.md，从 197 行降至 183 行
 - v0.5.62 2026-03-10 Claude: refactor(first): 收口型优化 F1/F2/F3/F4/F7 - 命令层瘦身，业务编排下沉到 executeFirst()，确认策略抽取为 shouldConfirmFirst() helper，refresh-all 自动检测并恢复不健康的 docs 投影，--skip 允许恢复投影，补充 router 级确认策略测试
 - v0.5.62 2026-03-10 Claude: refactor(init): Skill 优化 - 修复 description 触发条件、清理 frontmatter、精简 SKILL.md、增强交互示例 (user-visible)
