@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.48 2026-03-09 Claude: fix(viewer): 修复任务状态解析与归一化逻辑 (user-visible)
+- v0.5.48 2026-03-09 Claude: refactor: 优化命令路由与阶段推进逻辑，增强测试覆盖
+- v0.5.48 2026-03-09 Claude: docs: 审查并更新文档，增强 analyze skill 背景质量分析 (user-visible)
+- v0.5.48 2026-03-09 Claude: docs: 深度优化快速开始文档，提升小白用户友好度 (user-visible)
+- v0.5.48 2026-03-09 Claude: chore: 清理 first 文档产物，新增 skill 文档一致性测试
 - v0.5.47 2026-03-09 Claude: docs(readme): 修复 README.md 与实际代码不一致 — 版本号 v0.5.45→v0.5.47，Skill 数量 23→20，修正 08-code-review→08-review，移除不存在的 skills (09-test, 17-feature-list, 18-feature-switch, 19-feature-current)，补充 done 命令，CLI 命令数量 21→22 (user-visible)
 - v0.5.47 2026-03-09 Claude: docs(npm): 添加 npm 发布指引文档 (user-visible)
 - v0.5.129 2026-03-09 Claude: feat(spec-review): 添加运行时背景注入 — dispatcher 自动注入 backgroundInputStatus 和 specViewSummary (user-visible)

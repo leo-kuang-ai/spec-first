@@ -180,7 +180,10 @@ digraph plan_flow {
 
 ## 背景输入
 
-- 输出中必须包含 `backgroundInputStatus`
+- 规划阶段的背景命名遵循 `../shared/background-quality-contract.md`
+- 输入层 / metadata / runtime 内部字段使用 `backgroundInputStatus`
+- 用户可见输出、计划摘要与状态展示层字段使用 `background_input_status`
+- `backgroundInputStatus` 仅用于输入层，不替代输出层命名
 - 根据目标阶段显示 `dependencyStrength` (L1/L2/L3)
 - 高风险场景关注 `riskCategory` 和 `riskSignals`
 - 复用 orchestrate 的背景治理口径

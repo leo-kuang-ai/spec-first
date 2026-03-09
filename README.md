@@ -166,8 +166,8 @@
 │                                                                                     │
 │  ┌─────────────────────────────────────────────────────────────────────────────┐   │
 │  │  6️⃣ 双层架构                                                                 │   │
-│  │  Skill 层：流程编排、交互引导、内容生成（23 个 Skill）                        │   │
-│  │  CLI 层：确定性原子能力、状态管理（21 个命令）                                │   │
+│  │  Skill 层：流程编排、交互引导、内容生成（20 个 Skill）                        │   │
+│  │  CLI 层：确定性原子能力、状态管理（22 个命令组）                                │   │
 │  └─────────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                     │
 └─────────────────────────────────────────────────────────────────────────────────────┘
@@ -178,8 +178,8 @@
 | 指标 | 数值 | 说明 |
 |------|------|------|
 | 阶段覆盖 | 10 个 | 8 个主阶段 + 2 个终态 |
-| CLI 命令 | 21 个 | 确定性原子能力 |
-| Skill 数量 | 23 个 | 流程编排能力 |
+| CLI 命令 | 22 组 | 确定性原子能力 |
+| Skill 数量 | 20 个 | 流程编排能力 |
 | 覆盖率指标 | 9 项 | C1-C9 双向追踪 |
 | Gate 状态 | 3 种 | PASS / PASS_WITH_WAIVER / FAIL |
 | RFC 级别 | 3 级 | Critical / Major / Minor |
@@ -278,14 +278,14 @@
 
 | 框架 | 最新版本 | 语言 | 仓库地址 | 许可证 | 状态 |
 |------|----------|------|----------|--------|------|
-| **Spec-First** | v0.5.45 | TypeScript | [spec-first](https://github.com/your-org/spec-first) | MIT | ✅ 活跃维护 |
+| **Spec-First** | v0.5.47 | TypeScript | [spec-first](https://github.com/sunrain520/spec-first) | MIT | ✅ 活跃维护 |
 | **OpenSpec** | - | TypeScript | [open-spec](https://github.com/open-spec-dev/open-spec) | MIT | ✅ 活跃 |
 | **Spec Kit** | - | TypeScript | [spec-kit](https://github.com/spec-kit/spec-kit) | MIT | ✅ 活跃 |
 | **Superpowers** | v4.3.1 | Markdown Skill | [superpowers](https://github.com/richard1798/superpowers) | MIT | ✅ 活跃 |
 | **Planning-with-Files** | v2.16.0 | Markdown Skill | [planning-with-files](https://github.com/sisyphus-ean/planning-with-files) | MIT | ✅ 活跃 |
 | **Trellis** | v0.3.0 | TypeScript + Python | [trellis](https://github.com/karpathy/trellis) | MIT | ✅ 活跃 |
 
-> 注：Spec-First 版本基于本仓库 `package.json`（2026-03-06）；其余框架版本基于公开文档，实际以各仓库为准。
+> 注：Spec-First 版本基于本仓库 `package.json`（2026-03-09）；其余框架版本保留为历史参考，实际以各项目仓库为准。
 
 ### 状态判定口径（2026-03-06）
 
@@ -505,7 +505,7 @@ AI 既有约束又有上下文，执行更可靠
 | **Superpowers** | HARD-GATE 硬守卫模式 | 07-code SKILL.md P1-19 | ✅ 已实现 |
 | **Superpowers** | 3-Strike Error Protocol | 07-code SKILL.md | ✅ 已实现 |
 | **Superpowers** | 系统化调试流程 | 07-code SKILL.md | ✅ 已实现 |
-| **Superpowers** | 两阶段代码审查 | 08-code-review SKILL.md | ✅ 已实现 |
+| **Superpowers** | 两阶段代码审查 | 08-review SKILL.md | ✅ 已实现 |
 | **Superpowers** | Graphviz 决策流程图 | 13-orchestrate SKILL.md | ✅ 已实现 |
 | **Planning-with-Files** | 2-Action Rule 强制持久化 | 07-code SKILL.md | ✅ 已实现 |
 | **Planning-with-Files** | Read/Write 决策矩阵 | 07-code SKILL.md | ✅ 已实现 |
@@ -1100,11 +1100,11 @@ spec-first update                             # 升级刷新 Skill/MCP/Hooks
                              │  /spec-first:*
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Skill 层（流程编排 · 23 个 Skill）                              │
+│  Skill 层（流程编排 · 20 个 Skill）                              │
 │  职责: 流程编排、阶段流转触发、交互引导、内容生成                │
 │  宿主: Claude Code / Codex CLI                                   │
 ├─────────────────────────────────────────────────────────────────┤
-│  CLI 层（确定性原子能力 · 21 命令）                              │
+│  CLI 层（确定性原子能力 · 22 命令组）                            │
 │  职责: ID 生成、Gate 校验、状态推进、度量计算                    │
 │  约束: 相同输入 = 相同输出                                       │
 ├─────────────────────────────────────────────────────────────────┤
@@ -1261,12 +1261,12 @@ P5_SIDE_EFFECT — 副作用执行
 
 ```text
   00_init ──► 01_specify ──► 02_design ──► 03_plan ──► 04_implement ──► 05_verify ──► 06_wrap_up ──► 07_release ──► 08_done
-  Skill:init   Skill:spec     Skill:design  Skill:task  Skill:code        Skill:test    Skill:archive   (Smoke Test)   (终态)
+  Skill:init   Skill:spec     Skill:design  Skill:task  Skill:code        Skill:verify    Skill:archive   (Smoke Test)   (终态)
                             │                                          │
                             │         ┌────────────────────────────────┤
                             │         │                                │
                             ▼         ▼                                ▼
-                      05-research  08-code-review              ┌───────────┐
+                      05-research  08-review              ┌───────────┐
                         (可选)        (可选)                   │09_cancelled│
                                                              │  (终态)    │
                                                              └───────────┘
@@ -1284,7 +1284,7 @@ P5_SIDE_EFFECT — 副作用执行
 | 02_design | `/spec-first:design` | `design.md` + C2=100% + C11 | `design.md`, `contracts/` |
 | 03_plan | `/spec-first:task` | C3=100% + C8=100% + Analyze 无 CRITICAL | `task_plan.md`, `checklist.md`, `reports/analysis-report.md` |
 | 04_implement | `/spec-first:code` | C4>=80% + C7=100% | 代码, 单元测试 |
-| 05_verify | `/spec-first:test` | C4=100% + C5 达阈值 + C9=100% | `tests/*.test.md`, `reports/test-report.md` |
+| 05_verify | `/spec-first:verify` | Gate / 矩阵 / 覆盖率校验通过并写入 `findings.md` | `findings.md` |
 | 06_wrap_up | `/spec-first:archive` | C6=100% + 矩阵进入终态 | retro.md |
 | 07_release | — | Smoke Report + Release Note | `reports/smoke-test-report.md`, `reports/release-note.md` |
 
@@ -1487,12 +1487,12 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
                        07-code ◄── 08-review (可选)
                            │
                            ▼
-                       09-test
+                       12-verify
                            │
                            ▼
                       10-archive
 
-    辅助: 02-catchup | 14-status | 15-doctor | 16-sync | 17~19-feature-* | 20-spec-review | 21-analyze
+    辅助: 02-catchup | 14-status | 15-doctor | 16-sync | 17-feature | 20-spec-review | 21-analyze
 ```
 
 ### 阶段 × Skill 映射
@@ -1501,12 +1501,12 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | --- | --- | --- |
 | — | 00-first | docs/first/*.md（项目认知文档集）|
 | — | 00-onboarding | 无文件（交互式引导） |
-| 00_init | 01-init | stage-state.json, constitution.md, traceability-matrix.md, findings.md, task_plan.md, prd.md |
+| 00_init | 01-init | stage-state.json, constitution.md, traceability-matrix.md, findings.md, task_plan.md |
 | 01_specify | 03-spec, 20-spec-review | spec.md, checklists/spec-review.md |
 | 02_design | 04-design, 05-research | design.md, contracts/, research.md, impact-analysis.md（迭代场景） |
 | 03_plan | 06-task, 21-analyze | task_plan.md, checklist.md |
-| 04_implement | 07-code, 08-code-review | task_plan.md 状态更新 |
-| 05_verify | 09-test | tests/*.test.md |
+| 04_implement | 07-code, 08-review | 源代码、task_plan.md 状态更新、review-report.md |
+| 05_verify | 12-verify | findings.md |
 | 06_wrap_up | 10-archive | retro.md |
 | 任意阶段 | 02-catchup | 无文件（恢复摘要） |
 | 编排层 | 11-plan, 12-verify, 13-orchestrate | 执行计划 / 校验报告 |
@@ -1522,15 +1522,15 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 | [05-research](skills/spec-first/05-research/SKILL.md) | 02_design | 技术调研（可选）| assisted |
 | [06-task](skills/spec-first/06-task/SKILL.md) | 03_plan | 任务拆解与验收标准 | strict |
 | [07-code](skills/spec-first/07-code/SKILL.md) | 04_implement | 按 TASK 实现代码 | strict/assisted |
-| [08-code-review](skills/spec-first/08-code-review/SKILL.md) | 04_implement | 代码审查 | assisted |
-| [09-test](skills/spec-first/09-test/SKILL.md) | 05_verify | 测试用例定义 | strict |
+| [08-review](skills/spec-first/08-review/SKILL.md) | 04_implement | 代码审查 | assisted |
+| [12-verify](skills/spec-first/12-verify/SKILL.md) | 05_verify | 阶段验收校验 | auto |
 | [10-archive](skills/spec-first/10-archive/SKILL.md) | 06_wrap_up | 归档复盘 | assisted |
 
 ---
 
 ## CLI 命令
 
-### 22 个命令
+### 22 个命令组
 
 | 命令 | 功能 | 模块 |
 |------|------|------|
@@ -1706,7 +1706,7 @@ spec-first/
 │   ├── cli/                  # CLI (21 命令)
 │   │   ├── index.ts          # CLI 入口
 │   │   └── commands/         # 各命令实现
-│   ├── core/                 # 核心模块 (11 目录)
+│   ├── core/                 # 核心模块 (12 目录)
 │   │   ├── process-engine/   # M1: 阶段状态机
 │   │   ├── trace-engine/     # M2: ID + 矩阵
 │   │   ├── gate-engine/      # M3: Gate + SCA
@@ -1719,7 +1719,7 @@ spec-first/
 │   │   ├── tool-integration/ # M7: Hook + CI
 │   │   └── validators/       # 格式与结构校验
 │   └── shared/               # 共享类型 (types, constants, utils)
-├── skills/spec-first/        # 23 个 Skill
+├── skills/spec-first/        # 20 个 Skill
 │   ├── AGENTS.md             # 全局 Agent 指令
 │   ├── SHARED.md             # 跨 Skill 共享约束
 │   └── */SKILL.md            # 各 Skill 定义
@@ -1860,4 +1860,4 @@ Copyright © 2025-2026 Spec-First Contributors
 
 ---
 
-*本文档基于代码生成 | 更新: 2026-03-06 | 版本: v0.5.45*
+*本文档基于代码生成 | 更新: 2026-03-09 | 版本: v0.5.47*

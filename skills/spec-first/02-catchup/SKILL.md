@@ -172,6 +172,12 @@ I'm using the catchup skill to restore context for [Feature].
 
 ---
 
+## 背景状态展示约定
+
+- catchup 的背景状态展示遵循 `../shared/background-quality-contract.md`
+- 恢复报告属于展示层，因此用户可见字段统一使用 `background_input_status`
+- catchup 负责恢复与展示已有背景结论，不在展示层重新推导新的背景严重度
+
 ## 5-Question Reboot Test（P1-06）
 
 恢复输出必须回答以下 5 个问题：
