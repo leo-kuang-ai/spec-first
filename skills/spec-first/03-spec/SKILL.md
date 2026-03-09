@@ -195,6 +195,8 @@ spec-first validate format <featureId>
 
 ## 参考文档
 
+**路径基准**: 相对于 `skills/spec-first/03-spec/` 目录
+
 - [references/phase0-prd-workflow.md](references/phase0-prd-workflow.md) - Phase 0 详细流程
 - [references/steps-fr-ac-workflow.md](references/steps-fr-ac-workflow.md) - Step 0-8 详细流程
 - [references/complexity-matrix.md](references/complexity-matrix.md) - 复杂度判定矩阵
@@ -217,4 +219,18 @@ spec-first validate format <featureId>
 - 优先读取 `spec-view`
 - 建议从 `.spec-first/runtime/first/stage-views.json` 的 spec-view 获取摘要
 - 执行前应显式声明 `background_input_status`
-- 当背景不足时进入 `degraded` 降级模式，不得静默假设上下文完整
+
+### 背景不足判定标准
+
+**触发 degraded 降级模式的条件**（满足任一即触发）:
+- PRD 不存在或为空
+- constitution.md 不存在
+- Feature 阶段状态不明确
+- 追溯矩阵缺失或损坏
+- 用户输入缺少核心要素（业务目标/功能边界/约束条件中任意 2 项缺失）
+
+**降级模式行为**:
+- 明确告知用户当前处于降级模式
+- 列出缺失的背景信息
+- 请求用户补充必要信息后再继续
+- 不得静默假设上下文完整
