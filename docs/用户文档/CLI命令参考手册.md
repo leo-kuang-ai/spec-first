@@ -44,7 +44,7 @@ CLI 命令层（本文档）: spec-first init, spec-first id next, ...
 | 14 | `spec-first hooks` | 3 | Git Hooks 管理 | ✅ |
 | 15 | `spec-first viewer` | 3 | 可视化面板 | ✅ |
 | 16 | `spec-first update` | 1 | 刷新配置 | ✅ |
-| 17 | `spec-first setup` | 1 | 已废弃 | ⚠️ |
+| 17 | `spec-first setup` | 1 | 宿主注册 | ✅ |
 | 18 | `spec-first uninstall` | 1 | 清理配置 | ✅ |
 | 19 | `spec-first analyze` | 1 | 一致性分析 | ✅ |
 | 20 | `spec-first trace` | 1 | 追溯链修复 | ✅ |
@@ -215,6 +215,12 @@ spec-first matrix check <featureId>
 
 ```bash
 spec-first matrix export <featureId> [--format markdown|yaml]
+```
+
+### 6.3 更新追踪矩阵行
+
+```bash
+spec-first matrix update <featureId> <rowId> [options]
 ```
 
 ---

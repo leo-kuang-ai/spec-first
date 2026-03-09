@@ -5,6 +5,7 @@ import { join } from 'node:path';
 const ANALYZE_ROOT = join(import.meta.dirname, '../../skills/spec-first/21-analyze');
 const SKILL_MD = join(ANALYZE_ROOT, 'SKILL.md');
 const RULES = join(ANALYZE_ROOT, 'references/analysis-rules.md');
+const REPORT = join(ANALYZE_ROOT, 'references/report-format.md');
 
 function read(path: string): string {
   return readFileSync(path, 'utf-8');
@@ -14,6 +15,7 @@ describe('21-analyze skill docs consistency', () => {
   it('should include background input status in analysis scope', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(RULES)).toBe(true);
+    expect(existsSync(REPORT)).toBe(true);
 
     const skill = read(SKILL_MD);
     const rules = read(RULES);
@@ -30,5 +32,41 @@ describe('21-analyze skill docs consistency', () => {
     expect(skill).toContain('runtime 真源');
     expect(rules).toContain('docs 投影视图');
     expect(rules).toContain('漂移');
+  });
+
+  it('should make background quality analysis explicit in execution flow', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`，并加载 `background_input_status` 与 runtime/docs 背景状态');
+    expect(skill).toContain('P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突、背景质量漂移）');
+    expect(skill).toContain('P5: 输出结论摘要、背景质量结论与后续修复建议');
+  });
+
+  it('should include background quality in success criteria and report format', () => {
+    const skill = read(SKILL_MD);
+    const report = read(REPORT);
+
+    expect(skill).toContain('报告包含背景质量结论（`background_input_status` / `runtime 真源` / `docs 投影视图` / `同步状态`）');
+    expect(report).toContain('## 背景质量结论');
+    expect(report).toContain('background_input_status');
+    expect(report).toContain('runtime 真源');
+    expect(report).toContain('docs 投影视图');
+    expect(report).toContain('同步状态');
+  });
+
+  it('should classify background drift severity in analysis rules', () => {
+    const rules = read(RULES);
+
+    expect(rules).toContain('runtime 真源异常 → `HIGH`');
+    expect(rules).toContain('docs 投影视图漂移 → `MEDIUM`');
+    expect(rules).toContain('background_input_status = blind → `HIGH`');
+  });
+
+  it('should keep report examples aligned with background quality section', () => {
+    const report = read(REPORT);
+    const matches = report.match(/## 背景质量结论/g) ?? [];
+
+    expect(matches.length).toBeGreaterThanOrEqual(3);
+    expect(report).not.toContain('---\n---');
   });
 });

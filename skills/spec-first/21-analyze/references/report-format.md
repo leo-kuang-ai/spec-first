@@ -25,6 +25,14 @@
 | LOW | {count} |
 | **总计** | {total} |
 
+## 背景质量结论
+
+- background_input_status: {full/degraded/blind}
+- runtime 真源: {healthy/degraded/missing}
+- docs 投影视图: {synced/stale/drifted}
+- 同步状态: {in_sync/stale/drifted}
+- 建议动作: {repair_action}
+
 ---
 
 ## 🔴 CRITICAL（阻断级）
@@ -96,6 +104,14 @@
 | MEDIUM | 3 |
 | LOW | 5 |
 | **总计** | 11 |
+
+## 背景质量结论
+
+- background_input_status: blind
+- runtime 真源: missing
+- docs 投影视图: drifted
+- 同步状态: drifted
+- 建议动作: 先补齐背景输入并重新同步 runtime/docs 状态，再继续分析
 
 ---
 
@@ -213,6 +229,14 @@
 | MEDIUM | 0 |
 | LOW | 0 |
 | **总计** | 0 |
+
+## 背景质量结论
+
+- background_input_status: full
+- runtime 真源: healthy
+- docs 投影视图: synced
+- 同步状态: in_sync
+- 建议动作: 无需额外修复，维持当前同步节奏
 
 ---
 

@@ -7,7 +7,7 @@
    ```bash
    npm login
    ```
-3. **权限确认**：确保对 `@spec-first/core` 包有发布权限
+3. **权限确认**：确保对 `spec-first` 包有发布权限
 
 ## 发布流程
 

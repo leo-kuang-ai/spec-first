@@ -30,11 +30,11 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），收集基础产物路径
-- P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`
-- P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突）
+- P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`，并加载 `background_input_status` 与 runtime/docs 背景状态
+- P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突、背景质量漂移）
 - P3: 与用户确认高严重度项（CRITICAL/HIGH）
 - P4: 写入 `reports/analysis-report.md`
-- P5: 输出结论摘要与后续修复建议
+- P5: 输出结论摘要、背景质量结论与后续修复建议
 
 ## 严重度分级
 - `CRITICAL`: 必须先修复，阻断推进
@@ -45,6 +45,10 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 ## 输出路径
 - `specs/{featureId}/reports/analysis-report.md`
 
+## 参考清单
+- `references/analysis-rules.md`
+- `references/report-format.md`
+
 ## 确认策略
 - 推荐: assisted（分析发现需要人工裁决）
 
@@ -52,6 +56,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - 生成结构化报告（按严重度排序）
 - 发现项包含类型、位置、建议
 - 报告可被后续 gate 读取并识别 CRITICAL 数量
+- 报告包含背景质量结论（`background_input_status` / `runtime 真源` / `docs 投影视图` / `同步状态`）
 
 
 ## 背景质量分析

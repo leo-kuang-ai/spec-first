@@ -1,24 +1,12 @@
 # Spec-First Skill 命令参考手册
 
-> **版本**: v2.0 | **日期**: 2026-02-14
+> **版本**: v2.1 | **日期**: 2026-03-09
 > **基准**: 当前代码实现（src/cli/commands/*.ts + skills/spec-first/*.md）
-> **总览**: 3 协同命令 + 22 Skill（6 阶段执行模型） + 13 CLI 命令组（38 子命令）
+> **总览**: 20 个 Skill（6 阶段执行模型） + 22 个 CLI 命令组（47 子命令）
 
 ---
 
-## 一、协同命令（3 条）
-
-日常使用的顶层入口，内部编排 Skill + CLI 原子命令。位于 `.claude/commands/`。
-
-| 命令 | 参数 | 说明 | 产出物 |
-|------|------|------|--------|
-| `/plan` | `<featureId> "<task>"` | 阶段规划：识别当前阶段，调用对应 Skill 生成交付物，执行 Gate 校验 | 执行计划 + stage-state.json |
-| `/verify` | `<featureId> [quick\|full]` | 质量校验：矩阵完整性 + 覆盖率 + Gate 条件检查 | 校验报告（findings.md） |
-| `/orchestrate` | `<featureId> "<task>"` | 全流程编排：plan → skill → verify → stage advance 循环 | 全阶段交付物 + 阶段推进 |
-
----
-
-## 二、22 个 Skill
+## 一、20 个 Skill
 
 所有 Skill 调用格式：`/spec-first:<skillName>`（如 `/spec-first:spec`、`/spec-first:catchup`）。
 
@@ -33,22 +21,21 @@ P4_WRITE       写入目标文件，注册新 ID
 P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 ```
 
-### 2.1 阶段 Skill（10 条）
+### 1.1 阶段 Skill（9 条）
 
 | # | Skill | 命令 | 阶段 | confirm | 产出物 | CLI 依赖 |
 |---|-------|------|------|---------|--------|---------|
-| 01 | init | `/spec-first:init` | any | strict | stage-state.json, constitution.md, traceability-matrix.md | `spec-first init` |
+| 01 | init | `/spec-first:init` | any | strict | stage-state.json, constitution.md, trace-matrix.yaml | `spec-first init` |
 | 02 | catchup | `/spec-first:catchup` | any | assisted | stage-state.json（恢复摘要追加） | `ai catchup`, `stage current` |
-| 03 | spec | `/spec-first:spec` | 01_specify | strict/assisted | spec.md, traceability-matrix.md | `id next FR`, `matrix update`, `matrix check` |
-| 04 | design | `/spec-first:design` | 02_design | strict | design.md, traceability-matrix.md | `id next DS`, `matrix update`, `metrics coverage` |
+| 03 | spec | `/spec-first:spec` | 01_specify | strict/assisted | spec.md, trace-matrix.yaml | `id next FR`, `matrix update`, `matrix check` |
+| 04 | design | `/spec-first:design` | 02_design | strict | design.md, trace-matrix.yaml | `id next DS`, `matrix update`, `metrics coverage` |
 | 05 | research | `/spec-first:research` | any | assisted | research.md | `ai context` |
-| 06 | task | `/spec-first:task` | 03_plan | assisted | task_plan.md, traceability-matrix.md | `id next TASK`, `matrix update`, `metrics coverage` |
+| 06 | task | `/spec-first:task` | 03_plan | assisted | task_plan.md, trace-matrix.yaml | `id next TASK`, `matrix update`, `metrics coverage` |
 | 07 | code | `/spec-first:code` | 04_implement | strict/assisted | 源代码, task_plan.md, stage-state.json | `commit`, `matrix update`, `ai context` |
-| 08 | code-review | `/spec-first:code-review` | 04_implement | assisted | findings.md | `metrics coverage`, `matrix check` |
-| 09 | test | `/spec-first:test` | 05_verify | assisted | tests/*.test.md, traceability-matrix.md | `id next TC`, `matrix update`, `metrics coverage` |
+| 08 | review | `/spec-first:review` | 04_implement | assisted | review-report.md | `metrics coverage`, `matrix check` |
 | 10 | archive | `/spec-first:archive` | 06_wrap_up | strict | retro.md | `metrics report`, `gate check`, `stage advance` |
 
-### 2.2 编排 Skill（3 条）
+### 1.2 编排 Skill（3 条）
 
 | # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
 |---|-------|------|---------|------|---------|
@@ -56,60 +43,84 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 | 12 | verify | `/spec-first:verify` | auto | 校验报告（Gate + 矩阵 + 覆盖率缺口），写入 findings.md | `gate check`, `matrix check`, `metrics coverage` |
 | 13 | orchestrate | `/spec-first:orchestrate` | strict | 主编排器：plan → 阶段 Skill → verify → advance | `stage current/advance`, `gate check`, `metrics health` |
 
-13-orchestrate 调度协议：
-
-| 当前阶段 | 调度 Skill |
-|---------|-----------|
-| 01_specify | 03-spec |
-| 02_design | 04-design（05-research 按需） |
-| 03_plan | 06-task |
-| 04_implement | 07-code（08-code-review 按需） |
-| 05_verify | 09-test |
-| 06_wrap_up | 10-archive |
-
-子 Skill 失败时 orchestrate 终止，已完成的产出物保留不回滚。
-
-### 2.3 辅助 Skill（6 条）
+### 1.3 辅助 Skill（6 条）
 
 | # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
 |---|-------|------|---------|------|---------|
+| 00 | first | `/spec-first:first` | auto | 项目快速认知（生成技术栈、架构文档） | 无 |
+| 00 | onboarding | `/spec-first:onboarding` | auto | 新手引导（场景识别与学习路径推荐） | 无 |
 | 14 | status | `/spec-first:status` | auto | 状态仪表盘（只读，不写文件） | `stage current`, `metrics health`, `feature current` |
 | 15 | doctor | `/spec-first:doctor` | auto | 环境诊断（只读，不写文件） | `spec-first doctor` |
 | 16 | sync | `/spec-first:sync` | assisted | 矩阵同步回填，审计日志写入 findings.md | `matrix update`, `matrix check`, `rfc list` |
-| 17 | feature-list | `/spec-first:feature-list` | auto | 列出当前项目全部 Feature（只读） | `feature list` |
-| 18 | feature-switch | `/spec-first:feature-switch <featureId>` | assisted | 切换当前 Feature 上下文（更新 .spec-first/current） | `feature list`, `feature switch`, `feature current` |
-| 19 | feature-current | `/spec-first:feature-current` | auto | 查看当前 Feature 与阶段信息（只读） | `feature current`, `stage current` |
+| 17 | feature | `/spec-first:feature` | auto | Feature 查询/切换命令族 | `feature list/switch/current` |
 
-### 2.4 confirm_policy 语义
+### 1.4 质量保障 Skill（2 条）
+
+| # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
+|---|-------|------|---------|------|---------|
+| 20 | spec-review | `/spec-first:spec-review` | assisted | 需求规格质量审查（C10 指标） | `matrix check` |
+| 21 | analyze | `/spec-first:analyze` | assisted | 跨产物一致性分析 | `matrix check`, `metrics coverage` |
+
+### 1.5 confirm_policy 语义
 
 | policy | P3 行为 | 适用 Skill |
 |--------|--------|-----------|
-| auto | 跳过用户确认，直接进入 P4 | status, doctor, verify |
-| assisted | 展示摘要，用户可确认/修改/拒绝 | catchup, research, task, code-review, test, plan, sync |
+| auto | 跳过用户确认，直接进入 P4 | first, onboarding, status, doctor, verify, feature |
+| assisted | 展示摘要，用户可确认/修改/拒绝 | catchup, research, task, review, plan, sync, spec-review, analyze |
 | strict | 展示完整内容，用户逐项审阅确认 | init, spec, design, code, archive, orchestrate |
 
-### 2.5 阶段 × Skill 映射
+### 1.6 阶段 × Skill 映射
 
 | 阶段 | Skill | 主要交付物 |
 |------|-------|-----------|
 | 00_init | 01-init | stage-state.json, constitution.md |
-| 01_specify | 03-spec | spec.md |
-| 02_design | 04-design, 05-research | design.md, contracts/, research.md |
-| 03_plan | 06-task | task_plan.md, checklist.md |
-| 04_implement | 07-code, 08-code-review | 源代码, task_plan.md 状态更新 |
-| 05_verify | 09-test | tests/*.test.md |
+| 01_specify | 03-spec | spec.md, prd.md |
+| 02_design | 04-design, 05-research | design.md, research.md |
+| 03_plan | 06-task | task_plan.md |
+| 04_implement | 07-code, 08-review | 源代码, review-report.md |
+| 05_verify | 12-verify | findings.md |
 | 06_wrap_up | 10-archive | retro.md |
-| 任意阶段 | 02-catchup, 05-research | 恢复报告, 调研报告 |
+| 任意阶段 | 02-catchup, 05-research, 20-spec-review, 21-analyze | 恢复报告, 调研报告, 质量报告, 分析报告 |
 | 编排层 | 11-plan, 12-verify, 13-orchestrate | 执行计划, 校验报告 |
-| 辅助层 | 14-status, 15-doctor, 16-sync, 17-feature-list, 18-feature-switch, 19-feature-current | 状态查询, 诊断, 矩阵同步, Feature 上下文切换 |
+| 辅助层 | 00-first, 00-onboarding, 14-status, 15-doctor, 16-sync, 17-feature | 项目认知, 新手引导, 状态查询, 诊断, 矩阵同步, Feature 管理 |
 
 ---
 
-## 三、CLI 原子命令（13 组 38 子命令）
+## 二、CLI 原子命令（22 组 47 子命令）
 
-底层确定性执行层，由 Skill 编排调用或用户直接使用。
+底层确定性执行层，由 Skill 编排调用或用户直接使用。详见《CLI命令参考手册.md》。
 
-### 3.1 init（1 条）
+### 2.1 命令总览
+
+| # | 命令组 | 子命令数 | 功能域 |
+|---|---|---:|---|
+| 1 | `spec-first init` | 1 | Feature 初始化 |
+| 2 | `spec-first stage` | 3 | 阶段管理 |
+| 3 | `spec-first id` | 4 | ID 管理 |
+| 4 | `spec-first gate` | 3 | Gate 校验 |
+| 5 | `spec-first golive` | 1 | 上线检查 |
+| 6 | `spec-first done` | 1 | 收口到 08_done |
+| 7 | `spec-first matrix` | 3 | 追踪矩阵 |
+| 8 | `spec-first metrics` | 3 | 覆盖率与度量 |
+| 9 | `spec-first rfc` | 5 | RFC 变更管理 |
+| 10 | `spec-first defect` | 5 | 缺陷追踪 |
+| 11 | `spec-first ai` | 3 | AI 编排 |
+| 12 | `spec-first commit` | 1 | 标准化提交 |
+| 13 | `spec-first feature` | 3 | Feature 切换 |
+| 14 | `spec-first hooks` | 3 | Git Hooks 管理 |
+| 15 | `spec-first viewer` | 3 | 可视化面板 |
+| 16 | `spec-first update` | 1 | 刷新配置 |
+| 17 | `spec-first setup` | 1 | 宿主注册 |
+| 18 | `spec-first uninstall` | 1 | 清理配置 |
+| 19 | `spec-first analyze` | 1 | 一致性分析 |
+| 20 | `spec-first trace` | 1 | 追溯链修复 |
+| 21 | `spec-first validate` | 1 | 产物校验 |
+| 22 | `spec-first doctor` | 1 | 环境诊断 |
+| | **合计** | **47** | |
+
+---
+
+## 三、使用建议
 
 | 命令 | 参数 | 说明 |
 |------|------|------|
