@@ -38,6 +38,14 @@ describe('03-spec skill docs consistency', () => {
     expect(gate).toContain('background_input_status');
   });
 
+  it('should align spec background guidance with the shared contract', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('shared/background-quality-contract.md');
+    expect(skill).toContain('background_input_status');
+    expect(skill).toContain('degraded');
+  });
+
   it('should surface assumptions during phase 0.2 quality scan', () => {
     const skill = read(SKILL_MD);
 

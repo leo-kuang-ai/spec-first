@@ -540,6 +540,7 @@ Gate 已通过，可以推进到下一阶段。
 - 失败项修复建议？
 
 ## 背景输入
+- 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 优先读取 `verify-view`
 - 核对 `critical_flows`、`validation_focus`、`recommended_checks`、`validation_hooks`、`release_blockers`
 - 高风险验证 / 上线前验证属于 `pre-release-verification` 场景

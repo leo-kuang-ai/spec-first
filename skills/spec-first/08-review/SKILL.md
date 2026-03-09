@@ -66,8 +66,11 @@ Stage 2 的发现必须分为以下三类：
 ## 背景输入
 
 - 优先读取 `code-view` 获取变更上下文
-- 输出中必须包含 `backgroundInputStatus`
+- 输入元数据字段使用 `backgroundInputStatus`
+- 若需输出用户可见背景字段，统一使用 `background_input_status`
+- 背景质量命名与枚举遵循 `../shared/background-quality-contract.md`
 - 高风险场景需关注 `riskCategory` 和 `riskSignals`
+- `backgroundInputStatus` 属于输入层字段，不替代文档输出字段命名
 
 ## 执行阶段（增强）
 - P0: 定位 Feature，确定检查层级（single/cross/completion）

@@ -1,6 +1,6 @@
 # Spec-First — AI 时代的规范驱动研发流程引擎
 
-![Status](https://img.shields.io/badge/状态-活跃维护-brightgreen) ![Version](https://img.shields.io/badge/版本-v0.5.45-blue) ![Node](https://img.shields.io/badge/Node.js-≥20_LTS-green) ![TypeScript](https://img.shields.io/badge/TypeScript-≥5.4-3178c6)
+![Status](https://img.shields.io/badge/状态-活跃维护-brightgreen) ![Version](https://img.shields.io/badge/版本-v0.5.47-blue) ![Node](https://img.shields.io/badge/Node.js-≥20_LTS-green) ![TypeScript](https://img.shields.io/badge/TypeScript-≥5.4-3178c6)
 
 **Spec-First 是面向 AI 时代的规范驱动研发流程引擎**——以结构化规范为单一真理源，通过全链路追踪 + AI 辅助 + 自动化门禁，将"需求→设计→编码→测试→交付"从人工驱动升级为规范驱动。
 
@@ -1437,16 +1437,16 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 
 ## Skill 体系
 
-### 23 个 Skill 分类
+### 20 个 Skill 分类
 
 ```text
 ┌─────────────────────────────────────────────────────────────────┐
 │  项目认知 Skills (2)                                             │
 │  00-first | 00-onboarding                                       │
 ├─────────────────────────────────────────────────────────────────┤
-│  核心工作流 Skills (9)                                          │
+│  核心工作流 Skills (7)                                          │
 │  01-init | 03-spec | 04-design | 05-research | 06-task         │
-│  07-code | 08-code-review | 09-test | 10-archive               │
+│  07-code | 08-review                                            │
 ├─────────────────────────────────────────────────────────────────┤
 │  编排与验证 Skills (3)                                          │
 │  11-plan | 12-verify | 13-orchestrate                           │
@@ -1454,11 +1454,11 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 │  会话管理 Skills (4)                                            │
 │  02-catchup | 14-status | 15-doctor | 16-sync                   │
 ├─────────────────────────────────────────────────────────────────┤
-│  Feature 管理 Skills (3)                                        │
-│  17-feature-list | 18-feature-switch | 19-feature-current       │
+│  Feature 管理 Skills (1)                                        │
+│  17-feature                                                      │
 ├─────────────────────────────────────────────────────────────────┤
-│  扩展 Skills (2)                                                │
-│  20-spec-review | 21-analyze                                    │
+│  扩展 Skills (3)                                                │
+│  10-archive | 20-spec-review | 21-analyze                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -1484,7 +1484,7 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
                        06-task
                            │
                            ▼
-                       07-code ◄── 08-code-review (可选)
+                       07-code ◄── 08-review (可选)
                            │
                            ▼
                        09-test
@@ -1530,13 +1530,14 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 
 ## CLI 命令
 
-### 21 个命令
+### 22 个命令
 
 | 命令 | 功能 | 模块 |
 |------|------|------|
 | `init` | 初始化 Feature | M1 |
 | `stage` | 阶段管理 | M1 |
 | `feature` | Feature 管理 | M1 |
+| `done` | 将 Feature 从 07_release 收口到 08_done | M1 |
 | `id` | ID 生成/校验/检索 | M2 |
 | `matrix` | 追踪矩阵 | M2 |
 | `gate` | Gate 评估 | M3 |

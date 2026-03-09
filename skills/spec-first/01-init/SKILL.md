@@ -75,6 +75,9 @@ changelog: Initial version with standardized metadata
 - 推荐: strict
 
 ## 背景状态
+- 背景状态定义遵循 `../shared/background-quality-contract.md`
+- runtime / stage-state 内部字段使用 `backgroundInputStatus`
+- CLI 摘要与文档输出统一使用 `background_input_status`
 - `background_input_status=full`：runtime 真源完整且健康
 - `background_input_status=degraded`：存在可用背景，但 runtime 真源不完整
 - `background_input_status=blind`：缺少足够背景输入，需优先补跑 `/spec-first:first`

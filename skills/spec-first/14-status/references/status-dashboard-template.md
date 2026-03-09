@@ -319,6 +319,6 @@
 
 ## 背景状态卡片
 - background_input_status
-- runtime 真源状态
-- docs 投影视图状态
+- runtime 真源
+- docs 投影视图
 - 同步状态

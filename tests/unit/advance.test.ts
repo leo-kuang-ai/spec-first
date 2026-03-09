@@ -96,6 +96,37 @@ describe('advance', () => {
     expect(updated.current_stage).toBeUndefined();
   });
 
+  it('should preserve background and auto-advance metadata when persisting advanced state', () => {
+    const state = {
+      ...makeState({ backgroundInputStatus: 'degraded' }),
+      stageStatus: 'ready_to_advance',
+      autoAdvancePolicy: 'assisted',
+      lastSuggestedCommand: 'spec-first stage suggest FSREQ-20260211-ADV-001',
+      lastVerifiedAt: '2026-03-09T00:00:00.000Z',
+    } as StageState & {
+      stageStatus?: string;
+      autoAdvancePolicy?: string;
+      lastSuggestedCommand?: string;
+      lastVerifiedAt?: string;
+    };
+    writeState(state);
+
+    advance(FEAT_ID, TMP);
+
+    const updated = readState() as StageState & {
+      backgroundInputStatus?: string;
+      stageStatus?: string;
+      autoAdvancePolicy?: string;
+      lastSuggestedCommand?: string;
+      lastVerifiedAt?: string;
+    };
+    expect(updated.backgroundInputStatus).toBe('degraded');
+    expect(updated.stageStatus).toBe('ready_to_advance');
+    expect(updated.autoAdvancePolicy).toBe('assisted');
+    expect(updated.lastSuggestedCommand).toBe('spec-first stage suggest FSREQ-20260211-ADV-001');
+    expect(updated.lastVerifiedAt).toBe('2026-03-09T00:00:00.000Z');
+  });
+
   it('should write gate-history.jsonl on advance', () => {
     writeState(makeState());
     advance(FEAT_ID, TMP);

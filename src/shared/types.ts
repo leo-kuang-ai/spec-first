@@ -39,6 +39,8 @@ export type Size = 'S' | 'M' | 'L';
 
 export type BackgroundInputStatus = 'full' | 'degraded' | 'blind';
 
+export type StageStatus = 'drafting' | 'awaiting_review' | 'review_failed' | 'ready_to_advance' | 'advanced';
+export type AutoAdvancePolicy = 'suggest' | 'assisted' | 'auto_advance' | 'auto_run';
 // ─── ExitCode ─────────────────────────────────────────────
 export enum ExitCode {
   SUCCESS = 0,
@@ -64,6 +66,10 @@ export interface StageState {
   size: Size;
   platforms: string[];
   backgroundInputStatus?: BackgroundInputStatus;
+  stageStatus?: StageStatus;
+  autoAdvancePolicy?: AutoAdvancePolicy;
+  lastVerifiedAt?: string;
+  lastSuggestedCommand?: string;
   mergedRules?: {
     gateConditions: Record<string, unknown[]>;
     deliverables: Record<string, unknown[]>;

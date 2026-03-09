@@ -48,6 +48,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 ## 参考清单
 - `references/analysis-rules.md`
 - `references/report-format.md`
+- `../shared/background-quality-contract.md`
 
 ## 确认策略
 - 推荐: assisted（分析发现需要人工裁决）

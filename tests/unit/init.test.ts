@@ -42,6 +42,8 @@ describe('init', () => {
     expect(state.mode).toBe('N');
     expect(state.size).toBe('S');
     expect(state.terminal).toBe(false);
+    expect(state.stageStatus).toBe('drafting');
+    expect(state.autoAdvancePolicy).toBe('suggest');
     expect(state.mergedRules).toBeDefined();
     expect(state.mergedRules.gateConditions).toBeDefined();
     expect(state.mergedRules.deliverables).toBeDefined();

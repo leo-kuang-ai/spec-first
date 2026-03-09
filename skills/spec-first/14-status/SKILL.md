@@ -369,6 +369,7 @@ digraph status_flow {
 - 下一步建议已提供？
 
 ## 背景状态展示
+- 背景状态字段与枚举遵循 `../shared/background-quality-contract.md`
 - 状态面板必须展示 `background_input_status`
 - 明确区分 `runtime 真源` 与 `docs 投影视图`
 - 若两层状态不一致，需标记同步状态与建议动作

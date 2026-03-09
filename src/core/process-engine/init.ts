@@ -593,6 +593,8 @@ function createInitialStageState(
     size: opts.size,
     platforms: opts.platforms,
     backgroundInputStatus,
+    stageStatus: 'drafting',
+    autoAdvancePolicy: 'suggest',
     mergedRules: {
       gateConditions: mergedRules.gateConditions as Record<string, unknown[]>,
       deliverables: mergedRules.deliverables as Record<string, unknown[]>,
