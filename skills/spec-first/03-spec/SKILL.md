@@ -576,6 +576,13 @@ C. [具体方案 C]
    - 使用 `spec-first matrix update <featureId> <id> --title "标题" --yes` 注册到矩阵
    - 注意：matrix update 需要 `--yes` 确认（policy=strict）
 
+   **错误处理**:
+   - ID 生成失败: 检查 Feature 存在性 → 检查 ABBR 格式 → 重试 1 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
+   - Matrix 更新失败: 检查 ID 冲突 → 使用 `--force` 覆盖 → 重试 1 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
+   - 网络超时: 等待 5 秒重试 → 最多 3 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
+   - **阻断规则**: 不得跳过注册，所有 FR 必须成功注册后才能执行 gate check
+
+
 **确认包格式**:
 ```markdown
 ## 最终确认包
