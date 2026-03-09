@@ -229,3 +229,14 @@ SKIPPED — Trivial 复杂度，无需 ADR
 1. specs/FSREQ-20260309-HOMEPAGE-001/design.md: add 'Constitution Clause <id> (v<version>)' references
 
 - [2026-03-09T07:32:01.976Z] Context Sync: /Users/kuang/xiaobu/spec-first/CLAUDE.md
+
+---
+
+## [TDD-WAIVER] TASK-VIS-001
+
+| 字段 | 值 |
+|------|-----|
+| **场景** | CSS 样式调整 |
+| **理由** | 视觉效果需浏览器目视检查，无法通过自动化测试验证 |
+| **批准人** | orchestrate 编排流程 |
+| **时间** | 2026-03-09T14:49:21.052Z |

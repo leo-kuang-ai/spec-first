@@ -147,9 +147,9 @@ function detectCCSwitchInstallation(): {
 function runUpdate(): void {
   const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
   try {
-    execFileSync(process.execPath, [entry, 'update', '--from-postinstall'], { stdio: 'inherit' });
+    execFileSync(process.execPath, [entry, 'update', '--from-postinstall', '--yes'], { stdio: 'inherit' });
   } catch {
-    console.error('❌ 自动注册失败，请手动执行: spec-first update');
+    console.error('❌ 自动注册失败，请手动执行: spec-first update --yes');
   }
 }
 
