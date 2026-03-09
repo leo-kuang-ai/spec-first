@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.6.2 2026-03-10 Claude: feat(init): 增强 feat 参数交互 - 支持中文输入自动生成英文缩写候选项，保持逐步引导流程 (user-visible)
 - v0.6.1 2026-03-10 Claude: docs(init): 删除断点续传描述 - 与代码实现保持一致，默认创建新 Feature
 - v0.6.0 2026-03-09 Claude: feat(code): 完全重写为批量模式 - 支持依赖解析、拓扑排序、并发执行、失败率控制，三层守卫架构，上下文包 < 2KB，降级策略，checkpoint 机制 (user-visible)
 - v0.6.0 2026-03-09 Claude: feat(cli): 新增 batch-test 命令 - 集成批量执行器到 CLI，支持从 task_plan.md 解析任务并执行

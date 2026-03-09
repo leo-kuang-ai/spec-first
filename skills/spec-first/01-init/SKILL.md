@@ -48,8 +48,12 @@ changelog: Initial version with standardized metadata
 - 当 `.spec-first/layer2/` 不存在或为空时，必须中止并提示先创建平台 YAML，再继续 init
 
 ## 交互引导要求（强制）
-- P2 必须使用**逐步交互式引导**，禁止一次性要求用户提交全部字段。
+- P2 必须使用**逐步交互式引导**，逐个展示问题并等待用户回答。
 - 推荐顺序：`feat -> mode(单选) -> size(单选) -> platforms(多选) -> title -> feature-id -> bootstrap(是/否)`。
+- `feat` 参数特殊处理：
+  - 当用户输入中文描述时，自动解析关键词生成 3-4 个符合规范的英文缩写候选项
+  - 提供单选界面让用户选择，或允许自定义输入
+  - 示例：输入"首页阶段流转图优化" → 候选 HOMEPAGE/FLOWCHART/STAGEFLOW + 自定义
 - `mode/size` 必须给出编号选项与默认值（支持直接回车采用默认）。
 - `platforms` 必须展示 `.spec-first/layer2/*.yaml` 解析出的可选列表，并以多选交互收集结果（可切换勾选、可全选、可清空、完成前至少选 1 项）。
 - 参数确认阶段（P3）必须回显最终选择（含是否启用 `--bootstrap`）后再执行。
