@@ -204,9 +204,15 @@ export function advance(
   let finalTo = to;
   let finalGateResult = gateResult;
 
-  // 07_release 自动跳转到 08_done
+  // 07_release 自动跳转到 08_done（预留扩展，当前自动跳过）
   if (to === Stage.RELEASE) {
-    appendFindings(featureId, projectRoot, `AUTO_ADVANCE: ${to} → ${Stage.DONE}`);
+    appendFindings(featureId, projectRoot,
+      `AUTO_ADVANCE: ${to} → ${Stage.DONE} (发布阶段预留扩展，当前自动跳过)`);
+    writeLog(getGateLogPath(featureId, projectRoot), {
+      event: 'release_auto_skip',
+      message: '发布阶段预留扩展，当前自动跳过',
+      featureId,
+    });
     const doneResult = advance(featureId, projectRoot, _options);
     finalTo = doneResult.to;
     finalGateResult = doneResult.gateResult;

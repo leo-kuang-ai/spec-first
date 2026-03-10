@@ -11,7 +11,7 @@ export const FLOW_STAGES = [
   { id: '04_implement', label: '编码实现', desc: '完成编码并通过实现阶段质量门禁。' },
   { id: '05_verify', label: '验证测试', desc: '执行测试与回归，确认需求达成。' },
   { id: '06_wrap_up', label: '归档复盘', desc: '沉淀追踪矩阵、归档交付物与结论。' },
-  { id: '07_release', label: '发布', desc: '发布到测试环境（自动跳转到完成）。' },
+  { id: '07_release', label: '发布', desc: '发布到测试环境（预留扩展，当前自动跳过）。' },
   { id: '08_done', label: '完成', desc: 'Feature 开发完成，进入终态。' },
 ];
 
