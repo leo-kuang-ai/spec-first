@@ -10,6 +10,15 @@ import { readJson, exists, writeMarkdown, readMarkdown, ensureDir } from '../../
 const CURRENT_FILE = '.spec-first/current';
 const FEATURE_ENV_KEYS = ['SPEC_FIRST_FEATURE', 'SPEC_FIRST_CURRENT_FEATURE', 'FEATURE_ID'] as const;
 
+function readValidatedFeatureState(featureDirName: string, projectRoot: string): StageState {
+  const stateFile = join(projectRoot, 'specs', featureDirName, 'stage-state.json');
+  const state = readJson<StageState>(stateFile);
+  if (state.featureId !== featureDirName) {
+    throw new Error(`Feature 目录名与 stage-state.featureId 不一致：目录=${featureDirName}，state=${state.featureId}`);
+  }
+  return state;
+}
+
 /** 读取当前活跃 Feature ID，不存在返回 null */
 export function currentFeature(projectRoot: string): string | null {
   const p = join(projectRoot, CURRENT_FILE);
@@ -30,7 +39,7 @@ export function getFeatureState(featureId: string, projectRoot: string): StageSt
   if (!exists(p)) {
     throw new Error(`Feature ${featureId} not found`);
   }
-  return readJson<StageState>(p);
+  return readValidatedFeatureState(featureId, projectRoot);
 }
 
 /** 扫描 specs/ 下所有 Feature，返回按 updatedAt 降序排列的摘要 */
@@ -46,7 +55,12 @@ export function listFeatures(projectRoot: string): FeatureSummary[] {
     const stateFile = join(specsDir, entry.name, 'stage-state.json');
     if (!exists(stateFile)) continue;
 
-    const state = readJson<StageState>(stateFile);
+    let state: StageState;
+    try {
+      state = readValidatedFeatureState(entry.name, projectRoot);
+    } catch {
+      continue;
+    }
     summaries.push({
       featureId: state.featureId,
       title: state.title,
@@ -75,6 +89,14 @@ function resolveByExactOrPrefix(
   return undefined;
 }
 
+function listFeatureDirectoryNames(projectRoot: string): string[] {
+  const specsDir = join(projectRoot, 'specs');
+  if (!exists(specsDir)) return [];
+  return readdirSync(specsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+}
+
 function getEnvOverride(env: NodeJS.ProcessEnv): string | undefined {
   for (const key of FEATURE_ENV_KEYS) {
     const value = env[key];
@@ -90,10 +112,19 @@ export function resolveFeatureId(
   projectRoot: string,
   options?: { env?: NodeJS.ProcessEnv },
 ): { featureId: string; source: 'exact' | 'prefix' | 'env' } {
-  const featureIds = listFeatures(projectRoot).map((item) => item.featureId);
+  const featureIds = Array.from(new Set([
+    ...listFeatures(projectRoot).map((item) => item.featureId),
+    ...listFeatureDirectoryNames(projectRoot),
+  ]));
   const input = requested?.trim();
 
   if (input) {
+    const exactStatePath = join(projectRoot, 'specs', input, 'stage-state.json');
+    if (exists(exactStatePath)) {
+      getFeatureState(input, projectRoot);
+      return { featureId: input, source: 'exact' };
+    }
+
     const resolved = resolveByExactOrPrefix(input, featureIds);
     if (resolved) {
       return { featureId: resolved, source: resolved === input ? 'exact' : 'prefix' };

@@ -4,6 +4,7 @@
  */
 import { join } from 'node:path';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
+import { validateId } from '../trace-engine/id-validator.js';
 
 export interface FormatValidationResult {
   pass: boolean;
@@ -72,6 +73,18 @@ function validateIdFormat(featureId: string, projectRoot: string): string[] {
     if (parts.length > 3) {
       errors.push(`ID 格式错误：${id}（应移除中间连字符）`);
     }
+  }
+
+  const seen = new Set<string>();
+  const dupes = new Set<string>();
+  for (const match of content.matchAll(/\|\s*([A-Z][A-Z0-9-]{2,40})\s*\|/g)) {
+    const id = match[1];
+    if (!validateId(id).valid) continue;
+    if (seen.has(id)) dupes.add(id);
+    seen.add(id);
+  }
+  for (const id of dupes) {
+    errors.push(`重复 ID：${id}`);
   }
 
   return errors;

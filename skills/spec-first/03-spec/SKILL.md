@@ -12,6 +12,8 @@ allowed-tools: "Read, Write, Edit, Bash"
 
 定义需求规格，通过 Phase 0（PRD）+ Step 0-8 流程生成 FR 功能需求与验收标准（AC）。
 
+- Command: `/spec-first:spec [featureId]`
+
 ## Announce at Start
 
 ```
@@ -24,7 +26,7 @@ I'm using the spec skill to define requirements for [Feature].
 
 ### Phase 0: PRD 生成
 
-详见 [references/phase0-prd-workflow.md](references/phase0-prd-workflow.md)
+详见 [Phase 0 PRD 工作流](references/phase0-prd-workflow.md)
 
 **快速概览**:
 - **Phase 0.0**: Feature 快速初始化（防止信息丢失）
@@ -41,12 +43,12 @@ I'm using the spec skill to define requirements for [Feature].
 
 ### Step 0-8: FR/AC 定义
 
-详见 [references/steps-fr-ac-workflow.md](references/steps-fr-ac-workflow.md)
+详见 [Step 0-8 工作流](references/steps-fr-ac-workflow.md)
 
 **快速概览**:
 - **Step 0**: 任务存在性检查
 - **Step 1**: [已合并到 Phase 0.2]
-- **Step 2**: 复杂度判定（详见 [complexity-matrix.md](references/complexity-matrix.md)）
+- **Step 2**: 复杂度判定（详见 [复杂度矩阵](references/complexity-matrix.md)）
 - **Step 3**: 提问门禁（先推导再提问）
 - **Step 4**: 调研模式（技术选型前调研）
 - **Step 5**: 发散扫描（边界/失败场景/NFR）
@@ -67,7 +69,7 @@ I'm using the spec skill to define requirements for [Feature].
 
 **注**: Step 1 已合并到 Phase 0.2，所有路径都不再单独执行 Step 1。
 
-详见 [references/complexity-matrix.md](references/complexity-matrix.md)
+详见 [复杂度矩阵](references/complexity-matrix.md)
 
 ---
 
@@ -75,7 +77,16 @@ I'm using the spec skill to define requirements for [Feature].
 
 ### 字面即精神原则
 
-不得自行变通流程。详见 [references/anti-rationalization-guards.md](references/anti-rationalization-guards.md)
+不得自行变通流程。详见 [反合理化守卫](references/anti-rationalization-guards.md)
+
+### 隐含假设清单
+
+Phase 0.2 的质量扫描必须显式暴露隐含假设，避免把口语化默认前提静默带入 `spec.md`：
+- 使用 `[ASSUMED]` 标记可接受的合理默认值
+- 使用 `[NEEDS CLARIFICATION]` 标记会影响范围、合规、安全或验收结果的不确定项
+- 出现 `通常 / 一般 / 默认 / 预期会` 这类表述时，必须检查是否应转化为假设条目
+
+详见 [Phase 0 PRD 工作流](references/phase0-prd-workflow.md)。
 
 ### 模板驱动约束
 
@@ -92,13 +103,13 @@ I'm using the spec skill to define requirements for [Feature].
 - **确认策略**: `matrix update` 必须添加 `--yes`（policy=strict）
 - **串行执行**: matrix 操作串行执行，避免并行失败级联
 
-详见 [references/cli-commands-reference.md](references/cli-commands-reference.md)
+详见 [CLI 命令参考](references/cli-commands-reference.md)
 
 ---
 
 ## 质量门禁
 
-详见 [references/quality-gates.md](references/quality-gates.md)
+详见 [质量门禁](references/quality-gates.md)
 
 **Phase 0.4**: PRD 自检（C-PRD >= 85%）
 **Step 8**: Gate Check（G-SPEC-00 + 格式校验）
@@ -148,6 +159,18 @@ I'm using the spec skill to define requirements for [Feature].
 
 ---
 
+## 宪法权威检查（P1-CON）
+
+### P1.5: 宪法一致性检查
+
+在 FR/AC 收敛后、进入后续设计决策前，必须执行宪法一致性检查：
+- 逐条检查 FR/AC 是否违反 `constitution.md` 中的硬约束
+- 发现违反时，必须标记 `[CONSTITUTION_VIOLATION]`
+- 必须输出违反的具体宪法条款
+- 必须给出可执行修改建议；未修正或未获确认前不得继续推进
+
+详见 [Step 0-8 工作流](references/steps-fr-ac-workflow.md) 与 `references/constitution-authority.md`。
+
 ## AC ID 规范
 
 - **命名**: `AC-<ABBR>-<FRSEQ>-<NN>`
@@ -166,7 +189,7 @@ spec-first gate check <featureId>
 spec-first validate format <featureId>
 ```
 
-详见 [references/cli-commands-reference.md](references/cli-commands-reference.md)
+详见 [CLI 命令参考](references/cli-commands-reference.md)
 
 ---
 
@@ -197,12 +220,12 @@ spec-first validate format <featureId>
 
 **路径基准**: 相对于 `skills/spec-first/03-spec/` 目录
 
-- [references/phase0-prd-workflow.md](references/phase0-prd-workflow.md) - Phase 0 详细流程
-- [references/steps-fr-ac-workflow.md](references/steps-fr-ac-workflow.md) - Step 0-8 详细流程
-- [references/complexity-matrix.md](references/complexity-matrix.md) - 复杂度判定矩阵
-- [references/anti-rationalization-guards.md](references/anti-rationalization-guards.md) - 反合理化守卫
-- [references/cli-commands-reference.md](references/cli-commands-reference.md) - CLI 命令参考
-- [references/quality-gates.md](references/quality-gates.md) - 质量门禁详解
+- [Phase 0 PRD 工作流](references/phase0-prd-workflow.md) - Phase 0 详细流程
+- [Step 0-8 工作流](references/steps-fr-ac-workflow.md) - Step 0-8 详细流程
+- [复杂度矩阵](references/complexity-matrix.md) - 复杂度判定矩阵
+- [反合理化守卫](references/anti-rationalization-guards.md) - 反合理化守卫
+- [CLI 命令参考](references/cli-commands-reference.md) - CLI 命令参考
+- [质量门禁](references/quality-gates.md) - 质量门禁详解
 - `references/spec-review-checklist.md` - 规格审查清单
 - `references/test-level-glossary.md` - 测试层级术语表
 - `references/constitution-authority.md` - 宪法权威说明

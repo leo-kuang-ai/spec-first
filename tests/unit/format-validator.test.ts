@@ -53,6 +53,24 @@ describe('format-validator', () => {
     expect(result.errors.some(e => e.includes('FR-SPEC-OPT-001'))).toBe(true);
   });
 
+  it('should detect duplicate IDs across all matrix types', () => {
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'),
+      '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
+      'Feature ID: TEST-FEAT-001\n');
+    writeFileSync(
+      join(TEST_ROOT, 'specs', FEATURE_ID, 'traceability-matrix.md'),
+      '| ID | Type | Title | Status | Upstream | Downstream |\n'
+      + '|----|------|-------|--------|----------|------------|\n'
+      + '| TASK-AUTH-001 | TASK | Login | Planned |  |  |\n'
+      + '| TASK-AUTH-001 | TASK | Login Again | Planned |  |  |\n',
+    );
+
+    const result = validateFormat(FEATURE_ID, TEST_ROOT);
+    expect(result.pass).toBe(false);
+    expect(result.errors.some(e => e.includes('重复 ID'))).toBe(true);
+  });
+
   it('should detect missing required files', () => {
     const result = validateFormat(FEATURE_ID, TEST_ROOT);
     expect(result.pass).toBe(false);

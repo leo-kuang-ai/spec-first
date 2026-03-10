@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import { exists } from '../../shared/fs-utils.js';
+import { getCurrentTaskId } from '../../core/task-plan/parser.js';
 import { parseFlag } from '../parse-utils.js';
 
 const GIT_COMMIT_TIMEOUT_MS = 30_000;
@@ -67,17 +68,7 @@ function inferTaskId(projectRoot: string): string | undefined {
   const featureId = readFileSync(currentFile, 'utf-8').trim().split('\n')[0];
   if (!featureId) return undefined;
 
-  const taskPlan = join(projectRoot, 'specs', featureId, 'task_plan.md');
-  if (!exists(taskPlan)) return undefined;
-
-  const content = readFileSync(taskPlan, 'utf-8');
-  for (const line of content.split('\n')) {
-    if (line.includes('In Progress')) {
-      const match = line.match(/TASK-[\w-]+/);
-      if (match) return match[0];
-    }
-  }
-  return undefined;
+  return getCurrentTaskId(projectRoot, featureId);
 }
 
 function isValidTaskId(id: string): boolean {

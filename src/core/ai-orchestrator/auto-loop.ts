@@ -28,6 +28,7 @@ import { checkRequiredMcps } from './mcp-checker.js';
 import { loadSlopRules, runSlopCheck } from './slop-checker.js';
 import { writeAuditLog } from './audit-log.js';
 import { runWatchdogCheck, updateHeartbeat, updateWatchdogCheckedAt } from './watchdog.js';
+import { makeRetryDecision, applyRetryToState } from './retry-controller.js';
 
 // ─── 类型定义 ───────────────────────────────────────────
 
@@ -191,11 +192,37 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         completedTasks.push(task.id);
         writeAuditLog({ event: 'task_done', featureId, taskId: task.id }, projectRoot);
       } else {
+        const retryState = state.runtime?.autoLoop?.retry ?? createAutoLoopState().retry;
+        const retryDecision = makeRetryDecision(result.message, retryState, cfg.runtime.auto_orchestrate);
+        state = applyRetryToState(state, retryDecision, result.message);
+
+        if (retryDecision.shouldRetry && retryDecision.errorCategory === 'temporary') {
+          state = updateTodoStatus(state, task.id, 'pending');
+          state = updateAutoLoopLastResult(
+            state,
+            task.id,
+            'pending',
+            `retry scheduled (${retryDecision.backoffMs}ms): ${result.message}`,
+          );
+          writeAuditLog({
+            event: 'task_retry_scheduled',
+            featureId,
+            taskId: task.id,
+            detail: {
+              message: result.message,
+              backoffMs: retryDecision.backoffMs,
+              regenerateCount: state.runtime?.autoLoop?.retry.regenerateCount ?? 0,
+            },
+          }, projectRoot);
+          checkpoint(state, projectRoot, onCheckpoint);
+          continue;
+        }
+
         state = updateTodoStatus(state, task.id, 'blocked');
         state = updateAutoLoopLastResult(state, task.id, 'blocked', result.message);
         writeAuditLog({
           event: 'task_blocked', featureId, taskId: task.id,
-          detail: { message: result.message },
+          detail: { message: result.message, retryReason: retryDecision.reason },
         }, projectRoot);
 
         if (cfg.runtime.auto_orchestrate.stop_on_blocked) {
@@ -368,7 +395,7 @@ function markTaskStarted(state: TodoRunnerState, taskId: string): TodoRunnerStat
 function updateAutoLoopLastResult(
   state: TodoRunnerState,
   taskId: string,
-  outcome: 'done' | 'blocked',
+  outcome: 'pending' | 'done' | 'blocked',
   message: string,
 ): TodoRunnerState {
   return {

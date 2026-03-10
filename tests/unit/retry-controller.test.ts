@@ -209,11 +209,14 @@ describe('makeRetryDecision', () => {
 describe('applyRetryToState', () => {
   function makeState(): TodoRunnerState {
     return {
-      version: '2.0',
+      kind: 'todo-runner-state',
+      version: 1,
       featureId: 'test',
-      todos: [],
+      iteration: 0,
+      maxIterations: 3,
+      halted: false,
+      items: [],
       runtime: { autoLoop: createAutoLoopState() },
-      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
   }
@@ -249,6 +252,8 @@ describe('applyRetryToState', () => {
 
   it('无 runtime.autoLoop 时回退到默认状态', () => {
     const state: TodoRunnerState = {
+      kind: 'todo-runner-state',
+      version: 1,
       featureId: 'test',
       items: [],
       iteration: 0,

@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import type { StageState } from '../../shared/types.js';
 import { readJson, exists, readMarkdown } from '../../shared/fs-utils.js';
 import { loadTodoState, summarizeTodoState } from './todo-runner.js';
+import { readTaskPlan } from '../task-plan/parser.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import { buildTaskContextPack } from './context-pack.js';
 import { buildCatchupSummary, extractFiveQuestions } from './catchup-summary.js';
@@ -115,12 +116,11 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   let totalTasks = 0;
   let completedTasks = 0;
   const taskPlanPath = join(specDir, 'task_plan.md');
-  if (exists(taskPlanPath)) {
-    const content = readMarkdown(taskPlanPath);
-    const lines = content.split('\n').filter(l => l.trim().startsWith('|') && !l.includes('---'));
-    totalTasks = Math.max(0, lines.length - 1); // exclude header
-    completedTasks = content.split('\n').filter(l => l.includes('Done') || l.includes('Completed')).length;
-  } else {
+  const parsedTaskPlan = readTaskPlan(projectRoot, featureId);
+  if (parsedTaskPlan) {
+    totalTasks = parsedTaskPlan.stats.total;
+    completedTasks = parsedTaskPlan.stats.completed;
+  } else if (!exists(taskPlanPath)) {
     missingFiles.push('task_plan.md');
   }
 
@@ -157,17 +157,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   }
 
   // Step 4: Locate current task
-  let currentTask: string | undefined;
-  if (exists(taskPlanPath)) {
-    const content = readMarkdown(taskPlanPath);
-    const inProgress = content.split('\n').find(l =>
-      l.includes('In Progress') || l.includes('进行中'),
-    );
-    if (inProgress) {
-      const match = inProgress.match(/TASK-\S+/);
-      currentTask = match?.[0];
-    }
-  }
+  const currentTask = parsedTaskPlan?.currentTaskId;
 
   // Step 4.2: 构建 TASK 级独立上下文包（Fresh Context Per Task）
   const taskContextPack = currentTask

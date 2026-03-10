@@ -129,6 +129,13 @@ describe('resolveFeatureId', () => {
       .toThrow(/歧义/);
   });
 
+
+  it('should reject directory and stage-state featureId mismatch', () => {
+    const dir = 'FSREQ-20260211-DIR-001';
+    writeState(dir, { featureId: 'FSREQ-20260211-OTHER-001' });
+    expect(() => resolveFeatureId(dir, TMP, { env: {} as NodeJS.ProcessEnv })).toThrow(/目录名.*featureId|featureId.*目录名/);
+  });
+
   it('should fallback to env override when request cannot resolve', () => {
     writeState('FSREQ-20260211-ENV-001');
     const resolved = resolveFeatureId('MISSING', TMP, {

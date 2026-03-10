@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import { exists, readJsonChecked, readMarkdown, parseMarkdownTable } from '../../shared/fs-utils.js';
+import { getCurrentTaskId } from '../task-plan/parser.js';
 import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 import { SKILL_STAGE_REQUIREMENTS } from '../rules/truth-source.js';
@@ -51,11 +52,19 @@ function readCurrentStage(projectRoot: string, featureId: string): string | unde
   }
 }
 
-function hasInProgressTask(taskPlan: string): boolean {
-  return Boolean(findInProgressTaskId(taskPlan));
+function hasInProgressTask(taskPlan: string, specDir?: string): boolean {
+  return Boolean(findInProgressTaskId(taskPlan, specDir));
 }
 
-function findInProgressTaskId(taskPlan: string): string | undefined {
+function findInProgressTaskId(taskPlan: string, specDir?: string): string | undefined {
+  if (specDir) {
+    const featureId = specDir.split('/').at(-1);
+    const projectRoot = specDir.split('/specs/')[0];
+    if (featureId && projectRoot) {
+      return getCurrentTaskId(projectRoot, featureId);
+    }
+  }
+
   for (const cells of parseMarkdownTable(taskPlan)) {
     const taskCell = cells.find(cell => /^TASK-/i.test(cell));
     if (!taskCell) continue;

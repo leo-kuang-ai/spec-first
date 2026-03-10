@@ -67,6 +67,8 @@ describe('batch-executor integration', () => {
     const checkpoint = loadCheckpoint(featureId, testRoot);
     expect(checkpoint).not.toBeNull();
     expect(checkpoint!.completedTasks).toHaveLength(2);
+    expect(existsSync(join(testRoot, 'specs', featureId, 'batch-checkpoint.json'))).toBe(true);
+    expect(existsSync(join(testRoot, 'specs', featureId, 'todo-state.json'))).toBe(false);
   });
 
   it('should generate report', async () => {

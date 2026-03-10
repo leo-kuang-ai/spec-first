@@ -3,6 +3,7 @@ import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import type { StageState } from '../../shared/types.js';
 import { readJson } from '../../shared/fs-utils.js';
+import { getCurrentTaskId } from '../task-plan/parser.js';
 
 export interface PromptAssemblyContext {
   featureId: string;
@@ -137,19 +138,7 @@ function readCurrentStage(projectRoot: string, featureId: string): string {
 
 function readCurrentTask(projectRoot: string, featureId: string): string {
   if (!featureId || featureId === 'N/A') return 'N/A';
-  const taskPlanPath = join(projectRoot, 'specs', featureId, 'task_plan.md');
-  if (!exists(taskPlanPath)) return 'N/A';
-
-  const lines = readMarkdown(taskPlanPath).split('\n');
-  const row = lines.find((line) => {
-    if (!line.trim().startsWith('|')) return false;
-    const low = line.toLowerCase();
-    return low.includes('in_progress') || low.includes('in progress');
-  });
-  if (!row) return 'N/A';
-
-  const match = row.match(/TASK-[A-Z0-9-]+/);
-  return match?.[0] ?? 'N/A';
+  return getCurrentTaskId(projectRoot, featureId) ?? 'N/A';
 }
 
 export function resolvePromptAssemblyContext(projectRoot: string): PromptAssemblyContext {

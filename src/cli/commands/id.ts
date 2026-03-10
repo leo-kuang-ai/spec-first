@@ -7,6 +7,7 @@ import { ExitCode } from '../../shared/types.js';
 import { nextId } from '../../core/trace-engine/id-generator.js';
 import { validateId } from '../../core/trace-engine/id-validator.js';
 import { searchId, listIds } from '../../core/trace-engine/id-search.js';
+import { resolveFeatureId } from '../../core/process-engine/feature.js';
 import { parseFlag } from '../parse-utils.js';
 
 // 有效的 NextIdType 值
@@ -72,7 +73,8 @@ function handleNext(args: string[]): number {
   const type = typeArg as NextIdType;
 
   try {
-    const result = nextId({ type, abbr, featureId: feature, projectRoot: process.cwd(), tcLevel });
+    const resolvedFeatureId = resolveFeatureId(feature, process.cwd()).featureId;
+    const result = nextId({ type, abbr, featureId: resolvedFeatureId, projectRoot: process.cwd(), tcLevel });
     console.log(`已生成：${result.id}`);
     return ExitCode.SUCCESS;
   } catch (e) {
@@ -118,7 +120,8 @@ function handleSearch(args: string[]): number {
     type = typeArg as IdType;
   }
 
-  const results = searchId(query, feature, process.cwd(), type);
+  const resolvedFeatureId = resolveFeatureId(feature, process.cwd()).featureId;
+  const results = searchId(query, resolvedFeatureId, process.cwd(), type);
   if (results.length === 0) {
     console.log('未找到匹配的 ID。');
     return ExitCode.SUCCESS;
@@ -149,7 +152,8 @@ function handleList(args: string[]): number {
     type = typeArg as IdType;
   }
 
-  const results = listIds(feature, process.cwd(), type);
+  const resolvedFeatureId = resolveFeatureId(feature, process.cwd()).featureId;
+  const results = listIds(resolvedFeatureId, process.cwd(), type);
   if (results.length === 0) {
     console.log('未找到 ID。');
     return ExitCode.SUCCESS;

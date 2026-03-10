@@ -192,6 +192,36 @@ describe('auto-loop blocked & halt', () => {
     expect(final.items[0].status).toBe('blocked');
   });
 
+  it('temporary timeout failure should retry and eventually complete', async () => {
+    seedState(makeItems(['T1']));
+
+    let attempts = 0;
+    const flakyExecutor: TaskExecutor = async () => {
+      attempts += 1;
+      if (attempts === 1) {
+        return { success: false, message: 'timeout error' };
+      }
+      return { success: true, message: 'ok after retry' };
+    };
+
+    const result = await runAutoLoop({
+      featureId: FEAT,
+      projectRoot: TMP,
+      args: autoArgs,
+      executor: flakyExecutor,
+    });
+
+    expect(attempts).toBe(2);
+    expect(result.halted).toBe(true);
+    expect(result.haltReason).toBe('completed');
+    expect(result.completedTasks).toEqual(['T1']);
+
+    const final = loadTodoState(FEAT, TMP)!;
+    expect(final.items[0].status).toBe('done');
+    expect(final.runtime?.autoLoop?.retry.regenerateCount).toBe(1);
+    expect(final.runtime?.autoLoop?.retry.lastFailureReason).toBe('timeout error');
+  });
+
   it('maxIterations 耗尽时 halt', async () => {
     // 设置 maxIterations=1，但有 2 个有依赖的 TASK
     seedState(makeItems(['T1', 'T2'], { T2: ['T1'] }), 1);
@@ -320,5 +350,31 @@ describe('auto-loop post-write guards', () => {
     expect(result.halted).toBe(true);
     expect(result.haltReason).toContain('blocked');
     expect(loadTodoState(FEAT, TMP)!.items[0].status).toBe('blocked');
+  });
+});
+
+
+describe('auto-loop state schema guard', () => {
+  it('should ignore batch checkpoint file path and keep todo-state separate', async () => {
+    seedState(makeItems(['T1']));
+
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'batch-checkpoint.json'),
+      JSON.stringify({ featureId: FEAT, currentLayer: 0, completedTasks: [], failedTasks: [], startTime: 'x', lastUpdateTime: 'x', layerResults: [] }, null, 2),
+      'utf-8',
+    );
+
+    const state = loadTodoState(FEAT, TMP);
+    expect(state?.items).toHaveLength(1);
+  });
+
+  it('should throw on invalid todo-state schema', () => {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'todo-state.json'),
+      JSON.stringify({ featureId: FEAT, currentLayer: 1, completedTasks: [] }, null, 2),
+      'utf-8',
+    );
+
+    expect(() => loadTodoState(FEAT, TMP, { strict: true })).toThrow(/todo-state schema/i);
   });
 });

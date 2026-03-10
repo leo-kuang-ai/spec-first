@@ -45,6 +45,9 @@ changelog: |
 
 **role-views 数据使用策略**：
 
+- 优先读取 `.spec-first/runtime/first/role-views.json` 作为 onboarding 的角色裁剪输入
+- 若无 first 资产或 role-views 不可用，则进入 `degraded` 降级模式
+
 1. **检测 role-views**：
    - 读取 `.spec-first/runtime/first/role-views.json`
    - 检查文件是否存在且格式正确

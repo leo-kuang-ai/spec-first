@@ -1,0 +1,31 @@
+| ID | Type | Title | Status | Upstream | Downstream |
+|----|------|-------|--------|----------|------------|
+| FR-HOMEPERF-001 | FR | CSS 优化 | Planned | REQ-PERF-CSS | AC-HOMEPERF-001-01~03 |
+| FR-HOMEPERF-002 | FR | JavaScript 优化 | Planned | REQ-PERF-JS | AC-HOMEPERF-002-01~04 |
+| FR-HOMEPERF-003 | FR | API 响应缓存 | Planned | REQ-PERF-CACHE | AC-HOMEPERF-003-01~04 |
+| FR-HOMEPERF-004 | FR | Feature 列表渲染优化 | Planned | REQ-PERF-LIST | AC-HOMEPERF-004-01~03 |
+| FR-HOMEPERF-005 | FR | 首屏渲染优化 | Planned | REQ-PERF-FCP | AC-HOMEPERF-005-01~04 |
+| AC-HOMEPERF-001-01 | AC | CSS 体积减少 ≥ 30% | Planned | FR-HOMEPERF-001 | TC-HOMEPERF-001 |
+| AC-HOMEPERF-001-02 | AC | 关键 CSS 内联 | Planned | FR-HOMEPERF-001 | TC-HOMEPERF-002 |
+| AC-HOMEPERF-001-03 | AC | 非关键 CSS 延迟加载 | Planned | FR-HOMEPERF-001 | TC-HOMEPERF-003 |
+| AC-HOMEPERF-002-01 | AC | JS 体积减少 ≥ 30% | Planned | FR-HOMEPERF-002 | TC-HOMEPERF-004 |
+| AC-HOMEPERF-002-02 | AC | 轮询刷新策略可配置 | Planned | FR-HOMEPERF-002 | TC-HOMEPERF-005 |
+| AC-HOMEPERF-002-03 | AC | DOM 增量更新 | Planned | FR-HOMEPERF-002 | TC-HOMEPERF-006 |
+| AC-HOMEPERF-002-04 | AC | 搜索输入防抖 | Planned | FR-HOMEPERF-002 | TC-HOMEPERF-007 |
+| AC-HOMEPERF-003-01 | AC | Feature 列表缓存 TTL ≥ 30s | Planned | FR-HOMEPERF-003 | TC-HOMEPERF-008 |
+| AC-HOMEPERF-003-02 | AC | 缓存命中无网络请求 | Planned | FR-HOMEPERF-003 | TC-HOMEPERF-009 |
+| AC-HOMEPERF-003-03 | AC | 强制刷新按钮 | Planned | FR-HOMEPERF-003 | TC-HOMEPERF-010 |
+| AC-HOMEPERF-003-04 | AC | 缓存可配置开关 | Planned | FR-HOMEPERF-003 | TC-HOMEPERF-011 |
+| AC-HOMEPERF-004-01 | AC | 100+ 列表渲染 < 300ms | Planned | FR-HOMEPERF-004 | TC-HOMEPERF-012 |
+| AC-HOMEPERF-004-02 | AC | 滚动帧率 ≥ 50fps | Planned | FR-HOMEPERF-004 | TC-HOMEPERF-013 |
+| AC-HOMEPERF-004-03 | AC | 搜索响应 < 100ms | Planned | FR-HOMEPERF-004 | TC-HOMEPERF-014 |
+| AC-HOMEPERF-005-01 | AC | FCP ≤ 1s | Planned | FR-HOMEPERF-005 | TC-HOMEPERF-015 |
+| AC-HOMEPERF-005-02 | AC | TTI ≤ 1.5s | Planned | FR-HOMEPERF-005 | TC-HOMEPERF-016 |
+| AC-HOMEPERF-005-03 | AC | 骨架屏显示 | Planned | FR-HOMEPERF-005 | TC-HOMEPERF-017 |
+| AC-HOMEPERF-005-04 | AC | API 请求并行化 | Planned | FR-HOMEPERF-005 | TC-HOMEPERF-018 |
+| DS-HOMEPERF-001 | DS | CSS 优化 | Planned | FR-HOMEPERF-001, FR-HOMEPERF-005 | TASK-* |
+| DS-HOMEPERF-002 | DS | JavaScript 优化 | Planned | FR-HOMEPERF-002, FR-HOMEPERF-005 | TASK-* |
+| DS-HOMEPERF-003 | DS | API 响应缓存 | Planned | FR-HOMEPERF-003 | TASK-* |
+| DS-HOMEPERF-004 | DS | Feature 列表虚拟滚动 | Planned | FR-HOMEPERF-004 | TASK-* |
+| DS-HOMEPERF-005 | DS | 首屏渲染优化 | Planned | FR-HOMEPERF-005 | TASK-* |
+| DS-HOMEPERF-006 | DS | 渲染性能优化 | Planned | FR-HOMEPERF-004, FR-HOMEPERF-005 | TASK-* |

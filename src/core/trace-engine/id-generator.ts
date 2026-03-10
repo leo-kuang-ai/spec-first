@@ -5,6 +5,7 @@
 import { join } from 'node:path';
 import type { NextIdType, TcLevel, MatrixRow } from '../../shared/types.js';
 import { readMarkdown, writeMarkdown, exists } from '../../shared/fs-utils.js';
+import { withFileLock } from '../../shared/file-lock.js';
 import { validateId } from './id-validator.js';
 import { parseMatrixIds } from './matrix.js';
 
@@ -27,25 +28,27 @@ export interface NextIdResult {
 
 /** 生成下一个 ID 并写入矩阵 */
 export function nextId(opts: NextIdOptions): NextIdResult {
-  validateAbbr(opts.abbr);
-  if (opts.type === 'TC' && !opts.tcLevel) {
-    throw new Error('TC 类型必须提供 tcLevel（UT|IT|E2E|ST）');
-  }
+  return withFileLock(join(opts.projectRoot, 'specs', opts.featureId, '.matrix.lock'), () => {
+    validateAbbr(opts.abbr);
+    if (opts.type === 'TC' && !opts.tcLevel) {
+      throw new Error('TC 类型必须提供 tcLevel（UT|IT|E2E|ST）');
+    }
 
-  const matrixPath = getMatrixPath(opts.projectRoot, opts.featureId);
-  const rows = parseMatrixIds(matrixPath);
+    const matrixPath = getMatrixPath(opts.projectRoot, opts.featureId);
+    const rows = parseMatrixIds(matrixPath);
 
-  const seq = findNextSeq(rows, opts.type, opts.abbr, opts.tcLevel);
-  const id = assembleId(opts.type, opts.abbr, seq, opts.tcLevel);
+    const seq = findNextSeq(rows, opts.type, opts.abbr, opts.tcLevel);
+    const id = assembleId(opts.type, opts.abbr, seq, opts.tcLevel);
 
-  const validation = validateId(id);
-  if (!validation.valid) {
-    throw new Error(`生成了无效 ID：${id} — ${validation.error}`);
-  }
+    const validation = validateId(id);
+    if (!validation.valid) {
+      throw new Error(`生成了无效 ID：${id} — ${validation.error}`);
+    }
 
-  appendToMatrix(matrixPath, { id, type: opts.type, title: '', status: 'Planned' });
+    appendToMatrix(matrixPath, { id, type: opts.type, title: '', status: 'Planned' });
 
-  return { id, seq };
+    return { id, seq };
+  });
 }
 
 /** 校验缩写格式：1-16 位大写字母+数字，首字符必须是字母（连字符会被自动移除） */
@@ -121,6 +124,8 @@ function appendToMatrix(
   }
 
   const content = readMarkdown(matrixPath);
+  const existingIds = parseMatrixIds(matrixPath);
+  if (existingIds.includes(row.id)) return;
   const newRow = `| ${row.id} | ${row.type} | ${row.title} | ${row.status} |  |  |\n`;
   writeMarkdown(matrixPath, content + newRow);
 }

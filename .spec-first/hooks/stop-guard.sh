@@ -2,21 +2,18 @@
 set -eu
 
 FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
-FILE="specs/$FEAT/task_plan.md"
+[ -z "$FEAT" ] && exit 0
 
-# 仅在 04_implement 阶段才检查 in_progress 任务
-if [ -z "$FEAT" ] || [ ! -f "$FILE" ]; then
-  exit 0
+STAGE_FILE="specs/$FEAT/stage-state.json"
+TASK_FILE="specs/$FEAT/task_plan.md"
+
+# 仅在 04_implement 阶段检查 in_progress 任务
+if [ -f "$STAGE_FILE" ]; then
+  STAGE="$(awk -F'"' '/"currentStage"[[:space:]]*:/ {print $4; exit}' "$STAGE_FILE" 2>/dev/null || true)"
+  [ "$STAGE" != "04_implement" ] && exit 0
 fi
 
-# 读取阶段信息（优先 stage-state.json）
-STAGE=""
-if [ -f "specs/$FEAT/stage-state.json" ]; then
-  STAGE="$(awk -F'"' '/"currentStage"[[:space:]]*:/ {print $4; exit}' "specs/$FEAT/stage-state.json" 2>/dev/null || true)"
-fi
-
-# 仅在 04_implement 阶段检查
-[ "$STAGE" = "04_implement" ] || exit 0
+[ ! -f "$TASK_FILE" ] && exit 0
 
 IN_PROGRESS_IDS="$(
   awk -F'|' '
@@ -34,7 +31,7 @@ IN_PROGRESS_IDS="$(
       s=tolower(last)
       if (s == "in_progress" || s == "in progress") print taskid
     }
-  ' "$FILE" 2>/dev/null || true
+  ' "$TASK_FILE" 2>/dev/null || true
 )"
 
 # 只输出提醒，不返回错误码（避免触发 AI 死循环）

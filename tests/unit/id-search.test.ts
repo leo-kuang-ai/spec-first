@@ -7,6 +7,16 @@ const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-idsearch');
 const FEAT_ID = 'FSREQ-20260211-AUTH-001';
 const SPEC_DIR = join(TMP, 'specs', FEAT_ID);
 
+function withCwd(dir: string, fn: () => void | number): void | number {
+  const original = process.cwd;
+  process.cwd = () => dir;
+  try {
+    return fn();
+  } finally {
+    process.cwd = original;
+  }
+}
+
 const MATRIX_CONTENT = `| ID | Type | Title | Status | Upstream | Downstream |
 |----|------|-------|--------|----------|------------|
 | FR-AUTH-001 | FR | Login | Planned |  |  |
@@ -71,5 +81,27 @@ describe('listIds', () => {
 
   it('should return empty when matrix missing', () => {
     expect(listIds('FSREQ-20260211-NOPE-001', TMP)).toEqual([]);
+  });
+});
+
+
+import { handleId } from '../../src/cli/commands/id.js';
+import { vi } from 'vitest';
+
+describe('id command feature resolution', () => {
+  it('should resolve feature prefix for id list', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const code = withCwd(TMP, () => handleId(['list', '--feature', 'FSREQ-20260211-AUT']));
+    expect(code).toBe(0);
+    expect(log.mock.calls.some((call) => String(call[0]).includes('FR-AUTH-001'))).toBe(true);
+    log.mockRestore();
+  });
+
+  it('should resolve feature prefix for id search', () => {
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const code = withCwd(TMP, () => handleId(['search', 'AUTH', '--feature', 'FSREQ-20260211-AUT']));
+    expect(code).toBe(0);
+    expect(log.mock.calls.some((call) => String(call[0]).includes('FR-AUTH-001'))).toBe(true);
+    log.mockRestore();
   });
 });

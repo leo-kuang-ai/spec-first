@@ -4,9 +4,7 @@
 import { ExitCode } from '../../shared/types.js';
 import { resolveFeatureId, currentFeature } from '../../core/process-engine/feature.js';
 import { generateExecutionPlan, executeConcurrent } from '../../core/batch-executor/index.js';
-import type { TaskNode } from '../../core/batch-executor/types.js';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readTaskPlan, toTaskNodes } from '../../core/task-plan/parser.js';
 
 export async function handleBatchTest(args: string[]): Promise<number> {
   try {
@@ -21,7 +19,8 @@ export async function handleBatchTest(args: string[]): Promise<number> {
     const { featureId: resolvedId } = resolveFeatureId(featureId, projectRoot);
 
     // 读取 task_plan.md 解析 TASK
-    const tasks = parseTaskPlan(resolvedId, projectRoot);
+    const parsedPlan = readTaskPlan(projectRoot, resolvedId);
+    const tasks = parsedPlan ? toTaskNodes(parsedPlan) : [];
 
     console.log(`\n📋 批量执行计划`);
     console.log(`Feature: ${resolvedId}`);
@@ -59,31 +58,4 @@ export async function handleBatchTest(args: string[]): Promise<number> {
     console.error('批量执行失败:', error instanceof Error ? error.message : error);
     return ExitCode.GENERAL_ERROR;
   }
-}
-
-function parseTaskPlan(featureId: string, projectRoot: string): TaskNode[] {
-  const path = join(projectRoot, 'specs', featureId, 'task_plan.md');
-  const content = readFileSync(path, 'utf-8');
-
-  const tasks: TaskNode[] = [];
-  const taskRegex = /^- \[ \] (TASK-[\w-]+):\s*(.+?)(?:\s*\(depends_on:\s*\[(.*?)\]\))?$/gm;
-
-  let match;
-  while ((match = taskRegex.exec(content)) !== null) {
-    const [, id, title, depsStr] = match;
-    const dependsOn = depsStr ? depsStr.split(',').map(s => s.trim()) : [];
-
-    tasks.push({
-      id,
-      title,
-      description: '',
-      acceptanceCriteria: [],
-      dependsOn,
-      status: 'todo',
-      relatedFR: [],
-      relatedDS: [],
-    });
-  }
-
-  return tasks;
 }
