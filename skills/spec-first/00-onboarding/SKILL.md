@@ -1,105 +1,133 @@
 ---
 name: onboarding
 description: 新手引导 - 交互式场景识别与学习路径推荐
-version: 1.3.0
+version: 1.5.0
 user-invocable: true
-changelog: |
-  1.3.0: 交互体验优化 - 支持命令行参数（--role/--task/--size），CLI 参数检测与提示
-  1.2.0: 文档结构优化 - 拆分输出模板到 references/output-templates.md，精简 SKILL.md
-  1.1.0: 补充场景匹配算法、role-views 使用策略、完整错误处理矩阵
-  1.0.0: 初始版本 - 3 问题交互式引导、场景推荐、学习路径保存
 ---
 
 # 00-onboarding — 新手引导
 
-> **版本**: v1.0.0 | **类型**: Utility | **状态**: Active
+> **版本**: v1.5.0 | **类型**: Utility | **状态**: Active
 
 ---
 
 ## 执行流程
 
 - Command: `/spec-first:onboarding`
-- 支持参数（可选）：`--role=<role> --task=<task> --size=<size>`
 
-**参数说明**：
-- `--role`: developer | pm | qa | architect | <自定义>
-- `--task`: new_feature | fix_bug | refactor | learn
-- `--size`: small | medium | large
+**重要**：本 Skill 的所有用户交互必须使用 `AskUserQuestion` 工具，禁止使用文本提示让用户输入数字或文字。
 
-**注意**：参数仅用于 AI 内部传递，CLI 不支持参数化启动
+### Phase 0: 前置检查与欢迎
 
-### Phase 0: 欢迎与说明
+**前置检查**：
+1. 检测 `docs/onboarding/` 目录下是否存在学习路径文档（*.md）
+2. 检测 `.spec-first/runtime/first/role-views.json` 是否存在
 
-**输出格式**：
+---
+
+**场景 A：已完成 onboarding（存在学习路径文档）**
+
+**立即调用 `AskUserQuestion` 工具**（不要输出文本提示）：
+
+```
+header: "已完成"
+question: "检测到你已经完成了 onboarding，上次生成的学习路径已保存到 docs/onboarding/ 目录。你想要？"
+multiSelect: false
+options:
+  - label: "查看上次的学习路径"
+    description: "读取并显示已保存的文档"
+  - label: "重新生成学习路径"
+    description: "重新进行场景识别"
+  - label: "退出"
+    description: "结束 onboarding"
+```
+
+**处理逻辑**：
+- 选择"查看上次的学习路径" → 读取 `docs/onboarding/*.md` 并输出内容，然后结束
+- 选择"重新生成学习路径" → 继续 Phase 0.5
+- 选择"退出" → 直接结束
+
+---
+
+**场景 B：首次使用（无学习路径文档）**
+
+输出欢迎信息：
 ```
 🎉 欢迎使用 Spec-First！
 
-我会通过 3 个简单问题帮你找到最适合的学习路径。
-
----
+我会帮你找到最适合的学习路径。
 ```
 
+继续 Phase 0.5
+
 ---
 
-### Phase 0.5: 背景输入检查
+### Phase 0.5: 引导模式选择
+
+**使用 `AskUserQuestion` 工具收集用户选择**：
+
+**场景 A：无 role-views（降级模式）**
+
+**Q0: 检测到你还没有运行过项目分析**
+
+提示：建议先执行 `/spec-first:first` 了解项目结构（约 3-5 分钟），这样能提供更精准的推荐。
+
+选项：
+- 现在就去分析项目（推荐） - 执行 first 后获得个性化推荐
+- 第一次使用，给我最简路径 - 跳过分析，3 步快速开始
+- 我想自定义学习路径 - 跳过分析，完整场景识别
+
+**处理逻辑**：
+- 选择"现在就去分析项目" → 执行 `/spec-first:first`，完成后重新进入 onboarding
+- 选择"第一次使用" → 跳过 Phase 1，输出快速路径（Phase 2.8-快速模式）
+- 选择"自定义" → 进入 Phase 1 完整场景识别（降级模式）
+
+**场景 B：有 role-views（正常模式）**
+
+**Q0: 你的使用经验？**
+
+选项：
+- 第一次使用，给我最简路径（推荐） - 3 步快速开始
+- 我想自定义学习路径 - 完整场景识别
+
+**处理逻辑**：
+- 选择"第一次使用" → 跳过 Phase 1，输出快速路径（Phase 2.8-快速模式）
+- 选择"自定义" → 进入 Phase 1 完整场景识别（正常模式）
 
 **role-views 数据使用策略**：
+- 正常模式：根据用户角色调整推荐内容，标注 `📊 数据来源：基于项目分析（role-views）`
+- 降级模式：使用通用推荐，标注 `💡 数据来源：通用推荐`
 
-- 优先读取 `.spec-first/runtime/first/role-views.json` 作为 onboarding 的角色裁剪输入
-- 若无 first 资产或 role-views 不可用，则进入 `degraded` 降级模式
-
-1. **检测 role-views**：
-   - 读取 `.spec-first/runtime/first/role-views.json`
-   - 检查文件是否存在且格式正确
-
-2. **正常模式**（存在 role-views）：
-   - 根据用户角色调整推荐内容：
-     - **开发者**：突出 `codebase-overview.md`、`architecture.md`、开发入口
-     - **产品经理**：突出 `domain-model.md`、`api-docs.md`、业务流程
-     - **测试工程师**：突出 `api-docs.md`、测试策略、验收标准
-     - **架构师**：突出 `architecture.md`、`call-graph.md`、技术决策
-   - 在推荐路径中插入”建议先阅读”提示
-   - 标注：`📊 数据来源：基于项目分析（role-views）`
-
-3. **降级模式**（无 role-views）：
-   - 使用通用推荐路径
-   - 第一步强制推荐：`/spec-first:first`
-   - 标注：`⚠️ 数据来源：通用推荐（无 first 资产，建议先运行 /spec-first:first）`
-
-4. **错误处理**：
-   - role-views.json 格式错误 → 降级模式 + 警告
-   - 文件读取失败 → 降级模式
-
-**注意**：onboarding 只负责入口裁剪，不生成 runtime 真源
+---
 
 ### Phase 1: 场景识别（交互式）
 
-使用 `AskUserQuestion` 工具收集用户信息：
+**一次性收集 3 个问题**（使用 `AskUserQuestion` 工具）：
 
 **Q1: 你的主要角色是？**
 
 选项：
-- 开发者（写代码）
-- 产品经理（写需求）
-- 测试工程师（写测试）
-- 架构师（做设计）
+- 开发者 - 编写和维护代码
+- 产品经理 - 定义需求和规划功能
+- 测试工程师 - 编写测试和质量保障
+- 架构师 - 设计系统架构和技术方案
 
-**注意**：用户可以选择"Other"自定义角色名称（如：运维工程师、技术经理等）
+**注意**：用户可以选择"Other"自定义角色（如：运维工程师、技术经理）
 
 **Q2: 你想做什么？**
 
 选项：
-- 开发新功能
-- 修复 Bug
-- 重构代码
-- 学习 Spec-First
+- 开发新功能 - 从零开始实现新特性
+- 修复 Bug - 定位和解决现有问题
+- 重构代码 - 优化现有代码结构
+- 学习 Spec-First - 了解工作流和最佳实践
 
 **Q3: 项目规模？**
 
 选项：
-- 小型（1-2 人）
-- 中型（3-10 人）
-- 大型（10+ 人）
+- 小型 - 1-2 人团队
+- 中型 - 3-10 人团队
+- 大型 - 10+ 人团队
 
 ---
 
@@ -109,25 +137,138 @@ changelog: |
 - 格式：`{role}_{task}_{size}`
 - 示例：`developer_new_feature_small`
 
-**场景匹配算法**：
-1. **精确匹配**：`{role}_{task}_{size}` 完全匹配（如 `developer_new_feature_small`）
-2. **部分通配**：`{role}_{task}_*` 匹配任意规模（如 `developer_fix_bug_*`）
-3. **任务通配**：`*_{task}_*` 匹配任意角色（如 `*_learn_*`）
-4. **默认场景**：无匹配时使用 `default`
-
 **查询映射表**：
-- 读取 `references/scenario-mapping.md`
-- 按优先级顺序匹配场景
-- 返回第一个匹配的推荐路径
+- 读取 `references/scenario-mapping.md` 匹配场景
+- 返回对应的推荐路径
 
-**输出格式**：见 `references/output-templates.md`
+---
 
-**核心逻辑**：
-1. 构建场景标识：`{role}_{task}_{size}`
-2. 查询 scenario-mapping.md 匹配场景
-3. 根据 role-views 定制推荐内容
-4. 渲染输出模板
-5. 保存到 `docs/onboarding/{角色}学习路径.md`
+### Phase 2.5: 参数确认
+
+**仅在完整模式下执行**（快速模式跳过此步骤）
+
+**输出确认信息**：
+```
+📋 请确认你的选择：
+
+- 角色：开发者
+- 任务：开发新功能
+- 规模：小型
+- 场景：developer_new_feature_small
+- 预计时间：30-60 分钟
+
+是否继续？
+```
+
+使用 `AskUserQuestion` 工具：
+
+选项：
+- 确认，生成学习路径
+- 修改选择
+
+**处理逻辑**：
+- 选择"确认" → 进入 Phase 2.8 输出路径
+- 选择"修改" → 返回 Phase 1 重新选择
+
+---
+
+### Phase 2.8: 输出学习路径
+
+**输出格式（快速模式 - 来自 Phase 0.5）**：
+```
+✨ 为你推荐快速开始路径
+
+💡 数据来源：通用推荐（适合首次使用）
+⏱️  预计时间：15-20 分钟
+
+---
+
+## 🚀 快速开始（3 步）
+
+### Step 1: 项目快速认知 (5 分钟)
+```bash
+/spec-first:first
+```
+**目标**：了解项目技术栈、架构、代码结构
+
+### Step 2: 初始化 Feature (2 分钟)
+```bash
+/spec-first:init
+```
+**目标**：创建 Feature 工作区
+
+### Step 3: 编写需求规格 (10 分钟)
+```bash
+/spec-first:spec
+```
+**目标**：生成 PRD 和 spec.md
+
+---
+
+💡 **提示**：
+- 每步完成后运行 `/spec-first:status` 查看进度
+- 遇到问题运行 `/spec-first:doctor` 诊断环境
+
+🎯 **下一步**：复制上面第一个命令开始吧！
+```
+
+**输出格式（完整模式 - 来自 Phase 1）**：
+```
+✨ 为你推荐以下学习路径
+
+📊 数据来源：基于项目分析（role-views）
+📌 场景：开发者 + 新功能 + 小型项目
+⏱️  预计时间：30-60 分钟（不含编码）
+
+---
+
+## 🚀 你的学习路径
+
+### Step 1: 项目快速认知 (5 分钟)
+```bash
+/spec-first:first
+```
+**目标**：了解项目技术栈、架构、代码结构
+
+### Step 2: 初始化 Feature (2 分钟)
+```bash
+/spec-first:init
+```
+**目标**：创建 Feature 工作区
+
+### Step 3: 编写需求规格 (10 分钟)
+```bash
+/spec-first:spec
+```
+**目标**：生成 PRD 和 spec.md
+
+### Step 4: 技术设计 (8 分钟)
+```bash
+/spec-first:design
+```
+**目标**：生成 design.md
+
+### Step 5: 代码实现 (按需)
+```bash
+/spec-first:code
+```
+**目标**：实现功能代码
+
+### Step 6: 阶段验收 (5 分钟)
+```bash
+/spec-first:verify
+```
+**目标**：确保通过 Gate 检查
+
+---
+
+💡 **提示**：
+- 每步完成后运行 `/spec-first:status` 查看进度
+- 遇到问题运行 `/spec-first:doctor` 诊断环境
+- 查看详细文档：`docs/用户文档/quick-start.md`
+
+🎯 **下一步**：复制上面第一个命令开始吧！
+```
 
 ---
 
@@ -142,7 +283,34 @@ changelog: |
 - 架构师 → `架构师学习路径.md`
 - 自定义角色 → `{自定义角色名}学习路径.md`
 
-**文档内容结构**：见 `references/output-templates.md`
+**文档内容结构**：
+```markdown
+# {角色}学习路径
+
+> **生成时间**: {timestamp}
+> **场景标识**: {role}_{task}_{size}
+
+## 📋 场景信息
+
+- **角色**: {角色中文名}
+- **任务类型**: {任务类型中文名}
+- **项目规模**: {规模中文名}
+- **预计时间**: {预计时间}
+
+## 🚀 推荐学习路径
+
+{完整的 Skill 序列，与 Phase 2 输出格式一致}
+
+## 💡 使用提示
+
+- 每步完成后运行 `/spec-first:status` 查看进度
+- 遇到问题运行 `/spec-first:doctor` 诊断环境
+- 查看详细文档：`docs/用户文档/quick-start.md`
+
+---
+
+*本文档由 Spec-First Onboarding 自动生成*
+```
 
 **更新策略**：
 - 首次执行：创建对应角色的文档
@@ -186,31 +354,7 @@ changelog: |
 
 ## 错误处理
 
-### 错误处理矩阵
+- 用户跳过问题 → 使用默认场景（开发者 + 新功能 + 小型）
+- 无匹配场景 → 推荐通用路径（first → init → spec）
+- 无 role-views → 提示"建议先运行 /spec-first:first 了解项目结构"
 
-| 错误场景 | 处理策略 | 用户提示 |
-|---------|---------|---------|
-| role-views.json 不存在 | 降级模式 | ⚠️ 无 first 资产，建议先运行 /spec-first:first |
-| role-views.json 格式错误 | 降级模式 + 警告 | ⚠️ role-views 数据异常，使用通用推荐 |
-| 无匹配场景 | 使用 default | ℹ️ 使用通用学习路径 |
-| 文档保存失败 | 仅输出到终端 | ⚠️ 无法保存文档，请手动记录 |
-| 用户跳过所有问题 | 使用默认配置 | ℹ️ 使用默认配置：开发者 + 新功能 + 小型 |
-| docs/onboarding/ 目录不存在 | 自动创建 | - |
-| 文件写入权限错误 | 降级到终端输出 | ⚠️ 无写入权限，路径已输出到终端 |
-
-### 降级策略
-
-1. **role-views 降级**：
-   - 检测失败 → 使用通用路径
-   - 格式错误 → 记录警告 + 通用路径
-   - 读取超时 → 跳过 role-views
-
-2. **文档保存降级**：
-   - 目录创建失败 → 终端输出
-   - 文件写入失败 → 终端输出
-   - 权限错误 → 终端输出 + 提示
-
-3. **场景匹配降级**：
-   - 无精确匹配 → 尝试通配匹配
-   - 无通配匹配 → 使用 default
-   - default 缺失 → 使用内置最小路径

@@ -195,9 +195,8 @@
     }
     .flow-track {
       display: grid;
-      grid-template-columns: repeat(13, minmax(80px, 1fr));
-      gap: 8px;
-      min-width: 980px;
+      grid-template-columns: repeat(17, auto);
+      gap: 0;
       align-items: stretch;
     }
     .flow-step {

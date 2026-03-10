@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { appendFileSync } from 'node:fs';
 import { Stage } from '../../shared/types.js';
 import type { StageState, StageHistoryEntry } from '../../shared/types.js';
-import { readJsonChecked, writeJson, exists } from '../../shared/fs-utils.js';
+import { readJsonChecked, writeJson, exists, writeMarkdown } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
 import { writeLog } from '../../shared/logger.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
@@ -201,7 +201,26 @@ export function advance(
     }
   }
 
-  return { from, to, gateResult };
+  let finalTo = to;
+  let finalGateResult = gateResult;
+
+  // 07_release 自动跳转到 08_done
+  if (to === Stage.RELEASE) {
+    appendFindings(featureId, projectRoot, `AUTO_ADVANCE: ${to} → ${Stage.DONE}`);
+    const doneResult = advance(featureId, projectRoot, _options);
+    finalTo = doneResult.to;
+    finalGateResult = doneResult.gateResult;
+  }
+
+  // 到达终态时清空 current 文件
+  if (finalTo === Stage.DONE || finalTo === Stage.CANCELLED) {
+    const currentFile = join(projectRoot, '.spec-first/current');
+    if (exists(currentFile)) {
+      writeMarkdown(currentFile, '');
+    }
+  }
+
+  return { from, to: finalTo, gateResult: finalGateResult };
 }
 
 /**
