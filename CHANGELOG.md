@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.69 2026-03-10 Claude: fix(status): 全链路状态一致性修复 - 创建 status-mapper.ts 支持 30+ 状态别名映射，matrix.ts 增强错误消息显示有效状态列表，format-validator.ts 修复重复 ID 检测只匹配 ID 列，coverage.ts C8 计算添加 NFR 标签支持，CLI matrix 命令添加 --help 和状态列表，更新 skill 文档状态描述 (user-visible)
 - v0.5.68 2026-03-10 Claude: feat(orchestrate): 核心信号打通与边界冻结 - autoLoopStatus 接入 decider（优先级检查），reasonCodes 结构化输出（ReasonCodeValue 类型安全），禁用 AUTO_RUN_NEXT_SKILL（方案A边界冻结），统一自动推进放行条件，补齐 03→05 矩阵测试（10个用例），修复 todoState 缺失误判，性能优化（常量提取），用户体验提升（友好状态提示） (user-visible)
 - v0.5.67 2026-03-10 Claude: feat(onboarding): 交互体验优化 v1.2.0→v1.3.0 - 支持命令行参数（--role/--task/--size），CLI 参数检测与友好提示 (user-visible)
 - v0.5.66 2026-03-10 Claude: refactor(onboarding): 文档结构优化 v1.1.0→v1.2.0 - 拆分输出模板到 references/output-templates.md（欢迎/路径/步骤/角色定制/错误提示），精简 SKILL.md 从 233 行降至 180 行

@@ -115,9 +115,25 @@ function calcTaskCompliance(
     ...dsRows.map((r) => r.id),
   ]);
 
-  const compliant = taskRows.filter(r =>
-    lineage.hasAnyAncestor(r.id, allowedUpstreamIds),
-  );
+  // 支持 NFR 标签关联：FR 的 nfrTag 允许 TASK 通过 NFR-TAG 格式引用
+  // 例如：FR-PERF-001 有 nfrTag=PERF，TASK 可通过 NFR-PERF-001 关联
+  for (const fr of frRows) {
+    if (fr.nfrTag) {
+      allowedUpstreamIds.add(`NFR-${fr.nfrTag}`);
+    }
+  }
+
+  const compliant = taskRows.filter((r) => {
+    // 检查通过 lineage 的关联
+    if (lineage.hasAnyAncestor(r.id, allowedUpstreamIds)) return true;
+    // 检查直接的 upstream 引用（支持 NFR-TAG 格式）
+    if (r.upstream) {
+      for (const u of r.upstream) {
+        if (allowedUpstreamIds.has(u)) return true;
+      }
+    }
+    return false;
+  });
   return pct(compliant.length, taskRows.length);
 }
 

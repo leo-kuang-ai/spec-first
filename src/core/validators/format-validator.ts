@@ -77,7 +77,13 @@ function validateIdFormat(featureId: string, projectRoot: string): string[] {
 
   const seen = new Set<string>();
   const dupes = new Set<string>();
-  for (const match of content.matchAll(/\|\s*([A-Z][A-Z0-9-]{2,40})\s*\|/g)) {
+  // 只匹配 ID 列（第1列）：行首 | ID | 格式
+  for (const line of content.split('\n')) {
+    // 跳过表头和分隔线
+    if (line.startsWith('| ID |') || line.match(/^\|[-\s|]+\|$/)) continue;
+    // 只匹配第1列的ID
+    const match = line.match(/^\|\s*([A-Z][A-Z0-9-]{2,40})\s*\|/);
+    if (!match) continue;
     const id = match[1];
     if (!validateId(id).valid) continue;
     if (seen.has(id)) dupes.add(id);

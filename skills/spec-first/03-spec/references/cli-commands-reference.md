@@ -21,14 +21,19 @@
 ### Matrix 状态
 
 **✅ 使用**:
-- `Planned` - 已计划
-- `InProgress` - 进行中
-- `Completed` - 已完成
+- `Planned` - 已规划（默认）
+- `Implemented` - 已实现
 - `Verified` - 已验证
-- `Blocked` - 已阻塞
+- `Accepted` - 已验收
+- `Deferred` - 已延期
+- `Cancelled` - 已取消
+- `Exception` - 例外处理
 
 **❌ 禁止**:
 - `pending` - 应使用 `Planned`
+- `InProgress` - 应使用 `Implemented`
+- `Completed` - 应使用 `Implemented` 或 `Verified`
+- `Blocked` - 应使用 `Deferred`
 
 ### 确认策略
 

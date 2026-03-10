@@ -272,21 +272,21 @@ npm run format             # prettier 格式化
 <!-- SPEC-FIRST:END MANUAL -->
 
 <!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-> Auto-synced at 2026-03-09T07:32:01.974Z
+> Auto-synced at 2026-03-10T01:22:07.113Z
 
 ## Spec-First Context Snapshot
-- Feature: FSREQ-20260309-HOMEPAGE-001
+- Feature: FSREQ-20260310-HOMEPERF-001
 - Stage: 03_plan
-- Design: specs/FSREQ-20260309-HOMEPAGE-001/design.md
+- Design: specs/FSREQ-20260310-HOMEPERF-001/design.md
 
 ### Design Highlights
-- Design — FSREQ-20260309-HOMEPAGE-001
-- Constitution 合规性
+- Design — FSREQ-20260310-HOMEPERF-001
 - 设计概述
-- DS-VIS-001: 视觉层次优化设计
-- DS-INT-001: 交互体验提升设计
-- DS-VIZ-001: 数据可视化增强设计
-- DS-LAY-001: 整体布局优化设计
-- 数据模型
+- DS 设计规格
+- DS-HOMEPERF-001: CSS 优化
+- DS-HOMEPERF-002: JavaScript 优化
+- DS-HOMEPERF-003: API 响应缓存
+- DS-HOMEPERF-004: Feature 列表虚拟滚动
+- DS-HOMEPERF-005: 首屏渲染优化
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
 

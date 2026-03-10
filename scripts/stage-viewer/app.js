@@ -1,5 +1,61 @@
 import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js';
 
+  // ─── Cache System (TASK-HOMEPERF-003) ─────────────────────────────────────
+  const CONFIG = {
+    cacheTTL: 30000, // 30 seconds
+    pollInterval: 5000,
+    debounceDelay: 300,
+  };
+
+  const cache = {
+    features: { data: null, timestamp: 0 },
+    feature: new Map(), // featureId -> { data, timestamp }
+    tasks: new Map(), // featureId -> { data, timestamp }
+    metrics: new Map(), // featureId -> { data, timestamp }
+    gateStatus: new Map(), // featureId -> { data, timestamp }
+    defects: new Map(), // featureId -> { data, timestamp }
+    timeline: new Map(), // featureId -> { data, timestamp }
+  };
+
+  function isCacheValid(cacheEntry, ttl = CONFIG.cacheTTL) {
+    if (!cacheEntry || !cacheEntry.data) return false;
+    return Date.now() - cacheEntry.timestamp < ttl;
+  }
+
+  function setCache(cacheKey, data) {
+    if (cacheKey === 'features') {
+      cache.features = { data, timestamp: Date.now() };
+    } else {
+      const map = cache[cacheKey];
+      if (map instanceof Map && data?.featureId) {
+        map.set(data.featureId, { data, timestamp: Date.now() });
+      }
+    }
+  }
+
+  function getCache(cacheKey, featureId = null) {
+    if (cacheKey === 'features') {
+      return isCacheValid(cache.features) ? cache.features.data : null;
+    }
+    const map = cache[cacheKey];
+    if (map instanceof Map && featureId) {
+      const entry = map.get(featureId);
+      return isCacheValid(entry) ? entry.data : null;
+    }
+    return null;
+  }
+
+  function clearAllCache() {
+    cache.features = { data: null, timestamp: 0 };
+    cache.feature.clear();
+    cache.tasks.clear();
+    cache.metrics.clear();
+    cache.gateStatus.clear();
+    cache.defects.clear();
+    cache.timeline.clear();
+    console.log('[Cache] All caches cleared');
+  }
+
   const state = {
     features: [],
     selectedFeatureId: null,
@@ -7,6 +63,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     gateStatus: {}, // 存储 Gate 状态
     selectedHistoryKey: null,
     projectRoot: '',
+    skeletonVisible: true,
   };
 
   const featureListEl = document.getElementById('featureList');
@@ -14,6 +71,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
   const projectRootEl = document.getElementById('projectRoot');
   const detailEl = document.getElementById('detail');
   const emptyEl = document.getElementById('empty');
+  const refreshBtn = document.getElementById('refreshBtn');
   const MODE_LABEL_MAP = {
     N: '新建',
     I: '迭代',
@@ -162,6 +220,11 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     return percent >= 100 ? 'var(--ok)' : (percent >= 50 ? 'var(--accent)' : 'var(--warn)');
   }
 
+  // ─── Diff Detection (TASK-HOMEPERF-004) ─────────────────────────────
+  function shallowEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
   function renderFeatureList() {
     const q = searchEl.value.trim().toLowerCase();
     const list = state.features.filter((item) => {
@@ -170,11 +233,17 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
         || String(item.title || '').toLowerCase().includes(q);
     });
 
-    featureListEl.innerHTML = list.map((item) => {
+    // Use DocumentFragment for batch DOM updates
+    const fragment = document.createDocumentFragment();
+
+    list.forEach((item) => {
       const active = item.featureId === state.selectedFeatureId ? 'active' : '';
       const progress = calcStageProgress(item.currentStage);
-      return `
-      <div class="feature ${active}" data-id="${escapeHtml(item.featureId)}">
+
+      const div = document.createElement('div');
+      div.className = `feature ${active}`;
+      div.setAttribute('data-id', item.featureId);
+      div.innerHTML = `
         <div class="feature-header">
           <div class="title mono">${escapeHtml(item.featureId)}</div>
           <div class="feature-progress-badge">${progress}%</div>
@@ -188,18 +257,28 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
           <span class="chip">${escapeHtml(formatModeSize(item.mode, item.size))}</span>
           <span class="chip">${item.terminal ? 'terminal' : 'active'}</span>
         </div>
-      </div>`;
-    }).join('');
+      `;
 
-    for (const node of featureListEl.querySelectorAll('.feature')) {
-      node.addEventListener('click', () => {
-        state.selectedFeatureId = node.getAttribute('data-id');
+      div.addEventListener('click', () => {
+        state.selectedFeatureId = div.getAttribute('data-id');
         state.selectedFlowStage = null;
         state.selectedHistoryKey = null;
         renderFeatureList();
         loadDetail();
       });
-    }
+
+      fragment.appendChild(div);
+    });
+
+    // Use requestAnimationFrame for batch update
+    requestAnimationFrame(() => {
+      featureListEl.innerHTML = '';
+      featureListEl.appendChild(fragment);
+      // Hide skeleton after render
+      if (state.skeletonVisible) {
+        hideSkeleton();
+      }
+    });
   }
 
   function kvCard(key, value, cls = '') {
@@ -380,11 +459,37 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
   }
 
   async function loadFeatures() {
+    // Check cache first (TASK-HOMEPERF-003)
+    const cached = getCache('features');
+    if (cached) {
+      state.features = cached.features || [];
+      state.projectRoot = cached.projectRoot || '';
+      projectRootEl.textContent = state.projectRoot;
+      if (!state.selectedFeatureId && state.features.length > 0) {
+        state.selectedFeatureId = state.features[0].featureId;
+      }
+      if (state.selectedFeatureId && !state.features.find((item) => item.featureId === state.selectedFeatureId)) {
+        state.selectedFeatureId = state.features[0]?.featureId || null;
+        state.selectedFlowStage = null;
+        state.selectedHistoryKey = null;
+      }
+      renderFeatureList();
+      return;
+    }
+
+    // Show skeleton while loading
+    if (!state.features.length) {
+      state.skeletonVisible = true;
+    }
+
     const res = await fetch('/api/features', { cache: 'no-store' });
     const data = await res.json();
     state.features = data.features || [];
     state.projectRoot = data.projectRoot || '';
     projectRootEl.textContent = state.projectRoot;
+
+    // Save to cache (30s TTL)
+    setCache('features', { features: state.features, projectRoot: state.projectRoot }, 30000);
 
     if (!state.selectedFeatureId && state.features.length > 0) {
       state.selectedFeatureId = state.features[0].featureId;
@@ -397,6 +502,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     }
 
     renderFeatureList();
+    hideSkeleton();
   }
 
   async function loadDetail() {
@@ -464,11 +570,13 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
       escapeHtml(item?.direction ?? '-'),
     ]));
 
-    // Load Health Dashboard, Task Progress and Gate Status
-    loadHealthDashboard();
-    loadTaskProgress();
-    loadGateStatus(s);
-    loadTimeline();
+    // Parallel API requests (TASK-HOMEPERF-008)
+    await Promise.all([
+      loadHealthDashboard(),
+      loadTaskProgress(),
+      loadGateStatus(s),
+      loadTimeline(),
+    ]);
 
     emptyEl.style.display = 'none';
     detailEl.style.display = 'block';
@@ -958,6 +1066,50 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     }).join('');
   }
 
-  searchEl.addEventListener('input', () => renderFeatureList());
+  // ─── Debounce Function (TASK-HOMEPERF-005) ─────────────────────────────
+  function debounce(fn, delay) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn.apply(this, args), delay);
+    };
+  }
+
+  // Debounced search handler
+  const debouncedSearch = debounce(() => {
+    renderFeatureList();
+  }, 300);
+
+  searchEl.addEventListener('input', debouncedSearch);
+
+  // ─── Refresh Button Handler (TASK-HOMEPERF-003) ─────────────────────────────
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+    clearAllCache();
+    state.skeletonVisible = true;
+    showSkeleton();
+    refreshAll();
+  });
+  }
+
+  // ─── Skeleton Functions (TASK-HOMEPERF-007) ─────────────────────────────
+  function showSkeleton() {
+    const loader = document.getElementById('skeletonLoader');
+    if (loader) {
+      loader.style.display = 'block';
+    }
+    document.getElementById('featureList').innerHTML = document.getElementById('featureList').innerHTML; // force re-render
+  }
+
+  function hideSkeleton() {
+    const loader = document.getElementById('skeletonLoader');
+    if (loader) {
+      loader.style.display = 'none';
+    }
+    state.skeletonVisible = false;
+  }
+
+  // Initial skeleton show
+  showSkeleton();
   refreshAll();
   setInterval(refreshAll, 5000);

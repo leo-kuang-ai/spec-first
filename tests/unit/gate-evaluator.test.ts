@@ -330,10 +330,13 @@ describe('evaluateGate', () => {
     expect(wrapCond?.status).toBe('PASS');
   });
 
-  it('should reject undocumented terminal aliases such as done at 06_wrap_up', () => {
+  it('should accept documented status aliases such as done -> Accepted at 06_wrap_up', () => {
     writeState('06_wrap_up');
     writeMatrix('| FR-AUTH-001 | FR | Login | done |  |  |\n');
-    expect(() => evaluateGate(FEAT, TMP)).toThrow(/Invalid matrix status/);
+    const result = evaluateGate(FEAT, TMP);
+    // done 应被映射为 Accepted，所以 G-WRAP-02 应该 PASS
+    const wrapCond = result.conditions.find(c => c.id === 'G-WRAP-02');
+    expect(wrapCond?.status).toBe('PASS');
   });
 
   it('should FAIL for 03_plan when analysis-report.md is missing', () => {

@@ -171,6 +171,13 @@ export type MatrixStatus =
   | 'Cancelled'
   | 'Exception';
 
+/** 终态矩阵状态 */
+export const TERMINAL_STATUSES: ReadonlySet<MatrixStatus> = new Set([
+  'Accepted',
+  'Cancelled',
+  'Exception',
+]);
+
 export interface MatrixRow {
   id: string;
   type: IdType;

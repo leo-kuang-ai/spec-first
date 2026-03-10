@@ -3,20 +3,11 @@
  * 矩阵的读取、解析、完整性校验、导出
  */
 import { join } from 'node:path';
-import type { MatrixRow, MatrixStatus, IdType } from '../../shared/types.js';
+import type { MatrixRow, IdType } from '../../shared/types.js';
 import { readMarkdown, writeMarkdown, exists, parseMarkdownTable } from '../../shared/fs-utils.js';
 import { validateId } from './id-validator.js';
 import { createTraceContext } from './trace-context.js';
-
-const VALID_MATRIX_STATUSES: ReadonlySet<MatrixStatus> = new Set([
-  'Planned',
-  'Implemented',
-  'Verified',
-  'Accepted',
-  'Deferred',
-  'Cancelled',
-  'Exception',
-]);
+import { normalizeStatus, getValidStatusList } from '../../shared/status-mapper.js';
 
 /** 矩阵校验结果 */
 export interface MatrixCheckResult {
@@ -160,10 +151,16 @@ function parseMatrixContent(content: string): MatrixRow[] {
     const type: IdType = validation.type ?? 'Feature';
     const title = cells[2] ?? '';
     const rawStatus = (cells[3] ?? 'Planned').trim();
-    if (!VALID_MATRIX_STATUSES.has(rawStatus as MatrixStatus)) {
-      throw new Error(`Invalid matrix status "${rawStatus}" for ${id}`);
+
+    // 使用状态映射器规范化状态值
+    const normalizedStatus = normalizeStatus(rawStatus);
+    if (!normalizedStatus) {
+      const validList = getValidStatusList();
+      throw new Error(
+        `Invalid matrix status "${rawStatus}" for ${id}. Valid statuses: ${validList}. Default: Planned`,
+      );
     }
-    const status = rawStatus as MatrixStatus;
+    const status = normalizedStatus;
     const upstream = parseRefList(cells[4]);
     const downstream = parseRefList(cells[5]);
 

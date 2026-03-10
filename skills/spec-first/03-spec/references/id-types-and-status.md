@@ -22,13 +22,30 @@ CLI 支持的追踪 ID 类型：
 ## Matrix 有效状态值
 
 追踪矩阵支持的状态：
-- `Planned` - 已规划
-- `InProgress` - 进行中
-- `Completed` - 已完成
+- `Planned` - 已规划（默认）
+- `Implemented` - 已实现
 - `Verified` - 已验证
-- `Blocked` - 已阻塞
+- `Accepted` - 已验收
+- `Deferred` - 已延期
+- `Cancelled` - 已取消
+- `Exception` - 例外处理
 
-**注意**：不支持 `pending` 状态，应使用 `Planned`。
+### 状态生命周期
+
+**非终态 (Non-Terminal Status)**：
+- `Planned` → `Implemented` → `Verified`
+- `Deferred` - 暂缓实现
+
+**终态 (Terminal Status)**：
+- `Accepted` - 已验收通过（正常完成）
+- `Cancelled` - 已取消（不再实现）
+- `Exception` - 例外处理（特殊情况）
+
+**重要**：06_wrap_up 阶段的 Gate Check 要求所有矩阵条目必须达到终态。`Verified` 状态需推进到 `Accepted` 才能通过归档门禁。
+
+**注意**：
+- 不支持 `pending` 状态，应使用 `Planned`
+- 不支持 `InProgress`/`Completed`/`Blocked`，应分别使用 `Implemented`/`Verified`/`Deferred`
 
 ## CLI 命令示例
 

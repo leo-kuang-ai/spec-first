@@ -2,6 +2,8 @@
 
 > Stage Viewer 页面性能优化
 
+**Feature ID**: FSREQ-20260310-HOMEPERF-001
+
 ## FR 功能需求
 
 ### FR-HOMEPERF-001: CSS 优化

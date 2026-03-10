@@ -9,6 +9,7 @@ import type {
   Stage, GateStatus, GateResult, ConditionResult, WaiverRef,
   CoverageMetrics, StageState, IdType, MatrixRow,
 } from '../../shared/types.js';
+import { TERMINAL_STATUSES } from '../../shared/types.js';
 import { readJsonChecked, appendJsonl, exists } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
 import { getCoverage } from '../trace-engine/coverage.js';
@@ -269,8 +270,7 @@ GATE_CONDITIONS['06_wrap_up' as Stage] = [
     id: 'G-WRAP-02',
     description: 'All matrix entries in terminal status',
     evaluate: (ctx) => {
-      const terminal = new Set(['Accepted', 'Cancelled', 'Exception']);
-      const nonTerminal = ctx.rows.filter(r => !terminal.has(r.status));
+      const nonTerminal = ctx.rows.filter(r => !TERMINAL_STATUSES.has(r.status));
       return {
         pass: nonTerminal.length === 0,
         detail: nonTerminal.length > 0

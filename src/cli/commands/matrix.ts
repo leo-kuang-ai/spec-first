@@ -9,6 +9,12 @@ export function handleMatrix(args: string[]): number {
   const sub = args[0];
   const rest = args.slice(1);
 
+  // 支持 --help
+  if (sub === '--help' || sub === '-h' || !sub) {
+    printMatrixHelp();
+    return ExitCode.SUCCESS;
+  }
+
   switch (sub) {
     case 'check':  return handleCheck(rest);
     case 'export': return handleExport(rest);
@@ -16,8 +22,38 @@ export function handleMatrix(args: string[]): number {
     default:
       console.error(`未知 matrix 子命令：${sub}`);
       console.log('子命令：check, export, update');
+      console.log('使用 spec-first matrix --help 查看详细帮助');
       return ExitCode.VALIDATION_ERROR;
   }
+}
+
+function printMatrixHelp(): void {
+  console.log(`用法：spec-first matrix <subcommand> <featureId> [options]
+
+子命令：
+  check   检查追踪矩阵完整性
+  export  导出追踪矩阵为 JSON/YAML
+  update  更新追踪矩阵条目
+
+更新选项：
+  --status <value>    状态值，有效选项：
+                      - Planned (默认，已规划)
+                      - Implemented (已实现)
+                      - Verified (已验证)
+                      - Accepted (已验收)
+                      - Deferred (已延期)
+                      - Cancelled (已取消)
+                      - Exception (例外处理)
+  --title <text>      标题
+  --upstream <ids>    上游依赖 ID（逗号分隔）
+  --downstream <ids>  下游影响 ID（逗号分隔）
+  --yes               确认执行（必需）
+
+示例：
+  spec-first matrix check FSREQ-20260309-AUTH-001
+  spec-first matrix export FSREQ-20260309-AUTH-001 --format yaml
+  spec-first matrix update FSREQ-001 FR-001 --status Implemented --yes
+`);
 }
 
 function handleCheck(args: string[]): number {

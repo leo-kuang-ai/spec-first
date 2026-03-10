@@ -48,7 +48,7 @@ describe('parseMatrix', () => {
     expect(parseMatrix('FSREQ-20260211-NOPE-001', TMP)).toEqual([]);
   });
 
-  it('should reject undocumented matrix status values', () => {
+  it('should accept documented status aliases and map them correctly', () => {
     writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
       '| ID | Type | Title | Status | Upstream | Downstream |',
       '|----|------|-------|--------|----------|------------|',
@@ -56,7 +56,10 @@ describe('parseMatrix', () => {
       '',
     ].join('\n'), 'utf-8');
 
-    expect(() => parseMatrix(FEAT_ID, TMP)).toThrow(/Invalid matrix status/);
+    // done 应被映射为 Accepted
+    const rows = parseMatrix(FEAT_ID, TMP);
+    expect(rows).toHaveLength(1);
+    expect(rows[0].status).toBe('Accepted');
   });
 });
 
