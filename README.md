@@ -1,6 +1,6 @@
 # Spec-First — AI 时代的规范驱动研发流程引擎
 
-![Spec-First Banner](image.png)
+![Spec-First Banner](ui-image.png)
 
 > 📚 **完整文档**：[PROJECT-INTRODUCTION.md](PROJECT-INTRODUCTION.md) - 包含生态对比、框架深度解析等详细内容
 
