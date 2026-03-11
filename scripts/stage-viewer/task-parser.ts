@@ -64,10 +64,6 @@ export function parseTaskPlan(projectRoot: string, featureId: string): TaskPlanR
     const phaseTitle = phaseMatch[2].trim();
     const phaseContent = phaseMatch[3];
 
-    // 提取阶段状态
-    const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
-    const phaseStatus = statusMatch ? normalizeTaskStatus(statusMatch[1]) : 'pending';
-
     // 提取阶段内的任务
     const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(.+)/g;
     let taskMatch;
@@ -83,6 +79,26 @@ export function parseTaskPlan(projectRoot: string, featureId: string): TaskPlanR
       });
     }
 
+    // 提取阶段状态：优先使用显式标记，否则根据任务完成情况推导
+    const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
+    let phaseStatus: string;
+    if (statusMatch) {
+      phaseStatus = normalizeTaskStatus(statusMatch[1]);
+    } else if (phaseTasks.length > 0) {
+      // 根据任务完成情况推导阶段状态
+      const allComplete = phaseTasks.every(t => t.status === 'complete');
+      const anyInProgress = phaseTasks.some(t => t.status === 'in_progress');
+      if (allComplete) {
+        phaseStatus = 'complete';
+      } else if (anyInProgress) {
+        phaseStatus = 'in_progress';
+      } else {
+        phaseStatus = 'pending';
+      }
+    } else {
+      phaseStatus = 'pending';
+    }
+
     phases.push({
       id: phaseId,
       title: phaseTitle,
@@ -91,8 +107,8 @@ export function parseTaskPlan(projectRoot: string, featureId: string): TaskPlanR
     });
   }
 
-  // 解析任务明细表格
-  const tableRegex = /\|\s*TASK ID\s*\|[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/;
+  // 解析任务明细表格（支持 Task ID 或 TASK ID）
+  const tableRegex = /\|\s*(?:Task|TASK) ID\s*\|[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/;
   const tableMatch = content.match(tableRegex);
   if (tableMatch) {
     const rows = tableMatch[1].trim().split('\n').filter(row => row.includes('TASK-'));

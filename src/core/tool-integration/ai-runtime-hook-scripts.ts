@@ -15,7 +15,34 @@ export const MANAGED_HOOK_COMMAND_MARKERS = [
 ] as const;
 
 const TASK_CONTEXT_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
+# Spec-First AI Runtime Hook - Task Context
+# Requires: POSIX sh, Git (optional for root detection)
+
 set -eu
+
+# 跨平台项目根目录发现
+find_root() {
+  # 方法1: 向上查找包含 specs/ 目录的项目根
+  dir="$(pwd)"
+  while [ "$dir" != "/" ] && [ -n "$dir" ]; do
+    # 检查是否为真正的项目根（同时有 .spec-first 和 specs 目录）
+    if [ -d "$dir/.spec-first" ] && [ -d "$dir/specs" ]; then
+      printf '%s' "$dir"
+      return 0
+    fi
+    parent="$(dirname "$dir")"
+    [ "$parent" = "$dir" ] && break
+    dir="$parent"
+  done
+  # 方法2: Git root (Windows Git Bash / macOS / Linux)
+  if git rev-parse --show-toplevel 2>/dev/null; then
+    return 0
+  fi
+  return 1
+}
+
+ROOT="$(find_root)" || exit 0
+cd "$ROOT" 2>/dev/null || exit 0
 
 FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
 FILE="specs/$FEAT/task_plan.md"
@@ -80,7 +107,26 @@ awk -F'|' '
 `;
 
 const STOP_GUARD_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
+# Spec-First AI Runtime Hook - Stop Guard
+# Requires: POSIX sh, Git (optional for root detection)
+
 set -eu
+
+# 跨平台项目根目录发现
+find_root() {
+  dir="$(pwd)"
+  while [ "$dir" != "/" ] && [ -n "$dir" ]; do
+    [ -d "$dir/.spec-first" ] && printf '%s' "$dir" && return 0
+    parent="$(dirname "$dir")"
+    [ "$parent" = "$dir" ] && break
+    dir="$parent"
+  done
+  git rev-parse --show-toplevel 2>/dev/null && return 0
+  return 1
+}
+
+ROOT="$(find_root)" || exit 0
+cd "$ROOT" 2>/dev/null || exit 0
 
 FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
 [ -z "$FEAT" ] && exit 0
@@ -126,7 +172,26 @@ exit 0
 
 // Planning-with-Files P1-2: PostToolUse 进度同步提醒脚本
 const PROGRESS_SYNC_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
+# Spec-First AI Runtime Hook - Progress Sync
+# Requires: POSIX sh, Git (optional for root detection)
+
 set -eu
+
+# 跨平台项目根目录发现
+find_root() {
+  dir="$(pwd)"
+  while [ "$dir" != "/" ] && [ -n "$dir" ]; do
+    [ -d "$dir/.spec-first" ] && printf '%s' "$dir" && return 0
+    parent="$(dirname "$dir")"
+    [ "$parent" = "$dir" ] && break
+    dir="$parent"
+  done
+  git rev-parse --show-toplevel 2>/dev/null && return 0
+  return 1
+}
+
+ROOT="$(find_root)" || exit 0
+cd "$ROOT" 2>/dev/null || exit 0
 
 FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
 FILE="specs/$FEAT/task_plan.md"

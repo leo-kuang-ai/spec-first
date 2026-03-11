@@ -43,10 +43,6 @@ export function parseTaskPlan(projectRoot, featureId) {
     const phaseTitle = phaseMatch[2].trim();
     const phaseContent = phaseMatch[3];
 
-    // 提取阶段状态
-    const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
-    const phaseStatus = statusMatch ? normalizeTaskStatus(statusMatch[1]) : 'pending';
-
     // 提取阶段内的任务（支持 [P] [US1] 等标签）
     const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(?:\[.*?\]\s*)*(.+)/g;
     let taskMatch;
@@ -60,6 +56,26 @@ export function parseTaskPlan(projectRoot, featureId) {
         title: taskTitle,
         status: checked ? 'complete' : 'pending',
       });
+    }
+
+    // 提取阶段状态：优先使用显式标记，否则根据任务完成情况推导
+    const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
+    let phaseStatus;
+    if (statusMatch) {
+      phaseStatus = normalizeTaskStatus(statusMatch[1]);
+    } else if (phaseTasks.length > 0) {
+      // 根据任务完成情况推导阶段状态
+      const allComplete = phaseTasks.every(t => t.status === 'complete');
+      const anyInProgress = phaseTasks.some(t => t.status === 'in_progress');
+      if (allComplete) {
+        phaseStatus = 'complete';
+      } else if (anyInProgress) {
+        phaseStatus = 'in_progress';
+      } else {
+        phaseStatus = 'pending';
+      }
+    } else {
+      phaseStatus = 'pending';
     }
 
     phases.push({

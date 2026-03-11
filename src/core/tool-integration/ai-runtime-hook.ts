@@ -65,7 +65,7 @@ export function generateAIHookConfigs(projectRoot: string): AIHookConfig[] {
     },
     {
       type: 'Stop',
-      command: `sh ${STOP_GUARD_SCRIPT}`,
+      command: wrapSoftHook(`sh ${STOP_GUARD_SCRIPT}`, 'stop-guard'),
     },
   ];
 

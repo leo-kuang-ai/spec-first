@@ -59,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .spec-first/hooks/stop-guard.sh"
+            "command": "sh -c 'sh .spec-first/hooks/stop-guard.sh || echo \"spec-first: stop-guard hook 执行失败（已降级）\" >&2'"
           }
         ]
       }
