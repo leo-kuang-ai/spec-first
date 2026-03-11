@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- v0.5.73 2026-03-11 Claude: feat(skill-validation): 新增 Skill 测试用例框架 - 支持 3 类测试用例（normal/error/boundary），与 Vitest 集成，包含 TestCaseLoader/SkillTestExecutor/ReportGenerator 核心组件，提供 TestCaseFactory 快速创建工具，25 个单元测试全部通过 (user-visible)
+- v0.5.79 2026-03-11 Claude: feat(dispatcher): runtime 缺失时自动降级到 docs/first - 新增 parseStageSummaryFromDocs/parseRoleSummaryFromDocs 辅助函数（支持中英文格式），8 个 build*RuntimeNotice 函数添加 docs 降级逻辑（spec/design/code/verify/onboarding），统一字段命名为 snake_case（background_input_status/data_source），新增 data_source 字段标识数据来源（runtime/docs），最小侵入式实现（0 新增文件，~50 行代码） (user-visible)
+- v0.5.78 2026-03-11 Claude: fix(auto-loop): 重试退避机制生效 (F-07) - TodoItem 新增 resumeAt 字段，pickReadyTodos 过滤未到恢复时间的任务，重试时设置 resumeAt = Date.now() + backoffMs，修复退避只记录不等待的问题 (user-visible)
+- v0.5.77 2026-03-11 Claude: fix(tests): 统一测试中的 ID 格式规范 (F-08) - 将测试文件中的 REQ-PRD-* 格式统一为 REQ-* 格式（REQ-AUTH-001），修正 REQ ID 格式（必须有模块名部分），涉及的测试文件：validate-command.test.ts、analyze-background-quality.test.ts、gate-evaluator.test.ts、sca-security.test.ts
+- v0.5.76 2026-03-11 Claude: fix(coverage): C5 AC Coverage 分层降级策略 (F-05) - 新增 AC 类型支持（types.ts + id-validator.ts + trace-context.ts），C5 计算逻辑分层降级（有 AC 时计算 AC→TC，无 AC 时降级为 FR→TC），Gate 条件分层降级（有 AC 时正常阈值 S:60%/M/L:90%，无 AC 时降低阈值 S:50%/M/L:70%），避免无 AC 的项目在 05_verify 阶段卡住 (user-visible)
 - v0.5.72 2026-03-10 Claude: fix(viewer): 修复任务进度和时间线视图显示问题 - task-parser.js 支持 US 格式阶段标题和任务标签，修正表格列索引和标题匹配，server.js 修正变量名 STAGE_NAMES/STAGE_ORDER (user-visible)
 - v0.5.71 2026-03-10 Claude: fix(init): 深度修复 Windows 平台创建问题 - CLI 新增 guidePlatformCreation() 交互式引导（支持 Java/前端/H5 三种模板），修正 platform 字段（非 name），Skill 新增 platform-yaml-template.md 规范文档，更新 prerequisites.md 创建流程，解决 Skill 文档与代码不一致问题 (user-visible)
 - v0.5.70 2026-03-10 Claude: fix(init): Windows 平台 YAML 创建修复 - 新增 platform-yaml-template.md 模板文档（明确 platform 字段为必填），更新 SKILL.md 和 prerequisites.md 添加平台创建引导流程，修复字段名错误（name → platform）导致的 CLI 校验失败

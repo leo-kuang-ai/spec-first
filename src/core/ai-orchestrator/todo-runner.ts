@@ -21,6 +21,8 @@ export interface TodoItem {
   status: TodoStatus;
   dependsOn?: string[];
   parallel?: boolean;
+  /** 重试恢复时间戳（毫秒），用于退避等待 @see F-07 */
+  resumeAt?: number;
 }
 
 /** auto-loop 重试状态 @see V2-13§4.3 */
@@ -82,6 +84,9 @@ function isTodoItem(value: unknown): value is TodoItem {
     return false;
   }
   if (item.parallel !== undefined && typeof item.parallel !== 'boolean') {
+    return false;
+  }
+  if (item.resumeAt !== undefined && typeof item.resumeAt !== 'number') {
     return false;
   }
   return true;
@@ -246,6 +251,7 @@ export function pickReadyTodos(
 ): TodoItem[] {
   if (state.halted) return [];
   const maxParallel = Math.max(1, options?.maxParallel ?? 4);
+  const now = Date.now();
 
   const inProgress = state.items.filter((item) => item.status === 'in_progress');
   if (inProgress.length > 0) return inProgress.slice(0, maxParallel);
@@ -256,6 +262,8 @@ export function pickReadyTodos(
 
   const readyPending = state.items.filter((item) => {
     if (item.status !== 'pending') return false;
+    // 退避检查：resumeAt 未到则跳过 @see F-07
+    if (item.resumeAt !== undefined && item.resumeAt > now) return false;
     const deps = item.dependsOn ?? [];
     return deps.every((dep) => doneSet.has(dep));
   });
@@ -282,6 +290,23 @@ export function updateTodoStatus(
 ): TodoRunnerState {
   const nextItems = state.items.map((item) => (
     item.id === todoId ? { ...item, status } : item
+  ));
+
+  return {
+    ...state,
+    items: nextItems,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/** 设置任务的退避恢复时间 @see F-07 */
+export function setTodoResumeAt(
+  state: TodoRunnerState,
+  todoId: string,
+  resumeAt: number | undefined,
+): TodoRunnerState {
+  const nextItems = state.items.map((item) => (
+    item.id === todoId ? { ...item, resumeAt } : item
   ));
 
   return {

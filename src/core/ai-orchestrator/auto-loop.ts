@@ -11,6 +11,7 @@ import {
   updateTodoStatus,
   advanceTodoIteration,
   createAutoLoopState,
+  setTodoResumeAt,
 } from './todo-runner.js';
 import type {
   TodoRunnerState,
@@ -123,6 +124,31 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         checkpoint(state, projectRoot, onCheckpoint);
         break;
       }
+
+      // F-07: 检查是否有任务在退避等待中
+      const now = Date.now();
+      const waitingTasks = state.items.filter(
+        (i) => i.status === 'pending' && i.resumeAt !== undefined && i.resumeAt > now
+      );
+
+      if (waitingTasks.length > 0) {
+        // 找到最早的恢复时间
+        const earliestResume = Math.min(...waitingTasks.map((t) => t.resumeAt!));
+        const waitMs = earliestResume - now;
+
+        if (waitMs > 0) {
+          writeAuditLog({
+            event: 'backoff_wait',
+            featureId,
+            detail: { waitMs, waitingTaskIds: waitingTasks.map((t) => t.id) },
+          }, projectRoot);
+
+          // 等待退避时间
+          await new Promise((resolve) => setTimeout(resolve, waitMs));
+          continue; // 重新 pick，这次应该能拿到 ready 任务
+        }
+      }
+
       // 有未完成但无可执行 → advance iteration 等待依赖
       state = advanceTodoIteration(state);
       checkpoint(state, projectRoot, onCheckpoint);
@@ -198,6 +224,8 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
 
         if (retryDecision.shouldRetry && retryDecision.errorCategory === 'temporary') {
           state = updateTodoStatus(state, task.id, 'pending');
+          // F-07: 设置退避恢复时间，pickReadyTodos 会过滤 resumeAt 未到的任务
+          state = setTodoResumeAt(state, task.id, Date.now() + retryDecision.backoffMs);
           state = updateAutoLoopLastResult(
             state,
             task.id,
