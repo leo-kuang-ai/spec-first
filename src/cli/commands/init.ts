@@ -27,6 +27,42 @@ import {
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
 const VALID_SIZES: ReadonlySet<string> = new Set(['S', 'M', 'L']);
 
+const PLATFORM_TEMPLATES = {
+  'java-backend': `platform: java-backend
+label: Java 后端服务
+description: Spring Boot 后端服务
+tech_stack:
+  language: Java
+  framework: Spring Boot
+build:
+  tool: Maven
+test:
+  unit: JUnit 5
+`,
+  'admin-frontend': `platform: admin-frontend
+label: 管理后台前端
+description: React + TypeScript 前端应用
+tech_stack:
+  language: TypeScript
+  framework: React 18
+build:
+  tool: Vite
+test:
+  unit: Vitest
+`,
+  'h5': `platform: h5
+label: H5 移动端
+description: Vue 3 移动端应用
+tech_stack:
+  language: TypeScript
+  framework: Vue 3
+build:
+  tool: Vite
+test:
+  unit: Vitest
+`,
+} as const;
+
 interface InitCliInput {
   feat?: string;
   mode?: string;
@@ -403,6 +439,44 @@ function discoverPlatforms(projectRoot: string): string[] {
   }
 }
 
+async function guidePlatformCreation(rl: ReturnType<typeof createInterface>, projectRoot: string): Promise<string[]> {
+  console.log('\n⚠️  检测到 .spec-first/layer2/ 目录不存在或为空');
+  console.log('    将引导您创建平台配置文件\n');
+  console.log('请选择项目类型：');
+  console.log('  1. Java 后端服务');
+  console.log('  2. 前端应用（React/Vue）');
+  console.log('  3. H5 移动端');
+  console.log('  4. 跳过（手动创建）');
+
+  const choice = await rl.question('\n请输入 [1-4]: ');
+
+  if (choice === '4') {
+    console.log('\n请手动创建 .spec-first/layer2/*.yaml 文件后重新运行 init');
+    return [];
+  }
+
+  const templateMap: Record<string, keyof typeof PLATFORM_TEMPLATES> = {
+    '1': 'java-backend',
+    '2': 'admin-frontend',
+    '3': 'h5',
+  };
+
+  const platformKey = templateMap[choice];
+  if (!platformKey) {
+    console.error('❌ 无效选择');
+    return [];
+  }
+
+  const layerDir = join(projectRoot, '.spec-first', 'layer2');
+  mkdirSync(layerDir, { recursive: true });
+
+  const yamlPath = join(layerDir, `${platformKey}.yaml`);
+  writeFileSync(yamlPath, PLATFORM_TEMPLATES[platformKey], 'utf-8');
+
+  console.log(`\n✅ 已创建平台配置：${platformKey}.yaml`);
+  return [platformKey];
+}
+
 function validatePlatformSelection(platforms: string[], projectRoot: string): string | null {
   const discovered = discoverPlatforms(projectRoot);
   if (discovered.length === 0) {
@@ -584,10 +658,12 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     printStepConfirm('项目规模', `${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`);
 
     // Step 4/7: 平台选择
-    const discovered = discoverPlatforms(process.cwd());
+    let discovered = discoverPlatforms(process.cwd());
     if (discovered.length === 0) {
-      console.error('\n❌ 未发现 .spec-first/layer2 平台模板。请先创建 *.yaml 后再执行初始化。');
-      return null;
+      discovered = await guidePlatformCreation(rl, process.cwd());
+      if (discovered.length === 0) {
+        return null;
+      }
     }
     printStepHeader(4, 7, '平台选择');
     console.log('  检测到以下可用平台（来自 .spec-first/layer2/*.yaml）：\n');

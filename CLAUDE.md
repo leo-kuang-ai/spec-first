@@ -272,21 +272,21 @@ npm run format             # prettier 格式化
 <!-- SPEC-FIRST:END MANUAL -->
 
 <!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-> Auto-synced at 2026-03-10T01:22:07.113Z
+> Auto-synced at 2026-03-10T16:21:48.070Z
 
 ## Spec-First Context Snapshot
-- Feature: FSREQ-20260310-HOMEPERF-001
+- Feature: FSREQ-20260310-SKILLREFINE-001
 - Stage: 03_plan
-- Design: specs/FSREQ-20260310-HOMEPERF-001/design.md
+- Design: specs/FSREQ-20260310-SKILLREFINE-001/design.md
 
 ### Design Highlights
-- Design — FSREQ-20260310-HOMEPERF-001
+- Design — FSREQ-20260310-SKILLREFINE-001
 - 设计概述
 - DS 设计规格
-- DS-HOMEPERF-001: CSS 优化
-- DS-HOMEPERF-002: JavaScript 优化
-- DS-HOMEPERF-003: API 响应缓存
-- DS-HOMEPERF-004: Feature 列表虚拟滚动
-- DS-HOMEPERF-005: 首屏渲染优化
+- DS-SKILLREFINE-001: 代码库架构建模设计
+- DS-SKILLREFINE-002: Skill 深度验证设计
+- DS-SKILLREFINE-003: 全流程健壮性审查设计
+- DS-SKILLREFINE-004: 多视角审计设计
+- DS-SKILLREFINE-005: 优化清单输出设计
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
 

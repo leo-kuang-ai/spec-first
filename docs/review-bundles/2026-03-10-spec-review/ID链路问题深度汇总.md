@@ -21,8 +21,8 @@
 - 统一规则源：新增 `src/shared/id-rules.ts`（或 `trace-rules.ts`），由 runtime/skill/docs 共同引用。
 
 ### 检查点
-- `matrix check` 对 `REQ-*` 通过，对 `REQ-PRD-*` 给出迁移提示。
-- 迁移完成后，禁止 `REQ-PRD-*` 的校验必须失败。
+- `matrix check` 对 `REQ-*` 通过，对 `REQ-PRD-*` 直接失败（开发阶段无兼容期）。
+- `validateId('REQ-PRD-001')` 返回 `{ valid: false }`。
 
 ---
 

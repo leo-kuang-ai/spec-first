@@ -330,7 +330,7 @@ function getTimelineData(projectRoot, featureId) {
       if (event.stage && !stageEntries[event.stage]) {
         stageEntries[event.stage] = {
           stage: event.stage,
-          stageName: stageNames[event.stage] || event.stage,
+          stageName: STAGE_NAMES[event.stage] || event.stage,
           startTime: event.timestamp,
           status: event.status || 'UNKNOWN',
           conditions: event.conditions || []
@@ -339,7 +339,7 @@ function getTimelineData(projectRoot, featureId) {
     }
 
     // 按预定义顺序构建时间线
-    for (const stage of stageOrder) {
+    for (const stage of STAGE_ORDER) {
       if (stageEntries[stage]) {
         stageTimeline.push(stageEntries[stage]);
       }

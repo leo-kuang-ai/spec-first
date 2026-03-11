@@ -60,14 +60,14 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
   const brokenChains: MatrixCheckResult['brokenChains'] = [];
   for (const fr of frRows) {
     const missing: string[] = [];
-    const hasPrd = (fr.upstream ?? []).some(u => u.startsWith('REQ-PRD-'));
+    const hasPrd = (fr.upstream ?? []).some(u => u.startsWith('REQ-'));
     const hasDs = rows.some(r => r.type === 'DS' && r.upstream?.includes(fr.id));
     const hasTask = rows.some((r) => {
       if (r.type !== 'TASK') return false;
       return trace.lineage.hasAnyAncestor(r.id, new Set([fr.id]));
     });
     const hasTc = rows.some(r => r.type === 'TC' && r.upstream?.includes(fr.id));
-    if (!hasPrd) missing.push('REQ-PRD-*');
+    if (!hasPrd) missing.push('REQ-*');
     if (!hasDs) missing.push('DS');
     if (!hasTask) missing.push('TASK');
     if (!hasTc) missing.push('TC');
@@ -148,7 +148,16 @@ function parseMatrixContent(content: string): MatrixRow[] {
     if (cells.length < 4) continue;
     const id = cells[0];
     const validation = validateId(id);
-    const type: IdType = validation.type ?? 'Feature';
+
+    // 非法 ID 格式：强失败，不降级
+    if (!validation.valid) {
+      throw new Error(
+        `Invalid ID format: "${id}" - ${validation.error}\n` +
+        `Hint: Check supported ID types in id-validator.ts`
+      );
+    }
+
+    const type: IdType = validation.type!;
     const title = cells[2] ?? '';
     const rawStatus = (cells[3] ?? 'Planned').trim();
 

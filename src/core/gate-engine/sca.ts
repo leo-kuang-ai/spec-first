@@ -148,7 +148,7 @@ function checkSpecify(rows: MatrixRow[]): ScaCheckItem[] {
 
   // PRD→FR 映射完整性
   const unmappedFr = frRows.filter(r =>
-    !(r.upstream ?? []).some(u => u.startsWith('REQ-PRD-'))
+    !(r.upstream ?? []).some(u => u.startsWith('REQ-'))
   );
   checks.push({
     rule: 'SCA-SPEC-00: PRD→FR 映射完整性',
@@ -301,15 +301,15 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
     });
   } else if (trace.frRows.length > 0) {
     const unmappedPrd = trace.frRows.filter((r) =>
-      !(r.upstream ?? []).some((u) => u.startsWith('REQ-PRD-'))
+      !(r.upstream ?? []).some((u) => u.startsWith('REQ-'))
     ).map((r) => r.id);
     if (unmappedPrd.length > 0) {
       findings.push({
         severity: 'HIGH',
         type: 'COVERAGE_GAP_PRD',
         location: 'traceability-matrix.md',
-        detail: `FR 未映射 PRD: ${unmappedPrd.slice(0, 8).join(', ')}${unmappedPrd.length > 8 ? ' ...' : ''}`,
-        suggestion: '每个 FR 至少需要 1 条 REQ-PRD-* upstream 引用',
+        detail: `FR 未映射 REQ: ${unmappedPrd.slice(0, 8).join(', ')}${unmappedPrd.length > 8 ? ' ...' : ''}`,
+        suggestion: '每个 FR 至少需要 1 条 REQ-* upstream 引用',
       });
     }
 

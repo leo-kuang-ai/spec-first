@@ -85,15 +85,47 @@ function validateIdFormat(featureId: string, projectRoot: string): string[] {
     const match = line.match(/^\|\s*([A-Z][A-Z0-9-]{2,40})\s*\|/);
     if (!match) continue;
     const id = match[1];
-    if (!validateId(id).valid) continue;
+    const validation = validateId(id);
+    if (!validation.valid) {
+      errors.push(`非法 ID 格式：${id} - ${validation.error}`);
+      continue;
+    }
     if (seen.has(id)) dupes.add(id);
     seen.add(id);
+
+    // 校验 upstream/downstream 列（第5、6列）
+    const cells = line.split('|').map(c => c.trim());
+    if (cells.length >= 6) {
+      const upstream = cells[5];
+      const downstream = cells[6];
+      validateRefList(upstream, 'upstream', id, errors);
+      validateRefList(downstream, 'downstream', id, errors);
+    }
   }
   for (const id of dupes) {
     errors.push(`重复 ID：${id}`);
   }
 
   return errors;
+}
+
+/** 校验引用列表（upstream/downstream）中的 ID 格式 */
+function validateRefList(refList: string, field: string, rowId: string, errors: string[]): void {
+  if (!refList || refList.trim() === '') return;
+
+  const refs = refList.split(',').map(r => r.trim()).filter(Boolean);
+  for (const ref of refs) {
+    // 跳过占位符（如 src/** 路径）
+    if (ref.includes('/') || ref.includes('*')) {
+      errors.push(`${rowId} ${field} 包含非法引用：${ref}（应为合法 ID）`);
+      continue;
+    }
+
+    const validation = validateId(ref);
+    if (!validation.valid) {
+      errors.push(`${rowId} ${field} 包含非法 ID：${ref} - ${validation.error}`);
+    }
+  }
 }
 
 function validateFilePaths(featureId: string, projectRoot: string): string[] {

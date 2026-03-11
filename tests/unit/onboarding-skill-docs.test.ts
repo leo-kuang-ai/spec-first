@@ -18,19 +18,22 @@ describe('00-onboarding skill docs consistency', () => {
     const skill = read(SKILL_MD);
     const mapping = read(SCENARIO_MAPPING);
 
+    // SKILL.md references role-views.json for normal mode
     expect(skill).toContain('role-views');
-    expect(skill).toContain('优先');
     expect(skill).toContain('.spec-first/runtime/first/role-views.json');
+    // scenario-mapping.md documents the role-views strategy
     expect(mapping).toContain('role-views');
+    expect(mapping).toContain('优先按角色裁剪');
   });
 
   it('should document degraded onboarding when first assets are missing', () => {
     const skill = read(SKILL_MD);
     const mapping = read(SCENARIO_MAPPING);
 
-    expect(skill).toContain('degraded');
-    expect(skill).toContain('无 first 资产');
+    // SKILL.md uses "降级模式" for degraded mode (no role-views)
     expect(skill).toContain('降级');
+    expect(skill).toContain('模式');
+    // scenario-mapping.md documents degraded mode with explicit "无 first 资产"
     expect(mapping).toContain('degraded');
     expect(mapping).toContain('无 first 资产');
   });

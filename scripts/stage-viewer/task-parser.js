@@ -35,8 +35,8 @@ export function parseTaskPlan(projectRoot, featureId) {
   const tasks = [];
   const phases = [];
 
-  // 解析阶段 (### Phase N: Title)
-  const phaseRegex = /### (Phase \d+):\s*(.+?)\n([\s\S]*?)(?=### Phase|\n## |$)/g;
+  // 解析阶段 (### Phase N: Title 或 ### US N — Title)
+  const phaseRegex = /### ((?:Phase|US)\s*\d+)[:\s—]+(.+?)\n([\s\S]*?)(?=### (?:Phase|US)|\n## |$)/g;
   let phaseMatch;
   while ((phaseMatch = phaseRegex.exec(content)) !== null) {
     const phaseId = phaseMatch[1];
@@ -47,8 +47,8 @@ export function parseTaskPlan(projectRoot, featureId) {
     const statusMatch = phaseContent.match(/\*\*Status:\*\*\s*(\w+)/);
     const phaseStatus = statusMatch ? normalizeTaskStatus(statusMatch[1]) : 'pending';
 
-    // 提取阶段内的任务
-    const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(.+)/g;
+    // 提取阶段内的任务（支持 [P] [US1] 等标签）
+    const taskRegex = /-\s*\[([ x])\]\s*(TASK-\w+-\d+)\s+(?:\[.*?\]\s*)*(.+)/g;
     let taskMatch;
     const phaseTasks = [];
     while ((taskMatch = taskRegex.exec(phaseContent)) !== null) {
@@ -70,13 +70,14 @@ export function parseTaskPlan(projectRoot, featureId) {
     });
   }
 
-  // 解析任务明细表格
-  const tableRegex = /\|\s*TASK ID\s*\|[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/;
+  // 解析任务明细表格（支持 Task ID 或 TASK ID）
+  const tableRegex = /\|\s*(?:Task|TASK) ID\s*\|[\s\S]*?\n([\s\S]*?)(?=\n## |\n$)/;
   const tableMatch = content.match(tableRegex);
   if (tableMatch) {
     const rows = tableMatch[1].trim().split('\n').filter(row => row.includes('TASK-'));
     for (const row of rows) {
       const cols = row.split('|').map(c => c.trim()).filter(c => c);
+      // 支持 7、8、9 列格式
       if (cols.length >= 7) {
         const taskId = cols[0];
         const title = cols[1];
@@ -85,7 +86,17 @@ export function parseTaskPlan(projectRoot, featureId) {
         const traces = cols[4] || '';
         const dependsOn = cols[5] || '-';
         const acceptance = cols[6] || '-';
-        const status = cols[7] || 'pending';
+        // 7 列格式：无 status 列，默认 pending
+        // 8 列格式：最后一列是 status
+        // 9 列格式：cols[8] 是 status
+        let status = 'pending';
+        if (cols.length === 7) {
+          status = 'pending';
+        } else if (cols.length === 8) {
+          status = cols[7] || 'pending';
+        } else {
+          status = cols[8] || 'pending';
+        }
 
         tasks.push({
           id: taskId,

@@ -1,5 +1,7 @@
 # Spec-First — AI 时代的规范驱动研发流程引擎
 
+![Spec-First Banner](image.png)
+
 > 📚 **完整文档**：[PROJECT-INTRODUCTION.md](PROJECT-INTRODUCTION.md) - 包含生态对比、框架深度解析等详细内容
 
 ![Version](https://img.shields.io/badge/version-v0.5.49-blue)
@@ -354,6 +356,14 @@ npm run lint
 ### 技术方案
 
 - `docs/02-技术方案/V2/README.md`
+
+### 代码审查与架构优化
+
+- `docs/review-bundles/2026-03-10-spec-review/00-最佳修复方案-健壮版.md` - **ID 链路最佳修复方案（健壮版）** - 数据完整性 vs 业务完整性，系统级保证
+- `docs/review-bundles/2026-03-10-spec-review/00-最佳修复方案-终稿.md` - ID 链路修复方案（领域分层、职责单一）
+- `docs/review-bundles/2026-03-10-spec-review/ID链路问题深度汇总.md` - 14 个问题详细分析
+- `docs/review-bundles/2026-03-10-spec-review/ID链路全流程全景图.md` - 7 节点数据流图
+- `docs/review-bundles/2026-03-10-spec-review/修复方案-分层校验策略.md` - 长期治理方案参考
 
 ## 仓库与许可证
 

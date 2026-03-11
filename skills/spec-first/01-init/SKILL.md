@@ -21,6 +21,8 @@ description: "初始化 Feature 工作区，收集参数并生成阶段状态文
 
 - **P0**: 前置检查 - 详见 [prerequisites.md](references/prerequisites.md)
 - **P1**: 读取平台列表 - 扫描 `.spec-first/layer2/*.yaml`
+  - ⚠️ 若目录不存在或为空，引导创建平台 YAML - 详见 [platform-yaml-template.md](references/platform-yaml-template.md)
+  - **关键**：必须使用 `platform:` 字段（不是 `name:`），这是 CLI 校验的硬性要求
 - **P2**: 交互式收集参数 - 详见 [interaction-guide.md](references/interaction-guide.md)
 - **P3**: 参数确认 - 回显所有选择后执行
 - **P4**: 执行 CLI - `spec-first init [参数]`

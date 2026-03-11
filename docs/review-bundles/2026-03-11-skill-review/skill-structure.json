@@ -1,0 +1,186 @@
+{
+  "scanTime": "2026-03-11T00:30:00.000Z",
+  "totalSkills": 20,
+  "skills": [
+    {
+      "id": "00-first",
+      "name": "spec-first:first",
+      "description": "项目快速认知：quick 模式生成 5-6 份核心文档（含 README），deep 模式生成 10-11 份完整文档",
+      "path": "skills/spec-first/00-first/",
+      "entryFile": "SKILL.md",
+      "category": "cognitive"
+    },
+    {
+      "id": "00-onboarding",
+      "name": "onboarding",
+      "description": "新手引导 - 交互式场景识别与学习路径推荐",
+      "path": "skills/spec-first/00-onboarding/",
+      "entryFile": "SKILL.md",
+      "category": "onboarding"
+    },
+    {
+      "id": "01-init",
+      "name": "spec-first:init",
+      "description": "初始化 Feature 工作区，收集参数并生成阶段状态文件",
+      "path": "skills/spec-first/01-init/",
+      "entryFile": "SKILL.md",
+      "category": "lifecycle"
+    },
+    {
+      "id": "02-catchup",
+      "name": "spec-first:catchup",
+      "description": "定位当前 Feature 并恢复上下文",
+      "path": "skills/spec-first/02-catchup/",
+      "entryFile": "SKILL.md",
+      "category": "context"
+    },
+    {
+      "id": "03-spec",
+      "name": "spec-first:spec",
+      "description": "定义需求规格，通过 Phase 0（PRD）+ Step 0-8 流程生成 FR 功能需求与验收标准",
+      "path": "skills/spec-first/03-spec/",
+      "entryFile": "SKILL.md",
+      "category": "specification"
+    },
+    {
+      "id": "04-design",
+      "name": "spec-first:design",
+      "description": "定位 Feature 并校验阶段为技术设计（02_design）",
+      "path": "skills/spec-first/04-design/",
+      "entryFile": "SKILL.md",
+      "category": "design"
+    },
+    {
+      "id": "05-research",
+      "name": "spec-first:research",
+      "description": "定位 Feature 上下文并生成调研结论",
+      "path": "skills/spec-first/05-research/",
+      "entryFile": "SKILL.md",
+      "category": "research"
+    },
+    {
+      "id": "06-task",
+      "name": "spec-first:task",
+      "description": "定位 Feature 并校验阶段为任务拆解（03_plan）",
+      "path": "skills/spec-first/06-task/",
+      "entryFile": "SKILL.md",
+      "category": "planning"
+    },
+    {
+      "id": "07-code",
+      "name": "spec-first:code",
+      "description": "执行代码实现（自动批量执行所有 TASK）",
+      "path": "skills/spec-first/07-code/",
+      "entryFile": "SKILL.md",
+      "category": "implementation"
+    },
+    {
+      "id": "08-review",
+      "name": "spec-first:review",
+      "description": "定位变更范围并执行代码审查",
+      "path": "skills/spec-first/08-review/",
+      "entryFile": "SKILL.md",
+      "category": "review"
+    },
+    {
+      "id": "10-archive",
+      "name": "spec-first:archive",
+      "description": "定位 Feature 并校验阶段为归档复盘（06_wrap_up）",
+      "path": "skills/spec-first/10-archive/",
+      "entryFile": "SKILL.md",
+      "category": "archive"
+    },
+    {
+      "id": "11-plan",
+      "name": "spec-first:plan",
+      "description": "定位 Feature 并加载当前阶段计划",
+      "path": "skills/spec-first/11-plan/",
+      "entryFile": "SKILL.md",
+      "category": "planning"
+    },
+    {
+      "id": "12-verify",
+      "name": "spec-first:verify",
+      "description": "定位 Feature 并执行阶段验收校验",
+      "path": "skills/spec-first/12-verify/",
+      "entryFile": "SKILL.md",
+      "category": "verification"
+    },
+    {
+      "id": "13-orchestrate",
+      "name": "spec-first:orchestrate",
+      "description": "定位 Feature 并加载当前状态执行编排",
+      "path": "skills/spec-first/13-orchestrate/",
+      "entryFile": "SKILL.md",
+      "category": "orchestration"
+    },
+    {
+      "id": "14-status",
+      "name": "spec-first:status",
+      "description": "定位当前 Feature 并输出状态概览",
+      "path": "skills/spec-first/14-status/",
+      "entryFile": "SKILL.md",
+      "category": "status"
+    },
+    {
+      "id": "15-doctor",
+      "name": "spec-first:doctor",
+      "description": "定位项目与宿主配置并执行环境诊断",
+      "path": "skills/spec-first/15-doctor/",
+      "entryFile": "SKILL.md",
+      "category": "diagnostics"
+    },
+    {
+      "id": "16-sync",
+      "name": "spec-first:sync",
+      "description": "定位 Feature 并同步追踪矩阵与状态",
+      "path": "skills/spec-first/16-sync/",
+      "entryFile": "SKILL.md",
+      "category": "sync"
+    },
+    {
+      "id": "17-feature",
+      "name": "spec-first:feature",
+      "description": "Feature 查询/切换命令族",
+      "path": "skills/spec-first/17-feature/",
+      "entryFile": "SKILL.md",
+      "category": "feature"
+    },
+    {
+      "id": "20-spec-review",
+      "name": "spec-first:spec-review",
+      "description": "定位 Feature 并执行需求规格质量审查（C10）",
+      "path": "skills/spec-first/20-spec-review/",
+      "entryFile": "SKILL.md",
+      "category": "review"
+    },
+    {
+      "id": "21-analyze",
+      "name": "spec-first:analyze",
+      "description": "执行跨产物一致性分析并生成分析报告",
+      "path": "skills/spec-first/21-analyze/",
+      "entryFile": "SKILL.md",
+      "category": "analysis"
+    }
+  ],
+  "categories": {
+    "cognitive": ["00-first"],
+    "onboarding": ["00-onboarding"],
+    "lifecycle": ["01-init"],
+    "context": ["02-catchup"],
+    "specification": ["03-spec"],
+    "design": ["04-design"],
+    "research": ["05-research"],
+    "planning": ["06-task", "11-plan"],
+    "implementation": ["07-code"],
+    "review": ["08-review", "20-spec-review"],
+    "archive": ["10-archive"],
+    "verification": ["12-verify"],
+    "orchestration": ["13-orchestrate"],
+    "status": ["14-status"],
+    "diagnostics": ["15-doctor"],
+    "sync": ["16-sync"],
+    "feature": ["17-feature"],
+    "analysis": ["21-analyze"]
+  }
+}

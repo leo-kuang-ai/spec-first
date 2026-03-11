@@ -21,7 +21,7 @@ describe('format-validator', () => {
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
       'Feature ID: TEST-FEAT-001\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'traceability-matrix.md'),
-      '| FR-001 | FR | Test |\n');
+      '| FR-AUTH-001 | FR | Test |\n');
 
     const result = validateFormat(FEATURE_ID, TEST_ROOT);
     expect(result.pass).toBe(true);

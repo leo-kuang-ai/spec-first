@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.73 2026-03-11 Claude: feat(skill-validation): 新增 Skill 测试用例框架 - 支持 3 类测试用例（normal/error/boundary），与 Vitest 集成，包含 TestCaseLoader/SkillTestExecutor/ReportGenerator 核心组件，提供 TestCaseFactory 快速创建工具，25 个单元测试全部通过 (user-visible)
+- v0.5.72 2026-03-10 Claude: fix(viewer): 修复任务进度和时间线视图显示问题 - task-parser.js 支持 US 格式阶段标题和任务标签，修正表格列索引和标题匹配，server.js 修正变量名 STAGE_NAMES/STAGE_ORDER (user-visible)
+- v0.5.71 2026-03-10 Claude: fix(init): 深度修复 Windows 平台创建问题 - CLI 新增 guidePlatformCreation() 交互式引导（支持 Java/前端/H5 三种模板），修正 platform 字段（非 name），Skill 新增 platform-yaml-template.md 规范文档，更新 prerequisites.md 创建流程，解决 Skill 文档与代码不一致问题 (user-visible)
+- v0.5.70 2026-03-10 Claude: fix(init): Windows 平台 YAML 创建修复 - 新增 platform-yaml-template.md 模板文档（明确 platform 字段为必填），更新 SKILL.md 和 prerequisites.md 添加平台创建引导流程，修复字段名错误（name → platform）导致的 CLI 校验失败
 - v0.5.69 2026-03-10 Claude: fix(status): 全链路状态一致性修复 - 创建 status-mapper.ts 支持 30+ 状态别名映射，matrix.ts 增强错误消息显示有效状态列表，format-validator.ts 修复重复 ID 检测只匹配 ID 列，coverage.ts C8 计算添加 NFR 标签支持，CLI matrix 命令添加 --help 和状态列表，更新 skill 文档状态描述 (user-visible)
 - v0.5.68 2026-03-10 Claude: feat(orchestrate): 核心信号打通与边界冻结 - autoLoopStatus 接入 decider（优先级检查），reasonCodes 结构化输出（ReasonCodeValue 类型安全），禁用 AUTO_RUN_NEXT_SKILL（方案A边界冻结），统一自动推进放行条件，补齐 03→05 矩阵测试（10个用例），修复 todoState 缺失误判，性能优化（常量提取），用户体验提升（友好状态提示） (user-visible)
 - v0.5.67 2026-03-10 Claude: feat(onboarding): 交互体验优化 v1.2.0→v1.3.0 - 支持命令行参数（--role/--task/--size），CLI 参数检测与友好提示 (user-visible)
