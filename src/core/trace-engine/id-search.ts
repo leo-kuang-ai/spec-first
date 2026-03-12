@@ -18,7 +18,7 @@ export function searchId(
   query: string,
   featureId: string,
   projectRoot: string,
-  type?: IdType,
+  type?: IdType
 ): SearchResult[] {
   if (!query) return [];
 
@@ -47,11 +47,7 @@ export function searchId(
 }
 
 /** 列出 Feature 下所有 ID（可按类型过滤） */
-export function listIds(
-  featureId: string,
-  projectRoot: string,
-  type?: IdType,
-): SearchResult[] {
+export function listIds(featureId: string, projectRoot: string, type?: IdType): SearchResult[] {
   const matrixPath = join(projectRoot, 'specs', featureId, 'traceability-matrix.md');
   if (!exists(matrixPath)) return [];
 

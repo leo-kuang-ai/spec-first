@@ -1,9 +1,13 @@
 import { join } from 'node:path';
-import { exists, readMarkdown } from '../../shared/fs-utils.js';
+import { exists } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import type { StageState } from '../../shared/types.js';
 import { readJson } from '../../shared/fs-utils.js';
 import { getCurrentTaskId } from '../task-plan/parser.js';
+import {
+  type SkillExecutionContext,
+  resolveExecutionFeatureId,
+} from './execution-context.js';
 
 export interface PromptAssemblyContext {
   featureId: string;
@@ -52,7 +56,14 @@ const PLACEHOLDER_REPLACERS: Record<string, (ctx: PromptAssemblyContext) => stri
  * Feature: {{FEATURE_ID}}
  * ```
  */
-const STATIC_PREFIX_FIELDS = ['FEATURE_ID', 'CURRENT_STAGE', 'CURRENT_TASK', 'TOKEN_BUDGET', 'MAX_ITERATIONS', 'MAX_SELF_CORRECTION'] as const;
+const STATIC_PREFIX_FIELDS = [
+  'FEATURE_ID',
+  'CURRENT_STAGE',
+  'CURRENT_TASK',
+  'TOKEN_BUDGET',
+  'MAX_ITERATIONS',
+  'MAX_SELF_CORRECTION',
+] as const;
 const DYNAMIC_FIELDS = ['DATE_ISO'] as const;
 
 /** 提取模板的静态前缀部分（用于 KV-Cache 稳定性检查） */
@@ -109,19 +120,14 @@ export function validateKvCacheStability(template: string): { stable: boolean; i
   for (const [staticField, staticPos] of Object.entries(staticPositions)) {
     for (const [dynamicField, dynamicPos] of Object.entries(dynamicPositions)) {
       if (staticPos > dynamicPos) {
-        issues.push(`静态字段 {{${staticField}}} (位置 ${staticPos}) 在动态字段 {{${dynamicField}}} (位置 ${dynamicPos}) 之后`);
+        issues.push(
+          `静态字段 {{${staticField}}} (位置 ${staticPos}) 在动态字段 {{${dynamicField}}} (位置 ${dynamicPos}) 之后`
+        );
       }
     }
   }
 
   return { stable: issues.length === 0, issues };
-}
-
-function readCurrentFeature(projectRoot: string): string {
-  const currentPath = join(projectRoot, '.spec-first', 'current');
-  if (!exists(currentPath)) return 'N/A';
-  const value = readMarkdown(currentPath).trim();
-  return value || 'N/A';
 }
 
 function readCurrentStage(projectRoot: string, featureId: string): string {
@@ -141,14 +147,25 @@ function readCurrentTask(projectRoot: string, featureId: string): string {
   return getCurrentTaskId(projectRoot, featureId) ?? 'N/A';
 }
 
-export function resolvePromptAssemblyContext(projectRoot: string): PromptAssemblyContext {
-  const featureId = readCurrentFeature(projectRoot);
-  const cfg = loadConfig(projectRoot);
+function normalizeExecutionContext(
+  projectRootOrContext: string | SkillExecutionContext
+): SkillExecutionContext {
+  return typeof projectRootOrContext === 'string'
+    ? { projectRoot: projectRootOrContext }
+    : projectRootOrContext;
+}
+
+export function resolvePromptAssemblyContext(
+  projectRootOrContext: string | SkillExecutionContext
+): PromptAssemblyContext {
+  const executionContext = normalizeExecutionContext(projectRootOrContext);
+  const featureId = resolveExecutionFeatureId(executionContext) ?? 'N/A';
+  const cfg = loadConfig(executionContext.projectRoot);
 
   return {
     featureId,
-    currentStage: readCurrentStage(projectRoot, featureId),
-    currentTask: readCurrentTask(projectRoot, featureId),
+    currentStage: readCurrentStage(executionContext.projectRoot, featureId),
+    currentTask: readCurrentTask(executionContext.projectRoot, featureId),
     tokenBudget: cfg.context.token_budget,
     maxIterations: cfg.runtime.max_iterations,
     maxSelfCorrection: cfg.runtime.max_self_corrections,
@@ -165,7 +182,9 @@ export function assemblePrompt(template: string, ctx: PromptAssemblyContext): st
     return replacer(ctx);
   });
   if (result.length > MAX_CONTEXT_PACK_BYTES) {
-    console.warn(`[spec-first] Context Pack 超出建议大小（${result.length} > ${MAX_CONTEXT_PACK_BYTES} bytes）`);
+    console.warn(
+      `[spec-first] Context Pack 超出建议大小（${result.length} > ${MAX_CONTEXT_PACK_BYTES} bytes）`
+    );
   }
   return result;
 }

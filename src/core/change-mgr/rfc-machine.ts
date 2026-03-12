@@ -6,7 +6,10 @@
  */
 import type { RfcStatus } from '../../shared/types.js';
 
-const RFC_TRANSITIONS: ReadonlyMap<RfcStatus, ReadonlySet<RfcStatus>> = new Map<RfcStatus, ReadonlySet<RfcStatus>>([
+const RFC_TRANSITIONS: ReadonlyMap<RfcStatus, ReadonlySet<RfcStatus>> = new Map<
+  RfcStatus,
+  ReadonlySet<RfcStatus>
+>([
   ['draft', new Set(['approved', 'rejected'])],
   ['approved', new Set(['closed', 'rejected'])],
 ]);

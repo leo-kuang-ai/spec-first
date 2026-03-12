@@ -39,13 +39,7 @@ const MAX_REVISIONS = 3;
 const ARCHIVE_THRESHOLD = 500;
 const KEEP_LINES = 200;
 const RISK_ARCHIVE_THRESHOLD = 200;
-const ARCHIVE_RISK_MARKERS = [
-  'FORCE_SKIPPED',
-  'PASS_WITH_WAIVER',
-  'Exception',
-  '阻塞',
-  '风险',
-];
+const ARCHIVE_RISK_MARKERS = ['FORCE_SKIPPED', 'PASS_WITH_WAIVER', 'Exception', '阻塞', '风险'];
 
 function shouldArchiveRuntimeFile(content: string, lines: string[]): boolean {
   if (lines.length > ARCHIVE_THRESHOLD) return true;
@@ -84,8 +78,8 @@ export function transition(state: PhaseState, to: Phase): PhaseState {
     next.confirmed = false;
     if (next.revisionCount >= next.maxRevisions) {
       throw new Error(
-        `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. `
-        + '必须升级到架构审查或方案重设计，禁止继续“再试一次”。',
+        `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. ` +
+          '必须升级到架构审查或方案重设计，禁止继续“再试一次”。'
       );
     }
   }
@@ -96,8 +90,8 @@ export function transition(state: PhaseState, to: Phase): PhaseState {
     next.confirmed = false;
     if (next.revisionCount >= next.maxRevisions) {
       throw new Error(
-        `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. `
-        + '必须升级到架构审查或方案重设计，禁止继续"再试一次"。',
+        `3-Strike triggered: revision rounds reached ${next.revisionCount}/${next.maxRevisions}. ` +
+          '必须升级到架构审查或方案重设计，禁止继续"再试一次"。'
       );
     }
   }

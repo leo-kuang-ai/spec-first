@@ -33,7 +33,7 @@ export const E_ORCH_ARGS_RESUME_WITHOUT_AUTO = 'E_ORCH_ARGS_RESUME_WITHOUT_AUTO'
 export class OrchestrateArgsError extends Error {
   constructor(
     public readonly code: string,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = 'OrchestrateArgsError';
@@ -56,7 +56,7 @@ const ALLOWED_FLAGS = new Set(['--auto', '--resume', '--auto-advance']);
  */
 export function validateOrchestrateArgs(
   args: string[],
-  onWarn?: (msg: string) => void,
+  onWarn?: (msg: string) => void
 ): OrchestrateArgs {
   const seen = new Set<string>();
   const flags: string[] = [];
@@ -69,7 +69,7 @@ export function validateOrchestrateArgs(
     if (!ALLOWED_FLAGS.has(arg)) {
       throw new OrchestrateArgsError(
         E_ORCH_ARGS_UNKNOWN,
-        `Unknown orchestrate flag: ${arg}. Allowed: ${[...ALLOWED_FLAGS].join(', ')}`,
+        `Unknown orchestrate flag: ${arg}. Allowed: ${[...ALLOWED_FLAGS].join(', ')}`
       );
     }
 
@@ -91,7 +91,7 @@ export function validateOrchestrateArgs(
   if (hasResume && !hasAuto) {
     throw new OrchestrateArgsError(
       E_ORCH_ARGS_RESUME_WITHOUT_AUTO,
-      '--resume requires --auto mode',
+      '--resume requires --auto mode'
     );
   }
 
@@ -113,7 +113,6 @@ export function resolveOrchestrateConfirmPolicy(_args: OrchestrateArgs): 'strict
   return 'strict';
 }
 
-
 export type DependencyStrength = 'L1' | 'L2' | 'L3';
 
 export interface BackgroundInputGuidance {
@@ -129,19 +128,23 @@ export function buildBackgroundInputGuidance(
   backgroundStatus: BackgroundInputStatus,
   dependencyStrength: DependencyStrength,
   riskSignals: string[] = [],
-  riskCategory?: BackgroundInputGuidance['riskCategory'],
+  riskCategory?: BackgroundInputGuidance['riskCategory']
 ): BackgroundInputGuidance {
-  const normalizedRiskSignals = [...new Set(riskSignals.filter(signal => signal.trim().length > 0))];
-  const riskCategoryHint = riskCategory === 'formal-design-review'
-    ? '，且当前属于正式设计评审门槛'
-    : riskCategory === 'high-risk-implementation'
-      ? '，且当前属于高风险改动门槛'
-      : riskCategory === 'pre-release-verification'
-        ? '，且当前属于上线前 / 高风险验证门槛'
-        : '';
-  const riskHint = normalizedRiskSignals.length > 0
-    ? `${riskCategory ? '，并' : '，且'}存在高风险信号（${normalizedRiskSignals.join('；')}）`
-    : '';
+  const normalizedRiskSignals = [
+    ...new Set(riskSignals.filter((signal) => signal.trim().length > 0)),
+  ];
+  const riskCategoryHint =
+    riskCategory === 'formal-design-review'
+      ? '，且当前属于正式设计评审门槛'
+      : riskCategory === 'high-risk-implementation'
+        ? '，且当前属于高风险改动门槛'
+        : riskCategory === 'pre-release-verification'
+          ? '，且当前属于上线前 / 高风险验证门槛'
+          : '';
+  const riskHint =
+    normalizedRiskSignals.length > 0
+      ? `${riskCategory ? '，并' : '，且'}存在高风险信号（${normalizedRiskSignals.join('；')}）`
+      : '';
 
   if (backgroundStatus === 'blind') {
     return {

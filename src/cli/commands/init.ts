@@ -50,7 +50,7 @@ build:
 test:
   unit: Vitest
 `,
-  'h5': `platform: h5
+  h5: `platform: h5
 label: H5 移动端
 description: Vue 3 移动端应用
 tech_stack:
@@ -120,8 +120,13 @@ function runBootstrapIfEnabled(shouldBootstrap: boolean): number | undefined {
   return ExitCode.CONFIG_ERROR;
 }
 
-async function resolveInitCliInput(args: string[], initial: InitCliInput): Promise<InitCliInput | undefined> {
-  const hasRequiredArgs = Boolean(initial.feat && initial.mode && initial.size && initial.platforms);
+async function resolveInitCliInput(
+  args: string[],
+  initial: InitCliInput
+): Promise<InitCliInput | undefined> {
+  const hasRequiredArgs = Boolean(
+    initial.feat && initial.mode && initial.size && initial.platforms
+  );
   if (hasRequiredArgs) return initial;
 
   if (!isInteractiveTerminal()) {
@@ -170,7 +175,9 @@ function normalizeInitInput(input: InitCliInput, cwd: string): NormalizedInitInp
     return undefined;
   }
   if (parsedPlatforms.hadDuplicates) {
-    console.warn(`警告：检测到重复 platforms，已自动去重并排序：${parsedPlatforms.values.join(', ')}`);
+    console.warn(
+      `警告：检测到重复 platforms，已自动去重并排序：${parsedPlatforms.values.join(', ')}`
+    );
   }
 
   const platformValidationError = validatePlatformSelection(parsedPlatforms.values, cwd);
@@ -278,8 +285,12 @@ export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
     return {
       mode: runtimeIndex.mode,
       techStack: runtimeSummary.project?.platformType ?? '待确认',
-      codeVolume: runtimeSummary.modules?.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
-      apiSurface: runtimeSummary.apiSurface?.length > 0 ? `${runtimeSummary.apiSurface.length}+ 个` : '待确认',
+      codeVolume:
+        runtimeSummary.modules?.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
+      apiSurface:
+        runtimeSummary.apiSurface?.length > 0
+          ? `${runtimeSummary.apiSurface.length}+ 个`
+          : '待确认',
     };
   }
 
@@ -290,7 +301,6 @@ export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
     apiSurface: '待确认',
   };
 }
-
 
 export async function handleInit(args: string[]): Promise<number> {
   if (args.includes('--help') || args.includes('-h')) {
@@ -323,7 +333,7 @@ export async function handleInit(args: string[]): Promise<number> {
   if (!resolvedInput) return ExitCode.VALIDATION_ERROR;
 
   const shouldBootstrap = Boolean(
-    resolvedInput.bootstrap || process.env.SPEC_FIRST_INIT_BOOTSTRAP === '1',
+    resolvedInput.bootstrap || process.env.SPEC_FIRST_INIT_BOOTSTRAP === '1'
   );
   const bootstrapCode = runBootstrapIfEnabled(shouldBootstrap);
   if (typeof bootstrapCode === 'number') return bootstrapCode;
@@ -404,7 +414,9 @@ function ensureProjectClaudeSettings(projectRoot: string): void {
 }
 
 function printInitHelp(): void {
-  console.log('用法：spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>] [--bootstrap]\n');
+  console.log(
+    '用法：spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>] [--bootstrap]\n'
+  );
   console.log('参数说明：');
   console.log('  --feat       FEAT 缩写（必须匹配 ^[A-Z][A-Z0-9]{0,15}$，例如 AUTH、REPORT）');
   console.log('  --mode       开发模式：N（新功能）| I（增量迭代）');
@@ -415,9 +427,15 @@ function printInitHelp(): void {
   console.log('  --bootstrap  执行宿主环境自修复（MCP/skills/binaries）');
 }
 
-function parsePlatforms(platforms: string | undefined): { values: string[]; hadDuplicates: boolean } {
+function parsePlatforms(platforms: string | undefined): {
+  values: string[];
+  hadDuplicates: boolean;
+} {
   if (!platforms) return { values: [], hadDuplicates: false };
-  const list = platforms.split(',').map((p) => p.trim()).filter(Boolean);
+  const list = platforms
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
   const deduped = [...new Set(list)];
   const values = deduped.sort((a, b) => a.localeCompare(b));
   return { values, hadDuplicates: deduped.length !== list.length };
@@ -431,7 +449,9 @@ function discoverPlatforms(projectRoot: string): string[] {
   const layerDir = join(projectRoot, '.spec-first', 'layer2');
   try {
     return readdirSync(layerDir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml')))
+      .filter(
+        (entry) => entry.isFile() && (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml'))
+      )
       .map((entry) => entry.name.replace(/\.ya?ml$/i, ''))
       .sort();
   } catch {
@@ -439,7 +459,10 @@ function discoverPlatforms(projectRoot: string): string[] {
   }
 }
 
-async function guidePlatformCreation(rl: ReturnType<typeof createInterface>, projectRoot: string): Promise<string[]> {
+async function guidePlatformCreation(
+  rl: ReturnType<typeof createInterface>,
+  projectRoot: string
+): Promise<string[]> {
   console.log('\n⚠️  检测到 .spec-first/layer2/ 目录不存在或为空');
   console.log('    将引导您创建平台配置文件\n');
   console.log('请选择项目类型：');
@@ -501,7 +524,13 @@ interface GuidedInitInput {
 
 function normalizeModeInput(value: string): 'N' | 'I' | undefined {
   const normalized = value.trim().toUpperCase();
-  if (!normalized || normalized === '1' || normalized === 'N' || normalized === '新' || normalized === '新功能') {
+  if (
+    !normalized ||
+    normalized === '1' ||
+    normalized === 'N' ||
+    normalized === '新' ||
+    normalized === '新功能'
+  ) {
     return 'N';
   }
   if (normalized === '2' || normalized === 'I' || normalized === '增量' || normalized === '迭代') {
@@ -512,7 +541,8 @@ function normalizeModeInput(value: string): 'N' | 'I' | undefined {
 
 function normalizeSizeInput(value: string): 'S' | 'M' | 'L' | undefined {
   const normalized = value.trim().toUpperCase();
-  if (normalized === '' || normalized === '2' || normalized === 'M' || normalized === '中') return 'M';
+  if (normalized === '' || normalized === '2' || normalized === 'M' || normalized === '中')
+    return 'M';
   if (normalized === '1' || normalized === 'S' || normalized === '小') return 'S';
   if (normalized === '3' || normalized === 'L' || normalized === '大') return 'L';
   return undefined;
@@ -528,11 +558,20 @@ interface PlatformActionResult {
   error?: string;
 }
 
-function applyPlatformAction(rawInput: string, discovered: string[], selected: Set<string>): PlatformActionResult {
+function applyPlatformAction(
+  rawInput: string,
+  discovered: string[],
+  selected: Set<string>
+): PlatformActionResult {
   const raw = rawInput.trim();
   const normalized = raw.toLowerCase();
 
-  const isDone = raw === '' || normalized === 'd' || normalized === 'done' || normalized === 'ok' || normalized === '完成';
+  const isDone =
+    raw === '' ||
+    normalized === 'd' ||
+    normalized === 'done' ||
+    normalized === 'ok' ||
+    normalized === '完成';
   if (isDone) {
     if (selected.size === 0) {
       return { done: false, error: '至少选择一个平台后才能继续（可输入 a 全选）' };
@@ -544,12 +583,20 @@ function applyPlatformAction(rawInput: string, discovered: string[], selected: S
     discovered.forEach((item) => selected.add(item));
     return { done: false };
   }
-  if (normalized === 'n' || normalized === 'none' || normalized === 'clear' || normalized === '清空') {
+  if (
+    normalized === 'n' ||
+    normalized === 'none' ||
+    normalized === 'clear' ||
+    normalized === '清空'
+  ) {
     selected.clear();
     return { done: false };
   }
 
-  const tokens = raw.split(',').map((item) => item.trim()).filter(Boolean);
+  const tokens = raw
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
   if (tokens.length === 0) {
     return { done: false, error: '平台输入为空，请输入编号/平台名，或输入 d 完成' };
   }
@@ -559,7 +606,10 @@ function applyPlatformAction(rawInput: string, discovered: string[], selected: S
     if (/^\d+$/.test(token)) {
       const idx = Number.parseInt(token, 10);
       if (!Number.isInteger(idx) || idx < 1 || idx > discovered.length) {
-        return { done: false, error: `平台编号超出范围：${token}（有效范围 1-${discovered.length}）` };
+        return {
+          done: false,
+          error: `平台编号超出范围：${token}（有效范围 1-${discovered.length}）`,
+        };
       }
       resolved.push(discovered[idx - 1]);
       continue;
@@ -589,7 +639,7 @@ function formatSelectedPlatforms(selected: Set<string>): string {
 
 async function askPlatformsInteractively(
   rl: ReturnType<typeof createInterface>,
-  discovered: string[],
+  discovered: string[]
 ): Promise<string[] | null> {
   const selected = new Set<string>();
   console.log('4) 请选择平台（多选）:');
@@ -632,7 +682,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  格式：大写字母开头，仅包含大写字母和数字，长度 1-16 字符');
     console.log('  示例：DASHBOARD、AUTH、REPORT');
     const feat = await askUntilValid(rl, '\n你的输入: ', (value) =>
-      /^[A-Z][A-Z0-9]{0,15}$/.test(value) ? null : '❌ FEAT 格式错误：需匹配 ^[A-Z][A-Z0-9]{0,15}$',
+      /^[A-Z][A-Z0-9]{0,15}$/.test(value) ? null : '❌ FEAT 格式错误：需匹配 ^[A-Z][A-Z0-9]{0,15}$'
     );
     printStepConfirm('Feature 缩写', feat);
 
@@ -641,7 +691,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  1. N (New) - 全新功能开发');
     console.log('  2. I (Iteration) - 迭代优化现有功能');
     const modeInput = await askUntilValid(rl, '\n请输入 [1/2]（默认：1）: ', (value) =>
-      normalizeModeInput(value) ? null : '❌ 模式无效，请输入 1/2 或 N/I',
+      normalizeModeInput(value) ? null : '❌ 模式无效，请输入 1/2 或 N/I'
     );
     const mode = normalizeModeInput(modeInput) as 'N' | 'I';
     printStepConfirm('开发模式', mode === 'N' ? 'N (New)' : 'I (Iteration)');
@@ -652,10 +702,13 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  2. M (Medium) - 中型功能（1-2 周）');
     console.log('  3. L (Large) - 大型项目（2+ 周）');
     const sizeInput = await askUntilValid(rl, '\n请输入 [1/2/3]（默认：2）: ', (value) =>
-      normalizeSizeInput(value) ? null : '❌ 规模无效，请输入 1/2/3 或 S/M/L',
+      normalizeSizeInput(value) ? null : '❌ 规模无效，请输入 1/2/3 或 S/M/L'
     );
     const size = normalizeSizeInput(sizeInput) as 'S' | 'M' | 'L';
-    printStepConfirm('项目规模', `${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`);
+    printStepConfirm(
+      '项目规模',
+      `${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`
+    );
 
     // Step 4/7: 平台选择
     let discovered = discoverPlatforms(process.cwd());
@@ -704,7 +757,9 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  参数确认\n');
     console.log(`  Feature 缩写:    ${feat}`);
     console.log(`  开发模式:        ${mode} (${mode === 'N' ? 'New' : 'Iteration'})`);
-    console.log(`  项目规模:        ${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`);
+    console.log(
+      `  项目规模:        ${size} (${size === 'S' ? 'Small' : size === 'M' ? 'Medium' : 'Large'})`
+    );
     console.log(`  平台:            ${platforms}`);
     console.log(`  标题:            ${title}`);
     console.log(`  Feature ID:      ${featureIdInput || '自动生成'}`);
@@ -715,7 +770,15 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
       return null;
     }
 
-    return { feat, mode, size, platforms, title, featureId: featureIdInput || undefined, bootstrap };
+    return {
+      feat,
+      mode,
+      size,
+      platforms,
+      title,
+      featureId: featureIdInput || undefined,
+      bootstrap,
+    };
   } finally {
     rl.close();
   }
@@ -724,7 +787,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
 async function askUntilValid(
   rl: ReturnType<typeof createInterface>,
   prompt: string,
-  validate: (value: string) => string | null,
+  validate: (value: string) => string | null
 ): Promise<string> {
   while (true) {
     const value = (await rl.question(prompt)).trim();

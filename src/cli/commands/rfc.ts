@@ -15,11 +15,16 @@ export function handleRfc(args: string[]): number {
   const rest = args.slice(1);
 
   switch (sub) {
-    case 'create':     return handleCreate(rest);
-    case 'submit':     return handleSubmit(rest);
-    case 'transition': return handleTransition(rest);
-    case 'list':       return handleList(rest);
-    case 'get':        return handleGet(rest);
+    case 'create':
+      return handleCreate(rest);
+    case 'submit':
+      return handleSubmit(rest);
+    case 'transition':
+      return handleTransition(rest);
+    case 'list':
+      return handleList(rest);
+    case 'get':
+      return handleGet(rest);
     default:
       console.error(`未知 rfc 子命令：${sub}`);
       printRfcHelp();
@@ -36,7 +41,9 @@ function handleCreate(args: string[]): number {
   const description = parseFlag(args, '--description');
 
   if (!featureId || !title) {
-    console.error('用法：spec-first rfc create <featureId> --title "<title>" [--level <Minor|Major|Critical>] [--by <by>]');
+    console.error(
+      '用法：spec-first rfc create <featureId> --title "<title>" [--level <Minor|Major|Critical>] [--by <by>]'
+    );
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -46,13 +53,17 @@ function handleCreate(args: string[]): number {
   }
 
   try {
-    const r = createRfc(featureId, {
-      title,
-      level: (level as RfcLevel) ?? undefined,
-      by,
-      motivation: motivation ?? undefined,
-      description: description ?? undefined,
-    }, process.cwd());
+    const r = createRfc(
+      featureId,
+      {
+        title,
+        level: (level as RfcLevel) ?? undefined,
+        by,
+        motivation: motivation ?? undefined,
+        description: description ?? undefined,
+      },
+      process.cwd()
+    );
     console.log(`已创建：${r.id}（${r.status}）`);
     return ExitCode.SUCCESS;
   } catch (e) {

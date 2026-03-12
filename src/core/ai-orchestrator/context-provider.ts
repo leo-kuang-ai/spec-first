@@ -41,7 +41,7 @@ export function getProviders(): ContextProvider[] {
 
 /** 获取适用于指定阶段的 Provider 列表 */
 export function getProvidersForStage(stage: string): ContextProvider[] {
-  return [...registry.values()].filter(p => p.appliesTo(stage));
+  return [...registry.values()].filter((p) => p.appliesTo(stage));
 }
 
 /** 清空注册表（测试用） */
@@ -53,7 +53,7 @@ export function clearProviders(): void {
 export function collectContextRefs(
   featureId: string,
   projectRoot: string,
-  stage: string,
+  stage: string
 ): ContextRef[] {
   const providers = getProvidersForStage(stage);
   const refs: ContextRef[] = [];

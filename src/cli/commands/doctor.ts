@@ -77,7 +77,12 @@ function checkNodeVersion(): CheckResult {
     if (major >= 20) {
       return { name: 'Node.js', level: 'PASS', message: `${ver} (≥ 20)` };
     }
-    return { name: 'Node.js', level: 'ERROR', message: `${ver} (< 20)`, fix: '请升级到 Node.js ≥ 20' };
+    return {
+      name: 'Node.js',
+      level: 'ERROR',
+      message: `${ver} (< 20)`,
+      fix: '请升级到 Node.js ≥ 20',
+    };
   } catch {
     return { name: 'Node.js', level: 'ERROR', message: '未找到', fix: '请安装 Node.js ≥ 20' };
   }
@@ -101,7 +106,12 @@ function checkSpecFirstDir(root: string): CheckResult {
   if (existsSync(dir)) {
     return { name: '.spec-first/', level: 'PASS', message: '已找到' };
   }
-  return { name: '.spec-first/', level: 'WARNING', message: '未找到', fix: '运行 spec-first init 创建项目配置' };
+  return {
+    name: '.spec-first/',
+    level: 'WARNING',
+    message: '未找到',
+    fix: '运行 spec-first init 创建项目配置',
+  };
 }
 
 function checkSpecsDir(root: string): CheckResult {
@@ -109,7 +119,12 @@ function checkSpecsDir(root: string): CheckResult {
   if (existsSync(dir)) {
     return { name: 'specs/', level: 'PASS', message: '已找到' };
   }
-  return { name: 'specs/', level: 'WARNING', message: '未找到', fix: '运行 spec-first init 创建 specs 目录' };
+  return {
+    name: 'specs/',
+    level: 'WARNING',
+    message: '未找到',
+    fix: '运行 spec-first init 创建 specs 目录',
+  };
 }
 
 function checkConfig(root: string): CheckResult {
@@ -130,7 +145,12 @@ function checkFeatureDir(root: string, featureId: string): CheckResult {
   if (existsSync(dir)) {
     return { name: `Feature ${featureId}`, level: 'PASS', message: '目录已找到' };
   }
-  return { name: `Feature ${featureId}`, level: 'ERROR', message: '目录未找到', fix: '运行 spec-first init --feat ... 创建 Feature' };
+  return {
+    name: `Feature ${featureId}`,
+    level: 'ERROR',
+    message: '目录未找到',
+    fix: '运行 spec-first init --feat ... 创建 Feature',
+  };
 }
 
 function checkStageState(root: string, featureId: string): CheckResult {
@@ -153,7 +173,9 @@ function checkBackgroundInput(root: string, featureId: string): CheckResult {
   }
 
   try {
-    const state = JSON.parse(readFileSync(stageStatePath, 'utf-8')) as { backgroundInputStatus?: string };
+    const state = JSON.parse(readFileSync(stageStatePath, 'utf-8')) as {
+      backgroundInputStatus?: string;
+    };
     const status = state.backgroundInputStatus;
     if (status === 'full') {
       return { name: 'Background Input', level: 'PASS', message: 'full' };
@@ -185,12 +207,14 @@ function checkBackgroundInput(root: string, featureId: string): CheckResult {
 function checkFirstRuntimeProjection(root: string): CheckResult[] {
   const index = readFirstRuntimeIndex(root);
   if (!index) {
-    return [{
-      name: 'First Stage Views',
-      level: 'WARNING',
-      message: '未找到 runtime index',
-      fix: '先执行 /spec-first:first 生成 .spec-first/runtime/first/index.json',
-    }];
+    return [
+      {
+        name: 'First Stage Views',
+        level: 'WARNING',
+        message: '未找到 runtime index',
+        fix: '先执行 /spec-first:first 生成 .spec-first/runtime/first/index.json',
+      },
+    ];
   }
 
   const results: CheckResult[] = [];
@@ -198,8 +222,14 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
   results.push({
     name: 'First Stage Views',
     level: index.stageViews.healthy ? 'PASS' : 'WARNING',
-    message: index.stageViews.healthy ? 'healthy' : (stageViewIssues ? `异常: ${stageViewIssues}` : 'unhealthy'),
-    fix: index.stageViews.healthy ? undefined : '重新执行 /spec-first:first，修复 stage-views 产物健康状态',
+    message: index.stageViews.healthy
+      ? 'healthy'
+      : stageViewIssues
+        ? `异常: ${stageViewIssues}`
+        : 'unhealthy',
+    fix: index.stageViews.healthy
+      ? undefined
+      : '重新执行 /spec-first:first，修复 stage-views 产物健康状态',
   });
 
   const driftDocs = Object.entries(index.docsProjection)
@@ -210,7 +240,10 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
     name: 'Docs Projection Sync',
     level: driftDocs.length === 0 ? 'PASS' : 'WARNING',
     message: driftDocs.length === 0 ? '已同步' : `失同步: ${driftDocs.join(', ')}`,
-    fix: driftDocs.length === 0 ? undefined : '重新生成 docs 投影视图，确保 runtime 真源与 docs 投影视图保持同步',
+    fix:
+      driftDocs.length === 0
+        ? undefined
+        : '重新生成 docs 投影视图，确保 runtime 真源与 docs 投影视图保持同步',
   });
 
   return results;
@@ -219,26 +252,45 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
 /** Hook 安装状态检查 */
 function checkHookStatus(root: string): CheckResult[] {
   if (!existsSync(join(root, '.git'))) {
-    return [{
-      name: 'Git Hooks',
-      level: 'PASS',
-      message: '未检测到 .git（非 Git 仓库，已跳过）',
-    }];
+    return [
+      {
+        name: 'Git Hooks',
+        level: 'PASS',
+        message: '未检测到 .git（非 Git 仓库，已跳过）',
+      },
+    ];
   }
 
   try {
     const statuses = checkHooks(root);
-    return statuses.map(s => {
+    return statuses.map((s) => {
       if (s.installed && s.isSpecFirst) {
         return { name: `Hook: ${s.name}`, level: 'PASS' as Level, message: '已安装' };
       }
       if (s.installed) {
-        return { name: `Hook: ${s.name}`, level: 'WARNING' as Level, message: '已存在但非 spec-first', fix: '运行 spec-first hooks install' };
+        return {
+          name: `Hook: ${s.name}`,
+          level: 'WARNING' as Level,
+          message: '已存在但非 spec-first',
+          fix: '运行 spec-first hooks install',
+        };
       }
-      return { name: `Hook: ${s.name}`, level: 'WARNING' as Level, message: '未安装', fix: '运行 spec-first hooks install' };
+      return {
+        name: `Hook: ${s.name}`,
+        level: 'WARNING' as Level,
+        message: '未安装',
+        fix: '运行 spec-first hooks install',
+      };
     });
   } catch {
-    return [{ name: 'Git Hooks', level: 'WARNING', message: '无法检查（缺少 .git?）', fix: '请先初始化 Git 仓库' }];
+    return [
+      {
+        name: 'Git Hooks',
+        level: 'WARNING',
+        message: '无法检查（缺少 .git?）',
+        fix: '请先初始化 Git 仓库',
+      },
+    ];
   }
 }
 
@@ -295,7 +347,9 @@ function checkSessionHook(): CheckResult {
 
     // 检查首轮注入关键内容（路由表 + 1% 规则 + catchup + viewer）
     const entry = specFirstEntry as SessionHookEntry;
-    const firstHook = Array.isArray(entry.hooks) ? entry.hooks[0] as SessionHookCommandEntry | undefined : undefined;
+    const firstHook = Array.isArray(entry.hooks)
+      ? (entry.hooks[0] as SessionHookCommandEntry | undefined)
+      : undefined;
     const firstCommand = firstHook?.command;
     const command = typeof firstCommand === 'string' ? firstCommand : '';
     const hasRouteMap = command.includes('技能路由表') || command.includes('route');
@@ -344,7 +398,12 @@ function checkGateDegradation(root: string, _featureId: string): CheckResult {
     resetConfigCache();
     const config = loadConfig(root);
     if (config.gate.pilot_mode) {
-      return { name: 'Gate Degradation', level: 'WARNING', message: 'pilot_mode 已开启 — gate 仅提示不阻断', fix: '准备强校验时请设置 pilot_mode: false' };
+      return {
+        name: 'Gate Degradation',
+        level: 'WARNING',
+        message: 'pilot_mode 已开启 — gate 仅提示不阻断',
+        fix: '准备强校验时请设置 pilot_mode: false',
+      };
     }
     return { name: 'Gate Degradation', level: 'PASS', message: '强校验模式' };
   } catch (e) {

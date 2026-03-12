@@ -37,14 +37,20 @@ function normalizeHeader(cell: string): string {
 }
 
 export function normalizeTaskPlanStatus(value: string): ParsedTaskStatus {
-  const normalized = value.trim().toLowerCase().replace(/[-\s]+/g, '_');
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .replace(/[-\s]+/g, '_');
   if (['complete', 'completed', 'done', 'verified'].includes(normalized)) return 'complete';
   if (['in_progress', 'wip', 'doing', '进行中'].includes(normalized)) return 'in_progress';
   if (['blocked'].includes(normalized)) return 'blocked';
   return 'pending';
 }
 
-function resolveColumnIndex(headers: string[], kind: 'task_id' | 'title' | 'status' | 'depends_on' | 'traces' | 'owner'): number {
+function resolveColumnIndex(
+  headers: string[],
+  kind: 'task_id' | 'title' | 'status' | 'depends_on' | 'traces' | 'owner'
+): number {
   const exact = {
     task_id: ['task_id', 'taskid', 'id'],
     title: ['title', '标题'],
@@ -74,7 +80,8 @@ export function parseTaskPlanContent(content: string): ParsedTaskPlan {
   for (let index = 0; index < lines.length - 1; index++) {
     const header = lines[index]?.trim() ?? '';
     const divider = lines[index + 1]?.trim() ?? '';
-    if (!header.startsWith('|') || !divider.startsWith('|') || !/^\|[\s\-:|]+$/.test(divider)) continue;
+    if (!header.startsWith('|') || !divider.startsWith('|') || !/^\|[\s\-:|]+$/.test(divider))
+      continue;
 
     const rawHeaders = splitMarkdownRow(header);
     const normalizedHeaders = rawHeaders.map(normalizeHeader);
@@ -96,14 +103,20 @@ export function parseTaskPlanContent(content: string): ParsedTaskPlan {
       const tracesIdx = resolveColumnIndex(normalizedHeaders, 'traces');
       const ownerIdx = resolveColumnIndex(normalizedHeaders, 'owner');
 
-      const dependsOn = dependsIdx === -1 ? [] : (row[dependsIdx] ?? '')
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item && item !== '-');
-      const traces = tracesIdx === -1 ? [] : (row[tracesIdx] ?? '')
-        .split(',')
-        .map((item) => item.trim())
-        .filter((item) => item && item !== '-');
+      const dependsOn =
+        dependsIdx === -1
+          ? []
+          : (row[dependsIdx] ?? '')
+              .split(',')
+              .map((item) => item.trim())
+              .filter((item) => item && item !== '-');
+      const traces =
+        tracesIdx === -1
+          ? []
+          : (row[tracesIdx] ?? '')
+              .split(',')
+              .map((item) => item.trim())
+              .filter((item) => item && item !== '-');
 
       tasks.push({
         id: taskId.toUpperCase(),
@@ -111,7 +124,7 @@ export function parseTaskPlanContent(content: string): ParsedTaskPlan {
         status: normalizeTaskPlanStatus(row[statusIdx] ?? ''),
         dependsOn,
         traces,
-        owner: ownerIdx === -1 ? undefined : ((row[ownerIdx] ?? '').trim() || undefined),
+        owner: ownerIdx === -1 ? undefined : (row[ownerIdx] ?? '').trim() || undefined,
       });
     }
 
@@ -159,13 +172,14 @@ export function toTaskNodes(plan: ParsedTaskPlan): TaskNode[] {
     description: '',
     acceptanceCriteria: [],
     dependsOn: task.dependsOn,
-    status: task.status === 'complete'
-      ? 'done'
-      : task.status === 'in_progress'
-        ? 'in_progress'
-        : task.status === 'blocked'
-          ? 'blocked'
-          : 'todo',
+    status:
+      task.status === 'complete'
+        ? 'done'
+        : task.status === 'in_progress'
+          ? 'in_progress'
+          : task.status === 'blocked'
+            ? 'blocked'
+            : 'todo',
     relatedFR: task.traces.filter((trace) => trace.startsWith('FR-')),
     relatedDS: task.traces.filter((trace) => trace.startsWith('DS-')),
   }));

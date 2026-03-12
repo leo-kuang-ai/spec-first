@@ -58,7 +58,7 @@ function nextDefectSeq(projectRoot: string, featureId: string): number {
 export function registerDefect(
   featureId: string,
   opts: DefectRegisterOptions,
-  projectRoot: string,
+  projectRoot: string
 ): DefectRecord {
   const dir = defectDir(projectRoot, featureId);
   ensureDir(dir);
@@ -86,11 +86,7 @@ export function registerDefect(
 }
 
 /** 获取单个缺陷 */
-export function getDefect(
-  featureId: string,
-  seq: number,
-  projectRoot: string,
-): DefectRecord {
+export function getDefect(featureId: string, seq: number, projectRoot: string): DefectRecord {
   const p = defectPath(projectRoot, featureId, seq);
   if (!exists(p)) {
     throw new Error(`未找到缺陷 #${seq}（${featureId}）`);
@@ -103,7 +99,7 @@ export function transitionDefect(
   featureId: string,
   seq: number,
   status: DefectStatus,
-  projectRoot: string,
+  projectRoot: string
 ): DefectRecord {
   const record = getDefect(featureId, seq, projectRoot);
   assertDefectTransition(record.status, status);
@@ -119,7 +115,7 @@ export function transitionDefect(
 export function listDefects(
   featureId: string,
   projectRoot: string,
-  filter?: DefectFilter,
+  filter?: DefectFilter
 ): DefectRecord[] {
   const dir = defectDir(projectRoot, featureId);
   if (!exists(dir)) return [];
@@ -147,20 +143,15 @@ export interface EscapeRateResult {
   rate: number;
 }
 
-const POST_VERIFY_STAGES: ReadonlySet<string> = new Set([
-  '06_wrap_up', '07_release', '08_done',
-]);
+const POST_VERIFY_STAGES: ReadonlySet<string> = new Set(['06_wrap_up', '07_release', '08_done']);
 
-export function getEscapeRate(
-  featureId: string,
-  projectRoot: string,
-): EscapeRateResult {
+export function getEscapeRate(featureId: string, projectRoot: string): EscapeRateResult {
   const all = listDefects(featureId, projectRoot);
   const total = all.length;
   if (total === 0) return { total: 0, escaped: 0, rate: 0 };
 
   const escaped = all.filter(
-    (d) => d.discoveredIn && POST_VERIFY_STAGES.has(d.discoveredIn),
+    (d) => d.discoveredIn && POST_VERIFY_STAGES.has(d.discoveredIn)
   ).length;
 
   return { total, escaped, rate: escaped / total };

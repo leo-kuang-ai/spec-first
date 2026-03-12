@@ -46,46 +46,26 @@ export interface MergedRules {
 /** 基线 Gate 条件（各阶段通用最低要求） */
 function layer0Gates(): Record<string, GateCondition[]> {
   return {
-    '01_specify': [
-      { id: 'L0-SPEC-001', description: 'FR/NFR 列表存在且非空' },
-    ],
-    '02_design': [
-      { id: 'L0-DESIGN-001', description: '设计文档存在' },
-    ],
-    '03_plan': [
-      { id: 'L0-PLAN-001', description: 'task_plan.md 存在且非空' },
-    ],
-    '04_implement': [
-      { id: 'L0-IMPL-001', description: '追踪矩阵覆盖率 ≥ 基线' },
-    ],
-    '05_verify': [
-      { id: 'L0-VERIFY-001', description: '测试用例存在且通过' },
-    ],
-    '06_wrap_up': [
-      { id: 'L0-WRAP-001', description: '归档清单完整' },
-    ],
+    '01_specify': [{ id: 'L0-SPEC-001', description: 'FR/NFR 列表存在且非空' }],
+    '02_design': [{ id: 'L0-DESIGN-001', description: '设计文档存在' }],
+    '03_plan': [{ id: 'L0-PLAN-001', description: 'task_plan.md 存在且非空' }],
+    '04_implement': [{ id: 'L0-IMPL-001', description: '追踪矩阵覆盖率 ≥ 基线' }],
+    '05_verify': [{ id: 'L0-VERIFY-001', description: '测试用例存在且通过' }],
+    '06_wrap_up': [{ id: 'L0-WRAP-001', description: '归档清单完整' }],
   };
 }
 
 /** 基线产出物（各阶段标准交付物） */
 function layer0Deliverables(): Record<string, Deliverable[]> {
   return {
-    '01_specify': [
-      { name: 'spec.md', required: true, description: 'FR/NFR 列表' },
-    ],
+    '01_specify': [{ name: 'spec.md', required: true, description: 'FR/NFR 列表' }],
     '02_design': [
       { name: 'design.md', required: true, description: '技术设计文档' },
       { name: 'api-contract.yaml', required: true, description: 'API 契约' },
     ],
-    '03_plan': [
-      { name: 'task_plan.md', required: true, description: '任务计划' },
-    ],
-    '05_verify': [
-      { name: 'reports/test-report.md', required: true, description: '测试报告' },
-    ],
-    '06_wrap_up': [
-      { name: 'retro.md', required: true, description: '归档复盘记录' },
-    ],
+    '03_plan': [{ name: 'task_plan.md', required: true, description: '任务计划' }],
+    '05_verify': [{ name: 'reports/test-report.md', required: true, description: '测试报告' }],
+    '06_wrap_up': [{ name: 'retro.md', required: true, description: '归档复盘记录' }],
     '07_release': RELEASE_REQUIRED_ARTIFACTS.map((name) => ({
       name,
       required: true,
@@ -100,7 +80,7 @@ function applyLayer1(
   gates: Record<string, GateCondition[]>,
   deliverables: Record<string, Deliverable[]>,
   mode: Mode,
-  size: Size,
+  size: Size
 ): void {
   // Mode I 追加
   if (mode === 'I') {
@@ -111,11 +91,15 @@ function applyLayer1(
     });
     deliverables['01_specify'] = deliverables['01_specify'] ?? [];
     deliverables['01_specify'].push({
-      name: 'impact-analysis.md', required: true, description: '变更影响分析',
+      name: 'impact-analysis.md',
+      required: true,
+      description: '变更影响分析',
     });
     deliverables['05_verify'] = deliverables['05_verify'] ?? [];
     deliverables['05_verify'].push({
-      name: 'reports/regression-report.md', required: true, description: '回归验证报告',
+      name: 'reports/regression-report.md',
+      required: true,
+      description: '回归验证报告',
     });
   }
 
@@ -123,26 +107,34 @@ function applyLayer1(
   if (size === 'M' || size === 'L') {
     deliverables['01_specify'] = deliverables['01_specify'] ?? [];
     deliverables['01_specify'].push({
-      name: 'user-stories.md', required: false, description: '用户故事',
+      name: 'user-stories.md',
+      required: false,
+      description: '用户故事',
     });
     deliverables['02_design'] = deliverables['02_design'] ?? [];
     deliverables['02_design'].push({
-      name: 'data-model.md', required: false, description: '数据模型',
+      name: 'data-model.md',
+      required: false,
+      description: '数据模型',
     });
   }
   if (size === 'L') {
     deliverables['02_design'] = deliverables['02_design'] ?? [];
     deliverables['02_design'].push({
-      name: 'adr/', required: false, description: '架构决策记录',
+      name: 'adr/',
+      required: false,
+      description: '架构决策记录',
     });
     deliverables['03_plan'] = deliverables['03_plan'] ?? [];
     deliverables['03_plan'].push({
-      name: 'risk-matrix.md', required: false, description: '风险矩阵',
+      name: 'risk-matrix.md',
+      required: false,
+      description: '风险矩阵',
     });
     deliverables['05_verify'] = deliverables['05_verify'] ?? [];
     deliverables['05_verify'].push(
       { name: 'reports/perf-report.md', required: false, description: '性能测试报告' },
-      { name: 'reports/security-scan.md', required: false, description: '安全扫描报告' },
+      { name: 'reports/security-scan.md', required: false, description: '安全扫描报告' }
     );
   }
 }
@@ -219,14 +211,11 @@ function parseThresholdNumber(raw: unknown): number | undefined {
   return Number.isNaN(value) ? undefined : value;
 }
 
-function normalizeThresholdEntry(
-  raw: unknown,
-  key: string,
-  platform: string,
-): ThresholdEntry {
-  const asObjectEntry = raw && typeof raw === 'object' && !Array.isArray(raw)
-    ? (raw as Record<string, unknown>)
-    : undefined;
+function normalizeThresholdEntry(raw: unknown, key: string, platform: string): ThresholdEntry {
+  const asObjectEntry =
+    raw && typeof raw === 'object' && !Array.isArray(raw)
+      ? (raw as Record<string, unknown>)
+      : undefined;
 
   const parsedValue = asObjectEntry
     ? parseThresholdNumber(asObjectEntry.value)
@@ -234,22 +223,27 @@ function normalizeThresholdEntry(
 
   if (parsedValue === undefined) {
     throw new Error(
-      `平台 "${platform}" 的阈值 "${key}" 数值无效。`
-      + '请使用数字或可解析的数字字符串（如 500、500ms、80%）。',
+      `平台 "${platform}" 的阈值 "${key}" 数值无效。` +
+        '请使用数字或可解析的数字字符串（如 500、500ms、80%）。'
     );
   }
 
   const explicitDirection = asObjectEntry?.direction;
-  if (explicitDirection !== undefined
-      && (typeof explicitDirection !== 'string'
-        || !THRESHOLD_DIRECTIONS.includes(explicitDirection as ThresholdEntry['direction']))) {
-    throw new Error(`平台 "${platform}" 的阈值 "${key}" direction 无效："${String(explicitDirection)}"`);
+  if (
+    explicitDirection !== undefined &&
+    (typeof explicitDirection !== 'string' ||
+      !THRESHOLD_DIRECTIONS.includes(explicitDirection as ThresholdEntry['direction']))
+  ) {
+    throw new Error(
+      `平台 "${platform}" 的阈值 "${key}" direction 无效："${String(explicitDirection)}"`
+    );
   }
 
-  const direction = (explicitDirection as ThresholdEntry['direction'] | undefined) || inferDirection(key);
+  const direction =
+    (explicitDirection as ThresholdEntry['direction'] | undefined) || inferDirection(key);
   if (!direction) {
     throw new Error(
-      `无法推断平台 "${platform}" 的阈值 "${key}" direction，请显式配置 direction 字段。`,
+      `无法推断平台 "${platform}" 的阈值 "${key}" direction，请显式配置 direction 字段。`
     );
   }
 
@@ -261,7 +255,7 @@ function applyLayer2(
   deliverables: Record<string, Deliverable[]>,
   thresholds: Record<string, ThresholdEntry>,
   platforms: string[],
-  projectRoot: string,
+  projectRoot: string
 ): void {
   for (const platform of platforms) {
     const py = loadPlatformYaml(platform, projectRoot);
@@ -274,7 +268,7 @@ function applyLayer2(
           const conflict = gates[stage].find((g) => g.id === cond.id);
           if (conflict) {
             throw new Error(
-              `Gate ID 冲突：阶段 ${stage} 中存在重复 ID ${cond.id}（平台：${platform}）`,
+              `Gate ID 冲突：阶段 ${stage} 中存在重复 ID ${cond.id}（平台：${platform}）`
             );
           }
           gates[stage].push(cond);
@@ -332,7 +326,7 @@ function applyExtensionRules(
   gates: Record<string, GateCondition[]>,
   deliverables: Record<string, Deliverable[]>,
   thresholds: Record<string, ThresholdEntry>,
-  projectRoot: string,
+  projectRoot: string
 ): Array<{ namespace: string; version: string }> {
   const loaded = loadEnabledExtensions(projectRoot);
   const applied: Array<{ namespace: string; version: string }> = [];
@@ -345,8 +339,14 @@ function applyExtensionRules(
     }
 
     const gateConditionsRaw = rules.gate_conditions;
-    if (gateConditionsRaw && typeof gateConditionsRaw === 'object' && !Array.isArray(gateConditionsRaw)) {
-      for (const [stage, conditions] of Object.entries(gateConditionsRaw as Record<string, unknown>)) {
+    if (
+      gateConditionsRaw &&
+      typeof gateConditionsRaw === 'object' &&
+      !Array.isArray(gateConditionsRaw)
+    ) {
+      for (const [stage, conditions] of Object.entries(
+        gateConditionsRaw as Record<string, unknown>
+      )) {
         if (!Array.isArray(conditions)) {
           throw new Error(`扩展 "${ext.namespace}" 的 gate_conditions.${stage} 必须为数组`);
         }
@@ -444,7 +444,7 @@ function applyLayer3(
   gates: Record<string, GateCondition[]>,
   deliverables: Record<string, Deliverable[]>,
   thresholds: Record<string, ThresholdEntry>,
-  projectRoot: string,
+  projectRoot: string
 ): void {
   const local = loadLocalYaml(projectRoot);
 
@@ -466,7 +466,7 @@ function applyLayer3(
         const conflict = gates[stage].find((g) => g.id === cond.id);
         if (conflict) {
           throw new Error(
-            `本地 layer3.yaml 的 Gate ID 冲突：${cond.id}（阶段 ${stage}）。若意图覆盖，请使用唯一 ID 或先删除原规则。`,
+            `本地 layer3.yaml 的 Gate ID 冲突：${cond.id}（阶段 ${stage}）。若意图覆盖，请使用唯一 ID 或先删除原规则。`
           );
         }
         gates[stage].push(cond);
@@ -520,7 +520,7 @@ export function mergeLayerRules(
   mode: Mode,
   size: Size,
   platforms: string[],
-  projectRoot: string,
+  projectRoot: string
 ): MergedRules {
   // Layer 0: 基线
   const gates = layer0Gates();

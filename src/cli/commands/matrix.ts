@@ -16,9 +16,12 @@ export function handleMatrix(args: string[]): number {
   }
 
   switch (sub) {
-    case 'check':  return handleCheck(rest);
-    case 'export': return handleExport(rest);
-    case 'update': return handleUpdate(rest);
+    case 'check':
+      return handleCheck(rest);
+    case 'export':
+      return handleExport(rest);
+    case 'update':
+      return handleUpdate(rest);
     default:
       console.error(`未知 matrix 子命令：${sub}`);
       console.log('子命令：check, export, update');
@@ -90,7 +93,7 @@ function handleExport(args: string[]): number {
   }
 
   const formatIdx = args.indexOf('--format');
-  const format = (formatIdx !== -1 && args[formatIdx + 1]) as 'markdown' | 'yaml' || 'markdown';
+  const format = ((formatIdx !== -1 && args[formatIdx + 1]) as 'markdown' | 'yaml') || 'markdown';
 
   try {
     const output = exportMatrix(featureId, process.cwd(), format);
@@ -106,7 +109,9 @@ function handleUpdate(args: string[]): number {
   const featureId = args[0];
   const id = args[1];
   if (!featureId || !id) {
-    console.error('用法：spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]');
+    console.error(
+      '用法：spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]'
+    );
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -116,10 +121,22 @@ function handleUpdate(args: string[]): number {
     const val = args[i + 1];
     if (!val) break;
     switch (flag) {
-      case '--status':   updates.status = val; i++; break;
-      case '--title':    updates.title = val; i++; break;
-      case '--upstream': updates.upstream = val.split(',').map(s => s.trim()); i++; break;
-      case '--downstream': updates.downstream = val.split(',').map(s => s.trim()); i++; break;
+      case '--status':
+        updates.status = val;
+        i++;
+        break;
+      case '--title':
+        updates.title = val;
+        i++;
+        break;
+      case '--upstream':
+        updates.upstream = val.split(',').map((s) => s.trim());
+        i++;
+        break;
+      case '--downstream':
+        updates.downstream = val.split(',').map((s) => s.trim());
+        i++;
+        break;
     }
   }
 

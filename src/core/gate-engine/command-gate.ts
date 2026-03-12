@@ -72,7 +72,7 @@ function tokenizeCommandSegment(segment: string): string[] {
       continue;
     }
 
-    if (ch === '\'' && !inDouble) {
+    if (ch === "'" && !inDouble) {
       inSingle = !inSingle;
       continue;
     }
@@ -105,7 +105,7 @@ function scanTopLevelOperator(expression: string): string | undefined {
     const ch = expression[i];
     const next = expression[i + 1];
 
-    if (ch === '\'' && !inDouble) {
+    if (ch === "'" && !inDouble) {
       inSingle = !inSingle;
       continue;
     }
@@ -152,7 +152,7 @@ function splitByLogicalAnd(expression: string): string[] {
     const ch = expression[i];
     const next = expression[i + 1];
 
-    if (ch === '\'' && !inDouble) {
+    if (ch === "'" && !inDouble) {
       inSingle = !inSingle;
       current += ch;
       continue;
@@ -223,12 +223,10 @@ function executeArgvCommand(segment: string, cwd: string): CommandExecutionResul
   } catch (err: unknown) {
     if (err instanceof Error) {
       const typed = err as Error & { stderr?: Buffer | string; stdout?: Buffer | string };
-      const stderr = typeof typed.stderr === 'string'
-        ? typed.stderr
-        : typed.stderr?.toString('utf-8');
-      const stdout = typeof typed.stdout === 'string'
-        ? typed.stdout
-        : typed.stdout?.toString('utf-8');
+      const stderr =
+        typeof typed.stderr === 'string' ? typed.stderr : typed.stderr?.toString('utf-8');
+      const stdout =
+        typeof typed.stdout === 'string' ? typed.stdout : typed.stdout?.toString('utf-8');
       return {
         pass: false,
         detail: tailDetail(stderr || stdout || typed.message),
@@ -298,4 +296,3 @@ export function runCommandGate(command: string, cwd: string): { pass: boolean; d
   const result = executeCommandExpression(command, cwd);
   return { pass: result.pass, detail: result.detail };
 }
-

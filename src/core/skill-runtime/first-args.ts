@@ -20,7 +20,14 @@
  */
 
 export type FirstMode = 'quick' | 'deep';
-export type PlatformType = 'backend' | 'frontend' | 'mobile' | 'cross-platform' | 'desktop' | 'monorepo' | 'mixed';
+export type PlatformType =
+  | 'backend'
+  | 'frontend'
+  | 'mobile'
+  | 'cross-platform'
+  | 'desktop'
+  | 'monorepo'
+  | 'mixed';
 
 /** 所有可能的产物名称 */
 export const PRODUCT_NAMES = [
@@ -36,7 +43,7 @@ export const PRODUCT_NAMES = [
   'development-guidelines',
   'README',
 ] as const;
-export type ProductName = typeof PRODUCT_NAMES[number];
+export type ProductName = (typeof PRODUCT_NAMES)[number];
 
 export interface FirstArgs {
   mode: FirstMode;
@@ -58,14 +65,21 @@ export const E_FIRST_ARGS_INVALID_TYPE = 'E_FIRST_ARGS_INVALID_TYPE';
 export class FirstArgsError extends Error {
   constructor(
     public readonly code: string,
-    message: string,
+    message: string
   ) {
     super(message);
     this.name = 'FirstArgsError';
   }
 }
 
-const ALLOWED_FLAGS = new Set(['--auto', '--quick', '--deep', '--force', '--skip', '--check-health']);
+const ALLOWED_FLAGS = new Set([
+  '--auto',
+  '--quick',
+  '--deep',
+  '--force',
+  '--skip',
+  '--check-health',
+]);
 const TYPE_PREFIX = '--type=';
 const UPDATE_PREFIX = '--update=';
 const SINCE_PREFIX = '--since=';
@@ -87,10 +101,7 @@ const VALID_TYPES = new Set<PlatformType>([
  * @returns 校验后的参数对象
  * @throws FirstArgsError 参数错误时抛出
  */
-export function validateFirstArgs(
-  args: string[],
-  onWarn?: (msg: string) => void,
-): FirstArgs {
+export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void): FirstArgs {
   const result: FirstArgs = {
     mode: 'quick', // 默认 quick 模式
     modeExplicit: false,
@@ -110,17 +121,22 @@ export function validateFirstArgs(
       seen.add(UPDATE_PREFIX);
 
       const productsStr = arg.slice(UPDATE_PREFIX.length);
-      const products = productsStr.split(',').map(p => p.trim()).filter(p => p);
+      const products = productsStr
+        .split(',')
+        .map((p) => p.trim())
+        .filter((p) => p);
       const validProducts: ProductName[] = [];
 
       for (const product of products) {
-        const productName = product.endsWith('.md') ? product.slice(0, -3) as ProductName : product as ProductName;
+        const productName = product.endsWith('.md')
+          ? (product.slice(0, -3) as ProductName)
+          : (product as ProductName);
         if (PRODUCT_NAMES.includes(productName)) {
           validProducts.push(productName);
         } else {
           throw new FirstArgsError(
             E_FIRST_ARGS_UNKNOWN,
-            `无效的产物名称: ${product}。有效值: ${PRODUCT_NAMES.join(', ')}`,
+            `无效的产物名称: ${product}。有效值: ${PRODUCT_NAMES.join(', ')}`
           );
         }
       }
@@ -151,7 +167,7 @@ export function validateFirstArgs(
       if (!VALID_TYPES.has(typeValue as PlatformType)) {
         throw new FirstArgsError(
           E_FIRST_ARGS_INVALID_TYPE,
-          `无效的 --type 值: ${typeValue}。有效值: ${Array.from(VALID_TYPES).join(', ')}`,
+          `无效的 --type 值: ${typeValue}。有效值: ${Array.from(VALID_TYPES).join(', ')}`
         );
       }
       result.type = typeValue as PlatformType;
@@ -194,7 +210,7 @@ export function validateFirstArgs(
     // 未知参数
     throw new FirstArgsError(
       E_FIRST_ARGS_UNKNOWN,
-      `未知参数: ${arg}。有效参数: --auto, --quick, --deep, --type=<value>, --force, --skip, --update=<products>, --since=<commit|version>, --check-health`,
+      `未知参数: ${arg}。有效参数: --auto, --quick, --deep, --type=<value>, --force, --skip, --update=<products>, --since=<commit|version>, --check-health`
     );
   }
 
@@ -208,7 +224,7 @@ export function validateFirstArgs(
  */
 export function resolveFirstConfirmPolicy(args: FirstArgs): 'skip' | 'require' {
   // --auto, --force, --skip, 显式 --quick/--deep 都跳过交互
-  return (args.auto || args.force || args.skip || args.modeExplicit) ? 'skip' : 'require';
+  return args.auto || args.force || args.skip || args.modeExplicit ? 'skip' : 'require';
 }
 
 /**

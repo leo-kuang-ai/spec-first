@@ -5,7 +5,11 @@
 import { join } from 'node:path';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { ExitCode } from '../../shared/types.js';
-import { advance, GateUnavailableError, GateFailedError } from '../../core/process-engine/advance.js';
+import {
+  advance,
+  GateUnavailableError,
+  GateFailedError,
+} from '../../core/process-engine/advance.js';
 import { cancel } from '../../core/process-engine/advance.js';
 import { getFeatureState } from '../../core/process-engine/feature.js';
 import { checkDependencies } from '../../core/process-engine/dependency-checker.js';
@@ -18,7 +22,7 @@ import { parseFlag } from '../parse-utils.js';
 
 /** AI Runtime Hook 类型常量 */
 const AI_HOOK_TYPES = ['PreToolUse', 'PostToolUse', 'Stop'] as const;
-type AIHookType = typeof AI_HOOK_TYPES[number];
+type AIHookType = (typeof AI_HOOK_TYPES)[number];
 
 /** AI Hooks 状态检查结果 */
 interface AIHooksStatus {
@@ -30,10 +34,14 @@ export function handleStage(args: string[]): number {
   const rest = args.slice(1);
 
   switch (sub) {
-    case 'current': return handleCurrent(rest);
-    case 'suggest': return handleSuggest(rest);
-    case 'advance': return handleAdvance(rest);
-    case 'cancel':  return handleCancel(rest);
+    case 'current':
+      return handleCurrent(rest);
+    case 'suggest':
+      return handleSuggest(rest);
+    case 'advance':
+      return handleAdvance(rest);
+    case 'cancel':
+      return handleCancel(rest);
     default:
       console.error(`未知 stage 子命令：${sub}`);
       printStageHelp();
@@ -115,8 +123,12 @@ function handleCurrent(args: string[]): number {
     console.log(`终态：${state.terminal}`);
 
     const hookStatuses = checkHooks(projectRoot);
-    const installedHooks = hookStatuses.filter((h) => h.installed && h.isSpecFirst).map((h) => h.name);
-    const missingHooks = hookStatuses.filter((h) => !h.installed || !h.isSpecFirst).map((h) => h.name);
+    const installedHooks = hookStatuses
+      .filter((h) => h.installed && h.isSpecFirst)
+      .map((h) => h.name);
+    const missingHooks = hookStatuses
+      .filter((h) => !h.installed || !h.isSpecFirst)
+      .map((h) => h.name);
     console.log(`\nHooks：`);
     console.log(`  已安装: ${installedHooks.length > 0 ? installedHooks.join(', ') : '(无)'}`);
     if (missingHooks.length > 0) {
@@ -125,7 +137,9 @@ function handleCurrent(args: string[]): number {
 
     const aiHooksStatus = checkAIHooksStatus(projectRoot);
     console.log(`\nAI Hooks：`);
-    console.log(`  已注册: ${aiHooksStatus.registered.length > 0 ? aiHooksStatus.registered.join(', ') : '(无)'}`);
+    console.log(
+      `  已注册: ${aiHooksStatus.registered.length > 0 ? aiHooksStatus.registered.join(', ') : '(无)'}`
+    );
 
     const skillCount = countSkillCommands(projectRoot);
     console.log(`\nSkill 命令：`);
@@ -155,10 +169,13 @@ function handleSuggest(args: string[]): number {
       currentStage: state.currentStage,
       stageStatus: state.stageStatus,
       autoAdvancePolicy: state.autoAdvancePolicy,
-      gateStatus: state.stageStatus === 'ready_to_advance'
-        ? evaluateGate(featureId, projectRoot, { persist: false }).status
+      gateStatus:
+        state.stageStatus === 'ready_to_advance'
+          ? evaluateGate(featureId, projectRoot, { persist: false }).status
+          : undefined,
+      dependencyCheck: upcomingStage
+        ? checkDependencies(featureId, upcomingStage, projectRoot)
         : undefined,
-      dependencyCheck: upcomingStage ? checkDependencies(featureId, upcomingStage, projectRoot) : undefined,
       todoState: loadTodoState(featureId, projectRoot),
     });
 

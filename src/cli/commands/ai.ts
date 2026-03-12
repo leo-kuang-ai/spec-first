@@ -12,9 +12,12 @@ import { getFirstRuntimeNotice } from '../../core/skill-runtime/dispatcher.js';
 export function handleAi(args: string[]): number {
   const sub = args[0];
   switch (sub) {
-    case 'context': return handleContext(args.slice(1));
-    case 'catchup': return handleCatchup(args.slice(1));
-    case 'stats': return handleStats(args.slice(1));
+    case 'context':
+      return handleContext(args.slice(1));
+    case 'catchup':
+      return handleCatchup(args.slice(1));
+    case 'stats':
+      return handleStats(args.slice(1));
     case 'task':
       console.error('提示：任务拆解请使用 Skill 命令');
       console.error('  执行：/spec-first:task <featureId>');
@@ -35,7 +38,10 @@ function handleContext(args: string[]): number {
   const fullDetail = args.includes('--full');
   const expandArg = parseFlag(args, '--expand');
   const expandPaths = expandArg
-    ? expandArg.split(',').map((item) => item.trim()).filter(Boolean)
+    ? expandArg
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean)
     : [];
 
   try {
@@ -55,12 +61,16 @@ function handleContext(args: string[]): number {
     if (pack.references.length > 0) {
       console.log('\n引用列表：');
       for (const ref of pack.references) {
-        console.log(`  ${ref.path}#${ref.selector ?? 'n/a'} [${ref.reason}] ${ref.checksum.slice(0, 8)}...`);
+        console.log(
+          `  ${ref.path}#${ref.selector ?? 'n/a'} [${ref.reason}] ${ref.checksum.slice(0, 8)}...`
+        );
       }
     }
 
     if (!fullDetail && expandPaths.length === 0) {
-      console.log('\n提示：默认摘要模式。需要详细上下文时可用 `--expand spec.md,design.md` 或 `--full`。');
+      console.log(
+        '\n提示：默认摘要模式。需要详细上下文时可用 `--expand spec.md,design.md` 或 `--full`。'
+      );
     }
 
     return valid ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
@@ -84,9 +94,7 @@ function handleCatchup(args: string[]): number {
 
     const firstNotice = getFirstRuntimeNotice(process.cwd());
     if (firstNotice) {
-      const cleaned = firstNotice
-        .replace(/<!--\s*\/?first-runtime-context\s*-->/g, '')
-        .trim();
+      const cleaned = firstNotice.replace(/<!--\s*\/?first-runtime-context\s*-->/g, '').trim();
       if (cleaned) {
         console.log(`\n${cleaned}`);
       }
@@ -121,7 +129,9 @@ function handleStats(args: string[]): number {
 
   console.log('按 Skill 统计：');
   for (const [skill, data] of Object.entries(summary.bySkill)) {
-    console.log(`  ${skill.padEnd(20)} ${data.calls} 次  ${data.tokensIn}/${data.tokensOut} tokens`);
+    console.log(
+      `  ${skill.padEnd(20)} ${data.calls} 次  ${data.tokensIn}/${data.tokensOut} tokens`
+    );
   }
 
   return ExitCode.SUCCESS;

@@ -6,14 +6,9 @@ import { join } from 'node:path';
 import { writeFileSync, chmodSync, readFileSync, unlinkSync } from 'node:fs';
 import { exists } from '../../shared/fs-utils.js';
 
-const HOOK_NAMES = [
-  'prepare-commit-msg',
-  'commit-msg',
-  'pre-push',
-  'pre-commit',
-] as const;
+const HOOK_NAMES = ['prepare-commit-msg', 'commit-msg', 'pre-push', 'pre-commit'] as const;
 
-export type HookName = typeof HOOK_NAMES[number];
+export type HookName = (typeof HOOK_NAMES)[number];
 
 export interface HookStatus {
   name: HookName;
@@ -95,7 +90,9 @@ function generateHookScript(name: HookName): string {
   switch (name) {
     case 'prepare-commit-msg':
       // 从分支名或 .spec-first/current + task_plan.md 提取当前 TASK ID，自动填充前缀
-      return header + `
+      return (
+        header +
+        `
 # Auto-fill TASK ID prefix in commit message
 CURRENT_FILE=".spec-first/current"
 if [ -f "$CURRENT_FILE" ]; then
@@ -112,11 +109,14 @@ if [ -f "$CURRENT_FILE" ]; then
     fi
   fi
 fi
-`;
+`
+      );
 
     case 'commit-msg':
       // 校验 commit message 格式：至少包含一个有效 ID 标识符
-      return header + `
+      return (
+        header +
+        `
 # Validate commit message contains at least one valid ID
 MSG=$(cat "$1")
 if ! echo "$MSG" | grep -qE '(TASK|FR|DS|TC|RFC|FSREQ)-'; then
@@ -124,11 +124,14 @@ if ! echo "$MSG" | grep -qE '(TASK|FR|DS|TC|RFC|FSREQ)-'; then
   echo "可用格式：[TASK-FEAT-NNN] <message>"
   exit 1
 fi
-`;
+`
+      );
 
     case 'pre-push':
       // 增量 SCA 检查
-      return header + `
+      return (
+        header +
+        `
 # Incremental SCA check before push
 if command -v npx >/dev/null 2>&1; then
   FEAT_FILE=".spec-first/current"
@@ -148,11 +151,14 @@ if command -v npx >/dev/null 2>&1; then
     exit 1
   fi
 fi
-`;
+`
+      );
 
     case 'pre-commit':
       // 基本格式校验
-      return header + `
+      return (
+        header +
+        `
 # Pre-commit validation
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMRD 2>/dev/null || true)
 if [ -z "$STAGED_FILES" ]; then
@@ -197,7 +203,8 @@ if [ "$HAS_CLAUDE" -ne 1 ]; then
 fi
 
 echo "spec-first: pre-commit 检查通过"
-`;
+`
+      );
   }
 }
 
@@ -205,7 +212,7 @@ echo "spec-first: pre-commit 检查通过"
 export function checkHooks(projectRoot: string): HookStatus[] {
   const hooksDir = join(projectRoot, '.git', 'hooks');
 
-  return HOOK_NAMES.map(name => {
+  return HOOK_NAMES.map((name) => {
     const hookPath = join(hooksDir, name);
     if (!exists(hookPath)) {
       return { name, installed: false, isSpecFirst: false };

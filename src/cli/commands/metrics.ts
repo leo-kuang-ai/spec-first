@@ -27,9 +27,12 @@ export function handleMetrics(args: string[]): number {
   const rest = args.slice(1);
 
   switch (sub) {
-    case 'coverage': return handleCoverage(rest);
-    case 'report': return handleReport(rest);
-    case 'health': return handleHealth(rest);
+    case 'coverage':
+      return handleCoverage(rest);
+    case 'report':
+      return handleReport(rest);
+    case 'health':
+      return handleHealth(rest);
     default:
       if (sub) console.error(`未知 metrics 子命令：${sub}`);
       printMetricsHelp();
@@ -39,7 +42,7 @@ export function handleMetrics(args: string[]): number {
 
 function handleCoverage(args: string[]): number {
   const jsonFlag = args.includes('--json');
-  const featureId = args.find(a => !a.startsWith('--'));
+  const featureId = args.find((a) => !a.startsWith('--'));
 
   if (!featureId) {
     console.error('用法：spec-first metrics coverage <featureId> [--json]');
@@ -71,9 +74,9 @@ function handleCoverage(args: string[]): number {
       const status = pass ? '通过' : '失败 *';
       console.log(
         `${def.key} ${def.name}`.padEnd(25) +
-        `${(current * 100).toFixed(1)}%`.padEnd(10) +
-        `${(def.target * 100).toFixed(0)}%`.padEnd(10) +
-        status,
+          `${(current * 100).toFixed(1)}%`.padEnd(10) +
+          `${(def.target * 100).toFixed(0)}%`.padEnd(10) +
+          status
       );
     }
 

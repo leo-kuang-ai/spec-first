@@ -18,16 +18,23 @@ export enum Stage {
 }
 
 /** 终态阶段 */
-export const TERMINAL_STAGES: ReadonlySet<Stage> = new Set([
-  Stage.DONE,
-  Stage.CANCELLED,
-]);
+export const TERMINAL_STAGES: ReadonlySet<Stage> = new Set([Stage.DONE, Stage.CANCELLED]);
 
 // ─── ID 类型 ──────────────────────────────────────────────
 export type NextIdType =
-  | 'FR' | 'DS' | 'TASK' | 'TC' | 'RFC'
-  | 'REQ' | 'SYS' | 'ARCH' | 'MOD'
-  | 'ATP' | 'STP' | 'ITP' | 'UTP';
+  | 'FR'
+  | 'DS'
+  | 'TASK'
+  | 'TC'
+  | 'RFC'
+  | 'REQ'
+  | 'SYS'
+  | 'ARCH'
+  | 'MOD'
+  | 'ATP'
+  | 'STP'
+  | 'ITP'
+  | 'UTP';
 export type IdType = NextIdType | 'Feature';
 
 /** TC 级别前缀 */
@@ -39,7 +46,12 @@ export type Size = 'S' | 'M' | 'L';
 
 export type BackgroundInputStatus = 'full' | 'degraded' | 'blind';
 
-export type StageStatus = 'drafting' | 'awaiting_review' | 'review_failed' | 'ready_to_advance' | 'advanced';
+export type StageStatus =
+  | 'drafting'
+  | 'awaiting_review'
+  | 'review_failed'
+  | 'ready_to_advance'
+  | 'advanced';
 export type AutoAdvancePolicy = 'suggest' | 'assisted' | 'auto_advance' | 'auto_run';
 // ─── ExitCode ─────────────────────────────────────────────
 export enum ExitCode {
@@ -75,7 +87,10 @@ export interface StageState {
   mergedRules?: {
     gateConditions: Record<string, unknown[]>;
     deliverables: Record<string, unknown[]>;
-    thresholds: Record<string, { value: number; direction: 'higher_is_better' | 'lower_is_better' }>;
+    thresholds: Record<
+      string,
+      { value: number; direction: 'higher_is_better' | 'lower_is_better' }
+    >;
   };
   currentStage: Stage;
   history: StageHistoryEntry[];

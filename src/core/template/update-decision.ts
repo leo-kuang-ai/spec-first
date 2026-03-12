@@ -36,7 +36,13 @@ export interface BatchUpdateDecision {
  * 检查本地是否有同名模板覆盖
  */
 function hasLocalOverride(templateName: string, projectRoot: string): boolean {
-  const localTemplatePath = join(projectRoot, '.spec-first', 'local', 'templates', `${templateName}.hbs`);
+  const localTemplatePath = join(
+    projectRoot,
+    '.spec-first',
+    'local',
+    'templates',
+    `${templateName}.hbs`
+  );
   return exists(localTemplatePath);
 }
 
@@ -46,10 +52,7 @@ function hasLocalOverride(templateName: string, projectRoot: string): boolean {
  * @param hasLocalOverride 本地是否有覆盖
  * @returns 更新决策
  */
-export function decideUpdate(
-  change: HashChange,
-  hasLocalOverride: boolean,
-): UpdateDecision {
+export function decideUpdate(change: HashChange, hasLocalOverride: boolean): UpdateDecision {
   const { template, changeType, level } = change;
 
   // 未变更：跳过
@@ -101,9 +104,7 @@ export function decideUpdate(
     return {
       template,
       action: 'AUTO_UPDATE',
-      reason: level === 'Major'
-        ? '流程/Skill 模板变更，无本地定制'
-        : '文档/辅助模板变更',
+      reason: level === 'Major' ? '流程/Skill 模板变更，无本地定制' : '文档/辅助模板变更',
       level,
       hasLocalOverride: false,
     };
@@ -125,11 +126,13 @@ export function decideUpdate(
  * @param projectRoot 项目根目录
  * @returns 批量更新决策
  */
-export function decideBatchUpdate(
-  diff: HashDiffResult,
-  projectRoot: string,
-): BatchUpdateDecision {
-  const allChanges: HashChange[] = [...diff.added, ...diff.modified, ...diff.deleted, ...diff.unchanged];
+export function decideBatchUpdate(diff: HashDiffResult, projectRoot: string): BatchUpdateDecision {
+  const allChanges: HashChange[] = [
+    ...diff.added,
+    ...diff.modified,
+    ...diff.deleted,
+    ...diff.unchanged,
+  ];
 
   const decisions = allChanges.map((change) => {
     const localOverride = hasLocalOverride(change.template, projectRoot);
@@ -157,7 +160,7 @@ export function decideBatchUpdate(
  */
 export function filterByAction(
   batchDecision: BatchUpdateDecision,
-  action: UpdateAction,
+  action: UpdateAction
 ): UpdateDecision[] {
   return batchDecision.decisions.filter((d) => d.action === action);
 }

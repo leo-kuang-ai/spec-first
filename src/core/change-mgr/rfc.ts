@@ -68,7 +68,7 @@ function formatRfcId(seq: number): string {
 export function createRfc(
   featureId: string,
   opts: RfcCreateOptions,
-  projectRoot: string,
+  projectRoot: string
 ): RfcRecord {
   const dir = rfcDir(projectRoot, featureId);
   ensureDir(dir);
@@ -98,11 +98,7 @@ export function createRfc(
 }
 
 /** 获取单个 RFC */
-export function getRfc(
-  rfcId: string,
-  featureId: string,
-  projectRoot: string,
-): RfcRecord {
+export function getRfc(rfcId: string, featureId: string, projectRoot: string): RfcRecord {
   const p = rfcPath(projectRoot, featureId, rfcId);
   if (!exists(p)) {
     throw new Error(`未找到 RFC：${rfcId}（${featureId}）`);
@@ -115,7 +111,7 @@ export function transitionRfc(
   rfcId: string,
   status: RfcStatus,
   featureId: string,
-  projectRoot: string,
+  projectRoot: string
 ): RfcRecord {
   const record = getRfc(rfcId, featureId, projectRoot);
   assertRfcTransition(record.status, status);
@@ -128,21 +124,14 @@ export function transitionRfc(
 }
 
 /** 便捷入口：draft → approved */
-export function submitRfc(
-  rfcId: string,
-  featureId: string,
-  projectRoot: string,
-): RfcRecord {
+export function submitRfc(rfcId: string, featureId: string, projectRoot: string): RfcRecord {
   const approved = transitionRfc(rfcId, 'approved', featureId, projectRoot);
   syncKnownExceptionsFromWaivers(approved, projectRoot);
   return approved;
 }
 
 /** 列出 Feature 下所有 RFC */
-export function listRfc(
-  featureId: string,
-  projectRoot: string,
-): RfcRecord[] {
+export function listRfc(featureId: string, projectRoot: string): RfcRecord[] {
   const dir = rfcDir(projectRoot, featureId);
   if (!exists(dir)) return [];
 
@@ -213,7 +202,7 @@ function syncKnownExceptionsFromWaivers(record: RfcRecord, projectRoot: string):
     maxSeq += 1;
     const exId = `EX-${String(maxSeq).padStart(3, '0')}`;
     appendLines.push(
-      `| ${exId} | ${record.id} | ${waiver.frId} | ${waiver.reason} | ${waiver.expiresAt} | ${waiver.rollbackPoint} | ${waiver.approvedBy ?? record.by} | ${waiver.approvedAt ?? now} |`,
+      `| ${exId} | ${record.id} | ${waiver.frId} | ${waiver.reason} | ${waiver.expiresAt} | ${waiver.rollbackPoint} | ${waiver.approvedBy ?? record.by} | ${waiver.approvedAt ?? now} |`
     );
   }
 

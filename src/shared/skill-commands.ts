@@ -8,7 +8,17 @@
  * Skills 先从 npm 包同步到用户级固定目录 ~/.spec-first/skills/spec-first/，
  * 命令文件和 Codex skills 统一引用该固定路径，避免 npm 全局路径漂移。
  */
-import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REMOVED_SKILLS } from '../core/rules/truth-source.js';
@@ -58,14 +68,13 @@ function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | 
   return targetRoot;
 }
 
-
 function pruneRemovedUserSkills(pkgSkillsRoot: string, targetRoot: string): void {
   if (!existsSync(targetRoot)) return;
 
   const validEntries = new Set(
     readdirSync(pkgSkillsRoot, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
-      .map((entry) => entry.name),
+      .map((entry) => entry.name)
   );
 
   for (const entry of readdirSync(targetRoot, { withFileTypes: true })) {
@@ -77,7 +86,8 @@ function pruneRemovedUserSkills(pkgSkillsRoot: string, targetRoot: string): void
 
 const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   onboarding: '新手引导 - 交互式场景识别与学习路径推荐',
-  first: '项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式生成 10-11 份完整文档（支持 --deep/--type/--force 参数）',
+  first:
+    '项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式生成 10-11 份完整文档（支持 --deep/--type/--force 参数）',
   init: '定位项目根目录并通过交互式引导初始化 Feature 工作区（可选 --bootstrap 执行宿主检查/安装）',
   catchup: '定位当前 Feature 并恢复上下文',
   spec: '定位 Feature 并校验阶段为需求规格（01_specify）',
@@ -124,15 +134,51 @@ interface SkillEntry {
   description: string;
 }
 
+interface SkillFrontmatter {
+  name?: string;
+  description?: string;
+}
+
+interface FrontmatterBlock {
+  raw: string;
+  body: string;
+}
+
 function sanitizeDescription(value: string): string {
   return value.replace(/`/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function quoteYamlString(value: string): string {
-  const escaped = value
-    .replace(/\\/g, '\\\\')
-    .replace(/"/g, '\\"');
+  const escaped = value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   return `"${escaped}"`;
+}
+
+function parseSkillFrontmatter(content: string): SkillFrontmatter {
+  if (!content.startsWith('---\n')) return {};
+  const end = content.indexOf('\n---', 4);
+  if (end < 0) return {};
+
+  const yaml = content.slice(4, end);
+  const nameMatch = yaml.match(/^name:\s*"?(.*?)"?$/m);
+  const descriptionMatch = yaml.match(/^description:\s*"?(.*?)"?$/m);
+
+  return {
+    name: nameMatch?.[1]?.trim(),
+    description: descriptionMatch?.[1]?.trim(),
+  };
+}
+
+function extractFrontmatterBlock(content: string): FrontmatterBlock | undefined {
+  if (!content.startsWith('---\n')) return undefined;
+  const end = content.indexOf('\n---', 4);
+  if (end < 0) return undefined;
+
+  const bodyStart = end + '\n---'.length;
+  const body = content.startsWith('\n', bodyStart) ? content.slice(bodyStart + 1) : content.slice(bodyStart);
+  return {
+    raw: content.slice(0, bodyStart),
+    body,
+  };
 }
 
 /** 从 SKILL.md 提取简短描述：取执行阶段第一条（P0）作为摘要 */
@@ -141,6 +187,14 @@ function extractDescription(content: string): string {
   if (match) return match[1].trim();
   const trigger = content.match(/^- Command:\s*`([^`]+)`/m);
   return trigger ? trigger[1] : 'Spec-First Skill';
+}
+
+function renderDynamicRenderCommand(
+  entry: SkillEntry,
+  options?: { inputPlaceholder?: string }
+): string {
+  const base = `spec-first skill render ${entry.skillName}`;
+  return options?.inputPlaceholder ? `${base} --input ${options.inputPlaceholder}` : base;
 }
 
 /** 扫描 skills 目录，返回需要生成命令入口的 Skill 列表 */
@@ -160,7 +214,7 @@ export function discoverSkills(overrideRoot?: string): SkillEntry[] {
     const content = readFileSync(skillMd, 'utf-8');
     const nameMatch = content.match(/^#\s*Skill:\s*(\S+)/m);
     const skillName = nameMatch ? nameMatch[1] : dir.name.replace(/^\d+-/, '');
-    if (REMOVED_SKILLS.includes(skillName as typeof REMOVED_SKILLS[number])) continue;
+    if (REMOVED_SKILLS.includes(skillName as (typeof REMOVED_SKILLS)[number])) continue;
 
     entries.push({
       commandName: `spec-first-${skillName}`,
@@ -181,9 +235,60 @@ function renderCommandFile(entry: SkillEntry): string {
 description: ${description}
 ---
 
-读取并执行以下完整 Skill 定义：${entry.skillPath}
+先运行以下命令，获取带项目运行时上下文的最新 Skill 定义：
+
+\`${renderDynamicRenderCommand(entry, { inputPlaceholder: '"$ARGUMENTS"' })}\`
+
+将命令输出视为本次执行的完整 Skill 定义，并严格遵循其要求。
 
 用户输入：$ARGUMENTS
+`;
+}
+
+function renderCodexWrapper(entry: SkillEntry): string {
+  const original = readFileSync(entry.skillPath, 'utf-8');
+  const frontmatter = extractFrontmatterBlock(original);
+  if (frontmatter) {
+    return `${frontmatter.raw.trimEnd()}
+
+# Skill: ${entry.skillName}
+
+此入口为动态代理，不直接内联静态 Skill 正文。
+
+执行前先运行：
+
+\`${renderDynamicRenderCommand(entry)}\`
+
+如果用户请求中显式提到了 Feature ID，也可以执行：
+
+\`${renderDynamicRenderCommand(entry, { inputPlaceholder: '"<用户原始输入>"' })}\`
+
+将命令输出作为当前项目上下文下的完整 Skill 定义，再按其要求继续执行。
+`;
+  }
+
+  const parsed = parseSkillFrontmatter(original);
+  const name = quoteYamlString(parsed.name ?? `spec-first:${entry.skillName}`);
+  const description = quoteYamlString(sanitizeDescription(parsed.description ?? entry.description));
+  return `---
+name: ${name}
+description: ${description}
+user-invocable: true
+---
+
+# Skill: ${entry.skillName}
+
+此入口为动态代理，不直接内联静态 Skill 正文。
+
+执行前先运行：
+
+\`${renderDynamicRenderCommand(entry)}\`
+
+如果用户请求中显式提到了 Feature ID，也可以执行：
+
+\`${renderDynamicRenderCommand(entry, { inputPlaceholder: '"<用户原始输入>"' })}\`
+
+将命令输出作为当前项目上下文下的完整 Skill 定义，再按其要求继续执行。
 `;
 }
 
@@ -210,7 +315,11 @@ export interface SkillCommandOptions {
  * 注册 Claude Code 命令入口文件。
  * 幂等覆盖：始终写入最新内容。
  */
-function ensureClaudeCommands(commandsDir: string, skills: SkillEntry[], dryRun?: boolean): string[] {
+function ensureClaudeCommands(
+  commandsDir: string,
+  skills: SkillEntry[],
+  dryRun?: boolean
+): string[] {
   if (!dryRun) {
     mkdirSync(commandsDir, { recursive: true });
     cleanupLegacyClaudeCommands(commandsDir, skills);
@@ -234,7 +343,11 @@ interface CodexSkillResult {
   warnings: string[];
 }
 
-function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?: boolean): CodexSkillResult {
+function ensureCodexSkills(
+  skills: SkillEntry[],
+  codexSkillsDir: string,
+  dryRun?: boolean
+): CodexSkillResult {
   if (!dryRun) {
     mkdirSync(codexSkillsDir, { recursive: true });
     cleanupLegacyCodexSkills(codexSkillsDir, skills);
@@ -264,6 +377,7 @@ function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?
       // target 不存在，忽略
     }
     cpSync(entry.skillDir, target, { recursive: true });
+    writeFileSync(join(target, 'SKILL.md'), renderCodexWrapper(entry), 'utf-8');
     created.push(`spec-first:${entry.skillName}`);
 
     // 验证复制后的 SKILL.md frontmatter
@@ -276,7 +390,11 @@ function ensureCodexSkills(skills: SkillEntry[], codexSkillsDir: string, dryRun?
   return { created, warnings };
 }
 
-function ensureGenericSkills(skills: SkillEntry[], genericSkillsDir: string, dryRun?: boolean): string[] {
+function ensureGenericSkills(
+  skills: SkillEntry[],
+  genericSkillsDir: string,
+  dryRun?: boolean
+): string[] {
   if (!dryRun) {
     mkdirSync(genericSkillsDir, { recursive: true });
   }
@@ -298,7 +416,10 @@ function ensureGenericSkills(skills: SkillEntry[], genericSkillsDir: string, dry
   return created;
 }
 
-function resolveHosts(isGlobal: boolean, hosts?: SkillHostTarget[]): Set<'claude' | 'codex' | 'generic'> {
+function resolveHosts(
+  isGlobal: boolean,
+  hosts?: SkillHostTarget[]
+): Set<'claude' | 'codex' | 'generic'> {
   if (!hosts || hosts.length === 0) {
     return new Set(isGlobal ? ['claude', 'codex'] : ['claude']);
   }
@@ -355,7 +476,10 @@ function cleanupLegacyCodexSkills(codexSkillsDir: string, skills: SkillEntry[]):
  * - global=true：写入 ~/.claude/commands/ + ~/.codex/skills/（全局安装）
  * - global=false：仅写入 {projectRoot}/.claude/commands/（项目 init）
  */
-export function ensureSkillCommands(projectRoot: string, options?: SkillCommandOptions): SkillCommandResult {
+export function ensureSkillCommands(
+  projectRoot: string,
+  options?: SkillCommandOptions
+): SkillCommandResult {
   const isGlobal = options?.global ?? false;
   const dryRun = options?.dryRun;
   const hostPaths = detectHostPaths();
@@ -366,24 +490,24 @@ export function ensureSkillCommands(projectRoot: string, options?: SkillCommandO
 
   // dry-run 不执行实际复制，用户目录可能为空，回退到包源目录发现
   const skills = discoverSkills(
-    dryRun && userSkillsRoot && !existsSync(userSkillsRoot) ? undefined : userSkillsRoot,
+    dryRun && userSkillsRoot && !existsSync(userSkillsRoot) ? undefined : userSkillsRoot
   );
 
   const claudeDir = isGlobal
     ? hostPaths.claudeCommandsDir
     : join(projectRoot, '.claude', 'commands');
 
-  const claude = hosts.has('claude')
-    ? ensureClaudeCommands(claudeDir, skills, dryRun)
-    : [];
+  const claude = hosts.has('claude') ? ensureClaudeCommands(claudeDir, skills, dryRun) : [];
 
-  const codexResult = (isGlobal && hosts.has('codex'))
-    ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun)
-    : { created: [], warnings: [] };
+  const codexResult =
+    isGlobal && hosts.has('codex')
+      ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun)
+      : { created: [], warnings: [] };
 
-  const generic = (isGlobal && hosts.has('generic'))
-    ? ensureGenericSkills(skills, hostPaths.genericSkillsDir, dryRun)
-    : [];
+  const generic =
+    isGlobal && hosts.has('generic')
+      ? ensureGenericSkills(skills, hostPaths.genericSkillsDir, dryRun)
+      : [];
 
   return {
     claude,

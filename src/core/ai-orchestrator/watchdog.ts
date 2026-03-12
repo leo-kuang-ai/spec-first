@@ -8,10 +8,7 @@ import type { AutoOrchestrateConfig } from '../../shared/config-schema.js';
 
 // ─── 类型定义 ───────────────────────────────────────────
 
-export type WatchdogEvent =
-  | 'heartbeat_ok'
-  | 'heartbeat_stalled'
-  | 'task_timeout';
+export type WatchdogEvent = 'heartbeat_ok' | 'heartbeat_stalled' | 'task_timeout';
 
 export interface WatchdogCheckResult {
   event: WatchdogEvent;
@@ -26,7 +23,7 @@ export interface WatchdogCheckResult {
 export function checkTaskTimeout(
   state: TodoRunnerState,
   config: AutoOrchestrateConfig,
-  now?: Date,
+  now?: Date
 ): WatchdogCheckResult | null {
   const autoLoop = state.runtime?.autoLoop;
   if (!autoLoop?.currentTaskId || !autoLoop.taskStartedAt) return null;
@@ -50,7 +47,7 @@ export function checkTaskTimeout(
 export function checkHeartbeatStalled(
   state: TodoRunnerState,
   config: AutoOrchestrateConfig,
-  now?: Date,
+  now?: Date
 ): WatchdogCheckResult | null {
   const autoLoop = state.runtime?.autoLoop;
   if (!autoLoop?.currentTaskId || !autoLoop.heartbeatAt) return null;
@@ -83,7 +80,7 @@ export function checkHeartbeatStalled(
 export function runWatchdogCheck(
   state: TodoRunnerState,
   config: AutoOrchestrateConfig,
-  now?: Date,
+  now?: Date
 ): WatchdogCheckResult | null {
   // task timeout 优先级最高
   const timeout = checkTaskTimeout(state, config, now);

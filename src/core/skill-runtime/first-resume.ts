@@ -10,7 +10,11 @@
 import { existsSync } from 'node:fs';
 import { checkFirstUpdateContext } from './first-change-detector.js';
 import { classifyProjectMaturity, detectPlatformType } from './first-platform-detector.js';
-import { resolveFirstConfirmPolicy, resolveFirstModePolicy, validateFirstArgs } from './first-args.js';
+import {
+  resolveFirstConfirmPolicy,
+  resolveFirstModePolicy,
+  validateFirstArgs,
+} from './first-args.js';
 import { logFirstRuntimeWarning } from './first-runtime-observability.js';
 import {
   getFirstRuntimeDir,
@@ -95,8 +99,11 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
   const lastRunTime = new Date(runtimeIndex.lastRun);
   const daysSince = Math.floor((Date.now() - lastRunTime.getTime()) / (1000 * 60 * 60 * 24));
   const detectedPlatform = detectPlatformType(projectRoot);
-  const platformType = runtimeSummary?.project.platformType
-    ?? (detectedPlatform.subType ? `${detectedPlatform.type}/${detectedPlatform.subType}` : detectedPlatform.type);
+  const platformType =
+    runtimeSummary?.project.platformType ??
+    (detectedPlatform.subType
+      ? `${detectedPlatform.type}/${detectedPlatform.subType}`
+      : detectedPlatform.type);
   const options: ResumeOption[] = ['view_summary'];
 
   if (runtimeIndex.mode === 'quick') {
@@ -110,7 +117,10 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
   let recommendedOption: ResumeOption = 'skip';
   if (staleCheck.stale || updateContext.changeAnalysis?.recommendedStrategy === 'full') {
     recommendedOption = 'full_regenerate';
-  } else if (runtimeIndex.mode === 'quick' && updateContext.productStatus.some(product => product.issues.length > 0)) {
+  } else if (
+    runtimeIndex.mode === 'quick' &&
+    updateContext.productStatus.some((product) => product.issues.length > 0)
+  ) {
     recommendedOption = 'upgrade_deep';
   }
 
@@ -132,9 +142,15 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
   const canSkipConfirm = (args: string[]): boolean => {
     try {
       const parsed = validateFirstArgs(args);
-      return resolveFirstConfirmPolicy(parsed) === 'skip' && resolveFirstModePolicy(parsed) === 'manual';
+      return (
+        resolveFirstConfirmPolicy(parsed) === 'skip' && resolveFirstModePolicy(parsed) === 'manual'
+      );
     } catch (error) {
-      logFirstRuntimeWarning('first-resume.formatResumePrompt', '解析恢复参数失败，降级为不显示快捷命令', error);
+      logFirstRuntimeWarning(
+        'first-resume.formatResumePrompt',
+        '解析恢复参数失败，降级为不显示快捷命令',
+        error
+      );
       return false;
     }
   };

@@ -2,6 +2,10 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { readFirstStageViews } from './first-runtime-store.js';
+import {
+  type SkillExecutionContext,
+  resolveExecutionFeatureId,
+} from './execution-context.js';
 
 const SCOPE_GUARD_SKILLS = new Set(['code', 'review', 'verify']);
 const TASK_SECTION_RE = /^###\s*(TASK-[A-Z0-9-]+)\b.*$/gm;
@@ -21,28 +25,31 @@ export class ScopeGuardBlockedError extends Error {
   readonly unmatchedFiles: string[];
 
   constructor(skillName: string, unmatchedFiles: string[]) {
-    super(`SCOPE-GUARD-BLOCKED: ${skillName} has out-of-scope changes (${unmatchedFiles.join(', ')})`);
+    super(
+      `SCOPE-GUARD-BLOCKED: ${skillName} has out-of-scope changes (${unmatchedFiles.join(', ')})`
+    );
     this.name = 'ScopeGuardBlockedError';
     this.unmatchedFiles = unmatchedFiles;
   }
 }
 
-function readCurrentFeature(projectRoot: string): string | undefined {
-  const currentPath = join(projectRoot, '.spec-first', 'current');
-  if (!exists(currentPath)) return undefined;
-  const value = readMarkdown(currentPath).trim();
-  return value || undefined;
-}
-
 function normalizeTaskStatus(value: string): string {
-  return value.trim().toLowerCase().replace(/[-\s]+/g, '_');
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[-\s]+/g, '_');
 }
 
 function readCurrentTaskId(taskPlanContent: string): string | undefined {
   const lines = taskPlanContent.split('\n');
-  const headerLine = lines.find((line) => line.trim().startsWith('|') && /task id/i.test(line) && /状态|status/i.test(line));
+  const headerLine = lines.find(
+    (line) => line.trim().startsWith('|') && /task id/i.test(line) && /状态|status/i.test(line)
+  );
   if (!headerLine) return undefined;
-  const headers = headerLine.split('|').slice(1, -1).map((cell) => cell.trim().toLowerCase());
+  const headers = headerLine
+    .split('|')
+    .slice(1, -1)
+    .map((cell) => cell.trim().toLowerCase());
   const taskIdx = headers.findIndex((cell) => cell === 'task id' || cell === 'task');
   const statusIdx = headers.findIndex((cell) => cell === '状态' || cell === 'status');
   if (taskIdx === -1 || statusIdx === -1) return undefined;
@@ -53,7 +60,10 @@ function readCurrentTaskId(taskPlanContent: string): string | undefined {
     const trimmed = line.trim();
     if (!trimmed.startsWith('|')) continue;
     if (/^\|[\s\-:|]+$/.test(trimmed)) continue;
-    const cells = trimmed.split('|').slice(1, -1).map((cell) => cell.trim());
+    const cells = trimmed
+      .split('|')
+      .slice(1, -1)
+      .map((cell) => cell.trim());
     const status = normalizeTaskStatus(cells[statusIdx] ?? '');
     if (status !== 'in_progress') continue;
     const taskIdMatch = (cells[taskIdx] ?? '').match(/TASK-[A-Z0-9-]+/i);
@@ -70,7 +80,10 @@ function readTaskSection(taskPlanContent: string, taskId: string): string | unde
     const currentId = match[1]?.toUpperCase();
     if (currentId !== taskId) continue;
     const start = match.index ?? 0;
-    const end = i + 1 < sections.length ? (sections[i + 1].index ?? taskPlanContent.length) : taskPlanContent.length;
+    const end =
+      i + 1 < sections.length
+        ? (sections[i + 1].index ?? taskPlanContent.length)
+        : taskPlanContent.length;
     return taskPlanContent.slice(start, end);
   }
   return undefined;
@@ -81,7 +94,9 @@ function parseTaskFiles(taskSection: string | undefined): string[] {
   const fileListMarker = taskSection.indexOf('**文件清单**');
   if (fileListMarker === -1) return [];
   const afterMarker = taskSection.slice(fileListMarker);
-  const endCandidates = [afterMarker.indexOf('**执行步骤**'), afterMarker.indexOf('\n### ')].filter((idx) => idx > 0);
+  const endCandidates = [afterMarker.indexOf('**执行步骤**'), afterMarker.indexOf('\n### ')].filter(
+    (idx) => idx > 0
+  );
   const sliceEnd = endCandidates.length > 0 ? Math.min(...endCandidates) : afterMarker.length;
   const block = afterMarker.slice(0, sliceEnd);
   const refs = [...block.matchAll(/`([^`]+)`/g)].map((match) => match[1] ?? '');
@@ -114,7 +129,11 @@ function listChangedFiles(projectRoot: string): string[] {
     const withHead = runGit(projectRoot, ['rev-parse', '--verify', 'HEAD']);
     if (withHead) {
       const tracked = runGit(projectRoot, ['diff', '--name-only', 'HEAD']);
-      tracked.split('\n').map((line) => line.trim()).filter(Boolean).forEach((file) => changed.add(file));
+      tracked
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .forEach((file) => changed.add(file));
     }
   } catch {
     // ignore: repo may not have HEAD yet
@@ -122,14 +141,22 @@ function listChangedFiles(projectRoot: string): string[] {
 
   try {
     const staged = runGit(projectRoot, ['diff', '--cached', '--name-only']);
-    staged.split('\n').map((line) => line.trim()).filter(Boolean).forEach((file) => changed.add(file));
+    staged
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .forEach((file) => changed.add(file));
   } catch {
     // ignore
   }
 
   try {
     const untracked = runGit(projectRoot, ['ls-files', '--others', '--exclude-standard']);
-    untracked.split('\n').map((line) => line.trim()).filter(Boolean).forEach((file) => changed.add(file));
+    untracked
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .forEach((file) => changed.add(file));
   } catch {
     // ignore
   }
@@ -155,14 +182,23 @@ function toDirPrefix(pathValue: string): string {
   return pathValue.endsWith('/') ? pathValue : `${pathValue}/`;
 }
 
-function isAllowedFile(file: string, taskFiles: string[], entryPoints: string[], areas: string[]): boolean {
+function isAllowedFile(
+  file: string,
+  taskFiles: string[],
+  entryPoints: string[],
+  areas: string[]
+): boolean {
   const normalized = file.replace(/\\/g, '/');
   if (taskFiles.includes(normalized)) return true;
   if (entryPoints.includes(normalized)) return true;
   return areas.some((area) => normalized === area || normalized.startsWith(toDirPrefix(area)));
 }
 
-export function evaluateRuntimeScopeGuard(skillName: string, projectRoot: string): ScopeGuardDecision {
+export function evaluateRuntimeScopeGuard(
+  skillName: string,
+  executionContext: SkillExecutionContext
+): ScopeGuardDecision {
+  const projectRoot = executionContext.projectRoot;
   if (!SCOPE_GUARD_SKILLS.has(skillName)) {
     return {
       active: false,
@@ -175,7 +211,7 @@ export function evaluateRuntimeScopeGuard(skillName: string, projectRoot: string
     };
   }
 
-  const featureId = readCurrentFeature(projectRoot);
+  const featureId = resolveExecutionFeatureId(executionContext);
   if (!featureId) {
     return {
       active: false,
@@ -229,18 +265,25 @@ export function evaluateRuntimeScopeGuard(skillName: string, projectRoot: string
   }
 
   const stageViews = readFirstStageViews(projectRoot);
-  const codeViewEntryPoints = stageViews?.code?.entryPoints?.map((entry) => entry.replace(/\\/g, '/')) ?? [];
-  const codeViewAreas = stageViews?.code?.likelyChangeAreas?.map((area) => area.replace(/\\/g, '/')) ?? [];
+  const codeViewEntryPoints =
+    stageViews?.code?.entryPoints?.map((entry) => entry.replace(/\\/g, '/')) ?? [];
+  const codeViewAreas =
+    stageViews?.code?.likelyChangeAreas?.map((area) => area.replace(/\\/g, '/')) ?? [];
   const changedFiles = listChangedFiles(projectRoot)
     .map((file) => file.replace(/\\/g, '/'))
     .filter((file) => !isIgnoredRuntimeFile(file, featureId));
 
-  const unmatchedFiles = changedFiles.filter((file) => !isAllowedFile(file, taskFiles, codeViewEntryPoints, codeViewAreas));
+  const unmatchedFiles = changedFiles.filter(
+    (file) => !isAllowedFile(file, taskFiles, codeViewEntryPoints, codeViewAreas)
+  );
 
   return {
     active: true,
     blocked: unmatchedFiles.length > 0,
-    reason: unmatchedFiles.length > 0 ? `Detected out-of-scope changes: ${unmatchedFiles.join(', ')}` : undefined,
+    reason:
+      unmatchedFiles.length > 0
+        ? `Detected out-of-scope changes: ${unmatchedFiles.join(', ')}`
+        : undefined,
     changedFiles,
     unmatchedFiles,
     taskFiles,

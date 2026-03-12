@@ -26,11 +26,7 @@ export interface PrdValidationResult {
 
 // ─── 必需章节 ────────────────────────────────────────────
 
-const REQUIRED_SECTIONS = [
-  '## 1. 业务目标',
-  '## 2. 功能需求',
-  '## 3. 非功能需求',
-];
+const REQUIRED_SECTIONS = ['## 1. 业务目标', '## 2. 功能需求', '## 3. 非功能需求'];
 
 const GREENFIELD_SECTIONS = [
   '### 1.1 问题陈述',
@@ -72,7 +68,7 @@ function parseMetadata(content: string): PrdMetadata {
   if (Array.isArray(parsed.evidence_paths)) {
     meta.evidence_paths = parsed.evidence_paths
       .filter((item): item is string => typeof item === 'string')
-      .map(item => item.trim())
+      .map((item) => item.trim())
       .filter(Boolean);
   } else if (typeof parsed.evidence_paths === 'string' && parsed.evidence_paths.trim().length > 0) {
     meta.evidence_paths = [parsed.evidence_paths.trim()];
@@ -92,7 +88,10 @@ function parseMetadata(content: string): PrdMetadata {
 
 // ─── 章节完整性检查 ──────────────────────────────────────
 
-function checkSections(content: string, meta: PrdMetadata): { errors: string[]; _warnings: string[] } {
+function checkSections(
+  content: string,
+  meta: PrdMetadata
+): { errors: string[]; _warnings: string[] } {
   const errors: string[] = [];
   const _warnings: string[] = [];
 
@@ -149,7 +148,12 @@ function validateScenario(meta: PrdMetadata): string[] {
 
 // ─── C-PRD 评分 ──────────────────────────────────────────
 
-function calculateScore(content: string, meta: PrdMetadata, errors: string[], _warnings: string[]): number {
+function calculateScore(
+  content: string,
+  meta: PrdMetadata,
+  errors: string[],
+  _warnings: string[]
+): number {
   let score = 100;
 
   // 元信息完整性 (30%)

@@ -13,11 +13,7 @@ import {
   createAutoLoopState,
   setTodoResumeAt,
 } from './todo-runner.js';
-import type {
-  TodoRunnerState,
-  TodoItem,
-  HaltReasonCode,
-} from './todo-runner.js';
+import type { TodoRunnerState, TodoItem, HaltReasonCode } from './todo-runner.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import { exists } from '../../shared/fs-utils.js';
 import type { OrchestrateArgs } from '../skill-runtime/orchestrate-args.js';
@@ -57,7 +53,13 @@ export interface AutoLoopOptions {
   onIteration?: (iteration: number, state: TodoRunnerState) => void;
 }
 
-export type AutoLoopStatus = 'all_done' | 'has_blocked' | 'timeout' | 'no_state_file' | 'max_iterations' | 'incomplete';
+export type AutoLoopStatus =
+  | 'all_done'
+  | 'has_blocked'
+  | 'timeout'
+  | 'no_state_file'
+  | 'max_iterations'
+  | 'incomplete';
 
 export interface AutoLoopResult {
   halted: boolean;
@@ -105,7 +107,13 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
   // 加载或恢复状态
   let state = loadTodoState(featureId, projectRoot);
   if (!state) {
-    return { halted: true, haltReason: 'no_state_file', status: 'no_state_file', iterations: 0, completedTasks: [] };
+    return {
+      halted: true,
+      haltReason: 'no_state_file',
+      status: 'no_state_file',
+      iterations: 0,
+      completedTasks: [],
+    };
   }
 
   state = ensureAutoLoopState(state);
@@ -137,11 +145,14 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         const waitMs = earliestResume - now;
 
         if (waitMs > 0) {
-          writeAuditLog({
-            event: 'backoff_wait',
-            featureId,
-            detail: { waitMs, waitingTaskIds: waitingTasks.map((t) => t.id) },
-          }, projectRoot);
+          writeAuditLog(
+            {
+              event: 'backoff_wait',
+              featureId,
+              detail: { waitMs, waitingTaskIds: waitingTasks.map((t) => t.id) },
+            },
+            projectRoot
+          );
 
           // 等待退避时间
           await new Promise((resolve) => setTimeout(resolve, waitMs));
@@ -172,12 +183,18 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
 
       const watchdogResult = runWatchdogCheck(state, cfg.runtime.auto_orchestrate);
       if (watchdogResult) {
-        writeAuditLog({
-          event: watchdogResult.event,
-          featureId,
-          taskId: task.id,
-          detail: { elapsedMs: watchdogResult.elapsedMs, thresholdMs: watchdogResult.thresholdMs },
-        }, projectRoot);
+        writeAuditLog(
+          {
+            event: watchdogResult.event,
+            featureId,
+            taskId: task.id,
+            detail: {
+              elapsedMs: watchdogResult.elapsedMs,
+              thresholdMs: watchdogResult.thresholdMs,
+            },
+          },
+          projectRoot
+        );
 
         if (watchdogResult.event === 'task_timeout') {
           state = updateTodoStatus(state, task.id, 'blocked');
@@ -197,13 +214,21 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         const guard = runPostWriteGuards(task, result, featureId, projectRoot);
         if (!guard.passed) {
           state = updateTodoStatus(state, task.id, 'blocked');
-          state = updateAutoLoopLastResult(state, task.id, 'blocked', guard.reason ?? 'post-write guard failed');
-          writeAuditLog({
-            event: 'task_blocked',
-            featureId,
-            taskId: task.id,
-            detail: { message: guard.reason ?? 'post-write guard failed' },
-          }, projectRoot);
+          state = updateAutoLoopLastResult(
+            state,
+            task.id,
+            'blocked',
+            guard.reason ?? 'post-write guard failed'
+          );
+          writeAuditLog(
+            {
+              event: 'task_blocked',
+              featureId,
+              taskId: task.id,
+              detail: { message: guard.reason ?? 'post-write guard failed' },
+            },
+            projectRoot
+          );
 
           if (cfg.runtime.auto_orchestrate.stop_on_blocked) {
             state = haltState(state, 'blocked', task.id);
@@ -219,7 +244,11 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         writeAuditLog({ event: 'task_done', featureId, taskId: task.id }, projectRoot);
       } else {
         const retryState = state.runtime?.autoLoop?.retry ?? createAutoLoopState().retry;
-        const retryDecision = makeRetryDecision(result.message, retryState, cfg.runtime.auto_orchestrate);
+        const retryDecision = makeRetryDecision(
+          result.message,
+          retryState,
+          cfg.runtime.auto_orchestrate
+        );
         state = applyRetryToState(state, retryDecision, result.message);
 
         if (retryDecision.shouldRetry && retryDecision.errorCategory === 'temporary') {
@@ -230,28 +259,36 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
             state,
             task.id,
             'pending',
-            `retry scheduled (${retryDecision.backoffMs}ms): ${result.message}`,
+            `retry scheduled (${retryDecision.backoffMs}ms): ${result.message}`
           );
-          writeAuditLog({
-            event: 'task_retry_scheduled',
-            featureId,
-            taskId: task.id,
-            detail: {
-              message: result.message,
-              backoffMs: retryDecision.backoffMs,
-              regenerateCount: state.runtime?.autoLoop?.retry.regenerateCount ?? 0,
+          writeAuditLog(
+            {
+              event: 'task_retry_scheduled',
+              featureId,
+              taskId: task.id,
+              detail: {
+                message: result.message,
+                backoffMs: retryDecision.backoffMs,
+                regenerateCount: state.runtime?.autoLoop?.retry.regenerateCount ?? 0,
+              },
             },
-          }, projectRoot);
+            projectRoot
+          );
           checkpoint(state, projectRoot, onCheckpoint);
           continue;
         }
 
         state = updateTodoStatus(state, task.id, 'blocked');
         state = updateAutoLoopLastResult(state, task.id, 'blocked', result.message);
-        writeAuditLog({
-          event: 'task_blocked', featureId, taskId: task.id,
-          detail: { message: result.message, retryReason: retryDecision.reason },
-        }, projectRoot);
+        writeAuditLog(
+          {
+            event: 'task_blocked',
+            featureId,
+            taskId: task.id,
+            detail: { message: result.message, retryReason: retryDecision.reason },
+          },
+          projectRoot
+        );
 
         if (cfg.runtime.auto_orchestrate.stop_on_blocked) {
           state = haltState(state, 'blocked', task.id);
@@ -272,11 +309,7 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
 
 // ─── 内部辅助函数 ───────────────────────────────────────
 
-function haltState(
-  state: TodoRunnerState,
-  code: HaltReasonCode,
-  taskId?: string,
-): TodoRunnerState {
+function haltState(state: TodoRunnerState, code: HaltReasonCode, taskId?: string): TodoRunnerState {
   const reason = taskId ? `${code}:${taskId}` : code;
   return {
     ...state,
@@ -290,7 +323,7 @@ function haltState(
 function checkpoint(
   state: TodoRunnerState,
   projectRoot: string,
-  onCheckpoint?: (s: TodoRunnerState) => void,
+  onCheckpoint?: (s: TodoRunnerState) => void
 ): void {
   saveTodoState(state, projectRoot);
   onCheckpoint?.(state);
@@ -314,7 +347,7 @@ function runPostWriteGuards(
   task: TodoItem,
   result: TaskResult,
   featureId: string,
-  projectRoot: string,
+  projectRoot: string
 ): GuardResult {
   const skillMeta: SkillFrontMatter = result.skillPath
     ? parseSkillFrontMatter(result.skillPath)
@@ -323,15 +356,18 @@ function runPostWriteGuards(
   const requiredMcps = skillMeta.required_mcps ?? [];
   if (requiredMcps.length > 0) {
     const mcpReport = checkRequiredMcps(requiredMcps);
-    writeAuditLog({
-      event: 'required_mcps_checked',
-      featureId,
-      taskId: task.id,
-      detail: {
-        required: requiredMcps,
-        missing: mcpReport.missing,
+    writeAuditLog(
+      {
+        event: 'required_mcps_checked',
+        featureId,
+        taskId: task.id,
+        detail: {
+          required: requiredMcps,
+          missing: mcpReport.missing,
+        },
       },
-    }, projectRoot);
+      projectRoot
+    );
 
     if (!mcpReport.passed) {
       return {
@@ -349,29 +385,35 @@ function runPostWriteGuards(
   if (result.writePath) {
     const writeMode = resolveWriteMode(skillMeta);
     const writeResult = idempotentWrite(result.writePath, output, writeMode);
-    writeAuditLog({
-      event: 'idempotent_write',
-      featureId,
-      taskId: task.id,
-      detail: {
-        path: writeResult.path,
-        mode: writeResult.mode,
-        written: writeResult.written,
+    writeAuditLog(
+      {
+        event: 'idempotent_write',
+        featureId,
+        taskId: task.id,
+        detail: {
+          path: writeResult.path,
+          mode: writeResult.mode,
+          written: writeResult.written,
+        },
       },
-    }, projectRoot);
+      projectRoot
+    );
   }
 
   const markers = loadCompletionMarkers(skillMeta, projectRoot);
   const completion = runFullCompletionDetection(output, markers);
-  writeAuditLog({
-    event: 'completion_checked',
-    featureId,
-    taskId: task.id,
-    detail: {
-      passed: completion.passed,
-      failureReasons: completion.failureReasons,
+  writeAuditLog(
+    {
+      event: 'completion_checked',
+      featureId,
+      taskId: task.id,
+      detail: {
+        passed: completion.passed,
+        failureReasons: completion.failureReasons,
+      },
     },
-  }, projectRoot);
+    projectRoot
+  );
   if (!completion.passed) {
     return {
       passed: false,
@@ -380,16 +422,19 @@ function runPostWriteGuards(
   }
 
   const slopReport = runSlopCheck(output, loadSlopRules(projectRoot));
-  writeAuditLog({
-    event: 'slop_checked',
-    featureId,
-    taskId: task.id,
-    detail: {
-      passed: slopReport.passed,
-      errorCount: slopReport.errorCount,
-      warningCount: slopReport.warningCount,
+  writeAuditLog(
+    {
+      event: 'slop_checked',
+      featureId,
+      taskId: task.id,
+      detail: {
+        passed: slopReport.passed,
+        errorCount: slopReport.errorCount,
+        warningCount: slopReport.warningCount,
+      },
     },
-  }, projectRoot);
+    projectRoot
+  );
   if (!slopReport.passed) {
     const firstError = slopReport.hits.find((hit) => hit.severity === 'error');
     return {
@@ -424,7 +469,7 @@ function updateAutoLoopLastResult(
   state: TodoRunnerState,
   taskId: string,
   outcome: 'pending' | 'done' | 'blocked',
-  message: string,
+  message: string
 ): TodoRunnerState {
   return {
     ...state,
@@ -443,7 +488,7 @@ function updateAutoLoopLastResult(
 function buildResult(
   state: TodoRunnerState,
   startIteration: number,
-  completedTasks: string[],
+  completedTasks: string[]
 ): AutoLoopResult {
   return {
     halted: state.halted,
@@ -458,7 +503,8 @@ function classifyAutoLoopStatus(haltReason: string | undefined): AutoLoopStatus 
   if (haltReason === 'completed') return 'all_done';
   if (haltReason === 'no_state_file') return 'no_state_file';
   if (haltReason?.startsWith('blocked')) return 'has_blocked';
-  if (haltReason?.startsWith('task_timeout') || haltReason?.startsWith('stalled_timeout')) return 'timeout';
+  if (haltReason?.startsWith('task_timeout') || haltReason?.startsWith('stalled_timeout'))
+    return 'timeout';
   if (haltReason?.startsWith('max_iterations')) return 'max_iterations';
   return 'incomplete';
 }

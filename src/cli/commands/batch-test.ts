@@ -31,17 +31,17 @@ export async function handleBatchTest(args: string[]): Promise<number> {
     console.log(`分层结果:`);
     for (const layer of plan.layers) {
       const mode = layer.concurrent ? '并发' : '串行';
-      console.log(`  Layer ${layer.layer} (${mode}): ${layer.tasks.map(t => t.id).join(', ')}`);
+      console.log(`  Layer ${layer.layer} (${mode}): ${layer.tasks.map((t) => t.id).join(', ')}`);
     }
 
     if (plan.tddWarnings.length > 0) {
       console.log(`\n⚠️  TDD 警告:`);
-      plan.tddWarnings.forEach(w => console.log(`  - ${w}`));
+      plan.tddWarnings.forEach((w) => console.log(`  - ${w}`));
     }
 
     if (plan.riskWarnings.length > 0) {
       console.log(`\n⚠️  风险警告:`);
-      plan.riskWarnings.forEach(w => console.log(`  - ${w}`));
+      plan.riskWarnings.forEach((w) => console.log(`  - ${w}`));
     }
 
     console.log(`\n开始执行...\n`);

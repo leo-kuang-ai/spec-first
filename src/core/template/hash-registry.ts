@@ -50,7 +50,7 @@ export interface HashDiffResult {
  */
 export async function computeTemplateHashes(
   dir: string,
-  _baseDir: string,
+  _baseDir: string
 ): Promise<Record<string, TemplateHashEntry>> {
   const hashes: Record<string, TemplateHashEntry> = {};
 
@@ -116,7 +116,10 @@ export async function loadHashRegistry(projectRoot: string): Promise<TemplateHas
  * @param registry 注册表对象
  * @param projectRoot 项目根目录
  */
-export async function saveHashRegistry(registry: TemplateHashRegistry, projectRoot: string): Promise<void> {
+export async function saveHashRegistry(
+  registry: TemplateHashRegistry,
+  projectRoot: string
+): Promise<void> {
   const registryPath = join(projectRoot, '.spec-first', 'meta', 'template-hashes.json');
   const metaDir = join(projectRoot, '.spec-first', 'meta');
   await mkdir(metaDir, { recursive: true });
@@ -133,7 +136,7 @@ export async function saveHashRegistry(registry: TemplateHashRegistry, projectRo
  */
 export function compareHashes(
   oldRegistry: TemplateHashRegistry,
-  newRegistry: TemplateHashRegistry,
+  newRegistry: TemplateHashRegistry
 ): HashDiffResult {
   const oldTemplates = new Set(Object.keys(oldRegistry.templates));
   const newTemplates = new Set(Object.keys(newRegistry.templates));

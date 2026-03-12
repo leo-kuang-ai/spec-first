@@ -21,7 +21,9 @@ function parseArgs(args: string[]): { role?: string; task?: string; size?: strin
 
 export function handleOnboarding(args: string[]): number {
   const projectRoot = process.cwd();
-  const hasFirstAssets = existsSync(join(projectRoot, '.spec-first', 'runtime', 'first', 'index.json'));
+  const hasFirstAssets = existsSync(
+    join(projectRoot, '.spec-first', 'runtime', 'first', 'index.json')
+  );
   const params = parseArgs(args);
 
   if (params.role || params.task || params.size) {
@@ -51,9 +53,11 @@ AI 助手会根据你的选择生成个性化学习路径。
 
 onboarding 是一个交互式新手引导 skill，需要通过 AI 助手调用。
 
-${hasFirstAssets
+${
+  hasFirstAssets
     ? '📊 检测到项目已有 first 资产，将提供基于项目分析的个性化推荐'
-    : '⚠️ 未检测到 first 资产，建议先运行 /spec-first:first 获取更好的体验'}
+    : '⚠️ 未检测到 first 资产，建议先运行 /spec-first:first 获取更好的体验'
+}
 
 🚀 启动方式：
 

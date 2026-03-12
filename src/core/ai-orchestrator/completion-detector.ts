@@ -41,7 +41,10 @@ export function checkContainsPattern(content: string, pattern: string): boolean 
 }
 
 /** min_entities 检测：统计 markdown 中有实质内容的标题数量 */
-export function checkMinEntities(content: string, minCount: number): { passed: boolean; actual: number } {
+export function checkMinEntities(
+  content: string,
+  minCount: number
+): { passed: boolean; actual: number } {
   const lines = content.split('\n');
   let count = 0;
 
@@ -105,7 +108,7 @@ const DEFAULT_MARKERS: CompletionMarker[] = [
  */
 export function loadCompletionMarkers(
   skillMeta?: SkillFrontMatter,
-  projectRoot?: string,
+  projectRoot?: string
 ): CompletionMarker[] {
   // Layer 1: Skill 级
   if (skillMeta?.completion_markers && skillMeta.completion_markers.length > 0) {
@@ -142,7 +145,10 @@ function loadMarkersFromYaml(filePath: string): CompletionMarker[] {
  * 语义检测：逐项运行 markers 检查
  * 所有 marker 通过才算 passed
  */
-export function runCompletionCheck(content: string, markers: CompletionMarker[]): CompletionCheckResult {
+export function runCompletionCheck(
+  content: string,
+  markers: CompletionMarker[]
+): CompletionCheckResult {
   if (markers.length === 0) {
     return { passed: true, checks: [] };
   }
@@ -192,7 +198,7 @@ export interface FullDetectionResult {
  */
 export function runFullCompletionDetection(
   content: string,
-  markers: CompletionMarker[],
+  markers: CompletionMarker[]
 ): FullDetectionResult {
   const structural = checkStructuralCompletion(content);
   const semantic = runCompletionCheck(content, markers);
@@ -200,9 +206,7 @@ export function runFullCompletionDetection(
   const failureReasons: string[] = [];
 
   if (!structural.passed) {
-    failureReasons.push(
-      `empty headings detected: ${structural.emptyHeadings.join(', ')}`,
-    );
+    failureReasons.push(`empty headings detected: ${structural.emptyHeadings.join(', ')}`);
   }
 
   for (const check of semantic.checks) {

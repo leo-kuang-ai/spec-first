@@ -11,8 +11,10 @@ import { getCoverage } from '../../core/trace-engine/coverage.js';
 export function handleTrace(args: string[]): number {
   const sub = args[0];
   switch (sub) {
-    case 'fix': return handleFix(args.slice(1));
-    case 'validate': return handleValidate(args.slice(1));
+    case 'fix':
+      return handleFix(args.slice(1));
+    case 'validate':
+      return handleValidate(args.slice(1));
     default:
       printTraceHelp();
       if (sub) console.error(`未知 trace 子命令：${sub}`);
@@ -36,7 +38,7 @@ function handleFix(args: string[]): number {
   }
 
   const rows = parseMatrix(featureId, projectRoot);
-  const taskRows = rows.filter(r => r.type === 'TASK' && r.status === 'Implemented');
+  const taskRows = rows.filter((r) => r.type === 'TASK' && r.status === 'Implemented');
 
   if (taskRows.length === 0) {
     console.log('无需修复：没有已实现的 TASK');

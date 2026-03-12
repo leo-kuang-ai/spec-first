@@ -49,12 +49,12 @@ export function getAvailableMcps(): string[] {
  * @param requiredMcps Skill front matter 中声明的 required_mcps
  */
 export function checkRequiredMcps(requiredMcps: string[]): McpCheckReport {
-  const results: McpCheckResult[] = requiredMcps.map(name => ({
+  const results: McpCheckResult[] = requiredMcps.map((name) => ({
     name,
     available: availableMcps.has(name),
   }));
 
-  const missing = results.filter(r => !r.available).map(r => r.name);
+  const missing = results.filter((r) => !r.available).map((r) => r.name);
 
   return {
     passed: missing.length === 0,

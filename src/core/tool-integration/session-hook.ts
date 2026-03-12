@@ -29,7 +29,9 @@ function resolveSpecFirstBin(): string {
   try {
     const output = execFileSync('which', ['spec-first'], {
       stdio: ['ignore', 'pipe', 'ignore'],
-    }).toString().trim();
+    })
+      .toString()
+      .trim();
     if (output) return output;
   } catch {
     // ignore
@@ -109,7 +111,9 @@ export function registerSessionHooks(options?: { dryRun?: boolean }): {
   // 兼容历史写法：将 top-level SessionStart 迁移到 hooks.SessionStart
   if (Array.isArray(settings.SessionStart)) {
     const legacyEntries = settings.SessionStart as unknown[];
-    const existingInHooks = Array.isArray(hooks.SessionStart) ? hooks.SessionStart as unknown[] : [];
+    const existingInHooks = Array.isArray(hooks.SessionStart)
+      ? (hooks.SessionStart as unknown[])
+      : [];
     hooks.SessionStart = [...existingInHooks, ...legacyEntries];
     delete settings.SessionStart;
   }
@@ -121,11 +125,13 @@ export function registerSessionHooks(options?: { dryRun?: boolean }): {
 
   filtered.push({
     matcher: '*',
-    hooks: [{
-      type: 'command' as const,
-      command: buildSessionStartCommand(specFirstBin),
-      timeout: 15,
-    }],
+    hooks: [
+      {
+        type: 'command' as const,
+        command: buildSessionStartCommand(specFirstBin),
+        timeout: 15,
+      },
+    ],
   });
 
   hooks.SessionStart = filtered;

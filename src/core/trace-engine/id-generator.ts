@@ -55,9 +55,7 @@ export function nextId(opts: NextIdOptions): NextIdResult {
 function validateAbbr(abbr: string): void {
   const normalized = abbr.replace(/-/g, '');
   if (!/^[A-Z][A-Z0-9]{0,15}$/.test(normalized)) {
-    throw new Error(
-      `无效缩写 "${abbr}"：移除连字符后必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`,
-    );
+    throw new Error(`无效缩写 "${abbr}"：移除连字符后必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`);
   }
 }
 
@@ -115,11 +113,12 @@ function getMatrixPath(projectRoot: string, featureId: string): string {
 /** 追加一行到矩阵 Markdown 表格 */
 function appendToMatrix(
   matrixPath: string,
-  row: Pick<MatrixRow, 'id' | 'type' | 'title' | 'status'>,
+  row: Pick<MatrixRow, 'id' | 'type' | 'title' | 'status'>
 ): void {
   if (!exists(matrixPath)) {
-    const header = '| ID | Type | Title | Status | Upstream | Downstream |\n'
-      + '|----|------|-------|--------|----------|------------|\n';
+    const header =
+      '| ID | Type | Title | Status | Upstream | Downstream |\n' +
+      '|----|------|-------|--------|----------|------------|\n';
     writeMarkdown(matrixPath, header);
   }
 

@@ -48,7 +48,11 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   // 00_init
   { relativePath: 'stage-state.json', stage: Stage.INIT },
   { relativePath: 'constitution.md', stage: Stage.INIT, template: 'init/constitution.md' },
-  { relativePath: 'traceability-matrix.md', stage: Stage.INIT, template: 'matrix/traceability-matrix.md' },
+  {
+    relativePath: 'traceability-matrix.md',
+    stage: Stage.INIT,
+    template: 'matrix/traceability-matrix.md',
+  },
   { relativePath: 'findings.md', stage: Stage.INIT },
   { relativePath: 'task_plan.md', stage: Stage.INIT },
   // 01_specify
@@ -67,7 +71,11 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   // 05_verify
   { relativePath: 'reports/test-report.md', stage: Stage.VERIFY },
   { relativePath: 'reports/security-scan.md', stage: Stage.VERIFY },
-  { relativePath: 'reports/regression-report.md', stage: Stage.VERIFY, skipWhen: (m) => skipNonI(m) },
+  {
+    relativePath: 'reports/regression-report.md',
+    stage: Stage.VERIFY,
+    skipWhen: (m) => skipNonI(m),
+  },
   { relativePath: 'reports/uat-signoff.md', stage: Stage.VERIFY },
   // 06_wrap_up
   { relativePath: 'retro.md', stage: Stage.WRAP_UP },
@@ -75,16 +83,25 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   ...RELEASE_REQUIRED_ARTIFACTS.map((relativePath) => ({
     relativePath,
     stage: Stage.RELEASE,
-    template: relativePath.endsWith('release-note.md') ? 'release/release-note.md' : 'release/smoke-test-report.md',
+    template: relativePath.endsWith('release-note.md')
+      ? 'release/release-note.md'
+      : 'release/smoke-test-report.md',
   })),
 ];
 
 // ─── 阶段顺序（用于判定"当前阶段及之前"） ─────────────
 
 const STAGE_ORDER: readonly Stage[] = [
-  Stage.INIT, Stage.SPECIFY, Stage.DESIGN, Stage.PLAN,
-  Stage.IMPLEMENT, Stage.VERIFY, Stage.WRAP_UP, Stage.RELEASE,
-  Stage.DONE, Stage.CANCELLED,
+  Stage.INIT,
+  Stage.SPECIFY,
+  Stage.DESIGN,
+  Stage.PLAN,
+  Stage.IMPLEMENT,
+  Stage.VERIFY,
+  Stage.WRAP_UP,
+  Stage.RELEASE,
+  Stage.DONE,
+  Stage.CANCELLED,
 ];
 
 function stageIndex(s: Stage): number {
@@ -111,10 +128,7 @@ function loadStageState(projectRoot: string, featureId: string): StageState {
  * 检查并补全当前阶段及之前的必须产出物
  * 缺失且有模板的产出物会自动渲染骨架
  */
-export function ensureArtifacts(
-  featureId: string,
-  projectRoot: string,
-): EnsureResult {
+export function ensureArtifacts(featureId: string, projectRoot: string): EnsureResult {
   const state = loadStageState(projectRoot, featureId);
   const currentIdx = stageIndex(state.currentStage);
   const featDir = featureDir(projectRoot, featureId);
@@ -163,10 +177,7 @@ export function ensureArtifacts(
 /**
  * 列出 Feature 下所有产出物及状态
  */
-export function listArtifacts(
-  featureId: string,
-  projectRoot: string,
-): ArtifactEntry[] {
+export function listArtifacts(featureId: string, projectRoot: string): ArtifactEntry[] {
   const state = loadStageState(projectRoot, featureId);
   const featDir = featureDir(projectRoot, featureId);
   const result: ArtifactEntry[] = [];

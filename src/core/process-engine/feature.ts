@@ -8,13 +8,19 @@ import type { StageState, FeatureSummary } from '../../shared/types.js';
 import { readJson, exists, writeMarkdown, readMarkdown, ensureDir } from '../../shared/fs-utils.js';
 
 const CURRENT_FILE = '.spec-first/current';
-const FEATURE_ENV_KEYS = ['SPEC_FIRST_FEATURE', 'SPEC_FIRST_CURRENT_FEATURE', 'FEATURE_ID'] as const;
+const FEATURE_ENV_KEYS = [
+  'SPEC_FIRST_FEATURE',
+  'SPEC_FIRST_CURRENT_FEATURE',
+  'FEATURE_ID',
+] as const;
 
 function readValidatedFeatureState(featureDirName: string, projectRoot: string): StageState {
   const stateFile = join(projectRoot, 'specs', featureDirName, 'stage-state.json');
   const state = readJson<StageState>(stateFile);
   if (state.featureId !== featureDirName) {
-    throw new Error(`Feature 目录名与 stage-state.featureId 不一致：目录=${featureDirName}，state=${state.featureId}`);
+    throw new Error(
+      `Feature 目录名与 stage-state.featureId 不一致：目录=${featureDirName}，state=${state.featureId}`
+    );
   }
   return state;
 }
@@ -75,10 +81,7 @@ export function listFeatures(projectRoot: string): FeatureSummary[] {
   return summaries.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
-function resolveByExactOrPrefix(
-  input: string,
-  featureIds: string[],
-): string | undefined {
+function resolveByExactOrPrefix(input: string, featureIds: string[]): string | undefined {
   if (featureIds.includes(input)) return input;
 
   const matches = featureIds.filter((id) => id.startsWith(input));
@@ -110,12 +113,14 @@ function getEnvOverride(env: NodeJS.ProcessEnv): string | undefined {
 export function resolveFeatureId(
   requested: string | undefined,
   projectRoot: string,
-  options?: { env?: NodeJS.ProcessEnv },
+  options?: { env?: NodeJS.ProcessEnv }
 ): { featureId: string; source: 'exact' | 'prefix' | 'env' } {
-  const featureIds = Array.from(new Set([
-    ...listFeatures(projectRoot).map((item) => item.featureId),
-    ...listFeatureDirectoryNames(projectRoot),
-  ]));
+  const featureIds = Array.from(
+    new Set([
+      ...listFeatures(projectRoot).map((item) => item.featureId),
+      ...listFeatureDirectoryNames(projectRoot),
+    ])
+  );
   const input = requested?.trim();
 
   if (input) {

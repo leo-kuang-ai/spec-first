@@ -94,7 +94,7 @@ function validateIdFormat(featureId: string, projectRoot: string): string[] {
     seen.add(id);
 
     // 校验 upstream/downstream 列（第5、6列）
-    const cells = line.split('|').map(c => c.trim());
+    const cells = line.split('|').map((c) => c.trim());
     if (cells.length >= 6) {
       const upstream = cells[5];
       const downstream = cells[6];
@@ -113,7 +113,10 @@ function validateIdFormat(featureId: string, projectRoot: string): string[] {
 function validateRefList(refList: string, field: string, rowId: string, errors: string[]): void {
   if (!refList || refList.trim() === '') return;
 
-  const refs = refList.split(',').map(r => r.trim()).filter(Boolean);
+  const refs = refList
+    .split(',')
+    .map((r) => r.trim())
+    .filter(Boolean);
   for (const ref of refs) {
     // 跳过占位符（如 src/** 路径）
     if (ref.includes('/') || ref.includes('*')) {

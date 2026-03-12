@@ -30,7 +30,7 @@ export function validateSecurity(findings: SecurityFinding[]): SecurityResult {
   }
 
   const s1Count = summary.S1;
-  const unwaivedS2 = findings.filter(f => f.severity === 'S2' && !f.waived).length;
+  const unwaivedS2 = findings.filter((f) => f.severity === 'S2' && !f.waived).length;
   const noCritical = s1Count === 0 && unwaivedS2 === 0;
 
   // S1 存在 → 强制 FAIL（不可豁免）

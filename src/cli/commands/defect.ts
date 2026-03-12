@@ -14,18 +14,29 @@ import {
 import { parseFlag } from '../parse-utils.js';
 
 const VALID_SEVERITIES: ReadonlySet<string> = new Set(['S1', 'S2', 'S3', 'S4']);
-const VALID_STATUSES: ReadonlySet<string> = new Set(['open', 'fixing', 'fixed', 'verified', 'wontfix']);
+const VALID_STATUSES: ReadonlySet<string> = new Set([
+  'open',
+  'fixing',
+  'fixed',
+  'verified',
+  'wontfix',
+]);
 
 export function handleDefect(args: string[]): number {
   const sub = args[0];
   const rest = args.slice(1);
 
   switch (sub) {
-    case 'register':    return handleRegister(rest);
-    case 'update':      return handleUpdate(rest);
-    case 'list':        return handleList(rest);
-    case 'get':         return handleGet(rest);
-    case 'escape-rate': return handleEscapeRate(rest);
+    case 'register':
+      return handleRegister(rest);
+    case 'update':
+      return handleUpdate(rest);
+    case 'list':
+      return handleList(rest);
+    case 'get':
+      return handleGet(rest);
+    case 'escape-rate':
+      return handleEscapeRate(rest);
     default:
       console.error(`未知 defect 子命令：${sub}`);
       printDefectHelp();
@@ -43,7 +54,9 @@ function handleRegister(args: string[]): number {
   const linkedFr = parseFlag(args, '--linked-fr');
 
   if (!featureId || !severity || !title) {
-    console.error('用法：spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" --reporter "<name>"');
+    console.error(
+      '用法：spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" --reporter "<name>"'
+    );
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -53,14 +66,18 @@ function handleRegister(args: string[]): number {
   }
 
   try {
-    const d = registerDefect(featureId, {
-      severity: severity as SecuritySeverity,
-      title,
-      reporter,
-      description: description ?? undefined,
-      discoveredIn,
-      linkedFr: linkedFr ?? undefined,
-    }, process.cwd());
+    const d = registerDefect(
+      featureId,
+      {
+        severity: severity as SecuritySeverity,
+        title,
+        reporter,
+        description: description ?? undefined,
+        discoveredIn,
+        linkedFr: linkedFr ?? undefined,
+      },
+      process.cwd()
+    );
     console.log(`已登记：缺陷 #${d.seq} (${d.severity})`);
     return ExitCode.SUCCESS;
   } catch (e) {
@@ -76,7 +93,9 @@ function handleUpdate(args: string[]): number {
   parseFlag(args, '--actor'); // 阶段 A 暂不持久化 actor，仅保留参数兼容
 
   if (!featureId || !seqStr || !status) {
-    console.error('用法：spec-first defect update <featureId> <seq> --status <status> [--actor <actor>]');
+    console.error(
+      '用法：spec-first defect update <featureId> <seq> --status <status> [--actor <actor>]'
+    );
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -104,7 +123,9 @@ function handleUpdate(args: string[]): number {
 function handleList(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
-    console.error('用法：spec-first defect list <featureId> [--status <status>] [--severity <severity>]');
+    console.error(
+      '用法：spec-first defect list <featureId> [--status <status>] [--severity <severity>]'
+    );
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -159,7 +180,9 @@ function handleEscapeRate(args: string[]): number {
   }
 
   const result = getEscapeRate(featureId, process.cwd());
-  console.log(`总数：${result.total}，逃逸：${result.escaped}，逃逸率：${(result.rate * 100).toFixed(1)}%`);
+  console.log(
+    `总数：${result.total}，逃逸：${result.escaped}，逃逸率：${(result.rate * 100).toFixed(1)}%`
+  );
   return ExitCode.SUCCESS;
 }
 

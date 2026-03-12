@@ -19,10 +19,10 @@ export interface ImpactResult {
 export function analyzeImpact(
   featureId: string,
   changedIds: string[],
-  projectRoot: string,
+  projectRoot: string
 ): ImpactResult {
   const rows = parseMatrix(featureId, projectRoot);
-  const rowMap = new Map(rows.map(r => [r.id, r]));
+  const rowMap = new Map(rows.map((r) => [r.id, r]));
 
   const visited = new Set<string>(changedIds);
   const directImpact: MatrixRow[] = [];
@@ -40,18 +40,20 @@ export function analyzeImpact(
   }
 
   // 第二层：间接影响（邻居的邻居）
-  const indirectQueue = directImpact.map(r => r.id);
+  const indirectQueue = directImpact.map((r) => r.id);
   for (const id of indirectQueue) {
     const row = rowMap.get(id);
     if (!row) continue;
     collectNeighbors(row, rowMap, visited, indirectImpact, new Set());
   }
 
-  const allAffected = [...new Set([
-    ...changedIds,
-    ...directImpact.map(r => r.id),
-    ...indirectImpact.map(r => r.id),
-  ])];
+  const allAffected = [
+    ...new Set([
+      ...changedIds,
+      ...directImpact.map((r) => r.id),
+      ...indirectImpact.map((r) => r.id),
+    ]),
+  ];
 
   return {
     changedIds,
@@ -67,12 +69,9 @@ function collectNeighbors(
   rowMap: Map<string, MatrixRow>,
   visited: Set<string>,
   result: MatrixRow[],
-  resultSet: Set<string>,
+  resultSet: Set<string>
 ): void {
-  const neighbors = [
-    ...(row.upstream ?? []),
-    ...(row.downstream ?? []),
-  ];
+  const neighbors = [...(row.upstream ?? []), ...(row.downstream ?? [])];
   for (const nId of neighbors) {
     if (visited.has(nId)) continue;
     visited.add(nId);

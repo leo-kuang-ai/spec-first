@@ -29,7 +29,8 @@ export interface AIHookResult {
   softBlock?: boolean;
 }
 
-const WRITE_INTENT_MATCHER = 'write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append';
+const WRITE_INTENT_MATCHER =
+  'write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append';
 
 function wrapSoftHook(command: string, hookName: string): string {
   return `sh -c '${command} || echo "spec-first: ${hookName} hook 执行失败（已降级）" >&2'`;
@@ -69,13 +70,14 @@ export function generateAIHookConfigs(projectRoot: string): AIHookConfig[] {
     },
   ];
 
-  const extHooks: AIHookConfig[] = loadEnabledExtensions(projectRoot)
-    .flatMap((ext) => ext.hooks.map((hook) => ({
+  const extHooks: AIHookConfig[] = loadEnabledExtensions(projectRoot).flatMap((ext) =>
+    ext.hooks.map((hook) => ({
       type: hook.type,
       matcher: hook.matcher,
       // 命名空间注入用于审计定位（不改变 hook 本体语义）
       command: `sh -c 'SPEC_FIRST_EXTENSION_NAMESPACE=${ext.namespace}; ${hook.command}'`,
-    })));
+    }))
+  );
 
   return [...builtins, ...extHooks];
 }
@@ -104,13 +106,18 @@ function isManagedHookEntry(item: unknown): boolean {
   if (entry?.specFirstManaged === true) return true;
   const hooks = entry?.hooks;
   if (!Array.isArray(hooks)) return false;
-  return hooks.some((hook: Record<string, unknown>) =>
-    typeof hook.command === 'string'
-    && MANAGED_HOOK_COMMAND_MARKERS.some((marker) => (hook.command as string).includes(marker)));
+  return hooks.some(
+    (hook: Record<string, unknown>) =>
+      typeof hook.command === 'string' &&
+      MANAGED_HOOK_COMMAND_MARKERS.some((marker) => (hook.command as string).includes(marker))
+  );
 }
 
 /** 注册 AI Hook 到宿主环境配置 */
-export function registerAIHooks(projectRoot: string, options?: { dryRun?: boolean }): { registered: string[]; warnings: string[] } {
+export function registerAIHooks(
+  projectRoot: string,
+  options?: { dryRun?: boolean }
+): { registered: string[]; warnings: string[] } {
   const configs = generateAIHookConfigs(projectRoot);
   const groupedConfigs = groupHookConfigs(configs);
   const registered: string[] = [];
@@ -151,12 +158,14 @@ export function registerAIHooks(projectRoot: string, options?: { dryRun?: boolea
     // Migrate legacy top-level entries into hooks wrapper
     if (Array.isArray(settings[hookType])) {
       const legacy = settings[hookType] as unknown[];
-      const existingInHooks = Array.isArray(hooksObj[hookType]) ? hooksObj[hookType] as unknown[] : [];
+      const existingInHooks = Array.isArray(hooksObj[hookType])
+        ? (hooksObj[hookType] as unknown[])
+        : [];
       hooksObj[hookType] = [...existingInHooks, ...legacy];
       delete settings[hookType];
     }
 
-    const existing = Array.isArray(hooksObj[hookType]) ? hooksObj[hookType] as unknown[] : [];
+    const existing = Array.isArray(hooksObj[hookType]) ? (hooksObj[hookType] as unknown[]) : [];
     const filtered = existing.filter((item: unknown) => !isManagedHookEntry(item));
     hooksObj[hookType] = [...filtered, ...hookConfigs.map((config) => buildHookEntry(config))];
     registered.push(hookType);
@@ -170,10 +179,7 @@ export function registerAIHooks(projectRoot: string, options?: { dryRun?: boolea
 }
 
 /** 模拟 PreToolUse Hook 执行：检查 Gate 条件 */
-export function executePreToolUse(
-  featureId: string,
-  projectRoot: string,
-): AIHookResult {
+export function executePreToolUse(featureId: string, projectRoot: string): AIHookResult {
   // 简化实现：检查 stage-state 是否存在
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) {
@@ -196,7 +202,7 @@ export function executePreToolUse(
 export function executeStopHook(
   featureId: string,
   projectRoot: string,
-  summary: string,
+  summary: string
 ): AIHookResult {
   const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
   const timestamp = new Date().toISOString();

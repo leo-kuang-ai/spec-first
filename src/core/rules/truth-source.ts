@@ -60,9 +60,7 @@ export function getSuggestedCommandForStage(stage: string, featureId?: string): 
   }
 
   if (route.command === 'golive') {
-    return featureId
-      ? `spec-first golive check ${featureId}`
-      : 'spec-first golive check';
+    return featureId ? `spec-first golive check ${featureId}` : 'spec-first golive check';
   }
 
   if (route.command === 'done') {

@@ -6,14 +6,14 @@ import { Stage, TERMINAL_STAGES } from '../../shared/types.js';
 
 /** 合法转换表：key → 允许的下一阶段集合 */
 const TRANSITIONS = new Map<Stage, ReadonlySet<Stage>>([
-  [Stage.INIT,      new Set([Stage.SPECIFY, Stage.CANCELLED])],
-  [Stage.SPECIFY,   new Set([Stage.DESIGN, Stage.CANCELLED])],
-  [Stage.DESIGN,    new Set([Stage.PLAN, Stage.CANCELLED])],
-  [Stage.PLAN,      new Set([Stage.IMPLEMENT, Stage.CANCELLED])],
+  [Stage.INIT, new Set([Stage.SPECIFY, Stage.CANCELLED])],
+  [Stage.SPECIFY, new Set([Stage.DESIGN, Stage.CANCELLED])],
+  [Stage.DESIGN, new Set([Stage.PLAN, Stage.CANCELLED])],
+  [Stage.PLAN, new Set([Stage.IMPLEMENT, Stage.CANCELLED])],
   [Stage.IMPLEMENT, new Set([Stage.VERIFY, Stage.CANCELLED])],
-  [Stage.VERIFY,    new Set([Stage.WRAP_UP, Stage.CANCELLED])],
-  [Stage.WRAP_UP,   new Set([Stage.RELEASE, Stage.CANCELLED])],
-  [Stage.RELEASE,   new Set([Stage.DONE, Stage.CANCELLED])],
+  [Stage.VERIFY, new Set([Stage.WRAP_UP, Stage.CANCELLED])],
+  [Stage.WRAP_UP, new Set([Stage.RELEASE, Stage.CANCELLED])],
+  [Stage.RELEASE, new Set([Stage.DONE, Stage.CANCELLED])],
 ]);
 
 export class TransitionError extends Error {

@@ -1,4 +1,12 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, renameSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+  unlinkSync,
+  renameSync,
+} from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -53,7 +61,9 @@ function atomicWriteJson(filePath: string, data: unknown): void {
     renameSync(tmpPath, filePath); // 原子操作
   } catch (e) {
     // 失败时清理临时文件
-    try { unlinkSync(tmpPath); } catch {}
+    try {
+      unlinkSync(tmpPath);
+    } catch {}
     throw e;
   }
 }
@@ -107,7 +117,10 @@ export function ensureHostBootstrap(options?: BootstrapOptions): BootstrapSummar
   return { ok, results };
 }
 
-function collectPathResolutionWarnings(paths: HostPaths, env: NodeJS.ProcessEnv): BootstrapResult[] {
+function collectPathResolutionWarnings(
+  paths: HostPaths,
+  env: NodeJS.ProcessEnv
+): BootstrapResult[] {
   const warnings: BootstrapResult[] = [];
   const checks: Array<{
     host: BootstrapResult['host'];
@@ -117,14 +130,54 @@ function collectPathResolutionWarnings(paths: HostPaths, env: NodeJS.ProcessEnv)
   }> = [
     { host: 'Codex', category: 'MCP', envKey: 'CODEX_HOME', selected: paths.codexRoot },
     { host: 'Codex', category: 'MCP', envKey: 'CODEX_ROOT', selected: paths.codexRoot },
-    { host: 'Codex', category: 'MCP', envKey: 'CODEX_CONFIG_PATH', selected: paths.codexConfigPath },
-    { host: 'Codex', category: 'Skill', envKey: 'CODEX_SKILLS_DIR', selected: paths.codexSkillsDir },
-    { host: 'Claude Code', category: 'MCP', envKey: 'CLAUDE_CODE_CONFIG_DIR', selected: paths.claudeConfigDir },
-    { host: 'Claude Code', category: 'MCP', envKey: 'CLAUDE_CONFIG_DIR', selected: paths.claudeConfigDir },
-    { host: 'Claude Code', category: 'Skill', envKey: 'CLAUDE_HOME', selected: paths.claudeHomeDir },
-    { host: 'Claude Code', category: 'Skill', envKey: 'CLAUDE_USER_HOME', selected: paths.claudeHomeDir },
-    { host: 'Claude Code', category: 'Skill', envKey: 'CLAUDE_SKILLS_DIR', selected: paths.claudeSkillsDir },
-    { host: 'Claude Code', category: 'Skill', envKey: 'CLAUDE_COMMANDS_DIR', selected: paths.claudeCommandsDir },
+    {
+      host: 'Codex',
+      category: 'MCP',
+      envKey: 'CODEX_CONFIG_PATH',
+      selected: paths.codexConfigPath,
+    },
+    {
+      host: 'Codex',
+      category: 'Skill',
+      envKey: 'CODEX_SKILLS_DIR',
+      selected: paths.codexSkillsDir,
+    },
+    {
+      host: 'Claude Code',
+      category: 'MCP',
+      envKey: 'CLAUDE_CODE_CONFIG_DIR',
+      selected: paths.claudeConfigDir,
+    },
+    {
+      host: 'Claude Code',
+      category: 'MCP',
+      envKey: 'CLAUDE_CONFIG_DIR',
+      selected: paths.claudeConfigDir,
+    },
+    {
+      host: 'Claude Code',
+      category: 'Skill',
+      envKey: 'CLAUDE_HOME',
+      selected: paths.claudeHomeDir,
+    },
+    {
+      host: 'Claude Code',
+      category: 'Skill',
+      envKey: 'CLAUDE_USER_HOME',
+      selected: paths.claudeHomeDir,
+    },
+    {
+      host: 'Claude Code',
+      category: 'Skill',
+      envKey: 'CLAUDE_SKILLS_DIR',
+      selected: paths.claudeSkillsDir,
+    },
+    {
+      host: 'Claude Code',
+      category: 'Skill',
+      envKey: 'CLAUDE_COMMANDS_DIR',
+      selected: paths.claudeCommandsDir,
+    },
   ];
 
   for (const item of checks) {
@@ -265,13 +318,17 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
 function ensureRequiredSkills(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
   const results: BootstrapResult[] = [];
   for (const skill of REQUIRED_SKILLS) {
-    const source = resolveSkillSource(paths, skill) ?? cloneSkillSource(paths, skill, results, dryRun);
-    const codexTarget = skill.codexTarget === 'system'
-      ? join(paths.codexSystemSkillsDir, skill.name)
-      : join(paths.codexSkillsDir, skill.name);
+    const source =
+      resolveSkillSource(paths, skill) ?? cloneSkillSource(paths, skill, results, dryRun);
+    const codexTarget =
+      skill.codexTarget === 'system'
+        ? join(paths.codexSystemSkillsDir, skill.name)
+        : join(paths.codexSkillsDir, skill.name);
 
     results.push(copySkill(source, codexTarget, 'Codex', skill.name, dryRun));
-    results.push(copySkill(source, join(paths.claudeSkillsDir, skill.name), 'Claude Code', skill.name, dryRun));
+    results.push(
+      copySkill(source, join(paths.claudeSkillsDir, skill.name), 'Claude Code', skill.name, dryRun)
+    );
   }
 
   return results;
@@ -282,7 +339,7 @@ function copySkill(
   target: string,
   host: 'Codex' | 'Claude Code',
   skillName: string,
-  dryRun: boolean = false,
+  dryRun: boolean = false
 ): BootstrapResult {
   if (!source || !existsSync(source)) {
     return {
@@ -316,7 +373,11 @@ function copySkill(
   };
 }
 
-function resolveSourcePath(paths: HostPaths, source: SkillSourceLocation, skillName: string): string {
+function resolveSourcePath(
+  paths: HostPaths,
+  source: SkillSourceLocation,
+  skillName: string
+): string {
   switch (source) {
     case 'agents':
       return join(paths.agentsSkillsDir, skillName);
@@ -330,7 +391,9 @@ function resolveSourcePath(paths: HostPaths, source: SkillSourceLocation, skillN
 }
 
 function resolveSkillSource(paths: HostPaths, skill: RequiredSkill): string | undefined {
-  const candidates = skill.sourcePriority.map((source) => resolveSourcePath(paths, source, skill.name));
+  const candidates = skill.sourcePriority.map((source) =>
+    resolveSourcePath(paths, source, skill.name)
+  );
   return candidates.find((candidate) => existsSync(candidate));
 }
 
@@ -338,7 +401,7 @@ function cloneSkillSource(
   paths: HostPaths,
   skill: RequiredSkill,
   results: BootstrapResult[],
-  dryRun: boolean = false,
+  dryRun: boolean = false
 ): string | undefined {
   if (dryRun) return undefined;
   if (!skill.clone) return undefined;
@@ -383,10 +446,7 @@ function ensureMcpBinaries(): BootstrapResult[] {
   return results;
 }
 
-function checkBinary(
-  name: string,
-  probes: readonly BinaryProbeCommand[],
-): BootstrapResult {
+function checkBinary(name: string, probes: readonly BinaryProbeCommand[]): BootstrapResult {
   if (probes.length === 0) {
     return {
       host: 'Common',
@@ -419,8 +479,10 @@ function checkBinary(
 
 function readJsonObject(
   filePath: string,
-  options?: { dryRun?: boolean },
-): { ok: true; value: Record<string, unknown> } | { ok: false; error: string; backupPath?: string } {
+  options?: { dryRun?: boolean }
+):
+  | { ok: true; value: Record<string, unknown> }
+  | { ok: false; error: string; backupPath?: string } {
   if (!existsSync(filePath)) return { ok: true, value: {} };
   const content = readFileSync(filePath, 'utf-8').trim();
   if (!content) return { ok: true, value: {} };
@@ -446,7 +508,11 @@ function readJsonObject(
   }
 }
 
-function backupInvalidJson(filePath: string, content: string, dryRun?: boolean): string | undefined {
+function backupInvalidJson(
+  filePath: string,
+  content: string,
+  dryRun?: boolean
+): string | undefined {
   const backupPath = `${filePath}.invalid-${Date.now()}.bak`;
   if (!dryRun) {
     writeFileSync(backupPath, `${content}\n`, 'utf-8');

@@ -99,7 +99,10 @@ export function parseRange(rangeStr: string): SimpleVersionRange {
   }
 
   // 区间表达式 "1.2.3..2.0.0" 或 "1.2.3-2.0.0"
-  const rangeMatch = /^(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)\s*(\.\.||-)\s*(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)$/.exec(rangeStr);
+  const rangeMatch =
+    /^(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)\s*(\.\.||-)\s*(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)$/.exec(
+      rangeStr
+    );
   if (rangeMatch) {
     return {
       from: rangeMatch[1],
@@ -154,7 +157,7 @@ export function matches(current: string, range: string | SimpleVersionRange): bo
  */
 export function filterManifestsByVersion<T extends { versionRange: { from: string; to: string } }>(
   currentVersion: string,
-  manifests: T[],
+  manifests: T[]
 ): T[] {
   return manifests.filter((m) => matches(currentVersion, m.versionRange));
 }

@@ -72,6 +72,8 @@ describe('ensureSkillCommands', () => {
     const content = readFileSync(doctorCommand, 'utf-8');
     expect(content).toContain('description: "定位项目与宿主配置并执行环境诊断"');
     expect(content).not.toContain('(`Codex` + `Claude`)');
+    expect(content).toContain('spec-first skill render doctor --input "$ARGUMENTS"');
+    expect(content).not.toContain('读取并执行以下完整 Skill 定义');
   });
 
   it('should cleanup legacy flat command aliases', () => {
@@ -101,7 +103,25 @@ describe('ensureSkillCommands', () => {
     expect(lstatSync(target).isSymbolicLink()).toBe(false);
     const skill = readFileSync(join(target, 'SKILL.md'), 'utf-8');
     expect(skill).toContain('name: "spec-first:doctor"');
+    expect(skill).toContain('spec-first skill render doctor');
+    expect(skill).toContain('--input "<用户原始输入>"');
     expect(skill).not.toContain('# stale');
+  });
+
+  it('should preserve original codex frontmatter fields when writing dynamic wrapper', () => {
+    ensureSkillCommands(TMP, { global: true });
+
+    const skill = readFileSync(
+      join(process.env.CODEX_SKILLS_DIR as string, 'spec-first', 'task', 'SKILL.md'),
+      'utf-8',
+    );
+
+    expect(skill).toContain('name: "spec-first:task"');
+    expect(skill).toContain('allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, mcp__serena__find_symbol, mcp__serena__get_symbols_overview"');
+    expect(skill).toContain('hooks:');
+    expect(skill).toContain('metadata:');
+    expect(skill).toContain('spec-first skill render task');
+    expect(skill).toContain('--input "<用户原始输入>"');
   });
 
 

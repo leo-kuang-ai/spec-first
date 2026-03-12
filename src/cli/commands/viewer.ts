@@ -10,7 +10,9 @@ import { ExitCode } from '../../shared/types.js';
 
 type ViewerSubcommand = 'start' | 'open' | 'url';
 
-function parseSubcommand(args: string[]): { subcommand: ViewerSubcommand; passthrough: string[] } | null {
+function parseSubcommand(
+  args: string[]
+): { subcommand: ViewerSubcommand; passthrough: string[] } | null {
   if (args.length === 0) {
     return { subcommand: 'start', passthrough: [] };
   }

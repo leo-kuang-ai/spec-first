@@ -7,7 +7,10 @@
  */
 import type { DefectStatus } from '../../shared/types.js';
 
-const DEFECT_TRANSITIONS: ReadonlyMap<DefectStatus, ReadonlySet<DefectStatus>> = new Map<DefectStatus, ReadonlySet<DefectStatus>>([
+const DEFECT_TRANSITIONS: ReadonlyMap<DefectStatus, ReadonlySet<DefectStatus>> = new Map<
+  DefectStatus,
+  ReadonlySet<DefectStatus>
+>([
   ['open', new Set(['fixing', 'wontfix'])],
   ['fixing', new Set(['fixed', 'open'])],
   ['fixed', new Set(['verified', 'open'])],

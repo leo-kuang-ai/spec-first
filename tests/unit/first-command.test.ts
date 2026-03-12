@@ -129,4 +129,35 @@ describe('handleFirst', () => {
 
     expect(code).toBe(2);
   });
+
+  it('补跑 first 后会同步已有 Feature 的 backgroundInputStatus', () => {
+    seedProject();
+    const featureId = 'FSREQ-20260312-FIRSTSYNC-001';
+    mkdirSync(join(TMP, 'specs', featureId), { recursive: true });
+    writeFileSync(
+      join(TMP, 'specs', featureId, 'stage-state.json'),
+      JSON.stringify({
+        featureId,
+        currentStage: '02_design',
+        history: [],
+        terminal: false,
+        mode: 'N',
+        size: 'S',
+        platforms: ['h5'],
+        backgroundInputStatus: 'blind',
+        createdAt: '2026-03-12T12:00:00.000Z',
+        updatedAt: '2026-03-12T12:00:00.000Z',
+      }),
+      'utf-8',
+    );
+
+    const code = handleFirst(['--quick']);
+
+    expect(code).toBe(0);
+    const state = JSON.parse(
+      readFileSync(join(TMP, 'specs', featureId, 'stage-state.json'), 'utf-8')
+    ) as { backgroundInputStatus?: string; updatedAt?: string };
+    expect(state.backgroundInputStatus).toBe('full');
+    expect(state.updatedAt).toBe('2026-03-12T12:00:00.000Z');
+  });
 });

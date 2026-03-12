@@ -129,40 +129,44 @@ function asStringArray(value: unknown): string[] {
 }
 
 function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
-  return Array.from(new Set(groups.flatMap(group => group ?? []).filter(Boolean)));
+  return Array.from(new Set(groups.flatMap((group) => group ?? []).filter(Boolean)));
 }
 
 function toDocRefs(entries: string[]): string[] {
-  return entries.map(entry => entry.startsWith('docs/') ? entry : `docs/first/${entry}`);
+  return entries.map((entry) => (entry.startsWith('docs/') ? entry : `docs/first/${entry}`));
 }
 
 function isLegacyRuntimeIndex(value: unknown): value is LegacyFirstRuntimeIndex {
-  return isRecord(value)
-    && typeof value.version === 'string'
-    && Array.isArray(value.artifacts)
-    && isRecord(value.project);
+  return (
+    isRecord(value) &&
+    typeof value.version === 'string' &&
+    Array.isArray(value.artifacts) &&
+    isRecord(value.project)
+  );
 }
 
 function isLegacyRuntimeSummary(value: unknown): value is LegacyFirstRuntimeSummary {
-  return isRecord(value)
-    && typeof value.generated_at === 'string'
-    && typeof value.project_type === 'string'
-    && Array.isArray(value.core_modules);
+  return (
+    isRecord(value) &&
+    typeof value.generated_at === 'string' &&
+    typeof value.project_type === 'string' &&
+    Array.isArray(value.core_modules)
+  );
 }
 
 function isLegacyRoleViews(value: unknown): value is LegacyFirstRoleViews {
-  return isRecord(value)
-    && typeof value.generated_at === 'string'
-    && isRecord(value.roles);
+  return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.roles);
 }
 
 function isLegacyStageViews(value: unknown): value is LegacyFirstStageViews {
-  return isRecord(value)
-    && typeof value.generated_at === 'string'
-    && isRecord(value.stages);
+  return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.stages);
 }
 
-function makeSyntheticAsset(projectRoot: string, path: string, lastUpdated: string): FirstRuntimeAssetIndexEntry {
+function makeSyntheticAsset(
+  projectRoot: string,
+  path: string,
+  lastUpdated: string
+): FirstRuntimeAssetIndexEntry {
   const healthy = existsSync(join(projectRoot, path));
   return {
     path,
@@ -173,9 +177,14 @@ function makeSyntheticAsset(projectRoot: string, path: string, lastUpdated: stri
   };
 }
 
-function normalizeLegacyRoleView(role: FirstRoleView['role'], descriptor?: LegacyFirstRoleDescriptor): FirstRoleView {
+function normalizeLegacyRoleView(
+  role: FirstRoleView['role'],
+  descriptor?: LegacyFirstRoleDescriptor
+): FirstRoleView {
   const priorityDocs = toDocRefs(asStringArray(descriptor?.priority_docs));
-  const entryPoints = asStringArray(descriptor?.entry_points).map(entryPoint => `entry: ${entryPoint}`);
+  const entryPoints = asStringArray(descriptor?.entry_points).map(
+    (entryPoint) => `entry: ${entryPoint}`
+  );
   const keyConcepts = asStringArray(descriptor?.key_concepts);
 
   return {
@@ -186,19 +195,35 @@ function normalizeLegacyRoleView(role: FirstRoleView['role'], descriptor?: Legac
   };
 }
 
-function normalizeLegacyRuntimeIndex(projectRoot: string, rawIndex: LegacyFirstRuntimeIndex): FirstRuntimeIndex {
+function normalizeLegacyRuntimeIndex(
+  projectRoot: string,
+  rawIndex: LegacyFirstRuntimeIndex
+): FirstRuntimeIndex {
   const generatedAt = rawIndex.generated_at ?? new Date(0).toISOString();
-  const summary = makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/summary.json', generatedAt);
-  const roleViews = makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/role-views.json', generatedAt);
-  const stageViews = makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/stage-views.json', generatedAt);
+  const summary = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/summary.json',
+    generatedAt
+  );
+  const roleViews = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/role-views.json',
+    generatedAt
+  );
+  const stageViews = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/stage-views.json',
+    generatedAt
+  );
   const status = summary.healthy && roleViews.healthy && stageViews.healthy ? 'current' : 'stale';
-  const staleReason = status === 'current'
-    ? undefined
-    : [
-      ...(!summary.healthy ? ['summary unhealthy'] : []),
-      ...(!roleViews.healthy ? ['role-views unhealthy'] : []),
-      ...(!stageViews.healthy ? ['stage-views unhealthy'] : []),
-    ].join('；');
+  const staleReason =
+    status === 'current'
+      ? undefined
+      : [
+          ...(!summary.healthy ? ['summary unhealthy'] : []),
+          ...(!roleViews.healthy ? ['role-views unhealthy'] : []),
+          ...(!stageViews.healthy ? ['stage-views unhealthy'] : []),
+        ].join('；');
 
   return {
     version: rawIndex.version ?? 'legacy-runtime',
@@ -217,36 +242,38 @@ function normalizeLegacyRuntimeSummary(
   projectRoot: string,
   rawSummary: LegacyFirstRuntimeSummary,
   rawIndex: LegacyFirstRuntimeIndex | null,
-  rawRoleViews: LegacyFirstRoleViews | null,
+  rawRoleViews: LegacyFirstRoleViews | null
 ): FirstRuntimeSummary {
-  const generatedAt = rawSummary.generated_at ?? rawIndex?.generated_at ?? new Date(0).toISOString();
+  const generatedAt =
+    rawSummary.generated_at ?? rawIndex?.generated_at ?? new Date(0).toISOString();
   const projectName = rawIndex?.project?.name ?? basename(projectRoot);
   const entryPoints = uniqueStrings(
     asStringArray(rawRoleViews?.roles?.developer?.entry_points),
     asStringArray(rawRoleViews?.roles?.product_manager?.entry_points),
     asStringArray(rawRoleViews?.roles?.tester?.entry_points),
-    asStringArray(rawRoleViews?.roles?.architect?.entry_points),
+    asStringArray(rawRoleViews?.roles?.architect?.entry_points)
   );
   const apiSurface = toDocRefs(
     rawIndex?.artifacts
-      ?.filter(artifact => artifact.type?.includes('api'))
-      .map(artifact => artifact.path)
-      .filter((path): path is string => typeof path === 'string') ?? [],
+      ?.filter((artifact) => artifact.type?.includes('api'))
+      .map((artifact) => artifact.path)
+      .filter((path): path is string => typeof path === 'string') ?? []
   );
   const dataModels = toDocRefs(
     rawIndex?.artifacts
-      ?.filter(artifact => artifact.type?.includes('domain'))
-      .map(artifact => artifact.path)
-      .filter((path): path is string => typeof path === 'string') ?? [],
+      ?.filter((artifact) => artifact.type?.includes('domain'))
+      .map((artifact) => artifact.path)
+      .filter((path): path is string => typeof path === 'string') ?? []
   );
   const capabilities = uniqueStrings(
     rawSummary.project_type ? [`project type: ${rawSummary.project_type}`] : [],
     typeof rawSummary.commands_count === 'number' ? [`commands: ${rawSummary.commands_count}`] : [],
-    [rawSummary.has_database ? 'database: detected' : 'database: not detected'],
+    [rawSummary.has_database ? 'database: detected' : 'database: not detected']
   );
-  const risks = rawIndex?.database?.detected === false && rawIndex.database.reason
-    ? [`database: ${rawIndex.database.reason}`]
-    : [];
+  const risks =
+    rawIndex?.database?.detected === false && rawIndex.database.reason
+      ? [`database: ${rawIndex.database.reason}`]
+      : [];
 
   return {
     generatedAt,
@@ -256,7 +283,9 @@ function normalizeLegacyRuntimeSummary(
       platformType: rawSummary.project_type ?? rawIndex?.project?.type,
       overview: rawIndex?.project?.description,
     },
-    techStack: Object.entries(rawSummary.tech_stack ?? {}).map(([key, value]) => `${key}: ${value}`),
+    techStack: Object.entries(rawSummary.tech_stack ?? {}).map(
+      ([key, value]) => `${key}: ${value}`
+    ),
     modules: asStringArray(rawSummary.core_modules),
     capabilities,
     entryPoints,
@@ -309,7 +338,7 @@ function normalizeLegacyStageViews(rawStageViews: LegacyFirstStageViews): FirstS
       businessCapabilities: specDocs,
       coreEntities: [],
       dependencies: specFiles,
-      warnings: initFiles.map(file => `00_init: ${file}`),
+      warnings: initFiles.map((file) => `00_init: ${file}`),
     },
     design: {
       stage: 'design',
@@ -324,7 +353,7 @@ function normalizeLegacyStageViews(rawStageViews: LegacyFirstStageViews): FirstS
       summary: 'Derived from 04_implement runtime stage',
       entryPoints: codeFiles,
       likelyChangeAreas: uniqueStrings(planFiles, codeDocs),
-      callPathHints: planFiles.map(file => `03_plan -> ${file}`),
+      callPathHints: planFiles.map((file) => `03_plan -> ${file}`),
       couplingPoints: uniqueStrings(planDocs, designFiles),
       changeHazards: [],
       verificationHooks: verifyFiles,
@@ -366,7 +395,7 @@ export function readFirstRuntimeSummary(projectRoot: string): FirstRuntimeSummar
       projectRoot,
       raw,
       isLegacyRuntimeIndex(rawIndex) ? rawIndex : null,
-      isLegacyRoleViews(rawRoleViews) ? rawRoleViews : null,
+      isLegacyRoleViews(rawRoleViews) ? rawRoleViews : null
     );
   }
   return raw as FirstRuntimeSummary;

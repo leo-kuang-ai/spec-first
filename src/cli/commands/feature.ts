@@ -14,9 +14,12 @@ export function handleFeature(args: string[]): number {
   const rest = args.slice(1);
 
   switch (sub) {
-    case 'list': return handleList();
-    case 'current': return handleCurrent();
-    case 'switch': return handleSwitch(rest);
+    case 'list':
+      return handleList();
+    case 'current':
+      return handleCurrent();
+    case 'switch':
+      return handleSwitch(rest);
     default:
       if (sub) console.error(`未知 feature 子命令：${sub}`);
       printFeatureHelp();
@@ -32,8 +35,9 @@ function handleList(): number {
     return ExitCode.SUCCESS;
   }
 
-  const entries = readdirSync(specsDir, { withFileTypes: true })
-    .filter(e => e.isDirectory() && e.name.startsWith('FSREQ-'));
+  const entries = readdirSync(specsDir, { withFileTypes: true }).filter(
+    (e) => e.isDirectory() && e.name.startsWith('FSREQ-')
+  );
 
   if (entries.length === 0) {
     console.log('未找到 Feature。');
@@ -50,9 +54,9 @@ function handleList(): number {
     const state = readJson<StageState>(statePath);
     console.log(
       state.featureId.padEnd(35) +
-      (state.title ?? '').padEnd(25) +
-      state.currentStage.padEnd(18) +
-      (state.updatedAt ?? ''),
+        (state.title ?? '').padEnd(25) +
+        state.currentStage.padEnd(18) +
+        (state.updatedAt ?? '')
     );
   }
 
@@ -113,7 +117,9 @@ function handleSwitch(args: string[]): number {
   const configDir = join(projectRoot, '.spec-first');
   ensureDir(configDir);
   writeFileSync(join(configDir, 'current'), resolved.featureId, 'utf-8');
-  console.log(`已切换到：${resolved.featureId}${resolved.source === 'exact' ? '' : `（来源: ${resolved.source}）`}`);
+  console.log(
+    `已切换到：${resolved.featureId}${resolved.source === 'exact' ? '' : `（来源: ${resolved.source}）`}`
+  );
 
   return ExitCode.SUCCESS;
 }

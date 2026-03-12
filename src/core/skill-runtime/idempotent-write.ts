@@ -23,7 +23,7 @@ export interface WriteResult {
 export function idempotentWrite(
   path: string,
   content: string,
-  mode: WriteMode = 'overwrite',
+  mode: WriteMode = 'overwrite'
 ): WriteResult {
   switch (mode) {
     case 'overwrite':

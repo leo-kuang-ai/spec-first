@@ -20,12 +20,7 @@ export interface PlatformDetectionResult {
   evidence: string[];
 }
 
-const MONOREPO_MARKERS = [
-  'turbo.json',
-  'nx.json',
-  'lerna.json',
-  'pnpm-workspace.yaml',
-];
+const MONOREPO_MARKERS = ['turbo.json', 'nx.json', 'lerna.json', 'pnpm-workspace.yaml'];
 
 const BACKEND_MARKERS = [
   'pom.xml',
@@ -83,7 +78,7 @@ function mergePackageDeps(pkg?: Record<string, unknown>): Record<string, string>
 }
 
 function hasAnyDependency(deps: Record<string, string>, names: string[]): boolean {
-  return names.some(name => name in deps);
+  return names.some((name) => name in deps);
 }
 
 function hasAnyMarker(projectRoot: string, markers: string[]): string | undefined {
@@ -96,7 +91,7 @@ function hasAnyMarker(projectRoot: string, markers: string[]): string | undefine
 function scanFiles(
   root: string,
   predicate: (name: string) => boolean,
-  maxDepth: number = 4,
+  maxDepth: number = 4
 ): string | undefined {
   const stack: Array<{ dir: string; depth: number }> = [{ dir: root, depth: 0 }];
 
@@ -125,8 +120,25 @@ function scanFiles(
 
 function countCodeFiles(projectRoot: string, maxDepth: number = 4, stopAt: number = 60): number {
   const codeExt = new Set([
-    '.ts', '.tsx', '.js', '.jsx', '.java', '.kt', '.go', '.py', '.rs', '.php', '.rb',
-    '.swift', '.dart', '.cs', '.c', '.cc', '.cpp', '.h', '.hpp',
+    '.ts',
+    '.tsx',
+    '.js',
+    '.jsx',
+    '.java',
+    '.kt',
+    '.go',
+    '.py',
+    '.rs',
+    '.php',
+    '.rb',
+    '.swift',
+    '.dart',
+    '.cs',
+    '.c',
+    '.cc',
+    '.cpp',
+    '.h',
+    '.hpp',
   ]);
   let count = 0;
   const stack: Array<{ dir: string; depth: number }> = [{ dir: projectRoot, depth: 0 }];
@@ -186,14 +198,23 @@ export function classifyProjectMaturity(projectRoot: string): ProjectMaturity {
 
   const hasPackageManager = Boolean(
     hasAnyMarker(projectRoot, [
-      'package.json', 'pom.xml', 'build.gradle', 'build.gradle.kts', 'go.mod',
-      'requirements.txt', 'pyproject.toml', 'Cargo.toml', 'composer.json', 'Gemfile',
-    ]),
+      'package.json',
+      'pom.xml',
+      'build.gradle',
+      'build.gradle.kts',
+      'go.mod',
+      'requirements.txt',
+      'pyproject.toml',
+      'Cargo.toml',
+      'composer.json',
+      'Gemfile',
+    ])
   );
-  const hasDepsInstalled = existsSync(join(projectRoot, 'node_modules'))
-    || existsSync(join(projectRoot, 'venv'))
-    || existsSync(join(projectRoot, '.venv'))
-    || existsSync(join(projectRoot, 'target'));
+  const hasDepsInstalled =
+    existsSync(join(projectRoot, 'node_modules')) ||
+    existsSync(join(projectRoot, 'venv')) ||
+    existsSync(join(projectRoot, '.venv')) ||
+    existsSync(join(projectRoot, 'target'));
   if (hasPackageManager && hasDepsInstalled) return 'brownfield';
 
   let rootEntries: Array<{ name: string; isDirectory: () => boolean }>;
@@ -203,12 +224,12 @@ export function classifyProjectMaturity(projectRoot: string): ProjectMaturity {
     return 'brownfield';
   }
 
-  const visibleEntries = rootEntries.filter(entry => !entry.name.startsWith('.'));
+  const visibleEntries = rootEntries.filter((entry) => !entry.name.startsWith('.'));
   if (visibleEntries.length === 0) return 'greenfield';
   if (
-    visibleEntries.length === 1
-    && !visibleEntries[0].isDirectory()
-    && visibleEntries[0].name.toLowerCase().startsWith('readme')
+    visibleEntries.length === 1 &&
+    !visibleEntries[0].isDirectory() &&
+    visibleEntries[0].name.toLowerCase().startsWith('readme')
   ) {
     return 'greenfield';
   }
@@ -236,7 +257,8 @@ export function detectPlatformType(projectRoot: string): PlatformDetectionResult
   if (hasBackendJs) evidence.push('package.json#backend-deps');
 
   const hasFrontendFramework = hasAnyDependency(deps, FRONTEND_FRAMEWORKS);
-  const hasFrontendStructure = existsSync(join(projectRoot, 'src')) && existsSync(join(projectRoot, 'index.html'));
+  const hasFrontendStructure =
+    existsSync(join(projectRoot, 'src')) && existsSync(join(projectRoot, 'index.html'));
   const hasFrontend = hasFrontendFramework || hasFrontendStructure;
   if (hasFrontendFramework) evidence.push('package.json#frontend-framework');
   if (hasFrontendStructure) evidence.push('src/ + index.html');
@@ -258,10 +280,10 @@ export function detectPlatformType(projectRoot: string): PlatformDetectionResult
     return { type: 'frontend', subType, evidence };
   }
 
-  const androidMarker = scanFiles(projectRoot, name => name === 'AndroidManifest.xml');
+  const androidMarker = scanFiles(projectRoot, (name) => name === 'AndroidManifest.xml');
   const iosMarker = scanFiles(
     projectRoot,
-    name => name.endsWith('.xcodeproj') || name.endsWith('.xcworkspace') || name === 'Podfile',
+    (name) => name.endsWith('.xcodeproj') || name.endsWith('.xcworkspace') || name === 'Podfile'
   );
   if (androidMarker || iosMarker) {
     if (androidMarker) evidence.push('AndroidManifest.xml');
@@ -280,7 +302,7 @@ export function detectPlatformType(projectRoot: string): PlatformDetectionResult
 
   const desktopByFile = scanFiles(
     projectRoot,
-    name => name.endsWith('.sln') || name.endsWith('.csproj') || name === 'CMakeLists.txt',
+    (name) => name.endsWith('.sln') || name.endsWith('.csproj') || name === 'CMakeLists.txt'
   );
   if (desktopByFile) {
     evidence.push('desktop-marker');

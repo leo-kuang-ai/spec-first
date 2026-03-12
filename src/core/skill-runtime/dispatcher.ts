@@ -3,20 +3,61 @@
  * 解析 /spec-first:* 命令，分发到 Skill 路由或 Runtime 路由
  */
 import { join } from 'node:path';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
-import { assemblePrompt, resolvePromptAssemblyContext, validateKvCacheStability } from './prompt-assembler.js';
-import { buildScopeGuardRuntimeNotice, evaluateRuntimeScopeGuard, ScopeGuardBlockedError } from './scope-guard.js';
-import { assessHighRiskChanges, buildHardGateRuntimeNotice, evaluateSkillHardGate, HardGateBlockedError, type HighRiskAssessment } from './hard-gate.js';
-import { readFirstRuntimeIndex, readFirstRoleViews, readFirstStageViews } from './first-runtime-store.js';
+import {
+  assemblePrompt,
+  resolvePromptAssemblyContext,
+  validateKvCacheStability,
+} from './prompt-assembler.js';
+import {
+  buildScopeGuardRuntimeNotice,
+  evaluateRuntimeScopeGuard,
+  ScopeGuardBlockedError,
+} from './scope-guard.js';
+import {
+  assessHighRiskChanges,
+  buildHardGateRuntimeNotice,
+  evaluateSkillHardGate,
+  HardGateBlockedError,
+  type HighRiskAssessment,
+} from './hard-gate.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
-import { buildBackgroundInputGuidance, validateOrchestrateArgs, type BackgroundInputGuidance, type DependencyStrength, type OrchestrateArgs } from './orchestrate-args.js';
-import { validateFirstArgs, resolveFirstConfirmPolicy, resolveFirstModePolicy, type FirstArgs } from './first-args.js';
-import { generateResumeRecommendation, formatResumePrompt, formatProductSummary } from './first-resume.js';
-import { formatHealthStatus, formatChangeAnalysis, checkFirstUpdateContext } from './first-change-detector.js';
+import {
+  buildBackgroundInputGuidance,
+  validateOrchestrateArgs,
+  type BackgroundInputGuidance,
+  type DependencyStrength,
+  type OrchestrateArgs,
+} from './orchestrate-args.js';
+import {
+  validateFirstArgs,
+  resolveFirstConfirmPolicy,
+  resolveFirstModePolicy,
+  type FirstArgs,
+} from './first-args.js';
+import {
+  generateResumeRecommendation,
+  formatResumePrompt,
+  formatProductSummary,
+} from './first-resume.js';
+import {
+  formatHealthStatus,
+  formatChangeAnalysis,
+  checkFirstUpdateContext,
+} from './first-change-detector.js';
+import {
+  resolveCurrentFeatureId,
+  resolveSkillContext,
+  type ResolvedSkillContext,
+} from './context-resolver.js';
+import { type SkillExecutionContext } from './execution-context.js';
 import { REMOVED_SKILLS } from '../rules/truth-source.js';
-import type { BackgroundInputStatus as OrchestrateBackgroundInputStatus, StageState } from '../../shared/types.js';
+import type {
+  BackgroundInputStatus as OrchestrateBackgroundInputStatus,
+  StageState,
+} from '../../shared/types.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -48,9 +89,17 @@ const SEMANTIC_MAP: Record<string, { command: string; argTemplate: string }> = {
 
 /** Runtime 路由命令列表（直接映射 CLI 原子命令） */
 const RUNTIME_COMMANDS = new Set([
-  'id', 'matrix', 'stage', 'rfc', 'defect',
-  'metrics', 'gate', 'golive', 'ai',
-  'commit', 'feature',
+  'id',
+  'matrix',
+  'stage',
+  'rfc',
+  'defect',
+  'metrics',
+  'gate',
+  'golive',
+  'ai',
+  'commit',
+  'feature',
 ]);
 
 const NEXT_STEPS_POLICY_MARKER = '## Next Steps（Required Handoff）';
@@ -70,7 +119,9 @@ function ensureNextStepsPolicy(content: string): string {
 `;
 }
 
-function parseExtensionSkillName(skillName: string): { namespace: string; skill: string } | undefined {
+function parseExtensionSkillName(
+  skillName: string
+): { namespace: string; skill: string } | undefined {
   const match = skillName.match(/^ext\.([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/);
   if (!match) return undefined;
   return { namespace: match[1], skill: match[2] };
@@ -92,7 +143,7 @@ function normalizeLayerArgs(args: string[], layer: string): string[] {
 
 function validateLayerArgs(
   skillName: string,
-  args: string[],
+  args: string[]
 ): { ok: true; args: string[] } | { ok: false; error: string } {
   if (skillName !== 'review' && skillName !== 'verify') {
     return { ok: true, args };
@@ -127,7 +178,7 @@ function validateLayerArgs(
  */
 function resolveOrchestrateDependencyStrength(
   currentStage?: string,
-  highRiskAssessment?: HighRiskAssessment,
+  highRiskAssessment?: HighRiskAssessment
 ): DependencyStrength {
   let baseStrength: DependencyStrength;
 
@@ -158,7 +209,7 @@ function resolveOrchestrateDependencyStrength(
 
 function resolveOrchestrateRiskCategory(
   currentStage?: string,
-  highRiskAssessment?: HighRiskAssessment,
+  highRiskAssessment?: HighRiskAssessment
 ): BackgroundInputGuidance['riskCategory'] {
   if (!highRiskAssessment?.isHighRisk) return undefined;
 
@@ -176,7 +227,7 @@ function resolveOrchestrateRiskCategory(
 
 function resolveOrchestrateHighRiskAssessment(
   projectRoot: string,
-  featureId: string,
+  featureId: string
 ): HighRiskAssessment | undefined {
   try {
     return assessHighRiskChanges(projectRoot, featureId);
@@ -185,41 +236,39 @@ function resolveOrchestrateHighRiskAssessment(
   }
 }
 
-function readCurrentFeatureId(projectRoot: string): string | undefined {
-  const currentPath = join(projectRoot, '.spec-first', 'current');
-  if (!exists(currentPath)) return undefined;
-  const featureId = readFileSync(currentPath, 'utf-8').trim();
-  return featureId || undefined;
-}
-
-function resolveOrchestrateBackgroundGuidance(projectRoot: string) {
-  const featureId = readCurrentFeatureId(projectRoot);
+function resolveOrchestrateBackgroundGuidance(
+  executionContext: SkillExecutionContext
+) {
+  const { projectRoot } = executionContext;
+  const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
   if (!featureId) return undefined;
 
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) return undefined;
 
   try {
-    const state = readJson<StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }>(statePath);
+    const state = readJson<
+      StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }
+    >(statePath);
     const backgroundStatus = state.backgroundInputStatus ?? 'blind';
     const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
-    const dependencyStrength = resolveOrchestrateDependencyStrength(state.currentStage, highRiskAssessment);
+    const dependencyStrength = resolveOrchestrateDependencyStrength(
+      state.currentStage,
+      highRiskAssessment
+    );
     const riskCategory = resolveOrchestrateRiskCategory(state.currentStage, highRiskAssessment);
     return buildBackgroundInputGuidance(
       backgroundStatus,
       dependencyStrength,
       highRiskAssessment?.reasons ?? [],
-      riskCategory,
+      riskCategory
     );
   } catch {
     return undefined;
   }
 }
 
-export function dispatchCommand(
-  input: string,
-  projectRoot: string,
-): DispatchResult {
+export function dispatchCommand(input: string, projectRoot: string): DispatchResult {
   const parts = input.trim().split(/\s+/);
   const first = parts[0];
   const rest = parts.slice(1);
@@ -235,7 +284,7 @@ export function dispatchCommand(
     return { route: 'error', error: 'Empty command' };
   }
 
-  if (REMOVED_SKILLS.includes(skillName as typeof REMOVED_SKILLS[number])) {
+  if (REMOVED_SKILLS.includes(skillName as (typeof REMOVED_SKILLS)[number])) {
     return { route: 'error', error: `REMOVED_SKILL: ${skillName}` };
   }
 
@@ -275,7 +324,9 @@ export function dispatchCommand(
     if (skillName === 'orchestrate') {
       try {
         const orchestrateArgs = validateOrchestrateArgs(normalizedRest);
-        const orchestrateBackgroundGuidance = resolveOrchestrateBackgroundGuidance(projectRoot);
+        const orchestrateBackgroundGuidance = resolveOrchestrateBackgroundGuidance({
+          projectRoot,
+        });
         return {
           route: 'skill',
           skillName,
@@ -329,13 +380,12 @@ export function dispatchCommand(
  * 解析 Skill 文件路径
  * 优先级: 项目本地 skills/ → 包级 skills/ → 未找到
  */
-export function resolveSkillPath(
-  skillName: string,
-  projectRoot: string,
-): string | undefined {
+export function resolveSkillPath(skillName: string, projectRoot: string): string | undefined {
   const extReq = parseExtensionSkillName(skillName);
   if (extReq) {
-    const ext = loadEnabledExtensions(projectRoot).find((item) => item.namespace === extReq.namespace);
+    const ext = loadEnabledExtensions(projectRoot).find(
+      (item) => item.namespace === extReq.namespace
+    );
     if (!ext) return undefined;
 
     const direct = join(ext.skillsDir, extReq.skill, 'SKILL.md');
@@ -384,14 +434,17 @@ function findSkillFile(baseDir: string, skillName: string): string | undefined {
 /** 加载 Skill 文件内容（可选动态组装） */
 export function loadSkill(
   skillPath: string,
-  options?: { projectRoot?: string; enableAssembly?: boolean },
+  options?: { projectRoot?: string; featureId?: string; enableAssembly?: boolean }
 ): string {
   let content = ensureNextStepsPolicy(loadSkillTemplate(skillPath));
   const projectRoot = options?.projectRoot;
   const enableAssembly = options?.enableAssembly ?? Boolean(projectRoot);
+  const executionContext: SkillExecutionContext | undefined = projectRoot
+    ? { projectRoot, featureId: options?.featureId }
+    : undefined;
 
-  if (enableAssembly && projectRoot) {
-    const ctx = resolvePromptAssemblyContext(projectRoot);
+  if (enableAssembly && executionContext) {
+    const ctx = resolvePromptAssemblyContext(executionContext);
     content = assemblePrompt(content, ctx);
   }
 
@@ -410,12 +463,13 @@ export function loadSkill(
   if (!projectRoot) return content;
 
   const skillName = inferSkillNameFromPath(skillPath);
-  const hardGateDecision = evaluateSkillHardGate(skillName, projectRoot);
+  const runtimeContext = executionContext as SkillExecutionContext;
+  const hardGateDecision = evaluateSkillHardGate(skillName, runtimeContext);
   if (hardGateDecision.severity === 'BLOCKED') {
     throw new HardGateBlockedError(skillName, hardGateDecision);
   }
 
-  const scopeGuardDecision = evaluateRuntimeScopeGuard(skillName, projectRoot);
+  const scopeGuardDecision = evaluateRuntimeScopeGuard(skillName, runtimeContext);
   if (scopeGuardDecision.blocked) {
     throw new ScopeGuardBlockedError(skillName, scopeGuardDecision.unmatchedFiles);
   }
@@ -425,7 +479,7 @@ export function loadSkill(
     content = `${scopeGuardNotice}\n\n${content}`;
   }
 
-  const hardGateNotice = buildHardGateRuntimeNotice(skillName, projectRoot);
+  const hardGateNotice = buildHardGateRuntimeNotice(skillName, runtimeContext);
   if (hardGateNotice) {
     content = `${hardGateNotice}\n\n${content}`;
   }
@@ -438,70 +492,70 @@ export function loadSkill(
   }
 
   if (skillName === 'orchestrate') {
-    const orchestrateNotice = buildOrchestrateRuntimeNotice(projectRoot);
+    const orchestrateNotice = buildOrchestrateRuntimeNotice(runtimeContext);
     if (orchestrateNotice) {
       content = `${orchestrateNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'onboarding') {
-    const onboardingNotice = buildOnboardingRuntimeNotice(projectRoot);
+    const onboardingNotice = buildOnboardingRuntimeNotice(runtimeContext);
     if (onboardingNotice) {
       content = `${onboardingNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'spec') {
-    const specNotice = buildSpecRuntimeNotice(projectRoot);
+    const specNotice = buildSpecRuntimeNotice(runtimeContext);
     if (specNotice) {
       content = `${specNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'design') {
-    const designNotice = buildDesignRuntimeNotice(projectRoot);
+    const designNotice = buildDesignRuntimeNotice(runtimeContext);
     if (designNotice) {
       content = `${designNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'task') {
-    const taskNotice = buildTaskRuntimeNotice(projectRoot);
+    const taskNotice = buildTaskRuntimeNotice(runtimeContext);
     if (taskNotice) {
       content = `${taskNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'code') {
-    const codeNotice = buildCodeRuntimeNotice(projectRoot);
+    const codeNotice = buildCodeRuntimeNotice(runtimeContext);
     if (codeNotice) {
       content = `${codeNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'review') {
-    const reviewNotice = buildReviewRuntimeNotice(projectRoot);
+    const reviewNotice = buildReviewRuntimeNotice(runtimeContext);
     if (reviewNotice) {
       content = `${reviewNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'plan') {
-    const planNotice = buildPlanRuntimeNotice(projectRoot);
+    const planNotice = buildPlanRuntimeNotice(runtimeContext);
     if (planNotice) {
       content = `${planNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'verify') {
-    const verifyNotice = buildVerifyRuntimeNotice(projectRoot);
+    const verifyNotice = buildVerifyRuntimeNotice(runtimeContext);
     if (verifyNotice) {
       content = `${verifyNotice}\n\n${content}`;
     }
   }
 
   if (skillName === 'spec-review') {
-    const specReviewNotice = buildSpecReviewRuntimeNotice(projectRoot);
+    const specReviewNotice = buildSpecReviewRuntimeNotice(runtimeContext);
     if (specReviewNotice) {
       content = `${specReviewNotice}\n\n${content}`;
     }
@@ -510,68 +564,44 @@ export function loadSkill(
   return content;
 }
 
-/**
- * 从 docs/first/stage-views.md 解析指定阶段的摘要
- * 支持中英文格式：**摘要**: ... 或 - Summary: ...
- */
-function parseStageSummaryFromDocs(
-  projectRoot: string,
-  stage: 'spec' | 'design' | 'code' | 'verify'
-): string | null {
-  try {
-    const docsPath = join(projectRoot, 'docs/first/stage-views.md');
-    if (!existsSync(docsPath)) return null;
+function formatStageRuntimeNotice(
+  marker: string,
+  title: string,
+  backgroundKey: 'background_input_status' | 'backgroundInputStatus',
+  summaryKey: string,
+  context: ResolvedSkillContext
+): string | undefined {
+  if (context.source === 'none' || !context.stageViewSummary) return undefined;
 
-    const content = readFileSync(docsPath, 'utf-8');
+  const parts = [`<!-- ${marker} -->`, `## ${title}`];
+  parts.push(`${backgroundKey}: ${context.backgroundInputStatus}`);
+  parts.push(`data_source: ${context.source}`);
+  parts.push(`${summaryKey}: ${context.stageViewSummary}`);
 
-    const stagePatterns: Record<string, RegExp> = {
-      spec: /##\s*(?:需求阶段视图|Spec View)/i,
-      design: /##\s*(?:设计阶段视图|Design View)/i,
-      code: /##\s*(?:代码阶段视图|Code View)/i,
-      verify: /##\s*(?:验证阶段视图|Verify View)/i,
-    };
-
-    const stagePattern = stagePatterns[stage];
-    if (!stagePattern) return null;
-
-    const stageMatch = content.match(stagePattern);
-    if (!stageMatch) return null;
-
-    const stageStart = stageMatch.index! + stageMatch[0].length;
-    const nextSectionMatch = content.slice(stageStart).match(/\n##\s/);
-    const stageContent = nextSectionMatch
-      ? content.slice(stageStart, stageStart + nextSectionMatch.index!)
-      : content.slice(stageStart);
-
-    const summaryMatch = stageContent.match(/(?:\*\*摘要\*\*:\s*|-\s*Summary:\s*)(.+?)(?:\n|$)/);
-    return summaryMatch ? summaryMatch[1].trim() : null;
-  } catch {
-    return null;
+  if (context.firstSummaryLite?.projectName) {
+    parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
   }
-}
 
-/**
- * 从 docs/first/role-views.md 解析角色摘要
- */
-function parseRoleSummaryFromDocs(projectRoot: string): string | null {
-  try {
-    const docsPath = join(projectRoot, 'docs/first/role-views.md');
-    if (!existsSync(docsPath)) return null;
-
-    const content = readFileSync(docsPath, 'utf-8');
-    const summaryMatch = content.match(/-\s*Summary:\s*(.+?)(?:\n|$)/);
-    return summaryMatch ? summaryMatch[1].trim() : null;
-  } catch {
-    return null;
+  if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
+    parts.push(`missing_assets: ${context.missingAssets.join(', ')}`);
   }
+
+  if (context.recommendedAction) {
+    parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+  }
+
+  parts.push(`<!-- /${marker} -->`);
+  return parts.join('\n');
 }
 
 /**
  * 构建 first skill 运行时上下文通知
  * 检测已有产物、变更状态、会话恢复建议，注入到 skill prompt 前部
  */
-function buildOrchestrateRuntimeNotice(projectRoot: string): string | undefined {
-  const guidance = resolveOrchestrateBackgroundGuidance(projectRoot);
+function buildOrchestrateRuntimeNotice(
+  executionContext: SkillExecutionContext
+): string | undefined {
+  const guidance = resolveOrchestrateBackgroundGuidance(executionContext);
   if (!guidance) return undefined;
 
   const parts = [
@@ -630,31 +660,36 @@ function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
   return parts.join('\n');
 }
 
-function buildOnboardingRuntimeNotice(projectRoot: string): string | undefined {
+function buildOnboardingRuntimeNotice(
+  executionContext: SkillExecutionContext
+): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const roleViews = readFirstRoleViews(projectRoot);
+    const context = resolveSkillContext(
+      executionContext.projectRoot,
+      'onboarding',
+      executionContext.featureId
+    );
 
-    if (index?.roleViews && roleViews) {
-      const roles = Object.keys(roleViews);
+    if (context.source === 'runtime' && context.roleViewSummary) {
       return [
         '<!-- onboarding-runtime-context -->',
         '## Role Views Available',
-        'data_source: runtime',
-        `available_roles: ${roles.join(', ')}`,
+        `data_source: ${context.source}`,
+        `role_summary: ${context.roleViewSummary}`,
         'recommendation_mode: project-based',
+        ...(context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full'
+          ? [`missing_assets: ${context.missingAssets.join(', ')}`]
+          : []),
         '<!-- /onboarding-runtime-context -->',
       ].join('\n');
     }
 
-    // 降级到 docs
-    const docsSummary = parseRoleSummaryFromDocs(projectRoot);
-    if (docsSummary) {
+    if (context.source === 'docs' && context.roleViewSummary) {
       return [
         '<!-- onboarding-runtime-context -->',
         '## Role Views Available',
-        'data_source: docs',
-        `role_summary: ${docsSummary}`,
+        `data_source: ${context.source}`,
+        `role_summary: ${context.roleViewSummary}`,
         'recommendation_mode: generic',
         'recommendation: 建议先运行 /spec-first:first 补全背景数据',
         '<!-- /onboarding-runtime-context -->',
@@ -667,151 +702,72 @@ function buildOnboardingRuntimeNotice(projectRoot: string): string | undefined {
   }
 }
 
-function buildSpecRuntimeNotice(projectRoot: string): string | undefined {
+function buildSpecRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const stageViews = readFirstStageViews(projectRoot);
-
-    if (index && stageViews?.spec) {
-      const parts = [
-        '<!-- spec-runtime-context -->',
-        '## Spec View Available',
-      ];
-
-      const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-      parts.push(`background_input_status: ${backgroundStatus}`);
-      parts.push('data_source: runtime');
-
-      if (stageViews.spec.summary) {
-        parts.push(`spec_view_summary: ${stageViews.spec.summary}`);
-      }
-
-      if (backgroundStatus === 'degraded') {
-        const missing: string[] = [];
-        if (!index.summary.healthy) missing.push('summary');
-        if (!index.roleViews.healthy) missing.push('role-views');
-        if (!index.stageViews.healthy) missing.push('stage-views');
-        if (missing.length > 0) {
-          parts.push(`missing_assets: ${missing.join(', ')}`);
-          parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-        }
-      }
-
-      parts.push('<!-- /spec-runtime-context -->');
-      return parts.join('\n');
-    }
-
-    // 降级到 docs
-    const docsSummary = parseStageSummaryFromDocs(projectRoot, 'spec');
-    if (docsSummary) {
-      const parts = [
-        '<!-- spec-runtime-context -->',
-        '## Spec View Available',
-        'background_input_status: degraded',
-        'data_source: docs',
-        `spec_view_summary: ${docsSummary}`,
-        'missing_assets: summary, role-views, stage-views',
-        'recommendation: 建议先运行 /spec-first:first 补全背景数据',
-        '<!-- /spec-runtime-context -->',
-      ];
-      return parts.join('\n');
-    }
-
-    return undefined;
+    return formatStageRuntimeNotice(
+      'spec-runtime-context',
+      'Spec View Available',
+      'background_input_status',
+      'spec_view_summary',
+      resolveSkillContext(executionContext.projectRoot, 'spec', executionContext.featureId)
+    );
   } catch {
     return undefined;
   }
 }
 
-function buildDesignRuntimeNotice(projectRoot: string): string | undefined {
+function buildDesignRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const stageViews = readFirstStageViews(projectRoot);
+    const { projectRoot } = executionContext;
+    const context = resolveSkillContext(projectRoot, 'design', executionContext.featureId);
+    const notice = formatStageRuntimeNotice(
+      'design-runtime-context',
+      'Design View Available',
+      'background_input_status',
+      'design_view_summary',
+      context
+    );
+    if (!notice) return undefined;
 
-    if (index && stageViews?.design) {
-      const parts = [
-        '<!-- design-runtime-context -->',
-        '## Design View Available',
-      ];
+    const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
+    if (!featureId) return notice;
 
-      const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-      parts.push(`background_input_status: ${backgroundStatus}`);
-      parts.push('data_source: runtime');
-
-      if (stageViews.design.summary) {
-        parts.push(`design_view_summary: ${stageViews.design.summary}`);
-      }
-
-      const featureId = readCurrentFeatureId(projectRoot);
-      if (featureId) {
-        const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
-        if (highRiskAssessment?.isHighRisk) {
-          parts.push('risk_category: formal-design-review');
-          parts.push(`risk_signals: ${highRiskAssessment.reasons.join('；')}`);
-        }
-      }
-
-      if (backgroundStatus === 'degraded') {
-        const missing: string[] = [];
-        if (!index.summary.healthy) missing.push('summary');
-        if (!index.roleViews.healthy) missing.push('role-views');
-        if (!index.stageViews.healthy) missing.push('stage-views');
-        if (missing.length > 0) {
-          parts.push(`missing_assets: ${missing.join(', ')}`);
-          parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-        }
-      }
-
-      parts.push('<!-- /design-runtime-context -->');
-      return parts.join('\n');
+    const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+    if (!highRiskAssessment?.isHighRisk) {
+      return notice;
     }
 
-    // 降级到 docs
-    const docsSummary = parseStageSummaryFromDocs(projectRoot, 'design');
-    if (docsSummary) {
-      const parts = [
-        '<!-- design-runtime-context -->',
-        '## Design View Available',
-        'background_input_status: degraded',
-        'data_source: docs',
-        `design_view_summary: ${docsSummary}`,
-        'missing_assets: summary, role-views, stage-views',
-        'recommendation: 建议先运行 /spec-first:first 补全背景数据',
-        '<!-- /design-runtime-context -->',
-      ];
-      return parts.join('\n');
-    }
-
-    return undefined;
+    return notice.replace(
+      '<!-- /design-runtime-context -->',
+      `risk_category: formal-design-review\nrisk_signals: ${highRiskAssessment.reasons.join('；')}\n<!-- /design-runtime-context -->`
+    );
   } catch {
     return undefined;
   }
 }
 
-function buildTaskRuntimeNotice(projectRoot: string): string | undefined {
+function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    if (!index) return undefined;
-
-    const parts = [
-      '<!-- task-runtime-context -->',
-      '## Task Planning Context',
-    ];
-
-    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
-    parts.push('data_source: runtime');
+    const context = resolveSkillContext(
+      executionContext.projectRoot,
+      'task',
+      executionContext.featureId
+    );
+    const parts = ['<!-- task-runtime-context -->', '## Task Planning Context'];
+    parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
+    parts.push(`data_source: ${context.source}`);
     parts.push('required_inputs: spec.md + design.md + traceability-matrix.md');
 
-    if (backgroundStatus === 'degraded') {
-      const missing: string[] = [];
-      if (!index.summary.healthy) missing.push('summary');
-      if (!index.roleViews.healthy) missing.push('role-views');
-      if (!index.stageViews.healthy) missing.push('stage-views');
-      if (missing.length > 0) {
-        parts.push(`missing_assets: ${missing.join(', ')}`);
-        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-      }
+    if (context.firstSummaryLite?.projectName) {
+      parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
+    }
+
+    if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
+      parts.push(`missing_assets: ${context.missingAssets.join(', ')}`);
+    }
+
+    if (context.recommendedAction) {
+      parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
     }
 
     parts.push('<!-- /task-runtime-context -->');
@@ -821,137 +777,87 @@ function buildTaskRuntimeNotice(projectRoot: string): string | undefined {
   }
 }
 
-function buildCodeRuntimeNotice(projectRoot: string): string | undefined {
+function buildCodeRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const stageViews = readFirstStageViews(projectRoot);
-
-    if (index && stageViews?.code) {
-      const parts = [
-        '<!-- code-runtime-context -->',
-        '## Code View Available',
-      ];
-
-      const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-      parts.push(`background_input_status: ${backgroundStatus}`);
-      parts.push('data_source: runtime');
-
-      if (stageViews.code.summary) {
-        parts.push(`code_view_summary: ${stageViews.code.summary}`);
-      }
-
-      if (backgroundStatus === 'degraded') {
-        const missing: string[] = [];
-        if (!index.summary.healthy) missing.push('summary');
-        if (!index.roleViews.healthy) missing.push('role-views');
-        if (!index.stageViews.healthy) missing.push('stage-views');
-        if (missing.length > 0) {
-          parts.push(`missing_assets: ${missing.join(', ')}`);
-          parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-        }
-      }
-
-      parts.push('<!-- /code-runtime-context -->');
-      return parts.join('\n');
-    }
-
-    // 降级到 docs
-    const docsSummary = parseStageSummaryFromDocs(projectRoot, 'code');
-    if (docsSummary) {
-      const parts = [
-        '<!-- code-runtime-context -->',
-        '## Code View Available',
-        'background_input_status: degraded',
-        'data_source: docs',
-        `code_view_summary: ${docsSummary}`,
-        'missing_assets: summary, role-views, stage-views',
-        'recommendation: 建议先运行 /spec-first:first 补全背景数据',
-        '<!-- /code-runtime-context -->',
-      ];
-      return parts.join('\n');
-    }
-
-    return undefined;
+    return formatStageRuntimeNotice(
+      'code-runtime-context',
+      'Code View Available',
+      'background_input_status',
+      'code_view_summary',
+      resolveSkillContext(executionContext.projectRoot, 'code', executionContext.featureId)
+    );
   } catch {
     return undefined;
   }
 }
 
-function buildReviewRuntimeNotice(projectRoot: string): string | undefined {
+function buildReviewRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const stageViews = readFirstStageViews(projectRoot);
+    const { projectRoot } = executionContext;
+    const context = resolveSkillContext(projectRoot, 'review', executionContext.featureId);
+    const notice = formatStageRuntimeNotice(
+      'review-runtime-context',
+      'Review Context',
+      'backgroundInputStatus',
+      'codeViewSummary',
+      context
+    );
+    if (!notice) return undefined;
 
-    if (!index || !stageViews?.code) return undefined;
-
-    const parts = [
-      '<!-- review-runtime-context -->',
-      '## Review Context',
-    ];
-
-    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
-
-    if (stageViews.code.summary) {
-      parts.push(`codeViewSummary: ${stageViews.code.summary}`);
-    }
-
-    const featureId = readCurrentFeatureId(projectRoot);
+    const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
     if (featureId) {
       const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
       if (highRiskAssessment?.isHighRisk) {
         const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
         if (exists(statePath)) {
           const state = readJson<StageState>(statePath);
-          const riskCategory = resolveOrchestrateRiskCategory(state.currentStage, highRiskAssessment);
+          const riskCategory = resolveOrchestrateRiskCategory(
+            state.currentStage,
+            highRiskAssessment
+          );
           if (riskCategory) {
-            parts.push(`riskCategory: ${riskCategory}`);
-            parts.push(`riskSignals: ${highRiskAssessment.reasons.join('；')}`);
+            return notice.replace(
+              '<!-- /review-runtime-context -->',
+              `riskCategory: ${riskCategory}\nriskSignals: ${highRiskAssessment.reasons.join('；')}\n<!-- /review-runtime-context -->`
+            );
           }
         }
       }
     }
 
-    if (backgroundStatus === 'degraded') {
-      const missing: string[] = [];
-      if (!index.summary.healthy) missing.push('summary');
-      if (!index.roleViews.healthy) missing.push('role-views');
-      if (!index.stageViews.healthy) missing.push('stage-views');
-      if (missing.length > 0) {
-        parts.push(`missing_assets: ${missing.join(', ')}`);
-        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-      }
-    }
-
-    parts.push('<!-- /review-runtime-context -->');
-    return parts.join('\n');
+    return notice;
   } catch {
     return undefined;
   }
 }
 
-function buildPlanRuntimeNotice(projectRoot: string): string | undefined {
+function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const featureId = readCurrentFeatureId(projectRoot);
+    const { projectRoot } = executionContext;
+    const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
     if (!featureId) return undefined;
 
     const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
     if (!exists(statePath)) return undefined;
 
-    const state = readJson<StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }>(statePath);
-    const index = readFirstRuntimeIndex(projectRoot);
+    const state = readJson<
+      StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }
+    >(statePath);
+    const context = resolveSkillContext(projectRoot, 'plan', featureId);
+    const parts = ['<!-- plan-runtime-context -->', '## Plan Context'];
 
-    const parts = [
-      '<!-- plan-runtime-context -->',
-      '## Plan Context',
-    ];
+    parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
+    parts.push(`data_source: ${context.source}`);
 
-    const backgroundStatus = state.backgroundInputStatus ?? (index?.summary.healthy && index?.stageViews.healthy ? 'full' : 'degraded');
-    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
-    parts.push('data_source: runtime');
+    if (context.firstSummaryLite?.projectName) {
+      parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
+    }
 
     const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
-    const dependencyStrength = resolveOrchestrateDependencyStrength(state.currentStage, highRiskAssessment);
+    const dependencyStrength = resolveOrchestrateDependencyStrength(
+      state.currentStage,
+      highRiskAssessment
+    );
     parts.push(`dependencyStrength: ${dependencyStrength}`);
 
     if (highRiskAssessment?.isHighRisk) {
@@ -962,6 +868,14 @@ function buildPlanRuntimeNotice(projectRoot: string): string | undefined {
       }
     }
 
+    if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
+      parts.push(`missing_assets: ${context.missingAssets.join(', ')}`);
+    }
+
+    if (context.recommendedAction) {
+      parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+    }
+
     parts.push('<!-- /plan-runtime-context -->');
     return parts.join('\n');
   } catch {
@@ -969,109 +883,53 @@ function buildPlanRuntimeNotice(projectRoot: string): string | undefined {
   }
 }
 
-function buildVerifyRuntimeNotice(projectRoot: string): string | undefined {
+function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const stageViews = readFirstStageViews(projectRoot);
+    const { projectRoot } = executionContext;
+    const context = resolveSkillContext(projectRoot, 'verify', executionContext.featureId);
+    const notice = formatStageRuntimeNotice(
+      'verify-runtime-context',
+      'Verify View Available',
+      'background_input_status',
+      'verify_view_summary',
+      context
+    );
+    if (!notice) return undefined;
 
-    if (index && stageViews?.verify) {
-      const parts = [
-        '<!-- verify-runtime-context -->',
-        '## Verify View Available',
-      ];
+    const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
+    if (!featureId) return notice;
 
-      const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-      parts.push(`background_input_status: ${backgroundStatus}`);
-      parts.push('data_source: runtime');
-
-      if (stageViews.verify.summary) {
-        parts.push(`verify_view_summary: ${stageViews.verify.summary}`);
-      }
-
-      const featureId = readCurrentFeatureId(projectRoot);
-      if (featureId) {
-        const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
-        if (highRiskAssessment?.isHighRisk) {
-          const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
-          if (exists(statePath)) {
-            const state = readJson<StageState>(statePath);
-            if (state.currentStage === '05_verify') {
-              parts.push('risk_category: pre-release-verification');
-              parts.push(`risk_signals: ${highRiskAssessment.reasons.join('；')}`);
-            }
-          }
-        }
-      }
-
-      if (backgroundStatus === 'degraded') {
-        const missing: string[] = [];
-        if (!index.summary.healthy) missing.push('summary');
-        if (!index.roleViews.healthy) missing.push('role-views');
-        if (!index.stageViews.healthy) missing.push('stage-views');
-        if (missing.length > 0) {
-          parts.push(`missing_assets: ${missing.join(', ')}`);
-          parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-        }
-      }
-
-      parts.push('<!-- /verify-runtime-context -->');
-      return parts.join('\n');
+    const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
+    if (!highRiskAssessment?.isHighRisk) {
+      return notice;
     }
 
-    // 降级到 docs
-    const docsSummary = parseStageSummaryFromDocs(projectRoot, 'verify');
-    if (docsSummary) {
-      const parts = [
-        '<!-- verify-runtime-context -->',
-        '## Verify View Available',
-        'background_input_status: degraded',
-        'data_source: docs',
-        `verify_view_summary: ${docsSummary}`,
-        'missing_assets: summary, role-views, stage-views',
-        'recommendation: 建议先运行 /spec-first:first 补全背景数据',
-        '<!-- /verify-runtime-context -->',
-      ];
-      return parts.join('\n');
-    }
+    const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
+    if (!exists(statePath)) return notice;
 
-    return undefined;
+    const state = readJson<StageState>(statePath);
+    if (state.currentStage !== '05_verify') return notice;
+
+    return notice.replace(
+      '<!-- /verify-runtime-context -->',
+      `risk_category: pre-release-verification\nrisk_signals: ${highRiskAssessment.reasons.join('；')}\n<!-- /verify-runtime-context -->`
+    );
   } catch {
     return undefined;
   }
 }
 
-function buildSpecReviewRuntimeNotice(projectRoot: string): string | undefined {
+function buildSpecReviewRuntimeNotice(
+  executionContext: SkillExecutionContext
+): string | undefined {
   try {
-    const index = readFirstRuntimeIndex(projectRoot);
-    const stageViews = readFirstStageViews(projectRoot);
-
-    if (!index || !stageViews?.spec) return undefined;
-
-    const parts = [
-      '<!-- spec-review-runtime-context -->',
-      '## Spec Review Context',
-    ];
-
-    const backgroundStatus = index.summary.healthy && index.stageViews.healthy ? 'full' : 'degraded';
-    parts.push(`backgroundInputStatus: ${backgroundStatus}`);
-
-    if (stageViews.spec.summary) {
-      parts.push(`specViewSummary: ${stageViews.spec.summary}`);
-    }
-
-    if (backgroundStatus === 'degraded') {
-      const missing: string[] = [];
-      if (!index.summary.healthy) missing.push('summary');
-      if (!index.roleViews.healthy) missing.push('role-views');
-      if (!index.stageViews.healthy) missing.push('stage-views');
-      if (missing.length > 0) {
-        parts.push(`missing_assets: ${missing.join(', ')}`);
-        parts.push('recommendation: 建议先运行 /spec-first:first 补全背景数据');
-      }
-    }
-
-    parts.push('<!-- /spec-review-runtime-context -->');
-    return parts.join('\n');
+    return formatStageRuntimeNotice(
+      'spec-review-runtime-context',
+      'Spec Review Context',
+      'backgroundInputStatus',
+      'specViewSummary',
+      resolveSkillContext(executionContext.projectRoot, 'spec', executionContext.featureId)
+    );
   } catch {
     return undefined;
   }
@@ -1082,7 +940,7 @@ export function getFirstRuntimeNotice(projectRoot: string): string | undefined {
 }
 
 export function getOrchestrateRuntimeNotice(projectRoot: string): string | undefined {
-  return buildOrchestrateRuntimeNotice(projectRoot);
+  return buildOrchestrateRuntimeNotice({ projectRoot });
 }
 
 function loadSkillTemplate(skillPath: string): string {

@@ -43,7 +43,8 @@ function isGlobalInstall(): boolean {
   // 4. volta managed
   if (process.env.VOLTA_HOME && process.execPath.includes(process.env.VOLTA_HOME)) return true;
   // 5. npm_config_prefix 检测
-  if (process.env.npm_config_prefix && process.argv[1]?.includes(process.env.npm_config_prefix)) return true;
+  if (process.env.npm_config_prefix && process.argv[1]?.includes(process.env.npm_config_prefix))
+    return true;
   // 6. INIT_CWD 检测
   const initCwd = process.env.INIT_CWD;
   if (initCwd) {
@@ -54,7 +55,8 @@ function isGlobalInstall(): boolean {
   // 7. 全局 node_modules 路径检测
   if (isInGlobalNodeModules()) return true;
   // 8. npm_config_root 检测
-  if (process.env.npm_config_root && process.argv[1]?.includes(process.env.npm_config_root)) return true;
+  if (process.env.npm_config_root && process.argv[1]?.includes(process.env.npm_config_root))
+    return true;
 
   return false;
 }

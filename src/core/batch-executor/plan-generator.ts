@@ -2,13 +2,17 @@
  * 执行计划生成器
  */
 import type { TaskNode, ExecutionPlan } from './types.js';
-import { buildDependencyGraph, detectCyclicDependency, topologicalSort } from './dependency-resolver.js';
+import {
+  buildDependencyGraph,
+  detectCyclicDependency,
+  topologicalSort,
+} from './dependency-resolver.js';
 import { checkTddEvidence, detectFileConflicts } from './guards.js';
 
 export function generateExecutionPlan(
   tasks: TaskNode[],
   featureId: string,
-  projectRoot: string,
+  projectRoot: string
 ): ExecutionPlan {
   const graph = buildDependencyGraph(tasks);
   const cycle = detectCyclicDependency(graph);
@@ -36,7 +40,7 @@ export function generateExecutionPlan(
     );
   }
 
-  const hasConflicts = layers.some(l => !l.concurrent);
+  const hasConflicts = layers.some((l) => !l.concurrent);
   if (hasConflicts) {
     riskWarnings.push('检测到文件冲突，部分层将串行执行');
   }

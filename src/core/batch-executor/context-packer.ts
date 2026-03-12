@@ -21,11 +21,7 @@ export interface ContextPack {
   dependencies: string[];
 }
 
-export function packContext(
-  task: TaskNode,
-  featureId: string,
-  projectRoot: string,
-): ContextPack {
+export function packContext(task: TaskNode, featureId: string, projectRoot: string): ContextPack {
   const pack: ContextPack = {
     task: {
       id: task.id,
@@ -38,11 +34,8 @@ export function packContext(
       ds: extractRelatedContent(task.relatedDS, featureId, projectRoot, 'design.md'),
     },
     constitution: loadConstitution(projectRoot),
-    tddRequirement: [
-      '必须有 RED 证据或 WAIVER',
-      '测试先行原则',
-    ],
-    dependencies: task.dependsOn.map(id => `依赖 ${id} 已完成`),
+    tddRequirement: ['必须有 RED 证据或 WAIVER', '测试先行原则'],
+    dependencies: task.dependsOn.map((id) => `依赖 ${id} 已完成`),
   };
 
   // 验证大小 < 2KB
@@ -58,7 +51,7 @@ function extractRelatedContent(
   ids: string[],
   featureId: string,
   projectRoot: string,
-  filename: string,
+  filename: string
 ): string {
   if (ids.length === 0) return '';
 
@@ -68,11 +61,13 @@ function extractRelatedContent(
   const content = readFileSync(path, 'utf-8');
 
   // 提取相关段落（简化实现）
-  const excerpts = ids.map(id => {
-    const regex = new RegExp(`## ${id}[\\s\\S]{0,300}`, 'i');
-    const match = content.match(regex);
-    return match ? match[0] : '';
-  }).filter(Boolean);
+  const excerpts = ids
+    .map((id) => {
+      const regex = new RegExp(`## ${id}[\\s\\S]{0,300}`, 'i');
+      const match = content.match(regex);
+      return match ? match[0] : '';
+    })
+    .filter(Boolean);
 
   return excerpts.join('\n\n').slice(0, 500); // 限制 500 字符
 }
@@ -82,8 +77,9 @@ function loadConstitution(projectRoot: string): string[] {
   if (!existsSync(path)) return [];
 
   const content = readFileSync(path, 'utf-8');
-  return content.split('\n')
-    .filter(line => line.startsWith('- '))
-    .map(line => line.slice(2))
+  return content
+    .split('\n')
+    .filter((line) => line.startsWith('- '))
+    .map((line) => line.slice(2))
     .slice(0, 5); // 最多 5 条约束
 }

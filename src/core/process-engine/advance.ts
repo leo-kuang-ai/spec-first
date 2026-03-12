@@ -32,15 +32,13 @@ export class GateFailedError extends Error {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface AdvanceOptions {
-}
+export interface AdvanceOptions {}
 
 export interface AdvanceResult {
   from: Stage;
   to: Stage;
   gateResult: string;
 }
-
 
 function getStatePath(featureId: string, root: string): string {
   return join(root, 'specs', featureId, 'stage-state.json');
@@ -107,7 +105,7 @@ function saveState(featureId: string, root: string, state: StageState): void {
 export function advance(
   featureId: string,
   projectRoot: string,
-  _options: AdvanceOptions = {},
+  _options: AdvanceOptions = {}
 ): AdvanceResult {
   resetConfigCache();
   const state = loadState(featureId, projectRoot);
@@ -125,10 +123,13 @@ export function advance(
   // 正常路径：先执行依赖检查，再执行 Gate 校验
   const depCheck = checkDependencies(featureId, to, projectRoot);
   if (!depCheck.pass) {
-    appendFindings(featureId, projectRoot,
-      `DEPENDENCY_CHECK_FAIL: 缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`);
+    appendFindings(
+      featureId,
+      projectRoot,
+      `DEPENDENCY_CHECK_FAIL: 缺失项:\n${depCheck.missing.map((m) => `  - ${m}`).join('\n')}`
+    );
     throw new GateFailedError(
-      `阶段 ${to} 的依赖检查未通过。缺失项:\n${depCheck.missing.map(m => `  - ${m}`).join('\n')}`
+      `阶段 ${to} 的依赖检查未通过。缺失项:\n${depCheck.missing.map((m) => `  - ${m}`).join('\n')}`
     );
   }
 
@@ -137,7 +138,14 @@ export function advance(
     gateResult = gate.status;
     if (gate.status === 'FAIL') {
       throw new GateFailedError(
-        `阶段 ${from} 的 Gate 未通过。请先修复失败条件，再推进 ${from} → ${to}。`,
+        `阶段 ${from} 的 Gate 未通过。请先修复失败条件，再推进 ${from} → ${to}。`
+      );
+    }
+    if (gate.status === 'PASS_WITH_WAIVER' && gate.waivers) {
+      appendFindings(
+        featureId,
+        projectRoot,
+        `WAIVER: ${gate.waivers.map((w) => `${w.exceptionId} (RFC: ${w.rfcId})`).join(', ')}`
       );
     }
   } catch (e) {
@@ -148,12 +156,14 @@ export function advance(
       const config = loadConfig(projectRoot);
       if (config.gate.pilot_mode) {
         gateResult = 'PILOT_PASS';
-        appendFindings(featureId, projectRoot,
-          `PILOT_PASS: ${from} → ${to} (gate unavailable, pilot_mode=true)`);
+        appendFindings(
+          featureId,
+          projectRoot,
+          `PILOT_PASS: ${from} → ${to} (gate unavailable, pilot_mode=true)`
+        );
       } else {
         throw new GateUnavailableError(
-          `Gate 检查不可用且 pilot_mode=false。` +
-          `无法推进 ${from} → ${to}。请开启 pilot_mode。`
+          `Gate 检查不可用且 pilot_mode=false。` + `无法推进 ${from} → ${to}。请开启 pilot_mode。`
         );
       }
     } else {
@@ -161,12 +171,14 @@ export function advance(
       const config = loadConfig(projectRoot);
       if (config.gate.pilot_mode) {
         gateResult = 'PILOT_PASS';
-        appendFindings(featureId, projectRoot,
-          `PILOT_PASS: ${from} → ${to} (gate runtime error, pilot_mode=true)`);
+        appendFindings(
+          featureId,
+          projectRoot,
+          `PILOT_PASS: ${from} → ${to} (gate runtime error, pilot_mode=true)`
+        );
       } else {
         throw new GateUnavailableError(
-          `Gate 运行异常且 pilot_mode=false。` +
-          `无法推进 ${from} → ${to}。请开启 pilot_mode。`
+          `Gate 运行异常且 pilot_mode=false。` + `无法推进 ${from} → ${to}。请开启 pilot_mode。`
         );
       }
     }
@@ -206,8 +218,11 @@ export function advance(
 
   // 07_release 自动跳转到 08_done（预留扩展，当前自动跳过）
   if (to === Stage.RELEASE) {
-    appendFindings(featureId, projectRoot,
-      `AUTO_ADVANCE: ${to} → ${Stage.DONE} (发布阶段预留扩展，当前自动跳过)`);
+    appendFindings(
+      featureId,
+      projectRoot,
+      `AUTO_ADVANCE: ${to} → ${Stage.DONE} (发布阶段预留扩展，当前自动跳过)`
+    );
     writeLog(getGateLogPath(featureId, projectRoot), {
       event: 'release_auto_skip',
       message: '发布阶段预留扩展，当前自动跳过',
@@ -232,11 +247,7 @@ export function advance(
 /**
  * 取消 Feature — 任意非终态 → 09_cancelled
  */
-export function cancel(
-  featureId: string,
-  projectRoot: string,
-  reason: string,
-): AdvanceResult {
+export function cancel(featureId: string, projectRoot: string, reason: string): AdvanceResult {
   if (!reason) {
     throw new Error('取消原因不能为空');
   }
@@ -253,7 +264,11 @@ export function cancel(
 
   const now = new Date().toISOString();
   const entry: StageHistoryEntry = {
-    from, to, timestamp: now, gateResult: 'CANCELLED', reason,
+    from,
+    to,
+    timestamp: now,
+    gateResult: 'CANCELLED',
+    reason,
   };
   state.currentStage = to;
   state.history.push(entry);

@@ -92,7 +92,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
       totalTasks: 0,
       missingFiles: [],
       fiveQuestions: skipQuestions,
-      skipped: true,  // I5: 标记为节流跳过
+      skipped: true, // I5: 标记为节流跳过
       summary: `已跳过会话恢复：距离上次仅 ${Math.round((now - lastRun) / 1000)}s（< 60s）`,
     };
   }
@@ -146,8 +146,18 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
       if (currentStepMatch) {
         stepRecovery = {
           currentStep: currentStepMatch[1],
-          completedSteps: completedMatch ? completedMatch[1].split(',').map(s => s.trim().replace(/"/g, '')).filter(Boolean) : [],
-          skippedSteps: skippedMatch ? skippedMatch[1].split(',').map(s => s.trim().replace(/"/g, '')).filter(Boolean) : [],
+          completedSteps: completedMatch
+            ? completedMatch[1]
+                .split(',')
+                .map((s) => s.trim().replace(/"/g, ''))
+                .filter(Boolean)
+            : [],
+          skippedSteps: skippedMatch
+            ? skippedMatch[1]
+                .split(',')
+                .map((s) => s.trim().replace(/"/g, ''))
+                .filter(Boolean)
+            : [],
           nextStep: nextStepMatch?.[1] ?? '',
           complexity: complexityMatch?.[1] ?? '待判定',
           scenario: scenarioMatch?.[1] ?? '待判定',
@@ -165,12 +175,12 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     : null;
   const taskContextSummary = taskContextPack
     ? {
-      taskId: taskContextPack.taskId,
-      contextSize: taskContextPack.contextSize,
-      relatedFRCount: taskContextPack.relatedFR.length,
-      relatedDSCount: taskContextPack.relatedDS.length,
-      relatedAPICount: taskContextPack.relatedAPI.length,
-    }
+        taskId: taskContextPack.taskId,
+        contextSize: taskContextPack.contextSize,
+        relatedFRCount: taskContextPack.relatedFR.length,
+        relatedDSCount: taskContextPack.relatedDS.length,
+        relatedAPICount: taskContextPack.relatedAPI.length,
+      }
     : undefined;
 
   // Step 5: Scan required files for current stage
@@ -192,7 +202,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     currentPhase,
     currentTask,
     findingsContent,
-    uniqueMissingFiles,
+    uniqueMissingFiles
   );
 
   // Step 5.5: Todo Runner continuation state (P1-10)
@@ -207,8 +217,10 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     autoLoopSummary = {
       currentTaskId: autoLoop.currentTaskId,
       heartbeatAt: autoLoop.heartbeatAt,
-      retryBudgetRemaining: Math.max(0,
-        aoConfig.max_total_retry_duration_ms - (autoLoop.retry?.totalRetryDurationMs ?? 0)),
+      retryBudgetRemaining: Math.max(
+        0,
+        aoConfig.max_total_retry_duration_ms - (autoLoop.retry?.totalRetryDurationMs ?? 0)
+      ),
     };
   }
 
@@ -223,7 +235,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     todoSummary,
     fiveQuestions,
     taskContextSummary,
-    state?.backgroundInputStatus,
+    state?.backgroundInputStatus
   );
 
   return {
@@ -239,7 +251,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     fiveQuestions,
     autoLoopSummary,
     stepRecovery,
-    skipped: false,  // I5: 正常执行，非节流跳过
+    skipped: false, // I5: 正常执行，非节流跳过
     summary,
   };
 }
@@ -252,11 +264,17 @@ export function resetLocks(): void {
 function getRequiredFiles(stage: string): string[] {
   const base = ['stage-state.json', 'constitution.md', 'traceability-matrix.md'];
   switch (stage) {
-    case '01_specify': return [...base, 'spec.md'];
-    case '02_design': return [...base, 'design.md'];
-    case '03_plan': return [...base, 'task_plan.md'];
-    case '04_implement': return [...base, 'task_plan.md'];
-    case '05_verify': return [...base, 'task_plan.md'];
-    default: return base;
+    case '01_specify':
+      return [...base, 'spec.md'];
+    case '02_design':
+      return [...base, 'design.md'];
+    case '03_plan':
+      return [...base, 'task_plan.md'];
+    case '04_implement':
+      return [...base, 'task_plan.md'];
+    case '05_verify':
+      return [...base, 'task_plan.md'];
+    default:
+      return base;
   }
 }

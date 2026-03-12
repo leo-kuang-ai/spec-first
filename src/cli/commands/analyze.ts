@@ -35,7 +35,9 @@ export function handleAnalyze(args: string[]): number {
 
   console.log(`分析完成：${featureId}`);
   console.log(`报告：${outputPath}`);
-  console.log(`CRITICAL=${result.summary.CRITICAL}, HIGH=${result.summary.HIGH}, MEDIUM=${result.summary.MEDIUM}, LOW=${result.summary.LOW}`);
+  console.log(
+    `CRITICAL=${result.summary.CRITICAL}, HIGH=${result.summary.HIGH}, MEDIUM=${result.summary.MEDIUM}, LOW=${result.summary.LOW}`
+  );
 
   return result.summary.CRITICAL > 0 ? ExitCode.GATE_FAILED : ExitCode.SUCCESS;
 }

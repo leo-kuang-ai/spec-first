@@ -53,7 +53,10 @@ export function createUpstreamLineage(rows: MatrixRow[]): UpstreamLineage {
       }
       return false;
     },
-    collectCoveredTargetIds(startIds: Iterable<string>, targetIds: ReadonlySet<string>): Set<string> {
+    collectCoveredTargetIds(
+      startIds: Iterable<string>,
+      targetIds: ReadonlySet<string>
+    ): Set<string> {
       const covered = new Set<string>();
       if (targetIds.size === 0) return covered;
 

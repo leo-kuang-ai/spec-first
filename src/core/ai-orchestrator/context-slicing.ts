@@ -31,31 +31,34 @@ const DEFAULT_CONFIG: SliceConfig = {
 /** 按 Size 选择策略 */
 export function getStrategy(size: Size): 'inline-first' | 'hybrid' | 'references-first' {
   switch (size) {
-    case 'S': return 'inline-first';
-    case 'M': return 'hybrid';
-    case 'L': return 'references-first';
-    default: return 'hybrid';
+    case 'S':
+      return 'inline-first';
+    case 'M':
+      return 'hybrid';
+    case 'L':
+      return 'references-first';
+    default:
+      return 'hybrid';
   }
 }
 
 /** 对 references 执行动态裁剪 */
 export function sliceContext(
   refs: ContextRef[],
-  config: SliceConfig = DEFAULT_CONFIG,
+  config: SliceConfig = DEFAULT_CONFIG
 ): SliceResult {
-  const estimate = (ref: ContextRef): number => (
-    typeof ref.estimatedTokens === 'number' && ref.estimatedTokens > 0
-      ? ref.estimatedTokens
-      : 200
-  );
+  const estimate = (ref: ContextRef): number =>
+    typeof ref.estimatedTokens === 'number' && ref.estimatedTokens > 0 ? ref.estimatedTokens : 200;
   const estimatedTokens = refs.reduce((sum, ref) => sum + estimate(ref), 0);
-  const order = new Map(refs.map((ref, idx) => [`${ref.path}::${ref.selector ?? ''}::${ref.checksum}`, idx]));
-  const sortBySourceOrder = (items: ContextRef[]): ContextRef[] => (
-    [...items].sort((a, b) => (
-      (order.get(`${a.path}::${a.selector ?? ''}::${a.checksum}`) ?? 0)
-      - (order.get(`${b.path}::${b.selector ?? ''}::${b.checksum}`) ?? 0)
-    ))
+  const order = new Map(
+    refs.map((ref, idx) => [`${ref.path}::${ref.selector ?? ''}::${ref.checksum}`, idx])
   );
+  const sortBySourceOrder = (items: ContextRef[]): ContextRef[] =>
+    [...items].sort(
+      (a, b) =>
+        (order.get(`${a.path}::${a.selector ?? ''}::${a.checksum}`) ?? 0) -
+        (order.get(`${b.path}::${b.selector ?? ''}::${b.checksum}`) ?? 0)
+    );
 
   if (estimatedTokens <= config.budgetTokens) {
     return {

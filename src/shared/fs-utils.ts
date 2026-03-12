@@ -88,11 +88,14 @@ export function parseMarkdownTable(content: string): string[][] {
   for (const line of content.split('\n')) {
     const trimmed = line.trim();
     if (!trimmed.startsWith('|')) continue;
-    if (/^\|[\s\-:|]+$/.test(trimmed)) { headerSkipped = true; continue; }
+    if (/^\|[\s\-:|]+$/.test(trimmed)) {
+      headerSkipped = true;
+      continue;
+    }
     if (!headerSkipped) continue;
     const parts = trimmed.split('|').slice(1);
     if (parts.at(-1)?.trim() === '') parts.pop();
-    rows.push(parts.map(c => c.trim()));
+    rows.push(parts.map((c) => c.trim()));
   }
   return rows;
 }

@@ -30,7 +30,7 @@ export function buildCatchupSummary(
     relatedDSCount: number;
     relatedAPICount: number;
   },
-  backgroundInputStatus?: 'full' | 'degraded' | 'blind',
+  backgroundInputStatus?: 'full' | 'degraded' | 'blind'
 ): string {
   const lines = [
     `会话恢复 — ${featureId}`,
@@ -51,11 +51,11 @@ export function buildCatchupSummary(
   }
   if (taskContextSummary) {
     lines.push(
-      `TaskContextPack: ${taskContextSummary.taskId} `
-      + `(size=${taskContextSummary.contextSize}b, `
-      + `FR=${taskContextSummary.relatedFRCount}, `
-      + `DS=${taskContextSummary.relatedDSCount}, `
-      + `API=${taskContextSummary.relatedAPICount})`,
+      `TaskContextPack: ${taskContextSummary.taskId} ` +
+        `(size=${taskContextSummary.contextSize}b, ` +
+        `FR=${taskContextSummary.relatedFRCount}, ` +
+        `DS=${taskContextSummary.relatedDSCount}, ` +
+        `API=${taskContextSummary.relatedAPICount})`
     );
   }
 
@@ -85,7 +85,7 @@ export function extractFiveQuestions(
   phase: string,
   task: string | undefined,
   findingsContent: string,
-  missingFiles: string[],
+  missingFiles: string[]
 ): FiveQuestions {
   // Q1: Feature 与阶段
   const featureAndStage = {
@@ -104,7 +104,9 @@ export function extractFiveQuestions(
   let lastConclusion = '未找到';
   let lastConclusionGap = true;
   if (findingsContent) {
-    const nonEmptyLines = findingsContent.split('\n').filter((line) => line.trim() && !line.startsWith('#'));
+    const nonEmptyLines = findingsContent
+      .split('\n')
+      .filter((line) => line.trim() && !line.startsWith('#'));
     if (nonEmptyLines.length > 0) {
       lastConclusion = nonEmptyLines[nonEmptyLines.length - 1].trim().slice(0, 100);
       lastConclusionGap = false;
@@ -129,7 +131,18 @@ export function extractFiveQuestions(
 
   // Q5: 下一步命令（必须给出有效可执行命令）
   let nextAction = getSuggestedCommandForStage(phase, featureId);
-  let nextActionGap = !task && !['01_specify', '02_design', '03_plan', '04_implement', '05_verify', '06_wrap_up', '07_release', '08_done'].includes(phase);
+  let nextActionGap =
+    !task &&
+    ![
+      '01_specify',
+      '02_design',
+      '03_plan',
+      '04_implement',
+      '05_verify',
+      '06_wrap_up',
+      '07_release',
+      '08_done',
+    ].includes(phase);
   if (task) {
     nextAction = `/spec-first:code --task ${task}`;
     nextActionGap = false;

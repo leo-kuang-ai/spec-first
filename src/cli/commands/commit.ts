@@ -11,8 +11,20 @@ import { getCurrentTaskId } from '../../core/task-plan/parser.js';
 import { parseFlag } from '../parse-utils.js';
 
 const GIT_COMMIT_TIMEOUT_MS = 30_000;
-const SOURCE_FILE_PREFIXES = ['src/', 'scripts/', 'templates/', 'skills/', '.spec-first/hooks/'] as const;
-const SOURCE_FILE_EXACT = ['package.json', 'tsconfig.json', 'eslint.config.js', 'vitest.config.ts', 'tsup.config.ts'] as const;
+const SOURCE_FILE_PREFIXES = [
+  'src/',
+  'scripts/',
+  'templates/',
+  'skills/',
+  '.spec-first/hooks/',
+] as const;
+const SOURCE_FILE_EXACT = [
+  'package.json',
+  'tsconfig.json',
+  'eslint.config.js',
+  'vitest.config.ts',
+  'tsup.config.ts',
+] as const;
 
 export function handleCommit(args: string[]): number {
   const projectRoot = process.cwd();
@@ -87,7 +99,10 @@ function listStagedFiles(projectRoot: string): string[] {
       timeout: GIT_COMMIT_TIMEOUT_MS,
     }).trim();
     if (!out) return [];
-    return out.split('\n').map((line) => line.trim()).filter(Boolean);
+    return out
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
   } catch {
     // 非 Git 环境或索引不可读时，交由 git commit 主流程处理
     return [];
@@ -95,11 +110,13 @@ function listStagedFiles(projectRoot: string): string[] {
 }
 
 function isSourceFile(path: string): boolean {
-  if (SOURCE_FILE_EXACT.includes(path as typeof SOURCE_FILE_EXACT[number])) return true;
+  if (SOURCE_FILE_EXACT.includes(path as (typeof SOURCE_FILE_EXACT)[number])) return true;
   return SOURCE_FILE_PREFIXES.some((prefix) => path.startsWith(prefix));
 }
 
-function validateGovernanceStaging(projectRoot: string): { ok: true } | { ok: false; reason: string } {
+function validateGovernanceStaging(
+  projectRoot: string
+): { ok: true } | { ok: false; reason: string } {
   const staged = listStagedFiles(projectRoot);
   if (staged.length === 0) return { ok: true };
 

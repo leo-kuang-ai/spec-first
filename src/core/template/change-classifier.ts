@@ -53,7 +53,7 @@ export function isMinorTemplate(templateName: string): boolean {
  */
 export function classifyChange(
   templateName: string,
-  changeType: 'added' | 'modified' | 'deleted' | 'unchanged',
+  changeType: 'added' | 'modified' | 'deleted' | 'unchanged'
 ): ClassificationResult {
   // 未变更直接返回 Minor
   if (changeType === 'unchanged') {

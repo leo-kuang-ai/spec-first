@@ -22,10 +22,10 @@ export function syncBackfill(
   featureId: string,
   changedIds: string[],
   newStatus: MatrixStatus,
-  projectRoot: string,
+  projectRoot: string
 ): BackfillResult {
   const rows = parseMatrix(featureId, projectRoot);
-  const rowMap = new Map(rows.map(r => [r.id, r]));
+  const rowMap = new Map(rows.map((r) => [r.id, r]));
 
   const updatedIds: string[] = [];
   const skippedIds: string[] = [];
@@ -59,16 +59,12 @@ export function syncBackfill(
 }
 
 /** 追加审计记录到 findings.md */
-function writeAuditLog(
-  featureId: string,
-  projectRoot: string,
-  entries: string[],
-): void {
+function writeAuditLog(featureId: string, projectRoot: string, entries: string[]): void {
   if (entries.length === 0) return;
 
   const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
   const header = exists(findingsPath) ? '' : '# Findings & Audit Log\n\n';
-  const section = `\n## Backfill Sync\n\n${entries.map(e => `- ${e}`).join('\n')}\n`;
+  const section = `\n## Backfill Sync\n\n${entries.map((e) => `- ${e}`).join('\n')}\n`;
 
   appendFileSync(findingsPath, header + section);
 }

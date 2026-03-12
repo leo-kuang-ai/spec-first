@@ -67,7 +67,13 @@ interface UpdateOptions {
   hosts?: SkillHostTarget[];
 }
 
-async function runUpdate({ dryRun, skipMcp, skipHooks, quiet, hosts }: UpdateOptions): Promise<number> {
+async function runUpdate({
+  dryRun,
+  skipMcp,
+  skipHooks,
+  quiet,
+  hosts,
+}: UpdateOptions): Promise<number> {
   const cwd = process.cwd();
   const log = quiet ? () => {} : console.log.bind(console);
   const prefix = dryRun ? '[dry-run] ' : '';
@@ -99,15 +105,30 @@ async function runUpdate({ dryRun, skipMcp, skipHooks, quiet, hosts }: UpdateOpt
 }
 
 /** 刷新宿主集成：Skills 同步、MCP 配置、Git/AI/Session Hooks */
-function refreshHostIntegrations({ cwd, dryRun, skipMcp, skipHooks, hosts, log, prefix }: {
-  cwd: string; dryRun: boolean; skipMcp: boolean; skipHooks: boolean;
-  hosts?: SkillHostTarget[]; log: (...args: unknown[]) => void; prefix: string;
+function refreshHostIntegrations({
+  cwd,
+  dryRun,
+  skipMcp,
+  skipHooks,
+  hosts,
+  log,
+  prefix,
+}: {
+  cwd: string;
+  dryRun: boolean;
+  skipMcp: boolean;
+  skipHooks: boolean;
+  hosts?: SkillHostTarget[];
+  log: (...args: unknown[]) => void;
+  prefix: string;
 }): void {
   // Skills 同步
   const hostPaths = detectHostPaths();
   const skills = ensureSkillCommands(cwd, { global: true, dryRun, hosts });
   const genericCount = skills.generic?.length ?? 0;
-  log(`${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex, ${genericCount} generic → ${hostPaths.specFirstSkillsDir}`);
+  log(
+    `${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex, ${genericCount} generic → ${hostPaths.specFirstSkillsDir}`
+  );
   if (skills.codexWarnings.length > 0) {
     log(`  ⚠ Codex skill 验证失败 (${skills.codexWarnings.length}):`);
     for (const w of skills.codexWarnings) log(`    - ${w}`);
@@ -117,8 +138,8 @@ function refreshHostIntegrations({ cwd, dryRun, skipMcp, skipHooks, hosts, log, 
   if (!skipMcp) {
     // update 仅做“存在性检查 + 缺失补齐”，不做二进制探测（避免 npx/uvx 网络阻塞）
     const mcp = ensureHostBootstrap({ dryRun, checkBinaries: false });
-    const fixed = mcp.results.filter(r => r.level === 'FIXED').length;
-    const errors = mcp.results.filter(r => r.level === 'ERROR').length;
+    const fixed = mcp.results.filter((r) => r.level === 'FIXED').length;
+    const errors = mcp.results.filter((r) => r.level === 'ERROR').length;
     log(`${prefix}MCP: ${mcp.results.length} checked, ${fixed} fixed, ${errors} errors`);
   } else {
     log(`${prefix}MCP: skipped`);
@@ -196,7 +217,9 @@ async function checkTemplateChanges(options: TemplateCheckOptions): Promise<void
   const batchDecision = decideBatchUpdate(diff, cwd);
 
   // 6. 输出摘要
-  log(`${prefix}Templates: ${batchDecision.summary.autoUpdate} auto, ${batchDecision.summary.prompt} prompt, ${batchDecision.summary.block} block`);
+  log(
+    `${prefix}Templates: ${batchDecision.summary.autoUpdate} auto, ${batchDecision.summary.prompt} prompt, ${batchDecision.summary.block} block`
+  );
 
   if (batchDecision.requiresUserInput && !dryRun) {
     console.log('\n' + formatDecisionSummary(batchDecision));
@@ -239,14 +262,18 @@ function checkAndExecuteManifests(options: ManifestCheckOptions): void {
 
   const { manifest } = manifestResult;
 
-  log(`${prefix}Migrations: found ${manifest.description} (${manifest.versionRange.from} -> ${manifest.versionRange.to})`);
+  log(
+    `${prefix}Migrations: found ${manifest.description} (${manifest.versionRange.from} -> ${manifest.versionRange.to})`
+  );
 
   // 执行迁移
   const conflictStrategy = dryRun ? ConflictStrategy.Skip : ConflictStrategy.Skip;
   const result = executeManifest(manifest, cwd, conflictStrategy);
 
   // 输出结果
-  log(`${prefix}Migrations: ${result.executedSteps} executed, ${result.skippedSteps} skipped, ${result.failedSteps} failed`);
+  log(
+    `${prefix}Migrations: ${result.executedSteps} executed, ${result.skippedSteps} skipped, ${result.failedSteps} failed`
+  );
 
   if (!result.success) {
     log(`${prefix}⚠ Migration completed with errors`);
@@ -304,7 +331,9 @@ function ensureProjectInstallScaffold(options: {
 async function checkForUpdates(): Promise<void> {
   try {
     // update-notifier 为可选依赖，动态 import 避免 ESM/CJS 混用
-    const mod = await import('update-notifier' as string) as { default: (options: unknown) => { notify: () => void } };
+    const mod = (await import('update-notifier' as string)) as {
+      default: (options: unknown) => { notify: () => void };
+    };
     const pkg = { name: 'spec-first', version: getCliVersion() };
     mod.default({ pkg, updateCheckInterval: 1000 * 60 * 60 * 24 }).notify();
   } catch {
@@ -323,7 +352,10 @@ function parseHostTargets(args: string[]): SkillHostTarget[] | undefined {
       throw new Error('参数错误：--host 需要一个目标值（claude|codex|generic|all）');
     }
     i += 1;
-    const targets = raw.split(',').map((item) => item.trim()).filter(Boolean);
+    const targets = raw
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
     for (const target of targets) {
       if (!HOST_TARGETS.has(target as SkillHostTarget)) {
         throw new Error(`参数错误：未知 host "${target}"，可选值: claude|codex|generic|all`);

@@ -63,9 +63,9 @@ const CONTROL_LIMIT = 2048; // 2KB hard limit
 // ─── 阶段×上下文映射 ─────────────────────────────────────
 
 interface LayerDef {
-  l1: string[];  // 始终加载
-  l2: string[];  // 按阶段加载
-  l3: string[];  // 矩阵关联
+  l1: string[]; // 始终加载
+  l2: string[]; // 按阶段加载
+  l3: string[]; // 矩阵关联
 }
 
 const STAGE_LAYERS: Partial<Record<string, LayerDef>> = {
@@ -102,7 +102,7 @@ const STAGE_LAYERS: Partial<Record<string, LayerDef>> = {
 export function buildContextPack(
   featureId: string,
   projectRoot: string,
-  options?: ContextPackOptions,
+  options?: ContextPackOptions
 ): ContextPack {
   const specDir = join(projectRoot, 'specs', featureId);
   const statePath = join(specDir, 'stage-state.json');
@@ -160,13 +160,15 @@ function buildReferences(
   featureId: string,
   projectRoot: string,
   state: StageState,
-  options?: ContextPackOptions,
+  options?: ContextPackOptions
 ): ContextRef[] {
   const specDir = join(projectRoot, 'specs', featureId);
   const layers = STAGE_LAYERS[state.currentStage] ?? { l1: ['constitution.md'], l2: [], l3: [] };
   const refs: ContextRef[] = [];
   const seen = new Set<string>();
-  const expandPaths = new Set((options?.expandPaths ?? []).map((item) => item.trim()).filter(Boolean));
+  const expandPaths = new Set(
+    (options?.expandPaths ?? []).map((item) => item.trim()).filter(Boolean)
+  );
   const isExpanded = (relPath: string): boolean => {
     if (options?.fullDetail) return true;
     if (expandPaths.has(relPath)) return true;
@@ -217,7 +219,7 @@ function buildRef(
   fullPath: string,
   relPath: string,
   reason: string,
-  granularity: 'summary' | 'detail',
+  granularity: 'summary' | 'detail'
 ): ContextRef | null {
   try {
     const stat = statSync(fullPath);
@@ -262,7 +264,7 @@ export interface TaskContextPack {
 export function buildTaskContextPack(
   taskId: string,
   featureId: string,
-  projectRoot: string,
+  projectRoot: string
 ): TaskContextPack | null {
   const specDir = join(projectRoot, 'specs', featureId);
   const taskPlanPath = join(specDir, 'task_plan.md');
@@ -338,7 +340,7 @@ function extractTaskContent(taskPlan: string, taskId: string): string | null {
 /** 从 traceability-matrix 提取 TASK 关联的 FR/DS/API */
 function extractTaskTraces(
   matrix: string,
-  taskId: string,
+  taskId: string
 ): { relatedFR: string[]; relatedDS: string[]; relatedAPI: string[] } {
   const relatedFR: string[] = [];
   const relatedDS: string[] = [];

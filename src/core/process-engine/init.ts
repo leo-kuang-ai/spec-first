@@ -3,7 +3,17 @@
  * 生成 Feature ID → 创建目录 → 渲染状态 → 初始化骨架文件 → 注册缩写
  */
 import { join } from 'node:path';
-import { closeSync, openSync, readFileSync, readdirSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+import {
+  closeSync,
+  openSync,
+  readFileSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+  statSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { Stage } from '../../shared/types.js';
 import type { BackgroundInputStatus, Mode, Size, StageState } from '../../shared/types.js';
 import {
@@ -46,9 +56,7 @@ export interface InitResult {
 
 function validateFeat(feat: string): void {
   if (!/^[A-Z][A-Z0-9]{0,15}$/.test(feat)) {
-    throw new Error(
-      `无效 FEAT 缩写 "${feat}"：必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`,
-    );
+    throw new Error(`无效 FEAT 缩写 "${feat}"：必须为 1-16 位、以 A-Z 开头、且仅包含 A-Z0-9`);
   }
 }
 
@@ -166,10 +174,7 @@ function registerFeatUnlocked(specsDir: string, feat: string, featureId: string)
   const regPath = join(specsDir, REGISTRY_FILE);
 
   if (!exists(regPath)) {
-    const header =
-      '# FEAT 缩写注册表\n\n'
-      + '| FEAT | Feature ID |\n'
-      + '|------|------------|\n';
+    const header = '# FEAT 缩写注册表\n\n' + '| FEAT | Feature ID |\n' + '|------|------------|\n';
     writeMarkdown(regPath, header);
   }
 
@@ -192,7 +197,7 @@ function writeRegistryLockPayload(lockPath: string): void {
     writeFileSync(
       lockPath,
       `${JSON.stringify({ pid: process.pid, createdAt: Date.now() })}\n`,
-      'utf-8',
+      'utf-8'
     );
   } catch {
     // ignore payload write failure; lock ownership is still valid
@@ -203,7 +208,8 @@ function tryRecoverStaleRegistryLock(lockPath: string): boolean {
   const payload = readRegistryLockPayload(lockPath);
   const createdAt = payload?.createdAt ?? readRegistryLockMtime(lockPath);
   const staleByAge = createdAt > 0 && Date.now() - createdAt >= REGISTRY_LOCK_STALE_MS;
-  const staleByPid = typeof payload?.pid === 'number' && payload.pid > 0 && !isProcessAlive(payload.pid);
+  const staleByPid =
+    typeof payload?.pid === 'number' && payload.pid > 0 && !isProcessAlive(payload.pid);
 
   if (!staleByAge && !staleByPid) return false;
 
@@ -216,7 +222,9 @@ function tryRecoverStaleRegistryLock(lockPath: string): boolean {
   }
 }
 
-function readRegistryLockPayload(lockPath: string): { pid?: number; createdAt?: number } | undefined {
+function readRegistryLockPayload(
+  lockPath: string
+): { pid?: number; createdAt?: number } | undefined {
   try {
     const raw = readFileSync(lockPath, 'utf-8').trim();
     if (!raw) return undefined;
@@ -251,96 +259,102 @@ function isProcessAlive(pid: number): boolean {
 // ─── 骨架文件生成 ────────────────────────────────────────
 
 function skeletonFindings(featureId: string): string {
-  return `# Findings & Decisions — ${featureId}
+  return (
+    `# Findings & Decisions — ${featureId}
 
-`
-    + `## Plan Summary
+` +
+    `## Plan Summary
 
-`
-    + `| Field | Value |
-`
-    + `|------|-------|
-`
-    + `| Target Stage | 01_specify |
-`
-    + `| Next Action | 补齐规格并推进当前阶段 |
-`
-    + `| Blockers | none |
-`
-    + `| Risk Level | LOW |
-`
-    + `| Suggested Command | /spec-first:spec |
+` +
+    `| Field | Value |
+` +
+    `|------|-------|
+` +
+    `| Target Stage | 01_specify |
+` +
+    `| Next Action | 补齐规格并推进当前阶段 |
+` +
+    `| Blockers | none |
+` +
+    `| Risk Level | LOW |
+` +
+    `| Suggested Command | /spec-first:spec |
 
-`
-    + `## Decision Log
+` +
+    `## Decision Log
 
-`
-    + `| Time | Stage | Decision | Rationale |
-`
-    + `|------|-------|----------|-----------|
+` +
+    `| Time | Stage | Decision | Rationale |
+` +
+    `|------|-------|----------|-----------|
 
-`
-    + `## Execution Evidence
+` +
+    `## Execution Evidence
 
-`
-    + `| Time | Type | Evidence | Result |
-`
-    + `|------|------|----------|--------|
+` +
+    `| Time | Type | Evidence | Result |
+` +
+    `|------|------|----------|--------|
 
-`
-    + `## Risks & Blockers
+` +
+    `## Risks & Blockers
 
-`
-    + `- None
+` +
+    `- None
 
-`
-    + `## Next Steps
+` +
+    `## Next Steps
 
+` +
+    `1. 执行 /spec-first:spec
 `
-    + `1. 执行 /spec-first:spec
-`;
+  );
 }
 
 function skeletonTaskPlan(featureId: string, title: string): string {
-  return `# Task Plan — ${featureId}
+  return (
+    `# Task Plan — ${featureId}
 
-`
-    + `> ${title}
+` +
+    `> ${title}
 
-`
-    + `## 任务明细
+` +
+    `## 任务明细
 
-`
-    + `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
-`
-    + `|---|---|---|---|---|---|---|---|---|
-`
-    + `| TASK-XXX-001 | 初始化基础骨架 | dev | 0.5d | FR-XXX-001 | - | CLI 可初始化并生成骨架 | pnpm test -- tests/unit/init.test.ts | todo |
+` +
+    `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+` +
+    `|---|---|---|---|---|---|---|---|---|
+` +
+    `| TASK-XXX-001 | 初始化基础骨架 | dev | 0.5d | FR-XXX-001 | - | CLI 可初始化并生成骨架 | pnpm test -- tests/unit/init.test.ts | todo |
 
-`
-    + `## 实施步骤
+` +
+    `## 实施步骤
 
-`
-    + `### TASK-XXX-001 — 初始化基础骨架
+` +
+    `### TASK-XXX-001 — 初始化基础骨架
 
-`
-    + `1. 建立最小骨架与目录
-`
-    + `2. 补齐追踪关系与必要文档
-`
-    + `3. 记录关键结论到 findings.md
+` +
+    `1. 建立最小骨架与目录
+` +
+    `2. 补齐追踪关系与必要文档
+` +
+    `3. 记录关键结论到 findings.md
 
-`
-    + `## 验证命令
+` +
+    `## 验证命令
 
+` +
+    `- pnpm test -- tests/unit/init.test.ts
 `
-    + `- pnpm test -- tests/unit/init.test.ts
-`;
+  );
 }
 
 function skeletonMatrix(): string {
-  return '| ID | Type | Title | Status | Upstream | Downstream |\n'
-    + '|----|------|-------|--------|----------|------------|\n';
+  return (
+    '| ID | Type | Title | Status | Upstream | Downstream |\n' +
+    '|----|------|-------|--------|----------|------------|\n'
+  );
 }
 
 function skeletonPrd(featureId: string, title: string): string {
@@ -421,8 +435,8 @@ last_updated: "${today}"
 
 function detectProjectType(platforms: string[]): string {
   if (platforms.length === 0) return 'fullstack';
-  if (platforms.every(p => p.includes('frontend'))) return 'frontend';
-  if (platforms.every(p => p.includes('backend'))) return 'backend';
+  if (platforms.every((p) => p.includes('frontend'))) return 'frontend';
+  if (platforms.every((p) => p.includes('backend'))) return 'backend';
   return 'fullstack';
 }
 
@@ -440,12 +454,14 @@ function buildConstitutionTemplateContext(opts: InitOptions, featureId: string):
 }
 
 function fallbackConstitution(featureId: string): string {
-  return `# Constitution — ${featureId}\n\n`
-    + `> 项目宪法副本。请在 .spec-first/constitution.md 中维护主版本。\n\n`
-    + `## Core Principles\n\n`
-    + `1. 规范先行（Specification First）\n`
-    + `2. 全链路追踪（Traceability）\n`
-    + `3. 质量门禁（Quality Gates）\n\n`;
+  return (
+    `# Constitution — ${featureId}\n\n` +
+    `> 项目宪法副本。请在 .spec-first/constitution.md 中维护主版本。\n\n` +
+    `## Core Principles\n\n` +
+    `1. 规范先行（Specification First）\n` +
+    `2. 全链路追踪（Traceability）\n` +
+    `3. 质量门禁（Quality Gates）\n\n`
+  );
 }
 
 function skeletonConstitution(opts: InitOptions, featureId: string): string {
@@ -466,16 +482,19 @@ function skeletonConstitution(opts: InitOptions, featureId: string): string {
 function ensureConstitutionMeta(content: string): string {
   const today = new Date().toISOString().slice(0, 10);
   let next = content.trimEnd();
-  const dateOrDateTime = '\\d{4}-\\d{2}-\\d{2}(?:[T\\s]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})?)?';
+  const dateOrDateTime =
+    '\\d{4}-\\d{2}-\\d{2}(?:[T\\s]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})?)?';
 
-  const hasVersion = /(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*[vV]?\d+\.\d+\.\d+/i.test(next);
+  const hasVersion = /(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*[vV]?\d+\.\d+\.\d+/i.test(
+    next
+  );
   const hasRatified = new RegExp(
     `(?:\\*\\*)?\\s*(?:ratified|批准日期|通过日期|生效日期)\\s*(?:\\*\\*)?\\s*[:：]\\s*${dateOrDateTime}`,
-    'i',
+    'i'
   ).test(next);
   const hasLastAmended = new RegExp(
     `(?:\\*\\*)?\\s*(?:last[_\\s-]*amended|最近修订|最后修订)\\s*(?:\\*\\*)?\\s*[:：]\\s*${dateOrDateTime}`,
-    'i',
+    'i'
   ).test(next);
   const hasAmendmentHistory = /(?:^|\n)##\s*(amendment history|修订历史)\b/i.test(next);
 
@@ -487,10 +506,11 @@ function ensureConstitutionMeta(content: string): string {
   }
 
   if (!hasAmendmentHistory) {
-    next += '\n\n## Amendment History\n\n'
-      + '| Version | Date | Summary |\n'
-      + '|---------|------|---------|\n'
-      + `| 1.0.0 | ${today} | Initial constitution |`;
+    next +=
+      '\n\n## Amendment History\n\n' +
+      '| Version | Date | Summary |\n' +
+      '|---------|------|---------|\n' +
+      `| 1.0.0 | ${today} | Initial constitution |`;
   }
 
   return `${next.trimEnd()}\n`;
@@ -508,7 +528,10 @@ function snapshotCurrentFeature(projectRoot: string): { existed: boolean; conten
   return { existed: true, content: readMarkdown(currentPath) };
 }
 
-function restoreCurrentFeature(projectRoot: string, snapshot: { existed: boolean; content?: string }): void {
+function restoreCurrentFeature(
+  projectRoot: string,
+  snapshot: { existed: boolean; content?: string }
+): void {
   const currentPath = join(projectRoot, '.spec-first', 'current');
   ensureDir(join(projectRoot, '.spec-first'));
   if (snapshot.existed) {
@@ -553,7 +576,11 @@ function resolveFeatureInitTargets(opts: InitOptions): FeatureInitTargets {
   return { specsDir, featureId, featureDir, tmpFeatureDir };
 }
 
-function assertFeatNotOccupied(existingId: string | undefined, feat: string, featureId: string): void {
+function assertFeatNotOccupied(
+  existingId: string | undefined,
+  feat: string,
+  featureId: string
+): void {
   if (existingId && existingId !== featureId) {
     throw new Error(`FEAT 缩写 "${feat}" 已被注册到 ${existingId}`);
   }
@@ -565,7 +592,7 @@ function recoverExistingFeature(
   featureId: string,
   featureDir: string,
   existingId: string | undefined,
-  mergedRules: MergedRules,
+  mergedRules: MergedRules
 ): InitResult {
   const backgroundInputStatus = detectBackgroundInputStatus(opts.projectRoot);
   if (!existingId) {
@@ -584,7 +611,7 @@ function createInitialStageState(
   opts: InitOptions,
   featureId: string,
   mergedRules: MergedRules,
-  backgroundInputStatus: BackgroundInputStatus,
+  backgroundInputStatus: BackgroundInputStatus
 ): StageState {
   const now = new Date().toISOString();
   return {
@@ -613,7 +640,7 @@ function writeFeatureSkeleton(
   tmpFeatureDir: string,
   opts: InitOptions,
   featureId: string,
-  mergedRules: MergedRules,
+  mergedRules: MergedRules
 ): void {
   const backgroundInputStatus = detectBackgroundInputStatus(opts.projectRoot);
   ensureDir(tmpFeatureDir);
@@ -637,7 +664,7 @@ function commitFeatureInit(
   specsDir: string,
   featureId: string,
   featureDir: string,
-  tmpFeatureDir: string,
+  tmpFeatureDir: string
 ): 'created' | 'idempotent' {
   return withRegistryLock(specsDir, () => {
     const latest = loadRegistry(specsDir);
@@ -682,7 +709,7 @@ function recoverFromInitError(
   featureId: string,
   featureDir: string,
   tmpFeatureDir: string,
-  mergedRules: MergedRules,
+  mergedRules: MergedRules
 ): InitResult {
   rmSync(tmpFeatureDir, { recursive: true, force: true });
   if (!exists(featureDir)) {
@@ -694,7 +721,7 @@ function recoverFromInitError(
     featureId,
     featureDir,
     loadRegistry(specsDir).get(opts.feat),
-    mergedRules,
+    mergedRules
   );
 }
 
@@ -722,7 +749,7 @@ export function init(opts: InitOptions): InitResult {
       targets.featureId,
       targets.featureDir,
       existingId,
-      mergedRules,
+      mergedRules
     );
   }
 
@@ -735,7 +762,7 @@ export function init(opts: InitOptions): InitResult {
       targets.specsDir,
       targets.featureId,
       targets.featureDir,
-      targets.tmpFeatureDir,
+      targets.tmpFeatureDir
     );
     if (commitResult === 'idempotent') {
       rmSync(targets.tmpFeatureDir, { recursive: true, force: true });
@@ -748,7 +775,7 @@ export function init(opts: InitOptions): InitResult {
       targets.featureId,
       targets.featureDir,
       targets.tmpFeatureDir,
-      mergedRules,
+      mergedRules
     );
   }
 

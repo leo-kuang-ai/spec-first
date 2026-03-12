@@ -34,7 +34,7 @@ export const ReasonCode = {
   TODO_PENDING: 'TODO_PENDING',
 } as const;
 
-export type ReasonCodeValue = typeof ReasonCode[keyof typeof ReasonCode];
+export type ReasonCodeValue = (typeof ReasonCode)[keyof typeof ReasonCode];
 
 export type NextStepDecisionType =
   | 'BLOCKED'
@@ -91,7 +91,10 @@ const SUGGESTED_SKILL_COMMANDS: Partial<Record<Stage, string>> = {
   [Stage.IMPLEMENT]: '/spec-first:verify',
 };
 
-const AUTO_LOOP_STATUS_TO_REASON_CODE: Record<Exclude<AutoLoopStatus, 'all_done'>, ReasonCodeValue> = {
+const AUTO_LOOP_STATUS_TO_REASON_CODE: Record<
+  Exclude<AutoLoopStatus, 'all_done'>,
+  ReasonCodeValue
+> = {
   has_blocked: ReasonCode.AUTO_LOOP_HAS_BLOCKED,
   timeout: ReasonCode.AUTO_LOOP_TIMEOUT,
   no_state_file: ReasonCode.AUTO_LOOP_NO_STATE_FILE,
@@ -106,7 +109,7 @@ export function getNextStage(currentStage: Stage): Stage | undefined {
 }
 
 export function summarizeTodoProgress(
-  todoState?: NextStepDecisionInput['todoState'],
+  todoState?: NextStepDecisionInput['todoState']
 ): TodoProgress {
   if (!todoState) {
     return {
@@ -118,7 +121,9 @@ export function summarizeTodoProgress(
   }
 
   const blockedCount = todoState.items.filter((item) => item.status === 'blocked').length;
-  const pendingCount = todoState.items.filter((item) => item.status === 'pending' || item.status === 'in_progress').length;
+  const pendingCount = todoState.items.filter(
+    (item) => item.status === 'pending' || item.status === 'in_progress'
+  ).length;
 
   return {
     allDone: todoState.items.length > 0 && todoState.items.every((item) => item.status === 'done'),

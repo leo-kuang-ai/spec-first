@@ -21,8 +21,8 @@ import {
 import { logFirstRuntimeWarning, toErrorMessage } from './first-runtime-observability.js';
 
 const GIT_COMMAND_TIMEOUT_MS = 5_000;
-const CHANGE_THRESHOLD = 0.30;
-const ALL_ARTIFACTS = PRODUCT_NAMES.map((name) => name === 'README' ? 'README.md' : `${name}.md`);
+const CHANGE_THRESHOLD = 0.3;
+const ALL_ARTIFACTS = PRODUCT_NAMES.map((name) => (name === 'README' ? 'README.md' : `${name}.md`));
 
 export type UpdateStrategy = 'incremental' | 'full' | 'skip';
 
@@ -108,11 +108,17 @@ export function analyzeChanges(projectRoot: string, lastUpdateCommit?: string): 
     const compareCommit = lastUpdateCommit || 'HEAD~10';
     const totalOutput = runGit(projectRoot, ['ls-files']);
     const totalFiles = totalOutput.split('\n').filter((file) => file.trim()).length;
-    const diffOutput = runGit(projectRoot, ['diff', '--name-only', `${compareCommit}..${currentCommit}`]);
+    const diffOutput = runGit(projectRoot, [
+      'diff',
+      '--name-only',
+      `${compareCommit}..${currentCommit}`,
+    ]);
     const changedFiles = diffOutput.split('\n').filter((file) => file.trim());
     const changePercentage = pct(changedFiles.length, totalFiles);
 
-    const affectedArtifacts = Array.from(new Set(changedFiles.flatMap((file) => matchArtifactsByChangedFile(file))));
+    const affectedArtifacts = Array.from(
+      new Set(changedFiles.flatMap((file) => matchArtifactsByChangedFile(file)))
+    );
 
     if (changedFiles.length === 0) {
       return {
@@ -156,7 +162,11 @@ export function analyzeChanges(projectRoot: string, lastUpdateCommit?: string): 
       reason: `变更规模适中（${changedFiles.length}/${totalFiles} 个文件，${(changePercentage * 100).toFixed(1)}%），受影响 ${affectedArtifacts.length} 个产物，使用增量更新`,
     };
   } catch (error) {
-    logFirstRuntimeWarning('change-detector.analyzeChanges', 'Git 变更分析失败，回退到全量更新', error);
+    logFirstRuntimeWarning(
+      'change-detector.analyzeChanges',
+      'Git 变更分析失败，回退到全量更新',
+      error
+    );
     return {
       changedFiles: 0,
       totalFiles: 0,
@@ -210,7 +220,10 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     }
 
     if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
-      issues.push({ type: 'hash_mismatch', message: 'runtime 资产与索引记录不一致（可能被手动修改）' });
+      issues.push({
+        type: 'hash_mismatch',
+        message: 'runtime 资产与索引记录不一致（可能被手动修改）',
+      });
     }
 
     return {
@@ -234,11 +247,16 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     currentCommit,
     changeAnalysis: analyzeChanges(projectRoot),
     productStatus,
-    hasManualModifications: productStatus.some((item) => item.issues.some((issue) => issue.type === 'hash_mismatch')),
+    hasManualModifications: productStatus.some((item) =>
+      item.issues.some((issue) => issue.type === 'hash_mismatch')
+    ),
   };
 }
 
-export function getAffectedArtifacts(context: FirstUpdateContext, forceUpdate: boolean = false): string[] {
+export function getAffectedArtifacts(
+  context: FirstUpdateContext,
+  forceUpdate: boolean = false
+): string[] {
   if (!context.hasExistingOutput || forceUpdate) {
     return ALL_ARTIFACTS.slice();
   }
@@ -264,7 +282,9 @@ export function formatChangeAnalysis(analysis: ChangeAnalysis): string {
   lines.push('');
   lines.push(`- 变更文件: ${analysis.changedFiles} 个`);
   lines.push(`- 变更占比: ${(analysis.changePercentage * 100).toFixed(1)}%`);
-  lines.push(`- 更新策略: ${analysis.recommendedStrategy === 'incremental' ? '增量更新' : analysis.recommendedStrategy === 'full' ? '全量更新' : '跳过'}`);
+  lines.push(
+    `- 更新策略: ${analysis.recommendedStrategy === 'incremental' ? '增量更新' : analysis.recommendedStrategy === 'full' ? '全量更新' : '跳过'}`
+  );
   lines.push('');
 
   if (analysis.affectedArtifacts.length > 0 && analysis.recommendedStrategy !== 'full') {
@@ -275,7 +295,9 @@ export function formatChangeAnalysis(analysis: ChangeAnalysis): string {
     lines.push('');
   }
 
-  const unaffected = ALL_ARTIFACTS.filter((artifact) => !analysis.affectedArtifacts.includes(artifact));
+  const unaffected = ALL_ARTIFACTS.filter(
+    (artifact) => !analysis.affectedArtifacts.includes(artifact)
+  );
   if (unaffected.length > 0 && analysis.recommendedStrategy !== 'full') {
     lines.push('📝 **保持不变的产物**:');
     for (const artifact of unaffected) {
@@ -296,8 +318,12 @@ export function formatHealthStatus(context: FirstUpdateContext): string {
 
   lines.push('📋 **检测到已有产物**');
   if (context.lastUpdateTime) {
-    const daysSince = Math.floor((Date.now() - context.lastUpdateTime.getTime()) / (1000 * 60 * 60 * 24));
-    lines.push(`- 上次更新: ${context.lastUpdateTime.toISOString().split('T')[0]}（距今 ${daysSince} 天）`);
+    const daysSince = Math.floor(
+      (Date.now() - context.lastUpdateTime.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    lines.push(
+      `- 上次更新: ${context.lastUpdateTime.toISOString().split('T')[0]}（距今 ${daysSince} 天）`
+    );
   }
   if (context.lastUpdateCommit && context.currentCommit) {
     const commitMatch = context.lastUpdateCommit === context.currentCommit;
@@ -328,8 +354,12 @@ export interface FirstRefreshDecision {
 }
 
 export function detectFirstRefreshScope(changedFiles: string[]): FirstRefreshDecision {
-  const runtimeArtifacts = Array.from(new Set(changedFiles.flatMap((file) => matchRuntimeArtifactsByChangedFile(file))));
-  const docsProjections = Array.from(new Set(changedFiles.flatMap((file) => collectProjectionDocsForChangedFiles([file]))));
+  const runtimeArtifacts = Array.from(
+    new Set(changedFiles.flatMap((file) => matchRuntimeArtifactsByChangedFile(file)))
+  );
+  const docsProjections = Array.from(
+    new Set(changedFiles.flatMap((file) => collectProjectionDocsForChangedFiles([file])))
+  );
 
   return {
     scope: docsProjections.length > 0 ? 'runtime-and-docs' : 'runtime-only',

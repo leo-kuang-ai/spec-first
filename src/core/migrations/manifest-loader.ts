@@ -6,11 +6,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { exists } from '../../shared/fs-utils.js';
 import yaml from 'js-yaml';
-import type {
-  MigrationManifest,
-  ValidationResult,
-  VersionRange,
-} from './manifest-schema.js';
+import type { MigrationManifest, ValidationResult, VersionRange } from './manifest-schema.js';
 
 // ─── 常量定义 ───────────────────────────────────────────
 
@@ -46,7 +42,7 @@ export function loadManifest(path: string): MigrationManifest {
   const schemaVersion = manifest.schemaVersion;
   if (typeof schemaVersion !== 'string' || !SUPPORTED_SCHEMA_VERSIONS.includes(schemaVersion)) {
     throw new Error(
-      `不支持的清单 schema 版本：${schemaVersion}（支持：${SUPPORTED_SCHEMA_VERSIONS.join(', ')}）`,
+      `不支持的清单 schema 版本：${schemaVersion}（支持：${SUPPORTED_SCHEMA_VERSIONS.join(', ')}）`
     );
   }
 
@@ -212,7 +208,9 @@ function validateStep(step: unknown, index: number): string[] {
       break;
 
     default:
-      errors.push(`steps[${index}] 无效的 type：${type}（支持：mkdir, rename, delete, copy, patch, execute）`);
+      errors.push(
+        `steps[${index}] 无效的 type：${type}（支持：mkdir, rename, delete, copy, patch, execute）`
+      );
   }
 
   return errors;
@@ -223,7 +221,9 @@ function validateStep(step: unknown, index: number): string[] {
  * @param projectRoot 项目根目录
  * @returns 清单数组，按版本范围排序
  */
-export function listManifests(projectRoot: string): Array<{ path: string; manifest: MigrationManifest }> {
+export function listManifests(
+  projectRoot: string
+): Array<{ path: string; manifest: MigrationManifest }> {
   const manifestsDir = join(projectRoot, 'templates', 'migrations');
 
   if (!exists(manifestsDir)) {
@@ -268,7 +268,7 @@ export function listManifests(projectRoot: string): Array<{ path: string; manife
  */
 export function findManifestForVersion(
   currentVersion: string,
-  projectRoot: string,
+  projectRoot: string
 ): { path: string; manifest: MigrationManifest } | null {
   const manifests = listManifests(projectRoot);
 

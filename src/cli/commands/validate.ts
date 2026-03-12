@@ -14,9 +14,12 @@ export interface ValidateOptions {
 export function handleValidate(args: string[], options?: ValidateOptions): number {
   const sub = args[0];
   switch (sub) {
-    case 'format': return handleFormatValidation(args.slice(1), options);
-    case 'matrix': return handleMatrixValidation(args.slice(1), options);
-    case 'all': return handleAllValidation(args.slice(1), options);
+    case 'format':
+      return handleFormatValidation(args.slice(1), options);
+    case 'matrix':
+      return handleMatrixValidation(args.slice(1), options);
+    case 'all':
+      return handleAllValidation(args.slice(1), options);
     default:
       printValidateHelp();
       if (sub) console.error(`未知 validate 子命令：${sub}`);
@@ -46,7 +49,7 @@ function handleFormatValidation(args: string[], options?: ValidateOptions): numb
   }
 
   console.error('✗ 格式校验失败：\n');
-  result.errors.forEach(err => console.error(`  - ${err}`));
+  result.errors.forEach((err) => console.error(`  - ${err}`));
   return ExitCode.VALIDATION_ERROR;
 }
 
@@ -56,7 +59,8 @@ function handleMatrixValidation(args: string[], options?: ValidateOptions): numb
 
   const projectRoot = options?.projectRoot ?? process.cwd();
   const result = checkMatrix(featureId, projectRoot);
-  const hasIssues = result.orphans.length > 0 || result.brokenChains.length > 0 || result.vModelPairs.length > 0;
+  const hasIssues =
+    result.orphans.length > 0 || result.brokenChains.length > 0 || result.vModelPairs.length > 0;
 
   if (!hasIssues) {
     console.log('✓ 矩阵校验通过');

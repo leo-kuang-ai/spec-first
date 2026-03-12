@@ -44,15 +44,24 @@ export interface AnalyzeResult {
   };
 }
 
-function collectBackgroundQualityFindings(featureId: string, projectRoot: string): AnalyzeFinding[] {
+function collectBackgroundQualityFindings(
+  featureId: string,
+  projectRoot: string
+): AnalyzeFinding[] {
   const findings: AnalyzeFinding[] = [];
   const featureDir = join(projectRoot, 'specs', featureId);
   const stageStatePath = join(featureDir, 'stage-state.json');
 
   if (exists(stageStatePath)) {
     try {
-      const stageState = readJson<{ currentStage?: string; backgroundInputStatus?: string }>(stageStatePath);
-      if (stageState.currentStage === '05_verify' && stageState.backgroundInputStatus && stageState.backgroundInputStatus !== 'full') {
+      const stageState = readJson<{ currentStage?: string; backgroundInputStatus?: string }>(
+        stageStatePath
+      );
+      if (
+        stageState.currentStage === '05_verify' &&
+        stageState.backgroundInputStatus &&
+        stageState.backgroundInputStatus !== 'full'
+      ) {
         findings.push({
           severity: 'HIGH',
           type: 'BACKGROUND_INPUT_DEGRADED',
@@ -124,19 +133,25 @@ export function runSca(featureId: string, projectRoot: string, stage: Stage): Sc
   const checks = getStageSca(stage, rows);
   return {
     stage,
-    pass: checks.every(c => c.pass),
+    pass: checks.every((c) => c.pass),
     checks,
   };
 }
 
 function getStageSca(stage: Stage, rows: MatrixRow[]): ScaCheckItem[] {
   switch (stage) {
-    case '01_specify' as Stage: return checkSpecify(rows);
-    case '02_design' as Stage: return checkDesign(rows);
-    case '03_plan' as Stage: return checkPlan(rows);
-    case '04_implement' as Stage: return checkImplement(rows);
-    case '05_verify' as Stage: return checkVerify(rows);
-    default: return [{ rule: 'SCA-SKIP', pass: true, detail: `阶段 ${stage} 无 SCA 规则` }];
+    case '01_specify' as Stage:
+      return checkSpecify(rows);
+    case '02_design' as Stage:
+      return checkDesign(rows);
+    case '03_plan' as Stage:
+      return checkPlan(rows);
+    case '04_implement' as Stage:
+      return checkImplement(rows);
+    case '05_verify' as Stage:
+      return checkVerify(rows);
+    default:
+      return [{ rule: 'SCA-SKIP', pass: true, detail: `阶段 ${stage} 无 SCA 规则` }];
   }
 }
 
@@ -144,22 +159,21 @@ function getStageSca(stage: Stage, rows: MatrixRow[]): ScaCheckItem[] {
 
 function checkSpecify(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
-  const frRows = rows.filter(r => r.type === 'FR');
+  const frRows = rows.filter((r) => r.type === 'FR');
 
   // PRD→FR 映射完整性
-  const unmappedFr = frRows.filter(r =>
-    !(r.upstream ?? []).some(u => u.startsWith('REQ-'))
-  );
+  const unmappedFr = frRows.filter((r) => !(r.upstream ?? []).some((u) => u.startsWith('REQ-')));
   checks.push({
     rule: 'SCA-SPEC-00: PRD→FR 映射完整性',
     pass: unmappedFr.length === 0,
-    detail: unmappedFr.length > 0
-      ? `未映射 PRD 的 FR：${unmappedFr.map(r => r.id).join(', ')}`
-      : `${frRows.length} 个 FR 全部映射到 PRD`,
+    detail:
+      unmappedFr.length > 0
+        ? `未映射 PRD 的 FR：${unmappedFr.map((r) => r.id).join(', ')}`
+        : `${frRows.length} 个 FR 全部映射到 PRD`,
   });
 
   // FR ID 唯一性（NFR 暂未纳入 IdType，按 FR 检查）
-  const ids = rows.filter(r => r.type === 'FR').map(r => r.id);
+  const ids = rows.filter((r) => r.type === 'FR').map((r) => r.id);
   const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
   checks.push({
     rule: 'SCA-SPEC-01: FR/NFR ID 唯一性',
@@ -168,11 +182,12 @@ function checkSpecify(rows: MatrixRow[]): ScaCheckItem[] {
   });
 
   // 每个 FR 必须有 title
-  const noTitle = frRows.filter(r => !r.title || r.title.trim() === '');
+  const noTitle = frRows.filter((r) => !r.title || r.title.trim() === '');
   checks.push({
     rule: 'SCA-SPEC-02: FR 标题完整性',
     pass: noTitle.length === 0,
-    detail: noTitle.length > 0 ? `缺少标题：${noTitle.map(r => r.id).join(', ')}` : '全部 FR 均有标题',
+    detail:
+      noTitle.length > 0 ? `缺少标题：${noTitle.map((r) => r.id).join(', ')}` : '全部 FR 均有标题',
   });
 
   return checks;
@@ -182,18 +197,19 @@ function checkSpecify(rows: MatrixRow[]): ScaCheckItem[] {
 
 function checkDesign(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
-  const frRows = rows.filter(r => r.type === 'FR');
-  const dsRows = rows.filter(r => r.type === 'DS');
-  const dsUpstreams = new Set(dsRows.flatMap(r => r.upstream ?? []));
+  const frRows = rows.filter((r) => r.type === 'FR');
+  const dsRows = rows.filter((r) => r.type === 'DS');
+  const dsUpstreams = new Set(dsRows.flatMap((r) => r.upstream ?? []));
 
   // 每个 FR 必须有对应 DS
-  const unmapped = frRows.filter(r => !dsUpstreams.has(r.id));
+  const unmapped = frRows.filter((r) => !dsUpstreams.has(r.id));
   checks.push({
     rule: 'SCA-DESIGN-01: FR→DS 映射完整性',
     pass: unmapped.length === 0,
-    detail: unmapped.length > 0
-      ? `未映射 FR：${unmapped.map(r => r.id).join(', ')}`
-      : `${frRows.length} 个 FR 全部映射到 DS`,
+    detail:
+      unmapped.length > 0
+        ? `未映射 FR：${unmapped.map((r) => r.id).join(', ')}`
+        : `${frRows.length} 个 FR 全部映射到 DS`,
   });
 
   return checks;
@@ -206,17 +222,18 @@ function checkPlan(rows: MatrixRow[]): ScaCheckItem[] {
   const trace = createTraceContext(rows);
   const mappedFr = trace.lineage.collectCoveredTargetIds(
     trace.taskRows.map((task) => task.id),
-    trace.frIds,
+    trace.frIds
   );
 
   // 每个 FR 必须有对应 TASK
-  const unmapped = trace.frRows.filter(r => !mappedFr.has(r.id));
+  const unmapped = trace.frRows.filter((r) => !mappedFr.has(r.id));
   checks.push({
     rule: 'SCA-PLAN-01: FR→TASK 映射完整性',
     pass: unmapped.length === 0,
-    detail: unmapped.length > 0
-      ? `未映射 FR：${unmapped.map(r => r.id).join(', ')}`
-      : `${trace.frRows.length} 个 FR 全部映射到 TASK`,
+    detail:
+      unmapped.length > 0
+        ? `未映射 FR：${unmapped.map((r) => r.id).join(', ')}`
+        : `${trace.frRows.length} 个 FR 全部映射到 TASK`,
   });
 
   return checks;
@@ -226,17 +243,18 @@ function checkPlan(rows: MatrixRow[]): ScaCheckItem[] {
 
 function checkImplement(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
-  const taskRows = rows.filter(r => r.type === 'TASK');
+  const taskRows = rows.filter((r) => r.type === 'TASK');
 
   // TASK 必须有 Implemented 或更高状态
   const implemented = new Set(['Implemented', 'Verified', 'Accepted']);
-  const incomplete = taskRows.filter(r => !implemented.has(r.status));
+  const incomplete = taskRows.filter((r) => !implemented.has(r.status));
   checks.push({
     rule: 'SCA-IMPL-01: TASK 实现完整性',
     pass: incomplete.length === 0,
-    detail: incomplete.length > 0
-      ? `未完成：${incomplete.map(r => `${r.id}(${r.status})`).join(', ')}`
-      : `${taskRows.length} 个 TASK 全部实现`,
+    detail:
+      incomplete.length > 0
+        ? `未完成：${incomplete.map((r) => `${r.id}(${r.status})`).join(', ')}`
+        : `${taskRows.length} 个 TASK 全部实现`,
   });
 
   return checks;
@@ -246,18 +264,19 @@ function checkImplement(rows: MatrixRow[]): ScaCheckItem[] {
 
 function checkVerify(rows: MatrixRow[]): ScaCheckItem[] {
   const checks: ScaCheckItem[] = [];
-  const frRows = rows.filter(r => r.type === 'FR');
-  const tcRows = rows.filter(r => r.type === 'TC');
-  const tcUpstreams = new Set(tcRows.flatMap(r => r.upstream ?? []));
+  const frRows = rows.filter((r) => r.type === 'FR');
+  const tcRows = rows.filter((r) => r.type === 'TC');
+  const tcUpstreams = new Set(tcRows.flatMap((r) => r.upstream ?? []));
 
   // 每个 FR 必须有对应 TC
-  const untested = frRows.filter(r => !tcUpstreams.has(r.id));
+  const untested = frRows.filter((r) => !tcUpstreams.has(r.id));
   checks.push({
     rule: 'SCA-VERIFY-01: FR→TC 测试覆盖',
     pass: untested.length === 0,
-    detail: untested.length > 0
-      ? `未测试 FR：${untested.map(r => r.id).join(', ')}`
-      : `${frRows.length} 个 FR 全部有 TC`,
+    detail:
+      untested.length > 0
+        ? `未测试 FR：${untested.map((r) => r.id).join(', ')}`
+        : `${frRows.length} 个 FR 全部有 TC`,
   });
 
   return checks;
@@ -300,9 +319,9 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
       suggestion: '先补齐 FR/DS/TASK/TC 基础行',
     });
   } else if (trace.frRows.length > 0) {
-    const unmappedPrd = trace.frRows.filter((r) =>
-      !(r.upstream ?? []).some((u) => u.startsWith('REQ-'))
-    ).map((r) => r.id);
+    const unmappedPrd = trace.frRows
+      .filter((r) => !(r.upstream ?? []).some((u) => u.startsWith('REQ-')))
+      .map((r) => r.id);
     if (unmappedPrd.length > 0) {
       findings.push({
         severity: 'HIGH',
@@ -316,7 +335,7 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
     const dsUpstream = new Set(trace.dsRows.flatMap((r) => r.upstream ?? []));
     const taskMappedFr = trace.lineage.collectCoveredTargetIds(
       trace.taskRows.map((task) => task.id),
-      trace.frIds,
+      trace.frIds
     );
 
     const uncoveredByDs = trace.frRows.filter((r) => !dsUpstream.has(r.id)).map((r) => r.id);
@@ -342,12 +361,24 @@ export function analyzeArtifacts(featureId: string, projectRoot: string): Analyz
     }
   }
 
-  const ambiguousTerms = ['适当', '合理', '尽快', '等等', '可能', '大概', 'as needed', 'etc', 'user-friendly'];
+  const ambiguousTerms = [
+    '适当',
+    '合理',
+    '尽快',
+    '等等',
+    '可能',
+    '大概',
+    'as needed',
+    'etc',
+    'user-friendly',
+  ];
   for (const file of ['spec.md', 'design.md', 'task_plan.md']) {
     const fullPath = join(featureDir, file);
     if (!exists(fullPath)) continue;
     const content = readMarkdown(fullPath);
-    const hits = ambiguousTerms.filter((term) => content.toLowerCase().includes(term.toLowerCase()));
+    const hits = ambiguousTerms.filter((term) =>
+      content.toLowerCase().includes(term.toLowerCase())
+    );
     if (hits.length === 0) continue;
     findings.push({
       severity: 'MEDIUM',
@@ -398,7 +429,9 @@ export function renderAnalysisReport(result: AnalyzeResult): string {
   lines.push('| Severity | Type | Location | Detail | Suggestion |');
   lines.push('|----------|------|----------|--------|------------|');
   for (const finding of result.findings) {
-    lines.push(`| ${finding.severity} | ${finding.type} | ${escapeCell(finding.location)} | ${escapeCell(finding.detail)} | ${escapeCell(finding.suggestion)} |`);
+    lines.push(
+      `| ${finding.severity} | ${finding.type} | ${escapeCell(finding.location)} | ${escapeCell(finding.detail)} | ${escapeCell(finding.suggestion)} |`
+    );
   }
   lines.push('');
   return lines.join('\n');

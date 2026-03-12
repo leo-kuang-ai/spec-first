@@ -28,22 +28,16 @@ export interface ContextReviewResult {
 /**
  * 检查 _context.md 是否已有审计事件（已被审核过）
  */
-export function hasContextAuditEvent(
-  featureId: string,
-  projectRoot: string,
-): boolean {
+export function hasContextAuditEvent(featureId: string, projectRoot: string): boolean {
   const records = readAuditLog(featureId, projectRoot);
-  return records.some(r => r.event === 'context_reviewed');
+  return records.some((r) => r.event === 'context_reviewed');
 }
 
 /**
  * 生成 _context.md 的 diff 预览
  * 对比已有内容与新生成内容，返回简化 diff
  */
-export function generateContextDiff(
-  existingContent: string,
-  newContent: string,
-): string {
+export function generateContextDiff(existingContent: string, newContent: string): string {
   const oldLines = existingContent.split('\n');
   const newLines = newContent.split('\n');
 
@@ -72,7 +66,7 @@ export function generateContextDiff(
 export function reviewContextGeneration(
   featureId: string,
   projectRoot: string,
-  newContent: string,
+  newContent: string
 ): ContextReviewResult {
   // 已有审计事件 → 跳过审核
   if (hasContextAuditEvent(featureId, projectRoot)) {
@@ -83,16 +77,17 @@ export function reviewContextGeneration(
     };
   }
 
-  const contextPath = join(
-    projectRoot, 'specs', featureId, '_context.md',
-  );
+  const contextPath = join(projectRoot, 'specs', featureId, '_context.md');
 
   // 文件不存在 → 首次生成，需人工审核
   if (!existsSync(contextPath)) {
     return {
       needsReview: true,
       strategy: 'manual',
-      diff: newContent.split('\n').map(l => `+ ${l}`).join('\n'),
+      diff: newContent
+        .split('\n')
+        .map((l) => `+ ${l}`)
+        .join('\n'),
     };
   }
 

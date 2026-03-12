@@ -12,7 +12,7 @@ function sleepMs(ms: number): void {
 export function withFileLock<T>(
   lockPath: string,
   action: () => T,
-  options?: { timeoutMs?: number; retryMs?: number },
+  options?: { timeoutMs?: number; retryMs?: number }
 ): T {
   const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   const retryMs = options?.retryMs ?? DEFAULT_RETRY_MS;

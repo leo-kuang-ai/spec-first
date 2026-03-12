@@ -42,7 +42,8 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
   checks.push({
     id: 'GL-01',
     description: '最近一次 Gate 结果为 PASS 或 PASS_WITH_WAIVER',
-    pass: lastGate !== null && (lastGate.status === 'PASS' || lastGate.status === 'PASS_WITH_WAIVER'),
+    pass:
+      lastGate !== null && (lastGate.status === 'PASS' || lastGate.status === 'PASS_WITH_WAIVER'),
     detail: lastGate ? `最近 Gate：${lastGate.status}（阶段 ${lastGate.stage}）` : '暂无 Gate 历史',
   });
 
@@ -52,7 +53,7 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
     id: 'GL-02',
     description: '最终 SCA 通过',
     pass: sca.pass,
-    detail: sca.pass ? 'SCA 已通过' : `${sca.checks.filter(c => !c.pass).length} 项 SCA 失败`,
+    detail: sca.pass ? 'SCA 已通过' : `${sca.checks.filter((c) => !c.pass).length} 项 SCA 失败`,
   });
 
   // GL-03: 安全扫描无 critical
@@ -76,29 +77,29 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
   // GL-04: 追踪矩阵全部终态
   const rows = parseMatrix(featureId, projectRoot);
   const terminal = new Set(['Accepted', 'Cancelled', 'Exception']);
-  const nonTerminal = rows.filter(r => !terminal.has(r.status));
+  const nonTerminal = rows.filter((r) => !terminal.has(r.status));
   checks.push({
     id: 'GL-04',
     description: '追踪矩阵全部处于终态',
     pass: nonTerminal.length === 0,
-    detail: nonTerminal.length > 0
-      ? `${nonTerminal.length} 条非终态条目`
-      : '全部条目已终态',
+    detail: nonTerminal.length > 0 ? `${nonTerminal.length} 条非终态条目` : '全部条目已终态',
   });
 
   // GL-05: Release evidence exists
-  const missingArtifacts = RELEASE_REQUIRED_ARTIFACTS
-    .filter((relativePath) => !exists(join(projectRoot, 'specs', featureId, relativePath)));
+  const missingArtifacts = RELEASE_REQUIRED_ARTIFACTS.filter(
+    (relativePath) => !exists(join(projectRoot, 'specs', featureId, relativePath))
+  );
   checks.push({
     id: 'GL-05',
     description: 'Release 证据齐备（release-note + smoke-test-report）',
     pass: missingArtifacts.length === 0,
-    detail: missingArtifacts.length === 0
-      ? 'release evidence complete'
-      : `missing: ${missingArtifacts.join(', ')}`,
+    detail:
+      missingArtifacts.length === 0
+        ? 'release evidence complete'
+        : `missing: ${missingArtifacts.join(', ')}`,
   });
 
-  const pass = checks.every(c => c.pass);
+  const pass = checks.every((c) => c.pass);
 
   // 降级策略：任一 GL 失败 → confirm_policy 降级为 strict
   return {
@@ -121,9 +122,10 @@ function getLastGateResult(featureId: string, projectRoot: string): GateResult |
     try {
       const entry = JSON.parse(lines[i]) as Record<string, unknown>;
       const isGateEval = entry.event === 'gate_eval';
-      const isLegacy = typeof entry.status === 'string'
-        && typeof entry.stage === 'string'
-        && Array.isArray(entry.conditions);
+      const isLegacy =
+        typeof entry.status === 'string' &&
+        typeof entry.stage === 'string' &&
+        Array.isArray(entry.conditions);
       if (!isGateEval && !isLegacy) continue;
       return entry as unknown as GateResult;
     } catch {

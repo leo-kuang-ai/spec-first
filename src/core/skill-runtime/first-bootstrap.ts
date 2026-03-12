@@ -16,7 +16,12 @@ import {
   writeFirstRuntimeSummary,
   writeFirstStageViews,
 } from './first-runtime-store.js';
-import type { FirstRuntimeAssetIndexEntry, FirstRuntimeIndex, FirstRuntimeMode, FirstRuntimeSummary } from './first-runtime-types.js';
+import type {
+  FirstRuntimeAssetIndexEntry,
+  FirstRuntimeIndex,
+  FirstRuntimeMode,
+  FirstRuntimeSummary,
+} from './first-runtime-types.js';
 import { buildStageViews } from './first-stage-views.js';
 import { buildFirstSummary } from './first-summary.js';
 
@@ -35,9 +40,8 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
-
 function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
-  return Array.from(new Set(groups.flatMap(group => group ?? []).filter(Boolean)));
+  return Array.from(new Set(groups.flatMap((group) => group ?? []).filter(Boolean)));
 }
 
 function readPackageJson(projectRoot: string): Record<string, unknown> | undefined {
@@ -58,7 +62,9 @@ function readPackageBinPaths(pkg?: Record<string, unknown>): string[] {
     return [bin];
   }
   if (!isRecord(bin)) return [];
-  return Object.values(bin).filter((value): value is string => typeof value === 'string' && value.trim().length > 0);
+  return Object.values(bin).filter(
+    (value): value is string => typeof value === 'string' && value.trim().length > 0
+  );
 }
 
 function readPackageBinNames(pkg?: Record<string, unknown>): string[] {
@@ -80,7 +86,10 @@ function detectTechStack(projectRoot: string, pkg?: Record<string, unknown>): st
     techStack.push(`runtime: Node.js ${nodeVersion}`);
   }
 
-  if (existsSync(join(projectRoot, 'tsconfig.json')) || existsSync(join(projectRoot, 'tsconfig.base.json'))) {
+  if (
+    existsSync(join(projectRoot, 'tsconfig.json')) ||
+    existsSync(join(projectRoot, 'tsconfig.base.json'))
+  ) {
     techStack.push('language: TypeScript');
   } else if (pkg) {
     techStack.push('language: JavaScript');
@@ -88,9 +97,9 @@ function detectTechStack(projectRoot: string, pkg?: Record<string, unknown>): st
 
   const packageManager = typeof pkg?.packageManager === 'string' ? pkg.packageManager : undefined;
   if (
-    packageManager?.startsWith('pnpm@')
-    || existsSync(join(projectRoot, 'pnpm-lock.yaml'))
-    || existsSync(join(projectRoot, 'pnpm-workspace.yaml'))
+    packageManager?.startsWith('pnpm@') ||
+    existsSync(join(projectRoot, 'pnpm-lock.yaml')) ||
+    existsSync(join(projectRoot, 'pnpm-workspace.yaml'))
   ) {
     techStack.push('package-manager: pnpm');
   }
@@ -139,12 +148,9 @@ function detectModules(projectRoot: string): string[] {
 
 function detectEntryPoints(projectRoot: string, pkg?: Record<string, unknown>): string[] {
   const declaredEntryPoints = readPackageBinPaths(pkg);
-  const existingEntryPoints = [
-    'src/cli/index.ts',
-    'src/index.ts',
-    'index.ts',
-    'main.ts',
-  ].filter((relativePath) => existsSync(join(projectRoot, relativePath)));
+  const existingEntryPoints = ['src/cli/index.ts', 'src/index.ts', 'index.ts', 'main.ts'].filter(
+    (relativePath) => existsSync(join(projectRoot, relativePath))
+  );
 
   return uniqueStrings(declaredEntryPoints, existingEntryPoints);
 }
@@ -181,9 +187,9 @@ function detectEvidence(projectRoot: string, entryPoints: string[], modules: str
     ...modules,
   ];
 
-  return Array.from(new Set(
-    priority.filter((relativePath) => existsSync(join(projectRoot, relativePath))),
-  )).slice(0, 8);
+  return Array.from(
+    new Set(priority.filter((relativePath) => existsSync(join(projectRoot, relativePath))))
+  ).slice(0, 8);
 }
 
 function detectOverview(projectRoot: string, pkg: Record<string, unknown> | undefined): string {
@@ -212,11 +218,15 @@ function detectRisks(projectRoot: string, platformType?: string): string[] {
   return risks;
 }
 
-function buildBootstrapSummary(projectRoot: string, options: BootstrapFirstRuntimeOptions): FirstRuntimeSummary {
+function buildBootstrapSummary(
+  projectRoot: string,
+  options: BootstrapFirstRuntimeOptions
+): FirstRuntimeSummary {
   const pkg = readPackageJson(projectRoot);
-  const projectName = typeof pkg?.name === 'string' && pkg.name.trim() !== ''
-    ? pkg.name.trim()
-    : basename(projectRoot);
+  const projectName =
+    typeof pkg?.name === 'string' && pkg.name.trim() !== ''
+      ? pkg.name.trim()
+      : basename(projectRoot);
   const platformType = resolvePlatformType(projectRoot, options.platformType);
   const modules = detectModules(projectRoot);
   const entryPoints = detectEntryPoints(projectRoot, pkg);
@@ -244,7 +254,11 @@ function buildBootstrapSummary(projectRoot: string, options: BootstrapFirstRunti
   });
 }
 
-function buildIndexEntry(fullPath: string, relativePath: string, now: string): FirstRuntimeAssetIndexEntry {
+function buildIndexEntry(
+  fullPath: string,
+  relativePath: string,
+  now: string
+): FirstRuntimeAssetIndexEntry {
   const content = readFileSync(fullPath, 'utf-8');
   return {
     path: relativePath,
@@ -268,7 +282,7 @@ function getCurrentSourceCommit(projectRoot: string): string | undefined {
 
 export function bootstrapFirstRuntime(
   projectRoot: string,
-  options: BootstrapFirstRuntimeOptions,
+  options: BootstrapFirstRuntimeOptions
 ): BootstrapFirstRuntimeResult {
   const summary = buildBootstrapSummary(projectRoot, options);
   const roleViews = buildRoleViews(summary);
@@ -287,17 +301,17 @@ export function bootstrapFirstRuntime(
     summary: buildIndexEntry(
       getFirstRuntimeSummaryPath(projectRoot),
       '.spec-first/runtime/first/summary.json',
-      now,
+      now
     ),
     roleViews: buildIndexEntry(
       getFirstRoleViewsPath(projectRoot),
       '.spec-first/runtime/first/role-views.json',
-      now,
+      now
     ),
     stageViews: buildIndexEntry(
       getFirstStageViewsPath(projectRoot),
       '.spec-first/runtime/first/stage-views.json',
-      now,
+      now
     ),
     docsProjection: {},
     status: 'current',
@@ -312,7 +326,7 @@ export function bootstrapFirstRuntime(
       docsProjections.map((relativePath) => [
         relativePath,
         buildIndexEntry(join(projectRoot, relativePath), relativePath, now),
-      ]),
+      ])
     ),
   });
 

@@ -119,8 +119,8 @@ export function runSlopCheck(content: string, rules: SlopRule[]): SlopReport {
     }
   }
 
-  const errorCount = hits.filter(h => h.severity === 'error').length;
-  const warningCount = hits.filter(h => h.severity === 'warning').length;
+  const errorCount = hits.filter((h) => h.severity === 'error').length;
+  const warningCount = hits.filter((h) => h.severity === 'warning').length;
 
   return {
     passed: errorCount === 0,

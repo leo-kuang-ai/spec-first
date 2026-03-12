@@ -15,7 +15,7 @@ export interface TddCheckResult {
 export function checkTddEvidence(
   tasks: TaskNode[],
   featureId: string,
-  projectRoot: string,
+  projectRoot: string
 ): TddCheckResult {
   const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
 
@@ -24,7 +24,7 @@ export function checkTddEvidence(
       passed: false,
       missingCount: tasks.length,
       totalCount: tasks.length,
-      missingTasks: tasks.map(t => t.id),
+      missingTasks: tasks.map((t) => t.id),
     };
   }
 
@@ -51,7 +51,7 @@ export function checkTddEvidence(
 }
 
 export function detectFileConflicts(layers: TaskLayer[]): TaskLayer[] {
-  return layers.map(layer => {
+  return layers.map((layer) => {
     const fileMap = new Map<string, string[]>();
 
     for (const task of layer.tasks) {
@@ -65,8 +65,7 @@ export function detectFileConflicts(layers: TaskLayer[]): TaskLayer[] {
       }
     }
 
-    const conflicts = Array.from(fileMap.entries())
-      .filter(([_, tasks]) => tasks.length > 1);
+    const conflicts = Array.from(fileMap.entries()).filter(([_, tasks]) => tasks.length > 1);
 
     if (conflicts.length > 0) {
       return {

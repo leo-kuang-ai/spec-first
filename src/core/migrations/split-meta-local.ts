@@ -108,10 +108,7 @@ function scanDirectory(dirPath: string, baseDir: string): string[] {
 /**
  * 迁移文件到目标目录
  */
-function moveFile(
-  sourcePath: string,
-  targetPath: string,
-): { success: boolean; error?: string } {
+function moveFile(sourcePath: string, targetPath: string): { success: boolean; error?: string } {
   try {
     const content = readFileSync(sourcePath, 'binary');
 
@@ -136,10 +133,7 @@ function moveFile(
  * @param dryRun 预演模式，不实际写入文件
  * @returns 迁移报告
  */
-export function splitMetaLocal(
-  projectRoot: string,
-  dryRun = false,
-): MigrationReport {
+export function splitMetaLocal(projectRoot: string, dryRun = false): MigrationReport {
   const specFirstDir = join(projectRoot, '.spec-first');
 
   if (!existsSync(specFirstDir)) {
@@ -164,9 +158,7 @@ export function splitMetaLocal(
         reason = '包级基线文件';
         break;
       case 'local':
-        reason = PACKAGE_BASELINE_FILES.has(filePath)
-          ? '包级文件但已被用户修改'
-          : '用户定制文件';
+        reason = PACKAGE_BASELINE_FILES.has(filePath) ? '包级文件但已被用户修改' : '用户定制文件';
         break;
       case 'skip':
         reason = '无需迁移';

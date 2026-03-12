@@ -36,11 +36,7 @@ export function evaluatePolicy(input: PolicyInput): ConfirmPolicy {
 }
 
 /** auto 执行时写审计记录到 findings.md */
-export function writeAutoAudit(
-  featureId: string,
-  projectRoot: string,
-  action: string,
-): void {
+export function writeAutoAudit(featureId: string, projectRoot: string, action: string): void {
   const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
   const timestamp = new Date().toISOString();
   const entry = `\n- [${timestamp}] AUTO_CONFIRM: ${action}\n`;

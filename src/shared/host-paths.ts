@@ -70,7 +70,7 @@ function pickDirectoryByMarkers(candidates: string[], markers: string[]): string
 function buildCodexRootCandidates(
   env: NodeJS.ProcessEnv,
   homeDir: string,
-  platform: NodeJS.Platform,
+  platform: NodeJS.Platform
 ): string[] {
   const appData = env.APPDATA;
   const localAppData = env.LOCALAPPDATA;
@@ -88,7 +88,7 @@ function buildCodexRootCandidates(
 function buildClaudeConfigCandidates(
   env: NodeJS.ProcessEnv,
   homeDir: string,
-  platform: NodeJS.Platform,
+  platform: NodeJS.Platform
 ): string[] {
   const appData = env.APPDATA;
   const localAppData = env.LOCALAPPDATA;
@@ -99,8 +99,12 @@ function buildClaudeConfigCandidates(
     platform === 'win32' && appData ? join(appData, 'claude-code') : undefined,
     platform === 'win32' && localAppData ? join(localAppData, 'claude-code') : undefined,
     xdg ? join(xdg, 'claude-code') : undefined,
-    platform === 'darwin' ? join(homeDir, 'Library', 'Application Support', 'claude-code') : undefined,
-    platform === 'darwin' ? join(homeDir, 'Library', 'Application Support', 'Claude Code') : undefined,
+    platform === 'darwin'
+      ? join(homeDir, 'Library', 'Application Support', 'claude-code')
+      : undefined,
+    platform === 'darwin'
+      ? join(homeDir, 'Library', 'Application Support', 'Claude Code')
+      : undefined,
     join(homeDir, '.config', 'claude-code'),
   ]);
 }
@@ -108,7 +112,7 @@ function buildClaudeConfigCandidates(
 function buildClaudeHomeCandidates(
   env: NodeJS.ProcessEnv,
   homeDir: string,
-  platform: NodeJS.Platform,
+  platform: NodeJS.Platform
 ): string[] {
   const appData = env.APPDATA;
   return normalizeCandidates([
@@ -129,43 +133,46 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
   const ccSwitchSkillsDir = env.CC_SWITCH_SKILLS_DIR?.trim() || join(ccSwitchDataDir, 'skills');
   const ccSwitchInstalled = existsSync(join(ccSwitchDataDir, 'cc-switch.db'));
 
-  const codexRoot = pickDirectoryByMarkers(
-    buildCodexRootCandidates(env, homeDir, platform),
-    ['config.toml', 'skills'],
-  ) ?? join(homeDir, '.codex');
+  const codexRoot =
+    pickDirectoryByMarkers(buildCodexRootCandidates(env, homeDir, platform), [
+      'config.toml',
+      'skills',
+    ]) ?? join(homeDir, '.codex');
 
   const codexConfigPath = env.CODEX_CONFIG_PATH?.trim() || join(codexRoot, 'config.toml');
   const codexSkillsDir = env.CODEX_SKILLS_DIR?.trim() || join(codexRoot, 'skills');
   const codexSystemSkillsDir = join(codexSkillsDir, '.system');
 
-  const claudeConfigDir = pickDirectoryByMarkers(
-    buildClaudeConfigCandidates(env, homeDir, platform),
-    ['mcp.json', 'settings.json'],
-  ) ?? join(homeDir, '.config', 'claude-code');
+  const claudeConfigDir =
+    pickDirectoryByMarkers(buildClaudeConfigCandidates(env, homeDir, platform), [
+      'mcp.json',
+      'settings.json',
+    ]) ?? join(homeDir, '.config', 'claude-code');
 
   const claudeConfigFiles = [
     join(claudeConfigDir, 'mcp.json'),
     join(claudeConfigDir, 'settings.json'),
   ];
 
-  const claudeHomeDir = pickDirectoryByMarkers(
-    buildClaudeHomeCandidates(env, homeDir, platform),
-    ['skills', 'commands'],
-  ) ?? join(homeDir, '.claude');
+  const claudeHomeDir =
+    pickDirectoryByMarkers(buildClaudeHomeCandidates(env, homeDir, platform), [
+      'skills',
+      'commands',
+    ]) ?? join(homeDir, '.claude');
 
   const claudeSkillsDir = env.CLAUDE_SKILLS_DIR?.trim() || join(claudeHomeDir, 'skills');
   const claudeCommandsDir = env.CLAUDE_COMMANDS_DIR?.trim() || join(claudeHomeDir, 'commands');
   const agentsSkillsDir = env.AGENTS_HOME?.trim()
     ? join(env.AGENTS_HOME.trim(), 'skills')
     : join(homeDir, '.agents', 'skills');
-  const genericHomeDir = env.SPEC_FIRST_GENERIC_HOME?.trim()
-    || join(homeDir, '.spec-first', 'generic');
-  const genericSkillsDir = env.SPEC_FIRST_GENERIC_SKILLS_DIR?.trim()
-    || join(genericHomeDir, 'skills');
-  const specFirstSkillsDir = env.SPEC_FIRST_SKILLS_DIR?.trim()
-    || join(homeDir, '.spec-first', 'skills');
-  const bootstrapCacheDir = env.SPEC_FIRST_BOOTSTRAP_CACHE?.trim()
-    || join(homeDir, '.spec-first', 'bootstrap-cache');
+  const genericHomeDir =
+    env.SPEC_FIRST_GENERIC_HOME?.trim() || join(homeDir, '.spec-first', 'generic');
+  const genericSkillsDir =
+    env.SPEC_FIRST_GENERIC_SKILLS_DIR?.trim() || join(genericHomeDir, 'skills');
+  const specFirstSkillsDir =
+    env.SPEC_FIRST_SKILLS_DIR?.trim() || join(homeDir, '.spec-first', 'skills');
+  const bootstrapCacheDir =
+    env.SPEC_FIRST_BOOTSTRAP_CACHE?.trim() || join(homeDir, '.spec-first', 'bootstrap-cache');
 
   return {
     homeDir,

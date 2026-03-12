@@ -6,24 +6,31 @@
 import type { CoverageMetrics } from '../../shared/types.js';
 
 export interface HealthScore {
-  H1: number;       // 综合健康分 0-100
-  E1: number;       // 周期时间（天）
-  Q1: number;       // 缺陷逃逸率
+  H1: number; // 综合健康分 0-100
+  E1: number; // 周期时间（天）
+  Q1: number; // 缺陷逃逸率
   breakdown: Record<string, number>;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
 }
 
 /** 默认权重 */
 const WEIGHTS: Record<string, number> = {
-  C1: 0.12, C2: 0.10, C3: 0.10, C4: 0.15,
-  C5: 0.10, C6: 0.13, C7: 0.10, C8: 0.10, C9: 0.10,
+  C1: 0.12,
+  C2: 0.1,
+  C3: 0.1,
+  C4: 0.15,
+  C5: 0.1,
+  C6: 0.13,
+  C7: 0.1,
+  C8: 0.1,
+  C9: 0.1,
 };
 
 /** 计算综合健康分 */
 export function calcHealthScore(
   coverage: CoverageMetrics,
   cycleTimeDays: number,
-  escapeRate: number,
+  escapeRate: number
 ): HealthScore {
   const record = coverage as unknown as Record<string, number>;
   let weighted = 0;

@@ -1,6 +1,7 @@
 const SESSION_START_MANAGED_MARKER = 'SPEC_FIRST_MANAGED_SESSION=1';
 const VIEWER_OPEN_WITH_FLAGS = /\bviewer\s+open\b[\s\S]*--print-url\b[\s\S]*--background\b/i;
-const LEGACY_SHORT_FORM_PATTERN = /^\s*['"][^'"\n]+['"]\s+viewer\s+open\b[\s\S]*--print-url\b[\s\S]*--background\b[\s\S]*$/i;
+const LEGACY_SHORT_FORM_PATTERN =
+  /^\s*['"][^'"\n]+['"]\s+viewer\s+open\b[\s\S]*--print-url\b[\s\S]*--background\b[\s\S]*$/i;
 
 interface SessionStartHookCommand {
   type?: unknown;
@@ -36,18 +37,22 @@ export function isManagedSessionStartEntry(entry: unknown): boolean {
     if (hasStrongManagedSignal(commandText)) return true;
 
     // 兜底仅用于兼容旧短格式，并要求命中历史 entry 指纹，避免误删非托管命令。
-    return isLegacyShortFormCommand(commandText) && hasLegacyManagedEntryFingerprint(typed, hookConfig);
+    return (
+      isLegacyShortFormCommand(commandText) && hasLegacyManagedEntryFingerprint(typed, hookConfig)
+    );
   });
 }
 
 function hasStrongManagedSignal(command: string): boolean {
   const normalized = command.toLowerCase();
-  return command.includes(SESSION_START_MANAGED_MARKER)
-    || normalized.includes('.spec-first/current')
-    || normalized.includes('spec-first')
-    || normalized.includes('spec_first_bin_fallback=')
-    || normalized.includes('spec_first_bin_resolved=')
-    || normalized.includes('spec_first_bin=');
+  return (
+    command.includes(SESSION_START_MANAGED_MARKER) ||
+    normalized.includes('.spec-first/current') ||
+    normalized.includes('spec-first') ||
+    normalized.includes('spec_first_bin_fallback=') ||
+    normalized.includes('spec_first_bin_resolved=') ||
+    normalized.includes('spec_first_bin=')
+  );
 }
 
 function isLegacyShortFormCommand(command: string): boolean {
@@ -56,9 +61,7 @@ function isLegacyShortFormCommand(command: string): boolean {
 
 function hasLegacyManagedEntryFingerprint(
   entry: SessionStartEntry,
-  hook: SessionStartHookCommand | undefined,
+  hook: SessionStartHookCommand | undefined
 ): boolean {
-  return entry.matcher === '*'
-    && hook?.type === 'command'
-    && hook?.timeout === 15;
+  return entry.matcher === '*' && hook?.type === 'command' && hook?.timeout === 15;
 }

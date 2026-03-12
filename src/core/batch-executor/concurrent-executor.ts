@@ -1,7 +1,13 @@
 /**
  * 并发执行器（阶段 3）
  */
-import type { ExecutionPlan, BatchExecutionResult, TaskResult, LayerResult, TaskNode } from './types.js';
+import type {
+  ExecutionPlan,
+  BatchExecutionResult,
+  TaskResult,
+  LayerResult,
+  TaskNode,
+} from './types.js';
 import { saveCheckpoint } from './checkpoint.js';
 import { generateReport } from './report-generator.js';
 import { ProgressTracker } from './progress-tracker.js';
@@ -10,7 +16,7 @@ import { loadConfig } from '../../shared/config-schema.js';
 
 export async function executeConcurrent(
   plan: ExecutionPlan,
-  projectRoot: string,
+  projectRoot: string
 ): Promise<BatchExecutionResult> {
   const cfg = loadConfig(projectRoot);
   const maxParallel = cfg.runtime?.auto_orchestrate?.max_parallel || 2;
@@ -31,7 +37,7 @@ export async function executeConcurrent(
       ? await executeLayerConcurrent(layer.tasks, maxParallel, plan.featureId, projectRoot, tracker)
       : await executeLayerSerial(layer.tasks, plan.featureId, projectRoot, tracker);
 
-    const failureCount = results.filter(r => !r.success).length;
+    const failureCount = results.filter((r) => !r.success).length;
     const failureRate = failureCount / results.length;
 
     layerResults.push({
@@ -48,15 +54,18 @@ export async function executeConcurrent(
       }
     }
 
-    saveCheckpoint({
-      featureId: plan.featureId,
-      currentLayer: layer.layer,
-      completedTasks,
-      failedTasks,
-      startTime,
-      lastUpdateTime: new Date().toISOString(),
-      layerResults,
-    }, projectRoot);
+    saveCheckpoint(
+      {
+        featureId: plan.featureId,
+        currentLayer: layer.layer,
+        completedTasks,
+        failedTasks,
+        startTime,
+        lastUpdateTime: new Date().toISOString(),
+        layerResults,
+      },
+      projectRoot
+    );
 
     if (failureRate > 0.5) {
       halted = true;
@@ -65,12 +74,12 @@ export async function executeConcurrent(
     }
   }
 
-  const allResults = layerResults.flatMap(l => l.results);
+  const allResults = layerResults.flatMap((l) => l.results);
   const result: BatchExecutionResult = {
     featureId: plan.featureId,
     totalTasks: plan.totalTasks,
-    successCount: allResults.filter(r => r.success).length,
-    failureCount: allResults.filter(r => !r.success).length,
+    successCount: allResults.filter((r) => r.success).length,
+    failureCount: allResults.filter((r) => !r.success).length,
     blockedCount: 0,
     layers: layerResults,
     halted,
@@ -86,13 +95,13 @@ async function executeLayerConcurrent(
   maxParallel: number,
   featureId: string,
   projectRoot: string,
-  tracker: ProgressTracker,
+  tracker: ProgressTracker
 ): Promise<TaskResult[]> {
   const results: TaskResult[] = [];
   const chunks = chunkArray(tasks, maxParallel);
 
   for (const chunk of chunks) {
-    const promises = chunk.map(task => {
+    const promises = chunk.map((task) => {
       tracker.startTask(task.id);
       return executeTask(task, featureId, projectRoot);
     });
@@ -111,7 +120,7 @@ async function executeLayerSerial(
   tasks: TaskNode[],
   featureId: string,
   projectRoot: string,
-  tracker: ProgressTracker,
+  tracker: ProgressTracker
 ): Promise<TaskResult[]> {
   const results: TaskResult[] = [];
 
@@ -128,7 +137,7 @@ async function executeLayerSerial(
 async function executeTask(
   task: TaskNode,
   featureId: string,
-  projectRoot: string,
+  projectRoot: string
 ): Promise<TaskResult> {
   const startTime = Date.now();
 
@@ -142,7 +151,7 @@ async function executeTask(
     //   run_in_background: true
     // });
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     return {
       taskId: task.id,

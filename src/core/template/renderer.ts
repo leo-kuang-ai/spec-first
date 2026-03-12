@@ -87,7 +87,7 @@ export function renderTemplate(
   templateName: string,
   context: TemplateContext,
   outputPath: string,
-  projectRoot: string,
+  projectRoot: string
 ): boolean {
   // 文件已存在则跳过
   if (exists(outputPath)) return false;
@@ -95,7 +95,7 @@ export function renderTemplate(
   const tplPath = findTemplatePath(templateName, projectRoot);
   if (!tplPath) {
     throw new Error(
-      `Template not found: ${templateName}.hbs (searched in: ${LOCAL_TEMPLATE_DIR}, ${META_TEMPLATE_DIR}, ${TEMPLATE_DIR})`,
+      `Template not found: ${templateName}.hbs (searched in: ${LOCAL_TEMPLATE_DIR}, ${META_TEMPLATE_DIR}, ${TEMPLATE_DIR})`
     );
   }
 
@@ -114,12 +114,12 @@ export function renderTemplate(
 export function renderToString(
   templateName: string,
   context: TemplateContext,
-  projectRoot: string,
+  projectRoot: string
 ): string {
   const tplPath = findTemplatePath(templateName, projectRoot);
   if (!tplPath) {
     throw new Error(
-      `Template not found: ${templateName}.hbs (searched in: ${LOCAL_TEMPLATE_DIR}, ${META_TEMPLATE_DIR}, ${TEMPLATE_DIR})`,
+      `Template not found: ${templateName}.hbs (searched in: ${LOCAL_TEMPLATE_DIR}, ${META_TEMPLATE_DIR}, ${TEMPLATE_DIR})`
     );
   }
 

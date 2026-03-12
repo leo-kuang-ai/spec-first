@@ -3,7 +3,11 @@
  * gate check / gate history / gate conditions / golive check
  */
 import { ExitCode } from '../../shared/types.js';
-import { evaluateGate, getConditions, getGateHistory } from '../../core/gate-engine/gate-evaluator.js';
+import {
+  evaluateGate,
+  getConditions,
+  getGateHistory,
+} from '../../core/gate-engine/gate-evaluator.js';
 import { checkGoLive } from '../../core/gate-engine/golive.js';
 import { readJson, exists } from '../../shared/fs-utils.js';
 import { join } from 'node:path';
@@ -13,9 +17,12 @@ import type { ConditionResult, StageState } from '../../shared/types.js';
 export function handleGate(args: string[]): number {
   const sub = args[0];
   switch (sub) {
-    case 'check': return handleCheck(args.slice(1));
-    case 'history': return handleHistory(args.slice(1));
-    case 'conditions': return handleConditions(args.slice(1));
+    case 'check':
+      return handleCheck(args.slice(1));
+    case 'history':
+      return handleHistory(args.slice(1));
+    case 'conditions':
+      return handleConditions(args.slice(1));
     default:
       printGateHelp();
       if (sub) console.error(`未知 gate 子命令：${sub}`);
@@ -194,12 +201,15 @@ function appendFixStepsToFindings(
   featureId: string,
   projectRoot: string,
   conditions: ConditionResult[],
-  fixSteps: string[],
+  fixSteps: string[]
 ): void {
   const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
   const failedConditions = conditions
     .filter((condition) => condition.status === 'FAIL')
-    .map((condition) => `${condition.id}: ${condition.description}${condition.detail ? ` (${condition.detail})` : ''}`);
+    .map(
+      (condition) =>
+        `${condition.id}: ${condition.description}${condition.detail ? ` (${condition.detail})` : ''}`
+    );
 
   const section = [
     '',

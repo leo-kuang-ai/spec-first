@@ -20,7 +20,7 @@ function isInGlobalNodeModules(): boolean {
   // 全局 node_modules 的路径特征
   const globalPatterns = [
     '/lib/node_modules/',
-    '/node_modules/',  // 通用模式
+    '/node_modules/', // 通用模式
     '\\node_modules\\', // Windows
   ];
 
@@ -60,7 +60,8 @@ function isGlobalInstall(): boolean {
   if (process.env.VOLTA_HOME && process.execPath.includes(process.env.VOLTA_HOME)) return true;
 
   // 5. 通用检测：npm prefix --global 路径包含在安装路径中
-  if (process.env.npm_config_prefix && process.argv[1]?.includes(process.env.npm_config_prefix)) return true;
+  if (process.env.npm_config_prefix && process.argv[1]?.includes(process.env.npm_config_prefix))
+    return true;
 
   // 6. 检测 INIT_CWD（npm 7+ 设置的初始工作目录）
   // 全局安装时 INIT_CWD 通常是用户 home 目录或全局 node_modules 路径
@@ -147,7 +148,9 @@ function detectCCSwitchInstallation(): {
 function runUpdate(): void {
   const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
   try {
-    execFileSync(process.execPath, [entry, 'update', '--from-postinstall', '--yes'], { stdio: 'inherit' });
+    execFileSync(process.execPath, [entry, 'update', '--from-postinstall', '--yes'], {
+      stdio: 'inherit',
+    });
   } catch {
     console.error('❌ 自动注册失败，请手动执行: spec-first update --yes');
   }
@@ -188,7 +191,9 @@ function printInstallGuide(options: {
   if (!claudeInstalled.installed) {
     console.log('💡 提示：未检测到 Claude Code 安装');
     console.log('   - 如果您使用 Claude Code，请先安装：https://claude.ai/code');
-    console.log('   - 或使用 CC Switch 统一管理多个 CLI 工具：https://github.com/farion1231/cc-switch');
+    console.log(
+      '   - 或使用 CC Switch 统一管理多个 CLI 工具：https://github.com/farion1231/cc-switch'
+    );
     console.log('   - 安装后重新运行 spec-first update\n');
   } else if (!ccSwitchInstalled.installed) {
     console.log('✅ 检测到 Claude Code 安装');

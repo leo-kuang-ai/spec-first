@@ -12,16 +12,14 @@ import { createTraceContext } from './trace-context.js';
 import { pct } from './ratio.js';
 
 /** 排除状态：不计入有效分母 */
-const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set([
-  'Deferred', 'Cancelled',
-]);
+const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set(['Deferred', 'Cancelled']);
 
 /** 计算 C1-C9 覆盖率指标 */
 export function getCoverage(
   featureId: string,
   projectRoot: string,
   preRows?: MatrixRow[],
-  preRfcStatuses?: Map<string, string>,
+  preRfcStatuses?: Map<string, string>
 ): CoverageMetrics {
   const rows = preRows ?? parseMatrix(featureId, projectRoot);
   const validExceptionFrIds = loadValidExceptionFrIds(featureId, projectRoot, preRfcStatuses);
@@ -61,13 +59,16 @@ function calcApiCoverage(frRows: MatrixRow[], dsRows: MatrixRow[]): number {
 function calcTaskCoverage(
   frRows: MatrixRow[],
   taskRows: MatrixRow[],
-  lineage: UpstreamLineage,
+  lineage: UpstreamLineage
 ): number {
   if (frRows.length === 0) return 1;
   if (taskRows.length === 0) return 0;
 
   const frIds = new Set(frRows.map((r) => r.id));
-  const coveredFrIds = lineage.collectCoveredTargetIds(taskRows.map((task) => task.id), frIds);
+  const coveredFrIds = lineage.collectCoveredTargetIds(
+    taskRows.map((task) => task.id),
+    frIds
+  );
 
   return pct(coveredFrIds.size, frRows.length);
 }
@@ -85,8 +86,8 @@ function calcTestCoverageAC(frRows: MatrixRow[], tcRows: MatrixRow[]): number {
 /** C6: Impl Coverage — TASK 中状态为 Implemented/Verified/Accepted 的比例 */
 function calcImplCoverage(taskRows: MatrixRow[]): number {
   if (taskRows.length === 0) return 1;
-  const implemented = taskRows.filter(r =>
-    r.status === 'Implemented' || r.status === 'Verified' || r.status === 'Accepted',
+  const implemented = taskRows.filter(
+    (r) => r.status === 'Implemented' || r.status === 'Verified' || r.status === 'Accepted'
   );
   return pct(implemented.length, taskRows.length);
 }
@@ -96,7 +97,7 @@ function calcImplCoverage(taskRows: MatrixRow[]): number {
 /** C7: PR Compliance — TASK 中有上游 FR 关联的比例 */
 function calcPrCompliance(taskRows: MatrixRow[]): number {
   if (taskRows.length === 0) return 1;
-  const linked = taskRows.filter(r => r.upstream && r.upstream.length > 0);
+  const linked = taskRows.filter((r) => r.upstream && r.upstream.length > 0);
   return pct(linked.length, taskRows.length);
 }
 
@@ -105,7 +106,7 @@ function calcTaskCompliance(
   taskRows: MatrixRow[],
   frRows: MatrixRow[],
   dsRows: MatrixRow[],
-  lineage: UpstreamLineage,
+  lineage: UpstreamLineage
 ): number {
   if (taskRows.length === 0) return 1;
 
@@ -140,10 +141,8 @@ function calcTaskCompliance(
 /** C9: TC Compliance — TC 有上游 FR 的比例（反向：无孤儿 TC） */
 function calcTcCompliance(tcRows: MatrixRow[], frRows: MatrixRow[]): number {
   if (tcRows.length === 0) return 1;
-  const frIds = new Set(frRows.map(r => r.id));
-  const compliant = tcRows.filter(r =>
-    r.upstream?.some(u => frIds.has(u)),
-  );
+  const frIds = new Set(frRows.map((r) => r.id));
+  const compliant = tcRows.filter((r) => r.upstream?.some((u) => frIds.has(u)));
   return pct(compliant.length, tcRows.length);
 }
 
@@ -158,16 +157,19 @@ function calcUpstreamCoverage(frRows: MatrixRow[], downstreamRows: MatrixRow[]):
       for (const u of row.upstream) coveredFrIds.add(u);
     }
   }
-  const covered = frRows.filter(r => coveredFrIds.has(r.id));
+  const covered = frRows.filter((r) => coveredFrIds.has(r.id));
 
   // 检测 ID 格式不匹配
   if (covered.length === 0 && frRows.length > 0 && downstreamRows.length > 0) {
-    const uncovered = frRows.filter(r => !coveredFrIds.has(r.id));
-    const allUpstreamIds = downstreamRows.flatMap(r => r.upstream || []);
-    const mismatches = detectIdFormatMismatch(uncovered.map(r => r.id), allUpstreamIds);
+    const uncovered = frRows.filter((r) => !coveredFrIds.has(r.id));
+    const allUpstreamIds = downstreamRows.flatMap((r) => r.upstream || []);
+    const mismatches = detectIdFormatMismatch(
+      uncovered.map((r) => r.id),
+      allUpstreamIds
+    );
     if (mismatches.length > 0) {
       console.warn('⚠️  检测到 ID 格式不匹配（可能包含多余连字符）:');
-      mismatches.slice(0, 3).forEach(m => console.warn(`   ${m.expected} ≠ ${m.actual}`));
+      mismatches.slice(0, 3).forEach((m) => console.warn(`   ${m.expected} ≠ ${m.actual}`));
       if (mismatches.length > 3) console.warn(`   ... 还有 ${mismatches.length - 3} 个`);
     }
   }
@@ -176,8 +178,11 @@ function calcUpstreamCoverage(frRows: MatrixRow[], downstreamRows: MatrixRow[]):
 }
 
 /** 检测 ID 格式不匹配（如 FR-SPECOPT-001 vs FR-SPEC-OPT-001） */
-function detectIdFormatMismatch(expectedIds: string[], actualIds: string[]): Array<{expected: string, actual: string}> {
-  const mismatches: Array<{expected: string, actual: string}> = [];
+function detectIdFormatMismatch(
+  expectedIds: string[],
+  actualIds: string[]
+): Array<{ expected: string; actual: string }> {
+  const mismatches: Array<{ expected: string; actual: string }> = [];
   for (const expected of expectedIds) {
     const normalized = expected.replace(/-/g, '');
     for (const actual of actualIds) {
@@ -191,7 +196,11 @@ function detectIdFormatMismatch(expectedIds: string[], actualIds: string[]): Arr
   return mismatches;
 }
 
-function loadValidExceptionFrIds(featureId: string, projectRoot: string, preRfcStatuses?: Map<string, string>): Set<string> {
+function loadValidExceptionFrIds(
+  featureId: string,
+  projectRoot: string,
+  preRfcStatuses?: Map<string, string>
+): Set<string> {
   const rfcStatuses = preRfcStatuses ?? loadRfcStatuses(featureId, projectRoot);
   const { valid } = validateExceptions(featureId, projectRoot, rfcStatuses);
   return new Set(valid.map((ex) => ex.frId));

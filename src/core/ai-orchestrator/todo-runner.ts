@@ -80,7 +80,10 @@ function isTodoItem(value: unknown): value is TodoItem {
   if (typeof item.id !== 'string' || typeof item.title !== 'string' || !isTodoStatus(item.status)) {
     return false;
   }
-  if (item.dependsOn !== undefined && (!Array.isArray(item.dependsOn) || item.dependsOn.some((dep) => typeof dep !== 'string'))) {
+  if (
+    item.dependsOn !== undefined &&
+    (!Array.isArray(item.dependsOn) || item.dependsOn.some((dep) => typeof dep !== 'string'))
+  ) {
     return false;
   }
   if (item.parallel !== undefined && typeof item.parallel !== 'boolean') {
@@ -95,31 +98,37 @@ function isTodoItem(value: unknown): value is TodoItem {
 function isAutoLoopRetry(value: unknown): value is AutoLoopRetry {
   if (!value || typeof value !== 'object') return false;
   const retry = value as Record<string, unknown>;
-  return typeof retry.regenerateCount === 'number'
-    && typeof retry.autoRetryCount === 'number'
-    && typeof retry.manualRevisionCount === 'number'
-    && typeof retry.totalRetryDurationMs === 'number'
-    && (typeof retry.lastFailureReason === 'string' || retry.lastFailureReason === null);
+  return (
+    typeof retry.regenerateCount === 'number' &&
+    typeof retry.autoRetryCount === 'number' &&
+    typeof retry.manualRevisionCount === 'number' &&
+    typeof retry.totalRetryDurationMs === 'number' &&
+    (typeof retry.lastFailureReason === 'string' || retry.lastFailureReason === null)
+  );
 }
 
 function isAutoLoopLastResult(value: unknown): value is AutoLoopLastResult {
   if (value === null) return true;
   if (!value || typeof value !== 'object') return false;
   const result = value as Record<string, unknown>;
-  return typeof result.taskId === 'string'
-    && isTodoStatus(result.outcome)
-    && typeof result.message === 'string';
+  return (
+    typeof result.taskId === 'string' &&
+    isTodoStatus(result.outcome) &&
+    typeof result.message === 'string'
+  );
 }
 
 function isAutoLoopState(value: unknown): value is AutoLoopState {
   if (!value || typeof value !== 'object') return false;
   const state = value as Record<string, unknown>;
-  return (typeof state.currentTaskId === 'string' || state.currentTaskId === null)
-    && (typeof state.taskStartedAt === 'string' || state.taskStartedAt === null)
-    && (typeof state.heartbeatAt === 'string' || state.heartbeatAt === null)
-    && (typeof state.watchdogCheckedAt === 'string' || state.watchdogCheckedAt === null)
-    && isAutoLoopRetry(state.retry)
-    && isAutoLoopLastResult(state.lastResult);
+  return (
+    (typeof state.currentTaskId === 'string' || state.currentTaskId === null) &&
+    (typeof state.taskStartedAt === 'string' || state.taskStartedAt === null) &&
+    (typeof state.heartbeatAt === 'string' || state.heartbeatAt === null) &&
+    (typeof state.watchdogCheckedAt === 'string' || state.watchdogCheckedAt === null) &&
+    isAutoLoopRetry(state.retry) &&
+    isAutoLoopLastResult(state.lastResult)
+  );
 }
 
 function isTodoRunnerState(value: unknown): value is TodoRunnerState {
@@ -127,7 +136,11 @@ function isTodoRunnerState(value: unknown): value is TodoRunnerState {
   const state = value as Record<string, unknown>;
   const hasSchemaTag = state.kind !== undefined || state.version !== undefined;
   if (hasSchemaTag && (state.kind !== 'todo-runner-state' || state.version !== 1)) return false;
-  if (typeof state.featureId !== 'string' || typeof state.iteration !== 'number' || typeof state.maxIterations !== 'number') {
+  if (
+    typeof state.featureId !== 'string' ||
+    typeof state.iteration !== 'number' ||
+    typeof state.maxIterations !== 'number'
+  ) {
     return false;
   }
   if (typeof state.halted !== 'boolean') return false;
@@ -184,7 +197,7 @@ export function getAutoLoopState(state: TodoRunnerState): AutoLoopState | undefi
 export function loadTodoState(
   featureId: string,
   projectRoot: string,
-  options?: { strict?: boolean },
+  options?: { strict?: boolean }
 ): TodoRunnerState | undefined {
   const statePath = getTodoStatePath(featureId, projectRoot);
   if (!exists(statePath)) return undefined;
@@ -218,7 +231,7 @@ export function initTodoState(
   featureId: string,
   projectRoot: string,
   items: TodoItem[],
-  maxIterations?: number,
+  maxIterations?: number
 ): TodoRunnerState {
   const cfg = loadConfig(projectRoot);
   const resolvedMax = maxIterations ?? cfg.runtime.max_iterations;
@@ -247,7 +260,7 @@ function isParallelTodo(item: TodoItem): boolean {
 
 export function pickReadyTodos(
   state: TodoRunnerState,
-  options?: { maxParallel?: number },
+  options?: { maxParallel?: number }
 ): TodoItem[] {
   if (state.halted) return [];
   const maxParallel = Math.max(1, options?.maxParallel ?? 4);
@@ -257,7 +270,7 @@ export function pickReadyTodos(
   if (inProgress.length > 0) return inProgress.slice(0, maxParallel);
 
   const doneSet = new Set(
-    state.items.filter((item) => item.status === 'done').map((item) => item.id),
+    state.items.filter((item) => item.status === 'done').map((item) => item.id)
   );
 
   const readyPending = state.items.filter((item) => {
@@ -286,11 +299,9 @@ export function pickReadyTodos(
 export function updateTodoStatus(
   state: TodoRunnerState,
   todoId: string,
-  status: TodoStatus,
+  status: TodoStatus
 ): TodoRunnerState {
-  const nextItems = state.items.map((item) => (
-    item.id === todoId ? { ...item, status } : item
-  ));
+  const nextItems = state.items.map((item) => (item.id === todoId ? { ...item, status } : item));
 
   return {
     ...state,
@@ -303,11 +314,9 @@ export function updateTodoStatus(
 export function setTodoResumeAt(
   state: TodoRunnerState,
   todoId: string,
-  resumeAt: number | undefined,
+  resumeAt: number | undefined
 ): TodoRunnerState {
-  const nextItems = state.items.map((item) => (
-    item.id === todoId ? { ...item, resumeAt } : item
-  ));
+  const nextItems = state.items.map((item) => (item.id === todoId ? { ...item, resumeAt } : item));
 
   return {
     ...state,
@@ -340,7 +349,9 @@ export function advanceTodoIteration(state: TodoRunnerState): TodoRunnerState {
 export function summarizeTodoState(state: TodoRunnerState): string {
   const done = state.items.filter((item) => item.status === 'done').length;
   const blocked = state.items.filter((item) => item.status === 'blocked').length;
-  const pending = state.items.filter((item) => item.status === 'pending' || item.status === 'in_progress').length;
+  const pending = state.items.filter(
+    (item) => item.status === 'pending' || item.status === 'in_progress'
+  ).length;
   const haltPart = state.halted ? ` halted (${state.haltReason ?? 'unknown'})` : '';
 
   return `Todo续航: done=${done}, pending=${pending}, blocked=${blocked}, iteration=${state.iteration}/${state.maxIterations}${haltPart}`;

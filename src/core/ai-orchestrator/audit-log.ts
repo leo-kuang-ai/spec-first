@@ -55,10 +55,7 @@ function getLastHash(logPath: string): string {
  * 写入一条审计日志（hash chain 模式）
  * 如果 audit_log.enabled=false 则静默跳过
  */
-export function writeAuditLog(
-  entry: AuditEntry,
-  projectRoot: string,
-): AuditRecord | null {
+export function writeAuditLog(entry: AuditEntry, projectRoot: string): AuditRecord | null {
   const cfg = loadConfig(projectRoot);
   if (!cfg.runtime.audit_log.enabled) return null;
 
@@ -68,9 +65,8 @@ export function writeAuditLog(
 
   // 构建不含 hash 的记录用于计算 hash
   const payload = { ...entry, timestamp, prevHash };
-  const hash = cfg.runtime.audit_log.tamper_proof === 'hash_chain'
-    ? sha256(JSON.stringify(payload))
-    : '';
+  const hash =
+    cfg.runtime.audit_log.tamper_proof === 'hash_chain' ? sha256(JSON.stringify(payload)) : '';
 
   const record: AuditRecord = { ...payload, hash };
   appendJsonl(logPath, record as unknown as Record<string, unknown>);

@@ -39,4 +39,3 @@ export function classifyTemplateLevel(templateName: string): TemplateLevel {
   if (isMajorTemplateName(templateName)) return 'Major';
   return 'Minor';
 }
-

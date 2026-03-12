@@ -23,7 +23,7 @@ function getCheckpointPath(featureId: string, projectRoot: string): string {
 
 export function saveCheckpoint(
   state: Omit<CheckpointState, 'kind' | 'version'> | CheckpointState,
-  projectRoot: string,
+  projectRoot: string
 ): void {
   const path = getCheckpointPath(state.featureId, projectRoot);
   const payload: CheckpointState = {
@@ -34,10 +34,7 @@ export function saveCheckpoint(
   writeFileSync(path, JSON.stringify(payload, null, 2), 'utf-8');
 }
 
-export function loadCheckpoint(
-  featureId: string,
-  projectRoot: string,
-): CheckpointState | null {
+export function loadCheckpoint(featureId: string, projectRoot: string): CheckpointState | null {
   const path = getCheckpointPath(featureId, projectRoot);
   if (!existsSync(path)) return null;
 

@@ -27,7 +27,7 @@ export interface RollbackPlan {
 export function buildRollbackPlan(
   featureId: string,
   level: RollbackLevel,
-  commitSha?: string,
+  commitSha?: string
 ): RollbackPlan {
   if (commitSha !== undefined && !/^[0-9a-f]{7,40}$/i.test(commitSha)) {
     throw new Error(`无效 commit SHA：${commitSha}`);
@@ -61,7 +61,7 @@ export function buildRollbackPlan(
   return {
     featureId,
     actions,
-    requiresManual: actions.some(a => a.manual === true),
+    requiresManual: actions.some((a) => a.manual === true),
   };
 }
 

@@ -14,18 +14,27 @@ export interface MatrixCheckResult {
   total: number;
   orphans: MatrixRow[];
   brokenChains: Array<{ frId: string; missing: string[] }>;
-  vModelPairs: Array<{ id: string; direction: 'forward' | 'backward'; expected: string; detail: string }>;
+  vModelPairs: Array<{
+    id: string;
+    direction: 'forward' | 'backward';
+    expected: string;
+    detail: string;
+  }>;
   warnings: string[];
 }
 
-const V_MODEL_FORWARD: Readonly<Record<'REQ' | 'SYS' | 'ARCH' | 'MOD', 'ATP' | 'STP' | 'ITP' | 'UTP'>> = {
+const V_MODEL_FORWARD: Readonly<
+  Record<'REQ' | 'SYS' | 'ARCH' | 'MOD', 'ATP' | 'STP' | 'ITP' | 'UTP'>
+> = {
   REQ: 'ATP',
   SYS: 'STP',
   ARCH: 'ITP',
   MOD: 'UTP',
 };
 
-const V_MODEL_BACKWARD: Readonly<Record<'ATP' | 'STP' | 'ITP' | 'UTP', 'REQ' | 'SYS' | 'ARCH' | 'MOD'>> = {
+const V_MODEL_BACKWARD: Readonly<
+  Record<'ATP' | 'STP' | 'ITP' | 'UTP', 'REQ' | 'SYS' | 'ARCH' | 'MOD'>
+> = {
   ATP: 'REQ',
   STP: 'SYS',
   ITP: 'ARCH',
@@ -48,8 +57,12 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
   const trace = createTraceContext(rows);
 
   // 孤儿项：非 FR/Feature/REQ 类型且无 upstream
-  const orphans = rows.filter(r =>
-    r.type !== 'Feature' && r.type !== 'FR' && r.type !== 'REQ' && (!r.upstream || r.upstream.length === 0),
+  const orphans = rows.filter(
+    (r) =>
+      r.type !== 'Feature' &&
+      r.type !== 'FR' &&
+      r.type !== 'REQ' &&
+      (!r.upstream || r.upstream.length === 0)
   );
   for (const o of orphans) {
     warnings.push(`Orphan: ${o.id} has no upstream reference`);
@@ -60,13 +73,13 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
   const brokenChains: MatrixCheckResult['brokenChains'] = [];
   for (const fr of frRows) {
     const missing: string[] = [];
-    const hasPrd = (fr.upstream ?? []).some(u => u.startsWith('REQ-'));
-    const hasDs = rows.some(r => r.type === 'DS' && r.upstream?.includes(fr.id));
+    const hasPrd = (fr.upstream ?? []).some((u) => u.startsWith('REQ-'));
+    const hasDs = rows.some((r) => r.type === 'DS' && r.upstream?.includes(fr.id));
     const hasTask = rows.some((r) => {
       if (r.type !== 'TASK') return false;
       return trace.lineage.hasAnyAncestor(r.id, new Set([fr.id]));
     });
-    const hasTc = rows.some(r => r.type === 'TC' && r.upstream?.includes(fr.id));
+    const hasTc = rows.some((r) => r.type === 'TC' && r.upstream?.includes(fr.id));
     if (!hasPrd) missing.push('REQ-*');
     if (!hasDs) missing.push('DS');
     if (!hasTask) missing.push('TASK');
@@ -79,7 +92,9 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
 
   const vModelPairs = checkVModelPairs(rows);
   for (const issue of vModelPairs) {
-    warnings.push(`V-Model ${issue.direction}: ${issue.id} missing ${issue.expected} (${issue.detail})`);
+    warnings.push(
+      `V-Model ${issue.direction}: ${issue.id} missing ${issue.expected} (${issue.detail})`
+    );
   }
 
   return { total: rows.length, orphans, brokenChains, vModelPairs, warnings };
@@ -89,7 +104,7 @@ export function checkMatrix(featureId: string, projectRoot: string): MatrixCheck
 export function exportMatrix(
   featureId: string,
   projectRoot: string,
-  format: 'markdown' | 'yaml' = 'markdown',
+  format: 'markdown' | 'yaml' = 'markdown'
 ): string {
   const rows = parseMatrix(featureId, projectRoot);
 
@@ -104,11 +119,11 @@ export function updateMatrixRow(
   featureId: string,
   projectRoot: string,
   id: string,
-  updates: Partial<Pick<MatrixRow, 'status' | 'title' | 'upstream' | 'downstream'>>,
+  updates: Partial<Pick<MatrixRow, 'status' | 'title' | 'upstream' | 'downstream'>>
 ): void {
   const matrixPath = getMatrixPath(projectRoot, featureId);
   const rows = parseMatrix(featureId, projectRoot);
-  const idx = rows.findIndex(r => r.id === id);
+  const idx = rows.findIndex((r) => r.id === id);
   if (idx === -1) throw new Error(`ID not found in matrix: ${id}`);
 
   // 使用 !== undefined 而非 truthiness，允许设置空字符串或空数组
@@ -153,7 +168,7 @@ function parseMatrixContent(content: string): MatrixRow[] {
     if (!validation.valid) {
       throw new Error(
         `Invalid ID format: "${id}" - ${validation.error}\n` +
-        `Hint: Check supported ID types in id-validator.ts`
+          `Hint: Check supported ID types in id-validator.ts`
       );
     }
 
@@ -166,7 +181,7 @@ function parseMatrixContent(content: string): MatrixRow[] {
     if (!normalizedStatus) {
       const validList = getValidStatusList();
       throw new Error(
-        `Invalid matrix status "${rawStatus}" for ${id}. Valid statuses: ${validList}. Default: Planned`,
+        `Invalid matrix status "${rawStatus}" for ${id}. Valid statuses: ${validList}. Default: Planned`
       );
     }
     const status = normalizedStatus;
@@ -185,19 +200,25 @@ function parseMatrixContent(content: string): MatrixRow[] {
 /** 解析引用列表（逗号分隔） */
 function parseRefList(cell: string | undefined): string[] | undefined {
   if (!cell || !cell.trim()) return undefined;
-  return cell.split(',').map(s => s.trim()).filter(Boolean);
+  return cell
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 /** MatrixRow[] → Markdown 表格 */
 function rowsToMarkdown(rows: MatrixRow[]): string {
-  const header = '| ID | Type | Title | Status | Upstream | Downstream |\n'
-    + '|----|------|-------|--------|----------|------------|\n';
+  const header =
+    '| ID | Type | Title | Status | Upstream | Downstream |\n' +
+    '|----|------|-------|--------|----------|------------|\n';
 
-  const body = rows.map(r => {
-    const up = r.upstream?.join(', ') ?? '';
-    const down = r.downstream?.join(', ') ?? '';
-    return `| ${r.id} | ${r.type} | ${r.title} | ${r.status} | ${up} | ${down} |`;
-  }).join('\n');
+  const body = rows
+    .map((r) => {
+      const up = r.upstream?.join(', ') ?? '';
+      const down = r.downstream?.join(', ') ?? '';
+      return `| ${r.id} | ${r.type} | ${r.title} | ${r.status} | ${up} | ${down} |`;
+    })
+    .join('\n');
 
   return header + body + '\n';
 }
@@ -210,8 +231,10 @@ function exportAsYaml(rows: MatrixRow[]): string {
     lines.push(`    type: "${r.type}"`);
     lines.push(`    title: "${r.title}"`);
     lines.push(`    status: "${r.status}"`);
-    if (r.upstream?.length) lines.push(`    upstream: [${r.upstream.map(u => `"${u}"`).join(', ')}]`);
-    if (r.downstream?.length) lines.push(`    downstream: [${r.downstream.map(d => `"${d}"`).join(', ')}]`);
+    if (r.upstream?.length)
+      lines.push(`    upstream: [${r.upstream.map((u) => `"${u}"`).join(', ')}]`);
+    if (r.downstream?.length)
+      lines.push(`    downstream: [${r.downstream.map((d) => `"${d}"`).join(', ')}]`);
     if (r.nfrTag) lines.push(`    nfrTag: "${r.nfrTag}"`);
   }
   return lines.join('\n') + '\n';
@@ -227,9 +250,13 @@ function checkVModelPairs(rows: MatrixRow[]): MatrixCheckResult['vModelPairs'] {
   const byId = new Map(rows.map((row) => [row.id, row]));
 
   const hasTypeLink = (source: MatrixRow, expectedType: string): boolean => {
-    const byDownstream = (source.downstream ?? []).some((id) => byId.get(id)?.type === expectedType);
+    const byDownstream = (source.downstream ?? []).some(
+      (id) => byId.get(id)?.type === expectedType
+    );
     if (byDownstream) return true;
-    return rows.some((row) => row.type === expectedType && (row.upstream ?? []).includes(source.id));
+    return rows.some(
+      (row) => row.type === expectedType && (row.upstream ?? []).includes(source.id)
+    );
   };
 
   for (const row of rows) {

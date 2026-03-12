@@ -29,7 +29,7 @@ export function registerCommand(
   name: string,
   description: string,
   handler: CommandHandler,
-  options?: RegisterCommandOptions,
+  options?: RegisterCommandOptions
 ): void {
   commands.set(name, { description, handler, requiresConfirmation: options?.requiresConfirmation });
 }
@@ -39,7 +39,10 @@ export function getRegisteredCommands(): Map<string, CommandEntry> {
   return commands;
 }
 
-function shouldRequireConfirmation(requirement: ConfirmationRequirement | undefined, args: string[]): boolean {
+function shouldRequireConfirmation(
+  requirement: ConfirmationRequirement | undefined,
+  args: string[]
+): boolean {
   if (typeof requirement === 'function') return requirement(args);
   return requirement ?? false;
 }
@@ -121,10 +124,7 @@ export function getCliVersion(): string {
   if (fromEnv) return fromEnv;
 
   const baseDir = dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    join(baseDir, '../package.json'),
-    join(baseDir, '../../package.json'),
-  ];
+  const candidates = [join(baseDir, '../package.json'), join(baseDir, '../../package.json')];
 
   for (const filePath of candidates) {
     if (!existsSync(filePath)) continue;

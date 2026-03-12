@@ -16,7 +16,7 @@ export interface ExceptionValidationResult {
 export function validateExceptions(
   featureId: string,
   projectRoot: string,
-  rfcStatuses: Map<string, string>,
+  rfcStatuses: Map<string, string>
 ): ExceptionValidationResult {
   const exceptionsPath = join(projectRoot, 'specs', featureId, 'known-exceptions.md');
   if (!exists(exceptionsPath)) {

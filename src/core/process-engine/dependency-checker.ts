@@ -63,10 +63,7 @@ const STAGE_TO_CONFIG_KEY: Record<Stage, string> = {
 /**
  * 从配置文件获取依赖项，回退到内置默认值
  */
-function getStageDependencies(
-  targetStage: Stage,
-  projectRoot: string
-): StageDependency | null {
+function getStageDependencies(targetStage: Stage, projectRoot: string): StageDependency | null {
   // 先尝试从配置文件读取
   try {
     const config = loadConfig(projectRoot);
@@ -90,7 +87,7 @@ function getStageDependencies(
   }
 
   // 回退到内置默认值
-  return DEFAULT_STAGE_DEPENDENCIES.find(d => d.stage === targetStage) ?? null;
+  return DEFAULT_STAGE_DEPENDENCIES.find((d) => d.stage === targetStage) ?? null;
 }
 
 export function describeDependencyIssues(result: DependencyCheckResult): string[] {
@@ -111,7 +108,9 @@ export function checkDependencies(
   if (deps.npmScripts) {
     const pkgPath = join(projectRoot, 'package.json');
     if (existsSync(pkgPath)) {
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as { scripts?: Record<string, string> };
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as {
+        scripts?: Record<string, string>;
+      };
       for (const script of deps.npmScripts) {
         if (!pkg.scripts?.[script]) {
           missing.push(`npm script: ${script}`);

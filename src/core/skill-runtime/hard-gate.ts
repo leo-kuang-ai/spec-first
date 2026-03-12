@@ -1,9 +1,18 @@
 import { join } from 'node:path';
-import { exists, readJsonChecked, readMarkdown, parseMarkdownTable } from '../../shared/fs-utils.js';
+import {
+  exists,
+  readJsonChecked,
+  readMarkdown,
+  parseMarkdownTable,
+} from '../../shared/fs-utils.js';
 import { getCurrentTaskId } from '../task-plan/parser.js';
 import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 import { SKILL_STAGE_REQUIREMENTS } from '../rules/truth-source.js';
+import {
+  type SkillExecutionContext,
+  resolveExecutionFeatureId,
+} from './execution-context.js';
 
 const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = { ...SKILL_STAGE_REQUIREMENTS };
 const GIT_COMMAND_TIMEOUT_MS = 5_000;
@@ -34,13 +43,6 @@ export class HardGateBlockedError extends Error {
   }
 }
 
-function readCurrentFeature(projectRoot: string): string | undefined {
-  const currentPath = join(projectRoot, '.spec-first', 'current');
-  if (!exists(currentPath)) return undefined;
-  const featureId = readMarkdown(currentPath).trim();
-  return featureId || undefined;
-}
-
 function readCurrentStage(projectRoot: string, featureId: string): string | undefined {
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) return undefined;
@@ -66,11 +68,13 @@ function findInProgressTaskId(taskPlan: string, specDir?: string): string | unde
   }
 
   for (const cells of parseMarkdownTable(taskPlan)) {
-    const taskCell = cells.find(cell => /^TASK-/i.test(cell));
+    const taskCell = cells.find((cell) => /^TASK-/i.test(cell));
     if (!taskCell) continue;
     const hasInProgress = cells.some((cell) => {
       const normalized = cell.toLowerCase();
-      return normalized === 'in_progress' || normalized === 'in progress' || normalized === '进行中';
+      return (
+        normalized === 'in_progress' || normalized === 'in progress' || normalized === '进行中'
+      );
     });
     if (!hasInProgress) continue;
     const match = taskCell.match(/TASK-[A-Z0-9-]+/i);
@@ -85,10 +89,12 @@ function hasTddWaiver(findings: string, taskId?: string): boolean {
     const marker = /\[TDD-WAIVER\]|TDD豁免|TDD waiver/i.test(block);
     if (!marker) return false;
     if (taskId && !block.includes(taskId)) return false;
-    return /(场景|scenario)\s*[:：]/i.test(block)
-      && /(理由|reason)\s*[:：]/i.test(block)
-      && /(批准人|approver|approved by)\s*[:：]/i.test(block)
-      && /(时间|timestamp|time)\s*[:：]/i.test(block);
+    return (
+      /(场景|scenario)\s*[:：]/i.test(block) &&
+      /(理由|reason)\s*[:：]/i.test(block) &&
+      /(批准人|approver|approved by)\s*[:：]/i.test(block) &&
+      /(时间|timestamp|time)\s*[:：]/i.test(block)
+    );
   });
 }
 
@@ -99,7 +105,7 @@ function hasTddRedEvidence(findings: string, taskId?: string): boolean {
     if (!/(TDD[-_\s]?RED|Verify RED|RED 证据|失败测试证据|failing test)/i.test(block)) continue;
     if (!/(command|命令|测试命令)\s*[:=：]/i.test(block)) continue;
 
-    const exitCodePattern = /(exit\s*code|退出码)\s*[:=：]\s*(-?\d+)/ig;
+    const exitCodePattern = /(exit\s*code|退出码)\s*[:=：]\s*(-?\d+)/gi;
     let match: RegExpExecArray | null = exitCodePattern.exec(block);
     while (match) {
       const code = Number.parseInt(match[2] ?? '0', 10);
@@ -115,19 +121,29 @@ function hasPlanApprovalEvidence(findings: string): boolean {
   return blocks.some((block) => {
     const marker = /\[PLAN-APPROVED\]|方案审核通过|review approved|approved plan/i.test(block);
     if (!marker) return false;
-    return /(审核人|reviewer|approver)\s*[:：]/i.test(block)
-      && /(时间|timestamp|time)\s*[:：]/i.test(block);
+    return (
+      /(审核人|reviewer|approver)\s*[:：]/i.test(block) &&
+      /(时间|timestamp|time)\s*[:：]/i.test(block)
+    );
   });
 }
 
 function parseConstitutionVersion(content: string): string | undefined {
-  const match = content.match(/(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*([vV]?\d+\.\d+\.\d+)/i);
+  const match = content.match(
+    /(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*([vV]?\d+\.\d+\.\d+)/i
+  );
   return match?.[1];
 }
 
 function compareSemver(a: string, b: string): number {
-  const pa = a.replace(/^v/i, '').split('.').map((v) => Number.parseInt(v, 10) || 0);
-  const pb = b.replace(/^v/i, '').split('.').map((v) => Number.parseInt(v, 10) || 0);
+  const pa = a
+    .replace(/^v/i, '')
+    .split('.')
+    .map((v) => Number.parseInt(v, 10) || 0);
+  const pb = b
+    .replace(/^v/i, '')
+    .split('.')
+    .map((v) => Number.parseInt(v, 10) || 0);
   for (let i = 0; i < 3; i += 1) {
     const diff = (pa[i] ?? 0) - (pb[i] ?? 0);
     if (diff !== 0) return diff;
@@ -215,8 +231,8 @@ export function assessHighRiskChanges(projectRoot: string, featureId: string): H
       const diffOutput = runGit(projectRoot, ['diff', '--name-only', `HEAD~${depth}`]);
 
       if (diffOutput) {
-        const changedFiles = diffOutput.split('\n').filter(f => f.trim());
-        const dirs = new Set(changedFiles.map(f => f.split('/')[0] ?? 'root'));
+        const changedFiles = diffOutput.split('\n').filter((f) => f.trim());
+        const dirs = new Set(changedFiles.map((f) => f.split('/')[0] ?? 'root'));
 
         if (dirs.size >= 3) {
           reasons.push(`跨目录变更: ${dirs.size} 个目录`);
@@ -224,9 +240,7 @@ export function assessHighRiskChanges(projectRoot: string, featureId: string): H
         }
 
         const corePatterns = ['src/core/', 'src/shared/', 'config.'];
-        const hasCoreChanges = changedFiles.some(f =>
-          corePatterns.some(p => f.includes(p)),
-        );
+        const hasCoreChanges = changedFiles.some((f) => corePatterns.some((p) => f.includes(p)));
         if (hasCoreChanges) {
           reasons.push('涉及核心模块变更');
           requiresWorktree = true;
@@ -253,9 +267,22 @@ export function assessHighRiskChanges(projectRoot: string, featureId: string): H
   };
 }
 
-export function evaluateSkillHardGate(skillName: string, projectRoot: string): HardGateDecision {
+function normalizeExecutionContext(
+  projectRootOrContext: string | SkillExecutionContext
+): SkillExecutionContext {
+  return typeof projectRootOrContext === 'string'
+    ? { projectRoot: projectRootOrContext }
+    : projectRootOrContext;
+}
+
+export function evaluateSkillHardGate(
+  skillName: string,
+  projectRootOrContext: string | SkillExecutionContext
+): HardGateDecision {
+  const executionContext = normalizeExecutionContext(projectRootOrContext);
   const expectedStage = HARD_GATE_STAGE_REQUIREMENTS[skillName];
   const requiresContext = Boolean(expectedStage) || skillName === 'orchestrate';
+  const projectRoot = executionContext.projectRoot;
 
   if (!requiresContext) {
     return {
@@ -266,13 +293,13 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
     };
   }
 
-  const featureId = readCurrentFeature(projectRoot);
+  const featureId = resolveExecutionFeatureId(executionContext);
   if (!featureId) {
     return {
       allowed: false,
       severity: 'BLOCKED',
-      reason: `skill=${skillName} requires current feature pointer (.spec-first/current)`,
-      remediation: '先在 P0 定位当前 Feature，再继续执行 HARD-GATE 校验',
+      reason: `skill=${skillName} requires feature context`,
+      remediation: '先显式指定 feature，或在 P0 定位当前 Feature，再继续执行 HARD-GATE 校验',
     };
   }
 
@@ -357,7 +384,8 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
         allowed: false,
         severity: 'BLOCKED',
         reason: 'code requires plan approval evidence for constitution>=1.1.0',
-        remediation: '先在 findings.md 添加 [PLAN-APPROVED] 审核记录（至少包含 reviewer/approver 与 timestamp/time）',
+        remediation:
+          '先在 findings.md 添加 [PLAN-APPROVED] 审核记录（至少包含 reviewer/approver 与 timestamp/time）',
       };
     }
 
@@ -370,7 +398,8 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
         reason: activeTaskId
           ? `code requires TDD RED evidence for ${activeTaskId}`
           : 'code requires TDD RED evidence for in_progress TASK',
-        remediation: '先补齐 RED 失败测试证据（建议标记 TDD-RED + 退出码非 0）或记录结构化 [TDD-WAIVER] 豁免',
+        remediation:
+          '先补齐 RED 失败测试证据（建议标记 TDD-RED + 退出码非 0）或记录结构化 [TDD-WAIVER] 豁免',
       };
     }
   }
@@ -389,7 +418,8 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
           allowed: false,
           severity: 'BLOCKED',
           reason: `高风险操作检测: 当前在 ${currentBranch} 分支，${highRiskAssessment.reasons.join('; ')}`,
-          remediation: '请切换到 git worktree 后重试，或在 task_plan.md 添加 [WORKTREE-CONFIRMED] 明确确认',
+          remediation:
+            '请切换到 git worktree 后重试，或在 task_plan.md 添加 [WORKTREE-CONFIRMED] 明确确认',
           highRiskAssessment,
         };
       }
@@ -425,16 +455,20 @@ export function evaluateSkillHardGate(skillName: string, projectRoot: string): H
   };
 }
 
-export function buildHardGateRuntimeNotice(skillName: string, projectRoot: string): string | undefined {
+export function buildHardGateRuntimeNotice(
+  skillName: string,
+  projectRootOrContext: string | SkillExecutionContext
+): string | undefined {
   if (!HARD_GATE_STAGE_REQUIREMENTS[skillName] && skillName !== 'orchestrate') return undefined;
 
-  const decision = evaluateSkillHardGate(skillName, projectRoot);
+  const decision = evaluateSkillHardGate(skillName, projectRootOrContext);
   const status = decision.severity;
-  const action = status === 'BLOCKED'
-    ? '当前仅允许执行定位与补齐动作，禁止实施写入。'
-    : status === 'WARN'
-      ? '允许继续，但需优先处理风险提示后再实施写入。'
-      : '可以继续执行实现相关动作。';
+  const action =
+    status === 'BLOCKED'
+      ? '当前仅允许执行定位与补齐动作，禁止实施写入。'
+      : status === 'WARN'
+        ? '允许继续，但需优先处理风险提示后再实施写入。'
+        : '可以继续执行实现相关动作。';
 
   const lines = [
     '## HARD-GATE 运行时检查（自动）',

@@ -80,9 +80,10 @@ export function loadEnabledExtensions(projectRoot: string): ExtensionDescriptor[
     if (!namespace || !/^[a-z][a-z0-9_-]{1,31}$/i.test(namespace)) continue;
     if (!version) continue;
 
-    const skillsDirRel = typeof manifest.skills_dir === 'string' && manifest.skills_dir.trim().length > 0
-      ? manifest.skills_dir.trim()
-      : 'skills';
+    const skillsDirRel =
+      typeof manifest.skills_dir === 'string' && manifest.skills_dir.trim().length > 0
+        ? manifest.skills_dir.trim()
+        : 'skills';
     const skillsDir = join(rootDir, skillsDirRel);
 
     out.push({
@@ -91,13 +92,13 @@ export function loadEnabledExtensions(projectRoot: string): ExtensionDescriptor[
       enabled: true,
       rootDir,
       skillsDir,
-      rules: (manifest.rules && typeof manifest.rules === 'object' && !Array.isArray(manifest.rules))
-        ? (manifest.rules as Record<string, unknown>)
-        : undefined,
+      rules:
+        manifest.rules && typeof manifest.rules === 'object' && !Array.isArray(manifest.rules)
+          ? (manifest.rules as Record<string, unknown>)
+          : undefined,
       hooks: normalizeHooks(manifest.hooks),
     });
   }
 
   return out.sort((a, b) => a.namespace.localeCompare(b.namespace));
 }
-

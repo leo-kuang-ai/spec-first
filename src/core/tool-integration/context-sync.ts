@@ -26,7 +26,11 @@ function extractDesignSummary(designPath: string): string[] {
   return headings.map((line) => `- ${line.replace(/^#+\s*/, '')}`);
 }
 
-function renderManagedContext(featureId: string, state: StageState, designSummary: string[]): string {
+function renderManagedContext(
+  featureId: string,
+  state: StageState,
+  designSummary: string[]
+): string {
   const now = new Date().toISOString();
   return [
     MANAGED_BEGIN,
@@ -59,7 +63,10 @@ function upsertManagedBlock(content: string, managedBlock: string): string {
   return `${content.trimEnd()}\n\n${managedBlock}`;
 }
 
-export function syncAgentContextFromDesign(featureId: string, projectRoot: string): ContextSyncResult {
+export function syncAgentContextFromDesign(
+  featureId: string,
+  projectRoot: string
+): ContextSyncResult {
   const result: ContextSyncResult = { updated: [], skipped: [], warnings: [] };
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   const designPath = join(projectRoot, 'specs', featureId, 'design.md');
@@ -95,4 +102,3 @@ export function syncAgentContextFromDesign(featureId: string, projectRoot: strin
 
   return result;
 }
-

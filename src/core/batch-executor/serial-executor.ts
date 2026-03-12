@@ -1,14 +1,20 @@
 /**
  * 串行执行器（阶段 1+2）
  */
-import type { ExecutionPlan, BatchExecutionResult, TaskResult, LayerResult, TaskNode } from './types.js';
+import type {
+  ExecutionPlan,
+  BatchExecutionResult,
+  TaskResult,
+  LayerResult,
+  TaskNode,
+} from './types.js';
 import { saveCheckpoint } from './checkpoint.js';
 import { generateReport } from './report-generator.js';
 import { ProgressTracker } from './progress-tracker.js';
 
 export async function executeSerial(
   plan: ExecutionPlan,
-  projectRoot: string,
+  projectRoot: string
 ): Promise<BatchExecutionResult> {
   const layerResults: LayerResult[] = [];
   const completedTasks: string[] = [];
@@ -38,7 +44,7 @@ export async function executeSerial(
       }
     }
 
-    const failureCount = results.filter(r => !r.success).length;
+    const failureCount = results.filter((r) => !r.success).length;
     const failureRate = failureCount / results.length;
 
     layerResults.push({
@@ -48,15 +54,18 @@ export async function executeSerial(
     });
 
     // Checkpoint
-    saveCheckpoint({
-      featureId: plan.featureId,
-      currentLayer: layer.layer,
-      completedTasks,
-      failedTasks,
-      startTime,
-      lastUpdateTime: new Date().toISOString(),
-      layerResults,
-    }, projectRoot);
+    saveCheckpoint(
+      {
+        featureId: plan.featureId,
+        currentLayer: layer.layer,
+        completedTasks,
+        failedTasks,
+        startTime,
+        lastUpdateTime: new Date().toISOString(),
+        layerResults,
+      },
+      projectRoot
+    );
 
     // 失败率控制
     if (failureRate > 0.5) {
@@ -66,9 +75,9 @@ export async function executeSerial(
     }
   }
 
-  const allResults = layerResults.flatMap(l => l.results);
-  const successCount = allResults.filter(r => r.success).length;
-  const failureCount = allResults.filter(r => !r.success).length;
+  const allResults = layerResults.flatMap((l) => l.results);
+  const successCount = allResults.filter((r) => r.success).length;
+  const failureCount = allResults.filter((r) => !r.success).length;
 
   const result: BatchExecutionResult = {
     featureId: plan.featureId,
@@ -90,13 +99,13 @@ export async function executeSerial(
 async function executeTask(
   task: TaskNode,
   _featureId: string,
-  _projectRoot: string,
+  _projectRoot: string
 ): Promise<TaskResult> {
   const startTime = Date.now();
 
   try {
     // TODO: 实际执行逻辑（调用 Agent tool）
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     return {
       taskId: task.id,

@@ -1,7 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import type { BackgroundInputStatus } from '../../shared/types.js';
+import { readJson, writeJson } from '../../shared/fs-utils.js';
+import type { BackgroundInputStatus, StageState } from '../../shared/types.js';
 import {
   FIRST_RUNTIME_ARTIFACTS,
   matchRuntimeArtifactsByChangedFile,
@@ -67,7 +68,7 @@ function requireRuntimeAsset<T>(asset: T | null, label: string): T {
 function ensureHealthyRuntimeAsset(
   index: FirstRuntimeIndex,
   assetName: 'summary' | 'roleViews' | 'stageViews',
-  label: 'summary' | 'role-views' | 'stage-views',
+  label: 'summary' | 'role-views' | 'stage-views'
 ): void {
   const asset = index[assetName];
   if (!asset.healthy) {
@@ -81,10 +82,12 @@ function ensureHealthyStageViews(index: FirstRuntimeIndex): void {
 }
 
 function isRuntimeHealthy(index: FirstRuntimeIndex): boolean {
-  return index.status === 'current'
-    && index.summary.healthy
-    && index.roleViews.healthy
-    && index.stageViews.healthy;
+  return (
+    index.status === 'current' &&
+    index.summary.healthy &&
+    index.roleViews.healthy &&
+    index.stageViews.healthy
+  );
 }
 
 function getCurrentSourceCommit(projectRoot: string): string | null {
@@ -113,16 +116,20 @@ function getWorkingTreeChangedFiles(projectRoot: string): string[] | null {
 
     return output
       .split('\n')
-      .map(line => line.slice(3).trim())
-      .map(path => path.includes(' -> ') ? path.split(' -> ').at(-1) ?? path : path)
-      .map(path => path.replace(/^"|"$/g, ''))
+      .map((line) => line.slice(3).trim())
+      .map((path) => (path.includes(' -> ') ? (path.split(' -> ').at(-1) ?? path) : path))
+      .map((path) => path.replace(/^"|"$/g, ''))
       .filter(Boolean);
   } catch {
     return null;
   }
 }
 
-function getCommittedSourceChanges(projectRoot: string, fromCommit: string, toCommit: string): string[] | null {
+function getCommittedSourceChanges(
+  projectRoot: string,
+  fromCommit: string,
+  toCommit: string
+): string[] | null {
   try {
     const output = execFileSync('git', ['diff', '--name-only', `${fromCommit}..${toCommit}`], {
       cwd: projectRoot,
@@ -134,38 +141,49 @@ function getCommittedSourceChanges(projectRoot: string, fromCommit: string, toCo
       return [];
     }
 
-    return Array.from(new Set(
-      output
-        .split('\n')
-        .map(line => line.trim())
-        .filter(Boolean)
-        .filter(line => !line.startsWith('.spec-first/runtime/first/'))
-        .filter(line => !line.startsWith('docs/first/')),
-    ));
+    return Array.from(
+      new Set(
+        output
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .filter((line) => !line.startsWith('.spec-first/runtime/first/'))
+          .filter((line) => !line.startsWith('docs/first/'))
+      )
+    );
   } catch {
     return null;
   }
 }
 
 function mergeChangedFiles(...groups: Array<string[] | null>): string[] | null {
-  if (groups.some(group => group === null)) {
+  if (groups.some((group) => group === null)) {
     return null;
   }
 
-  return Array.from(new Set(groups.flatMap(group => group ?? [])));
+  return Array.from(new Set(groups.flatMap((group) => group ?? [])));
 }
 
 function normalizeRuntimeArtifactList(runtimeArtifacts: string[]): FirstRuntimeArtifact[] {
-  return runtimeArtifacts.filter(
-    (artifact): artifact is FirstRuntimeArtifact => FIRST_RUNTIME_ARTIFACTS.includes(artifact as FirstRuntimeArtifact),
+  return runtimeArtifacts.filter((artifact): artifact is FirstRuntimeArtifact =>
+    FIRST_RUNTIME_ARTIFACTS.includes(artifact as FirstRuntimeArtifact)
   );
 }
 
 function determineImpactedRuntimeArtifacts(changedFiles: string[]): FirstRuntimeArtifact[] {
-  return Array.from(new Set(changedFiles.flatMap(file => normalizeRuntimeArtifactList(matchRuntimeArtifactsByChangedFile(file)))));
+  return Array.from(
+    new Set(
+      changedFiles.flatMap((file) =>
+        normalizeRuntimeArtifactList(matchRuntimeArtifactsByChangedFile(file))
+      )
+    )
+  );
 }
 
-function determineRebuildArtifacts(changedFiles: string[], index: FirstRuntimeIndex): FirstRuntimeArtifact[] {
+function determineRebuildArtifacts(
+  changedFiles: string[],
+  index: FirstRuntimeIndex
+): FirstRuntimeArtifact[] {
   if (!isRuntimeHealthy(index)) {
     return [...FIRST_RUNTIME_ARTIFACTS];
   }
@@ -180,25 +198,31 @@ function determineRebuildArtifacts(changedFiles: string[], index: FirstRuntimeIn
       continue;
     }
 
-    if (file.endsWith('/first-role-views.ts') || file === 'src/core/skill-runtime/first-role-views.ts') {
+    if (
+      file.endsWith('/first-role-views.ts') ||
+      file === 'src/core/skill-runtime/first-role-views.ts'
+    ) {
       artifacts.add('role-views.json');
       continue;
     }
 
-    if (file.endsWith('/first-stage-views.ts') || file === 'src/core/skill-runtime/first-stage-views.ts') {
+    if (
+      file.endsWith('/first-stage-views.ts') ||
+      file === 'src/core/skill-runtime/first-stage-views.ts'
+    ) {
       artifacts.add('stage-views.json');
       continue;
     }
 
     if (
-      file.endsWith('/first-runtime-store.ts')
-      || file === 'src/core/skill-runtime/first-runtime-store.ts'
-      || file.endsWith('/first-context.ts')
-      || file === 'src/core/skill-runtime/first-context.ts'
-      || file.endsWith('/first-doc-projection.ts')
-      || file === 'src/core/skill-runtime/first-doc-projection.ts'
-      || file.endsWith('/first-artifact-mapping.ts')
-      || file === 'src/core/skill-runtime/first-artifact-mapping.ts'
+      file.endsWith('/first-runtime-store.ts') ||
+      file === 'src/core/skill-runtime/first-runtime-store.ts' ||
+      file.endsWith('/first-context.ts') ||
+      file === 'src/core/skill-runtime/first-context.ts' ||
+      file.endsWith('/first-doc-projection.ts') ||
+      file === 'src/core/skill-runtime/first-doc-projection.ts' ||
+      file.endsWith('/first-artifact-mapping.ts') ||
+      file === 'src/core/skill-runtime/first-artifact-mapping.ts'
     ) {
       artifacts.add('summary.json');
       artifacts.add('role-views.json');
@@ -243,11 +267,18 @@ function buildIndexEntry(path: string, now: string): FirstRuntimeAssetIndexEntry
   };
 }
 
-function buildDocIndexEntry(projectRoot: string, docPath: string, now: string): FirstRuntimeAssetIndexEntry {
+function buildDocIndexEntry(
+  projectRoot: string,
+  docPath: string,
+  now: string
+): FirstRuntimeAssetIndexEntry {
   return buildIndexEntry(join(projectRoot, docPath), now);
 }
 
-function rewriteRuntimeArtifacts(projectRoot: string, artifacts: FirstRuntimeArtifact[]): FirstRuntimeArtifact[] {
+function rewriteRuntimeArtifacts(
+  projectRoot: string,
+  artifacts: FirstRuntimeArtifact[]
+): FirstRuntimeArtifact[] {
   if (artifacts.length === 0) {
     return [];
   }
@@ -292,7 +323,7 @@ function syncRuntimeIndex(
   projectRoot: string,
   index: FirstRuntimeIndex,
   rewrittenArtifacts: FirstRuntimeArtifact[],
-  refreshedDocs: string[],
+  refreshedDocs: string[]
 ): FirstRuntimeIndex {
   const now = new Date().toISOString();
   const nextIndex: FirstRuntimeIndex = {
@@ -327,13 +358,14 @@ function syncRuntimeIndex(
   const stageHealthy = nextIndex.stageViews.healthy;
 
   nextIndex.status = summaryHealthy && roleHealthy && stageHealthy ? 'current' : 'stale';
-  nextIndex.staleReason = nextIndex.status === 'current'
-    ? undefined
-    : [
-      ...(!summaryHealthy ? ['summary unhealthy'] : []),
-      ...(!roleHealthy ? ['role-views unhealthy'] : []),
-      ...(!stageHealthy ? ['stage-views unhealthy'] : []),
-    ].join('；');
+  nextIndex.staleReason =
+    nextIndex.status === 'current'
+      ? undefined
+      : [
+          ...(!summaryHealthy ? ['summary unhealthy'] : []),
+          ...(!roleHealthy ? ['role-views unhealthy'] : []),
+          ...(!stageHealthy ? ['stage-views unhealthy'] : []),
+        ].join('；');
 
   return nextIndex;
 }
@@ -375,20 +407,26 @@ export function loadFirstRoleView(projectRoot: string, role: FirstRuntimeRole): 
 
 export function refreshFirstArtifacts(
   projectRoot: string,
-  mode: FirstRefreshMode,
+  mode: FirstRefreshMode
 ): FirstRefreshResult {
   const index = requireRuntimeAsset(readFirstRuntimeIndex(projectRoot), 'index');
   const workingTreeChangedFiles = getWorkingTreeChangedFiles(projectRoot);
   const currentCommit = getCurrentSourceCommit(projectRoot);
-  const committedSourceChanges = mode === 'refresh-docs-from-runtime'
-    || index.sourceCommit === undefined
-    || currentCommit === null
-    || index.sourceCommit === currentCommit
-    ? []
-    : getCommittedSourceChanges(projectRoot, index.sourceCommit, currentCommit);
+  const committedSourceChanges =
+    mode === 'refresh-docs-from-runtime' ||
+    index.sourceCommit === undefined ||
+    currentCommit === null ||
+    index.sourceCommit === currentCommit
+      ? []
+      : getCommittedSourceChanges(projectRoot, index.sourceCommit, currentCommit);
   const changedFiles = mergeChangedFiles(workingTreeChangedFiles, committedSourceChanges);
 
-  if (mode !== 'refresh-docs-from-runtime' && changedFiles !== null && changedFiles.length === 0 && isRuntimeHealthy(index)) {
+  if (
+    mode !== 'refresh-docs-from-runtime' &&
+    changedFiles !== null &&
+    changedFiles.length === 0 &&
+    isRuntimeHealthy(index)
+  ) {
     return {
       mode,
       runtimeArtifacts: [],
@@ -396,16 +434,18 @@ export function refreshFirstArtifacts(
     };
   }
 
-  const impactedRuntimeArtifacts = mode === 'refresh-docs-from-runtime'
-    ? [...FIRST_RUNTIME_ARTIFACTS]
-    : changedFiles === null
+  const impactedRuntimeArtifacts =
+    mode === 'refresh-docs-from-runtime'
       ? [...FIRST_RUNTIME_ARTIFACTS]
-      : determineImpactedRuntimeArtifacts(changedFiles);
-  const rebuildArtifacts = mode === 'refresh-docs-from-runtime'
-    ? []
-    : changedFiles === null
-      ? [...FIRST_RUNTIME_ARTIFACTS]
-      : determineRebuildArtifacts(changedFiles, index);
+      : changedFiles === null
+        ? [...FIRST_RUNTIME_ARTIFACTS]
+        : determineImpactedRuntimeArtifacts(changedFiles);
+  const rebuildArtifacts =
+    mode === 'refresh-docs-from-runtime'
+      ? []
+      : changedFiles === null
+        ? [...FIRST_RUNTIME_ARTIFACTS]
+        : determineRebuildArtifacts(changedFiles, index);
 
   let docsArtifacts: FirstRuntimeArtifact[];
   if (mode === 'refresh-runtime-only') {
@@ -414,9 +454,12 @@ export function refreshFirstArtifacts(
     docsArtifacts = [...FIRST_RUNTIME_ARTIFACTS];
   } else {
     // refresh-all: 合并 impacted + rebuild，并检查 docs 健康度
-    const baseArtifacts = Array.from(new Set<FirstRuntimeArtifact>([...impactedRuntimeArtifacts, ...rebuildArtifacts]));
+    const baseArtifacts = Array.from(
+      new Set<FirstRuntimeArtifact>([...impactedRuntimeArtifacts, ...rebuildArtifacts])
+    );
     const docsProjectionEntries = Object.values(index.docsProjection);
-    const hasUnhealthyDocs = docsProjectionEntries.length === 0 || docsProjectionEntries.some(doc => !doc.healthy);
+    const hasUnhealthyDocs =
+      docsProjectionEntries.length === 0 || docsProjectionEntries.some((doc) => !doc.healthy);
     docsArtifacts = hasUnhealthyDocs ? [...FIRST_RUNTIME_ARTIFACTS] : baseArtifacts;
   }
 
@@ -435,9 +478,8 @@ export function refreshFirstArtifacts(
     writeFirstRuntimeIndex(projectRoot, nextIndex);
   }
 
-  const docsProjections = docsArtifacts.length > 0
-    ? refreshFirstDocsFromRuntime(projectRoot, docsArtifacts)
-    : [];
+  const docsProjections =
+    docsArtifacts.length > 0 ? refreshFirstDocsFromRuntime(projectRoot, docsArtifacts) : [];
 
   if (docsProjections.length > 0 || runtimeArtifacts.length > 0) {
     nextIndex = syncRuntimeIndex(projectRoot, nextIndex, [], docsProjections);
@@ -458,9 +500,9 @@ function hasHealthyRuntimeTruth(projectRoot: string): boolean {
   }
 
   return Boolean(
-    readFirstRuntimeSummary(projectRoot)
-    && readFirstRoleViews(projectRoot)
-    && readFirstStageViews(projectRoot),
+    readFirstRuntimeSummary(projectRoot) &&
+    readFirstRoleViews(projectRoot) &&
+    readFirstStageViews(projectRoot)
   );
 }
 
@@ -488,20 +530,79 @@ export function detectBackgroundInputStatus(projectRoot: string): BackgroundInpu
   const runtimeStageViews = readFirstStageViews(projectRoot);
 
   if (
-    runtimeIndex
-    && runtimeSummary
-    && runtimeRoleViews
-    && runtimeStageViews
-    && runtimeIndex.summary.healthy
-    && runtimeIndex.roleViews.healthy
-    && runtimeIndex.stageViews.healthy
+    runtimeIndex &&
+    runtimeSummary &&
+    runtimeRoleViews &&
+    runtimeStageViews &&
+    runtimeIndex.summary.healthy &&
+    runtimeIndex.roleViews.healthy &&
+    runtimeIndex.stageViews.healthy
   ) {
     return 'full';
   }
 
-  if (runtimeIndex || runtimeSummary || runtimeRoleViews || runtimeStageViews || existsSync(join(projectRoot, 'docs', 'first'))) {
+  if (
+    runtimeIndex ||
+    runtimeSummary ||
+    runtimeRoleViews ||
+    runtimeStageViews ||
+    existsSync(join(projectRoot, 'docs', 'first'))
+  ) {
     return 'degraded';
   }
 
   return 'blind';
+}
+
+export interface BackgroundInputSyncResult {
+  backgroundInputStatus: BackgroundInputStatus;
+  updatedFeatures: string[];
+  skippedFeatures: string[];
+}
+
+export function syncBackgroundInputStatus(projectRoot: string): BackgroundInputSyncResult {
+  const backgroundInputStatus = detectBackgroundInputStatus(projectRoot);
+  const specsDir = join(projectRoot, 'specs');
+
+  if (!existsSync(specsDir)) {
+    return {
+      backgroundInputStatus,
+      updatedFeatures: [],
+      skippedFeatures: [],
+    };
+  }
+
+  const updatedFeatures: string[] = [];
+  const skippedFeatures: string[] = [];
+
+  for (const entry of readdirSync(specsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+
+    const statePath = join(specsDir, entry.name, 'stage-state.json');
+    if (!existsSync(statePath)) {
+      skippedFeatures.push(entry.name);
+      continue;
+    }
+
+    try {
+      const state = readJson<Record<string, unknown> & Partial<StageState>>(statePath);
+      if (state.backgroundInputStatus === backgroundInputStatus) {
+        continue;
+      }
+
+      writeJson(statePath, {
+        ...state,
+        backgroundInputStatus,
+      });
+      updatedFeatures.push(entry.name);
+    } catch {
+      skippedFeatures.push(entry.name);
+    }
+  }
+
+  return {
+    backgroundInputStatus,
+    updatedFeatures,
+    skippedFeatures,
+  };
 }

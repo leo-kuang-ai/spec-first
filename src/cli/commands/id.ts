@@ -12,14 +12,24 @@ import { parseFlag } from '../parse-utils.js';
 
 // 有效的 NextIdType 值
 const VALID_NEXT_TYPES: ReadonlySet<NextIdType> = new Set([
-  'FR', 'DS', 'TASK', 'TC', 'RFC', 'REQ', 'SYS', 'ARCH', 'MOD', 'ATP', 'STP', 'ITP', 'UTP',
+  'FR',
+  'DS',
+  'TASK',
+  'TC',
+  'RFC',
+  'REQ',
+  'SYS',
+  'ARCH',
+  'MOD',
+  'ATP',
+  'STP',
+  'ITP',
+  'UTP',
 ]);
 
 // 有效的 IdType 值（用于 search/list）
 // 注意：只包含 IdType 类型的值（NFR/API 不在 IdType 中）
-const VALID_ID_TYPES: ReadonlySet<string> = new Set([
-  'FR', 'DS', 'TASK', 'TC', 'RFC', 'Feature',
-]);
+const VALID_ID_TYPES: ReadonlySet<string> = new Set(['FR', 'DS', 'TASK', 'TC', 'RFC', 'Feature']);
 
 // 有效的 TcLevel 值
 const VALID_TC_LEVELS: ReadonlySet<TcLevel> = new Set(['UT', 'IT', 'E2E', 'ST']);
@@ -29,10 +39,14 @@ export function handleId(args: string[]): number {
   const rest = args.slice(1);
 
   switch (sub) {
-    case 'next':    return handleNext(rest);
-    case 'validate': return handleValidate(rest);
-    case 'search':  return handleSearch(rest);
-    case 'list':    return handleList(rest);
+    case 'next':
+      return handleNext(rest);
+    case 'validate':
+      return handleValidate(rest);
+    case 'search':
+      return handleSearch(rest);
+    case 'list':
+      return handleList(rest);
     default:
       console.error(`未知 id 子命令：${sub}`);
       printIdHelp();
@@ -47,7 +61,9 @@ function handleNext(args: string[]): number {
   const tcLevelArg = parseFlag(args, '--level')?.toUpperCase();
 
   if (!typeArg || !abbr || !feature) {
-    console.error('用法：spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]');
+    console.error(
+      '用法：spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]'
+    );
     console.error('  <type>: FR|DS|TASK|TC|RFC|REQ|SYS|ARCH|MOD|ATP|STP|ITP|UTP');
     return ExitCode.VALIDATION_ERROR;
   }
@@ -74,7 +90,13 @@ function handleNext(args: string[]): number {
 
   try {
     const resolvedFeatureId = resolveFeatureId(feature, process.cwd()).featureId;
-    const result = nextId({ type, abbr, featureId: resolvedFeatureId, projectRoot: process.cwd(), tcLevel });
+    const result = nextId({
+      type,
+      abbr,
+      featureId: resolvedFeatureId,
+      projectRoot: process.cwd(),
+      tcLevel,
+    });
     console.log(`已生成：${result.id}`);
     return ExitCode.SUCCESS;
   } catch (e) {

@@ -69,7 +69,7 @@ export function computeFingerprint(reason: string): string {
  */
 export function buildFailureInjection(
   reason: string,
-  previousReason: string | null,
+  previousReason: string | null
 ): FailureInjection {
   const fingerprint = computeFingerprint(reason);
   const prevFingerprint = previousReason ? computeFingerprint(previousReason) : null;
@@ -94,10 +94,7 @@ export function computeBackoffMs(baseMs: number, attempt: number): number {
 // ─── ORCH-013: 预算检查 ─────────────────────────────────
 
 /** 检查总重试时长是否超出预算 */
-export function isRetryBudgetExhausted(
-  retry: AutoLoopRetry,
-  maxTotalMs: number,
-): boolean {
+export function isRetryBudgetExhausted(retry: AutoLoopRetry, maxTotalMs: number): boolean {
   return retry.totalRetryDurationMs >= maxTotalMs;
 }
 
@@ -124,7 +121,7 @@ export function migrateLegacyRetryCount(retry: AutoLoopRetry): AutoLoopRetry {
 export function makeRetryDecision(
   failureMessage: string,
   retry: AutoLoopRetry,
-  config: AutoOrchestrateConfig,
+  config: AutoOrchestrateConfig
 ): RetryDecision {
   const category = classifyError(failureMessage);
 
@@ -175,7 +172,7 @@ export function makeRetryDecision(
 export function applyRetryToState(
   state: TodoRunnerState,
   decision: RetryDecision,
-  failureMessage: string,
+  failureMessage: string
 ): TodoRunnerState {
   const autoLoop = state.runtime?.autoLoop ?? createAutoLoopState();
   const retry = autoLoop.retry;

@@ -5,18 +5,16 @@ import { writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { BatchExecutionResult } from './types.js';
 
-export function generateReport(
-  result: BatchExecutionResult,
-  projectRoot: string,
-): void {
+export function generateReport(result: BatchExecutionResult, projectRoot: string): void {
   const report = buildReportContent(result);
   const path = join(projectRoot, 'specs', result.featureId, 'batch-report.md');
   writeFileSync(path, report, 'utf-8');
 }
 
 function buildReportContent(result: BatchExecutionResult): string {
-  const duration = result.layers.reduce((sum, l) =>
-    sum + l.results.reduce((s, r) => s + r.duration, 0), 0
+  const duration = result.layers.reduce(
+    (sum, l) => sum + l.results.reduce((s, r) => s + r.duration, 0),
+    0
   );
   const successRate = ((result.successCount / result.totalTasks) * 100).toFixed(1);
 
@@ -44,9 +42,7 @@ function buildReportContent(result: BatchExecutionResult): string {
     content += `\n失败率: ${(layer.failureRate * 100).toFixed(1)}%\n\n`;
   }
 
-  const failures = result.layers.flatMap(l =>
-    l.results.filter(r => !r.success)
-  );
+  const failures = result.layers.flatMap((l) => l.results.filter((r) => !r.success));
 
   if (failures.length > 0) {
     content += `## 失败详情\n\n`;

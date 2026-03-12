@@ -5,7 +5,11 @@
 import { join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { ExitCode } from '../../shared/types.js';
-import { checkHooks, installHooks, uninstallHooks } from '../../core/tool-integration/hook-installer.js';
+import {
+  checkHooks,
+  installHooks,
+  uninstallHooks,
+} from '../../core/tool-integration/hook-installer.js';
 
 export function handleHooks(args: string[]): number {
   const sub = args[0];
@@ -58,11 +62,11 @@ function handleStatus(): number {
   }
   const statuses = checkHooks(projectRoot);
   for (const status of statuses) {
-    const icon = status.installed
-      ? status.isSpecFirst ? '[OK]' : '[WARN]'
-      : '[WARN]';
+    const icon = status.installed ? (status.isSpecFirst ? '[OK]' : '[WARN]') : '[WARN]';
     const msg = status.installed
-      ? status.isSpecFirst ? '已安装（spec-first）' : '已安装（非 spec-first）'
+      ? status.isSpecFirst
+        ? '已安装（spec-first）'
+        : '已安装（非 spec-first）'
       : '未安装';
     console.log(`${icon} ${status.name}: ${msg}`);
   }

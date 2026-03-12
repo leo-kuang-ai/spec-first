@@ -55,9 +55,15 @@ export interface SpecFirstConfig {
   gate: { pilot_mode: boolean };
   health: {
     weights: {
-      w1: number; w2: number; w3: number;
-      w4: number; w5: number; w6: number;
-      w7: number; w8: number; w9: number;
+      w1: number;
+      w2: number;
+      w3: number;
+      w4: number;
+      w5: number;
+      w6: number;
+      w7: number;
+      w8: number;
+      w9: number;
     };
   };
   dependencies?: DependenciesConfig;
@@ -114,9 +120,15 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
   },
   health: {
     weights: {
-      w1: 0.10, w2: 0.10, w3: 0.10,
-      w4: 0.15, w5: 0.10, w6: 0.15,
-      w7: 0.10, w8: 0.10, w9: 0.10,
+      w1: 0.1,
+      w2: 0.1,
+      w3: 0.1,
+      w4: 0.15,
+      w5: 0.1,
+      w6: 0.15,
+      w7: 0.1,
+      w8: 0.1,
+      w9: 0.1,
     },
   },
 };
@@ -137,10 +149,7 @@ export function renderDefaultConfigYaml(): string {
  * 深度合并两个对象（source 覆盖 target 的同名属性）
  * 用于 meta → local → config.yaml 的配置合并
  */
-function deepMerge(
-  target: Record<string, unknown>,
-  source: unknown,
-): Record<string, unknown> {
+function deepMerge(target: Record<string, unknown>, source: unknown): Record<string, unknown> {
   if (!source || typeof source !== 'object') return target;
   if (Array.isArray(source)) return target; // 不合并数组，保持原样
 
@@ -164,7 +173,7 @@ function deepMerge(
       // 递归合并嵌套对象
       result[key] = deepMerge(
         targetValue as Record<string, unknown>,
-        srcValue as Record<string, unknown>,
+        srcValue as Record<string, unknown>
       );
     } else {
       // 直接覆盖（包括数组）
@@ -184,13 +193,15 @@ export function loadConfig(projectRoot: string): SpecFirstConfig {
   const normalizedRoot = resolve(projectRoot);
 
   const cached = configCache.get(normalizedRoot);
-  if (cached && (Date.now() - cached.cachedAt) < CONFIG_CACHE_TTL_MS) return cached.config;
+  if (cached && Date.now() - cached.cachedAt < CONFIG_CACHE_TTL_MS) return cached.config;
 
   // 从两个层级加载配置，local 覆盖 meta，meta 覆盖默认
   const metaPath = join(projectRoot, '.spec-first', 'meta', 'config.yaml');
   const localPath = join(projectRoot, '.spec-first', 'local', 'config.yaml');
 
-  let merged: Record<string, unknown> = structuredClone(DEFAULT_SPEC_FIRST_CONFIG) as unknown as Record<string, unknown>;
+  let merged: Record<string, unknown> = structuredClone(
+    DEFAULT_SPEC_FIRST_CONFIG
+  ) as unknown as Record<string, unknown>;
 
   // Layer 1: meta/config.yaml（包级基线）
   if (exists(metaPath)) {
@@ -220,7 +231,7 @@ export function loadConfig(projectRoot: string): SpecFirstConfig {
 /** 类型安全的配置读取 */
 export function getConfigValue<K extends keyof SpecFirstConfig>(
   config: SpecFirstConfig,
-  key: K,
+  key: K
 ): SpecFirstConfig[K] {
   return config[key];
 }
@@ -274,14 +285,22 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
   const ao = runtime?.auto_orchestrate as Record<string, unknown> | undefined;
   if (ao) {
     if (typeof ao.enabled === 'boolean') cfg.runtime.auto_orchestrate.enabled = ao.enabled;
-    if (typeof ao.stop_on_blocked === 'boolean') cfg.runtime.auto_orchestrate.stop_on_blocked = ao.stop_on_blocked;
-    if (typeof ao.max_task_duration_ms === 'number') cfg.runtime.auto_orchestrate.max_task_duration_ms = ao.max_task_duration_ms;
-    if (typeof ao.heartbeat_timeout_ms === 'number') cfg.runtime.auto_orchestrate.heartbeat_timeout_ms = ao.heartbeat_timeout_ms;
-    if (typeof ao.watchdog_interval_ms === 'number') cfg.runtime.auto_orchestrate.watchdog_interval_ms = ao.watchdog_interval_ms;
-    if (typeof ao.max_retry_per_task === 'number') cfg.runtime.auto_orchestrate.max_retry_per_task = ao.max_retry_per_task;
-    if (typeof ao.retry_backoff_ms === 'number') cfg.runtime.auto_orchestrate.retry_backoff_ms = ao.retry_backoff_ms;
-    if (typeof ao.max_total_retry_duration_ms === 'number') cfg.runtime.auto_orchestrate.max_total_retry_duration_ms = ao.max_total_retry_duration_ms;
-    if (typeof ao.max_parallel === 'number') cfg.runtime.auto_orchestrate.max_parallel = ao.max_parallel;
+    if (typeof ao.stop_on_blocked === 'boolean')
+      cfg.runtime.auto_orchestrate.stop_on_blocked = ao.stop_on_blocked;
+    if (typeof ao.max_task_duration_ms === 'number')
+      cfg.runtime.auto_orchestrate.max_task_duration_ms = ao.max_task_duration_ms;
+    if (typeof ao.heartbeat_timeout_ms === 'number')
+      cfg.runtime.auto_orchestrate.heartbeat_timeout_ms = ao.heartbeat_timeout_ms;
+    if (typeof ao.watchdog_interval_ms === 'number')
+      cfg.runtime.auto_orchestrate.watchdog_interval_ms = ao.watchdog_interval_ms;
+    if (typeof ao.max_retry_per_task === 'number')
+      cfg.runtime.auto_orchestrate.max_retry_per_task = ao.max_retry_per_task;
+    if (typeof ao.retry_backoff_ms === 'number')
+      cfg.runtime.auto_orchestrate.retry_backoff_ms = ao.retry_backoff_ms;
+    if (typeof ao.max_total_retry_duration_ms === 'number')
+      cfg.runtime.auto_orchestrate.max_total_retry_duration_ms = ao.max_total_retry_duration_ms;
+    if (typeof ao.max_parallel === 'number')
+      cfg.runtime.auto_orchestrate.max_parallel = ao.max_parallel;
   }
 
   // runtime.audit_log
@@ -291,7 +310,8 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
     if (typeof al.tamper_proof === 'string' && ['none', 'hash_chain'].includes(al.tamper_proof)) {
       cfg.runtime.audit_log.tamper_proof = al.tamper_proof as AuditTamperProof;
     }
-    if (typeof al.rotation_size_mb === 'number') cfg.runtime.audit_log.rotation_size_mb = al.rotation_size_mb;
+    if (typeof al.rotation_size_mb === 'number')
+      cfg.runtime.audit_log.rotation_size_mb = al.rotation_size_mb;
   }
 
   // health.weights
@@ -319,19 +339,27 @@ function validate(cfg: SpecFirstConfig): void {
     errors.push(`runtime.max_iterations must be 1-20, got ${cfg.runtime.max_iterations}`);
   }
   if (cfg.runtime.max_self_corrections < 1 || cfg.runtime.max_self_corrections > 10) {
-    errors.push(`runtime.max_self_corrections must be 1-10, got ${cfg.runtime.max_self_corrections}`);
+    errors.push(
+      `runtime.max_self_corrections must be 1-10, got ${cfg.runtime.max_self_corrections}`
+    );
   }
 
   // auto_orchestrate 范围校验
   const ao = cfg.runtime.auto_orchestrate;
   if (ao.max_task_duration_ms < 60_000 || ao.max_task_duration_ms > 3_600_000) {
-    errors.push(`auto_orchestrate.max_task_duration_ms must be 60000-3600000, got ${ao.max_task_duration_ms}`);
+    errors.push(
+      `auto_orchestrate.max_task_duration_ms must be 60000-3600000, got ${ao.max_task_duration_ms}`
+    );
   }
   if (ao.heartbeat_timeout_ms < 10_000 || ao.heartbeat_timeout_ms > 600_000) {
-    errors.push(`auto_orchestrate.heartbeat_timeout_ms must be 10000-600000, got ${ao.heartbeat_timeout_ms}`);
+    errors.push(
+      `auto_orchestrate.heartbeat_timeout_ms must be 10000-600000, got ${ao.heartbeat_timeout_ms}`
+    );
   }
   if (ao.watchdog_interval_ms < 1_000 || ao.watchdog_interval_ms > 60_000) {
-    errors.push(`auto_orchestrate.watchdog_interval_ms must be 1000-60000, got ${ao.watchdog_interval_ms}`);
+    errors.push(
+      `auto_orchestrate.watchdog_interval_ms must be 1000-60000, got ${ao.watchdog_interval_ms}`
+    );
   }
   if (ao.max_retry_per_task < 0 || ao.max_retry_per_task > 10) {
     errors.push(`auto_orchestrate.max_retry_per_task must be 0-10, got ${ao.max_retry_per_task}`);
@@ -340,7 +368,9 @@ function validate(cfg: SpecFirstConfig): void {
     errors.push(`auto_orchestrate.retry_backoff_ms must be 100-30000, got ${ao.retry_backoff_ms}`);
   }
   if (ao.max_total_retry_duration_ms < 60_000 || ao.max_total_retry_duration_ms > 7_200_000) {
-    errors.push(`auto_orchestrate.max_total_retry_duration_ms must be 60000-7200000, got ${ao.max_total_retry_duration_ms}`);
+    errors.push(
+      `auto_orchestrate.max_total_retry_duration_ms must be 60000-7200000, got ${ao.max_total_retry_duration_ms}`
+    );
   }
   if (ao.max_parallel < 1 || ao.max_parallel > 4) {
     errors.push(`auto_orchestrate.max_parallel must be 1-4, got ${ao.max_parallel}`);

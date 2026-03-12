@@ -73,19 +73,13 @@ export function detectBottlenecks(coverage: CoverageMetrics): Bottleneck[] {
 }
 
 /** 计算返工率（目标 <10%） */
-export function calcReworkRate(
-  totalTasks: number,
-  reopenedTasks: number,
-): number {
+export function calcReworkRate(totalTasks: number, reopenedTasks: number): number {
   if (totalTasks === 0) return 0;
   return reopenedTasks / totalTasks;
 }
 
 /** 计算 Gate 一次通过率（目标 >85%） */
-export function calcGateFirstPassRate(
-  totalGates: number,
-  firstPassGates: number,
-): number {
+export function calcGateFirstPassRate(totalGates: number, firstPassGates: number): number {
   if (totalGates === 0) return 1;
   return firstPassGates / totalGates;
 }

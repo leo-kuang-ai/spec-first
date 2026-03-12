@@ -1,7 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { loadFirstContext, type FirstContext } from './first-context.js';
-import { FIRST_RUNTIME_ARTIFACTS, getProjectionDocsForRuntimeArtifact } from './first-artifact-mapping.js';
+import {
+  FIRST_RUNTIME_ARTIFACTS,
+  getProjectionDocsForRuntimeArtifact,
+} from './first-artifact-mapping.js';
 import {
   getFirstRoleViewsPath,
   getFirstRuntimeIndexPath,
@@ -106,37 +109,37 @@ function asStringArray(value: unknown): string[] {
 }
 
 function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
-  return Array.from(new Set(groups.flatMap(group => group ?? []).filter(Boolean)));
+  return Array.from(new Set(groups.flatMap((group) => group ?? []).filter(Boolean)));
 }
 
 function toDocRefs(entries: string[]): string[] {
-  return entries.map(entry => entry.startsWith('docs/') ? entry : `docs/first/${entry}`);
+  return entries.map((entry) => (entry.startsWith('docs/') ? entry : `docs/first/${entry}`));
 }
 
 function isLegacyRuntimeIndex(value: unknown): value is LegacyFirstRuntimeIndex {
-  return isRecord(value)
-    && typeof value.version === 'string'
-    && Array.isArray(value.artifacts)
-    && isRecord(value.project);
+  return (
+    isRecord(value) &&
+    typeof value.version === 'string' &&
+    Array.isArray(value.artifacts) &&
+    isRecord(value.project)
+  );
 }
 
 function isLegacyRuntimeSummary(value: unknown): value is LegacyFirstRuntimeSummary {
-  return isRecord(value)
-    && typeof value.generated_at === 'string'
-    && typeof value.project_type === 'string'
-    && Array.isArray(value.core_modules);
+  return (
+    isRecord(value) &&
+    typeof value.generated_at === 'string' &&
+    typeof value.project_type === 'string' &&
+    Array.isArray(value.core_modules)
+  );
 }
 
 function isLegacyRoleViews(value: unknown): value is LegacyFirstRoleViews {
-  return isRecord(value)
-    && typeof value.generated_at === 'string'
-    && isRecord(value.roles);
+  return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.roles);
 }
 
 function isLegacyStageViews(value: unknown): value is LegacyFirstStageViews {
-  return isRecord(value)
-    && typeof value.generated_at === 'string'
-    && isRecord(value.stages);
+  return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.stages);
 }
 
 function makeSyntheticAsset(path: string, lastUpdated: string): FirstRuntimeAssetIndexEntry {
@@ -159,12 +162,18 @@ function readRawRuntimeJson(path: string): unknown | null {
   }
 }
 
-function readLegacyProjectionHints(projectRoot: string): Pick<ProjectionContext, 'artifactDocs' | 'techStack'> {
+function readLegacyProjectionHints(
+  projectRoot: string
+): Pick<ProjectionContext, 'artifactDocs' | 'techStack'> {
   const rawIndex = readRawRuntimeJson(getFirstRuntimeIndexPath(projectRoot));
   const rawSummary = readRawRuntimeJson(getFirstRuntimeSummaryPath(projectRoot));
 
   const artifactDocs = isLegacyRuntimeIndex(rawIndex)
-    ? uniqueStrings(rawIndex.artifacts?.map(artifact => artifact.path).filter((path): path is string => typeof path === 'string'))
+    ? uniqueStrings(
+        rawIndex.artifacts
+          ?.map((artifact) => artifact.path)
+          .filter((path): path is string => typeof path === 'string')
+      )
     : [];
   const techStack = isLegacyRuntimeSummary(rawSummary)
     ? Object.entries(rawSummary.tech_stack ?? {}).map(([key, value]) => `${key}: ${value}`)
@@ -173,9 +182,14 @@ function readLegacyProjectionHints(projectRoot: string): Pick<ProjectionContext,
   return { artifactDocs, techStack };
 }
 
-function normalizeLegacyRoleView(role: FirstRoleView['role'], descriptor?: LegacyFirstRoleDescriptor): FirstRoleView {
+function normalizeLegacyRoleView(
+  role: FirstRoleView['role'],
+  descriptor?: LegacyFirstRoleDescriptor
+): FirstRoleView {
   const priorityDocs = toDocRefs(asStringArray(descriptor?.priority_docs));
-  const entryPoints = asStringArray(descriptor?.entry_points).map(entryPoint => `entry: ${entryPoint}`);
+  const entryPoints = asStringArray(descriptor?.entry_points).map(
+    (entryPoint) => `entry: ${entryPoint}`
+  );
   const keyConcepts = asStringArray(descriptor?.key_concepts);
   const focus = uniqueStrings(priorityDocs, entryPoints, keyConcepts);
 
@@ -224,7 +238,7 @@ function normalizeLegacyStageViews(rawStageViews: LegacyFirstStageViews): FirstS
       businessCapabilities: specDocs,
       coreEntities: [],
       dependencies: specFiles,
-      warnings: initFiles.map(file => `00_init: ${file}`),
+      warnings: initFiles.map((file) => `00_init: ${file}`),
     },
     design: {
       stage: 'design',
@@ -239,7 +253,7 @@ function normalizeLegacyStageViews(rawStageViews: LegacyFirstStageViews): FirstS
       summary: 'Derived from 04_implement runtime stage',
       entryPoints: codeFiles,
       likelyChangeAreas: uniqueStrings(planFiles, codeDocs),
-      callPathHints: planFiles.map(file => `03_plan -> ${file}`),
+      callPathHints: planFiles.map((file) => `03_plan -> ${file}`),
       couplingPoints: uniqueStrings(planDocs, designFiles),
       changeHazards: [],
       verificationHooks: verifyFiles,
@@ -264,42 +278,57 @@ function loadLegacyProjectionContext(projectRoot: string): ProjectionContext | n
   const rawRoleViews = readRawRuntimeJson(getFirstRoleViewsPath(projectRoot));
   const rawStageViews = readRawRuntimeJson(getFirstStageViewsPath(projectRoot));
 
-  if (!isLegacyRuntimeIndex(rawIndex) || !isLegacyRuntimeSummary(rawSummary) || !isLegacyRoleViews(rawRoleViews) || !isLegacyStageViews(rawStageViews)) {
+  if (
+    !isLegacyRuntimeIndex(rawIndex) ||
+    !isLegacyRuntimeSummary(rawSummary) ||
+    !isLegacyRoleViews(rawRoleViews) ||
+    !isLegacyStageViews(rawStageViews)
+  ) {
     return null;
   }
 
-  const generatedAt = rawSummary.generated_at ?? rawRoleViews.generated_at ?? rawStageViews.generated_at ?? rawIndex.generated_at ?? 'unknown';
+  const generatedAt =
+    rawSummary.generated_at ??
+    rawRoleViews.generated_at ??
+    rawStageViews.generated_at ??
+    rawIndex.generated_at ??
+    'unknown';
   const projectName = rawIndex.project?.name ?? basename(projectRoot);
   const artifactDocs = uniqueStrings(
-    rawIndex.artifacts?.map(artifact => artifact.path).filter((path): path is string => typeof path === 'string'),
+    rawIndex.artifacts
+      ?.map((artifact) => artifact.path)
+      .filter((path): path is string => typeof path === 'string')
   );
-  const techStack = Object.entries(rawSummary.tech_stack ?? {}).map(([key, value]) => `${key}: ${value}`);
+  const techStack = Object.entries(rawSummary.tech_stack ?? {}).map(
+    ([key, value]) => `${key}: ${value}`
+  );
   const entryPoints = uniqueStrings(
     asStringArray(rawRoleViews.roles?.developer?.entry_points),
     asStringArray(rawRoleViews.roles?.product_manager?.entry_points),
     asStringArray(rawRoleViews.roles?.tester?.entry_points),
-    asStringArray(rawRoleViews.roles?.architect?.entry_points),
+    asStringArray(rawRoleViews.roles?.architect?.entry_points)
   );
   const apiSurface = toDocRefs(
     rawIndex.artifacts
-      ?.filter(artifact => artifact.type?.includes('api'))
-      .map(artifact => artifact.path)
-      .filter((path): path is string => typeof path === 'string') ?? [],
+      ?.filter((artifact) => artifact.type?.includes('api'))
+      .map((artifact) => artifact.path)
+      .filter((path): path is string => typeof path === 'string') ?? []
   );
   const dataModels = toDocRefs(
     rawIndex.artifacts
-      ?.filter(artifact => artifact.type?.includes('domain'))
-      .map(artifact => artifact.path)
-      .filter((path): path is string => typeof path === 'string') ?? [],
+      ?.filter((artifact) => artifact.type?.includes('domain'))
+      .map((artifact) => artifact.path)
+      .filter((path): path is string => typeof path === 'string') ?? []
   );
   const capabilities = uniqueStrings(
     rawSummary.project_type ? [`project type: ${rawSummary.project_type}`] : [],
     typeof rawSummary.commands_count === 'number' ? [`commands: ${rawSummary.commands_count}`] : [],
-    [rawSummary.has_database ? 'database: detected' : 'database: not detected'],
+    [rawSummary.has_database ? 'database: detected' : 'database: not detected']
   );
-  const risks = rawIndex.database?.detected === false && rawIndex.database.reason
-    ? [`database: ${rawIndex.database.reason}`]
-    : [];
+  const risks =
+    rawIndex.database?.detected === false && rawIndex.database.reason
+      ? [`database: ${rawIndex.database.reason}`]
+      : [];
   const summary: FirstRuntimeSummary = {
     generatedAt,
     mode: rawSummary.mode === 'deep' ? 'deep' : 'quick',
@@ -328,8 +357,14 @@ function loadLegacyProjectionContext(projectRoot: string): ProjectionContext | n
       lastRun: generatedAt,
       mode: summary.mode,
       summary: makeSyntheticAsset('.spec-first/runtime/first/summary.json', generatedAt),
-      roleViews: makeSyntheticAsset('.spec-first/runtime/first/role-views.json', rawRoleViews.generated_at ?? generatedAt),
-      stageViews: makeSyntheticAsset('.spec-first/runtime/first/stage-views.json', rawStageViews.generated_at ?? generatedAt),
+      roleViews: makeSyntheticAsset(
+        '.spec-first/runtime/first/role-views.json',
+        rawRoleViews.generated_at ?? generatedAt
+      ),
+      stageViews: makeSyntheticAsset(
+        '.spec-first/runtime/first/stage-views.json',
+        rawStageViews.generated_at ?? generatedAt
+      ),
       docsProjection: {},
       status: 'current',
     },
@@ -348,9 +383,10 @@ function loadProjectionContext(projectRoot: string): ProjectionContext {
     const context = loadFirstContext(projectRoot);
     return {
       ...context,
-      artifactDocs: legacyHints.artifactDocs.length > 0
-        ? legacyHints.artifactDocs
-        : Object.keys(context.index.docsProjection ?? {}).sort(),
+      artifactDocs:
+        legacyHints.artifactDocs.length > 0
+          ? legacyHints.artifactDocs
+          : Object.keys(context.index.docsProjection ?? {}).sort(),
       techStack: context.summary.techStack ?? legacyHints.techStack,
     };
   } catch (error) {
@@ -363,7 +399,7 @@ function loadProjectionContext(projectRoot: string): ProjectionContext {
 }
 
 function renderList(items: string[], emptyLabel: string = '无'): string[] {
-  return items.length > 0 ? items.map(item => `- ${item}`) : [`- ${emptyLabel}`];
+  return items.length > 0 ? items.map((item) => `- ${item}`) : [`- ${emptyLabel}`];
 }
 
 function renderSection(title: string, items: string[], emptyLabel?: string): string[] {
@@ -409,7 +445,7 @@ function renderOverviewDoc(context: ProjectionContext): string {
     '## 使用约定',
     '- 读取机器真相时优先使用 `.spec-first/runtime/first/`。',
     '- 阅读面向人的摘要时使用 `docs/first/` 投影视图。',
-    '- 当 runtime 真源变化时，应重新刷新 docs 投影视图。',
+    '- 当 runtime 真源变化时，应重新刷新 docs 投影视图。'
   );
 
   return lines.join('\n');
@@ -425,7 +461,10 @@ function renderSummaryDoc(context: ProjectionContext): string {
     `- 平台: ${context.summary.project.platformType ?? 'unknown'}`,
     `- 生成时间: ${context.summary.generatedAt}`,
     `- 概述: ${context.summary.project.overview ?? '未提供'}`,
-    ...renderSection('Tech Stack', context.techStack.length > 0 ? context.techStack : (context.summary.techStack ?? [])),
+    ...renderSection(
+      'Tech Stack',
+      context.techStack.length > 0 ? context.techStack : (context.summary.techStack ?? [])
+    ),
     ...renderSection('Capabilities', context.summary.capabilities),
     ...renderSection('Modules', context.summary.modules),
     ...renderSection('Entry Points', context.summary.entryPoints),
@@ -536,13 +575,20 @@ export function renderProjectedDoc(docPath: string, context: ProjectionContext):
   return renderGenericProjectedDoc(docPath, context);
 }
 
-export function refreshFirstDocsFromRuntime(projectRoot: string, runtimeArtifacts: string[] = [...FIRST_RUNTIME_ARTIFACTS]): string[] {
+export function refreshFirstDocsFromRuntime(
+  projectRoot: string,
+  runtimeArtifacts: string[] = [...FIRST_RUNTIME_ARTIFACTS]
+): string[] {
   const context = loadProjectionContext(projectRoot);
-  const docs = Array.from(new Set(
-    runtimeArtifacts
-      .filter((artifact): artifact is (typeof FIRST_RUNTIME_ARTIFACTS)[number] => FIRST_RUNTIME_ARTIFACTS.includes(artifact as (typeof FIRST_RUNTIME_ARTIFACTS)[number]))
-      .flatMap(artifact => getProjectionDocsForRuntimeArtifact(artifact)),
-  ));
+  const docs = Array.from(
+    new Set(
+      runtimeArtifacts
+        .filter((artifact): artifact is (typeof FIRST_RUNTIME_ARTIFACTS)[number] =>
+          FIRST_RUNTIME_ARTIFACTS.includes(artifact as (typeof FIRST_RUNTIME_ARTIFACTS)[number])
+        )
+        .flatMap((artifact) => getProjectionDocsForRuntimeArtifact(artifact))
+    )
+  );
 
   for (const relativeDocPath of docs) {
     const fullPath = join(projectRoot, relativeDocPath);

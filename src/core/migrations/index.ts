@@ -22,7 +22,4 @@ export {
   filterManifestsByVersion,
   rangeToString,
 } from './version-matcher.js';
-export {
-  executeStep,
-  executeManifest,
-} from './manifest-engine.js';
+export { executeStep, executeManifest } from './manifest-engine.js';

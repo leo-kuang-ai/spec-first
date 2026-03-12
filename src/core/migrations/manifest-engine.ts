@@ -2,7 +2,17 @@
  * Manifest 迁移执行引擎
  * 执行迁移清单中的各个步骤
  */
-import { existsSync, mkdirSync, renameSync, rmSync, readFileSync, writeFileSync, copyFileSync, readdirSync, statSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  renameSync,
+  rmSync,
+  readFileSync,
+  writeFileSync,
+  copyFileSync,
+  readdirSync,
+  statSync,
+} from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import yaml from 'js-yaml';
 import { execSync } from 'node:child_process';
@@ -14,7 +24,14 @@ import type {
   ExecutionResult,
 } from './manifest-schema.js';
 import { ConflictStrategy } from './manifest-schema.js';
-import { isMkdirStep, isRenameStep, isDeleteStep, isCopyStep, isPatchStep, isExecuteStep } from './manifest-schema.js';
+import {
+  isMkdirStep,
+  isRenameStep,
+  isDeleteStep,
+  isCopyStep,
+  isPatchStep,
+  isExecuteStep,
+} from './manifest-schema.js';
 
 // ─── 路径安全校验 ───────────────────────────────────────────
 
@@ -39,7 +56,7 @@ function resolveSafePath(projectRoot: string, relativePath: string): string {
 export function executeStep(
   step: MigrationStep,
   projectRoot: string,
-  conflictStrategy: ConflictStrategy = ConflictStrategy.Skip,
+  conflictStrategy: ConflictStrategy = ConflictStrategy.Skip
 ): StepResult {
   try {
     if (isMkdirStep(step)) {
@@ -99,7 +116,11 @@ function executeMkdir(step: MigrationStep, projectRoot: string): StepResult {
 /**
  * 执行 rename 步骤
  */
-function executeRename(step: MigrationStep, projectRoot: string, conflictStrategy: ConflictStrategy): StepResult {
+function executeRename(
+  step: MigrationStep,
+  projectRoot: string,
+  conflictStrategy: ConflictStrategy
+): StepResult {
   if (!isRenameStep(step)) throw new Error('Invalid step type');
 
   const fromPath = resolveSafePath(projectRoot, step.from);
@@ -185,7 +206,11 @@ function executeDelete(step: MigrationStep, projectRoot: string): StepResult {
 /**
  * 执行 copy 步骤
  */
-function executeCopy(step: MigrationStep, projectRoot: string, conflictStrategy: ConflictStrategy): StepResult {
+function executeCopy(
+  step: MigrationStep,
+  projectRoot: string,
+  conflictStrategy: ConflictStrategy
+): StepResult {
   if (!isCopyStep(step)) throw new Error('Invalid step type');
 
   const fromPath = resolveSafePath(projectRoot, step.from);
@@ -271,7 +296,11 @@ function copyDirectory(source: string, target: string): void {
 /**
  * 执行 patch 步骤
  */
-function executePatch(step: MigrationStep, projectRoot: string, _conflictStrategy: ConflictStrategy): StepResult {
+function executePatch(
+  step: MigrationStep,
+  projectRoot: string,
+  _conflictStrategy: ConflictStrategy
+): StepResult {
   if (!isPatchStep(step)) throw new Error('Invalid step type');
 
   const filePath = resolveSafePath(projectRoot, step.file);
@@ -310,9 +339,10 @@ function executePatch(step: MigrationStep, projectRoot: string, _conflictStrateg
   }
 
   // 合并或替换
-  const result = step.mergeStrategy === 'replace'
-    ? step.patch
-    : deepMerge(data as Record<string, unknown>, step.patch);
+  const result =
+    step.mergeStrategy === 'replace'
+      ? step.patch
+      : deepMerge(data as Record<string, unknown>, step.patch);
 
   writeFileSync(filePath, JSON.stringify(result, null, 2), 'utf-8');
 
@@ -326,7 +356,10 @@ function executePatch(step: MigrationStep, projectRoot: string, _conflictStrateg
 /**
  * 深度合并两个对象
  */
-function deepMerge(target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> {
+function deepMerge(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>
+): Record<string, unknown> {
   const result = { ...target };
 
   for (const key of Object.keys(source)) {
@@ -341,7 +374,10 @@ function deepMerge(target: Record<string, unknown>, source: Record<string, unkno
       typeof tgtValue === 'object' &&
       !Array.isArray(tgtValue)
     ) {
-      result[key] = deepMerge(tgtValue as Record<string, unknown>, srcValue as Record<string, unknown>);
+      result[key] = deepMerge(
+        tgtValue as Record<string, unknown>,
+        srcValue as Record<string, unknown>
+      );
     } else {
       result[key] = srcValue;
     }
@@ -400,7 +436,7 @@ function executeCommand(step: MigrationStep, projectRoot: string): StepResult {
 export function executeManifest(
   manifest: MigrationManifest,
   projectRoot: string,
-  conflictStrategy: ConflictStrategy = ConflictStrategy.Skip,
+  conflictStrategy: ConflictStrategy = ConflictStrategy.Skip
 ): ExecutionResult {
   const results: StepResult[] = [];
   let executedSteps = 0;

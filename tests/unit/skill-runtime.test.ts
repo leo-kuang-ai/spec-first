@@ -8,7 +8,12 @@ import { join } from 'node:path';
 import { execSync } from 'node:child_process';
 import { dispatchCommand, loadSkill, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
 import { resetConfigCache } from '../../src/shared/config-schema.js';
-import { writeFirstRuntimeIndex, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
+import {
+  writeFirstRoleViews,
+  writeFirstRuntimeIndex,
+  writeFirstRuntimeSummary,
+  writeFirstStageViews,
+} from '../../src/core/skill-runtime/first-runtime-store.js';
 import {
   createPhaseState, canTransition, transition, confirmPhase,
   preWriteArchive, getValidTransitions,
@@ -510,6 +515,140 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('orchestrate-runtime-context');
     expect(content).toContain('background_status: blind');
     expect(content).toContain('recommended_action: backfill-first');
+  });
+
+  it('should inject task runtime context even when first runtime is unavailable', () => {
+    const skillDir = join(TMP, 'skills', 'spec-first', '06-task');
+    const skillPath = join(skillDir, 'SKILL.md');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        currentStage: '03_plan',
+        history: [],
+        terminal: false,
+        mode: 'N',
+        size: 'S',
+        platforms: ['h5'],
+        createdAt: '2026-03-12T12:00:00.000Z',
+        updatedAt: '2026-03-12T12:00:00.000Z',
+      }),
+      'utf-8',
+    );
+    writeFileSync(skillPath, '# Task Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('task-runtime-context');
+    expect(content).toContain('backgroundInputStatus: blind');
+    expect(content).toContain('recommendation: 建议先运行 /spec-first:first 补全背景数据');
+  });
+
+  it('should prefer resolver truth over cached backgroundInputStatus in plan runtime notice', () => {
+    const skillDir = join(TMP, 'skills', 'spec-first', '10-plan');
+    const skillPath = join(skillDir, 'SKILL.md');
+    mkdirSync(skillDir, { recursive: true });
+    writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        currentStage: '03_plan',
+        backgroundInputStatus: 'blind',
+        history: [],
+        terminal: false,
+        mode: 'N',
+        size: 'S',
+        platforms: ['h5'],
+        createdAt: '2026-03-12T12:00:00.000Z',
+        updatedAt: '2026-03-12T12:00:00.000Z',
+      }),
+      'utf-8',
+    );
+    writeFirstRuntimeIndex(TMP, {
+      version: '1.0.0',
+      lastRun: '2026-03-12T12:00:00.000Z',
+      mode: 'quick',
+      summary: {
+        path: '.spec-first/runtime/first/summary.json',
+        fileHash: 'summary',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      roleViews: {
+        path: '.spec-first/runtime/first/role-views.json',
+        fileHash: 'roles',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      stageViews: {
+        path: '.spec-first/runtime/first/stage-views.json',
+        fileHash: 'stages',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      docsProjection: {},
+      status: 'current',
+    });
+    writeFirstRuntimeSummary(TMP, {
+      generatedAt: '2026-03-12T12:00:00.000Z',
+      mode: 'quick',
+      project: { name: 'spec-first', platformType: 'cli' },
+      techStack: ['TypeScript'],
+      modules: ['skill-runtime'],
+      capabilities: [],
+      entryPoints: [],
+      dataModels: [],
+      apiSurface: [],
+      risks: [],
+      evidence: [],
+    });
+    writeFirstRoleViews(TMP, {
+      product: { role: 'product', summary: 'Product summary', focus: [], warnings: [] },
+      dev: { role: 'dev', summary: 'Dev summary', focus: [], warnings: [] },
+      qa: { role: 'qa', summary: 'QA summary', focus: [], warnings: [] },
+      architect: { role: 'architect', summary: 'Architect summary', focus: [], warnings: [] },
+    });
+    writeFirstStageViews(TMP, {
+      spec: {
+        stage: 'spec',
+        summary: 'Spec summary',
+        businessCapabilities: [],
+        coreEntities: [],
+        dependencies: [],
+        warnings: [],
+      },
+      design: {
+        stage: 'design',
+        summary: 'Design summary',
+        moduleBoundaries: [],
+        integrationPoints: [],
+        technicalConstraints: [],
+        risks: [],
+      },
+      code: {
+        stage: 'code',
+        summary: 'Code summary',
+        entryPoints: [],
+        likelyChangeAreas: [],
+        changeHazards: [],
+        verificationHooks: [],
+      },
+      verify: {
+        stage: 'verify',
+        summary: 'Verify summary',
+        testFocus: [],
+        riskAreas: [],
+        validationHooks: [],
+        releaseBlockers: [],
+      },
+    });
+    writeFileSync(skillPath, '# Plan Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('plan-runtime-context');
+    expect(content).toContain('backgroundInputStatus: full');
+    expect(content).not.toContain('backgroundInputStatus: blind');
   });
 
   it('should throw when review hard-gate is BLOCKED by stage mismatch', () => {

@@ -81,7 +81,9 @@ function runUninstall({ dryRun, keepMcp }: UninstallOptions): number {
   if (keepMcp) {
     console.log(`${prefix}MCP 配置: 已保留（--keep-mcp）`);
   } else {
-    console.log(`${prefix}MCP 配置: sequential-thinking/context7/serena/fetch/playwright-mcp 为通用服务，已保留`);
+    console.log(
+      `${prefix}MCP 配置: sequential-thinking/context7/serena/fetch/playwright-mcp 为通用服务，已保留`
+    );
     console.log('  如需清理，请手动编辑:');
     for (const f of paths.claudeConfigFiles) {
       console.log(`    ${f}`);
@@ -130,7 +132,9 @@ function removeSessionHook(claudeHomeDir: string, dryRun: boolean, prefix: strin
     }
 
     const before = hooks.SessionStart.length;
-    hooks.SessionStart = hooks.SessionStart.filter((item: unknown) => !isManagedSessionStartEntry(item));
+    hooks.SessionStart = hooks.SessionStart.filter(
+      (item: unknown) => !isManagedSessionStartEntry(item)
+    );
     const removed = before - hooks.SessionStart.length;
 
     if (removed === 0) {
@@ -175,13 +179,13 @@ function removeAIHooks(projectRoot: string, dryRun: boolean, prefix: string): vo
       if (!Array.isArray(hooks[hookType])) continue;
       const currentEntries = hooks[hookType] as HookEntry[];
       const before = currentEntries.length;
-      hooks[hookType] = currentEntries.filter((item: HookEntry) =>
-        !item?.hooks?.some((h: HookCommand) =>
-          typeof h.command === 'string' && (
-            h.command.includes('npx spec-first')
-            || h.command.includes('sh .spec-first/hooks/')
-          ),
-        ),
+      hooks[hookType] = currentEntries.filter(
+        (item: HookEntry) =>
+          !item?.hooks?.some(
+            (h: HookCommand) =>
+              typeof h.command === 'string' &&
+              (h.command.includes('npx spec-first') || h.command.includes('sh .spec-first/hooks/'))
+          )
       );
       const removed = before - (hooks[hookType] as HookEntry[]).length;
       totalRemoved += removed;
@@ -198,9 +202,8 @@ function removeAIHooks(projectRoot: string, dryRun: boolean, prefix: string): vo
       const before = currentEntries.length;
       hooks[hookType] = currentEntries.filter((item: unknown) => {
         if (hookType === 'SessionStart') return !isManagedSessionStartEntry(item);
-        return !(item as HookEntry | undefined)?.hooks?.some((hook) =>
-          typeof hook?.command === 'string'
-          && hook.command.includes('session-end'),
+        return !(item as HookEntry | undefined)?.hooks?.some(
+          (hook) => typeof hook?.command === 'string' && hook.command.includes('session-end')
         );
       });
       totalRemoved += before - (hooks[hookType] as HookEntry[]).length;
