@@ -152,8 +152,10 @@ function validateRequiredFields(featureId: string, projectRoot: string): string[
   const content = readMarkdown(specPath);
   const errors: string[] = [];
 
-  // 检查必需元信息
-  if (!content.includes('Feature ID:')) {
+  // 检查必需元信息：支持字段普通写法和 Markdown 加粗写法
+  const hasFeatureIdField = /^(?:\*\*)?Feature ID(?:\*\*)?\s*:/m.test(content);
+
+  if (!hasFeatureIdField) {
     errors.push('spec.md 缺少 Feature ID 字段');
   }
 

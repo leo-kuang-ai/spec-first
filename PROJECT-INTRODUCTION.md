@@ -1391,24 +1391,44 @@ type GateStatus = 'PASS' | 'PASS_WITH_WAIVER' | 'FAIL';
 
 ## 覆盖率指标
 
-### 正向覆盖率（需求是否被实现）
+Spec-First 共有 **C1-C11** 共 11 项覆盖率指标，分为三类：
 
-| 指标 | 公式 | 阈值 |
-|------|------|------|
-| C1 Design | 有 DS 祖先关联的 FR / 总 FR | = 100%（Design Gate） |
-| C2 API | 同 C1（当前实现） | = 100%（Design Gate） |
-| C3 Task | 有 TASK 祖先关联的 FR / 总 FR | = 100%（Plan Gate） |
-| C4 Test(FR) | 有 TC 关联的 FR / 总 FR | Implement 阶段 ≥80%，Verify 阶段 =100% |
-| C5 Test(AC) | 同 C4（当前实现） | S: ≥60%，M/L: ≥90% |
-| C6 Impl | Implemented/Verified/Accepted TASK / 总 TASK | = 100%（Wrap-up Gate） |
+### 正向覆盖率（C1-C6：需求是否被实现）
 
-### 反向合规率（实现是否有需求依据）
+| 指标 | 说明 | 公式 | 阈值 |
+|------|------|------|------|
+| C1 Design Coverage | FR 有设计映射 | 有 DS 祖先关联的 FR / 总 FR | = 100%（Design Gate） |
+| C2 API Coverage | FR 有 API 设计 | 同 C1（当前实现） | = 100%（Design Gate） |
+| C3 Task Coverage | FR 有任务拆解 | 有 TASK 祖先关联的 FR / 总 FR | = 100%（Plan Gate） |
+| C4 Test Coverage (FR) | FR 有测试用例 | 有 TC 关联的 FR / 总 FR | Implement ≥80%，Verify =100% |
+| C5 Test Coverage (AC) | AC 级测试覆盖 | 同 C4（当前实现） | S: ≥60%，M/L: ≥90% |
+| C6 Impl Coverage | 任务实现完成度 | Implemented/Verified/Accepted TASK / 总 TASK | = 100%（Wrap-up Gate） |
 
-| 指标 | 公式 | 阈值 |
-|------|------|------|
-| C7 PR Compliance | 有上游关联的 TASK / 总 TASK | = 100% |
-| C8 Task Compliance | 有 FR/DS 上游祖先的 TASK / 总 TASK | = 100% |
-| C9 TC Compliance | 有 FR 的 TC / 总 TC | = 100% |
+### 反向合规率（C7-C9：实现是否有需求依据）
+
+| 指标 | 说明 | 公式 | 阈值 |
+|------|------|------|------|
+| C7 PR Compliance | PR 有需求关联 | 有上游关联的 TASK / 总 TASK | = 100% |
+| C8 Task Compliance | 任务有需求依据 | 有 FR/DS 上游祖先的 TASK / 总 TASK | = 100% |
+| C9 TC Compliance | 测试用例有需求依据 | 有 FR 的 TC / 总 TC | = 100% |
+
+### 质量评审指标（C10-C11：手工/规则校验）
+
+| 指标 | 说明 | 计算方式 | 阈值 |
+|------|------|----------|------|
+| C10 Spec Quality Score | 需求规格质量评分 | 已勾选 checklist 项 / 总 checklist 项 | ≥ 80%（Specify Gate） |
+| C11 Constitution Compliance | 宪章合规性 | 检查 constitution.md 版本/批准/修订历史 | PASS（Design Gate） |
+
+**C10 计算说明**：
+- 读取 `specs/FEATURE_ID/checklists/spec-review.md`（或 `spec-review.md`、`checklist.md`）
+- 统计 `- [x]` 已勾选项 / `- [ ]` 总项数
+- 或使用显式评分：文件中包含 `C10=XX%` 格式
+
+**健康度评分权重**（H1 指标）：
+```
+C1: 12%, C2: 10%, C3: 10%, C4: 15%, C5: 10%
+C6: 13%, C7: 10%, C8: 10%, C9: 10%
+```
 
 > Metrics 命令中的目标值和 Health Score 权重用于日常质量观测，不等同于阶段 Gate 阈值；阶段推进以 Gate + 依赖检查结果为准。
 
