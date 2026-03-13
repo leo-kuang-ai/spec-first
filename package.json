@@ -54,6 +54,8 @@
     "skills",
     "templates",
     "README.md",
+    "README-CN.md",
+    "image.png",
     "scripts/stage-viewer",
     "scripts/codex"
   ],

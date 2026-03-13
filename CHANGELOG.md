@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.0.2 2026-03-14 Claude: docs(readme): 新增 Stage Viewer 截图节，package.json files 补充 image.png，双语同步 (user-visible)
+- v1.0.2 2026-03-14 Claude: docs(readme): 移除 npm 失效内链，修复 FSM 图对齐，补 downloads badge，Mint→Generate，SIDE_EFFECT→SIDE EFFECTS，追溯链分组优化，双语同步 (user-visible)
+- v1.0.2 2026-03-14 Claude: docs(readme): 竞品对比章节改为竞品学习——引入真实 AI 工作流竞品（OpenSpec/Spec Kit/Planning-Files/Trellis/Superpowers），正向叙述借鉴点，双语同步 (user-visible)
+- v1.0.2 2026-03-14 Claude: docs(readme-cn): 同步英文版全部优化——新增工作原理/为什么选Spec-First/贡献指南，痛点升级三列表，阶段表补交付物列，14类ID修正，Quick Start补参数说明，架构图补模块职责 (user-visible)
+- v1.0.2 2026-03-14 Claude: docs(readme): 深度重写英文 README — 新增 How It Works/Why Spec-First/Contributing，修正 ID 类型数，补全 Quick Start 参数说明，架构图补充模块职责，语言精度全面提升 (user-visible)
+- v1.0.2 2026-03-14 Claude: fix(docs): 修正 README.md 两处数据错误 — ID 类型数 12→14（代码实证），07_release gate 条件数 7→2（代码实证） (user-visible)
+- v1.0.2 2026-03-13 Claude: chore(docs): 拆分双语 README — 新建英文主 README.md（npm SEO），中文内容迁移至 README-CN.md，package.json files 同步补充 (user-visible)
 - v1.0.1 2026-03-13 Claude: chore: 版本号升级至 1.0.1 (user-visible)
 - v0.5.78 2026-03-13 Claude: chore(package): 补充 repository/homepage/bugs/author 字段，提升 npms.io 质量分与维护性评分 (user-visible)
 - v0.5.78 2026-03-13 Claude: chore(seo): 优化 npm SEO — 改写 package.json description 嵌入核心关键词，README H1 改为英文并添加英文摘要行 (user-visible)
