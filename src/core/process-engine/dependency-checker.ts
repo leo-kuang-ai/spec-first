@@ -94,14 +94,24 @@ export function describeDependencyIssues(result: DependencyCheckResult): string[
   return result.missing.map((item) => `缺少 ${item}`);
 }
 
+/**
+ * 过滤默认依赖项（default-simplified profile）
+ */
+function filterDefaultDependencies(deps: StageDependency, _targetStage: Stage): StageDependency {
+  // default-simplified: 仅保留文件依赖，移除 npmScripts 和 envVars
+  return { stage: deps.stage, files: deps.files };
+}
+
 export function checkDependencies(
   featureId: string,
   targetStage: Stage,
-  projectRoot: string
+  projectRoot: string,
+  profile: string = 'default-simplified'
 ): DependencyCheckResult {
-  const deps = getStageDependencies(targetStage, projectRoot);
-  if (!deps) return { pass: true, missing: [] };
+  const rawDeps = getStageDependencies(targetStage, projectRoot);
+  if (!rawDeps) return { pass: true, missing: [] };
 
+  const deps = profile === 'strict' ? rawDeps : filterDefaultDependencies(rawDeps, targetStage);
   const missing: string[] = [];
 
   // 检查 npm scripts

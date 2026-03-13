@@ -13,30 +13,41 @@ export interface HealthScore {
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
 }
 
-/** 默认权重 */
-const WEIGHTS: Record<string, number> = {
-  C1: 0.12,
-  C2: 0.1,
-  C3: 0.1,
+/** 默认权重 - 只包含 C3/C4/C6/C8/C9 */
+const DEFAULT_WEIGHTS: Record<string, number> = {
+  C3: 0.25,
+  C4: 0.20,
+  C6: 0.25,
+  C8: 0.15,
+  C9: 0.15,
+};
+
+/** 严格模式权重 - 包含全部 C1-C9 */
+const STRICT_WEIGHTS: Record<string, number> = {
+  C1: 0.08,
+  C2: 0.08,
+  C3: 0.20,
   C4: 0.15,
-  C5: 0.1,
-  C6: 0.13,
-  C7: 0.1,
-  C8: 0.1,
-  C9: 0.1,
+  C5: 0.08,
+  C6: 0.20,
+  C7: 0.06,
+  C8: 0.10,
+  C9: 0.05,
 };
 
 /** 计算综合健康分 */
 export function calcHealthScore(
   coverage: CoverageMetrics,
   cycleTimeDays: number,
-  escapeRate: number
+  escapeRate: number,
+  profile: string = 'default-simplified'
 ): HealthScore {
+  const weights = profile === 'strict' ? STRICT_WEIGHTS : DEFAULT_WEIGHTS;
   const record = coverage as unknown as Record<string, number>;
   let weighted = 0;
   const breakdown: Record<string, number> = {};
 
-  for (const [key, weight] of Object.entries(WEIGHTS)) {
+  for (const [key, weight] of Object.entries(weights)) {
     const val = Math.min(record[key] ?? 0, 1.0);
     breakdown[key] = val * weight * 100;
     weighted += val * weight;

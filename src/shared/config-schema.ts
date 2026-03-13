@@ -52,7 +52,10 @@ export interface SpecFirstConfig {
     auto_orchestrate: AutoOrchestrateConfig;
     audit_log: AuditLogConfig;
   };
-  gate: { pilot_mode: boolean };
+  gate: {
+    pilot_mode: boolean;
+    profile: 'default-simplified' | 'strict';
+  };
   health: {
     weights: {
       w1: number;
@@ -93,7 +96,7 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
       rotation_size_mb: 10,
     },
   },
-  gate: { pilot_mode: false },
+  gate: { pilot_mode: false, profile: 'default-simplified' },
   dependencies: {
     autoCheck: true,
     stages: {
@@ -267,6 +270,9 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
   const gate = parsed.gate as Record<string, unknown> | undefined;
   if (gate && typeof gate.pilot_mode === 'boolean') {
     cfg.gate.pilot_mode = gate.pilot_mode;
+  }
+  if (gate?.profile && ['default-simplified', 'strict'].includes(String(gate.profile))) {
+    cfg.gate.profile = gate.profile as SpecFirstConfig['gate']['profile'];
   }
 
   // runtime.max_iterations

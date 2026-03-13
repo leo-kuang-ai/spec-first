@@ -45,6 +45,7 @@ describe('init', () => {
     expect(state.stageStatus).toBe('drafting');
     expect(state.autoAdvancePolicy).toBe('suggest');
     expect(state.mergedRules).toBeDefined();
+    expect(state.mergedRules.profile).toBe('default-simplified');
     expect(state.mergedRules.gateConditions).toBeDefined();
     expect(state.mergedRules.deliverables).toBeDefined();
 

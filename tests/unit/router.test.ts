@@ -42,6 +42,24 @@ describe('CLI Router', () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+  it('should show validation error before confirmation requirement', async () => {
+    const handler = vi.fn(() => 0);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    registerCommand('write-cmd-invalid', 'A mutating command', handler, {
+      requiresConfirmation: true,
+      validateArgs: () => 'usage: write-cmd-invalid <id>',
+    });
+
+    try {
+      const code = await dispatch(['write-cmd-invalid']);
+      expect(code).toBe(2);
+      expect(handler).not.toHaveBeenCalled();
+      expect(errSpy).toHaveBeenCalledWith('usage: write-cmd-invalid <id>');
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
   it('should allow mutating commands with --yes under strict policy', async () => {
     const handler = vi.fn(() => 0);
     registerCommand('write-cmd-confirmed', 'A mutating command', handler, { requiresConfirmation: true });

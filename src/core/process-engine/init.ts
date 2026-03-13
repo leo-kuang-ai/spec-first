@@ -623,6 +623,7 @@ function createInitialStageState(
     stageStatus: 'drafting',
     autoAdvancePolicy: 'suggest',
     mergedRules: {
+      profile: mergedRules.profile ?? 'default-simplified',
       gateConditions: mergedRules.gateConditions as Record<string, unknown[]>,
       deliverables: mergedRules.deliverables as Record<string, unknown[]>,
       thresholds: mergedRules.thresholds,

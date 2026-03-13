@@ -114,7 +114,12 @@ export async function handleOrchestrate(
           ? evaluateGate(featureId, projectRoot, { persist: false }).status
           : undefined,
       dependencyCheck: upcomingStage
-        ? checkDependencies(featureId, upcomingStage, projectRoot)
+        ? checkDependencies(
+            featureId,
+            upcomingStage,
+            projectRoot,
+            state.mergedRules?.profile ?? 'default-simplified'
+          )
         : undefined,
       todoState: loadTodoState(featureId, projectRoot),
       autoLoopStatus: autoLoopResult?.status,

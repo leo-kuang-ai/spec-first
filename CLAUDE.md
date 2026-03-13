@@ -272,21 +272,21 @@ npm run format             # prettier 格式化
 <!-- SPEC-FIRST:END MANUAL -->
 
 <!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-> Auto-synced at 2026-03-10T16:21:48.070Z
+> Auto-synced at 2026-03-13T02:03:14.118Z
 
 ## Spec-First Context Snapshot
-- Feature: FSREQ-20260310-SKILLREFINE-001
+- Feature: FSREQ-20260313-UIOPT-001
 - Stage: 03_plan
-- Design: specs/FSREQ-20260310-SKILLREFINE-001/design.md
+- Design: specs/FSREQ-20260313-UIOPT-001/design.md
 
 ### Design Highlights
-- Design — FSREQ-20260310-SKILLREFINE-001
+- Design — FSREQ-20260313-UIOPT-001
 - 设计概述
-- DS 设计规格
-- DS-SKILLREFINE-001: 代码库架构建模设计
-- DS-SKILLREFINE-002: Skill 深度验证设计
-- DS-SKILLREFINE-003: 全流程健壮性审查设计
-- DS-SKILLREFINE-004: 多视角审计设计
-- DS-SKILLREFINE-005: 优化清单输出设计
+- DS-UIOPT-001: Gate 条件展示逻辑优化
+- DS-UIOPT-002: 覆盖率指标展示精简
+- DS-UIOPT-003: 健康分计算与展示优化
+- 文件修改清单
+- 数据流
+- 非功能需求实现
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
 

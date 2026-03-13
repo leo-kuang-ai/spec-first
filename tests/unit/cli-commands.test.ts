@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleId } from '../../src/cli/commands/id.js';
-import { handleMatrix } from '../../src/cli/commands/matrix.js';
+import { handleMatrix, validateMatrixArgs } from '../../src/cli/commands/matrix.js';
 import { handleAnalyze } from '../../src/cli/commands/analyze.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-cmd');
@@ -80,6 +80,14 @@ describe('handleMatrix', () => {
 
   it('should return error for unknown subcommand', () => {
     expect(handleMatrix(['unknown'])).toBe(2);
+  });
+
+  it('should validate matrix update args before confirmation', () => {
+    expect(validateMatrixArgs(['update', FEAT_ID])).toContain('matrix update <featureId> <id>');
+  });
+
+  it('should require at least one update field for matrix update', () => {
+    expect(validateMatrixArgs(['update', FEAT_ID, 'FR-AUTH-001'])).toContain('至少需要一个更新参数');
   });
 });
 

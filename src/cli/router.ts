@@ -11,15 +11,18 @@ import { parseFlag } from './parse-utils.js';
 
 export type CommandHandler = (args: string[]) => Promise<number> | number;
 type ConfirmationRequirement = boolean | ((args: string[]) => boolean);
+export type ArgsValidator = (args: string[]) => string | undefined;
 
 interface CommandEntry {
   description: string;
   handler: CommandHandler;
   requiresConfirmation?: ConfirmationRequirement;
+  validateArgs?: ArgsValidator;
 }
 
 interface RegisterCommandOptions {
   requiresConfirmation?: ConfirmationRequirement;
+  validateArgs?: ArgsValidator;
 }
 
 const commands = new Map<string, CommandEntry>();
@@ -31,7 +34,12 @@ export function registerCommand(
   handler: CommandHandler,
   options?: RegisterCommandOptions
 ): void {
-  commands.set(name, { description, handler, requiresConfirmation: options?.requiresConfirmation });
+  commands.set(name, {
+    description,
+    handler,
+    requiresConfirmation: options?.requiresConfirmation,
+    validateArgs: options?.validateArgs,
+  });
 }
 
 /** 获取所有已注册命令（用于 help 输出） */
@@ -89,6 +97,12 @@ export async function dispatch(args: string[]): Promise<number> {
   const rawSubArgs = args.slice(1);
   const confirmed = rawSubArgs.includes('--yes');
   const subArgs = rawSubArgs.filter((arg) => arg !== '--yes');
+  const validationError = entry.validateArgs?.(subArgs);
+
+  if (validationError) {
+    console.error(validationError);
+    return ExitCode.VALIDATION_ERROR;
+  }
 
   if (shouldRequireConfirmation(entry.requiresConfirmation, subArgs)) {
     const policy = resolveConfirmPolicy(subArgs);

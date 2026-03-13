@@ -445,11 +445,28 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     document.getElementById('gateTitle').textContent = `${stageLabel(activeStage)} Gate`;
     document.getElementById('deliverableTitle').textContent = `${stageLabel(activeStage)} 产物`;
 
-    renderTable('gateTable', ['id', 'description', 'command'], gates.map((item) => [
-      `<span class="mono">${escapeHtml(item.id || '-')}</span>`,
-      escapeHtml(item.description || '-'),
-      item.command ? `<span class="mono">${escapeHtml(item.command)}</span>` : '<span class="muted">manual</span>',
-    ]));
+    // 使用 Gate 历史数据渲染表格
+    const gateHistory = state.gateStatus?.current?.conditions || [];
+    const gateRows = gates.map((item) => {
+      const history = gateHistory.find(h => h.id === item.id);
+      let statusBadge = '<span class="muted">-</span>';
+      if (history) {
+        if (history.status === 'PASS') {
+          statusBadge = '<span class="ok">[OK]</span>';
+        } else if (history.status === 'WAIVER') {
+          statusBadge = '<span class="ok">[WVR]</span>';
+        } else if (history.status === 'FAIL') {
+          statusBadge = history.blocking ? '<span class="fail">[FAIL]</span>' : '<span class="warn">[WARN]</span>';
+        }
+      }
+      return [
+        `<span class="mono">${escapeHtml(item.id || '-')}</span>`,
+        `${statusBadge} ${escapeHtml(item.description || '-')}`,
+        item.command ? `<span class="mono">${escapeHtml(item.command)}</span>` : '<span class="muted">manual</span>',
+      ];
+    });
+
+    renderTable('gateTable', ['id', 'description', 'command'], gateRows);
 
     renderTable('deliverableTable', ['name', 'required', 'description'], deliverables.map((item) => [
       `<span class="mono">${escapeHtml(item.name || '-')}</span>`,
@@ -633,7 +650,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
   }
 
   function renderHealthDashboard(data) {
-    const { health, coverage } = data;
+    const { health, coverage, profile } = data;
 
     // Health Score
     const score = health?.H1 ?? 0;
@@ -649,17 +666,25 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     progressEl.style.strokeDashoffset = offset;
 
     const gradeColors = {
-      'A': '#2ec27e',
-      'B': '#4ea1ff',
-      'C': '#f5c451',
-      'D': '#f97316',
-      'F': '#ef5c6b',
+      'A': '#2ec27e',  // ≥90 绿色
+      'B': '#f5c451',  // 70-89 黄色
+      'C': '#f5c451',  // 70-89 黄色
+      'D': '#ef5c6b',  // <70 红色
+      'F': '#ef5c6b',  // <70 红色
     };
     progressEl.style.stroke = gradeColors[grade] || '#4ea1ff';
     document.getElementById('healthScoreValue').style.color = gradeColors[grade] || 'var(--text)';
 
-    // Coverage Bars
-    const metricDefs = data.metricDefs || [];
+    // Profile 显示
+    const profileEl = document.getElementById('healthProfile');
+    if (profileEl && profile) {
+      profileEl.textContent = `Profile: ${profile}`;
+      profileEl.style.display = 'block';
+    }
+
+    // Coverage Bars - 只显示核心指标
+    const CORE_METRICS = ['C3', 'C4', 'C6', 'C8', 'C9'];
+    const metricDefs = (data.metricDefs || []).filter(def => CORE_METRICS.includes(def.key));
     const coverageBarsEl = document.getElementById('coverageBars');
     if (metricDefs.length > 0 && coverage) {
       coverageBarsEl.innerHTML = metricDefs.map((def) => {

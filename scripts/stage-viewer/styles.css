@@ -161,6 +161,7 @@
     .value { margin-top: 8px; font-size: 13px; }
     .ok { color: var(--ok); }
     .warn { color: var(--warn); }
+    .fail { color: var(--danger); }
     table {
       width: 100%;
       border-collapse: collapse;

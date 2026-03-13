@@ -73,11 +73,12 @@ Content
     rmSync(testRoot, { recursive: true, force: true });
   });
 
-  it('should FAIL without waiver when C-PRD < 85%', () => {
+  it('should PASS with warning when C-PRD < 85%', () => {
     const result = evaluateGate(featureId, testRoot);
-    expect(result.status).toBe('FAIL');
+    expect(result.status).toBe('PASS');
     const cprdCondition = result.conditions.find((c) => c.id === 'G-SPEC-00');
     expect(cprdCondition?.status).toBe('FAIL');
+    expect(cprdCondition?.blocking).toBe(false);
   });
 
   it('should return scopeFrIds for G-SPEC-00 condition', () => {
@@ -87,8 +88,8 @@ Content
     expect(cprdCondition?.scopeFrIds).toContain('FR-TEST-001');
   });
 
-  it('should PASS_WITH_WAIVER when exception is valid', () => {
-    // 创建已批准的 RFC (.rfc.json 文件)
+  it('should not apply waiver to warning conditions', () => {
+    // 创建已批准的 RFC
     writeFileSync(
       join(featureDir, 'rfc', 'RFC-001.rfc.json'),
       JSON.stringify({
@@ -99,7 +100,6 @@ Content
       })
     );
 
-    // 更新 traceability-matrix.md
     writeFileSync(
       join(featureDir, 'traceability-matrix.md'),
       `| ID | Type | Title | Status |
@@ -109,7 +109,6 @@ Content
 `
     );
 
-    // 创建 known-exceptions.md
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
     writeFileSync(
       join(featureDir, 'known-exceptions.md'),
@@ -119,23 +118,12 @@ Content
 `
     );
 
-    // Debug
-    const rfcStatuses = loadRfcStatuses(featureId, testRoot);
-    const exceptionResult = validateExceptions(featureId, testRoot, rfcStatuses);
-    console.log('Exception frId:', exceptionResult.valid[0]?.frId);
-    console.log('Condition scopeFrIds:', ['FR-TEST-001']);
-
     const result = evaluateGate(featureId, testRoot);
 
-    result.conditions.forEach(c => {
-      console.log(`${c.id}: ${c.status}`);
-    });
-    console.log('Status:', result.status);
-
-    expect(result.status).toBe('PASS_WITH_WAIVER');
+    expect(result.status).toBe('PASS');
     const cprdCondition = result.conditions.find((c) => c.id === 'G-SPEC-00');
-    expect(cprdCondition?.status).toBe('WAIVER');
-    expect(result.waivers).toBeDefined();
-    expect(result.waivers?.[0].rfcId).toBe('RFC-001');
+    expect(cprdCondition?.status).toBe('FAIL');
+    expect(cprdCondition?.blocking).toBe(false);
+    expect(result.waivers).toBeUndefined();
   });
 });

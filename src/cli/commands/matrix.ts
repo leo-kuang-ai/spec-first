@@ -5,6 +5,11 @@
 import { ExitCode } from '../../shared/types.js';
 import { checkMatrix, exportMatrix, updateMatrixRow } from '../../core/trace-engine/matrix.js';
 
+const MATRIX_UPDATE_USAGE =
+  '用法：spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]';
+
+const MATRIX_UPDATE_REQUIRED_ARG_ERROR = '至少需要一个更新参数：--status、--title、--upstream、--downstream';
+
 export function handleMatrix(args: string[]): number {
   const sub = args[0];
   const rest = args.slice(1);
@@ -28,6 +33,25 @@ export function handleMatrix(args: string[]): number {
       console.log('使用 spec-first matrix --help 查看详细帮助');
       return ExitCode.VALIDATION_ERROR;
   }
+}
+
+export function validateMatrixArgs(args: string[]): string | undefined {
+  if (args[0] !== 'update') return undefined;
+
+  const featureId = args[1];
+  const id = args[2];
+  if (!featureId || !id) return MATRIX_UPDATE_USAGE;
+
+  for (let i = 3; i < args.length; i++) {
+    const flag = args[i];
+    const val = args[i + 1];
+    if (!val) continue;
+    if (flag === '--status' || flag === '--title' || flag === '--upstream' || flag === '--downstream') {
+      return undefined;
+    }
+  }
+
+  return MATRIX_UPDATE_REQUIRED_ARG_ERROR;
 }
 
 function printMatrixHelp(): void {
@@ -106,14 +130,15 @@ function handleExport(args: string[]): number {
 }
 
 function handleUpdate(args: string[]): number {
-  const featureId = args[0];
-  const id = args[1];
-  if (!featureId || !id) {
-    console.error(
-      '用法：spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]'
-    );
+  const validationError = validateMatrixArgs(['update', ...args]);
+  if (validationError) {
+    console.error(validationError);
     return ExitCode.VALIDATION_ERROR;
   }
+
+  const featureId = args[0];
+  const id = args[1];
+  if (!featureId || !id) return ExitCode.VALIDATION_ERROR;
 
   const updates: Record<string, unknown> = {};
   for (let i = 2; i < args.length; i++) {
@@ -137,13 +162,10 @@ function handleUpdate(args: string[]): number {
         updates.downstream = val.split(',').map((s) => s.trim());
         i++;
         break;
-    }
+      }
   }
 
-  if (Object.keys(updates).length === 0) {
-    console.error('至少需要一个更新参数：--status、--title、--upstream、--downstream');
-    return ExitCode.VALIDATION_ERROR;
-  }
+  if (Object.keys(updates).length === 0) return ExitCode.VALIDATION_ERROR;
 
   try {
     updateMatrixRow(featureId, process.cwd(), id, updates);

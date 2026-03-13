@@ -44,7 +44,7 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
     description: '最近一次 Gate 结果为 PASS 或 PASS_WITH_WAIVER',
     pass:
       lastGate !== null && (lastGate.status === 'PASS' || lastGate.status === 'PASS_WITH_WAIVER'),
-    detail: lastGate ? `最近 Gate：${lastGate.status}（阶段 ${lastGate.stage}）` : '暂无 Gate 历史',
+    detail: lastGate ? formatGateDetail(lastGate) : '暂无 Gate 历史',
   });
 
   // GL-02: 最终 SCA 通过
@@ -108,6 +108,18 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
     degraded: !pass,
     confirmPolicy: pass ? 'auto' : 'strict',
   };
+}
+
+function formatGateDetail(gateResult: GateResult): string {
+  const warnings = gateResult.conditions.filter(
+    (c) => c.status === 'FAIL' && c.blocking === false
+  );
+  const warningCount = warnings.length;
+
+  if (warningCount > 0) {
+    return `最近 Gate：${gateResult.status}（阶段 ${gateResult.stage}，${warningCount} warnings）`;
+  }
+  return `最近 Gate：${gateResult.status}（阶段 ${gateResult.stage}）`;
 }
 
 function getLastGateResult(featureId: string, projectRoot: string): GateResult | null {

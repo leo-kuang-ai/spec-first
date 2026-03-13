@@ -100,6 +100,14 @@ function saveState(featureId: string, root: string, state: StageState): void {
 
 /**
  * 推进 Feature 到下一阶段
+ *
+ * 完整推进链：
+ * 1. 依赖检查 (checkDependencies) - 验证目标阶段所需产物是否齐全
+ * 2. Gate 校验 (evaluateGate) - 执行 Layer1 内置条件 + Layer2 命令条件
+ * 3. Warning 审计 - 记录非阻塞性失败条件到 findings.md
+ * 4. 状态更新 - 写入 stage-state.json + gate-history.jsonl
+ * 5. 特殊处理 - Context Sync (02_design→03_plan) / Auto-skip (07_release→08_done)
+ *
  * Phase A 降级：GateEngine 未就绪时根据 pilot_mode 决定放行/阻断
  */
 export function advance(
@@ -119,9 +127,10 @@ export function advance(
   assertTransitionAllowed(from, to);
 
   let gateResult: string;
+  const profile = state.mergedRules?.profile ?? 'default-simplified';
 
   // 正常路径：先执行依赖检查，再执行 Gate 校验
-  const depCheck = checkDependencies(featureId, to, projectRoot);
+  const depCheck = checkDependencies(featureId, to, projectRoot, profile);
   if (!depCheck.pass) {
     appendFindings(
       featureId,
@@ -148,6 +157,12 @@ export function advance(
         `WAIVER: ${gate.waivers.map((w) => `${w.exceptionId} (RFC: ${w.rfcId})`).join(', ')}`
       );
     }
+    if (gate.status === 'PASS' || gate.status === 'PASS_WITH_WAIVER') {
+      const warnings = gate.conditions.filter((c) => c.status === 'FAIL' && c.blocking === false);
+      for (const w of warnings) {
+        appendFindings(featureId, projectRoot, `GATE_WARNING: ${w.id} ${w.detail ?? ''}`);
+      }
+    }
   } catch (e) {
     if (e instanceof GateFailedError) {
       throw e;
@@ -169,12 +184,14 @@ export function advance(
     } else {
       // Gate 执行异常时，按不可用降级策略处理
       const config = loadConfig(projectRoot);
+      const errorMsg = e instanceof Error ? e.message : String(e);
+      const errorStack = e instanceof Error ? e.stack : undefined;
       if (config.gate.pilot_mode) {
         gateResult = 'PILOT_PASS';
         appendFindings(
           featureId,
           projectRoot,
-          `PILOT_PASS: ${from} → ${to} (gate runtime error, pilot_mode=true)`
+          `PILOT_PASS: ${from} → ${to} (gate runtime error: ${errorMsg}${errorStack ? '\nStack: ' + errorStack : ''})`
         );
       } else {
         throw new GateUnavailableError(

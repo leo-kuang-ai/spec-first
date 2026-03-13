@@ -30,7 +30,7 @@ describe('dependency-checker', () => {
   it('should detect missing npm scripts', () => {
     writeFileSync(join(TEST_ROOT, 'package.json'), JSON.stringify({ scripts: {} }));
 
-    const result = checkDependencies(FEATURE_ID, Stage.IMPLEMENT, TEST_ROOT);
+    const result = checkDependencies(FEATURE_ID, Stage.IMPLEMENT, TEST_ROOT, 'strict');
     expect(result.pass).toBe(false);
     expect(result.missing).toContain('npm script: test');
     expect(result.missing).toContain('npm script: build');
@@ -49,8 +49,23 @@ describe('dependency-checker', () => {
 
   it('should detect missing smoke test report', () => {
     // 配置中 RELEASE 阶段检查 contract:check 脚本
-    const result = checkDependencies(FEATURE_ID, Stage.RELEASE, TEST_ROOT);
+    const result = checkDependencies(FEATURE_ID, Stage.RELEASE, TEST_ROOT, 'strict');
     expect(result.pass).toBe(false);
     expect(result.missing).toContain('npm script: contract:check');
+  });
+
+  it('should skip npm scripts in default-simplified profile', () => {
+    writeFileSync(join(TEST_ROOT, 'package.json'), JSON.stringify({ scripts: {} }));
+
+    const result = checkDependencies(FEATURE_ID, Stage.IMPLEMENT, TEST_ROOT, 'default-simplified');
+    expect(result.pass).toBe(true);
+    expect(result.missing).toHaveLength(0);
+  });
+
+  it('should use default-simplified profile by default', () => {
+    writeFileSync(join(TEST_ROOT, 'package.json'), JSON.stringify({ scripts: {} }));
+
+    const result = checkDependencies(FEATURE_ID, Stage.IMPLEMENT, TEST_ROOT);
+    expect(result.pass).toBe(true);
   });
 });

@@ -74,7 +74,7 @@ describe('handleGate', () => {
     expect(code).toBe(ExitCode.IO_ERROR);
   });
 
-  it('should print actionable fix steps for C11 failures', () => {
+  it('should print actionable fix steps for C11 warnings', () => {
     writeState('02_design');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'design.md'),
@@ -87,7 +87,7 @@ describe('handleGate', () => {
     try {
       const code = withCwd(TMP, () => handleGate(['check', FEAT]));
       const output = logSpy.mock.calls.flat().join('\n');
-      expect(code).toBe(ExitCode.VALIDATION_ERROR);
+      expect(code).toBe(ExitCode.SUCCESS);
       expect(output).toContain('可执行修复步骤：');
       expect(output).toContain(`create specs/${FEAT}/constitution.md`);
     } finally {
@@ -96,7 +96,7 @@ describe('handleGate', () => {
     }
   });
 
-  it('should persist C11 fix steps to findings.md for audit', () => {
+  it('should persist C11 warnings to findings.md for audit', () => {
     writeState('02_design');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'design.md'),
@@ -108,7 +108,7 @@ describe('handleGate', () => {
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
       const code = withCwd(TMP, () => handleGate(['check', FEAT]));
-      expect(code).toBe(ExitCode.VALIDATION_ERROR);
+      expect(code).toBe(ExitCode.SUCCESS);
     } finally {
       logSpy.mockRestore();
       errSpy.mockRestore();

@@ -246,6 +246,7 @@ function getGateStatus(projectRoot, featureId) {
         description: c.description,
         status: c.status,
         detail: c.detail,
+        blocking: c.blocking !== false,
       })),
       lastCheck: lastEntry.timestamp || null,
     };
@@ -449,11 +450,14 @@ const server = createServer((req, res) => {
     const defectStats = getDefectStats(projectRoot, featureId);
     const escapeRate = defectStats.total > 0 ? 0 : 0; // 简化：实际应从缺陷发现阶段计算
     const health = calcHealthScore(coverage, escapeRate);
+    const state = loadFeature(projectRoot, featureId);
+    const profile = state?.mergedRules?.profile || 'default-simplified';
 
     sendJson(res, 200, {
       featureId,
       coverage,
       health,
+      profile,
       metricDefs: METRIC_DEFS,
       now: new Date().toISOString(),
     });

@@ -2,16 +2,19 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { mergeLayerRules } from '../../src/core/process-engine/layer-merger.js';
+import { resetConfigCache } from '../../src/shared/config-schema.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-merger');
 const L2_DIR = join(TMP, '.spec-first', 'layer2');
 
 beforeEach(() => {
   mkdirSync(L2_DIR, { recursive: true });
+  resetConfigCache();
 });
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
+  resetConfigCache();
 });
 
 function writeYaml(platform: string, content: string): void {
@@ -24,9 +27,23 @@ describe('mergeLayerRules', () => {
       const result = mergeLayerRules('N', 'S', [], TMP);
       expect(result.mode).toBe('N');
       expect(result.size).toBe('S');
+      expect(result.profile).toBe('default-simplified');
       expect(result.gateConditions['01_specify']).toHaveLength(1);
       expect(result.deliverables['01_specify']).toHaveLength(1);
       expect(result.deliverables['01_specify'][0].name).toBe('spec.md');
+    });
+
+    it('should inherit gate.profile from config', () => {
+      mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+      writeFileSync(
+        join(TMP, '.spec-first', 'meta', 'config.yaml'),
+        'gate:\n  profile: strict\n',
+        'utf-8'
+      );
+      resetConfigCache(TMP);
+
+      const result = mergeLayerRules('N', 'S', [], TMP);
+      expect(result.profile).toBe('strict');
     });
   });
 

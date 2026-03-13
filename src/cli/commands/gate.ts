@@ -7,6 +7,7 @@ import {
   evaluateGate,
   getConditions,
   getGateHistory,
+  getProjectTypeFromConstitution,
 } from '../../core/gate-engine/gate-evaluator.js';
 import { checkGoLive } from '../../core/gate-engine/golive.js';
 import { readJson, exists } from '../../shared/fs-utils.js';
@@ -41,6 +42,15 @@ export function handleGoLive(args: string[]): number {
 
 // ─── Subcommand Handlers ─────────────────────────────────
 
+function formatConditionStatus(condition: ConditionResult): string {
+  if (condition.status === 'PASS') return '\x1b[32m[OK]\x1b[0m';
+  if (condition.status === 'WAIVER') return '\x1b[36m[WVR]\x1b[0m';
+  if (condition.status === 'FAIL' && condition.blocking === false) {
+    return '\x1b[33m[WARN]\x1b[0m';
+  }
+  return '\x1b[31m[FAIL]\x1b[0m';
+}
+
 function handleCheck(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {
@@ -55,8 +65,8 @@ function handleCheck(args: string[]): number {
     console.log(`结果：${result.status}\n`);
 
     for (const c of result.conditions) {
-      const icon = c.status === 'PASS' ? '[OK]' : c.status === 'WAIVER' ? '[WVR]' : '[FAIL]';
-      console.log(`  ${icon.padEnd(7)} ${c.description}`);
+      const icon = formatConditionStatus(c);
+      console.log(`  ${icon.padEnd(16)} ${c.description}`);
       if (c.detail) console.log(`          ${c.detail}`);
     }
 
@@ -73,7 +83,7 @@ function handleCheck(args: string[]): number {
       }
     }
 
-    if (result.status === 'FAIL' && fixSteps.length > 0) {
+    if (fixSteps.length > 0) {
       appendFixStepsToFindings(featureId, cwd, result.conditions, fixSteps);
       console.log(`\n审计留痕：已同步修复步骤到 specs/${featureId}/findings.md`);
     }
@@ -123,7 +133,9 @@ function handleConditions(args: string[]): number {
   }
 
   const state = readJson<StageState>(statePath);
-  const defs = getConditions(state.currentStage);
+  const projectType = getProjectTypeFromConstitution(featureId, cwd);
+  const profile = state.mergedRules?.profile ?? 'default-simplified';
+  const defs = getConditions(state.currentStage, projectType, profile);
 
   console.log(`Gate 条件 — ${featureId} (${state.currentStage})\n`);
   for (const d of defs) {
@@ -205,7 +217,14 @@ function appendFixStepsToFindings(
 ): void {
   const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
   const failedConditions = conditions
-    .filter((condition) => condition.status === 'FAIL')
+    .filter((condition) => condition.status === 'FAIL' && condition.blocking !== false)
+    .map(
+      (condition) =>
+        `${condition.id}: ${condition.description}${condition.detail ? ` (${condition.detail})` : ''}`
+    );
+
+  const warnings = conditions
+    .filter((condition) => condition.status === 'FAIL' && condition.blocking === false)
     .map(
       (condition) =>
         `${condition.id}: ${condition.description}${condition.detail ? ` (${condition.detail})` : ''}`
@@ -218,6 +237,9 @@ function appendFixStepsToFindings(
     '### Failed Conditions',
     ...(failedConditions.length > 0 ? failedConditions.map((item) => `- ${item}`) : ['- (none)']),
     '',
+    ...(warnings.length > 0
+      ? ['### Warnings', ...warnings.map((item) => `- ${item}`), '']
+      : []),
     '### Actionable Fix Steps',
     ...fixSteps.map((step, index) => `${index + 1}. ${step}`),
     '',

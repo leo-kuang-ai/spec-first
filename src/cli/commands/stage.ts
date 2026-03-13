@@ -174,7 +174,12 @@ function handleSuggest(args: string[]): number {
           ? evaluateGate(featureId, projectRoot, { persist: false }).status
           : undefined,
       dependencyCheck: upcomingStage
-        ? checkDependencies(featureId, upcomingStage, projectRoot)
+        ? checkDependencies(
+            featureId,
+            upcomingStage,
+            projectRoot,
+            state.mergedRules?.profile ?? 'default-simplified'
+          )
         : undefined,
       todoState: loadTodoState(featureId, projectRoot),
     });

@@ -37,11 +37,12 @@ describe('loadConfig', () => {
   it('should merge user values with defaults', () => {
     writeFileSync(
       join(META_DIR, 'config.yaml'),
-      'gate:\n  pilot_mode: false\nruntime:\n  kv_cache_hard_gate: true\n',
+      'gate:\n  pilot_mode: false\n  profile: strict\nruntime:\n  kv_cache_hard_gate: true\n',
       'utf-8',
     );
     const cfg = loadConfig(TMP);
     expect(cfg.gate.pilot_mode).toBe(false);
+    expect(cfg.gate.profile).toBe('strict');
     expect(cfg.catchup.trigger).toBe('prompt');
     expect(cfg.runtime.kv_cache_hard_gate).toBe(true);
   });

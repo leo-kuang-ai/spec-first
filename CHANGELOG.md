@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.96 2026-03-13 Claude: fix(viewer): Stage Viewer 指标模型与 CLI 对齐 - health-utils.js 更新为核心 5 指标（C3/C4/C6/C8/C9）和新权重（0.25/0.20/0.25/0.15/0.15），移除 C1/C2/C5/C7 计算逻辑，与 CLI default-simplified 模式保持一致
+- v0.5.95 2026-03-13 Claude: fix(gate): 修复 warning 被写入 Failed Conditions - appendFixStepsToFindings 函数过滤 blocking: false 条件，将 warning 单独记录到 Warnings 部分，Failed Conditions 仅包含真正阻断的失败项
+- v0.5.94 2026-03-13 Claude: fix(metrics): 修正 C3/C6/C8/C9 目标阈值为 100% - 将 METRIC_DEFS 中 C3/C6/C8/C9 的 target 从 0.8 改为 1.0，与 Gate 要求保持一致
+- v0.5.93 2026-03-13 Claude: fix(gate): 完善错误堆栈记录 - advance.ts Gate 异常捕获时记录完整 error.stack 到 findings.md，gate-evaluator.ts getGateHistory 解析失败时输出错误堆栈到 console.error，便于生产问题追溯
+- v0.5.92 2026-03-13 Claude: refactor(gate): 拆分 gate-evaluator.ts 为 3 个模块 - 将 908 行的 gate-evaluator.ts 拆分为：gate-evaluator.ts (207行，核心评估逻辑)、condition-registry.ts (386行，条件定义表)、constitution-validator.ts (346行，C11校验逻辑)，保持所有导出接口向后兼容，所有测试通过
+- v0.5.91 2026-03-12 Claude: test(gate): 新增 warning 语义、blocking 字段、waiver 匹配、profile 切换测试 - 单元测试新增 warning 不阻断、waiver 不匹配 warning、blocking 字段持久化测试，集成测试新增完整推进链和 profile 规则测试，E2E 测试新增 CLI 输出和 gate-history 持久化测试，修复 gate-waiver 和 gate-cli 测试以适配 warning 语义
+- v0.5.90 2026-03-13 Claude: docs(profile): 新增 Profile 配置说明文档 - 创建 docs/07-用户文档/Profile配置说明.md，说明 default-simplified 和 strict 两种模式的区别、使用场景、配置方式（当前版本为全局默认值） (user-visible)
+- v0.5.89 2026-03-12 Claude: feat(metrics): health-score 和 bottleneck 支持 profile 参数 - calcHealthScore 新增 profile 参数（默认 'default-simplified'），新增 STRICT_WEIGHTS 权重配置（C1-C9 全覆盖），detectBottlenecks 新增 profile 参数，根据 profile 动态选择检测指标集合
+- v0.5.88 2026-03-12 Claude: feat(gate): Gate 条件支持 profile 与 projectType 双维过滤 - getConditions 函数新增 profile 参数，evaluateGate 从 mergedRules 读取 profile 并传递，导出 getProjectTypeFromConstitution 函数供外部使用
+- v0.5.87 2026-03-12 Claude: feat(layer-merger): 扩展类型支持 profile 字段 - StageState.mergedRules 新增 profile 字段（'default-simplified' | 'strict'），MergedRules 接口新增 profile 字段，mergeLayerRules 默认返回 profile: 'default-simplified'
+- v0.5.86 2026-03-12 Claude: feat(dependency-checker): 支持 profile 参数 - checkDependencies 新增 profile 参数（默认 'default-simplified'），filterDefaultDependencies 函数过滤 npmScripts/envVars，strict profile 保留全部检查项，更新 3 个调用点传递 profile，新增测试覆盖
+- v0.5.85 2026-03-12 Claude: feat(metrics): coverage 命令默认显示 5 核心指标，GoLive 显示 warning 数量 - metrics.ts 添加 core 标记（C3/C4/C6/C8/C9），新增 --all 选项显示全部指标，golive.ts 新增 formatGateDetail 函数统计 warning 数量 (user-visible)
+- v0.5.84 2026-03-12 Claude: refactor(metrics): 健康度和瓶颈分析只使用默认 5 指标 - health-score.ts 权重调整为 C3/C4/C6/C8/C9（0.25/0.20/0.25/0.15/0.15），bottleneck.ts 规则映射为 R1:C3/R2:C4/R3:C6/R4:C8/R5:C9，移除 C1/C2/C5/C7 依赖 (user-visible)
+- v0.5.83 2026-03-12 Claude: feat(gate): gate-history.jsonl 持久化 blocking 字段 - 确保历史记录包含 blocking 字段，兼容旧格式读取（blocking 可选）
+- v0.5.82 2026-03-12 Claude: feat(gate): CLI 支持 [WARN] 标识与颜色 - 新增 formatConditionStatus 函数，warning 条件显示黄色 [WARN]，PASS 绿色，FAIL 红色，WAIVER 青色 (user-visible)
+- v0.5.81 2026-03-12 Claude: feat(gate): 支持 warning 级别条件 - GateConditionDef 新增 blocking 字段，waiver 只匹配 blocking failures，warning (blocking=false) 不影响 PASS/FAIL 判定
+- v0.5.80 2026-03-12 Claude: refactor(gate): 删除重复 Gate 定义 - 移除 G-DESIGN-02 (C2)、G-IMPL-02 (C7)、G-VERIFY-02 (C5)，避免与 Layer2 动态 Gate 重复校验
 - v0.5.79 2026-03-11 Claude: feat(dispatcher): runtime 缺失时自动降级到 docs/first - 新增 parseStageSummaryFromDocs/parseRoleSummaryFromDocs 辅助函数（支持中英文格式），8 个 build*RuntimeNotice 函数添加 docs 降级逻辑（spec/design/code/verify/onboarding），统一字段命名为 snake_case（background_input_status/data_source），新增 data_source 字段标识数据来源（runtime/docs），最小侵入式实现（0 新增文件，~50 行代码） (user-visible)
 - v0.5.78 2026-03-11 Claude: fix(auto-loop): 重试退避机制生效 (F-07) - TodoItem 新增 resumeAt 字段，pickReadyTodos 过滤未到恢复时间的任务，重试时设置 resumeAt = Date.now() + backoffMs，修复退避只记录不等待的问题 (user-visible)
 - v0.5.77 2026-03-11 Claude: fix(tests): 统一测试中的 ID 格式规范 (F-08) - 将测试文件中的 REQ-PRD-* 格式统一为 REQ-* 格式（REQ-AUTH-001），修正 REQ ID 格式（必须有模块名部分），涉及的测试文件：validate-command.test.ts、analyze-background-quality.test.ts、gate-evaluator.test.ts、sca-security.test.ts
@@ -480,3 +497,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 建议补充 P0 级节点：Test-Design, Test-Execution, UAT, Deployment, API-Design (user-visible)
 - v0.5.46 2026-03-06 Claude: feat(gate): 项目类型感知的 Gate 规则，CSS-only/frontend 项目豁免测试覆盖率检查 (user-visible)
 - v0.5.47 2026-03-06 Claude: fix(gate): Matrix 终态检查支持 done 状态，修复 upstream-lineage API 调用 (user-visible)
+- v0.5.91 2026-03-12 Claude: docs(review): 完成全链路优化代码审查 - 42个任务全部完成，1439个测试通过，生成完整审查报告 (user-visible)
+- v0.5.92 2026-03-12 Claude: review(deep): 完成三维度深度审查（架构85分+安全85分+质量82分），综合评分84分A-级，可部署 (user-visible)
+- v0.5.97 2026-03-12 Claude: test(stage-viewer): 修复测试用例以匹配新的核心指标模型（C3/C4/C6/C8/C9）

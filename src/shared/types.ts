@@ -85,6 +85,7 @@ export interface StageState {
   lastVerifiedAt?: string;
   lastSuggestedCommand?: string;
   mergedRules?: {
+    profile?: 'default-simplified' | 'strict';
     gateConditions: Record<string, unknown[]>;
     deliverables: Record<string, unknown[]>;
     thresholds: Record<
@@ -110,6 +111,8 @@ export interface ConditionResult {
   detail?: string;
   /** 与该条件失败直接相关的 FR 列表，用于精确豁免匹配 */
   scopeFrIds?: string[];
+  /** false 表示 warning-only，不阻塞流程；默认 true */
+  blocking?: boolean;
 }
 
 export interface WaiverRef {
@@ -206,13 +209,13 @@ export interface MatrixRow {
 
 // ─── 覆盖率指标 ───────────────────────────────────────────
 export interface CoverageMetrics {
-  C1: number; // Design Coverage
-  C2: number; // API Coverage
+  C1: number; // @deprecated 已下线，保留字段兼容
+  C2: number; // @deprecated 已下线，保留字段兼容
   C3: number; // Task Coverage
   C4: number; // Test Coverage (FR)
-  C5: number; // Test Coverage (AC)
+  C5: number; // @deprecated 已下线，保留字段兼容
   C6: number; // Impl Coverage
-  C7: number; // PR Compliance
+  C7: number; // @deprecated 已下线，保留字段兼容
   C8: number; // Task Compliance
   C9: number; // TC Compliance
 }

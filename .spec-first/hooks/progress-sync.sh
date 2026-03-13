@@ -6,22 +6,14 @@ set -eu
 
 # 跨平台项目根目录发现
 find_root() {
-  # 方法1: 向上查找包含 specs/ 目录的项目根
   dir="$(pwd)"
   while [ "$dir" != "/" ] && [ -n "$dir" ]; do
-    # 检查是否为真正的项目根（同时有 .spec-first 和 specs 目录）
-    if [ -d "$dir/.spec-first" ] && [ -d "$dir/specs" ]; then
-      printf '%s' "$dir"
-      return 0
-    fi
+    [ -d "$dir/.spec-first" ] && printf '%s' "$dir" && return 0
     parent="$(dirname "$dir")"
     [ "$parent" = "$dir" ] && break
     dir="$parent"
   done
-  # 方法2: Git root (Windows Git Bash / macOS / Linux)
-  if git rev-parse --show-toplevel 2>/dev/null; then
-    return 0
-  fi
+  git rev-parse --show-toplevel 2>/dev/null && return 0
   return 1
 }
 

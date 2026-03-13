@@ -8,6 +8,7 @@ import yaml from 'js-yaml';
 import type { Mode, Size } from '../../shared/types.js';
 import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 import { exists } from '../../shared/fs-utils.js';
+import { loadConfig } from '../../shared/config-schema.js';
 import { loadEnabledExtensions } from './extensions.js';
 
 // ─── 合并结果类型 ─────────────────────────────────────────
@@ -32,6 +33,7 @@ export interface ThresholdEntry {
 }
 
 export interface MergedRules {
+  profile?: 'default-simplified' | 'strict';
   mode: Mode;
   size: Size;
   platforms: string[];
@@ -522,6 +524,7 @@ export function mergeLayerRules(
   platforms: string[],
   projectRoot: string
 ): MergedRules {
+  const config = loadConfig(projectRoot);
   // Layer 0: 基线
   const gates = layer0Gates();
   const deliverables = layer0Deliverables();
@@ -542,6 +545,7 @@ export function mergeLayerRules(
   applyLayer3(gates, deliverables, thresholds, projectRoot);
 
   return {
+    profile: config.gate.profile,
     mode,
     size,
     platforms,

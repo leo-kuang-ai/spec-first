@@ -16,12 +16,13 @@ function withCwd(dir: string, fn: () => unknown): unknown {
   try { return fn(); } finally { process.cwd = orig; }
 }
 
-function writeState(stage: string, mode = 'N', size = 'M') {
+function writeState(stage: string, mode = 'N', size = 'M', mergedRules: Record<string, unknown> = {}) {
   writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), JSON.stringify({
     featureId: FEAT, mode, size, platforms: ['h5'],
     currentStage: stage, history: [], terminal: false,
     createdAt: '2026-02-11T00:00:00Z',
     updatedAt: '2026-02-11T00:00:00Z',
+    mergedRules,
   }));
 }
 
@@ -93,6 +94,18 @@ describe('getConditions', () => {
     for (const s of [Stage.INIT, Stage.SPECIFY, Stage.DESIGN, Stage.PLAN, Stage.IMPLEMENT, Stage.VERIFY, Stage.WRAP_UP, Stage.RELEASE]) {
       expect(getConditions(s).length).toBeGreaterThan(0);
     }
+  });
+
+  it('should skip test-related built-in gates for frontend projects', () => {
+    expect(getConditions(Stage.IMPLEMENT, 'frontend')).toEqual([]);
+    expect(getConditions(Stage.VERIFY, 'frontend').map((c) => c.id)).toEqual(['G-VERIFY-03']);
+  });
+
+  it('should upgrade warning conditions to blocking in strict profile', () => {
+    const conds = getConditions(Stage.SPECIFY, undefined, 'strict');
+    const warning = conds.find((c) => c.id === 'G-SPEC-00');
+    expect(warning?.blocking).toBe(true);
+    expect(warning?.description.includes('(warning)')).toBe(false);
   });
 });
 
@@ -532,5 +545,103 @@ describe('evaluateGate', () => {
 describe('getGateHistory', () => {
   it('should return empty array when no history file', () => {
     expect(getGateHistory(FEAT, TMP)).toEqual([]);
+  });
+
+  it('should persist blocking field in gate-history.jsonl', () => {
+    writeState('01_specify');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] Item1\n- [ ] Item2\n');
+
+    evaluateGate(FEAT, TMP);
+    const history = getGateHistory(FEAT, TMP);
+
+    expect(history).toHaveLength(1);
+    const warningCond = history[0].conditions.find(c => c.id === 'G-SPEC-00');
+    const blockingCond = history[0].conditions.find(c => c.id === 'G-SPEC-01');
+
+    expect(warningCond?.blocking).toBe(false);
+    expect(blockingCond?.blocking).toBe(true);
+  });
+
+  it('should read legacy history without blocking field', () => {
+    writeState('00_init');
+    const legacyEntry = {
+      status: 'PASS',
+      stage: '00_init',
+      timestamp: '2026-03-12T00:00:00Z',
+      conditions: [
+        { id: 'G-INIT-01', description: 'Test', status: 'PASS' }
+      ]
+    };
+
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'gate-history.jsonl'),
+      JSON.stringify(legacyEntry) + '\n'
+    );
+
+    const history = getGateHistory(FEAT, TMP);
+    expect(history).toHaveLength(1);
+    expect(history[0].conditions[0].blocking).toBeUndefined();
+  });
+});
+
+describe('warning semantics', () => {
+  it('should PASS stage when only warning conditions fail', () => {
+    writeState('01_specify');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] Item1\n- [ ] Item2\n');
+
+    const result = evaluateGate(FEAT, TMP);
+    expect(result.status).toBe('PASS');
+
+    const warningCond = result.conditions.find(c => c.id === 'G-SPEC-03');
+    expect(warningCond?.status).toBe('FAIL');
+    expect(warningCond?.blocking).toBe(false);
+  });
+
+  it('should not apply waiver to warning conditions', () => {
+    writeState('01_specify');
+    writeFileSync(join(TMP, 'specs', FEAT, 'prd.md'), '# PRD\n## 1. 业务目标\nTest');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] Item1\n- [ ] Item2\n');
+
+    mkdirSync(join(TMP, 'specs', FEAT, 'exceptions'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'exceptions', 'EX-001.md'),
+      '---\nid: EX-001\nfrId: FR-AUTH-001\nrfcId: RFC-001\nexpiresAt: 2026-12-31\n---\n# Exception',
+      'utf-8'
+    );
+
+    const result = evaluateGate(FEAT, TMP);
+    const warningCond = result.conditions.find(c => c.id === 'G-SPEC-03');
+    expect(warningCond?.status).toBe('FAIL');
+    expect(result.waivers).toBeUndefined();
+  });
+
+  it('should show warnings in suggestions when present', () => {
+    writeState('01_specify');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] Item1\n- [ ] Item2\n');
+
+    const result = evaluateGate(FEAT, TMP);
+    expect(result.status).toBe('PASS');
+    expect(result.suggestions).toBeUndefined();
+  });
+
+  it('should FAIL in strict profile when warning-only condition fails', () => {
+    writeState('01_specify', 'N', 'M', { profile: 'strict' });
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeMatrix('| FR-AUTH-001 | FR | Login | Planned |  |  |\n');
+    writeSpecReview('- [x] Item1\n- [ ] Item2\n');
+
+    const result = evaluateGate(FEAT, TMP);
+    const cond = result.conditions.find((c) => c.id === 'G-SPEC-00');
+    expect(cond?.status).toBe('FAIL');
+    expect(cond?.blocking).toBe(false);
+    expect(result.status).toBe('PASS');
   });
 });

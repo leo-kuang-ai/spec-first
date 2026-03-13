@@ -208,8 +208,8 @@ featureId: ${FEAT}
 describe('getDefaultMetrics', () => {
   it('should return default metrics when no matrix file', () => {
     const metrics = getDefaultMetrics(FEAT, TMP);
-    expect(metrics.C1).toBe(0);
-    expect(metrics.C7).toBe(1); // 默认合规率为 1
+    expect(metrics.C3).toBe(0);
+    expect(metrics.C8).toBe(1); // 默认合规率为 1
   });
 
   it('should calculate coverage from traceability matrix', () => {
@@ -226,7 +226,6 @@ describe('getDefaultMetrics', () => {
     const metrics = getDefaultMetrics(FEAT, TMP);
 
     // FR: 3, DS: 3, TASK: 4, TC: 2
-    expect(metrics.C1).toBe(1); // 3/3 DS/FR
     expect(metrics.C3).toBe(1); // 4/3 TASK/FR = 1.33 -> capped at 1
     expect(metrics.C4).toBeCloseTo(2/3, 2); // 2/3 TC/FR
   });
@@ -317,19 +316,20 @@ describe('calcHealthScore', () => {
       C5: 1, C6: 1, C7: 1, C8: 1, C9: 1,
     };
     const result = calcHealthScore(coverage, 0.5); // 50% escape rate
+    // base = 100 (all core metrics = 1)
     // penalty = min(0.5 * 200, 50) = 50
     expect(result.H1).toBe(50); // 100 - 50 = 50
     expect(result.grade).toBe('F');
   });
 
   it('should handle partial coverage data', () => {
-    const coverage = { C1: 1, C4: 1 }; // only 2 metrics
+    const coverage = { C3: 1, C4: 1 }; // only 2 metrics
     const result = calcHealthScore(coverage);
-    // C1: 1 * 0.12 = 0.12
-    // C4: 1 * 0.15 = 0.15
+    // C3: 1 * 0.25 = 0.25
+    // C4: 1 * 0.20 = 0.20
     // others: 0
-    // total = 0.27 * 100 = 27
-    expect(result.H1).toBe(27);
+    // total = 0.45 * 100 = 45
+    expect(result.H1).toBe(45);
     expect(result.grade).toBe('F');
   });
 
@@ -339,8 +339,8 @@ describe('calcHealthScore', () => {
       C5: 1, C6: 1, C7: 1, C8: 1, C9: 1,
     };
     const result = calcHealthScore(coverage);
-    expect(result.breakdown.C1).toBe(12); // 1 * 0.12 * 100
-    expect(result.breakdown.C4).toBe(15); // 1 * 0.15 * 100
-    expect(result.breakdown.C6).toBe(13); // 1 * 0.13 * 100
+    expect(result.breakdown.C3).toBe(25); // 1 * 0.25 * 100
+    expect(result.breakdown.C4).toBe(20); // 1 * 0.20 * 100
+    expect(result.breakdown.C6).toBe(25); // 1 * 0.25 * 100
   });
 });

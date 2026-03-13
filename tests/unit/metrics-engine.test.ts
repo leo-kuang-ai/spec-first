@@ -2,7 +2,7 @@
  * M6 MetricsEngine 单元测试
  * Health Score + Bottleneck + Metrics CLI
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { calcHealthScore } from '../../src/core/metrics-engine/health-score.js';
@@ -54,8 +54,7 @@ describe('calcHealthScore', () => {
     const result = calcHealthScore(coverage, 5, 0.05);
     // penalty = 0.05 * 200 = 10
     expect(result.H1).toBe(90);
-    // 浮点精度: weights 之和 ≈ 0.9999..., raw H1 ≈ 89.999, grade 按 raw 值判定
-    expect(result.grade).toBe('B');
+    expect(result.grade).toBe('A');
   });
 
   it('should cap penalty at 50', () => {
@@ -84,8 +83,9 @@ describe('calcHealthScore', () => {
     const coverage = makeCoverage();
     const result = calcHealthScore(coverage, 0, 0);
     expect(result.breakdown).toBeDefined();
-    expect(Object.keys(result.breakdown)).toContain('C1');
+    expect(Object.keys(result.breakdown)).toContain('C3');
     expect(Object.keys(result.breakdown)).toContain('C9');
+    expect(Object.keys(result.breakdown)).toHaveLength(5);
   });
 });
 
@@ -98,12 +98,13 @@ describe('detectBottlenecks', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('should detect R1 design bottleneck', () => {
-    const coverage = makeCoverage({ C1: 0.3 });
+  it('should detect R1 task bottleneck', () => {
+    const coverage = makeCoverage({ C3: 0.3 });
     const result = detectBottlenecks(coverage);
     const r1 = result.find(b => b.rule === 'R1');
     expect(r1).toBeDefined();
     expect(r1!.severity).toBe('high');
+    expect(r1!.description).toContain('task coverage');
   });
 
   it('should detect R2 test bottleneck', () => {
@@ -125,17 +126,26 @@ describe('detectBottlenecks', () => {
   });
 
   it('should detect R4 compliance gap', () => {
-    const coverage = makeCoverage({ C7: 0.6 });
+    const coverage = makeCoverage({ C8: 0.6 });
     const result = detectBottlenecks(coverage);
     const r4 = result.find(b => b.rule === 'R4');
     expect(r4).toBeDefined();
     expect(r4!.severity).toBe('medium');
   });
 
-  it('should detect multiple bottlenecks', () => {
-    const coverage = makeCoverage({ C1: 0.3, C4: 0.3, C6: 0.4, C7: 0.5 });
+  it('should detect R5 test traceability gap', () => {
+    const coverage = makeCoverage({ C9: 0.5 });
     const result = detectBottlenecks(coverage);
-    expect(result.length).toBeGreaterThanOrEqual(4);
+    const r5 = result.find(b => b.rule === 'R5');
+    expect(r5).toBeDefined();
+    expect(r5!.severity).toBe('medium');
+    expect(r5!.description).toContain('test compliance');
+  });
+
+  it('should detect multiple bottlenecks', () => {
+    const coverage = makeCoverage({ C3: 0.3, C4: 0.3, C6: 0.4, C8: 0.5 });
+    const result = detectBottlenecks(coverage);
+    expect(result.length).toBe(4);
   });
 });
 
@@ -162,6 +172,36 @@ describe('calcGateFirstPassRate', () => {
 // ─── Metrics CLI Tests ──────────────────────────────────
 
 describe('handleMetrics', () => {
+  it('should hide archived metrics in default-simplified report', () => {
+    writeFileSync(
+      join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
+      JSON.stringify({
+        featureId: 'FEAT-TEST',
+        currentStage: '03_plan',
+        mergedRules: { profile: 'default-simplified' },
+      }),
+      'utf-8'
+    );
+    writeFileSync(
+      join(TMP, 'specs', 'FEAT-TEST', 'traceability-matrix.md'),
+      '| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n| FR-AUTH-001 | FR | Test | Planned |  | TASK-AUTH-001,TC-UT-AUTH-001 |\n| TASK-AUTH-001 | TASK | Task | Planned | FR-AUTH-001 |  |\n| TC-UT-AUTH-001 | TC | Test | Planned | FR-AUTH-001 |  |\n',
+      'utf-8'
+    );
+
+    const logs: string[] = [];
+    const spy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
+      logs.push(String(msg ?? ''));
+    });
+    try {
+      const code = withCwd(TMP, () => handleMetrics(['report', 'FEAT-TEST']));
+      expect(code).toBe(ExitCode.SUCCESS);
+      expect(logs.join('\n')).not.toContain('C1 设计覆盖率');
+      expect(logs.join('\n')).toContain('已隐藏历史参考指标');
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it('should return VALIDATION_ERROR without subcommand', () => {
     const code = withCwd(TMP, () => handleMetrics([]));
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
