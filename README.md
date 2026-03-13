@@ -1,4 +1,7 @@
-# Spec-First — AI 时代的规范驱动研发流程引擎
+# Spec-First — AI Workflow Engine for Spec-Driven Development
+
+> **Spec-First** is an AI workflow CLI for spec-driven development.
+> Features: quality gates · requirements traceability · feature lifecycle · SDLC automation · AI coding orchestration.
 
 ![Spec-First Banner](ui-image.png)
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.0.1 2026-03-13 Claude: chore: 版本号升级至 1.0.1 (user-visible)
+- v0.5.78 2026-03-13 Claude: chore(package): 补充 repository/homepage/bugs/author 字段，提升 npms.io 质量分与维护性评分 (user-visible)
+- v0.5.78 2026-03-13 Claude: chore(seo): 优化 npm SEO — 改写 package.json description 嵌入核心关键词，README H1 改为英文并添加英文摘要行 (user-visible)
+- v0.5.78 2026-03-13 Claude: chore(package): 优化 npm keywords，从 4 个扩展至 10 个，覆盖 ai-workflow/quality-gates/sdlc 等高搜索量词 (user-visible)
 - v0.5.109 2026-03-13 Claude: feat(viewer): Stage Viewer 深度优化与修复 - 修复阶段耗时分布计算（优先使用 stage_advance 事件时间，终态阶段使用 advance 时间而非 new Date()）；Gate/产物表格优化（表头中文化、状态独立列、检查方式本地化）；修复历史阶段 Gate 状态显示（getAllStageGateStatus 返回 conditions，前端根据 activeStage 匹配）；Gate 检查项描述中文化（新增 GATE_DESC_CN 映射）；详情文本自动换行完整展示；终态阶段覆盖率指标 fallback（metricTargets 为空时填入目标值） (user-visible)
 - v0.5.108 2026-03-13 Claude: refactor(process-engine): 编排决策拆分与依赖检查增强 - decideNextStep 拆分为 checkPrerequisites/checkBlockers/decideForStage 三个子函数降低复杂度；修复 PASS_WITH_WAIVER 被错误阻塞的 bug（与 advance.ts 逻辑对齐）；依赖检查新增空文件校验并合并为单次 statSync；优化错误描述格式；orchestrate 命令接入 auto-loop onIteration 进度回调
 

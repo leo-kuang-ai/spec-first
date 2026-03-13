@@ -1,7 +1,7 @@
 {
   "name": "spec-first",
-  "version": "0.5.78",
-  "description": "Specification-driven development process engine for AI-era software development",
+  "version": "1.0.1",
+  "description": "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams",
   "type": "module",
   "bin": {
     "spec-first": "dist/cli/index.js"
@@ -28,11 +28,26 @@
     "node": ">=20.0.0"
   },
   "keywords": [
-    "spec-first",
-    "specification",
+    "ai-workflow",
+    "cli",
+    "quality-gates",
     "traceability",
-    "development-process"
+    "spec-driven",
+    "ai-coding",
+    "feature-lifecycle",
+    "development-workflow",
+    "sdlc",
+    "requirements"
   ],
+  "author": "leo.kuang",
+  "homepage": "https://github.com/sunrain520/spec-first#readme",
+  "bugs": {
+    "url": "https://github.com/sunrain520/spec-first/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sunrain520/spec-first.git"
+  },
   "license": "MIT",
   "files": [
     "dist",
