@@ -22,8 +22,7 @@ function withCwd(dir: string, fn: () => number): number {
 /** 构造 CoverageMetrics */
 function makeCoverage(overrides: Partial<Record<string, number>> = {}): CoverageMetrics {
   const base: Record<string, number> = {
-    C1: 0.9, C2: 0.9, C3: 0.9, C4: 0.9,
-    C5: 0.8, C6: 0.9, C7: 0.95, C8: 0.9, C9: 0.9,
+    C3: 0.9, C4: 0.9, C6: 0.9, C8: 0.9, C9: 0.9,
     ...overrides,
   };
   return base as unknown as CoverageMetrics;
@@ -41,7 +40,7 @@ afterEach(() => {
 
 describe('calcHealthScore', () => {
   it('should return high score for full coverage', () => {
-    const coverage = makeCoverage({ C1: 1, C2: 1, C3: 1, C4: 1, C5: 1, C6: 1, C7: 1, C8: 1, C9: 1 });
+    const coverage = makeCoverage({ C3: 1, C4: 1, C6: 1, C8: 1, C9: 1 });
     const result = calcHealthScore(coverage, 5, 0);
     expect(result.H1).toBe(100);
     expect(result.grade).toBe('A');
@@ -50,7 +49,7 @@ describe('calcHealthScore', () => {
   });
 
   it('should apply escape rate penalty', () => {
-    const coverage = makeCoverage({ C1: 1, C2: 1, C3: 1, C4: 1, C5: 1, C6: 1, C7: 1, C8: 1, C9: 1 });
+    const coverage = makeCoverage({ C3: 1, C4: 1, C6: 1, C8: 1, C9: 1 });
     const result = calcHealthScore(coverage, 5, 0.05);
     // penalty = 0.05 * 200 = 10
     expect(result.H1).toBe(90);
@@ -58,7 +57,7 @@ describe('calcHealthScore', () => {
   });
 
   it('should cap penalty at 50', () => {
-    const coverage = makeCoverage({ C1: 1, C2: 1, C3: 1, C4: 1, C5: 1, C6: 1, C7: 1, C8: 1, C9: 1 });
+    const coverage = makeCoverage({ C3: 1, C4: 1, C6: 1, C8: 1, C9: 1 });
     const result = calcHealthScore(coverage, 5, 0.5);
     // penalty = min(0.5*200, 50) = 50
     expect(result.H1).toBe(50);
@@ -66,14 +65,14 @@ describe('calcHealthScore', () => {
   });
 
   it('should return grade B for score 80-89', () => {
-    const coverage = makeCoverage({ C1: 0.8, C2: 0.8, C3: 0.8, C4: 0.8, C5: 0.8, C6: 0.8, C7: 0.8, C8: 0.8, C9: 0.8 });
+    const coverage = makeCoverage({ C3: 0.8, C4: 0.8, C6: 0.8, C8: 0.8, C9: 0.8 });
     const result = calcHealthScore(coverage, 3, 0);
     expect(result.H1).toBe(80);
     expect(result.grade).toBe('B');
   });
 
   it('should return grade F for low coverage', () => {
-    const coverage = makeCoverage({ C1: 0.3, C2: 0.3, C3: 0.3, C4: 0.3, C5: 0.3, C6: 0.3, C7: 0.3, C8: 0.3, C9: 0.3 });
+    const coverage = makeCoverage({ C3: 0.3, C4: 0.3, C6: 0.3, C8: 0.3, C9: 0.3 });
     const result = calcHealthScore(coverage, 10, 0);
     expect(result.H1).toBe(30);
     expect(result.grade).toBe('F');
@@ -195,8 +194,8 @@ describe('handleMetrics', () => {
     try {
       const code = withCwd(TMP, () => handleMetrics(['report', 'FEAT-TEST']));
       expect(code).toBe(ExitCode.SUCCESS);
-      expect(logs.join('\n')).not.toContain('C1 设计覆盖率');
-      expect(logs.join('\n')).toContain('已隐藏历史参考指标');
+      expect(logs.join('\n')).toContain('C3');
+      expect(logs.join('\n')).toContain('C4');
     } finally {
       spy.mockRestore();
     }
@@ -225,5 +224,69 @@ describe('handleMetrics', () => {
   it('should return VALIDATION_ERROR for health without featureId', () => {
     const code = withCwd(TMP, () => handleMetrics(['health']));
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
+  });
+
+  it('should not fail C4=0.67 in 04_implement stage', () => {
+    writeFileSync(
+      join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
+      JSON.stringify({
+        featureId: 'FEAT-TEST',
+        currentStage: '04_implement',
+        mergedRules: { profile: 'default-simplified' },
+      }),
+      'utf-8'
+    );
+    writeFileSync(
+      join(TMP, 'specs', 'FEAT-TEST', 'traceability-matrix.md'),
+      '| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n| FR-AUTH-001 | FR | Test1 | Planned |  | TC-UT-AUTH-001 |\n| FR-AUTH-002 | FR | Test2 | Planned |  | TC-UT-AUTH-002 |\n| FR-AUTH-003 | FR | Test3 | Planned |  |  |\n| TC-UT-AUTH-001 | TC | Test1 | Planned | FR-AUTH-001 |  |\n| TC-UT-AUTH-002 | TC | Test2 | Planned | FR-AUTH-002 |  |\n',
+      'utf-8'
+    );
+
+    const logs: string[] = [];
+    const spy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
+      logs.push(String(msg ?? ''));
+    });
+    try {
+      const code = withCwd(TMP, () => handleMetrics(['coverage', 'FEAT-TEST']));
+      expect(code).toBe(ExitCode.SUCCESS);
+      const output = logs.join('\n');
+      expect(output).toContain('C4');
+      expect(output).toContain('60%');
+      expect(output).toContain('通过');
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('should fail C4=0.67 in 05_verify stage', () => {
+    writeFileSync(
+      join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
+      JSON.stringify({
+        featureId: 'FEAT-TEST',
+        currentStage: '05_verify',
+        mergedRules: { profile: 'default-simplified' },
+      }),
+      'utf-8'
+    );
+    writeFileSync(
+      join(TMP, 'specs', 'FEAT-TEST', 'traceability-matrix.md'),
+      '| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n| FR-AUTH-001 | FR | Test1 | Planned |  | TC-UT-AUTH-001 |\n| FR-AUTH-002 | FR | Test2 | Planned |  | TC-UT-AUTH-002 |\n| FR-AUTH-003 | FR | Test3 | Planned |  |  |\n| TC-UT-AUTH-001 | TC | Test1 | Planned | FR-AUTH-001 |  |\n| TC-UT-AUTH-002 | TC | Test2 | Planned | FR-AUTH-002 |  |\n',
+      'utf-8'
+    );
+
+    const logs: string[] = [];
+    const spy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
+      logs.push(String(msg ?? ''));
+    });
+    try {
+      const code = withCwd(TMP, () => handleMetrics(['coverage', 'FEAT-TEST']));
+      expect(code).toBe(ExitCode.SUCCESS);
+      const output = logs.join('\n');
+      expect(output).toContain('C4');
+      expect(output).toContain('80%');
+      expect(output).toContain('失败');
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

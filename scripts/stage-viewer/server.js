@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { METRIC_DEFS, getDefaultMetrics, calcHealthScore } from './health-utils.js';
+import { getDefaultMetrics, calcHealthScore } from './health-utils.js';
 import { parseTaskPlan, normalizeTaskStatus } from './task-parser.js';
 import { STAGE_ORDER, STAGE_NAMES } from './stage-constants.js';
 
@@ -137,6 +137,8 @@ function sanitizeFeatureId(raw) {
 
 // ─── Metrics API ─────────────────────────────────────────────────────
 
+// metricTargets 由 getRealtimeGateStatus() 从核心 evaluator 获取，不再本地维护
+
 function getMetrics(projectRoot, featureId) {
   // 先校验 featureId 格式（防御命令注入）
   if (!FEATURE_ID_PATTERN.test(featureId)) {
@@ -223,35 +225,89 @@ function getDefects(projectRoot, featureId) {
 
 // ─── Gate Status API ─────────────────────────────────────────────────
 
-function getGateStatus(projectRoot, featureId) {
+// 从历史快照读取（fallback + 历史聚合用）
+function getGateStatusFromHistory(projectRoot, featureId) {
   const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
   if (!existsSync(historyPath)) {
-    return { currentStage: null, status: null, conditions: [], lastCheck: null };
+    return { currentStage: null, status: null, conditions: [], effectiveGates: [], warnings: [], statusSummary: { status: null, blockingCount: 0, warningCount: 0 }, lastCheck: null };
   }
 
   try {
     const content = readFileSync(historyPath, 'utf-8');
     const lines = content.trim().split('\n').filter(Boolean);
     if (lines.length === 0) {
-      return { currentStage: null, status: null, conditions: [], lastCheck: null };
+      return { currentStage: null, status: null, conditions: [], effectiveGates: [], warnings: [], statusSummary: { status: null, blockingCount: 0, warningCount: 0 }, lastCheck: null };
     }
 
-    // 获取最新的 Gate 检查结果
     const lastEntry = JSON.parse(lines[lines.length - 1]);
+    const conditions = (lastEntry.conditions || []).map(c => ({
+      id: c.id,
+      description: c.description,
+      status: c.status,
+      detail: c.detail,
+      blocking: c.blocking !== false,
+    }));
+    const effectiveGates = conditions.filter(c => c.blocking !== false);
+    const warnings = conditions.filter(c => c.status === 'FAIL' && c.blocking === false);
+
     return {
       currentStage: lastEntry.stage || null,
       status: lastEntry.status || null,
-      conditions: (lastEntry.conditions || []).map(c => ({
-        id: c.id,
-        description: c.description,
-        status: c.status,
-        detail: c.detail,
-        blocking: c.blocking !== false,
-      })),
+      conditions,
+      effectiveGates,
+      warnings,
+      statusSummary: {
+        status: lastEntry.status || null,
+        blockingCount: effectiveGates.filter(c => c.status === 'FAIL').length,
+        warningCount: warnings.length,
+      },
       lastCheck: lastEntry.timestamp || null,
     };
   } catch {
-    return { currentStage: null, status: null, conditions: [], lastCheck: null };
+    return { currentStage: null, status: null, conditions: [], effectiveGates: [], warnings: [], statusSummary: { status: null, blockingCount: 0, warningCount: 0 }, lastCheck: null };
+  }
+}
+
+// 实时 Gate 评估：通过 CLI subprocess 调用核心 evaluator，带缓存
+const gateCache = new Map();
+const GATE_CACHE_TTL = 30000; // 30s
+
+function getRealtimeGateStatus(projectRoot, featureId) {
+  const cacheKey = `gate:${featureId}`;
+  const cached = gateCache.get(cacheKey);
+  if (cached && Date.now() - cached.time < GATE_CACHE_TTL) {
+    return cached.data;
+  }
+
+  const cliPath = join(projectRoot, 'dist/cli/index.js');
+  if (!existsSync(cliPath)) {
+    // 未构建，fallback 到历史快照
+    return getGateStatusFromHistory(projectRoot, featureId);
+  }
+
+  try {
+    const output = execFileSync('node', [cliPath, 'gate', 'check', featureId, '--json', '--no-persist'], {
+      cwd: projectRoot,
+      encoding: 'utf-8',
+      timeout: 15000,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const result = JSON.parse(output);
+    const data = {
+      currentStage: result.stage,
+      status: result.status,
+      conditions: result.conditions || [],
+      effectiveGates: result.effectiveGates || [],
+      warnings: result.warnings || [],
+      statusSummary: result.statusSummary || { status: result.status, blockingCount: 0, warningCount: 0 },
+      metricTargets: result.metricTargets || {},
+      lastCheck: result.timestamp,
+    };
+    gateCache.set(cacheKey, { time: Date.now(), data });
+    return data;
+  } catch {
+    // CLI 失败，fallback 到历史快照
+    return getGateStatusFromHistory(projectRoot, featureId);
   }
 }
 
@@ -280,6 +336,7 @@ function getAllStageGateStatus(projectRoot, featureId) {
           stageStatus[stage] = {
             status,
             timestamp: entry.timestamp || null,
+            conditions,
             passCount: conditions.filter(c => c.status === 'PASS').length || (status === 'PASS' ? 1 : 0),
             totalCount: conditions.length || 1,
           };
@@ -325,8 +382,23 @@ function getTimelineData(projectRoot, featureId) {
     // 计算每个阶段的时间
     const stageTimeline = [];
 
-    // 按阶段分组，取每个阶段的第一个 PASS 事件作为进入时间
+    // 按阶段分组，优先用 stage_advance 的 to 时间作为进入时间（更准确）
     const stageEntries = {};
+
+    // 先从 stage_advance 事件提取阶段进入时间
+    for (const event of events) {
+      if (event.event === 'stage_advance' && event.to && !stageEntries[event.to]) {
+        stageEntries[event.to] = {
+          stage: event.to,
+          stageName: STAGE_NAMES[event.to] || event.to,
+          startTime: event.timestamp,
+          status: 'PASS',
+          conditions: []
+        };
+      }
+    }
+
+    // 再从 gate_eval 事件补充（stage_advance 未覆盖的阶段，如初始阶段）
     for (const event of events) {
       if (event.stage && !stageEntries[event.stage]) {
         stageEntries[event.stage] = {
@@ -347,15 +419,28 @@ function getTimelineData(projectRoot, featureId) {
     }
 
     // 计算每个阶段的持续时间
+    // 判断 Feature 是否已到达终态
+    const lastAdvance = [...events].reverse().find(e => e.event === 'stage_advance');
+    const featureTerminal = lastAdvance && (lastAdvance.to === '08_done' || lastAdvance.to === '09_cancelled');
+
     let totalDuration = 0;
     for (let i = 0; i < stageTimeline.length; i++) {
       const current = stageTimeline[i];
       const startTime = new Date(current.startTime);
+      const isTerminal = current.stage === '08_done' || current.stage === '09_cancelled';
 
       let endTime;
-      if (i < stageTimeline.length - 1) {
+      if (isTerminal) {
+        // 终态阶段持续时间为 0
+        endTime = startTime;
+      } else if (i < stageTimeline.length - 1) {
         endTime = new Date(stageTimeline[i + 1].startTime);
+      } else if (featureTerminal) {
+        // Feature 已完成，但该阶段是 timeline 最后一项（缺少终态 gate_eval）
+        // 使用终态 advance 事件的时间
+        endTime = new Date(lastAdvance.timestamp);
       } else {
+        // 非终态的最后阶段且 Feature 仍在进行中：计算到当前时间
         endTime = new Date();
       }
 
@@ -438,31 +523,6 @@ const server = createServer((req, res) => {
     return;
   }
 
-  // Metrics API - 必须在 feature 详情路由之前匹配
-  if (url.pathname.match(/^\/api\/feature\/[^/]+\/metrics$/)) {
-    const rawFeatureId = url.pathname.split('/')[3];
-    const featureId = sanitizeFeatureId(rawFeatureId);
-    if (!featureId) {
-      sendJson(res, 400, { error: 'Invalid feature ID' });
-      return;
-    }
-    const coverage = getMetrics(projectRoot, featureId);
-    const defectStats = getDefectStats(projectRoot, featureId);
-    const escapeRate = defectStats.total > 0 ? 0 : 0; // 简化：实际应从缺陷发现阶段计算
-    const health = calcHealthScore(coverage, escapeRate);
-    const state = loadFeature(projectRoot, featureId);
-    const profile = state?.mergedRules?.profile || 'default-simplified';
-
-    sendJson(res, 200, {
-      featureId,
-      coverage,
-      health,
-      profile,
-      metricDefs: METRIC_DEFS,
-      now: new Date().toISOString(),
-    });
-    return;
-  }
 
   // Timeline API - 必须在 feature 详情路由之前匹配
   if (url.pathname.match(/^\/api\/feature\/[^/]+\/timeline$/)) {
@@ -543,7 +603,7 @@ const server = createServer((req, res) => {
       sendJson(res, 400, { error: 'Invalid feature ID' });
       return;
     }
-    const currentGate = getGateStatus(projectRoot, featureId);
+    const currentGate = getRealtimeGateStatus(projectRoot, featureId);
     const allStageGates = getAllStageGateStatus(projectRoot, featureId);
 
     sendJson(res, 200, {
@@ -551,6 +611,42 @@ const server = createServer((req, res) => {
       current: currentGate,
       stages: allStageGates,
       now: new Date().toISOString(),
+    });
+    return;
+  }
+
+  if (url.pathname.startsWith('/api/feature/') && url.pathname.endsWith('/metrics')) {
+    const rawFeatureId = url.pathname.replace('/api/feature/', '').replace('/metrics', '');
+    const featureId = sanitizeFeatureId(rawFeatureId);
+    if (!featureId) {
+      sendJson(res, 400, { error: 'Invalid feature ID' });
+      return;
+    }
+    const state = loadFeature(projectRoot, featureId);
+    if (!state) {
+      sendJson(res, 404, { error: `feature not found: ${featureId}` });
+      return;
+    }
+    const coverage = getMetrics(projectRoot, featureId);
+    const health = calcHealthScore(coverage, 0);
+    const profile = state.mergedRules?.profile ?? 'default-simplified';
+    const currentStage = state.currentStage;
+    // metricTargets 从实时 Gate 评估结果获取（核心真源）
+    const gateResult = getRealtimeGateStatus(projectRoot, featureId);
+    let metricTargets = gateResult.metricTargets || {};
+
+    // 终态阶段 fallback：所有核心指标标记为已达标
+    const isTerminal = currentStage === '08_done' || currentStage === '09_cancelled';
+    if (isTerminal && Object.keys(metricTargets).length === 0) {
+      metricTargets = { C3: 1.0, C4: 0.8, C6: 1.0, C8: 1.0, C9: 1.0 };
+    }
+
+    sendJson(res, 200, {
+      coverage,
+      health,
+      profile,
+      currentStage,
+      metricTargets,
     });
     return;
   }
@@ -610,8 +706,8 @@ const server = createServer((req, res) => {
 
   // Serve JavaScript files
   if (url.pathname.endsWith('.js')) {
-    const jsPath = join(__dirname, url.pathname);
-    if (!existsSync(jsPath)) {
+    const jsPath = resolve(__dirname, '.' + url.pathname);
+    if (!jsPath.startsWith(__dirname) || !existsSync(jsPath)) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.end('JavaScript file not found');
       return;

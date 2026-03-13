@@ -133,17 +133,10 @@ export function summarizeTodoProgress(
   };
 }
 
-export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
-  const nextStage = getNextStage(input.currentStage);
-  if (!nextStage) {
-    return {
-      decision: 'BLOCKED',
-      currentStage: input.currentStage,
-      reasons: [`阶段 ${input.currentStage} 之后不存在下一阶段`],
-      reasonCodes: [ReasonCode.NO_NEXT_STAGE],
-    };
-  }
-
+function checkPrerequisites(
+  input: NextStepDecisionInput,
+  nextStage: Stage
+): NextStepDecision | null {
   if (input.autoLoopStatus && input.autoLoopStatus !== 'all_done') {
     return {
       decision: 'BLOCKED',
@@ -165,19 +158,32 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
     };
   }
 
+  return null;
+}
+
+function checkBlockers(
+  input: NextStepDecisionInput,
+  nextStage: Stage,
+  todoProgress: TodoProgress
+): NextStepDecision | null {
   const reasons: string[] = [];
   const reasonCodes: ReasonCodeValue[] = [];
+
   if (input.dependencyCheck && !input.dependencyCheck.pass) {
     reasons.push(...describeDependencyIssues(input.dependencyCheck));
     reasonCodes.push(ReasonCode.DEPENDENCY_FAILED);
   }
 
-  if (input.gateStatus && input.gateStatus !== 'PASS' && input.gateStatus !== 'PILOT_PASS') {
+  if (
+    input.gateStatus &&
+    input.gateStatus !== 'PASS' &&
+    input.gateStatus !== 'PASS_WITH_WAIVER' &&
+    input.gateStatus !== 'PILOT_PASS'
+  ) {
     reasons.push('Gate 未通过，需先修复失败条件后再推进阶段');
     reasonCodes.push(ReasonCode.GATE_FAILED);
   }
 
-  const todoProgress = summarizeTodoProgress(input.todoState);
   if (todoProgress.hasBlocked) {
     reasons.push('存在 blocked todo，需先清除阻塞后再推进阶段');
     reasonCodes.push(ReasonCode.TODO_BLOCKED);
@@ -193,6 +199,14 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
     };
   }
 
+  return null;
+}
+
+function decideForStage(
+  input: NextStepDecisionInput,
+  nextStage: Stage,
+  todoProgress: TodoProgress
+): NextStepDecision {
   if (input.currentStage === Stage.SPECIFY) {
     return {
       decision: 'SUGGEST_NEXT',
@@ -280,6 +294,27 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
     reasons: [],
     reasonCodes: [],
   };
+}
+
+export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
+  const nextStage = getNextStage(input.currentStage);
+  if (!nextStage) {
+    return {
+      decision: 'BLOCKED',
+      currentStage: input.currentStage,
+      reasons: [`阶段 ${input.currentStage} 之后不存在下一阶段`],
+      reasonCodes: [ReasonCode.NO_NEXT_STAGE],
+    };
+  }
+
+  const prerequisiteCheck = checkPrerequisites(input, nextStage);
+  if (prerequisiteCheck) return prerequisiteCheck;
+
+  const todoProgress = summarizeTodoProgress(input.todoState);
+  const blockerCheck = checkBlockers(input, nextStage, todoProgress);
+  if (blockerCheck) return blockerCheck;
+
+  return decideForStage(input, nextStage, todoProgress);
 }
 
 function buildAdvanceCommand(featureId?: string): string | undefined {

@@ -33,3 +33,5 @@
 {"event":"release_auto_skip","message":"发布阶段预留扩展，当前自动跳过","featureId":"FSREQ-20260313-UIOPT-001","timestamp":"2026-03-13T02:39:45.833Z"}
 {"event":"gate_eval","featureId":"FSREQ-20260313-UIOPT-001","status":"PASS","stage":"07_release","timestamp":"2026-03-13T02:39:45.835Z","conditions":[{"id":"G-REL-01","description":"Smoke test report exists","status":"PASS","blocking":true},{"id":"G-REL-02","description":"Release note exists","status":"PASS","blocking":true}]}
 {"event":"stage_advance","action":"advance","from":"07_release","to":"08_done","gateStatus":"PASS","featureId":"FSREQ-20260313-UIOPT-001","timestamp":"2026-03-13T02:39:45.835Z"}
+{"event":"gate_eval","featureId":"FSREQ-20260313-UIOPT-001","status":"PASS","stage":"08_done","timestamp":"2026-03-13T05:02:35.000Z","conditions":[]}
+{"event":"gate_eval","featureId":"FSREQ-20260313-UIOPT-001","status":"PASS","stage":"08_done","timestamp":"2026-03-13T08:37:16.620Z","conditions":[]}

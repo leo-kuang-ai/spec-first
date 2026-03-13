@@ -29,7 +29,7 @@
       <input id="search" class="input" placeholder="搜索 featureId / 标题" style="flex:1;" />
       <button id="refreshBtn" class="btn-refresh" title="强制刷新（清除缓存)" aria-label="强制刷新">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12 4 12 8 4 12V4a2h6v6a2 6 0 4 6 0 1.41-.14L1.41-1.41-1.414 1.41 1.41 1.414-1.41 1.414 1.41" d="M3 3V3a2h6V6a2 6 0 4 6 0 1.41-.14l1.41-1.41-1.414 1.41 1.414 1.41 1.414 1.41 1.414 1.41 1.414 1.41 1.414-1.41-2.83 3.51-2.83a9 3.51-2.83 3.51 2.83 3.51 2.83 3.51 2.83 3.51 2.83 3.51-2.83 3.51 2.83 3.51 2.83-3.51-2.83z"/>
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
         </svg>
       </button>
     </div>
@@ -47,7 +47,10 @@
     </div>
   </aside>
   <main class="main">
-    <div id="empty" class="muted">请选择左侧 Feature 查看详情。</div>
+    <div id="empty" class="muted" style="text-align:center;padding:60px 20px;">
+      <div style="font-size:16px;margin-bottom:12px;">请选择左侧 Feature 查看详情</div>
+      <div style="font-size:13px;color:var(--muted);">💡 提示：使用搜索框快速定位 Feature，或点击刷新按钮更新列表</div>
+    </div>
     <div id="detail" style="display:none;">
       <h2 id="detailTitle"></h2>
       <div class="summary" id="summary"></div>
@@ -90,14 +93,19 @@
         <h2>阶段流转图（00→08）</h2>
         <div class="muted flow-help">说明：绿色为已完成，蓝色为当前阶段，灰色为待开始；点击某个阶段可联动查看该阶段的 Gate 与产物。</div>
         <div id="stageFlow" class="flow-wrap"></div>
-        <div id="stageDesc" class="flow-stage-desc"></div>
+        <details style="margin-top:12px;">
+          <summary style="cursor:pointer;color:var(--accent);font-size:13px;">查看阶段说明</summary>
+          <div id="stageDesc" class="flow-stage-desc" style="margin-top:8px;"></div>
+        </details>
       </section>
 
       <!-- Gate + Deliverables（阶段联动详情） -->
       <div class="row">
         <section>
           <h2 id="gateTitle">阶段 Gate</h2>
+          <div id="gateSummary" style="display:none; margin-bottom:8px; font-weight:600;"></div>
           <table id="gateTable"></table>
+          <div id="gateWarnings" style="display:none; margin-top:12px;"></div>
         </section>
         <section>
           <h2 id="deliverableTitle">阶段产物</h2>
@@ -105,43 +113,8 @@
         </section>
       </div>
 
-      <!-- Task Progress -->
-      <section id="taskProgressSection" class="task-progress-section" style="display:none;">
-        <div class="task-progress-header">
-          <h3>任务进度</h3>
-        </div>
-        <div class="task-stats-grid" id="taskStatsGrid">
-          <div class="task-stat-card">
-            <div class="task-stat-value ok" id="completedCount">0</div>
-            <div class="task-stat-label">已完成</div>
-          </div>
-          <div class="task-stat-card">
-            <div class="task-stat-value accent" id="inProgressCount">0</div>
-            <div class="task-stat-label">进行中</div>
-          </div>
-          <div class="task-stat-card">
-            <div class="task-stat-value" id="pendingCount">0</div>
-            <div class="task-stat-label">待处理</div>
-          </div>
-        </div>
-        <div class="task-progress-bar-container">
-          <div class="task-progress-bar-fill" id="taskProgressFill"></div>
-        </div>
-        <div class="current-tasks-panel" id="currentTasksPanel" style="display:none;">
-          <div class="current-tasks-title">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="6" cy="6" r="5"/>
-              <polyline points="12,12 16,14"/>
-            </svg>
-            当前进行中
-          </div>
-          <div id="currentTasksList"></div>
-        </div>
-        <div class="phase-grid" id="phaseGrid"></div>
-      </section>
-
       <!-- Timeline -->
-      <section id="timelineSection" class="timeline-section" style="display:none;">
+      <section id="timelineSection" class="timeline-section">
         <div class="timeline-header">
           <h3>时间线视图</h3>
           <div class="timeline-summary" id="timelineSummary"></div>
@@ -157,17 +130,6 @@
         </div>
       </section>
 
-      <!-- History + Thresholds（参考数据） -->
-      <div class="row">
-        <section>
-          <h2>阶段历史</h2>
-          <table id="historyTable"></table>
-        </section>
-        <section>
-          <h2>质量阈值</h2>
-          <table id="thresholdTable"></table>
-        </section>
-      </div>
     </div>
   </main>
 </div>

@@ -18,7 +18,7 @@ afterEach(() => {
 describe('getCoverage', () => {
   it('should return 100% for empty matrix', () => {
     const c = getCoverage(FEAT_ID, TMP);
-    expect(c.C1).toBe(1);
+    expect(c.C3).toBe(1);
     expect(c.C6).toBe(1);
   });
 
@@ -34,11 +34,9 @@ describe('getCoverage', () => {
     ].join('\n'), 'utf-8');
 
     const c = getCoverage(FEAT_ID, TMP);
-    expect(c.C1).toBe(1); // FR covered by DS
     expect(c.C3).toBe(1); // FR covered by TASK
     expect(c.C4).toBe(1); // FR covered by TC
     expect(c.C6).toBe(1); // TASK implemented
-    expect(c.C7).toBe(1); // TASK has upstream
     expect(c.C8).toBe(1); // TASK linked to FR
     expect(c.C9).toBe(1); // TC linked to FR
   });
@@ -64,12 +62,12 @@ describe('getCoverage', () => {
       '|----|------|-------|--------|----------|------------|',
       '| FR-AUTH-001 | FR | Login | Planned |  |  |',
       '| FR-AUTH-002 | FR | Logout | Planned |  |  |',
-      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 |  |',
+      '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-001 |  |',
       '',
     ].join('\n'), 'utf-8');
 
     const c = getCoverage(FEAT_ID, TMP);
-    expect(c.C1).toBe(0.5); // 1/2 FR covered by DS
+    expect(c.C3).toBe(0.5); // 1/2 FR covered by TASK
   });
 
   it('should exclude Deferred/Cancelled from denominator', () => {
@@ -78,13 +76,13 @@ describe('getCoverage', () => {
       '|----|------|-------|--------|----------|------------|',
       '| FR-AUTH-001 | FR | Login | Planned |  |  |',
       '| FR-AUTH-002 | FR | Logout | Deferred |  |  |',
-      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 |  |',
+      '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-001 |  |',
       '',
     ].join('\n'), 'utf-8');
 
     const c = getCoverage(FEAT_ID, TMP);
     // Only FR-AUTH-001 in denominator (FR-AUTH-002 excluded as Deferred)
-    expect(c.C1).toBe(1);
+    expect(c.C3).toBe(1);
   });
 
   it('should calculate C6 impl coverage correctly', () => {
@@ -121,13 +119,13 @@ describe('getCoverage', () => {
       '| ID | Type | Title | Status | Upstream | Downstream |',
       '|----|------|-------|--------|----------|------------|',
       '| FR-AUTH-001 | FR | Login | Exception |  |  |',
-      '| FR-AUTH-002 | FR | Logout | Planned |  |  |',
-      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-002 |  |',
+      '| FR-AUTH-002 | FR | Logout | Planned |  | TC-UT-AUTH-001 |',
+      '| TC-UT-AUTH-001 | TC | Test | Planned | FR-AUTH-002 |  |',
       '',
     ].join('\n'), 'utf-8');
 
     const c = getCoverage(FEAT_ID, TMP);
-    expect(c.C1).toBe(1); // 仅 FR-AUTH-002 计入分母
+    expect(c.C4).toBe(1); // 仅 FR-AUTH-002 计入分母
   });
 
   it('should keep invalid Exception in denominator', () => {
@@ -152,11 +150,11 @@ describe('getCoverage', () => {
       '|----|------|-------|--------|----------|------------|',
       '| FR-AUTH-001 | FR | Login | Exception |  |  |',
       '| FR-AUTH-002 | FR | Logout | Planned |  |  |',
-      '| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-002 |  |',
+      '| TASK-AUTH-001 | TASK | Impl | Planned | FR-AUTH-002 |  |',
       '',
     ].join('\n'), 'utf-8');
 
     const c = getCoverage(FEAT_ID, TMP);
-    expect(c.C1).toBe(0.5); // 无效 Exception 仍计入分母
+    expect(c.C3).toBe(0.5); // 无效 Exception 仍计入分母
   });
 });

@@ -115,15 +115,15 @@ describe('metrics template', () => {
       ...BASE_CTX,
       score: 85,
       metrics: [
-        { name: 'C1-FR覆盖率', current: '90%', target: '80%', status: 'PASS' },
-        { name: 'C2-DS覆盖率', current: '70%', target: '80%', status: 'FAIL' },
+        { name: 'C3-任务覆盖率', current: '90%', target: '100%', status: 'FAIL' },
+        { name: 'C4-测试覆盖率', current: '85%', target: '80%', status: 'PASS' },
       ],
-      bottlenecks: [{ metric: 'C2', description: 'DS coverage below target' }],
-      recommendations: ['Add missing design specs'],
+      bottlenecks: [{ metric: 'C3', description: 'Task coverage below target' }],
+      recommendations: ['Add missing task decomposition'],
     });
     expect(out).toContain('85 / 100');
-    expect(out).toContain('C1-FR覆盖率');
-    expect(out).toContain('DS coverage below');
+    expect(out).toContain('C3-任务覆盖率');
+    expect(out).toContain('Task coverage below');
   });
 });
 

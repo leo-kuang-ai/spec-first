@@ -8,19 +8,7 @@ import { calcHealthScore } from '../../core/metrics-engine/health-score.js';
 import { detectBottlenecks } from '../../core/metrics-engine/bottleneck.js';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { join } from 'node:path';
-
-/** C1-C9 指标名称与目标值 */
-const METRIC_DEFS: readonly { key: string; name: string; target: number; core?: boolean }[] = [
-  { key: 'C1', name: '设计覆盖率', target: 0.8 },
-  { key: 'C2', name: 'API 覆盖率', target: 0.8 },
-  { key: 'C3', name: '任务覆盖率', target: 1.0, core: true },
-  { key: 'C4', name: '测试覆盖率 (FR)', target: 0.8, core: true },
-  { key: 'C5', name: '测试覆盖率 (AC)', target: 0.6 },
-  { key: 'C6', name: '实现覆盖率', target: 1.0, core: true },
-  { key: 'C7', name: 'PR 合规率', target: 0.9 },
-  { key: 'C8', name: '任务合规率', target: 1.0, core: true },
-  { key: 'C9', name: 'TC 合规率', target: 1.0, core: true },
-];
+import { getStageMetricTargets, getAllCoreMetricDefs } from '../../core/metrics-engine/core-metric-thresholds.js';
 
 export function handleMetrics(args: string[]): number {
   const sub = args[0];
@@ -63,28 +51,39 @@ function handleCoverage(args: string[]): number {
       return ExitCode.SUCCESS;
     }
 
-    const metricsToShow = allFlag ? METRIC_DEFS : METRIC_DEFS.filter((d) => d.core);
+    const state = readJson(join(process.cwd(), 'specs', featureId, 'stage-state.json')) as StageState;
+    const stageTargets = getStageMetricTargets(state.currentStage);
 
-    console.log(`覆盖率报告 — ${featureId}\n`);
-    console.log('指标'.padEnd(25) + '当前值'.padEnd(10) + '目标值'.padEnd(10) + '状态');
-    console.log('-'.repeat(55));
+    console.log(`覆盖率报告 — ${featureId} (${state.currentStage})\n`);
 
-    let allPass = true;
-    for (const def of metricsToShow) {
-      const current = record[def.key] ?? 0;
-      const pass = current >= def.target;
-      if (!pass) allPass = false;
-      const status = pass ? '通过' : '失败 *';
-      console.log(
-        `${def.key} ${def.name}`.padEnd(25) +
-          `${(current * 100).toFixed(1)}%`.padEnd(10) +
-          `${(def.target * 100).toFixed(0)}%`.padEnd(10) +
-          status
-      );
-    }
-
-    if (!allPass) {
-      console.log('\n* 未达标指标需要关注');
+    if (allFlag) {
+      const allMetrics = getAllCoreMetricDefs();
+      console.log('指标'.padEnd(25) + '当前值');
+      console.log('-'.repeat(35));
+      for (const def of allMetrics) {
+        const current = record[def.key] ?? 0;
+        console.log(`${def.key} ${def.name}`.padEnd(25) + `${(current * 100).toFixed(1)}%`);
+      }
+      console.log('\n提示：--all 仅展示原始值，不做阶段判定');
+    } else {
+      console.log('指标'.padEnd(25) + '当前值'.padEnd(10) + '目标值'.padEnd(10) + '状态');
+      console.log('-'.repeat(55));
+      let allPass = true;
+      for (const def of stageTargets) {
+        const current = record[def.key] ?? 0;
+        const pass = current >= def.target;
+        if (!pass && def.blocking) allPass = false;
+        const status = pass ? '通过' : def.blocking ? '失败 *' : '警告';
+        console.log(
+          `${def.key} ${def.name}`.padEnd(25) +
+            `${(current * 100).toFixed(1)}%`.padEnd(10) +
+            `${(def.target * 100).toFixed(0)}%`.padEnd(10) +
+            status
+        );
+      }
+      if (!allPass) {
+        console.log('\n* 未达标指标需要关注');
+      }
     }
     return ExitCode.SUCCESS;
   } catch (e) {
@@ -97,7 +96,7 @@ function printMetricsHelp(): void {
   console.log(`用法：spec-first metrics <subcommand>
 
 子命令：
-  coverage  展示 Feature 的 C1-C9 覆盖率
+  coverage  展示 Feature 的核心覆盖率指标 (C3/C4/C6/C8/C9)
   report    生成完整度量报告
   health    展示健康分与关键风险`);
 }
@@ -117,25 +116,43 @@ function handleReport(args: string[]): number {
   const statePath = join(cwd, 'specs', featureId, 'stage-state.json');
   const state = readJson<StageState>(statePath);
   const profile = state.mergedRules?.profile ?? 'default-simplified';
+  const currentStage = state.currentStage;
 
   const coverage = getCoverage(featureId, cwd);
-  const health = calcHealthScore(coverage, 0, 0, profile);
-  const bottlenecks = detectBottlenecks(coverage, profile);
-  const metricsToShow = profile === 'strict' ? METRIC_DEFS : METRIC_DEFS.filter((d) => d.core);
-
-  console.log(`度量报告 — ${featureId}\n`);
-  console.log(`健康分：${health.H1}（${health.grade}） [profile=${profile}]\n`);
-
-  console.log('覆盖率：');
+  const health = calcHealthScore(coverage, 0, 0);
+  const bottlenecks = detectBottlenecks(coverage);
+  const allMetrics = getAllCoreMetricDefs();
+  const stageTargets = getStageMetricTargets(currentStage as any);
   const record = coverage as unknown as Record<string, number>;
-  for (const def of metricsToShow) {
+
+  // ① 健康分
+  console.log(`度量报告 — ${featureId} (${currentStage})\n`);
+  console.log(`健康分：${health.H1}（${health.grade}） [profile=${profile}]`);
+  console.log(`提示：健康分基于全量覆盖率快照，不等于当前阶段 Gate 判定\n`);
+
+  // ② Coverage Snapshot — 全量原始值
+  console.log('Coverage Snapshot：');
+  for (const def of allMetrics) {
     const val = record[def.key] ?? 0;
     console.log(`  ${def.key} ${def.name.padEnd(22)} ${(val * 100).toFixed(1)}%`);
   }
-  if (profile !== 'strict') {
-    console.log('\n已隐藏历史参考指标：C1 / C2 / C5 / C7（使用 metrics coverage --all 查看）');
+
+  // ③ Current Stage Targets — 仅当前阶段纳入判定的指标
+  if (stageTargets.length > 0) {
+    console.log(`\nCurrent Stage Targets (${currentStage})：`);
+    for (const t of stageTargets) {
+      const current = record[t.key] ?? 0;
+      const targetPct = (t.target * 100).toFixed(0);
+      const currentPct = (current * 100).toFixed(1);
+      const pass = current >= t.target;
+      const icon = pass ? '✓' : '✗';
+      console.log(`  ${icon} ${t.key} ${t.name.padEnd(22)} target=${targetPct}%  current=${currentPct}%`);
+    }
+  } else {
+    console.log(`\nCurrent Stage Targets (${currentStage})：当前阶段无指标判定`);
   }
 
+  // ④ Bottlenecks
   if (bottlenecks.length > 0) {
     console.log(`\n瓶颈项（${bottlenecks.length}）：`);
     for (const b of bottlenecks) {
@@ -161,16 +178,13 @@ function handleHealth(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const statePath = join(cwd, 'specs', featureId, 'stage-state.json');
-  const state = readJson<StageState>(statePath);
-  const profile = state.mergedRules?.profile ?? 'default-simplified';
-
   const coverage = getCoverage(featureId, cwd);
-  const health = calcHealthScore(coverage, 0, 0, profile);
-  const bottlenecks = detectBottlenecks(coverage, profile);
+  const health = calcHealthScore(coverage, 0, 0);
+  const bottlenecks = detectBottlenecks(coverage);
 
   console.log(`健康分 — ${featureId}\n`);
   console.log(`分数：${health.H1} / 100  等级：${health.grade}`);
+  console.log(`提示：健康分不等于当前阶段 Gate 判定，仅供参考\n`);
 
   if (bottlenecks.length > 0) {
     console.log(`\n关键风险（${bottlenecks.length}）：`);

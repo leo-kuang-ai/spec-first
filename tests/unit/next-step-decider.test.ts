@@ -93,4 +93,32 @@ describe('decideNextStep', () => {
     expect(result.reasons).toContain('存在 blocked todo，需先清除阻塞后再推进阶段');
     expect(result.reasonCodes).toContain(ReasonCode.TODO_BLOCKED);
   });
+
+  it('should allow PASS_WITH_WAIVER to advance', () => {
+    const result = decideNextStep({
+      featureId: 'FSREQ-20260309-AUTO-001',
+      currentStage: Stage.DESIGN,
+      stageStatus: 'ready_to_advance',
+      autoAdvancePolicy: 'assisted',
+      gateStatus: 'PASS_WITH_WAIVER',
+      dependencyCheck: { pass: true, missing: [] },
+    });
+
+    expect(result.decision).toBe('READY_TO_ADVANCE');
+    expect(result.reasonCodes).not.toContain(ReasonCode.GATE_FAILED);
+  });
+
+  it('should block when gate status is FAIL', () => {
+    const result = decideNextStep({
+      featureId: 'FSREQ-20260309-AUTO-001',
+      currentStage: Stage.DESIGN,
+      stageStatus: 'ready_to_advance',
+      autoAdvancePolicy: 'assisted',
+      gateStatus: 'FAIL',
+      dependencyCheck: { pass: true, missing: [] },
+    });
+
+    expect(result.decision).toBe('BLOCKED');
+    expect(result.reasonCodes).toContain(ReasonCode.GATE_FAILED);
+  });
 });

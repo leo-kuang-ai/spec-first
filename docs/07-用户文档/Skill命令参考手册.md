@@ -185,23 +185,21 @@ Gate 结果：`PASS`（通过）| `PASS_WITH_WAIVER`（有豁免的通过）| `F
 
 | 命令 | 参数 | 说明 |
 |------|------|------|
-| `spec-first metrics coverage` | `<featureId>` | 计算 C1-C9 九项覆盖率指标 |
+| `spec-first metrics coverage` | `<featureId>` | 计算核心 5 项覆盖率指标 |
 | `spec-first metrics report` | `<featureId>` | 生成综合度量报告 |
 | `spec-first metrics health` | `<featureId>` | 健康分（加权综合评分） |
 
-9 项覆盖率指标：
+核心 5 项覆盖率指标：
 
 | 指标 | 含义 |
 |------|------|
-| C1 Design Coverage | 被 DS 覆盖的 FR 比例 |
-| C2 API Coverage | 需接口的 FR 被 API 覆盖比例 |
 | C3 Task Coverage | 被 TASK 覆盖的 FR 比例 |
 | C4 Test Coverage (FR) | 被 TC 覆盖的 FR 比例 |
-| C5 Test Coverage (AC) | 被 TC 覆盖的 AC 比例 |
 | C6 Impl Coverage | 已实现的 TASK 比例 |
-| C7 PR Compliance | 关联 TASK ID 的 PR 比例 |
 | C8 Task Compliance | 关联 DS/FR 的 TASK 比例 |
 | C9 TC Compliance | 关联 AC/FR 的 TC 比例 |
+
+> **注意**：历史版本的 C1/C2/C5/C7 已归档，当前版本使用核心 5 指标。
 
 ### 3.8 rfc（5 条）
 

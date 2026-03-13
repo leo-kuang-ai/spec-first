@@ -22,13 +22,11 @@ describe('10-archive skill docs consistency', () => {
 
   it('should keep coverage metrics wording aligned with current implementation', () => {
     const retro = read(RETRO_TEMPLATE);
-    expect(retro).toContain('C1: Design Coverage');
-    expect(retro).toContain('C2: API Coverage');
-    expect(retro).toContain('FR → DS（当前实现与 C1 同口径）');
     expect(retro).toContain('C3: Task Coverage');
     expect(retro).toContain('C4: Test Coverage (FR)');
-    expect(retro).toContain('C5: Test Coverage (AC)');
-    expect(retro).toContain('FR → TC（当前实现暂与 C4 同口径）');
+    expect(retro).toContain('C6: Impl Coverage');
+    expect(retro).toContain('C8: Task Compliance');
+    expect(retro).toContain('C9: TC Compliance');
   });
 
   it('should keep break-loop five-dimension sections in retro template', () => {

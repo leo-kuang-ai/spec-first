@@ -21,11 +21,11 @@
 
 | 覆盖维度 | 指标 | 值 |
 |---------|------|-----|
-| C1: Design Coverage | FR → DS | X/Y |
-| C2: API Coverage | FR → DS（当前实现与 C1 同口径） | X/Y |
 | C3: Task Coverage | FR → TASK | X/Y |
 | C4: Test Coverage (FR) | FR → TC | X/Y |
-| C5: Test Coverage (AC) | FR → TC（当前实现暂与 C4 同口径） | X/Y |
+| C6: Impl Coverage | TASK 实现率 | X/Y |
+| C8: Task Compliance | TASK 合规率 | X/Y |
+| C9: TC Compliance | TC 合规率 | X/Y |
 
 ## 三、5 维度失败分析
 

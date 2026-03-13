@@ -209,15 +209,11 @@ export interface MatrixRow {
 
 // ─── 覆盖率指标 ───────────────────────────────────────────
 export interface CoverageMetrics {
-  C1: number; // @deprecated 已下线，保留字段兼容
-  C2: number; // @deprecated 已下线，保留字段兼容
-  C3: number; // Task Coverage
-  C4: number; // Test Coverage (FR)
-  C5: number; // @deprecated 已下线，保留字段兼容
-  C6: number; // Impl Coverage
-  C7: number; // @deprecated 已下线，保留字段兼容
-  C8: number; // Task Compliance
-  C9: number; // TC Compliance
+  C3: number; // 任务覆盖率
+  C4: number; // 测试覆盖率 (FR)
+  C6: number; // 实现覆盖率
+  C8: number; // 任务合规率
+  C9: number; // TC 合规率
 }
 
 // ─── Known Exception ──────────────────────────────────────

@@ -3,7 +3,7 @@
  * stage advance 前检查下一阶段依赖项
  * 支持通过 config.yaml 配置依赖项
  */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { Stage } from '../../shared/types.js';
 import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
@@ -91,14 +91,24 @@ function getStageDependencies(targetStage: Stage, projectRoot: string): StageDep
 }
 
 export function describeDependencyIssues(result: DependencyCheckResult): string[] {
-  return result.missing.map((item) => `缺少 ${item}`);
+  return result.missing.map((item) => {
+    if (item.startsWith('file (empty):')) {
+      return item.replace('file (empty):', '文件内容为空:');
+    }
+    return `缺少 ${item}`;
+  });
 }
 
 /**
  * 过滤默认依赖项（default-simplified profile）
+ * 开发期放松脚本依赖，release 保留完整校验
  */
-function filterDefaultDependencies(deps: StageDependency, _targetStage: Stage): StageDependency {
-  // default-simplified: 仅保留文件依赖，移除 npmScripts 和 envVars
+function filterDefaultDependencies(deps: StageDependency, targetStage: Stage): StageDependency {
+  // release 阶段保留全部依赖（包括 contract:check）
+  if (targetStage === Stage.RELEASE) {
+    return deps;
+  }
+  // 非 release 阶段只保留 files，去掉 npmScripts 和 envVars
   return { stage: deps.stage, files: deps.files };
 }
 
@@ -129,11 +139,17 @@ export function checkDependencies(
     }
   }
 
-  // 检查文件
+  // 检查文件（存在性 + 非空校验，单次 statSync）
   if (deps.files) {
     for (const file of deps.files) {
       const path = file.replace('{featureId}', featureId);
-      if (!existsSync(join(projectRoot, path))) {
+      const fullPath = join(projectRoot, path);
+      try {
+        const stat = statSync(fullPath);
+        if (stat.size === 0) {
+          missing.push(`file (empty): ${path}`);
+        }
+      } catch {
         missing.push(`file: ${path}`);
       }
     }

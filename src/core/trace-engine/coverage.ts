@@ -1,6 +1,6 @@
 /**
  * 覆盖率计算
- * 基于追踪矩阵计算 C1-C9 九项指标
+ * 基于追踪矩阵计算核心 5 项指标：C3/C4/C6/C8/C9
  * 指标值统一为 0~1（比例）
  */
 import type { CoverageMetrics, MatrixRow, MatrixStatus } from '../../shared/types.js';
@@ -14,7 +14,7 @@ import { pct } from './ratio.js';
 /** 排除状态：不计入有效分母 */
 const EXCLUDED_STATUSES: ReadonlySet<MatrixStatus> = new Set(['Deferred', 'Cancelled']);
 
-/** 计算 C1-C9 覆盖率指标 */
+/** 计算核心 5 项覆盖率指标 */
 export function getCoverage(
   featureId: string,
   projectRoot: string,
@@ -31,29 +31,15 @@ export function getCoverage(
   const trace = createTraceContext(active);
 
   return {
-    C1: calcDesignCoverage(trace.frRows, trace.dsRows),
-    C2: calcApiCoverage(trace.frRows, trace.dsRows),
     C3: calcTaskCoverage(trace.frRows, trace.taskRows, trace.lineage),
     C4: calcTestCoverageFR(trace.frRows, trace.tcRows),
-    C5: calcTestCoverageAC(trace.frRows, trace.tcRows),
     C6: calcImplCoverage(trace.taskRows),
-    C7: calcPrCompliance(trace.taskRows),
     C8: calcTaskCompliance(trace.taskRows, trace.frRows, trace.dsRows, trace.lineage),
     C9: calcTcCompliance(trace.tcRows, trace.frRows),
   };
 }
 
-// ─── 正向覆盖率（C1-C6）─────────────────────────────────
-
-/** C1: Design Coverage — FR 中有 DS 映射的比例 */
-function calcDesignCoverage(frRows: MatrixRow[], dsRows: MatrixRow[]): number {
-  return calcUpstreamCoverage(frRows, dsRows);
-}
-
-/** C2: API Coverage — FR 中有 API 相关 DS 映射的比例（同 C1，DS 含 API 设计） */
-function calcApiCoverage(frRows: MatrixRow[], dsRows: MatrixRow[]): number {
-  return calcUpstreamCoverage(frRows, dsRows);
-}
+// ─── 正向覆盖率 ─────────────────────────────────────────
 
 /** C3: Task Coverage — FR 中有 TASK 映射的比例 */
 function calcTaskCoverage(
@@ -78,11 +64,6 @@ function calcTestCoverageFR(frRows: MatrixRow[], tcRows: MatrixRow[]): number {
   return calcUpstreamCoverage(frRows, tcRows);
 }
 
-/** C5: Test Coverage (AC) — 同 C4（AC 级别细化留给 Phase B） */
-function calcTestCoverageAC(frRows: MatrixRow[], tcRows: MatrixRow[]): number {
-  return calcUpstreamCoverage(frRows, tcRows);
-}
-
 /** C6: Impl Coverage — TASK 中状态为 Implemented/Verified/Accepted 的比例 */
 function calcImplCoverage(taskRows: MatrixRow[]): number {
   if (taskRows.length === 0) return 1;
@@ -92,14 +73,7 @@ function calcImplCoverage(taskRows: MatrixRow[]): number {
   return pct(implemented.length, taskRows.length);
 }
 
-// ─── 反向合规率（C7-C9）─────────────────────────────────
-
-/** C7: PR Compliance — TASK 中有上游 FR 关联的比例 */
-function calcPrCompliance(taskRows: MatrixRow[]): number {
-  if (taskRows.length === 0) return 1;
-  const linked = taskRows.filter((r) => r.upstream && r.upstream.length > 0);
-  return pct(linked.length, taskRows.length);
-}
+// ─── 反向合规率 ─────────────────────────────────────────
 
 /** C8: Task Compliance — TASK 有上游 FR/NFR/DS 的比例（反向：无孤儿 TASK） */
 function calcTaskCompliance(

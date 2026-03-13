@@ -4,27 +4,36 @@
 
 > 📚 **完整文档**：[PROJECT-INTRODUCTION.md](PROJECT-INTRODUCTION.md) - 包含生态对比、框架深度解析等详细内容
 
-![Version](https://img.shields.io/badge/version-v0.5.49-blue)
-![Node](https://img.shields.io/badge/node-%3E%3D20-green)
+![Version](https://img.shields.io/badge/version-v0.5.77-blue)
+![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)
 ![License](https://img.shields.io/badge/license-MIT-brightgreen)
 
 ## 项目定位
 
-Spec-First 是一个面向 AI 协同开发场景的**规范驱动研发流程引擎**。它把需求、设计、任务、实现、校验、发布串成一个可追踪、可验证、可恢复的闭环，并同时提供：
+Spec-First 是一个面向 AI 协同开发场景的**规范驱动研发流程引擎**。
 
-- **Skill 层**：面向 Claude Code / Codex 的高层协同入口，负责引导、编排、确认与文档生成。
-- **CLI 层**：面向脚本与 Skill 的确定性原子命令，负责状态、追踪、校验、诊断与宿主集成。
-- **运行时层**：提供阶段状态机、Context Pack、Gate、追踪矩阵、Hook 与 Viewer 支撑。
+### 解决的核心痛点
 
-如果一句话概括：**Spec-First 让 AI 不只是”写代码”，而是按规范、按阶段、按证据推进交付。**
+- **上下文丢失**：多轮对话后 AI 忘记之前的需求和设计决策
+- **质量失控**：AI 生成代码直接提交，缺少质量门禁和验证
+- **追溯困难**：不知道某段代码为什么这么写，需求变更影响范围不清
+- **协作混乱**：团队成员使用 AI 的方式不统一，缺少规范约束
+
+### 三层架构
+
+- **Skill 层**：面向 Claude Code / Codex 的高层协同入口，负责引导、编排、确认与文档生成
+- **CLI 层**：面向脚本与 Skill 的确定性原子命令，负责状态、追踪、校验、诊断与宿主集成
+- **运行时层**：提供阶段状态机、Context Pack、Gate、追踪矩阵、Hook 与 Viewer 支撑
+
+**一句话概括**：Spec-First 让 AI 不只是”写代码”，而是按规范、按阶段、按证据推进交付。
 
 ## 适合谁使用
 
-- **AI 协同开发者**：希望把需求、设计、任务和代码放进同一条受控流程。
-- **流程治理与工程效率负责人**：希望把 Gate、追踪矩阵、缺陷和变更纳入工具化治理。
-- **需要可恢复会话的团队**：希望 AI 会话能恢复上下文，而不是每次重讲一遍项目背景。
-- **想要保留人工控制权的团队**：Spec-First 不追求”全自动替代人”，而是追求”AI 在规则内加速交付”。
+- **个人开发者**：使用 AI 辅助开发，希望保持代码质量和可追溯性
+- **技术 Leader**：需要团队统一 AI 协作规范，确保交付质量
+- **质量负责人**：需要对 AI 生成代码进行门禁管控和验证
+- **开源维护者**：需要规范化的 PR 流程和变更追踪
 
 ## 目录
 
@@ -35,7 +44,7 @@ Spec-First 是一个面向 AI 协同开发场景的**规范驱动研发流程引
 - [安装与初始化](#安装与初始化)
 - [流程模型](#流程模型)
 - [20 个内置 Skills](#20-个内置-skills)
-- [22 组 CLI 命令概览](#22-组-cli-命令概览)
+- [28 组 CLI 命令概览](#28-组-cli-命令概览)
 - [宿主集成与分发](#宿主集成与分发)
 - [可视化面板](#可视化面板)
 - [仓库结构](#仓库结构)
@@ -51,13 +60,13 @@ Spec-First 是一个面向 AI 协同开发场景的**规范驱动研发流程引
 | 维度 | 当前状态 |
 |---|---|
 | 包名 | `spec-first` |
-| 当前版本 | `0.5.49` |
-| 运行环境 | `Node.js >= 20` |
+| 当前版本 | `0.5.77` |
+| 运行环境 | `Node.js >= 20.0.0` |
 | 语言与模块 | TypeScript + ESM |
 | 构建工具 | `tsup` |
 | 测试工具 | `vitest` |
 | 内置 spec-first Skills | **20 个** |
-| 顶层 CLI 命令组 | **22 组** |
+| 顶层 CLI 命令组 | **28 组** |
 | 流程模型 | **8+2 阶段状态机** |
 | 宿主集成 | Claude Code / Codex / Generic |
 | 可视化 | 内置 Stage Viewer |
@@ -99,9 +108,44 @@ spec-first viewer open --print-url
 spec-first update --dry-run
 ```
 
+### 典型使用场景
+
+**新功能开发流程**：
+```bash
+# 在 Claude Code 中使用 Skill
+/spec-first:init          # 初始化 Feature
+/spec-first:spec          # 编写需求规格
+/spec-first:design        # 技术设计
+/spec-first:task          # 任务拆解
+/spec-first:code          # 代码实现
+/spec-first:verify        # 阶段验收
+```
+
+**日常状态检查**：
+```bash
+spec-first feature current    # 查看当前 Feature
+spec-first stage current      # 查看当前阶段
+spec-first metrics report     # 查看覆盖率指标
+spec-first gate               # 检查质量门禁
+```
+
+**CI/CD 集成**：
+```bash
+spec-first gate --stage 04_implement  # 质量门禁检查
+spec-first golive check <featureId>   # 上线就绪检查
+spec-first metrics coverage --threshold 0.8  # 覆盖率校验
+```
+
 > 当前用户文档的官方口径也是：**Skill 是推荐入口，CLI 是底层原子能力层**。
 
 ## 安装与初始化
+
+### 前置条件
+
+- Node.js >= 20.0.0
+- npm 或 pnpm
+- Git（用于 Hooks 集成）
+- Claude Code 或 Codex（可选，用于 Skill 集成）
 
 ### 全局安装
 
@@ -110,19 +154,25 @@ npm install -g spec-first@latest
 spec-first --version
 ```
 
+### 安装验证
+
+```bash
+spec-first --version        # 检查版本
+spec-first doctor           # 环境诊断
+spec-first update --dry-run # 检查宿主集成
+```
+
 如果全局安装后的自动注册没有生效，手动执行：
 
 ```bash
 spec-first update
 ```
 
-### 建议的首次检查
+### 常见问题
 
-```bash
-spec-first doctor
-spec-first update --dry-run
-spec-first update
-```
+- **找不到命令**：检查 npm 全局 bin 目录是否在 PATH 中
+- **update 失败**：检查 `~/.spec-first/` 和 `~/.claude/` 目录权限
+- **init 失败**：确保当前目录是 Git 仓库（`git init`）
 
 ### 在目标项目中初始化 Feature
 
@@ -150,32 +200,35 @@ spec-first init --feat AUTH --mode N --size M --platforms h5,java-backend
 | 阶段 | 含义 | 推荐入口 |
 |---|---|---|
 | `00_init` | 初始化工作区 | `/spec-first:init` |
-| `01_specify` | 需求规格 | `/spec-first:spec` |
-| `02_design` | 技术设计 | `/spec-first:design` |
-| `03_plan` | 任务拆解 | `/spec-first:task` |
+| `01_specify` | 需求规格（FR + AC） | `/spec-first:spec` |
+| `02_design` | 技术设计（DS + API） | `/spec-first:design` |
+| `03_plan` | 任务拆解（TASK） | `/spec-first:task` |
 | `04_implement` | 编码实现 | `/spec-first:code` |
-| `05_verify` | 阶段验收 | `/spec-first:verify` |
+| `05_verify` | 阶段验收（TC） | `/spec-first:verify` |
 | `06_wrap_up` | 归档复盘 | `/spec-first:archive` |
-| `07_release` | 上线检查 | `spec-first golive check <featureId>` |
-| `08_done` | 完成收口 | `spec-first done <featureId>` |
-| `09_cancelled` | 取消终态 | `spec-first stage cancel <featureId>` |
+| `07_release` | 上线检查 | `spec-first golive check` |
+| `08_done` | 完成收口（终态） | `spec-first done` |
+| `09_cancelled` | 取消终态 | `spec-first stage cancel` |
 
-其中 `08_done` 与 `09_cancelled` 是终态。
+**设计原则**：
+- **顺序推进**：确保质量门禁不被跳过，每个阶段都有明确的交付物和验收标准
+- **终态不可逆**：防止已完成项目被误操作，08_done 和 09_cancelled 不可再转换
+- **取消通道**：任何阶段都可以取消（→09_cancelled），保证随时止损
 
 ### Skill 统一执行模型
 
-当前 Skills 采用统一的 P0-P5 模型：
+当前 Skills 采用统一的 P0-P5 六阶段执行模型（详见 `skills/spec-first/SHARED.md`）：
 
 ```text
-P0_LOCATE      定位 Feature / 校验阶段
-P1_CONTEXT     加载 Context Pack 与阶段产物
-P2_GENERATE    AI 推理生成
-P3_CONFIRM     用户确认 / 修改 / 拒绝
-P4_WRITE       写入交付物并注册 ID
-P5_SIDE_EFFECT 矩阵、Gate、运行态同步
+P0_LOCATE      定位 Feature 并校验阶段合法性
+P1_CONTEXT     加载 Context Pack、阶段产物与历史状态
+P2_GENERATE    AI 推理生成交付物草稿
+P3_CONFIRM     用户确认、修改或拒绝（支持多轮迭代）
+P4_WRITE       写入最终交付物并注册追溯 ID
+P5_SIDE_EFFECT 同步追踪矩阵、触发 Gate 评估、更新运行态
 ```
 
-这意味着 Spec-First 不只是“生成文档”，而是把**生成、确认、写入、校验、副作用**统一纳入流程治理。
+这意味着 Spec-First 不只是”生成文档”，而是把**定位、上下文、生成、确认、写入、副作用**六个环节统一纳入流程治理，确保每个 Skill 执行都是可追溯、可验证、可恢复的。
 
 ## 20 个内置 Skills
 
@@ -183,8 +236,8 @@ P5_SIDE_EFFECT 矩阵、Gate、运行态同步
 
 | Skill | 命令 | 作用 |
 |---|---|---|
-| `onboarding` | `/spec-first:onboarding` | 新手引导与学习路径推荐 |
-| `first` | `/spec-first:first` | 项目快速认知，生成技术栈/架构等文档 |
+| `onboarding` | `/spec-first:onboarding` | 新手引导 - 交互式场景识别与学习路径推荐 |
+| `first` | `/spec-first:first` | 项目快速认知 - quick 模式生成 4-5 份核心文档，deep 模式生成 10-11 份完整文档 |
 
 ### 核心阶段 Skills
 
@@ -221,40 +274,51 @@ P5_SIDE_EFFECT 矩阵、Gate、运行态同步
 
 完整 Skill 目录见：`skills/spec-first/README.md`
 
-## 22 组 CLI 命令概览
+## 28 组 CLI 命令概览
 
-当前顶层 CLI 注册于 `src/cli/index.ts`，共 22 组命令：
+当前顶层 CLI 注册于 `src/cli/index.ts`，共 28 组命令：
 
 ### 工作区与流转
 
-- `init`
-- `stage`
-- `feature`
-- `done`
-- `doctor`
+- `init` - 初始化 Feature 工作区
+- `stage` - 阶段流转管理（current/suggest/advance/cancel）
+- `feature` - Feature 列表、切换与查看
+- `done` - 将 Feature 从 07_release 收口到 08_done
+- `doctor` - 环境诊断与修复
 
 ### 追踪、校验与治理
 
-- `id`
-- `matrix`
-- `trace`
-- `validate`
-- `metrics`
-- `gate`
-- `golive`
-- `rfc`
-- `defect`
-- `analyze`
+- `id` - 追溯 ID 生成、校验与检索
+- `matrix` - 同步追踪矩阵
+- `trace` - 追溯链修复与校验
+- `validate` - 产物格式校验
+- `metrics` - 覆盖率度量与健康评分
+- `gate` - 阶段质量门禁评估
+- `golive` - 上线就绪检查与批准
+- `rfc` - RFC 变更请求与状态管理
+- `defect` - 缺陷跟踪与状态管理
+- `analyze` - 跨产物一致性分析
 
-### 协同、提交与宿主集成
+### AI 协同与编排
 
-- `ai`
-- `commit`
-- `hooks`
-- `viewer`
-- `update`
-- `setup`（兼容入口，已废弃）
-- `uninstall`
+- `ai` - 会话恢复与上下文摘要
+- `orchestrate` - 受控编排协调入口（支持 --auto/--resume/--auto-advance）
+- `first` - 项目首轮认知 runtime/docs 刷新
+- `onboarding` - 新手引导 - 交互式场景识别与学习路径推荐
+- `skill` - 动态渲染 skill 内容
+
+### 提交与宿主集成
+
+- `commit` - 规范提交并关联追溯 ID
+- `hooks` - Git Hooks 安装与状态管理
+- `viewer` - Stage Viewer 可视化面板
+- `update` - 升级后刷新 Skill/MCP/Hooks
+- `setup` - 注册 Claude Code + Codex Skill 命令（兼容入口，已废弃）
+- `uninstall` - 清理宿主配置（卸载前执行）
+
+### 开发与测试
+
+- `batch-test` - 批量执行测试（临时命令）
 
 完整参数与子命令请查看：`docs/07-用户文档/CLI命令参考手册.md`
 
@@ -345,6 +409,7 @@ npm run lint
 - `docs/07-用户文档/使用手册.md`
 - `docs/07-用户文档/CLI命令参考手册.md`
 - `docs/07-用户文档/Skill命令参考手册.md`
+- `docs/07-用户文档/Profile配置说明.md`
 - `docs/07-用户文档/npm-发布指引.md`
 
 ### Skill 文档

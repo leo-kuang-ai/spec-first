@@ -4,14 +4,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-export const METRIC_DEFS = [
-  { key: 'C3', name: '任务覆盖率', target: 1.0 },
-  { key: 'C4', name: '测试覆盖率 (FR)', target: 0.8 },
-  { key: 'C6', name: '实现覆盖率', target: 1.0 },
-  { key: 'C8', name: '任务合规率', target: 1.0 },
-  { key: 'C9', name: 'TC 合规率', target: 1.0 },
-];
-
 const WEIGHTS = {
   C3: 0.25, C4: 0.20, C6: 0.25, C8: 0.15, C9: 0.15,
 };

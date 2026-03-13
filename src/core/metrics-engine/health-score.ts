@@ -1,6 +1,6 @@
 /**
  * Health Score Calculation
- * H1 = (w1×C1 + ... + w9×C9) × 100 - penalty(Q1)
+ * H1 = (w1×C3 + w2×C4 + w3×C6 + w4×C8 + w5×C9) × 100 - penalty(Q1)
  * 含 E1 周期时间和 Q1 缺陷逃逸率
  */
 import type { CoverageMetrics } from '../../shared/types.js';
@@ -13,8 +13,8 @@ export interface HealthScore {
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
 }
 
-/** 默认权重 - 只包含 C3/C4/C6/C8/C9 */
-const DEFAULT_WEIGHTS: Record<string, number> = {
+/** 核心指标权重 - default 和 strict 使用相同权重 */
+const CORE_WEIGHTS: Record<string, number> = {
   C3: 0.25,
   C4: 0.20,
   C6: 0.25,
@@ -22,27 +22,13 @@ const DEFAULT_WEIGHTS: Record<string, number> = {
   C9: 0.15,
 };
 
-/** 严格模式权重 - 包含全部 C1-C9 */
-const STRICT_WEIGHTS: Record<string, number> = {
-  C1: 0.08,
-  C2: 0.08,
-  C3: 0.20,
-  C4: 0.15,
-  C5: 0.08,
-  C6: 0.20,
-  C7: 0.06,
-  C8: 0.10,
-  C9: 0.05,
-};
-
 /** 计算综合健康分 */
 export function calcHealthScore(
   coverage: CoverageMetrics,
   cycleTimeDays: number,
-  escapeRate: number,
-  profile: string = 'default-simplified'
+  escapeRate: number
 ): HealthScore {
-  const weights = profile === 'strict' ? STRICT_WEIGHTS : DEFAULT_WEIGHTS;
+  const weights = CORE_WEIGHTS;
   const record = coverage as unknown as Record<string, number>;
   let weighted = 0;
   const breakdown: Record<string, number> = {};

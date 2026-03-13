@@ -84,9 +84,7 @@ export function evaluateGate(
 
   for (const def of defs) {
     const result = def.evaluate(ctx);
-    // 硬编码 warning-only 条件
-    const isWarningOnly = ['G-SPEC-00', 'G-SPEC-03', 'G-DESIGN-03'].includes(def.id);
-    const blocking = isWarningOnly ? false : (result.blocking ?? def.blocking ?? true);
+    const blocking = result.blocking ?? def.blocking ?? true;
     conditions.push({
       id: def.id,
       description: def.description,
@@ -98,7 +96,6 @@ export function evaluateGate(
   }
 
   // Layer2 命令 Gate：从 mergedRules.gateConditions 读取带 command 的条件并执行
-  // 注意：mergedRules 已在规则合并阶段完成 profile 过滤，此处无需再次过滤
   // 行为：执行所有带 command 的条件，跳过已被 Layer1 评估的重复 ID
   const l2Conditions = (state.mergedRules?.gateConditions?.[stage] ?? []) as Array<{
     id: string;

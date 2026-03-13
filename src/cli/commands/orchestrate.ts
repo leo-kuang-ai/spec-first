@@ -95,6 +95,11 @@ export async function handleOrchestrate(
         projectRoot,
         args: orchestrateArgs,
         executor: options.executor,
+        onIteration: (iteration, state) => {
+          const done = state.items.filter((i) => i.status === 'done').length;
+          const total = state.items.length;
+          console.log(`  [auto-loop] 迭代 ${iteration}: ${done}/${total} 任务完成`);
+        },
       });
       console.log(`auto-loop: ${AUTO_LOOP_STATUS_MESSAGES[autoLoopResult.status]}`);
       if (autoLoopResult.haltReason) {

@@ -192,21 +192,6 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     if (selectedNode) {
       selectedNode.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     }
-
-    const historyEl = document.getElementById('historyTable');
-    const candidateRows = Array.from(historyEl.querySelectorAll('tr[data-flow-stage]'));
-    for (const row of candidateRows) {
-      const byHistoryKey = state.selectedHistoryKey && row.getAttribute('data-history-key') === state.selectedHistoryKey;
-      const byFlowStage = !state.selectedHistoryKey && row.getAttribute('data-flow-stage') === activeStage;
-      row.classList.toggle('selected', Boolean(byHistoryKey || byFlowStage));
-    }
-
-    if (state.selectedHistoryKey && !candidateRows.some((row) => row.classList.contains('selected'))) {
-      state.selectedHistoryKey = null;
-      for (const row of candidateRows) {
-        row.classList.toggle('selected', row.getAttribute('data-flow-stage') === activeStage);
-      }
-    }
   }
 
   function calcStageProgress(currentStage) {
@@ -365,7 +350,8 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     for (let index = 0; index < FLOW_STAGES.length; index += 1) {
       const step = FLOW_STAGES[index];
       const stepRank = stageRank.get(step.id);
-      const status = stepRank < currentRank ? 'done' : (step.id === currentStage ? 'current' : 'todo');
+      const isTerminal = currentStage === '08_done' || currentStage === '09_cancelled';
+      const status = stepRank < currentRank ? 'done' : (step.id === currentStage ? (isTerminal ? 'done' : 'current') : 'todo');
       const selectedClass = step.id === activeStage ? 'selected' : '';
       // 从 history 或 gateStatus 中查找该阶段的时间
       const historyItem = history.find(h => normalizeStageId(h.to) === step.id);
@@ -438,39 +424,122 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     `;
   }
 
+  // Gate 检查项中文映射
+  const GATE_DESC_CN = {
+    'G-SPEC-00': 'PRD 存在且质量 ≥ 85%',
+    'G-SPEC-01': 'spec.md 存在',
+    'G-SPEC-02': 'FR/NFR ID 已分配',
+    'G-SPEC-03': '需求质量分 (C10) ≥ 80%',
+    'G-DESIGN-01': '设计文档存在',
+    'G-DESIGN-03': '架构合规性 (C11)',
+    'G-PLAN-01': '任务拆解文档存在',
+    'G-PLAN-02': '任务已关联 FR',
+    'G-PLAN-03': '任务覆盖率达标',
+    'G-IMPL-01': '追踪矩阵覆盖率 ≥ 基线',
+    'G-BE-LINT': 'Lint 检查通过',
+    'G-BE-UNIT': '单元测试通过',
+    'G-BE-CONTRACT': '契约测试通过',
+    'G-VERIFY-01': '测试用例覆盖率达标',
+    'G-VERIFY-03': '测试执行通过',
+    'G-WRAP-01': '归档复盘文档存在',
+    'G-WRAP-02': '回顾记录已完成',
+    'G-REL-01': '冒烟测试报告存在',
+    'G-REL-02': '发布说明存在',
+  };
+
+  function gateDescCn(c) {
+    return GATE_DESC_CN[c.id] || c.description || '-';
+  }
+
+  // 详情文本：完整展示
+  function formatDetail(detail) {
+    if (!detail) return '';
+    return `<span class="muted" style="word-break:break-all;white-space:normal;">${escapeHtml(detail)}</span>`;
+  }
+
   function renderStageTables(stageState, activeStage) {
-    const gates = (((stageState.mergedRules || {}).gateConditions || {})[activeStage]) || [];
     const deliverables = (((stageState.mergedRules || {}).deliverables || {})[activeStage]) || [];
 
     document.getElementById('gateTitle').textContent = `${stageLabel(activeStage)} Gate`;
     document.getElementById('deliverableTitle').textContent = `${stageLabel(activeStage)} 产物`;
 
-    // 使用 Gate 历史数据渲染表格
-    const gateHistory = state.gateStatus?.current?.conditions || [];
-    const gateRows = gates.map((item) => {
-      const history = gateHistory.find(h => h.id === item.id);
-      let statusBadge = '<span class="muted">-</span>';
-      if (history) {
-        if (history.status === 'PASS') {
-          statusBadge = '<span class="ok">[OK]</span>';
-        } else if (history.status === 'WAIVER') {
-          statusBadge = '<span class="ok">[WVR]</span>';
-        } else if (history.status === 'FAIL') {
-          statusBadge = history.blocking ? '<span class="fail">[FAIL]</span>' : '<span class="warn">[WARN]</span>';
-        }
+    // 从 API 响应获取结构化 Gate 数据
+    const isCurrentStage = activeStage === state.gateStatus?.current?.currentStage;
+    let conditions = [];
+    if (isCurrentStage && state.gateStatus?.current?.conditions?.length > 0) {
+      // 当前阶段：使用实时 evaluator 结果
+      conditions = state.gateStatus.current.conditions;
+    } else if (state.gateStatus?.stages?.[activeStage]?.conditions?.length > 0) {
+      // 历史阶段：使用历史快照
+      conditions = state.gateStatus.stages[activeStage].conditions;
+    }
+
+    // 拆分为阻断条件和警告
+    const effectiveGates = conditions.filter(c => c.blocking !== false);
+    const warnings = conditions.filter(c => c.status === 'FAIL' && c.blocking === false);
+
+    function conditionBadge(c) {
+      if (c.status === 'PASS') return '<span class="ok">✓ 通过</span>';
+      if (c.status === 'WAIVER') return '<span class="ok">⊘ 豁免</span>';
+      if (c.status === 'FAIL' && c.blocking === false) return '<span class="warn">⚠ 警告</span>';
+      if (c.status === 'FAIL') return '<span class="fail">✗ 阻断</span>';
+      return '<span class="muted">-</span>';
+    }
+
+    // 渲染阻断条件表
+    const gateRows = effectiveGates.map(c => [
+      `<span class="mono">${escapeHtml(c.id || '-')}</span>`,
+      escapeHtml(gateDescCn(c)),
+      conditionBadge(c),
+      c.detail ? formatDetail(c.detail) : '',
+    ]);
+
+    renderTable('gateTable', ['编号', '检查项', '状态', '详情'], gateRows);
+
+    // 渲染警告（如有）
+    const warningEl = document.getElementById('gateWarnings');
+    if (warningEl) {
+      if (warnings.length > 0) {
+        const warningRows = warnings.map(c => [
+          `<span class="mono">${escapeHtml(c.id || '-')}</span>`,
+          escapeHtml(gateDescCn(c)),
+          '<span class="warn">⚠ 警告</span>',
+          c.detail ? formatDetail(c.detail) : '',
+        ]);
+        warningEl.innerHTML = `<h4>⚠ 非阻断警告 (${warnings.length})</h4>`;
+        const warningTableEl = document.createElement('div');
+        warningTableEl.id = 'gateWarningTable';
+        warningEl.appendChild(warningTableEl);
+        renderTable('gateWarningTable', ['编号', '检查项', '状态', '详情'], warningRows);
+        warningEl.style.display = 'block';
+      } else {
+        warningEl.innerHTML = '';
+        warningEl.style.display = 'none';
       }
-      return [
-        `<span class="mono">${escapeHtml(item.id || '-')}</span>`,
-        `${statusBadge} ${escapeHtml(item.description || '-')}`,
-        item.command ? `<span class="mono">${escapeHtml(item.command)}</span>` : '<span class="muted">manual</span>',
-      ];
-    });
+    }
 
-    renderTable('gateTable', ['id', 'description', 'command'], gateRows);
+    // 状态摘要
+    const summaryEl = document.getElementById('gateSummary');
+    if (summaryEl && (isCurrentStage || conditions.length > 0)) {
+      const summary = isCurrentStage
+        ? state.gateStatus.current.statusSummary
+        : { status: state.gateStatus?.stages?.[activeStage]?.status, blockingCount: effectiveGates.filter(c => c.status === 'FAIL').length, warningCount: warnings.length };
+      if (summary?.status) {
+        const statusClass = summary.status === 'PASS' ? 'ok' : summary.status === 'FAIL' ? 'fail' : 'warn';
+        summaryEl.innerHTML = `<span class="${statusClass}">${escapeHtml(summary.status)}</span>` +
+          (summary.blockingCount > 0 ? ` · <span class="fail">${summary.blockingCount} 阻断</span>` : '') +
+          (summary.warningCount > 0 ? ` · <span class="warn">${summary.warningCount} 警告</span>` : '');
+        summaryEl.style.display = 'block';
+      } else {
+        summaryEl.style.display = 'none';
+      }
+    } else if (summaryEl) {
+      summaryEl.style.display = 'none';
+    }
 
-    renderTable('deliverableTable', ['name', 'required', 'description'], deliverables.map((item) => [
+    renderTable('deliverableTable', ['文件', '必需', '说明'], deliverables.map((item) => [
       `<span class="mono">${escapeHtml(item.name || '-')}</span>`,
-      item.required ? '<span class="ok">yes</span>' : '<span class="muted">no</span>',
+      item.required ? '<span class="ok">✓ 必需</span>' : '<span class="muted">可选</span>',
       escapeHtml(item.description || ''),
     ]));
   }
@@ -554,43 +623,12 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     const activeStage = resolveActiveStage(currentStage);
 
     const history = Array.isArray(s.history) ? s.history : [];
-    renderTable('historyTable', ['from', 'to', 'at', 'by'], history.map((item) => {
-      const toStage = item.to || '';
-      return [
-        `<span class="mono">${escapeHtml(formatStageIdWithLabel(item.from || '-'))}</span>`,
-        `<span class="mono">${escapeHtml(formatStageIdWithLabel(toStage || '-'))}</span>`,
-        escapeHtml(formatTimestamp(item.at || item.timestamp)),
-        escapeHtml(item.by || '-'),
-      ];
-    }));
-
-    const historyTableEl = document.getElementById('historyTable');
-    const rows = Array.from(historyTableEl.querySelectorAll('tr')).slice(1);
-    rows.forEach((row, index) => {
-      const historyItem = history[index];
-      const flowStage = resolveHistoryFlowStage(historyItem);
-      if (!flowStage) return;
-      const historyKey = getHistoryKey(historyItem, index);
-      row.setAttribute('data-flow-stage', flowStage);
-      row.setAttribute('data-history-key', historyKey);
-      row.addEventListener('click', () => {
-        selectStage(s, flowStage, { historyKey });
-      });
-    });
 
     selectStage(s, activeStage);
-
-    const thresholds = (s.mergedRules || {}).thresholds || {};
-    renderTable('thresholdTable', ['metric', 'value', 'direction'], Object.entries(thresholds).map(([key, item]) => [
-      `<span class="mono">${escapeHtml(key)}</span>`,
-      escapeHtml(item?.value ?? '-'),
-      escapeHtml(item?.direction ?? '-'),
-    ]));
 
     // Parallel API requests (TASK-HOMEPERF-008)
     await Promise.all([
       loadHealthDashboard(),
-      loadTaskProgress(),
       loadGateStatus(s),
       loadTimeline(),
     ]);
@@ -615,9 +653,10 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
       }
       state.gateStatus = await res.json();
 
-      // 重新渲染阶段流转图以显示 Gate 状态
+      // 重新渲染阶段流转图和 Gate 表以显示最新状态
       if (stageState) {
         renderStageFlow(stageState, state.selectedFlowStage || stageState.currentStage);
+        renderStageTables(stageState, state.selectedFlowStage || stageState.currentStage);
       }
     } catch (e) {
       console.error('Failed to load gate status:', e);
@@ -650,7 +689,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
   }
 
   function renderHealthDashboard(data) {
-    const { health, coverage, profile } = data;
+    const { health, coverage, profile, metricTargets = {} } = data;
 
     // Health Score
     const score = health?.H1 ?? 0;
@@ -658,6 +697,12 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
 
     document.getElementById('healthScoreValue').textContent = Math.round(score);
     document.getElementById('healthGrade').textContent = `等级 ${grade}`;
+
+    // 健康分说明文本
+    const healthLabelEl = document.querySelector('.health-score-label');
+    if (healthLabelEl) {
+      healthLabelEl.innerHTML = '健康分<div style="font-size:10px;color:var(--muted);margin-top:2px;">综合评分基于以下5项指标</div>';
+    }
 
     // Progress Ring
     const progressEl = document.getElementById('healthRingProgress');
@@ -678,33 +723,74 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     // Profile 显示
     const profileEl = document.getElementById('healthProfile');
     if (profileEl && profile) {
-      profileEl.textContent = `Profile: ${profile}`;
+      const profileText = profile === 'default-simplified' ? '开发友好模式' : profile === 'strict' ? '严格模式' : profile;
+      const tooltip = profile === 'default-simplified' ? '适合快速迭代，部分检查项为警告级别' : '所有检查项均为阻断级别';
+      profileEl.innerHTML = `门禁配置: ${profileText} <span style="color:var(--muted);cursor:help;" title="${tooltip}">ⓘ</span>`;
       profileEl.style.display = 'block';
     }
 
     // Coverage Bars - 只显示核心指标
     const CORE_METRICS = ['C3', 'C4', 'C6', 'C8', 'C9'];
-    const metricDefs = (data.metricDefs || []).filter(def => CORE_METRICS.includes(def.key));
+    const METRIC_NAMES = {
+      C3: '任务覆盖率',
+      C4: '测试覆盖率 (FR)',
+      C6: '实现覆盖率',
+      C8: '任务合规率',
+      C9: 'TC合规率'
+    };
     const coverageBarsEl = document.getElementById('coverageBars');
-    if (metricDefs.length > 0 && coverage) {
-      coverageBarsEl.innerHTML = metricDefs.map((def) => {
-        const value = (coverage[def.key] ?? 0) * 100;
-        const target = def.target * 100;
-        const statusClass = value >= target ? 'pass' : (value >= target * 0.7 ? 'warn' : 'fail');
+    if (coverage) {
+      const bars = CORE_METRICS.map((key) => {
+        const value = (coverage[key] ?? 0) * 100;
+        const target = metricTargets[key];
+
+        // 当前阶段未考核的指标
+        if (target === undefined) {
+          return `
+            <div class="coverage-item" style="opacity: 0.6;">
+              <div class="coverage-item-header">
+                <span class="name">${escapeHtml(key)} ${escapeHtml(METRIC_NAMES[key])}</span>
+                <span class="value muted">${value.toFixed(0)}% <small>(当前阶段不考核)</small></span>
+              </div>
+              <div class="coverage-bar">
+                <div class="coverage-bar-fill" style="width:${Math.min(value, 100)}%; background: #ccc;"></div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">该指标将在后续阶段纳入考核</div>
+            </div>
+          `;
+        }
+
+        const targetPct = target * 100;
+        const statusClass = value >= targetPct ? 'pass' : (value >= targetPct * 0.7 ? 'warn' : 'fail');
         const color = statusClass === 'pass' ? 'var(--ok)' : (statusClass === 'warn' ? 'var(--warn)' : 'var(--danger)');
+        const statusText = statusClass === 'pass' ? '✓ 已达标' : (statusClass === 'warn' ? '⚠ 待改进' : '✗ 需关注');
+
+        // 友好提示
+        let hint = '';
+        if (value === 0 && statusClass === 'fail') {
+          hint = '<div style="font-size:10px;color:var(--muted);margin-top:2px;">提示: 尚未开始相关工作，建议尽快启动</div>';
+        } else if (statusClass === 'fail') {
+          hint = '<div style="font-size:10px;color:var(--muted);margin-top:2px;">提示: 当前进度未达标，建议优先处理</div>';
+        }
 
         return `
           <div class="coverage-item">
             <div class="coverage-item-header">
-              <span class="name">${escapeHtml(def.key)} ${escapeHtml(def.name)}</span>
-              <span class="value" style="color:${color}">${value.toFixed(0)}%</span>
+              <span class="name">${escapeHtml(key)} ${escapeHtml(METRIC_NAMES[key])}</span>
+              <span class="value">
+                <span style="color:${color}">实际: ${value.toFixed(0)}%</span>
+                <span class="muted"> | 目标: ${targetPct.toFixed(0)}%</span>
+                <span style="color:${color}"> | ${statusText}</span>
+              </span>
             </div>
             <div class="coverage-bar">
               <div class="coverage-bar-fill ${statusClass}" style="width:${Math.min(value, 100)}%"></div>
             </div>
+            ${hint}
           </div>
         `;
-      }).join('');
+      });
+      coverageBarsEl.innerHTML = bars.join('');
     } else {
       coverageBarsEl.innerHTML = '<div class="muted">暂无覆盖率数据</div>';
     }
@@ -994,11 +1080,13 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     const currentStageIndex = stageState ? FLOW_STAGES.findIndex(fs => fs.id === stageState.currentStage) : -1;
 
     // Update status based on current stage position
+    const isTerminalStage = stageState && (stageState.currentStage === '08_done' || stageState.currentStage === '09_cancelled');
     for (let i = 0; i < allStages.length; i++) {
       if (currentStageIndex >= 0 && i < currentStageIndex) {
         allStages[i].status = 'complete';
       } else if (i === currentStageIndex) {
-        allStages[i].status = 'in-progress';
+        // 终态阶段标记为 complete，非终态标记为 in-progress
+        allStages[i].status = isTerminalStage ? 'complete' : 'in-progress';
       } else if (currentStageIndex >= 0) {
         allStages[i].status = 'pending';
       }
@@ -1076,7 +1164,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
       const width = totalHours > 0 ? ((stage.durationHours || 0) / totalHours * 100) : 0;
       const statusClass = 'complete';
       const stageLabel = FLOW_STAGES.find(fs => fs.id === stage.stage)?.label || stage.stageName;
-      const durationText = stage.durationDays >= 1 ? stage.durationDays + '天' : stage.durationHours + '小时';
+      const durationText = stage.durationHours === 0 ? '-' : (stage.durationDays >= 1 ? stage.durationDays + '天' : stage.durationHours + '小时');
 
       return `
         <div class="timeline-gantt-row">

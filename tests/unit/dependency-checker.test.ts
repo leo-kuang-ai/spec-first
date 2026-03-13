@@ -19,8 +19,8 @@ describe('dependency-checker', () => {
   });
 
   it('should pass when all dependencies exist', () => {
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'), '');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'), '');
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'), '# PRD\ncontent');
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'), '# Spec\ncontent');
 
     const result = checkDependencies(FEATURE_ID, Stage.DESIGN, TEST_ROOT);
     expect(result.pass).toBe(true);
@@ -40,6 +40,15 @@ describe('dependency-checker', () => {
     const result = checkDependencies(FEATURE_ID, Stage.DESIGN, TEST_ROOT);
     expect(result.pass).toBe(false);
     expect(result.missing).toContain(`file: specs/${FEATURE_ID}/prd.md`);
+  });
+
+  it('should detect empty required files', () => {
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'), '');
+    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'), '');
+
+    const result = checkDependencies(FEATURE_ID, Stage.DESIGN, TEST_ROOT);
+    expect(result.pass).toBe(false);
+    expect(result.missing).toContain(`file (empty): specs/${FEATURE_ID}/prd.md`);
   });
 
   it('should skip check for stage without dependencies', () => {
@@ -67,5 +76,21 @@ describe('dependency-checker', () => {
 
     const result = checkDependencies(FEATURE_ID, Stage.IMPLEMENT, TEST_ROOT);
     expect(result.pass).toBe(true);
+  });
+
+  it('should preserve contract:check in release stage with default-simplified', () => {
+    writeFileSync(join(TEST_ROOT, 'package.json'), JSON.stringify({ scripts: {} }));
+
+    const result = checkDependencies(FEATURE_ID, Stage.RELEASE, TEST_ROOT, 'default-simplified');
+    expect(result.pass).toBe(false);
+    expect(result.missing).toContain('npm script: contract:check');
+  });
+
+  it('should preserve contract:check in release stage with strict', () => {
+    writeFileSync(join(TEST_ROOT, 'package.json'), JSON.stringify({ scripts: {} }));
+
+    const result = checkDependencies(FEATURE_ID, Stage.RELEASE, TEST_ROOT, 'strict');
+    expect(result.pass).toBe(false);
+    expect(result.missing).toContain('npm script: contract:check');
   });
 });

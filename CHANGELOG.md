@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v0.5.109 2026-03-13 Claude: feat(viewer): Stage Viewer 深度优化与修复 - 修复阶段耗时分布计算（优先使用 stage_advance 事件时间，终态阶段使用 advance 时间而非 new Date()）；Gate/产物表格优化（表头中文化、状态独立列、检查方式本地化）；修复历史阶段 Gate 状态显示（getAllStageGateStatus 返回 conditions，前端根据 activeStage 匹配）；Gate 检查项描述中文化（新增 GATE_DESC_CN 映射）；详情文本自动换行完整展示；终态阶段覆盖率指标 fallback（metricTargets 为空时填入目标值） (user-visible)
+- v0.5.108 2026-03-13 Claude: refactor(process-engine): 编排决策拆分与依赖检查增强 - decideNextStep 拆分为 checkPrerequisites/checkBlockers/decideForStage 三个子函数降低复杂度；修复 PASS_WITH_WAIVER 被错误阻塞的 bug（与 advance.ts 逻辑对齐）；依赖检查新增空文件校验并合并为单次 statSync；优化错误描述格式；orchestrate 命令接入 auto-loop onIteration 进度回调
+
+- v0.5.107 2026-03-13 Claude: feat(viewer): Stage Viewer UI/UX 全面优化 - 健康分添加"综合评分基于以下5项指标"说明；门禁配置添加 tooltip 悬停说明；未考核指标添加"该指标将在后续阶段纳入考核"提示；0%/未达标指标添加友好建议；删除质量阈值表格和阶段历史表格；阶段说明改为折叠默认隐藏；修复刷新按钮 SVG 路径错误；优化空状态提示；时间线视图改为默认展示；修复终态阶段（08_done/09_cancelled）流转图节点显示为绿色"已完成"而非蓝色"进行中" (user-visible)
+- v0.5.106 2026-03-13 Claude: fix(viewer): 修复终态阶段时间线显示问题 - renderTimeline 函数新增终态判断，08_done/09_cancelled 显示为"完成"而非"进行中"；getTimelineData 函数修复终态阶段持续时间计算，终态阶段持续时间为 0 而非持续增长 (user-visible)
+- v0.5.105 2026-03-13 Claude: fix(viewer): 修复 metrics 接口回归与前端展示优化 - 删除重复的旧 /metrics 路由（返回 metricDefs），保留新路由（返回 metricTargets）；删除 health-utils.js 中未使用的 METRIC_DEFS 常量；前端接入服务端 metricTargets 并标注"当前阶段不考核"的指标；getStageTargets 返回对象格式；gate history 显示 warning 数量；考核指标添加彩色左边框高亮，非考核指标降低透明度；指标显示中文名称；采用累积模式显示已通过阶段的指标；优化展示样式（显示目标值和状态文本）；移除任务进度模块 (user-visible)
+- v0.5.104 2026-03-13 Claude: docs(user-manual): 更新用户文档以反映核心 5 指标 - 使用手册.md 更新健康分权重配置、metrics 命令说明、FAQ 覆盖率计算说明；Skill命令参考手册.md 更新核心指标表格并添加历史指标归档说明；完成 P2 文档清理工作 (user-visible)
+- v0.5.103 2026-03-13 Claude: refactor(viewer): 清理 viewer 侧遗留 C1/C2/C5/C7 类型定义 - task-parser.ts 的 CoverageMetrics 接口更新为核心 5 指标，stage-viewer.test.ts 测试数据更新为核心 5 指标，所有测试通过
+- v0.5.102 2026-03-13 Claude: docs(readme): 专业视角深度审查并优化 README.md - 补充核心痛点说明（上下文丢失/质量失控/追溯困难/协作混乱）；优化用户画像（个人开发者/技术Leader/质量负责人/开源维护者）；补充 8+2 阶段设计原则（顺序推进/终态不可逆/取消通道）；新增典型使用场景（新功能开发/日常检查/CI集成）；补充安装前置条件、验证步骤和常见问题 (user-visible)
+- v0.5.101 2026-03-13 Claude: feat(gate): CLI 智能提示与配置验证 - gate check 新增智能提示功能（自动识别环境问题并给出解决建议）；新增 gate validate-config 命令（检查 Profile 配置）；创建 Profile 模板库（frontend/backend/mobile.yaml）和使用指南 (user-visible)
+- v0.5.100 2026-03-13 Claude: docs(readme): 深度审查并修正 README.md 各章节内容 - 优化 P0-P5 执行模型描述（补充六阶段详细说明和执行语义）；补充 Profile配置说明.md 文档索引；精确化 Node.js 版本要求为 >=20.0.0；优化 Skills 认知与引导章节描述 (user-visible)
+- v0.5.99 2026-03-13 Claude: test(metrics): 补充阶段化 target 和 release 边界测试 - 新增 metrics 阶段化判定测试（04_implement C4=67% 通过，05_verify C4=67% 失败），新增 dependency-checker release 边界测试（default-simplified 和 strict 模式下 07_release 缺少 contract:check 均失败）
+- v0.5.98 2026-03-13 Claude: fix(metrics): 完成指标优化遗留问题修复 - stage-viewer 新增 getStageTargets() 函数实现阶段化指标目标，/api/feature/:id/metrics 返回 metricTargets 字段；metrics report/health 输出添加"健康分不等于当前阶段 Gate"提示；dependency-checker 统一过滤所有非 release 阶段；删除 gate-evaluator 误导性注释 (user-visible)
+- v0.5.97 2026-03-13 Claude: refactor(metrics): 全链路指标优化 - 物理删除 C1/C2/C5/C7，统一使用核心 5 指标（C3/C4/C6/C8/C9）；新增 core-metric-thresholds.ts 统一真源模块；修复 dependency-checker.ts 的 release 边界误放松问题（07_release 保留 contract:check）；删除 gate-evaluator.ts 的 warning 硬编码覆盖；health-score.ts 和 bottleneck.ts 统一使用核心权重；metrics CLI 支持阶段化 target 展示；viewer 新增 /api/feature/:id/metrics 接口；更新所有相关测试 (user-visible)
 - v0.5.96 2026-03-13 Claude: fix(viewer): Stage Viewer 指标模型与 CLI 对齐 - health-utils.js 更新为核心 5 指标（C3/C4/C6/C8/C9）和新权重（0.25/0.20/0.25/0.15/0.15），移除 C1/C2/C5/C7 计算逻辑，与 CLI default-simplified 模式保持一致
 - v0.5.95 2026-03-13 Claude: fix(gate): 修复 warning 被写入 Failed Conditions - appendFixStepsToFindings 函数过滤 blocking: false 条件，将 warning 单独记录到 Warnings 部分，Failed Conditions 仅包含真正阻断的失败项
 - v0.5.94 2026-03-13 Claude: fix(metrics): 修正 C3/C6/C8/C9 目标阈值为 100% - 将 METRIC_DEFS 中 C3/C6/C8/C9 的 target 从 0.8 改为 1.0，与 Gate 要求保持一致

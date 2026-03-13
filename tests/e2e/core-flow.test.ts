@@ -106,7 +106,7 @@ describe('Core Flow E2E', () => {
   it('should compute coverage metrics after init', () => {
     const cov = getCoverage(featureId, TMP);
     expect(cov).toBeDefined();
-    expect(typeof cov.C1).toBe('number');
+    expect(typeof cov.C3).toBe('number');
     expect(typeof cov.C6).toBe('number');
   });
 

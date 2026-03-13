@@ -22,19 +22,12 @@ export interface MetricsReport {
 }
 
 /** R1-R5 瓶颈检测规则 */
-export function detectBottlenecks(
-  coverage: CoverageMetrics,
-  profile: string = 'default-simplified'
-): Bottleneck[] {
+export function detectBottlenecks(coverage: CoverageMetrics): Bottleneck[] {
   const bottlenecks: Bottleneck[] = [];
   const c = coverage as unknown as Record<string, number>;
-  const metricsToCheck =
-    profile === 'strict'
-      ? ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9']
-      : ['C3', 'C4', 'C6', 'C8', 'C9'];
 
   // R1: 需求瓶颈 — C3 < 0.6
-  if (metricsToCheck.includes('C3') && c.C3 < 0.6) {
+  if (c.C3 < 0.6) {
     bottlenecks.push({
       rule: 'R1',
       description: 'Requirement bottleneck: low task coverage',
@@ -44,7 +37,7 @@ export function detectBottlenecks(
   }
 
   // R2: 测试瓶颈 — C4 < 0.6
-  if (metricsToCheck.includes('C4') && c.C4 < 0.6) {
+  if (c.C4 < 0.6) {
     bottlenecks.push({
       rule: 'R2',
       description: 'Test bottleneck: insufficient test coverage',
@@ -54,7 +47,7 @@ export function detectBottlenecks(
   }
 
   // R3: 实现滞后 — C6 < 0.7
-  if (metricsToCheck.includes('C6') && c.C6 < 0.7) {
+  if (c.C6 < 0.7) {
     bottlenecks.push({
       rule: 'R3',
       description: 'Implementation lag: tasks not fully implemented',
@@ -64,7 +57,7 @@ export function detectBottlenecks(
   }
 
   // R4: 合规缺口 — C8 < 0.7
-  if (metricsToCheck.includes('C8') && c.C8 < 0.7) {
+  if (c.C8 < 0.7) {
     bottlenecks.push({
       rule: 'R4',
       description: 'Compliance gap: task compliance below threshold',
@@ -74,7 +67,7 @@ export function detectBottlenecks(
   }
 
   // R5: 测试追溯缺口 — C9 < 0.7
-  if (metricsToCheck.includes('C9') && c.C9 < 0.7) {
+  if (c.C9 < 0.7) {
     bottlenecks.push({
       rule: 'R5',
       description: 'Traceability gap: low test compliance',

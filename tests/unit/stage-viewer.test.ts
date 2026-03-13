@@ -251,8 +251,7 @@ describe('getDefaultMetrics', () => {
 describe('calcHealthScore', () => {
   it('should calculate H1 with all metrics at 100%', () => {
     const coverage = {
-      C1: 1, C2: 1, C3: 1, C4: 1,
-      C5: 1, C6: 1, C7: 1, C8: 1, C9: 1,
+      C3: 1, C4: 1, C6: 1, C8: 1, C9: 1,
     };
     const result = calcHealthScore(coverage);
     expect(result.H1).toBe(100);
@@ -261,8 +260,7 @@ describe('calcHealthScore', () => {
 
   it('should calculate H1 with all metrics at 80%', () => {
     const coverage = {
-      C1: 0.8, C2: 0.8, C3: 0.8, C4: 0.8,
-      C5: 0.8, C6: 0.8, C7: 0.8, C8: 0.8, C9: 0.8,
+      C3: 0.8, C4: 0.8, C6: 0.8, C8: 0.8, C9: 0.8,
     };
     const result = calcHealthScore(coverage);
     expect(result.H1).toBe(80);
@@ -271,8 +269,7 @@ describe('calcHealthScore', () => {
 
   it('should calculate grade C at 70%', () => {
     const coverage = {
-      C1: 0.7, C2: 0.7, C3: 0.7, C4: 0.7,
-      C5: 0.7, C6: 0.7, C7: 0.7, C8: 0.7, C9: 0.7,
+      C3: 0.7, C4: 0.7, C6: 0.7, C8: 0.7, C9: 0.7,
     };
     const result = calcHealthScore(coverage);
     expect(result.H1).toBe(70);
@@ -281,8 +278,7 @@ describe('calcHealthScore', () => {
 
   it('should calculate grade D at 60%', () => {
     const coverage = {
-      C1: 0.6, C2: 0.6, C3: 0.6, C4: 0.6,
-      C5: 0.6, C6: 0.6, C7: 0.6, C8: 0.6, C9: 0.6,
+      C3: 0.6, C4: 0.6, C6: 0.6, C8: 0.6, C9: 0.6,
     };
     const result = calcHealthScore(coverage);
     expect(result.H1).toBe(60);
@@ -291,8 +287,7 @@ describe('calcHealthScore', () => {
 
   it('should calculate grade F below 60%', () => {
     const coverage = {
-      C1: 0.5, C2: 0.5, C3: 0.5, C4: 0.5,
-      C5: 0.5, C6: 0.5, C7: 0.5, C8: 0.5, C9: 0.5,
+      C3: 0.5, C4: 0.5, C6: 0.5, C8: 0.5, C9: 0.5,
     };
     const result = calcHealthScore(coverage);
     expect(result.H1).toBe(50);
@@ -301,8 +296,7 @@ describe('calcHealthScore', () => {
 
   it('should apply escape rate penalty', () => {
     const coverage = {
-      C1: 1, C2: 1, C3: 1, C4: 1,
-      C5: 1, C6: 1, C7: 1, C8: 1, C9: 1,
+      C3: 1, C4: 1, C6: 1, C8: 1, C9: 1,
     };
     const result = calcHealthScore(coverage, 0.1); // 10% escape rate
     // penalty = 0.1 * 200 = 20
@@ -312,8 +306,7 @@ describe('calcHealthScore', () => {
 
   it('should cap penalty at 50', () => {
     const coverage = {
-      C1: 1, C2: 1, C3: 1, C4: 1,
-      C5: 1, C6: 1, C7: 1, C8: 1, C9: 1,
+      C3: 1, C4: 1, C6: 1, C8: 1, C9: 1,
     };
     const result = calcHealthScore(coverage, 0.5); // 50% escape rate
     // base = 100 (all core metrics = 1)
@@ -335,8 +328,7 @@ describe('calcHealthScore', () => {
 
   it('should include breakdown', () => {
     const coverage = {
-      C1: 1, C2: 1, C3: 1, C4: 1,
-      C5: 1, C6: 1, C7: 1, C8: 1, C9: 1,
+      C3: 1, C4: 1, C6: 1, C8: 1, C9: 1,
     };
     const result = calcHealthScore(coverage);
     expect(result.breakdown.C3).toBe(25); // 1 * 0.25 * 100
