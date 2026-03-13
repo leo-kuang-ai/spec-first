@@ -1,6 +1,6 @@
 {
   "name": "spec-first",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams",
   "type": "module",
   "bin": {
