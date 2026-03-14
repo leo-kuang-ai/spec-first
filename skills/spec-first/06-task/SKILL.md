@@ -1,9 +1,10 @@
 ---
 name: "spec-first:task"
 description: "定位 Feature 并校验阶段为任务拆解（03_plan）"
-version: 1.2.0
-last_updated: 2026-03-05
+version: 1.3.0
+last_updated: 2026-03-15
 changelog: |
+  v1.3.0: 对齐当前 task_plan 模板、C3=100% Gate 口径、验证命令列与 canonical 状态集
   v1.2.0: 新增 Execution Handoff、Hooks 行为规范、中断恢复策略、Error Log Pattern、Decision Log Pattern、Operation Types
   v1.1.0: 新增 Announce at Start、字面即精神原则、Bite-Sized Granularity、Task Structure Detail、决策流程图、When to Stop and Ask、references/ 目录、hooks 配置
   v1.0.0: Initial version with standardized metadata
@@ -29,7 +30,7 @@ hooks:
         - type: checkpoint
           message: "[task] 检查清单：任务粒度？依赖完整？验收标准？references 已引用？"
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   phase: "stable"
   category: "spec-phase"
 ---
@@ -124,7 +125,7 @@ I'm using the task skill to break down [Feature] into executable tasks.
 | 创建文件 | Create `src/auth/service.ts` | 5-10 分钟 |
 | 读取参考 | Read `docs/api-spec.md` section 3 | 5-15 分钟 |
 | 编写代码 | Implement `login()` function | 15-30 分钟 |
-| 运行测试 | `npm test auth.test.ts` | 2-5 分钟 |
+| 运行测试 | `pnpm vitest run tests/unit/auth.test.ts` | 2-5 分钟 |
 | 本地验证 | `curl http://localhost:3000/api/login` | 2-5 分钟 |
 | 提交代码 | git commit | 2-5 分钟 |
 
@@ -179,15 +180,15 @@ git commit -m "scope: brief description"
 <expected output>
 ```
 
-**状态**: planned | in_progress | complete | verified
+**状态**: todo | in_progress | blocked | verified | done
 ```
 
 ### 任务明细表
 
-| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |
-|---------|------|-------|----------|--------|------------|----------|------|
-| TASK-AUTH-001 | 初始化鉴权模块 | BE | 0.5d | FR-AUTH-001,DS-AUTH-001 | - | 模块骨架创建完成 | planned |
-| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | TASK-AUTH-001 | API 可调用且返回正确 | planned |
+| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+|---------|------|-------|----------|--------|------------|----------|----------|------|
+| TASK-AUTH-001 | 初始化鉴权模块 | BE | 0.5d | FR-AUTH-001,DS-AUTH-001 | - | 模块骨架创建完成 | pnpm vitest run tests/unit/auth/init.test.ts | todo |
+| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | TASK-AUTH-001 | API 可调用且返回正确 | pnpm vitest run tests/unit/auth/send-otp.test.ts | todo |
 
 ## Task Breakup 决策流程图
 
@@ -253,8 +254,8 @@ digraph task_breakup_flow {
   UpdateMatrix -> CoverageCheck;
 
   CoverageCheck [label="覆盖率检查"];
-  CoverageCheck -> Done [label="C3 > 0%"];
-  CoverageCheck -> AddTasks [label="C3 = 0%"];
+  CoverageCheck -> Done [label="C3 = 100%"];
+  CoverageCheck -> AddTasks [label="C3 < 100%"];
 
   AddTasks [label="补充任务"];
   AddTasks -> CoverageCheck;
@@ -344,7 +345,7 @@ task 阶段只输出执行计划，不输出实现代码：
 - `spec-first id next TASK <abbr> --feature <featureId>`
 - `spec-first matrix update`
 - `spec-first matrix check`
-- `spec-first metrics coverage`
+- `spec-first trace validate <featureId>`
 
 ## 输出路径
 
@@ -359,10 +360,11 @@ task 阶段只输出执行计划，不输出实现代码：
 
 ## 成功标准
 
-- `task_plan.md` 已写入，包含所有 TASK 定义（ID、标题、Owner、工期、依赖、状态）
+- `task_plan.md` 已写入，包含所有 TASK 定义（ID、标题、Owner、工期、依赖、验收标准、验证命令、状态）
 - 所有 TASK 已通过 `id next TASK` 注册
 - `traceability-matrix.md` 已更新，每个 FR 有对应 TASK 引用
-- `metrics coverage` C3 (Task Coverage) > 0%
+- `trace validate` / `matrix check` 通过
+- `metrics coverage` 或 Gate 校验显示 `C3 (Task Coverage) = 100%`
 - Review Checklist 已通过自检
 
 **格式校验（P4 落盘后自动执行）**:
@@ -399,7 +401,7 @@ spec-first validate format <featureId>
 ## TASK 字段语义
 
 - **Owner**：单一责任人（一个 TASK 仅允许 1 名 owner）
-- **Status**：`planned | in_progress | blocked | complete | verified`
+- **Status**：主文档示例统一使用 `todo | in_progress | blocked | verified | done`
 - **depends_on**：仅允许引用同一 Feature 下 TASK ID，禁止自然语言依赖
 - **任务明细表契约**：首个非空单元格为 TASK ID，最后非空单元格为状态
 
@@ -440,10 +442,10 @@ Phase 2: Implementation
 
 ## 任务明细
 
-| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |
-|---------|------|-------|----------|--------|------------|----------|------|
-| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | - | API 可调用，返回成功/频控错误码 | planned |
-| TASK-AUTH-003 | 验证码登录 API | BE | 1d | FR-AUTH-001,DS-AUTH-002 | TASK-AUTH-002 | 正确登录并覆盖错误路径 | planned |
+| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+|---------|------|-------|----------|--------|------------|----------|----------|------|
+| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | - | API 可调用，返回成功/频控错误码 | pnpm vitest run tests/unit/auth/send-otp.test.ts | todo |
+| TASK-AUTH-003 | 验证码登录 API | BE | 1d | FR-AUTH-001,DS-AUTH-002 | TASK-AUTH-002 | 正确登录并覆盖错误路径 | pnpm vitest run tests/unit/auth/login-by-code.test.ts | todo |
 ```
 
 ## Execution Handoff

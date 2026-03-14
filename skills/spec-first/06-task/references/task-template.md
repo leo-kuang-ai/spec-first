@@ -11,7 +11,7 @@
 
 | Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
 |---|---|---|---|---|---|---|---|---|
-| TASK-AUTH-001 | 登录接口实现 | dev | 1d | FR-AUTH-001 | - | 返回 token 且错误码完整 | pnpm test -- tests/unit/auth.test.ts | in_progress |
+| TASK-AUTH-001 | 登录接口实现 | dev | 1d | FR-AUTH-001 | - | 返回 token 且错误码完整 | pnpm vitest run tests/unit/auth.test.ts | todo |
 
 ## 实施步骤
 
@@ -22,8 +22,8 @@
 
 ## 验证命令
 
-- pnpm test -- tests/unit/auth.test.ts
-- pnpm test -- tests/e2e/auth-flow.test.ts
+- pnpm vitest run tests/unit/auth.test.ts
+- pnpm vitest run tests/e2e/auth-flow.test.ts
 ```
 
 ## 字段要求
@@ -35,7 +35,7 @@
 | `depends_on` | 仅填 TASK ID，多个用逗号分隔 |
 | `验收标准` | 写结果，不写动作 |
 | `验证命令` | 写最小可执行命令，不能留空 |
-| `状态` | `todo/in_progress/blocked/verified/done` |
+| `状态` | 主文档示例统一使用 `todo/in_progress/blocked/verified/done` |
 
 ## 实施步骤
 
