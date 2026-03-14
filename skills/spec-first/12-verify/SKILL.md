@@ -187,16 +187,18 @@ I'm using the verify skill to validate [Feature] stage completion.
 
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
-| G-IMPL-01 | Unit test coverage (C4) | ≥ 80% |
+| G-IMPL-01 | Unit test coverage (C4) | 读取 gate.thresholds.G-IMPL-01 |
 | G-IMPL-02 | PR compliance (C7) | = 100% |
 
 ### 05_verify
 
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
-| G-VERIFY-01 | Test coverage FR (C4) | = 100% |
+| G-VERIFY-01 | Test coverage FR (C4) | 读取 gate.thresholds.G-VERIFY-01 |
 | G-VERIFY-02 | Test coverage AC (C5) | ≥ 90% (M/L), 60% (S) |
 | G-VERIFY-03 | TC compliance (C9) | = 100% |
+
+> `G-IMPL-01` / `G-VERIFY-01` 的阈值真理源为 `.spec-first/meta/config.yaml` 与 `.spec-first/local/config.yaml` 中的 `gate.thresholds`。执行 verify 时读取 `.spec-first/meta/config.yaml` / `.spec-first/local/config.yaml`，再解释 Gate 结果。
 
 ### 06_wrap_up
 

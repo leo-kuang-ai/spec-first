@@ -168,7 +168,12 @@ export function resolvePromptAssemblyContext(
     currentTask: readCurrentTask(executionContext.projectRoot, featureId),
     tokenBudget: cfg.context.token_budget,
     maxIterations: cfg.runtime.max_iterations,
-    maxSelfCorrection: cfg.runtime.max_self_corrections,
+    // 取 min(max_self_corrections, max_retry_per_task)：
+    // prompt 承诺的自我修正上限不应超过程序实际允许的重试上限
+    maxSelfCorrection: Math.min(
+      cfg.runtime.max_self_corrections,
+      cfg.runtime.auto_orchestrate.max_retry_per_task
+    ),
     dateIso: new Date().toISOString(),
   };
 }

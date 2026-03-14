@@ -116,12 +116,15 @@ export function migrateLegacyRetryCount(retry: AutoLoopRetry): AutoLoopRetry {
 
 /**
  * 综合重试决策：错误分类 → 预算检查 → 计数检查 → 退避计算
- * 返回是否应重试及退避时长
+ * P4: taskRetryCount 为任务级重试次数，优先于全局 regenerateCount
+ * NEW-1: taskLastFailureReason 为任务级上次失败原因，用于 fingerprint 比对，优先于全局
  */
 export function makeRetryDecision(
   failureMessage: string,
   retry: AutoLoopRetry,
-  config: AutoOrchestrateConfig
+  config: AutoOrchestrateConfig,
+  taskRetryCount?: number,
+  taskLastFailureReason?: string | null
 ): RetryDecision {
   const category = classifyError(failureMessage);
 
@@ -135,7 +138,7 @@ export function makeRetryDecision(
     };
   }
 
-  // 预算耗尽
+  // 预算耗尽（全局时间预算）
   if (isRetryBudgetExhausted(retry, config.max_total_retry_duration_ms)) {
     return {
       shouldRetry: false,
@@ -145,18 +148,31 @@ export function makeRetryDecision(
     };
   }
 
-  // 单任务重试次数耗尽
-  if (retry.regenerateCount >= config.max_retry_per_task) {
+  // P4: 优先使用任务级计数（若提供），否则降级为全局 regenerateCount
+  const effectiveRetryCount = taskRetryCount ?? retry.regenerateCount;
+  if (effectiveRetryCount >= config.max_retry_per_task) {
     return {
       shouldRetry: false,
-      reason: `max_retry_per_task reached: ${retry.regenerateCount}/${config.max_retry_per_task}`,
+      reason: `max_retry_per_task reached: ${effectiveRetryCount}/${config.max_retry_per_task}`,
       backoffMs: 0,
       errorCategory: category,
     };
   }
 
   // 可重试：计算退避
-  const backoffMs = computeBackoffMs(config.retry_backoff_ms, retry.regenerateCount + 1);
+  // P3 fix: 集成连续失败检测，同一 fingerprint 连续 2 次 → 3× 退避
+  // NEW-1: fingerprint 比对优先用任务级 lastFailureReason，避免多任务场景下跨任务污染
+  const previousReason =
+    taskLastFailureReason !== undefined ? taskLastFailureReason : retry.lastFailureReason;
+  const injection = buildFailureInjection(failureMessage, previousReason);
+  const consecutiveMultiplier = injection.forceBackoff ? 3 : 1;
+  // P6 联动: unknown 错误使用更保守的退避（2×），为分类不准确留缓冲
+  const unknownMultiplier = category === 'unknown' ? 2 : 1;
+  const backoffMs = Math.min(
+    computeBackoffMs(config.retry_backoff_ms, effectiveRetryCount + 1)
+      * consecutiveMultiplier * unknownMultiplier,
+    30_000
+  );
 
   return {
     shouldRetry: true,

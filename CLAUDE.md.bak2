@@ -1,0 +1,149 @@
+# CLAUDE.md
+
+Spec-First 全链路研发闭环引擎——阶段状态机驱动 Feature 从需求到上线，规范可被自动化校验，每个实现可追溯对应规范定义。
+
+---
+
+## 🛠️ 技术栈与常用命令
+
+**技术栈**
+
+- **Runtime**: Node.js ≥20, ESM (`"type": "module"`)
+- **Language**: TypeScript ≥5.4, strict mode, `verbatimModuleSyntax`
+- **Bundler**: tsup
+- **Test**: Vitest (globals enabled, v8 coverage, 75% threshold)
+- **Lint**: eslint + typescript-eslint, Prettier
+- **Templates**: Handlebars | **Config**: js-yaml
+
+**常用命令**
+
+```bash
+# 构建
+npm run build              # tsup 打包
+npm run typecheck          # tsc --noEmit 类型检查
+
+# 测试
+npm test                   # vitest run（全量）
+npm run test:watch         # vitest watch 模式
+npx vitest run tests/unit/fs-utils.test.ts  # 单文件
+npx vitest run -t "pattern"                 # 按名称匹配
+
+# 代码质量
+npm run lint               # eslint src
+npm run lint:fix
+npm run format             # prettier 格式化
+```
+
+---
+
+## 🏗️ 架构速查
+
+### 核心模块 (`src/core/`)
+
+| 模块 | 职责 |
+|------|------|
+| `process-engine/` | 阶段状态机（8 active + 2 terminal stages），驱动 Feature 生命周期 |
+| `skill-runtime/` | Skill 分发、prompt 组装、hard-gate 校验 |
+| `ai-orchestrator/` | Auto-loop、catchup 上下文恢复、context-pack |
+| `gate-engine/` | 阶段质量门禁评估、豁免管理 |
+| `trace-engine/` | 追溯 ID 生成/校验/搜索、覆盖率矩阵（C3/C4/C6/C8/C9） |
+| `change-mgr/` | RFC + Defect 状态机、影响分析 |
+| `template/` | Handlebars 模板渲染、产物检查 |
+| `tool-integration/` | AI runtime hooks、context 同步 |
+| `metrics-engine/` | 健康度评分、瓶颈分析 |
+
+### 命令路由
+
+- 入口: `src/cli/index.ts` → `dispatch(argv)`
+- 路由: `src/cli/router.ts` — `Map<string, CommandEntry>` 注册表
+- Skill 三层路由: **Semantic Map** → **Runtime Route**（`RUNTIME_COMMANDS`）→ **Skill File**（`resolveSkillPath()` → 包级 fallback）
+- Skill 加载管线: 读文件 → `ensureNextStepsPolicy()` → `assemblePrompt()` → KV-cache 检查 → `buildHardGateRuntimeNotice()`
+
+### 关键约定
+
+- **ESM only** — 全项目 `"type": "module"`，使用 `import/export`
+- **Named exports only** — core 模块不使用 default export
+- **文件命名**: `kebab-case.ts`
+- **类型集中**: `src/shared/types.ts`（Stage enum、ExitCode、ID types）
+- **未使用变量**: `_` 前缀（eslint 规则 `^_`）
+- **Stage 枚举**: `00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release → 08_done / 09_cancelled`
+- **追溯 ID 类型（14 类）**: FR, DS, TASK, TC, RFC, REQ, SYS, ARCH, MOD, ATP, STP, ITP, UTP, Feature
+
+### 测试结构
+
+```
+tests/unit/        # 单元测试（每模块一文件）
+tests/integration/ # 集成测试
+tests/e2e/         # 端到端测试
+tests/benchmark/   # 性能基准测试
+tests/fixtures/    # 测试固件数据
+覆盖率阈值: lines/functions/statements 75%, branches 65%
+```
+
+---
+
+## 🔒 强制规则
+
+**三条原则**：
+
+1. **KISS + 最小影响** — 变更只触及必要范围，找根因，不打临时补丁
+2. **规范驱动** — 任何实现必须能追溯到对应规范定义（FR/DS/TASK）
+3. **主动挑战** — 结论与数据矛盾、计划过于乐观、技术优先伤害业务价值时，直接指出并提供依据
+
+**代码变动铁律**：
+
+- **CHANGELOG.md 强制更新**：任何源码新增/删除/修改，必须同步在根目录 `CHANGELOG.md` 添加一条记录
+  - 格式：`- vX.Y.Z YYYY-MM-DD 作者: 一句话摘要`，用户可见变更末尾加 `(user-visible)`
+  - 无此记录的代码变动一律拒绝生成
+- **强制自检**：完成后确认实现与需求完全对齐，规范与代码一致
+- **CLAUDE.md 同步提交**：每次 commit 将 CLAUDE.md 纳入提交范围
+
+---
+
+## 📋 工作流程
+
+非简单任务走完整流程；修 Bug 直接修（见"自主修 Bug"）：
+
+1. **计划** — 在 `specs/{featureId}/task_plan.md` 写可勾选的任务清单
+2. **确认** — 实现前与用户确认
+3. **执行** — 逐项实现，完成时标记，每步给出高层摘要
+4. **自检** — 实现与需求对齐？CHANGELOG 更新？
+
+不得"带假设开工"，所有疑点在前期调研中厘清。
+
+---
+
+## ⚙️ Claude 工作模式
+
+**Plan 模式**（3+ 步骤或涉及架构决策时必须进入）：
+- 遇到偏差立即停下重新规划，不要硬推
+- 前期写清楚详细 spec，减少歧义
+
+**Subagent 策略**：
+- 调研、探索、并行分析下放给 subagent
+- 复杂问题多 subagent 并行投入算力
+- 每个 subagent 只做一件事，保持聚焦
+
+**完成前验证**：
+- 跑测试、查日志、展示正确性
+- 对比 main 分支与当前变更行为差异
+
+**自主修 Bug**：
+- 收到 bug 报告后直接修复，不反问用户怎么做
+- CI 测试失败时主动修复，无需指导
+
+---
+
+## 🎯 输出规范
+
+默认中文回复；技术术语保留英文原文（如 API、Spec-First、ESM）。
+
+---
+
+<!-- SPEC-FIRST:BEGIN MANUAL -->
+<!-- 手动补充上下文，请保留此块 -->
+<!-- SPEC-FIRST:END MANUAL -->
+
+<!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
+<!-- 此块由 spec-first context sync 自动更新，请勿手动编辑 -->
+<!-- SPEC-FIRST:END AUTO-CONTEXT -->

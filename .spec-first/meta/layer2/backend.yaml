@@ -1,0 +1,29 @@
+platform: backend
+name: Generic Backend API
+description: Language agnostic backend service standard
+gate_conditions:
+  04_implement:
+    - id: G-BE-LINT
+      description: Lint pass
+      command: npm run lint
+    - id: G-BE-UNIT
+      description: Unit test pass
+      command: npm test
+  05_verify:
+    - id: G-BE-CONTRACT
+      description: API contract check pass
+      command: npm run contract:check
+extra_deliverables:
+  02_design:
+    - name: contracts/openapi.yaml
+      required: true
+  07_release:
+    - name: reports/api-change-log.md
+      required: false
+quality_thresholds:
+  api_p95_latency:
+    value: 300
+    direction: lower_is_better
+  error_rate:
+    value: 1
+    direction: lower_is_better

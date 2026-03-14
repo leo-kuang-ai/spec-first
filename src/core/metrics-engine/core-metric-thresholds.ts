@@ -1,8 +1,9 @@
 /**
  * 核心指标阈值统一真源
- * 从 Gate 条件定义中抽取的阶段化指标阈值
+ * 从 config.yaml 读取的阶段化指标阈值
  */
 import { Stage } from '../../shared/types.js';
+import { DEFAULT_SPEC_FIRST_CONFIG, loadConfig } from '../../shared/config-schema.js';
 
 export interface MetricTargetDef {
   key: 'C3' | 'C4' | 'C6' | 'C8' | 'C9';
@@ -14,8 +15,18 @@ export interface MetricTargetDef {
 /** 核心指标集合 */
 export const CORE_METRICS = ['C3', 'C4', 'C6', 'C8', 'C9'] as const;
 
+function resolveConfiguredThreshold(
+  projectRoot: string | undefined,
+  gateId: 'G-IMPL-01' | 'G-VERIFY-01'
+): number {
+  const thresholds = projectRoot
+    ? loadConfig(projectRoot).gate.thresholds
+    : DEFAULT_SPEC_FIRST_CONFIG.gate.thresholds;
+  return thresholds[gateId].value;
+}
+
 /** 获取指定阶段的核心指标阈值 */
-export function getStageMetricTargets(stage: Stage): MetricTargetDef[] {
+export function getStageMetricTargets(stage: Stage, projectRoot?: string): MetricTargetDef[] {
   switch (stage) {
     case Stage.PLAN:
       return [
@@ -23,10 +34,22 @@ export function getStageMetricTargets(stage: Stage): MetricTargetDef[] {
         { key: 'C8', name: '任务合规率', target: 1.0, blocking: true },
       ];
     case Stage.IMPLEMENT:
-      return [{ key: 'C4', name: '测试覆盖率 (FR)', target: 0.6, blocking: true }];
+      return [
+        {
+          key: 'C4',
+          name: '测试覆盖率 (FR)',
+          target: resolveConfiguredThreshold(projectRoot, 'G-IMPL-01'),
+          blocking: true,
+        },
+      ];
     case Stage.VERIFY:
       return [
-        { key: 'C4', name: '测试覆盖率 (FR)', target: 0.8, blocking: true },
+        {
+          key: 'C4',
+          name: '测试覆盖率 (FR)',
+          target: resolveConfiguredThreshold(projectRoot, 'G-VERIFY-01'),
+          blocking: true,
+        },
         { key: 'C9', name: 'TC 合规率', target: 1.0, blocking: true },
       ];
     case Stage.WRAP_UP:

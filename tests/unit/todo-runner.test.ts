@@ -10,6 +10,7 @@ import {
   updateTodoStatus,
   advanceTodoIteration,
   summarizeTodoState,
+  diagnoseStuckReason,
 } from '../../src/core/ai-orchestrator/todo-runner.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-todo-runner');
@@ -122,5 +123,54 @@ describe('todo runner', () => {
 
     const next = pickNextTodo(state);
     expect(next).toBeUndefined();
+  });
+});
+
+// ─── P5: diagnoseStuckReason ─────────────────────────────
+describe('diagnoseStuckReason', () => {
+  it('all_blocked: 全部 pending 已 blocked', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'T1', title: 'A', status: 'blocked' },
+      { id: 'T2', title: 'B', status: 'blocked' },
+    ]);
+    const d = diagnoseStuckReason(state);
+    expect(d.type).toBe('all_blocked');
+    expect(d.taskIds).toEqual(['T1', 'T2']);
+  });
+
+  it('dependency_blocked: pending 任务依赖已 blocked 的任务', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'T1', title: 'A', status: 'blocked' },
+      { id: 'T2', title: 'B', status: 'pending', dependsOn: ['T1'] },
+    ]);
+    const d = diagnoseStuckReason(state);
+    expect(d.type).toBe('dependency_blocked');
+    expect(d.taskIds).toContain('T2');
+  });
+
+  it('dependency_blocked: pending 任务依赖不存在的任务', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'T1', title: 'A', status: 'pending', dependsOn: ['T-GHOST'] },
+    ]);
+    const d = diagnoseStuckReason(state);
+    expect(d.type).toBe('dependency_blocked');
+  });
+
+  it('cyclic_dependency: 循环依赖', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'T1', title: 'A', status: 'pending', dependsOn: ['T2'] },
+      { id: 'T2', title: 'B', status: 'pending', dependsOn: ['T1'] },
+    ]);
+    const d = diagnoseStuckReason(state);
+    expect(d.type).toBe('cyclic_dependency');
+  });
+
+  it('waiting_for_deps: 正常等待（依赖为 pending 但无环）', () => {
+    const state = initTodoState(FEAT, TMP, [
+      { id: 'T1', title: 'A', status: 'pending' },
+      { id: 'T2', title: 'B', status: 'pending', dependsOn: ['T1'] },
+    ]);
+    const d = diagnoseStuckReason(state);
+    expect(d.type).toBe('waiting_for_deps');
   });
 });

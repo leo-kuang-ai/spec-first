@@ -10,6 +10,7 @@ import {
   TASK_CONTEXT_SCRIPT,
   STOP_GUARD_SCRIPT,
   PROGRESS_SYNC_SCRIPT,
+  EXTENSION_HOOK_SCRIPT,
   MANAGED_HOOK_COMMAND_MARKERS,
   ensureManagedHookScripts,
 } from './ai-runtime-hook-scripts.js';
@@ -34,6 +35,15 @@ const WRITE_INTENT_MATCHER =
 
 function wrapSoftHook(command: string, hookName: string): string {
   return `sh -c '${command} || echo "spec-first: ${hookName} hook 执行失败（已降级）" >&2'`;
+}
+
+function shellQuote(value: string): string {
+  if (value.length === 0) return "''";
+  return `'${value.replace(/'/g, `'"'"'`)}'`;
+}
+
+function encodeHookArg(value: string): string {
+  return Buffer.from(value, 'utf8').toString('base64url');
 }
 
 /** 生成 AI Runtime Hook 配置（用于写入 .claude/settings.json） */
@@ -74,8 +84,10 @@ export function generateAIHookConfigs(projectRoot: string): AIHookConfig[] {
     ext.hooks.map((hook) => ({
       type: hook.type,
       matcher: hook.matcher,
-      // 命名空间注入用于审计定位（不改变 hook 本体语义）
-      command: `sh -c 'SPEC_FIRST_EXTENSION_NAMESPACE=${ext.namespace}; ${hook.command}'`,
+      // 通过托管脚本执行扩展 hook，避免把 namespace/command 直接插值进 shell 字符串。
+      command: `${shellQuote(process.execPath)} ${shellQuote(EXTENSION_HOOK_SCRIPT)} ${shellQuote(
+        encodeHookArg(ext.namespace)
+      )} ${shellQuote(encodeHookArg(hook.command))}`,
     }))
   );
 

@@ -55,7 +55,7 @@ describe('prompt assembler', () => {
     expect(ctx.currentTask).toBe('TASK-AUTH-001');
     expect(ctx.tokenBudget).toBe(12000);
     expect(ctx.maxIterations).toBe(7);
-    expect(ctx.maxSelfCorrection).toBe(4);
+    expect(ctx.maxSelfCorrection).toBe(3); // min(max_self_corrections=4, max_retry_per_task=3)
   });
 
   it('should replace supported placeholders', () => {

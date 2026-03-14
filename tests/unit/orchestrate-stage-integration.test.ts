@@ -93,7 +93,7 @@ afterEach(() => {
 
 describe('handleOrchestrate stage integration', () => {
   const successExecutor: TaskExecutor = async () => ({ success: true, message: 'ok' });
-  const failExecutor: TaskExecutor = async () => ({ success: false, message: 'blocked' });
+  const failExecutor: TaskExecutor = async () => ({ success: false, message: 'ENOENT: no such file' });
 
   it('should suggest stage advance after auto-loop completes by default', async () => {
     const featureId = await setupFeature();

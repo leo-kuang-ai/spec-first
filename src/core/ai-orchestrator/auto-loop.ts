@@ -9,9 +9,11 @@ import {
   saveTodoState,
   pickReadyTodos,
   updateTodoStatus,
+  updateTodoItem,
   advanceTodoIteration,
+  diagnoseStuckReason,
   createAutoLoopState,
-  setTodoResumeAt,
+  cascadeBlocked,
 } from './todo-runner.js';
 import type { TodoRunnerState, TodoItem, HaltReasonCode } from './todo-runner.js';
 import { loadConfig } from '../../shared/config-schema.js';
@@ -72,6 +74,8 @@ export interface AutoLoopResult {
 interface GuardResult {
   passed: boolean;
   reason?: string;
+  /** P7: block=环境问题需人工介入, retry_with_correction=质量问题可重试 */
+  policy?: 'block' | 'retry_with_correction';
 }
 
 // ─── 状态初始化 ─────────────────────────────────────────
@@ -86,6 +90,49 @@ function ensureAutoLoopState(state: TodoRunnerState): TodoRunnerState {
       autoLoop: createAutoLoopState(),
     },
   };
+}
+
+/** P9: 进程重启后恢复中断的任务，将僵尸 in_progress 重置为 pending */
+function recoverInterruptedTasks(
+  state: TodoRunnerState,
+  featureId: string,
+  projectRoot: string
+): TodoRunnerState {
+  const zombies = state.items.filter((i) => i.status === 'in_progress');
+  if (zombies.length === 0) return state;
+
+  // 清理运行态
+  let recovered = state;
+  for (const z of zombies) {
+    recovered = updateTodoStatus(recovered, z.id, 'pending');
+    // 递增 retryCount 防止无限崩溃重试循环
+    recovered = updateTodoItem(recovered, z.id, {
+      retryCount: (z.retryCount ?? 0) + 1,
+      lastFailureReason: 'process_crash_recovery',
+    });
+    writeAuditLog(
+      { event: 'zombie_recovered', featureId, taskId: z.id },
+      projectRoot
+    );
+  }
+
+  // 清理 autoLoop 运行态（全部 4 个瞬时字段必须重置，避免重启后 watchdog 按旧时间戳误判超时）
+  const autoLoop = recovered.runtime?.autoLoop ?? createAutoLoopState();
+  recovered = {
+    ...recovered,
+    runtime: {
+      ...recovered.runtime,
+      autoLoop: {
+        ...autoLoop,
+        currentTaskId: null,
+        taskStartedAt: null,
+        heartbeatAt: null,
+        watchdogCheckedAt: null,
+      },
+    },
+  };
+
+  return recovered;
 }
 
 // ─── 主循环 ─────────────────────────────────────────────
@@ -117,8 +164,16 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
   }
 
   state = ensureAutoLoopState(state);
+
+  // P9 fix: 进程重启后恢复 in_progress 僵尸任务 → pending
+  state = recoverInterruptedTasks(state, featureId, projectRoot);
+
   const completedTasks: string[] = [];
   const startIteration = state.iteration;
+
+  // P8 fix: 循环外预加载项目级 slop 规则，避免每个任务都重新读磁盘
+  // completionMarkers 不缓存：Skill 级 markers 优先于项目级，每个任务的 skillMeta 不同
+  const preloadedSlopRules = loadSlopRules(projectRoot);
 
   while (state.iteration < state.maxIterations && !state.halted) {
     // 1) Pick ready todos
@@ -160,6 +215,22 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         }
       }
 
+      // P5 fix: 在 advance iteration 前诊断是否存在死锁
+      const diagnosis = diagnoseStuckReason(state);
+      if (diagnosis.type !== 'waiting_for_deps') {
+        writeAuditLog(
+          { event: 'loop_stuck', featureId, detail: { type: diagnosis.type, taskIds: diagnosis.taskIds } },
+          projectRoot
+        );
+        state = haltState(state, 'blocked');
+        state = {
+          ...state,
+          haltReason: `stuck_${diagnosis.type}${diagnosis.taskIds ? ':' + diagnosis.taskIds.join(',') : ''}`,
+        };
+        checkpoint(state, projectRoot, onCheckpoint);
+        return buildResult(state, startIteration, completedTasks);
+      }
+
       // 有未完成但无可执行 → advance iteration 等待依赖
       state = advanceTodoIteration(state);
       checkpoint(state, projectRoot, onCheckpoint);
@@ -168,6 +239,12 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
     }
 
     // 2) 执行每个 ready TASK
+    // 设计决策：即使 pickReadyTodos 返回多个 [P] 任务，此处仍串行 await 执行。
+    // 原因：(a) executor 是 LLM API 调用，受 rate limit 制约，并行收益有限；
+    //       (b) AutoLoopState（currentTaskId/heartbeatAt/retry）是单任务结构，
+    //           并行化需要完整重构为多任务跟踪 + fork-execute-merge 模型；
+    //       (c) 默认 max_parallel=1，当前无实际并行场景。
+    // 如需真正并行，参见审查报告 P10 附录中的改造路径分析。
     for (const task of ready) {
       state = markTaskStarted(state, task.id);
       checkpoint(state, projectRoot, onCheckpoint);
@@ -175,7 +252,25 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
       // 审计：task_started
       writeAuditLog({ event: 'task_started', featureId, taskId: task.id }, projectRoot);
 
-      const result = await executor(task, state);
+      // P1 fix: Promise.race 防止 executor 挂起导致主循环永久卡死
+      // 注意：超时后 executor 内部已发出的异步操作仍可能继续运行，
+      // 此处仅让 Auto-Loop 主循环能够继续推进，不是真正的取消机制。
+      const taskTimeoutMs = cfg.runtime.auto_orchestrate.max_task_duration_ms;
+      let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+      const result = await Promise.race([
+        executor(task, state),
+        new Promise<TaskResult>((_, reject) => {
+          timeoutHandle = setTimeout(
+            () => reject(new Error(`TASK_TIMEOUT:${task.id}:${taskTimeoutMs}ms`)),
+            taskTimeoutMs
+          );
+        }),
+      ]).catch((err: Error): TaskResult => ({
+        success: false,
+        message: err.message,
+      })).finally(() => {
+        if (timeoutHandle) clearTimeout(timeoutHandle);
+      });
 
       // 执行后更新 heartbeat + watchdog 检查
       state = updateHeartbeat(state);
@@ -211,8 +306,47 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
       }
 
       if (result.success) {
-        const guard = runPostWriteGuards(task, result, featureId, projectRoot);
+        const guard = runPostWriteGuards(task, result, featureId, projectRoot, preloadedSlopRules);
         if (!guard.passed) {
+          // P7: 区分 block（环境问题）和 retry_with_correction（质量问题）
+          if (guard.policy === 'retry_with_correction') {
+            const retryState = state.runtime?.autoLoop?.retry ?? createAutoLoopState().retry;
+            const guardRetryDecision = makeRetryDecision(
+              `GUARD_CORRECTION:${guard.reason}`,
+              retryState,
+              cfg.runtime.auto_orchestrate,
+              task.retryCount ?? 0,
+              task.lastFailureReason ?? null
+            );
+
+            if (guardRetryDecision.shouldRetry) {
+              state = updateTodoStatus(state, task.id, 'pending');
+              state = updateTodoItem(state, task.id, {
+                retryCount: (task.retryCount ?? 0) + 1,
+                lastFailureReason: `GUARD_CORRECTION:${guard.reason}`,
+                resumeAt: Date.now() + guardRetryDecision.backoffMs,
+              });
+              state = updateAutoLoopLastResult(
+                state, task.id, 'pending',
+                `guard retry scheduled (${guardRetryDecision.backoffMs}ms): ${guard.reason}`
+              );
+              writeAuditLog(
+                {
+                  event: 'guard_retry_scheduled',
+                  featureId,
+                  taskId: task.id,
+                  detail: { reason: guard.reason, backoffMs: guardRetryDecision.backoffMs },
+                },
+                projectRoot
+              );
+              state = applyRetryToState(state, guardRetryDecision, `GUARD_CORRECTION:${guard.reason}`);
+              checkpoint(state, projectRoot, onCheckpoint);
+              continue;
+            }
+            // guard 重试预算耗尽 → 降级为 blocked
+          }
+
+          // block 策略或 retry 预算耗尽
           state = updateTodoStatus(state, task.id, 'blocked');
           state = updateAutoLoopLastResult(
             state,
@@ -231,6 +365,12 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
           );
 
           if (cfg.runtime.auto_orchestrate.stop_on_blocked) {
+            // NEW-2: cascade blocked 下游后再 halt，状态文件准确反映传播结果
+            const { state: cs, cascaded: cc } = cascadeBlocked(state);
+            if (cc.length > 0) {
+              state = cs;
+              writeAuditLog({ event: 'blocked_cascade', featureId, detail: { cascaded: cc } }, projectRoot);
+            }
             state = haltState(state, 'blocked', task.id);
             checkpoint(state, projectRoot, onCheckpoint);
             return buildResult(state, startIteration, completedTasks);
@@ -244,17 +384,25 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         writeAuditLog({ event: 'task_done', featureId, taskId: task.id }, projectRoot);
       } else {
         const retryState = state.runtime?.autoLoop?.retry ?? createAutoLoopState().retry;
+        // P4: 传入任务级 retryCount，优先于全局 regenerateCount
+        // NEW-1: 传入任务级 lastFailureReason，fingerprint 比对用任务级上下文，避免多任务污染
         const retryDecision = makeRetryDecision(
           result.message,
           retryState,
-          cfg.runtime.auto_orchestrate
+          cfg.runtime.auto_orchestrate,
+          task.retryCount ?? 0,
+          task.lastFailureReason ?? null
         );
         state = applyRetryToState(state, retryDecision, result.message);
 
-        if (retryDecision.shouldRetry && retryDecision.errorCategory === 'temporary') {
+        if (retryDecision.shouldRetry && retryDecision.errorCategory !== 'permanent') {
           state = updateTodoStatus(state, task.id, 'pending');
-          // F-07: 设置退避恢复时间，pickReadyTodos 会过滤 resumeAt 未到的任务
-          state = setTodoResumeAt(state, task.id, Date.now() + retryDecision.backoffMs);
+          // P4: 更新任务级失败状态
+          state = updateTodoItem(state, task.id, {
+            retryCount: (task.retryCount ?? 0) + 1,
+            lastFailureReason: result.message,
+            resumeAt: Date.now() + retryDecision.backoffMs,
+          });
           state = updateAutoLoopLastResult(
             state,
             task.id,
@@ -269,7 +417,7 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
               detail: {
                 message: result.message,
                 backoffMs: retryDecision.backoffMs,
-                regenerateCount: state.runtime?.autoLoop?.retry.regenerateCount ?? 0,
+                taskRetryCount: (task.retryCount ?? 0) + 1,
               },
             },
             projectRoot
@@ -291,6 +439,12 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
         );
 
         if (cfg.runtime.auto_orchestrate.stop_on_blocked) {
+          // NEW-2: cascade blocked 下游后再 halt，状态文件准确反映传播结果
+          const { state: cs, cascaded: cc } = cascadeBlocked(state);
+          if (cc.length > 0) {
+            state = cs;
+            writeAuditLog({ event: 'blocked_cascade', featureId, detail: { cascaded: cc } }, projectRoot);
+          }
           state = haltState(state, 'blocked', task.id);
           checkpoint(state, projectRoot, onCheckpoint);
           return buildResult(state, startIteration, completedTasks);
@@ -298,7 +452,21 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
       }
     }
 
-    // 3) Checkpoint + advance
+    // 3) P10: blocked 级联传播 — 在本轮所有 task 处理完后统一级联
+    const cascade = cascadeBlocked(state);
+    if (cascade.cascaded.length > 0) {
+      state = cascade.state;
+      writeAuditLog(
+        {
+          event: 'blocked_cascade',
+          featureId,
+          detail: { cascaded: cascade.cascaded },
+        },
+        projectRoot
+      );
+    }
+
+    // 4) Checkpoint + advance
     state = advanceTodoIteration(state);
     checkpoint(state, projectRoot, onCheckpoint);
     onIteration?.(state.iteration, state);
@@ -347,7 +515,8 @@ function runPostWriteGuards(
   task: TodoItem,
   result: TaskResult,
   featureId: string,
-  projectRoot: string
+  projectRoot: string,
+  cachedSlopRules?: ReturnType<typeof loadSlopRules>
 ): GuardResult {
   const skillMeta: SkillFrontMatter = result.skillPath
     ? parseSkillFrontMatter(result.skillPath)
@@ -373,6 +542,7 @@ function runPostWriteGuards(
       return {
         passed: false,
         reason: `missing required_mcps: ${mcpReport.missing.join(', ')}`,
+        policy: 'block',
       };
     }
   }
@@ -418,10 +588,11 @@ function runPostWriteGuards(
     return {
       passed: false,
       reason: `completion guard failed: ${completion.failureReasons.join('; ') || 'unknown reason'}`,
+      policy: 'retry_with_correction',
     };
   }
 
-  const slopReport = runSlopCheck(output, loadSlopRules(projectRoot));
+  const slopReport = runSlopCheck(output, cachedSlopRules ?? loadSlopRules(projectRoot));
   writeAuditLog(
     {
       event: 'slop_checked',
@@ -442,6 +613,7 @@ function runPostWriteGuards(
       reason: firstError
         ? `slop error L${firstError.line}: ${firstError.message}`
         : 'slop checker failed',
+      policy: 'retry_with_correction',
     };
   }
 
@@ -502,7 +674,7 @@ function buildResult(
 function classifyAutoLoopStatus(haltReason: string | undefined): AutoLoopStatus {
   if (haltReason === 'completed') return 'all_done';
   if (haltReason === 'no_state_file') return 'no_state_file';
-  if (haltReason?.startsWith('blocked')) return 'has_blocked';
+  if (haltReason?.startsWith('blocked') || haltReason?.startsWith('stuck_')) return 'has_blocked';
   if (haltReason?.startsWith('task_timeout') || haltReason?.startsWith('stalled_timeout'))
     return 'timeout';
   if (haltReason?.startsWith('max_iterations')) return 'max_iterations';

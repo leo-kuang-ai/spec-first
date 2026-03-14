@@ -32,6 +32,8 @@ describe('loadConfig', () => {
     expect(cfg.runtime.max_self_corrections).toBe(3);
     expect(cfg.runtime.kv_cache_hard_gate).toBe(false);
     expect(cfg.gate.pilot_mode).toBe(false);
+    expect(cfg.gate.thresholds['G-IMPL-01'].value).toBe(0.8);
+    expect(cfg.gate.thresholds['G-VERIFY-01'].value).toBe(1);
   });
 
   it('should merge user values with defaults', () => {
@@ -45,6 +47,17 @@ describe('loadConfig', () => {
     expect(cfg.gate.profile).toBe('strict');
     expect(cfg.catchup.trigger).toBe('prompt');
     expect(cfg.runtime.kv_cache_hard_gate).toBe(true);
+  });
+
+  it('should merge gate thresholds with defaults', () => {
+    writeFileSync(
+      join(META_DIR, 'config.yaml'),
+      'gate:\n  thresholds:\n    G-IMPL-01:\n      value: 0.75\n      direction: higher_is_better\n',
+      'utf-8',
+    );
+    const cfg = loadConfig(TMP);
+    expect(cfg.gate.thresholds['G-IMPL-01'].value).toBe(0.75);
+    expect(cfg.gate.thresholds['G-VERIFY-01'].value).toBe(1);
   });
 
   it('should reject out-of-range token_budget', () => {
@@ -61,6 +74,15 @@ describe('loadConfig', () => {
     writeFileSync(join(META_DIR, 'config.yaml'), 'runtime:\n  max_self_corrections: 20\n', 'utf-8');
     expect(() => loadConfig(TMP)).toThrow('runtime.max_self_corrections must be 1-10');
   });
+
+  it('should reject out-of-range gate threshold values', () => {
+    writeFileSync(
+      join(META_DIR, 'config.yaml'),
+      'gate:\n  thresholds:\n    G-VERIFY-01:\n      value: 1.2\n      direction: higher_is_better\n',
+      'utf-8'
+    );
+    expect(() => loadConfig(TMP)).toThrow('gate.thresholds.G-VERIFY-01.value must be 0-1');
+  });
 });
 
 describe('getConfigValue', () => {
@@ -68,6 +90,7 @@ describe('getConfigValue', () => {
     const cfg = loadConfig(TMP);
     const gate = getConfigValue(cfg, 'gate');
     expect(gate.pilot_mode).toBe(false);
+    expect(gate.thresholds['G-IMPL-01'].value).toBe(0.8);
   });
 });
 
@@ -79,5 +102,6 @@ describe('renderDefaultConfigYaml', () => {
     expect(rendered).toContain(`trigger: ${DEFAULT_SPEC_FIRST_CONFIG.catchup.trigger}`);
     expect(rendered).toContain(`max_self_corrections: ${DEFAULT_SPEC_FIRST_CONFIG.runtime.max_self_corrections}`);
     expect(rendered).toContain(`kv_cache_hard_gate: ${DEFAULT_SPEC_FIRST_CONFIG.runtime.kv_cache_hard_gate}`);
+    expect(rendered).toContain('G-IMPL-01:');
   });
 });

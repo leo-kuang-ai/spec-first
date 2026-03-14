@@ -4,6 +4,7 @@ import { chmodSync, mkdirSync, writeFileSync } from 'node:fs';
 export const TASK_CONTEXT_SCRIPT = '.spec-first/hooks/task-context.sh';
 export const STOP_GUARD_SCRIPT = '.spec-first/hooks/stop-guard.sh';
 export const PROGRESS_SYNC_SCRIPT = '.spec-first/hooks/progress-sync.sh';
+export const EXTENSION_HOOK_SCRIPT = '.spec-first/hooks/extension-hook.mjs';
 
 export const MANAGED_HOOK_COMMAND_MARKERS = [
   'npx spec-first gate check',
@@ -12,6 +13,7 @@ export const MANAGED_HOOK_COMMAND_MARKERS = [
   `sh ${TASK_CONTEXT_SCRIPT}`,
   `sh ${STOP_GUARD_SCRIPT}`,
   `sh ${PROGRESS_SYNC_SCRIPT}`,
+  EXTENSION_HOOK_SCRIPT,
 ] as const;
 
 const TASK_CONTEXT_SCRIPT_CONTENT = String.raw`#!/usr/bin/env sh
@@ -223,6 +225,34 @@ awk -F'|' '
 ' "$FILE"
 `;
 
+const EXTENSION_HOOK_SCRIPT_CONTENT = String.raw`#!/usr/bin/env node
+import { execFileSync } from 'node:child_process';
+
+const [namespaceEncoded = '', commandEncoded = ''] = process.argv.slice(2);
+
+function decode(value) {
+  return Buffer.from(value, 'base64url').toString('utf8');
+}
+
+try {
+  const namespace = decode(namespaceEncoded);
+  const command = decode(commandEncoded);
+  execFileSync('sh', ['-lc', command], {
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      SPEC_FIRST_EXTENSION_NAMESPACE: namespace,
+    },
+  });
+} catch (error) {
+  const status =
+    error && typeof error === 'object' && 'status' in error && typeof error.status === 'number'
+      ? error.status
+      : 1;
+  process.exit(status);
+}
+`;
+
 export function ensureManagedHookScripts(projectRoot: string, dryRun: boolean): void {
   if (dryRun) return;
 
@@ -238,6 +268,10 @@ export function ensureManagedHookScripts(projectRoot: string, dryRun: boolean): 
     {
       path: join(projectRoot, PROGRESS_SYNC_SCRIPT),
       content: PROGRESS_SYNC_SCRIPT_CONTENT,
+    },
+    {
+      path: join(projectRoot, EXTENSION_HOOK_SCRIPT),
+      content: EXTENSION_HOOK_SCRIPT_CONTENT,
     },
   ];
 

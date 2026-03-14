@@ -1,39 +1,45 @@
-# Traces Trailer 注入规范
+# Traces Trailer Reference
 
-## 格式定义
+用于 `spec-first:code` 生成代码时附加稳定尾注。
 
-每个实现文件末尾必须注入 traces trailer：
+## 标准格式
 
 ```typescript
 // Related: FR-AUTH-001, DS-AUTH-001
 // Task: TASK-AUTH-002
-// Author: Claude Code (spec-first:code v2.0)
-// Date: 2026-03-09
+// Author: spec-first:code
+// Date: 2026-03-14
 ```
 
-## 字段说明
+## 规则
 
-| 字段 | 说明 | 示例 |
-|------|------|------|
-| Related | 关联的需求 ID 和设计 ID | `FR-AUTH-001, DS-AUTH-001` |
-| Task | 当前 TASK ID | `TASK-AUTH-002` |
-| Author | 生成者 + 版本 | `Claude Code (spec-first:code v2.0)` |
-| Date | 生成日期 | `2026-03-09` |
+1. 只使用以下 4 行：
+   - `Related`
+   - `Task`
+   - `Author`
+   - `Date`
+2. 不要扩展成 `Design`、`Tasks` 等多头字段。
+3. `Related` 中可包含多个 FR / DS，但保持单行字段名不变。
+4. `Task` 默认只记录当前主 TASK。
 
-## 多关联格式
-
-当一个文件关联多个 FR/DS/TASK 时：
+## 多关联示例
 
 ```typescript
-// Related: FR-AUTH-001, FR-AUTH-002
-// Design: DS-AUTH-001, DS-AUTH-003
-// Tasks: TASK-AUTH-002, TASK-AUTH-004
-// Author: Claude Code (spec-first:code v2.0)
-// Date: 2026-03-09
+// Related: FR-AUTH-001, FR-AUTH-002, DS-AUTH-001
+// Task: TASK-AUTH-002
+// Author: spec-first:code
+// Date: 2026-03-14
 ```
 
-## 批量模式注意事项
+## 目的
 
-- 每个 subagent 生成的文件都必须注入 traces
-- traces 信息从上下文包中获取
-- 不允许遗漏或格式错误
+- 便于检索实现与需求/设计的关系
+- 保持批量模式下不同 subagent 输出格式一致
+- 降低后续解析和审查成本
+
+## 禁止项
+
+- 不要省略字段名
+- 不要使用多套字段命名
+- 不要在尾注中加入长段落说明
+- 不要把多个 TASK 写成自由文本

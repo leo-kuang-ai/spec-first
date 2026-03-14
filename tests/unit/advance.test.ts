@@ -201,6 +201,50 @@ describe('advance', () => {
     expect(content).toContain('SPEC-FIRST:BEGIN AUTO-CONTEXT');
     expect(content).toContain('Spec-First Context Snapshot');
   });
+
+  it('should auto-advance WRAP_UP → RELEASE → DONE', () => {
+    mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+    writeFileSync(
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
+      'dependencies:\n  autoCheck: false\n',
+      'utf-8'
+    );
+    writeState(makeState({ currentStage: Stage.WRAP_UP }));
+    writeFileSync(
+      join(SPEC_DIR, 'traceability-matrix.md'),
+      [
+        '| ID | Type | Title | Status | Upstream | Downstream |',
+        '|----|------|-------|--------|----------|------------|',
+        '| FR-AUTH-001 | FR | Login | Accepted |  | TASK-AUTH-001,TC-UT-AUTH-001 |',
+        '| TASK-AUTH-001 | TASK | Implement login | Accepted | FR-AUTH-001 |  |',
+        '| TC-UT-AUTH-001 | TC | Login test | Accepted | FR-AUTH-001 |  |',
+        '',
+      ].join('\n'),
+      'utf-8'
+    );
+    mkdirSync(join(SPEC_DIR, 'reports'), { recursive: true });
+    writeFileSync(join(SPEC_DIR, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'retro.md'), '# Retro\n', 'utf-8');
+
+    const result = advance(FEAT_ID, TMP);
+
+    expect(result.from).toBe(Stage.WRAP_UP);
+    expect(result.to).toBe(Stage.DONE);
+    expect(result.gateResult).toBe('PASS');
+
+    const updated = readState();
+    expect(updated.currentStage).toBe(Stage.DONE);
+    expect(updated.terminal).toBe(true);
+
+    const history = readFileSync(join(SPEC_DIR, 'gate-history.jsonl'), 'utf-8');
+    expect(history).toContain('"from":"06_wrap_up"');
+    expect(history).toContain('"to":"07_release"');
+    expect(history).toContain('"from":"07_release"');
+    expect(history).toContain('"to":"08_done"');
+    expect(history).toContain('release_auto_skip');
+    expect(readFileSync(join(SPEC_DIR, 'findings.md'), 'utf-8')).toContain('AUTO_ADVANCE');
+  });
 });
 
 describe('cancel', () => {

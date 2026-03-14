@@ -13,6 +13,7 @@ import { evaluateConstitutionCompliance } from './constitution-validator.js';
 import { statSync } from 'node:fs';
 import { getCriticalCountFromAnalysisReport, analyzeArtifacts } from './sca.js';
 import { createTraceContext } from '../trace-engine/trace-context.js';
+import { loadConfig } from '../../shared/config-schema.js';
 
 export interface GateConditionDef {
   id: string;
@@ -33,6 +34,14 @@ export interface EvalContext {
 
 /** 每个阶段的 Gate 条件表 */
 export const GATE_CONDITIONS: Partial<Record<Stage, GateConditionDef[]>> = {};
+
+function formatPercentThreshold(value: number, operator: '>=' | '='): string {
+  return `${operator} ${Number((value * 100).toFixed(2))}%`;
+}
+
+function getConfiguredGateThreshold(projectRoot: string, gateId: 'G-IMPL-01' | 'G-VERIFY-01'): number {
+  return loadConfig(projectRoot).gate.thresholds[gateId].value;
+}
 
 // ─── 00_init 条件 ──────────────────────────────────────────
 GATE_CONDITIONS['00_init' as Stage] = [
@@ -173,16 +182,17 @@ GATE_CONDITIONS['03_plan' as Stage] = [
 GATE_CONDITIONS['04_implement' as Stage] = [
   {
     id: 'G-IMPL-01',
-    description: 'Unit test coverage (C4) ≥ 60%',
+    description: 'Unit test coverage (C4) meets configured threshold',
     evaluate: (ctx) => {
       const val = ctx.coverage.C4;
+      const threshold = getConfiguredGateThreshold(ctx.projectRoot, 'G-IMPL-01');
       const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
       return {
-        pass: val >= 0.6,
+        pass: val >= threshold,
         detail:
           uncovered.length > 0
-            ? `C4=${(val * 100).toFixed(1)}% uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
-            : `C4=${(val * 100).toFixed(1)}%`,
+            ? `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '>=')}) uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
+            : `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '>=')})`,
         scopeFrIds: uncovered,
       };
     },
@@ -193,16 +203,17 @@ GATE_CONDITIONS['04_implement' as Stage] = [
 GATE_CONDITIONS['05_verify' as Stage] = [
   {
     id: 'G-VERIFY-01',
-    description: 'Test coverage FR (C4) ≥ 80%',
+    description: 'Test coverage FR (C4) meets configured threshold',
     evaluate: (ctx) => {
       const val = ctx.coverage.C4;
+      const threshold = getConfiguredGateThreshold(ctx.projectRoot, 'G-VERIFY-01');
       const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
       return {
-        pass: val >= 0.8,
+        pass: val >= threshold,
         detail:
           uncovered.length > 0
-            ? `C4=${(val * 100).toFixed(1)}% uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
-            : `C4=${(val * 100).toFixed(1)}%`,
+            ? `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '=')}) uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
+            : `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '=')})`,
         scopeFrIds: uncovered,
       };
     },

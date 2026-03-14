@@ -19,6 +19,7 @@ import { validateExceptions } from '../trace-engine/exception-validator.js';
 import { runCommandGate } from './command-gate.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
 import { GATE_CONDITIONS, shouldSkipCondition, type GateConditionDef, type EvalContext } from './condition-registry.js';
+import { loadConfig } from '../../shared/config-schema.js';
 
 // ─── 导出类型 ─────────────────────────────────────────────
 export type { GateConditionDef, EvalContext };
@@ -37,16 +38,23 @@ export function getProjectTypeFromConstitution(featureId: string, projectRoot: s
 }
 
 /** 获取指定阶段的 Gate 条件定义 */
-export function getConditions(stage: Stage, projectType?: string, profile?: string): GateConditionDef[] {
+export function getConditions(
+  stage: Stage,
+  projectType?: string,
+  profile?: string,
+  projectRoot?: string
+): GateConditionDef[] {
   const conditions = GATE_CONDITIONS[stage] ?? [];
   const filtered = projectType
     ? conditions.filter((c) => !shouldSkipCondition(c.id, projectType))
     : conditions;
 
-  if (profile !== 'strict') return filtered;
+  const withConfigDescriptions = projectRoot ? applyConfigThresholdDescriptions(filtered, projectRoot) : filtered;
+
+  if (profile !== 'strict') return withConfigDescriptions;
 
   // strict 不恢复已删除 Gate，但会把默认 warning 提升为 blocking
-  return filtered.map((c) =>
+  return withConfigDescriptions.map((c) =>
     c.blocking === false
       ? {
           ...c,
@@ -55,6 +63,32 @@ export function getConditions(stage: Stage, projectType?: string, profile?: stri
         }
       : c
   );
+}
+
+function applyConfigThresholdDescriptions(
+  conditions: GateConditionDef[],
+  projectRoot: string
+): GateConditionDef[] {
+  const thresholds = loadConfig(projectRoot).gate.thresholds;
+  return conditions.map((condition) => {
+    if (condition.id === 'G-IMPL-01') {
+      return {
+        ...condition,
+        description: `Unit test coverage (C4) ${formatThreshold(thresholds['G-IMPL-01'].value, '>=')}`,
+      };
+    }
+    if (condition.id === 'G-VERIFY-01') {
+      return {
+        ...condition,
+        description: `Test coverage FR (C4) ${formatThreshold(thresholds['G-VERIFY-01'].value, '=')}`,
+      };
+    }
+    return condition;
+  });
+}
+
+function formatThreshold(value: number, operator: '>=' | '='): string {
+  return `${operator} ${Number((value * 100).toFixed(2))}%`;
 }
 
 /** 评估 Gate：条件检查 + 豁免匹配 → 三态结果 */
@@ -79,7 +113,7 @@ export function evaluateGate(
 
   const projectType = getProjectTypeFromConstitution(featureId, projectRoot);
   const profile = state.mergedRules?.profile ?? 'default-simplified';
-  const defs = getConditions(stage, projectType, profile);
+  const defs = getConditions(stage, projectType, profile, projectRoot);
   const conditions: ConditionResult[] = [];
 
   for (const def of defs) {

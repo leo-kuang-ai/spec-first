@@ -106,7 +106,8 @@ hooks:
     const settings = JSON.parse(readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8'));
     const stopEntries = settings.hooks.Stop;
     expect(stopEntries.some((entry: { hooks: Array<{ command: string }> }) =>
-      entry.hooks[0].command.includes('SPEC_FIRST_EXTENSION_NAMESPACE=qa'))).toBe(true);
+      entry.hooks[0].command.includes('extension-hook.mjs'))).toBe(true);
+    expect(existsSync(join(TMP, '.spec-first', 'hooks', 'extension-hook.mjs'))).toBe(true);
   });
 
   it('should generate stop-guard with reminder-only semantics', () => {

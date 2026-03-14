@@ -87,7 +87,7 @@ function handleCheck(args: string[]): number {
       const warnings = result.conditions.filter(
         (c) => c.status === 'FAIL' && c.blocking === false
       );
-      const targets = getStageMetricTargets(result.stage as any);
+      const targets = getStageMetricTargets(result.stage as any, cwd);
       const metricTargets: Record<string, number> = {};
       for (const t of targets) {
         metricTargets[t.key] = t.target;
@@ -194,7 +194,7 @@ function handleConditions(args: string[]): number {
   const state = readJson<StageState>(statePath);
   const projectType = getProjectTypeFromConstitution(featureId, cwd);
   const profile = state.mergedRules?.profile ?? 'default-simplified';
-  const defs = getConditions(state.currentStage, projectType, profile);
+  const defs = getConditions(state.currentStage, projectType, profile, cwd);
 
   console.log(`Gate 条件 — ${featureId} (${state.currentStage})\n`);
   for (const d of defs) {

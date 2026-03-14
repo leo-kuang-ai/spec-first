@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import { writeFileSync, renameSync } from 'node:fs';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
+import { withFileLock } from '../../shared/file-lock.js';
 
 export type TodoStatus = 'pending' | 'in_progress' | 'blocked' | 'done';
 
@@ -23,6 +24,12 @@ export interface TodoItem {
   parallel?: boolean;
   /** 重试恢复时间戳（毫秒），用于退避等待 @see F-07 */
   resumeAt?: number;
+  /** P4: 当前任务的重试次数（任务级隔离） */
+  retryCount?: number;
+  /** P4: 当前任务的最后失败原因 */
+  lastFailureReason?: string;
+  /** P3+P4: 连续相同失败次数（用于加速退避） */
+  consecutiveErrorCount?: number;
 }
 
 /** auto-loop 重试状态 @see V2-13§4.3 */
@@ -90,6 +97,16 @@ function isTodoItem(value: unknown): value is TodoItem {
     return false;
   }
   if (item.resumeAt !== undefined && typeof item.resumeAt !== 'number') {
+    return false;
+  }
+  // P4: 新增可选字段校验
+  if (item.retryCount !== undefined && typeof item.retryCount !== 'number') {
+    return false;
+  }
+  if (item.lastFailureReason !== undefined && typeof item.lastFailureReason !== 'string') {
+    return false;
+  }
+  if (item.consecutiveErrorCount !== undefined && typeof item.consecutiveErrorCount !== 'number') {
     return false;
   }
   return true;
@@ -223,8 +240,11 @@ export function loadTodoState(
 export function saveTodoState(state: TodoRunnerState, projectRoot: string): void {
   const statePath = getTodoStatePath(state.featureId, projectRoot);
   const tmpPath = `${statePath}.tmp`;
-  writeFileSync(tmpPath, `${JSON.stringify(state, null, 2)}\n`, 'utf-8');
-  renameSync(tmpPath, statePath);
+  const lockPath = `${statePath}.lock`;
+  withFileLock(lockPath, () => {
+    writeFileSync(tmpPath, `${JSON.stringify(state, null, 2)}\n`, 'utf-8');
+    renameSync(tmpPath, statePath);
+  });
 }
 
 export function initTodoState(
@@ -310,6 +330,23 @@ export function updateTodoStatus(
   };
 }
 
+/** P4: 更新任务级字段（retryCount / lastFailureReason / consecutiveErrorCount 等） */
+export function updateTodoItem(
+  state: TodoRunnerState,
+  todoId: string,
+  patch: Partial<Pick<TodoItem, 'retryCount' | 'lastFailureReason' | 'consecutiveErrorCount' | 'resumeAt'>>
+): TodoRunnerState {
+  const nextItems = state.items.map((item) =>
+    item.id === todoId ? { ...item, ...patch } : item
+  );
+
+  return {
+    ...state,
+    items: nextItems,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 /** 设置任务的退避恢复时间 @see F-07 */
 export function setTodoResumeAt(
   state: TodoRunnerState,
@@ -323,6 +360,94 @@ export function setTodoResumeAt(
     items: nextItems,
     updatedAt: new Date().toISOString(),
   };
+}
+
+// ─── P5: 依赖死锁诊断 ────────────────────────────────────
+
+export type StuckType = 'all_blocked' | 'dependency_blocked' | 'cyclic_dependency' | 'waiting_for_deps';
+
+export interface StuckDiagnosis {
+  type: StuckType;
+  taskIds?: string[];
+}
+
+/** P5: 诊断无任务可执行的根因（死锁 vs 正常等待） */
+export function diagnoseStuckReason(state: TodoRunnerState): StuckDiagnosis {
+  const pending = state.items.filter((i) => i.status === 'pending');
+  const blocked = state.items.filter((i) => i.status === 'blocked');
+
+  // 情况 A：所有未完成任务都已 blocked（无 pending 可调度）
+  if (pending.length === 0 && blocked.length > 0) {
+    return { type: 'all_blocked', taskIds: blocked.map((i) => i.id) };
+  }
+
+  // 情况 B：存在 pending 任务，但某个依赖已 blocked 或根本不存在
+  const unresolvable = pending.filter((item) => {
+    const deps = item.dependsOn ?? [];
+    return deps.some((dep) => {
+      const depItem = state.items.find((i) => i.id === dep);
+      return depItem?.status === 'blocked' || !depItem;
+    });
+  });
+  if (unresolvable.length > 0) {
+    return { type: 'dependency_blocked', taskIds: unresolvable.map((i) => i.id) };
+  }
+
+  // 情况 C：依赖都是 pending，但存在环（DFS 检测）
+  const visited = new Set<string>();
+  const inStack = new Set<string>();
+  function hasCycle(id: string): boolean {
+    if (inStack.has(id)) return true;
+    if (visited.has(id)) return false;
+    visited.add(id);
+    inStack.add(id);
+    const item = pending.find((i) => i.id === id);
+    for (const dep of item?.dependsOn ?? []) {
+      if (hasCycle(dep)) return true;
+    }
+    inStack.delete(id);
+    return false;
+  }
+  if (pending.some((i) => hasCycle(i.id))) {
+    return { type: 'cyclic_dependency' };
+  }
+
+  return { type: 'waiting_for_deps' };
+}
+
+// ─── P10: blocked 级联传播 ──────────────────────────────
+
+/** P10: 将 blocked 任务的直接/间接下游 pending 任务也标记为 blocked */
+export function cascadeBlocked(state: TodoRunnerState): { state: TodoRunnerState; cascaded: string[] } {
+  const blockedIds = new Set(
+    state.items.filter((i) => i.status === 'blocked').map((i) => i.id)
+  );
+  const cascaded: string[] = [];
+
+  // 多轮传播直到无新增
+  // 修复：每轮先收集本轮新增（newlyBlocked），应用后再进入下一轮，
+  // 避免用旧 state.items 遍历导致已 blocked 的任务被重复处理
+  let changed = true;
+  while (changed) {
+    changed = false;
+    const newlyBlocked: string[] = [];
+    for (const item of state.items) {
+      if (item.status !== 'pending') continue;
+      const deps = item.dependsOn ?? [];
+      if (deps.some((dep) => blockedIds.has(dep))) {
+        blockedIds.add(item.id);
+        newlyBlocked.push(item.id);
+        changed = true;
+      }
+    }
+    // 应用本轮新增，state 更新后下一轮用最新 state.items 遍历
+    for (const id of newlyBlocked) {
+      state = updateTodoStatus(state, id, 'blocked');
+      cascaded.push(id);
+    }
+  }
+
+  return { state, cascaded };
 }
 
 export function advanceTodoIteration(state: TodoRunnerState): TodoRunnerState {
