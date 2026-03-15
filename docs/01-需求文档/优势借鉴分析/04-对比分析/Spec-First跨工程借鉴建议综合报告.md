@@ -57,7 +57,6 @@
 | **多运行时** | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐ |
 | **工具集成** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | **上下文管理** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **成本追踪** | ⭐⭐⭐⭐⭐ | ⭐ | ⭐ | ⭐ | ⭐ | ⭐ | ⭐ | ⭐ | ⭐ | ⭐ |
 | **易用性** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
 | **持久记忆** | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐ | ⭐ |
 | **架构抽象** | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
@@ -71,7 +70,6 @@
 
 **GSD-2 独有**:
 - 真正的 Auto Mode (状态机完全自主)
-- 成本追踪 Dashboard + 预算控制
 - 三层超时监督 (soft/idle/hard)
 - Git branch-per-slice 自动化
 - 14 个内置扩展 (Playwright, Voice, LSP...)
@@ -174,9 +172,9 @@
 **借鉴价值**: ⭐⭐⭐⭐⭐
 
 **现状问题**:
-- Spec-First 每步需手动执行命令
-- 用户无法离开，必须持续确认
-- 无法实现真正的自动化开发
+- Spec-First 已有 `orchestrate --auto/--resume/--auto-advance` 能力，但自动化深度仍偏浅
+- 当前仍以阶段推进为主，长时间无人值守能力弱于 GSD-2
+- 缺少类似 GSD-2 的 slice 级自治循环和超时监督
 
 **GSD-2 实现参考**:
 ```typescript
@@ -223,51 +221,13 @@ export async function runAutoMode(options: AutoModeOptions) {
 
 ---
 
-#### 3.1.2 成本追踪 Dashboard (来自 GSD-2)
-
-**借鉴价值**: ⭐⭐⭐⭐⭐
-
-**GSD-2 实现参考**:
-```typescript
-// gsd-2/src/resources/extensions/gsd/metrics.ts
-
-interface UnitMetrics {
-  inputTokens: number;
-  outputTokens: number;
-  cost: number;
-  model: string;
-  phase: string;
-  sliceId: string;
-}
-
-if (totals.cost >= budgetCeiling) {
-  pauseAutoMode();
-  reportBudgetExceeded();
-}
-```
-
-**建议实现方案**:
-```typescript
-// spec-first/src/core/metrics-engine/cost-tracker.ts (新增)
-
-export interface FeatureMetrics {
-  featureId: string;
-  totalCost: number;
-  totalTokens: number;
-  phaseBreakdown: Map<Stage, PhaseMetrics>;
-  budgetCeiling?: number;
-}
-```
-
----
-
-#### 3.1.3 Quick 模式 (来自 Get-Shit-Done)
+#### 3.1.2 Quick 模式 (来自 Get-Shit-Done)
 
 **借鉴价值**: ⭐⭐⭐⭐
 
 **现状问题**:
-- 小任务也需要走完整 4 阶段流程
-- Bug 修复、配置修改等场景过于繁琐
+- 小任务仍倾向走完整 8 个 active stages
+- Bug 修复、配置修改等场景仍偏繁琐
 
 **建议实现方案**:
 ```typescript
@@ -282,7 +242,7 @@ export async function quickMode(description: string) {
 
 ---
 
-#### 3.1.4 Steering 项目记忆 (来自 cc-sdd)
+#### 3.1.3 Steering 项目记忆 (来自 cc-sdd)
 
 **借鉴价值**: ⭐⭐⭐⭐⭐
 
@@ -308,7 +268,7 @@ export interface SteeringContext {
 
 ---
 
-#### 3.1.5 Adapter 多 Agent 模式 (来自 Gentle-AI)
+#### 3.1.4 Adapter 多 Agent 模式 (来自 Gentle-AI)
 
 **借鉴价值**: ⭐⭐⭐⭐⭐
 
@@ -472,7 +432,7 @@ WAVE 1 (parallel)    WAVE 2 (parallel)    WAVE 3
 | Claude Code | ✅ | ✅ | ✅ | ✅ |
 | OpenCode | ✅ | ✅ | ✅ | ❌ |
 | Gemini CLI | ✅ | ✅ | ✅ | ❌ |
-| Codex | ✅ | ✅ | ❌ | ❌ |
+| Codex | ✅ | ✅ | ❌ | ✅ |
 | Cursor | ❌ | ✅ | ✅ | ❌ |
 | VS Code Copilot | ❌ | ❌ | ✅ | ❌ |
 
@@ -514,7 +474,7 @@ WAVE 1 (parallel)    WAVE 2 (parallel)    WAVE 3
 
 | 项目 | Skill 数量 | 核心定位 | 设计理念 |
 |------|-----------|---------|---------|
-| **Spec-First** | 22 | 全链路研发闭环 | 阶段驱动、追溯矩阵、Gate 门禁 |
+| **Spec-First** | 20 | 全链路研发闭环 | 阶段驱动、追溯矩阵、Gate 门禁 |
 | **OpenSpec** | 12 | 流动迭代工作流 | Actions not phases、DAG 依赖 |
 | **Spec Kit** | 9 | 规范驱动开发 | Spec-Driven Development、命令模板 |
 | **Planning-Files** | 1 | 上下文工程 | Manus 原则、文件系统即内存 |
@@ -538,7 +498,7 @@ WAVE 1 (parallel)    WAVE 2 (parallel)    WAVE 3
 ```
 00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release
            ↓            ↓          ↓          ↓             ↓            ↓
-         spec Skill   design    task       code         test        archive
+         spec Skill   design    task       code        verify      archive
 ```
 
 #### OpenSpec: 工件 DAG 驱动
@@ -576,7 +536,7 @@ brainstorming → worktrees → plans → [exec|subagent] → verify → finish
 |--------|------|-----------|-----------|
 | **TDD 强制铁律** | Superpowers | code | HARD-GATE + 反合理化守卫 |
 | **break-loop 深度复盘** | Trellis | archive | 5 维度分析 + Immediate Actions |
-| **分层检查体系** | Trellis | verify + code-review | 单层 + 跨层 + 完成检查 |
+| **分层检查体系** | Trellis | verify + review | 单层 + 跨层 + 完成检查 |
 | **Constitution 权威层** | Spec Kit | 全局 | 宪法权威层级 |
 
 **TDD 铁律核心**:
@@ -615,7 +575,7 @@ RED（写失败测试）→ Verify RED → GREEN（最小实现）→ Verify GRE
 | 设计 | 描述 | 独特性 |
 |------|------|--------|
 | **追溯 ID 体系** | FR/NFR/DS/TASK/TC/RFC 等 14 类 | ★★★★★ 全链路追溯 |
-| **覆盖率矩阵** | C1-C9 双向覆盖率 + C10 质量审查 | ★★★★★ 质量可视化 |
+| **覆盖率矩阵** | C3/C4/C6/C8/C9 五项核心覆盖率 | ★★★★★ 质量可视化 |
 | **Gate 门禁** | 五步证据铁律、硬性阻塞 | ★★★★☆ 质量保障 |
 | **Stage 状态机** | 8 active + 2 terminal stages | ★★★★☆ 流程控制 |
 | **Defect/RFC 变更管理** | 变更状态机 + 影响分析 | ★★★★★ 独特优势 |
@@ -644,7 +604,7 @@ RED（写失败测试）→ Verify RED → GREEN（最小实现）→ Verify GRE
 │  │  └──────────────┘ └──────────────┘ └──────────────┘            │   │
 │  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐            │   │
 │  │  │ Metrics      │ │ Timeout      │ │ Wave         │            │   │
-│  │  │ (from GSD-2) │ │ (from GSD-2) │ │ (from GSD-1) │            │   │
+│  │  │ (from GSD-2) │ │ (from GSD-2) │ │ (from Get-Shit-Done) │    │   │
 │  │  └──────────────┘ └──────────────┘ └──────────────┘            │   │
 │  │  ┌──────────────┐ ┌──────────────┐                             │   │
 │  │  │ Pipeline     │ │ FileMerge    │ (from Gentle-AI)            │   │
@@ -699,12 +659,11 @@ timeout-supervisor  metrics-engine      process-engine
 
 ### 6.1 Phase 1: 核心自动化 (1-2 周)
 
-**目标**: 实现真正的 Auto Mode + 多 Agent 基础
+**目标**: 增强 Auto Mode 深度 + 多 Agent 基础
 
 | 任务 | 来源 | 优先级 | 预估 |
 |------|------|--------|------|
 | Auto Loop 状态机 | GSD-2 | P0 | 3 天 |
-| 成本追踪基础 | GSD-2 | P0 | 2 天 |
 | Quick 模式 | Get-Shit-Done | P0 | 1 天 |
 | Git 自动提交 | GSD-2 | P0 | 1 天 |
 | AgentAdapter 接口 | Gentle-AI | P0 | 1 天 |
@@ -712,7 +671,6 @@ timeout-supervisor  metrics-engine      process-engine
 
 **产出**:
 - `src/core/auto-loop/` 模块
-- `src/core/metrics-engine/cost-tracker.ts`
 - `spec-first quick` 命令
 - `src/core/git-automation/` 模块
 - `src/core/agents/adapter.ts` 接口
@@ -769,7 +727,6 @@ timeout-supervisor  metrics-engine      process-engine
 |------|------|----------|
 | Auto Mode 复杂度高 | 高 | 分阶段实现，先做手动确认版 |
 | 多运行时兼容性 | 中 | 先实现抽象接口，逐个适配 |
-| 成本追踪准确性 | 中 | 使用 AI SDK 提供的用量数据 |
 | Git 自动化冲突 | 低 | 提供 `--no-auto-git` 跳过选项 |
 
 ### 7.2 用户体验风险
@@ -778,7 +735,6 @@ timeout-supervisor  metrics-engine      process-engine
 |------|------|----------|
 | 学习曲线变陡 | 高 | 保留简单模式，Auto Mode 可选 |
 | 自动化失控 | 中 | 提供暂停/恢复机制 |
-| 成本超支 | 中 | 强制设置预算上限 |
 
 ---
 
@@ -786,12 +742,11 @@ timeout-supervisor  metrics-engine      process-engine
 
 ### 8.1 核心借鉴清单
 
-**从 GSD-2 借鉴** (5 项):
+**从 GSD-2 借鉴** (4 项):
 1. ✅ Auto Mode 状态机 (P0)
-2. ✅ 成本追踪 Dashboard (P0)
-3. ✅ 三层超时监督 (P1)
-4. ✅ Git 自动化 (P0)
-5. ✅ Worktree 管理 (P2)
+2. ✅ 三层超时监督 (P1)
+3. ✅ Git 自动化 (P0)
+4. ✅ Worktree 管理 (P2)
 
 **从 Get-Shit-Done 借鉴** (4 项):
 1. ✅ Quick 模式 (P0)
@@ -836,11 +791,10 @@ timeout-supervisor  metrics-engine      process-engine
 │  "真正自动化的规范驱动引擎"                                              │
 │                                                                          │
 │  ├── 用户可以离开 (Auto Mode from GSD-2)                                │
-│  ├── 成本可控 (Dashboard + 预算 from GSD-2)                             │
 │  ├── 质量保证 (Gate 校验 - Spec-First 原创)                             │
 │  ├── 完整追溯 (14 类 ID - Spec-First 原创)                              │
 │  ├── 项目记忆 (Steering from cc-sdd + Engram from Gentle-AI)            │
-│  ├── 灵活模式 (Quick from GSD-1 / Full)                                 │
+│  ├── 灵活模式 (Quick from Get-Shit-Done / Full)                         │
 │  ├── 多运行时 (Adapter from Gentle-AI)                                  │
 │  ├── 安全注入 (Pipeline + FileMerge from Gentle-AI)                     │
 │  └── 超时监督 (三层 from GSD-2)                                         │

@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-pre-push');
 const SCRIPT = join(import.meta.dirname, '../../.spec-first/hooks/pre-push.sh');
+const POSIX_SHELL = existsSync('/bin/dash') ? '/bin/dash' : 'sh';
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
@@ -19,7 +20,7 @@ describe('pre-push hook', () => {
     // Create minimal PATH with no spec-first
     const env = { ...process.env, PATH: '/usr/bin:/bin' };
 
-    const result = spawnSync('sh', [SCRIPT], {
+    const result = spawnSync(POSIX_SHELL, [SCRIPT], {
       cwd: TMP,
       encoding: 'utf-8',
       env,
@@ -29,7 +30,7 @@ describe('pre-push hook', () => {
   });
 
   it('should output version when --version flag is passed', () => {
-    const result = spawnSync('sh', [SCRIPT, '--version'], { encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, '--version'], { encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('spec-first pre-push hook');
@@ -48,7 +49,7 @@ describe('pre-push hook', () => {
 
     const env = { ...process.env, PATH: `${TMP}:${process.env.PATH}` };
 
-    const result = spawnSync('sh', [SCRIPT], {
+    const result = spawnSync(POSIX_SHELL, [SCRIPT], {
       cwd: TMP,
       encoding: 'utf-8',
       env,
@@ -72,7 +73,7 @@ describe('pre-push hook', () => {
 
     const env = { ...process.env, PATH: `${TMP}:${process.env.PATH}` };
 
-    const result = spawnSync('sh', [SCRIPT], {
+    const result = spawnSync(POSIX_SHELL, [SCRIPT], {
       cwd: TMP,
       encoding: 'utf-8',
       env,
@@ -93,7 +94,7 @@ describe('pre-push hook', () => {
 
     const env = { ...process.env, PATH: `${TMP}:${process.env.PATH}` };
 
-    const result = spawnSync('sh', [SCRIPT], {
+    const result = spawnSync(POSIX_SHELL, [SCRIPT], {
       cwd: TMP,
       encoding: 'utf-8',
       env,
