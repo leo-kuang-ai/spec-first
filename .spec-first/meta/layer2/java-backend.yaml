@@ -1,0 +1,31 @@
+platform: java-backend
+name: Java Backend
+description: Spring Boot Microservice standard
+gate_conditions:
+  04_implement:
+    - id: G-JAVA-CHECKSTYLE
+      description: Checkstyle pass
+      command: ./mvnw checkstyle:check
+    - id: G-JAVA-UNIT
+      description: JUnit pass
+      command: ./mvnw test
+  05_verify:
+    - id: G-JAVA-JACOCO
+      description: JaCoCo coverage > 80%
+      command: ./mvnw verify
+extra_deliverables:
+  02_design:
+    - name: data-model.md
+      required: false
+    - name: contracts/openapi.yaml
+      required: false
+  05_verify:
+    - name: reports/load-test.jtl
+      required: false
+quality_thresholds:
+  api_p99_latency:
+    value: 500
+    direction: lower_is_better
+  code_coverage:
+    value: 80
+    direction: higher_is_better

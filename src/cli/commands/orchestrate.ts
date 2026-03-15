@@ -23,7 +23,7 @@ import {
   GateUnavailableError,
 } from '../../core/process-engine/advance.js';
 import { decideNextStep, getNextStage } from '../../core/process-engine/next-step-decider.js';
-import { resetConfigCache } from '../../shared/config-schema.js';
+import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 
 const AUTO_LOOP_STATUS_MESSAGES: Record<AutoLoopStatus, string> = {
   all_done: '✅ 所有任务完成',
@@ -85,11 +85,16 @@ export async function handleOrchestrate(
   try {
     const projectRoot = process.cwd();
     resetConfigCache();
+    const cfg = loadConfig(projectRoot);
     const orchestrateArgs = validateOrchestrateArgs(args);
     const featureId = resolveFeatureOrCurrent(pickFeatureToken(args), projectRoot);
 
+    // enabled 配置联动：--auto 标志 OR config enabled=true → auto 模式
+    const isAutoMode =
+      orchestrateArgs.mode === 'auto' || cfg.runtime.auto_orchestrate.enabled;
+
     let autoLoopResult: AutoLoopResult | undefined;
-    if (orchestrateArgs.mode === 'auto' && options.executor) {
+    if (isAutoMode && options.executor) {
       autoLoopResult = await (options.runLoop ?? runAutoLoop)({
         featureId,
         projectRoot,

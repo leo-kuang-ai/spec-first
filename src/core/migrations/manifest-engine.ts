@@ -15,7 +15,7 @@ import {
 } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import yaml from 'js-yaml';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { ensureDir } from '../../shared/fs-utils.js';
 import type {
   MigrationManifest,
@@ -399,16 +399,16 @@ function executeCommand(step: MigrationStep, projectRoot: string): StepResult {
   }
 
   try {
-    const fullCommand = step.command + (step.args?.length ? ' ' + step.args.join(' ') : '');
+    const args = step.args ?? [];
     const cwd = step.cwd ? resolveSafePath(projectRoot, step.cwd) : projectRoot;
-    execSync(fullCommand, {
+    execFileSync(step.command, args, {
       cwd,
       stdio: 'ignore',
     });
     return {
       step,
       success: true,
-      message: `命令执行成功：${fullCommand}`,
+      message: `命令执行成功：${step.command}${args.length > 0 ? ` ${args.join(' ')}` : ''}`,
     };
   } catch (err) {
     const error = err as Error;

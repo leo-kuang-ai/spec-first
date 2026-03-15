@@ -103,4 +103,14 @@ describe('04-design skill docs consistency', () => {
     expect(skill).toContain('background_input_status');
     expect(skill).toContain('输入层');
   });
+
+  it('should define 05-research trigger conditions and round-trip contract', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('05-research');
+    expect(skill).toContain('存在 2 个以上合理候选方案');
+    expect(skill).toContain('research.md');
+    expect(skill).toContain('最终采用方案');
+    expect(skill).toContain('不应绕过 `research.md`');
+  });
 });

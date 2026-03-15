@@ -1,0 +1,15 @@
+platform: v-model
+gate_conditions:
+  05_verify:
+    - id: VMODEL-PAIR-001
+      description: "REQ/SYS/ARCH/MOD 与 ATP/STP/ITP/UTP 形成双向可追踪映射"
+      type: auto
+extra_deliverables:
+  05_verify:
+    - name: reports/v-model-trace-report.md
+      required: false
+      description: "V-Model 四层配对追踪报告"
+quality_thresholds:
+  v_model_pair_coverage:
+    value: 100
+    direction: higher_is_better

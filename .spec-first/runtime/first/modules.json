@@ -1,0 +1,96 @@
+{
+  "modules": [
+    {
+      "name": "cli",
+      "path": "src/cli/",
+      "responsibility": "CLI 命令层，命令注册、路由分发、参数解析",
+      "files": 25,
+      "keyFiles": ["index.ts", "router.ts", "commands/*.ts"]
+    },
+    {
+      "name": "process-engine",
+      "path": "src/core/process-engine/",
+      "responsibility": "阶段状态机，驱动 Feature 生命周期流转 (00_init → 08_done/09_cancelled)",
+      "files": 8,
+      "keyFiles": ["stage-machine.ts", "advance.ts", "feature.ts"]
+    },
+    {
+      "name": "skill-runtime",
+      "path": "src/core/skill-runtime/",
+      "responsibility": "Skill 分发、prompt 组装、三层路由、编排参数解析",
+      "files": 22,
+      "keyFiles": ["dispatcher.ts", "prompt-assembler.ts", "hard-gate.ts"]
+    },
+    {
+      "name": "ai-orchestrator",
+      "path": "src/core/ai-orchestrator/",
+      "responsibility": "AI 自动循环、上下文恢复、context-pack、重试控制",
+      "files": 15,
+      "keyFiles": ["auto-loop.ts", "catchup.ts", "context-pack.ts"]
+    },
+    {
+      "name": "gate-engine",
+      "path": "src/core/gate-engine/",
+      "responsibility": "质量门禁评估、安全扫描、SCA、上线/回滚门禁",
+      "files": 7,
+      "keyFiles": ["gate-evaluator.ts", "security.ts", "golive.ts"]
+    },
+    {
+      "name": "trace-engine",
+      "path": "src/core/trace-engine/",
+      "responsibility": "追溯 ID 生成/校验/搜索、覆盖率矩阵 (C1-C9)",
+      "files": 9,
+      "keyFiles": ["id-generator.ts", "matrix.ts", "coverage.ts"]
+    },
+    {
+      "name": "change-mgr",
+      "path": "src/core/change-mgr/",
+      "responsibility": "RFC + Defect 状态机、影响分析、同步机制",
+      "files": 6,
+      "keyFiles": ["rfc-machine.ts", "defect-machine.ts", "impact.ts"]
+    },
+    {
+      "name": "template",
+      "path": "src/core/template/",
+      "responsibility": "Handlebars 模板渲染、产物检查、变更分类",
+      "files": 6,
+      "keyFiles": ["renderer.ts", "artifact-checker.ts", "hash-registry.ts"]
+    },
+    {
+      "name": "tool-integration",
+      "path": "src/core/tool-integration/",
+      "responsibility": "AI runtime hooks、会话钩子、上下文同步",
+      "files": 6,
+      "keyFiles": ["ai-runtime-hook.ts", "session-hook.ts", "context-sync.ts"]
+    },
+    {
+      "name": "metrics-engine",
+      "path": "src/core/metrics-engine/",
+      "responsibility": "健康度评分、瓶颈分析",
+      "files": 2,
+      "keyFiles": ["health-score.ts", "bottleneck.ts"]
+    },
+    {
+      "name": "shared",
+      "path": "src/shared/",
+      "responsibility": "共享类型定义 (Stage, ExitCode, ID types) 与工具函数",
+      "files": 1,
+      "keyFiles": ["types.ts"]
+    },
+    {
+      "name": "config",
+      "path": "src/config/",
+      "responsibility": "配置管理",
+      "files": 1,
+      "keyFiles": []
+    }
+  ],
+  "metadata": {
+    "generatedAt": "2026-03-09T04:50:21.733Z",
+    "agent": "A1",
+    "mode": "deep",
+    "projectVersion": "0.5.49",
+    "totalFiles": 10110,
+    "serenaAvailable": true
+  }
+}

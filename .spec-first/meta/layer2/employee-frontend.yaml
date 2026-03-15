@@ -1,0 +1,29 @@
+platform: employee-frontend
+name: Employee Frontend
+description: Employee portal web frontend standard
+gate_conditions:
+  04_implement:
+    - id: G-EMP-FE-LINT
+      description: ESLint pass
+      command: pnpm lint
+    - id: G-EMP-FE-TYPECHECK
+      description: TypeScript typecheck pass
+      command: pnpm typecheck
+  05_verify:
+    - id: G-EMP-FE-BUILD
+      description: Production build pass
+      command: pnpm build
+extra_deliverables:
+  02_design:
+    - name: page-routing-map.md
+      required: false
+  07_release:
+    - name: reports/employee-performance-report.md
+      required: false
+quality_thresholds:
+  bundle_size_main:
+    value: 300
+    direction: lower_is_better
+  interaction_delay_p95:
+    value: 200
+    direction: lower_is_better

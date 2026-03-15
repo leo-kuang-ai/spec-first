@@ -1,68 +1,70 @@
 # 目标环境验证清单
 
-## 前端代码验证
+适用场景：
+- TASK 已完成代码修改，需要确认当前仓库可用
+- 目标是给 `07-code` skill 提供最小、稳定、可复用的验证动作
 
-### 必须执行的步骤
+## 默认验证顺序
 
-1. **打开目标页面**
-   ```bash
-   # 启动本地服务器（如果需要）
-   open scripts/stage-viewer/index.html
-   # 或
-   python -m http.server 8000
-   open http://localhost:8000/scripts/stage-viewer/
-   ```
+### 1. 先跑仓库级硬验证
 
-2. **检查浏览器控制台**
-   - 打开 DevTools (F12)
-   - 切换到 Console 标签
-   - 刷新页面
-   - **阻断条件**: 出现以下错误立即失败
-     - `ReferenceError: xxx is not defined`
-     - `TypeError: xxx is not a function`
-     - `Uncaught SyntaxError`
+```bash
+pnpm test -- --run
+pnpm typecheck
+```
 
-3. **验证核心功能**
-   - 点击主要按钮（如刷新按钮）
-   - 输入搜索关键词
-   - 检查数据是否正常加载
-   - **阻断条件**: 核心功能不可用
+阻断条件：
+- 任一命令失败
+- 出现新的类型错误
+- 出现与本 TASK 相关的测试回归
 
-4. **记录证据**
-   - 截图控制台（无错误）
-   - 截图页面正常显示
-   - 写入 findings.md
+### 2. 再跑变更相关的定向验证
 
-## 后端代码验证
+优先选择和变更范围最接近的命令，例如：
 
-### 必须执行的步骤
+```bash
+pnpm vitest run tests/unit/example.test.ts
+pnpm vitest run tests/unit/a.test.ts tests/unit/b.test.ts
+```
 
-1. **启动服务**
-   ```bash
-   # 根据项目类型选择
-   npm start
-   # 或
-   python main.py
-   ```
+要求：
+- 记录实际执行的命令
+- 说明命令覆盖了哪些文件或行为
+- 不要只写“已验证通过”而没有命令证据
 
-2. **检查启动日志**
-   - 无 `Error` 或 `Exception`
-   - 端口正常监听
+### 3. 必要时做运行态验证
 
-3. **调用关键 API**
-   ```bash
-   curl http://localhost:3000/api/health
-   curl http://localhost:3000/api/features
-   ```
+只有在以下情况才需要补充运行态验证：
+- 前端页面行为有明显交互变化
+- CLI 命令输出发生变化
+- 服务启动、文件写入、浏览器行为属于变更核心
 
-4. **记录证据**
-   - 复制 curl 输出到 findings.md
-   - 记录响应状态码
+可接受的运行态验证方式：
+- 运行相关 CLI 并检查输出
+- 启动本地服务并访问关键路径
+- 手动检查页面或关键日志
+
+## 证据记录
+
+建议把以下内容写入本 TASK 的执行记录或 `findings.md`：
+
+- 验证命令
+- 通过/失败结果
+- 失败时的关键错误信息
+- 如果只做了定向验证，说明为什么没有跑更大范围验证
 
 ## 失败处理
 
 如果验证失败：
-1. 立即标记 TASK 为 blocked
-2. 记录错误信息到 findings.md
-3. 不推进 TASK 状态
-4. 修复后重新验证
+
+1. 立即将 TASK 标记为 `blocked` 或保持 `in_progress`
+2. 记录失败命令和关键错误
+3. 不要把 TASK 标成 `done`
+4. 修复后重新执行最小必要验证
+
+## 不推荐的做法
+
+- 使用与当前仓库无关的通用命令模板
+- 没有证据就声称“验证通过”
+- 用页面截图替代测试/类型检查
+- 跳过 `pnpm typecheck` 后直接宣称交付完成

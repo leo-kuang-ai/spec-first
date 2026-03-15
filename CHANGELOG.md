@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.0.4 2026-03-14 Claude: fix(stage-viewer): 修复 Claude session 启动时浏览器不自动打开的问题 — openBrowser 从 spawn+unref() 改为 spawnSync，确保浏览器实际打开后再退出 (user-visible)
+- v1.0.4 2026-03-14 Claude: test(auto-loop): SF-4 补充 P6 unknown 错误端到端集成测试（3 用例：unknown→pending、2×退避验证、重试预算耗尽→blocked）
+- v1.0.4 2026-03-14 Claude: fix(auto-loop): NEW-2 两处 stop_on_blocked 提前执行 cascadeBlocked，状态文件准确反映级联传播结果
+- v1.0.4 2026-03-14 Claude: fix(retry-controller): NEW-1 makeRetryDecision 新增 taskLastFailureReason 参数，fingerprint 比对优先用任务级上下文，避免多任务跨污染
+- v1.0.4 2026-03-14 Claude: fix(auto-loop): SF-1 补全 P9 运行态清理（heartbeatAt/watchdogCheckedAt 置 null），SF-2 修复 cascadeBlocked 跨轮重复处理 bug
 - v1.0.2 2026-03-14 Claude: docs(readme): 新增 Stage Viewer 截图节，package.json files 补充 image.png，双语同步 (user-visible)
 - v1.0.2 2026-03-14 Claude: docs(readme): 移除 npm 失效内链，修复 FSM 图对齐，补 downloads badge，Mint→Generate，SIDE_EFFECT→SIDE EFFECTS，追溯链分组优化，双语同步 (user-visible)
 - v1.0.2 2026-03-14 Claude: docs(readme): 竞品对比章节改为竞品学习——引入真实 AI 工作流竞品（OpenSpec/Spec Kit/Planning-Files/Trellis/Superpowers），正向叙述借鉴点，双语同步 (user-visible)

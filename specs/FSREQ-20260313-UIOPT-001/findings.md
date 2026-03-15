@@ -1,5 +1,40 @@
 # Findings & Decisions — FSREQ-20260313-UIOPT-001
 
+## [2026-03-14] Auto-Loop 架构修复 代码审查
+
+> **审查范围**：`src/core/ai-orchestrator/` (auto-loop.ts · retry-controller.ts · todo-runner.ts)
+> **规格来源**：`docs/review-bundles/2026-03-13-全流程梳理/09-Auto-Loop架构深度审查报告.md` 附录二
+> **Stage 1（合规）**：PASS | **Stage 2（质量）**：4 项 SHOULD FIX → SF-1/SF-2 已修复，SF-3 描述有误（实际已 OK），SF-4 待补充
+
+### SHOULD FIX 状态
+
+| # | 位置 | 问题摘要 | 状态 |
+|---|------|---------|------|
+| SF-1 | `auto-loop.ts` recoverInterruptedTasks | P9 仅清 2/4 运行态字段，`heartbeatAt`/`watchdogCheckedAt` 未置 null，重启后 watchdog 误判 heartbeat_stalled | ✅ 已修复 2026-03-14 |
+| SF-2 | `todo-runner.ts` cascadeBlocked | cascaded 跨轮累积 + 每轮遍历旧 state.items，导致已 blocked 任务被重复处理 | ✅ 已修复 2026-03-14 |
+| SF-3 | `auto-loop.ts:339` Guard retry 路径 | ~~未调用 applyRetryToState~~ — 描述有误，实际第 339 行已调用，Guard 重试正确消耗全局 totalRetryDurationMs | ✅ 描述已勘误，无需修复 |
+| SF-4 | `tests/unit/auto-loop.test.ts` | P6 unknown 错误缺少端到端集成测试（unknown→pending，而非 blocked） | ✅ 已修复 2026-03-14 |
+
+### 架构优化（2026-03-14 深度分析新增）
+
+| # | 位置 | 问题摘要 | 状态 |
+|---|------|---------|------|
+| NEW-1 | `retry-controller.ts` makeRetryDecision | fingerprint 比对使用全局 lastFailureReason，多任务并发场景下跨任务污染 | ✅ 已修复 2026-03-14 |
+| NEW-2 | `auto-loop.ts` 两处 stop_on_blocked | halt 前未执行 cascadeBlocked，持久化状态文件遗漏级联传播结果 | ✅ 已修复 2026-03-14 |
+
+### OUT_OF_SCOPE（范围外记录）
+
+| # | 问题摘要 |
+|---|---------|
+| OOS-1 | P5 死锁检测缺 auto-loop 集成测试（haltReason=stuck_* 端到端验证） |
+| OOS-2 | TASK_TIMEOUT 依赖 timeout 子字符串匹配，建议增加专属模式 |
+| OOS-3 | P3 consecutiveErrorCount 未被 Guard retry 路径写入 |
+| OOS-4 | 阶段三（interval watchdog + AbortSignal）未实施，待设计评审 |
+
+### 关键提醒
+
+⚠️ 所有 P1-P10 修复当前以**未提交**状态存在于工作区。建议在 SF-1/SF-3 修复后，一并提交并更新 CHANGELOG.md。
+
 ## Plan Summary
 
 | Field | Value |

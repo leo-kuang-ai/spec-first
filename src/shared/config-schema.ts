@@ -13,6 +13,7 @@ export interface AutoOrchestrateConfig {
   stop_on_blocked: boolean;
   max_task_duration_ms: number;
   heartbeat_timeout_ms: number;
+  /** @reserved 预留给未来 interval-based watchdog，当前未实现 */
   watchdog_interval_ms: number;
   max_retry_per_task: number;
   retry_backoff_ms: number;
@@ -42,6 +43,15 @@ export interface AuditLogConfig {
   rotation_size_mb: number;
 }
 
+export type GateThresholdDirection = 'higher_is_better' | 'lower_is_better';
+
+export interface GateThresholdConfig {
+  value: number;
+  direction: GateThresholdDirection;
+}
+
+export type GateThresholdId = 'G-IMPL-01' | 'G-VERIFY-01';
+
 export interface SpecFirstConfig {
   catchup: { trigger: 'auto' | 'prompt' | 'off' };
   context: { token_budget: number };
@@ -55,6 +65,7 @@ export interface SpecFirstConfig {
   gate: {
     pilot_mode: boolean;
     profile: 'default-simplified' | 'strict';
+    thresholds: Record<GateThresholdId, GateThresholdConfig>;
   };
   health: {
     weights: {
@@ -84,6 +95,8 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
       stop_on_blocked: true,
       max_task_duration_ms: 600_000,
       heartbeat_timeout_ms: 300_000,
+      // P2: reserved, not yet implemented — 预留给未来 interval-based watchdog 轮询
+      // 当前 watchdog 检查为同步模式（executor 返回后才检测），此字段已定义、校验但未读取
       watchdog_interval_ms: 10_000,
       max_retry_per_task: 3,
       retry_backoff_ms: 2_000,
@@ -96,7 +109,14 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
       rotation_size_mb: 10,
     },
   },
-  gate: { pilot_mode: false, profile: 'default-simplified' },
+  gate: {
+    pilot_mode: false,
+    profile: 'default-simplified',
+    thresholds: {
+      'G-IMPL-01': { value: 0.8, direction: 'higher_is_better' },
+      'G-VERIFY-01': { value: 1.0, direction: 'higher_is_better' },
+    },
+  },
   dependencies: {
     autoCheck: true,
     stages: {
@@ -274,6 +294,22 @@ function mergeWithDefaults(parsed: Record<string, unknown>): SpecFirstConfig {
   if (gate?.profile && ['default-simplified', 'strict'].includes(String(gate.profile))) {
     cfg.gate.profile = gate.profile as SpecFirstConfig['gate']['profile'];
   }
+  const thresholds = gate?.thresholds as Record<string, unknown> | undefined;
+  if (thresholds) {
+    for (const gateId of Object.keys(cfg.gate.thresholds) as GateThresholdId[]) {
+      const rawThreshold = thresholds[gateId] as Record<string, unknown> | undefined;
+      if (!rawThreshold) continue;
+      if (typeof rawThreshold.value === 'number') {
+        cfg.gate.thresholds[gateId].value = rawThreshold.value;
+      }
+      if (
+        typeof rawThreshold.direction === 'string' &&
+        ['higher_is_better', 'lower_is_better'].includes(rawThreshold.direction)
+      ) {
+        cfg.gate.thresholds[gateId].direction = rawThreshold.direction as GateThresholdDirection;
+      }
+    }
+  }
 
   // runtime.max_iterations
   const runtime = parsed.runtime as Record<string, unknown> | undefined;
@@ -393,7 +429,17 @@ function validate(cfg: SpecFirstConfig): void {
     errors.push(`health.weights must sum to 1.0, got ${wSum.toFixed(3)}`);
   }
 
+  for (const [gateId, threshold] of Object.entries(cfg.gate.thresholds)) {
+    if (threshold.value < 0 || threshold.value > 1) {
+      errors.push(`gate.thresholds.${gateId}.value must be 0-1, got ${threshold.value}`);
+    }
+  }
+
   if (errors.length > 0) {
     throw new Error(`Config validation failed:\n${errors.join('\n')}`);
   }
+}
+
+export function getGateThreshold(config: SpecFirstConfig, gateId: GateThresholdId): GateThresholdConfig {
+  return config.gate.thresholds[gateId];
 }

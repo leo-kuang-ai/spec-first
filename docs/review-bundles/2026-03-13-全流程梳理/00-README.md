@@ -22,9 +22,9 @@
 **Spec-First 是 AI 时代的规范驱动研发流程引擎**，通过以下四个机制解决 AI 协同研发的系统性问题：
 
 1. **规范即真理源** — `specs/{featureId}/` 目录是跨会话的持久化语义上下文
-2. **全链路追溯** — 12 类 ID 体系（FR/DS/TASK/TC...）+ 5 项覆盖率指标（C3/C4/C6/C8/C9）
+2. **全链路追溯** — 14 类 ID 体系（FR/DS/TASK/TC/RFC/REQ/SYS/ARCH/MOD/ATP/STP/ITP/UTP/Feature）+ 5 项覆盖率指标（C3/C4/C6/C8/C9）
 3. **阶段质量门禁** — 8+2 阶段状态机，每阶段 3-7 个 blocking 条件，不达标不得推进
-4. **AI 协同协议** — 22 个 Skill（P0-P5 标准模型）+ Catchup 6 步恢复 + Auto-Loop 自动编排
+4. **AI 协同协议** — 20 个 Skill（P0-P5 标准模型）+ Catchup 6 步恢复 + Auto-Loop 自动编排
 
 ---
 
@@ -34,13 +34,13 @@
 |------|-----|
 | 版本 | v0.5.78 |
 | CLI 命令数 | 27 个 |
-| Skill 数量 | 22 个 |
-| 追溯 ID 类型 | 12 类 |
+| Skill 数量 | 20 个 |
+| 追溯 ID 类型 | 14 类 |
 | 核心覆盖率指标 | 5 项（C3/C4/C6/C8/C9） |
 | 阶段数 | 8 active + 2 terminal |
 | 健康分权重维度 | 5 维（可配置） |
 | 瓶颈检测规则 | R1-R5（5 条） |
-| 核心引擎模块 | 10 个 |
+| 核心引擎模块 | 10 个（详见 06-核心模块详解.md；另有 tool-integration/batch-executor/rules 3 个辅助模块） |
 | Gate 条件（07_release） | 7 条（最严格） |
 
 ---
@@ -68,7 +68,7 @@
 - `src/core/` 各模块源码
 - `src/shared/types.ts`（全局类型定义）
 - `src/shared/config-schema.ts`（配置 Schema）
-- `skills/spec-first/`（22 个 Skill 定义）
+- `skills/spec-first/`（20 个 Skill 定义）
 
 **原则**：以代码为准，不捏造；不确定内容标注 `[待确认]`。
 

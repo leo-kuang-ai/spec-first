@@ -52,7 +52,7 @@ function handleCoverage(args: string[]): number {
     }
 
     const state = readJson(join(process.cwd(), 'specs', featureId, 'stage-state.json')) as StageState;
-    const stageTargets = getStageMetricTargets(state.currentStage);
+    const stageTargets = getStageMetricTargets(state.currentStage, process.cwd());
 
     console.log(`覆盖率报告 — ${featureId} (${state.currentStage})\n`);
 
@@ -122,7 +122,7 @@ function handleReport(args: string[]): number {
   const health = calcHealthScore(coverage, 0, 0);
   const bottlenecks = detectBottlenecks(coverage);
   const allMetrics = getAllCoreMetricDefs();
-  const stageTargets = getStageMetricTargets(currentStage as any);
+  const stageTargets = getStageMetricTargets(currentStage as any, cwd);
   const record = coverage as unknown as Record<string, number>;
 
   // ① 健康分

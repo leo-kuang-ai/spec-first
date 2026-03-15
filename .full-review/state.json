@@ -1,0 +1,18 @@
+{
+  "target": "spec-first — 全链路规范驱动研发平台 (src/ + tests/ + skills/)",
+  "status": "in_progress",
+  "flags": {
+    "security_focus": false,
+    "performance_critical": false,
+    "strict_mode": true,
+    "framework": "Node.js/TypeScript ESM + Vitest",
+    "sdd_focus": true,
+    "context7": true
+  },
+  "current_step": 0,
+  "current_phase": 0,
+  "completed_steps": [],
+  "files_created": [],
+  "started_at": "2026-03-14T14:10:00.000Z",
+  "last_updated": "2026-03-14T14:10:00.000Z"
+}

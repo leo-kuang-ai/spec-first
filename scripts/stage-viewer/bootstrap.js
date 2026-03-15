@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import {
   closeSync,
   existsSync,
@@ -125,10 +125,16 @@ function isPortOpen(host, port, timeoutMs = 450) {
 function openBrowser(url) {
   // Use python webbrowser module (same as serena) — reliable across all environments
   // including Claude hook subprocess chains where macOS 'open' command fails silently.
-  spawn('python3', ['-c', `import webbrowser; webbrowser.open(${JSON.stringify(url)})`], {
-    stdio: ['ignore', 'ignore', 'ignore'],
-    detached: true,
-  }).unref();
+  // IMPORTANT: Use spawnSync to ensure browser is actually opened before parent exits.
+  // spawn + unref() can cause the subprocess to be terminated before browser launches.
+  try {
+    spawnSync('python3', ['-c', `import webbrowser; webbrowser.open(${JSON.stringify(url)})`], {
+      stdio: ['ignore', 'ignore', 'ignore'],
+      timeout: 5000, // 5 second timeout to prevent hanging
+    });
+  } catch {
+    // Silently ignore errors - browser opening is best-effort
+  }
 }
 
 function launchServer(projectRoot, host, port, stateFile, source) {

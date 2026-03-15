@@ -1,0 +1,29 @@
+platform: admin-frontend
+name: Admin Frontend
+description: Enterprise admin web frontend standard
+gate_conditions:
+  04_implement:
+    - id: G-ADMIN-FE-LINT
+      description: ESLint pass
+      command: pnpm lint
+    - id: G-ADMIN-FE-TYPECHECK
+      description: TypeScript typecheck pass
+      command: pnpm typecheck
+  05_verify:
+    - id: G-ADMIN-FE-BUILD
+      description: Production build pass
+      command: pnpm build
+extra_deliverables:
+  02_design:
+    - name: ui-information-architecture.md
+      required: false
+  07_release:
+    - name: reports/admin-bundle-analysis.md
+      required: false
+quality_thresholds:
+  bundle_size_main:
+    value: 400
+    direction: lower_is_better
+  first_screen_time:
+    value: 2500
+    direction: lower_is_better

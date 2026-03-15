@@ -48,14 +48,14 @@
 
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
-| G-IMPL-01 | Unit test coverage (C4) | C4 ≥ 80% | ≥ 80% |
+| G-IMPL-01 | Unit test coverage (C4) | C4 满足 `gate.thresholds.G-IMPL-01` | 配置驱动 |
 | G-IMPL-02 | PR compliance (C7) | C7 = 100% | = 100% |
 
 ### 05_verify
 
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
-| G-VERIFY-01 | Test coverage FR (C4) | C4 = 100% | = 100% |
+| G-VERIFY-01 | Test coverage FR (C4) | C4 满足 `gate.thresholds.G-VERIFY-01` | 配置驱动 |
 | G-VERIFY-02 | Test coverage AC (C5) | C5 ≥ 90% (M/L), 60% (S) | 动态阈值 |
 | G-VERIFY-03 | TC compliance (C9) | C9 = 100% | = 100% |
 
@@ -140,8 +140,10 @@ def evaluate_gate(feature_id, stage):
 | G-SPEC-02 (FR 未分配) | spec.md 中没有 FR | 运行 `/spec-first:spec` 生成 FR |
 | G-DESIGN-02 (C2 < 100%) | 部分 FR 缺少 DS | 运行 `/spec-first:design` 补充 DS |
 | G-PLAN-01 (C3 < 100%) | 部分 FR 缺少 TASK | 运行 `/spec-first:task` 拆解任务 |
-| G-IMPL-01 (C4 < 80%) | 单测覆盖不足 | 补充单元测试 |
-| G-VERIFY-01 (C4 < 100%) | 部分 FR 缺少 TC | 回到 `task/code` 补齐测试设计与 TDD 证据 |
+| G-IMPL-01 (C4 < configured threshold) | 单测覆盖不足 | 先核对 `gate.thresholds.G-IMPL-01`，再补充单元测试 |
+| G-VERIFY-01 (C4 < configured threshold) | 部分 FR 缺少 TC | 先核对 `gate.thresholds.G-VERIFY-01`，再回到 `task/code` 补齐测试设计与 TDD 证据 |
+
+> `G-IMPL-01` / `G-VERIFY-01` 的数值阈值不再写死在文档中。唯一真理源为 `.spec-first/meta/config.yaml` 与 `.spec-first/local/config.yaml` 的 `gate.thresholds`。
 
 ## verify-view Gate 输入
 - Gate 条件校验前优先读取 `verify-view`

@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-commit-msg');
 const SCRIPT = join(import.meta.dirname, '../../.spec-first/hooks/commit-msg.sh');
+const POSIX_SHELL = existsSync('/bin/dash') ? '/bin/dash' : 'sh';
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
@@ -19,7 +20,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, '[TASK-AUTH-001] implement login feature\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -29,7 +30,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, '[FR-AUTH-001] user authentication\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -39,7 +40,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, '[DS-AUTH-001] auth service design\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -49,7 +50,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, '[RFC-001] propose new auth flow\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -59,7 +60,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'feat(auth): implement login\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -69,7 +70,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'fix: correct login bug\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -79,7 +80,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'docs: update README\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -89,7 +90,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'chore: update dependencies\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -99,7 +100,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'ci: add github actions\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -109,7 +110,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'test: add login tests\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -119,7 +120,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'refactor(auth): simplify login logic\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -129,7 +130,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'style: format code\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
@@ -139,7 +140,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, 'just a random message\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(1);
     const output = result.stdout + result.stderr;
@@ -152,7 +153,7 @@ describe('commit-msg hook', () => {
     const msgFile = join(TMP, 'commit-msg.txt');
     writeFileSync(msgFile, '\n', 'utf-8');
 
-    const result = spawnSync('sh', [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, msgFile], { cwd: TMP, encoding: 'utf-8' });
 
     expect(result.status).toBe(1);
     const output = result.stdout + result.stderr;
@@ -160,7 +161,7 @@ describe('commit-msg hook', () => {
   });
 
   it('should output version when --version flag is passed', () => {
-    const result = spawnSync('sh', [SCRIPT, '--version'], { encoding: 'utf-8' });
+    const result = spawnSync(POSIX_SHELL, [SCRIPT, '--version'], { encoding: 'utf-8' });
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('spec-first commit-msg hook');

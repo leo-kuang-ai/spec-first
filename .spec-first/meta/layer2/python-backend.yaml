@@ -1,0 +1,29 @@
+platform: python-backend
+name: Python Backend
+description: Python API service standard
+gate_conditions:
+  04_implement:
+    - id: G-PY-BE-RUFF
+      description: Ruff lint pass
+      command: ruff check .
+    - id: G-PY-BE-PYTEST
+      description: Pytest pass
+      command: pytest
+  05_verify:
+    - id: G-PY-BE-DIFF-COV
+      description: Diff coverage ≥ 80%
+      command: pytest --cov --cov-report=json && diff-cover coverage.json --compare-branch=main --fail-under=80
+extra_deliverables:
+  02_design:
+    - name: contracts/openapi.yaml
+      required: true
+  07_release:
+    - name: reports/python-service-slo.md
+      required: false
+quality_thresholds:
+  diff_coverage:
+    value: 80
+    direction: higher_is_better
+  api_p95_latency:
+    value: 350
+    direction: lower_is_better

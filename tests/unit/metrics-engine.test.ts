@@ -226,7 +226,7 @@ describe('handleMetrics', () => {
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should not fail C4=0.67 in 04_implement stage', () => {
+  it('should fail C4=0.67 in 04_implement stage after aligning with verify skill threshold', () => {
     writeFileSync(
       join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
       JSON.stringify({
@@ -251,8 +251,8 @@ describe('handleMetrics', () => {
       expect(code).toBe(ExitCode.SUCCESS);
       const output = logs.join('\n');
       expect(output).toContain('C4');
-      expect(output).toContain('60%');
-      expect(output).toContain('通过');
+      expect(output).toContain('80%');
+      expect(output).toContain('失败');
     } finally {
       spy.mockRestore();
     }
@@ -283,7 +283,7 @@ describe('handleMetrics', () => {
       expect(code).toBe(ExitCode.SUCCESS);
       const output = logs.join('\n');
       expect(output).toContain('C4');
-      expect(output).toContain('80%');
+      expect(output).toContain('100%');
       expect(output).toContain('失败');
     } finally {
       spy.mockRestore();

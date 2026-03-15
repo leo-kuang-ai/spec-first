@@ -109,6 +109,11 @@ function saveState(featureId: string, root: string, state: StageState): void {
  * 5. 特殊处理 - Context Sync (02_design→03_plan) / Auto-skip (07_release→08_done)
  *
  * Phase A 降级：GateEngine 未就绪时根据 pilot_mode 决定放行/阻断
+ *
+ * 当前行为说明：
+ * - 07_release 为预留发布阶段
+ * - 当前默认自动收口到 08_done，以保持主流程顺滑
+ * - 后续若接入真实发布自动化，可在 07_release 内扩展显式发布动作与更严格门禁
  */
 export function advance(
   featureId: string,
@@ -233,16 +238,16 @@ export function advance(
   let finalTo = to;
   let finalGateResult = gateResult;
 
-  // 07_release 自动跳转到 08_done（预留扩展，当前自动跳过）
+  // 07_release 自动跳转到 08_done（当前保持自动收口）
   if (to === Stage.RELEASE) {
     appendFindings(
       featureId,
       projectRoot,
-      `AUTO_ADVANCE: ${to} → ${Stage.DONE} (发布阶段预留扩展，当前自动跳过)`
+      `AUTO_ADVANCE: ${to} → ${Stage.DONE} (发布阶段当前自动收口，后续可扩展真实发布动作)`
     );
     writeLog(getGateLogPath(featureId, projectRoot), {
       event: 'release_auto_skip',
-      message: '发布阶段预留扩展，当前自动跳过',
+      message: '发布阶段当前自动收口，后续可扩展真实发布动作',
       featureId,
     });
     const doneResult = advance(featureId, projectRoot, _options);
