@@ -5,7 +5,6 @@ version: 1.4.0
 last_updated: 2026-03-15
 changelog: |
   v1.4.0: 下沉并行/用户故事标记与日志模式到 references；主文档进一步收敛为流程、字段与成功标准
->>>>>>> feature-leo-2026-03-15
   v1.3.0: 对齐当前 task_plan 模板、C3=100% Gate 口径、验证命令列与 canonical 状态集
   v1.2.0: 新增 Execution Handoff、Hooks 行为规范、中断恢复策略、Error Log Pattern、Decision Log Pattern、Operation Types
   v1.1.0: 新增 Announce at Start、字面即精神原则、Bite-Sized Granularity、Task Structure Detail、决策流程图、When to Stop and Ask、references/ 目录、hooks 配置

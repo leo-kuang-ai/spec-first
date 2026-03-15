@@ -17,26 +17,3 @@ if command -v spec-first >/dev/null 2>&1; then
   fi
 fi
 exit 0
-
-#!/bin/sh
-# spec-first-hook
-
-# Incremental SCA check before push
-if command -v npx >/dev/null 2>&1; then
-  FEAT_FILE=".spec-first/current"
-  FEAT_ID=""
-  if [ -f "$FEAT_FILE" ]; then
-    FEAT_ID=$(head -1 "$FEAT_FILE" | tr -d '\r')
-  fi
-
-  if [ -z "$FEAT_ID" ]; then
-    echo "spec-first: 跳过 matrix 检查（未设置当前 feature）"
-    exit 0
-  fi
-
-  npx spec-first matrix check "$FEAT_ID"
-  if [ $? -ne 0 ]; then
-    echo "错误：$FEAT_ID 的 spec-first matrix check 失败，已阻止 push。"
-    exit 1
-  fi
-fi
