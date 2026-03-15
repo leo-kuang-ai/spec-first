@@ -19,6 +19,7 @@
 2. `P1 平台层`
    - 建立 `Host Adapter`
    - 建立 `Tool Registry / Capability Matrix / Selection Policy`
+   - 建立阶段门禁与多 agent 审查机制
    - 将宿主扩展变成标准化接入
 
 3. `P2 生态层`
@@ -33,9 +34,11 @@
 ### 2.1 本轮纳入范围
 
 - `src/config/bootstrap-manifest.ts`
+- `src/postinstall.ts`
 - `src/shared/skill-commands.ts`
 - `src/cli/commands/update.ts`
 - `src/cli/commands/doctor.ts`
+- `src/cli/commands/init.ts`
 - `skills/spec-first/05-research/SKILL.md`
 - `skills/spec-first/08-review/SKILL.md`
 - `skills/spec-first/12-verify/SKILL.md`
@@ -188,7 +191,39 @@ Hosts:
 
 状态：`未开始`
 
-### T3. 扩充 `doctor` 的“缺失影响”输出
+### T3. 建立安装链路默认引导与强制补齐
+
+目标：
+
+- 让安装 `spec-first` 后的链路真正进入“默认引导 + 基线补齐”
+- 让 `postinstall / init --bootstrap / update` 三条链路口径一致
+
+涉及文件：
+
+- [postinstall.ts](/Users/kuang/xiaobu/spec-first/src/postinstall.ts)
+- [init.ts](/Users/kuang/xiaobu/spec-first/src/cli/commands/init.ts)
+- [update.ts](/Users/kuang/xiaobu/spec-first/src/cli/commands/update.ts)
+
+开发动作：
+
+- 为 `postinstall` 增加更明确的基线能力引导
+- 明确首次安装后的推荐动作或自动触发策略
+- 对齐 `init --bootstrap` 与 `update` 的基线补齐口径
+- 明确“默认强制安装基线能力”在安装链路中的实际入口
+
+依赖：
+
+- T1
+
+验收标准：
+
+- 首次安装后的行为说明清晰
+- `postinstall / init --bootstrap / update` 不再各说各话
+- 用户能明确知道如何完成基线补齐
+
+状态：`未开始`
+
+### T4. 扩充 `doctor` 的“缺失影响”输出
 
 目标：
 
@@ -213,7 +248,7 @@ Hosts:
 ```text
 WARN mcp:serena missing
   impact: code navigation and symbol-level analysis degraded
-  fix: run spec-first update
+ fix: run spec-first update
 ```
 
 依赖：
@@ -227,7 +262,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T4. 产出宿主能力矩阵文档
+### T5. 产出宿主能力矩阵文档
 
 目标：
 
@@ -263,7 +298,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T5. 产出工具集成总说明文档
+### T6. 产出工具集成总说明文档
 
 目标：
 
@@ -295,7 +330,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T6. 在 `research` 中显式接入 `fetch / serena`
+### T7. 在 `research` 中显式接入 `fetch / context7 / serena`
 
 目标：
 
@@ -309,6 +344,7 @@ WARN mcp:serena missing
 
 - 明确写出：
   - 外部资料优先使用 `fetch`
+  - 官方文档、规范、SDK/API 说明优先使用 `context7`
   - 代码结构优先使用 `serena`
   - 工具缺失时的降级策略
 - 补充研究证据产出要求
@@ -324,7 +360,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T7. 在 `review` 中显式接入 `serena / playwright-mcp`
+### T8. 在 `review` 中显式接入 `serena / playwright-mcp`
 
 目标：
 
@@ -352,7 +388,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T8. 在 `verify` 中显式接入浏览器验收模板
+### T9. 在 `verify` 中显式接入浏览器验收模板
 
 目标：
 
@@ -384,7 +420,7 @@ WARN mcp:serena missing
 
 ## 6. P1 任务清单
 
-### T9. 建立 `Tool Registry`
+### T10. 建立 `Tool Registry`
 
 目标：
 
@@ -401,6 +437,7 @@ WARN mcp:serena missing
 - 注册首批工具：
   - `serena`
   - `fetch`
+  - `context7`
   - `playwright-mcp`
   - `shell`
   - `viewer`
@@ -415,7 +452,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T10. 建立 `Capability Matrix`
+### T11. 建立 `Capability Matrix`
 
 目标：
 
@@ -446,7 +483,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T11. 建立 `Host Adapter` 基础设施
+### T12. 建立 `Host Adapter` 基础设施
 
 目标：
 
@@ -478,7 +515,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T12. 让 `update / doctor` 切换到 Adapter 驱动
+### T13. 让 `update / doctor` 切换到 Adapter 驱动
 
 目标：
 
@@ -501,7 +538,7 @@ WARN mcp:serena missing
 
 依赖：
 
-- T11
+- T12
 
 验收标准：
 
@@ -510,7 +547,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T13. 建立 `Tool Selection Policy`
+### T14. 建立 `Tool Selection Policy`
 
 目标：
 
@@ -524,7 +561,7 @@ WARN mcp:serena missing
 
 - 建立场景映射：
   - 代码分析 -> `serena`
-  - 外部调研 -> `fetch`
+  - 外部调研 -> `fetch + context7`
   - 页面验收 -> `playwright-mcp`
   - 降级 -> `shell / manual-template`
 
@@ -543,7 +580,7 @@ WARN mcp:serena missing
 
 ## 7. P2 任务清单
 
-### T14. 接入 `GeminiAdapter`
+### T15. 接入 `GeminiAdapter`
 
 目标：
 
@@ -571,7 +608,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T15. 接入 `CursorAdapter`
+### T16. 接入 `CursorAdapter`
 
 目标：
 
@@ -598,7 +635,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T16. 组件化安装
+### T17. 组件化安装
 
 目标：
 
@@ -632,7 +669,7 @@ WARN mcp:serena missing
 
 状态：`未开始`
 
-### T17. 标准产物模板
+### T18. 标准产物模板
 
 目标：
 
@@ -651,13 +688,118 @@ WARN mcp:serena missing
 
 依赖：
 
-- T6
 - T7
 - T8
+- T9
 
 验收标准：
 
 - 研究、验证、审计有标准产物可复用
+
+状态：`未开始`
+
+### T19. 安装链路与基线补齐集成验证
+
+目标：
+
+- 验证“安装 -> 引导 -> 基线补齐 -> 运行时消费”链路是否真正闭合
+
+涉及文件：
+
+- `[postinstall-host-bootstrap.test.ts](/Users/kuang/xiaobu/spec-first/tests/integration/postinstall-host-bootstrap.test.ts)`（新增）
+- `[init-bootstrap.test.ts](/Users/kuang/xiaobu/spec-first/tests/integration/init-bootstrap.test.ts)`（新增）
+- `[update-doctor-baseline.test.ts](/Users/kuang/xiaobu/spec-first/tests/integration/update-doctor-baseline.test.ts)`（新增）
+
+开发动作：
+
+- 增加 `postinstall` 行为测试
+- 增加 `init --bootstrap` 行为测试
+- 增加 `update / doctor` 基线一致性测试
+
+依赖：
+
+- T3
+- T4
+- T13
+- T17
+
+验收标准：
+
+- 能验证首次安装后的引导与基线补齐逻辑
+- 能验证 `init / update / doctor` 三条链路口径一致
+
+状态：`未开始`
+
+### T20. 配置写入安全机制
+
+目标：
+
+- 让基线能力强制补齐建立在安全写入之上
+
+涉及文件：
+
+- `src/shared/*`
+- `src/core/tool-integration/*`
+- `src/cli/commands/update.ts`
+
+开发动作：
+
+- 建立写入前自动备份
+- 优先 merge，避免粗暴覆盖用户配置
+- 增加冲突检测与提示
+- 支持写入失败回滚
+- 增加幂等验证
+
+重点适用对象：
+
+- `~/.codex/config.toml`
+- `~/.claude/...`
+- hooks / session hooks / MCP config
+
+依赖：
+
+- T1
+- T2
+- T3
+
+验收标准：
+
+- 基线补齐不会粗暴覆盖已有用户配置
+- 重复执行保持幂等
+- 失败时可恢复
+
+状态：`未开始`
+
+### T21. 阶段门禁与多 Agent 审查机制
+
+目标：
+
+- 把“最佳实践”从口头要求变成可执行机制
+
+涉及文件：
+
+- `[tool-integration-gates.md](/Users/kuang/xiaobu/spec-first/docs/reference/tool-integration-gates.md)`（新增）
+- `[tool-integration-review-checklists.md](/Users/kuang/xiaobu/spec-first/docs/reference/tool-integration-review-checklists.md)`（新增）
+
+开发动作：
+
+- 定义 `P0 -> P1 -> P2` 的进入条件与退出标准
+- 定义 3 类审查清单：
+  - 安装链路审查
+  - 配置安全审查
+  - 运行时策略审查
+- 明确何时触发人工复审与回归复审
+
+依赖：
+
+- T20
+- T13
+- T14
+
+验收标准：
+
+- 每个阶段都有门禁
+- 多 agent 审查不再依赖临时口头判断
 
 状态：`未开始`
 
@@ -669,30 +811,41 @@ WARN mcp:serena missing
 T1
  ├─ T2
  ├─ T3
- ├─ T6
- ├─ T7
- └─ T8
-
-T2 + T3
  ├─ T4
- └─ T5
+ ├─ T7
+ ├─ T8
+ └─ T9
 
-T4
- └─ T10
+T2 + T3 + T4
+ ├─ T5
+ └─ T6
 
-T9 + T10
+T5
  └─ T11
 
-T11
- ├─ T12
- ├─ T14
- └─ T15
+T10 + T11
+ └─ T12
 
 T12
+ ├─ T13
+ ├─ T15
  └─ T16
 
-T6 + T7 + T8
- └─ T17
+T13
+ ├─ T17
+ └─ T19
+
+T7 + T8 + T9
+ └─ T18
+
+T3 + T4 + T17
+ └─ T19
+
+T1 + T2 + T3
+ └─ T20
+
+T20 + T13 + T14
+ └─ T21
 ```
 
 ---
@@ -713,18 +866,23 @@ T6 + T7 + T8
 10. `T10`
 11. `T11`
 12. `T12`
-13. `T14`
-14. `T15`
-15. `T16`
-16. `T17`
+13. `T13`
+14. `T14`
+15. `T15`
+16. `T16`
+17. `T17`
+18. `T18`
+19. `T19`
+20. `T20`
+21. `T21`
 
 如果要压缩成两个里程碑：
 
-- `M1`: `T1-T8`
+- `M1`: `T1-T9`
   - 目标：基线稳定并进入流程
 
-- `M2`: `T9-T17`
-  - 目标：形成平台抽象并完成宿主扩展验证
+- `M2`: `T10-T21`
+  - 目标：形成平台抽象、建立治理机制并完成宿主扩展验证
 
 ---
 
@@ -734,21 +892,25 @@ T6 + T7 + T8
 |----|--------|------|------|--------|------|
 | T1 | P0 | 收敛必备 Skill / MCP 基线定义 | 未开始 |  |  |
 | T2 | P0 | 扩充 update 分层摘要输出 | 未开始 |  |  |
-| T3 | P0 | 扩充 doctor 缺失影响输出 | 未开始 |  |  |
-| T4 | P0 | 宿主能力矩阵文档 | 未开始 |  |  |
-| T5 | P0 | 工具集成总说明文档 | 未开始 |  |  |
-| T6 | P0 | research 显式接入 fetch / serena | 未开始 |  |  |
-| T7 | P0 | review 显式接入 serena / playwright-mcp | 未开始 |  |  |
-| T8 | P0 | verify 显式接入浏览器验收模板 | 未开始 |  |  |
-| T9 | P1 | 建立 Tool Registry | 未开始 |  |  |
-| T10 | P1 | 建立 Capability Matrix | 未开始 |  |  |
-| T11 | P1 | 建立 Host Adapter 基础设施 | 未开始 |  |  |
-| T12 | P1 | update / doctor 切换到 Adapter 驱动 | 未开始 |  |  |
-| T13 | P1 | 建立 Tool Selection Policy | 未开始 |  |  |
-| T14 | P2 | 接入 GeminiAdapter | 未开始 |  |  |
-| T15 | P2 | 接入 CursorAdapter | 未开始 |  |  |
-| T16 | P2 | 组件化安装 | 未开始 |  |  |
-| T17 | P2 | 标准产物模板 | 未开始 |  |  |
+| T3 | P0 | 建立安装链路默认引导与强制补齐 | 未开始 |  |  |
+| T4 | P0 | 扩充 doctor 缺失影响输出 | 未开始 |  |  |
+| T5 | P0 | 宿主能力矩阵文档 | 未开始 |  |  |
+| T6 | P0 | 工具集成总说明文档 | 未开始 |  |  |
+| T7 | P0 | research 显式接入 fetch / context7 / serena | 未开始 |  |  |
+| T8 | P0 | review 显式接入 serena / playwright-mcp | 未开始 |  |  |
+| T9 | P0 | verify 显式接入浏览器验收模板 | 未开始 |  |  |
+| T10 | P1 | 建立 Tool Registry | 未开始 |  |  |
+| T11 | P1 | 建立 Capability Matrix | 未开始 |  |  |
+| T12 | P1 | 建立 Host Adapter 基础设施 | 未开始 |  |  |
+| T13 | P1 | update / doctor 切换到 Adapter 驱动 | 未开始 |  |  |
+| T14 | P1 | 建立 Tool Selection Policy | 未开始 |  |  |
+| T15 | P2 | 接入 GeminiAdapter | 未开始 |  |  |
+| T16 | P2 | 接入 CursorAdapter | 未开始 |  |  |
+| T17 | P2 | 组件化安装 | 未开始 |  |  |
+| T18 | P2 | 标准产物模板 | 未开始 |  |  |
+| T19 | P2 | 安装链路与基线补齐集成验证 | 未开始 |  |  |
+| T20 | P1 | 配置写入安全机制 | 未开始 |  |  |
+| T21 | P1 | 阶段门禁与多 Agent 审查机制 | 未开始 |  |  |
 
 状态建议枚举：
 
@@ -775,11 +937,13 @@ T6 + T7 + T8
 - 存在 `Tool Registry`
 - 存在 `Capability Matrix`
 - 存在 `Host Adapter`
+- 存在阶段门禁与多 agent 审查清单
 
 ### 11.3 扩展结果
 
 - `Gemini` 和 `Cursor` 至少完成基础级接入验证
 - 工具结果能沉淀为标准模板产物
+- 配置写入具备 backup / merge / rollback / idempotency
 
 ---
 

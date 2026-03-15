@@ -79,3 +79,26 @@ describe('SEC-002: 路径遍历防护', () => {
     expect(existsSync(join(TMP, 'sub/dir/deep'))).toBe(true);
   });
 });
+
+describe('基础步骤执行', () => {
+  it('patch 在目标文件不存在时应创建文件并写入 patch 内容', () => {
+    const step: MigrationStep = {
+      type: 'patch',
+      file: 'meta/template-hashes.json',
+      patch: {
+        version: '1.0.0',
+        generated: '1970-01-01T00:00:00Z',
+        templates: {},
+      },
+      mergeStrategy: 'replace',
+    } as MigrationStep;
+
+    const result = executeStep(step, TMP);
+
+    expect(result.success).toBe(true);
+    expect(existsSync(join(TMP, 'meta', 'template-hashes.json'))).toBe(true);
+    expect(JSON.parse(readFileSync(join(TMP, 'meta', 'template-hashes.json'), 'utf-8'))).toEqual(
+      step.patch,
+    );
+  });
+});
