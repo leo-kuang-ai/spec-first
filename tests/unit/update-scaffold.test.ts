@@ -4,7 +4,14 @@ import { join } from 'node:path';
 import { ExitCode } from '../../src/shared/types.js';
 
 vi.mock('../../src/shared/skill-commands.js', () => ({
-  ensureSkillCommands: vi.fn(() => ({ claude: [], codex: [], generic: [], codexWarnings: [] })),
+  ensureSkillCommands: vi.fn(() => ({
+    claude: [],
+    codex: [],
+    gemini: [],
+    cursor: [],
+    generic: [],
+    codexWarnings: [],
+  })),
 }));
 vi.mock('../../src/shared/host-bootstrap.js', () => ({
   ensureHostBootstrap: vi.fn(() => ({ ok: true, results: [] })),

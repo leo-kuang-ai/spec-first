@@ -4,97 +4,50 @@
  */
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { detectHostPaths } from './shared/host-paths.js';
+import { detectGlobalInstall, type InstallDetectionContext } from './shared/install-detection.js';
+import { resolveHostAdapterStatuses } from './core/host-adapters/registry.js';
+import type { HostAdapterStatus } from './core/host-adapters/types.js';
 
-/**
- * 检测当前包是否安装在全局 node_modules 中
- * 通过检查当前文件路径是否包含全局 node_modules 路径特征
- */
-function isInGlobalNodeModules(): boolean {
-  // 获取当前文件所在目录（dist/ 或 src/）
-  const currentDir = dirname(fileURLToPath(import.meta.url));
-
-  // 全局 node_modules 的路径特征
-  const globalPatterns = [
-    '/lib/node_modules/',
-    '/node_modules/', // 通用模式
-    '\\node_modules\\', // Windows
-  ];
-
-  // 检查是否包含全局路径特征
-  for (const pattern of globalPatterns) {
-    if (currentDir.includes(pattern)) {
-      // 进一步检查是否在全局目录下（而非项目 node_modules）
-      // 全局安装通常路径为：/usr/local/lib/node_modules/ 或 ~/.npm-global/lib/node_modules/
-      const lowerPath = currentDir.toLowerCase();
-      if (
-        lowerPath.includes('/usr/local/') ||
-        lowerPath.includes('/usr/lib/') ||
-        lowerPath.includes('.npm-global') ||
-        lowerPath.includes('.npm/lib') ||
-        lowerPath.includes('appdata') || // Windows
-        lowerPath.includes('program files') // Windows
-      ) {
-        return true;
-      }
-    }
-  }
-
-  return false;
+export interface SkillRegistrationStatus {
+  claude: boolean;
+  codex: boolean;
+  claudePath: string;
+  codexPath: string;
 }
 
-function isGlobalInstall(): boolean {
-  // 1. npm 官方标记（最可靠）
-  if (process.env.npm_config_global === 'true') return true;
+export interface ClaudeInstallationStatus {
+  installed: boolean;
+  configDir: string;
+  commandsDir: string;
+}
 
-  // 2. pnpm global
-  if (process.env.PNPM_HOME && process.execPath.includes(process.env.PNPM_HOME)) return true;
+export interface CCSwitchInstallationStatus {
+  installed: boolean;
+  dataDir: string;
+  skillsDir: string;
+}
 
-  // 3. yarn global (yarn 设置 npm_config_global 不一定为 true)
-  if (process.env.npm_config_prefix && process.env.npm_config_prefix.includes('.yarn')) return true;
+export interface PostinstallContext {
+  env?: NodeJS.ProcessEnv;
+  argv?: string[];
+  onGlobalInstall?: () => boolean;
+  skillStatus?: SkillRegistrationStatus;
+  claudeInstallation?: ClaudeInstallationStatus;
+  ccSwitchInstallation?: CCSwitchInstallationStatus;
+  hostStatuses?: HostAdapterStatus[];
+}
 
-  // 4. volta managed
-  if (process.env.VOLTA_HOME && process.execPath.includes(process.env.VOLTA_HOME)) return true;
-
-  // 5. 通用检测：npm prefix --global 路径包含在安装路径中
-  if (process.env.npm_config_prefix && process.argv[1]?.includes(process.env.npm_config_prefix))
-    return true;
-
-  // 6. 检测 INIT_CWD（npm 7+ 设置的初始工作目录）
-  // 全局安装时 INIT_CWD 通常是用户 home 目录或全局 node_modules 路径
-  const initCwd = process.env.INIT_CWD;
-  if (initCwd) {
-    const home = homedir();
-    // 如果 INIT_CWD 不包含项目特征（package.json），很可能是全局安装
-    const hasProjectPkg = existsSync(join(initCwd, 'package.json'));
-    if (!hasProjectPkg && initCwd === home) {
-      return true;
-    }
-  }
-
-  // 7. 检测当前包是否在全局 node_modules 路径中
-  if (isInGlobalNodeModules()) return true;
-
-  // 8. 通过 npm_config_root 检测（某些 npm 版本设置）
-  if (process.env.npm_config_root && process.argv[1]?.includes(process.env.npm_config_root)) {
-    return true;
-  }
-
-  return false;
+export function isGlobalInstall(context: InstallDetectionContext = {}): boolean {
+  return detectGlobalInstall(context, import.meta.url);
 }
 
 /**
  * 检测 skills 是否已注册
  */
-function checkSkillsRegistered(): {
-  claude: boolean;
-  codex: boolean;
-  claudePath: string;
-  codexPath: string;
-} {
+export function checkSkillsRegistered(): SkillRegistrationStatus {
   const hostPaths = detectHostPaths();
   const claudePath = join(hostPaths.claudeCommandsDir, 'spec-first');
   const codexPath = join(hostPaths.codexSkillsDir, 'spec-first');
@@ -110,11 +63,7 @@ function checkSkillsRegistered(): {
 /**
  * 检测 Claude Code 是否已安装
  */
-function detectClaudeInstallation(): {
-  installed: boolean;
-  configDir: string;
-  commandsDir: string;
-} {
+export function detectClaudeInstallation(): ClaudeInstallationStatus {
   const hostPaths = detectHostPaths();
   const configExists = existsSync(hostPaths.claudeConfigDir);
   const commandsExists = existsSync(hostPaths.claudeCommandsDir);
@@ -129,11 +78,7 @@ function detectClaudeInstallation(): {
 /**
  * 检测 CC Switch 是否已安装
  */
-function detectCCSwitchInstallation(): {
-  installed: boolean;
-  dataDir: string;
-  skillsDir: string;
-} {
+export function detectCCSwitchInstallation(): CCSwitchInstallationStatus {
   const hostPaths = detectHostPaths();
   return {
     installed: hostPaths.ccSwitchInstalled,
@@ -145,37 +90,37 @@ function detectCCSwitchInstallation(): {
 /**
  * 执行 spec-first update
  */
-function runUpdate(): void {
+export function runUpdate(): void {
   const entry = join(fileURLToPath(new URL('.', import.meta.url)), 'cli', 'index.js');
   try {
-    execFileSync(process.execPath, [entry, 'update', '--from-postinstall', '--yes'], {
+    execFileSync(process.execPath, [entry, 'update', '--from-postinstall'], {
       stdio: 'inherit',
     });
   } catch {
-    console.error('❌ 自动注册失败，请手动执行: spec-first update --yes');
+    console.error('❌ 基线能力自动补齐失败，请手动执行: spec-first update');
   }
 }
 
 /**
  * 打印安装完成提示
  */
-function printInstallGuide(options: {
+export function printInstallGuide(options: {
   isGlobal: boolean;
-  skillsRegistered: ReturnType<typeof checkSkillsRegistered>;
-  claudeInstalled: ReturnType<typeof detectClaudeInstallation>;
-  ccSwitchInstalled: ReturnType<typeof detectCCSwitchInstallation>;
+  skillsRegistered: SkillRegistrationStatus;
+  claudeInstalled: ClaudeInstallationStatus;
+  ccSwitchInstalled: CCSwitchInstallationStatus;
+  hostStatuses: HostAdapterStatus[];
 }): void {
-  const { isGlobal, skillsRegistered, claudeInstalled, ccSwitchInstalled } = options;
+  const { isGlobal, skillsRegistered, claudeInstalled, ccSwitchInstalled, hostStatuses } = options;
 
-  // 如果 skills 已注册，不需要提示
-  if (skillsRegistered.claude || skillsRegistered.codex) {
+  if (getMissingStableHostRegistrations(skillsRegistered).length === 0) {
     return;
   }
 
   console.log('\n📦 spec-first 安装完成！\n');
 
   // skills 未注册的情况
-  console.log('⚠️  Skills 尚未注册到 Claude Code/Codex');
+  console.log('⚠️  基线能力尚未完整注册到 Claude Code/Codex');
   console.log('\n请执行以下命令完成注册：');
   console.log('   spec-first update\n');
 
@@ -201,6 +146,46 @@ function printInstallGuide(options: {
     console.log(`   命令目录: ${claudeInstalled.commandsDir}\n`);
   }
 
+  console.log('💡 提示：spec-first 的必备 Skills + 核心 MCP 属于基线能力。');
+  console.log('   如未自动补齐，请优先执行 spec-first update\n');
+
+  const stableHosts = hostStatuses.filter(
+    (entry) => entry.id === 'claude' || entry.id === 'codex'
+  );
+  const experimentalHosts = hostStatuses.filter(
+    (entry) =>
+      (entry.id === 'gemini' || entry.id === 'cursor') &&
+      (entry.detected || entry.baselineState !== 'unknown')
+  );
+
+  if (stableHosts.length > 0) {
+    console.log('宿主基线状态：');
+    for (const entry of stableHosts) {
+      const missing =
+        entry.missingBaseline.length > 0 ? `missing=${entry.missingBaseline.join('+')}` : 'missing=(none)';
+      console.log(
+        `   ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
+      );
+      if (entry.baselineState !== 'ready') {
+        console.log(`   - ${entry.remediation}`);
+      }
+    }
+    console.log('');
+  }
+
+  if (experimentalHosts.length > 0) {
+    console.log('实验宿主提示：');
+    for (const entry of experimentalHosts) {
+      const missing =
+        entry.missingBaseline.length > 0 ? `missing=${entry.missingBaseline.join('+')}` : 'missing=(none)';
+      console.log(
+        `   ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
+      );
+      console.log(`   - ${entry.remediation}`);
+    }
+    console.log('');
+  }
+
   // 显示检测到的路径信息（调试用）
   if (process.env.SPEC_FIRST_DEBUG) {
     console.log('🔍 调试信息：');
@@ -212,21 +197,39 @@ function printInstallGuide(options: {
   }
 }
 
-// 主逻辑
-const globalInstall = isGlobalInstall();
-const skillsRegistered = checkSkillsRegistered();
-const claudeInstalled = detectClaudeInstallation();
-const ccSwitchInstalled = detectCCSwitchInstallation();
+function getMissingStableHostRegistrations(skillsRegistered: SkillRegistrationStatus): string[] {
+  const missing: string[] = [];
+  if (!skillsRegistered.claude) missing.push('claude');
+  if (!skillsRegistered.codex) missing.push('codex');
+  return missing;
+}
 
-if (globalInstall) {
-  // 全局安装：自动执行 update
-  runUpdate();
-} else {
-  // 非全局安装或检测失败：给出友好提示
+function isDirectExecution(argv: string[] = process.argv): boolean {
+  const currentFile = fileURLToPath(import.meta.url);
+  return Boolean(argv[1] && argv[1] === currentFile);
+}
+
+export function runPostinstallMain(context: PostinstallContext = {}): void {
+  const globalInstall = context.onGlobalInstall?.() ?? isGlobalInstall();
+  const skillsRegistered = context.skillStatus ?? checkSkillsRegistered();
+  const claudeInstalled = context.claudeInstallation ?? detectClaudeInstallation();
+  const ccSwitchInstalled = context.ccSwitchInstallation ?? detectCCSwitchInstallation();
+  const hostStatuses = context.hostStatuses ?? resolveHostAdapterStatuses();
+
+  if (globalInstall) {
+    runUpdate();
+    return;
+  }
+
   printInstallGuide({
     isGlobal: globalInstall,
     skillsRegistered,
     claudeInstalled,
     ccSwitchInstalled,
+    hostStatuses,
   });
+}
+
+if (isDirectExecution()) {
+  runPostinstallMain();
 }

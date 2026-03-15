@@ -81,6 +81,16 @@ Stage 2 的发现必须分为以下三类：
 - P4: 与用户确认审查发现，范围外问题单独标注并写入 findings.md
 - P5: 审查通过则更新 TASK 状态
 
+## 工具选择策略
+
+- 代码结构、引用关系、符号定位：
+  - 优先 `serena`
+- 前端交互、表单与页面回归类问题：
+  - 可使用 `playwright-mcp`
+- 工具不可用时：
+  - `serena` 降级为 `rg + Read`
+  - `playwright-mcp` 降级为手工步骤 + findings 记录
+
 ## TDD 审查问题单
 
 Stage 1 至少回答以下问题：

@@ -424,7 +424,7 @@ spec-first viewer url           # 输出当前地址
 ### 14.1 刷新配置
 
 ```bash
-spec-first update [--dry-run] [--skip-mcp] [--skip-hooks]
+spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>] [--component <set>]
 ```
 
 ---
@@ -434,7 +434,7 @@ spec-first update [--dry-run] [--skip-mcp] [--skip-hooks]
 ### 15.1 清理配置
 
 ```bash
-spec-first uninstall [--dry-run] [--keep-mcp]
+spec-first uninstall [--dry-run] [--keep-mcp] [--host <target>]
 ```
 
 ---

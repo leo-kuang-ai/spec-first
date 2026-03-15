@@ -12,6 +12,9 @@ import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
+import { formatHostDoctorMessage } from '../../core/host-adapters/format.js';
+import { resolveHostAdapterStatuses } from '../../core/host-adapters/registry.js';
+import { selectToolsForScenario } from '../../core/tool-integration/tool-selection.js';
 
 type Level = 'PASS' | 'WARNING' | 'ERROR';
 
@@ -52,6 +55,8 @@ export function handleDoctor(args: string[]): number {
 
   results.push(...checkHookStatus(projectRoot));
   results.push(checkSessionHook());
+  results.push(...checkHostCapabilities());
+  results.push(...checkToolPolicies());
 
   if (featureId) {
     results.push(checkFeatureDir(projectRoot, featureId));
@@ -294,6 +299,42 @@ function checkHookStatus(root: string): CheckResult[] {
   }
 }
 
+function checkHostCapabilities(): CheckResult[] {
+  return resolveHostAdapterStatuses().map((entry) => {
+    const isExperimental = entry.maturity === 'experimental';
+    const level: Level = !entry.detected || isExperimental ? 'WARNING' : 'PASS';
+
+    return {
+      name: `Host Capability:${entry.id}`,
+      level,
+      message: formatHostDoctorMessage(entry),
+      fix: level === 'WARNING' ? entry.remediation : undefined,
+    };
+  });
+}
+
+function checkToolPolicies(): CheckResult[] {
+  const scenarios = [
+    { host: 'claude' as const, scenario: 'external-research' as const },
+    { host: 'codex' as const, scenario: 'browser-verification' as const },
+    { host: 'generic' as const, scenario: 'host-diagnostics' as const },
+  ];
+
+  return scenarios.map(({ host, scenario }) => {
+    const selection = selectToolsForScenario(host, scenario);
+    const primary = selection.primary.length > 0 ? selection.primary.join(', ') : '(none)';
+    const fallback = selection.fallback.length > 0 ? selection.fallback.join(', ') : '(none)';
+    const hasPrimary = selection.primary.length > 0;
+
+    return {
+      name: `Tool Policy:${host}:${scenario}`,
+      level: hasPrimary ? 'PASS' : 'WARNING',
+      message: `primary=${primary}; fallback=${fallback}`,
+      fix: hasPrimary ? undefined : '请检查 Tool Registry / Capability Matrix / Selection Policy 配置',
+    };
+  });
+}
+
 /** Session Hook 可达性检查（Superpowers P1-4） */
 function checkSessionHook(): CheckResult {
   const homeDir = process.env.HOME?.trim() || homedir();
@@ -462,31 +503,35 @@ function mapBootstrapResult(entry: {
   name: string;
   level: 'PASS' | 'FIXED' | 'WARNING' | 'ERROR';
   detail: string;
+  impact?: string;
+  requiredByDefault?: boolean;
 }): CheckResult {
+  const baseline = entry.requiredByDefault ? ' [baseline]' : '';
+  const messageWithImpact = entry.impact ? `${entry.detail}；影响：${entry.impact}` : entry.detail;
   if (entry.level === 'ERROR') {
     return {
-      name: `${entry.host} ${entry.category}:${entry.name}`,
+      name: `${entry.host} ${entry.category}:${entry.name}${baseline}`,
       level: 'ERROR',
-      message: entry.detail,
+      message: messageWithImpact,
       fix: '检查网络和权限后重试 bootstrap',
     };
   }
   if (entry.level === 'FIXED') {
     return {
-      name: `${entry.host} ${entry.category}:${entry.name}`,
+      name: `${entry.host} ${entry.category}:${entry.name}${baseline}`,
       level: 'WARNING',
-      message: `已自动修复（${entry.detail}）`,
+      message: entry.impact ? `已自动修复（${entry.detail}）；影响：${entry.impact}` : `已自动修复（${entry.detail}）`,
     };
   }
   if (entry.level === 'WARNING') {
     return {
-      name: `${entry.host} ${entry.category}:${entry.name}`,
+      name: `${entry.host} ${entry.category}:${entry.name}${baseline}`,
       level: 'WARNING',
-      message: entry.detail,
+      message: messageWithImpact,
     };
   }
   return {
-    name: `${entry.host} ${entry.category}:${entry.name}`,
+    name: `${entry.host} ${entry.category}:${entry.name}${baseline}`,
     level: 'PASS',
     message: entry.detail,
   };

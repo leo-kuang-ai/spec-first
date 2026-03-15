@@ -66,6 +66,26 @@ describe('detectHostPaths', () => {
     expect(paths.claudeHomeDir).toBe(claudeHome);
   });
 
+  it('should prefer explicit claude config override over marker-based auto-detection', () => {
+    const homeDir = join(TMP, 'home');
+    const explicitConfigDir = join(TMP, 'explicit-claude-config');
+    const detectedConfigDir = join(homeDir, '.config', 'claude-code');
+
+    mkdirSync(detectedConfigDir, { recursive: true });
+    writeFileSync(join(detectedConfigDir, 'mcp.json'), '{}', 'utf-8');
+
+    const paths = detectHostPaths({
+      homeDir,
+      platform: 'linux',
+      env: {
+        HOME: homeDir,
+        CLAUDE_CODE_CONFIG_DIR: explicitConfigDir,
+      } as NodeJS.ProcessEnv,
+    });
+
+    expect(paths.claudeConfigDir).toBe(explicitConfigDir);
+  });
+
   it('should format host path summary for diagnostics', () => {
     const paths = detectHostPaths({
       homeDir: join(TMP, 'home'),

@@ -84,6 +84,15 @@ I'm using the verify skill to validate [Feature] stage completion.
 - 需要获取可执行的修复建议
 - 需要生成验证报告
 
+## 工具选择策略
+
+- CLI / gate / metrics / matrix 校验：
+  - 优先使用 `spec-first` 命令
+- 浏览器交互验收与页面验证：
+  - 宿主支持时优先 `playwright-mcp`
+- 浏览器工具不可用时：
+  - 退回手工验证模板，并把步骤、结果、失败点写入 findings
+
 ## verify-view 背景输入
 
 - 主背景输入：`verify-view`

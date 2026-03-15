@@ -9,6 +9,7 @@ import { stdin as input, stdout as output } from 'node:process';
 import { ExitCode } from '../../shared/types.js';
 import type { Mode, Size } from '../../shared/types.js';
 import { init } from '../../core/process-engine/init.js';
+import { resolveHostAdapterStatuses } from '../../core/host-adapters/registry.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { detectHostPaths, formatHostPathSummary } from '../../shared/host-paths.js';
 import { ensureSkillCommands } from '../../shared/skill-commands.js';
@@ -120,6 +121,48 @@ function runBootstrapIfEnabled(shouldBootstrap: boolean): number | undefined {
   return ExitCode.CONFIG_ERROR;
 }
 
+function printBootstrapHostStatus(): void {
+  const statuses = resolveHostAdapterStatuses();
+  const stableHosts = statuses.filter(
+    (entry) => entry.id === 'claude' || entry.id === 'codex'
+  );
+  const experimentalHosts = statuses.filter(
+    (entry) =>
+      (entry.id === 'gemini' || entry.id === 'cursor') &&
+      (entry.detected || entry.baselineState !== 'unknown')
+  );
+
+  if (stableHosts.length === 0 && experimentalHosts.length === 0) return;
+
+  if (stableHosts.length > 0) {
+    console.log('宿主基线状态：');
+    for (const entry of stableHosts) {
+      const missing =
+        entry.missingBaseline.length > 0 ? entry.missingBaseline.join('+') : '(none)';
+      console.log(
+        `  ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, missing=${missing}`
+      );
+      if (entry.baselineState !== 'ready') {
+        console.log(`  - ${entry.remediation}`);
+      }
+    }
+    console.log('');
+  }
+
+  if (experimentalHosts.length > 0) {
+    console.log('实验宿主提示：');
+    for (const entry of experimentalHosts) {
+      const missing =
+        entry.missingBaseline.length > 0 ? entry.missingBaseline.join('+') : '(none)';
+      console.log(
+        `  ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, missing=${missing}`
+      );
+      console.log(`  - ${entry.remediation}`);
+    }
+    console.log('');
+  }
+}
+
 async function resolveInitCliInput(
   args: string[],
   initial: InitCliInput
@@ -217,6 +260,17 @@ function runPostInitSetup(cwd: string): void {
     }
   } catch (e) {
     console.warn(`警告：Feature 已初始化，但 Skill 命令注册失败：${(e as Error).message}`);
+  }
+}
+
+function ensureStableHostSkillsForBootstrap(projectRoot: string): void {
+  try {
+    ensureSkillCommands(projectRoot, {
+      global: true,
+      hosts: ['claude', 'codex'],
+    });
+  } catch (e) {
+    console.warn(`警告：宿主级 Skill 同步失败：${(e as Error).message}`);
   }
 }
 
@@ -381,6 +435,10 @@ export async function handleInit(args: string[]): Promise<number> {
   }
 
   runPostInitSetup(cwd);
+  if (shouldBootstrap) {
+    ensureStableHostSkillsForBootstrap(cwd);
+    printBootstrapHostStatus();
+  }
   console.log(`background_input_status: ${result.backgroundInputStatus}`);
   console.log(`Feature 初始化完成：${result.featureId}`);
   console.log(`目录：${result.featureDir}`);
@@ -746,11 +804,11 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     // Step 7/7: Bootstrap 选项
     printStepHeader(7, 7, 'Bootstrap 选项');
     console.log('  是否需要执行宿主环境检查（MCP + skills 检查/自动修复）？');
-    console.log('  1. 否 - 仅项目内初始化（推荐）');
-    console.log('  2. 是 - 包含宿主环境检查');
-    const bootstrapInput = (await rl.question('\n请输入 [1/2]（默认：1）: ')).trim();
-    const bootstrap = bootstrapInput === '2' || isConfirmed(bootstrapInput);
-    printStepConfirm('Bootstrap', bootstrap ? '是 - 包含宿主环境检查' : '否（仅项目内初始化）');
+    console.log('  1. 否 - 仅项目内初始化');
+    console.log('  2. 是 - 包含宿主环境检查（推荐）');
+    const bootstrapInput = (await rl.question('\n请输入 [1/2]（默认：2）: ')).trim();
+    const bootstrap = bootstrapInput === '' || bootstrapInput === '2' || isConfirmed(bootstrapInput);
+    printStepConfirm('Bootstrap', bootstrap ? '是 - 包含宿主环境检查（推荐）' : '否（仅项目内初始化）');
 
     // 最终确认
     console.log('\n  ---');

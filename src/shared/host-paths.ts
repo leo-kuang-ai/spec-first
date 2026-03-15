@@ -19,6 +19,13 @@ export interface HostPaths {
   claudeCommandsDir: string;
   claudeConfigDir: string;
   claudeConfigFiles: string[];
+  geminiHomeDir: string;
+  geminiConfigDir: string;
+  geminiSettingsPath: string;
+  cursorHomeDir: string;
+  cursorConfigDir: string;
+  cursorSettingsPath: string;
+  cursorMcpConfigPath: string;
   agentsSkillsDir: string;
   genericHomeDir: string;
   genericSkillsDir: string;
@@ -39,6 +46,8 @@ export function formatHostPathSummary(paths: HostPaths): string[] {
     `Claude 配置目录: ${paths.claudeConfigDir}`,
     `Claude 命令目录: ${paths.claudeCommandsDir}`,
     `Claude skills: ${paths.claudeSkillsDir}`,
+    `Gemini 配置目录: ${paths.geminiConfigDir}`,
+    `Cursor 配置目录: ${paths.cursorConfigDir}`,
     `Generic skills: ${paths.genericSkillsDir}`,
     `spec-first skills: ${paths.specFirstSkillsDir}`,
     `CC Switch: ${paths.ccSwitchInstalled ? '已安装' : '未安装'} (${paths.ccSwitchDataDir})`,
@@ -123,6 +132,22 @@ function buildClaudeHomeCandidates(
   ]);
 }
 
+function buildGeminiHomeCandidates(env: NodeJS.ProcessEnv, homeDir: string): string[] {
+  return normalizeCandidates([
+    env.GEMINI_HOME,
+    env.GEMINI_CLI_HOME,
+    join(homeDir, '.gemini'),
+  ]);
+}
+
+function buildCursorHomeCandidates(env: NodeJS.ProcessEnv, homeDir: string): string[] {
+  return normalizeCandidates([
+    env.CURSOR_HOME,
+    env.CURSOR_USER_HOME,
+    join(homeDir, '.cursor'),
+  ]);
+}
+
 export function detectHostPaths(options?: HostPathOptions): HostPaths {
   const env = options?.env ?? process.env;
   const homeDir = options?.homeDir ?? homedir();
@@ -133,35 +158,63 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
   const ccSwitchSkillsDir = env.CC_SWITCH_SKILLS_DIR?.trim() || join(ccSwitchDataDir, 'skills');
   const ccSwitchInstalled = existsSync(join(ccSwitchDataDir, 'cc-switch.db'));
 
+  const explicitCodexRoot = env.CODEX_HOME?.trim() || env.CODEX_ROOT?.trim();
   const codexRoot =
+    explicitCodexRoot ||
     pickDirectoryByMarkers(buildCodexRootCandidates(env, homeDir, platform), [
       'config.toml',
       'skills',
-    ]) ?? join(homeDir, '.codex');
+    ]) ||
+    join(homeDir, '.codex');
 
   const codexConfigPath = env.CODEX_CONFIG_PATH?.trim() || join(codexRoot, 'config.toml');
   const codexSkillsDir = env.CODEX_SKILLS_DIR?.trim() || join(codexRoot, 'skills');
   const codexSystemSkillsDir = join(codexSkillsDir, '.system');
 
+  const explicitClaudeConfigDir =
+    env.CLAUDE_CODE_CONFIG_DIR?.trim() || env.CLAUDE_CONFIG_DIR?.trim();
   const claudeConfigDir =
+    explicitClaudeConfigDir ||
     pickDirectoryByMarkers(buildClaudeConfigCandidates(env, homeDir, platform), [
       'mcp.json',
       'settings.json',
-    ]) ?? join(homeDir, '.config', 'claude-code');
+    ]) ||
+    join(homeDir, '.config', 'claude-code');
 
   const claudeConfigFiles = [
     join(claudeConfigDir, 'mcp.json'),
     join(claudeConfigDir, 'settings.json'),
   ];
 
+  const explicitClaudeHomeDir = env.CLAUDE_HOME?.trim() || env.CLAUDE_USER_HOME?.trim();
   const claudeHomeDir =
+    explicitClaudeHomeDir ||
     pickDirectoryByMarkers(buildClaudeHomeCandidates(env, homeDir, platform), [
       'skills',
       'commands',
-    ]) ?? join(homeDir, '.claude');
+    ]) ||
+    join(homeDir, '.claude');
 
   const claudeSkillsDir = env.CLAUDE_SKILLS_DIR?.trim() || join(claudeHomeDir, 'skills');
   const claudeCommandsDir = env.CLAUDE_COMMANDS_DIR?.trim() || join(claudeHomeDir, 'commands');
+  const geminiHomeDir =
+    env.GEMINI_HOME?.trim() ||
+    env.GEMINI_CLI_HOME?.trim() ||
+    buildGeminiHomeCandidates(env, homeDir)[0] ||
+    join(homeDir, '.gemini');
+  const geminiConfigDir =
+    env.GEMINI_CONFIG_DIR?.trim() ||
+    env.GEMINI_CLI_CONFIG_DIR?.trim() ||
+    join(geminiHomeDir, 'config');
+  const geminiSettingsPath = join(geminiHomeDir, 'settings.json');
+  const cursorHomeDir =
+    env.CURSOR_HOME?.trim() ||
+    env.CURSOR_USER_HOME?.trim() ||
+    buildCursorHomeCandidates(env, homeDir)[0] ||
+    join(homeDir, '.cursor');
+  const cursorConfigDir = env.CURSOR_CONFIG_DIR?.trim() || join(cursorHomeDir, 'config');
+  const cursorSettingsPath = join(cursorHomeDir, 'settings.json');
+  const cursorMcpConfigPath = join(cursorHomeDir, 'mcp.json');
   const agentsSkillsDir = env.AGENTS_HOME?.trim()
     ? join(env.AGENTS_HOME.trim(), 'skills')
     : join(homeDir, '.agents', 'skills');
@@ -185,6 +238,13 @@ export function detectHostPaths(options?: HostPathOptions): HostPaths {
     claudeCommandsDir,
     claudeConfigDir,
     claudeConfigFiles,
+    geminiHomeDir,
+    geminiConfigDir,
+    geminiSettingsPath,
+    cursorHomeDir,
+    cursorConfigDir,
+    cursorSettingsPath,
+    cursorMcpConfigPath,
     agentsSkillsDir,
     genericHomeDir,
     genericSkillsDir,

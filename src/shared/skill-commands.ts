@@ -295,12 +295,14 @@ user-invocable: true
 export interface SkillCommandResult {
   claude: string[];
   codex: string[];
+  gemini: string[];
+  cursor: string[];
   generic: string[];
   /** Codex skill 验证警告（frontmatter 缺失或无效） */
   codexWarnings: string[];
 }
 
-export type SkillHostTarget = 'claude' | 'codex' | 'generic' | 'all';
+export type SkillHostTarget = 'claude' | 'codex' | 'gemini' | 'cursor' | 'generic' | 'all';
 
 export interface SkillCommandOptions {
   /** true = 全局（~/.claude/commands/ + ~/.codex/skills/），false = 项目级（仅 .claude/commands/） */
@@ -419,16 +421,18 @@ function ensureGenericSkills(
 function resolveHosts(
   isGlobal: boolean,
   hosts?: SkillHostTarget[]
-): Set<'claude' | 'codex' | 'generic'> {
+): Set<'claude' | 'codex' | 'gemini' | 'cursor' | 'generic'> {
   if (!hosts || hosts.length === 0) {
     return new Set(isGlobal ? ['claude', 'codex'] : ['claude']);
   }
 
-  const resolved = new Set<'claude' | 'codex' | 'generic'>();
+  const resolved = new Set<'claude' | 'codex' | 'gemini' | 'cursor' | 'generic'>();
   for (const host of hosts) {
     if (host === 'all') {
       resolved.add('claude');
       resolved.add('codex');
+      resolved.add('gemini');
+      resolved.add('cursor');
       resolved.add('generic');
       continue;
     }
@@ -504,6 +508,16 @@ export function ensureSkillCommands(
       ? ensureCodexSkills(skills, hostPaths.codexSkillsDir, dryRun)
       : { created: [], warnings: [] };
 
+  const gemini =
+    isGlobal && hosts.has('gemini')
+      ? ensureGenericSkills(skills, join(hostPaths.geminiHomeDir, 'skills'), dryRun)
+      : [];
+
+  const cursor =
+    isGlobal && hosts.has('cursor')
+      ? ensureGenericSkills(skills, join(hostPaths.cursorHomeDir, 'skills'), dryRun)
+      : [];
+
   const generic =
     isGlobal && hosts.has('generic')
       ? ensureGenericSkills(skills, hostPaths.genericSkillsDir, dryRun)
@@ -512,6 +526,8 @@ export function ensureSkillCommands(
   return {
     claude,
     codex: codexResult.created,
+    gemini,
+    cursor,
     generic,
     codexWarnings: codexResult.warnings,
   };

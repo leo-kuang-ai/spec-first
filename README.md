@@ -166,7 +166,9 @@ Skills are the AI-facing interface. Each Skill executes the deterministic P0–P
 ### Host Integration and Automation
 
 ```bash
-spec-first update          # Push Skills to Claude Code (~/.claude/) and Codex (~/.codex/)
+spec-first update          # Refresh baseline Skills/MCP for stable hosts (Claude Code + Codex)
+spec-first update --host gemini   # Opt in to Gemini baseline (experimental)
+spec-first update --host cursor   # Opt in to Cursor baseline (experimental)
 spec-first hooks status    # Inspect Git hook integration
 spec-first viewer start    # Launch the Stage Viewer dashboard
 spec-first commit          # Structured commit with auto-linked traceability ID
