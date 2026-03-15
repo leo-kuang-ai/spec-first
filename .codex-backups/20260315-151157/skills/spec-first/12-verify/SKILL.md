@@ -141,16 +141,6 @@ I'm using the verify skill to validate [Feature] stage completion.
 | TASK 完成 | 测试命令输出 + review 通过 | "代码写完了" |
 | Feature 可归档 | `spec-first gate check <featureId>` + `spec-first matrix check <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
 
-## TDD 与覆盖率的边界
-
-verify 必须区分：
-
-- 覆盖率指标：C4 / C5 / C6 等结果性指标
-- TDD 证据：`[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 等过程性证据
-
-禁止把“覆盖率达标”表述成“已经遵守 TDD”。
-如果 `findings.md` 显示存在 TDD 缺口，应在 verify 结论中单列风险，即使 Gate 结果仍然通过。
-
 ## Gate 状态
 
 | 状态 | 说明 | 退出码 | 可推进阶段 | 下一步 |
@@ -446,7 +436,6 @@ digraph verify_flow {
 - **P2**: 执行 `gate check`、`matrix check`、`metrics coverage`，获取验证结果
 - **P3**: 生成校验报告（Gate 评估、矩阵完整性、覆盖率缺口、verify-view 重点、修复建议）
 - **P4**: 将校验结果写入 findings.md
-- **P4.5**: 如发现 TDD 过程缺口，单列写入 findings.md，避免被覆盖率结论掩盖
 - **P5**: 若所有条件满足，建议执行 stage advance
 
 ## CLI 依赖
@@ -467,7 +456,6 @@ digraph verify_flow {
 
 - 校验报告已生成，包含 Gate 评估、矩阵完整性、覆盖率缺口
 - 校验结果已写入 `findings.md`
-- 如存在 TDD 缺口，已与覆盖率问题分开描述
 - 声称通过时必须附带本次执行命令输出与退出码
 - 若所有条件满足，已建议执行 `stage advance`
 - FAIL 时必须包含可执行的修复建议

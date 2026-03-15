@@ -17,7 +17,6 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - 验证证据是否新鲜且可复现
 - 变更是否符合阶段与流程守卫
 - 宪法合规（是否违反 constitution 原则，违规按 CRITICAL 处理）
-- TDD 流程是否自洽（RED / WAIVER / GREEN 与变更类型是否匹配）
 
 ### Stage 2: 质量审查（在 Stage 1 通过后执行）
 - 4 维度：SOLID / 安全 / 性能 / 测试
@@ -81,23 +80,6 @@ Stage 2 的发现必须分为以下三类：
 - P4: 与用户确认审查发现，范围外问题单独标注并写入 findings.md
 - P5: 审查通过则更新 TASK 状态
 
-## TDD 审查问题单
-
-Stage 1 至少回答以下问题：
-
-1. 当前变更是否本应 `required TDD`，却被写成 WAIVER？
-2. `findings.md` 是否存在 `[TDD-RED]` 或 `[TDD-WAIVER]`？
-3. 是否出现“只有 GREEN，没有 RED/WAIVER”的伪闭环？
-4. WAIVER 是否写明 `Scope / Reason / Alternative Verification / Approver`？
-5. 替代验证是否与变更类型匹配，而不是泛泛写“已人工验证”？
-
-判定建议：
-
-- 缺少 RED/WAIVER 且已写生产代码：`MUST FIX`
-- 只有 GREEN，没有 RED：`MUST FIX`
-- WAIVER 存在但理由空泛、替代验证不足：`SHOULD FIX`
-- 与当前 TASK 无关的历史 TDD 欠账：`OUT_OF_SCOPE`
-
 ## Layer 参数约定
 
 - 支持：`/spec-first:review --layer <single|cross|completion>`
@@ -139,4 +121,3 @@ Stage 1 至少回答以下问题：
 - 通过审查的 TASK 状态已更新
 - Stage 2 发现已按 MUST FIX / SHOULD FIX / OUT_OF_SCOPE 分类
 - `OUT_OF_SCOPE` 未被包装为当前阻断项
-- TDD 审查结论已明确区分流程缺口与普通测试缺口

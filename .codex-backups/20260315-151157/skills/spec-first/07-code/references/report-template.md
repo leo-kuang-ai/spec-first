@@ -69,16 +69,3 @@
 2. `blocked` 与 `failure` 必须区分。
 3. 下一步建议必须可执行，不能写空泛描述。
 4. 不要虚构未执行的 layer。
-
-## TDD 相关解读
-
-报告解释必须与当前 runtime 对齐：
-
-- `blocked - 缺少 TDD RED 证据` 表示未检测到 `[TDD-RED] TASK-ID` 或 `[TDD-WAIVER] TASK-ID`
-- 不得把结构化字段缺失描述成 runtime 已阻断
-- 如人工审查发现 WAIVER 理由不足，可作为 review / status 风险项补充说明，但不应伪称 batch executor 已校验
-
-推荐在报告结论里补充：
-
-- 当前被阻断的是 runtime 字符串预检
-- 当前未自动审查的是 WAIVER 质量、替代验证充分性、RED/GREEN 闭环合理性

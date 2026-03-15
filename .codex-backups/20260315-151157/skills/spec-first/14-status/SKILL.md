@@ -137,23 +137,6 @@ I'm using the status skill to show the current state of [Feature].
 
 ---
 
-## 🧪 TDD 状态
-
-| 指标 | 数量 | 说明 |
-|------|------|------|
-| 有 `[TDD-RED]` 的任务 | {count} | 已记录失败起点 |
-| 有 `[TDD-WAIVER]` 的任务 | {count} | 已记录豁免 |
-| 有 `[TDD-GREEN]` 的任务 | {count} | 已形成闭环 |
-| TDD 缺口任务 | {count} | 缺少 RED / WAIVER / GREEN 或闭环异常 |
-
-**当前判断**: {healthy / warning / blocked}
-
-说明：
-- 该区块读取 `findings.md` 中的 TDD 标记
-- 它用于展示流程风险，不等同于覆盖率指标
-
----
-
 ## ⚠️ 风险识别
 
 ### 🔴 高风险 (0)
@@ -168,10 +151,6 @@ I'm using the status skill to show the current state of [Feature].
    - 影响: 质量无保障
    - 建议: 回到 `/spec-first:task` 或 `/spec-first:code` 补齐测试设计与 TDD 证据
 
-3. **TDD 证据不闭环** — 存在只有 GREEN、没有 RED/WAIVER 的任务
-   - 影响: 流程真实性不足，审查难以追溯
-   - 建议: 回到 `findings.md` 补齐证据链，再执行 review / verify
-
 ### 🟢 低风险 (1)
 1. **任务进度略慢** — 预计剩余 1.5 天，可能延期 0.5 天
    - 影响: 轻微延期
@@ -185,8 +164,7 @@ I'm using the status skill to show the current state of [Feature].
 
 1. **补充 TASK 拆解** — 执行 `/spec-first:task` 完成 C3 覆盖
 2. **补齐测试设计与 TDD 证据** — 回到 `/spec-first:task` / `/spec-first:code` 收口 C4/C5
-3. **修复 TDD 闭环异常** — 先补齐 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 关系
-4. **继续实现任务** — 完成剩余 2 个 in_progress 任务
+3. **继续实现任务** — 完成剩余 2 个 in_progress 任务
 
 **可推进阶段？** ❌ 否（C3 未达标）
 ```
@@ -265,7 +243,6 @@ I'm using the status skill to show the current state of [Feature].
 | **任务阻塞** | 🔴 | 存在 blocked 状态任务 | 解除阻塞 |
 | **进度延期** | 🟡 | 实际进度 < 预期进度 20% | 评估资源 |
 | **测试缺失** | 🟡 | C4/C5 = 0 | 生成测试用例 |
-| **TDD 证据缺口** | 🟡 / 🔴 | findings 中缺少 RED/WAIVER/GREEN 闭环 | 补齐 TDD 证据并重审 |
 | **文档过期** | 🟢 | 文档更新时间 > 7 天 | 更新文档 |
 
 ## Status 决策流程图
