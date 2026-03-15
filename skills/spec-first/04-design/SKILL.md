@@ -1,9 +1,11 @@
 ---
 name: "spec-first:design"
 description: "定位 Feature 并校验阶段为技术设计（02_design）"
-version: 1.1.0
-last_updated: 2026-03-05
-changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
+version: 1.2.0
+last_updated: 2026-03-15
+changelog: |
+  v1.2.0 - 明确与 05-research 的主从契约；补外部证据触发条件与 design 回流要求
+  v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
 ---
 
 # Skill: design
@@ -94,6 +96,30 @@ NO implementation code until design artifacts are complete and approved.
 - 对架构分层、接口边界、数据一致性策略等关键设计决策，优先在 Plan Mode 中先收敛再落文档
 - Plan Mode 的关键结论必须同步到 `findings.md`，并在 `design.md` 中保留可追溯引用
 
+## 与 05-research 的协同契约
+
+`04-design` 是主 skill，`05-research` 是按需 companion skill。
+
+当满足以下任一条件时，`04-design` 应自动或按需触发 `05-research`：
+- 存在 2 个以上合理候选方案
+- 需要外部最佳实践、官方文档或兼容性依据
+- 安全 / 性能 / 成本结论无法仅靠本仓库上下文得出
+- 需要评估第三方服务、框架或外部集成方案
+
+触发后必须：
+- 将 research 结论写入 `research.md`
+- 将摘要、证据路径、下一步动作写入 `findings.md`
+
+`04-design` 消费 research 输出时，必须把以下信息回写到 `design.md`：
+- 最终采用方案
+- 采用理由
+- 关键风险
+- 待验证项（如仍存在）
+
+边界：
+- `05-research` 提供证据输入，不替代 `design.md`
+- `04-design` 不应绕过 `research.md` 直接用外部资料拍板
+
 ## 宪法权威检查（P1-CON）
 
 ### P2.5: 设计宪法检查
@@ -162,9 +188,9 @@ digraph design_flow {
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），校验阶段为 02_design
 - P1: 从矩阵加载 FR，读取 constitution.md
-- P2: 生成 DS（设计规格）条目，映射到 FR，并逐条执行“设计简洁性守卫”自检
+- P2: 生成 DS（设计规格）条目，映射到 FR，并逐条执行“设计简洁性守卫”自检；若出现多方案或外部证据缺口，先触发 `05-research`
 - P3: 与用户确认设计决策，仅保留直接支撑当前交付的必要设计
-- P4: 将 DS 写入矩阵，创建设计文档
+- P4: 将 DS 写入矩阵，创建设计文档，并把 `research.md` 的推荐结论/风险/待验证项回流到 `design.md`
 - P5: 执行 metrics coverage 检查 FR→DS 覆盖率，执行 matrix check 检测 orphan 项
 
 ## CLI 依赖

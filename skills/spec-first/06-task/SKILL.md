@@ -1,9 +1,11 @@
 ---
 name: "spec-first:task"
 description: "定位 Feature 并校验阶段为任务拆解（03_plan）"
-version: 1.3.0
+version: 1.4.0
 last_updated: 2026-03-15
 changelog: |
+  v1.4.0: 下沉并行/用户故事标记与日志模式到 references；主文档进一步收敛为流程、字段与成功标准
+>>>>>>> feature-leo-2026-03-15
   v1.3.0: 对齐当前 task_plan 模板、C3=100% Gate 口径、验证命令列与 canonical 状态集
   v1.2.0: 新增 Execution Handoff、Hooks 行为规范、中断恢复策略、Error Log Pattern、Decision Log Pattern、Operation Types
   v1.1.0: 新增 Announce at Start、字面即精神原则、Bite-Sized Granularity、Task Structure Detail、决策流程图、When to Stop and Ask、references/ 目录、hooks 配置
@@ -30,7 +32,7 @@ hooks:
         - type: checkpoint
           message: "[task] 检查清单：任务粒度？依赖完整？验收标准？references 已引用？"
 metadata:
-  version: "1.3.0"
+  version: "1.4.0"
   phase: "stable"
   category: "spec-phase"
 ---
@@ -128,6 +130,8 @@ I'm using the task skill to break down [Feature] into executable tasks.
 | 运行测试 | `pnpm vitest run tests/unit/auth.test.ts` | 2-5 分钟 |
 | 本地验证 | `curl http://localhost:3000/api/login` | 2-5 分钟 |
 | 提交代码 | git commit | 2-5 分钟 |
+| 更新矩阵 | Sync `traceability-matrix.md` | 2-5 分钟 |
+| 记录结论 | Update `findings.md` with next step | 2-5 分钟 |
 
 ## Task Structure Detail
 
@@ -405,11 +409,6 @@ spec-first validate format <featureId>
 - **depends_on**：仅允许引用同一 Feature 下 TASK ID，禁止自然语言依赖
 - **任务明细表契约**：首个非空单元格为 TASK ID，最后非空单元格为状态
 
-## 并行与用户故事标记
-
-- **`[P]`**：可并行执行（不依赖其他任务）
-- **`[US#]`**：所属用户故事（可独立交付和测试）
-
 ## 模板引用路径
 
 本 skill 使用的模板位于 `references/` 目录：
@@ -418,6 +417,7 @@ spec-first validate format <featureId>
 |---------|------|------|
 | 任务检查 | `task-checklist.md` | 拆解质量检查清单 |
 | 任务模板 | `task-template.md` | 标准任务格式规范 |
+| 协作约定 | `coordination-conventions.md` | `[P]` / `[US#]`、handoff、日志与操作标记 |
 
 ## 示例（P2 输出格式）
 
@@ -448,40 +448,15 @@ Phase 2: Implementation
 | TASK-AUTH-003 | 验证码登录 API | BE | 1d | FR-AUTH-001,DS-AUTH-002 | TASK-AUTH-002 | 正确登录并覆盖错误路径 | pnpm vitest run tests/unit/auth/login-by-code.test.ts | todo |
 ```
 
-## Execution Handoff
+## Handoff
 
-任务拆解完成后，提供执行选项：
+任务拆解完成后，只保留一条统一交接语：
 
-**"任务拆解完成并保存到 `specs/{featureId}/task_plan.md`。执行选项："**
+`task_plan.md` 已写入。下一步进入 `/spec-first:code`，按依赖顺序执行；若存在 `[P]` 标记任务，可按并行约定分批推进。
 
-**1. 当前会话执行（推荐）** — 我在此会话逐步执行任务，每个任务完成后汇报
+并行标记、用户故事标记、交接选项和日志格式见：
 
-**2. 新会话执行** — 开启新会话使用 `/spec-first:code` 执行任务
-
-**3. 并行执行** — 多个子代理并行处理独立任务（需标记 `[P]`）
-
-**选择执行方式？**
-
----
-
-### 如果选择"当前会话执行"
-
-- 使用 TodoWrite 创建任务追踪
-- 按依赖顺序执行任务
-- 每个任务完成后报告验证结果
-- 遇到阻塞立即停止并询问
-
-### 如果选择"新会话执行"
-
-- 引导用户在新会话执行 `/spec-first:code`
-- 新会话将自动加载 task_plan.md
-- 任务状态可跨会话同步
-
-### 如果选择"并行执行"
-
-- 识别所有 `[P]` 标记的独立任务
-- 为每个任务启动独立子代理
-- 主进程收集结果并合并
+- [coordination-conventions.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/06-task/references/coordination-conventions.md)
 
 ## Hooks 行为规范
 
@@ -526,59 +501,6 @@ Phase 2: Implementation
 | 当前结论 | 已拆解的 TASK 列表 | "已完成 TASK-AUTH-001 到 TASK-AUTH-005" |
 | 证据路径 | 任务计划文件位置 | `specs/FSREQ-XXX/task_plan.md:20-50` |
 | 下一步 | 待处理的 FR/DS | "继续处理 FR-AUTH-002" |
-
-## Error Log Pattern
-
-任务拆解过程中遇到错误时，使用以下格式记录：
-
-```markdown
-## Errors Encountered
-
-| Error | 尝试次数 | 解决方案 |
-|-------|---------|----------|
-| FR-AUTH-001 缺少对应 DS | 1 | 先执行 `/spec-first:design` 生成 DS |
-| TASK-AUTH-003 粒度过粗 | 1 | 拆分为 TASK-AUTH-003A 和 TASK-AUTH-003B |
-| 检测到循环依赖 TASK-AUTH-004 → TASK-AUTH-005 → TASK-AUTH-004 | 1 | 调整依赖关系，移除 TASK-AUTH-005 对 TASK-AUTH-004 的依赖 |
-```
-
-## Decision Log Pattern
-
-任务拆解过程中的重要决策，使用以下格式记录：
-
-```markdown
-## Decisions Made
-
-| 决策 | 理由 |
-|------|------|
-| 按用户故事分组任务 | 便于独立交付和验收 |
-| TASK-AUTH-002 设为可并行 `[P]` | 不依赖其他任务，可提前开始 |
-| 登录 API 拆分为 2 个任务 | 发送验证码和验证码登录是两个独立的端点 |
-| 频控功能独立为 US2 | 虽然依赖 US1，但属于横切关注点，独立验收更合理 |
-```
-
-## Operation Types
-
-| 标记 | 含义 | 执行者 |
-|------|------|--------|
-| `[AI]` | 自动分析/拆解 | AI |
-| `[USER]` | 需要用户确认 | 用户 |
-
-### 操作分工示例
-
-```bash
-# [AI] 自动执行
-- 读取 FR/DS 条目
-- 生成 TASK 拆解
-- 检测依赖关系
-- 计算覆盖率
-
-# [USER] 需要确认
-- 任务粒度调整
-- 依赖关系确认
-- 验收标准补充
-- 执行方式选择
-```
-
 
 ## 测试设计前置要求（v2）
 

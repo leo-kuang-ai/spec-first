@@ -1,23 +1,25 @@
 ---
 name: "spec-first:research"
 description: "定位 Feature 上下文并生成调研结论"
-version: 1.4.0
-last_updated: 2026-03-05
+version: 1.6.0
+last_updated: 2026-03-15
 changelog: |
+  v1.6.0: 明确作为 04-design 的 companion skill；补充触发/回流契约、调研任务分型与短版决策框架
+  v1.5.0: 对齐 02_design 按需阶段口径；精简主文档证据协议；下沉协作约定到 references；补当前宿主工具边界说明
   v1.4.0: 新增 Operation Types 章节、模板引用路径、metadata.version 分离
   v1.3.0: 新增 hooks 配置（PreToolUse/PostToolUse/Stop）、allowed-tools 约束、user-invocable 标记
   v1.2.0: 新增 references/ 目录、Don't Skip Research When、Evidence Protocol、Review Checklist
   v1.1.0: 补充字面即精神原则、模板驱动约束、决策流程图、Plan Mode 协同、示例输出
   v1.0.0: Initial version with standardized metadata
 user-invocable: true
-allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch, mcp__web_reader__webReader"
+allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch"
 metadata:
-  version: "1.4.0"
+  version: "1.6.0"
   phase: "stable"
   category: "spec-phase"
 hooks:
   PreToolUse:
-    - matcher: "WebSearch|mcp__fetch__fetch|mcp__web_reader__webReader"
+    - matcher: "WebSearch|mcp__fetch__fetch"
       hooks:
         - type: reminder
           message: "[research] 查阅资料后立即更新 findings.md（2-Action Rule）"
@@ -30,7 +32,7 @@ hooks:
       hooks:
         - type: reminder
           message: "[research] 文件已更新，检查是否需同步 findings.md"
-    - matcher: "WebSearch|mcp__fetch__fetch|mcp__web_reader__webReader"
+    - matcher: "WebSearch|mcp__fetch__fetch"
       hooks:
         - type: reminder
           message: "[research] 资料已查阅，提取关键结论到 findings.md"
@@ -39,7 +41,7 @@ hooks:
         - type: reminder
           message: "[research] 会话结束前确保 findings.md 已包含：当前结论、证据路径、待验证项"
         - type: checkpoint
-          message: "[research] 检查清单：research.md 完整？findings.md 同步？假设已标记？"
+          message: "[research] 检查清单：research.md 完整？findings.md 同步？未验证假设已按 [NEEDS VERIFICATION][TYPE] 标记？"
 ---
 
 # Skill: research
@@ -79,7 +81,7 @@ I'm using the research skill to evaluate [调研主题].
 
 ## When to Use
 
-用于任何需要技术决策的场景：
+默认用于 `02_design` 阶段内的技术调研与方案收敛：
 - 技术栈选型（框架、库、工具）
 - 第三方服务评估（云服务、SaaS、API）
 - 架构方案对比（单体 vs 微服务、SQL vs NoSQL）
@@ -91,6 +93,61 @@ I'm using the research skill to evaluate [调研主题].
 - 涉及安全、合规、隐私相关决策
 - 迁移成本高或回滚困难
 - 多个方案各有优劣，难以判断
+
+若在其他阶段调用：
+
+- 仅作为补充性 research
+- 不替代当前阶段主 skill
+- 结论应回写到 `findings.md`，供当前阶段消费
+
+## 与 04-design 的关系
+
+`05-research` 不是独立主阶段 skill，而是 `04-design` 的按需 companion skill。
+
+当 `04-design` 满足以下任一条件时，应自动或按需调用 `05-research`：
+- 存在 2 个以上合理候选方案
+- 需要外部最佳实践、官方文档或兼容性依据
+- 安全 / 性能 / 成本结论无法仅靠本仓库上下文得出
+- 需要评估第三方服务、框架或外部集成方案
+
+`05-research` 的输出契约：
+- `research.md`：推荐方案、备选方案、证据路径、风险与限制、未验证假设
+- `findings.md`：本次 research 摘要、证据路径、下一步动作
+
+`04-design` 的回流契约：
+- 读取 `research.md` 和 `findings.md`
+- 将最终采用方案、采用理由、关键风险、待验证项回写到 `design.md`
+
+边界：
+- `05-research` 不直接生成 `design.md`
+- `04-design` 不应绕过 `research.md` 直接用外部资料拍板
+- `05-research` 是 design 的证据输入，不替代 design 本身
+
+## 调研任务分型
+
+默认按下列类型选择输出结构：
+
+1. `TYPE A: 方案选型`
+   - 多个候选方案中给出推荐
+   - 重点输出：对比矩阵、推荐结论、风险与依赖
+2. `TYPE B: 最佳实践 / 实现参考`
+   - 收敛官方推荐、兼容实践、参考实现
+   - 重点输出：来源链接、版本范围、适用边界
+3. `TYPE C: 背景追溯 / 历史决策`
+   - 解释历史选择、迁移包袱、反证据
+   - 重点输出：背景、反证据、当前建议
+
+## 短版决策框架
+
+默认按以下顺序评估推荐优先级：
+
+1. 问题匹配度
+2. 与现有栈兼容性
+3. 长期维护成本
+4. 风险与回滚成本
+5. 证据强度
+
+默认必须给出首选方案；除非证据不足，才允许输出“暂不推荐”。
 
 ## Don't Skip Research When
 
@@ -122,33 +179,13 @@ research 阶段输出技术选型依据，不输出实现方案：
 
 ## Evidence Protocol
 
-### 证据强度要求
+research 阶段的证据规则以 [evidence-types.md](./references/evidence-types.md) 为真理源。
 
-| 结论类型 | 必需证据 | 证据强度 | 示例 |
-|---------|---------|----------|------|
-| 性能声明 | Benchmark 数据 | 🔴 强 | 压测报告、官方性能数据 |
-| 安全声明 | 安全审计/官方文档 | 🔴 强 | 安全白皮书、合规认证 |
-| 成本声明 | 官方报价单 | 🔴 强 | 厂商报价、TCO 计算表 |
-| 成熟度声明 | 用户案例/社区数据 | 🟡 中 | GitHub stars、案例研究 |
-| 易用性声明 | 文档/教程质量 | 🟢 弱 | 文档完整性、学习曲线 |
+主文档只保留三条硬规则：
 
-### 证据来源可信度
-
-| 来源 | 可信度 | 说明 |
-|------|--------|------|
-| 官方文档 | ⭐⭐⭐⭐⭐ | 厂商官方发布，权威最高 |
-| 技术白皮书 | ⭐⭐⭐⭐ | 深度分析，但可能有营销倾向 |
-| 开源社区 | ⭐⭐⭐ | GitHub issues、StackOverflow |
-| 案例研究 | ⭐⭐⭐ | 实际用户经验，参考价值高 |
-| 媒体报道 | ⭐⭐ | 需交叉验证，避免营销话术 |
-| 个人博客 | ⭐ | 个人经验，仅供参考 |
-
-### 反证据原则
-
-当发现与当前结论相反的证据时：
-1. **必须记录**：在 `research.md` 中记录反证据
-2. **分析原因**：解释为什么反证据不影响当前结论
-3. **更新结论**：如反证据更强，必须更新推荐方案
+1. 每个关键结论都必须有可追溯证据
+2. 未验证假设必须标记 `[NEEDS VERIFICATION][TYPE]`
+3. 发现反证据时必须记录并重新评估推荐结论
 
 ## Research 流程决策图
 
@@ -228,7 +265,7 @@ digraph research_flow {
 
 | 匹配工具 | 提醒内容 | 目的 |
 |---------|---------|------|
-| `WebSearch` / `mcp__fetch__fetch` / `mcp__web_reader__webReader` | 查阅资料后立即更新 findings.md | 强化证据收集后的落盘 |
+| `WebSearch` / `mcp__fetch__fetch` | 查阅资料后立即更新 findings.md | 强化证据收集后的落盘 |
 | `Write` / `Edit` | 写入文件前检查是否同步 findings.md | 确保 findings.md 与研究结论同步 |
 
 ### PostToolUse（工具调用后提醒）
@@ -236,7 +273,7 @@ digraph research_flow {
 | 匹配工具 | 提醒内容 | 目的 |
 |---------|---------|------|
 | `Write` / `Edit` | 文件已更新，检查是否需同步 findings.md | 确保变更反映到 findings.md |
-| `WebSearch` / `mcp__fetch__fetch` / `mcp__web_reader__webReader` | 资料已查阅，提取关键结论到 findings.md | 提醒及时处理检索到的信息 |
+| `WebSearch` / `mcp__fetch__fetch` | 资料已查阅，提取关键结论到 findings.md | 提醒及时处理检索到的信息 |
 
 ### Stop（会话结束前检查）
 
@@ -252,32 +289,12 @@ digraph research_flow {
 | 文件操作 | `Read`, `Write`, `Edit` | 读写调研文档 |
 | 命令执行 | `Bash` | 执行 CLI 命令 |
 | 代码搜索 | `Glob`, `Grep` | 搜索代码库 |
-| 网络检索 | `WebSearch`, `mcp__fetch__fetch`, `mcp__web_reader__webReader` | 查阅技术资料 |
+| 网络检索 | `WebSearch`, `mcp__fetch__fetch` | 查阅技术资料 |
 
-**注意**：超出白名单的工具调用将被拦截。
+**注意**：
 
-## Operation Types
-
-| 标记 | 含义 | 执行者 |
-|------|------|--------|
-| `[AI]` | Bash 脚本或工具调用 | AI |
-| `[USER]` | 需要用户确认的决策 | 用户 |
-
-### 操作分工示例
-
-```bash
-# [AI] 自动执行
-- 搜索技术文档
-- 读取现有方案
-- 生成对比矩阵
-- 写入 research.md
-
-# [USER] 需要确认
-- 推荐方案确认
-- 风险接受决策
-- 调研范围调整
-- 下一步动作确认
-```
+- `WebSearch` 代表宿主提供的搜索能力；不同宿主可映射到不同实际工具名
+- 若当前宿主没有搜索工具，至少保留本地文档读取 + `mcp__fetch__fetch` 抓取能力
 
 ## 模板引用路径
 
@@ -285,15 +302,16 @@ digraph research_flow {
 
 | 模板类型 | 路径 | 用途 |
 |---------|------|------|
-| 调研输出 | `references/research-checklist.md` | 检查清单 |
+| 检查清单 | `references/research-checklist.md` | 输出前自检 |
 | 对比矩阵 | `references/tech-comparison-template.md` | 标准对比模板 |
-| 证据标记 | `references/evidence-types.md` | 假设类型规范 |
+| 证据规则 | `references/evidence-types.md` | 假设类型与证据强度 |
+| 协作约定 | `references/coordination-conventions.md` | 操作分工与确认边界 |
 
 **使用方式**：在输出前引用对应模板，确保格式一致。
 
 ## 触发条件
 
-- **阶段**：任意阶段（不限阶段，但通常在 spec/design 前执行）
+- **阶段**：`02_design` 按需执行
 - **Command**：`/spec-first:research`
 - **典型场景**：
   - 新技术栈选型
@@ -315,6 +333,7 @@ digraph research_flow {
 
 - `.spec-first/current` 不存在或为空 → 降级到交互式
 - 指定 Feature 不存在 → 报错并终止
+- 若在非 `02_design` 阶段调用：仅允许作为补充性 research，不应替代当前阶段主 skill
 
 ## 执行阶段
 
@@ -325,9 +344,12 @@ digraph research_flow {
 - **P4**: 将调研笔记写入 `research.md`，更新 `findings.md`
 - **P5**: 执行 review checklist 自检
 
-## CLI 依赖
+## CLI / 能力依赖
 
-- `spec-first ai context`
+- Feature 上下文定位
+- `spec.md` / `design.md` / `findings.md` 读取
+- 外部资料检索或抓取
+- `research.md` / `findings.md` 落盘
 
 ## 输出路径
 

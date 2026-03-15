@@ -30,6 +30,24 @@ describe('target module', () => {
 });
 ```
 
+## RED First 要求
+
+写实现前，必须先让测试以当前缺失行为失败一次。
+
+最低顺序：
+
+1. 先写或改测试
+2. 执行定向测试并记录失败
+3. 在 `findings.md` 记录 `[TDD-RED] TASK-ID`
+4. 再写最小实现
+5. 再次执行同一测试并记录 `[TDD-GREEN] TASK-ID`
+
+禁止顺序：
+
+- 先写实现，再补测试
+- 先跑全量绿，再回填 RED
+- 先写 WAIVER，后面不补任何替代验证
+
 ## 推荐结构
 
 每个 TASK 相关测试至少覆盖：
@@ -82,6 +100,28 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
 如果增加了测试但未覆盖验收标准，应在 findings 中说明缺口。
 
+## 按端参考
+
+### app
+
+- 优先测试 ViewModel / Presenter / state machine / usecase
+- 原生壳工程配置更适合 WAIVER + build / smoke 证据
+
+### h5 / admin
+
+- 优先测试 hooks / store / form 校验 / 页面交互状态
+- 纯样式和文案变更可走 WAIVER
+
+### backend
+
+- 优先测试 service / validator / handler error path / policy
+- 外部依赖重的改动可用 integration / contract test 充当 RED
+
+### shared
+
+- 多端共享逻辑默认按高风险处理
+- 优先单测 mapper / schema / domain 规则，避免只靠调用端间接覆盖
+
 ## 命名建议
 
 - 文件名：`*.test.ts`
@@ -97,3 +137,4 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 - 测试命令应可纳入：
   - `pnpm test -- --run`
   - 或最小子集定向测试命令
+- 如走 WAIVER，必须有明确替代验证，不得把 WAIVER 伪装成完成测试

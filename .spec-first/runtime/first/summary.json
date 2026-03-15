@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-03-09T04:52:18.445Z",
+  "mode": "deep",
+  "project": {
+    "name": "spec-first",
+    "platformType": "cli-tool",
+    "overview": "Specification-driven development process engine"
+  },
+  "modules": [
+    "cli",
+    "process-engine",
+    "skill-runtime",
+    "ai-orchestrator",
+    "gate-engine",
+    "trace-engine",
+    "change-mgr",
+    "template",
+    "tool-integration",
+    "metrics-engine",
+    "shared",
+    "config"
+  ],
+  "capabilities": [
+    "Feature lifecycle management",
+    "Stage state machine",
+    "Traceability matrix",
+    "Quality gates",
+    "RFC and defect tracking"
+  ],
+  "entryPoints": [
+    "src/cli/index.ts",
+    "src/core/process-engine/stage-machine.ts",
+    "src/core/skill-runtime/dispatcher.ts"
+  ],
+  "dataModels": [
+    "Feature",
+    "Stage",
+    "Task",
+    "RFC",
+    "Defect",
+    "Gate",
+    "TraceabilityMatrix"
+  ],
+  "apiSurface": [
+    "spec-first init",
+    "spec-first stage",
+    "spec-first id",
+    "spec-first matrix",
+    "spec-first rfc",
+    "spec-first defect",
+    "spec-first gate"
+  ],
+  "risks": [],
+  "evidence": [],
+  "techStack": [
+    "runtime: Node.js ≥20.0.0",
+    "language: TypeScript 5.4+",
+    "module_system: ESM",
+    "bundler: tsup",
+    "test_framework: Vitest"
+  ]
+}

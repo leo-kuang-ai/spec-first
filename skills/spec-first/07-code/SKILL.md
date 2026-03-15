@@ -1,6 +1,7 @@
 ---
 name: "spec-first:code"
-description: "执行代码实现。支持单 TASK 与分层批量实现；当前以 skill 指导的人工/半自动执行为主。"
+description: "执行代码实现。支持单 TASK 与自动批量模式；当前以自动批量提示词驱动，运行时可按宿主能力落到人工/半自动调度。"
+- Command: `/spec-first:code [featureId]`
 version: 2.1.0
 last_updated: 2026-03-14
 changelog: |
@@ -23,11 +24,13 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
 
 当前仓库的真实状态是：
 
-- skill 已定义完整批量执行流程
+- skill 以自动批量模式定义完整执行流程
 - batch executor 仍未完全接入真实 subagent 执行链路
-- 因此本 skill 当前主要用于指导人工/半自动分层执行
+- 因此当前默认做法是：
+  - 提示词仍按自动批量模式组织
+  - 运行时根据宿主能力落到真实 subagent 或人工/半自动调度
 
-不要把“目标态自动批量执行”误当成“当前已稳定实现能力”。
+不要把“自动批量模式提示词”直接等同于“当前 runtime 已稳定自动接线”。
 
 ## 背景质量契约
 
@@ -101,7 +104,7 @@ runtime:
 2. 没有可靠冲突信息时，默认串行而不是乐观并发。
 3. subagent 只负责单 TASK 实现，不负责共享状态写入。
 4. 主进程统一汇总结果并写共享文件。
-5. 找不到真实运行时接线时，按人工/半自动模式执行，不宣称“已自动批量完成”。
+5. 提示词始终按自动批量模式组织；找不到真实运行时接线时，由宿主或主进程按同一批量流程落到人工/半自动调度。
 6. `Simplicity First`：优先最小实现，避免为单个 TASK 顺手扩写无关能力。
 7. `Surgical Changes`：只动当前 TASK 必需的文件和范围，不顺带重构无关区域。
 
@@ -167,7 +170,7 @@ runtime:
 1. 先判断串行还是并发
 2. 为每个 TASK 准备上下文包
 3. 如宿主已接线真实 subagent，则可并发派发
-4. 如未接线，则按人工/半自动顺序执行
+4. 如未接线，则保持自动批量模式的任务组织方式，但由宿主或主进程按人工/半自动顺序调度
 5. 收集结果：`success / failure / blocked`
 6. 计算本层失败情况
 7. 更新共享状态与报告
@@ -189,7 +192,7 @@ runtime:
 | 只有 1 个待执行 TASK | 单任务 |
 | 多个 TASK 且依赖清晰、无冲突信息缺口 | 可分层批量 |
 | 多个 TASK，但共享文件/共享配置/共享迁移 | 串行 |
-| 宿主未接线真实 subagent | 人工/半自动 |
+| 宿主未接线真实 subagent | 自动批量模式提示词 + 人工/半自动调度 |
 | 上下文包超限 | 降级裁剪或串行 |
 
 ## 主进程 / Subagent 边界
@@ -262,6 +265,29 @@ Subagent 可写：
 - 批量前做一次 TDD 预检
 - 单 TASK 执行前再次检查 RED / WAIVER
 - 成功后必须形成 GREEN 证据或等价测试通过记录
+
+执行时还必须遵守以下解释规则：
+
+- TDD 强制优先按**变更类型**判定，不按端类型一刀切
+- `business_logic / orchestration / shared_domain` 默认 `required`
+- `style_copy_only / doc_only` 可 `waived`
+- `config_only / external_integration / infra_wiring` 默认 `conditional_waiver`
+- `conditional_waiver` 必须写替代验证，不得只写一句“无法测试”
+
+推荐执行顺序：
+
+1. 解析 TASK 的主要变更类型
+2. 映射到 `required / conditional_waiver / waived`
+3. 在 `findings.md` 写入 `[TDD-RED]` 或 `[TDD-WAIVER]`
+4. 仅在证据存在后开始写生产代码
+5. 完成后补 `[TDD-GREEN]`
+
+禁止合理化：
+
+- 先写代码，后补 RED
+- 用全量绿替代 RED
+- 把样式、配置、外部接线之外的逻辑改动一律归类成 WAIVER
+- 把“改动很小 / 时间不够 / 页面不好测”当成 WAIVER 理由
 
 ## Traces 规则
 

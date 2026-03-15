@@ -122,7 +122,7 @@ function handleReport(args: string[]): number {
   const health = calcHealthScore(coverage, 0, 0);
   const bottlenecks = detectBottlenecks(coverage);
   const allMetrics = getAllCoreMetricDefs();
-  const stageTargets = getStageMetricTargets(currentStage as any, cwd);
+  const stageTargets = getStageMetricTargets(currentStage, cwd);
   const record = coverage as unknown as Record<string, number>;
 
   // ① 健康分

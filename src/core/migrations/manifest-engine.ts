@@ -306,10 +306,12 @@ function executePatch(
   const filePath = resolveSafePath(projectRoot, step.file);
 
   if (!existsSync(filePath)) {
+    ensureDir(dirname(filePath));
+    writeFileSync(filePath, JSON.stringify(step.patch, null, 2), 'utf-8');
     return {
       step,
-      success: false,
-      message: `目标文件不存在：${step.file}`,
+      success: true,
+      message: `创建并补丁：${step.file}`,
     };
   }
 
