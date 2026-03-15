@@ -2,7 +2,7 @@
 
 > **分析日期**: 2026-03-15
 > **分析团队**: Anthropic SDD 技术研发团队
-> **分析范围**: GSD-2, Get-Shit-Done, cc-sdd, Gentle-AI, OpenSpec, Spec Kit, Planning-Files, Trellis, Superpowers
+> **分析范围**: GSD-2, Get-Shit-Done, cc-sdd, Gentle-AI, OpenSpec, Spec Kit, Planning-Files, Trellis, Superpowers, code-audit, agency-agents
 
 ---
 
@@ -25,6 +25,8 @@
 | **Planning-Files** | - | 上下文工程 | 文件即内存、5-Question Reboot |
 | **Trellis** | - | AI 工作流系统 | Read Before Write、知识持久化 |
 | **Superpowers** | - | 高质量代理技能 | TDD 铁律、系统化调试 |
+| **code-audit** | - | 安全审计专项 Skill | 双轨白盒审计、143 检测项、抗幻觉规则 |
+| **agency-agents** | - | 多专家 Agent 库 | 专家角色库、多工具集成、编排代理 |
 | **Spec-First** | v1.0.4 | 全链路研发引擎 | Gate 校验、追溯体系 |
 
 ### 1.3 分析方法
@@ -47,7 +49,9 @@
 
 ## 二、功能对比总览
 
-### 2.1 全项目功能矩阵（10 系统）
+### 2.1 全项目功能矩阵（10 + 2 系统）
+
+> 说明：主矩阵保留 10 个“通用研发系统”作为横向星级比较对象。`code-audit` 与 `agency-agents` 更偏专项能力库，放在下方做定性补充，避免用同一套通用研发指标强行打分失真。
 
 | 功能维度 | GSD-2 | Get-Shit-Done | cc-sdd | Gentle-AI | OpenSpec | Spec Kit | Planning-Files | Trellis | Superpowers | Spec-First |
 |----------|:-----:|:-------------:|:------:|:---------:|:--------:|:--------:|:--------------:|:-------:|:-----------:|:----------:|
@@ -65,6 +69,13 @@
 | **知识捕获** | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
 | **安全控制** | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
 | **TDD 强制** | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+
+### 2.1.1 补充分析对象（定性对比）
+
+| 项目 | 定位 | 源码核验核心能力 | 与 Spec-First 的互补点 |
+|------|------|------------------|-------------------------|
+| **code-audit** | 安全审计专项 Skill | 55+ 漏洞类型、143 Mandatory Detection Items、Dual-Track Audit Model、Multi-Agent Deep Analysis、Anti-Hallucination | 可补齐 Spec-First 在白盒安全审计、漏洞证据化报告、专项安全检查表上的深度 |
+| **agency-agents** | 多专家 Agent 库 | 专家角色库、Production-Ready workflows、Multi-Tool Integrations、Agents Orchestrator | 可补齐 Spec-First 在领域专家分工、多角色协作、非研发专业能力接入上的广度 |
 
 ### 2.2 各系统独有优势
 
@@ -124,6 +135,18 @@
 - 3-Strike 调试协议 (3+ 修复失败质疑架构)
 - 子代理并行派发 (问题域分组)
 
+**code-audit 独有**:
+- 双轨白盒审计模型 (Sink-driven + Control-driven)
+- 143 个强制检测项 (10 个安全维度)
+- 多 Agent 深度审计 (大仓并行审查)
+- 抗幻觉审计规则 (无证据不报、宁缺毋滥)
+
+**agency-agents 独有**:
+- 大规模专家 Agent 角色库
+- 多工具集成生成与安装流程
+- Agents Orchestrator 多代理协作
+- 面向交付物的专家 workflows + deliverables
+
 **Spec-First 独有**:
 - Gate 校验引擎 (19 条)
 - 追溯 ID 体系 (14 类)
@@ -144,6 +167,8 @@
 | **Planning-Files** | 7 步代理循环 | Requirements → Plan → Exec → Verify → Commit → Iterate |
 | **Trellis** | 任务工作流 | start → brainstorm → before-*-dev → implement → check-* → finish-work → record-session |
 | **Superpowers** | 计划执行流 | brainstorming → worktrees → plans → [exec\|subagent] → verify → finish |
+| **code-audit** | 双轨审计流 | sink-driven 检测危险点 + control-driven 检查缺失控制 |
+| **agency-agents** | 专家切换流 | 选择专家 → 执行角色 workflow → 产出 deliverable / 必要时交由 orchestrator 协调 |
 | **Spec-First** | 阶段状态机 | 00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release |
 
 ### 2.4 错误处理协议对比
@@ -559,6 +584,7 @@ RED（写失败测试）→ Verify RED → GREEN（最小实现）→ Verify GRE
 | **三层检查机制** | Trellis | single → cross → completion |
 | **宪法权威机制** | Spec Kit | Constitution > Spec > Design > Code |
 | **两阶段审查** | Superpowers | Stage 1 合规 + Stage 2 质量 |
+| **强制检测清单** | code-audit | 安全专项检查表 + 证据化审计 |
 | **KV-Cache 优化** | Planning-Files | 稳定 prompt 前缀 |
 | **5-Question Reboot** | Planning-Files | 上下文恢复机制 |
 
@@ -569,6 +595,8 @@ RED（写失败测试）→ Verify RED → GREEN（最小实现）→ Verify GRE
 | **DAG 工件依赖** | OpenSpec | 使能器而非门禁 |
 | **Delta Specs** | OpenSpec | ADDED/MODIFIED/REMOVED 操作 |
 | **并行执行** | Superpowers | dispatching-parallel-agents |
+| **专项安全审计** | code-audit | 白盒漏洞专项扫描与证据报告 |
+| **专家角色库** | agency-agents | 多领域专家分工与 orchestrator 协同 |
 
 ### 4.6 Spec-First 保持优势（不借鉴）
 
@@ -689,6 +717,8 @@ timeout-supervisor  metrics-engine      process-engine
 | 批量讨论模式 | Get-Shit-Done | P1 | 1 天 |
 | Pipeline 执行引擎 | Gentle-AI | P1 | 2 天 |
 | FileMerge 模块 | Gentle-AI | P1 | 1 天 |
+| 安全审计清单 | code-audit | P1 | 2 天 |
+| 审计报告模板 | code-audit | P1 | 1 天 |
 
 **产出**:
 - `src/core/steering/` 模块
@@ -697,6 +727,8 @@ timeout-supervisor  metrics-engine      process-engine
 - EARS 格式模板
 - `src/core/pipeline/orchestrator.ts`
 - `src/core/filemerge/markdown-merge.ts`
+- `src/core/security/audit-checklist.ts`
+- `docs/templates/security-audit-report.md`
 
 ### 6.3 Phase 3: 生态扩展 (1-2 月)
 
@@ -709,6 +741,8 @@ timeout-supervisor  metrics-engine      process-engine
 | Cursor 适配器 | Gentle-AI | P2 | 2 天 |
 | 浏览器工具集成 | GSD-2 | P2 | 3 天 |
 | TUI 安装向导 | Gentle-AI | P2 | 3 天 |
+| 专家角色库接入 | agency-agents | P2 | 3 天 |
+| Orchestrator 协作模板 | agency-agents | P2 | 2 天 |
 
 **产出**:
 - `src/core/agents/opencode-adapter.ts`
@@ -716,6 +750,8 @@ timeout-supervisor  metrics-engine      process-engine
 - `src/core/agents/cursor-adapter.ts`
 - Playwright 扩展 (可选)
 - TUI 安装界面 (可选)
+- `skills/spec-first/experts/` 角色库
+- `src/core/agents/orchestrator-profiles.ts`
 
 ---
 
@@ -766,6 +802,14 @@ timeout-supervisor  metrics-engine      process-engine
 4. ✅ FileMerge 无覆盖注入 (P1)
 5. ✅ TUI 安装向导 (P2)
 
+**从 code-audit 借鉴** (2 项):
+1. ✅ 双轨白盒安全审计 (P1)
+2. ✅ 强制检测清单 + 审计报告模板 (P1)
+
+**从 agency-agents 借鉴** (2 项):
+1. ✅ 专家角色库接入 (P2)
+2. ✅ Orchestrator 协作模板 (P2)
+
 **从 Skill 体系借鉴** (4 项):
 1. ✅ TDD 强制铁律 (from Superpowers)
 2. ✅ break-loop 深度复盘 (from Trellis)
@@ -797,14 +841,35 @@ timeout-supervisor  metrics-engine      process-engine
 │  ├── 灵活模式 (Quick from Get-Shit-Done / Full)                         │
 │  ├── 多运行时 (Adapter from Gentle-AI)                                  │
 │  ├── 安全注入 (Pipeline + FileMerge from Gentle-AI)                     │
+│  ├── 安全审计 (Dual-Track Audit from code-audit)                        │
+│  ├── 专家协作 (Experts + Orchestrator from agency-agents)               │
 │  └── 超时监督 (三层 from GSD-2)                                         │
 │                                                                          │
 │  = GSD-2 的自动化 + Spec-First 的规范 + cc-sdd 的记忆 + Gentle-AI 的生态 │
+│    + code-audit 的安全深度 + agency-agents 的专家广度                   │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
+
+## 附录：项目路径说明
+
+本报告的源码核验基于以下本地项目路径：
+
+- `Spec-First`: `/Users/kuang/xiaobu/spec-first`
+- `GSD-2`: `/Users/kuang/xiaobu/gsd-2`
+- `Get-Shit-Done`: `/Users/kuang/xiaobu/get-shit-done`
+- `cc-sdd`: `/Users/kuang/xiaobu/cc-sdd`
+- `Gentle-AI`: `/Users/kuang/xiaobu/gentle-ai`
+- `OpenSpec`: `/Users/kuang/xiaobu/OpenSpec`
+- `Spec Kit`: `/Users/kuang/xiaobu/spec-kit`
+- `Planning-Files`: `/Users/kuang/xiaobu/planning-with-files`
+- `Trellis`: `/Users/kuang/xiaobu/Trellis`
+- `Superpowers`: `/Users/kuang/xiaobu/superpowers`
+
+- `code-audit`: `/Users/kuang/xiaobu/code-audit`
+- `agency-agents`: `/Users/kuang/xiaobu/agency-agents`
 
 *分析完成于 2026-03-15*
 *分析团队: Anthropic SDD 技术研发团队*

@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** 补齐 Spec-First 相对其他项目处于 `<=3 星` 的能力短板，优先提升自动化、持久记忆、易用性、多运行时、工具集成和 TDD 强制。
+**Goal:** 补齐 Spec-First 相对其他项目处于 `<=3 星` 的能力短板，并补入安全审计深度与专家角色协作能力，优先提升自动化、持久记忆、易用性、多运行时、工具集成和 TDD 强制。
 
-**Architecture:** 以现有 `stage + gate + skill` 体系为内核，不推翻 Spec-First 的阶段状态机，而是在其外层补充 `auto loop`、`memory`、`agent adapter`、`quick path` 和 `tool bridge`。优先做可以复用现有 CLI/状态文件/门禁机制的增量改造，避免引入第二套流程系统。
+**Architecture:** 以现有 `stage + gate + skill` 体系为内核，不推翻 Spec-First 的阶段状态机，而是在其外层补充 `auto loop`、`memory`、`agent adapter`、`quick path`、`tool bridge`、`security audit layer` 和 `expert profiles`。优先做可以复用现有 CLI/状态文件/门禁机制的增量改造，避免引入第二套流程系统。
 
 **Tech Stack:** TypeScript、Commander CLI、现有 Spec-First core/cli 模块、MCP/Playwright 适配、Markdown state/spec 文档。
 
@@ -21,11 +21,43 @@
 5. 工具集成
 6. TDD 强制
 
+并补充 2 个专项增强方向：
+
+7. 安全审计深度
+8. 专家角色协作
+
 不包含：
 
 - 成本追踪
 - Dashboard/预算控制
 - 与当前 Gate/Trace 体系无关的大规模重构
+
+## Progress Tracker
+
+| ID | 优先级 | 任务 | 来源 | 当前状态 | 备注 |
+|----|--------|------|------|----------|------|
+| T1 | P0 | 补强 Auto Loop | GSD-2 | 未开始 | 自动推进、暂停、恢复 |
+| T2 | P0 | 引入超时监督骨架 | GSD-2 | 未开始 | soft / idle / hard |
+| T3 | P0 | 建立 Steering 项目记忆 | cc-sdd | 未开始 | project / tech / structure / patterns |
+| T4 | P0 | 增加 Quick 路径 | Get-Shit-Done | 未开始 | bugfix / config / docs 短路径 |
+| T5 | P0 | 强制 TDD 最小门禁 | Superpowers | 未开始 | RED / GREEN 证据化 |
+| T6 | P1 | 增加跨会话记忆接口 | Gentle-AI | 未开始 | provider interface + 摘要读取 |
+| T7 | P1 | 增加 Batch Discuss 交互 | Get-Shit-Done | 未开始 | grouped prompts |
+| T8 | P1 | 引入 Wave 并行调度 | Get-Shit-Done | 未开始 | dependency → waves |
+| T9 | P1 | 增强 Knowledge Capture | Trellis | 未开始 | session record / archive knowledge |
+| T10 | P1 | 增加安全审计清单与报告模板 | code-audit | 未开始 | checklist + report template |
+| T11 | P2 | 扩展多运行时适配层 | Gentle-AI | 未开始 | OpenCode / Gemini / Cursor |
+| T12 | P2 | 浏览器工具集成 | GSD-2 | 未开始 | Playwright / MCP |
+| T13 | P2 | 引入 Constitution 与 Delta Spec 能力 | Spec Kit + OpenSpec | 未开始 | hierarchy + ADDED/MODIFIED/REMOVED |
+| T14 | P2 | 接入专家角色库与 Orchestrator 协作模板 | agency-agents | 未开始 | expert profiles + orchestration |
+
+状态建议：
+
+- `未开始`
+- `进行中`
+- `已完成`
+- `已阻塞`
+- `已放弃`
 
 ---
 
@@ -388,11 +420,51 @@ git add skills/spec-first/08-review/SKILL.md skills/spec-first/13-archive/SKILL.
 git commit -m "feat: capture session knowledge during review and archive"
 ```
 
+### Task 10: 增加安全审计清单与报告模板
+
+**Files:**
+- Create: `src/core/security/audit-checklist.ts`
+- Create: `docs/templates/security-audit-report.md`
+- Modify: `skills/spec-first/08-review/SKILL.md`
+- Modify: `skills/spec-first/12-verify/SKILL.md`
+- Test: `tests/core/security/audit-checklist.test.ts`
+
+**Step 1: Write the failing tests**
+
+- 可按审计维度加载检查项。
+- review/verify 可输出结构化安全检查结果。
+- 缺少关键安全检查时报告给出未覆盖提示。
+
+**Step 2: Run test to verify it fails**
+
+Run: `pnpm test -- audit-checklist`
+
+Expected: FAIL
+
+**Step 3: Write minimal implementation**
+
+- 先引入轻量安全审计清单，不直接做全量漏洞扫描引擎。
+- 按 `注入 / 认证鉴权 / 文件操作 / SSRF / 业务逻辑` 等维度组织检查项。
+- 输出一份可复用的安全审计报告模板，强调“无证据不报”。
+
+**Step 4: Run test to verify it passes**
+
+Run: `pnpm test -- audit-checklist`
+
+Expected: PASS
+
+**Step 5: Commit**
+
+```bash
+git add src/core/security/audit-checklist.ts docs/templates/security-audit-report.md skills/spec-first/08-review/SKILL.md skills/spec-first/12-verify/SKILL.md tests/core/security/audit-checklist.test.ts
+git commit -m "feat: add security audit checklist and report template"
+```
+
 ---
 
 ## P2
 
-### Task 10: 扩展多运行时适配层
+### Task 11: 扩展多运行时适配层
 
 **Files:**
 - Create: `src/core/agents/adapter.ts`
@@ -432,7 +504,7 @@ git add src/core/agents src/cli/commands/setup.ts tests/core/agents/adapter.test
 git commit -m "feat: add multi-runtime agent adapters"
 ```
 
-### Task 11: 浏览器工具集成
+### Task 12: 浏览器工具集成
 
 **Files:**
 - Create: `src/core/tools/browser-tool.ts`
@@ -469,7 +541,7 @@ git add src/core/tools/browser-tool.ts src/cli/commands/setup.ts skills/spec-fir
 git commit -m "feat: add browser tool integration"
 ```
 
-### Task 12: 引入 Constitution 与 Delta Spec 能力
+### Task 13: 引入 Constitution 与 Delta Spec 能力
 
 **Files:**
 - Create: `docs/constitution.md`
@@ -507,19 +579,61 @@ git add docs/constitution.md src/core/gate-engine/condition-registry.ts src/cli/
 git commit -m "feat: add constitution hierarchy and delta spec support"
 ```
 
+### Task 14: 接入专家角色库与 Orchestrator 协作模板
+
+**Files:**
+- Create: `skills/spec-first/experts/README.md`
+- Create: `skills/spec-first/experts/security-auditor.md`
+- Create: `skills/spec-first/experts/architect-reviewer.md`
+- Create: `src/core/agents/orchestrator-profiles.ts`
+- Modify: `src/cli/commands/orchestrate.ts`
+- Test: `tests/core/agents/orchestrator-profiles.test.ts`
+
+**Step 1: Write the failing tests**
+
+- orchestrate 可按任务类型匹配专家 profile。
+- 专家 profile 缺失时回退到默认执行流。
+- 不同 profile 输出不同的协作提示与交付物要求。
+
+**Step 2: Run test to verify it fails**
+
+Run: `pnpm test -- orchestrator-profiles`
+
+Expected: FAIL
+
+**Step 3: Write minimal implementation**
+
+- 先做轻量专家角色库，不复制整个 agency-agents 仓库。
+- 抽象 `task type -> expert profile -> deliverable expectations` 映射。
+- 初期至少支持 `security audit`、`architecture review`、`workflow optimization` 三类 profile。
+
+**Step 4: Run test to verify it passes**
+
+Run: `pnpm test -- orchestrator-profiles`
+
+Expected: PASS
+
+**Step 5: Commit**
+
+```bash
+git add skills/spec-first/experts/README.md skills/spec-first/experts/security-auditor.md skills/spec-first/experts/architect-reviewer.md src/core/agents/orchestrator-profiles.ts src/cli/commands/orchestrate.ts tests/core/agents/orchestrator-profiles.test.ts
+git commit -m "feat: add expert profiles and orchestrator templates"
+```
+
 ---
 
 ## Suggested Sequence
 
 1. 先做 `Task 1-5`
-2. 再做 `Task 6-9`
-3. 最后做 `Task 10-12`
+2. 再做 `Task 6-10`
+3. 最后做 `Task 11-14`
 
 原因：
 
 - `Auto Loop + Quick + TDD Gate` 会最快改善实际体验
 - `Steering + Memory` 会减少重复工作
-- `Multi-runtime + Browser Tool` 更像平台化扩展，应该晚于核心闭环
+- `Security Audit` 应在核心闭环稳定后尽快补齐
+- `Multi-runtime + Browser Tool + Expert Profiles` 更像平台化扩展，应该晚于核心闭环
 
 ## Verification
 
@@ -539,6 +653,7 @@ pnpm typecheck
 - 小任务可通过 `quick` 短路径完成
 - 项目级记忆与跨会话记忆可被稳定读取
 - TDD 证据成为实现/验证阶段的硬门禁之一
+- review/verify 可产出结构化安全审计清单与报告
 - 适配层可清晰支持至少 `Claude Code + Codex + OpenCode + Gemini`
 - 浏览器工具可通过配置注入而非手工散落接入
-
+- 专家角色库可按任务类型提供差异化协作模板
