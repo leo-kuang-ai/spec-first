@@ -5,11 +5,16 @@ import { handleInit } from '../../src/cli/commands/init.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
 import { handleDone } from '../../src/cli/commands/done.js';
 import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
+import * as hostBootstrap from '../../src/shared/host-bootstrap.js';
+import * as hostAdapterRegistry from '../../src/core/host-adapters/registry.js';
+import * as skillCommands from '../../src/shared/skill-commands.js';
+import { ExitCode } from '../../src/shared/types.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-init-stage');
 
 const origCwd = process.cwd;
 const origSpecFirstSkillsDir = process.env.SPEC_FIRST_SKILLS_DIR;
+const origInitBootstrap = process.env.SPEC_FIRST_INIT_BOOTSTRAP;
 
 
 function seedHealthyRuntimeFirst(projectRoot: string): void {
@@ -79,7 +84,13 @@ afterEach(() => {
   } else {
     process.env.SPEC_FIRST_SKILLS_DIR = origSpecFirstSkillsDir;
   }
+  if (origInitBootstrap === undefined) {
+    delete process.env.SPEC_FIRST_INIT_BOOTSTRAP;
+  } else {
+    process.env.SPEC_FIRST_INIT_BOOTSTRAP = origInitBootstrap;
+  }
   process.cwd = origCwd;
+  vi.restoreAllMocks();
 });
 
 describe('handleInit', () => {
@@ -334,6 +345,158 @@ describe('handleInit', () => {
     expect(code).toBe(0);
     expect(readdirSync(join(TMP, '.git', 'hooks'))).toContain('pre-commit');
     expect(readdirSync(join(TMP, '.git', 'hooks'))).toContain('commit-msg');
+  });
+
+  it('should run bootstrap when --bootstrap is provided', async () => {
+    const bootstrapSpy = vi
+      .spyOn(hostBootstrap, 'ensureHostBootstrap')
+      .mockReturnValue({ ok: true, results: [] });
+    vi.spyOn(skillCommands, 'ensureSkillCommands').mockReturnValue({
+      claude: [],
+      codex: [],
+      gemini: [],
+      cursor: [],
+      generic: [],
+      codexWarnings: [],
+    });
+
+    const code = await handleInit([
+      '--feat',
+      'AUTH',
+      '--mode',
+      'N',
+      '--size',
+      'S',
+      '--platforms',
+      'h5',
+      '--bootstrap',
+    ]);
+
+    expect(code).toBe(0);
+    expect(bootstrapSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should print structured host status after successful bootstrap', async () => {
+    vi.spyOn(hostBootstrap, 'ensureHostBootstrap').mockReturnValue({ ok: true, results: [] });
+    vi.spyOn(hostAdapterRegistry, 'resolveHostAdapterStatuses').mockReturnValue([
+      {
+        id: 'claude',
+        detected: true,
+        summary: 'Claude detected',
+        maturity: 'stable',
+        remediation: '如需刷新 Claude 基线能力，运行 spec-first update --host claude',
+        baselineState: 'ready',
+        missingBaseline: [],
+      },
+      {
+        id: 'gemini',
+        detected: true,
+        summary: 'Gemini CLI detected',
+        maturity: 'experimental',
+        remediation: '运行 spec-first update --host gemini',
+        baselineState: 'partial',
+        missingBaseline: ['skills', 'mcp'],
+      },
+    ]);
+    vi.spyOn(skillCommands, 'ensureSkillCommands').mockReturnValue({
+      claude: [],
+      codex: [],
+      gemini: [],
+      cursor: [],
+      generic: [],
+      codexWarnings: [],
+    });
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      const code = await handleInit([
+        '--feat',
+        'AUTH',
+        '--mode',
+        'N',
+        '--size',
+        'S',
+        '--platforms',
+        'h5',
+        '--bootstrap',
+      ]);
+
+      const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
+      expect(code).toBe(0);
+      expect(output).toContain('宿主基线状态：');
+      expect(output).toContain('claude: detected, baseline=ready, missing=(none)');
+      expect(output).not.toContain('宿主基线状态：\n  gemini: detected, baseline=partial, missing=skills+mcp');
+      expect(output).toContain('实验宿主提示：');
+      expect(output).toContain('gemini: detected, baseline=partial, missing=skills+mcp');
+      expect(output).toContain('运行 spec-first update --host gemini');
+      expect(output.indexOf('宿主基线状态：')).toBeGreaterThan(
+        output.indexOf('AI Runtime Hooks 已注册')
+      );
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+
+  it('should run bootstrap when SPEC_FIRST_INIT_BOOTSTRAP=1', async () => {
+    process.env.SPEC_FIRST_INIT_BOOTSTRAP = '1';
+    const bootstrapSpy = vi
+      .spyOn(hostBootstrap, 'ensureHostBootstrap')
+      .mockReturnValue({ ok: true, results: [] });
+    vi.spyOn(skillCommands, 'ensureSkillCommands').mockReturnValue({
+      claude: [],
+      codex: [],
+      gemini: [],
+      cursor: [],
+      generic: [],
+      codexWarnings: [],
+    });
+
+    const code = await handleInit([
+      '--feat',
+      'AUTH',
+      '--mode',
+      'N',
+      '--size',
+      'S',
+      '--platforms',
+      'h5',
+    ]);
+
+    expect(code).toBe(0);
+    expect(bootstrapSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should stop init when bootstrap reports config errors', async () => {
+    vi.spyOn(hostBootstrap, 'ensureHostBootstrap').mockReturnValue({
+      ok: false,
+      results: [
+        {
+          host: 'Claude Code',
+          category: 'MCP',
+          name: 'context7',
+          level: 'ERROR',
+          detail: 'missing context7 config',
+        },
+      ],
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const code = await handleInit([
+      '--feat',
+      'AUTH',
+      '--mode',
+      'N',
+      '--size',
+      'S',
+      '--platforms',
+      'h5',
+      '--bootstrap',
+    ]);
+
+    expect(code).toBe(ExitCode.CONFIG_ERROR);
+    expect(errSpy).toHaveBeenCalledWith(
+      '[bootstrap] [Claude Code] MCP/context7: missing context7 config'
+    );
   });
 });
 

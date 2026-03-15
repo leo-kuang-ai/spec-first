@@ -1,9 +1,10 @@
 ---
 name: "spec-first:research"
 description: "定位 Feature 上下文并生成调研结论"
-version: 1.6.0
+version: 1.7.0
 last_updated: 2026-03-15
 changelog: |
+  v1.7.0: 明确 fetch + context7 + serena 的研究工具选择策略，并补充降级路径
   v1.6.0: 明确作为 04-design 的 companion skill；补充触发/回流契约、调研任务分型与短版决策框架
   v1.5.0: 对齐 02_design 按需阶段口径；精简主文档证据协议；下沉协作约定到 references；补当前宿主工具边界说明
   v1.4.0: 新增 Operation Types 章节、模板引用路径、metadata.version 分离
@@ -12,14 +13,14 @@ changelog: |
   v1.1.0: 补充字面即精神原则、模板驱动约束、决策流程图、Plan Mode 协同、示例输出
   v1.0.0: Initial version with standardized metadata
 user-invocable: true
-allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch"
+allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__serena__find_symbol, mcp__serena__get_symbols_overview"
 metadata:
-  version: "1.6.0"
+  version: "1.7.0"
   phase: "stable"
   category: "spec-phase"
 hooks:
   PreToolUse:
-    - matcher: "WebSearch|mcp__fetch__fetch"
+    - matcher: "WebSearch|mcp__fetch__fetch|mcp__context7__resolve-library-id|mcp__context7__query-docs"
       hooks:
         - type: reminder
           message: "[research] 查阅资料后立即更新 findings.md（2-Action Rule）"
@@ -32,7 +33,7 @@ hooks:
       hooks:
         - type: reminder
           message: "[research] 文件已更新，检查是否需同步 findings.md"
-    - matcher: "WebSearch|mcp__fetch__fetch"
+    - matcher: "WebSearch|mcp__fetch__fetch|mcp__context7__resolve-library-id|mcp__context7__query-docs"
       hooks:
         - type: reminder
           message: "[research] 资料已查阅，提取关键结论到 findings.md"
@@ -136,6 +137,25 @@ I'm using the research skill to evaluate [调研主题].
 3. `TYPE C: 背景追溯 / 历史决策`
    - 解释历史选择、迁移包袱、反证据
    - 重点输出：背景、反证据、当前建议
+
+## 工具选择策略
+
+调研默认按以下优先级使用工具：
+
+1. 外部网页内容、公告、文章、非结构化资料：
+   - 优先 `mcp__fetch__fetch`
+2. 官方文档、SDK、API、规范类资料：
+   - 优先 `mcp__context7__resolve-library-id`
+   - 再用 `mcp__context7__query-docs`
+3. 本地代码结构、符号引用、模块关系：
+   - 优先 `mcp__serena__get_symbols_overview`
+   - 再用 `mcp__serena__find_symbol`
+
+降级策略：
+
+- `fetch` 不可用：退回 `WebSearch` 或手工提供链接
+- `context7` 不可用：退回官方站点手工查阅，并在 findings 中标记
+- `serena` 不可用：退回 `rg + Read`
 
 ## 短版决策框架
 

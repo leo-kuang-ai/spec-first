@@ -85,6 +85,45 @@ describe('handleDoctor', () => {
     expect(lines.join('\n')).toContain('未找到（使用内置默认值）');
   });
 
+  it('should report tool policy selections for baseline scenarios', () => {
+    const lines: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([]));
+    } finally {
+      console.log = originalLog;
+    }
+
+    const joined = lines.join('\n');
+    expect(joined).toContain('Tool Policy:claude:external-research');
+    expect(joined).toContain('fetch, context7');
+    expect(joined).toContain('Tool Policy:codex:browser-verification');
+    expect(joined).toContain('playwright-mcp');
+    expect(joined).toContain('Host Capability:gemini');
+  });
+
+  it('should provide host-specific remediation for planned gemini and cursor support', () => {
+    const lines: string[] = [];
+    const originalLog = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((arg) => String(arg)).join(' '));
+    };
+    try {
+      withCwd(TMP, () => handleDoctor([]));
+    } finally {
+      console.log = originalLog;
+    }
+
+    const joined = lines.join('\n');
+    expect(joined).toContain('Host Capability:gemini');
+    expect(joined).toContain('Host Capability:cursor');
+    expect(joined).toContain('spec-first update --host gemini');
+    expect(joined).toContain('spec-first update --host cursor');
+  });
+
   it('should parse pilot_mode via yaml instead of string matching', () => {
     writeFileSync(
       join(TMP, '.spec-first', 'meta', 'config.yaml'),

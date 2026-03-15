@@ -11,9 +11,11 @@ import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { detectHostPaths, type HostPaths } from './host-paths.js';
+import type { HostId } from '../core/tool-integration/tool-types.js';
 import {
   REQUIRED_MCP_SERVERS,
   REQUIRED_SKILLS,
+  type BootstrapCapabilityRole,
   type BinaryProbeCommand,
   type McpCommandSpec,
   type RequiredSkill,
@@ -23,11 +25,14 @@ import {
 export type BootstrapLevel = 'PASS' | 'FIXED' | 'WARNING' | 'ERROR';
 
 export interface BootstrapResult {
-  host: 'Codex' | 'Claude Code' | 'Common';
+  host: 'Codex' | 'Claude Code' | 'Gemini CLI' | 'Cursor' | 'Common';
   category: 'MCP' | 'Skill' | 'Binary';
   name: string;
   level: BootstrapLevel;
   detail: string;
+  role?: BootstrapCapabilityRole;
+  impact?: string;
+  requiredByDefault?: boolean;
 }
 
 export interface BootstrapSummary {
@@ -37,11 +42,16 @@ export interface BootstrapSummary {
 
 export interface BootstrapOptions {
   dryRun?: boolean;
+  hosts?: HostId[];
   /**
    * 是否执行 MCP 二进制可运行性探测。
    * 默认关闭：update 场景仅做“存在性检查 + 缺失补齐”，避免网络探测导致阻塞。
    */
   checkBinaries?: boolean;
+}
+
+function shouldIncludeHost(hosts: readonly HostId[] | undefined, host: HostId): boolean {
+  return !hosts || hosts.length === 0 || hosts.includes(host);
 }
 
 /**
@@ -68,7 +78,32 @@ function atomicWriteJson(filePath: string, data: unknown): void {
   }
 }
 
+function backupFileIfExists(filePath: string): string | undefined {
+  if (!existsSync(filePath)) return undefined;
+  const backupPath = `${filePath}.bak`;
+  writeFileSync(backupPath, readFileSync(filePath, 'utf-8'), 'utf-8');
+  return backupPath;
+}
+
+function atomicWriteText(filePath: string, content: string): void {
+  const dir = dirname(filePath);
+  mkdirSync(dir, { recursive: true });
+  const randomSuffix = Math.random().toString(36).substring(2, 10);
+  const tmpPath = join(tmpdir(), `spec-first-text-${randomSuffix}.tmp`);
+
+  try {
+    writeFileSync(tmpPath, content, 'utf-8');
+    renameSync(tmpPath, filePath);
+  } catch (e) {
+    try {
+      unlinkSync(tmpPath);
+    } catch {}
+    throw e;
+  }
+}
+
 const GIT_CLONE_TIMEOUT_MS = 120_000;
+const DEFAULT_BOOTSTRAP_HOSTS: HostId[] = ['claude', 'codex'];
 
 export function ensureHostBootstrap(options?: BootstrapOptions): BootstrapSummary {
   if (process.env.SPEC_FIRST_SKIP_BOOTSTRAP === '1') {
@@ -79,36 +114,77 @@ export function ensureHostBootstrap(options?: BootstrapOptions): BootstrapSummar
   }
 
   const dryRun = options?.dryRun ?? false;
+  const selectedHosts = options?.hosts ?? DEFAULT_BOOTSTRAP_HOSTS;
   const checkBinaries = options?.checkBinaries ?? false;
   const hostPaths = detectHostPaths();
   const results: BootstrapResult[] = [];
   results.push(...collectPathResolutionWarnings(hostPaths, process.env));
 
-  try {
-    results.push(...ensureCodexMcpConfig(hostPaths, dryRun));
-  } catch (e) {
-    results.push({
-      host: 'Codex',
-      category: 'MCP',
-      name: 'config.toml',
-      level: 'ERROR',
-      detail: `更新 Codex MCP 配置失败：${(e as Error).message}`,
-    });
+  if (shouldIncludeHost(selectedHosts, 'codex')) {
+    try {
+      results.push(...ensureCodexMcpConfig(hostPaths, dryRun));
+    } catch (e) {
+      results.push({
+        host: 'Codex',
+        category: 'MCP',
+        name: 'config.toml',
+        level: 'ERROR',
+          detail: `更新 Codex MCP 配置失败：${(e as Error).message}`,
+          impact: '会导致 Codex 宿主缺失核心 MCP 配置',
+          requiredByDefault: true,
+        });
+    }
   }
 
-  try {
-    results.push(...ensureClaudeMcpConfig(hostPaths, dryRun));
-  } catch (e) {
-    results.push({
-      host: 'Claude Code',
-      category: 'MCP',
-      name: 'mcp config',
-      level: 'ERROR',
-      detail: `更新 Claude MCP 配置失败：${(e as Error).message}`,
-    });
+  if (shouldIncludeHost(selectedHosts, 'claude')) {
+    try {
+      results.push(...ensureClaudeMcpConfig(hostPaths, dryRun));
+    } catch (e) {
+      results.push({
+        host: 'Claude Code',
+        category: 'MCP',
+        name: 'mcp config',
+        level: 'ERROR',
+          detail: `更新 Claude MCP 配置失败：${(e as Error).message}`,
+          impact: '会导致 Claude Code 宿主缺失核心 MCP 配置',
+          requiredByDefault: true,
+        });
+    }
   }
 
-  results.push(...ensureRequiredSkills(hostPaths, dryRun));
+  if (shouldIncludeHost(selectedHosts, 'gemini')) {
+    try {
+      results.push(...ensureGeminiMcpConfig(hostPaths, dryRun));
+    } catch (e) {
+      results.push({
+        host: 'Gemini CLI',
+        category: 'MCP',
+        name: 'settings.json',
+        level: 'ERROR',
+        detail: `更新 Gemini MCP 配置失败：${(e as Error).message}`,
+        impact: '会导致 Gemini CLI 宿主缺失核心 MCP 配置',
+        requiredByDefault: false,
+      });
+    }
+  }
+
+  if (shouldIncludeHost(selectedHosts, 'cursor')) {
+    try {
+      results.push(...ensureCursorMcpConfig(hostPaths, dryRun));
+    } catch (e) {
+      results.push({
+        host: 'Cursor',
+        category: 'MCP',
+        name: 'mcp.json',
+        level: 'ERROR',
+        detail: `更新 Cursor MCP 配置失败：${(e as Error).message}`,
+        impact: '会导致 Cursor 宿主缺失核心 MCP 配置',
+        requiredByDefault: false,
+      });
+    }
+  }
+
+  results.push(...ensureRequiredSkills(hostPaths, dryRun, selectedHosts));
   if (checkBinaries) {
     results.push(...ensureMcpBinaries());
   }
@@ -229,6 +305,9 @@ function ensureCodexMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResul
         name: entry.name,
         level: 'FIXED',
         detail: `已补齐缺失配置块到 ${codexConfig}`,
+        role: entry.role,
+        impact: entry.impact,
+        requiredByDefault: entry.requiredByDefault,
       });
     } else {
       results.push({
@@ -237,12 +316,32 @@ function ensureCodexMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResul
         name: entry.name,
         level: 'PASS',
         detail: '已配置',
+        role: entry.role,
+        impact: entry.impact,
+        requiredByDefault: entry.requiredByDefault,
       });
     }
   }
 
   if (content !== original && !dryRun) {
-    writeFileSync(codexConfig, content, 'utf-8');
+    const backupPath = backupFileIfExists(codexConfig);
+    try {
+      atomicWriteText(codexConfig, content);
+    } catch (e) {
+      if (backupPath && existsSync(backupPath)) {
+        atomicWriteText(codexConfig, readFileSync(backupPath, 'utf-8'));
+      }
+      throw e;
+    }
+    results.push({
+      host: 'Codex',
+      category: 'MCP',
+      name: 'config.toml.backup',
+      level: 'PASS',
+      detail: backupPath ? `已创建备份 ${backupPath}` : '首次写入，无需备份',
+      impact: '支持配置写入失败时回滚',
+      requiredByDefault: true,
+    });
   }
 
   return results;
@@ -266,6 +365,8 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
         detail: loaded.backupPath
           ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}`
           : loaded.error,
+        impact: '会导致 Claude Code 无法稳定读取 MCP 配置',
+        requiredByDefault: true,
       });
       continue;
     }
@@ -294,7 +395,24 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
 
     if (changed && !dryRun) {
       root.mcpServers = mcpServers;
-      atomicWriteJson(filePath, root);
+      const backupPath = backupFileIfExists(filePath);
+      try {
+        atomicWriteJson(filePath, root);
+      } catch (e) {
+        if (backupPath && existsSync(backupPath)) {
+          atomicWriteText(filePath, readFileSync(backupPath, 'utf-8'));
+        }
+        throw e;
+      }
+      results.push({
+        host: 'Claude Code',
+        category: 'MCP',
+        name: `${filePath}.backup`,
+        level: 'PASS',
+        detail: backupPath ? `已创建备份 ${backupPath}` : '首次写入，无需备份',
+        impact: '支持配置写入失败时回滚',
+        requiredByDefault: true,
+      });
     }
   }
 
@@ -309,13 +427,20 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
       name,
       level: fixedNames.has(name) ? 'FIXED' : 'PASS',
       detail: fixedNames.has(name) ? '缺失/错误配置已自动修复' : '已配置',
+      role: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)?.role,
+      impact: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)?.impact,
+      requiredByDefault: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)?.requiredByDefault,
     });
   }
 
   return results;
 }
 
-function ensureRequiredSkills(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
+function ensureRequiredSkills(
+  paths: HostPaths,
+  dryRun: boolean,
+  hosts?: readonly HostId[]
+): BootstrapResult[] {
   const results: BootstrapResult[] = [];
   for (const skill of REQUIRED_SKILLS) {
     const source =
@@ -325,13 +450,200 @@ function ensureRequiredSkills(paths: HostPaths, dryRun: boolean): BootstrapResul
         ? join(paths.codexSystemSkillsDir, skill.name)
         : join(paths.codexSkillsDir, skill.name);
 
-    results.push(copySkill(source, codexTarget, 'Codex', skill.name, dryRun));
-    results.push(
-      copySkill(source, join(paths.claudeSkillsDir, skill.name), 'Claude Code', skill.name, dryRun)
-    );
+    if (shouldIncludeHost(hosts, 'codex')) {
+      results.push(copySkill(source, codexTarget, 'Codex', skill.name, dryRun));
+    }
+    if (shouldIncludeHost(hosts, 'claude')) {
+      results.push(
+        copySkill(source, join(paths.claudeSkillsDir, skill.name), 'Claude Code', skill.name, dryRun)
+      );
+    }
   }
 
   return results;
+}
+
+function shouldManageGemini(paths: HostPaths): boolean {
+  return Boolean(
+    process.env.GEMINI_HOME?.trim() ||
+      process.env.GEMINI_CONFIG_DIR?.trim() ||
+      process.env.GEMINI_CLI_HOME?.trim() ||
+      process.env.GEMINI_CLI_CONFIG_DIR?.trim() ||
+      existsSync(paths.geminiHomeDir) ||
+      existsSync(paths.geminiConfigDir)
+  );
+}
+
+function shouldManageCursor(paths: HostPaths): boolean {
+  return Boolean(
+    process.env.CURSOR_HOME?.trim() ||
+      process.env.CURSOR_CONFIG_DIR?.trim() ||
+      process.env.CURSOR_USER_HOME?.trim() ||
+      existsSync(paths.cursorHomeDir) ||
+      existsSync(paths.cursorConfigDir)
+  );
+}
+
+function ensureGeminiMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
+  if (!shouldManageGemini(paths)) return [];
+
+  const filePath = paths.geminiSettingsPath;
+  if (!dryRun) mkdirSync(dirname(filePath), { recursive: true });
+  const loaded = readJsonObject(filePath, { dryRun });
+  if (!loaded.ok) {
+    return [
+      {
+        host: 'Gemini CLI',
+        category: 'MCP',
+        name: filePath,
+        level: 'ERROR',
+        detail: loaded.backupPath ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}` : loaded.error,
+        impact: '会导致 Gemini CLI 无法稳定读取 MCP 配置',
+        requiredByDefault: false,
+      },
+    ];
+  }
+
+  const root = loaded.value;
+  const { mcpServers, normalizedRoot } = resolveHostMcpServers(root, ['mcpServers', 'mcp_servers']);
+  const rootChanged = normalizedRoot !== root;
+
+  let changed = false;
+  const fixedNames = new Set<string>();
+  const warningNames = new Set<string>();
+  for (const entry of REQUIRED_MCP_SERVERS) {
+    const existing = mcpServers[entry.name] as Record<string, unknown> | undefined;
+    const required = entry.claude;
+    const state = classifyJsonMcpEntry(existing, required);
+    if (state === 'missing') {
+      mcpServers[entry.name] = required;
+      changed = true;
+      fixedNames.add(entry.name);
+    } else if (state === 'conflict') {
+      warningNames.add(entry.name);
+    }
+  }
+
+  if (changed && !dryRun) {
+    normalizedRoot.mcpServers = mcpServers;
+    const backupPath = backupFileIfExists(filePath);
+    try {
+      atomicWriteJson(filePath, normalizedRoot);
+    } catch (e) {
+      if (backupPath && existsSync(backupPath)) {
+        atomicWriteText(filePath, readFileSync(backupPath, 'utf-8'));
+      }
+      throw e;
+    }
+  }
+
+  if (rootChanged && !changed && !dryRun) {
+    const backupPath = backupFileIfExists(filePath);
+    try {
+      atomicWriteJson(filePath, normalizedRoot);
+    } catch (e) {
+      if (backupPath && existsSync(backupPath)) {
+        atomicWriteText(filePath, readFileSync(backupPath, 'utf-8'));
+      }
+      throw e;
+    }
+  }
+
+  return REQUIRED_MCP_SERVERS.map((entry) => ({
+    host: 'Gemini CLI' as const,
+    category: 'MCP' as const,
+    name: entry.name,
+    level: fixedNames.has(entry.name) ? 'FIXED' : warningNames.has(entry.name) ? 'WARNING' : 'PASS',
+    detail: fixedNames.has(entry.name)
+      ? '缺失配置已自动补齐'
+      : warningNames.has(entry.name)
+        ? '检测到宿主已有同名自定义配置，已保留现有条目'
+        : '已配置',
+    role: entry.role,
+    impact: entry.impact,
+    requiredByDefault: false,
+  }));
+}
+
+function ensureCursorMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResult[] {
+  if (!shouldManageCursor(paths)) return [];
+
+  const filePath = paths.cursorMcpConfigPath;
+  if (!dryRun) mkdirSync(dirname(filePath), { recursive: true });
+  const loaded = readJsonObject(filePath, { dryRun });
+  if (!loaded.ok) {
+    return [
+      {
+        host: 'Cursor',
+        category: 'MCP',
+        name: filePath,
+        level: 'ERROR',
+        detail: loaded.backupPath ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}` : loaded.error,
+        impact: '会导致 Cursor 无法稳定读取 MCP 配置',
+        requiredByDefault: false,
+      },
+    ];
+  }
+
+  const root = loaded.value;
+  const { mcpServers, normalizedRoot } = resolveHostMcpServers(root, ['mcpServers', 'servers']);
+  const rootChanged = normalizedRoot !== root;
+
+  let changed = false;
+  const fixedNames = new Set<string>();
+  const warningNames = new Set<string>();
+  for (const entry of REQUIRED_MCP_SERVERS) {
+    const existing = mcpServers[entry.name] as Record<string, unknown> | undefined;
+    const required = entry.claude;
+    const state = classifyJsonMcpEntry(existing, required);
+    if (state === 'missing') {
+      mcpServers[entry.name] = required;
+      changed = true;
+      fixedNames.add(entry.name);
+    } else if (state === 'conflict') {
+      warningNames.add(entry.name);
+    }
+  }
+
+  if (changed && !dryRun) {
+    normalizedRoot.mcpServers = mcpServers;
+    const backupPath = backupFileIfExists(filePath);
+    try {
+      atomicWriteJson(filePath, normalizedRoot);
+    } catch (e) {
+      if (backupPath && existsSync(backupPath)) {
+        atomicWriteText(filePath, readFileSync(backupPath, 'utf-8'));
+      }
+      throw e;
+    }
+  }
+
+  if (rootChanged && !changed && !dryRun) {
+    const backupPath = backupFileIfExists(filePath);
+    try {
+      atomicWriteJson(filePath, normalizedRoot);
+    } catch (e) {
+      if (backupPath && existsSync(backupPath)) {
+        atomicWriteText(filePath, readFileSync(backupPath, 'utf-8'));
+      }
+      throw e;
+    }
+  }
+
+  return REQUIRED_MCP_SERVERS.map((entry) => ({
+    host: 'Cursor' as const,
+    category: 'MCP' as const,
+    name: entry.name,
+    level: fixedNames.has(entry.name) ? 'FIXED' : warningNames.has(entry.name) ? 'WARNING' : 'PASS',
+    detail: fixedNames.has(entry.name)
+      ? '缺失配置已自动补齐'
+      : warningNames.has(entry.name)
+        ? '检测到宿主已有同名自定义配置，已保留现有条目'
+        : '已配置',
+    role: entry.role,
+    impact: entry.impact,
+    requiredByDefault: false,
+  }));
 }
 
 function copySkill(
@@ -348,6 +660,8 @@ function copySkill(
       name: skillName,
       level: 'ERROR',
       detail: `未找到技能源目录（${source ?? 'undefined'}）`,
+      impact: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.impact,
+      requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.requiredByDefault,
     };
   }
   if (existsSync(target)) {
@@ -357,6 +671,9 @@ function copySkill(
       name: skillName,
       level: 'PASS',
       detail: '已安装',
+      role: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.role,
+      impact: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.impact,
+      requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.requiredByDefault,
     };
   }
 
@@ -370,6 +687,9 @@ function copySkill(
     name: skillName,
     level: 'FIXED',
     detail: `已从 ${source} 复制安装`,
+    role: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.role,
+    impact: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.impact,
+    requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.requiredByDefault,
   };
 }
 
@@ -431,6 +751,9 @@ function cloneSkillSource(
       name: skill.name,
       level: 'ERROR',
       detail: `克隆失败：${(e as Error).message}`,
+      role: skill.role,
+      impact: skill.impact,
+      requiredByDefault: skill.requiredByDefault,
     });
     return undefined;
   }
@@ -454,6 +777,7 @@ function checkBinary(name: string, probes: readonly BinaryProbeCommand[]): Boots
       name,
       level: 'WARNING',
       detail: '未配置 binary probes，已跳过',
+      impact: '无法验证 MCP 二进制是否可执行',
     };
   }
 
@@ -465,6 +789,7 @@ function checkBinary(name: string, probes: readonly BinaryProbeCommand[]): Boots
       name,
       level: i === 0 ? 'PASS' : 'FIXED',
       detail: i === 0 ? '可执行命令可用' : '回退可执行命令可用',
+      impact: 'MCP 二进制可执行性已验证',
     };
   }
 
@@ -474,6 +799,7 @@ function checkBinary(name: string, probes: readonly BinaryProbeCommand[]): Boots
     name,
     level: 'ERROR',
     detail: '可执行命令检查失败',
+    impact: 'MCP 已配置但运行时可能无法启动',
   };
 }
 
@@ -508,6 +834,34 @@ function readJsonObject(
   }
 }
 
+function resolveHostMcpServers(
+  root: Record<string, unknown>,
+  keys: readonly string[],
+): { mcpServers: Record<string, unknown>; normalizedRoot: Record<string, unknown> } {
+  const collected: Record<string, unknown> = {};
+
+  for (const key of keys) {
+    const value = root[key];
+    if (typeof value !== 'object' || !value || Array.isArray(value)) continue;
+    Object.assign(collected, value as Record<string, unknown>);
+  }
+
+  const normalizedRoot =
+    keys.length > 1 && keys.some((key) => key !== 'mcpServers' && key in root)
+      ? Object.fromEntries(
+          Object.entries({
+            ...root,
+            mcpServers: collected,
+          }).filter(([key]) => !keys.includes(key) || key === 'mcpServers')
+        )
+      : root;
+
+  return {
+    mcpServers: { ...collected },
+    normalizedRoot,
+  };
+}
+
 function backupInvalidJson(
   filePath: string,
   content: string,
@@ -522,6 +876,14 @@ function backupInvalidJson(
 
 function sameStringArray(a: unknown, b: readonly string[]): boolean {
   return Array.isArray(a) && a.length === b.length && a.every((v, index) => v === b[index]);
+}
+
+function classifyJsonMcpEntry(
+  existing: Record<string, unknown> | undefined,
+  _required: McpCommandSpec
+): 'missing' | 'same' | 'conflict' {
+  if (!existing) return 'missing';
+  return 'same';
 }
 
 function runCommand(command: BinaryProbeCommand): void {

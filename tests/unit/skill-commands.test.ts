@@ -10,6 +10,8 @@ const ENV_KEYS = [
   'CLAUDE_COMMANDS_DIR',
   'CLAUDE_SKILLS_DIR',
   'CLAUDE_CODE_CONFIG_DIR',
+  'GEMINI_HOME',
+  'CURSOR_HOME',
   'SPEC_FIRST_GENERIC_SKILLS_DIR',
   'SPEC_FIRST_SKILLS_DIR',
 ];
@@ -25,6 +27,8 @@ beforeEach(() => {
   process.env.CLAUDE_COMMANDS_DIR = join(TMP, 'claude-commands');
   process.env.CLAUDE_SKILLS_DIR = join(TMP, 'claude-skills');
   process.env.CLAUDE_CODE_CONFIG_DIR = join(TMP, 'claude-code-config');
+  process.env.GEMINI_HOME = join(TMP, 'gemini-home');
+  process.env.CURSOR_HOME = join(TMP, 'cursor-home');
   process.env.SPEC_FIRST_GENERIC_SKILLS_DIR = join(TMP, 'generic-skills');
   process.env.SPEC_FIRST_SKILLS_DIR = join(TMP, 'spec-first-skills');
 });
@@ -142,9 +146,29 @@ describe('ensureSkillCommands', () => {
     expect(result.generic.length).toBeGreaterThan(0);
     expect(result.claude).toHaveLength(0);
     expect(result.codex).toHaveLength(0);
+    expect(result.gemini).toHaveLength(0);
+    expect(result.cursor).toHaveLength(0);
 
     const skillName = result.generic[0].split(':')[1];
     const target = join(process.env.SPEC_FIRST_GENERIC_SKILLS_DIR as string, 'spec-first', skillName, 'SKILL.md');
     expect(existsSync(target)).toBe(true);
+  });
+
+  it('should support gemini and cursor host targets', () => {
+    const result = ensureSkillCommands(TMP, { global: true, hosts: ['gemini', 'cursor'] });
+    expect(result.gemini.length).toBeGreaterThan(0);
+    expect(result.cursor.length).toBeGreaterThan(0);
+    expect(result.claude).toHaveLength(0);
+    expect(result.codex).toHaveLength(0);
+    expect(result.generic).toHaveLength(0);
+
+    const geminiSkillName = result.gemini[0].split(':')[1];
+    const cursorSkillName = result.cursor[0].split(':')[1];
+    expect(
+      existsSync(join(process.env.GEMINI_HOME as string, 'skills', 'spec-first', geminiSkillName, 'SKILL.md'))
+    ).toBe(true);
+    expect(
+      existsSync(join(process.env.CURSOR_HOME as string, 'skills', 'spec-first', cursorSkillName, 'SKILL.md'))
+    ).toBe(true);
   });
 });

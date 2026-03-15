@@ -1,11 +1,15 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { ExitCode } from '../../src/shared/types.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-uninstall');
 const CLAUDE_HOME = join(TMP, '.claude');
 const CODEX_SKILLS = join(TMP, '.codex', 'skills');
+const GEMINI_HOME = join(TMP, '.gemini');
+const CURSOR_HOME = join(TMP, '.cursor');
 const SF_SKILLS = join(TMP, '.spec-first', 'skills');
+const CC_SWITCH_SKILLS = join(TMP, '.cc-switch', 'skills');
 const PROJECT = join(TMP, 'project');
 
 vi.mock('../../src/shared/host-paths.js', () => ({
@@ -20,6 +24,12 @@ vi.mock('../../src/shared/host-paths.js', () => ({
       join(TMP, '.config', 'claude-code', 'settings.json'),
     ],
     codexConfigPath: join(TMP, '.codex', 'config.toml'),
+    geminiHomeDir: GEMINI_HOME,
+    geminiSettingsPath: join(GEMINI_HOME, 'settings.json'),
+    cursorHomeDir: CURSOR_HOME,
+    cursorMcpConfigPath: join(CURSOR_HOME, 'mcp.json'),
+    ccSwitchInstalled: true,
+    ccSwitchSkillsDir: CC_SWITCH_SKILLS,
   }),
 }));
 
@@ -37,6 +47,18 @@ function setupFixtures(): void {
   // Codex skills
   mkdirSync(join(CODEX_SKILLS, 'spec-first', 'init'), { recursive: true });
   writeFileSync(join(CODEX_SKILLS, 'spec-first', 'init', 'SKILL.md'), '# init');
+
+  // Gemini skills
+  mkdirSync(join(GEMINI_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
+  writeFileSync(join(GEMINI_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
+
+  // Cursor skills
+  mkdirSync(join(CURSOR_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
+  writeFileSync(join(CURSOR_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
+
+  // CC Switch skills
+  mkdirSync(join(CC_SWITCH_SKILLS, 'spec-first', 'init'), { recursive: true });
+  writeFileSync(join(CC_SWITCH_SKILLS, 'spec-first', 'init', 'SKILL.md'), '# init');
 
   // Global settings with SessionStart hook
   writeFileSync(join(CLAUDE_HOME, 'settings.json'), JSON.stringify({
@@ -91,11 +113,31 @@ describe('handleUninstall', () => {
     expect(code).toBe(0);
   });
 
+  it('should reject --host without a value', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const code = handleUninstall(['--host']);
+    expect(code).toBe(ExitCode.CONFIG_ERROR);
+    expect(errSpy).toHaveBeenCalledWith(
+      'uninstall 失败：参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）'
+    );
+  });
+
+  it('should reject unknown host values', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const code = handleUninstall(['--host', 'gemni']);
+    expect(code).toBe(ExitCode.CONFIG_ERROR);
+    expect(errSpy).toHaveBeenCalledWith(
+      'uninstall 失败：参数错误：未知 host "gemni"，可选值: claude|codex|gemini|cursor|all'
+    );
+  });
+
   it('should not delete files in dry-run mode', () => {
     handleUninstall(['--dry-run']);
     expect(existsSync(join(SF_SKILLS, 'spec-first'))).toBe(true);
     expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
+    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(true);
+    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(true);
   });
 
   it('should remove skills cache directory', () => {
@@ -111,6 +153,55 @@ describe('handleUninstall', () => {
   it('should remove codex skills directory', () => {
     handleUninstall([]);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(false);
+  });
+
+  it('should remove gemini and cursor skills directories', () => {
+    handleUninstall([]);
+    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
+  });
+
+  it('should only remove selected host artifacts when --host gemini,cursor is provided', () => {
+    handleUninstall(['--host', 'gemini,cursor']);
+    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
+    expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
+  });
+
+  it('should keep shared skills cache and cc-switch skills when uninstall is scoped by --host', () => {
+    handleUninstall(['--host', 'gemini,cursor']);
+    expect(existsSync(join(SF_SKILLS, 'spec-first'))).toBe(true);
+    expect(existsSync(join(CC_SWITCH_SKILLS, 'spec-first'))).toBe(true);
+  });
+
+  it('should treat --host all as full uninstall', () => {
+    handleUninstall(['--host', 'all']);
+    expect(existsSync(join(SF_SKILLS, 'spec-first'))).toBe(false);
+    expect(existsSync(join(CC_SWITCH_SKILLS, 'spec-first'))).toBe(false);
+    expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(false);
+    expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(false);
+    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
+  });
+
+  it('should keep claude session hook when selected hosts exclude claude', () => {
+    handleUninstall(['--host', 'gemini,cursor']);
+    const settings = JSON.parse(readFileSync(join(CLAUDE_HOME, 'settings.json'), 'utf-8'));
+    expect(settings.hooks.SessionStart).toHaveLength(7);
+  });
+
+  it('should keep project-local hooks when uninstall is scoped by --host', () => {
+    handleUninstall(['--host', 'gemini,cursor']);
+    const settings = JSON.parse(readFileSync(join(PROJECT, '.claude', 'settings.json'), 'utf-8'));
+    expect(settings.hooks.PreToolUse).toHaveLength(1);
+    expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('npx spec-first gate check');
+  });
+
+  it('should remove claude session hook when selected hosts include claude', () => {
+    handleUninstall(['--host', 'claude']);
+    const settings = JSON.parse(readFileSync(join(CLAUDE_HOME, 'settings.json'), 'utf-8'));
+    expect(settings.hooks.SessionStart).toHaveLength(4);
   });
 
   it('should remove spec-first SessionStart hook but keep others', () => {

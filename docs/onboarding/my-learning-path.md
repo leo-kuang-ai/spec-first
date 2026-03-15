@@ -70,7 +70,7 @@
 
 - **查看进度**: 每步完成后运行 `/spec-first:status` 查看当前状态
 - **恢复上下文**: 中断后运行 `/spec-first:catchup <feature-id>` 快速恢复
-- **切换 Feature**: 运行 `/spec-first:feature-switch` 在多个 Feature 间切换
+- **切换 Feature**: 运行 `/spec-first:feature switch <featureId>` 在多个 Feature 间切换
 
 ---
 

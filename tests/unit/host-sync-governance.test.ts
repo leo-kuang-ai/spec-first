@@ -9,6 +9,8 @@ const ENV_KEYS = [
   'CLAUDE_COMMANDS_DIR',
   'CLAUDE_SKILLS_DIR',
   'CLAUDE_CODE_CONFIG_DIR',
+  'GEMINI_HOME',
+  'CURSOR_HOME',
   'SPEC_FIRST_GENERIC_SKILLS_DIR',
   'SPEC_FIRST_SKILLS_DIR',
 ];
@@ -21,6 +23,8 @@ beforeEach(() => {
   process.env.CLAUDE_COMMANDS_DIR = join(TMP, 'claude-commands');
   process.env.CLAUDE_SKILLS_DIR = join(TMP, 'claude-skills');
   process.env.CLAUDE_CODE_CONFIG_DIR = join(TMP, 'claude-code-config');
+  process.env.GEMINI_HOME = join(TMP, 'gemini-home');
+  process.env.CURSOR_HOME = join(TMP, 'cursor-home');
   process.env.SPEC_FIRST_GENERIC_SKILLS_DIR = join(TMP, 'generic-skills');
   process.env.SPEC_FIRST_SKILLS_DIR = join(TMP, 'spec-first-skills');
 });

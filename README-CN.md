@@ -166,7 +166,9 @@ Skill 是面向 AI 的交互界面。每个 Skill 执行确定性的 P0–P5 协
 ### 宿主集成与自动化
 
 ```bash
-spec-first update          # 将 Skill 同步到 Claude Code (~/.claude/) 和 Codex (~/.codex/)
+spec-first update                # 刷新稳定宿主基线能力（Claude Code + Codex）
+spec-first update --host gemini  # 显式启用 Gemini baseline（experimental）
+spec-first update --host cursor  # 显式启用 Cursor baseline（experimental）
 spec-first hooks status    # 查看 Git Hook 集成状态
 spec-first viewer start    # 启动 Stage Viewer 可视化面板
 spec-first commit          # 结构化提交，自动关联追溯 ID

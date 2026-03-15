@@ -1,6 +1,6 @@
 /**
  * update CLI 命令
- * spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--from-postinstall]
+ * spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>] [--component <set>] [--from-postinstall]
  *
  * 升级后刷新 Skill/MCP/Hooks，合并原 setup --global 功能。
  */
@@ -11,10 +11,21 @@ import { getCliVersion } from '../router.js';
 import { ensureSkillCommands, type SkillHostTarget } from '../../shared/skill-commands.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { detectHostPaths } from '../../shared/host-paths.js';
+import { REQUIRED_MCP_SERVERS, REQUIRED_SKILLS } from '../../config/bootstrap-manifest.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
 import { registerSessionHooks } from '../../core/tool-integration/session-hook.js';
+import {
+  buildInstallPlan,
+  type InstallComponent as UpdateComponent,
+} from '../../core/tool-integration/install-plan.js';
 import { renderDefaultConfigYaml } from '../../shared/config-schema.js';
+import {
+  formatHostUpdateRemediation,
+  formatHostUpdateSummary,
+} from '../../core/host-adapters/format.js';
+import { resolveHostAdapterStatuses } from '../../core/host-adapters/registry.js';
+import type { HostId } from '../../core/tool-integration/tool-types.js';
 import {
   computeTemplateHashes,
   loadHashRegistry,
@@ -34,15 +45,17 @@ export async function handleUpdate(args: string[]): Promise<number> {
   const skipHooks = args.includes('--skip-hooks');
   const fromPostinstall = args.includes('--from-postinstall');
   const quiet = fromPostinstall;
+  const components = parseComponents(args);
 
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('用法: spec-first update [--dry-run] [--skip-mcp] [--skip-hooks]\n');
+    console.log('用法: spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>] [--component <set>]\n');
     console.log('升级后刷新 Skill/MCP/Hooks。\n');
     console.log('选项:');
     console.log('  --dry-run         仅输出将发生的变更，不写文件');
     console.log('  --skip-mcp        跳过 MCP 配置补齐');
     console.log('  --skip-hooks      跳过 Git hooks 刷新');
-    console.log('  --host <target>   仅刷新指定宿主（claude|codex|generic|all，可多次/逗号分隔）');
+    console.log('  --host <target>   仅刷新指定宿主（claude|codex|gemini|cursor|generic|all，可多次/逗号分隔）');
+    console.log('  --component <set> 组件安装计划（skills|mcp|hooks|viewer，可多次/逗号分隔）');
     console.log('  --from-postinstall  静默模式（postinstall 调用）');
     return ExitCode.SUCCESS;
   }
@@ -50,7 +63,7 @@ export async function handleUpdate(args: string[]): Promise<number> {
   const hosts = parseHostTargets(args);
 
   try {
-    return await runUpdate({ dryRun, skipMcp, skipHooks, quiet, hosts });
+    return await runUpdate({ dryRun, skipMcp, skipHooks, quiet, hosts, components });
   } catch (err) {
     if (fromPostinstall) return ExitCode.SUCCESS;
     const msg = err instanceof Error ? err.message : String(err);
@@ -65,6 +78,7 @@ interface UpdateOptions {
   skipHooks: boolean;
   quiet: boolean;
   hosts?: SkillHostTarget[];
+  components?: UpdateComponent[];
 }
 
 async function runUpdate({
@@ -73,6 +87,7 @@ async function runUpdate({
   skipHooks,
   quiet,
   hosts,
+  components,
 }: UpdateOptions): Promise<number> {
   const cwd = process.cwd();
   const log = quiet ? () => {} : console.log.bind(console);
@@ -94,7 +109,7 @@ async function runUpdate({
   checkAndExecuteManifests({ cwd, dryRun, log, prefix });
 
   // 4-8. 宿主集成刷新（Skills/MCP/Hooks）
-  refreshHostIntegrations({ cwd, dryRun, skipMcp, skipHooks, hosts, log, prefix });
+  refreshHostIntegrations({ cwd, dryRun, skipMcp, skipHooks, hosts, components, log, prefix });
 
   // 9. 摘要
   if (dryRun) {
@@ -111,6 +126,7 @@ function refreshHostIntegrations({
   skipMcp,
   skipHooks,
   hosts,
+  components,
   log,
   prefix,
 }: {
@@ -119,16 +135,28 @@ function refreshHostIntegrations({
   skipMcp: boolean;
   skipHooks: boolean;
   hosts?: SkillHostTarget[];
+  components?: UpdateComponent[];
   log: (...args: unknown[]) => void;
   prefix: string;
 }): void {
   // Skills 同步
   const hostPaths = detectHostPaths();
+  const installPlan = buildInstallPlan(components);
   const skills = ensureSkillCommands(cwd, { global: true, dryRun, hosts });
+  const selectedHostIds = normalizeHostIds(hosts);
+  const shouldApplyClaudeHome = shouldApplyClaudeHomeAction(selectedHostIds);
   const genericCount = skills.generic?.length ?? 0;
+  const geminiCount = skills.gemini?.length ?? 0;
+  const cursorCount = skills.cursor?.length ?? 0;
+  log(`${prefix}Component Plan:`);
+  log(`  baseline=${installPlan.baseline.join(', ')}`);
+  log(`  optional=${installPlan.optional.length > 0 ? installPlan.optional.join(', ') : '(none)'}`);
+  log(`${prefix}Skills:`);
+  log(`  external-required: ${REQUIRED_SKILLS.length} baseline`);
   log(
-    `${prefix}Skill: ${skills.claude.length} claude, ${skills.codex.length} codex, ${genericCount} generic → ${hostPaths.specFirstSkillsDir}`
+    `  spec-first-builtins: claude=${skills.claude.length}, codex=${skills.codex.length}, gemini=${geminiCount}, cursor=${cursorCount}, generic=${genericCount}`
   );
+  log(`  sync-root: ${hostPaths.specFirstSkillsDir}`);
   if (skills.codexWarnings.length > 0) {
     log(`  ⚠ Codex skill 验证失败 (${skills.codexWarnings.length}):`);
     for (const w of skills.codexWarnings) log(`    - ${w}`);
@@ -137,31 +165,79 @@ function refreshHostIntegrations({
   // MCP 配置补齐
   if (!skipMcp) {
     // update 仅做“存在性检查 + 缺失补齐”，不做二进制探测（避免 npx/uvx 网络阻塞）
-    const mcp = ensureHostBootstrap({ dryRun, checkBinaries: false });
-    const fixed = mcp.results.filter((r) => r.level === 'FIXED').length;
-    const errors = mcp.results.filter((r) => r.level === 'ERROR').length;
-    log(`${prefix}MCP: ${mcp.results.length} checked, ${fixed} fixed, ${errors} errors`);
+    const mcp = ensureHostBootstrap({ dryRun, hosts: selectedHostIds, checkBinaries: false });
+    const requiredMcpNames = new Set(REQUIRED_MCP_SERVERS.map((entry) => entry.name));
+    const mcpEntries = mcp.results.filter(
+      (r) => r.category === 'MCP' && r.host !== 'Common' && requiredMcpNames.has(r.name)
+    );
+    const skillEntries = mcp.results.filter((r) => r.category === 'Skill');
+    const fixed = mcpEntries.filter((r) => r.level === 'FIXED').length;
+    const warnings = mcpEntries.filter((r) => r.level === 'WARNING').length;
+    const errors = mcpEntries.filter((r) => r.level === 'ERROR').length;
+    const skillFixed = skillEntries.filter((r) => r.level === 'FIXED').length;
+    const skillWarnings = skillEntries.filter((r) => r.level === 'WARNING').length;
+    const skillErrors = skillEntries.filter((r) => r.level === 'ERROR').length;
+    const mcpHostCount = new Set(
+      mcpEntries
+        .map((entry) => entry.host)
+        .filter((host) => host !== 'Common')
+    ).size;
+    log(`${prefix}Baseline Bootstrap:`);
+    log(
+      `  skills: ${skillEntries.length} checked, ${skillFixed} fixed, ${skillWarnings} warnings, ${skillErrors} errors`
+    );
+    log(
+      `  mcp: ${mcpEntries.length}/${REQUIRED_MCP_SERVERS.length * mcpHostCount} host entries checked, ${fixed} fixed, ${warnings} warnings, ${errors} errors`
+    );
   } else {
     log(`${prefix}MCP: skipped`);
   }
 
+  log(`${prefix}Hosts:`);
+  for (const status of resolveHostAdapterStatuses(selectedHostIds)) {
+    log(`  ${formatHostUpdateSummary(status)}`);
+    const remediation = formatHostUpdateRemediation(status);
+    if (remediation) {
+      log(`    -> ${remediation}`);
+    }
+  }
+
+  const shouldRunHooks = !skipHooks && installPlan.optional.includes('hooks');
+  const shouldRunViewer = installPlan.optional.includes('viewer');
+
   // Git hooks
-  if (!skipHooks && existsSync('.git')) {
+  if (shouldRunHooks && existsSync(join(cwd, '.git'))) {
     const hooks = installHooks(cwd, { dryRun });
     log(`${prefix}Git Hooks: ${hooks.length} installed`);
   } else {
-    log(`${prefix}Git Hooks: skipped${!skipHooks ? '（非 Git 仓库）' : ''}`);
+    log(`${prefix}Git Hooks: skipped${shouldRunHooks ? '（非 Git 仓库）' : '（组件未启用）'}`);
   }
 
   // AI Runtime Hooks
-  const ai = registerAIHooks(cwd, { dryRun });
-  log(`${prefix}AI Hooks: ${ai.registered.length} registered`);
-  for (const w of ai.warnings) log(`  ⚠ ${w}`);
+  if (shouldRunHooks) {
+    const ai = registerAIHooks(cwd, { dryRun });
+    log(`${prefix}AI Hooks: ${ai.registered.length} registered`);
+    for (const w of ai.warnings) log(`  ⚠ ${w}`);
+  } else {
+    log(`${prefix}AI Hooks: skipped（组件未启用）`);
+  }
 
   // SessionStart Hook
-  const session = registerSessionHooks({ dryRun });
-  log(`${prefix}Session Hook: ${session.registered.length} registered`);
-  for (const w of session.warnings) log(`  ⚠ ${w}`);
+  if (shouldRunViewer && shouldApplyClaudeHome) {
+    const session = registerSessionHooks({ dryRun });
+    log(`${prefix}Session Hook: ${session.registered.length} registered`);
+    for (const w of session.warnings) log(`  ⚠ ${w}`);
+  } else if (shouldRunViewer) {
+    log(`${prefix}Session Hook: skipped（当前宿主集合不包含 claude）`);
+  } else {
+    log(`${prefix}Session Hook: skipped（组件未启用）`);
+  }
+
+  if (shouldRunViewer && shouldApplyClaudeHome) {
+    log(`${prefix}Viewer: managed via viewer command, no additional install step`);
+  } else if (shouldRunViewer) {
+    log(`${prefix}Viewer: skipped（当前宿主集合不包含 claude）`);
+  }
 }
 
 // ─── 模板变更检测（T1 集成）────────────────────────────────
@@ -341,7 +417,30 @@ async function checkForUpdates(): Promise<void> {
   }
 }
 
-const HOST_TARGETS = new Set<SkillHostTarget>(['claude', 'codex', 'generic', 'all']);
+const HOST_TARGETS = new Set<SkillHostTarget>(['claude', 'codex', 'gemini', 'cursor', 'generic', 'all']);
+const COMPONENT_TARGETS = new Set<UpdateComponent>(['skills', 'mcp', 'hooks', 'viewer']);
+
+function normalizeHostIds(hosts?: SkillHostTarget[]): HostId[] | undefined {
+  if (!hosts || hosts.length === 0) return undefined;
+  const resolved = new Set<HostId>();
+  for (const host of hosts) {
+    if (host === 'all') {
+      resolved.add('claude');
+      resolved.add('codex');
+      resolved.add('gemini');
+      resolved.add('cursor');
+      resolved.add('generic');
+      continue;
+    }
+    resolved.add(host);
+  }
+  return [...resolved];
+}
+
+function shouldApplyClaudeHomeAction(hosts?: HostId[]): boolean {
+  if (!hosts || hosts.length === 0) return true;
+  return hosts.includes('claude');
+}
 
 function parseHostTargets(args: string[]): SkillHostTarget[] | undefined {
   const values: SkillHostTarget[] = [];
@@ -349,7 +448,7 @@ function parseHostTargets(args: string[]): SkillHostTarget[] | undefined {
     if (args[i] !== '--host') continue;
     const raw = args[i + 1];
     if (!raw || raw.startsWith('--')) {
-      throw new Error('参数错误：--host 需要一个目标值（claude|codex|generic|all）');
+      throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|generic|all）');
     }
     i += 1;
     const targets = raw
@@ -358,9 +457,32 @@ function parseHostTargets(args: string[]): SkillHostTarget[] | undefined {
       .filter(Boolean);
     for (const target of targets) {
       if (!HOST_TARGETS.has(target as SkillHostTarget)) {
-        throw new Error(`参数错误：未知 host "${target}"，可选值: claude|codex|generic|all`);
+        throw new Error(`参数错误：未知 host "${target}"，可选值: claude|codex|gemini|cursor|generic|all`);
       }
       values.push(target as SkillHostTarget);
+    }
+  }
+  return values.length > 0 ? values : undefined;
+}
+
+function parseComponents(args: string[]): UpdateComponent[] | undefined {
+  const values: UpdateComponent[] = [];
+  for (let i = 0; i < args.length; i += 1) {
+    if (args[i] !== '--component') continue;
+    const raw = args[i + 1];
+    if (!raw || raw.startsWith('--')) {
+      throw new Error('参数错误：--component 需要一个目标值（skills|mcp|hooks|viewer）');
+    }
+    i += 1;
+    const targets = raw
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+    for (const target of targets) {
+      if (!COMPONENT_TARGETS.has(target as UpdateComponent)) {
+        throw new Error(`参数错误：未知 component "${target}"，可选值: skills|mcp|hooks|viewer`);
+      }
+      values.push(target as UpdateComponent);
     }
   }
   return values.length > 0 ? values : undefined;

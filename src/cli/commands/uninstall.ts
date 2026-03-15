@@ -1,6 +1,6 @@
 /**
  * uninstall CLI 命令
- * spec-first uninstall [--dry-run] [--keep-mcp]
+ * spec-first uninstall [--dry-run] [--keep-mcp] [--host <target>]
  *
  * 清理 spec-first 注册的全部宿主配置（Skills/Hooks/命令入口）。
  * 用于卸载前或手动清理场景。
@@ -11,14 +11,16 @@ import { ExitCode } from '../../shared/types.js';
 import { detectHostPaths } from '../../shared/host-paths.js';
 import { uninstallHooks } from '../../core/tool-integration/hook-installer.js';
 import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
+import type { HostId } from '../../core/tool-integration/tool-types.js';
 
 export function handleUninstall(args: string[]): number {
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('用法: spec-first uninstall [--dry-run] [--keep-mcp]\n');
+    console.log('用法: spec-first uninstall [--dry-run] [--keep-mcp] [--host <target>]\n');
     console.log('清理 spec-first 注册的全部宿主配置。\n');
     console.log('选项:');
     console.log('  --dry-run     仅输出将清理的内容，不执行删除');
     console.log('  --keep-mcp    保留 MCP 配置（sequential-thinking 等为通用服务）');
+    console.log('  --host <target> 仅清理指定宿主（claude|codex|gemini|cursor|all，可多次/逗号分隔）');
     return ExitCode.SUCCESS;
   }
 
@@ -26,10 +28,14 @@ export function handleUninstall(args: string[]): number {
   const keepMcp = args.includes('--keep-mcp');
 
   try {
-    return runUninstall({ dryRun, keepMcp });
+    const { hosts, fullUninstall } = parseHostTargets(args);
+    return runUninstall({ dryRun, keepMcp, hosts, fullUninstall });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(`uninstall 失败：${msg}`);
+    if (msg.startsWith('参数错误：')) {
+      return ExitCode.CONFIG_ERROR;
+    }
     return ExitCode.UNKNOWN_ERROR;
   }
 }
@@ -37,6 +43,8 @@ export function handleUninstall(args: string[]): number {
 interface UninstallOptions {
   dryRun: boolean;
   keepMcp: boolean;
+  hosts?: HostId[];
+  fullUninstall: boolean;
 }
 
 interface HookCommand {
@@ -47,37 +55,23 @@ interface HookEntry {
   hooks?: HookCommand[];
 }
 
-function runUninstall({ dryRun, keepMcp }: UninstallOptions): number {
+function runUninstall({ dryRun, keepMcp, hosts, fullUninstall }: UninstallOptions): number {
   const cwd = process.cwd();
   const prefix = dryRun ? '[dry-run] ' : '';
   const paths = detectHostPaths();
+  const scopedHosts = fullUninstall ? undefined : hosts;
 
   console.log('spec-first uninstall — 清理宿主配置\n');
 
-  // 1. 清理全局 Skills 缓存
-  removeDir(`${prefix}Skills 缓存`, join(paths.specFirstSkillsDir, 'spec-first'), dryRun);
-
-  // 2. 清理 Claude 命令入口
-  removeDir(`${prefix}Claude 命令`, join(paths.claudeCommandsDir, 'spec-first'), dryRun);
-
-  // 3. 清理 Codex skills
-  removeDir(`${prefix}Codex skills`, join(paths.codexSkillsDir, 'spec-first'), dryRun);
-
-  // 4. 清理 CC Switch skills
-  if (paths.ccSwitchInstalled) {
-    removeDir(`${prefix}CC Switch skills`, join(paths.ccSwitchSkillsDir, 'spec-first'), dryRun);
+  removeHostUserArtifacts(paths, dryRun, prefix, scopedHosts);
+  removeClaudeHomeArtifacts(paths.claudeHomeDir, dryRun, prefix, scopedHosts);
+  if (scopedHosts && scopedHosts.length > 0) {
+    console.log(`${prefix}Project-local Hooks: 检测到 --host 定向卸载，已跳过`);
+  } else {
+    removeProjectLocalArtifacts(cwd, dryRun, prefix);
   }
 
-  // 5. 清理全局 SessionStart Hook
-  removeSessionHook(paths.claudeHomeDir, dryRun, prefix);
-
-  // 6. 清理项目 AI Runtime Hooks
-  removeAIHooks(cwd, dryRun, prefix);
-
-  // 7. 清理 Git hooks
-  removeGitHooks(cwd, dryRun, prefix);
-
-  // 8. MCP 配置提示
+  // 9. MCP 配置提示
   if (keepMcp) {
     console.log(`${prefix}MCP 配置: 已保留（--keep-mcp）`);
   } else {
@@ -89,6 +83,8 @@ function runUninstall({ dryRun, keepMcp }: UninstallOptions): number {
       console.log(`    ${f}`);
     }
     console.log(`    ${paths.codexConfigPath}`);
+    console.log(`    ${paths.geminiSettingsPath}`);
+    console.log(`    ${paths.cursorMcpConfigPath}`);
   }
 
   console.log('');
@@ -103,6 +99,63 @@ function runUninstall({ dryRun, keepMcp }: UninstallOptions): number {
   return ExitCode.SUCCESS;
 }
 
+function removeHostUserArtifacts(
+  paths: ReturnType<typeof detectHostPaths>,
+  dryRun: boolean,
+  prefix: string,
+  hosts?: HostId[]
+): void {
+  if (!hosts || hosts.length === 0) {
+    removeDir(`${prefix}Skills 缓存`, join(paths.specFirstSkillsDir, 'spec-first'), dryRun);
+  } else {
+    console.log(`${prefix}Skills 缓存: 检测到 --host 定向卸载，已跳过`);
+  }
+  if (shouldIncludeHost(hosts, 'claude')) {
+    removeDir(`${prefix}Claude 命令`, join(paths.claudeCommandsDir, 'spec-first'), dryRun);
+  } else {
+    console.log(`${prefix}Claude 命令: 当前宿主集合不包含 claude，跳过`);
+  }
+  if (shouldIncludeHost(hosts, 'codex')) {
+    removeDir(`${prefix}Codex skills`, join(paths.codexSkillsDir, 'spec-first'), dryRun);
+  } else {
+    console.log(`${prefix}Codex skills: 当前宿主集合不包含 codex，跳过`);
+  }
+  if (shouldIncludeHost(hosts, 'gemini')) {
+    removeDir(`${prefix}Gemini skills`, join(paths.geminiHomeDir, 'skills', 'spec-first'), dryRun);
+  } else {
+    console.log(`${prefix}Gemini skills: 当前宿主集合不包含 gemini，跳过`);
+  }
+  if (shouldIncludeHost(hosts, 'cursor')) {
+    removeDir(`${prefix}Cursor skills`, join(paths.cursorHomeDir, 'skills', 'spec-first'), dryRun);
+  } else {
+    console.log(`${prefix}Cursor skills: 当前宿主集合不包含 cursor，跳过`);
+  }
+
+  if (paths.ccSwitchInstalled && (!hosts || hosts.length === 0)) {
+    removeDir(`${prefix}CC Switch skills`, join(paths.ccSwitchSkillsDir, 'spec-first'), dryRun);
+  } else if (paths.ccSwitchInstalled) {
+    console.log(`${prefix}CC Switch skills: 检测到 --host 定向卸载，已跳过`);
+  }
+}
+
+function removeClaudeHomeArtifacts(
+  claudeHomeDir: string,
+  dryRun: boolean,
+  prefix: string,
+  hosts?: HostId[]
+): void {
+  if (!shouldIncludeHost(hosts, 'claude')) {
+    console.log(`${prefix}SessionStart Hook: 当前宿主集合不包含 claude，跳过`);
+    return;
+  }
+  removeSessionHook(claudeHomeDir, dryRun, prefix);
+}
+
+function removeProjectLocalArtifacts(projectRoot: string, dryRun: boolean, prefix: string): void {
+  removeAIHooks(projectRoot, dryRun, prefix);
+  removeGitHooks(projectRoot, dryRun, prefix);
+}
+
 /** 删除目录（如存在） */
 function removeDir(label: string, dirPath: string, dryRun: boolean): void {
   if (!existsSync(dirPath)) {
@@ -111,8 +164,10 @@ function removeDir(label: string, dirPath: string, dryRun: boolean): void {
   }
   if (!dryRun) {
     rmSync(dirPath, { recursive: true, force: true });
+    console.log(`${label}: ${dirPath} — 已清理`);
+    return;
   }
-  console.log(`${label}: ${dirPath} — 已清理`);
+  console.log(`${label}: ${dirPath} — 将清理`);
 }
 
 /** 从 ~/.claude/settings.json 移除 spec-first SessionStart 条目 */
@@ -244,4 +299,37 @@ function removeGitHooks(projectRoot: string, dryRun: boolean, prefix: string): v
   } else {
     console.log(`${prefix}Git Hooks: 无 spec-first hook，跳过`);
   }
+}
+
+function parseHostTargets(args: string[]): { hosts?: HostId[]; fullUninstall: boolean } {
+  const values: HostId[] = [];
+  let hostFlagSeen = false;
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] !== '--host') continue;
+    hostFlagSeen = true;
+    const raw = args[i + 1];
+    if (!raw || raw.startsWith('--')) {
+      throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）');
+    }
+    i += 1;
+    for (const part of raw.split(',').map((item) => item.trim()).filter(Boolean)) {
+      if (part === 'all') {
+        return { fullUninstall: true };
+      }
+      if (part !== 'claude' && part !== 'codex' && part !== 'gemini' && part !== 'cursor') {
+        throw new Error(`参数错误：未知 host "${part}"，可选值: claude|codex|gemini|cursor|all`);
+      }
+      values.push(part);
+    }
+  }
+
+  if (!hostFlagSeen) return { fullUninstall: true };
+  if (values.length === 0) {
+    throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）');
+  }
+  return { hosts: [...new Set(values)], fullUninstall: false };
+}
+
+function shouldIncludeHost(hosts: readonly HostId[] | undefined, host: HostId): boolean {
+  return !hosts || hosts.length === 0 || hosts.includes(host);
 }
