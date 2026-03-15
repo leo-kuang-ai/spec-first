@@ -87,7 +87,7 @@ function handleCheck(args: string[]): number {
       const warnings = result.conditions.filter(
         (c) => c.status === 'FAIL' && c.blocking === false
       );
-      const targets = getStageMetricTargets(result.stage as any, cwd);
+      const targets = getStageMetricTargets(result.stage, cwd);
       const metricTargets: Record<string, number> = {};
       for (const t of targets) {
         metricTargets[t.key] = t.target;

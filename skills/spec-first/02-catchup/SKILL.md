@@ -142,6 +142,19 @@ I'm using the catchup skill to restore context for [Feature].
 
 ---
 
+## 3.5️⃣ TDD 证据快照
+
+| Task ID | RED | WAIVER | GREEN | 结论 |
+|---------|-----|--------|-------|------|
+| {task_id} | ✅/❌ | ✅/❌ | ✅/❌ | {required / waived / gap} |
+
+说明：
+- 只基于 `findings.md` 中的 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 标记恢复
+- 如果只有 GREEN 没有 RED/WAIVER，应标记为流程缺口
+- 如果 WAIVER 存在但无替代验证说明，应标记为审查风险
+
+---
+
 ## 4️⃣ 缺失文件检查
 
 | 文件 | 状态 | 说明 |
@@ -160,6 +173,13 @@ I'm using the catchup skill to restore context for [Feature].
 
 ### 🟡 中风险 ({count})
 {medium_risk_items}
+
+TDD 风险至少检查：
+
+- 进行中 TASK 缺少 `[TDD-RED]` / `[TDD-WAIVER]`
+- 已完成 TASK 缺少 `[TDD-GREEN]`
+- 只有 GREEN，没有对应 RED/WAIVER
+- WAIVER 没有替代验证
 
 ---
 
@@ -237,6 +257,14 @@ Owner: {owner}
 ✅ 无阻塞，可继续工作
 ```
 
+如果阻塞与 TDD 相关，应明确回答：
+```
+阻塞类型: TDD evidence gap
+描述: TASK-XXX 缺少 RED 或 WAIVER
+影响: 不应继续新增生产代码
+解除方案: 在 findings.md 补齐 [TDD-RED] 或 [TDD-WAIVER]
+```
+
 ### Q5: 下一步最小可执行命令是什么？
 
 **回答格式**:
@@ -268,10 +296,11 @@ Owner: {owner}
 2. 读取 stage-state.json → 获取阶段信息
 3. 读取 task_plan.md → 获取任务进度
 4. 读取 findings.md → 获取最近发现
-5. 检查文件完整性 → 识别缺失文件
-6. 识别风险 → 标记阻塞项
-7. 生成恢复报告 → 回答 5-Question
-8. 建议下一步 → 提供可执行命令
+5. 扫描 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` → 恢复 TDD 证据状态
+6. 检查文件完整性 → 识别缺失文件
+7. 识别风险 → 标记阻塞项
+8. 生成恢复报告 → 回答 5-Question
+9. 建议下一步 → 提供可执行命令
 ```
 
 ## 信息缺口处理
@@ -389,11 +418,11 @@ digraph catchup_flow {
 
 - **P0**: 从 `.spec-first/current` 定位当前 Feature
 - **P1**: 加载 `stage-state.json`、`task_plan.md`、`findings.md`
-- **P2**: 检查文件完整性，识别缺失文件
-- **P3**: 生成 6 步恢复报告（Feature 信息、任务进度、最近发现、缺失文件、风险、建议）
-- **P4**: 执行 5-Question Reboot Test，验证恢复质量
-- **P5**: 标记信息缺口，提供补齐方案
-- **P6**: 将恢复结果追加到 findings.md
+- **P2**: 扫描 TDD 标记并识别证据缺口
+- **P3**: 检查文件完整性，识别缺失文件
+- **P4**: 生成 6 步恢复报告（Feature 信息、任务进度、最近发现、缺失文件、风险、建议）
+- **P5**: 执行 5-Question Reboot Test，验证恢复质量
+- **P6**: 标记信息缺口，提供补齐方案，并将恢复结果追加到 findings.md
 
 ## CLI 依赖
 

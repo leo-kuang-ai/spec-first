@@ -457,7 +457,7 @@ WAVE 1 (parallel)    WAVE 2 (parallel)    WAVE 3
 | Claude Code | ✅ | ✅ | ✅ | ✅ |
 | OpenCode | ✅ | ✅ | ✅ | ❌ |
 | Gemini CLI | ✅ | ✅ | ✅ | ❌ |
-| Codex | ✅ | ✅ | ❌ | ✅ |
+| Codex | ✅ | ✅ | ❌ | ❌ |
 | Cursor | ❌ | ✅ | ✅ | ❌ |
 | VS Code Copilot | ❌ | ❌ | ✅ | ❌ |
 
@@ -781,7 +781,7 @@ timeout-supervisor  metrics-engine      process-engine
 **从 GSD-2 借鉴** (4 项):
 1. ✅ Auto Mode 状态机 (P0)
 2. ✅ 三层超时监督 (P1)
-3. ✅ Git 自动化 (P0)
+3. ✅ Git 自动化 (P2)
 4. ✅ Worktree 管理 (P2)
 
 **从 Get-Shit-Done 借鉴** (4 项):
@@ -854,6 +854,9 @@ timeout-supervisor  metrics-engine      process-engine
 ---
 
 ## 附录：项目路径说明
+
+> **配套实施计划**：`2026-03-15-spec-first-gap-closure.md`（同目录）
+> 覆盖 14 个任务（T1–T14），对应本报告六大低分短板的补齐方案，采用 TDD 五步骤实施，含验收指标与完成判定标准。
 
 本报告的源码核验基于以下本地项目路径：
 

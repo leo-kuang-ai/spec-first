@@ -266,6 +266,29 @@ Subagent 可写：
 - 单 TASK 执行前再次检查 RED / WAIVER
 - 成功后必须形成 GREEN 证据或等价测试通过记录
 
+执行时还必须遵守以下解释规则：
+
+- TDD 强制优先按**变更类型**判定，不按端类型一刀切
+- `business_logic / orchestration / shared_domain` 默认 `required`
+- `style_copy_only / doc_only` 可 `waived`
+- `config_only / external_integration / infra_wiring` 默认 `conditional_waiver`
+- `conditional_waiver` 必须写替代验证，不得只写一句“无法测试”
+
+推荐执行顺序：
+
+1. 解析 TASK 的主要变更类型
+2. 映射到 `required / conditional_waiver / waived`
+3. 在 `findings.md` 写入 `[TDD-RED]` 或 `[TDD-WAIVER]`
+4. 仅在证据存在后开始写生产代码
+5. 完成后补 `[TDD-GREEN]`
+
+禁止合理化：
+
+- 先写代码，后补 RED
+- 用全量绿替代 RED
+- 把样式、配置、外部接线之外的逻辑改动一律归类成 WAIVER
+- 把“改动很小 / 时间不够 / 页面不好测”当成 WAIVER 理由
+
 ## Traces 规则
 
 尾注格式见 [traces-trailer.md](./references/traces-trailer.md)。

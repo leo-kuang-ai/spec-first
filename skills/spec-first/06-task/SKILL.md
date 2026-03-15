@@ -127,6 +127,8 @@ I'm using the task skill to break down [Feature] into executable tasks.
 | 读取参考 | Read `docs/api-spec.md` section 3 | 5-15 分钟 |
 | 编写代码 | Implement `login()` function | 15-30 分钟 |
 | 运行测试 | `pnpm vitest run tests/unit/auth.test.ts` | 2-5 分钟 |
+| 本地验证 | `curl http://localhost:3000/api/login` | 2-5 分钟 |
+| 提交代码 | git commit | 2-5 分钟 |
 | 更新矩阵 | Sync `traceability-matrix.md` | 2-5 分钟 |
 | 记录结论 | Update `findings.md` with next step | 2-5 分钟 |
 

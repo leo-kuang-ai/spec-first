@@ -46,7 +46,7 @@
 | T8 | P1 | 引入 Wave 并行调度 | Get-Shit-Done | 未开始 | dependency → waves |
 | T9 | P1 | 增强 Knowledge Capture | Trellis | 未开始 | session record / archive knowledge |
 | T10 | P1 | 增加安全审计清单与报告模板 | code-audit | 未开始 | checklist + report template |
-| T11 | P2 | 扩展多运行时适配层 | Gentle-AI | 未开始 | OpenCode / Gemini / Cursor |
+| T11 | P2 | 扩展多运行时适配层 | Gentle-AI | 进行中 | 参考方案已输出；目标 OpenCode / Gemini / Cursor |
 | T12 | P2 | 浏览器工具集成 | GSD-2 | 未开始 | Playwright / MCP |
 | T13 | P2 | 引入 Constitution 与 Delta Spec 能力 | Spec Kit + OpenSpec | 未开始 | hierarchy + ADDED/MODIFIED/REMOVED |
 | T14 | P2 | 接入专家角色库与 Orchestrator 协作模板 | agency-agents | 未开始 | expert profiles + orchestration |
@@ -466,42 +466,66 @@ git commit -m "feat: add security audit checklist and report template"
 
 ### Task 11: 扩展多运行时适配层
 
+**进展更新（2026-03-15）**
+
+- 已输出专题参考方案：
+  - `docs/01-需求文档/优势借鉴分析/10-多运行时/Spec-First多运行时参考方案-2026-03-15.md`
+- 已对齐正式设计：
+  - `docs/01-需求文档/优势借鉴分析/11-综合升级/Host-Adapter-设计文档.md`
+- 当前阶段完成的是“方案收敛”，尚未进入代码实现
+- 推荐拆分为：
+  - `T11-A`：抽象现有 `Claude + Codex`
+  - `T11-B`：新增 `OpenCode` 验证第三宿主
+
 **Files:**
-- Create: `src/core/agents/adapter.ts`
-- Create: `src/core/agents/opencode-adapter.ts`
-- Create: `src/core/agents/gemini-adapter.ts`
-- Create: `src/core/agents/cursor-adapter.ts`
-- Modify: `src/cli/commands/setup.ts`
-- Test: `tests/core/agents/adapter.test.ts`
+- Create: `src/core/host-adapters/types.ts`
+- Create: `src/core/host-adapters/registry.ts`
+- Create: `src/core/host-adapters/base-adapter.ts`
+- Create: `src/core/host-adapters/claude-adapter.ts`
+- Create: `src/core/host-adapters/codex-adapter.ts`
+- Create: `src/core/host-adapters/opencode-adapter.ts`
+- Create: `src/core/host-adapters/gemini-adapter.ts`
+- Create: `src/core/host-adapters/cursor-adapter.ts`
+- Create: `src/core/host-adapters/mutation-plan.ts`
+- Create: `src/core/host-adapters/mutation-executor.ts`
+- Create: `src/core/host-adapters/validation.ts`
+- Modify: `src/cli/commands/update.ts`
+- Modify: `src/cli/commands/doctor.ts`
+- Modify: `src/cli/commands/init.ts`
+- Modify: `src/postinstall.ts`
+- Test: `tests/core/host-adapters/registry.test.ts`
+- Test: `tests/core/host-adapters/claude-codex-adapter.test.ts`
 
 **Step 1: Write the failing tests**
 
-- 检测不同 agent 是否已安装。
-- 检测 agent 是否支持 skills/MCP。
-- setup 可按 agent 生成对应配置。
+- 检测不同 host 是否已安装。
+- 检测 host capability（skills / mcp / hooks / session hook）。
+- `update / doctor` 可通过 registry + adapter 生成对应 mutation / 校验结果。
 
 **Step 2: Run test to verify it fails**
 
-Run: `pnpm test -- agents adapter`
+Run: `pnpm test -- host-adapters`
 
 Expected: FAIL
 
 **Step 3: Write minimal implementation**
 
 - 抽象公共 capability。
-- 每个 adapter 只做检测和配置模板，不把执行层耦合进去。
+- 先实现 `ClaudeAdapter` 与 `CodexAdapter`。
+- 每个 adapter 只做检测、路径解析、mutation plan、校验输出，不把执行层耦合进去。
+- `OpenCode` 留在第二阶段，不与第一阶段混做。
 
 **Step 4: Run test to verify it passes**
 
-Run: `pnpm test -- agents adapter`
+Run: `pnpm test -- host-adapters`
 
 Expected: PASS
 
 **Step 5: Commit**
 
 ```bash
-git add src/core/agents src/cli/commands/setup.ts tests/core/agents/adapter.test.ts
-git commit -m "feat: add multi-runtime agent adapters"
+git add src/core/host-adapters src/cli/commands/update.ts src/cli/commands/doctor.ts src/cli/commands/init.ts src/postinstall.ts tests/core/host-adapters
+git commit -m "feat: add host adapter layer for multi-runtime support"
 ```
 
 ### Task 12: 浏览器工具集成

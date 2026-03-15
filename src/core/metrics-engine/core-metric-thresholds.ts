@@ -14,6 +14,7 @@ export interface MetricTargetDef {
 
 /** 核心指标集合 */
 export const CORE_METRICS = ['C3', 'C4', 'C6', 'C8', 'C9'] as const;
+const CORE_METRIC_SET: ReadonlySet<string> = new Set(CORE_METRICS);
 
 function resolveConfiguredThreshold(
   projectRoot: string | undefined,
@@ -61,7 +62,7 @@ export function getStageMetricTargets(stage: Stage, projectRoot?: string): Metri
 
 /** 判断是否为核心指标 */
 export function isCoreMetric(key: string): key is 'C3' | 'C4' | 'C6' | 'C8' | 'C9' {
-  return CORE_METRICS.includes(key as any);
+  return CORE_METRIC_SET.has(key);
 }
 
 /** 获取所有核心指标的展示定义（用于全量展示，不含 target） */
