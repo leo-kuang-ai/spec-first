@@ -14,6 +14,23 @@ describe('tool registry', () => {
     expect(result.primary).toEqual(['fetch', 'context7']);
   });
 
+  it('should select tools per host and scenario compatibility', () => {
+    expect(selectToolsForScenario('generic', 'code-analysis')).toEqual({
+      primary: [],
+      fallback: ['shell-rg'],
+    });
+
+    expect(selectToolsForScenario('codex', 'code-analysis')).toEqual({
+      primary: ['serena'],
+      fallback: ['shell-rg'],
+    });
+
+    expect(selectToolsForScenario('generic', 'external-research')).toEqual({
+      primary: [],
+      fallback: ['browser', 'manual-official-docs'],
+    });
+  });
+
   it('should return descriptor metadata for serena', () => {
     const descriptor = getToolDescriptor('serena');
     expect(descriptor?.category).toBe('code');

@@ -19,7 +19,10 @@ export function selectToolsForScenario(host: HostId, scenario: ToolScenario): To
 
   switch (scenario) {
     case 'code-analysis':
-      return { primary: ['serena'], fallback: ['shell-rg'] };
+      return {
+        primary: isToolSupported(host, 'serena') ? ['serena'] : [],
+        fallback: ['shell-rg'],
+      };
     case 'external-research':
       return {
         primary: ['fetch', 'context7'].filter((tool) => isToolSupported(host, tool)),

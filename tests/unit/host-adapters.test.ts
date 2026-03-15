@@ -41,13 +41,8 @@ const { existsSyncMock, readFileSyncMock } = vi.hoisted(() => ({
   ),
 }));
 
-vi.mock('node:fs', () => ({
-  existsSync: existsSyncMock,
-  readFileSync: readFileSyncMock,
-}));
-
-vi.mock('../../src/shared/host-paths.js', () => ({
-  detectHostPaths: () => ({
+const { detectHostPathsMock } = vi.hoisted(() => ({
+  detectHostPathsMock: vi.fn(() => ({
     codexConfigPath: '/tmp/codex/config.toml',
     codexSkillsDir: '/tmp/codex/skills',
     claudeCommandsDir: '/tmp/claude/commands',
@@ -59,7 +54,16 @@ vi.mock('../../src/shared/host-paths.js', () => ({
     cursorHomeDir: '/tmp/cursor',
     cursorConfigDir: '/tmp/cursor/config',
     cursorMcpConfigPath: '/tmp/cursor/mcp.json',
-  }),
+  })),
+}));
+
+vi.mock('node:fs', () => ({
+  existsSync: existsSyncMock,
+  readFileSync: readFileSyncMock,
+}));
+
+vi.mock('../../src/shared/host-paths.js', () => ({
+  detectHostPaths: detectHostPathsMock,
 }));
 
 import { listHostAdapters, resolveHostAdapterStatuses } from '../../src/core/host-adapters/registry.js';
@@ -67,6 +71,7 @@ import { getHostCapability } from '../../src/core/tool-integration/capability-ma
 
 describe('host adapters', () => {
   beforeEach(() => {
+    detectHostPathsMock.mockClear();
     existsSyncMock.mockImplementation((path: string) =>
       path.includes('/tmp/gemini') ||
       path.includes('/tmp/cursor') ||
@@ -112,9 +117,23 @@ describe('host adapters', () => {
     expect(ids).toEqual(['claude', 'codex', 'gemini', 'cursor']);
   });
 
+  it('should not expose mutable registry state through listHostAdapters', () => {
+    const adapters = listHostAdapters();
+    adapters.pop();
+
+    expect(listHostAdapters().map((adapter) => adapter.id)).toEqual([
+      'claude',
+      'codex',
+      'gemini',
+      'cursor',
+    ]);
+  });
+
   it('should expose capability matrix entries', () => {
     expect(getHostCapability('claude')?.supportsMcp).toBe(true);
     expect(getHostCapability('codex')?.supportsSkills).toBe(true);
+    expect(getHostCapability('generic')?.supportsSkills).toBe(true);
+    expect(getHostCapability('generic')?.supportsMcp).toBe(false);
     expect(getHostCapability('gemini')?.supportsMcp).toBe(true);
     expect(getHostCapability('gemini')?.supportsSkills).toBe(true);
     expect(getHostCapability('cursor')?.supportsSkills).toBe(true);
@@ -127,6 +146,12 @@ describe('host adapters', () => {
     expect(statuses.find((entry) => entry.id === 'gemini')?.maturity).toBe('experimental');
     expect(statuses.find((entry) => entry.id === 'gemini')?.remediation).toContain('spec-first update --host gemini');
     expect(statuses.find((entry) => entry.id === 'gemini')?.baselineState).toBe('ready');
+  });
+
+  it('should reuse host path detection while resolving adapter statuses', () => {
+    resolveHostAdapterStatuses();
+
+    expect(detectHostPathsMock).toHaveBeenCalledTimes(1);
   });
 
   it('should distinguish missing baseline assets for gemini and cursor', () => {
