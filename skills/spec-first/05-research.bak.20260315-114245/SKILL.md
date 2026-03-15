@@ -1,10 +1,9 @@
 ---
 name: "spec-first:research"
 description: "定位 Feature 上下文并生成调研结论"
-version: 1.6.0
+version: 1.5.0
 last_updated: 2026-03-15
 changelog: |
-  v1.6.0: 明确作为 04-design 的 companion skill；补充触发/回流契约、调研任务分型与短版决策框架
   v1.5.0: 对齐 02_design 按需阶段口径；精简主文档证据协议；下沉协作约定到 references；补当前宿主工具边界说明
   v1.4.0: 新增 Operation Types 章节、模板引用路径、metadata.version 分离
   v1.3.0: 新增 hooks 配置（PreToolUse/PostToolUse/Stop）、allowed-tools 约束、user-invocable 标记
@@ -14,7 +13,7 @@ changelog: |
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch"
 metadata:
-  version: "1.6.0"
+  version: "1.5.0"
   phase: "stable"
   category: "spec-phase"
 hooks:
@@ -99,55 +98,6 @@ I'm using the research skill to evaluate [调研主题].
 - 仅作为补充性 research
 - 不替代当前阶段主 skill
 - 结论应回写到 `findings.md`，供当前阶段消费
-
-## 与 04-design 的关系
-
-`05-research` 不是独立主阶段 skill，而是 `04-design` 的按需 companion skill。
-
-当 `04-design` 满足以下任一条件时，应自动或按需调用 `05-research`：
-- 存在 2 个以上合理候选方案
-- 需要外部最佳实践、官方文档或兼容性依据
-- 安全 / 性能 / 成本结论无法仅靠本仓库上下文得出
-- 需要评估第三方服务、框架或外部集成方案
-
-`05-research` 的输出契约：
-- `research.md`：推荐方案、备选方案、证据路径、风险与限制、未验证假设
-- `findings.md`：本次 research 摘要、证据路径、下一步动作
-
-`04-design` 的回流契约：
-- 读取 `research.md` 和 `findings.md`
-- 将最终采用方案、采用理由、关键风险、待验证项回写到 `design.md`
-
-边界：
-- `05-research` 不直接生成 `design.md`
-- `04-design` 不应绕过 `research.md` 直接用外部资料拍板
-- `05-research` 是 design 的证据输入，不替代 design 本身
-
-## 调研任务分型
-
-默认按下列类型选择输出结构：
-
-1. `TYPE A: 方案选型`
-   - 多个候选方案中给出推荐
-   - 重点输出：对比矩阵、推荐结论、风险与依赖
-2. `TYPE B: 最佳实践 / 实现参考`
-   - 收敛官方推荐、兼容实践、参考实现
-   - 重点输出：来源链接、版本范围、适用边界
-3. `TYPE C: 背景追溯 / 历史决策`
-   - 解释历史选择、迁移包袱、反证据
-   - 重点输出：背景、反证据、当前建议
-
-## 短版决策框架
-
-默认按以下顺序评估推荐优先级：
-
-1. 问题匹配度
-2. 与现有栈兼容性
-3. 长期维护成本
-4. 风险与回滚成本
-5. 证据强度
-
-默认必须给出首选方案；除非证据不足，才允许输出“暂不推荐”。
 
 ## Don't Skip Research When
 

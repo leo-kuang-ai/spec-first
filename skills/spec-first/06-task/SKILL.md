@@ -1,9 +1,11 @@
 ---
 name: "spec-first:task"
 description: "定位 Feature 并校验阶段为任务拆解（03_plan）"
-version: 1.2.0
-last_updated: 2026-03-05
+version: 1.4.0
+last_updated: 2026-03-15
 changelog: |
+  v1.4.0: 下沉并行/用户故事标记与日志模式到 references；主文档进一步收敛为流程、字段与成功标准
+  v1.3.0: 对齐当前 task_plan 模板、C3=100% Gate 口径、验证命令列与 canonical 状态集
   v1.2.0: 新增 Execution Handoff、Hooks 行为规范、中断恢复策略、Error Log Pattern、Decision Log Pattern、Operation Types
   v1.1.0: 新增 Announce at Start、字面即精神原则、Bite-Sized Granularity、Task Structure Detail、决策流程图、When to Stop and Ask、references/ 目录、hooks 配置
   v1.0.0: Initial version with standardized metadata
@@ -29,7 +31,7 @@ hooks:
         - type: checkpoint
           message: "[task] 检查清单：任务粒度？依赖完整？验收标准？references 已引用？"
 metadata:
-  version: "1.2.0"
+  version: "1.4.0"
   phase: "stable"
   category: "spec-phase"
 ---
@@ -124,9 +126,9 @@ I'm using the task skill to break down [Feature] into executable tasks.
 | 创建文件 | Create `src/auth/service.ts` | 5-10 分钟 |
 | 读取参考 | Read `docs/api-spec.md` section 3 | 5-15 分钟 |
 | 编写代码 | Implement `login()` function | 15-30 分钟 |
-| 运行测试 | `npm test auth.test.ts` | 2-5 分钟 |
-| 本地验证 | `curl http://localhost:3000/api/login` | 2-5 分钟 |
-| 提交代码 | git commit | 2-5 分钟 |
+| 运行测试 | `pnpm vitest run tests/unit/auth.test.ts` | 2-5 分钟 |
+| 更新矩阵 | Sync `traceability-matrix.md` | 2-5 分钟 |
+| 记录结论 | Update `findings.md` with next step | 2-5 分钟 |
 
 ## Task Structure Detail
 
@@ -179,15 +181,15 @@ git commit -m "scope: brief description"
 <expected output>
 ```
 
-**状态**: planned | in_progress | complete | verified
+**状态**: todo | in_progress | blocked | verified | done
 ```
 
 ### 任务明细表
 
-| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |
-|---------|------|-------|----------|--------|------------|----------|------|
-| TASK-AUTH-001 | 初始化鉴权模块 | BE | 0.5d | FR-AUTH-001,DS-AUTH-001 | - | 模块骨架创建完成 | planned |
-| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | TASK-AUTH-001 | API 可调用且返回正确 | planned |
+| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+|---------|------|-------|----------|--------|------------|----------|----------|------|
+| TASK-AUTH-001 | 初始化鉴权模块 | BE | 0.5d | FR-AUTH-001,DS-AUTH-001 | - | 模块骨架创建完成 | pnpm vitest run tests/unit/auth/init.test.ts | todo |
+| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | TASK-AUTH-001 | API 可调用且返回正确 | pnpm vitest run tests/unit/auth/send-otp.test.ts | todo |
 
 ## Task Breakup 决策流程图
 
@@ -253,8 +255,8 @@ digraph task_breakup_flow {
   UpdateMatrix -> CoverageCheck;
 
   CoverageCheck [label="覆盖率检查"];
-  CoverageCheck -> Done [label="C3 > 0%"];
-  CoverageCheck -> AddTasks [label="C3 = 0%"];
+  CoverageCheck -> Done [label="C3 = 100%"];
+  CoverageCheck -> AddTasks [label="C3 < 100%"];
 
   AddTasks [label="补充任务"];
   AddTasks -> CoverageCheck;
@@ -344,7 +346,7 @@ task 阶段只输出执行计划，不输出实现代码：
 - `spec-first id next TASK <abbr> --feature <featureId>`
 - `spec-first matrix update`
 - `spec-first matrix check`
-- `spec-first metrics coverage`
+- `spec-first trace validate <featureId>`
 
 ## 输出路径
 
@@ -359,10 +361,11 @@ task 阶段只输出执行计划，不输出实现代码：
 
 ## 成功标准
 
-- `task_plan.md` 已写入，包含所有 TASK 定义（ID、标题、Owner、工期、依赖、状态）
+- `task_plan.md` 已写入，包含所有 TASK 定义（ID、标题、Owner、工期、依赖、验收标准、验证命令、状态）
 - 所有 TASK 已通过 `id next TASK` 注册
 - `traceability-matrix.md` 已更新，每个 FR 有对应 TASK 引用
-- `metrics coverage` C3 (Task Coverage) > 0%
+- `trace validate` / `matrix check` 通过
+- `metrics coverage` 或 Gate 校验显示 `C3 (Task Coverage) = 100%`
 - Review Checklist 已通过自检
 
 **格式校验（P4 落盘后自动执行）**:
@@ -399,14 +402,9 @@ spec-first validate format <featureId>
 ## TASK 字段语义
 
 - **Owner**：单一责任人（一个 TASK 仅允许 1 名 owner）
-- **Status**：`planned | in_progress | blocked | complete | verified`
+- **Status**：主文档示例统一使用 `todo | in_progress | blocked | verified | done`
 - **depends_on**：仅允许引用同一 Feature 下 TASK ID，禁止自然语言依赖
 - **任务明细表契约**：首个非空单元格为 TASK ID，最后非空单元格为状态
-
-## 并行与用户故事标记
-
-- **`[P]`**：可并行执行（不依赖其他任务）
-- **`[US#]`**：所属用户故事（可独立交付和测试）
 
 ## 模板引用路径
 
@@ -416,6 +414,7 @@ spec-first validate format <featureId>
 |---------|------|------|
 | 任务检查 | `task-checklist.md` | 拆解质量检查清单 |
 | 任务模板 | `task-template.md` | 标准任务格式规范 |
+| 协作约定 | `coordination-conventions.md` | `[P]` / `[US#]`、handoff、日志与操作标记 |
 
 ## 示例（P2 输出格式）
 
@@ -440,46 +439,21 @@ Phase 2: Implementation
 
 ## 任务明细
 
-| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 状态 |
-|---------|------|-------|----------|--------|------------|----------|------|
-| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | - | API 可调用，返回成功/频控错误码 | planned |
-| TASK-AUTH-003 | 验证码登录 API | BE | 1d | FR-AUTH-001,DS-AUTH-002 | TASK-AUTH-002 | 正确登录并覆盖错误路径 | planned |
+| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+|---------|------|-------|----------|--------|------------|----------|----------|------|
+| TASK-AUTH-002 | 发送验证码 API | BE | 1d | FR-AUTH-001,DS-AUTH-001 | - | API 可调用，返回成功/频控错误码 | pnpm vitest run tests/unit/auth/send-otp.test.ts | todo |
+| TASK-AUTH-003 | 验证码登录 API | BE | 1d | FR-AUTH-001,DS-AUTH-002 | TASK-AUTH-002 | 正确登录并覆盖错误路径 | pnpm vitest run tests/unit/auth/login-by-code.test.ts | todo |
 ```
 
-## Execution Handoff
+## Handoff
 
-任务拆解完成后，提供执行选项：
+任务拆解完成后，只保留一条统一交接语：
 
-**"任务拆解完成并保存到 `specs/{featureId}/task_plan.md`。执行选项："**
+`task_plan.md` 已写入。下一步进入 `/spec-first:code`，按依赖顺序执行；若存在 `[P]` 标记任务，可按并行约定分批推进。
 
-**1. 当前会话执行（推荐）** — 我在此会话逐步执行任务，每个任务完成后汇报
+并行标记、用户故事标记、交接选项和日志格式见：
 
-**2. 新会话执行** — 开启新会话使用 `/spec-first:code` 执行任务
-
-**3. 并行执行** — 多个子代理并行处理独立任务（需标记 `[P]`）
-
-**选择执行方式？**
-
----
-
-### 如果选择"当前会话执行"
-
-- 使用 TodoWrite 创建任务追踪
-- 按依赖顺序执行任务
-- 每个任务完成后报告验证结果
-- 遇到阻塞立即停止并询问
-
-### 如果选择"新会话执行"
-
-- 引导用户在新会话执行 `/spec-first:code`
-- 新会话将自动加载 task_plan.md
-- 任务状态可跨会话同步
-
-### 如果选择"并行执行"
-
-- 识别所有 `[P]` 标记的独立任务
-- 为每个任务启动独立子代理
-- 主进程收集结果并合并
+- [coordination-conventions.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/06-task/references/coordination-conventions.md)
 
 ## Hooks 行为规范
 
@@ -524,59 +498,6 @@ Phase 2: Implementation
 | 当前结论 | 已拆解的 TASK 列表 | "已完成 TASK-AUTH-001 到 TASK-AUTH-005" |
 | 证据路径 | 任务计划文件位置 | `specs/FSREQ-XXX/task_plan.md:20-50` |
 | 下一步 | 待处理的 FR/DS | "继续处理 FR-AUTH-002" |
-
-## Error Log Pattern
-
-任务拆解过程中遇到错误时，使用以下格式记录：
-
-```markdown
-## Errors Encountered
-
-| Error | 尝试次数 | 解决方案 |
-|-------|---------|----------|
-| FR-AUTH-001 缺少对应 DS | 1 | 先执行 `/spec-first:design` 生成 DS |
-| TASK-AUTH-003 粒度过粗 | 1 | 拆分为 TASK-AUTH-003A 和 TASK-AUTH-003B |
-| 检测到循环依赖 TASK-AUTH-004 → TASK-AUTH-005 → TASK-AUTH-004 | 1 | 调整依赖关系，移除 TASK-AUTH-005 对 TASK-AUTH-004 的依赖 |
-```
-
-## Decision Log Pattern
-
-任务拆解过程中的重要决策，使用以下格式记录：
-
-```markdown
-## Decisions Made
-
-| 决策 | 理由 |
-|------|------|
-| 按用户故事分组任务 | 便于独立交付和验收 |
-| TASK-AUTH-002 设为可并行 `[P]` | 不依赖其他任务，可提前开始 |
-| 登录 API 拆分为 2 个任务 | 发送验证码和验证码登录是两个独立的端点 |
-| 频控功能独立为 US2 | 虽然依赖 US1，但属于横切关注点，独立验收更合理 |
-```
-
-## Operation Types
-
-| 标记 | 含义 | 执行者 |
-|------|------|--------|
-| `[AI]` | 自动分析/拆解 | AI |
-| `[USER]` | 需要用户确认 | 用户 |
-
-### 操作分工示例
-
-```bash
-# [AI] 自动执行
-- 读取 FR/DS 条目
-- 生成 TASK 拆解
-- 检测依赖关系
-- 计算覆盖率
-
-# [USER] 需要确认
-- 任务粒度调整
-- 依赖关系确认
-- 验收标准补充
-- 执行方式选择
-```
-
 
 ## 测试设计前置要求（v2）
 
