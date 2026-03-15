@@ -5,3 +5,5 @@ coverage/
 .DS_Store
 
 .spec-first/runtime/
+!.spec-first/runtime/first/
+!.spec-first/runtime/first/*.json
