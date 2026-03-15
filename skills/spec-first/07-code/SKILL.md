@@ -1,6 +1,7 @@
 ---
 name: "spec-first:code"
 description: "执行代码实现。支持单 TASK 与自动批量模式；当前以自动批量提示词驱动，运行时可按宿主能力落到人工/半自动调度。"
+- Command: `/spec-first:code [featureId]`
 version: 2.1.0
 last_updated: 2026-03-14
 changelog: |

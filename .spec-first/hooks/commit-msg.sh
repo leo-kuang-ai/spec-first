@@ -23,14 +23,3 @@ else
   echo "[How]  格式: [TASK-XXX-001] 描述 或 feat(scope): 描述"
   exit 1
 fi
-
-#!/bin/sh
-# spec-first-hook
-
-# Validate commit message contains at least one valid ID
-MSG=$(cat "$1")
-if ! echo "$MSG" | grep -qE '(TASK|FR|DS|TC|RFC|FSREQ)-'; then
-  echo "错误：commit message 必须至少引用一个有效 ID（TASK-xxx、FR-xxx 等）"
-  echo "可用格式：[TASK-FEAT-NNN] <message>"
-  exit 1
-fi
