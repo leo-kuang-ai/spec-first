@@ -433,6 +433,96 @@ last_updated: "${today}"
 `;
 }
 
+/**
+ * Baseline-specific PRD skeleton for FSREQ-19700101-LEGACY-BASELINE.
+ * Contains 已上线能力摘要 section instead of standard business goals.
+ */
+export function skeletonPrdBaseline(featureId: string, title: string): string {
+  const today = new Date().toISOString();
+  return `---
+scenario: "brownfield-baseline"
+scenario_reason: "存量系统现状能力盘点"
+evidence_paths: []
+complexity: "待判定"
+created_at: "${today}"
+last_updated: "${today}"
+---
+
+# PRD — ${featureId}
+
+> ${title}
+
+## 1. 已上线能力摘要
+
+### 1.1 现有功能盘点
+
+**核心模块**：
+[列出已上线的核心业务模块]
+
+**技术栈**：
+[描述当前系统技术栈]
+
+**集成点**：
+[列出外部系统集成点]
+
+### 1.2 能力缺口分析
+
+**已知问题**：
+- [问题 1]
+- [问题 2]
+
+**待补齐能力**：
+- [能力 1]
+- [能力 2]
+
+## 2. 基线范围
+
+### 2.1 纳入范围
+
+- [模块 1]
+- [模块 2]
+
+### 2.2 排除范围
+
+- [明确排除的内容]
+
+## 3. 验收标准
+
+- [ ] 所有核心模块已完成现状盘点
+- [ ] 能力缺口已识别并记录
+- [ ] 基线文档已完成评审
+
+## 4. 开放问题
+
+| 问题 | 优先级 | 负责人 | 状态 |
+|------|--------|--------|------|
+| [问题 1] | High/Medium/Low | [姓名] | Open/Resolved |
+`;
+}
+
+/**
+ * Baseline-specific task_plan skeleton for FSREQ-19700101-LEGACY-BASELINE.
+ * Contains 基线补齐 section instead of standard task breakdown.
+ */
+export function skeletonTaskPlanBaseline(featureId: string, title: string): string {
+  return (
+    `# Task Plan — ${featureId}\n\n` +
+    `> ${title}\n\n` +
+    `## 基线补齐\n\n` +
+    `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |\n` +
+    `|---|---|---|---|---|---|---|---|---|\n` +
+    `| TASK-LEGACY-001 | 现有能力盘点 | dev | 1d | - | - | 能力清单完整 | - | todo |\n` +
+    `| TASK-LEGACY-002 | 技术债务识别 | dev | 0.5d | - | TASK-LEGACY-001 | 问题清单完整 | - | todo |\n\n` +
+    `## 实施步骤\n\n` +
+    `### TASK-LEGACY-001 — 现有能力盘点\n\n` +
+    `1. 梳理现有模块清单\n` +
+    `2. 记录 API 端点与数据模型\n` +
+    `3. 更新 findings.md\n\n` +
+    `## 验证命令\n\n` +
+    `- 人工评审基线文档完整性\n`
+  );
+}
+
 function detectProjectType(platforms: string[]): string {
   if (platforms.length === 0) return 'fullstack';
   if (platforms.every((p) => p.includes('frontend'))) return 'frontend';

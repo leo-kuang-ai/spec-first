@@ -18,6 +18,7 @@ import { execFileSync } from 'node:child_process';
 import {
   detectInitProjectState,
   detectInitTrack,
+  buildLegacyBaselinePreset,
 } from '../../src/cli/commands/init.js';
 
 // ─────────────────────────────────────────────
@@ -606,5 +607,55 @@ describe('detectInitTrack - boundary cases', () => {
     };
     const track = detectInitTrack(state, []);
     expect(track).not.toBe('brownfield-baseline');
+  });
+});
+
+// ─────────────────────────────────────────────
+// Task 5: brownfield baseline preset tests
+// ─────────────────────────────────────────────
+
+describe('buildLegacyBaselinePreset - baseline preset', () => {
+  it('should return the fixed legacy baseline featureId', () => {
+    const preset = buildLegacyBaselinePreset();
+    expect(preset.featureId).toBe('FSREQ-19700101-LEGACY-BASELINE');
+  });
+
+  it('should return mode I (Iteration)', () => {
+    const preset = buildLegacyBaselinePreset();
+    expect(preset.mode).toBe('I');
+  });
+
+  it('should return size M (Medium)', () => {
+    const preset = buildLegacyBaselinePreset();
+    expect(preset.size).toBe('M');
+  });
+
+  it('should return a non-empty title', () => {
+    const preset = buildLegacyBaselinePreset();
+    expect(typeof preset.title).toBe('string');
+    expect(preset.title.length).toBeGreaterThan(0);
+  });
+
+  it('should return feat abbr LEGACY', () => {
+    const preset = buildLegacyBaselinePreset();
+    expect(preset.feat).toBe('LEGACY');
+  });
+});
+
+// ─────────────────────────────────────────────
+// Task 5: baseline prd/task_plan template content tests
+// ─────────────────────────────────────────────
+
+describe('baseline skeleton content - E3 template specialization', () => {
+  it('[E3] prd skeleton for LEGACY-BASELINE includes 已上线能力摘要 section', async () => {
+    const { skeletonPrdBaseline } = await import('../../src/core/process-engine/init.js');
+    const content = skeletonPrdBaseline('FSREQ-19700101-LEGACY-BASELINE', '存量系统可分析基线');
+    expect(content).toContain('已上线能力摘要');
+  });
+
+  it('[E3] task_plan skeleton for LEGACY-BASELINE includes 基线补齐 section', async () => {
+    const { skeletonTaskPlanBaseline } = await import('../../src/core/process-engine/init.js');
+    const content = skeletonTaskPlanBaseline('FSREQ-19700101-LEGACY-BASELINE', '存量系统可分析基线');
+    expect(content).toContain('基线补齐');
   });
 });
