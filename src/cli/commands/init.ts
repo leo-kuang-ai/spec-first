@@ -98,6 +98,57 @@ interface FirstSummary {
   apiSurface: string;
 }
 
+// ─────────────────────────────────────────────
+// Init Router Types (Task 1 scaffold → Task 2/3 implementations)
+// ─────────────────────────────────────────────
+
+export type ProjectMaturity = 'greenfield' | 'brownfield';
+
+export type InitTrack =
+  | 'project-onboarding'
+  | 'brownfield-baseline'
+  | 'feature-init'
+  | 'feature-init-blocked'
+  | 'no-git';
+
+export interface InitProjectState {
+  gitReady: boolean;
+  specFirstDirExists: boolean;
+  metaConfigExists: boolean;
+  firstRuntimeHealthy: boolean;
+  hasAnyFeature: boolean;
+  hasLegacyBaseline: boolean;
+  baselineSkipped: boolean;
+  projectMaturity: ProjectMaturity;
+  discoveredPlatforms: string[];
+}
+
+/**
+ * Detect current project initialization state.
+ * Placeholder implementation — Task 2 will provide full implementation.
+ */
+export function detectInitProjectState(_projectRoot: string): InitProjectState {
+  return {
+    gitReady: false,
+    specFirstDirExists: false,
+    metaConfigExists: false,
+    firstRuntimeHealthy: false,
+    hasAnyFeature: false,
+    hasLegacyBaseline: false,
+    baselineSkipped: false,
+    projectMaturity: 'greenfield',
+    discoveredPlatforms: [],
+  };
+}
+
+/**
+ * Determine which initialization track to follow based on project state.
+ * Placeholder implementation — Task 3 will provide full implementation.
+ */
+export function detectInitTrack(_state: InitProjectState, _args: string[]): InitTrack {
+  return 'feature-init';
+}
+
 function parseInitCliInput(args: string[]): InitCliInput {
   return {
     feat: parseFlag(args, '--feat'),

@@ -1,10 +1,10 @@
 export const FIRST_RUNTIME_STAGES = ['spec', 'design', 'code', 'verify'] as const;
 export const FIRST_RUNTIME_ROLES = ['product', 'dev', 'qa', 'architect'] as const;
 
-export type FirstRuntimeMode = 'quick' | 'deep';
 export type FirstRuntimeStage = (typeof FIRST_RUNTIME_STAGES)[number];
 export type FirstRuntimeRole = (typeof FIRST_RUNTIME_ROLES)[number];
 export type FirstRuntimeStatus = 'current' | 'stale';
+export type FirstRuntimeConditionalStatus = 'healthy' | 'not_applicable' | 'degraded';
 
 export interface FirstRuntimeAssetIndexEntry {
   path: string;
@@ -14,11 +14,14 @@ export interface FirstRuntimeAssetIndexEntry {
   issues?: string[];
 }
 
+export interface FirstRuntimeConditionalAssetIndexEntry extends FirstRuntimeAssetIndexEntry {
+  status: FirstRuntimeConditionalStatus;
+}
+
 export interface FirstRuntimeIndex {
   version: string;
   lastRun: string;
   sourceCommit?: string;
-  mode: FirstRuntimeMode;
   summary: FirstRuntimeAssetIndexEntry;
   roleViews: FirstRuntimeAssetIndexEntry;
   stageViews: FirstRuntimeAssetIndexEntry;
@@ -28,6 +31,10 @@ export interface FirstRuntimeIndex {
   changeMap: FirstRuntimeAssetIndexEntry;
   entryGuide: FirstRuntimeAssetIndexEntry;
   rebootGuide: FirstRuntimeAssetIndexEntry;
+  apiContracts: FirstRuntimeAssetIndexEntry;
+  structureOverview: FirstRuntimeAssetIndexEntry;
+  domainModel: FirstRuntimeAssetIndexEntry;
+  databaseSchema: FirstRuntimeConditionalAssetIndexEntry;
   docsProjection: Record<string, FirstRuntimeAssetIndexEntry>;
   status: FirstRuntimeStatus;
   staleReason?: string;
@@ -35,7 +42,6 @@ export interface FirstRuntimeIndex {
 
 export interface FirstRuntimeSummary {
   generatedAt: string;
-  mode: FirstRuntimeMode;
   project: {
     name: string;
     platformType?: string;
@@ -96,6 +102,70 @@ export interface FirstConventions {
   module: FirstConventionBucket;
   testing: FirstConventionBucket;
   projectRules: FirstConventionBucket;
+}
+
+export interface FirstApiContract {
+  interfaceType: 'http' | 'cli-command' | 'page-route' | 'job' | 'event' | 'bridge' | 'other';
+  name: string;
+  path?: string;
+  method?: string;
+  handler: string;
+  request: string[];
+  response: string[];
+  auth: string[];
+  evidence: string[];
+}
+
+export interface FirstApiContracts {
+  interfaces: FirstApiContract[];
+  integrationPoints: string[];
+  notes: string[];
+}
+
+export interface FirstStructureModule {
+  name: string;
+  purpose: string;
+  keyPaths: string[];
+  entryPoints: string[];
+  dependencies?: string[];
+}
+
+export interface FirstStructureOverview {
+  topology: string[];
+  modules: FirstStructureModule[];
+  readingOrder: string[];
+  evidence: string[];
+}
+
+export interface FirstDomainEntity {
+  name: string;
+  kind: 'entity' | 'value-object' | 'aggregate' | 'service' | 'state' | 'concept';
+  description: string;
+  invariants: string[];
+  relationships: string[];
+  evidence: string[];
+}
+
+export interface FirstDomainModel {
+  entities: FirstDomainEntity[];
+  glossary: string[];
+  evidence: string[];
+}
+
+export interface FirstDatabaseTable {
+  name: string;
+  purpose?: string;
+  fields: string[];
+  relations: string[];
+  evidence: string[];
+}
+
+export interface FirstDatabaseSchema {
+  status: FirstRuntimeConditionalStatus;
+  provider?: string;
+  tables: FirstDatabaseTable[];
+  risks: string[];
+  evidence: string[];
 }
 
 export interface FirstCriticalFlow {
