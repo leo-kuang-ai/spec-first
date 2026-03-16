@@ -120,7 +120,11 @@ function seedHealthyRuntimeFirst(projectRoot: string): void {
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
+  mkdirSync(join(TMP, '.git'), { recursive: true }); // git repo required for feature-init track
   mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+  // baselineSkipped: true prevents brownfield-baseline routing in tests that focus on feature-init
+  writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1.0.0\nbaselineSkipped: true\n', 'utf-8');
   mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
   writeFileSync(
     join(TMP, '.spec-first', 'layer2', 'h5.yaml'),
@@ -322,11 +326,11 @@ describe('handleInit', () => {
       const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
       const output = errSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
       expect(code).toBe(2);
-      expect(output).toContain('⚠️  前置检查失败');
-      expect(output).toContain('00-first Skill 尚未执行');
+      // With --feat and unhealthy runtime → feature-init-blocked track
+      expect(output).toContain('⚠️  Feature 初始化被阻止');
+      expect(output).toContain('00-first Skill 尚未完成');
       expect(output).toContain('/spec-first:first --quick');
-      expect(output).toContain('/spec-first:first --deep');
-      expect(output).toContain('完成后再运行 /spec-first:init');
+      expect(output).toContain('/spec-first:init');
     } finally {
       errSpy.mockRestore();
     }
@@ -347,9 +351,12 @@ describe('handleInit', () => {
 
   it('should warn when meta config auto-create fails', async () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // Remove the meta directory created in beforeEach, then put a file at that path to block dir creation
+    rmSync(join(TMP, '.spec-first', 'meta'), { recursive: true, force: true });
     writeFileSync(join(TMP, '.spec-first', 'meta'), 'occupied', 'utf-8');
     try {
-      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
+      // Use --track feature to bypass brownfield/onboarding routing since meta config is now broken
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5', '--track', 'feature']);
       const output = warnSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
       expect(code).toBe(0);
       expect(output).toContain('无法创建 .spec-first/meta/config.yaml');
