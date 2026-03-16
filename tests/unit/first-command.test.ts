@@ -5,11 +5,18 @@ import { handleFirst } from '../../src/cli/commands/first.js';
 import {
   readFirstRuntimeIndex,
   readFirstRuntimeSummary,
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstSteering,
   writeFirstStageViews,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
+import type { FirstConventions, FirstSteering } from '../../src/core/skill-runtime/first-runtime-types.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-command');
 const origCwd = process.cwd;
@@ -60,6 +67,55 @@ function seedRuntimeTruthOnly(): void {
     code: { stage: 'code', summary: 'code', entryPoints: ['src/cli/index.ts'], likelyChangeAreas: ['src/core/skill-runtime'], changeHazards: [], verificationHooks: ['tests/unit/first-command.test.ts'] },
     verify: { stage: 'verify', summary: 'verify', testFocus: ['runtime truth source'], riskAreas: [], validationHooks: ['pnpm vitest'], releaseBlockers: [] },
   });
+  const steering: FirstSteering = {
+    product: { overview: 'runtime summary only', coreScenarios: ['runtime truth source'], nonGoals: [], glossary: ['Feature'] },
+    tech: { stack: ['runtime: Node.js >=20.0.0', 'language: TypeScript'], constraints: [], forbiddenPatterns: ['docs-only truth'] },
+    structure: { modules: ['src/core/skill-runtime'], boundaries: ['src/cli/index.ts'], entryRules: ['read runtime truth first'] },
+  };
+  const conventions: FirstConventions = {
+    api: { observedPatterns: ['CLI: spec-first'], deviations: [], recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.', evidence: ['src/cli/index.ts'] },
+    module: { observedPatterns: ['src/core/skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core and CLI entry under src/cli.', evidence: ['src/core/skill-runtime'] },
+    testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['vitest.config.ts'] },
+    projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth before docs.', evidence: ['.spec-first/runtime/first'] },
+  };
+  writeFirstSteering(TMP, steering);
+  writeFirstConventions(TMP, conventions);
+  writeFirstCriticalFlows(TMP, [
+    {
+      flowId: 'flow-cli-entry',
+      name: 'CLI Entry Flow',
+      entryPoints: ['src/cli/index.ts'],
+      coreModules: ['src/core/skill-runtime'],
+      invariants: ['runtime truth first'],
+      verificationHooks: ['pnpm vitest'],
+    },
+  ]);
+  writeFirstChangeMap(TMP, [
+    {
+      changeType: 'runtime-asset-extension',
+      likelyModules: ['src/core/skill-runtime'],
+      likelyCommands: ['src/cli/commands/first.ts'],
+      likelyConfigs: ['package.json'],
+      likelyTests: ['tests/unit/first-command.test.ts'],
+      riskPoints: ['runtime index drift'],
+    },
+  ]);
+  writeFirstEntryGuide(TMP, [
+    {
+      taskCategory: 'runtime-extension',
+      readFirst: ['.spec-first/runtime/first/summary.json', '.spec-first/runtime/first/steering.json'],
+      thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
+      avoidEntry: ['docs/first/tech-stack.md'],
+      relatedFlows: ['flow-cli-entry'],
+    },
+  ]);
+  writeFirstRebootGuide(TMP, {
+    projectWhat: 'runtime summary only',
+    whereToStart: ['.spec-first/runtime/first/summary.json', 'docs/first/README.md'],
+    currentCriticalAreas: ['runtime truth first'],
+    commonChangePaths: ['src/core/skill-runtime'],
+    verifyChecklist: ['pnpm vitest'],
+  });
   writeFirstRuntimeIndex(TMP, {
     version: '1.0.0',
     lastRun: '2026-03-09T12:00:00.000Z',
@@ -67,6 +123,12 @@ function seedRuntimeTruthOnly(): void {
     summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
     roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'role', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
     stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stage', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
+    steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
+    conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
+    criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
+    changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
+    entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
+    rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-09T12:00:00.000Z', healthy: true },
     docsProjection: {},
     status: 'current',
   });
@@ -120,6 +182,7 @@ describe('handleFirst', () => {
     expect(existsSync(summaryDoc)).toBe(true);
     expect(readFileSync(summaryDoc, 'utf-8')).toContain('runtime-truth');
     expect(readFileSync(readmeDoc, 'utf-8')).toContain('.spec-first/runtime/first/');
+    expect(readFileSync(readmeDoc, 'utf-8')).toContain('Canonical Projection Docs');
   });
 
   it('check-health 在缺失 runtime 时返回校验失败', () => {
@@ -159,5 +222,19 @@ describe('handleFirst', () => {
     ) as { backgroundInputStatus?: string; updatedAt?: string };
     expect(state.backgroundInputStatus).toBe('full');
     expect(state.updatedAt).toBe('2026-03-12T12:00:00.000Z');
+  });
+
+  it('help 与 health 输出明确 canonical projection docs 边界', () => {
+    seedProject();
+
+    handleFirst(['--help']);
+    handleFirst(['--check-health']);
+
+    const logOutput = vi.mocked(console.log).mock.calls.flat().join('\n');
+
+    expect(logOutput).toContain('canonical `.spec-first/runtime/first/`');
+    expect(logOutput).toContain('canonical projection docs');
+    expect(logOutput).toContain('仅检查 runtime truth + canonical projection docs');
+    expect(logOutput).not.toContain('检查全部 legacy docs');
   });
 });

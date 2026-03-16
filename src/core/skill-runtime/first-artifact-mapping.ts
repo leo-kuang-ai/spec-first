@@ -18,6 +18,12 @@ export const FIRST_RUNTIME_ARTIFACTS = [
   'summary.json',
   'role-views.json',
   'stage-views.json',
+  'steering.json',
+  'conventions.json',
+  'critical-flows.json',
+  'change-map.json',
+  'entry-guide.json',
+  'reboot-guide.json',
 ] as const;
 
 export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<
@@ -27,7 +33,38 @@ export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<
   'summary.json': ['docs/first/README.md', 'docs/first/summary.md'],
   'role-views.json': ['docs/first/README.md', 'docs/first/role-views.md'],
   'stage-views.json': ['docs/first/README.md', 'docs/first/stage-views.md'],
+  'steering.json': ['docs/first/README.md', 'docs/first/steering.md'],
+  'conventions.json': [
+    'docs/first/README.md',
+    'docs/first/conventions.md',
+    'docs/first/common-playbooks.md',
+  ],
+  'critical-flows.json': [
+    'docs/first/README.md',
+    'docs/first/critical-flows.md',
+    'docs/first/known-risks-and-traps.md',
+  ],
+  'change-map.json': [
+    'docs/first/README.md',
+    'docs/first/change-map.md',
+    'docs/first/common-playbooks.md',
+    'docs/first/known-risks-and-traps.md',
+  ],
+  'entry-guide.json': [
+    'docs/first/README.md',
+    'docs/first/entry-guide.md',
+    'docs/first/common-playbooks.md',
+  ],
+  'reboot-guide.json': [
+    'docs/first/README.md',
+    'docs/first/reboot-guide.md',
+    'docs/first/known-risks-and-traps.md',
+  ],
 };
+
+export const CANONICAL_PROJECTION_DOCS = Array.from(
+  new Set(Object.values(FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP).flat())
+).sort() as readonly string[];
 
 export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
   'package.json': DEPENDENCY_ARTIFACTS,
@@ -149,10 +186,47 @@ export function matchRuntimeArtifactsByChangedFile(changedFile: string): string[
     return ['stage-views.json'];
   }
   if (
+    changedFile.endsWith('/first-conventions.ts') ||
+    changedFile === 'src/core/skill-runtime/first-conventions.ts'
+  ) {
+    return ['conventions.json'];
+  }
+  if (
+    changedFile.endsWith('/first-critical-flows.ts') ||
+    changedFile === 'src/core/skill-runtime/first-critical-flows.ts'
+  ) {
+    return ['critical-flows.json'];
+  }
+  if (
+    changedFile.endsWith('/first-change-map.ts') ||
+    changedFile === 'src/core/skill-runtime/first-change-map.ts'
+  ) {
+    return ['change-map.json'];
+  }
+  if (
+    changedFile.endsWith('/first-entry-guide.ts') ||
+    changedFile === 'src/core/skill-runtime/first-entry-guide.ts'
+  ) {
+    return ['entry-guide.json'];
+  }
+  if (
+    changedFile.endsWith('/first-reboot-guide.ts') ||
+    changedFile === 'src/core/skill-runtime/first-reboot-guide.ts'
+  ) {
+    return ['reboot-guide.json'];
+  }
+  if (
+    changedFile.endsWith('/first-bootstrap.ts') ||
+    changedFile === 'src/core/skill-runtime/first-bootstrap.ts'
+  ) {
+    return [...FIRST_RUNTIME_ARTIFACTS];
+  }
+  if (
     changedFile.endsWith('/first-context.ts') ||
     changedFile.endsWith('/first-runtime-store.ts') ||
     changedFile.endsWith('/first-doc-projection.ts') ||
-    changedFile.endsWith('/first-artifact-mapping.ts')
+    changedFile.endsWith('/first-artifact-mapping.ts') ||
+    changedFile.endsWith('/first-runtime-types.ts')
   ) {
     return [...FIRST_RUNTIME_ARTIFACTS];
   }

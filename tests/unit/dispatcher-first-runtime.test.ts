@@ -3,12 +3,24 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getFirstRuntimeNotice, getOrchestrateRuntimeNotice } from '../../src/core/skill-runtime/dispatcher.js';
 import {
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
   writeFirstRoleViews,
+  writeFirstSteering,
   writeFirstStageViews,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
 import type {
+  FirstChangeMap,
+  FirstConventions,
+  FirstCriticalFlows,
+  FirstEntryGuide,
+  FirstRebootGuide,
+  FirstSteering,
   FirstRuntimeIndex,
   FirstRuntimeSummary,
   FirstRoleViews,
@@ -24,6 +36,12 @@ const index: FirstRuntimeIndex = {
   summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   docsProjection: {},
   status: 'current',
 };
@@ -55,6 +73,74 @@ const stageViews: FirstStageViews = {
   verify: { stage: 'verify', summary: 'verify', testFocus: ['truth-source'], riskAreas: [], validationHooks: ['pnpm vitest'], releaseBlockers: [] },
 };
 
+const steering: FirstSteering = {
+  product: { overview: 'Runtime-backed first context', coreScenarios: ['bootstrap'], nonGoals: [], glossary: ['Feature'] },
+  tech: { stack: ['TypeScript'], constraints: ['strict'], forbiddenPatterns: ['docs-only truth'] },
+  structure: { modules: ['src/core/skill-runtime'], boundaries: ['src/cli/commands'], entryRules: ['read runtime truth first'] },
+};
+
+const conventions: FirstConventions = {
+  api: { observedPatterns: ['spec-first init'], deviations: [], recommendedConvention: 'Keep CLI verbs stable.', evidence: ['src/cli/commands/init.ts'] },
+  module: { observedPatterns: ['src/core/skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core.', evidence: ['src/core/skill-runtime'] },
+  testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['tests/unit'] },
+  projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth first.', evidence: ['.spec-first/runtime/first'] },
+};
+
+const criticalFlows: FirstCriticalFlows = [
+  {
+    flowId: 'flow-cli-entry',
+    name: 'CLI Entry Flow',
+    entryPoints: ['src/cli/commands/init.ts'],
+    coreModules: ['src/core/skill-runtime'],
+    invariants: ['runtime truth first'],
+    verificationHooks: ['pnpm vitest'],
+  },
+];
+
+const changeMap: FirstChangeMap = [
+  {
+    changeType: 'runtime-asset-extension',
+    likelyModules: ['src/core/skill-runtime'],
+    likelyCommands: ['src/cli/commands/first.ts'],
+    likelyConfigs: ['package.json'],
+    likelyTests: ['tests/unit/dispatcher-first-runtime.test.ts'],
+    riskPoints: ['runtime index drift'],
+  },
+  {
+    changeType: 'docs-projection-adjustment',
+    likelyModules: ['src/core/skill-runtime/first-doc-projection.ts'],
+    likelyCommands: [],
+    likelyConfigs: [],
+    likelyTests: ['tests/unit/first-doc-projection.test.ts'],
+    riskPoints: ['canonical docs mismatch'],
+  },
+];
+
+const entryGuide: FirstEntryGuide = [
+  {
+    taskCategory: 'runtime-extension',
+    readFirst: ['.spec-first/runtime/first/summary.json'],
+    thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
+    avoidEntry: ['docs/first/README.md'],
+    relatedFlows: ['flow-cli-entry'],
+  },
+  {
+    taskCategory: 'docs-projection',
+    readFirst: ['docs/first/README.md'],
+    thenRead: ['src/core/skill-runtime/first-doc-projection.ts'],
+    avoidEntry: ['legacy docs as truth'],
+    relatedFlows: ['flow-cli-entry'],
+  },
+];
+
+const rebootGuide: FirstRebootGuide = {
+  projectWhat: 'Runtime-backed first context',
+  whereToStart: ['.spec-first/runtime/first/summary.json'],
+  currentCriticalAreas: ['runtime truth first'],
+  commonChangePaths: ['src/core/skill-runtime'],
+  verifyChecklist: ['pnpm vitest'],
+};
+
 describe('dispatcher first runtime notice', () => {
   beforeEach(() => {
     rmSync(TEST_ROOT, { recursive: true, force: true });
@@ -63,6 +149,12 @@ describe('dispatcher first runtime notice', () => {
     writeFirstRuntimeSummary(TEST_ROOT, summary);
     writeFirstRoleViews(TEST_ROOT, roleViews);
     writeFirstStageViews(TEST_ROOT, stageViews);
+    writeFirstSteering(TEST_ROOT, steering);
+    writeFirstConventions(TEST_ROOT, conventions);
+    writeFirstCriticalFlows(TEST_ROOT, criticalFlows);
+    writeFirstChangeMap(TEST_ROOT, changeMap);
+    writeFirstEntryGuide(TEST_ROOT, entryGuide);
+    writeFirstRebootGuide(TEST_ROOT, rebootGuide);
   });
 
   afterEach(() => {
@@ -110,5 +202,11 @@ describe('dispatcher first runtime notice', () => {
     expect(notice).toContain('recommended_action: backfill-first');
     expect(notice).toContain('risk_signals: 存在并行任务标记');
     expect(notice).toContain('risk_category: formal-design-review');
+    expect(notice).toContain('project_name: spec-first');
+    expect(notice).toContain('change_types: runtime-asset-extension');
+    expect(notice).toContain('critical_flows: CLI Entry Flow');
+    expect(notice).toContain('entry_categories: runtime-extension');
+    expect(notice).not.toContain('docs-projection');
+    expect(notice).not.toContain('docs-projection-adjustment');
   });
 });

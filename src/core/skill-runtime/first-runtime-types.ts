@@ -22,6 +22,12 @@ export interface FirstRuntimeIndex {
   summary: FirstRuntimeAssetIndexEntry;
   roleViews: FirstRuntimeAssetIndexEntry;
   stageViews: FirstRuntimeAssetIndexEntry;
+  steering: FirstRuntimeAssetIndexEntry;
+  conventions: FirstRuntimeAssetIndexEntry;
+  criticalFlows: FirstRuntimeAssetIndexEntry;
+  changeMap: FirstRuntimeAssetIndexEntry;
+  entryGuide: FirstRuntimeAssetIndexEntry;
+  rebootGuide: FirstRuntimeAssetIndexEntry;
   docsProjection: Record<string, FirstRuntimeAssetIndexEntry>;
   status: FirstRuntimeStatus;
   staleReason?: string;
@@ -57,6 +63,79 @@ export interface FirstRoleViews {
   dev: FirstRoleView;
   qa: FirstRoleView;
   architect: FirstRoleView;
+}
+
+export interface FirstSteering {
+  product: {
+    overview: string;
+    coreScenarios: string[];
+    nonGoals: string[];
+    glossary: string[];
+  };
+  tech: {
+    stack: string[];
+    constraints: string[];
+    forbiddenPatterns: string[];
+  };
+  structure: {
+    modules: string[];
+    boundaries: string[];
+    entryRules: string[];
+  };
+}
+
+export interface FirstConventionBucket {
+  observedPatterns: string[];
+  deviations: string[];
+  recommendedConvention: string;
+  evidence: string[];
+}
+
+export interface FirstConventions {
+  api: FirstConventionBucket;
+  module: FirstConventionBucket;
+  testing: FirstConventionBucket;
+  projectRules: FirstConventionBucket;
+}
+
+export interface FirstCriticalFlow {
+  flowId: string;
+  name: string;
+  entryPoints: string[];
+  coreModules: string[];
+  invariants: string[];
+  verificationHooks: string[];
+}
+
+export type FirstCriticalFlows = FirstCriticalFlow[];
+
+export interface FirstChangeMapEntry {
+  changeType: string;
+  likelyModules: string[];
+  likelyCommands: string[];
+  likelyConfigs: string[];
+  likelyTests: string[];
+  riskPoints: string[];
+}
+
+export type FirstChangeMap = FirstChangeMapEntry[];
+
+export interface FirstEntryGuideEntry {
+  taskCategory: string;
+  readFirst: string[];
+  thenRead: string[];
+  avoidEntry: string[];
+  relatedFlows: string[];
+}
+
+export type FirstEntryGuide = FirstEntryGuideEntry[];
+
+export interface FirstRebootGuide {
+  projectWhat: string;
+  whereToStart: string[];
+  currentCriticalAreas: string[];
+  commonChangePaths: string[];
+  verifyChecklist: string[];
 }
 
 export interface FirstSpecView {

@@ -2,16 +2,28 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { loadFirstContext, type FirstContext } from './first-context.js';
 import {
+  CANONICAL_PROJECTION_DOCS,
   FIRST_RUNTIME_ARTIFACTS,
   getProjectionDocsForRuntimeArtifact,
 } from './first-artifact-mapping.js';
 import {
+  readFirstChangeMap,
+  readFirstConventions,
+  readFirstCriticalFlows,
+  readFirstEntryGuide,
+  readFirstRebootGuide,
   getFirstRoleViewsPath,
   getFirstRuntimeIndexPath,
   getFirstRuntimeSummaryPath,
   getFirstStageViewsPath,
 } from './first-runtime-store.js';
 import type {
+  FirstChangeMap,
+  FirstConventions,
+  FirstCriticalFlows,
+  FirstEntryGuide,
+  FirstRebootGuide,
+  FirstSteering,
   FirstRoleView,
   FirstRoleViews,
   FirstRuntimeAssetIndexEntry,
@@ -96,6 +108,144 @@ interface LegacyFirstStageViews {
 interface ProjectionContext extends FirstContext {
   artifactDocs: string[];
   techStack: string[];
+  conventions: FirstConventions;
+  criticalFlows: FirstCriticalFlows;
+  changeMap: FirstChangeMap;
+  entryGuide: FirstEntryGuide;
+  rebootGuide: FirstRebootGuide;
+}
+
+function buildSyntheticSteering(
+  summary: FirstRuntimeSummary,
+  artifactDocs: string[] = []
+): FirstSteering {
+  return {
+    product: {
+      overview: summary.project.overview ?? `${summary.project.name} project cognition`,
+      coreScenarios: summary.capabilities.slice(0, 3),
+      nonGoals: artifactDocs.length > 0 ? ['legacy docs as canonical truth'] : [],
+      glossary: summary.dataModels.slice(0, 5),
+    },
+    tech: {
+      stack: summary.techStack ?? [],
+      constraints: summary.risks.slice(0, 3),
+      forbiddenPatterns: ['docs-only truth'],
+    },
+    structure: {
+      modules: summary.modules,
+      boundaries: summary.entryPoints,
+      entryRules: ['read runtime truth first'],
+    },
+  };
+}
+
+function buildSyntheticConventions(summary: FirstRuntimeSummary): FirstConventions {
+  return {
+    api: {
+      observedPatterns: summary.apiSurface.length > 0 ? summary.apiSurface : ['CLI surface not explicitly detected'],
+      deviations: [],
+      recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.',
+      evidence: [...summary.entryPoints, ...summary.evidence].slice(0, 5),
+    },
+    module: {
+      observedPatterns: summary.modules.length > 0 ? summary.modules : ['module boundaries not explicitly detected'],
+      deviations: [],
+      recommendedConvention: 'Keep runtime logic under src/core and entry orchestration near src/cli.',
+      evidence: [...summary.modules, ...summary.entryPoints].slice(0, 5),
+    },
+    testing: {
+      observedPatterns:
+        summary.techStack?.filter((item) => item.toLowerCase().includes('test')) ?? ['testing stack not explicitly detected'],
+      deviations: [],
+      recommendedConvention: 'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
+      evidence: [...(summary.techStack ?? []), ...summary.evidence].slice(0, 5),
+    },
+    projectRules: {
+      observedPatterns: ['runtime truth first', ...summary.risks.slice(0, 2)],
+      deviations: [],
+      recommendedConvention:
+        'Treat .spec-first/runtime/first as canonical truth before projecting docs/first views.',
+      evidence: [...summary.evidence, '.spec-first/runtime/first'].slice(0, 5),
+    },
+  };
+}
+
+function buildSyntheticCriticalFlows(summary: FirstRuntimeSummary): FirstCriticalFlows {
+  const primaryEntryPoint = summary.entryPoints[0] ?? 'src/cli/index.ts';
+  const runtimeModule =
+    summary.modules.find((item) => item.includes('skill-runtime')) ?? 'src/core/skill-runtime';
+
+  return [
+    {
+      flowId: 'flow-cli-entry',
+      name: 'CLI Entry Flow',
+      entryPoints: [primaryEntryPoint],
+      coreModules: [runtimeModule],
+      invariants: ['runtime truth first'],
+      verificationHooks: ['refresh docs from runtime truth'],
+    },
+    {
+      flowId: 'flow-doc-projection',
+      name: 'Docs Projection Flow',
+      entryPoints: ['src/core/skill-runtime/first-doc-projection.ts'],
+      coreModules: [runtimeModule],
+      invariants: ['canonical projection docs must reflect runtime truth'],
+      verificationHooks: ['refresh docs from runtime truth'],
+    },
+  ];
+}
+
+function buildSyntheticChangeMap(summary: FirstRuntimeSummary): FirstChangeMap {
+  const runtimeModule =
+    summary.modules.find((item) => item.includes('skill-runtime')) ?? 'src/core/skill-runtime';
+
+  return [
+    {
+      changeType: 'runtime-asset-extension',
+      likelyModules: [runtimeModule],
+      likelyCommands: ['src/cli/commands/first.ts'],
+      likelyConfigs: ['package.json'],
+      likelyTests: ['tests/unit/first-runtime-store.test.ts'],
+      riskPoints: ['runtime index drift'],
+    },
+    {
+      changeType: 'docs-projection-adjustment',
+      likelyModules: ['src/core/skill-runtime/first-doc-projection.ts'],
+      likelyCommands: [],
+      likelyConfigs: [],
+      likelyTests: ['tests/unit/first-doc-projection.test.ts'],
+      riskPoints: ['canonical docs mismatch'],
+    },
+  ];
+}
+
+function buildSyntheticEntryGuide(): FirstEntryGuide {
+  return [
+    {
+      taskCategory: 'runtime-extension',
+      readFirst: ['.spec-first/runtime/first/summary.json', '.spec-first/runtime/first/steering.json'],
+      thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
+      avoidEntry: ['docs/first/tech-stack.md'],
+      relatedFlows: ['flow-cli-entry'],
+    },
+    {
+      taskCategory: 'docs-projection',
+      readFirst: ['docs/first/README.md', '.spec-first/runtime/first/change-map.json'],
+      thenRead: ['src/core/skill-runtime/first-doc-projection.ts'],
+      avoidEntry: ['legacy docs as truth'],
+      relatedFlows: ['flow-doc-projection'],
+    },
+  ];
+}
+
+function buildSyntheticRebootGuide(summary: FirstRuntimeSummary): FirstRebootGuide {
+  return {
+    projectWhat: summary.project.overview ?? `${summary.project.name} project cognition`,
+    whereToStart: ['.spec-first/runtime/first/summary.json', 'docs/first/README.md'],
+    currentCriticalAreas: ['runtime truth first', ...summary.risks.slice(0, 2)],
+    commonChangePaths: [...summary.modules.slice(0, 3), ...summary.entryPoints.slice(0, 2)],
+    verifyChecklist: ['refresh docs from runtime truth'],
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -365,12 +515,27 @@ function loadLegacyProjectionContext(projectRoot: string): ProjectionContext | n
         '.spec-first/runtime/first/stage-views.json',
         rawStageViews.generated_at ?? generatedAt
       ),
+      steering: makeSyntheticAsset('.spec-first/runtime/first/steering.json', generatedAt),
+      conventions: makeSyntheticAsset('.spec-first/runtime/first/conventions.json', generatedAt),
+      criticalFlows: makeSyntheticAsset(
+        '.spec-first/runtime/first/critical-flows.json',
+        generatedAt
+      ),
+      changeMap: makeSyntheticAsset('.spec-first/runtime/first/change-map.json', generatedAt),
+      entryGuide: makeSyntheticAsset('.spec-first/runtime/first/entry-guide.json', generatedAt),
+      rebootGuide: makeSyntheticAsset('.spec-first/runtime/first/reboot-guide.json', generatedAt),
       docsProjection: {},
       status: 'current',
     },
     summary,
     roleViews: normalizeLegacyRoleViews(rawRoleViews),
     stageViews: normalizeLegacyStageViews(rawStageViews),
+    steering: buildSyntheticSteering(summary, artifactDocs),
+    conventions: buildSyntheticConventions(summary),
+    criticalFlows: buildSyntheticCriticalFlows(summary),
+    changeMap: buildSyntheticChangeMap(summary),
+    entryGuide: buildSyntheticEntryGuide(),
+    rebootGuide: buildSyntheticRebootGuide(summary),
     artifactDocs,
     techStack,
   };
@@ -388,6 +553,12 @@ function loadProjectionContext(projectRoot: string): ProjectionContext {
           ? legacyHints.artifactDocs
           : Object.keys(context.index.docsProjection ?? {}).sort(),
       techStack: context.summary.techStack ?? legacyHints.techStack,
+      conventions: readFirstConventions(projectRoot) ?? buildSyntheticConventions(context.summary),
+      criticalFlows:
+        readFirstCriticalFlows(projectRoot) ?? buildSyntheticCriticalFlows(context.summary),
+      changeMap: readFirstChangeMap(projectRoot) ?? buildSyntheticChangeMap(context.summary),
+      entryGuide: readFirstEntryGuide(projectRoot) ?? buildSyntheticEntryGuide(),
+      rebootGuide: readFirstRebootGuide(projectRoot) ?? buildSyntheticRebootGuide(context.summary),
     };
   } catch (error) {
     const legacyContext = loadLegacyProjectionContext(projectRoot);
@@ -411,42 +582,41 @@ function renderSubsection(title: string, items: string[], emptyLabel?: string): 
 }
 
 function renderOverviewDoc(context: ProjectionContext): string {
-  const summaryDoc = 'docs/first/summary.md';
-  const roleViewsDoc = 'docs/first/role-views.md';
-  const stageViewsDoc = 'docs/first/stage-views.md';
+  const legacyDocs = context.artifactDocs.filter((doc) => !CANONICAL_PROJECTION_DOCS.includes(doc));
   const lines = [
     '# 项目认知投影视图',
     '',
-    '> `docs/first/` 是 `.spec-first/runtime/first/` 的人类可读投影视图层，不作为 runtime 真源。',
+    '> `docs/first/` 是 `.spec-first/runtime/first/` 的人类可读投影视图层，不作为 runtime 真源；其中只有 canonical projection docs 受 runtime 自动刷新保障。',
     '',
     '## 项目概览',
     `- project: ${context.summary.project.name}`,
     `- mode: ${context.summary.mode}`,
     `- generatedAt: ${context.summary.generatedAt}`,
     '',
-    '## 文档投影视图',
-    `- ${summaryDoc}`,
-    `- ${roleViewsDoc}`,
-    `- ${stageViewsDoc}`,
-  ];
-
-  if (context.artifactDocs.length > 0) {
-    lines.push('', '## Skill 初始化文档', ...renderList(context.artifactDocs));
-  }
-
-  lines.push(
+    '## Runtime Canonical Truth',
     '',
-    '## Runtime 真源',
     '- .spec-first/runtime/first/index.json',
     '- .spec-first/runtime/first/summary.json',
     '- .spec-first/runtime/first/role-views.json',
     '- .spec-first/runtime/first/stage-views.json',
     '',
+    '## Canonical Projection Docs',
+    ...renderList([...CANONICAL_PROJECTION_DOCS]),
+    '',
+    '## Legacy / Reference Docs',
+    ...renderList(legacyDocs, '无'),
+    '- 当前不受 runtime 真源自动刷新保障。',
+    '',
+    '## Skill Consumption Contract',
+    '- 后续 skill 的正式输入优先读取 `.spec-first/runtime/first/`。',
+    '- 列出的 `Canonical Projection Docs` 全部受 runtime 自动刷新保障。',
+    '- 其他 `docs/first/*` 文档只作为 legacy/reference docs 提供人工参考，不作为 canonical truth。',
+    '',
     '## 使用约定',
-    '- 读取机器真相时优先使用 `.spec-first/runtime/first/`。',
-    '- 阅读面向人的摘要时使用 `docs/first/` 投影视图。',
-    '- 当 runtime 真源变化时，应重新刷新 docs 投影视图。'
-  );
+    '- 读取机器真相时优先使用 `.spec-first/runtime/first/` runtime truth。',
+    '- 阅读面向人的摘要时使用 canonical projection docs。',
+    '- 当 runtime truth 变化时，应重新刷新 canonical projection docs。'
+  ];
 
   return lines.join('\n');
 }
@@ -486,6 +656,172 @@ function renderRoleViewsDoc(context: ProjectionContext): string {
   }
 
   return lines.join('\n');
+}
+
+function renderSteeringDoc(context: ProjectionContext): string {
+  return [
+    '# First Runtime Steering',
+    '',
+    '## Product Steering',
+    `- Overview: ${context.steering.product.overview}`,
+    ...renderSubsection('Core Scenarios', context.steering.product.coreScenarios),
+    ...renderSubsection('Non Goals', context.steering.product.nonGoals),
+    ...renderSubsection('Glossary', context.steering.product.glossary),
+    ...renderSection('Tech Stack', context.steering.tech.stack),
+    ...renderSection('Constraints', context.steering.tech.constraints),
+    ...renderSection('Forbidden Patterns', context.steering.tech.forbiddenPatterns),
+    ...renderSection('Modules', context.steering.structure.modules),
+    ...renderSection('Boundaries', context.steering.structure.boundaries),
+    ...renderSection('Entry Rules', context.steering.structure.entryRules),
+  ].join('\n');
+}
+
+function renderConventionsDoc(context: ProjectionContext): string {
+  return [
+    '# First Runtime Conventions',
+    '',
+    '## API',
+    ...renderSubsection('Observed Patterns', context.conventions.api.observedPatterns),
+    ...renderSubsection('Deviations', context.conventions.api.deviations, '无'),
+    '',
+    `- Recommended Convention: ${context.conventions.api.recommendedConvention}`,
+    ...renderSubsection('Evidence', context.conventions.api.evidence),
+    '',
+    '## Module',
+    ...renderSubsection('Observed Patterns', context.conventions.module.observedPatterns),
+    ...renderSubsection('Deviations', context.conventions.module.deviations, '无'),
+    '',
+    `- Recommended Convention: ${context.conventions.module.recommendedConvention}`,
+    ...renderSubsection('Evidence', context.conventions.module.evidence),
+    '',
+    '## Testing',
+    ...renderSubsection('Observed Patterns', context.conventions.testing.observedPatterns),
+    ...renderSubsection('Deviations', context.conventions.testing.deviations, '无'),
+    '',
+    `- Recommended Convention: ${context.conventions.testing.recommendedConvention}`,
+    ...renderSubsection('Evidence', context.conventions.testing.evidence),
+    '',
+    '## Project Rules',
+    ...renderSubsection('Observed Patterns', context.conventions.projectRules.observedPatterns),
+    ...renderSubsection('Deviations', context.conventions.projectRules.deviations, '无'),
+    '',
+    `- Recommended Convention: ${context.conventions.projectRules.recommendedConvention}`,
+    ...renderSubsection('Evidence', context.conventions.projectRules.evidence),
+  ].join('\n');
+}
+
+function renderCriticalFlowsDoc(context: ProjectionContext): string {
+  const lines = ['# First Runtime Critical Flows'];
+
+  for (const flow of context.criticalFlows) {
+    lines.push('', `## ${flow.name}`, '', `- Flow ID: ${flow.flowId}`);
+    lines.push(...renderSubsection('Entry Points', flow.entryPoints));
+    lines.push(...renderSubsection('Core Modules', flow.coreModules));
+    lines.push(...renderSubsection('Invariants', flow.invariants));
+    lines.push(...renderSubsection('Verification Hooks', flow.verificationHooks));
+  }
+
+  return lines.join('\n');
+}
+
+function renderChangeMapDoc(context: ProjectionContext): string {
+  const lines = ['# First Runtime Change Map'];
+
+  for (const entry of context.changeMap) {
+    lines.push('', `## ${entry.changeType}`);
+    lines.push(...renderSubsection('Likely Modules', entry.likelyModules));
+    lines.push(...renderSubsection('Likely Commands', entry.likelyCommands, '无'));
+    lines.push(...renderSubsection('Likely Configs', entry.likelyConfigs, '无'));
+    lines.push(...renderSubsection('Likely Tests', entry.likelyTests, '无'));
+    lines.push(...renderSubsection('Risk Points', entry.riskPoints));
+  }
+
+  return lines.join('\n');
+}
+
+function renderEntryGuideDoc(context: ProjectionContext): string {
+  const lines = ['# First Runtime Entry Guide'];
+
+  for (const entry of context.entryGuide) {
+    lines.push('', `## ${entry.taskCategory}`);
+    lines.push(...renderSubsection('Read First', entry.readFirst));
+    lines.push(...renderSubsection('Then Read', entry.thenRead, '无'));
+    lines.push(...renderSubsection('Avoid Entry', entry.avoidEntry, '无'));
+    lines.push(...renderSubsection('Related Flows', entry.relatedFlows, '无'));
+  }
+
+  return lines.join('\n');
+}
+
+function renderCommonPlaybooksDoc(context: ProjectionContext): string {
+  const lines = ['# Common Playbooks'];
+
+  for (const entry of context.entryGuide) {
+    const matchingChangeMap = context.changeMap.find(
+      (item) => item.changeType.includes(entry.taskCategory) || entry.taskCategory.includes(item.changeType)
+    );
+
+    lines.push('', `## ${entry.taskCategory}`);
+    lines.push(...renderSubsection('Read First', entry.readFirst));
+    lines.push(...renderSubsection('Then Read', entry.thenRead, '无'));
+    lines.push(...renderSubsection('Avoid Entry', entry.avoidEntry, '无'));
+    lines.push(...renderSubsection('Related Flows', entry.relatedFlows, '无'));
+
+    if (matchingChangeMap) {
+      lines.push(...renderSubsection('Likely Modules', matchingChangeMap.likelyModules, '无'));
+      lines.push(...renderSubsection('Likely Tests', matchingChangeMap.likelyTests, '无'));
+      lines.push(...renderSubsection('Risk Points', matchingChangeMap.riskPoints, '无'));
+    }
+
+    const matchingConvention = Object.values(context.conventions).find((bucket) =>
+      bucket.observedPatterns.some((pattern: string) =>
+        [...entry.readFirst, ...entry.thenRead].some((target) => target.includes(pattern))
+      )
+    );
+    if (matchingConvention) {
+      lines.push('', `- Recommended Convention: ${matchingConvention.recommendedConvention}`);
+      lines.push(...renderSubsection('Evidence', matchingConvention.evidence, '无'));
+    }
+  }
+
+  return lines.join('\n');
+}
+
+function renderKnownRisksAndTrapsDoc(context: ProjectionContext): string {
+  const lines = [
+    '# Known Risks And Traps',
+    '',
+    '## Current Critical Areas',
+    ...renderList(context.rebootGuide.currentCriticalAreas, '无'),
+    '',
+    '## Summary Risks',
+    ...renderList(context.summary.risks, '无'),
+  ];
+
+  for (const flow of context.criticalFlows) {
+    lines.push('', `## ${flow.name}`);
+    lines.push(...renderSubsection('Invariants', flow.invariants, '无'));
+    lines.push(...renderSubsection('Verification Hooks', flow.verificationHooks, '无'));
+
+    const relatedRiskPoints = context.changeMap
+      .filter((entry) => flow.coreModules.some((module) => entry.likelyModules.includes(module)))
+      .flatMap((entry) => entry.riskPoints);
+    lines.push(...renderSubsection('Risk Points', Array.from(new Set(relatedRiskPoints)), '无'));
+  }
+
+  return lines.join('\n');
+}
+
+function renderRebootGuideDoc(context: ProjectionContext): string {
+  return [
+    '# First Runtime Reboot Guide',
+    '',
+    `- Project What: ${context.rebootGuide.projectWhat}`,
+    ...renderSection('Where To Start', context.rebootGuide.whereToStart),
+    ...renderSection('Current Critical Areas', context.rebootGuide.currentCriticalAreas),
+    ...renderSection('Common Change Paths', context.rebootGuide.commonChangePaths),
+    ...renderSection('Verify Checklist', context.rebootGuide.verifyChecklist),
+  ].join('\n');
 }
 
 function renderStageViewsDoc(context: ProjectionContext): string {
@@ -570,6 +906,30 @@ export function renderProjectedDoc(docPath: string, context: ProjectionContext):
   }
   if (docPath.endsWith('stage-views.md')) {
     return renderStageViewsDoc(context);
+  }
+  if (docPath.endsWith('steering.md')) {
+    return renderSteeringDoc(context);
+  }
+  if (docPath.endsWith('conventions.md')) {
+    return renderConventionsDoc(context);
+  }
+  if (docPath.endsWith('critical-flows.md')) {
+    return renderCriticalFlowsDoc(context);
+  }
+  if (docPath.endsWith('change-map.md')) {
+    return renderChangeMapDoc(context);
+  }
+  if (docPath.endsWith('entry-guide.md')) {
+    return renderEntryGuideDoc(context);
+  }
+  if (docPath.endsWith('common-playbooks.md')) {
+    return renderCommonPlaybooksDoc(context);
+  }
+  if (docPath.endsWith('known-risks-and-traps.md')) {
+    return renderKnownRisksAndTrapsDoc(context);
+  }
+  if (docPath.endsWith('reboot-guide.md')) {
+    return renderRebootGuideDoc(context);
   }
 
   return renderGenericProjectedDoc(docPath, context);

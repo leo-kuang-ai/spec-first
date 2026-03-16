@@ -13,12 +13,18 @@ import {
 } from '../../src/core/skill-runtime/first-change-detector.js';
 import {
   getFirstRuntimeDir,
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstSteering,
   writeFirstStageViews,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
-import type { FirstRuntimeIndex, FirstRuntimeSummary, FirstRoleViews, FirstStageViews } from '../../src/core/skill-runtime/first-runtime-types.js';
+import type { FirstChangeMap, FirstConventions, FirstCriticalFlows, FirstEntryGuide, FirstRebootGuide, FirstRuntimeIndex, FirstRuntimeSummary, FirstRoleViews, FirstStageViews, FirstSteering } from '../../src/core/skill-runtime/first-runtime-types.js';
 
 const TEST_DIR = join(import.meta.dirname, '../fixtures/first-change-detector');
 
@@ -29,6 +35,12 @@ const index: FirstRuntimeIndex = {
   summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   docsProjection: {},
   status: 'current',
 };
@@ -60,10 +72,69 @@ const stageViews: FirstStageViews = {
   verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
 };
 
+const steering: FirstSteering = {
+  product: { overview: 'runtime health', coreScenarios: ['runtime truth source'], nonGoals: [], glossary: ['Feature'] },
+  tech: { stack: ['TypeScript'], constraints: [], forbiddenPatterns: ['docs-only truth'] },
+  structure: { modules: ['src/core/skill-runtime'], boundaries: ['src/cli/commands/init.ts'], entryRules: ['read runtime truth first'] },
+};
+
+const conventions: FirstConventions = {
+  api: { observedPatterns: ['spec-first init'], deviations: [], recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.', evidence: ['src/cli/commands/init.ts'] },
+  module: { observedPatterns: ['src/core/skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core and CLI entry under src/cli.', evidence: ['src/core/skill-runtime'] },
+  testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['tests/unit/first-change-detector.test.ts'] },
+  projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth before docs.', evidence: ['.spec-first/runtime/first'] },
+};
+
+const criticalFlows: FirstCriticalFlows = [
+  {
+    flowId: 'flow-cli-entry',
+    name: 'CLI Entry Flow',
+    entryPoints: ['src/cli/commands/init.ts'],
+    coreModules: ['src/core/skill-runtime'],
+    invariants: ['runtime truth first'],
+    verificationHooks: ['pnpm vitest'],
+  },
+];
+
+const changeMap: FirstChangeMap = [
+  {
+    changeType: 'runtime-asset-extension',
+    likelyModules: ['src/core/skill-runtime'],
+    likelyCommands: ['src/cli/commands/first.ts'],
+    likelyConfigs: ['package.json'],
+    likelyTests: ['tests/unit/first-change-detector.test.ts'],
+    riskPoints: ['runtime index drift'],
+  },
+];
+
+const entryGuide: FirstEntryGuide = [
+  {
+    taskCategory: 'runtime-extension',
+    readFirst: ['.spec-first/runtime/first/summary.json', '.spec-first/runtime/first/steering.json'],
+    thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
+    avoidEntry: ['docs/first/tech-stack.md'],
+    relatedFlows: ['flow-cli-entry'],
+  },
+];
+
+const rebootGuide: FirstRebootGuide = {
+  projectWhat: 'runtime health',
+  whereToStart: ['.spec-first/runtime/first/summary.json', 'docs/first/README.md'],
+  currentCriticalAreas: ['runtime truth first'],
+  commonChangePaths: ['src/core/skill-runtime', 'src/cli/commands/init.ts'],
+  verifyChecklist: ['pnpm vitest'],
+};
+
 function seedRuntime(projectRoot: string, overrideIndex?: Partial<FirstRuntimeIndex>) {
   writeFirstRuntimeSummary(projectRoot, summary);
   writeFirstRoleViews(projectRoot, roleViews);
   writeFirstStageViews(projectRoot, stageViews);
+  writeFirstSteering(projectRoot, steering);
+  writeFirstConventions(projectRoot, conventions);
+  writeFirstCriticalFlows(projectRoot, criticalFlows);
+  writeFirstChangeMap(projectRoot, changeMap);
+  writeFirstEntryGuide(projectRoot, entryGuide);
+  writeFirstRebootGuide(projectRoot, rebootGuide);
 
   const runtimeIndex = { ...index, ...overrideIndex };
   const runtimeDir = getFirstRuntimeDir(projectRoot);
@@ -86,6 +157,42 @@ function seedRuntime(projectRoot: string, overrideIndex?: Partial<FirstRuntimeIn
       fileHash: runtimeIndex.stageViews.fileHash === 'stages'
         ? sha256Hex(readFileSync(join(runtimeDir, 'stage-views.json'), 'utf-8'))
         : runtimeIndex.stageViews.fileHash,
+    },
+    steering: {
+      ...runtimeIndex.steering,
+      fileHash: runtimeIndex.steering.fileHash === 'steering'
+        ? sha256Hex(readFileSync(join(runtimeDir, 'steering.json'), 'utf-8'))
+        : runtimeIndex.steering.fileHash,
+    },
+    conventions: {
+      ...runtimeIndex.conventions,
+      fileHash: runtimeIndex.conventions.fileHash === 'conventions'
+        ? sha256Hex(readFileSync(join(runtimeDir, 'conventions.json'), 'utf-8'))
+        : runtimeIndex.conventions.fileHash,
+    },
+    criticalFlows: {
+      ...runtimeIndex.criticalFlows,
+      fileHash: runtimeIndex.criticalFlows.fileHash === 'critical-flows'
+        ? sha256Hex(readFileSync(join(runtimeDir, 'critical-flows.json'), 'utf-8'))
+        : runtimeIndex.criticalFlows.fileHash,
+    },
+    changeMap: {
+      ...runtimeIndex.changeMap,
+      fileHash: runtimeIndex.changeMap.fileHash === 'change-map'
+        ? sha256Hex(readFileSync(join(runtimeDir, 'change-map.json'), 'utf-8'))
+        : runtimeIndex.changeMap.fileHash,
+    },
+    entryGuide: {
+      ...runtimeIndex.entryGuide,
+      fileHash: runtimeIndex.entryGuide.fileHash === 'entry-guide'
+        ? sha256Hex(readFileSync(join(runtimeDir, 'entry-guide.json'), 'utf-8'))
+        : runtimeIndex.entryGuide.fileHash,
+    },
+    rebootGuide: {
+      ...runtimeIndex.rebootGuide,
+      fileHash: runtimeIndex.rebootGuide.fileHash === 'reboot-guide'
+        ? sha256Hex(readFileSync(join(runtimeDir, 'reboot-guide.json'), 'utf-8'))
+        : runtimeIndex.rebootGuide.fileHash,
     },
   });
 }
@@ -141,7 +248,7 @@ describe('checkFirstUpdateContext', () => {
     expect(result.hasManualModifications).toBe(false);
   });
 
-  it('runtime 资产健康时返回 3 个运行时资产状态', () => {
+  it('runtime 资产健康时返回 9 个运行时资产状态', () => {
     seedRuntime(TEST_DIR);
 
     const result = checkFirstUpdateContext(TEST_DIR);
@@ -151,9 +258,25 @@ describe('checkFirstUpdateContext', () => {
       'summary.json',
       'role-views.json',
       'stage-views.json',
+      'steering.json',
+      'conventions.json',
+      'critical-flows.json',
+      'change-map.json',
+      'entry-guide.json',
+      'reboot-guide.json',
     ]);
     expect(result.productStatus.every((item) => item.issues.length === 0)).toBe(true);
     expect(result.hasManualModifications).toBe(false);
+  });
+
+  it('runtime 健康上下文会透出 sourceCommit 作为 lastUpdateCommit', () => {
+    seedRuntime(TEST_DIR, {
+      sourceCommit: 'abc123',
+    });
+
+    const result = checkFirstUpdateContext(TEST_DIR);
+
+    expect(result.lastUpdateCommit).toBe('abc123');
   });
 
   it('runtime 资产 hash 不匹配时标记 hasManualModifications=true', () => {
@@ -253,6 +376,18 @@ describe('formatHealthStatus', () => {
 
     expect(output).toContain('summary.json');
     expect(output).toContain('summary mismatch');
+  });
+
+  it('显示 Git commit mismatch 状态', () => {
+    const output = formatHealthStatus({
+      hasExistingOutput: true,
+      lastUpdateCommit: 'abc123',
+      currentCommit: 'def456',
+      productStatus: [],
+      hasManualModifications: false,
+    });
+
+    expect(output).toContain('Git commit: ⚠️ 不匹配');
   });
 });
 

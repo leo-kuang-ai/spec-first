@@ -194,6 +194,12 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     { name: 'summary.json', entry: runtimeIndex?.summary },
     { name: 'role-views.json', entry: runtimeIndex?.roleViews },
     { name: 'stage-views.json', entry: runtimeIndex?.stageViews },
+    { name: 'steering.json', entry: runtimeIndex?.steering },
+    { name: 'conventions.json', entry: runtimeIndex?.conventions },
+    { name: 'critical-flows.json', entry: runtimeIndex?.criticalFlows },
+    { name: 'change-map.json', entry: runtimeIndex?.changeMap },
+    { name: 'entry-guide.json', entry: runtimeIndex?.entryGuide },
+    { name: 'reboot-guide.json', entry: runtimeIndex?.rebootGuide },
   ];
 
   const productStatus: ProductStatus[] = runtimeAssets.map(({ name, entry }) => {
@@ -244,8 +250,9 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
   return {
     hasExistingOutput: true,
     lastUpdateTime,
+    lastUpdateCommit: runtimeIndex?.sourceCommit,
     currentCommit,
-    changeAnalysis: analyzeChanges(projectRoot),
+    changeAnalysis: analyzeChanges(projectRoot, runtimeIndex?.sourceCommit),
     productStatus,
     hasManualModifications: productStatus.some((item) =>
       item.issues.some((issue) => issue.type === 'hash_mismatch')
@@ -313,10 +320,11 @@ export function formatHealthStatus(context: FirstUpdateContext): string {
   const lines: string[] = [];
 
   if (!context.hasExistingOutput) {
-    return '✅ 未检测到已有产物，将执行首次生成。\n';
+    return '✅ 未检测到已有产物，将执行首次生成。仅检查 runtime truth + canonical projection docs，legacy docs 不在 health 范围内。\n';
   }
 
   lines.push('📋 **检测到已有产物**');
+  lines.push('- health 范围: runtime truth + canonical projection docs');
   if (context.lastUpdateTime) {
     const daysSince = Math.floor(
       (Date.now() - context.lastUpdateTime.getTime()) / (1000 * 60 * 60 * 24)

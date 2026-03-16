@@ -8,21 +8,45 @@ import {
   matchRuntimeArtifactsByChangedFile,
 } from './first-artifact-mapping.js';
 import { refreshFirstDocsFromRuntime } from './first-doc-projection.js';
+import { buildFirstChangeMap } from './first-change-map.js';
+import { buildFirstConventions } from './first-conventions.js';
+import { buildFirstCriticalFlows } from './first-critical-flows.js';
+import { buildFirstEntryGuide } from './first-entry-guide.js';
+import { buildFirstRebootGuide } from './first-reboot-guide.js';
 import { buildRoleViews } from './first-role-views.js';
 import {
+  getFirstConventionsPath,
+  getFirstChangeMapPath,
+  getFirstCriticalFlowsPath,
+  getFirstEntryGuidePath,
+  getFirstRebootGuidePath,
   getFirstRoleViewsPath,
   getFirstRuntimeSummaryPath,
+  getFirstSteeringPath,
   getFirstStageViewsPath,
   readFirstRoleViews,
   readFirstRuntimeIndex,
   readFirstRuntimeSummary,
+  readFirstChangeMap,
+  readFirstConventions,
+  readFirstCriticalFlows,
+  readFirstEntryGuide,
+  readFirstRebootGuide,
+  readFirstSteering,
   readFirstStageViews,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
+  writeFirstSteering,
   writeFirstStageViews,
 } from './first-runtime-store.js';
 import type {
+  FirstSteering,
   FirstRoleView,
   FirstRuntimeAssetIndexEntry,
   FirstRuntimeIndex,
@@ -48,6 +72,7 @@ type FirstRuntimeArtifact = (typeof FIRST_RUNTIME_ARTIFACTS)[number];
 export interface FirstContext {
   index: FirstRuntimeIndex;
   summary: FirstRuntimeSummary;
+  steering: FirstSteering;
   roleViews: FirstRoleViews;
   stageViews: FirstStageViews;
 }
@@ -67,8 +92,8 @@ function requireRuntimeAsset<T>(asset: T | null, label: string): T {
 
 function ensureHealthyRuntimeAsset(
   index: FirstRuntimeIndex,
-  assetName: 'summary' | 'roleViews' | 'stageViews',
-  label: 'summary' | 'role-views' | 'stage-views'
+  assetName: 'summary' | 'roleViews' | 'stageViews' | 'criticalFlows',
+  label: 'summary' | 'role-views' | 'stage-views' | 'critical-flows'
 ): void {
   const asset = index[assetName];
   if (!asset.healthy) {
@@ -81,12 +106,26 @@ function ensureHealthyStageViews(index: FirstRuntimeIndex): void {
   ensureHealthyRuntimeAsset(index, 'stageViews', 'stage-views');
 }
 
+function ensureHealthySteering(index: FirstRuntimeIndex): void {
+  const asset = index.steering;
+  if (!asset.healthy) {
+    const reason = asset.issues?.join('；') || index.staleReason || 'runtime asset unhealthy';
+    throw new Error(`steering: ${reason}`);
+  }
+}
+
 function isRuntimeHealthy(index: FirstRuntimeIndex): boolean {
   return (
     index.status === 'current' &&
     index.summary.healthy &&
     index.roleViews.healthy &&
-    index.stageViews.healthy
+    index.stageViews.healthy &&
+    index.steering.healthy &&
+    index.conventions.healthy &&
+    index.criticalFlows.healthy &&
+    index.changeMap.healthy &&
+    index.entryGuide.healthy &&
+    index.rebootGuide.healthy
   );
 }
 
@@ -195,6 +234,12 @@ function determineRebuildArtifacts(
       artifacts.add('summary.json');
       artifacts.add('role-views.json');
       artifacts.add('stage-views.json');
+      artifacts.add('steering.json');
+      artifacts.add('conventions.json');
+      artifacts.add('critical-flows.json');
+      artifacts.add('change-map.json');
+      artifacts.add('entry-guide.json');
+      artifacts.add('reboot-guide.json');
       continue;
     }
 
@@ -215,6 +260,32 @@ function determineRebuildArtifacts(
     }
 
     if (
+      file.endsWith('/first-conventions.ts') ||
+      file === 'src/core/skill-runtime/first-conventions.ts'
+    ) {
+      artifacts.add('conventions.json');
+      continue;
+    }
+
+    if (
+      file.endsWith('/first-critical-flows.ts') ||
+      file === 'src/core/skill-runtime/first-critical-flows.ts'
+    ) {
+      artifacts.add('critical-flows.json');
+      continue;
+    }
+
+    if (
+      file.endsWith('/first-change-map.ts') ||
+      file === 'src/core/skill-runtime/first-change-map.ts'
+    ) {
+      artifacts.add('change-map.json');
+      artifacts.add('entry-guide.json');
+      artifacts.add('reboot-guide.json');
+      continue;
+    }
+
+    if (
       file.endsWith('/first-runtime-store.ts') ||
       file === 'src/core/skill-runtime/first-runtime-store.ts' ||
       file.endsWith('/first-context.ts') ||
@@ -227,6 +298,12 @@ function determineRebuildArtifacts(
       artifacts.add('summary.json');
       artifacts.add('role-views.json');
       artifacts.add('stage-views.json');
+      artifacts.add('steering.json');
+      artifacts.add('conventions.json');
+      artifacts.add('critical-flows.json');
+      artifacts.add('change-map.json');
+      artifacts.add('entry-guide.json');
+      artifacts.add('reboot-guide.json');
     }
   }
 
@@ -244,7 +321,28 @@ function getRuntimeArtifactFullPath(projectRoot: string, artifact: FirstRuntimeA
   if (artifact === 'role-views.json') {
     return getFirstRoleViewsPath(projectRoot);
   }
-  return getFirstStageViewsPath(projectRoot);
+  if (artifact === 'stage-views.json') {
+    return getFirstStageViewsPath(projectRoot);
+  }
+  if (artifact === 'steering.json') {
+    return getFirstSteeringPath(projectRoot);
+  }
+  if (artifact === 'conventions.json') {
+    return getFirstConventionsPath(projectRoot);
+  }
+  if (artifact === 'critical-flows.json') {
+    return getFirstCriticalFlowsPath(projectRoot);
+  }
+  if (artifact === 'change-map.json') {
+    return getFirstChangeMapPath(projectRoot);
+  }
+  if (artifact === 'entry-guide.json') {
+    return getFirstEntryGuidePath(projectRoot);
+  }
+  if (artifact === 'reboot-guide.json') {
+    return getFirstRebootGuidePath(projectRoot);
+  }
+  return getFirstSteeringPath(projectRoot);
 }
 
 function buildIndexEntry(path: string, now: string): FirstRuntimeAssetIndexEntry {
@@ -316,6 +414,53 @@ function rewriteRuntimeArtifacts(
     rewritten.add('stage-views.json');
   }
 
+  if (artifacts.includes('steering.json')) {
+    writeFirstSteering(projectRoot, {
+      product: {
+        overview: summary.project.overview ?? `${summary.project.name} project cognition`,
+        coreScenarios: summary.capabilities.slice(0, 3),
+        nonGoals: ['legacy docs as canonical truth'],
+        glossary: summary.dataModels.slice(0, 5),
+      },
+      tech: {
+        stack: summary.techStack ?? [],
+        constraints: summary.risks.slice(0, 3),
+        forbiddenPatterns: ['docs-only truth'],
+      },
+      structure: {
+        modules: summary.modules,
+        boundaries: summary.entryPoints,
+        entryRules: ['read runtime truth first'],
+      },
+    });
+    rewritten.add('steering.json');
+  }
+
+  if (artifacts.includes('conventions.json')) {
+    writeFirstConventions(projectRoot, buildFirstConventions(summary));
+    rewritten.add('conventions.json');
+  }
+
+  if (artifacts.includes('critical-flows.json')) {
+    writeFirstCriticalFlows(projectRoot, buildFirstCriticalFlows(summary));
+    rewritten.add('critical-flows.json');
+  }
+
+  if (artifacts.includes('change-map.json')) {
+    writeFirstChangeMap(projectRoot, buildFirstChangeMap(summary));
+    rewritten.add('change-map.json');
+  }
+
+  if (artifacts.includes('entry-guide.json')) {
+    writeFirstEntryGuide(projectRoot, buildFirstEntryGuide(summary));
+    rewritten.add('entry-guide.json');
+  }
+
+  if (artifacts.includes('reboot-guide.json')) {
+    writeFirstRebootGuide(projectRoot, buildFirstRebootGuide(summary));
+    rewritten.add('reboot-guide.json');
+  }
+
   return Array.from(rewritten);
 }
 
@@ -343,7 +488,31 @@ function syncRuntimeIndex(
       nextIndex.roleViews = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
       continue;
     }
-    nextIndex.stageViews = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+    if (artifact === 'stage-views.json') {
+      nextIndex.stageViews = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+      continue;
+    }
+    if (artifact === 'steering.json') {
+      nextIndex.steering = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+      continue;
+    }
+    if (artifact === 'conventions.json') {
+      nextIndex.conventions = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+      continue;
+    }
+    if (artifact === 'critical-flows.json') {
+      nextIndex.criticalFlows = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+      continue;
+    }
+    if (artifact === 'change-map.json') {
+      nextIndex.changeMap = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+      continue;
+    }
+    if (artifact === 'entry-guide.json') {
+      nextIndex.entryGuide = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
+      continue;
+    }
+    nextIndex.rebootGuide = { ...entry, path: getRuntimeArtifactRelativePath(artifact) };
   }
 
   for (const docPath of refreshedDocs) {
@@ -356,8 +525,25 @@ function syncRuntimeIndex(
   const summaryHealthy = nextIndex.summary.healthy;
   const roleHealthy = nextIndex.roleViews.healthy;
   const stageHealthy = nextIndex.stageViews.healthy;
+  const steeringHealthy = nextIndex.steering.healthy;
+  const conventionsHealthy = nextIndex.conventions.healthy;
+  const criticalFlowsHealthy = nextIndex.criticalFlows.healthy;
+  const changeMapHealthy = nextIndex.changeMap.healthy;
+  const entryGuideHealthy = nextIndex.entryGuide.healthy;
+  const rebootGuideHealthy = nextIndex.rebootGuide.healthy;
 
-  nextIndex.status = summaryHealthy && roleHealthy && stageHealthy ? 'current' : 'stale';
+  nextIndex.status =
+    summaryHealthy &&
+    roleHealthy &&
+    stageHealthy &&
+    steeringHealthy &&
+    conventionsHealthy &&
+    criticalFlowsHealthy &&
+    changeMapHealthy &&
+    entryGuideHealthy &&
+    rebootGuideHealthy
+      ? 'current'
+      : 'stale';
   nextIndex.staleReason =
     nextIndex.status === 'current'
       ? undefined
@@ -365,6 +551,12 @@ function syncRuntimeIndex(
           ...(!summaryHealthy ? ['summary unhealthy'] : []),
           ...(!roleHealthy ? ['role-views unhealthy'] : []),
           ...(!stageHealthy ? ['stage-views unhealthy'] : []),
+          ...(!steeringHealthy ? ['steering unhealthy'] : []),
+          ...(!conventionsHealthy ? ['conventions unhealthy'] : []),
+          ...(!criticalFlowsHealthy ? ['critical-flows unhealthy'] : []),
+          ...(!changeMapHealthy ? ['change-map unhealthy'] : []),
+          ...(!entryGuideHealthy ? ['entry-guide unhealthy'] : []),
+          ...(!rebootGuideHealthy ? ['reboot-guide unhealthy'] : []),
         ].join('；');
 
   return nextIndex;
@@ -376,14 +568,18 @@ export function loadFirstContext(projectRoot: string): FirstContext {
   ensureHealthyRuntimeAsset(index, 'summary', 'summary');
   ensureHealthyRuntimeAsset(index, 'roleViews', 'role-views');
   ensureHealthyStageViews(index);
+  ensureHealthySteering(index);
+  ensureHealthyRuntimeAsset(index, 'criticalFlows', 'critical-flows');
 
   const summary = requireRuntimeAsset(readFirstRuntimeSummary(projectRoot), 'summary');
   const stageViews = requireRuntimeAsset(readFirstStageViews(projectRoot), 'stage-views');
   const roleViews = requireRuntimeAsset(readFirstRoleViews(projectRoot), 'role-views');
+  const steering = requireRuntimeAsset(readFirstSteering(projectRoot), 'steering');
 
   return {
     index,
     summary,
+    steering,
     roleViews,
     stageViews,
   };
@@ -495,14 +691,30 @@ export function refreshFirstArtifacts(
 
 function hasHealthyRuntimeTruth(projectRoot: string): boolean {
   const index = readFirstRuntimeIndex(projectRoot);
-  if (!index?.summary.healthy || !index.roleViews.healthy || !index.stageViews.healthy) {
+  if (
+    !index?.summary.healthy ||
+    !index.roleViews.healthy ||
+    !index.stageViews.healthy ||
+    !index.steering.healthy ||
+    !index.conventions.healthy ||
+    !index.criticalFlows.healthy ||
+    !index.changeMap.healthy ||
+    !index.entryGuide.healthy ||
+    !index.rebootGuide.healthy
+  ) {
     return false;
   }
 
   return Boolean(
     readFirstRuntimeSummary(projectRoot) &&
     readFirstRoleViews(projectRoot) &&
-    readFirstStageViews(projectRoot)
+    readFirstStageViews(projectRoot) &&
+    readFirstSteering(projectRoot) &&
+    readFirstConventions(projectRoot) &&
+    readFirstCriticalFlows(projectRoot) &&
+    readFirstChangeMap(projectRoot) &&
+    readFirstEntryGuide(projectRoot) &&
+    readFirstRebootGuide(projectRoot)
   );
 }
 
@@ -528,15 +740,33 @@ export function detectBackgroundInputStatus(projectRoot: string): BackgroundInpu
   const runtimeSummary = readFirstRuntimeSummary(projectRoot);
   const runtimeRoleViews = readFirstRoleViews(projectRoot);
   const runtimeStageViews = readFirstStageViews(projectRoot);
+  const runtimeSteering = readFirstSteering(projectRoot);
+  const runtimeConventions = readFirstConventions(projectRoot);
+  const runtimeCriticalFlows = readFirstCriticalFlows(projectRoot);
+  const runtimeChangeMap = readFirstChangeMap(projectRoot);
+  const runtimeEntryGuide = readFirstEntryGuide(projectRoot);
+  const runtimeRebootGuide = readFirstRebootGuide(projectRoot);
 
   if (
     runtimeIndex &&
     runtimeSummary &&
     runtimeRoleViews &&
     runtimeStageViews &&
+    runtimeSteering &&
+    runtimeConventions &&
+    runtimeCriticalFlows &&
+    runtimeChangeMap &&
+    runtimeEntryGuide &&
+    runtimeRebootGuide &&
     runtimeIndex.summary.healthy &&
     runtimeIndex.roleViews.healthy &&
-    runtimeIndex.stageViews.healthy
+    runtimeIndex.stageViews.healthy &&
+    runtimeIndex.steering.healthy &&
+    runtimeIndex.conventions.healthy &&
+    runtimeIndex.criticalFlows.healthy &&
+    runtimeIndex.changeMap.healthy &&
+    runtimeIndex.entryGuide.healthy
+    && runtimeIndex.rebootGuide.healthy
   ) {
     return 'full';
   }
@@ -546,6 +776,12 @@ export function detectBackgroundInputStatus(projectRoot: string): BackgroundInpu
     runtimeSummary ||
     runtimeRoleViews ||
     runtimeStageViews ||
+    runtimeSteering ||
+    runtimeConventions ||
+    runtimeCriticalFlows ||
+    runtimeChangeMap ||
+    runtimeEntryGuide ||
+    runtimeRebootGuide ||
     existsSync(join(projectRoot, 'docs', 'first'))
   ) {
     return 'degraded';

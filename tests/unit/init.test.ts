@@ -4,7 +4,18 @@ import { join } from 'node:path';
 import { init } from '../../src/core/process-engine/init.js';
 import type { InitOptions } from '../../src/core/process-engine/init.js';
 import { Stage } from '../../src/shared/types.js';
-import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
+import {
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
+  writeFirstRuntimeIndex,
+  writeFirstRuntimeSummary,
+  writeFirstRoleViews,
+  writeFirstSteering,
+  writeFirstStageViews,
+} from '../../src/core/skill-runtime/first-runtime-store.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-init');
 
@@ -82,6 +93,12 @@ describe('init', () => {
       summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       docsProjection: {},
       status: 'current',
     });
@@ -108,6 +125,53 @@ describe('init', () => {
       design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
       code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
       verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
+    });
+    writeFirstSteering(TMP, {
+      product: { overview: 'spec-first', coreScenarios: ['init'], nonGoals: [], glossary: [] },
+      tech: { stack: ['TypeScript'], constraints: [], forbiddenPatterns: [] },
+      structure: { modules: ['src/core'], boundaries: [], entryRules: [] },
+    });
+    writeFirstConventions(TMP, {
+      api: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+      module: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+      testing: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+      projectRules: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    });
+    writeFirstCriticalFlows(TMP, [
+      {
+        flowId: 'flow-init',
+        name: 'Init Flow',
+        entryPoints: ['src/cli/commands/init.ts'],
+        coreModules: ['src/core/process-engine/init.ts'],
+        invariants: ['runtime truth first'],
+        verificationHooks: ['pnpm vitest'],
+      },
+    ]);
+    writeFirstChangeMap(TMP, [
+      {
+        changeType: 'init-flow',
+        likelyModules: ['src/core/process-engine/init.ts'],
+        likelyCommands: ['src/cli/commands/init.ts'],
+        likelyConfigs: ['package.json'],
+        likelyTests: ['tests/unit/init.test.ts'],
+        riskPoints: ['background input drift'],
+      },
+    ]);
+    writeFirstEntryGuide(TMP, [
+      {
+        taskCategory: 'init',
+        readFirst: ['.spec-first/runtime/first/summary.json'],
+        thenRead: ['src/core/process-engine/init.ts'],
+        avoidEntry: ['docs/first/README.md'],
+        relatedFlows: ['flow-init'],
+      },
+    ]);
+    writeFirstRebootGuide(TMP, {
+      projectWhat: 'spec-first',
+      whereToStart: ['.spec-first/runtime/first/summary.json'],
+      currentCriticalAreas: ['runtime truth first'],
+      commonChangePaths: ['src/core/process-engine/init.ts'],
+      verifyChecklist: ['pnpm vitest'],
     });
 
     const result = init(baseOpts());

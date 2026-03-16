@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
+import { writeFirstConventions, writeFirstCriticalFlows, writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstSteering, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
 import { loadFirstContext, loadFirstRoleView, loadStageView } from '../../src/core/skill-runtime/first-context.js';
-import type { FirstRuntimeIndex, FirstRuntimeSummary, FirstRoleViews, FirstStageViews } from '../../src/core/skill-runtime/first-runtime-types.js';
+import type { FirstConventions, FirstCriticalFlows, FirstRuntimeIndex, FirstRuntimeSummary, FirstRoleViews, FirstStageViews, FirstSteering } from '../../src/core/skill-runtime/first-runtime-types.js';
 
 const TEST_ROOT = join(import.meta.dirname, '../fixtures/.tmp-first-context');
 
@@ -14,6 +14,9 @@ const index: FirstRuntimeIndex = {
   summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   docsProjection: {},
   status: 'current',
 };
@@ -38,6 +41,43 @@ const roleViews: FirstRoleViews = {
   architect: { role: 'architect', summary: 'arch', focus: ['backend'], warnings: [] },
 };
 
+const steering: FirstSteering = {
+  product: {
+    overview: 'context test',
+    coreScenarios: ['brownfield delivery'],
+    nonGoals: ['legacy docs as truth'],
+    glossary: ['Feature'],
+  },
+  tech: {
+    stack: ['TypeScript'],
+    constraints: ['backend'],
+    forbiddenPatterns: ['docs-only truth'],
+  },
+  structure: {
+    modules: ['src/core/skill-runtime'],
+    boundaries: ['cli -> runtime'],
+    entryRules: ['read runtime first'],
+  },
+};
+
+const conventions: FirstConventions = {
+  api: { observedPatterns: ['CLI: spec-first init'], deviations: [], recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.', evidence: ['src/cli/index.ts'] },
+  module: { observedPatterns: ['src/core/skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core and CLI entry under src/cli.', evidence: ['src/core/skill-runtime'] },
+  testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['tests/unit/first-context.test.ts'] },
+  projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth before docs.', evidence: ['.spec-first/runtime/first'] },
+};
+
+const criticalFlows: FirstCriticalFlows = [
+  {
+    flowId: 'flow-cli-entry',
+    name: 'CLI Entry Flow',
+    entryPoints: ['src/cli/index.ts'],
+    coreModules: ['src/core/skill-runtime'],
+    invariants: ['runtime truth first'],
+    verificationHooks: ['pnpm vitest'],
+  },
+];
+
 const stageViews: FirstStageViews = {
   spec: { stage: 'spec', summary: 'spec', businessCapabilities: ['runtime truth source'], coreEntities: ['Feature'], dependencies: ['spec-first init'], warnings: [] },
   design: { stage: 'design', summary: 'design', moduleBoundaries: ['src/core/skill-runtime'], integrationPoints: ['spec-first init'], technicalConstraints: ['backend'], risks: [] },
@@ -60,11 +100,15 @@ describe('first context', () => {
     writeFirstRuntimeSummary(TEST_ROOT, summary);
     writeFirstRoleViews(TEST_ROOT, roleViews);
     writeFirstStageViews(TEST_ROOT, stageViews);
+    writeFirstSteering(TEST_ROOT, steering);
+    writeFirstConventions(TEST_ROOT, conventions);
+    writeFirstCriticalFlows(TEST_ROOT, criticalFlows);
 
     const context = loadFirstContext(TEST_ROOT);
 
     expect(context.index.mode).toBe('quick');
     expect(context.summary.project.name).toBe('spec-first');
+    expect(context.steering.tech.constraints).toContain('backend');
     expect(context.roleViews.dev.role).toBe('dev');
     expect(context.stageViews.verify.stage).toBe('verify');
   });
@@ -74,6 +118,9 @@ describe('first context', () => {
     writeFirstRuntimeSummary(TEST_ROOT, summary);
     writeFirstRoleViews(TEST_ROOT, roleViews);
     writeFirstStageViews(TEST_ROOT, stageViews);
+    writeFirstSteering(TEST_ROOT, steering);
+    writeFirstConventions(TEST_ROOT, conventions);
+    writeFirstCriticalFlows(TEST_ROOT, criticalFlows);
 
     expect(loadFirstRoleView(TEST_ROOT, 'architect')).toEqual(roleViews.architect);
     expect(loadStageView(TEST_ROOT, 'code')).toEqual(stageViews.code);
@@ -89,6 +136,9 @@ describe('first context', () => {
     writeFirstRuntimeSummary(TEST_ROOT, summary);
     writeFirstRoleViews(TEST_ROOT, roleViews);
     writeFirstStageViews(TEST_ROOT, stageViews);
+    writeFirstSteering(TEST_ROOT, steering);
+    writeFirstConventions(TEST_ROOT, conventions);
+    writeFirstCriticalFlows(TEST_ROOT, criticalFlows);
 
     expect(() => loadFirstContext(TEST_ROOT)).toThrow(/summary/i);
   });
@@ -103,6 +153,9 @@ describe('first context', () => {
     writeFirstRuntimeSummary(TEST_ROOT, summary);
     writeFirstRoleViews(TEST_ROOT, roleViews);
     writeFirstStageViews(TEST_ROOT, stageViews);
+    writeFirstSteering(TEST_ROOT, steering);
+    writeFirstConventions(TEST_ROOT, conventions);
+    writeFirstCriticalFlows(TEST_ROOT, criticalFlows);
 
     expect(() => loadFirstContext(TEST_ROOT)).toThrow(/role-views/i);
     expect(() => loadFirstRoleView(TEST_ROOT, 'architect')).toThrow(/role-views/i);
