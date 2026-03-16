@@ -1,0 +1,242 @@
+---
+title: First Skill 文档与 Runtime 映射审查报告
+date: 2026-03-16
+author: Claude
+status: review
+version: 1.0
+---
+
+# First Skill 文档与 Runtime 映射审查报告
+
+## 一、现状盘点
+
+### 1.1 Runtime 文件清单（`.spec-first/runtime/first/`）
+
+| 文件 | 在 FIRST_RUNTIME_ARTIFACTS | 在 index.json | 状态 |
+|------|---------------------------|---------------|------|
+| `index.json` | N/A（元数据） | ✅ 自身 | ✅ 正常 |
+| `summary.json` | ✅ | ✅ | ✅ Canonical |
+| `role-views.json` | ✅ | ✅ | ✅ Canonical |
+| `stage-views.json` | ✅ | ✅ | ✅ Canonical |
+| `steering.json` | ✅ | ✅ | ✅ Canonical |
+| `conventions.json` | ✅ | ✅ | ✅ Canonical |
+| `critical-flows.json` | ✅ | ✅ | ✅ Canonical |
+| `change-map.json` | ✅ | ✅ | ✅ Canonical |
+| `entry-guide.json` | ✅ | ✅ | ✅ Canonical |
+| `reboot-guide.json` | ✅ | ✅ | ✅ Canonical |
+| `modules.json` | ❌ **缺失** | ❌ **缺失** | ⚠️ **孤儿文件** |
+
+### 1.2 Docs 文件清单（`docs/first/`）
+
+| 文件 | 在 CANONICAL_PROJECTION_DOCS | Runtime 投影源 | 状态 |
+|------|------------------------------|----------------|------|
+| `README.md` | ✅ | 多个 Runtime Assets | ✅ Canonical |
+| `summary.md` | ✅ | `summary.json` | ✅ Canonical |
+| `role-views.md` | ✅ | `role-views.json` | ✅ Canonical |
+| `stage-views.md` | ✅ | `stage-views.json` | ✅ Canonical |
+| `steering.md` | ✅ | `steering.json` | ✅ Canonical |
+| `conventions.md` | ✅ | `conventions.json` | ✅ Canonical |
+| `critical-flows.md` | ✅ | `critical-flows.json` | ✅ Canonical |
+| `change-map.md` | ✅ | `change-map.json` | ✅ Canonical |
+| `entry-guide.md` | ✅ | `entry-guide.json` | ✅ Canonical |
+| `reboot-guide.md` | ✅ | `reboot-guide.json` | ✅ Canonical |
+| `common-playbooks.md` | ✅ | 多个 Runtime Assets | ✅ Canonical（派生） |
+| `known-risks-and-traps.md` | ✅ | 多个 Runtime Assets | ✅ Canonical（派生） |
+| `api-docs.md` | ❌ | 无 | ⚠️ Legacy（Agent 直接生成） |
+| `codebase-overview.md` | ❌ | 无 | ⚠️ Legacy（Agent 直接生成） |
+| `domain-model.md` | ❌ | 无 | ⚠️ Legacy（Agent 直接生成） |
+| `tech-stack.md` | ❌ | 无 | ⚠️ Legacy（Agent 直接生成） |
+
+### 1.3 CANONICAL_PROJECTION_DOCS 计算结果
+
+从 `FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP` 计算得出 **12 个标准投影文档**：
+
+```
+docs/first/README.md
+docs/first/change-map.md
+docs/first/common-playbooks.md
+docs/first/conventions.md
+docs/first/critical-flows.md
+docs/first/entry-guide.md
+docs/first/known-risks-and-traps.md
+docs/first/reboot-guide.md
+docs/first/role-views.md
+docs/first/stage-views.md
+docs/first/steering.md
+docs/first/summary.md
+```
+
+---
+
+## 二、SKILL.md 规格与实际差异
+
+### 2.1 SKILL.md 定义的产物清单
+
+| 产物 | 模式 | 实际存在 | 状态 |
+|------|------|----------|------|
+| `README.md` | quick + deep | ✅ | 一致 |
+| `tech-stack.md` | quick | ✅ | Legacy，非 Runtime |
+| `api-docs.md` | quick | ✅ | Legacy，非 Runtime |
+| `codebase-overview.md` | quick | ✅ | Legacy，非 Runtime |
+| `domain-model.md` | quick | ✅ | Legacy，非 Runtime |
+| `database-er.md` | quick（如有 DB） | ❌ **不存在** | ⚠️ 缺失 |
+| `call-graph.md` | deep | ❌ **不存在** | ⚠️ 缺失 |
+| `architecture.md` | deep | ❌ **不存在** | ⚠️ 缺失 |
+| `external-deps.md` | deep | ❌ **不存在** | ⚠️ 缺失 |
+| `local-setup.md` | deep | ❌ **不存在** | ⚠️ 缺失 |
+| `development-guidelines.md` | deep | ❌ **不存在** | ⚠️ 缺失 |
+
+### 2.2 实际存在但 SKILL.md 未定义的产物
+
+| 产物 | 来源 | 状态 |
+|------|------|------|
+| `steering.md` | `steering.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `conventions.md` | `conventions.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `critical-flows.md` | `critical-flows.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `change-map.md` | `change-map.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `entry-guide.md` | `entry-guide.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `reboot-guide.md` | `reboot-guide.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `role-views.md` | `role-views.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `stage-views.md` | `stage-views.json` 投影 | ✅ Canonical，SKILL.md 应更新 |
+| `common-playbooks.md` | 多源派生 | ✅ Canonical，SKILL.md 应更新 |
+| `known-risks-and-traps.md` | 多源派生 | ✅ Canonical，SKILL.md 应更新 |
+
+---
+
+## 三、问题汇总
+
+### 🔴 严重问题
+
+| ID | 问题 | 影响 | 建议 |
+|----|------|------|------|
+| P1 | `modules.json` 是孤儿文件 | 不被 Runtime 体系追踪，无法检测过期 | 纳入 `FIRST_RUNTIME_ARTIFACTS` 或删除 |
+| P2 | SKILL.md 产物清单与实际严重不符 | 文档误导，用户期望落空 | 同步更新 SKILL.md |
+
+### 🟠 中等问题
+
+| ID | 问题 | 影响 | 建议 |
+|----|------|------|------|
+| P3 | `PREFIX_FILE_TO_ARTIFACT_MAP` 引用不存在的文件 | 变更检测逻辑失效 | 清理或实现对应产物 |
+| P4 | 4 个 Legacy 产物无 Runtime 支持 | 无法追踪状态、无增量更新 | 按方案 C 纳入 Runtime |
+
+### 🟡 轻微问题
+
+| ID | 问题 | 影响 | 建议 |
+|----|------|------|------|
+| P5 | `architecture.md` 等在映射中但未生成 | Deep 模式承诺未兑现 | 明确标注"暂不支持" |
+
+---
+
+## 四、映射关系图
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Runtime Truth Layer                              │
+│                    (.spec-first/runtime/first/)                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│  FIRST_RUNTIME_ARTIFACTS (9 个)                                         │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │ summary.json│ │role-views   │ │stage-views  │ │steering.json│       │
+│  └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘       │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │conventions  │ │critical-flows│ │change-map   │ │entry-guide  │       │
+│  └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘       │
+│  ┌─────────────┐ ┌─────────────┐                                        │
+│  │reboot-guide │ │ modules.json│ ← ⚠️ 孤儿文件，不在 FIRST_RUNTIME_ARTIFACTS │
+│  └──────┬──────┘ └─────────────┘                                        │
+└─────────┼───────────────────────────────────────────────────────────────┘
+          │ 投影
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      Docs Projection Layer                              │
+│                          (docs/first/)                                  │
+├─────────────────────────────────────────────────────────────────────────┤
+│  CANONICAL_PROJECTION_DOCS (12 个)                                      │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │ README.md   │ │ summary.md  │ │role-views.md│ │stage-views.md│       │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │steering.md  │ │conventions  │ │critical-flows│ │change-map.md│       │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │entry-guide  │ │reboot-guide │ │common-      │ │known-risks  │       │
+│  │    .md      │ │    .md      │ │playbooks.md │ │-and-traps.md│       │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Legacy Docs (4 个) - Agent 直接生成，无 Runtime 支持                    │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │tech-stack.md│ │api-docs.md  │ │codebase-    │ │domain-model │       │
+│  │             │ │             │ │overview.md  │ │    .md      │       │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │
+├─────────────────────────────────────────────────────────────────────────┤
+│  SKILL.md 定义但未实现 (6 个)                                            │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│  │database-er  │ │call-graph.md│ │architecture │ │external-deps│       │
+│  │    .md      │ │             │ │    .md      │ │    .md      │       │
+│  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘       │
+│  ┌─────────────┐ ┌─────────────┐                                        │
+│  │local-setup  │ │development  │                                        │
+│  │    .md      │ │-guidelines  │                                        │
+│  └─────────────┘ └─────────────┘                                        │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 五、建议行动
+
+### 5.1 紧急修复（P1/P2）
+
+1. **处理 `modules.json`**
+   - 方案 A：纳入 `FIRST_RUNTIME_ARTIFACTS`，添加投影逻辑
+   - 方案 B：删除，将其内容合并到 `summary.json`
+
+2. **同步 SKILL.md**
+   - 更新产物清单，反映当前实际 12 Canonical + 4 Legacy 结构
+   - 标注 `database-er.md` 等为"规划中"
+
+### 5.2 中期优化（P3/P4）
+
+3. **清理 `PREFIX_FILE_TO_ARTIFACT_MAP`**
+   - 移除不存在的产物引用
+   - 或实现对应的 Runtime 资产
+
+4. **Legacy 产物规范化**
+   - 按方案 C 分层处理：`tech-stack`、`api-docs`、`domain-model` 纳入 Runtime
+   - `codebase-overview` 保持 Quick 模式
+
+### 5.3 长期规划（P5）
+
+5. **实现 Deep 模式缺失产物**
+   - `architecture.md` → 新增 `architecture.json`
+   - `call-graph.md` → 新增 `call-graph.json`
+   - `external-deps.md` → 合并到 `steering.json`
+   - `local-setup.md` → 新增 `setup-guide.json`
+   - `development-guidelines.md` → 合并到 `conventions.json`
+
+---
+
+## 六、数据统计
+
+| 指标 | 数量 |
+|------|------|
+| Runtime 资产总数 | 10（含 1 孤儿） |
+| Canonical Runtime 资产 | 9 |
+| Docs 文件总数 | 16 |
+| Canonical Docs | 12 |
+| Legacy Docs | 4 |
+| SKILL.md 定义但未实现 | 6 |
+| 映射一致率 | 75%（12/16 docs 有 Runtime 支持） |
+
+---
+
+## 七、结论
+
+当前 First Skill 的 Runtime → Docs 投影体系已基本建立，但存在以下核心问题：
+
+1. **孤儿文件**：`modules.json` 未被体系追踪
+2. **文档脱节**：SKILL.md 与实际产物严重不符
+3. **架构不一致**：4 个 Legacy 产物走独立生成路径
+4. **承诺未兑现**：6 个 Deep 模式产物未实现
+
+建议按优先级逐步修复，先解决 P1/P2 的文档一致性问题，再推进 Legacy 产物规范化。
