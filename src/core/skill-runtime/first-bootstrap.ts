@@ -17,14 +17,22 @@ import {
   getFirstConventionsPath,
   getFirstCriticalFlowsPath,
   getFirstEntryGuidePath,
+  getFirstApiContractsPath,
+  getFirstStructureOverviewPath,
+  getFirstDomainModelPath,
+  getFirstDatabaseSchemaPath,
   getFirstRebootGuidePath,
   getFirstRoleViewsPath,
   getFirstRuntimeSummaryPath,
   getFirstSteeringPath,
   getFirstStageViewsPath,
+  writeFirstApiContracts,
+  writeFirstDatabaseSchema,
+  writeFirstDomainModel,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstStructureOverview,
   writeFirstConventions,
   writeFirstChangeMap,
   writeFirstCriticalFlows,
@@ -34,17 +42,19 @@ import {
   writeFirstStageViews,
 } from './first-runtime-store.js';
 import type {
+  FirstApiContracts,
+  FirstDatabaseSchema,
+  FirstDomainModel,
   FirstSteering,
   FirstRuntimeAssetIndexEntry,
   FirstRuntimeIndex,
-  FirstRuntimeMode,
   FirstRuntimeSummary,
+  FirstStructureOverview,
 } from './first-runtime-types.js';
 import { buildStageViews } from './first-stage-views.js';
 import { buildFirstSummary } from './first-summary.js';
 
 export interface BootstrapFirstRuntimeOptions {
-  mode: FirstRuntimeMode;
   platformType?: PlatformType;
 }
 
@@ -257,7 +267,6 @@ function buildBootstrapSummary(
 
   return buildFirstSummary({
     generatedAt: new Date().toISOString(),
-    mode: options.mode,
     projectName,
     platformType,
     overview: detectOverview(projectRoot, pkg),
@@ -277,7 +286,7 @@ function buildBootstrapSteering(summary: FirstRuntimeSummary): FirstSteering {
     product: {
       overview: summary.project.overview ?? `${summary.project.name} project cognition`,
       coreScenarios: summary.capabilities.slice(0, 3),
-      nonGoals: ['legacy docs as canonical truth'],
+      nonGoals: ['unregistered docs as canonical truth'],
       glossary: summary.dataModels.slice(0, 5),
     },
     tech: {
@@ -290,6 +299,98 @@ function buildBootstrapSteering(summary: FirstRuntimeSummary): FirstSteering {
       boundaries: summary.entryPoints,
       entryRules: ['read runtime truth first'],
     },
+  };
+}
+
+function buildBootstrapApiContracts(summary: FirstRuntimeSummary): FirstApiContracts {
+  return {
+    interfaces:
+      summary.apiSurface.length > 0
+        ? summary.apiSurface.map((surface, _index) => ({
+            interfaceType: surface.startsWith('CLI:') ? 'cli-command' : 'other',
+            name: surface.replace(/^CLI:\s*/, ''),
+            path: surface.replace(/^CLI:\s*/, ''),
+            method: 'run',
+            handler: summary.entryPoints[0] ?? 'src/cli/commands/first.ts',
+            request: [],
+            response: ['更新 first runtime assets', '刷新 docs/first'],
+            auth: [],
+            evidence: uniqueStrings(summary.entryPoints, summary.evidence).slice(0, 6),
+          }))
+        : [
+            {
+              interfaceType: 'other',
+              name: `${summary.project.name}-project-entry`,
+              handler: summary.entryPoints[0] ?? 'src/index.ts',
+              request: [],
+              response: ['项目入口待进一步识别'],
+              auth: [],
+              evidence: summary.evidence.slice(0, 6),
+            },
+          ],
+    integrationPoints: uniqueStrings(summary.entryPoints, summary.modules).slice(0, 8),
+    notes: ['当前资产由 bootstrap 基于项目入口与命令面自动归纳'],
+  };
+}
+
+function buildBootstrapStructureOverview(summary: FirstRuntimeSummary): FirstStructureOverview {
+  return {
+    topology: ['entry -> runtime assets -> docs projection'],
+    modules: summary.modules.map((modulePath) => ({
+      name: modulePath.split('/').at(-1) ?? modulePath,
+      purpose: `${modulePath} 承载项目结构的一部分`,
+      keyPaths: [modulePath],
+      entryPoints: summary.entryPoints.filter((entryPoint) => entryPoint.startsWith(modulePath)),
+      dependencies: summary.entryPoints.filter((entryPoint) => !entryPoint.startsWith(modulePath)),
+    })),
+    readingOrder: uniqueStrings(summary.entryPoints, summary.modules).slice(0, 10),
+    evidence: summary.evidence,
+  };
+}
+
+function buildBootstrapDomainModel(summary: FirstRuntimeSummary): FirstDomainModel {
+  return {
+    entities: summary.dataModels.map((modelName) => ({
+      name: modelName,
+      kind: 'concept',
+      description: `${modelName} 是项目认知中的核心概念`,
+      invariants: ['必须与 runtime truth 保持一致'],
+      relationships: summary.apiSurface.slice(0, 3).map((surface) => `关联接口: ${surface}`),
+      evidence: summary.evidence,
+    })),
+    glossary: uniqueStrings(summary.dataModels, summary.capabilities).slice(0, 10),
+    evidence: summary.evidence,
+  };
+}
+
+function buildBootstrapDatabaseSchema(projectRoot: string): FirstDatabaseSchema {
+  const schemaPaths = ['prisma/schema.prisma', 'schema.prisma'].filter((relativePath) =>
+    existsSync(join(projectRoot, relativePath))
+  );
+
+  if (schemaPaths.length === 0) {
+    return {
+      status: 'not_applicable',
+      tables: [],
+      risks: [],
+      evidence: [],
+    };
+  }
+
+  return {
+    status: 'healthy',
+    provider: 'prisma',
+    tables: [
+      {
+        name: 'schema',
+        purpose: '数据库结构入口',
+        fields: [],
+        relations: [],
+        evidence: schemaPaths,
+      },
+    ],
+    risks: [],
+    evidence: schemaPaths,
   };
 }
 
@@ -327,6 +428,10 @@ export function bootstrapFirstRuntime(
   const roleViews = buildRoleViews(summary);
   const stageViews = buildStageViews(summary);
   const steering = buildBootstrapSteering(summary);
+  const apiContracts = buildBootstrapApiContracts(summary);
+  const structureOverview = buildBootstrapStructureOverview(summary);
+  const domainModel = buildBootstrapDomainModel(summary);
+  const databaseSchema = buildBootstrapDatabaseSchema(projectRoot);
   const conventions = buildFirstConventions(summary);
   const criticalFlows = buildFirstCriticalFlows(summary);
   const changeMap = buildFirstChangeMap(summary);
@@ -335,6 +440,9 @@ export function bootstrapFirstRuntime(
   const now = new Date().toISOString();
 
   writeFirstRuntimeSummary(projectRoot, summary);
+  writeFirstApiContracts(projectRoot, apiContracts);
+  writeFirstStructureOverview(projectRoot, structureOverview);
+  writeFirstDomainModel(projectRoot, domainModel);
   writeFirstRoleViews(projectRoot, roleViews);
   writeFirstStageViews(projectRoot, stageViews);
   writeFirstSteering(projectRoot, steering);
@@ -343,12 +451,14 @@ export function bootstrapFirstRuntime(
   writeFirstChangeMap(projectRoot, changeMap);
   writeFirstEntryGuide(projectRoot, entryGuide);
   writeFirstRebootGuide(projectRoot, rebootGuide);
+  if (databaseSchema.status === 'healthy') {
+    writeFirstDatabaseSchema(projectRoot, databaseSchema);
+  }
 
   const initialIndex: FirstRuntimeIndex = {
     version: '1.0.0',
     lastRun: now,
     sourceCommit: getCurrentSourceCommit(projectRoot),
-    mode: options.mode,
     summary: buildIndexEntry(
       getFirstRuntimeSummaryPath(projectRoot),
       '.spec-first/runtime/first/summary.json',
@@ -394,6 +504,42 @@ export function bootstrapFirstRuntime(
       '.spec-first/runtime/first/reboot-guide.json',
       now
     ),
+    apiContracts: buildIndexEntry(
+      getFirstApiContractsPath(projectRoot),
+      '.spec-first/runtime/first/api-contracts.json',
+      now
+    ),
+    structureOverview: buildIndexEntry(
+      getFirstStructureOverviewPath(projectRoot),
+      '.spec-first/runtime/first/structure-overview.json',
+      now
+    ),
+    domainModel: buildIndexEntry(
+      getFirstDomainModelPath(projectRoot),
+      '.spec-first/runtime/first/domain-model.json',
+      now
+    ),
+    databaseSchema: {
+      ...(databaseSchema.status === 'healthy'
+        ? buildIndexEntry(
+            getFirstDatabaseSchemaPath(projectRoot),
+            '.spec-first/runtime/first/database-schema.json',
+            now
+          )
+        : {
+            path: '.spec-first/runtime/first/database-schema.json',
+            fileHash: 'conditional-not-applicable',
+            lastUpdated: now,
+            healthy: false,
+            issues: undefined,
+          }),
+      healthy: databaseSchema.status === 'healthy',
+      status: databaseSchema.status,
+      issues:
+        databaseSchema.status === 'healthy'
+          ? undefined
+          : ['database schema not applicable for current project'],
+    },
     docsProjection: {},
     status: 'current',
   };

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - v1.1.3 2026-03-16 Claude: fix(init): 当 index.json 存在但不完整时，提示"数据不完整需要重新生成"而非"尚未执行"，引导用户运行 /spec-first:first 修复 (user-visible)
+- v1.1.4 2026-03-17 Claude: fix(lint): 清理 first-bootstrap/first-change-detector/first-doc-projection 中的未使用变量与死代码
 - v1.1.3 2026-03-16 Claude: fix(first-runtime): 修复 normalizeCanonicalRuntimeIndex 空指针异常 — 访问 rawIndex.summary?.healthy 等属性时添加可选链，防止旧版/不完整 index.json 导致崩溃 (user-visible)
 - v1.1.2 2026-03-16 Claude: docs(first-skill): 硬编码默认输出语言为中文，在 QA 规则和 SKILL.md 中添加语言约束 (user-visible)
 - v1.1.2 2026-03-16 Claude: feat(first-runtime): 添加路径校验函数 validateFirstRuntimePath，防止写入错误目录（如 .config-first/） (user-visible)
