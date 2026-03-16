@@ -103,7 +103,7 @@ source_design: ./2026-03-15-first-skill-项目认知编译器优化方案.md
 - 已完成本轮全量验证收口
   - 修复 `tests/unit/init.test.ts` 与 `tests/unit/cli-init-stage.test.ts` 中仍按旧三资产模型构造 healthy runtime first fixture 的回归问题，统一升级为九资产 canonical runtime fixture
   - 已完成 `pnpm vitest run`、`pnpm typecheck`、`pnpm lint`
-  - 当前验证基线：`175` 个测试文件通过，`1565` 个测试通过，`7` 个跳过
+  - 当前验证基线：`176` 个测试文件通过，`1571` 个测试通过，`7` 个跳过
 - 已完成 `T17`
   - 新增 `tests/integration/first-governance-e2e.test.ts`
   - 已覆盖 `06_wrap_up -> 07_release -> 08_done` 路径上的 runtime writeback 日志、gate 决策、canonical truth 刷新

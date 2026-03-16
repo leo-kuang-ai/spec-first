@@ -14,6 +14,7 @@ import { PRODUCT_NAMES } from './first-args.js';
 import { getFirstRuntimeDir, readFirstRuntimeIndex } from './first-runtime-store.js';
 import { sha256Hex } from '../../shared/crypto-utils.js';
 import {
+  CANONICAL_PROJECTION_DOCS,
   collectProjectionDocsForChangedFiles,
   matchArtifactsByChangedFile,
   matchRuntimeArtifactsByChangedFile,
@@ -81,6 +82,37 @@ function hasGitRepo(projectRoot: string): boolean {
   return existsSync(join(projectRoot, '.git'));
 }
 
+function parseChangedFiles(output: string): string[] {
+  return output
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function parsePorcelainChangedFiles(output: string): string[] {
+  return output
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => line.slice(3).trim())
+    .map((path) => (path.includes(' -> ') ? (path.split(' -> ').at(-1) ?? path) : path))
+    .map((path) => path.replace(/^"|"$/g, ''))
+    .filter(Boolean);
+}
+
+function getWorkingTreeChangedFiles(projectRoot: string): string[] {
+  if (!hasGitRepo(projectRoot)) return [];
+  try {
+    return parsePorcelainChangedFiles(runGit(projectRoot, ['status', '--porcelain']));
+  } catch (error) {
+    logFirstRuntimeWarning(
+      'change-detector.getWorkingTreeChangedFiles',
+      '读取工作区变更失败',
+      error
+    );
+    return [];
+  }
+}
+
 export function getCurrentCommit(projectRoot: string): string | undefined {
   if (!hasGitRepo(projectRoot)) return undefined;
   try {
@@ -107,13 +139,16 @@ export function analyzeChanges(projectRoot: string, lastUpdateCommit?: string): 
     const currentCommit = getCurrentCommit(projectRoot) || 'HEAD';
     const compareCommit = lastUpdateCommit || 'HEAD~10';
     const totalOutput = runGit(projectRoot, ['ls-files']);
-    const totalFiles = totalOutput.split('\n').filter((file) => file.trim()).length;
+    const totalFiles = parseChangedFiles(totalOutput).length;
     const diffOutput = runGit(projectRoot, [
       'diff',
       '--name-only',
       `${compareCommit}..${currentCommit}`,
     ]);
-    const changedFiles = diffOutput.split('\n').filter((file) => file.trim());
+    const committedChangedFiles = parseChangedFiles(diffOutput);
+    const changedFiles = Array.from(
+      new Set([...committedChangedFiles, ...getWorkingTreeChangedFiles(projectRoot)])
+    );
     const changePercentage = pct(changedFiles.length, totalFiles);
 
     const affectedArtifacts = Array.from(
@@ -201,9 +236,16 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     { name: 'entry-guide.json', entry: runtimeIndex?.entryGuide },
     { name: 'reboot-guide.json', entry: runtimeIndex?.rebootGuide },
   ];
+  const docsProjectionAssets = CANONICAL_PROJECTION_DOCS.map((docPath) => ({
+    name: docPath,
+    entry: runtimeIndex?.docsProjection[docPath],
+  }));
 
-  const productStatus: ProductStatus[] = runtimeAssets.map(({ name, entry }) => {
-    const assetPath = join(runtimeDir, name);
+  const productStatus: ProductStatus[] = [...runtimeAssets, ...docsProjectionAssets].map(
+    ({ name, entry }) => {
+      const assetPath = name.startsWith('docs/')
+        ? join(projectRoot, name)
+        : join(runtimeDir, name);
     const assetExists = existsSync(assetPath);
     const issues: HealthIssue[] = [];
     let currentHash: string | undefined;
@@ -240,7 +282,8 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
       issues,
       needsUpdate: issues.length > 0,
     };
-  });
+    }
+  );
 
   const lastUpdateTime = productStatus
     .map((item) => item.lastUpdated)

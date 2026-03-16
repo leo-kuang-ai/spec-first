@@ -1,91 +1,166 @@
 ---
-mode: deep
-generated_at: 2026-03-09T20:06:12.462Z
+mode: quick
 ---
 
-# 代码结构概览
+# Spec-First 代码库概览
 
-## 模块划分
+> 快速了解项目结构与核心模块职责
 
-### 1. cli
-- **路径**: `src/cli/`
-- **职责**: CLI 命令层，命令注册、路由分发、参数解析
-- **文件数**: 25
-- **关键文件**: `index.ts`, `router.ts`, `commands/*.ts`
+## 目录结构
 
-### 2. process-engine
-- **路径**: `src/core/process-engine/`
-- **职责**: 阶段状态机，驱动 Feature 生命周期流转 (00_init → 08_done/09_cancelled)
-- **文件数**: 8
-- **关键文件**: `stage-machine.ts`, `advance.ts`, `feature.ts`
+```
+src/
+├── cli/                    # CLI 入口与命令解析
+│   ├── index.ts           # bin 入口，注册所有命令
+│   ├── router.ts          # 命令路由与分发
+│   ├── parse-utils.ts     # 参数解析工具
+│   └── commands/          # 26 个命令实现
+│       ├── init.ts        # 项目初始化
+│       ├── stage.ts       # 阶段推进
+│       ├── gate.ts        # Gate 校验
+│       ├── feature.ts     # Feature 管理
+│       ├── matrix.ts      # 追溯矩阵
+│       ├── metrics.ts     # 指标计算
+│       ├── id.ts          # ID 生成/搜索
+│       ├── defect.ts      # 缺陷管理
+│       ├── rfc.ts         # 变更请求
+│       ├── ai.ts          # AI 编排
+│       ├── hooks.ts       # Git Hook
+│       ├── doctor.ts      # 环境诊断
+│       ├── first.ts       # FIRST Skill 入口
+│       ├── onboarding.ts  # 新手引导
+│       ├── skill.ts       # Skill 分发
+│       └── ... (其他 11 个命令)
+│
+├── core/                   # 核心引擎（15 个模块）
+│   ├── process-engine/     # M1: 阶段状态机（8阶段 + 2终态）
+│   ├── trace-engine/       # M2: ID 注册/校验/搜索、矩阵管理
+│   ├── gate-engine/        # M3: Gate 条件评估、SCA 校验
+│   ├── change-mgr/         # M4: RFC 状态机、缺陷管理
+│   ├── ai-orchestrator/    # M5: Context Pack、Catchup、Auto-loop
+│   ├── metrics-engine/     # M6: 12 指标计算、健康分
+│   ├── tool-integration/   # M7: Git Hook、CI 模板
+│   ├── skill-runtime/      # Skill 分发、prompt 组装、三层路由
+│   ├── task-plan/          # task_plan.md 解析与状态管理
+│   ├── template/           # Handlebars 模板渲染
+│   ├── validators/         # 产物格式校验
+│   ├── batch-executor/     # 批量任务执行
+│   ├── migrations/         # 状态文件版本迁移
+│   ├── host-adapters/      # 宿主适配器（Claude/Codex/Cursor）
+│   └── rules/              # 真理源规则定义
+│
+├── shared/                 # 共享类型和工具
+│   ├── types.ts            # Stage enum、ExitCode、ID types
+│   ├── config-schema.ts    # 配置 Schema 定义
+│   ├── host-bootstrap.ts   # 宿主环境引导
+│   ├── host-paths.ts       # 宿主路径解析
+│   ├── skill-commands.ts   # Skill 命令映射
+│   ├── logger.ts           # 日志工具
+│   ├── fs-utils.ts         # 文件系统工具
+│   ├── validators.ts       # 通用校验器
+│   └── ... (其他工具)
+│
+├── config/                 # 配置相关
+│   └── index.ts           # 配置加载与合并
+│
+├── postinstall.ts          # npm postinstall 钩子
+└── preuninstall.ts         # npm preuninstall 钩子
+```
 
-### 3. skill-runtime
-- **路径**: `src/core/skill-runtime/`
-- **职责**: Skill 分发、prompt 组装、三层路由、编排参数解析
-- **文件数**: 22
-- **关键文件**: `dispatcher.ts`, `prompt-assembler.ts`, `hard-gate.ts`
+## 核心模块职责
 
-### 4. ai-orchestrator
-- **路径**: `src/core/ai-orchestrator/`
-- **职责**: AI 自动循环、上下文恢复、context-pack、重试控制
-- **文件数**: 15
-- **关键文件**: `auto-loop.ts`, `catchup.ts`, `context-pack.ts`
+| 模块 | 职责 | 关键文件 |
+|------|------|----------|
+| **process-engine** | 阶段状态机驱动 Feature 生命周期、ID 生成、目录初始化 | `stage-machine.ts`, `feature-lifecycle.ts` |
+| **trace-engine** | 追溯 ID 生成/校验/搜索、覆盖率矩阵（C3/C4/C6/C8/C9） | `id-registry.ts`, `coverage-matrix.ts` |
+| **gate-engine** | 阶段质量门禁评估（19条：16 blocking + 3 warning）、豁免管理 | `gate-evaluator.ts`, `exemption-manager.ts` |
+| **change-mgr** | RFC + Defect 状态机、影响分析 | `rfc-state-machine.ts`, `defect-manager.ts` |
+| **ai-orchestrator** | Auto-loop、Catchup 上下文恢复、Context Pack 组装 | `auto-loop.ts`, `catchup.ts`, `context-pack.ts` |
+| **metrics-engine** | 健康度评分（H1）、瓶颈检测（R1-R5）、12 项指标 | `health-score.ts`, `bottleneck-detector.ts` |
+| **skill-runtime** | Skill 三层路由、prompt 组装、hard-gate 校验 | `skill-resolver.ts`, `prompt-assembler.ts` |
+| **tool-integration** | Git Hook、CI 模板、AI runtime hooks | `git-hooks.ts`, `ci-templates.ts` |
+| **task-plan** | task_plan.md 解析、Todo 状态管理 | `task-plan-parser.ts` |
+| **template** | Handlebars 模板渲染、产物生成 | `template-engine.ts` |
+| **validators** | 产物格式校验（ID 格式、必需章节、追踪矩阵一致性） | `artifact-validator.ts` |
+| **batch-executor** | 批量任务执行、并行编排支持 | `batch-runner.ts` |
+| **migrations** | 状态文件版本迁移、升级兼容处理 | `migrator.ts` |
+| **host-adapters** | 宿主适配器（Claude/Codex/Cursor） | `claude-adapter.ts` |
+| **rules** | 真理源（RELEASE_REQUIRED_ARTIFACTS 等） | `truth-source.ts` |
 
-### 5. gate-engine
-- **路径**: `src/core/gate-engine/`
-- **职责**: 质量门禁评估、安全扫描、SCA、上线/回滚门禁
-- **文件数**: 7
-- **关键文件**: `gate-evaluator.ts`, `security.ts`, `golive.ts`
+## 开发入口命令
 
-### 6. trace-engine
-- **路径**: `src/core/trace-engine/`
-- **职责**: 追溯 ID 生成/校验/搜索、覆盖率矩阵 (C1-C9)
-- **文件数**: 9
-- **关键文件**: `id-generator.ts`, `matrix.ts`, `coverage.ts`
+```bash
+# 构建与类型检查
+npm run build              # tsup 打包
+npm run typecheck          # tsc --noEmit 类型检查
 
-### 7. change-mgr
-- **路径**: `src/core/change-mgr/`
-- **职责**: RFC + Defect 状态机、影响分析、同步机制
-- **文件数**: 6
-- **关键文件**: `rfc-machine.ts`, `defect-machine.ts`, `impact.ts`
+# 测试
+npm test                   # vitest run（全量）
+npm run test:watch         # vitest watch 模式
+npx vitest run tests/unit/<file>.test.ts   # 单文件
+npx vitest run -t "pattern"               # 按名称匹配
 
-### 8. template
-- **路径**: `src/core/template/`
-- **职责**: Handlebars 模板渲染、产物检查、变更分类
-- **文件数**: 6
-- **关键文件**: `renderer.ts`, `artifact-checker.ts`, `hash-registry.ts`
+# 代码质量
+npm run lint               # eslint src
+npm run lint:fix           # eslint --fix
+npm run format             # prettier 格式化
 
-### 9. tool-integration
-- **路径**: `src/core/tool-integration/`
-- **职责**: AI runtime hooks、会话钩子、上下文同步
-- **文件数**: 6
-- **关键文件**: `ai-runtime-hook.ts`, `session-hook.ts`, `context-sync.ts`
+# 本地开发
+npm link                  # 全局链接，本地测试 CLI
+spec-first --help         # 查看帮助
+```
 
-### 10. metrics-engine
-- **路径**: `src/core/metrics-engine/`
-- **职责**: 健康度评分、瓶颈分析
-- **文件数**: 2
-- **关键文件**: `health-score.ts`, `bottleneck.ts`
+## 核心领域概念
 
-### 11. shared
-- **路径**: `src/shared/`
-- **职责**: 共享类型定义 (Stage, ExitCode, ID types) 与工具函数
-- **文件数**: 1
-- **关键文件**: `types.ts`
+### Stage 枚举（单向不可逆）
 
-### 12. config
-- **路径**: `src/config/`
-- **职责**: 配置管理
-- **文件数**: 1
+```
+00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release → 08_done / 09_cancelled
+```
 
-## 开发入口
+### 追溯 ID（14 类）
 
-1. **CLI 入口**: `src/cli/index.ts`
-2. **状态机入口**: `src/core/process-engine/stage-machine.ts`
-3. **Skill 分发入口**: `src/core/skill-runtime/dispatcher.ts`
+| 分类 | ID 类型 | 说明 |
+|------|---------|------|
+| 业务链路 | FR | 功能需求 |
+| | DS | 设计规格 |
+| | TASK | 任务项 |
+| | TC | 测试用例 |
+| | RFC | 变更请求 |
+| V-Model | REQ | 需求规格 |
+| | SYS | 系统设计 |
+| | ARCH | 架构设计 |
+| | MOD | 模块设计 |
+| | ATP | 验收测试计划 |
+| | STP | 系统测试计划 |
+| | ITP | 集成测试计划 |
+| | UTP | 单元测试计划 |
+| 顶层 | Feature | 功能特性 |
 
-## 项目统计
+### 覆盖率（5 项）
 
-- **总文件数**: 10,110
-- **核心模块数**: 12
-- **Serena 可用**: ✅
+| 指标 | 含义 | 计算方式 |
+|------|------|----------|
+| C3 | TASK 覆 FR | 传递链覆盖 |
+| C4 | TC 覆 FR | 直接覆盖（不支持传递） |
+| C6 | TASK 已实现 | 完成状态统计 |
+| C8 | TASK 有上游 | 关联 FR 数量 |
+| C9 | TC 有上游 FR | 关联 FR 数量 |
+
+### Skill 三层路由
+
+```
+用户输入 → Semantic Map（复合命令映射，如 "rfc approve" → CLI+参数）
+         → Runtime Route（RUNTIME_COMMANDS 集合，直接分发 CLI）
+         → Skill File（resolveSkillPath() 搜索 skills/spec-first/NN-name/SKILL.md）
+```
+
+Skill 调用格式：`/spec-first:<skill-name>`
+
+## 关键约定
+
+- **ESM only** - 全项目 `"type": "module"`，使用 `import/export`
+- **Named exports only** - core 模块禁止使用 default export
+- **文件命名**: `kebab-case.ts`
+- **类型集中**: `src/shared/types.ts`（Stage enum、ExitCode、ID types）
+- **未使用变量**: `_` 前缀（eslint 规则 `^_`）

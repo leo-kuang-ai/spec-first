@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { execSync } from 'node:child_process';
 import { sha256Hex } from '../../src/shared/crypto-utils.js';
 import {
   analyzeChanges,
@@ -41,7 +42,80 @@ const index: FirstRuntimeIndex = {
   changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-  docsProjection: {},
+  docsProjection: {
+    'docs/first/README.md': {
+      path: 'docs/first/README.md',
+      fileHash: 'readme-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/summary.md': {
+      path: 'docs/first/summary.md',
+      fileHash: 'summary-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/role-views.md': {
+      path: 'docs/first/role-views.md',
+      fileHash: 'role-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/stage-views.md': {
+      path: 'docs/first/stage-views.md',
+      fileHash: 'stage-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/steering.md': {
+      path: 'docs/first/steering.md',
+      fileHash: 'steering-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/conventions.md': {
+      path: 'docs/first/conventions.md',
+      fileHash: 'conventions-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/critical-flows.md': {
+      path: 'docs/first/critical-flows.md',
+      fileHash: 'critical-flows-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/change-map.md': {
+      path: 'docs/first/change-map.md',
+      fileHash: 'change-map-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/entry-guide.md': {
+      path: 'docs/first/entry-guide.md',
+      fileHash: 'entry-guide-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/reboot-guide.md': {
+      path: 'docs/first/reboot-guide.md',
+      fileHash: 'reboot-guide-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/common-playbooks.md': {
+      path: 'docs/first/common-playbooks.md',
+      fileHash: 'common-playbooks-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+    'docs/first/known-risks-and-traps.md': {
+      path: 'docs/first/known-risks-and-traps.md',
+      fileHash: 'known-risks-doc',
+      lastUpdated: '2026-03-08T12:00:00.000Z',
+      healthy: true,
+    },
+  },
   status: 'current',
 };
 
@@ -135,6 +209,11 @@ function seedRuntime(projectRoot: string, overrideIndex?: Partial<FirstRuntimeIn
   writeFirstChangeMap(projectRoot, changeMap);
   writeFirstEntryGuide(projectRoot, entryGuide);
   writeFirstRebootGuide(projectRoot, rebootGuide);
+  mkdirSync(join(projectRoot, 'docs', 'first'), { recursive: true });
+  const docsProjectionPaths = Object.keys(index.docsProjection);
+  for (const docPath of docsProjectionPaths) {
+    writeFileSync(join(projectRoot, docPath), `# ${docPath}\n`, 'utf-8');
+  }
 
   const runtimeIndex = { ...index, ...overrideIndex };
   const runtimeDir = getFirstRuntimeDir(projectRoot);
@@ -194,7 +273,24 @@ function seedRuntime(projectRoot: string, overrideIndex?: Partial<FirstRuntimeIn
         ? sha256Hex(readFileSync(join(runtimeDir, 'reboot-guide.json'), 'utf-8'))
         : runtimeIndex.rebootGuide.fileHash,
     },
+    docsProjection: Object.fromEntries(
+      Object.entries(runtimeIndex.docsProjection).map(([docPath, entry]) => [
+        docPath,
+        {
+          ...entry,
+          fileHash: entry.fileHash.endsWith('-doc')
+            ? sha256Hex(readFileSync(join(projectRoot, docPath), 'utf-8'))
+            : entry.fileHash,
+        },
+      ])
+    ),
   });
+}
+
+function initGitRepo(projectRoot: string): void {
+  execSync('git init', { cwd: projectRoot, stdio: 'ignore' });
+  execSync('git config user.email "dev@example.com"', { cwd: projectRoot, stdio: 'ignore' });
+  execSync('git config user.name "Dev"', { cwd: projectRoot, stdio: 'ignore' });
 }
 
 describe('analyzeChanges', () => {
@@ -228,6 +324,30 @@ describe('analyzeChanges', () => {
     expect(result).toContain('全量更新');
     expect(result).toContain('变更文件');
   });
+
+  it('包含未提交工作区改动的受影响产物', () => {
+    initGitRepo(TEST_DIR);
+    mkdirSync(join(TEST_DIR, 'src', 'core', 'skill-runtime'), { recursive: true });
+    writeFileSync(
+      join(TEST_DIR, 'src', 'core', 'skill-runtime', 'first-doc-projection.ts'),
+      'export const projection = true;\n',
+      'utf-8'
+    );
+    execSync('git add .', { cwd: TEST_DIR, stdio: 'ignore' });
+    execSync('git commit -m "seed"', { cwd: TEST_DIR, stdio: 'ignore' });
+
+    writeFileSync(
+      join(TEST_DIR, 'src', 'core', 'skill-runtime', 'first-doc-projection.ts'),
+      'export const projection = false;\n',
+      'utf-8'
+    );
+
+    const result = analyzeChanges(TEST_DIR, 'HEAD');
+
+    expect(result.changedFiles).toBeGreaterThan(0);
+    expect(result.affectedArtifacts.length).toBeGreaterThan(0);
+    expect(result.recommendedStrategy).not.toBe('skip');
+  });
 });
 
 describe('checkFirstUpdateContext', () => {
@@ -254,17 +374,32 @@ describe('checkFirstUpdateContext', () => {
     const result = checkFirstUpdateContext(TEST_DIR);
 
     expect(result.hasExistingOutput).toBe(true);
-    expect(result.productStatus.map((item) => item.name)).toEqual([
-      'summary.json',
-      'role-views.json',
-      'stage-views.json',
-      'steering.json',
-      'conventions.json',
-      'critical-flows.json',
-      'change-map.json',
-      'entry-guide.json',
-      'reboot-guide.json',
-    ]);
+    expect(result.productStatus.map((item) => item.name)).toEqual(
+      expect.arrayContaining([
+        'summary.json',
+        'role-views.json',
+        'stage-views.json',
+        'steering.json',
+        'conventions.json',
+        'critical-flows.json',
+        'change-map.json',
+        'entry-guide.json',
+        'reboot-guide.json',
+        'docs/first/README.md',
+        'docs/first/summary.md',
+        'docs/first/role-views.md',
+        'docs/first/stage-views.md',
+        'docs/first/steering.md',
+        'docs/first/conventions.md',
+        'docs/first/critical-flows.md',
+        'docs/first/change-map.md',
+        'docs/first/entry-guide.md',
+        'docs/first/reboot-guide.md',
+        'docs/first/common-playbooks.md',
+        'docs/first/known-risks-and-traps.md',
+      ])
+    );
+    expect(result.productStatus).toHaveLength(21);
     expect(result.productStatus.every((item) => item.issues.length === 0)).toBe(true);
     expect(result.hasManualModifications).toBe(false);
   });
@@ -300,6 +435,16 @@ describe('checkFirstUpdateContext', () => {
     const roleStatus = result.productStatus.find((item) => item.name === 'role-views.json');
 
     expect(roleStatus?.issues.some((issue) => issue.type === 'format_error')).toBe(true);
+  });
+
+  it('canonical projection docs 缺失时会出现在健康问题中', () => {
+    seedRuntime(TEST_DIR);
+    rmSync(join(TEST_DIR, 'docs', 'first', 'README.md'));
+
+    const result = checkFirstUpdateContext(TEST_DIR);
+    const readmeStatus = result.productStatus.find((item) => item.name === 'docs/first/README.md');
+
+    expect(readmeStatus?.issues.some((issue) => issue.type === 'missing')).toBe(true);
   });
 
   it('忽略 docs/first 历史文件，未生成 runtime 时仍视为首次生成', () => {

@@ -505,7 +505,7 @@ export function resolveSkillContext(
 
   if (stageKey) {
     const docsStageSummary = parseStageSummaryFromDocs(projectRoot, stageKey);
-    if (docsStageSummary) {
+    if (docsStageSummary && hasHealthyCanonicalDocsFallback(projectRoot)) {
       return {
         featureId,
         skillName,
@@ -530,7 +530,7 @@ export function resolveSkillContext(
 
   if (skillName === 'onboarding') {
     const docsRoleSummary = parseRoleSummaryFromDocs(projectRoot);
-    if (docsRoleSummary) {
+    if (docsRoleSummary && hasHealthyCanonicalDocsFallback(projectRoot)) {
       return {
         featureId,
         skillName,

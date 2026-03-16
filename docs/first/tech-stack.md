@@ -1,60 +1,66 @@
 ---
-mode: deep
-generated_at: 2026-03-09T20:06:12.462Z
+mode: quick
 ---
 
-# 技术栈摘要
+# Tech Stack
 
-## 运行时环境
+> **spec-first v1.1.0** — AI-workflow CLI for spec-driven development
 
-- **Runtime**: Node.js ≥20.0.0
-- **Module System**: ESM (`"type": "module"`)
+## Overview
 
-## 编程语言
+| Category | Technology | Version |
+|----------|-----------|---------|
+| **Runtime** | Node.js | >=20.0.0 |
+| **Module System** | ESM | `"type": "module"` |
+| **Language** | TypeScript | ^5.4.0 |
 
-- **Language**: TypeScript 5.4+
-- **Type Checking**: Strict mode enabled
-- **Module Syntax**: `verbatimModuleSyntax`
+## Build & Bundle
 
-## 构建工具链
+| Tool | Version | Purpose |
+|------|---------|---------|
+| tsup | ^8.5.1 | TypeScript bundler |
+| TypeScript | ^5.4.0 | Type checker + compiler |
 
-- **Bundler**: tsup
-- **Type Checker**: tsc (TypeScript Compiler)
+## Testing
 
-## 测试框架
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Vitest | ^1.6.1 | Test framework |
+| @vitest/coverage-v8 | ^1.6.1 | Code coverage (v8) |
+| jsdom | ^28.1.0 | DOM simulation |
 
-- **Test Framework**: Vitest
-- **Coverage Tool**: @vitest/coverage-v8
-- **Coverage Threshold**: 75% (lines/functions/statements), 65% (branches)
+**Coverage Threshold**: lines/functions/statements 75%, branches 65%
 
-## 代码质量
+## Code Quality
 
-- **Linter**: ESLint 10+ with typescript-eslint
-- **Formatter**: Prettier 3.8+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| ESLint | ^10.0.2 | Linting |
+| typescript-eslint | ^8.56.1 | TypeScript ESLint rules |
+| @eslint/js | ^10.0.1 | ESLint JS config |
+| Prettier | ^3.8.1 | Code formatting |
 
-## 核心依赖
+## Runtime Dependencies
 
-### 生产依赖
-- `handlebars` ^4.7.8 - 模板渲染
-- `js-yaml` ^4.1.0 - YAML 配置解析
-- `semver` ^7.7.4 - 版本管理
-- `update-notifier` ^7.0.0 - 更新通知
+| Package | Version | Purpose |
+|---------|---------|---------|
+| handlebars | ^4.7.8 | Template engine |
+| js-yaml | ^4.1.0 | YAML parser |
+| semver | ^7.7.4 | Semantic versioning |
+| update-notifier | ^7.0.0 | CLI update notifications |
 
-### 开发依赖
-- `@types/node` ^20.11.0
-- `@types/js-yaml` ^4.0.9
-- `@types/semver` ^7.7.1
-- `vitest` ^1.6.1
-- `tsup` ^8.5.1
-- `typescript` ^5.4.0
+## TypeScript Configuration
 
-## 包管理器
+| Option | Value |
+|--------|-------|
+| Target | ES2022 |
+| Module | ESNext |
+| Module Resolution | bundler |
+| Strict Mode | enabled |
+| verbatimModuleSyntax | enabled |
+| isolatedModules | enabled |
+| Declaration | enabled |
 
-- **Primary**: npm
-- **Alternative**: pnpm (with overrides configured)
+## Package Manager
 
-## 发布配置
-
-- **Registry**: npm public registry
-- **Entry Point**: `dist/cli/index.js`
-- **Binary**: `spec-first` command
+pnpm (with overrides for rollup, minimatch, esbuild)

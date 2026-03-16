@@ -76,7 +76,7 @@ describe('ensureSkillCommands', () => {
     const content = readFileSync(doctorCommand, 'utf-8');
     expect(content).toContain('description: "定位项目与宿主配置并执行环境诊断"');
     expect(content).not.toContain('(`Codex` + `Claude`)');
-    expect(content).toContain('spec-first skill render doctor --input "$ARGUMENTS"');
+    expect(content).toContain('spec-first skill render doctor${ARGUMENTS:+ --input "$ARGUMENTS"}');
     expect(content).not.toContain('读取并执行以下完整 Skill 定义');
   });
 

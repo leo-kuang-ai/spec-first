@@ -43,18 +43,17 @@ function parseRenderArgs(args: string[]): { skillName?: string; options: RenderO
 
     if (arg === '--input') {
       const value = args[i + 1];
-      if (!value || value.startsWith('--')) {
+      if (value === undefined || value.startsWith('--')) {
         return null;
       }
-      options.input = value;
+      options.input = value || undefined;
       i++;
       continue;
     }
 
     if (arg.startsWith('--input=')) {
       const value = arg.slice('--input='.length);
-      if (!value) return null;
-      options.input = value;
+      options.input = value || undefined;
       continue;
     }
 

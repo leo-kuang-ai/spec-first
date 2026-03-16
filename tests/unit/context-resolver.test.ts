@@ -271,7 +271,28 @@ describe('resolveSkillContext', () => {
   it('falls back to docs context when runtime is unavailable', async () => {
     const { resolveSkillContext } = await import('../../src/core/skill-runtime/context-resolver.js');
 
+    const index = makeHealthyIndex();
+    index.summary.healthy = false;
+    index.roleViews.healthy = false;
+    index.stageViews.healthy = false;
+    index.docsProjection = Object.fromEntries(
+      CANONICAL_PROJECTION_DOCS.map((docPath) => [
+        docPath,
+        {
+          path: docPath,
+          fileHash: `hash-${docPath}`,
+          lastUpdated: '2026-03-12T12:00:00.000Z',
+          healthy: true,
+        },
+      ])
+    );
+    writeFirstRuntimeIndex(TMP, index);
     mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    for (const docPath of CANONICAL_PROJECTION_DOCS) {
+      if (docPath !== 'docs/first/stage-views.md') {
+        writeFileSync(join(TMP, docPath), `# ${docPath}\n`, 'utf-8');
+      }
+    }
     writeFileSync(
       join(TMP, 'docs', 'first', 'stage-views.md'),
       [
@@ -351,6 +372,17 @@ describe('resolveSkillContext', () => {
 
     const index = makeHealthyIndex();
     index.stageViews.healthy = false;
+    index.docsProjection = Object.fromEntries(
+      CANONICAL_PROJECTION_DOCS.map((docPath) => [
+        docPath,
+        {
+          path: docPath,
+          fileHash: `hash-${docPath}`,
+          lastUpdated: '2026-03-12T12:00:00.000Z',
+          healthy: true,
+        },
+      ])
+    );
     writeFirstRuntimeIndex(TMP, index);
     writeFirstStageViews(TMP, {
       spec: {
@@ -387,6 +419,11 @@ describe('resolveSkillContext', () => {
       },
     });
     mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    for (const docPath of CANONICAL_PROJECTION_DOCS) {
+      if (docPath !== 'docs/first/stage-views.md') {
+        writeFileSync(join(TMP, docPath), `# ${docPath}\n`, 'utf-8');
+      }
+    }
     writeFileSync(
       join(TMP, 'docs', 'first', 'stage-views.md'),
       ['## Spec View', '', '- Summary: Fresh docs spec summary'].join('\n'),
@@ -398,6 +435,34 @@ describe('resolveSkillContext', () => {
     expect(result.source).toBe('docs');
     expect(result.stageViewSummary).toBe('Fresh docs spec summary');
     expect(result.fallback.warning).toContain('stage-views');
+  });
+
+  it('does not fallback to docs for stage skills when canonical docs health is unavailable', async () => {
+    const { resolveSkillContext } = await import('../../src/core/skill-runtime/context-resolver.js');
+
+    mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'docs', 'first', 'stage-views.md'),
+      ['## Spec View', '', '- Summary: Fresh docs spec summary'].join('\n'),
+      'utf-8',
+    );
+
+    const result = resolveSkillContext(TMP, 'spec', FEATURE_ID);
+
+    expect(result.source).toBe('none');
+    expect(result.recommendedAction).toBe('run-first');
+  });
+
+  it('does not fallback to docs for onboarding when canonical docs health is unavailable', async () => {
+    const { resolveSkillContext } = await import('../../src/core/skill-runtime/context-resolver.js');
+
+    mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    writeFileSync(join(TMP, 'docs', 'first', 'role-views.md'), '- Summary: onboarding docs\n', 'utf-8');
+
+    const result = resolveSkillContext(TMP, 'onboarding', FEATURE_ID);
+
+    expect(result.source).toBe('none');
+    expect(result.recommendedAction).toBe('run-first');
   });
 
   it('filters optional task-category slices for planning skills', async () => {

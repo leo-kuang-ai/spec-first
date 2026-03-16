@@ -1,104 +1,105 @@
 {
-  "version": "2.1.0",
-  "lastRun": "2026-03-09T04:52:18.445Z",
+  "version": "2.2.0",
   "mode": "deep",
-  "summary": {
-    "path": ".spec-first/runtime/first/summary.json",
-    "fileHash": "fd68223282940ff1af6c144a2441a935c01a659a30cb0cc819b8a88ce24b5590",
-    "lastUpdated": "2026-03-09T04:52:18.445Z",
-    "healthy": true
+  "generated_at": "2026-03-16",
+  "project": {
+    "name": "spec-first",
+    "version": "1.1.0",
+    "type": "cli",
+    "language": "typescript",
+    "runtime": "node"
   },
-  "roleViews": {
-    "path": ".spec-first/runtime/first/role-views.json",
-    "fileHash": "63c821192e872592f13bedc06684dabe138ac07762773a14871bc72c3150a64e",
-    "lastUpdated": "2026-03-09T04:52:18.445Z",
-    "healthy": true
-  },
-  "stageViews": {
-    "path": ".spec-first/runtime/first/stage-views.json",
-    "fileHash": "cbae3af40841aece9d9ea81b9c7c7905ba05c40a483c1e1fdf493565c0149c3b",
-    "lastUpdated": "2026-03-09T04:52:18.445Z",
-    "healthy": true
-  },
-  "docsProjection": {
-    "docs/first/README.md": {
+  "artifacts": [
+    {
+      "name": "README.md",
       "path": "docs/first/README.md",
-      "fileHash": "850f32bed2d9933defcbdfb634bc90886fc93e02caa5a2179278eb36564bd034",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "索引导航文档",
+      "mode": "deep"
     },
-    "docs/first/summary.md": {
-      "path": "docs/first/summary.md",
-      "fileHash": "afd5d41dec534b8c43453cce871c6c968028fa010610d968382eb524133ec6a6",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
-    },
-    "docs/first/role-views.md": {
-      "path": "docs/first/role-views.md",
-      "fileHash": "48957228a86d8768f5e7a002cdc93021c86753f7df33502588339efa1f3f2838",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
-    },
-    "docs/first/stage-views.md": {
-      "path": "docs/first/stage-views.md",
-      "fileHash": "e51dfafa02ba31c1e98fbcca6d24b9e9694df4a0e80a4cac7c8644006704368a",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
-    },
-    "docs/first/tech-stack.md": {
+    {
+      "name": "tech-stack.md",
       "path": "docs/first/tech-stack.md",
-      "fileHash": "38c997bd48aff5d07ff34571091bd4a2bc5132ebd2415b1234c8085b281b1b7a",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "技术栈摘要",
+      "mode": "quick"
     },
-    "docs/first/api-docs.md": {
+    {
+      "name": "api-docs.md",
       "path": "docs/first/api-docs.md",
-      "fileHash": "830691d2deb1afa2dfdbc55f80b489ec132fb8d2119c4ec35ad9834d0db72bf6",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "CLI 命令规范",
+      "mode": "quick"
     },
-    "docs/first/codebase-overview.md": {
+    {
+      "name": "codebase-overview.md",
       "path": "docs/first/codebase-overview.md",
-      "fileHash": "162a57aeed16c90b88dd9273ee0d06c0c17d3e27c9a82345760c360b703ff983",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "代码结构概览",
+      "mode": "quick"
     },
-    "docs/first/domain-model.md": {
+    {
+      "name": "domain-model.md",
       "path": "docs/first/domain-model.md",
-      "fileHash": "51f401df3aa8e81e1b135d352c2fd618ea3475cfe4bbf59641c28979b1974930",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "业务领域模型",
+      "mode": "quick"
     },
-    "docs/first/call-graph.md": {
-      "path": "docs/first/call-graph.md",
-      "fileHash": "e81389ce3f40ccadf4621b554a7f764d0d58ae1803354ab1d5a3641c373defc2",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
-    },
-    "docs/first/architecture.md": {
+    {
+      "name": "architecture.md",
       "path": "docs/first/architecture.md",
-      "fileHash": "7571e62c31b986f6d32c528c66f1832c0b01dae3f48ca3e579a4ed424888fe47",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "架构设计（含证据标注）",
+      "mode": "deep",
+      "evidence_coverage": "100%"
     },
-    "docs/first/external-deps.md": {
+    {
+      "name": "call-graph.md",
+      "path": "docs/first/call-graph.md",
+      "description": "调用链分析（含证据标注）",
+      "mode": "deep",
+      "call_chains": 6
+    },
+    {
+      "name": "external-deps.md",
       "path": "docs/first/external-deps.md",
-      "fileHash": "b621136a0d3dd1ac67ae7e0df4babb7760c9ceb4a51b5aac77f2d19245cf512e",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "外部依赖分析",
+      "mode": "deep"
     },
-    "docs/first/local-setup.md": {
+    {
+      "name": "local-setup.md",
       "path": "docs/first/local-setup.md",
-      "fileHash": "0488541b8a628e0acdfe706a1b1b35846331cca3d5ccbe4de9346b6e8c76f6f6",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "本地环境搭建",
+      "mode": "deep"
     },
-    "docs/first/development-guidelines.md": {
+    {
+      "name": "development-guidelines.md",
       "path": "docs/first/development-guidelines.md",
-      "fileHash": "ca2b97d07b57356f304ab98ad2ffbc6ad6de70c36b29a2999f124280e04801ba",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
+      "description": "研发规范（含证据标注）",
+      "mode": "deep"
     }
+  ],
+  "tech_stack": {
+    "runtime": "Node.js >=20",
+    "language": "TypeScript >=5.4 (ESM)",
+    "build": "tsup",
+    "test": "Vitest",
+    "template": "Handlebars",
+    "config": "js-yaml"
   },
-  "status": "current"
+  "core_modules": [
+    "process-engine",
+    "trace-engine",
+    "gate-engine",
+    "change-mgr",
+    "ai-orchestrator",
+    "metrics-engine",
+    "skill-runtime",
+    "task-plan",
+    "template",
+    "validators",
+    "batch-executor",
+    "migrations",
+    "host-adapters",
+    "rules"
+  ],
+  "stage_count": 10,
+  "skill_count": 20,
+  "command_count": 27,
+  "id_types": 14,
+  "coverage_metrics": ["C3", "C4", "C6", "C8", "C9"]
 }

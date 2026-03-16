@@ -31,7 +31,7 @@
 - Completed `T19`: task-category injection now narrows `entry-guide` and `change-map` slices for planning/orchestrate style skills, reducing irrelevant context in large repos.
 - Completed `T20`: governance update logs now reserve `topicKey / assetId / updateSource` metadata for a future memory backend without introducing one now.
 - Verification refresh completed on `2026-03-16`: fixed init-chain regressions caused by legacy three-asset fixtures in `tests/unit/init.test.ts` and `tests/unit/cli-init-stage.test.ts`, and revalidated full repo health with `pnpm vitest run`, `pnpm typecheck`, `pnpm lint`.
-- Latest verification baseline: `175` test files passed, `1565` tests passed, `7` skipped.
+- Latest verification baseline: `176` test files passed, `1571` tests passed, `7` skipped.
 - Mainline target `T01-T20` is complete. Remaining work is follow-up hardening only, not a blocked primary task.
 
 ### Task 1: Phase 0.5 Boundary Cleanup

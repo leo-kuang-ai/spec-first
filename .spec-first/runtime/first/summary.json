@@ -1,62 +1,39 @@
 {
-  "generatedAt": "2026-03-09T04:52:18.445Z",
+  "project_name": "spec-first",
+  "project_type": "cli",
+  "end_type": "backend",
+  "language": "typescript",
+  "framework": "native",
   "mode": "deep",
-  "project": {
-    "name": "spec-first",
-    "platformType": "cli-tool",
-    "overview": "Specification-driven development process engine"
+  "generated_at": "2026-03-16",
+  "artifacts_generated": 10,
+  "artifacts_quick": 5,
+  "artifacts_deep": 5,
+  "has_database": false,
+  "evidence_coverage": {
+    "core_conclusions": "100%",
+    "inferential": ">=60%"
   },
-  "modules": [
-    "cli",
-    "process-engine",
-    "skill-runtime",
-    "ai-orchestrator",
-    "gate-engine",
-    "trace-engine",
-    "change-mgr",
-    "template",
-    "tool-integration",
-    "metrics-engine",
-    "shared",
-    "config"
+  "key_findings": [
+    "Spec-First 是面向 AI 时代的规范驱动研发流程引擎",
+    "采用 8 阶段状态机 + 2 终态的生命周期管理",
+    "支持 14 类追溯 ID 的全链路追踪",
+    "提供 20 个 Skill 覆盖完整研发流程",
+    "三层规范体系：基线 + Mode×Size 裁剪 + 端特有规范",
+    "四层架构：Skill 层 → CLI 层 → Core 层 → Shared 层",
+    "19 条 Gate 条件（16 blocking + 3 warning）",
+    "5 项覆盖率指标：C3/C4/C6/C8/C9"
   ],
-  "capabilities": [
-    "Feature lifecycle management",
-    "Stage state machine",
-    "Traceability matrix",
-    "Quality gates",
-    "RFC and defect tracking"
+  "call_chains_analyzed": [
+    "CLI 启动链",
+    "Feature 初始化链",
+    "Stage 推进链",
+    "Gate 校验链",
+    "ID 追溯链",
+    "Skill 分发链"
   ],
-  "entryPoints": [
-    "src/cli/index.ts",
-    "src/core/process-engine/stage-machine.ts",
-    "src/core/skill-runtime/dispatcher.ts"
-  ],
-  "dataModels": [
-    "Feature",
-    "Stage",
-    "Task",
-    "RFC",
-    "Defect",
-    "Gate",
-    "TraceabilityMatrix"
-  ],
-  "apiSurface": [
-    "spec-first init",
-    "spec-first stage",
-    "spec-first id",
-    "spec-first matrix",
-    "spec-first rfc",
-    "spec-first defect",
-    "spec-first gate"
-  ],
-  "risks": [],
-  "evidence": [],
-  "techStack": [
-    "runtime: Node.js ≥20.0.0",
-    "language: TypeScript 5.4+",
-    "module_system: ESM",
-    "bundler: tsup",
-    "test_framework: Vitest"
-  ]
+  "dependencies": {
+    "runtime": 4,
+    "dev": 12
+  }
 }

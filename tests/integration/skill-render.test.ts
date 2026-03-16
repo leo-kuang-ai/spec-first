@@ -173,6 +173,19 @@ describe('handleSkill render', () => {
     expect(rendered).not.toContain('dependencyStrength: L1');
   });
 
+  it('treats empty --input as omitted instead of validation error', async () => {
+    const { handleSkill } = await import('../../src/cli/commands/skill.js');
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const stderr = vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.spyOn(process, 'cwd').mockReturnValue(TMP);
+
+    const exitCode = handleSkill(['render', 'spec', '--input', '']);
+
+    expect(exitCode).toBe(ExitCode.SUCCESS);
+    expect(stdout).toHaveBeenCalledTimes(1);
+    expect(stderr).not.toHaveBeenCalled();
+  });
+
   it('returns validation error when skill name is missing', async () => {
     const { handleSkill } = await import('../../src/cli/commands/skill.js');
     const stderr = vi.spyOn(console, 'error').mockImplementation(() => {});
