@@ -1,6 +1,6 @@
 # Host Capability Matrix
 
-> 更新时间：2026-03-15
+> 更新时间：2026-03-16
 
 ## 宿主支持矩阵
 
@@ -10,7 +10,7 @@
 | Codex | stable | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | 稳定基线宿主 |
 | Gemini CLI | experimental | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | 实验性宿主，已支持 baseline skills/MCP |
 | Cursor | experimental | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | 实验性宿主，已支持 baseline skills/MCP |
-| Generic | planned | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 占位宿主，仅用于策略降级 |
+| Generic | planned | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | 弱宿主，仅支持 skills 导出与策略降级 |
 
 ## 宿主说明
 
@@ -48,6 +48,17 @@
   - 遇到同名自定义 MCP 条目时保留原配置并报告 warning
   - 冲突配置会让 `doctor` 继续判定 `mcp` 为 `partial`
 
+### Generic
+
+- 已支持：
+  - `~/.spec-first/generic/skills` 下的 skills 导出
+  - `spec-first update --host generic` 的目标选择与同步
+  - 作为弱宿主参与工具策略降级与状态展示
+- 当前约束：
+  - 属于 planned，不作为完整运行时宿主宣传
+  - 不支持 MCP、browser、hooks、session hook、viewer
+  - 更适合作为导出目标或兼容层，而不是完整 agent runtime
+
 ## 状态口径
 
 - `stable`
@@ -55,7 +66,7 @@
 - `experimental`
   - 可以接入、可诊断、可回归，但不应宣传为完整稳定宿主。
 - `planned`
-  - 仅存在策略或占位定义，还未进入真实集成链路。
+  - 已有部分集成能力，但仍未进入完整宿主链路；适用于弱宿主、导出宿主或兼容层。
 
 ## 对齐来源
 

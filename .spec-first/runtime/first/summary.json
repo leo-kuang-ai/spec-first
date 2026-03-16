@@ -1,62 +1,50 @@
 {
-  "generatedAt": "2026-03-09T04:52:18.445Z",
+  "generatedAt": "2026-03-16T04:32:50.219Z",
   "mode": "deep",
   "project": {
     "name": "spec-first",
-    "platformType": "cli-tool",
-    "overview": "Specification-driven development process engine"
+    "overview": "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams"
   },
+  "techStack": [
+    "runtime: Node.js >=20.0.0",
+    "language: TypeScript",
+    "package-manager: pnpm",
+    "testing: Vitest",
+    "build: tsup"
+  ],
   "modules": [
-    "cli",
-    "process-engine",
-    "skill-runtime",
-    "ai-orchestrator",
-    "gate-engine",
-    "trace-engine",
-    "change-mgr",
-    "template",
-    "tool-integration",
-    "metrics-engine",
-    "shared",
-    "config"
+    "src/cli",
+    "src/config",
+    "src/core",
+    "src/postinstall.ts",
+    "src/preuninstall.ts",
+    "src/shared"
   ],
   "capabilities": [
-    "Feature lifecycle management",
-    "Stage state machine",
-    "Traceability matrix",
-    "Quality gates",
-    "RFC and defect tracking"
+    "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams"
   ],
   "entryPoints": [
-    "src/cli/index.ts",
-    "src/core/process-engine/stage-machine.ts",
-    "src/core/skill-runtime/dispatcher.ts"
+    "dist/cli/index.js",
+    "src/cli/index.ts"
   ],
   "dataModels": [
     "Feature",
-    "Stage",
-    "Task",
-    "RFC",
-    "Defect",
-    "Gate",
-    "TraceabilityMatrix"
+    "StageState"
   ],
   "apiSurface": [
-    "spec-first init",
-    "spec-first stage",
-    "spec-first id",
-    "spec-first matrix",
-    "spec-first rfc",
-    "spec-first defect",
-    "spec-first gate"
+    "CLI: spec-first"
   ],
-  "risks": [],
-  "evidence": [],
-  "techStack": [
-    "runtime: Node.js ≥20.0.0",
-    "language: TypeScript 5.4+",
-    "module_system: ESM",
-    "bundler: tsup",
-    "test_framework: Vitest"
+  "risks": [
+    "项目端类型待确认"
+  ],
+  "evidence": [
+    "package.json",
+    "tsconfig.json",
+    "vitest.config.ts",
+    "dist/cli/index.js",
+    "src/cli/index.ts",
+    "src/cli",
+    "src/config",
+    "src/core"
   ]
 }

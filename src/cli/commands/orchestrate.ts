@@ -90,8 +90,7 @@ export async function handleOrchestrate(
     const featureId = resolveFeatureOrCurrent(pickFeatureToken(args), projectRoot);
 
     // enabled 配置联动：--auto 标志 OR config enabled=true → auto 模式
-    const isAutoMode =
-      orchestrateArgs.mode === 'auto' || cfg.runtime.auto_orchestrate.enabled;
+    const isAutoMode = orchestrateArgs.mode === 'auto' || cfg.runtime.auto_orchestrate.enabled;
 
     let autoLoopResult: AutoLoopResult | undefined;
     if (isAutoMode && options.executor) {

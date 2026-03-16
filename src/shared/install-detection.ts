@@ -32,7 +32,7 @@ function isInGlobalNodeModules(currentPath: string): boolean {
 function isLocalSourceInstall(
   currentFile: string,
   initCwd: string | undefined,
-  pathExists: (target: string) => boolean,
+  pathExists: (target: string) => boolean
 ): boolean {
   if (!initCwd) return false;
   if (!pathExists(join(initCwd, 'package.json'))) return false;
@@ -48,7 +48,7 @@ function isLocalSourceInstall(
 
 export function detectGlobalInstall(
   context: InstallDetectionContext = {},
-  fallbackFileUrl?: string,
+  fallbackFileUrl?: string
 ): boolean {
   const env = context.env ?? process.env;
   const argv = context.argv ?? process.argv;

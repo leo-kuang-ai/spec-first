@@ -2,10 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { readFirstStageViews } from './first-runtime-store.js';
-import {
-  type SkillExecutionContext,
-  resolveExecutionFeatureId,
-} from './execution-context.js';
+import { type SkillExecutionContext, resolveExecutionFeatureId } from './execution-context.js';
 
 const SCOPE_GUARD_SKILLS = new Set(['code', 'review', 'verify']);
 const TASK_SECTION_RE = /^###\s*(TASK-[A-Z0-9-]+)\b.*$/gm;

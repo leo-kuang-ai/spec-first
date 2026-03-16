@@ -2,8 +2,8 @@
 title: First Skill 项目认知编译器开发任务文档
 date: 2026-03-15
 author: Anthropic SDD 技术研发团队
-status: draft
-version: 1.2
+status: in_progress
+version: 1.3
 source_design: ./2026-03-15-first-skill-项目认知编译器优化方案.md
 ---
 
@@ -54,6 +54,75 @@ source_design: ./2026-03-15-first-skill-项目认知编译器优化方案.md
 - rich assets 进入 runtime schema
 - phase-aware skill consumption
 - `wrap_up/done` 反向更新 first canonical truth
+
+## 二点一、当前开发进度
+
+截至 `2026-03-16`，当前推进状态如下：
+
+- 已完成 `T01-T03`
+  - 完成 `docs/first` canonical / legacy 边界收敛
+  - 完成 `README` 投影视图边界说明
+  - 完成 `first --help / --check-health / --skip` 文案收敛
+- 已完成 `T04`
+  - `steering.json` 已接入 runtime types / store / bootstrap / context / docs projection
+- 已完成 `T05`
+  - `conventions.json` 已接入 runtime types / store / bootstrap / context / docs projection
+- 已完成 `T06`
+  - `critical-flows.json` 已接入 runtime types / store / bootstrap / context / docs projection
+  - 旧 runtime index 缺失 `steering / conventions / critical-flows` 时可兼容补齐，不会在 refresh / resume / context 读取时崩溃
+- 已完成 `T07`
+  - `change-map.json` 已接入 runtime types / store / bootstrap / context / docs projection
+  - `handleFirst` 在 runtime truth 健康但 canonical docs 缺失时，会主动从 runtime 重新投影 docs
+- 已完成 `T08`
+  - `entry-guide.json` 已接入 runtime types / store / bootstrap / context / docs projection
+  - 当前 runtime canonical asset 已扩展到 `summary / role-views / stage-views / steering / conventions / critical-flows / change-map / entry-guide`
+- 已完成 `T09`
+  - `reboot-guide.json` 已接入 runtime types / store / bootstrap / context / docs projection
+  - 当前 runtime canonical asset 已扩展到 `summary / role-views / stage-views / steering / conventions / critical-flows / change-map / entry-guide / reboot-guide`
+- 已完成 `T10`
+  - 新增 canonical assets 的 docs projection 合同已整体收口
+  - `refresh-all / refresh-docs-from-runtime` 与 canonical projection tests 已覆盖全部 9 个 runtime assets
+- 已完成 `T11`
+  - `ResolvedSkillContext` 已升级为 `required / optional / fallback`
+  - `context-resolver` 能按 skill 输出 richer asset slice，并在 required 缺失时提供稳定 warning / recommendation / missing_required_assets
+- 已完成 `T12`
+  - `spec / design / code / review / verify` 已消费 non-summary canonical assets
+  - `task / plan / orchestrate` 已接入 `change-map / critical-flows / entry-guide`
+  - `onboarding` 已接入 `steering`，并将 `reboot-guide` 作为 optional asset 暴露
+- 已完成 `T13`
+  - 新增 `.spec-first/runtime/first/project-cognition-updates.jsonl` 作为 append-only 项目认知更新日志
+- 已完成 `T14`
+  - `advance()` 在 `06_wrap_up` 与终态 `08_done` 场景接入 cognition diff 触发
+  - 当前自动收口链 `06_wrap_up -> 07_release -> 08_done` 会在外层调用中执行一次治理写回
+- 已完成 `T15`
+  - 已建立最小 `Project Cognition Gate`
+  - 支持 `must_update / should_update / must_not_update` 分类，以及 `approved / skipped / blocked` gate 状态
+- 已完成 `T16`
+  - gate 通过时可执行 `bootstrap / refresh-all / refresh-docs-from-runtime`
+  - canonical truth 与 docs projection 已能在治理链中自动刷新
+- 已完成本轮全量验证收口
+  - 修复 `tests/unit/init.test.ts` 与 `tests/unit/cli-init-stage.test.ts` 中仍按旧三资产模型构造 healthy runtime first fixture 的回归问题，统一升级为九资产 canonical runtime fixture
+  - 已完成 `pnpm vitest run`、`pnpm typecheck`、`pnpm lint`
+  - 当前验证基线：`176` 个测试文件通过，`1571` 个测试通过，`7` 个跳过
+- 已完成 `T17`
+  - 新增 `tests/integration/first-governance-e2e.test.ts`
+  - 已覆盖 `06_wrap_up -> 07_release -> 08_done` 路径上的 runtime writeback 日志、gate 决策、canonical truth 刷新
+  - 已覆盖 `07_release -> 08_done` 路径上的 canonical docs drift 检测与 `refresh-docs-from-runtime` 回投影
+- 已完成 `T18`
+  - 新增 `docs/first/common-playbooks.md` 与 `docs/first/known-risks-and-traps.md` 两类增强投影视图
+  - 这两类文档由现有 runtime truth 派生生成，不新增 runtime health 必选资产，不破坏当前 9 资产 canonical contract
+  - 已补齐 `first-artifact-mapping` 与 `first-doc-projection` 测试覆盖
+- 已完成 `T19`
+  - `context-resolver` 已按 skill 的 task category 对 `entry-guide / change-map` 做选择性注入
+  - `plan / orchestrate` 等背景型 skill 不再默认拿到无关的 `docs-projection` slice
+  - 已补齐 `context-resolver / dispatcher-first-runtime` 测试覆盖
+- 已完成 `T20`
+  - `project-cognition-updates.jsonl` 已为长期记忆预留 `topicKey / assetId / updateSource` 三个结构位
+  - 当前仅在治理日志中补齐元数据，不新增 memory backend，也不改变现有 gate / writeback 主路径
+  - 已补齐 `first-governance / first-governance-e2e` 测试覆盖
+- 当前主线任务状态
+  - `T01-T20` 已全部完成
+  - 后续进入增强收尾与持续演进阶段，不再存在主线阻塞项
 
 ---
 
@@ -305,6 +374,8 @@ interface FirstSteering {
 
 ### T06 扩展 runtime schema：`critical-flows.json`
 
+**当前状态：已完成（2026-03-16）**
+
 **目标**
 
 让 `design/code/verify` 能读取项目级关键链路。
@@ -324,6 +395,8 @@ interface FirstSteering {
 - `verify` 能消费其摘要或切片
 
 ### T07 扩展 runtime schema：`change-map.json`
+
+**当前状态：已完成（2026-03-16）**
 
 **目标**
 
@@ -345,6 +418,8 @@ interface FirstSteering {
 
 ### T08 扩展 runtime schema：`entry-guide.json`
 
+**当前状态：已完成（2026-03-16）**
+
 **目标**
 
 给 agent 一个“从哪里开始阅读”的稳定入口。
@@ -358,6 +433,8 @@ interface FirstSteering {
 - `relatedFlows`
 
 ### T09 扩展 runtime schema：`reboot-guide.json`
+
+**当前状态：已完成（2026-03-16）**
 
 **目标**
 

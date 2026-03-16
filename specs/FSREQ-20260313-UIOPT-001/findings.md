@@ -143,3 +143,62 @@
   - file: specs/FSREQ-20260313-UIOPT-001/reports/release-note.md
 
 - [2026-03-13T02:39:45.833Z] AUTO_ADVANCE: 07_release → 08_done (发布阶段预留扩展，当前自动跳过)
+
+## [2026-03-16] 07-工具集成 代码审查（cross-layer）
+
+> **审查范围**：`src/core/tool-integration/`、`src/core/host-adapters/`、`src/shared/host-mcp-baseline.ts`、`src/shared/install-detection.ts`、`src/config/bootstrap-manifest.ts`
+> **关联提交**：`b4499c7` feat: 新增 host-adapters、tool-integration、代码审查文档
+> **层级**：cross（多模块跨层）
+> **Stage 1（合规）**：✅ PASS — 追溯链完整，测试全绿（168 files / 1550 tests），typecheck PASS，build PASS
+> **Stage 2（质量）**：2 项 MUST FIX，4 项 SHOULD FIX，3 项 OUT_OF_SCOPE
+
+---
+
+### MUST FIX（阻断）
+
+| # | 位置 | 问题摘要 | 验证结论 | 状态 |
+|---|------|---------|---------|------|
+| MF-1 | `src/core/tool-integration/capability-matrix.ts:39` | `generic` 宿主 `supportsSkills` 硬编码为 `true`，与 `docs/reference/host-capability-matrix.md` 声明（❌）矛盾；下游逻辑依赖该字段会得到错误结果 | ✅ 已复现：`getHostCapability('generic')?.supportsSkills` 返回 `true`，文档声明 `false` | ⏳ 待修复 |
+| MF-2 | `src/core/tool-integration/tool-selection.ts:21-22` | `code-analysis` 场景硬编码返回 `['serena']`，未经 `isToolSupported` 过滤；对 `generic` 宿主调用时错误返回 `serena`（serena.hosts 不含 generic，且 generic 无 MCP 支持） | ✅ 已复现：`selectToolsForScenario('generic', 'code-analysis')` = `{primary:['serena']}` 而期望 `{primary:[]}` | ⏳ 待修复 |
+
+**MF-1 修复方案**：
+```typescript
+// capability-matrix.ts
+{
+  host: 'generic',
+  supportsSkills: false,  // 与文档对齐，generic 是降级占位宿主
+  supportsMcp: false,
+  ...
+}
+```
+
+**MF-2 修复方案**：
+```typescript
+// tool-selection.ts
+case 'code-analysis':
+  return {
+    primary: isToolSupported(host, 'serena') ? ['serena'] : [],
+    fallback: ['shell-rg'],
+  };
+```
+
+---
+
+### SHOULD FIX（建议）
+
+| # | 位置 | 问题摘要 | 严重性 | 状态 |
+|---|------|---------|--------|------|
+| SF-1 | `src/core/host-adapters/gemini-adapter.ts`、`cursor-adapter.ts` | `detectHostPaths()` 在每个 public 方法中独立调用（各 9 次），单次 `resolveHostAdapterStatuses()` 触发 10+ 次 FS 路径探测；`ClaudeAdapter`/`CodexAdapter` 的 `remediation()` 不调用 `detectHostPaths` 是更合理的模式 | 性能 | ⏳ 待修复 |
+| SF-2 | `src/core/host-adapters/registry.ts:7,15` | `DEFAULT_ADAPTERS` 声明为可变数组 `HostAdapter[]`，`listHostAdapters()` 直接返回其引用；调用方可 `push/splice` 污染内部单例状态 | 防御性设计 | ⏳ 待修复 |
+| SF-3 | `src/core/tool-integration/capability-matrix.ts:15` | `getCapabilityMatrix()` 无缓存，每次调用重新执行路径探测；4 个 adapter 各自调用 `getHostCapability()` 导致矩阵被重复构建 4 次 | 性能 | ⏳ 待修复 |
+| SF-4 | `tests/unit/tool-registry.test.ts` | `code-analysis` 场景仅测试 `claude` 宿主，未覆盖 `generic`/`codex` 宿主，导致 MF-2 在测试中未被发现 | 测试完备性 | ⏳ 待补充 |
+
+---
+
+### OUT_OF_SCOPE（范围外记录）
+
+| # | 问题摘要 |
+|---|---------|
+| OOS-1 | `hasRequiredCodexMcpBaseline` 使用字符串 `includes` 而非 TOML 解析器，注释中包含 `[mcp_servers.xxx]` 时存在假阳性风险；属于历史技术债，非本次引入 |
+| OOS-2 | `session-hook.ts`、`ai-runtime-hook.ts` 体量较大，与工具集成核心边界有距离，建议单独审查 |
+| OOS-3 | `install-plan.ts` 对非法 `component` 的静默忽略；调用方 `update.ts` 已有 CLI 层校验兜底，非本模块问题 |

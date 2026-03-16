@@ -4,7 +4,18 @@ import { join } from 'node:path';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
 import { handleDone } from '../../src/cli/commands/done.js';
-import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
+import {
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
+  writeFirstRuntimeIndex,
+  writeFirstRuntimeSummary,
+  writeFirstRoleViews,
+  writeFirstSteering,
+  writeFirstStageViews,
+} from '../../src/core/skill-runtime/first-runtime-store.js';
 import * as hostBootstrap from '../../src/shared/host-bootstrap.js';
 import * as hostAdapterRegistry from '../../src/core/host-adapters/registry.js';
 import * as skillCommands from '../../src/shared/skill-commands.js';
@@ -25,6 +36,12 @@ function seedHealthyRuntimeFirst(projectRoot: string): void {
     summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
     roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
     stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
     docsProjection: {},
     status: 'current',
   });
@@ -51,6 +68,53 @@ function seedHealthyRuntimeFirst(projectRoot: string): void {
     design: { stage: 'design', summary: 'design', moduleBoundaries: ['src/core/process-engine'], integrationPoints: ['src/cli/commands/init.ts'], technicalConstraints: ['runtime truth source'], risks: [] },
     code: { stage: 'code', summary: 'code', entryPoints: ['src/cli/commands/init.ts'], likelyChangeAreas: ['src/core/process-engine/init.ts'], changeHazards: [], verificationHooks: ['tests/unit/cli-init-stage.test.ts'] },
     verify: { stage: 'verify', summary: 'verify', testFocus: ['runtime readiness'], riskAreas: [], validationHooks: ['pnpm vitest run tests/unit/cli-init-stage.test.ts'], releaseBlockers: [] },
+  });
+  writeFirstSteering(projectRoot, {
+    product: { overview: 'runtime init', coreScenarios: ['feature initialization'], nonGoals: [], glossary: ['Feature'] },
+    tech: { stack: ['TypeScript'], constraints: ['runtime truth source'], forbiddenPatterns: ['docs-only truth'] },
+    structure: { modules: ['src/core/process-engine/init.ts'], boundaries: ['src/cli/commands/init.ts'], entryRules: ['read runtime truth first'] },
+  });
+  writeFirstConventions(projectRoot, {
+    api: { observedPatterns: ['spec-first init'], deviations: [], recommendedConvention: 'stable', evidence: ['src/cli/commands/init.ts'] },
+    module: { observedPatterns: ['src/core/process-engine/init.ts'], deviations: [], recommendedConvention: 'stable', evidence: ['src/core/process-engine/init.ts'] },
+    testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'stable', evidence: ['tests/unit/cli-init-stage.test.ts'] },
+    projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'stable', evidence: ['.spec-first/runtime/first'] },
+  });
+  writeFirstCriticalFlows(projectRoot, [
+    {
+      flowId: 'flow-init',
+      name: 'Init Flow',
+      entryPoints: ['src/cli/commands/init.ts'],
+      coreModules: ['src/core/process-engine/init.ts'],
+      invariants: ['runtime truth first'],
+      verificationHooks: ['pnpm vitest run tests/unit/cli-init-stage.test.ts'],
+    },
+  ]);
+  writeFirstChangeMap(projectRoot, [
+    {
+      changeType: 'init-flow',
+      likelyModules: ['src/core/process-engine/init.ts'],
+      likelyCommands: ['src/cli/commands/init.ts'],
+      likelyConfigs: ['package.json'],
+      likelyTests: ['tests/unit/cli-init-stage.test.ts'],
+      riskPoints: ['background input drift'],
+    },
+  ]);
+  writeFirstEntryGuide(projectRoot, [
+    {
+      taskCategory: 'init',
+      readFirst: ['.spec-first/runtime/first/summary.json'],
+      thenRead: ['src/core/process-engine/init.ts'],
+      avoidEntry: ['docs/first/README.md'],
+      relatedFlows: ['flow-init'],
+    },
+  ]);
+  writeFirstRebootGuide(projectRoot, {
+    projectWhat: 'runtime init',
+    whereToStart: ['.spec-first/runtime/first/summary.json'],
+    currentCriticalAreas: ['runtime truth first'],
+    commonChangePaths: ['src/core/process-engine/init.ts'],
+    verifyChecklist: ['pnpm vitest run tests/unit/cli-init-stage.test.ts'],
   });
 }
 
@@ -170,40 +234,7 @@ describe('handleInit', () => {
     const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     try {
       rmSync(join(TMP, 'docs'), { recursive: true, force: true });
-      writeFirstRuntimeIndex(TMP, {
-        version: '1.0.0',
-        lastRun: '2026-03-08T12:00:00.000Z',
-        mode: 'quick',
-        summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        docsProjection: {},
-        status: 'current',
-      });
-      writeFirstRuntimeSummary(TMP, {
-        generatedAt: '2026-03-08T12:00:00.000Z',
-        mode: 'quick',
-        project: { name: 'spec-first', platformType: 'backend', overview: 'runtime-only init' },
-        modules: ['src/core/process-engine/init.ts'],
-        capabilities: ['feature initialization'],
-        entryPoints: ['src/cli/commands/init.ts'],
-        dataModels: ['Feature'],
-        apiSurface: ['spec-first init'],
-        risks: [],
-        evidence: [],
-      });
-      writeFirstRoleViews(TMP, {
-        product: { role: 'product', summary: 'product', focus: [], warnings: [] },
-        dev: { role: 'dev', summary: 'dev', focus: [], warnings: [] },
-        qa: { role: 'qa', summary: 'qa', focus: [], warnings: [] },
-        architect: { role: 'architect', summary: 'architect', focus: [], warnings: [] },
-      });
-      writeFirstStageViews(TMP, {
-        spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
-        design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
-        code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
-        verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
-      });
+      seedHealthyRuntimeFirst(TMP);
 
       const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'h5']);
       const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');

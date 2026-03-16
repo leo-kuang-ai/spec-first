@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { mkdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync } from 'node:fs';
 
 const withFileLockMock = vi.fn((_: string, action: () => void) => action());
 
@@ -10,14 +11,18 @@ vi.mock('../../src/shared/file-lock.js', () => ({
 
 const { initTodoState, saveTodoState } = await import('../../src/core/ai-orchestrator/todo-runner.js');
 
-const TMP = join(process.cwd(), 'tests', 'fixtures', '.tmp-todo-runner-file-lock');
 const FEAT = 'FSREQ-20260314-LOCK-001';
+let TMP = '';
 
 beforeEach(() => {
   withFileLockMock.mockClear();
-  rmSync(TMP, { recursive: true, force: true });
+  TMP = mkdtempSync(join(tmpdir(), 'spec-first-todo-lock-'));
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+});
+
+afterEach(() => {
+  rmSync(TMP, { recursive: true, force: true });
 });
 
 describe('todo runner file lock', () => {

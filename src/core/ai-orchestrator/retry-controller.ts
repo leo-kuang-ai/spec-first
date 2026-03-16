@@ -169,8 +169,9 @@ export function makeRetryDecision(
   // P6 联动: unknown 错误使用更保守的退避（2×），为分类不准确留缓冲
   const unknownMultiplier = category === 'unknown' ? 2 : 1;
   const backoffMs = Math.min(
-    computeBackoffMs(config.retry_backoff_ms, effectiveRetryCount + 1)
-      * consecutiveMultiplier * unknownMultiplier,
+    computeBackoffMs(config.retry_backoff_ms, effectiveRetryCount + 1) *
+      consecutiveMultiplier *
+      unknownMultiplier,
     30_000
   );
 

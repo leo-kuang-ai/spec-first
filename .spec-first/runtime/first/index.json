@@ -1,102 +1,133 @@
 {
-  "version": "2.1.0",
-  "lastRun": "2026-03-09T04:52:18.445Z",
+  "version": "1.0.0",
+  "lastRun": "2026-03-16T05:58:29.109Z",
+  "sourceCommit": "143ce2e2f98a8942fc0d47b44d815f2da289ebe9",
   "mode": "deep",
   "summary": {
     "path": ".spec-first/runtime/first/summary.json",
-    "fileHash": "fd68223282940ff1af6c144a2441a935c01a659a30cb0cc819b8a88ce24b5590",
-    "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "fileHash": "b7124bf56bff5b9b96687479d3a514bd4f65bd29f170958d002fee10b05daeeb",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
     "healthy": true
   },
   "roleViews": {
     "path": ".spec-first/runtime/first/role-views.json",
-    "fileHash": "63c821192e872592f13bedc06684dabe138ac07762773a14871bc72c3150a64e",
-    "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "fileHash": "5861f5e833d2b0c2b3e837b98b00d1ab03e96068d62f19c149bab99203d8d6cb",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
     "healthy": true
   },
   "stageViews": {
     "path": ".spec-first/runtime/first/stage-views.json",
-    "fileHash": "cbae3af40841aece9d9ea81b9c7c7905ba05c40a483c1e1fdf493565c0149c3b",
-    "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "fileHash": "5ec1437102efa1df1605286c1a4cd3f3e595eed94eb18d951a7f127715caa19c",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
+    "healthy": true
+  },
+  "steering": {
+    "path": ".spec-first/runtime/first/steering.json",
+    "fileHash": "0dca3121b84d00b63e3a4600470c96dbc2fdc2d8fd60a89cebb5d1609efaaab0",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
+    "healthy": true
+  },
+  "conventions": {
+    "path": ".spec-first/runtime/first/conventions.json",
+    "fileHash": "e1c7bc0f69438439f8f641289e09575854d2b2bb8fbbba09f50731838b1cfebb",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
+    "healthy": true
+  },
+  "criticalFlows": {
+    "path": ".spec-first/runtime/first/critical-flows.json",
+    "fileHash": "40179816d1338c800f269237b869398838a8ca807103088228f3db9fe056519b",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
+    "healthy": true
+  },
+  "changeMap": {
+    "path": ".spec-first/runtime/first/change-map.json",
+    "fileHash": "96636da99c37df066bbd1025079f865c7d7015c42c4ab40930017a614b15cdd2",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
+    "healthy": true
+  },
+  "entryGuide": {
+    "path": ".spec-first/runtime/first/entry-guide.json",
+    "fileHash": "5c24b248053cf7242e029a2bd2c262fd192955796c2c4700828143ab8601e35a",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
+    "healthy": true
+  },
+  "rebootGuide": {
+    "path": ".spec-first/runtime/first/reboot-guide.json",
+    "fileHash": "dea8be3fe2fb957ee3bd3ec4c08716361b3bde9fac5c7250e5ee5ab648b06194",
+    "lastUpdated": "2026-03-16T04:32:50.220Z",
     "healthy": true
   },
   "docsProjection": {
     "docs/first/README.md": {
       "path": "docs/first/README.md",
-      "fileHash": "850f32bed2d9933defcbdfb634bc90886fc93e02caa5a2179278eb36564bd034",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+      "fileHash": "a1de3698e6115b23d6d8c9a8f30bf265fea33a520dd9f5a1993f27048e55fccb",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
     "docs/first/summary.md": {
       "path": "docs/first/summary.md",
-      "fileHash": "afd5d41dec534b8c43453cce871c6c968028fa010610d968382eb524133ec6a6",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+      "fileHash": "9950fe06874b2dff1bdc64fe0295592567d54a39daf3a3111af088d846a8cba3",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
     "docs/first/role-views.md": {
       "path": "docs/first/role-views.md",
-      "fileHash": "48957228a86d8768f5e7a002cdc93021c86753f7df33502588339efa1f3f2838",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+      "fileHash": "e0ee7eefe7c713531d734d4f1e8376d46cacb364ebe42ab81ba3b60eaccac110",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
     "docs/first/stage-views.md": {
       "path": "docs/first/stage-views.md",
-      "fileHash": "e51dfafa02ba31c1e98fbcca6d24b9e9694df4a0e80a4cac7c8644006704368a",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+      "fileHash": "0cb258cda3543c335e746f5ef26508fe170e78adb6a967025fc5346dc13fcdcc",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/tech-stack.md": {
-      "path": "docs/first/tech-stack.md",
-      "fileHash": "38c997bd48aff5d07ff34571091bd4a2bc5132ebd2415b1234c8085b281b1b7a",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/steering.md": {
+      "path": "docs/first/steering.md",
+      "fileHash": "6e2e1a259f5ef4536a567e82e59fb241162d48de6d433f64d0fe89c450f3b711",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/api-docs.md": {
-      "path": "docs/first/api-docs.md",
-      "fileHash": "830691d2deb1afa2dfdbc55f80b489ec132fb8d2119c4ec35ad9834d0db72bf6",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/conventions.md": {
+      "path": "docs/first/conventions.md",
+      "fileHash": "dbd77d1dca94c738463c82371ca2425b07f60e572b06fcde43d865ddba15dad1",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/codebase-overview.md": {
-      "path": "docs/first/codebase-overview.md",
-      "fileHash": "162a57aeed16c90b88dd9273ee0d06c0c17d3e27c9a82345760c360b703ff983",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/common-playbooks.md": {
+      "path": "docs/first/common-playbooks.md",
+      "fileHash": "c391e17e9f74e47cb0d0e6eff1119014d9af15a53c612359df68a9adc99e5ce3",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/domain-model.md": {
-      "path": "docs/first/domain-model.md",
-      "fileHash": "51f401df3aa8e81e1b135d352c2fd618ea3475cfe4bbf59641c28979b1974930",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/critical-flows.md": {
+      "path": "docs/first/critical-flows.md",
+      "fileHash": "647beb63eef432df594e8e79354b5d958a482cb366a51c8c40a426c4a750d878",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/call-graph.md": {
-      "path": "docs/first/call-graph.md",
-      "fileHash": "e81389ce3f40ccadf4621b554a7f764d0d58ae1803354ab1d5a3641c373defc2",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/known-risks-and-traps.md": {
+      "path": "docs/first/known-risks-and-traps.md",
+      "fileHash": "95fee77f17f2d96b6910e38619c47da64aaa0ab1ab88509e9ba5d4569f3bf65f",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/architecture.md": {
-      "path": "docs/first/architecture.md",
-      "fileHash": "7571e62c31b986f6d32c528c66f1832c0b01dae3f48ca3e579a4ed424888fe47",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/change-map.md": {
+      "path": "docs/first/change-map.md",
+      "fileHash": "57851e4bffc16958b44f7b4eb47e58652dad4d1dfd9f1fa9f7b41bcf5bb22111",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/external-deps.md": {
-      "path": "docs/first/external-deps.md",
-      "fileHash": "b621136a0d3dd1ac67ae7e0df4babb7760c9ceb4a51b5aac77f2d19245cf512e",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/entry-guide.md": {
+      "path": "docs/first/entry-guide.md",
+      "fileHash": "98e32e6b8e495192035f3f8b1f27b31e2aee326f935846c2ce83bf2de48e7d54",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     },
-    "docs/first/local-setup.md": {
-      "path": "docs/first/local-setup.md",
-      "fileHash": "0488541b8a628e0acdfe706a1b1b35846331cca3d5ccbe4de9346b6e8c76f6f6",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
-      "healthy": true
-    },
-    "docs/first/development-guidelines.md": {
-      "path": "docs/first/development-guidelines.md",
-      "fileHash": "ca2b97d07b57356f304ab98ad2ffbc6ad6de70c36b29a2999f124280e04801ba",
-      "lastUpdated": "2026-03-09T04:52:18.445Z",
+    "docs/first/reboot-guide.md": {
+      "path": "docs/first/reboot-guide.md",
+      "fileHash": "089487d34da2236a2509f188bc4969ff3a796d757c71542d3b7088cd8028e076",
+      "lastUpdated": "2026-03-16T04:32:50.220Z",
       "healthy": true
     }
   },

@@ -8,7 +8,10 @@ import { calcHealthScore } from '../../core/metrics-engine/health-score.js';
 import { detectBottlenecks } from '../../core/metrics-engine/bottleneck.js';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { join } from 'node:path';
-import { getStageMetricTargets, getAllCoreMetricDefs } from '../../core/metrics-engine/core-metric-thresholds.js';
+import {
+  getStageMetricTargets,
+  getAllCoreMetricDefs,
+} from '../../core/metrics-engine/core-metric-thresholds.js';
 
 export function handleMetrics(args: string[]): number {
   const sub = args[0];
@@ -51,7 +54,9 @@ function handleCoverage(args: string[]): number {
       return ExitCode.SUCCESS;
     }
 
-    const state = readJson(join(process.cwd(), 'specs', featureId, 'stage-state.json')) as StageState;
+    const state = readJson(
+      join(process.cwd(), 'specs', featureId, 'stage-state.json')
+    ) as StageState;
     const stageTargets = getStageMetricTargets(state.currentStage, process.cwd());
 
     console.log(`覆盖率报告 — ${featureId} (${state.currentStage})\n`);
@@ -146,7 +151,9 @@ function handleReport(args: string[]): number {
       const currentPct = (current * 100).toFixed(1);
       const pass = current >= t.target;
       const icon = pass ? '✓' : '✗';
-      console.log(`  ${icon} ${t.key} ${t.name.padEnd(22)} target=${targetPct}%  current=${currentPct}%`);
+      console.log(
+        `  ${icon} ${t.key} ${t.name.padEnd(22)} target=${targetPct}%  current=${currentPct}%`
+      );
     }
   } else {
     console.log(`\nCurrent Stage Targets (${currentStage})：当前阶段无指标判定`);

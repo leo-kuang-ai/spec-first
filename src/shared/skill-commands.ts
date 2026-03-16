@@ -174,7 +174,9 @@ function extractFrontmatterBlock(content: string): FrontmatterBlock | undefined 
   if (end < 0) return undefined;
 
   const bodyStart = end + '\n---'.length;
-  const body = content.startsWith('\n', bodyStart) ? content.slice(bodyStart + 1) : content.slice(bodyStart);
+  const body = content.startsWith('\n', bodyStart)
+    ? content.slice(bodyStart + 1)
+    : content.slice(bodyStart);
   return {
     raw: content.slice(0, bodyStart),
     body,
@@ -191,9 +193,12 @@ function extractDescription(content: string): string {
 
 function renderDynamicRenderCommand(
   entry: SkillEntry,
-  options?: { inputPlaceholder?: string }
+  options?: { inputPlaceholder?: string; optionalInputPlaceholder?: string }
 ): string {
   const base = `spec-first skill render ${entry.skillName}`;
+  if (options?.optionalInputPlaceholder) {
+    return `${base}\${${options.optionalInputPlaceholder}:+ --input "$${options.optionalInputPlaceholder}"}`;
+  }
   return options?.inputPlaceholder ? `${base} --input ${options.inputPlaceholder}` : base;
 }
 
@@ -237,7 +242,7 @@ description: ${description}
 
 先运行以下命令，获取带项目运行时上下文的最新 Skill 定义：
 
-\`${renderDynamicRenderCommand(entry, { inputPlaceholder: '"$ARGUMENTS"' })}\`
+\`${renderDynamicRenderCommand(entry, { optionalInputPlaceholder: 'ARGUMENTS' })}\`
 
 将命令输出视为本次执行的完整 Skill 定义，并严格遵循其要求。
 

@@ -110,10 +110,7 @@ function recoverInterruptedTasks(
       retryCount: (z.retryCount ?? 0) + 1,
       lastFailureReason: 'process_crash_recovery',
     });
-    writeAuditLog(
-      { event: 'zombie_recovered', featureId, taskId: z.id },
-      projectRoot
-    );
+    writeAuditLog({ event: 'zombie_recovered', featureId, taskId: z.id }, projectRoot);
   }
 
   // 清理 autoLoop 运行态（全部 4 个瞬时字段必须重置，避免重启后 watchdog 按旧时间戳误判超时）
@@ -219,7 +216,11 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
       const diagnosis = diagnoseStuckReason(state);
       if (diagnosis.type !== 'waiting_for_deps') {
         writeAuditLog(
-          { event: 'loop_stuck', featureId, detail: { type: diagnosis.type, taskIds: diagnosis.taskIds } },
+          {
+            event: 'loop_stuck',
+            featureId,
+            detail: { type: diagnosis.type, taskIds: diagnosis.taskIds },
+          },
           projectRoot
         );
         state = haltState(state, 'blocked');
@@ -265,12 +266,16 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
             taskTimeoutMs
           );
         }),
-      ]).catch((err: Error): TaskResult => ({
-        success: false,
-        message: err.message,
-      })).finally(() => {
-        if (timeoutHandle) clearTimeout(timeoutHandle);
-      });
+      ])
+        .catch(
+          (err: Error): TaskResult => ({
+            success: false,
+            message: err.message,
+          })
+        )
+        .finally(() => {
+          if (timeoutHandle) clearTimeout(timeoutHandle);
+        });
 
       // 执行后更新 heartbeat + watchdog 检查
       state = updateHeartbeat(state);
@@ -327,7 +332,9 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
                 resumeAt: Date.now() + guardRetryDecision.backoffMs,
               });
               state = updateAutoLoopLastResult(
-                state, task.id, 'pending',
+                state,
+                task.id,
+                'pending',
                 `guard retry scheduled (${guardRetryDecision.backoffMs}ms): ${guard.reason}`
               );
               writeAuditLog(
@@ -339,7 +346,11 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
                 },
                 projectRoot
               );
-              state = applyRetryToState(state, guardRetryDecision, `GUARD_CORRECTION:${guard.reason}`);
+              state = applyRetryToState(
+                state,
+                guardRetryDecision,
+                `GUARD_CORRECTION:${guard.reason}`
+              );
               checkpoint(state, projectRoot, onCheckpoint);
               continue;
             }
@@ -369,7 +380,10 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
             const { state: cs, cascaded: cc } = cascadeBlocked(state);
             if (cc.length > 0) {
               state = cs;
-              writeAuditLog({ event: 'blocked_cascade', featureId, detail: { cascaded: cc } }, projectRoot);
+              writeAuditLog(
+                { event: 'blocked_cascade', featureId, detail: { cascaded: cc } },
+                projectRoot
+              );
             }
             state = haltState(state, 'blocked', task.id);
             checkpoint(state, projectRoot, onCheckpoint);
@@ -443,7 +457,10 @@ export async function runAutoLoop(options: AutoLoopOptions): Promise<AutoLoopRes
           const { state: cs, cascaded: cc } = cascadeBlocked(state);
           if (cc.length > 0) {
             state = cs;
-            writeAuditLog({ event: 'blocked_cascade', featureId, detail: { cascaded: cc } }, projectRoot);
+            writeAuditLog(
+              { event: 'blocked_cascade', featureId, detail: { cascaded: cc } },
+              projectRoot
+            );
           }
           state = haltState(state, 'blocked', task.id);
           checkpoint(state, projectRoot, onCheckpoint);

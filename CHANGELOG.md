@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.1.2 2026-03-16 Claude: docs(first-skill): 硬编码默认输出语言为中文，在 QA 规则和 SKILL.md 中添加语言约束 (user-visible)
+- v1.1.2 2026-03-16 Claude: feat(first-runtime): 添加路径校验函数 validateFirstRuntimePath，防止写入错误目录（如 .config-first/） (user-visible)
+- v1.1.2 2026-03-16 Claude: docs(first): 新增事故复盘文档 incident-2026-03-16-json-generation-error.md，记录 JSON 生成错误根因与解决方案
+- v1.1.2 2026-03-16 Claude: docs(first): 生成 quick 模式项目认知文档 (tech-stack.md/api-docs.md/codebase-overview.md/domain-model.md/README.md + runtime 真源文件) (user-visible)
 - v1.0.4 2026-03-14 Claude: fix(stage-viewer): 修复 Claude session 启动时浏览器不自动打开的问题 — openBrowser 从 spawn+unref() 改为 spawnSync，确保浏览器实际打开后再退出 (user-visible)
 - v1.0.4 2026-03-14 Claude: test(auto-loop): SF-4 补充 P6 unknown 错误端到端集成测试（3 用例：unknown→pending、2×退避验证、重试预算耗尽→blocked）
 - v1.0.4 2026-03-14 Claude: fix(auto-loop): NEW-2 两处 stop_on_blocked 提前执行 cascadeBlocked，状态文件准确反映级联传播结果

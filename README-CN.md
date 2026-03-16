@@ -2,7 +2,7 @@
 
 **为 AI 协同交付引入结构、可追溯性与质量门禁。**
 
-[![Version](https://img.shields.io/badge/version-v1.0.2-blue)](https://www.npmjs.com/package/spec-first)
+[![Version](https://img.shields.io/badge/version-v1.1.2-blue)](https://www.npmjs.com/package/spec-first)
 [![npm downloads](https://img.shields.io/npm/dm/spec-first)](https://www.npmjs.com/package/spec-first)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org)

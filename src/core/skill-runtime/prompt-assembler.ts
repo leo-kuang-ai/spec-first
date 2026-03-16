@@ -4,10 +4,7 @@ import { loadConfig } from '../../shared/config-schema.js';
 import type { StageState } from '../../shared/types.js';
 import { readJson } from '../../shared/fs-utils.js';
 import { getCurrentTaskId } from '../task-plan/parser.js';
-import {
-  type SkillExecutionContext,
-  resolveExecutionFeatureId,
-} from './execution-context.js';
+import { type SkillExecutionContext, resolveExecutionFeatureId } from './execution-context.js';
 
 export interface PromptAssemblyContext {
   featureId: string;

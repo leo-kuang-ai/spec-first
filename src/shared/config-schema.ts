@@ -440,6 +440,9 @@ function validate(cfg: SpecFirstConfig): void {
   }
 }
 
-export function getGateThreshold(config: SpecFirstConfig, gateId: GateThresholdId): GateThresholdConfig {
+export function getGateThreshold(
+  config: SpecFirstConfig,
+  gateId: GateThresholdId
+): GateThresholdConfig {
   return config.gate.thresholds[gateId];
 }

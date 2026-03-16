@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { detectHostPaths } from '../../shared/host-paths.js';
+import { detectHostPaths, type HostPaths } from '../../shared/host-paths.js';
 import { hasRequiredClaudeMcpBaseline } from '../../shared/host-mcp-baseline.js';
 import { getHostCapability } from '../tool-integration/capability-matrix.js';
 import type { HostAdapter, HostBaselinePart, HostBaselineState } from './types.js';
@@ -8,8 +8,7 @@ import type { HostAdapter, HostBaselinePart, HostBaselineState } from './types.j
 export class ClaudeAdapter implements HostAdapter {
   id = 'claude' as const;
 
-  detect(): boolean {
-    const paths = detectHostPaths();
+  detect(paths: HostPaths = detectHostPaths()): boolean {
     return (
       existsSync(paths.claudeCommandsDir) ||
       existsSync(paths.claudeConfigDir) ||
@@ -17,12 +16,11 @@ export class ClaudeAdapter implements HostAdapter {
     );
   }
 
-  capabilities() {
-    return getHostCapability(this.id);
+  capabilities(paths?: HostPaths) {
+    return getHostCapability(this.id, paths);
   }
 
-  summary(): string {
-    const paths = detectHostPaths();
+  summary(paths: HostPaths = detectHostPaths()): string {
     return `claude commands=${paths.claudeCommandsDir} config=${paths.claudeConfigDir} baseline=${this.computeBaseline(paths).state}`;
   }
 
@@ -36,19 +34,19 @@ export class ClaudeAdapter implements HostAdapter {
       : '安装 Claude Code 后运行 spec-first update --host claude 补齐 commands / MCP / hooks';
   }
 
-  baselineState() {
-    return this.computeBaseline(detectHostPaths()).state;
+  baselineState(paths: HostPaths = detectHostPaths()) {
+    return this.computeBaseline(paths).state;
   }
 
-  missingBaseline() {
-    return this.computeBaseline(detectHostPaths()).missing;
+  missingBaseline(paths: HostPaths = detectHostPaths()) {
+    return this.computeBaseline(paths).missing;
   }
 
-  private computeBaseline(paths: ReturnType<typeof detectHostPaths>): {
+  private computeBaseline(paths: HostPaths): {
     state: HostBaselineState;
     missing: HostBaselinePart[];
   } {
-    if (!this.detect()) {
+    if (!this.detect(paths)) {
       return { state: 'unknown', missing: [] };
     }
 

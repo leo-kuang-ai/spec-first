@@ -9,9 +9,15 @@ import { execSync } from 'node:child_process';
 import { dispatchCommand, loadSkill, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
 import { resetConfigCache } from '../../src/shared/config-schema.js';
 import {
+  writeFirstChangeMap,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstSteering,
   writeFirstStageViews,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
 import {
@@ -35,6 +41,56 @@ afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
   resetConfigCache();
 });
+
+function writeSupplementalFirstAssets(projectRoot: string): void {
+  writeFirstSteering(projectRoot, {
+    product: { overview: 'skill runtime tests', coreScenarios: ['planning'], nonGoals: [], glossary: ['Feature'] },
+    tech: { stack: ['TypeScript'], constraints: ['strict'], forbiddenPatterns: ['docs-only truth'] },
+    structure: { modules: ['skill-runtime'], boundaries: ['src/cli'], entryRules: ['read runtime truth first'] },
+  });
+  writeFirstConventions(projectRoot, {
+    api: { observedPatterns: ['spec-first CLI'], deviations: [], recommendedConvention: 'Keep CLI verbs stable.', evidence: ['src/cli'] },
+    module: { observedPatterns: ['skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core.', evidence: ['src/core'] },
+    testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['tests/unit'] },
+    projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth first.', evidence: ['.spec-first/runtime/first'] },
+  });
+  writeFirstCriticalFlows(projectRoot, [
+    {
+      flowId: 'flow-cli-entry',
+      name: 'CLI Entry Flow',
+      entryPoints: ['src/cli/index.ts'],
+      coreModules: ['skill-runtime'],
+      invariants: ['runtime truth first'],
+      verificationHooks: ['pnpm vitest'],
+    },
+  ]);
+  writeFirstChangeMap(projectRoot, [
+    {
+      changeType: 'runtime-asset-extension',
+      likelyModules: ['skill-runtime'],
+      likelyCommands: ['src/cli/commands/first.ts'],
+      likelyConfigs: ['package.json'],
+      likelyTests: ['tests/unit/skill-runtime.test.ts'],
+      riskPoints: ['runtime index drift'],
+    },
+  ]);
+  writeFirstEntryGuide(projectRoot, [
+    {
+      taskCategory: 'runtime-extension',
+      readFirst: ['.spec-first/runtime/first/summary.json'],
+      thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
+      avoidEntry: ['docs/first/README.md'],
+      relatedFlows: ['flow-cli-entry'],
+    },
+  ]);
+  writeFirstRebootGuide(projectRoot, {
+    projectWhat: 'skill runtime tests',
+    whereToStart: ['.spec-first/runtime/first/summary.json'],
+    currentCriticalAreas: ['runtime truth first'],
+    commonChangePaths: ['src/core/skill-runtime'],
+    verifyChecklist: ['pnpm vitest'],
+  });
+}
 
 // ─── Dispatcher Tests ───────────────────────────────────
 
@@ -515,6 +571,8 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('orchestrate-runtime-context');
     expect(content).toContain('background_status: blind');
     expect(content).toContain('recommended_action: backfill-first');
+    expect(content).toContain('missing_required_assets: summary');
+    expect(content).toContain('first_context_warning: required runtime assets unavailable: summary');
   });
 
   it('should inject task runtime context even when first runtime is unavailable', () => {
@@ -541,6 +599,7 @@ describe('loadSkill hard-gate notice', () => {
     const content = loadSkill(skillPath, { projectRoot: TMP });
     expect(content).toContain('task-runtime-context');
     expect(content).toContain('backgroundInputStatus: blind');
+    expect(content).toContain('required_assets: summary');
     expect(content).toContain('recommendation: 建议先运行 /spec-first:first 补全背景数据');
   });
 
@@ -584,6 +643,42 @@ describe('loadSkill hard-gate notice', () => {
       stageViews: {
         path: '.spec-first/runtime/first/stage-views.json',
         fileHash: 'stages',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      steering: {
+        path: '.spec-first/runtime/first/steering.json',
+        fileHash: 'steering',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      conventions: {
+        path: '.spec-first/runtime/first/conventions.json',
+        fileHash: 'conventions',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      criticalFlows: {
+        path: '.spec-first/runtime/first/critical-flows.json',
+        fileHash: 'critical-flows',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      changeMap: {
+        path: '.spec-first/runtime/first/change-map.json',
+        fileHash: 'change-map',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      entryGuide: {
+        path: '.spec-first/runtime/first/entry-guide.json',
+        fileHash: 'entry-guide',
+        lastUpdated: '2026-03-12T12:00:00.000Z',
+        healthy: true,
+      },
+      rebootGuide: {
+        path: '.spec-first/runtime/first/reboot-guide.json',
+        fileHash: 'reboot-guide',
         lastUpdated: '2026-03-12T12:00:00.000Z',
         healthy: true,
       },
@@ -643,12 +738,15 @@ describe('loadSkill hard-gate notice', () => {
         releaseBlockers: [],
       },
     });
+    writeSupplementalFirstAssets(TMP);
     writeFileSync(skillPath, '# Plan Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
     expect(content).toContain('plan-runtime-context');
     expect(content).toContain('backgroundInputStatus: full');
     expect(content).not.toContain('backgroundInputStatus: blind');
+    expect(content).toContain('changeTypes: runtime-asset-extension');
+    expect(content).toContain('entryCategories: runtime-extension');
   });
 
   it('should throw when review hard-gate is BLOCKED by stage mismatch', () => {
@@ -876,6 +974,12 @@ describe('loadSkill hard-gate notice', () => {
       summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       docsProjection: {},
       status: 'current',
     });
@@ -892,6 +996,7 @@ describe('loadSkill hard-gate notice', () => {
       },
       verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
     });
+    writeSupplementalFirstAssets(TMP);
 
     execSync('git -c core.hooksPath=/dev/null init', { cwd: TMP, stdio: 'ignore' });
     execSync('git config user.email "test@example.com"', { cwd: TMP, stdio: 'ignore' });

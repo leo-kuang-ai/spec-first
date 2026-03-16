@@ -1,119 +1,121 @@
----
-mode: deep
-generated_at: 2026-03-09T20:06:12.462Z
----
+# First Runtime Stage Views
 
-# 阶段视图
+## Spec View
 
-## 需求阶段视图 (Spec)
+- Summary: spec-first 需求视图：1 项能力，2 个核心实体，1 个风险点
 
-**摘要**: spec-first 需求视图：5 项能力，7 个核心实体，0 个风险点
+### Business Capabilities
+- AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams
 
-### 业务能力
-- Feature lifecycle management
-- Stage state machine
-- Traceability matrix
-- Quality gates
-- RFC and defect tracking
-
-### 核心实体
+### Core Entities
 - Feature
-- Stage
-- Task
-- RFC
-- Defect
-- Gate
-- TraceabilityMatrix
+- StageState
 
-### 接口依赖
-- spec-first init
-- spec-first stage
-- spec-first id
-- spec-first matrix
-- spec-first rfc
-- spec-first defect
-- spec-first gate
+### Dependencies
+- 接口: CLI: spec-first
 
----
+### Warnings
+- 项目端类型待确认
 
-## 设计阶段视图 (Design)
+## Design View
 
-**摘要**: spec-first 设计视图：12 个模块边界，7 个集成点，0 个风险点
+- Summary: spec-first 设计视图：6 个模块边界，1 个集成点，1 个风险点
 
-### 模块边界
-- cli
-- process-engine
-- skill-runtime
-- ai-orchestrator
-- gate-engine
-- trace-engine
-- change-mgr
-- template
-- tool-integration
-- metrics-engine
-- shared
-- config
+### Module Boundaries
+- src/cli
+- src/config
+- src/core
+- src/postinstall.ts
+- src/preuninstall.ts
+- src/shared
 
-### 集成点
-- spec-first init
-- spec-first stage
-- spec-first id
-- spec-first matrix
-- spec-first rfc
-- spec-first defect
-- spec-first gate
+### Integration Points
+- CLI: spec-first
 
-### 技术约束
-- 平台类型: cli-tool
+### Technical Constraints
+- 平台类型: unknown
 
----
+### Risks
+- 项目端类型待确认
 
-## 代码阶段视图 (Code)
+## Code View
 
-**摘要**: spec-first 代码视图：3 个入口，12 个潜在改动区，0 个变更风险
+- Summary: spec-first 代码视图：2 个入口，6 个潜在改动区，1 个变更风险
 
-### 入口点
-- `src/cli/index.ts`
-- `src/core/process-engine/stage-machine.ts`
-- `src/core/skill-runtime/dispatcher.ts`
+### Entry Points
+- dist/cli/index.js
+- src/cli/index.ts
 
-### 潜在改动区
-- cli
-- process-engine
-- skill-runtime
-- ai-orchestrator
-- gate-engine
-- trace-engine
-- change-mgr
-- template
-- tool-integration
-- metrics-engine
-- shared
-- config
+### Likely Change Areas
+- src/cli
+- src/config
+- src/core
+- src/postinstall.ts
+- src/preuninstall.ts
+- src/shared
 
----
+### Call Path Hints
+- 入口 -> dist/cli/index.js
+- 入口 -> src/cli/index.ts
+
+### Coupling Points
+- 模块耦合: src/cli
+- 模块耦合: src/config
+- 模块耦合: src/core
+- 模块耦合: src/postinstall.ts
+- 模块耦合: src/preuninstall.ts
+- 模块耦合: src/shared
+
+### Change Hazards
+- 项目端类型待确认
+
+### Verification Hooks
+- package.json
+- tsconfig.json
+- vitest.config.ts
+- dist/cli/index.js
+- src/cli/index.ts
+- src/cli
+- src/config
+- src/core
 
 ## Verify View
 
-## 验证阶段视图 (Verify)
+- Summary: spec-first 验证视图：1 项能力，2 条关键链路，1 个发布风险
 
-**摘要**: spec-first 验证视图：5 项能力，3 条关键链路，0 个发布风险
+### Critical Flows
+- 入口链路: dist/cli/index.js
+- 入口链路: src/cli/index.ts
 
-### 关键流程
-- 入口链路: `src/cli/index.ts`
-- 入口链路: `src/core/process-engine/stage-machine.ts`
-- 入口链路: `src/core/skill-runtime/dispatcher.ts`
+### Validation Focus
+- 能力验证: AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams
+- 风险验证: 项目端类型待确认
 
-### 验证焦点
-- Feature lifecycle management
-- Stage state machine
-- Traceability matrix
-- Quality gates
-- RFC and defect tracking
+### Test Focus
+- AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams
 
-### 测试重点
-- Feature lifecycle management
-- Stage state machine
-- Traceability matrix
-- Quality gates
-- RFC and defect tracking
+### Risk Areas
+- 项目端类型待确认
+
+### Recommended Checks
+- 证据核对: package.json
+- 证据核对: tsconfig.json
+- 证据核对: vitest.config.ts
+- 证据核对: dist/cli/index.js
+- 证据核对: src/cli/index.ts
+- 证据核对: src/cli
+- 证据核对: src/config
+- 证据核对: src/core
+
+### Validation Hooks
+- package.json
+- tsconfig.json
+- vitest.config.ts
+- dist/cli/index.js
+- src/cli/index.ts
+- src/cli
+- src/config
+- src/core
+
+### Release Blockers
+- 项目端类型待确认

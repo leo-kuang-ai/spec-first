@@ -7,16 +7,34 @@ import { refreshFirstDocsFromRuntime } from './first-doc-projection.js';
 import type { PlatformType } from './first-args.js';
 import { detectPlatformType, classifyProjectMaturity } from './first-platform-detector.js';
 import { buildRoleViews } from './first-role-views.js';
+import { buildFirstConventions } from './first-conventions.js';
+import { buildFirstChangeMap } from './first-change-map.js';
+import { buildFirstCriticalFlows } from './first-critical-flows.js';
+import { buildFirstEntryGuide } from './first-entry-guide.js';
+import { buildFirstRebootGuide } from './first-reboot-guide.js';
 import {
+  getFirstChangeMapPath,
+  getFirstConventionsPath,
+  getFirstCriticalFlowsPath,
+  getFirstEntryGuidePath,
+  getFirstRebootGuidePath,
   getFirstRoleViewsPath,
   getFirstRuntimeSummaryPath,
+  getFirstSteeringPath,
   getFirstStageViewsPath,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstConventions,
+  writeFirstChangeMap,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
+  writeFirstSteering,
   writeFirstStageViews,
 } from './first-runtime-store.js';
 import type {
+  FirstSteering,
   FirstRuntimeAssetIndexEntry,
   FirstRuntimeIndex,
   FirstRuntimeMode,
@@ -254,6 +272,27 @@ function buildBootstrapSummary(
   });
 }
 
+function buildBootstrapSteering(summary: FirstRuntimeSummary): FirstSteering {
+  return {
+    product: {
+      overview: summary.project.overview ?? `${summary.project.name} project cognition`,
+      coreScenarios: summary.capabilities.slice(0, 3),
+      nonGoals: ['legacy docs as canonical truth'],
+      glossary: summary.dataModels.slice(0, 5),
+    },
+    tech: {
+      stack: summary.techStack ?? [],
+      constraints: summary.risks.slice(0, 3),
+      forbiddenPatterns: ['docs-only truth'],
+    },
+    structure: {
+      modules: summary.modules,
+      boundaries: summary.entryPoints,
+      entryRules: ['read runtime truth first'],
+    },
+  };
+}
+
 function buildIndexEntry(
   fullPath: string,
   relativePath: string,
@@ -287,11 +326,23 @@ export function bootstrapFirstRuntime(
   const summary = buildBootstrapSummary(projectRoot, options);
   const roleViews = buildRoleViews(summary);
   const stageViews = buildStageViews(summary);
+  const steering = buildBootstrapSteering(summary);
+  const conventions = buildFirstConventions(summary);
+  const criticalFlows = buildFirstCriticalFlows(summary);
+  const changeMap = buildFirstChangeMap(summary);
+  const entryGuide = buildFirstEntryGuide(summary);
+  const rebootGuide = buildFirstRebootGuide(summary);
   const now = new Date().toISOString();
 
   writeFirstRuntimeSummary(projectRoot, summary);
   writeFirstRoleViews(projectRoot, roleViews);
   writeFirstStageViews(projectRoot, stageViews);
+  writeFirstSteering(projectRoot, steering);
+  writeFirstConventions(projectRoot, conventions);
+  writeFirstCriticalFlows(projectRoot, criticalFlows);
+  writeFirstChangeMap(projectRoot, changeMap);
+  writeFirstEntryGuide(projectRoot, entryGuide);
+  writeFirstRebootGuide(projectRoot, rebootGuide);
 
   const initialIndex: FirstRuntimeIndex = {
     version: '1.0.0',
@@ -311,6 +362,36 @@ export function bootstrapFirstRuntime(
     stageViews: buildIndexEntry(
       getFirstStageViewsPath(projectRoot),
       '.spec-first/runtime/first/stage-views.json',
+      now
+    ),
+    steering: buildIndexEntry(
+      getFirstSteeringPath(projectRoot),
+      '.spec-first/runtime/first/steering.json',
+      now
+    ),
+    conventions: buildIndexEntry(
+      getFirstConventionsPath(projectRoot),
+      '.spec-first/runtime/first/conventions.json',
+      now
+    ),
+    criticalFlows: buildIndexEntry(
+      getFirstCriticalFlowsPath(projectRoot),
+      '.spec-first/runtime/first/critical-flows.json',
+      now
+    ),
+    changeMap: buildIndexEntry(
+      getFirstChangeMapPath(projectRoot),
+      '.spec-first/runtime/first/change-map.json',
+      now
+    ),
+    entryGuide: buildIndexEntry(
+      getFirstEntryGuidePath(projectRoot),
+      '.spec-first/runtime/first/entry-guide.json',
+      now
+    ),
+    rebootGuide: buildIndexEntry(
+      getFirstRebootGuidePath(projectRoot),
+      '.spec-first/runtime/first/reboot-guide.json',
       now
     ),
     docsProjection: {},

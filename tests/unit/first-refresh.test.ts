@@ -7,14 +7,32 @@ import {
   getFirstRoleViewsPath,
   getFirstRuntimeIndexPath,
   getFirstRuntimeSummaryPath,
+  getFirstConventionsPath,
+  getFirstChangeMapPath,
+  getFirstCriticalFlowsPath,
+  getFirstEntryGuidePath,
+  getFirstRebootGuidePath,
+  getFirstSteeringPath,
   getFirstStageViewsPath,
   readFirstRuntimeIndex,
+  writeFirstConventions,
+  writeFirstChangeMap,
+  writeFirstCriticalFlows,
+  writeFirstEntryGuide,
+  writeFirstRebootGuide,
   writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
+  writeFirstSteering,
   writeFirstStageViews,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
 import type {
+  FirstConventions,
+  FirstChangeMap,
+  FirstCriticalFlows,
+  FirstEntryGuide,
+  FirstRebootGuide,
+  FirstSteering,
   FirstRoleViews,
   FirstRuntimeIndex,
   FirstRuntimeSummary,
@@ -30,6 +48,12 @@ const index: FirstRuntimeIndex = {
   summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+  rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
   docsProjection: {},
   status: 'current',
 };
@@ -80,6 +104,59 @@ const stageViews: FirstStageViews = {
   },
 };
 
+const steering: FirstSteering = {
+  product: { overview: 'refresh tests', coreScenarios: ['runtime truth source'], nonGoals: [], glossary: ['Feature'] },
+  tech: { stack: ['TypeScript'], constraints: ['平台类型: backend'], forbiddenPatterns: ['docs-only truth'] },
+  structure: { modules: ['src/core/skill-runtime', 'src/cli/commands'], boundaries: ['src/cli/commands/init.ts'], entryRules: ['read runtime truth first'] },
+};
+
+const conventions: FirstConventions = {
+  api: { observedPatterns: ['CLI: spec-first init'], deviations: [], recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.', evidence: ['src/cli/commands/init.ts'] },
+  module: { observedPatterns: ['src/core/skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core and CLI entry under src/cli.', evidence: ['src/core/skill-runtime'] },
+  testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['vitest.config.ts'] },
+  projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth before docs.', evidence: ['.spec-first/runtime/first'] },
+};
+
+const criticalFlows: FirstCriticalFlows = [
+  {
+    flowId: 'flow-cli-entry',
+    name: 'CLI Entry Flow',
+    entryPoints: ['src/cli/commands/init.ts'],
+    coreModules: ['src/core/skill-runtime', 'src/cli/commands'],
+    invariants: ['runtime truth first'],
+    verificationHooks: ['pnpm vitest'],
+  },
+];
+
+const changeMap: FirstChangeMap = [
+  {
+    changeType: 'runtime-asset-extension',
+    likelyModules: ['src/core/skill-runtime'],
+    likelyCommands: ['src/cli/commands/first.ts'],
+    likelyConfigs: ['package.json'],
+    likelyTests: ['tests/unit/first-refresh.test.ts'],
+    riskPoints: ['runtime index drift'],
+  },
+];
+
+const entryGuide: FirstEntryGuide = [
+  {
+    taskCategory: 'runtime-extension',
+    readFirst: ['.spec-first/runtime/first/summary.json', '.spec-first/runtime/first/steering.json'],
+    thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
+    avoidEntry: ['docs/first/tech-stack.md'],
+    relatedFlows: ['flow-cli-entry'],
+  },
+];
+
+const rebootGuide: FirstRebootGuide = {
+  projectWhat: 'refresh tests',
+  whereToStart: ['.spec-first/runtime/first/summary.json', 'docs/first/README.md'],
+  currentCriticalAreas: ['runtime truth first', 'half-switch state'],
+  commonChangePaths: ['src/core/skill-runtime', 'src/cli/commands/first.ts'],
+  verifyChecklist: ['pnpm vitest', 'pnpm typecheck'],
+};
+
 describe('refreshFirstArtifacts', () => {
   beforeEach(() => {
     rmSync(TEST_ROOT, { recursive: true, force: true });
@@ -101,6 +178,12 @@ describe('refreshFirstArtifacts', () => {
     writeFirstRuntimeSummary(TEST_ROOT, summary);
     writeFirstRoleViews(TEST_ROOT, roleViews);
     writeFirstStageViews(TEST_ROOT, stageViews);
+    writeFirstSteering(TEST_ROOT, steering);
+    writeFirstConventions(TEST_ROOT, conventions);
+    writeFirstCriticalFlows(TEST_ROOT, criticalFlows);
+    writeFirstChangeMap(TEST_ROOT, changeMap);
+    writeFirstEntryGuide(TEST_ROOT, entryGuide);
+    writeFirstRebootGuide(TEST_ROOT, rebootGuide);
 
     execSync('git -c core.hooksPath=/dev/null add .', { cwd: TEST_ROOT, stdio: 'ignore' });
     execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "runtime init"', { cwd: TEST_ROOT, stdio: 'ignore' });
@@ -202,6 +285,62 @@ describe('refreshFirstArtifacts', () => {
       },
     }, null, 2), 'utf-8');
 
+    writeFileSync(getFirstSteeringPath(TEST_ROOT), JSON.stringify({
+      generated_at: '2026-03-09T04:43:27.542Z',
+      project_what: 'Specification-driven development process engine',
+      where_to_start: ['src/cli/index.ts'],
+      current_critical_areas: ['skill-runtime'],
+      common_change_paths: ['src/core/skill-runtime'],
+      verify_checklist: ['pnpm vitest'],
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstConventionsPath(TEST_ROOT), JSON.stringify({
+      api: { observedPatterns: ['CLI: spec-first'], deviations: [], recommendedConvention: 'Keep command verbs under the spec-first CLI.', evidence: ['src/cli/index.ts'] },
+      module: { observedPatterns: ['src/core/skill-runtime'], deviations: [], recommendedConvention: 'Keep runtime logic under src/core/skill-runtime.', evidence: ['src/core/skill-runtime'] },
+      testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'Use Vitest.', evidence: ['vitest.config.ts'] },
+      projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'Read runtime truth before docs.', evidence: ['docs/first/README.md'] },
+    }, null, 2), 'utf-8');
+
+    writeFileSync(getFirstCriticalFlowsPath(TEST_ROOT), JSON.stringify([
+      {
+        flowId: 'flow-cli-entry',
+        name: 'CLI Entry Flow',
+        entryPoints: ['src/cli/index.ts'],
+        coreModules: ['src/core/skill-runtime'],
+        invariants: ['runtime truth first'],
+        verificationHooks: ['pnpm vitest'],
+      },
+    ], null, 2), 'utf-8');
+
+    writeFileSync(getFirstChangeMapPath(TEST_ROOT), JSON.stringify([
+      {
+        changeType: 'runtime-asset-extension',
+        likelyModules: ['src/core/skill-runtime'],
+        likelyCommands: ['spec-first first'],
+        likelyConfigs: [],
+        likelyTests: ['pnpm vitest'],
+        riskPoints: ['legacy runtime drift'],
+      },
+    ], null, 2), 'utf-8');
+
+    writeFileSync(getFirstEntryGuidePath(TEST_ROOT), JSON.stringify([
+      {
+        taskCategory: 'runtime-extension',
+        readFirst: ['.spec-first/runtime/first/summary.json'],
+        thenRead: ['src/core/skill-runtime'],
+        avoidEntry: ['legacy docs as truth'],
+        relatedFlows: ['flow-cli-entry'],
+      },
+    ], null, 2), 'utf-8');
+
+    writeFileSync(getFirstRebootGuidePath(TEST_ROOT), JSON.stringify({
+      projectWhat: 'Specification-driven development process engine',
+      whereToStart: ['.spec-first/runtime/first/summary.json'],
+      currentCriticalAreas: ['skill-runtime'],
+      commonChangePaths: ['src/core/skill-runtime'],
+      verifyChecklist: ['pnpm vitest'],
+    }, null, 2), 'utf-8');
+
     const result = refreshFirstArtifacts(TEST_ROOT, 'refresh-docs-from-runtime');
 
     expect(result.runtimeArtifacts).toEqual([]);
@@ -210,6 +349,7 @@ describe('refreshFirstArtifacts', () => {
       'docs/first/summary.md',
       'docs/first/role-views.md',
       'docs/first/stage-views.md',
+      'docs/first/steering.md',
     ]));
     expect(readFileSync(join(TEST_ROOT, 'docs', 'first', 'summary.md'), 'utf-8')).toContain('## Tech Stack');
     expect(readFirstRuntimeIndex(TEST_ROOT)?.docsProjection['docs/first/summary.md']?.healthy).toBe(true);

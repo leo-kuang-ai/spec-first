@@ -1,84 +1,97 @@
 ---
-mode: deep
-generated_at: 2026-03-09T20:06:12.462Z
-version: 2.1.0
+last_updated: 2026-03-16
+mode: quick
+project: spec-first
+generated_at: 2026-03-16T04:35:00.000Z
 ---
 
 # Spec-First 项目认知文档
 
-> 快速认知文档 - 基于 deep 模式生成
+> `docs/first/` 是 `.spec-first/runtime/first/` 的人类可读投影视图层。
+> 本文档由 `spec-first:first` 自动生成（quick 模式）
 
-> `docs/first/` 是面向人的长期维护投影视图；运行时真源位于 `.spec-first/runtime/first/`。
+## 📋 文档索引
 
-## 📋 文档导航
+### 核心认知文档（quick 模式）
 
-### 核心文档（Quick 模式）
-- [技术栈摘要](./tech-stack.md) - 运行时、语言、工具链
-- [API 接口规范](./api-docs.md) - CLI 命令接口
-- [代码结构概览](./codebase-overview.md) - 模块划分与职责
-- [业务领域模型](./domain-model.md) - 核心实体与能力
+| 文档 | 说明 | 用途 |
+|------|------|------|
+| [tech-stack.md](./tech-stack.md) | 技术栈摘要 | 了解项目使用的技术和依赖 |
+| [api-docs.md](./api-docs.md) | CLI 命令接口规范 | 查看所有可用命令及参数 |
+| [codebase-overview.md](./codebase-overview.md) | 代码结构概览 | 快速定位代码位置 |
+| [domain-model.md](./domain-model.md) | 领域模型 | 理解核心业务概念和状态机 |
 
-### 深度分析文档（Deep 模式）
-- [调用链分析](./call-graph.md) - 关键路径与依赖关系
-- [架构设计](./architecture.md) - 系统架构与模块边界
-- [外部依赖](./external-deps.md) - 第三方依赖分析
-- [本地环境搭建](./local-setup.md) - 开发环境配置
-- [研发规范](./development-guidelines.md) - 代码规范与工作流
+### 辅助文档
 
-### 视图文档
-- [项目摘要](./summary.md) - 项目概览
-- [角色视图](./role-views.md) - 产品/开发/QA/架构师视角
-- [阶段视图](./stage-views.md) - 需求/设计/代码/验证视角
-
-## 🎯 项目概览
-
-**项目名称**: spec-first
-**平台类型**: CLI 工具
-**核心定位**: Specification-driven development process engine
-
-### 核心能力
-- Feature lifecycle management
-- Stage state machine
-- Traceability matrix
-- Quality gates
-- RFC and defect tracking
-
-### 技术栈
-- Runtime: Node.js ≥20.0.0
-- Language: TypeScript 5.4+
-- Module System: ESM
-- Bundler: tsup
-- Test Framework: Vitest
+| 文档 | 说明 |
+|------|------|
+| [change-map.md](./change-map.md) | 变更地图 |
+| [common-playbooks.md](./common-playbooks.md) | 常用操作手册 |
+| [conventions.md](./conventions.md) | 编码约定 |
+| [critical-flows.md](./critical-flows.md) | 关键流程 |
+| [entry-guide.md](./entry-guide.md) | 入口指南 |
+| [known-risks-and-traps.md](./known-risks-and-traps.md) | 已知风险与陷阱 |
+| [reboot-guide.md](./reboot-guide.md) | 恢复指南 |
+| [role-views.md](./role-views.md) | 角色视图 |
+| [stage-views.md](./stage-views.md) | 阶段视图 |
+| [steering.md](./steering.md) | 方向指引 |
+| [summary.md](./summary.md) | 摘要 |
 
 ## 🚀 快速开始
 
+### 项目简介
+
+**spec-first** — AI-workflow CLI for spec-driven development
+
+一个面向 AI 辅助开发团队的 CLI 工具，提供：
+- **质量门禁** — 19 条 Gate 规则确保阶段交付质量
+- **可追溯性** — 14 类 ID 实现 FR→TC 的全链路追溯
+- **Feature 生命周期** — 8 活跃阶段 + 2 终态的状态机驱动
+
+### 核心命令
+
 ```bash
-# 安装依赖
-npm install
+# 查看 Feature 状态
+spec-first feature current
 
-# 构建
-npm run build
+# 执行 Gate 检查
+spec-first gate check --feature <featureId>
 
-# 运行测试
-npm test
+# 推进阶段
+spec-first stage advance --feature <featureId>
 
-# 类型检查
-npm run typecheck
+# 生成追溯 ID
+spec-first id next FR <abbr> --feature <featureId>
 ```
 
-## 📦 核心模块
+### 开发入口
 
-| 模块 | 职责 |
+| 任务 | 位置 |
 |------|------|
-| cli | CLI 命令层，命令注册、路由分发 |
-| process-engine | 阶段状态机，Feature 生命周期流转 |
-| skill-runtime | Skill 分发、prompt 组装 |
-| ai-orchestrator | AI 自动循环、上下文恢复 |
-| gate-engine | 质量门禁评估、安全扫描 |
-| trace-engine | 追溯 ID 生成/校验/搜索 |
+| 新增 CLI 命令 | `src/cli/commands/` |
+| 修改核心逻辑 | `src/core/` |
+| 修改 Skill 定义 | `skills/` |
+| 修改模板 | `templates/` |
 
-完整模块列表见 [代码结构概览](./codebase-overview.md)。
+## 📊 项目概览
+
+- **语言**: TypeScript (ESM)
+- **运行时**: Node.js ≥20
+- **测试框架**: Vitest
+- **覆盖率阈值**: 75% (lines/functions/statements), 65% (branches)
+
+## 🗂️ Runtime 真源
+
+- `.spec-first/runtime/first/index.json` — 索引文件
+- `.spec-first/runtime/first/summary.json` — 摘要
+- `.spec-first/runtime/first/role-views.json` — 角色视图
+- `.spec-first/runtime/first/stage-views.json` — 阶段视图
+
+## 🔗 相关链接
+
+- [GitHub Repository](https://github.com/sunrain520/spec-first)
+- [NPM Package](https://www.npmjs.com/package/spec-first)
 
 ---
 
-*最后更新: 2026-03-09*
+*生成时间: 2026-03-16 | 模式: quick*

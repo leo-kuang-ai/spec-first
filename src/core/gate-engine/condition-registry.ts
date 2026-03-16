@@ -19,7 +19,12 @@ export interface GateConditionDef {
   id: string;
   description: string;
   blocking?: boolean;
-  evaluate: (ctx: EvalContext) => { pass: boolean; detail?: string; scopeFrIds?: string[]; blocking?: boolean };
+  evaluate: (ctx: EvalContext) => {
+    pass: boolean;
+    detail?: string;
+    scopeFrIds?: string[];
+    blocking?: boolean;
+  };
 }
 
 export interface EvalContext {
@@ -39,7 +44,10 @@ function formatPercentThreshold(value: number, operator: '>=' | '='): string {
   return `${operator} ${Number((value * 100).toFixed(2))}%`;
 }
 
-function getConfiguredGateThreshold(projectRoot: string, gateId: 'G-IMPL-01' | 'G-VERIFY-01'): number {
+function getConfiguredGateThreshold(
+  projectRoot: string,
+  gateId: 'G-IMPL-01' | 'G-VERIFY-01'
+): number {
   return loadConfig(projectRoot).gate.thresholds[gateId].value;
 }
 

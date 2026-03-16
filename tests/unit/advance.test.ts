@@ -244,6 +244,12 @@ describe('advance', () => {
     expect(history).toContain('"to":"08_done"');
     expect(history).toContain('release_auto_skip');
     expect(readFileSync(join(SPEC_DIR, 'findings.md'), 'utf-8')).toContain('AUTO_ADVANCE');
+    const cognitionUpdates = readFileSync(
+      join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
+      'utf-8'
+    );
+    expect(cognitionUpdates).toContain(`"featureId":"${FEAT_ID}"`);
+    expect(cognitionUpdates).toContain('"triggerStage":"06_wrap_up"');
   });
 });
 

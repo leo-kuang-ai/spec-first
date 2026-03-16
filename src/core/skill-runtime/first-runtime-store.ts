@@ -1,8 +1,14 @@
 import { existsSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename, join, posix } from 'node:path';
 import { readJson, writeJson } from '../../shared/fs-utils.js';
 import { logFirstRuntimeWarning, toErrorMessage } from './first-runtime-observability.js';
 import type {
+  FirstChangeMap,
+  FirstConventions,
+  FirstCriticalFlows,
+  FirstEntryGuide,
+  FirstRebootGuide,
+  FirstSteering,
   FirstRoleView,
   FirstRoleViews,
   FirstRuntimeAssetIndexEntry,
@@ -16,6 +22,13 @@ export const FIRST_RUNTIME_INDEX_FILE = 'index.json';
 export const FIRST_RUNTIME_SUMMARY_FILE = 'summary.json';
 export const FIRST_RUNTIME_ROLE_VIEWS_FILE = 'role-views.json';
 export const FIRST_RUNTIME_STAGE_VIEWS_FILE = 'stage-views.json';
+export const FIRST_RUNTIME_STEERING_FILE = 'steering.json';
+export const FIRST_RUNTIME_CONVENTIONS_FILE = 'conventions.json';
+export const FIRST_RUNTIME_CRITICAL_FLOWS_FILE = 'critical-flows.json';
+export const FIRST_RUNTIME_CHANGE_MAP_FILE = 'change-map.json';
+export const FIRST_RUNTIME_ENTRY_GUIDE_FILE = 'entry-guide.json';
+export const FIRST_RUNTIME_REBOOT_GUIDE_FILE = 'reboot-guide.json';
+export const FIRST_PROJECT_COGNITION_UPDATES_FILE = 'project-cognition-updates.jsonl';
 
 interface LegacyFirstRuntimeIndexArtifact {
   id?: string;
@@ -77,6 +90,15 @@ interface LegacyFirstStageViews {
   stages?: Record<string, LegacyFirstStageDescriptor>;
 }
 
+interface LegacyFirstSteering {
+  generated_at?: string;
+  project_what?: string;
+  where_to_start?: string[];
+  current_critical_areas?: string[];
+  common_change_paths?: string[];
+  verify_checklist?: string[];
+}
+
 export function getFirstRuntimeDir(projectRoot: string): string {
   return join(projectRoot, FIRST_RUNTIME_DIR);
 }
@@ -97,6 +119,34 @@ export function getFirstStageViewsPath(projectRoot: string): string {
   return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_STAGE_VIEWS_FILE);
 }
 
+export function getFirstSteeringPath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_STEERING_FILE);
+}
+
+export function getFirstConventionsPath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_CONVENTIONS_FILE);
+}
+
+export function getFirstCriticalFlowsPath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_CRITICAL_FLOWS_FILE);
+}
+
+export function getFirstChangeMapPath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_CHANGE_MAP_FILE);
+}
+
+export function getFirstEntryGuidePath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_ENTRY_GUIDE_FILE);
+}
+
+export function getFirstRebootGuidePath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_REBOOT_GUIDE_FILE);
+}
+
+export function getFirstProjectCognitionUpdatesPath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_PROJECT_COGNITION_UPDATES_FILE);
+}
+
 function readRuntimeJson<T>(path: string): T | null {
   if (!existsSync(path)) {
     return null;
@@ -110,7 +160,42 @@ function readRuntimeJson<T>(path: string): T | null {
   }
 }
 
+/**
+ * 校验路径是否为有效的 First Runtime 路径
+ * 防止因硬编码错误路径导致的文件写入到错误位置
+ * @see docs/first/incident-2026-03-16-json-generation-error.md
+ */
+export function validateFirstRuntimePath(targetPath: string): boolean {
+  const normalizedTarget = posix.normalize(targetPath.replaceAll('\\', '/'));
+  const targetSegments = normalizedTarget.split('/').filter(Boolean);
+  const runtimeSegments = FIRST_RUNTIME_DIR.split('/');
+
+  for (let i = 0; i <= targetSegments.length - runtimeSegments.length; i++) {
+    const matches = runtimeSegments.every((segment, offset) => targetSegments[i + offset] === segment);
+    if (matches) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * 断言路径为有效的 First Runtime 路径，无效时抛出错误
+ */
+export function assertValidFirstRuntimePath(targetPath: string): void {
+  if (!validateFirstRuntimePath(targetPath)) {
+    throw new Error(
+      `Invalid First Runtime path: "${targetPath}". ` +
+        `Expected path to contain "${FIRST_RUNTIME_DIR}". ` +
+        `This error prevents accidental writes to wrong directories (e.g., ".config-first/"). ` +
+        `Use getFirstRuntimeDir(projectRoot) or getFirst*Path(projectRoot) functions to construct paths.`
+    );
+  }
+}
+
 function writeRuntimeJson(path: string, data: unknown): void {
+  assertValidFirstRuntimePath(path);
   try {
     writeJson(path, data);
   } catch (error) {
@@ -160,6 +245,14 @@ function isLegacyRoleViews(value: unknown): value is LegacyFirstRoleViews {
 
 function isLegacyStageViews(value: unknown): value is LegacyFirstStageViews {
   return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.stages);
+}
+
+function isLegacySteering(value: unknown): value is LegacyFirstSteering {
+  return (
+    isRecord(value) &&
+    typeof value.generated_at === 'string' &&
+    typeof value.project_what === 'string'
+  );
 }
 
 function makeSyntheticAsset(
@@ -215,7 +308,66 @@ function normalizeLegacyRuntimeIndex(
     '.spec-first/runtime/first/stage-views.json',
     generatedAt
   );
-  const status = summary.healthy && roleViews.healthy && stageViews.healthy ? 'current' : 'stale';
+  const steering = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/steering.json',
+    generatedAt
+  );
+  steering.healthy = true;
+  steering.issues = undefined;
+  steering.fileHash = 'legacy-derived';
+  const conventions = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/conventions.json',
+    generatedAt
+  );
+  conventions.healthy = true;
+  conventions.issues = undefined;
+  conventions.fileHash = 'legacy-derived';
+  const criticalFlows = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/critical-flows.json',
+    generatedAt
+  );
+  criticalFlows.healthy = true;
+  criticalFlows.issues = undefined;
+  criticalFlows.fileHash = 'legacy-derived';
+  const changeMap = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/change-map.json',
+    generatedAt
+  );
+  changeMap.healthy = true;
+  changeMap.issues = undefined;
+  changeMap.fileHash = 'legacy-derived';
+  const entryGuide = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/entry-guide.json',
+    generatedAt
+  );
+  entryGuide.healthy = true;
+  entryGuide.issues = undefined;
+  entryGuide.fileHash = 'legacy-derived';
+  const rebootGuide = makeSyntheticAsset(
+    projectRoot,
+    '.spec-first/runtime/first/reboot-guide.json',
+    generatedAt
+  );
+  rebootGuide.healthy = true;
+  rebootGuide.issues = undefined;
+  rebootGuide.fileHash = 'legacy-derived';
+  const status =
+    summary.healthy &&
+    roleViews.healthy &&
+    stageViews.healthy &&
+    steering.healthy &&
+    conventions.healthy &&
+    criticalFlows.healthy &&
+    changeMap.healthy &&
+    entryGuide.healthy &&
+    rebootGuide.healthy
+      ? 'current'
+      : 'stale';
   const staleReason =
     status === 'current'
       ? undefined
@@ -223,6 +375,12 @@ function normalizeLegacyRuntimeIndex(
           ...(!summary.healthy ? ['summary unhealthy'] : []),
           ...(!roleViews.healthy ? ['role-views unhealthy'] : []),
           ...(!stageViews.healthy ? ['stage-views unhealthy'] : []),
+          ...(!steering.healthy ? ['steering unhealthy'] : []),
+          ...(!conventions.healthy ? ['conventions unhealthy'] : []),
+          ...(!criticalFlows.healthy ? ['critical-flows unhealthy'] : []),
+          ...(!changeMap.healthy ? ['change-map unhealthy'] : []),
+          ...(!entryGuide.healthy ? ['entry-guide unhealthy'] : []),
+          ...(!rebootGuide.healthy ? ['reboot-guide unhealthy'] : []),
         ].join('；');
 
   return {
@@ -232,9 +390,77 @@ function normalizeLegacyRuntimeIndex(
     summary,
     roleViews,
     stageViews,
+    steering,
+    conventions,
+    criticalFlows,
+    changeMap,
+    entryGuide,
+    rebootGuide,
     docsProjection: {},
     status,
     staleReason,
+  };
+}
+
+function normalizeCanonicalRuntimeIndex(
+  projectRoot: string,
+  rawIndex: FirstRuntimeIndex
+): FirstRuntimeIndex {
+  const lastUpdated = rawIndex.lastRun ?? new Date(0).toISOString();
+  const steering =
+    rawIndex.steering ??
+    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/steering.json', lastUpdated);
+  const conventions =
+    rawIndex.conventions ??
+    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/conventions.json', lastUpdated);
+  const criticalFlows =
+    rawIndex.criticalFlows ??
+    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/critical-flows.json', lastUpdated);
+  const changeMap =
+    rawIndex.changeMap ??
+    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/change-map.json', lastUpdated);
+  const entryGuide =
+    rawIndex.entryGuide ??
+    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/entry-guide.json', lastUpdated);
+  const rebootGuide =
+    rawIndex.rebootGuide ??
+    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/reboot-guide.json', lastUpdated);
+  const status =
+    rawIndex.summary.healthy &&
+    rawIndex.roleViews.healthy &&
+    rawIndex.stageViews.healthy &&
+    steering.healthy &&
+    conventions.healthy &&
+    criticalFlows.healthy &&
+    changeMap.healthy &&
+    entryGuide.healthy &&
+    rebootGuide.healthy
+      ? 'current'
+      : 'stale';
+
+  return {
+    ...rawIndex,
+    steering,
+    conventions,
+    criticalFlows,
+    changeMap,
+    entryGuide,
+    rebootGuide,
+    status,
+    staleReason:
+      status === 'current'
+        ? undefined
+        : [
+            ...(!rawIndex.summary.healthy ? ['summary unhealthy'] : []),
+            ...(!rawIndex.roleViews.healthy ? ['role-views unhealthy'] : []),
+            ...(!rawIndex.stageViews.healthy ? ['stage-views unhealthy'] : []),
+            ...(!steering.healthy ? ['steering unhealthy'] : []),
+            ...(!conventions.healthy ? ['conventions unhealthy'] : []),
+            ...(!criticalFlows.healthy ? ['critical-flows unhealthy'] : []),
+            ...(!changeMap.healthy ? ['change-map unhealthy'] : []),
+            ...(!entryGuide.healthy ? ['entry-guide unhealthy'] : []),
+            ...(!rebootGuide.healthy ? ['reboot-guide unhealthy'] : []),
+          ].join('；'),
   };
 }
 
@@ -372,6 +598,32 @@ function normalizeLegacyStageViews(rawStageViews: LegacyFirstStageViews): FirstS
   };
 }
 
+function normalizeLegacySteering(
+  rawSteering: LegacyFirstSteering,
+  rawSummary: LegacyFirstRuntimeSummary | null
+): FirstSteering {
+  return {
+    product: {
+      overview: rawSteering.project_what ?? 'project cognition',
+      coreScenarios: asStringArray(rawSteering.current_critical_areas),
+      nonGoals: ['legacy docs as canonical truth'],
+      glossary: [],
+    },
+    tech: {
+      stack: rawSummary
+        ? Object.entries(rawSummary.tech_stack ?? {}).map(([key, value]) => `${key}: ${value}`)
+        : [],
+      constraints: asStringArray(rawSteering.verify_checklist),
+      forbiddenPatterns: ['docs-only truth'],
+    },
+    structure: {
+      modules: asStringArray(rawSteering.common_change_paths),
+      boundaries: asStringArray(rawSteering.where_to_start),
+      entryRules: ['read runtime truth first'],
+    },
+  };
+}
+
 export function readFirstRuntimeIndex(projectRoot: string): FirstRuntimeIndex | null {
   const raw = readRuntimeJson<unknown>(getFirstRuntimeIndexPath(projectRoot));
   if (raw === null) {
@@ -380,7 +632,7 @@ export function readFirstRuntimeIndex(projectRoot: string): FirstRuntimeIndex | 
   if (isLegacyRuntimeIndex(raw)) {
     return normalizeLegacyRuntimeIndex(projectRoot, raw);
   }
-  return raw as FirstRuntimeIndex;
+  return normalizeCanonicalRuntimeIndex(projectRoot, raw as FirstRuntimeIndex);
 }
 
 export function readFirstRuntimeSummary(projectRoot: string): FirstRuntimeSummary | null {
@@ -423,6 +675,162 @@ export function readFirstStageViews(projectRoot: string): FirstStageViews | null
   return raw as FirstStageViews;
 }
 
+export function readFirstSteering(projectRoot: string): FirstSteering | null {
+  const raw = readRuntimeJson<unknown>(getFirstSteeringPath(projectRoot));
+  if (raw === null) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    const rawIndex = readRuntimeJson<unknown>(getFirstRuntimeIndexPath(projectRoot));
+    if (isLegacyRuntimeSummary(rawSummary)) {
+      return normalizeLegacySteering(
+        {
+          generated_at: rawSummary.generated_at,
+          project_what:
+            isLegacyRuntimeIndex(rawIndex) && typeof rawIndex.project?.description === 'string'
+              ? rawIndex.project.description
+              : `${basename(projectRoot)} project cognition`,
+          where_to_start: isLegacyRuntimeIndex(rawIndex)
+            ? rawIndex.artifacts
+                ?.map((artifact) => artifact.path)
+                .filter((path): path is string => typeof path === 'string')
+            : [],
+          current_critical_areas: asStringArray(rawSummary.core_modules),
+          common_change_paths: asStringArray(rawSummary.core_modules),
+          verify_checklist: ['refresh steering from runtime truth'],
+        },
+        rawSummary
+      );
+    }
+    return null;
+  }
+  if (isLegacySteering(raw)) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    return normalizeLegacySteering(raw, isLegacyRuntimeSummary(rawSummary) ? rawSummary : null);
+  }
+  return raw as FirstSteering;
+}
+
+export function readFirstConventions(projectRoot: string): FirstConventions | null {
+  const raw = readRuntimeJson<unknown>(getFirstConventionsPath(projectRoot));
+  if (raw === null) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    if (isLegacyRuntimeSummary(rawSummary)) {
+      return {
+        api: {
+          observedPatterns: ['CLI surface not explicitly detected'],
+          deviations: [],
+          recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.',
+          evidence: [],
+        },
+        module: {
+          observedPatterns: asStringArray(rawSummary.core_modules),
+          deviations: [],
+          recommendedConvention:
+            'Keep runtime logic under src/core and entry orchestration near src/cli.',
+          evidence: asStringArray(rawSummary.core_modules),
+        },
+        testing: {
+          observedPatterns: Object.entries(rawSummary.tech_stack ?? {})
+            .map(([key, value]) => `${key}: ${value}`)
+            .filter((item) => item.toLowerCase().includes('test')),
+          deviations: [],
+          recommendedConvention:
+            'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
+          evidence: ['vitest.config.ts'],
+        },
+        projectRules: {
+          observedPatterns: ['runtime truth first'],
+          deviations: [],
+          recommendedConvention:
+            'Treat .spec-first/runtime/first as canonical truth before projecting docs/first views.',
+          evidence: ['.spec-first/runtime/first'],
+        },
+      };
+    }
+    return null;
+  }
+  return raw as FirstConventions;
+}
+
+export function readFirstCriticalFlows(projectRoot: string): FirstCriticalFlows | null {
+  const raw = readRuntimeJson<unknown>(getFirstCriticalFlowsPath(projectRoot));
+  if (raw === null) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    if (isLegacyRuntimeSummary(rawSummary)) {
+      return [
+        {
+          flowId: 'flow-cli-entry',
+          name: 'CLI Entry Flow',
+          entryPoints: ['src/cli/index.ts'],
+          coreModules: asStringArray(rawSummary.core_modules),
+          invariants: ['runtime truth first'],
+          verificationHooks: ['refresh critical flows from runtime truth'],
+        },
+      ];
+    }
+    return null;
+  }
+  return raw as FirstCriticalFlows;
+}
+
+export function readFirstChangeMap(projectRoot: string): FirstChangeMap | null {
+  const raw = readRuntimeJson<unknown>(getFirstChangeMapPath(projectRoot));
+  if (raw === null) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    if (isLegacyRuntimeSummary(rawSummary)) {
+      return [
+        {
+          changeType: 'runtime-asset-extension',
+          likelyModules: asStringArray(rawSummary.core_modules),
+          likelyCommands: ['spec-first first'],
+          likelyConfigs: [],
+          likelyTests: ['refresh change-map from runtime truth'],
+          riskPoints: ['legacy runtime drift'],
+        },
+      ];
+    }
+    return null;
+  }
+  return raw as FirstChangeMap;
+}
+
+export function readFirstEntryGuide(projectRoot: string): FirstEntryGuide | null {
+  const raw = readRuntimeJson<unknown>(getFirstEntryGuidePath(projectRoot));
+  if (raw === null) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    if (isLegacyRuntimeSummary(rawSummary)) {
+      return [
+        {
+          taskCategory: 'runtime-extension',
+          readFirst: ['.spec-first/runtime/first/summary.json'],
+          thenRead: asStringArray(rawSummary.core_modules),
+          avoidEntry: ['legacy docs as truth'],
+          relatedFlows: [],
+        },
+      ];
+    }
+    return null;
+  }
+  return raw as FirstEntryGuide;
+}
+
+export function readFirstRebootGuide(projectRoot: string): FirstRebootGuide | null {
+  const raw = readRuntimeJson<unknown>(getFirstRebootGuidePath(projectRoot));
+  if (raw === null) {
+    const rawSummary = readRuntimeJson<unknown>(getFirstRuntimeSummaryPath(projectRoot));
+    if (isLegacyRuntimeSummary(rawSummary)) {
+      return {
+        projectWhat: `${basename(projectRoot)} project cognition`,
+        whereToStart: ['.spec-first/runtime/first/summary.json'],
+        currentCriticalAreas: asStringArray(rawSummary.core_modules),
+        commonChangePaths: asStringArray(rawSummary.core_modules),
+        verifyChecklist: ['refresh reboot-guide from runtime truth'],
+      };
+    }
+    return null;
+  }
+  return raw as FirstRebootGuide;
+}
+
 export function writeFirstRuntimeIndex(projectRoot: string, index: FirstRuntimeIndex): void {
   writeRuntimeJson(getFirstRuntimeIndexPath(projectRoot), index);
 }
@@ -437,4 +845,31 @@ export function writeFirstRoleViews(projectRoot: string, roleViews: FirstRoleVie
 
 export function writeFirstStageViews(projectRoot: string, stageViews: FirstStageViews): void {
   writeRuntimeJson(getFirstStageViewsPath(projectRoot), stageViews);
+}
+
+export function writeFirstSteering(projectRoot: string, steering: FirstSteering): void {
+  writeRuntimeJson(getFirstSteeringPath(projectRoot), steering);
+}
+
+export function writeFirstConventions(projectRoot: string, conventions: FirstConventions): void {
+  writeRuntimeJson(getFirstConventionsPath(projectRoot), conventions);
+}
+
+export function writeFirstCriticalFlows(
+  projectRoot: string,
+  criticalFlows: FirstCriticalFlows
+): void {
+  writeRuntimeJson(getFirstCriticalFlowsPath(projectRoot), criticalFlows);
+}
+
+export function writeFirstChangeMap(projectRoot: string, changeMap: FirstChangeMap): void {
+  writeRuntimeJson(getFirstChangeMapPath(projectRoot), changeMap);
+}
+
+export function writeFirstEntryGuide(projectRoot: string, entryGuide: FirstEntryGuide): void {
+  writeRuntimeJson(getFirstEntryGuidePath(projectRoot), entryGuide);
+}
+
+export function writeFirstRebootGuide(projectRoot: string, rebootGuide: FirstRebootGuide): void {
+  writeRuntimeJson(getFirstRebootGuidePath(projectRoot), rebootGuide);
 }

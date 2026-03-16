@@ -236,9 +236,7 @@ function resolveOrchestrateHighRiskAssessment(
   }
 }
 
-function resolveOrchestrateBackgroundGuidance(
-  executionContext: SkillExecutionContext
-) {
+function resolveOrchestrateBackgroundGuidance(executionContext: SkillExecutionContext) {
   const { projectRoot } = executionContext;
   const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
   if (!featureId) return undefined;
@@ -569,7 +567,8 @@ function formatStageRuntimeNotice(
   title: string,
   backgroundKey: 'background_input_status' | 'backgroundInputStatus',
   summaryKey: string,
-  context: ResolvedSkillContext
+  context: ResolvedSkillContext,
+  extraLines: string[] = []
 ): string | undefined {
   if (context.source === 'none' || !context.stageViewSummary) return undefined;
 
@@ -577,13 +576,29 @@ function formatStageRuntimeNotice(
   parts.push(`${backgroundKey}: ${context.backgroundInputStatus}`);
   parts.push(`data_source: ${context.source}`);
   parts.push(`${summaryKey}: ${context.stageViewSummary}`);
+  if (context.requiredAssetNames.length > 0) {
+    parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
+  }
+  if (context.optionalAssetNames.length > 0) {
+    parts.push(`optional_assets: ${context.optionalAssetNames.join(', ')}`);
+  }
 
   if (context.firstSummaryLite?.projectName) {
     parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
   }
 
+  parts.push(...extraLines);
+
   if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
     parts.push(`missing_assets: ${context.missingAssets.join(', ')}`);
+  }
+
+  if (context.missingRequiredAssets.length > 0) {
+    parts.push(`missing_required_assets: ${context.missingRequiredAssets.join(', ')}`);
+  }
+
+  if (context.fallback.warning) {
+    parts.push(`warning: ${context.fallback.warning}`);
   }
 
   if (context.recommendedAction) {
@@ -624,6 +639,40 @@ function buildOrchestrateRuntimeNotice(
     parts.push(`warning: ${guidance.warning}`);
   }
 
+  try {
+    const firstContext = resolveSkillContext(
+      executionContext.projectRoot,
+      'orchestrate',
+      executionContext.featureId
+    );
+    if (firstContext.firstSummaryLite?.projectName) {
+      parts.push(`project_name: ${firstContext.firstSummaryLite.projectName}`);
+    }
+    if (firstContext.optional.changeMap?.length) {
+      parts.push(
+        `change_types: ${firstContext.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+      );
+    }
+    if (firstContext.optional.criticalFlows?.length) {
+      parts.push(
+        `critical_flows: ${firstContext.optional.criticalFlows.map((entry) => entry.name).join(', ')}`
+      );
+    }
+    if (firstContext.optional.entryGuide?.length) {
+      parts.push(
+        `entry_categories: ${firstContext.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`
+      );
+    }
+    if (firstContext.missingRequiredAssets.length > 0) {
+      parts.push(`missing_required_assets: ${firstContext.missingRequiredAssets.join(', ')}`);
+    }
+    if (firstContext.fallback.warning) {
+      parts.push(`first_context_warning: ${firstContext.fallback.warning}`);
+    }
+  } catch {
+    // ignore first context enrichment when runtime context cannot be resolved
+  }
+
   parts.push('<!-- /orchestrate-runtime-context -->');
   return parts.join('\n');
 }
@@ -660,9 +709,7 @@ function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
   return parts.join('\n');
 }
 
-function buildOnboardingRuntimeNotice(
-  executionContext: SkillExecutionContext
-): string | undefined {
+function buildOnboardingRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
     const context = resolveSkillContext(
       executionContext.projectRoot,
@@ -670,15 +717,26 @@ function buildOnboardingRuntimeNotice(
       executionContext.featureId
     );
 
-    if (context.source === 'runtime' && context.roleViewSummary) {
+    if (context.source === 'runtime') {
+      const steeringOverview = context.required.steering?.product.overview;
+      const rebootStart = context.optional.rebootGuide?.whereToStart?.join(', ');
       return [
         '<!-- onboarding-runtime-context -->',
         '## Role Views Available',
         `data_source: ${context.source}`,
-        `role_summary: ${context.roleViewSummary}`,
+        `required_assets: ${context.requiredAssetNames.join(', ')}`,
+        ...(context.optionalAssetNames.length > 0
+          ? [`optional_assets: ${context.optionalAssetNames.join(', ')}`]
+          : []),
+        ...(context.roleViewSummary ? [`role_summary: ${context.roleViewSummary}`] : []),
+        ...(steeringOverview ? [`steering_overview: ${steeringOverview}`] : []),
+        ...(rebootStart ? [`reboot_start: ${rebootStart}`] : []),
         'recommendation_mode: project-based',
         ...(context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full'
           ? [`missing_assets: ${context.missingAssets.join(', ')}`]
+          : []),
+        ...(context.missingRequiredAssets.length > 0
+          ? [`missing_required_assets: ${context.missingRequiredAssets.join(', ')}`]
           : []),
         '<!-- /onboarding-runtime-context -->',
       ].join('\n');
@@ -690,6 +748,7 @@ function buildOnboardingRuntimeNotice(
         '## Role Views Available',
         `data_source: ${context.source}`,
         `role_summary: ${context.roleViewSummary}`,
+        ...(context.fallback.warning ? [`warning: ${context.fallback.warning}`] : []),
         'recommendation_mode: generic',
         'recommendation: 建议先运行 /spec-first:first 补全背景数据',
         '<!-- /onboarding-runtime-context -->',
@@ -709,7 +768,16 @@ function buildSpecRuntimeNotice(executionContext: SkillExecutionContext): string
       'Spec View Available',
       'background_input_status',
       'spec_view_summary',
-      resolveSkillContext(executionContext.projectRoot, 'spec', executionContext.featureId)
+      resolveSkillContext(executionContext.projectRoot, 'spec', executionContext.featureId),
+      (() => {
+        const context = resolveSkillContext(
+          executionContext.projectRoot,
+          'spec',
+          executionContext.featureId
+        );
+        const convention = context.optional.conventions?.projectRules.recommendedConvention;
+        return convention ? [`convention_rule: ${convention}`] : [];
+      })()
     );
   } catch {
     return undefined;
@@ -725,7 +793,17 @@ function buildDesignRuntimeNotice(executionContext: SkillExecutionContext): stri
       'Design View Available',
       'background_input_status',
       'design_view_summary',
-      context
+      context,
+      [
+        ...(context.optional.steering?.tech.constraints.length
+          ? [`design_constraints: ${context.optional.steering.tech.constraints.join('；')}`]
+          : []),
+        ...(context.optional.criticalFlows?.length
+          ? [
+              `critical_flows: ${context.optional.criticalFlows.map((flow) => flow.name).join(', ')}`,
+            ]
+          : []),
+      ]
     );
     if (!notice) return undefined;
 
@@ -757,13 +835,43 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
     parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
     parts.push(`data_source: ${context.source}`);
     parts.push('required_inputs: spec.md + design.md + traceability-matrix.md');
+    if (context.requiredAssetNames.length > 0) {
+      parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
+    }
+    if (context.optionalAssetNames.length > 0) {
+      parts.push(`optional_assets: ${context.optionalAssetNames.join(', ')}`);
+    }
 
     if (context.firstSummaryLite?.projectName) {
       parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
     }
 
+    if (context.optional.changeMap?.length) {
+      parts.push(
+        `change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+      );
+    }
+    if (context.optional.criticalFlows?.length) {
+      parts.push(
+        `critical_flows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`
+      );
+    }
+    if (context.optional.entryGuide?.length) {
+      parts.push(
+        `entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`
+      );
+    }
+
     if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
       parts.push(`missing_assets: ${context.missingAssets.join(', ')}`);
+    }
+
+    if (context.missingRequiredAssets.length > 0) {
+      parts.push(`missing_required_assets: ${context.missingRequiredAssets.join(', ')}`);
+    }
+
+    if (context.fallback.warning) {
+      parts.push(`warning: ${context.fallback.warning}`);
     }
 
     if (context.recommendedAction) {
@@ -784,7 +892,26 @@ function buildCodeRuntimeNotice(executionContext: SkillExecutionContext): string
       'Code View Available',
       'background_input_status',
       'code_view_summary',
-      resolveSkillContext(executionContext.projectRoot, 'code', executionContext.featureId)
+      resolveSkillContext(executionContext.projectRoot, 'code', executionContext.featureId),
+      (() => {
+        const context = resolveSkillContext(
+          executionContext.projectRoot,
+          'code',
+          executionContext.featureId
+        );
+        return [
+          ...(context.optional.entryGuide?.length
+            ? [
+                `entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`,
+              ]
+            : []),
+          ...(context.optional.changeMap?.length
+            ? [
+                `change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`,
+              ]
+            : []),
+        ];
+      })()
     );
   } catch {
     return undefined;
@@ -800,7 +927,19 @@ function buildReviewRuntimeNotice(executionContext: SkillExecutionContext): stri
       'Review Context',
       'backgroundInputStatus',
       'codeViewSummary',
-      context
+      context,
+      [
+        ...(context.optional.entryGuide?.length
+          ? [
+              `entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`,
+            ]
+          : []),
+        ...(context.optional.changeMap?.length
+          ? [
+              `changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`,
+            ]
+          : []),
+      ]
     );
     if (!notice) return undefined;
 
@@ -848,9 +987,31 @@ function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string
 
     parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
     parts.push(`data_source: ${context.source}`);
+    if (context.requiredAssetNames.length > 0) {
+      parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
+    }
+    if (context.optionalAssetNames.length > 0) {
+      parts.push(`optional_assets: ${context.optionalAssetNames.join(', ')}`);
+    }
 
     if (context.firstSummaryLite?.projectName) {
       parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
+    }
+
+    if (context.optional.changeMap?.length) {
+      parts.push(
+        `changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+      );
+    }
+    if (context.optional.criticalFlows?.length) {
+      parts.push(
+        `criticalFlows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`
+      );
+    }
+    if (context.optional.entryGuide?.length) {
+      parts.push(
+        `entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`
+      );
     }
 
     const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
@@ -870,6 +1031,14 @@ function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string
 
     if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
       parts.push(`missing_assets: ${context.missingAssets.join(', ')}`);
+    }
+
+    if (context.missingRequiredAssets.length > 0) {
+      parts.push(`missing_required_assets: ${context.missingRequiredAssets.join(', ')}`);
+    }
+
+    if (context.fallback.warning) {
+      parts.push(`warning: ${context.fallback.warning}`);
     }
 
     if (context.recommendedAction) {
@@ -892,7 +1061,17 @@ function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): stri
       'Verify View Available',
       'background_input_status',
       'verify_view_summary',
-      context
+      context,
+      [
+        ...(context.optional.criticalFlows?.length
+          ? [
+              `critical_flows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`,
+            ]
+          : []),
+        ...(context.optional.conventions?.testing.recommendedConvention
+          ? [`testing_convention: ${context.optional.conventions.testing.recommendedConvention}`]
+          : []),
+      ]
     );
     if (!notice) return undefined;
 
@@ -919,9 +1098,7 @@ function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): stri
   }
 }
 
-function buildSpecReviewRuntimeNotice(
-  executionContext: SkillExecutionContext
-): string | undefined {
+function buildSpecReviewRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
     return formatStageRuntimeNotice(
       'spec-review-runtime-context',

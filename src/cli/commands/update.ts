@@ -48,13 +48,17 @@ export async function handleUpdate(args: string[]): Promise<number> {
   const components = parseComponents(args);
 
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('用法: spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>] [--component <set>]\n');
+    console.log(
+      '用法: spec-first update [--dry-run] [--skip-mcp] [--skip-hooks] [--host <target>] [--component <set>]\n'
+    );
     console.log('升级后刷新 Skill/MCP/Hooks。\n');
     console.log('选项:');
     console.log('  --dry-run         仅输出将发生的变更，不写文件');
     console.log('  --skip-mcp        跳过 MCP 配置补齐');
     console.log('  --skip-hooks      跳过 Git hooks 刷新');
-    console.log('  --host <target>   仅刷新指定宿主（claude|codex|gemini|cursor|generic|all，可多次/逗号分隔）');
+    console.log(
+      '  --host <target>   仅刷新指定宿主（claude|codex|gemini|cursor|generic|all，可多次/逗号分隔）'
+    );
     console.log('  --component <set> 组件安装计划（skills|mcp|hooks|viewer，可多次/逗号分隔）');
     console.log('  --from-postinstall  静默模式（postinstall 调用）');
     return ExitCode.SUCCESS;
@@ -178,9 +182,7 @@ function refreshHostIntegrations({
     const skillWarnings = skillEntries.filter((r) => r.level === 'WARNING').length;
     const skillErrors = skillEntries.filter((r) => r.level === 'ERROR').length;
     const mcpHostCount = new Set(
-      mcpEntries
-        .map((entry) => entry.host)
-        .filter((host) => host !== 'Common')
+      mcpEntries.map((entry) => entry.host).filter((host) => host !== 'Common')
     ).size;
     log(`${prefix}Baseline Bootstrap:`);
     log(
@@ -417,7 +419,14 @@ async function checkForUpdates(): Promise<void> {
   }
 }
 
-const HOST_TARGETS = new Set<SkillHostTarget>(['claude', 'codex', 'gemini', 'cursor', 'generic', 'all']);
+const HOST_TARGETS = new Set<SkillHostTarget>([
+  'claude',
+  'codex',
+  'gemini',
+  'cursor',
+  'generic',
+  'all',
+]);
 const COMPONENT_TARGETS = new Set<UpdateComponent>(['skills', 'mcp', 'hooks', 'viewer']);
 
 function normalizeHostIds(hosts?: SkillHostTarget[]): HostId[] | undefined {
@@ -457,7 +466,9 @@ function parseHostTargets(args: string[]): SkillHostTarget[] | undefined {
       .filter(Boolean);
     for (const target of targets) {
       if (!HOST_TARGETS.has(target as SkillHostTarget)) {
-        throw new Error(`参数错误：未知 host "${target}"，可选值: claude|codex|gemini|cursor|generic|all`);
+        throw new Error(
+          `参数错误：未知 host "${target}"，可选值: claude|codex|gemini|cursor|generic|all`
+        );
       }
       values.push(target as SkillHostTarget);
     }

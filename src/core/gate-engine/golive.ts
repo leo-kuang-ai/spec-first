@@ -111,9 +111,7 @@ export function checkGoLive(featureId: string, projectRoot: string): GoLiveResul
 }
 
 function formatGateDetail(gateResult: GateResult): string {
-  const warnings = gateResult.conditions.filter(
-    (c) => c.status === 'FAIL' && c.blocking === false
-  );
+  const warnings = gateResult.conditions.filter((c) => c.status === 'FAIL' && c.blocking === false);
   const warningCount = warnings.length;
 
   if (warningCount > 0) {

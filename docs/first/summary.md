@@ -1,73 +1,50 @@
----
-mode: deep
-generated_at: 2026-03-09T20:06:12.462Z
----
-
-# 项目摘要
+# First Runtime Summary
 
 ## 项目概览
+- 项目: spec-first
+- 模式: deep
+- 平台: unknown
+- 生成时间: 2026-03-16T04:32:50.219Z
+- 概述: AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams
 
-- **项目名称**: spec-first
-- **平台类型**: cli-tool
-- **项目定位**: Specification-driven development process engine
+## Tech Stack
+- runtime: Node.js >=20.0.0
+- language: TypeScript
+- package-manager: pnpm
+- testing: Vitest
+- build: tsup
 
-## 核心能力
+## Capabilities
+- AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams
 
-1. Feature lifecycle management
-2. Stage state machine
-3. Traceability matrix
-4. Quality gates
-5. RFC and defect tracking
+## Modules
+- src/cli
+- src/config
+- src/core
+- src/postinstall.ts
+- src/preuninstall.ts
+- src/shared
 
-## 核心模块
+## Entry Points
+- dist/cli/index.js
+- src/cli/index.ts
 
-- cli
-- process-engine
-- skill-runtime
-- ai-orchestrator
-- gate-engine
-- trace-engine
-- change-mgr
-- template
-- tool-integration
-- metrics-engine
-- shared
-- config
-
-## 入口点
-
-- `src/cli/index.ts`
-- `src/core/process-engine/stage-machine.ts`
-- `src/core/skill-runtime/dispatcher.ts`
-
-## 核心实体
-
+## Data Models
 - Feature
-- Stage
-- Task
-- RFC
-- Defect
-- Gate
-- TraceabilityMatrix
+- StageState
 
-## CLI 命令接口
+## API Surface
+- CLI: spec-first
 
-- spec-first init
-- spec-first stage
-- spec-first id
-- spec-first matrix
-- spec-first rfc
-- spec-first defect
-- spec-first gate
+## Risks
+- 项目端类型待确认
 
-## 技术栈
-
-- runtime: Node.js ≥20.0.0
-- language: TypeScript 5.4+
-- module_system: ESM
-- bundler: tsup
-- test_framework: Vitest
-
-## 风险点
-
-*当前无已识别风险*
+## Evidence
+- package.json
+- tsconfig.json
+- vitest.config.ts
+- dist/cli/index.js
+- src/cli/index.ts
+- src/cli
+- src/config
+- src/core

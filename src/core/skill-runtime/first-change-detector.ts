@@ -14,6 +14,7 @@ import { PRODUCT_NAMES } from './first-args.js';
 import { getFirstRuntimeDir, readFirstRuntimeIndex } from './first-runtime-store.js';
 import { sha256Hex } from '../../shared/crypto-utils.js';
 import {
+  CANONICAL_PROJECTION_DOCS,
   collectProjectionDocsForChangedFiles,
   matchArtifactsByChangedFile,
   matchRuntimeArtifactsByChangedFile,
@@ -81,6 +82,37 @@ function hasGitRepo(projectRoot: string): boolean {
   return existsSync(join(projectRoot, '.git'));
 }
 
+function parseChangedFiles(output: string): string[] {
+  return output
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function parsePorcelainChangedFiles(output: string): string[] {
+  return output
+    .split('\n')
+    .filter(Boolean)
+    .map((line) => line.slice(3).trim())
+    .map((path) => (path.includes(' -> ') ? (path.split(' -> ').at(-1) ?? path) : path))
+    .map((path) => path.replace(/^"|"$/g, ''))
+    .filter(Boolean);
+}
+
+function getWorkingTreeChangedFiles(projectRoot: string): string[] {
+  if (!hasGitRepo(projectRoot)) return [];
+  try {
+    return parsePorcelainChangedFiles(runGit(projectRoot, ['status', '--porcelain']));
+  } catch (error) {
+    logFirstRuntimeWarning(
+      'change-detector.getWorkingTreeChangedFiles',
+      '读取工作区变更失败',
+      error
+    );
+    return [];
+  }
+}
+
 export function getCurrentCommit(projectRoot: string): string | undefined {
   if (!hasGitRepo(projectRoot)) return undefined;
   try {
@@ -107,13 +139,16 @@ export function analyzeChanges(projectRoot: string, lastUpdateCommit?: string): 
     const currentCommit = getCurrentCommit(projectRoot) || 'HEAD';
     const compareCommit = lastUpdateCommit || 'HEAD~10';
     const totalOutput = runGit(projectRoot, ['ls-files']);
-    const totalFiles = totalOutput.split('\n').filter((file) => file.trim()).length;
+    const totalFiles = parseChangedFiles(totalOutput).length;
     const diffOutput = runGit(projectRoot, [
       'diff',
       '--name-only',
       `${compareCommit}..${currentCommit}`,
     ]);
-    const changedFiles = diffOutput.split('\n').filter((file) => file.trim());
+    const committedChangedFiles = parseChangedFiles(diffOutput);
+    const changedFiles = Array.from(
+      new Set([...committedChangedFiles, ...getWorkingTreeChangedFiles(projectRoot)])
+    );
     const changePercentage = pct(changedFiles.length, totalFiles);
 
     const affectedArtifacts = Array.from(
@@ -194,47 +229,59 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     { name: 'summary.json', entry: runtimeIndex?.summary },
     { name: 'role-views.json', entry: runtimeIndex?.roleViews },
     { name: 'stage-views.json', entry: runtimeIndex?.stageViews },
+    { name: 'steering.json', entry: runtimeIndex?.steering },
+    { name: 'conventions.json', entry: runtimeIndex?.conventions },
+    { name: 'critical-flows.json', entry: runtimeIndex?.criticalFlows },
+    { name: 'change-map.json', entry: runtimeIndex?.changeMap },
+    { name: 'entry-guide.json', entry: runtimeIndex?.entryGuide },
+    { name: 'reboot-guide.json', entry: runtimeIndex?.rebootGuide },
   ];
+  const docsProjectionAssets = CANONICAL_PROJECTION_DOCS.map((docPath) => ({
+    name: docPath,
+    entry: runtimeIndex?.docsProjection[docPath],
+  }));
 
-  const productStatus: ProductStatus[] = runtimeAssets.map(({ name, entry }) => {
-    const assetPath = join(runtimeDir, name);
-    const assetExists = existsSync(assetPath);
-    const issues: HealthIssue[] = [];
-    let currentHash: string | undefined;
+  const productStatus: ProductStatus[] = [...runtimeAssets, ...docsProjectionAssets].map(
+    ({ name, entry }) => {
+      const assetPath = name.startsWith('docs/') ? join(projectRoot, name) : join(runtimeDir, name);
+      const assetExists = existsSync(assetPath);
+      const issues: HealthIssue[] = [];
+      let currentHash: string | undefined;
 
-    if (!assetExists) {
-      issues.push({ type: 'missing', message: 'runtime 资产文件不存在' });
-    } else {
-      currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
+      if (!assetExists) {
+        issues.push({ type: 'missing', message: 'runtime 资产文件不存在' });
+      } else {
+        currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
+      }
+
+      if (!entry) {
+        issues.push({ type: 'missing', message: 'runtime 索引记录缺失' });
+      }
+
+      if (entry?.healthy === false) {
+        issues.push({
+          type: 'format_error',
+          message: entry.issues?.join('；') || 'runtime 资产状态异常',
+        });
+      }
+
+      if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
+        issues.push({
+          type: 'hash_mismatch',
+          message: 'runtime 资产与索引记录不一致（可能被手动修改）',
+        });
+      }
+
+      return {
+        name,
+        exists: assetExists,
+        lastUpdated: entry?.lastUpdated ? new Date(entry.lastUpdated) : undefined,
+        currentHash,
+        issues,
+        needsUpdate: issues.length > 0,
+      };
     }
-
-    if (!entry) {
-      issues.push({ type: 'missing', message: 'runtime 索引记录缺失' });
-    }
-
-    if (entry?.healthy === false) {
-      issues.push({
-        type: 'format_error',
-        message: entry.issues?.join('；') || 'runtime 资产状态异常',
-      });
-    }
-
-    if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
-      issues.push({
-        type: 'hash_mismatch',
-        message: 'runtime 资产与索引记录不一致（可能被手动修改）',
-      });
-    }
-
-    return {
-      name,
-      exists: assetExists,
-      lastUpdated: entry?.lastUpdated ? new Date(entry.lastUpdated) : undefined,
-      currentHash,
-      issues,
-      needsUpdate: issues.length > 0,
-    };
-  });
+  );
 
   const lastUpdateTime = productStatus
     .map((item) => item.lastUpdated)
@@ -244,8 +291,9 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
   return {
     hasExistingOutput: true,
     lastUpdateTime,
+    lastUpdateCommit: runtimeIndex?.sourceCommit,
     currentCommit,
-    changeAnalysis: analyzeChanges(projectRoot),
+    changeAnalysis: analyzeChanges(projectRoot, runtimeIndex?.sourceCommit),
     productStatus,
     hasManualModifications: productStatus.some((item) =>
       item.issues.some((issue) => issue.type === 'hash_mismatch')
@@ -313,10 +361,11 @@ export function formatHealthStatus(context: FirstUpdateContext): string {
   const lines: string[] = [];
 
   if (!context.hasExistingOutput) {
-    return '✅ 未检测到已有产物，将执行首次生成。\n';
+    return '✅ 未检测到已有产物，将执行首次生成。仅检查 runtime truth + canonical projection docs，legacy docs 不在 health 范围内。\n';
   }
 
   lines.push('📋 **检测到已有产物**');
+  lines.push('- health 范围: runtime truth + canonical projection docs');
   if (context.lastUpdateTime) {
     const daysSince = Math.floor(
       (Date.now() - context.lastUpdateTime.getTime()) / (1000 * 60 * 60 * 24)

@@ -18,7 +18,12 @@ import { parseMatrix } from '../trace-engine/matrix.js';
 import { validateExceptions } from '../trace-engine/exception-validator.js';
 import { runCommandGate } from './command-gate.js';
 import { loadRfcStatuses } from '../change-mgr/rfc.js';
-import { GATE_CONDITIONS, shouldSkipCondition, type GateConditionDef, type EvalContext } from './condition-registry.js';
+import {
+  GATE_CONDITIONS,
+  shouldSkipCondition,
+  type GateConditionDef,
+  type EvalContext,
+} from './condition-registry.js';
 import { loadConfig } from '../../shared/config-schema.js';
 
 // ─── 导出类型 ─────────────────────────────────────────────
@@ -49,7 +54,9 @@ export function getConditions(
     ? conditions.filter((c) => !shouldSkipCondition(c.id, projectType))
     : conditions;
 
-  const withConfigDescriptions = projectRoot ? applyConfigThresholdDescriptions(filtered, projectRoot) : filtered;
+  const withConfigDescriptions = projectRoot
+    ? applyConfigThresholdDescriptions(filtered, projectRoot)
+    : filtered;
 
   if (profile !== 'strict') return withConfigDescriptions;
 
@@ -236,7 +243,9 @@ export function getGateHistory(featureId: string, projectRoot: string): GateResu
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : String(e);
       const errorStack = e instanceof Error ? e.stack : undefined;
-      console.error(`[gate-evaluator] Failed to parse gate history line: ${errorMsg}${errorStack ? '\nStack: ' + errorStack : ''}`);
+      console.error(
+        `[gate-evaluator] Failed to parse gate history line: ${errorMsg}${errorStack ? '\nStack: ' + errorStack : ''}`
+      );
     }
   }
   return records;

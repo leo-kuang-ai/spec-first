@@ -8,7 +8,8 @@ import { checkMatrix, exportMatrix, updateMatrixRow } from '../../core/trace-eng
 const MATRIX_UPDATE_USAGE =
   '用法：spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]';
 
-const MATRIX_UPDATE_REQUIRED_ARG_ERROR = '至少需要一个更新参数：--status、--title、--upstream、--downstream';
+const MATRIX_UPDATE_REQUIRED_ARG_ERROR =
+  '至少需要一个更新参数：--status、--title、--upstream、--downstream';
 
 export function handleMatrix(args: string[]): number {
   const sub = args[0];
@@ -46,7 +47,12 @@ export function validateMatrixArgs(args: string[]): string | undefined {
     const flag = args[i];
     const val = args[i + 1];
     if (!val) continue;
-    if (flag === '--status' || flag === '--title' || flag === '--upstream' || flag === '--downstream') {
+    if (
+      flag === '--status' ||
+      flag === '--title' ||
+      flag === '--upstream' ||
+      flag === '--downstream'
+    ) {
       return undefined;
     }
   }
@@ -162,7 +168,7 @@ function handleUpdate(args: string[]): number {
         updates.downstream = val.split(',').map((s) => s.trim());
         i++;
         break;
-      }
+    }
   }
 
   if (Object.keys(updates).length === 0) return ExitCode.VALIDATION_ERROR;

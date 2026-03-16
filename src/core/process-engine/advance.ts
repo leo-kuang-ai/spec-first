@@ -16,6 +16,10 @@ import { evaluateGate } from '../gate-engine/gate-evaluator.js';
 import { syncAgentContextFromDesign } from '../tool-integration/context-sync.js';
 import { checkDependencies } from './dependency-checker.js';
 import { getNextStage } from './next-step-decider.js';
+import {
+  applyProjectCognitionWriteback,
+  formatProjectCognitionWritebackFinding,
+} from '../skill-runtime/first-governance.js';
 
 export class GateUnavailableError extends Error {
   constructor(message = 'GateEngine 不可用') {
@@ -31,8 +35,9 @@ export class GateFailedError extends Error {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface AdvanceOptions {}
+export interface AdvanceOptions {
+  skipProjectCognitionGovernance?: boolean;
+}
 
 export interface AdvanceResult {
   from: Stage;
@@ -250,7 +255,10 @@ export function advance(
       message: '发布阶段当前自动收口，后续可扩展真实发布动作',
       featureId,
     });
-    const doneResult = advance(featureId, projectRoot, _options);
+    const doneResult = advance(featureId, projectRoot, {
+      ..._options,
+      skipProjectCognitionGovernance: true,
+    });
     finalTo = doneResult.to;
     finalGateResult = doneResult.gateResult;
   }
@@ -260,6 +268,24 @@ export function advance(
     const currentFile = join(projectRoot, '.spec-first/current');
     if (exists(currentFile)) {
       writeMarkdown(currentFile, '');
+    }
+  }
+
+  if (!_options.skipProjectCognitionGovernance) {
+    const governanceTriggerStage =
+      from === Stage.WRAP_UP ? Stage.WRAP_UP : finalTo === Stage.DONE ? Stage.DONE : undefined;
+    if (governanceTriggerStage) {
+      try {
+        const governance = applyProjectCognitionWriteback(
+          featureId,
+          projectRoot,
+          governanceTriggerStage
+        );
+        appendFindings(featureId, projectRoot, formatProjectCognitionWritebackFinding(governance));
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        appendFindings(featureId, projectRoot, `PROJECT_COGNITION_BLOCKED: ${message}`);
+      }
     }
   }
 
