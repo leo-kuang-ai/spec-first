@@ -433,6 +433,129 @@ last_updated: "${today}"
 `;
 }
 
+/**
+ * Baseline-specific PRD skeleton for FSREQ-19700101-LEGACY-BASELINE.
+ * Contains 已上线能力摘要 section instead of standard business goals.
+ */
+export function skeletonPrdBaseline(featureId: string, title: string): string {
+  const today = new Date().toISOString();
+  return `---
+scenario: "brownfield-baseline"
+scenario_reason: "存量系统现状能力盘点"
+evidence_paths: []
+complexity: "待判定"
+created_at: "${today}"
+last_updated: "${today}"
+---
+
+# PRD — ${featureId}
+
+> ${title}
+
+## 1. 已上线能力摘要
+
+### 1.1 现有功能盘点
+
+**核心模块**：
+[列出已上线的核心业务模块]
+
+**技术栈**：
+[描述当前系统技术栈]
+
+**集成点**：
+[列出外部系统集成点]
+
+### 1.2 能力缺口分析
+
+**已知问题**：
+- [问题 1]
+- [问题 2]
+
+**待补齐能力**：
+- [能力 1]
+- [能力 2]
+
+## 2. 基线范围
+
+### 2.1 纳入范围
+
+- [模块 1]
+- [模块 2]
+
+### 2.2 排除范围
+
+- [明确排除的内容]
+
+## 3. 验收标准
+
+- [ ] 所有核心模块已完成现状盘点
+- [ ] 能力缺口已识别并记录
+- [ ] 基线文档已完成评审
+
+## 4. 开放问题
+
+| 问题 | 优先级 | 负责人 | 状态 |
+|------|--------|--------|------|
+| [问题 1] | High/Medium/Low | [姓名] | Open/Resolved |
+`;
+}
+
+/**
+ * Baseline-specific task_plan skeleton for FSREQ-19700101-LEGACY-BASELINE.
+ * Contains 基线补齐 section instead of standard task breakdown.
+ */
+export function skeletonTaskPlanBaseline(featureId: string, title: string): string {
+  return (
+    `# Task Plan — ${featureId}\n\n` +
+    `> ${title}\n\n` +
+    `## 基线补齐\n\n` +
+    `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |\n` +
+    `|---|---|---|---|---|---|---|---|---|\n` +
+    `| TASK-LEGACY-001 | 现有能力盘点 | dev | 1d | - | - | 能力清单完整 | - | todo |\n` +
+    `| TASK-LEGACY-002 | 技术债务识别 | dev | 0.5d | - | TASK-LEGACY-001 | 问题清单完整 | - | todo |\n\n` +
+    `## 实施步骤\n\n` +
+    `### TASK-LEGACY-001 — 现有能力盘点\n\n` +
+    `1. 梳理现有模块清单\n` +
+    `2. 记录 API 端点与数据模型\n` +
+    `3. 更新 findings.md\n\n` +
+    `## 验证命令\n\n` +
+    `- 人工评审基线文档完整性\n`
+  );
+}
+
+/**
+ * Impact analysis skeleton for Mode I (Iteration) Features.
+ * Scaffolds sections for change scope assessment and risk evaluation.
+ */
+function skeletonImpactAnalysis(featureId: string, title: string): string {
+  return (
+    `# Impact Analysis — ${featureId}\n\n` +
+    `> ${title}\n\n` +
+    `## 1. 变更范围\n\n` +
+    `### 1.1 受影响模块\n\n` +
+    `| 模块 | 变更类型 | 影响程度 | 说明 |\n` +
+    `|------|---------|---------|------|\n` +
+    `| [模块名] | 新增/修改/删除 | 高/中/低 | [说明] |\n\n` +
+    `### 1.2 受影响 API\n\n` +
+    `| API | 变更类型 | 兼容性 | 说明 |\n` +
+    `|-----|---------|--------|------|\n` +
+    `| [接口名] | 新增/修改/废弃 | 向后兼容/不兼容 | [说明] |\n\n` +
+    `## 2. 风险评估\n\n` +
+    `### 2.1 技术风险\n\n` +
+    `- [风险 1]：[缓解措施]\n` +
+    `- [风险 2]：[缓解措施]\n\n` +
+    `### 2.2 数据迁移\n\n` +
+    `- [ ] 是否需要数据迁移：[是/否]\n` +
+    `- 迁移方案：[说明]\n\n` +
+    `## 3. 回滚方案\n\n` +
+    `[描述回滚步骤]\n\n` +
+    `## 4. 依赖方通知\n\n` +
+    `| 依赖方 | 变更内容 | 通知状态 |\n` +
+    `|--------|---------|--------|\n` +
+    `| [团队/系统] | [变更描述] | 待通知/已通知 |\n`
+  );
+}
+
 function detectProjectType(platforms: string[]): string {
   if (platforms.length === 0) return 'fullstack';
   if (platforms.every((p) => p.includes('frontend'))) return 'frontend';
@@ -637,6 +760,9 @@ function createInitialStageState(
   };
 }
 
+/** Canonical marker for brownfield baseline captures — must match CLI constant. */
+const LEGACY_BASELINE_FEATURE_ID = 'FSREQ-19700101-LEGACY-BASELINE';
+
 function writeFeatureSkeleton(
   tmpFeatureDir: string,
   opts: InitOptions,
@@ -652,12 +778,24 @@ function writeFeatureSkeleton(
   const state = createInitialStageState(opts, featureId, mergedRules, backgroundInputStatus);
   writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
   writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
-  writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
   writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
   writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(opts, featureId));
 
-  // 可选预置 PRD 骨架（不替代 Phase 0 完整产出）
-  writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));
+  const isLegacyBaseline = featureId === LEGACY_BASELINE_FEATURE_ID;
+  if (isLegacyBaseline) {
+    // Baseline-specific skeletons: 已上线能力摘要 PRD + 基线补齐 task plan
+    writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrdBaseline(featureId, opts.title));
+    writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlanBaseline(featureId, opts.title));
+    // Baseline Features do not need impact-analysis.md
+  } else {
+    // Standard skeleton
+    writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
+    writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));
+    // Mode I: scaffold impact analysis doc to guide change scope assessment
+    if (opts.mode === 'I') {
+      writeMarkdown(join(tmpFeatureDir, 'impact-analysis.md'), skeletonImpactAnalysis(featureId, opts.title));
+    }
+  }
 }
 
 function commitFeatureInit(

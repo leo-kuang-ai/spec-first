@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { loadFirstContext, type FirstContext } from './first-context.js';
 import {
   CANONICAL_PROJECTION_DOCS,
@@ -7,28 +7,27 @@ import {
   getProjectionDocsForRuntimeArtifact,
 } from './first-artifact-mapping.js';
 import {
+  readFirstApiContracts,
   readFirstChangeMap,
   readFirstConventions,
   readFirstCriticalFlows,
+  readFirstDatabaseSchema,
+  readFirstDomainModel,
   readFirstEntryGuide,
   readFirstRebootGuide,
-  getFirstRoleViewsPath,
-  getFirstRuntimeIndexPath,
-  getFirstRuntimeSummaryPath,
-  getFirstStageViewsPath,
+  readFirstStructureOverview,
 } from './first-runtime-store.js';
 import type {
+  FirstApiContracts,
   FirstChangeMap,
   FirstConventions,
   FirstCriticalFlows,
+  FirstDatabaseSchema,
+  FirstDomainModel,
   FirstEntryGuide,
   FirstRebootGuide,
-  FirstSteering,
-  FirstRoleView,
-  FirstRoleViews,
-  FirstRuntimeAssetIndexEntry,
   FirstRuntimeSummary,
-  FirstStageViews,
+  FirstStructureOverview,
 } from './first-runtime-types.js';
 
 const ROLE_LABELS = {
@@ -45,98 +44,18 @@ const STAGE_LABELS = {
   verify: 'Verify View',
 } as const;
 
-interface LegacyFirstRuntimeIndexArtifact {
-  id?: string;
-  path?: string;
-  type?: string;
-  status?: string;
-}
-
-interface LegacyFirstRuntimeIndex {
-  version?: string;
-  mode?: 'quick' | 'deep';
-  generated_at?: string;
-  project?: {
-    name?: string;
-    version?: string;
-    type?: string;
-    description?: string;
-  };
-  artifacts?: LegacyFirstRuntimeIndexArtifact[];
-  database?: {
-    detected?: boolean;
-    reason?: string;
-  };
-}
-
-interface LegacyFirstRuntimeSummary {
-  mode?: 'quick' | 'deep';
-  generated_at?: string;
-  tech_stack?: Record<string, string>;
-  project_type?: string;
-  core_modules?: string[];
-  commands_count?: number;
-  has_database?: boolean;
-}
-
-interface LegacyFirstRoleDescriptor {
-  priority_docs?: string[];
-  entry_points?: string[];
-  key_concepts?: string[];
-}
-
-interface LegacyFirstRoleViews {
-  generated_at?: string;
-  roles?: {
-    developer?: LegacyFirstRoleDescriptor;
-    product_manager?: LegacyFirstRoleDescriptor;
-    tester?: LegacyFirstRoleDescriptor;
-    architect?: LegacyFirstRoleDescriptor;
-  };
-}
-
-interface LegacyFirstStageDescriptor {
-  relevant_docs?: string[];
-  key_files?: string[];
-}
-
-interface LegacyFirstStageViews {
-  generated_at?: string;
-  stages?: Record<string, LegacyFirstStageDescriptor>;
-}
-
 interface ProjectionContext extends FirstContext {
   artifactDocs: string[];
   techStack: string[];
+  apiContracts: FirstApiContracts;
+  structureOverview: FirstStructureOverview;
+  domainModel: FirstDomainModel;
+  databaseSchema: FirstDatabaseSchema | null;
   conventions: FirstConventions;
   criticalFlows: FirstCriticalFlows;
   changeMap: FirstChangeMap;
   entryGuide: FirstEntryGuide;
   rebootGuide: FirstRebootGuide;
-}
-
-function buildSyntheticSteering(
-  summary: FirstRuntimeSummary,
-  artifactDocs: string[] = []
-): FirstSteering {
-  return {
-    product: {
-      overview: summary.project.overview ?? `${summary.project.name} project cognition`,
-      coreScenarios: summary.capabilities.slice(0, 3),
-      nonGoals: artifactDocs.length > 0 ? ['legacy docs as canonical truth'] : [],
-      glossary: summary.dataModels.slice(0, 5),
-    },
-    tech: {
-      stack: summary.techStack ?? [],
-      constraints: summary.risks.slice(0, 3),
-      forbiddenPatterns: ['docs-only truth'],
-    },
-    structure: {
-      modules: summary.modules,
-      boundaries: summary.entryPoints,
-      entryRules: ['read runtime truth first'],
-    },
-  };
 }
 
 function buildSyntheticConventions(summary: FirstRuntimeSummary): FirstConventions {
@@ -244,7 +163,7 @@ function buildSyntheticEntryGuide(): FirstEntryGuide {
       taskCategory: 'docs-projection',
       readFirst: ['docs/first/README.md', '.spec-first/runtime/first/change-map.json'],
       thenRead: ['src/core/skill-runtime/first-doc-projection.ts'],
-      avoidEntry: ['legacy docs as truth'],
+      avoidEntry: ['unregistered docs as truth'],
       relatedFlows: ['flow-doc-projection'],
     },
   ];
@@ -260,325 +179,78 @@ function buildSyntheticRebootGuide(summary: FirstRuntimeSummary): FirstRebootGui
   };
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
+function buildSyntheticApiContracts(summary: FirstRuntimeSummary): FirstApiContracts {
+  return {
+    interfaces:
+      summary.apiSurface.length > 0
+        ? summary.apiSurface.map((surface) => ({
+            interfaceType: surface.startsWith('CLI:') ? 'cli-command' : 'other',
+            name: surface.replace(/^CLI:\s*/, ''),
+            path: surface.replace(/^CLI:\s*/, ''),
+            method: 'run',
+            handler: summary.entryPoints[0] ?? 'src/cli/index.ts',
+            request: [],
+            response: ['自动生成 runtime 认知资产'],
+            auth: [],
+            evidence: uniqueStrings(summary.entryPoints, summary.evidence).slice(0, 6),
+          }))
+        : [],
+    integrationPoints: uniqueStrings(summary.entryPoints, summary.modules).slice(0, 8),
+    notes: ['当缺少细粒度接口证据时，这里展示最小接口面摘要。'],
+  };
 }
 
-function asStringArray(value: unknown): string[] {
-  return Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
-    : [];
+function buildSyntheticStructureOverview(summary: FirstRuntimeSummary): FirstStructureOverview {
+  return {
+    topology: ['entry -> modules -> runtime projection'],
+    modules: summary.modules.map((modulePath) => ({
+      name: modulePath.split('/').at(-1) ?? modulePath,
+      purpose: `${modulePath} 是项目结构中的关键模块`,
+      keyPaths: [modulePath],
+      entryPoints: summary.entryPoints.filter((entryPoint) => entryPoint.startsWith(modulePath)),
+      dependencies: [],
+    })),
+    readingOrder: uniqueStrings(summary.entryPoints, summary.modules).slice(0, 10),
+    evidence: summary.evidence,
+  };
+}
+
+function buildSyntheticDomainModel(summary: FirstRuntimeSummary): FirstDomainModel {
+  return {
+    entities: summary.dataModels.map((modelName) => ({
+      name: modelName,
+      kind: 'concept',
+      description: `${modelName} 是项目认知中的核心概念`,
+      invariants: ['需要与 runtime truth 保持一致'],
+      relationships: summary.apiSurface.map((surface) => `关联接口: ${surface}`).slice(0, 5),
+      evidence: summary.evidence,
+    })),
+    glossary: uniqueStrings(summary.dataModels, summary.capabilities).slice(0, 10),
+    evidence: summary.evidence,
+  };
 }
 
 function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
   return Array.from(new Set(groups.flatMap((group) => group ?? []).filter(Boolean)));
 }
 
-function toDocRefs(entries: string[]): string[] {
-  return entries.map((entry) => (entry.startsWith('docs/') ? entry : `docs/first/${entry}`));
-}
-
-function isLegacyRuntimeIndex(value: unknown): value is LegacyFirstRuntimeIndex {
-  return (
-    isRecord(value) &&
-    typeof value.version === 'string' &&
-    Array.isArray(value.artifacts) &&
-    isRecord(value.project)
-  );
-}
-
-function isLegacyRuntimeSummary(value: unknown): value is LegacyFirstRuntimeSummary {
-  return (
-    isRecord(value) &&
-    typeof value.generated_at === 'string' &&
-    typeof value.project_type === 'string' &&
-    Array.isArray(value.core_modules)
-  );
-}
-
-function isLegacyRoleViews(value: unknown): value is LegacyFirstRoleViews {
-  return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.roles);
-}
-
-function isLegacyStageViews(value: unknown): value is LegacyFirstStageViews {
-  return isRecord(value) && typeof value.generated_at === 'string' && isRecord(value.stages);
-}
-
-function makeSyntheticAsset(path: string, lastUpdated: string): FirstRuntimeAssetIndexEntry {
-  return {
-    path,
-    fileHash: 'legacy-runtime',
-    lastUpdated,
-    healthy: true,
-  };
-}
-function readRawRuntimeJson(path: string): unknown | null {
-  if (!existsSync(path)) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(readFileSync(path, 'utf-8'));
-  } catch {
-    return null;
-  }
-}
-
-function readLegacyProjectionHints(
-  projectRoot: string
-): Pick<ProjectionContext, 'artifactDocs' | 'techStack'> {
-  const rawIndex = readRawRuntimeJson(getFirstRuntimeIndexPath(projectRoot));
-  const rawSummary = readRawRuntimeJson(getFirstRuntimeSummaryPath(projectRoot));
-
-  const artifactDocs = isLegacyRuntimeIndex(rawIndex)
-    ? uniqueStrings(
-        rawIndex.artifacts
-          ?.map((artifact) => artifact.path)
-          .filter((path): path is string => typeof path === 'string')
-      )
-    : [];
-  const techStack = isLegacyRuntimeSummary(rawSummary)
-    ? Object.entries(rawSummary.tech_stack ?? {}).map(([key, value]) => `${key}: ${value}`)
-    : [];
-
-  return { artifactDocs, techStack };
-}
-
-function normalizeLegacyRoleView(
-  role: FirstRoleView['role'],
-  descriptor?: LegacyFirstRoleDescriptor
-): FirstRoleView {
-  const priorityDocs = toDocRefs(asStringArray(descriptor?.priority_docs));
-  const entryPoints = asStringArray(descriptor?.entry_points).map(
-    (entryPoint) => `entry: ${entryPoint}`
-  );
-  const keyConcepts = asStringArray(descriptor?.key_concepts);
-  const focus = uniqueStrings(priorityDocs, entryPoints, keyConcepts);
-
-  return {
-    role,
-    summary: priorityDocs[0] ? `Prioritize ${priorityDocs[0]}` : 'No summary available',
-    focus,
-    warnings: [],
-  };
-}
-
-function normalizeLegacyRoleViews(rawRoleViews: LegacyFirstRoleViews): FirstRoleViews {
-  return {
-    product: normalizeLegacyRoleView('product', rawRoleViews.roles?.product_manager),
-    dev: normalizeLegacyRoleView('dev', rawRoleViews.roles?.developer),
-    qa: normalizeLegacyRoleView('qa', rawRoleViews.roles?.tester),
-    architect: normalizeLegacyRoleView('architect', rawRoleViews.roles?.architect),
-  };
-}
-
-function normalizeLegacyStageViews(rawStageViews: LegacyFirstStageViews): FirstStageViews {
-  const initStage = rawStageViews.stages?.['00_init'];
-  const specStage = rawStageViews.stages?.['01_specify'] ?? initStage;
-  const designStage = rawStageViews.stages?.['02_design'] ?? specStage;
-  const planStage = rawStageViews.stages?.['03_plan'];
-  const codeStage = rawStageViews.stages?.['04_implement'] ?? planStage ?? designStage;
-  const verifyStage = rawStageViews.stages?.['05_verify'] ?? codeStage;
-
-  const specDocs = toDocRefs(asStringArray(specStage?.relevant_docs));
-  const designDocs = toDocRefs(asStringArray(designStage?.relevant_docs));
-  const planDocs = toDocRefs(asStringArray(planStage?.relevant_docs));
-  const codeDocs = toDocRefs(asStringArray(codeStage?.relevant_docs));
-  const verifyDocs = toDocRefs(asStringArray(verifyStage?.relevant_docs));
-
-  const specFiles = asStringArray(specStage?.key_files);
-  const designFiles = asStringArray(designStage?.key_files);
-  const planFiles = asStringArray(planStage?.key_files);
-  const codeFiles = asStringArray(codeStage?.key_files);
-  const verifyFiles = asStringArray(verifyStage?.key_files);
-  const initFiles = asStringArray(initStage?.key_files);
-
-  return {
-    spec: {
-      stage: 'spec',
-      summary: 'Derived from 01_specify runtime stage',
-      businessCapabilities: specDocs,
-      coreEntities: [],
-      dependencies: specFiles,
-      warnings: initFiles.map((file) => `00_init: ${file}`),
-    },
-    design: {
-      stage: 'design',
-      summary: 'Derived from 02_design runtime stage',
-      moduleBoundaries: designFiles,
-      integrationPoints: designDocs,
-      technicalConstraints: [],
-      risks: [],
-    },
-    code: {
-      stage: 'code',
-      summary: 'Derived from 04_implement runtime stage',
-      entryPoints: codeFiles,
-      likelyChangeAreas: uniqueStrings(planFiles, codeDocs),
-      callPathHints: planFiles.map((file) => `03_plan -> ${file}`),
-      couplingPoints: uniqueStrings(planDocs, designFiles),
-      changeHazards: [],
-      verificationHooks: verifyFiles,
-    },
-    verify: {
-      stage: 'verify',
-      summary: 'Derived from 05_verify runtime stage',
-      criticalFlows: verifyFiles,
-      validationFocus: verifyDocs,
-      testFocus: verifyFiles.length > 0 ? verifyFiles : verifyDocs,
-      riskAreas: [],
-      recommendedChecks: verifyDocs,
-      validationHooks: [],
-      releaseBlockers: [],
-    },
-  };
-}
-
-function loadLegacyProjectionContext(projectRoot: string): ProjectionContext | null {
-  const rawIndex = readRawRuntimeJson(getFirstRuntimeIndexPath(projectRoot));
-  const rawSummary = readRawRuntimeJson(getFirstRuntimeSummaryPath(projectRoot));
-  const rawRoleViews = readRawRuntimeJson(getFirstRoleViewsPath(projectRoot));
-  const rawStageViews = readRawRuntimeJson(getFirstStageViewsPath(projectRoot));
-
-  if (
-    !isLegacyRuntimeIndex(rawIndex) ||
-    !isLegacyRuntimeSummary(rawSummary) ||
-    !isLegacyRoleViews(rawRoleViews) ||
-    !isLegacyStageViews(rawStageViews)
-  ) {
-    return null;
-  }
-
-  const generatedAt =
-    rawSummary.generated_at ??
-    rawRoleViews.generated_at ??
-    rawStageViews.generated_at ??
-    rawIndex.generated_at ??
-    'unknown';
-  const projectName = rawIndex.project?.name ?? basename(projectRoot);
-  const artifactDocs = uniqueStrings(
-    rawIndex.artifacts
-      ?.map((artifact) => artifact.path)
-      .filter((path): path is string => typeof path === 'string')
-  );
-  const techStack = Object.entries(rawSummary.tech_stack ?? {}).map(
-    ([key, value]) => `${key}: ${value}`
-  );
-  const entryPoints = uniqueStrings(
-    asStringArray(rawRoleViews.roles?.developer?.entry_points),
-    asStringArray(rawRoleViews.roles?.product_manager?.entry_points),
-    asStringArray(rawRoleViews.roles?.tester?.entry_points),
-    asStringArray(rawRoleViews.roles?.architect?.entry_points)
-  );
-  const apiSurface = toDocRefs(
-    rawIndex.artifacts
-      ?.filter((artifact) => artifact.type?.includes('api'))
-      .map((artifact) => artifact.path)
-      .filter((path): path is string => typeof path === 'string') ?? []
-  );
-  const dataModels = toDocRefs(
-    rawIndex.artifacts
-      ?.filter((artifact) => artifact.type?.includes('domain'))
-      .map((artifact) => artifact.path)
-      .filter((path): path is string => typeof path === 'string') ?? []
-  );
-  const capabilities = uniqueStrings(
-    rawSummary.project_type ? [`project type: ${rawSummary.project_type}`] : [],
-    typeof rawSummary.commands_count === 'number' ? [`commands: ${rawSummary.commands_count}`] : [],
-    [rawSummary.has_database ? 'database: detected' : 'database: not detected']
-  );
-  const risks =
-    rawIndex.database?.detected === false && rawIndex.database.reason
-      ? [`database: ${rawIndex.database.reason}`]
-      : [];
-  const summary: FirstRuntimeSummary = {
-    generatedAt,
-    mode: rawSummary.mode === 'deep' ? 'deep' : 'quick',
-    project: {
-      name: projectName,
-      platformType: rawSummary.project_type ?? rawIndex.project?.type,
-      overview: rawIndex.project?.description,
-    },
-    modules: asStringArray(rawSummary.core_modules),
-    capabilities,
-    entryPoints,
-    dataModels,
-    apiSurface,
-    risks,
-    evidence: [
-      '.spec-first/runtime/first/index.json',
-      '.spec-first/runtime/first/summary.json',
-      '.spec-first/runtime/first/role-views.json',
-      '.spec-first/runtime/first/stage-views.json',
-    ],
-  };
-
-  return {
-    index: {
-      version: rawIndex.version ?? 'legacy-runtime',
-      lastRun: generatedAt,
-      mode: summary.mode,
-      summary: makeSyntheticAsset('.spec-first/runtime/first/summary.json', generatedAt),
-      roleViews: makeSyntheticAsset(
-        '.spec-first/runtime/first/role-views.json',
-        rawRoleViews.generated_at ?? generatedAt
-      ),
-      stageViews: makeSyntheticAsset(
-        '.spec-first/runtime/first/stage-views.json',
-        rawStageViews.generated_at ?? generatedAt
-      ),
-      steering: makeSyntheticAsset('.spec-first/runtime/first/steering.json', generatedAt),
-      conventions: makeSyntheticAsset('.spec-first/runtime/first/conventions.json', generatedAt),
-      criticalFlows: makeSyntheticAsset(
-        '.spec-first/runtime/first/critical-flows.json',
-        generatedAt
-      ),
-      changeMap: makeSyntheticAsset('.spec-first/runtime/first/change-map.json', generatedAt),
-      entryGuide: makeSyntheticAsset('.spec-first/runtime/first/entry-guide.json', generatedAt),
-      rebootGuide: makeSyntheticAsset('.spec-first/runtime/first/reboot-guide.json', generatedAt),
-      docsProjection: {},
-      status: 'current',
-    },
-    summary,
-    roleViews: normalizeLegacyRoleViews(rawRoleViews),
-    stageViews: normalizeLegacyStageViews(rawStageViews),
-    steering: buildSyntheticSteering(summary, artifactDocs),
-    conventions: buildSyntheticConventions(summary),
-    criticalFlows: buildSyntheticCriticalFlows(summary),
-    changeMap: buildSyntheticChangeMap(summary),
-    entryGuide: buildSyntheticEntryGuide(),
-    rebootGuide: buildSyntheticRebootGuide(summary),
-    artifactDocs,
-    techStack,
-  };
-}
-
 function loadProjectionContext(projectRoot: string): ProjectionContext {
-  const legacyHints = readLegacyProjectionHints(projectRoot);
-
-  try {
-    const context = loadFirstContext(projectRoot);
-    return {
-      ...context,
-      artifactDocs:
-        legacyHints.artifactDocs.length > 0
-          ? legacyHints.artifactDocs
-          : Object.keys(context.index.docsProjection ?? {}).sort(),
-      techStack: context.summary.techStack ?? legacyHints.techStack,
-      conventions: readFirstConventions(projectRoot) ?? buildSyntheticConventions(context.summary),
-      criticalFlows:
-        readFirstCriticalFlows(projectRoot) ?? buildSyntheticCriticalFlows(context.summary),
-      changeMap: readFirstChangeMap(projectRoot) ?? buildSyntheticChangeMap(context.summary),
-      entryGuide: readFirstEntryGuide(projectRoot) ?? buildSyntheticEntryGuide(),
-      rebootGuide: readFirstRebootGuide(projectRoot) ?? buildSyntheticRebootGuide(context.summary),
-    };
-  } catch (error) {
-    const legacyContext = loadLegacyProjectionContext(projectRoot);
-    if (legacyContext !== null) {
-      return legacyContext;
-    }
-    throw error;
-  }
+  const context = loadFirstContext(projectRoot);
+  return {
+    ...context,
+    artifactDocs: Object.keys(context.index.docsProjection ?? {}).sort(),
+    techStack: context.summary.techStack ?? [],
+    apiContracts: readFirstApiContracts(projectRoot) ?? buildSyntheticApiContracts(context.summary),
+    structureOverview:
+      readFirstStructureOverview(projectRoot) ?? buildSyntheticStructureOverview(context.summary),
+    domainModel: readFirstDomainModel(projectRoot) ?? buildSyntheticDomainModel(context.summary),
+    databaseSchema: readFirstDatabaseSchema(projectRoot),
+    conventions: readFirstConventions(projectRoot) ?? buildSyntheticConventions(context.summary),
+    criticalFlows: readFirstCriticalFlows(projectRoot) ?? buildSyntheticCriticalFlows(context.summary),
+    changeMap: readFirstChangeMap(projectRoot) ?? buildSyntheticChangeMap(context.summary),
+    entryGuide: readFirstEntryGuide(projectRoot) ?? buildSyntheticEntryGuide(),
+    rebootGuide: readFirstRebootGuide(projectRoot) ?? buildSyntheticRebootGuide(context.summary),
+  };
 }
 
 function renderList(items: string[], emptyLabel: string = '无'): string[] {
@@ -594,7 +266,7 @@ function renderSubsection(title: string, items: string[], emptyLabel?: string): 
 }
 
 function renderOverviewDoc(context: ProjectionContext): string {
-  const legacyDocs = context.artifactDocs.filter((doc) => !CANONICAL_PROJECTION_DOCS.includes(doc));
+  const unregisteredDocs = context.artifactDocs.filter((doc) => !CANONICAL_PROJECTION_DOCS.includes(doc));
   const lines = [
     '# 项目认知投影视图',
     '',
@@ -602,7 +274,6 @@ function renderOverviewDoc(context: ProjectionContext): string {
     '',
     '## 项目概览',
     `- project: ${context.summary.project.name}`,
-    `- mode: ${context.summary.mode}`,
     `- generatedAt: ${context.summary.generatedAt}`,
     '',
     '## Runtime Canonical Truth',
@@ -615,14 +286,14 @@ function renderOverviewDoc(context: ProjectionContext): string {
     '## Canonical Projection Docs',
     ...renderList([...CANONICAL_PROJECTION_DOCS]),
     '',
-    '## Legacy / Reference Docs',
-    ...renderList(legacyDocs, '无'),
-    '- 当前不受 runtime 真源自动刷新保障。',
+    '## Unregistered Docs',
+    ...renderList(unregisteredDocs, '无'),
+    '- 当前不在正式 projection registry 中，不受 runtime 自动刷新保障。',
     '',
     '## Skill Consumption Contract',
     '- 后续 skill 的正式输入优先读取 `.spec-first/runtime/first/`。',
     '- 列出的 `Canonical Projection Docs` 全部受 runtime 自动刷新保障。',
-    '- 其他 `docs/first/*` 文档只作为 legacy/reference docs 提供人工参考，不作为 canonical truth。',
+    '- 未注册的 `docs/first/*` 文档不参与 canonical truth 与自动治理。',
     '',
     '## 使用约定',
     '- 读取机器真相时优先使用 `.spec-first/runtime/first/` runtime truth。',
@@ -639,7 +310,6 @@ function renderSummaryDoc(context: ProjectionContext): string {
     '',
     '## 项目概览',
     `- 项目: ${context.summary.project.name}`,
-    `- 模式: ${context.summary.mode}`,
     `- 平台: ${context.summary.project.platformType ?? 'unknown'}`,
     `- 生成时间: ${context.summary.generatedAt}`,
     `- 概述: ${context.summary.project.overview ?? '未提供'}`,
@@ -655,6 +325,143 @@ function renderSummaryDoc(context: ProjectionContext): string {
     ...renderSection('Risks', context.summary.risks),
     ...renderSection('Evidence', context.summary.evidence),
   ].join('\n');
+}
+
+function renderTechStackDoc(context: ProjectionContext): string {
+  return [
+    '# Tech Stack',
+    '',
+    ...renderSection('Stack', context.techStack.length > 0 ? context.techStack : context.steering.tech.stack),
+    ...renderSection('Constraints', context.steering.tech.constraints, '无'),
+    ...renderSection('Forbidden Patterns', context.steering.tech.forbiddenPatterns, '无'),
+    ...renderSection('Evidence', context.summary.evidence, '无'),
+  ].join('\n');
+}
+
+function renderApiDocsDoc(context: ProjectionContext): string {
+  const lines = ['# API Docs'];
+  for (const item of context.apiContracts.interfaces) {
+    lines.push('', `## ${item.name}`);
+    lines.push('', `- Type: ${item.interfaceType}`);
+    lines.push(`- Handler: ${item.handler}`);
+    if (item.method) lines.push(`- Method: ${item.method}`);
+    if (item.path) lines.push(`- Path: ${item.path}`);
+    lines.push(...renderSubsection('Request', item.request, '无'));
+    lines.push(...renderSubsection('Response', item.response, '无'));
+    lines.push(...renderSubsection('Auth', item.auth, '无'));
+    lines.push(...renderSubsection('Evidence', item.evidence, '无'));
+  }
+  lines.push(...renderSection('Integration Points', context.apiContracts.integrationPoints, '无'));
+  lines.push(...renderSection('Notes', context.apiContracts.notes, '无'));
+  return lines.join('\n');
+}
+
+function renderCodebaseOverviewDoc(context: ProjectionContext): string {
+  const lines = ['# Codebase Overview'];
+  lines.push(...renderSection('Topology', context.structureOverview.topology, '无'));
+  for (const module of context.structureOverview.modules) {
+    lines.push('', `## ${module.name}`);
+    lines.push('', `- Purpose: ${module.purpose}`);
+    lines.push(...renderSubsection('Key Paths', module.keyPaths, '无'));
+    lines.push(...renderSubsection('Entry Points', module.entryPoints, '无'));
+    lines.push(...renderSubsection('Dependencies', module.dependencies ?? [], '无'));
+  }
+  lines.push(...renderSection('Reading Order', context.structureOverview.readingOrder, '无'));
+  lines.push(...renderSection('Evidence', context.structureOverview.evidence, '无'));
+  return lines.join('\n');
+}
+
+function renderDomainModelDoc(context: ProjectionContext): string {
+  const lines = ['# Domain Model'];
+  for (const entity of context.domainModel.entities) {
+    lines.push('', `## ${entity.name}`);
+    lines.push('', `- Kind: ${entity.kind}`);
+    lines.push(`- Description: ${entity.description}`);
+    lines.push(...renderSubsection('Invariants', entity.invariants, '无'));
+    lines.push(...renderSubsection('Relationships', entity.relationships, '无'));
+    lines.push(...renderSubsection('Evidence', entity.evidence, '无'));
+  }
+  lines.push(...renderSection('Glossary', context.domainModel.glossary, '无'));
+  lines.push(...renderSection('Evidence', context.domainModel.evidence, '无'));
+  return lines.join('\n');
+}
+
+function renderArchitectureDoc(context: ProjectionContext): string {
+  return [
+    '# Architecture',
+    '',
+    ...renderSection('Topology', context.structureOverview.topology, '无'),
+    ...renderSection('Modules', context.steering.structure.modules, '无'),
+    ...renderSection('Boundaries', context.steering.structure.boundaries, '无'),
+    ...renderSection('Entry Rules', context.steering.structure.entryRules, '无'),
+    ...renderSection('Critical Flows', context.criticalFlows.map((flow) => flow.name), '无'),
+  ].join('\n');
+}
+
+function renderCallGraphDoc(context: ProjectionContext): string {
+  const lines = ['# Call Graph'];
+  for (const flow of context.criticalFlows) {
+    lines.push('', `## ${flow.name}`);
+    lines.push(...renderSubsection('Entry Points', flow.entryPoints, '无'));
+    lines.push(...renderSubsection('Core Modules', flow.coreModules, '无'));
+    lines.push(...renderSubsection('Verification Hooks', flow.verificationHooks, '无'));
+  }
+  return lines.join('\n');
+}
+
+function renderExternalDepsDoc(context: ProjectionContext): string {
+  return [
+    '# External Dependencies',
+    '',
+    ...renderSection(
+      'Dependency Surface',
+      context.techStack.filter((item) =>
+        /runtime:|package-manager:|testing:|build:/i.test(item)
+      ),
+      '无'
+    ),
+    ...renderSection('Integration Points', context.apiContracts.integrationPoints, '无'),
+    ...renderSection('Evidence', context.summary.evidence, '无'),
+  ].join('\n');
+}
+
+function renderLocalSetupDoc(context: ProjectionContext): string {
+  return [
+    '# Local Setup',
+    '',
+    ...renderSection('Entry Paths', context.entryGuide.flatMap((entry) => entry.readFirst), '无'),
+    ...renderSection('Then Read', context.entryGuide.flatMap((entry) => entry.thenRead), '无'),
+    ...renderSection('Recommended Rules', [context.conventions.testing.recommendedConvention], '无'),
+    ...renderSection('Verify Checklist', context.rebootGuide.verifyChecklist, '无'),
+  ].join('\n');
+}
+
+function renderDevelopmentGuidelinesDoc(context: ProjectionContext): string {
+  return [
+    '# Development Guidelines',
+    '',
+    `- API: ${context.conventions.api.recommendedConvention}`,
+    `- Module: ${context.conventions.module.recommendedConvention}`,
+    `- Testing: ${context.conventions.testing.recommendedConvention}`,
+    `- Project Rules: ${context.conventions.projectRules.recommendedConvention}`,
+  ].join('\n');
+}
+
+function renderDatabaseErDoc(context: ProjectionContext): string {
+  if (!context.databaseSchema || context.databaseSchema.status !== 'healthy') {
+    return ['# Database ER', '', '- 当前项目不适用数据库 ER 视图。'].join('\n');
+  }
+
+  const lines = ['# Database ER', '', `- Provider: ${context.databaseSchema.provider ?? 'unknown'}`];
+  for (const table of context.databaseSchema.tables) {
+    lines.push('', `## ${table.name}`);
+    if (table.purpose) lines.push('', `- Purpose: ${table.purpose}`);
+    lines.push(...renderSubsection('Fields', table.fields, '无'));
+    lines.push(...renderSubsection('Relations', table.relations, '无'));
+    lines.push(...renderSubsection('Evidence', table.evidence, '无'));
+  }
+  lines.push(...renderSection('Risks', context.databaseSchema.risks, '无'));
+  return lines.join('\n');
 }
 
 function renderRoleViewsDoc(context: ProjectionContext): string {
@@ -944,6 +751,36 @@ export function renderProjectedDoc(docPath: string, context: ProjectionContext):
   if (docPath.endsWith('reboot-guide.md')) {
     return renderRebootGuideDoc(context);
   }
+  if (docPath.endsWith('tech-stack.md')) {
+    return renderTechStackDoc(context);
+  }
+  if (docPath.endsWith('api-docs.md')) {
+    return renderApiDocsDoc(context);
+  }
+  if (docPath.endsWith('codebase-overview.md')) {
+    return renderCodebaseOverviewDoc(context);
+  }
+  if (docPath.endsWith('domain-model.md')) {
+    return renderDomainModelDoc(context);
+  }
+  if (docPath.endsWith('architecture.md')) {
+    return renderArchitectureDoc(context);
+  }
+  if (docPath.endsWith('call-graph.md')) {
+    return renderCallGraphDoc(context);
+  }
+  if (docPath.endsWith('external-deps.md')) {
+    return renderExternalDepsDoc(context);
+  }
+  if (docPath.endsWith('local-setup.md')) {
+    return renderLocalSetupDoc(context);
+  }
+  if (docPath.endsWith('development-guidelines.md')) {
+    return renderDevelopmentGuidelinesDoc(context);
+  }
+  if (docPath.endsWith('database-er.md')) {
+    return renderDatabaseErDoc(context);
+  }
 
   return renderGenericProjectedDoc(docPath, context);
 }
@@ -963,13 +800,26 @@ export function refreshFirstDocsFromRuntime(
     )
   );
 
+  const generatedDocs: string[] = [];
+
   for (const relativeDocPath of docs) {
     const fullPath = join(projectRoot, relativeDocPath);
+    const shouldGenerate =
+      !relativeDocPath.endsWith('database-er.md') || context.databaseSchema?.status === 'healthy';
+
+    if (!shouldGenerate) {
+      if (existsSync(fullPath)) {
+        rmSync(fullPath, { force: true });
+      }
+      continue;
+    }
+
     mkdirSync(dirname(fullPath), { recursive: true });
     writeFileSync(fullPath, renderProjectedDoc(relativeDocPath, context), 'utf-8');
+    generatedDocs.push(relativeDocPath);
   }
 
-  return docs;
+  return generatedDocs;
 }
 
 export { getProjectionDocsForRuntimeArtifact };

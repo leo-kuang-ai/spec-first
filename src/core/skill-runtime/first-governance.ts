@@ -1,6 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { bootstrapFirstRuntime } from './first-bootstrap.js';
-import { matchRuntimeArtifactsByChangedFile } from './first-artifact-mapping.js';
+import {
+  BASE_PROJECTION_DOCS,
+  CONDITIONAL_PROJECTION_DOCS,
+  FORMAL_TOPIC_PROJECTION_DOCS,
+  matchRuntimeArtifactsByChangedFile,
+} from './first-artifact-mapping.js';
 import { refreshFirstArtifacts, type FirstRefreshResult } from './first-context.js';
 import {
   getFirstProjectCognitionUpdatesPath,
@@ -26,6 +31,11 @@ export interface ProjectCognitionWritebackResult {
   gateStatus: ProjectCognitionGateStatus;
   gateReason: string;
   updatedAssets: string[];
+  updatedRuntimeAssets: string[];
+  updatedBaseDocs: string[];
+  updatedTopicDocs: string[];
+  updatedConditionalDocs: string[];
+  conditionalStatuses: Record<string, 'healthy' | 'not_applicable' | 'degraded'>;
   writebackMode?: 'bootstrap' | 'refresh-all' | 'refresh-docs-from-runtime';
   refreshResult?: FirstRefreshResult;
   writebackPerformed: boolean;
@@ -170,6 +180,37 @@ function inferProjectCognitionMemoryMetadata(
   };
 }
 
+function partitionUpdatedDocs(updatedAssets: string[]): {
+  updatedRuntimeAssets: string[];
+  updatedBaseDocs: string[];
+  updatedTopicDocs: string[];
+  updatedConditionalDocs: string[];
+} {
+  return {
+    updatedRuntimeAssets: updatedAssets.filter((asset) => asset.endsWith('.json')),
+    updatedBaseDocs: updatedAssets.filter((asset) =>
+      BASE_PROJECTION_DOCS.includes(asset as (typeof BASE_PROJECTION_DOCS)[number])
+    ),
+    updatedTopicDocs: updatedAssets.filter((asset) =>
+      FORMAL_TOPIC_PROJECTION_DOCS.includes(asset as (typeof FORMAL_TOPIC_PROJECTION_DOCS)[number])
+    ),
+    updatedConditionalDocs: updatedAssets.filter((asset) =>
+      CONDITIONAL_PROJECTION_DOCS.includes(asset as (typeof CONDITIONAL_PROJECTION_DOCS)[number])
+    ),
+  };
+}
+
+function readConditionalStatuses(projectRoot: string): Record<string, 'healthy' | 'not_applicable' | 'degraded'> {
+  const index = readFirstRuntimeIndex(projectRoot);
+  if (!index) {
+    return {};
+  }
+
+  return {
+    databaseSchema: index.databaseSchema.status,
+  };
+}
+
 export function analyzeProjectCognitionDiff(
   projectRoot: string,
   triggerStage: Stage.WRAP_UP | Stage.DONE
@@ -191,7 +232,7 @@ export function analyzeProjectCognitionDiff(
 
 function ensureFirstRuntime(projectRoot: string): 'bootstrap' | undefined {
   if (readFirstRuntimeIndex(projectRoot)) return undefined;
-  bootstrapFirstRuntime(projectRoot, { mode: 'quick' });
+  bootstrapFirstRuntime(projectRoot, {});
   return 'bootstrap';
 }
 
@@ -223,7 +264,9 @@ export function applyProjectCognitionWriteback(
       if (diff.decision === 'must_update') {
         writebackMode = 'refresh-all';
         refreshResult = refreshFirstArtifacts(projectRoot, 'refresh-all');
-        updatedAssets = refreshResult.runtimeArtifacts;
+        updatedAssets = Array.from(
+          new Set([...refreshResult.runtimeArtifacts, ...refreshResult.docsProjections])
+        );
         writebackPerformed =
           writebackPerformed ||
           refreshResult.runtimeArtifacts.length > 0 ||
@@ -253,6 +296,8 @@ export function applyProjectCognitionWriteback(
   }
 
   const memoryMetadata = inferProjectCognitionMemoryMetadata(diff, updatedAssets);
+  const partitioned = partitionUpdatedDocs(updatedAssets);
+  const conditionalStatuses = readConditionalStatuses(projectRoot);
 
   writeLog(getFirstProjectCognitionUpdatesPath(projectRoot), {
     event: 'project_cognition_update',
@@ -263,6 +308,11 @@ export function applyProjectCognitionWriteback(
     gateReason,
     changedFiles: diff.changedFiles,
     updatedAssets,
+    updatedRuntimeAssets: partitioned.updatedRuntimeAssets,
+    updatedBaseDocs: partitioned.updatedBaseDocs,
+    updatedTopicDocs: partitioned.updatedTopicDocs,
+    updatedConditionalDocs: partitioned.updatedConditionalDocs,
+    conditionalStatuses,
     evidence: diff.evidence,
     writebackMode,
     writebackPerformed,
@@ -276,6 +326,11 @@ export function applyProjectCognitionWriteback(
     gateStatus,
     gateReason,
     updatedAssets,
+    updatedRuntimeAssets: partitioned.updatedRuntimeAssets,
+    updatedBaseDocs: partitioned.updatedBaseDocs,
+    updatedTopicDocs: partitioned.updatedTopicDocs,
+    updatedConditionalDocs: partitioned.updatedConditionalDocs,
+    conditionalStatuses,
     writebackMode,
     refreshResult,
     writebackPerformed,

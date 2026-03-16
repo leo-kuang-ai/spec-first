@@ -1,11 +1,11 @@
 ---
 name: "spec-first:init"
-description: "初始化 Feature 工作区，收集参数并生成阶段状态文件。触发场景：(1) 用户说 'init'、'初始化'、'创建 Feature'、'新建需求'，(2) 执行 /spec-first:init 命令，(3) 需要开始新的 Feature 开发时，(4) 项目已完成 first 认知后的首个 Feature 创建"
+description: "统一初始化入口：自动识别项目状态（新项目 / 存量项目 / Feature 创建），路由到对应轨道。触发场景：(1) 用户说 'init'、'初始化'、'创建 Feature'、'新建需求'，(2) 执行 /spec-first:init 命令，(3) 首次接入 spec-first，(4) 创建新 Feature 需求"
 ---
 
 # Skill: init
 
-初始化 Feature 工作区，收集参数并生成阶段状态文件。
+统一初始化入口，自动检测项目状态并路由到对应轨道。
 
 - Command: `/spec-first:init`
 
@@ -13,13 +13,52 @@ description: "初始化 Feature 工作区，收集参数并生成阶段状态文
 
 本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)。
 
-初始化完成后输出：
-- `backgroundInputStatus`: 背景输入完整度（full/degraded/blind）
-- `background_input_status`: 文档输出字段名
+## 五轨道自动路由
+
+`spec-first init` 根据项目当前状态自动识别并路由到五条轨道之一：
+
+| 轨道 | 触发条件 | 主要动作 |
+|------|---------|---------|
+| `no-git` | `.git` 不存在 | 输出 git init 指引，退出 |
+| `project-onboarding` | `.spec-first` 不存在、`meta/config.yaml` 缺失、或 00-first 未完成 | 引导运行 `first` skill |
+| `feature-init-blocked` | 00-first 未完成且携带 `--feat` 参数 | 明确报错，阻止创建 Feature |
+| `brownfield-baseline` | 存量项目（≥50 源码文件）且尚无基线 Feature | 交互式引导创建 `FSREQ-19700101-LEGACY-BASELINE` |
+| `feature-init` | 健康项目 + 基线已就绪（或 greenfield） | 收集参数并创建新 Feature |
+
+可通过 `--track <project|baseline|feature>` 显式覆盖自动路由。
 
 ## 执行流程
 
-- **P0**: 前置检查 - 详见 [prerequisites.md](references/prerequisites.md)
+### no-git 轨道
+
+1. 输出 git init 操作指引
+2. 退出，等待用户完成后重新运行 `/spec-first:init`
+
+### project-onboarding 轨道
+
+1. 检测缺失项（git / .spec-first / first runtime）
+2. 输出具体的补救命令（`/spec-first:first --quick`）
+3. 退出，等待用户完成前置步骤后重新运行 `/spec-first:init`
+
+### feature-init-blocked 轨道
+
+1. 检测到 `--feat` 参数但 first runtime 不健康
+2. 输出明确错误，引导用户先运行 `/spec-first:first`
+3. 退出，等待用户完成后重新运行 `/spec-first:init`
+
+### brownfield-baseline 轨道
+
+1. 提示用户存量项目尚无基线
+2. 显示将创建的 baseline Feature 参数（featureId: `FSREQ-19700101-LEGACY-BASELINE`，mode: I，size: M）
+3. 提供三个选项：
+   - **[y] 创建基线**：自动生成 baseline Feature，含 `prd.md`（已上线能力摘要）和 `task_plan.md`（基线补齐）
+   - **[s] 跳过**：写入 `baselineSkipped: true` 到 `.spec-first/meta/config.yaml`，下次直接进入 feature-init
+   - **[n] 退出**：取消操作
+4. 创建基线后，提示用户完成 `prd.md` 盘点，然后再运行 `/spec-first:init` 创建业务 Feature
+
+### feature-init 轨道
+
+- **P0**: 显示 00-first 摘要（技术栈/代码量/API 端点）
 - **P1**: 读取平台列表 - 扫描 `.spec-first/layer2/*.yaml`
   - ⚠️ 若目录不存在或为空，引导创建平台 YAML - 详见 [platform-yaml-template.md](references/platform-yaml-template.md)
   - **关键**：必须使用 `platform:` 字段（不是 `name:`），这是 CLI 校验的硬性要求
@@ -35,6 +74,8 @@ description: "初始化 Feature 工作区，收集参数并生成阶段状态文
 - `platforms`: 必须来自 `.spec-first/layer2/*.yaml`
 - `mode`: N/I，默认 N
 - `size`: S/M/L，默认 M
+
+**Mode I 特性**：Mode I Feature 初始化时额外生成 `impact-analysis.md`（变更影响分析模板）。
 
 ## 交互要求
 
@@ -54,6 +95,7 @@ description: "初始化 Feature 工作区，收集参数并生成阶段状态文
 - **禁止删除 Feature 目录**
 - **中断恢复**：继续完成初始化，不删除已有内容
 - **空 PRD 处理**：引导用户填充，不判定为"无用 Feature"
+- **基线去重**：`FSREQ-19700101-LEGACY-BASELINE` 已存在时不重复创建
 
 ## 成功标准
 

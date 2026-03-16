@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastRun": "2026-03-16T05:58:29.109Z",
+  "lastRun": "2026-03-16T06:25:11.494Z",
   "sourceCommit": "143ce2e2f98a8942fc0d47b44d815f2da289ebe9",
   "mode": "deep",
   "summary": {
@@ -11,13 +11,13 @@
   },
   "roleViews": {
     "path": ".spec-first/runtime/first/role-views.json",
-    "fileHash": "5861f5e833d2b0c2b3e837b98b00d1ab03e96068d62f19c149bab99203d8d6cb",
+    "fileHash": "63c821192e872592f13bedc06684dabe138ac07762773a14871bc72c3150a64e",
     "lastUpdated": "2026-03-16T04:32:50.220Z",
     "healthy": true
   },
   "stageViews": {
     "path": ".spec-first/runtime/first/stage-views.json",
-    "fileHash": "5ec1437102efa1df1605286c1a4cd3f3e595eed94eb18d951a7f127715caa19c",
+    "fileHash": "cbae3af40841aece9d9ea81b9c7c7905ba05c40a483c1e1fdf493565c0149c3b",
     "lastUpdated": "2026-03-16T04:32:50.220Z",
     "healthy": true
   },

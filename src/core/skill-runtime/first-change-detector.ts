@@ -10,20 +10,23 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { PRODUCT_NAMES } from './first-args.js';
-import { getFirstRuntimeDir, readFirstRuntimeIndex } from './first-runtime-store.js';
-import { sha256Hex } from '../../shared/crypto-utils.js';
 import {
   CANONICAL_PROJECTION_DOCS,
   collectProjectionDocsForChangedFiles,
+
   matchArtifactsByChangedFile,
   matchRuntimeArtifactsByChangedFile,
 } from './first-artifact-mapping.js';
+import {
+  getFirstRuntimeDir,
+  readFirstRuntimeIndex,
+} from './first-runtime-store.js';
+import { sha256Hex } from '../../shared/crypto-utils.js';
 import { logFirstRuntimeWarning, toErrorMessage } from './first-runtime-observability.js';
 
 const GIT_COMMAND_TIMEOUT_MS = 5_000;
 const CHANGE_THRESHOLD = 0.3;
-const ALL_ARTIFACTS = PRODUCT_NAMES.map((name) => (name === 'README' ? 'README.md' : `${name}.md`));
+const ALL_ARTIFACTS = CANONICAL_PROJECTION_DOCS.map((docPath) => docPath.replace(/^docs\/first\//, ''));
 
 export type UpdateStrategy = 'incremental' | 'full' | 'skip';
 
@@ -235,6 +238,10 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     { name: 'change-map.json', entry: runtimeIndex?.changeMap },
     { name: 'entry-guide.json', entry: runtimeIndex?.entryGuide },
     { name: 'reboot-guide.json', entry: runtimeIndex?.rebootGuide },
+    { name: 'api-contracts.json', entry: runtimeIndex?.apiContracts },
+    { name: 'structure-overview.json', entry: runtimeIndex?.structureOverview },
+    { name: 'domain-model.json', entry: runtimeIndex?.domainModel },
+    { name: 'database-schema.json', entry: runtimeIndex?.databaseSchema },
   ];
   const docsProjectionAssets = CANONICAL_PROJECTION_DOCS.map((docPath) => ({
     name: docPath,
@@ -248,24 +255,43 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
       const issues: HealthIssue[] = [];
       let currentHash: string | undefined;
 
-      if (!assetExists) {
+      const conditionalStatus =
+        name === 'database-schema.json' && entry && 'status' in entry
+          ? entry.status
+          : undefined;
+
+      if (!assetExists && conditionalStatus !== 'not_applicable') {
         issues.push({ type: 'missing', message: 'runtime 资产文件不存在' });
       } else {
-        currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
+        if (assetExists) {
+          currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
+        }
       }
 
       if (!entry) {
         issues.push({ type: 'missing', message: 'runtime 索引记录缺失' });
       }
 
-      if (entry?.healthy === false) {
+      if (entry?.healthy === false && conditionalStatus !== 'not_applicable') {
         issues.push({
           type: 'format_error',
           message: entry.issues?.join('；') || 'runtime 资产状态异常',
         });
       }
 
-      if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
+      if (conditionalStatus === 'degraded') {
+        issues.push({
+          type: 'format_error',
+          message: entry?.issues?.join('；') || '条件型 runtime 资产处于 degraded 状态',
+        });
+      }
+
+      if (
+        conditionalStatus !== 'not_applicable' &&
+        entry?.fileHash &&
+        currentHash &&
+        entry.fileHash !== currentHash
+      ) {
         issues.push({
           type: 'hash_mismatch',
           message: 'runtime 资产与索引记录不一致（可能被手动修改）',
@@ -361,7 +387,7 @@ export function formatHealthStatus(context: FirstUpdateContext): string {
   const lines: string[] = [];
 
   if (!context.hasExistingOutput) {
-    return '✅ 未检测到已有产物，将执行首次生成。仅检查 runtime truth + canonical projection docs，legacy docs 不在 health 范围内。\n';
+    return '✅ 未检测到已有产物，将执行首次生成。仅检查 runtime truth + canonical projection docs，未注册 docs 不在 health 范围内。\n';
   }
 
   lines.push('📋 **检测到已有产物**');

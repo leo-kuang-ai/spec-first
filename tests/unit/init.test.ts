@@ -369,3 +369,30 @@ describe('init', () => {
     expect(existsSync(join(specsDir, '.feat-registry.lock'))).toBe(false);
   });
 });
+
+// ─────────────────────────────────────────────
+// Task 6: impact-analysis.md for Mode I
+// ─────────────────────────────────────────────
+
+describe('init - impact-analysis', () => {
+  it('mode I should generate impact-analysis.md in the feature directory', () => {
+    const result = init(baseOpts({ mode: 'I', feat: 'ITER' }));
+    const impactPath = join(result.featureDir, 'impact-analysis.md');
+    expect(existsSync(impactPath)).toBe(true);
+  });
+
+  it('mode N should NOT generate impact-analysis.md', () => {
+    const result = init(baseOpts({ mode: 'N', feat: 'NEW1' }));
+    const impactPath = join(result.featureDir, 'impact-analysis.md');
+    expect(existsSync(impactPath)).toBe(false);
+  });
+
+  it('mode I non-baseline feature also gets impact-analysis.md', () => {
+    const result = init(baseOpts({ mode: 'I', feat: 'UIOPT', title: 'UI Optimization' }));
+    const impactPath = join(result.featureDir, 'impact-analysis.md');
+    expect(existsSync(impactPath)).toBe(true);
+    // Other skeleton files should still exist
+    expect(existsSync(join(result.featureDir, 'prd.md'))).toBe(true);
+    expect(existsSync(join(result.featureDir, 'task_plan.md'))).toBe(true);
+  });
+});
