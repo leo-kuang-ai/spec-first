@@ -3,7 +3,7 @@ import { REQUIRED_MCP_SERVERS } from '../config/bootstrap-manifest.js';
 
 function collectMcpServers(
   root: Record<string, unknown>,
-  keys: readonly string[],
+  keys: readonly string[]
 ): Record<string, unknown> {
   const collected: Record<string, unknown> = {};
 

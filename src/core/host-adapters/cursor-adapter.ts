@@ -11,7 +11,7 @@ export class CursorAdapter implements HostAdapter {
   detect(paths: HostPaths = detectHostPaths()): boolean {
     return Boolean(
       (paths.cursorHomeDir && existsSync(paths.cursorHomeDir)) ||
-        (paths.cursorConfigDir && existsSync(paths.cursorConfigDir))
+      (paths.cursorConfigDir && existsSync(paths.cursorConfigDir))
     );
   }
 

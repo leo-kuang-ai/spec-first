@@ -174,7 +174,9 @@ function extractFrontmatterBlock(content: string): FrontmatterBlock | undefined 
   if (end < 0) return undefined;
 
   const bodyStart = end + '\n---'.length;
-  const body = content.startsWith('\n', bodyStart) ? content.slice(bodyStart + 1) : content.slice(bodyStart);
+  const body = content.startsWith('\n', bodyStart)
+    ? content.slice(bodyStart + 1)
+    : content.slice(bodyStart);
   return {
     raw: content.slice(0, bodyStart),
     body,

@@ -11,7 +11,7 @@ export class GeminiAdapter implements HostAdapter {
   detect(paths: HostPaths = detectHostPaths()): boolean {
     return Boolean(
       (paths.geminiHomeDir && existsSync(paths.geminiHomeDir)) ||
-        (paths.geminiConfigDir && existsSync(paths.geminiConfigDir))
+      (paths.geminiConfigDir && existsSync(paths.geminiConfigDir))
     );
   }
 

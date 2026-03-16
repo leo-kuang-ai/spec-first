@@ -273,11 +273,7 @@ export function advance(
 
   if (!_options.skipProjectCognitionGovernance) {
     const governanceTriggerStage =
-      from === Stage.WRAP_UP
-        ? Stage.WRAP_UP
-        : finalTo === Stage.DONE
-          ? Stage.DONE
-          : undefined;
+      from === Stage.WRAP_UP ? Stage.WRAP_UP : finalTo === Stage.DONE ? Stage.DONE : undefined;
     if (governanceTriggerStage) {
       try {
         const governance = applyProjectCognitionWriteback(
@@ -285,11 +281,7 @@ export function advance(
           projectRoot,
           governanceTriggerStage
         );
-        appendFindings(
-          featureId,
-          projectRoot,
-          formatProjectCognitionWritebackFinding(governance)
-        );
+        appendFindings(featureId, projectRoot, formatProjectCognitionWritebackFinding(governance));
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         appendFindings(featureId, projectRoot, `PROJECT_COGNITION_BLOCKED: ${message}`);

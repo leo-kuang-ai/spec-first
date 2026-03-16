@@ -281,7 +281,9 @@ function resolveSkillAssetContract(skillName: string): SkillAssetContract {
 
 function readRuntimeAssetSnapshot(projectRoot: string): RuntimeAssetSnapshot {
   const availableAssets = new Set<RuntimeAssetName>();
-  const summary = hasHealthyRuntimeSummary(projectRoot) ? buildFirstSummaryLite(projectRoot) : undefined;
+  const summary = hasHealthyRuntimeSummary(projectRoot)
+    ? buildFirstSummaryLite(projectRoot)
+    : undefined;
   if (summary) availableAssets.add('summary');
 
   const roleViewSummary = hasHealthyRuntimeRoleViews(projectRoot)
@@ -289,34 +291,38 @@ function readRuntimeAssetSnapshot(projectRoot: string): RuntimeAssetSnapshot {
     : undefined;
   if (roleViewSummary) availableAssets.add('role-views');
 
-  const stageViews = hasHealthyRuntimeStageViews(projectRoot) ? readFirstStageViews(projectRoot) : undefined;
+  const stageViews = hasHealthyRuntimeStageViews(projectRoot)
+    ? readFirstStageViews(projectRoot)
+    : undefined;
   if (stageViews) availableAssets.add('stage-views');
 
-  const steering = hasHealthyRuntimeSteering(projectRoot) ? readFirstSteering(projectRoot) ?? undefined : undefined;
+  const steering = hasHealthyRuntimeSteering(projectRoot)
+    ? (readFirstSteering(projectRoot) ?? undefined)
+    : undefined;
   if (steering) availableAssets.add('steering');
 
   const conventions = hasHealthyRuntimeConventions(projectRoot)
-    ? readFirstConventions(projectRoot) ?? undefined
+    ? (readFirstConventions(projectRoot) ?? undefined)
     : undefined;
   if (conventions) availableAssets.add('conventions');
 
   const criticalFlows = hasHealthyRuntimeCriticalFlows(projectRoot)
-    ? readFirstCriticalFlows(projectRoot) ?? undefined
+    ? (readFirstCriticalFlows(projectRoot) ?? undefined)
     : undefined;
   if (criticalFlows) availableAssets.add('critical-flows');
 
   const changeMap = hasHealthyRuntimeChangeMap(projectRoot)
-    ? readFirstChangeMap(projectRoot) ?? undefined
+    ? (readFirstChangeMap(projectRoot) ?? undefined)
     : undefined;
   if (changeMap) availableAssets.add('change-map');
 
   const entryGuide = hasHealthyRuntimeEntryGuide(projectRoot)
-    ? readFirstEntryGuide(projectRoot) ?? undefined
+    ? (readFirstEntryGuide(projectRoot) ?? undefined)
     : undefined;
   if (entryGuide) availableAssets.add('entry-guide');
 
   const rebootGuide = hasHealthyRuntimeRebootGuide(projectRoot)
-    ? readFirstRebootGuide(projectRoot) ?? undefined
+    ? (readFirstRebootGuide(projectRoot) ?? undefined)
     : undefined;
   if (rebootGuide) availableAssets.add('reboot-guide');
 
@@ -341,7 +347,9 @@ function buildRuntimeSlices(
 ): Pick<ResolvedSkillContext, 'required' | 'optional' | 'missingRequiredAssets'> {
   const required: ResolvedSkillContext['required'] = {};
   const optional: ResolvedSkillContext['optional'] = {};
-  const missingRequiredAssets = contract.required.filter((asset) => !snapshot.availableAssets.has(asset));
+  const missingRequiredAssets = contract.required.filter(
+    (asset) => !snapshot.availableAssets.has(asset)
+  );
   const allowedTaskCategories = SKILL_TASK_CATEGORIES[skillName];
   const allowedChangeTypes = allowedTaskCategories?.flatMap(
     (category) => TASK_CATEGORY_TO_CHANGE_TYPES[category] ?? []
@@ -349,19 +357,23 @@ function buildRuntimeSlices(
 
   for (const asset of contract.required) {
     if (asset === 'steering' && snapshot.steering) required.steering = snapshot.steering;
-    if (asset === 'conventions' && snapshot.conventions) required.conventions = snapshot.conventions;
+    if (asset === 'conventions' && snapshot.conventions)
+      required.conventions = snapshot.conventions;
     if (asset === 'critical-flows' && snapshot.criticalFlows) {
       required.criticalFlows = snapshot.criticalFlows;
     }
     if (asset === 'change-map' && snapshot.changeMap) required.changeMap = snapshot.changeMap;
     if (asset === 'entry-guide' && snapshot.entryGuide) required.entryGuide = snapshot.entryGuide;
-    if (asset === 'reboot-guide' && snapshot.rebootGuide) required.rebootGuide = snapshot.rebootGuide;
+    if (asset === 'reboot-guide' && snapshot.rebootGuide)
+      required.rebootGuide = snapshot.rebootGuide;
   }
 
   for (const asset of contract.optional) {
     if (asset === 'steering' && snapshot.steering) optional.steering = snapshot.steering;
-    if (asset === 'conventions' && snapshot.conventions) optional.conventions = snapshot.conventions;
-    if (asset === 'critical-flows' && snapshot.criticalFlows) optional.criticalFlows = snapshot.criticalFlows;
+    if (asset === 'conventions' && snapshot.conventions)
+      optional.conventions = snapshot.conventions;
+    if (asset === 'critical-flows' && snapshot.criticalFlows)
+      optional.criticalFlows = snapshot.criticalFlows;
     if (asset === 'change-map' && snapshot.changeMap) {
       optional.changeMap = allowedChangeTypes
         ? snapshot.changeMap.filter((entry) => allowedChangeTypes.includes(entry.changeType))
@@ -372,7 +384,8 @@ function buildRuntimeSlices(
         ? snapshot.entryGuide.filter((entry) => allowedTaskCategories.includes(entry.taskCategory))
         : snapshot.entryGuide;
     }
-    if (asset === 'reboot-guide' && snapshot.rebootGuide) optional.rebootGuide = snapshot.rebootGuide;
+    if (asset === 'reboot-guide' && snapshot.rebootGuide)
+      optional.rebootGuide = snapshot.rebootGuide;
   }
 
   return { required, optional, missingRequiredAssets };
@@ -452,7 +465,9 @@ export function resolveSkillContext(
   const contract = resolveSkillAssetContract(skillName);
   const runtimeSlices = buildRuntimeSlices(snapshot, contract, skillName);
   const fallbackWarning = buildFallbackWarning(runtimeSlices.missingRequiredAssets);
-  const stageViews = hasHealthyRuntimeStageViews(projectRoot) ? readFirstStageViews(projectRoot) : undefined;
+  const stageViews = hasHealthyRuntimeStageViews(projectRoot)
+    ? readFirstStageViews(projectRoot)
+    : undefined;
 
   if (
     runtimeSlices.missingRequiredAssets.length === 0 &&

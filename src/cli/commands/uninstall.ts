@@ -20,7 +20,9 @@ export function handleUninstall(args: string[]): number {
     console.log('选项:');
     console.log('  --dry-run     仅输出将清理的内容，不执行删除');
     console.log('  --keep-mcp    保留 MCP 配置（sequential-thinking 等为通用服务）');
-    console.log('  --host <target> 仅清理指定宿主（claude|codex|gemini|cursor|all，可多次/逗号分隔）');
+    console.log(
+      '  --host <target> 仅清理指定宿主（claude|codex|gemini|cursor|all，可多次/逗号分隔）'
+    );
     return ExitCode.SUCCESS;
   }
 
@@ -312,7 +314,10 @@ function parseHostTargets(args: string[]): { hosts?: HostId[]; fullUninstall: bo
       throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）');
     }
     i += 1;
-    for (const part of raw.split(',').map((item) => item.trim()).filter(Boolean)) {
+    for (const part of raw
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)) {
       if (part === 'all') {
         return { fullUninstall: true };
       }

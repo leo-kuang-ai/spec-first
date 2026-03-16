@@ -123,9 +123,7 @@ function runBootstrapIfEnabled(shouldBootstrap: boolean): number | undefined {
 
 function printBootstrapHostStatus(): void {
   const statuses = resolveHostAdapterStatuses();
-  const stableHosts = statuses.filter(
-    (entry) => entry.id === 'claude' || entry.id === 'codex'
-  );
+  const stableHosts = statuses.filter((entry) => entry.id === 'claude' || entry.id === 'codex');
   const experimentalHosts = statuses.filter(
     (entry) =>
       (entry.id === 'gemini' || entry.id === 'cursor') &&
@@ -137,8 +135,7 @@ function printBootstrapHostStatus(): void {
   if (stableHosts.length > 0) {
     console.log('宿主基线状态：');
     for (const entry of stableHosts) {
-      const missing =
-        entry.missingBaseline.length > 0 ? entry.missingBaseline.join('+') : '(none)';
+      const missing = entry.missingBaseline.length > 0 ? entry.missingBaseline.join('+') : '(none)';
       console.log(
         `  ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, missing=${missing}`
       );
@@ -152,8 +149,7 @@ function printBootstrapHostStatus(): void {
   if (experimentalHosts.length > 0) {
     console.log('实验宿主提示：');
     for (const entry of experimentalHosts) {
-      const missing =
-        entry.missingBaseline.length > 0 ? entry.missingBaseline.join('+') : '(none)';
+      const missing = entry.missingBaseline.length > 0 ? entry.missingBaseline.join('+') : '(none)';
       console.log(
         `  ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, missing=${missing}`
       );
@@ -807,8 +803,12 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  1. 否 - 仅项目内初始化');
     console.log('  2. 是 - 包含宿主环境检查（推荐）');
     const bootstrapInput = (await rl.question('\n请输入 [1/2]（默认：2）: ')).trim();
-    const bootstrap = bootstrapInput === '' || bootstrapInput === '2' || isConfirmed(bootstrapInput);
-    printStepConfirm('Bootstrap', bootstrap ? '是 - 包含宿主环境检查（推荐）' : '否（仅项目内初始化）');
+    const bootstrap =
+      bootstrapInput === '' || bootstrapInput === '2' || isConfirmed(bootstrapInput);
+    printStepConfirm(
+      'Bootstrap',
+      bootstrap ? '是 - 包含宿主环境检查（推荐）' : '否（仅项目内初始化）'
+    );
 
     // 最终确认
     console.log('\n  ---');

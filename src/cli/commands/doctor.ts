@@ -330,7 +330,9 @@ function checkToolPolicies(): CheckResult[] {
       name: `Tool Policy:${host}:${scenario}`,
       level: hasPrimary ? 'PASS' : 'WARNING',
       message: `primary=${primary}; fallback=${fallback}`,
-      fix: hasPrimary ? undefined : '请检查 Tool Registry / Capability Matrix / Selection Policy 配置',
+      fix: hasPrimary
+        ? undefined
+        : '请检查 Tool Registry / Capability Matrix / Selection Policy 配置',
     };
   });
 }
@@ -520,7 +522,9 @@ function mapBootstrapResult(entry: {
     return {
       name: `${entry.host} ${entry.category}:${entry.name}${baseline}`,
       level: 'WARNING',
-      message: entry.impact ? `已自动修复（${entry.detail}）；影响：${entry.impact}` : `已自动修复（${entry.detail}）`,
+      message: entry.impact
+        ? `已自动修复（${entry.detail}）；影响：${entry.impact}`
+        : `已自动修复（${entry.detail}）`,
     };
   }
   if (entry.level === 'WARNING') {

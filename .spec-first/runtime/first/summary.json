@@ -1,39 +1,50 @@
 {
-  "project_name": "spec-first",
-  "project_type": "cli",
-  "end_type": "backend",
-  "language": "typescript",
-  "framework": "native",
+  "generatedAt": "2026-03-16T04:32:50.219Z",
   "mode": "deep",
-  "generated_at": "2026-03-16",
-  "artifacts_generated": 10,
-  "artifacts_quick": 5,
-  "artifacts_deep": 5,
-  "has_database": false,
-  "evidence_coverage": {
-    "core_conclusions": "100%",
-    "inferential": ">=60%"
+  "project": {
+    "name": "spec-first",
+    "overview": "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams"
   },
-  "key_findings": [
-    "Spec-First 是面向 AI 时代的规范驱动研发流程引擎",
-    "采用 8 阶段状态机 + 2 终态的生命周期管理",
-    "支持 14 类追溯 ID 的全链路追踪",
-    "提供 20 个 Skill 覆盖完整研发流程",
-    "三层规范体系：基线 + Mode×Size 裁剪 + 端特有规范",
-    "四层架构：Skill 层 → CLI 层 → Core 层 → Shared 层",
-    "19 条 Gate 条件（16 blocking + 3 warning）",
-    "5 项覆盖率指标：C3/C4/C6/C8/C9"
+  "techStack": [
+    "runtime: Node.js >=20.0.0",
+    "language: TypeScript",
+    "package-manager: pnpm",
+    "testing: Vitest",
+    "build: tsup"
   ],
-  "call_chains_analyzed": [
-    "CLI 启动链",
-    "Feature 初始化链",
-    "Stage 推进链",
-    "Gate 校验链",
-    "ID 追溯链",
-    "Skill 分发链"
+  "modules": [
+    "src/cli",
+    "src/config",
+    "src/core",
+    "src/postinstall.ts",
+    "src/preuninstall.ts",
+    "src/shared"
   ],
-  "dependencies": {
-    "runtime": 4,
-    "dev": 12
-  }
+  "capabilities": [
+    "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams"
+  ],
+  "entryPoints": [
+    "dist/cli/index.js",
+    "src/cli/index.ts"
+  ],
+  "dataModels": [
+    "Feature",
+    "StageState"
+  ],
+  "apiSurface": [
+    "CLI: spec-first"
+  ],
+  "risks": [
+    "项目端类型待确认"
+  ],
+  "evidence": [
+    "package.json",
+    "tsconfig.json",
+    "vitest.config.ts",
+    "dist/cli/index.js",
+    "src/cli/index.ts",
+    "src/cli",
+    "src/config",
+    "src/core"
+  ]
 }

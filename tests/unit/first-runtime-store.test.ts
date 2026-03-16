@@ -44,6 +44,8 @@ import {
   writeFirstRebootGuide,
   writeFirstSteering,
   writeFirstStageViews,
+  assertValidFirstRuntimePath,
+  validateFirstRuntimePath,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
 import type {
   FirstConventions,
@@ -375,6 +377,23 @@ describe('first runtime store', () => {
     expect(readFirstChangeMap(TEST_ROOT)).toEqual(changeMap);
     expect(readFirstEntryGuide(TEST_ROOT)).toEqual(entryGuide);
     expect(readFirstRebootGuide(TEST_ROOT)).toEqual(rebootGuide);
+
+    const rawJsonPaths = [
+      getFirstRuntimeIndexPath(TEST_ROOT),
+      getFirstRuntimeSummaryPath(TEST_ROOT),
+      getFirstRoleViewsPath(TEST_ROOT),
+      getFirstStageViewsPath(TEST_ROOT),
+      getFirstSteeringPath(TEST_ROOT),
+      getFirstConventionsPath(TEST_ROOT),
+      getFirstCriticalFlowsPath(TEST_ROOT),
+      getFirstChangeMapPath(TEST_ROOT),
+      getFirstEntryGuidePath(TEST_ROOT),
+      getFirstRebootGuidePath(TEST_ROOT),
+    ];
+
+    for (const path of rawJsonPaths) {
+      expect(() => JSON.parse(readFileSync(path, 'utf-8'))).not.toThrow();
+    }
   });
 
   it('returns null for missing or invalid json files', () => {
@@ -483,6 +502,41 @@ describe('first runtime store', () => {
     expect(existsSync(getFirstRuntimeDir(TEST_ROOT))).toBe(true);
     expect(JSON.parse(readFileSync(getFirstRuntimeSummaryPath(TEST_ROOT), 'utf8'))).toMatchObject({
       project: { name: 'spec-first' },
+    });
+  });
+
+  describe('validateFirstRuntimePath', () => {
+    it('returns true for valid runtime paths', () => {
+      expect(validateFirstRuntimePath('/project/.spec-first/runtime/first/summary.json')).toBe(true);
+      expect(validateFirstRuntimePath('.spec-first/runtime/first/index.json')).toBe(true);
+      expect(validateFirstRuntimePath('/absolute/path/.spec-first/runtime/first/role-views.json')).toBe(true);
+      expect(validateFirstRuntimePath('C:\\project\\.spec-first\\runtime\\first\\summary.json')).toBe(true);
+    });
+
+    it('returns false for invalid paths', () => {
+      // Common typo: .config-first instead of .spec-first
+      expect(validateFirstRuntimePath('/project/.config-first/runtime/first/summary.json')).toBe(false);
+      expect(validateFirstRuntimePath('.config-first/runtime/first/index.json')).toBe(false);
+      // Missing runtime segment
+      expect(validateFirstRuntimePath('/project/.spec-first/summary.json')).toBe(false);
+      // Wrong directory name
+      expect(validateFirstRuntimePath('/project/.spec-first/runtime/second/summary.json')).toBe(false);
+      // Prefix collision should not be treated as the canonical runtime dir
+      expect(validateFirstRuntimePath('/project/.spec-first/runtime/first-backup/summary.json')).toBe(false);
+      expect(validateFirstRuntimePath('/project/.spec-first/runtime/first-old/index.json')).toBe(false);
+      // Path traversal should not normalize into a valid target accidentally
+      expect(validateFirstRuntimePath('/project/.spec-first/runtime/first/../shadow/summary.json')).toBe(false);
+    });
+  });
+
+  describe('assertValidFirstRuntimePath', () => {
+    it('throws for invalid runtime targets that only partially match the canonical dir', () => {
+      expect(() =>
+        assertValidFirstRuntimePath('/project/.spec-first/runtime/first-backup/summary.json')
+      ).toThrow(/Invalid First Runtime path/);
+      expect(() =>
+        assertValidFirstRuntimePath('/project/.config-first/runtime/first/summary.json')
+      ).toThrow(/Invalid First Runtime path/);
     });
   });
 });

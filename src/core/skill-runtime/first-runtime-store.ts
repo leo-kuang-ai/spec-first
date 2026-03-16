@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename, join, posix } from 'node:path';
 import { readJson, writeJson } from '../../shared/fs-utils.js';
 import { logFirstRuntimeWarning, toErrorMessage } from './first-runtime-observability.js';
 import type {
@@ -160,7 +160,42 @@ function readRuntimeJson<T>(path: string): T | null {
   }
 }
 
+/**
+ * 校验路径是否为有效的 First Runtime 路径
+ * 防止因硬编码错误路径导致的文件写入到错误位置
+ * @see docs/first/incident-2026-03-16-json-generation-error.md
+ */
+export function validateFirstRuntimePath(targetPath: string): boolean {
+  const normalizedTarget = posix.normalize(targetPath.replaceAll('\\', '/'));
+  const targetSegments = normalizedTarget.split('/').filter(Boolean);
+  const runtimeSegments = FIRST_RUNTIME_DIR.split('/');
+
+  for (let i = 0; i <= targetSegments.length - runtimeSegments.length; i++) {
+    const matches = runtimeSegments.every((segment, offset) => targetSegments[i + offset] === segment);
+    if (matches) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * 断言路径为有效的 First Runtime 路径，无效时抛出错误
+ */
+export function assertValidFirstRuntimePath(targetPath: string): void {
+  if (!validateFirstRuntimePath(targetPath)) {
+    throw new Error(
+      `Invalid First Runtime path: "${targetPath}". ` +
+        `Expected path to contain "${FIRST_RUNTIME_DIR}". ` +
+        `This error prevents accidental writes to wrong directories (e.g., ".config-first/"). ` +
+        `Use getFirstRuntimeDir(projectRoot) or getFirst*Path(projectRoot) functions to construct paths.`
+    );
+  }
+}
+
 function writeRuntimeJson(path: string, data: unknown): void {
+  assertValidFirstRuntimePath(path);
   try {
     writeJson(path, data);
   } catch (error) {
@@ -689,7 +724,8 @@ export function readFirstConventions(projectRoot: string): FirstConventions | nu
         module: {
           observedPatterns: asStringArray(rawSummary.core_modules),
           deviations: [],
-          recommendedConvention: 'Keep runtime logic under src/core and entry orchestration near src/cli.',
+          recommendedConvention:
+            'Keep runtime logic under src/core and entry orchestration near src/cli.',
           evidence: asStringArray(rawSummary.core_modules),
         },
         testing: {
@@ -697,7 +733,8 @@ export function readFirstConventions(projectRoot: string): FirstConventions | nu
             .map(([key, value]) => `${key}: ${value}`)
             .filter((item) => item.toLowerCase().includes('test')),
           deviations: [],
-          recommendedConvention: 'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
+          recommendedConvention:
+            'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
           evidence: ['vitest.config.ts'],
         },
         projectRules: {
@@ -833,9 +870,6 @@ export function writeFirstEntryGuide(projectRoot: string, entryGuide: FirstEntry
   writeRuntimeJson(getFirstEntryGuidePath(projectRoot), entryGuide);
 }
 
-export function writeFirstRebootGuide(
-  projectRoot: string,
-  rebootGuide: FirstRebootGuide
-): void {
+export function writeFirstRebootGuide(projectRoot: string, rebootGuide: FirstRebootGuide): void {
   writeRuntimeJson(getFirstRebootGuidePath(projectRoot), rebootGuide);
 }

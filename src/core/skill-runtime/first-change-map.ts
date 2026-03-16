@@ -15,7 +15,10 @@ export function buildFirstChangeMap(summary: FirstRuntimeSummary): FirstChangeMa
       likelyModules: [runtimeModule],
       likelyCommands: ['src/cli/commands/first.ts'],
       likelyConfigs: ['package.json'],
-      likelyTests: ['tests/unit/first-runtime-store.test.ts', 'tests/unit/first-runtime-types.test.ts'],
+      likelyTests: [
+        'tests/unit/first-runtime-store.test.ts',
+        'tests/unit/first-runtime-types.test.ts',
+      ],
       riskPoints: ['runtime index drift', 'legacy compatibility regression'],
     },
     {

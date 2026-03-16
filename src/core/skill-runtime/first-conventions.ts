@@ -8,22 +8,33 @@ export function buildFirstConventions(summary: FirstRuntimeSummary): FirstConven
   return {
     api: {
       observedPatterns:
-        summary.apiSurface.length > 0 ? summary.apiSurface : ['CLI surface not explicitly detected'],
+        summary.apiSurface.length > 0
+          ? summary.apiSurface
+          : ['CLI surface not explicitly detected'],
       deviations: [],
       recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.',
-      evidence: uniqueStrings(summary.apiSurface, summary.entryPoints, summary.evidence).slice(0, 5),
+      evidence: uniqueStrings(summary.apiSurface, summary.entryPoints, summary.evidence).slice(
+        0,
+        5
+      ),
     },
     module: {
-      observedPatterns: summary.modules.length > 0 ? summary.modules : ['module boundaries not explicitly detected'],
+      observedPatterns:
+        summary.modules.length > 0
+          ? summary.modules
+          : ['module boundaries not explicitly detected'],
       deviations: [],
-      recommendedConvention: 'Keep runtime logic under src/core and entry orchestration near src/cli.',
+      recommendedConvention:
+        'Keep runtime logic under src/core and entry orchestration near src/cli.',
       evidence: uniqueStrings(summary.modules, summary.entryPoints).slice(0, 5),
     },
     testing: {
-      observedPatterns:
-        summary.techStack?.filter((item) => item.toLowerCase().includes('test')) ?? ['testing stack not explicitly detected'],
+      observedPatterns: summary.techStack?.filter((item) =>
+        item.toLowerCase().includes('test')
+      ) ?? ['testing stack not explicitly detected'],
       deviations: [],
-      recommendedConvention: 'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
+      recommendedConvention:
+        'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
       evidence: uniqueStrings(summary.techStack, summary.evidence).slice(0, 5),
     },
     projectRules: {

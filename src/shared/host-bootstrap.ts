@@ -129,10 +129,10 @@ export function ensureHostBootstrap(options?: BootstrapOptions): BootstrapSummar
         category: 'MCP',
         name: 'config.toml',
         level: 'ERROR',
-          detail: `更新 Codex MCP 配置失败：${(e as Error).message}`,
-          impact: '会导致 Codex 宿主缺失核心 MCP 配置',
-          requiredByDefault: true,
-        });
+        detail: `更新 Codex MCP 配置失败：${(e as Error).message}`,
+        impact: '会导致 Codex 宿主缺失核心 MCP 配置',
+        requiredByDefault: true,
+      });
     }
   }
 
@@ -145,10 +145,10 @@ export function ensureHostBootstrap(options?: BootstrapOptions): BootstrapSummar
         category: 'MCP',
         name: 'mcp config',
         level: 'ERROR',
-          detail: `更新 Claude MCP 配置失败：${(e as Error).message}`,
-          impact: '会导致 Claude Code 宿主缺失核心 MCP 配置',
-          requiredByDefault: true,
-        });
+        detail: `更新 Claude MCP 配置失败：${(e as Error).message}`,
+        impact: '会导致 Claude Code 宿主缺失核心 MCP 配置',
+        requiredByDefault: true,
+      });
     }
   }
 
@@ -429,7 +429,8 @@ function ensureClaudeMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
       detail: fixedNames.has(name) ? '缺失/错误配置已自动修复' : '已配置',
       role: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)?.role,
       impact: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)?.impact,
-      requiredByDefault: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)?.requiredByDefault,
+      requiredByDefault: REQUIRED_MCP_SERVERS.find((entry) => entry.name === name)
+        ?.requiredByDefault,
     });
   }
 
@@ -455,7 +456,13 @@ function ensureRequiredSkills(
     }
     if (shouldIncludeHost(hosts, 'claude')) {
       results.push(
-        copySkill(source, join(paths.claudeSkillsDir, skill.name), 'Claude Code', skill.name, dryRun)
+        copySkill(
+          source,
+          join(paths.claudeSkillsDir, skill.name),
+          'Claude Code',
+          skill.name,
+          dryRun
+        )
       );
     }
   }
@@ -466,21 +473,21 @@ function ensureRequiredSkills(
 function shouldManageGemini(paths: HostPaths): boolean {
   return Boolean(
     process.env.GEMINI_HOME?.trim() ||
-      process.env.GEMINI_CONFIG_DIR?.trim() ||
-      process.env.GEMINI_CLI_HOME?.trim() ||
-      process.env.GEMINI_CLI_CONFIG_DIR?.trim() ||
-      existsSync(paths.geminiHomeDir) ||
-      existsSync(paths.geminiConfigDir)
+    process.env.GEMINI_CONFIG_DIR?.trim() ||
+    process.env.GEMINI_CLI_HOME?.trim() ||
+    process.env.GEMINI_CLI_CONFIG_DIR?.trim() ||
+    existsSync(paths.geminiHomeDir) ||
+    existsSync(paths.geminiConfigDir)
   );
 }
 
 function shouldManageCursor(paths: HostPaths): boolean {
   return Boolean(
     process.env.CURSOR_HOME?.trim() ||
-      process.env.CURSOR_CONFIG_DIR?.trim() ||
-      process.env.CURSOR_USER_HOME?.trim() ||
-      existsSync(paths.cursorHomeDir) ||
-      existsSync(paths.cursorConfigDir)
+    process.env.CURSOR_CONFIG_DIR?.trim() ||
+    process.env.CURSOR_USER_HOME?.trim() ||
+    existsSync(paths.cursorHomeDir) ||
+    existsSync(paths.cursorConfigDir)
   );
 }
 
@@ -497,7 +504,9 @@ function ensureGeminiMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
         category: 'MCP',
         name: filePath,
         level: 'ERROR',
-        detail: loaded.backupPath ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}` : loaded.error,
+        detail: loaded.backupPath
+          ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}`
+          : loaded.error,
         impact: '会导致 Gemini CLI 无法稳定读取 MCP 配置',
         requiredByDefault: false,
       },
@@ -578,7 +587,9 @@ function ensureCursorMcpConfig(paths: HostPaths, dryRun: boolean): BootstrapResu
         category: 'MCP',
         name: filePath,
         level: 'ERROR',
-        detail: loaded.backupPath ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}` : loaded.error,
+        detail: loaded.backupPath
+          ? `${loaded.error}；原文件已备份到 ${loaded.backupPath}`
+          : loaded.error,
         impact: '会导致 Cursor 无法稳定读取 MCP 配置',
         requiredByDefault: false,
       },
@@ -661,7 +672,8 @@ function copySkill(
       level: 'ERROR',
       detail: `未找到技能源目录（${source ?? 'undefined'}）`,
       impact: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.impact,
-      requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.requiredByDefault,
+      requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)
+        ?.requiredByDefault,
     };
   }
   if (existsSync(target)) {
@@ -673,7 +685,8 @@ function copySkill(
       detail: '已安装',
       role: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.role,
       impact: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.impact,
-      requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)?.requiredByDefault,
+      requiredByDefault: REQUIRED_SKILLS.find((skill) => skill.name === skillName)
+        ?.requiredByDefault,
     };
   }
 
@@ -836,7 +849,7 @@ function readJsonObject(
 
 function resolveHostMcpServers(
   root: Record<string, unknown>,
-  keys: readonly string[],
+  keys: readonly string[]
 ): { mcpServers: Record<string, unknown>; normalizedRoot: Record<string, unknown> } {
   const collected: Record<string, unknown> = {};
 

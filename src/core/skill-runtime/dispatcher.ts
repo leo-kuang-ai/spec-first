@@ -236,9 +236,7 @@ function resolveOrchestrateHighRiskAssessment(
   }
 }
 
-function resolveOrchestrateBackgroundGuidance(
-  executionContext: SkillExecutionContext
-) {
+function resolveOrchestrateBackgroundGuidance(executionContext: SkillExecutionContext) {
   const { projectRoot } = executionContext;
   const featureId = resolveCurrentFeatureId(projectRoot, executionContext.featureId);
   if (!featureId) return undefined;
@@ -711,9 +709,7 @@ function buildFirstRuntimeNotice(projectRoot: string): string | undefined {
   return parts.join('\n');
 }
 
-function buildOnboardingRuntimeNotice(
-  executionContext: SkillExecutionContext
-): string | undefined {
+function buildOnboardingRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
     const context = resolveSkillContext(
       executionContext.projectRoot,
@@ -803,7 +799,9 @@ function buildDesignRuntimeNotice(executionContext: SkillExecutionContext): stri
           ? [`design_constraints: ${context.optional.steering.tech.constraints.join('；')}`]
           : []),
         ...(context.optional.criticalFlows?.length
-          ? [`critical_flows: ${context.optional.criticalFlows.map((flow) => flow.name).join(', ')}`]
+          ? [
+              `critical_flows: ${context.optional.criticalFlows.map((flow) => flow.name).join(', ')}`,
+            ]
           : []),
       ]
     );
@@ -849,13 +847,19 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
     }
 
     if (context.optional.changeMap?.length) {
-      parts.push(`change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`);
+      parts.push(
+        `change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+      );
     }
     if (context.optional.criticalFlows?.length) {
-      parts.push(`critical_flows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`);
+      parts.push(
+        `critical_flows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`
+      );
     }
     if (context.optional.entryGuide?.length) {
-      parts.push(`entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`);
+      parts.push(
+        `entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`
+      );
     }
 
     if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
@@ -897,10 +901,14 @@ function buildCodeRuntimeNotice(executionContext: SkillExecutionContext): string
         );
         return [
           ...(context.optional.entryGuide?.length
-            ? [`entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`]
+            ? [
+                `entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`,
+              ]
             : []),
           ...(context.optional.changeMap?.length
-            ? [`change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`]
+            ? [
+                `change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`,
+              ]
             : []),
         ];
       })()
@@ -922,10 +930,14 @@ function buildReviewRuntimeNotice(executionContext: SkillExecutionContext): stri
       context,
       [
         ...(context.optional.entryGuide?.length
-          ? [`entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`]
+          ? [
+              `entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`,
+            ]
           : []),
         ...(context.optional.changeMap?.length
-          ? [`changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`]
+          ? [
+              `changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`,
+            ]
           : []),
       ]
     );
@@ -987,13 +999,19 @@ function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string
     }
 
     if (context.optional.changeMap?.length) {
-      parts.push(`changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`);
+      parts.push(
+        `changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+      );
     }
     if (context.optional.criticalFlows?.length) {
-      parts.push(`criticalFlows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`);
+      parts.push(
+        `criticalFlows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`
+      );
     }
     if (context.optional.entryGuide?.length) {
-      parts.push(`entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`);
+      parts.push(
+        `entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`
+      );
     }
 
     const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
@@ -1046,7 +1064,9 @@ function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): stri
       context,
       [
         ...(context.optional.criticalFlows?.length
-          ? [`critical_flows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`]
+          ? [
+              `critical_flows: ${context.optional.criticalFlows.map((entry) => entry.name).join(', ')}`,
+            ]
           : []),
         ...(context.optional.conventions?.testing.recommendedConvention
           ? [`testing_convention: ${context.optional.conventions.testing.recommendedConvention}`]
@@ -1078,9 +1098,7 @@ function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): stri
   }
 }
 
-function buildSpecReviewRuntimeNotice(
-  executionContext: SkillExecutionContext
-): string | undefined {
+function buildSpecReviewRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
   try {
     return formatStageRuntimeNotice(
       'spec-review-runtime-context',

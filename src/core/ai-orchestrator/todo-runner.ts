@@ -334,11 +334,11 @@ export function updateTodoStatus(
 export function updateTodoItem(
   state: TodoRunnerState,
   todoId: string,
-  patch: Partial<Pick<TodoItem, 'retryCount' | 'lastFailureReason' | 'consecutiveErrorCount' | 'resumeAt'>>
+  patch: Partial<
+    Pick<TodoItem, 'retryCount' | 'lastFailureReason' | 'consecutiveErrorCount' | 'resumeAt'>
+  >
 ): TodoRunnerState {
-  const nextItems = state.items.map((item) =>
-    item.id === todoId ? { ...item, ...patch } : item
-  );
+  const nextItems = state.items.map((item) => (item.id === todoId ? { ...item, ...patch } : item));
 
   return {
     ...state,
@@ -364,7 +364,11 @@ export function setTodoResumeAt(
 
 // ─── P5: 依赖死锁诊断 ────────────────────────────────────
 
-export type StuckType = 'all_blocked' | 'dependency_blocked' | 'cyclic_dependency' | 'waiting_for_deps';
+export type StuckType =
+  | 'all_blocked'
+  | 'dependency_blocked'
+  | 'cyclic_dependency'
+  | 'waiting_for_deps';
 
 export interface StuckDiagnosis {
   type: StuckType;
@@ -418,10 +422,11 @@ export function diagnoseStuckReason(state: TodoRunnerState): StuckDiagnosis {
 // ─── P10: blocked 级联传播 ──────────────────────────────
 
 /** P10: 将 blocked 任务的直接/间接下游 pending 任务也标记为 blocked */
-export function cascadeBlocked(state: TodoRunnerState): { state: TodoRunnerState; cascaded: string[] } {
-  const blockedIds = new Set(
-    state.items.filter((i) => i.status === 'blocked').map((i) => i.id)
-  );
+export function cascadeBlocked(state: TodoRunnerState): {
+  state: TodoRunnerState;
+  cascaded: string[];
+} {
+  const blockedIds = new Set(state.items.filter((i) => i.status === 'blocked').map((i) => i.id));
   const cascaded: string[] = [];
 
   // 多轮传播直到无新增

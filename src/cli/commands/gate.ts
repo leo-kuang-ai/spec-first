@@ -84,9 +84,7 @@ function handleCheck(args: string[]): number {
 
     if (jsonFlag) {
       const effectiveGates = result.conditions.filter((c) => c.blocking !== false);
-      const warnings = result.conditions.filter(
-        (c) => c.status === 'FAIL' && c.blocking === false
-      );
+      const warnings = result.conditions.filter((c) => c.status === 'FAIL' && c.blocking === false);
       const targets = getStageMetricTargets(result.stage, cwd);
       const metricTargets: Record<string, number> = {};
       for (const t of targets) {
@@ -169,7 +167,9 @@ function handleHistory(args: string[]): number {
   console.log(`Gate 历史 — ${featureId}\n`);
   for (const entry of history) {
     const icon = entry.status === 'PASS' ? '✓' : entry.status === 'PASS_WITH_WAIVER' ? '~' : '✗';
-    const warnings = (entry.conditions || []).filter(c => c.status === 'FAIL' && c.blocking === false).length;
+    const warnings = (entry.conditions || []).filter(
+      (c) => c.status === 'FAIL' && c.blocking === false
+    ).length;
     const warningSuffix = warnings > 0 ? ` (${warnings} warnings)` : '';
     console.log(`  ${icon} ${entry.timestamp}  ${entry.stage}  ${entry.status}${warningSuffix}`);
   }
@@ -315,9 +315,7 @@ function appendFixStepsToFindings(
     '### Failed Conditions',
     ...(failedConditions.length > 0 ? failedConditions.map((item) => `- ${item}`) : ['- (none)']),
     '',
-    ...(warnings.length > 0
-      ? ['### Warnings', ...warnings.map((item) => `- ${item}`), '']
-      : []),
+    ...(warnings.length > 0 ? ['### Warnings', ...warnings.map((item) => `- ${item}`), ''] : []),
     '### Actionable Fix Steps',
     ...fixSteps.map((step, index) => `${index + 1}. ${step}`),
     '',

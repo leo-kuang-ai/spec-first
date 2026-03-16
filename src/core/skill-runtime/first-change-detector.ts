@@ -243,45 +243,43 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
 
   const productStatus: ProductStatus[] = [...runtimeAssets, ...docsProjectionAssets].map(
     ({ name, entry }) => {
-      const assetPath = name.startsWith('docs/')
-        ? join(projectRoot, name)
-        : join(runtimeDir, name);
-    const assetExists = existsSync(assetPath);
-    const issues: HealthIssue[] = [];
-    let currentHash: string | undefined;
+      const assetPath = name.startsWith('docs/') ? join(projectRoot, name) : join(runtimeDir, name);
+      const assetExists = existsSync(assetPath);
+      const issues: HealthIssue[] = [];
+      let currentHash: string | undefined;
 
-    if (!assetExists) {
-      issues.push({ type: 'missing', message: 'runtime 资产文件不存在' });
-    } else {
-      currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
-    }
+      if (!assetExists) {
+        issues.push({ type: 'missing', message: 'runtime 资产文件不存在' });
+      } else {
+        currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
+      }
 
-    if (!entry) {
-      issues.push({ type: 'missing', message: 'runtime 索引记录缺失' });
-    }
+      if (!entry) {
+        issues.push({ type: 'missing', message: 'runtime 索引记录缺失' });
+      }
 
-    if (entry?.healthy === false) {
-      issues.push({
-        type: 'format_error',
-        message: entry.issues?.join('；') || 'runtime 资产状态异常',
-      });
-    }
+      if (entry?.healthy === false) {
+        issues.push({
+          type: 'format_error',
+          message: entry.issues?.join('；') || 'runtime 资产状态异常',
+        });
+      }
 
-    if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
-      issues.push({
-        type: 'hash_mismatch',
-        message: 'runtime 资产与索引记录不一致（可能被手动修改）',
-      });
-    }
+      if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
+        issues.push({
+          type: 'hash_mismatch',
+          message: 'runtime 资产与索引记录不一致（可能被手动修改）',
+        });
+      }
 
-    return {
-      name,
-      exists: assetExists,
-      lastUpdated: entry?.lastUpdated ? new Date(entry.lastUpdated) : undefined,
-      currentHash,
-      issues,
-      needsUpdate: issues.length > 0,
-    };
+      return {
+        name,
+        exists: assetExists,
+        lastUpdated: entry?.lastUpdated ? new Date(entry.lastUpdated) : undefined,
+        currentHash,
+        issues,
+        needsUpdate: issues.length > 0,
+      };
     }
   );
 

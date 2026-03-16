@@ -133,19 +133,11 @@ function buildClaudeHomeCandidates(
 }
 
 function buildGeminiHomeCandidates(env: NodeJS.ProcessEnv, homeDir: string): string[] {
-  return normalizeCandidates([
-    env.GEMINI_HOME,
-    env.GEMINI_CLI_HOME,
-    join(homeDir, '.gemini'),
-  ]);
+  return normalizeCandidates([env.GEMINI_HOME, env.GEMINI_CLI_HOME, join(homeDir, '.gemini')]);
 }
 
 function buildCursorHomeCandidates(env: NodeJS.ProcessEnv, homeDir: string): string[] {
-  return normalizeCandidates([
-    env.CURSOR_HOME,
-    env.CURSOR_USER_HOME,
-    join(homeDir, '.cursor'),
-  ]);
+  return normalizeCandidates([env.CURSOR_HOME, env.CURSOR_USER_HOME, join(homeDir, '.cursor')]);
 }
 
 export function detectHostPaths(options?: HostPathOptions): HostPaths {

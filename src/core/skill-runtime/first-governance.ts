@@ -2,7 +2,10 @@ import { execFileSync } from 'node:child_process';
 import { bootstrapFirstRuntime } from './first-bootstrap.js';
 import { matchRuntimeArtifactsByChangedFile } from './first-artifact-mapping.js';
 import { refreshFirstArtifacts, type FirstRefreshResult } from './first-context.js';
-import { getFirstProjectCognitionUpdatesPath, readFirstRuntimeIndex } from './first-runtime-store.js';
+import {
+  getFirstProjectCognitionUpdatesPath,
+  readFirstRuntimeIndex,
+} from './first-runtime-store.js';
 import { readLog, writeLog } from '../../shared/logger.js';
 import { Stage } from '../../shared/types.js';
 
@@ -145,9 +148,7 @@ function inferDecision(changedFiles: string[]): {
 
 function collectSuggestedAssets(changedFiles: string[]): string[] {
   return Array.from(
-    new Set(
-      changedFiles.flatMap((file) => matchRuntimeArtifactsByChangedFile(file))
-    )
+    new Set(changedFiles.flatMap((file) => matchRuntimeArtifactsByChangedFile(file)))
   );
 }
 

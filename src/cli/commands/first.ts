@@ -103,9 +103,9 @@ export function handleFirst(args: string[]): number {
       index.steering.healthy &&
       index.conventions.healthy &&
       index.criticalFlows.healthy &&
-      index.changeMap.healthy
-      && index.entryGuide.healthy
-      && index.rebootGuide.healthy
+      index.changeMap.healthy &&
+      index.entryGuide.healthy &&
+      index.rebootGuide.healthy
     ) {
       const result = hasCanonicalProjectionDocs
         ? executeFirst(projectRoot)

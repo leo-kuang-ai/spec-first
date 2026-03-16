@@ -142,22 +142,31 @@ function buildSyntheticSteering(
 function buildSyntheticConventions(summary: FirstRuntimeSummary): FirstConventions {
   return {
     api: {
-      observedPatterns: summary.apiSurface.length > 0 ? summary.apiSurface : ['CLI surface not explicitly detected'],
+      observedPatterns:
+        summary.apiSurface.length > 0
+          ? summary.apiSurface
+          : ['CLI surface not explicitly detected'],
       deviations: [],
       recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.',
       evidence: [...summary.entryPoints, ...summary.evidence].slice(0, 5),
     },
     module: {
-      observedPatterns: summary.modules.length > 0 ? summary.modules : ['module boundaries not explicitly detected'],
+      observedPatterns:
+        summary.modules.length > 0
+          ? summary.modules
+          : ['module boundaries not explicitly detected'],
       deviations: [],
-      recommendedConvention: 'Keep runtime logic under src/core and entry orchestration near src/cli.',
+      recommendedConvention:
+        'Keep runtime logic under src/core and entry orchestration near src/cli.',
       evidence: [...summary.modules, ...summary.entryPoints].slice(0, 5),
     },
     testing: {
-      observedPatterns:
-        summary.techStack?.filter((item) => item.toLowerCase().includes('test')) ?? ['testing stack not explicitly detected'],
+      observedPatterns: summary.techStack?.filter((item) =>
+        item.toLowerCase().includes('test')
+      ) ?? ['testing stack not explicitly detected'],
       deviations: [],
-      recommendedConvention: 'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
+      recommendedConvention:
+        'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
       evidence: [...(summary.techStack ?? []), ...summary.evidence].slice(0, 5),
     },
     projectRules: {
@@ -223,7 +232,10 @@ function buildSyntheticEntryGuide(): FirstEntryGuide {
   return [
     {
       taskCategory: 'runtime-extension',
-      readFirst: ['.spec-first/runtime/first/summary.json', '.spec-first/runtime/first/steering.json'],
+      readFirst: [
+        '.spec-first/runtime/first/summary.json',
+        '.spec-first/runtime/first/steering.json',
+      ],
       thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
       avoidEntry: ['docs/first/tech-stack.md'],
       relatedFlows: ['flow-cli-entry'],
@@ -615,7 +627,7 @@ function renderOverviewDoc(context: ProjectionContext): string {
     '## 使用约定',
     '- 读取机器真相时优先使用 `.spec-first/runtime/first/` runtime truth。',
     '- 阅读面向人的摘要时使用 canonical projection docs。',
-    '- 当 runtime truth 变化时，应重新刷新 canonical projection docs。'
+    '- 当 runtime truth 变化时，应重新刷新 canonical projection docs。',
   ];
 
   return lines.join('\n');
@@ -758,7 +770,8 @@ function renderCommonPlaybooksDoc(context: ProjectionContext): string {
 
   for (const entry of context.entryGuide) {
     const matchingChangeMap = context.changeMap.find(
-      (item) => item.changeType.includes(entry.taskCategory) || entry.taskCategory.includes(item.changeType)
+      (item) =>
+        item.changeType.includes(entry.taskCategory) || entry.taskCategory.includes(item.changeType)
     );
 
     lines.push('', `## ${entry.taskCategory}`);

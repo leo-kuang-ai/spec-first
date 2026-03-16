@@ -765,8 +765,8 @@ export function detectBackgroundInputStatus(projectRoot: string): BackgroundInpu
     runtimeIndex.conventions.healthy &&
     runtimeIndex.criticalFlows.healthy &&
     runtimeIndex.changeMap.healthy &&
-    runtimeIndex.entryGuide.healthy
-    && runtimeIndex.rebootGuide.healthy
+    runtimeIndex.entryGuide.healthy &&
+    runtimeIndex.rebootGuide.healthy
   ) {
     return 'full';
   }

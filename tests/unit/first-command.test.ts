@@ -157,6 +157,7 @@ describe('handleFirst', () => {
     expect(code).toBe(0);
     expect(existsSync(join(TMP, '.spec-first', 'runtime', 'first', 'index.json'))).toBe(true);
     expect(existsSync(join(TMP, 'docs', 'first', 'summary.md'))).toBe(true);
+    expect(existsSync(join(TMP, '.config-first'))).toBe(false);
 
     const summary = readFirstRuntimeSummary(TMP);
     const index = readFirstRuntimeIndex(TMP);

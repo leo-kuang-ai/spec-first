@@ -10,8 +10,7 @@ const OPTIONAL_COMPONENTS: InstallComponent[] = ['hooks', 'viewer'];
 
 export function buildInstallPlan(requested?: InstallComponent[]): InstallPlan {
   const uniqueRequested = [...new Set(requested ?? [])];
-  const optionalSelection =
-    uniqueRequested.length > 0 ? uniqueRequested : OPTIONAL_COMPONENTS;
+  const optionalSelection = uniqueRequested.length > 0 ? uniqueRequested : OPTIONAL_COMPONENTS;
 
   return {
     baseline: BASELINE_COMPONENTS,

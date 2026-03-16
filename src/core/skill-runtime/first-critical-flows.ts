@@ -13,25 +13,19 @@ export function buildFirstCriticalFlows(summary: FirstRuntimeSummary): FirstCrit
       name: 'CLI Entry Flow',
       entryPoints: [primaryEntryPoint],
       coreModules: [primaryCliModule, runtimeModule],
-      invariants: ['runtime truth first', 'CLI orchestration must preserve canonical runtime assets'],
-      verificationHooks: [
-        'pnpm vitest run tests/unit/first-*.test.ts',
-        'pnpm typecheck',
+      invariants: [
+        'runtime truth first',
+        'CLI orchestration must preserve canonical runtime assets',
       ],
+      verificationHooks: ['pnpm vitest run tests/unit/first-*.test.ts', 'pnpm typecheck'],
     },
     {
       flowId: 'flow-doc-projection',
       name: 'Docs Projection Flow',
       entryPoints: ['src/core/skill-runtime/first-doc-projection.ts'],
       coreModules: [runtimeModule],
-      invariants: [
-        'runtime truth first',
-        'canonical projection docs must reflect runtime truth',
-      ],
-      verificationHooks: [
-        'pnpm vitest run tests/unit/first-doc-projection.test.ts',
-        'pnpm lint',
-      ],
+      invariants: ['runtime truth first', 'canonical projection docs must reflect runtime truth'],
+      verificationHooks: ['pnpm vitest run tests/unit/first-doc-projection.test.ts', 'pnpm lint'],
     },
   ];
 }

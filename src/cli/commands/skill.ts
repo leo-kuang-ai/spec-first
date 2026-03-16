@@ -7,7 +7,9 @@ interface RenderOptions {
 }
 
 function printUsage(): void {
-  console.error('用法：spec-first skill render <skill-name> [--feature <featureId>] [--input <rawUserInput>]');
+  console.error(
+    '用法：spec-first skill render <skill-name> [--feature <featureId>] [--input <rawUserInput>]'
+  );
 }
 
 const FEATURE_ID_RE = /\bFSREQ-\d{8}-[A-Z][A-Z0-9]{1,15}-\d{3}\b/i;
@@ -43,7 +45,7 @@ function parseRenderArgs(args: string[]): { skillName?: string; options: RenderO
 
     if (arg === '--input') {
       const value = args[i + 1];
-      if (value === undefined || value.startsWith('--')) {
+      if (value === undefined) {
         return null;
       }
       options.input = value || undefined;

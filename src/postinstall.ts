@@ -149,9 +149,7 @@ export function printInstallGuide(options: {
   console.log('💡 提示：spec-first 的必备 Skills + 核心 MCP 属于基线能力。');
   console.log('   如未自动补齐，请优先执行 spec-first update\n');
 
-  const stableHosts = hostStatuses.filter(
-    (entry) => entry.id === 'claude' || entry.id === 'codex'
-  );
+  const stableHosts = hostStatuses.filter((entry) => entry.id === 'claude' || entry.id === 'codex');
   const experimentalHosts = hostStatuses.filter(
     (entry) =>
       (entry.id === 'gemini' || entry.id === 'cursor') &&
@@ -162,7 +160,9 @@ export function printInstallGuide(options: {
     console.log('宿主基线状态：');
     for (const entry of stableHosts) {
       const missing =
-        entry.missingBaseline.length > 0 ? `missing=${entry.missingBaseline.join('+')}` : 'missing=(none)';
+        entry.missingBaseline.length > 0
+          ? `missing=${entry.missingBaseline.join('+')}`
+          : 'missing=(none)';
       console.log(
         `   ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
       );
@@ -177,7 +177,9 @@ export function printInstallGuide(options: {
     console.log('实验宿主提示：');
     for (const entry of experimentalHosts) {
       const missing =
-        entry.missingBaseline.length > 0 ? `missing=${entry.missingBaseline.join('+')}` : 'missing=(none)';
+        entry.missingBaseline.length > 0
+          ? `missing=${entry.missingBaseline.join('+')}`
+          : 'missing=(none)';
       console.log(
         `   ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
       );

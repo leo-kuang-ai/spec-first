@@ -9,10 +9,7 @@ import { getCurrentTaskId } from '../task-plan/parser.js';
 import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 import { SKILL_STAGE_REQUIREMENTS } from '../rules/truth-source.js';
-import {
-  type SkillExecutionContext,
-  resolveExecutionFeatureId,
-} from './execution-context.js';
+import { type SkillExecutionContext, resolveExecutionFeatureId } from './execution-context.js';
 
 const HARD_GATE_STAGE_REQUIREMENTS: Record<string, string> = { ...SKILL_STAGE_REQUIREMENTS };
 const GIT_COMMAND_TIMEOUT_MS = 5_000;

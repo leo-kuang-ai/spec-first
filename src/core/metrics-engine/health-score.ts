@@ -16,7 +16,7 @@ export interface HealthScore {
 /** 核心指标权重 - default 和 strict 使用相同权重 */
 const CORE_WEIGHTS: Record<string, number> = {
   C3: 0.25,
-  C4: 0.20,
+  C4: 0.2,
   C6: 0.25,
   C8: 0.15,
   C9: 0.15,
