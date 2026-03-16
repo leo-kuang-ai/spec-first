@@ -523,6 +523,39 @@ export function skeletonTaskPlanBaseline(featureId: string, title: string): stri
   );
 }
 
+/**
+ * Impact analysis skeleton for Mode I (Iteration) Features.
+ * Scaffolds sections for change scope assessment and risk evaluation.
+ */
+function skeletonImpactAnalysis(featureId: string, title: string): string {
+  return (
+    `# Impact Analysis — ${featureId}\n\n` +
+    `> ${title}\n\n` +
+    `## 1. 变更范围\n\n` +
+    `### 1.1 受影响模块\n\n` +
+    `| 模块 | 变更类型 | 影响程度 | 说明 |\n` +
+    `|------|---------|---------|------|\n` +
+    `| [模块名] | 新增/修改/删除 | 高/中/低 | [说明] |\n\n` +
+    `### 1.2 受影响 API\n\n` +
+    `| API | 变更类型 | 兼容性 | 说明 |\n` +
+    `|-----|---------|--------|------|\n` +
+    `| [接口名] | 新增/修改/废弃 | 向后兼容/不兼容 | [说明] |\n\n` +
+    `## 2. 风险评估\n\n` +
+    `### 2.1 技术风险\n\n` +
+    `- [风险 1]：[缓解措施]\n` +
+    `- [风险 2]：[缓解措施]\n\n` +
+    `### 2.2 数据迁移\n\n` +
+    `- [ ] 是否需要数据迁移：[是/否]\n` +
+    `- 迁移方案：[说明]\n\n` +
+    `## 3. 回滚方案\n\n` +
+    `[描述回滚步骤]\n\n` +
+    `## 4. 依赖方通知\n\n` +
+    `| 依赖方 | 变更内容 | 通知状态 |\n` +
+    `|--------|---------|--------|\n` +
+    `| [团队/系统] | [变更描述] | 待通知/已通知 |\n`
+  );
+}
+
 function detectProjectType(platforms: string[]): string {
   if (platforms.length === 0) return 'fullstack';
   if (platforms.every((p) => p.includes('frontend'))) return 'frontend';
@@ -748,6 +781,11 @@ function writeFeatureSkeleton(
 
   // 可选预置 PRD 骨架（不替代 Phase 0 完整产出）
   writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));
+
+  // Mode I: scaffold impact analysis doc to guide change scope assessment
+  if (opts.mode === 'I') {
+    writeMarkdown(join(tmpFeatureDir, 'impact-analysis.md'), skeletonImpactAnalysis(featureId, opts.title));
+  }
 }
 
 function commitFeatureInit(
