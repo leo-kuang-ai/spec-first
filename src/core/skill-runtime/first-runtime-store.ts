@@ -426,9 +426,9 @@ function normalizeCanonicalRuntimeIndex(
     rawIndex.rebootGuide ??
     makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/reboot-guide.json', lastUpdated);
   const status =
-    rawIndex.summary.healthy &&
-    rawIndex.roleViews.healthy &&
-    rawIndex.stageViews.healthy &&
+    rawIndex.summary?.healthy &&
+    rawIndex.roleViews?.healthy &&
+    rawIndex.stageViews?.healthy &&
     steering.healthy &&
     conventions.healthy &&
     criticalFlows.healthy &&
@@ -451,9 +451,9 @@ function normalizeCanonicalRuntimeIndex(
       status === 'current'
         ? undefined
         : [
-            ...(!rawIndex.summary.healthy ? ['summary unhealthy'] : []),
-            ...(!rawIndex.roleViews.healthy ? ['role-views unhealthy'] : []),
-            ...(!rawIndex.stageViews.healthy ? ['stage-views unhealthy'] : []),
+            ...(!rawIndex.summary?.healthy ? ['summary unhealthy'] : []),
+            ...(!rawIndex.roleViews?.healthy ? ['role-views unhealthy'] : []),
+            ...(!rawIndex.stageViews?.healthy ? ['stage-views unhealthy'] : []),
             ...(!steering.healthy ? ['steering unhealthy'] : []),
             ...(!conventions.healthy ? ['conventions unhealthy'] : []),
             ...(!criticalFlows.healthy ? ['critical-flows unhealthy'] : []),

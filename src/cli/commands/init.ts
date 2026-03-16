@@ -86,6 +86,7 @@ interface NormalizedInitInput {
 interface InitReadinessStatus {
   firstCompleted: boolean;
   firstMissing: string[];
+  indexExistsButIncomplete: boolean;
   projectInitialized: boolean;
   projectMissing: string[];
 }
@@ -286,6 +287,7 @@ function ensureProjectMetaConfig(projectRoot: string): void {
 
 export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   const firstMissing: string[] = [];
+  let indexExistsButIncomplete = false;
   const runtimeDir = getFirstRuntimeDir(projectRoot);
   if (!existsSync(runtimeDir)) {
     firstMissing.push('.spec-first/runtime/first/');
@@ -297,14 +299,29 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
 
     if (!runtimeIndex) {
       firstMissing.push('.spec-first/runtime/first/index.json');
+    } else {
+      // index.json 存在但字段不完整
+      if (!runtimeIndex.summary?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/summary.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.roleViews?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/role-views.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.stageViews?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/stage-views.json');
+        indexExistsButIncomplete = true;
+      }
     }
-    if (!runtimeSummary || !runtimeIndex?.summary.healthy) {
+    // 单独检查各 JSON 文件是否存在（即使 index 完整）
+    if (!runtimeSummary && !firstMissing.includes('.spec-first/runtime/first/summary.json')) {
       firstMissing.push('.spec-first/runtime/first/summary.json');
     }
-    if (!runtimeRoleViews || !runtimeIndex?.roleViews.healthy) {
+    if (!runtimeRoleViews && !firstMissing.includes('.spec-first/runtime/first/role-views.json')) {
       firstMissing.push('.spec-first/runtime/first/role-views.json');
     }
-    if (!runtimeStageViews || !runtimeIndex?.stageViews.healthy) {
+    if (!runtimeStageViews && !firstMissing.includes('.spec-first/runtime/first/stage-views.json')) {
       firstMissing.push('.spec-first/runtime/first/stage-views.json');
     }
   }
@@ -323,6 +340,7 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   return {
     firstCompleted: firstMissing.length === 0,
     firstMissing,
+    indexExistsButIncomplete,
     projectInitialized: projectMissing.length === 0,
     projectMissing,
   };
@@ -366,14 +384,24 @@ export async function handleInit(args: string[]): Promise<number> {
   if (!readiness.firstCompleted) {
     console.error('⚠️  前置检查失败');
     console.error('');
-    console.error('00-first Skill 尚未执行，无法初始化需求工作区。');
-    console.error('');
-    console.error('建议操作：');
-    console.error('  1. 运行 /spec-first:first --quick    快速认知项目（<5min）');
-    console.error('  2. 运行 /spec-first:first --deep     完整分析项目（<10min）');
-    console.error('');
-    console.error('缺失项：');
-    for (const item of readiness.firstMissing) console.error(`  - ${item}`);
+    if (readiness.indexExistsButIncomplete) {
+      console.error('00-first 数据不完整，需要重新生成。');
+      console.error('');
+      console.error('建议操作：');
+      console.error('  运行 /spec-first:first --quick    重新生成项目认知数据');
+      console.error('');
+      console.error('不完整项：');
+      for (const item of readiness.firstMissing) console.error(`  - ${item}`);
+    } else {
+      console.error('00-first Skill 尚未执行，无法初始化需求工作区。');
+      console.error('');
+      console.error('建议操作：');
+      console.error('  1. 运行 /spec-first:first --quick    快速认知项目（<5min）');
+      console.error('  2. 运行 /spec-first:first --deep     完整分析项目（<10min）');
+      console.error('');
+      console.error('缺失项：');
+      for (const item of readiness.firstMissing) console.error(`  - ${item}`);
+    }
     console.error('');
     console.error('完成后再运行 /spec-first:init');
     return ExitCode.VALIDATION_ERROR;

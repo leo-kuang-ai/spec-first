@@ -97,15 +97,15 @@ export function handleFirst(args: string[]): number {
       existsSync(join(projectRoot, path))
     );
     if (
-      index?.summary.healthy &&
-      index.roleViews.healthy &&
-      index.stageViews.healthy &&
-      index.steering.healthy &&
-      index.conventions.healthy &&
-      index.criticalFlows.healthy &&
-      index.changeMap.healthy &&
-      index.entryGuide.healthy &&
-      index.rebootGuide.healthy
+      index?.summary?.healthy &&
+      index?.roleViews?.healthy &&
+      index?.stageViews?.healthy &&
+      index?.steering?.healthy &&
+      index?.conventions?.healthy &&
+      index?.criticalFlows?.healthy &&
+      index?.changeMap?.healthy &&
+      index?.entryGuide?.healthy &&
+      index?.rebootGuide?.healthy
     ) {
       const result = hasCanonicalProjectionDocs
         ? executeFirst(projectRoot)
