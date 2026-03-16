@@ -2,7 +2,7 @@
  * init CLI 命令
  * spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>]
  */
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -17,6 +17,7 @@ import { renderDefaultConfigYaml } from '../../shared/config-schema.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { parseFlag } from '../parse-utils.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
+import { classifyProjectMaturity } from '../../core/skill-runtime/first-platform-detector.js';
 import {
   getFirstRuntimeDir,
   readFirstRoleViews,
@@ -125,27 +126,130 @@ export interface InitProjectState {
 
 /**
  * Detect current project initialization state.
- * Placeholder implementation — Task 2 will provide full implementation.
  */
-export function detectInitProjectState(_projectRoot: string): InitProjectState {
+export function detectInitProjectState(projectRoot: string): InitProjectState {
+  // 1. Check git repo
+  const gitReady = existsSync(join(projectRoot, '.git'));
+
+  // 2. Check .spec-first directory
+  const specFirstDirExists = existsSync(join(projectRoot, '.spec-first'));
+
+  // 3. Check meta/config.yaml
+  const metaConfigPath = join(projectRoot, '.spec-first', 'meta', 'config.yaml');
+  const metaConfigExists = existsSync(metaConfigPath);
+
+  // 4. Check first runtime health (index.json must exist and all sub-records healthy)
+  let firstRuntimeHealthy = false;
+  const runtimeIndexPath = join(projectRoot, '.spec-first', 'runtime', 'first', 'index.json');
+  if (existsSync(runtimeIndexPath)) {
+    try {
+      const idx = JSON.parse(readFileSync(runtimeIndexPath, 'utf-8'));
+      firstRuntimeHealthy = Boolean(
+        idx?.summary?.healthy && idx?.roleViews?.healthy && idx?.stageViews?.healthy
+      );
+    } catch {
+      firstRuntimeHealthy = false;
+    }
+  }
+
+  // 5. Detect legacy baseline directory
+  const legacyBaselinePath = join(projectRoot, 'specs', 'FSREQ-19700101-LEGACY-BASELINE');
+  const hasLegacyBaseline = existsSync(legacyBaselinePath);
+
+  // 6. Detect any non-legacy feature directories under specs/
+  const specsDir = join(projectRoot, 'specs');
+  let hasAnyFeature = false;
+  if (existsSync(specsDir)) {
+    try {
+      hasAnyFeature = readdirSync(specsDir, { withFileTypes: true }).some(
+        (entry) =>
+          entry.isDirectory() &&
+          /^FSREQ-/.test(entry.name) &&
+          entry.name !== 'FSREQ-19700101-LEGACY-BASELINE'
+      );
+    } catch {
+      hasAnyFeature = false;
+    }
+  }
+
+  // 7. Read baselineSkipped flag from meta/config.yaml
+  let baselineSkipped = false;
+  if (metaConfigExists) {
+    try {
+      const configContent = readFileSync(metaConfigPath, 'utf-8');
+      const match = /^baselineSkipped:\s*(true|false)/m.exec(configContent);
+      if (match) baselineSkipped = match[1] === 'true';
+    } catch {
+      baselineSkipped = false;
+    }
+  }
+
+  // 8. Classify project maturity (reuse first-platform-detector logic)
+  const projectMaturity = classifyProjectMaturity(projectRoot);
+
+  // 9. Discover available platforms from layer2
+  const discoveredPlatforms = discoverPlatforms(projectRoot);
+
   return {
-    gitReady: false,
-    specFirstDirExists: false,
-    metaConfigExists: false,
-    firstRuntimeHealthy: false,
-    hasAnyFeature: false,
-    hasLegacyBaseline: false,
-    baselineSkipped: false,
-    projectMaturity: 'greenfield',
-    discoveredPlatforms: [],
+    gitReady,
+    specFirstDirExists,
+    metaConfigExists,
+    firstRuntimeHealthy,
+    hasAnyFeature,
+    hasLegacyBaseline,
+    baselineSkipped,
+    projectMaturity,
+    discoveredPlatforms,
   };
 }
 
 /**
  * Determine which initialization track to follow based on project state.
- * Placeholder implementation — Task 3 will provide full implementation.
+ *
+ * Routing priority (highest first):
+ *   1. Explicit --track flag override
+ *   2. No git → no-git
+ *   3. .spec-first missing or meta/config missing → project-onboarding
+ *   4. First runtime unhealthy:
+ *      - with --feat flag → feature-init-blocked (signal error to user)
+ *      - otherwise        → project-onboarding
+ *   5. Brownfield with no legacy baseline, not skipped, no existing features → brownfield-baseline
+ *   6. Default → feature-init
  */
-export function detectInitTrack(_state: InitProjectState, _args: string[]): InitTrack {
+export function detectInitTrack(state: InitProjectState, args: string[]): InitTrack {
+  // 1. Explicit --track override takes highest priority
+  const trackFlagIdx = args.indexOf('--track');
+  if (trackFlagIdx !== -1) {
+    const trackValue = args[trackFlagIdx + 1];
+    if (trackValue === 'feature') return 'feature-init';
+    if (trackValue === 'project') return 'project-onboarding';
+    if (trackValue === 'baseline') return 'brownfield-baseline';
+  }
+
+  // 2. No git repo
+  if (!state.gitReady) return 'no-git';
+
+  // 3. Project not yet onboarded (.spec-first or meta/config missing)
+  if (!state.specFirstDirExists || !state.metaConfigExists) return 'project-onboarding';
+
+  // 4. First runtime unhealthy
+  if (!state.firstRuntimeHealthy) {
+    // Explicit --feat arg means user is trying to create a feature but is blocked
+    if (args.includes('--feat')) return 'feature-init-blocked';
+    return 'project-onboarding';
+  }
+
+  // 5. Brownfield with no baseline captured yet and user hasn't explicitly skipped it
+  if (
+    state.projectMaturity === 'brownfield' &&
+    !state.hasLegacyBaseline &&
+    !state.baselineSkipped &&
+    !state.hasAnyFeature
+  ) {
+    return 'brownfield-baseline';
+  }
+
+  // 6. Everything else: proceed to feature init
   return 'feature-init';
 }
 
