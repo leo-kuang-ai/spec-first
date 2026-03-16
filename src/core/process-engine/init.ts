@@ -760,6 +760,9 @@ function createInitialStageState(
   };
 }
 
+/** Canonical marker for brownfield baseline captures — must match CLI constant. */
+const LEGACY_BASELINE_FEATURE_ID = 'FSREQ-19700101-LEGACY-BASELINE';
+
 function writeFeatureSkeleton(
   tmpFeatureDir: string,
   opts: InitOptions,
@@ -775,16 +778,23 @@ function writeFeatureSkeleton(
   const state = createInitialStageState(opts, featureId, mergedRules, backgroundInputStatus);
   writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
   writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
-  writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
   writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
   writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(opts, featureId));
 
-  // 可选预置 PRD 骨架（不替代 Phase 0 完整产出）
-  writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));
-
-  // Mode I: scaffold impact analysis doc to guide change scope assessment
-  if (opts.mode === 'I') {
-    writeMarkdown(join(tmpFeatureDir, 'impact-analysis.md'), skeletonImpactAnalysis(featureId, opts.title));
+  const isLegacyBaseline = featureId === LEGACY_BASELINE_FEATURE_ID;
+  if (isLegacyBaseline) {
+    // Baseline-specific skeletons: 已上线能力摘要 PRD + 基线补齐 task plan
+    writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrdBaseline(featureId, opts.title));
+    writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlanBaseline(featureId, opts.title));
+    // Baseline Features do not need impact-analysis.md
+  } else {
+    // Standard skeleton
+    writeMarkdown(join(tmpFeatureDir, 'task_plan.md'), skeletonTaskPlan(featureId, opts.title));
+    writeMarkdown(join(tmpFeatureDir, 'prd.md'), skeletonPrd(featureId, opts.title));
+    // Mode I: scaffold impact analysis doc to guide change scope assessment
+    if (opts.mode === 'I') {
+      writeMarkdown(join(tmpFeatureDir, 'impact-analysis.md'), skeletonImpactAnalysis(featureId, opts.title));
+    }
   }
 }
 

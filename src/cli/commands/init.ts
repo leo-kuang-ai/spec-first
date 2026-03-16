@@ -153,7 +153,7 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
   }
 
   // 5. Detect legacy baseline directory
-  const legacyBaselinePath = join(projectRoot, 'specs', 'FSREQ-19700101-LEGACY-BASELINE');
+  const legacyBaselinePath = join(projectRoot, 'specs', LEGACY_BASELINE_FEATURE_ID);
   const hasLegacyBaseline = existsSync(legacyBaselinePath);
 
   // 6. Detect any non-legacy feature directories under specs/
@@ -165,7 +165,7 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
         (entry) =>
           entry.isDirectory() &&
           /^FSREQ-/.test(entry.name) &&
-          entry.name !== 'FSREQ-19700101-LEGACY-BASELINE'
+          entry.name !== LEGACY_BASELINE_FEATURE_ID
       );
     } catch {
       hasAnyFeature = false;
@@ -224,6 +224,11 @@ export function detectInitTrack(state: InitProjectState, args: string[]): InitTr
     if (trackValue === 'feature') return 'feature-init';
     if (trackValue === 'project') return 'project-onboarding';
     if (trackValue === 'baseline') return 'brownfield-baseline';
+    // Unknown or missing value: fall through to auto-routing with a warning
+    if (trackValue && !trackValue.startsWith('--')) {
+      // Non-empty and not another flag — invalid value, warn and fall through
+      console.warn(`警告：--track 值 "${trackValue}" 无效，有效值为 feature/project/baseline，已忽略并使用自动路由`);
+    }
   }
 
   // 2. No git repo
@@ -257,6 +262,9 @@ export function detectInitTrack(state: InitProjectState, args: string[]): InitTr
 // Brownfield-baseline track
 // ─────────────────────────────────────────────
 
+/** Canonical Feature ID for brownfield baseline captures. Used as marker throughout the system. */
+export const LEGACY_BASELINE_FEATURE_ID = 'FSREQ-19700101-LEGACY-BASELINE';
+
 export interface LegacyBaselinePreset {
   featureId: string;
   feat: string;
@@ -272,7 +280,7 @@ export interface LegacyBaselinePreset {
  */
 export function buildLegacyBaselinePreset(): LegacyBaselinePreset {
   return {
-    featureId: 'FSREQ-19700101-LEGACY-BASELINE',
+    featureId: LEGACY_BASELINE_FEATURE_ID,
     feat: 'LEGACY',
     mode: 'I',
     size: 'M',
@@ -719,6 +727,15 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
     } finally {
       rl.close();
     }
+  } else {
+    // Non-interactive (CI/pipe): do not silently create baseline.
+    // Require explicit --track baseline or --track feature to proceed.
+    console.error('⚠️  检测到存量项目需要创建基线，但当前为非交互式终端');
+    console.error('');
+    console.error('请显式指定操作：');
+    console.error('  spec-first init --track baseline    创建存量系统基线 Feature');
+    console.error('  spec-first init --track feature     跳过基线，直接创建业务 Feature');
+    return ExitCode.VALIDATION_ERROR;
   }
 
   // Discover platforms for the baseline feature
