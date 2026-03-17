@@ -1,10 +1,11 @@
 ---
 name: "spec-first:first"
-description: "项目快速认知：quick 模式生成 5-6 份核心文档（含 README），deep 模式生成 10-11 份完整文档（支持 --deep/--type/--force 参数）"
+description: "项目认知标准模式：生成完整 runtime-first 认知资产与 docs/first projection（支持 --type/--force 参数）"
 version: 2.2.0
 last_updated: {{DATE}}
 confirm_policy: assisted
 changelog: |
+  2.3.0: 收敛为单一标准模式，移除 quick/deep 双模式表述，统一以 runtime-first 正式产物集为准
   2.2.0: 方案 A 优化 — 精简 SKILL.md（删除重复内容、优化 description、添加 reference 导航、放宽证据覆盖率要求）+ quick 模式生成 README.md
   2.1.0: Agent B 优化 — api-docs.md 从"端点列表"改为"接口规范提取"
   2.0.0: quick/deep 双模式重构 — 移除 Q3 交互式选项, frontmatter 标记 mode
@@ -12,10 +13,11 @@ changelog: |
 
 # Skill: first
 
-快速认知一个项目：自动分析目标项目的技术栈、代码结构、业务流程、API、数据模型等。
+快速认知一个项目：自动分析目标项目的技术栈、代码结构、业务流程、API、数据模型等，并写入 runtime 真源与 docs projection。
 
-- **quick 模式**（默认）：生成 5-6 个核心文档（含 README 索引），聚焦"快速了解项目 + 承载的业务流程 + 数据模型"
-- **deep 模式**（完整分析）：生成 10-11 个文档，包含调用链、架构、外部依赖、环境搭建、研发规范等
+- **标准模式**（唯一模式）：生成完整正式产物集
+- `docs/first/*.md` 是 projection，不是旁路真源
+- `.spec-first/runtime/first/` 是唯一正式真源
 
 运行时真源维护在 `.spec-first/runtime/first/`，其中 `.spec-first/runtime/first/index.json` 是正式真索引；`docs/first/` 保留为长期维护的人类可读投影视图层。
 
@@ -55,8 +57,7 @@ changelog: |
 - **以代码为准，禁止捏造**：所有产物内容必须严格基于代码文件、配置文件、依赖声明等实际存在的证据
 - **注意语言特性**：不同语言/框架有不同惯例，不可用 A 语言的惯例推断 B 语言的行为
 - **不确定标注**：未在代码中找到明确证据的内容，标注 `[待确认]`，不得裸写
-- **quick 模式豁免**：quick 模式不强制要求证据标注，以提升执行速度
-- **deep 模式证据要求**：
+- **标准模式证据要求**：
   - **核心结论**（技术栈、API 端点、数据库表）必须有证据，格式：`- <结论> (\`<file_path>:<line>\` — \`<关键代码片段>\` — \`[证据类型]\`)`
   - **推断性结论**（模块职责、业务流程）可标注 `[推断]`
   - **证据类型**：`[显式]`（代码明确声明）、`[推断]`（从行为分析）、`[待确认]`（无法确定）
@@ -77,25 +78,20 @@ changelog: |
 ```
 docs/
 └── first/
-    ├── README.md                # 索引导航 [quick + deep]
-    ├── tech-stack.md            # 技术栈摘要 [quick]
-    ├── api-docs.md              # API 接口规范 [quick]
-    ├── codebase-overview.md     # 代码结构概览 + 开发入口 [quick]
-    ├── domain-model.md          # 业务领域模型 [quick]
-    ├── database-er.md           # ER 图 + 字段详情 [quick, 如有 DB]
-    ├── call-graph.md            # 调用链分析 [deep]
-    ├── architecture.md          # 架构图 [deep]
-    ├── external-deps.md         # 外部依赖 [deep]
-    ├── local-setup.md           # 本地环境搭建 [deep]
-    └── development-guidelines.md # 研发规范 [deep]
+    ├── README.md
+    ├── tech-stack.md
+    ├── api-docs.md
+    ├── codebase-overview.md
+    ├── domain-model.md
+    ├── database-er.md            # 如有 DB
+    ├── call-graph.md
+    ├── architecture.md
+    ├── external-deps.md
+    ├── local-setup.md
+    └── development-guidelines.md
 ```
 
-**按模式分组**：
-
-| 模式 | 产物数量 | 产物列表 |
-|------|----------|----------|
-| **quick** | 5-6 个 | README, tech-stack, api-docs, codebase-overview, domain-model, database-er（如有 DB） |
-| **deep** | 10-11 个 | quick 全部 + call-graph, architecture, external-deps, local-setup, development-guidelines |
+标准模式默认生成正式文档全集；条件型文档如 `database-er.md` 仅在能力适用时生成。
 
 ---
 
@@ -103,17 +99,7 @@ docs/
 
 派发 Agent 时，在 prompt 中明确指示读取对应规格文件。
 
-### quick 模式（4-5 个 Agent）
-
-| Agent | 产出 | 规格文件 |
-|-------|------|----------|
-| A | tech-stack.md | 主线程直接生成 |
-| B | api-docs.md | `references/agents-api-deps.md` |
-| C | codebase-overview.md（简化版） | `references/agents-code-analysis.md` |
-| D | domain-model.md | `references/agent-domain-model.md` |
-| E | database-er.md（条件派发） | `references/agent-database.md` |
-
-### deep 模式（8 个逻辑 Agent）
+### 标准模式（8 个逻辑 Agent）
 
 | Agent | 产出 | 规格文件 |
 |-------|------|----------|
@@ -135,7 +121,7 @@ docs/
 详细流程见 `references/execution-flow.md`：
 - P0: 定位与校验（项目检测、Greenfield/Brownfield 判断、Serena 激活）
 - P1: 技术栈识别（语言/框架/端类型检测）
-- P2: Agent 并行执行（quick/deep 模式分波派发）
+- P2: Agent 并行执行（标准模式分波派发）
 - P3: 汇总输出（README 生成、交叉验证）
 
 详细并发/超时规则见 `references/subagent-architecture.md`。
@@ -144,14 +130,10 @@ docs/
 
 ## 成功标准
 
-### quick 模式
+### 标准模式
 - ✅ 必须生成：README.md、tech-stack.md、api-docs.md、codebase-overview.md、domain-model.md
+- ✅ 必须追加：call-graph.md、architecture.md、external-deps.md、local-setup.md、development-guidelines.md
 - ✅ 如检测到 DB，database-er.md 存在
-- ✅ 所有文档头部包含 `mode: quick`
-
-### deep 模式
-- ✅ quick 模式全部产物
-- ✅ 追加产物：call-graph.md、architecture.md、external-deps.md、local-setup.md、development-guidelines.md、README.md
 - ✅ 所有文档头部包含 `mode: deep`
 - ✅ 核心结论证据覆盖率 100%，推断性结论 ≥60%
 - ✅ 交叉验证通过率 100%

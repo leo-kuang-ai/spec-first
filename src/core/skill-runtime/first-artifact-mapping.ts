@@ -63,8 +63,12 @@ export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<
 };
 
 export const CANONICAL_PROJECTION_DOCS = Array.from(
-  new Set(Object.values(FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP).flat())
+    new Set(Object.values(FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP).flat())
 ).sort() as readonly string[];
+
+export const BASE_PROJECTION_DOCS = CANONICAL_PROJECTION_DOCS;
+export const CONDITIONAL_PROJECTION_DOCS: readonly string[] = [];
+export const FORMAL_TOPIC_PROJECTION_DOCS: readonly string[] = [];
 
 export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
   'package.json': DEPENDENCY_ARTIFACTS,

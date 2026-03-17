@@ -18,7 +18,7 @@ import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-st
 
 function printFirstHelp(): void {
   console.log(
-    '用法：spec-first first [--quick|--deep] [--type=<value>] [--force] [--skip] [--check-health]'
+    '用法：spec-first first [--type=<value>] [--auto] [--force] [--skip] [--check-health]'
   );
   console.log('');
   console.log('说明：');
@@ -115,7 +115,6 @@ export function handleFirst(args: string[]): number {
       );
     } else {
       const bootstrap = bootstrapFirstRuntime(projectRoot, {
-        mode: firstArgs.mode,
         platformType: firstArgs.type,
       });
       console.log(

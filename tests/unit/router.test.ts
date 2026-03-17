@@ -100,15 +100,15 @@ describe('CLI Router', () => {
       expect(handler).not.toHaveBeenCalled();
     });
 
-    it('should skip confirmation with --quick', async () => {
+    it('should skip confirmation with --force', async () => {
       const handler = vi.fn(() => 0);
       registerCommand('first-test-2', 'Test first', handler, {
         requiresConfirmation: shouldConfirmFirst,
       });
 
-      const code = await dispatch(['first-test-2', '--quick']);
+      const code = await dispatch(['first-test-2', '--force']);
       expect(code).toBe(0);
-      expect(handler).toHaveBeenCalledWith(['--quick']);
+      expect(handler).toHaveBeenCalledWith(['--force']);
     });
 
     it('should skip confirmation with --force', async () => {

@@ -1,0 +1,592 @@
+# Spec-First 专家集成实施手册 v2.2
+
+> 日期：2026-03-17  
+> 版本：v2.2 Final  
+> 类型：实施手册  
+> 目标：在当前 `spec-first` 真实 skill 体系上落地专家能力
+
+---
+
+## 1. 文档定位
+
+### 1.1 目标
+
+本手册用于指导 `spec-first` 在不重做 runtime 的前提下，把参考项目中的专家能力以“文档增强”的方式接入当前 skill 体系。
+
+本文档关注的是：
+
+- 专家能力接到哪些真实节点
+- 各节点该接什么级别的专家角色
+- 实施顺序如何安排
+- 如何判断集成是否真正生效
+
+### 1.2 非目标
+
+本方案不做以下事情：
+
+- 不复制 `agency-agents` 或 `oh-my-opencode` 的完整运行时
+- 不新增“用户手动选专家”的独立机制
+- 不引入第二套状态机
+- 不把专家能力硬编码成新的 TypeScript 编排逻辑
+- 不把固定命令、固定工具、固定阈值写成跨项目默认前提
+
+### 1.3 当前实现前提
+
+当前真实 skill 根目录是：
+
+`/Users/kuang/.codex/skills/spec-first/`
+
+当前真实入口包括：
+
+- `spec`
+- `research`
+- `design`
+- `task`
+- `code`
+- `review`
+- `verify`
+- `orchestrate`
+- `plan`
+- `spec-review`
+- `analyze`
+- `archive`
+- `init`
+- `catchup`
+- `status`
+- `sync`
+- `feature`
+- `doctor`
+- `first`
+- `onboarding`
+
+每个入口当前都通过：
+
+```bash
+spec-first skill render <skill-name>
+```
+
+生成最终运行时 prompt。
+
+因此，本文档里的所有接入动作，都必须围绕“render 后是否可见、可消费、可执行”来设计。
+
+---
+
+## 2. 核心原则
+
+### 2.1 真实路径优先
+
+只以当前真实 skill 路径为准，不再使用旧编号式目录幻想，例如：
+
+- `03-spec`
+- `04-design`
+- `08-review`
+- `12-verify`
+- `13-orchestrate`
+
+这些名称可以作为历史映射说明，但不能再作为实施目标路径。
+
+### 2.2 render 闭环优先
+
+新增文档只有在以下条件至少满足一项时，才算真正生效：
+
+1. `spec-first skill render <name>` 明确内联了对应专家文档
+2. 对应 skill 的 `SKILL.md` 或 render 模板稳定引用了该专家文档
+3. render 流程已把这些文档纳入上下文包或 reference 清单
+
+如果做不到这一点，只能称为“文档真源已建立”，不能称为“运行时已生效”。
+
+### 2.3 分层专家化
+
+不是所有节点都需要同等重量的专家人格。
+
+本方案采用三层模型：
+
+- 强专家节点：高判断密度，接主专家 + 辅专家
+- 中专家节点：保留主判断视角，但不堆叠过多人格
+- 轻引导节点：定义工作姿态，不引入重型 borrowed experts
+
+### 2.4 文档增强优先于代码增强
+
+第一阶段以：
+
+- 专家文档
+- references 模板
+- render 可见性
+
+为主，而不是先改 CLI/runtime 代码。
+
+### 2.5 禁止写死跨项目默认命令
+
+例如以下内容不应被写成通用前提：
+
+- `npm run test:api`
+- `npm run test:integration`
+- `npm run test:perf`
+- 固定 Lighthouse 分数阈值
+- 固定安全扫描工具名
+
+正确做法是：
+
+- 先从 `task_plan.md`、仓库脚本、CI 配置中发现现有命令
+- 若不存在，再写入可复现的手动验证步骤
+
+---
+
+## 3. 专家分层模型
+
+### 3.1 强专家节点
+
+这些节点直接承担澄清、设计、审查、验收、编排等高判断密度工作：
+
+- `spec`
+- `research`
+- `design`
+- `task`
+- `review`
+- `verify`
+- `orchestrate`
+
+要求：
+
+- 必须定义主专家
+- 必须定义辅专家
+- 必须定义停止条件
+- 必须定义输出质量标准
+
+### 3.2 中专家节点
+
+这些节点承担质量门、只读分析、计划解释、实现约束、归档收口等次高判断工作：
+
+- `plan`
+- `spec-review`
+- `analyze`
+- `code`
+- `archive`
+
+要求：
+
+- 定义主专家
+- 可选接入 1-2 个辅专家
+- 保持节点原有职责边界
+
+### 3.3 轻引导节点
+
+这些节点更适合定义为工作姿态，而不是完整专家人格：
+
+- `init`
+- `catchup`
+- `status`
+- `sync`
+- `feature`
+- `doctor`
+- `first`
+- `onboarding`
+
+要求：
+
+- 低噪声
+- 强稳定
+- 易恢复
+- 不越界承担重判断任务
+
+---
+
+## 4. 全量节点角色矩阵
+
+### 4.1 实施总表
+
+这张表用于快速决定“某个节点要接什么角色、加什么内容、避免什么错误”。
+
+| 节点 | 分层 | 主专家/主角色 | 辅专家/辅角色 | 节点目标 | 输出重点 | 禁止越界 |
+|---|---|---|---|---|---|---|
+| `spec` | 强专家 | `Prometheus` | `Metis` + `Momus` + `Socratic Clarification` | 把模糊需求收敛成可验证规格 | FR / AC、边界、假设、未决项 | 不进入技术设计与任务拆解 |
+| `research` | 强专家 | `Librarian` | `Oracle` | 为设计或规格提供外部证据 | 证据分级、结论、待验证项 | 不替代 design 做方案决策 |
+| `design` | 强专家 | `Software Architect` | `Oracle` + `Backend Architect` | 形成可落地技术方案 | 方案权衡、边界、失败模式 | 不直接进入实现 |
+| `task` | 强专家 | `Prometheus` | `Momus` + `Atlas` | 把设计拆成可执行任务 | 粒度、依赖、DoD、并行性 | 不代替 code 执行 |
+| `review` | 强专家 | `Code Reviewer` | `Security Engineer` + `Oracle` | 识别质量与安全风险 | findings、分级、风险说明 | 不直接修复代码 |
+| `verify` | 强专家 | `Reality Checker` | `API Tester` + `Frontend Evidence Check` + `Security Review` | 做证据化验收判定 | 证据、通过/失败/未证明、残余风险 | 不用感觉替代证据 |
+| `orchestrate` | 强专家 | `Atlas` | `Agents Orchestrator` + `Project Shepherd` | 选择节点、推进流程、处理回流 | handoff、回流、推进策略 | 不直接承担实现产出 |
+| `plan` | 中专家 | `Prometheus` | `Metis` + `Momus` | 形成阶段计划快照 | 阶段摘要、下一步、风险 | 不替代 task 生成任务明细 |
+| `spec-review` | 中专家 | `Momus` | `Software Architect` | 做规格质量门检查 | 清晰度、完整性、可实现性 | 不直接改写 spec |
+| `analyze` | 中专家 | `Oracle` | `Reality Checker` | 做跨产物只读分析 | 问题归类、证据、优先级 | 不直接修复问题 |
+| `code` | 中专家 | `Hephaestus` | `Senior Developer` + `Security Engineer` | 在边界内完成实现 | 最小变更、实现前自检、范围控制 | 不跳过规范/TDD/边界约束 |
+| `archive` | 中专家 | `Reality Checker` | `Technical Writer` | 确认能否收口并形成交付摘要 | 完成证据、遗留问题、交付摘要 | 不把“差不多完成”当收口 |
+| `init` | 轻引导 | `Feature Intake Guide` | - | 初始化 Feature 上下文 | 参数收集、模式选择、约束提醒 | 不扩展成需求分析 |
+| `catchup` | 轻引导 | `Context Recovery Guide` | - | 恢复当前工作上下文 | 当前 Feature、状态、下一步 | 不替代 status / plan |
+| `status` | 轻引导 | `Progress Interpreter` | - | 解释当前进展状态 | 当前进展、风险、建议动作 | 不替代 analyze |
+| `sync` | 轻引导 | `Trace Sync Clerk` | - | 保持追踪与状态一致 | 矩阵同步、差异说明、冲突解释 | 不做额外业务判断 |
+| `feature` | 轻引导 | `Feature Navigator` | - | 导航和切换 Feature | 查询、切换、定位 | 不做计划与诊断 |
+| `doctor` | 轻引导 | `Environment Diagnostician` | 轻量 `Oracle` | 做环境与配置诊断 | 分层诊断、优先级建议 | 不把诊断扩展成架构评审 |
+| `first` | 轻引导 | `Repository Cartographer` | - | 快速建立项目认知 | 结构地图、入口、关键约定 | 不替代 design / analyze |
+| `onboarding` | 轻引导 | `Onboarding Guide` | - | 提供学习路径与入口建议 | 场景识别、学习路径、入口建议 | 不承担项目实施决策 |
+
+### 4.2 强专家节点细表
+
+这些节点应优先接入共享专家文档，并在 render 输出中可见。
+
+| 节点 | 主专家 | 辅专家 | 必加内容 | 主要 reference | 成功信号 |
+|---|---|---|---|---|---|
+| `spec` | `Prometheus` | `Metis` + `Momus` + `Socratic Clarification` | 澄清问题、缺口扫描、AC 可测试性检查、停止条件 | `clarification-protocol.md` + `socratic-clarification.md` | 生成前先澄清，输出里可见未决项/假设/AC 质量约束 |
+| `research` | `Librarian` | `Oracle` | 证据分级、不猜测原则、待验证项标记 | 证据协议类 reference | 输出中明确强/中/弱证据和待验证项 |
+| `design` | `Software Architect` | `Oracle` + `Backend Architect` | 方案权衡、失败模式、待 research/POC 项 | `tradeoff-template.md` + `failure-mode-checklist.md` | 输出里可见权衡表和失败模式 |
+| `task` | `Prometheus` | `Momus` + `Atlas` | 任务独立性检查、DoD、依赖/并行约束 | 任务独立性与 handoff 模板 | 任务粒度更稳定，可分派、可验证 |
+| `review` | `Code Reviewer` | `Security Engineer` + `Oracle` | 审查模式切换、findings 结构、敏感变更清单 | `review-mode-matrix.md` | findings 更结构化，模式切换清晰 |
+| `verify` | `Reality Checker` | `API Tester` + `Frontend Evidence Check` + `Security Review` | 证据要求、未证明规则、模式矩阵、失败项复现 | `verification-matrix.md` + `evidence-requirements.md` | 输出里可见证据链和未证明判断 |
+| `orchestrate` | `Atlas` | `Agents Orchestrator` + `Project Shepherd` | handoff 模板、回流条件、批次推进规则 | `handoff-template.md` | 输出里可见节点选择、回流和推进策略 |
+
+### 4.3 中专家节点细表
+
+这些节点需要专家视角，但不适合接入过重的人格堆叠。
+
+| 节点 | 主专家 | 辅专家 | 核心作用 | 重点增强 | 禁止事项 |
+|---|---|---|---|---|---|
+| `plan` | `Prometheus` | `Metis` + `Momus` | 阶段计划解释 | 目标摘要、风险、下一步建议 | 不替代 `task` |
+| `spec-review` | `Momus` | `Software Architect` | 规格质量门 | 清晰度、完整性、可实现性检查 | 不直接回写 spec |
+| `analyze` | `Oracle` | `Reality Checker` | 只读一致性诊断 | 证据化问题归类、优先级建议 | 不直接修复 |
+| `code` | `Hephaestus` | `Senior Developer` + `Security Engineer` | 深度实现 | 最小变更、实现前自检、范围控制 | 不跳过现有实现规范 |
+| `archive` | `Reality Checker` | `Technical Writer` | 收口检查 | 完成证据、遗留问题、交付摘要 | 不把未闭环事项强行归档 |
+
+### 4.4 轻引导节点细表
+
+这些节点建议只定义轻角色，不单独创建 borrowed-expert 长文档。
+
+| 节点 | 主角色 | 主要职责 | 推荐输出风格 | 不应承担 |
+|---|---|---|---|---|
+| `init` | `Feature Intake Guide` | 初始化参数、模式与约束收集 | 简短清单式 | 需求分析 |
+| `catchup` | `Context Recovery Guide` | 恢复当前工作点和阻塞项 | 恢复摘要式 | 深度诊断 |
+| `status` | `Progress Interpreter` | 解释当前阶段、风险和下一步 | 状态摘要式 | 跨产物分析 |
+| `sync` | `Trace Sync Clerk` | 同步矩阵和状态、解释差异 | 差异说明式 | 决策判断 |
+| `feature` | `Feature Navigator` | 查询、切换、定位 Feature | 导航提示式 | 计划制定 |
+| `doctor` | `Environment Diagnostician` | 环境与配置诊断 | 分层诊断式 | 架构评审 |
+| `first` | `Repository Cartographer` | 生成项目认知图谱 | 地图摘要式 | 实施计划 |
+| `onboarding` | `Onboarding Guide` | 场景识别和学习路径推荐 | 路径引导式 | 具体交付决策 |
+
+---
+
+## 5. 按层实施
+
+### Phase 1：建立专家真源
+
+目标：
+
+- 在 `/Users/kuang/.codex/skills/spec-first/experts/` 建立共享专家文档
+- 建立 `README.md` 说明专家到节点的引用关系
+- 建立全量节点角色矩阵
+- 为轻引导节点定义轻角色说明
+
+建议最小专家集：
+
+- `planning-consult.md`
+- `architecture-review.md`
+- `code-quality-review.md`
+- `security-review.md`
+- `api-verification.md`
+- `frontend-evidence-check.md`
+- `execution-orchestration.md`
+- `socratic-clarification.md`
+
+### Phase 2：增强强专家节点
+
+覆盖节点：
+
+- `spec`
+- `research`
+- `design`
+- `task`
+- `review`
+- `verify`
+- `orchestrate`
+
+目标：
+
+- 接入主专家/辅专家视角
+- 补前置检查和停止条件
+- 补输出质量标准
+- 新增必要 references
+
+### Phase 3：增强中专家节点
+
+覆盖节点：
+
+- `plan`
+- `spec-review`
+- `analyze`
+- `code`
+- `archive`
+
+目标：
+
+- 定义主专家工作姿态
+- 明确不越界原则
+- 增加最小模板，而不是完整重写
+
+### Phase 4：定型轻引导节点
+
+覆盖节点：
+
+- `init`
+- `catchup`
+- `status`
+- `sync`
+- `feature`
+- `doctor`
+- `first`
+- `onboarding`
+
+目标：
+
+- 统一角色命名
+- 统一输出风格
+- 明确禁止越界事项
+
+### Phase 5：验证 render 闭环
+
+必须检查：
+
+- `spec-first skill render spec`
+- `spec-first skill render research`
+- `spec-first skill render design`
+- `spec-first skill render task`
+- `spec-first skill render review`
+- `spec-first skill render verify`
+- `spec-first skill render orchestrate`
+
+重点不是“文档写了什么”，而是“render 输出里是否真的可见”。
+
+---
+
+## 6. 节点实施模板
+
+本节定义统一模板，避免每个节点都写成长篇自由描述。
+
+### 6.1 通用模板
+
+每个节点的实施说明统一包含：
+
+1. 目标
+2. 接入专家
+3. 必加内容
+4. 禁止事项
+5. 验证方式
+
+### 6.2 `spec` 模板
+
+目标：
+
+- 把模糊需求收敛为可执行、可验证、可追溯的 FR / AC
+
+接入专家：
+
+- 主：`Prometheus`
+- 辅：`Metis` `Momus` `Socratic Clarification`
+
+必加内容：
+
+- 澄清问题清单
+- 隐含假设扫描
+- AC 可测试性检查
+- 关键未决项停止条件
+
+禁止事项：
+
+- 不进入技术设计细节
+- 不代替 `task` 做任务拆解
+
+验证方式：
+
+- render 输出中可见澄清/缺口识别/可验证性规则
+
+### 6.3 `review` 模板
+
+目标：
+
+- 提升审查密度，但保持只读风险审查边界
+
+接入专家：
+
+- 主：`Code Reviewer`
+- 辅：`Security Engineer` `Oracle`
+
+必加内容：
+
+- 审查模式切换
+- findings 输出结构
+- 安全敏感变更检查清单
+
+禁止事项：
+
+- 不直接写修复代码
+- 不把所有变更都按同等重量审查
+
+验证方式：
+
+- render 输出中可见模式矩阵和 findings 质量要求
+
+### 6.4 `verify` 模板
+
+目标：
+
+- 从“执行校验”提升为“证据导向验收”
+
+接入专家：
+
+- 主：`Reality Checker`
+- 辅：`API Tester` `Frontend Evidence Check` `Security Review`
+
+必加内容：
+
+- 证据不足默认未证明
+- 验证模式矩阵
+- 证据要求模板
+- 失败项复现步骤与修复方向
+
+禁止事项：
+
+- 不写死项目命令
+- 不以“看起来可以”替代证据
+
+验证方式：
+
+- render 输出中可见证据导向规则
+
+### 6.5 `orchestrate` 模板
+
+目标：
+
+- 强化“只编排、不代替各 skill 实施”的边界
+
+接入专家：
+
+- 主：`Atlas`
+- 辅：`Agents Orchestrator` `Project Shepherd`
+
+必加内容：
+
+- handoff 最小模板
+- 回流条件
+- 批次推进规则
+- 状态汇总和下一步格式
+
+禁止事项：
+
+- 不直接承担实现任务
+- 不跳过上游澄清与设计回流
+
+验证方式：
+
+- render 输出中可见 handoff / 回流 / 推进规则
+
+### 6.6 其余节点的处理方法
+
+除 `spec / review / verify / orchestrate` 外，其余节点本轮只要求：
+
+- 在矩阵中定义清楚角色
+- 补最小模板
+- 不做长篇节点说明
+
+这样可以避免文档再次失控膨胀。
+
+---
+
+## 7. 完成标准与验收
+
+### 7.1 完成标准
+
+#### Phase 1
+
+- [ ] `/Users/kuang/.codex/skills/spec-first/experts/` 已创建
+- [ ] `experts/README.md` 已建立引用总览
+- [ ] 共享专家文档已建立
+- [ ] 全量节点角色矩阵已定义
+- [ ] 轻引导节点角色说明已定义
+
+#### Phase 2
+
+- [ ] `spec` 已接入澄清/补漏专家视角
+- [ ] `research` 已接入证据分级/不猜测增强
+- [ ] `design` 已接入架构权衡与失败模式要求
+- [ ] `task` 已接入任务独立性/补漏增强
+- [ ] `review` 已接入审查模式矩阵
+- [ ] `verify` 已接入证据导向规则
+- [ ] `orchestrate` 已接入 handoff / 回流 / 推进规则
+
+#### Phase 3
+
+- [ ] `plan` 已定义计划解释专家视角
+- [ ] `spec-review` 已定义规格质量门专家视角
+- [ ] `analyze` 已定义只读一致性诊断专家视角
+- [ ] `code` 已定义实现前自检与边界约束视角
+- [ ] `archive` 已定义收口检查视角
+
+#### Phase 4
+
+- [ ] 8 个轻引导节点已定义角色与输出风格
+
+### 7.2 render 验收
+
+至少验证以下输出中可见新规则：
+
+- [ ] `spec-first skill render spec`
+- [ ] `spec-first skill render research`
+- [ ] `spec-first skill render design`
+- [ ] `spec-first skill render task`
+- [ ] `spec-first skill render review`
+- [ ] `spec-first skill render verify`
+- [ ] `spec-first skill render orchestrate`
+
+### 7.3 真实演练验收
+
+- [ ] 使用改造后的入口完成至少 1 个真实 Feature 演练
+- [ ] 演练中未出现 Gate 误阻断
+- [ ] 演练中未出现路径失配或引用失效
+- [ ] 输出质量相较现状有可观察提升
+
+### 7.4 成功判定
+
+满足以下条件，才可以称为“方案落地成功”：
+
+1. 专家文档已存在
+2. 全量节点矩阵已定义
+3. 入口文档已按分层接入
+4. render 输出已可见
+5. 至少一个真实 Feature 演练通过
+
+少任一项，都只能说“部分完成”。
+
+---
+
+## 附：推荐实施节奏
+
+第 1-2 天：
+
+- 建立 `experts/`
+- 建立矩阵
+- 完成强专家节点所需共享文档
+
+第 3-4 天：
+
+- 增强 `spec`
+- 增强 `review`
+- 增强 `verify`
+
+第 5-6 天：
+
+- 增强 `research`
+- 增强 `design`
+- 增强 `task`
+- 增强 `orchestrate`
+
+第 7 天：
+
+- 增强中专家节点
+- 定型轻引导节点
+- 执行 render 检查和真实 Feature 演练
+
+---
+
+## 相关文档
+
+- `2026-03-15-研发专家角色参考文档.md`
+- `2026-03-15-专家角色最佳集成方案.md`
+- `2026-03-17-Skill角色能力映射表.md`
+- `2026-03-17-苏格拉底式提问集成草案.md`

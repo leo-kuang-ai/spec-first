@@ -1,6 +1,6 @@
 # Agent C2 — 研发规范与本地环境
 
-> **适用模式**: deep 模式专用（quick 模式不生成这两个文档）
+> **适用模式**: 标准模式
 
 > 第二波派发（P1b 完成后）。依赖 P1b Context7 映射结果 + C1 完成。
 > 内部串行：development-guidelines.md → local-setup.md
@@ -16,7 +16,7 @@
 
 | 模块 | 检测方式 |
 |------|----------|
-| 代码风格 | ESLint/Prettier/Black/gofmt/rustfmt 配置；代码采样（deep 模式） |
+| 代码风格 | ESLint/Prettier/Black/gofmt/rustfmt 配置；代码采样 |
 | 提交规范 | commitlint 配置；`git log -50` 格式分析 |
 | 测试要求 | 测试框架配置；覆盖率阈值；tests/ 目录结构 |
 | 文档规范 | JSDoc/Docstring 配置；注释采样 |
@@ -60,10 +60,9 @@ context7_sources: [...]
 - ...
 ```
 
-### Adaptive 深度
+### 分析深度
 
-- **Shallow（默认）**：仅读取配置文件
-- **Deep（depth=deep）**：配置 + 代码采样验证，标注"配置 vs 实际"差异
+- 标准模式默认执行配置 + 代码采样验证，标注“配置 vs 实际”差异
 
 ### 降级策略
 

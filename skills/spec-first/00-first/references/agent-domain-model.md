@@ -1,6 +1,6 @@
 # Agent A4 — 领域模型分析
 
-> **适用模式**: deep 模式专用（quick 模式下，domain-model.md 由 Agent D 生成简化版本）
+> **适用模式**: 标准模式
 
 > 输入上下文: P1a tech-stack 结果 + Agent A2 的架构图 + Agent B 的 api-docs + Agent D 的 database-er.md（如有） + `serena_available` 状态
 >

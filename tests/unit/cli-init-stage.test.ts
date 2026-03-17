@@ -182,7 +182,7 @@ describe('handleInit', () => {
       const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
       expect(code).toBe(0);
       expect(output).toContain('✅ 前置检查通过');
-      expect(output).toContain('00-first Skill 已完成 (quick 模式)');
+      expect(output).toContain('00-first Skill 已完成 (deep 模式)');
       expect(output).toContain('- 技术栈:');
       expect(output).toContain('- 代码量:');
       expect(output).toContain('- API 端点:');
@@ -198,7 +198,7 @@ describe('handleInit', () => {
     writeFirstRuntimeIndex(TMP, {
       version: '1.0.0',
       lastRun: '2026-03-08T12:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
@@ -207,7 +207,7 @@ describe('handleInit', () => {
     });
     writeFirstRuntimeSummary(TMP, {
       generatedAt: '2026-03-08T12:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       project: { name: 'spec-first', platformType: 'backend', overview: 'runtime-only init' },
       modules: ['src/core/process-engine/init.ts'],
       capabilities: ['feature initialization'],
@@ -329,7 +329,7 @@ describe('handleInit', () => {
       // With --feat and unhealthy runtime → feature-init-blocked track
       expect(output).toContain('⚠️  Feature 初始化被阻止');
       expect(output).toContain('00-first Skill 尚未完成');
-      expect(output).toContain('/spec-first:first --quick');
+      expect(output).toContain('/spec-first:first');
       expect(output).toContain('/spec-first:init');
     } finally {
       errSpy.mockRestore();

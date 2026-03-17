@@ -51,7 +51,7 @@
    | **Greenfield** | 提示"检测到空项目或新建项目，建议先创建代码后再运行"并退出 |
    | **未知**（无包管理文件且无代码） | 提示"无法识别项目类型，可用 --type 参数手动指定"
 
-3. 收集用户交互式选项（`depth`、可选 `platform_type`）
+3. 收集用户输入（可选 `platform_type`）
 
 4. **激活 Serena 项目**：
    - 使用 `serena:activate_project` 激活目标项目
@@ -123,30 +123,11 @@
 
 **输出执行计划**：
 
-在 P1 开始时，先根据 `depth` 模式输出执行计划：
+在 P1 开始时，输出标准模式执行计划：
 
-**quick 模式执行计划**：
+**标准模式执行计划**：
 ```
-📋 First Skill 执行计划（quick 模式）
-
-项目: [从 package.json/pom.xml/go.mod 等提取项目名称]
-语言: [检测到的主要语言]
-
-📦 将生成 [N] 个核心文档:
-  1. tech-stack.md            技术栈摘要
-  2. codebase-overview.md     代码结构概览
-  3. domain-model.md          业务领域模型
-  4. api-docs.md              API 文档
-  5. database-er.md           数据库 ER（如有 DB）
-
-⚙️ 并发策略: 4-5 个 Agent 派发（单 agent 60s，整体 <5min）
-
-开始生成...
-```
-
-**deep 模式执行计划**：
-```
-📋 First Skill 执行计划（deep 模式）
+📋 First Skill 执行计划（标准模式）
 
 项目: [从 package.json/pom.xml/go.mod 等提取项目名称]
 语言: [检测到的主要语言]
@@ -182,11 +163,11 @@
 
 **检测规则**：语言（12 种）、框架（20 种）、多端技术栈详见 → `references/detection-rules.md`
 
-输出 → `docs/first/tech-stack.md`（头部包含 `last_updated: {{DATE}}` 和 `mode: quick/deep`）
+输出 → `docs/first/tech-stack.md`（头部包含 `last_updated: {{DATE}}` 和 `mode: deep`）
 
 → **P1a 完成，立即派发 Agent**
 
-### P1b: Context7 映射收集（仅 deep 模式）
+### P1b: Context7 映射收集
 
 
 ---
@@ -204,7 +185,7 @@
    ```typescript
    interface FirstRuntimeSummary {
      generatedAt: string;           // ISO 8601 时间戳
-     mode: 'quick' | 'deep';
+     mode: 'deep';
      project: {
        name: string;                // 从 package.json/pom.xml 等提取
        platformType?: string;       // 如 "cli-tool", "web-app", "backend-api"
@@ -234,7 +215,7 @@
    interface FirstRuntimeIndex {
      version: string;               // 固定 "2.1.0"
      lastRun: string;               // ISO 8601 时间戳
-     mode: 'quick' | 'deep';
+     mode: 'deep';
      summary: {
        path: string;                // ".spec-first/runtime/first/summary.json"
        fileHash: string;            // SHA-256 哈希
@@ -295,4 +276,3 @@
 - 生成后读取 JSON 文件验证可解析
 - 检查必需字段是否存在
 - 输出生成的 runtime 资产路径
-

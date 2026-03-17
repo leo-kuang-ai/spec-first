@@ -4,7 +4,7 @@ import { basename, join } from 'node:path';
 import { sha256Hex } from '../../shared/crypto-utils.js';
 import { FIRST_RUNTIME_ARTIFACTS } from './first-artifact-mapping.js';
 import { refreshFirstDocsFromRuntime } from './first-doc-projection.js';
-import type { PlatformType } from './first-args.js';
+import type { FirstMode, PlatformType } from './first-args.js';
 import { detectPlatformType, classifyProjectMaturity } from './first-platform-detector.js';
 import { buildRoleViews } from './first-role-views.js';
 import { buildFirstConventions } from './first-conventions.js';
@@ -55,6 +55,7 @@ import { buildStageViews } from './first-stage-views.js';
 import { buildFirstSummary } from './first-summary.js';
 
 export interface BootstrapFirstRuntimeOptions {
+  mode?: FirstMode;
   platformType?: PlatformType;
 }
 
@@ -267,6 +268,7 @@ function buildBootstrapSummary(
 
   return buildFirstSummary({
     generatedAt: new Date().toISOString(),
+    mode: options.mode ?? 'deep',
     projectName,
     platformType,
     overview: detectOverview(projectRoot, pkg),
@@ -458,6 +460,7 @@ export function bootstrapFirstRuntime(
   const initialIndex: FirstRuntimeIndex = {
     version: '1.0.0',
     lastRun: now,
+    mode: summary.mode,
     sourceCommit: getCurrentSourceCommit(projectRoot),
     summary: buildIndexEntry(
       getFirstRuntimeSummaryPath(projectRoot),

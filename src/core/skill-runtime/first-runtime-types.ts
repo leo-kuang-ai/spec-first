@@ -1,8 +1,11 @@
 export const FIRST_RUNTIME_STAGES = ['spec', 'design', 'code', 'verify'] as const;
 export const FIRST_RUNTIME_ROLES = ['product', 'dev', 'qa', 'architect'] as const;
+// `quick` 仅作为历史 runtime 数据的兼容值保留；新的 CLI 与写入统一使用 `deep`。
+export const FIRST_RUNTIME_MODES = ['quick', 'deep'] as const;
 
 export type FirstRuntimeStage = (typeof FIRST_RUNTIME_STAGES)[number];
 export type FirstRuntimeRole = (typeof FIRST_RUNTIME_ROLES)[number];
+export type FirstRuntimeMode = (typeof FIRST_RUNTIME_MODES)[number];
 export type FirstRuntimeStatus = 'current' | 'stale';
 export type FirstRuntimeConditionalStatus = 'healthy' | 'not_applicable' | 'degraded';
 
@@ -21,6 +24,7 @@ export interface FirstRuntimeConditionalAssetIndexEntry extends FirstRuntimeAsse
 export interface FirstRuntimeIndex {
   version: string;
   lastRun: string;
+  mode?: FirstRuntimeMode;
   sourceCommit?: string;
   summary: FirstRuntimeAssetIndexEntry;
   roleViews: FirstRuntimeAssetIndexEntry;
@@ -42,6 +46,7 @@ export interface FirstRuntimeIndex {
 
 export interface FirstRuntimeSummary {
   generatedAt: string;
+  mode?: FirstRuntimeMode;
   project: {
     name: string;
     platformType?: string;

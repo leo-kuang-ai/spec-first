@@ -262,7 +262,18 @@ export function detectInitTrack(state: InitProjectState, args: string[]): InitTr
 // Brownfield-baseline track
 // ─────────────────────────────────────────────
 
-/** Canonical Feature ID for brownfield baseline captures. Used as marker throughout the system. */
+/**
+ * Canonical Feature ID for brownfield baseline captures.
+ *
+ * Current implementation constraint:
+ * - the system supports exactly one canonical legacy baseline
+ * - baseline semantics are identified via this fixed Feature ID
+ *
+ * This is an internal marker for the current single-baseline model, not the ideal
+ * long-term representation of baseline semantics. If baseline variants or multiple
+ * baselines are introduced later, migrate the semantic check to explicit metadata
+ * (for example, `featureKind`) instead of relying on the ID literal alone.
+ */
 export const LEGACY_BASELINE_FEATURE_ID = 'FSREQ-19700101-LEGACY-BASELINE';
 
 export interface LegacyBaselinePreset {
@@ -563,7 +574,7 @@ export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
   const runtimeSummary = readFirstRuntimeSummary(projectRoot);
   if (runtimeIndex && runtimeSummary) {
     return {
-      mode: runtimeIndex.mode,
+      mode: runtimeIndex.mode ?? 'deep',
       techStack: runtimeSummary.project?.platformType ?? '待确认',
       codeVolume:
         runtimeSummary.modules?.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
@@ -645,7 +656,7 @@ function runProjectOnboardingTrack(state: InitProjectState, cwd: string): number
       console.error('00-first 数据不完整，需要重新生成。');
       console.error('');
       console.error('建议操作：');
-      console.error('  运行 /spec-first:first --quick    重新生成项目认知数据');
+      console.error('  运行 /spec-first:first            重新生成项目认知数据');
       console.error('');
       console.error('不完整项：');
       for (const item of readiness.firstMissing) console.error(`  - ${item}`);
@@ -653,8 +664,8 @@ function runProjectOnboardingTrack(state: InitProjectState, cwd: string): number
       console.error('00-first Skill 尚未执行，无法初始化需求工作区。');
       console.error('');
       console.error('建议操作：');
-      console.error('  1. 运行 /spec-first:first --quick    快速认知项目（<5min）');
-      console.error('  2. 运行 /spec-first:first --deep     完整分析项目（<10min）');
+      console.error('  1. 运行 /spec-first:first            生成项目认知数据');
+      console.error('  2. 认知完成后再继续 /spec-first:init');
       console.error('');
       console.error('缺失项：');
       for (const item of readiness.firstMissing) console.error(`  - ${item}`);
@@ -669,7 +680,7 @@ function runProjectOnboardingTrack(state: InitProjectState, cwd: string): number
     console.log('✅ 项目 meta 配置已创建');
     console.log('');
     console.log('建议接下来运行：');
-    console.log('  /spec-first:first --quick    快速认知项目');
+    console.log('  /spec-first:first            生成项目认知数据');
     return ExitCode.SUCCESS;
   }
 
@@ -682,7 +693,7 @@ function runFeatureInitBlockedTrack(): number {
   console.error('00-first Skill 尚未完成，无法创建 Feature。');
   console.error('');
   console.error('建议操作：');
-  console.error('  1. 运行 /spec-first:first --quick    快速认知项目（<5min）');
+  console.error('  1. 运行 /spec-first:first            生成项目认知数据');
   console.error('  2. 完成后重新运行 /spec-first:init');
   return ExitCode.VALIDATION_ERROR;
 }

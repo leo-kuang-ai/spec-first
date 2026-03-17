@@ -4,7 +4,7 @@
  * 功能:
  * - 检测已有 runtime 产物并生成恢复提示
  * - 过期检测与提醒
- * - 渐进式升级提示 (quick → deep)
+ * - 已有 runtime 产物的恢复与重建建议
  */
 
 import { existsSync } from 'node:fs';
@@ -25,7 +25,6 @@ import {
 export type ResumeOption =
   | 'view_summary'
   | 'incremental'
-  | 'upgrade_deep'
   | 'full_regenerate'
   | 'skip';
 
@@ -106,9 +105,6 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
       : detectedPlatform.type);
   const options: ResumeOption[] = ['view_summary'];
 
-  if (runtimeIndex.mode === 'quick') {
-    options.push('upgrade_deep');
-  }
   if ((updateContext.changeAnalysis?.changedFiles ?? 0) > 0) {
     options.push('incremental');
   }
@@ -117,23 +113,18 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
   let recommendedOption: ResumeOption = 'skip';
   if (staleCheck.stale || updateContext.changeAnalysis?.recommendedStrategy === 'full') {
     recommendedOption = 'full_regenerate';
-  } else if (
-    runtimeIndex.mode === 'quick' &&
-    updateContext.productStatus.some((product) => product.issues.length > 0)
-  ) {
-    recommendedOption = 'upgrade_deep';
   }
 
   return {
     hasExistingProducts: true,
-    lastMode: runtimeIndex.mode,
+    lastMode: runtimeIndex.mode ?? 'deep',
     lastRunTime,
     isStale: staleCheck.stale,
     staleReason: staleCheck.reason,
     commitMismatch: false,
     options,
     recommendedOption,
-    message: `📋 检测到已有 00-first runtime 产物 | 模式: ${runtimeIndex.mode} | 端类型: ${platformType} | 距今: ${daysSince} 天`,
+    message: `📋 检测到已有 00-first runtime 产物 | 模式: ${runtimeIndex.mode ?? 'deep'} | 端类型: ${platformType} | 距今: ${daysSince} 天`,
   };
 }
 
@@ -168,7 +159,6 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
   const optionLabels: Record<ResumeOption, string> = {
     view_summary: '查看产物摘要',
     incremental: '增量更新（基于 git diff）',
-    upgrade_deep: '升级到 deep 模式（追加 6 个文档）',
     full_regenerate: '全量重新生成',
     skip: '跳过（使用现有产物）',
   };
@@ -186,9 +176,6 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
 
   if (recommendation.options.includes('incremental')) {
     lines.push('  /spec-first:first --update=<产物列表>');
-  }
-  if (recommendation.options.includes('upgrade_deep') && canSkipConfirm(['--deep'])) {
-    lines.push('  /spec-first:first --deep');
   }
   if (recommendation.options.includes('full_regenerate') && canSkipConfirm(['--force'])) {
     lines.push('  /spec-first:first --force');
@@ -210,7 +197,7 @@ export function formatProductSummary(projectRoot: string): string {
   const lines: string[] = [];
   lines.push('📋 **00-first runtime 摘要**');
   lines.push('');
-  lines.push(`- 运行模式: ${runtimeIndex.mode}`);
+  lines.push(`- 运行模式: ${runtimeIndex.mode ?? 'deep'}`);
   lines.push(`- 上次更新: ${runtimeIndex.lastRun.slice(0, 19).replace('T', ' ')}`);
   if (runtimeSummary?.project.name) {
     lines.push(`- 项目名称: ${runtimeSummary.project.name}`);

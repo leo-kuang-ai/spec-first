@@ -3,9 +3,8 @@
  * 统一 /spec-first:first 参数入口
  *
  * 模式选择:
- * --auto: 跳过交互，使用智能推荐模式
- * --quick: 跳过交互，强制使用 quick 模式
- * --deep: 跳过交互，强制使用 deep 模式
+ * - 运行模式统一为 deep
+ * --auto: 跳过交互，使用智能推荐执行策略
  *
  * 端类型指定:
  * --type=<value>: 手动指定端类型 (backend/frontend/mobile/cross-platform/desktop/monorepo)
@@ -19,7 +18,7 @@
  * --check-health: 仅检查产物健康度，不生成
  */
 
-export type FirstMode = 'quick' | 'deep';
+export type FirstMode = 'deep';
 export type PlatformType =
   | 'backend'
   | 'frontend'
@@ -47,7 +46,6 @@ export type ProductName = (typeof PRODUCT_NAMES)[number];
 
 export interface FirstArgs {
   mode: FirstMode;
-  modeExplicit: boolean; // 用户是否显式传入了 --quick 或 --deep
   type?: PlatformType;
   auto: boolean; // --auto 标志：使用智能推荐
   force: boolean; // --force 标志：跳过二次确认
@@ -74,8 +72,6 @@ export class FirstArgsError extends Error {
 
 const ALLOWED_FLAGS = new Set([
   '--auto',
-  '--quick',
-  '--deep',
   '--force',
   '--skip',
   '--check-health',
@@ -103,8 +99,7 @@ const VALID_TYPES = new Set<PlatformType>([
  */
 export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void): FirstArgs {
   const result: FirstArgs = {
-    mode: 'quick', // 默认 quick 模式
-    modeExplicit: false,
+    mode: 'deep',
     auto: false,
     force: false,
     skip: false,
@@ -184,15 +179,7 @@ export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void
       switch (arg) {
         case '--auto':
           result.auto = true;
-          // mode 由智能推荐决定，保持默认 quick
-          break;
-        case '--quick':
-          result.mode = 'quick';
-          result.modeExplicit = true;
-          break;
-        case '--deep':
-          result.mode = 'deep';
-          result.modeExplicit = true;
+          // 运行模式固定为 deep，auto 仅影响执行策略
           break;
         case '--force':
           result.force = true;
@@ -210,7 +197,7 @@ export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void
     // 未知参数
     throw new FirstArgsError(
       E_FIRST_ARGS_UNKNOWN,
-      `未知参数: ${arg}。有效参数: --auto, --quick, --deep, --type=<value>, --force, --skip, --update=<products>, --since=<commit|version>, --check-health`
+      `未知参数: ${arg}。有效参数: --auto, --type=<value>, --force, --skip, --update=<products>, --since=<commit|version>, --check-health`
     );
   }
 
@@ -219,12 +206,11 @@ export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void
 
 /**
  * 解析 first skill 确认策略
- * 基于 --auto/--quick/--deep 标志决定是否跳过交互
+ * 基于 --auto/--force/--skip 标志决定是否跳过交互
  * @returns 'skip' - 跳过交互直接执行 | 'require' - 需要交互式确认
  */
 export function resolveFirstConfirmPolicy(args: FirstArgs): 'skip' | 'require' {
-  // --auto, --force, --skip, 显式 --quick/--deep 都跳过交互
-  return args.auto || args.force || args.skip || args.modeExplicit ? 'skip' : 'require';
+  return args.auto || args.force || args.skip ? 'skip' : 'require';
 }
 
 /**

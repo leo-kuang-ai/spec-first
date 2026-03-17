@@ -387,7 +387,7 @@ function rewriteRuntimeArtifacts(
   if (artifacts.includes('summary.json')) {
     summary = buildFirstSummary({
       generatedAt: new Date().toISOString(),
-      mode: summary.mode,
+      mode: summary.mode ?? 'deep',
       projectName: summary.project.name,
       platformType: summary.project.platformType,
       overview: summary.project.overview,

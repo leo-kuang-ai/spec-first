@@ -760,7 +760,12 @@ function createInitialStageState(
   };
 }
 
-/** Canonical marker for brownfield baseline captures — must match CLI constant. */
+/**
+ * Canonical marker for brownfield baseline captures — must match CLI constant.
+ * Current implementation recognizes the single legacy baseline by this fixed ID.
+ * If baseline semantics are later moved to explicit metadata, keep this value only
+ * as a compatibility/default marker instead of the primary semantic switch.
+ */
 const LEGACY_BASELINE_FEATURE_ID = 'FSREQ-19700101-LEGACY-BASELINE';
 
 function writeFeatureSkeleton(

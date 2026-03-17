@@ -20,12 +20,12 @@ import {
 
 const TEST_DIR = join(import.meta.dirname, '../fixtures/first-resume');
 
-function seedHealthyRuntime(projectRoot: string, overrides?: { mode?: 'quick' | 'deep'; platformType?: string }) {
+function seedHealthyRuntime(projectRoot: string, overrides?: { mode?: 'deep'; platformType?: string }) {
   const now = '2026-03-08T12:00:00.000Z';
   writeFirstRuntimeIndex(projectRoot, {
     version: '1.0.0',
     lastRun: now,
-    mode: overrides?.mode ?? 'quick',
+    mode: overrides?.mode ?? 'deep',
     summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: now, healthy: true },
     roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: now, healthy: true },
     stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: now, healthy: true },
@@ -34,7 +34,7 @@ function seedHealthyRuntime(projectRoot: string, overrides?: { mode?: 'quick' | 
   });
   writeFirstRuntimeSummary(projectRoot, {
     generatedAt: now,
-    mode: overrides?.mode ?? 'quick',
+    mode: overrides?.mode ?? 'deep',
     project: { name: 'spec-first', platformType: overrides?.platformType, overview: 'runtime-only' },
     modules: ['src/core/skill-runtime'],
     capabilities: ['runtime truth source'],
@@ -89,14 +89,13 @@ describe('generateResumeRecommendation', () => {
   });
 
   it('仅基于 runtime 真源返回会话恢复选项', () => {
-    seedHealthyRuntime(TEST_DIR, { mode: 'quick', platformType: 'backend' });
+    seedHealthyRuntime(TEST_DIR, { mode: 'deep', platformType: 'backend' });
 
     const result = generateResumeRecommendation(TEST_DIR);
 
     expect(result.hasExistingProducts).toBe(true);
-    expect(result.lastMode).toBe('quick');
+    expect(result.lastMode).toBe('deep');
     expect(result.options).toContain('view_summary');
-    expect(result.options).toContain('upgrade_deep');
     expect(result.message).toContain('00-first runtime 产物');
   });
 
@@ -153,13 +152,13 @@ describe('formatResumePrompt', () => {
   it('格式化会话恢复提示', () => {
     const recommendation: ResumeRecommendation = {
       hasExistingProducts: true,
-      lastMode: 'quick',
+      lastMode: 'deep',
       lastRunTime: new Date('2026-03-01'),
       isStale: false,
       commitMismatch: false,
-      options: ['view_summary', 'upgrade_deep', 'full_regenerate', 'skip'],
+      options: ['view_summary', 'full_regenerate', 'skip'],
       recommendedOption: 'skip',
-      message: '检测到已有产物 | 模式: quick | 距今: 1 天',
+      message: '检测到已有产物 | 模式: deep | 距今: 1 天',
     };
 
     const prompt = formatResumePrompt(recommendation);
@@ -170,14 +169,14 @@ describe('formatResumePrompt', () => {
   it('格式化过期状态提示', () => {
     const recommendation: ResumeRecommendation = {
       hasExistingProducts: true,
-      lastMode: 'quick',
+      lastMode: 'deep',
       lastRunTime: new Date('2026-02-20'),
       isStale: true,
       staleReason: '产物已过期（距今 10 天）',
       commitMismatch: false,
       options: ['full_regenerate', 'skip'],
       recommendedOption: 'full_regenerate',
-      message: '检测到已有产物 | 模式: quick',
+      message: '检测到已有产物 | 模式: deep',
     };
 
     const prompt = formatResumePrompt(recommendation);
@@ -196,7 +195,7 @@ describe('formatProductSummary', () => {
   });
 
   it('格式化 runtime 摘要', () => {
-    seedHealthyRuntime(TEST_DIR, { mode: 'quick', platformType: 'backend' });
+    seedHealthyRuntime(TEST_DIR, { mode: 'deep', platformType: 'backend' });
 
     const summary = formatProductSummary(TEST_DIR);
 

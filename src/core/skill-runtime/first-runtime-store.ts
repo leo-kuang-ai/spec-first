@@ -21,6 +21,19 @@ import type {
   FirstStageViews,
 } from './first-runtime-types.js';
 
+function normalizeFirstRuntimeMode(mode: unknown): 'deep' | undefined {
+  if (mode === 'deep') return 'deep';
+  if (
+    mode === 'quick' ||
+    mode === 'bootstrap' ||
+    mode === 'refresh-all' ||
+    mode === 'refresh-docs-from-runtime'
+  ) {
+    return 'deep';
+  }
+  return undefined;
+}
+
 export const FIRST_RUNTIME_DIR = '.spec-first/runtime/first';
 export const FIRST_RUNTIME_INDEX_FILE = 'index.json';
 export const FIRST_RUNTIME_SUMMARY_FILE = 'summary.json';
@@ -245,6 +258,7 @@ function normalizeCanonicalRuntimeIndex(
 
   return {
     ...rawIndex,
+    mode: normalizeFirstRuntimeMode(rawIndex.mode),
     steering,
     conventions,
     criticalFlows,
@@ -283,7 +297,12 @@ export function readFirstRuntimeIndex(projectRoot: string): FirstRuntimeIndex | 
 }
 
 export function readFirstRuntimeSummary(projectRoot: string): FirstRuntimeSummary | null {
-  return readRuntimeJson<FirstRuntimeSummary>(getFirstRuntimeSummaryPath(projectRoot));
+  const raw = readRuntimeJson<FirstRuntimeSummary>(getFirstRuntimeSummaryPath(projectRoot));
+  if (raw === null) return null;
+  return {
+    ...raw,
+    mode: normalizeFirstRuntimeMode(raw.mode),
+  };
 }
 
 export function readFirstApiContracts(projectRoot: string): FirstApiContracts | null {

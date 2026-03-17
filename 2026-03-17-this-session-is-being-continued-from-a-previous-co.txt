@@ -1,0 +1,792 @@
+╭───────────────────────────────────────────────────╮
+│ ✻ Welcome to Claude Code!                         │
+│                                                   │
+│   /help for help, /status for your current setup  │
+│                                                   │
+│   cwd: /Users/kuang/xiaobu/spec-first             │
+│                                                   │
+│   ─────────────────────────────────────────────── │
+│                                                   │
+│   Overrides (via env):                            │
+│                                                   │
+│   • API Base URL:                                 │
+│   https://code.newcli.com/claude/aws              │
+╰───────────────────────────────────────────────────╯
+══════════════════════════════════════════════════════════════════════════════════════ Conversation compacted · ctrl+r for history ══════════════════════════════════════════════════════════════════════════════════════
+
+> <session-start-hook>[spec-first] 技能路由表: init→spec→design→task→code→review→verify→archive→feature→catchup
+  [spec-first] 1%规则: 有1%相关性也先走skill检查，不要直接执行</session-start-hook>
+
+✻ Thinking…
+
+  Let me continue with the pending fixes. I need to:
+  1. Replace pnpm test → npm test in Batch 1 and Batch 2 documents
+  2. Add default-guidance.md to P0-1
+  3. Fix minor issues
+
+  Let me start with the first task which is marked as in_progress.
+
+⏺ 继续处理待修复的问题。先从严重问题1开始：替换 pnpm test → npm test。
+
+⏺ Bash(cd "/Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/12-专家角色" && grep -n "pnpm test" "2026-03-15-第一批专家集成改造任务文档.md" | head -30)
+  ⎿  162:| 建议命令 | `pnpm test -- tests/unit/spec-skill-docs.test.ts tests/integration/skill-render.test.ts` | 两类断言都通过 |                                                               
+     198:| 建议命令 | `pnpm test -- tests/unit/design-skill-docs.test.ts tests/integration/skill-render.test.ts` | 两类断言都通过 |
+     259:| 建议命令 | `pnpm test -- tests/unit/task-skill-docs.test.ts tests/unit/task-plan-parser.test.ts tests/unit/plan-artifact-structure.test.ts tests/integration/skill-render.test.ts` |
+     文本、结构、解析三层均通过 |
+     … +8 lines (ctrl+r to expand)
+
+⏺ Bash(cd "/Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/12-专家角色" && grep -n "pnpm test" "2026-03-15-第二批专家集成改造任务文档.md" | head -30)
+  ⎿  95:| 运行命令 | `pnpm test -- tests/unit/spec-review-skill-docs.test.ts tests/unit/shared-contract-coverage.test.ts` |                                                                      
+     134:| 建议命令 | `pnpm test -- tests/unit/research-skill-docs.test.ts tests/integration/skill-render.test.ts` | 两类断言都通过 |
+     171:| 建议命令 | `pnpm test -- tests/unit/code-skill-docs.test.ts tests/unit/skill-runtime.test.ts tests/unit/hard-gate.test.ts tests/integration/skill-render.test.ts` | 文本与门禁均通过 |
+     … +8 lines (ctrl+r to expand)
+
+⏺ Bash(cd "/Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/12-专家角色" && sed -i '' 's/`pnpm test --/`npm test --/g' "2026-03-15-第一批专家集成改造任务文档.md" && echo "Batch 1 don…)
+  ⎿  Batch 1 done
+
+⏺ Bash(cd "/Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/12-专家角色" && sed -i '' 's/`pnpm test --/`npm test --/g' "2026-03-15-第二批专家集成改造任务文档.md" && echo "Batch 2 don…)
+  ⎿  Batch 2 done
+
+⏺ 替换成功。验证一下确无残留：
+
+⏺ Bash(cd "/Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/12-专家角色" && grep -c "pnpm test" "2026-03-15-第一批专家集成改造任务文档.md" "2026-03-15-第二批专家集成改造任务文档.md" 2>&1)
+  ⎿  2026-03-15-第一批专家集成改造任务文档.md:0
+     2026-03-15-第二批专家集成改造任务文档.md:0
+
+⏺ 现在修复严重问题2：在 P0-1 中补充 default-guidance.md：
+
+⏺ Read(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第一批专家集成改造任务文档.md)
+  ⎿  Read 18 lines (ctrl+r to expand)
+
+⏺ Update(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第一批专家集成改造任务文档.md)
+  ⎿  Updated docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第一批专家集成改造任务文档.md with 3 additions and 1 removal                                     
+       59    | 需新增文件 | `skills/spec-first/experts/execution-orchestration.md` |
+       60    | 需新增文件 | `skills/spec-first/experts/api-verification.md` |
+       61    | 需新增文件 | `skills/spec-first/experts/frontend-evidence-check.md` |
+       62 +  | 需新增文件 | `skills/spec-first/experts/default-guidance.md` |
+       63    | 统一模板 | `目标`、`适用 skill`、`触发信号`、`关注点`、`交付要求`、`停止条件`、`不负责的内容` |
+       64 -  | 完成标准 | profile 命名稳定，边界不与 stage/gate/trace 真源重叠 |
+       64 +  | `default-guidance.md` 内容要求 | 按当前 stage 给出"本阶段最常见质量风险"（2-3 条）+ "下一步推荐 skill"（1 条）；不包含任务特定内容，始终安全可渲染 |
+       65 +  | 完成标准 | profile 命名稳定，边界不与 stage/gate/trace 真源重叠；`default-guidance.md` 已建立作为 fallback 真源 |
+       66    
+       67    ### Task P0-2：建立 Profile 映射真源
+       68    
+
+⏺ 现在处理3个轻微问题。先读相关部分：
+
+⏺ Read(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-专家角色最佳集成方案.md)
+  ⎿  Read 30 lines (ctrl+r to expand)
+
+⏺ Read(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-专家角色最佳集成方案.md)
+  ⎿  Read 13 lines (ctrl+r to expand)
+
+⏺ 现在处理3个轻微问题：
+
+  问题1: §十二 与第一批任务文档§八的实施顺序不一致 → 在§十二加注说明问题2: §十六"7个"漏掉 default-guidance → 修正计数问题3: 第三批前置依赖描述模糊 → 精确化
+
+⏺ Update(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-专家角色最佳集成方案.md)
+  ⎿  Updated docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-专家角色最佳集成方案.md with 2 additions                                                             
+       235    
+       236    ## 十二、建议的改写顺序
+       237    
+       238 +  > **注**：本节为 Skill 文本改写的概念优先级顺序，**实际含 P0 前置任务的执行顺序以第一批任务文档§八为准**（P0-1→P0-2→P0-3→P0-4 必须先于所有 Skill 改写）。
+       239 +  
+       240    | 顺序 | Skill | 原因 |
+       241    |------|------|------|
+       242    | 1 | `12-verify` | 质量提升最直接，收益最大 |
+
+⏺ Update(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-专家角色最佳集成方案.md)
+  ⎿  Updated docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-专家角色最佳集成方案.md with 1 addition and 1 removal                                           
+       316    
+       317    | 标准 | 说明 |
+       318    |------|------|
+       319 -  | Canonical profile 真源存在 | 至少完成第一批 7 个稳定 canonical profile 的文档真源 |
+       319 +  | Canonical profile 真源存在 | 完成第一批 7 个专项 canonical profile + 1 个 `default-guidance` fallback profile（共 8 条顶层注册表条目）的文档真源 |
+       320    | Fragment 真源存在 | 第二、第三批 fragment 均有独立真源，但不进入顶层 registry |
+       321    | 关键 skill 已吸收专家能力 | 第一批 `03/04/06/08/12/13` 完成 canonical profile 吸收；第二、第三批通过 fragment/guidance 接入 |
+       322    | 输出质量提升 | `review`、`verify`、`design`、`orchestrate` 输出具备差异化专家视角，低上下文 CLI 命令具备最小 guidance |
+
+⏺ 现在修复第三批文档中前置依赖描述模糊问题：
+
+⏺ Read(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第三批专家集成改造任务文档.md)
+  ⎿  Read 5 lines (ctrl+r to expand)
+
+⏺ Update(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第三批专家集成改造任务文档.md)
+  ⎿  Updated docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第三批专家集成改造任务文档.md with 1 addition and 1 removal                                                                 
+       10    | 项目 | 内容 |
+       11    |------|------|
+       12    | 保持不变 | 不改阶段状态机、不改 Gate 真源、不改变命令主语义、不引入第二套恢复/诊断系统 |
+       13 -  | 前置依赖 | 第一批 canonical profile 与第二批 fragment 附着机制已建立 |
+       13 +  | 前置依赖 | 第一批 canonical profile（P0-1~P0-4）与第二批 fragment 基础架构（P1-1、P1-2）已建立；P2-2 将在此基础上继续扩展第三批条目 |
+       14    | 第三批 skill | `00-first`、`00-onboarding`、`01-init`、`02-catchup`、`14-status`、`15-doctor`、`16-sync`、`17-feature` |
+       15    | 第三批定位 | 只做“引导、恢复、诊断、同步、切换”的轻量专家增强，不把这些 skill 变成重审查入口 |
+       16    | 本版重点 | 补齐 `01-init`、`16-sync`、`17-feature` 缺失的独立 docs test；采用 `skillName/static fragment + command-local guidance` 模式，避免无上下文命令硬套 task/stage 映射 |
+
+⏺ 最后修复第一批任务文档 §一 的计数（7个 → 明确7+1）：
+
+⏺ Read(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第一批专家集成改造任务文档.md)
+  ⎿  Read 8 lines (ctrl+r to expand)
+
+⏺ Update(docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第一批专家集成改造任务文档.md)
+  ⎿  Updated docs/01-需求文档/优势借鉴分析/12-专家角色/2026-03-15-第一批专家集成改造任务文档.md with 2 additions and 2 removals                                                                  
+       12    | 保持不变 | 不改阶段状态机、不改 Gate 真源、不引入第二套 orchestrator |
+       13    | 正式路线 | 先建立 `profile` 真源与映射，再改 skill 文本，再补最小 runtime 接入，最后补测试 |
+       14    | 第一批 skill | `03-spec`、`04-design`、`06-task`、`08-review`、`12-verify`、`13-orchestrate` |
+       15 -  | 第一批 profile | `planning-consult`、`architecture-review`、`code-quality-review`、`security-review`、`execution-orchestration`、`api-verification`、`frontend-evidence-check` |
+       16 -  | Canonical 边界 | 第一批 7 个 profile 构成唯一顶层 canonical profile 注册表；第二、第三批默认复用或扩展，不再新增顶层 profile |
+       15 +  | 第一批 profile | `planning-consult`、`architecture-review`、`code-quality-review`、`security-review`、`execution-orchestration`、`api-verification`、`frontend-evidence-check`（7 
+          +  个专项）+ `default-guidance`（fallback，第 8 条） |
+       16 +  | Canonical 边界 | 第一批 7 个专项 profile + 1 个 `default-guidance` fallback 共 8 条构成唯一顶层 canonical profile 注册表；第二、第三批默认复用或扩展，不再新增顶层 profile |
+       17    | 本版修正重点 | 补齐 `13-orchestrate` 的 CLI/runtime 任务、`06-task` 的 schema/parser 任务、所有改造的测试任务 |
+       18    
+       19    ## 二、当前实现约束
+
+⏺ 所有问题已修复完毕：
+
+  ❌ 严重问题（已修复）：
+  1. pnpm test → npm test：第一批（9处）+ 第二批（10处）全部替换，无残留
+  2. P0-1 遗漏 default-guidance.md：已补入文件清单，并增加内容要求（2-3条质量风险 + 1条推荐skill）
+
+  ⚠️ 轻微问题（已修复）：
+  3. 实施顺序不一致：§十二加注明确"实际执行顺序以第一批任务文档§八为准"
+  4. 计数歧义：第一批§一 + 最佳方案§十六 统一改为"7个专项 + 1个default-guidance = 8条"
+  5. 第三批前置依赖模糊：精确化为"P0-1~P0-4 与 P1-1、P1-2 已建立；P2-2 将继续扩展"
+
+> 当前实现是否会过于复杂
+
+✻ Thinking…
+
+  The user is asking whether the current implementation plan is overly complex. Let me think about this carefully based on what I've read.
+
+  The plan involves:
+  1. Three-layer integration model (canonical profiles, expert fragments, command-local guidance)
+  2. 5 independent exported functions in prompt-assembler.ts
+  3. Three-stage cascade fallback
+  4. Extension Interface pattern for TaskPlanExtended
+  5. Pre-building test skeletons
+  6. Three batches of skills across all skills
+
+  Let me assess complexity honestly.
+
+⏺ 是的，有几个维度值得直接说清楚。
+
+  真实复杂度评估
+
+  必要的复杂度（保留）
+
+  | 机制                              | 复杂度来源                | 是否必要                         |
+  |---------------------------------|----------------------|------------------------------|
+  | 三层模型（profile/fragment/guidance） | 适配不同上下文能力的 skill     | ✅ 必要，否则无上下文命令硬套 taskType 会更糟 |
+  | 三段降级（taskType→stage→default）    | 生产中 taskType 经常缺失    | ✅ 必要，无回退等于接入失败               |
+  | prompt-assembler 策略分离           | 防止三批叠加后 if/switch 堆积 | ✅ 必要，但实施时序可以后移               |
+
+  过度复杂的部分（风险）
+
+  1. 三批同时设计，但执行窗口太长
+  - 设计文档覆盖20个skill、7+1个profile、13个fragment，实施需要数月
+  - 风险：第一批完成时，第三批设计已过时
+
+  2. S3-R TaskPlanExtended 的性价比可疑
+  - 为了 handoff/DoD 字段新建私有类型体系 + 修改 parser + 修改 CLI
+  - 但这些字段在 SKILL.md 里作为 Markdown 约定也能工作，不必进运行时
+  - 可考虑：先做文本约定，推迟到真正有消费需求时再做 schema
+
+  3. P0-4 的"预建第三批骨架"是沉没成本陷阱
+  - 现在预建7个空骨架文件，将来填充时规范可能已变
+  - 实际价值：锁文件名。代价：增加 shared-contract 维护项
+
+  4. shared-contract-coverage 机制的维护成本被低估
+  - 三批都要往里注册，成为每次改动必须同步的隐性契约
+
+  建议的简化路线
+
+  当前方案（复杂）           建议简化（务实）
+  ─────────────────         ─────────────────
+  三批 × 前置任务 × 测试    → 只做第一批 + 第二批基础设施
+  S3-R（parser 扩展）       → 推迟，先做 SKILL.md 文本约定
+  P0-4 骨架预建             → 移除，用时再建
+  prompt-assembler 五函数   → 先实现，但不在 P0 阶段强制
+
+  核心建议：第三批的详细任务文档现在不应该存在——它是过度设计。先把第一批交付出来，看真实反馈再决定第二批形态。
+
+> 简单的方法,是不是直接优化skill 的md文件内容就行了?
+
+✻ Thinking…
+
+  The user is asking if the simplest approach is to just directly optimize the skill MD files content, without all the complex runtime infrastructure (prompt-assembler, orchestrator-profiles, expert-fragments, etc.).
+
+  Let me think about this honestly.
+
+⏺ 是的，这是最务实的路线。
+
+  直接改 SKILL.md 的优势
+
+  | 维度   | 直接改 SKILL.md | 当前三层方案                              |
+  |------|--------------|-------------------------------------|
+  | 实施成本 | 改文件即生效       | 需要新建5+个 .ts 文件                      |
+  | 风险   | 近乎零          | 改 dispatcher/prompt-assembler 有回归风险 |
+  | 可验证性 | 立即可读、可对比     | 需要跑测试才能验证注入                         |
+  | 交付速度 | 天级           | 周级                                  |
+  | 收益   | 90%          | 100%（多了动态注入）                        |
+
+  什么时候才需要运行时注入
+
+  只有当你需要根据上下文动态切换专家视角时才有必要：
+
+  同一个 review skill，安全改动 → 注入 security-review profile
+  同一个 review skill，普通改动 → 注入 code-quality-review profile
+
+  但现实是：Claude 读了 SKILL.md 里写清楚的分支判断规则，自己就会选，不需要运行时做这件事。
+
+  实际建议
+
+  现在做：直接改 6 个核心 SKILL.md
+  ─────────────────────────────────
+  03-spec    加：边界澄清协议、歧义扫描、AC可测试性检查
+  04-design  加：架构权衡表、失败模式、Design DoD
+  06-task    加：任务独立性检查、Task DoD、handoff模板
+  08-review  加：模式选择矩阵（质量/安全/架构）、findings升级
+  12-verify  加：验证模式矩阵、证据要求、默认怀疑规则
+  13-orchestrate 加：profile选择规则、handoff模板、回流模板
+
+  暂不做（除非有明确需求）：
+  ─────────────────────────────────
+  orchestrator-profiles.ts
+  expert-fragments.ts
+  prompt-assembler 改造
+  TaskPlanExtended schema
+
+  三批任务文档可以大幅精简——本质上就是一份"6个SKILL.md的改写清单"。
+
+> 现在做：直接改 6 个核心 SKILL.md   这个是在第一批任务中吗
+
+✻ Thinking…
+
+  The user is asking if the 6 core SKILL.md files to directly edit are part of the first batch tasks. Let me check the current directory structure to see what SKILL.md files exist for the 6 core skills mentioned.
+
+  Yes, these are in the first batch tasks (第一批). Looking at the task document:
+  - S1: 03-spec
+  - S2: 04-design  
+  - S3: 06-task
+  - S4: 08-review
+  - S5: 12-verify
+  - S6: 13-orchestrate
+
+  These are exactly the 6 skills in the first batch (第一批). The tasks S1-S6 in the first batch document cover these 6 skills.
+
+⏺ 是的，就是第一批任务文档里的 S1~S6：
+
+  | 任务  | Skill          | 当前文档状态                         |
+  |-----|----------------|--------------------------------|
+  | S1  | 03-spec        | 有详细改造子任务                       |
+  | S2  | 04-design      | 有详细改造子任务                       |
+  | S3  | 06-task        | 有详细改造子任务（含 S3-R parser 扩展，可跳过） |
+  | S4  | 08-review      | 有详细改造子任务                       |
+  | S5  | 12-verify      | 有详细改造子任务                       |
+  | S6  | 13-orchestrate | 有详细改造子任务（含 S6-R CLI 改造，可跳过）    |
+
+  简化后只需做的部分
+
+  第一批任务文档里，可以跳过的：
+  - P0-1~P0-4（建立 profile 真源、runtime 接入点、测试骨架）
+  - S3-R（TaskPlanExtended parser 扩展）
+  - S6-R（orchestrate CLI 改造）
+
+  只保留：S1、S2、S3（仅 SKILL.md 部分）、S4、S5、S6（仅 SKILL.md 部分）
+
+  ---
+  是否要现在就开始直接改这 6 个文件？可以从最高收益的 12-verify 或 08-review 开始。
+
+> 当前方案中,是直接改skill md文档的方案吗
+
+✻ Thinking…
+
+  The user is asking if the current plan (in the task documents) is the approach of directly editing skill MD files. Let me look at the current first batch task document to understand what it actually says.
+
+  Looking at the documents I've read, the first batch task document does include:
+  - P0-1 through P0-4 (infrastructure setup)
+  - S3-R (parser extension)
+  - S6-R (CLI modification)
+
+  But the S1-S6 tasks DO include directly modifying SKILL.md files. However, the overall plan also includes significant runtime infrastructure work (P0-1~P0-4, S3-R, S6-R).
+
+  So the current plan is NOT a pure "just edit SKILL.md" approach - it's a hybrid that includes both SKILL.md edits AND runtime infrastructure changes.
+
+  I'm wondering if we should simplify the task documents to focus on just the SKILL.md edits instead of including all the infrastructure work.
+
+⏺ 不是。当前方案是混合方案，包含大量 runtime 基础设施工作：
+
+  当前第一批任务文档包含：
+  - P0-1~P0-4：建 profile 真源目录、映射文件、改造 prompt-assembler、补测试骨架
+  - S3-R：新建 TaskPlanExtended、改 parser.ts、改 orchestrate.ts
+  - S6-R：改 orchestrate.ts CLI 逻辑
+  - S1~S6：才是改 SKILL.md 文本
+
+  SKILL.md 直接改写方案需要新建一份精简任务文档，去掉所有 runtime 部分，只保留 6 个 SKILL.md 的改写清单。
+
+  ---
+  你想怎么处理？
+
+  A. 更新当前任务文档，把 runtime 部分标注为"暂缓/可选"B. 新建一份精简版任务文档，只包含 6 个 SKILL.md 改写任务C. 直接开始改 SKILL.md，任务文档暂不动
+
+> 直接改skill md文档,是不是见效最快,成本最低的方案?
+
+✻ Thinking…
+
+  The user is asking if directly editing the SKILL.md files is the fastest and lowest-cost approach. Let me think about this honestly and directly.
+
+⏺ 是。
+
+  | 维度   | 直接改 SKILL.md | 当前完整方案                            |
+  |------|--------------|-----------------------------------|
+  | 启动成本 | 零（文件已存在）     | 需先建5+个新文件                         |
+  | 见效时间 | 改完即生效        | 需等 runtime 接入完成                   |
+  | 回归风险 | 近乎零          | 改 dispatcher/prompt-assembler 有风险 |
+  | 可验证  | 直接读文件对比      | 需跑测试                              |
+  | 放弃成本 | 随时可改回        | 已有 runtime 改动难回滚                  |
+
+  Claude 读 SKILL.md 时会直接遵循里面写的规则和模板——文本本身就是执行逻辑，不需要 runtime 注入。
+
+  要现在开始改吗？从哪个 skill 开始？
+
+> 把三个批次要优化的skill,统一输出一份直接修改skill md文档的改造方案文档, 细化到每个skill要集成参考哪些角色, think
+
+✻ Thinking…
+
+  The user wants me to create a new, simplified task document that:
+  1. Covers all three batches of skills
+  2. Focuses only on directly editing SKILL.md files
+  3. Details which expert roles each skill should integrate/reference
+  4. Is a clean, actionable document
+
+  Let me think about this carefully before writing.
+
+  Skills to cover:
+  - Batch 1 (core): 03-spec, 04-design, 06-task, 08-review, 12-verify, 13-orchestrate
+  - Batch 2 (extended): 05-research, 07-code, 10-archive, 11-plan, 20-spec-review, 21-analyze
+
+  - Batch 3 (lightweight): 00-first, 00-onboarding, 01-init, 02-catchup, 14-status, 15-doctor, 16-sync, 17-feature
+
+  Now I'm mapping out the available expert roles from the agency-agents reference: Software Architect, Security Engineer, Code Reviewer, Reality Checker, and API Tester are all P0 priority roles that can be integrated
+   across these skills.
+
+  I also have the P0 roles from oh-my-opencode like Agents Orchestrator for multi-role coordination, Prometheus for interview-style planning, Atlas for execution orchestration, and Oracle for architectural 
+  consultation, plus P1 roles like Hephaestus for deep implementation work, Metis for finding plan gaps, Momus for verification, Librarian for documentation searches, and Explore for codebase navigation.
+
+  For the 03-spec skill, I'm planning to add Prometheus for clarification interviews, Metis to surface ambiguities, and Momus to verify acceptance criteria.
+
+  For 04-design, I'll include the Software Architect for tradeoff analysis and Oracle for reviewing complex logic, with sections covering architecture decisions and failure modes.
+
+  For 06-task, I'm adding Prometheus for scope work, Momus for task verification, Atlas for dispatch readiness, and a Senior Project Manager, with sections on task independence and handoff templates.
+
+  For 08-review, I'm incorporating a Code Reviewer for quality standards... For the research phase, I'm setting up the Librarian and Oracle to handle documentation searches and complex logic, with the Tool Evaluator 
+  assessing options through evidence strength grading and candidate comparisons. The code implementation stage brings in Hephaestus and senior developers to handle deep work with pre-implementation risk checks and 
+  security constraints throughout. For archiving, I'm establishing evidence recovery procedures and knowledge preservation requirements to close out findings and document any lingering risks.
+
+  Moving into planning, Prometheus and Metis will identify gaps while Momus reviews the plan quality against approval criteria. The spec review phase has Momus and the architect checking implementability and FR-AC 
+  consistency, then the analysis stage uses the Oracle and Reality Checker to diagnose background quality and prioritize fixes.
+
+  For the foundational stages, I'm mapping out lightweight onboarding with risk hints, guided role-based paths for different scenarios, initialization readiness checks, and context recovery mechanisms with blocking 
+  identification rules.
+
+  Now moving into the operational phases—I need to establish status observability with risk explanation rules and next-step generation, diagnostic layering for repair workflows with prioritized fixes, sync governance 
+  with strategy selection and conflict handling, and feature navigation guidance for multi-feature scenarios. The document structure should emphasize clarity and actionability across each phase boundary.
+
+  For prioritization, the review and verification phases deliver immediate value, followed by design and orchestration work, then specification and task management. The remaining phases—research through feature 
+  onboarding—form the secondary tier. I'll organize this in the 12-专家角色 directory without requiring any runtime infrastructure changes.
+
+  Now I'm structuring the document to show each skill's path, which expert roles it connects to, what new sections are needed, and the core principles guiding the integration. The file goes in the designated directory
+   with today's date, and I'll keep everything focused on the documentation layer without mentioning code or runtime modifications.
+
+⏺ 让我先理清思路再写文档。
+
+⏺ sequential-thinking - sequentialthinking (MCP)(thought: "要输出一份\"直接改 SKILL.md\"的方案文档，需要先想清楚几个设计问题：\n\n1. **覆盖范围**：三批共20个skill（03/04/06/08/12/13 + 05/07/10/11/20/21 +
+                                                00-first/00-onboarding/01-init/02-catchup/14-status/15-doctor/16-sync/17-feature）\n\n2. **每个skill需要输出什么**：\n   -
+                                                参考哪些专家角色（从研发专家角色参考文档提取）\n   - 借鉴这些角色的什么能力（具体到关注点，不是角色名堆砌）\n   - 新增哪些section（标题 + 一句话说明内容）\n   -
+                                                改写的核心原则（边界，防止over-engineering）\n\n3. **优先级设计**：\n   - P0（最高收益）：08-review、12-verify、04-design、13-orchestrate\n   -
+                                                P1（流程关键）：03-spec、06-task、05-research、21-analyze\n   - P2（深度扩展）：07-code、11-plan、20-spec-review、10-archive\n   -
+                                                P3（轻量引导）：第三批8个（00-first等）\n\n4. **文档格式**：要够精简，每个skill用一个固定结构表达，避免重复啰嗦", nextThoughtNeeded: true, thoughtNumber: 1,
+                                                totalThoughts: 3)
+  ⎿  {                                                                                                                                                                                                              
+       "thoughtNumber": 1,
+       "totalThoughts": 3,
+     … +4 lines (ctrl+r to expand)
+
+⏺ sequential-thinking - sequentialthinking (MCP)(totalThoughts: 3, nextThoughtNeeded: true, thought: "**专家角色 → Skill 的映射逻辑**（从参考文档提炼）：\n\n核心专家角色能力提炼：\n-
+                                                **Prometheus**（oh-my-opencode）：访谈式澄清、边界识别、计划生成前的范围收敛\n- **Metis**（oh-my-opencode）：歧义识别、隐含风险、计划补漏\n-
+                                                **Momus**（oh-my-opencode）：计划/规格的可验证性审查、清晰度检查\n- **Software Architect**（agency-agents）：系统边界、架构权衡、依赖方向、失败模式\n-
+                                                **Oracle**（oh-my-opencode）：只读高强度逻辑审查（状态机、并发、权限、一致性）\n- **Code Reviewer**（agency-agents）：风险分级、可维护性、回归点\n- **Security
+                                                Engineer**（agency-agents）：威胁建模、输入验证、鉴权、敏感数据\n- **Reality Checker**（agency-agents）：默认怀疑、证据导向、不接受\"看起来可以\"\n- **API
+                                                Tester**（agency-agents）：接口验证、集成回归、证据化\n- **Evidence Collector**（agency-agents）：截图/日志/命令输出作为验收证据\n-
+                                                **Atlas**（oh-my-opencode）：只编排不实现、批次推进、经验累积\n- **Agents Orchestrator**（agency-agents）：handoff模板、checkpoint、质量回路\n-
+                                                **Hephaestus**（oh-my-opencode）：实现前风险自检、范围边界纪律\n- **Librarian**（oh-my-opencode）：文档证据、外部资料分级\n- **Technical
+                                                Writer**（agency-agents）：收口文档、知识沉淀\n\n**每个skill借鉴的精确映射**：\n\nP0批（核心治理入口）：\n- 08-review → Code Reviewer（质量/风险）+ Security
+                                                Engineer（安全）+ Oracle（架构只读）\n- 12-verify → Reality Checker（默认怀疑）+ API Tester（接口验证）+ Evidence Collector（证据化）\n- 04-design → Software
+                                                Architect（权衡/失败模式）+ Oracle（复杂逻辑只读审查）\n- 13-orchestrate → Atlas（只编排）+ Agents Orchestrator（handoff）+
+                                                Prometheus（边界确认）\n\nP1批（流程关键）：\n- 03-spec → Prometheus（访谈澄清）+ Metis（歧义识别）+ Momus（AC可验证性）\n- 06-task → Prometheus（范围收敛）+
+                                                Momus（任务可验证性）+ Atlas（可分派性）\n- 05-research → Librarian（证据分级）+ Oracle（技术选型咨询）\n- 21-analyze → Oracle（诊断）+ Reality
+                                                Checker（保守结论）\n\nP2批（深度扩展）：\n- 07-code → Hephaestus（实现前自检）+ Security Engineer（实现期安全）\n- 11-plan → Prometheus + Metis +
+                                                Momus（三者组合做计划质量）\n- 20-spec-review → Momus（规格可验证性）+ Software Architect（可实现性）\n- 10-archive → Technical Writer（知识沉淀）+ Reality
+                                                Checker（证据闭环）\n\nP3批（轻量引导，只加1-2个section，不引重专家语义）：\n- 第三批8个skill只加\"引导建议\"类section，不需要具名专家角色", thoughtNumber: 2)
+  ⎿  {                                                                                                                                                                                                              
+       "thoughtNumber": 2,
+       "totalThoughts": 3,
+     … +4 lines (ctrl+r to expand)
+
+✻ Thinking…
+
+  The user seems to have sent an empty message or just the system reminder triggered. I should continue with the task - I was in the middle of thinking through the document structure and should now write the document.
+
+  Let me complete the sequential thinking and then write the document.
+
+⏺ sequential-thinking - sequentialthinking (MCP)(totalThoughts: 3, nextThoughtNeeded: false, thought: "**文档结构设计**：\n\n文档名：`2026-03-16-skill-md直接改写专家能力集成方案.md`\n\n结构：\n1.
+                                                一句话原则（专家能力写进SKILL.md文本，Claude读文本即执行）\n2. 改写优先级总表（一眼看清20个skill的优先级和对应专家）\n3. 按优先级分组展开每个skill：\n   - 参考角色 +
+                                                借鉴的核心能力（不是角色名堆砌，是具体能力点）\n   - 新增section清单（标题 + 一句话内容说明）\n   - 改写边界（防止越界）\n\n格式要求：\n- 用表格，紧凑\n-
+                                                每个skill不超过一屏\n- 不写实施步骤/测试/验收（那是执行时的事）\n- 专注\"改什么\"而不是\"怎么改\"\n\n现在可以写文档了。", thoughtNumber: 3)
+  ⎿  {                                                                                                                                                                                                              
+       "thoughtNumber": 3,
+       "totalThoughts": 3,
+     … +4 lines (ctrl+r to expand)
+
+✻ Thinking…
+
+  The user wants me to think about best practices before writing the document. Let me think more carefully.
+
+  Key question: What are the best practices for directly editing SKILL.md files to integrate expert roles?
+
+  Let me think about this:
+
+  1. What makes a SKILL.md effective?
+    - Claude reads it and follows it literally
+    - Clear, unambiguous instructions work better than vague principles
+    - Concrete templates > abstract descriptions
+    - Stop conditions are critical (when NOT to proceed)
+    - Mode/matrix selection (when to use which approach)
+  2. Best practices for integrating expert roles into SKILL.md:
+    - Don't just add role names - extract the specific BEHAVIORS and TEMPLATES
+    - Each new section needs to specify what Claude should actually DO differently, not just describe a persona
+    - Decision matrices work better than prose - if this condition, then that behavior
+    - Include concrete output templates rather than abstract descriptions
+    - Add explicit stop conditions like a Reality Checker would use
+  3. Anti-patterns to avoid:
+    - Adding role descriptions without behavioral change ("be like Prometheus" is useless)
+    - Making sections too long - Claude context window is precious
+    - Overlapping sections that create ambiguity
+    - Adding sections that contradict existing skill logic
+  4. Structure per skill:
+    - Keep existing sections intact (first do no harm)
+    - Add new sections at the end to avoid disrupting what already works
+    - New sections should be self-contained
+    - Each section title should be action-oriented
+  5. The key insight: The expert role integration is valuable NOT because we import the role's persona, but because we import their decision criteria, output templates, checklists, and skepticism rules - so the 
+  document should specify for each skill which of these to add and where they come from.
+
+⏺ sequential-thinking - sequentialthinking (MCP)(thoughtNumber: 1, totalThoughts: 2, nextThoughtNeeded: true, thought: "**最佳实践的核心洞察**：\n\n直接改 SKILL.md
+                                                的价值不是\"把角色名写进去\"，而是把角色的**4类具体行为模式**提取出来写进去：\n\n1. **决策标准**（Decision Criteria）：在什么条件下切换行为、停止、升级\n   -
+                                                例：Prometheus → \"边界未澄清前禁止输出FR\"\n   - 例：Reality Checker → \"证据不足时结论默认为不通过\"\n\n2. **输出模板**（Output Templates）：要求产出什么结构化内容\n
+                                                 - 例：Software Architect → 架构权衡表（方案/采用理由/拒绝理由/风险）\n   - 例：Agents Orchestrator → handoff模板（输入/产出/交接条件）\n\n3.
+                                                **检查清单**（Checklists）：在继续前必须验证的项目列表\n   - 例：Security Engineer → 输入验证/鉴权/敏感数据/边界检查\n   - 例：Momus → AC是否可观察/可测试/可复核\n\n4.
+                                                **停止条件**（Stop Conditions）：明确何时不能继续推进\n   - 例：Metis → 歧义项超过阈值必须停下澄清\n   - 例：Librarian →
+                                                证据强度不足时不输出强结论\n\n**反模式（要避免的）**：\n- 写\"参考Prometheus风格\"这种空话 → 没有行为改变\n- 把角色的完整描述复制进SKILL.md → 太长，稀释核心指令\n-
+                                                新旧section语义重叠 → 产生歧义\n- 每个skill都加太多section → 上下文浪费\n\n**最佳格式原则**：\n- 新section标题：动词短语（\"检查/扫描/验证/选择\"）\n-
+                                                section内容：决策树或矩阵 > 列表 > 段落\n- 每个新section控制在5-10行内\n-
+                                                必须有\"触发条件\"（什么时候用这个section）\n\n这样文档就能精确告诉改写者：每个skill加什么、怎么写、边界在哪里。")
+  ⎿  {                                                                                                                                                                                                              
+       "thoughtNumber": 1,
+       "totalThoughts": 2,
+     … +4 lines (ctrl+r to expand)
+
+✻ Thinking…
+
+  The user wants me to thoroughly understand the agents from the reference projects (agency-agents and oh-my-opencode) to ensure best practice borrowing. Let me read the research reference document more carefully to 
+  extract the specific behavioral patterns, templates, and decision criteria from each agent.
+
+  I should look at the source material more carefully. Let me re-read the expert roles reference document that was already read, and also look for any other reference materials.
+
+  Actually, I already have the content from 2026-03-15-研发专家角色参考文档.md in memory. But the user wants me to understand the agents MORE deeply - specifically their behavioral patterns, not just their 
+  descriptions.
+
+  I need to check if there are additional reference files about these agents or examine what I already have in more detail to extract the actual behavioral patterns and decision-making logic.
+
+⏺ 让我先搜索是否有更详细的原始参考材料：
+
+⏺ Bash(find /Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析 -name "*.md" | sort)
+  ⎿  /Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/00-导航总览/目录索引.md                       
+     /Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/01-跨项目借鉴/P0-落地清单-五篇整合-审查报告.md
+     /Users/kuang/xiaobu/spec-first/docs/01-需求文档/优势借鉴分析/01-跨项目借鉴/P0-落地清单-五篇整合.md
+     … +145 lines (ctrl+r to expand)
+
+⏺ 有 oh-my-opencode 和 agency-agents 的原始材料，并行读取关键参考文档：
+
+⏺ research(深度研究借鉴项目的agent行为)
+  ⎿  Done (6 tool uses · 66.0k tokens · 1m 41.2s)                                                                                                                                                                   
+
+⏺ 很好，有了 Trellis agents 的具体行为模式。现在并行读取 oh-my-opencode 的专项分析：
+
+⏺ research(研究oh-my-opencode各agent的具体行为)
+  ⎿  Done (11 tool uses · 91.3k tokens · 1m 52.6s)                                                                                                                                                                  
+
+⏺ research(研究agency-agents专家角色的具体行为)
+  ⎿  Done (8 tool uses · 66.5k tokens · 1m 28.4s)                                                                                                                                                                   
+
+⏺ 现在有了所有 agent 的具体行为规则，可以写出高质量的方案文档了：
+  ⎿  API Error: Connection error.
+
+> 把三个批次要优化的skill,统一输出一份直接修改skill md文档的改造方案文档, 细化到每个skill要集成参考哪些角色, think
+
+✻ Thinking…
+
+  The user wants me to create the actual document now. I have all the research I need. Let me write the document.
+
+  Key information gathered:
+  1. oh-my-opencode agents: Prometheus, Atlas, Oracle, Metis, Momus, Hephaestus - with specific behavioral rules
+  2. agency-agents: Software Architect, Security Engineer, Code Reviewer, Reality Checker, API Tester, Agents Orchestrator - with specific behavioral rules
+  3. Trellis agents: Plan Agent, Check Agent, Implement Agent, Research Agent - with specific behavioral rules
+
+  Now I need to map these to the 20 skills across 3 batches and write a clean, actionable document.
+
+  I'm structuring the document to show exactly which expert roles map to each skill, what behavioral patterns to embed in SKILL.md, and how to prioritize the implementation across the three batches. The focus is 
+  purely on text changes to the skill definitions—decision criteria, output templates, and stopping conditions that Claude will read and execute directly. 检查清单
+  - 不借鉴：角色的运行时实现、完整系统、基础设施
+
+  实施优先级总览（一张表）
+
+  第一批（P0）- 6个核心skill
+
+  08-review
+
+  12-verify
+
+  04-design
+
+  13-orchestrate
+
+  03-spec
+
+  06-task
+
+  第二批（P1）- 6个扩展skill
+
+  05-research
+
+  21-analyze
+
+  07-code
+
+  11-plan
+
+  20-spec-review
+
+  10-archive
+
+  第三批（P2）- 8个轻量skill
+
+  00-first
+
+  00-onboarding
+
+  01-init
+
+  02-catch
+
+  14-status
+
+  15-doctor
+
+  16-sync
+
+  17-feature
+
+  对每个skill，我需要整理参考角色的具体来源、提取核心行为规则（用if/when→then的形式）、列出新增的section清单，以及明确改写时的边界限制。
+
+  以08-review为例，我参考Code Reviewer角色的问题分级机制（用🔴🟡💭标记严重程度）和三要素评论法（位置、原因、建议），一次性输出所有反馈。
+
+  对于安全审查，我引入Security Engineer的STRIDE威胁模型和零信任原则，同时参考Oracle角色的只读审查模式，不直接写代码只给建议。新增的section包括审查模式选择矩阵、安全敏感检查清单和Findings输出模板。
+
+  对于12-verify，我采用Reality Checker的默认NEEDS WORK态度和证据驱动的假设推翻方法，以及API Tester的三轴测试框架（功能、安全、性能），但覆盖率必须达到95%以上才算通过。
+
+  Check Agent负责完成标记和最多5次迭代的限制。新增验证模式矩阵、证据要求模板和默认怀疑式的结论规则。
+
+  对于04-design，Software Architect必须提供两个备选方案并说明trade-off，使用ADR模板，无法解释权衡就拒绝推进。Oracle同样采用只读审查模式。新增架构权衡表、设计边界检查和失败模式分析。
+
+  在13-orchestrate层，Atlas只负责编排不实现，通过Notepad积累学习并支持断点恢复。Agents 
+  Orchestrator在没有QA通过前不推进，限制3次重试，证据不足默认失败。Prometheus确认边界并通过5项清单门控。新增专家选择规则、交接模板和阻塞回流处理。
+
+  03-spec中Prometheus采用访谈式澄清加5项清单门控的方式。
+
+  Metis检测5类缺口（隐含意图、歧义、AI风险、缺失AC、边界情况），Momus进行4维度审查并量化通过阈值。Plan Agent有4类拒绝条件。新增需求边界澄清协议、隐含假设扫描和AC可测试性检查，以及需求收敛失败的停止条件。
+
+  对于任务层面，需要通过范围收敛和清单门控来验证可分派性，同时检查任务独立性、定义DoD，并建立并行与依赖约束规则。Research Agent则采用只读模式，支持4类搜索类型。
+
+  在证据收集阶段，Oracle负责证据分级和不猜测原则，Librarian进行外部资料查证，并建立证据强度分级和资料不足的停止条件。分析阶段则由Oracle进行只读诊断，Reality 
+  Checker采用证据导向的默认怀疑态度，通过背景质量诊断矩阵和修复优先级建议规则来指导后续行动。
+
+  现在进入实现阶段，Implement Agent确保实现前必读规范，遇到规范冲突时停下澄清，遵循最小变更原则；Hephaestus强调研究先于行动和端到端执行纪律；Security 
+  Engineer在实现期应用默认不信任外部输入的安全约束。这个阶段需要实现前风险自检、范围外问题的findings.md记录协议，以及完成后的最小交付要求。最后在规划阶段，Prometheus提供5项清单和明确的边界，Metis补充完整计划。
+
+  接下来是计划审查环节，Momus按4维度加量化阈值进行审查，新增计划质量检查表、执行前批准证据要求和Plan Summary最小字段，还有计划失效时的回流规则。规格评审阶段，Momus进行4维度审查并给出REJECTED或OKAY的结论，Software 
+  Architect检查可实现性并识别无理由的抽象，建立规格评审模式矩阵、FR-AC一致性检查、可实现性与依赖风险检查，最后用MUST FIX、SHOULD FIX或ACCEPT WITH RISK的模板来总结评审结论。
+
+  对于存档环节，Reality Checker负责证据闭环并默认标记为NEEDS WORK，Check Agent完成标记检查且不能跳过，新增复盘证据回收清单、遗留风险与行动项分层、知识沉淀要求，以及归档失败的停止条件。轻量级的第三批包括项目认知优先级
+  、关键风险阅读提示和边界说明，还有角色视角推荐、场景路径映射和退化场景兜底，初始化前的检查清单、缺失前提的保守建议。
+
+  后续还要补充恢复摘要模板、阻塞识别规则、保守回流建议，以及风险解释规则、下一步建议生成规则、展示边界，诊断分层规则、修复优先级建议、协作边界，同步策略选择规则、冲突解释模板、边界说明，还有Feature导航建议、多Feature
+  场景提示、命令边界。现在要把这份文档写到指定的目录里。
+
+  我需要为每个技能模块结构化地整理参考角色、借鉴规则、新增section和改写边界，确保内容简洁完整。
+  ⎿ API Error: 524 <!DOCTYPE html>
+    <!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en-US"> <![endif]-->
+    <!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+    <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+    <!--[if gt IE 8]><!--> <html class="no-js" lang="en-US"> <!--<![endif]-->
+    <head>
+
+    <title>newcli.com | 524: A timeout occurred</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" id="cf_styles-css" href="/cdn-cgi/styles/main.css" />
+    </head>
+    <body>
+    <div id="cf-wrapper">
+        <div id="cf-error-details" class="p-0">
+            <header class="mx-auto pt-10 lg:pt-6 lg:px-8 w-240 lg:w-full mb-8">
+                <h1 class="inline-block sm:block sm:mb-2 font-light text-60 lg:text-4xl text-black-dark leading-tight mr-2">
+                    <span class="inline-block">A timeout occurred</span>
+                    <span class="code-label">Error code 524</span>
+                </h1>
+                <div>
+                    Visit <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=code.newcli.com" target="_blank" rel="noopener noreferrer">cloudflare.com</a> for more information.
+                </div>
+                <div class="mt-3">2026-03-16 20:44:46 UTC</div>
+            </header>
+            <div class="my-8 bg-gradient-gray">
+                <div class="w-240 lg:w-full mx-auto">
+                    <div class="clearfix md:px-8">
+                        <div id="cf-browser-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left 
+    md:float-none text-center">
+      <div class="relative mb-10 md:m-0">
+        
+        <span class="cf-icon-browser block md:hidden h-20 bg-center bg-no-repeat"></span>
+        <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+        
+      </div>
+      <span class="md:block w-full truncate">You</span>
+      <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+      
+        Browser
+      
+      </h3>
+      
+      <span class="leading-1.3 text-2xl text-green-success">Working</span>
+      
+    </div>
+                        <div id="cf-cloudflare-status" class=" relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left 
+    md:float-none text-center">
+      <div class="relative mb-10 md:m-0">
+        <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=code.newcli.com" target="_blank" rel="noopener noreferrer">
+        <span class="cf-icon-cloud block md:hidden h-20 bg-center bg-no-repeat"></span>
+        <span class="cf-icon-ok w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+        </a>
+      </div>
+      <span class="md:block w-full truncate">Singapore</span>
+      <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+      <a href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&utm_campaign=code.newcli.com" target="_blank" rel="noopener noreferrer">
+        Cloudflare
+      </a>
+      </h3>
+      
+      <span class="leading-1.3 text-2xl text-green-success">Working</span>
+      
+    </div>
+                        <div id="cf-host-status" class="cf-error-source relative w-1/3 md:w-full py-15 md:p-0 md:py-8 md:text-left md:border-solid md:border-0 md:border-b md:border-gray-400 overflow-hidden float-left 
+    md:float-none text-center">
+      <div class="relative mb-10 md:m-0">
+        
+        <span class="cf-icon-server block md:hidden h-20 bg-center bg-no-repeat"></span>
+        <span class="cf-icon-error w-12 h-12 absolute left-1/2 md:left-auto md:right-0 md:top-0 -ml-6 -bottom-4"></span>
+        
+      </div>
+      <span class="md:block w-full truncate">code.newcli.com</span>
+      <h3 class="md:inline-block mt-3 md:mt-0 text-2xl text-gray-600 font-light leading-1.3">
+      
+        Host
+      
+      </h3>
+      
+      <span class="leading-1.3 text-2xl text-red-error">Error</span>
+      
+    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-240 lg:w-full mx-auto mb-8 lg:px-8">
+                <div class="clearfix">
+                    <div class="w-1/2 md:w-full float-left pr-6 md:pb-10 md:pr-0 leading-relaxed">
+                        <h2 class="text-3xl font-normal leading-1.3 mb-4">What happened?</h2>
+                        <p class="mb-2">The origin web server timed out responding to this request.</p><p>The likely cause is an overloaded background task, database or application, stressing the resources on the host
+     web server.</p>
+                    </div>
+                    <div class="w-1/2 md:w-full float-left leading-relaxed">
+                        <h2 class="text-3xl font-normal leading-1.3 mb-4">What can I do?</h2>
+                        
+                  <h3 class="text-15 font-semibold mb-2">If you're a visitor of this website:</h3>
+                  <p class="mb-6">Please try again in a few minutes.</p>
+
+                  <h3 class="text-15 font-semibold mb-2">If you're the owner of this website:</h3>
+                  <p>Please refer to the <a rel="noopener noreferrer" href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/">Error 524</a> article:</p>
+                  <ul class="ml-4">
+                    <li>Contact your hosting provider; check for long-running processes or an overloaded web server.</li>
+                    <li>Use status polling of large HTTP processes to avoid this error.</li>
+                    <li>Run the long-running scripts on a <a rel="noopener noreferrer" href="https://developers.cloudflare.com/dns/proxy-status/#dns-only-records">grey-clouded subdomain</a>.</li>
+                    <li>Enterprise customers can <a rel="noopener noreferrer" 
+    href="https://developers.cloudflare.com/support/troubleshooting/http-status-codes/cloudflare-5xx-errors/error-524/#resolution-on-cloudflare">increase the timeout setting</a> globally or for specific requests using
+     Cache Rules.</li>
+                  </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cf-error-footer cf-wrapper w-240 lg:w-full py-10 sm:py-4 sm:px-8 mx-auto text-center sm:text-left border-solid border-0 border-t border-gray-300">
+        <p class="text-13">
+          <span class="cf-footer-item sm:block sm:mb-1">Cloudflare Ray ID: <strong class="font-semibold">9dd695f7ea97899e</strong></span>
+          <span class="cf-footer-separator sm:hidden">&bull;</span>
+          <span id="cf-footer-item-ip" class="cf-footer-item hidden sm:block sm:mb-1">
+            Your IP:
+            <button type="button" id="cf-footer-ip-reveal" class="cf-footer-ip-reveal-btn">Click to reveal</button>
+            <span class="hidden" id="cf-footer-ip">140.235.140.170</span>
+            <span class="cf-footer-separator sm:hidden">&bull;</span>
+          </span>
+          <span class="cf-footer-item sm:block sm:mb-1"><span>Performance &amp; security by</span> <a rel="noopener noreferrer" 
+    href="https://www.cloudflare.com/5xx-error-landing?utm_source=errorcode_524&#38;utm_campaign=code.newcli.com" id="brand_link" target="_blank">Cloudflare</a></span>
+          
+        </p>
+        <script>(function(){function d(){var b=a.getElementById("cf-footer-item-ip"),c=a.getElementById("cf-footer-ip-reveal");b&&"classList"in 
+    b&&(b.classList.remove("hidden"),c.addEventListener("click",function(){c.classList.add("hidden");a.getElementById("cf-footer-ip").classList.remove("hidden")}))}var 
+    a=document;document.addEventListener&&a.addEventListener("DOMContentLoaded",d)})();</script>
+      </div><!-- /.error-footer -->
+
+        </div>
+    </div>
+    </body>
+    </html>
+
+
+> 上面文档完成后, 再输出一份完成后的skill 对应角色 能力说明文档 think
+
+> <session-start-hook>[spec-first] 技能路由表: init→spec→design→task→code→review→verify→archive→feature→catchup
+  [spec-first] 1%规则: 有1%相关性也先走skill检查，不要直接执行
+  http://127.0.0.1:55960</session-start-hook>
+
+> 上面文档完成后, 再输出一份完成后的skill 对应角色 能力说明文档 think
+  ⎿  API Error: 400 {"error":{"message":"请求参数不合法，请检查后重试","type":"invalid_request_error"},"type":"error"}
+
+> 当前到哪一步了
+  ⎿  API Error: 400 {"error":{"message":"请求参数不合法，请检查后重试","type":"invalid_request_error"},"type":"error"}
+
+> 你好
+  ⎿  API Error: 400 {"error":{"message":"请求参数不合法，请检查后重试","type":"invalid_request_error"},"type":"error"}
+

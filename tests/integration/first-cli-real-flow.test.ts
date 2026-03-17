@@ -27,9 +27,15 @@ const origEnv = {
 
 function seedProject(): void {
   mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
   mkdirSync(join(TMP, 'src', 'cli'), { recursive: true });
   mkdirSync(join(TMP, 'src', 'core', 'skill-runtime'), { recursive: true });
   writeFileSync(join(TMP, '.spec-first', 'layer2', 'h5.yaml'), 'platform: h5\n', 'utf-8');
+  writeFileSync(
+    join(TMP, '.spec-first', 'meta', 'config.yaml'),
+    'version: 1.0.0\nbaselineSkipped: true\n',
+    'utf-8'
+  );
   writeFileSync(
     join(TMP, 'package.json'),
     JSON.stringify(
@@ -155,7 +161,7 @@ afterEach(() => {
 
 describe('first cli real flow', () => {
   it('runs first -> init -> done and writes back runtime truth through CLI handlers', async () => {
-    expect(handleFirst(['--quick'])).toBe(0);
+    expect(handleFirst(['--force'])).toBe(0);
 
     const initCode = await handleInit([
       '--feat',
@@ -202,7 +208,7 @@ describe('first cli real flow', () => {
   });
 
   it('runs done alias from release and reprojects docs drift through CLI handlers', async () => {
-    expect(handleFirst(['--quick'])).toBe(0);
+    expect(handleFirst(['--force'])).toBe(0);
 
     const initCode = await handleInit([
       '--feat',
