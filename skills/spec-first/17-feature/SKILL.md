@@ -1,9 +1,9 @@
 ---
 name: "spec-first:feature"
 description: "Feature 查询/切换命令族"
-argument-hint: [subcommand] [featureId]
-version: 2.0.0
-last_updated: {{DATE}}
+argument-hint: "[subcommand] [featureId]"
+version: "2.0.0"
+last_updated: "2026-03-17"
 ---
 
 # Skill: feature

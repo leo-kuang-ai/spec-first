@@ -5,31 +5,23 @@
 
 ## 1. 正式文档全集
 
-### 基础文档（固定 16 个）
+### 基础文档（固定 9 个）
 
 - `README.md`
 - `summary.md`
-- `role-views.md`
-- `stage-views.md`
 - `steering.md`
 - `conventions.md`
 - `critical-flows.md`
-- `change-map.md`
 - `entry-guide.md`
-- `reboot-guide.md`
-- `common-playbooks.md`
-- `known-risks-and-traps.md`
-- `tech-stack.md`
 - `api-docs.md`
 - `codebase-overview.md`
 - `domain-model.md`
 
-### 正式专题文档（固定 5 个）
+### 正式专题文档（固定 4 个）
 
 - `architecture.md`
 - `call-graph.md`
 - `external-deps.md`
-- `local-setup.md`
 - `development-guidelines.md`
 
 ### 条件型文档（按状态生成）
@@ -65,8 +57,7 @@
 ### mobile / cross-platform / desktop
 
 - `architecture.md` 关注平台层、桥接层、进程边界
-- `local-setup.md` 关注开发环境、模拟器、打包链路
-- `development-guidelines.md` 关注平台特定规范
+- `development-guidelines.md` 同时关注平台特定规范与本地环境配置
 
 ## 4. 条件型能力判定
 

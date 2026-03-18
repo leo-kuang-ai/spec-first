@@ -1,8 +1,8 @@
-import type { FirstRuntimeMode, FirstRuntimeSummary } from './first-runtime-types.js';
+import type { FirstRuntimeSummary } from './first-runtime-types.js';
 
 export interface FirstSummarySource {
   generatedAt?: string;
-  mode: FirstRuntimeMode;
+  mode?: 'deep';
   projectName?: string;
   platformType?: string;
   overview?: string;
@@ -19,7 +19,7 @@ export interface FirstSummarySource {
 export function buildFirstSummary(source: FirstSummarySource): FirstRuntimeSummary {
   return {
     generatedAt: source.generatedAt ?? new Date().toISOString(),
-    mode: source.mode,
+    mode: source.mode ?? 'deep',
     project: {
       name: source.projectName ?? '',
       platformType: source.platformType,

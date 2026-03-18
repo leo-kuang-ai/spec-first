@@ -41,7 +41,7 @@ describe('first summary builder', () => {
   });
 
   it('falls back to an empty project name when source name is missing', () => {
-    const summary = buildFirstSummary({ mode: 'quick' });
+    const summary = buildFirstSummary({ mode: 'deep' });
 
     expect(summary.project.name).toBe('');
     expect(summary.modules).toEqual([]);

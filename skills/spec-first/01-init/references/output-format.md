@@ -32,36 +32,36 @@ background_input_status: full
 Runtime 背景:
 - .spec-first/runtime/first/index.json
 - .spec-first/runtime/first/summary.json
-- .spec-first/runtime/first/role-views.json
-- .spec-first/runtime/first/stage-views.json
+- .spec-first/runtime/first/entry-guide.json
+- .spec-first/runtime/first/steering.json
 
 💡 下一步:
 运行 /spec-first:spec 开始编写需求规格
 ```
 
-### degraded 提示
+### 降级提示
 
 ```
-⚠️ 当前以 degraded 背景状态初始化
+⚠️ 当前以降级背景状态初始化
 background_input_status: degraded
 
 说明:
 - runtime 真源不完整，已使用可用背景继续初始化
-- 建议尽快补跑 /spec-first:first，避免后续设计 / 实现阶段缺少 stage view
+- 建议尽快补跑 /spec-first:first，避免后续设计 / 实现阶段缺少项目认知背景
 ```
 
 ## 错误消息
 
-### 前置检查失败
+### 背景缺失提醒
 
 ```
-❌ 初始化失败: 缺失 00-first runtime 真源
+⚠️ 00-first runtime 真源不完整，已降级继续初始化
 
 缺失:
 - .spec-first/runtime/first/index.json
 - .spec-first/runtime/first/summary.json
 
-💡 解决方案:
+💡 建议操作:
 运行 /spec-first:first 生成 runtime 真源
 ```
 
@@ -72,7 +72,7 @@ background_input_status: degraded
 以下文件共同构成 readiness 真相：
 - `.spec-first/runtime/first/index.json`
 - `.spec-first/runtime/first/summary.json`
-- `.spec-first/runtime/first/role-views.json`
-- `.spec-first/runtime/first/stage-views.json`
+- `.spec-first/runtime/first/entry-guide.json`
+- `.spec-first/runtime/first/steering.json`
 
 `docs/first/` 仅作为人类可读投影视图层，不再作为 init 前置真相。

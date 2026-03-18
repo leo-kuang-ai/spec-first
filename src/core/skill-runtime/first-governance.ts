@@ -166,10 +166,14 @@ function inferProjectCognitionMemoryMetadata(
   diff: ProjectCognitionDiff,
   updatedAssets: string[]
 ): ProjectCognitionMemoryMetadata {
+  const runtimeAsset = updatedAssets.find((asset) => asset.endsWith('.json'));
+  const docsAsset = updatedAssets.find((asset) => asset.startsWith('docs/first/'));
   const assetId =
-    updatedAssets[0] ??
-    diff.suggestedAssets[0] ??
-    diff.changedFiles.find((file) => file.startsWith('docs/first/')) ??
+    (diff.decision === 'must_update'
+      ? diff.suggestedAssets[0] ?? runtimeAsset
+      : docsAsset ?? diff.changedFiles.find((file) => file.startsWith('docs/first/'))) ??
+    runtimeAsset ??
+    docsAsset ??
     diff.changedFiles[0] ??
     'project-cognition';
 

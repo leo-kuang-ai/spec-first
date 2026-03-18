@@ -214,7 +214,7 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
   if (!index) {
     return [
       {
-        name: 'First Stage Views',
+        name: 'First Runtime Index',
         level: 'WARNING',
         message: '未找到 runtime index',
         fix: '先执行 /spec-first:first 生成 .spec-first/runtime/first/index.json',
@@ -223,19 +223,39 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
   }
 
   const results: CheckResult[] = [];
-  const stageViewIssues = index.stageViews.issues?.join('; ');
+  const requiredAssets = [
+    ['summary', index.summary],
+    ['steering', index.steering],
+    ['conventions', index.conventions],
+    ['critical-flows', index.criticalFlows],
+    ['entry-guide', index.entryGuide],
+    ['api-contracts', index.apiContracts],
+    ['structure-overview', index.structureOverview],
+    ['domain-model', index.domainModel],
+  ] as const;
+
+  const unhealthyAssets = requiredAssets
+    .filter(([, entry]) => !entry.healthy)
+    .map(([name, entry]) => `${name}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
+
   results.push({
-    name: 'First Stage Views',
-    level: index.stageViews.healthy ? 'PASS' : 'WARNING',
-    message: index.stageViews.healthy
-      ? 'healthy'
-      : stageViewIssues
-        ? `异常: ${stageViewIssues}`
-        : 'unhealthy',
-    fix: index.stageViews.healthy
-      ? undefined
-      : '重新执行 /spec-first:first，修复 stage-views 产物健康状态',
+    name: 'First Runtime Assets',
+    level: unhealthyAssets.length === 0 ? 'PASS' : 'WARNING',
+    message: unhealthyAssets.length === 0 ? 'healthy' : `异常: ${unhealthyAssets.join(', ')}`,
+    fix:
+      unhealthyAssets.length === 0
+        ? undefined
+        : '重新执行 /spec-first:first，修复项目级 runtime 资产健康状态',
   });
+
+  if (index.databaseSchema.status === 'degraded') {
+    results.push({
+      name: 'First Database Schema',
+      level: 'WARNING',
+      message: 'database-schema degraded',
+      fix: '检查数据库结构探测逻辑，或将数据库资产标记为 not_applicable',
+    });
+  }
 
   const driftDocs = Object.entries(index.docsProjection)
     .filter(([, entry]) => !entry.healthy)

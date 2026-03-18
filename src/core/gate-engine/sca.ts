@@ -101,13 +101,24 @@ function collectBackgroundQualityFindings(
     return findings;
   }
 
-  if (!runtimeIndex.stageViews.healthy) {
+  const requiredAssets = [
+    runtimeIndex.summary,
+    runtimeIndex.steering,
+    runtimeIndex.conventions,
+    runtimeIndex.criticalFlows,
+    runtimeIndex.entryGuide,
+    runtimeIndex.apiContracts,
+    runtimeIndex.structureOverview,
+    runtimeIndex.domainModel,
+  ];
+
+  if (requiredAssets.some((asset) => !asset.healthy) || runtimeIndex.databaseSchema.status === 'degraded') {
     findings.push({
       severity: 'MEDIUM',
-      type: 'STAGE_VIEWS_UNHEALTHY',
-      location: runtimeIndex.stageViews.path,
-      detail: `stage-views 健康状态异常: ${(runtimeIndex.stageViews.issues ?? ['unknown']).join('; ')}`,
-      suggestion: '重新执行 /spec-first:first 修复 stage-views 健康状态',
+      type: 'FIRST_RUNTIME_UNHEALTHY',
+      location: '.spec-first/runtime/first/index.json',
+      detail: `first runtime 健康状态异常: ${runtimeIndex.staleReason ?? 'unknown'}`,
+      suggestion: '重新执行 /spec-first:first 修复 runtime 真源健康状态',
     });
   }
 

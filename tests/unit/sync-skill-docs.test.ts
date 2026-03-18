@@ -16,6 +16,6 @@ describe('16-sync skill docs consistency', () => {
 
     expect(skill).toContain('First 项目认知资产接入');
     expect(skill).toContain('index.json');
-    expect(skill).toContain('change-map.json');
+    expect(skill).toContain('summary.json');
   });
 });

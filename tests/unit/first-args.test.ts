@@ -9,7 +9,6 @@ import {
   E_FIRST_ARGS_UNKNOWN,
   E_FIRST_ARGS_INVALID_TYPE,
   resolveFirstConfirmPolicy,
-  resolveFirstModePolicy,
   PRODUCT_NAMES,
   type FirstArgs,
 } from '../../src/core/skill-runtime/first-args.js';
@@ -17,22 +16,12 @@ import {
 describe('validateFirstArgs', () => {
   it('无参数 → 默认 deep', () => {
     const result = validateFirstArgs([]);
-    expect(result).toEqual({ mode: 'deep', auto: false, force: false, skip: false });
-  });
-
-  it('--auto → auto=true，mode 仍为 deep', () => {
-    const result = validateFirstArgs(['--auto']);
-    expect(result).toEqual({ mode: 'deep', auto: true, force: false, skip: false });
+    expect(result).toEqual({ mode: 'deep', force: false });
   });
 
   it('--force → force=true', () => {
     const result = validateFirstArgs(['--force']);
-    expect(result).toEqual({ mode: 'deep', auto: false, force: true, skip: false });
-  });
-
-  it('--skip → skip=true', () => {
-    const result = validateFirstArgs(['--skip']);
-    expect(result).toEqual({ mode: 'deep', auto: false, force: false, skip: true });
+    expect(result).toEqual({ mode: 'deep', force: true });
   });
 
   it('--type=backend → type=backend', () => {
@@ -40,20 +29,16 @@ describe('validateFirstArgs', () => {
     expect(result).toEqual({
       mode: 'deep',
       type: 'backend',
-      auto: false,
       force: false,
-      skip: false,
     });
   });
 
-  it('--auto --type=backend --force → 合法组合', () => {
-    const result = validateFirstArgs(['--auto', '--type=backend', '--force']);
+  it('--type=backend --force → 合法组合', () => {
+    const result = validateFirstArgs(['--type=backend', '--force']);
     expect(result).toEqual({
       mode: 'deep',
       type: 'backend',
-      auto: true,
       force: true,
-      skip: false,
     });
   });
 
@@ -75,6 +60,24 @@ describe('validateFirstArgs', () => {
     }
   });
 
+  it('拒绝已删除参数 --auto', () => {
+    expect(() => validateFirstArgs(['--auto'])).toThrow(FirstArgsError);
+    try {
+      validateFirstArgs(['--auto']);
+    } catch (e) {
+      expect((e as FirstArgsError).code).toBe(E_FIRST_ARGS_UNKNOWN);
+    }
+  });
+
+  it('拒绝已删除参数 --skip', () => {
+    expect(() => validateFirstArgs(['--skip'])).toThrow(FirstArgsError);
+    try {
+      validateFirstArgs(['--skip']);
+    } catch (e) {
+      expect((e as FirstArgsError).code).toBe(E_FIRST_ARGS_UNKNOWN);
+    }
+  });
+
   it('--type=invalid → E_FIRST_ARGS_INVALID_TYPE', () => {
     expect(() => validateFirstArgs(['--type=invalid'])).toThrow(FirstArgsError);
     try {
@@ -87,15 +90,8 @@ describe('validateFirstArgs', () => {
   it('重复 --force 按一次处理', () => {
     const warn = vi.fn();
     const result = validateFirstArgs(['--force', '--force'], warn);
-    expect(result).toEqual({ mode: 'deep', auto: false, force: true, skip: false });
+    expect(result).toEqual({ mode: 'deep', force: true });
     expect(warn).toHaveBeenCalledWith('重复的参数: --force');
-  });
-
-  it('重复 --auto 按一次处理', () => {
-    const warn = vi.fn();
-    const result = validateFirstArgs(['--auto', '--auto'], warn);
-    expect(result).toEqual({ mode: 'deep', auto: true, force: false, skip: false });
-    expect(warn).toHaveBeenCalledWith('重复的参数: --auto');
   });
 
   it('--update 参数支持多个产物', () => {
@@ -104,8 +100,8 @@ describe('validateFirstArgs', () => {
   });
 
   it('--update 支持 .md 后缀', () => {
-    const result = validateFirstArgs(['--update=tech-stack.md,domain-model.md']);
-    expect(result.update).toEqual(['tech-stack', 'domain-model']);
+    const result = validateFirstArgs(['--update=summary.md,domain-model.md']);
+    expect(result.update).toEqual(['summary', 'domain-model']);
   });
 
   it('--since 参数保留', () => {
@@ -117,9 +113,7 @@ describe('validateFirstArgs', () => {
     const result = validateFirstArgs(['--check-health', '--update=api-docs']);
     expect(result).toEqual({
       mode: 'deep',
-      auto: false,
       force: false,
-      skip: false,
       checkHealth: true,
       update: ['api-docs'],
     });
@@ -133,9 +127,7 @@ describe('validateFirstArgs', () => {
     ]);
     expect(result).toEqual({
       mode: 'deep',
-      auto: false,
       force: false,
-      skip: false,
       update: ['api-docs', 'architecture'],
       since: 'v1.2.0',
       checkHealth: true,
@@ -145,42 +137,24 @@ describe('validateFirstArgs', () => {
 
 describe('resolveFirstConfirmPolicy', () => {
   it('默认需要确认', () => {
-    const args: FirstArgs = { mode: 'deep', auto: false, force: false, skip: false };
+    const args: FirstArgs = { mode: 'deep', force: false };
     expect(resolveFirstConfirmPolicy(args)).toBe('require');
   });
 
-  it('auto=true → skip', () => {
-    const args: FirstArgs = { mode: 'deep', auto: true, force: false, skip: false };
-    expect(resolveFirstConfirmPolicy(args)).toBe('skip');
-  });
-
   it('force=true → skip', () => {
-    const args: FirstArgs = { mode: 'deep', auto: false, force: true, skip: false };
+    const args: FirstArgs = { mode: 'deep', force: true };
     expect(resolveFirstConfirmPolicy(args)).toBe('skip');
-  });
-
-  it('skip=true → skip', () => {
-    const args: FirstArgs = { mode: 'deep', auto: false, force: false, skip: true };
-    expect(resolveFirstConfirmPolicy(args)).toBe('skip');
-  });
-});
-
-describe('resolveFirstModePolicy', () => {
-  it('auto=true → auto', () => {
-    const args: FirstArgs = { mode: 'deep', auto: true, force: false, skip: false };
-    expect(resolveFirstModePolicy(args)).toBe('auto');
-  });
-
-  it('auto=false → manual', () => {
-    const args: FirstArgs = { mode: 'deep', auto: false, force: false, skip: false };
-    expect(resolveFirstModePolicy(args)).toBe('manual');
   });
 });
 
 describe('PRODUCT_NAMES', () => {
-  it('保持 11 个产物名称', () => {
+  it('保持 canonical projection 产物名称', () => {
     expect(PRODUCT_NAMES).toEqual([
-      'tech-stack',
+      'summary',
+      'steering',
+      'conventions',
+      'critical-flows',
+      'entry-guide',
       'codebase-overview',
       'domain-model',
       'api-docs',
@@ -188,7 +162,6 @@ describe('PRODUCT_NAMES', () => {
       'call-graph',
       'architecture',
       'external-deps',
-      'local-setup',
       'development-guidelines',
       'README',
     ]);

@@ -1,166 +1,111 @@
 ---
 name: "spec-first:first"
-description: "项目认知标准模式：生成完整 runtime-first 认知资产与 docs/first projection（支持 --type/--force 参数）"
-version: 2.2.0
-last_updated: {{DATE}}
-confirm_policy: assisted
-changelog: |
-  2.3.0: 收敛为单一标准模式，移除 quick/deep 双模式表述，统一以 runtime-first 正式产物集为准
-  2.2.0: 方案 A 优化 — 精简 SKILL.md（删除重复内容、优化 description、添加 reference 导航、放宽证据覆盖率要求）+ quick 模式生成 README.md
-  2.1.0: Agent B 优化 — api-docs.md 从"端点列表"改为"接口规范提取"
-  2.0.0: quick/deep 双模式重构 — 移除 Q3 交互式选项, frontmatter 标记 mode
+description: "Use when you need to understand an existing project quickly, generate or refresh docs/first, rebuild .spec-first/runtime/first, or verify first outputs are complete."
 ---
 
 # Skill: first
 
-快速认知一个项目：自动分析目标项目的技术栈、代码结构、业务流程、API、数据模型等，并写入 runtime 真源与 docs projection。
+生成或刷新项目级 runtime-first 认知资产。默认路径是直接执行 CLI，而不是先走多 Agent 编排。
 
-- **标准模式**（唯一模式）：生成完整正式产物集
-- `docs/first/*.md` 是 projection，不是旁路真源
+## 默认命令
+
+```bash
+spec-first first
+```
+
+非交互批处理推荐：
+
+```bash
+spec-first first --yes
+```
+
+增强分析只在以下场景按需启用：
+- 代码结构、架构关系、调用链需要更深证据
+- API 接口契约提取不完整
+- 领域模型或数据库关系需要补强
+
+## 正式 contract
+
 - `.spec-first/runtime/first/` 是唯一正式真源
-
-运行时真源维护在 `.spec-first/runtime/first/`，其中 `.spec-first/runtime/first/index.json` 是正式真索引；`docs/first/` 保留为长期维护的人类可读投影视图层。
-
----
-
-## 📚 Reference 文件导航
-
-**执行流程**：
-- `references/execution-flow.md` - P0-P3 详细流程
-- `references/subagent-architecture.md` - 并行策略与超时控制
-
-**Agent 规格**（派发时加载对应文件）：
-- `references/agents-code-analysis.md` - A1/A2/A3（代码分析链）
-- `references/agents-api-deps.md` - B/C1（API 与外部依赖）
-- `references/agent-guidelines-setup.md` - C2（研发规范 + 环境搭建）
-- `references/agent-database.md` - D/E（数据库分析）
-- `references/agent-domain-model.md` - A4/D（领域模型）
-
-**质量保障**：
-- `references/quality-assurance-rules.md` - 统一 QA 规则（所有 Agent 必读）
-
-**检测规则**：
-- `references/detection-rules.md` - 语言/框架/端类型检测
-- `references/端类型产物映射.md` - 端类型 → 产物映射表
-
----
+- `.spec-first/runtime/first/index.json` 是正式真索引
+- `docs/first/*.md` 是 projection，不是旁路真源
+- 默认运行口径固定为 `deep`
+- 所有 projection 文档默认使用中文；术语、路径、命令、代码标识符保留英文
+- 如果 projection 输出与中文 contract 不一致，优先修 renderer 与测试，不接受“规范要求中文、实现临时英文”的漂移状态
 
 ## Runtime 分层模型
 
-- **机器真源层**：`.spec-first/runtime/first/` （index.json、summary.json、role-views.json、stage-views.json）
-- **文档投影视图层**：`docs/first/`
-- 默认采用**增量更新**，而不是每次全量重生成
+- 机器真源层：`.spec-first/runtime/first/`
+- 文档投影视图层：`docs/first/`
+- 执行策略：优先增量刷新，必要时再全量重建
 
-## 核心约束
+正式 runtime 资产共 `9` 个：
+- `summary.json`
+- `steering.json`
+- `conventions.json`
+- `critical-flows.json`
+- `entry-guide.json`
+- `api-contracts.json`
+- `structure-overview.json`
+- `domain-model.json`
+- `database-schema.json`
 
-- **输出语言：中文**：所有生成的文档必须使用中文撰写，技术术语（TypeScript、Vitest、Feature、Gate）和代码标识符保留英文原文
-- **以代码为准，禁止捏造**：所有产物内容必须严格基于代码文件、配置文件、依赖声明等实际存在的证据
-- **注意语言特性**：不同语言/框架有不同惯例，不可用 A 语言的惯例推断 B 语言的行为
-- **不确定标注**：未在代码中找到明确证据的内容，标注 `[待确认]`，不得裸写
-- **标准模式证据要求**：
-  - **核心结论**（技术栈、API 端点、数据库表）必须有证据，格式：`- <结论> (\`<file_path>:<line>\` — \`<关键代码片段>\` — \`[证据类型]\`)`
-  - **推断性结论**（模块职责、业务流程）可标注 `[推断]`
-  - **证据类型**：`[显式]`（代码明确声明）、`[推断]`（从行为分析）、`[待确认]`（无法确定）
-  - **覆盖率目标**：核心结论 100%，推断性结论 ≥60%
-  - **证据抽检**：每个 Agent 抽检 2 条核心结论即可
+正式投影视图共 `14` 个：
+- 9 个基础投影视图
+- 4 个正式专题投影视图
+- 1 个条件型投影视图（`database-er.md`）
 
----
+## 最小执行流程
 
-## 触发条件
+1. 执行 `spec-first first`
+2. 非交互场景使用 `spec-first first --yes`
+3. 生成或刷新 runtime truth
+4. 从 runtime truth 统一投影 `docs/first/*.md`
+5. 若个别专题证据不足，再按需读取增强 reference
 
-- 阶段: 任意（通常在接手项目时首次运行）
-- Command: `/spec-first:first`
+## Reference 读取规则
 
----
+### 默认
 
-## 产物清单
+- `references/execution-flow.md`
+- `references/detection-rules.md`
+- `references/platform-document-mapping.md`
+- `references/testing-strategy.md`
 
-```
-docs/
-└── first/
-    ├── README.md
-    ├── tech-stack.md
-    ├── api-docs.md
-    ├── codebase-overview.md
-    ├── domain-model.md
-    ├── database-er.md            # 如有 DB
-    ├── call-graph.md
-    ├── architecture.md
-    ├── external-deps.md
-    ├── local-setup.md
-    └── development-guidelines.md
-```
+### 增强
 
-标准模式默认生成正式文档全集；条件型文档如 `database-er.md` 仅在能力适用时生成。
+- `references/agents-code-analysis.md`
+- `references/agents-api-deps.md`
+- `references/agent-guidelines-setup.md`
+- `references/agent-database.md`
+- `references/agent-domain-model.md`
+- `references/subagent-architecture.md`
 
----
+### 低频专项
 
-## Agent 分配
+- `references/database-config.md`
+- `references/quality-assurance-rules.md`
 
-派发 Agent 时，在 prompt 中明确指示读取对应规格文件。
+## 核心硬约束
 
-### 标准模式（8 个逻辑 Agent）
+- 以代码、配置、依赖声明和 runtime 真源为准，禁止捏造
+- 先写 runtime truth，再生成 Markdown projection
+- 不得把 `docs/first/*.md` 中的叙述回灌为真源
+- 无法确认的结论必须标记 `[待确认]`
+- `database-er.md` 只有在 `databaseSchema.status === healthy` 时才允许生成
+- `api-docs.md` 只服务项目 API 接口规范，不承载外部依赖综述
 
-| Agent | 产出 | 规格文件 |
-|-------|------|----------|
-| A1 | codebase-overview.md + 模块清单 | `references/agents-code-analysis.md` |
-| A2 | architecture.md（等待 A1） | `references/agents-code-analysis.md` |
-| A3 | call-graph.md | `references/agents-code-analysis.md` |
-| B | api-docs.md | `references/agents-api-deps.md` |
-| C1 | external-deps.md | `references/agents-api-deps.md` |
-| C2 | development-guidelines.md + local-setup.md | `references/agent-guidelines-setup.md` |
-| D | database-er.md（如有 DB） | `references/agent-database.md` |
-| A4 | domain-model.md（等待 A2+B+D） | `references/agent-domain-model.md` |
+## Common Mistakes
 
-所有 Agent 必须读取 `references/quality-assurance-rules.md`。
+- 把 `docs/first/*.md` 当成事实真源使用
+- 默认误走多 Agent 重路径，而不是先执行 `spec-first first`
+- 在 `databaseSchema.status !== healthy` 时强行消费 `database-er.md`
+- 把 `api-docs.md` 当成外部依赖或集成说明文档
+- 在 projection 层补充 runtime truth 中不存在的新事实
 
----
+## 版本与维护说明
 
-## 执行流程
-
-详细流程见 `references/execution-flow.md`：
-- P0: 定位与校验（项目检测、Greenfield/Brownfield 判断、Serena 激活）
-- P1: 技术栈识别（语言/框架/端类型检测）
-- P2: Agent 并行执行（标准模式分波派发）
-- P3: 汇总输出（README 生成、交叉验证）
-
-详细并发/超时规则见 `references/subagent-architecture.md`。
-
----
-
-## 成功标准
-
-### 标准模式
-- ✅ 必须生成：README.md、tech-stack.md、api-docs.md、codebase-overview.md、domain-model.md
-- ✅ 必须追加：call-graph.md、architecture.md、external-deps.md、local-setup.md、development-guidelines.md
-- ✅ 如检测到 DB，database-er.md 存在
-- ✅ 所有文档头部包含 `mode: deep`
-- ✅ 核心结论证据覆盖率 100%，推断性结论 ≥60%
-- ✅ 交叉验证通过率 100%
-
----
-
-## 参考清单
-
-| 文件 | 内容 | 消费者 |
-|------|------|--------|
-| `references/execution-flow.md` | 详细执行流程（P0-P3） | 主线程编排 |
-| `references/subagent-architecture.md` | 并行波次、依赖链、超时策略 | 主线程编排 |
-| `references/detection-rules.md` | 语言/框架/端类型检测表 | P1a 主线程 |
-| `references/testing-strategy.md` | 最小测试矩阵与 Phase 2/3 回归清单 | 文档治理 |
-| `references/agents-code-analysis.md` | A1/A2/A3 规格（代码分析链） | Agent A1、A2、A3 |
-| `references/agents-api-deps.md` | B/C1 规格（API 与外部依赖） | Agent B、C1 |
-| `references/agent-guidelines-setup.md` | C2 规格（研发规范 + 本地环境） | Agent C2 |
-| `references/agent-database.md` | D/E 规格（DB 检测 + ER 生成） | Agent D、E |
-| `references/agent-domain-model.md` | A4/D 规格（领域模型分析） | Agent A4、D |
-| `references/quality-assurance-rules.md` | 统一 QA 规则 | 全部 Agent |
-| `references/database-config.md` | 数据库配置指南 | Agent D、E |
-| `references/端类型产物映射.md` | 端类型→产物组合映射 | P1a 端类型检测 |
-
----
-
-## 确认策略
-
-- 推荐: assisted
-- P0 幂等检测发现已有产物时，展示变更摘要后须用户确认再更新
-- Agent D/E 数据库连接前须用户确认（涉及外部服务访问）
+- 当前版本：`2.3.0`
+- 最近更新：`2026-03-17`
+- `2.3.0`：收敛为单一标准模式，统一以 runtime-first 正式产物集为准
+- 历史变更记录不再作为主 skill 触发心智的一部分；执行细节以当前 reference 与测试为准

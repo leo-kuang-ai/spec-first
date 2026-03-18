@@ -51,10 +51,16 @@ describe('analyzeArtifacts background quality', () => {
       JSON.stringify({
         version: '1.0.0',
         lastRun: '2026-03-08T12:00:00.000Z',
-        mode: 'quick',
+        mode: 'deep',
         summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['hash mismatch'] },
+        steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'api-contracts', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['hash mismatch'] },
+        structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true, status: 'healthy' },
         docsProjection: {
           'docs/first/README.md': { path: 'docs/first/README.md', fileHash: 'readme', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['stale projection'] },
         },
@@ -67,6 +73,6 @@ describe('analyzeArtifacts background quality', () => {
     const result = analyzeArtifacts(FEAT, TMP);
 
     expect(result.findings.some((finding) => finding.detail.includes('docs 投影视图漂移'))).toBe(true);
-    expect(result.findings.some((finding) => finding.detail.includes('stage-views'))).toBe(true);
+    expect(result.findings.some((finding) => finding.detail.includes('first runtime 健康状态异常'))).toBe(true);
   });
 });

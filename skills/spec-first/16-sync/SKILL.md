@@ -36,6 +36,20 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - P4: 执行回填，更新矩阵行
 - P5: 将审计日志写入 findings.md
 
+## First 项目认知资产接入
+
+当项目已生成 `00-first` runtime 真源时，sync 应优先吸收以下项目认知资产作为辅助输入：
+
+- `index.json`
+- `summary.json`
+- `entry-guide.json`
+
+使用原则：
+
+- `index.json`：判断 canonical runtime 与 docs 投影视图是否健康、是否需要补同步
+- `summary.json`：帮助 sync 在回填矩阵时保持项目范围与术语一致
+- `entry-guide.json`：帮助定位应优先追踪的入口、流程与实现链路
+
 ## CLI 依赖
 - `spec-first matrix update`
 - `spec-first matrix check`

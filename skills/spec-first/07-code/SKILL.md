@@ -1,9 +1,8 @@
 ---
 name: "spec-first:code"
 description: "执行代码实现。支持单 TASK 与自动批量模式；当前以自动批量提示词驱动，运行时可按宿主能力落到人工/半自动调度。"
-- Command: `/spec-first:code [featureId]`
-version: 2.1.0
-last_updated: 2026-03-14
+version: "2.1.0"
+last_updated: "2026-03-14"
 changelog: |
   v2.1.0: 收敛为当前可执行模式；去除冗余 FAQ；对齐真实配置/状态文件/能力边界
   v2.0.0: 完全重写为批量模式，支持依赖解析、并发执行、失败率控制
@@ -21,6 +20,8 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
 - 多 agent / subagent 辅助执行
 
 ## 当前模式
+
+- Command: `/spec-first:code [featureId]`
 
 当前仓库的真实状态是：
 

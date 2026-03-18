@@ -3,27 +3,26 @@
  * 将规则集中到独立模块，避免 first-change-detector 体积和维护复杂度持续增长。
  */
 
-const DEPENDENCY_ARTIFACTS = ['tech-stack.md', 'external-deps.md'] as const;
+const DEPENDENCY_ARTIFACTS = ['summary.md', 'external-deps.md'] as const;
 const OVERVIEW_ARTIFACTS = ['codebase-overview.md', 'architecture.md'] as const;
 const API_ARTIFACTS = ['api-docs.md'] as const;
 const MODEL_ARTIFACTS = ['domain-model.md', 'database-er.md'] as const;
 const DEV_GUIDELINE_ARTIFACTS = ['development-guidelines.md'] as const;
-const LOCAL_SETUP_ARTIFACTS = ['local-setup.md'] as const;
-const ARCH_SETUP_ARTIFACTS = ['architecture.md', 'local-setup.md'] as const;
+const ARCH_SETUP_ARTIFACTS = ['architecture.md', 'development-guidelines.md'] as const;
 const API_MODEL_ARTIFACTS = ['api-docs.md', 'domain-model.md'] as const;
 const DB_MODEL_ARTIFACTS = ['database-er.md', 'domain-model.md'] as const;
 
 export const DEFAULT_AFFECTED_ARTIFACTS = ['codebase-overview.md', 'architecture.md'] as const;
 export const FIRST_RUNTIME_ARTIFACTS = [
   'summary.json',
-  'role-views.json',
-  'stage-views.json',
   'steering.json',
   'conventions.json',
   'critical-flows.json',
-  'change-map.json',
   'entry-guide.json',
-  'reboot-guide.json',
+  'api-contracts.json',
+  'structure-overview.json',
+  'domain-model.json',
+  'database-schema.json',
 ] as const;
 
 export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<
@@ -31,44 +30,48 @@ export const FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP: Record<
   readonly string[]
 > = {
   'summary.json': ['docs/first/README.md', 'docs/first/summary.md'],
-  'role-views.json': ['docs/first/README.md', 'docs/first/role-views.md'],
-  'stage-views.json': ['docs/first/README.md', 'docs/first/stage-views.md'],
   'steering.json': ['docs/first/README.md', 'docs/first/steering.md'],
-  'conventions.json': [
-    'docs/first/README.md',
-    'docs/first/conventions.md',
-    'docs/first/common-playbooks.md',
+  'conventions.json': ['docs/first/conventions.md', 'docs/first/development-guidelines.md'],
+  'critical-flows.json': ['docs/first/critical-flows.md', 'docs/first/call-graph.md'],
+  'entry-guide.json': ['docs/first/entry-guide.md'],
+  'api-contracts.json': ['docs/first/api-docs.md'],
+  'structure-overview.json': [
+    'docs/first/codebase-overview.md',
+    'docs/first/architecture.md',
+    'docs/first/external-deps.md',
   ],
-  'critical-flows.json': [
-    'docs/first/README.md',
-    'docs/first/critical-flows.md',
-    'docs/first/known-risks-and-traps.md',
-  ],
-  'change-map.json': [
-    'docs/first/README.md',
-    'docs/first/change-map.md',
-    'docs/first/common-playbooks.md',
-    'docs/first/known-risks-and-traps.md',
-  ],
-  'entry-guide.json': [
-    'docs/first/README.md',
-    'docs/first/entry-guide.md',
-    'docs/first/common-playbooks.md',
-  ],
-  'reboot-guide.json': [
-    'docs/first/README.md',
-    'docs/first/reboot-guide.md',
-    'docs/first/known-risks-and-traps.md',
-  ],
+  'domain-model.json': ['docs/first/domain-model.md'],
+  'database-schema.json': ['docs/first/database-er.md'],
 };
 
-export const CANONICAL_PROJECTION_DOCS = Array.from(
-    new Set(Object.values(FIRST_RUNTIME_TO_DOCS_PROJECTION_MAP).flat())
-).sort() as readonly string[];
+export const BASE_PROJECTION_DOCS = [
+  'docs/first/README.md',
+  'docs/first/summary.md',
+  'docs/first/steering.md',
+  'docs/first/conventions.md',
+  'docs/first/critical-flows.md',
+  'docs/first/entry-guide.md',
+  'docs/first/api-docs.md',
+  'docs/first/codebase-overview.md',
+  'docs/first/domain-model.md',
+] as const;
 
-export const BASE_PROJECTION_DOCS = CANONICAL_PROJECTION_DOCS;
-export const CONDITIONAL_PROJECTION_DOCS: readonly string[] = [];
-export const FORMAL_TOPIC_PROJECTION_DOCS: readonly string[] = [];
+export const FORMAL_TOPIC_PROJECTION_DOCS = [
+  'docs/first/architecture.md',
+  'docs/first/call-graph.md',
+  'docs/first/development-guidelines.md',
+  'docs/first/external-deps.md',
+] as const;
+
+export const CONDITIONAL_PROJECTION_DOCS = ['docs/first/database-er.md'] as const;
+
+export const CANONICAL_PROJECTION_DOCS = Array.from(
+  new Set([
+    ...BASE_PROJECTION_DOCS,
+    ...FORMAL_TOPIC_PROJECTION_DOCS,
+    ...CONDITIONAL_PROJECTION_DOCS,
+  ])
+).sort() as readonly string[];
 
 export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
   'package.json': DEPENDENCY_ARTIFACTS,
@@ -110,16 +113,16 @@ export const EXACT_FILE_TO_ARTIFACT_MAP: Record<string, readonly string[]> = {
   'docker-compose.yml': ARCH_SETUP_ARTIFACTS,
   'docker-compose.yaml': ARCH_SETUP_ARTIFACTS,
   'Dockerfile.prod': ARCH_SETUP_ARTIFACTS,
-  Makefile: LOCAL_SETUP_ARTIFACTS,
-  makefile: LOCAL_SETUP_ARTIFACTS,
-  '.env.example': LOCAL_SETUP_ARTIFACTS,
-  '.env.sample': LOCAL_SETUP_ARTIFACTS,
-  '.env.example.local': LOCAL_SETUP_ARTIFACTS,
+  Makefile: DEV_GUIDELINE_ARTIFACTS,
+  makefile: DEV_GUIDELINE_ARTIFACTS,
+  '.env.example': DEV_GUIDELINE_ARTIFACTS,
+  '.env.sample': DEV_GUIDELINE_ARTIFACTS,
+  '.env.example.local': DEV_GUIDELINE_ARTIFACTS,
   'prisma/schema.prisma': DB_MODEL_ARTIFACTS,
   'schema.prisma': DB_MODEL_ARTIFACTS,
-  'knexfile.js': ['database-er.md', 'local-setup.md'],
-  'knexfile.ts': ['database-er.md', 'local-setup.md'],
-  '.sequelizerc': ['database-er.md', 'local-setup.md'],
+  'knexfile.js': ['database-er.md', 'development-guidelines.md'],
+  'knexfile.ts': ['database-er.md', 'development-guidelines.md'],
+  '.sequelizerc': ['database-er.md', 'development-guidelines.md'],
   'mikro-orm.config.ts': DB_MODEL_ARTIFACTS,
   'mikro-orm.config.js': DB_MODEL_ARTIFACTS,
   'TypeOrm.config.ts': DB_MODEL_ARTIFACTS,
@@ -178,18 +181,6 @@ export function matchRuntimeArtifactsByChangedFile(changedFile: string): string[
     return ['summary.json'];
   }
   if (
-    changedFile.endsWith('/first-role-views.ts') ||
-    changedFile === 'src/core/skill-runtime/first-role-views.ts'
-  ) {
-    return ['role-views.json'];
-  }
-  if (
-    changedFile.endsWith('/first-stage-views.ts') ||
-    changedFile === 'src/core/skill-runtime/first-stage-views.ts'
-  ) {
-    return ['stage-views.json'];
-  }
-  if (
     changedFile.endsWith('/first-conventions.ts') ||
     changedFile === 'src/core/skill-runtime/first-conventions.ts'
   ) {
@@ -202,22 +193,10 @@ export function matchRuntimeArtifactsByChangedFile(changedFile: string): string[
     return ['critical-flows.json'];
   }
   if (
-    changedFile.endsWith('/first-change-map.ts') ||
-    changedFile === 'src/core/skill-runtime/first-change-map.ts'
-  ) {
-    return ['change-map.json'];
-  }
-  if (
     changedFile.endsWith('/first-entry-guide.ts') ||
     changedFile === 'src/core/skill-runtime/first-entry-guide.ts'
   ) {
     return ['entry-guide.json'];
-  }
-  if (
-    changedFile.endsWith('/first-reboot-guide.ts') ||
-    changedFile === 'src/core/skill-runtime/first-reboot-guide.ts'
-  ) {
-    return ['reboot-guide.json'];
   }
   if (
     changedFile.endsWith('/first-bootstrap.ts') ||

@@ -2,36 +2,76 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { checkInitReadiness, summarizeFirstArtifacts } from '../../src/cli/commands/init.js';
-import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
-import type { FirstRuntimeIndex, FirstRuntimeSummary, FirstRoleViews, FirstStageViews } from '../../src/core/skill-runtime/first-runtime-types.js';
+import {
+  writeFirstApiContracts,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstDatabaseSchema,
+  writeFirstDomainModel,
+  writeFirstEntryGuide,
+  writeFirstRuntimeIndex,
+  writeFirstRuntimeSummary,
+  writeFirstSteering,
+  writeFirstStructureOverview,
+} from '../../src/core/skill-runtime/first-runtime-store.js';
 
 const TEST_ROOT = join(import.meta.dirname, '../fixtures/.tmp-init-runtime-readiness');
 
-const index: FirstRuntimeIndex = {
-  version: '1.0.0',
-  lastRun: '2026-03-08T12:00:00.000Z',
-  mode: 'quick',
-  summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-  roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-  stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-  docsProjection: {},
-  status: 'current',
-};
-const summary: FirstRuntimeSummary = {
-  generatedAt: '2026-03-08T12:00:00.000Z', mode: 'quick', project: { name: 'spec-first' }, modules: [], capabilities: [], entryPoints: [], dataModels: [], apiSurface: [], risks: [], evidence: [],
-};
-const roleViews: FirstRoleViews = {
-  product: { role: 'product', summary: 'product', focus: [], warnings: [] },
-  dev: { role: 'dev', summary: 'dev', focus: [], warnings: [] },
-  qa: { role: 'qa', summary: 'qa', focus: [], warnings: [] },
-  architect: { role: 'architect', summary: 'architect', focus: [], warnings: [] },
-};
-const stageViews: FirstStageViews = {
-  spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
-  design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
-  code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
-  verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
-};
+function healthyEntry(path: string) {
+  return {
+    path,
+    fileHash: path,
+    lastUpdated: '2026-03-08T12:00:00.000Z',
+    healthy: true,
+  };
+}
+
+function seedCanonicalRuntime(healthySummary = true) {
+  writeFirstRuntimeIndex(TEST_ROOT, {
+    version: '1.0.0',
+    lastRun: '2026-03-08T12:00:00.000Z',
+    summary: { ...healthyEntry('.spec-first/runtime/first/summary.json'), healthy: healthySummary, issues: healthySummary ? undefined : ['stale summary'] },
+    steering: healthyEntry('.spec-first/runtime/first/steering.json'),
+    conventions: healthyEntry('.spec-first/runtime/first/conventions.json'),
+    criticalFlows: healthyEntry('.spec-first/runtime/first/critical-flows.json'),
+    entryGuide: healthyEntry('.spec-first/runtime/first/entry-guide.json'),
+    apiContracts: healthyEntry('.spec-first/runtime/first/api-contracts.json'),
+    structureOverview: healthyEntry('.spec-first/runtime/first/structure-overview.json'),
+    domainModel: healthyEntry('.spec-first/runtime/first/domain-model.json'),
+    databaseSchema: { ...healthyEntry('.spec-first/runtime/first/database-schema.json'), status: 'healthy' },
+    docsProjection: {},
+    status: healthySummary ? 'current' : 'stale',
+  });
+  writeFirstRuntimeSummary(TEST_ROOT, {
+    generatedAt: '2026-03-08T12:00:00.000Z',
+    mode: 'deep',
+    project: { name: 'spec-first' },
+    modules: [],
+    capabilities: [],
+    entryPoints: [],
+    dataModels: [],
+    apiSurface: [],
+    risks: [],
+    evidence: [],
+  });
+  writeFirstSteering(TEST_ROOT, {
+    product: { overview: 'spec-first', coreScenarios: ['init'], nonGoals: [], glossary: [] },
+    tech: { stack: ['TypeScript'], constraints: [], forbiddenPatterns: [] },
+    structure: { modules: ['src/core'], boundaries: [], entryRules: [] },
+  });
+  writeFirstConventions(TEST_ROOT, {
+    api: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    module: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    testing: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    projectRules: { observedPatterns: [], deviations: [], recommendedConvention: 'stable', evidence: [] },
+  });
+  writeFirstCriticalFlows(TEST_ROOT, []);
+  writeFirstEntryGuide(TEST_ROOT, []);
+  writeFirstApiContracts(TEST_ROOT, { interfaces: [], integrationPoints: [], notes: [] });
+  writeFirstStructureOverview(TEST_ROOT, { topology: [], modules: [], readingOrder: [], evidence: [] });
+  writeFirstDomainModel(TEST_ROOT, { entities: [], glossary: [], evidence: [] });
+  writeFirstDatabaseSchema(TEST_ROOT, { status: 'healthy', provider: 'sqlite', tables: [], risks: [], evidence: [] });
+}
 
 describe('init runtime readiness', () => {
   beforeEach(() => {
@@ -43,28 +83,16 @@ describe('init runtime readiness', () => {
     rmSync(TEST_ROOT, { recursive: true, force: true });
   });
 
-  it('treats runtime truth source as readiness signal', () => {
-    writeFirstRuntimeIndex(TEST_ROOT, index);
-    writeFirstRuntimeSummary(TEST_ROOT, summary);
-    writeFirstRoleViews(TEST_ROOT, roleViews);
-    writeFirstStageViews(TEST_ROOT, stageViews);
-
+  it('treats canonical runtime truth source as readiness signal', () => {
+    seedCanonicalRuntime();
     const readiness = checkInitReadiness(TEST_ROOT);
     expect(readiness.firstCompleted).toBe(true);
     expect(readiness.firstMissing).toEqual([]);
   });
 
   it('fails readiness when runtime assets exist but are marked unhealthy', () => {
-    writeFirstRuntimeIndex(TEST_ROOT, {
-      ...index,
-      summary: { ...index.summary, healthy: false, issues: ['stale summary'] },
-    });
-    writeFirstRuntimeSummary(TEST_ROOT, summary);
-    writeFirstRoleViews(TEST_ROOT, roleViews);
-    writeFirstStageViews(TEST_ROOT, stageViews);
-
+    seedCanonicalRuntime(false);
     const readiness = checkInitReadiness(TEST_ROOT);
-
     expect(readiness.firstCompleted).toBe(false);
     expect(readiness.firstMissing).toContain('.spec-first/runtime/first/summary.json');
   });
@@ -72,12 +100,8 @@ describe('init runtime readiness', () => {
   it('does not fall back to docs projection when runtime summary is missing', () => {
     const docsFirst = join(TEST_ROOT, 'docs', 'first');
     mkdirSync(docsFirst, { recursive: true });
-    writeFileSync(join(docsFirst, 'tech-stack.md'), '# Tech Stack\nNode.js + TypeScript\n', 'utf-8');
-    writeFileSync(join(docsFirst, 'codebase-overview.md'), '代码量: 123 行\n', 'utf-8');
-    writeFileSync(join(docsFirst, 'api-docs.md'), '3 个 API\n', 'utf-8');
-
+    writeFileSync(join(docsFirst, 'summary.md'), '# Summary\nunknown\n', 'utf-8');
     const summary = summarizeFirstArtifacts(TEST_ROOT);
-
     expect(summary).toEqual({
       mode: 'unknown',
       techStack: '待确认',
@@ -85,5 +109,4 @@ describe('init runtime readiness', () => {
       apiSurface: '待确认',
     });
   });
-
 });

@@ -12,6 +12,8 @@ description: "统一初始化入口：自动识别项目状态（新项目 / 存
 ## 背景质量契约
 
 本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)。
+- 关键字段：`backgroundInputStatus` / `background_input_status`
+- 使用原则：`first` 是优先背景输入，不是硬阻断前置；当 `backgroundInputStatus=degraded|blind` 时允许降级初始化，但必须给出补跑 `/spec-first:first` 的建议。
 
 ## 五轨道自动路由
 
@@ -37,7 +39,7 @@ description: "统一初始化入口：自动识别项目状态（新项目 / 存
 ### project-onboarding 轨道
 
 1. 检测缺失项（git / .spec-first / first runtime）
-2. 输出具体的补救命令（`/spec-first:first --quick`）
+2. 输出具体的补救命令（`/spec-first:first`）
 3. 退出，等待用户完成前置步骤后重新运行 `/spec-first:init`
 
 ### feature-init-blocked 轨道

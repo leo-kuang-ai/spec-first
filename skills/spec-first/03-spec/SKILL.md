@@ -240,7 +240,7 @@ spec-first validate format <featureId>
 
 - 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
 - 优先读取 `spec-view`
-- 建议从 `.spec-first/runtime/first/stage-views.json` 的 spec-view 获取摘要
+- 建议优先读取 `.spec-first/runtime/first/summary.json`、`critical-flows.json` 与 `domain-model.json` 获取需求背景
 - 执行前应显式声明 `background_input_status`
 
 ### 背景不足判定标准

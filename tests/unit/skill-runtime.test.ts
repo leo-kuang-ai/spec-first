@@ -9,16 +9,16 @@ import { execSync } from 'node:child_process';
 import { dispatchCommand, loadSkill, resolveSkillPath } from '../../src/core/skill-runtime/dispatcher.js';
 import { resetConfigCache } from '../../src/shared/config-schema.js';
 import {
-  writeFirstChangeMap,
+  writeFirstApiContracts,
   writeFirstConventions,
   writeFirstCriticalFlows,
+  writeFirstDatabaseSchema,
+  writeFirstDomainModel,
   writeFirstEntryGuide,
-  writeFirstRebootGuide,
-  writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
   writeFirstSteering,
-  writeFirstStageViews,
+  writeFirstStructureOverview,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
 import {
   createPhaseState, canTransition, transition, confirmPhase,
@@ -64,16 +64,6 @@ function writeSupplementalFirstAssets(projectRoot: string): void {
       verificationHooks: ['pnpm vitest'],
     },
   ]);
-  writeFirstChangeMap(projectRoot, [
-    {
-      changeType: 'runtime-asset-extension',
-      likelyModules: ['skill-runtime'],
-      likelyCommands: ['src/cli/commands/first.ts'],
-      likelyConfigs: ['package.json'],
-      likelyTests: ['tests/unit/skill-runtime.test.ts'],
-      riskPoints: ['runtime index drift'],
-    },
-  ]);
   writeFirstEntryGuide(projectRoot, [
     {
       taskCategory: 'runtime-extension',
@@ -83,13 +73,10 @@ function writeSupplementalFirstAssets(projectRoot: string): void {
       relatedFlows: ['flow-cli-entry'],
     },
   ]);
-  writeFirstRebootGuide(projectRoot, {
-    projectWhat: 'skill runtime tests',
-    whereToStart: ['.spec-first/runtime/first/summary.json'],
-    currentCriticalAreas: ['runtime truth first'],
-    commonChangePaths: ['src/core/skill-runtime'],
-    verifyChecklist: ['pnpm vitest'],
-  });
+  writeFirstApiContracts(projectRoot, { interfaces: [], integrationPoints: ['src/cli/index.ts'], notes: [] });
+  writeFirstStructureOverview(projectRoot, { topology: ['cli -> runtime'], modules: [], readingOrder: [], evidence: [] });
+  writeFirstDomainModel(projectRoot, { entities: [], glossary: ['Feature'], evidence: [] });
+  writeFirstDatabaseSchema(projectRoot, { status: 'healthy', provider: 'sqlite', tables: [], risks: [], evidence: [] });
 }
 
 // ─── Dispatcher Tests ───────────────────────────────────
@@ -380,8 +367,8 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('skill');
     expect(result.firstArgs).toBeDefined();
     expect(result.firstArgs!.mode).toBe('deep');
+    expect(result.firstArgs!.force).toBe(true);
     expect(result.firstConfirmPolicy).toBe('skip');
-    expect(result.firstModePolicy).toBe('manual');
   });
 
   it('should reject legacy first --quick flag', () => {
@@ -623,22 +610,10 @@ describe('loadSkill hard-gate notice', () => {
     writeFirstRuntimeIndex(TMP, {
       version: '1.0.0',
       lastRun: '2026-03-12T12:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       summary: {
         path: '.spec-first/runtime/first/summary.json',
         fileHash: 'summary',
-        lastUpdated: '2026-03-12T12:00:00.000Z',
-        healthy: true,
-      },
-      roleViews: {
-        path: '.spec-first/runtime/first/role-views.json',
-        fileHash: 'roles',
-        lastUpdated: '2026-03-12T12:00:00.000Z',
-        healthy: true,
-      },
-      stageViews: {
-        path: '.spec-first/runtime/first/stage-views.json',
-        fileHash: 'stages',
         lastUpdated: '2026-03-12T12:00:00.000Z',
         healthy: true,
       },
@@ -660,30 +635,22 @@ describe('loadSkill hard-gate notice', () => {
         lastUpdated: '2026-03-12T12:00:00.000Z',
         healthy: true,
       },
-      changeMap: {
-        path: '.spec-first/runtime/first/change-map.json',
-        fileHash: 'change-map',
-        lastUpdated: '2026-03-12T12:00:00.000Z',
-        healthy: true,
-      },
       entryGuide: {
         path: '.spec-first/runtime/first/entry-guide.json',
         fileHash: 'entry-guide',
         lastUpdated: '2026-03-12T12:00:00.000Z',
         healthy: true,
       },
-      rebootGuide: {
-        path: '.spec-first/runtime/first/reboot-guide.json',
-        fileHash: 'reboot-guide',
-        lastUpdated: '2026-03-12T12:00:00.000Z',
-        healthy: true,
-      },
+      apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'api-contracts', lastUpdated: '2026-03-12T12:00:00.000Z', healthy: true },
+      structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-12T12:00:00.000Z', healthy: true },
+      domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-12T12:00:00.000Z', healthy: true },
+      databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-12T12:00:00.000Z', healthy: true, status: 'healthy' },
       docsProjection: {},
       status: 'current',
     });
     writeFirstRuntimeSummary(TMP, {
       generatedAt: '2026-03-12T12:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       project: { name: 'spec-first', platformType: 'cli' },
       techStack: ['TypeScript'],
       modules: ['skill-runtime'],
@@ -694,46 +661,6 @@ describe('loadSkill hard-gate notice', () => {
       risks: [],
       evidence: [],
     });
-    writeFirstRoleViews(TMP, {
-      product: { role: 'product', summary: 'Product summary', focus: [], warnings: [] },
-      dev: { role: 'dev', summary: 'Dev summary', focus: [], warnings: [] },
-      qa: { role: 'qa', summary: 'QA summary', focus: [], warnings: [] },
-      architect: { role: 'architect', summary: 'Architect summary', focus: [], warnings: [] },
-    });
-    writeFirstStageViews(TMP, {
-      spec: {
-        stage: 'spec',
-        summary: 'Spec summary',
-        businessCapabilities: [],
-        coreEntities: [],
-        dependencies: [],
-        warnings: [],
-      },
-      design: {
-        stage: 'design',
-        summary: 'Design summary',
-        moduleBoundaries: [],
-        integrationPoints: [],
-        technicalConstraints: [],
-        risks: [],
-      },
-      code: {
-        stage: 'code',
-        summary: 'Code summary',
-        entryPoints: [],
-        likelyChangeAreas: [],
-        changeHazards: [],
-        verificationHooks: [],
-      },
-      verify: {
-        stage: 'verify',
-        summary: 'Verify summary',
-        testFocus: [],
-        riskAreas: [],
-        validationHooks: [],
-        releaseBlockers: [],
-      },
-    });
     writeSupplementalFirstAssets(TMP);
     writeFileSync(skillPath, '# Plan Skill', 'utf-8');
 
@@ -741,7 +668,6 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('plan-runtime-context');
     expect(content).toContain('backgroundInputStatus: full');
     expect(content).not.toContain('backgroundInputStatus: blind');
-    expect(content).toContain('changeTypes: runtime-asset-extension');
     expect(content).toContain('entryCategories: runtime-extension');
   });
 
@@ -966,31 +892,18 @@ describe('loadSkill hard-gate notice', () => {
     writeFirstRuntimeIndex(TMP, {
       version: '1.0.0',
       lastRun: '2026-03-09T00:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
-      roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
-      stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
-      changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
       entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
-      rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'api-contracts', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true },
+      databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-09T00:00:00.000Z', healthy: true, status: 'healthy' },
       docsProjection: {},
       status: 'current',
-    });
-    writeFirstStageViews(TMP, {
-      spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
-      design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
-      code: {
-        stage: 'code',
-        summary: 'code',
-        entryPoints: ['src/allowed.ts'],
-        likelyChangeAreas: ['src/feature'],
-        changeHazards: [],
-        verificationHooks: [],
-      },
-      verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
     });
     writeSupplementalFirstAssets(TMP);
 
@@ -1002,7 +915,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'src', 'feature', 'helper.ts'), 'export const helper = true;\n', 'utf-8');
     execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/feature/helper.ts skills/spec-first/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
     execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
-    writeFileSync(join(TMP, 'src', 'feature', 'helper.ts'), 'export const helper = false;\n', 'utf-8');
+    writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = false;\n', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
     expect(content).toContain('HARD-GATE 运行时检查（自动）');

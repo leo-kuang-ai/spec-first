@@ -6,7 +6,7 @@ describe('first entry guide', () => {
   it('builds at least two stable reading paths for common task categories', () => {
     const summary: FirstRuntimeSummary = {
       generatedAt: '2026-03-16T00:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       project: {
         name: 'spec-first',
         platformType: 'backend',

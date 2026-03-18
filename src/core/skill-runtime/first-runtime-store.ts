@@ -4,47 +4,103 @@ import { readJson, writeJson } from '../../shared/fs-utils.js';
 import { logFirstRuntimeWarning, toErrorMessage } from './first-runtime-observability.js';
 import type {
   FirstApiContracts,
-  FirstChangeMap,
   FirstConventions,
   FirstCriticalFlows,
   FirstDatabaseSchema,
   FirstDomainModel,
   FirstEntryGuide,
-  FirstRebootGuide,
-  FirstSteering,
-  FirstStructureOverview,
-  FirstRuntimeConditionalAssetIndexEntry,
   FirstRuntimeAssetIndexEntry,
+  FirstRuntimeConditionalAssetIndexEntry,
   FirstRuntimeIndex,
   FirstRuntimeSummary,
-  FirstRoleViews,
-  FirstStageViews,
+  FirstSteering,
+  FirstStructureOverview,
 } from './first-runtime-types.js';
 
 function normalizeFirstRuntimeMode(mode: unknown): 'deep' | undefined {
-  if (mode === 'deep') return 'deep';
-  if (
-    mode === 'quick' ||
-    mode === 'bootstrap' ||
-    mode === 'refresh-all' ||
-    mode === 'refresh-docs-from-runtime'
-  ) {
-    return 'deep';
+  return mode === 'deep' ? 'deep' : undefined;
+}
+
+function normalizeLegacyTechStack(techStack: unknown): string[] {
+  if (Array.isArray(techStack)) {
+    return techStack.filter((item): item is string => typeof item === 'string');
   }
-  return undefined;
+  if (techStack && typeof techStack === 'object') {
+    return Object.entries(techStack)
+      .filter(([, value]) => typeof value === 'string' && value.length > 0)
+      .map(([key, value]) => `${key}: ${value}`);
+  }
+  return [];
+}
+
+function normalizeRuntimeSummary(raw: Record<string, unknown>): FirstRuntimeSummary {
+  const project =
+    raw.project && typeof raw.project === 'object' ? (raw.project as Record<string, unknown>) : {};
+  const generatedAt =
+    typeof raw.generatedAt === 'string'
+      ? raw.generatedAt
+      : typeof raw.generated_at === 'string'
+        ? raw.generated_at
+        : new Date(0).toISOString();
+  const modules = Array.isArray(raw.modules)
+    ? raw.modules.filter((item): item is string => typeof item === 'string')
+    : Array.isArray(raw.core_modules)
+      ? raw.core_modules.filter((item): item is string => typeof item === 'string')
+      : [];
+  const apiSurface = Array.isArray(raw.apiSurface)
+    ? raw.apiSurface.filter((item): item is string => typeof item === 'string')
+    : [];
+
+  if (apiSurface.length === 0 && typeof raw.commands_count === 'number' && raw.commands_count > 0) {
+    apiSurface.push('docs/first/api-docs.md');
+  }
+
+  return {
+    generatedAt,
+    mode: normalizeFirstRuntimeMode(raw.mode) ?? 'deep',
+    project: {
+      name: typeof project.name === 'string' ? project.name : 'unknown-project',
+      platformType:
+        typeof project.platformType === 'string'
+          ? project.platformType
+          : typeof raw.project_type === 'string'
+            ? raw.project_type
+            : undefined,
+      overview:
+        typeof project.overview === 'string'
+          ? project.overview
+          : typeof project.description === 'string'
+            ? project.description
+            : undefined,
+    },
+    techStack: normalizeLegacyTechStack(raw.techStack ?? raw.tech_stack),
+    modules,
+    capabilities: Array.isArray(raw.capabilities)
+      ? raw.capabilities.filter((item): item is string => typeof item === 'string')
+      : [],
+    entryPoints: Array.isArray(raw.entryPoints)
+      ? raw.entryPoints.filter((item): item is string => typeof item === 'string')
+      : [],
+    dataModels: Array.isArray(raw.dataModels)
+      ? raw.dataModels.filter((item): item is string => typeof item === 'string')
+      : [],
+    apiSurface,
+    risks: Array.isArray(raw.risks)
+      ? raw.risks.filter((item): item is string => typeof item === 'string')
+      : [],
+    evidence: Array.isArray(raw.evidence)
+      ? raw.evidence.filter((item): item is string => typeof item === 'string')
+      : [],
+  };
 }
 
 export const FIRST_RUNTIME_DIR = '.spec-first/runtime/first';
 export const FIRST_RUNTIME_INDEX_FILE = 'index.json';
 export const FIRST_RUNTIME_SUMMARY_FILE = 'summary.json';
-export const FIRST_RUNTIME_ROLE_VIEWS_FILE = 'role-views.json';
-export const FIRST_RUNTIME_STAGE_VIEWS_FILE = 'stage-views.json';
 export const FIRST_RUNTIME_STEERING_FILE = 'steering.json';
 export const FIRST_RUNTIME_CONVENTIONS_FILE = 'conventions.json';
 export const FIRST_RUNTIME_CRITICAL_FLOWS_FILE = 'critical-flows.json';
-export const FIRST_RUNTIME_CHANGE_MAP_FILE = 'change-map.json';
 export const FIRST_RUNTIME_ENTRY_GUIDE_FILE = 'entry-guide.json';
-export const FIRST_RUNTIME_REBOOT_GUIDE_FILE = 'reboot-guide.json';
 export const FIRST_RUNTIME_API_CONTRACTS_FILE = 'api-contracts.json';
 export const FIRST_RUNTIME_STRUCTURE_OVERVIEW_FILE = 'structure-overview.json';
 export const FIRST_RUNTIME_DOMAIN_MODEL_FILE = 'domain-model.json';
@@ -63,14 +119,6 @@ export function getFirstRuntimeSummaryPath(projectRoot: string): string {
   return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_SUMMARY_FILE);
 }
 
-export function getFirstRoleViewsPath(projectRoot: string): string {
-  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_ROLE_VIEWS_FILE);
-}
-
-export function getFirstStageViewsPath(projectRoot: string): string {
-  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_STAGE_VIEWS_FILE);
-}
-
 export function getFirstSteeringPath(projectRoot: string): string {
   return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_STEERING_FILE);
 }
@@ -83,16 +131,8 @@ export function getFirstCriticalFlowsPath(projectRoot: string): string {
   return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_CRITICAL_FLOWS_FILE);
 }
 
-export function getFirstChangeMapPath(projectRoot: string): string {
-  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_CHANGE_MAP_FILE);
-}
-
 export function getFirstEntryGuidePath(projectRoot: string): string {
   return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_ENTRY_GUIDE_FILE);
-}
-
-export function getFirstRebootGuidePath(projectRoot: string): string {
-  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_REBOOT_GUIDE_FILE);
 }
 
 export function getFirstApiContractsPath(projectRoot: string): string {
@@ -116,10 +156,7 @@ export function getFirstProjectCognitionUpdatesPath(projectRoot: string): string
 }
 
 function readRuntimeJson<T>(path: string): T | null {
-  if (!existsSync(path)) {
-    return null;
-  }
-
+  if (!existsSync(path)) return null;
   try {
     return readJson<T>(path);
   } catch (error) {
@@ -128,35 +165,26 @@ function readRuntimeJson<T>(path: string): T | null {
   }
 }
 
-/**
- * 校验路径是否为有效的 First Runtime 路径
- * 防止因硬编码错误路径导致的文件写入到错误位置
- * @see docs/first/incident-2026-03-16-json-generation-error.md
- */
 export function validateFirstRuntimePath(targetPath: string): boolean {
   const normalizedTarget = posix.normalize(targetPath.replaceAll('\\', '/'));
   const targetSegments = normalizedTarget.split('/').filter(Boolean);
   const runtimeSegments = FIRST_RUNTIME_DIR.split('/');
 
-  for (let i = 0; i <= targetSegments.length - runtimeSegments.length; i++) {
-    const matches = runtimeSegments.every((segment, offset) => targetSegments[i + offset] === segment);
-    if (matches) {
-      return true;
-    }
+  for (let i = 0; i <= targetSegments.length - runtimeSegments.length; i += 1) {
+    const matches = runtimeSegments.every(
+      (segment, offset) => targetSegments[i + offset] === segment
+    );
+    if (matches) return true;
   }
 
   return false;
 }
 
-/**
- * 断言路径为有效的 First Runtime 路径，无效时抛出错误
- */
 export function assertValidFirstRuntimePath(targetPath: string): void {
   if (!validateFirstRuntimePath(targetPath)) {
     throw new Error(
       `Invalid First Runtime path: "${targetPath}". ` +
         `Expected path to contain "${FIRST_RUNTIME_DIR}". ` +
-        `This error prevents accidental writes to wrong directories (e.g., ".config-first/"). ` +
         `Use getFirstRuntimeDir(projectRoot) or getFirst*Path(projectRoot) functions to construct paths.`
     );
   }
@@ -213,21 +241,19 @@ function normalizeCanonicalRuntimeIndex(
   const criticalFlows =
     rawIndex.criticalFlows ??
     makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/critical-flows.json', lastUpdated);
-  const changeMap =
-    rawIndex.changeMap ??
-    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/change-map.json', lastUpdated);
   const entryGuide =
     rawIndex.entryGuide ??
     makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/entry-guide.json', lastUpdated);
-  const rebootGuide =
-    rawIndex.rebootGuide ??
-    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/reboot-guide.json', lastUpdated);
   const apiContracts =
     rawIndex.apiContracts ??
     makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/api-contracts.json', lastUpdated);
   const structureOverview =
     rawIndex.structureOverview ??
-    makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/structure-overview.json', lastUpdated);
+    makeSyntheticAsset(
+      projectRoot,
+      '.spec-first/runtime/first/structure-overview.json',
+      lastUpdated
+    );
   const domainModel =
     rawIndex.domainModel ??
     makeSyntheticAsset(projectRoot, '.spec-first/runtime/first/domain-model.json', lastUpdated);
@@ -241,14 +267,10 @@ function normalizeCanonicalRuntimeIndex(
     );
   const status =
     rawIndex.summary?.healthy &&
-    rawIndex.roleViews?.healthy &&
-    rawIndex.stageViews?.healthy &&
     steering.healthy &&
     conventions.healthy &&
     criticalFlows.healthy &&
-    changeMap.healthy &&
     entryGuide.healthy &&
-    rebootGuide.healthy &&
     apiContracts.healthy &&
     structureOverview.healthy &&
     domainModel.healthy &&
@@ -258,13 +280,10 @@ function normalizeCanonicalRuntimeIndex(
 
   return {
     ...rawIndex,
-    mode: normalizeFirstRuntimeMode(rawIndex.mode),
     steering,
     conventions,
     criticalFlows,
-    changeMap,
     entryGuide,
-    rebootGuide,
     apiContracts,
     structureOverview,
     domainModel,
@@ -275,14 +294,10 @@ function normalizeCanonicalRuntimeIndex(
         ? undefined
         : [
             ...(!rawIndex.summary?.healthy ? ['summary unhealthy'] : []),
-            ...(!rawIndex.roleViews?.healthy ? ['role-views unhealthy'] : []),
-            ...(!rawIndex.stageViews?.healthy ? ['stage-views unhealthy'] : []),
             ...(!steering.healthy ? ['steering unhealthy'] : []),
             ...(!conventions.healthy ? ['conventions unhealthy'] : []),
             ...(!criticalFlows.healthy ? ['critical-flows unhealthy'] : []),
-            ...(!changeMap.healthy ? ['change-map unhealthy'] : []),
             ...(!entryGuide.healthy ? ['entry-guide unhealthy'] : []),
-            ...(!rebootGuide.healthy ? ['reboot-guide unhealthy'] : []),
             ...(!apiContracts.healthy ? ['api-contracts unhealthy'] : []),
             ...(!structureOverview.healthy ? ['structure-overview unhealthy'] : []),
             ...(!domainModel.healthy ? ['domain-model unhealthy'] : []),
@@ -291,18 +306,51 @@ function normalizeCanonicalRuntimeIndex(
   };
 }
 
+function isCanonicalRuntimeIndexShape(rawIndex: unknown): rawIndex is FirstRuntimeIndex {
+  if (typeof rawIndex !== 'object' || rawIndex === null) return false;
+  const obj = rawIndex as Record<string, unknown>;
+  return (
+    obj.summary !== undefined &&
+    obj.steering !== undefined &&
+    obj.conventions !== undefined &&
+    obj.criticalFlows !== undefined &&
+    obj.entryGuide !== undefined &&
+    obj.apiContracts !== undefined &&
+    obj.structureOverview !== undefined &&
+    obj.domainModel !== undefined &&
+    obj.databaseSchema !== undefined &&
+    obj.status !== undefined
+  );
+}
+
 export function readFirstRuntimeIndex(projectRoot: string): FirstRuntimeIndex | null {
-  const raw = readRuntimeJson<FirstRuntimeIndex>(getFirstRuntimeIndexPath(projectRoot));
-  return raw === null ? null : normalizeCanonicalRuntimeIndex(projectRoot, raw);
+  const raw = readRuntimeJson<Record<string, unknown>>(getFirstRuntimeIndexPath(projectRoot));
+  if (raw === null || !isCanonicalRuntimeIndexShape(raw)) {
+    return null;
+  }
+  return normalizeCanonicalRuntimeIndex(projectRoot, raw);
 }
 
 export function readFirstRuntimeSummary(projectRoot: string): FirstRuntimeSummary | null {
-  const raw = readRuntimeJson<FirstRuntimeSummary>(getFirstRuntimeSummaryPath(projectRoot));
+  const raw = readRuntimeJson<Record<string, unknown>>(getFirstRuntimeSummaryPath(projectRoot));
   if (raw === null) return null;
-  return {
-    ...raw,
-    mode: normalizeFirstRuntimeMode(raw.mode),
-  };
+  return normalizeRuntimeSummary(raw);
+}
+
+export function readFirstSteering(projectRoot: string): FirstSteering | null {
+  return readRuntimeJson<FirstSteering>(getFirstSteeringPath(projectRoot));
+}
+
+export function readFirstConventions(projectRoot: string): FirstConventions | null {
+  return readRuntimeJson<FirstConventions>(getFirstConventionsPath(projectRoot));
+}
+
+export function readFirstCriticalFlows(projectRoot: string): FirstCriticalFlows | null {
+  return readRuntimeJson<FirstCriticalFlows>(getFirstCriticalFlowsPath(projectRoot));
+}
+
+export function readFirstEntryGuide(projectRoot: string): FirstEntryGuide | null {
+  return readRuntimeJson<FirstEntryGuide>(getFirstEntryGuidePath(projectRoot));
 }
 
 export function readFirstApiContracts(projectRoot: string): FirstApiContracts | null {
@@ -321,44 +369,31 @@ export function readFirstDatabaseSchema(projectRoot: string): FirstDatabaseSchem
   return readRuntimeJson<FirstDatabaseSchema>(getFirstDatabaseSchemaPath(projectRoot));
 }
 
-export function readFirstRoleViews(projectRoot: string): FirstRoleViews | null {
-  return readRuntimeJson<FirstRoleViews>(getFirstRoleViewsPath(projectRoot));
-}
-
-export function readFirstStageViews(projectRoot: string): FirstStageViews | null {
-  return readRuntimeJson<FirstStageViews>(getFirstStageViewsPath(projectRoot));
-}
-
-export function readFirstSteering(projectRoot: string): FirstSteering | null {
-  return readRuntimeJson<FirstSteering>(getFirstSteeringPath(projectRoot));
-}
-
-export function readFirstConventions(projectRoot: string): FirstConventions | null {
-  return readRuntimeJson<FirstConventions>(getFirstConventionsPath(projectRoot));
-}
-
-export function readFirstCriticalFlows(projectRoot: string): FirstCriticalFlows | null {
-  return readRuntimeJson<FirstCriticalFlows>(getFirstCriticalFlowsPath(projectRoot));
-}
-
-export function readFirstChangeMap(projectRoot: string): FirstChangeMap | null {
-  return readRuntimeJson<FirstChangeMap>(getFirstChangeMapPath(projectRoot));
-}
-
-export function readFirstEntryGuide(projectRoot: string): FirstEntryGuide | null {
-  return readRuntimeJson<FirstEntryGuide>(getFirstEntryGuidePath(projectRoot));
-}
-
-export function readFirstRebootGuide(projectRoot: string): FirstRebootGuide | null {
-  return readRuntimeJson<FirstRebootGuide>(getFirstRebootGuidePath(projectRoot));
-}
-
 export function writeFirstRuntimeIndex(projectRoot: string, index: FirstRuntimeIndex): void {
   writeRuntimeJson(getFirstRuntimeIndexPath(projectRoot), index);
 }
 
 export function writeFirstRuntimeSummary(projectRoot: string, summary: FirstRuntimeSummary): void {
   writeRuntimeJson(getFirstRuntimeSummaryPath(projectRoot), summary);
+}
+
+export function writeFirstSteering(projectRoot: string, steering: FirstSteering): void {
+  writeRuntimeJson(getFirstSteeringPath(projectRoot), steering);
+}
+
+export function writeFirstConventions(projectRoot: string, conventions: FirstConventions): void {
+  writeRuntimeJson(getFirstConventionsPath(projectRoot), conventions);
+}
+
+export function writeFirstCriticalFlows(
+  projectRoot: string,
+  criticalFlows: FirstCriticalFlows
+): void {
+  writeRuntimeJson(getFirstCriticalFlowsPath(projectRoot), criticalFlows);
+}
+
+export function writeFirstEntryGuide(projectRoot: string, entryGuide: FirstEntryGuide): void {
+  writeRuntimeJson(getFirstEntryGuidePath(projectRoot), entryGuide);
 }
 
 export function writeFirstApiContracts(projectRoot: string, apiContracts: FirstApiContracts): void {
@@ -381,39 +416,4 @@ export function writeFirstDatabaseSchema(
   databaseSchema: FirstDatabaseSchema
 ): void {
   writeRuntimeJson(getFirstDatabaseSchemaPath(projectRoot), databaseSchema);
-}
-
-export function writeFirstRoleViews(projectRoot: string, roleViews: FirstRoleViews): void {
-  writeRuntimeJson(getFirstRoleViewsPath(projectRoot), roleViews);
-}
-
-export function writeFirstStageViews(projectRoot: string, stageViews: FirstStageViews): void {
-  writeRuntimeJson(getFirstStageViewsPath(projectRoot), stageViews);
-}
-
-export function writeFirstSteering(projectRoot: string, steering: FirstSteering): void {
-  writeRuntimeJson(getFirstSteeringPath(projectRoot), steering);
-}
-
-export function writeFirstConventions(projectRoot: string, conventions: FirstConventions): void {
-  writeRuntimeJson(getFirstConventionsPath(projectRoot), conventions);
-}
-
-export function writeFirstCriticalFlows(
-  projectRoot: string,
-  criticalFlows: FirstCriticalFlows
-): void {
-  writeRuntimeJson(getFirstCriticalFlowsPath(projectRoot), criticalFlows);
-}
-
-export function writeFirstChangeMap(projectRoot: string, changeMap: FirstChangeMap): void {
-  writeRuntimeJson(getFirstChangeMapPath(projectRoot), changeMap);
-}
-
-export function writeFirstEntryGuide(projectRoot: string, entryGuide: FirstEntryGuide): void {
-  writeRuntimeJson(getFirstEntryGuidePath(projectRoot), entryGuide);
-}
-
-export function writeFirstRebootGuide(projectRoot: string, rebootGuide: FirstRebootGuide): void {
-  writeRuntimeJson(getFirstRebootGuidePath(projectRoot), rebootGuide);
 }

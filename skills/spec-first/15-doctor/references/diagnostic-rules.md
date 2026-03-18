@@ -305,6 +305,6 @@ npm install
 | P3 | node_modules 清理 | ⚠️ 需确认 |
 
 ## background checks
-- 检查 `stage-views` 是否存在且 healthy
+- 检查 canonical first runtime 资产是否存在且 healthy
 - 检查 runtime 真源与 docs 投影视图是否失同步
 - 检查 `background_input_status` 是否缺失或退化

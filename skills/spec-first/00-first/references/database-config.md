@@ -1,245 +1,88 @@
-# 数据库配置指南
+# 数据库能力配置与适用性规范
 
-> 版本: 1.0.0 | 日期: 2026-03-03
+> **当前正式 contract**：数据库认知是条件型能力，不是默认必选能力。
+> 本文档约束 `database-schema.json` 的适用性判定、schema 来源优先级与 `database-er.md` 的条件生成规则。
 
-本文档说明如何通过 `.spec-first/meta/config.yaml` 配置数据库，用于 Spec-First 数据库检测。
+## 1. 适用性判定
 
----
+数据库能力只在以下场景进入正式分析：
+- 检测到 ORM schema
+- 检测到 migration / DDL
+- 检测到明确数据库配置
+- 检测到 repository / entity / model 等强证据
 
-## 配置位置
+状态语义：
+- `healthy`：证据充分，可生成 `database-schema.json`
+- `degraded`：有数据库线索，但不足以形成正式 schema
+- `not_applicable`：当前项目不适用数据库认知能力
 
-配置文件位于项目根目录：
+## 2. 正式输出
 
-```
-your-project/
-├── .spec-first/
-│   ├── meta/
-│   │   └── config.yaml      # 项目级基线（可提交）
-│   └── local/
-│       └── config.yaml      # 本地覆盖（不提交）
-```
+### runtime truth
 
----
+- `database-schema.json`
 
-## 显式配置（推荐）
+### projection docs
 
-在 `.spec-first/meta/config.yaml` 中添加 `databases` 配置段：
+- `docs/first/database-er.md`
 
-```yaml
-databases:
-  # 未配置 list 时，是否自动检测
-  auto_detect: false
+约束：
+- 只有 `databaseSchema.status === healthy` 时才生成 `database-er.md`
+- 不生成 `database-index.md`
+- 不生成 `database-{name}.md`
+- 不生成任何未注册数据库专题文件
 
-  # 数据库列表
-  list:
-    - name: primary
-      type: postgresql
-      primary: true
-      purpose: 主业务数据库
-      connection:
-        env_var: DATABASE_URL
-      orm: prisma
+## 3. schema 来源优先级
 
-    - name: analytics
-      type: mysql
-      purpose: 数据分析仓库
-      connection:
-        env_var: ANALYTICS_DB_URL
-      orm: none
-```
+从高到低：
+1. ORM schema：Prisma / TypeORM / Sequelize / Drizzle / Mongoose
+2. migration / DDL
+3. 数据库配置与连接声明
+4. repository / entity / model 代码线索
+5. `.spec-first/meta/config.yaml` 中的数据库配置
 
-### 配置字段说明
+规则：
+- 高优先级来源足够时，不依赖低优先级补全“想象中的结构”
+- 低优先级只能补充证据，不能单独伪造完整 schema
 
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `name` | string | ✓ | - | 数据库唯一标识，用于文档命名 |
-| `type` | enum | ✓ | - | mysql/postgresql/sqlite/oracle/sqlserver/mongodb |
-| `primary` | boolean | - | false | 是否主数据库 |
-| `purpose` | string | - | - | 用途描述 |
-| `connection.env_var` | string | - | - | 环境变量名 |
-| `orm` | enum | - | none | prisma/drizzle/typeorm/sequelize/mongoose/none |
+## 4. 不适用场景
 
-### type 枚举值
+以下场景应直接判定为 `not_applicable`：
+- 纯前端站点，无本地数据库或显式持久化层
+- 纯库项目，无数据库接入语义
+- 静态站点或文档仓库
+- 仅有弱关键词但无实际 schema / config / code 证据
 
-| 值 | 数据库类型 |
-|----|-----------|
-| `mysql` | MySQL / MariaDB |
-| `postgresql` | PostgreSQL |
-| `sqlite` | SQLite |
-| `oracle` | Oracle Database |
-| `sqlserver` | Microsoft SQL Server |
-| `mongodb` | MongoDB |
+## 5. 降级场景
 
----
+以下场景应判定为 `degraded`：
+- 检测到数据库依赖，但没有 schema 级证据
+- 只看到环境变量名，无法确认结构
+- 只能识别数据库类型，无法识别表、集合、字段关系
 
-## 配置示例
+降级行为：
+- 允许写入 `database-schema.json`，但状态必须为 `degraded`
+- 不生成正式 `database-er.md`
+- 必须记录降级原因与证据不足点
 
-### 单数据库（PostgreSQL + Prisma）
+## 6. 多数据库项目
 
-```yaml
-databases:
-  auto_detect: false
-  list:
-    - name: default
-      type: postgresql
-      primary: true
-      purpose: 主业务数据库
-      connection:
-        env_var: DATABASE_URL
-      orm: prisma
-```
+多数据库场景的收口方式：
+- 所有数据库事实统一汇总到同一份 `database-schema.json`
+- 最终仍只有一个正式投影视图：`database-er.md`
 
-对应的环境变量：
+约束：
+- 不因数据库数量增加额外正式文档
+- 不把数据库 `name` 当作文档命名入口
 
-```bash
-# .env
-DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
-```
+## 7. 安全与输出约束
 
-### 多数据库（主库 + 分析库）
+- 不得输出密码、完整连接串、令牌、私钥
+- 环境变量只允许保留名称，不允许保留敏感值
+- 即时探测失败时，输出结构化原因，不回显原始凭证
 
-```yaml
-databases:
-  auto_detect: false
-  list:
-    - name: primary
-      type: postgresql
-      primary: true
-      purpose: 主业务数据库
-      connection:
-        env_var: DATABASE_URL
-      orm: prisma
+## 8. 验收标准
 
-    - name: analytics
-      type: mysql
-      purpose: 数据分析仓库
-      connection:
-        env_var: ANALYTICS_DB_URL
-      orm: none
-```
-
-对应的环境变量：
-
-```bash
-# .env
-DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
-ANALYTICS_DB_URL="mysql://user:password@localhost:3306/analytics"
-```
-
-### SQLite 本地开发
-
-```yaml
-databases:
-  auto_detect: false
-  list:
-    - name: local
-      type: sqlite
-      primary: true
-      purpose: 本地开发数据库
-      connection:
-        env_var: DB_PATH
-      orm: prisma
-```
-
-对应的环境变量：
-
-```bash
-# .env
-DB_PATH="prisma/dev.db"
-```
-
-### MongoDB
-
-```yaml
-databases:
-  auto_detect: false
-  list:
-    - name: mongo
-      type: mongodb
-      primary: true
-      purpose: 文档存储
-      connection:
-        env_var: MONGO_URI
-      orm: mongoose
-```
-
-对应的环境变量：
-
-```bash
-# .env
-MONGO_URI="mongodb://localhost:27017/mydb"
-```
-
----
-
-## 自动检测模式
-
-当 `databases.auto_detect: true` 或未配置 `databases.list` 时，启用自动检测。
-
-### 检测顺序
-
-1. **环境变量** — 扫描 `.env`、`.env.local`
-2. **ORM 配置** — Prisma、Drizzle、TypeORM 等
-3. **框架配置** — Spring、Django、Rails 等
-
-### 支持的环境变量模式
-
-| 模式 | 示例 | 推断类型 |
-|------|------|----------|
-| `DATABASE_URL` | `postgresql://...` | 从协议推断 |
-| `{NAME}_DATABASE_URL` | `ANALYTICS_DATABASE_URL` | 从协议推断 |
-| `DB_HOST` + `DB_NAME` | `DB_HOST=localhost` | MySQL |
-| `POSTGRES_HOST` | - | PostgreSQL |
-| `MONGO_URI` | - | MongoDB |
-| `MONGODB_URI` | - | MongoDB |
-
-### 协议识别
-
-| 协议前缀 | 数据库类型 |
-|---------|-----------|
-| `postgres://` / `postgresql://` | PostgreSQL |
-| `mysql://` / `mysql2://` | MySQL |
-| `sqlite://` / `file:` | SQLite |
-| `mongodb://` / `mongodb+srv://` | MongoDB |
-| `oracle://` | Oracle |
-| `mssql://` / `sqlserver://` | SQL Server |
-
-### 首次检测后
-
-检测完成后，会询问是否将结果写入配置文件：
-
-```
-检测到 2 个数据库:
-
-1. primary (PostgreSQL) - 主业务库 [已验证 ✓]
-2. analytics (MySQL) - 数据分析 [已验证 ✓]
-
-是否将检测结果写入配置文件？
-- [Y] 是 - 下次跳过检测，直接使用配置
-- [N] 否 - 每次都重新检测
-- [S] 跳过 - 仅生成文档
-```
-
----
-
-## 本地配置（不提交）
-
-对于敏感信息（如开发环境密码），使用 `.spec-first/local/config.yaml`：
-
-```yaml
-# .spec-first/local/config.yaml (不提交到 git)
-databases:
-  list:
-    - name: primary
-      type: postgresql
-      connection:
-        # 本地开发使用固定连接串
-        url_template: "postgresql://dev:dev123@localhost:5432/mydb"
-```
-
-`.spec-first/local/` 目录应加入 `.gitignore`：
-
-```
-# .gitignore
-.spec-first/local/
-```
+- 能明确哪些项目不生成 `database-er.md`
+- 能解释 `healthy / degraded / not_applicable` 的边界
+- 能把多数据库项目收口到单一 `database-schema.json`

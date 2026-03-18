@@ -230,14 +230,10 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
   const runtimeIndex = readFirstRuntimeIndex(projectRoot);
   const runtimeAssets = [
     { name: 'summary.json', entry: runtimeIndex?.summary },
-    { name: 'role-views.json', entry: runtimeIndex?.roleViews },
-    { name: 'stage-views.json', entry: runtimeIndex?.stageViews },
     { name: 'steering.json', entry: runtimeIndex?.steering },
     { name: 'conventions.json', entry: runtimeIndex?.conventions },
     { name: 'critical-flows.json', entry: runtimeIndex?.criticalFlows },
-    { name: 'change-map.json', entry: runtimeIndex?.changeMap },
     { name: 'entry-guide.json', entry: runtimeIndex?.entryGuide },
-    { name: 'reboot-guide.json', entry: runtimeIndex?.rebootGuide },
     { name: 'api-contracts.json', entry: runtimeIndex?.apiContracts },
     { name: 'structure-overview.json', entry: runtimeIndex?.structureOverview },
     { name: 'domain-model.json', entry: runtimeIndex?.domainModel },

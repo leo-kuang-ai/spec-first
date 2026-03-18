@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.1.4 2026-03-18 Claude: refactor(context-resolver): 输入矩阵代码化 — 将 resolveSkillAssetContract 的 switch-case 提取为 SKILL_INPUT_MATRIX 常量，集中管理 14 个 skill 的资产契约
+- v1.1.4 2026-03-18 Claude: refactor(dispatcher): 统一 runtime notice 参数命名 — 将 6 个 build*RuntimeNotice 函数的参数从下划线命名（background_input_status）改为驼峰命名（backgroundInputStatus），简化 formatStageRuntimeNotice 函数签名
+- v1.1.4 2026-03-17 Claude: refactor(first): 简化 CLI 参数协议 — 删除 --auto 和 --skip 参数，统一为单一执行路径（有 runtime → 刷新，无 runtime → bootstrap），更新帮助文档和测试用例 (user-visible)
+- v1.1.4 2026-03-17 Claude: feat(context-resolver): 为 6 个未接入节点添加 first 资产 contract（catchup/research/doctor/archive/sync/feature），完成 Batch 2-3 节点接入 (user-visible)
+- v1.1.4 2026-03-17 Claude: fix(first-runtime-store): 修复 isCanonicalRuntimeIndexShape 类型守卫，仅检查核心必需字段以兼容旧版 index
+- v1.1.4 2026-03-17 Claude: test(context-resolver): 更新 makeHealthyIndex 测试辅助函数，添加缺失的 runtime 资产字段
 - v1.1.4 2026-03-17 Claude: feat(init): 为 Mode I Feature 初始化生成 impact-analysis.md，重构 handleInit 为五轨道路由，添加 brownfield-baseline 跳过机制 (user-visible)
 - v1.1.4 2026-03-17 Claude: refactor(init): 代码质量加固：提取 LEGACY_BASELINE_FEATURE_ID 常量、--track 无效值告警回退、非 TTY 时 brownfield-baseline 返回 VALIDATION_ERROR、baseline Feature 使用专属 PRD/task_plan 骨架、SKILL.md 更新为五轨道文档
 - v1.1.4 2026-03-17 Claude: test(init): 修复 cli-init-stage 全部 36 个测试用例，适配五轨道路由重构后新行为

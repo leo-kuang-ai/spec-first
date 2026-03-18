@@ -1,21 +1,17 @@
 /**
  * First Skill 参数协议与校验
- * 统一 /spec-first:first 参数入口
- *
- * 模式选择:
- * - 运行模式统一为 deep
- * --auto: 跳过交互，使用智能推荐执行策略
+ * 统一 spec-first first 参数入口
  *
  * 端类型指定:
  * --type=<value>: 手动指定端类型 (backend/frontend/mobile/cross-platform/desktop/monorepo)
  *
  * 行为控制:
- * --force: 跳过二次确认，强制全量更新
- *
- * 增量更新 (Phase 3):
- * --update=<products>: 仅更新指定产物，逗号分隔 (如: --update=api-docs,architecture)
- * --since=<commit|version>: 更新指定版本/commit 后的变更
+ * --force: 强制重新生成，跳过确认
  * --check-health: 仅检查产物健康度，不生成
+ *
+ * Phase 3 参数（第一阶段暂不启用）:
+ * --update=<products>: 仅更新指定产物，逗号分隔
+ * --since=<commit|version>: 更新指定版本/commit 后的变更
  */
 
 export type FirstMode = 'deep';
@@ -30,7 +26,11 @@ export type PlatformType =
 
 /** 所有可能的产物名称 */
 export const PRODUCT_NAMES = [
-  'tech-stack',
+  'summary',
+  'steering',
+  'conventions',
+  'critical-flows',
+  'entry-guide',
   'codebase-overview',
   'domain-model',
   'api-docs',
@@ -38,7 +38,6 @@ export const PRODUCT_NAMES = [
   'call-graph',
   'architecture',
   'external-deps',
-  'local-setup',
   'development-guidelines',
   'README',
 ] as const;
@@ -47,14 +46,12 @@ export type ProductName = (typeof PRODUCT_NAMES)[number];
 export interface FirstArgs {
   mode: FirstMode;
   type?: PlatformType;
-  auto: boolean; // --auto 标志：使用智能推荐
-  force: boolean; // --force 标志：跳过二次确认
-  skip: boolean; // --skip 标志：跳过生成，使用现有产物
+  force: boolean; // --force 标志：强制重新生成
+  checkHealth?: boolean; // --check-health 仅检查健康度
 
-  // Phase 3: 增量更新参数
+  // Phase 3: 增量更新参数（第一阶段暂不启用）
   update?: ProductName[]; // --update 指定要更新的产物
   since?: string; // --since 指定起始版本/commit
-  checkHealth?: boolean; // --check-health 仅检查健康度
 }
 
 export const E_FIRST_ARGS_UNKNOWN = 'E_FIRST_ARGS_UNKNOWN';
@@ -71,9 +68,7 @@ export class FirstArgsError extends Error {
 }
 
 const ALLOWED_FLAGS = new Set([
-  '--auto',
   '--force',
-  '--skip',
   '--check-health',
 ]);
 const TYPE_PREFIX = '--type=';
@@ -100,9 +95,7 @@ const VALID_TYPES = new Set<PlatformType>([
 export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void): FirstArgs {
   const result: FirstArgs = {
     mode: 'deep',
-    auto: false,
     force: false,
-    skip: false,
   };
 
   const seen = new Set<string>();
@@ -177,15 +170,8 @@ export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void
       seen.add(arg);
 
       switch (arg) {
-        case '--auto':
-          result.auto = true;
-          // 运行模式固定为 deep，auto 仅影响执行策略
-          break;
         case '--force':
           result.force = true;
-          break;
-        case '--skip':
-          result.skip = true;
           break;
         case '--check-health':
           result.checkHealth = true;
@@ -197,7 +183,7 @@ export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void
     // 未知参数
     throw new FirstArgsError(
       E_FIRST_ARGS_UNKNOWN,
-      `未知参数: ${arg}。有效参数: --auto, --type=<value>, --force, --skip, --update=<products>, --since=<commit|version>, --check-health`
+      `未知参数: ${arg}。有效参数: --type=<value>, --force, --check-health`
     );
   }
 
@@ -206,19 +192,11 @@ export function validateFirstArgs(args: string[], onWarn?: (msg: string) => void
 
 /**
  * 解析 first skill 确认策略
- * 基于 --auto/--force/--skip 标志决定是否跳过交互
+ * 基于 --force 标志决定是否跳过交互
  * @returns 'skip' - 跳过交互直接执行 | 'require' - 需要交互式确认
  */
 export function resolveFirstConfirmPolicy(args: FirstArgs): 'skip' | 'require' {
-  return args.auto || args.force || args.skip ? 'skip' : 'require';
-}
-
-/**
- * 解析是否使用智能推荐模式
- * @returns 'auto' - 智能推荐 | 'manual' - 用户手动指定模式
- */
-export function resolveFirstModePolicy(args: FirstArgs): 'auto' | 'manual' {
-  return args.auto ? 'auto' : 'manual';
+  return args.force ? 'skip' : 'require';
 }
 
 /**

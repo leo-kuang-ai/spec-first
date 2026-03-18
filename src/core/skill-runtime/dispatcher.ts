@@ -34,7 +34,6 @@ import {
 import {
   validateFirstArgs,
   resolveFirstConfirmPolicy,
-  resolveFirstModePolicy,
   type FirstArgs,
 } from './first-args.js';
 import {
@@ -74,8 +73,6 @@ export interface DispatchResult {
   firstArgs?: FirstArgs;
   /** first 专用：确认策略（仅 skillName=first 时存在） */
   firstConfirmPolicy?: 'skip' | 'require';
-  /** first 专用：模式策略（仅 skillName=first 时存在） */
-  firstModePolicy?: 'auto' | 'manual';
 }
 
 /** 语义子命令映射表 */
@@ -345,7 +342,6 @@ export function dispatchCommand(input: string, projectRoot: string): DispatchRes
       try {
         const firstArgs = validateFirstArgs(normalizedRest);
         const firstConfirmPolicy = resolveFirstConfirmPolicy(firstArgs);
-        const firstModePolicy = resolveFirstModePolicy(firstArgs);
         return {
           route: 'skill',
           skillName,
@@ -353,7 +349,6 @@ export function dispatchCommand(input: string, projectRoot: string): DispatchRes
           skillPath,
           firstArgs,
           firstConfirmPolicy,
-          firstModePolicy,
         };
       } catch (e) {
         return {
@@ -565,17 +560,16 @@ export function loadSkill(
 function formatStageRuntimeNotice(
   marker: string,
   title: string,
-  backgroundKey: 'background_input_status' | 'backgroundInputStatus',
   summaryKey: string,
   context: ResolvedSkillContext,
   extraLines: string[] = []
 ): string | undefined {
-  if (context.source === 'none' || !context.stageViewSummary) return undefined;
+  if (context.source === 'none' || !context.contextSummary) return undefined;
 
   const parts = [`<!-- ${marker} -->`, `## ${title}`];
-  parts.push(`${backgroundKey}: ${context.backgroundInputStatus}`);
+  parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
   parts.push(`data_source: ${context.source}`);
-  parts.push(`${summaryKey}: ${context.stageViewSummary}`);
+  parts.push(`${summaryKey}: ${context.contextSummary}`);
   if (context.requiredAssetNames.length > 0) {
     parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
   }
@@ -648,9 +642,9 @@ function buildOrchestrateRuntimeNotice(
     if (firstContext.firstSummaryLite?.projectName) {
       parts.push(`project_name: ${firstContext.firstSummaryLite.projectName}`);
     }
-    if (firstContext.optional.changeMap?.length) {
+    if (firstContext.optional.apiContracts?.interfaces.length) {
       parts.push(
-        `change_types: ${firstContext.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+        `api_interfaces: ${firstContext.optional.apiContracts.interfaces.map((entry) => entry.name).join(', ')}`
       );
     }
     if (firstContext.optional.criticalFlows?.length) {
@@ -719,18 +713,18 @@ function buildOnboardingRuntimeNotice(executionContext: SkillExecutionContext): 
 
     if (context.source === 'runtime') {
       const steeringOverview = context.required.steering?.product.overview;
-      const rebootStart = context.optional.rebootGuide?.whereToStart?.join(', ');
+      const recommendedReads = context.optional.entryGuide?.flatMap((entry) => entry.readFirst).slice(0, 4).join(', ');
       return [
         '<!-- onboarding-runtime-context -->',
-        '## Role Views Available',
+        '## Onboarding Background Available',
         `data_source: ${context.source}`,
         `required_assets: ${context.requiredAssetNames.join(', ')}`,
         ...(context.optionalAssetNames.length > 0
           ? [`optional_assets: ${context.optionalAssetNames.join(', ')}`]
           : []),
-        ...(context.roleViewSummary ? [`role_summary: ${context.roleViewSummary}`] : []),
+        ...(context.onboardingSummary ? [`project_summary: ${context.onboardingSummary}`] : []),
         ...(steeringOverview ? [`steering_overview: ${steeringOverview}`] : []),
-        ...(rebootStart ? [`reboot_start: ${rebootStart}`] : []),
+        ...(recommendedReads ? [`recommended_reads: ${recommendedReads}`] : []),
         'recommendation_mode: project-based',
         ...(context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full'
           ? [`missing_assets: ${context.missingAssets.join(', ')}`]
@@ -742,12 +736,12 @@ function buildOnboardingRuntimeNotice(executionContext: SkillExecutionContext): 
       ].join('\n');
     }
 
-    if (context.source === 'docs' && context.roleViewSummary) {
+    if (context.source === 'docs' && context.onboardingSummary) {
       return [
         '<!-- onboarding-runtime-context -->',
-        '## Role Views Available',
+        '## Onboarding Background Available',
         `data_source: ${context.source}`,
-        `role_summary: ${context.roleViewSummary}`,
+        `project_summary: ${context.onboardingSummary}`,
         ...(context.fallback.warning ? [`warning: ${context.fallback.warning}`] : []),
         'recommendation_mode: generic',
         'recommendation: 建议先运行 /spec-first:first 补全背景数据',
@@ -766,8 +760,7 @@ function buildSpecRuntimeNotice(executionContext: SkillExecutionContext): string
     return formatStageRuntimeNotice(
       'spec-runtime-context',
       'Spec View Available',
-      'background_input_status',
-      'spec_view_summary',
+      'specViewSummary',
       resolveSkillContext(executionContext.projectRoot, 'spec', executionContext.featureId),
       (() => {
         const context = resolveSkillContext(
@@ -791,8 +784,7 @@ function buildDesignRuntimeNotice(executionContext: SkillExecutionContext): stri
     const notice = formatStageRuntimeNotice(
       'design-runtime-context',
       'Design View Available',
-      'background_input_status',
-      'design_view_summary',
+      'designViewSummary',
       context,
       [
         ...(context.optional.steering?.tech.constraints.length
@@ -846,9 +838,9 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
       parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
     }
 
-    if (context.optional.changeMap?.length) {
+    if (context.optional.apiContracts?.interfaces.length) {
       parts.push(
-        `change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+        `api_interfaces: ${context.optional.apiContracts.interfaces.map((entry) => entry.name).join(', ')}`
       );
     }
     if (context.optional.criticalFlows?.length) {
@@ -890,8 +882,7 @@ function buildCodeRuntimeNotice(executionContext: SkillExecutionContext): string
     return formatStageRuntimeNotice(
       'code-runtime-context',
       'Code View Available',
-      'background_input_status',
-      'code_view_summary',
+      'codeViewSummary',
       resolveSkillContext(executionContext.projectRoot, 'code', executionContext.featureId),
       (() => {
         const context = resolveSkillContext(
@@ -905,9 +896,9 @@ function buildCodeRuntimeNotice(executionContext: SkillExecutionContext): string
                 `entry_categories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`,
               ]
             : []),
-          ...(context.optional.changeMap?.length
+          ...(context.optional.apiContracts?.interfaces.length
             ? [
-                `change_types: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`,
+                `api_interfaces: ${context.optional.apiContracts.interfaces.map((entry) => entry.name).join(', ')}`,
               ]
             : []),
         ];
@@ -925,7 +916,6 @@ function buildReviewRuntimeNotice(executionContext: SkillExecutionContext): stri
     const notice = formatStageRuntimeNotice(
       'review-runtime-context',
       'Review Context',
-      'backgroundInputStatus',
       'codeViewSummary',
       context,
       [
@@ -934,9 +924,9 @@ function buildReviewRuntimeNotice(executionContext: SkillExecutionContext): stri
               `entryCategories: ${context.optional.entryGuide.map((entry) => entry.taskCategory).join(', ')}`,
             ]
           : []),
-        ...(context.optional.changeMap?.length
+        ...(context.optional.apiContracts?.interfaces.length
           ? [
-              `changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`,
+              `apiInterfaces: ${context.optional.apiContracts.interfaces.map((entry) => entry.name).join(', ')}`,
             ]
           : []),
       ]
@@ -998,9 +988,9 @@ function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string
       parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
     }
 
-    if (context.optional.changeMap?.length) {
+    if (context.optional.apiContracts?.interfaces.length) {
       parts.push(
-        `changeTypes: ${context.optional.changeMap.map((entry) => entry.changeType).join(', ')}`
+        `apiInterfaces: ${context.optional.apiContracts.interfaces.map((entry) => entry.name).join(', ')}`
       );
     }
     if (context.optional.criticalFlows?.length) {
@@ -1059,8 +1049,7 @@ function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): stri
     const notice = formatStageRuntimeNotice(
       'verify-runtime-context',
       'Verify View Available',
-      'background_input_status',
-      'verify_view_summary',
+      'verifyViewSummary',
       context,
       [
         ...(context.optional.criticalFlows?.length
@@ -1103,7 +1092,6 @@ function buildSpecReviewRuntimeNotice(executionContext: SkillExecutionContext): 
     return formatStageRuntimeNotice(
       'spec-review-runtime-context',
       'Spec Review Context',
-      'backgroundInputStatus',
       'specViewSummary',
       resolveSkillContext(executionContext.projectRoot, 'spec', executionContext.featureId)
     );

@@ -6,14 +6,10 @@ import { FIRST_RUNTIME_ARTIFACTS } from './first-artifact-mapping.js';
 import { refreshFirstDocsFromRuntime } from './first-doc-projection.js';
 import type { FirstMode, PlatformType } from './first-args.js';
 import { detectPlatformType, classifyProjectMaturity } from './first-platform-detector.js';
-import { buildRoleViews } from './first-role-views.js';
 import { buildFirstConventions } from './first-conventions.js';
-import { buildFirstChangeMap } from './first-change-map.js';
 import { buildFirstCriticalFlows } from './first-critical-flows.js';
 import { buildFirstEntryGuide } from './first-entry-guide.js';
-import { buildFirstRebootGuide } from './first-reboot-guide.js';
 import {
-  getFirstChangeMapPath,
   getFirstConventionsPath,
   getFirstCriticalFlowsPath,
   getFirstEntryGuidePath,
@@ -21,25 +17,18 @@ import {
   getFirstStructureOverviewPath,
   getFirstDomainModelPath,
   getFirstDatabaseSchemaPath,
-  getFirstRebootGuidePath,
-  getFirstRoleViewsPath,
   getFirstRuntimeSummaryPath,
   getFirstSteeringPath,
-  getFirstStageViewsPath,
   writeFirstApiContracts,
   writeFirstDatabaseSchema,
   writeFirstDomainModel,
-  writeFirstRoleViews,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
   writeFirstStructureOverview,
   writeFirstConventions,
-  writeFirstChangeMap,
   writeFirstCriticalFlows,
   writeFirstEntryGuide,
-  writeFirstRebootGuide,
   writeFirstSteering,
-  writeFirstStageViews,
 } from './first-runtime-store.js';
 import type {
   FirstApiContracts,
@@ -51,7 +40,6 @@ import type {
   FirstRuntimeSummary,
   FirstStructureOverview,
 } from './first-runtime-types.js';
-import { buildStageViews } from './first-stage-views.js';
 import { buildFirstSummary } from './first-summary.js';
 
 export interface BootstrapFirstRuntimeOptions {
@@ -268,7 +256,6 @@ function buildBootstrapSummary(
 
   return buildFirstSummary({
     generatedAt: new Date().toISOString(),
-    mode: options.mode ?? 'deep',
     projectName,
     platformType,
     overview: detectOverview(projectRoot, pkg),
@@ -317,6 +304,7 @@ function buildBootstrapApiContracts(summary: FirstRuntimeSummary): FirstApiContr
             request: [],
             response: ['更新 first runtime assets', '刷新 docs/first'],
             auth: [],
+            errors: [],
             evidence: uniqueStrings(summary.entryPoints, summary.evidence).slice(0, 6),
           }))
         : [
@@ -327,6 +315,7 @@ function buildBootstrapApiContracts(summary: FirstRuntimeSummary): FirstApiContr
               request: [],
               response: ['项目入口待进一步识别'],
               auth: [],
+              errors: [],
               evidence: summary.evidence.slice(0, 6),
             },
           ],
@@ -427,8 +416,6 @@ export function bootstrapFirstRuntime(
   options: BootstrapFirstRuntimeOptions
 ): BootstrapFirstRuntimeResult {
   const summary = buildBootstrapSummary(projectRoot, options);
-  const roleViews = buildRoleViews(summary);
-  const stageViews = buildStageViews(summary);
   const steering = buildBootstrapSteering(summary);
   const apiContracts = buildBootstrapApiContracts(summary);
   const structureOverview = buildBootstrapStructureOverview(summary);
@@ -436,23 +423,17 @@ export function bootstrapFirstRuntime(
   const databaseSchema = buildBootstrapDatabaseSchema(projectRoot);
   const conventions = buildFirstConventions(summary);
   const criticalFlows = buildFirstCriticalFlows(summary);
-  const changeMap = buildFirstChangeMap(summary);
   const entryGuide = buildFirstEntryGuide(summary);
-  const rebootGuide = buildFirstRebootGuide(summary);
   const now = new Date().toISOString();
 
   writeFirstRuntimeSummary(projectRoot, summary);
   writeFirstApiContracts(projectRoot, apiContracts);
   writeFirstStructureOverview(projectRoot, structureOverview);
   writeFirstDomainModel(projectRoot, domainModel);
-  writeFirstRoleViews(projectRoot, roleViews);
-  writeFirstStageViews(projectRoot, stageViews);
   writeFirstSteering(projectRoot, steering);
   writeFirstConventions(projectRoot, conventions);
   writeFirstCriticalFlows(projectRoot, criticalFlows);
-  writeFirstChangeMap(projectRoot, changeMap);
   writeFirstEntryGuide(projectRoot, entryGuide);
-  writeFirstRebootGuide(projectRoot, rebootGuide);
   if (databaseSchema.status === 'healthy') {
     writeFirstDatabaseSchema(projectRoot, databaseSchema);
   }
@@ -460,21 +441,10 @@ export function bootstrapFirstRuntime(
   const initialIndex: FirstRuntimeIndex = {
     version: '1.0.0',
     lastRun: now,
-    mode: summary.mode,
     sourceCommit: getCurrentSourceCommit(projectRoot),
     summary: buildIndexEntry(
       getFirstRuntimeSummaryPath(projectRoot),
       '.spec-first/runtime/first/summary.json',
-      now
-    ),
-    roleViews: buildIndexEntry(
-      getFirstRoleViewsPath(projectRoot),
-      '.spec-first/runtime/first/role-views.json',
-      now
-    ),
-    stageViews: buildIndexEntry(
-      getFirstStageViewsPath(projectRoot),
-      '.spec-first/runtime/first/stage-views.json',
       now
     ),
     steering: buildIndexEntry(
@@ -492,19 +462,9 @@ export function bootstrapFirstRuntime(
       '.spec-first/runtime/first/critical-flows.json',
       now
     ),
-    changeMap: buildIndexEntry(
-      getFirstChangeMapPath(projectRoot),
-      '.spec-first/runtime/first/change-map.json',
-      now
-    ),
     entryGuide: buildIndexEntry(
       getFirstEntryGuidePath(projectRoot),
       '.spec-first/runtime/first/entry-guide.json',
-      now
-    ),
-    rebootGuide: buildIndexEntry(
-      getFirstRebootGuidePath(projectRoot),
-      '.spec-first/runtime/first/reboot-guide.json',
       now
     ),
     apiContracts: buildIndexEntry(

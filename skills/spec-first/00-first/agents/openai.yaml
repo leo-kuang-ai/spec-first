@@ -1,0 +1,5 @@
+display_name: First
+short_description: 生成或刷新项目级 runtime-first 认知真源与 docs/first 投影视图
+default_prompt: |
+  先执行 `spec-first first --yes`。
+  仅在默认输出证据不足时，再按需读取 00-first references 中的增强提示文件补强结构、API、规范、数据库或领域模型证据。

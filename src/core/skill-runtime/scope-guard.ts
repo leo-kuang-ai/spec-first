@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
-import { readFirstStageViews } from './first-runtime-store.js';
+import { readFirstStructureOverview } from './first-runtime-store.js';
 import { type SkillExecutionContext, resolveExecutionFeatureId } from './execution-context.js';
 
 const SCOPE_GUARD_SKILLS = new Set(['code', 'review', 'verify']);
@@ -261,11 +261,15 @@ export function evaluateRuntimeScopeGuard(
     };
   }
 
-  const stageViews = readFirstStageViews(projectRoot);
+  const structureOverview = readFirstStructureOverview(projectRoot);
   const codeViewEntryPoints =
-    stageViews?.code?.entryPoints?.map((entry) => entry.replace(/\\/g, '/')) ?? [];
+    structureOverview?.modules
+      ?.flatMap((module) => module.entryPoints)
+      ?.map((entry) => entry.replace(/\\/g, '/')) ?? [];
   const codeViewAreas =
-    stageViews?.code?.likelyChangeAreas?.map((area) => area.replace(/\\/g, '/')) ?? [];
+    structureOverview?.modules
+      ?.flatMap((module) => module.keyPaths)
+      ?.map((area) => area.replace(/\\/g, '/')) ?? [];
   const changedFiles = listChangedFiles(projectRoot)
     .map((file) => file.replace(/\\/g, '/'))
     .filter((file) => !isIgnoredRuntimeFile(file, featureId));

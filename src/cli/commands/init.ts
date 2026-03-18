@@ -20,10 +20,16 @@ import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js'
 import { classifyProjectMaturity } from '../../core/skill-runtime/first-platform-detector.js';
 import {
   getFirstRuntimeDir,
-  readFirstRoleViews,
+  readFirstApiContracts,
+  readFirstConventions,
+  readFirstCriticalFlows,
+  readFirstDatabaseSchema,
+  readFirstDomainModel,
+  readFirstEntryGuide,
   readFirstRuntimeIndex,
   readFirstRuntimeSummary,
-  readFirstStageViews,
+  readFirstSteering,
+  readFirstStructureOverview,
 } from '../../core/skill-runtime/first-runtime-store.js';
 
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
@@ -145,7 +151,15 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
     try {
       const idx = JSON.parse(readFileSync(runtimeIndexPath, 'utf-8'));
       firstRuntimeHealthy = Boolean(
-        idx?.summary?.healthy && idx?.roleViews?.healthy && idx?.stageViews?.healthy
+        idx?.summary?.healthy &&
+          idx?.steering?.healthy &&
+          idx?.conventions?.healthy &&
+          idx?.criticalFlows?.healthy &&
+          idx?.entryGuide?.healthy &&
+          idx?.apiContracts?.healthy &&
+          idx?.structureOverview?.healthy &&
+          idx?.domainModel?.healthy &&
+          (idx?.databaseSchema?.status === 'healthy' || idx?.databaseSchema?.status === 'not_applicable')
       );
     } catch {
       firstRuntimeHealthy = false;
@@ -517,8 +531,14 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   } else {
     const runtimeIndex = readFirstRuntimeIndex(projectRoot);
     const runtimeSummary = readFirstRuntimeSummary(projectRoot);
-    const runtimeRoleViews = readFirstRoleViews(projectRoot);
-    const runtimeStageViews = readFirstStageViews(projectRoot);
+    const runtimeSteering = readFirstSteering(projectRoot);
+    const runtimeConventions = readFirstConventions(projectRoot);
+    const runtimeCriticalFlows = readFirstCriticalFlows(projectRoot);
+    const runtimeEntryGuide = readFirstEntryGuide(projectRoot);
+    const runtimeApiContracts = readFirstApiContracts(projectRoot);
+    const runtimeStructureOverview = readFirstStructureOverview(projectRoot);
+    const runtimeDomainModel = readFirstDomainModel(projectRoot);
+    const runtimeDatabaseSchema = readFirstDatabaseSchema(projectRoot);
 
     if (!runtimeIndex) {
       firstMissing.push('.spec-first/runtime/first/index.json');
@@ -528,12 +548,39 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
         firstMissing.push('.spec-first/runtime/first/summary.json');
         indexExistsButIncomplete = true;
       }
-      if (!runtimeIndex.roleViews?.healthy) {
-        firstMissing.push('.spec-first/runtime/first/role-views.json');
+      if (!runtimeIndex.steering?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/steering.json');
         indexExistsButIncomplete = true;
       }
-      if (!runtimeIndex.stageViews?.healthy) {
-        firstMissing.push('.spec-first/runtime/first/stage-views.json');
+      if (!runtimeIndex.conventions?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/conventions.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.criticalFlows?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/critical-flows.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.entryGuide?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/entry-guide.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.apiContracts?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/api-contracts.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.structureOverview?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/structure-overview.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.domainModel?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/domain-model.json');
+        indexExistsButIncomplete = true;
+      }
+      if (
+        runtimeIndex.databaseSchema?.status !== 'healthy' &&
+        runtimeIndex.databaseSchema?.status !== 'not_applicable'
+      ) {
+        firstMissing.push('.spec-first/runtime/first/database-schema.json');
         indexExistsButIncomplete = true;
       }
     }
@@ -541,11 +588,35 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
     if (!runtimeSummary && !firstMissing.includes('.spec-first/runtime/first/summary.json')) {
       firstMissing.push('.spec-first/runtime/first/summary.json');
     }
-    if (!runtimeRoleViews && !firstMissing.includes('.spec-first/runtime/first/role-views.json')) {
-      firstMissing.push('.spec-first/runtime/first/role-views.json');
+    if (!runtimeSteering && !firstMissing.includes('.spec-first/runtime/first/steering.json')) {
+      firstMissing.push('.spec-first/runtime/first/steering.json');
     }
-    if (!runtimeStageViews && !firstMissing.includes('.spec-first/runtime/first/stage-views.json')) {
-      firstMissing.push('.spec-first/runtime/first/stage-views.json');
+    if (!runtimeConventions && !firstMissing.includes('.spec-first/runtime/first/conventions.json')) {
+      firstMissing.push('.spec-first/runtime/first/conventions.json');
+    }
+    if (!runtimeCriticalFlows && !firstMissing.includes('.spec-first/runtime/first/critical-flows.json')) {
+      firstMissing.push('.spec-first/runtime/first/critical-flows.json');
+    }
+    if (!runtimeEntryGuide && !firstMissing.includes('.spec-first/runtime/first/entry-guide.json')) {
+      firstMissing.push('.spec-first/runtime/first/entry-guide.json');
+    }
+    if (!runtimeApiContracts && !firstMissing.includes('.spec-first/runtime/first/api-contracts.json')) {
+      firstMissing.push('.spec-first/runtime/first/api-contracts.json');
+    }
+    if (
+      !runtimeStructureOverview &&
+      !firstMissing.includes('.spec-first/runtime/first/structure-overview.json')
+    ) {
+      firstMissing.push('.spec-first/runtime/first/structure-overview.json');
+    }
+    if (!runtimeDomainModel && !firstMissing.includes('.spec-first/runtime/first/domain-model.json')) {
+      firstMissing.push('.spec-first/runtime/first/domain-model.json');
+    }
+    if (
+      !runtimeDatabaseSchema &&
+      !firstMissing.includes('.spec-first/runtime/first/database-schema.json')
+    ) {
+      firstMissing.push('.spec-first/runtime/first/database-schema.json');
     }
   }
 
@@ -574,7 +645,7 @@ export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
   const runtimeSummary = readFirstRuntimeSummary(projectRoot);
   if (runtimeIndex && runtimeSummary) {
     return {
-      mode: runtimeIndex.mode ?? 'deep',
+      mode: 'deep',
       techStack: runtimeSummary.project?.platformType ?? '待确认',
       codeVolume:
         runtimeSummary.modules?.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',

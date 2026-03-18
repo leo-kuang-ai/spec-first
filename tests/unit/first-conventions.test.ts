@@ -6,7 +6,7 @@ describe('first conventions', () => {
   it('builds non-empty convention buckets with evidence', () => {
     const summary: FirstRuntimeSummary = {
       generatedAt: '2026-03-16T00:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       project: {
         name: 'spec-first',
         platformType: 'backend',

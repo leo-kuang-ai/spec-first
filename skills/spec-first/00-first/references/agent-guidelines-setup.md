@@ -1,103 +1,38 @@
-# Agent C2 — 研发规范与本地环境
+# 规范与本地环境执行提示
 
-> **适用模式**: 标准模式
+> 这是增强路径提示，不是主题规范正文。只在 CLI 输出证据不足时补规范或本地环境证据缺口。
 
-> 第二波派发（P1b 完成后）。依赖 P1b Context7 映射结果 + C1 完成。
-> 内部串行：development-guidelines.md → local-setup.md
-> 输出被使用：local-setup.md 被 A4 使用（如 A4 需要外部服务信息）
+## 适用场景
 
----
+- `development-guidelines.md` 缺少规则来源或验证方式
+- `development-guidelines.md` 缺少运行时版本、安装/启动命令、环境变量来源或最小验证路径
 
-## development-guidelines.md
+## 对应 runtime 资产
 
-基于 P1 传递的技术栈和 Context7 映射，分析项目实际遵循的开发规范：
+- `conventions.json`
+- `entry-guide.json`
 
-### 6 个规范模块
+## 最小执行责任
 
-| 模块 | 检测方式 |
-|------|----------|
-| 代码风格 | ESLint/Prettier/Black/gofmt/rustfmt 配置；代码采样 |
-| 提交规范 | commitlint 配置；`git log -50` 格式分析 |
-| 测试要求 | 测试框架配置；覆盖率阈值；tests/ 目录结构 |
-| 文档规范 | JSDoc/Docstring 配置；注释采样 |
-| 错误处理 | 日志框架依赖（winston/pino/logging）；异常处理模式采样 |
-| 依赖管理 | 包管理器（npm/pnpm/yarn/pip/cargo）；lock 文件策略；版本规则 |
+### C2-规范
 
-### 文档结构示例
+- 补项目实际采用的代码规范、测试规范、配置规则和禁忌模式
+- 先写 `conventions.json`
+- 再投影为 `docs/first/development-guidelines.md`
 
-```markdown
----
-last_updated: {{DATE}}
-context7_sources: [...]
----
+### C2-环境
 
-# 项目研发规范
+- 补运行时版本、安装命令、启动命令、环境变量来源、最小验证路径
+- 先写 `entry-guide.json`
+- 再投影到 `docs/first/development-guidelines.md` 的本地环境章节
 
-> 本文档基于项目实际代码和配置自动生成，并结合业界最佳实践进行对比分析。
+## 工具与降级
 
-## 代码风格
+- 可按需读取配置文件、脚本、环境模板和运行命令
+- 缺少配置文件时，允许只输出代码中可见的最低规则
+- 缺少环境示例文件时，允许只输出启动与验证路径
+- 无法确认的步骤必须标注 `[待确认]`
 
-**当前规范**:
-- 缩进: 2 空格（证据：ESLint `indent: 2`）
-- 命名: camelCase
-- ...
-
-**业界最佳实践** (来源: Context7 - ESLint v9):
-- ✅ 2 空格缩进
-- ⚠️ 建议启用 `no-unused-vars: error`（当前是 warn）
-- ℹ️ 推荐 `@typescript-eslint/no-explicit-any: error`
-
-**改进建议**:
-1. 升级 `no-unused-vars` 为 error 级别
-2. 启用 `no-explicit-any` 规则
-
-[... 其他模块同理 ...]
-
-## 最佳实践来源
-
-本规范参考了以下 Context7 文档：
-- ESLint: https://context7.dev/eslint/eslint
-- ...
-```
-
-### 分析深度
-
-- 标准模式默认执行配置 + 代码采样验证，标注“配置 vs 实际”差异
-
-### 降级策略
-
-- Context7 无该库文档 → 标注 `[最佳实践来源待补充]`
-- Context7 API 超时 → 标注 `[最佳实践查询超时，稍后可重试]`
-- 项目无技术栈配置 → 输出骨架文档，标注 `[未检测到技术栈配置]`
-- **P1b 失败** → 降级到纯本地配置分析（不包含最佳实践对比），标注 `[Context7 不可用，仅本地配置]`
-
-输出 → `docs/first/development-guidelines.md`
-
-### 串行断链处理
-
-| 场景 | 处理方式 |
-|------|----------|
-| development-guidelines.md 生成失败 | local-setup.md 仍可生成（基于 C1 + 配置文件），标注 `[跳过: development-guidelines 生成失败]` |
-| P1b 失败 | development-guidelines.md 跳过最佳实践对比，仅输出本地配置；local-setup.md 正常生成 |
-| C1 失败 | local-setup.md 中外部服务部分标注 `[待确认: external-deps 生成失败]` |
-
----
-
-## local-setup.md
-
-自动梳理项目运行所需环境信息：
-- 语言/运行时版本（从 `.nvmrc`、`.python-version`、`go.mod`、`pom.xml` 等提取）
-- 依赖安装命令（`npm install`、`mvn install`、`pip install` 等）
-- 环境变量清单（从 `.env.example`/`.env.template` 提取，**脱敏处理，不输出实际值**）
-- 所需外部服务（从 `docker-compose.yml` 或 external-deps 推断）
-- 启动命令（从 `package.json scripts`、`Makefile`、`Procfile` 等提取）
-
-输出 → `docs/first/local-setup.md`
-
----
-
-## 质量保障规则（Agent C2）
+## 质量保障
 
 - 通用证据格式、抽样流程、违规判定：见 `references/quality-assurance-rules.md`
-- C2 的“必须标注证据内容”与“抽样规模”：见统一规则文档中的 Agent 矩阵
-- C2 若出现无法验证项，必须显式标记 `[待确认]`

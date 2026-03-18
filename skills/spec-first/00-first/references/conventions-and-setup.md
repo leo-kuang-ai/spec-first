@@ -1,7 +1,7 @@
 # 规范与本地环境分析主题
 
 > **当前正式 contract**：单一标准模式 runtime-first。
-> 正式真源以 `conventions.json`、`entry-guide.json`、`reboot-guide.json` 为准；`development-guidelines.md` 与 `local-setup.md` 为专题投影视图。
+> 正式真源以 `conventions.json`、`entry-guide.json` 为准；`development-guidelines.md` 承载规范与本地环境专题投影视图。
 
 ## 1. 主题划分
 
@@ -14,12 +14,10 @@
 
 - `conventions.json`
 - `entry-guide.json`
-- `reboot-guide.json`
 
 ### projection docs
 
 - `docs/first/development-guidelines.md`
-- `docs/first/local-setup.md`
 
 ## 3. 规范分析要求
 
@@ -49,7 +47,7 @@
 ## 5. 输出约束
 
 - `development-guidelines.md` 负责专题展开，不引入新事实
-- `local-setup.md` 负责上手路径，不替代 runtime truth
+- `development-guidelines.md` 负责规范与上手路径，不替代 runtime truth
 - Markdown 默认中文输出，命令与路径保留英文原文
 
 ## 6. 降级策略

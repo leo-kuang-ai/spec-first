@@ -12,7 +12,6 @@ import { checkFirstUpdateContext } from './first-change-detector.js';
 import { classifyProjectMaturity, detectPlatformType } from './first-platform-detector.js';
 import {
   resolveFirstConfirmPolicy,
-  resolveFirstModePolicy,
   validateFirstArgs,
 } from './first-args.js';
 import { logFirstRuntimeWarning } from './first-runtime-observability.js';
@@ -30,7 +29,7 @@ export type ResumeOption =
 
 export interface ResumeRecommendation {
   hasExistingProducts: boolean;
-  lastMode?: 'quick' | 'deep';
+  lastMode?: 'deep';
   lastRunTime?: Date;
   isStale: boolean;
   staleReason?: string;
@@ -117,14 +116,14 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
 
   return {
     hasExistingProducts: true,
-    lastMode: runtimeIndex.mode ?? 'deep',
+    lastMode: 'deep',
     lastRunTime,
     isStale: staleCheck.stale,
     staleReason: staleCheck.reason,
     commitMismatch: false,
     options,
     recommendedOption,
-    message: `📋 检测到已有 00-first runtime 产物 | 模式: ${runtimeIndex.mode ?? 'deep'} | 端类型: ${platformType} | 距今: ${daysSince} 天`,
+    message: `📋 检测到已有 00-first runtime 产物 | 端类型: ${platformType} | 距今: ${daysSince} 天`,
   };
 }
 
@@ -133,9 +132,7 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
   const canSkipConfirm = (args: string[]): boolean => {
     try {
       const parsed = validateFirstArgs(args);
-      return (
-        resolveFirstConfirmPolicy(parsed) === 'skip' && resolveFirstModePolicy(parsed) === 'manual'
-      );
+      return resolveFirstConfirmPolicy(parsed) === 'skip';
     } catch (error) {
       logFirstRuntimeWarning(
         'first-resume.formatResumePrompt',
@@ -180,10 +177,6 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
   if (recommendation.options.includes('full_regenerate') && canSkipConfirm(['--force'])) {
     lines.push('  /spec-first:first --force');
   }
-  if (recommendation.options.includes('skip') && canSkipConfirm(['--skip'])) {
-    lines.push('  /spec-first:first --skip');
-  }
-
   return lines.join('\n');
 }
 
@@ -194,10 +187,21 @@ export function formatProductSummary(projectRoot: string): string {
     return '❌ 未找到 runtime 索引文件';
   }
 
+  const runtimeAssets = [
+    runtimeIndex.summary.path,
+    runtimeIndex.steering.path,
+    runtimeIndex.conventions.path,
+    runtimeIndex.criticalFlows.path,
+    runtimeIndex.entryGuide.path,
+    runtimeIndex.apiContracts.path,
+    runtimeIndex.structureOverview.path,
+    runtimeIndex.domainModel.path,
+    runtimeIndex.databaseSchema.path,
+  ];
+
   const lines: string[] = [];
   lines.push('📋 **00-first runtime 摘要**');
   lines.push('');
-  lines.push(`- 运行模式: ${runtimeIndex.mode ?? 'deep'}`);
   lines.push(`- 上次更新: ${runtimeIndex.lastRun.slice(0, 19).replace('T', ' ')}`);
   if (runtimeSummary?.project.name) {
     lines.push(`- 项目名称: ${runtimeSummary.project.name}`);
@@ -206,9 +210,9 @@ export function formatProductSummary(projectRoot: string): string {
     lines.push(`- 端类型: ${runtimeSummary.project.platformType}`);
   }
   lines.push('');
-  lines.push('**runtime-assets** (3 个):');
-  lines.push(`  - ${runtimeIndex.summary.path}`);
-  lines.push(`  - ${runtimeIndex.roleViews.path}`);
-  lines.push(`  - ${runtimeIndex.stageViews.path}`);
+  lines.push(`**runtime-assets** (${runtimeAssets.length} 个):`);
+  for (const asset of runtimeAssets) {
+    lines.push(`  - ${asset}`);
+  }
   return lines.join('\n');
 }

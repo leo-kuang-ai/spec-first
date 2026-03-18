@@ -1,50 +1,42 @@
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { loadFirstContext, type FirstContext } from './first-context.js';
 import {
+  BASE_PROJECTION_DOCS,
   CANONICAL_PROJECTION_DOCS,
   FIRST_RUNTIME_ARTIFACTS,
+  FORMAL_TOPIC_PROJECTION_DOCS,
+  CONDITIONAL_PROJECTION_DOCS,
   getProjectionDocsForRuntimeArtifact,
 } from './first-artifact-mapping.js';
 import {
   readFirstApiContracts,
-  readFirstChangeMap,
   readFirstConventions,
   readFirstCriticalFlows,
   readFirstDatabaseSchema,
   readFirstDomainModel,
   readFirstEntryGuide,
-  readFirstRebootGuide,
+  readFirstRuntimeIndex,
+  readFirstRuntimeSummary,
+  readFirstSteering,
   readFirstStructureOverview,
 } from './first-runtime-store.js';
 import type {
   FirstApiContracts,
-  FirstChangeMap,
   FirstConventions,
   FirstCriticalFlows,
   FirstDatabaseSchema,
   FirstDomainModel,
   FirstEntryGuide,
-  FirstRebootGuide,
+  FirstRuntimeIndex,
   FirstRuntimeSummary,
+  FirstSteering,
   FirstStructureOverview,
 } from './first-runtime-types.js';
 
-const ROLE_LABELS = {
-  product: 'Product',
-  dev: 'Developer',
-  qa: 'QA',
-  architect: 'Architect',
-} as const;
-
-const STAGE_LABELS = {
-  spec: 'Spec View',
-  design: 'Design View',
-  code: 'Code View',
-  verify: 'Verify View',
-} as const;
-
-interface ProjectionContext extends FirstContext {
+interface ProjectionContext {
+  index: FirstRuntimeIndex;
+  summary: FirstRuntimeSummary;
+  steering: FirstSteering;
   artifactDocs: string[];
   techStack: string[];
   apiContracts: FirstApiContracts;
@@ -53,9 +45,7 @@ interface ProjectionContext extends FirstContext {
   databaseSchema: FirstDatabaseSchema | null;
   conventions: FirstConventions;
   criticalFlows: FirstCriticalFlows;
-  changeMap: FirstChangeMap;
   entryGuide: FirstEntryGuide;
-  rebootGuide: FirstRebootGuide;
 }
 
 function buildSyntheticConventions(summary: FirstRuntimeSummary): FirstConventions {
@@ -123,30 +113,6 @@ function buildSyntheticCriticalFlows(summary: FirstRuntimeSummary): FirstCritica
   ];
 }
 
-function buildSyntheticChangeMap(summary: FirstRuntimeSummary): FirstChangeMap {
-  const runtimeModule =
-    summary.modules.find((item) => item.includes('skill-runtime')) ?? 'src/core/skill-runtime';
-
-  return [
-    {
-      changeType: 'runtime-asset-extension',
-      likelyModules: [runtimeModule],
-      likelyCommands: ['src/cli/commands/first.ts'],
-      likelyConfigs: ['package.json'],
-      likelyTests: ['tests/unit/first-runtime-store.test.ts'],
-      riskPoints: ['runtime index drift'],
-    },
-    {
-      changeType: 'docs-projection-adjustment',
-      likelyModules: ['src/core/skill-runtime/first-doc-projection.ts'],
-      likelyCommands: [],
-      likelyConfigs: [],
-      likelyTests: ['tests/unit/first-doc-projection.test.ts'],
-      riskPoints: ['canonical docs mismatch'],
-    },
-  ];
-}
-
 function buildSyntheticEntryGuide(): FirstEntryGuide {
   return [
     {
@@ -156,27 +122,17 @@ function buildSyntheticEntryGuide(): FirstEntryGuide {
         '.spec-first/runtime/first/steering.json',
       ],
       thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
-      avoidEntry: ['docs/first/tech-stack.md'],
+      avoidEntry: ['docs/first/summary.md'],
       relatedFlows: ['flow-cli-entry'],
     },
     {
       taskCategory: 'docs-projection',
-      readFirst: ['docs/first/README.md', '.spec-first/runtime/first/change-map.json'],
+      readFirst: ['docs/first/README.md', '.spec-first/runtime/first/entry-guide.json'],
       thenRead: ['src/core/skill-runtime/first-doc-projection.ts'],
       avoidEntry: ['unregistered docs as truth'],
       relatedFlows: ['flow-doc-projection'],
     },
   ];
-}
-
-function buildSyntheticRebootGuide(summary: FirstRuntimeSummary): FirstRebootGuide {
-  return {
-    projectWhat: summary.project.overview ?? `${summary.project.name} project cognition`,
-    whereToStart: ['.spec-first/runtime/first/summary.json', 'docs/first/README.md'],
-    currentCriticalAreas: ['runtime truth first', ...summary.risks.slice(0, 2)],
-    commonChangePaths: [...summary.modules.slice(0, 3), ...summary.entryPoints.slice(0, 2)],
-    verifyChecklist: ['refresh docs from runtime truth'],
-  };
 }
 
 function buildSyntheticApiContracts(summary: FirstRuntimeSummary): FirstApiContracts {
@@ -192,6 +148,7 @@ function buildSyntheticApiContracts(summary: FirstRuntimeSummary): FirstApiContr
             request: [],
             response: ['自动生成 runtime 认知资产'],
             auth: [],
+            errors: [],
             evidence: uniqueStrings(summary.entryPoints, summary.evidence).slice(0, 6),
           }))
         : [],
@@ -235,21 +192,26 @@ function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
 }
 
 function loadProjectionContext(projectRoot: string): ProjectionContext {
-  const context = loadFirstContext(projectRoot);
+  const index = readFirstRuntimeIndex(projectRoot);
+  const summary = readFirstRuntimeSummary(projectRoot);
+  const steering = readFirstSteering(projectRoot);
+  if (!index || !summary || !steering) {
+    throw new Error('Missing first runtime asset: summary/steering/index');
+  }
   return {
-    ...context,
-    artifactDocs: Object.keys(context.index.docsProjection ?? {}).sort(),
-    techStack: context.summary.techStack ?? [],
-    apiContracts: readFirstApiContracts(projectRoot) ?? buildSyntheticApiContracts(context.summary),
+    index,
+    summary,
+    steering,
+    artifactDocs: Object.keys(index.docsProjection ?? {}).sort(),
+    techStack: summary.techStack ?? [],
+    apiContracts: readFirstApiContracts(projectRoot) ?? buildSyntheticApiContracts(summary),
     structureOverview:
-      readFirstStructureOverview(projectRoot) ?? buildSyntheticStructureOverview(context.summary),
-    domainModel: readFirstDomainModel(projectRoot) ?? buildSyntheticDomainModel(context.summary),
+      readFirstStructureOverview(projectRoot) ?? buildSyntheticStructureOverview(summary),
+    domainModel: readFirstDomainModel(projectRoot) ?? buildSyntheticDomainModel(summary),
     databaseSchema: readFirstDatabaseSchema(projectRoot),
-    conventions: readFirstConventions(projectRoot) ?? buildSyntheticConventions(context.summary),
-    criticalFlows: readFirstCriticalFlows(projectRoot) ?? buildSyntheticCriticalFlows(context.summary),
-    changeMap: readFirstChangeMap(projectRoot) ?? buildSyntheticChangeMap(context.summary),
+    conventions: readFirstConventions(projectRoot) ?? buildSyntheticConventions(summary),
+    criticalFlows: readFirstCriticalFlows(projectRoot) ?? buildSyntheticCriticalFlows(summary),
     entryGuide: readFirstEntryGuide(projectRoot) ?? buildSyntheticEntryGuide(),
-    rebootGuide: readFirstRebootGuide(projectRoot) ?? buildSyntheticRebootGuide(context.summary),
   };
 }
 
@@ -265,23 +227,54 @@ function renderSubsection(title: string, items: string[], emptyLabel?: string): 
   return ['', `### ${title}`, ...renderList(items, emptyLabel)];
 }
 
+function renderDocHeader(title: string, truthSources: string[]): string[] {
+  return [
+    `# ${title}`,
+    '',
+    '> 标准模式：deep',
+    '> 文档层级：docs/first 投影视图',
+    `> 真源依赖：${truthSources.join('、')}`,
+  ];
+}
+
 function renderOverviewDoc(context: ProjectionContext): string {
   const unregisteredDocs = context.artifactDocs.filter((doc) => !CANONICAL_PROJECTION_DOCS.includes(doc));
+  const runtimeTruthFiles = [
+    '.spec-first/runtime/first/index.json',
+    ...FIRST_RUNTIME_ARTIFACTS.map((artifact) => `.spec-first/runtime/first/${artifact}`),
+  ];
+  const conditionalStatus = CONDITIONAL_PROJECTION_DOCS.map((docPath) => {
+    if (docPath.endsWith('database-er.md')) {
+      const status = context.databaseSchema?.status ?? 'not_applicable';
+      return `${docPath} -> ${status === 'healthy' ? '生成' : '不生成'} (${status})`;
+    }
+    return `${docPath} -> [待确认]`;
+  });
   const lines = [
-    '# 项目认知投影视图',
+    ...renderDocHeader('项目认知投影视图总览', ['.spec-first/runtime/first/index.json', ...FIRST_RUNTIME_ARTIFACTS.map((artifact) => `.spec-first/runtime/first/${artifact}`)]),
     '',
     '> `docs/first/` 是 `.spec-first/runtime/first/` 的人类可读投影视图层，不作为 runtime 真源；其中只有 canonical projection docs 受 runtime 自动刷新保障。',
     '',
-    '## 项目概览',
+    '## 项目摘要',
     `- project: ${context.summary.project.name}`,
     `- generatedAt: ${context.summary.generatedAt}`,
+    `- platform: ${context.summary.project.platformType ?? 'unknown'}`,
+    `- overview: ${context.summary.project.overview ?? '未提供'}`,
+    '',
+    '## 正式资产导航',
+    ...renderList(runtimeTruthFiles),
+    '',
+    '## 基础投影视图',
+    ...renderList([...BASE_PROJECTION_DOCS]),
+    '',
+    '## 专题文档导航',
+    ...renderList([...FORMAL_TOPIC_PROJECTION_DOCS]),
+    '',
+    '## 条件型资产状态',
+    ...renderList(conditionalStatus, '无'),
     '',
     '## Runtime Canonical Truth',
-    '',
-    '- .spec-first/runtime/first/index.json',
-    '- .spec-first/runtime/first/summary.json',
-    '- .spec-first/runtime/first/role-views.json',
-    '- .spec-first/runtime/first/stage-views.json',
+    ...renderList(runtimeTruthFiles),
     '',
     '## Canonical Projection Docs',
     ...renderList([...CANONICAL_PROJECTION_DOCS]),
@@ -290,15 +283,16 @@ function renderOverviewDoc(context: ProjectionContext): string {
     ...renderList(unregisteredDocs, '无'),
     '- 当前不在正式 projection registry 中，不受 runtime 自动刷新保障。',
     '',
+    '## 使用建议',
+    '- 后续 skill 的正式输入优先读取 `.spec-first/runtime/first/`。',
+    '- 新同学先读 `summary.md`、`entry-guide.md`、`codebase-overview.md`。',
+    '- 涉及实现定位时优先使用 `critical-flows.md`、`architecture.md`、`codebase-overview.md`。',
+    '- 涉及数据库理解时先检查条件型资产状态，再决定是否消费 `database-er.md`。',
+    '',
     '## Skill Consumption Contract',
     '- 后续 skill 的正式输入优先读取 `.spec-first/runtime/first/`。',
     '- 列出的 `Canonical Projection Docs` 全部受 runtime 自动刷新保障。',
     '- 未注册的 `docs/first/*` 文档不参与 canonical truth 与自动治理。',
-    '',
-    '## 使用约定',
-    '- 读取机器真相时优先使用 `.spec-first/runtime/first/` runtime truth。',
-    '- 阅读面向人的摘要时使用 canonical projection docs。',
-    '- 当 runtime truth 变化时，应重新刷新 canonical projection docs。',
   ];
 
   return lines.join('\n');
@@ -306,389 +300,316 @@ function renderOverviewDoc(context: ProjectionContext): string {
 
 function renderSummaryDoc(context: ProjectionContext): string {
   return [
-    '# First Runtime Summary',
+    ...renderDocHeader('项目摘要', ['.spec-first/runtime/first/summary.json']),
     '',
-    '## 项目概览',
+    '## 项目是什么',
     `- 项目: ${context.summary.project.name}`,
     `- 平台: ${context.summary.project.platformType ?? 'unknown'}`,
     `- 生成时间: ${context.summary.generatedAt}`,
     `- 概述: ${context.summary.project.overview ?? '未提供'}`,
-    ...renderSection(
-      'Tech Stack',
-      context.techStack.length > 0 ? context.techStack : (context.summary.techStack ?? [])
-    ),
-    ...renderSection('Capabilities', context.summary.capabilities),
-    ...renderSection('Modules', context.summary.modules),
-    ...renderSection('Entry Points', context.summary.entryPoints),
-    ...renderSection('Data Models', context.summary.dataModels),
-    ...renderSection('API Surface', context.summary.apiSurface),
-    ...renderSection('Risks', context.summary.risks),
-    ...renderSection('Evidence', context.summary.evidence),
-  ].join('\n');
-}
-
-function renderTechStackDoc(context: ProjectionContext): string {
-  return [
-    '# Tech Stack',
-    '',
-    ...renderSection('Stack', context.techStack.length > 0 ? context.techStack : context.steering.tech.stack),
-    ...renderSection('Constraints', context.steering.tech.constraints, '无'),
-    ...renderSection('Forbidden Patterns', context.steering.tech.forbiddenPatterns, '无'),
-    ...renderSection('Evidence', context.summary.evidence, '无'),
+    ...renderSection('技术栈', context.techStack, '无'),
+    ...renderSection('主要能力', context.summary.capabilities),
+    ...renderSection('入口', context.summary.entryPoints),
+    ...renderSection('关键模块', context.summary.modules),
+    ...renderSection('核心数据模型', context.summary.dataModels),
+    ...renderSection('接口面', context.summary.apiSurface),
+    ...renderSection('风险', context.summary.risks),
+    ...renderSection('证据摘要', context.summary.evidence),
   ].join('\n');
 }
 
 function renderApiDocsDoc(context: ProjectionContext): string {
-  const lines = ['# API Docs'];
+  const lines = renderDocHeader('接口文档', ['.spec-first/runtime/first/api-contracts.json']);
+  lines.push(
+    '',
+    '## 接口清单',
+    ...renderList(
+      context.apiContracts.interfaces.map(
+        (item) => `${item.name} -> ${item.interfaceType}${item.path ? ` (${item.path})` : ''}`
+      ),
+      '无'
+    )
+  );
   for (const item of context.apiContracts.interfaces) {
     lines.push('', `## ${item.name}`);
-    lines.push('', `- Type: ${item.interfaceType}`);
-    lines.push(`- Handler: ${item.handler}`);
-    if (item.method) lines.push(`- Method: ${item.method}`);
-    if (item.path) lines.push(`- Path: ${item.path}`);
-    lines.push(...renderSubsection('Request', item.request, '无'));
-    lines.push(...renderSubsection('Response', item.response, '无'));
-    lines.push(...renderSubsection('Auth', item.auth, '无'));
-    lines.push(...renderSubsection('Evidence', item.evidence, '无'));
+    lines.push('', `- 类型: ${item.interfaceType}`);
+    lines.push(`- 处理入口: ${item.handler}`);
+    if (item.method) lines.push(`- 请求方法: ${item.method}`);
+    if (item.path) lines.push(`- 接口路径: ${item.path}`);
+    lines.push(...renderSubsection('请求规范', item.request, '无'));
+    lines.push(...renderSubsection('响应规范', item.response, '无'));
+    lines.push(...renderSubsection('鉴权要求', item.auth, '无'));
+    lines.push(...renderSubsection('错误语义', item.errors ?? [], '无'));
+    lines.push(...renderSubsection('证据', item.evidence, '无'));
   }
-  lines.push(...renderSection('Integration Points', context.apiContracts.integrationPoints, '无'));
-  lines.push(...renderSection('Notes', context.apiContracts.notes, '无'));
   return lines.join('\n');
 }
 
 function renderCodebaseOverviewDoc(context: ProjectionContext): string {
-  const lines = ['# Codebase Overview'];
-  lines.push(...renderSection('Topology', context.structureOverview.topology, '无'));
+  const lines = renderDocHeader('代码库总览', ['.spec-first/runtime/first/structure-overview.json']);
+  lines.push(...renderSection('结构拓扑', context.structureOverview.topology, '无'));
   for (const module of context.structureOverview.modules) {
     lines.push('', `## ${module.name}`);
-    lines.push('', `- Purpose: ${module.purpose}`);
-    lines.push(...renderSubsection('Key Paths', module.keyPaths, '无'));
-    lines.push(...renderSubsection('Entry Points', module.entryPoints, '无'));
-    lines.push(...renderSubsection('Dependencies', module.dependencies ?? [], '无'));
+    lines.push('', `- 作用: ${module.purpose}`);
+    lines.push(...renderSubsection('关键路径', module.keyPaths, '无'));
+    lines.push(...renderSubsection('入口点', module.entryPoints, '无'));
+    lines.push(...renderSubsection('依赖', module.dependencies ?? [], '无'));
   }
-  lines.push(...renderSection('Reading Order', context.structureOverview.readingOrder, '无'));
-  lines.push(...renderSection('Evidence', context.structureOverview.evidence, '无'));
+  lines.push(...renderSection('建议阅读顺序', context.structureOverview.readingOrder, '无'));
+  lines.push(...renderSection('证据', context.structureOverview.evidence, '无'));
   return lines.join('\n');
 }
 
 function renderDomainModelDoc(context: ProjectionContext): string {
-  const lines = ['# Domain Model'];
+  const lines = renderDocHeader('领域模型', ['.spec-first/runtime/first/domain-model.json']);
   for (const entity of context.domainModel.entities) {
     lines.push('', `## ${entity.name}`);
-    lines.push('', `- Kind: ${entity.kind}`);
-    lines.push(`- Description: ${entity.description}`);
-    lines.push(...renderSubsection('Invariants', entity.invariants, '无'));
-    lines.push(...renderSubsection('Relationships', entity.relationships, '无'));
-    lines.push(...renderSubsection('Evidence', entity.evidence, '无'));
+    lines.push('', `- 类型: ${entity.kind}`);
+    lines.push(`- 描述: ${entity.description}`);
+    lines.push(...renderSubsection('不变量', entity.invariants, '无'));
+    lines.push(...renderSubsection('关系', entity.relationships, '无'));
+    lines.push(...renderSubsection('证据', entity.evidence, '无'));
   }
-  lines.push(...renderSection('Glossary', context.domainModel.glossary, '无'));
-  lines.push(...renderSection('Evidence', context.domainModel.evidence, '无'));
+  lines.push(...renderSection('术语表', context.domainModel.glossary, '无'));
+  lines.push(...renderSection('证据', context.domainModel.evidence, '无'));
   return lines.join('\n');
 }
 
 function renderArchitectureDoc(context: ProjectionContext): string {
   return [
-    '# Architecture',
+    ...renderDocHeader('架构总览', [
+      '.spec-first/runtime/first/structure-overview.json',
+      '.spec-first/runtime/first/steering.json',
+      '.spec-first/runtime/first/critical-flows.json',
+    ]),
     '',
-    ...renderSection('Topology', context.structureOverview.topology, '无'),
-    ...renderSection('Modules', context.steering.structure.modules, '无'),
-    ...renderSection('Boundaries', context.steering.structure.boundaries, '无'),
-    ...renderSection('Entry Rules', context.steering.structure.entryRules, '无'),
-    ...renderSection('Critical Flows', context.criticalFlows.map((flow) => flow.name), '无'),
+    ...renderSection('系统概览', context.structureOverview.topology, '无'),
+    ...renderSection('技术边界', context.steering.tech.constraints, '无'),
+    ...renderSection('结构边界', context.steering.structure.boundaries, '无'),
+    ...renderSection(
+      '关键协作关系',
+      context.criticalFlows.map((flow) => `${flow.name} -> ${flow.coreModules.join(' / ')}`),
+      '无'
+    ),
+    ...renderSection('架构风险', context.steering.tech.forbiddenPatterns, '无'),
   ].join('\n');
 }
 
 function renderCallGraphDoc(context: ProjectionContext): string {
-  const lines = ['# Call Graph'];
+  const lines = renderDocHeader('调用链路', [
+    '.spec-first/runtime/first/critical-flows.json',
+    '.spec-first/runtime/first/structure-overview.json',
+  ]);
+  lines.push(
+    ...renderSection(
+      '入口清单',
+      Array.from(new Set(context.criticalFlows.flatMap((flow) => flow.entryPoints))),
+      '无'
+    )
+  );
   for (const flow of context.criticalFlows) {
     lines.push('', `## ${flow.name}`);
-    lines.push(...renderSubsection('Entry Points', flow.entryPoints, '无'));
-    lines.push(...renderSubsection('Core Modules', flow.coreModules, '无'));
-    lines.push(...renderSubsection('Verification Hooks', flow.verificationHooks, '无'));
+    lines.push(...renderSubsection('入口点', flow.entryPoints, '无'));
+    lines.push(...renderSubsection('核心模块', flow.coreModules, '无'));
+    lines.push(...renderSubsection('验证钩子', flow.verificationHooks, '无'));
+    lines.push(...renderSubsection('高风险扩散点', flow.invariants, '无'));
   }
   return lines.join('\n');
 }
 
 function renderExternalDepsDoc(context: ProjectionContext): string {
+  const thirdPartyDeps = context.techStack.filter((item) =>
+    /runtime:|package-manager:|testing:|build:/i.test(item)
+  );
   return [
-    '# External Dependencies',
+    ...renderDocHeader('外部依赖', [
+      '.spec-first/runtime/first/api-contracts.json',
+      '.spec-first/runtime/first/summary.json',
+      '.spec-first/runtime/first/steering.json',
+      '.spec-first/runtime/first/conventions.json',
+    ]),
     '',
-    ...renderSection(
-      'Dependency Surface',
-      context.techStack.filter((item) =>
-        /runtime:|package-manager:|testing:|build:/i.test(item)
-      ),
-      '无'
-    ),
-    ...renderSection('Integration Points', context.apiContracts.integrationPoints, '无'),
-    ...renderSection('Evidence', context.summary.evidence, '无'),
-  ].join('\n');
-}
-
-function renderLocalSetupDoc(context: ProjectionContext): string {
-  return [
-    '# Local Setup',
-    '',
-    ...renderSection('Entry Paths', context.entryGuide.flatMap((entry) => entry.readFirst), '无'),
-    ...renderSection('Then Read', context.entryGuide.flatMap((entry) => entry.thenRead), '无'),
-    ...renderSection('Recommended Rules', [context.conventions.testing.recommendedConvention], '无'),
-    ...renderSection('Verify Checklist', context.rebootGuide.verifyChecklist, '无'),
+    ...renderSection('第三方依赖', thirdPartyDeps, '无'),
+    ...renderSection('外部服务', context.apiContracts.integrationPoints, '无'),
+    ...renderSection('风险提示', uniqueStrings(context.summary.risks, context.steering.tech.forbiddenPatterns), '无'),
+    ...renderSection('证据', context.summary.evidence, '无'),
   ].join('\n');
 }
 
 function renderDevelopmentGuidelinesDoc(context: ProjectionContext): string {
+  const runtimeRequirements = context.steering.tech.stack.filter((item) =>
+    /runtime:|language:|package-manager:|build:/i.test(item)
+  );
+  const packageManager =
+    context.steering.tech.stack.find((item) => item.toLowerCase().includes('package-manager:')) ??
+    '[待确认] package-manager';
+  const installCommands =
+    packageManager.includes('pnpm')
+      ? ['pnpm install']
+      : packageManager.includes('yarn')
+        ? ['yarn install']
+        : packageManager.includes('npm')
+          ? ['npm install']
+          : ['[待确认] 安装命令'];
+  const startupCommands = context.entryGuide
+    .flatMap((entry) => entry.thenRead)
+    .filter((item) => /src\/|spec-first\s+/i.test(item));
+
   return [
-    '# Development Guidelines',
+    ...renderDocHeader('开发规范', ['.spec-first/runtime/first/conventions.json']),
     '',
-    `- API: ${context.conventions.api.recommendedConvention}`,
-    `- Module: ${context.conventions.module.recommendedConvention}`,
-    `- Testing: ${context.conventions.testing.recommendedConvention}`,
-    `- Project Rules: ${context.conventions.projectRules.recommendedConvention}`,
+    '## API 规范',
+    ...renderSubsection('观察到的模式', context.conventions.api.observedPatterns, '无'),
+    ...renderSubsection('偏差', context.conventions.api.deviations, '无'),
+    '',
+    `- 推荐规则: ${context.conventions.api.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.api.evidence, '无'),
+    '',
+    '## 模块规范',
+    ...renderSubsection('观察到的模式', context.conventions.module.observedPatterns, '无'),
+    ...renderSubsection('偏差', context.conventions.module.deviations, '无'),
+    '',
+    `- 推荐规则: ${context.conventions.module.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.module.evidence, '无'),
+    '',
+    '## 测试规范',
+    ...renderSubsection('观察到的模式', context.conventions.testing.observedPatterns, '无'),
+    ...renderSubsection('偏差', context.conventions.testing.deviations, '无'),
+    '',
+    `- 推荐规则: ${context.conventions.testing.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.testing.evidence, '无'),
+    '',
+    '## 配置规范',
+    ...renderSubsection('观察到的模式', context.conventions.projectRules.observedPatterns, '无'),
+    ...renderSubsection('偏差', context.conventions.projectRules.deviations, '无'),
+    '',
+    `- 推荐规则: ${context.conventions.projectRules.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.projectRules.evidence, '无'),
+    '',
+    '## 交付规范',
+    ...renderSubsection('观察到的模式', context.conventions.projectRules.observedPatterns, '无'),
+    ...renderSubsection('偏差', context.conventions.projectRules.deviations, '无'),
+    '',
+    `- 推荐规则: ${context.conventions.projectRules.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.projectRules.evidence, '无'),
+    '',
+    '## 本地环境配置',
+    ...renderSubsection('环境要求', runtimeRequirements, '[待确认]'),
+    ...renderSubsection('安装步骤', installCommands, '[待确认]'),
+    ...renderSubsection(
+      '启动步骤',
+      startupCommands.length > 0 ? startupCommands : ['[待确认] 启动命令'],
+      '[待确认]'
+    ),
+    ...renderSubsection('优先阅读', context.entryGuide.flatMap((entry) => entry.readFirst), '无'),
   ].join('\n');
 }
 
 function renderDatabaseErDoc(context: ProjectionContext): string {
   if (!context.databaseSchema || context.databaseSchema.status !== 'healthy') {
-    return ['# Database ER', '', '- 当前项目不适用数据库 ER 视图。'].join('\n');
+    return [
+      ...renderDocHeader('数据库 ER', ['.spec-first/runtime/first/database-schema.json']),
+      '',
+      '- 当前项目不适用数据库 ER 视图。',
+    ].join('\n');
   }
 
-  const lines = ['# Database ER', '', `- Provider: ${context.databaseSchema.provider ?? 'unknown'}`];
+  const lines = [
+    ...renderDocHeader('数据库 ER', ['.spec-first/runtime/first/database-schema.json']),
+    '',
+    `- Provider: ${context.databaseSchema.provider ?? 'unknown'}`,
+  ];
   for (const table of context.databaseSchema.tables) {
     lines.push('', `## ${table.name}`);
-    if (table.purpose) lines.push('', `- Purpose: ${table.purpose}`);
-    lines.push(...renderSubsection('Fields', table.fields, '无'));
-    lines.push(...renderSubsection('Relations', table.relations, '无'));
-    lines.push(...renderSubsection('Evidence', table.evidence, '无'));
+    if (table.purpose) lines.push('', `- 用途: ${table.purpose}`);
+    lines.push(...renderSubsection('字段', table.fields, '无'));
+    lines.push(...renderSubsection('关系', table.relations, '无'));
+    lines.push(...renderSubsection('证据', table.evidence, '无'));
   }
-  lines.push(...renderSection('Risks', context.databaseSchema.risks, '无'));
-  return lines.join('\n');
-}
-
-function renderRoleViewsDoc(context: ProjectionContext): string {
-  const lines = ['# First Runtime Role Views'];
-
-  for (const role of Object.keys(context.roleViews) as Array<keyof typeof context.roleViews>) {
-    const view = context.roleViews[role];
-    lines.push('', `## ${ROLE_LABELS[role]}`, '', `- Summary: ${view.summary}`);
-    lines.push(...renderSubsection('Focus', view.focus));
-    lines.push(...renderSubsection('Warnings', view.warnings));
-  }
-
+  lines.push(...renderSection('风险', context.databaseSchema.risks, '无'));
   return lines.join('\n');
 }
 
 function renderSteeringDoc(context: ProjectionContext): string {
   return [
-    '# First Runtime Steering',
+    ...renderDocHeader('项目导向与边界', ['.spec-first/runtime/first/steering.json']),
     '',
-    '## Product Steering',
-    `- Overview: ${context.steering.product.overview}`,
-    ...renderSubsection('Core Scenarios', context.steering.product.coreScenarios),
-    ...renderSubsection('Non Goals', context.steering.product.nonGoals),
-    ...renderSubsection('Glossary', context.steering.product.glossary),
-    ...renderSection('Tech Stack', context.steering.tech.stack),
-    ...renderSection('Constraints', context.steering.tech.constraints),
-    ...renderSection('Forbidden Patterns', context.steering.tech.forbiddenPatterns),
-    ...renderSection('Modules', context.steering.structure.modules),
-    ...renderSection('Boundaries', context.steering.structure.boundaries),
-    ...renderSection('Entry Rules', context.steering.structure.entryRules),
+    '## 项目导向',
+    `- 概述: ${context.steering.product.overview}`,
+    ...renderSubsection('核心场景', context.steering.product.coreScenarios),
+    ...renderSubsection('非目标', context.steering.product.nonGoals),
+    ...renderSubsection('术语表', context.steering.product.glossary),
+    ...renderSection('技术约束', uniqueStrings(context.steering.tech.stack, context.steering.tech.constraints), '无'),
+    ...renderSection('结构边界', uniqueStrings(context.steering.structure.modules, context.steering.structure.boundaries, context.steering.structure.entryRules), '无'),
+    ...renderSection(
+      '权威顺序',
+      [
+        '.spec-first/runtime/first/*.json -> docs/first/*.md',
+        'runtime truth 优先于 docs projection',
+        '未注册 docs 不参与 canonical truth',
+      ],
+      '无'
+    ),
   ].join('\n');
 }
 
 function renderConventionsDoc(context: ProjectionContext): string {
   return [
-    '# First Runtime Conventions',
+    ...renderDocHeader('项目规范', ['.spec-first/runtime/first/conventions.json']),
     '',
-    '## API',
-    ...renderSubsection('Observed Patterns', context.conventions.api.observedPatterns),
-    ...renderSubsection('Deviations', context.conventions.api.deviations, '无'),
+    '## API 规范',
+    ...renderSubsection('观察到的模式', context.conventions.api.observedPatterns),
+    ...renderSubsection('偏差', context.conventions.api.deviations, '无'),
     '',
-    `- Recommended Convention: ${context.conventions.api.recommendedConvention}`,
-    ...renderSubsection('Evidence', context.conventions.api.evidence),
+    `- 推荐规则: ${context.conventions.api.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.api.evidence),
     '',
-    '## Module',
-    ...renderSubsection('Observed Patterns', context.conventions.module.observedPatterns),
-    ...renderSubsection('Deviations', context.conventions.module.deviations, '无'),
+    '## 代码规范',
+    ...renderSubsection('观察到的模式', context.conventions.module.observedPatterns),
+    ...renderSubsection('偏差', context.conventions.module.deviations, '无'),
     '',
-    `- Recommended Convention: ${context.conventions.module.recommendedConvention}`,
-    ...renderSubsection('Evidence', context.conventions.module.evidence),
+    `- 推荐规则: ${context.conventions.module.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.module.evidence),
     '',
-    '## Testing',
-    ...renderSubsection('Observed Patterns', context.conventions.testing.observedPatterns),
-    ...renderSubsection('Deviations', context.conventions.testing.deviations, '无'),
+    '## 测试规范',
+    ...renderSubsection('观察到的模式', context.conventions.testing.observedPatterns),
+    ...renderSubsection('偏差', context.conventions.testing.deviations, '无'),
     '',
-    `- Recommended Convention: ${context.conventions.testing.recommendedConvention}`,
-    ...renderSubsection('Evidence', context.conventions.testing.evidence),
+    `- 推荐规则: ${context.conventions.testing.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.testing.evidence),
     '',
-    '## Project Rules',
-    ...renderSubsection('Observed Patterns', context.conventions.projectRules.observedPatterns),
-    ...renderSubsection('Deviations', context.conventions.projectRules.deviations, '无'),
+    '## 交付规范',
+    ...renderSubsection('观察到的模式', context.conventions.projectRules.observedPatterns),
+    ...renderSubsection('偏差', context.conventions.projectRules.deviations, '无'),
     '',
-    `- Recommended Convention: ${context.conventions.projectRules.recommendedConvention}`,
-    ...renderSubsection('Evidence', context.conventions.projectRules.evidence),
+    `- 推荐规则: ${context.conventions.projectRules.recommendedConvention}`,
+    ...renderSubsection('证据', context.conventions.projectRules.evidence),
   ].join('\n');
 }
 
 function renderCriticalFlowsDoc(context: ProjectionContext): string {
-  const lines = ['# First Runtime Critical Flows'];
+  const lines = renderDocHeader('关键流', ['.spec-first/runtime/first/critical-flows.json']);
 
   for (const flow of context.criticalFlows) {
-    lines.push('', `## ${flow.name}`, '', `- Flow ID: ${flow.flowId}`);
-    lines.push(...renderSubsection('Entry Points', flow.entryPoints));
-    lines.push(...renderSubsection('Core Modules', flow.coreModules));
-    lines.push(...renderSubsection('Invariants', flow.invariants));
-    lines.push(...renderSubsection('Verification Hooks', flow.verificationHooks));
-  }
-
-  return lines.join('\n');
-}
-
-function renderChangeMapDoc(context: ProjectionContext): string {
-  const lines = ['# First Runtime Change Map'];
-
-  for (const entry of context.changeMap) {
-    lines.push('', `## ${entry.changeType}`);
-    lines.push(...renderSubsection('Likely Modules', entry.likelyModules));
-    lines.push(...renderSubsection('Likely Commands', entry.likelyCommands, '无'));
-    lines.push(...renderSubsection('Likely Configs', entry.likelyConfigs, '无'));
-    lines.push(...renderSubsection('Likely Tests', entry.likelyTests, '无'));
-    lines.push(...renderSubsection('Risk Points', entry.riskPoints));
+    lines.push('', `## ${flow.name}`, '', `- 流程标识: ${flow.flowId}`);
+    lines.push(...renderSubsection('核心流程', flow.entryPoints));
+    lines.push(...renderSubsection('不可轻易破坏路径', flow.coreModules));
+    lines.push(...renderSubsection('风险点', flow.invariants));
+    lines.push(...renderSubsection('验证钩子', flow.verificationHooks));
   }
 
   return lines.join('\n');
 }
 
 function renderEntryGuideDoc(context: ProjectionContext): string {
-  const lines = ['# First Runtime Entry Guide'];
+  const lines = renderDocHeader('新手入口指南', ['.spec-first/runtime/first/entry-guide.json']);
 
   for (const entry of context.entryGuide) {
     lines.push('', `## ${entry.taskCategory}`);
-    lines.push(...renderSubsection('Read First', entry.readFirst));
-    lines.push(...renderSubsection('Then Read', entry.thenRead, '无'));
-    lines.push(...renderSubsection('Avoid Entry', entry.avoidEntry, '无'));
-    lines.push(...renderSubsection('Related Flows', entry.relatedFlows, '无'));
-  }
-
-  return lines.join('\n');
-}
-
-function renderCommonPlaybooksDoc(context: ProjectionContext): string {
-  const lines = ['# Common Playbooks'];
-
-  for (const entry of context.entryGuide) {
-    const matchingChangeMap = context.changeMap.find(
-      (item) =>
-        item.changeType.includes(entry.taskCategory) || entry.taskCategory.includes(item.changeType)
-    );
-
-    lines.push('', `## ${entry.taskCategory}`);
-    lines.push(...renderSubsection('Read First', entry.readFirst));
-    lines.push(...renderSubsection('Then Read', entry.thenRead, '无'));
-    lines.push(...renderSubsection('Avoid Entry', entry.avoidEntry, '无'));
-    lines.push(...renderSubsection('Related Flows', entry.relatedFlows, '无'));
-
-    if (matchingChangeMap) {
-      lines.push(...renderSubsection('Likely Modules', matchingChangeMap.likelyModules, '无'));
-      lines.push(...renderSubsection('Likely Tests', matchingChangeMap.likelyTests, '无'));
-      lines.push(...renderSubsection('Risk Points', matchingChangeMap.riskPoints, '无'));
-    }
-
-    const matchingConvention = Object.values(context.conventions).find((bucket) =>
-      bucket.observedPatterns.some((pattern: string) =>
-        [...entry.readFirst, ...entry.thenRead].some((target) => target.includes(pattern))
-      )
-    );
-    if (matchingConvention) {
-      lines.push('', `- Recommended Convention: ${matchingConvention.recommendedConvention}`);
-      lines.push(...renderSubsection('Evidence', matchingConvention.evidence, '无'));
-    }
-  }
-
-  return lines.join('\n');
-}
-
-function renderKnownRisksAndTrapsDoc(context: ProjectionContext): string {
-  const lines = [
-    '# Known Risks And Traps',
-    '',
-    '## Current Critical Areas',
-    ...renderList(context.rebootGuide.currentCriticalAreas, '无'),
-    '',
-    '## Summary Risks',
-    ...renderList(context.summary.risks, '无'),
-  ];
-
-  for (const flow of context.criticalFlows) {
-    lines.push('', `## ${flow.name}`);
-    lines.push(...renderSubsection('Invariants', flow.invariants, '无'));
-    lines.push(...renderSubsection('Verification Hooks', flow.verificationHooks, '无'));
-
-    const relatedRiskPoints = context.changeMap
-      .filter((entry) => flow.coreModules.some((module) => entry.likelyModules.includes(module)))
-      .flatMap((entry) => entry.riskPoints);
-    lines.push(...renderSubsection('Risk Points', Array.from(new Set(relatedRiskPoints)), '无'));
-  }
-
-  return lines.join('\n');
-}
-
-function renderRebootGuideDoc(context: ProjectionContext): string {
-  return [
-    '# First Runtime Reboot Guide',
-    '',
-    `- Project What: ${context.rebootGuide.projectWhat}`,
-    ...renderSection('Where To Start', context.rebootGuide.whereToStart),
-    ...renderSection('Current Critical Areas', context.rebootGuide.currentCriticalAreas),
-    ...renderSection('Common Change Paths', context.rebootGuide.commonChangePaths),
-    ...renderSection('Verify Checklist', context.rebootGuide.verifyChecklist),
-  ].join('\n');
-}
-
-function renderStageViewsDoc(context: ProjectionContext): string {
-  const lines = ['# First Runtime Stage Views'];
-
-  for (const stage of Object.keys(context.stageViews) as Array<keyof typeof context.stageViews>) {
-    if (stage === 'spec') {
-      const view = context.stageViews.spec;
-      lines.push('', `## ${STAGE_LABELS[stage]}`, '', `- Summary: ${view.summary}`);
-      lines.push(...renderSubsection('Business Capabilities', view.businessCapabilities));
-      lines.push(...renderSubsection('Core Entities', view.coreEntities));
-      lines.push(...renderSubsection('Dependencies', view.dependencies));
-      lines.push(...renderSubsection('Warnings', view.warnings));
-      continue;
-    }
-
-    if (stage === 'design') {
-      const view = context.stageViews.design;
-      lines.push('', `## ${STAGE_LABELS[stage]}`, '', `- Summary: ${view.summary}`);
-      lines.push(...renderSubsection('Module Boundaries', view.moduleBoundaries));
-      lines.push(...renderSubsection('Integration Points', view.integrationPoints));
-      lines.push(...renderSubsection('Technical Constraints', view.technicalConstraints));
-      lines.push(...renderSubsection('Risks', view.risks));
-      continue;
-    }
-
-    if (stage === 'code') {
-      const view = context.stageViews.code;
-      lines.push('', `## ${STAGE_LABELS[stage]}`, '', `- Summary: ${view.summary}`);
-      lines.push(...renderSubsection('Entry Points', view.entryPoints));
-      lines.push(...renderSubsection('Likely Change Areas', view.likelyChangeAreas));
-      lines.push(...renderSubsection('Call Path Hints', view.callPathHints ?? []));
-      lines.push(...renderSubsection('Coupling Points', view.couplingPoints ?? []));
-      lines.push(...renderSubsection('Change Hazards', view.changeHazards));
-      lines.push(...renderSubsection('Verification Hooks', view.verificationHooks));
-      continue;
-    }
-
-    const view = context.stageViews.verify;
-    lines.push('', `## ${STAGE_LABELS[stage]}`, '', `- Summary: ${view.summary}`);
-    lines.push(...renderSubsection('Critical Flows', view.criticalFlows ?? []));
-    lines.push(...renderSubsection('Validation Focus', view.validationFocus ?? []));
-    lines.push(...renderSubsection('Test Focus', view.testFocus));
-    lines.push(...renderSubsection('Risk Areas', view.riskAreas));
-    lines.push(...renderSubsection('Recommended Checks', view.recommendedChecks ?? []));
-    lines.push(...renderSubsection('Validation Hooks', view.validationHooks));
-    lines.push(...renderSubsection('Release Blockers', view.releaseBlockers));
+    lines.push(...renderSubsection('从哪里开始', entry.readFirst));
+    lines.push(...renderSubsection('先改什么', entry.thenRead, '无'));
+    lines.push(...renderSubsection('避免误入', entry.avoidEntry, '无'));
+    lines.push(...renderSubsection('关联关键流', entry.relatedFlows, '无'));
   }
 
   return lines.join('\n');
@@ -698,19 +619,19 @@ function renderGenericProjectedDoc(docPath: string, context: ProjectionContext):
   const fileName = docPath.split('/').at(-1) ?? 'first-doc';
 
   return [
-    `# ${fileName}`,
+    ...renderDocHeader(fileName, ['.spec-first/runtime/first/index.json']),
     '',
     `- project: ${context.summary.project.name}`,
     `- generatedAt: ${context.summary.generatedAt}`,
     '- projection: runtime-derived document',
     '- canonical-docs:',
     '  - docs/first/summary.md',
-    '  - docs/first/role-views.md',
-    '  - docs/first/stage-views.md',
+    '  - docs/first/architecture.md',
+    '  - docs/first/development-guidelines.md',
     '',
-    '## Notes',
+    '## 说明',
     '- This document is projected from the current first runtime assets.',
-    '- Prefer canonical docs for detailed review and stage-specific decisions.',
+    '- Prefer canonical docs for detailed review and project-level cognition decisions.',
   ].join('\n');
 }
 
@@ -721,12 +642,6 @@ export function renderProjectedDoc(docPath: string, context: ProjectionContext):
   if (docPath.endsWith('summary.md')) {
     return renderSummaryDoc(context);
   }
-  if (docPath.endsWith('role-views.md')) {
-    return renderRoleViewsDoc(context);
-  }
-  if (docPath.endsWith('stage-views.md')) {
-    return renderStageViewsDoc(context);
-  }
   if (docPath.endsWith('steering.md')) {
     return renderSteeringDoc(context);
   }
@@ -736,23 +651,8 @@ export function renderProjectedDoc(docPath: string, context: ProjectionContext):
   if (docPath.endsWith('critical-flows.md')) {
     return renderCriticalFlowsDoc(context);
   }
-  if (docPath.endsWith('change-map.md')) {
-    return renderChangeMapDoc(context);
-  }
   if (docPath.endsWith('entry-guide.md')) {
     return renderEntryGuideDoc(context);
-  }
-  if (docPath.endsWith('common-playbooks.md')) {
-    return renderCommonPlaybooksDoc(context);
-  }
-  if (docPath.endsWith('known-risks-and-traps.md')) {
-    return renderKnownRisksAndTrapsDoc(context);
-  }
-  if (docPath.endsWith('reboot-guide.md')) {
-    return renderRebootGuideDoc(context);
-  }
-  if (docPath.endsWith('tech-stack.md')) {
-    return renderTechStackDoc(context);
   }
   if (docPath.endsWith('api-docs.md')) {
     return renderApiDocsDoc(context);
@@ -771,9 +671,6 @@ export function renderProjectedDoc(docPath: string, context: ProjectionContext):
   }
   if (docPath.endsWith('external-deps.md')) {
     return renderExternalDepsDoc(context);
-  }
-  if (docPath.endsWith('local-setup.md')) {
-    return renderLocalSetupDoc(context);
   }
   if (docPath.endsWith('development-guidelines.md')) {
     return renderDevelopmentGuidelinesDoc(context);

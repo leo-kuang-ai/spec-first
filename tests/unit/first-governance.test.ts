@@ -60,7 +60,7 @@ beforeEach(() => {
     cwd: TMP,
     stdio: 'ignore',
   });
-  bootstrapFirstRuntime(TMP, { mode: 'quick' });
+  bootstrapFirstRuntime(TMP, { mode: 'deep' });
   execSync('git -c core.hooksPath=/dev/null add .', { cwd: TMP, stdio: 'ignore' });
   execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "bootstrap"', {
     cwd: TMP,

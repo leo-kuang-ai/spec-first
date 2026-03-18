@@ -11,16 +11,16 @@ function read(path: string): string {
 }
 
 describe('15-doctor skill docs consistency', () => {
-  it('should diagnose runtime stage-views and projection sync', () => {
+  it('should diagnose canonical runtime assets and projection sync', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(RULES)).toBe(true);
 
     const skill = read(SKILL_MD);
     const rules = read(RULES);
 
-    expect(skill).toContain('stage-views');
+    expect(skill).toContain('canonical 资产健康状态');
     expect(skill).toContain('docs 投影视图');
-    expect(rules).toContain('stage-views');
+    expect(rules).toContain('runtime 真源');
     expect(rules).toContain('失同步');
   });
 

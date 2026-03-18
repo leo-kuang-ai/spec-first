@@ -21,7 +21,7 @@ user-invocable: true
 
 **前置检查**：
 1. 检测 `docs/onboarding/` 目录下是否存在学习路径文档（*.md）
-2. 检测 `.spec-first/runtime/first/role-views.json` 是否存在
+2. 检测 `.spec-first/runtime/first/summary.json` 与 `entry-guide.json` 是否存在
 
 ---
 
@@ -66,7 +66,7 @@ options:
 
 **使用 `AskUserQuestion` 工具收集用户选择**：
 
-**场景 A：无 role-views（降级模式）**
+**场景 A：无 first 项目认知资产（降级模式）**
 
 **Q0: 检测到你还没有运行过项目分析**
 
@@ -82,7 +82,7 @@ options:
 - 选择"第一次使用" → 跳过 Phase 1，输出快速路径（Phase 2.8-快速模式）
 - 选择"自定义" → 进入 Phase 1 完整场景识别（降级模式）
 
-**场景 B：有 role-views（正常模式）**
+**场景 B：有 first 项目认知资产（正常模式）**
 
 **Q0: 你的使用经验？**
 
@@ -94,8 +94,8 @@ options:
 - 选择"第一次使用" → 跳过 Phase 1，输出快速路径（Phase 2.8-快速模式）
 - 选择"自定义" → 进入 Phase 1 完整场景识别（正常模式）
 
-**role-views 数据使用策略**：
-- 正常模式：根据用户角色调整推荐内容，标注 `📊 数据来源：基于项目分析（role-views）`
+**项目认知数据使用策略**：
+- 正常模式：根据项目摘要与入口建议调整推荐内容，标注 `📊 数据来源：基于项目分析（summary / entry-guide）`
 - 降级模式：使用通用推荐，标注 `💡 数据来源：通用推荐`
 
 ---
@@ -216,7 +216,7 @@ options:
 ```
 ✨ 为你推荐以下学习路径
 
-📊 数据来源：基于项目分析（role-views）
+📊 数据来源：基于项目分析（summary / entry-guide）
 📌 场景：开发者 + 新功能 + 小型项目
 ⏱️  预计时间：30-60 分钟（不含编码）
 
@@ -356,5 +356,4 @@ options:
 
 - 用户跳过问题 → 使用默认场景（开发者 + 新功能 + 小型）
 - 无匹配场景 → 推荐通用路径（first → init → spec）
-- 无 role-views → 提示"建议先运行 /spec-first:first 了解项目结构"
-
+- 无 first 项目认知资产 → 提示"建议先运行 /spec-first:first 了解项目结构"

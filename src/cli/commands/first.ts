@@ -1,34 +1,29 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
 import {
   formatHealthStatus,
   checkFirstUpdateContext,
 } from '../../core/skill-runtime/first-change-detector.js';
-import { CANONICAL_PROJECTION_DOCS } from '../../core/skill-runtime/first-artifact-mapping.js';
 import { bootstrapFirstRuntime } from '../../core/skill-runtime/first-bootstrap.js';
 import {
-  executeFirst,
   refreshFirstArtifacts,
-  syncBackgroundInputStatus,
 } from '../../core/skill-runtime/first-context.js';
 import { FirstArgsError, validateFirstArgs } from '../../core/skill-runtime/first-args.js';
 import { formatProductSummary } from '../../core/skill-runtime/first-resume.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
 
 function printFirstHelp(): void {
-  console.log(
-    '用法：spec-first first [--type=<value>] [--auto] [--force] [--skip] [--check-health]'
-  );
+  console.log('用法：spec-first first [选项]');
   console.log('');
   console.log('说明：');
-  console.log(
-    '  - 无 runtime 真源时，生成最小 canonical `.spec-first/runtime/first/` 与 canonical projection docs'
-  );
-  console.log(
-    '  - 已有 runtime 真源时，优先刷新 runtime truth，再强制从 runtime 恢复 canonical projection docs'
-  );
-  console.log('  - legacy/reference docs 不在自动刷新与 health 承诺范围内');
+  console.log('  生成项目级认知真源（.spec-first/runtime/first/）与投影文档（docs/first/）');
+  console.log('  - 无 runtime 真源时：执行 bootstrap 生成');
+  console.log('  - 有 runtime 真源时：执行增量刷新');
+  console.log('');
+  console.log('选项：');
+  console.log('  --type=<value>      指定平台类型（backend/frontend/mobile/cross-platform/desktop/monorepo）');
+  console.log('  --force             强制重新生成（忽略现有 runtime）');
+  console.log('  --check-health      检查 first 健康状态');
+  console.log('  --help, -h          显示帮助信息');
 }
 
 function handleCheckHealth(projectRoot: string): number {
@@ -44,25 +39,6 @@ function handleCheckHealth(projectRoot: string): number {
     : ExitCode.SUCCESS;
 }
 
-function handleSkip(projectRoot: string): number {
-  try {
-    const result = executeFirst(projectRoot);
-    const sync = syncBackgroundInputStatus(projectRoot);
-    if (result.docsProjections.length > 0) {
-      console.log(
-        `✓ 已从 runtime 恢复 canonical projection docs (${result.docsProjections.length} 项)`
-      );
-    }
-    if (sync.updatedFeatures.length > 0) {
-      console.log(`✓ 已同步 ${sync.updatedFeatures.length} 个 Feature 的 backgroundInputStatus`);
-    }
-    console.log(formatProductSummary(projectRoot));
-    return ExitCode.SUCCESS;
-  } catch (error) {
-    console.error(`--skip 执行失败：${error instanceof Error ? error.message : String(error)}`);
-    return ExitCode.VALIDATION_ERROR;
-  }
-}
 
 export function handleFirst(args: string[]): number {
   if (args.includes('--help') || args.includes('-h')) {
@@ -87,29 +63,21 @@ export function handleFirst(args: string[]): number {
     return handleCheckHealth(projectRoot);
   }
 
-  if (firstArgs.skip) {
-    return handleSkip(projectRoot);
-  }
-
   try {
     const index = readFirstRuntimeIndex(projectRoot);
-    const hasCanonicalProjectionDocs = CANONICAL_PROJECTION_DOCS.every((path) =>
-      existsSync(join(projectRoot, path))
-    );
-    if (
+    const hasHealthyRuntime =
       index?.summary?.healthy &&
-      index?.roleViews?.healthy &&
-      index?.stageViews?.healthy &&
       index?.steering?.healthy &&
       index?.conventions?.healthy &&
       index?.criticalFlows?.healthy &&
-      index?.changeMap?.healthy &&
       index?.entryGuide?.healthy &&
-      index?.rebootGuide?.healthy
-    ) {
-      const result = hasCanonicalProjectionDocs
-        ? executeFirst(projectRoot)
-        : refreshFirstArtifacts(projectRoot, 'refresh-docs-from-runtime');
+      index?.apiContracts?.healthy &&
+      index?.structureOverview?.healthy &&
+      index?.domainModel?.healthy &&
+      (index?.databaseSchema?.status === 'healthy' || index?.databaseSchema?.status === 'not_applicable');
+
+    if (hasHealthyRuntime && !firstArgs.force) {
+      const result = refreshFirstArtifacts(projectRoot, 'refresh-docs-from-runtime');
       console.log(
         `✓ 已刷新 first runtime (${result.runtimeArtifacts.length} 项) 与 canonical projection docs (${result.docsProjections.length} 项)`
       );
@@ -120,11 +88,6 @@ export function handleFirst(args: string[]): number {
       console.log(
         `✓ 已生成 first runtime (${bootstrap.runtimeArtifacts.length} 项) 与 canonical projection docs (${bootstrap.docsProjections.length} 项)`
       );
-    }
-
-    const sync = syncBackgroundInputStatus(projectRoot);
-    if (sync.updatedFeatures.length > 0) {
-      console.log(`✓ 已同步 ${sync.updatedFeatures.length} 个 Feature 的 backgroundInputStatus`);
     }
 
     console.log(formatProductSummary(projectRoot));

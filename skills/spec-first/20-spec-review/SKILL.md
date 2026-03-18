@@ -39,6 +39,21 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - `../03-spec/references/spec-review-checklist.md`
 - `../03-spec/references/test-level-glossary.md`
 
+## First 项目认知资产接入
+
+当项目已生成 `00-first` runtime 真源时，审查时应优先吸收以下项目认知资产作为辅助输入，而不是依赖零散 `docs/first/*` 推断：
+
+- `summary.json`
+- `critical-flows.json`
+- `domain-model.json`
+
+使用原则：
+
+- `summary.json`：辅助判断需求目标、平台边界与项目范围是否完整
+- `critical-flows.json`：辅助判断关键链路、验收路径与风险覆盖是否充分
+- `domain-model.json`：辅助判断术语、实体边界、关系描述是否一致
+- 若 `00-first` 资产缺失，不阻断 `spec-review`，但应标记为“缺少项目认知辅助输入”
+
 ## 输出路径
 - `specs/{featureId}/checklists/spec-review.md`
 

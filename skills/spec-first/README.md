@@ -14,7 +14,7 @@ description: Spec-First AI Agent Skills 目录索引
 
 | Skill | 说明 | 确认策略 |
 |-------|------|----------|
-| [00-first](./00-first/SKILL.md) | 项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式追加至 10-11 份（含条件产物） | assisted |
+| [00-first](./00-first/SKILL.md) | 项目快速认知：默认以 deep 规格生成 runtime 真源与正式 docs 投影视图（含条件产物） | assisted |
 
 ### 核心工作流 Skills
 

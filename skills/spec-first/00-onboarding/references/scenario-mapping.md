@@ -32,9 +32,9 @@
 
 ---
 
-## role-views / degraded 背景策略
+## first 资产 / degraded 背景策略
 
-- 存在 `.spec-first/runtime/first/role-views.json` 时：优先按角色裁剪推荐路径
+- 存在 `.spec-first/runtime/first/summary.json` 与 `entry-guide.json` 时：优先按项目认知裁剪推荐路径
 - 无 first 资产时：进入 `degraded` 模式，输出通用路径并显式提示“无 first 资产”
 - `degraded` 模式下不阻断 onboarding，但第一步应优先推荐 `/spec-first:first`
 

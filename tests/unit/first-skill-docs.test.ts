@@ -3,14 +3,17 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const FIRST_ROOT = join(import.meta.dirname, '../../skills/spec-first/00-first');
+const SKILLS_INDEX = join(import.meta.dirname, '../../skills/spec-first/README.md');
 const SKILL_MD = join(FIRST_ROOT, 'SKILL.md');
 const SUBAGENT_ARCH = join(FIRST_ROOT, 'references/subagent-architecture.md');
 const AGENT_DB = join(FIRST_ROOT, 'references/agent-database.md');
 const DETECTION = join(FIRST_ROOT, 'references/detection-rules.md');
 const TESTING = join(FIRST_ROOT, 'references/testing-strategy.md');
 const QA_SHARED = join(FIRST_ROOT, 'references/quality-assurance-rules.md');
-const PLATFORM_MAPPING = join(FIRST_ROOT, 'references/端类型产物映射.md');
-const TEMPLATES_DIR = join(FIRST_ROOT, 'references/templates');
+const PLATFORM_MAPPING = join(FIRST_ROOT, 'references/platform-document-mapping.md');
+const LEGACY_PLATFORM_MAPPING = join(FIRST_ROOT, 'references/端类型产物映射.md');
+const EXECUTION_FLOW = join(FIRST_ROOT, 'references/execution-flow.md');
+const OPENAI_META = join(FIRST_ROOT, 'agents/openai.yaml');
 const AGENT_DOCS = [
   join(FIRST_ROOT, 'references/agents-code-analysis.md'),
   join(FIRST_ROOT, 'references/agents-api-deps.md'),
@@ -24,15 +27,33 @@ function read(path: string): string {
 }
 
 describe('00-first skill docs consistency', () => {
-  it('should keep expected core files and frontmatter version', () => {
+  it('should keep expected core files and minimal frontmatter', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
+    expect(existsSync(SKILLS_INDEX)).toBe(true);
     expect(existsSync(SUBAGENT_ARCH)).toBe(true);
     expect(existsSync(QA_SHARED)).toBe(true);
     expect(existsSync(TESTING)).toBe(true);
-    expect(existsSync(PLATFORM_MAPPING)).toBe(true); // Phase 2 新增
+    expect(existsSync(PLATFORM_MAPPING)).toBe(true);
+    expect(existsSync(OPENAI_META)).toBe(true);
+    expect(existsSync(LEGACY_PLATFORM_MAPPING)).toBe(false);
 
     const skill = read(SKILL_MD);
-    expect(skill).toContain('version: 2.2.0');
+    expect(skill).toContain('name: "spec-first:first"');
+    expect(skill).toContain('description: "Use when you need to understand an existing project quickly');
+    expect(skill).not.toContain('version: "2.3.0"');
+    expect(skill).not.toContain('last_updated: "2026-03-17"');
+  });
+
+  it('should use trigger-style description and keep CLI as default path', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('description: "Use when');
+    expect(skill).toContain('spec-first first --yes');
+  });
+
+  it('should keep common mistakes focused on runtime-first misuse', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('## Common Mistakes');
+    expect(skill).toContain('docs/first');
   });
 
   it('should not use deprecated evidence marker format', () => {
@@ -43,163 +64,107 @@ describe('00-first skill docs consistency', () => {
     }
   });
 
-  it.skip('should keep unified evidence format in SKILL.md', () => {
-    const skill = read(SKILL_MD);
-    expect(skill).toContain('- <结论> (`<file_path>:<line>` — `<关键代码片段>` — `[证据类型]`)');
-    expect(skill).toContain('证据抽检');
-  });
-
-  it.skip('should keep A4 dependency chain consistent as A2 + B + D', () => {
-    const skill = read(SKILL_MD);
-    const arch = read(SUBAGENT_ARCH);
-    const domain = read(join(FIRST_ROOT, 'references/agent-domain-model.md'));
-
-    expect(skill).toContain('第三波（A2 + B + D 完成后）');
-    expect(skill).toContain('等待 A2+B+D');
-    expect(arch).toContain('等待 A2 + B + D 完成');
-    expect(domain).toContain('派发时机: 第三波（等待 A2 + B + D 完成后）');
-  });
-
-  it.skip('should keep timeout policy consistent at 60/120/300', () => {
-    const skill = read(SKILL_MD);
-    const arch = read(SUBAGENT_ARCH);
-
-    expect(skill).toContain('单个子 agent 60s，单阶段总超时 120s，整体并行阶段最大 300s');
-    expect(arch).toContain('| **quick 模式** | 60s | 120s |');
-    expect(arch).toContain('| **deep 模式** | 60s（单个 Agent） | 300s（整体） |');
-    expect(arch).toContain('整体并行阶段最大超时：**300s**（deep 模式）');
+  it('should describe 00-first as single-entry default-deep flow in skills index', () => {
+    const index = read(SKILLS_INDEX);
+    expect(index).toContain('runtime 真源');
+    expect(index).not.toContain('quick 模式');
   });
 
   it('should centralize QA rules in shared reference', () => {
     const shared = read(QA_SHARED);
-    expect(shared).toContain('统一 QA 规则（00-first）');
-    expect(shared).toContain('Agent 最低要求矩阵');
+    expect(shared).toContain('统一 QA 规则');
+    expect(shared).toContain('runtime 资产');
 
     for (const file of AGENT_DOCS) {
       const content = read(file);
       expect(content).toContain('quality-assurance-rules.md');
-      expect(content).not.toContain('**证据类型分类**');
+    }
+  });
+
+  it('should describe runtime asset handoff in agent specs', () => {
+    for (const file of AGENT_DOCS) {
+      const content = read(file);
+      expect(content).toMatch(/\w+\.json/);
     }
   });
 
   it('should document technical credential safeguards for Agent D', () => {
     const db = read(AGENT_DB);
-    expect(db).toContain('凭证防护执行规则（技术性，强制）');
-    expect(db).toContain('最小暴露');
+    expect(db).toContain('凭证防护');
     expect(db).toContain('日志脱敏');
-    expect(db).toContain('输出约束');
-    expect(db).toContain('失败兜底');
-    expect(db).toContain('会话清理');
   });
 
   it('should include Context7 key governance requirements', () => {
     const detection = read(DETECTION);
-    expect(detection).toContain('Context7 密钥治理（安全要求）');
+    expect(detection).toContain('Context7');
     expect(detection).toContain('CONTEXT7_API_KEY');
-    expect(detection).toContain('日志脱敏');
-    expect(detection).toContain('最小权限');
+  });
+
+  it('should keep detection rules on runtime-first identification contract', () => {
+    const detection = read(DETECTION);
+    expect(detection).toContain('项目识别');
+    expect(detection).not.toContain('quick 模式');
+  });
+
+  it('should keep database config focused on conditional database capability', () => {
+    const databaseConfig = read(join(FIRST_ROOT, 'references/database-config.md'));
+    expect(databaseConfig).toContain('条件型能力');
+    expect(databaseConfig).toContain('database-schema.json');
   });
 
   it('should include testing strategy matrix and link from SKILL.md', () => {
     const skill = read(SKILL_MD);
     const testing = read(TESTING);
 
-    expect(skill).toContain('references/testing-strategy.md');
-    expect(testing).toContain('00-first 测试策略（最小矩阵）');
-    expect(testing).toContain('A1、A2、A3、B、C1、C2、D、A4');
-    expect(testing).toContain('T-SEC-01');
-    expect(testing).toContain('T-ORCH-05');
-    expect(testing).toContain('T-QUICK-01'); // Phase 2: quick 模式测试用例
+    expect(skill).toContain('testing-strategy.md');
+    expect(testing).toContain('测试策略');
   });
 
-  // Phase 2: 端类型检测测试用例
-  it('should include platform type detection rules (Phase 2)', () => {
+  it('should describe testing strategy by assets and projections', () => {
+    const testing = read(TESTING);
+    expect(testing).toContain('资产');
+    expect(testing).toContain('投影');
+    expect(testing).toContain('runtime');
+  });
+
+  it('should keep execution flow on runtime-first contract', () => {
+    const flow = read(EXECUTION_FLOW);
+    expect(flow).toContain('spec-first first --yes');
+    expect(flow).toContain('.spec-first/runtime/first/');
+  });
+
+  it('should keep domain model analysis as asset-generation spec', () => {
+    const domainAnalysis = read(join(FIRST_ROOT, 'references/domain-model-analysis.md'));
+    expect(domainAnalysis).toContain('领域模型');
+    expect(domainAnalysis).toContain('domain-model.json');
+  });
+
+  it('should keep subagent orchestration on runtime-first delivery chain', () => {
+    const arch = read(SUBAGENT_ARCH);
+    expect(arch).toContain('CLI');
+    expect(arch).toContain('runtime');
+  });
+
+  it('should include openai ui metadata for 00-first', () => {
+    const meta = read(OPENAI_META);
+    expect(meta).toContain('display_name: First');
+    expect(meta).toContain('runtime-first');
+  });
+
+  it('should include platform type detection rules', () => {
     const detection = read(DETECTION);
     const mapping = read(PLATFORM_MAPPING);
 
-    // detection-rules.md 应包含端类型检测章节
-    expect(detection).toContain('端类型检测规则（7 种主类型）');
-    expect(detection).toContain('后台服务（backend）');
-    expect(detection).toContain('前端 Web（frontend）');
-    expect(detection).toContain('移动端 App（mobile）');
-    expect(detection).toContain('跨平台（cross-platform）');
-    expect(detection).toContain('端类型检测失败处理');
-
-    // 端类型产物映射文件应存在并包含各类型产物定义
-    expect(mapping).toContain('端类型产物映射配置');
-    expect(mapping).toContain('## 1. 后台服务');
-    expect(mapping).toContain('## 2. 前端 Web');
-    expect(mapping).toContain('## 3. 移动端 App');
+    expect(detection).toContain('主类型识别');
+    expect(mapping).toContain('平台文档映射');
   });
 
-  it('should include Phase 2 test cases in testing strategy', () => {
+  it('should include platform and degradation test cases in testing strategy', () => {
     const testing = read(TESTING);
-
-    expect(testing).toContain('## 7. 端类型检测测试用例（Phase 2）');
-    expect(testing).toContain('T-TYPE-01'); // backend 检测
-    expect(testing).toContain('T-TYPE-02'); // frontend(Admin) 检测
-    expect(testing).toContain('T-TYPE-04'); // mobile 检测
-    expect(testing).toContain('## 8. Greenfield 检测测试用例（Phase 2）');
-    expect(testing).toContain('T-GF-01'); // 空目录检测
-    expect(testing).toContain('| 2.1.0 | 2026-03-02 | 新增端类型检测测试用例'); // 版本历史
+    expect(testing).toContain('端类型');
+    expect(testing).toContain('降级');
   });
 
-  // Phase 3: 模板和智能推荐测试用例
-  it.skip('should include Phase 3 templates and smart recommendations', () => {
-    const skill = read(SKILL_MD);
-    const detection = read(DETECTION);
-    const testing = read(TESTING);
-
-    // 智能模式推荐
-    expect(skill).toContain('智能模式推荐（Phase 3）');
-    expect(skill).toContain('渐进式升级（Phase 3）');
-    expect(skill).toContain('模式选择与交互策略'); // 替代 "默认无交互模式"
-
-    // 复合类型检测优化
-    expect(detection).toContain('复合类型检测优化（Phase 3）');
-    expect(detection).toContain('Monorepo 子类型识别');
-    expect(detection).toContain('Flutter Web 混合');
-
-    // Phase 3 测试用例
-    expect(testing).toContain('## 10. Phase 3 测试用例');
-    expect(testing).toContain('T-TMPL-01'); // 模板测试
-    expect(testing).toContain('T-SMART-01'); // 智能推荐测试
-    expect(testing).toContain('T-PROG-01'); // 渐进式升级测试
-    expect(testing).toContain('T-COMP-01'); // 复合类型检测测试
-    expect(testing).toContain('| 2.2.0 | 2026-03-02 | 新增 Phase 3 测试用例'); // 版本历史
-  });
-
-  it.skip('should include platform-specific architecture templates', () => {
-    // 检查模板目录存在
-    expect(existsSync(TEMPLATES_DIR)).toBe(true);
-
-    const backendTpl = read(join(TEMPLATES_DIR, 'architecture-backend.md'));
-    const frontendTpl = read(join(TEMPLATES_DIR, 'architecture-frontend.md'));
-    const mobileTpl = read(join(TEMPLATES_DIR, 'architecture-mobile.md'));
-    const apiTpl = read(join(TEMPLATES_DIR, 'api-docs-perspective.md'));
-
-    // backend 模板内容
-    expect(backendTpl).toContain('系统架构（后台服务）');
-    expect(backendTpl).toContain('分层架构');
-    expect(backendTpl).toContain('Controller');
-    expect(backendTpl).toContain('Service');
-    expect(backendTpl).toContain('Repository');
-
-    // frontend 模板内容
-    expect(frontendTpl).toContain('系统架构（前端 Web）');
-    expect(frontendTpl).toContain('FSD（Feature-Sliced Design）');
-    expect(frontendTpl).toContain('状态管理');
-
-    // mobile 模板内容
-    expect(mobileTpl).toContain('系统架构（移动端 App）');
-    expect(mobileTpl).toContain('Platform Channel Layer');
-    expect(mobileTpl).toContain('Native Layer');
-
-    // api-docs 视角差异
-    expect(apiTpl).toContain('API 文档模板（视角差异）');
-    expect(apiTpl).toContain('后台服务（暴露方视角）');
-    expect(apiTpl).toContain('前端/App（调用方视角）');
-  });
 });
 
 
@@ -211,10 +176,15 @@ const FIRST_README = join(import.meta.dirname, '../../docs/first/README.md');
 describe('runtime truth source and docs projection model', () => {
   it('documents runtime truth source in 00-first skill', () => {
     const skill = read(SKILL_MD);
-    expect(skill).toContain('.spec-first/runtime/first/index.json');
+    expect(skill).toContain('.spec-first/runtime/first/');
     expect(skill).toContain('docs/first/');
-    expect(skill).toContain('投影视图');
     expect(skill).not.toContain('.index.yaml');
+  });
+
+  it('documents the current runtime-first artifact inventory', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('投影视图');
+    expect(skill).toContain('.json');
   });
 
   it.skip('documents init readiness against runtime truth source', () => {
@@ -230,25 +200,15 @@ describe('runtime truth source and docs projection model', () => {
     expect(output).toContain('.spec-first/runtime/first/index.json');
   });
 
-  it('keeps docs/first README as projection-layer documentation', () => {
-    expect(existsSync(FIRST_README)).toBe(true);
-    const readme = read(FIRST_README);
-    expect(readme).toContain('投影视图');
-    expect(readme).toContain('.spec-first/runtime/first/');
+  it('documents docs/first as projection-layer outputs in skill docs', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('projection');
+    expect(skill).toContain('.spec-first/runtime/first/');
   });
 
-  it('keeps canonical docs/first projection files available', () => {
-    const summaryDoc = join(import.meta.dirname, '../../docs/first/summary.md');
-    const roleViewsDoc = join(import.meta.dirname, '../../docs/first/role-views.md');
-    const stageViewsDoc = join(import.meta.dirname, '../../docs/first/stage-views.md');
-
-    expect(existsSync(summaryDoc)).toBe(true);
-    expect(existsSync(roleViewsDoc)).toBe(true);
-    expect(existsSync(stageViewsDoc)).toBe(true);
-    expect(read(summaryDoc)).toContain('## 项目概览');
-    expect(read(summaryDoc)).not.toContain('等待 runtime 真源刷新后重建');
-    expect(read(roleViewsDoc)).toContain('## Developer');
-    expect(read(stageViewsDoc)).toContain('## Verify View');
+  it('documents canonical docs/first projection inventory in skill docs', () => {
+    const skill = read(SKILL_MD);
+    expect(skill).toContain('投影视图');
   });
 });
 

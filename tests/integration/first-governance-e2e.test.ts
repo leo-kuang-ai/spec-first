@@ -94,7 +94,7 @@ beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
   initRepo();
   seedFeatureDeliverables();
-  bootstrapFirstRuntime(TMP, { mode: 'quick' });
+  bootstrapFirstRuntime(TMP, { mode: 'deep' });
   execSync('git -c core.hooksPath=/dev/null add .', { cwd: TMP, stdio: 'ignore' });
   execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', {
     cwd: TMP,
