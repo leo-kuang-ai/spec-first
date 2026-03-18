@@ -103,9 +103,3 @@ spec-first first --yes
 - 把 `api-docs.md` 当成外部依赖或集成说明文档
 - 在 projection 层补充 runtime truth 中不存在的新事实
 
-## 版本与维护说明
-
-- 当前版本：`2.3.0`
-- 最近更新：`2026-03-17`
-- `2.3.0`：收敛为单一标准模式，统一以 runtime-first 正式产物集为准
-- 历史变更记录不再作为主 skill 触发心智的一部分；执行细节以当前 reference 与测试为准

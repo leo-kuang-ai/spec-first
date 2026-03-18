@@ -56,15 +56,15 @@ spec-first hooks install
 
 ### 4. 项目配置检查
 
-**检查路径**: `.spec-first/config.yaml` 或 `.spec-first/config.yml`
+**检查路径**: `.spec-first/meta/config.yaml`
 
 **规则**:
 - ✅ 通过: 文件存在且格式正确
 - ⚠️ 警告: 文件存在但格式错误
-- ❌ 失败: 文件不存在
+- ⚠️ 警告: 文件不存在（使用内置默认值）
 
 **修复建议**:
-- 运行 `spec-first init` 初始化配置
+- 可选：运行 `spec-first init` 初始化项目配置，或手动创建 `.spec-first/meta/config.yaml`
 
 ---
 
@@ -83,13 +83,57 @@ spec-first hooks install
 
 ### 检查范围
 
-**Codex**:
-- 配置文件: `~/.codex/config.toml`
-- 检查项: `[mcpServers]` 段落中的必需 MCP
+`doctor` 不依赖单一路径硬编码。规则是：
+- 先读取宿主相关环境变量
+- 再按平台默认目录候选集探测
+- 若多个候选都存在，优先选择包含配置/skills 标记文件的目录
 
-**Claude Code**:
-- 配置文件: `~/.config/claude-code/mcp.json`
-- 检查项: `mcpServers` 对象中的必需 MCP
+#### Claude Code
+
+**自动识别优先级**:
+- `CLAUDE_CODE_CONFIG_DIR`
+- `CLAUDE_CONFIG_DIR`
+- 平台默认目录（如 `~/.config/claude-code` 或系统等价目录）
+
+**检查项**:
+- `mcp.json`
+- `settings.json`
+- `~/.claude/skills/` 或环境变量指定的 skills 目录
+
+#### Codex
+
+**自动识别优先级**:
+- `CODEX_HOME`
+- `CODEX_ROOT`
+- 平台默认目录（如 `~/.codex` 或系统等价目录）
+
+**检查项**:
+- `config.toml`
+- `skills/`
+
+#### Gemini
+
+**自动识别优先级**:
+- `GEMINI_HOME`
+- `GEMINI_CLI_HOME`
+- 平台默认目录（如 `~/.gemini`）
+
+**检查项**:
+- `settings.json`
+- `skills/`
+- 宿主 baseline 与 MCP 配置是否齐备
+
+#### Cursor
+
+**自动识别优先级**:
+- `CURSOR_HOME`
+- `CURSOR_USER_HOME`
+- 平台默认目录（如 `~/.cursor`）
+
+**检查项**:
+- `mcp.json`
+- `settings.json`
+- `skills/`
 
 ### 必需 MCP 列表
 
@@ -110,6 +154,10 @@ spec-first hooks install
 4. **fetch**
    - 用途: HTTP 请求
    - 命令: `uvx mcp-server-fetch`
+
+5. **playwright-mcp**
+   - 用途: 浏览器交互与页面验收
+   - 命令: `npx -y @playwright/mcp@latest`
 
 ### 检查规则
 
@@ -132,12 +180,20 @@ spec-first hooks install
 
 ### 检查范围
 
-**Codex**:
-- Root skills: `~/.codex/skills/`
-- System skills: `~/.codex/system-skills/`
+skills 目录同样按“环境变量优先 + 平台默认目录兜底”的规则自动识别。
 
 **Claude Code**:
-- User skills: `~/.claude/skills/`
+- User skills: `CLAUDE_SKILLS_DIR` 或 `~/.claude/skills/`
+
+**Codex**:
+- Root skills: `CODEX_SKILLS_DIR` 或 `<codexRoot>/skills/`
+- System skills: `<codexSkillsDir>/.system/`
+
+**Gemini**:
+- User skills: `<geminiHome>/skills/`
+
+**Cursor**:
+- User skills: `<cursorHome>/skills/`
 
 ### 必需 Skills 列表
 
@@ -217,7 +273,7 @@ npm install
 
 ### 检查项
 
-**配置路径**: `.spec-first/config.yaml`
+**配置路径**: `.spec-first/meta/config.yaml` / `.spec-first/local/config.yaml`
 
 **检查字段**: `gate.fallback_mode`
 
@@ -293,14 +349,20 @@ npm install
 
 ---
 
+## 默认模式与自动修复优先级
+
+- 默认执行 `spec-first doctor` 时只输出诊断与修复建议（dry-run）
+- 只有显式执行 `spec-first doctor --fix --yes` 时才进入 apply 模式
+- apply 模式完成后必须复检并输出修复前后差异
+
 ## 自动修复优先级
 
 | 优先级 | 修复项 | 自动执行 |
 |--------|--------|----------|
 | P0 | Node.js 版本过低 | ❌ 需手动 |
-| P1 | Git Hooks 缺失 | ✅ 自动 |
-| P1 | MCP 配置缺失 | ✅ 自动 |
-| P2 | Skills 缺失 | ✅ 自动 |
+| P1 | Git Hooks 缺失 | ✅ 仅 `--fix --yes` |
+| P1 | MCP 配置缺失 | ✅ 仅 `--fix --yes` |
+| P2 | Skills 缺失 | ✅ 仅 `--fix --yes` |
 | P3 | 临时文件清理 | ⚠️ 需确认 |
 | P3 | node_modules 清理 | ⚠️ 需确认 |
 

@@ -1,6 +1,6 @@
 ---
 version: 1.0.0
-last_updated: {{DATE}}
+last_updated: 2026-03-18
 description: Spec-First AI Agent Skills 目录索引
 ---
 
@@ -64,6 +64,14 @@ description: Spec-First AI Agent Skills 目录索引
 - **[AGENTS.md](./AGENTS.md)** — 全局 Agent 指令与 CLI 命令参考
 - **[SHARED.md](./SHARED.md)** — 跨 Skill 共享约束与规则（消除重复）
 
+## Discovery Governance
+
+- 正式 skill 的 `name` 统一使用 `spec-first:*` 命名空间
+- `description` 只描述触发条件，统一以 `Use when...` 开头
+- frontmatter 禁止总结完整流程、能力边界或实现细节，避免宿主在 discovery 阶段跳过正文
+- 项目扩展字段（如 `version`、`last_updated`、`changelog`、`user-invocable`、`allowed-tools`、`hooks`、`argument-hint`）只能补充治理信息，不能替代 `name` 与 `description`
+- 新增或修改 skill 时，必须同时通过 skill catalog / governance / 对应 `*-skill-docs` 测试
+
 ## 快速开始
 
 ### 按工作流程查找
@@ -105,7 +113,7 @@ description: Spec-First AI Agent Skills 目录索引
 ## 维护信息
 
 - **版本**: 1.0.0
-- **最后更新**: 2026-03-02
+- **最后更新**: 2026-03-18
 - **维护者**: Spec-First Team
 
 ## Canonical Flow

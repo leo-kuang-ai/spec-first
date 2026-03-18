@@ -375,6 +375,20 @@ function syncRuntimeIndex(
   return nextIndex;
 }
 
+export function syncFirstRuntimeIndexEntries(
+  projectRoot: string,
+  refreshedArtifacts: string[],
+  refreshedDocs: string[]
+): FirstRuntimeIndex {
+  const index = requireRuntimeAsset(readFirstRuntimeIndex(projectRoot), 'index');
+  const normalizedArtifacts = refreshedArtifacts.filter((artifact): artifact is FirstRuntimeArtifact =>
+    FIRST_RUNTIME_ARTIFACTS.includes(artifact as FirstRuntimeArtifact)
+  );
+  const nextIndex = syncRuntimeIndex(projectRoot, index, normalizedArtifacts, refreshedDocs);
+  writeFirstRuntimeIndex(projectRoot, nextIndex);
+  return nextIndex;
+}
+
 export function loadFirstContext(projectRoot: string): FirstContext {
   const index = requireRuntimeAsset(readFirstRuntimeIndex(projectRoot), 'index');
 
@@ -432,8 +446,7 @@ export function refreshFirstArtifacts(
 
   if (mode === 'refresh-docs-from-runtime') {
     const docsProjections = refreshFirstDocsFromRuntime(projectRoot, [...FIRST_RUNTIME_ARTIFACTS]);
-    const nextIndex = syncRuntimeIndex(projectRoot, index, [], docsProjections);
-    writeFirstRuntimeIndex(projectRoot, nextIndex);
+    syncFirstRuntimeIndexEntries(projectRoot, [], docsProjections);
     return { mode, runtimeArtifacts: [], docsProjections };
   }
 

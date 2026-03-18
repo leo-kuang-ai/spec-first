@@ -317,9 +317,9 @@ spec-first gate check <featureId>
 - **不得跳过 gate check 进入下一阶段**
 
 **通过后**:
-- 更新 `stage-state.json` 为 `02_design`
 - 记录 gate check 通过时间到 `findings.md`
-- 提示用户："Gate check 通过，可执行 /spec-first:design"
+- 提示用户："Gate check 通过，可执行 /spec-first:design，或由 /spec-first:orchestrate 执行后续推进"
+- `gate check` 只负责校验；阶段推进由 `stage advance` 或 `orchestrate` 负责
 
 **输出**:
 - `spec.md` 最终版本

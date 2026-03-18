@@ -197,7 +197,7 @@
 
 ## 同步命令
 
-**手动触发**: `spec-first sync context`
+**手动触发**: `/spec-first:sync`
 
 **自动触发**: design 阶段完成后
 

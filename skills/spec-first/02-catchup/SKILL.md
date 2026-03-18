@@ -1,12 +1,13 @@
 ---
 name: "spec-first:catchup"
-description: "定位当前 Feature 并恢复上下文"
+description: "Use when resuming work on the current feature, recovering lost context after an interruption, or verifying which feature workspace is currently active."
 version: 1.1.0
-last_updated: {{DATE}}
+last_updated: 2026-03-18
 changelog: |
   v1.1.0: 新增 Announce at Start、字面即精神原则、When to Use、恢复报告模板、上下文恢复策略、信息缺口处理、决策流程图、references/ 目录、hooks 配置、user-invocable 标记
   v1.0.0: Initial version with standardized metadata
 user-invocable: true
+confirm_policy: auto
 allowed-tools: "Read, Write, Edit, Bash"
 hooks:
   PreToolUse:
@@ -36,6 +37,13 @@ metadata:
 # Skill: catchup
 
 恢复会话上下文，生成恢复报告帮助快速续接工作。
+
+## Skill 类型与确认策略
+
+- 类型：路由控制型
+- confirm_policy: `auto`
+- 作用域：允许写运行态恢复报告，不写 Feature 正式交付物
+- 与 [SHARED.md](../SHARED.md) 的关系：不套用默认产物型 `P0-P5`，按本 skill 的恢复流程执行
 
 ## Announce at Start
 
@@ -312,7 +320,7 @@ Owner: {owner}
 | **Feature 未定位** | `.spec-first/current` 不存在 | 执行 `/spec-first:feature list` 选择 Feature |
 | **阶段状态缺失** | `stage-state.json` 不存在 | 执行 `/spec-first:init` 初始化 |
 | **任务计划缺失** | `task_plan.md` 不存在 | 执行 `/spec-first:task` 拆解任务 |
-| **发现记录为空** | `findings.md` 为空 | 执行 `/spec-first:status` 生成当前状态 |
+| **发现记录为空** | `findings.md` 为空 | 执行 `/spec-first:status` 读取当前状态，再由 catchup 生成恢复摘要 |
 | **无 in_progress 任务** | 所有任务为 planned/complete | 从 task_plan.md 选择下一个任务 |
 
 ### 信息缺口标记格式

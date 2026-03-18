@@ -1,8 +1,8 @@
 ---
 name: "spec-first:status"
-description: "定位当前 Feature 并输出状态概览"
+description: "Use when you need a snapshot of the current feature's stage, coverage, risks, and runtime/docs background health."
 version: 1.1.0
-last_updated: {{DATE}}
+last_updated: 2026-03-18
 changelog: |
   v1.1.0: 新增 Announce at Start、When to Use、状态仪表盘模板、健康分解读、风险指标、决策流程图、references/ 目录、hooks 配置、user-invocable 标记
   v1.0.0: Initial version with standardized metadata
@@ -100,7 +100,7 @@ I'm using the status skill to show the current state of [Feature].
 
 | 指标 | 当前值 | 阈值 | 状态 | 说明 |
 |------|--------|------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ | 需求已定义 |
+| C1 (Design Coverage) | 100% | >0% | ✅ | FR 已被设计覆盖 |
 | C2 (API Coverage) | 100% | 100% | ✅ | 设计已完成 |
 | C3 (Task Coverage) | 80% | 100% | ⚠️ | 部分 FR 缺少 TASK |
 | C4 (Test Coverage FR) | 0% | ≥80% | ❌ | 测试用例未生成 |
@@ -126,10 +126,14 @@ I'm using the status skill to show the current state of [Feature].
 
 | 状态 | 数量 | 占比 |
 |------|------|------|
-| ✅ complete | 6 | 60% |
+| ✅ done | 6 | 60% |
 | 🔄 in_progress | 2 | 20% |
-| ⏸️ planned | 2 | 20% |
+| ⏸️ todo | 2 | 20% |
 | 🚫 blocked | 0 | 0% |
+
+说明：
+- 汇总层只展示 canonical 状态：`todo / in_progress / blocked / done`
+- legacy `complete / completed / verified / planned` 在读取时必须先归一后再展示
 
 **总任务数**: 10
 **完成率**: 60%
@@ -214,6 +218,7 @@ I'm using the status skill to show the current state of [Feature].
 覆盖率完整性 = (C1 + C2 + C3 + C4 + C5 + C6) / 6
 ```
 
+- C1 表示 Design Coverage，不得在状态面板中重命名为 Spec Coverage
 - C1-C6 按阈值达标情况计分
 - 达标 = 100 分，未达标 = 0 分
 

@@ -65,7 +65,7 @@
 
 1. **FR→DS 覆盖率**
    - 命令: `spec-first metrics coverage`
-   - 要求: C1 (Design Coverage) > 0%
+   - 要求: C2 (API Coverage / FR→DS Coverage) > 0%
    - 失败: 补齐缺失的 DS
 
 2. **孤立项检测**
@@ -156,7 +156,7 @@ Design 方案: POST /api/orders 不支持幂等
 
 ## 覆盖率检查
 
-### C1: Design Coverage
+### C2: API Coverage / FR→DS Coverage
 
 **定义**: FR→DS 覆盖率
 
@@ -168,7 +168,7 @@ Design 方案: POST /api/orders 不支持幂等
 
 **输出示例**:
 ```
-C1 (Design Coverage): 80% (8/10 FR)
+C2 (API Coverage): 80% (8/10 FR)
 
 未覆盖 FR:
 - FR-AUTH-009: 第三方登录

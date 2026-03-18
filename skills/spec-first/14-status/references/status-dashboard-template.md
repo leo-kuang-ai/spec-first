@@ -38,7 +38,7 @@
 
 | 指标 | 当前值 | 阈值 | 状态 | 说明 |
 |------|--------|------|------|------|
-| C1 (Spec Coverage) | {c1}% | >0% | {status} | 需求覆盖率 |
+| C1 (Design Coverage) | {c1}% | >0% | {status} | FR 被 DS 覆盖比例 |
 | C2 (API Coverage) | {c2}% | 100% | {status} | API 设计覆盖率 |
 | C3 (Task Coverage) | {c3}% | 100% | {status} | 任务覆盖率 |
 | C4 (Test Coverage FR) | {c4}% | ≥80% | {status} | 测试对 FR 覆盖率 |
@@ -67,11 +67,14 @@
 
 | 状态 | 数量 | 占比 |
 |------|------|------|
-| ✅ complete | {complete_count} | {complete_pct}% |
-| ✅ verified | {verified_count} | {verified_pct}% |
+| ✅ done | {done_count} | {done_pct}% |
 | 🔄 in_progress | {in_progress_count} | {in_progress_pct}% |
-| ⏸️ planned | {planned_count} | {planned_pct}% |
+| ⏸️ todo | {todo_count} | {todo_pct}% |
 | 🚫 blocked | {blocked_count} | {blocked_pct}% |
+
+说明：
+- 汇总层只展示 canonical 状态：`todo / in_progress / blocked / done`
+- legacy `complete/completed/verified/planned` 在读取时统一归一后再展示
 
 **总任务数**: {total_tasks}
 **完成率**: {completion_rate}%
@@ -169,7 +172,7 @@
 
 | 指标 | 当前值 | 阈值 | 状态 | 说明 |
 |------|--------|------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ | 需求已定义 |
+| C1 (Design Coverage) | 100% | >0% | ✅ | 需求已完成设计覆盖 |
 | C2 (API Coverage) | 100% | 100% | ✅ | 设计已完成 |
 | C3 (Task Coverage) | 100% | 100% | ✅ | 任务已拆解 |
 | C4 (Test Coverage FR) | 85% | ≥80% | ✅ | 测试覆盖达标 |
@@ -195,9 +198,9 @@
 
 | 状态 | 数量 | 占比 |
 |------|------|------|
-| ✅ complete | 6 | 60% |
+| ✅ done | 6 | 60% |
 | 🔄 in_progress | 2 | 20% |
-| ⏸️ planned | 2 | 20% |
+| ⏸️ todo | 2 | 20% |
 | 🚫 blocked | 0 | 0% |
 
 **总任务数**: 10
@@ -267,7 +270,7 @@
 
 | 指标 | 当前值 | 阈值 | 状态 | 说明 |
 |------|--------|------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ | 需求已定义 |
+| C1 (Design Coverage) | 100% | >0% | ✅ | FR 已完成设计覆盖 |
 | C2 (API Coverage) | 66.7% | 100% | ❌ | 部分 FR 缺少 DS |
 | C3 (Task Coverage) | 50% | 100% | ❌ | 任务拆解不完整 |
 | C4 (Test Coverage FR) | 0% | ≥80% | ❌ | 测试用例未生成 |

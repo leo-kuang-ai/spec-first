@@ -110,19 +110,22 @@ G-PLAN-03: FAIL (0)
 
 | 状态 | 权重 |
 |------|------|
-| complete | 100% |
-| verified | 100% |
+| done | 100% |
 | in_progress | 50% |
-| planned | 0% |
+| todo | 0% |
 | blocked | 0% |
+
+说明：
+- 汇总层 canonical 状态为 `todo / in_progress / blocked / done`
+- `complete` / `completed` / `verified` / `planned` 等 legacy 状态在状态面板中统一归一后再统计
 
 ### 示例
 
 ```
 总任务: 10 个
-complete: 6 个
+done: 6 个
 in_progress: 2 个
-planned: 2 个
+todo: 2 个
 
 完成任务数 = 6 + 2 × 50% = 7
 任务进度 = (7 / 10) × 100 = 70 分

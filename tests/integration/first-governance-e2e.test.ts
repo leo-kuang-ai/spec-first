@@ -142,6 +142,42 @@ describe('first governance e2e', () => {
     expect(index.conventions.healthy).toBe(true);
   });
 
+  it('writes back structural feature changes when wrap_up advances with feature artifact updates', () => {
+    writeStageState(Stage.WRAP_UP);
+    writeFileSync(
+      join(SPEC_DIR, 'design.md'),
+      [
+        '# Design',
+        '## 模块划分',
+        '- Billing Core',
+        '',
+        '## API 设计',
+        '- POST /billing/invoices',
+      ].join('\n'),
+      'utf-8'
+    );
+
+    const result = advance(FEATURE_ID, TMP);
+
+    expect(result.from).toBe(Stage.WRAP_UP);
+    expect(result.to).toBe(Stage.DONE);
+
+    const updatesLog = readFileSync(
+      join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
+      'utf-8'
+    );
+    expect(updatesLog).toContain('"writebackMode":"incremental-structural-update"');
+    expect(updatesLog).toContain('"decision":"must_update"');
+    expect(updatesLog).toContain('Billing Core');
+
+    const summary = readFileSync(
+      join(TMP, '.spec-first', 'runtime', 'first', 'summary.json'),
+      'utf-8'
+    );
+    expect(summary).toContain('Billing Core');
+    expect(summary).toContain('/billing/invoices');
+  });
+
   it('reprojects canonical docs from runtime when release advances to done with docs drift', () => {
     writeStageState(Stage.RELEASE);
     writeFileSync(join(TMP, 'docs', 'first', 'README.md'), '# Drifted README\n', 'utf-8');

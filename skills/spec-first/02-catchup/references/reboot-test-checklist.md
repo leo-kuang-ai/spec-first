@@ -14,7 +14,7 @@
 
 - [ ] Feature ID 已识别（格式：`FSREQ-YYYYMMDD-<ABBR>-NNN`）
 - [ ] Feature 标题已获取
-- [ ] 当前阶段已确定（00_init ~ 08_done）
+- [ ] 当前阶段已确定（00_init ~ 07_release）
 - [ ] 阶段状态已确定（in_progress/completed）
 - [ ] 停留时间已计算
 
@@ -47,7 +47,7 @@ Feature: {featureId} - {title}
 
 **常见失败原因**：
 - `.spec-first/current` 不存在 → 执行 `spec-first feature list` 选择 Feature
-- `stage-state.json` 不存在 → 执行 `spec-first init` 初始化
+- `stage-state.json` 不存在 → 执行 `/spec-first:init` 初始化
 
 ---
 
@@ -96,7 +96,7 @@ Owner: {owner}
 
 **常见失败原因**：
 - `task_plan.md` 不存在 → 执行 `/spec-first:task` 拆解任务
-- 所有任务为 planned/complete → 从 task_plan.md 选择下一个任务
+- 所有任务为 todo/done → 从 task_plan.md 选择下一个任务
 
 ---
 
@@ -131,12 +131,12 @@ Owner: {owner}
 ```markdown
 ❌ 无法回答
 原因: findings.md 为空或无最近记录
-补齐方案: 执行 `/spec-first:status` 获取当前状态
+补齐方案: 执行 `/spec-first:status` 读取当前状态，再由 catchup 补写恢复摘要
 ```
 
 **常见失败原因**：
-- `findings.md` 不存在 → 执行 `/spec-first:status` 生成状态
-- `findings.md` 为空 → 执行 `/spec-first:status` 生成状态
+- `findings.md` 不存在 → 执行 `/spec-first:status` 读取状态，再由 catchup 生成恢复摘要
+- `findings.md` 为空 → 执行 `/spec-first:status` 读取状态，再由 catchup 生成恢复摘要
 - 最后记录 > 7 天 → 标记为过期，建议重新生成
 
 ---

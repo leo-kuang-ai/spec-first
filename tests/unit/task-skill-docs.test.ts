@@ -27,4 +27,11 @@ describe('06-task skill docs consistency', () => {
     expect(skill).toContain('background_input_status');
     expect(skill).toContain('输入层');
   });
+
+  it('should keep task status examples aligned with canonical status set', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('todo | in_progress | blocked | done');
+    expect(skill).not.toContain('todo | in_progress | blocked | verified | done');
+  });
 });

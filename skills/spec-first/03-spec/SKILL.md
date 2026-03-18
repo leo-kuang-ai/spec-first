@@ -1,6 +1,6 @@
 ---
 name: "spec-first:spec"
-description: "定义需求规格，通过 Phase 0（PRD）+ Step 0-8 流程生成 FR 功能需求与验收标准（AC）。触发条件：(1) 阶段为 01_specify，(2) 用户说'写需求规格'/'定义 FR'/'生成 spec'/'写 PRD'，(3) 用户提供新功能描述需要结构化。包含复杂度自适应（Trivial/Simple/Moderate/Complex）、质量门禁（C-PRD >= 85%）、追溯矩阵注册。"
+description: "Use when a feature is in 01_specify and you need to turn a raw request into structured requirements, acceptance criteria, and traceable spec outputs."
 version: 3.0.0
 last_updated: 2026-03-09
 changelog: "v3.0.0: Progressive Disclosure 重构，精简到 ~200 行; v2.2.0: 新增 Phase 0.0/0.2/0.5 增强; v2.1.0: 新增自动 Feature 定位; v2.0.0: 重构为 Phase 0 + Step 0-8 流程"
@@ -220,12 +220,19 @@ spec-first validate format <featureId>
 
 **路径基准**: 相对于 `skills/spec-first/03-spec/` 目录
 
+### 主文档必须发现（Primary References）
+
 - [Phase 0 PRD 工作流](references/phase0-prd-workflow.md) - Phase 0 详细流程
 - [Step 0-8 工作流](references/steps-fr-ac-workflow.md) - Step 0-8 详细流程
 - [复杂度矩阵](references/complexity-matrix.md) - 复杂度判定矩阵
 - [反合理化守卫](references/anti-rationalization-guards.md) - 反合理化守卫
 - [CLI 命令参考](references/cli-commands-reference.md) - CLI 命令参考
 - [质量门禁](references/quality-gates.md) - 质量门禁详解
+
+### 内部辅助参考（Secondary / Helper References）
+
+以下文件仍然是有效真源，但不要求在每次主流程中都显式加载：
+
 - `references/spec-review-checklist.md` - 规格审查清单
 - `references/test-level-glossary.md` - 测试层级术语表
 - `references/constitution-authority.md` - 宪法权威说明
@@ -233,6 +240,13 @@ spec-first validate format <featureId>
 - `references/prd-template-iteration.md` - PRD 模板（迭代增强）
 - `references/adr-lite-template.md` - ADR-lite 模板
 - `references/id-types-and-status.md` - ID 类型与状态规范
+- `references/question-gate-rules.md` - 问题门禁细则
+- `references/final-confirmation-template.md` - 最终确认模板
+- `references/complexity-classification.md` - 复杂度分类详解
+- `references/convergence-qa-rules.md` - 收敛问答规则
+- `references/expansion-sweep-rules.md` - 扩展扫描规则
+- `references/findings-state-header.md` - findings 状态头模板
+- `references/prd-extraction-prompt.md` - PRD 抽取提示词
 
 ---
 

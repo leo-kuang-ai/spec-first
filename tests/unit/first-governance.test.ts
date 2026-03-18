@@ -98,6 +98,39 @@ describe('first governance', () => {
     expect(records[0]?.updateSource).toBe('governance-wrap-up');
   });
 
+  it('classifies structural feature changes as must_update and performs incremental writeback', () => {
+    writeFileSync(
+      join(TMP, 'specs', FEATURE_ID, 'design.md'),
+      [
+        '# Design',
+        '## 模块划分',
+        '- Billing Core',
+        '',
+        '## API 设计',
+        '- POST /billing/invoices',
+      ].join('\n'),
+      'utf-8'
+    );
+
+    const diff = analyzeProjectCognitionDiff(TMP, Stage.WRAP_UP, FEATURE_ID);
+    expect(diff.decision).toBe('must_update');
+    expect(diff.structuralChanges).toHaveLength(2);
+    expect(diff.suggestedAssets).toEqual(
+      expect.arrayContaining(['summary.json', 'structure-overview.json', 'api-contracts.json'])
+    );
+
+    const result = applyProjectCognitionWriteback(FEATURE_ID, TMP, Stage.WRAP_UP);
+    expect(result.gateStatus).toBe('approved');
+    expect(result.writebackMode).toBe('incremental-structural-update');
+    expect(result.updatedAssets).toEqual(
+      expect.arrayContaining(['summary.json', 'structure-overview.json', 'api-contracts.json'])
+    );
+
+    const records = getProjectCognitionUpdateRecords(TMP);
+    expect(records[0]?.decision).toBe('must_update');
+    expect(JSON.stringify(records[0])).toContain('Billing Core');
+  });
+
   it('classifies canonical docs drift as should_update and refreshes docs from runtime', () => {
     writeFileSync(join(TMP, 'docs', 'first', 'README.md'), '# Drifted README\n', 'utf-8');
 

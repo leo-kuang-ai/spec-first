@@ -21,4 +21,13 @@ describe('13-orchestrate skill docs consistency', () => {
     expect(skill).toContain('recommended_action');
     expect(skill).toContain('展示层');
   });
+
+  it('should document release and done stages as runtime-route responsibilities', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('07_release / 08_done 责任说明');
+    expect(skill).toContain('runtime route');
+    expect(skill).toContain('golive');
+    expect(skill).toContain('done');
+  });
 });

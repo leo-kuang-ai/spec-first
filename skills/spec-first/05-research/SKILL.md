@@ -1,6 +1,6 @@
 ---
 name: "spec-first:research"
-description: "定位 Feature 上下文并生成调研结论"
+description: "Use when design work is blocked by technical uncertainty, external dependencies, tool choices, or missing evidence that requires structured research."
 version: 1.7.0
 last_updated: 2026-03-15
 changelog: |
@@ -13,14 +13,14 @@ changelog: |
   v1.1.0: 补充字面即精神原则、模板驱动约束、决策流程图、Plan Mode 协同、示例输出
   v1.0.0: Initial version with standardized metadata
 user-invocable: true
-allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch, mcp__context7__resolve-library-id, mcp__context7__query-docs, mcp__serena__find_symbol, mcp__serena__get_symbols_overview"
+allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, WebSearch, mcp__fetch__fetch, mcp__context7__resolve_library_id, mcp__context7__query_docs, mcp__serena__find_symbol, mcp__serena__get_symbols_overview"
 metadata:
   version: "1.7.0"
   phase: "stable"
   category: "spec-phase"
 hooks:
   PreToolUse:
-    - matcher: "WebSearch|mcp__fetch__fetch|mcp__context7__resolve-library-id|mcp__context7__query-docs"
+    - matcher: "WebSearch|mcp__fetch__fetch|mcp__context7__resolve_library_id|mcp__context7__query_docs"
       hooks:
         - type: reminder
           message: "[research] 查阅资料后立即更新 findings.md（2-Action Rule）"
@@ -33,7 +33,7 @@ hooks:
       hooks:
         - type: reminder
           message: "[research] 文件已更新，检查是否需同步 findings.md"
-    - matcher: "WebSearch|mcp__fetch__fetch|mcp__context7__resolve-library-id|mcp__context7__query-docs"
+    - matcher: "WebSearch|mcp__fetch__fetch|mcp__context7__resolve_library_id|mcp__context7__query_docs"
       hooks:
         - type: reminder
           message: "[research] 资料已查阅，提取关键结论到 findings.md"
@@ -189,7 +189,7 @@ I'm using the research skill to evaluate [调研主题].
 research 阶段输出技术选型依据，不输出实现方案：
 - **必须写**：调研目标、候选方案、对比维度（成本/风险/成熟度/生态）、优劣分析、推荐结论
 - **禁止写**：具体实现代码、类/函数设计、部署细节（这些属于 design/code 阶段）
-- **自我修正上限**：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）
+- **自我修正上限**：`3` 轮
 - **假设标记**：当结论依赖未验证假设时，必须标记 `[NEEDS VERIFICATION][TYPE]`
   - `PERF`（性能假设）
   - `COMPAT`（兼容性假设）

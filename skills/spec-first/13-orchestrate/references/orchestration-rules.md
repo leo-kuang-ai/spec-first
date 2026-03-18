@@ -15,7 +15,7 @@
 - 检查点：前置条件是否满足
 
 **Batch 2: Skill 执行**
-- 调度目标 Skill（spec/design/task/code/test/archive）
+- 调度目标 Skill（spec/design/task/code/archive）
 - 执行 Skill P0-P5
 - 检查点：Skill 执行结果
 
@@ -189,7 +189,7 @@ TASK-003: [P] 实现找回密码接口
 
 ## 背景状态与依赖强度
 - `full`: 存在并成功读取匹配背景
-- `degraded`: 存在部分背景，但 stage-view / role-view 不完整
+- `degraded`: 存在部分背景，但所需 canonical runtime 资产或 docs 投影视图不完整
 - `blind`: 缺少足够背景输入
 - `L1`: 推荐
 - `L2`: 强烈推荐

@@ -2,12 +2,13 @@
  * M7 ToolIntegration 单元测试
  * Hook Installer + Commit + Feature CLI + Doctor Extended + AI Runtime Hook
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { installHooks, uninstallHooks, checkHooks } from '../../src/core/tool-integration/hook-installer.js';
 import { generateAIHookConfigs, registerAIHooks, executePreToolUse, executeStopHook } from '../../src/core/tool-integration/ai-runtime-hook.js';
 import { handleFeature } from '../../src/cli/commands/feature.js';
+import { handleStatus } from '../../src/cli/commands/status.js';
 import { handleCommit } from '../../src/cli/commands/commit.js';
 import { ExitCode } from '../../src/shared/types.js';
 
@@ -17,6 +18,28 @@ function withCwd(dir: string, fn: () => number): number {
   const orig = process.cwd;
   process.cwd = () => dir;
   try { return fn(); } finally { process.cwd = orig; }
+}
+
+function captureConsole(run: () => number): { code: number; stdout: string; stderr: string } {
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const logSpy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
+    stdout.push(String(msg ?? ''));
+  });
+  const errSpy = vi.spyOn(console, 'error').mockImplementation((msg?: unknown) => {
+    stderr.push(String(msg ?? ''));
+  });
+
+  try {
+    return {
+      code: run(),
+      stdout: stdout.join('\n'),
+      stderr: stderr.join('\n'),
+    };
+  } finally {
+    logSpy.mockRestore();
+    errSpy.mockRestore();
+  }
 }
 
 beforeEach(() => {
@@ -141,21 +164,141 @@ describe('handleFeature', () => {
   });
 
   it('should show current (no current set)', () => {
-    const code = withCwd(TMP, () => handleFeature(['current']));
+    const { code, stdout } = captureConsole(() => withCwd(TMP, () => handleFeature(['current'])));
     expect(code).toBe(ExitCode.SUCCESS);
+    expect(stdout).toContain('尚未设置当前 Feature');
+    expect(stdout).toContain('spec-first feature switch <featureId> --yes');
   });
 
   it('should switch feature', () => {
     writeFeatureState();
-    const code = withCwd(TMP, () => handleFeature(['switch', FEAT]));
+    const { code, stdout } = captureConsole(() => withCwd(TMP, () => handleFeature(['switch', FEAT])));
     expect(code).toBe(ExitCode.SUCCESS);
     const current = readFileSync(join(TMP, '.spec-first', 'current'), 'utf-8');
     expect(current).toBe(FEAT);
+    expect(stdout).toContain(`已切换到：${FEAT}`);
+    expect(stdout).toContain('.spec-first/current 已更新');
+    expect(stdout).toContain('/spec-first:catchup');
   });
 
   it('should fail switch for nonexistent feature', () => {
-    const code = withCwd(TMP, () => handleFeature(['switch', 'NONEXIST']));
+    const { code, stderr } = captureConsole(() =>
+      withCwd(TMP, () => handleFeature(['switch', 'NONEXIST']))
+    );
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
+    expect(stderr).toContain('失败时未改写 .spec-first/current');
+  });
+});
+
+describe('handleStatus', () => {
+  function writeRuntimeIndex() {
+    mkdirSync(join(TMP, '.spec-first', 'runtime', 'first'), { recursive: true });
+    writeFileSync(
+      join(TMP, '.spec-first', 'runtime', 'first', 'index.json'),
+      JSON.stringify({
+        version: '1.0.0',
+        lastRun: '2026-03-18T00:00:00Z',
+        summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'a', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'b', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'c', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'd', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'e', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'f', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'g', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'h', lastUpdated: '2026-03-18T00:00:00Z', healthy: true },
+        databaseSchema: {
+          path: '.spec-first/runtime/first/database-schema.json',
+          fileHash: 'i',
+          lastUpdated: '2026-03-18T00:00:00Z',
+          healthy: true,
+          status: 'healthy',
+        },
+        docsProjection: {
+          'docs/first/index.md': {
+            path: 'docs/first/index.md',
+            fileHash: 'p',
+            lastUpdated: '2026-03-18T00:00:00Z',
+            healthy: true,
+          },
+        },
+        status: 'current',
+      }),
+    );
+  }
+
+  function writeTaskPlan() {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      [
+        '| Task ID | Title | Status | Depends On | Traces | Owner |',
+        '|---------|-------|--------|------------|--------|-------|',
+        '| TASK-AUTH-001 | Build login UI | done | - | FR-AUTH-001 | dev |',
+        '| TASK-AUTH-002 | Wire SMS API | in_progress | TASK-AUTH-001 | FR-AUTH-001 | dev |',
+        '| TASK-AUTH-003 | Add retry logic | planned | TASK-AUTH-002 | FR-AUTH-001 | dev |',
+        '| TASK-AUTH-004 | Fix flaky test | blocked | TASK-AUTH-002 | FR-AUTH-001 | qa |',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+  }
+
+  function writeMatrix() {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'traceability-matrix.md'),
+      [
+        '| ID | Type | Title | Status | Upstream | Downstream |',
+        '|----|------|-------|--------|----------|------------|',
+        '| REQ-AUTH-001 | REQ | Login request | Accepted |  | FR-AUTH-001 |',
+        '| FR-AUTH-001 | FR | SMS login | Accepted | REQ-AUTH-001 | DS-AUTH-001,TASK-AUTH-001,TC-UT-AUTH-001 |',
+        '| DS-AUTH-001 | DS | Login design | Accepted | FR-AUTH-001 | TASK-AUTH-001 |',
+        '| TASK-AUTH-001 | TASK | Build login UI | Accepted | FR-AUTH-001,DS-AUTH-001 |  |',
+        '| TASK-AUTH-002 | TASK | Wire SMS API | Implemented | FR-AUTH-001,DS-AUTH-001 |  |',
+        '| TASK-AUTH-003 | TASK | Add retry logic | Planned | FR-AUTH-001,DS-AUTH-001 |  |',
+        '| TASK-AUTH-004 | TASK | Fix flaky test | Deferred | FR-AUTH-001,DS-AUTH-001 |  |',
+        '| TC-UT-AUTH-001 | TC | Login test | Verified | FR-AUTH-001 |  |',
+        '',
+      ].join('\n'),
+      'utf-8',
+    );
+  }
+
+  it('should print layered background status, canonical task states, and next step guidance', () => {
+    writeFeatureState();
+    writeRuntimeIndex();
+    writeTaskPlan();
+    writeMatrix();
+    writeFileSync(join(TMP, '.spec-first', 'current'), FEAT, 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        mode: 'N',
+        size: 'M',
+        platforms: ['h5'],
+        backgroundInputStatus: 'full',
+        stageStatus: 'ready_to_advance',
+        currentStage: '04_implement',
+        history: [],
+        terminal: false,
+        title: 'Auth Module',
+        createdAt: '2026-02-11T00:00:00Z',
+        updatedAt: '2026-02-11T00:00:00Z',
+      }),
+    );
+
+    const { code, stdout } = captureConsole(() => withCwd(TMP, () => handleStatus([])));
+
+    expect(code).toBe(ExitCode.SUCCESS);
+    expect(stdout).toContain('background_input_status: full');
+    expect(stdout).toContain('runtime 真源: current');
+    expect(stdout).toContain('docs 投影视图: healthy');
+    expect(stdout).toContain('同步状态: in_sync');
+    expect(stdout).toContain('C1 (Design Coverage): 100.0%');
+    expect(stdout).toContain('done: 1');
+    expect(stdout).toContain('in_progress: 1');
+    expect(stdout).toContain('todo: 1');
+    expect(stdout).toContain('blocked: 1');
+    expect(stdout).toContain('建议下一步: /spec-first:code');
   });
 });
 

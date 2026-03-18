@@ -1,6 +1,6 @@
 ---
 name: "spec-first:design"
-description: "定位 Feature 并校验阶段为技术设计（02_design）"
+description: "Use when a feature is in 02_design and you need architecture, API, data, or integration decisions based on an approved spec."
 version: 1.2.0
 last_updated: 2026-03-15
 changelog: |
@@ -30,7 +30,7 @@ changelog: |
 design 阶段输出系统级 HOW，不输出实现级 HOW：
 - 必须写：模块边界、接口契约、数据模型、一致性/回滚策略
 - 禁止写：类/函数级实现、具体代码片段、与需求无关的库细节
-- 自我修正上限：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）
+- 自我修正上限：`3` 轮
 - 当设计依据不足时必须标记 `[NEEDS CLARIFICATION][TYPE]`（每轮最多 3 项）
 
 ## Simplicity First - 设计简洁性守卫

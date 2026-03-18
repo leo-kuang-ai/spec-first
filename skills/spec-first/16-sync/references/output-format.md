@@ -20,8 +20,8 @@ Orphan 项 ({count}):
 - TASK-007 (无 DS 映射)
 
 状态更新 ({count}):
-- RFC-001: draft → approved
-- RFC-002: approved → implemented
+- FR-AUTH-001: Planned → Implemented
+- TASK-AUTH-003: Implemented → Verified
 
 是否确认并执行？[Y/n]
 ```
@@ -72,5 +72,5 @@ Feature: FSREQ-20260305-AUTH-001
 原因: traceability-matrix.md 不存在
 
 💡 解决方案:
-运行 spec-first matrix update 初始化矩阵
+先补齐 `traceability-matrix.md`，再运行 `/spec-first:sync`
 ```

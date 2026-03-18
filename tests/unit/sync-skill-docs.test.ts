@@ -18,4 +18,14 @@ describe('16-sync skill docs consistency', () => {
     expect(skill).toContain('index.json');
     expect(skill).toContain('summary.json');
   });
+
+  it('should keep sync truth source aligned with its reference rules', () => {
+    const skill = read(SKILL_MD);
+    const rules = readFileSync(join(SYNC_ROOT, 'references/sync-rules.md'), 'utf-8');
+
+    expect(skill).toContain('当前阶段产物、验证证据与 findings');
+    expect(rules).toContain('当前阶段产物与验证证据');
+    expect(skill).not.toContain('spec-first rfc list');
+    expect(rules).toContain('不依赖独立 `RFC` 列表作为状态真源');
+  });
 });

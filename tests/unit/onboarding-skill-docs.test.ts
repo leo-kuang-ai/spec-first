@@ -11,6 +11,15 @@ function read(path: string): string {
 }
 
 describe('00-onboarding skill docs consistency', () => {
+  it('should use spec-first discovery naming and trigger-style description', () => {
+    expect(existsSync(SKILL_MD)).toBe(true);
+
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('name: "spec-first:onboarding"');
+    expect(skill).toContain('description: "Use when');
+  });
+
   it('should guide users to run first before personalized onboarding', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(SCENARIO_MAPPING)).toBe(true);

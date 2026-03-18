@@ -17,6 +17,8 @@
 | 04_implement | 07-code | 代码实现 | 08-review |
 | 05_verify | 12-verify | 阶段验收 | - |
 | 06_wrap_up | 10-archive | 归档总结 | - |
+| 07_release | runtime route (`golive`) | 上线就绪检查 | - |
+| 08_done | runtime route (`done`) | 最终收口 | - |
 
 ---
 
@@ -129,6 +131,17 @@ plan → skill → verify → advance
 ```
 verify → advance
 ```
+
+---
+
+## Release / Done 承接
+
+`07_release` 与 `08_done` 由 runtime route 承接，而不是额外 skill 目录：
+
+- `07_release` → `spec-first golive <featureId>`
+- `08_done` → `spec-first done <featureId> --yes`
+
+因此 orchestrate 的主文档与映射表都必须显式写出这条链路，避免读者误解为流程在 `10-archive` 结束。
 
 ---
 

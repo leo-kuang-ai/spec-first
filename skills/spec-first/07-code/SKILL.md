@@ -1,11 +1,11 @@
 ---
 name: "spec-first:code"
-description: "执行代码实现。支持单 TASK 与自动批量模式；当前以自动批量提示词驱动，运行时可按宿主能力落到人工/半自动调度。"
+description: "Use when implementation work is ready, a TASK has been approved, and you need to execute code changes in the current feature workspace."
 version: "2.1.0"
-last_updated: "2026-03-14"
+last_updated: "2026-03-18"
 changelog: |
-  v2.1.0: 收敛为当前可执行模式；去除冗余 FAQ；对齐真实配置/状态文件/能力边界
-  v2.0.0: 完全重写为批量模式，支持依赖解析、并发执行、失败率控制
+  v2.1.0: 收敛为当前可执行模式；去除冗余 FAQ；对齐真实配置/状态文件/能力边界；明确 stop_on_failure_rate 等仍属目标态
+  v2.0.0: 完全重写为批量模式；当前只保留依赖解析、上下文打包、checkpoint/report 等已落地能力，失败率控制仍未接入真实运行时
   v1.1.0: 单 TASK 模式（已废弃）
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
@@ -27,6 +27,7 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
 
 - skill 以自动批量模式定义完整执行流程
 - batch executor 仍未完全接入真实 subagent 执行链路
+- 失败率控制、超时裁剪、多层并发控制仍停留在目标态设计，不是当前稳定运行能力
 - 因此当前默认做法是：
   - 提示词仍按自动批量模式组织
   - 运行时根据宿主能力落到真实 subagent 或人工/半自动调度
@@ -98,6 +99,17 @@ runtime:
   - `max_layers`
 
 这些最多只能视为目标态设计，不应当作当前执行依据。
+
+## 当前未兑现的目标态能力
+
+以下能力仍然属于设计目标，而不是当前稳定承诺：
+
+- 基于 `stop_on_failure_rate` 的自动熔断
+- 基于 `task_timeout_ms` 的任务级超时治理
+- 基于 `context_pack_size` 的统一上下文预算调度
+- 基于 `max_layers` 的层级上限控制
+
+如果需要这些能力，必须先以代码实现或测试证据证明已落地，再回写到 skill 文档。
 
 ## 硬规则
 

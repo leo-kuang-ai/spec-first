@@ -1,12 +1,14 @@
 import { execFileSync } from 'node:child_process';
 import { bootstrapFirstRuntime } from './first-bootstrap.js';
+import { detectStructuralChanges, type StructuralChange } from './first-change-detection.js';
 import {
   BASE_PROJECTION_DOCS,
   CONDITIONAL_PROJECTION_DOCS,
   FORMAL_TOPIC_PROJECTION_DOCS,
   matchRuntimeArtifactsByChangedFile,
 } from './first-artifact-mapping.js';
-import { refreshFirstArtifacts, type FirstRefreshResult } from './first-context.js';
+import { refreshFirstArtifacts, syncBackgroundInputStatus, type FirstRefreshResult } from './first-context.js';
+import { incrementalUpdateRuntimeAssets } from './first-incremental-update.js';
 import {
   getFirstProjectCognitionUpdatesPath,
   readFirstRuntimeIndex,
@@ -24,6 +26,7 @@ export interface ProjectCognitionDiff {
   reasons: string[];
   suggestedAssets: string[];
   evidence: string[];
+  structuralChanges: StructuralChange[];
 }
 
 export interface ProjectCognitionWritebackResult {
@@ -36,7 +39,7 @@ export interface ProjectCognitionWritebackResult {
   updatedTopicDocs: string[];
   updatedConditionalDocs: string[];
   conditionalStatuses: Record<string, 'healthy' | 'not_applicable' | 'degraded'>;
-  writebackMode?: 'bootstrap' | 'refresh-all' | 'refresh-docs-from-runtime';
+  writebackMode?: 'bootstrap' | 'refresh-all' | 'refresh-docs-from-runtime' | 'incremental-structural-update';
   refreshResult?: FirstRefreshResult;
   writebackPerformed: boolean;
 }
@@ -217,11 +220,49 @@ function readConditionalStatuses(projectRoot: string): Record<string, 'healthy' 
 
 export function analyzeProjectCognitionDiff(
   projectRoot: string,
-  triggerStage: Stage.WRAP_UP | Stage.DONE
+  triggerStage: Stage.WRAP_UP | Stage.DONE,
+  featureId?: string
 ): ProjectCognitionDiff {
   const changedFiles = collectProjectCognitionChangedFiles(projectRoot).filter(
     (file) => !file.startsWith('.spec-first/runtime/first/')
   );
+  const structuralChanges = featureId ? detectStructuralChanges(projectRoot, featureId) : [];
+  if (structuralChanges.length > 0) {
+    const suggestedAssets = Array.from(
+      new Set(
+        structuralChanges.flatMap((change) => matchRuntimeArtifactsByChangedFile(change.evidence.split('#')[0] ?? ''))
+      )
+    );
+    const fallbackAssets = Array.from(
+      new Set(
+        structuralChanges.flatMap((change) => {
+          switch (change.type) {
+            case 'module':
+              return ['summary.json', 'structure-overview.json'];
+            case 'api':
+              return ['summary.json', 'api-contracts.json'];
+            case 'risk':
+              return ['summary.json'];
+            case 'flow':
+              return ['critical-flows.json', 'entry-guide.json'];
+            case 'convention':
+              return ['conventions.json'];
+            case 'tech-stack':
+              return ['summary.json'];
+          }
+        })
+      )
+    );
+    return {
+      triggerStage,
+      changedFiles,
+      decision: 'must_update',
+      reasons: ['detected structural feature changes'],
+      suggestedAssets: suggestedAssets.length > 0 ? suggestedAssets : fallbackAssets,
+      evidence: structuralChanges.map((change) => change.evidence).slice(0, 10),
+      structuralChanges,
+    };
+  }
   const inferred = inferDecision(changedFiles);
 
   return {
@@ -231,6 +272,7 @@ export function analyzeProjectCognitionDiff(
     reasons: inferred.reasons,
     suggestedAssets: collectSuggestedAssets(changedFiles),
     evidence: inferred.evidence,
+    structuralChanges: [],
   };
 }
 
@@ -249,7 +291,7 @@ export function applyProjectCognitionWriteback(
   projectRoot: string,
   triggerStage: Stage.WRAP_UP | Stage.DONE
 ): ProjectCognitionWritebackResult {
-  const diff = analyzeProjectCognitionDiff(projectRoot, triggerStage);
+  const diff = analyzeProjectCognitionDiff(projectRoot, triggerStage, featureId);
   let gateStatus: ProjectCognitionGateStatus = 'skipped';
   let gateReason = diff.reasons.join('; ');
   let updatedAssets: string[] = [];
@@ -265,7 +307,17 @@ export function applyProjectCognitionWriteback(
         writebackPerformed = true;
       }
 
-      if (diff.decision === 'must_update') {
+      if (diff.structuralChanges.length > 0) {
+        writebackMode = 'incremental-structural-update';
+        const result = incrementalUpdateRuntimeAssets(projectRoot, featureId, diff.structuralChanges);
+        updatedAssets = Array.from(
+          new Set([...result.updatedRuntimeAssets, ...result.docsProjections])
+        );
+        writebackPerformed =
+          writebackPerformed ||
+          result.updatedRuntimeAssets.length > 0 ||
+          result.docsProjections.length > 0;
+      } else if (diff.decision === 'must_update') {
         writebackMode = 'refresh-all';
         refreshResult = refreshFirstArtifacts(projectRoot, 'refresh-all');
         updatedAssets = Array.from(
@@ -290,9 +342,15 @@ export function applyProjectCognitionWriteback(
 
       gateStatus = 'approved';
       gateReason =
-        diff.decision === 'must_update'
+        diff.structuralChanges.length > 0
+          ? 'structural project cognition writeback approved'
+          : diff.decision === 'must_update'
           ? 'project cognition writeback approved'
           : 'canonical docs projection refresh approved';
+
+      if (writebackPerformed) {
+        syncBackgroundInputStatus(projectRoot);
+      }
     } catch (error) {
       gateStatus = 'blocked';
       gateReason = error instanceof Error ? error.message : String(error);
@@ -311,6 +369,7 @@ export function applyProjectCognitionWriteback(
     gateStatus,
     gateReason,
     changedFiles: diff.changedFiles,
+    structuralChanges: diff.structuralChanges,
     updatedAssets,
     updatedRuntimeAssets: partitioned.updatedRuntimeAssets,
     updatedBaseDocs: partitioned.updatedBaseDocs,

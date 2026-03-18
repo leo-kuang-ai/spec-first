@@ -59,6 +59,43 @@ describe('handleMetrics', () => {
 });
 
 describe('handleDoctor', () => {
+  it('should use dry-run bootstrap by default', () => {
+    let observedDryRun: boolean | undefined;
+
+    const code = withCwd(TMP, () =>
+      handleDoctor([], {
+        bootstrapFn: (options) => {
+          observedDryRun = options?.dryRun;
+          return { ok: true, results: [] };
+        },
+      })
+    );
+
+    expect(code).toBe(ExitCode.SUCCESS);
+    expect(observedDryRun).toBe(true);
+  });
+
+  it('should use apply mode when --fix is provided', () => {
+    let observedDryRun: boolean | undefined;
+
+    const code = withCwd(TMP, () =>
+      handleDoctor(['--fix'], {
+        bootstrapFn: (options) => {
+          observedDryRun = options?.dryRun;
+          return { ok: true, results: [] };
+        },
+      })
+    );
+
+    expect(code).toBe(ExitCode.SUCCESS);
+    expect(observedDryRun).toBe(false);
+  });
+
+  it('should reject unknown doctor flags', () => {
+    const code = withCwd(TMP, () => handleDoctor(['--unknown']));
+    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+  });
+
   it('should return SUCCESS when project structure is valid', () => {
     writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1');
     const code = withCwd(TMP, () => handleDoctor([]));

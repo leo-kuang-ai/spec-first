@@ -1,6 +1,6 @@
 ---
 name: "spec-first:analyze"
-description: "执行跨产物一致性分析并生成分析报告"
+description: "Use when you need a read-only consistency analysis across spec, design, tasks, matrix, and related feature artifacts."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）

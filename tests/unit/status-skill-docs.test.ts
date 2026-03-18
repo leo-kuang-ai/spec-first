@@ -48,6 +48,21 @@ describe('14-status skill docs consistency', () => {
     expect(skill).toContain('状态面板已展示 `background_input_status`、`runtime 真源`、`docs 投影视图`、`同步状态`');
   });
 
+  it('should keep status metrics and task states aligned with canonical semantics', () => {
+    const skill = read(SKILL_MD);
+    const dashboard = read(DASHBOARD);
+
+    expect(skill).toContain('C1 (Design Coverage)');
+    expect(dashboard).toContain('C1 (Design Coverage)');
+    expect(skill).not.toContain('C1 (Spec Coverage)');
+    expect(dashboard).not.toContain('C1 (Spec Coverage)');
+
+    expect(skill).toContain('汇总层只展示 canonical 状态：`todo / in_progress / blocked / done`');
+    expect(dashboard).toContain('汇总层只展示 canonical 状态：`todo / in_progress / blocked / done`');
+    expect(skill).not.toContain('| ✅ complete |');
+    expect(dashboard).not.toContain('| ✅ complete |');
+  });
+
   it('should treat runtime/docs drift as an explicit status risk', () => {
     expect(existsSync(RISK)).toBe(true);
     const risk = read(RISK);

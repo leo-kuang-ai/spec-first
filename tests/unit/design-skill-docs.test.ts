@@ -113,4 +113,13 @@ describe('04-design skill docs consistency', () => {
     expect(skill).toContain('最终采用方案');
     expect(skill).toContain('不应绕过 `research.md`');
   });
+
+  it('should not leave unresolved self-correction placeholders', () => {
+    const skill = read(SKILL_MD);
+    const constraints = read(CONSTRAINTS);
+
+    expect(skill).not.toContain('{{MAX_SELF_CORRECTION}}');
+    expect(constraints).not.toContain('{{MAX_SELF_CORRECTION}}');
+    expect(skill).toContain('自我修正上限：`3` 轮');
+  });
 });

@@ -56,7 +56,7 @@ cat .spec-first/current
 spec-first feature list
 
 # 选择 Feature
-spec-first feature switch <featureId>
+spec-first feature switch <featureId> --yes
 ```
 
 ---
@@ -78,8 +78,8 @@ cat specs/<featureId>/stage-state.json
 
 **失败处理**:
 ```bash
-# 初始化 Feature
-spec-first init <featureId>
+# 重新执行初始化入口
+/spec-first:init
 ```
 
 ---
@@ -213,7 +213,7 @@ ls -la specs/<featureId>/{spec.md,design.md,task_plan.md,findings.md}
 spec-first feature list
 
 # 选择 Feature
-spec-first feature switch <featureId>
+spec-first feature switch <featureId> --yes
 ```
 
 ---
@@ -226,8 +226,8 @@ spec-first feature switch <featureId>
 
 **补齐方案**:
 ```bash
-# 初始化 Feature
-spec-first init <featureId>
+# 重新执行初始化入口
+/spec-first:init
 ```
 
 ---

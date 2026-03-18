@@ -1,6 +1,6 @@
 ---
 name: "spec-first:spec-review"
-description: "定位 Feature 并执行需求规格质量审查（C10）"
+description: "Use when a feature is in 01_specify and you need a quality review of spec outputs before design begins."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）

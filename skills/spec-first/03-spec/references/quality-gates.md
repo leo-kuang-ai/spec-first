@@ -105,9 +105,9 @@ spec-first gate check <featureId>
 
 ### 通过后操作
 
-1. 更新 `stage-state.json` 为 `02_design`
-2. 记录 gate check 通过时间到 `findings.md`
-3. 提示用户："Gate check 通过，可执行 /spec-first:design"
+1. 记录 gate check 通过时间到 `findings.md`
+2. 提示用户："Gate check 通过，可执行 /spec-first:design 或由 /spec-first:orchestrate 推进阶段"
+3. `gate check` 本身只负责校验，不直接更新 `stage-state.json`；阶段推进由 `stage advance` / `orchestrate` 负责
 
 ---
 

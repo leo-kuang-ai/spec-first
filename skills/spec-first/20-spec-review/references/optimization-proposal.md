@@ -1,6 +1,8 @@
-# spec-review Skill 优化方案
+# spec-review Skill 优化方案（历史归档）
 
-> 自动读取当前激活 Feature，无参数时自动定位
+> 历史提案：自动读取当前激活 Feature，无参数时自动定位
+
+> 当前状态：已实现。现行规则以 `feature-location.md` 和 `SKILL.md` 为准。
 
 ---
 

@@ -1,6 +1,6 @@
 ---
-name: onboarding
-description: 新手引导 - 交互式场景识别与学习路径推荐
+name: "spec-first:onboarding"
+description: "Use when a new user needs guided onboarding, scenario-based learning paths, or first-step recommendations for adopting spec-first in the current project."
 version: 1.5.0
 user-invocable: true
 ---

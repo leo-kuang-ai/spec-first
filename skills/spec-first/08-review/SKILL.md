@@ -1,6 +1,6 @@
 ---
 name: "spec-first:review"
-description: "定位变更范围并执行代码审查"
+description: "Use when code changes exist for the current feature and you need compliance and quality review before advancing or merging."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）

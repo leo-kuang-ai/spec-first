@@ -1,6 +1,6 @@
 ---
 name: "spec-first:init"
-description: "统一初始化入口：自动识别项目状态（新项目 / 存量项目 / Feature 创建），路由到对应轨道。触发场景：(1) 用户说 'init'、'初始化'、'创建 Feature'、'新建需求'，(2) 执行 /spec-first:init 命令，(3) 首次接入 spec-first，(4) 创建新 Feature 需求"
+description: "Use when starting spec-first in a repo, creating a new feature workspace, or routing initialization for a new or existing project."
 ---
 
 # Skill: init

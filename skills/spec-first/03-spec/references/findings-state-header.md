@@ -28,7 +28,6 @@ quality_score: 92
 **取值范围**:
 - `"Phase 0"` - PRD 生成阶段
 - `"Step 0"` - 确保任务存在
-- `"Step 1"` - [已合并到 Phase 0.2]
 - `"Step 2"` - 复杂度分类
 - `"Step 3"` - Question Gate
 - `"Step 4"` - Research-first Mode
@@ -49,7 +48,7 @@ quality_score: 92
 
 **示例**:
 ```yaml
-skipped_steps: ["Step 4", "Step 5", "Step 7"]  # Moderate 复杂度跳过 Step 7
+skipped_steps: ["Step 7"]  # Moderate 复杂度跳过 Step 7
 ```
 
 ---

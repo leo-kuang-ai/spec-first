@@ -54,6 +54,21 @@ describe('skill catalog governance', () => {
     }
   });
 
+  it('should keep discovery metadata aligned with project governance', () => {
+    for (const dir of SKILL_DIRS) {
+      const content = readSkill(dir);
+      const frontmatter = content.match(/^---\n([\s\S]*?)\n---/);
+      const yaml = frontmatter?.[1] ?? '';
+      const name = (yaml.match(/name\s*:\s*"?([^"\n]+)"?/) || [])[1];
+      const description = (yaml.match(/description\s*:\s*"?([^"\n]+)"?/) || [])[1];
+
+      expect(name, `${dir} should declare a parsable name`).toBeTruthy();
+      expect(name, `${dir} should use spec-first namespace`).toMatch(/^spec-first:/);
+      expect(description, `${dir} should declare a parsable description`).toBeTruthy();
+      expect(description, `${dir} description should start with Use when`).toMatch(/^Use when\b/);
+    }
+  });
+
   it('should keep all referenced local skill files resolvable', () => {
     for (const dir of SKILL_DIRS) {
       const skillPath = join(ROOT, dir, 'SKILL.md');

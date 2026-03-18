@@ -47,4 +47,13 @@ describe('03-spec skill docs consistency', () => {
     expect(skill).toContain('[NEEDS CLARIFICATION]');
     expect(skill).toContain('通常 / 一般 / 默认 / 预期会');
   });
+
+  it('should distinguish primary references from helper references', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('主文档必须发现（Primary References）');
+    expect(skill).toContain('内部辅助参考（Secondary / Helper References）');
+    expect(skill).toContain('question-gate-rules.md');
+    expect(skill).toContain('final-confirmation-template.md');
+  });
 });

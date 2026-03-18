@@ -1,6 +1,6 @@
 /**
  * doctor CLI 命令
- * spec-first doctor [featureId]
+ * spec-first doctor [featureId] [--fix]
  */
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -39,12 +39,49 @@ interface ClaudeSettingsShape {
   };
 }
 
-export function handleDoctor(args: string[]): number {
-  const featureId = args[0];
+interface ParsedDoctorArgs {
+  featureId?: string;
+  fix: boolean;
+}
+
+interface DoctorCommandOptions {
+  bootstrapFn?: typeof ensureHostBootstrap;
+}
+
+function parseDoctorArgs(args: string[]): ParsedDoctorArgs | undefined {
+  let featureId: string | undefined;
+  let fix = false;
+
+  for (const arg of args) {
+    if (arg === '--fix') {
+      fix = true;
+      continue;
+    }
+    if (arg.startsWith('--')) {
+      return undefined;
+    }
+    if (featureId) {
+      return undefined;
+    }
+    featureId = arg;
+  }
+
+  return { featureId, fix };
+}
+
+export function handleDoctor(args: string[], options: DoctorCommandOptions = {}): number {
+  const parsed = parseDoctorArgs(args);
+  if (!parsed) {
+    console.error('用法：spec-first doctor [featureId] [--fix]');
+    return ExitCode.VALIDATION_ERROR;
+  }
+
+  const { featureId, fix } = parsed;
   const projectRoot = process.cwd();
   const results: CheckResult[] = [];
+  const bootstrapFn = options.bootstrapFn ?? ensureHostBootstrap;
 
-  const bootstrap = ensureHostBootstrap();
+  const bootstrap = bootstrapFn({ dryRun: !fix });
   results.push(...bootstrap.results.map(mapBootstrapResult));
 
   results.push(checkNodeVersion());
@@ -67,7 +104,7 @@ export function handleDoctor(args: string[]): number {
     results.push(...checkRuntimeFiles(projectRoot, featureId));
   }
 
-  printReport(results);
+  printReport(results, { fix });
 
   const hasError = results.some((r) => r.level === 'ERROR');
   return hasError ? ExitCode.CONFIG_ERROR : ExitCode.SUCCESS;
@@ -504,8 +541,9 @@ function checkRuntimeFiles(root: string, featureId: string): CheckResult[] {
 
 // ─── 输出 ────────────────────────────────────────────
 
-function printReport(results: CheckResult[]): void {
+function printReport(results: CheckResult[], options?: { fix?: boolean }): void {
   console.log('Spec-First 环境诊断\n');
+  console.log(`模式：${options?.fix ? 'apply (--fix)' : 'dry-run'}`);
   for (const r of results) {
     const icon = r.level === 'PASS' ? '[OK]' : r.level === 'WARNING' ? '[WARN]' : '[ERR]';
     console.log(`  ${icon.padEnd(7)} ${r.name.padEnd(22)} ${r.message}`);

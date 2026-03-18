@@ -1,6 +1,6 @@
 ---
 name: "spec-first:task"
-description: "定位 Feature 并校验阶段为任务拆解（03_plan）"
+description: "Use when a feature is in 03_plan and you need executable tasks, sequencing, ownership, and acceptance mapping from approved design inputs."
 version: 1.4.0
 last_updated: 2026-03-15
 changelog: |
@@ -183,7 +183,7 @@ git commit -m "scope: brief description"
 <expected output>
 ```
 
-**状态**: todo | in_progress | blocked | verified | done
+**状态**: todo | in_progress | blocked | done
 ```
 
 ### 任务明细表
@@ -285,7 +285,7 @@ digraph task_breakup_flow {
 task 阶段只输出执行计划，不输出实现代码：
 - **必须写**：任务范围、依赖、验收标准、并行性标记、文件清单、执行步骤
 - **禁止写**：代码实现细节、框架/库调用示例
-- **自我修正上限**：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）
+- **自我修正上限**：`3` 轮
 - **假设标记**：当信息不足时必须标记 `[NEEDS CLARIFICATION][TYPE]`（每轮最多 3 项）
 
 ## Plan Mode 协同
@@ -404,7 +404,7 @@ spec-first validate format <featureId>
 ## TASK 字段语义
 
 - **Owner**：单一责任人（一个 TASK 仅允许 1 名 owner）
-- **Status**：主文档示例统一使用 `todo | in_progress | blocked | verified | done`
+- **Status**：主文档示例统一使用 `todo | in_progress | blocked | done`
 - **depends_on**：仅允许引用同一 Feature 下 TASK ID，禁止自然语言依赖
 - **任务明细表契约**：首个非空单元格为 TASK ID，最后非空单元格为状态
 

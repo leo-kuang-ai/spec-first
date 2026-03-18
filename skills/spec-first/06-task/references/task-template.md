@@ -35,7 +35,7 @@
 | `depends_on` | 仅填 TASK ID，多个用逗号分隔 |
 | `验收标准` | 写结果，不写动作 |
 | `验证命令` | 写最小可执行命令，不能留空 |
-| `状态` | 主文档示例统一使用 `todo/in_progress/blocked/verified/done` |
+| `状态` | 主文档示例优先使用 `todo/in_progress/blocked/done`；历史完成态如 `verified` 进入运行时前应归一处理 |
 
 ## 实施步骤
 

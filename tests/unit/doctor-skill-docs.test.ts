@@ -33,4 +33,13 @@ describe('15-doctor skill docs consistency', () => {
     expect(rules).toContain('runtime 真源');
   });
 
+  it('should describe dry-run as the default and --fix as explicit apply mode', () => {
+    const skill = read(SKILL_MD);
+    const rules = read(RULES);
+
+    expect(skill).toContain('默认以 dry-run');
+    expect(skill).toContain('spec-first doctor --fix --yes');
+    expect(rules).toContain('doctor --fix --yes');
+  });
+
 });
