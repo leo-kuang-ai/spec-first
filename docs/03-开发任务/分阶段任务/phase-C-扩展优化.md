@@ -234,7 +234,8 @@ templates/ci/
 **产出物**:
 - `package.json` 发布配置（files, bin, exports）
 - `.npmrc` 模板（内网/外网仓库切换）
-- `scripts/publish.sh` 发布脚本
+- `scripts/publish.mjs` 跨平台发布入口
+- `scripts/publish.sh` 兼容转发壳（保留）
 
 **功能**:
 - npm pack 产出合法 tarball（含 skills/、templates/）
@@ -245,8 +246,9 @@ templates/ci/
 **验收标准**:
 1. `npm pack` 产出 tarball 可正常安装
 2. 全局安装后 CLI 入口可用
-3. skills/ 和 templates/ 目录包含在发布包中
-4. 内网/外网仓库切换文档完整
+3. `release:publish` 可跨平台执行并自动完成版本更新与包校验
+4. skills/ 和 templates/ 目录包含在发布包中
+5. 内网/外网仓库切换文档完整
 
 **依赖**: T-AS-001, T-AS-005
 

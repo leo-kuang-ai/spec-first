@@ -1,6 +1,8 @@
+import { execFileSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { ExitCode } from '../../src/shared/types.js';
 import {
   writeFirstApiContracts,
@@ -202,5 +204,19 @@ describe('handleSkill render', () => {
     const rendered = stdout.mock.calls[0]?.[0];
     expect(rendered).toContain('<!-- plan-runtime-context -->');
     expect(rendered).toContain('project_name: spec-first');
+  });
+
+  it('renders packaged first skill from the published dist entry when local skills are absent', () => {
+    const isolatedCwd = mkdtempSync(join(tmpdir(), 'spec-first-skill-render-'));
+    const cliEntry = join(import.meta.dirname, '../../dist/cli/index.js');
+
+    const output = execFileSync(process.execPath, [cliEntry, 'skill', 'render', 'first'], {
+      cwd: isolatedCwd,
+      encoding: 'utf8',
+    });
+
+    expect(output).toContain('<!-- skill-files-context -->');
+    expect(output).toContain('skill_path:');
+    expect(output).toContain('/skills/spec-first/00-first/SKILL.md');
   });
 });

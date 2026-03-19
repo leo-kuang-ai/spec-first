@@ -4,6 +4,7 @@
  */
 import { dirname, join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
 import {
@@ -367,9 +368,9 @@ export function resolveSkillPath(skillName: string, projectRoot: string): string
   const localPath = findSkillFile(localPattern, skillName);
   if (localPath) return localPath;
 
-  // 包级 skills/ 回退（ESM 使用 import.meta.dirname）
-  const pkgPattern = join(import.meta.dirname, '..', '..', '..', 'skills', 'spec-first');
-  const pkgPath = findSkillFile(pkgPattern, skillName);
+  // 包级 skills/ 回退：从当前模块位置向上搜索可用的 skills/spec-first
+  const pkgPattern = resolveBundledSkillsRoot();
+  const pkgPath = pkgPattern ? findSkillFile(pkgPattern, skillName) : undefined;
   if (pkgPath) return pkgPath;
 
   return undefined;
@@ -393,6 +394,26 @@ function findSkillFile(baseDir: string, skillName: string): string | undefined {
     // 目录不存在
   }
   return undefined;
+}
+
+function resolveBundledSkillsRoot(): string | undefined {
+  // 兼容源码执行（src/core/skill-runtime）与发布包执行（dist/cli/index.js）
+  // 不再依赖固定的 ../.. 层级，而是从当前模块位置逐级向上查找 skills/spec-first。
+  let currentDir = dirname(fileURLToPath(import.meta.url));
+
+  while (true) {
+    const candidate = join(currentDir, 'skills', 'spec-first');
+    if (exists(candidate)) {
+      return candidate;
+    }
+
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      return undefined;
+    }
+
+    currentDir = parentDir;
+  }
 }
 
 /** 加载 Skill 文件内容（可选动态组装） */

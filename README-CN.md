@@ -2,7 +2,7 @@
 
 **为 AI 协同交付引入结构、可追溯性与质量门禁。**
 
-[![Version](https://img.shields.io/badge/version-v1.1.2-blue)](https://www.npmjs.com/package/spec-first)
+[![Version](https://img.shields.io/badge/version-v1.1.4-blue)](https://www.npmjs.com/package/spec-first)
 [![npm downloads](https://img.shields.io/npm/dm/spec-first)](https://www.npmjs.com/package/spec-first)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org)
@@ -186,6 +186,16 @@ spec-first hooks status    # 查看 Git Hook 集成状态
 spec-first viewer start    # 启动 Stage Viewer 可视化面板
 spec-first commit          # 结构化提交，自动关联追溯 ID
 ```
+
+### 发布
+
+```bash
+pnpm run release:publish                # 跨平台发布入口，默认自动判断版本升级
+pnpm run release:publish -- minor       # 强制 minor 升级
+pnpm run release:publish -- auto --dry-run
+```
+
+`publish.sh` 仍保留为兼容包装器，但推荐使用 `release:publish` / `scripts/publish.mjs` 作为正式入口。
 
 ---
 

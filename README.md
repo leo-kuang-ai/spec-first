@@ -2,7 +2,7 @@
 
 **Bring structure, traceability, and quality gates to AI-assisted software delivery.**
 
-[![Version](https://img.shields.io/badge/version-v1.1.2-blue)](https://www.npmjs.com/package/spec-first)
+[![Version](https://img.shields.io/badge/version-v1.1.4-blue)](https://www.npmjs.com/package/spec-first)
 [![npm downloads](https://img.shields.io/npm/dm/spec-first)](https://www.npmjs.com/package/spec-first)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org)
@@ -183,6 +183,16 @@ spec-first hooks status    # Inspect Git hook integration
 spec-first viewer start    # Launch the Stage Viewer dashboard
 spec-first commit          # Structured commit with auto-linked traceability ID
 ```
+
+### Release
+
+```bash
+pnpm run release:publish                # Cross-platform release entry (auto version bump by default)
+pnpm run release:publish -- minor       # Force a minor bump
+pnpm run release:publish -- auto --dry-run
+```
+
+`publish.sh` is kept as a compatibility wrapper, but the supported release entry is `release:publish` / `scripts/publish.mjs`.
 
 ---
 

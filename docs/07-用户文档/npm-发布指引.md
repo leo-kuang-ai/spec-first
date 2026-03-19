@@ -11,67 +11,73 @@
 
 ## 发布流程
 
-### 1. 版本更新
+### 推荐入口
 
-修改 `package.json` 中的版本号，遵循 [语义化版本](https://semver.org/lang/zh-CN/)：
+```bash
+pnpm run release:publish
+```
+
+默认会自动完成以下步骤：
+
+1. 前置检查工作区与分支
+2. 执行 `typecheck`
+3. 执行 `build`
+4. 自动判定版本升级类型并更新 `package.json`
+5. 校验发布包内容
+6. 执行 `npm publish`
+7. 写入发布 commit 和 tag
+
+如需手动指定版本升级类型，可使用：
+
+```bash
+pnpm run release:publish -- patch
+pnpm run release:publish -- minor
+pnpm run release:publish -- major
+pnpm run release:publish -- auto --dry-run
+```
+
+### 版本与说明
+
+版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)：
 
 - **补丁版本** (1.0.x)：bug 修复
 - **次版本** (1.x.0)：新功能，向后兼容
 - **主版本** (x.0.0)：破坏性变更
 
-```bash
-# 自动升级版本
-npm version patch  # 1.0.0 → 1.0.1
-npm version minor  # 1.0.0 → 1.1.0
-npm version major  # 1.0.0 → 2.0.0
-```
-
-### 2. 更新 CHANGELOG
-
-在 `CHANGELOG.md` 添加版本记录：
+如果需要维护变更记录，可在发布前同步更新 `CHANGELOG.md`：
 
 ```markdown
 - vX.Y.Z YYYY-MM-DD 作者: 一句话摘要 (user-visible)
 ```
 
-### 3. 质量检查
+### 手动流程（仅在需要时）
+
+如果你希望绕过自动发布入口，也可以手动执行：
 
 ```bash
-# 类型检查
 npm run typecheck
-
-# 代码检查
-npm run lint
-
-# 运行测试
-npm test
-
-# 构建产物
 npm run build
-```
-
-### 4. 发布到 npm
-
-```bash
+npm run release:check
 npm publish
 ```
 
-### 5. 提交代码
+然后再手工提交并打 tag：
 
 ```bash
-git add .
+git add package.json
 git commit -m "chore: release vX.Y.Z"
-git push origin master
 git tag vX.Y.Z
+git push origin master
 git push origin vX.Y.Z
 ```
 
 ## 发布检查清单
 
-- [ ] 版本号已更新
+- [ ] 版本号已更新（或通过 `release:publish` 自动更新）
 - [ ] CHANGELOG.md 已更新
 - [ ] 所有测试通过
 - [ ] 代码已构建
+- [ ] 发布包校验通过
 - [ ] npm 发布成功
 - [ ] 代码已提交并打 tag
 
