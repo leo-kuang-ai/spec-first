@@ -42,6 +42,22 @@
 - `model-docs`
   - 产出：`domain-model.md`、`database-er.md`
 
+## 输入与输出边界
+
+### runtime agents
+
+- 输入：本轮 evidence pack、当前 wave、上一轮 runtime 结果摘要
+- 输出：对应的结构化 runtime JSON（必须附带证据指针/来源路径）
+- 禁止：把 docs 正文当作真源或把长篇分析回灌主线程
+- 若输入证据不足：必须在输出中显式标注 `[待确认]`，并说明缺口位置（字段/模块/链路）
+
+### docs agents
+
+- 输入：本轮 evidence pack、已确认的 runtime 结果、当前 wave
+- 输出：对应的 `docs/first/*.md`
+- 禁止：重新取证或反向修正 runtime 真源
+- 门禁：docs agents 只能基于“已确认”的 runtime 资产展开；缺少真源时必须返回阻塞原因，不得硬写正文补洞
+
 ## 推荐波次
 
 ### Wave 1
@@ -77,15 +93,17 @@
 - docs agents 默认读取同轮 evidence pack，并参考 runtime agents 已产出的结果
 - `database-er.md` 必须受 `databaseSchema.status` 约束
 - 任一波次最多并发 3 个 Agent
+- 每波最多 3 个 Agent，且不得突破总并发上限
 
 ## 失败与重试
 
+- 统一策略：失败重试一次后再阻断
 - runtime agent 失败：
   - 优先重试一次
-  - 仍失败则阻断对应 runtime 资产写盘
+  - 仍失败则阻断对应 runtime 资产写盘，并回传失败原因（用于阻塞下游 docs 派发）
 - docs agent 失败：
   - 可单独重试
-  - 不得伪造内容补洞
+  - 仍失败不得伪造内容补洞；允许只输出“阻塞原因 + `[待确认]` 缺口标记”供主线程决策
 - 任意 Agent 缺证据：
   - 输出 `[待确认]`
   - 不得把猜测写成确定事实

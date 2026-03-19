@@ -172,9 +172,9 @@ I'm using the status skill to show the current state of [Feature].
    - 影响: 质量无保障
    - 建议: 回到 `/spec-first:task` 或 `/spec-first:code` 补齐测试设计与 TDD 证据
 
-3. **TDD 证据不闭环** — 存在只有 GREEN、没有 RED/WAIVER 的任务
+3. **TDD 记录不闭环** — 存在只有 GREEN、没有 RED/WAIVER 的任务
    - 影响: 流程真实性不足，审查难以追溯
-   - 建议: 回到 `findings.md` 补齐证据链，再执行 review / verify
+   - 建议: 回到 `findings.md` 补齐证据记录，后续 review / verify 仅据此做风险提示
 
 ### 🟢 低风险 (1)
 1. **任务进度略慢** — 预计剩余 1.5 天，可能延期 0.5 天
@@ -189,7 +189,7 @@ I'm using the status skill to show the current state of [Feature].
 
 1. **补充 TASK 拆解** — 执行 `/spec-first:task` 完成 C3 覆盖
 2. **补齐测试设计与 TDD 证据** — 回到 `/spec-first:task` / `/spec-first:code` 收口 C4/C5
-3. **修复 TDD 闭环异常** — 先补齐 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 关系
+3. **补齐 TDD 记录** — 如有需要，补齐 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 关系，供审查与回放使用
 4. **继续实现任务** — 完成剩余 2 个 in_progress 任务
 
 **可推进阶段？** ❌ 否（C3 未达标）

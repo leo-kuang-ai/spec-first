@@ -96,15 +96,15 @@ Stage 2 的发现必须分为以下三类：
 Stage 1 至少回答以下问题：
 
 1. 当前变更是否本应 `required TDD`，却被写成 WAIVER？
-2. `findings.md` 是否存在 `[TDD-RED]` 或 `[TDD-WAIVER]`？
-3. 是否出现“只有 GREEN，没有 RED/WAIVER”的伪闭环？
+2. `findings.md` 是否记录了当前 TASK 相关的 TDD 过程证据？
+3. 是否出现“只有 GREEN，没有 RED/WAIVER”的记录缺口？
 4. WAIVER 是否写明 `Scope / Reason / Alternative Verification / Approver`？
 5. 替代验证是否与变更类型匹配，而不是泛泛写“已人工验证”？
 
 判定建议：
 
-- 缺少 RED/WAIVER 且已写生产代码：`MUST FIX`
-- 只有 GREEN，没有 RED：`MUST FIX`
+- 记录缺失且会影响当前 TASK 的可追溯性：`MUST FIX`
+- 只有 GREEN，没有 RED/WAIVER：`SHOULD FIX`
 - WAIVER 存在但理由空泛、替代验证不足：`SHOULD FIX`
 - 与当前 TASK 无关的历史 TDD 欠账：`OUT_OF_SCOPE`
 

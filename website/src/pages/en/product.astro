@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../../layouts/base-layout.astro';
+import featuresData from '../../data/features.json';
+
+const { title, subtitle, features, architecture, cta } = featuresData.en;
+---
+
+<BaseLayout title="Product" lang="en">
+  <section class="product-hero container">
+    <h1 class="product-title">{title}</h1>
+    <p class="product-subtitle">{subtitle}</p>
+  </section>
+
+  <section class="features-section container">
+    <div class="grid grid-3">
+      {features.map((feature) => (
+        <div class="card feature-card">
+          <span class="feature-icon">{feature.icon}</span>
+          <h3>{feature.title}</h3>
+          <p>{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="architecture-section container">
+    <h2 class="section-title">{architecture.title}</h2>
+    <div class="architecture-diagram">
+      {architecture.layers.map((layer, index) => (
+        <div class="architecture-layer" style={`--layer-index: ${index}`}>
+          <div class="layer-header">
+            <span class="layer-name">{layer.name}</span>
+            <span class="layer-modules">{layer.modules}</span>
+          </div>
+          <p class="layer-description">{layer.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="cta-section container">
+    <p class="cta-text">{cta.text}</p>
+    <div class="cta-actions">
+      <a href={cta.primary.href} target="_blank" rel="noopener" class="btn btn-primary">
+        {cta.primary.label}
+      </a>
+      <a href={cta.secondary.href} target="_blank" rel="noopener" class="btn btn-secondary">
+        {cta.secondary.label}
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .product-hero {
+    padding: var(--spacing-3xl) var(--spacing-md);
+    text-align: center;
+  }
+
+  .product-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .product-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .features-section {
+    padding: var(--spacing-2xl) var(--spacing-md);
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: var(--spacing-xl);
+  }
+
+  .feature-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .feature-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .feature-card p {
+    color: var(--color-text-light);
+    line-height: 1.6;
+    font-size: 0.9375rem;
+  }
+
+  .architecture-section {
+    padding: var(--spacing-2xl) var(--spacing-md);
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .architecture-diagram {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .architecture-layer {
+    background: linear-gradient(135deg, var(--color-bg-alt) 0%, var(--color-bg) 100%);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    transition: all var(--transition-fast);
+  }
+
+  .architecture-layer:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+
+  .layer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .layer-name {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .layer-modules {
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  .layer-description {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    margin: 0;
+  }
+
+  .cta-section {
+    padding: var(--spacing-3xl) var(--spacing-md);
+    text-align: center;
+    background-color: var(--color-bg-alt);
+    border-radius: var(--radius-xl);
+    margin: var(--spacing-2xl) auto;
+  }
+
+  .cta-text {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 767px) {
+    .product-title {
+      font-size: 2rem;
+    }
+
+    .cta-text {
+      font-size: 1.25rem;
+    }
+  }
+</style>

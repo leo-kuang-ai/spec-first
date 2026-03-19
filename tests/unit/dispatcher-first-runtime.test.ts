@@ -194,6 +194,9 @@ describe('dispatcher first runtime notice', () => {
     expect(notice).toContain('api-contracts.json');
     expect(notice).toContain('spec-first');
     expect(notice).toContain('docs_quick_start');
+    expect(notice).not.toContain('main-thread-contract');
+    expect(notice).not.toContain('evidence-pack-spec');
+    expect(notice).not.toContain('agent-output-schema');
   });
 
   it('builds orchestrate notice from current feature background guidance', () => {

@@ -87,26 +87,19 @@
 
 当 `.spec-first/layer2/` 不存在或为空时：
 
-1. **询问项目类型**：
-   ```
-   ⚠️  检测到 .spec-first/layer2/ 目录不存在
-       将在初始化过程中自动创建平台配置。
+1. **中止当前 init 交互**
+   - CLI 不再询问项目类型，也不在脚本里自动创建平台模板
+   - 平台模板属于 Skill / 工作流决策，不属于脚本启发式
 
-   请选择项目类型：
-     1. Java 后端服务
-     2. 前端应用（React/Vue）
-     3. H5 移动端
-     4. 其他（手动配置）
+2. **运行 Skill 补齐流程**
+   - 先执行 `spec-first skill render init`
+   - 按 Skill 输出的流程补齐 `.spec-first/layer2/*.yaml`
+   - 模板内容示例详见 [platform-yaml-template.md](platform-yaml-template.md)
 
-   请选择 [1-4]: _
-   ```
-
-2. **根据选择创建对应模板**（详见 [platform-yaml-template.md](platform-yaml-template.md)）
-
-3. **关键约束**：
-   - ⚠️ 第一个字段必须是 `platform:`（不是 `name:`）
+3. **关键约束**
+   - 第一个字段必须是 `platform:`（不是 `name:`）
    - 这是 CLI 校验的硬性要求，否则会报错：`"platform" 为必填`
 
-4. **Windows 注意事项**：
+4. **Windows 注意事项**
    - 使用 UTF-8 编码
    - 使用 LF 换行符（不是 CRLF）

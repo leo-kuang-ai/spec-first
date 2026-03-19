@@ -26,6 +26,7 @@ spec-first first
   - 定义 runtime agents 与 docs agents 的分工
   - 定义证据来源、禁止猜测边界、成功标准与重试原则
   - 定义总并发上限：单轮最多 3 个 Agent 并发
+  - 定义“事实检测”与“工作流决策”的分界
 - CLI 负责：
   - 启动 `first`
   - 准备最小输入
@@ -90,6 +91,14 @@ spec-first first
 
 详细执行流见 `references/execution-flow.md`。Agent 层完成认知产出后直接写入最终 `.spec-first/runtime/first/*` 与 `docs/first/*`，CLI 层负责校验与宿主集成。
 
+## 主线程契约
+
+以下文档是 `first` 主线程的 canonical 约束，要求优先读取：
+
+- `references/main-thread-contract.md`
+- `references/evidence-pack-spec.md`
+- `references/agent-output-schema.md`
+
 ## Reference 读取规则
 
 ### 默认
@@ -98,6 +107,9 @@ spec-first first
 - `references/subagent-architecture.md`
 - `references/detection-rules.md`
 - `references/quality-assurance-rules.md`
+- `references/main-thread-contract.md`
+- `references/evidence-pack-spec.md`
+- `references/agent-output-schema.md`
 
 ### 按需 Agent 规格
 
@@ -128,6 +140,7 @@ spec-first first
 
 - 以代码、配置、依赖声明和 runtime 真源为准，禁止捏造
 - Skill 定义编排，CLI 不实现多 Agent 调度器
+- Skill 可以强制工作流决策、模板选择、产物顺序与成功标准；脚本只允许提供原始事实与最小执行能力
 - 先有 runtime 结果，再允许写入 runtime 真源
 - Skill 工作流直接写入最终 runtime/docs 文件，CLI 不承担文件交付职责
 - docs 不得回灌为真源

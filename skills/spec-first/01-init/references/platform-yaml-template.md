@@ -91,11 +91,12 @@ deploy:
 
 当检测到 `.spec-first/layer2/` 不存在或为空时：
 
-1. **询问用户项目类型**（后端/前端/移动端/其他）
-2. **根据类型选择对应模板**
-3. **创建目录**：`mkdir -p .spec-first/layer2`
-4. **写入文件**：`.spec-first/layer2/<platform>.yaml`
-5. **验证格式**：确保 `platform` 字段存在
+1. **停止 CLI 内的模板自动创建**
+2. **运行 `spec-first skill render init`**
+3. **按 Skill 输出的工作流补齐模板**
+4. **创建目录**：`mkdir -p .spec-first/layer2`
+5. **写入文件**：`.spec-first/layer2/<platform>.yaml`
+6. **验证格式**：确保 `platform` 字段存在
 
 ---
 

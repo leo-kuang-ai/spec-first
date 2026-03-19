@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/base-layout.astro';
+import HeroSection from '../../components/hero-section/hero-section.astro';
+import FeatureCards from '../../components/feature-cards/feature-cards.astro';
+import TerminalDemo from '../../components/terminal-demo/terminal-demo.astro';
+
+const features = [
+  {
+    title: 'Stage State Machine',
+    description: '8 active stages + 2 terminal states, unidirectional and irreversible, ensuring process discipline.',
+  },
+  {
+    title: 'Traceability IDs',
+    description: '14 ID types covering business chain and V-Model, enabling complete spec-to-implementation traceability.',
+  },
+  {
+    title: 'Gate Quality Checks',
+    description: '19 validation rules (16 blocking + 3 warnings), enforcing quality before stage advancement.',
+  },
+  {
+    title: 'Skill Orchestration',
+    description: '20+ AI-powered Skills covering the entire lifecycle, intelligently guiding development workflows.',
+  },
+];
+---
+
+<BaseLayout title="Home" lang="en">
+  <HeroSection
+    title="Spec-First"
+    subtitle="Specification-Driven AI Workflow Engine"
+    description="From requirements to release, a stage state machine drives the full development lifecycle. Every implementation traces back to its specification, with automated compliance checks."
+    primaryAction={{ label: 'Learn More', href: '/en/product' }}
+    secondaryAction={{ label: 'GitHub', href: 'https://github.com/kuangp/spec-first' }}
+  />
+  <TerminalDemo lang="en" />
+  <FeatureCards title="Core Features" features={features} />
+</BaseLayout>

@@ -2,7 +2,7 @@
  * Skill Command Parsing & Route Dispatch
  * 解析 /spec-first:* 命令，分发到 Skill 路由或 Runtime 路由
  */
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { readFileSync, readdirSync } from 'node:fs';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
@@ -424,6 +424,11 @@ export function loadSkill(
     }
   }
 
+  const skillContextNotice = buildSkillFileContextNotice(skillPath);
+  if (skillContextNotice) {
+    content = `${skillContextNotice}\n\n${content}`;
+  }
+
   if (!projectRoot) return content;
 
   const skillName = inferSkillNameFromPath(skillPath);
@@ -574,6 +579,35 @@ function formatStageRuntimeNotice(
 
   parts.push(`<!-- /${marker} -->`);
   return parts.join('\n');
+}
+
+function buildSkillFileContextNotice(skillPath: string): string {
+  if (!isSpecFirstSkillPath(skillPath)) {
+    return '';
+  }
+
+  const skillDir = dirname(skillPath);
+  const referencesRoot = join(skillDir, 'references');
+  const referencesStatus = exists(referencesRoot) ? 'present' : 'missing';
+
+  return [
+    '<!-- skill-files-context -->',
+    '## Skill File Context',
+    `skill_path: ${skillPath}`,
+    `skill_dir: ${skillDir}`,
+    `references_root: ${referencesRoot}`,
+    `references_status: ${referencesStatus}`,
+    'reference_resolution: resolve relative references against references_root',
+    ...(referencesStatus === 'missing'
+      ? ['warning: references directory missing; run spec-first update to resync skill assets']
+      : []),
+    '<!-- /skill-files-context -->',
+  ].join('\n');
+}
+
+function isSpecFirstSkillPath(skillPath: string): boolean {
+  const normalized = skillPath.replace(/\\/g, '/');
+  return /\/skills\/spec-first\/\d+-[^/]+\/SKILL\.md$/.test(normalized);
 }
 
 function appendDocsIndexHints(parts: string[], context: ResolvedSkillContext): void {

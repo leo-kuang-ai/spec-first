@@ -14,6 +14,13 @@
 
 - 默认入口：`spec-first first`
 
+### 0. load main-thread contract
+
+- 读取 `references/main-thread-contract.md`
+- 读取 `references/evidence-pack-spec.md`
+- 读取 `references/agent-output-schema.md`
+- 主线程只保留契约摘要与波次控制信息，不携带原始长证据正文
+
 ### 1. collect evidence pack
 
 - 收集项目结构、关键配置、依赖声明、入口、重要源码证据

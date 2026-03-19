@@ -88,3 +88,11 @@
 ```markdown
 - users 表有 email 字段 (`mysql:DESCRIBE users` — `email varchar(255) NOT NULL`)
 ```
+
+---
+
+## 5. 主线程消费边界（强制）
+
+- 主线程只消费 agent 摘要，不消费完整推理链
+- runtime/docs 产物的正式结论必须先收敛成结构化摘要，再进入主线程
+- 如果摘要不足以支撑结论，必须标记 `[待确认]`，不得把长篇分析直接回灌主线程

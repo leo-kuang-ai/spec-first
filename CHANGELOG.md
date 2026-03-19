@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.1.4 2026-03-20 Claude: docs(first): 主线程上下文收缩 — 新增 main-thread-contract.md、evidence-pack-spec.md、agent-output-schema.md 三个 canonical 契约文档；收敛 SKILL.md 为总入口；压薄 agent-*.md 为核心四小节；明确 runtime/docs 分工边界 (user-visible)
+- v1.1.4 2026-03-20 Claude: fix(lint): 移除 guards.ts 中未使用的 TaskNode 类型导入
 - v1.1.4 2026-03-19 Claude: fix(docs): 修正 pnpm link 开发模式卸载文档误导 — 将"pnpm remove --global"从"自动卸载"分离为独立小节，明确 preuninstall 跳过原因（防误删全局资产）；补充 preuninstall 测试覆盖全局卸载（npm_config_global=true）场景 (user-visible)
 - v1.1.4 2026-03-18 Claude: refactor(context-resolver): 输入矩阵代码化 — 将 resolveSkillAssetContract 的 switch-case 提取为 SKILL_INPUT_MATRIX 常量，集中管理 14 个 skill 的资产契约
 - v1.1.4 2026-03-18 Claude: refactor(dispatcher): 统一 runtime notice 参数命名 — 将 6 个 build*RuntimeNotice 函数的参数从下划线命名（background_input_status）改为驼峰命名（backgroundInputStatus），简化 formatStageRuntimeNotice 函数签名

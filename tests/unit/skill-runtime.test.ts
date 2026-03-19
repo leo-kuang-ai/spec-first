@@ -776,6 +776,20 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('下一条可执行命令');
   });
 
+  it('should inject absolute skill file context for relative reference resolution', () => {
+    const skillDir = join(TMP, 'skills', 'spec-first', '00-first');
+    const skillPath = join(skillDir, 'SKILL.md');
+    mkdirSync(join(skillDir, 'references'), { recursive: true });
+    writeFileSync(skillPath, '# First Skill', 'utf-8');
+
+    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
+    expect(content).toContain('<!-- skill-files-context -->');
+    expect(content).toContain(`skill_path: ${skillPath}`);
+    expect(content).toContain(`skill_dir: ${skillDir}`);
+    expect(content).toContain(`references_root: ${join(skillDir, 'references')}`);
+    expect(content).toContain('reference_resolution: resolve relative references against references_root');
+  });
+
   it('should block code when changed files exceed task file list and code-view scope', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     mkdirSync(join(TMP, 'src'), { recursive: true });

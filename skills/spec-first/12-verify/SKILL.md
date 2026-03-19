@@ -75,7 +75,7 @@ I'm using the verify skill to validate [Feature] stage completion.
 用于执行阶段验收校验：
 - 完成阶段交付物后
 - 准备推进到下一阶段前
-- 执行 `/spec-first:orchestrate` 时的预检
+- 执行 `/spec-first:orchestrate` 时的检查
 - 发布前的最终检查
 
 **Use this ESPECIALLY when**：

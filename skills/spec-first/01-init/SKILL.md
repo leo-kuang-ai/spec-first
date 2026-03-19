@@ -62,7 +62,8 @@ description: "Use when starting spec-first in a repo, creating a new feature wor
 
 - **P0**: 显示 00-first 摘要（技术栈/代码量/API 端点）
 - **P1**: 读取平台列表 - 扫描 `.spec-first/layer2/*.yaml`
-  - ⚠️ 若目录不存在或为空，引导创建平台 YAML - 详见 [platform-yaml-template.md](references/platform-yaml-template.md)
+  - ⚠️ 若目录不存在或为空，进入 Skill 侧的模板补齐流程，再回到 CLI 执行
+  - **关键**：平台模板属于 Skill/工作流决策，不允许脚本根据启发式自动编造
   - **关键**：必须使用 `platform:` 字段（不是 `name:`），这是 CLI 校验的硬性要求
 - **P2**: 交互式收集参数 - 详见 [interaction-guide.md](references/interaction-guide.md)
 - **P3**: 参数确认 - 回显所有选择后执行
@@ -91,6 +92,13 @@ description: "Use when starting spec-first in a repo, creating a new feature wor
 **feat 特殊处理**：中文输入时自动生成 3-4 个英文缩写候选项
 
 详细交互流程见 [interaction-guide.md](references/interaction-guide.md)
+
+## 平台模板策略
+
+- 平台模板选择优先由 Skill / Agent 基于项目事实完成，而不是由 CLI 脚本猜测
+- `backend` / `frontend` / `mobile` 的事实检测可以作为输入，但不能直接替代工作流决策
+- 当模板缺失且证据不足时，Skill 负责补齐模板或请求明确输入；CLI 只负责校验已存在模板和执行已确认参数
+- `docs` 或面向人的说明文档不得反向成为平台模板决策的隐式真源
 
 ## 保护规则
 

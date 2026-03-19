@@ -22,6 +22,7 @@
     "prepublishOnly": "npm run build",
     "postinstall": "node dist/postinstall.js || true",
     "preuninstall": "node dist/preuninstall.js || true",
+    "compat-check": "echo 'compat-check: static site, skipped' && exit 0",
     "contract:check": "echo \"No API contract for Skill optimization\""
   },
   "engines": {

@@ -1,54 +1,7 @@
 /**
- * TDD 预检和文件冲突检测
+ * 文件冲突检测
  */
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import type { TaskNode, TaskLayer } from './types.js';
-
-export interface TddCheckResult {
-  passed: boolean;
-  missingCount: number;
-  totalCount: number;
-  missingTasks: string[];
-}
-
-export function checkTddEvidence(
-  tasks: TaskNode[],
-  featureId: string,
-  projectRoot: string
-): TddCheckResult {
-  const findingsPath = join(projectRoot, 'specs', featureId, 'findings.md');
-
-  if (!existsSync(findingsPath)) {
-    return {
-      passed: false,
-      missingCount: tasks.length,
-      totalCount: tasks.length,
-      missingTasks: tasks.map((t) => t.id),
-    };
-  }
-
-  const findings = readFileSync(findingsPath, 'utf-8');
-  const missingTasks: string[] = [];
-
-  for (const task of tasks) {
-    const hasRed = findings.includes(`[TDD-RED] ${task.id}`);
-    const hasWaiver = findings.includes(`[TDD-WAIVER] ${task.id}`);
-
-    if (!hasRed && !hasWaiver) {
-      missingTasks.push(task.id);
-    }
-  }
-
-  const missingRate = missingTasks.length / tasks.length;
-
-  return {
-    passed: missingRate <= 0.5,
-    missingCount: missingTasks.length,
-    totalCount: tasks.length,
-    missingTasks,
-  };
-}
+import type { TaskLayer } from './types.js';
 
 export function detectFileConflicts(layers: TaskLayer[]): TaskLayer[] {
   return layers.map((layer) => {

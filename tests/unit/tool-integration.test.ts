@@ -226,6 +226,30 @@ describe('handleStatus', () => {
     );
   }
 
+  function writeDocsOutputs() {
+    const docsRoot = join(TMP, 'docs', 'first');
+    mkdirSync(docsRoot, { recursive: true });
+    const docs = [
+      'README.md',
+      'summary.md',
+      'steering.md',
+      'conventions.md',
+      'critical-flows.md',
+      'entry-guide.md',
+      'api-docs.md',
+      'codebase-overview.md',
+      'domain-model.md',
+      'architecture.md',
+      'call-graph.md',
+      'development-guidelines.md',
+      'external-deps.md',
+    ];
+    for (const doc of docs) {
+      writeFileSync(join(docsRoot, doc), `# ${doc}\n`, 'utf-8');
+    }
+    writeFileSync(join(docsRoot, 'database-er.md'), '# database-er.md\n', 'utf-8');
+  }
+
   function writeTaskPlan() {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
@@ -267,6 +291,7 @@ describe('handleStatus', () => {
     writeRuntimeIndex();
     writeTaskPlan();
     writeMatrix();
+    writeDocsOutputs();
     writeFileSync(join(TMP, '.spec-first', 'current'), FEAT, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),

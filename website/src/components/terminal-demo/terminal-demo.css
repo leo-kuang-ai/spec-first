@@ -1,0 +1,131 @@
+.terminal-demo {
+  max-width: 800px;
+  margin: var(--spacing-2xl) auto;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: linear-gradient(180deg, #3c3c3c 0%, #2d2d2d 100%);
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot-red {
+  background-color: #ff5f56;
+}
+
+.terminal-dot-yellow {
+  background-color: #ffbd2e;
+}
+
+.terminal-dot-green {
+  background-color: #27ca40;
+}
+
+.terminal-title {
+  margin-left: var(--spacing-md);
+  color: #a0a0a0;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+
+.terminal-body {
+  background-color: #1e1e1e;
+  padding: var(--spacing-md);
+}
+
+.terminal-output {
+  min-height: 280px;
+  padding: var(--spacing-sm);
+}
+
+.terminal-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid #3c3c3c;
+}
+
+.terminal-btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  color: #d4d4d4;
+  background-color: #3c3c3c;
+  border: 1px solid #555;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.terminal-btn:hover {
+  background-color: #4a4a4a;
+  border-color: #666;
+}
+
+.terminal-btn-play {
+  background-color: #2d5a27;
+  border-color: #3d7a37;
+}
+
+.terminal-btn-play:hover {
+  background-color: #3d7a37;
+}
+
+/* Fallback */
+.terminal-fallback {
+  padding: var(--spacing-xl);
+  text-align: center;
+  background-color: #1e1e1e;
+}
+
+.terminal-fallback-text {
+  margin: 0;
+  color: #a0a0a0;
+  font-size: 0.875rem;
+}
+
+/* XTerm overrides */
+.terminal-output .xterm {
+  padding: var(--spacing-sm);
+}
+
+.terminal-output .xterm-viewport::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-output .xterm-viewport::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.terminal-output .xterm-viewport::-webkit-scrollbar-thumb {
+  background: #3c3c3c;
+  border-radius: 4px;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+  .terminal-demo {
+    margin: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .terminal-output {
+    min-height: 200px;
+  }
+
+  .terminal-title {
+    display: none;
+  }
+}

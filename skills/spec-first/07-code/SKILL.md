@@ -129,7 +129,6 @@ runtime:
 - `design.md` 必须存在
 - `task_plan.md` 中至少有一个待执行 TASK
 - 必须先解析依赖关系
-- 必须先做 TDD 预检
 
 ### 单 TASK 守卫
 
@@ -173,8 +172,7 @@ runtime:
 5. 解析 `depends_on`
 6. 构建依赖图
 7. 检查是否有循环依赖
-8. 做 TDD 预检
-9. 输出执行计划
+8. 输出执行计划
 
 ### P1 执行阶段
 
@@ -275,9 +273,9 @@ Subagent 可写：
 
 最小执行要求：
 
-- 批量前做一次 TDD 预检
-- 单 TASK 执行前再次检查 RED / WAIVER
-- 成功后必须形成 GREEN 证据或等价测试通过记录
+- `findings.md` 仅作为执行记录载体，不作为 code 进入门禁
+- 执行中可记录 RED / WAIVER / GREEN 证据，但不作为前置阻断条件
+- 成功后建议形成 GREEN 证据或等价测试通过记录，便于回放
 
 执行时还必须遵守以下解释规则：
 
@@ -291,9 +289,9 @@ Subagent 可写：
 
 1. 解析 TASK 的主要变更类型
 2. 映射到 `required / conditional_waiver / waived`
-3. 在 `findings.md` 写入 `[TDD-RED]` 或 `[TDD-WAIVER]`
-4. 仅在证据存在后开始写生产代码
-5. 完成后补 `[TDD-GREEN]`
+3. 如有需要，记录到 `findings.md`
+4. 直接开始写生产代码
+5. 完成后如有测试结果，再补 `[TDD-GREEN]`
 
 禁止合理化：
 

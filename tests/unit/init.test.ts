@@ -34,6 +34,8 @@ function baseOpts(overrides?: Partial<InitOptions>): InitOptions {
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });
+  writeFileSync(join(TMP, '.spec-first', 'layer2', 'h5.yaml'), 'platform: h5\n', 'utf-8');
 });
 
 afterEach(() => {
@@ -77,6 +79,12 @@ describe('init', () => {
     expect(constitution).toContain('User Authentication');
     expect(constitution).toContain('角色映射');
     expect(constitution).toContain('Leo');
+  });
+
+  it('should classify pure h5 projects as frontend in constitution.md', () => {
+    const result = init(baseOpts({ feat: 'H5', title: 'H5 App', platforms: ['h5'] }));
+    const constitution = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
+    expect(constitution).toContain('- **项目类型**: frontend');
   });
 
   it('should write .spec-first/current', () => {
@@ -251,7 +259,7 @@ describe('init', () => {
   });
 
   it('should auto-increment sequence number', () => {
-    const r1 = init(baseOpts());
+    const _r1 = init(baseOpts());
     // 用不同缩写创建第二个
     const r2 = init(baseOpts({ feat: 'PAY', title: 'Payment' }));
     expect(r2.featureId).toMatch(/PAY-001$/);

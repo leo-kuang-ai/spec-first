@@ -35,42 +35,6 @@ import {
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
 const VALID_SIZES: ReadonlySet<string> = new Set(['S', 'M', 'L']);
 
-const PLATFORM_TEMPLATES = {
-  'java-backend': `platform: java-backend
-label: Java 后端服务
-description: Spring Boot 后端服务
-tech_stack:
-  language: Java
-  framework: Spring Boot
-build:
-  tool: Maven
-test:
-  unit: JUnit 5
-`,
-  'admin-frontend': `platform: admin-frontend
-label: 管理后台前端
-description: React + TypeScript 前端应用
-tech_stack:
-  language: TypeScript
-  framework: React 18
-build:
-  tool: Vite
-test:
-  unit: Vitest
-`,
-  h5: `platform: h5
-label: H5 移动端
-description: Vue 3 移动端应用
-tech_stack:
-  language: TypeScript
-  framework: Vue 3
-build:
-  tool: Vite
-test:
-  unit: Vitest
-`,
-} as const;
-
 interface InitCliInput {
   feat?: string;
   mode?: string;
@@ -772,6 +736,10 @@ function runFeatureInitBlockedTrack(): number {
 async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<number> {
   const preset = buildLegacyBaselinePreset();
 
+  if (!requireDiscoveredPlatforms(cwd)) {
+    return ExitCode.VALIDATION_ERROR;
+  }
+
   console.log('📦 检测到存量项目，建议先创建系统基线');
   console.log('');
   console.log(`将自动创建以下 Feature：`);
@@ -820,13 +788,7 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
     return ExitCode.VALIDATION_ERROR;
   }
 
-  // Discover platforms for the baseline feature
   const discoveredPlatforms = discoverPlatforms(cwd);
-  if (discoveredPlatforms.length === 0) {
-    console.error('⚠️  未找到平台配置（.spec-first/layer2/*.yaml）');
-    console.error('请先创建平台配置，再创建基线 Feature。');
-    return ExitCode.VALIDATION_ERROR;
-  }
 
   ensureProjectMetaConfig(cwd);
 
@@ -857,6 +819,8 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
 
 async function runFeatureInitTrack(args: string[], cwd: string): Promise<number> {
   const parsedInput = parseInitCliInput(args);
+
+  if (!requireDiscoveredPlatforms(cwd)) return ExitCode.VALIDATION_ERROR;
 
   // Show first runtime summary
   const summary = summarizeFirstArtifacts(cwd);
@@ -991,45 +955,21 @@ function discoverPlatforms(projectRoot: string): string[] {
   }
 }
 
-async function guidePlatformCreation(
-  rl: ReturnType<typeof createInterface>,
-  projectRoot: string
-): Promise<string[]> {
+function guidePlatformCreation(): null {
   console.log('\n⚠️  检测到 .spec-first/layer2/ 目录不存在或为空');
-  console.log('    将引导您创建平台配置文件\n');
-  console.log('请选择项目类型：');
-  console.log('  1. Java 后端服务');
-  console.log('  2. 前端应用（React/Vue）');
-  console.log('  3. H5 移动端');
-  console.log('  4. 跳过（手动创建）');
+  console.log('    平台模板属于 Skill/工作流决策，不在 CLI 中自动生成。\n');
+  console.log('请先运行 `spec-first skill render init`，按 Skill 侧流程补齐 .spec-first/layer2/*.yaml 后再运行 init。');
+  console.log('例如：h5.yaml、java-backend.yaml、admin-frontend.yaml');
+  return null;
+}
 
-  const choice = await rl.question('\n请输入 [1-4]: ');
-
-  if (choice === '4') {
-    console.log('\n请手动创建 .spec-first/layer2/*.yaml 文件后重新运行 init');
-    return [];
+function requireDiscoveredPlatforms(projectRoot: string): string[] | null {
+  const discovered = discoverPlatforms(projectRoot);
+  if (discovered.length === 0) {
+    guidePlatformCreation();
+    return null;
   }
-
-  const templateMap: Record<string, keyof typeof PLATFORM_TEMPLATES> = {
-    '1': 'java-backend',
-    '2': 'admin-frontend',
-    '3': 'h5',
-  };
-
-  const platformKey = templateMap[choice];
-  if (!platformKey) {
-    console.error('❌ 无效选择');
-    return [];
-  }
-
-  const layerDir = join(projectRoot, '.spec-first', 'layer2');
-  mkdirSync(layerDir, { recursive: true });
-
-  const yamlPath = join(layerDir, `${platformKey}.yaml`);
-  writeFileSync(yamlPath, PLATFORM_TEMPLATES[platformKey], 'utf-8');
-
-  console.log(`\n✅ 已创建平台配置：${platformKey}.yaml`);
-  return [platformKey];
+  return discovered;
 }
 
 function validatePlatformSelection(platforms: string[], projectRoot: string): string | null {
@@ -1209,6 +1149,11 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('║          Spec-First Feature 初始化                             ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
+    const discovered = requireDiscoveredPlatforms(process.cwd());
+    if (!discovered) {
+      return null;
+    }
+
     // Step 1/7: FEAT 缩写
     printStepHeader(1, 7, 'Feature 缩写');
     console.log('  格式：大写字母开头，仅包含大写字母和数字，长度 1-16 字符');
@@ -1243,13 +1188,6 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     );
 
     // Step 4/7: 平台选择
-    let discovered = discoverPlatforms(process.cwd());
-    if (discovered.length === 0) {
-      discovered = await guidePlatformCreation(rl, process.cwd());
-      if (discovered.length === 0) {
-        return null;
-      }
-    }
     printStepHeader(4, 7, '平台选择');
     console.log('  检测到以下可用平台（来自 .spec-first/layer2/*.yaml）：\n');
     const selectedPlatforms = await askPlatformsInteractively(rl, discovered);

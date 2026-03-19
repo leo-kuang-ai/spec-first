@@ -30,7 +30,7 @@
 失败率: 50.0%
 
 ### Layer 1
-- ⛔ TASK-ZZZ: blocked - 缺少 TDD RED 证据 (120ms)
+- ⛔ TASK-ZZZ: blocked - runtime 门禁未通过 (120ms)
 
 失败率: 100.0%
 
@@ -43,8 +43,8 @@
 
 **TASK-ZZZ**
 - 类型: blocked
-- 信息: 缺少 TDD RED 证据
-- 下一步: 补 RED 证据或 WAIVER
+- 信息: runtime 门禁未通过
+- 下一步: 修复阻断条件后重试
 
 ## 下一步建议
 
@@ -74,11 +74,11 @@
 
 报告解释必须与当前 runtime 对齐：
 
-- `blocked - 缺少 TDD RED 证据` 表示未检测到 `[TDD-RED] TASK-ID` 或 `[TDD-WAIVER] TASK-ID`
-- 不得把结构化字段缺失描述成 runtime 已阻断
+- `blocked` 的根因应来自当前 runtime 门禁或执行冲突，不应再把 TDD 记录缺失描述成主阻断理由
+- TDD 证据仅作为执行记录和回放依据，不参与当前批量执行器的硬门禁
 - 如人工审查发现 WAIVER 理由不足，可作为 review / status 风险项补充说明，但不应伪称 batch executor 已校验
 
 推荐在报告结论里补充：
 
-- 当前被阻断的是 runtime 字符串预检
+- 当前被阻断的是 runtime 门禁或执行冲突
 - 当前未自动审查的是 WAIVER 质量、替代验证充分性、RED/GREEN 闭环合理性

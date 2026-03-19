@@ -105,7 +105,7 @@ describe('evaluateSkillHardGate', () => {
     expect(result.reason).toContain('task');
   });
 
-  it('should BLOCK code when no in_progress task exists', () => {
+  it('should PASS code when task_plan.md exists with only todo tasks', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -120,12 +120,11 @@ describe('evaluateSkillHardGate', () => {
     );
 
     const result = evaluateSkillHardGate('code', TMP);
-    expect(result.allowed).toBe(false);
-    expect(result.severity).toBe('BLOCKED');
-    expect(result.reason).toContain('in_progress');
+    expect(result.allowed).toBe(true);
+    expect(result.severity).toBe('PASS');
   });
 
-  it('should PASS code when in_progress task exists without findings.md', () => {
+  it('should PASS code when task_plan.md exists without findings.md', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -135,7 +134,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
 
@@ -154,7 +153,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -184,7 +183,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -214,7 +213,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -253,7 +252,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -291,7 +290,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(

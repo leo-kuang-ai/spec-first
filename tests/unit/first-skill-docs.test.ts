@@ -39,7 +39,7 @@ describe('00-first skill docs consistency', () => {
 
     const skill = read(SKILL_MD);
     expect(skill).toContain('name: "spec-first:first"');
-    expect(skill).toContain('description: "Use when running spec-first first');
+    expect(skill).toContain('description: "Use when validating project cognition outputs');
     expect(skill).not.toContain('version: "2.3.0"');
     expect(skill).not.toContain('last_updated: "2026-03-17"');
   });
@@ -95,10 +95,10 @@ describe('00-first skill docs consistency', () => {
     expect(db).toContain('日志脱敏');
   });
 
-  it('should include Context7 key governance requirements', () => {
+  it('should keep detection rules focused on runtime-first identification', () => {
     const detection = read(DETECTION);
-    expect(detection).toContain('Context7');
-    expect(detection).toContain('CONTEXT7_API_KEY');
+    expect(detection).not.toContain('Context7');
+    expect(detection).not.toContain('CONTEXT7_API_KEY');
   });
 
   it('should keep detection rules on runtime-first identification contract', () => {
@@ -118,6 +118,9 @@ describe('00-first skill docs consistency', () => {
     const testing = read(TESTING);
 
     expect(skill).toContain('testing-strategy.md');
+    expect(skill).toContain('references/main-thread-contract.md');
+    expect(skill).toContain('references/evidence-pack-spec.md');
+    expect(skill).toContain('references/agent-output-schema.md');
     expect(testing).toContain('测试策略');
   });
 
@@ -133,6 +136,20 @@ describe('00-first skill docs consistency', () => {
     expect(flow).toContain('spec-first first');
     expect(flow).not.toContain('spec-first first --yes');
     expect(flow).toContain('.spec-first/runtime/first/');
+  });
+
+  it('loads main-thread canonical contracts before collecting evidence pack', () => {
+    const flow = read(EXECUTION_FLOW);
+    expect(flow).toContain('### 0. load main-thread contract');
+    expect(flow).toContain('references/main-thread-contract.md');
+    expect(flow).toContain('references/evidence-pack-spec.md');
+    expect(flow).toContain('references/agent-output-schema.md');
+    expect(flow).toContain('### 1. collect evidence pack');
+
+    // Order matters: contract must be loaded before evidence gathering.
+    expect(flow.indexOf('### 0. load main-thread contract')).toBeLessThan(
+      flow.indexOf('### 1. collect evidence pack')
+    );
   });
 
   it('should keep domain model analysis as asset-generation spec', () => {

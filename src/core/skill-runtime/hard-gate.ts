@@ -1,11 +1,5 @@
 import { join } from 'node:path';
-import {
-  exists,
-  readJsonChecked,
-  readMarkdown,
-  parseMarkdownTable,
-} from '../../shared/fs-utils.js';
-import { getCurrentTaskId } from '../task-plan/parser.js';
+import { exists, readJsonChecked, readMarkdown } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 import { SKILL_STAGE_REQUIREMENTS } from '../rules/truth-source.js';
@@ -49,35 +43,6 @@ function readCurrentStage(projectRoot: string, featureId: string): string | unde
   } catch {
     return undefined;
   }
-}
-
-function hasInProgressTask(taskPlan: string, specDir?: string): boolean {
-  return Boolean(findInProgressTaskId(taskPlan, specDir));
-}
-
-function findInProgressTaskId(taskPlan: string, specDir?: string): string | undefined {
-  if (specDir) {
-    const featureId = specDir.split('/').at(-1);
-    const projectRoot = specDir.split('/specs/')[0];
-    if (featureId && projectRoot) {
-      return getCurrentTaskId(projectRoot, featureId);
-    }
-  }
-
-  for (const cells of parseMarkdownTable(taskPlan)) {
-    const taskCell = cells.find((cell) => /^TASK-/i.test(cell));
-    if (!taskCell) continue;
-    const hasInProgress = cells.some((cell) => {
-      const normalized = cell.toLowerCase();
-      return (
-        normalized === 'in_progress' || normalized === 'in progress' || normalized === '进行中'
-      );
-    });
-    if (!hasInProgress) continue;
-    const match = taskCell.match(/TASK-[A-Z0-9-]+/i);
-    if (match?.[0]) return match[0];
-  }
-  return undefined;
 }
 
 function hasLocalGitRepo(projectRoot: string): boolean {
@@ -272,25 +237,7 @@ export function evaluateSkillHardGate(
       };
     }
 
-    const taskPlan = readMarkdown(taskPlanPath);
-    if (!hasInProgressTask(taskPlan)) {
-      return {
-        allowed: false,
-        severity: 'BLOCKED',
-        reason: 'code requires an in_progress TASK',
-        remediation: '先在 task_plan.md 标记 1 条 in_progress TASK，再进入实现',
-      };
-    }
-
-    const activeTaskId = findInProgressTaskId(taskPlan);
-    if (!activeTaskId) {
-      return {
-        allowed: false,
-        severity: 'BLOCKED',
-        reason: 'code requires an in_progress TASK',
-        remediation: '先在 task_plan.md 标记 1 条 in_progress TASK，再进入实现',
-      };
-    }
+    readMarkdown(taskPlanPath);
   }
 
   // Worktree First 运行时守卫（Superpowers P1-3）

@@ -1,38 +1,24 @@
 # API 与外部依赖执行提示
 
-> 这是按需补证据提示，不是主题规范正文。
-> 由 Skill 按执行流决定是否派发，不由 CLI 判断是否触发。
+> 这是按需补证据提示，不是主题规范正文。由 Skill 按执行流决定是否派发。
 
-## 适用场景
+## 任务范围
 
-- `api-docs.md` 缺少正式接口契约
-- `external-deps.md` 缺少第三方服务、外部系统或关键依赖证据
+- 只做正式 API 契约与外部依赖边界补强，沉淀到 runtime 真源
+- 不把 `docs/first/*.md` 当作真源，也不反向用 docs 修正 runtime
 
-## 对应 runtime 资产
+## 输入证据
+
+- 本轮 evidence pack（route/command 注册、handler/controller/adapter、配置、依赖声明）
+- 可选补充：DTO、auth guard、异常映射、OpenAPI/Swagger 文件、SDK/客户端封装
+
+## 输出资产
 
 - `api-contracts.json`
 - `summary.json`
 
-## 最小执行责任
+## 缺口标记
 
-### B：API 接口契约补强
-
-- 只提取项目正式对外接口契约
-- 把事实写入 `api-contracts.json`
-- `docs/first/api-docs.md` 只展开已确认接口清单、请求规范、响应规范、鉴权要求、错误语义和证据
-
-### C1：外部依赖补强
-
-- 只提取第三方服务、外部边界和关键依赖线索
-- 汇总到 `summary.json` 或相关 runtime 资产
-- `docs/first/external-deps.md` 只展开已确认事实
-
-## 工具与降级
-
-- 有符号分析能力时，可用符号定位 route、handler、DTO、auth guard、异常映射
-- 无符号分析能力时，退化到路由注册、控制器、装饰器、配置和依赖声明扫描
 - 无法确认的接口字段或外部边界必须标注 `[待确认]`
-
-## 质量保障
-
-- 通用证据格式、抽样流程、违规判定：见 `references/quality-assurance-rules.md`
+- 不得伪造接口契约或依赖关系补洞
+- 证据抽样与违规判定：`references/quality-assurance-rules.md`

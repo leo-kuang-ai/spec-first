@@ -265,12 +265,12 @@ Owner: {owner}
 ✅ 无阻塞，可继续工作
 ```
 
-如果阻塞与 TDD 相关，应明确回答：
+如果 TDD 记录存在缺口，应明确说明为风险而非阻塞：
 ```
-阻塞类型: TDD evidence gap
-描述: TASK-XXX 缺少 RED 或 WAIVER
-影响: 不应继续新增生产代码
-解除方案: 在 findings.md 补齐 [TDD-RED] 或 [TDD-WAIVER]
+风险类型: TDD evidence gap
+描述: TASK-XXX 缺少 RED / WAIVER / GREEN 记录或闭环不完整
+影响: 会降低回放和审查可追溯性
+建议: 在 findings.md 补齐相关记录，但不作为继续工作的硬阻断
 ```
 
 ### Q5: 下一步最小可执行命令是什么？
@@ -304,7 +304,7 @@ Owner: {owner}
 2. 读取 stage-state.json → 获取阶段信息
 3. 读取 task_plan.md → 获取任务进度
 4. 读取 findings.md → 获取最近发现
-5. 扫描 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` → 恢复 TDD 证据状态
+5. 扫描 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` → 恢复 TDD 证据记录状态
 6. 检查文件完整性 → 识别缺失文件
 7. 识别风险 → 标记阻塞项
 8. 生成恢复报告 → 回答 5-Question

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleInit } from '../../src/cli/commands/init.js';
@@ -203,5 +203,67 @@ describe('init bootstrap integration', () => {
     const codex = hostStatuses.find((entry) => entry.id === 'codex');
     expect(claude).toBeDefined();
     expect(codex).toBeDefined();
+  });
+
+  it('should stop early when layer2 templates are missing and point to Skill render flow', async () => {
+    rmSync(join(TMP, '.spec-first', 'layer2'), { recursive: true, force: true });
+    mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+    writeFileSync(
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
+      'baselineSkipped: true\nversion: 1.0\nproject: bootstrap\n',
+      'utf-8'
+    );
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = await handleInit([
+        '--feat',
+        'AUTH',
+        '--mode',
+        'N',
+        '--size',
+        'S',
+        '--platforms',
+        'h5',
+      ]);
+
+      expect(code).toBe(2);
+      const output = [...logSpy.mock.calls.flat(), ...errorSpy.mock.calls.flat()].join('\n');
+      expect(output).toContain('spec-first skill render init');
+      expect(output).toContain('平台模板属于 Skill/工作流决策');
+    } finally {
+      logSpy.mockRestore();
+      errorSpy.mockRestore();
+    }
+  });
+
+  it('should stop early for brownfield baseline when layer2 templates are missing', async () => {
+    rmSync(join(TMP, '.spec-first', 'layer2'), { recursive: true, force: true });
+    mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+    writeFileSync(
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
+      'baselineSkipped: false\nversion: 1.0\nproject: brownfield\n',
+      'utf-8'
+    );
+    mkdirSync(join(TMP, 'src', 'brownfield'), { recursive: true });
+    for (let i = 1; i <= 55; i += 1) {
+      writeFileSync(join(TMP, 'src', 'brownfield', `file-${i}.ts`), 'export const value = 1;\n', 'utf-8');
+    }
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = await handleInit([]);
+
+      expect(code).toBe(2);
+      const output = [...logSpy.mock.calls.flat(), ...errorSpy.mock.calls.flat()].join('\n');
+      expect(output).toContain('spec-first skill render init');
+      expect(output).toContain('平台模板属于 Skill/工作流决策');
+      expect(output).not.toContain('是否创建基线 Feature');
+    } finally {
+      logSpy.mockRestore();
+      errorSpy.mockRestore();
+    }
   });
 });
