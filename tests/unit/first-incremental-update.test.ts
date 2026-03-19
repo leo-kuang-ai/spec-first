@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { bootstrapFirstRuntime } from '../../src/core/skill-runtime/first-bootstrap.js';
 import { incrementalUpdateRuntimeAssets } from '../../src/core/skill-runtime/first-incremental-update.js';
 import { readFirstApiContracts, readFirstConventions, readFirstCriticalFlows, readFirstEntryGuide, readFirstRuntimeIndex, readFirstRuntimeSummary, readFirstStructureOverview } from '../../src/core/skill-runtime/first-runtime-store.js';
+import { seedFirstRuntimeOutputs } from '../helpers/first-runtime-fixture.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-incremental-update');
 const FEATURE_ID = 'FSREQ-20260318-FIRST-UPD-001';
@@ -24,7 +25,8 @@ beforeEach(() => {
     'utf-8'
   );
   initRepo();
-  bootstrapFirstRuntime(TMP, { mode: 'deep' });
+  seedFirstRuntimeOutputs(TMP, 'first-incremental-fixture');
+  bootstrapFirstRuntime(TMP);
 });
 
 afterEach(() => {
@@ -81,8 +83,8 @@ describe('first-incremental-update', () => {
         'conventions.json',
       ])
     );
-    expect(result.docsProjections).toContain('docs/first/summary.md');
-    expect(result.docsProjections).toContain('docs/first/api-docs.md');
+    expect(result.docsOutputs).toContain('docs/first/summary.md');
+    expect(result.docsOutputs).toContain('docs/first/api-docs.md');
 
     const summary = readFirstRuntimeSummary(TMP);
     expect(summary?.modules).toContain('Billing Core');

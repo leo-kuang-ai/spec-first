@@ -173,3 +173,20 @@ export interface FirstEntryGuideEntry {
 }
 
 export type FirstEntryGuide = FirstEntryGuideEntry[];
+
+export interface FirstDocsIndexEntry {
+  path: string;
+  title: string;
+  purpose: string;
+  relatedRuntimeAssets: string[];
+  recommendedWhen: string[];
+  priority: 'primary' | 'secondary' | 'optional';
+}
+
+export interface FirstDocsIndex {
+  generatedAt: string;
+  mode: 'deep';
+  quickStart: string[];
+  entries: FirstDocsIndexEntry[];
+  notes: string[];
+}

@@ -25,20 +25,20 @@ describe('21-analyze skill docs consistency', () => {
     expect(rules).toContain('background_input_status');
   });
 
-  it('should analyze runtime truth source and docs projection drift', () => {
+  it('should analyze runtime truth source and docs output issues', () => {
     const skill = read(SKILL_MD);
     const rules = read(RULES);
 
     expect(skill).toContain('runtime 真源');
-    expect(rules).toContain('docs 投影视图');
-    expect(rules).toContain('漂移');
+    expect(rules).toContain('docs 输出');
+    expect(rules).toContain('缺失');
   });
 
   it('should make background quality analysis explicit in execution flow', () => {
     const skill = read(SKILL_MD);
 
     expect(skill).toContain('P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`，并加载 `background_input_status` 与 runtime/docs 背景状态');
-    expect(skill).toContain('P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突、背景质量漂移）');
+    expect(skill).toContain('P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突、背景质量异常）');
     expect(skill).toContain('P5: 输出结论摘要、背景质量结论与后续修复建议');
   });
 
@@ -46,11 +46,11 @@ describe('21-analyze skill docs consistency', () => {
     const skill = read(SKILL_MD);
     const report = read(REPORT);
 
-    expect(skill).toContain('报告包含背景质量结论（`background_input_status` / `runtime 真源` / `docs 投影视图` / `同步状态`）');
+    expect(skill).toContain('报告包含背景质量结论（`background_input_status` / `runtime 真源` / `docs 输出` / `同步状态`）');
     expect(report).toContain('## 背景质量结论');
     expect(report).toContain('background_input_status');
     expect(report).toContain('runtime 真源');
-    expect(report).toContain('docs 投影视图');
+    expect(report).toContain('docs 输出');
     expect(report).toContain('同步状态');
   });
 
@@ -58,7 +58,7 @@ describe('21-analyze skill docs consistency', () => {
     const rules = read(RULES);
 
     expect(rules).toContain('runtime 真源异常 → `HIGH`');
-    expect(rules).toContain('docs 投影视图漂移 → `MEDIUM`');
+    expect(rules).toContain('docs 输出缺失 → `MEDIUM`');
     expect(rules).toContain('background_input_status = blind → `HIGH`');
   });
 

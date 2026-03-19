@@ -1,7 +1,7 @@
 # 规范与本地环境分析主题
 
 > **当前正式 contract**：单一标准模式 runtime-first。
-> 正式真源以 `conventions.json`、`entry-guide.json` 为准；`development-guidelines.md` 承载规范与本地环境专题投影视图。
+> 正式真源以 `conventions.json`、`entry-guide.json` 为准；`development-guidelines.md` 承载规范与本地环境专题阅读输出。
 
 ## 1. 主题划分
 
@@ -15,7 +15,7 @@
 - `conventions.json`
 - `entry-guide.json`
 
-### projection docs
+### docs outputs
 
 - `docs/first/development-guidelines.md`
 

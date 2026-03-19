@@ -1,5 +1,7 @@
 import { readFirstRuntimeSummary, readFirstApiContracts, readFirstConventions, readFirstCriticalFlows, readFirstEntryGuide, readFirstStructureOverview, writeFirstRuntimeSummary, writeFirstApiContracts, writeFirstConventions, writeFirstCriticalFlows, writeFirstEntryGuide, writeFirstStructureOverview } from './first-runtime-store.js';
+import { assertFirstDocsExist } from './first-docs-check.js';
 import { refreshFirstDocsFromRuntime } from './first-doc-projection.js';
+import { assertValidFirstRuntime } from './first-runtime-validator.js';
 import { mapChangesToAssets } from './first-asset-mapper.js';
 import type { StructuralChange } from './first-change-detection.js';
 import { syncFirstRuntimeIndexEntries } from './first-context.js';
@@ -13,7 +15,7 @@ export interface ConflictRecord {
 
 export interface IncrementalUpdateResult {
   updatedRuntimeAssets: string[];
-  docsProjections: string[];
+  docsOutputs: string[];
   conflicts: ConflictRecord[];
   skipped: string[];
 }
@@ -99,7 +101,7 @@ export function incrementalUpdateRuntimeAssets(
   if (changes.length === 0) {
     return {
       updatedRuntimeAssets: [],
-      docsProjections: [],
+      docsOutputs: [],
       conflicts: [],
       skipped: [],
     };
@@ -275,24 +277,26 @@ export function incrementalUpdateRuntimeAssets(
   if (conflicts.length > 0) {
     return {
       updatedRuntimeAssets: Array.from(updatedRuntimeAssets),
-      docsProjections: [],
+      docsOutputs: [],
       conflicts,
       skipped,
     };
   }
 
-  const docsProjections =
+  const docsOutputs =
     updatedRuntimeAssets.size > 0
-      ? refreshFirstDocsFromRuntime(projectRoot, Array.from(updatedRuntimeAssets))
+      ? (assertValidFirstRuntime(projectRoot),
+        refreshFirstDocsFromRuntime(projectRoot, Array.from(updatedRuntimeAssets)))
       : [];
 
-  if (updatedRuntimeAssets.size > 0 || docsProjections.length > 0) {
-    syncFirstRuntimeIndexEntries(projectRoot, Array.from(updatedRuntimeAssets), docsProjections);
+  if (updatedRuntimeAssets.size > 0 || docsOutputs.length > 0) {
+    assertFirstDocsExist(projectRoot);
+    syncFirstRuntimeIndexEntries(projectRoot, Array.from(updatedRuntimeAssets), docsOutputs);
   }
 
   return {
     updatedRuntimeAssets: Array.from(updatedRuntimeAssets),
-    docsProjections,
+    docsOutputs,
     conflicts,
     skipped,
   };

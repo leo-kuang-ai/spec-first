@@ -46,7 +46,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 使用原则：
 
-- `index.json`：判断 canonical runtime 与 docs 投影视图是否健康、是否需要补同步
+- `index.json`：判断 runtime 真源是否健康、docs 输出是否缺失、是否需要补同步
 - `summary.json`：帮助 sync 在回填矩阵时保持项目范围与术语一致
 - `entry-guide.json`：帮助定位应优先追踪的入口、流程与实现链路
 

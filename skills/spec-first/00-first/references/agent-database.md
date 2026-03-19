@@ -1,12 +1,13 @@
 # 数据库执行提示
 
-> 这是增强路径提示，不是主题规范正文。只在 CLI 输出证据不足时补数据库适用性、schema 证据和条件型投影判断。
+> 这是按需补证据提示，不是主题规范正文。
+> 由 Skill 按执行流决定是否派发，不由 CLI 判断是否触发。
 
 ## 适用场景
 
 - 需要确认项目是否适用数据库认知能力
 - `database-schema.json` 证据不足
-- 需要判断是否允许生成 `docs/first/database-er.md`
+- 需要判断是否允许产出 `docs/first/database-er.md`
 
 ## 对应 runtime 资产
 
@@ -16,8 +17,8 @@
 
 - 先判断数据库能力是否 `healthy` / `degraded` / `not_applicable`
 - 把结构化 schema 事实写入 `database-schema.json`
-- 只有 `databaseSchema.status === healthy` 时才允许生成 `docs/first/database-er.md`
-- 不生成 `database-index.md` 或其他未注册数据库专题文件
+- 只有 `databaseSchema.status === healthy` 时才允许产出 `docs/first/database-er.md`
+- 不产出 `database-index.md` 或其他未注册数据库专题文件
 
 ## 凭证防护执行规则（技术性，强制）
 

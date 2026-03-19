@@ -14,7 +14,7 @@ describe('first entry guide', () => {
       },
       techStack: ['language: TypeScript', 'testing: Vitest'],
       modules: ['src/core/skill-runtime', 'src/cli/commands'],
-      capabilities: ['runtime truth source', 'docs projection'],
+      capabilities: ['runtime truth source', 'docs outputs'],
       entryPoints: ['src/cli/index.ts'],
       dataModels: ['Feature'],
       apiSurface: ['CLI: spec-first'],

@@ -23,7 +23,7 @@
 - `.spec-first/runtime/first/steering.json`
 
 **说明**:
-- `docs/first/` 是投影视图层，可缺失或滞后
+- `docs/first/` 是阅读输出层，可缺失或滞后
 - readiness 只看 runtime 真源，不依赖任何 legacy YAML 索引
 - 不阻断初始化需求工作区，缺失时改走降级背景模式
 

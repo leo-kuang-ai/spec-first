@@ -7,6 +7,7 @@ import type {
   FirstConventions,
   FirstCriticalFlows,
   FirstDatabaseSchema,
+  FirstDocsIndex,
   FirstDomainModel,
   FirstEntryGuide,
   FirstRuntimeAssetIndexEntry,
@@ -105,6 +106,7 @@ export const FIRST_RUNTIME_API_CONTRACTS_FILE = 'api-contracts.json';
 export const FIRST_RUNTIME_STRUCTURE_OVERVIEW_FILE = 'structure-overview.json';
 export const FIRST_RUNTIME_DOMAIN_MODEL_FILE = 'domain-model.json';
 export const FIRST_RUNTIME_DATABASE_SCHEMA_FILE = 'database-schema.json';
+export const FIRST_RUNTIME_DOCS_INDEX_FILE = 'docs-index.json';
 export const FIRST_PROJECT_COGNITION_UPDATES_FILE = 'project-cognition-updates.jsonl';
 
 export function getFirstRuntimeDir(projectRoot: string): string {
@@ -149,6 +151,10 @@ export function getFirstDomainModelPath(projectRoot: string): string {
 
 export function getFirstDatabaseSchemaPath(projectRoot: string): string {
   return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_DATABASE_SCHEMA_FILE);
+}
+
+export function getFirstDocsIndexPath(projectRoot: string): string {
+  return join(getFirstRuntimeDir(projectRoot), FIRST_RUNTIME_DOCS_INDEX_FILE);
 }
 
 export function getFirstProjectCognitionUpdatesPath(projectRoot: string): string {
@@ -369,6 +375,10 @@ export function readFirstDatabaseSchema(projectRoot: string): FirstDatabaseSchem
   return readRuntimeJson<FirstDatabaseSchema>(getFirstDatabaseSchemaPath(projectRoot));
 }
 
+export function readFirstDocsIndex(projectRoot: string): FirstDocsIndex | null {
+  return readRuntimeJson<FirstDocsIndex>(getFirstDocsIndexPath(projectRoot));
+}
+
 export function writeFirstRuntimeIndex(projectRoot: string, index: FirstRuntimeIndex): void {
   writeRuntimeJson(getFirstRuntimeIndexPath(projectRoot), index);
 }
@@ -416,4 +426,8 @@ export function writeFirstDatabaseSchema(
   databaseSchema: FirstDatabaseSchema
 ): void {
   writeRuntimeJson(getFirstDatabaseSchemaPath(projectRoot), databaseSchema);
+}
+
+export function writeFirstDocsIndex(projectRoot: string, docsIndex: FirstDocsIndex): void {
+  writeRuntimeJson(getFirstDocsIndexPath(projectRoot), docsIndex);
 }

@@ -8,7 +8,7 @@ export type RuntimeAssetFile = (typeof FIRST_RUNTIME_ARTIFACTS)[number];
 
 export interface AffectedAssets {
   runtimeAssets: RuntimeAssetFile[];
-  docsProjections: string[];
+  docsOutputs: string[];
 }
 
 const CHANGE_TYPE_TO_RUNTIME_ASSETS: Record<StructuralChange['type'], RuntimeAssetFile[]> = {
@@ -24,12 +24,12 @@ export function mapChangesToAssets(changes: StructuralChange[]): AffectedAssets 
   const runtimeAssets = Array.from(
     new Set(changes.flatMap((change) => CHANGE_TYPE_TO_RUNTIME_ASSETS[change.type]))
   );
-  const docsProjections = Array.from(
+  const docsOutputs = Array.from(
     new Set(runtimeAssets.flatMap((asset) => getProjectionDocsForRuntimeArtifact(asset)))
   );
 
   return {
     runtimeAssets,
-    docsProjections,
+    docsOutputs,
   };
 }

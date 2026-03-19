@@ -1,6 +1,7 @@
 # 领域模型执行提示
 
-> 这是增强路径提示，不是主题规范正文。只在 CLI 输出证据不足时补领域概念、关系、状态和规则证据。
+> 这是按需补证据提示，不是主题规范正文。
+> 由 Skill 按执行流决定是否派发，不由 CLI 判断是否触发。
 
 ## 适用场景
 
@@ -15,8 +16,8 @@
 ## 最小执行责任
 
 - 领域事实必须先沉淀到 `domain-model.json`
-- `docs/first/domain-model.md` 只作为投影视图存在
-- 可以结合 `structure-overview.json`、`api-contracts.json`、`database-schema.json` 补强，但不得把投影视图回灌为真源
+- `docs/first/domain-model.md` 只作为阅读输出存在
+- 可以结合 `structure-overview.json`、`api-contracts.json`、`database-schema.json` 补强，但不得把 docs 输出回灌为真源
 
 ## 工具与降级
 

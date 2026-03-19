@@ -32,11 +32,6 @@ import {
   type OrchestrateArgs,
 } from './orchestrate-args.js';
 import {
-  validateFirstArgs,
-  resolveFirstConfirmPolicy,
-  type FirstArgs,
-} from './first-args.js';
-import {
   generateResumeRecommendation,
   formatResumePrompt,
   formatProductSummary,
@@ -69,10 +64,6 @@ export interface DispatchResult {
   orchestrateArgs?: OrchestrateArgs;
   /** orchestrate 专用：按当前 Feature 阶段推导的背景治理建议 */
   orchestrateBackgroundGuidance?: BackgroundInputGuidance;
-  /** first 专用：解析后的参数（仅 skillName=first 时存在） */
-  firstArgs?: FirstArgs;
-  /** first 专用：确认策略（仅 skillName=first 时存在） */
-  firstConfirmPolicy?: 'skip' | 'require';
 }
 
 /** 语义子命令映射表 */
@@ -338,26 +329,6 @@ export function dispatchCommand(input: string, projectRoot: string): DispatchRes
       }
     }
 
-    if (skillName === 'first') {
-      try {
-        const firstArgs = validateFirstArgs(normalizedRest);
-        const firstConfirmPolicy = resolveFirstConfirmPolicy(firstArgs);
-        return {
-          route: 'skill',
-          skillName,
-          args: normalizedRest,
-          skillPath,
-          firstArgs,
-          firstConfirmPolicy,
-        };
-      } catch (e) {
-        return {
-          route: 'error',
-          error: e instanceof Error ? e.message : String(e),
-        };
-      }
-    }
-
     return {
       route: 'skill',
       skillName,
@@ -581,6 +552,8 @@ function formatStageRuntimeNotice(
     parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
   }
 
+  appendDocsIndexHints(parts, context);
+
   parts.push(...extraLines);
 
   if (context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full') {
@@ -601,6 +574,29 @@ function formatStageRuntimeNotice(
 
   parts.push(`<!-- /${marker} -->`);
   return parts.join('\n');
+}
+
+function appendDocsIndexHints(parts: string[], context: ResolvedSkillContext): void {
+  const docsIndex = context.docsIndex;
+  if (!docsIndex || docsIndex.entries.length === 0) return;
+
+  if (docsIndex.quickStart.length > 0) {
+    parts.push(`docs_quick_start: ${docsIndex.quickStart.join(', ')}`);
+  }
+
+  const primaryDocs = docsIndex.entries.filter((entry) => entry.priority === 'primary').slice(0, 4);
+  if (primaryDocs.length === 0) return;
+
+  parts.push('docs_reference_index:');
+  for (const entry of primaryDocs) {
+    const relatedAssets =
+      entry.relatedRuntimeAssets.length > 0
+        ? ` | assets: ${entry.relatedRuntimeAssets.join(', ')}`
+        : '';
+    const recommendedWhen =
+      entry.recommendedWhen.length > 0 ? ` | when: ${entry.recommendedWhen.join(' / ')}` : '';
+    parts.push(`- ${entry.path} | ${entry.title} | ${entry.purpose}${relatedAssets}${recommendedWhen}`);
+  }
 }
 
 /**
@@ -642,6 +638,7 @@ function buildOrchestrateRuntimeNotice(
     if (firstContext.firstSummaryLite?.projectName) {
       parts.push(`project_name: ${firstContext.firstSummaryLite.projectName}`);
     }
+    appendDocsIndexHints(parts, firstContext);
     if (firstContext.optional.apiContracts?.interfaces.length) {
       parts.push(
         `api_interfaces: ${firstContext.optional.apiContracts.interfaces.map((entry) => entry.name).join(', ')}`
@@ -725,6 +722,9 @@ function buildOnboardingRuntimeNotice(executionContext: SkillExecutionContext): 
         ...(context.onboardingSummary ? [`project_summary: ${context.onboardingSummary}`] : []),
         ...(steeringOverview ? [`steering_overview: ${steeringOverview}`] : []),
         ...(recommendedReads ? [`recommended_reads: ${recommendedReads}`] : []),
+        ...(context.docsIndex?.quickStart?.length
+          ? [`docs_quick_start: ${context.docsIndex.quickStart.join(', ')}`]
+          : []),
         'recommendation_mode: project-based',
         ...(context.missingAssets.length > 0 && context.backgroundInputStatus !== 'full'
           ? [`missing_assets: ${context.missingAssets.join(', ')}`]
@@ -742,6 +742,9 @@ function buildOnboardingRuntimeNotice(executionContext: SkillExecutionContext): 
         '## Onboarding Background Available',
         `data_source: ${context.source}`,
         `project_summary: ${context.onboardingSummary}`,
+        ...(context.docsIndex?.quickStart?.length
+          ? [`docs_quick_start: ${context.docsIndex.quickStart.join(', ')}`]
+          : []),
         ...(context.fallback.warning ? [`warning: ${context.fallback.warning}`] : []),
         'recommendation_mode: generic',
         'recommendation: 建议先运行 /spec-first:first 补全背景数据',
@@ -837,6 +840,7 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
     if (context.firstSummaryLite?.projectName) {
       parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
     }
+    appendDocsIndexHints(parts, context);
 
     if (context.optional.apiContracts?.interfaces.length) {
       parts.push(
@@ -987,6 +991,7 @@ function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string
     if (context.firstSummaryLite?.projectName) {
       parts.push(`project_name: ${context.firstSummaryLite.projectName}`);
     }
+    appendDocsIndexHints(parts, context);
 
     if (context.optional.apiContracts?.interfaces.length) {
       parts.push(

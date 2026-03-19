@@ -151,7 +151,7 @@ function seedCanonicalRuntime(): void {
   });
 }
 
-describe('first docs projection', () => {
+describe('first docs outputs writer', () => {
   beforeEach(() => {
     rmSync(TEST_ROOT, { recursive: true, force: true });
     mkdirSync(TEST_ROOT, { recursive: true });
@@ -162,7 +162,7 @@ describe('first docs projection', () => {
     rmSync(TEST_ROOT, { recursive: true, force: true });
   });
 
-  it('writes canonical projection docs with readable content', () => {
+  it('writes docs outputs with readable content', () => {
     const docs = refreshFirstDocsFromRuntime(TEST_ROOT);
 
     expect(docs).toContain('docs/first/README.md');
@@ -177,10 +177,16 @@ describe('first docs projection', () => {
 
     expect(summaryDoc).toContain('## 项目是什么');
     expect(summaryDoc).toContain('spec-first');
-    expect(overviewDoc).toContain('Canonical Projection Docs');
+    expect(overviewDoc).toContain('Docs Outputs');
     expect(overviewDoc).toContain('.spec-first/runtime/first/');
     expect(devDoc).toContain('## API 规范');
+    expect(devDoc).toContain('## 项目规范');
+    expect(devDoc).not.toContain('## 配置规范');
+    expect(devDoc).not.toContain('## 交付规范');
     expect(devDoc).toContain('## 本地环境配置');
+    expect(readFileSync(join(TEST_ROOT, 'docs', 'first', 'conventions.md'), 'utf-8')).toContain(
+      '## 交付约束'
+    );
     expect(dbDoc).toContain('features');
   });
 });

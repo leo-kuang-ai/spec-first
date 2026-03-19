@@ -8,6 +8,7 @@ import {
   readFirstConventions,
   readFirstCriticalFlows,
   readFirstDatabaseSchema,
+  readFirstDocsIndex,
   readFirstDomainModel,
   readFirstEntryGuide,
   readFirstRuntimeIndex,
@@ -21,6 +22,7 @@ import type {
   FirstConventions,
   FirstCriticalFlows,
   FirstDatabaseSchema,
+  FirstDocsIndex,
   FirstDomainModel,
   FirstEntryGuide,
   FirstSteering,
@@ -45,6 +47,7 @@ export interface ResolvedSkillContext {
   contextSummary?: string;
   onboardingSummary?: string;
   firstSummaryLite?: FirstSummaryLite;
+  docsIndex?: FirstDocsIndex;
   requiredAssetNames: string[];
   optionalAssetNames: string[];
   missingRequiredAssets: string[];
@@ -199,6 +202,7 @@ interface RuntimeAssetSnapshot {
   structureOverview?: FirstStructureOverview;
   domainModel?: FirstDomainModel;
   databaseSchema?: FirstDatabaseSchema;
+  docsIndex?: FirstDocsIndex;
   availableAssets: Set<RuntimeAssetName>;
 }
 
@@ -355,6 +359,7 @@ function readRuntimeAssetSnapshot(projectRoot: string): RuntimeAssetSnapshot {
     ? (readFirstDatabaseSchema(projectRoot) ?? undefined)
     : undefined;
   if (databaseSchema) availableAssets.add('database-schema');
+  const docsIndex = readFirstDocsIndex(projectRoot) ?? undefined;
 
   const stageSummaries: Partial<Record<StageViewKey, string>> = {};
   if (summary) {
@@ -377,6 +382,7 @@ function readRuntimeAssetSnapshot(projectRoot: string): RuntimeAssetSnapshot {
     structureOverview,
     domainModel,
     databaseSchema,
+    docsIndex,
     availableAssets,
   };
 }
@@ -524,6 +530,7 @@ export function resolveSkillContext(
       backgroundInputStatus,
       contextSummary: snapshot.stageSummaries[stageKey],
       firstSummaryLite,
+      docsIndex: snapshot.docsIndex,
       requiredAssetNames: contract.required,
       optionalAssetNames: contract.optional,
       missingRequiredAssets: runtimeSlices.missingRequiredAssets,
@@ -543,6 +550,7 @@ export function resolveSkillContext(
       backgroundInputStatus,
       onboardingSummary: snapshot.onboardingSummary,
       firstSummaryLite,
+      docsIndex: snapshot.docsIndex,
       requiredAssetNames: contract.required,
       optionalAssetNames: contract.optional,
       missingRequiredAssets: runtimeSlices.missingRequiredAssets,
@@ -564,6 +572,7 @@ export function resolveSkillContext(
         backgroundInputStatus,
         contextSummary: docsStageSummary,
         firstSummaryLite,
+        docsIndex: snapshot.docsIndex,
         requiredAssetNames: contract.required,
         optionalAssetNames: contract.optional,
         missingRequiredAssets: runtimeSlices.missingRequiredAssets,
@@ -586,6 +595,7 @@ export function resolveSkillContext(
         backgroundInputStatus,
         onboardingSummary: docsRoleSummary,
         firstSummaryLite,
+        docsIndex: snapshot.docsIndex,
         requiredAssetNames: contract.required,
         optionalAssetNames: contract.optional,
         missingRequiredAssets: runtimeSlices.missingRequiredAssets,
@@ -605,6 +615,7 @@ export function resolveSkillContext(
       source: 'runtime',
       backgroundInputStatus,
       firstSummaryLite,
+      docsIndex: snapshot.docsIndex,
       requiredAssetNames: contract.required,
       optionalAssetNames: contract.optional,
       missingRequiredAssets: runtimeSlices.missingRequiredAssets,
@@ -638,8 +649,9 @@ export function resolveSkillContext(
     skillName,
     source: 'none',
     backgroundInputStatus,
-    firstSummaryLite,
-    requiredAssetNames: contract.required,
+      firstSummaryLite,
+      docsIndex: snapshot.docsIndex,
+      requiredAssetNames: contract.required,
     optionalAssetNames: contract.optional,
     missingRequiredAssets: runtimeSlices.missingRequiredAssets,
     required: {},

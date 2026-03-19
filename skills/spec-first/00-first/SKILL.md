@@ -1,45 +1,49 @@
 ---
 name: "spec-first:first"
-description: "Use when you need to understand an existing project quickly, generate or refresh docs/first, rebuild .spec-first/runtime/first, or verify first outputs are complete."
+description: "Use when validating project cognition outputs, coordinating Skill-driven runtime/docs delivery through external execution, onboarding to an unknown codebase, or when project context is stale, missing, or needs to be rebuilt after major changes."
 ---
 
 # Skill: first
 
-生成或刷新项目级 runtime-first 认知资产。默认路径是直接执行 CLI，而不是先走多 Agent 编排。
+`first` 是项目级认知 Skill。  
+它的职责是定义工作流、多 Agent 编排、约束和成功标准；Skill 工作流直接产出最终 runtime/docs 文件，CLI 只负责最小支撑层：启动、校验和宿主集成。
 
-## 默认命令
+## 默认模式
+
+- 唯一模式：`deep`
+- 默认就是 `deep`
+
+## 默认入口
 
 ```bash
 spec-first first
 ```
 
-非交互批处理推荐：
+## 正式边界
 
-```bash
-spec-first first --yes
-```
-
-增强分析只在以下场景按需启用：
-- 代码结构、架构关系、调用链需要更深证据
-- API 接口契约提取不完整
-- 领域模型或数据库关系需要补强
+- Skill 负责：
+  - 定义项目认知任务的工作流
+  - 定义 runtime agents 与 docs agents 的分工
+  - 定义证据来源、禁止猜测边界、成功标准与重试原则
+  - 定义总并发上限：单轮最多 3 个 Agent 并发
+- CLI 负责：
+  - 启动 `first`
+  - 准备最小输入
+  - 校验 runtime 结构
+  - 检查 docs 是否存在
 
 ## 正式 contract
 
-- `.spec-first/runtime/first/` 是唯一正式真源
-- `.spec-first/runtime/first/index.json` 是正式真索引
-- `docs/first/*.md` 是 projection，不是旁路真源
-- 默认运行口径固定为 `deep`
-- 所有 projection 文档默认使用中文；术语、路径、命令、代码标识符保留英文
-- 如果 projection 输出与中文 contract 不一致，优先修 renderer 与测试，不接受“规范要求中文、实现临时英文”的漂移状态
+- `.spec-first/runtime/first/` 是机器真源
+- `.spec-first/runtime/first/index.json` 是正式索引
+- `docs/first/*.md` 是人类阅读产物，不参与上下文注入
+- `docs/first/*.md` 不再承载文档真源语义
+- 所有输出默认使用中文；术语、路径、命令、代码标识符保留英文
 
-## Runtime 分层模型
-
-- 机器真源层：`.spec-first/runtime/first/`
-- 文档投影视图层：`docs/first/`
-- 执行策略：优先增量刷新，必要时再全量重建
+## 正式 runtime 资产
 
 正式 runtime 资产共 `9` 个：
+
 - `summary.json`
 - `steering.json`
 - `conventions.json`
@@ -50,56 +54,91 @@ spec-first first --yes
 - `domain-model.json`
 - `database-schema.json`
 
-正式投影视图共 `14` 个：
-- 9 个基础投影视图
-- 4 个正式专题投影视图
-- 1 个条件型投影视图（`database-er.md`）
+## 辅助 runtime 产物
 
-## 最小执行流程
+辅助 runtime 产物仅服务阅读路由与上下文引导，不属于正式真源资产。
 
-1. 执行 `spec-first first`
-2. 非交互场景使用 `spec-first first --yes`
-3. 生成或刷新 runtime truth
-4. 从 runtime truth 统一投影 `docs/first/*.md`
-5. 若个别专题证据不足，再按需读取增强 reference
+- `docs-index.json`
+
+约束：
+
+- 只服务 docs 阅读建议与快速索引
+- 不参与 runtime 真源判定
+- 不覆盖正式 runtime 资产
+- 不作为正式 contract 的一部分
+
+## 正式 docs 集合
+
+正式 docs 共 `14` 个：
+
+- `README.md`
+- `summary.md`
+- `steering.md`
+- `conventions.md`
+- `critical-flows.md`
+- `entry-guide.md`
+- `api-docs.md`
+- `codebase-overview.md`
+- `domain-model.md`
+- `architecture.md`
+- `call-graph.md`
+- `development-guidelines.md`
+- `external-deps.md`
+- `database-er.md`
+
+## 最小执行流
+
+详细执行流见 `references/execution-flow.md`。Agent 层完成认知产出后直接写入最终 `.spec-first/runtime/first/*` 与 `docs/first/*`，CLI 层负责校验与宿主集成。
 
 ## Reference 读取规则
 
 ### 默认
 
 - `references/execution-flow.md`
+- `references/subagent-architecture.md`
 - `references/detection-rules.md`
-- `references/platform-document-mapping.md`
-- `references/testing-strategy.md`
+- `references/quality-assurance-rules.md`
 
-### 增强
+### 按需 Agent 规格
 
 - `references/agents-code-analysis.md`
 - `references/agents-api-deps.md`
 - `references/agent-guidelines-setup.md`
 - `references/agent-database.md`
 - `references/agent-domain-model.md`
-- `references/subagent-architecture.md`
+
+### 分析专题补充（Agent 证据不足时按需加载）
+
+- `references/structure-analysis.md` — 代码结构 / 架构 / 调用链补强规则（A1-A3）
+- `references/api-and-dependencies.md` — API 接口与外部依赖补强规则（B/C1）
+- `references/conventions-and-setup.md` — 规范与环境配置补强规则（C2）
+- `references/domain-model-analysis.md` — 领域模型资产产出规范
+- `references/database-conditional-projection.md` — 条件型数据库处理规则（healthy/not_applicable/degraded）
 
 ### 低频专项
 
 - `references/database-config.md`
-- `references/quality-assurance-rules.md`
+- `references/platform-document-mapping.md`
+
+### 测试与验收
+
+- `references/testing-strategy.md` — runtime 资产与 docs 输出稳定性验证策略（验收阶段加载）
 
 ## 核心硬约束
 
 - 以代码、配置、依赖声明和 runtime 真源为准，禁止捏造
-- 先写 runtime truth，再生成 Markdown projection
-- 不得把 `docs/first/*.md` 中的叙述回灌为真源
+- Skill 定义编排，CLI 不实现多 Agent 调度器
+- 先有 runtime 结果，再允许写入 runtime 真源
+- Skill 工作流直接写入最终 runtime/docs 文件，CLI 不承担文件交付职责
+- docs 不得回灌为真源
 - 无法确认的结论必须标记 `[待确认]`
-- `database-er.md` 只有在 `databaseSchema.status === healthy` 时才允许生成
+- `database-er.md` 只有在 `databaseSchema.status === healthy` 时才允许产出
 - `api-docs.md` 只服务项目 API 接口规范，不承载外部依赖综述
 
 ## Common Mistakes
 
+- 把 CLI 当成项目认知主控，而不是最小支撑层
 - 把 `docs/first/*.md` 当成事实真源使用
-- 默认误走多 Agent 重路径，而不是先执行 `spec-first first`
 - 在 `databaseSchema.status !== healthy` 时强行消费 `database-er.md`
-- 把 `api-docs.md` 当成外部依赖或集成说明文档
-- 在 projection 层补充 runtime truth 中不存在的新事实
-
+- 在 projection/renderer 层补充 runtime 中不存在的新事实
+- 把 Agent 编排逻辑继续下沉到 `src` 代码里

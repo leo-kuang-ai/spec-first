@@ -97,7 +97,7 @@ describe('init runtime readiness', () => {
     expect(readiness.firstMissing).toContain('.spec-first/runtime/first/summary.json');
   });
 
-  it('does not fall back to docs projection when runtime summary is missing', () => {
+  it('does not fall back to docs outputs when runtime summary is missing', () => {
     const docsFirst = join(TEST_ROOT, 'docs', 'first');
     mkdirSync(docsFirst, { recursive: true });
     writeFileSync(join(docsFirst, 'summary.md'), '# Summary\nunknown\n', 'utf-8');

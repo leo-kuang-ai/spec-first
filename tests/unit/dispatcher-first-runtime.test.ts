@@ -11,6 +11,7 @@ import {
   writeFirstConventions,
   writeFirstCriticalFlows,
   writeFirstDatabaseSchema,
+  writeFirstDocsIndex,
   writeFirstDomainModel,
   writeFirstEntryGuide,
   writeFirstRuntimeIndex,
@@ -125,6 +126,34 @@ function seedCanonicalRuntime(): void {
     risks: [],
     evidence: [],
   });
+  writeFirstDocsIndex(TEST_ROOT, {
+    generatedAt: '2026-03-08T12:00:00.000Z',
+    mode: 'deep',
+    quickStart: [
+      'docs/first/README.md',
+      'docs/first/summary.md',
+      'docs/first/entry-guide.md',
+    ],
+    entries: [
+      {
+        path: 'docs/first/README.md',
+        title: '项目认知输出总览',
+        purpose: '快速导航 runtime 与 docs 输出。',
+        relatedRuntimeAssets: ['.spec-first/runtime/first/index.json', '.spec-first/runtime/first/summary.json'],
+        recommendedWhen: ['首次进入项目'],
+        priority: 'primary',
+      },
+      {
+        path: 'docs/first/summary.md',
+        title: '项目摘要',
+        purpose: '建立项目背景。',
+        relatedRuntimeAssets: ['.spec-first/runtime/first/summary.json'],
+        recommendedWhen: ['需要快速建立项目背景'],
+        priority: 'primary',
+      },
+    ],
+    notes: ['docs/first 仅供阅读。'],
+  });
   writeFirstRuntimeIndex(TEST_ROOT, {
     version: '1.0.0',
     lastRun: '2026-03-08T12:00:00.000Z',
@@ -164,6 +193,7 @@ describe('dispatcher first runtime notice', () => {
     expect(notice).toContain('summary.json');
     expect(notice).toContain('api-contracts.json');
     expect(notice).toContain('spec-first');
+    expect(notice).toContain('docs_quick_start');
   });
 
   it('builds orchestrate notice from current feature background guidance', () => {

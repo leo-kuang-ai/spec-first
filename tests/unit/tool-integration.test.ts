@@ -291,8 +291,8 @@ describe('handleStatus', () => {
     expect(code).toBe(ExitCode.SUCCESS);
     expect(stdout).toContain('background_input_status: full');
     expect(stdout).toContain('runtime 真源: current');
-    expect(stdout).toContain('docs 投影视图: healthy');
-    expect(stdout).toContain('同步状态: in_sync');
+    expect(stdout).toContain('docs 输出: ready');
+    expect(stdout).toContain('同步状态: ready');
     expect(stdout).toContain('C1 (Design Coverage): 100.0%');
     expect(stdout).toContain('done: 1');
     expect(stdout).toContain('in_progress: 1');

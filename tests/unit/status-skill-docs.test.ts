@@ -22,14 +22,14 @@ describe('14-status skill docs consistency', () => {
     expect(skill).toContain('background_input_status');
     expect(skill).toContain('runtime 真源');
     expect(dashboard).toContain('background_input_status');
-    expect(dashboard).toContain('docs 投影视图');
+    expect(dashboard).toContain('docs 输出');
   });
 
-  it('should distinguish runtime truth source from docs projection state', () => {
+  it('should distinguish runtime truth source from docs output state', () => {
     const skill = read(SKILL_MD);
     const dashboard = read(DASHBOARD);
 
-    expect(skill).toContain('docs 投影视图');
+    expect(skill).toContain('docs 输出');
     expect(dashboard).toContain('runtime 真源');
     expect(dashboard).toContain('同步状态');
   });
@@ -38,14 +38,14 @@ describe('14-status skill docs consistency', () => {
     const skill = read(SKILL_MD);
 
     expect(skill).toContain('**P1**: 加载 stage-state、指标、任务计划、Gate 历史，并读取 `background_input_status` 与 runtime/docs 分层状态');
-    expect(skill).toContain('**P2**: 计算健康分、识别风险、判断 runtime 真源与 docs 投影视图是否漂移');
+    expect(skill).toContain('**P2**: 计算健康分、识别风险、判断 runtime 真源是否异常、docs 输出是否缺失');
     expect(skill).toContain('**P3**: 生成状态仪表盘（阶段、覆盖率、健康分、任务、风险、背景状态卡片）');
   });
 
   it('should include background state and sync status in success criteria', () => {
     const skill = read(SKILL_MD);
 
-    expect(skill).toContain('状态面板已展示 `background_input_status`、`runtime 真源`、`docs 投影视图`、`同步状态`');
+    expect(skill).toContain('状态面板已展示 `background_input_status`、`runtime 真源`、`docs 输出`、`同步状态`');
   });
 
   it('should keep status metrics and task states aligned with canonical semantics', () => {
@@ -63,11 +63,11 @@ describe('14-status skill docs consistency', () => {
     expect(dashboard).not.toContain('| ✅ complete |');
   });
 
-  it('should treat runtime/docs drift as an explicit status risk', () => {
+  it('should treat runtime/docs output issues as explicit status risk', () => {
     expect(existsSync(RISK)).toBe(true);
     const risk = read(RISK);
 
-    expect(risk).toContain('docs 投影视图漂移');
+    expect(risk).toContain('docs 输出缺失');
     expect(risk).toContain('runtime 真源异常');
     expect(risk).toContain('同步状态异常');
   });

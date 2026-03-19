@@ -16,7 +16,7 @@ describe('background quality shared contract', () => {
 
     expect(contract).toContain('background_input_status');
     expect(contract).toContain('runtime 真源');
-    expect(contract).toContain('docs 投影视图');
+    expect(contract).toContain('docs 输出');
     expect(contract).toContain('同步状态');
     expect(contract).toContain('backgroundInputStatus');
   });
@@ -31,11 +31,10 @@ describe('background quality shared contract', () => {
     expect(contract).toContain('healthy');
     expect(contract).toContain('missing');
 
-    expect(contract).toContain('synced');
-    expect(contract).toContain('stale');
-    expect(contract).toContain('drifted');
-
-    expect(contract).toContain('in_sync');
+    expect(contract).toContain('ready');
+    expect(contract).toContain('missing');
+    expect(contract).toContain('attention');
+    expect(contract).toContain('unknown');
   });
 
   it('should anchor init and review to the shared contract', () => {
@@ -71,15 +70,15 @@ describe('background quality shared contract', () => {
     expect(statusSkill).toContain('shared/background-quality-contract.md');
     expect(statusTemplate).toContain('background_input_status');
     expect(statusTemplate).toContain('runtime 真源');
-    expect(statusTemplate).toContain('docs 投影视图');
+    expect(statusTemplate).toContain('docs 输出');
     expect(statusTemplate).toContain('同步状态');
 
     expect(analyzeSkill).toContain('shared/background-quality-contract.md');
     expect(analyzeTemplate).toContain('建议动作');
     expect(analyzeRules).toContain('background_input_status = blind → `HIGH`');
     expect(analyzeRules).toContain('runtime 真源异常 → `HIGH`');
-    expect(analyzeRules).toContain('docs 投影视图漂移 → `MEDIUM`');
-    expect(analyzeRules).toContain('同步状态 stale/drifted → `MEDIUM`');
+    expect(analyzeRules).toContain('docs 输出缺失 → `MEDIUM`');
+    expect(analyzeRules).toContain('同步状态 attention → `MEDIUM`');
   });
 
   it('should keep doctor and spec aligned with the shared contract', () => {
@@ -89,7 +88,7 @@ describe('background quality shared contract', () => {
     expect(doctorSkill).toContain('shared/background-quality-contract.md');
     expect(doctorSkill).toContain('background_input_status');
     expect(doctorSkill).toContain('runtime 真源');
-    expect(doctorSkill).toContain('docs 投影视图');
+    expect(doctorSkill).toContain('docs 输出');
 
     expect(specSkill).toContain('shared/background-quality-contract.md');
     expect(specSkill).toContain('spec-view');

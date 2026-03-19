@@ -6,6 +6,7 @@ import {
   FIRST_RUNTIME_CONVENTIONS_FILE,
   FIRST_RUNTIME_CRITICAL_FLOWS_FILE,
   FIRST_RUNTIME_DATABASE_SCHEMA_FILE,
+  FIRST_RUNTIME_DOCS_INDEX_FILE,
   FIRST_RUNTIME_DIR,
   FIRST_RUNTIME_DOMAIN_MODEL_FILE,
   FIRST_RUNTIME_ENTRY_GUIDE_FILE,
@@ -17,6 +18,7 @@ import {
   getFirstConventionsPath,
   getFirstCriticalFlowsPath,
   getFirstDatabaseSchemaPath,
+  getFirstDocsIndexPath,
   getFirstDomainModelPath,
   getFirstEntryGuidePath,
   getFirstRuntimeIndexPath,
@@ -28,6 +30,7 @@ import {
   writeFirstConventions,
   writeFirstCriticalFlows,
   writeFirstDatabaseSchema,
+  writeFirstDocsIndex,
   writeFirstDomainModel,
   writeFirstEntryGuide,
   writeFirstRuntimeIndex,
@@ -69,6 +72,7 @@ describe('first runtime store', () => {
     expect(FIRST_RUNTIME_STRUCTURE_OVERVIEW_FILE).toBe('structure-overview.json');
     expect(FIRST_RUNTIME_DOMAIN_MODEL_FILE).toBe('domain-model.json');
     expect(FIRST_RUNTIME_DATABASE_SCHEMA_FILE).toBe('database-schema.json');
+    expect(FIRST_RUNTIME_DOCS_INDEX_FILE).toBe('docs-index.json');
     expect(getFirstRuntimeIndexPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/index.json'));
     expect(getFirstRuntimeSummaryPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/summary.json'));
     expect(getFirstSteeringPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/steering.json'));
@@ -79,6 +83,7 @@ describe('first runtime store', () => {
     expect(getFirstStructureOverviewPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/structure-overview.json'));
     expect(getFirstDomainModelPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/domain-model.json'));
     expect(getFirstDatabaseSchemaPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/database-schema.json'));
+    expect(getFirstDocsIndexPath(TEST_ROOT)).toBe(join(TEST_ROOT, '.spec-first/runtime/first/docs-index.json'));
   });
 
   it('writes and reads canonical runtime assets', () => {
@@ -162,6 +167,22 @@ describe('first runtime store', () => {
       tables: [],
       risks: [],
       evidence: [],
+    });
+    writeFirstDocsIndex(TEST_ROOT, {
+      generatedAt: '2026-03-08T12:00:00.000Z',
+      mode: 'deep',
+      quickStart: ['docs/first/README.md'],
+      entries: [
+        {
+          path: 'docs/first/README.md',
+          title: '项目认知输出总览',
+          purpose: 'runtime docs index',
+          relatedRuntimeAssets: ['.spec-first/runtime/first/index.json'],
+          recommendedWhen: ['首次进入项目'],
+          priority: 'primary',
+        },
+      ],
+      notes: ['runtime docs index'],
     });
     writeFirstRuntimeIndex(TEST_ROOT, {
       version: '1.0.0',

@@ -203,9 +203,9 @@
 
 ## 背景质量规则
 - 分析 `background_input_status`
-- 检测 runtime 真源与 docs 投影视图漂移
-- 将背景缺失、失同步、健康度异常纳入 findings
+- 检测 runtime 真源异常与 docs 输出缺失
+- 将背景缺失、输出缺失、健康度异常纳入 findings
 - background_input_status = blind → `HIGH`
 - runtime 真源异常 → `HIGH`
-- docs 投影视图漂移 → `MEDIUM`
-- 同步状态 stale/drifted → `MEDIUM`
+- docs 输出缺失 → `MEDIUM`
+- 同步状态 attention → `MEDIUM`

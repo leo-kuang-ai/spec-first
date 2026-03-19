@@ -39,7 +39,7 @@ describe('00-first skill docs consistency', () => {
 
     const skill = read(SKILL_MD);
     expect(skill).toContain('name: "spec-first:first"');
-    expect(skill).toContain('description: "Use when you need to understand an existing project quickly');
+    expect(skill).toContain('description: "Use when running spec-first first');
     expect(skill).not.toContain('version: "2.3.0"');
     expect(skill).not.toContain('last_updated: "2026-03-17"');
   });
@@ -47,7 +47,8 @@ describe('00-first skill docs consistency', () => {
   it('should use trigger-style description and keep CLI as default path', () => {
     const skill = read(SKILL_MD);
     expect(skill).toContain('description: "Use when');
-    expect(skill).toContain('spec-first first --yes');
+    expect(skill).toContain('spec-first first');
+    expect(skill).not.toContain('spec-first first --yes');
   });
 
   it('should keep common mistakes focused on runtime-first misuse', () => {
@@ -81,7 +82,7 @@ describe('00-first skill docs consistency', () => {
     }
   });
 
-  it('should describe runtime asset handoff in agent specs', () => {
+  it('should describe runtime asset outputs in agent specs', () => {
     for (const file of AGENT_DOCS) {
       const content = read(file);
       expect(content).toMatch(/\w+\.json/);
@@ -120,16 +121,17 @@ describe('00-first skill docs consistency', () => {
     expect(testing).toContain('测试策略');
   });
 
-  it('should describe testing strategy by assets and projections', () => {
+  it('should describe testing strategy by assets and docs outputs', () => {
     const testing = read(TESTING);
     expect(testing).toContain('资产');
-    expect(testing).toContain('投影');
+    expect(testing).toContain('docs 输出');
     expect(testing).toContain('runtime');
   });
 
   it('should keep execution flow on runtime-first contract', () => {
     const flow = read(EXECUTION_FLOW);
-    expect(flow).toContain('spec-first first --yes');
+    expect(flow).toContain('spec-first first');
+    expect(flow).not.toContain('spec-first first --yes');
     expect(flow).toContain('.spec-first/runtime/first/');
   });
 
@@ -173,7 +175,7 @@ const INIT_PREREQ = join(import.meta.dirname, '../../skills/spec-first/01-init/r
 const INIT_OUTPUT = join(import.meta.dirname, '../../skills/spec-first/01-init/references/output-format.md');
 const FIRST_README = join(import.meta.dirname, '../../docs/first/README.md');
 
-describe('runtime truth source and docs projection model', () => {
+describe('runtime truth source and docs output model', () => {
   it('documents runtime truth source in 00-first skill', () => {
     const skill = read(SKILL_MD);
     expect(skill).toContain('.spec-first/runtime/first/');
@@ -183,7 +185,7 @@ describe('runtime truth source and docs projection model', () => {
 
   it('documents the current runtime-first artifact inventory', () => {
     const skill = read(SKILL_MD);
-    expect(skill).toContain('投影视图');
+    expect(skill).toContain('docs/first');
     expect(skill).toContain('.json');
   });
 
@@ -200,24 +202,14 @@ describe('runtime truth source and docs projection model', () => {
     expect(output).toContain('.spec-first/runtime/first/index.json');
   });
 
-  it('documents docs/first as projection-layer outputs in skill docs', () => {
+  it('documents docs/first as reading outputs in skill docs', () => {
     const skill = read(SKILL_MD);
-    expect(skill).toContain('projection');
+    expect(skill).toContain('阅读产物');
     expect(skill).toContain('.spec-first/runtime/first/');
   });
 
-  it('documents canonical docs/first projection inventory in skill docs', () => {
+  it('documents docs/first output inventory in skill docs', () => {
     const skill = read(SKILL_MD);
-    expect(skill).toContain('投影视图');
-  });
-});
-
-
-describe('refresh mode docs', () => {
-  it.skip('documents the three refresh modes in 00-first skill', () => {
-    const skill = read(SKILL_MD);
-    expect(skill).toContain('refresh-runtime-only');
-    expect(skill).toContain('refresh-docs-from-runtime');
-    expect(skill).toContain('refresh-all');
+    expect(skill).toContain('docs/first/*.md');
   });
 });

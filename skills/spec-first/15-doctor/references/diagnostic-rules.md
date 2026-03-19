@@ -368,5 +368,6 @@ npm install
 
 ## background checks
 - 检查 canonical first runtime 资产是否存在且 healthy
-- 检查 runtime 真源与 docs 投影视图是否失同步
+- 检查 runtime 真源是否异常或缺失
+- 检查 docs 输出是否缺失
 - 检查 `background_input_status` 是否缺失或退化

@@ -92,7 +92,7 @@ describe('first resume', () => {
   it('无 runtime 资产时返回首次运行建议', () => {
     const result = generateResumeRecommendation(join(TEST_DIR, 'nonexistent'));
     expect(result.hasExistingProducts).toBe(false);
-    expect(result.recommendedOption).toBe('full_regenerate');
+    expect(result.recommendedOption).toBe('skip');
   });
 
   it('runtime 存在时返回恢复建议', () => {
@@ -118,7 +118,7 @@ describe('first resume', () => {
       lastRunTime: new Date('2026-03-01'),
       isStale: false,
       commitMismatch: false,
-      options: ['view_summary', 'full_regenerate'],
+      options: ['view_summary', 'skip'],
       recommendedOption: 'view_summary',
       message: '检测到已有产物',
     };

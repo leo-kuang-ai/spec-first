@@ -1,6 +1,6 @@
 {
-  "featureId": "FSREQ-20260318-WEBSITE-001",
-  "mode": "I",
+  "featureId": "FSREQ-20260319-WEBSITE-001",
+  "mode": "N",
   "size": "S",
   "platforms": [
     "h5"
@@ -15,10 +15,6 @@
         {
           "id": "L0-SPEC-001",
           "description": "FR/NFR 列表存在且非空"
-        },
-        {
-          "id": "L1-MODE-I-001",
-          "description": "impact-analysis.md 存在且非空"
         }
       ],
       "02_design": [
@@ -73,11 +69,6 @@
           "name": "spec.md",
           "required": true,
           "description": "FR/NFR 列表"
-        },
-        {
-          "name": "impact-analysis.md",
-          "required": true,
-          "description": "变更影响分析"
         }
       ],
       "02_design": [
@@ -108,11 +99,6 @@
           "name": "reports/test-report.md",
           "required": true,
           "description": "测试报告"
-        },
-        {
-          "name": "reports/regression-report.md",
-          "required": true,
-          "description": "回归验证报告"
         }
       ],
       "06_wrap_up": [
@@ -150,23 +136,35 @@
       }
     }
   },
-  "currentStage": "02_design",
+  "currentStage": "04_implement",
   "history": [
     {
       "from": "00_init",
       "to": "01_specify",
-      "timestamp": "2026-03-18T12:46:57.480Z",
+      "timestamp": "2026-03-19T05:23:17.446Z",
       "gateResult": "PASS"
     },
     {
       "from": "01_specify",
       "to": "02_design",
-      "timestamp": "2026-03-18T12:55:33.591Z",
+      "timestamp": "2026-03-19T05:33:52.642Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "02_design",
+      "to": "03_plan",
+      "timestamp": "2026-03-19T05:41:30.053Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "03_plan",
+      "to": "04_implement",
+      "timestamp": "2026-03-19T05:52:41.805Z",
       "gateResult": "PASS"
     }
   ],
   "terminal": false,
-  "title": "项目官方网站",
-  "createdAt": "2026-03-18T12:43:23.939Z",
-  "updatedAt": "2026-03-18T12:55:33.591Z"
+  "title": "项目介绍官网",
+  "createdAt": "2026-03-19T05:20:47.387Z",
+  "updatedAt": "2026-03-19T05:52:41.805Z"
 }

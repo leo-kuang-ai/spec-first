@@ -24,7 +24,7 @@
 - `external-deps.md`
 - `development-guidelines.md`
 
-### 条件型文档（按状态生成）
+### 条件型文档（按状态产出）
 
 - `database-er.md`
 
@@ -63,12 +63,12 @@
 
 `database-er.md` 不是按端类型硬编码启用，而是由 `database-schema.json` 的状态决定：
 
-- `healthy` → 生成 `database-er.md`
-- `not_applicable` → 不生成
-- `degraded` → 不生成正式文档，仅记录告警
+- `healthy` → 产出 `database-er.md`
+- `not_applicable` → 不产出
+- `degraded` → 不产出正式文档，仅记录告警
 
 ## 5. 降级策略
 
-- 无法识别端类型时，仍生成正式文档全集
+- 无法识别端类型时，仍产出正式文档全集
 - 未确定的内容以 `[待确认]` 标注
 - 不得因为端类型识别失败而裁剪正式文档 contract

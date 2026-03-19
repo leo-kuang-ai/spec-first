@@ -175,18 +175,11 @@ export function resolvePromptAssemblyContext(
   };
 }
 
-const MAX_CONTEXT_PACK_BYTES = 2048;
-
 export function assemblePrompt(template: string, ctx: PromptAssemblyContext): string {
   const result = template.replace(/\{\{\s*([A-Z_]+)\s*\}\}/g, (full, key: string) => {
     const replacer = PLACEHOLDER_REPLACERS[key];
     if (!replacer) return full;
     return replacer(ctx);
   });
-  if (result.length > MAX_CONTEXT_PACK_BYTES) {
-    console.warn(
-      `[spec-first] Context Pack 超出建议大小（${result.length} > ${MAX_CONTEXT_PACK_BYTES} bytes）`
-    );
-  }
   return result;
 }

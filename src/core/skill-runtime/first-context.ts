@@ -8,8 +8,7 @@ import {
   FIRST_RUNTIME_ARTIFACTS,
   matchRuntimeArtifactsByChangedFile,
 } from './first-artifact-mapping.js';
-import { bootstrapFirstRuntime } from './first-bootstrap.js';
-import { refreshFirstDocsFromRuntime } from './first-doc-projection.js';
+import { parsePorcelainChangedFiles } from './first-change-detector.js';
 import {
   getFirstApiContractsPath,
   getFirstConventionsPath,
@@ -45,14 +44,6 @@ import type {
   FirstSteering,
   FirstStructureOverview,
 } from './first-runtime-types.js';
-
-export const FIRST_REFRESH_MODES = [
-  'refresh-runtime-only',
-  'refresh-docs-from-runtime',
-  'refresh-all',
-] as const;
-
-export type FirstRefreshMode = (typeof FIRST_REFRESH_MODES)[number];
 export type FirstRuntimeArtifact = (typeof FIRST_RUNTIME_ARTIFACTS)[number];
 
 export interface FirstContext {
@@ -66,17 +57,6 @@ export interface FirstContext {
   structureOverview: FirstStructureOverview;
   domainModel: FirstDomainModel;
   databaseSchema: FirstDatabaseSchema | null;
-}
-
-export interface FirstRefreshResult {
-  mode: FirstRefreshMode;
-  runtimeArtifacts: string[];
-  docsProjections: string[];
-}
-
-export interface ExecuteFirstResult {
-  runtimeArtifacts: string[];
-  docsProjections: string[];
 }
 
 export interface BackgroundInputSyncResult {
@@ -150,7 +130,7 @@ function getCurrentSourceCommit(projectRoot: string): string | null {
   }
 }
 
-function getWorkingTreeChangedFiles(projectRoot: string): string[] | null {
+function _getWorkingTreeChangedFiles(projectRoot: string): string[] | null {
   try {
     const output = execFileSync('git', ['status', '--porcelain'], {
       cwd: projectRoot,
@@ -162,18 +142,13 @@ function getWorkingTreeChangedFiles(projectRoot: string): string[] | null {
       return [];
     }
 
-    return output
-      .split('\n')
-      .map((line) => line.slice(3).trim())
-      .map((path) => (path.includes(' -> ') ? (path.split(' -> ').at(-1) ?? path) : path))
-      .map((path) => path.replace(/^"|"$/g, ''))
-      .filter(Boolean);
+    return parsePorcelainChangedFiles(output);
   } catch {
     return null;
   }
 }
 
-function getCommittedSourceChanges(
+function _getCommittedSourceChanges(
   projectRoot: string,
   fromCommit: string,
   toCommit: string
@@ -204,14 +179,14 @@ function getCommittedSourceChanges(
   }
 }
 
-function mergeChangedFiles(...groups: Array<string[] | null>): string[] | null {
+function _mergeChangedFiles(...groups: Array<string[] | null>): string[] | null {
   if (groups.some((group) => group === null)) {
     return null;
   }
   return Array.from(new Set(groups.flatMap((group) => group ?? [])));
 }
 
-function determineRebuildArtifacts(
+function _determineRebuildArtifacts(
   changedFiles: string[],
   index: FirstRuntimeIndex
 ): FirstRuntimeArtifact[] {
@@ -273,7 +248,7 @@ function getRuntimeArtifactFullPath(projectRoot: string, artifact: FirstRuntimeA
   }
 }
 
-function buildIndexEntry(path: string, now: string): FirstRuntimeAssetIndexEntry {
+function buildRuntimeIndexEntry(path: string, now: string): FirstRuntimeAssetIndexEntry {
   if (!existsSync(path)) {
     return {
       path,
@@ -309,7 +284,7 @@ function syncRuntimeIndex(
 
   for (const artifact of refreshedArtifacts) {
     const entry = {
-      ...buildIndexEntry(getRuntimeArtifactFullPath(projectRoot, artifact), now),
+      ...buildRuntimeIndexEntry(getRuntimeArtifactFullPath(projectRoot, artifact), now),
       path: getRuntimeArtifactRelativePath(artifact),
     };
 
@@ -349,7 +324,7 @@ function syncRuntimeIndex(
 
   for (const docPath of refreshedDocs) {
     nextIndex.docsProjection[docPath] = {
-      ...buildIndexEntry(join(projectRoot, docPath), now),
+      ...buildRuntimeIndexEntry(join(projectRoot, docPath), now),
       path: docPath,
     };
   }
@@ -419,55 +394,7 @@ export function loadFirstContext(projectRoot: string): FirstContext {
   };
 }
 
-export function refreshFirstArtifacts(
-  projectRoot: string,
-  mode: FirstRefreshMode
-): FirstRefreshResult {
-  const index = requireRuntimeAsset(readFirstRuntimeIndex(projectRoot), 'index');
-  const workingTreeChangedFiles = getWorkingTreeChangedFiles(projectRoot);
-  const currentCommit = getCurrentSourceCommit(projectRoot);
-  const committedSourceChanges =
-    mode === 'refresh-docs-from-runtime' ||
-    index.sourceCommit === undefined ||
-    currentCommit === null ||
-    index.sourceCommit === currentCommit
-      ? []
-      : getCommittedSourceChanges(projectRoot, index.sourceCommit, currentCommit);
-  const changedFiles = mergeChangedFiles(workingTreeChangedFiles, committedSourceChanges);
-
-  if (
-    mode !== 'refresh-docs-from-runtime' &&
-    changedFiles !== null &&
-    changedFiles.length === 0 &&
-    isRuntimeHealthy(index)
-  ) {
-    return { mode, runtimeArtifacts: [], docsProjections: [] };
-  }
-
-  if (mode === 'refresh-docs-from-runtime') {
-    const docsProjections = refreshFirstDocsFromRuntime(projectRoot, [...FIRST_RUNTIME_ARTIFACTS]);
-    syncFirstRuntimeIndexEntries(projectRoot, [], docsProjections);
-    return { mode, runtimeArtifacts: [], docsProjections };
-  }
-
-  const rebuildArtifacts =
-    changedFiles === null ? [...FIRST_RUNTIME_ARTIFACTS] : determineRebuildArtifacts(changedFiles, index);
-
-  if (rebuildArtifacts.length === 0 && isRuntimeHealthy(index)) {
-    return { mode, runtimeArtifacts: [], docsProjections: [] };
-  }
-
-  const bootstrap = bootstrapFirstRuntime(projectRoot, {
-    platformType: readFirstRuntimeSummary(projectRoot)?.project.platformType as never,
-  });
-  return {
-    mode,
-    runtimeArtifacts: bootstrap.runtimeArtifacts,
-    docsProjections: mode === 'refresh-runtime-only' ? [] : bootstrap.docsProjections,
-  };
-}
-
-function hasHealthyRuntimeTruth(projectRoot: string): boolean {
+function _hasHealthyRuntimeTruth(projectRoot: string): boolean {
   const index = readFirstRuntimeIndex(projectRoot);
   if (!index || !isRuntimeHealthy(index)) {
     return false;
@@ -484,18 +411,6 @@ function hasHealthyRuntimeTruth(projectRoot: string): boolean {
       readFirstDomainModel(projectRoot) &&
       (index.databaseSchema.status === 'not_applicable' || readFirstDatabaseSchema(projectRoot))
   );
-}
-
-export function executeFirst(projectRoot: string): ExecuteFirstResult {
-  if (hasHealthyRuntimeTruth(projectRoot)) {
-    const result = refreshFirstArtifacts(projectRoot, 'refresh-all');
-    return {
-      runtimeArtifacts: result.runtimeArtifacts,
-      docsProjections: result.docsProjections,
-    };
-  }
-
-  throw new Error('No healthy runtime truth found. Use bootstrap instead.');
 }
 
 export function detectBackgroundInputStatus(projectRoot: string): BackgroundInputStatus {

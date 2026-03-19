@@ -1,143 +1,163 @@
-# 调用链
+# 调用关系图
 
-> 生成时间: 2026-03-17 | 模式: deep
-
-## 关键入口
-
-| 入口 | 触发命令 | 核心调用链 |
-|------|----------|------------|
-| `src/cli/index.ts` | `spec-first *` | CLI router → command handler |
-| `src/core/process-engine/advance.ts` | `spec-first stage advance` | advance → gate-engine → stage-machine |
-| `src/core/gate-engine/gate-evaluator.ts` | `spec-first gate check` | evaluate → validators → trace-engine |
-| `src/core/skill-runtime/dispatcher.ts` | `spec-first skill render` | dispatch → resolveSkillPath → assemblePrompt |
-| `src/core/trace-engine/matrix.ts` | `spec-first matrix sync` | syncMatrix → validators → id-generator |
-
-## 核心调用链
-
-### 1. Stage Advance Flow
-
-**触发**: `spec-first stage advance --feature <featureId>`
-
-**证据**: `src/core/process-engine/advance.ts` — `[显式]`
+## CLI 启动调用链
 
 ```
-CLI (stage advance)
-  │
-  ├─→ validateCurrentStage()
-  │     └─→ stage-machine/getCurrentStage()
-  │
-  ├─→ evaluateGateConditions()
-  │     ├─→ gate-engine/evaluate()
-  │     │     ├─→ validators/validateArtifacts()
-  │     │     └─→ trace-engine/getCoverage()
-  │     └─→ checkBlockingConditions()
-  │
-  ├─→ checkDependencies()
-  │     └─→ trace-engine/checkUpstreamIds()
-  │
-  ├─→ syncAgentContext()
-  │     └─→ ai-orchestrator/syncContext()
-  │
-  └─→ updateStageState()
-        └─→ stage-machine/transition()
+spec-first <command>
+    │
+    ↓
+src/cli/index.ts
+    │ registerCommand() × 27
+    │ dispatch(process.argv.slice(2))
+    ↓
+src/cli/router.ts
+    │ 根据 command 名查找 handler
+    ↓
+src/cli/commands/<name>.ts
+    │ handleXxx()
+    ↓
+src/core/<module>/*.ts
+    │ 核心逻辑
+    ↓
+ExitCode
 ```
 
-### 2. Gate Check Flow
-
-**触发**: `spec-first gate check --feature <featureId>`
-
-**证据**: `src/core/gate-engine/gate-evaluator.ts` — `[显式]`
+## Stage 推进调用链
 
 ```
-CLI (gate check)
-  │
-  ├─→ loadGateConditions()
-  │     └─→ condition-registry/getConditions()
-  │
-  ├─→ loadArtifacts()
-  │     └─→ fs-utils/readArtifacts()
-  │
-  ├─→ evaluateEachCondition()
-  │     ├─→ validators/validateFormat()
-  │     ├─→ trace-engine/checkCoverage()
-  │     └─→ rules/checkRules()
-  │
-  ├─→ calculateCoverage()
-  │     └─→ trace-engine/getCoverageMetrics()
-  │
-  └─→ generateReport()
-        └─→ template/renderReport()
+spec-first stage advance
+    │
+    ↓
+handleStage() — src/cli/commands/stage.ts
+    │ loadStageState()
+    ↓
+src/core/process-engine/stage-machine.ts
+    │ canAdvance()
+    │     │ evaluateGate()
+    ↓
+src/core/gate-engine/gate-evaluator.ts
+    │ GATE_CONDITIONS[stage]
+    ↓
+src/core/gate-engine/condition-registry.ts
+    │ 逐条评估
+    ↓
+    │ advanceStage()
+    ↓
+src/core/process-engine/stage-machine.ts
+    │ writeJson(stage-state.json)
+    ↓
+成功/失败
 ```
 
-### 3. Skill Dispatch Flow
-
-**触发**: `spec-first skill render --skill <name>`
-
-**证据**: `src/core/skill-runtime/dispatcher.ts` — `[显式]`
+## Skill 执行调用链
 
 ```
-CLI (skill render)
-  │
-  ├─→ parseCommand()
-  │     └─→ parse-utils/parseArgs()
-  │
-  ├─→ resolveSkillPath()
-  │     └─→ skill-resolver/resolve()
-  │
-  ├─→ loadSkillDefinition()
-  │     └─→ fs-utils/readSkill()
-  │
-  ├─→ renderPrompt()
-  │     ├─→ template/render()
-  │     └─→ context-resolver/resolve()
-  │
-  └─→ executeSkill()
-        └─→ hard-gate-validator/validate()
+/spec-first:<skill>
+    │
+    ↓
+spec-first skill render <skill>
+    │
+    ↓
+handleSkill() — src/cli/commands/skill.ts
+    │ resolveSkillPath()
+    ↓
+src/core/skill-runtime/dispatcher.ts
+    │ assemblePrompt()
+    ↓
+src/core/skill-runtime/prompt-assembler.ts
+    │ 读取 SKILL.md
+    │ 读取 references/*.md
+    │ 读取 frontmatter
+    ↓
+    │ checkHardGate()
+    ↓
+src/core/skill-runtime/hard-gate.ts
+    │ 校验 Feature 状态
+    │ 校验阶段匹配
+    ↓
+返回完整 Skill prompt
 ```
 
-## 高扩散风险点
-
-| 区域 | 风险 | 缓解措施 | 证据 |
-|------|------|----------|------|
-| State Management | 手动编辑 stage-state.json 会导致状态机损坏 | 使用 CLI 命令操作 | `CLAUDE.md:31-49` — `[显式]` |
-| Coverage Metrics | C4 (TC coverage) 不支持传递链，只做严格 FR 覆盖 | 使用 C3 (TASK coverage) 进行传递验证 | `src/core/trace-engine/coverage.ts:62-65` — `[显式]` |
-| Gate Bypass | Waiver 可以绑过关键质量检查 | 在 gate-history/ 中追踪 waivers | `CLAUDE.md` — `[推断]` |
-| ID Format | ID 格式严格，非合规 ID 会被拒绝 | 使用 `spec-first id generate` 生成 ID | `src/core/trace-engine/id-validator.ts:9-22` — `[显式]` |
-
-## 模块依赖图
+## Gate 校验调用链
 
 ```
-                    ┌──────────────┐
-                    │   CLI Layer   │
-                    │   src/cli/    │
-                    └──────┬───────┘
-                           │
-                           ▼
-┌──────────────────────────────────────────────────────────┐
-│                      Core Layer                          │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
-│  │process-engine│  │skill-runtime│  │gate-engine  │       │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘       │
-│         │                │                │               │
-│         ▼                ▼                ▼               │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐       │
-│  │change-mgr   │  │ai-orchestrat│  │trace-engine │       │
-│  └─────────────┘  └─────────────┘  └──────┬──────┘       │
-│                                          │               │
-│                                          ▼               │
-│                                   ┌─────────────┐        │
-│                                   │ validators  │        │
-│                                   └──────┬──────┘        │
-│                                          │               │
-│                                          ▼               │
-│                                    ┌───────────┐         │
-│                                    │   rules   │         │
-│                                    └───────────┘         │
-└──────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-                    ┌──────────────┐
-                    │ Shared Layer │
-                    │  src/shared/ │
-                    └──────────────┘
+spec-first gate check
+    │
+    ↓
+handleGate() — src/cli/commands/gate.ts
+    │ evaluateGate()
+    ↓
+src/core/gate-engine/gate-evaluator.ts
+    │ GATE_CONDITIONS[stage]
+    ↓
+src/core/gate-engine/condition-registry.ts
+    │ evaluateConditions()
+    │     │ 每个条件 evaluate()
+    ↓
+各条件实现
+    │ exists() 检查文件
+    │ validatePrd() 校验 PRD
+    │ calculateCoverage() 计算覆盖率
+    ↓
+    │ aggregateResults()
+    ↓
+GateResult { status, conditions, waivers }
 ```
+
+## 追溯 ID 生成调用链
+
+```
+spec-first id generate FR
+    │
+    ↓
+handleId() — src/cli/commands/id.ts
+    │ validateIdType()
+    ↓
+src/core/trace-engine/id-validator.ts
+    │ 检查是否为 14 种合法类型
+    ↓
+    │ generateId()
+    ↓
+src/core/trace-engine/id-generator.ts
+    │ 格式: {TYPE}-{FEAT}-{NNN}
+    ↓
+    │ registerId()
+    ↓
+src/core/trace-engine/matrix.ts
+    │ 写入 traceability-matrix.md
+    ↓
+成功/失败
+```
+
+## 模块间依赖
+
+```
+cli/commands/
+    ├──→ process-engine/ (Stage 状态)
+    ├──→ gate-engine/ (Gate 校验)
+    ├──→ trace-engine/ (ID 生成)
+    ├──→ skill-runtime/ (Skill 分发)
+    └──→ change-mgr/ (RFC/Defect)
+
+process-engine/
+    └──→ shared/types.ts (Stage 枚举)
+
+gate-engine/
+    ├──→ trace-engine/ (覆盖率)
+    ├──→ rules/truth-source.ts (规则)
+    └──→ shared/types.ts (GateResult)
+
+skill-runtime/
+    ├──→ process-engine/ (阶段校验)
+    └──→ shared/types.ts (类型)
+
+trace-engine/
+    └──→ shared/types.ts (IdType, MatrixRow)
+```
+
+## 证据来源
+
+- CLI 入口 (`src/cli/index.ts:36-103`) — 显式
+- Router (`src/cli/router.ts`) — 显式
+- Gate 条件 (`src/core/gate-engine/condition-registry.ts`) — 显式
+- Skill 分发 (`src/core/skill-runtime/dispatcher.ts`) — 显式

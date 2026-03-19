@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { bootstrapFirstRuntime } from '../../src/core/skill-runtime/first-bootstrap.js';
 import { advance } from '../../src/core/process-engine/advance.js';
 import { Stage, type StageState } from '../../src/shared/types.js';
+import { seedFirstRuntimeOutputs } from '../helpers/first-runtime-fixture.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-governance-e2e');
 const FEATURE_ID = 'FSREQ-20260316-GOV-001';
@@ -94,7 +95,8 @@ beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
   initRepo();
   seedFeatureDeliverables();
-  bootstrapFirstRuntime(TMP, { mode: 'deep' });
+  seedFirstRuntimeOutputs(TMP, 'first-governance-e2e');
+  bootstrapFirstRuntime(TMP);
   execSync('git -c core.hooksPath=/dev/null add .', { cwd: TMP, stdio: 'ignore' });
   execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', {
     cwd: TMP,
@@ -107,7 +109,7 @@ afterEach(() => {
 });
 
 describe('first governance e2e', () => {
-  it('writes back canonical runtime truth when wrap_up advances with first runtime source changes', () => {
+  it('marks governance blocked when wrap_up advances with first runtime source changes', () => {
     writeStageState(Stage.WRAP_UP);
     writeFileSync(
       join(TMP, 'src', 'core', 'skill-runtime', 'first-conventions.ts'),
@@ -126,14 +128,13 @@ describe('first governance e2e', () => {
     );
     expect(updatesLog).toContain('"triggerStage":"06_wrap_up"');
     expect(updatesLog).toContain('"decision":"must_update"');
-    expect(updatesLog).toContain('"gateStatus":"approved"');
-    expect(updatesLog).toContain('"writebackMode":"refresh-all"');
+    expect(updatesLog).toContain('"gateStatus":"blocked"');
     expect(updatesLog).toContain('"topicKey":"project-cognition/first"');
     expect(updatesLog).toContain('"assetId":"conventions.json"');
     expect(updatesLog).toContain('"updateSource":"governance-wrap-up"');
 
     const findings = readFileSync(join(SPEC_DIR, 'findings.md'), 'utf-8');
-    expect(findings).toContain('PROJECT_COGNITION_APPROVED: must_update');
+    expect(findings).toContain('PROJECT_COGNITION_BLOCKED: must_update');
 
     const index = JSON.parse(
       readFileSync(join(TMP, '.spec-first', 'runtime', 'first', 'index.json'), 'utf-8')
@@ -142,7 +143,7 @@ describe('first governance e2e', () => {
     expect(index.conventions.healthy).toBe(true);
   });
 
-  it('writes back structural feature changes when wrap_up advances with feature artifact updates', () => {
+  it('marks governance blocked when wrap_up advances with feature artifact updates', () => {
     writeStageState(Stage.WRAP_UP);
     writeFileSync(
       join(SPEC_DIR, 'design.md'),
@@ -166,7 +167,7 @@ describe('first governance e2e', () => {
       join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
       'utf-8'
     );
-    expect(updatesLog).toContain('"writebackMode":"incremental-structural-update"');
+    expect(updatesLog).toContain('"gateStatus":"blocked"');
     expect(updatesLog).toContain('"decision":"must_update"');
     expect(updatesLog).toContain('Billing Core');
 
@@ -174,11 +175,12 @@ describe('first governance e2e', () => {
       join(TMP, '.spec-first', 'runtime', 'first', 'summary.json'),
       'utf-8'
     );
-    expect(summary).toContain('Billing Core');
-    expect(summary).toContain('/billing/invoices');
+    expect(summary).toContain('runtime payload');
+    expect(summary).not.toContain('Billing Core');
+    expect(summary).not.toContain('/billing/invoices');
   });
 
-  it('reprojects canonical docs from runtime when release advances to done with docs drift', () => {
+  it('does not rewrite docs outputs when release advances to done with docs-only drift', () => {
     writeStageState(Stage.RELEASE);
     writeFileSync(join(TMP, 'docs', 'first', 'README.md'), '# Drifted README\n', 'utf-8');
 
@@ -188,16 +190,15 @@ describe('first governance e2e', () => {
     expect(result.to).toBe(Stage.DONE);
 
     const readme = readFileSync(join(TMP, 'docs', 'first', 'README.md'), 'utf-8');
-    expect(readme).not.toContain('Drifted README');
-    expect(readme).toContain('Canonical Projection Docs');
+    expect(readme).toContain('Drifted README');
 
     const updatesLog = readFileSync(
       join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
       'utf-8'
     );
     expect(updatesLog).toContain('"triggerStage":"08_done"');
-    expect(updatesLog).toContain('"decision":"should_update"');
-    expect(updatesLog).toContain('"writebackMode":"refresh-docs-from-runtime"');
+    expect(updatesLog).toContain('"decision":"must_not_update"');
+    expect(updatesLog).toContain('"gateStatus":"skipped"');
     expect(updatesLog).toContain('"topicKey":"project-cognition/first"');
     expect(updatesLog).toContain('"assetId":"docs/first/README.md"');
     expect(updatesLog).toContain('"updateSource":"governance-done"');

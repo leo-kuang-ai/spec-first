@@ -1,125 +1,240 @@
-# 开发规范
+# 开发指南
 
-> 生成时间: 2026-03-17 | 模式: deep
+## 开发环境设置
 
-## 代码风格
+### 前置条件
 
-### Prettier 配置
+- Node.js ≥20.0.0
+- pnpm（推荐）或 npm
 
-| 配置项 | 值 | 证据 |
-|--------|-----|------|
-| indent | 2 spaces | `.prettierrc` — `[显式]` |
-| semi | true | `.prettierrc` — `[显式]` |
-| singleQuote | true | `.prettierrc` — `[显式]` |
-| tabWidth | 2 | `.prettierrc` — `[显式]` |
-| trailingComma | es5 | `.prettierrc` — `[显式]` |
-| printWidth | 100 | `.prettierrc` — `[显式]` |
-| bracketSpacing | true | `.prettierrc` — `[显式]` |
-| arrowParens | always | `.prettierrc` — `[显式]` |
-| endOfLine | lf | `.prettierrc` — `[显式]` |
+### 安装依赖
 
-### TypeScript 配置
-
-| 配置项 | 值 | 说明 |
-|--------|-----|------|
-| verbatimModuleSyntax | true | 严格模块语法 |
-| strict | true | 严格模式 |
-| module | ESNext | ESM 模块 |
-| target | ES2022 | 编译目标 |
-
-**证据**: `tsconfig.json` — `[显式]`
-
-## ESLint 规则
-
-| 规则 | 级别 | 说明 | 证据 |
-|------|------|------|------|
-| noUnusedVars | error | 未使用变量报错（argsIgnorePattern: ^_） | `eslint.config.js` — `[显式]` |
-| noExplicitAny | warn | any 类型警告 | `eslint.config.js` — `[显式]` |
-| noConsole | off | 允许 console | `eslint.config.js` — `[显式]` |
-| noEmpty | warn | 空块警告 | `eslint.config.js` — `[显式]` |
-
-## 测试规范
-
-### Vitest 配置
-
-| 配置项 | 值 | 证据 |
-|--------|-----|------|
-| framework | Vitest | `vitest.config.ts` — `[显式]` |
-| globals | true | `vitest.config.ts` — `[显式]` |
-
-### 覆盖率阈值
-
-| 指标 | 阈值 | 证据 |
-|------|------|------|
-| Lines | 75% | `vitest.config.ts:18-25` — `[显式]` |
-| Functions | 75% | `vitest.config.ts:18-25` — `[显式]` |
-| Branches | 65% | `vitest.config.ts:18-25` — `[显式]` |
-| Statements | 75% | `vitest.config.ts:18-25` — `[显式]` |
-
-### 测试结构
-
-```
-tests/
-├── unit/        # 单元测试（每模块一文件）
-├── integration/ # 集成测试
-├── e2e/         # 端到端测试
-├── benchmark/   # 性能基准测试
-└── fixtures/    # 测试固件数据
+```bash
+pnpm install
 ```
 
-## 提交规范
+### 验证环境
 
-### CHANGELOG 格式
+```bash
+pnpm run typecheck
+pnpm test
+```
+
+---
+
+## 开发工作流
+
+### 功能开发
+
+1. **初始化 Feature**
+   ```bash
+   spec-first init --feat MYFEAT --title "我的功能"
+   ```
+
+2. **需求规格** — `/spec-first:spec`
+
+3. **技术设计** — `/spec-first:design`
+
+4. **任务拆解** — `/spec-first:task`
+
+5. **代码实现** — `/spec-first:code`
+
+6. **验收测试** — `/spec-first:verify`
+
+### Bug 修复
+
+1. 直接修复
+2. 执行自检清单
+3. 提交代码
+
+### 代码自检清单
+
+每次 `src/` 下 `.ts` 文件变更后必须执行：
 
 ```
-- v{VERSION} {DATE} {Author}: {type}({scope}): {message}
+✅ 自检清单
+□ 1. pnpm run typecheck — 已通过
+□ 2. pnpm test — 已通过
+□ 3. CHANGELOG.md — 已更新（如适用）
+□ 4. 变更范围 — 已确认仅限必要文件
 ```
 
-**证据**: `CHANGELOG.md` — `[显式]`
+---
 
-### 提交类型
+## 代码规范
 
-| 类型 | 说明 |
+### 文件命名
+
+- kebab-case.ts
+
+### 命名约定
+
+| 类型 | 规则 |
 |------|------|
-| feat | 新功能 |
-| fix | Bug 修复 |
-| refactor | 重构 |
-| test | 测试相关 |
-| docs | 文档 |
-| chore | 杂项 |
+| 变量/函数 | camelCase |
+| 类 | PascalCase |
+| 常量 | SCREAMING_SNAKE_CASE |
+| 枚举 | PascalCase |
+| 未使用变量 | _前缀 |
 
-**证据**: `conventions.json:commit.types` — `[显式]`
+### 导出规则
 
-## 依赖管理
+- Named exports only
+- 禁止 default export
 
-### 包管理器
+### TypeScript
 
-- **推荐**: pnpm
-- **替代**: npm
+- strict mode
+- verbatimModuleSyntax
+- 显式类型导入
 
-**证据**: `conventions.json:dependencies.packageManager` — `[显式]`
+---
 
-### Node.js 版本
+## 测试
 
-- **最低版本**: >=20.0.0
+### 运行测试
 
-**证据**: `package.json:engines` — `[显式]`
+```bash
+# 全量测试
+pnpm test
 
-### 模块系统
+# 监听模式
+pnpm run test:watch
 
-- **ESM only**: 全项目使用 ESM（`type: module`）
-- **Named exports only**: core 模块禁止使用 default export
+# 单文件
+npx vitest run tests/unit/router.test.ts
 
-**证据**: `package.json:5`, `CLAUDE.md:59` — `[显式]`
+# 按名称匹配
+npx vitest run -t "StageMachine"
 
-## 禁忌模式
+# 覆盖率
+pnpm run test:coverage
+```
 
-| 禁止操作 | 原因 | 正确做法 |
-|----------|------|----------|
-| 手动编辑 `stage-state.json` | 状态机不可逆，会导致状态损坏 | 使用 `spec-first stage advance` |
-| 手动编辑 `traceability-matrix.md` | 覆盖率会失准 | 使用 `spec-first matrix sync` |
-| 手动编辑 `.spec-first/runtime/` 状态文件 | 数据污染、审计日志断裂 | 使用对应 CLI 子命令 |
-| 在 core 模块使用 default export | 违反项目约定 | 使用 named export |
-| 使用 CommonJS 语法 | 全项目 ESM only | 使用 `import/export` |
+### 测试规范
 
-**证据**: `CLAUDE.md:31-49` — `[显式]`
+- 框架：Vitest (globals enabled)
+- 命名：`*.test.ts`
+- 结构：`tests/unit/`, `tests/integration/`, `tests/e2e/`
+- 覆盖率：lines/functions/statements 75%, branches 65%
+
+### 测试示例
+
+```typescript
+describe('StageMachine', () => {
+  it('should advance stage when gate passes', () => {
+    const result = advanceStage(featureId, projectRoot);
+    expect(result.success).toBe(true);
+  });
+
+  it('should not advance when gate fails', () => {
+    // Mock gate failure
+    vi.spyOn(gate, 'evaluateGate').mockReturnValue({ status: 'FAIL' });
+    const result = advanceStage(featureId, projectRoot);
+    expect(result.success).toBe(false);
+  });
+});
+```
+
+---
+
+## 构建
+
+```bash
+# 构建
+pnpm run build
+
+# 类型检查
+pnpm run typecheck
+
+# Lint
+pnpm run lint
+pnpm run lint:fix
+
+# 格式化
+pnpm run format
+```
+
+---
+
+## 调试
+
+### 测试调试
+
+```bash
+# 监听模式
+pnpm run test:watch
+
+# 详细输出
+npx vitest run --reporter=verbose
+```
+
+### 环境诊断
+
+```bash
+spec-first doctor
+```
+
+---
+
+## Git 规范
+
+### 分支命名
+
+- 描述性名称，如 `leo-2026-03-19`, `feature/init-command`
+
+### 提交格式
+
+遵循 Conventional Commits：
+
+```
+type(scope): message
+
+类型：
+- feat: 新功能
+- fix: Bug 修复
+- docs: 文档
+- refactor: 重构
+- test: 测试
+- chore: 杂项
+```
+
+### 提交示例
+
+```
+feat(cli): add status command
+fix(gate): correct condition evaluation
+docs(readme): update installation guide
+```
+
+---
+
+## 常见问题
+
+### Q: 如何添加新的 CLI 命令？
+
+1. 在 `src/cli/commands/` 创建 `new-command.ts`
+2. 实现 `handleNewCommand()` 函数
+3. 在 `src/cli/index.ts` 注册：
+   ```typescript
+   registerCommand('new-command', '描述', handleNewCommand);
+   ```
+
+### Q: 如何添加新的 Skill？
+
+1. 在 `skills/spec-first/NN-name/` 创建目录
+2. 添加 `SKILL.md` 文件
+3. 添加 `references/` 目录（如需要）
+
+### Q: 如何添加新的 Gate 条件？
+
+1. 在 `src/core/gate-engine/condition-registry.ts` 添加条件定义
+2. 实现 `evaluate` 函数
+
+---
+
+## 证据来源
+
+- 包配置 (`package.json:10-25`) — scripts — 显式
+- 测试配置 (`vitest.config.ts:1-19`) — 覆盖率 — 显式
+- ESLint 配置 (`eslint.config.js:1-28`) — 规则 — 显式

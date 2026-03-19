@@ -8,13 +8,26 @@ description: Spec-First AI Agent Skills 目录索引
 
 > Spec-First 全链路研发闭环工具链 — AI Agent 技能定义与共享上下文
 
+## 第一性原则
+
+Spec-First 首先是一个 **Skill 主导系统**，不是一个 CLI 主导的脚本集合。
+
+- Skill 负责定义工作流、多 Agent 编排、约束和成功标准
+- CLI 只负责最小支撑层：启动、持久化、校验和宿主集成
+- 对于 `first` 这类项目认知任务，目标方向应当是：Skill 主导的多 Agent 编排优先，本地脚本退回支撑层
+
+边界保持清晰：
+
+- runtime 资产是机器输入，必须保持合同稳定
+- docs 是人类阅读输出，不能反向成为后续 Skill 的隐藏真源
+
 ## 目录导航
 
 ### 项目认知 Skills
 
 | Skill | 说明 | 确认策略 |
 |-------|------|----------|
-| [00-first](./00-first/SKILL.md) | 项目快速认知：默认以 deep 规格生成 runtime 真源与正式 docs 投影视图（含条件产物） | assisted |
+| [00-first](./00-first/SKILL.md) | 项目快速认知：默认以 deep 规格生成 runtime 真源与 docs 输出（含条件产物） | assisted |
 
 ### 核心工作流 Skills
 

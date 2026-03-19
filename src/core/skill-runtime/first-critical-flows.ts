@@ -21,10 +21,10 @@ export function buildFirstCriticalFlows(summary: FirstRuntimeSummary): FirstCrit
     },
     {
       flowId: 'flow-doc-projection',
-      name: 'Docs Projection Flow',
+      name: 'Docs Output Flow',
       entryPoints: ['src/core/skill-runtime/first-doc-projection.ts'],
       coreModules: [runtimeModule],
-      invariants: ['runtime truth first', 'canonical projection docs must reflect runtime truth'],
+      invariants: ['runtime truth first', 'docs outputs must stay derived from runtime truth'],
       verificationHooks: ['pnpm vitest run tests/unit/first-doc-projection.test.ts', 'pnpm lint'],
     },
   ];

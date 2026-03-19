@@ -1,7 +1,7 @@
-# 数据库识别与条件型投影
+# 数据库识别与条件型文档
 
 > **当前正式 contract**：数据库能力是条件型能力。
-> 正式真源是 `database-schema.json`；正式文档只有 `database-er.md`，且仅在 `databaseSchema.status === healthy` 时生成。
+> 正式真源是 `database-schema.json`；正式文档只有 `database-er.md`，且仅在 `databaseSchema.status === healthy` 时产出。
 
 ## 1. 能力边界
 
@@ -9,23 +9,23 @@
 
 - `database-schema.json`（条件型）
 
-### projection docs
+### docs outputs
 
 - `docs/first/database-er.md`（条件型）
 
 ### 不再承诺的产物
 
-- 不生成 `database-index.md`
-- 不生成 `database-{name}.md`
-- 不生成任何未注册数据库专题文件
+- 不产出 `database-index.md`
+- 不产出 `database-{name}.md`
+- 不产出任何未注册数据库专题文件
 
 ## 2. 状态语义
 
 | 状态 | 含义 | 行为 |
 |------|------|------|
-| `healthy` | 检测到明确数据库 schema 且证据充分 | 生成 `database-schema.json` 与 `database-er.md` |
-| `not_applicable` | 当前项目不适用数据库认知能力 | 不生成 `database-er.md` |
-| `degraded` | 检测到数据库线索但证据不足 | 不生成正式文档，仅记录告警 |
+| `healthy` | 检测到明确数据库 schema 且证据充分 | 产出 `database-schema.json` 与 `database-er.md` |
+| `not_applicable` | 当前项目不适用数据库认知能力 | 不产出 `database-er.md` |
+| `degraded` | 检测到数据库线索但证据不足 | 不产出正式文档，仅记录告警 |
 
 ## 3. 证据来源
 

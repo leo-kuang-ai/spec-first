@@ -358,32 +358,14 @@ describe('dispatchCommand', () => {
     expect(result.error).toContain('--resume requires --auto');
   });
 
-  // ─── First 参数校验集成 (B5) ─────────────────────────
-
-  it('should dispatch first --force with parsed firstArgs', () => {
+  it('should dispatch first command as skill route without historical protocol parsing', () => {
     mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
     writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
-    const result = dispatchCommand('first --force', TMP);
+    const result = dispatchCommand('first --check-health', TMP);
     expect(result.route).toBe('skill');
-    expect(result.firstArgs).toBeDefined();
-    expect(result.firstArgs!.mode).toBe('deep');
-    expect(result.firstArgs!.force).toBe(true);
-    expect(result.firstConfirmPolicy).toBe('skip');
-  });
-
-  it('should reject legacy first --quick flag', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
-    const result = dispatchCommand('first --quick --force', TMP);
-    expect(result.route).toBe('error');
-    expect(result.error).toContain('未知参数: --quick');
-  });
-
-  it('should reject first with unknown flag', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
-    const result = dispatchCommand('first --verbose', TMP);
-    expect(result.route).toBe('error');
+    expect(result.skillName).toBe('first');
+    expect(result.args).toEqual(['--check-health']);
+    expect(result.skillPath).toBeDefined();
   });
 
   it('should resolve namespaced extension skill route', () => {

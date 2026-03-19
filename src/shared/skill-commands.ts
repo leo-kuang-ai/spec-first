@@ -87,7 +87,7 @@ function pruneRemovedUserSkills(pkgSkillsRoot: string, targetRoot: string): void
 const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   onboarding: '新手引导 - 交互式场景识别与学习路径推荐',
   first:
-    '项目认知标准模式：生成完整 runtime-first 认知资产与 docs/first projection（支持 --type/--force 参数）',
+    '项目认知标准模式：校验 final runtime/docs 输出并提供最小支撑层集成',
   init: '定位项目根目录并通过交互式引导初始化 Feature 工作区（可选 --bootstrap 执行宿主检查/安装）',
   catchup: '定位当前 Feature 并恢复上下文',
   spec: '定位 Feature 并校验阶段为需求规格（01_specify）',

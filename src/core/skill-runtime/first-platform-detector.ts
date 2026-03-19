@@ -9,7 +9,15 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { PlatformType } from './first-args.js';
+
+export type PlatformType =
+  | 'backend'
+  | 'frontend'
+  | 'mobile'
+  | 'cross-platform'
+  | 'desktop'
+  | 'monorepo'
+  | 'mixed';
 
 export type DetectedPlatformType = PlatformType | 'unknown';
 export type ProjectMaturity = 'greenfield' | 'brownfield';

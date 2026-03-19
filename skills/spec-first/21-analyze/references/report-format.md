@@ -29,8 +29,8 @@
 
 - background_input_status: {full/degraded/blind}
 - runtime 真源: {healthy/degraded/missing}
-- docs 投影视图: {synced/stale/drifted}
-- 同步状态: {in_sync/stale/drifted}
+- docs 输出: {ready/missing}
+- 同步状态: {ready/attention/unknown}
 - 建议动作: {repair_action}
 
 ---
@@ -109,9 +109,9 @@
 
 - background_input_status: blind
 - runtime 真源: missing
-- docs 投影视图: drifted
-- 同步状态: drifted
-- 建议动作: 先补齐背景输入并重新同步 runtime/docs 状态，再继续分析
+- docs 输出: missing
+- 同步状态: attention
+- 建议动作: 先补齐背景输入与 docs 输出，再继续分析
 
 ---
 
@@ -234,7 +234,7 @@
 
 - background_input_status: full
 - runtime 真源: healthy
-- docs 投影视图: synced
+- docs 输出: ready
 - 同步状态: in_sync
 - 建议动作: 无需额外修复，维持当前同步节奏
 

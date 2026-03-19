@@ -8,6 +8,7 @@ import { detectBottlenecks } from '../../core/metrics-engine/bottleneck.js';
 import { parseMatrix } from '../../core/trace-engine/matrix.js';
 import { createTraceContext } from '../../core/trace-engine/trace-context.js';
 import { readTaskPlan } from '../../core/task-plan/parser.js';
+import { checkFirstDocsExistence } from '../../core/skill-runtime/first-docs-check.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
 import { decideNextStep } from '../../core/process-engine/next-step-decider.js';
 
@@ -16,8 +17,8 @@ type CanonicalTaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
 interface BackgroundLayers {
   backgroundInputStatus: BackgroundInputStatus | 'missing';
   runtimeTruth: 'current' | 'stale' | 'missing';
-  docsProjection: 'healthy' | 'drifted' | 'missing';
-  syncStatus: 'in_sync' | 'drifted' | 'unknown';
+  docsOutputs: 'ready' | 'missing';
+  syncStatus: 'ready' | 'attention' | 'unknown';
 }
 
 export function handleStatus(args: string[]): number {
@@ -80,7 +81,7 @@ export function handleStatus(args: string[]): number {
   console.log('');
   console.log(`background_input_status: ${background.backgroundInputStatus}`);
   console.log(`runtime 真源: ${background.runtimeTruth}`);
-  console.log(`docs 投影视图: ${background.docsProjection}`);
+  console.log(`docs 输出: ${background.docsOutputs}`);
   console.log(`同步状态: ${background.syncStatus}`);
   console.log('');
   console.log('覆盖率指标:');
@@ -100,7 +101,7 @@ export function handleStatus(args: string[]): number {
   console.log(`  blocked: ${taskCounts.blocked}`);
   console.log('');
 
-  if (bottlenecks.length > 0 || background.syncStatus !== 'in_sync') {
+  if (bottlenecks.length > 0 || background.syncStatus !== 'ready') {
     console.log('风险:');
     for (const bottleneck of bottlenecks) {
       console.log(`  [${bottleneck.severity}] ${bottleneck.rule}: ${bottleneck.description}`);
@@ -108,10 +109,10 @@ export function handleStatus(args: string[]): number {
     if (background.runtimeTruth !== 'current') {
       console.log('  [medium] runtime 真源异常');
     }
-    if (background.docsProjection === 'drifted') {
-      console.log('  [medium] docs 投影视图漂移');
+    if (background.docsOutputs === 'missing') {
+      console.log('  [medium] docs 输出缺失');
     }
-    if (background.syncStatus === 'drifted') {
+    if (background.syncStatus === 'attention') {
       console.log('  [medium] 同步状态异常');
     }
     console.log('');
@@ -185,20 +186,20 @@ function readBackgroundLayers(projectRoot: string, state: StageState): Backgroun
     return {
       backgroundInputStatus: state.backgroundInputStatus ?? 'missing',
       runtimeTruth: 'missing',
-      docsProjection: 'missing',
+      docsOutputs: 'missing',
       syncStatus: 'unknown',
     };
   }
 
-  const docsHealthy = Object.values(runtimeIndex.docsProjection).every((entry) => entry.healthy);
+  const docsReady = checkFirstDocsExistence(projectRoot).ok;
   const runtimeTruth = runtimeIndex.status === 'current' ? 'current' : 'stale';
-  const docsProjection = docsHealthy ? 'healthy' : 'drifted';
+  const docsOutputs = docsReady ? 'ready' : 'missing';
 
   return {
     backgroundInputStatus: state.backgroundInputStatus ?? 'missing',
     runtimeTruth,
-    docsProjection,
-    syncStatus: runtimeTruth === 'current' && docsHealthy ? 'in_sync' : 'drifted',
+    docsOutputs,
+    syncStatus: runtimeTruth === 'current' && docsReady ? 'ready' : 'attention',
   };
 }
 

@@ -45,7 +45,9 @@ describe('analyzeArtifacts background quality', () => {
     expect(result.findings.some((finding) => finding.detail.includes('background_input_status=degraded'))).toBe(true);
   });
 
-  it('should flag runtime/docs projection drift from first runtime index', () => {
+  it('should flag runtime issues and missing docs outputs from first runtime index', () => {
+    mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    writeFileSync(join(TMP, 'docs', 'first', 'summary.md'), '# Summary\n', 'utf-8');
     writeFileSync(
       join(TMP, '.spec-first', 'runtime', 'first', 'index.json'),
       JSON.stringify({
@@ -61,18 +63,16 @@ describe('analyzeArtifacts background quality', () => {
         structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
         domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
         databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true, status: 'healthy' },
-        docsProjection: {
-          'docs/first/README.md': { path: 'docs/first/README.md', fileHash: 'readme', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['stale projection'] },
-        },
+        docsProjection: {},
         status: 'stale',
-        staleReason: 'projection drift',
+        staleReason: 'docs outputs missing',
       }),
       'utf-8',
     );
 
     const result = analyzeArtifacts(FEAT, TMP);
 
-    expect(result.findings.some((finding) => finding.detail.includes('docs 投影视图漂移'))).toBe(true);
+    expect(result.findings.some((finding) => finding.detail.includes('docs 输出缺失'))).toBe(true);
     expect(result.findings.some((finding) => finding.detail.includes('first runtime 健康状态异常'))).toBe(true);
   });
 });

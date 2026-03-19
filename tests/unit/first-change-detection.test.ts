@@ -4,6 +4,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { bootstrapFirstRuntime } from '../../src/core/skill-runtime/first-bootstrap.js';
 import { detectStructuralChanges } from '../../src/core/skill-runtime/first-change-detection.js';
+import { seedFirstRuntimeOutputs } from '../helpers/first-runtime-fixture.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-change-detection');
 const FEATURE_ID = 'FSREQ-20260318-FIRST-DET-001';
@@ -23,7 +24,8 @@ beforeEach(() => {
     'utf-8'
   );
   initRepo();
-  bootstrapFirstRuntime(TMP, { mode: 'deep' });
+  seedFirstRuntimeOutputs(TMP, 'first-detection-fixture');
+  bootstrapFirstRuntime(TMP);
 });
 
 afterEach(() => {

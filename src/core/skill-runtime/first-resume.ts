@@ -8,23 +8,16 @@
  */
 
 import { existsSync } from 'node:fs';
-import { checkFirstUpdateContext } from './first-change-detector.js';
 import { classifyProjectMaturity, detectPlatformType } from './first-platform-detector.js';
 import {
-  resolveFirstConfirmPolicy,
-  validateFirstArgs,
-} from './first-args.js';
-import { logFirstRuntimeWarning } from './first-runtime-observability.js';
-import {
   getFirstRuntimeDir,
+  readFirstDocsIndex,
   readFirstRuntimeIndex,
   readFirstRuntimeSummary,
 } from './first-runtime-store.js';
 
 export type ResumeOption =
   | 'view_summary'
-  | 'incremental'
-  | 'full_regenerate'
   | 'skip';
 
 export interface ResumeRecommendation {
@@ -62,9 +55,9 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
         hasExistingProducts: false,
         isStale: false,
         commitMismatch: false,
-        options: ['skip', 'full_regenerate'],
+        options: ['skip'],
         recommendedOption: 'skip',
-        message: '⚠️ 检测到空项目或新建项目，建议先创建代码后再运行 /spec-first:first',
+        message: '⚠️ 检测到空项目或新建项目，建议先由 Skill 产出 final runtime/docs outputs',
       };
     }
 
@@ -72,9 +65,9 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
       hasExistingProducts: false,
       isStale: false,
       commitMismatch: false,
-      options: ['full_regenerate'],
-      recommendedOption: 'full_regenerate',
-      message: '✅ 首次运行，将生成项目认知文档',
+      options: ['skip'],
+      recommendedOption: 'skip',
+      message: '✅ 首次运行，将检查 Skill 产出的 final runtime/docs outputs',
     };
   }
 
@@ -85,14 +78,13 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
       isStale: true,
       staleReason: 'runtime 索引文件缺失，产物目录已存在',
       commitMismatch: false,
-      options: ['view_summary', 'full_regenerate', 'skip'],
-      recommendedOption: 'full_regenerate',
-      message: '⚠️ 检测到已有 runtime 产物但索引文件缺失，建议全量重新生成以重建索引',
+      options: ['view_summary', 'skip'],
+      recommendedOption: 'view_summary',
+      message: '⚠️ 检测到已有 runtime 产物但索引文件缺失，建议先查看摘要并确认 final outputs',
     };
   }
 
   const runtimeSummary = readFirstRuntimeSummary(projectRoot);
-  const updateContext = checkFirstUpdateContext(projectRoot);
   const staleCheck = checkRuntimeIndexStale(runtimeIndex.lastRun);
   const lastRunTime = new Date(runtimeIndex.lastRun);
   const daysSince = Math.floor((Date.now() - lastRunTime.getTime()) / (1000 * 60 * 60 * 24));
@@ -102,17 +94,8 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
     (detectedPlatform.subType
       ? `${detectedPlatform.type}/${detectedPlatform.subType}`
       : detectedPlatform.type);
-  const options: ResumeOption[] = ['view_summary'];
-
-  if ((updateContext.changeAnalysis?.changedFiles ?? 0) > 0) {
-    options.push('incremental');
-  }
-  options.push('full_regenerate', 'skip');
-
-  let recommendedOption: ResumeOption = 'skip';
-  if (staleCheck.stale || updateContext.changeAnalysis?.recommendedStrategy === 'full') {
-    recommendedOption = 'full_regenerate';
-  }
+  const options: ResumeOption[] = ['view_summary', 'skip'];
+  const recommendedOption: ResumeOption = 'view_summary';
 
   return {
     hasExistingProducts: true,
@@ -129,19 +112,6 @@ export function generateResumeRecommendation(projectRoot: string): ResumeRecomme
 
 export function formatResumePrompt(recommendation: ResumeRecommendation): string {
   const lines: string[] = [];
-  const canSkipConfirm = (args: string[]): boolean => {
-    try {
-      const parsed = validateFirstArgs(args);
-      return resolveFirstConfirmPolicy(parsed) === 'skip';
-    } catch (error) {
-      logFirstRuntimeWarning(
-        'first-resume.formatResumePrompt',
-        '解析恢复参数失败，降级为不显示快捷命令',
-        error
-      );
-      return false;
-    }
-  };
 
   lines.push(recommendation.message);
   lines.push('');
@@ -155,8 +125,6 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
 
   const optionLabels: Record<ResumeOption, string> = {
     view_summary: '查看产物摘要',
-    incremental: '增量更新（基于 git diff）',
-    full_regenerate: '全量重新生成',
     skip: '跳过（使用现有产物）',
   };
 
@@ -171,18 +139,13 @@ export function formatResumePrompt(recommendation: ResumeRecommendation): string
   lines.push('');
   lines.push('请选择选项或直接运行命令：');
 
-  if (recommendation.options.includes('incremental')) {
-    lines.push('  /spec-first:first --update=<产物列表>');
-  }
-  if (recommendation.options.includes('full_regenerate') && canSkipConfirm(['--force'])) {
-    lines.push('  /spec-first:first --force');
-  }
   return lines.join('\n');
 }
 
 export function formatProductSummary(projectRoot: string): string {
   const runtimeIndex = readFirstRuntimeIndex(projectRoot);
   const runtimeSummary = readFirstRuntimeSummary(projectRoot);
+  const docsIndex = readFirstDocsIndex(projectRoot);
   if (!runtimeIndex) {
     return '❌ 未找到 runtime 索引文件';
   }
@@ -213,6 +176,23 @@ export function formatProductSummary(projectRoot: string): string {
   lines.push(`**runtime-assets** (${runtimeAssets.length} 个):`);
   for (const asset of runtimeAssets) {
     lines.push(`  - ${asset}`);
+  }
+
+  if (docsIndex?.quickStart.length) {
+    lines.push('');
+    lines.push(`**docs_quick_start** (${docsIndex.quickStart.length} 个):`);
+    for (const docPath of docsIndex.quickStart.slice(0, 4)) {
+      lines.push(`  - ${docPath}`);
+    }
+  }
+
+  const primaryDocs = docsIndex?.entries.filter((entry) => entry.priority === 'primary').slice(0, 4);
+  if (primaryDocs && primaryDocs.length > 0) {
+    lines.push('');
+    lines.push('**docs_reference_index**:');
+    for (const entry of primaryDocs) {
+      lines.push(`  - ${entry.path} | ${entry.title} | ${entry.purpose}`);
+    }
   }
   return lines.join('\n');
 }

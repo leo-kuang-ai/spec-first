@@ -32,6 +32,7 @@ import type {
   FirstSteering,
   FirstStructureOverview,
 } from './first-runtime-types.js';
+import { assertValidFirstRuntime } from './first-runtime-validator.js';
 
 interface ProjectionContext {
   index: FirstRuntimeIndex;
@@ -48,143 +49,11 @@ interface ProjectionContext {
   entryGuide: FirstEntryGuide;
 }
 
-function buildSyntheticConventions(summary: FirstRuntimeSummary): FirstConventions {
-  return {
-    api: {
-      observedPatterns:
-        summary.apiSurface.length > 0
-          ? summary.apiSurface
-          : ['CLI surface not explicitly detected'],
-      deviations: [],
-      recommendedConvention: 'Expose command surfaces through stable spec-first CLI verbs.',
-      evidence: [...summary.entryPoints, ...summary.evidence].slice(0, 5),
-    },
-    module: {
-      observedPatterns:
-        summary.modules.length > 0
-          ? summary.modules
-          : ['module boundaries not explicitly detected'],
-      deviations: [],
-      recommendedConvention:
-        'Keep runtime logic under src/core and entry orchestration near src/cli.',
-      evidence: [...summary.modules, ...summary.entryPoints].slice(0, 5),
-    },
-    testing: {
-      observedPatterns: summary.techStack?.filter((item) =>
-        item.toLowerCase().includes('test')
-      ) ?? ['testing stack not explicitly detected'],
-      deviations: [],
-      recommendedConvention:
-        'Use Vitest-style automated regression coverage and keep test evidence alongside runtime changes.',
-      evidence: [...(summary.techStack ?? []), ...summary.evidence].slice(0, 5),
-    },
-    projectRules: {
-      observedPatterns: ['runtime truth first', ...summary.risks.slice(0, 2)],
-      deviations: [],
-      recommendedConvention:
-        'Treat .spec-first/runtime/first as canonical truth before projecting docs/first views.',
-      evidence: [...summary.evidence, '.spec-first/runtime/first'].slice(0, 5),
-    },
-  };
-}
-
-function buildSyntheticCriticalFlows(summary: FirstRuntimeSummary): FirstCriticalFlows {
-  const primaryEntryPoint = summary.entryPoints[0] ?? 'src/cli/index.ts';
-  const runtimeModule =
-    summary.modules.find((item) => item.includes('skill-runtime')) ?? 'src/core/skill-runtime';
-
-  return [
-    {
-      flowId: 'flow-cli-entry',
-      name: 'CLI Entry Flow',
-      entryPoints: [primaryEntryPoint],
-      coreModules: [runtimeModule],
-      invariants: ['runtime truth first'],
-      verificationHooks: ['refresh docs from runtime truth'],
-    },
-    {
-      flowId: 'flow-doc-projection',
-      name: 'Docs Projection Flow',
-      entryPoints: ['src/core/skill-runtime/first-doc-projection.ts'],
-      coreModules: [runtimeModule],
-      invariants: ['canonical projection docs must reflect runtime truth'],
-      verificationHooks: ['refresh docs from runtime truth'],
-    },
-  ];
-}
-
-function buildSyntheticEntryGuide(): FirstEntryGuide {
-  return [
-    {
-      taskCategory: 'runtime-extension',
-      readFirst: [
-        '.spec-first/runtime/first/summary.json',
-        '.spec-first/runtime/first/steering.json',
-      ],
-      thenRead: ['src/core/skill-runtime/first-runtime-store.ts'],
-      avoidEntry: ['docs/first/summary.md'],
-      relatedFlows: ['flow-cli-entry'],
-    },
-    {
-      taskCategory: 'docs-projection',
-      readFirst: ['docs/first/README.md', '.spec-first/runtime/first/entry-guide.json'],
-      thenRead: ['src/core/skill-runtime/first-doc-projection.ts'],
-      avoidEntry: ['unregistered docs as truth'],
-      relatedFlows: ['flow-doc-projection'],
-    },
-  ];
-}
-
-function buildSyntheticApiContracts(summary: FirstRuntimeSummary): FirstApiContracts {
-  return {
-    interfaces:
-      summary.apiSurface.length > 0
-        ? summary.apiSurface.map((surface) => ({
-            interfaceType: surface.startsWith('CLI:') ? 'cli-command' : 'other',
-            name: surface.replace(/^CLI:\s*/, ''),
-            path: surface.replace(/^CLI:\s*/, ''),
-            method: 'run',
-            handler: summary.entryPoints[0] ?? 'src/cli/index.ts',
-            request: [],
-            response: ['自动生成 runtime 认知资产'],
-            auth: [],
-            errors: [],
-            evidence: uniqueStrings(summary.entryPoints, summary.evidence).slice(0, 6),
-          }))
-        : [],
-    integrationPoints: uniqueStrings(summary.entryPoints, summary.modules).slice(0, 8),
-    notes: ['当缺少细粒度接口证据时，这里展示最小接口面摘要。'],
-  };
-}
-
-function buildSyntheticStructureOverview(summary: FirstRuntimeSummary): FirstStructureOverview {
-  return {
-    topology: ['entry -> modules -> runtime projection'],
-    modules: summary.modules.map((modulePath) => ({
-      name: modulePath.split('/').at(-1) ?? modulePath,
-      purpose: `${modulePath} 是项目结构中的关键模块`,
-      keyPaths: [modulePath],
-      entryPoints: summary.entryPoints.filter((entryPoint) => entryPoint.startsWith(modulePath)),
-      dependencies: [],
-    })),
-    readingOrder: uniqueStrings(summary.entryPoints, summary.modules).slice(0, 10),
-    evidence: summary.evidence,
-  };
-}
-
-function buildSyntheticDomainModel(summary: FirstRuntimeSummary): FirstDomainModel {
-  return {
-    entities: summary.dataModels.map((modelName) => ({
-      name: modelName,
-      kind: 'concept',
-      description: `${modelName} 是项目认知中的核心概念`,
-      invariants: ['需要与 runtime truth 保持一致'],
-      relationships: summary.apiSurface.map((surface) => `关联接口: ${surface}`).slice(0, 5),
-      evidence: summary.evidence,
-    })),
-    glossary: uniqueStrings(summary.dataModels, summary.capabilities).slice(0, 10),
-    evidence: summary.evidence,
-  };
+function requireRuntimeAsset<T>(asset: T | null, label: string): T {
+  if (asset === null) {
+    throw new Error(`Missing first runtime asset: ${label}`);
+  }
+  return asset;
 }
 
 function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
@@ -192,6 +61,7 @@ function uniqueStrings(...groups: Array<string[] | undefined>): string[] {
 }
 
 function loadProjectionContext(projectRoot: string): ProjectionContext {
+  assertValidFirstRuntime(projectRoot);
   const index = readFirstRuntimeIndex(projectRoot);
   const summary = readFirstRuntimeSummary(projectRoot);
   const steering = readFirstSteering(projectRoot);
@@ -204,14 +74,16 @@ function loadProjectionContext(projectRoot: string): ProjectionContext {
     steering,
     artifactDocs: Object.keys(index.docsProjection ?? {}).sort(),
     techStack: summary.techStack ?? [],
-    apiContracts: readFirstApiContracts(projectRoot) ?? buildSyntheticApiContracts(summary),
-    structureOverview:
-      readFirstStructureOverview(projectRoot) ?? buildSyntheticStructureOverview(summary),
-    domainModel: readFirstDomainModel(projectRoot) ?? buildSyntheticDomainModel(summary),
+    apiContracts: requireRuntimeAsset(readFirstApiContracts(projectRoot), 'api-contracts'),
+    structureOverview: requireRuntimeAsset(
+      readFirstStructureOverview(projectRoot),
+      'structure-overview'
+    ),
+    domainModel: requireRuntimeAsset(readFirstDomainModel(projectRoot), 'domain-model'),
     databaseSchema: readFirstDatabaseSchema(projectRoot),
-    conventions: readFirstConventions(projectRoot) ?? buildSyntheticConventions(summary),
-    criticalFlows: readFirstCriticalFlows(projectRoot) ?? buildSyntheticCriticalFlows(summary),
-    entryGuide: readFirstEntryGuide(projectRoot) ?? buildSyntheticEntryGuide(),
+    conventions: requireRuntimeAsset(readFirstConventions(projectRoot), 'conventions'),
+    criticalFlows: requireRuntimeAsset(readFirstCriticalFlows(projectRoot), 'critical-flows'),
+    entryGuide: requireRuntimeAsset(readFirstEntryGuide(projectRoot), 'entry-guide'),
   };
 }
 
@@ -232,7 +104,7 @@ function renderDocHeader(title: string, truthSources: string[]): string[] {
     `# ${title}`,
     '',
     '> 标准模式：deep',
-    '> 文档层级：docs/first 投影视图',
+    '> 文档层级：docs/first 阅读产物',
     `> 真源依赖：${truthSources.join('、')}`,
   ];
 }
@@ -251,9 +123,9 @@ function renderOverviewDoc(context: ProjectionContext): string {
     return `${docPath} -> [待确认]`;
   });
   const lines = [
-    ...renderDocHeader('项目认知投影视图总览', ['.spec-first/runtime/first/index.json', ...FIRST_RUNTIME_ARTIFACTS.map((artifact) => `.spec-first/runtime/first/${artifact}`)]),
+    ...renderDocHeader('项目认知输出总览', ['.spec-first/runtime/first/index.json', ...FIRST_RUNTIME_ARTIFACTS.map((artifact) => `.spec-first/runtime/first/${artifact}`)]),
     '',
-    '> `docs/first/` 是 `.spec-first/runtime/first/` 的人类可读投影视图层，不作为 runtime 真源；其中只有 canonical projection docs 受 runtime 自动刷新保障。',
+    '> `docs/first/` 是供人阅读的输出层，不参与 machine truth，不反向参与上下文注入。',
     '',
     '## 项目摘要',
     `- project: ${context.summary.project.name}`,
@@ -261,27 +133,27 @@ function renderOverviewDoc(context: ProjectionContext): string {
     `- platform: ${context.summary.project.platformType ?? 'unknown'}`,
     `- overview: ${context.summary.project.overview ?? '未提供'}`,
     '',
-    '## 正式资产导航',
+    '## Runtime 真源导航',
     ...renderList(runtimeTruthFiles),
     '',
-    '## 基础投影视图',
+    '## 基础 docs 输出',
     ...renderList([...BASE_PROJECTION_DOCS]),
     '',
-    '## 专题文档导航',
+    '## 专题 docs 输出',
     ...renderList([...FORMAL_TOPIC_PROJECTION_DOCS]),
     '',
-    '## 条件型资产状态',
+    '## 条件型 docs 状态',
     ...renderList(conditionalStatus, '无'),
     '',
-    '## Runtime Canonical Truth',
+    '## Runtime Truth',
     ...renderList(runtimeTruthFiles),
     '',
-    '## Canonical Projection Docs',
+    '## Docs Outputs',
     ...renderList([...CANONICAL_PROJECTION_DOCS]),
     '',
     '## Unregistered Docs',
     ...renderList(unregisteredDocs, '无'),
-    '- 当前不在正式 projection registry 中，不受 runtime 自动刷新保障。',
+    '- 当前不在正式 docs 集合中，不受最小支撑层输出约束。',
     '',
     '## 使用建议',
     '- 后续 skill 的正式输入优先读取 `.spec-first/runtime/first/`。',
@@ -291,8 +163,8 @@ function renderOverviewDoc(context: ProjectionContext): string {
     '',
     '## Skill Consumption Contract',
     '- 后续 skill 的正式输入优先读取 `.spec-first/runtime/first/`。',
-    '- 列出的 `Canonical Projection Docs` 全部受 runtime 自动刷新保障。',
-    '- 未注册的 `docs/first/*` 文档不参与 canonical truth 与自动治理。',
+    '- `docs/first/*` 是阅读输出，不参与 machine truth。',
+    '- 未注册的 `docs/first/*` 文档不参与正式上下文注入与治理。',
   ];
 
   return lines.join('\n');
@@ -479,14 +351,7 @@ function renderDevelopmentGuidelinesDoc(context: ProjectionContext): string {
     `- 推荐规则: ${context.conventions.testing.recommendedConvention}`,
     ...renderSubsection('证据', context.conventions.testing.evidence, '无'),
     '',
-    '## 配置规范',
-    ...renderSubsection('观察到的模式', context.conventions.projectRules.observedPatterns, '无'),
-    ...renderSubsection('偏差', context.conventions.projectRules.deviations, '无'),
-    '',
-    `- 推荐规则: ${context.conventions.projectRules.recommendedConvention}`,
-    ...renderSubsection('证据', context.conventions.projectRules.evidence, '无'),
-    '',
-    '## 交付规范',
+    '## 项目规范',
     ...renderSubsection('观察到的模式', context.conventions.projectRules.observedPatterns, '无'),
     ...renderSubsection('偏差', context.conventions.projectRules.deviations, '无'),
     '',
@@ -545,7 +410,7 @@ function renderSteeringDoc(context: ProjectionContext): string {
       '权威顺序',
       [
         '.spec-first/runtime/first/*.json -> docs/first/*.md',
-        'runtime truth 优先于 docs projection',
+        'runtime truth 优先于 docs outputs',
         '未注册 docs 不参与 canonical truth',
       ],
       '无'
@@ -578,10 +443,7 @@ function renderConventionsDoc(context: ProjectionContext): string {
     `- 推荐规则: ${context.conventions.testing.recommendedConvention}`,
     ...renderSubsection('证据', context.conventions.testing.evidence),
     '',
-    '## 交付规范',
-    ...renderSubsection('观察到的模式', context.conventions.projectRules.observedPatterns),
-    ...renderSubsection('偏差', context.conventions.projectRules.deviations, '无'),
-    '',
+    '## 交付约束',
     `- 推荐规则: ${context.conventions.projectRules.recommendedConvention}`,
     ...renderSubsection('证据', context.conventions.projectRules.evidence),
   ].join('\n');

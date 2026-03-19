@@ -8,6 +8,7 @@ import {
   writeFirstConventions,
   writeFirstCriticalFlows,
   writeFirstDatabaseSchema,
+  writeFirstDocsIndex,
   writeFirstDomainModel,
   writeFirstEntryGuide,
   writeFirstRuntimeIndex,
@@ -125,6 +126,42 @@ function seedCanonicalRuntime(): void {
     risks: [],
     evidence: ['schema.prisma'],
   });
+  writeFirstDocsIndex(TMP, {
+    generatedAt: '2026-03-12T10:00:00.000Z',
+    mode: 'deep',
+    quickStart: [
+      'docs/first/README.md',
+      'docs/first/summary.md',
+      'docs/first/entry-guide.md',
+    ],
+    entries: [
+      {
+        path: 'docs/first/README.md',
+        title: '项目认知输出总览',
+        purpose: '快速导航 runtime 与 docs 输出。',
+        relatedRuntimeAssets: ['.spec-first/runtime/first/index.json', '.spec-first/runtime/first/summary.json'],
+        recommendedWhen: ['首次进入项目'],
+        priority: 'primary',
+      },
+      {
+        path: 'docs/first/summary.md',
+        title: '项目摘要',
+        purpose: '建立项目背景。',
+        relatedRuntimeAssets: ['.spec-first/runtime/first/summary.json'],
+        recommendedWhen: ['需要建立项目认知'],
+        priority: 'primary',
+      },
+      {
+        path: 'docs/first/codebase-overview.md',
+        title: '代码库总览',
+        purpose: '了解代码库结构。',
+        relatedRuntimeAssets: ['.spec-first/runtime/first/structure-overview.json'],
+        recommendedWhen: ['需要定位模块'],
+        priority: 'secondary',
+      },
+    ],
+    notes: ['docs/first 仅供阅读。'],
+  });
   writeFirstRuntimeIndex(TMP, {
     version: '1.0.0',
     lastRun: '2026-03-12T10:00:00.000Z',
@@ -165,6 +202,7 @@ describe('resolveSkillContext', () => {
     expect(result.requiredAssetNames).toEqual(['summary']);
     expect(result.optionalAssetNames).toEqual(['domain-model', 'conventions']);
     expect(result.contextSummary).toContain('spec-first');
+    expect(result.docsIndex?.quickStart).toContain('docs/first/README.md');
     expect(result.optional.domainModel?.glossary).toContain('Feature');
   });
 

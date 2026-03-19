@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.1.4 2026-03-19 Claude: fix(docs): 修正 pnpm link 开发模式卸载文档误导 — 将"pnpm remove --global"从"自动卸载"分离为独立小节，明确 preuninstall 跳过原因（防误删全局资产）；补充 preuninstall 测试覆盖全局卸载（npm_config_global=true）场景 (user-visible)
 - v1.1.4 2026-03-18 Claude: refactor(context-resolver): 输入矩阵代码化 — 将 resolveSkillAssetContract 的 switch-case 提取为 SKILL_INPUT_MATRIX 常量，集中管理 14 个 skill 的资产契约
 - v1.1.4 2026-03-18 Claude: refactor(dispatcher): 统一 runtime notice 参数命名 — 将 6 个 build*RuntimeNotice 函数的参数从下划线命名（background_input_status）改为驼峰命名（backgroundInputStatus），简化 formatStageRuntimeNotice 函数签名
 - v1.1.4 2026-03-17 Claude: refactor(first): 简化 CLI 参数协议 — 删除 --auto 和 --skip 参数，统一为单一执行路径（有 runtime → 刷新，无 runtime → bootstrap），更新帮助文档和测试用例 (user-visible)

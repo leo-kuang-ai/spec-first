@@ -11,6 +11,7 @@ import { checkHooks } from '../../core/tool-integration/hook-installer.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
+import { checkFirstDocsExistence } from '../../core/skill-runtime/first-docs-check.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
 import { formatHostDoctorMessage } from '../../core/host-adapters/format.js';
 import { resolveHostAdapterStatuses } from '../../core/host-adapters/registry.js';
@@ -294,18 +295,16 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
     });
   }
 
-  const driftDocs = Object.entries(index.docsProjection)
-    .filter(([, entry]) => !entry.healthy)
-    .map(([doc, entry]) => `${doc}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
+  const missingDocs = checkFirstDocsExistence(root).missing;
 
   results.push({
-    name: 'Docs Projection Sync',
-    level: driftDocs.length === 0 ? 'PASS' : 'WARNING',
-    message: driftDocs.length === 0 ? '已同步' : `失同步: ${driftDocs.join(', ')}`,
+    name: 'Docs Outputs',
+    level: missingDocs.length === 0 ? 'PASS' : 'WARNING',
+    message: missingDocs.length === 0 ? '已生成' : `缺失: ${missingDocs.join(', ')}`,
     fix:
-      driftDocs.length === 0
+      missingDocs.length === 0
         ? undefined
-        : '重新生成 docs 投影视图，确保 runtime 真源与 docs 投影视图保持同步',
+        : '重新执行 /spec-first:first，补齐 docs/first 输出',
   });
 
   return results;

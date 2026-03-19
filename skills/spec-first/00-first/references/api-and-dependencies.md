@@ -19,7 +19,7 @@
 - `steering.json`
 - `conventions.json`
 
-### projection docs
+### docs outputs
 
 - `docs/first/api-docs.md`
 - `docs/first/external-deps.md`
@@ -36,7 +36,7 @@
 
 约束：
 - `api-docs.md` 只服务“项目 API 接口规范”，不承载外部依赖、外部服务或泛化集成说明
-- 真源层以结构化字段为主，不要求生成长篇接口说明
+- 真源层以结构化字段为主，不要求产出长篇接口说明
 - 不得把内部实现细节误判为正式接口
 
 ## 4. 外部依赖分析要求
@@ -48,12 +48,13 @@
 - 依赖升级或替换的风险点
 
 约束：
-- `external-deps.md` 只能从 runtime truth 投影，不得成为旁路清单
+- `external-deps.md` 只能展开已确认 runtime 事实，不得成为旁路清单
 - 缺少证据时必须标注 `[待确认]`
 
 ## 5. 输出约束
 
-- 所有结论先进入 runtime truth，再投影到 Markdown
+- runtime 事实必须先确认并进入正式 runtime 资产
+- docs 只能基于已确认事实展开，不得反向定义真源
 - `api-docs.md` 和 `external-deps.md` 默认中文输出
 - 命令、接口路径、字段名、包名保持英文原文
 

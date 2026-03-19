@@ -75,4 +75,4 @@ background_input_status: degraded
 - `.spec-first/runtime/first/entry-guide.json`
 - `.spec-first/runtime/first/steering.json`
 
-`docs/first/` 仅作为人类可读投影视图层，不再作为 init 前置真相。
+`docs/first/` 仅作为人类可读输出层，不再作为 init 前置真相。

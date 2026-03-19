@@ -217,13 +217,15 @@ describe('handleDoctor', () => {
     expect(lines.join('\n')).toContain('已跳过');
   });
 
-  it('should report background input and projection sync checks', () => {
+  it('should report background input, runtime health, and docs output checks', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
       JSON.stringify({ currentStage: '05_verify', backgroundInputStatus: 'degraded' }),
       'utf-8',
     );
     mkdirSync(join(TMP, '.spec-first', 'runtime', 'first'), { recursive: true });
+    mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    writeFileSync(join(TMP, 'docs', 'first', 'summary.md'), '# Summary\n', 'utf-8');
     writeFileSync(
       join(TMP, '.spec-first', 'runtime', 'first', 'index.json'),
       JSON.stringify({
@@ -239,11 +241,9 @@ describe('handleDoctor', () => {
         structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
         domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
         databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true, status: 'healthy' },
-        docsProjection: {
-          'docs/first/README.md': { path: 'docs/first/README.md', fileHash: 'readme', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['stale projection'] },
-        },
+        docsProjection: {},
         status: 'stale',
-        staleReason: 'projection drift',
+        staleReason: 'docs outputs missing',
       }),
       'utf-8',
     );
@@ -264,8 +264,8 @@ describe('handleDoctor', () => {
     expect(joined).toContain('degraded');
     expect(joined).toContain('First Runtime Assets');
     expect(joined).toContain('hash mismatch');
-    expect(joined).toContain('Docs Projection Sync');
-    expect(joined).toContain('失同步');
+    expect(joined).toContain('Docs Outputs');
+    expect(joined).toContain('缺失');
   });
 
   it('should warn when Session Hook misses required bootstrap segments', () => {

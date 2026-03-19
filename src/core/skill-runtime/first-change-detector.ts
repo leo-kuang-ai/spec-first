@@ -92,7 +92,7 @@ function parseChangedFiles(output: string): string[] {
     .filter(Boolean);
 }
 
-function parsePorcelainChangedFiles(output: string): string[] {
+export function parsePorcelainChangedFiles(output: string): string[] {
   return output
     .split('\n')
     .filter(Boolean)
@@ -239,59 +239,68 @@ export function checkFirstUpdateContext(projectRoot: string): FirstUpdateContext
     { name: 'domain-model.json', entry: runtimeIndex?.domainModel },
     { name: 'database-schema.json', entry: runtimeIndex?.databaseSchema },
   ];
-  const docsProjectionAssets = CANONICAL_PROJECTION_DOCS.map((docPath) => ({
+  const docsOutputAssets = CANONICAL_PROJECTION_DOCS.map((docPath) => ({
     name: docPath,
-    entry: runtimeIndex?.docsProjection[docPath],
+    entry: undefined,
   }));
 
-  const productStatus: ProductStatus[] = [...runtimeAssets, ...docsProjectionAssets].map(
+  const productStatus: ProductStatus[] = [...runtimeAssets, ...docsOutputAssets].map(
     ({ name, entry }) => {
+      const isDocOutput = name.startsWith('docs/');
       const assetPath = name.startsWith('docs/') ? join(projectRoot, name) : join(runtimeDir, name);
       const assetExists = existsSync(assetPath);
       const issues: HealthIssue[] = [];
       let currentHash: string | undefined;
 
       const conditionalStatus =
-        name === 'database-schema.json' && entry && 'status' in entry
-          ? entry.status
-          : undefined;
+        name === 'database-schema.json' && entry && 'status' in entry ? entry.status : undefined;
 
-      if (!assetExists && conditionalStatus !== 'not_applicable') {
-        issues.push({ type: 'missing', message: 'runtime 资产文件不存在' });
-      } else {
-        if (assetExists) {
+      if (isDocOutput) {
+        if (!assetExists) {
+          issues.push({
+            type: 'missing',
+            message: 'docs 输出文件不存在',
+          });
+        } else {
           currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
         }
-      }
+      } else {
+        if (!assetExists && conditionalStatus !== 'not_applicable') {
+          issues.push({
+            type: 'missing',
+            message: 'runtime 资产文件不存在',
+          });
+        } else if (assetExists) {
+          currentHash = sha256Hex(readFileSync(assetPath, 'utf-8'));
+        }
 
-      if (!entry) {
-        issues.push({ type: 'missing', message: 'runtime 索引记录缺失' });
-      }
+        if (!entry) {
+          issues.push({
+            type: 'missing',
+            message: 'runtime 索引记录缺失',
+          });
+        }
 
-      if (entry?.healthy === false && conditionalStatus !== 'not_applicable') {
-        issues.push({
-          type: 'format_error',
-          message: entry.issues?.join('；') || 'runtime 资产状态异常',
-        });
-      }
+        if (entry?.healthy === false && conditionalStatus !== 'not_applicable') {
+          issues.push({
+            type: 'format_error',
+            message: entry.issues?.join('；') || 'runtime 资产状态异常',
+          });
+        }
 
-      if (conditionalStatus === 'degraded') {
-        issues.push({
-          type: 'format_error',
-          message: entry?.issues?.join('；') || '条件型 runtime 资产处于 degraded 状态',
-        });
-      }
+        if (conditionalStatus === 'degraded') {
+          issues.push({
+            type: 'format_error',
+            message: entry?.issues?.join('；') || '条件型 runtime 资产处于 degraded 状态',
+          });
+        }
 
-      if (
-        conditionalStatus !== 'not_applicable' &&
-        entry?.fileHash &&
-        currentHash &&
-        entry.fileHash !== currentHash
-      ) {
-        issues.push({
-          type: 'hash_mismatch',
-          message: 'runtime 资产与索引记录不一致（可能被手动修改）',
-        });
+        if (entry?.fileHash && currentHash && entry.fileHash !== currentHash) {
+          issues.push({
+            type: 'hash_mismatch',
+            message: 'runtime 资产与索引记录不一致（可能被手动修改）',
+          });
+        }
       }
 
       return {
@@ -383,11 +392,11 @@ export function formatHealthStatus(context: FirstUpdateContext): string {
   const lines: string[] = [];
 
   if (!context.hasExistingOutput) {
-    return '✅ 未检测到已有产物，将执行首次生成。仅检查 runtime truth + canonical projection docs，未注册 docs 不在 health 范围内。\n';
+    return '✅ 未检测到已有产物，将执行首次生成。健康检查范围只覆盖 runtime 与正式 docs 文件存在性。\n';
   }
 
   lines.push('📋 **检测到已有产物**');
-  lines.push('- health 范围: runtime truth + canonical projection docs');
+  lines.push('- health 范围: runtime truth + docs 文件存在性');
   if (context.lastUpdateTime) {
     const daysSince = Math.floor(
       (Date.now() - context.lastUpdateTime.getTime()) / (1000 * 60 * 60 * 24)
@@ -421,20 +430,20 @@ export type FirstRefreshScope = 'runtime-only' | 'runtime-and-docs';
 export interface FirstRefreshDecision {
   scope: FirstRefreshScope;
   runtimeArtifacts: string[];
-  docsProjections: string[];
+  docsOutputs: string[];
 }
 
 export function detectFirstRefreshScope(changedFiles: string[]): FirstRefreshDecision {
   const runtimeArtifacts = Array.from(
     new Set(changedFiles.flatMap((file) => matchRuntimeArtifactsByChangedFile(file)))
   );
-  const docsProjections = Array.from(
+  const docsOutputs = Array.from(
     new Set(changedFiles.flatMap((file) => collectProjectionDocsForChangedFiles([file])))
   );
 
   return {
-    scope: docsProjections.length > 0 ? 'runtime-and-docs' : 'runtime-only',
+    scope: docsOutputs.length > 0 ? 'runtime-and-docs' : 'runtime-only',
     runtimeArtifacts,
-    docsProjections,
+    docsOutputs,
   };
 }

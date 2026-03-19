@@ -1,89 +1,187 @@
 # 领域模型
 
-> 生成时间: 2026-03-17 | 分析模式: static
+## 核心实体
 
-## 核心概念
+### Feature
 
-| 概念 | 类型 | 说明 | 证据 |
-|------|------|------|------|
-| Feature | Aggregate Root | 功能需求聚合根，贯穿整个生命周期 | `src/core/process-engine/stage-machine.ts` — `[显式]` |
-| Stage | Enum | 阶段枚举，8 个活跃阶段 + 2 个终态，单向不可逆 | `src/shared/types.ts:7-18` — `[显式]` |
-| IdType | Union Type | 追溯 ID 类型（FR/DS/TASK/TC/RFC 等 14 类） | `src/shared/types.ts:24-38` — `[显式]` |
-| ExitCode | Enum | CLI 退出码 | `src/shared/types.ts:57-66` — `[显式]` |
-| GateCondition | Interface | 门禁条件定义 | `src/core/gate-engine/condition-registry.ts` — `[显式]` |
-| CoverageMetrics | Interface | 覆盖率指标（C3/C4/C6/C8/C9） | `src/core/trace-engine/coverage.ts` — `[显式]` |
-| RFC | Entity | 变更请求 | `src/core/change-mgr/rfc-machine.ts` — `[显式]` |
-| Defect | Entity | 缺陷记录 | `src/core/change-mgr/defect-machine.ts` — `[显式]` |
-| Waiver | Entity | Gate 条件豁免 | `src/core/gate-engine/waiver.ts` — `[显式]` |
+**描述**：功能需求单元，是 Spec-First 管理的核心实体。
 
-## 领域服务
+**属性**：
 
-| 服务 | 职责 | 核心方法 | 证据 |
-|------|------|----------|------|
-| ProcessEngine | 阶段状态机驱动 | `advance()`, `canAdvance()`, `getCurrentStage()`, `validateTransition()` | `src/core/process-engine/advance.ts` — `[显式]` |
-| GateEngine | 门禁条件评估 | `evaluate()`, `getConditions()`, `validate()` | `src/core/gate-engine/gate-evaluator.ts` — `[显式]` |
-| TraceEngine | 追溯 ID 与覆盖率管理 | `generateId()`, `validateId()`, `getCoverage()`, `syncMatrix()` | `src/core/trace-engine/matrix.ts` — `[显式]` |
-| SkillRuntime | Skill 分发与执行 | `dispatch()`, `assemblePrompt()`, `validateHardGate()` | `src/core/skill-runtime/dispatcher.ts` — `[显式]` |
-| ChangeManager | RFC/Defect 状态管理 | `createRFC()`, `transitionDefect()`, `analyzeImpact()` | `src/core/change-mgr/rfc-machine.ts` — `[显式]` |
-| AIOrchestrator | AI 编排 | `runAutoLoop()`, `recoverContext()`, `prepareContextPack()` | `src/core/ai-orchestrator/auto-loop.ts` — `[显式]` |
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| featureId | string | 唯一标识，格式 FSREQ-YYYYMMDD-{FEAT}-{NNN} |
+| title | string | 功能标题 |
+| mode | 'N' \| 'I' | 新建/迭代模式 |
+| size | 'S' \| 'M' \| 'L' | 规模 |
+| currentStage | Stage | 当前阶段 |
+| terminal | boolean | 是否终态 |
 
-## 状态机
-
-### Stage State Machine
-
-**状态** (`src/shared/types.ts:7-18` — `[显式]`):
-- 活跃: `00_init`, `01_specify`, `02_design`, `03_plan`, `04_implement`, `05_verify`, `06_wrap_up`, `07_release`
-- 终态: `08_done`, `09_cancelled`
-
-**转换** (`src/core/process-engine/stage-machine.ts` — `[显式]`):
+**状态转换**：
 
 ```
 00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release → 08_done
-                                                                                               ↘ 09_cancelled
+任意阶段 → 09_cancelled
 ```
 
-| From | To | Trigger |
-|------|------|---------|
-| 00_init | 01_specify | init |
-| 01_specify | 02_design | specify |
-| 02_design | 03_plan | design |
-| 03_plan | 04_implement | plan |
-| 04_implement | 05_verify | implement |
-| 05_verify | 06_wrap_up | verify |
-| 06_wrap_up | 07_release | wrapUp |
-| 07_release | 08_done | release |
+**证据**：`src/shared/types.ts:77-102`
 
-### RFC State Machine
+---
 
-**状态** (`src/core/change-mgr/rfc-machine.ts` — `[显式]`):
-- draft, approved, closed, rejected
+### Stage
 
-| From | To | Trigger |
-|------|------|---------|
-| draft | approved | approve |
-| draft | rejected | reject |
-| approved | closed | close |
+**描述**：Feature 生命周期阶段。
 
-### Defect State Machine
+**枚举值**：
 
-**状态** (`src/core/change-mgr/defect-machine.ts` — `[显式]`):
-- open, fixing, fixed, verified, wontfix
-
-| From | To | Trigger |
-|------|------|---------|
-| open | fixing | startFix |
-| fixing | fixed | complete |
-| fixed | verified | verify |
-| verified | wontfix | wontfix |
-
-## 业务规则
-
-| 规则 | 约束 | 证据 |
+| 阶段 | 代码 | 说明 |
 |------|------|------|
-| Stage Advance Gate | 阶段推进必须通过 Gate 校验，Gate 条件必须全部 passing 才能 advance | `src/core/process-engine/advance.ts:95-112` — `[显式]` |
-| Coverage Thresholds | 覆盖率矩阵必须满足最低阈值（C3/C4/C6/C8/C9 各项阈值） | `src/core/trace-engine/coverage.ts:44-60` — `[显式]` |
-| ID Format Validation | 追溯 ID 必须符合格式规范（{TYPE}-{ABBR}-{SEQ}） | `src/core/trace-engine/id-validator.ts:9-22` — `[显式]` |
-| Gate Condition Rules | 19 条 Gate 条件（16 blocking + 3 warning），必须满足 blocking 条件才能 advance | `src/core/gate-engine/condition-registry.ts:269-277` — `[显式]` |
-| Manual Edit Prohibition | 状态文件只能通过 CLI 操作，禁止手动编辑 stage-state.json、traceability-matrix.md | `CLAUDE.md:31-49` — `[显式]` |
-| ESM Only | 全项目使用 ESM 模块系统（type: module） | `package.json:5` — `[显式]` |
-| Named Exports Only | core 模块禁止使用 default export | `CLAUDE.md:59` — `[显式]` |
+| INIT | 00_init | 初始化 |
+| SPECIFY | 01_specify | 需求规格 |
+| DESIGN | 02_design | 技术设计 |
+| PLAN | 03_plan | 任务拆解 |
+| IMPLEMENT | 04_implement | 代码实现 |
+| VERIFY | 05_verify | 验收测试 |
+| WRAP_UP | 06_wrap_up | 归档复盘 |
+| RELEASE | 07_release | 上线发布 |
+| DONE | 08_done | 完成 |
+| CANCELLED | 09_cancelled | 取消 |
+
+**约束**：
+- 单向不可逆流转
+- 必须通过 Gate 校验才能推进
+
+**证据**：`src/shared/types.ts:7-18`
+
+---
+
+### TraceabilityId
+
+**描述**：追溯 ID，支持全链路追踪。
+
+**类型（14 类）**：
+
+| 分类 | 类型 | 说明 |
+|------|------|------|
+| 业务链路 | FR | 功能需求 |
+| 业务链路 | DS | 设计规格 |
+| 业务链路 | TASK | 任务 |
+| 业务链路 | TC | 测试用例 |
+| 业务链路 | RFC | 变更请求 |
+| V-Model | REQ | 需求 |
+| V-Model | SYS | 系统 |
+| V-Model | ARCH | 架构 |
+| V-Model | MOD | 模块 |
+| V-Model | ATP | 验收测试计划 |
+| V-Model | STP | 系统测试计划 |
+| V-Model | ITP | 集成测试计划 |
+| V-Model | UTP | 单元测试计划 |
+| 顶层 | Feature | Feature 标识 |
+
+**格式**：`{TYPE}-{FEAT}-{NNN}`
+
+**证据**：`src/shared/types.ts:24-38`
+
+---
+
+### Gate
+
+**描述**：质量门禁，评估阶段推进条件。
+
+**属性**：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| status | 'PASS' \| 'PASS_WITH_WAIVER' \| 'FAIL' | 评估结果 |
+| conditions | ConditionResult[] | 条件评估结果 |
+| waivers | WaiverRef[] | 豁免引用 |
+
+**规则**：
+- 19 条规则：16 blocking + 3 warning
+- 任一 blocking 失败则整体 FAIL
+
+**证据**：`src/shared/types.ts:105-132`
+
+---
+
+### MatrixRow
+
+**描述**：追踪矩阵行。
+
+**属性**：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| id | string | 追溯 ID |
+| type | IdType | ID 类型 |
+| title | string | 标题 |
+| status | MatrixStatus | 状态 |
+| upstream | string[] | 上游 ID |
+| downstream | string[] | 下游 ID |
+
+**证据**：`src/shared/types.ts:199-208`
+
+---
+
+### RFC
+
+**描述**：变更请求。
+
+**属性**：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| id | string | RFC ID |
+| level | 'Minor' \| 'Major' \| 'Critical' | 影响级别 |
+| status | 'draft' \| 'approved' \| 'closed' \| 'rejected' | 状态 |
+| impactIds | string[] | 影响范围 |
+| waivers | RfcWaiver[] | 豁免项 |
+
+**证据**：`src/shared/types.ts:135-161`
+
+---
+
+### Defect
+
+**描述**：缺陷记录。
+
+**属性**：
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| seq | number | 序号 |
+| severity | 'S1' \| 'S2' \| 'S3' \| 'S4' | 严重程度 |
+| status | 'open' \| 'fixing' \| 'fixed' \| 'verified' \| 'wontfix' | 状态 |
+| linkedFr | string | 关联 FR |
+| linkedTc | string | 关联 TC |
+
+**证据**：`src/shared/types.ts:164-180`
+
+---
+
+## 实体关系
+
+```
+Feature ──has──→ Stage
+    │
+    └──contains──→ TraceabilityId
+                        │
+                        └──represented_in──→ MatrixRow
+
+Stage ──requires──→ Gate
+                        │
+                        ↑
+RFC ──waives─────────────┘
+```
+
+## 覆盖率指标
+
+| 指标 | 说明 | 计算方式 |
+|------|------|----------|
+| C3 | 任务覆盖率 | TASK 覆盖 FR（传递链） |
+| C4 | 测试覆盖率 | TC 直接覆盖 FR |
+| C6 | 实现覆盖率 | TASK 已实现 |
+| C8 | 任务合规率 | TASK 有上游 |
+| C9 | TC 合规率 | TC 有上游 FR |
+
+**证据**：`src/shared/types.ts:211-217`

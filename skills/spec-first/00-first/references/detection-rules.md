@@ -113,7 +113,7 @@
 - 根级需要统一描述，子包只影响内容侧重点，不新增旁路 docs 目录结构
 
 约束：
-- 不生成 `docs/first/backend/*` 这类子目录旁路产物
+- 不产出 `docs/first/backend/*` 这类子目录旁路产物
 - 最终仍收口到标准 `docs/first/*` 与 runtime truth
 
 ## 6. 识别失败降级
@@ -121,11 +121,11 @@
 当无法匹配任何已知类型时：
 - `summary.json.project.platformType` 使用 `unknown` 或最小可信主类型
 - `steering.json.tech.constraints` 记录“项目端类型待确认”
-- 下游专题文档继续按标准模式生成，但内容中显式标注 `[待确认]`
+- 下游专题文档继续按标准模式产出，但内容中显式标注 `[待确认]`
 
 用户提示语义：
 - “⚠️ 无法精确识别项目类型，已按标准模式继续，并记录待确认项”
-- 允许使用 `--type=<backend|frontend|mobile|cross-platform|desktop|monorepo|mixed>` 手动指定
+- 不再提供 `--type` 手动指定入口；识别结果只作为 runtime 真源的一部分记录
 
 ## 7. Context7 映射
 
@@ -150,4 +150,4 @@ P1b 可基于识别结果选择最佳实践来源，优先查询：
 
 - 不得把密钥、连接串、令牌写入识别结果
 - 不得因为外部工具失败而伪造识别结论
-- 不得把文档投影视图当成识别真源
+- 不得把 docs 输出当成识别真源

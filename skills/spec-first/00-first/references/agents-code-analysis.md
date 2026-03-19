@@ -1,6 +1,7 @@
 # 代码分析执行提示
 
-> 这是增强路径提示，不是主题规范正文。只在 CLI 输出证据不足时补当前缺失的结构、架构或调用链证据。
+> 这是按需补证据提示，不是主题规范正文。
+> 由 Skill 按执行流决定是否派发，不由 CLI 判断是否触发。
 
 ## 适用场景
 
@@ -18,20 +19,20 @@
 ### A1：代码库概览补强
 
 - 补模块边界、入口点、阅读顺序
-- 先把事实写入 `structure-overview.json`
-- 再由 projection 生成 `docs/first/codebase-overview.md`
+- 产出 `structure-overview.json` 所需的结构化事实
+- 同时补齐 `docs/first/codebase-overview.md` 所需的阅读材料
 
 ### A2：架构关系补强
 
 - 补模块依赖方向、层次边界、关键协作关系
 - 事实仍归并到 `structure-overview.json`
-- `docs/first/architecture.md` 只作为投影视图
+- `docs/first/architecture.md` 只能展开已确认事实，不得额外发明结构边界
 
 ### A3：调用链补强
 
 - 补关键入口、主调用路径、高扩散风险
 - 事实写入 `critical-flows.json`
-- 再投影到 `docs/first/call-graph.md`
+- `docs/first/call-graph.md` 只负责表达已确认链路
 
 ## 工具与降级
 

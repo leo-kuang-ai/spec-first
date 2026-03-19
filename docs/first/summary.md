@@ -1,87 +1,81 @@
-# 项目摘要
+# 项目概览
 
-> 标准模式：deep
-> 文档层级：docs/first 投影视图
-> 真源依赖：.spec-first/runtime/first/summary.json
+## 基本信息
 
-## 项目是什么
-- 项目: spec-first
-- 平台: cli-tool
-- 生成时间: 2026-03-17T10:30:00.000Z
-- 概述: AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams
+| 字段 | 值 |
+|------|-----|
+| 名称 | spec-first |
+| 版本 | 1.1.4 |
+| 类型 | CLI 工具 |
+| 描述 | AI-workflow CLI for spec-driven development |
 
-## 主要能力
-- Stage State Machine (8 active + 2 terminal)
-- Gate Engine (19 conditions: 16 blocking + 3 warning)
-- Trace Engine (14 ID types, 5 coverage metrics)
-- Skill Runtime (20 skills, 3-layer routing)
-- Change Management (RFC + Defect state machines)
-- AI Orchestrator (auto-loop, catchup context recovery)
-- Template Engine (Handlebars-based artifact generation)
-- CLI Commands (27 commands)
+## 技术栈
 
-## 入口
-- src/cli/index.ts
-- dist/cli/index.js
+| 类别 | 技术 |
+|------|------|
+| Runtime | Node.js ≥20 |
+| Language | TypeScript 5.4+ |
+| Module System | ESM |
+| Build Tool | tsup |
+| Test Framework | Vitest |
+| Template Engine | Handlebars |
+| Lint | ESLint + typescript-eslint |
+| Format | Prettier |
 
-## 关键模块
-- cli
-- process-engine
-- skill-runtime
-- gate-engine
-- trace-engine
-- change-mgr
-- ai-orchestrator
-- template
-- tool-integration
-- metrics-engine
-- validators
-- task-plan
-- rules
-- batch-executor
-- migrations
-- host-adapters
-- shared
-- config
+## 项目结构
 
-## 核心数据模型
-- Feature
-- Stage
-- IdType
-- ExitCode
-- GateCondition
-- GateResult
-- CoverageMetrics
-- RFC
-- Defect
-- Waiver
+```
+spec-first/
+├── src/
+│   ├── cli/           # CLI 命令（27 个）
+│   ├── core/          # 核心引擎（14 个模块）
+│   └── shared/        # 共享类型与工具
+├── skills/            # Skill 定义（22 个）
+├── templates/         # Handlebars 模板
+├── tests/             # 测试目录
+├── specs/             # Feature 产物
+└── .spec-first/       # 项目配置
+```
 
-## 接口面
-- spec-first init
-- spec-first stage advance
-- spec-first gate check
-- spec-first matrix sync
-- spec-first feature current
-- spec-first id generate
-- spec-first id search
-- spec-first defect create
-- spec-first rfc create
-- spec-first skill render
-- spec-first first
-- spec-first doctor
-- spec-first orchestrate
-- spec-first ai context
-- spec-first ai catchup
+## 核心模块
 
-## 风险
-- Stage state machine is irreversible - manual edits to stage-state.json will corrupt state
-- Gate conditions are blocking - failed gates prevent stage advancement
-- Coverage thresholds (C3/C4/C6/C8/C9) must be met for stage advancement
-- ID format validation is strict - non-conforming IDs will be rejected
-- Traceability matrix must be synchronized manually or via CLI
+| 模块 | 职责 |
+|------|------|
+| process-engine | Stage 状态机，驱动 Feature 生命周期 |
+| skill-runtime | Skill 分发、Prompt 组装、Hard-Gate |
+| ai-orchestrator | Auto-loop、Catchup 上下文恢复 |
+| gate-engine | 19 条质量门禁规则评估 |
+| trace-engine | 追溯 ID 生成/校验、覆盖率矩阵 |
+| change-mgr | RFC + Defect 状态机 |
+| template | Handlebars 模板渲染 |
+| tool-integration | AI runtime hooks |
+| metrics-engine | 健康度评分 |
+| validators | 产物格式校验 |
+| task-plan | task_plan.md 解析 |
+| rules | 静态规则定义 |
+| batch-executor | 批量任务执行 |
+| migrations | 状态文件迁移 |
 
-## 证据摘要
-- package.json:1-98 — project metadata — [显式]
-- src/shared/types.ts:7-18 — Stage enum definition — [显式]
-- src/core/gate-engine/condition-registry.ts:1-50 — Gate conditions — [显式]
-- src/core/trace-engine/id-validator.ts:9-22 — ID patterns — [显式]
+## 依赖
+
+### 运行时依赖
+
+- handlebars@^4.7.8 — 模板渲染
+- js-yaml@^4.1.0 — YAML 解析
+- semver@^7.7.4 — 版本管理
+- update-notifier@^7.0.0 — 更新检查
+
+### 开发依赖
+
+- typescript@^5.4.0
+- tsup@^8.5.1
+- vitest@^1.6.1
+- eslint@^10.0.2
+- prettier@^3.8.1
+
+## 证据来源
+
+- 项目配置 (`package.json:1-98`) — 显式
+- TypeScript 配置 (`tsconfig.json:1-22`) — 显式
+- 测试配置 (`vitest.config.ts:1-19`) — 显式
+- 目录结构分析 — 显式

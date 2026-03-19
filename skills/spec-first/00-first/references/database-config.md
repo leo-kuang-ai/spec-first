@@ -1,7 +1,7 @@
 # 数据库能力配置与适用性规范
 
 > **当前正式 contract**：数据库认知是条件型能力，不是默认必选能力。
-> 本文档约束 `database-schema.json` 的适用性判定、schema 来源优先级与 `database-er.md` 的条件生成规则。
+> 本文档约束 `database-schema.json` 的适用性判定、schema 来源优先级与 `database-er.md` 的条件产出规则。
 
 ## 1. 适用性判定
 
@@ -12,7 +12,7 @@
 - 检测到 repository / entity / model 等强证据
 
 状态语义：
-- `healthy`：证据充分，可生成 `database-schema.json`
+- `healthy`：证据充分，可产出 `database-schema.json`
 - `degraded`：有数据库线索，但不足以形成正式 schema
 - `not_applicable`：当前项目不适用数据库认知能力
 
@@ -22,15 +22,15 @@
 
 - `database-schema.json`
 
-### projection docs
+### docs outputs
 
 - `docs/first/database-er.md`
 
 约束：
-- 只有 `databaseSchema.status === healthy` 时才生成 `database-er.md`
-- 不生成 `database-index.md`
-- 不生成 `database-{name}.md`
-- 不生成任何未注册数据库专题文件
+- 只有 `databaseSchema.status === healthy` 时才产出 `database-er.md`
+- 不产出 `database-index.md`
+- 不产出 `database-{name}.md`
+- 不产出任何未注册数据库专题文件
 
 ## 3. schema 来源优先级
 
@@ -62,14 +62,14 @@
 
 降级行为：
 - 允许写入 `database-schema.json`，但状态必须为 `degraded`
-- 不生成正式 `database-er.md`
+- 不产出正式 `database-er.md`
 - 必须记录降级原因与证据不足点
 
 ## 6. 多数据库项目
 
 多数据库场景的收口方式：
 - 所有数据库事实统一汇总到同一份 `database-schema.json`
-- 最终仍只有一个正式投影视图：`database-er.md`
+- 最终仍只有一个正式 docs 输出：`database-er.md`
 
 约束：
 - 不因数据库数量增加额外正式文档
@@ -83,6 +83,6 @@
 
 ## 8. 验收标准
 
-- 能明确哪些项目不生成 `database-er.md`
+- 能明确哪些项目不产出 `database-er.md`
 - 能解释 `healthy / degraded / not_applicable` 的边界
 - 能把多数据库项目收口到单一 `database-schema.json`

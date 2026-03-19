@@ -189,7 +189,7 @@ TASK-003: [P] 实现找回密码接口
 
 ## 背景状态与依赖强度
 - `full`: 存在并成功读取匹配背景
-- `degraded`: 存在部分背景，但所需 canonical runtime 资产或 docs 投影视图不完整
+- `degraded`: 存在部分背景，但所需 runtime 资产或 docs 输出不完整
 - `blind`: 缺少足够背景输入
 - `L1`: 推荐
 - `L2`: 强烈推荐
