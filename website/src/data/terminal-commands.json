@@ -1,0 +1,30 @@
+{
+  "zh": [
+    {
+      "command": "spec-first init my-project",
+      "output": "✓ 项目初始化完成\n✓ 创建 specs/FSREQ-20260319-MYPROJ-001/\n✓ 生成 prd.md, spec.md, design.md"
+    },
+    {
+      "command": "spec-first gate check",
+      "output": "✓ Gate Check 通过\n  - C3 覆盖率: 100%\n  - C8 合规性: 100%\n  - 19/19 规则通过"
+    },
+    {
+      "command": "spec-first stage advance",
+      "output": "✓ 阶段推进成功\n  01_specify → 02_design\n  下一步: 实现技术设计"
+    }
+  ],
+  "en": [
+    {
+      "command": "spec-first init my-project",
+      "output": "✓ Project initialized\n✓ Created specs/FSREQ-20260319-MYPROJ-001/\n✓ Generated prd.md, spec.md, design.md"
+    },
+    {
+      "command": "spec-first gate check",
+      "output": "✓ Gate Check passed\n  - C3 coverage: 100%\n  - C8 compliance: 100%\n  - 19/19 rules passed"
+    },
+    {
+      "command": "spec-first stage advance",
+      "output": "✓ Stage advanced successfully\n  01_specify → 02_design\n  Next: Implement technical design"
+    }
+  ]
+}

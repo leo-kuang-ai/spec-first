@@ -1,0 +1,18 @@
+# Spec-First .npmrc 模板
+# 使用方式：复制为项目根目录 .npmrc 并按需修改
+
+# ─── 外网 npm 公共仓库（默认） ───────────────────────
+registry=https://registry.npmjs.org/
+
+# ─── 内网私有仓库（按需启用） ────────────────────────
+# 取消下方注释并替换为实际内网地址：
+# registry=https://npm.your-company.com/
+# //npm.your-company.com/:_authToken=${NPM_TOKEN}
+
+# ─── 作用域包配置（可选） ────────────────────────────
+# 仅对 @your-scope 作用域使用私有仓库：
+# @your-scope:registry=https://npm.your-company.com/
+
+# ─── 通用配置 ────────────────────────────────────────
+save-exact=true
+engine-strict=true

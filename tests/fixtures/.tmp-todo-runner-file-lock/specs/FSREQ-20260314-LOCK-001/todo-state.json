@@ -1,0 +1,16 @@
+{
+  "kind": "todo-runner-state",
+  "version": 1,
+  "featureId": "FSREQ-20260314-LOCK-001",
+  "iteration": 0,
+  "maxIterations": 3,
+  "halted": false,
+  "items": [
+    {
+      "id": "TASK-1",
+      "title": "A",
+      "status": "pending"
+    }
+  ],
+  "updatedAt": "2026-03-15T18:40:03.009Z"
+}

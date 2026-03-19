@@ -1,0 +1,41 @@
+# 上下文包格式定义
+# 当前实现真理源: src/core/batch-executor/context-packer.ts
+# 限制: JSON.stringify(pack).length 必须 <= 2048 bytes
+
+task:
+  id: TASK-INT-001
+  title: 交互体验提升
+  description: |
+    只保留当前 TASK 的目标、范围和关键文件。
+    不要放完整实现方案、历史讨论或大段 diff。
+  acceptanceCriteria:
+    - 验收标准 1
+    - 验收标准 2
+
+relatedSpecs:
+  fr: |
+    FR-INT-001 摘要。
+    当前实现会从 spec.md 中按关联 ID 抽取片段，并截断到约 500 字符。
+  ds: |
+    DS-INT-001 摘要。
+    当前实现会从 design.md 中按关联 ID 抽取片段，并截断到约 500 字符。
+
+constitution:
+  - 约束 1
+  - 约束 2
+  - 当前实现最多保留 5 条
+
+tddRequirement:
+  - 必须有 RED 证据或 WAIVER
+  - 测试先行原则
+
+dependencies:
+  - 依赖 TASK-XXX 已完成
+  - 依赖 TASK-YYY 已完成
+
+# 裁剪顺序（超限时按顺序缩减）
+# 1. 删除无关背景和历史日志
+# 2. 收紧 task.description，只保留目标/范围/关键文件
+# 3. 缩短 relatedSpecs 摘要
+# 4. 合并或删减非关键 dependencies 文本
+# 5. 不要扩展自定义字段；当前实现不读取额外字段

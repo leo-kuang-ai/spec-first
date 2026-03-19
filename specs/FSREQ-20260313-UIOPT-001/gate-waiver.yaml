@@ -1,0 +1,10 @@
+waivers:
+  - condition_id: C4
+    reason: "前端展示代码（stage-viewer）暂无单元测试框架，已通过手动验证"
+    approved_by: "Leo"
+    approved_at: "2026-03-13"
+    expires_at: "2026-06-13"
+    scope:
+      - FR-UIOPT-001
+      - FR-UIOPT-002
+      - FR-UIOPT-003

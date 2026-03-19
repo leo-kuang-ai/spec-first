@@ -1,0 +1,17 @@
+{
+  "featureId": "{{featureId}}",
+  "title": "{{title}}",
+  "mode": "{{mode}}",
+  "size": "{{size}}",
+  "platforms": [{{#each platforms}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}],
+  "currentStage": "00_init",
+  "history": [
+    {
+      "from": null,
+      "to": "00_init",
+      "timestamp": "{{timestamp}}",
+      "by": "{{author}}"
+    }
+  ],
+  "terminal": false
+}

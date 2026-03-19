@@ -1,0 +1,348 @@
+{
+  "featureId": "FSREQ-20260313-UIOPT-001",
+  "mode": "I",
+  "size": "S",
+  "platforms": [
+    "backend"
+  ],
+  "backgroundInputStatus": "full",
+  "stageStatus": "drafting",
+  "autoAdvancePolicy": "suggest",
+  "mergedRules": {
+    "gateConditions": {
+      "01_specify": [
+        {
+          "id": "L0-SPEC-001",
+          "description": "FR/NFR 列表存在且非空"
+        },
+        {
+          "id": "L1-MODE-I-001",
+          "description": "impact-analysis.md 存在且非空"
+        }
+      ],
+      "02_design": [
+        {
+          "id": "L0-DESIGN-001",
+          "description": "设计文档存在"
+        }
+      ],
+      "03_plan": [
+        {
+          "id": "L0-PLAN-001",
+          "description": "task_plan.md 存在且非空"
+        }
+      ],
+      "04_implement": [
+        {
+          "id": "L0-IMPL-001",
+          "description": "追踪矩阵覆盖率 ≥ 基线"
+        },
+        {
+          "id": "G-BE-LINT",
+          "description": "Lint pass",
+          "command": "npm run lint"
+        },
+        {
+          "id": "G-BE-UNIT",
+          "description": "Unit test pass",
+          "command": "npm test"
+        }
+      ],
+      "05_verify": [
+        {
+          "id": "L0-VERIFY-001",
+          "description": "测试用例存在且通过"
+        },
+        {
+          "id": "G-BE-CONTRACT",
+          "description": "API contract check pass",
+          "command": "npm run contract:check"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "id": "L0-WRAP-001",
+          "description": "归档清单完整"
+        }
+      ]
+    },
+    "deliverables": {
+      "01_specify": [
+        {
+          "name": "spec.md",
+          "required": true,
+          "description": "FR/NFR 列表"
+        },
+        {
+          "name": "impact-analysis.md",
+          "required": true,
+          "description": "变更影响分析"
+        }
+      ],
+      "02_design": [
+        {
+          "name": "design.md",
+          "required": true,
+          "description": "技术设计文档"
+        },
+        {
+          "name": "api-contract.yaml",
+          "required": true,
+          "description": "API 契约"
+        },
+        {
+          "name": "ui-information-architecture.md",
+          "required": false
+        },
+        {
+          "name": "ui-design.figma",
+          "required": false
+        },
+        {
+          "name": "ui-design.sketch",
+          "required": false
+        },
+        {
+          "name": "contracts/openapi.yaml",
+          "required": true
+        },
+        {
+          "name": "data-model.md",
+          "required": true
+        },
+        {
+          "name": "contracts/schema-ddl.sql",
+          "required": true
+        },
+        {
+          "name": "page-routing-map.md",
+          "required": false
+        },
+        {
+          "name": "contracts/api-schema.yaml",
+          "required": false
+        },
+        {
+          "name": "system-architecture.md",
+          "required": false
+        }
+      ],
+      "03_plan": [
+        {
+          "name": "task_plan.md",
+          "required": true,
+          "description": "任务计划"
+        }
+      ],
+      "05_verify": [
+        {
+          "name": "reports/test-report.md",
+          "required": true,
+          "description": "测试报告"
+        },
+        {
+          "name": "reports/regression-report.md",
+          "required": true,
+          "description": "回归验证报告"
+        },
+        {
+          "name": "reports/go-test-report.md",
+          "required": false
+        },
+        {
+          "name": "reports/load-test.jtl",
+          "required": false
+        },
+        {
+          "name": "reports/v-model-trace-report.md",
+          "required": false,
+          "description": "V-Model 四层配对追踪报告"
+        }
+      ],
+      "06_wrap_up": [
+        {
+          "name": "retro.md",
+          "required": true,
+          "description": "归档复盘记录"
+        }
+      ],
+      "07_release": [
+        {
+          "name": "reports/smoke-test-report.md",
+          "required": true,
+          "description": "冒烟验证报告"
+        },
+        {
+          "name": "reports/release-note.md",
+          "required": true,
+          "description": "发布说明"
+        },
+        {
+          "name": "reports/admin-bundle-analysis.md",
+          "required": false
+        },
+        {
+          "name": "reports/apk-size.md",
+          "required": false
+        },
+        {
+          "name": "reports/ipa-size.md",
+          "required": false
+        },
+        {
+          "name": "reports/api-change-log.md",
+          "required": false
+        },
+        {
+          "name": "reports/migration-execution-log.md",
+          "required": true
+        },
+        {
+          "name": "reports/employee-performance-report.md",
+          "required": false
+        },
+        {
+          "name": "reports/bundle-analysis.md",
+          "required": false
+        },
+        {
+          "name": "reports/memory-profile.md",
+          "required": false
+        },
+        {
+          "name": "reports/python-service-slo.md",
+          "required": false
+        }
+      ]
+    },
+    "thresholds": {
+      "bundle_size_main": {
+        "value": 200,
+        "direction": "lower_is_better"
+      },
+      "first_screen_time": {
+        "value": 2500,
+        "direction": "lower_is_better"
+      },
+      "apk_size": {
+        "value": 40,
+        "direction": "lower_is_better"
+      },
+      "anr_rate": {
+        "value": 0.1,
+        "direction": "lower_is_better"
+      },
+      "app_size_download": {
+        "value": 50,
+        "direction": "lower_is_better"
+      },
+      "startup_time": {
+        "value": 800,
+        "direction": "lower_is_better"
+      },
+      "api_p95_latency": {
+        "value": 300,
+        "direction": "lower_is_better"
+      },
+      "error_rate": {
+        "value": 1,
+        "direction": "lower_is_better"
+      },
+      "migration_duration_minutes": {
+        "value": 15,
+        "direction": "lower_is_better"
+      },
+      "slow_query_p95_ms": {
+        "value": 200,
+        "direction": "lower_is_better"
+      },
+      "interaction_delay_p95": {
+        "value": 200,
+        "direction": "lower_is_better"
+      },
+      "api_p99_latency": {
+        "value": 500,
+        "direction": "lower_is_better"
+      },
+      "code_coverage": {
+        "value": 80,
+        "direction": "higher_is_better"
+      },
+      "fcp_time": {
+        "value": 1500,
+        "direction": "lower_is_better"
+      },
+      "installer_size": {
+        "value": 100,
+        "direction": "lower_is_better"
+      },
+      "memory_usage_idle": {
+        "value": 200,
+        "direction": "lower_is_better"
+      },
+      "diff_coverage": {
+        "value": 80,
+        "direction": "higher_is_better"
+      },
+      "v_model_pair_coverage": {
+        "value": 100,
+        "direction": "higher_is_better"
+      }
+    }
+  },
+  "currentStage": "08_done",
+  "history": [
+    {
+      "from": "00_init",
+      "to": "01_specify",
+      "timestamp": "2026-03-13T01:42:08.584Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "01_specify",
+      "to": "02_design",
+      "timestamp": "2026-03-13T01:59:42.563Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "02_design",
+      "to": "03_plan",
+      "timestamp": "2026-03-13T02:03:14.117Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "03_plan",
+      "to": "04_implement",
+      "timestamp": "2026-03-13T02:08:18.109Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "04_implement",
+      "to": "05_verify",
+      "timestamp": "2026-03-13T02:31:21.925Z",
+      "gateResult": "PASS_WITH_WAIVER"
+    },
+    {
+      "from": "05_verify",
+      "to": "06_wrap_up",
+      "timestamp": "2026-03-13T02:35:20.456Z",
+      "gateResult": "PASS_WITH_WAIVER"
+    },
+    {
+      "from": "06_wrap_up",
+      "to": "07_release",
+      "timestamp": "2026-03-13T02:39:45.832Z",
+      "gateResult": "PASS"
+    },
+    {
+      "from": "07_release",
+      "to": "08_done",
+      "timestamp": "2026-03-13T02:39:45.835Z",
+      "gateResult": "PASS"
+    }
+  ],
+  "terminal": true,
+  "title": "Feature UIOPT",
+  "createdAt": "2026-03-13T01:35:04.269Z",
+  "updatedAt": "2026-03-13T02:39:45.835Z"
+}
