@@ -1,6 +1,6 @@
 ---
 version: 1.0.0
-last_updated: {{DATE}}
+last_updated: 2026-03-18
 changelog: Aligned doctor MCP/skills checks with manifest-driven source of truth
 description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 ---

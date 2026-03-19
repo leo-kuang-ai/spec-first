@@ -1,12 +1,11 @@
 ---
 name: "spec-first:code"
-description: "执行代码实现。支持单 TASK 与自动批量模式；当前以自动批量提示词驱动，运行时可按宿主能力落到人工/半自动调度。"
-- Command: `/spec-first:code [featureId]`
-version: 2.1.0
-last_updated: 2026-03-14
+description: "Use when implementation work is ready, a TASK has been approved, and you need to execute code changes in the current feature workspace."
+version: "2.1.0"
+last_updated: "2026-03-18"
 changelog: |
-  v2.1.0: 收敛为当前可执行模式；去除冗余 FAQ；对齐真实配置/状态文件/能力边界
-  v2.0.0: 完全重写为批量模式，支持依赖解析、并发执行、失败率控制
+  v2.1.0: 收敛为当前可执行模式；去除冗余 FAQ；对齐真实配置/状态文件/能力边界；明确 stop_on_failure_rate 等仍属目标态
+  v2.0.0: 完全重写为批量模式；当前只保留依赖解析、上下文打包、checkpoint/report 等已落地能力，失败率控制仍未接入真实运行时
   v1.1.0: 单 TASK 模式（已废弃）
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
@@ -22,10 +21,13 @@ allowed-tools: "Read, Write, Edit, Bash, Glob, Grep, Agent"
 
 ## 当前模式
 
+- Command: `/spec-first:code [featureId]`
+
 当前仓库的真实状态是：
 
 - skill 以自动批量模式定义完整执行流程
 - batch executor 仍未完全接入真实 subagent 执行链路
+- 失败率控制、超时裁剪、多层并发控制仍停留在目标态设计，不是当前稳定运行能力
 - 因此当前默认做法是：
   - 提示词仍按自动批量模式组织
   - 运行时根据宿主能力落到真实 subagent 或人工/半自动调度
@@ -98,6 +100,17 @@ runtime:
 
 这些最多只能视为目标态设计，不应当作当前执行依据。
 
+## 当前未兑现的目标态能力
+
+以下能力仍然属于设计目标，而不是当前稳定承诺：
+
+- 基于 `stop_on_failure_rate` 的自动熔断
+- 基于 `task_timeout_ms` 的任务级超时治理
+- 基于 `context_pack_size` 的统一上下文预算调度
+- 基于 `max_layers` 的层级上限控制
+
+如果需要这些能力，必须先以代码实现或测试证据证明已落地，再回写到 skill 文档。
+
 ## 硬规则
 
 1. 批量模式不放松任何单 TASK 守卫。
@@ -116,7 +129,6 @@ runtime:
 - `design.md` 必须存在
 - `task_plan.md` 中至少有一个待执行 TASK
 - 必须先解析依赖关系
-- 必须先做 TDD 预检
 
 ### 单 TASK 守卫
 
@@ -160,8 +172,7 @@ runtime:
 5. 解析 `depends_on`
 6. 构建依赖图
 7. 检查是否有循环依赖
-8. 做 TDD 预检
-9. 输出执行计划
+8. 输出执行计划
 
 ### P1 执行阶段
 
@@ -262,9 +273,9 @@ Subagent 可写：
 
 最小执行要求：
 
-- 批量前做一次 TDD 预检
-- 单 TASK 执行前再次检查 RED / WAIVER
-- 成功后必须形成 GREEN 证据或等价测试通过记录
+- `findings.md` 仅作为执行记录载体，不作为 code 进入门禁
+- 执行中可记录 RED / WAIVER / GREEN 证据，但不作为前置阻断条件
+- 成功后建议形成 GREEN 证据或等价测试通过记录，便于回放
 
 执行时还必须遵守以下解释规则：
 
@@ -278,9 +289,9 @@ Subagent 可写：
 
 1. 解析 TASK 的主要变更类型
 2. 映射到 `required / conditional_waiver / waived`
-3. 在 `findings.md` 写入 `[TDD-RED]` 或 `[TDD-WAIVER]`
-4. 仅在证据存在后开始写生产代码
-5. 完成后补 `[TDD-GREEN]`
+3. 如有需要，记录到 `findings.md`
+4. 直接开始写生产代码
+5. 完成后如有测试结果，再补 `[TDD-GREEN]`
 
 禁止合理化：
 

@@ -50,6 +50,16 @@ P5  SIDE EFFECTS — Sync tracking matrix, trigger gate evaluation, update runti
 
 This means every AI action is **locatable, context-aware, confirmable, and auditable**.
 
+## First Principle
+
+Spec-First is fundamentally a **Skill-led system**, not a CLI-led code generator.
+
+- Skills define the workflow, agent orchestration, constraints, and success criteria
+- CLI commands provide the minimal support layer: bootstrap, persistence, validation, and host integration
+- For project cognition tasks such as `first`, the desired direction is: Skill-led multi-agent orchestration first, local scripts second
+
+The practical boundary is simple: runtime artifacts are machine inputs and must remain contract-stable; human-facing docs may be generated more freely as long as they do not become a hidden source of truth for later Skills.
+
 ---
 
 ## Quick Start

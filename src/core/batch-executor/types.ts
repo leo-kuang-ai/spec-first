@@ -32,7 +32,6 @@ export interface ExecutionPlan {
   featureId: string;
   totalTasks: number;
   layers: TaskLayer[];
-  tddWarnings: string[]; // TDD 证据缺失警告
   riskWarnings: string[]; // 风险警告
 }
 

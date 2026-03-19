@@ -64,19 +64,19 @@ export const SHARED_CONTRACT_COVERAGE: SharedContractCoverageItem[] = [
     contractName: 'background-quality',
     contractPath: 'skills/spec-first/shared/background-quality-contract.md',
     targetPath: 'skills/spec-first/14-status/SKILL.md',
-    mustContain: ['shared/background-quality-contract.md', 'background_input_status', 'runtime 真源', 'docs 投影视图', '同步状态'],
+    mustContain: ['shared/background-quality-contract.md', 'background_input_status', 'runtime 真源', 'docs 输出', '同步状态'],
   },
   {
     contractName: 'background-quality',
     contractPath: 'skills/spec-first/shared/background-quality-contract.md',
     targetPath: 'skills/spec-first/15-doctor/SKILL.md',
-    mustContain: ['shared/background-quality-contract.md', 'background_input_status', 'runtime 真源', 'docs 投影视图'],
+    mustContain: ['shared/background-quality-contract.md', 'background_input_status', 'runtime 真源', 'docs 输出'],
   },
   {
     contractName: 'background-quality',
     contractPath: 'skills/spec-first/shared/background-quality-contract.md',
     targetPath: 'skills/spec-first/21-analyze/SKILL.md',
-    mustContain: ['shared/background-quality-contract.md', 'background_input_status', 'runtime 真源', 'docs 投影视图', '同步状态'],
+    mustContain: ['shared/background-quality-contract.md', 'background_input_status', 'runtime 真源', 'docs 输出', '同步状态'],
   },
   {
     contractName: 'orchestration-governance',

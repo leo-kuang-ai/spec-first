@@ -77,4 +77,13 @@ describe('07-code skill docs consistency', () => {
     expect(skill).toContain('backgroundInputStatus');
     expect(skill).toContain('background_input_status');
   });
+
+  it('should keep target-state features explicitly downgraded from current runtime truth', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('当前未兑现的目标态能力');
+    expect(skill).toContain('stop_on_failure_rate');
+    expect(skill).toContain('不是当前稳定运行能力');
+    expect(skill).toContain('不应当作当前执行依据');
+  });
 });

@@ -159,8 +159,10 @@ C5 = count(AC where has_linked_TC) / count(all AC)
 ### 计算
 
 ```
-C6 = count(TASK where status == 'complete' or 'verified') / count(all TASK)
+C6 = count(TASK where status in completed_terminal_statuses) / count(all TASK)
 ```
+
+> `completed_terminal_statuses` 表示已归一为完成态的终态集合。历史状态如 `verified` 会先归一到完成态，再参与统计。
 
 ### 阈值要求
 

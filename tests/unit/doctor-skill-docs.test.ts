@@ -11,17 +11,17 @@ function read(path: string): string {
 }
 
 describe('15-doctor skill docs consistency', () => {
-  it('should diagnose runtime stage-views and projection sync', () => {
+  it('should diagnose canonical runtime assets and docs outputs', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(RULES)).toBe(true);
 
     const skill = read(SKILL_MD);
     const rules = read(RULES);
 
-    expect(skill).toContain('stage-views');
-    expect(skill).toContain('docs 投影视图');
-    expect(rules).toContain('stage-views');
-    expect(rules).toContain('失同步');
+    expect(skill).toContain('canonical 资产健康状态');
+    expect(skill).toContain('docs 输出');
+    expect(rules).toContain('runtime 真源');
+    expect(rules).toContain('docs 输出是否缺失');
   });
 
   it('should include background checks in doctor guidance', () => {
@@ -31,6 +31,15 @@ describe('15-doctor skill docs consistency', () => {
     expect(skill).toContain('background_input_status');
     expect(rules).toContain('background checks');
     expect(rules).toContain('runtime 真源');
+  });
+
+  it('should describe dry-run as the default and --fix as explicit apply mode', () => {
+    const skill = read(SKILL_MD);
+    const rules = read(RULES);
+
+    expect(skill).toContain('默认以 dry-run');
+    expect(skill).toContain('spec-first doctor --fix --yes');
+    expect(rules).toContain('doctor --fix --yes');
   });
 
 });

@@ -1,8 +1,8 @@
 ---
 name: "spec-first:plan"
-description: "定位 Feature 并加载当前阶段计划"
+description: "Use when you need the current feature's execution plan, risk view, or next actionable steps before running another stage skill."
 version: 1.1.0
-last_updated: {{DATE}}
+last_updated: 2026-03-18
 changelog: |
   v1.1.0: 新增 Announce at Start、字面即精神原则、When to Use、风险评估详解、findings.md 字段详解、决策流程图增强、Plan Mode 协同增强、references/ 目录、hooks 配置、user-invocable 标记
   v1.0.0: Initial version with standardized metadata

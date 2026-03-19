@@ -7,6 +7,7 @@ import { handleInit } from '../../src/cli/commands/init.js';
 import { handleDone } from '../../src/cli/commands/done.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
 import { Stage, type StageState } from '../../src/shared/types.js';
+import { seedFirstRuntimeOutputs } from '../helpers/first-runtime-fixture.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-cli-real-flow');
 const origCwd = process.cwd;
@@ -130,6 +131,7 @@ beforeEach(() => {
   rmSync(TMP, { recursive: true, force: true });
   mkdirSync(TMP, { recursive: true });
   seedProject();
+  seedFirstRuntimeOutputs(TMP, 'first-cli-real-flow');
   initRepo();
   process.env.HOME = join(TMP, 'home');
   process.env.AGENTS_HOME = join(TMP, 'agents-home');
@@ -160,8 +162,8 @@ afterEach(() => {
 });
 
 describe('first cli real flow', () => {
-  it('runs first -> init -> done and writes back runtime truth through CLI handlers', async () => {
-    expect(handleFirst(['--force'])).toBe(0);
+  it('runs first -> init -> done and validates runtime truth through CLI handlers', async () => {
+    expect(handleFirst([])).toBe(0);
 
     const initCode = await handleInit([
       '--feat',
@@ -200,15 +202,15 @@ describe('first cli real flow', () => {
       'utf-8'
     );
     expect(updatesLog).toContain('"decision":"must_update"');
-    expect(updatesLog).toContain('"writebackMode":"refresh-all"');
+    expect(updatesLog).toContain('"gateStatus":"blocked"');
     expect(updatesLog).toContain('"updateSource":"governance-wrap-up"');
 
     const findings = readFileSync(join(TMP, 'specs', featureId, 'findings.md'), 'utf-8');
-    expect(findings).toContain('PROJECT_COGNITION_APPROVED: must_update');
+    expect(findings).toContain('PROJECT_COGNITION_BLOCKED: must_update');
   });
 
-  it('runs done alias from release and reprojects docs drift through CLI handlers', async () => {
-    expect(handleFirst(['--force'])).toBe(0);
+  it('runs done alias from release without treating docs-only drift as cognition writeback', async () => {
+    expect(handleFirst([])).toBe(0);
 
     const initCode = await handleInit([
       '--feat',
@@ -231,8 +233,7 @@ describe('first cli real flow', () => {
     expect(handleDone([featureId])).toBe(0);
 
     const readme = readFileSync(join(TMP, 'docs', 'first', 'README.md'), 'utf-8');
-    expect(readme).not.toContain('Drifted README');
-    expect(readme).toContain('Canonical Projection Docs');
+    expect(readme).toContain('Drifted README');
 
     const stageState = JSON.parse(
       readFileSync(join(TMP, 'specs', featureId, 'stage-state.json'), 'utf-8')
@@ -243,8 +244,8 @@ describe('first cli real flow', () => {
       join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
       'utf-8'
     );
-    expect(updatesLog).toContain('"decision":"should_update"');
-    expect(updatesLog).toContain('"writebackMode":"refresh-docs-from-runtime"');
+    expect(updatesLog).toContain('"decision":"must_not_update"');
+    expect(updatesLog).toContain('"gateStatus":"skipped"');
     expect(updatesLog).toContain('"updateSource":"governance-done"');
   });
 });

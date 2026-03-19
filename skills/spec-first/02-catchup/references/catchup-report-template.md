@@ -40,10 +40,9 @@
 
 | 状态 | 数量 | 占比 |
 |------|------|------|
-| ✅ complete | {count} | {percentage}% |
-| ✅ verified | {count} | {percentage}% |
+| ✅ done | {count} | {percentage}% |
 | 🔄 in_progress | {count} | {percentage}% |
-| ⏸️ planned | {count} | {percentage}% |
+| ⏸️ todo | {count} | {percentage}% |
 | 🚫 blocked | {count} | {percentage}% |
 
 **总任务数**: {total}
@@ -236,9 +235,9 @@ Owner: {owner}
 
 | 状态 | 数量 | 占比 |
 |------|------|------|
-| ✅ complete | 6 | 60% |
+| ✅ done | 6 | 60% |
 | 🔄 in_progress | 2 | 20% |
-| ⏸️ planned | 2 | 20% |
+| ⏸️ todo | 2 | 20% |
 | 🚫 blocked | 0 | 0% |
 
 **总任务数**: 10

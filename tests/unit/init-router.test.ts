@@ -52,9 +52,16 @@ function setupHealthyFirstRuntime(dir: string): void {
   mkdirSync(runtimeDir, { recursive: true });
   writeFileSync(join(runtimeDir, 'index.json'), JSON.stringify({
     version: '1.0.0',
+    lastRun: new Date().toISOString(),
     summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
-    roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
-    stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true },
+    databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'abc', lastUpdated: new Date().toISOString(), healthy: true, status: 'healthy' },
     docsProjection: {},
     status: 'current',
   }));

@@ -1,8 +1,8 @@
 ---
 name: "spec-first:status"
-description: "定位当前 Feature 并输出状态概览"
+description: "Use when you need a snapshot of the current feature's stage, coverage, risks, and runtime/docs background health."
 version: 1.1.0
-last_updated: {{DATE}}
+last_updated: 2026-03-18
 changelog: |
   v1.1.0: 新增 Announce at Start、When to Use、状态仪表盘模板、健康分解读、风险指标、决策流程图、references/ 目录、hooks 配置、user-invocable 标记
   v1.0.0: Initial version with standardized metadata
@@ -100,7 +100,7 @@ I'm using the status skill to show the current state of [Feature].
 
 | 指标 | 当前值 | 阈值 | 状态 | 说明 |
 |------|--------|------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ | 需求已定义 |
+| C1 (Design Coverage) | 100% | >0% | ✅ | FR 已被设计覆盖 |
 | C2 (API Coverage) | 100% | 100% | ✅ | 设计已完成 |
 | C3 (Task Coverage) | 80% | 100% | ⚠️ | 部分 FR 缺少 TASK |
 | C4 (Test Coverage FR) | 0% | ≥80% | ❌ | 测试用例未生成 |
@@ -126,10 +126,14 @@ I'm using the status skill to show the current state of [Feature].
 
 | 状态 | 数量 | 占比 |
 |------|------|------|
-| ✅ complete | 6 | 60% |
+| ✅ done | 6 | 60% |
 | 🔄 in_progress | 2 | 20% |
-| ⏸️ planned | 2 | 20% |
+| ⏸️ todo | 2 | 20% |
 | 🚫 blocked | 0 | 0% |
+
+说明：
+- 汇总层只展示 canonical 状态：`todo / in_progress / blocked / done`
+- legacy `complete / completed / verified / planned` 在读取时必须先归一后再展示
 
 **总任务数**: 10
 **完成率**: 60%
@@ -168,9 +172,9 @@ I'm using the status skill to show the current state of [Feature].
    - 影响: 质量无保障
    - 建议: 回到 `/spec-first:task` 或 `/spec-first:code` 补齐测试设计与 TDD 证据
 
-3. **TDD 证据不闭环** — 存在只有 GREEN、没有 RED/WAIVER 的任务
+3. **TDD 记录不闭环** — 存在只有 GREEN、没有 RED/WAIVER 的任务
    - 影响: 流程真实性不足，审查难以追溯
-   - 建议: 回到 `findings.md` 补齐证据链，再执行 review / verify
+   - 建议: 回到 `findings.md` 补齐证据记录，后续 review / verify 仅据此做风险提示
 
 ### 🟢 低风险 (1)
 1. **任务进度略慢** — 预计剩余 1.5 天，可能延期 0.5 天
@@ -185,7 +189,7 @@ I'm using the status skill to show the current state of [Feature].
 
 1. **补充 TASK 拆解** — 执行 `/spec-first:task` 完成 C3 覆盖
 2. **补齐测试设计与 TDD 证据** — 回到 `/spec-first:task` / `/spec-first:code` 收口 C4/C5
-3. **修复 TDD 闭环异常** — 先补齐 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 关系
+3. **补齐 TDD 记录** — 如有需要，补齐 `[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 关系，供审查与回放使用
 4. **继续实现任务** — 完成剩余 2 个 in_progress 任务
 
 **可推进阶段？** ❌ 否（C3 未达标）
@@ -214,6 +218,7 @@ I'm using the status skill to show the current state of [Feature].
 覆盖率完整性 = (C1 + C2 + C3 + C4 + C5 + C6) / 6
 ```
 
+- C1 表示 Design Coverage，不得在状态面板中重命名为 Spec Coverage
 - C1-C6 按阈值达标情况计分
 - 达标 = 100 分，未达标 = 0 分
 
@@ -327,7 +332,7 @@ digraph status_flow {
 
 - **P0**: 定位当前 Feature
 - **P1**: 加载 stage-state、指标、任务计划、Gate 历史，并读取 `background_input_status` 与 runtime/docs 分层状态
-- **P2**: 计算健康分、识别风险、判断 runtime 真源与 docs 投影视图是否漂移
+- **P2**: 计算健康分、识别风险、判断 runtime 真源是否异常、docs 输出是否缺失
 - **P3**: 生成状态仪表盘（阶段、覆盖率、健康分、任务、风险、背景状态卡片）
 - **P4**: 解读健康分、标注风险、建议下一步
 - **P5**: 向用户展示状态（无需确认）
@@ -355,7 +360,7 @@ digraph status_flow {
 - 风险项已识别并分级
 - 建议下一步已提供
 - 可推进阶段判断已给出
-- 状态面板已展示 `background_input_status`、`runtime 真源`、`docs 投影视图`、`同步状态`
+- 状态面板已展示 `background_input_status`、`runtime 真源`、`docs 输出`、`同步状态`
 
 ## 模板引用路径
 
@@ -394,5 +399,5 @@ digraph status_flow {
 ## 背景状态展示
 - 背景状态字段与枚举遵循 `../shared/background-quality-contract.md`
 - 状态面板必须展示 `background_input_status`
-- 明确区分 `runtime 真源` 与 `docs 投影视图`
+- 明确区分 `runtime 真源` 与 `docs 输出`
 - 若两层状态不一致，需标记同步状态与建议动作

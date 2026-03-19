@@ -7,7 +7,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { ExitCode } from '../../shared/types.js';
 import { exists, ensureDir, readJson } from '../../shared/fs-utils.js';
 import type { StageState } from '../../shared/types.js';
-import { resolveFeatureId } from '../../core/process-engine/feature.js';
+import { currentFeature, getFeatureState, resolveFeatureId } from '../../core/process-engine/feature.js';
 
 export function handleFeature(args: string[]): number {
   const sub = args[0];
@@ -68,24 +68,34 @@ function handleCurrent(): number {
   const currentFile = join(projectRoot, '.spec-first', 'current');
 
   if (!exists(currentFile)) {
-    console.log('尚未设置当前 Feature。请使用：spec-first feature switch <featureId>');
+    console.log('尚未设置当前 Feature。');
+    console.log('建议先执行：spec-first feature switch <featureId> --yes');
     return ExitCode.SUCCESS;
   }
 
-  const featureId = readFileSync(currentFile, 'utf-8').trim();
-  const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
+  const featureId = currentFeature(projectRoot) ?? readFileSync(currentFile, 'utf-8').trim();
+  if (!featureId) {
+    console.log('当前需求定位指针为空。');
+    console.log('建议重新执行：spec-first feature switch <featureId> --yes');
+    return ExitCode.SUCCESS;
+  }
 
+  const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) {
-    console.log(`当前 Feature：${featureId}（未找到 stage-state.json）`);
+    console.log(`当前 Feature：${featureId}`);
+    console.log('  定位来源：.spec-first/current');
+    console.log('  警告：未找到 stage-state.json，建议回切到有效 Feature 后执行 /spec-first:catchup');
     return ExitCode.SUCCESS;
   }
 
   const state = readJson<StageState>(statePath);
   console.log(`当前 Feature：${state.featureId}`);
+  console.log('  定位来源：.spec-first/current');
   console.log(`  标题：${state.title ?? 'N/A'}`);
   console.log(`  阶段：${state.currentStage}`);
   console.log(`  模式：${state.mode}  规模：${state.size}`);
   console.log(`  平台：${state.platforms.join(', ')}`);
+  console.log('  如需重载上下文：/spec-first:catchup');
 
   return ExitCode.SUCCESS;
 }
@@ -103,23 +113,30 @@ function handleSwitch(args: string[]): number {
     resolved = resolveFeatureId(featureId, projectRoot);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
+    console.error('失败时未改写 .spec-first/current');
     return ExitCode.VALIDATION_ERROR;
   }
 
-  // 验证 feature 目录存在且包含必要文件
-  const statePath = join(projectRoot, 'specs', resolved.featureId, 'stage-state.json');
-  if (!exists(statePath)) {
+  let state: StageState;
+  try {
+    state = getFeatureState(resolved.featureId, projectRoot);
+  } catch (error) {
+    const statePath = join(projectRoot, 'specs', resolved.featureId, 'stage-state.json');
     console.error(`错误：feature "${resolved.featureId}" 不存在或未初始化`);
     console.error(`  预期路径：${statePath}`);
+    console.error(error instanceof Error ? `  详情：${error.message}` : `  详情：${String(error)}`);
+    console.error('失败时不得改写 current 指针');
     return ExitCode.VALIDATION_ERROR;
   }
 
   const configDir = join(projectRoot, '.spec-first');
   ensureDir(configDir);
   writeFileSync(join(configDir, 'current'), resolved.featureId, 'utf-8');
-  console.log(
-    `已切换到：${resolved.featureId}${resolved.source === 'exact' ? '' : `（来源: ${resolved.source}）`}`
-  );
+  console.log(`已切换到：${resolved.featureId}`);
+  console.log(`  标题：${state.title ?? 'N/A'}`);
+  console.log(`  当前阶段：${state.currentStage}`);
+  console.log(`  .spec-first/current 已更新${resolved.source === 'exact' ? '' : `（解析来源：${resolved.source}）`}`);
+  console.log('  建议下一步：/spec-first:catchup');
 
   return ExitCode.SUCCESS;
 }

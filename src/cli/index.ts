@@ -31,7 +31,7 @@ import { handleFirst } from './commands/first.js';
 import { handleBatchTest } from './commands/batch-test.js';
 import { handleOnboarding } from './commands/onboarding.js';
 import { handleSkill } from './commands/skill.js';
-import { shouldConfirmFirst } from '../core/skill-runtime/first-args.js';
+import { handleStatus } from './commands/status.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
 registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
@@ -51,7 +51,9 @@ registerCommand('defect', '缺陷跟踪与状态管理', handleDefect, {
   requiresConfirmation: true,
 });
 registerCommand('metrics', '覆盖率度量与健康评分', handleMetrics);
-registerCommand('doctor', '环境诊断与修复', handleDoctor);
+registerCommand('doctor', '环境诊断与修复', handleDoctor, {
+  requiresConfirmation: (args) => args.includes('--fix'),
+});
 registerCommand('gate', '阶段质量门禁评估', handleGate);
 registerCommand('golive', '上线就绪检查与批准', handleGoLive);
 registerCommand('done', '将 Feature 从 07_release 收口到 08_done', handleDone, {
@@ -90,12 +92,13 @@ registerCommand('trace', '追溯链修复与校验', handleTrace, {
   requiresConfirmation: (args) => args[0] === 'repair',
 });
 registerCommand('validate', '产物格式校验', handleValidate);
-registerCommand('first', '项目首轮认知 runtime/docs 刷新', handleFirst, {
-  requiresConfirmation: shouldConfirmFirst,
+registerCommand('first', '项目首轮认知 runtime/docs 校验', handleFirst, {
+  requiresConfirmation: false,
 });
 registerCommand('onboarding', '新手引导 - 交互式场景识别与学习路径推荐', handleOnboarding);
 registerCommand('batch-test', '批量执行测试（临时命令）', handleBatchTest);
 registerCommand('skill', '动态渲染 skill 内容', handleSkill);
+registerCommand('status', '当前 Feature 状态概览与风险快照', handleStatus);
 
 const code = await dispatch(process.argv.slice(2));
 process.exit(code);

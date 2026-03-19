@@ -6,6 +6,11 @@
 
 ## 00-first runtime 真源要求
 
+**优先背景输入**：
+- `first` 项目认知资产是 init 的优先背景输入，不是唯一阻断前置
+- 当资产缺失或不完整时，允许以 `degraded` / `blind` 背景继续初始化
+- 降级模式继续，但必须显式提示用户补跑 `/spec-first:first`
+
 **必须存在的目录**:
 - `.spec-first/runtime/first/`
 
@@ -14,12 +19,13 @@
 
 **必须存在的 runtime 真源文件**:
 - `.spec-first/runtime/first/summary.json`
-- `.spec-first/runtime/first/role-views.json`
-- `.spec-first/runtime/first/stage-views.json`
+- `.spec-first/runtime/first/entry-guide.json`
+- `.spec-first/runtime/first/steering.json`
 
 **说明**:
-- `docs/first/` 是投影视图层，可缺失或滞后
+- `docs/first/` 是阅读输出层，可缺失或滞后
 - readiness 只看 runtime 真源，不依赖任何 legacy YAML 索引
+- 不阻断初始化需求工作区，缺失时改走降级背景模式
 
 ### 检查逻辑
 
@@ -28,22 +34,22 @@
    ├─ 否 → 提示执行 /spec-first:first
    └─ 是 → 继续
 
-2. 检查 index.json / summary.json / role-views.json / stage-views.json 是否存在
-   ├─ 缺失任一文件 → 提示执行 /spec-first:first
+2. 检查 index.json / summary.json / entry-guide.json / steering.json 是否存在
+   ├─ 缺失任一文件 → 标记 `background_input_status=degraded`，提示执行 /spec-first:first
    └─ 全部存在 → 通过 readiness
 ```
 
 ### 错误提示模板
 
 ```
-❌ 前置检查失败: 缺失 00-first runtime 真源
+⚠️ 优先背景输入不完整: 缺失 00-first runtime 真源
 
 缺失以下文件:
 - .spec-first/runtime/first/index.json
-- .spec-first/runtime/first/stage-views.json
+- .spec-first/runtime/first/entry-guide.json
 
 💡 解决方案:
-运行 /spec-first:first 重新生成 runtime 真源
+运行 /spec-first:first 重新生成 runtime 真源，或以降级模式继续初始化
 ```
 
 ---
@@ -81,26 +87,19 @@
 
 当 `.spec-first/layer2/` 不存在或为空时：
 
-1. **询问项目类型**：
-   ```
-   ⚠️  检测到 .spec-first/layer2/ 目录不存在
-       将在初始化过程中自动创建平台配置。
+1. **中止当前 init 交互**
+   - CLI 不再询问项目类型，也不在脚本里自动创建平台模板
+   - 平台模板属于 Skill / 工作流决策，不属于脚本启发式
 
-   请选择项目类型：
-     1. Java 后端服务
-     2. 前端应用（React/Vue）
-     3. H5 移动端
-     4. 其他（手动配置）
+2. **运行 Skill 补齐流程**
+   - 先执行 `spec-first skill render init`
+   - 按 Skill 输出的流程补齐 `.spec-first/layer2/*.yaml`
+   - 模板内容示例详见 [platform-yaml-template.md](platform-yaml-template.md)
 
-   请选择 [1-4]: _
-   ```
-
-2. **根据选择创建对应模板**（详见 [platform-yaml-template.md](platform-yaml-template.md)）
-
-3. **关键约束**：
-   - ⚠️ 第一个字段必须是 `platform:`（不是 `name:`）
+3. **关键约束**
+   - 第一个字段必须是 `platform:`（不是 `name:`）
    - 这是 CLI 校验的硬性要求，否则会报错：`"platform" 为必填`
 
-4. **Windows 注意事项**：
+4. **Windows 注意事项**
    - 使用 UTF-8 编码
    - 使用 LF 换行符（不是 CRLF）

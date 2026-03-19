@@ -1,6 +1,6 @@
 /**
  * doctor CLI 命令
- * spec-first doctor [featureId]
+ * spec-first doctor [featureId] [--fix]
  */
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
@@ -11,6 +11,7 @@ import { checkHooks } from '../../core/tool-integration/hook-installer.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
+import { checkFirstDocsExistence } from '../../core/skill-runtime/first-docs-check.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
 import { formatHostDoctorMessage } from '../../core/host-adapters/format.js';
 import { resolveHostAdapterStatuses } from '../../core/host-adapters/registry.js';
@@ -39,12 +40,49 @@ interface ClaudeSettingsShape {
   };
 }
 
-export function handleDoctor(args: string[]): number {
-  const featureId = args[0];
+interface ParsedDoctorArgs {
+  featureId?: string;
+  fix: boolean;
+}
+
+interface DoctorCommandOptions {
+  bootstrapFn?: typeof ensureHostBootstrap;
+}
+
+function parseDoctorArgs(args: string[]): ParsedDoctorArgs | undefined {
+  let featureId: string | undefined;
+  let fix = false;
+
+  for (const arg of args) {
+    if (arg === '--fix') {
+      fix = true;
+      continue;
+    }
+    if (arg.startsWith('--')) {
+      return undefined;
+    }
+    if (featureId) {
+      return undefined;
+    }
+    featureId = arg;
+  }
+
+  return { featureId, fix };
+}
+
+export function handleDoctor(args: string[], options: DoctorCommandOptions = {}): number {
+  const parsed = parseDoctorArgs(args);
+  if (!parsed) {
+    console.error('用法：spec-first doctor [featureId] [--fix]');
+    return ExitCode.VALIDATION_ERROR;
+  }
+
+  const { featureId, fix } = parsed;
   const projectRoot = process.cwd();
   const results: CheckResult[] = [];
+  const bootstrapFn = options.bootstrapFn ?? ensureHostBootstrap;
 
-  const bootstrap = ensureHostBootstrap();
+  const bootstrap = bootstrapFn({ dryRun: !fix });
   results.push(...bootstrap.results.map(mapBootstrapResult));
 
   results.push(checkNodeVersion());
@@ -67,7 +105,7 @@ export function handleDoctor(args: string[]): number {
     results.push(...checkRuntimeFiles(projectRoot, featureId));
   }
 
-  printReport(results);
+  printReport(results, { fix });
 
   const hasError = results.some((r) => r.level === 'ERROR');
   return hasError ? ExitCode.CONFIG_ERROR : ExitCode.SUCCESS;
@@ -214,7 +252,7 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
   if (!index) {
     return [
       {
-        name: 'First Stage Views',
+        name: 'First Runtime Index',
         level: 'WARNING',
         message: '未找到 runtime index',
         fix: '先执行 /spec-first:first 生成 .spec-first/runtime/first/index.json',
@@ -223,32 +261,50 @@ function checkFirstRuntimeProjection(root: string): CheckResult[] {
   }
 
   const results: CheckResult[] = [];
-  const stageViewIssues = index.stageViews.issues?.join('; ');
+  const requiredAssets = [
+    ['summary', index.summary],
+    ['steering', index.steering],
+    ['conventions', index.conventions],
+    ['critical-flows', index.criticalFlows],
+    ['entry-guide', index.entryGuide],
+    ['api-contracts', index.apiContracts],
+    ['structure-overview', index.structureOverview],
+    ['domain-model', index.domainModel],
+  ] as const;
+
+  const unhealthyAssets = requiredAssets
+    .filter(([, entry]) => !entry.healthy)
+    .map(([name, entry]) => `${name}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
+
   results.push({
-    name: 'First Stage Views',
-    level: index.stageViews.healthy ? 'PASS' : 'WARNING',
-    message: index.stageViews.healthy
-      ? 'healthy'
-      : stageViewIssues
-        ? `异常: ${stageViewIssues}`
-        : 'unhealthy',
-    fix: index.stageViews.healthy
-      ? undefined
-      : '重新执行 /spec-first:first，修复 stage-views 产物健康状态',
+    name: 'First Runtime Assets',
+    level: unhealthyAssets.length === 0 ? 'PASS' : 'WARNING',
+    message: unhealthyAssets.length === 0 ? 'healthy' : `异常: ${unhealthyAssets.join(', ')}`,
+    fix:
+      unhealthyAssets.length === 0
+        ? undefined
+        : '重新执行 /spec-first:first，修复项目级 runtime 资产健康状态',
   });
 
-  const driftDocs = Object.entries(index.docsProjection)
-    .filter(([, entry]) => !entry.healthy)
-    .map(([doc, entry]) => `${doc}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
+  if (index.databaseSchema.status === 'degraded') {
+    results.push({
+      name: 'First Database Schema',
+      level: 'WARNING',
+      message: 'database-schema degraded',
+      fix: '检查数据库结构探测逻辑，或将数据库资产标记为 not_applicable',
+    });
+  }
+
+  const missingDocs = checkFirstDocsExistence(root).missing;
 
   results.push({
-    name: 'Docs Projection Sync',
-    level: driftDocs.length === 0 ? 'PASS' : 'WARNING',
-    message: driftDocs.length === 0 ? '已同步' : `失同步: ${driftDocs.join(', ')}`,
+    name: 'Docs Outputs',
+    level: missingDocs.length === 0 ? 'PASS' : 'WARNING',
+    message: missingDocs.length === 0 ? '已生成' : `缺失: ${missingDocs.join(', ')}`,
     fix:
-      driftDocs.length === 0
+      missingDocs.length === 0
         ? undefined
-        : '重新生成 docs 投影视图，确保 runtime 真源与 docs 投影视图保持同步',
+        : '重新执行 /spec-first:first，补齐 docs/first 输出',
   });
 
   return results;
@@ -484,8 +540,9 @@ function checkRuntimeFiles(root: string, featureId: string): CheckResult[] {
 
 // ─── 输出 ────────────────────────────────────────────
 
-function printReport(results: CheckResult[]): void {
+function printReport(results: CheckResult[], options?: { fix?: boolean }): void {
   console.log('Spec-First 环境诊断\n');
+  console.log(`模式：${options?.fix ? 'apply (--fix)' : 'dry-run'}`);
   for (const r of results) {
     const icon = r.level === 'PASS' ? '[OK]' : r.level === 'WARNING' ? '[WARN]' : '[ERR]';
     console.log(`  ${icon.padEnd(7)} ${r.name.padEnd(22)} ${r.message}`);

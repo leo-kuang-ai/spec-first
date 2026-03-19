@@ -1,6 +1,6 @@
 ---
 name: "spec-first:archive"
-description: "定位 Feature 并校验阶段为归档复盘（06_wrap_up）"
+description: "Use when a feature is in 06_wrap_up and you need to archive delivery evidence, summarize outcomes, and prepare release handoff."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）

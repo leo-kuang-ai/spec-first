@@ -1,15 +1,28 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { execSync } from 'node:child_process';
+import os from 'node:os';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { handleOrchestrate } from '../../src/cli/commands/orchestrate.js';
 import { Stage } from '../../src/shared/types.js';
 import type { StageState } from '../../src/shared/types.js';
 import { initTodoState, saveTodoState } from '../../src/core/ai-orchestrator/todo-runner.js';
 import type { TaskExecutor } from '../../src/core/ai-orchestrator/auto-loop.js';
-import { writeFirstRuntimeIndex, writeFirstRuntimeSummary, writeFirstRoleViews, writeFirstStageViews } from '../../src/core/skill-runtime/first-runtime-store.js';
+import {
+  writeFirstApiContracts,
+  writeFirstConventions,
+  writeFirstCriticalFlows,
+  writeFirstDatabaseSchema,
+  writeFirstDomainModel,
+  writeFirstEntryGuide,
+  writeFirstRuntimeIndex,
+  writeFirstRuntimeSummary,
+  writeFirstSteering,
+  writeFirstStructureOverview,
+} from '../../src/core/skill-runtime/first-runtime-store.js';
 
-const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-orchestrate-stage');
+let TMP = '';
 const origCwd = process.cwd;
 const origSpecFirstSkillsDir = process.env.SPEC_FIRST_SKILLS_DIR;
 
@@ -17,16 +30,22 @@ function seedHealthyRuntimeFirst(projectRoot: string): void {
   writeFirstRuntimeIndex(projectRoot, {
     version: '1.0.0',
     lastRun: '2026-03-08T12:00:00.000Z',
-    mode: 'quick',
+    mode: 'deep',
     summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-    roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-    stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'api-contracts', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+    databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true, status: 'healthy' },
     docsProjection: {},
     status: 'current',
   });
   writeFirstRuntimeSummary(projectRoot, {
     generatedAt: '2026-03-08T12:00:00.000Z',
-    mode: 'quick',
+    mode: 'deep',
     project: { name: 'spec-first', platformType: 'backend', overview: 'runtime init' },
     modules: ['src/core/process-engine/init.ts'],
     capabilities: ['feature initialization'],
@@ -36,18 +55,40 @@ function seedHealthyRuntimeFirst(projectRoot: string): void {
     risks: [],
     evidence: [],
   });
-  writeFirstRoleViews(projectRoot, {
-    product: { role: 'product', summary: 'product', focus: ['capabilities'], warnings: [] },
-    dev: { role: 'dev', summary: 'dev', focus: ['modules'], warnings: [] },
-    qa: { role: 'qa', summary: 'qa', focus: ['validation'], warnings: [] },
-    architect: { role: 'architect', summary: 'architect', focus: ['entrypoints'], warnings: [] },
+  writeFirstSteering(projectRoot, {
+    product: { overview: 'runtime init', coreScenarios: ['feature initialization'], nonGoals: [], glossary: ['Feature'] },
+    tech: { stack: ['TypeScript'], constraints: ['runtime truth source'], forbiddenPatterns: [] },
+    structure: { modules: ['src/core/process-engine'], boundaries: ['src/cli/commands/init.ts'], entryRules: ['read runtime truth first'] },
   });
-  writeFirstStageViews(projectRoot, {
-    spec: { stage: 'spec', summary: 'spec', businessCapabilities: ['feature initialization'], coreEntities: ['Feature'], dependencies: ['spec-first init'], warnings: [] },
-    design: { stage: 'design', summary: 'design', moduleBoundaries: ['src/core/process-engine'], integrationPoints: ['src/cli/commands/init.ts'], technicalConstraints: ['runtime truth source'], risks: [] },
-    code: { stage: 'code', summary: 'code', entryPoints: ['src/cli/commands/orchestrate.ts'], likelyChangeAreas: ['src/core/ai-orchestrator/auto-loop.ts'], changeHazards: [], verificationHooks: ['tests/unit/orchestrate-stage-integration.test.ts'] },
-    verify: { stage: 'verify', summary: 'verify', testFocus: ['orchestrate coordination'], riskAreas: [], validationHooks: ['pnpm vitest run tests/unit/orchestrate-stage-integration.test.ts'], releaseBlockers: [] },
+  writeFirstConventions(projectRoot, {
+    api: { observedPatterns: ['spec-first init'], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    module: { observedPatterns: ['src/core/process-engine'], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    testing: { observedPatterns: ['Vitest'], deviations: [], recommendedConvention: 'stable', evidence: [] },
+    projectRules: { observedPatterns: ['runtime truth first'], deviations: [], recommendedConvention: 'stable', evidence: [] },
   });
+  writeFirstCriticalFlows(projectRoot, [
+    {
+      flowId: 'flow-orchestrate',
+      name: 'Orchestrate Flow',
+      entryPoints: ['src/cli/commands/orchestrate.ts'],
+      coreModules: ['src/core/ai-orchestrator/auto-loop.ts'],
+      invariants: ['runtime truth first'],
+      verificationHooks: ['pnpm vitest run tests/unit/orchestrate-stage-integration.test.ts'],
+    },
+  ]);
+  writeFirstEntryGuide(projectRoot, [
+    {
+      taskCategory: 'runtime-extension',
+      readFirst: ['.spec-first/runtime/first/summary.json'],
+      thenRead: ['src/core/ai-orchestrator/auto-loop.ts'],
+      avoidEntry: ['docs/first/summary.md'],
+      relatedFlows: ['flow-orchestrate'],
+    },
+  ]);
+  writeFirstApiContracts(projectRoot, { interfaces: [], integrationPoints: ['src/cli/commands/init.ts', 'src/cli/commands/orchestrate.ts'], notes: [] });
+  writeFirstStructureOverview(projectRoot, { topology: ['init -> orchestrate'], modules: [], readingOrder: [], evidence: [] });
+  writeFirstDomainModel(projectRoot, { entities: [], glossary: ['Feature'], evidence: [] });
+  writeFirstDatabaseSchema(projectRoot, { status: 'healthy', provider: 'sqlite', tables: [], risks: [], evidence: [] });
 }
 
 async function setupFeature(feat = 'ORC'): Promise<string> {
@@ -71,11 +112,16 @@ function seedTodo(featureId: string): void {
 }
 
 beforeEach(() => {
-  mkdirSync(TMP, { recursive: true });
+  TMP = mkdtempSync(join(os.tmpdir(), 'spec-first-orchestrate-stage-'));
   mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
   mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+  execSync('git -c core.hooksPath=/dev/null init', { cwd: TMP, stdio: 'ignore' });
+  execSync('git config user.email \"test@example.com\"', { cwd: TMP, stdio: 'ignore' });
+  execSync('git config user.name \"test\"', { cwd: TMP, stdio: 'ignore' });
+  writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1.0.0\nbaselineSkipped: true\n', 'utf-8');
   writeFileSync(join(TMP, '.spec-first', 'layer2', 'h5.yaml'), 'platform: h5\n', 'utf-8');
-  writeFileSync(join(TMP, 'docs', 'first', 'tech-stack.md'), '# Tech Stack\n', 'utf-8');
+  writeFileSync(join(TMP, 'docs', 'first', 'summary.md'), '# Summary\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'codebase-overview.md'), '# Codebase Overview\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'domain-model.md'), '# Domain Model\n', 'utf-8');
   writeFileSync(join(TMP, 'docs', 'first', 'api-docs.md'), '# API Docs\n', 'utf-8');
@@ -85,7 +131,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  rmSync(TMP, { recursive: true, force: true });
+  if (TMP) {
+    rmSync(TMP, { recursive: true, force: true });
+    TMP = '';
+  }
   if (origSpecFirstSkillsDir === undefined) delete process.env.SPEC_FIRST_SKILLS_DIR;
   else process.env.SPEC_FIRST_SKILLS_DIR = origSpecFirstSkillsDir;
   process.cwd = origCwd;

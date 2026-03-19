@@ -1,7 +1,11 @@
 ---
-description: "项目快速认知：quick 模式生成 4-5 份核心文档，deep 模式生成 10-11 份完整文档（支持 --deep/--type/--force 参数）"
+description: "项目认知标准模式：校验 final runtime/docs 输出并提供最小支撑层集成"
 ---
 
-读取并执行以下完整 Skill 定义：/Users/kuang/.spec-first/skills/spec-first/00-first/SKILL.md
+先运行以下命令，获取带项目运行时上下文的最新 Skill 定义：
+
+`spec-first skill render first${ARGUMENTS:+ --input "$ARGUMENTS"}`
+
+将命令输出视为本次执行的完整 Skill 定义，并严格遵循其要求。
 
 用户输入：$ARGUMENTS

@@ -1,0 +1,128 @@
+---
+import commandsData from '../../data/terminal-commands.json';
+import './terminal-demo.css';
+
+interface Props {
+  lang?: 'zh' | 'en';
+}
+
+const { lang = 'zh' } = Astro.props;
+const commands = commandsData[lang];
+---
+
+<div class="terminal-demo" data-lang={lang}>
+  <div class="terminal-header">
+    <span class="terminal-dot terminal-dot-red"></span>
+    <span class="terminal-dot terminal-dot-yellow"></span>
+    <span class="terminal-dot terminal-dot-green"></span>
+    <span class="terminal-title">Terminal — spec-first</span>
+  </div>
+
+  <div class="terminal-body">
+    <div id="terminal" class="terminal-output" data-commands={JSON.stringify(commands)}></div>
+    <div class="terminal-controls">
+      <button class="terminal-btn terminal-btn-play" id="terminal-play">
+        {lang === 'zh' ? '▶ 播放演示' : '▶ Play Demo'}
+      </button>
+      <button class="terminal-btn terminal-btn-reset" id="terminal-reset">
+        {lang === 'zh' ? '↺ 重置' : '↺ Reset'}
+      </button>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="terminal-fallback">
+      <p class="terminal-fallback-text">
+        {lang === 'zh' ? '请启用 JavaScript 以体验交互式终端演示' : 'Please enable JavaScript for interactive terminal demo'}
+      </p>
+    </div>
+  </noscript>
+</div>
+
+<script>
+  import { Terminal } from 'xterm';
+  import 'xterm/css/xterm.css';
+
+  interface Command {
+    command: string;
+    output: string;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('terminal');
+    if (!container) return;
+
+    const commands: Command[] = JSON.parse(container.dataset.commands || '[]');
+
+    const terminal = new Terminal({
+      theme: {
+        background: '#1e1e1e',
+        foreground: '#d4d4d4',
+        cursor: '#d4d4d4',
+        green: '#4ec9b0',
+        yellow: '#dcdcaa',
+        blue: '#569cd6',
+      },
+      fontFamily: "'SF Mono', Monaco, 'Cascadia Code', monospace",
+      fontSize: 14,
+      lineHeight: 1.4,
+      cursorBlink: true,
+      cols: 80,
+      rows: 12,
+    });
+
+    terminal.open(container);
+
+    let currentIndex = 0;
+    let isPlaying = false;
+
+    function typeText(text: string, callback: () => void) {
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          terminal.write(text[i]);
+          i++;
+        } else {
+          clearInterval(interval);
+          callback();
+        }
+      }, 30);
+    }
+
+    function runCommand(cmd: Command, callback: () => void) {
+      terminal.write('\r\n$ ');
+      typeText(cmd.command, () => {
+        setTimeout(() => {
+          terminal.write('\r\n' + cmd.output);
+          callback();
+        }, 300);
+      });
+    }
+
+    function playDemo() {
+      if (isPlaying || currentIndex >= commands.length) return;
+      isPlaying = true;
+
+      runCommand(commands[currentIndex], () => {
+        currentIndex++;
+        isPlaying = false;
+        if (currentIndex < commands.length) {
+          setTimeout(playDemo, 1000);
+        }
+      });
+    }
+
+    function resetDemo() {
+      terminal.clear();
+      terminal.write('$ ');
+      currentIndex = 0;
+      isPlaying = false;
+    }
+
+    document.getElementById('terminal-play')?.addEventListener('click', playDemo);
+    document.getElementById('terminal-reset')?.addEventListener('click', resetDemo);
+
+    // Initial prompt
+    terminal.write('$ ');
+  });
+</script>

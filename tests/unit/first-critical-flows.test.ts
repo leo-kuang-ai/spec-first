@@ -6,7 +6,7 @@ describe('first critical flows', () => {
   it('builds at least two project-level critical flows with hooks', () => {
     const summary: FirstRuntimeSummary = {
       generatedAt: '2026-03-16T00:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       project: {
         name: 'spec-first',
         platformType: 'backend',
@@ -14,7 +14,7 @@ describe('first critical flows', () => {
       },
       techStack: ['language: TypeScript', 'testing: Vitest'],
       modules: ['src/core/skill-runtime', 'src/cli/commands'],
-      capabilities: ['runtime truth source', 'docs projection'],
+      capabilities: ['runtime truth source', 'docs outputs'],
       entryPoints: ['src/cli/index.ts'],
       dataModels: ['Feature'],
       apiSurface: ['CLI: spec-first'],

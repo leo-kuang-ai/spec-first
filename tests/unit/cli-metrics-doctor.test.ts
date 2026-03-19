@@ -59,6 +59,43 @@ describe('handleMetrics', () => {
 });
 
 describe('handleDoctor', () => {
+  it('should use dry-run bootstrap by default', () => {
+    let observedDryRun: boolean | undefined;
+
+    const code = withCwd(TMP, () =>
+      handleDoctor([], {
+        bootstrapFn: (options) => {
+          observedDryRun = options?.dryRun;
+          return { ok: true, results: [] };
+        },
+      })
+    );
+
+    expect(code).toBe(ExitCode.SUCCESS);
+    expect(observedDryRun).toBe(true);
+  });
+
+  it('should use apply mode when --fix is provided', () => {
+    let observedDryRun: boolean | undefined;
+
+    const code = withCwd(TMP, () =>
+      handleDoctor(['--fix'], {
+        bootstrapFn: (options) => {
+          observedDryRun = options?.dryRun;
+          return { ok: true, results: [] };
+        },
+      })
+    );
+
+    expect(code).toBe(ExitCode.SUCCESS);
+    expect(observedDryRun).toBe(false);
+  });
+
+  it('should reject unknown doctor flags', () => {
+    const code = withCwd(TMP, () => handleDoctor(['--unknown']));
+    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+  });
+
   it('should return SUCCESS when project structure is valid', () => {
     writeFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'version: 1');
     const code = withCwd(TMP, () => handleDoctor([]));
@@ -180,27 +217,33 @@ describe('handleDoctor', () => {
     expect(lines.join('\n')).toContain('已跳过');
   });
 
-  it('should report background input and projection sync checks', () => {
+  it('should report background input, runtime health, and docs output checks', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
       JSON.stringify({ currentStage: '05_verify', backgroundInputStatus: 'degraded' }),
       'utf-8',
     );
     mkdirSync(join(TMP, '.spec-first', 'runtime', 'first'), { recursive: true });
+    mkdirSync(join(TMP, 'docs', 'first'), { recursive: true });
+    writeFileSync(join(TMP, 'docs', 'first', 'summary.md'), '# Summary\n', 'utf-8');
     writeFileSync(
       join(TMP, '.spec-first', 'runtime', 'first', 'index.json'),
       JSON.stringify({
         version: '1.0.0',
         lastRun: '2026-03-08T12:00:00.000Z',
-        mode: 'quick',
+        mode: 'deep',
         summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-        stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['hash mismatch'] },
-        docsProjection: {
-          'docs/first/README.md': { path: 'docs/first/README.md', fileHash: 'readme', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['stale projection'] },
-        },
+        steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'api-contracts', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: false, issues: ['hash mismatch'] },
+        structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+        databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true, status: 'healthy' },
+        docsProjection: {},
         status: 'stale',
-        staleReason: 'projection drift',
+        staleReason: 'docs outputs missing',
       }),
       'utf-8',
     );
@@ -219,10 +262,10 @@ describe('handleDoctor', () => {
     const joined = lines.join('\n');
     expect(joined).toContain('Background Input');
     expect(joined).toContain('degraded');
-    expect(joined).toContain('First Stage Views');
+    expect(joined).toContain('First Runtime Assets');
     expect(joined).toContain('hash mismatch');
-    expect(joined).toContain('Docs Projection Sync');
-    expect(joined).toContain('失同步');
+    expect(joined).toContain('Docs Outputs');
+    expect(joined).toContain('缺失');
   });
 
   it('should warn when Session Hook misses required bootstrap segments', () => {

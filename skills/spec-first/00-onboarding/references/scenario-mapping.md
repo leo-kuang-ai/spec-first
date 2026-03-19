@@ -32,9 +32,9 @@
 
 ---
 
-## role-views / degraded 背景策略
+## first 资产 / degraded 背景策略
 
-- 存在 `.spec-first/runtime/first/role-views.json` 时：优先按角色裁剪推荐路径
+- 存在 `.spec-first/runtime/first/summary.json` 与 `entry-guide.json` 时：优先按项目认知裁剪推荐路径
 - 无 first 资产时：进入 `degraded` 模式，输出通用路径并显式提示“无 first 资产”
 - `degraded` 模式下不阻断 onboarding，但第一步应优先推荐 `/spec-first:first`
 
@@ -111,11 +111,11 @@
 **推荐路径**:
 1. `first` - 项目快速认知 (5 分钟)
 2. `catchup` - 恢复上下文 (3 分钟)
-3. `test` - 测试生成 (15 分钟)
+3. `task` - 补充测试任务与用例映射 (10 分钟)
 4. `verify` - 阶段验收 (8 分钟)
 5. `status` - 状态跟踪 (2 分钟)
 
-**预计总时间**: 30-45 分钟
+**预计总时间**: 28-40 分钟
 
 ---
 

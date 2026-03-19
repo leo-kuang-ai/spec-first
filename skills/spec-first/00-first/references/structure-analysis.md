@@ -1,7 +1,7 @@
 # 代码结构分析主题
 
 > **当前正式 contract**：单一标准模式 runtime-first。
-> 本文档描述代码结构相关的分析主题与证据来源。正式真源是 `structure-overview.json`；`codebase-overview.md`、`architecture.md`、`call-graph.md` 都只是投影视图。
+> 本文档描述代码结构相关的分析主题与证据来源。正式真源是 `structure-overview.json`；`codebase-overview.md`、`architecture.md`、`call-graph.md` 都只是阅读输出。
 
 ## 1. 主题划分
 
@@ -19,7 +19,7 @@
 
 - `structure-overview.json`
 
-### projection docs
+### docs outputs
 
 - `docs/first/codebase-overview.md`
 - `docs/first/architecture.md`
@@ -60,7 +60,7 @@
 
 - 不得直接把分析结果当作 Markdown 真源写出
 - 所有结论先进入 `structure-overview.json`
-- `architecture.md` 与 `call-graph.md` 只能投影已有事实，不得新增事实
+- `architecture.md` 与 `call-graph.md` 只能展开已确认事实，不得新增事实
 - Markdown 默认使用中文，路径、命令、代码标识符保留英文
 
 ## 6. 降级策略

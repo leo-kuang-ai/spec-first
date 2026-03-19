@@ -5,6 +5,7 @@
 import { join } from 'node:path';
 import type { Stage, MatrixRow } from '../../shared/types.js';
 import { exists, readJson, readMarkdown } from '../../shared/fs-utils.js';
+import { checkFirstDocsExistence } from '../skill-runtime/first-docs-check.js';
 import { readFirstRuntimeIndex } from '../skill-runtime/first-runtime-store.js';
 import { parseMatrix } from '../trace-engine/matrix.js';
 import { createTraceContext } from '../trace-engine/trace-context.js';
@@ -101,26 +102,35 @@ function collectBackgroundQualityFindings(
     return findings;
   }
 
-  if (!runtimeIndex.stageViews.healthy) {
+  const requiredAssets = [
+    runtimeIndex.summary,
+    runtimeIndex.steering,
+    runtimeIndex.conventions,
+    runtimeIndex.criticalFlows,
+    runtimeIndex.entryGuide,
+    runtimeIndex.apiContracts,
+    runtimeIndex.structureOverview,
+    runtimeIndex.domainModel,
+  ];
+
+  if (requiredAssets.some((asset) => !asset.healthy) || runtimeIndex.databaseSchema.status === 'degraded') {
     findings.push({
       severity: 'MEDIUM',
-      type: 'STAGE_VIEWS_UNHEALTHY',
-      location: runtimeIndex.stageViews.path,
-      detail: `stage-views 健康状态异常: ${(runtimeIndex.stageViews.issues ?? ['unknown']).join('; ')}`,
-      suggestion: '重新执行 /spec-first:first 修复 stage-views 健康状态',
+      type: 'FIRST_RUNTIME_UNHEALTHY',
+      location: '.spec-first/runtime/first/index.json',
+      detail: `first runtime 健康状态异常: ${runtimeIndex.staleReason ?? 'unknown'}`,
+      suggestion: '重新执行 /spec-first:first 修复 runtime 真源健康状态',
     });
   }
 
-  const driftDocs = Object.entries(runtimeIndex.docsProjection)
-    .filter(([, entry]) => !entry.healthy)
-    .map(([doc, entry]) => `${doc}${entry.issues?.length ? ` (${entry.issues.join('; ')})` : ''}`);
-  if (driftDocs.length > 0) {
+  const missingDocs = checkFirstDocsExistence(projectRoot).missing;
+  if (missingDocs.length > 0) {
     findings.push({
       severity: 'MEDIUM',
-      type: 'DOCS_PROJECTION_DRIFT',
-      location: '.spec-first/runtime/first/index.json',
-      detail: `docs 投影视图漂移: ${driftDocs.join(', ')}`,
-      suggestion: '重新生成 docs 投影视图，并校验 runtime 真源与 docs 投影视图同步状态',
+      type: 'DOCS_OUTPUTS_MISSING',
+      location: 'docs/first',
+      detail: `docs 输出缺失: ${missingDocs.join(', ')}`,
+      suggestion: '重新执行 /spec-first:first 补齐 docs/first 输出',
     });
   }
 

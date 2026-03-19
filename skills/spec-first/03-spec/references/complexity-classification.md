@@ -17,10 +17,10 @@
 
 ### 判定流程
 
-1. **统计受影响文件数**（Step 1 Auto-Context 已收集）
+1. **统计受影响文件数**（Phase 0.2 已收集）
 2. **识别歧义点数量**（扫描 PRD 中的未定义术语/多解语义/缺失边界）
 3. **检测方案分支数**（关键词：或者/可选/待定/考虑）
-4. **统计外部依赖数量**（Step 1 Auto-Context 已收集）
+4. **统计外部依赖数量**（Phase 0.2 已收集）
 5. **按表格规则判定档位**（多维取最高档，边界情况向上取整）
 
 ---
@@ -29,12 +29,12 @@
 
 ### 节点覆盖矩阵
 
-| 档位 | Phase 0 | Step 0 | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Step 6 | Step 7 | Step 8 |
-|------|---------|--------|--------|--------|--------|--------|--------|--------|--------|--------|
-| Trivial | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Simple | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| Moderate | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Complex | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 档位 | Phase 0 | Step 0 | Step 2 | Step 3 | Step 4 | Step 5 | Step 6 | Step 7 | Step 8 |
+|------|---------|--------|--------|--------|--------|--------|--------|--------|--------|
+| Trivial | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Simple | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
+| Moderate | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Complex | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 **说明**：
 - ✅ = 必须执行
@@ -44,28 +44,28 @@
 
 #### Trivial 路径
 ```
-Phase 0 → Step 0 → Step 1 → Step 2 → Step 8
+Phase 0 → Step 0 → Step 2 → Step 8
 ```
 **跳过节点**：Step 3-7
 **理由**：单文件微调，无需提问、调研、发散、收敛、决策
 
 #### Simple 路径
 ```
-Phase 0 → Step 0 → Step 1 → Step 2 → Step 3 → Step 6 → Step 8
+Phase 0 → Step 0 → Step 2 → Step 3 → Step 6 → Step 8
 ```
 **跳过节点**：Step 4-5, 7
 **理由**：单模块功能，需确认边界（Step 3）和 FR/AC（Step 6），但无需调研、发散、决策
 
 #### Moderate 路径
 ```
-Phase 0 → Step 0 → Step 1 → Step 2 → Step 3 → Step 4 → Step 5 → Step 6 → Step 8
+Phase 0 → Step 0 → Step 2 → Step 3 → Step 4 → Step 5 → Step 6 → Step 8
 ```
 **跳过节点**：Step 7
 **理由**：跨模块协作，需调研和发散扫描，但技术方案相对明确，无需 ADR
 
 #### Complex 路径
 ```
-Phase 0 → Step 0 → Step 1 → Step 2 → Step 3 → Step 4 → Step 5 → Step 6 → Step 7 → Step 8
+Phase 0 → Step 0 → Step 2 → Step 3 → Step 4 → Step 5 → Step 6 → Step 7 → Step 8
 ```
 **跳过节点**：无
 **理由**：架构级变更，需要完整流程，包括 ADR 决策记录
@@ -181,7 +181,7 @@ Phase 0 → Step 0 → Step 1 → Step 2 → Step 3 → Step 4 → Step 5 → St
 执行过程中发现以下情况，应升档：
 
 1. **歧义点激增**：Step 3 Question Gate 发现歧义点 > 原判定 +3
-2. **依赖复杂化**：Step 1 Auto-Context 发现外部依赖 > 原判定 +2
+2. **依赖复杂化**：Phase 0.2 自动上下文发现外部依赖 > 原判定 +2
 3. **方案分歧**：Step 4 Research 发现方案分支 > 原判定 +1
 4. **文件扩散**：实际受影响文件数 > 原判定 +50%
 
@@ -195,7 +195,7 @@ Phase 0 → Step 0 → Step 1 → Step 2 → Step 3 → Step 4 → Step 5 → St
 执行过程中发现以下情况，可降档（需用户确认）：
 
 1. **需求收敛**：Step 3 Question Gate 后歧义点 < 原判定 -3
-2. **依赖简化**：Step 1 Auto-Context 发现外部依赖 < 原判定 -2
+2. **依赖简化**：Phase 0.2 自动上下文发现外部依赖 < 原判定 -2
 3. **方案明确**：Step 4 Research 后方案分支 = 1
 4. **范围缩小**：实际受影响文件数 < 原判定 -50%
 

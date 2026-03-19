@@ -17,6 +17,7 @@ describe('20-spec-review skill docs consistency', () => {
     expect(skill).toContain('First 项目认知资产接入');
     expect(skill).toContain('critical-flows.json');
     expect(skill).toContain('domain-model.json');
-    expect(skill).toContain('stage-views.json');
+    expect(skill).toContain('summary.json');
+    expect(skill).toContain('缺少项目认知辅助输入');
   });
 });

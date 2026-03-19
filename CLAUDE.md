@@ -245,5 +245,21 @@ tests/fixtures/    # 测试固件数据
 <!-- SPEC-FIRST:END MANUAL -->
 
 <!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-<!-- 此块由 spec-first context sync 自动更新，请勿手动编辑 -->
+> Auto-synced at 2026-03-19T05:41:30.054Z
+
+## Spec-First Context Snapshot
+- Feature: FSREQ-20260319-WEBSITE-001
+- Stage: 03_plan
+- Design: specs/FSREQ-20260319-WEBSITE-001/design.md
+
+### Design Highlights
+- Design — FSREQ-20260319-WEBSITE-001
+- 1. 技术选型
+- 1.1 核心框架
+- 1.2 设计约束映射
+- 2. 模块划分
+- 3. 设计规格（DS）
+- DS-WEBSITE-001: 首页展示模块
+- DS-WEBSITE-002: 交互式终端演示
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
+

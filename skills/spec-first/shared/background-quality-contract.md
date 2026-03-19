@@ -2,7 +2,7 @@
 
 ## Purpose
 
-背景质量 contract 用于统一 `spec-first` 多个 skill 对背景输入完整度、runtime 真源、docs 投影视图和同步状态的最小公共语义。
+背景质量 contract 用于统一 `spec-first` 多个 skill 对背景输入完整度、runtime 真源、docs 输出和同步状态的最小公共语义。
 
 ## Naming Layers
 
@@ -15,7 +15,7 @@
 
 - `background_input_status`
 - `runtime 真源`
-- `docs 投影视图`
+- `docs 输出`
 - `同步状态`
 
 如输出完整结论块，建议补充：
@@ -36,17 +36,16 @@
 - `degraded`
 - `missing`
 
-### `docs 投影视图`
+### `docs 输出`
 
-- `synced`
-- `stale`
-- `drifted`
+- `ready`
+- `missing`
 
 ### `同步状态`
 
-- `in_sync`
-- `stale`
-- `drifted`
+- `ready`
+- `attention`
+- `unknown`
 
 ## Minimal Semantics
 
@@ -54,12 +53,12 @@
 - `background_input_status=degraded`：背景输入部分可用，但完整性不足。
 - `background_input_status=blind`：缺少关键背景输入，不应直接给出高置信判断。
 - `runtime 真源=missing`：无法确认 runtime 事实真源。
-- `docs 投影视图=drifted`：docs 与 runtime 已明显偏离。
-- `同步状态!=in_sync`：输出中必须给出建议动作。
+- `docs 输出=missing`：阅读层输出不完整，需要补齐 `docs/first/*`。
+- `同步状态=attention`：当前背景层存在需要处理的问题，输出中必须给出建议动作。
 
 ## Severity Floor
 
 - `background_input_status=blind` → 不得低于 `HIGH`
 - `runtime 真源异常 / missing` → 不得低于 `HIGH`
-- `docs 投影视图=drifted` → 不得低于 `MEDIUM`
-- `同步状态=stale/drifted` → 不得低于 `MEDIUM`
+- `docs 输出=missing` → 不得低于 `MEDIUM`
+- `同步状态=attention` → 不得低于 `MEDIUM`

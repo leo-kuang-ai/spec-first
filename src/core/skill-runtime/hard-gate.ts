@@ -1,11 +1,5 @@
 import { join } from 'node:path';
-import {
-  exists,
-  readJsonChecked,
-  readMarkdown,
-  parseMarkdownTable,
-} from '../../shared/fs-utils.js';
-import { getCurrentTaskId } from '../task-plan/parser.js';
+import { exists, readJsonChecked, readMarkdown } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
 import { execFileSync } from 'node:child_process';
 import { SKILL_STAGE_REQUIREMENTS } from '../rules/truth-source.js';
@@ -49,112 +43,6 @@ function readCurrentStage(projectRoot: string, featureId: string): string | unde
   } catch {
     return undefined;
   }
-}
-
-function hasInProgressTask(taskPlan: string, specDir?: string): boolean {
-  return Boolean(findInProgressTaskId(taskPlan, specDir));
-}
-
-function findInProgressTaskId(taskPlan: string, specDir?: string): string | undefined {
-  if (specDir) {
-    const featureId = specDir.split('/').at(-1);
-    const projectRoot = specDir.split('/specs/')[0];
-    if (featureId && projectRoot) {
-      return getCurrentTaskId(projectRoot, featureId);
-    }
-  }
-
-  for (const cells of parseMarkdownTable(taskPlan)) {
-    const taskCell = cells.find((cell) => /^TASK-/i.test(cell));
-    if (!taskCell) continue;
-    const hasInProgress = cells.some((cell) => {
-      const normalized = cell.toLowerCase();
-      return (
-        normalized === 'in_progress' || normalized === 'in progress' || normalized === '进行中'
-      );
-    });
-    if (!hasInProgress) continue;
-    const match = taskCell.match(/TASK-[A-Z0-9-]+/i);
-    if (match?.[0]) return match[0];
-  }
-  return undefined;
-}
-
-function hasTddWaiver(findings: string, taskId?: string): boolean {
-  const blocks = findings.split(/\n{2,}/);
-  return blocks.some((block) => {
-    const marker = /\[TDD-WAIVER\]|TDD豁免|TDD waiver/i.test(block);
-    if (!marker) return false;
-    if (taskId && !block.includes(taskId)) return false;
-    return (
-      /(场景|scenario)\s*[:：]/i.test(block) &&
-      /(理由|reason)\s*[:：]/i.test(block) &&
-      /(批准人|approver|approved by)\s*[:：]/i.test(block) &&
-      /(时间|timestamp|time)\s*[:：]/i.test(block)
-    );
-  });
-}
-
-function hasTddRedEvidence(findings: string, taskId?: string): boolean {
-  const blocks = findings.split(/\n{2,}/);
-  for (const block of blocks) {
-    if (taskId && !block.includes(taskId)) continue;
-    if (!/(TDD[-_\s]?RED|Verify RED|RED 证据|失败测试证据|failing test)/i.test(block)) continue;
-    if (!/(command|命令|测试命令)\s*[:=：]/i.test(block)) continue;
-
-    const exitCodePattern = /(exit\s*code|退出码)\s*[:=：]\s*(-?\d+)/gi;
-    let match: RegExpExecArray | null = exitCodePattern.exec(block);
-    while (match) {
-      const code = Number.parseInt(match[2] ?? '0', 10);
-      if (!Number.isNaN(code) && code !== 0) return true;
-      match = exitCodePattern.exec(block);
-    }
-  }
-  return false;
-}
-
-function hasPlanApprovalEvidence(findings: string): boolean {
-  const blocks = findings.split(/\n{2,}/);
-  return blocks.some((block) => {
-    const marker = /\[PLAN-APPROVED\]|方案审核通过|review approved|approved plan/i.test(block);
-    if (!marker) return false;
-    return (
-      /(审核人|reviewer|approver)\s*[:：]/i.test(block) &&
-      /(时间|timestamp|time)\s*[:：]/i.test(block)
-    );
-  });
-}
-
-function parseConstitutionVersion(content: string): string | undefined {
-  const match = content.match(
-    /(?:\*\*)?\s*(?:version|版本)\s*(?:\*\*)?\s*[:：]\s*([vV]?\d+\.\d+\.\d+)/i
-  );
-  return match?.[1];
-}
-
-function compareSemver(a: string, b: string): number {
-  const pa = a
-    .replace(/^v/i, '')
-    .split('.')
-    .map((v) => Number.parseInt(v, 10) || 0);
-  const pb = b
-    .replace(/^v/i, '')
-    .split('.')
-    .map((v) => Number.parseInt(v, 10) || 0);
-  for (let i = 0; i < 3; i += 1) {
-    const diff = (pa[i] ?? 0) - (pb[i] ?? 0);
-    if (diff !== 0) return diff;
-  }
-  return 0;
-}
-
-function requiresPlanApprovalEvidence(specDir: string): boolean {
-  const constitutionPath = join(specDir, 'constitution.md');
-  if (!exists(constitutionPath)) return false;
-  const content = readMarkdown(constitutionPath);
-  const version = parseConstitutionVersion(content);
-  if (!version) return false;
-  return compareSemver(version, '1.1.0') >= 0;
 }
 
 function hasLocalGitRepo(projectRoot: string): boolean {
@@ -349,56 +237,7 @@ export function evaluateSkillHardGate(
       };
     }
 
-    const taskPlan = readMarkdown(taskPlanPath);
-    if (!hasInProgressTask(taskPlan)) {
-      return {
-        allowed: false,
-        severity: 'BLOCKED',
-        reason: 'code requires an in_progress TASK',
-        remediation: '先在 task_plan.md 标记 1 条 in_progress TASK，再进入实现',
-      };
-    }
-
-    const activeTaskId = findInProgressTaskId(taskPlan);
-    const findingsPath = join(specDir, 'findings.md');
-    const needPlanApproval = requiresPlanApprovalEvidence(specDir);
-    if (!exists(findingsPath)) {
-      return {
-        allowed: false,
-        severity: 'BLOCKED',
-        reason: needPlanApproval
-          ? 'code requires plan approval and TDD RED evidence in findings.md'
-          : 'code requires TDD RED evidence in findings.md',
-        remediation: needPlanApproval
-          ? '先在 findings.md 记录 [PLAN-APPROVED]（审核人+时间），再补齐 RED 失败测试证据或结构化 [TDD-WAIVER] 豁免'
-          : '先执行 RED 测试并在 findings.md 记录命令、退出码与失败原因，或记录结构化 [TDD-WAIVER] 豁免',
-      };
-    }
-
-    const findings = readMarkdown(findingsPath);
-    if (needPlanApproval && !hasPlanApprovalEvidence(findings)) {
-      return {
-        allowed: false,
-        severity: 'BLOCKED',
-        reason: 'code requires plan approval evidence for constitution>=1.1.0',
-        remediation:
-          '先在 findings.md 添加 [PLAN-APPROVED] 审核记录（至少包含 reviewer/approver 与 timestamp/time）',
-      };
-    }
-
-    const waived = hasTddWaiver(findings, activeTaskId);
-    const hasRedEvidence = hasTddRedEvidence(findings, activeTaskId);
-    if (!waived && !hasRedEvidence) {
-      return {
-        allowed: false,
-        severity: 'BLOCKED',
-        reason: activeTaskId
-          ? `code requires TDD RED evidence for ${activeTaskId}`
-          : 'code requires TDD RED evidence for in_progress TASK',
-        remediation:
-          '先补齐 RED 失败测试证据（建议标记 TDD-RED + 退出码非 0）或记录结构化 [TDD-WAIVER] 豁免',
-      };
-    }
+    readMarkdown(taskPlanPath);
   }
 
   // Worktree First 运行时守卫（Superpowers P1-3）

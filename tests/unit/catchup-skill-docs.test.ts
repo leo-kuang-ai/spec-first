@@ -25,4 +25,19 @@ describe('02-catchup skill docs consistency', () => {
     expect(skill).toContain('background_input_status');
     expect(skill).toContain('展示层');
   });
+
+  it('should declare catchup as routing control with explicit confirm policy', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('confirm_policy: auto');
+    expect(skill).toContain('类型：路由控制型');
+    expect(skill).toContain('不套用默认产物型 `P0-P5`');
+  });
+
+  it('should not claim that status directly regenerates findings.md', () => {
+    const skill = read(SKILL_MD);
+
+    expect(skill).toContain('执行 `/spec-first:status` 读取当前状态，再由 catchup 生成恢复摘要');
+    expect(skill).not.toContain('执行 `/spec-first:status` 生成当前状态');
+  });
 });

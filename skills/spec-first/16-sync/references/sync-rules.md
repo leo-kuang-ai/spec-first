@@ -48,8 +48,9 @@
 ### 3. 更新状态
 
 **来源**:
-- RFC 状态（来自 `spec-first rfc list`）
-- Defect 状态
+- `traceability-matrix.md` 中已有条目
+- 当前阶段产物与验证证据（spec/design/task/tests/findings）
+- 不依赖独立 `RFC` 列表作为状态真源
 
 **目标**: 同步到 `traceability-matrix.md`
 
@@ -69,7 +70,8 @@ Orphan 项:
 - TASK-007 (无 DS)
 
 状态更新:
-- RFC-001: draft → approved
+- FR-AUTH-001: Planned → Implemented
+- TASK-AUTH-003: Implemented → Verified
 
 是否确认并执行？[Y/n]
 ```
@@ -85,5 +87,5 @@ Orphan 项:
 **操作**: 回填 + orphan 清理
 **回填**: 2 项
 **删除**: 1 项 orphan
-**状态更新**: 1 项 RFC
+**状态更新**: 2 项矩阵条目
 ```

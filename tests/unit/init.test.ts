@@ -5,16 +5,16 @@ import { init } from '../../src/core/process-engine/init.js';
 import type { InitOptions } from '../../src/core/process-engine/init.js';
 import { Stage } from '../../src/shared/types.js';
 import {
-  writeFirstChangeMap,
+  writeFirstApiContracts,
   writeFirstConventions,
   writeFirstCriticalFlows,
+  writeFirstDatabaseSchema,
+  writeFirstDomainModel,
   writeFirstEntryGuide,
-  writeFirstRebootGuide,
   writeFirstRuntimeIndex,
   writeFirstRuntimeSummary,
-  writeFirstRoleViews,
   writeFirstSteering,
-  writeFirstStageViews,
+  writeFirstStructureOverview,
 } from '../../src/core/skill-runtime/first-runtime-store.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-init');
@@ -34,6 +34,8 @@ function baseOpts(overrides?: Partial<InitOptions>): InitOptions {
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
+  mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });
+  writeFileSync(join(TMP, '.spec-first', 'layer2', 'h5.yaml'), 'platform: h5\n', 'utf-8');
 });
 
 afterEach(() => {
@@ -79,6 +81,12 @@ describe('init', () => {
     expect(constitution).toContain('Leo');
   });
 
+  it('should classify pure h5 projects as frontend in constitution.md', () => {
+    const result = init(baseOpts({ feat: 'H5', title: 'H5 App', platforms: ['h5'] }));
+    const constitution = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
+    expect(constitution).toContain('- **项目类型**: frontend');
+  });
+
   it('should write .spec-first/current', () => {
     const result = init(baseOpts());
     const current = readFileSync(join(TMP, '.spec-first', 'current'), 'utf-8');
@@ -89,22 +97,22 @@ describe('init', () => {
     writeFirstRuntimeIndex(TMP, {
       version: '1.0.0',
       lastRun: '2026-03-08T12:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       summary: { path: '.spec-first/runtime/first/summary.json', fileHash: 'summary', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-      roleViews: { path: '.spec-first/runtime/first/role-views.json', fileHash: 'roles', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-      stageViews: { path: '.spec-first/runtime/first/stage-views.json', fileHash: 'stages', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       steering: { path: '.spec-first/runtime/first/steering.json', fileHash: 'steering', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       conventions: { path: '.spec-first/runtime/first/conventions.json', fileHash: 'conventions', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       criticalFlows: { path: '.spec-first/runtime/first/critical-flows.json', fileHash: 'critical-flows', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-      changeMap: { path: '.spec-first/runtime/first/change-map.json', fileHash: 'change-map', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
       entryGuide: { path: '.spec-first/runtime/first/entry-guide.json', fileHash: 'entry-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
-      rebootGuide: { path: '.spec-first/runtime/first/reboot-guide.json', fileHash: 'reboot-guide', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      apiContracts: { path: '.spec-first/runtime/first/api-contracts.json', fileHash: 'api-contracts', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      structureOverview: { path: '.spec-first/runtime/first/structure-overview.json', fileHash: 'structure-overview', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      domainModel: { path: '.spec-first/runtime/first/domain-model.json', fileHash: 'domain-model', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true },
+      databaseSchema: { path: '.spec-first/runtime/first/database-schema.json', fileHash: 'database-schema', lastUpdated: '2026-03-08T12:00:00.000Z', healthy: true, status: 'healthy' },
       docsProjection: {},
       status: 'current',
     });
     writeFirstRuntimeSummary(TMP, {
       generatedAt: '2026-03-08T12:00:00.000Z',
-      mode: 'quick',
+      mode: 'deep',
       project: { name: 'spec-first' },
       modules: [],
       capabilities: [],
@@ -113,18 +121,6 @@ describe('init', () => {
       apiSurface: [],
       risks: [],
       evidence: [],
-    });
-    writeFirstRoleViews(TMP, {
-      product: { role: 'product', summary: 'product', focus: [], warnings: [] },
-      dev: { role: 'dev', summary: 'dev', focus: [], warnings: [] },
-      qa: { role: 'qa', summary: 'qa', focus: [], warnings: [] },
-      architect: { role: 'architect', summary: 'architect', focus: [], warnings: [] },
-    });
-    writeFirstStageViews(TMP, {
-      spec: { stage: 'spec', summary: 'spec', businessCapabilities: [], coreEntities: [], dependencies: [], warnings: [] },
-      design: { stage: 'design', summary: 'design', moduleBoundaries: [], integrationPoints: [], technicalConstraints: [], risks: [] },
-      code: { stage: 'code', summary: 'code', entryPoints: [], likelyChangeAreas: [], changeHazards: [], verificationHooks: [] },
-      verify: { stage: 'verify', summary: 'verify', testFocus: [], riskAreas: [], validationHooks: [], releaseBlockers: [] },
     });
     writeFirstSteering(TMP, {
       product: { overview: 'spec-first', coreScenarios: ['init'], nonGoals: [], glossary: [] },
@@ -147,16 +143,6 @@ describe('init', () => {
         verificationHooks: ['pnpm vitest'],
       },
     ]);
-    writeFirstChangeMap(TMP, [
-      {
-        changeType: 'init-flow',
-        likelyModules: ['src/core/process-engine/init.ts'],
-        likelyCommands: ['src/cli/commands/init.ts'],
-        likelyConfigs: ['package.json'],
-        likelyTests: ['tests/unit/init.test.ts'],
-        riskPoints: ['background input drift'],
-      },
-    ]);
     writeFirstEntryGuide(TMP, [
       {
         taskCategory: 'init',
@@ -166,13 +152,10 @@ describe('init', () => {
         relatedFlows: ['flow-init'],
       },
     ]);
-    writeFirstRebootGuide(TMP, {
-      projectWhat: 'spec-first',
-      whereToStart: ['.spec-first/runtime/first/summary.json'],
-      currentCriticalAreas: ['runtime truth first'],
-      commonChangePaths: ['src/core/process-engine/init.ts'],
-      verifyChecklist: ['pnpm vitest'],
-    });
+    writeFirstApiContracts(TMP, { interfaces: [], integrationPoints: ['src/cli/commands/init.ts'], notes: [] });
+    writeFirstStructureOverview(TMP, { topology: ['init -> process-engine'], modules: [], readingOrder: [], evidence: [] });
+    writeFirstDomainModel(TMP, { entities: [], glossary: ['Feature'], evidence: [] });
+    writeFirstDatabaseSchema(TMP, { status: 'healthy', provider: 'sqlite', tables: [], risks: [], evidence: [] });
 
     const result = init(baseOpts());
     const state = JSON.parse(readFileSync(join(result.featureDir, 'stage-state.json'), 'utf-8')) as { backgroundInputStatus?: string };
@@ -276,7 +259,7 @@ describe('init', () => {
   });
 
   it('should auto-increment sequence number', () => {
-    const r1 = init(baseOpts());
+    const _r1 = init(baseOpts());
     // 用不同缩写创建第二个
     const r2 = init(baseOpts({ feat: 'PAY', title: 'Payment' }));
     expect(r2.featureId).toMatch(/PAY-001$/);

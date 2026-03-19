@@ -51,7 +51,7 @@
 
 ### 正常模式
 ```markdown
-📊 数据来源：基于项目分析（role-views）
+📊 数据来源：基于项目分析（summary / entry-guide）
 ```
 
 ### 降级模式
@@ -125,7 +125,7 @@
 
 ## 错误提示模板
 
-### role-views 不存在
+### first 资产不存在
 ```markdown
 ⚠️ 未检测到项目分析数据
 

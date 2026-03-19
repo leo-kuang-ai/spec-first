@@ -1,37 +1,37 @@
-# TDD 守卫说明
+# TDD 记录说明
 
 当前实现真理源: `src/core/batch-executor/guards.ts`
 
 ## 核心原则
 
-`NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST.`
+TDD 证据优先作为执行记录与回放依据，不作为 `code` 的前置门禁。
 
-## 当前守卫口径
+## 当前记录口径
 
-### P0 预检
+### 记录建议
 
-批量执行开始前，主进程会扫描 `specs/{featureId}/findings.md`：
+批量执行过程中，如有测试证据、豁免或回放结论，建议记录到 `specs/{featureId}/findings.md`：
 
-- 对每个 todo TASK，检查是否存在 `[TDD-RED] TASK-ID`
-- 或存在 `[TDD-WAIVER] TASK-ID`
-- 缺失率 `> 50%`：阻断整个批量执行
-- 缺失率 `<= 50%`：允许继续，但缺证据 TASK 仍应在执行前补齐
+- `[TDD-RED] TASK-ID`
+- `[TDD-WAIVER] TASK-ID`
+- `[TDD-GREEN] TASK-ID`
 
 注意：
-- 当前实现只检查标记字符串是否存在，不解析表格字段
-- `TDD-GREEN` 不是预检通过条件；它属于执行完成后的补充证据
+
+- 当前实现不再把 findings 作为 `code` 进入门禁
+- `TDD-GREEN` 仍可作为执行完成后的补充证据
 - 当前 skill 可以要求补充结构化字段，但不得把这些字段描述成 runtime 已强制解析
 
-### TASK 级守卫
+### TASK 级建议
 
-每个 TASK 在真正开始编码前，仍应满足以下之一：
+每个 TASK 在编码过程中，建议形成以下之一：
 
 1. 已记录 RED 证据
 2. 已记录经确认的 WAIVER
 
-不满足时，应返回 `blocked`，不要继续生成生产代码。
+不满足时，仍可继续进入实现，但应在 findings 或执行记录中补齐说明。
 
-## TDD Policy Resolution
+## TDD Policy Resolution（建议）
 
 TDD 是否强制，优先按**变更类型**判断，而不是按仓库端类型一刀切。
 
@@ -39,7 +39,7 @@ TDD 是否强制，优先按**变更类型**判断，而不是按仓库端类型
 
 1. 先判断本 TASK 的主要变更类型
 2. 再映射到 `required / conditional_waiver / waived`
-3. `conditional_waiver` 必须写明替代验证证据
+3. `conditional_waiver` 建议写明替代验证证据
 
 ### 默认矩阵
 
@@ -54,13 +54,14 @@ TDD 是否强制，优先按**变更类型**判断，而不是按仓库端类型
 | 外部集成接线 | conditional_waiver | conditional_waiver | conditional_waiver | conditional_waiver | 契约 / 冒烟替代 |
 
 说明：
+
 - `shared` 指多端共享包、schema mapper、SDK、共用 domain 模块
 - 同一 TASK 同时涉及多类变更时，按风险更高的类型执行
-- 无法判断时，默认按 `required` 处理，而不是先放行
+- 无法判断时，建议先做最小验证，再继续实现
 
-## WAIVER 口径
+## WAIVER 口径（建议）
 
-WAIVER 只用于**确实不适合先写失败测试**的情况，不用于绕过已有测试义务。
+WAIVER 只用于确实不适合先写失败测试的情况，不用于绕过已有测试义务。
 
 ### 建议 reason code
 
@@ -79,16 +80,16 @@ WAIVER 只用于**确实不适合先写失败测试**的情况，不用于绕过
 - Approver
 - Time
 
-如果是 `conditional_waiver`，必须写出可执行替代验证，例如：
+如果是 `conditional_waiver`，建议写出可执行替代验证，例如：
 
 - `pnpm lint`
 - `pnpm typecheck`
 - 定向 build / smoke / contract test
 - 人工验证步骤及边界
 
-## 反合理化守卫
+## 反合理化守卫（建议）
 
-以下理由默认无效，不得作为 WAIVER：
+以下理由不建议作为 WAIVER：
 
 - "改动很小"
 - "时间不够"
@@ -149,7 +150,7 @@ WAIVER 只用于**确实不适合先写失败测试**的情况，不用于绕过
 
 ## 执行建议
 
-- 预检只负责做批量入口拦截，不替代单 TASK 的 TDD 判断
-- 如果仓库只能跑全量验证，也可以记录 `pnpm test -- --run`，但要在说明里标明本 TASK 关联范围
-- RED/WAIVER/GREEN 都写入 `specs/{featureId}/findings.md`
+- findings.md 负责记录，不负责阻断
+- 如果仓库只能跑全量验证，也可以记录 `pnpm test -- --run`，并标明本 TASK 关联范围
+- RED / WAIVER / GREEN 都可以写入 `specs/{featureId}/findings.md`
 - 推荐在标记下方补结构化字段，便于 `catchup / status / review / verify` 做恢复与审查

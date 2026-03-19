@@ -7,12 +7,12 @@ import {
   detectCyclicDependency,
   topologicalSort,
 } from './dependency-resolver.js';
-import { checkTddEvidence, detectFileConflicts } from './guards.js';
+import { detectFileConflicts } from './guards.js';
 
 export function generateExecutionPlan(
   tasks: TaskNode[],
   featureId: string,
-  projectRoot: string
+  _projectRoot: string
 ): ExecutionPlan {
   const graph = buildDependencyGraph(tasks);
   const cycle = detectCyclicDependency(graph);
@@ -23,22 +23,7 @@ export function generateExecutionPlan(
 
   let layers = topologicalSort(graph);
   layers = detectFileConflicts(layers);
-
-  const tddCheck = checkTddEvidence(tasks, featureId, projectRoot);
-  const tddWarnings: string[] = [];
   const riskWarnings: string[] = [];
-
-  if (!tddCheck.passed) {
-    throw new Error(
-      `TDD 预检失败: ${tddCheck.missingCount}/${tddCheck.totalCount} 个 TASK 缺少 RED 证据 (> 50%)`
-    );
-  }
-
-  if (tddCheck.missingCount > 0) {
-    tddWarnings.push(
-      `${tddCheck.missingCount} 个 TASK 缺少 TDD 证据: ${tddCheck.missingTasks.join(', ')}`
-    );
-  }
 
   const hasConflicts = layers.some((l) => !l.concurrent);
   if (hasConflicts) {
@@ -51,7 +36,6 @@ export function generateExecutionPlan(
     featureId,
     totalTasks: tasks.length,
     layers,
-    tddWarnings,
     riskWarnings,
   };
 }

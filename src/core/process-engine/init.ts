@@ -558,7 +558,9 @@ function skeletonImpactAnalysis(featureId: string, title: string): string {
 
 function detectProjectType(platforms: string[]): string {
   if (platforms.length === 0) return 'fullstack';
-  if (platforms.every((p) => p.includes('frontend'))) return 'frontend';
+  const isFrontendPlatform = (platform: string): boolean =>
+    platform.includes('frontend') || platform === 'h5';
+  if (platforms.every(isFrontendPlatform)) return 'frontend';
   if (platforms.every((p) => p.includes('backend'))) return 'backend';
   return 'fullstack';
 }

@@ -1,0 +1,18 @@
+{
+  "zh": {
+    "nav": [
+      { "label": "首页", "href": "/zh/" },
+      { "label": "产品", "href": "/zh/product" },
+      { "label": "团队", "href": "/zh/team" },
+      { "label": "联系", "href": "/zh/contact" }
+    ]
+  },
+  "en": {
+    "nav": [
+      { "label": "Home", "href": "/en/" },
+      { "label": "Product", "href": "/en/product" },
+      { "label": "Team", "href": "/en/team" },
+      { "label": "Contact", "href": "/en/contact" }
+    ]
+  }
+}

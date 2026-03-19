@@ -81,6 +81,7 @@ describe('prompt assembler', () => {
     writeFileSync(skillPath, 'Feature={{FEATURE_ID}} Stage={{CURRENT_STAGE}}', 'utf-8');
 
     const loaded = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: true });
+    expect(loaded).not.toContain('skill-files-context');
     expect(loaded).toContain(`Feature=${FEAT}`);
     expect(loaded).toContain('Stage=04_implement');
   });

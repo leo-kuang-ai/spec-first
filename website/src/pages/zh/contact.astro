@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../../layouts/base-layout.astro';
+---
+
+<BaseLayout title="联系我们" lang="zh">
+  <section class="contact-hero container">
+    <h1 class="contact-title">联系我们</h1>
+    <p class="contact-subtitle">有任何问题或建议？我们很乐意听取您的反馈</p>
+  </section>
+
+  <section class="contact-methods container">
+    <div class="grid grid-2">
+      <a
+        href="https://github.com/kuangp/spec-first/issues"
+        target="_blank"
+        rel="noopener"
+        class="card contact-card"
+      >
+        <div class="contact-icon">🐛</div>
+        <h3>GitHub Issues</h3>
+        <p>报告 Bug、提出功能建议或参与讨论</p>
+        <span class="contact-link">github.com/kuangp/spec-first/issues →</span>
+      </a>
+
+      <a
+        href="mailto:contact@spec-first.dev"
+        class="card contact-card"
+      >
+        <div class="contact-icon">📧</div>
+        <h3>电子邮件</h3>
+        <p>商务合作或其他非技术问题</p>
+        <span class="contact-link">contact@spec-first.dev →</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="community-section container">
+    <h2 class="section-title">加入社区</h2>
+    <div class="grid grid-2">
+      <a
+        href="https://github.com/kuangp/spec-first"
+        target="_blank"
+        rel="noopener"
+        class="card community-card"
+      >
+        <h4>GitHub</h4>
+        <p>查看源码、Star 支持</p>
+      </a>
+
+      <a
+        href="https://github.com/kuangp/spec-first/discussions"
+        target="_blank"
+        rel="noopener"
+        class="card community-card"
+      >
+        <h4>Discussions</h4>
+        <p>参与社区讨论</p>
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-hero {
+    padding: var(--spacing-3xl) var(--spacing-md);
+    text-align: center;
+  }
+
+  .contact-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .contact-subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .contact-methods {
+    padding: var(--spacing-2xl) var(--spacing-md);
+  }
+
+  .contact-card {
+    text-decoration: none;
+    color: inherit;
+    text-align: center;
+    padding: var(--spacing-2xl);
+    transition: all var(--transition-fast);
+  }
+
+  .contact-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .contact-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-md);
+  }
+
+  .contact-card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .contact-card p {
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .contact-link {
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  .community-section {
+    padding: var(--spacing-2xl) var(--spacing-md);
+  }
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .community-card {
+    text-decoration: none;
+    color: inherit;
+    padding: var(--spacing-lg);
+    text-align: center;
+  }
+
+  .community-card h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .community-card p {
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+  }
+
+  @media (max-width: 767px) {
+    .contact-title {
+      font-size: 2rem;
+    }
+  }
+</style>

@@ -59,6 +59,8 @@
 
 整体状态: {overall_status}
 
+模式: {dry-run|apply}
+
 需要修复的项:
 {repair_items}
 
@@ -104,7 +106,9 @@
 
 🔌 MCP 服务器检查
 
-Claude Code 配置: ✅ 已配置
+已识别宿主: Claude Code
+配置路径: ~/.config/claude-code/mcp.json（示例；实际以自动探测结果为准）
+宿主配置: ✅ 已配置
 
 必需 MCP 服务器:
 - ✅ sequential-thinking
@@ -116,7 +120,8 @@ Claude Code 配置: ✅ 已配置
 
 📦 Skills 检查
 
-Claude Skills 目录: ✅ 存在
+Skills 目录: ✅ 存在
+检测路径: ~/.claude/skills（示例；实际以自动探测结果为准）
 
 Spec-First Skills: ✅ 通过包级安装可用
 
@@ -165,7 +170,9 @@ Spec-First Skills: ✅ 通过包级安装可用
 
 ⚠️ MCP 服务器检查
 
-Claude Code 配置: ⚠️ 部分缺失
+已识别宿主: Codex
+配置路径: $CODEX_HOME/config.toml（示例；若未设置则回退到平台默认目录）
+宿主配置: ⚠️ 部分缺失
 
 必需 MCP 服务器:
 - ✅ sequential-thinking
@@ -177,7 +184,8 @@ Claude Code 配置: ⚠️ 部分缺失
 
 ⚠️ Skills 检查
 
-Claude Skills 目录: ✅ 存在
+Skills 目录: ✅ 存在
+检测路径: 自动探测结果
 
 Spec-First Skills: ⚠️ 未检测到用户级安装
 
@@ -203,7 +211,8 @@ Spec-First Skills: ⚠️ 未检测到用户级安装
 5. ⚠️ 临时文件过多
 
 建议操作:
-- 运行自动修复安装 Git Hooks 和 MCP 配置
+- 先阅读诊断报告
+- 如确认执行修复，再运行 `spec-first doctor --fix --yes`
 - 运行 /spec-first:init 初始化项目配置
 - 手动升级 Node.js 到 v20+
 ```

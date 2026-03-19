@@ -84,7 +84,7 @@ spec-first matrix update <featureId> <id> --downstream <ids> --yes
 - `<featureId>`: Feature ID
 - `<id>`: 追溯 ID（如 FR-AUTH-001）
 - `--title`: 标题
-- `--status`: 状态（Planned/InProgress/Completed/Verified/Blocked）
+- `--status`: 状态（Planned/Implemented/Verified/Accepted/Deferred/Cancelled/Exception）
 - `--upstream`: 上游依赖 ID（逗号分隔）
 - `--downstream`: 下游依赖 ID（逗号分隔）
 - `--yes`: 强制确认（必需）
@@ -142,9 +142,9 @@ spec-first gate check FSREQ-20260309-AUTH-001
 - **不得跳过 gate check 进入下一阶段**
 
 **通过后**:
-- 更新 `stage-state.json` 为 `02_design`
-- 记录 gate check 通过时间到 `findings.md`
-- 提示用户："Gate check 通过，可执行 /spec-first:design"
+- 记录 gate check 通过结果到 `findings.md`
+- 提示用户："Gate check 通过，可进入 /spec-first:design 或由 /spec-first:orchestrate 执行阶段推进"
+- `gate check` 本身只负责校验，不直接推进阶段；阶段推进由 `stage advance` / `orchestrate` 负责
 
 ---
 

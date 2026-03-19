@@ -16,7 +16,7 @@
 - `backgroundInputStatus`
 - `background_input_status`
 - `runtime 真源`
-- `docs 投影视图`
+- `docs 输出`
 - `同步状态`
 
 仍由 `background-quality-contract.md` 负责。

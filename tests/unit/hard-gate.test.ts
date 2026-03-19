@@ -105,7 +105,7 @@ describe('evaluateSkillHardGate', () => {
     expect(result.reason).toContain('task');
   });
 
-  it('should BLOCK code when no in_progress task exists', () => {
+  it('should PASS code when task_plan.md exists with only todo tasks', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -120,12 +120,11 @@ describe('evaluateSkillHardGate', () => {
     );
 
     const result = evaluateSkillHardGate('code', TMP);
-    expect(result.allowed).toBe(false);
-    expect(result.severity).toBe('BLOCKED');
-    expect(result.reason).toContain('in_progress');
+    expect(result.allowed).toBe(true);
+    expect(result.severity).toBe('PASS');
   });
 
-  it('should BLOCK code when TDD RED evidence is missing', () => {
+  it('should PASS code when task_plan.md exists without findings.md', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -135,18 +134,16 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
-    writeFileSync(join(TMP, 'specs', FEAT, 'findings.md'), '# Findings\n', 'utf-8');
 
     const result = evaluateSkillHardGate('code', TMP);
-    expect(result.allowed).toBe(false);
-    expect(result.severity).toBe('BLOCKED');
-    expect(result.reason).toContain('TDD RED');
+    expect(result.allowed).toBe(true);
+    expect(result.severity).toBe('PASS');
   });
 
-  it('should PASS code when TDD RED evidence exists for in_progress task', () => {
+  it('should PASS code when findings.md exists but is not required', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -156,7 +153,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -164,12 +161,8 @@ describe('evaluateSkillHardGate', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
-        '- exit code: 1',
-        '- reason: function not implemented',
+        '## Notes',
+        '- findings are optional for code hard-gate',
         '',
       ].join('\n'),
       'utf-8',
@@ -180,7 +173,7 @@ describe('evaluateSkillHardGate', () => {
     expect(result.severity).toBe('PASS');
   });
 
-  it('should BLOCK code when findings has fail text but no non-zero exit code', () => {
+  it('should PASS code when findings.md has fail text but no non-zero exit code', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -190,7 +183,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -198,10 +191,7 @@ describe('evaluateSkillHardGate', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
+        '## Notes',
         '- result: test failed because function is missing',
         '',
       ].join('\n'),
@@ -209,12 +199,11 @@ describe('evaluateSkillHardGate', () => {
     );
 
     const result = evaluateSkillHardGate('code', TMP);
-    expect(result.allowed).toBe(false);
-    expect(result.severity).toBe('BLOCKED');
-    expect(result.reason).toContain('TDD RED');
+    expect(result.allowed).toBe(true);
+    expect(result.severity).toBe('PASS');
   });
 
-  it('should PASS code when structured TDD waiver exists', () => {
+  it('should PASS code when structured TDD waiver exists in findings.md', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -224,7 +213,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -248,7 +237,7 @@ describe('evaluateSkillHardGate', () => {
     expect(result.severity).toBe('PASS');
   });
 
-  it('should BLOCK code when constitution v1.1.0 requires plan approval evidence', () => {
+  it('should PASS code when findings.md has TDD evidence', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -263,7 +252,7 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
@@ -282,12 +271,11 @@ describe('evaluateSkillHardGate', () => {
     );
 
     const result = evaluateSkillHardGate('code', TMP);
-    expect(result.allowed).toBe(false);
-    expect(result.severity).toBe('BLOCKED');
-    expect(result.reason).toContain('plan approval');
+    expect(result.allowed).toBe(true);
+    expect(result.severity).toBe('PASS');
   });
 
-  it('should PASS code when constitution v1.1.0 has plan approval evidence and TDD RED', () => {
+  it('should PASS code when findings.md has TDD RED evidence', () => {
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -302,17 +290,13 @@ describe('evaluateSkillHardGate', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | todo |\n',
       'utf-8',
     );
     writeFileSync(
       join(TMP, 'specs', FEAT, 'findings.md'),
       [
         '# Findings',
-        '',
-        '## [PLAN-APPROVED]',
-        '- reviewer: tech-lead',
-        '- timestamp: 2026-03-05T10:00:00Z',
         '',
         '## TDD Evidence',
         '- TASK: TASK-AUTH-001',

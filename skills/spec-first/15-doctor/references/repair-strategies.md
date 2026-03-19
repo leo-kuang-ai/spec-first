@@ -8,9 +8,9 @@
 
 | 问题类型 | 自动修复 | 需确认 | 手动修复 |
 |---------|---------|--------|----------|
-| Git Hooks 缺失 | ✅ | - | - |
-| MCP 配置缺失 | ✅ | - | - |
-| Skills 缺失 | ✅ | - | - |
+| Git Hooks 缺失 | ✅ | `--fix --yes` | - |
+| MCP 配置缺失 | ✅ | `--fix --yes` | - |
+| Skills 缺失 | ✅ | `--fix --yes` | - |
 | Node.js 版本低 | - | - | ✅ |
 | 临时文件过多 | - | ✅ | - |
 | node_modules 膨胀 | - | ✅ | - |
@@ -22,7 +22,7 @@
 ### 问题识别
 - `.git/hooks/pre-commit` 不存在或不可执行
 
-### 自动修复命令
+### 自动修复命令（仅 apply 模式）
 ```bash
 spec-first hooks install
 ```
@@ -47,48 +47,45 @@ test -x .git/hooks/pre-commit && echo "OK" || echo "FAIL"
 
 ### 修复策略
 
-#### Codex (`~/.codex/config.toml`)
+#### 配置路径识别规则
 
-**检查**:
+优先按宿主环境变量解析配置路径，再回退到平台默认目录。
+
+**示例优先级**:
+- Codex: `CODEX_HOME` / `CODEX_ROOT` → 默认 `~/.codex/`
+- Claude Code: `CLAUDE_CODE_CONFIG_DIR` / `CLAUDE_CONFIG_DIR` / `CLAUDE_HOME` → 平台默认目录
+- Gemini: `GEMINI_HOME` / `GEMINI_CLI_HOME` → 平台默认目录
+- Cursor: `CURSOR_HOME` / `CURSOR_USER_HOME` → 平台默认目录
+
+#### 检查
+
+对自动识别出的 `{detected_config_path}` 检查必需 MCP 是否存在。
+
 ```bash
-grep -q "sequential-thinking" ~/.codex/config.toml
+# TOML / JSON 都以实际宿主配置格式处理
+test -f "{detected_config_path}" && echo "FOUND" || echo "MISSING"
 ```
 
-**修复**:
+#### 修复
+
+在 `{detected_config_path}` 中按宿主格式补齐缺失 MCP 条目。示例：
+
 ```toml
 [mcpServers.sequential-thinking]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 ```
 
-#### Claude Code (`~/.config/claude-code/mcp.json`)
-
-**检查**:
-```bash
-jq '.mcpServers | has("sequential-thinking")' ~/.config/claude-code/mcp.json
-```
-
-**修复**:
-```json
-{
-  "mcpServers": {
-    "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
-    }
-  }
-}
-```
-
-### 自动修复流程
+### 自动修复流程（仅 `spec-first doctor --fix --yes`）
 
 1. 读取 `src/config/bootstrap-manifest.ts`
 2. 遍历 `REQUIRED_MCP_SERVERS`
-3. 检查每个 MCP 在宿主配置中是否存在
-4. 缺失则追加配置
-5. 备份原配置文件（`.bak` 后缀）
-6. 写入更新后的配置
-7. 复检验证
+3. 解析宿主类型与自动识别出的配置路径
+4. 检查每个 MCP 在宿主配置中是否存在
+5. 缺失则追加配置
+6. 备份原配置文件（`.bak` 后缀）
+7. 写入更新后的配置
+8. 复检验证
 
 ---
 
@@ -108,26 +105,28 @@ jq '.mcpServers | has("sequential-thinking")' ~/.config/claude-code/mcp.json
 
 #### 用户级安装
 
-**目标路径**:
-- Codex: `~/.codex/skills/` 或 `~/.codex/system-skills/`
-- Claude Code: `~/.claude/skills/`
+**目标路径识别**:
+- 先读取宿主环境变量和已探测到的宿主根目录
+- 再根据宿主类型选择对应 skills 目录
+- 默认目录仅作兜底，不作为唯一真相
 
 **安装方法**:
 ```bash
-# 从包级路径复制
-cp -r /path/to/spec-first/skills/spec-first/* ~/.claude/skills/
+# 从包级路径复制到自动识别出的宿主 skills 目录
+cp -r /path/to/spec-first/skills/spec-first/* "{detected_skills_dir}/"
 
-# 或从 Git 仓库克隆
-git clone https://github.com/spec-first/skills ~/.claude/skills/spec-first
+# 或从 Git 仓库克隆到自动识别出的宿主 skills 目录
+git clone https://github.com/spec-first/skills "{detected_skills_dir}/spec-first"
 ```
 
-### 自动修复流程
+### 自动修复流程（仅 `spec-first doctor --fix --yes`）
 
 1. 读取 `REQUIRED_SKILLS` 清单
 2. 检查每个 Skill 是否存在
-3. 按 `sourcePriority` 顺序查找源
-4. 复制或克隆到目标路径
-5. 验证 `SKILL.md` 文件存在
+3. 解析宿主类型与自动识别出的 skills 目录
+4. 按 `sourcePriority` 顺序查找源
+5. 复制或克隆到目标路径
+6. 验证 `SKILL.md` 文件存在
 
 ---
 

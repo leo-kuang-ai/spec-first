@@ -1,6 +1,6 @@
 ---
 name: "spec-first:orchestrate"
-description: "定位 Feature 并加载当前状态执行编排"
+description: "Use when you need the system to inspect the current feature state and choose the next stage action, verification step, or recovery path."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
@@ -190,7 +190,7 @@ TASK 执行由 `todo-runner` 驱动，状态流转如下：
 
 ## 编排规则
 - 主调度器：根据当前阶段分派对应 Skill
-- 序列：plan -> (spec|design|task|code|test|archive) -> verify -> advance
+- 序列：plan -> (spec|design|task|code|archive) -> verify -> advance
 
 ### 调度协议
 
@@ -205,6 +205,13 @@ Stage -> Skill 映射（P4 按此表调度）：
 | 04_implement | 07-code | 代码实现（08-review 按需） |
 | 05_verify | 12-verify | 阶段验收 |
 | 06_wrap_up | 10-archive | 归档总结 |
+
+### 07_release / 08_done 责任说明
+
+- `07_release` 与 `08_done` 不再通过额外 skill 目录调度
+- 这两个阶段由现有 runtime route 承接，命令入口分别是 `golive` 与 `done`
+- orchestrate 在文档层必须显式承认这条责任链，避免制造“主流程只到 archive”的假象
+- 因此 `06_wrap_up` 之后的标准路径是：`archive -> golive -> done`
 
 ### 子 Skill 失败处理
 

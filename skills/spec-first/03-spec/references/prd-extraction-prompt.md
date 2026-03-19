@@ -6,9 +6,9 @@
 
 ## 使用方法
 
-1. 在 Claude Code 中上传需求文档（PDF/Word/图片）
-2. 复制下方 prompt 发送给 Claude
-3. 将 Claude 的输出保存为 `specs/{featureId}/raw-requirement.md`
+1. 在当前宿主中上传需求文档（PDF/Word/图片）
+2. 复制下方 prompt 发送给当前 AI 宿主
+3. 将宿主输出保存为 `specs/{featureId}/raw-requirement.md`
 
 ---
 

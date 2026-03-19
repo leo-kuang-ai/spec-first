@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.1.4 2026-03-20 Claude: docs(first): 主线程上下文收缩 — 新增 main-thread-contract.md、evidence-pack-spec.md、agent-output-schema.md 三个 canonical 契约文档；收敛 SKILL.md 为总入口；压薄 agent-*.md 为核心四小节；明确 runtime/docs 分工边界 (user-visible)
+- v1.1.4 2026-03-20 Claude: fix(lint): 移除 guards.ts 中未使用的 TaskNode 类型导入
+- v1.1.4 2026-03-19 Claude: fix(docs): 修正 pnpm link 开发模式卸载文档误导 — 将"pnpm remove --global"从"自动卸载"分离为独立小节，明确 preuninstall 跳过原因（防误删全局资产）；补充 preuninstall 测试覆盖全局卸载（npm_config_global=true）场景 (user-visible)
+- v1.1.4 2026-03-18 Claude: refactor(context-resolver): 输入矩阵代码化 — 将 resolveSkillAssetContract 的 switch-case 提取为 SKILL_INPUT_MATRIX 常量，集中管理 14 个 skill 的资产契约
+- v1.1.4 2026-03-18 Claude: refactor(dispatcher): 统一 runtime notice 参数命名 — 将 6 个 build*RuntimeNotice 函数的参数从下划线命名（background_input_status）改为驼峰命名（backgroundInputStatus），简化 formatStageRuntimeNotice 函数签名
+- v1.1.4 2026-03-17 Claude: refactor(first): 简化 CLI 参数协议 — 删除 --auto 和 --skip 参数，统一为单一执行路径（有 runtime → 刷新，无 runtime → bootstrap），更新帮助文档和测试用例 (user-visible)
+- v1.1.4 2026-03-17 Claude: feat(context-resolver): 为 6 个未接入节点添加 first 资产 contract（catchup/research/doctor/archive/sync/feature），完成 Batch 2-3 节点接入 (user-visible)
+- v1.1.4 2026-03-17 Claude: fix(first-runtime-store): 修复 isCanonicalRuntimeIndexShape 类型守卫，仅检查核心必需字段以兼容旧版 index
+- v1.1.4 2026-03-17 Claude: test(context-resolver): 更新 makeHealthyIndex 测试辅助函数，添加缺失的 runtime 资产字段
 - v1.1.4 2026-03-17 Claude: feat(init): 为 Mode I Feature 初始化生成 impact-analysis.md，重构 handleInit 为五轨道路由，添加 brownfield-baseline 跳过机制 (user-visible)
 - v1.1.4 2026-03-17 Claude: refactor(init): 代码质量加固：提取 LEGACY_BASELINE_FEATURE_ID 常量、--track 无效值告警回退、非 TTY 时 brownfield-baseline 返回 VALIDATION_ERROR、baseline Feature 使用专属 PRD/task_plan 骨架、SKILL.md 更新为五轨道文档
 - v1.1.4 2026-03-17 Claude: test(init): 修复 cli-init-stage 全部 36 个测试用例，适配五轨道路由重构后新行为

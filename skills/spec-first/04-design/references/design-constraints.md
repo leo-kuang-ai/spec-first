@@ -134,7 +134,7 @@ def send_sms(phone, code):
 
 ## 自我修正上限
 
-**规则**：`{{MAX_SELF_CORRECTION}}` 轮（默认 3）
+**规则**：`3` 轮
 
 **触发条件**：
 - 设计方案被用户拒绝

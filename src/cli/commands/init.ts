@@ -20,50 +20,20 @@ import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js'
 import { classifyProjectMaturity } from '../../core/skill-runtime/first-platform-detector.js';
 import {
   getFirstRuntimeDir,
-  readFirstRoleViews,
+  readFirstApiContracts,
+  readFirstConventions,
+  readFirstCriticalFlows,
+  readFirstDatabaseSchema,
+  readFirstDomainModel,
+  readFirstEntryGuide,
   readFirstRuntimeIndex,
   readFirstRuntimeSummary,
-  readFirstStageViews,
+  readFirstSteering,
+  readFirstStructureOverview,
 } from '../../core/skill-runtime/first-runtime-store.js';
 
 const VALID_MODES: ReadonlySet<string> = new Set(['N', 'I']);
 const VALID_SIZES: ReadonlySet<string> = new Set(['S', 'M', 'L']);
-
-const PLATFORM_TEMPLATES = {
-  'java-backend': `platform: java-backend
-label: Java 后端服务
-description: Spring Boot 后端服务
-tech_stack:
-  language: Java
-  framework: Spring Boot
-build:
-  tool: Maven
-test:
-  unit: JUnit 5
-`,
-  'admin-frontend': `platform: admin-frontend
-label: 管理后台前端
-description: React + TypeScript 前端应用
-tech_stack:
-  language: TypeScript
-  framework: React 18
-build:
-  tool: Vite
-test:
-  unit: Vitest
-`,
-  h5: `platform: h5
-label: H5 移动端
-description: Vue 3 移动端应用
-tech_stack:
-  language: TypeScript
-  framework: Vue 3
-build:
-  tool: Vite
-test:
-  unit: Vitest
-`,
-} as const;
 
 interface InitCliInput {
   feat?: string;
@@ -145,7 +115,15 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
     try {
       const idx = JSON.parse(readFileSync(runtimeIndexPath, 'utf-8'));
       firstRuntimeHealthy = Boolean(
-        idx?.summary?.healthy && idx?.roleViews?.healthy && idx?.stageViews?.healthy
+        idx?.summary?.healthy &&
+          idx?.steering?.healthy &&
+          idx?.conventions?.healthy &&
+          idx?.criticalFlows?.healthy &&
+          idx?.entryGuide?.healthy &&
+          idx?.apiContracts?.healthy &&
+          idx?.structureOverview?.healthy &&
+          idx?.domainModel?.healthy &&
+          (idx?.databaseSchema?.status === 'healthy' || idx?.databaseSchema?.status === 'not_applicable')
       );
     } catch {
       firstRuntimeHealthy = false;
@@ -517,8 +495,14 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
   } else {
     const runtimeIndex = readFirstRuntimeIndex(projectRoot);
     const runtimeSummary = readFirstRuntimeSummary(projectRoot);
-    const runtimeRoleViews = readFirstRoleViews(projectRoot);
-    const runtimeStageViews = readFirstStageViews(projectRoot);
+    const runtimeSteering = readFirstSteering(projectRoot);
+    const runtimeConventions = readFirstConventions(projectRoot);
+    const runtimeCriticalFlows = readFirstCriticalFlows(projectRoot);
+    const runtimeEntryGuide = readFirstEntryGuide(projectRoot);
+    const runtimeApiContracts = readFirstApiContracts(projectRoot);
+    const runtimeStructureOverview = readFirstStructureOverview(projectRoot);
+    const runtimeDomainModel = readFirstDomainModel(projectRoot);
+    const runtimeDatabaseSchema = readFirstDatabaseSchema(projectRoot);
 
     if (!runtimeIndex) {
       firstMissing.push('.spec-first/runtime/first/index.json');
@@ -528,12 +512,39 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
         firstMissing.push('.spec-first/runtime/first/summary.json');
         indexExistsButIncomplete = true;
       }
-      if (!runtimeIndex.roleViews?.healthy) {
-        firstMissing.push('.spec-first/runtime/first/role-views.json');
+      if (!runtimeIndex.steering?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/steering.json');
         indexExistsButIncomplete = true;
       }
-      if (!runtimeIndex.stageViews?.healthy) {
-        firstMissing.push('.spec-first/runtime/first/stage-views.json');
+      if (!runtimeIndex.conventions?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/conventions.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.criticalFlows?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/critical-flows.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.entryGuide?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/entry-guide.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.apiContracts?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/api-contracts.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.structureOverview?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/structure-overview.json');
+        indexExistsButIncomplete = true;
+      }
+      if (!runtimeIndex.domainModel?.healthy) {
+        firstMissing.push('.spec-first/runtime/first/domain-model.json');
+        indexExistsButIncomplete = true;
+      }
+      if (
+        runtimeIndex.databaseSchema?.status !== 'healthy' &&
+        runtimeIndex.databaseSchema?.status !== 'not_applicable'
+      ) {
+        firstMissing.push('.spec-first/runtime/first/database-schema.json');
         indexExistsButIncomplete = true;
       }
     }
@@ -541,11 +552,35 @@ export function checkInitReadiness(projectRoot: string): InitReadinessStatus {
     if (!runtimeSummary && !firstMissing.includes('.spec-first/runtime/first/summary.json')) {
       firstMissing.push('.spec-first/runtime/first/summary.json');
     }
-    if (!runtimeRoleViews && !firstMissing.includes('.spec-first/runtime/first/role-views.json')) {
-      firstMissing.push('.spec-first/runtime/first/role-views.json');
+    if (!runtimeSteering && !firstMissing.includes('.spec-first/runtime/first/steering.json')) {
+      firstMissing.push('.spec-first/runtime/first/steering.json');
     }
-    if (!runtimeStageViews && !firstMissing.includes('.spec-first/runtime/first/stage-views.json')) {
-      firstMissing.push('.spec-first/runtime/first/stage-views.json');
+    if (!runtimeConventions && !firstMissing.includes('.spec-first/runtime/first/conventions.json')) {
+      firstMissing.push('.spec-first/runtime/first/conventions.json');
+    }
+    if (!runtimeCriticalFlows && !firstMissing.includes('.spec-first/runtime/first/critical-flows.json')) {
+      firstMissing.push('.spec-first/runtime/first/critical-flows.json');
+    }
+    if (!runtimeEntryGuide && !firstMissing.includes('.spec-first/runtime/first/entry-guide.json')) {
+      firstMissing.push('.spec-first/runtime/first/entry-guide.json');
+    }
+    if (!runtimeApiContracts && !firstMissing.includes('.spec-first/runtime/first/api-contracts.json')) {
+      firstMissing.push('.spec-first/runtime/first/api-contracts.json');
+    }
+    if (
+      !runtimeStructureOverview &&
+      !firstMissing.includes('.spec-first/runtime/first/structure-overview.json')
+    ) {
+      firstMissing.push('.spec-first/runtime/first/structure-overview.json');
+    }
+    if (!runtimeDomainModel && !firstMissing.includes('.spec-first/runtime/first/domain-model.json')) {
+      firstMissing.push('.spec-first/runtime/first/domain-model.json');
+    }
+    if (
+      !runtimeDatabaseSchema &&
+      !firstMissing.includes('.spec-first/runtime/first/database-schema.json')
+    ) {
+      firstMissing.push('.spec-first/runtime/first/database-schema.json');
     }
   }
 
@@ -574,7 +609,7 @@ export function summarizeFirstArtifacts(projectRoot: string): FirstSummary {
   const runtimeSummary = readFirstRuntimeSummary(projectRoot);
   if (runtimeIndex && runtimeSummary) {
     return {
-      mode: runtimeIndex.mode ?? 'deep',
+      mode: 'deep',
       techStack: runtimeSummary.project?.platformType ?? '待确认',
       codeVolume:
         runtimeSummary.modules?.length > 0 ? `${runtimeSummary.modules.length} 个模块` : '待确认',
@@ -701,6 +736,10 @@ function runFeatureInitBlockedTrack(): number {
 async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<number> {
   const preset = buildLegacyBaselinePreset();
 
+  if (!requireDiscoveredPlatforms(cwd)) {
+    return ExitCode.VALIDATION_ERROR;
+  }
+
   console.log('📦 检测到存量项目，建议先创建系统基线');
   console.log('');
   console.log(`将自动创建以下 Feature：`);
@@ -749,13 +788,7 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
     return ExitCode.VALIDATION_ERROR;
   }
 
-  // Discover platforms for the baseline feature
   const discoveredPlatforms = discoverPlatforms(cwd);
-  if (discoveredPlatforms.length === 0) {
-    console.error('⚠️  未找到平台配置（.spec-first/layer2/*.yaml）');
-    console.error('请先创建平台配置，再创建基线 Feature。');
-    return ExitCode.VALIDATION_ERROR;
-  }
 
   ensureProjectMetaConfig(cwd);
 
@@ -786,6 +819,8 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
 
 async function runFeatureInitTrack(args: string[], cwd: string): Promise<number> {
   const parsedInput = parseInitCliInput(args);
+
+  if (!requireDiscoveredPlatforms(cwd)) return ExitCode.VALIDATION_ERROR;
 
   // Show first runtime summary
   const summary = summarizeFirstArtifacts(cwd);
@@ -920,45 +955,21 @@ function discoverPlatforms(projectRoot: string): string[] {
   }
 }
 
-async function guidePlatformCreation(
-  rl: ReturnType<typeof createInterface>,
-  projectRoot: string
-): Promise<string[]> {
+function guidePlatformCreation(): null {
   console.log('\n⚠️  检测到 .spec-first/layer2/ 目录不存在或为空');
-  console.log('    将引导您创建平台配置文件\n');
-  console.log('请选择项目类型：');
-  console.log('  1. Java 后端服务');
-  console.log('  2. 前端应用（React/Vue）');
-  console.log('  3. H5 移动端');
-  console.log('  4. 跳过（手动创建）');
+  console.log('    平台模板属于 Skill/工作流决策，不在 CLI 中自动生成。\n');
+  console.log('请先运行 `spec-first skill render init`，按 Skill 侧流程补齐 .spec-first/layer2/*.yaml 后再运行 init。');
+  console.log('例如：h5.yaml、java-backend.yaml、admin-frontend.yaml');
+  return null;
+}
 
-  const choice = await rl.question('\n请输入 [1-4]: ');
-
-  if (choice === '4') {
-    console.log('\n请手动创建 .spec-first/layer2/*.yaml 文件后重新运行 init');
-    return [];
+function requireDiscoveredPlatforms(projectRoot: string): string[] | null {
+  const discovered = discoverPlatforms(projectRoot);
+  if (discovered.length === 0) {
+    guidePlatformCreation();
+    return null;
   }
-
-  const templateMap: Record<string, keyof typeof PLATFORM_TEMPLATES> = {
-    '1': 'java-backend',
-    '2': 'admin-frontend',
-    '3': 'h5',
-  };
-
-  const platformKey = templateMap[choice];
-  if (!platformKey) {
-    console.error('❌ 无效选择');
-    return [];
-  }
-
-  const layerDir = join(projectRoot, '.spec-first', 'layer2');
-  mkdirSync(layerDir, { recursive: true });
-
-  const yamlPath = join(layerDir, `${platformKey}.yaml`);
-  writeFileSync(yamlPath, PLATFORM_TEMPLATES[platformKey], 'utf-8');
-
-  console.log(`\n✅ 已创建平台配置：${platformKey}.yaml`);
-  return [platformKey];
+  return discovered;
 }
 
 function validatePlatformSelection(platforms: string[], projectRoot: string): string | null {
@@ -1138,6 +1149,11 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('║          Spec-First Feature 初始化                             ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
+    const discovered = requireDiscoveredPlatforms(process.cwd());
+    if (!discovered) {
+      return null;
+    }
+
     // Step 1/7: FEAT 缩写
     printStepHeader(1, 7, 'Feature 缩写');
     console.log('  格式：大写字母开头，仅包含大写字母和数字，长度 1-16 字符');
@@ -1172,13 +1188,6 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     );
 
     // Step 4/7: 平台选择
-    let discovered = discoverPlatforms(process.cwd());
-    if (discovered.length === 0) {
-      discovered = await guidePlatformCreation(rl, process.cwd());
-      if (discovered.length === 0) {
-        return null;
-      }
-    }
     printStepHeader(4, 7, '平台选择');
     console.log('  检测到以下可用平台（来自 .spec-first/layer2/*.yaml）：\n');
     const selectedPlatforms = await askPlatformsInteractively(rl, discovered);
