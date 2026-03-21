@@ -109,6 +109,58 @@
 - 降级策略
 - 冲突/边界处理
 
+### 3.1 `structure-analysis.md`
+
+必须保留：
+- [structure-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/structure-analysis.md#L7) 到 [structure-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/structure-analysis.md#L70) 的主题主体
+- [structure-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/structure-analysis.md#L72) 的 QA 引用句
+
+仅允许收紧：
+- [structure-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/structure-analysis.md#L3) 到 [structure-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/structure-analysis.md#L5) 的开头前言
+- [structure-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/structure-analysis.md#L65) 的语言约束句
+
+禁止：
+- 禁止删除 `正式输出`、`分析要求`、`降级策略`、`冲突处理`
+
+### 3.2 `api-and-dependencies.md`
+
+必须保留：
+- [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L7) 到 [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L65) 的主题主体
+- [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L67) 的 QA 引用句
+
+仅允许收紧：
+- [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L3) 到 [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L5) 的开头前言
+- [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L57) 到 [api-and-dependencies.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/api-and-dependencies.md#L60) 的语言约束句
+
+禁止：
+- 禁止删除 API、依赖、外部系统、降级策略主体
+
+### 3.3 `conventions-and-setup.md`
+
+必须保留：
+- [conventions-and-setup.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/conventions-and-setup.md#L7) 到 [conventions-and-setup.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/conventions-and-setup.md#L57) 的主题主体
+- [conventions-and-setup.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/conventions-and-setup.md#L59) 的 QA 引用句
+
+仅允许收紧：
+- [conventions-and-setup.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/conventions-and-setup.md#L3) 到 [conventions-and-setup.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/conventions-and-setup.md#L5) 的开头前言
+- [conventions-and-setup.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/conventions-and-setup.md#L52) 的语言约束句
+
+禁止：
+- 禁止删除约定、环境、脚本、降级策略主体
+
+### 3.4 `domain-model-analysis.md`
+
+必须保留：
+- [domain-model-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/domain-model-analysis.md#L7) 到 [domain-model-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/domain-model-analysis.md#L61) 的主题主体
+- [domain-model-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/domain-model-analysis.md#L63) 的 QA 引用句
+
+仅允许收紧：
+- [domain-model-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/domain-model-analysis.md#L3) 到 [domain-model-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/domain-model-analysis.md#L5) 的开头前言
+- [domain-model-analysis.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/00-first/references/domain-model-analysis.md#L62) 的语言约束句
+
+禁止：
+- 禁止删除实体、关系、状态机、降级策略主体
+
 ## 4. 当前不动文件
 
 - `main-thread-contract.md`

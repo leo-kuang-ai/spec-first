@@ -2,9 +2,7 @@
 
 ## 总原则
 
-- 多 Agent 编排属于 Skill 层，不属于 CLI
 - Agent 负责产出结果，Skill 工作流负责将结果写入最终文件
-- CLI 只做最小支撑与校验
 - 单个 Agent 缺证据时必须显式标记 `[待确认]`
 - 总并发上限为 `3` 个 Agent，禁止超出该上限
 
@@ -35,10 +33,12 @@
   - 产出：`conventions.md`、`development-guidelines.md`、`entry-guide.md`
 - `flow-docs`
   - 产出：`critical-flows.md`、`call-graph.md`
+  - 图示表达统一使用 ASCII 文本图，不使用 Mermaid
 - `api-docs`
   - 产出：`api-docs.md`、`external-deps.md`
 - `structure-docs`
   - 产出：`codebase-overview.md`、`architecture.md`
+  - 架构表达统一使用 ASCII 文本图或表格，不使用 Mermaid
 - `model-docs`
   - 产出：`domain-model.md`、`database-er.md`
 
@@ -129,6 +129,7 @@
 - 默认最终位置：
   - `.spec-first/runtime/first/*.json`
   - `docs/first/*.md`
+- `call-graph.md`、`architecture.md` 等带图文档如需示意，必须使用 ASCII 文本图或表格，不得引入 Mermaid
 - CLI 输出：
   - runtime 校验结果
   - docs 存在性检查结果

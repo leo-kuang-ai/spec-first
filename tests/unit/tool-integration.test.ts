@@ -3,7 +3,7 @@
  * Hook Installer + Commit + Feature CLI + Doctor Extended + AI Runtime Hook
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, symlinkSync, lstatSync } from 'node:fs';
 import { join } from 'node:path';
 import { installHooks, uninstallHooks, checkHooks } from '../../src/core/tool-integration/hook-installer.js';
 import { generateAIHookConfigs, registerAIHooks, executePreToolUse, executeStopHook } from '../../src/core/tool-integration/ai-runtime-hook.js';
@@ -95,6 +95,20 @@ describe('installHooks', () => {
     expect(content).not.toContain('OLD_PRECOMMIT_TEMPLATE');
     expect(content).toContain('--diff-filter=ACMRD');
     expect(content).toContain('while IFS= read -r FILE');
+  });
+
+  it('should replace dangling legacy symlink hooks with managed files', () => {
+    const hookPath = join(TMP, '.git', 'hooks', 'commit-msg');
+    symlinkSync(join(TMP, '.spec-first', 'hooks', 'commit-msg.sh'), hookPath);
+
+    const installed = installHooks(TMP);
+    const stat = lstatSync(hookPath);
+    const content = readFileSync(hookPath, 'utf-8');
+
+    expect(installed).toContain('commit-msg');
+    expect(stat.isSymbolicLink()).toBe(false);
+    expect(content).toContain('spec-first-hook');
+    expect(content).toContain('有效 ID');
   });
 });
 

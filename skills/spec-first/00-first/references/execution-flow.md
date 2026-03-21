@@ -3,10 +3,8 @@
 ## 总原则
 
 - Skill 定义执行流
-- Skill 负责多 Agent 编排
-- CLI 只负责最小支撑层
-- runtime 是机器真源
 - docs 是人类阅读产物
+- 若需要流程、调用链或架构示意，统一使用 ASCII 文本图，不使用 Mermaid
 
 ## Skill 层执行流
 

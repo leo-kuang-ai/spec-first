@@ -359,17 +359,17 @@ function normalizeInitInput(input: InitCliInput, cwd: string): NormalizedInitInp
   }
 
   if (!VALID_MODES.has(input.mode)) {
-    console.error(`无效 mode "${input.mode}"：必须是 N 或 I`);
+    console.error(`当前处于 feature-init 参数校验阶段：mode "${input.mode}" 无效，必须是 N 或 I`);
     return undefined;
   }
   if (!VALID_SIZES.has(input.size)) {
-    console.error(`无效 size "${input.size}"：必须是 S、M 或 L`);
+    console.error(`当前处于 feature-init 参数校验阶段：size "${input.size}" 无效，必须是 S、M 或 L`);
     return undefined;
   }
 
   const parsedPlatforms = parsePlatforms(input.platforms);
   if (parsedPlatforms.values.length === 0) {
-    console.error('无效 platforms：至少需要一个平台（使用 --platforms p1,p2,...）');
+    console.error('当前处于 feature-init 参数校验阶段：至少需要一个平台（使用 --platforms p1,p2,...）');
     return undefined;
   }
   if (parsedPlatforms.hadDuplicates) {
@@ -662,11 +662,15 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
   const preset = buildLegacyBaselinePreset();
   const discoveredPlatforms = discoverPlatforms(cwd);
   if (discoveredPlatforms.length === 0) {
+    console.error('⚠️  当前轨道: brownfield-baseline');
     console.error('⚠️  检测到存量项目但未发现平台模板');
     console.error('');
-    console.error('平台模板属于 Skill/工作流决策，请先运行 `spec-first skill render init` 补齐 .spec-first/layer2/*.yaml 后再继续。');
+    console.error('如果这是新项目或刚 clone 的远程项目，请先补齐 .spec-first/layer2/*.yaml；如同时缺 .spec-first/meta/config.yaml，可先走 project-onboarding 补齐项目壳。');
+    console.error('如果这是存量项目需求迭代，请先补齐平台模板后再继续 brownfield-baseline / feature-init。');
     return ExitCode.VALIDATION_ERROR;
   }
+
+  printBrownfieldBaselineGuide();
 
   console.log('📦 检测到存量项目，建议先创建系统基线');
   console.log('');
@@ -681,8 +685,13 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
   if (isInteractiveTerminal()) {
     const rl = createInterface({ input, output });
     try {
+      console.log('选择建议：');
+      console.log('  [y] 创建基线：先盘点现状，再进入后续业务 Feature');
+      console.log('  [s] 跳过基线：写入 baselineSkipped，以后直接进入 Feature 初始化');
+      console.log('  [n] 退出：暂不初始化');
+      console.log('');
       const answer = await rl.question(
-        '是否创建基线 Feature？[y/跳过(s)/n-退出]: '
+        '是否创建基线 Feature？请输入 y / s / n: '
       );
       const normalized = answer.trim().toLowerCase();
 
@@ -690,15 +699,15 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
         // Write baselineSkipped: true to meta/config.yaml
         writeBaselineSkipped(cwd);
         console.log('');
-        console.log('✅ 已跳过基线创建，写入 .spec-first/meta/config.yaml');
+        console.log('✅ 已跳过 brownfield-baseline，写入 .spec-first/meta/config.yaml');
         console.log('');
-        console.log('下次运行 /spec-first:init 将直接进入 Feature 初始化。');
+        console.log('下次运行 /spec-first:init 将直接进入 feature-init。');
         return ExitCode.SUCCESS;
       }
 
       if (normalized === 'n' || normalized === 'no' || normalized === '否') {
         console.log('');
-        console.log('已取消。');
+        console.log('已取消 brownfield-baseline 选择。');
         return ExitCode.SUCCESS;
       }
       // y / yes / 是 / '' → proceed
@@ -708,11 +717,15 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
   } else {
     // Non-interactive (CI/pipe): do not silently create baseline.
     // Require explicit --track baseline or --track feature to proceed.
-    console.error('⚠️  检测到存量项目需要创建基线，但当前为非交互式终端');
+    console.error('⚠️  检测到存量项目需要先确认是否创建基线，但当前为非交互式终端');
+    console.error('');
+    console.error('选择原则：');
+    console.error('  baseline = 先盘点现状，生成存量系统基线');
+    console.error('  feature  = 你已经明确要直接推进具体业务需求');
     console.error('');
     console.error('请显式指定操作：');
-    console.error('  spec-first init --track baseline    创建存量系统基线 Feature');
-    console.error('  spec-first init --track feature     跳过基线，直接创建业务 Feature');
+    console.error('  spec-first init --track baseline    先创建存量系统基线 Feature');
+    console.error('  spec-first init --track feature     直接跳过基线，创建业务 Feature');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -847,6 +860,24 @@ function printInitHelp(): void {
   console.log(
     '用法：spec-first init --feat <abbr> --mode <N|I> --size <S|M|L> --platforms <p1,p2,...> [--feature-id <id>] [--title <title>] [--bootstrap]\n'
   );
+  console.log('典型场景：');
+  console.log('  - 新项目创建 / 刚 clone 的远程项目：如果 .spec-first 缺失，先走 project-onboarding；已具备基线则直接 feature-init');
+  console.log('  - 本地存量项目需求迭代：优先 brownfield-baseline 盘点现状；如果你已经明确要直接做需求，可用 --track feature');
+  console.log('  - 仅补项目壳：用 --track project，自动补齐 .spec-first 和 meta/config.yaml');
+  console.log('');
+  console.log('轨道选择：');
+  console.log('  - project-onboarding：.spec-first 或 meta/config.yaml 缺失时自动补齐项目壳');
+  console.log('  - brownfield-baseline：存量项目先建基线，盘点现状后再进入业务 Feature');
+  console.log('  - feature-init：greenfield 或已具备基线时，直接创建业务 Feature');
+  console.log('');
+  console.log('如何选择 --track：');
+  console.log('  --track baseline  先创建存量系统基线，适合需要先做现状盘点的项目');
+  console.log('  --track feature   直接进入业务 Feature，适合你已经明确要推进具体需求');
+  console.log('  --track project   先补齐 .spec-first 和 meta/config.yaml，再继续初始化');
+  console.log('');
+  console.log('brownfield 提示：');
+  console.log('  存量项目会先进入 brownfield-baseline；详细解释和选项会在交互流程里展示。');
+  console.log('');
   console.log('参数说明：');
   console.log('  --feat       FEAT 缩写（必须匹配 ^[A-Z][A-Z0-9]{0,15}$，例如 AUTH、REPORT）');
   console.log('  --mode       开发模式：N（新功能）| I（增量迭代）');
@@ -855,6 +886,10 @@ function printInitHelp(): void {
   console.log('  --title      Feature 标题（可选）');
   console.log('  --feature-id 指定 Feature ID（可选，默认自动生成）');
   console.log('  --bootstrap  执行宿主环境自修复（MCP/skills/binaries）');
+  console.log('');
+  console.log('退出语义：');
+  console.log('  - brownfield-baseline 里的 [n] 是放弃本次基线选择');
+  console.log('  - feature-init 里的取消只是终止当前参数收集，不影响已有项目壳或 runtime 资产');
 }
 
 function parsePlatforms(platforms: string | undefined): {
@@ -873,6 +908,15 @@ function parsePlatforms(platforms: string | undefined): {
 
 function isInteractiveTerminal(): boolean {
   return Boolean(input.isTTY && output.isTTY);
+}
+
+function printBrownfieldBaselineGuide(): void {
+  console.log('为什么建议先建基线：');
+  console.log('  - 把当前系统已有能力盘点成一份可分析起点');
+  console.log('  - 后续业务 Feature 会基于这份起点继续，不会把旧系统当空白项目');
+  console.log('');
+  console.log('如果你现在就是要做具体业务需求，也可以跳过基线，直接进入 Feature 初始化。');
+  console.log('');
 }
 
 function discoverPlatforms(projectRoot: string): string[] {
@@ -918,11 +962,20 @@ function ensureLayer2PlatformTemplates(projectRoot: string, platforms: string[])
 function validatePlatformSelection(platforms: string[], projectRoot: string): string | null {
   const discovered = discoverPlatforms(projectRoot);
   if (discovered.length === 0) {
-    return '未发现平台模板：请先创建 .spec-first/layer2/*.yaml（例如 h5.yaml、java-backend.yaml），再执行 init。';
+    return [
+      '当前无法校验 platforms：未发现 .spec-first/layer2/*.yaml 平台模板。',
+      '如果你是新项目或刚 clone 的远程项目，请先补齐 .spec-first/layer2/*.yaml 或先走 project-onboarding。',
+      '如果你是存量项目需求迭代，请先确认是否需要 brownfield-baseline，再继续 feature-init。',
+    ].join('\n');
   }
   const missing = platforms.filter((platform) => !discovered.includes(platform));
   if (missing.length > 0) {
-    return `无效 platforms：${missing.join(', ')}。可选平台：${discovered.join(', ')}`;
+    return [
+      '当前处于 feature-init 参数校验阶段：所选 platforms 与 .spec-first/layer2/*.yaml 不匹配。',
+      `缺失平台: ${missing.join(', ')}`,
+      `可选平台: ${discovered.join(', ')}`,
+      '如果你是新项目或刚 clone 的远程项目，请先补齐平台模板；如果你是存量项目需求迭代，请确认当前是否应先走 brownfield-baseline。',
+    ].join('\n');
   }
   return null;
 }
@@ -1142,7 +1195,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('  检测到以下可用平台（来自 .spec-first/layer2/*.yaml）：\n');
     const selectedPlatforms = await askPlatformsInteractively(rl, discovered);
     if (!selectedPlatforms || selectedPlatforms.length === 0) {
-      console.error('\n❌ 未选择任何平台，已取消初始化。');
+      console.error('\n❌ 当前处于 feature-init 平台选择阶段：未选择任何平台，已取消初始化。');
       return null;
     }
     const platforms = selectedPlatforms.join(',');
@@ -1176,6 +1229,8 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
       bootstrap ? '是 - 包含宿主环境检查（推荐）' : '否（仅项目内初始化）'
     );
 
+    printInitScenarioSummary(process.cwd(), 'feature-init');
+
     // 最终确认
     console.log('\n  ---');
     console.log('  参数确认\n');
@@ -1190,7 +1245,7 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log(`  Bootstrap:       ${bootstrap ? '是' : '否'}`);
     const confirm = await rl.question('\n是否继续？[y/n]: ');
     if (!isConfirmed(confirm)) {
-      console.error('\n❌ 已取消初始化。');
+      console.error('\n❌ 当前处于 feature-init 最终确认阶段：已取消初始化。');
       return null;
     }
 
@@ -1206,6 +1261,29 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
   } finally {
     rl.close();
   }
+}
+
+function printInitScenarioSummary(projectRoot: string, baselineMode: InitTrack): void {
+  const readiness = checkInitReadiness(projectRoot);
+  const summary = summarizeFirstArtifacts(projectRoot);
+  console.log('\n初始化场景摘要：');
+  console.log(`  当前轨道: ${baselineMode}`);
+  if (baselineMode === 'brownfield-baseline') {
+    console.log('  解释: 当前是存量项目，建议先做系统基线，再继续业务 Feature');
+  } else {
+    console.log('  解释: 当前将直接创建业务 Feature');
+  }
+  if (readiness.firstCompleted && summary.mode === 'deep') {
+    console.log('  00-first: 已完成，可直接进入参数确认');
+  } else if (readiness.indexExistsButIncomplete) {
+    console.log('  00-first: 降级可用，后续建议补跑 /spec-first:first');
+  } else {
+    console.log('  00-first: 信息不足，允许继续初始化，建议后续补跑 /spec-first:first');
+  }
+  if (readiness.projectMissing.length > 0) {
+    console.log(`  项目壳缺失: ${readiness.projectMissing.join(', ')}`);
+  }
+  console.log('');
 }
 
 async function askUntilValid(

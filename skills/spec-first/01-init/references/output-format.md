@@ -15,6 +15,7 @@
 - 输出 `00-first Skill 已完成`
 - 输出项目摘要、代码量、API 端点信息
 - 继续进入参数收集与 Feature 创建
+- 在最终参数确认前，补一段“初始化场景摘要”，说明当前轨道、为什么这样路由、以及是否建议后续补跑 `/spec-first:first`
 
 ### 2.2 降级状态
 
@@ -28,6 +29,12 @@
 - 输出 `当前背景信息不足，按降级模式继续`
 - 允许继续收集 `feat`、`mode`、`size`、`platforms` 等参数
 - 在完成初始化后提示补跑 `/spec-first:first`
+
+### 2.4 存量项目基线建议
+
+- `brownfield-baseline` 的详细解释与选项由 [interaction-guide.md](interaction-guide.md) 统一定义
+- CLI 在最终确认前只需保留一段“初始化场景摘要”
+- 当用户明确选择直接推进业务需求时，摘要应说明“当前将直接创建业务 Feature”
 
 ## 3. 输出要求
 

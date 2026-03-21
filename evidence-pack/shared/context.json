@@ -1,14 +1,11 @@
 {
   "serena_status": "active",
-  "serena_available": true,
   "fallback": null,
-  "project_root": "/Users/kuang/xiaobu/spec-first",
-  "current_feature": null,
-  "current_stage": null,
-  "execution_mode": "deep",
-  "config": {
-    "max_concurrency": 3,
-    "max_retry": 1,
-    "language": "zh-CN"
+  "key_config": {
+    "type": "module",
+    "node_version": ">=20.0.0",
+    "typescript": "^5.4.0",
+    "bundler": "tsup",
+    "test_framework": "vitest"
   }
 }

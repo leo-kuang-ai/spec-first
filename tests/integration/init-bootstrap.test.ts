@@ -262,6 +262,39 @@ describe('init bootstrap integration', () => {
     }
   });
 
+  it('should explain why baseline is suggested for non-interactive brownfield projects', async () => {
+    mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
+    writeFileSync(
+      join(TMP, '.spec-first', 'meta', 'config.yaml'),
+      'baselineSkipped: false\nversion: 1.0\nproject: brownfield\n',
+      'utf-8'
+    );
+    mkdirSync(join(TMP, 'src', 'brownfield'), { recursive: true });
+    for (let i = 1; i <= 55; i += 1) {
+      writeFileSync(join(TMP, 'src', 'brownfield', `file-${i}.ts`), 'export const value = 1;\n', 'utf-8');
+    }
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = await handleInit([]);
+
+      expect(code).toBe(2);
+      const output = [...logSpy.mock.calls.flat(), ...errorSpy.mock.calls.flat()].join('\n');
+      expect(output).toContain('为什么建议先建基线');
+      expect(output).toContain('把当前系统已有能力盘点成一份可分析起点');
+      expect(output).toContain('如果你现在就是要做具体业务需求');
+      expect(output).toContain('baseline = 先盘点现状');
+      expect(output).toContain('feature  = 你已经明确要直接推进具体业务需求');
+      expect(output).toContain('spec-first init --track baseline');
+      expect(output).toContain('spec-first init --track feature');
+      expect(output).not.toContain('是否创建基线 Feature？');
+    } finally {
+      logSpy.mockRestore();
+      errorSpy.mockRestore();
+    }
+  });
+
   it('should stop early for brownfield baseline when layer2 templates are missing', async () => {
     rmSync(join(TMP, '.spec-first', 'layer2'), { recursive: true, force: true });
     mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
@@ -282,8 +315,10 @@ describe('init bootstrap integration', () => {
 
       expect(code).toBe(2);
       const output = [...logSpy.mock.calls.flat(), ...errorSpy.mock.calls.flat()].join('\n');
-      expect(output).toContain('spec-first skill render init');
-      expect(output).toContain('平台模板属于 Skill/工作流决策');
+      expect(output).toContain('当前轨道: brownfield-baseline');
+      expect(output).toContain('如果这是新项目或刚 clone 的远程项目，请先补齐 .spec-first/layer2/*.yaml');
+      expect(output).toContain('如同时缺 .spec-first/meta/config.yaml');
+      expect(output).toContain('如果这是存量项目需求迭代');
       expect(output).not.toContain('是否创建基线 Feature');
     } finally {
       logSpy.mockRestore();

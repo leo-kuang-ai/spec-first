@@ -44,7 +44,7 @@ spec-first first
 
 ## 最小执行流
 
-详细执行流见 `references/execution-flow.md`。Agent 层完成认知产出后直接写入最终 `.spec-first/runtime/first/*` 与 `docs/first/*`，CLI 层负责校验与宿主集成。
+详细执行流见 `references/execution-flow.md`。本文件只保留入口级说明，不重复执行步骤正文。
 
 ## 主线程契约
 
@@ -74,6 +74,7 @@ spec-first first
 - 先有 runtime 结果，再允许写入 runtime 真源
 - Skill 工作流直接写入最终 runtime/docs 文件，CLI 不承担文件交付职责
 - docs 不得回灌为真源
+- 需要图示时统一使用 ASCII 文本图，不得新增 Mermaid 代码块
 - 无法确认的结论必须标记 `[待确认]`
 - `database-er.md` 只有在 `databaseSchema.status === healthy` 时才允许产出
 - `api-docs.md` 只服务项目 API 接口规范，不承载外部依赖综述
@@ -85,4 +86,5 @@ spec-first first
 - 在 `databaseSchema.status !== healthy` 时强行消费 `database-er.md`
 - 在 projection/renderer 层补充 runtime 中不存在的新事实
 - 把 Agent 编排逻辑继续下沉到 `src` 代码里
+- 用 Mermaid 代替 ASCII 文本图，导致宿主阅读和复制成本上升
 - runtime 资产完整时重跑 `first`（应改用 `catchup`）

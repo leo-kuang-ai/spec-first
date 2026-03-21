@@ -11,7 +11,8 @@ import {
   unlinkSync,
 } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { request as httpRequest } from 'node:http';
 import net from 'node:net';
 
 const DEFAULT_HOST = process.env.SPEC_FIRST_VIEWER_HOST ?? '127.0.0.1';
@@ -122,6 +123,65 @@ function isPortOpen(host, port, timeoutMs = 450) {
   });
 }
 
+export function isViewerRootHtmlHealthy(html) {
+  return typeof html === 'string'
+    && html.includes('<h1>Spec-First Viewer</h1>')
+    && !html.includes('stage viewer index.html missing');
+}
+
+export function probeViewerRoot(host, port, timeoutMs = 800) {
+  return new Promise((resolvePromise) => {
+    const req = httpRequest(
+      {
+        host,
+        port,
+        path: '/',
+        method: 'GET',
+        timeout: timeoutMs,
+      },
+      (res) => {
+        let body = '';
+
+        res.setEncoding('utf-8');
+        res.on('data', (chunk) => {
+          body += chunk;
+        });
+        res.on('end', () => {
+          resolvePromise(res.statusCode === 200 && isViewerRootHtmlHealthy(body));
+        });
+      },
+    );
+
+    req.on('timeout', () => {
+      req.destroy();
+      resolvePromise(false);
+    });
+    req.on('error', () => resolvePromise(false));
+    req.end();
+  });
+}
+
+export function clearViewerStateFile(stateFile) {
+  try {
+    unlinkSync(stateFile);
+  } catch {
+    // ignore missing or already-cleaned state
+  }
+}
+
+export async function isStateHealthy(state, projectRoot, deps = {}) {
+  if (!state || typeof state !== 'object') return false;
+  if (state.projectRoot !== projectRoot) return false;
+  if (typeof state.host !== 'string' || !state.host) return false;
+  if (!Number.isInteger(state.port) || state.port <= 0) return false;
+
+  const portOpen = deps.portOpen ?? isPortOpen;
+  const rootProbe = deps.rootProbe ?? probeViewerRoot;
+
+  if (!(await portOpen(state.host, state.port))) return false;
+  return rootProbe(state.host, state.port);
+}
+
 function openBrowser(url) {
   // Use python webbrowser module (same as serena) — reliable across all environments
   // including Claude hook subprocess chains where macOS 'open' command fails silently.
@@ -172,20 +232,11 @@ function launchServer(projectRoot, host, port, stateFile, source) {
   child.unref();
 }
 
-async function isStateHealthy(state, projectRoot) {
-  if (!state || typeof state !== 'object') return false;
-  if (state.projectRoot !== projectRoot) return false;
-  if (typeof state.host !== 'string' || !state.host) return false;
-  if (!Number.isInteger(state.port) || state.port <= 0) return false;
-  return isPortOpen(state.host, state.port);
-}
-
 async function waitForStateFile(stateFile, projectRoot, host, retries = 40, intervalMs = 120) {
   for (let index = 0; index < retries; index += 1) {
     const state = readJson(stateFile);
     if (state && state.projectRoot === projectRoot && state.host === host && Number.isInteger(state.port) && state.port > 0) {
-      const ready = await isPortOpen(state.host, state.port);
-      if (ready) {
+      if (await isStateHealthy(state, projectRoot)) {
         return state;
       }
     }
@@ -257,17 +308,21 @@ async function main() {
     if (await isStateHealthy(state, projectRoot)) {
       activeState = state;
     } else {
+      clearViewerStateFile(runtime.stateFile);
       const preferredPort = Number.isInteger(args.port) ? args.port : 0;
       launchServer(projectRoot, args.host, preferredPort, runtime.stateFile, args.source);
 
       activeState = await waitForStateFile(runtime.stateFile, projectRoot, args.host);
       if (!activeState && preferredPort > 0 && (await isPortOpen(args.host, preferredPort))) {
-        activeState = {
+        const fallbackState = {
           host: args.host,
           port: preferredPort,
           url: `http://${args.host}:${preferredPort}`,
           projectRoot,
         };
+        if (await isStateHealthy(fallbackState, projectRoot)) {
+          activeState = fallbackState;
+        }
       }
     }
   } finally {
@@ -292,4 +347,9 @@ async function main() {
   }
 }
 
-main().catch(() => process.exit(0));
+const isMainModule = process.argv[1]
+  && import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMainModule) {
+  main().catch(() => process.exit(0));
+}

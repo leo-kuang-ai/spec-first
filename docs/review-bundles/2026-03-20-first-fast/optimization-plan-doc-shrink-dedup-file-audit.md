@@ -11,9 +11,9 @@
 
 最佳方案不是“统一压短所有文档”，而是：
 
-- 保留 5 份主合同文档为权威来源
+- 保留核心主合同与 owner 文档为权威来源
 - 保留 5 份 agent 执行提示文档为轻壳
-- 对 5 份主题规范文档做局部去重
+- 对 4 份主题主文件做局部去重
 - 对数据库 3 件套做主次收口
 - 对 `SKILL.md` 只做轻量去重，不做结构性压缩
 - 保持 `testing-strategy.md` 独立完整，不参与瘦身主战场
@@ -221,7 +221,7 @@
 - 风险级别：`MEDIUM`
 
 **审查修正**
-- 与 `change-order.md` 对齐：保留简版状态表，不保留完整扩展说明
+- 与 `optimization-plan-doc-shrink-dedup-change-order.md` 对齐：保留简版状态表，不保留完整扩展说明
 
 ### 3.10 `references/platform-document-mapping.md`
 

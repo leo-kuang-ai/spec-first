@@ -1,61 +1,44 @@
 # 外部依赖
 
-> 本文档列出 spec-first 项目的所有外部依赖及其用途。
+> 真源: `.spec-first/runtime/first/summary.json` + `package.json`
 
 ## 运行时依赖
 
-### 核心依赖
-
-#### handlebars@^4.7.8
-- **用途**: 模板渲染引擎
-- **使用场景**: 生成规范文档、配置文件、代码骨架等
-- **代码位置**: `src/core/template/renderer.ts`
-- **许可证**: MIT
-
-#### js-yaml@^4.1.0
-- **用途**: YAML 解析与序列化
-- **使用场景**: 解析项目配置、Layer 2 规范配置
-- **代码位置**: `src/shared/config-loader.ts`
-- **许可证**: MIT
-
-#### semver@^7.7.4
-- **用途**: 语义版本控制
-- **使用场景**: CLI 版本校验、配置兼容性检查
-- **代码位置**: `src/cli/commands/update.ts`
-- **许可证**: ISC
-
-#### update-notifier@^7.0.0
-- **用途**: CLI 更新通知
-- **使用场景**: 检测并提示用户安装新版本
-- **代码位置**: `src/cli/index.ts`
-- **许可证**: BSD-2-Clause
+| 包名 | 版本 | 用途 |
+|------|------|------|
+| `handlebars` | ^4.7.8 | 模板引擎，用于产物生成 |
+| `js-yaml` | ^4.1.0 | YAML 配置解析 |
+| `semver` | ^7.7.4 | 语义版本号处理 |
+| `update-notifier` | ^7.0.0 | 版本更新检测 |
 
 ## 开发依赖
 
-### 构建工具
-- **tsup@^8.5.1** - TypeScript 打包（ESM/CJS）
-- **typescript@^5.4.0** - TypeScript 编译器
+| 包名 | 版本 | 用途 |
+|------|------|------|
+| `typescript` | ^5.4.0 | 类型系统 |
+| `tsup` | ^8.5.1 | 构建打包 |
+| `vitest` | ^1.6.1 | 单元测试框架 |
+| `@vitest/coverage-v8` | ^1.6.1 | 测试覆盖率 (v8 引擎) |
+| `eslint` | ^10.0.2 | 代码检查 |
+| `typescript-eslint` | ^8.56.1 | TypeScript ESLint 规则 |
+| `@eslint/js` | ^10.0.1 | ESLint JS 配置 |
+| `prettier` | ^3.8.1 | 代码格式化 |
+| `jsdom` | ^28.1.0 | DOM 环境模拟 (测试用) |
+| `@types/node` | ^20.11.0 | Node.js 类型定义 |
+| `@types/js-yaml` | ^4.0.9 | js-yaml 类型定义 |
+| `@types/semver` | ^7.7.1 | semver 类型定义 |
 
-### 测试工具
-- **vitest@^1.6.1** - 单元测试框架
-- **@vitest/coverage-v8@^1.6.1** - 覆盖率工具
+## 运行环境
 
-### 代码质量
-- **eslint@^10.0.2** - 代码检查
-- **typescript-eslint@^8.56.1** - TypeScript ESLint 支持
-- **prettier@^3.8.1** - 代码格式化
+| 组件 | 要求 |
+|------|------|
+| Node.js | >=20.0.0 |
+| 模块系统 | ESM (`"type": "module"`) |
 
-### 类型定义
-- **@types/node@^20.11.0** - Node.js 类型定义
-- **@types/js-yaml@^4.0.9** - js-yaml 类型定义
-- **@types/semver@^7.7.1** - semver 类型定义
+## pnpm Overrides
 
-## 包管理器
-
-- **开发**: pnpm@≥8.0（推荐）
-- **用户**: npm@≥9.0（内置）
-
-## 证据来源
-
-- `package.json:1-102` — 依赖声明 (`[显式]`)
-- `pnpm-lock.yaml` — 锁定版本 (`[显式]`)
+| 包名 | 版本 | 原因 |
+|------|------|------|
+| `rollup` | ^4.59.0 | 安全更新 |
+| `minimatch` | ^3.1.3 | 安全更新 |
+| `esbuild` | ^0.27.3 | 安全更新 |

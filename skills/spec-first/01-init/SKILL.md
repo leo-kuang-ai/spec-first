@@ -11,13 +11,19 @@ description: |
 
 - Command: `/spec-first:init`
 
+适用场景：
+- 新项目创建
+- 刚 clone 下来的 git 远程项目
+- 本地存量项目的需求迭代
+- 仅补齐 `.spec-first` 项目壳或 `meta/config.yaml`
+
 ## 背景质量契约
 
 - 本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)
 - `backgroundInputStatus` / `background_input_status` 三个值：`full` | `degraded` | `blind`
 - `first` 是优先背景输入，不是硬阻断前置；`degraded`/`blind` 时允许降级初始化，但必须给出补跑 `/spec-first:first` 的建议
 
-## 五轨道自动路由
+## 三轨道自动路由
 
 `spec-first init` 根据项目当前状态自动识别并路由到三条轨道之一：
 
@@ -41,11 +47,12 @@ description: |
 
 1. 提示用户存量项目尚无基线
 2. 显示将创建的 baseline Feature 参数（featureId: `FSREQ-19700101-LEGACY-BASELINE`，mode: I，size: M）
-3. 提供三个选项：
+3. 先解释为什么建议建基线：把当前系统已有能力盘点成一份可分析起点，后续业务 Feature 基于这份起点继续，不把旧系统当空白项目
+4. 提供三个选项：
    - **[y] 创建基线**：自动生成 baseline Feature，含 `prd.md`（已上线能力摘要）和 `task_plan.md`（基线补齐）
-   - **[s] 跳过**：写入 `baselineSkipped: true` 到 `.spec-first/meta/config.yaml`，下次直接进入 feature-init
+   - **[s] 跳过**：写入 `baselineSkipped: true` 到 `.spec-first/meta/config.yaml`，下次直接进入 feature-init；适合你已经明确要直接推进某个业务需求
    - **[n] 退出**：取消操作
-4. 创建基线后，提示用户完成 `prd.md` 盘点，然后再运行 `/spec-first:init` 创建业务 Feature
+5. 创建基线后，提示用户完成 `prd.md` 盘点，然后再运行 `/spec-first:init` 创建业务 Feature
 
 ### feature-init 轨道
 

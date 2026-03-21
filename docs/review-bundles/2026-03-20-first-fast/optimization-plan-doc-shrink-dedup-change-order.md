@@ -159,6 +159,10 @@
 
 ## 3. 文件级执行清单
 
+说明：
+- 本节是施工主清单，覆盖本次实际要动的全部 live 文件。
+- 其中高风险文件看本节即可开始施工；更细的行号级边界同步见 `optimization-plan-doc-shrink-dedup-execution-checklist.md`。
+
 ### 3.1 `skills/spec-first/00-first/SKILL.md`
 
 可做：
@@ -195,7 +199,27 @@
 不可做：
 - 降级为单纯示例文档。
 
-### 3.5 `skills/spec-first/00-first/references/quality-assurance-rules.md`
+### 3.5 `skills/spec-first/00-first/references/database-conditional-projection.md`
+
+可做：
+- 压成“概览 + 跳转”文件。
+- 保留 `healthy / degraded / not_applicable` 三行简版状态表。
+- 删除完整证据来源列表、凭证防护细则、独立 QA 尾注。
+
+不可做：
+- 删除 `database-er.md` 的条件产出语义。
+- 把数据库规则正文重新写回本文件。
+
+### 3.6 `skills/spec-first/00-first/references/platform-document-mapping.md`
+
+可做：
+- 仅保留正式文档全集、端类型内容侧重点、条件型能力简表。
+- 删除与 `database-config.md` 重复的数据库状态正文。
+
+不可做：
+- 让本文件承担数据库状态 canonical owner。
+
+### 3.7 `skills/spec-first/00-first/references/quality-assurance-rules.md`
 
 可做：
 - 收缩泛化说明。
@@ -204,6 +228,46 @@
 不可做：
 - 降低质量门禁。
 - 放松主线程消费边界。
+
+### 3.8 `skills/spec-first/00-first/references/structure-analysis.md`
+
+可做：
+- 收紧开头 `正式 contract` / `执行提示` 前言。
+- 将尾部 QA 尾注压成短引用句。
+- 将语言约束压成一句短规则。
+
+不可做：
+- 删除 `正式输出`、`分析要求`、`降级策略`、`冲突处理` 主体。
+
+### 3.9 `skills/spec-first/00-first/references/api-and-dependencies.md`
+
+可做：
+- 收紧开头前言。
+- 将语言约束压成一句短规则。
+- 将尾部 QA 尾注压成短引用句。
+
+不可做：
+- 删除 API、依赖、外部系统、证据要求主体。
+
+### 3.10 `skills/spec-first/00-first/references/conventions-and-setup.md`
+
+可做：
+- 收紧开头前言。
+- 将语言约束压成一句短规则。
+- 将尾部 QA 尾注压成短引用句。
+
+不可做：
+- 删除约定、环境、脚本、降级策略主体。
+
+### 3.11 `skills/spec-first/00-first/references/domain-model-analysis.md`
+
+可做：
+- 收紧开头前言。
+- 将语言约束压成一句短规则。
+- 将尾部 QA 尾注压成短引用句。
+
+不可做：
+- 删除实体、关系、状态机、降级策略主体。
 
 ## 4. 不执行清单
 

@@ -67,6 +67,8 @@
 - `not_applicable` → 不产出
 - `degraded` → 不产出正式文档，仅记录告警
 
+数据库状态语义、schema 来源优先级与安全约束统一见 `references/database-config.md`。
+
 ## 5. 降级策略
 
 - 无法识别端类型时，仍产出正式文档全集

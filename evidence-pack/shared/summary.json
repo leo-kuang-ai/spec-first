@@ -1,43 +1,29 @@
 {
-  "project": {
-    "name": "spec-first",
-    "platformType": "backend",
-    "subType": "cli-tool",
-    "language": "TypeScript",
-    "runtime": "Node.js >= 20.0.0",
-    "version": "1.1.4"
+  "project_type": {
+    "primary": "backend",
+    "subtype": "cli-tool"
   },
   "entry_points": {
-    "cli": "dist/cli/index.js",
-    "source": "src/cli/index.ts"
-  },
-  "tech_stack": {
-    "build": "tsup",
-    "test": "Vitest",
-    "lint": "ESLint + Prettier",
-    "templates": "Handlebars",
-    "config": "js-yaml"
+    "cli": "src/cli/index.ts",
+    "bin": "dist/cli/index.js"
   },
   "core_modules": [
     "process-engine",
-    "trace-engine",
-    "gate-engine",
-    "change-mgr",
+    "skill-runtime",
     "ai-orchestrator",
+    "gate-engine",
+    "trace-engine",
+    "change-mgr",
+    "template",
+    "tool-integration",
     "metrics-engine",
-    "tool-integration"
+    "validators",
+    "task-plan",
+    "rules",
+    "batch-executor",
+    "migrations"
   ],
-  "key_dependencies": [
-    "handlebars",
-    "js-yaml",
-    "semver",
-    "update-notifier"
-  ],
-  "gaps": [],
-  "evidence_paths": [
-    "package.json:1",
-    "README.md:1",
-    "tsconfig.json:1",
-    "src/cli/index.ts"
-  ]
+  "cli_commands": 27,
+  "skills_count": 20,
+  "gaps": []
 }

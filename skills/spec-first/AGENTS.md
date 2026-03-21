@@ -1,7 +1,7 @@
 ---
 version: 1.0.0
-last_updated: 2026-03-18
-changelog: Aligned doctor MCP/skills checks with manifest-driven source of truth
+last_updated: 2026-03-21
+changelog: Aligned doctor MCP/skills checks with manifest-driven source of truth; added global ASCII-only diagram rule
 description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 ---
 
@@ -65,6 +65,11 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
   - **阻断型 Hook**：失败时必须输出 stderr + 非 0 退出（如 gate check）
   - **提醒型 Hook**：输出 stderr 提示，但必须 exit 0（如 stop-guard.sh）
 - 非阻断型 Hook 失败必须可降级，避免单点故障拖垮主流程。
+
+## 文档图示约定（全局）
+
+- `skills/spec-first` 目录下的 Skill、共享文档与参考文档，在需要表达流程、调用链、架构、时序或 ER 关系时，统一使用 ASCII 文本图或表格，不使用 Mermaid
+- 复杂关系优先拆成列表、矩阵和 ASCII 树形结构，避免依赖渲染器才能理解内容
 
 ## 项目概述
 

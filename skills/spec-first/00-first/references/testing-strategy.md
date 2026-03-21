@@ -94,6 +94,7 @@
 - 修改 `first-doc-projection.ts`
 - 修改 `first-bootstrap.ts`
 - 修改任意增强提示文件或主题 reference
+- 修改图示输出格式，尤其是 Mermaid -> ASCII 的迁移
 
 ## 5. 最低断言
 
@@ -130,3 +131,4 @@
 - 测试对象按 runtime assets 与 docs outputs 分层
 - 条件型能力与专题文档有独立断言
 - 文档测试与代码测试使用同一 contract 口径
+- docs 输出中不得再出现 Mermaid 图块
