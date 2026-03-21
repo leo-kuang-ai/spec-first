@@ -2,6 +2,7 @@
 
 > **当前正式 contract**：单一标准模式 runtime-first。
 > 正式真源以 `domain-model.json` 为准；`domain-model.md` 为该真源的阅读输出。
+> 执行提示见 `references/agent-domain-model.md`，两者分工不同。
 
 ## 1. 输入来源
 

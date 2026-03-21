@@ -13,7 +13,7 @@
 **背景状态提示**:
 - 开始交互前先检查 runtime 真源
 - 成功时显示 `background_input_status`
-- 若为 `degraded`，必须显式提示”无完整 first 资产 / 当前为降级模式”
+- 若为 `degraded` 或 `blind`，必须显式提示“无完整 first 资产 / 当前为降级模式”，但继续交互
 
 ---
 
@@ -161,3 +161,5 @@ Feature ID:    FSREQ-20260310-HOMEPAGE-001
 
 是否继续初始化？[y/N]: _
 ```
+
+> 若为 `blind`，提示语义保持一致，只是将当前背景状态替换为 `background_input_status = blind`。

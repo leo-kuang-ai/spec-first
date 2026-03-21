@@ -10,12 +10,14 @@
 ## 输入证据
 
 - 本轮 evidence pack（配置文件、脚本、环境模板、启动与验证命令）
+- Serena 可用时优先使用符号工具，`shared/summary.json` 与 `shared/context.json` 用于快速定位入口与环境线索
 - 代码与配置中可见的版本约束与规则（如 package.json / toolchain / CI）
 
-## 输出资产
+## 输出约束
 
-- `conventions.json`
-- `entry-guide.json`
+- 当前任务只负责补足当前 wave 所需证据，帮助生成 `conventions.json` 与 `entry-guide.json`
+- 具体输出资产定义见 `references/conventions-and-setup.md`
+- 不得把长篇分析回灌主线程
 
 ## 缺口标记
 

@@ -1,0 +1,43 @@
+{
+  "project": {
+    "name": "spec-first",
+    "platformType": "backend",
+    "subType": "cli-tool",
+    "language": "TypeScript",
+    "runtime": "Node.js >= 20.0.0",
+    "version": "1.1.4"
+  },
+  "entry_points": {
+    "cli": "dist/cli/index.js",
+    "source": "src/cli/index.ts"
+  },
+  "tech_stack": {
+    "build": "tsup",
+    "test": "Vitest",
+    "lint": "ESLint + Prettier",
+    "templates": "Handlebars",
+    "config": "js-yaml"
+  },
+  "core_modules": [
+    "process-engine",
+    "trace-engine",
+    "gate-engine",
+    "change-mgr",
+    "ai-orchestrator",
+    "metrics-engine",
+    "tool-integration"
+  ],
+  "key_dependencies": [
+    "handlebars",
+    "js-yaml",
+    "semver",
+    "update-notifier"
+  ],
+  "gaps": [],
+  "evidence_paths": [
+    "package.json:1",
+    "README.md:1",
+    "tsconfig.json:1",
+    "src/cli/index.ts"
+  ]
+}

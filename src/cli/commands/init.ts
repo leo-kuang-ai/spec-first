@@ -63,7 +63,7 @@ interface InitReadinessStatus {
 }
 
 interface FirstSummary {
-  mode: 'quick' | 'deep' | 'unknown';
+  mode: 'deep' | 'unknown';
   techStack: string;
   codeVolume: string;
   apiSurface: string;
@@ -78,12 +78,9 @@ export type ProjectMaturity = 'greenfield' | 'brownfield';
 export type InitTrack =
   | 'project-onboarding'
   | 'brownfield-baseline'
-  | 'feature-init'
-  | 'feature-init-blocked'
-  | 'no-git';
+  | 'feature-init';
 
 export interface InitProjectState {
-  gitReady: boolean;
   specFirstDirExists: boolean;
   metaConfigExists: boolean;
   firstRuntimeHealthy: boolean;
@@ -98,17 +95,14 @@ export interface InitProjectState {
  * Detect current project initialization state.
  */
 export function detectInitProjectState(projectRoot: string): InitProjectState {
-  // 1. Check git repo
-  const gitReady = existsSync(join(projectRoot, '.git'));
-
-  // 2. Check .spec-first directory
+  // 1. Check .spec-first directory
   const specFirstDirExists = existsSync(join(projectRoot, '.spec-first'));
 
-  // 3. Check meta/config.yaml
+  // 2. Check meta/config.yaml
   const metaConfigPath = join(projectRoot, '.spec-first', 'meta', 'config.yaml');
   const metaConfigExists = existsSync(metaConfigPath);
 
-  // 4. Check first runtime health (index.json must exist and all sub-records healthy)
+  // 3. Check first runtime health (index.json must exist and all sub-records healthy)
   let firstRuntimeHealthy = false;
   const runtimeIndexPath = join(projectRoot, '.spec-first', 'runtime', 'first', 'index.json');
   if (existsSync(runtimeIndexPath)) {
@@ -130,11 +124,11 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
     }
   }
 
-  // 5. Detect legacy baseline directory
+  // 4. Detect legacy baseline directory
   const legacyBaselinePath = join(projectRoot, 'specs', LEGACY_BASELINE_FEATURE_ID);
   const hasLegacyBaseline = existsSync(legacyBaselinePath);
 
-  // 6. Detect any non-legacy feature directories under specs/
+  // 5. Detect any non-legacy feature directories under specs/
   const specsDir = join(projectRoot, 'specs');
   let hasAnyFeature = false;
   if (existsSync(specsDir)) {
@@ -150,7 +144,7 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
     }
   }
 
-  // 7. Read baselineSkipped flag from meta/config.yaml
+  // 6. Read baselineSkipped flag from meta/config.yaml
   let baselineSkipped = false;
   if (metaConfigExists) {
     try {
@@ -162,14 +156,13 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
     }
   }
 
-  // 8. Classify project maturity (reuse first-platform-detector logic)
+  // 7. Classify project maturity (reuse first-platform-detector logic)
   const projectMaturity = classifyProjectMaturity(projectRoot);
 
-  // 9. Discover available platforms from layer2
+  // 8. Discover available platforms from layer2
   const discoveredPlatforms = discoverPlatforms(projectRoot);
 
   return {
-    gitReady,
     specFirstDirExists,
     metaConfigExists,
     firstRuntimeHealthy,
@@ -186,13 +179,9 @@ export function detectInitProjectState(projectRoot: string): InitProjectState {
  *
  * Routing priority (highest first):
  *   1. Explicit --track flag override
- *   2. No git → no-git
- *   3. .spec-first missing or meta/config missing → project-onboarding
- *   4. First runtime unhealthy:
- *      - with --feat flag → feature-init-blocked (signal error to user)
- *      - otherwise        → project-onboarding
- *   5. Brownfield with no legacy baseline, not skipped, no existing features → brownfield-baseline
- *   6. Default → feature-init
+ *   2. .spec-first missing or meta/config missing → project-onboarding
+ *   3. Brownfield with no legacy baseline, not skipped, no existing features → brownfield-baseline
+ *   4. Default → feature-init
  */
 export function detectInitTrack(state: InitProjectState, args: string[]): InitTrack {
   // 1. Explicit --track override takes highest priority
@@ -209,20 +198,10 @@ export function detectInitTrack(state: InitProjectState, args: string[]): InitTr
     }
   }
 
-  // 2. No git repo
-  if (!state.gitReady) return 'no-git';
-
-  // 3. Project not yet onboarded (.spec-first or meta/config missing)
+  // 2. Project not yet onboarded (.spec-first or meta/config missing)
   if (!state.specFirstDirExists || !state.metaConfigExists) return 'project-onboarding';
 
-  // 4. First runtime unhealthy
-  if (!state.firstRuntimeHealthy) {
-    // Explicit --feat arg means user is trying to create a feature but is blocked
-    if (args.includes('--feat')) return 'feature-init-blocked';
-    return 'project-onboarding';
-  }
-
-  // 5. Brownfield with no baseline captured yet and user hasn't explicitly skipped it
+  // 3. Brownfield with no baseline captured yet and user hasn't explicitly skipped it
   if (
     state.projectMaturity === 'brownfield' &&
     !state.hasLegacyBaseline &&
@@ -399,10 +378,13 @@ function normalizeInitInput(input: InitCliInput, cwd: string): NormalizedInitInp
     );
   }
 
-  const platformValidationError = validatePlatformSelection(parsedPlatforms.values, cwd);
-  if (platformValidationError) {
-    console.error(platformValidationError);
-    return undefined;
+  const discovered = discoverPlatforms(cwd);
+  if (discovered.length > 0) {
+    const platformValidationError = validatePlatformSelection(parsedPlatforms.values, cwd);
+    if (platformValidationError) {
+      console.error(platformValidationError);
+      return undefined;
+    }
   }
 
   return {
@@ -644,17 +626,11 @@ export async function handleInit(args: string[]): Promise<number> {
 
   // ── Step 3: Dispatch to track handler ───────────────────────────────────
   switch (track) {
-    case 'no-git':
-      return runNoGitTrack();
-
     case 'project-onboarding':
-      return runProjectOnboardingTrack(state, cwd);
+      return await runProjectOnboardingTrack(state, cwd, args);
 
     case 'brownfield-baseline':
       return await runBrownfieldBaselineTrack(args, cwd);
-
-    case 'feature-init-blocked':
-      return runFeatureInitBlockedTrack();
 
     case 'feature-init':
     default:
@@ -666,77 +642,29 @@ export async function handleInit(args: string[]): Promise<number> {
 // Track handlers
 // ─────────────────────────────────────────────
 
-function runNoGitTrack(): number {
-  console.error('⚠️  未检测到 Git 仓库');
-  console.error('');
-  console.error('spec-first 需要在 Git 仓库中运行。');
-  console.error('');
-  console.error('建议操作：');
-  console.error('  git init');
-  console.error('  git add .');
-  console.error('  git commit -m "initial commit"');
-  console.error('');
-  console.error('完成后再运行 /spec-first:init');
-  return ExitCode.VALIDATION_ERROR;
-}
-
-function runProjectOnboardingTrack(state: InitProjectState, cwd: string): number {
+async function runProjectOnboardingTrack(
+  state: InitProjectState,
+  cwd: string,
+  args: string[]
+): Promise<number> {
   ensureProjectMetaConfig(cwd);
 
-  if (!state.firstRuntimeHealthy) {
-    console.error('⚠️  前置检查失败');
-    console.error('');
-    const readiness = checkInitReadiness(cwd);
-    if (readiness.indexExistsButIncomplete) {
-      console.error('00-first 数据不完整，需要重新生成。');
-      console.error('');
-      console.error('建议操作：');
-      console.error('  运行 /spec-first:first            重新生成项目认知数据');
-      console.error('');
-      console.error('不完整项：');
-      for (const item of readiness.firstMissing) console.error(`  - ${item}`);
-    } else {
-      console.error('00-first Skill 尚未执行，无法初始化需求工作区。');
-      console.error('');
-      console.error('建议操作：');
-      console.error('  1. 运行 /spec-first:first            生成项目认知数据');
-      console.error('  2. 认知完成后再继续 /spec-first:init');
-      console.error('');
-      console.error('缺失项：');
-      for (const item of readiness.firstMissing) console.error(`  - ${item}`);
-    }
-    console.error('');
-    console.error('完成后再运行 /spec-first:init');
-    return ExitCode.VALIDATION_ERROR;
-  }
-
-  // .spec-first exists but meta config was missing — already ensured above
   if (!state.specFirstDirExists || !state.metaConfigExists) {
     console.log('✅ 项目 meta 配置已创建');
     console.log('');
-    console.log('建议接下来运行：');
-    console.log('  /spec-first:first            生成项目认知数据');
-    return ExitCode.SUCCESS;
   }
 
-  return ExitCode.SUCCESS;
-}
-
-function runFeatureInitBlockedTrack(): number {
-  console.error('⚠️  Feature 初始化被阻止');
-  console.error('');
-  console.error('00-first Skill 尚未完成，无法创建 Feature。');
-  console.error('');
-  console.error('建议操作：');
-  console.error('  1. 运行 /spec-first:first            生成项目认知数据');
-  console.error('  2. 完成后重新运行 /spec-first:init');
-  return ExitCode.VALIDATION_ERROR;
+  console.log('继续进入 Feature 初始化（first runtime 可降级）...');
+  return await runFeatureInitTrack(args, cwd);
 }
 
 async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<number> {
   const preset = buildLegacyBaselinePreset();
-
-  if (!requireDiscoveredPlatforms(cwd)) {
+  const discoveredPlatforms = discoverPlatforms(cwd);
+  if (discoveredPlatforms.length === 0) {
+    console.error('⚠️  检测到存量项目但未发现平台模板');
+    console.error('');
+    console.error('平台模板属于 Skill/工作流决策，请先运行 `spec-first skill render init` 补齐 .spec-first/layer2/*.yaml 后再继续。');
     return ExitCode.VALIDATION_ERROR;
   }
 
@@ -788,8 +716,6 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const discoveredPlatforms = discoverPlatforms(cwd);
-
   ensureProjectMetaConfig(cwd);
 
   let result: ReturnType<typeof init>;
@@ -820,17 +746,21 @@ async function runBrownfieldBaselineTrack(args: string[], cwd: string): Promise<
 async function runFeatureInitTrack(args: string[], cwd: string): Promise<number> {
   const parsedInput = parseInitCliInput(args);
 
-  if (!requireDiscoveredPlatforms(cwd)) return ExitCode.VALIDATION_ERROR;
-
   // Show first runtime summary
   const summary = summarizeFirstArtifacts(cwd);
-  const modeLabel = summary.mode === 'unknown' ? 'unknown' : summary.mode;
   console.log('✅ 前置检查通过');
   console.log('');
-  console.log(`00-first Skill 已完成 (${modeLabel} 模式)`);
-  console.log(`- 技术栈: ${summary.techStack}`);
-  console.log(`- 代码量: ${summary.codeVolume}`);
-  console.log(`- API 端点: ${summary.apiSurface}`);
+  if (summary.mode === 'deep') {
+    console.log('00-first Skill 已完成 (deep 模式)');
+    console.log(`- 技术栈: ${summary.techStack}`);
+    console.log(`- 代码量: ${summary.codeVolume}`);
+    console.log(`- API 端点: ${summary.apiSurface}`);
+  } else {
+    console.log('当前背景信息不足，按降级模式继续');
+    console.log(`- 技术栈: ${summary.techStack}`);
+    console.log(`- 代码量: ${summary.codeVolume}`);
+    console.log(`- API 端点: ${summary.apiSurface}`);
+  }
   console.log('');
   console.log('继续初始化需求工作区...');
 
@@ -845,6 +775,10 @@ async function runFeatureInitTrack(args: string[], cwd: string): Promise<number>
 
   const normalized = normalizeInitInput(resolvedInput, cwd);
   if (!normalized) return ExitCode.VALIDATION_ERROR;
+  const createdPlatforms = ensureLayer2PlatformTemplates(cwd, normalized.platforms);
+  if (createdPlatforms.length > 0) {
+    console.log(`✅ 已创建平台模板：${createdPlatforms.join(', ')}`);
+  }
   ensureProjectMetaConfig(cwd);
 
   const postFixReadiness = checkInitReadiness(cwd);
@@ -955,21 +889,30 @@ function discoverPlatforms(projectRoot: string): string[] {
   }
 }
 
-function guidePlatformCreation(): null {
-  console.log('\n⚠️  检测到 .spec-first/layer2/ 目录不存在或为空');
-  console.log('    平台模板属于 Skill/工作流决策，不在 CLI 中自动生成。\n');
-  console.log('请先运行 `spec-first skill render init`，按 Skill 侧流程补齐 .spec-first/layer2/*.yaml 后再运行 init。');
-  console.log('例如：h5.yaml、java-backend.yaml、admin-frontend.yaml');
-  return null;
+function renderPlatformTemplate(platform: string): string {
+  return [
+    `platform: ${platform}`,
+    `label: ${platform}`,
+    `description: Auto-generated platform template for ${platform}`,
+    '',
+  ].join('\n');
 }
 
-function requireDiscoveredPlatforms(projectRoot: string): string[] | null {
-  const discovered = discoverPlatforms(projectRoot);
-  if (discovered.length === 0) {
-    guidePlatformCreation();
-    return null;
+function ensureLayer2PlatformTemplates(projectRoot: string, platforms: string[]): string[] {
+  const unique = uniquePlatforms(platforms);
+  if (unique.length === 0) return [];
+
+  const layerDir = join(projectRoot, '.spec-first', 'layer2');
+  mkdirSync(layerDir, { recursive: true });
+  const created: string[] = [];
+  for (const platform of unique) {
+    const templatePath = join(layerDir, `${platform}.yaml`);
+    if (!existsSync(templatePath)) {
+      writeFileSync(templatePath, renderPlatformTemplate(platform), 'utf-8');
+      created.push(platform);
+    }
   }
-  return discovered;
+  return created;
 }
 
 function validatePlatformSelection(platforms: string[], projectRoot: string): string | null {
@@ -1149,9 +1092,16 @@ async function runGuidedInit(): Promise<GuidedInitInput | null> {
     console.log('║          Spec-First Feature 初始化                             ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    const discovered = requireDiscoveredPlatforms(process.cwd());
-    if (!discovered) {
-      return null;
+    let discovered = discoverPlatforms(process.cwd());
+    if (discovered.length === 0) {
+      console.log('  未发现 .spec-first/layer2/*.yaml 平台模板，将先创建最小模板。');
+      const rawPlatforms = await askUntilValid(rl, '\n请输入要创建的平台（逗号分隔）: ', (value) => {
+        const platforms = parsePlatforms(value).values;
+        return platforms.length > 0 ? null : '❌ 至少需要输入一个平台，例如 h5 或 java-backend';
+      });
+      discovered = parsePlatforms(rawPlatforms).values;
+      ensureLayer2PlatformTemplates(process.cwd(), discovered);
+      console.log(`\n✅ 已创建平台模板：${discovered.join(', ')}`);
     }
 
     // Step 1/7: FEAT 缩写

@@ -69,16 +69,21 @@
 
 ## 3. 核心用例
 
-| ID | 类型 | 目标 |
-|----|------|------|
-| T-SEC-01 | Security | 凭证与日志脱敏策略生效 |
-| T-AUG-05 | Enhancement | 增强路径不替代 Skill 主链 |
-| T-FIRST-00 | Validation | 缺少最终 runtime/docs 时直接失败 |
-| T-FIRST-01 | Runtime | Runtime assets 可被写入与读取 |
-| T-FIRST-02 | Docs Output | docs 输出可由 Skill 写入并校验存在 |
-| T-FIRST-03 | Conditional | `database-er.md` 的条件语义正确 |
-| T-FIRST-04 | Governance | 治理更新只影响匹配资产与 docs 输出 |
-| T-FIRST-05 | Docs Index | `docs-index.json` 仅作为辅助索引，不参与真源判定 |
+| ID | 类型 | 目标 | 推荐文件 |
+|----|------|------|----------|
+| T-SEC-01 | Security | 凭证与日志脱敏策略生效 | `tests/unit/first-command.test.ts` |
+| T-AUG-05 | Enhancement | 增强路径不替代 Skill 主链 | `tests/unit/first-skill-docs.test.ts` |
+| T-FIRST-00 | Validation | 缺少最终 runtime/docs 时直接失败 | `tests/integration/first-cli-real-flow.test.ts` |
+| T-FIRST-01 | Runtime | Runtime assets 可被写入与读取 | `tests/unit/first-runtime-store.test.ts` |
+| T-FIRST-02 | Docs Output | docs 输出可由 Skill 写入并校验存在 | `tests/unit/first-doc-projection.test.ts` |
+| T-FIRST-03 | Conditional | `database-er.md` 的条件语义正确 | `tests/unit/first-governance.test.ts` |
+| T-FIRST-04 | Governance | 治理更新只影响匹配资产与 docs 输出 | `tests/unit/first-governance.test.ts` |
+| T-FIRST-05 | Docs Index | `docs-index.json` 仅作为辅助索引，不参与真源判定 | `tests/unit/first-bootstrap-validation.test.ts` |
+
+说明：
+- “推荐文件”表示主要覆盖位置，不要求一一对应
+- 同一个测试文件可以覆盖多个用例 ID
+- 若一个用例由多处断言共同覆盖，优先把主要断言所在文件标为推荐文件
 
 ## 4. 回归触发条件
 

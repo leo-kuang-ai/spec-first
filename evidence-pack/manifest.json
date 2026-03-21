@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-20T00:00:00.000Z",
+  "project": {
+    "name": "spec-first",
+    "type": "cli-tool",
+    "platform": "backend",
+    "language": "TypeScript",
+    "runtime": "Node.js"
+  },
+  "evidence_scope": {
+    "minified": true,
+    "includes": [
+      "package.json",
+      "README.md",
+      "tsconfig.json",
+      "src/cli/index.ts",
+      "src/core/*"
+    ],
+    "excludes": [
+      "node_modules",
+      "dist",
+      "tests/fixtures"
+    ]
+  },
+  "wave": "preparation",
+  "notes": "Initial evidence pack for first skill execution"
+}

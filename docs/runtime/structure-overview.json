@@ -1,0 +1,204 @@
+{
+  "modules": [
+    {
+      "name": "cli",
+      "path": "src/cli/",
+      "responsibility": "CLI 命令注册与路由，包含 29 个命令实现文件（init/gate/stage/feature/matrix/id 等）",
+      "dependencies": ["core/*", "shared/types", "shared/fs-utils"],
+      "evidence": "src/cli/index.ts 注册 27 个命令，src/cli/commands/ 目录下 29 个 .ts 文件"
+    },
+    {
+      "name": "process-engine",
+      "path": "src/core/process-engine/",
+      "responsibility": "阶段状态机（8 active + 2 terminal），驱动 Feature 生命周期、ID 生成、目录初始化",
+      "dependencies": ["shared/types", "shared/fs-utils", "shared/config-schema"],
+      "evidence": "src/core/process-engine/ 包含 stage-machine.ts, feature.ts, advance.ts, dependency-checker.ts 等"
+    },
+    {
+      "name": "skill-runtime",
+      "path": "src/core/skill-runtime/",
+      "responsibility": "Skill 分发、prompt 组装、hard-gate 校验（三层路由：Semantic Map → Runtime Route → Skill File）",
+      "dependencies": ["shared/types", "shared/fs-utils", "shared/config-schema", "core/rules", "core/process-engine"],
+      "evidence": "src/core/skill-runtime/dispatcher.ts 导入 rules/truth-source, process-engine/extensions"
+    },
+    {
+      "name": "ai-orchestrator",
+      "path": "src/core/ai-orchestrator/",
+      "responsibility": "Auto-loop、catchup 上下文恢复、context-pack，含 P1-P10 已修复的健壮性保障",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/ai-orchestrator/ 包含 auto-loop.ts, catchup.ts, context-pack.ts, todo-runner.ts 等 17 个文件"
+    },
+    {
+      "name": "gate-engine",
+      "path": "src/core/gate-engine/",
+      "responsibility": "阶段质量门禁评估（19条：16 blocking + 3 warning）、豁免管理、PRD 评分",
+      "dependencies": ["shared/types", "core/rules", "core/trace-engine"],
+      "evidence": "src/core/gate-engine/gate-evaluator.ts 导入 trace-engine/coverage, trace-engine/matrix; condition-registry.ts 导入 rules/truth-source"
+    },
+    {
+      "name": "trace-engine",
+      "path": "src/core/trace-engine/",
+      "responsibility": "追溯 ID 生成/校验/搜索、覆盖率矩阵（C3/C4/C6/C8/C9）、Exception 机制",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/trace-engine/ 包含 id-generator.ts, id-validator.ts, matrix.ts, coverage.ts 等 11 个文件"
+    },
+    {
+      "name": "change-mgr",
+      "path": "src/core/change-mgr/",
+      "responsibility": "RFC + Defect 状态机、影响分析",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/change-mgr/ 包含 rfc.ts, rfc-machine.ts, defect.ts, defect-machine.ts, impact.ts 等"
+    },
+    {
+      "name": "template",
+      "path": "src/core/template/",
+      "responsibility": "Handlebars 模板渲染、产物生成",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/template/ 包含 renderer.ts, artifact-checker.ts, change-classifier.ts 等"
+    },
+    {
+      "name": "tool-integration",
+      "path": "src/core/tool-integration/",
+      "responsibility": "AI runtime hooks、context 同步",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/tool-integration/ 包含 ai-runtime-hook.ts, hook-installer.ts 等"
+    },
+    {
+      "name": "metrics-engine",
+      "path": "src/core/metrics-engine/",
+      "responsibility": "健康度评分（H1）、瓶颈检测（R1-R5）",
+      "dependencies": ["shared/types", "core/trace-engine"],
+      "evidence": "src/cli/commands/metrics.ts 导入 trace-engine/coverage, metrics-engine/health-score, metrics-engine/bottleneck"
+    },
+    {
+      "name": "validators",
+      "path": "src/core/validators/",
+      "responsibility": "产物格式校验（ID 格式、必需章节、追踪矩阵一致性）",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/validators/ 包含 format-validator.ts"
+    },
+    {
+      "name": "task-plan",
+      "path": "src/core/task-plan/",
+      "responsibility": "task_plan.md 解析、Todo 状态管理",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/task-plan/parser.ts 被 cli/commands/commit.ts 导入"
+    },
+    {
+      "name": "rules",
+      "path": "src/core/rules/",
+      "responsibility": "真理源（RELEASE_REQUIRED_ARTIFACTS 等）、静态规则定义",
+      "dependencies": [],
+      "evidence": "src/core/rules/truth-source.ts 定义 PRIMARY_STAGE_SKILL, SKILL_STAGE_REQUIREMENTS, DELIVERY_ROUTE, RELEASE_REQUIRED_ARTIFACTS"
+    },
+    {
+      "name": "batch-executor",
+      "path": "src/core/batch-executor/",
+      "responsibility": "批量任务执行、并行编排支持",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/batch-executor/index.ts"
+    },
+    {
+      "name": "migrations",
+      "path": "src/core/migrations/",
+      "responsibility": "状态文件版本迁移、升级兼容处理",
+      "dependencies": ["shared/types"],
+      "evidence": "src/core/migrations/ 包含 manifest-engine.ts, version-matcher.ts, manifest-loader.ts 等"
+    },
+    {
+      "name": "shared",
+      "path": "src/shared/",
+      "responsibility": "共享类型（Stage enum、ExitCode、ID types）、工具函数（fs-utils, config-schema, logger）",
+      "dependencies": [],
+      "evidence": "src/shared/types.ts 定义 Stage enum, IdType, StageState, GateResult, RfcRecord, DefectRecord, MatrixRow, CoverageMetrics; src/shared/ 包含 fs-utils.ts, config-schema.ts, logger.ts 等 15 个文件"
+    }
+  ],
+  "layers": {
+    "cli": {
+      "description": "CLI 命令层，负责命令解析、参数校验、用户交互",
+      "modules": ["cli/"],
+      "file_count": 32,
+      "evidence": "src/cli/index.ts + src/cli/router.ts + src/cli/parse-utils.ts + src/cli/commands/ 下 29 个文件"
+    },
+    "core": {
+      "description": "核心引擎层，包含 14 个独立模块，实现业务逻辑",
+      "modules": [
+        "core/process-engine",
+        "core/skill-runtime",
+        "core/ai-orchestrator",
+        "core/gate-engine",
+        "core/trace-engine",
+        "core/change-mgr",
+        "core/template",
+        "core/tool-integration",
+        "core/metrics-engine",
+        "core/validators",
+        "core/task-plan",
+        "core/rules",
+        "core/batch-executor",
+        "core/migrations"
+      ],
+      "file_count": 95,
+      "evidence": "src/core/ 下 14 个子目录，每个目录包含多个 .ts 文件"
+    },
+    "shared": {
+      "description": "共享类型与工具层，被 cli 和 core 依赖，不依赖其他模块",
+      "modules": ["shared/"],
+      "file_count": 15,
+      "evidence": "src/shared/ 下 15 个 .ts 文件（types.ts, fs-utils.ts, config-schema.ts, logger.ts 等）"
+    }
+  },
+  "dependencyRules": [
+    "cli → core/*（CLI 调用核心模块，如 gate-engine, trace-engine, process-engine）",
+    "cli → shared/types（CLI 使用 Stage enum, IdType, StageState 等类型）",
+    "cli → shared/fs-utils（CLI 使用 readJson, writeJson, exists 等工具函数）",
+    "core/* → shared/types（所有核心模块使用共享类型）",
+    "core/* → shared/fs-utils（核心模块使用文件系统工具）",
+    "core 模块可相互依赖（如 gate-engine → rules, gate-engine → trace-engine, skill-runtime → process-engine）",
+    "shared 不依赖任何模块（作为基础层被其他层依赖）"
+  ],
+  "dependencyEvidence": {
+    "cli_to_core": [
+      "src/cli/commands/gate.ts → core/gate-engine/gate-evaluator",
+      "src/cli/commands/matrix.ts → core/trace-engine/matrix",
+      "src/cli/commands/feature.ts → core/process-engine/feature",
+      "src/cli/commands/ai.ts → core/ai-orchestrator/context-pack, core/ai-orchestrator/catchup",
+      "src/cli/commands/orchestrate.ts → core/ai-orchestrator/auto-loop, core/gate-engine/gate-evaluator, core/process-engine/next-step-decider"
+    ],
+    "cli_to_shared": [
+      "src/cli/commands/ 直接导入 shared/types.js",
+      "src/cli/commands/ 使用 shared/fs-utils.js 中的 readJson, writeJson, exists"
+    ],
+    "core_to_shared": [
+      "src/core/process-engine/dependency-checker.ts → shared/types.js (Stage enum)",
+      "src/core/process-engine/layer-merger.ts → shared/fs-utils.js (exists), shared/config-schema.js (loadConfig)",
+      "src/core/gate-engine/gate-evaluator.ts → shared/types.js (GateStatus)"
+    ],
+    "core_to_core": [
+      "src/core/gate-engine/gate-evaluator.ts → core/trace-engine/coverage, core/trace-engine/matrix",
+      "src/core/gate-engine/condition-registry.ts → core/rules/truth-source, core/trace-engine/trace-context",
+      "src/core/skill-runtime/dispatcher.ts → core/rules/truth-source, core/process-engine/extensions"
+    ]
+  },
+  "evidence_paths": [
+    "src/cli/index.ts",
+    "src/cli/router.ts",
+    "src/cli/commands/*.ts",
+    "src/core/*/index.ts",
+    "src/core/*/*.ts",
+    "src/shared/types.ts",
+    "src/shared/fs-utils.ts",
+    "src/shared/config-schema.ts",
+    "CLAUDE.md"
+  ],
+  "metadata": {
+    "generated_at": "2026-03-20T02:30:00Z",
+    "evidence_based": true,
+    "unconfirmed_items": [],
+    "notes": [
+      "所有依赖关系基于实际 import 语句分析",
+      "模块职责描述来自 CLAUDE.md 架构速查章节",
+      "文件数量基于实际目录扫描结果"
+    ]
+  }
+}

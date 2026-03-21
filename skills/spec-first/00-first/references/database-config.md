@@ -2,6 +2,7 @@
 
 > **当前正式 contract**：数据库认知是条件型能力，不是默认必选能力。
 > 本文档约束 `database-schema.json` 的适用性判定、schema 来源优先级与 `database-er.md` 的条件产出规则。
+> 执行提示见 `references/agent-database.md`，两者分工不同。
 
 ## 1. 适用性判定
 

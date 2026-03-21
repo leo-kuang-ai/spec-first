@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { resolveHostAdapterStatuses } from '../../src/core/host-adapters/registry.js';
@@ -205,7 +205,30 @@ describe('init bootstrap integration', () => {
     expect(codex).toBeDefined();
   });
 
-  it('should stop early when layer2 templates are missing and point to Skill render flow', async () => {
+  it('should initialize a new local project without git and bootstrap layer2 templates on demand', async () => {
+    rmSync(join(TMP, '.git'), { recursive: true, force: true });
+    rmSync(join(TMP, '.spec-first'), { recursive: true, force: true });
+
+    const code = await handleInit([
+      '--feat',
+      'AUTH',
+      '--mode',
+      'N',
+      '--size',
+      'S',
+      '--platforms',
+      'h5',
+    ]);
+
+    expect(code).toBe(0);
+    const configYaml = readFileSync(join(TMP, '.spec-first', 'meta', 'config.yaml'), 'utf-8');
+    expect(configYaml).toContain('catchup:');
+    expect(configYaml).toContain('runtime:');
+    expect(readFileSync(join(TMP, '.spec-first', 'layer2', 'h5.yaml'), 'utf-8')).toContain('platform: h5');
+    expect(readdirSync(join(TMP, 'specs')).some((name) => name.startsWith('FSREQ-'))).toBe(true);
+  });
+
+  it('should bootstrap missing layer2 templates and continue feature init', async () => {
     rmSync(join(TMP, '.spec-first', 'layer2'), { recursive: true, force: true });
     mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
     writeFileSync(
@@ -228,10 +251,11 @@ describe('init bootstrap integration', () => {
         'h5',
       ]);
 
-      expect(code).toBe(2);
+      expect(code).toBe(0);
       const output = [...logSpy.mock.calls.flat(), ...errorSpy.mock.calls.flat()].join('\n');
-      expect(output).toContain('spec-first skill render init');
-      expect(output).toContain('平台模板属于 Skill/工作流决策');
+      expect(output).toContain('已创建平台模板');
+      expect(output).toContain('Feature 初始化完成');
+      expect(readFileSync(join(TMP, '.spec-first', 'layer2', 'h5.yaml'), 'utf-8')).toContain('platform: h5');
     } finally {
       logSpy.mockRestore();
       errorSpy.mockRestore();

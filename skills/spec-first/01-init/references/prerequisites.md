@@ -87,19 +87,88 @@
 
 当 `.spec-first/layer2/` 不存在或为空时：
 
-1. **中止当前 init 交互**
-   - CLI 不再询问项目类型，也不在脚本里自动创建平台模板
-   - 平台模板属于 Skill / 工作流决策，不属于脚本启发式
+1. **中止当前 init 交互**（平台模板属于 Skill / 工作流决策，不属于脚本启发式）
+2. 询问用户"需要哪些平台？[h5, java-backend, ios, android, admin-frontend]"
+3. 创建目录：`mkdir -p .spec-first/layer2`
+4. 按用户选择创建平台 YAML（模板示例见下方）
 
-2. **运行 Skill 补齐流程**
-   - 先执行 `spec-first skill render init`
-   - 按 Skill 输出的流程补齐 `.spec-first/layer2/*.yaml`
-   - 模板内容示例详见 [platform-yaml-template.md](platform-yaml-template.md)
+---
 
-3. **关键约束**
-   - 第一个字段必须是 `platform:`（不是 `name:`）
-   - 这是 CLI 校验的硬性要求，否则会报错：`"platform" 为必填`
+## 平台 YAML 模板示例
 
-4. **Windows 注意事项**
-   - 使用 UTF-8 编码
-   - 使用 LF 换行符（不是 CRLF）
+**关键约束**：第一个字段必须是 `platform`（不是 `name`），这是 CLI 校验的硬性要求。
+
+### Java 后端服务
+
+```yaml
+platform: java-backend
+label: Java 后端服务
+description: Spring Boot + XXL-Job 定时任务服务
+tech_stack:
+  language: Java
+  framework: Spring Boot
+  scheduler: XXL-Job
+  rpc: Dubbo 3.0
+  config: Nacos
+  messaging: Kafka
+build:
+  tool: Maven
+  jdk: 17
+test:
+  unit: JUnit 5
+  integration: Spring Boot Test
+deploy:
+  container: Docker
+  orchestration: Kubernetes
+```
+
+### 前端应用
+
+```yaml
+platform: admin-frontend
+label: 管理后台前端
+description: React + TypeScript + Ant Design
+tech_stack:
+  language: TypeScript
+  framework: React 18
+  ui: Ant Design 5
+  state: Redux Toolkit
+  router: React Router 6
+build:
+  tool: Vite
+  node: 20
+test:
+  unit: Vitest
+  e2e: Playwright
+deploy:
+  cdn: OSS
+  server: Nginx
+```
+
+### H5 移动端
+
+```yaml
+platform: h5
+label: H5 移动端
+description: Vue 3 + Vant 移动端应用
+tech_stack:
+  language: TypeScript
+  framework: Vue 3
+  ui: Vant 4
+  state: Pinia
+build:
+  tool: Vite
+  node: 20
+test:
+  unit: Vitest
+deploy:
+  cdn: OSS
+```
+
+---
+
+## Windows 注意事项
+
+- 使用 UTF-8 编码保存文件
+- 使用 LF 换行符（不是 CRLF）
+- 路径分隔符使用 `/` 或 `\\`（Node.js 会自动处理）

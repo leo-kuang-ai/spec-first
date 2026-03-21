@@ -2,6 +2,7 @@
 
 > **当前正式 contract**：数据库能力是条件型能力。
 > 正式真源是 `database-schema.json`；正式文档只有 `database-er.md`，且仅在 `databaseSchema.status === healthy` 时产出。
+> 执行提示见 `references/agent-database.md`，两者分工不同。
 
 ## 1. 能力边界
 

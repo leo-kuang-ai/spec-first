@@ -10,12 +10,14 @@
 ## 输入证据
 
 - 本轮 evidence pack（route/command 注册、handler/controller/adapter、配置、依赖声明）
+- Serena 可用时优先使用符号工具，先读 `shared/summary.json` 和 `shared/context.json` 再补接口与依赖证据
 - 可选补充：DTO、auth guard、异常映射、OpenAPI/Swagger 文件、SDK/客户端封装
 
-## 输出资产
+## 输出约束
 
-- `api-contracts.json`
-- `summary.json`
+- 当前任务只负责补足当前 wave 所需证据，帮助生成 `api-contracts.json`、`summary.json`、`steering.json`、`conventions.json`
+- 具体输出资产定义见 `references/api-and-dependencies.md`
+- 不得把长篇分析回灌主线程
 
 ## 缺口标记
 

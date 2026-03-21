@@ -2,6 +2,7 @@
 
 > **当前正式 contract**：单一标准模式 runtime-first。
 > 本文档描述 API 与外部依赖的分析主题。正式真源以 `api-contracts.json`、`summary.json`、`steering.json`、`conventions.json` 为准。
+> 执行提示见 `references/agents-api-deps.md`，两者分工不同。
 
 ## 1. 主题划分
 

@@ -2,6 +2,7 @@
 
 > **当前正式 contract**：单一标准模式 runtime-first。
 > 本文档描述代码结构相关的分析主题与证据来源。正式真源是 `structure-overview.json`；`codebase-overview.md`、`architecture.md`、`call-graph.md` 都只是阅读输出。
+> 执行提示见 `references/agents-code-analysis.md`，两者分工不同。
 
 ## 1. 主题划分
 

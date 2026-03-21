@@ -2,6 +2,7 @@
 
 > **当前正式 contract**：单一标准模式 runtime-first。
 > 正式真源以 `conventions.json`、`entry-guide.json` 为准；`development-guidelines.md` 承载规范与本地环境专题阅读输出。
+> 执行提示见 `references/agent-guidelines-setup.md`，两者分工不同。
 
 ## 1. 主题划分
 
