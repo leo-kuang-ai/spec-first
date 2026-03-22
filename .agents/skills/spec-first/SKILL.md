@@ -32,12 +32,12 @@ description: |
   If the user pushes back on skill suggestions ("stop suggesting things",
   "I don't need suggestions", "too aggressive"):
   1. Stop suggesting for the rest of this session
-     2. Run: spec-first-config set proactive false
+  2. Run: spec-first-config set proactive false
   3. Say: "Got it — I'll stop suggesting skills. Just tell me to be proactive
      again if you change your mind."
   
   If the user says "be proactive again" or "turn on suggestions":
-     1. Run: spec-first-config set proactive true
+  1. Run: spec-first-config set proactive true
   2. Say: "Proactive suggestions are back on."
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->

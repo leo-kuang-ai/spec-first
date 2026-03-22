@@ -320,11 +320,21 @@ Template sources live here:
 - `focus-requirements/templates/handoff-summary.md`
 
 Reference example lives here:
+- `focus-requirements/examples/README.md`
 - `focus-requirements/examples/incremental-checkout-coupon/README.md`
 - `focus-requirements/examples/incremental-checkout-coupon/source-requirement.md`
 - `focus-requirements/examples/incremental-checkout-coupon/docs/requirements/focus-requirements.md`
 - `focus-requirements/examples/incremental-checkout-coupon/handoff/side-requirements.md`
 - `focus-requirements/examples/incremental-checkout-coupon/handoff/handoff-summary.md`
+- `focus-requirements/examples/simple-profile-copy-update/README.md`
+- `focus-requirements/examples/simple-profile-copy-update/source-requirement.md`
+- `focus-requirements/examples/simple-profile-copy-update/docs/requirements/focus-requirements.md`
+- `focus-requirements/examples/simple-profile-copy-update/handoff/side-requirements.md`
+- `focus-requirements/examples/simple-profile-copy-update/handoff/handoff-summary.md`
+- `focus-requirements/examples/ambiguity-confirmation/README.md`
+- `focus-requirements/examples/ambiguity-confirmation/source-requirement.md`
+- `focus-requirements/examples/ambiguity-confirmation/question-sequence.md`
+- `focus-requirements/examples/ambiguity-confirmation/resolved-focus-requirements.md`
 
 ## Workflow
 

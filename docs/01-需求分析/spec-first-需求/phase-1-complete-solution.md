@@ -536,8 +536,10 @@ handoff/
 
 首个参考样例：
 
+- `focus-requirements/examples/README.md`
 - `focus-requirements/examples/incremental-checkout-coupon/`
 - `focus-requirements/examples/simple-profile-copy-update/`
+- `focus-requirements/examples/ambiguity-confirmation/`
 
 ### 8.2 内容要求
 

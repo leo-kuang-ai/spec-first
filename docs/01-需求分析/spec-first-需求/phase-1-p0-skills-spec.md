@@ -228,8 +228,10 @@ P0 主链除 happy path 外，必须覆盖一组“人工前置条件未完成�
 
 首个参考样例：
 
+- `focus-requirements/examples/README.md`
 - `focus-requirements/examples/incremental-checkout-coupon/`
 - `focus-requirements/examples/simple-profile-copy-update/`
+- `focus-requirements/examples/ambiguity-confirmation/`
 
 ### 7.5 工作模式
 
