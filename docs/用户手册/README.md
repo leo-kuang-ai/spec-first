@@ -31,7 +31,7 @@
 ### 1. 安装 Spec-First (30 秒)
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.claude/skills/spec-first
 cd ~/.claude/skills/spec-first
 ./setup
 ```
@@ -93,15 +93,16 @@ Spec-First 是一个开源的 AI 辅助开发工具集,它将 Claude Code 转变
 
 ## 🆘 获取帮助
 
-- **GitHub Issues**: [提交问题](https://github.com/your-org/spec-first/issues)
+- **GitHub Issues**: [提交问题](https://github.com/sunrain520/spec-first/issues)
 - **文档**: 你正在阅读的文档
 - **社区**: 加入我们的社区讨论
 
 ## 📝 版本信息
 
-- **当前版本**: v1.0.0
+- **当前版本**: v1.3.1.1
 - **最后更新**: 2026-03-22
 - **维护状态**: 活跃维护中
+- **GitHub**: https://github.com/sunrain520/spec-first
 
 ---
 
