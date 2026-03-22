@@ -1,280 +1,426 @@
-# Spec-First — 规范驱动的 AI 研发流程引擎
+# Spec-First
 
-**为 AI 协同交付引入结构、可追溯性与质量门禁。**
+**AI-Powered Development Workflow - Spec-First Approach**
 
-[![Version](https://img.shields.io/badge/version-v1.1.4-blue)](https://www.npmjs.com/package/spec-first)
-[![npm downloads](https://img.shields.io/npm/dm/spec-first)](https://www.npmjs.com/package/spec-first)
-[![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-green)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org)
-[![License](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE)
+Spec-First 是一个强大的 AI 辅助开发工具集,将 Claude Code 转变为一个虚拟工程团队。通过结构化的工作流程和自动化工具,帮助开发者实现 10-100 倍的效率提升。
 
-📖 [English README](./README.md)
+## 🎯 核心理念
+
+**先规划,后编码** - 通过深度思考和系统化规划,确保每一行代码都符合产品目标。
+
+**一个完整的工作流**:
+```
+产品想法 → 深度规划 → 工程设计 → 实现 → 测试 → 发布
+```
+
+**效率提升**:
+- 🚀 **10-100x 效率提升** - 一个人的产出相当于 20 人的团队
+- 🎯 **结构化流程** - 从规划到部署的完整工作流
+- ✅ **质量保证** - 自动化的代码审查、测试和部署验证
+- 💰 **开源免费** - MIT 许可证,完全免费
+
+**适用人群**:
+- **创始人/CEO** - 尤其是技术型创始人,想要快速构建产品
+- **首次使用 Claude Code 的用户** - 结构化的角色而不是空白提示
+- **技术主管和架构师** - 为每个 PR 带来严格的审查、QA 和发布自动化
 
 ---
 
-## 问题所在
+## ⚡ 10 分钟快速开始
 
-AI 编程助手（Claude Code、Codex、Cursor）能力强大，但天然无状态。每次新会话都会丢失上一轮的决策上下文。代码在未经验证的情况下直接提交。需求变更无从追溯。团队成员对 AI 的使用方式各不相同，导致代码审查失去可信基准。
-
-Spec-First 在**流程层面**解决这些问题，而不是在提示词层面打补丁：
-
-| 表象 | 根因 | Spec-First 解法 |
-|---|---|---|
-| AI 生成的代码与之前的决策不一致 | 会话间没有持久化的语义上下文 | `specs/<featureId>/` 目录作为跨会话的唯一真理源 |
-| 未经验证的 AI 产物直接进入生产 | 生成与提交之间没有强制校验层 | 阶段门禁状态机——每个阶段必须通过质量门禁才能推进 |
-| "这段代码为什么这样写"无法回答 | 需求到实现之间没有制品链接 | 14 类追溯 ID 体系，覆盖 FR → DS → TASK → TC 完整链路 |
-| 每个开发者对 AI 的用法各异 | 没有共享的执行协议 | 20 个 Skill 统一采用 P0–P5 六阶段执行模型 |
-
----
-
-## 工作原理
-
-Spec-First 将 AI 工作流包裹在一个结构化状态机中。Feature 从 `00_init` 出发，只有当每个阶段的质量门禁通过后才能推进。
-
-```
-[想法] → 00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release → 08_done
-           ↓            ↓            ↓           ↓            ↓             ↓             ↓             ↓
-                                          09_cancelled  ←  （任意活跃阶段均可取消）
-```
-
-在每个阶段，**Skill** 通过确定性的六阶段协议引导 AI 执行：
-
-```
-P0  LOCATE       定位当前 Feature，校验阶段合法性
-P1  CONTEXT      加载 spec 目录、历史产物与运行记录
-P2  GENERATE     AI 推理，生成结构化交付物草稿
-P3  CONFIRM      用户审阅、迭代或拒绝（支持多轮确认）
-P4  WRITE        最终产物落盘，注册追溯 ID
-P5  副作用       同步追踪矩阵、触发门禁评估、更新运行态
-```
-
-这意味着每一次 AI 操作都是**可定位、有上下文、可确认、可审计**的。
-
-## 第一性原则
-
-Spec-First 的本质首先是一个 **Skill 主导系统**，而不是一个 CLI 主导的代码生成器。
-
-- Skill 负责定义工作流、多 Agent 编排、约束和成功标准
-- CLI 只负责最小支撑层：启动、持久化、校验和宿主集成
-- 对于 `first` 这类项目认知任务，目标方向应当是：Skill 主导的多 Agent 编排优先，本地脚本退回支撑层
-
-边界也很明确：
-
-- runtime 资产是机器输入，必须保持合同稳定
-- 面向人的文档可以更自由生成，但不能反向成为后续 Skill 的隐藏真源
-
----
-
-## 快速开始
-
-### 前置条件
-
-- Node.js ≥ 20.0.0
-- npm 或 pnpm
-- Git
-- Claude Code 或 Codex（可选，Skill 集成必需）
-
-### 安装
+### 1. 安装 Spec-First (30 秒)
 
 ```bash
-npm install -g spec-first@latest
-spec-first doctor          # 验证安装与宿主集成状态
+git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+cd ~/.claude/skills/spec-first
+./setup
 ```
 
-### 初始化 Feature
+### 2. 运行你的第一个技能
 
-```bash
-cd /path/to/your-project
+打开 Claude Code,输入:
 
-# --mode N = 全新功能  |  --mode I = 增量改进
-# --size S = 小        |  --size M = 中   |  --size L = 大
-spec-first init --feat AUTH --mode N --size M --platforms web,node
+```
+/office-hours
 ```
 
-### 完整开发流程（Claude Code / Codex）
+描述你想要构建的产品或功能。
+
+### 3. 体验完整工作流
 
 ```bash
-/spec-first:onboarding    # 第一次使用？从这里开始
-/spec-first:init          # 初始化 Feature 工作区
-/spec-first:spec          # 编写需求规格（FR + 验收标准）
-/spec-first:design        # 技术设计（DS + API 契约）
-/spec-first:task          # 将设计拆解为可追踪任务
-/spec-first:code          # 按任务实现，关联追溯 ID 提交
-/spec-first:verify        # 对照验收标准执行阶段验收
-/spec-first:archive       # 复盘归档，收口 Feature
+/plan-ceo-review       # CEO 视角审查
+/plan-eng-review       # 工程实现规划
+# ... 实现代码 ...
+/review                # 代码审查
+/qa                    # QA 测试
+/ship                  # 创建 PR
+/land-and-deploy       # 合并部署
 ```
 
-### 日常 CLI
+**预期结果**: 第一次运行在 5 分钟内完成,得到完整的设计文档和实现计划。
+
+---
+
+## 📦 安装指南
+
+### 系统要求
+
+| 软件 | 版本 | 说明 |
+|------|------|------|
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | 最新版 | 运行环境 |
+| [Git](https://git-scm.com/) | 2.0+ | 版本控制 |
+| [Bun](https://bun.sh/) | 1.0+ | JavaScript 运行时 |
+| [Node.js](https://nodejs.org/) | 18+ | 仅 Windows 需要 |
+
+### 方法 1: 全局安装 (推荐)
+
+在 Claude Code 中直接说:
+
+```
+安装 spec-first
+```
+
+或手动执行:
 
 ```bash
-spec-first feature current          # 当前是哪个 Feature？
-spec-first stage current            # 当前处于哪个阶段？
-spec-first gate                     # 门禁条件是否全部通过？
-spec-first metrics report           # 覆盖率与健康评分
-spec-first golive check <featureId> # 上线就绪检查
+git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+cd ~/.claude/skills/spec-first
+./setup
+```
+
+### 方法 2: 项目本地安装
+
+将 Spec-First 添加到项目,让团队成员自动获得:
+
+```bash
+cp -Rf ~/.claude/skills/spec-first .claude/skills/spec-first
+rm -rf .claude/skills/spec-first/.git
+cd .claude/skills/spec-first
+./setup
+```
+
+提交到版本控制:
+
+```bash
+git add .claude/skills/spec-first
+git commit -m "Add spec-first to project"
+git push
+```
+
+### 方法 3: 多平台支持 (Codex, Gemini CLI, Cursor)
+
+```bash
+git clone https://github.com/your-org/spec-first.git ~/.codex/skills/spec-first
+cd ~/.codex/skills/spec-first
+./setup --host codex
+```
+
+或自动检测:
+
+```bash
+git clone https://github.com/your-org/spec-first.git ~/spec-first-temp
+cd ~/spec-first-temp
+./setup --host auto
 ```
 
 ---
 
-## 核心能力
+## 🎬 看它如何工作
 
-### 阶段状态机（8 个活跃阶段 + 2 个终态）
+```
+用户:    我想构建一个每日简报应用,帮助管理多个日历。
+用户:    /office-hours
+Claude:  [询问真实痛点 - 具体例子,而不是假设]
 
-每个 Feature 在 8 个活跃阶段中依次推进——每个阶段都有阻断性门禁条件——最终进入两个终态之一。终态不可逆，设计如此。
+用户:    多个 Google 日历,事件信息过期,地点错误...
+         准备工作耗时很长,结果还不够好...
 
-| 阶段 | 交付物 | 入口 |
-|---|---|---|
-| `00_init` | Feature 工作区、配置 | `spec-first init` |
-| `01_specify` | 需求规格（FR + AC） | `/spec-first:spec` |
-| `02_design` | 技术设计（DS + API） | `/spec-first:design` |
-| `03_plan` | 带追溯 ID 的任务列表 | `/spec-first:task` |
-| `04_implement` | 关联规格的代码提交 | `/spec-first:code` |
-| `05_verify` | 测试用例与覆盖率证据 | `/spec-first:verify` |
-| `06_wrap_up` | 复盘文档 | `/spec-first:archive` |
-| `07_release` | 冒烟测试报告 + 发布说明 | `spec-first golive check` |
-| `08_done` | *（终态）* | `spec-first done` |
-| `09_cancelled` | *（终态）* | `spec-first stage cancel` |
+Claude:  我要挑战你的框架。你说"每日简报应用",但你实际描述的是
+         一个私人参谋长 AI。
+         [提取出你没想到的 5 个能力]
+         [挑战 4 个前提 - 你同意、不同意或调整]
+         [生成 3 个实现方案及工作量估算]
+         推荐: 明天发布最窄的切入点,从真实使用中学习。
+         [编写设计文档 → 自动传递给下游技能]
 
-### 质量门禁
+用户:    /plan-ceo-review
+         [读取设计文档,挑战范围,运行 10 个章节的审查]
 
-每个阶段定义一组阻断性条件，全部通过才可推进。门禁评估是确定性的，支持 CI 集成。
+用户:    /plan-eng-review
+         [数据流的 ASCII 图表,状态机,错误路径]
+         [测试矩阵,失败模式,安全问题]
+
+用户:    批准计划。退出计划模式。
+         [编写 2,400 行代码,11 个文件,约 8 分钟]
+
+用户:    /review
+         [自动修复] 2 个问题。[询问] 竞态条件 → 你批准修复。
+
+用户:    /qa https://staging.myapp.com
+         [打开真实浏览器,点击流程,发现并修复 bug]
+
+用户:    /ship
+         测试: 42 → 51 (+9 新增)。PR: github.com/you/app/pull/42
+```
+
+你说"每日简报应用",代理说"你在构建参谋长 AI" - 因为它倾听你的痛点,而不是你的功能需求。然后它挑战你的前提,生成三个方案,推荐最窄的切入点,并编写设计文档传递给每个下游技能。8 个命令。这不是副驾驶,这是一个团队。
+
+---
+
+## 🛠️ 技能列表
+
+### 📋 产品规划类
+
+| 技能 | 角色 | 功能 |
+|------|------|------|
+| `/office-hours` | **YC 办公时间** | 从这里开始。6 个强制性问题,在编写代码前重新构建你的产品。 |
+| `/plan-ceo-review` | **CEO/创始人** | 重新思考问题。找到隐藏在请求中的 10 倍产品。 |
+| `/plan-eng-review` | **工程经理** | 锁定架构、数据流、图表、边缘情况和测试。 |
+| `/plan-design-review` | **高级设计师** | 对每个设计维度评分 0-10,解释 10 分的样子,然后编辑计划达到目标。 |
+| `/design-consultation` | **设计合作伙伴** | 从头构建完整的设计系统。了解领域,提出创意风险。 |
+
+### 💻 开发类
+
+| 技能 | 角色 | 功能 |
+|------|------|------|
+| `/review` | **架构师** | 发现通过 CI 但在生产环境爆炸的 bug。自动修复明显问题。 |
+| `/investigate` | **调试专家** | 系统化的根因调试。铁律:没有调查就没有修复。 |
+| `/codex` | **第二意见** | 来自 OpenAI Codex CLI 的独立代码审查。 |
+
+### 🧪 测试类
+
+| 技能 | 角色 | 功能 |
+|------|------|------|
+| `/qa` | **QA 负责人** | 测试应用,发现 bug,用原子提交修复,重新验证。 |
+| `/qa-only` | **QA 报告员** | 与 /qa 相同的方法论,但仅报告。 |
+| `/canary` | **SRE** | 部署后监控循环。监视控制台错误、性能退化和页面故障。 |
+| `/benchmark` | **性能工程师** | 基线页面加载时间、Core Web Vitals 和资源大小。 |
+
+### 🚀 部署类
+
+| 技能 | 角色 | 功能 |
+|------|------|------|
+| `/ship` | **发布工程师** | 同步 main,运行测试,审计覆盖率,推送,打开 PR。 |
+| `/land-and-deploy` | **发布工程师** | 合并 PR,等待 CI 和部署,验证生产环境健康。 |
+| `/setup-deploy` | **部署配置器** | /land-and-deploy 的一次性设置。 |
+
+### 🎨 设计类
+
+| 技能 | 角色 | 功能 |
+|------|------|------|
+| `/design-review` | **会写代码的设计师** | 与 /plan-design-review 相同的审计,然后修复发现的问题。 |
+
+### 🔒 安全类
+
+| 技能 | 功能 |
+|------|------|
+| `/careful` | 破坏性命令前的警告 (rm -rf, DROP TABLE, force-push)。 |
+| `/freeze` | 将文件编辑限制在一个目录。 |
+| `/guard` | `/careful` + `/freeze` 的组合。 |
+| `/unfreeze` | 移除 `/freeze` 边界。 |
+
+### 🔧 工具类
+
+| 技能 | 功能 |
+|------|------|
+| `/browse` | 给代理眼睛。真实的 Chromium 浏览器,真实的点击,真实的截图。 |
+| `/setup-browser-cookies` | 从真实浏览器导入 cookie 到无头会话。 |
+| `/document-release` | 更新所有项目文档以匹配刚发布的内容。 |
+| `/retro` | 团队感知的每周回顾。每人细分,发布连续性,测试健康趋势。 |
+| `/spec-first-upgrade` | 升级 spec-first 到最新版本。 |
+
+---
+
+## 💡 核心特性
+
+### 1. `/office-hours` 重新构建产品
+
+你说"每日简报应用",它倾听你的实际痛点,挑战框架,告诉你真正构建的是私人参谋长 AI,挑战前提,生成三个实现方案及工作量估算。编写的设计文档直接传递给 `/plan-ceo-review` 和 `/plan-eng-review`。
+
+### 2. 设计为核心
+
+`/design-consultation` 不仅仅是选择字体。它研究你领域的内容,提出安全选择和创意风险,生成实际产品的真实模型,编写 `DESIGN.md` - 然后 `/design-review` 和 `/plan-eng-review` 读取你的选择。
+
+### 3. `/qa` 是巨大的解锁
+
+它让我从 6 个并行工作增加到 12 个。Claude Code 说"我看到问题了",然后实际修复它,生成回归测试,验证修复 - 这改变了我工作的方式。代理现在有眼睛了。
+
+### 4. 智能审查路由
+
+就像一个运行良好的初创公司:CEO 不必查看基础设施 bug 修复,后端更改不需要设计审查。spec-first 跟踪运行了哪些审查,找出什么是合适的,然后做聪明的事情。
+
+### 5. 测试一切
+
+`/ship` 如果项目没有测试框架,会从头开始引导。每次 `/ship` 运行都会生成覆盖率审计。每个 `/qa` bug 修复都会生成回归测试。100% 测试覆盖率是目标 - 测试让氛围编码变得安全,而不是 yolo 编码。
+
+### 6. 一键发布到生产
+
+`/land-and-deploy` 接替 `/ship` 离开的地方 - 合并 PR,等待 CI 和部署,然后对你的生产 URL 运行金丝雀验证。自动检测 Fly.io, Render, Vercel, Netlify, Heroku 或 GitHub Actions。
+
+### 7. 浏览器移交
+
+遇到 CAPTCHA、认证墙或 MFA 提示?`$B handoff` 打开一个可见的 Chrome,在完全相同的页面上,保留所有 cookie 和标签。解决问题,告诉 Claude 完成了,`$B resume` 从它离开的地方继续。
+
+### 8. 多 AI 第二意见
+
+`/codex` 从 OpenAI 的 Codex CLI 获得独立审查 - 完全不同的 AI 查看相同的差异。三种模式:带有通过/失败门的代码审查,主动尝试破坏代码的对抗性挑战,以及具有会话连续性的开放咨询。
+
+### 9. 按需安全护栏
+
+说"小心",`/careful` 在任何破坏性命令前警告 - rm -rf, DROP TABLE, force-push, git reset --hard。`/freeze` 在调试时将编辑锁定到一个目录,这样 Claude 就不会意外"修复"无关代码。`/guard` 激活两者。
+
+---
+
+## 📊 工作流程
+
+### 标准开发流程
+
+```
+产品想法
+   ↓
+/office-hours (1-2 小时)
+   ↓
+/plan-ceo-review (30-60 分钟)
+   ↓
+/plan-eng-review (30-60 分钟)
+   ↓
+实现代码 (数小时到数天)
+   ↓
+/review (15-30 分钟)
+   ↓
+/qa (30-60 分钟)
+   ↓
+/ship (15-30 分钟)
+   ↓
+/land-and-deploy (15-30 分钟)
+   ↓
+/canary (30 分钟监控)
+```
+
+### Bug 修复流程
+
+```
+发现问题
+   ↓
+/freeze (限制范围)
+   ↓
+/investigate (根因分析)
+   ↓
+实现修复
+   ↓
+/review (代码审查)
+   ↓
+/qa (验证)
+   ↓
+/ship (发布)
+```
+
+---
+
+## 📚 完整文档
+
+### 用户手册
+
+| 文档 | 内容 |
+|------|------|
+| [快速开始](docs/用户手册/01-快速开始.md) | 10 分钟上手指南 |
+| [安装指南](docs/用户手册/02-安装指南.md) | 详细安装步骤 |
+| [技能列表](docs/用户手册/04-技能列表.md) | 所有技能详解 |
+| [工作流程](docs/用户手册/05-工作流程.md) | 推荐开发流程 |
+| [配置指南](docs/用户手册/06-配置指南.md) | 自定义配置 |
+| [最佳实践](docs/用户手册/07-最佳实践.md) | 高效使用技巧 |
+| [常见问题](docs/用户手册/08-常见问题.md) | 28 个 FAQ |
+| [故障排除](docs/用户手册/09-故障排除.md) | 问题诊断解决 |
+
+### 开发者文档
+
+| 文档 | 内容 |
+|------|------|
+| [自定义技能](docs/用户手册/10-自定义技能.md) | 创建自己的技能 |
+| [贡献指南](docs/用户手册/11-贡献指南.md) | 如何贡献代码 |
+| [更新日志](docs/用户手册/12-更新日志.md) | 版本更新历史 |
+| [架构设计](ARCHITECTURE.md) | 设计决策和系统内部 |
+| [构建哲学](ETHOS.md) | Builder 哲学:Boil the Lake, Search Before Building |
+
+---
+
+## 🔒 隐私和遥测
+
+Spec-First 包含**可选的**使用遥测,帮助改进项目:
+
+- **默认关闭**。除非你明确说是,否则不会发送任何内容。
+- **首次运行时**,spec-first 会询问你是否要共享匿名使用数据。你可以说不。
+- **发送内容(如果你选择加入)**: 技能名称、持续时间、成功/失败、spec-first 版本、操作系统。仅此而已。
+- **从不发送**: 代码、文件路径、仓库名、分支名、提示或任何用户生成的内容。
+- **随时更改**: `spec-first-config set telemetry off` 立即禁用所有内容。
+
+---
+
+## 🛠️ 故障排除
+
+### 技能未显示?
 
 ```bash
-spec-first gate                              # 评估当前阶段门禁
-spec-first gate --stage 04_implement         # 评估指定阶段
-spec-first golive check <featureId>          # 上线全量门禁（07_release）
-spec-first metrics coverage --threshold 0.8  # 强制覆盖率阈值
+cd ~/.claude/skills/spec-first
+./setup
 ```
 
-### 全链路追溯
-
-每个制品都携带类型化的追溯 ID，形成从业务需求到线上代码的完整可导航链路：
-
-```
-FR · DS · TASK · TC · RFC                  ← 主交付链
-REQ · SYS · ARCH · MOD                    ← 需求与架构
-ATP · STP · ITP · UTP                     ← 测试规划
-Feature                                    ← Feature 级追踪
-```
-
-共 14 类 ID，每个 ID 均已注册、可检索、可校验。
+### `/browse` 失败?
 
 ```bash
-spec-first id generate FR        # 生成新需求 ID
-spec-first id verify FR-001      # 确认 ID 已注册并关联
-spec-first matrix sync           # 重建追溯覆盖率矩阵
+cd ~/.claude/skills/spec-first
+bun install
+bun run build
 ```
 
-### 20 个内置 Skill
+### 安装过期?
 
-Skill 是面向 AI 的交互界面。每个 Skill 执行确定性的 P0–P5 协议，确保每次 AI 交互都已加载上下文、经过确认、副作用可追踪。
+运行 `/spec-first-upgrade` - 或在 `~/.spec-first/config.yaml` 中设置 `auto_upgrade: true`
 
-| 分类 | Skills |
-|---|---|
-| **引导认知** | `onboarding`、`first` |
-| **核心阶段** | `init`、`spec`、`design`、`research`、`task`、`code`、`review`、`archive`、`catchup` |
-| **编排运维** | `plan`、`verify`、`orchestrate`、`status`、`sync`、`feature`、`doctor` |
-| **质量扩展** | `spec-review`、`analyze` |
+### Windows 用户
 
-### 宿主集成与自动化
+Spec-First 在 Windows 11 上通过 Git Bash 或 WSL 工作。除了 Bun 之外还需要 Node.js - Bun 在 Windows 上有 Playwright 管道传输的已知 bug ([bun#4253](https://github.com/oven-sh/bun/issues/4253))。browse 服务器自动回退到 Node.js。确保 `bun` 和 `node` 都在 PATH 上。
 
-```bash
-spec-first update                # 刷新稳定宿主基线能力（Claude Code + Codex）
-spec-first update --host gemini  # 显式启用 Gemini baseline（experimental）
-spec-first update --host cursor  # 显式启用 Cursor baseline（experimental）
-spec-first hooks status    # 查看 Git Hook 集成状态
-spec-first viewer start    # 启动 Stage Viewer 可视化面板
-spec-first commit          # 结构化提交，自动关联追溯 ID
-```
+### Claude 说找不到技能?
 
-### 发布
+确保项目的 `CLAUDE.md` 有 spec-first 部分。添加这个:
 
-```bash
-pnpm run release:publish                # 跨平台发布入口，默认自动判断版本升级
-pnpm run release:publish -- minor       # 强制 minor 升级
-pnpm run release:publish -- auto --dry-run
-```
+```markdown
+## Spec-First 技能
 
-`publish.sh` 仍保留为兼容包装器，但推荐使用 `release:publish` / `scripts/publish.mjs` 作为正式入口。
+使用 spec-first 的 /browse 进行所有网页浏览。不要使用 mcp__claude-in-chrome__* 工具。
 
----
-
-## 架构
-
-Spec-First 分为三层。层间边界严格：Skill 层不直接访问运行时，CLI 层不调用 Skill。
-
-```
-┌────────────────────────────────────────────────────┐
-│  Skill 层  — Claude Code / Codex 集成              │
-│  20 个 Skill · P0–P5 执行协议                      │
-├────────────────────────────────────────────────────┤
-│  CLI 层  — spec-first <命令>                       │
-│  28 组确定性命令                                    │
-├────────────────────────────────────────────────────┤
-│  运行时层                                           │
-│  ┌─────────────────┬──────────────────────────┐   │
-│  │ process-engine  │ 阶段状态机，生命周期控制   │   │
-│  │ gate-engine     │ 阻断性门禁条件评估         │   │
-│  │ trace-engine    │ ID 注册表，覆盖率矩阵       │   │
-│  │ skill-runtime   │ Skill 分发，Prompt 组装    │   │
-│  │ ai-orchestrator │ 自动循环，Context Pack     │   │
-│  │ metrics-engine  │ 健康评分，瓶颈检测         │   │
-│  └─────────────────┴──────────────────────────┘   │
-└────────────────────────────────────────────────────┘
+可用技能: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
+/design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review,
+/setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release,
+/codex, /careful, /freeze, /guard, /unfreeze, /spec-first-upgrade。
 ```
 
 ---
 
-## 可视化面板
+## 📄 许可证
 
-Spec-First 内置可视化看板。执行 `spec-first viewer start` 即可启动，一览 Feature 健康分、阶段流转状态、门禁通过情况与各阶段耗时分布。
-
-<img src="./image.png" alt="Spec-First Stage Viewer 截图 — 展示 Feature 健康分、阶段流转图、时间线与耗时分布" width="900">
+MIT License. 免费永久。去构建点什么吧。
 
 ---
 
-## 竞品学习
+## 🆘 获取帮助
 
-Spec-First 的设计来自对 AI 工作流生态的深入研究——不是为了取代这些工具，而是将它们各自最优秀的设计模式融合成一个完整的流程引擎。
-
-| 项目 | 核心理念 | Spec-First 的借鉴 |
-|---|---|---|
-| **OpenSpec** | Actions not Phases — 工件 DAG 驱动而非刚性阶段门禁 | Delta Spec 需求演进追踪思路 |
-| **Spec Kit** | 规范驱动开发 — constitution.md 作为最高准则 | 规范即契约原则；一致性分析模式 |
-| **Planning-Files** | 上下文工程 — 文件即持久化工作记忆 | `specs/<featureId>/` 跨会话上下文持久化；`catchup` 的 5-Question Reboot 机制 |
-| **Trellis** | Read Before Write — 每次开发前强制加载规范 | 开发前规范注入协议；`archive` 引入 break-loop 复盘机制 |
-| **Superpowers** | Discipline Over Convenience — TDD 作为硬性门禁 | P0–P5 确定性执行模型；验证前禁止声称完成的门禁条件 |
+- **GitHub Issues**: [提交问题](https://github.com/your-org/spec-first/issues)
+- **用户手册**: [完整文档](docs/用户手册/README.md)
+- **社区**: 加入讨论
 
 ---
 
-## 贡献指南
+## 🎉 致谢
 
-欢迎提交 Bug 报告和 Pull Request。重大改动请先[开 Issue](https://github.com/sunrain520/spec-first/issues) 讨论。
+Spec-First 的设计理念受到了 Y Combinator 办公时间、现代软件工程最佳实践和 AI 辅助开发前沿探索的启发。
 
-本地开发：
-
-```bash
-npm install
-npm run build
-npm test
-npm run lint
-```
+特别感谢所有贡献者和早期用户的反馈,帮助塑造了这个工具。
 
 ---
 
-## 参考资料
+**开始你的 Spec-First 之旅**: [快速开始 →](docs/用户手册/01-快速开始.md)
 
-- [完整项目介绍](./PROJECT-INTRODUCTION.md)
-- [用户文档](./docs/07-用户文档/)
-- [Skill 目录](./skills/spec-first/README.md)
-- [CLI 命令参考](./docs/07-用户文档/CLI命令参考手册.md)
-
----
-
-## 仓库与许可证
-
-- [GitHub](https://github.com/sunrain520/spec-first)
-- [Gitee](https://gitee.com/sunnyrain/spec-first)
-- [Issue Tracker](https://github.com/sunrain520/spec-first/issues)
-- [English README](./README.md)
-- License：MIT © [leo.kuang](https://github.com/sunrain520)
+**当前版本**: v1.3.1.1 | **最后更新**: 2026-03-22

@@ -1,0 +1,254 @@
+---
+name: focus-requirements
+version: 1.0.0
+description: |
+  Owner-scoped requirement narrowing for existing-project incremental demand.
+  Read a large reviewed requirement plus the current workspace context, then
+  narrow it into a focused PRD for the current owner or side. Produces one
+  true-source requirement doc and two thin handoff summaries for downstream
+  /plan-ceo-review and /plan-eng-review.
+  Use when the user already has a reviewed demand document, knows the current
+  owner boundary, and has prepared the relevant repos in the workspace.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /focus-requirements
+
+Turn a large reviewed requirement into an owner-scoped PRD. Your job is to lock the
+current owner's boundary, not to write a second global PRD and not to design the
+technical solution.
+
+## Applicability
+
+This skill is primarily for:
+- existing projects
+- incremental requirements
+
+It may also be used for new-project or hybrid demand only after the prerequisite
+work is already done:
+- owner boundary is explicit
+- affected repos are known
+- workspace is already prepared
+
+If those conditions are not true, stop with `BLOCKED`.
+
+## Non-goals
+
+Do not:
+- design architecture or APIs
+- break work into implementation tasks
+- estimate effort
+- coordinate cross-owner execution
+- silently fill in missing business rules
+- create a second source of truth outside the fixed outputs below
+
+## Success Criteria
+
+This skill is successful only when all of the following are true:
+
+1. `Owner Scope` is clear
+2. `In Scope / Out of Scope` is clear
+3. `Dependencies` are isolated from owned scope
+4. `Acceptance Criteria` are verifiable by the current owner
+5. `Open Questions` are explicit and honest
+
+Generating files without satisfying the criteria above is not success.
+
+## Required Inputs
+
+Direct narrowing mode requires all three:
+- the reviewed source requirement document
+- the current owner or side identifier
+- the current workspace project list
+
+Helpful but optional:
+- historical module docs
+- prior PRDs
+- terminology notes
+- business-rule clarifications
+
+If required inputs are partially present but insufficient to judge the boundary, stop
+with `NEEDS_CONTEXT`.
+
+If the workspace or owner boundary is not actually ready, stop with `BLOCKED`.
+
+## Fixed Outputs
+
+Write exactly these project files:
+- `docs/requirements/focus-requirements.md`
+- `handoff/side-requirements.md`
+- `handoff/handoff-summary.md`
+
+These three files are the entire output surface for this skill.
+
+Template sources live here:
+- `focus-requirements/templates/focus-requirements.md`
+- `focus-requirements/templates/side-requirements.md`
+- `focus-requirements/templates/handoff-summary.md`
+
+Reference example lives here:
+- `focus-requirements/examples/incremental-checkout-coupon/README.md`
+- `focus-requirements/examples/incremental-checkout-coupon/source-requirement.md`
+- `focus-requirements/examples/incremental-checkout-coupon/docs/requirements/focus-requirements.md`
+- `focus-requirements/examples/incremental-checkout-coupon/handoff/side-requirements.md`
+- `focus-requirements/examples/incremental-checkout-coupon/handoff/handoff-summary.md`
+- `focus-requirements/examples/simple-profile-copy-update/README.md`
+- `focus-requirements/examples/simple-profile-copy-update/source-requirement.md`
+- `focus-requirements/examples/simple-profile-copy-update/docs/requirements/focus-requirements.md`
+- `focus-requirements/examples/simple-profile-copy-update/handoff/side-requirements.md`
+- `focus-requirements/examples/simple-profile-copy-update/handoff/handoff-summary.md`
+
+## Workflow
+
+### Step 0: Confirm prerequisites
+
+Before narrowing anything, confirm:
+- there is a reviewed source requirement document
+- the current owner or side is named
+- the relevant repos are already present in the workspace
+- the task is requirement focusing, not architecture planning
+
+If information is missing but the shape of the workflow is valid, use `NEEDS_CONTEXT`.
+
+If prerequisite setup is missing, use `BLOCKED`.
+
+### Step 1: Read the requirement and workspace
+
+Read:
+- the reviewed source requirement
+- the current workspace project list
+- only the existing module docs that materially help define the current owner boundary
+
+Before drafting, extract:
+- `Candidate In Scope`
+- `Candidate Out of Scope`
+- `Dependencies`
+- `Ambiguities`
+
+Do not silently turn ambiguous items into facts.
+
+### Step 2: Try direct narrowing first
+
+Default behavior is direct narrowing. If the boundary is already sufficiently clear,
+proceed without asking unnecessary questions.
+
+Direct narrowing is allowed only when all of the following are clear from the inputs:
+- who owns the relevant module, page, domain, or flow segment
+- which major requirement items belong to that owner
+- what the owner's completion boundary looks like
+
+### Step 3: Enter confirmation mode only if needed
+
+Ask follow-up questions only when one of these ambiguity triggers is present:
+- `Owner Boundary Ambiguity`
+- `Dependency Ownership Ambiguity`
+- `Acceptance Boundary Ambiguity`
+
+When confirmation mode is needed:
+- resolve the most important ambiguity first
+- use the minimum number of rounds needed to continue safely
+- do not run a fixed interview script if two focused questions are enough
+
+Prioritize confirmation in this order:
+1. owner boundary
+2. requirement ownership and dependencies
+3. acceptance boundary
+
+Non-functional constraints and normal open questions should usually be recorded in the
+document, not used as a reason to block or over-interview.
+
+### Step 4: Write the true-source PRD
+
+Start from `focus-requirements/templates/focus-requirements.md` and fill it in.
+
+Write `docs/requirements/focus-requirements.md` with exactly these sections:
+- `Background`
+- `Owner Scope`
+- `In Scope`
+- `Out of Scope`
+- `Relevant Flows`
+- `Dependencies`
+- `Acceptance Criteria`
+- `Non-Functional Constraints`
+- `Assumptions`
+- `Open Questions`
+
+Keep the document owner-scoped. Do not drift back into a global requirement rewrite.
+
+### Step 5: Write the two thin handoff summaries
+
+Start from `focus-requirements/templates/side-requirements.md`.
+
+Write `handoff/side-requirements.md` with only:
+- `Owner Scope`
+- `In Scope`
+- `Out of Scope`
+- `Dependencies`
+
+Start from `focus-requirements/templates/handoff-summary.md`.
+
+Write `handoff/handoff-summary.md` with only:
+- `Requirement Summary`
+- `Key Acceptance Criteria`
+- `Open Questions`
+- `Recommended Next Step`
+
+Recommended next step is usually:
+- `/plan-ceo-review`
+- then `/plan-eng-review`
+
+### Step 6: Self-check before completion
+
+Before finishing, verify:
+- the PRD is not just a shortened copy of the source requirement
+- other owners' work is not mixed into this owner's scope
+- `Out of Scope` is concrete
+- `Dependencies` are not mixed into owned scope
+- `Acceptance Criteria` are owner-verifiable
+- unresolved items are listed honestly
+
+Revise before finishing if any of the checks fail.
+
+## Completion Status Protocol
+
+Use exactly one:
+- `DONE`
+- `DONE_WITH_CONCERNS`
+- `NEEDS_CONTEXT`
+- `BLOCKED`
+
+### `DONE`
+- owner boundary is clear
+- the three fixed outputs were written
+- the five success criteria are satisfied
+
+### `DONE_WITH_CONCERNS`
+- the output is usable for downstream review
+- a small number of open questions remain
+- those open questions do not invalidate the owner boundary
+
+### `NEEDS_CONTEXT`
+- information is insufficient
+- but the workflow prerequisites are otherwise in place
+
+### `BLOCKED`
+- workspace is not ready
+- owner is not actually defined
+- or the demand is still in pre-positioning rather than requirement focusing
+
+## Final response format
+
+Always end with:
+- completion status
+- one short paragraph summarizing the focused owner scope
+- explicit open questions or concerns
+- exact files written

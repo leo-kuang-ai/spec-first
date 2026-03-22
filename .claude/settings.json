@@ -1,8 +1,0 @@
-{
-  "hooks": {},
-  "enabledPlugins": {
-    "comprehensive-review@claude-code-workflows": true,
-    "code-review@claude-plugins-official": true,
-    "superpowers@superpowers-marketplace": true
-  }
-}

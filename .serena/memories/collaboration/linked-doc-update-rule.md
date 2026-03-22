@@ -1,1 +1,0 @@
-用户明确要求：当实现规则、配置或行为变更时，必须主动同步关联文档，不仅改代码。至少检查并按需更新：对应 SKILL.md、skills/spec-first/AGENTS.md、skills/spec-first/README.md 以及相关用户文档中的关键描述，确保与代码一致（尤其 doctor/update/MCP/skills 规则）。今后默认执行“实现 + 关联文档联动更新 + 一致性扫描”。

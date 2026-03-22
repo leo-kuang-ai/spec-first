@@ -1,0 +1,1937 @@
+#!/usr/bin/env bun
+/**
+ * Generate SKILL.md files from .tmpl templates.
+ *
+ * Pipeline:
+ *   read .tmpl → find {{PLACEHOLDERS}} → resolve from source → format → write .md
+ *
+ * Supports --dry-run: generate to memory, exit 1 if different from committed file.
+ * Used by skill:check and CI freshness checks.
+ */
+
+import { COMMAND_DESCRIPTIONS } from '../browse/src/commands';
+import { SNAPSHOT_FLAGS } from '../browse/src/snapshot';
+import { spawnSync } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const ROOT = path.resolve(import.meta.dir, '..');
+const DRY_RUN = process.argv.includes('--dry-run');
+
+// ─── Template Context ───────────────────────────────────────
+
+type Host = 'claude' | 'codex';
+
+const HOST_ARG = process.argv.find(a => a.startsWith('--host'));
+const HOST: Host = (() => {
+  if (!HOST_ARG) return 'claude';
+  const val = HOST_ARG.includes('=') ? HOST_ARG.split('=')[1] : process.argv[process.argv.indexOf(HOST_ARG) + 1];
+  if (val === 'codex' || val === 'agents') return 'codex';
+  if (val === 'claude') return 'claude';
+  throw new Error(`Unknown host: ${val}. Use claude, codex, or agents.`);
+})();
+
+interface HostPaths {
+  skillRoot: string;
+  localSkillRoot: string;
+  binDir: string;
+  browseDir: string;
+}
+
+const HOST_PATHS: Record<Host, HostPaths> = {
+  claude: {
+    skillRoot: '~/.claude/skills/spec-first',
+    localSkillRoot: '.claude/skills/spec-first',
+    binDir: '~/.claude/skills/spec-first/bin',
+    browseDir: '~/.claude/skills/spec-first/browse/dist',
+  },
+  codex: {
+    skillRoot: '~/.codex/skills/spec-first',
+    localSkillRoot: '.agents/skills/spec-first',
+    binDir: '~/.codex/skills/spec-first/bin',
+    browseDir: '~/.codex/skills/spec-first/browse/dist',
+  },
+};
+
+interface TemplateContext {
+  skillName: string;
+  tmplPath: string;
+  benefitsFrom?: string[];
+  host: Host;
+  paths: HostPaths;
+}
+
+// ─── Placeholder Resolvers ──────────────────────────────────
+
+function generateCommandReference(_ctx: TemplateContext): string {
+  // Group commands by category
+  const groups = new Map<string, Array<{ command: string; description: string; usage?: string }>>();
+  for (const [cmd, meta] of Object.entries(COMMAND_DESCRIPTIONS)) {
+    const list = groups.get(meta.category) || [];
+    list.push({ command: cmd, description: meta.description, usage: meta.usage });
+    groups.set(meta.category, list);
+  }
+
+  // Category display order
+  const categoryOrder = [
+    'Navigation', 'Reading', 'Interaction', 'Inspection',
+    'Visual', 'Snapshot', 'Meta', 'Tabs', 'Server',
+  ];
+
+  const sections: string[] = [];
+  for (const category of categoryOrder) {
+    const commands = groups.get(category);
+    if (!commands || commands.length === 0) continue;
+
+    // Sort alphabetically within category
+    commands.sort((a, b) => a.command.localeCompare(b.command));
+
+    sections.push(`### ${category}`);
+    sections.push('| Command | Description |');
+    sections.push('|---------|-------------|');
+    for (const cmd of commands) {
+      const display = cmd.usage ? `\`${cmd.usage}\`` : `\`${cmd.command}\``;
+      sections.push(`| ${display} | ${cmd.description} |`);
+    }
+    sections.push('');
+  }
+
+  return sections.join('\n').trimEnd();
+}
+
+function generateSnapshotFlags(_ctx: TemplateContext): string {
+  const lines: string[] = [
+    'The snapshot is your primary tool for understanding and interacting with pages.',
+    '',
+    '```',
+  ];
+
+  for (const flag of SNAPSHOT_FLAGS) {
+    const label = flag.valueHint ? `${flag.short} ${flag.valueHint}` : flag.short;
+    lines.push(`${label.padEnd(10)}${flag.long.padEnd(24)}${flag.description}`);
+  }
+
+  lines.push('```');
+  lines.push('');
+  lines.push('All flags can be combined freely. `-o` only applies when `-a` is also used.');
+  lines.push('Example: `$B snapshot -i -a -C -o /tmp/annotated.png`');
+  lines.push('');
+  lines.push('**Ref numbering:** @e refs are assigned sequentially (@e1, @e2, ...) in tree order.');
+  lines.push('@c refs from `-C` are numbered separately (@c1, @c2, ...).');
+  lines.push('');
+  lines.push('After snapshot, use @refs as selectors in any command:');
+  lines.push('```bash');
+  lines.push('$B click @e3       $B fill @e4 "value"     $B hover @e1');
+  lines.push('$B html @e2        $B css @e5 "color"      $B attrs @e6');
+  lines.push('$B click @c1       # cursor-interactive ref (from -C)');
+  lines.push('```');
+  lines.push('');
+  lines.push('**Output format:** indented accessibility tree with @ref IDs, one element per line.');
+  lines.push('```');
+  lines.push('  @e1 [heading] "Welcome" [level=1]');
+  lines.push('  @e2 [textbox] "Email"');
+  lines.push('  @e3 [button] "Submit"');
+  lines.push('```');
+  lines.push('');
+  lines.push('Refs are invalidated on navigation — run `snapshot` again after `goto`.');
+
+  return lines.join('\n');
+}
+
+function generatePreambleBash(ctx: TemplateContext): string {
+  return `## Preamble (run first)
+
+\`\`\`bash
+_UPD=$(${ctx.paths.binDir}/spec-first-update-check 2>/dev/null || ${ctx.paths.localSkillRoot}/bin/spec-first-update-check 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
+mkdir -p ~/.spec-first/sessions
+touch ~/.spec-first/sessions/"$PPID"
+_SESSIONS=$(find ~/.spec-first/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
+find ~/.spec-first/sessions -mmin +120 -type f -delete 2>/dev/null || true
+_CONTRIB=$(${ctx.paths.binDir}/spec-first-config get spec-first_contributor 2>/dev/null || true)
+_PROACTIVE=$(${ctx.paths.binDir}/spec-first-config get proactive 2>/dev/null || echo "true")
+_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+echo "BRANCH: $_BRANCH"
+echo "PROACTIVE: $_PROACTIVE"
+_LAKE_SEEN=$([ -f ~/.spec-first/.completeness-intro-seen ] && echo "yes" || echo "no")
+echo "LAKE_INTRO: $_LAKE_SEEN"
+_TEL=$(${ctx.paths.binDir}/spec-first-config get telemetry 2>/dev/null || true)
+_TEL_PROMPTED=$([ -f ~/.spec-first/.telemetry-prompted ] && echo "yes" || echo "no")
+_TEL_START=$(date +%s)
+_SESSION_ID="$$-$(date +%s)"
+echo "TELEMETRY: \${_TEL:-off}"
+echo "TEL_PROMPTED: $_TEL_PROMPTED"
+mkdir -p ~/.spec-first/analytics
+echo '{"skill":"${ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ${ctx.paths.binDir}/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+\`\`\``;
+}
+
+function generateUpgradeCheck(ctx: TemplateContext): string {
+  return `If \`PROACTIVE\` is \`"false"\`, do not proactively suggest spec-first skills — only invoke
+them when the user explicitly asks. The user opted out of proactive suggestions.
+
+If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`${ctx.paths.skillRoot}/spec-first-upgrade/SKILL.md\` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If \`JUST_UPGRADED <from> <to>\`: tell user "Running spec-first v{to} (just updated!)" and continue.`;
+}
+
+function generateLakeIntro(): string {
+  return `If \`LAKE_INTRO\` is \`no\`: Before continuing, introduce the Completeness Principle.
+Tell the user: "spec-first follows the **Boil the Lake** principle — always do the complete
+thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
+Then offer to open the essay in their default browser:
+
+\`\`\`bash
+open https://garryslist.org/posts/boil-the-ocean
+touch ~/.spec-first/.completeness-intro-seen
+\`\`\`
+
+Only run \`open\` if the user says yes. Always run \`touch\` to mark as seen. This only happens once.`;
+}
+
+function generateTelemetryPrompt(ctx: TemplateContext): string {
+  return `If \`TEL_PROMPTED\` is \`no\` AND \`LAKE_INTRO\` is \`yes\`: After the lake intro is handled,
+ask the user about telemetry. Use AskUserQuestion:
+
+> Help spec-first get better! Community mode shares usage data (which skills you use, how long
+> they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
+> No code, file paths, or repo names are ever sent.
+> Change anytime with \`spec-first-config set telemetry off\`.
+
+Options:
+- A) Help spec-first get better! (recommended)
+- B) No thanks
+
+If A: run \`${ctx.paths.binDir}/spec-first-config set telemetry community\`
+
+If B: ask a follow-up AskUserQuestion:
+
+> How about anonymous mode? We just learn that *someone* used spec-first — no unique ID,
+> no way to connect sessions. Just a counter that helps us know if anyone's out there.
+
+Options:
+- A) Sure, anonymous is fine
+- B) No thanks, fully off
+
+If B→A: run \`${ctx.paths.binDir}/spec-first-config set telemetry anonymous\`
+If B→B: run \`${ctx.paths.binDir}/spec-first-config set telemetry off\`
+
+Always run:
+\`\`\`bash
+touch ~/.spec-first/.telemetry-prompted
+\`\`\`
+
+This only happens once. If \`TEL_PROMPTED\` is \`yes\`, skip this entirely.`;
+}
+
+function generateAskUserFormat(_ctx: TemplateContext): string {
+  return `## AskUserQuestion Format
+
+**ALWAYS follow this structure for every AskUserQuestion call:**
+1. **Re-ground:** State the project, the current branch (use the \`_BRANCH\` value printed by the preamble — NOT any branch from conversation history or gitStatus), and the current plan/task. (1-2 sentences)
+2. **Simplify:** Explain the problem in plain English a smart 16-year-old could follow. No raw function names, no internal jargon, no implementation details. Use concrete examples and analogies. Say what it DOES, not what it's called.
+3. **Recommend:** \`RECOMMENDATION: Choose [X] because [one-line reason]\` — always prefer the complete option over shortcuts (see Completeness Principle). Include \`Completeness: X/10\` for each option. Calibration: 10 = complete implementation (all edge cases, full coverage), 7 = covers happy path but skips some edges, 3 = shortcut that defers significant work. If both options are 8+, pick the higher; if one is ≤5, flag it.
+4. **Options:** Lettered options: \`A) ... B) ... C) ...\` — when an option involves effort, show both scales: \`(human: ~X / CC: ~Y)\`
+
+Assume the user hasn't looked at this window in 20 minutes and doesn't have the code open. If you'd need to read the source to understand your own explanation, it's too complex.
+
+Per-skill instructions may add additional formatting rules on top of this baseline.`;
+}
+
+function generateCompletenessSection(): string {
+  return `## Completeness Principle — Boil the Lake
+
+AI-assisted coding makes the marginal cost of completeness near-zero. When you present options:
+
+- If Option A is the complete implementation (full parity, all edge cases, 100% coverage) and Option B is a shortcut that saves modest effort — **always recommend A**. The delta between 80 lines and 150 lines is meaningless with CC+spec-first. "Good enough" is the wrong instinct when "complete" costs minutes more.
+- **Lake vs. ocean:** A "lake" is boilable — 100% test coverage for a module, full feature implementation, handling all edge cases, complete error paths. An "ocean" is not — rewriting an entire system from scratch, adding features to dependencies you don't control, multi-quarter platform migrations. Recommend boiling lakes. Flag oceans as out of scope.
+- **When estimating effort**, always show both scales: human team time and CC+spec-first time. The compression ratio varies by task type — use this reference:
+
+| Task type | Human team | CC+spec-first | Compression |
+|-----------|-----------|-----------|-------------|
+| Boilerplate / scaffolding | 2 days | 15 min | ~100x |
+| Test writing | 1 day | 15 min | ~50x |
+| Feature implementation | 1 week | 30 min | ~30x |
+| Bug fix + regression test | 4 hours | 15 min | ~20x |
+| Architecture / design | 2 days | 4 hours | ~5x |
+| Research / exploration | 1 day | 3 hours | ~3x |
+
+- This principle applies to test coverage, error handling, documentation, edge cases, and feature completeness. Don't skip the last 10% to "save time" — with AI, that 10% costs seconds.
+
+**Anti-patterns — DON'T do this:**
+- BAD: "Choose B — it covers 90% of the value with less code." (If A is only 70 lines more, choose A.)
+- BAD: "We can skip edge case handling to save time." (Edge case handling costs minutes with CC.)
+- BAD: "Let's defer test coverage to a follow-up PR." (Tests are the cheapest lake to boil.)
+- BAD: Quoting only human-team effort: "This would take 2 weeks." (Say: "2 weeks human / ~1 hour CC.")`;
+}
+
+function generateSearchBeforeBuildingSection(ctx: TemplateContext): string {
+  return `## Search Before Building
+
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read \`${ctx.paths.skillRoot}/ETHOS.md\` for the full philosophy.
+
+**Three layers of knowledge:**
+- **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
+- **Layer 2** (new and popular — search for these). But scrutinize: humans are subject to mania. Search results are inputs to your thinking, not answers.
+- **Layer 3** (first principles — prize these above all). Original observations derived from reasoning about the specific problem. The most valuable of all.
+
+**Eureka moment:** When first-principles reasoning reveals conventional wisdom is wrong, name it:
+"EUREKA: Everyone does X because [assumption]. But [evidence] shows this is wrong. Y is better because [reasoning]."
+
+Log eureka moments:
+\`\`\`bash
+jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.spec-first/analytics/eureka.jsonl 2>/dev/null || true
+\`\`\`
+Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
+
+**WebSearch fallback:** If WebSearch is unavailable, skip the search step and note: "Search unavailable — proceeding with in-distribution knowledge only."`;
+}
+
+function generateContributorMode(): string {
+  return `## Contributor Mode
+
+If \`_CONTRIB\` is \`true\`: you are in **contributor mode**. You're a spec-first user who also helps make it better.
+
+**At the end of each major workflow step** (not after every single command), reflect on the spec-first tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by spec-first code or skill markdown — file a field report. Maybe our contributor will help make us better!
+
+**Calibration — this is the bar:** For example, \`$B js "await fetch(...)"\` used to fail with \`SyntaxError: await is only valid in async functions\` because spec-first didn't wrap expressions in async context. Small, but the input was reasonable and spec-first should have handled it — that's the kind of thing worth filing. Things less consequential than this, ignore.
+
+**NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
+
+**To file:** write \`~/.spec-first/contributor-logs/{slug}.md\` with **all sections below** (do not truncate — include every section through the Date/Version footer):
+
+\`\`\`
+# {Title}
+
+Hey spec-first team — ran into this while using /{skill-name}:
+
+**What I was trying to do:** {what the user/agent was attempting}
+**What happened instead:** {what actually happened}
+**My rating:** {0-10} — {one sentence on why it wasn't a 10}
+
+## Steps to reproduce
+1. {step}
+
+## Raw output
+\`\`\`
+{paste the actual error or unexpected output here}
+\`\`\`
+
+## What would make this a 10
+{one sentence: what spec-first should have done differently}
+
+**Date:** {YYYY-MM-DD} | **Version:** {spec-first version} | **Skill:** /{skill}
+\`\`\`
+
+Slug: lowercase, hyphens, max 60 chars (e.g. \`browse-js-no-await\`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed spec-first field report: {title}"`;
+}
+
+function generateCompletionStatus(ctx: TemplateContext): string {
+  return `## Completion Status Protocol
+
+When completing a skill workflow, report status using one of:
+- **DONE** — All steps completed successfully. Evidence provided for each claim.
+- **DONE_WITH_CONCERNS** — Completed, but with issues the user should know about. List each concern.
+- **BLOCKED** — Cannot proceed. State what is blocking and what was tried.
+- **NEEDS_CONTEXT** — Missing information required to continue. State exactly what you need.
+
+### Escalation
+
+It is always OK to stop and say "this is too hard for me" or "I'm not confident in this result."
+
+Bad work is worse than no work. You will not be penalized for escalating.
+- If you have attempted a task 3 times without success, STOP and escalate.
+- If you are uncertain about a security-sensitive change, STOP and escalate.
+- If the scope of work exceeds what you can verify, STOP and escalate.
+
+Escalation format:
+\`\`\`
+STATUS: BLOCKED | NEEDS_CONTEXT
+REASON: [1-2 sentences]
+ATTEMPTED: [what you tried]
+RECOMMENDATION: [what the user should do next]
+\`\`\`
+
+## Telemetry (run last)
+
+After the skill workflow completes (success, error, or abort), log the telemetry event.
+Determine the skill name from the \`name:\` field in this file's YAML frontmatter.
+Determine the outcome from the workflow result (success if completed normally, error
+if it failed, abort if the user interrupted).
+
+**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
+\`~/.spec-first/analytics/\` (user config directory, not project files). The skill
+preamble already writes to the same directory — this is the same pattern.
+Skipping this command loses session duration and outcome data.
+
+Run this bash:
+
+\`\`\`bash
+_TEL_END=$(date +%s)
+_TEL_DUR=$(( _TEL_END - _TEL_START ))
+rm -f ~/.spec-first/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
+${ctx.paths.binDir}/spec-first-telemetry-log \\
+  --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \\
+  --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
+\`\`\`
+
+Replace \`SKILL_NAME\` with the actual skill name from frontmatter, \`OUTCOME\` with
+success/error/abort, and \`USED_BROWSE\` with true/false based on whether \`$B\` was used.
+If you cannot determine the outcome, use "unknown". This runs in the background and
+never blocks the user.`;
+}
+
+function generatePreamble(ctx: TemplateContext): string {
+  return [
+    generatePreambleBash(ctx),
+    generateUpgradeCheck(ctx),
+    generateLakeIntro(),
+    generateTelemetryPrompt(ctx),
+    generateAskUserFormat(ctx),
+    generateCompletenessSection(),
+    generateSearchBeforeBuildingSection(ctx),
+    generateContributorMode(),
+    generateCompletionStatus(ctx),
+  ].join('\n\n');
+}
+
+function generateBrowseSetup(ctx: TemplateContext): string {
+  return `## SETUP (run this check BEFORE any browse command)
+
+\`\`\`bash
+_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+B=""
+[ -n "$_ROOT" ] && [ -x "$_ROOT/${ctx.paths.localSkillRoot}/browse/dist/browse" ] && B="$_ROOT/${ctx.paths.localSkillRoot}/browse/dist/browse"
+[ -z "$B" ] && B=${ctx.paths.browseDir}/browse
+if [ -x "$B" ]; then
+  echo "READY: $B"
+else
+  echo "NEEDS_SETUP"
+fi
+\`\`\`
+
+If \`NEEDS_SETUP\`:
+1. Tell the user: "spec-first browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
+2. Run: \`cd <SKILL_DIR> && ./setup\`
+3. If \`bun\` is not installed: \`curl -fsSL https://bun.sh/install | bash\``;
+}
+
+function generateBaseBranchDetect(_ctx: TemplateContext): string {
+  return `## Step 0: Detect base branch
+
+Determine which branch this PR targets. Use the result as "the base branch" in all subsequent steps.
+
+1. Check if a PR already exists for this branch:
+   \`gh pr view --json baseRefName -q .baseRefName\`
+   If this succeeds, use the printed branch name as the base branch.
+
+2. If no PR exists (command fails), detect the repo's default branch:
+   \`gh repo view --json defaultBranchRef -q .defaultBranchRef.name\`
+
+3. If both commands fail, fall back to \`main\`.
+
+Print the detected base branch name. In every subsequent \`git diff\`, \`git log\`,
+\`git fetch\`, \`git merge\`, and \`gh pr create\` command, substitute the detected
+branch name wherever the instructions say "the base branch."
+
+---`;
+}
+
+function generateQAMethodology(_ctx: TemplateContext): string {
+  return `## Modes
+
+### Diff-aware (automatic when on a feature branch with no URL)
+
+This is the **primary mode** for developers verifying their work. When the user says \`/qa\` without a URL and the repo is on a feature branch, automatically:
+
+1. **Analyze the branch diff** to understand what changed:
+   \`\`\`bash
+   git diff main...HEAD --name-only
+   git log main..HEAD --oneline
+   \`\`\`
+
+2. **Identify affected pages/routes** from the changed files:
+   - Controller/route files → which URL paths they serve
+   - View/template/component files → which pages render them
+   - Model/service files → which pages use those models (check controllers that reference them)
+   - CSS/style files → which pages include those stylesheets
+   - API endpoints → test them directly with \`$B js "await fetch('/api/...')"\`
+   - Static pages (markdown, HTML) → navigate to them directly
+
+   **If no obvious pages/routes are identified from the diff:** Do not skip browser testing. The user invoked /qa because they want browser-based verification. Fall back to Quick mode — navigate to the homepage, follow the top 5 navigation targets, check console for errors, and test any interactive elements found. Backend, config, and infrastructure changes affect app behavior — always verify the app still works.
+
+3. **Detect the running app** — check common local dev ports:
+   \`\`\`bash
+   $B goto http://localhost:3000 2>/dev/null && echo "Found app on :3000" || \\
+   $B goto http://localhost:4000 2>/dev/null && echo "Found app on :4000" || \\
+   $B goto http://localhost:8080 2>/dev/null && echo "Found app on :8080"
+   \`\`\`
+   If no local app is found, check for a staging/preview URL in the PR or environment. If nothing works, ask the user for the URL.
+
+4. **Test each affected page/route:**
+   - Navigate to the page
+   - Take a screenshot
+   - Check console for errors
+   - If the change was interactive (forms, buttons, flows), test the interaction end-to-end
+   - Use \`snapshot -D\` before and after actions to verify the change had the expected effect
+
+5. **Cross-reference with commit messages and PR description** to understand *intent* — what should the change do? Verify it actually does that.
+
+6. **Check TODOS.md** (if it exists) for known bugs or issues related to the changed files. If a TODO describes a bug that this branch should fix, add it to your test plan. If you find a new bug during QA that isn't in TODOS.md, note it in the report.
+
+7. **Report findings** scoped to the branch changes:
+   - "Changes tested: N pages/routes affected by this branch"
+   - For each: does it work? Screenshot evidence.
+   - Any regressions on adjacent pages?
+
+**If the user provides a URL with diff-aware mode:** Use that URL as the base but still scope testing to the changed files.
+
+### Full (default when URL is provided)
+Systematic exploration. Visit every reachable page. Document 5-10 well-evidenced issues. Produce health score. Takes 5-15 minutes depending on app size.
+
+### Quick (\`--quick\`)
+30-second smoke test. Visit homepage + top 5 navigation targets. Check: page loads? Console errors? Broken links? Produce health score. No detailed issue documentation.
+
+### Regression (\`--regression <baseline>\`)
+Run full mode, then load \`baseline.json\` from a previous run. Diff: which issues are fixed? Which are new? What's the score delta? Append regression section to report.
+
+---
+
+## Workflow
+
+### Phase 1: Initialize
+
+1. Find browse binary (see Setup above)
+2. Create output directories
+3. Copy report template from \`qa/templates/qa-report-template.md\` to output dir
+4. Start timer for duration tracking
+
+### Phase 2: Authenticate (if needed)
+
+**If the user specified auth credentials:**
+
+\`\`\`bash
+$B goto <login-url>
+$B snapshot -i                    # find the login form
+$B fill @e3 "user@example.com"
+$B fill @e4 "[REDACTED]"         # NEVER include real passwords in report
+$B click @e5                      # submit
+$B snapshot -D                    # verify login succeeded
+\`\`\`
+
+**If the user provided a cookie file:**
+
+\`\`\`bash
+$B cookie-import cookies.json
+$B goto <target-url>
+\`\`\`
+
+**If 2FA/OTP is required:** Ask the user for the code and wait.
+
+**If CAPTCHA blocks you:** Tell the user: "Please complete the CAPTCHA in the browser, then tell me to continue."
+
+### Phase 3: Orient
+
+Get a map of the application:
+
+\`\`\`bash
+$B goto <target-url>
+$B snapshot -i -a -o "$REPORT_DIR/screenshots/initial.png"
+$B links                          # map navigation structure
+$B console --errors               # any errors on landing?
+\`\`\`
+
+**Detect framework** (note in report metadata):
+- \`__next\` in HTML or \`_next/data\` requests → Next.js
+- \`csrf-token\` meta tag → Rails
+- \`wp-content\` in URLs → WordPress
+- Client-side routing with no page reloads → SPA
+
+**For SPAs:** The \`links\` command may return few results because navigation is client-side. Use \`snapshot -i\` to find nav elements (buttons, menu items) instead.
+
+### Phase 4: Explore
+
+Visit pages systematically. At each page:
+
+\`\`\`bash
+$B goto <page-url>
+$B snapshot -i -a -o "$REPORT_DIR/screenshots/page-name.png"
+$B console --errors
+\`\`\`
+
+Then follow the **per-page exploration checklist** (see \`qa/references/issue-taxonomy.md\`):
+
+1. **Visual scan** — Look at the annotated screenshot for layout issues
+2. **Interactive elements** — Click buttons, links, controls. Do they work?
+3. **Forms** — Fill and submit. Test empty, invalid, edge cases
+4. **Navigation** — Check all paths in and out
+5. **States** — Empty state, loading, error, overflow
+6. **Console** — Any new JS errors after interactions?
+7. **Responsiveness** — Check mobile viewport if relevant:
+   \`\`\`bash
+   $B viewport 375x812
+   $B screenshot "$REPORT_DIR/screenshots/page-mobile.png"
+   $B viewport 1280x720
+   \`\`\`
+
+**Depth judgment:** Spend more time on core features (homepage, dashboard, checkout, search) and less on secondary pages (about, terms, privacy).
+
+**Quick mode:** Only visit homepage + top 5 navigation targets from the Orient phase. Skip the per-page checklist — just check: loads? Console errors? Broken links visible?
+
+### Phase 5: Document
+
+Document each issue **immediately when found** — don't batch them.
+
+**Two evidence tiers:**
+
+**Interactive bugs** (broken flows, dead buttons, form failures):
+1. Take a screenshot before the action
+2. Perform the action
+3. Take a screenshot showing the result
+4. Use \`snapshot -D\` to show what changed
+5. Write repro steps referencing screenshots
+
+\`\`\`bash
+$B screenshot "$REPORT_DIR/screenshots/issue-001-step-1.png"
+$B click @e5
+$B screenshot "$REPORT_DIR/screenshots/issue-001-result.png"
+$B snapshot -D
+\`\`\`
+
+**Static bugs** (typos, layout issues, missing images):
+1. Take a single annotated screenshot showing the problem
+2. Describe what's wrong
+
+\`\`\`bash
+$B snapshot -i -a -o "$REPORT_DIR/screenshots/issue-002.png"
+\`\`\`
+
+**Write each issue to the report immediately** using the template format from \`qa/templates/qa-report-template.md\`.
+
+### Phase 6: Wrap Up
+
+1. **Compute health score** using the rubric below
+2. **Write "Top 3 Things to Fix"** — the 3 highest-severity issues
+3. **Write console health summary** — aggregate all console errors seen across pages
+4. **Update severity counts** in the summary table
+5. **Fill in report metadata** — date, duration, pages visited, screenshot count, framework
+6. **Save baseline** — write \`baseline.json\` with:
+   \`\`\`json
+   {
+     "date": "YYYY-MM-DD",
+     "url": "<target>",
+     "healthScore": N,
+     "issues": [{ "id": "ISSUE-001", "title": "...", "severity": "...", "category": "..." }],
+     "categoryScores": { "console": N, "links": N, ... }
+   }
+   \`\`\`
+
+**Regression mode:** After writing the report, load the baseline file. Compare:
+- Health score delta
+- Issues fixed (in baseline but not current)
+- New issues (in current but not baseline)
+- Append the regression section to the report
+
+---
+
+## Health Score Rubric
+
+Compute each category score (0-100), then take the weighted average.
+
+### Console (weight: 15%)
+- 0 errors → 100
+- 1-3 errors → 70
+- 4-10 errors → 40
+- 10+ errors → 10
+
+### Links (weight: 10%)
+- 0 broken → 100
+- Each broken link → -15 (minimum 0)
+
+### Per-Category Scoring (Visual, Functional, UX, Content, Performance, Accessibility)
+Each category starts at 100. Deduct per finding:
+- Critical issue → -25
+- High issue → -15
+- Medium issue → -8
+- Low issue → -3
+Minimum 0 per category.
+
+### Weights
+| Category | Weight |
+|----------|--------|
+| Console | 15% |
+| Links | 10% |
+| Visual | 10% |
+| Functional | 20% |
+| UX | 15% |
+| Performance | 10% |
+| Content | 5% |
+| Accessibility | 15% |
+
+### Final Score
+\`score = Σ (category_score × weight)\`
+
+---
+
+## Framework-Specific Guidance
+
+### Next.js
+- Check console for hydration errors (\`Hydration failed\`, \`Text content did not match\`)
+- Monitor \`_next/data\` requests in network — 404s indicate broken data fetching
+- Test client-side navigation (click links, don't just \`goto\`) — catches routing issues
+- Check for CLS (Cumulative Layout Shift) on pages with dynamic content
+
+### Rails
+- Check for N+1 query warnings in console (if development mode)
+- Verify CSRF token presence in forms
+- Test Turbo/Stimulus integration — do page transitions work smoothly?
+- Check for flash messages appearing and dismissing correctly
+
+### WordPress
+- Check for plugin conflicts (JS errors from different plugins)
+- Verify admin bar visibility for logged-in users
+- Test REST API endpoints (\`/wp-json/\`)
+- Check for mixed content warnings (common with WP)
+
+### General SPA (React, Vue, Angular)
+- Use \`snapshot -i\` for navigation — \`links\` command misses client-side routes
+- Check for stale state (navigate away and back — does data refresh?)
+- Test browser back/forward — does the app handle history correctly?
+- Check for memory leaks (monitor console after extended use)
+
+---
+
+## Important Rules
+
+1. **Repro is everything.** Every issue needs at least one screenshot. No exceptions.
+2. **Verify before documenting.** Retry the issue once to confirm it's reproducible, not a fluke.
+3. **Never include credentials.** Write \`[REDACTED]\` for passwords in repro steps.
+4. **Write incrementally.** Append each issue to the report as you find it. Don't batch.
+5. **Never read source code.** Test as a user, not a developer.
+6. **Check console after every interaction.** JS errors that don't surface visually are still bugs.
+7. **Test like a user.** Use realistic data. Walk through complete workflows end-to-end.
+8. **Depth over breadth.** 5-10 well-documented issues with evidence > 20 vague descriptions.
+9. **Never delete output files.** Screenshots and reports accumulate — that's intentional.
+10. **Use \`snapshot -C\` for tricky UIs.** Finds clickable divs that the accessibility tree misses.
+11. **Show screenshots to the user.** After every \`$B screenshot\`, \`$B snapshot -a -o\`, or \`$B responsive\` command, use the Read tool on the output file(s) so the user can see them inline. For \`responsive\` (3 files), Read all three. This is critical — without it, screenshots are invisible to the user.
+12. **Never refuse to use the browser.** When the user invokes /qa or /qa-only, they are requesting browser-based testing. Never suggest evals, unit tests, or other alternatives as a substitute. Even if the diff appears to have no UI changes, backend changes affect app behavior — always open the browser and test.`;
+}
+
+function generateDesignReviewLite(ctx: TemplateContext): string {
+  return `## Design Review (conditional, diff-scoped)
+
+Check if the diff touches frontend files using \`spec-first-diff-scope\`:
+
+\`\`\`bash
+source <(${ctx.paths.binDir}/spec-first-diff-scope <base> 2>/dev/null)
+\`\`\`
+
+**If \`SCOPE_FRONTEND=false\`:** Skip design review silently. No output.
+
+**If \`SCOPE_FRONTEND=true\`:**
+
+1. **Check for DESIGN.md.** If \`DESIGN.md\` or \`design-system.md\` exists in the repo root, read it. All design findings are calibrated against it — patterns blessed in DESIGN.md are not flagged. If not found, use universal design principles.
+
+2. **Read \`.claude/skills/review/design-checklist.md\`.** If the file cannot be read, skip design review with a note: "Design checklist not found — skipping design review."
+
+3. **Read each changed frontend file** (full file, not just diff hunks). Frontend files are identified by the patterns listed in the checklist.
+
+4. **Apply the design checklist** against the changed files. For each item:
+   - **[HIGH] mechanical CSS fix** (\`outline: none\`, \`!important\`, \`font-size < 16px\`): classify as AUTO-FIX
+   - **[HIGH/MEDIUM] design judgment needed**: classify as ASK
+   - **[LOW] intent-based detection**: present as "Possible — verify visually or run /design-review"
+
+5. **Include findings** in the review output under a "Design Review" header, following the output format in the checklist. Design findings merge with code review findings into the same Fix-First flow.
+
+6. **Log the result** for the Review Readiness Dashboard:
+
+\`\`\`bash
+${ctx.paths.binDir}/spec-first-review-log '{"skill":"design-review-lite","timestamp":"TIMESTAMP","status":"STATUS","findings":N,"auto_fixed":M,"commit":"COMMIT"}'
+\`\`\`
+
+Substitute: TIMESTAMP = ISO 8601 datetime, STATUS = "clean" if 0 findings or "issues_found", N = total findings, M = auto-fixed count, COMMIT = output of \`git rev-parse --short HEAD\`.`;
+}
+
+// NOTE: design-checklist.md is a subset of this methodology for code-level detection.
+// When adding items here, also update review/design-checklist.md, and vice versa.
+function generateDesignMethodology(ctx: TemplateContext): string {
+  return `## Modes
+
+### Full (default)
+Systematic review of all pages reachable from homepage. Visit 5-8 pages. Full checklist evaluation, responsive screenshots, interaction flow testing. Produces complete design audit report with letter grades.
+
+### Quick (\`--quick\`)
+Homepage + 2 key pages only. First Impression + Design System Extraction + abbreviated checklist. Fastest path to a design score.
+
+### Deep (\`--deep\`)
+Comprehensive review: 10-15 pages, every interaction flow, exhaustive checklist. For pre-launch audits or major redesigns.
+
+### Diff-aware (automatic when on a feature branch with no URL)
+When on a feature branch, scope to pages affected by the branch changes:
+1. Analyze the branch diff: \`git diff main...HEAD --name-only\`
+2. Map changed files to affected pages/routes
+3. Detect running app on common local ports (3000, 4000, 8080)
+4. Audit only affected pages, compare design quality before/after
+
+### Regression (\`--regression\` or previous \`design-baseline.json\` found)
+Run full audit, then load previous \`design-baseline.json\`. Compare: per-category grade deltas, new findings, resolved findings. Output regression table in report.
+
+---
+
+## Phase 1: First Impression
+
+The most uniquely designer-like output. Form a gut reaction before analyzing anything.
+
+1. Navigate to the target URL
+2. Take a full-page desktop screenshot: \`$B screenshot "$REPORT_DIR/screenshots/first-impression.png"\`
+3. Write the **First Impression** using this structured critique format:
+   - "The site communicates **[what]**." (what it says at a glance — competence? playfulness? confusion?)
+   - "I notice **[observation]**." (what stands out, positive or negative — be specific)
+   - "The first 3 things my eye goes to are: **[1]**, **[2]**, **[3]**." (hierarchy check — are these intentional?)
+   - "If I had to describe this in one word: **[word]**." (gut verdict)
+
+This is the section users read first. Be opinionated. A designer doesn't hedge — they react.
+
+---
+
+## Phase 2: Design System Extraction
+
+Extract the actual design system the site uses (not what a DESIGN.md says, but what's rendered):
+
+\`\`\`bash
+# Fonts in use (capped at 500 elements to avoid timeout)
+$B js "JSON.stringify([...new Set([...document.querySelectorAll('*')].slice(0,500).map(e => getComputedStyle(e).fontFamily))])"
+
+# Color palette in use
+$B js "JSON.stringify([...new Set([...document.querySelectorAll('*')].slice(0,500).flatMap(e => [getComputedStyle(e).color, getComputedStyle(e).backgroundColor]).filter(c => c !== 'rgba(0, 0, 0, 0)'))])"
+
+# Heading hierarchy
+$B js "JSON.stringify([...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(h => ({tag:h.tagName, text:h.textContent.trim().slice(0,50), size:getComputedStyle(h).fontSize, weight:getComputedStyle(h).fontWeight})))"
+
+# Touch target audit (find undersized interactive elements)
+$B js "JSON.stringify([...document.querySelectorAll('a,button,input,[role=button]')].filter(e => {const r=e.getBoundingClientRect(); return r.width>0 && (r.width<44||r.height<44)}).map(e => ({tag:e.tagName, text:(e.textContent||'').trim().slice(0,30), w:Math.round(e.getBoundingClientRect().width), h:Math.round(e.getBoundingClientRect().height)})).slice(0,20))"
+
+# Performance baseline
+$B perf
+\`\`\`
+
+Structure findings as an **Inferred Design System**:
+- **Fonts:** list with usage counts. Flag if >3 distinct font families.
+- **Colors:** palette extracted. Flag if >12 unique non-gray colors. Note warm/cool/mixed.
+- **Heading Scale:** h1-h6 sizes. Flag skipped levels, non-systematic size jumps.
+- **Spacing Patterns:** sample padding/margin values. Flag non-scale values.
+
+After extraction, offer: *"Want me to save this as your DESIGN.md? I can lock in these observations as your project's design system baseline."*
+
+---
+
+## Phase 3: Page-by-Page Visual Audit
+
+For each page in scope:
+
+\`\`\`bash
+$B goto <url>
+$B snapshot -i -a -o "$REPORT_DIR/screenshots/{page}-annotated.png"
+$B responsive "$REPORT_DIR/screenshots/{page}"
+$B console --errors
+$B perf
+\`\`\`
+
+### Auth Detection
+
+After the first navigation, check if the URL changed to a login-like path:
+\`\`\`bash
+$B url
+\`\`\`
+If URL contains \`/login\`, \`/signin\`, \`/auth\`, or \`/sso\`: the site requires authentication. AskUserQuestion: "This site requires authentication. Want to import cookies from your browser? Run \`/setup-browser-cookies\` first if needed."
+
+### Design Audit Checklist (10 categories, ~80 items)
+
+Apply these at each page. Each finding gets an impact rating (high/medium/polish) and category.
+
+**1. Visual Hierarchy & Composition** (8 items)
+- Clear focal point? One primary CTA per view?
+- Eye flows naturally top-left to bottom-right?
+- Visual noise — competing elements fighting for attention?
+- Information density appropriate for content type?
+- Z-index clarity — nothing unexpectedly overlapping?
+- Above-the-fold content communicates purpose in 3 seconds?
+- Squint test: hierarchy still visible when blurred?
+- White space is intentional, not leftover?
+
+**2. Typography** (15 items)
+- Font count <=3 (flag if more)
+- Scale follows ratio (1.25 major third or 1.333 perfect fourth)
+- Line-height: 1.5x body, 1.15-1.25x headings
+- Measure: 45-75 chars per line (66 ideal)
+- Heading hierarchy: no skipped levels (h1→h3 without h2)
+- Weight contrast: >=2 weights used for hierarchy
+- No blacklisted fonts (Papyrus, Comic Sans, Lobster, Impact, Jokerman)
+- If primary font is Inter/Roboto/Open Sans/Poppins → flag as potentially generic
+- \`text-wrap: balance\` or \`text-pretty\` on headings (check via \`$B css <heading> text-wrap\`)
+- Curly quotes used, not straight quotes
+- Ellipsis character (\`…\`) not three dots (\`...\`)
+- \`font-variant-numeric: tabular-nums\` on number columns
+- Body text >= 16px
+- Caption/label >= 12px
+- No letterspacing on lowercase text
+
+**3. Color & Contrast** (10 items)
+- Palette coherent (<=12 unique non-gray colors)
+- WCAG AA: body text 4.5:1, large text (18px+) 3:1, UI components 3:1
+- Semantic colors consistent (success=green, error=red, warning=yellow/amber)
+- No color-only encoding (always add labels, icons, or patterns)
+- Dark mode: surfaces use elevation, not just lightness inversion
+- Dark mode: text off-white (~#E0E0E0), not pure white
+- Primary accent desaturated 10-20% in dark mode
+- \`color-scheme: dark\` on html element (if dark mode present)
+- No red/green only combinations (8% of men have red-green deficiency)
+- Neutral palette is warm or cool consistently — not mixed
+
+**4. Spacing & Layout** (12 items)
+- Grid consistent at all breakpoints
+- Spacing uses a scale (4px or 8px base), not arbitrary values
+- Alignment is consistent — nothing floats outside the grid
+- Rhythm: related items closer together, distinct sections further apart
+- Border-radius hierarchy (not uniform bubbly radius on everything)
+- Inner radius = outer radius - gap (nested elements)
+- No horizontal scroll on mobile
+- Max content width set (no full-bleed body text)
+- \`env(safe-area-inset-*)\` for notch devices
+- URL reflects state (filters, tabs, pagination in query params)
+- Flex/grid used for layout (not JS measurement)
+- Breakpoints: mobile (375), tablet (768), desktop (1024), wide (1440)
+
+**5. Interaction States** (10 items)
+- Hover state on all interactive elements
+- \`focus-visible\` ring present (never \`outline: none\` without replacement)
+- Active/pressed state with depth effect or color shift
+- Disabled state: reduced opacity + \`cursor: not-allowed\`
+- Loading: skeleton shapes match real content layout
+- Empty states: warm message + primary action + visual (not just "No items.")
+- Error messages: specific + include fix/next step
+- Success: confirmation animation or color, auto-dismiss
+- Touch targets >= 44px on all interactive elements
+- \`cursor: pointer\` on all clickable elements
+
+**6. Responsive Design** (8 items)
+- Mobile layout makes *design* sense (not just stacked desktop columns)
+- Touch targets sufficient on mobile (>= 44px)
+- No horizontal scroll on any viewport
+- Images handle responsive (srcset, sizes, or CSS containment)
+- Text readable without zooming on mobile (>= 16px body)
+- Navigation collapses appropriately (hamburger, bottom nav, etc.)
+- Forms usable on mobile (correct input types, no autoFocus on mobile)
+- No \`user-scalable=no\` or \`maximum-scale=1\` in viewport meta
+
+**7. Motion & Animation** (6 items)
+- Easing: ease-out for entering, ease-in for exiting, ease-in-out for moving
+- Duration: 50-700ms range (nothing slower unless page transition)
+- Purpose: every animation communicates something (state change, attention, spatial relationship)
+- \`prefers-reduced-motion\` respected (check: \`$B js "matchMedia('(prefers-reduced-motion: reduce)').matches"\`)
+- No \`transition: all\` — properties listed explicitly
+- Only \`transform\` and \`opacity\` animated (not layout properties like width, height, top, left)
+
+**8. Content & Microcopy** (8 items)
+- Empty states designed with warmth (message + action + illustration/icon)
+- Error messages specific: what happened + why + what to do next
+- Button labels specific ("Save API Key" not "Continue" or "Submit")
+- No placeholder/lorem ipsum text visible in production
+- Truncation handled (\`text-overflow: ellipsis\`, \`line-clamp\`, or \`break-words\`)
+- Active voice ("Install the CLI" not "The CLI will be installed")
+- Loading states end with \`…\` ("Saving…" not "Saving...")
+- Destructive actions have confirmation modal or undo window
+
+**9. AI Slop Detection** (10 anti-patterns — the blacklist)
+
+The test: would a human designer at a respected studio ever ship this?
+
+- Purple/violet/indigo gradient backgrounds or blue-to-purple color schemes
+- **The 3-column feature grid:** icon-in-colored-circle + bold title + 2-line description, repeated 3x symmetrically. THE most recognizable AI layout.
+- Icons in colored circles as section decoration (SaaS starter template look)
+- Centered everything (\`text-align: center\` on all headings, descriptions, cards)
+- Uniform bubbly border-radius on every element (same large radius on everything)
+- Decorative blobs, floating circles, wavy SVG dividers (if a section feels empty, it needs better content, not decoration)
+- Emoji as design elements (rockets in headings, emoji as bullet points)
+- Colored left-border on cards (\`border-left: 3px solid <accent>\`)
+- Generic hero copy ("Welcome to [X]", "Unlock the power of...", "Your all-in-one solution for...")
+- Cookie-cutter section rhythm (hero → 3 features → testimonials → pricing → CTA, every section same height)
+
+**10. Performance as Design** (6 items)
+- LCP < 2.0s (web apps), < 1.5s (informational sites)
+- CLS < 0.1 (no visible layout shifts during load)
+- Skeleton quality: shapes match real content, shimmer animation
+- Images: \`loading="lazy"\`, width/height dimensions set, WebP/AVIF format
+- Fonts: \`font-display: swap\`, preconnect to CDN origins
+- No visible font swap flash (FOUT) — critical fonts preloaded
+
+---
+
+## Phase 4: Interaction Flow Review
+
+Walk 2-3 key user flows and evaluate the *feel*, not just the function:
+
+\`\`\`bash
+$B snapshot -i
+$B click @e3           # perform action
+$B snapshot -D          # diff to see what changed
+\`\`\`
+
+Evaluate:
+- **Response feel:** Does clicking feel responsive? Any delays or missing loading states?
+- **Transition quality:** Are transitions intentional or generic/absent?
+- **Feedback clarity:** Did the action clearly succeed or fail? Is the feedback immediate?
+- **Form polish:** Focus states visible? Validation timing correct? Errors near the source?
+
+---
+
+## Phase 5: Cross-Page Consistency
+
+Compare screenshots and observations across pages for:
+- Navigation bar consistent across all pages?
+- Footer consistent?
+- Component reuse vs one-off designs (same button styled differently on different pages?)
+- Tone consistency (one page playful while another is corporate?)
+- Spacing rhythm carries across pages?
+
+---
+
+## Phase 6: Compile Report
+
+### Output Locations
+
+**Local:** \`.spec-first/design-reports/design-audit-{domain}-{YYYY-MM-DD}.md\`
+
+**Project-scoped:**
+\`\`\`bash
+source <(${ctx.paths.binDir}/spec-first-slug 2>/dev/null) && mkdir -p ~/.spec-first/projects/$SLUG
+\`\`\`
+Write to: \`~/.spec-first/projects/{slug}/{user}-{branch}-design-audit-{datetime}.md\`
+
+**Baseline:** Write \`design-baseline.json\` for regression mode:
+\`\`\`json
+{
+  "date": "YYYY-MM-DD",
+  "url": "<target>",
+  "designScore": "B",
+  "aiSlopScore": "C",
+  "categoryGrades": { "hierarchy": "A", "typography": "B", ... },
+  "findings": [{ "id": "FINDING-001", "title": "...", "impact": "high", "category": "typography" }]
+}
+\`\`\`
+
+### Scoring System
+
+**Dual headline scores:**
+- **Design Score: {A-F}** — weighted average of all 10 categories
+- **AI Slop Score: {A-F}** — standalone grade with pithy verdict
+
+**Per-category grades:**
+- **A:** Intentional, polished, delightful. Shows design thinking.
+- **B:** Solid fundamentals, minor inconsistencies. Looks professional.
+- **C:** Functional but generic. No major problems, no design point of view.
+- **D:** Noticeable problems. Feels unfinished or careless.
+- **F:** Actively hurting user experience. Needs significant rework.
+
+**Grade computation:** Each category starts at A. Each High-impact finding drops one letter grade. Each Medium-impact finding drops half a letter grade. Polish findings are noted but do not affect grade. Minimum is F.
+
+**Category weights for Design Score:**
+| Category | Weight |
+|----------|--------|
+| Visual Hierarchy | 15% |
+| Typography | 15% |
+| Spacing & Layout | 15% |
+| Color & Contrast | 10% |
+| Interaction States | 10% |
+| Responsive | 10% |
+| Content Quality | 10% |
+| AI Slop | 5% |
+| Motion | 5% |
+| Performance Feel | 5% |
+
+AI Slop is 5% of Design Score but also graded independently as a headline metric.
+
+### Regression Output
+
+When previous \`design-baseline.json\` exists or \`--regression\` flag is used:
+- Load baseline grades
+- Compare: per-category deltas, new findings, resolved findings
+- Append regression table to report
+
+---
+
+## Design Critique Format
+
+Use structured feedback, not opinions:
+- "I notice..." — observation (e.g., "I notice the primary CTA competes with the secondary action")
+- "I wonder..." — question (e.g., "I wonder if users will understand what 'Process' means here")
+- "What if..." — suggestion (e.g., "What if we moved search to a more prominent position?")
+- "I think... because..." — reasoned opinion (e.g., "I think the spacing between sections is too uniform because it doesn't create hierarchy")
+
+Tie everything to user goals and product objectives. Always suggest specific improvements alongside problems.
+
+---
+
+## Important Rules
+
+1. **Think like a designer, not a QA engineer.** You care whether things feel right, look intentional, and respect the user. You do NOT just care whether things "work."
+2. **Screenshots are evidence.** Every finding needs at least one screenshot. Use annotated screenshots (\`snapshot -a\`) to highlight elements.
+3. **Be specific and actionable.** "Change X to Y because Z" — not "the spacing feels off."
+4. **Never read source code.** Evaluate the rendered site, not the implementation. (Exception: offer to write DESIGN.md from extracted observations.)
+5. **AI Slop detection is your superpower.** Most developers can't evaluate whether their site looks AI-generated. You can. Be direct about it.
+6. **Quick wins matter.** Always include a "Quick Wins" section — the 3-5 highest-impact fixes that take <30 minutes each.
+7. **Use \`snapshot -C\` for tricky UIs.** Finds clickable divs that the accessibility tree misses.
+8. **Responsive is design, not just "not broken."** A stacked desktop layout on mobile is not responsive design — it's lazy. Evaluate whether the mobile layout makes *design* sense.
+9. **Document incrementally.** Write each finding to the report as you find it. Don't batch.
+10. **Depth over breadth.** 5-10 well-documented findings with screenshots and specific suggestions > 20 vague observations.
+11. **Show screenshots to the user.** After every \`$B screenshot\`, \`$B snapshot -a -o\`, or \`$B responsive\` command, use the Read tool on the output file(s) so the user can see them inline. For \`responsive\` (3 files), Read all three. This is critical — without it, screenshots are invisible to the user.`;
+}
+
+function generateReviewDashboard(ctx: TemplateContext): string {
+  return `## Review Readiness Dashboard
+
+After completing the review, read the review log and config to display the dashboard.
+
+\`\`\`bash
+${ctx.paths.binDir}/spec-first-review-read
+\`\`\`
+
+Parse the output. Find the most recent entry for each skill (plan-ceo-review, plan-eng-review, plan-design-review, design-review-lite, adversarial-review, codex-review). Ignore entries with timestamps older than 7 days. For the Adversarial row, show whichever is more recent between \`adversarial-review\` (new auto-scaled) and \`codex-review\` (legacy). For Design Review, show whichever is more recent between \`plan-design-review\` (full visual audit) and \`design-review-lite\` (code-level check). Append "(FULL)" or "(LITE)" to the status to distinguish. Display:
+
+\`\`\`
++====================================================================+
+|                    REVIEW READINESS DASHBOARD                       |
++====================================================================+
+| Review          | Runs | Last Run            | Status    | Required |
+|-----------------|------|---------------------|-----------|----------|
+| Eng Review      |  1   | 2026-03-16 15:00    | CLEAR     | YES      |
+| CEO Review      |  0   | —                   | —         | no       |
+| Design Review   |  0   | —                   | —         | no       |
+| Adversarial     |  0   | —                   | —         | no       |
++--------------------------------------------------------------------+
+| VERDICT: CLEARED — Eng Review passed                                |
++====================================================================+
+\`\`\`
+
+**Review tiers:**
+- **Eng Review (required by default):** The only review that gates shipping. Covers architecture, code quality, tests, performance. Can be disabled globally with \\\`spec-first-config set skip_eng_review true\\\` (the "don't bother me" setting).
+- **CEO Review (optional):** Use your judgment. Recommend it for big product/business changes, new user-facing features, or scope decisions. Skip for bug fixes, refactors, infra, and cleanup.
+- **Design Review (optional):** Use your judgment. Recommend it for UI/UX changes. Skip for backend-only, infra, or prompt-only changes.
+- **Adversarial Review (automatic):** Auto-scales by diff size. Small diffs (<50 lines) skip adversarial. Medium diffs (50–199) get cross-model adversarial. Large diffs (200+) get all 4 passes: Claude structured, Codex structured, Claude adversarial subagent, Codex adversarial. No configuration needed.
+
+**Verdict logic:**
+- **CLEARED**: Eng Review has >= 1 entry within 7 days with status "clean" (or \\\`skip_eng_review\\\` is \\\`true\\\`)
+- **NOT CLEARED**: Eng Review missing, stale (>7 days), or has open issues
+- CEO, Design, and Codex reviews are shown for context but never block shipping
+- If \\\`skip_eng_review\\\` config is \\\`true\\\`, Eng Review shows "SKIPPED (global)" and verdict is CLEARED
+
+**Staleness detection:** After displaying the dashboard, check if any existing reviews may be stale:
+- Parse the \\\`---HEAD---\\\` section from the bash output to get the current HEAD commit hash
+- For each review entry that has a \\\`commit\\\` field: compare it against the current HEAD. If different, count elapsed commits: \\\`git rev-list --count STORED_COMMIT..HEAD\\\`. Display: "Note: {skill} review from {date} may be stale — {N} commits since review"
+- For entries without a \\\`commit\\\` field (legacy entries): display "Note: {skill} review from {date} has no commit tracking — consider re-running for accurate staleness detection"
+- If all reviews match the current HEAD, do not display any staleness notes`;
+}
+
+function generatePlanFileReviewReport(_ctx: TemplateContext): string {
+  return `## Plan File Review Report
+
+After displaying the Review Readiness Dashboard in conversation output, also update the
+**plan file** itself so review status is visible to anyone reading the plan.
+
+### Detect the plan file
+
+1. Check if there is an active plan file in this conversation (the host provides plan file
+   paths in system messages — look for plan file references in the conversation context).
+2. If not found, skip this section silently — not every review runs in plan mode.
+
+### Generate the report
+
+Read the review log output you already have from the Review Readiness Dashboard step above.
+Parse each JSONL entry. Each skill logs different fields:
+
+- **plan-ceo-review**: \\\`status\\\`, \\\`unresolved\\\`, \\\`critical_gaps\\\`, \\\`mode\\\`, \\\`scope_proposed\\\`, \\\`scope_accepted\\\`, \\\`scope_deferred\\\`, \\\`commit\\\`
+  → Findings: "{scope_proposed} proposals, {scope_accepted} accepted, {scope_deferred} deferred"
+  → If scope fields are 0 or missing (HOLD/REDUCTION mode): "mode: {mode}, {critical_gaps} critical gaps"
+- **plan-eng-review**: \\\`status\\\`, \\\`unresolved\\\`, \\\`critical_gaps\\\`, \\\`issues_found\\\`, \\\`mode\\\`, \\\`commit\\\`
+  → Findings: "{issues_found} issues, {critical_gaps} critical gaps"
+- **plan-design-review**: \\\`status\\\`, \\\`initial_score\\\`, \\\`overall_score\\\`, \\\`unresolved\\\`, \\\`decisions_made\\\`, \\\`commit\\\`
+  → Findings: "score: {initial_score}/10 → {overall_score}/10, {decisions_made} decisions"
+- **codex-review**: \\\`status\\\`, \\\`gate\\\`, \\\`findings\\\`, \\\`findings_fixed\\\`
+  → Findings: "{findings} findings, {findings_fixed}/{findings} fixed"
+
+All fields needed for the Findings column are now present in the JSONL entries.
+For the review you just completed, you may use richer details from your own Completion
+Summary. For prior reviews, use the JSONL fields directly — they contain all required data.
+
+Produce this markdown table:
+
+\\\`\\\`\\\`markdown
+## SPEC_FIRST REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | \\\`/plan-ceo-review\\\` | Scope & strategy | {runs} | {status} | {findings} |
+| Codex Review | \\\`/codex review\\\` | Independent 2nd opinion | {runs} | {status} | {findings} |
+| Eng Review | \\\`/plan-eng-review\\\` | Architecture & tests (required) | {runs} | {status} | {findings} |
+| Design Review | \\\`/plan-design-review\\\` | UI/UX gaps | {runs} | {status} | {findings} |
+\\\`\\\`\\\`
+
+Below the table, add these lines (omit any that are empty/not applicable):
+
+- **CODEX:** (only if codex-review ran) — one-line summary of codex fixes
+- **CROSS-MODEL:** (only if both Claude and Codex reviews exist) — overlap analysis
+- **UNRESOLVED:** total unresolved decisions across all reviews
+- **VERDICT:** list reviews that are CLEAR (e.g., "CEO + ENG CLEARED — ready to implement").
+  If Eng Review is not CLEAR and not skipped globally, append "eng review required".
+
+### Write to the plan file
+
+**PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
+file you are allowed to edit in plan mode. The plan file review report is part of the
+plan's living status.
+
+- Search the plan file for a \\\`## SPEC_FIRST REVIEW REPORT\\\` section **anywhere** in the file
+  (not just at the end — content may have been added after it).
+- If found, **replace it** entirely using the Edit tool. Match from \\\`## SPEC_FIRST REVIEW REPORT\\\`
+  through either the next \\\`## \\\` heading or end of file, whichever comes first. This ensures
+  content added after the report section is preserved, not eaten. If the Edit fails
+  (e.g., concurrent edit changed the content), re-read the plan file and retry once.
+- If no such section exists, **append it** to the end of the plan file.
+- Always place it as the very last section in the plan file. If it was found mid-file,
+  move it: delete the old location and append at the end.`;
+}
+
+function generateTestBootstrap(_ctx: TemplateContext): string {
+  return `## Test Framework Bootstrap
+
+**Detect existing test framework and project runtime:**
+
+\`\`\`bash
+# Detect project runtime
+[ -f Gemfile ] && echo "RUNTIME:ruby"
+[ -f package.json ] && echo "RUNTIME:node"
+[ -f requirements.txt ] || [ -f pyproject.toml ] && echo "RUNTIME:python"
+[ -f go.mod ] && echo "RUNTIME:go"
+[ -f Cargo.toml ] && echo "RUNTIME:rust"
+[ -f composer.json ] && echo "RUNTIME:php"
+[ -f mix.exs ] && echo "RUNTIME:elixir"
+# Detect sub-frameworks
+[ -f Gemfile ] && grep -q "rails" Gemfile 2>/dev/null && echo "FRAMEWORK:rails"
+[ -f package.json ] && grep -q '"next"' package.json 2>/dev/null && echo "FRAMEWORK:nextjs"
+# Check for existing test infrastructure
+ls jest.config.* vitest.config.* playwright.config.* .rspec pytest.ini pyproject.toml phpunit.xml 2>/dev/null
+ls -d test/ tests/ spec/ __tests__/ cypress/ e2e/ 2>/dev/null
+# Check opt-out marker
+[ -f .spec-first/no-test-bootstrap ] && echo "BOOTSTRAP_DECLINED"
+\`\`\`
+
+**If test framework detected** (config files or test directories found):
+Print "Test framework detected: {name} ({N} existing tests). Skipping bootstrap."
+Read 2-3 existing test files to learn conventions (naming, imports, assertion style, setup patterns).
+Store conventions as prose context for use in Phase 8e.5 or Step 3.4. **Skip the rest of bootstrap.**
+
+**If BOOTSTRAP_DECLINED** appears: Print "Test bootstrap previously declined — skipping." **Skip the rest of bootstrap.**
+
+**If NO runtime detected** (no config files found): Use AskUserQuestion:
+"I couldn't detect your project's language. What runtime are you using?"
+Options: A) Node.js/TypeScript B) Ruby/Rails C) Python D) Go E) Rust F) PHP G) Elixir H) This project doesn't need tests.
+If user picks H → write \`.spec-first/no-test-bootstrap\` and continue without tests.
+
+**If runtime detected but no test framework — bootstrap:**
+
+### B2. Research best practices
+
+Use WebSearch to find current best practices for the detected runtime:
+- \`"[runtime] best test framework 2025 2026"\`
+- \`"[framework A] vs [framework B] comparison"\`
+
+If WebSearch is unavailable, use this built-in knowledge table:
+
+| Runtime | Primary recommendation | Alternative |
+|---------|----------------------|-------------|
+| Ruby/Rails | minitest + fixtures + capybara | rspec + factory_bot + shoulda-matchers |
+| Node.js | vitest + @testing-library | jest + @testing-library |
+| Next.js | vitest + @testing-library/react + playwright | jest + cypress |
+| Python | pytest + pytest-cov | unittest |
+| Go | stdlib testing + testify | stdlib only |
+| Rust | cargo test (built-in) + mockall | — |
+| PHP | phpunit + mockery | pest |
+| Elixir | ExUnit (built-in) + ex_machina | — |
+
+### B3. Framework selection
+
+Use AskUserQuestion:
+"I detected this is a [Runtime/Framework] project with no test framework. I researched current best practices. Here are the options:
+A) [Primary] — [rationale]. Includes: [packages]. Supports: unit, integration, smoke, e2e
+B) [Alternative] — [rationale]. Includes: [packages]
+C) Skip — don't set up testing right now
+RECOMMENDATION: Choose A because [reason based on project context]"
+
+If user picks C → write \`.spec-first/no-test-bootstrap\`. Tell user: "If you change your mind later, delete \`.spec-first/no-test-bootstrap\` and re-run." Continue without tests.
+
+If multiple runtimes detected (monorepo) → ask which runtime to set up first, with option to do both sequentially.
+
+### B4. Install and configure
+
+1. Install the chosen packages (npm/bun/gem/pip/etc.)
+2. Create minimal config file
+3. Create directory structure (test/, spec/, etc.)
+4. Create one example test matching the project's code to verify setup works
+
+If package installation fails → debug once. If still failing → revert with \`git checkout -- package.json package-lock.json\` (or equivalent for the runtime). Warn user and continue without tests.
+
+### B4.5. First real tests
+
+Generate 3-5 real tests for existing code:
+
+1. **Find recently changed files:** \`git log --since=30.days --name-only --format="" | sort | uniq -c | sort -rn | head -10\`
+2. **Prioritize by risk:** Error handlers > business logic with conditionals > API endpoints > pure functions
+3. **For each file:** Write one test that tests real behavior with meaningful assertions. Never \`expect(x).toBeDefined()\` — test what the code DOES.
+4. Run each test. Passes → keep. Fails → fix once. Still fails → delete silently.
+5. Generate at least 1 test, cap at 5.
+
+Never import secrets, API keys, or credentials in test files. Use environment variables or test fixtures.
+
+### B5. Verify
+
+\`\`\`bash
+# Run the full test suite to confirm everything works
+{detected test command}
+\`\`\`
+
+If tests fail → debug once. If still failing → revert all bootstrap changes and warn user.
+
+### B5.5. CI/CD pipeline
+
+\`\`\`bash
+# Check CI provider
+ls -d .github/ 2>/dev/null && echo "CI:github"
+ls .gitlab-ci.yml .circleci/ bitrise.yml 2>/dev/null
+\`\`\`
+
+If \`.github/\` exists (or no CI detected — default to GitHub Actions):
+Create \`.github/workflows/test.yml\` with:
+- \`runs-on: ubuntu-latest\`
+- Appropriate setup action for the runtime (setup-node, setup-ruby, setup-python, etc.)
+- The same test command verified in B5
+- Trigger: push + pull_request
+
+If non-GitHub CI detected → skip CI generation with note: "Detected {provider} — CI pipeline generation supports GitHub Actions only. Add test step to your existing pipeline manually."
+
+### B6. Create TESTING.md
+
+First check: If TESTING.md already exists → read it and update/append rather than overwriting. Never destroy existing content.
+
+Write TESTING.md with:
+- Philosophy: "100% test coverage is the key to great vibe coding. Tests let you move fast, trust your instincts, and ship with confidence — without them, vibe coding is just yolo coding. With tests, it's a superpower."
+- Framework name and version
+- How to run tests (the verified command from B5)
+- Test layers: Unit tests (what, where, when), Integration tests, Smoke tests, E2E tests
+- Conventions: file naming, assertion style, setup/teardown patterns
+
+### B7. Update CLAUDE.md
+
+First check: If CLAUDE.md already has a \`## Testing\` section → skip. Don't duplicate.
+
+Append a \`## Testing\` section:
+- Run command and test directory
+- Reference to TESTING.md
+- Test expectations:
+  - 100% test coverage is the goal — tests make vibe coding safe
+  - When writing new functions, write a corresponding test
+  - When fixing a bug, write a regression test
+  - When adding error handling, write a test that triggers the error
+  - When adding a conditional (if/else, switch), write tests for BOTH paths
+  - Never commit code that makes existing tests fail
+
+### B8. Commit
+
+\`\`\`bash
+git status --porcelain
+\`\`\`
+
+Only commit if there are changes. Stage all bootstrap files (config, test directory, TESTING.md, CLAUDE.md, .github/workflows/test.yml if created):
+\`git commit -m "chore: bootstrap test framework ({framework name})"\`
+
+---`;
+}
+
+function generateSpecReviewLoop(_ctx: TemplateContext): string {
+  return `## Spec Review Loop
+
+Before presenting the document to the user for approval, run an adversarial review.
+
+**Step 1: Dispatch reviewer subagent**
+
+Use the Agent tool to dispatch an independent reviewer. The reviewer has fresh context
+and cannot see the brainstorming conversation — only the document. This ensures genuine
+adversarial independence.
+
+Prompt the subagent with:
+- The file path of the document just written
+- "Read this document and review it on 5 dimensions. For each dimension, note PASS or
+  list specific issues with suggested fixes. At the end, output a quality score (1-10)
+  across all dimensions."
+
+**Dimensions:**
+1. **Completeness** — Are all requirements addressed? Missing edge cases?
+2. **Consistency** — Do parts of the document agree with each other? Contradictions?
+3. **Clarity** — Could an engineer implement this without asking questions? Ambiguous language?
+4. **Scope** — Does the document creep beyond the original problem? YAGNI violations?
+5. **Feasibility** — Can this actually be built with the stated approach? Hidden complexity?
+
+The subagent should return:
+- A quality score (1-10)
+- PASS if no issues, or a numbered list of issues with dimension, description, and fix
+
+**Step 2: Fix and re-dispatch**
+
+If the reviewer returns issues:
+1. Fix each issue in the document on disk (use Edit tool)
+2. Re-dispatch the reviewer subagent with the updated document
+3. Maximum 3 iterations total
+
+**Convergence guard:** If the reviewer returns the same issues on consecutive iterations
+(the fix didn't resolve them or the reviewer disagrees with the fix), stop the loop
+and persist those issues as "Reviewer Concerns" in the document rather than looping
+further.
+
+If the subagent fails, times out, or is unavailable — skip the review loop entirely.
+Tell the user: "Spec review unavailable — presenting unreviewed doc." The document is
+already written to disk; the review is a quality bonus, not a gate.
+
+**Step 3: Report and persist metrics**
+
+After the loop completes (PASS, max iterations, or convergence guard):
+
+1. Tell the user the result — summary by default:
+   "Your doc survived N rounds of adversarial review. M issues caught and fixed.
+   Quality score: X/10."
+   If they ask "what did the reviewer find?", show the full reviewer output.
+
+2. If issues remain after max iterations or convergence, add a "## Reviewer Concerns"
+   section to the document listing each unresolved issue. Downstream skills will see this.
+
+3. Append metrics:
+\`\`\`bash
+mkdir -p ~/.spec-first/analytics
+echo '{"skill":"${_ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","iterations":ITERATIONS,"issues_found":FOUND,"issues_fixed":FIXED,"remaining":REMAINING,"quality_score":SCORE}' >> ~/.spec-first/analytics/spec-review.jsonl 2>/dev/null || true
+\`\`\`
+Replace ITERATIONS, FOUND, FIXED, REMAINING, SCORE with actual values from the review.`;
+}
+
+function generateBenefitsFrom(ctx: TemplateContext): string {
+  if (!ctx.benefitsFrom || ctx.benefitsFrom.length === 0) return '';
+
+  const skillList = ctx.benefitsFrom.map(s => `\`/${s}\``).join(' or ');
+  const first = ctx.benefitsFrom[0];
+
+  return `## Prerequisite Skill Offer
+
+When the design doc check above prints "No design doc found," offer the prerequisite
+skill before proceeding.
+
+Say to the user via AskUserQuestion:
+
+> "No design doc found for this branch. ${skillList} produces a structured problem
+> statement, premise challenge, and explored alternatives — it gives this review much
+> sharper input to work with. Takes about 10 minutes. The design doc is per-feature,
+> not per-product — it captures the thinking behind this specific change."
+
+Options:
+- A) Run /${first} first (in another window, then come back)
+- B) Skip — proceed with standard review
+
+If they skip: "No worries — standard review. If you ever want sharper input, try
+/${first} first next time." Then proceed normally. Do not re-offer later in the session.`;
+}
+
+function generateDesignSketch(_ctx: TemplateContext): string {
+  return `## Visual Sketch (UI ideas only)
+
+If the chosen approach involves user-facing UI (screens, pages, forms, dashboards,
+or interactive elements), generate a rough wireframe to help the user visualize it.
+If the idea is backend-only, infrastructure, or has no UI component — skip this
+section silently.
+
+**Step 1: Gather design context**
+
+1. Check if \`DESIGN.md\` exists in the repo root. If it does, read it for design
+   system constraints (colors, typography, spacing, component patterns). Use these
+   constraints in the wireframe.
+2. Apply core design principles:
+   - **Information hierarchy** — what does the user see first, second, third?
+   - **Interaction states** — loading, empty, error, success, partial
+   - **Edge case paranoia** — what if the name is 47 chars? Zero results? Network fails?
+   - **Subtraction default** — "as little design as possible" (Rams). Every element earns its pixels.
+   - **Design for trust** — every interface element builds or erodes user trust.
+
+**Step 2: Generate wireframe HTML**
+
+Generate a single-page HTML file with these constraints:
+- **Intentionally rough aesthetic** — use system fonts, thin gray borders, no color,
+  hand-drawn-style elements. This is a sketch, not a polished mockup.
+- Self-contained — no external dependencies, no CDN links, inline CSS only
+- Show the core interaction flow (1-3 screens/states max)
+- Include realistic placeholder content (not "Lorem ipsum" — use content that
+  matches the actual use case)
+- Add HTML comments explaining design decisions
+
+Write to a temp file:
+\`\`\`bash
+SKETCH_FILE="/tmp/spec-first-sketch-$(date +%s).html"
+\`\`\`
+
+**Step 3: Render and capture**
+
+\`\`\`bash
+$B goto "file://$SKETCH_FILE"
+$B screenshot /tmp/spec-first-sketch.png
+\`\`\`
+
+If \`$B\` is not available (browse binary not set up), skip the render step. Tell the
+user: "Visual sketch requires the browse binary. Run the setup script to enable it."
+
+**Step 4: Present and iterate**
+
+Show the screenshot to the user. Ask: "Does this feel right? Want to iterate on the layout?"
+
+If they want changes, regenerate the HTML with their feedback and re-render.
+If they approve or say "good enough," proceed.
+
+**Step 5: Include in design doc**
+
+Reference the wireframe screenshot in the design doc's "Recommended Approach" section.
+The screenshot file at \`/tmp/spec-first-sketch.png\` can be referenced by downstream skills
+(\`/plan-design-review\`, \`/design-review\`) to see what was originally envisioned.`;
+}
+
+function generateAdversarialStep(ctx: TemplateContext): string {
+  // Codex host: strip entirely — Codex should never invoke itself
+  if (ctx.host === 'codex') return '';
+
+  const isShip = ctx.skillName === 'ship';
+  const stepNum = isShip ? '3.8' : '5.7';
+
+  return `## Step ${stepNum}: Adversarial review (auto-scaled)
+
+Adversarial review thoroughness scales automatically based on diff size. No configuration needed.
+
+**Detect diff size and tool availability:**
+
+\`\`\`bash
+DIFF_INS=$(git diff origin/<base> --stat | tail -1 | grep -oE '[0-9]+ insertion' | grep -oE '[0-9]+' || echo "0")
+DIFF_DEL=$(git diff origin/<base> --stat | tail -1 | grep -oE '[0-9]+ deletion' | grep -oE '[0-9]+' || echo "0")
+DIFF_TOTAL=$((DIFF_INS + DIFF_DEL))
+which codex 2>/dev/null && echo "CODEX_AVAILABLE" || echo "CODEX_NOT_AVAILABLE"
+# Respect old opt-out
+OLD_CFG=$(${ctx.paths.binDir}/spec-first-config get codex_reviews 2>/dev/null || true)
+echo "DIFF_SIZE: $DIFF_TOTAL"
+echo "OLD_CFG: \${OLD_CFG:-not_set}"
+\`\`\`
+
+If \`OLD_CFG\` is \`disabled\`: skip this step silently. Continue to the next step.
+
+**User override:** If the user explicitly requested a specific tier (e.g., "run all passes", "paranoid review", "full adversarial", "do all 4 passes", "thorough review"), honor that request regardless of diff size. Jump to the matching tier section.
+
+**Auto-select tier based on diff size:**
+- **Small (< 50 lines changed):** Skip adversarial review entirely. Print: "Small diff ($DIFF_TOTAL lines) — adversarial review skipped." Continue to the next step.
+- **Medium (50–199 lines changed):** Run Codex adversarial challenge (or Claude adversarial subagent if Codex unavailable). Jump to the "Medium tier" section.
+- **Large (200+ lines changed):** Run all remaining passes — Codex structured review + Claude adversarial subagent + Codex adversarial. Jump to the "Large tier" section.
+
+---
+
+### Medium tier (50–199 lines)
+
+Claude's structured review already ran. Now add a **cross-model adversarial challenge**.
+
+**If Codex is available:** run the Codex adversarial challenge. **If Codex is NOT available:** fall back to the Claude adversarial subagent instead.
+
+**Codex adversarial:**
+
+\`\`\`bash
+TMPERR_ADV=$(mktemp /tmp/codex-adv-XXXXXXXX)
+codex exec "Review the changes on this branch against the base branch. Run git diff origin/<base> to see the diff. Your job is to find ways this code will fail in production. Think like an attacker and a chaos engineer. Find edge cases, race conditions, security holes, resource leaks, failure modes, and silent data corruption paths. Be adversarial. Be thorough. No compliments — just the problems." -s read-only -c 'model_reasoning_effort="xhigh"' --enable web_search_cached 2>"$TMPERR_ADV"
+\`\`\`
+
+Use a 5-minute timeout (\`timeout: 300000\`). After the command completes, read stderr:
+\`\`\`bash
+cat "$TMPERR_ADV"
+\`\`\`
+
+Present the full output verbatim. This is informational — it never blocks shipping.
+
+**Error handling:** All errors are non-blocking — adversarial review is a quality enhancement, not a prerequisite.
+- **Auth failure:** If stderr contains "auth", "login", "unauthorized", or "API key": "Codex authentication failed. Run \\\`codex login\\\` to authenticate."
+- **Timeout:** "Codex timed out after 5 minutes."
+- **Empty response:** "Codex returned no response. Stderr: <paste relevant error>."
+
+On any Codex error, fall back to the Claude adversarial subagent automatically.
+
+**Claude adversarial subagent** (fallback when Codex unavailable or errored):
+
+Dispatch via the Agent tool. The subagent has fresh context — no checklist bias from the structured review. This genuine independence catches things the primary reviewer is blind to.
+
+Subagent prompt:
+"Read the diff for this branch with \`git diff origin/<base>\`. Think like an attacker and a chaos engineer. Your job is to find ways this code will fail in production. Look for: edge cases, race conditions, security holes, resource leaks, failure modes, silent data corruption, logic errors that produce wrong results silently, error handling that swallows failures, and trust boundary violations. Be adversarial. Be thorough. No compliments — just the problems. For each finding, classify as FIXABLE (you know how to fix it) or INVESTIGATE (needs human judgment)."
+
+Present findings under an \`ADVERSARIAL REVIEW (Claude subagent):\` header. **FIXABLE findings** flow into the same Fix-First pipeline as the structured review. **INVESTIGATE findings** are presented as informational.
+
+If the subagent fails or times out: "Claude adversarial subagent unavailable. Continuing without adversarial review."
+
+**Persist the review result:**
+\`\`\`bash
+${ctx.paths.binDir}/spec-first-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"SOURCE","tier":"medium","commit":"'"$(git rev-parse --short HEAD)"'"}'
+\`\`\`
+Substitute STATUS: "clean" if no findings, "issues_found" if findings exist. SOURCE: "codex" if Codex ran, "claude" if subagent ran. If both failed, do NOT persist.
+
+**Cleanup:** Run \`rm -f "$TMPERR_ADV"\` after processing (if Codex was used).
+
+---
+
+### Large tier (200+ lines)
+
+Claude's structured review already ran. Now run **all three remaining passes** for maximum coverage:
+
+**1. Codex structured review (if available):**
+\`\`\`bash
+TMPERR=$(mktemp /tmp/codex-review-XXXXXXXX)
+codex review --base <base> -c 'model_reasoning_effort="xhigh"' --enable web_search_cached 2>"$TMPERR"
+\`\`\`
+
+Use a 5-minute timeout. Present output under \`CODEX SAYS (code review):\` header.
+Check for \`[P1]\` markers: found → \`GATE: FAIL\`, not found → \`GATE: PASS\`.
+
+If GATE is FAIL, use AskUserQuestion:
+\`\`\`
+Codex found N critical issues in the diff.
+
+A) Investigate and fix now (recommended)
+B) Continue — review will still complete
+\`\`\`
+
+If A: address the findings${isShip ? '. After fixing, re-run tests (Step 3) since code has changed' : ''}. Re-run \`codex review\` to verify.
+
+Read stderr for errors (same error handling as medium tier).
+
+After stderr: \`rm -f "$TMPERR"\`
+
+**2. Claude adversarial subagent:** Dispatch a subagent with the adversarial prompt (same prompt as medium tier). This always runs regardless of Codex availability.
+
+**3. Codex adversarial challenge (if available):** Run \`codex exec\` with the adversarial prompt (same as medium tier).
+
+If Codex is not available for steps 1 and 3, note to the user: "Codex CLI not found — large-diff review ran Claude structured + Claude adversarial (2 of 4 passes). Install Codex for full 4-pass coverage: \`npm install -g @openai/codex\`"
+
+**Persist the review result AFTER all passes complete** (not after each sub-step):
+\`\`\`bash
+${ctx.paths.binDir}/spec-first-review-log '{"skill":"adversarial-review","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","status":"STATUS","source":"SOURCE","tier":"large","gate":"GATE","commit":"'"$(git rev-parse --short HEAD)"'"}'
+\`\`\`
+Substitute: STATUS = "clean" if no findings across ALL passes, "issues_found" if any pass found issues. SOURCE = "both" if Codex ran, "claude" if only Claude subagent ran. GATE = the Codex structured review gate result ("pass"/"fail"), or "informational" if Codex was unavailable. If all passes failed, do NOT persist.
+
+---
+
+### Cross-model synthesis (medium and large tiers)
+
+After all passes complete, synthesize findings across all sources:
+
+\`\`\`
+ADVERSARIAL REVIEW SYNTHESIS (auto: TIER, N lines):
+════════════════════════════════════════════════════════════
+  High confidence (found by multiple sources): [findings agreed on by >1 pass]
+  Unique to Claude structured review: [from earlier step]
+  Unique to Claude adversarial: [from subagent, if ran]
+  Unique to Codex: [from codex adversarial or code review, if ran]
+  Models used: Claude structured ✓  Claude adversarial ✓/✗  Codex ✓/✗
+════════════════════════════════════════════════════════════
+\`\`\`
+
+High-confidence findings (agreed on by multiple sources) should be prioritized for fixes.
+
+---`;
+}
+
+function generateDeployBootstrap(_ctx: TemplateContext): string {
+  return `\`\`\`bash
+# Check for persisted deploy config in CLAUDE.md
+DEPLOY_CONFIG=$(grep -A 20 "## Deploy Configuration" CLAUDE.md 2>/dev/null || echo "NO_CONFIG")
+echo "$DEPLOY_CONFIG"
+
+# If config exists, parse it
+if [ "$DEPLOY_CONFIG" != "NO_CONFIG" ]; then
+  PROD_URL=$(echo "$DEPLOY_CONFIG" | grep -i "production.*url" | head -1 | sed 's/.*: *//')
+  PLATFORM=$(echo "$DEPLOY_CONFIG" | grep -i "platform" | head -1 | sed 's/.*: *//')
+  echo "PERSISTED_PLATFORM:$PLATFORM"
+  echo "PERSISTED_URL:$PROD_URL"
+fi
+
+# Auto-detect platform from config files
+[ -f fly.toml ] && echo "PLATFORM:fly"
+[ -f render.yaml ] && echo "PLATFORM:render"
+([ -f vercel.json ] || [ -d .vercel ]) && echo "PLATFORM:vercel"
+[ -f netlify.toml ] && echo "PLATFORM:netlify"
+[ -f Procfile ] && echo "PLATFORM:heroku"
+([ -f railway.json ] || [ -f railway.toml ]) && echo "PLATFORM:railway"
+
+# Detect deploy workflows
+for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+  [ -f "$f" ] && grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
+done
+\`\`\`
+
+If \`PERSISTED_PLATFORM\` and \`PERSISTED_URL\` were found in CLAUDE.md, use them directly
+and skip manual detection. If no persisted config exists, use the auto-detected platform
+to guide deploy verification. If nothing is detected, ask the user via AskUserQuestion
+in the decision tree below.
+
+If you want to persist deploy settings for future runs, suggest the user run \`/setup-deploy\`.`;
+}
+
+const RESOLVERS: Record<string, (ctx: TemplateContext) => string> = {
+  COMMAND_REFERENCE: generateCommandReference,
+  SNAPSHOT_FLAGS: generateSnapshotFlags,
+  PREAMBLE: generatePreamble,
+  BROWSE_SETUP: generateBrowseSetup,
+  BASE_BRANCH_DETECT: generateBaseBranchDetect,
+  QA_METHODOLOGY: generateQAMethodology,
+  DESIGN_METHODOLOGY: generateDesignMethodology,
+  DESIGN_REVIEW_LITE: generateDesignReviewLite,
+  REVIEW_DASHBOARD: generateReviewDashboard,
+  PLAN_FILE_REVIEW_REPORT: generatePlanFileReviewReport,
+  TEST_BOOTSTRAP: generateTestBootstrap,
+  SPEC_REVIEW_LOOP: generateSpecReviewLoop,
+  DESIGN_SKETCH: generateDesignSketch,
+  BENEFITS_FROM: generateBenefitsFrom,
+  CODEX_REVIEW_STEP: generateAdversarialStep,
+  ADVERSARIAL_STEP: generateAdversarialStep,
+  DEPLOY_BOOTSTRAP: generateDeployBootstrap,
+};
+
+// ─── Codex Helpers ───────────────────────────────────────────
+
+function codexSkillName(skillDir: string): string {
+  if (skillDir === '.' || skillDir === '') return 'spec-first';
+  if (skillDir.startsWith('spec-first-')) return skillDir;
+  return `spec-first-${skillDir}`;
+}
+
+/**
+ * Transform frontmatter for Codex: keep only name + description.
+ * Strips allowed-tools, hooks, version, and all other fields.
+ * Handles multiline block scalar descriptions (YAML | syntax).
+ */
+function transformFrontmatter(content: string, host: Host): string {
+  if (host === 'claude') return content;
+
+  // Find frontmatter boundaries
+  const fmStart = content.indexOf('---\n');
+  if (fmStart !== 0) return content; // frontmatter must be at the start
+  const fmEnd = content.indexOf('\n---', fmStart + 4);
+  if (fmEnd === -1) return content;
+
+  const frontmatter = content.slice(fmStart + 4, fmEnd);
+  const body = content.slice(fmEnd + 4); // includes the leading \n after ---
+
+  // Parse name
+  const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
+  const name = nameMatch ? nameMatch[1].trim() : '';
+
+  // Parse description — handle both simple and block scalar (|) formats
+  let description = '';
+  const lines = frontmatter.split('\n');
+  let inDescription = false;
+  const descLines: string[] = [];
+  for (const line of lines) {
+    if (line.match(/^description:\s*\|?\s*$/)) {
+      // Block scalar start: "description: |" or "description:"
+      inDescription = true;
+      continue;
+    }
+    if (line.match(/^description:\s*\S/)) {
+      // Simple inline: "description: some text"
+      description = line.replace(/^description:\s*/, '').trim();
+      break;
+    }
+    if (inDescription) {
+      // Block scalar continuation — indented lines (2 spaces) or blank lines
+      if (line === '' || line.match(/^\s/)) {
+        descLines.push(line.replace(/^  /, ''));
+      } else {
+        // End of block scalar — hit a non-indented, non-blank line
+        break;
+      }
+    }
+  }
+  if (descLines.length > 0) {
+    description = descLines.join('\n').trim();
+  }
+
+  // Re-emit Codex frontmatter (name + description only)
+  const indentedDesc = description.split('\n').map(l => `  ${l}`).join('\n');
+  const codexFm = `---\nname: ${name}\ndescription: |\n${indentedDesc}\n---`;
+  return codexFm + body;
+}
+
+/**
+ * Extract hook descriptions from frontmatter for inline safety prose.
+ * Returns a description of what the hooks do, or null if no hooks.
+ */
+function extractHookSafetyProse(tmplContent: string): string | null {
+  if (!tmplContent.match(/^hooks:/m)) return null;
+
+  // Parse the hook matchers to build a human-readable safety description
+  const matchers: string[] = [];
+  const matcherRegex = /matcher:\s*"(\w+)"/g;
+  let m;
+  while ((m = matcherRegex.exec(tmplContent)) !== null) {
+    if (!matchers.includes(m[1])) matchers.push(m[1]);
+  }
+
+  if (matchers.length === 0) return null;
+
+  // Build safety prose based on what tools are hooked
+  const toolDescriptions: Record<string, string> = {
+    Bash: 'check bash commands for destructive operations (rm -rf, DROP TABLE, force-push, git reset --hard, etc.) before execution',
+    Edit: 'verify file edits are within the allowed scope boundary before applying',
+    Write: 'verify file writes are within the allowed scope boundary before applying',
+  };
+
+  const safetyChecks = matchers
+    .map(t => toolDescriptions[t] || `check ${t} operations for safety`)
+    .join(', and ');
+
+  return `> **Safety Advisory:** This skill includes safety checks that ${safetyChecks}. When using this skill, always pause and verify before executing potentially destructive operations. If uncertain about a command's safety, ask the user for confirmation before proceeding.`;
+}
+
+// ─── Template Processing ────────────────────────────────────
+
+const GENERATED_HEADER = `<!-- AUTO-GENERATED from {{SOURCE}} — do not edit directly -->\n<!-- Regenerate: bun run gen:skill-docs -->\n`;
+
+function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath: string; content: string } {
+  const tmplContent = fs.readFileSync(tmplPath, 'utf-8');
+  const relTmplPath = path.relative(ROOT, tmplPath);
+  let outputPath = tmplPath.replace(/\.tmpl$/, '');
+
+  // Determine skill directory relative to ROOT
+  const skillDir = path.relative(ROOT, path.dirname(tmplPath));
+
+  // For codex host, route output to .agents/skills/{codexSkillName}/SKILL.md
+  if (host === 'codex') {
+    const codexName = codexSkillName(skillDir === '.' ? '' : skillDir);
+    const outputDir = path.join(ROOT, '.agents', 'skills', codexName);
+    fs.mkdirSync(outputDir, { recursive: true });
+    outputPath = path.join(outputDir, 'SKILL.md');
+  }
+
+  // Extract skill name from frontmatter for TemplateContext
+  const nameMatch = tmplContent.match(/^name:\s*(.+)$/m);
+  const skillName = nameMatch ? nameMatch[1].trim() : path.basename(path.dirname(tmplPath));
+
+  // Extract benefits-from list from frontmatter (inline YAML: benefits-from: [a, b])
+  const benefitsMatch = tmplContent.match(/^benefits-from:\s*\[([^\]]*)\]/m);
+  const benefitsFrom = benefitsMatch
+    ? benefitsMatch[1].split(',').map(s => s.trim()).filter(Boolean)
+    : undefined;
+
+  const ctx: TemplateContext = { skillName, tmplPath, benefitsFrom, host, paths: HOST_PATHS[host] };
+
+  // Replace placeholders
+  let content = tmplContent.replace(/\{\{(\w+)\}\}/g, (match, name) => {
+    const resolver = RESOLVERS[name];
+    if (!resolver) throw new Error(`Unknown placeholder {{${name}}} in ${relTmplPath}`);
+    return resolver(ctx);
+  });
+
+  // Check for any remaining unresolved placeholders
+  const remaining = content.match(/\{\{(\w+)\}\}/g);
+  if (remaining) {
+    throw new Error(`Unresolved placeholders in ${relTmplPath}: ${remaining.join(', ')}`);
+  }
+
+  // For codex host: transform frontmatter and replace Claude-specific paths
+  if (host === 'codex') {
+    // Extract hook safety prose BEFORE transforming frontmatter (which strips hooks)
+    const safetyProse = extractHookSafetyProse(tmplContent);
+
+    // Transform frontmatter: keep only name + description
+    content = transformFrontmatter(content, host);
+
+    // Insert safety advisory at the top of the body (after frontmatter)
+    if (safetyProse) {
+      const bodyStart = content.indexOf('\n---') + 4;
+      content = content.slice(0, bodyStart) + '\n' + safetyProse + '\n' + content.slice(bodyStart);
+    }
+
+    // Replace remaining hardcoded Claude paths with host-appropriate paths
+    content = content.replace(/~\/\.claude\/skills\/spec-first/g, ctx.paths.skillRoot);
+    content = content.replace(/\.claude\/skills\/spec-first/g, ctx.paths.localSkillRoot);
+    content = content.replace(/\.claude\/skills\/review/g, '.agents/skills/spec-first/review');
+    content = content.replace(/\.claude\/skills/g, '.agents/skills');
+  }
+
+  // Prepend generated header (after frontmatter)
+  const header = GENERATED_HEADER.replace('{{SOURCE}}', path.basename(tmplPath));
+  const fmEnd = content.indexOf('---', content.indexOf('---') + 3);
+  if (fmEnd !== -1) {
+    const insertAt = content.indexOf('\n', fmEnd) + 1;
+    content = content.slice(0, insertAt) + header + content.slice(insertAt);
+  } else {
+    content = header + content;
+  }
+
+  return { outputPath, content };
+}
+
+// ─── Main ───────────────────────────────────────────────────
+
+function findTemplates(): string[] {
+  const templates: string[] = [];
+  const rootTmpl = path.join(ROOT, 'SKILL.md.tmpl');
+  if (fs.existsSync(rootTmpl)) templates.push(rootTmpl);
+
+  for (const entry of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+    const tmpl = path.join(ROOT, entry.name, 'SKILL.md.tmpl');
+    if (fs.existsSync(tmpl)) templates.push(tmpl);
+  }
+  return templates;
+}
+
+let hasChanges = false;
+
+if (HOST === 'codex' && !DRY_RUN) {
+  const codexSkillsDir = path.join(ROOT, '.agents', 'skills');
+  try {
+    fs.rmSync(codexSkillsDir, { recursive: true, force: true });
+  } catch (error) {
+    const result = spawnSync('rm', ['-rf', codexSkillsDir], { stdio: 'inherit' });
+    if (result.status !== 0) throw error;
+  }
+}
+
+for (const tmplPath of findTemplates()) {
+  // Skip /codex skill for codex host (self-referential — it's a Claude wrapper around codex exec)
+  if (HOST === 'codex') {
+    const dir = path.basename(path.dirname(tmplPath));
+    if (dir === 'codex') continue;
+  }
+
+  const { outputPath, content } = processTemplate(tmplPath, HOST);
+  const relOutput = path.relative(ROOT, outputPath);
+
+  if (DRY_RUN) {
+    const existing = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, 'utf-8') : '';
+    if (existing !== content) {
+      console.log(`STALE: ${relOutput}`);
+      hasChanges = true;
+    } else {
+      console.log(`FRESH: ${relOutput}`);
+    }
+  } else {
+    fs.writeFileSync(outputPath, content);
+    console.log(`GENERATED: ${relOutput}`);
+  }
+}
+
+if (DRY_RUN && hasChanges) {
+  console.error('\nGenerated SKILL.md files are stale. Run: bun run gen:skill-docs');
+  process.exit(1);
+}

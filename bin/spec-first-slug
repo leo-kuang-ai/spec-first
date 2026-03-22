@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# spec-first-slug — output project slug and sanitized branch name
+# Usage: source <(spec-first-slug)  → sets SLUG and BRANCH variables
+# Or:    spec-first-slug           → prints SLUG=... and BRANCH=... lines
+set -euo pipefail
+SLUG=$(git remote get-url origin 2>/dev/null | sed 's|.*[:/]\([^/]*/[^/]*\)\.git$|\1|;s|.*[:/]\([^/]*/[^/]*\)$|\1|' | tr '/' '-' || true)
+if [ -z "$SLUG" ]; then
+  ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+  SLUG=$(basename "$ROOT_DIR" | tr '/' '-')
+fi
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown)
+BRANCH=$(printf '%s' "$BRANCH" | tr '/' '-')
+echo "SLUG=$SLUG"
+echo "BRANCH=$BRANCH"

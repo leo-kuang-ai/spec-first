@@ -1,102 +1,55 @@
 {
   "name": "spec-first",
-  "version": "1.1.4",
-  "description": "AI-workflow CLI for spec-driven development — quality gates, traceability, and feature lifecycle management for AI-era teams",
+  "version": "0.9.8.0",
+  "description": "Garry's Stack — Claude Code skills + fast headless browser. One repo, one install, entire AI engineering workflow.",
+  "license": "MIT",
   "type": "module",
   "bin": {
-    "spec-first": "dist/cli/index.js"
+    "browse": "./browse/dist/browse"
   },
   "scripts": {
-    "build": "tsup",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "bench": "vitest bench",
-    "viewer:start": "node scripts/stage-viewer/server.js --project-root . --port 0",
-    "viewer:bootstrap": "node scripts/stage-viewer/bootstrap.js --open",
-    "codex:autostart:install": "bash scripts/codex/install-codex-autostart.sh",
-    "release:publish": "node scripts/publish.mjs",
-    "release:check": "node scripts/release-pack-check.mjs",
-    "release:version": "node scripts/release-version.mjs",
-    "prepublishOnly": "npm run build",
-    "postinstall": "node dist/postinstall.js || true",
-    "preuninstall": "node dist/preuninstall.js || true",
-    "compat-check": "echo 'compat-check: static site, skipped' && exit 0",
-    "contract:check": "echo \"No API contract for Skill optimization\""
-  },
-  "engines": {
-    "node": ">=20.0.0"
-  },
-  "keywords": [
-    "ai-workflow",
-    "cli",
-    "quality-gates",
-    "traceability",
-    "spec-driven",
-    "ai-coding",
-    "feature-lifecycle",
-    "development-workflow",
-    "sdlc",
-    "requirements"
-  ],
-  "author": "leo.kuang",
-  "homepage": "https://github.com/sunrain520/spec-first#readme",
-  "bugs": {
-    "url": "https://github.com/sunrain520/spec-first/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sunrain520/spec-first.git"
-  },
-  "license": "MIT",
-  "files": [
-    "dist",
-    "skills",
-    "templates",
-    "README.md",
-    "README-CN.md",
-    "image.png",
-    "scripts/stage-viewer",
-    "scripts/codex"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/cli/index.js",
-      "types": "./dist/cli/index.d.ts"
-    }
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20.11.0",
-    "@types/semver": "^7.7.1",
-    "@vitest/coverage-v8": "^1.6.1",
-    "eslint": "^10.0.2",
-    "jsdom": "^28.1.0",
-    "prettier": "^3.8.1",
-    "tsup": "^8.5.1",
-    "typescript": "^5.4.0",
-    "typescript-eslint": "^8.56.1",
-    "vitest": "^1.6.1"
+    "build": "bun run gen:skill-docs && bun run gen:skill-docs --host codex && bun build --compile browse/src/cli.ts --outfile browse/dist/browse && bun build --compile browse/src/find-browse.ts --outfile browse/dist/find-browse && bash browse/scripts/build-node-server.sh && git rev-parse HEAD > browse/dist/.version && rm -f .*.bun-build || true",
+    "gen:skill-docs": "bun run scripts/gen-skill-docs.ts",
+    "dev": "bun run browse/src/cli.ts",
+    "server": "bun run browse/src/server.ts",
+    "test": "bun test browse/test/ test/ --ignore 'test/skill-e2e-*.test.ts' --ignore test/skill-llm-eval.test.ts --ignore test/skill-routing-e2e.test.ts --ignore test/codex-e2e.test.ts --ignore test/gemini-e2e.test.ts",
+    "test:evals": "EVALS=1 bun test --retry 2 --concurrent --max-concurrency ${EVALS_CONCURRENCY:-15} test/skill-llm-eval.test.ts test/skill-e2e-*.test.ts test/skill-routing-e2e.test.ts test/codex-e2e.test.ts test/gemini-e2e.test.ts",
+    "test:evals:all": "EVALS=1 EVALS_ALL=1 bun test --retry 2 --concurrent --max-concurrency ${EVALS_CONCURRENCY:-15} test/skill-llm-eval.test.ts test/skill-e2e-*.test.ts test/skill-routing-e2e.test.ts test/codex-e2e.test.ts test/gemini-e2e.test.ts",
+    "test:e2e": "EVALS=1 bun test --retry 2 --concurrent --max-concurrency ${EVALS_CONCURRENCY:-15} test/skill-e2e-*.test.ts test/skill-routing-e2e.test.ts test/codex-e2e.test.ts test/gemini-e2e.test.ts",
+    "test:e2e:all": "EVALS=1 EVALS_ALL=1 bun test --retry 2 --concurrent --max-concurrency ${EVALS_CONCURRENCY:-15} test/skill-e2e-*.test.ts test/skill-routing-e2e.test.ts test/codex-e2e.test.ts test/gemini-e2e.test.ts",
+    "test:e2e:fast": "EVALS=1 EVALS_FAST=1 bun test --retry 2 --concurrent --max-concurrency ${EVALS_CONCURRENCY:-15} test/skill-e2e-*.test.ts test/skill-routing-e2e.test.ts",
+    "test:codex": "EVALS=1 bun test test/codex-e2e.test.ts",
+    "test:codex:all": "EVALS=1 EVALS_ALL=1 bun test test/codex-e2e.test.ts",
+    "test:gemini": "EVALS=1 bun test test/gemini-e2e.test.ts",
+    "test:gemini:all": "EVALS=1 EVALS_ALL=1 bun test test/gemini-e2e.test.ts",
+    "skill:check": "bun run scripts/skill-check.ts",
+    "dev:skill": "bun run scripts/dev-skill.ts",
+    "start": "bun run browse/src/server.ts",
+    "eval:list": "bun run scripts/eval-list.ts",
+    "eval:compare": "bun run scripts/eval-compare.ts",
+    "eval:summary": "bun run scripts/eval-summary.ts",
+    "eval:watch": "bun run scripts/eval-watch.ts",
+    "eval:select": "bun run scripts/eval-select.ts",
+    "analytics": "bun run scripts/analytics.ts"
   },
   "dependencies": {
-    "handlebars": "^4.7.8",
-    "js-yaml": "^4.1.0",
-    "semver": "^7.7.4",
-    "update-notifier": "^7.0.0"
+    "playwright": "^1.58.2",
+    "diff": "^7.0.0"
   },
-  "pnpm": {
-    "overrides": {
-      "rollup": "^4.59.0",
-      "minimatch": "^3.1.3",
-      "esbuild": "^0.27.3"
-    }
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "keywords": [
+    "browser",
+    "automation",
+    "playwright",
+    "headless",
+    "cli",
+    "claude",
+    "ai-agent",
+    "devtools"
+  ],
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.78.0"
   }
 }

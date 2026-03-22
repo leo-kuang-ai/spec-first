@@ -1,7 +1,0 @@
-
-namespace: qa
-version: 1.0.0
-enabled: true
-hooks:
-  - type: Stop
-    command: echo ext-stop

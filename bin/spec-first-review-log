@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# spec-first-review-log — atomically log a review result
+# Usage: spec-first-review-log '{"skill":"...","timestamp":"...","status":"..."}'
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+eval $("$SCRIPT_DIR/spec-first-slug" 2>/dev/null)
+SPEC_FIRST_HOME="${SPEC_FIRST_HOME:-$HOME/.spec-first}"
+mkdir -p "$SPEC_FIRST_HOME/projects/$SLUG"
+echo "$1" >> "$SPEC_FIRST_HOME/projects/$SLUG/$BRANCH-reviews.jsonl"
