@@ -31,6 +31,18 @@ const HOST: Host = (() => {
   throw new Error(`Unknown host: ${val}. Use claude, codex, or agents.`);
 })();
 
+// 读取语言配置 (zh/en)
+function getLang(): 'zh' | 'en' {
+  const langPath = path.join(process.env.HOME || '', '.spec-first', 'lang');
+  try {
+    const lang = fs.readFileSync(langPath, 'utf-8').trim();
+    return lang === 'en' ? 'en' : 'zh';
+  } catch {
+    return 'zh';  // 默认中文
+  }
+}
+const LANG = getLang();
+
 interface HostPaths {
   skillRoot: string;
   localSkillRoot: string;
@@ -139,7 +151,13 @@ function generateSnapshotFlags(_ctx: TemplateContext): string {
 }
 
 function generatePreambleBash(ctx: TemplateContext): string {
+  const langDirective = LANG === 'zh'
+    ? '**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。'
+    : '**Language**: Respond in English.';
+
   return `## Preamble (run first)
+
+${langDirective}
 
 \`\`\`bash
 _UPD=$(${ctx.paths.binDir}/spec-first-update-check 2>/dev/null || ${ctx.paths.localSkillRoot}/bin/spec-first-update-check 2>/dev/null || true)
@@ -161,9 +179,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: \${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"${ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ${ctx.paths.binDir}/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"${ctx.skillName}","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(${ctx.paths.binDir}/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ${ctx.paths.binDir}/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 \`\`\``;
 }
 
@@ -427,7 +446,7 @@ Determine which branch this PR targets. Use the result as "the base branch" in a
 2. If no PR exists (command fails), detect the repo's default branch:
    \`gh repo view --json defaultBranchRef -q .defaultBranchRef.name\`
 
-3. If both commands fail, fall back to \`main\`.
+3. If both commands fail, fall back to \`master\`.
 
 Print the detected base branch name. In every subsequent \`git diff\`, \`git log\`,
 \`git fetch\`, \`git merge\`, and \`gh pr create\` command, substitute the detected
@@ -445,8 +464,8 @@ This is the **primary mode** for developers verifying their work. When the user 
 
 1. **Analyze the branch diff** to understand what changed:
    \`\`\`bash
-   git diff main...HEAD --name-only
-   git log main..HEAD --oneline
+   git diff master...HEAD --name-only
+   git log master..HEAD --oneline
    \`\`\`
 
 2. **Identify affected pages/routes** from the changed files:
@@ -767,7 +786,7 @@ Comprehensive review: 10-15 pages, every interaction flow, exhaustive checklist.
 
 ### Diff-aware (automatic when on a feature branch with no URL)
 When on a feature branch, scope to pages affected by the branch changes:
-1. Analyze the branch diff: \`git diff main...HEAD --name-only\`
+1. Analyze the branch diff: \`git diff master...HEAD --name-only\`
 2. Map changed files to affected pages/routes
 3. Detect running app on common local ports (3000, 4000, 8080)
 4. Audit only affected pages, compare design quality before/after
@@ -1672,9 +1691,10 @@ fi
 ([ -f railway.json ] || [ -f railway.toml ]) && echo "PLATFORM:railway"
 
 # Detect deploy workflows
-for f in .github/workflows/*.yml .github/workflows/*.yaml; do
-  [ -f "$f" ] && grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
-done
+find .github/workflows -maxdepth 1 \\( -name '*.yml' -o -name '*.yaml' \\) -type f 2>/dev/null |
+  while IFS= read -r f; do
+    grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
+  done
 \`\`\`
 
 If \`PERSISTED_PLATFORM\` and \`PERSISTED_URL\` were found in CLAUDE.md, use them directly
@@ -1896,16 +1916,6 @@ function findTemplates(): string[] {
 }
 
 let hasChanges = false;
-
-if (HOST === 'codex' && !DRY_RUN) {
-  const codexSkillsDir = path.join(ROOT, '.agents', 'skills');
-  try {
-    fs.rmSync(codexSkillsDir, { recursive: true, force: true });
-  } catch (error) {
-    const result = spawnSync('rm', ['-rf', codexSkillsDir], { stdio: 'inherit' });
-    if (result.status !== 0) throw error;
-  }
-}
 
 for (const tmplPath of findTemplates()) {
   // Skip /codex skill for codex host (self-referential — it's a Claude wrapper around codex exec)

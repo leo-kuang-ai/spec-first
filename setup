@@ -17,12 +17,15 @@ case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*|Windows_NT) IS_WINDOWS=1 ;;
 esac
 
-# ─── Parse --host flag ─────────────────────────────────────────
+# ─── Parse flags ───────────────────────────────────────────────
 HOST="claude"
+LANG="zh"  # 默认中文
 while [ $# -gt 0 ]; do
   case "$1" in
     --host) HOST="$2"; shift 2 ;;
     --host=*) HOST="${1#--host=}"; shift ;;
+    --lang) LANG="$2"; shift 2 ;;
+    --lang=*) LANG="${1#--lang=}"; shift ;;
     *) shift ;;
   esac
 done
@@ -30,6 +33,11 @@ done
 case "$HOST" in
   claude|codex|auto) ;;
   *) echo "Unknown --host value: $HOST (expected claude, codex, or auto)" >&2; exit 1 ;;
+esac
+
+case "$LANG" in
+  zh|en) ;;
+  *) echo "Unknown --lang value: $LANG (expected zh or en)" >&2; exit 1 ;;
 esac
 
 # For auto: detect which agents are installed
@@ -133,6 +141,45 @@ fi
 # 3. Ensure ~/.spec-first global state directory exists
 mkdir -p "$HOME/.spec-first/projects"
 
+# 3.5 Save language preference
+echo "$LANG" > "$HOME/.spec-first/lang"
+
+# ─── Helper: get skill description in current language ─────────────────────
+get_skill_desc() {
+  local skill="$1"
+  local lang="$2"
+  case "$skill" in
+    benchmark)       [ "$lang" = "zh" ] && echo "性能回归检测" || echo "Performance regression testing" ;;
+    browse)          [ "$lang" = "zh" ] && echo "浏览器自动化" || echo "Browser automation" ;;
+    canary)          [ "$lang" = "zh" ] && echo "部署后监控" || echo "Post-deploy monitoring" ;;
+    careful)         [ "$lang" = "zh" ] && echo "危险命令警告" || echo "Dangerous command warning" ;;
+    codex)           [ "$lang" = "zh" ] && echo "Codex 集成" || echo "Codex integration" ;;
+    design-consultation) [ "$lang" = "zh" ] && echo "设计咨询" || echo "Design consultation" ;;
+    design-review)   [ "$lang" = "zh" ] && echo "设计审查" || echo "Design review" ;;
+    document-release) [ "$lang" = "zh" ] && echo "文档更新" || echo "Document release" ;;
+    focus-requirements) [ "$lang" = "zh" ] && echo "需求聚焦" || echo "Focus requirements" ;;
+    freeze)          [ "$lang" = "zh" ] && echo "冻结编辑范围" || echo "Freeze edit scope" ;;
+    guard)           [ "$lang" = "zh" ] && echo "完整安全模式" || echo "Full security mode" ;;
+    investigate)     [ "$lang" = "zh" ] && echo "系统化调试" || echo "Systematic debugging" ;;
+    land-and-deploy) [ "$lang" = "zh" ] && echo "合并和部署" || echo "Land and deploy" ;;
+    office-hours)    [ "$lang" = "zh" ] && echo "办公时间规划" || echo "Office hours planning" ;;
+    plan-ceo-review) [ "$lang" = "zh" ] && echo "CEO 审查" || echo "CEO review" ;;
+    plan-design-review) [ "$lang" = "zh" ] && echo "设计审查" || echo "Design review" ;;
+    plan-eng-review) [ "$lang" = "zh" ] && echo "工程审查" || echo "Engineering review" ;;
+    qa-only)         [ "$lang" = "zh" ] && echo "仅 QA 报告" || echo "QA report only" ;;
+    qa)              [ "$lang" = "zh" ] && echo "QA 测试修复" || echo "QA testing and fixes" ;;
+    retro)           [ "$lang" = "zh" ] && echo "回顾总结" || echo "Retrospective" ;;
+    review)          [ "$lang" = "zh" ] && echo "代码审查" || echo "Code review" ;;
+    setup-browser-cookies) [ "$lang" = "zh" ] && echo "设置浏览器 Cookies" || echo "Setup browser cookies" ;;
+    setup-deploy)    [ "$lang" = "zh" ] && echo "部署配置" || echo "Deploy setup" ;;
+    ship)            [ "$lang" = "zh" ] && echo "发布流程" || echo "Ship workflow" ;;
+    spec-first-upgrade) [ "$lang" = "zh" ] && echo "版本升级" || echo "Version upgrade" ;;
+    unfreeze)        [ "$lang" = "zh" ] && echo "解冻编辑范围" || echo "Unfreeze edit scope" ;;
+    spec-first)      [ "$lang" = "zh" ] && echo "主技能" || echo "Main skill" ;;
+    *)               echo "$skill" ;;
+  esac
+}
+
 # ─── Helper: link Claude skill subdirectories into a skills parent directory ──
 link_claude_skill_dirs() {
   local spec_first_dir="$1"
@@ -152,7 +199,11 @@ link_claude_skill_dirs() {
     fi
   done
   if [ ${#linked[@]} -gt 0 ]; then
-    echo "  linked skills: ${linked[*]}"
+    echo "  linked skills:"
+    for s in "${linked[@]}"; do
+      desc=$(get_skill_desc "$s" "$LANG")
+      printf "    - %-24s %s\n" "$s" "$desc"
+    done
   fi
 }
 
@@ -182,7 +233,13 @@ link_codex_skill_dirs() {
     fi
   done
   if [ ${#linked[@]} -gt 0 ]; then
-    echo "  linked skills: ${linked[*]}"
+    echo "  linked skills:"
+    for s in "${linked[@]}"; do
+      # Strip spec-first- prefix for description lookup
+      base_name="${s#spec-first-}"
+      desc=$(get_skill_desc "$base_name" "$LANG")
+      printf "    - %-28s %s\n" "$s" "$desc"
+    done
   fi
 }
 
@@ -224,9 +281,11 @@ if [ "$INSTALL_CLAUDE" -eq 1 ]; then
   if [ "$SKILLS_BASENAME" = "skills" ]; then
     link_claude_skill_dirs "$SPEC_FIRST_DIR" "$SKILLS_DIR"
     echo "spec-first ready (claude)."
+    echo "  lang: $LANG"
     echo "  browse: $BROWSE_BIN"
   else
     echo "spec-first ready (claude)."
+    echo "  lang: $LANG"
     echo "  browse: $BROWSE_BIN"
     echo "  (skipped skill symlinks — not inside .claude/skills/)"
   fi
@@ -246,6 +305,7 @@ if [ "$INSTALL_CODEX" -eq 1 ]; then
   link_codex_skill_dirs "$SPEC_FIRST_DIR" "$CODEX_SKILLS"
 
   echo "spec-first ready (codex)."
+  echo "  lang: $LANG"
   echo "  browse: $BROWSE_BIN"
   echo "  codex skills: $CODEX_SKILLS"
 fi
