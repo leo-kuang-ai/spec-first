@@ -299,17 +299,17 @@ skill before proceeding.
 
 Say to the user via AskUserQuestion:
 
-> "No design doc found for this branch. `/office-hours` produces a structured problem
+> "No design doc found for this branch. `/brainstorm` produces a structured problem
 > statement, premise challenge, and explored alternatives — it gives this review much
 > sharper input to work with. Takes about 10 minutes. The design doc is per-feature,
 > not per-product — it captures the thinking behind this specific change."
 
 Options:
-- A) Run /office-hours first (in another window, then come back)
+- A) Run /brainstorm first (in another window, then come back)
 - B) Skip — proceed with standard review
 
 If they skip: "No worries — standard review. If you ever want sharper input, try
-/office-hours first next time." Then proceed normally. Do not re-offer later in the session.
+/brainstorm first next time." Then proceed normally. Do not re-offer later in the session.
 
 ### Step 0: Scope Challenge
 Before reviewing anything, answer these questions:

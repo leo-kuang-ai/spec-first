@@ -113,7 +113,7 @@ it's about ensuring every line of code serves a clear purpose aligned with
 product goals.
 
 **Structured thinking:**
-- Start with `/office-hours` to deeply understand the problem
+- Start with `/brainstorm` to deeply understand the problem
 - Use `/plan-ceo-review` and `/plan-eng-review` to think through approaches
 - Generate design docs that feed into implementation
 - Let specs guide every downstream decision

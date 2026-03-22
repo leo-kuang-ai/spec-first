@@ -238,6 +238,7 @@ Claude / Codex 读取 skill
 - `spec-first install` 作为面向 npm 用户的显式安装入口，对外暴露给用户。
 - `spec-first install` 内部调用 `setup` 完成初始化与环境接线。
 - `spec-first install` 需要透传 `setup` 已有参数，避免两套入口出现不同语义。
+- `spec-first install` 和 `setup` 都应该拒绝未知参数并明确报错，避免静默忽略导致安装结果和用户预期不一致。
 - `setup` 继续保留为底层初始化入口，供开发态、补装和脚本链路复用。
 
 ## SPEC_FIRST REVIEW REPORT

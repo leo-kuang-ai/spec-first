@@ -1,268 +1,34 @@
 ---
-name: office-hours
+name: brainstorm
+version: 2.0.0
 description: |
-  YC Office Hours — two modes. Startup mode: six forcing questions that expose
+  Brainstorm — two modes. Startup mode: six forcing questions that expose
   demand reality, status quo, desperate specificity, narrowest wedge, observation,
   and future-fit. Builder mode: design thinking brainstorming for side projects,
   hackathons, learning, and open source. Saves a design doc.
   Use when asked to "brainstorm this", "I have an idea", "help me think through
-  this", "office hours", or "is this worth building".
+  this", "brainstorm", or "is this worth building".
   Proactively suggest when the user describes a new product idea or is exploring
   whether something is worth building — before any code is written.
   Use before /plan-ceo-review or /plan-eng-review.
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Edit
+  - AskUserQuestion
+  - WebSearch
 ---
-<!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
-<!-- Regenerate: bun run gen:skill-docs -->
 
-## Preamble (run first)
+{{PREAMBLE}}
 
-**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
+{{BROWSE_SETUP}}
 
-```bash
-_UPD=$(~/.codex/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .agents/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
-[ -n "$_UPD" ] && echo "$_UPD" || true
-mkdir -p ~/.spec-first/sessions
-touch ~/.spec-first/sessions/"$PPID"
-_SESSIONS=$(find ~/.spec-first/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
-find ~/.spec-first/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.codex/skills/spec-first/bin/spec-first-config get spec-first_contributor 2>/dev/null || true)
-_PROACTIVE=$(~/.codex/skills/spec-first/bin/spec-first-config get proactive 2>/dev/null || echo "true")
-_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
-echo "BRANCH: $_BRANCH"
-echo "PROACTIVE: $_PROACTIVE"
-_LAKE_SEEN=$([ -f ~/.spec-first/.completeness-intro-seen ] && echo "yes" || echo "no")
-echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(~/.codex/skills/spec-first/bin/spec-first-config get telemetry 2>/dev/null || true)
-_TEL_PROMPTED=$([ -f ~/.spec-first/.telemetry-prompted ] && echo "yes" || echo "no")
-_TEL_START=$(date +%s)
-_SESSION_ID="$$-$(date +%s)"
-echo "TELEMETRY: ${_TEL:-off}"
-echo "TEL_PROMPTED: $_TEL_PROMPTED"
-    mkdir -p ~/.spec-first/analytics
-    echo '{"skill":"office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-    _PENDING=$(~/.codex/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
-    [ -n "$_PENDING" ] && ~/.codex/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
-```
+# Brainstorm
 
-If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
-them when the user explicitly asks. The user opted out of proactive suggestions.
-
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.codex/skills/spec-first/spec-first-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running spec-first v{to} (just updated!)" and continue.
-
-If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "spec-first follows the **Boil the Lake** principle — always do the complete
-thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
-Then offer to open the essay in their default browser:
-
-```bash
-open https://garryslist.org/posts/boil-the-ocean
-touch ~/.spec-first/.completeness-intro-seen
-```
-
-Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
-
-If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
-ask the user about telemetry. Use AskUserQuestion:
-
-> Help spec-first get better! Community mode shares usage data (which skills you use, how long
-> they take, crash info) with a stable device ID so we can track trends and fix bugs faster.
-> No code, file paths, or repo names are ever sent.
-> Change anytime with `spec-first-config set telemetry off`.
-
-Options:
-- A) Help spec-first get better! (recommended)
-- B) No thanks
-
-If A: run `~/.codex/skills/spec-first/bin/spec-first-config set telemetry community`
-
-If B: ask a follow-up AskUserQuestion:
-
-> How about anonymous mode? We just learn that *someone* used spec-first — no unique ID,
-> no way to connect sessions. Just a counter that helps us know if anyone's out there.
-
-Options:
-- A) Sure, anonymous is fine
-- B) No thanks, fully off
-
-If B→A: run `~/.codex/skills/spec-first/bin/spec-first-config set telemetry anonymous`
-If B→B: run `~/.codex/skills/spec-first/bin/spec-first-config set telemetry off`
-
-Always run:
-```bash
-touch ~/.spec-first/.telemetry-prompted
-```
-
-This only happens once. If `TEL_PROMPTED` is `yes`, skip this entirely.
-
-## AskUserQuestion Format
-
-**ALWAYS follow this structure for every AskUserQuestion call:**
-1. **Re-ground:** State the project, the current branch (use the `_BRANCH` value printed by the preamble — NOT any branch from conversation history or gitStatus), and the current plan/task. (1-2 sentences)
-2. **Simplify:** Explain the problem in plain English a smart 16-year-old could follow. No raw function names, no internal jargon, no implementation details. Use concrete examples and analogies. Say what it DOES, not what it's called.
-3. **Recommend:** `RECOMMENDATION: Choose [X] because [one-line reason]` — always prefer the complete option over shortcuts (see Completeness Principle). Include `Completeness: X/10` for each option. Calibration: 10 = complete implementation (all edge cases, full coverage), 7 = covers happy path but skips some edges, 3 = shortcut that defers significant work. If both options are 8+, pick the higher; if one is ≤5, flag it.
-4. **Options:** Lettered options: `A) ... B) ... C) ...` — when an option involves effort, show both scales: `(human: ~X / CC: ~Y)`
-
-Assume the user hasn't looked at this window in 20 minutes and doesn't have the code open. If you'd need to read the source to understand your own explanation, it's too complex.
-
-Per-skill instructions may add additional formatting rules on top of this baseline.
-
-## Completeness Principle — Boil the Lake
-
-AI-assisted coding makes the marginal cost of completeness near-zero. When you present options:
-
-- If Option A is the complete implementation (full parity, all edge cases, 100% coverage) and Option B is a shortcut that saves modest effort — **always recommend A**. The delta between 80 lines and 150 lines is meaningless with CC+spec-first. "Good enough" is the wrong instinct when "complete" costs minutes more.
-- **Lake vs. ocean:** A "lake" is boilable — 100% test coverage for a module, full feature implementation, handling all edge cases, complete error paths. An "ocean" is not — rewriting an entire system from scratch, adding features to dependencies you don't control, multi-quarter platform migrations. Recommend boiling lakes. Flag oceans as out of scope.
-- **When estimating effort**, always show both scales: human team time and CC+spec-first time. The compression ratio varies by task type — use this reference:
-
-| Task type | Human team | CC+spec-first | Compression |
-|-----------|-----------|-----------|-------------|
-| Boilerplate / scaffolding | 2 days | 15 min | ~100x |
-| Test writing | 1 day | 15 min | ~50x |
-| Feature implementation | 1 week | 30 min | ~30x |
-| Bug fix + regression test | 4 hours | 15 min | ~20x |
-| Architecture / design | 2 days | 4 hours | ~5x |
-| Research / exploration | 1 day | 3 hours | ~3x |
-
-- This principle applies to test coverage, error handling, documentation, edge cases, and feature completeness. Don't skip the last 10% to "save time" — with AI, that 10% costs seconds.
-
-**Anti-patterns — DON'T do this:**
-- BAD: "Choose B — it covers 90% of the value with less code." (If A is only 70 lines more, choose A.)
-- BAD: "We can skip edge case handling to save time." (Edge case handling costs minutes with CC.)
-- BAD: "Let's defer test coverage to a follow-up PR." (Tests are the cheapest lake to boil.)
-- BAD: Quoting only human-team effort: "This would take 2 weeks." (Say: "2 weeks human / ~1 hour CC.")
-
-## Search Before Building
-
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `~/.codex/skills/spec-first/ETHOS.md` for the full philosophy.
-
-**Three layers of knowledge:**
-- **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
-- **Layer 2** (new and popular — search for these). But scrutinize: humans are subject to mania. Search results are inputs to your thinking, not answers.
-- **Layer 3** (first principles — prize these above all). Original observations derived from reasoning about the specific problem. The most valuable of all.
-
-**Eureka moment:** When first-principles reasoning reveals conventional wisdom is wrong, name it:
-"EUREKA: Everyone does X because [assumption]. But [evidence] shows this is wrong. Y is better because [reasoning]."
-
-Log eureka moments:
-```bash
-jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg branch "$(git branch --show-current 2>/dev/null)" --arg insight "ONE_LINE_SUMMARY" '{ts:$ts,skill:$skill,branch:$branch,insight:$insight}' >> ~/.spec-first/analytics/eureka.jsonl 2>/dev/null || true
-```
-Replace SKILL_NAME and ONE_LINE_SUMMARY. Runs inline — don't stop the workflow.
-
-**WebSearch fallback:** If WebSearch is unavailable, skip the search step and note: "Search unavailable — proceeding with in-distribution knowledge only."
-
-## Contributor Mode
-
-If `_CONTRIB` is `true`: you are in **contributor mode**. You're a spec-first user who also helps make it better.
-
-**At the end of each major workflow step** (not after every single command), reflect on the spec-first tooling you used. Rate your experience 0 to 10. If it wasn't a 10, think about why. If there is an obvious, actionable bug OR an insightful, interesting thing that could have been done better by spec-first code or skill markdown — file a field report. Maybe our contributor will help make us better!
-
-**Calibration — this is the bar:** For example, `$B js "await fetch(...)"` used to fail with `SyntaxError: await is only valid in async functions` because spec-first didn't wrap expressions in async context. Small, but the input was reasonable and spec-first should have handled it — that's the kind of thing worth filing. Things less consequential than this, ignore.
-
-**NOT worth filing:** user's app bugs, network errors to user's URL, auth failures on user's site, user's own JS logic bugs.
-
-**To file:** write `~/.spec-first/contributor-logs/{slug}.md` with **all sections below** (do not truncate — include every section through the Date/Version footer):
-
-```
-# {Title}
-
-Hey spec-first team — ran into this while using /{skill-name}:
-
-**What I was trying to do:** {what the user/agent was attempting}
-**What happened instead:** {what actually happened}
-**My rating:** {0-10} — {one sentence on why it wasn't a 10}
-
-## Steps to reproduce
-1. {step}
-
-## Raw output
-```
-{paste the actual error or unexpected output here}
-```
-
-## What would make this a 10
-{one sentence: what spec-first should have done differently}
-
-**Date:** {YYYY-MM-DD} | **Version:** {spec-first version} | **Skill:** /{skill}
-```
-
-Slug: lowercase, hyphens, max 60 chars (e.g. `browse-js-no-await`). Skip if file already exists. Max 3 reports per session. File inline and continue — don't stop the workflow. Tell user: "Filed spec-first field report: {title}"
-
-## Completion Status Protocol
-
-When completing a skill workflow, report status using one of:
-- **DONE** — All steps completed successfully. Evidence provided for each claim.
-- **DONE_WITH_CONCERNS** — Completed, but with issues the user should know about. List each concern.
-- **BLOCKED** — Cannot proceed. State what is blocking and what was tried.
-- **NEEDS_CONTEXT** — Missing information required to continue. State exactly what you need.
-
-### Escalation
-
-It is always OK to stop and say "this is too hard for me" or "I'm not confident in this result."
-
-Bad work is worse than no work. You will not be penalized for escalating.
-- If you have attempted a task 3 times without success, STOP and escalate.
-- If you are uncertain about a security-sensitive change, STOP and escalate.
-- If the scope of work exceeds what you can verify, STOP and escalate.
-
-Escalation format:
-```
-STATUS: BLOCKED | NEEDS_CONTEXT
-REASON: [1-2 sentences]
-ATTEMPTED: [what you tried]
-RECOMMENDATION: [what the user should do next]
-```
-
-## Telemetry (run last)
-
-After the skill workflow completes (success, error, or abort), log the telemetry event.
-Determine the skill name from the `name:` field in this file's YAML frontmatter.
-Determine the outcome from the workflow result (success if completed normally, error
-if it failed, abort if the user interrupted).
-
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`~/.spec-first/analytics/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
-Skipping this command loses session duration and outcome data.
-
-Run this bash:
-
-```bash
-_TEL_END=$(date +%s)
-_TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ~/.spec-first/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.codex/skills/spec-first/bin/spec-first-telemetry-log \
-  --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
-  --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
-```
-
-Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with
-success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was used.
-If you cannot determine the outcome, use "unknown". This runs in the background and
-never blocks the user.
-
-## SETUP (run this check BEFORE any browse command)
-
-```bash
-_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
-B=""
-[ -n "$_ROOT" ] && [ -x "$_ROOT/.agents/skills/spec-first/browse/dist/browse" ] && B="$_ROOT/.agents/skills/spec-first/browse/dist/browse"
-[ -z "$B" ] && B=~/.codex/skills/spec-first/browse/dist/browse
-if [ -x "$B" ]; then
-  echo "READY: $B"
-else
-  echo "NEEDS_SETUP"
-fi
-```
-
-If `NEEDS_SETUP`:
-1. Tell the user: "spec-first browse needs a one-time build (~10 seconds). OK to proceed?" Then STOP and wait.
-2. Run: `cd <SKILL_DIR> && ./setup`
-3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
-
-# YC Office Hours
-
-You are a **YC office hours partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
+You are a **brainstorm partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
 
 **HARD GATE:** Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
 
@@ -273,7 +39,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 Understand the project and the area the user wants to change.
 
 ```bash
-source <(~/.codex/skills/spec-first/bin/spec-first-slug 2>/dev/null)
+source <(~/.claude/skills/spec-first/bin/spec-first-slug 2>/dev/null)
 ```
 
 1. Read `CLAUDE.md`, `TODOS.md` (if they exist).
@@ -615,63 +381,7 @@ Present via AskUserQuestion. Do NOT proceed without user approval of the approac
 
 ---
 
-## Visual Sketch (UI ideas only)
-
-If the chosen approach involves user-facing UI (screens, pages, forms, dashboards,
-or interactive elements), generate a rough wireframe to help the user visualize it.
-If the idea is backend-only, infrastructure, or has no UI component — skip this
-section silently.
-
-**Step 1: Gather design context**
-
-1. Check if `DESIGN.md` exists in the repo root. If it does, read it for design
-   system constraints (colors, typography, spacing, component patterns). Use these
-   constraints in the wireframe.
-2. Apply core design principles:
-   - **Information hierarchy** — what does the user see first, second, third?
-   - **Interaction states** — loading, empty, error, success, partial
-   - **Edge case paranoia** — what if the name is 47 chars? Zero results? Network fails?
-   - **Subtraction default** — "as little design as possible" (Rams). Every element earns its pixels.
-   - **Design for trust** — every interface element builds or erodes user trust.
-
-**Step 2: Generate wireframe HTML**
-
-Generate a single-page HTML file with these constraints:
-- **Intentionally rough aesthetic** — use system fonts, thin gray borders, no color,
-  hand-drawn-style elements. This is a sketch, not a polished mockup.
-- Self-contained — no external dependencies, no CDN links, inline CSS only
-- Show the core interaction flow (1-3 screens/states max)
-- Include realistic placeholder content (not "Lorem ipsum" — use content that
-  matches the actual use case)
-- Add HTML comments explaining design decisions
-
-Write to a temp file:
-```bash
-SKETCH_FILE="/tmp/spec-first-sketch-$(date +%s).html"
-```
-
-**Step 3: Render and capture**
-
-```bash
-$B goto "file://$SKETCH_FILE"
-$B screenshot /tmp/spec-first-sketch.png
-```
-
-If `$B` is not available (browse binary not set up), skip the render step. Tell the
-user: "Visual sketch requires the browse binary. Run the setup script to enable it."
-
-**Step 4: Present and iterate**
-
-Show the screenshot to the user. Ask: "Does this feel right? Want to iterate on the layout?"
-
-If they want changes, regenerate the HTML with their feedback and re-render.
-If they approve or say "good enough," proceed.
-
-**Step 5: Include in design doc**
-
-Reference the wireframe screenshot in the design doc's "Recommended Approach" section.
-The screenshot file at `/tmp/spec-first-sketch.png` can be referenced by downstream skills
-(`/plan-design-review`, `/design-review`) to see what was originally envisioned.
+{{DESIGN_SKETCH}}
 
 ---
 
@@ -697,7 +407,7 @@ Count the signals. You'll use this count in Phase 6 to determine which tier of c
 Write the design document to the project directory.
 
 ```bash
-source <(~/.codex/skills/spec-first/bin/spec-first-slug 2>/dev/null) && mkdir -p ~/.spec-first/projects/$SLUG
+source <(~/.claude/skills/spec-first/bin/spec-first-slug 2>/dev/null) && mkdir -p ~/.spec-first/projects/$SLUG
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
@@ -706,7 +416,7 @@ DATETIME=$(date +%Y%m%d-%H%M%S)
 ```bash
 PRIOR=$(ls -t ~/.spec-first/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
 ```
-If `$PRIOR` exists, the new doc gets a `Supersedes:` field referencing it. This creates a revision chain — you can trace how a design evolved across office hours sessions.
+If `$PRIOR` exists, the new doc gets a `Supersedes:` field referencing it. This creates a revision chain — you can trace how a design evolved across brainstorm sessions.
 
 Write to `~/.spec-first/projects/{slug}/{user}-{branch}-design-{datetime}.md`:
 
@@ -715,7 +425,7 @@ Write to `~/.spec-first/projects/{slug}/{user}-{branch}-design-{datetime}.md`:
 ```markdown
 # Design: {title}
 
-Generated by /office-hours on {date}
+Generated by /brainstorm on {date}
 Branch: {branch}
 Repo: {owner/repo}
 Status: DRAFT
@@ -750,7 +460,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 {chosen approach with rationale}
 
 ## Open Questions
-{any unresolved questions from the office hours}
+{any unresolved questions from the brainstorm}
 
 ## Success Criteria
 {measurable criteria from Phase 2A}
@@ -770,7 +480,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 ```markdown
 # Design: {title}
 
-Generated by /office-hours on {date}
+Generated by /brainstorm on {date}
 Branch: {branch}
 Repo: {owner/repo}
 Status: DRAFT
@@ -799,7 +509,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 {chosen approach with rationale}
 
 ## Open Questions
-{any unresolved questions from the office hours}
+{any unresolved questions from the brainstorm}
 
 ## Success Criteria
 {what "done" looks like}
@@ -813,67 +523,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 
 ---
 
-## Spec Review Loop
-
-Before presenting the document to the user for approval, run an adversarial review.
-
-**Step 1: Dispatch reviewer subagent**
-
-Use the Agent tool to dispatch an independent reviewer. The reviewer has fresh context
-and cannot see the brainstorming conversation — only the document. This ensures genuine
-adversarial independence.
-
-Prompt the subagent with:
-- The file path of the document just written
-- "Read this document and review it on 5 dimensions. For each dimension, note PASS or
-  list specific issues with suggested fixes. At the end, output a quality score (1-10)
-  across all dimensions."
-
-**Dimensions:**
-1. **Completeness** — Are all requirements addressed? Missing edge cases?
-2. **Consistency** — Do parts of the document agree with each other? Contradictions?
-3. **Clarity** — Could an engineer implement this without asking questions? Ambiguous language?
-4. **Scope** — Does the document creep beyond the original problem? YAGNI violations?
-5. **Feasibility** — Can this actually be built with the stated approach? Hidden complexity?
-
-The subagent should return:
-- A quality score (1-10)
-- PASS if no issues, or a numbered list of issues with dimension, description, and fix
-
-**Step 2: Fix and re-dispatch**
-
-If the reviewer returns issues:
-1. Fix each issue in the document on disk (use Edit tool)
-2. Re-dispatch the reviewer subagent with the updated document
-3. Maximum 3 iterations total
-
-**Convergence guard:** If the reviewer returns the same issues on consecutive iterations
-(the fix didn't resolve them or the reviewer disagrees with the fix), stop the loop
-and persist those issues as "Reviewer Concerns" in the document rather than looping
-further.
-
-If the subagent fails, times out, or is unavailable — skip the review loop entirely.
-Tell the user: "Spec review unavailable — presenting unreviewed doc." The document is
-already written to disk; the review is a quality bonus, not a gate.
-
-**Step 3: Report and persist metrics**
-
-After the loop completes (PASS, max iterations, or convergence guard):
-
-1. Tell the user the result — summary by default:
-   "Your doc survived N rounds of adversarial review. M issues caught and fixed.
-   Quality score: X/10."
-   If they ask "what did the reviewer find?", show the full reviewer output.
-
-2. If issues remain after max iterations or convergence, add a "## Reviewer Concerns"
-   section to the document listing each unresolved issue. Downstream skills will see this.
-
-3. Append metrics:
-```bash
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","iterations":ITERATIONS,"issues_found":FOUND,"issues_fixed":FIXED,"remaining":REMAINING,"quality_score":SCORE}' >> ~/.spec-first/analytics/spec-review.jsonl 2>/dev/null || true
-```
-Replace ITERATIONS, FOUND, FIXED, REMAINING, SCORE with actual values from the review.
+{{SPEC_REVIEW_LOOP}}
 
 ---
 

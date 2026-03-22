@@ -41,7 +41,7 @@ cd ~/.claude/skills/spec-first
 Open Claude Code and type:
 
 ```
-/office-hours
+/brainstorm
 ```
 
 Describe the product or feature you want to build.
@@ -132,7 +132,7 @@ This installs to `~/.claude/skills/spec-first` and/or `~/.codex/skills/spec-firs
 
 ```
 You:    I want to build a daily briefing app for my calendar.
-You:    /office-hours
+You:    /brainstorm
 Claude: [asks about the pain — specific examples, not hypotheticals]
 
 You:    Multiple Google calendars, events with stale info, wrong locations.
@@ -179,7 +179,7 @@ You said "daily briefing app." The agent said "you're building a chief of staff 
 
 | Skill | Role | What It Does |
 |-------|------|--------------|
-| `/office-hours` | **YC Office Hours** | Start here. Six forcing questions that reframe your product before you write code. Pushes back on your framing, challenges premises, generates implementation alternatives. Design doc feeds into every downstream skill. |
+| `/brainstorm` | **YC Brainstorm** | Start here. Six forcing questions that reframe your product before you write code. Pushes back on your framing, challenges premises, generates implementation alternatives. Design doc feeds into every downstream skill. |
 | `/plan-ceo-review` | **CEO / Founder** | Rethink the problem. Find the 10-star product hiding inside the request. Four modes: Expansion, Selective Expansion, Hold Scope, Reduction. |
 | `/plan-eng-review` | **Eng Manager** | Lock in architecture, data flow, diagrams, edge cases, and tests. Forces hidden assumptions into the open. |
 | `/plan-design-review` | **Senior Designer** | Rates each design dimension 0-10, explains what a 10 looks like, then edits the plan to get there. AI Slop detection. Interactive — one AskUserQuestion per design choice. |
@@ -206,7 +206,7 @@ You said "daily briefing app." The agent said "you're building a chief of staff 
 
 | Skill | Role | What It Does |
 |-------|------|--------------|
-| `/ship` | **Release Engineer** | Sync main, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one. One command. |
+| `/ship` | **Release Engineer** | Sync master, run tests, audit coverage, push, open PR. Bootstraps test frameworks if you don't have one. One command. |
 | `/land-and-deploy` | **Release Engineer** | Merge the PR, wait for CI and deploy, verify production health. Takes over after `/ship`. One command from "approved" to "verified in production." |
 | `/setup-deploy` | **Deploy Configurator** | One-time setup for `/land-and-deploy`. Detects your platform, production URL, and deploy commands. |
 
@@ -239,7 +239,7 @@ You said "daily briefing app." The agent said "you're building a chief of staff 
 
 ## 💡 Key Features
 
-### 1. `/office-hours` Reframes Your Product
+### 1. `/brainstorm` Reframes Your Product
 
 You say "daily briefing app." It listens to your actual pain, pushes back on the framing, tells you you're really building a personal chief of staff AI, challenges your premises, and generates three implementation approaches with effort estimates. The design doc it writes feeds directly into `/plan-ceo-review` and `/plan-eng-review` — so every downstream skill starts with real clarity instead of a vague feature request.
 
@@ -284,7 +284,7 @@ Say "be careful" and `/careful` warns before any destructive command — rm -rf,
 ```
 Product Idea
    ↓
-/office-hours (1-2 hours)
+/brainstorm (1-2 hours)
    ↓
 /plan-ceo-review (30-60 minutes)
    ↓
@@ -399,7 +399,7 @@ Make sure your project's `CLAUDE.md` has a spec-first section. Add this:
 ## Spec-First Skills
 
 Use /browse from spec-first for all web browsing. Never use mcp__claude-in-chrome__* tools.
-Available skills: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
+Available skills: /brainstorm, /plan-ceo-review, /plan-eng-review, /plan-design-review,
 /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review,
 /setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release,
 /codex, /careful, /freeze, /guard, /unfreeze, /spec-first-upgrade.
@@ -423,7 +423,7 @@ MIT License. Free forever. Go build something.
 
 ## 🎉 Acknowledgments
 
-Spec-First's design philosophy is inspired by Y Combinator office hours, modern software engineering best practices, and cutting-edge exploration of AI-assisted development.
+Spec-First's design philosophy is inspired by Y Combinator brainstorm, modern software engineering best practices, and cutting-edge exploration of AI-assisted development.
 
 Special thanks to all contributors and early adopters whose feedback helped shape this tool.
 

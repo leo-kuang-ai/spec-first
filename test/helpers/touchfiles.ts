@@ -59,8 +59,8 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'review-base-branch':       ['review/**'],
   'review-design-lite':       ['review/**', 'test/fixtures/review-eval-design-slop.*'],
 
-  // Office Hours
-  'office-hours-spec-review':  ['office-hours/**', 'scripts/gen-skill-docs.ts'],
+  // Brainstorm
+  'brainstorm-spec-review':  ['brainstorm/**', 'scripts/gen-skill-docs.ts'],
 
   // Plan reviews
   'plan-ceo-review':           ['plan-ceo-review/**'],
@@ -158,9 +158,9 @@ export const LLM_JUDGE_TOUCHFILES: Record<string, string[]> = {
   'design-review/SKILL.md fix loop':      ['design-review/SKILL.md', 'design-review/SKILL.md.tmpl'],
   'design-consultation/SKILL.md research': ['design-consultation/SKILL.md', 'design-consultation/SKILL.md.tmpl'],
 
-  // Office Hours
-  'office-hours/SKILL.md spec review':    ['office-hours/SKILL.md', 'office-hours/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
-  'office-hours/SKILL.md design sketch':  ['office-hours/SKILL.md', 'office-hours/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
+  // Brainstorm
+  'brainstorm/SKILL.md spec review':    ['brainstorm/SKILL.md', 'brainstorm/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
+  'brainstorm/SKILL.md design sketch':  ['brainstorm/SKILL.md', 'brainstorm/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
 
   // Deploy skills
   'land-and-deploy/SKILL.md workflow':    ['land-and-deploy/SKILL.md', 'land-and-deploy/SKILL.md.tmpl'],

@@ -70,7 +70,7 @@ spec-first/
 ├── review/          # PR 审查技能
 ├── plan-ceo-review/ # /plan-ceo-review 技能
 ├── plan-eng-review/ # /plan-eng-review 技能
-├── office-hours/    # /office-hours 技能 (YC Office Hours — 创业诊断 + 构建者头脑风暴)
+├── brainstorm/    # /brainstorm 技能 (YC Brainstorm — 创业诊断 + 构建者头脑风暴)
 ├── investigate/     # /investigate 技能 (系统化根因调试)
 ├── retro/           # 回顾技能
 ├── document-release/ # /document-release 技能 (发布后文档更新)

@@ -504,7 +504,7 @@ Bash 命令
 ### 8.1 典型主流程
 
 ```text
-/office-hours
+/brainstorm
     |
     v
 /plan-ceo-review
@@ -598,7 +598,7 @@ gstack = 技能模板编译系统
 ```text
 用户
  |
- +--> 产品负责人: /office-hours /plan-ceo-review
+ +--> 产品负责人: /brainstorm /plan-ceo-review
  |
  +--> 工程负责人: /plan-eng-review /review /investigate
  |

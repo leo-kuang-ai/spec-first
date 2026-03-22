@@ -14,7 +14,7 @@
 ```text
                             新项目 / 从 0 到 1
 +--------+     +------------------+     +---------------------+
-| 想法   | --> | /office-hours    | --> | /plan-ceo-review    |
+| 想法   | --> | /brainstorm    | --> | /plan-ceo-review    |
 | 痛点   |     | 重构问题定义     |     | 审 scope / 愿景     |
 +--------+     +------------------+     +---------------------+
                                                    |
@@ -97,7 +97,7 @@
        | 需求清晰                     | 需求不清晰 / 方向要重想
        v                              v
 +----------------------+     +------------------+
-| /plan-eng-review     |     | /office-hours    |
+| /plan-eng-review     |     | /brainstorm    |
 | 审实现方案与测试     |     | 重构需求定义     |
 +----------------------+     +------------------+
        |                              |
@@ -194,7 +194,7 @@
 
 ```text
 新项目:
-office-hours
+brainstorm
    -> ceo-review
       -> eng-review [关键门禁]
          -> design-review(plan) [UI 项目强建议]
@@ -234,7 +234,7 @@ investigate
 重点是：
 
 - 如果需求已清晰，可以从 `/plan-eng-review` 起步
-- 如果需求本身还不清晰，就先回到 `/office-hours` 和 `/plan-ceo-review`
+- 如果需求本身还不清晰，就先回到 `/brainstorm` 和 `/plan-ceo-review`
 
 ### Bugfix / 排障
 

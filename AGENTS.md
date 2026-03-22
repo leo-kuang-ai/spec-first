@@ -6,11 +6,11 @@ designer, QA lead, release engineer, debugger, and more.
 
 ## Available skills
 
-Skills live in `.agents/skills/`. Invoke them by name (e.g., `/office-hours`).
+Skills live in `.agents/skills/`. Invoke them by name (e.g., `/brainstorm`).
 
 | Skill | What it does |
 |-------|-------------|
-| `/office-hours` | Start here. Reframes your product idea before you write code. |
+| `/brainstorm` | Start here. Reframes your product idea before you write code. |
 | `/plan-ceo-review` | CEO-level review: find the 10-star product in the request. |
 | `/plan-eng-review` | Lock architecture, data flow, edge cases, and tests. |
 | `/plan-design-review` | Rate each design dimension 0-10, explain what a 10 looks like. |

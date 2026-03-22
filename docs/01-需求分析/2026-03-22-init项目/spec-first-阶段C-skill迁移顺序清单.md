@@ -38,7 +38,7 @@
 当前已确认的 skill 集合如下：
 
 - 根 `SKILL.md`
-- `office-hours`
+- `brainstorm`
 - `plan-ceo-review`
 - `plan-eng-review`
 - `plan-design-review`
@@ -98,7 +98,7 @@
 
 ### G2：规划与文档类 skill
 
-- `office-hours`
+- `brainstorm`
 - `plan-ceo-review`
 - `plan-eng-review`
 - `plan-design-review`
@@ -183,7 +183,7 @@
 
 ### 顺序 3：G2a 轻依赖规划与文档类 skill
 
-1. `office-hours`
+1. `brainstorm`
 2. `design-consultation`
 3. `document-release`
 4. `retro`

@@ -345,7 +345,7 @@ DESIGN=$(ls -t ~/.spec-first/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | 
 [ -z "$DESIGN" ] && DESIGN=$(ls -t ~/.spec-first/projects/$SLUG/*-design-*.md 2>/dev/null | head -1)
 [ -n "$DESIGN" ] && echo "Design doc found: $DESIGN" || echo "No design doc found"
 ```
-If a design doc exists (from `/office-hours`), read it. Use it as the source of truth for the problem statement, constraints, and chosen approach. If it has a `Supersedes:` field, note that this is a revised design.
+If a design doc exists (from `/brainstorm`), read it. Use it as the source of truth for the problem statement, constraints, and chosen approach. If it has a `Supersedes:` field, note that this is a revised design.
 
 **Handoff note check** (reuses $SLUG and $BRANCH from the design doc check above):
 ```bash
@@ -354,7 +354,7 @@ HANDOFF=$(ls -t ~/.spec-first/projects/$SLUG/*-$BRANCH-ceo-handoff-*.md 2>/dev/n
 ```
 If this block runs in a separate shell from the design doc check, recompute $SLUG and $BRANCH first using the same commands from that block.
 If a handoff note is found: read it. This contains system audit findings and discussion
-from a prior CEO review session that paused so the user could run `/office-hours`. Use it
+from a prior CEO review session that paused so the user could run `/brainstorm`. Use it
 as additional context alongside the design doc. The handoff note helps you avoid re-asking
 questions the user already answered. Do NOT skip any steps — run the full review, but use
 the handoff note to inform your analysis and avoid redundant questions.
@@ -369,19 +369,19 @@ skill before proceeding.
 
 Say to the user via AskUserQuestion:
 
-> "No design doc found for this branch. `/office-hours` produces a structured problem
+> "No design doc found for this branch. `/brainstorm` produces a structured problem
 > statement, premise challenge, and explored alternatives — it gives this review much
 > sharper input to work with. Takes about 10 minutes. The design doc is per-feature,
 > not per-product — it captures the thinking behind this specific change."
 
 Options:
-- A) Run /office-hours first (in another window, then come back)
+- A) Run /brainstorm first (in another window, then come back)
 - B) Skip — proceed with standard review
 
 If they skip: "No worries — standard review. If you ever want sharper input, try
-/office-hours first next time." Then proceed normally. Do not re-offer later in the session.
+/brainstorm first next time." Then proceed normally. Do not re-offer later in the session.
 
-**Handoff note save (BENEFITS_FROM):** If the user chose A (run /office-hours first),
+**Handoff note save (BENEFITS_FROM):** If the user chose A (run /brainstorm first),
 save a handoff context note before they leave. Reuse $SLUG and $BRANCH from the
 design doc check block above (they use the same `remote-slug || basename` fallback
 that handles repos without an origin remote). Then run:
@@ -399,7 +399,7 @@ Branch: {branch}
 Repo: {owner/repo}
 
 ## Why I paused
-User chose to run /office-hours first (no design doc found).
+User chose to run /brainstorm first (no design doc found).
 
 ## System Audit Summary
 {Summarize what the system audit found — recent git history, diff scope,
@@ -410,29 +410,29 @@ CLAUDE.md key points, TODOS.md relevant items, known pain points}
 run yet — it will be assessed when the review resumes.}
 ```
 
-Tell the user: "Context saved. Run /office-hours in another window. When you come back
+Tell the user: "Context saved. Run /brainstorm in another window. When you come back
 and invoke /plan-ceo-review, I'll pick up the context automatically — including the
-design doc /office-hours produces."
+design doc /brainstorm produces."
 
 **Mid-session detection:** During Step 0A (Premise Challenge), if the user can't
 articulate the problem, keeps changing the problem statement, answers with "I'm not
-sure," or is clearly exploring rather than reviewing — offer `/office-hours`:
+sure," or is clearly exploring rather than reviewing — offer `/brainstorm`:
 
 > "It sounds like you're still figuring out what to build — that's totally fine, but
-> that's what /office-hours is designed for. Want to pause this review and run
-> /office-hours first? It'll help you nail down the problem and approach, then come
+> that's what /brainstorm is designed for. Want to pause this review and run
+> /brainstorm first? It'll help you nail down the problem and approach, then come
 > back here for the strategic review."
 
-Options: A) Yes, run /office-hours first. B) No, keep going.
+Options: A) Yes, run /brainstorm first. B) No, keep going.
 If they keep going, proceed normally — no guilt, no re-asking.
 
-**Handoff note save (mid-session):** If the user chose A (run /office-hours first from
+**Handoff note save (mid-session):** If the user chose A (run /brainstorm first from
 mid-session detection), save a handoff context note with the same format above, but
 include any Step 0A progress in the "Discussion So Far" section — premises discussed,
 problem framing attempts, user answers so far. Use the same bash block to generate the
 file path.
 
-Tell the user: "Context saved with your discussion so far. Run /office-hours, then
+Tell the user: "Context saved with your discussion so far. Run /brainstorm, then
 come back to /plan-ceo-review."
 
 When reading TODOS.md, specifically:

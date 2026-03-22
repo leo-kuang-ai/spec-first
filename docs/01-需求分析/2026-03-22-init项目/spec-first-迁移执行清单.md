@@ -31,7 +31,7 @@ spec-first-pro/
 ├── scripts/
 ├── test/
 ├── supabase/
-├── office-hours/
+├── brainstorm/
 ├── plan-ceo-review/
 ├── plan-eng-review/
 ├── plan-design-review/

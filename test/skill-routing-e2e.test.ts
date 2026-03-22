@@ -50,7 +50,7 @@ function installSkills(tmpDir: string) {
     '', // root spec-first SKILL.md
     'qa', 'qa-only', 'ship', 'review', 'plan-ceo-review', 'plan-eng-review',
     'plan-design-review', 'design-review', 'design-consultation', 'retro',
-    'document-release', 'investigate', 'office-hours', 'browse', 'setup-browser-cookies',
+    'document-release', 'investigate', 'brainstorm', 'browse', 'setup-browser-cookies',
     'spec-first-upgrade', 'humanizer',
   ];
 
@@ -113,7 +113,7 @@ describeE2E('Skill Routing E2E — Developer Journey', () => {
       spawnSync('git', ['commit', '-m', 'initial'], { cwd: tmpDir, stdio: 'pipe', timeout: 5000 });
 
       const testName = 'journey-ideation';
-      const expectedSkill = 'office-hours';
+      const expectedSkill = 'brainstorm';
       const result = await runSkillTest({
         prompt: "I've been thinking about building a waitlist management tool for restaurants. The existing solutions are expensive and overcomplicated. I want something simple — a tablet app where hosts can add parties, see wait times, and text customers when their table is ready. Help me think through whether this is worth building and what the key design decisions are.",
         workingDirectory: tmpDir,
@@ -361,7 +361,7 @@ export default app;
       const testName = 'journey-code-review';
       const expectedSkill = 'review';
       const result = await runSkillTest({
-        prompt: "I'm about to merge this into main. Can you look over my changes and flag anything risky before I land it?",
+        prompt: "I'm about to merge this into master. Can you look over my changes and flag anything risky before I land it?",
         workingDirectory: tmpDir,
         maxTurns: 5,
         allowedTools: ['Skill', 'Read', 'Bash', 'Glob', 'Grep'],

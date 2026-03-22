@@ -10,7 +10,7 @@ description: |
 
   spec-first also includes development workflow skills. When you notice the user is at
   these stages, suggest the appropriate skill:
-  - Brainstorming a new idea → suggest /office-hours
+  - Brainstorming a new idea → suggest /brainstorm
   - Narrowing a large requirement into owner scope → suggest /focus-requirements
   - Reviewing a plan (strategy) → suggest /plan-ceo-review
   - Reviewing a plan (architecture) → suggest /plan-eng-review

@@ -23,7 +23,7 @@ gstack 不是一个纯粹的 process engine，也不是一个普通的 prompt �
    |                  |                  |                  |
 产品/设计专家层       工程评审层         质量与交付层       通用运行时约束
    |                  |                  |                  |
-/office-hours         /plan-eng-review   /review            AskUserQuestion
+/brainstorm         /plan-eng-review   /review            AskUserQuestion
 /plan-ceo-review      /plan-design...    /qa                Boil the Lake
 /design-consultation                      /ship              Search Before Building
                                           /document-release  telemetry / review-log
@@ -44,7 +44,7 @@ gstack 不是一个纯粹的 process engine，也不是一个普通的 prompt �
 
 它把开发流程拆成一组专家角色：
 
-- `/office-hours`
+- `/brainstorm`
 - `/plan-ceo-review`
 - `/plan-eng-review`
 - `/plan-design-review`
@@ -221,7 +221,7 @@ artifact 才是流程记忆体
 
 代表 skill：
 
-- `/office-hours`
+- `/brainstorm`
 - `/plan-ceo-review`
 - `/plan-eng-review`
 - `/plan-design-review`

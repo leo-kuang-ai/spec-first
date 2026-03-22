@@ -503,7 +503,7 @@ Bash 命令
 
 下面按“触发场景 -> 主逻辑 -> 产出/依赖”梳理。
 
-## 8.1 `/office-hours`
+## 8.1 `/brainstorm`
 
 定位：产品/想法阶段入口。
 
@@ -969,7 +969,7 @@ Step 1 询问用户或根据配置自动升级
 ### 9.1 典型主流程
 
 ```text
-/office-hours
+/brainstorm
     |
     v
 /plan-ceo-review
@@ -1063,7 +1063,7 @@ gstack = 技能模板编译系统
 ```text
 用户
  |
- +--> 产品负责人: /office-hours /plan-ceo-review
+ +--> 产品负责人: /brainstorm /plan-ceo-review
  |
  +--> 工程负责人: /plan-eng-review /review /investigate
  |

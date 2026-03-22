@@ -9,11 +9,11 @@
 - **Browse and skill state now resolve spec-first paths.** Active code paths now default to `~/.spec-first`, `.spec-first`, and `spec-first-*` naming instead of the legacy gstack variants.
 - **Skill generation and validation now match the renamed project.** Claude and Codex skill outputs stay fresh under the spec-first naming scheme.
 
-## [0.9.9.0] - 2026-03-21 — Harder Office Hours
+## [0.9.9.0] - 2026-03-21 — Harder Brainstorm
 
 ### Changed
 
-- **`/office-hours` now pushes back harder.** The diagnostic questions no longer soften toward confident founders. Five changes: hardened response posture ("direct to the point of discomfort"), anti-sycophancy rules (banned phrases like "that's an interesting approach"), 5 worked pushback patterns showing BAD vs GOOD responses, a post-Q1 framing check that challenges undefined terms and hidden assumptions, and a gated escape hatch that asks 2 more questions before letting founders skip. Inspired by user feedback comparing gstack with dontbesilent's diagnostic skill.
+- **`/brainstorm` now pushes back harder.** The diagnostic questions no longer soften toward confident founders. Five changes: hardened response posture ("direct to the point of discomfort"), anti-sycophancy rules (banned phrases like "that's an interesting approach"), 5 worked pushback patterns showing BAD vs GOOD responses, a post-Q1 framing check that challenges undefined terms and hidden assumptions, and a gated escape hatch that asks 2 more questions before letting founders skip. Inspired by user feedback comparing gstack with dontbesilent's diagnostic skill.
 
 ## [0.9.8.0] - 2026-03-21 — Deploy Pipeline + E2E Performance
 
@@ -60,11 +60,11 @@
 - **ETHOS.md — gstack's builder philosophy in one document.** Four principles: The Golden Age (AI compression ratios), Boil the Lake (completeness is cheap), Search Before Building (three layers of knowledge), and Build for Yourself. This is the philosophical source of truth that every workflow skill references.
 - **Every workflow skill now searches before recommending.** Before suggesting infrastructure patterns, concurrency approaches, or framework-specific solutions, gstack checks if the runtime has a built-in and whether the pattern is current best practice. Three layers of knowledge — tried-and-true (Layer 1), new-and-popular (Layer 2), and first-principles (Layer 3) — with the most valuable insights prized above all.
 - **Eureka moments.** When first-principles reasoning reveals that conventional wisdom is wrong, gstack names it, celebrates it, and logs it. Your weekly `/retro` now surfaces these insights so you can see where your projects zigged while others zagged.
-- **`/office-hours` adds Landscape Awareness phase.** After understanding your problem through questioning but before challenging premises, gstack searches for what the world thinks — then runs a three-layer synthesis to find where conventional wisdom might be wrong for your specific case.
+- **`/brainstorm` adds Landscape Awareness phase.** After understanding your problem through questioning but before challenging premises, gstack searches for what the world thinks — then runs a three-layer synthesis to find where conventional wisdom might be wrong for your specific case.
 - **`/plan-eng-review` adds search check.** Step 0 now verifies architectural patterns against current best practices and flags custom solutions where built-ins exist.
 - **`/investigate` searches on hypothesis failure.** When your first debugging hypothesis is wrong, gstack searches for the exact error message and known framework issues before guessing again.
 - **`/design-consultation` three-layer synthesis.** Competitive research now uses the structured Layer 1/2/3 framework to find where your product should deliberately break from category norms.
-- **CEO review saves context when handing off to `/office-hours`.** When `/plan-ceo-review` suggests running `/office-hours` first, it now saves a handoff note with your system audit findings and any discussion so far. When you come back and re-invoke `/plan-ceo-review`, it picks up that context automatically — no more starting from scratch.
+- **CEO review saves context when handing off to `/brainstorm`.** When `/plan-ceo-review` suggests running `/brainstorm` first, it now saves a handoff note with your system audit findings and any discussion so far. When you come back and re-invoke `/plan-ceo-review`, it picks up that context automatically — no more starting from scratch.
 
 ## [0.9.4.1] - 2026-03-20
 
@@ -109,9 +109,9 @@
 
 ### Added
 
-- **Your design docs now get stress-tested before you see them.** When you run `/office-hours`, an independent AI reviewer checks your design doc for completeness, consistency, clarity, scope creep, and feasibility — up to 3 rounds. You get a quality score (1-10) and a summary of what was caught and fixed. The doc you approve has already survived adversarial review.
-- **Visual wireframes during brainstorming.** For UI ideas, `/office-hours` now generates a rough HTML wireframe using your project's design system (from DESIGN.md) and screenshots it. You see what you're designing while you're still thinking, not after you've coded it.
-- **Skills help each other now.** `/plan-ceo-review` and `/plan-eng-review` detect when you'd benefit from running `/office-hours` first and offer it — one-tap to switch, one-tap to decline. If you seem lost during a CEO review, it'll gently suggest brainstorming first.
+- **Your design docs now get stress-tested before you see them.** When you run `/brainstorm`, an independent AI reviewer checks your design doc for completeness, consistency, clarity, scope creep, and feasibility — up to 3 rounds. You get a quality score (1-10) and a summary of what was caught and fixed. The doc you approve has already survived adversarial review.
+- **Visual wireframes during brainstorming.** For UI ideas, `/brainstorm` now generates a rough HTML wireframe using your project's design system (from DESIGN.md) and screenshots it. You see what you're designing while you're still thinking, not after you've coded it.
+- **Skills help each other now.** `/plan-ceo-review` and `/plan-eng-review` detect when you'd benefit from running `/brainstorm` first and offer it — one-tap to switch, one-tap to decline. If you seem lost during a CEO review, it'll gently suggest brainstorming first.
 - **Spec review metrics.** Every adversarial review logs iterations, issues found/fixed, and quality score to `~/.gstack/analytics/spec-review.jsonl`. Over time, you can see if your design docs are getting better.
 
 ## [0.9.0.1] - 2026-03-19
@@ -245,7 +245,7 @@ When both `/review` (Claude) and `/codex review` have run, you get a cross-model
 
 ### Added
 
-- **gstack now suggests skills at natural moments.** You don't need to know slash commands — just talk about what you're doing. Brainstorming an idea? gstack suggests `/office-hours`. Something's broken? It suggests `/debug`. Ready to deploy? It suggests `/ship`. Every workflow skill now has proactive triggers that fire when the moment is right.
+- **gstack now suggests skills at natural moments.** You don't need to know slash commands — just talk about what you're doing. Brainstorming an idea? gstack suggests `/brainstorm`. Something's broken? It suggests `/debug`. Ready to deploy? It suggests `/ship`. Every workflow skill now has proactive triggers that fire when the moment is right.
 - **Lifecycle map.** gstack's root skill description now includes a developer workflow guide mapping 12 stages (brainstorm → plan → review → code → debug → test → ship → docs → retro) to the right skill. Claude sees this in every session.
 - **Opt-out with natural language.** If proactive suggestions feel too aggressive, just say "stop suggesting things" — gstack remembers across sessions. Say "be proactive again" to re-enable.
 - **11 journey-stage E2E tests.** Each test simulates a real moment in the developer lifecycle with realistic project context (plan.md, error logs, git history, code) and verifies the right skill fires from natural language alone. 11/11 pass.
@@ -253,11 +253,11 @@ When both `/review` (Claude) and `/codex review` have run, you get a cross-model
 
 ### Fixed
 
-- `/debug` and `/office-hours` were completely invisible to natural language — no trigger phrases at all. Now both have full reactive + proactive triggers.
+- `/debug` and `/brainstorm` were completely invisible to natural language — no trigger phrases at all. Now both have full reactive + proactive triggers.
 
-## [0.7.0] - 2026-03-18 — YC Office Hours
+## [0.7.0] - 2026-03-18 — YC Brainstorm
 
-**`/office-hours` — sit down with a YC partner before you write a line of code.**
+**`/brainstorm` — sit down with a YC partner before you write a line of code.**
 
 Two modes. If you're building a startup, you get six forcing questions distilled from how YC evaluates products: demand reality, status quo, desperate specificity, narrowest wedge, observation & surprise, and future-fit. If you're hacking on a side project, learning to code, or at a hackathon, you get an enthusiastic brainstorming partner who helps you find the coolest version of your idea.
 

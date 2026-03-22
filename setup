@@ -157,12 +157,12 @@ get_skill_desc() {
     design-consultation) [ "$lang" = "zh" ] && echo "设计咨询" || echo "Design consultation" ;;
     design-review)   [ "$lang" = "zh" ] && echo "设计审查" || echo "Design review" ;;
     document-release) [ "$lang" = "zh" ] && echo "文档更新" || echo "Document release" ;;
-    focus-requirements) [ "$lang" = "zh" ] && echo "需求聚焦" || echo "Focus requirements" ;;
+    focus-requirements) [ "$lang" = "zh" ] && echo "需求拆分" || echo "Focus requirements" ;;
     freeze)          [ "$lang" = "zh" ] && echo "冻结编辑范围" || echo "Freeze edit scope" ;;
     guard)           [ "$lang" = "zh" ] && echo "完整安全模式" || echo "Full security mode" ;;
     investigate)     [ "$lang" = "zh" ] && echo "系统化调试" || echo "Systematic debugging" ;;
     land-and-deploy) [ "$lang" = "zh" ] && echo "合并和部署" || echo "Land and deploy" ;;
-    office-hours)    [ "$lang" = "zh" ] && echo "办公时间规划" || echo "Office hours planning" ;;
+    brainstorm)      [ "$lang" = "zh" ] && echo "头脑风暴" || echo "Brainstorm" ;;
     plan-ceo-review) [ "$lang" = "zh" ] && echo "CEO 审查" || echo "CEO review" ;;
     plan-design-review) [ "$lang" = "zh" ] && echo "设计审查" || echo "Design review" ;;
     plan-eng-review) [ "$lang" = "zh" ] && echo "工程审查" || echo "Engineering review" ;;

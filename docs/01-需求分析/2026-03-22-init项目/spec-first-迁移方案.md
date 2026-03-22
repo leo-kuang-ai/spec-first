@@ -485,7 +485,7 @@ spec-first-pro/
 ├── review/
 ├── qa/
 ├── ship/
-├── office-hours/
+├── brainstorm/
 ├── ...
 ├── .agents/skills/spec-first-*
 └── docs/

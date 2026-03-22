@@ -10,7 +10,7 @@
 
 本组包含：
 
-- `office-hours`
+- `brainstorm`
 - `design-consultation`
 - `document-release`
 - `retro`
@@ -26,8 +26,8 @@
 
 ## 2. 本任务包覆盖文件
 
-- `office-hours/SKILL.md.tmpl`
-- `office-hours/SKILL.md`
+- `brainstorm/SKILL.md.tmpl`
+- `brainstorm/SKILL.md`
 - `design-consultation/SKILL.md.tmpl`
 - `design-consultation/SKILL.md`
 - `document-release/SKILL.md.tmpl`
@@ -37,7 +37,7 @@
 
 ## 3. 当前已识别的关键迁移点
 
-## 3.1 `office-hours`
+## 3.1 `brainstorm`
 
 已确认存在：
 
@@ -49,18 +49,18 @@
 
 说明：
 
-- `office-hours` 是这一组里最典型的“项目级状态目录 skill”
+- `brainstorm` 是这一组里最典型的“项目级状态目录 skill”
 
 ## 3.2 `design-consultation`
 
 已确认存在：
 
 - `~/.claude/skills/gstack/bin/gstack-slug`
-- `ls ~/.gstack/projects/$SLUG/*office-hours*`
+- `ls ~/.gstack/projects/$SLUG/*brainstorm*`
 
 说明：
 
-- 它依赖 `office-hours` 的产物发现链
+- 它依赖 `brainstorm` 的产物发现链
 
 ## 3.3 `document-release`
 
@@ -97,7 +97,7 @@ G2a 迁移完成后，这组 skill 应满足：
 
 ## 5. 任务拆解
 
-## 5.1 G2a-1 迁移 `office-hours`
+## 5.1 G2a-1 迁移 `brainstorm`
 
 重点：
 
@@ -115,12 +115,12 @@ G2a 迁移完成后，这组 skill 应满足：
 
 重点：
 
-- 对 `office-hours` 产物的读取路径
+- 对 `brainstorm` 产物的读取路径
 - `gstack-slug` -> `spec-first-slug`
 
 专项验证：
 
-- 能正确描述如何从 `~/.spec-first/projects/$SLUG/` 读取 office-hours 产物
+- 能正确描述如何从 `~/.spec-first/projects/$SLUG/` 读取 brainstorm 产物
 
 ## 5.3 G2a-3 迁移 `document-release`
 
@@ -174,8 +174,8 @@ G2a 迁移完成后，这组 skill 应满足：
 
 ### Step 4：逐个专项验证
 
-- `office-hours`：项目设计文档路径
-- `design-consultation`：对 `office-hours` 产物的读取路径
+- `brainstorm`：项目设计文档路径
+- `design-consultation`：对 `brainstorm` 产物的读取路径
 - `document-release`：文档扫描忽略目录与临时文件名
 - `retro`：analytics / greptile / eureka 路径
 
@@ -206,7 +206,7 @@ G2a 迁移完成后，这组 skill 应满足：
 
 最容易出的问题：
 
-1. `office-hours` 写到 `~/.spec-first/projects`
+1. `brainstorm` 写到 `~/.spec-first/projects`
 2. `design-consultation` 还在读 `~/.gstack/projects`
 
 这会让 skill 间交接链路直接断掉。

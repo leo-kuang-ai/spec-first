@@ -178,7 +178,7 @@
 定位：
 
 - 阶段 C 第二批 skill 执行包
-- 处理 `office-hours`、`design-consultation`、`document-release`、`retro`
+- 处理 `brainstorm`、`design-consultation`、`document-release`、`retro`
 
 适用场景：
 

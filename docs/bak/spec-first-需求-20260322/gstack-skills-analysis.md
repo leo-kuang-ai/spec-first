@@ -10,7 +10,7 @@ gstack 当前可见的 skill 共 21 个：
 
 ```text
 产品与规划
-  /office-hours
+  /brainstorm
   /plan-ceo-review
   /plan-eng-review
   /plan-design-review
@@ -45,7 +45,7 @@ gstack 当前可见的 skill 共 21 个：
 
 ```text
 想法
-  -> /office-hours
+  -> /brainstorm
   -> /plan-ceo-review
   -> /plan-eng-review
   -> /plan-design-review
@@ -60,7 +60,7 @@ gstack 当前可见的 skill 共 21 个：
 
 ## 2. 每个 skill 的逐个逻辑
 
-## 2.1 `/office-hours`
+## 2.1 `/brainstorm`
 
 定位：产品/想法阶段入口。
 
@@ -570,7 +570,7 @@ Step 1 询问用户或根据配置自动升级
 ### 3.1 规划链
 
 ```text
-/office-hours
+/brainstorm
   -> /plan-ceo-review
   -> /plan-eng-review
   -> /plan-design-review

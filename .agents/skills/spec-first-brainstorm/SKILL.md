@@ -1,25 +1,15 @@
 ---
-name: office-hours
-version: 2.0.0
+name: brainstorm
 description: |
-  YC Office Hours — two modes. Startup mode: six forcing questions that expose
+  Brainstorm — two modes. Startup mode: six forcing questions that expose
   demand reality, status quo, desperate specificity, narrowest wedge, observation,
   and future-fit. Builder mode: design thinking brainstorming for side projects,
   hackathons, learning, and open source. Saves a design doc.
   Use when asked to "brainstorm this", "I have an idea", "help me think through
-  this", "office hours", or "is this worth building".
+  this", "brainstorm", or "is this worth building".
   Proactively suggest when the user describes a new product idea or is exploring
   whether something is worth building — before any code is written.
   Use before /plan-ceo-review or /plan-eng-review.
-allowed-tools:
-  - Bash
-  - Read
-  - Grep
-  - Glob
-  - Write
-  - Edit
-  - AskUserQuestion
-  - WebSearch
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
@@ -29,35 +19,35 @@ allowed-tools:
 **语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
 
 ```bash
-_UPD=$(~/.claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
+_UPD=$(~/.codex/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .agents/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 mkdir -p ~/.spec-first/sessions
 touch ~/.spec-first/sessions/"$PPID"
 _SESSIONS=$(find ~/.spec-first/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr -d ' ')
 find ~/.spec-first/sessions -mmin +120 -type f -delete 2>/dev/null || true
-_CONTRIB=$(~/.claude/skills/spec-first/bin/spec-first-config get spec-first_contributor 2>/dev/null || true)
-_PROACTIVE=$(~/.claude/skills/spec-first/bin/spec-first-config get proactive 2>/dev/null || echo "true")
+_CONTRIB=$(~/.codex/skills/spec-first/bin/spec-first-config get spec-first_contributor 2>/dev/null || true)
+_PROACTIVE=$(~/.codex/skills/spec-first/bin/spec-first-config get proactive 2>/dev/null || echo "true")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "BRANCH: $_BRANCH"
 echo "PROACTIVE: $_PROACTIVE"
 _LAKE_SEEN=$([ -f ~/.spec-first/.completeness-intro-seen ] && echo "yes" || echo "no")
 echo "LAKE_INTRO: $_LAKE_SEEN"
-_TEL=$(~/.claude/skills/spec-first/bin/spec-first-config get telemetry 2>/dev/null || true)
+_TEL=$(~/.codex/skills/spec-first/bin/spec-first-config get telemetry 2>/dev/null || true)
 _TEL_PROMPTED=$([ -f ~/.spec-first/.telemetry-prompted ] && echo "yes" || echo "no")
 _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
     mkdir -p ~/.spec-first/analytics
-    echo '{"skill":"office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-    _PENDING=$(~/.claude/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
-    [ -n "$_PENDING" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
+    echo '{"skill":"brainstorm","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.codex/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.codex/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/spec-first/spec-first-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running spec-first v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.codex/skills/spec-first/spec-first-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running spec-first v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "spec-first follows the **Boil the Lake** principle — always do the complete
@@ -83,7 +73,7 @@ Options:
 - A) Help spec-first get better! (recommended)
 - B) No thanks
 
-If A: run `~/.claude/skills/spec-first/bin/spec-first-config set telemetry community`
+If A: run `~/.codex/skills/spec-first/bin/spec-first-config set telemetry community`
 
 If B: ask a follow-up AskUserQuestion:
 
@@ -94,8 +84,8 @@ Options:
 - A) Sure, anonymous is fine
 - B) No thanks, fully off
 
-If B→A: run `~/.claude/skills/spec-first/bin/spec-first-config set telemetry anonymous`
-If B→B: run `~/.claude/skills/spec-first/bin/spec-first-config set telemetry off`
+If B→A: run `~/.codex/skills/spec-first/bin/spec-first-config set telemetry anonymous`
+If B→B: run `~/.codex/skills/spec-first/bin/spec-first-config set telemetry off`
 
 Always run:
 ```bash
@@ -143,7 +133,7 @@ AI-assisted coding makes the marginal cost of completeness near-zero. When you p
 
 ## Search Before Building
 
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `~/.claude/skills/spec-first/ETHOS.md` for the full philosophy.
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `~/.codex/skills/spec-first/ETHOS.md` for the full philosophy.
 
 **Three layers of knowledge:**
 - **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
@@ -241,7 +231,7 @@ Run this bash:
 _TEL_END=$(date +%s)
 _TEL_DUR=$(( _TEL_END - _TEL_START ))
 rm -f ~/.spec-first/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.claude/skills/spec-first/bin/spec-first-telemetry-log \
+~/.codex/skills/spec-first/bin/spec-first-telemetry-log \
   --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
   --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
 ```
@@ -256,8 +246,8 @@ never blocks the user.
 ```bash
 _ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 B=""
-[ -n "$_ROOT" ] && [ -x "$_ROOT/.claude/skills/spec-first/browse/dist/browse" ] && B="$_ROOT/.claude/skills/spec-first/browse/dist/browse"
-[ -z "$B" ] && B=~/.claude/skills/spec-first/browse/dist/browse
+[ -n "$_ROOT" ] && [ -x "$_ROOT/.agents/skills/spec-first/browse/dist/browse" ] && B="$_ROOT/.agents/skills/spec-first/browse/dist/browse"
+[ -z "$B" ] && B=~/.codex/skills/spec-first/browse/dist/browse
 if [ -x "$B" ]; then
   echo "READY: $B"
 else
@@ -270,9 +260,9 @@ If `NEEDS_SETUP`:
 2. Run: `cd <SKILL_DIR> && ./setup`
 3. If `bun` is not installed: `curl -fsSL https://bun.sh/install | bash`
 
-# YC Office Hours
+# Brainstorm
 
-You are a **YC office hours partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
+You are a **brainstorm partner**. Your job is to ensure the problem is understood before solutions are proposed. You adapt to what the user is building — startup founders get the hard questions, builders get an enthusiastic collaborator. This skill produces design docs, not code.
 
 **HARD GATE:** Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action. Your only output is a design document.
 
@@ -283,7 +273,7 @@ You are a **YC office hours partner**. Your job is to ensure the problem is unde
 Understand the project and the area the user wants to change.
 
 ```bash
-source <(~/.claude/skills/spec-first/bin/spec-first-slug 2>/dev/null)
+source <(~/.codex/skills/spec-first/bin/spec-first-slug 2>/dev/null)
 ```
 
 1. Read `CLAUDE.md`, `TODOS.md` (if they exist).
@@ -707,7 +697,7 @@ Count the signals. You'll use this count in Phase 6 to determine which tier of c
 Write the design document to the project directory.
 
 ```bash
-source <(~/.claude/skills/spec-first/bin/spec-first-slug 2>/dev/null) && mkdir -p ~/.spec-first/projects/$SLUG
+source <(~/.codex/skills/spec-first/bin/spec-first-slug 2>/dev/null) && mkdir -p ~/.spec-first/projects/$SLUG
 USER=$(whoami)
 DATETIME=$(date +%Y%m%d-%H%M%S)
 ```
@@ -716,7 +706,7 @@ DATETIME=$(date +%Y%m%d-%H%M%S)
 ```bash
 PRIOR=$(ls -t ~/.spec-first/projects/$SLUG/*-$BRANCH-design-*.md 2>/dev/null | head -1)
 ```
-If `$PRIOR` exists, the new doc gets a `Supersedes:` field referencing it. This creates a revision chain — you can trace how a design evolved across office hours sessions.
+If `$PRIOR` exists, the new doc gets a `Supersedes:` field referencing it. This creates a revision chain — you can trace how a design evolved across brainstorm sessions.
 
 Write to `~/.spec-first/projects/{slug}/{user}-{branch}-design-{datetime}.md`:
 
@@ -725,7 +715,7 @@ Write to `~/.spec-first/projects/{slug}/{user}-{branch}-design-{datetime}.md`:
 ```markdown
 # Design: {title}
 
-Generated by /office-hours on {date}
+Generated by /brainstorm on {date}
 Branch: {branch}
 Repo: {owner/repo}
 Status: DRAFT
@@ -760,7 +750,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 {chosen approach with rationale}
 
 ## Open Questions
-{any unresolved questions from the office hours}
+{any unresolved questions from the brainstorm}
 
 ## Success Criteria
 {measurable criteria from Phase 2A}
@@ -780,7 +770,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 ```markdown
 # Design: {title}
 
-Generated by /office-hours on {date}
+Generated by /brainstorm on {date}
 Branch: {branch}
 Repo: {owner/repo}
 Status: DRAFT
@@ -809,7 +799,7 @@ Supersedes: {prior filename — omit this line if first design on this branch}
 {chosen approach with rationale}
 
 ## Open Questions
-{any unresolved questions from the office hours}
+{any unresolved questions from the brainstorm}
 
 ## Success Criteria
 {what "done" looks like}
@@ -881,7 +871,7 @@ After the loop completes (PASS, max iterations, or convergence guard):
 3. Append metrics:
 ```bash
 mkdir -p ~/.spec-first/analytics
-echo '{"skill":"office-hours","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","iterations":ITERATIONS,"issues_found":FOUND,"issues_fixed":FIXED,"remaining":REMAINING,"quality_score":SCORE}' >> ~/.spec-first/analytics/spec-review.jsonl 2>/dev/null || true
+echo '{"skill":"brainstorm","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","iterations":ITERATIONS,"issues_found":FOUND,"issues_fixed":FIXED,"remaining":REMAINING,"quality_score":SCORE}' >> ~/.spec-first/analytics/spec-review.jsonl 2>/dev/null || true
 ```
 Replace ITERATIONS, FOUND, FIXED, REMAINING, SCORE with actual values from the review.
 

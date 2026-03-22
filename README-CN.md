@@ -41,7 +41,7 @@ cd ~/.claude/skills/spec-first
 打开 Claude Code,输入:
 
 ```
-/office-hours
+/brainstorm
 ```
 
 描述你想要构建的产品或功能。
@@ -130,7 +130,7 @@ cd ~/spec-first-temp
 
 ```
 用户:    我想构建一个每日简报应用,帮助管理多个日历。
-用户:    /office-hours
+用户:    /brainstorm
 Claude:  [询问真实痛点 - 具体例子,而不是假设]
 
 用户:    多个 Google 日历,事件信息过期,地点错误...
@@ -174,7 +174,7 @@ Claude:  我要挑战你的框架。你说"每日简报应用",但你实际描�
 
 | 技能 | 角色 | 功能 |
 |------|------|------|
-| `/office-hours` | **YC 办公时间** | 从这里开始。6 个强制性问题,在编写代码前重新构建你的产品。 |
+| `/brainstorm` | **头脑风暴** | 从这里开始。6 个强制性问题,在编写代码前重新构建你的产品。 |
 | `/plan-ceo-review` | **CEO/创始人** | 重新思考问题。找到隐藏在请求中的 10 倍产品。 |
 | `/plan-eng-review` | **工程经理** | 锁定架构、数据流、图表、边缘情况和测试。 |
 | `/plan-design-review` | **高级设计师** | 对每个设计维度评分 0-10,解释 10 分的样子,然后编辑计划达到目标。 |
@@ -201,7 +201,7 @@ Claude:  我要挑战你的框架。你说"每日简报应用",但你实际描�
 
 | 技能 | 角色 | 功能 |
 |------|------|------|
-| `/ship` | **发布工程师** | 同步 main,运行测试,审计覆盖率,推送,打开 PR。 |
+| `/ship` | **发布工程师** | 同步 master,运行测试,审计覆盖率,推送,打开 PR。 |
 | `/land-and-deploy` | **发布工程师** | 合并 PR,等待 CI 和部署,验证生产环境健康。 |
 | `/setup-deploy` | **部署配置器** | /land-and-deploy 的一次性设置。 |
 
@@ -234,7 +234,7 @@ Claude:  我要挑战你的框架。你说"每日简报应用",但你实际描�
 
 ## 💡 核心特性
 
-### 1. `/office-hours` 重新构建产品
+### 1. `/brainstorm` 重新构建产品
 
 你说"每日简报应用",它倾听你的实际痛点,挑战框架,告诉你真正构建的是私人参谋长 AI,挑战前提,生成三个实现方案及工作量估算。编写的设计文档直接传递给 `/plan-ceo-review` 和 `/plan-eng-review`。
 
@@ -279,7 +279,7 @@ Claude:  我要挑战你的框架。你说"每日简报应用",但你实际描�
 ```
 产品想法
    ↓
-/office-hours (1-2 小时)
+/brainstorm (1-2 小时)
    ↓
 /plan-ceo-review (30-60 分钟)
    ↓
@@ -391,7 +391,7 @@ Spec-First 在 Windows 11 上通过 Git Bash 或 WSL 工作。除了 Bun 之外�
 
 使用 spec-first 的 /browse 进行所有网页浏览。不要使用 mcp__claude-in-chrome__* 工具。
 
-可用技能: /office-hours, /plan-ceo-review, /plan-eng-review, /plan-design-review,
+可用技能: /brainstorm, /plan-ceo-review, /plan-eng-review, /plan-design-review,
 /design-consultation, /review, /ship, /browse, /qa, /qa-only, /design-review,
 /setup-browser-cookies, /setup-deploy, /retro, /investigate, /document-release,
 /codex, /careful, /freeze, /guard, /unfreeze, /spec-first-upgrade。

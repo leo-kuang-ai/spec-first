@@ -461,7 +461,7 @@ describe('PLAN_FILE_REVIEW_REPORT resolver', () => {
 // --- {{SPEC_REVIEW_LOOP}} resolver tests ---
 
 describe('SPEC_REVIEW_LOOP resolver', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+  const content = fs.readFileSync(path.join(ROOT, 'brainstorm', 'SKILL.md'), 'utf-8');
 
   test('contains all 5 review dimensions', () => {
     for (const dim of ['Completeness', 'Consistency', 'Clarity', 'Scope', 'Feasibility']) {
@@ -497,7 +497,7 @@ describe('SPEC_REVIEW_LOOP resolver', () => {
 // --- {{DESIGN_SKETCH}} resolver tests ---
 
 describe('DESIGN_SKETCH resolver', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+  const content = fs.readFileSync(path.join(ROOT, 'brainstorm', 'SKILL.md'), 'utf-8');
 
   test('references DESIGN.md for design system constraints', () => {
     expect(content).toContain('DESIGN.md');
@@ -532,12 +532,12 @@ describe('BENEFITS_FROM resolver', () => {
 
   test('plan-ceo-review contains prerequisite skill offer', () => {
     expect(ceoContent).toContain('Prerequisite Skill Offer');
-    expect(ceoContent).toContain('/office-hours');
+    expect(ceoContent).toContain('/brainstorm');
   });
 
   test('plan-eng-review contains prerequisite skill offer', () => {
     expect(engContent).toContain('Prerequisite Skill Offer');
-    expect(engContent).toContain('/office-hours');
+    expect(engContent).toContain('/brainstorm');
   });
 
   test('offer includes graceful decline', () => {
@@ -673,15 +673,15 @@ describe('Codex generation (--host codex)', () => {
   });
 
   test('multiline descriptions preserved in Codex output', () => {
-    // office-hours has a multiline description — verify it survives the frontmatter transform
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'spec-first-office-hours', 'SKILL.md'), 'utf-8');
+    // brainstorm has a multiline description — verify it survives the frontmatter transform
+    const content = fs.readFileSync(path.join(AGENTS_DIR, 'spec-first-brainstorm', 'SKILL.md'), 'utf-8');
     const fmEnd = content.indexOf('\n---', 4);
     const frontmatter = content.slice(4, fmEnd);
     // Description should span multiple lines (block scalar)
     const descLines = frontmatter.split('\n').filter(l => l.startsWith('  '));
     expect(descLines.length).toBeGreaterThan(1);
     // Verify key phrases survived
-    expect(frontmatter).toContain('YC Office Hours');
+    expect(frontmatter).toContain('Brainstorm — two modes');
   });
 
   test('hook skills have safety prose and no hooks: in frontmatter', () => {

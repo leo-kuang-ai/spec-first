@@ -219,7 +219,7 @@
 
 必须检查：
 
-- `office-hours` -> `design-consultation`
+- `brainstorm` -> `design-consultation`
 - `plan-*` -> `qa` / `qa-only`
 - `review` / `codex` -> `ship`
 - `design-review` / `canary` / `benchmark` -> `land-and-deploy`

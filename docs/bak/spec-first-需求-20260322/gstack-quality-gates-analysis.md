@@ -28,7 +28,7 @@ gstack 确实有“上一阶段进入下一阶段”的质量控制机制，但�
    |
    v
 +-------------------+
-| /office-hours     |
+| /brainstorm     |
 | 目标: 重构问题    |
 | 产物: design doc  |
 +-------------------+
@@ -119,7 +119,7 @@ gstack 确实有“上一阶段进入下一阶段”的质量控制机制，但�
 
 典型位置：
 
-- `/office-hours` 之后再进入 plan 阶段。
+- `/brainstorm` 之后再进入 plan 阶段。
 - `/plan-ceo-review` 用于避免产品方向错误。
 - `/plan-design-review` 用于避免 UI/UX 规格缺失。
 
@@ -187,7 +187,7 @@ gstack 中真正会直接拦截动作的，多数不在“产品阶段切换”�
 
 ## 4. 每个阶段如何保障质量
 
-## 4.1 `/office-hours`
+## 4.1 `/brainstorm`
 
 输入：
 
@@ -422,7 +422,7 @@ gstack 不只是“上一阶段给建议”，而是会留下阶段产物。
 典型产物流如下：
 
 ```text
-/office-hours
+/brainstorm
   -> design doc
 
 /plan-ceo-review

@@ -142,7 +142,7 @@
 
 通常来自：
 
-- `/office-hours`
+- `/brainstorm`
 - `/plan-ceo-review`
 - `/plan-design-review`
 
@@ -626,7 +626,7 @@ Implementation Lead / TDD Engineer 负责：
 
 gstack 的前半段已经有：
 
-- `/office-hours`
+- `/brainstorm`
 - `/plan-ceo-review`
 - `/plan-eng-review`
 - `/plan-design-review`

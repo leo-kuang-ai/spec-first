@@ -50,7 +50,7 @@ cd .claude/skills/spec-first
 打开 Claude Code,输入:
 
 ```
-/office-hours
+/brainstorm
 ```
 
 然后描述你想要构建的产品或功能。
@@ -61,7 +61,7 @@ cd .claude/skills/spec-first
 
 Spec-First 是一个开源的 AI 辅助开发工具集,它将 Claude Code 转变为一个虚拟工程团队:
 
-- **CEO/产品角色** - `/office-hours`, `/plan-ceo-review`
+- **CEO/产品角色** - `/brainstorm`, `/plan-ceo-review`
 - **工程经理角色** - `/plan-eng-review`, `/review`
 - **设计师角色** - `/design-review`, `/design-consultation`
 - **QA 角色** - `/qa`, `/qa-only`, `/canary`

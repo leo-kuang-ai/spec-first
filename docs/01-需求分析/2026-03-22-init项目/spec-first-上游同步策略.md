@@ -180,7 +180,7 @@ spec-first 适配层（品牌、路径、命名前缀、兼容层）
 - `scripts/`
 - `test/`
 - `supabase/`
-- `office-hours/`
+- `brainstorm/`
 - `plan-ceo-review/`
 - `plan-eng-review/`
 - `plan-design-review/`

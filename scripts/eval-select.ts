@@ -5,7 +5,7 @@
  * Usage:
  *   bun run eval:select              # human-readable output
  *   bun run eval:select --json       # machine-readable JSON
- *   bun run eval:select --base main  # override base branch
+ *   bun run eval:select --base master  # override base branch
  */
 
 import * as path from 'path';
@@ -25,7 +25,7 @@ const baseIdx = args.indexOf('--base');
 const baseOverride = baseIdx >= 0 ? args[baseIdx + 1] : undefined;
 
 // Detect base branch
-const baseBranch = baseOverride || detectBaseBranch(ROOT) || 'main';
+const baseBranch = baseOverride || detectBaseBranch(ROOT) || 'master';
 const changedFiles = getChangedFiles(baseBranch, ROOT);
 
 if (changedFiles.length === 0) {
