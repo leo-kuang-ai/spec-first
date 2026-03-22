@@ -4,7 +4,7 @@
 # Creates .claude/skills/spec-first → (symlink to repo root) so Claude Code
 # discovers skills from your working tree. Changes take effect immediately.
 #
-# Also copies .env from the main worktree if this is a Conductor workspace
+# Also copies .env from the master worktree if this is a Conductor workspace
 # or git worktree (so API keys carry over automatically).
 #
 # Usage: bin/dev-setup       # set up
@@ -13,12 +13,12 @@ set -e
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
-# 1. Copy .env from main worktree (if we're a worktree and don't have one)
+# 1. Copy .env from master worktree (if we're a worktree and don't have one)
 if [ ! -f "$REPO_ROOT/.env" ]; then
-  MAIN_WORKTREE="$(git -C "$REPO_ROOT" worktree list --porcelain 2>/dev/null | head -1 | sed 's/^worktree //')"
-  if [ -n "$MAIN_WORKTREE" ] && [ "$MAIN_WORKTREE" != "$REPO_ROOT" ] && [ -f "$MAIN_WORKTREE/.env" ]; then
-    cp "$MAIN_WORKTREE/.env" "$REPO_ROOT/.env"
-    echo "Copied .env from main worktree ($MAIN_WORKTREE)"
+  MASTER_WORKTREE="$(git -C "$REPO_ROOT" worktree list --porcelain 2>/dev/null | head -1 | sed 's/^worktree //')"
+  if [ -n "$MASTER_WORKTREE" ] && [ "$MASTER_WORKTREE" != "$REPO_ROOT" ] && [ -f "$MASTER_WORKTREE/.env" ]; then
+    cp "$MASTER_WORKTREE/.env" "$REPO_ROOT/.env"
+    echo "Copied .env from master worktree ($MASTER_WORKTREE)"
   fi
 fi
 

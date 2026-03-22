@@ -66,8 +66,7 @@ fi
 # ─── Finalize stale .pending markers ────────────────────────
 # Each session gets its own .pending-$SESSION_ID file to avoid races
 # between concurrent sessions. Finalize any that don't match our session.
-for PFILE in "$PENDING_DIR"/.pending-*; do
-  [ -f "$PFILE" ] || continue
+while IFS= read -r -d '' PFILE; do
   # Skip our own session's marker (it's still in-flight)
   PFILE_BASE="$(basename "$PFILE")"
   PFILE_SID="${PFILE_BASE#.pending-}"
@@ -89,7 +88,7 @@ for PFILE in "$PENDING_DIR"/.pending-*; do
     printf '{"v":1,"ts":"%s","event_type":"skill_run","skill":"%s","session_id":"%s","spec_first_version":"%s","os":"%s","arch":"%s","duration_s":null,"outcome":"unknown","error_class":null,"used_browse":false,"sessions":1}\n' \
       "$P_TS" "$P_SKILL" "$P_SID" "$P_VER" "$P_OS" "$P_ARCH" >> "$JSONL_FILE" 2>/dev/null || true
   fi
-done
+done < <(find "$PENDING_DIR" -maxdepth 1 -type f -name '.pending-*' -print0 2>/dev/null || true)
 
 # Clear our own session's pending marker (we're about to log the real event)
 [ -n "$SESSION_ID" ] && rm -f "$PENDING_DIR/.pending-$SESSION_ID" 2>/dev/null || true

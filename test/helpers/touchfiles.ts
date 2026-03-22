@@ -195,7 +195,7 @@ export const GLOBAL_TOUCHFILES = [
  * Returns the first valid ref, or null if none found.
  */
 export function detectBaseBranch(cwd: string): string | null {
-  for (const ref of ['origin/main', 'origin/master', 'main', 'master']) {
+  for (const ref of ['origin/master', 'master', 'main']) {
     const result = spawnSync('git', ['rev-parse', '--verify', ref], {
       cwd, stdio: 'pipe', timeout: 3000,
     });

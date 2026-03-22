@@ -18,7 +18,7 @@ CACHE_FILE="$STATE_DIR/last-update-check"
 MARKER_FILE="$STATE_DIR/just-upgraded-from"
 SNOOZE_FILE="$STATE_DIR/update-snoozed"
 VERSION_FILE="$SPEC_FIRST_DIR/VERSION"
-REMOTE_URL="${SPEC_FIRST_REMOTE_URL:-https://raw.githubusercontent.com/garrytan/spec-first/main/VERSION}"
+REMOTE_URL="${SPEC_FIRST_REMOTE_URL:-https://raw.githubusercontent.com/sunrain520/spec-first/master/VERSION}"
 
 # ─── Force flag (busts cache for standalone /spec-first-upgrade) ──
 if [ "${1:-}" = "--force" ]; then

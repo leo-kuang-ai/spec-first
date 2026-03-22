@@ -14,6 +14,8 @@ description: |
 
 ## Preamble (run first)
 
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
+
 ```bash
 _UPD=$(~/.codex/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .agents/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
@@ -34,9 +36,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"focus-requirements","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ~/.codex/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"focus-requirements","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.codex/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.codex/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
@@ -254,7 +257,33 @@ work is already done:
 - affected repos are known
 - workspace is already prepared
 
+If the user needs to create the source requirement from scratch, do **not** send
+them to `/spec` (there is no `/spec` skill in this repo). Use `/office-hours`
+first to create the initial requirement/design doc, then come back here with the
+reviewed source requirement for narrowing.
+
 If those conditions are not true, stop with `BLOCKED`.
+
+### Visual evidence rules
+
+If the reviewed source requirement contains screenshots, redlines, diagrams, or
+other marked-up images:
+- Treat the images as primary source material, not decorative attachments.
+- Read the screenshot before compressing the text requirement.
+- Extract the exact visible labels, numbers, UI states, and annotation text.
+- Identify every marked change point and describe what changes, where it changes,
+  and whether the change is a rename, copy update, layout shift, state change, or
+  entirely new behavior.
+- Compare multiple images to separate the current state from the target state.
+- If the image contains a flow chart, journey map, state machine, or process
+  diagram, reconstruct it as an ASCII diagram in the output instead of only
+  paraphrasing it in prose.
+- Preserve node labels, branch conditions, start/end states, and the order of
+  transitions. Use ASCII arrows and boxes when possible.
+- If the image implies a requirement that the text does not say, surface it as a
+  candidate requirement and mark it as inferred from visual evidence.
+- If the image is unreadable, ambiguous, or too low resolution to interpret safely,
+  stop with `NEEDS_CONTEXT` and name the missing visual detail.
 
 ## Non-goals
 
@@ -353,6 +382,8 @@ Before drafting, extract:
 - `Candidate Out of Scope`
 - `Dependencies`
 - `Ambiguities`
+- `Visual Evidence Notes` for screenshots / marked images, if present
+- `ASCII Diagram Draft` for any flow/process diagram found in the source
 
 Do not silently turn ambiguous items into facts.
 
@@ -404,6 +435,12 @@ Write `docs/requirements/focus-requirements.md` with exactly these sections:
 
 Keep the document owner-scoped. Do not drift back into a global requirement rewrite.
 
+When screenshots or annotated images are part of the source requirement, make sure
+`Background`, `Relevant Flows`, `Acceptance Criteria`, and `Open Questions` carry
+the visual evidence forward in plain text instead of dropping it.
+When a screenshot contains a flow/process diagram, include an ASCII version of the
+diagram in `Relevant Flows` or the most relevant section of the PRD.
+
 ### Step 5: Write the two thin handoff summaries
 
 Start from `focus-requirements/templates/side-requirements.md`.
@@ -435,6 +472,8 @@ Before finishing, verify:
 - `Dependencies` are not mixed into owned scope
 - `Acceptance Criteria` are owner-verifiable
 - unresolved items are listed honestly
+- screenshot / image evidence has been translated into explicit text
+- uncertain visual interpretation is called out instead of guessed
 
 Revise before finishing if any of the checks fail.
 

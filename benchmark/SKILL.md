@@ -19,6 +19,8 @@ allowed-tools:
 
 ## Preamble (run first)
 
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
+
 ```bash
 _UPD=$(~/.claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
@@ -39,9 +41,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"benchmark","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"benchmark","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.claude/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
@@ -293,7 +296,7 @@ Same as /canary — auto-discover from navigation or use `--pages`.
 
 If `--diff` mode:
 ```bash
-git diff $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || echo main)...HEAD --name-only
+git diff $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || gh repo view --json defaultBranchRef -q .defaultBranchRef.name 2>/dev/null || echo master)...HEAD --name-only
 ```
 
 ### Phase 3: Performance Data Collection

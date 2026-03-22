@@ -58,7 +58,7 @@ let selectedTests: string[] | null = null; // null = run all
 if (evalsEnabled && !process.env.EVALS_ALL) {
   const baseBranch = process.env.EVALS_BASE
     || detectBaseBranch(ROOT)
-    || 'main';
+    || 'master';
   const changedFiles = getChangedFiles(baseBranch, ROOT);
 
   if (changedFiles.length > 0) {
@@ -70,7 +70,7 @@ if (evalsEnabled && !process.env.EVALS_ALL) {
     }
     process.stderr.write('\n');
   }
-  // If changedFiles is empty (e.g., on main branch), selectedTests stays null -> run all
+  // If changedFiles is empty (e.g., on master branch), selectedTests stays null -> run all
 }
 
 /** Skip an individual test if not selected by diff-based selection. */

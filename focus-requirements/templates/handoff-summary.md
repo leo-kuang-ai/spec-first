@@ -4,10 +4,13 @@
 - Source requirement:
 - Current owner:
 - Workspace:
+- Visual evidence summary:
+- ASCII diagram summary:
 
 ## Key Acceptance Criteria
 - Criteria 1:
 - Criteria 2:
+- Visual confirmation criteria:
 
 ## Open Questions
 - Blocking:

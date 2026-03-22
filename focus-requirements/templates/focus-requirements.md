@@ -5,6 +5,9 @@
 - Current owner:
 - Workspace context:
 - Goal of this document:
+- Visual evidence summary:
+- Screenshot-derived change points:
+- Visual ambiguities:
 
 ## 2. Owner Scope
 - One-sentence scope:
@@ -24,6 +27,8 @@
 ## 5. Relevant Flows
 - Happy path:
 - Edge or exception paths:
+- Screenshot-backed flow/state changes:
+- ASCII diagram:
 
 ## 6. Dependencies
 - Team/module dependencies:
@@ -35,6 +40,7 @@
 - Criteria 1:
 - Criteria 2:
 - Criteria 3:
+- Visual confirmation criteria:
 
 ## 8. Non-Functional Constraints
 - Known constraints:

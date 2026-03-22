@@ -55,7 +55,7 @@ describe('spec-first-telemetry-log', () => {
     expect(events[0].session_id).toBe('test-123');
     expect(events[0].event_type).toBe('skill_run');
     expect(events[0].os).toBeTruthy();
-    expect(events[0].spec-first_version).toBeTruthy();
+    expect(events[0].spec_first_version).toBeTruthy();
   });
 
   test('produces no output when tier=off', () => {
@@ -139,6 +139,17 @@ describe('spec-first-telemetry-log', () => {
 });
 
 describe('.pending marker', () => {
+  test('spec-first-pending-check returns the pending path when one exists', () => {
+    const analyticsDir = path.join(tmpDir, 'analytics');
+    fs.mkdirSync(analyticsDir, { recursive: true });
+    const pendingPath = path.join(analyticsDir, '.pending-demo-123');
+    fs.writeFileSync(pendingPath, '{"skill":"demo"}');
+
+    const output = run(`${BIN}/spec-first-pending-check`);
+
+    expect(output).toBe(pendingPath);
+  });
+
   test('finalizes stale .pending from another session as outcome:unknown', () => {
     setConfig('telemetry', 'anonymous');
 

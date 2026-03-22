@@ -112,7 +112,7 @@ Use the install type and directory detected in Step 2:
 cd "$INSTALL_DIR"
 STASH_OUTPUT=$(git stash 2>&1)
 git fetch origin
-git reset --hard origin/main
+git reset --hard origin/master
 ./setup
 ```
 If `$STASH_OUTPUT` contains "Saved working directory", warn the user: "Note: local changes were stashed. Run `git stash pop` in the skill directory to restore them."
@@ -121,7 +121,7 @@ If `$STASH_OUTPUT` contains "Saved working directory", warn the user: "Note: loc
 ```bash
 PARENT=$(dirname "$INSTALL_DIR")
 TMP_DIR=$(mktemp -d)
-git clone --depth 1 https://github.com/garrytan/spec-first.git "$TMP_DIR/spec-first"
+git clone --depth 1 https://github.com/sunrain520/spec-first.git "$TMP_DIR/spec-first"
 mv "$INSTALL_DIR" "$INSTALL_DIR.bak"
 mv "$TMP_DIR/spec-first" "$INSTALL_DIR"
 cd "$INSTALL_DIR" && ./setup

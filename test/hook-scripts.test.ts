@@ -149,14 +149,14 @@ describe('check-careful.sh', () => {
 
   describe('git destructive commands', () => {
     test('git push --force warns with force-push', () => {
-      const { exitCode, output } = runHook(CAREFUL_SCRIPT, carefulInput('git push --force origin main'));
+      const { exitCode, output } = runHook(CAREFUL_SCRIPT, carefulInput('git push --force origin master'));
       expect(exitCode).toBe(0);
       expect(output.permissionDecision).toBe('ask');
       expect(output.message).toContain('force-push');
     });
 
     test('git push -f warns', () => {
-      const { exitCode, output } = runHook(CAREFUL_SCRIPT, carefulInput('git push -f origin main'));
+      const { exitCode, output } = runHook(CAREFUL_SCRIPT, carefulInput('git push -f origin master'));
       expect(exitCode).toBe(0);
       expect(output.permissionDecision).toBe('ask');
       expect(output.message).toContain('force-push');

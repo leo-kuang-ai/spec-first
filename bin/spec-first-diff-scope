@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # spec-first-diff-scope — categorize what changed in the diff against a base branch
-# Usage: source <(spec-first-diff-scope main)  → sets SCOPE_FRONTEND=true SCOPE_BACKEND=false ...
-# Or:    spec-first-diff-scope main           → prints SCOPE_*=... lines
+# Usage: source <(spec-first-diff-scope master)  → sets SCOPE_FRONTEND=true SCOPE_BACKEND=false ...
+# Or:    spec-first-diff-scope master           → prints SCOPE_*=... lines
 set -euo pipefail
 
-BASE="${1:-main}"
+BASE="${1:-master}"
 
 # Get changed file list
 FILES=$(git diff "${BASE}...HEAD" --name-only 2>/dev/null || git diff "${BASE}" --name-only 2>/dev/null || echo "")

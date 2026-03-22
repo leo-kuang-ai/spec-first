@@ -31,7 +31,7 @@ Spec-First 是一个强大的 AI 辅助开发工具集,将 Claude Code 转变为
 ### 1. 安装 Spec-First (30 秒)
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.claude/skills/spec-first
 cd ~/.claude/skills/spec-first
 ./setup
 ```
@@ -84,7 +84,7 @@ cd ~/.claude/skills/spec-first
 或手动执行:
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.claude/skills/spec-first
 cd ~/.claude/skills/spec-first
 ./setup
 ```
@@ -111,7 +111,7 @@ git push
 ### 方法 3: 多平台支持 (Codex, Gemini CLI, Cursor)
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.codex/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.codex/skills/spec-first
 cd ~/.codex/skills/spec-first
 ./setup --host codex
 ```
@@ -119,7 +119,7 @@ cd ~/.codex/skills/spec-first
 或自动检测:
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/spec-first-temp
+git clone https://github.com/sunrain520/spec-first.git ~/spec-first-temp
 cd ~/spec-first-temp
 ./setup --host auto
 ```
@@ -407,7 +407,7 @@ MIT License. 免费永久。去构建点什么吧。
 
 ## 🆘 获取帮助
 
-- **GitHub Issues**: [提交问题](https://github.com/your-org/spec-first/issues)
+- **GitHub Issues**: [提交问题](https://github.com/sunrain520/spec-first/issues)
 - **用户手册**: [完整文档](docs/用户手册/README.md)
 - **社区**: 加入讨论
 

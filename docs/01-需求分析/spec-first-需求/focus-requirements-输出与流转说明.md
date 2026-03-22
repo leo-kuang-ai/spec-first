@@ -364,3 +364,51 @@ focus-requirements/
 - A 没有被删除
 - 但后续 skill 如果按 `ls -t ... | head -1` 取输入，就会先看到 B
 - 这就是“影子化”，不是“物理覆盖”
+
+#### Case 6: 不同 repo，各自有自己的项目目录
+
+```text
+repo A: /Users/kuang/work/app-a
+repo B: /Users/kuang/work/app-b
+```
+
+结果：
+
+- repo A 的仓库内产物写到 `/Users/kuang/work/app-a/docs/...` 和 `/Users/kuang/work/app-a/handoff/...`
+- repo B 的仓库内产物写到 `/Users/kuang/work/app-b/docs/...` 和 `/Users/kuang/work/app-b/handoff/...`
+- project-scoped 目录也会按各自的 slug 分开
+
+所以不同 repo 之间默认不会互相覆盖。
+
+#### Case 7: 同 repo，不同 worktree
+
+```text
+worktree 1: /Users/kuang/work/app-a
+worktree 2: /Users/kuang/work/app-a-feature-x
+```
+
+结果：
+
+- 如果这两个 worktree 属于同一个 repo / 同一个远端 slug，它们通常会共用同一个 `~/.spec-first/projects/$SLUG/`
+- 真正区分它们的主要是 `branch` 和 `datetime`
+- 如果 branch 相同，就会出现“最新匹配优先”的影子化效果
+
+也就是说：
+
+- worktree 路径本身不一定决定 project-scoped 目录
+- repo slug 更关键
+
+#### Case 8: 同 repo，不同 branch
+
+```text
+branch A: feature/login
+branch B: feature/payments
+```
+
+结果：
+
+- project-scoped 文件名里会带不同的 `{branch}`
+- 例如 `alice-feature-login-test-plan-20260322-120000.md`
+- 例如 `alice-feature-payments-test-plan-20260322-121500.md`
+
+如果下游按 branch 过滤，就会优先看到同 branch 的那份；如果只按最近时间取，就会看到最新生成的那份。

@@ -62,6 +62,12 @@ function nowEpoch(): number {
 }
 
 describe('spec-first-update-check', () => {
+  test('defaults to the current GitHub repo VERSION URL', () => {
+    const script = readFileSync(SCRIPT, 'utf-8');
+    expect(script).toContain('raw.githubusercontent.com/sunrain520/spec-first/master/VERSION');
+    expect(script).not.toContain('garrytan/spec-first');
+  });
+
   // ─── Path A: No VERSION file ────────────────────────────────
   test('exits 0 with no output when VERSION file is missing', () => {
     const { exitCode, stdout } = run();

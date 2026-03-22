@@ -1,13 +1,15 @@
 ---
 name: ship
 description: |
-  Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".
+  Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. Use when asked to "ship", "deploy", "push to master", "create a PR", or "merge and push".
   Proactively suggest when the user says code is ready or asks about deploying.
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
 
 ## Preamble (run first)
+
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
 
 ```bash
 _UPD=$(~/.codex/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .agents/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
@@ -29,9 +31,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"ship","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ~/.codex/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"ship","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.codex/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.codex/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
@@ -242,7 +245,7 @@ Determine which branch this PR targets. Use the result as "the base branch" in a
 2. If no PR exists (command fails), detect the repo's default branch:
    `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`
 
-3. If both commands fail, fall back to `main`.
+3. If both commands fail, fall back to `master`.
 
 Print the detected base branch name. In every subsequent `git diff`, `git log`,
 `git fetch`, `git merge`, and `gh pr create` command, substitute the detected

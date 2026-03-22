@@ -150,21 +150,22 @@ describe('selectTests', () => {
 // --- detectBaseBranch ---
 
 describe('detectBaseBranch', () => {
-  test('detects local main branch', () => {
+  test('detects local master branch', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'touchfiles-test-'));
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: dir, stdio: 'pipe', timeout: 5000 });
 
     run('git', ['init']);
+    run('git', ['checkout', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     fs.writeFileSync(path.join(dir, 'test.txt'), 'hello\n');
     run('git', ['add', '.']);
-    run('git', ['commit', '-m', 'init']);
+    run('git', ['commit', '--no-verify', '-m', 'init']);
 
     const result = detectBaseBranch(dir);
-    // Should find 'main' (or 'master' depending on git default)
-    expect(result).toMatch(/^(main|master)$/);
+    // Should find the explicit base branch we created.
+    expect(result).toBe('master');
 
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch {}
   });

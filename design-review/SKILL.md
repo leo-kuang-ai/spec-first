@@ -24,6 +24,8 @@ allowed-tools:
 
 ## Preamble (run first)
 
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
+
 ```bash
 _UPD=$(~/.claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
@@ -44,9 +46,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"design-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"design-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.claude/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
@@ -263,7 +266,7 @@ You are a senior product designer AND a frontend engineer. Review live sites wit
 
 **If no URL is given and you're on a feature branch:** Automatically enter **diff-aware mode** (see Modes below).
 
-**If no URL is given and you're on main/master:** Ask the user for a URL.
+**If no URL is given and you're on master/default branch:** Ask the user for a URL.
 
 **Check for DESIGN.md:**
 
@@ -487,7 +490,7 @@ Comprehensive review: 10-15 pages, every interaction flow, exhaustive checklist.
 
 ### Diff-aware (automatic when on a feature branch with no URL)
 When on a feature branch, scope to pages affected by the branch changes:
-1. Analyze the branch diff: `git diff main...HEAD --name-only`
+1. Analyze the branch diff: `git diff master...HEAD --name-only`
 2. Map changed files to affected pages/routes
 3. Detect running app on common local ports (3000, 4000, 8080)
 4. Audit only affected pages, compare design quality before/after

@@ -31,7 +31,7 @@ Product Idea → Deep Planning → Engineering Design → Implementation → Tes
 ### 1. Install Spec-First (30 seconds)
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.claude/skills/spec-first
 cd ~/.claude/skills/spec-first
 ./setup
 ```
@@ -84,7 +84,7 @@ Install spec-first
 Or manually execute:
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.claude/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.claude/skills/spec-first
 cd ~/.claude/skills/spec-first
 ./setup
 ```
@@ -111,7 +111,7 @@ git push
 ### Method 3: Multi-Platform Support (Codex, Gemini CLI, Cursor)
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/.codex/skills/spec-first
+git clone https://github.com/sunrain520/spec-first.git ~/.codex/skills/spec-first
 cd ~/.codex/skills/spec-first
 ./setup --host codex
 ```
@@ -119,7 +119,7 @@ cd ~/.codex/skills/spec-first
 Or auto-detect:
 
 ```bash
-git clone https://github.com/your-org/spec-first.git ~/spec-first-temp
+git clone https://github.com/sunrain520/spec-first.git ~/spec-first-temp
 cd ~/spec-first-temp
 ./setup --host auto
 ```
@@ -415,7 +415,7 @@ MIT License. Free forever. Go build something.
 
 ## 🆘 Get Help
 
-- **GitHub Issues**: [Submit Issue](https://github.com/your-org/spec-first/issues)
+- **GitHub Issues**: [Submit Issue](https://github.com/sunrain520/spec-first/issues)
 - **User Manual**: [Complete Docs](docs/用户手册/README.md)
 - **Community**: Join the discussion
 

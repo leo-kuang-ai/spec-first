@@ -165,6 +165,24 @@ describe('gen-skill-docs', () => {
     expect(content).toContain('~/.spec-first/analytics');
   });
 
+  test('generated SKILL.md uses pending-check helper instead of inline globbing', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
+    expect(content).toContain('spec-first-pending-check');
+    expect(content).not.toContain("grep -F '.pending-'");
+  });
+
+  test('deploy skill bootstrap avoids empty glob expansion', () => {
+    const setupContent = fs.readFileSync(path.join(ROOT, 'setup-deploy', 'SKILL.md'), 'utf-8');
+    expect(setupContent).toContain("find .github/workflows -maxdepth 1 \\(");
+    expect(setupContent).toContain("find . -maxdepth 1 -name '*.gemspec'");
+    expect(setupContent).not.toContain('for f in .github/workflows/*.yml');
+    expect(setupContent).not.toContain('ls *.gemspec');
+
+    const landContent = fs.readFileSync(path.join(ROOT, 'land-and-deploy', 'SKILL.md'), 'utf-8');
+    expect(landContent).toContain("find .github/workflows -maxdepth 1 \\(");
+    expect(landContent).not.toContain('for f in .github/workflows/*.yml');
+  });
+
   test('preamble-using skills have correct skill name in telemetry', () => {
     const PREAMBLE_SKILLS = [
       { dir: '.', name: 'spec-first' },
@@ -247,8 +265,8 @@ describe('BASE_BRANCH_DETECT resolver', () => {
     expect(shipContent).toContain('gh repo view --json defaultBranchRef');
   });
 
-  test('resolver output contains fallback to main', () => {
-    expect(shipContent).toMatch(/fall\s*back\s+to\s+`main`/i);
+  test('resolver output contains fallback to master', () => {
+    expect(shipContent).toMatch(/fall\s*back\s+to\s+`master`/i);
   });
 
   test('resolver output uses "the base branch" phrasing', () => {
@@ -891,7 +909,8 @@ describe('telemetry', () => {
 
   test('generated SKILL.md contains pending marker handling', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
-    expect(content).toContain('.pending');
+    expect(content).toContain('spec-first-pending-check');
+    expect(content).not.toContain("grep -F '.pending-'");
     expect(content).toContain('_pending_finalize');
   });
 

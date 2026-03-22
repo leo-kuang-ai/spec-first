@@ -22,6 +22,8 @@ allowed-tools:
 
 ## Preamble (run first)
 
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
+
 ```bash
 _UPD=$(~/.claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
@@ -42,9 +44,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"setup-deploy","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"setup-deploy","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.claude/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
@@ -287,13 +290,14 @@ Run the platform detection from the deploy bootstrap:
 [ -f railway.json ] || [ -f railway.toml ] && echo "PLATFORM:railway"
 
 # GitHub Actions deploy workflows
-for f in .github/workflows/*.yml .github/workflows/*.yaml; do
-  [ -f "$f" ] && grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
-done
+find .github/workflows -maxdepth 1 \( -name '*.yml' -o -name '*.yaml' \) -type f 2>/dev/null |
+  while IFS= read -r f; do
+    grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
+  done
 
 # Project type
 [ -f package.json ] && grep -q '"bin"' package.json 2>/dev/null && echo "PROJECT_TYPE:cli"
-ls *.gemspec 2>/dev/null && echo "PROJECT_TYPE:library"
+find . -maxdepth 1 -name '*.gemspec' -print -quit 2>/dev/null | grep -q . && echo "PROJECT_TYPE:library"
 ```
 
 ### Step 3: Platform-specific setup
@@ -324,7 +328,7 @@ If `render.yaml` detected:
 5. Set health check: the inferred URL
 
 Ask the user to confirm. Render uses auto-deploy from the connected git branch — after
-merge to main, Render picks it up automatically. The "deploy wait" in /land-and-deploy
+merge to master, Render picks it up automatically. The "deploy wait" in /land-and-deploy
 should poll the Render URL until it responds with the new version.
 
 #### Vercel
@@ -333,7 +337,7 @@ If vercel.json or .vercel detected:
 
 1. Check for `vercel` CLI: `which vercel 2>/dev/null`
 2. If installed: `vercel ls --prod 2>/dev/null | head -3`
-3. Vercel deploys automatically on push — preview on PR, production on merge to main
+3. Vercel deploys automatically on push — preview on PR, production on merge to master
 4. Set health check: the production URL from vercel project settings
 
 #### Netlify
@@ -359,7 +363,7 @@ If nothing detected:
 Use AskUserQuestion to gather the information:
 
 1. **How are deploys triggered?**
-   - A) Automatically on push to main (Fly, Render, Vercel, Netlify, etc.)
+   - A) Automatically on push to master (Fly, Render, Vercel, Netlify, etc.)
    - B) Via GitHub Actions workflow
    - C) Via a deploy script or CLI command (describe it)
    - D) Manually (SSH, dashboard, etc.)
@@ -394,7 +398,7 @@ if it exists, or append it at the end.
 
 ### Custom deploy hooks
 - Pre-merge: {command or "none"}
-- Deploy trigger: {command or "automatic on push to main"}
+- Deploy trigger: {command or "automatic on push to master"}
 - Deploy status: {command or "poll production URL"}
 - Health check: {URL or command}
 ```

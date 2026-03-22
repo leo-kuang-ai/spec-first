@@ -25,11 +25,11 @@ describeIfSelected('Review skill E2E', ['review-sql-injection'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: reviewDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    // Commit a clean base on main
+    // Commit a clean base on master
     fs.writeFileSync(path.join(reviewDir, 'app.rb'), '# clean base\nclass App\nend\n');
     run('git', ['add', 'app.rb']);
     run('git', ['commit', '-m', 'initial commit']);
@@ -53,11 +53,11 @@ describeIfSelected('Review skill E2E', ['review-sql-injection'], () => {
 
   test('/review produces findings on SQL injection branch', async () => {
     const result = await runSkillTest({
-      prompt: `You are in a git repo on a feature branch with changes against main.
+      prompt: `You are in a git repo on a feature branch with changes against master.
 Read review-SKILL.md for the review workflow instructions.
 Also read review-checklist.md and apply it.
 Skip the preamble bash block, lake intro, telemetry, and contributor mode sections — go straight to the review.
-Run /review on the current diff (git diff main...HEAD).
+Run /review on the current diff (git diff master...HEAD).
 Write your review findings to ${reviewDir}/review-output.md`,
       workingDirectory: reviewDir,
       maxTurns: 20,
@@ -98,11 +98,11 @@ describeIfSelected('Review enum completeness E2E', ['review-enum-completeness'],
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: enumDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    // Commit baseline on main — order model with 4 statuses
+    // Commit baseline on master — order model with 4 statuses
     const baseContent = fs.readFileSync(path.join(ROOT, 'test', 'fixtures', 'review-eval-enum.rb'), 'utf-8');
     fs.writeFileSync(path.join(enumDir, 'order.rb'), baseContent);
     run('git', ['add', 'order.rb']);
@@ -127,10 +127,10 @@ describeIfSelected('Review enum completeness E2E', ['review-enum-completeness'],
 
   test('/review catches missing enum handlers for new status value', async () => {
     const result = await runSkillTest({
-      prompt: `You are in a git repo on branch feature/add-returned-status with changes against main.
+      prompt: `You are in a git repo on branch feature/add-returned-status with changes against master.
 Read review-SKILL.md for the review workflow instructions.
 Also read review-checklist.md and apply it — pay special attention to the Enum & Value Completeness section.
-Run /review on the current diff (git diff main...HEAD).
+Run /review on the current diff (git diff master...HEAD).
 Write your review findings to ${enumDir}/review-output.md
 
 The diff adds a new "returned" status to the Order model. Your job is to check if all consumers handle it.`,
@@ -170,11 +170,11 @@ describeIfSelected('Review design lite E2E', ['review-design-lite'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: designDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    // Commit clean base on main
+    // Commit clean base on master
     fs.writeFileSync(path.join(designDir, 'index.html'), '<h1>Clean</h1>\n');
     fs.writeFileSync(path.join(designDir, 'styles.css'), 'body { font-size: 16px; }\n');
     run('git', ['add', '.']);
@@ -202,11 +202,11 @@ describeIfSelected('Review design lite E2E', ['review-design-lite'], () => {
 
   test('/review catches design anti-patterns in CSS/HTML diff', async () => {
     const result = await runSkillTest({
-      prompt: `You are in a git repo on branch feature/add-landing-page with changes against main.
+      prompt: `You are in a git repo on branch feature/add-landing-page with changes against master.
 Read review-SKILL.md for the review workflow instructions.
 Read review-checklist.md for the code review checklist.
 Read review-design-checklist.md for the design review checklist.
-Run /review on the current diff (git diff main...HEAD).
+Run /review on the current diff (git diff master...HEAD).
 
 Skip the preamble bash block, lake intro, telemetry, and contributor mode sections — go straight to the review.
 
@@ -271,7 +271,7 @@ describeIfSelected('Base branch detection', ['review-base-branch', 'ship-base-br
     const dir = path.join(baseBranchDir, 'review-base');
     fs.mkdirSync(dir, { recursive: true });
 
-    // Create git repo with a feature branch off main
+    // Create git repo with a feature branch off master
     run('git', ['init'], dir);
     run('git', ['config', 'user.email', 'test@test.com'], dir);
     run('git', ['config', 'user.name', 'Test'], dir);
@@ -296,7 +296,7 @@ describeIfSelected('Base branch detection', ['review-base-branch', 'ship-base-br
 Read review-SKILL.md for the review workflow instructions.
 Also read review-checklist.md and apply it.
 
-IMPORTANT: Follow Step 0 to detect the base branch. Since there is no remote, gh commands will fail — fall back to main.
+IMPORTANT: Follow Step 0 to detect the base branch. Since there is no remote, gh commands will fail — fall back to master.
 Then run the review against the detected base branch.
 Write your findings to ${dir}/review-output.md`,
       workingDirectory: dir,
@@ -313,7 +313,7 @@ Write your findings to ${dir}/review-output.md`,
     // Verify the review used "base branch" language (from Step 0)
     const toolOutputs = result.toolCalls.map(tc => tc.output || '').join('\n');
     const allOutput = (result.output || '') + toolOutputs;
-    // The agent should have run git diff against main (the fallback)
+    // The agent should have run git diff against master (the fallback)
     const usedGitDiff = result.toolCalls.some(tc => {
       if (tc.tool !== 'Bash') return false;
       const cmd = typeof tc.input === 'string' ? tc.input : tc.input?.command || JSON.stringify(tc.input);
@@ -349,7 +349,7 @@ Write your findings to ${dir}/review-output.md`,
 Skip the preamble bash block, lake intro, telemetry, and contributor mode sections — go straight to Step 0.
 
 Run ONLY Step 0 (Detect base branch) and Step 1 (Pre-flight) from the ship workflow.
-Since there is no remote, gh commands will fail — fall back to main.
+Since there is no remote, gh commands will fail — fall back to master.
 
 After completing Step 0 and Step 1, STOP. Do NOT proceed to Step 2 or beyond.
 Do NOT push, create PRs, or modify VERSION/CHANGELOG.
@@ -375,7 +375,7 @@ Write a summary of what you detected to ${dir}/ship-preflight.md including:
       const content = fs.readFileSync(preflightPath, 'utf-8');
       expect(content.length).toBeGreaterThan(20);
       // Should mention the branch name
-      expect(content.toLowerCase()).toMatch(/main|base/);
+      expect(content.toLowerCase()).toMatch(/master|base/);
     }
 
     // Verify no destructive actions — no push, no PR creation
@@ -414,11 +414,11 @@ Write a summary of what you detected to ${dir}/ship-preflight.md including:
     const result = await runSkillTest({
       prompt: `Read retro/SKILL.md for instructions on how to run a retrospective.
 
-IMPORTANT: Follow the "Detect default branch" step first. Since there is no remote, gh will fail — fall back to main.
+IMPORTANT: Follow the "Detect default branch" step first. Since there is no remote, gh will fail — fall back to master.
 Then use the detected branch name for all git queries.
 
 Run /retro for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
-This is a local-only repo so use the local branch (main) instead of origin/main for all git log commands.
+This is a local-only repo so use the local branch (master) instead of origin/master for all git log commands.
 
 Write your retrospective to ${dir}/retro-output.md`,
       workingDirectory: dir,
@@ -454,7 +454,7 @@ describeIfSelected('Retro E2E', ['retro'], () => {
       spawnSync(cmd, args, { cwd: retroDir, stdio: 'pipe', timeout: 5000 });
 
     // Create a git repo with varied commit history
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'dev@example.com']);
     run('git', ['config', 'user.name', 'Dev']);
 

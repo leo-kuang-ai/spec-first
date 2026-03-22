@@ -224,7 +224,7 @@ Per the contributor mode instructions, file a field report to ${logsDir}/browse-
     // Set up a git repo so there's project/branch context to reference
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: sessionDir, stdio: 'pipe', timeout: 5000 });
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     fs.writeFileSync(path.join(sessionDir, 'app.rb'), '# my app\n');

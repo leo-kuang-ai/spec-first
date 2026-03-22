@@ -28,7 +28,7 @@ describeIfSelected('Document-Release skill E2E', ['document-release'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: docReleaseDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -64,7 +64,7 @@ describeIfSelected('Document-Release skill E2E', ['document-release'], () => {
     const result = await runSkillTest({
       prompt: `Read the file document-release/SKILL.md for the document-release workflow instructions.
 
-Run the /document-release workflow on this repo. The base branch is "main".
+Run the /document-release workflow on this repo. The base branch is "master".
 
 IMPORTANT:
 - Do NOT use AskUserQuestion — auto-approve everything or skip if unsure.
@@ -138,13 +138,13 @@ describeIfSelected('Ship workflow E2E', ['ship-local-workflow'], () => {
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    // Initial commit on main
+    // Initial commit on master
     fs.writeFileSync(path.join(shipWorkDir, 'app.ts'), 'console.log("v1");\n');
     fs.writeFileSync(path.join(shipWorkDir, 'VERSION'), '0.1.0.0\n');
     fs.writeFileSync(path.join(shipWorkDir, 'CHANGELOG.md'), '# Changelog\n');
     run('git', ['add', '.']);
     run('git', ['commit', '-m', 'initial']);
-    run('git', ['push', '-u', 'origin', 'main']);
+    run('git', ['push', '-u', 'origin', 'master']);
 
     // Feature branch
     run('git', ['checkout', '-b', 'feature/ship-test']);
@@ -166,7 +166,7 @@ describeIfSelected('Ship workflow E2E', ['ship-local-workflow'], () => {
 Step 0 — Detect base branch:
 Try: gh pr view --json baseRefName -q .baseRefName
 If that fails, try: gh repo view --json defaultBranchRef -q .defaultBranchRef.name
-If both fail, fall back to "main". Use the detected branch as <base> in all subsequent steps.
+If both fail, fall back to "master". Use the detected branch as <base> in all subsequent steps.
 
 Step 2 — Merge base branch:
 git fetch origin <base> && git merge origin/<base> --no-edit
@@ -310,7 +310,7 @@ describeIfSelected('spec-first-upgrade E2E', ['spec-first-upgrade-happy-path'], 
     // Initial commit + push
     run('git', ['add', '.'], mockSpecFirst);
     run('git', ['commit', '-m', 'initial'], mockSpecFirst);
-    run('git', ['push', '-u', 'origin', 'HEAD:main'], mockSpecFirst);
+    run('git', ['push', '-u', 'origin', 'HEAD:master'], mockSpecFirst);
 
     // Create new version (simulate upstream release)
     fs.writeFileSync(path.join(mockSpecFirst, 'VERSION'), '0.6.0\n');
@@ -318,7 +318,7 @@ describeIfSelected('spec-first-upgrade E2E', ['spec-first-upgrade-happy-path'], 
       '# Changelog\n\n## 0.6.0 — 2026-03-15\n\n- New feature: interactive design review\n- Fix: snapshot flag validation\n\n## 0.5.0 — 2026-03-01\n\n- Initial release\n');
     run('git', ['add', '.'], mockSpecFirst);
     run('git', ['commit', '-m', 'release 0.6.0'], mockSpecFirst);
-    run('git', ['push', 'origin', 'HEAD:main'], mockSpecFirst);
+    run('git', ['push', 'origin', 'HEAD:master'], mockSpecFirst);
 
     // Reset working copy back to old version
     run('git', ['reset', '--hard', 'HEAD~1'], mockSpecFirst);
@@ -347,11 +347,11 @@ describeIfSelected('spec-first-upgrade E2E', ['spec-first-upgrade-happy-path'], 
 
 You are running /spec-first-upgrade standalone. The spec-first installation is at ./.claude/skills/spec-first (local-git type — it has a .git directory with an origin remote).
 
-Current version: 0.5.0. A new version 0.6.0 is available on origin/main.
+Current version: 0.5.0. A new version 0.6.0 is available on origin/master.
 
 Follow the standalone upgrade flow:
 1. Detect install type (local-git)
-2. Run git fetch origin && git reset --hard origin/main in the install directory
+2. Run git fetch origin && git reset --hard origin/master in the install directory
 3. Run the setup script
 4. Show what's new from CHANGELOG
 
@@ -444,10 +444,10 @@ describe('processPayment', () => {
 });
 `);
 
-    // Init git repo with main branch
+    // Init git repo with master branch
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: coverageDir, stdio: 'pipe', timeout: 5000 });
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     run('git', ['add', '.']);
@@ -465,7 +465,7 @@ describe('processPayment', () => {
     const result = await runSkillTest({
       prompt: `Read the file ship/SKILL.md for the ship workflow instructions.
 
-You are on the feature/billing branch. The base branch is main.
+    You are on the feature/billing branch. The base branch is master.
 This is a test project — there is no remote, no PR to create.
 
 ONLY run Step 3.4 (Test Coverage Audit) from the ship workflow.
@@ -520,11 +520,11 @@ describeIfSelected('Codex skill E2E', ['codex-review'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: codexDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    // Commit a clean base on main
+    // Commit a clean base on master
     fs.writeFileSync(path.join(codexDir, 'app.rb'), '# clean base\nclass App\nend\n');
     run('git', ['add', 'app.rb']);
     run('git', ['commit', '-m', 'initial commit']);
@@ -553,9 +553,9 @@ describeIfSelected('Codex skill E2E', ['codex-review'], () => {
     }
 
     const result = await runSkillTest({
-      prompt: `You are in a git repo on branch feature/add-vuln with changes against main.
+      prompt: `You are in a git repo on branch feature/add-vuln with changes against master.
 Read codex-SKILL.md for the /codex skill instructions.
-Run /codex review to review the current diff against main.
+Run /codex review to review the current diff against master.
 Write the full output (including the GATE verdict) to ${codexDir}/codex-output.md`,
       workingDirectory: codexDir,
       maxTurns: 15,

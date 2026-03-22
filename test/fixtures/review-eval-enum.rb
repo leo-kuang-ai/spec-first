@@ -1,4 +1,4 @@
-# Existing file on main: order model with status handling
+# Existing file on master: order model with status handling
 class Order < ApplicationRecord
   STATUSES = %w[pending processing shipped delivered].freeze
 

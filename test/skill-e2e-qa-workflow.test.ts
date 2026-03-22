@@ -96,7 +96,7 @@ describeIfSelected('QA-Only skill E2E', ['qa-only-no-fix'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: qaOnlyDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     fs.writeFileSync(path.join(qaOnlyDir, 'index.html'), '<h1>Test</h1>\n');
@@ -196,7 +196,7 @@ describeIfSelected('QA Fix Loop E2E', ['qa-fix-loop'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: qaFixDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     run('git', ['add', '.']);
@@ -314,7 +314,7 @@ export function divide(a, b) { return a / b; } // BUG: no zero check
     // Init git repo
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: bootstrapDir, stdio: 'pipe', timeout: 5000 });
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     run('git', ['add', '.']);
@@ -362,7 +362,7 @@ export function divide(a, b) { return a / b; }
     // Init git repo
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: bsDir, stdio: 'pipe', timeout: 5000 });
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     run('git', ['add', '.']);

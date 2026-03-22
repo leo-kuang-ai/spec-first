@@ -114,7 +114,7 @@ cp .env.example .env
 bun install
 ```
 
-Bun auto-loads `.env` — no extra config. Conductor workspaces inherit `.env` from the main worktree automatically (see "Conductor workspaces" below).
+Bun auto-loads `.env` — no extra config. Conductor workspaces inherit `.env` from the master worktree automatically (see "Conductor workspaces" below).
 
 ### Test tiers
 
@@ -189,7 +189,7 @@ Uses Claude Sonnet to score generated SKILL.md docs on three dimensions:
 - **Completeness** — Are all commands, flags, and usage patterns documented?
 - **Actionability** — Can the agent execute tasks using only the information in the doc?
 
-Each dimension is scored 1-5. Threshold: every dimension must score **≥ 4**. There's also a regression test that compares generated docs against the hand-maintained baseline from `origin/main` — generated must score equal or higher.
+Each dimension is scored 1-5. Threshold: every dimension must score **≥ 4**. There's also a regression test that compares generated docs against the hand-maintained baseline from `origin/master` — generated must score equal or higher.
 
 ```bash
 # Needs ANTHROPIC_API_KEY in .env — included in bun run test:evals
@@ -288,12 +288,12 @@ If you're using [Conductor](https://conductor.build) to run multiple Claude Code
 
 | Hook | Script | What it does |
 |------|--------|-------------|
-| `setup` | `bin/dev-setup` | Copies `.env` from main worktree, installs deps, symlinks skills |
+| `setup` | `bin/dev-setup` | Copies `.env` from master worktree, installs deps, symlinks skills |
 | `archive` | `bin/dev-teardown` | Removes skill symlinks, cleans up `.claude/` directory |
 
-When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It detects the main worktree (via `git worktree list`), copies your `.env` so API keys carry over, and sets up dev mode — no manual steps needed.
+When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It detects the master worktree (via `git worktree list`), copies your `.env` so API keys carry over, and sets up dev mode — no manual steps needed.
 
-**First-time setup:** Put your `ANTHROPIC_API_KEY` in `.env` in the main repo (see `.env.example`). Every Conductor workspace inherits it automatically.
+**First-time setup:** Put your `ANTHROPIC_API_KEY` in `.env` in the repository root (see `.env.example`). Every Conductor workspace inherits it automatically.
 
 ## Things to know
 
@@ -302,7 +302,7 @@ When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It d
 - **Browse source changes need a rebuild.** If you touch `browse/src/*.ts`, run `bun run build`.
 - **Dev mode shadows your global install.** Project-local skills take priority over `~/.claude/skills/gstack`. `bin/dev-teardown` restores the global one.
 - **Conductor workspaces are independent.** Each workspace is its own git worktree. `bin/dev-setup` runs automatically via `conductor.json`.
-- **`.env` propagates across worktrees.** Set it once in the main repo, all Conductor workspaces get it.
+- **`.env` propagates across worktrees.** Set it once in the repository root, all Conductor workspaces get it.
 - **`.claude/skills/` is gitignored.** The symlinks never get committed.
 
 ## Testing your changes in a real project
@@ -340,7 +340,7 @@ git checkout origin/<branch>
 bun install && bun run build
 ```
 
-This affects all projects. To revert: `git checkout main && git pull && bun run build`.
+This affects all projects. To revert: `git checkout master && git pull && bun run build`.
 
 ## Shipping your changes
 

@@ -9,14 +9,14 @@ removed=()
 # ─── Clean up .claude/skills/ ─────────────────────────────────
 CLAUDE_SKILLS="$REPO_ROOT/.claude/skills"
 if [ -d "$CLAUDE_SKILLS" ]; then
-  for link in "$CLAUDE_SKILLS"/*/; do
+  while IFS= read -r -d '' link; do
     name="$(basename "$link")"
     [ "$name" = "spec-first" ] && continue
     if [ -L "${link%/}" ]; then
       rm "${link%/}"
       removed+=("claude/$name")
     fi
-  done
+  done < <(find "$CLAUDE_SKILLS" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null || true)
 
   if [ -L "$CLAUDE_SKILLS/spec-first" ]; then
     rm "$CLAUDE_SKILLS/spec-first"
@@ -30,14 +30,14 @@ fi
 # ─── Clean up .agents/skills/ ────────────────────────────────
 AGENTS_SKILLS="$REPO_ROOT/.agents/skills"
 if [ -d "$AGENTS_SKILLS" ]; then
-  for link in "$AGENTS_SKILLS"/*/; do
+  while IFS= read -r -d '' link; do
     name="$(basename "$link")"
     [ "$name" = "spec-first" ] && continue
     if [ -L "${link%/}" ]; then
       rm "${link%/}"
       removed+=("agents/$name")
     fi
-  done
+  done < <(find "$AGENTS_SKILLS" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null || true)
 
   if [ -L "$AGENTS_SKILLS/spec-first" ]; then
     rm "$AGENTS_SKILLS/spec-first"

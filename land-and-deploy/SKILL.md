@@ -18,6 +18,8 @@ allowed-tools:
 
 ## Preamble (run first)
 
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
+
 ```bash
 _UPD=$(~/.claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || .claude/skills/spec-first/bin/spec-first-update-check 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
@@ -38,9 +40,10 @@ _TEL_START=$(date +%s)
 _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
-mkdir -p ~/.spec-first/analytics
-echo '{"skill":"land-and-deploy","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
-for _PF in ~/.spec-first/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
+    mkdir -p ~/.spec-first/analytics
+    echo '{"skill":"land-and-deploy","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.spec-first/analytics/skill-usage.jsonl 2>/dev/null || true
+    _PENDING=$(~/.claude/skills/spec-first/bin/spec-first-pending-check 2>/dev/null || true)
+    [ -n "$_PENDING" ] && ~/.claude/skills/spec-first/bin/spec-first-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest spec-first skills — only invoke
@@ -270,7 +273,7 @@ Determine which branch this PR targets. Use the result as "the base branch" in a
 2. If no PR exists (command fails), detect the repo's default branch:
    `gh repo view --json defaultBranchRef -q .defaultBranchRef.name`
 
-3. If both commands fail, fall back to `main`.
+3. If both commands fail, fall back to `master`.
 
 Print the detected base branch name. In every subsequent `git diff`, `git log`,
 `git fetch`, `git merge`, and `gh pr create` command, substitute the detected
@@ -454,7 +457,7 @@ gh pr view --json body -q .body
 
 Read the current diff summary:
 ```bash
-git log --oneline $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)..HEAD | head -20
+git log --oneline $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master)..HEAD | head -20
 ```
 
 Compare the PR body against the actual commits. Check for:
@@ -470,12 +473,12 @@ changes.** List what's missing or stale.
 Check if documentation was updated on this branch:
 
 ```bash
-git log --oneline --all-match --grep="docs:" $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)..HEAD | head -5
+git log --oneline --all-match --grep="docs:" $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master)..HEAD | head -5
 ```
 
 Also check if key doc files were modified:
 ```bash
-git diff --name-only $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)...HEAD -- README.md CHANGELOG.md ARCHITECTURE.md CONTRIBUTING.md CLAUDE.md VERSION
+git diff --name-only $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master)...HEAD -- README.md CHANGELOG.md ARCHITECTURE.md CONTRIBUTING.md CLAUDE.md VERSION
 ```
 
 If CHANGELOG.md and VERSION were NOT modified on this branch and the diff includes
@@ -494,7 +497,7 @@ Build the full readiness report:
 ╠══════════════════════════════════════════════════════════╣
 ║                                                          ║
 ║  PR: #NNN — title                                        ║
-║  Branch: feature → main                                  ║
+║  Branch: feature → master                                ║
 ║                                                          ║
 ║  REVIEWS                                                 ║
 ║  ├─ Eng Review:    CURRENT / STALE (N commits) / —       ║
@@ -607,9 +610,10 @@ fi
 ([ -f railway.json ] || [ -f railway.toml ]) && echo "PLATFORM:railway"
 
 # Detect deploy workflows
-for f in .github/workflows/*.yml .github/workflows/*.yaml; do
-  [ -f "$f" ] && grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
-done
+find .github/workflows -maxdepth 1 \( -name '*.yml' -o -name '*.yaml' \) -type f 2>/dev/null |
+  while IFS= read -r f; do
+    grep -qiE "deploy|release|production|staging|cd" "$f" 2>/dev/null && echo "DEPLOY_WORKFLOW:$f"
+  done
 ```
 
 If `PERSISTED_PLATFORM` and `PERSISTED_URL` were found in CLAUDE.md, use them directly
@@ -622,7 +626,7 @@ If you want to persist deploy settings for future runs, suggest the user run `/s
 Then run `spec-first-diff-scope` to classify the changes:
 
 ```bash
-eval $(~/.claude/skills/spec-first/bin/spec-first-diff-scope $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main) 2>/dev/null)
+eval $(~/.claude/skills/spec-first/bin/spec-first-diff-scope $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master) 2>/dev/null)
 echo "FRONTEND=$SCOPE_FRONTEND BACKEND=$SCOPE_BACKEND DOCS=$SCOPE_DOCS CONFIG=$SCOPE_CONFIG"
 ```
 

@@ -291,7 +291,7 @@ When something is broken and you don't know why, `/debug` is your systematic deb
 ### Added
 
 - **Every PR touching frontend code now gets a design review automatically.** `/review` and `/ship` apply a 20-item design checklist against changed CSS, HTML, JSX, and view files. Catches AI slop patterns (purple gradients, 3-column icon grids, generic hero copy), typography issues (body text < 16px, blacklisted fonts), accessibility gaps (`outline: none`), and `!important` abuse. Mechanical CSS fixes are auto-applied; design judgment calls ask you first.
-- **`gstack-diff-scope` categorizes what changed in your branch.** Run `source <(gstack-diff-scope main)` and get `SCOPE_FRONTEND=true/false`, `SCOPE_BACKEND`, `SCOPE_PROMPTS`, `SCOPE_TESTS`, `SCOPE_DOCS`, `SCOPE_CONFIG`. Design review uses it to skip silently on backend-only PRs. Ship pre-flight uses it to recommend design review when frontend files are touched.
+- **`gstack-diff-scope` categorizes what changed in your branch.** Run `source <(gstack-diff-scope master)` and get `SCOPE_FRONTEND=true/false`, `SCOPE_BACKEND`, `SCOPE_PROMPTS`, `SCOPE_TESTS`, `SCOPE_DOCS`, `SCOPE_CONFIG`. Design review uses it to skip silently on backend-only PRs. Ship pre-flight uses it to recommend design review when frontend files are touched.
 - **Design review shows up in the Review Readiness Dashboard.** The dashboard now distinguishes between "LITE" (code-level, runs automatically in /review and /ship) and "FULL" (visual audit via /plan-design-review with browse binary). Both show up as Design Review entries.
 - **E2E eval for design review detection.** Planted CSS/HTML fixtures with 7 known anti-patterns (Papyrus font, 14px body text, `outline: none`, `!important`, purple gradient, generic hero copy, 3-column feature grid). The eval verifies `/review` catches at least 4 of 7.
 
@@ -491,7 +491,7 @@ Read the philosophy: https://garryslist.org/posts/boil-the-ocean
 - 6 new async wrapping unit tests, 40 new contributor mode preamble validation tests.
 - Calibration example framed as historical ("used to fail") to avoid implying a live bug post-fix.
 - Added "Writing SKILL templates" section to CLAUDE.md — rules for natural language over bash-isms, dynamic branch detection, self-contained code blocks.
-- Hardcoded-main regression test scans all `.tmpl` files for git commands with hardcoded `main`.
+- Hardcoded-branch regression test scans all `.tmpl` files for git commands with hardcoded default branches.
 - QA template cleaned up: removed `REPORT_DIR` shell variable, simplified port detection to prose.
 - gstack-upgrade template: explicit cross-step prose for variable references between bash blocks.
 
@@ -628,7 +628,7 @@ Read the philosophy: https://garryslist.org/posts/boil-the-ocean
 - `test/helpers/session-runner.ts` — Agent SDK wrapper with error pattern scanning and transcript saving
 - **ARCHITECTURE.md** — design decisions document covering daemon model, security, ref system, logging, crash recovery
 - **Conductor integration** (`conductor.json`) — lifecycle hooks for workspace setup/teardown
-- **`.env` propagation** — `bin/dev-setup` copies `.env` from main worktree into Conductor workspaces automatically
+- **`.env` propagation** — `bin/dev-setup` copies `.env` from master worktree into Conductor workspaces automatically
 - `.env.example` template for API key configuration
 
 ### Changed
@@ -656,7 +656,7 @@ Read the philosophy: https://garryslist.org/posts/boil-the-ocean
 - **Local dev mode** — `bin/dev-setup` symlinks skills from the repo for in-place development; `bin/dev-teardown` restores global install
 - `help` command — agents can self-discover all commands and snapshot flags
 - Version-aware `find-browse` with META signal protocol — detects stale binaries and prompts agents to update
-- `browse/dist/find-browse` compiled binary with git SHA comparison against origin/main (4hr cached)
+- `browse/dist/find-browse` compiled binary with git SHA comparison against origin/master (4hr cached)
 - `.version` file written at build time for binary version tracking
 - Route-level tests for cookie picker (13 tests) and find-browse version check (10 tests)
 - Config resolution tests (14 tests) covering git root detection, BROWSE_STATE_FILE override, ensureStateDir, readVersionHash, resolveServerScript, and version mismatch detection

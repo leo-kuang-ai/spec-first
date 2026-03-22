@@ -53,7 +53,7 @@ describeIfSelected('Design Consultation E2E', [
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: designDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -316,7 +316,7 @@ describeIfSelected('Plan Design Review E2E', ['plan-design-review-plan-mode', 'p
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: dir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -483,7 +483,7 @@ describeIfSelected('Design Review E2E', ['design-review-fix'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: qaDesignDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 

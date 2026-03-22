@@ -196,7 +196,7 @@ gh pr view --json body -q .body
 
 Read the current diff summary:
 ```bash
-git log --oneline $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)..HEAD | head -20
+git log --oneline $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master)..HEAD | head -20
 ```
 
 Compare the PR body against the actual commits. Check for:
@@ -212,12 +212,12 @@ changes.** List what's missing or stale.
 Check if documentation was updated on this branch:
 
 ```bash
-git log --oneline --all-match --grep="docs:" $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)..HEAD | head -5
+git log --oneline --all-match --grep="docs:" $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master)..HEAD | head -5
 ```
 
 Also check if key doc files were modified:
 ```bash
-git diff --name-only $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main)...HEAD -- README.md CHANGELOG.md ARCHITECTURE.md CONTRIBUTING.md CLAUDE.md VERSION
+git diff --name-only $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master)...HEAD -- README.md CHANGELOG.md ARCHITECTURE.md CONTRIBUTING.md CLAUDE.md VERSION
 ```
 
 If CHANGELOG.md and VERSION were NOT modified on this branch and the diff includes
@@ -236,7 +236,7 @@ Build the full readiness report:
 ╠══════════════════════════════════════════════════════════╣
 ║                                                          ║
 ║  PR: #NNN — title                                        ║
-║  Branch: feature → main                                  ║
+║  Branch: feature → master                                ║
 ║                                                          ║
 ║  REVIEWS                                                 ║
 ║  ├─ Eng Review:    CURRENT / STALE (N commits) / —       ║
@@ -332,7 +332,7 @@ First, run the deploy configuration bootstrap to detect or read persisted deploy
 Then run `spec-first-diff-scope` to classify the changes:
 
 ```bash
-eval $(~/.claude/skills/spec-first/bin/spec-first-diff-scope $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo main) 2>/dev/null)
+eval $(~/.claude/skills/spec-first/bin/spec-first-diff-scope $(gh pr view --json baseRefName -q .baseRefName 2>/dev/null || echo master) 2>/dev/null)
 echo "FRONTEND=$SCOPE_FRONTEND BACKEND=$SCOPE_BACKEND DOCS=$SCOPE_DOCS CONFIG=$SCOPE_CONFIG"
 ```
 

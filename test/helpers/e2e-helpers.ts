@@ -20,7 +20,7 @@ export const ROOT = path.resolve(import.meta.dir, '..', '..');
 // Skip unless EVALS=1. Session runner strips CLAUDE* env vars to avoid nested session issues.
 //
 // BLAME PROTOCOL: When an eval fails, do NOT claim "pre-existing" or "not related
-// to our changes" without proof. Run the same eval on main to verify. These tests
+// to our changes" without proof. Run the same eval on master to verify. These tests
 // have invisible couplings — preamble text, SKILL.md content, and timing all affect
 // agent behavior. See CLAUDE.md "E2E eval failure blame protocol" for details.
 export const evalsEnabled = !!process.env.EVALS;
@@ -40,7 +40,7 @@ const FAST_EXCLUDED_TESTS = [
 if (evalsEnabled && !process.env.EVALS_ALL) {
   const baseBranch = process.env.EVALS_BASE
     || detectBaseBranch(ROOT)
-    || 'main';
+    || 'master';
   const changedFiles = getChangedFiles(baseBranch, ROOT);
 
   if (changedFiles.length > 0) {
@@ -52,7 +52,7 @@ if (evalsEnabled && !process.env.EVALS_ALL) {
     }
     process.stderr.write('\n');
   }
-  // If changedFiles is empty (e.g., on main branch), selectedTests stays null → run all
+  // If changedFiles is empty (e.g., on master branch), selectedTests stays null → run all
 }
 
 // Apply EVALS_FAST filter after diff-based selection

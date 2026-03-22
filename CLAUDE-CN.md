@@ -240,7 +240,7 @@ CHANGELOG.md 是**给用户的**,不是贡献者的。像产品发布说明一�
 活动技能位于 `~/.claude/skills/spec-first/`。进行更改后:
 
 1. 推送你的分支
-2. 在技能目录中获取并重置: `cd ~/.claude/skills/spec-first && git fetch origin && git reset --hard origin/main`
+2. 在技能目录中获取并重置: `cd ~/.claude/skills/spec-first && git fetch origin && git reset --hard origin/master`
 3. 重新构建: `cd ~/.claude/skills/spec-first && bun run build`
 
 或直接复制二进制: `cp browse/dist/browse ~/.claude/skills/spec-first/browse/dist/browse`

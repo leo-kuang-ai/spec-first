@@ -33,7 +33,7 @@ let selectedTests: string[] | null = null;
 if (evalsEnabled && !process.env.EVALS_ALL) {
   const baseBranch = process.env.EVALS_BASE
     || detectBaseBranch(ROOT)
-    || 'main';
+    || 'master';
   const changedFiles = getChangedFiles(baseBranch, ROOT);
 
   if (changedFiles.length > 0) {

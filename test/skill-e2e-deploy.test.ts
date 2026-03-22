@@ -23,7 +23,7 @@ describeIfSelected('Land-and-Deploy skill E2E', ['land-and-deploy-workflow'], ()
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: landDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -48,7 +48,7 @@ describeIfSelected('Land-and-Deploy skill E2E', ['land-and-deploy-workflow'], ()
     const result = await runSkillTest({
       prompt: `Read land-and-deploy/SKILL.md for the /land-and-deploy skill instructions.
 
-You are on branch feat/add-deploy with changes against main. This repo has a fly.toml
+You are on branch feat/add-deploy with changes against master. This repo has a fly.toml
 with app = "test-app", indicating a Fly.io deployment.
 
 IMPORTANT: There is NO remote and NO GitHub PR — you cannot run gh commands.
@@ -95,7 +95,7 @@ describeIfSelected('Canary skill E2E', ['canary-workflow'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: canaryDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -156,7 +156,7 @@ describeIfSelected('Benchmark skill E2E', ['benchmark-workflow'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: benchDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -221,7 +221,7 @@ describeIfSelected('Setup-Deploy skill E2E', ['setup-deploy-workflow'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: setupDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 

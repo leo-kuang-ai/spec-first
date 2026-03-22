@@ -24,7 +24,7 @@ describeIfSelected('Plan CEO Review E2E', ['plan-ceo-review'], () => {
       spawnSync(cmd, args, { cwd: planDir, stdio: 'pipe', timeout: 5000 });
 
     // Init git repo (CEO review SKILL.md has a "System Audit" step that runs git)
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -110,7 +110,7 @@ describeIfSelected('Plan CEO Review SELECTIVE EXPANSION E2E', ['plan-ceo-review-
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: planDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -193,7 +193,7 @@ describeIfSelected('Plan Eng Review E2E', ['plan-eng-review'], () => {
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: planDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
@@ -288,11 +288,11 @@ describeIfSelected('Plan-Eng-Review Test-Plan Artifact E2E', ['plan-eng-review-a
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: planDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    // Create base commit on main
+    // Create base commit on master
     fs.writeFileSync(path.join(planDir, 'app.ts'), 'export function greet() { return "hello"; }\n');
     run('git', ['add', '.']);
     run('git', ['commit', '-m', 'initial']);
@@ -423,7 +423,7 @@ describeIfSelected('Office Hours Spec Review E2E', ['office-hours-spec-review'],
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: ohDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     fs.writeFileSync(path.join(ohDir, 'README.md'), '# Test Project\n');
@@ -484,7 +484,7 @@ describeIfSelected('Plan CEO Review Benefits-From E2E', ['plan-ceo-review-benefi
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: benefitsDir, stdio: 'pipe', timeout: 5000 });
 
-    run('git', ['init', '-b', 'main']);
+    run('git', ['init', '-b', 'master']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
     fs.writeFileSync(path.join(benefitsDir, 'README.md'), '# Test Project\n');
