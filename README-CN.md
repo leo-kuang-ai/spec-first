@@ -104,6 +104,21 @@ spec-first init --feat AUTH --mode N --size M --platforms web,node
 /spec-first:archive       # 复盘归档，收口 Feature
 ```
 
+### 需求聚焦
+
+当一份已经评审过的需求需要进一步收敛到单一 owner 的交付边界时，使用：
+
+```bash
+/spec-first:focus-requirements
+```
+
+它会把原始需求压缩成 owner-scoped 的 PRD、side requirements 和 handoff summary，重点明确：
+
+- `In Scope / Out of Scope`
+- 依赖边界
+- 可验证的验收标准
+- 交接所需的最小上下文
+
 ### 日常 CLI
 
 ```bash

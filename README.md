@@ -101,6 +101,21 @@ spec-first init --feat AUTH --mode N --size M --platforms web,node
 /spec-first:archive       # Retrospective and close-out
 ```
 
+### Requirement Focus
+
+When an already reviewed requirement needs to be narrowed to a single owner's delivery boundary, use:
+
+```bash
+/spec-first:focus-requirements
+```
+
+It compresses the original requirement into an owner-scoped PRD, side requirements, and a handoff summary, with emphasis on:
+
+- `In Scope / Out of Scope`
+- dependency boundaries
+- verifiable acceptance criteria
+- the minimum context needed for handoff
+
 ### Day-to-Day CLI
 
 ```bash
