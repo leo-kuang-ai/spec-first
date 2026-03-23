@@ -17,7 +17,7 @@ Feature: {featureId}
 执行序列:
 1. Batch 1: 前置校验
    - 加载 stage-state
-   - 加载覆盖率数据
+   - 加载文档关联索引
    - 检查 Gate 历史
 
 2. Batch 2: Skill 执行
@@ -44,7 +44,7 @@ Feature: {featureId}
 已完成:
 - ✅ Feature 定位成功
 - ✅ stage-state.json 已加载
-- ✅ 覆盖率数据已加载
+- ✅ 文档关联索引已加载
 
 阻塞项: (无)
 
@@ -61,7 +61,7 @@ Feature: {featureId}
 已完成:
 - ✅ 调度 03-spec Skill
 - ✅ spec.md 已生成
-- ✅ FR 已注册到追溯矩阵
+- ✅ 文档引用已同步
 
 阻塞项: (无)
 
@@ -139,7 +139,7 @@ Feature: FSREQ-20260305-AUTH-001
 
 产出物:
 - specs/FSREQ-20260305-AUTH-001/spec.md
-- specs/FSREQ-20260305-AUTH-001/traceability-matrix.md
+- specs/FSREQ-20260305-AUTH-001/document-links.yaml
 
 💡 下一步:
 运行 /spec-first:design 开始技术设计

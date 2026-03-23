@@ -122,6 +122,19 @@ describe('dispatchCommand', () => {
     expect(result.skillPath).toBeDefined();
   });
 
+  it('should resolve exact skill directory names before NN-prefixed matches', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', 'focus-requirements'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'skills', 'spec-first', 'focus-requirements', 'SKILL.md'),
+      '# Focus Requirements',
+      'utf-8',
+    );
+
+    const result = resolveSkillPath('focus-requirements', TMP);
+
+    expect(result).toBe(join(TMP, 'skills', 'spec-first', 'focus-requirements', 'SKILL.md'));
+  });
+
   it('should not hard-block code skill at dispatch layer when prerequisites are missing', () => {
     writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
     const result = dispatchCommand('code', TMP);

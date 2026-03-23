@@ -45,7 +45,8 @@
 | process-engine | `src/core/process-engine/` | 8 | Stage 状态机，Feature 生命周期管理 |
 | skill-runtime | `src/core/skill-runtime/` | 25 | Skill 分发、prompt 组装、hard-gate 校验 |
 | gate-engine | `src/core/gate-engine/` | 10 | 阶段质量门禁评估（19 条条件） |
-| trace-engine | `src/core/trace-engine/` | 9 | 追溯 ID 生成/校验/搜索、覆盖率矩阵 |
+| trace-engine | `src/core/trace-engine/` | 9 | 追溯 ID 生成/校验/搜索 |
+| document-links | `src/core/document-links.ts` | 1 | 文档关联索引与引用校验 |
 | ai-orchestrator | `src/core/ai-orchestrator/` | 15 | Auto-loop、catchup 上下文恢复 |
 | change-mgr | `src/core/change-mgr/` | 7 | RFC + Defect 状态机 |
 | template | `src/core/template/` | 6 | Handlebars 模板渲染 |

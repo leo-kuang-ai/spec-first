@@ -95,7 +95,7 @@ tests/
 - Core 模块使用 default export
 - 未加 `_` 前缀的未使用变量
 - 手动编辑 `stage-state.json`
-- 手动编辑 `traceability-matrix.md`
+- 手动编辑 `document-links.yaml`
 
 ---
 

@@ -11,7 +11,7 @@
 **Batch 1: 前置校验**
 - 定位 Feature
 - 加载 stage-state
-- 加载覆盖率、Gate 历史
+- 加载文档关联索引、Gate 历史
 - 检查点：前置条件是否满足
 
 **Batch 2: Skill 执行**
@@ -149,8 +149,8 @@ TASK-003: [P] 实现找回密码接口
 
 **步骤**:
 1. 执行 `spec-first gate check <featureId>`
-2. 执行 `spec-first matrix check`
-3. 执行 `spec-first metrics coverage`
+2. 执行 `spec-first docs links validate <featureId>`
+3. 必要时执行 `spec-first metrics report <featureId>`
 4. 明确读取并报告退出码
 5. 仅当证据为本次会话新鲜执行结果时，才允许 `stage advance`
 

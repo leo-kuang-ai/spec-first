@@ -45,7 +45,7 @@
 | `skill-runtime` | Skill 分发、prompt 组装 |
 | `ai-orchestrator` | Auto-loop、catchup 上下文恢复 |
 | `gate-engine` | 阶段质量门禁评估 |
-| `trace-engine` | 追溯 ID 生成/校验、覆盖率矩阵 |
+| `trace-engine` | 追溯 ID 生成/校验/搜索、文档关联索引 |
 | `change-mgr` | RFC + Defect 状态机 |
 | `template` | Handlebars 模板渲染 |
 | `tool-integration` | AI runtime hooks |

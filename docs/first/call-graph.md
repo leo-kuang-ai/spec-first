@@ -47,14 +47,14 @@ src/core/process-engine/advance.ts
 src/core/gate-engine/gate-evaluator.ts
 ```
 
-### 2. 覆盖率计算调用链
+### 2. 文档关联与度量调用链
 
 ```
-src/core/trace-engine/matrix.ts
-    │ (function_call: parseMatrix)
+src/core/document-links.ts
+    │ (function_call: loadDocumentLinks)
     ▼
-src/core/trace-engine/coverage.ts
-    │ (function_call: getCoverage)
+src/core/metrics-engine/health-score.ts
+    │ (function_call: calcHealthScore)
     ▼
 src/core/gate-engine/gate-evaluator.ts
 ```
@@ -86,10 +86,9 @@ src/cli/commands/*.ts
 
 | 上游模块 | 下游模块 | 依赖类型 |
 |---------|---------|---------|
-| `src/shared/types.ts` | `stage-machine.ts`, `gate-evaluator.ts`, `coverage.ts`, `router.ts` | type_import |
+| `src/shared/types.ts` | `stage-machine.ts`, `gate-evaluator.ts`, `document-links.ts`, `router.ts` | type_import |
 | `src/core/process-engine/stage-machine.ts` | `advance.ts` | function_call |
-| `src/core/trace-engine/matrix.ts` | `gate-evaluator.ts`, `coverage.ts` | function_call |
-| `src/core/trace-engine/coverage.ts` | `gate-evaluator.ts` | function_call |
+| `src/core/document-links.ts` | `gate-evaluator.ts`, `metrics-engine/health-score.ts` | function_call |
 | `src/core/gate-engine/gate-evaluator.ts` | `advance.ts`, `orchestrate.ts` | function_call |
 | `src/core/skill-runtime/dispatcher.ts` | `hard-gate.ts`, `prompt-assembler.ts`, `scope-guard.ts` | function_call |
 | `src/core/ai-orchestrator/auto-loop.ts` | `orchestrate.ts` | function_call |
@@ -115,7 +114,8 @@ src/cli/commands/*.ts
 | process-engine | `src/core/process-engine/` | 8 | 阶段状态机，Feature 生命周期管理 |
 | skill-runtime | `src/core/skill-runtime/` | 25 | Skill 分发、prompt 组装、hard-gate 校验 |
 | gate-engine | `src/core/gate-engine/` | 10 | 阶段质量门禁评估（19 条条件） |
-| trace-engine | `src/core/trace-engine/` | 9 | 追溯 ID 生成/校验/搜索、覆盖率矩阵 |
+| trace-engine | `src/core/trace-engine/` | 9 | 追溯 ID 生成/校验/搜索 |
+| document-links | `src/core/document-links.ts` | 1 | 文档关联索引加载与校验 |
 | ai-orchestrator | `src/core/ai-orchestrator/` | 15 | Auto-loop、catchup 上下文恢复 |
 | change-mgr | `src/core/change-mgr/` | 7 | RFC + Defect 状态机 |
 | template | `src/core/template/` | 6 | Handlebars 模板渲染 |

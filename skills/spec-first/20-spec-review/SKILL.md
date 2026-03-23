@@ -29,7 +29,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），校验 `spec.md` 已存在
-- P1: 加载 `spec.md`、`constitution.md`、`traceability-matrix.md`
+- P1: 加载 `spec.md`、`constitution.md`、`document-links.yaml`
 - P2: 基于清单生成审查项并评估通过/不通过
 - P3: 与用户确认未通过项和修订建议
 - P4: 写入审查结果到 `checklists/spec-review.md`

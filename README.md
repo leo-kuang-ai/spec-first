@@ -126,7 +126,7 @@ Every feature advances through eight active stages — each with blocking gate c
 | `02_design` | Technical design (DS + API) | `/spec-first:design` |
 | `03_plan` | Task list with traceability IDs | `/spec-first:task` |
 | `04_implement` | Spec-linked code commits | `/spec-first:code` |
-| `05_verify` | Test cases and coverage evidence | `/spec-first:verify` |
+| `05_verify` | Test cases and document-link evidence | `/spec-first:verify` |
 | `06_wrap_up` | Retrospective document | `/spec-first:archive` |
 | `07_release` | Smoke test report + release note | `spec-first golive check` |
 | `08_done` | *(terminal)* | `spec-first done` |
@@ -140,7 +140,7 @@ Each stage defines blocking conditions that must pass before the stage can advan
 spec-first gate                              # Evaluate current stage
 spec-first gate --stage 04_implement         # Evaluate a specific stage
 spec-first golive check <featureId>          # Full pre-release gate (07_release)
-spec-first metrics coverage --threshold 0.8  # Enforce coverage threshold
+spec-first metrics report --feature <featureId>  # Generate document-link metrics report
 ```
 
 ### Full-Lifecycle Traceability
@@ -159,7 +159,7 @@ Feature                                    ← feature-level tracking
 ```bash
 spec-first id generate FR        # Generate a new requirement ID
 spec-first id verify FR-001      # Confirm ID is registered and linked
-spec-first matrix sync           # Rebuild the traceability coverage matrix
+spec-first docs links validate   # Validate document-link index
 ```
 
 ### 20 Built-in Skills
@@ -212,7 +212,7 @@ Spec-First is organized in three layers. The boundary between layers is strict: 
 │  ┌─────────────────┬──────────────────────────┐   │
 │  │ process-engine  │ Stage FSM, lifecycle ctrl │   │
 │  │ gate-engine     │ Blocking condition eval   │   │
-│  │ trace-engine    │ ID registry, coverage     │   │
+│  │ trace-engine    │ ID registry, document links│   │
 │  │ skill-runtime   │ Skill dispatch, prompts   │   │
 │  │ ai-orchestrator │ Auto-loop, context pack   │   │
 │  │ metrics-engine  │ Health score, bottlenecks │   │

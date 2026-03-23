@@ -378,13 +378,14 @@ export function resolveSkillPath(skillName: string, projectRoot: string): string
 
 /** 在目录中查找匹配的 Skill 文件 */
 function findSkillFile(baseDir: string, skillName: string): string | undefined {
-  // 尝试 NN-skillName/SKILL.md 格式
   if (!exists(baseDir)) return undefined;
+
+  const exact = join(baseDir, skillName, 'SKILL.md');
+  if (exists(exact)) return exact;
 
   try {
     const entries = readdirSync(baseDir);
     for (const entry of entries) {
-      // 匹配 NN-skillName 格式
       if (entry.endsWith(`-${skillName}`)) {
         const skillFile = join(baseDir, entry, 'SKILL.md');
         if (exists(skillFile)) return skillFile;

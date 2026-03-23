@@ -187,20 +187,20 @@ digraph design_flow {
 
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），校验阶段为 02_design
-- P1: 从矩阵加载 FR，读取 constitution.md
+- P1: 从 spec/design 读取需求依据，读取 constitution.md
 - P2: 生成 DS（设计规格）条目，映射到 FR，并逐条执行“设计简洁性守卫”自检；若出现多方案或外部证据缺口，先触发 `05-research`
 - P3: 与用户确认设计决策，仅保留直接支撑当前交付的必要设计
-- P4: 将 DS 写入矩阵，创建设计文档，并把 `research.md` 的推荐结论/风险/待验证项回流到 `design.md`
-- P5: 执行 metrics coverage 检查 FR→DS 覆盖率，执行 matrix check 检测 orphan 项
+- P4: 将 DS 写入设计文档，并把 `research.md` 的推荐结论/风险/待验证项回流到 `design.md`
+- P5: 执行文档关联校验，检查孤立文档与缺失引用
 
 ## CLI 依赖
 - `spec-first id next DS <abbr> --feature <featureId>`
-- `spec-first matrix update`
-- `spec-first matrix check`
-- `spec-first metrics coverage`
+- `spec-first docs links validate`
+- `spec-first docs links show`
+- `spec-first metrics report`
 
 ## 输出路径
-- `specs/{featureId}/traceability-matrix.md`
+- `specs/{featureId}/document-links.yaml`
 - `specs/{featureId}/design.md`
 - `specs/{featureId}/contracts/*.yaml`（按需）
 
@@ -210,8 +210,8 @@ digraph design_flow {
 ## 成功标准
 - `design.md` 已写入，包含模块划分、API 设计、数据模型
 - 所有 DS 已通过 `id next DS` 注册
-- `traceability-matrix.md` 已更新，每个 FR 有对应 DS 引用
-- `metrics coverage` C1 (Design Coverage) > 0%
+- `document-links.yaml` 已更新，设计文档引用完整
+- 文档关联校验通过，无孤立项
 - 无与当前交付无关的投机性架构层
 
 **格式校验（P4 落盘后自动执行）**:

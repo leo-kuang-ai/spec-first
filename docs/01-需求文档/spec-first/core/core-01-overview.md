@@ -78,7 +78,7 @@
 
 | # | 问题 | 现状痛点 | Spec-First 解法 |
 |---|------|---------|----------------|
-| 11 | **AI 辅助过程中知识沉淀缺失** | 技术决策复用率不足 15%；同类问题重复调研 40% | **结构化产出物模板 + 追踪矩阵** |
+| 11 | **AI 辅助过程中知识沉淀缺失** | 技术决策复用率不足 15%；同类问题重复调研 40% | **结构化产出物模板 + 文档关联索引** |
 
 **问题总结**：共性根因三点——**AI 协作无标准**、**规范与实现脱节**、**过程知识不沉淀**。解决思路：以结构化规范为单一真理源，通过 Skill 统一 AI 协作入口，通过全链路 ID 追踪 + Gate 自动校验确保一致性，通过 Context Pack + Session Catchup 解决上下文断裂。
 
@@ -97,7 +97,7 @@
 对 Tech Lead： 设计不再"评审完就忘"——Gate 自动校验设计与实现一致性
 对 Developer：  开发不再"猜着做"——每个 TASK 明确 traces 到 FR，AC 即测试用例
 对 QA：        测试不再"漏测背锅"——Test 覆盖率 = 100% 是 Gate 硬指标
-对 管理层：     交付不再"黑盒"——追踪矩阵 + 度量体系，全程可视可量化
+对 管理层：     交付不再"黑盒"——文档关联索引 + 度量体系，全程可视可量化
 ```
 
 ### 产品边界
@@ -105,7 +105,7 @@
 | 范围 | 包含 | 不包含 |
 |------|------|--------|
 | 流程定义 | 8 主阶段 + 2 终态、Gate、横切机制 | 项目管理（排期、资源分配） |
-| 规范标准 | 产出物模板、ID 体系、追踪矩阵 | 具体业务领域建模 |
+| 规范标准 | 产出物模板、ID 体系、文档关联索引 | 具体业务领域建模 |
 | 工具实现 | CLI（12 命令组）+ Skill（16 个） | IDE 插件（v7.1 不含，vNext 可选扩展）、Jira 深度定制 |
 | AI 协作 | Skill 执行模型、Context Pack、Session Catchup、confirm_policy（三档确认） | AI 模型训练、私有化部署 |
 | 度量体系 | 覆盖率、合规率、返工率、Gate 通过率 | 人效评估、绩效考核 |
@@ -164,9 +164,9 @@
 | UC-003 | 技术设计 | A2 + A6 | 02. Design | `/spec-first:design` + CLI: `spec-first id next DS <abbr>` |
 | UC-004 | 技术调研 | A2 + A6 | 02. Design | `/spec-first:research` |
 | UC-005 | 任务拆解 | A2 + A6 | 03. Plan | `/spec-first:task` + CLI: `spec-first id next TASK <abbr>` |
-| UC-006 | 规范驱动开发 | A3 + A6 | 04. Implement | `/spec-first:code` + CLI: `spec-first matrix check` |
+| UC-006 | 规范驱动开发 | A3 + A6 | 04. Implement | `/spec-first:code` + CLI: `spec-first docs links validate` |
 | UC-020 | 代码评审 | A2 + A3 + A6 | 04. Implement | `/spec-first:code-review` + CLI: `spec-first gate check` |
-| UC-007 | 测试验证 | A4 + A6 | 05. Verify | `/spec-first:test` + CLI: `spec-first metrics coverage` |
+| UC-007 | 测试验证 | A4 + A6 | 05. Verify | `/spec-first:test` + CLI: `spec-first metrics report` |
 | UC-008 | 归档复盘 | A2 + A6 | 06. Wrap-up | `/spec-first:archive` + CLI: `spec-first gate check` |
 
 #### B. 横切用例（5 个）
@@ -175,7 +175,7 @@
 |---------|------|---------|---------|---------------|
 | UC-009 | Gate 校验 | A7 + A2 | 阶段切换时 | `/spec-first:verify`（用户入口）→ 内部调用 CLI: `spec-first gate check` + Hook 自动触发 |
 | UC-010 | Commit 合规校验 | A7 | Git commit 时 | Git Hook: `commit-msg`（自动化，非用户直调） |
-| UC-011 | 一致性校验（SCA） | A7 | 5 个触发时机 | `/spec-first:verify`（用户入口）→ 内部调用 CLI: `spec-first matrix check` |
+| UC-011 | 一致性校验（SCA） | A7 | 5 个触发时机 | `/spec-first:verify`（用户入口）→ 内部调用 CLI: `spec-first docs links validate` |
 | UC-012 | 变更管理（RFC） | A1 + A2 | 需求/设计变更时 | `/spec-first:rfc`（用户入口）→ Runtime 路由到 CLI: `spec-first rfc create`；`/spec-first:orchestrate` 在编排流程中自动触发 RFC |
 | UC-013 | 缺陷管理 | A4 | 缺陷发现时 | `/spec-first:verify`（用户入口）→ 内部调用 CLI: `spec-first defect register` |
 
@@ -191,9 +191,9 @@
 
 | 用例 ID | 名称 | 触发条件 | 对应 Skill/CLI |
 |---------|------|---------|---------------|
-| UC-017 | 度量报告 | Feature 完成后 | `/spec-first:status` + CLI: `spec-first metrics coverage` |
+| UC-017 | 度量报告 | Feature 完成后 | `/spec-first:status` + CLI: `spec-first metrics report` |
 | UC-018 | 环境诊断 | 首次使用时 | `/spec-first:doctor` |
-| UC-019 | 反向同步（Hotfix/Sync） | 手工改动后需回填规范时 | `/spec-first:sync <file_path>`（用户入口）→ 内部调用 `matrix check + gate check`，必要时触发 RFC 草案 |
+| UC-019 | 反向同步（Hotfix/Sync） | 手工改动后需回填规范时 | `/spec-first:sync <file_path>`（用户入口）→ 内部调用 `docs links validate + gate check`，必要时触发 RFC 草案 |
 
 ---
 

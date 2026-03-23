@@ -118,7 +118,7 @@ P4_WRITE — 写入交付物
   └── spec-first id next <type> <abbr>（注册新 ID）
 
 P5_SIDE_EFFECT — 副作用执行
-  ├── spec-first matrix check <featureId>（校验追踪矩阵）
+  ├── spec-first docs links validate <featureId>（校验文档关联索引）
   ├── spec-first gate check <featureId>（校验 Gate）
   └── 更新运行态文件（findings.md / task_plan.md）
 ```

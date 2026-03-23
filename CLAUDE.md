@@ -13,14 +13,14 @@ Spec-First 全链路研发闭环引擎——阶段状态机驱动 Feature 从需
 | 禁止手动编辑的文件 | 正确操作 | 风险等级 |
 |-------------------|---------|---------|
 | `stage-state.json` | `spec-first stage advance` | 🔴 高（状态机不可逆） |
-| `traceability-matrix.md` | `spec-first matrix sync` | 🟠 中（覆盖率会失准） |
+| `document-links.yaml` | `spec-first docs links validate` | 🟠 中（引用会失准） |
 | `specs/` 下状态与报告文件（`todo-state.json`、`reports/`） | 对应 CLI 子命令 | 🟠 中 |
 
 > **可以编辑**：`specs/{featureId}/` 下的规范产物（`spec.md`、`design.md`、`task_plan.md`、`prd.md` 等文档）。
 >
 > **CLI 不可用时的降级**（按风险分层）：
 > - `stage advance`：**永不降级**，直接告知用户 CLI 不可用，等待人工操作
-> - `matrix sync`：可临时跳过，记录原因，任务完成后提醒用户手动补同步
+> - `docs links validate`：可临时跳过，记录原因，任务完成后提醒用户手动补校验
 > - 其他状态文件：仅读取不写入，告知用户需补 CLI 命令
 
 **违规后果**：手动修改状态文件会导致 Gate 校验失准、覆盖率数据污染、审计日志断裂。如用户坚持要求手动编辑，Claude 应明确说明风险并拒绝执行，建议改为使用对应 CLI 命令。
@@ -151,7 +151,7 @@ spec-first feature current                          # 查看当前 featureId
 spec-first feature switch FSREQ-20260313-UIOPT-001  # 切换 Feature
 spec-first gate check --feature <featureId>         # 执行 Gate 校验
 spec-first gate check --feature <featureId> --stage 03_plan  # 指定阶段
-spec-first matrix sync --feature <featureId>        # 同步追踪矩阵
+spec-first docs links validate --feature <featureId> # 校验文档关联
 spec-first stage advance --feature <featureId>      # 推进阶段（须先通过 Gate）
 spec-first metrics --feature <featureId>            # 查看 C3/C4/C6/C8/C9
 spec-first id search FR-UIOPT-001                   # 追溯某 ID 的上下游
@@ -196,7 +196,7 @@ templates/    # Handlebars 模板
 | `template/` | Handlebars 模板渲染、产物生成 |
 | `tool-integration/` | AI runtime hooks、context 同步 |
 | `metrics-engine/` | 健康度评分（H1）、瓶颈检测（R1-R5） |
-| `validators/` | 产物格式校验（ID 格式、必需章节、追踪矩阵一致性） |
+| `validators/` | 产物格式校验（ID 格式、必需章节、文档关联一致性） |
 | `task-plan/` | task_plan.md 解析、Todo 状态管理 |
 | `rules/` | 真理源（RELEASE_REQUIRED_ARTIFACTS 等）、静态规则定义 |
 | `batch-executor/` | 批量任务执行、并行编排支持 |
@@ -262,4 +262,3 @@ tests/fixtures/    # 测试固件数据
 - DS-WEBSITE-001: 首页展示模块
 - DS-WEBSITE-002: 交互式终端演示
 <!-- SPEC-FIRST:END AUTO-CONTEXT -->
-

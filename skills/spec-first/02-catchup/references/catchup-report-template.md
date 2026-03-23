@@ -73,7 +73,7 @@
 | design.md | ✅ 存在 | {date} | 技术设计 |
 | task_plan.md | ⚠️ 过期 | {date} (> 7 天) | 需要更新 |
 | findings.md | ✅ 存在 | {date} | 发现记录 |
-| traceability-matrix.md | ✅ 存在 | {date} | 追溯矩阵 |
+| document-links.yaml | ✅ 存在 | {date} | 文档关联索引 |
 
 ---
 
@@ -266,7 +266,7 @@ Owner: {owner}
 | design.md | ✅ 存在 | 2026-03-04 | 技术设计 |
 | task_plan.md | ✅ 存在 | 2026-03-05 | 任务计划 |
 | findings.md | ✅ 存在 | 2026-03-05 | 发现记录 |
-| traceability-matrix.md | ✅ 存在 | 2026-03-05 | 追溯矩阵 |
+| document-links.yaml | ✅ 存在 | 2026-03-05 | 文档关联索引 |
 
 ---
 

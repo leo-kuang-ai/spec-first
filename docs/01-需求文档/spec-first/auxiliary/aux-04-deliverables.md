@@ -41,7 +41,7 @@ specs/                              # Feature 工作区根目录
     │   ├── uat-signoff.md          # 验收签核记录
     │   └── regression-report.md    # 回归验证报告（Mode I 必须）
     ├── retro.md                    # 复盘报告（06_wrap_up）
-    ├── traceability-matrix.md      # 追踪矩阵（或 .yaml）
+    ├── document-links.yaml         # 文档关联索引
     ├── stage-state.json                 # 进度记录（运行态）
     ├── findings.md                 # 过程发现（运行态）
     ├── gate-history.jsonl          # Gate 评估历史
@@ -61,7 +61,7 @@ specs/                              # Feature 工作区根目录
 | API 契约 | OpenAPI 3.x YAML | js-yaml |
 | 状态数据 | JSON | 原生 JSON.parse |
 | 时序数据（gate/metrics/ai-stats） | JSONL（每行一条 JSON） | 逐行解析 |
-| 追踪矩阵 | Markdown 表格 或 YAML | remark / js-yaml |
+| 文档关联索引 | YAML | js-yaml |
 
 ---
 
@@ -92,9 +92,8 @@ templates/
 ├── init/                           # 项目初始化模板
 │   ├── stage-state.json.hbs       ✅ 已存在
 │   └── constitution.md.hbs        ✅ 已存在
-├── matrix/                         # 追踪矩阵模板
-│   ├── traceability-matrix.md.hbs ✅ 已存在
-│   └── traceability-matrix.yaml.hbs ✅ 已存在
+├── docs/                           # 文档关联模板
+│   └── document-links.yaml.hbs    ✅ 已存在
 ├── gate/                           # Gate 报告模板
 │   └── gate-report.md.hbs        ✅ 已存在
 ├── review/                         # 代码评审报告模板

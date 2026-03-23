@@ -435,7 +435,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     'G-PLAN-01': '任务拆解文档存在',
     'G-PLAN-02': '任务已关联 FR',
     'G-PLAN-03': '任务覆盖率达标',
-    'G-IMPL-01': '追踪矩阵覆盖率 ≥ 基线',
+    'G-IMPL-01': '文档关联完整性 ≥ 基线',
     'G-BE-LINT': 'Lint 检查通过',
     'G-BE-UNIT': '单元测试通过',
     'G-BE-CONTRACT': '契约测试通过',

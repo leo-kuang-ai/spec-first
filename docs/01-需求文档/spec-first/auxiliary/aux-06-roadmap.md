@@ -14,7 +14,7 @@
 | 模块/能力 | 状态 | 说明 |
 |----------|------|------|
 | M1 ProcessEngine | ✅ | 阶段状态机、init/stage 命令可用 |
-| M2 TraceEngine | ✅ | ID 注册/校验、追踪矩阵管理、覆盖率计算 |
+| M2 TraceEngine | ✅ | ID 注册/校验、文档关联索引管理、度量查询 |
 | M4 ChangeMgr | ✅ | RFC 状态机 + 缺陷管理（rfc/defect 命令） |
 | M6 MetricsEngine | ✅ | 覆盖率计算 + 度量报告 |
 | CLI 12 个命令组 | ✅ (10/12) | init/id/gate/stage/matrix/metrics/ai/rfc/defect/doctor 已交付，feature/commit 规划中（个别子命令有类型漂移） |
@@ -72,7 +72,7 @@
 |---|------|------|------|------|----------|
 | R1 | 流程过重导致团队抵触 | 高 | 高 | 🔴 | Mode×Size 裁剪：S 模式保留全部阶段但降低产出物深度，仅保留核心 Gate 条件 |
 | R2 | AI 生成内容质量不可控 | 中 | 高 | 🟡 | SCA 三检查点 + 人在回路强制确认 + Gate 阻断机制 |
-| R3 | 规范与实现渐行渐远 | 中 | 高 | 🟡 | 追踪矩阵实时校验 + PR Gate 自动检查 + 覆盖率阈值 |
+| R3 | 规范与实现渐行渐远 | 中 | 高 | 🟡 | 文档关联索引实时校验 + PR Gate 自动检查 + 度量阈值 |
 | R4 | 上下文丢失致 AI 重复劳动 | 中 | 中 | 🟡 | Context Pack + Session Catchup + 运行态三文件 |
 | R5 | 工具链学习成本过高 | 中 | 中 | 🟡 | Skill 封装复杂度 + CLI 统一入口 + doctor 自检 |
 

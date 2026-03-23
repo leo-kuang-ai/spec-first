@@ -34,12 +34,12 @@ spec-first <command> <subcommand> [args] [--flags]
 | 命令 | 说明 | 需确认 |
 |------|------|--------|
 | `id` | 追溯 ID 生成、校验与检索 | 否 |
-| `matrix` | 同步追踪矩阵 | 条件 |
+| `docs` | 校验与展示文档关联索引 | 条件 |
 | `init` | 初始化 Feature 工作区 | 否 |
 | `stage` | 阶段流转管理 | 条件 |
 | `rfc` | RFC 变更请求与状态管理 | 是 |
 | `defect` | 缺陷跟踪与状态管理 | 是 |
-| `metrics` | 覆盖率度量与健康评分 | 否 |
+| `metrics` | 健康评分与文档关联度量 | 否 |
 | `doctor` | 环境诊断与修复 | 条件 |
 | `gate` | 阶段质量门禁评估 | 否 |
 | `golive` | 上线就绪检查与批准 | 否 |
@@ -76,7 +76,7 @@ spec-first <command> <subcommand> [args] [--flags]
 
 ## 确认策略
 
-采用四维判定矩阵决定命令执行是否需要用户确认：
+采用四维判定规则决定命令执行是否需要用户确认：
 
 - **维度**: `mode`, `size`, `hasNfrSec`, `hasNewExternalApi`
 - **策略**: `auto` / `assisted` / `strict`

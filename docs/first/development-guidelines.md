@@ -46,7 +46,7 @@ npx vitest run tests/unit/<file>.test.ts
 # 按名称匹配
 npx vitest run -t "pattern"
 
-# 覆盖率报告
+# 测试报告
 npm run test:coverage
 ```
 

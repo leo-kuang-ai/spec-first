@@ -15,8 +15,8 @@
 | **Skill** | AI Agent 技能定义 | name, stage, confirm_policy | `src/core/skill-runtime/dispatcher.ts` |
 | **RFC** | 变更请求，管理豁免 | id, status, impact | `src/core/change-mgr/rfc-machine.ts` |
 | **Defect** | 缺陷记录 | id, status, severity | `src/core/change-mgr/defect-machine.ts` |
-| **TraceabilityMatrix** | 追溯矩阵 | rows, coverage | `src/core/trace-engine/matrix.ts` |
-| **CoverageMetrics** | 覆盖率指标（C3/C4/C6/C8/C9） | c3, c4, c6, c8, c9 | `src/core/trace-engine/coverage.ts` |
+| **DocumentLinksFile** | 文档关联索引文件 | version, featureId, documents | `src/core/document-links.ts` |
+| **DocumentLinksValidationResult** | 文档关联校验结果 | valid, errors | `src/core/document-links.ts` |
 | **KnownException** | 已批准的豁免记录 | id, rfc_id, expiry | `src/core/trace-engine/exception-validator.ts` |
 
 ---
@@ -79,7 +79,7 @@ open → fixing → fixed → verified (终态)
 | 豁免必须关联 RFC | Gate 豁免必须关联有效的 RFC |
 | 追溯链完整性 | FR → DS → TASK → TC 链路必须可追溯 |
 | 状态文件禁止手动编辑 | stage-state.json 等文件只能通过 CLI 操作 |
-| 覆盖率阈值 | C3/C4/C6/C8/C9 必须满足阈值要求 |
+| 文档关联完整性 | 所有声明文档与引用必须可解析 |
 | Skill-Stage 映射 | Skill 只能在对应 Stage 执行 |
 | Release 产物完整性 | 07_release 阶段必须产出完整产物集 |
 | V-Model 配对 | REQ ↔ ATP, SYS ↔ STP, ARCH ↔ ITP, MOD ↔ UTP |
@@ -98,7 +98,7 @@ open → fixing → fixed → verified (终态)
 | TC | 测试用例 (Test Case) |
 | RFC | 变更请求 (Request for Change) |
 | Waiver | Gate 豁免 |
-| C3-C9 | 覆盖率指标 |
+| document-links | 文档关联索引 |
 
 ---
 

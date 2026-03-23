@@ -147,7 +147,7 @@ export function listRfc(featureId: string, projectRoot: string): RfcRecord[] {
 
 /**
  * 加载 Feature 下所有 RFC 的状态
- * 提取为共享函数，避免在 coverage.ts 和 gate-evaluator.ts 中重复实现
+ * 提取为共享函数，避免在 gate-evaluator.ts 和变更校验中重复实现
  */
 export function loadRfcStatuses(featureId: string, projectRoot: string): Map<string, string> {
   const dir = rfcDir(projectRoot, featureId);

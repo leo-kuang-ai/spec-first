@@ -294,7 +294,7 @@ Owner: {owner}
 | **P1** | `stage-state.json` | 阶段状态、时间戳 | 高 |
 | **P2** | `task_plan.md` | 任务列表、状态 | 高 |
 | **P3** | `findings.md` | 发现、决策、阻塞 | 中 |
-| **P4** | `traceability-matrix.md` | FR/DS/TASK/TC 映射 | 中 |
+| **P4** | `document-links.yaml` | 文档关联索引 | 中 |
 | **P5** | Git 历史 | 最近提交、变更 | 低 |
 
 ### 恢复步骤

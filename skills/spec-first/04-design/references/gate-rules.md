@@ -63,17 +63,12 @@
 
 ### 检查项
 
-1. **FR→DS 覆盖率**
-   - 命令: `spec-first metrics coverage`
-   - 要求: C2 (API Coverage / FR→DS Coverage) > 0%
-   - 失败: 补齐缺失的 DS
+1. **文档关联完整性**
+   - 命令: `spec-first docs links validate <featureId>`
+   - 要求: 无断链引用、无缺失文档关联
+   - 失败: 补齐或移除无效引用
 
-2. **孤立项检测**
-   - 命令: `spec-first matrix check`
-   - 要求: 无 orphan DS（无 FR 映射的 DS）
-   - 失败: 删除或关联孤立 DS
-
-3. **design.md 结构检查**
+2. **design.md 结构检查**
    - 要求: 包含模块划分、API 设计、数据模型
    - 失败: 补充缺失章节
 
@@ -154,57 +149,13 @@ Design 方案: POST /api/orders 不支持幂等
 
 ---
 
-## 覆盖率检查
-
-### C2: API Coverage / FR→DS Coverage
-
-**定义**: FR→DS 覆盖率
-
-**计算**: `(已映射 FR 数 / 总 FR 数) * 100%`
-
-**要求**: > 0%
-
-**命令**: `spec-first metrics coverage`
-
-**输出示例**:
-```
-C2 (API Coverage): 80% (8/10 FR)
-
-未覆盖 FR:
-- FR-AUTH-009: 第三方登录
-- FR-AUTH-010: 账号注销
-```
-
----
-
-## 孤立项检测
-
-**定义**: 无上游映射的 DS
-
-**命令**: `spec-first matrix check`
-
-**输出示例**:
-```
-⚠️  发现 2 个孤立 DS:
-
-- DS-AUTH-005: 无对应 FR
-- DS-AUTH-007: 无对应 FR
-
-建议:
-1. 删除无用 DS
-2. 或补充对应 FR
-```
-
----
-
 ## 阻断原因分类
 
 | 类型 | 说明 | 解决方案 |
 |------|------|----------|
 | 阶段不匹配 | 当前阶段 ≠ 02_design | 运行 stage advance |
 | 缺失 spec.md | 需求规格未生成 | 运行 /spec-first:spec |
-| FR 覆盖率为 0 | 所有 FR 都无 DS | 补充 DS 映射 |
-| 存在孤立 DS | DS 无 FR 映射 | 删除或关联 DS |
+| 文档关联断链 | 存在无效引用 | 运行 docs links validate 并修复 |
 | design.md 不完整 | 缺少必需章节 | 补充模块/API/数据模型 |
 
 ## design-view 评审门槛

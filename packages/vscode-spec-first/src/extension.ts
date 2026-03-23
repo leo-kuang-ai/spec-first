@@ -136,18 +136,18 @@ class SpecFirstDefinitionProvider implements vscode.DefinitionProvider {
     if (!ID_PATTERN.test(word)) return undefined;
     ID_PATTERN.lastIndex = 0;
 
-    // 在追踪矩阵中查找该 ID
+    // 在文档关联索引中查找该 ID
     const ws = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
     if (!ws) return undefined;
 
-    const glob = new vscode.RelativePattern(ws, 'specs/**/traceability-matrix.md');
+    const glob = new vscode.RelativePattern(ws, 'specs/**/document-links.yaml');
     const files = vscode.workspace.findFiles(glob, undefined, 1);
 
     // 同步回退：直接搜索 specs 目录
     try {
       const { execSync: exec } = require('child_process');
       const result = exec(
-        `grep -rn "${word}" specs/*/traceability-matrix.md`,
+        `grep -rn "${word}" specs/*/document-links.yaml`,
         { cwd: ws, encoding: 'utf-8', timeout: 3000 },
       );
       const firstLine = result.split('\n')[0];

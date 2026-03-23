@@ -49,7 +49,7 @@
 **风险等级**：high
 
 **步骤**：
-1. `parseMatrix()` 解析追踪矩阵
+1. `loadDocumentLinks()` 解析文档关联索引
 2. `loadRfcStatuses()` 加载 RFC 状态
 3. `getCoverage()` 计算 C3/C4/C6/C8/C9
 4. `getConditions()` 获取阶段条件定义（Layer1）
@@ -102,24 +102,21 @@
 
 ---
 
-### 6. 覆盖率计算流程
+### 6. 文档关联检查流程
 
-**入口**：`src/core/trace-engine/coverage.ts:18`
+**入口**：`src/core/document-links.ts:103`
 
 **风险等级**：high
 
 **步骤**：
-1. `parseMatrix()` 或使用预解析 rows
-2. `loadValidExceptionFrIds()` 加载有效豁免
-3. 过滤 `EXCLUDED_STATUSES`（Deferred/Cancelled）
-4. `createTraceContext(active)` 创建追溯上下文
-5. `calcTaskCoverage()` → C3（传递链）
-6. `calcTestCoverageFR()` → C4（直接）
-7. `calcImplCoverage()` → C6
-8. `calcTaskCompliance()` → C8
-9. `calcTcCompliance()` → C9
+1. `loadDocumentLinks()` 读取 `document-links.yaml`
+2. `validateDocumentLinksData()` 校验结构与引用
+3. `validateStageDocumentLinks()` 校验当前阶段必要文档
+4. `listMissingDocumentFiles()` 发现缺失文件
+5. `findBrokenDocumentReferences()` 发现坏引用
+6. `appendJsonl()` 写入 Gate / 诊断历史
 
-**证据**：`src/core/trace-engine/coverage.ts:18-182`
+**证据**：`src/core/document-links.ts:55-207`
 
 ---
 
@@ -127,12 +124,12 @@
 
 | 文件 | 关键元素 | 风险等级 | 影响 |
 |------|---------|---------|------|
-| `src/shared/types.ts` | Stage 枚举, ExitCode, CoverageMetrics | critical | 阶段定义变更影响所有状态机、Gate 条件 |
+| `src/shared/types.ts` | Stage 枚举, ExitCode, MatrixStatus | critical | 阶段定义变更影响所有状态机、Gate 条件 |
 | `src/core/process-engine/stage-machine.ts` | TRANSITIONS 表 | critical | 转换表变更直接影响 advance 合法性 |
 | `src/core/gate-engine/condition-registry.ts` | GATE_CONDITIONS | high | 新增/删除条件影响所有 Feature 阶段推进 |
 | `src/core/skill-runtime/dispatcher.ts` | RUNTIME_COMMANDS, SEMANTIC_MAP | high | 路由表变更影响所有 Skill 分发 |
 | `src/core/ai-orchestrator/auto-loop.ts` | runAutoLoop() 主循环 | high | 循环逻辑变更影响所有 Auto-Loop 执行 |
-| `src/core/trace-engine/coverage.ts` | getCoverage(), C3/C4/C6/C8/C9 | high | 算法变更直接影响 Gate 校验结果 |
+| `src/core/document-links.ts` | loadDocumentLinks(), listMissingDocumentFiles() | high | 文档引用变更直接影响 Gate 校验结果 |
 
 ---
 
@@ -144,7 +141,7 @@
 src/shared/types.ts
     ├── src/core/process-engine/stage-machine.ts
     ├── src/core/gate-engine/gate-evaluator.ts
-    ├── src/core/trace-engine/coverage.ts
+    ├── src/core/document-links.ts
     └── src/cli/router.ts
 ```
 
@@ -154,9 +151,9 @@ src/shared/types.ts
 src/core/process-engine/stage-machine.ts
     └── src/core/process-engine/advance.ts
 
-src/core/trace-engine/matrix.ts
+src/core/document-links.ts
     ├── src/core/gate-engine/gate-evaluator.ts
-    └── src/core/trace-engine/coverage.ts
+    └── src/core/gate-engine/condition-registry.ts
 
 src/core/gate-engine/gate-evaluator.ts
     ├── src/core/process-engine/advance.ts
