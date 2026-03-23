@@ -79,6 +79,24 @@ describe('CLI Router', () => {
     expect(handler).toHaveBeenCalledWith(['--mode', 'I', '--size', 'S']);
   });
 
+  it('should report confirm-policy with the canonical label', async () => {
+    const handler = vi.fn(() => 0);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    registerCommand('write-cmd-confirm-policy', 'A mutating command', handler, {
+      requiresConfirmation: true,
+    });
+
+    try {
+      const code = await dispatch(['write-cmd-confirm-policy']);
+      expect(code).toBe(2);
+      expect(errSpy).toHaveBeenCalledWith(
+        expect.stringContaining('confirm-policy=')
+      );
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
   it('should return UNKNOWN_ERROR when handler throws', async () => {
     registerCommand('fail-cmd', 'Will fail', () => {
       throw new Error('boom');

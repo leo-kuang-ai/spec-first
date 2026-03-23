@@ -32,6 +32,36 @@ describe('Defect CRUD', () => {
     expect(d2.seq).toBe(2);
   });
 
+  it('should reject invalid linkedFr in defect register', () => {
+    expect(() =>
+      registerDefect(
+        FEAT,
+        { severity: 'S2', title: 'Bug', reporter: 'Leo', linkedFr: 'TC-UT-AUTH-001' },
+        TMP
+      )
+    ).toThrow(/linkedFr/);
+  });
+
+  it('should reject invalid linkedTc in defect register', () => {
+    expect(() =>
+      registerDefect(
+        FEAT,
+        { severity: 'S2', title: 'Bug', reporter: 'Leo', linkedTc: 'FR-AUTH-001' },
+        TMP
+      )
+    ).toThrow(/linkedTc/);
+  });
+
+  it('should reject invalid discoveredIn in defect register', () => {
+    expect(() =>
+      registerDefect(
+        FEAT,
+        { severity: 'S2', title: 'Bug', reporter: 'Leo', discoveredIn: '99_x' as Stage },
+        TMP
+      )
+    ).toThrow(/discoveredIn/);
+  });
+
   it('should get defect by seq', () => {
     registerDefect(FEAT, { severity: 'S3', title: 'Test', reporter: 'Leo' }, TMP);
     const d = getDefect(FEAT, 1, TMP);

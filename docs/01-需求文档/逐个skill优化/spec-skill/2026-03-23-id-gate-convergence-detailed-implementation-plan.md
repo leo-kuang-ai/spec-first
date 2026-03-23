@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript, Vitest, Markdown, YAML, existing `spec-first` CLI/core modules.
 
+**当前进度:** Phase 0-4 已完成核心实现和回归验证；Phase 5 的文档术语统一、兼容性收口与残余校验仍在继续，文档中的少量待补项保留为后续小修任务。
+
 ---
 
 ## 1. 目标态定义
@@ -41,6 +43,7 @@ ID 体系按两层看：
   - `MatrixRow`
 
 主链路负责推进和交付解释，补充 ID 负责治理、豁免、回流和验证留痕。
+其中 `relationship-graph.ts` 当前只负责 row-tier 可表达的 `TC / RFC` 分类；`EX`、`Defect`、`MatrixRow` 保留在各自治理/矩阵模块里，不进入 row-tier 节点集合。
 
 ### 1.3 不做项
 
@@ -299,14 +302,14 @@ ID 体系按两层看：
 
 **Step 1: 写失败测试**
 - 断言主链路只认 `Feature -> REQ -> FR -> DS -> TASK`。
-- 断言补充链路只认 `TC / RFC / EX / Defect / MatrixRow`。
+- 断言补充链路在 row-tier 上只认 `TC / RFC`；`EX / Defect / MatrixRow` 不属于 row-tier 节点集合。
 
 **Step 2: 建立 graph helper**
 - 在 `relationship-graph.ts` 定义：
   - 主链路节点类型
-  - 补充节点类型
+  - row-tier 补充节点类型
   - upstream / downstream / link / waiver 的关系标签
-- 让所有 trace / RFC / defect / link 校验都引用它。
+- 让所有 trace / RFC / link 校验都引用它；`Defect` / `MatrixRow` 继续走各自模块，不强行塞进 row-tier helper。
 
 **Step 3: 收敛解释口径**
 - `src/core/task-plan/parser.ts` 保持只消费现有 traces，不把 `TC` 强行塞进执行节点。

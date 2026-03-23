@@ -180,7 +180,7 @@ function checkBlockers(
     input.gateStatus !== 'PASS_WITH_WAIVER' &&
     input.gateStatus !== 'PILOT_PASS'
   ) {
-    reasons.push('Gate 未通过，需先修复失败条件后再推进阶段');
+    reasons.push('stage-gate 未通过，需先修复失败条件后再推进阶段');
     reasonCodes.push(ReasonCode.GATE_FAILED);
   }
 

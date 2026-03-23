@@ -67,12 +67,23 @@
 - [spec-first-00-first-深挖问题修改验证.md](./spec-first-00-first-深挖问题修改验证.md)
 - [spec-first-03-04-06-07-12-深挖问题修改验证.md](./spec-first-03-04-06-07-12-深挖问题修改验证.md)
 - [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
-
-### 收敛方案
-
 - [2026-03-23-id-gate-convergence-plan.md](./2026-03-23-id-gate-convergence-plan.md)
 - [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](./2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
 
-### 后续推进
+### 收敛方案
 
-- 当前已完成阶段性梳理和收敛方案整理，后续将按收敛方案的 Phase 1 -> Phase 5 继续推进代码与文档同步优化。
+- 这两份文档已归入“已完成”状态，作为收敛方案的历史入口保留在上方列表。
+
+### 代码落地进度
+
+- Phase 0: 已完成，回归基线已建立。
+- Phase 1: 已完成，gate taxonomy / gate 输出口径已收敛。
+- Phase 2: 已完成，ID taxonomy 已共享化。
+- Phase 3: 已完成主链路收敛，关系图 helper 已落地，defect 回流校验已闭合。
+- Phase 4: 已完成消费端表述对齐。
+- Phase 5: 进行中，文档术语统一与收尾回归继续推进。
+
+### 待补关注点
+
+- `TaskNode` 相关关系展示仍以窄结构为主，补充链路只在视图层展开。
+- `skills/spec-first` 的术语统一按需分批替换，避免机械全量改写。

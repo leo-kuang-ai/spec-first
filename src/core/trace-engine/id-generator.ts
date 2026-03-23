@@ -8,6 +8,7 @@ import type { NextIdType, TcLevel } from '../../shared/types.js';
 import { exists, readJson, readMarkdown, writeJson } from '../../shared/fs-utils.js';
 import { withFileLock } from '../../shared/file-lock.js';
 import { validateId } from './id-validator.js';
+import { ID_SCAN_PATTERN } from './id-taxonomy.js';
 
 export interface NextIdOptions {
   type: NextIdType;
@@ -21,8 +22,6 @@ export interface NextIdResult {
   id: string;
   seq: number;
 }
-
-const ID_PATTERN = /\b(?:FR|DS|TASK|TC-(?:UT|IT|E2E|ST)|RFC|REQ|SYS|ARCH|MOD|ATP|STP|ITP|UTP)-[A-Z0-9]+-\d{3}\b|\bRFC-\d{3}\b/g;
 
 export function nextId(opts: NextIdOptions): NextIdResult {
   return withFileLock(join(opts.projectRoot, 'specs', opts.featureId, '.id.lock'), () => {
@@ -97,7 +96,7 @@ export function collectKnownIds(projectRoot: string, featureId: string): string[
   for (const relativePath of walkFeatureTextFiles(featureDir, '')) {
     const fullPath = join(featureDir, relativePath);
     const content = readMarkdown(fullPath);
-    const matches = content.match(ID_PATTERN) ?? [];
+    const matches = content.match(ID_SCAN_PATTERN) ?? [];
     for (const match of matches) {
       const validation = validateId(match);
       if (validation.valid) ids.add(match);

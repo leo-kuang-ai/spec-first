@@ -9,30 +9,15 @@ import { validateId } from '../../core/trace-engine/id-validator.js';
 import { searchId, listIds } from '../../core/trace-engine/id-search.js';
 import { resolveFeatureId } from '../../core/process-engine/feature.js';
 import { parseFlag } from '../parse-utils.js';
-
-// 有效的 NextIdType 值
-const VALID_NEXT_TYPES: ReadonlySet<NextIdType> = new Set([
-  'FR',
-  'DS',
-  'TASK',
-  'TC',
-  'RFC',
-  'REQ',
-  'SYS',
-  'ARCH',
-  'MOD',
-  'ATP',
-  'STP',
-  'ITP',
-  'UTP',
-]);
-
-// 有效的 IdType 值（用于 search/list）
-// 注意：只包含 IdType 类型的值（NFR/API 不在 IdType 中）
-const VALID_ID_TYPES: ReadonlySet<string> = new Set(['FR', 'DS', 'TASK', 'TC', 'RFC', 'Feature']);
-
-// 有效的 TcLevel 值
-const VALID_TC_LEVELS: ReadonlySet<TcLevel> = new Set(['UT', 'IT', 'E2E', 'ST']);
+import {
+  NEXT_ID_TYPES,
+  VALID_ID_TYPES,
+  VALID_NEXT_ID_TYPES,
+  VALID_TC_LEVELS,
+  isIdType,
+  isNextIdType,
+  isTcLevel,
+} from '../../core/trace-engine/id-taxonomy.js';
 
 export function handleId(args: string[]): number {
   const sub = args[0];
@@ -64,26 +49,26 @@ function handleNext(args: string[]): number {
     console.error(
       '用法：spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]'
     );
-    console.error('  <type>: FR|DS|TASK|TC|RFC|REQ|SYS|ARCH|MOD|ATP|STP|ITP|UTP');
+    console.error(`  <type>: ${NEXT_ID_TYPES.join('|')}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
   // 校验 type 参数
-  if (!VALID_NEXT_TYPES.has(typeArg as NextIdType)) {
+  if (!isNextIdType(typeArg)) {
     console.error(`错误：无效的 type "${typeArg}"`);
-    console.error(`有效值：${Array.from(VALID_NEXT_TYPES).join(', ')}`);
+    console.error(`有效值：${Array.from(VALID_NEXT_ID_TYPES).join(', ')}`);
     return ExitCode.VALIDATION_ERROR;
   }
 
   // 校验 tcLevel 参数（如果提供）
   let tcLevel: TcLevel | undefined;
   if (tcLevelArg) {
-    if (!VALID_TC_LEVELS.has(tcLevelArg as TcLevel)) {
+    if (!isTcLevel(tcLevelArg)) {
       console.error(`错误：无效的 level "${tcLevelArg}"`);
       console.error(`有效值：${Array.from(VALID_TC_LEVELS).join(', ')}`);
       return ExitCode.VALIDATION_ERROR;
     }
-    tcLevel = tcLevelArg as TcLevel;
+    tcLevel = tcLevelArg;
   }
 
   const type = typeArg as NextIdType;
@@ -134,7 +119,7 @@ function handleSearch(args: string[]): number {
   // 校验 type 参数（如果提供）
   let type: IdType | undefined;
   if (typeArg) {
-    if (!VALID_ID_TYPES.has(typeArg as IdType)) {
+    if (!isIdType(typeArg)) {
       console.error(`错误：无效的 type "${typeArg}"`);
       console.error(`有效值：${Array.from(VALID_ID_TYPES).join(', ')}`);
       return ExitCode.VALIDATION_ERROR;
@@ -166,7 +151,7 @@ function handleList(args: string[]): number {
   // 校验 type 参数（如果提供）
   let type: IdType | undefined;
   if (typeArg) {
-    if (!VALID_ID_TYPES.has(typeArg as IdType)) {
+    if (!isIdType(typeArg)) {
       console.error(`错误：无效的 type "${typeArg}"`);
       console.error(`有效值：${Array.from(VALID_ID_TYPES).join(', ')}`);
       return ExitCode.VALIDATION_ERROR;

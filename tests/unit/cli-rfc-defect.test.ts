@@ -3,6 +3,7 @@ import { mkdirSync, rmSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleRfc } from '../../src/cli/commands/rfc.js';
 import { handleDefect } from '../../src/cli/commands/defect.js';
+import { getDefect } from '../../src/core/change-mgr/defect.js';
 import { ExitCode } from '../../src/shared/types.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-cm');
@@ -82,6 +83,71 @@ describe('Defect CLI', () => {
       handleDefect(['register', FEAT, '--severity', 'S2', '--title', 'Bug A']),
     );
     expect(code).toBe(ExitCode.SUCCESS);
+  });
+
+  it('should persist linkedTc for defect register', () => {
+    const code = withCwd(TMP, () =>
+      handleDefect([
+        'register',
+        FEAT,
+        '--severity',
+        'S2',
+        '--title',
+        'Bug A',
+        '--linked-tc',
+        'TC-UT-AUTH-001',
+      ]),
+    );
+    expect(code).toBe(ExitCode.SUCCESS);
+    expect(getDefect(FEAT, 1, TMP).linkedTc).toBe('TC-UT-AUTH-001');
+  });
+
+  it('should reject defect register with invalid linkedFr type', () => {
+    const code = withCwd(TMP, () =>
+      handleDefect([
+        'register',
+        FEAT,
+        '--severity',
+        'S2',
+        '--title',
+        'Bug A',
+        '--linked-fr',
+        'TC-UT-AUTH-001',
+      ]),
+    );
+    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+  });
+
+  it('should reject defect register with invalid linkedTc type', () => {
+    const code = withCwd(TMP, () =>
+      handleDefect([
+        'register',
+        FEAT,
+        '--severity',
+        'S2',
+        '--title',
+        'Bug A',
+        '--linked-tc',
+        'FR-AUTH-001',
+      ]),
+    );
+    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+  });
+
+  it('should reject defect register with invalid discoveredIn stage', () => {
+    const code = withCwd(TMP, () =>
+      handleDefect([
+        'register',
+        FEAT,
+        '--severity',
+        'S2',
+        '--title',
+        'Bug A',
+        '--discovered-in',
+        '99_x',
+      ]),
+    );
+    expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
   it('should reject register without required flags', () => {

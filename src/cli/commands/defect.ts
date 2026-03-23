@@ -3,7 +3,8 @@
  * spec-first defect register|update|list|get|escape-rate
  */
 import { ExitCode } from '../../shared/types.js';
-import type { DefectStatus, SecuritySeverity, Stage } from '../../shared/types.js';
+import { Stage } from '../../shared/types.js';
+import type { DefectStatus, SecuritySeverity } from '../../shared/types.js';
 import {
   registerDefect,
   getDefect,
@@ -11,6 +12,7 @@ import {
   listDefects,
   getEscapeRate,
 } from '../../core/change-mgr/defect.js';
+import { validateId } from '../../core/trace-engine/id-validator.js';
 import { parseFlag } from '../parse-utils.js';
 
 const VALID_SEVERITIES: ReadonlySet<string> = new Set(['S1', 'S2', 'S3', 'S4']);
@@ -21,6 +23,23 @@ const VALID_STATUSES: ReadonlySet<string> = new Set([
   'verified',
   'wontfix',
 ]);
+const VALID_STAGES: ReadonlySet<string> = new Set(Object.values(Stage));
+
+function validateLinkedId(field: 'linked-fr' | 'linked-tc', value?: string): string | undefined {
+  if (!value) return undefined;
+
+  const validation = validateId(value);
+  if (!validation.valid || !validation.type) {
+    throw new Error(`${field} "${value}" 不是有效 ID`);
+  }
+
+  const expectedType = field === 'linked-fr' ? 'FR' : 'TC';
+  if (validation.type !== expectedType) {
+    throw new Error(`${field} "${value}" 必须是 ${expectedType} 类型`);
+  }
+
+  return value;
+}
 
 export function handleDefect(args: string[]): number {
   const sub = args[0];
@@ -50,12 +69,13 @@ function handleRegister(args: string[]): number {
   const title = parseFlag(args, '--title');
   const reporter = parseFlag(args, '--reporter') ?? 'cli';
   const description = parseFlag(args, '--description');
-  const discoveredIn = parseFlag(args, '--discovered-in') as Stage | undefined;
-  const linkedFr = parseFlag(args, '--linked-fr');
+  const discoveredInRaw = parseFlag(args, '--discovered-in');
+  const linkedFrRaw = parseFlag(args, '--linked-fr');
+  const linkedTcRaw = parseFlag(args, '--linked-tc');
 
   if (!featureId || !severity || !title) {
     console.error(
-      '用法：spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" --reporter "<name>"'
+      '用法：spec-first defect register <featureId> --severity <S1|S2|S3|S4> --title "<title>" --reporter "<name>" [--linked-fr <frId>] [--linked-tc <tcId>]'
     );
     return ExitCode.VALIDATION_ERROR;
   }
@@ -66,6 +86,12 @@ function handleRegister(args: string[]): number {
   }
 
   try {
+    if (discoveredInRaw && !VALID_STAGES.has(discoveredInRaw)) {
+      throw new Error(`无效 discovered-in "${discoveredInRaw}"：必须是 ${Array.from(VALID_STAGES).join('、')}`);
+    }
+    const linkedFr = validateLinkedId('linked-fr', linkedFrRaw);
+    const linkedTc = validateLinkedId('linked-tc', linkedTcRaw);
+
     const d = registerDefect(
       featureId,
       {
@@ -73,8 +99,9 @@ function handleRegister(args: string[]): number {
         title,
         reporter,
         description: description ?? undefined,
-        discoveredIn,
-        linkedFr: linkedFr ?? undefined,
+        discoveredIn: discoveredInRaw as Stage | undefined,
+        linkedFr,
+        linkedTc,
       },
       process.cwd()
     );

@@ -1,6 +1,7 @@
 import { join } from 'node:path';
 import type { TaskNode } from '../batch-executor/types.js';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
+import { splitCanonicalTraceIds } from '../trace-engine/relationship-graph.js';
 
 export type ParsedTaskStatus = 'pending' | 'in_progress' | 'complete' | 'blocked';
 
@@ -166,21 +167,24 @@ export function getCurrentTaskId(projectRoot: string, featureId: string): string
 }
 
 export function toTaskNodes(plan: ParsedTaskPlan): TaskNode[] {
-  return plan.tasks.map((task) => ({
-    id: task.id,
-    title: task.title,
-    description: '',
-    acceptanceCriteria: [],
-    dependsOn: task.dependsOn,
-    status:
-      task.status === 'complete'
-        ? 'done'
-        : task.status === 'in_progress'
-          ? 'in_progress'
-          : task.status === 'blocked'
-            ? 'blocked'
-            : 'todo',
-    relatedFR: task.traces.filter((trace) => trace.startsWith('FR-')),
-    relatedDS: task.traces.filter((trace) => trace.startsWith('DS-')),
-  }));
+  return plan.tasks.map((task) => {
+    const partitions = splitCanonicalTraceIds(task.traces);
+    return {
+      id: task.id,
+      title: task.title,
+      description: '',
+      acceptanceCriteria: [],
+      dependsOn: task.dependsOn,
+      status:
+        task.status === 'complete'
+          ? 'done'
+          : task.status === 'in_progress'
+            ? 'in_progress'
+            : task.status === 'blocked'
+              ? 'blocked'
+              : 'todo',
+      relatedFR: partitions.relatedFRIds,
+      relatedDS: partitions.relatedDSIds,
+    };
+  });
 }

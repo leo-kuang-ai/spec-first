@@ -1,6 +1,6 @@
 ---
 name: "spec-first:verify"
-description: "Use when a feature reaches a stage gate and you need evidence-based acceptance checks before advancing to the next stage."
+description: "Use when a feature reaches a stage-gate and you need evidence-based acceptance checks before advancing to the next stage."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: |

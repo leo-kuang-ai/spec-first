@@ -4,10 +4,12 @@
  */
 import { join } from 'node:path';
 import { readdirSync } from 'node:fs';
-import type { DefectStatus, SecuritySeverity, DefectRecord, Stage } from '../../shared/types.js';
+import { Stage } from '../../shared/types.js';
+import type { DefectStatus, SecuritySeverity, DefectRecord } from '../../shared/types.js';
 import { readJson, readJsonChecked, writeJson, exists, ensureDir } from '../../shared/fs-utils.js';
 import { isDefectRecord } from '../../shared/validators.js';
 import { assertDefectTransition } from './defect-machine.js';
+import { validateId } from '../trace-engine/id-validator.js';
 
 // ─── 类型 ────────────────────────────────────────────────
 
@@ -52,6 +54,30 @@ function nextDefectSeq(projectRoot: string, featureId: string): number {
   return maxSeq + 1;
 }
 
+const VALID_STAGES: ReadonlySet<string> = new Set(Object.values(Stage));
+
+function validateOptionalLinkedId(
+  field: 'linkedFr' | 'linkedTc',
+  value: string | undefined,
+  expectedType: 'FR' | 'TC'
+): void {
+  if (!value) return;
+
+  const validation = validateId(value);
+  if (!validation.valid || validation.type !== expectedType) {
+    throw new Error(`${field} "${value}" 必须是 ${expectedType} 类型`);
+  }
+}
+
+function validateDefectRegisterOptions(opts: DefectRegisterOptions): void {
+  if (opts.discoveredIn && !VALID_STAGES.has(opts.discoveredIn)) {
+    throw new Error(`discoveredIn "${opts.discoveredIn}" 无效：必须是合法 stage`);
+  }
+
+  validateOptionalLinkedId('linkedFr', opts.linkedFr, 'FR');
+  validateOptionalLinkedId('linkedTc', opts.linkedTc, 'TC');
+}
+
 // ─── CRUD ────────────────────────────────────────────────
 
 /** 注册缺陷，Feature 内自增序号 */
@@ -60,6 +86,7 @@ export function registerDefect(
   opts: DefectRegisterOptions,
   projectRoot: string
 ): DefectRecord {
+  validateDefectRegisterOptions(opts);
   const dir = defectDir(projectRoot, featureId);
   ensureDir(dir);
 

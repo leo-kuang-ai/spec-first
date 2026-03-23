@@ -107,7 +107,7 @@ export async function dispatch(args: string[]): Promise<number> {
   if (shouldRequireConfirmation(entry.requiresConfirmation, subArgs)) {
     const policy = resolveConfirmPolicy(subArgs);
     if (policy !== 'auto' && !confirmed) {
-      console.error(`命令 ${cmd} 需要确认：policy=${policy}。请追加 --yes 重试。`);
+      console.error(`命令 ${cmd} 需要确认：confirm-policy=${policy}。请追加 --yes 重试。`);
       return ExitCode.VALIDATION_ERROR;
     }
   }

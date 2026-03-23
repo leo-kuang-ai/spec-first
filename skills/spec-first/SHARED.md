@@ -130,7 +130,7 @@ P5_SIDE_EFFECT — 副作用执行
 | Skill 类型 | 代表 Skill | P3_CONFIRM | P4_WRITE | findings.md | stage advance | 说明 |
 | --- | --- | --- | --- | --- | --- | --- |
 | 产物生成型 | 03-spec / 04-design / 06-task / 07-code / 10-archive / 20-spec-review | 必须 | 允许写 Feature 交付物 | 必须 | 仅部分允许 | 使用默认 P0-P5 模板 |
-| 只读诊断型 | 11-plan / 12-verify / 14-status / 21-analyze | 视 confirm policy | 不写交付物 | 建议或必须按各自声明 | 不允许，verify 只提供证据 | 可以写运行态摘要，但不应伪装成产物写入 |
+| 只读诊断型 | 11-plan / 12-verify / 14-status / 21-analyze | 视 confirm-policy | 不写交付物 | 建议或必须按各自声明 | 不允许，verify 只提供证据 | 可以写运行态摘要，但不应伪装成产物写入 |
 | 路由控制型 | 02-catchup / 13-orchestrate / 16-sync / 17-feature | 按各自声明 | 只允许写运行态或控制面文件 | 必须按各自声明 | 仅 orchestrate 允许 | 不强制套用 `id next` 或产物生成流程 |
 | 宿主修复型 | 15-doctor | assisted | 不写项目交付物，可更新宿主配置 | 不要求写 Feature findings | 不允许 | 作用域是用户环境，不是 Feature 工作区 |
 
@@ -161,7 +161,7 @@ P5_SIDE_EFFECT — 副作用执行
 
 ## 确认策略（Confirm Policy）
 
-| policy | P3 行为 | 适用场景 |
+| confirm-policy | P3 行为 | 适用场景 |
 | --- | --- | --- |
 | auto | 跳过用户确认，P2 完成后直接进入 P4 | 只读/低风险操作 |
 | assisted | 展示生成内容摘要，用户可确认、修改或拒绝 | 中等风险操作 |

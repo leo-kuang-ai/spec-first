@@ -161,6 +161,19 @@ describe('handleGoLive', () => {
     const code = withCwd(TMP, () => handleGoLive(['check']));
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
+
+  it('should print confirm-policy using the canonical label when degraded', () => {
+    writeState('05_verify');
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      const code = withCwd(TMP, () => handleGoLive(['check', FEAT]));
+      expect(code).toBe(ExitCode.VALIDATION_ERROR);
+      expect(logSpy.mock.calls.flat().join('\n')).toContain('confirm-policy 已降级为');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
 });
 
 // ─── GoLive Core Tests ──────────────────────────────────

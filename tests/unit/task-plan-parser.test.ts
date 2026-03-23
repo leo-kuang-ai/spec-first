@@ -39,7 +39,7 @@ describe('task-plan parser', () => {
     const parsed = parseTaskPlanContent([
       '| Task ID | 标题 | traces | depends_on | 状态 |',
       '|---|---|---|---|---|',
-      '| TASK-AUTH-001 | Login | FR-AUTH-001, DS-AUTH-001 | - | in_progress |',
+      '| TASK-AUTH-001 | Login | FR-AUTH-001, DS-AUTH-001, TC-UT-AUTH-001 | - | in_progress |',
     ].join('\n'));
 
     expect(toTaskNodes(parsed)).toEqual([

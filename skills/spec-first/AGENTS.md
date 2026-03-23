@@ -450,9 +450,9 @@ P5_SIDE_EFFECT — 副作用执行
 
 ### 确认策略执行语义
 
-每个 Skill 声明一种 confirm_policy，决定 P3 阶段的交互模式：
+每个 Skill 声明一种 confirm-policy，决定 P3 阶段的交互模式：
 
-| policy | P3 行为 | 适用场景 |
+| confirm-policy | P3 行为 | 适用场景 |
 | --- | --- | --- |
 | auto | 跳过用户确认，P2 完成后直接进入 P4 | 只读/低风险操作（status、verify、feature） |
 | assisted | 展示生成内容摘要，用户可确认、修改或拒绝 | 中等风险操作（catchup、task、review、sync、doctor、feature） |
@@ -504,7 +504,7 @@ P5_SIDE_EFFECT — 副作用执行
 ### 人在回路
 
 - 涉及关键交付物（`spec.md` / `design.md` / `task_plan.md` 等）写入前，**必须展示给用户确认**
-- `confirm_policy = auto` 的 Skill 可跳过 P3，但仅允许只读或写入运行态文件（如 `findings.md`）
+- `confirm-policy = auto` 的 Skill 可跳过 P3，但仅允许只读或写入运行态文件（如 `findings.md`）
 - `assisted` / `strict` 场景下，用户拒绝时必须根据反馈修改后重新展示
 
 ### 阶段纪律

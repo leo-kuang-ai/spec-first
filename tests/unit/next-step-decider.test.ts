@@ -119,6 +119,7 @@ describe('decideNextStep', () => {
     });
 
     expect(result.decision).toBe('BLOCKED');
+    expect(result.reasons.join(' ')).toContain('stage-gate');
     expect(result.reasonCodes).toContain(ReasonCode.GATE_FAILED);
   });
 });

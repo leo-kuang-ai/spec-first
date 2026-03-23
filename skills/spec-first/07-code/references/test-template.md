@@ -114,7 +114,7 @@ const fetchSpy = vi.spyOn(globalThis, 'fetch');
 
 ### backend
 
-- 优先测试 service / validator / handler error path / policy
+- 优先测试 service / validator / handler error path / guard
 - 外部依赖重的改动可用 integration / contract test 充当 RED
 
 ### shared

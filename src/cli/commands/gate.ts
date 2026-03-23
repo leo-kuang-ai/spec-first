@@ -228,7 +228,7 @@ function handleGoLiveCheck(args: string[]): number {
 
     console.log(`\n结果：${result.pass ? '可上线' : '未就绪'}`);
     if (result.degraded) {
-      console.log(`confirm_policy 已降级为：${result.confirmPolicy}`);
+      console.log(`confirm-policy 已降级为：${result.confirmPolicy}`);
     }
 
     return result.pass ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;

@@ -1,5 +1,5 @@
 /**
- * confirm_policy Evaluator
+ * confirm-policy evaluator
  * 基于四维输入自动判定确认策略
  */
 import { join } from 'node:path';

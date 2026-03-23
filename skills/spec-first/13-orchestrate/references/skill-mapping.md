@@ -95,9 +95,9 @@ design --feature FSREQ-20260305-AUTH-001
 
 ---
 
-### confirm_policy 保持
+### confirm-policy 保持
 
-**规则**: 子 Skill 的 confirm_policy 保持各自定义
+**规则**: 子 Skill 的 confirm-policy 保持各自定义
 
 **示例**:
 - orchestrate: strict

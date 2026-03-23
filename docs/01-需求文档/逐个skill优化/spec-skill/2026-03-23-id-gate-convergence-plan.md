@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript, YAML, Markdown, existing `spec-first` runtime and trace modules.
 
+**当前进度:** Phase 0-4 的核心代码收敛已经落地，Phase 5 的文档术语统一与收尾回归仍在推进中；个别补强点会以后续小修补齐，而不是回退整个方案。
+
 ---
 
 ## 收敛目标
@@ -32,6 +34,7 @@
   - `Defect -> FR / TC`
   - `MatrixRow -> upstream / downstream`
 - 其他关系模型只允许做补充，不允许再生成新解释层。
+  - 其中 `relationship-graph.ts` 只负责 `MatrixRow.type` 能表达的 row-tier 分类，当前收口到 `TC / RFC`；`Defect` / `MatrixRow` 本身仍由各自治理与矩阵模块表达，不进入 row-tier 类型集合。
 
 ### 目标 3：消歧与对齐
 
@@ -184,7 +187,7 @@
 
 **Step 2: 选定补充链路**
 
-把 `RFC / EX / Defect / MatrixRow` 定义成补充链路，不参与主链路排序。
+把 `TC / RFC` 定义成补充链路的 row-tier 类型，不参与主链路排序；`EX / Defect / MatrixRow` 作为治理/矩阵对象单独处理，不放入 row-tier 类型集合。
 
 **Step 3: 统一术语**
 

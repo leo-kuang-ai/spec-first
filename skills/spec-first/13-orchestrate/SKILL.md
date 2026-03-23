@@ -223,7 +223,7 @@ Stage -> Skill 映射（P4 按此表调度）：
 ### 参数传递
 
 - 所有子 Skill 继承 orchestrate 的 featureId
-- 子 Skill 的 confirm_policy 保持各自定义（不被 orchestrate 覆盖）
+- 子 Skill 的 confirm-policy 保持各自定义（不被 orchestrate 覆盖）
 
 
 ## 背景治理口径

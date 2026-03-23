@@ -3,6 +3,8 @@
  * 消除隐式字符串协议，所有模块统一引用
  */
 
+import type { IdType } from '../core/trace-engine/id-taxonomy.js';
+
 // ─── Stage 枚举 ───────────────────────────────────────────
 export enum Stage {
   INIT = '00_init',
@@ -21,24 +23,20 @@ export enum Stage {
 export const TERMINAL_STAGES: ReadonlySet<Stage> = new Set([Stage.DONE, Stage.CANCELLED]);
 
 // ─── ID 类型 ──────────────────────────────────────────────
-export type NextIdType =
-  | 'FR'
-  | 'DS'
-  | 'TASK'
-  | 'TC'
-  | 'RFC'
-  | 'REQ'
-  | 'SYS'
-  | 'ARCH'
-  | 'MOD'
-  | 'ATP'
-  | 'STP'
-  | 'ITP'
-  | 'UTP';
-export type IdType = NextIdType | 'Feature';
-
-/** TC 级别前缀 */
-export type TcLevel = 'UT' | 'IT' | 'E2E' | 'ST';
+export {
+  ID_PATTERNS,
+  ID_SCAN_PATTERN,
+  ID_TYPES,
+  NEXT_ID_TYPES,
+  TC_LEVELS,
+  VALID_ID_TYPES,
+  VALID_NEXT_ID_TYPES,
+  VALID_TC_LEVELS,
+  isIdType,
+  isNextIdType,
+  isTcLevel,
+} from '../core/trace-engine/id-taxonomy.js';
+export type { IdType, NextIdType, TcLevel } from '../core/trace-engine/id-taxonomy.js';
 
 // ─── Mode / Size ──────────────────────────────────────────
 export type Mode = 'N' | 'I';

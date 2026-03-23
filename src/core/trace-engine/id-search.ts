@@ -2,7 +2,7 @@
  * ID 搜索
  * 基于源文档内容与预留登记，不再依赖外部关系表。
  */
-import type { IdType } from '../../shared/types.js';
+import type { IdType } from './id-taxonomy.js';
 import { validateId } from './id-validator.js';
 import { collectKnownIds } from './id-generator.js';
 
