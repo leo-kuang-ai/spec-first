@@ -12,12 +12,12 @@
 Feature: {featureId}
 
 回填项 ({count}):
-- FR-AUTH-001 → 补充 DS 映射
-- DS-AUTH-003 → 补充 TASK 映射
+- FR-AUTH-001 → 补充文档引用
+- DS-AUTH-003 → 补充文档引用
 
-Orphan 项 ({count}):
-- DS-AUTH-005 (无 FR 映射)
-- TASK-007 (无 DS 映射)
+断链项 ({count}):
+- DS-AUTH-005 (引用断链)
+- TASK-007 (引用断链)
 
 状态更新 ({count}):
 - FR-AUTH-001: Planned → Implemented
@@ -31,17 +31,17 @@ Orphan 项 ({count}):
 ## 成功输出
 
 ```markdown
-✅ 同步完成
+✅ 文档关联同步完成
 
 Feature: FSREQ-20260305-AUTH-001
 
 执行摘要:
 - 回填: 2 项
-- 删除 orphan: 1 项
+- 删除断链: 1 项
 - 状态更新: 2 项
 
 已更新:
-- specs/FSREQ-20260305-AUTH-001/traceability-matrix.md
+- specs/FSREQ-20260305-AUTH-001/document-links.yaml
 - specs/FSREQ-20260305-AUTH-001/findings.md
 ```
 
@@ -50,13 +50,13 @@ Feature: FSREQ-20260305-AUTH-001
 ## 无变更输出
 
 ```markdown
-✅ 矩阵已同步
+✅ 文档关联已同步
 
 Feature: FSREQ-20260305-AUTH-001
 
 检查结果:
-- 无缺失关联
-- 无 orphan 项
+- 无缺失引用
+- 无断链项
 - 状态已是最新
 
 无需同步。
@@ -69,8 +69,8 @@ Feature: FSREQ-20260305-AUTH-001
 ```markdown
 ❌ 同步失败
 
-原因: traceability-matrix.md 不存在
+原因: document-links.yaml 不存在
 
 💡 解决方案:
-先补齐 `traceability-matrix.md`，再运行 `/spec-first:sync`
+先补齐 `document-links.yaml`，再运行 `/spec-first:sync`
 ```

@@ -22,6 +22,13 @@ describe('00-first evidence pack and bundle contract', () => {
     expect(spec).toContain('主线程只发包，不发长证据');
   });
 
+  it('defines shared summary as a skill-layer execution artifact', () => {
+    const spec = read(join(FIRST_REFS, 'evidence-pack-spec.md'));
+    expect(spec).toContain('shared/summary.json');
+    expect(spec).toContain('serena_available');
+    expect(spec).toContain('Skill 层执行产物');
+  });
+
   it('keeps the review bundle focused on design and implementation only', () => {
     const readme = read(BUNDLE_README);
     expect(readme).toContain('设计与实施说明');

@@ -85,9 +85,9 @@ spec-first gate check <featureId>
    - 文件路径: `specs/{featureId}/spec.md`
    - 必含内容: FR 列表 + AC 列表
 
-3. **FR 已注册到追溯矩阵**
-   - 文件路径: `specs/{featureId}/traceability-matrix.md`
-   - 检查: 所有 FR ID 已注册
+3. **文档关联已同步**
+   - 文件路径: `specs/{featureId}/document-links.yaml`
+   - 检查: spec.md / prd.md / findings.md 的引用关系可解析
 
 4. **spec-review.md 存在**（如需要）
    - 文件路径: `specs/{featureId}/spec-review.md`
@@ -99,7 +99,7 @@ spec-first gate check <featureId>
 |---------|---------|
 | C-PRD < 85% | 返回 Phase 0.3 修正 PRD，重新执行 Phase 0.4-0.6 |
 | 缺少文件 | 补齐后重新执行 gate check |
-| FR 未注册 | 执行注册后重新执行 gate check |
+| 文档关联未同步 | 运行 docs links validate 后重新执行 gate check |
 
 **阻断规则**: 不得跳过 gate check 进入下一阶段
 

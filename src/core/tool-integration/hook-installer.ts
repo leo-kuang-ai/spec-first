@@ -3,7 +3,7 @@
  * 4 个 Git Hook: prepare-commit-msg, commit-msg, pre-push, pre-commit
  */
 import { join } from 'node:path';
-import { writeFileSync, chmodSync, readFileSync, unlinkSync } from 'node:fs';
+import { writeFileSync, chmodSync, readFileSync, unlinkSync, lstatSync, mkdirSync } from 'node:fs';
 import { exists } from '../../shared/fs-utils.js';
 
 const HOOK_NAMES = ['prepare-commit-msg', 'commit-msg', 'pre-push', 'pre-commit'] as const;
@@ -17,6 +17,14 @@ export interface HookStatus {
 }
 
 const MARKER = '# spec-first-hook';
+
+function isSymbolicLink(path: string): boolean {
+  try {
+    return lstatSync(path).isSymbolicLink();
+  } catch {
+    return false;
+  }
+}
 
 function mergeHookContent(existing: string, generated: string): string {
   if (!existing.trim()) return generated;
@@ -44,12 +52,18 @@ export function installHooks(projectRoot: string, options?: { dryRun?: boolean }
   const hooksDir = join(projectRoot, '.git', 'hooks');
   const installed: string[] = [];
 
+  if (!options?.dryRun) {
+    mkdirSync(hooksDir, { recursive: true });
+  }
+
   for (const name of HOOK_NAMES) {
     const hookPath = join(hooksDir, name);
     const generated = generateHookScript(name);
+    const linked = isSymbolicLink(hookPath);
     const existing = exists(hookPath) ? readFileSync(hookPath, 'utf-8') : '';
     const content = mergeHookContent(existing, generated);
     if (!options?.dryRun) {
+      if (linked) unlinkSync(hookPath);
       writeFileSync(hookPath, content, 'utf-8');
       chmodSync(hookPath, 0o755);
     }
@@ -141,13 +155,13 @@ if command -v npx >/dev/null 2>&1; then
   fi
 
   if [ -z "$FEAT_ID" ]; then
-    echo "spec-first: 跳过 matrix 检查（未设置当前 feature）"
+    echo "spec-first: 跳过 docs 校验（未设置当前 feature）"
     exit 0
   fi
 
-  npx spec-first matrix check "$FEAT_ID"
+  npx spec-first docs validate "$FEAT_ID"
   if [ $? -ne 0 ]; then
-    echo "错误：$FEAT_ID 的 spec-first matrix check 失败，已阻止 push。"
+    echo "错误：$FEAT_ID 的 spec-first docs validate 失败，已阻止 push。"
     exit 1
   fi
 fi

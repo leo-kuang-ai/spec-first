@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { vi } from 'vitest';
 import { init } from '../../src/core/process-engine/init.js';
 import type { InitOptions } from '../../src/core/process-engine/init.js';
+import { handleInit } from '../../src/cli/commands/init.js';
 import { Stage } from '../../src/shared/types.js';
 import {
   writeFirstApiContracts,
@@ -68,9 +70,11 @@ describe('init', () => {
     expect(taskPlan).toContain('Task Plan');
     expect(taskPlan).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |');
 
-    // traceability-matrix.md
-    expect(readFileSync(join(result.featureDir, 'traceability-matrix.md'), 'utf-8')).toContain('| ID |');
-
+    // document-links.yaml
+    const documentLinks = readFileSync(join(result.featureDir, 'document-links.yaml'), 'utf-8');
+    expect(documentLinks).toContain('version: 1');
+    expect(documentLinks).toContain(`featureId: ${result.featureId}`);
+    expect(documentLinks).toContain('path: spec.md');
     // constitution.md
     const constitution = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
     expect(constitution).toContain('Constitution');
@@ -350,6 +354,60 @@ describe('init', () => {
     const result = init(baseOpts());
     expect(result.featureId).toMatch(/^FSREQ-\d{8}-AUTH-001$/);
     expect(existsSync(join(specsDir, '.feat-registry.lock'))).toBe(false);
+  });
+});
+
+describe('init CLI help', () => {
+  it('should explain track selection and brownfield baseline guidance', async () => {
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    try {
+      const code = await handleInit(['--help']);
+      expect(code).toBe(0);
+      const output = logSpy.mock.calls.flat().join('\n');
+      expect(output).toContain('典型场景：');
+      expect(output).toContain('新项目创建 / 刚 clone 的远程项目');
+      expect(output).toContain('本地存量项目需求迭代');
+      expect(output).toContain('轨道选择：');
+      expect(output).toContain('--track baseline');
+      expect(output).toContain('--track feature');
+      expect(output).toContain('brownfield-baseline');
+      expect(output).toContain('存量项目会先进入 brownfield-baseline');
+      expect(output).toContain('退出语义：');
+      expect(output).toContain('brownfield-baseline 里的 [n] 是放弃本次基线选择');
+      expect(output).toContain('feature-init 里的取消只是终止当前参数收集');
+    } finally {
+      logSpy.mockRestore();
+    }
+  });
+});
+
+describe('init CLI diagnostics', () => {
+  it('should explain invalid mode and size in feature-init context', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'X', '--size', 'S', '--platforms', 'h5']);
+      expect(code).toBe(2);
+      const output = errorSpy.mock.calls.flat().join('\n');
+      expect(output).toContain('当前处于 feature-init 参数校验阶段');
+      expect(output).toContain('mode "X" 无效');
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it('should explain platform mismatch in feature-init context', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'ios']);
+      expect(code).toBe(2);
+      const output = errorSpy.mock.calls.flat().join('\n');
+      expect(output).toContain('当前处于 feature-init 参数校验阶段');
+      expect(output).toContain('所选 platforms 与 .spec-first/layer2/*.yaml 不匹配');
+      expect(output).toContain('可选平台:');
+      expect(output).toContain('如果你是新项目或刚 clone 的远程项目');
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });
 

@@ -45,7 +45,7 @@ P1  CONTEXT      加载 spec 目录、历史产物与运行记录
 P2  GENERATE     AI 推理，生成结构化交付物草稿
 P3  CONFIRM      用户审阅、迭代或拒绝（支持多轮确认）
 P4  WRITE        最终产物落盘，注册追溯 ID
-P5  副作用       同步追踪矩阵、触发门禁评估、更新运行态
+P5  副作用       同步文档关联索引、触发门禁评估、更新运行态
 ```
 
 这意味着每一次 AI 操作都是**可定位、有上下文、可确认、可审计**的。
@@ -104,6 +104,21 @@ spec-first init --feat AUTH --mode N --size M --platforms web,node
 /spec-first:archive       # 复盘归档，收口 Feature
 ```
 
+### 需求聚焦
+
+当一份已经评审过的需求需要进一步收敛到单一 owner 的交付边界时，使用：
+
+```bash
+/spec-first:focus-requirements
+```
+
+它会把原始需求压缩成 owner-scoped 的 PRD、side requirements 和 handoff summary，重点明确：
+
+- `In Scope / Out of Scope`
+- 依赖边界
+- 可验证的验收标准
+- 交接所需的最小上下文
+
 ### 日常 CLI
 
 ```bash
@@ -129,7 +144,7 @@ spec-first golive check <featureId> # 上线就绪检查
 | `02_design` | 技术设计（DS + API） | `/spec-first:design` |
 | `03_plan` | 带追溯 ID 的任务列表 | `/spec-first:task` |
 | `04_implement` | 关联规格的代码提交 | `/spec-first:code` |
-| `05_verify` | 测试用例与覆盖率证据 | `/spec-first:verify` |
+| `05_verify` | 测试用例与文档关联证据 | `/spec-first:verify` |
 | `06_wrap_up` | 复盘文档 | `/spec-first:archive` |
 | `07_release` | 冒烟测试报告 + 发布说明 | `spec-first golive check` |
 | `08_done` | *（终态）* | `spec-first done` |
@@ -143,7 +158,7 @@ spec-first golive check <featureId> # 上线就绪检查
 spec-first gate                              # 评估当前阶段门禁
 spec-first gate --stage 04_implement         # 评估指定阶段
 spec-first golive check <featureId>          # 上线全量门禁（07_release）
-spec-first metrics coverage --threshold 0.8  # 强制覆盖率阈值
+spec-first metrics report --feature <featureId>  # 生成文档关联度量报告
 ```
 
 ### 全链路追溯
@@ -162,7 +177,7 @@ Feature                                    ← Feature 级追踪
 ```bash
 spec-first id generate FR        # 生成新需求 ID
 spec-first id verify FR-001      # 确认 ID 已注册并关联
-spec-first matrix sync           # 重建追溯覆盖率矩阵
+spec-first docs links validate   # 校验文档关联索引
 ```
 
 ### 20 个内置 Skill
@@ -215,7 +230,7 @@ Spec-First 分为三层。层间边界严格：Skill 层不直接访问运行时
 │  ┌─────────────────┬──────────────────────────┐   │
 │  │ process-engine  │ 阶段状态机，生命周期控制   │   │
 │  │ gate-engine     │ 阻断性门禁条件评估         │   │
-│  │ trace-engine    │ ID 注册表，覆盖率矩阵       │   │
+│  │ trace-engine    │ ID 注册表，文档关联索引      │   │
 │  │ skill-runtime   │ Skill 分发，Prompt 组装    │   │
 │  │ ai-orchestrator │ 自动循环，Context Pack     │   │
 │  │ metrics-engine  │ 健康评分，瓶颈检测         │   │

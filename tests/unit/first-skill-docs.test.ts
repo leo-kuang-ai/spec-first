@@ -39,7 +39,7 @@ describe('00-first skill docs consistency', () => {
 
     const skill = read(SKILL_MD);
     expect(skill).toContain('name: "spec-first:first"');
-    expect(skill).toContain('description: "Use when validating project cognition outputs');
+    expect(skill).toContain('description: "Use when onboarding to an unknown codebase');
     expect(skill).not.toContain('version: "2.3.0"');
     expect(skill).not.toContain('last_updated: "2026-03-17"');
   });
@@ -162,6 +162,8 @@ describe('00-first skill docs consistency', () => {
     const arch = read(SUBAGENT_ARCH);
     expect(arch).toContain('CLI');
     expect(arch).toContain('runtime');
+    expect(arch).toContain('Serena');
+    expect(arch).toContain('shared/summary.json');
   });
 
   it('should include openai ui metadata for 00-first', () => {

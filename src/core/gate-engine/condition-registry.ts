@@ -1,19 +1,20 @@
 /**
  * Gate 条件定义注册表
- * 集中管理所有阶段的 Gate 条件定义
+ * 仅基于阶段状态、文档存在性、文档引用、关键证据文件存在性进行校验
  */
 import { join } from 'node:path';
-import { readFileSync } from 'node:fs';
-import type { Stage, CoverageMetrics, StageState, MatrixRow, IdType } from '../../shared/types.js';
-import { TERMINAL_STATUSES } from '../../shared/types.js';
+import { readFileSync, statSync } from 'node:fs';
+import type { Stage, StageState } from '../../shared/types.js';
 import { exists } from '../../shared/fs-utils.js';
+import {
+  loadDocumentLinks,
+  validateStageDocumentLinks,
+  listMissingDocumentFiles,
+} from '../document-links.js';
 import { validatePrd } from './prd-validator.js';
 import { RELEASE_REQUIRED_ARTIFACTS } from '../rules/truth-source.js';
 import { evaluateConstitutionCompliance } from './constitution-validator.js';
-import { statSync } from 'node:fs';
-import { getCriticalCountFromAnalysisReport, analyzeArtifacts } from './sca.js';
-import { createTraceContext } from '../trace-engine/trace-context.js';
-import { loadConfig } from '../../shared/config-schema.js';
+import { analyzeArtifacts, getCriticalCountFromAnalysisReport } from './sca.js';
 
 export interface GateConditionDef {
   id: string;
@@ -22,7 +23,6 @@ export interface GateConditionDef {
   evaluate: (ctx: EvalContext) => {
     pass: boolean;
     detail?: string;
-    scopeFrIds?: string[];
     blocking?: boolean;
   };
 }
@@ -32,26 +32,10 @@ export interface EvalContext {
   projectRoot: string;
   stage: Stage;
   state: StageState;
-  coverage: CoverageMetrics;
-  rows: MatrixRow[];
-  rfcStatuses: Map<string, string>;
 }
 
-/** 每个阶段的 Gate 条件表 */
 export const GATE_CONDITIONS: Partial<Record<Stage, GateConditionDef[]>> = {};
 
-function formatPercentThreshold(value: number, operator: '>=' | '='): string {
-  return `${operator} ${Number((value * 100).toFixed(2))}%`;
-}
-
-function getConfiguredGateThreshold(
-  projectRoot: string,
-  gateId: 'G-IMPL-01' | 'G-VERIFY-01'
-): number {
-  return loadConfig(projectRoot).gate.thresholds[gateId].value;
-}
-
-// ─── 00_init 条件 ──────────────────────────────────────────
 GATE_CONDITIONS['00_init' as Stage] = [
   {
     id: 'G-INIT-01',
@@ -67,20 +51,19 @@ GATE_CONDITIONS['00_init' as Stage] = [
     evaluate: (ctx) => {
       const { mode, size, platforms } = ctx.state;
       const pass = !!mode && !!size && Array.isArray(platforms) && platforms.length > 0;
-      return { pass, detail: `mode=${mode} size=${size} platforms=${platforms?.join(',')}` };
+      return { pass, detail: `mode=${mode} size=${size} platforms=${platforms.join(',')}` };
     },
   },
   {
     id: 'G-INIT-03',
     description: 'stage-state.json exists',
     evaluate: (ctx) => {
-      const p = join(ctx.projectRoot, 'specs', ctx.featureId, 'stage-state.json');
-      return { pass: exists(p) };
+      const filePath = join(ctx.projectRoot, 'specs', ctx.featureId, 'stage-state.json');
+      return { pass: exists(filePath), detail: filePath };
     },
   },
 ];
 
-// ─── 01_specify 条件 ─────────────────────────────────────
 GATE_CONDITIONS['01_specify' as Stage] = [
   {
     id: 'G-SPEC-00',
@@ -92,11 +75,9 @@ GATE_CONDITIONS['01_specify' as Stage] = [
         return { pass: false, detail: 'prd.md not found', blocking: false };
       }
       const result = validatePrd(prdPath);
-      const frIds = ctx.rows.filter((r) => r.type === 'FR').map((r) => r.id);
       return {
         pass: result.valid && result.score >= 85,
         detail: `C-PRD=${result.score}% errors=${result.errors.length}`,
-        scopeFrIds: frIds,
         blocking: false,
       };
     },
@@ -104,17 +85,17 @@ GATE_CONDITIONS['01_specify' as Stage] = [
   {
     id: 'G-SPEC-01',
     description: 'spec.md exists',
-    evaluate: (ctx) => {
-      const p = join(ctx.projectRoot, 'specs', ctx.featureId, 'spec.md');
-      return { pass: exists(p) };
-    },
+    evaluate: (ctx) => ({
+      pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, 'spec.md')),
+    }),
   },
   {
     id: 'G-SPEC-02',
-    description: 'FR/NFR IDs assigned (matrix has FR rows)',
+    description: 'document-links.yaml declares spec.md',
     evaluate: (ctx) => {
-      const frCount = ctx.rows.filter((r) => r.type === 'FR').length;
-      return { pass: frCount > 0, detail: `FR count: ${frCount}` };
+      const links = loadDocumentLinks(ctx.featureId, ctx.projectRoot);
+      const result = validateStageDocumentLinks(links, ctx.stage);
+      return { pass: result.pass, detail: result.detail };
     },
   },
   {
@@ -123,167 +104,136 @@ GATE_CONDITIONS['01_specify' as Stage] = [
     blocking: false,
     evaluate: (ctx) => {
       const c10 = evaluateSpecQualityScore(ctx.featureId, ctx.projectRoot);
-      const frIds = ctx.rows.filter((r) => r.type === 'FR').map((r) => r.id);
-      return { pass: c10.pass, detail: c10.detail, scopeFrIds: frIds, blocking: false };
+      return { pass: c10.pass, detail: c10.detail, blocking: false };
     },
   },
 ];
 
-// ─── 02_design 条件 ──────────────────────────────────────
 GATE_CONDITIONS['02_design' as Stage] = [
   {
     id: 'G-DESIGN-01',
     description: 'design.md exists',
+    evaluate: (ctx) => ({
+      pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, 'design.md')),
+    }),
+  },
+  {
+    id: 'G-DESIGN-02',
+    description: 'design.md references spec.md',
     evaluate: (ctx) => {
-      const p = join(ctx.projectRoot, 'specs', ctx.featureId, 'design.md');
-      return { pass: exists(p) };
+      const links = loadDocumentLinks(ctx.featureId, ctx.projectRoot);
+      const result = validateStageDocumentLinks(links, ctx.stage);
+      return { pass: result.pass, detail: result.detail };
     },
   },
   {
     id: 'G-DESIGN-03',
-    description: 'Constitution compliance (C11) (warning)',
+    description: 'Constitution compliance (warning)',
     blocking: false,
     evaluate: (ctx) => {
-      const c11 = evaluateConstitutionCompliance(ctx.featureId, ctx.projectRoot);
-      return { pass: c11.pass, detail: c11.detail };
+      const result = evaluateConstitutionCompliance(ctx.featureId, ctx.projectRoot);
+      return { pass: result.pass, detail: result.detail, blocking: false };
     },
   },
 ];
 
-// ─── 03_plan 条件 ────────────────────────────────────────
 GATE_CONDITIONS['03_plan' as Stage] = [
   {
     id: 'G-PLAN-01',
-    description: 'Task coverage (C3) = 100%',
-    evaluate: (ctx) => {
-      const val = ctx.coverage.C3;
-      const uncovered = getUncoveredFrIds(ctx.rows, 'TASK');
-      return {
-        pass: val >= 1.0,
-        detail:
-          uncovered.length > 0
-            ? `C3=${(val * 100).toFixed(1)}% uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
-            : `C3=${(val * 100).toFixed(1)}%`,
-        scopeFrIds: uncovered,
-      };
-    },
+    description: 'task_plan.md exists',
+    evaluate: (ctx) => ({
+      pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, 'task_plan.md')),
+    }),
   },
   {
     id: 'G-PLAN-02',
-    description: 'Task compliance (C8) = 100%',
+    description: 'task_plan.md references spec.md and design.md',
     evaluate: (ctx) => {
-      const val = ctx.coverage.C8;
-      return { pass: val >= 1.0, detail: `C8=${(val * 100).toFixed(1)}%` };
+      const links = loadDocumentLinks(ctx.featureId, ctx.projectRoot);
+      const result = validateStageDocumentLinks(links, ctx.stage);
+      return { pass: result.pass, detail: result.detail };
     },
   },
   {
     id: 'G-PLAN-03',
     description: 'Analyze CRITICAL findings = 0',
-    evaluate: (ctx) => {
-      const analyze = evaluateAnalyzeCriticalFindings(ctx.featureId, ctx.projectRoot);
-      return { pass: analyze.pass, detail: analyze.detail };
-    },
+    evaluate: (ctx) => evaluateAnalyzeCriticalFindings(ctx.featureId, ctx.projectRoot),
   },
 ];
 
-// ─── 04_implement 条件 ───────────────────────────────────
 GATE_CONDITIONS['04_implement' as Stage] = [
   {
     id: 'G-IMPL-01',
-    description: 'Unit test coverage (C4) meets configured threshold',
+    description: 'Declared documents exist on disk',
     evaluate: (ctx) => {
-      const val = ctx.coverage.C4;
-      const threshold = getConfiguredGateThreshold(ctx.projectRoot, 'G-IMPL-01');
-      const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
+      const links = loadDocumentLinks(ctx.featureId, ctx.projectRoot);
+      const missing = listMissingDocumentFiles(links, ctx.featureId, ctx.projectRoot);
       return {
-        pass: val >= threshold,
-        detail:
-          uncovered.length > 0
-            ? `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '>=')}) uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
-            : `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '>=')})`,
-        scopeFrIds: uncovered,
+        pass: missing.length === 0,
+        detail: missing.length === 0 ? 'all declared docs exist' : `missing: ${missing.join(', ')}`,
       };
     },
   },
 ];
 
-// ─── 05_verify 条件 ──────────────────────────────────────
 GATE_CONDITIONS['05_verify' as Stage] = [
   {
     id: 'G-VERIFY-01',
-    description: 'Test coverage FR (C4) meets configured threshold',
+    description: 'reports/test-report.md exists',
     evaluate: (ctx) => {
-      const val = ctx.coverage.C4;
-      const threshold = getConfiguredGateThreshold(ctx.projectRoot, 'G-VERIFY-01');
-      const uncovered = getUncoveredFrIds(ctx.rows, 'TC');
-      return {
-        pass: val >= threshold,
-        detail:
-          uncovered.length > 0
-            ? `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '=')}) uncovered FR: ${uncovered.slice(0, 5).join(', ')}`
-            : `C4=${(val * 100).toFixed(1)}% target(${formatPercentThreshold(threshold, '=')})`,
-        scopeFrIds: uncovered,
-      };
+      const filePath = join(ctx.projectRoot, 'specs', ctx.featureId, 'reports', 'test-report.md');
+      return { pass: exists(filePath), detail: filePath };
     },
   },
   {
     id: 'G-VERIFY-03',
-    description: 'TC compliance (C9) = 100%',
+    description: 'reports/security-scan.md exists',
     evaluate: (ctx) => {
-      const val = ctx.coverage.C9;
-      return { pass: val >= 1.0, detail: `C9=${(val * 100).toFixed(1)}%` };
+      const filePath = join(
+        ctx.projectRoot,
+        'specs',
+        ctx.featureId,
+        'reports',
+        'security-scan.md'
+      );
+      return { pass: exists(filePath), detail: filePath };
     },
   },
 ];
 
-// ─── 06_wrap_up 条件 ─────────────────────────────────────
 GATE_CONDITIONS['06_wrap_up' as Stage] = [
   {
     id: 'G-WRAP-01',
-    description: 'Implementation coverage (C6) = 100%',
-    evaluate: (ctx) => {
-      const val = ctx.coverage.C6;
-      return { pass: val >= 1.0, detail: `C6=${(val * 100).toFixed(1)}%` };
-    },
+    description: 'retro.md exists',
+    evaluate: (ctx) => ({
+      pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, 'retro.md')),
+    }),
   },
   {
     id: 'G-WRAP-02',
-    description: 'All matrix entries in terminal status',
+    description: 'release evidence exists',
     evaluate: (ctx) => {
-      const nonTerminal = ctx.rows.filter((r) => !TERMINAL_STATUSES.has(r.status));
+      const missing = RELEASE_REQUIRED_ARTIFACTS.filter(
+        (relativePath) => !exists(join(ctx.projectRoot, 'specs', ctx.featureId, relativePath))
+      );
       return {
-        pass: nonTerminal.length === 0,
-        detail:
-          nonTerminal.length > 0
-            ? `${nonTerminal.length} non-terminal: ${nonTerminal
-                .slice(0, 3)
-                .map((r) => r.id)
-                .join(', ')}`
-            : 'All terminal',
+        pass: missing.length === 0,
+        detail: missing.length === 0 ? 'release evidence complete' : `missing: ${missing.join(', ')}`,
       };
     },
   },
 ];
 
-// ─── 07_release 条件 ─────────────────────────────────────
 GATE_CONDITIONS['07_release' as Stage] = RELEASE_REQUIRED_ARTIFACTS.map((relativePath, index) => ({
   id: index === 0 ? 'G-REL-01' : 'G-REL-02',
-  description: relativePath.endsWith('release-note.md')
-    ? 'Release note exists'
-    : 'Smoke test report exists',
+  description: relativePath,
   evaluate: (ctx) => ({
     pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, relativePath)),
   }),
 }));
 
-// ─── 辅助函数 ─────────────────────────────────────────────
-
 export function shouldSkipCondition(conditionId: string, projectType: string): boolean {
-  if (projectType === 'css-only' || projectType === 'frontend') {
-    return ['G-IMPL-01', 'G-VERIFY-01', 'PYTEST', 'DIFF-COV'].some((id) =>
-      conditionId.includes(id)
-    );
-  }
+  if (projectType === 'css-only') return conditionId === 'G-DESIGN-03';
   return false;
 }
 
@@ -309,25 +259,17 @@ function evaluateSpecQualityScore(
   const totalChecks = (content.match(/^\s*[-*]\s*\[[ xX]\]\s+/gm) ?? []).length;
   const passedChecks = (content.match(/^\s*[-*]\s*\[[xX]\]\s+/gm) ?? []).length;
 
-  if (totalChecks > 0) {
-    const score = passedChecks / totalChecks;
+  if (totalChecks === 0) {
     return {
-      pass: score >= 0.8,
-      detail: `C10=${(score * 100).toFixed(1)}% (${passedChecks}/${totalChecks}) source=${toFeatureRelativePath(featureId, projectRoot, source)}`,
+      pass: false,
+      detail: `C10 unavailable: no checklist items parsed in ${toFeatureRelativePath(featureId, projectRoot, source)}`,
     };
   }
 
-  const explicitScore = parseExplicitPercent(content, 'C10');
-  if (explicitScore !== undefined) {
-    return {
-      pass: explicitScore >= 0.8,
-      detail: `C10=${(explicitScore * 100).toFixed(1)}% source=${toFeatureRelativePath(featureId, projectRoot, source)} (from explicit score)`,
-    };
-  }
-
+  const score = passedChecks / totalChecks;
   return {
-    pass: false,
-    detail: `C10 unavailable: no checklist items parsed in ${toFeatureRelativePath(featureId, projectRoot, source)}`,
+    pass: score >= 0.8,
+    detail: `C10=${(score * 100).toFixed(1)}% (${passedChecks}/${totalChecks}) source=${toFeatureRelativePath(featureId, projectRoot, source)}`,
   };
 }
 
@@ -338,10 +280,8 @@ function evaluateAnalyzeCriticalFindings(
   const reportPath = join(projectRoot, 'specs', featureId, 'reports', 'analysis-report.md');
 
   if (exists(reportPath)) {
-    const mtime = statSync(reportPath).mtime;
-    const age = Date.now() - mtime.getTime();
-    if (age > 5 * 60 * 1000) {
-      console.log('⚠️  分析报告过期，自动刷新...');
+    const ageMs = Date.now() - statSync(reportPath).mtime.getTime();
+    if (ageMs > 5 * 60 * 1000) {
       analyzeArtifacts(featureId, projectRoot);
     }
   } else {
@@ -359,20 +299,6 @@ function evaluateAnalyzeCriticalFindings(
   };
 }
 
-function parseExplicitPercent(content: string, metric: string): number | undefined {
-  const pattern = new RegExp(`${escapeRegExp(metric)}\\s*[:=]\\s*(\\d+(?:\\.\\d+)?)\\s*%?`, 'i');
-  const match = content.match(pattern);
-  if (!match?.[1]) return undefined;
-  const raw = Number.parseFloat(match[1]);
-  if (Number.isNaN(raw)) return undefined;
-  if (raw > 1) return raw / 100;
-  return raw;
-}
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function toFeatureRelativePath(
   featureId: string,
   projectRoot: string,
@@ -380,27 +306,4 @@ function toFeatureRelativePath(
 ): string {
   const prefix = `${join(projectRoot, 'specs', featureId)}/`;
   return absolutePath.startsWith(prefix) ? absolutePath.slice(prefix.length) : absolutePath;
-}
-
-function getUncoveredFrIds(rows: MatrixRow[], downstreamType: IdType): string[] {
-  const trace = createTraceContext(rows);
-  if (trace.frRows.length === 0) return [];
-
-  const covered = new Set<string>();
-  if (downstreamType === 'TASK') {
-    const coveredFrIds = trace.lineage.collectCoveredTargetIds(
-      trace.rows.filter((row) => row.type === 'TASK').map((row) => row.id),
-      trace.frIds
-    );
-    for (const frId of coveredFrIds) covered.add(frId);
-  } else {
-    const downstreamRows = rows.filter((r) => r.type === downstreamType);
-    for (const row of downstreamRows) {
-      for (const upstreamId of row.upstream ?? []) {
-        covered.add(upstreamId);
-      }
-    }
-  }
-
-  return trace.frRows.filter((fr) => !covered.has(fr.id)).map((fr) => fr.id);
 }

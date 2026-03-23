@@ -18,7 +18,35 @@ function withCwd(dir: string, fn: () => number): number {
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
-  writeFileSync(join(TMP, 'specs', FEAT, 'stage-state.json'), '{}');
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'stage-state.json'),
+    JSON.stringify({
+      featureId: FEAT,
+      currentStage: '03_plan',
+      mode: 'N',
+      size: 'M',
+      platforms: ['h5'],
+      history: [],
+      terminal: false,
+      createdAt: '2026-03-23T00:00:00.000Z',
+      updatedAt: '2026-03-23T00:00:00.000Z',
+    }),
+    'utf-8'
+  );
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'document-links.yaml'),
+    [
+      'version: 1',
+      `featureId: ${FEAT}`,
+      'documents:',
+      '  - path: spec.md',
+      '    kind: requirements',
+      '    stage: 01_specify',
+      '    references: []',
+      '',
+    ].join('\n'),
+    'utf-8'
+  );
 });
 
 afterEach(() => {
@@ -32,23 +60,18 @@ afterEach(() => {
 
 describe('handleMetrics', () => {
   it('should return VALIDATION_ERROR without featureId', () => {
-    const code = withCwd(TMP, () => handleMetrics(['coverage']));
+    const code = withCwd(TMP, () => handleMetrics(['report']));
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should return SUCCESS with valid matrix', () => {
-    // 写入一个简单的 traceability-matrix.md
-    writeFileSync(join(TMP, 'specs', FEAT, 'traceability-matrix.md'),
-      '| ID | Type | Title | Status | Upstream | Downstream |\n' +
-      '|----|------|-------|--------|----------|------------|\n' +
-      '| FR-AUTH-001 | FR | Login | Planned |  |  |\n',
-    );
-    const code = withCwd(TMP, () => handleMetrics(['coverage', FEAT]));
+  it('should return SUCCESS with valid document links', () => {
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
+    const code = withCwd(TMP, () => handleMetrics(['report', FEAT]));
     expect(code).toBe(ExitCode.SUCCESS);
   });
 
   it('should return VALIDATION_ERROR when feature does not exist', () => {
-    const code = withCwd(TMP, () => handleMetrics(['coverage', 'NONEXISTENT']));
+    const code = withCwd(TMP, () => handleMetrics(['report', 'NONEXISTENT']));
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 

@@ -36,7 +36,7 @@
 |------|------|
 | **目标** | 将业务意图转化为带唯一 ID 的结构化需求契约 |
 | **活动** | 需求分析 → 结构化 PRD → ID 分配（FR/NFR）→ Clarify |
-| **产出物** | `spec.md`（含 FR-FEAT-NNN, NFR-DIM-NNN）、`traceability-matrix.md`（初始化） |
+| **产出物** | `spec.md`（含 FR-FEAT-NNN, NFR-DIM-NNN）、`document-links.yaml`（初始化） |
 | **Exit Gate** | DoR Sign-off + 无 `[NEEDS CLARIFICATION]` 标记 + 所有 FR/NFR 已分配 ID |
 | **工具支撑** | Skill: `/spec-first:spec` / CLI: `spec-first id next FR <abbr>` |
 
@@ -55,7 +55,7 @@
    - 自动扫描 `[NEEDS CLARIFICATION]` 标记
    - 所有歧义必须在本阶段消除，不得带入 Design
 
-4. **追踪矩阵初始化**：创建 `traceability-matrix.md`，填入所有 FR/NFR ID
+4. **文档关联索引初始化**：创建 `document-links.yaml`，填入关键文档与引用关系
 
 **Mode I 额外活动**：Impact Analysis → 输出 `impact-analysis.md`（影响范围清单 + 风险评估）。
 
@@ -68,7 +68,7 @@
 | **目标** | 将需求规格转化为可实现的技术方案，API 端点分配唯一 ID |
 | **活动** | Research → 技术选型 → 架构设计 → API 契约设计（纳入 DS 的 `api_ref` 属性）→ 数据建模 |
 | **产出物** | `research.md`, `design.md`, `contracts/`, `data-model.md`, ADR |
-| **Exit Gate** | 设计评审 + Spec-Consistency-Analysis + API 覆盖率 = 100% |
+| **Exit Gate** | 设计评审 + Spec-Consistency-Analysis + 文档关联校验 |
 | **工具支撑** | Skill: `/spec-first:design`, `/spec-first:research` / CLI: `spec-first id next DS <abbr>` |
 
 **子产出物**：
@@ -78,7 +78,7 @@
 3. **API-Design**：OpenAPI Spec / GraphQL Schema，每个端点在 DS 中通过 `api_ref` 引用
 4. **Data-Modeling**：ERD、State Machine Diagram、数据字典
 
-**追踪矩阵更新**：填充 Design Ref 列（含 API 契约的 `api_ref` 属性）。
+**文档关联索引更新**：记录 `design.md` 对 `spec.md` 与 `contracts/` 的引用。
 
 ---
 
@@ -88,20 +88,20 @@
 |------|------|
 | **目标** | 将技术设计拆解为带 ID 的可执行任务清单 |
 | **活动** | 任务拆解（分配 TASK-FEAT-NNN）→ 依赖分析 → Checklist 生成 |
-| **产出物** | `task_plan.md`（含 TASK-FEAT-NNN + traces）, `checklist.md` |
-| **Exit Gate** | 任务评审 + Task 覆盖率 = 100% + Task 合规率 = 100% |
+| **产出物** | `task_plan.md`（含 TASK-FEAT-NNN + references）, `checklist.md` |
+| **Exit Gate** | 任务评审 + 任务文档依据完整性 |
 | **工具支撑** | Skill: `/spec-first:task` / CLI: `spec-first id next TASK <abbr>` |
 
 **任务拆解标准**：
 
-- 每个任务分配 `TASK-<FEAT>-NNN`，必须包含 `traces: [FR-<FEAT>-NNN, ...]`
+- 每个任务分配 `TASK-<FEAT>-NNN`，并显式记录关联文档 `references: [spec.md, design.md]`
 - 任务粒度：单人 1-3 天可完成
 - 依赖关系显式标注：`depends_on: [TASK-<FEAT>-NNN]`
 - 可并行任务标记：`parallel: true`
 
 **Checklist**：从 AC 派生的验证场景清单，作为 Implement 和 Verify 的输入。
 
-**追踪矩阵更新**：填充 Task Ref 列，校验 Task 覆盖率。
+**文档关联索引更新**：记录 `task_plan.md` 对 `spec.md`、`design.md` 的引用。
 
 ---
 
@@ -110,16 +110,16 @@
 | 维度 | 内容 |
 |------|------|
 | **目标** | 按任务清单实现代码，确保每行代码可追溯到需求 |
-| **活动** | 按 TASK 开发（`/spec-first:code`）→ TDD → Code Review（`/spec-first:code-review`，含追踪合规审查） |
+| **活动** | 按 TASK 开发（`/spec-first:code`）→ TDD → Code Review（`/spec-first:code-review`，含文档关联审查） |
 | **产出物** | 代码实现、单元测试、`reports/code-review-report.md`（格式规范见 [`code-review-integration.md` 第四章](../../02技术方案/V2/code-review-integration.md#四cr-report-格式规范)） |
-| **Exit Gate** | Code CR 通过 + 单元测试代码覆盖率 ≥ 80% + PR 合规率 = 100% |
+| **Exit Gate** | Code CR 通过 + 单元测试通过 + PR 合规率 = 100% |
 | **工具支撑** | Skill: `/spec-first:code`, `/spec-first:code-review` / CLI: `spec-first gate check` |
 
 **开发规范**：
 
-- 每个 TASK 开发前，重读对应 FR 条目
+- 每个 TASK 开发前，重读对应 spec/design 文档
 - TDD：先写测试（基于 AC），再写实现
-- 代码关键位置标注追踪引用：`// implements: TASK-AUTH-001, traces: FR-AUTH-001`
+- 代码关键位置标注实现引用：`// implements: TASK-AUTH-001`
 - Git Commit 格式：`[TASK-<FEAT>-NNN] 提交描述`
 - PR 描述必须包含：`Implements: TASK-<FEAT>-NNN, TASK-<FEAT>-NNN`
 
@@ -197,7 +197,7 @@
 
 > 完整修复闭环流程详见 [`code-review-integration.md` 第六章](../../02技术方案/V2/code-review-integration.md#六阻断修复闭环)。
 
-**追踪矩阵更新**：填充 PR Ref 列。
+**文档关联索引更新**：记录 `code-review-report.md` 与 `task_plan.md` 的互引。
 
 ---
 
@@ -206,15 +206,15 @@
 | 维度 | 内容 |
 |------|------|
 | **目标** | 验证实现是否满足所有 AC 和 NFR，每个 TC 可追溯到需求 |
-| **活动** | 测试设计（分配 TC-LVL-FEAT-NNN）→ 测试执行 → 安全扫描 → UAT |
+| **活动** | 测试设计 → 测试执行 → 安全扫描 → UAT |
 | **产出物** | Test Report, Security Report, UAT Sign-off |
 | **Exit Gate** | 全部 AC 通过 + 安全无高危（按 `core-05` 的 S1-S4 映射） + Test 覆盖率 = 100% + TC 合规率 = 100% |
-| **工具支撑** | Skill: `/spec-first:test` / CLI: `spec-first id next TC <abbr>`, `spec-first metrics coverage` |
+| **工具支撑** | Skill: `/spec-first:test` / CLI: `spec-first id next TC <abbr>`, `spec-first metrics report` |
 
 **子活动**：
 
-1. **Test-Design**：每个 TC 分配 `TC-<LVL>-<FEAT>-NNN`，必须包含 `verifies: [FR-<FEAT>-NNN/AC-N]`
-2. **Test-Execution**：集成测试 + 回归测试 + Coverage Matrix
+1. **Test-Design**：每个 TC 分配 `TC-<LVL>-<FEAT>-NNN`
+2. **Test-Execution**：集成测试 + 回归测试 + 测试清单
 3. **Security-Review**（按 Size 分级）：
 
    | Size | 必须 | 推荐 |
@@ -229,7 +229,7 @@
 
 **Mode I 额外活动**：回归验证 → 产出 `regression-report.md`。
 
-**追踪矩阵更新**：填充 Test Case Ref 列，校验 Test 覆盖率。
+**文档关联索引更新**：记录 `test-report.md` 与 `spec.md`、`task_plan.md` 的引用关系。
 
 ---
 
@@ -237,18 +237,18 @@
 
 | 维度 | 内容 |
 |------|------|
-| **目标** | 复盘交付，归档文档，确保追踪矩阵完整闭环 |
-| **活动** | 复盘 → 文档归档 → Spec 同步 → 追踪矩阵最终校验 |
-| **产出物** | `retro.md`, 更新后的 Spec 文档, 完整的 `traceability-matrix.md` |
-| **Exit Gate** | 文档完整性 + 实现覆盖率 = 100% + 追踪矩阵 Status 全部为 Accepted、Cancelled 或 Exception（须有有效豁免） |
-| **工具支撑** | Skill: `/spec-first:archive` / CLI: `spec-first metrics coverage`, `spec-first gate check` |
+| **目标** | 复盘交付，归档文档，确保文档关联闭环 |
+| **活动** | 复盘 → 文档归档 → Spec 同步 → 文档关联最终校验 |
+| **产出物** | `retro.md`, 更新后的 Spec 文档, 完整的 `document-links.yaml` |
+| **Exit Gate** | 文档完整性 + 归档清单完成 + 文档关联索引校验通过 |
+| **工具支撑** | Skill: `/spec-first:archive` / CLI: `spec-first metrics report`, `spec-first gate check` |
 
 **关键活动**：
 
 - Retrospective：回顾流程执行情况
 - 文档归档：按归档清单逐项检查
 - Spec 同步：如有实现偏差，更新 Spec 使其与最终实现一致
-- 追踪矩阵最终校验：确认所有 FR/NFR 的 Status 为 Accepted、Cancelled 或 Exception（Exception 须有有效豁免）
+- 文档关联最终校验：确认索引内所有引用都可解析
 - Action Items：提炼改进项
 
 **归档清单**（19 项，Exit Gate 检查依据）：
@@ -257,14 +257,14 @@
 |---------|---------|---------|
 | 00 Init | `constitution.md` | 版本与实际执行一致 |
 | 01 Specify | `spec.md` | 与最终实现对齐，无过期 AC |
-| 01 Specify | `traceability-matrix.md` | 所有行 Status 为 Accepted、Cancelled 或 Exception |
+| 01 Specify | `document-links.yaml` | 所有声明文档路径与引用可解析 |
 | 02 Design | `design.md` | 与最终实现对齐 |
 | 02 Design | `contracts/*.yaml` | 与实际 API 签名一致 |
 | 02 Design | `data-model.md` | 与实际 Schema 一致 |
 | 02 Design | `adr/*.adr.md` | 决策记录完整 |
 | 03 Plan | `task_plan.md` | 所有 Task 状态已闭合 |
 | 03 Plan | `checklist.md` | 验证清单已完成 |
-| 04 Implement | 代码 + 单元测试 | CR 通过，代码覆盖率 ≥ 80% |
+| 04 Implement | 代码 + 单元测试 | CR 通过，单测通过 |
 | 04 Implement | `reports/code-review-report.md` | 评审结论为通过，且追踪合规无阻断项 |
 | 05 Verify | `tests/*.test.md` | 测试用例已归档 |
 | 05 Verify | `reports/test-report.md` | 测试执行报告已归档 |
@@ -298,8 +298,8 @@
 
 | 终态 | 进入条件 | 进入路径 | 审计要求 |
 |------|---------|---------|---------|
-| **08_done** | 07 Release 的 Exit Gate 通过（Smoke Test + 核心指标无异常） | `spec-first stage advance` 从 07_release 推进 | 追踪矩阵全部 Accepted/Cancelled/Exception；归档清单全部勾选 |
-| **09_cancelled** | 项目决策取消该 Feature（必须记录取消原因） | `spec-first stage cancel <featureId> --reason "<reason>"`，任何阶段均可触发 | 取消原因存档；已产出物保留不删除；追踪矩阵标记 Cancelled |
+| **08_done** | 07 Release 的 Exit Gate 通过（Smoke Test + 核心指标无异常） | `spec-first stage advance` 从 07_release 推进 | 文档关联索引校验通过；归档清单全部勾选 |
+| **09_cancelled** | 项目决策取消该 Feature（必须记录取消原因） | `spec-first stage cancel <featureId> --reason "<reason>"`，任何阶段均可触发 | 取消原因存档；已产出物保留不删除；文档关联索引保留 |
 
 **不可逆规则**：
 

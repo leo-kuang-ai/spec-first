@@ -1,7 +1,7 @@
 ---
 version: 1.0.0
-last_updated: 2026-03-18
-changelog: Aligned doctor MCP/skills checks with manifest-driven source of truth
+last_updated: 2026-03-21
+changelog: Aligned doctor MCP/skills checks with manifest-driven source of truth; added global ASCII-only diagram rule
 description: Spec-First 全链路研发闭环 — 全局 Agent 指令
 ---
 
@@ -66,6 +66,11 @@ description: Spec-First 全链路研发闭环 — 全局 Agent 指令
   - **提醒型 Hook**：输出 stderr 提示，但必须 exit 0（如 stop-guard.sh）
 - 非阻断型 Hook 失败必须可降级，避免单点故障拖垮主流程。
 
+## 文档图示约定（全局）
+
+- `skills/spec-first` 目录下的 Skill、共享文档与参考文档，在需要表达流程、调用链、架构、时序或 ER 关系时，统一使用 ASCII 文本图或表格，不使用 Mermaid
+- 复杂关系优先拆成列表、矩阵和 ASCII 树形结构，避免依赖渲染器才能理解内容
+
 ## 项目概述
 
 **Spec-First** 是一套规范驱动的全链路研发闭环工具链。核心理念：
@@ -103,7 +108,7 @@ specs/                          # Feature 工作区根目录
     │   ├── security-scan.md
     │   └── uat-signoff.md
     ├── retro.md                # 复盘报告（06_wrap_up）
-    ├── traceability-matrix.md  # 追踪矩阵
+    ├── document-links.yaml     # 文档关联索引
     ├── findings.md             # 过程发现与会话摘要（运行态）
     ├── gate-history.jsonl      # Gate 评估历史
     ├── ai-stats.jsonl          # AI 调用统计
@@ -195,30 +200,24 @@ spec-first stage cancel <featureId> --reason "<reason>"
 取消流程：任意阶段 --[spec-first stage cancel]--> 09_cancelled（终态，不可逆）
 ```
 
-### spec-first matrix
+### spec-first docs links
 
-追踪矩阵管理。
+文档关联索引管理。
 
 ```bash
-# 校验追踪矩阵完整性
-spec-first matrix check <featureId>
+# 校验文档关联完整性
+spec-first docs links validate <featureId>
 
-# 导出追踪矩阵
-spec-first matrix export <featureId> [--format <markdown|yaml>]
-
-# 更新矩阵行
-spec-first matrix update <featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]
+# 查看文档关联
+spec-first docs links show <featureId>
 ```
 
 ### spec-first metrics
 
-覆盖率与度量。
+文档健康与度量。
 
 ```bash
-# 计算覆盖率（9 项指标）
-spec-first metrics coverage <featureId>
-
-# 生成度量报告
+# 生成文档健康报告
 spec-first metrics report <featureId>
 
 # 健康分（加权综合评分）
@@ -262,7 +261,7 @@ spec-first ai stats <featureId>
 spec-first analyze <featureId> [--out <path>]
 ```
 
-- 读取 `spec.md` / `design.md` / `task_plan.md` / `traceability-matrix.md`
+- 读取 `spec.md` / `design.md` / `task_plan.md` / `document-links.yaml`
 - 产出 `reports/analysis-report.md`（默认路径）
 - 发现 `CRITICAL` 时返回非 0（可用于 gate 阻断）
 
@@ -444,7 +443,7 @@ P4_WRITE — 写入交付物
   └── spec-first id next <type> <abbr>（注册新 ID）
 
 P5_SIDE_EFFECT — 副作用执行
-  ├── spec-first matrix check <featureId>（校验追踪矩阵）
+  ├── spec-first docs links validate <featureId>（校验文档关联）
   ├── spec-first gate check <featureId>（校验 Gate）
   └── 更新运行态文件（findings.md / task_plan.md）
 ```
@@ -483,7 +482,7 @@ P5_SIDE_EFFECT — 副作用执行
 | P3 | 用户连续拒绝 3 次 | 终止执行，建议用户手动完成或调整需求 |
 | P4 | 文件写入失败 | 终止执行，不执行 P5，告知用户错误原因 |
 | P4 | CLI 命令失败（如 id next 返回错误） | 终止执行，展示 CLI 错误输出 |
-| P5 | 副作用执行失败（如 matrix check 报错） | 不回滚 P4 已写入的文件，但警告用户副作用未完成 |
+| P5 | 副作用执行失败（如 docs links validate 报错） | 不回滚 P4 已写入的文件，但警告用户副作用未完成 |
 
 ## 阶段 × Skill 映射
 

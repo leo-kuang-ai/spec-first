@@ -1,13 +1,13 @@
 /**
  * 性能基准测试套件
- * SLA: validateId<10ms, getCoverage<50ms, evaluateGate<200ms, buildContext<500ms
+ * SLA: validateId<10ms, getDocumentMetrics<50ms, evaluateGate<200ms, buildContext<500ms
  */
 import { bench, describe, beforeAll, afterAll } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
 import { validateId } from '../../src/core/trace-engine/id-validator.js';
-import { getCoverage } from '../../src/core/trace-engine/coverage.js';
+import { getDocumentMetrics } from '../../src/cli/commands/metrics.js';
 import { evaluateGate } from '../../src/core/gate-engine/gate-evaluator.js';
 import { buildContextPack } from '../../src/core/ai-orchestrator/context-pack.js';
 
@@ -27,14 +27,16 @@ function setupFixtures(): void {
     updatedAt: new Date().toISOString(),
   }));
 
-  // 100 条矩阵记录
-  const rows: string[] = ['| ID | Type | Title | Status | Upstream | Downstream |'];
-  rows.push('|----|------|-------|--------|----------|------------|');
+  // 100 条文档关联记录
+  const lines: string[] = ['version: 1', `featureId: ${FEAT}`, 'documents:'];
   for (let i = 1; i <= 100; i++) {
     const pad = String(i).padStart(3, '0');
-    rows.push(`| FR-BENCH-${pad} | FR | Req ${i} | Planned | | DS-BENCH-${pad} |`);
+    lines.push(`  - path: docs/doc-${pad}.md`);
+    lines.push('    kind: note');
+    lines.push('    stage: 01_specify');
+    lines.push('    references: []');
   }
-  writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), rows.join('\n'));
+  writeFileSync(join(SPEC_DIR, 'document-links.yaml'), lines.join('\n'));
 
   // constitution.md
   writeFileSync(join(SPEC_DIR, 'constitution.md'), '# Constitution\nmode: N\nsize: M');
@@ -53,8 +55,8 @@ describe('Performance SLA', () => {
     validateId('FR-BENCH-001');
   }, { time: 1000, warmupTime: 200 });
 
-  bench('getCoverage — SLA < 50ms (100 rows)', () => {
-    getCoverage(FEAT, TMP);
+  bench('getDocumentMetrics — SLA < 50ms (100 docs)', () => {
+    getDocumentMetrics(FEAT, TMP);
   }, { time: 1000, warmupTime: 200 });
 
   bench('evaluateGate — SLA < 200ms', () => {

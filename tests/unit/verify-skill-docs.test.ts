@@ -66,9 +66,9 @@ describe('12-verify skill docs consistency', () => {
   it('should make completion verification flow explicit', () => {
     const skill = read(SKILL_MD);
 
-    expect(skill).toContain('**P1**: 加载 `verify-view`、矩阵、覆盖率指标、Gate 条件');
-    expect(skill).toContain('**P2**: 执行 `gate check`、`matrix check`、`metrics coverage`，获取验证结果');
-    expect(skill).toContain('**P3**: 生成校验报告（Gate 评估、矩阵完整性、覆盖率缺口、verify-view 重点、修复建议）');
+    expect(skill).toContain('**P1**: 加载 `verify-view`、文档关联、文档健康指标、Gate 条件');
+    expect(skill).toContain('**P2**: 执行 `gate check`、`docs links validate`、`metrics report`，获取验证结果');
+    expect(skill).toContain('**P3**: 生成校验报告（Gate 评估、文档关联完整性、文档健康缺口、verify-view 重点、修复建议）');
     expect(skill).toContain('已核对 `verify-view` 必查字段并纳入校验结论');
   });
 });

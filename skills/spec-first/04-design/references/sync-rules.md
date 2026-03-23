@@ -238,7 +238,7 @@
 **恢复时读取**:
 - `findings.md` 最新记录
 - `design.md` 当前状态
-- `traceability-matrix.md` 已注册 DS
+- `document-links.yaml` 中已记录的文档引用
 
 **示例**:
 ```markdown
@@ -246,5 +246,5 @@
 
 **已完成**: DS-AUTH-001, DS-AUTH-002 已定义
 **未决问题**: 用户服务与订单服务是否需要拆分？
-**下一步**: 运行 spec-first matrix update 更新追溯矩阵
+**下一步**: 运行 spec-first docs links validate <featureId> 检查文档关联
 ```

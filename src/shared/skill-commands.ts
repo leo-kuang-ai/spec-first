@@ -102,7 +102,7 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   orchestrate: '定位 Feature 并加载当前状态执行编排',
   status: '定位当前 Feature 并输出状态概览',
   doctor: '定位项目与宿主配置并执行环境诊断',
-  sync: '定位 Feature 并同步追踪矩阵与状态',
+  sync: '定位 Feature 并同步文档关联索引与状态',
   feature: 'Feature 查询/切换命令族',
   'spec-review': '定位 Feature 并执行需求规格质量审查（C10）',
   analyze: '执行跨产物一致性分析并生成分析报告',

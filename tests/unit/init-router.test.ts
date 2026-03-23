@@ -36,7 +36,12 @@ function cleanupDir(dir: string): void {
 }
 
 function gitInit(dir: string): void {
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
+  try {
+    execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
+  } catch {
+    execFileSync('git', ['init', '-q'], { cwd: dir, stdio: 'ignore' });
+    execFileSync('git', ['checkout', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
+  }
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir, stdio: 'ignore' });
 }
@@ -97,15 +102,11 @@ describe('detectInitProjectState - project state detection', () => {
     cleanupDir(tmpDir);
   });
 
-  it('should detect missing git repo', () => {
+  it('should detect project state without requiring git', () => {
     const state = detectInitProjectState(tmpDir);
-    expect(state.gitReady).toBe(false);
-  });
-
-  it('should detect git repo as ready', () => {
-    gitInit(tmpDir);
-    const state = detectInitProjectState(tmpDir);
-    expect(state.gitReady).toBe(true);
+    expect(state.specFirstDirExists).toBe(false);
+    expect(state.metaConfigExists).toBe(false);
+    expect(state.firstRuntimeHealthy).toBe(false);
   });
 
   it('should detect missing .spec-first directory', () => {
@@ -214,25 +215,20 @@ describe('detectInitProjectState - boundary cases', () => {
     cleanupDir(tmpDir);
   });
 
-  it('B1: no git → gitReady=false', () => {
+  it('B1: no git should not block project state detection', () => {
     const state = detectInitProjectState(tmpDir);
-    expect(state.gitReady).toBe(false);
     expect(state.specFirstDirExists).toBe(false);
     expect(state.firstRuntimeHealthy).toBe(false);
   });
 
-  it('B2: git + no .spec-first → specFirstDirExists=false', () => {
-    gitInit(tmpDir);
+  it('B2: no .spec-first → specFirstDirExists=false', () => {
     const state = detectInitProjectState(tmpDir);
-    expect(state.gitReady).toBe(true);
     expect(state.specFirstDirExists).toBe(false);
   });
 
-  it('B3: git + .spec-first + no first runtime → firstRuntimeHealthy=false', () => {
-    gitInit(tmpDir);
+  it('B3: .spec-first + no first runtime → firstRuntimeHealthy=false', () => {
     setupSpecFirstDir(tmpDir);
     const state = detectInitProjectState(tmpDir);
-    expect(state.gitReady).toBe(true);
     expect(state.specFirstDirExists).toBe(true);
     expect(state.firstRuntimeHealthy).toBe(false);
   });
@@ -264,25 +260,8 @@ describe('detectInitProjectState - boundary cases', () => {
 // ─────────────────────────────────────────────
 
 describe('detectInitTrack - track detection', () => {
-  it('should route to project-onboarding when git is not ready', () => {
+  it('should route to project-onboarding when project is not onboarded', () => {
     const state = {
-      gitReady: false,
-      specFirstDirExists: false,
-      metaConfigExists: false,
-      firstRuntimeHealthy: false,
-      hasAnyFeature: false,
-      hasLegacyBaseline: false,
-      baselineSkipped: false,
-      projectMaturity: 'greenfield' as const,
-      discoveredPlatforms: [],
-    };
-    const track = detectInitTrack(state, []);
-    expect(track).toBe('no-git');
-  });
-
-  it('should route to project-onboarding when .spec-first is missing', () => {
-    const state = {
-      gitReady: true,
       specFirstDirExists: false,
       metaConfigExists: false,
       firstRuntimeHealthy: false,
@@ -296,9 +275,23 @@ describe('detectInitTrack - track detection', () => {
     expect(track).toBe('project-onboarding');
   });
 
-  it('should route to project-onboarding when first runtime is unhealthy', () => {
+  it('should route to project-onboarding when .spec-first is missing', () => {
     const state = {
-      gitReady: true,
+      specFirstDirExists: false,
+      metaConfigExists: false,
+      firstRuntimeHealthy: false,
+      hasAnyFeature: false,
+      hasLegacyBaseline: false,
+      baselineSkipped: false,
+      projectMaturity: 'greenfield' as const,
+      discoveredPlatforms: [],
+    };
+    const track = detectInitTrack(state, []);
+    expect(track).toBe('project-onboarding');
+  });
+
+  it('should route to brownfield-baseline when first runtime is unhealthy and brownfield lacks baseline', () => {
+    const state = {
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: false,
@@ -309,12 +302,11 @@ describe('detectInitTrack - track detection', () => {
       discoveredPlatforms: [],
     };
     const track = detectInitTrack(state, []);
-    expect(track).toBe('project-onboarding');
+    expect(track).toBe('brownfield-baseline');
   });
 
   it('should route to brownfield-baseline for brownfield with no baseline', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -330,7 +322,6 @@ describe('detectInitTrack - track detection', () => {
 
   it('should route to feature-init for healthy project with baseline', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -346,7 +337,6 @@ describe('detectInitTrack - track detection', () => {
 
   it('should route to feature-init for healthy greenfield project', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -362,7 +352,6 @@ describe('detectInitTrack - track detection', () => {
 
   it('should route to feature-init when --track feature is explicit', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -378,7 +367,6 @@ describe('detectInitTrack - track detection', () => {
 
   it('should route to project-onboarding when --track project is explicit', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -394,7 +382,6 @@ describe('detectInitTrack - track detection', () => {
 
   it('should route to brownfield-baseline when --track baseline is explicit', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -414,24 +401,8 @@ describe('detectInitTrack - track detection', () => {
 // ─────────────────────────────────────────────
 
 describe('detectInitTrack - boundary cases', () => {
-  it('B1: no git → should return no-git', () => {
+  it('B1: no .spec-first → project-onboarding', () => {
     const state = {
-      gitReady: false,
-      specFirstDirExists: false,
-      metaConfigExists: false,
-      firstRuntimeHealthy: false,
-      hasAnyFeature: false,
-      hasLegacyBaseline: false,
-      baselineSkipped: false,
-      projectMaturity: 'greenfield' as const,
-      discoveredPlatforms: [],
-    };
-    expect(detectInitTrack(state, [])).toBe('no-git');
-  });
-
-  it('B2: git + no .spec-first → project-onboarding', () => {
-    const state = {
-      gitReady: true,
       specFirstDirExists: false,
       metaConfigExists: false,
       firstRuntimeHealthy: false,
@@ -444,9 +415,22 @@ describe('detectInitTrack - boundary cases', () => {
     expect(detectInitTrack(state, [])).toBe('project-onboarding');
   });
 
-  it('B3: git + .spec-first + no first runtime → project-onboarding', () => {
+  it('B2: .spec-first missing metadata → project-onboarding', () => {
     const state = {
-      gitReady: true,
+      specFirstDirExists: false,
+      metaConfigExists: false,
+      firstRuntimeHealthy: false,
+      hasAnyFeature: false,
+      hasLegacyBaseline: false,
+      baselineSkipped: false,
+      projectMaturity: 'greenfield' as const,
+      discoveredPlatforms: [],
+    };
+    expect(detectInitTrack(state, [])).toBe('project-onboarding');
+  });
+
+  it('B3: .spec-first + no first runtime → brownfield-baseline', () => {
+    const state = {
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: false,
@@ -456,12 +440,11 @@ describe('detectInitTrack - boundary cases', () => {
       projectMaturity: 'brownfield' as const,
       discoveredPlatforms: [],
     };
-    expect(detectInitTrack(state, [])).toBe('project-onboarding');
+    expect(detectInitTrack(state, [])).toBe('brownfield-baseline');
   });
 
   it('B4: healthy project without baseline + greenfield → feature-init', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -476,7 +459,6 @@ describe('detectInitTrack - boundary cases', () => {
 
   it('B5: brownfield + no baseline → brownfield-baseline', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -491,7 +473,6 @@ describe('detectInitTrack - boundary cases', () => {
 
   it('B6: brownfield + baseline → feature-init', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -504,9 +485,8 @@ describe('detectInitTrack - boundary cases', () => {
     expect(detectInitTrack(state, [])).toBe('feature-init');
   });
 
-  it('B7: .spec-first exists, first unhealthy, no --feat → project-onboarding', () => {
+  it('B7: .spec-first exists, first unhealthy, no --feat → feature-init when baseline already exists', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: false,
@@ -516,13 +496,11 @@ describe('detectInitTrack - boundary cases', () => {
       projectMaturity: 'brownfield' as const,
       discoveredPlatforms: [],
     };
-    // No --feat arg, so routes to project-onboarding (will fix first there)
-    expect(detectInitTrack(state, [])).toBe('project-onboarding');
+    expect(detectInitTrack(state, [])).toBe('feature-init');
   });
 
   it('B8: first healthy + --feat AUTH → feature-init', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -535,9 +513,8 @@ describe('detectInitTrack - boundary cases', () => {
     expect(detectInitTrack(state, ['--feat', 'AUTH'])).toBe('feature-init');
   });
 
-  it('B9: first unhealthy + --feat AUTH → feature-init-blocked (error signal)', () => {
+  it('B9: first unhealthy + --feat AUTH → feature-init', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: false,
@@ -547,13 +524,11 @@ describe('detectInitTrack - boundary cases', () => {
       projectMaturity: 'brownfield' as const,
       discoveredPlatforms: [],
     };
-    // explicit --feat but first is broken → signal error
-    expect(detectInitTrack(state, ['--feat', 'AUTH'])).toBe('feature-init-blocked');
+    expect(detectInitTrack(state, ['--feat', 'AUTH'])).toBe('feature-init');
   });
 
   it('B10: healthy project + baseline + no --feat → feature-init', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -569,7 +544,6 @@ describe('detectInitTrack - boundary cases', () => {
   it('healthy project should NOT be misrouted to brownfield-baseline', () => {
     // B6 반대: 已接入项目不应被误路由到 baseline
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -585,7 +559,6 @@ describe('detectInitTrack - boundary cases', () => {
 
   it('baseline-skipped brownfield should route to feature-init not brownfield-baseline', () => {
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,
@@ -602,7 +575,6 @@ describe('detectInitTrack - boundary cases', () => {
   it('should not re-create baseline if FSREQ-19700101-LEGACY-BASELINE already exists', () => {
     // hasLegacyBaseline=true → bypass brownfield-baseline track
     const state = {
-      gitReady: true,
       specFirstDirExists: true,
       metaConfigExists: true,
       firstRuntimeHealthy: true,

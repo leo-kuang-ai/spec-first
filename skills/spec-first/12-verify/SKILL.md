@@ -10,7 +10,7 @@ user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash"
 hooks:
   PreToolUse:
-    - matcher: "spec-first (gate|metrics|matrix)"
+    - matcher: "spec-first (gate|metrics|docs)"
       hooks:
         - type: reminder
           message: "[verify] 执行验证命令后必须完整记录输出到 findings.md"
@@ -86,7 +86,7 @@ I'm using the verify skill to validate [Feature] stage completion.
 
 ## 工具选择策略
 
-- CLI / gate / metrics / matrix 校验：
+- CLI / gate / metrics / docs links 校验：
   - 优先使用 `spec-first` 命令
 - 浏览器交互验收与页面验证：
   - 宿主支持时优先 `playwright-mcp`
@@ -145,10 +145,10 @@ I'm using the verify skill to validate [Feature] stage completion.
 | 声明 | 需要的证据 | 不充分的证据 |
 |------|-----------|-------------|
 | Gate 通过 | `spec-first gate check <featureId>` 输出: `PASS` 或 `PASS_WITH_WAIVER` | "我检查过了"、"应该没问题" |
-| 覆盖率达标 | `spec-first metrics coverage <featureId>` + 当前阶段 `gate check` 判定通过 | "所有 FR 都有对应 TASK" |
-| 阶段可推进 | `gate check` 退出码 0（`PASS/PASS_WITH_WAIVER`）+ `matrix check` 满足当前阶段策略 | "上一轮通过了" |
+| 文档关联达标 | `spec-first docs links validate <featureId>` + 当前阶段 `gate check` 判定通过 | "所有文档都已关联" |
+| 阶段可推进 | `gate check` 退出码 0（`PASS/PASS_WITH_WAIVER`）+ `docs links validate` 满足当前阶段策略 | "上一轮通过了" |
 | TASK 完成 | 测试命令输出 + review 通过 | "代码写完了" |
-| Feature 可归档 | `spec-first gate check <featureId>` + `spec-first matrix check <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
+| Feature 可归档 | `spec-first gate check <featureId>` + `spec-first docs links validate <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
 
 ## TDD 与覆盖率的边界
 
@@ -224,7 +224,7 @@ verify 必须区分：
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
 | G-WRAP-01 | Implementation coverage (C6) | = 100% |
-| G-WRAP-02 | All matrix entries in terminal status | ✅/❌ |
+| G-WRAP-02 | All document links resolved | ✅/❌ |
 
 ### 07_release
 
@@ -395,7 +395,7 @@ digraph verify_flow {
 ## 量化通过条件
 
 - **Gate 通过**：`spec-first gate check <featureId>` 退出码为 0，且状态为 `PASS` 或 `PASS_WITH_WAIVER`
-- **阶段可推进**：`gate check` 通过；`matrix check` 按阶段策略执行
+- **阶段可推进**：`gate check` 通过；`docs links validate` 按阶段策略执行
 - **覆盖率可接受**：以 `gate check` 对当前阶段的阈值判定为准
 - **结论可宣告**：以上证据均为本次会话新鲜执行结果（非历史缓存）
 
@@ -437,7 +437,7 @@ digraph verify_flow {
 
 ### Layer 3: 完成检查（Completion）
 
-- 目标：阶段推进前统一验收（gate check + matrix check + 覆盖率判定）
+- 目标：阶段推进前统一验收（gate check + docs links validate + 文档健康判定）
 - 推荐入口：`/spec-first:verify --layer completion`
 
 > 说明：当前 runtime 仅开放 verify 的 completion 层；single/cross 由 review 承载。
@@ -451,9 +451,9 @@ digraph verify_flow {
 ## 执行阶段
 
 - **P0**: 定位 Feature，加载当前阶段
-- **P1**: 加载 `verify-view`、矩阵、覆盖率指标、Gate 条件
-- **P2**: 执行 `gate check`、`matrix check`、`metrics coverage`，获取验证结果
-- **P3**: 生成校验报告（Gate 评估、矩阵完整性、覆盖率缺口、verify-view 重点、修复建议）
+- **P1**: 加载 `verify-view`、文档关联、文档健康指标、Gate 条件
+- **P2**: 执行 `gate check`、`docs links validate`、`metrics report`，获取验证结果
+- **P3**: 生成校验报告（Gate 评估、文档关联完整性、文档健康缺口、verify-view 重点、修复建议）
 - **P4**: 将校验结果写入 findings.md
 - **P4.5**: 如发现 TDD 过程缺口，单列写入 findings.md，避免被覆盖率结论掩盖
 - **P5**: 若所有条件满足，建议执行 stage advance
@@ -461,8 +461,8 @@ digraph verify_flow {
 ## CLI 依赖
 
 - `spec-first gate check`
-- `spec-first matrix check`
-- `spec-first metrics coverage`
+- `spec-first docs links validate`
+- `spec-first metrics report`
 
 ## 输出路径
 
@@ -533,7 +533,7 @@ Gate 已通过，可以推进到下一阶段。
 | 模板类型 | 路径 | 用途 |
 |---------|------|------|
 | Gate 条件 | `gate-conditions.md` | 各阶段 Gate 条件定义 |
-| 覆盖率指标 | `coverage-metrics.md` | C1-C11 指标详解 |
+| 文档指标 | `coverage-metrics.md` | C1-C11 指标与文档健康说明 |
 | 报告模板 | `verify-report-template.md` | verify 报告格式 |
 
 ## Hooks 行为规范
@@ -544,8 +544,8 @@ Gate 已通过，可以推进到下一阶段。
 
 | 匹配工具 | 提醒内容 | 目的 |
 |---------|---------|------|
-| `spec-first (gate\|metrics\|matrix)` | 执行验证命令后必须完整记录输出到 findings.md | 确保证据留存 |
-| `spec-first (gate\|metrics\|matrix)` | 五步 Gate Function: IDENTIFY → RUN → READ → VERIFY → ONLY THEN | 强化铁律 |
+| `spec-first (gate\|metrics\|docs)` | 执行验证命令后必须完整记录输出到 findings.md | 确保证据留存 |
+| `spec-first (gate\|metrics\|docs)` | 五步 Gate Function: IDENTIFY → RUN → READ → VERIFY → ONLY THEN | 强化铁律 |
 | `Write` / `Edit` | 写入校验结果前检查：命令输出完整？退出码正确？失败项有修复建议？ | 确保报告质量 |
 
 ### PostToolUse（工具调用后提醒）

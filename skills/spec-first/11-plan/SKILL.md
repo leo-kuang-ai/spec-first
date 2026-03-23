@@ -14,7 +14,7 @@ hooks:
       hooks:
         - type: reminder
           message: "[plan] 写入 findings.md 前检查：计划摘要完整？风险已评估？下一步明确？"
-    - matcher: "spec-first (gate|metrics|matrix)"
+    - matcher: "spec-first (gate|metrics|docs)"
       hooks:
         - type: reminder
           message: "[plan] 命令执行后必须记录输出到 findings.md"
@@ -269,8 +269,8 @@ digraph plan_flow {
 - `spec-first metrics health`
 - `spec-first doctor`
 - `spec-first gate check`
-- `spec-first matrix check`
-- `spec-first metrics coverage`
+- `spec-first docs links validate`
+- `spec-first metrics report`
 
 ## 输出路径
 
@@ -309,8 +309,8 @@ digraph plan_flow {
 | 阻塞类型 | 检测方式 | 建议解决 |
 |----------|----------|----------|
 | **Gate 失败** | `gate check` 返回 FAIL | 修复失败项 |
-| **覆盖率不足** | `metrics coverage` 显示缺口 | 补充对应产物 |
-| **矩阵缺失** | `matrix check` 发现 orphan | 更新矩阵 |
+| **文档关联不足** | `docs links validate` 显示缺口 | 补充对应产物 |
+| **引用缺失** | `docs links validate` 发现 orphan | 更新文档关联索引 |
 | **AC 歧义** | spec.md 中存在 `[NEEDS CLARIFICATION]` | 澄清需求 |
 
 ## 模板引用路径
@@ -331,7 +331,7 @@ digraph plan_flow {
 | 匹配工具 | 提醒内容 | 目的 |
 |---------|---------|------|
 | `Write` / `Edit` | 写入 findings.md 前检查：计划摘要完整？风险已评估？下一步明确？ | 确保计划质量 |
-| `spec-first (gate\|metrics\|matrix)` | 命令执行后必须记录输出到 findings.md | 确保证据留存 |
+| `spec-first (gate\|metrics\|docs)` | 命令执行后必须记录输出到 findings.md | 确保证据留存 |
 
 ### PostToolUse（工具调用后提醒）
 

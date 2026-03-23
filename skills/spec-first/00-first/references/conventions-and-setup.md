@@ -1,7 +1,7 @@
 # 规范与本地环境分析主题
 
-> **当前正式 contract**：单一标准模式 runtime-first。
 > 正式真源以 `conventions.json`、`entry-guide.json` 为准；`development-guidelines.md` 承载规范与本地环境专题阅读输出。
+> 执行提示见 `references/agent-guidelines-setup.md`。
 
 ## 1. 主题划分
 
@@ -56,6 +56,6 @@
 - 缺少环境示例文件时，允许只输出启动与验证路径
 - 无法确认的步骤必须标注 `[待确认]`
 
-## 7. 质量保障
+## 7. 质量门禁引用
 
-- 通用证据格式、抽样流程、违规判定：见 `references/quality-assurance-rules.md`
+- 通用证据格式、抽样验证与违规判定统一遵循 `references/quality-assurance-rules.md`

@@ -12,12 +12,28 @@ function writeRequiredArtifacts() {
   writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\n', 'utf-8');
   writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), '# Task Plan\n', 'utf-8');
   writeFileSync(
-    join(TMP, 'specs', FEAT, 'traceability-matrix.md'),
-    '| ID | Type | Title | Status | Upstream | Downstream |\n' +
-    '|----|------|-------|--------|----------|------------|\n' +
-    '| FR-AUTH-001 | FR | Login | Planned | REQ-PRD-001 | DS-AUTH-001 |\n' +
-    '| DS-AUTH-001 | DS | Flow | Planned | FR-AUTH-001 | TASK-AUTH-001 |\n' +
-    '| TASK-AUTH-001 | TASK | Impl | Planned | DS-AUTH-001 | TC-AUTH-001 |\n',
+    join(TMP, 'specs', FEAT, 'document-links.yaml'),
+    [
+      'version: 1',
+      `featureId: ${FEAT}`,
+      'documents:',
+      '  - path: spec.md',
+      '    kind: spec',
+      '    stage: 01_specify',
+      '    references: []',
+      '  - path: design.md',
+      '    kind: design',
+      '    stage: 02_design',
+      '    references:',
+      '      - spec.md',
+      '  - path: task_plan.md',
+      '    kind: task-plan',
+      '    stage: 03_plan',
+      '    references:',
+      '      - spec.md',
+      '      - design.md',
+      '',
+    ].join('\n'),
     'utf-8',
   );
 }

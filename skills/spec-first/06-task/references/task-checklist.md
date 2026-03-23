@@ -47,7 +47,7 @@
 - [ ] 使用统一的 task_plan.md 模板
 - [ ] 任务明细表格式一致
 - [ ] TASK ID 命名规范一致
-- [ ] traceability-matrix.md 已同步更新
+- [ ] document-links.yaml 已同步更新
 
 ## H. 常见陷阱（自检）
 

@@ -1,6 +1,6 @@
 /**
  * 核心流程 E2E 测试
- * init → advance 全流程 + Gate 校验 + 矩阵校验 + 覆盖率校验
+ * init → advance 全流程 + Gate 校验 + 文档骨架校验
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
@@ -9,7 +9,6 @@ import yaml from 'js-yaml';
 import { init } from '../../src/core/process-engine/init.js';
 import { advance } from '../../src/core/process-engine/advance.js';
 import { getFeatureState } from '../../src/core/process-engine/feature.js';
-import { getCoverage } from '../../src/core/trace-engine/coverage.js';
 import { evaluateGate } from '../../src/core/gate-engine/gate-evaluator.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-e2e-core');
@@ -71,6 +70,7 @@ describe('Core Flow E2E', () => {
     // 目录和文件存在
     expect(existsSync(join(TMP, 'specs', featureId))).toBe(true);
     expect(existsSync(join(TMP, 'specs', featureId, 'stage-state.json'))).toBe(true);
+    expect(existsSync(join(TMP, 'specs', featureId, 'document-links.yaml'))).toBe(true);
   });
 
   it('should only advance while gate requirements are actually satisfied', () => {
@@ -88,10 +88,10 @@ describe('Core Flow E2E', () => {
     advance(featureId, TMP); // 00→01
     writeFileSync(join(TMP, 'specs', featureId, 'prd.md'), '# PRD\n', 'utf-8');
     writeFileSync(join(TMP, 'specs', featureId, 'spec.md'), '# Spec\n', 'utf-8');
-    expect(() => advance(featureId, TMP)).toThrow(/Gate 未通过/);
+    expect(() => advance(featureId, TMP)).not.toThrow();
     const state = getFeatureState(featureId, TMP);
-    expect(state.currentStage).toBe('01_specify');
-    expect(state.history).toHaveLength(1);
+    expect(state.currentStage).toBe('02_design');
+    expect(state.history).toHaveLength(2);
     expect(state.history[0].from).toBe('00_init');
     expect(state.history[0].to).toBe('01_specify');
   });
@@ -103,11 +103,11 @@ describe('Core Flow E2E', () => {
     expect(gateResult.conditions.length).toBeGreaterThan(0);
   });
 
-  it('should compute coverage metrics after init', () => {
-    const cov = getCoverage(featureId, TMP);
-    expect(cov).toBeDefined();
-    expect(typeof cov.C3).toBe('number');
-    expect(typeof cov.C6).toBe('number');
+  it('should create document links skeleton after init', () => {
+    const content = readFileSync(join(TMP, 'specs', featureId, 'document-links.yaml'), 'utf-8');
+    expect(content).toContain('version: 1');
+    expect(content).toContain(`featureId: ${featureId}`);
+    expect(content).toContain('path: spec.md');
   });
 
   it('should write findings.md on normal advance', () => {

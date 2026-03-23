@@ -4,7 +4,6 @@ import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
 import { getDefaultMetrics, calcHealthScore } from './health-utils.js';
 import { parseTaskPlan, normalizeTaskStatus } from './task-parser.js';
 import { STAGE_ORDER, STAGE_NAMES } from './stage-constants.js';
@@ -145,21 +144,7 @@ function getMetrics(projectRoot, featureId) {
     return getDefaultMetrics(featureId, projectRoot);
   }
 
-  try {
-    // 使用 execFileSync + 参数数组，避免 shell 注入
-    const output = execFileSync('npx', ['spec-first', 'metrics', 'coverage', featureId, '--json'], {
-      cwd: projectRoot,
-      encoding: 'utf-8',
-      timeout: 10000,
-      // npx 可能不存在，优雅降级
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    const parsed = JSON.parse(String(output));
-    return parsed;
-  } catch {
-    // CLI 不可用时返回模拟数据（从 stage-state.json 推断）
-    return getDefaultMetrics(featureId, projectRoot);
-  }
+  return getDefaultMetrics(featureId, projectRoot);
 }
 
 

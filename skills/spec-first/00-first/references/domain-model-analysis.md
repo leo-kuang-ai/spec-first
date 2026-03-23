@@ -1,7 +1,7 @@
 # 领域模型资产产出规范
 
-> **当前正式 contract**：单一标准模式 runtime-first。
 > 正式真源以 `domain-model.json` 为准；`domain-model.md` 为该真源的阅读输出。
+> 执行提示见 `references/agent-domain-model.md`。
 
 ## 1. 输入来源
 
@@ -60,6 +60,6 @@
 - 不得在文档产出阶段补充 runtime truth 中不存在的新事实
 - 默认中文输出，术语、路径、代码标识符保留英文原文
 
-## 8. 质量保障
+## 8. 质量门禁引用
 
-- 通用证据格式、抽样流程、违规判定：见 `references/quality-assurance-rules.md`
+- 通用证据格式、抽样验证与违规判定统一遵循 `references/quality-assurance-rules.md`

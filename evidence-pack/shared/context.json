@@ -1,0 +1,11 @@
+{
+  "serena_status": "active",
+  "fallback": null,
+  "key_config": {
+    "type": "module",
+    "node_version": ">=20.0.0",
+    "typescript": "^5.4.0",
+    "bundler": "tsup",
+    "test_framework": "vitest"
+  }
+}

@@ -22,11 +22,11 @@ function writeState(mode: string, size: string, stage: string) {
 beforeEach(() => {
   mkdirSync(FEAT_DIR, { recursive: true });
   mkdirSync(join(TMP, 'templates', 'init'), { recursive: true });
-  mkdirSync(join(TMP, 'templates', 'matrix'), { recursive: true });
+  mkdirSync(join(TMP, 'templates', 'docs'), { recursive: true });
   mkdirSync(join(TMP, 'templates', 'release'), { recursive: true });
   // stub 模板文件，避免 renderTemplate 报 "not found"
   writeFileSync(join(TMP, 'templates', 'init', 'constitution.md.hbs'), '# {{featureId}}');
-  writeFileSync(join(TMP, 'templates', 'matrix', 'traceability-matrix.md.hbs'), '| {{featureId}} |');
+  writeFileSync(join(TMP, 'templates', 'docs', 'document-links.yaml.hbs'), 'version: 1\nfeatureId: {{featureId}}\n');
   writeFileSync(join(TMP, 'templates', 'release', 'release-note.md.hbs'), '# {{featureId}}');
   writeFileSync(join(TMP, 'templates', 'release', 'smoke-test-report.md.hbs'), '# {{featureId}}');
 });

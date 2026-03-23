@@ -2,9 +2,7 @@
 
 ## 总原则
 
-- 多 Agent 编排属于 Skill 层，不属于 CLI
 - Agent 负责产出结果，Skill 工作流负责将结果写入最终文件
-- CLI 只做最小支撑与校验
 - 单个 Agent 缺证据时必须显式标记 `[待确认]`
 - 总并发上限为 `3` 个 Agent，禁止超出该上限
 
@@ -35,10 +33,12 @@
   - 产出：`conventions.md`、`development-guidelines.md`、`entry-guide.md`
 - `flow-docs`
   - 产出：`critical-flows.md`、`call-graph.md`
+  - 图示表达统一使用 ASCII 文本图，不使用 Mermaid
 - `api-docs`
   - 产出：`api-docs.md`、`external-deps.md`
 - `structure-docs`
   - 产出：`codebase-overview.md`、`architecture.md`
+  - 架构表达统一使用 ASCII 文本图或表格，不使用 Mermaid
 - `model-docs`
   - 产出：`domain-model.md`、`database-er.md`
 
@@ -47,6 +47,7 @@
 ### runtime agents
 
 - 输入：本轮 evidence pack、当前 wave、上一轮 runtime 结果摘要
+- Serena 可用时优先使用符号工具；`shared/summary.json` 与 `shared/context.json` 是本轮共享事实起点
 - 输出：对应的结构化 runtime JSON（必须附带证据指针/来源路径）
 - 禁止：把 docs 正文当作真源或把长篇分析回灌主线程
 - 若输入证据不足：必须在输出中显式标注 `[待确认]`，并说明缺口位置（字段/模块/链路）
@@ -54,6 +55,7 @@
 ### docs agents
 
 - 输入：本轮 evidence pack、已确认的 runtime 结果、当前 wave
+- 优先读取 `shared/summary.json` 与 `shared/context.json`，再结合已确认 runtime 结果展开
 - 输出：对应的 `docs/first/*.md`
 - 禁止：重新取证或反向修正 runtime 真源
 - 门禁：docs agents 只能基于“已确认”的 runtime 资产展开；缺少真源时必须返回阻塞原因，不得硬写正文补洞
@@ -88,6 +90,16 @@
 - `structure-docs`
 - `model-docs`
 
+## 波次前置条件
+
+| Wave | 前置条件 | 部分失败策略 |
+|------|---------|------------|
+| Wave 1 | 本轮 evidence pack 已可读 | 3 个 runtime agents 可独立派发；某个 agent 失败不阻止同波其他 agent |
+| Wave 2 | `summary-steering` healthy，且 Wave 1 的共享证据基础已收敛 | `api-contracts` 与 `structure-overview` 可在各自输入满足时继续；`domain-model` 依赖 `summary-steering` healthy，若该前置失败则保持阻塞 |
+| Wave 3 | Wave 2 的结构化 runtime 资产已可用 | 若 Wave 2 的关键资产仍 `blocked`，Wave 3 不派发 |
+| Wave 4 | Wave 1-3 的 runtime 资产均已可用于 docs 生成 | 允许个别 docs agent 失败重试，但不得用未确认事实补洞 |
+| Wave 5 | 对应 runtime 资产与 docs 输入均已确认 | 只消费已确认 runtime 结果，缺口继续标记 `[待确认]` |
+
 规则：
 
 - docs agents 默认读取同轮 evidence pack，并参考 runtime agents 已产出的结果
@@ -117,6 +129,7 @@
 - 默认最终位置：
   - `.spec-first/runtime/first/*.json`
   - `docs/first/*.md`
+- `call-graph.md`、`architecture.md` 等带图文档如需示意，必须使用 ASCII 文本图或表格，不得引入 Mermaid
 - CLI 输出：
   - runtime 校验结果
   - docs 存在性检查结果

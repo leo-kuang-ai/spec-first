@@ -184,7 +184,7 @@ Owner: {owner}
 |------|------|------|
 | 任务阻塞 | `task_plan.md` | Status 列 = blocked |
 | Gate 失败 | `gate-history.jsonl` | 最后一条 result = FAIL |
-| 覆盖率 | `traceability-matrix.md` | 覆盖率统计 |
+| 文档关联 | `document-links.yaml` | 链接有效性统计 |
 | 发现记录 | `findings.md` | 阻塞标记 |
 
 ---

@@ -2,24 +2,33 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleId } from '../../src/cli/commands/id.js';
-import { handleMatrix, validateMatrixArgs } from '../../src/cli/commands/matrix.js';
 import { handleAnalyze } from '../../src/cli/commands/analyze.js';
+import { handleDocsLinks } from '../../src/cli/commands/docs-links.js';
+import { handleTrace } from '../../src/cli/commands/trace.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-cmd');
 const FEAT_ID = 'FSREQ-20260211-AUTH-001';
 const SPEC_DIR = join(TMP, 'specs', FEAT_ID);
 
-const MATRIX = `| ID | Type | Title | Status | Upstream | Downstream |
-|----|------|-------|--------|----------|------------|
-| FR-AUTH-001 | FR | Login | Planned |  |  |
-| DS-AUTH-001 | DS | Design | Planned | FR-AUTH-001 |  |
+const DOCUMENT_LINKS = `version: 1
+featureId: ${FEAT_ID}
+documents:
+  - path: spec.md
+    kind: requirements
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references:
+      - spec.md
 `;
 
 const origCwd = process.cwd;
 
 beforeEach(() => {
   mkdirSync(SPEC_DIR, { recursive: true });
-  writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), MATRIX, 'utf-8');
+  writeFileSync(join(SPEC_DIR, 'document-links.yaml'), DOCUMENT_LINKS, 'utf-8');
   process.cwd = () => TMP;
 });
 
@@ -57,37 +66,43 @@ describe('handleId', () => {
   });
 });
 
-describe('handleMatrix', () => {
-  it('should check matrix', () => {
-    const code = handleMatrix(['check', FEAT_ID]);
-    // Returns GATE_FAILED (1) because FR-AUTH-001 has broken chains
-    expect(code).toBe(1);
-  });
-
-  it('should export matrix as markdown', () => {
-    const code = handleMatrix(['export', FEAT_ID]);
+describe('handleDocsLinks', () => {
+  it('should validate document links', () => {
+    const code = handleDocsLinks(['validate', FEAT_ID]);
     expect(code).toBe(0);
   });
 
-  it('should export matrix as yaml', () => {
-    const code = handleMatrix(['export', FEAT_ID, '--format', 'yaml']);
+  it('should show document links', () => {
+    const code = handleDocsLinks(['show', FEAT_ID]);
     expect(code).toBe(0);
+  });
+
+  it('should return validation error when references are broken', () => {
+    writeFileSync(
+      join(SPEC_DIR, 'document-links.yaml'),
+      DOCUMENT_LINKS.replace('      - spec.md', '      - missing.md'),
+      'utf-8'
+    );
+    const code = handleDocsLinks(['validate', FEAT_ID]);
+    expect(code).toBe(2);
   });
 
   it('should return error for missing featureId', () => {
-    expect(handleMatrix(['check'])).toBe(2);
+    expect(handleDocsLinks(['validate'])).toBe(2);
   });
 
   it('should return error for unknown subcommand', () => {
-    expect(handleMatrix(['unknown'])).toBe(2);
+    expect(handleDocsLinks(['unknown'])).toBe(2);
+  });
+});
+
+describe('handleTrace', () => {
+  it('should validate document links through trace validate', () => {
+    expect(handleTrace(['validate', FEAT_ID])).toBe(0);
   });
 
-  it('should validate matrix update args before confirmation', () => {
-    expect(validateMatrixArgs(['update', FEAT_ID])).toContain('matrix update <featureId> <id>');
-  });
-
-  it('should require at least one update field for matrix update', () => {
-    expect(validateMatrixArgs(['update', FEAT_ID, 'FR-AUTH-001'])).toContain('至少需要一个更新参数');
+  it('should reject trace fix because auto repair was removed', () => {
+    expect(handleTrace(['fix', FEAT_ID])).toBe(2);
   });
 });
 

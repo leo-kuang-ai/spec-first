@@ -1,59 +1,51 @@
 /**
  * Impact Analysis & Query Interface
- * 基于追踪矩阵的变更影响分析
+ * 基于文档关联的变更影响分析。
  */
-import type { MatrixRow } from '../../shared/types.js';
-import { parseMatrix } from '../trace-engine/matrix.js';
+import { loadDocumentLinks } from '../document-links.js';
 import { getRfc, listRfc } from './rfc.js';
 import { getDefect, getEscapeRate, listDefects } from './defect.js';
 
+export interface ImpactNode {
+  path: string;
+  kind: string;
+  stage: string;
+}
+
 export interface ImpactResult {
   changedIds: string[];
-  directImpact: MatrixRow[];
-  indirectImpact: MatrixRow[];
+  directImpact: ImpactNode[];
+  indirectImpact: ImpactNode[];
   allAffected: string[];
   summary: string;
 }
 
-/** 分析变更影响范围：基于追踪矩阵的上下游传播 */
 export function analyzeImpact(
   featureId: string,
   changedIds: string[],
   projectRoot: string
 ): ImpactResult {
-  const rows = parseMatrix(featureId, projectRoot);
-  const rowMap = new Map(rows.map((r) => [r.id, r]));
+  const links = loadDocumentLinks(featureId, projectRoot);
+  const docMap = new Map(links.documents.map((document) => [document.path, document]));
+  const reverseMap = new Map<string, string[]>();
+
+  for (const document of links.documents) {
+    for (const reference of document.references) {
+      const existing = reverseMap.get(reference) ?? [];
+      existing.push(document.path);
+      reverseMap.set(reference, existing);
+    }
+  }
 
   const visited = new Set<string>(changedIds);
-  const directImpact: MatrixRow[] = [];
-  const indirectImpact: MatrixRow[] = [];
-
-  // BFS: 从 changedIds 出发，沿 upstream/downstream 传播
-  const queue = [...changedIds];
-  const directSet = new Set<string>();
-
-  // 第一层：直接影响（上下游邻居）
-  for (const id of queue) {
-    const row = rowMap.get(id);
-    if (!row) continue;
-    collectNeighbors(row, rowMap, visited, directImpact, directSet);
-  }
-
-  // 第二层：间接影响（邻居的邻居）
-  const indirectQueue = directImpact.map((r) => r.id);
-  for (const id of indirectQueue) {
-    const row = rowMap.get(id);
-    if (!row) continue;
-    collectNeighbors(row, rowMap, visited, indirectImpact, new Set());
-  }
-
-  const allAffected = [
-    ...new Set([
-      ...changedIds,
-      ...directImpact.map((r) => r.id),
-      ...indirectImpact.map((r) => r.id),
-    ]),
-  ];
+  const directImpact = collectImpacts(changedIds, docMap, reverseMap, visited);
+  const indirectImpact = collectImpacts(
+    directImpact.map((node) => node.path),
+    docMap,
+    reverseMap,
+    visited
+  );
+  const allAffected = [...new Set([...changedIds, ...directImpact.map((node) => node.path), ...indirectImpact.map((node) => node.path)])];
 
   return {
     changedIds,
@@ -64,24 +56,35 @@ export function analyzeImpact(
   };
 }
 
-function collectNeighbors(
-  row: MatrixRow,
-  rowMap: Map<string, MatrixRow>,
-  visited: Set<string>,
-  result: MatrixRow[],
-  resultSet: Set<string>
-): void {
-  const neighbors = [...(row.upstream ?? []), ...(row.downstream ?? [])];
-  for (const nId of neighbors) {
-    if (visited.has(nId)) continue;
-    visited.add(nId);
-    const neighbor = rowMap.get(nId);
-    if (neighbor && !resultSet.has(nId)) {
-      result.push(neighbor);
-      resultSet.add(nId);
+function collectImpacts(
+  sourcePaths: string[],
+  docMap: Map<string, { path: string; kind: string; stage: string; references: string[] }>,
+  reverseMap: Map<string, string[]>,
+  visited: Set<string>
+): ImpactNode[] {
+  const results: ImpactNode[] = [];
+  const seen = new Set<string>();
+
+  for (const path of sourcePaths) {
+    const references = docMap.get(path)?.references ?? [];
+    const reverseRefs = reverseMap.get(path) ?? [];
+    const neighbors = [...references, ...reverseRefs];
+
+    for (const neighborPath of neighbors) {
+      if (visited.has(neighborPath) || seen.has(neighborPath)) continue;
+      const neighbor = docMap.get(neighborPath);
+      if (!neighbor) continue;
+      visited.add(neighborPath);
+      seen.add(neighborPath);
+      results.push({
+        path: neighbor.path,
+        kind: neighbor.kind,
+        stage: neighbor.stage,
+      });
     }
   }
+
+  return results;
 }
 
-// Re-export query interfaces for convenience
 export { getRfc, listRfc, getDefect, listDefects, getEscapeRate };

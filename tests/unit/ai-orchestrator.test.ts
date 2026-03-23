@@ -150,7 +150,7 @@ describe('catchup', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'),
       '| ID | Title | Status |\n|---|---|---|\n| TASK-AUTH-001 | Login | In Progress |\n');
     writeFileSync(join(TMP, 'specs', FEAT, 'constitution.md'), '# Constitution');
-    writeFileSync(join(TMP, 'specs', FEAT, 'traceability-matrix.md'), '');
+    writeFileSync(join(TMP, 'specs', FEAT, 'document-links.yaml'), 'version: 1\nfeatureId: FSREQ-20260211-AUTH-001\ndocuments: []\n');
     const result = catchup(FEAT, TMP);
     expect(result.currentTask).toBe('TASK-AUTH-001');
   });
@@ -159,21 +159,36 @@ describe('catchup', () => {
     writeState('04_implement');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| ID | Title | Status |\n|---|---|---|\n| TASK-AUTH-001 | Login API | In Progress |\n',
+      '| ID | Title | Status |\n|---|---|---|\n| TASK-AUTH-001 | Login API spec.md design.md | In Progress |\n',
       'utf-8',
     );
     writeFileSync(
-      join(TMP, 'specs', FEAT, 'traceability-matrix.md'),
-      '| ID | Type | Title | Status | Upstream | Downstream |\n'
-      + '|---|---|---|---|---|---|\n'
-      + '| TASK-AUTH-001 | TASK | Login API | in_progress | FR-AUTH-001,DS-AUTH-001 | /api/auth/login |\n',
+      join(TMP, 'specs', FEAT, 'document-links.yaml'),
+      `version: 1
+featureId: ${FEAT}
+documents:
+  - path: spec.md
+    kind: spec
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references: [spec.md]
+  - path: task_plan.md
+    kind: task-plan
+    stage: 03_plan
+    references: [spec.md, design.md]
+`,
       'utf-8',
     );
     writeFileSync(join(TMP, 'specs', FEAT, 'constitution.md'), '# Constitution');
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\nspec.md');
 
     const result = catchup(FEAT, TMP);
     expect(result.taskContextSummary?.taskId).toBe('TASK-AUTH-001');
-    expect(result.taskContextSummary?.relatedFRCount).toBeGreaterThan(0);
+    expect(result.taskContextSummary?.relatedDocumentCount).toBeGreaterThan(0);
     expect(result.summary).toContain('TaskContextPack: TASK-AUTH-001');
   });
 

@@ -17,19 +17,23 @@ function withCwd(dir: string, fn: () => void | number): void | number {
   }
 }
 
-const MATRIX_CONTENT = `| ID | Type | Title | Status | Upstream | Downstream |
-|----|------|-------|--------|----------|------------|
-| FR-AUTH-001 | FR | Login | Planned |  |  |
-| FR-AUTH-002 | FR | Logout | Planned |  |  |
-| DS-AUTH-001 | DS | Auth Design | Planned |  |  |
-| TASK-AUTH-001 | TASK | Impl Login | Planned |  |  |
-| TC-UT-AUTH-001 | TC | Unit Test | Planned |  |  |
-| RFC-001 | RFC | Change scope | Planned |  |  |
-`;
-
 beforeEach(() => {
   mkdirSync(SPEC_DIR, { recursive: true });
-  writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), MATRIX_CONTENT, 'utf-8');
+  writeFileSync(
+    join(SPEC_DIR, 'spec.md'),
+    [
+      '# Spec',
+      '',
+      'FR-AUTH-001 Login',
+      'FR-AUTH-002 Logout',
+      'DS-AUTH-001 Auth Design',
+      'TASK-AUTH-001 Impl Login',
+      'TC-UT-AUTH-001 Unit Test',
+      'RFC-001 Change scope',
+      '',
+    ].join('\n'),
+    'utf-8'
+  );
 });
 
 afterEach(() => {

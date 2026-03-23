@@ -90,9 +90,9 @@ describe('dispatchCommand', () => {
   });
 
   it('should dispatch with namespace prefix', () => {
-    const result = dispatchCommand('spec-first:matrix check', TMP);
+    const result = dispatchCommand('spec-first:docs validate', TMP);
     expect(result.route).toBe('runtime');
-    expect(result.command).toBe('matrix');
+    expect(result.command).toBe('docs');
   });
 
   it('should map semantic subcommand', () => {
@@ -120,6 +120,19 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('skill');
     expect(result.skillName).toBe('code');
     expect(result.skillPath).toBeDefined();
+  });
+
+  it('should resolve exact skill directory names before NN-prefixed matches', () => {
+    mkdirSync(join(TMP, 'skills', 'spec-first', 'focus-requirements'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'skills', 'spec-first', 'focus-requirements', 'SKILL.md'),
+      '# Focus Requirements',
+      'utf-8',
+    );
+
+    const result = resolveSkillPath('focus-requirements', TMP);
+
+    expect(result).toBe(join(TMP, 'skills', 'spec-first', 'focus-requirements', 'SKILL.md'));
   });
 
   it('should not hard-block code skill at dispatch layer when prerequisites are missing', () => {

@@ -153,17 +153,6 @@ export function parseTaskPlan(projectRoot: string, featureId: string): TaskPlanR
 }
 
 /**
- * 从追踪矩阵推断覆盖率（简化版本）
- */
-export interface CoverageMetrics {
-  C3: number;
-  C4: number;
-  C6: number;
-  C8: number;
-  C9: number;
-}
-
-/**
  * 健康分数计算
  */
 export interface HealthResult {

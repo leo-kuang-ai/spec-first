@@ -127,24 +127,24 @@ Mode I 相比 Mode N 多出 3 个必须处理的环节：
      │                    ← SCA（spec ↔ design）
      ▼
 03. Plan (Tasks + Dependencies + Checklist)        ← /spec-first:task
-     │                    ← Exit Gate: Task Review + 追踪覆盖率校验
+     │                    ← Exit Gate: Task Review + 文档关联校验
      │                    ← SCA（spec ↔ tasks）
      ▼
 04. Implement (Spec-Driven Dev + TDD + CR)         ← /spec-first:code → /spec-first:code-review
-     │                    ← Exit Gate: Code CR + 追踪合规率校验
+     │                    ← Exit Gate: Code CR + 代码合规校验
      │                    ← SCA（spec ↔ code）
      ▼
 05. Verify (Integration Test + Security + UAT)     ← /spec-first:test
-     │                    ← Exit Gate: UAT Sign-off + 测试覆盖率校验
+     │                    ← Exit Gate: UAT Sign-off + 测试产物校验
      │                    ← SCA（spec ↔ test results）
      ▼
-06. Wrap-up (Retrospective + Docs + 矩阵归档)     ← /spec-first:archive
+06. Wrap-up (Retrospective + Docs + 文档归档)     ← /spec-first:archive
      │
      ▼
 07. Release (Build + Smoke Test + Submit to DevOps)
 
 横切机制（贯穿全流程）:
-├── A. Quality Gate — 每个阶段的准出条件（含追踪覆盖率）
+├── A. Quality Gate — 每个阶段的准出条件（含文档关联校验）
 ├── B. SCA — 跨产物一致性校验（5 个触发时机）
 └── C. Change-Management — 变更管理（分级处理，任何阶段可触发）
 
@@ -161,12 +161,12 @@ Mode I 相比 Mode N 多出 3 个必须处理的环节：
 | 阶段 | 活动 | 产出物 | Exit Gate | 追踪校验项 | Skill / CLI |
 |------|------|--------|-----------|-----------|-------------|
 | 00. Init | Feature 启动 + Constitution 读取 | Feature 目录、元数据 | 目录就绪，Mode/Size/端已确认 | — | `/spec-first:init` + CLI: `spec-first init` |
-| 01. Specify | 需求分析 → PRD → ID 分配 → Clarify | `spec.md`, 矩阵初始化 | DoR Sign-off，无歧义标记 | 所有 FR/NFR 已分配 ID | `/spec-first:spec` |
-| 02. Design | Research → 技术选型 → API 契约 → 数据建模 | `design.md`, `contracts/`, ADR | Design Review + API 覆盖率 = 100% | API 覆盖率 = 100% | `/spec-first:design`, `/spec-first:research` |
-| 03. Plan | 任务拆解 → 依赖分析 → Checklist | `task_plan.md`, `checklist.md` | Task Review | Task 覆盖率 = 100%，Task 合规率 = 100% | `/spec-first:task` |
-| 04. Implement | 按 TASK 开发 → TDD → Code Review | 代码、单元测试、`reports/code-review-report.md` | Code CR + 代码覆盖率 ≥ 80% | PR 合规率 = 100% | `/spec-first:code`, `/spec-first:code-review` |
-| 05. Verify | 测试设计 → 执行 → 安全扫描 → UAT | Test Report, UAT Sign-off | UAT Sign-off + 安全无高危（高危定义见 `core-05-cross-cutting.md`） | Test 覆盖率 = 100%，TC 合规率 = 100% | `/spec-first:test` |
-| 06. Wrap-up | 复盘 → 归档 → 矩阵校验 | `retro.md`, 完整矩阵 | 文档完整性 + 归档清单 | 实现覆盖率 = 100%，矩阵全 Accepted/Cancelled | `/spec-first:archive` |
+| 01. Specify | 需求分析 → PRD → ID 分配 → Clarify | `spec.md`, `document-links.yaml` 初始化 | DoR Sign-off，无歧义标记 | 关键文档已声明 | `/spec-first:spec` |
+| 02. Design | Research → 技术选型 → API 契约 → 数据建模 | `design.md`, `contracts/`, ADR | Design Review + 文档关联校验 | 设计文档引用已声明 | `/spec-first:design`, `/spec-first:research` |
+| 03. Plan | 任务拆解 → 依赖分析 → Checklist | `task_plan.md`, `checklist.md` | Task Review | 任务文档引用已声明 | `/spec-first:task` |
+| 04. Implement | 按 TASK 开发 → TDD → Code Review | 代码、单元测试、`reports/code-review-report.md` | Code CR + 代码合规校验 | PR 合规率 = 100% | `/spec-first:code`, `/spec-first:code-review` |
+| 05. Verify | 测试设计 → 执行 → 安全扫描 → UAT | Test Report, UAT Sign-off | UAT Sign-off + 安全无高危（高危定义见 `core-05-cross-cutting.md`） | 测试产物已齐备 | `/spec-first:test` |
+| 06. Wrap-up | 复盘 → 归档 → 文档校验 | `retro.md`, `document-links.yaml` | 文档完整性 + 归档清单 | 文档关联索引已闭合 | `/spec-first:archive` |
 | 07. Release | 构建 → Smoke Test → 提交 DevOps 平台 | Release Note, Smoke Test 报告 | Smoke Test + 核心指标无异常 | — | — |
 
 ---

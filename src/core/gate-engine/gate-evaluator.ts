@@ -1,35 +1,21 @@
 /**
  * Gate 条件评估引擎
- * 读取 stage-state → 评估当前阶段 Gate 条件 → 检查豁免 → 输出三态结果
+ * 读取 stage-state → 评估当前阶段 Gate 条件 → 输出结果
  */
 import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
-import type {
-  Stage,
-  GateStatus,
-  GateResult,
-  ConditionResult,
-  WaiverRef,
-} from '../../shared/types.js';
+import type { Stage, GateStatus, GateResult, ConditionResult } from '../../shared/types.js';
 import { readJsonChecked, appendJsonl, exists } from '../../shared/fs-utils.js';
 import { isStageState } from '../../shared/validators.js';
-import { getCoverage } from '../trace-engine/coverage.js';
-import { parseMatrix } from '../trace-engine/matrix.js';
-import { validateExceptions } from '../trace-engine/exception-validator.js';
 import { runCommandGate } from './command-gate.js';
-import { loadRfcStatuses } from '../change-mgr/rfc.js';
 import {
   GATE_CONDITIONS,
   shouldSkipCondition,
   type GateConditionDef,
   type EvalContext,
 } from './condition-registry.js';
-import { loadConfig } from '../../shared/config-schema.js';
 
-// ─── 导出类型 ─────────────────────────────────────────────
 export type { GateConditionDef, EvalContext };
-
-// ─── 核心评估函数 ─────────────────────────────────────────
 
 export function getProjectTypeFromConstitution(featureId: string, projectRoot: string): string {
   try {
@@ -42,63 +28,29 @@ export function getProjectTypeFromConstitution(featureId: string, projectRoot: s
   }
 }
 
-/** 获取指定阶段的 Gate 条件定义 */
 export function getConditions(
   stage: Stage,
   projectType?: string,
-  profile?: string,
-  projectRoot?: string
+  profile?: string
 ): GateConditionDef[] {
   const conditions = GATE_CONDITIONS[stage] ?? [];
   const filtered = projectType
-    ? conditions.filter((c) => !shouldSkipCondition(c.id, projectType))
+    ? conditions.filter((condition) => !shouldSkipCondition(condition.id, projectType))
     : conditions;
 
-  const withConfigDescriptions = projectRoot
-    ? applyConfigThresholdDescriptions(filtered, projectRoot)
-    : filtered;
+  if (profile !== 'strict') return filtered;
 
-  if (profile !== 'strict') return withConfigDescriptions;
-
-  // strict 不恢复已删除 Gate，但会把默认 warning 提升为 blocking
-  return withConfigDescriptions.map((c) =>
-    c.blocking === false
+  return filtered.map((condition) =>
+    condition.blocking === false
       ? {
-          ...c,
+          ...condition,
           blocking: true,
-          description: c.description.replace(/\s*\(warning\)\s*/i, ''),
+          description: condition.description.replace(/\s*\(warning\)\s*/i, ''),
         }
-      : c
+      : condition
   );
 }
 
-function applyConfigThresholdDescriptions(
-  conditions: GateConditionDef[],
-  projectRoot: string
-): GateConditionDef[] {
-  const thresholds = loadConfig(projectRoot).gate.thresholds;
-  return conditions.map((condition) => {
-    if (condition.id === 'G-IMPL-01') {
-      return {
-        ...condition,
-        description: `Unit test coverage (C4) ${formatThreshold(thresholds['G-IMPL-01'].value, '>=')}`,
-      };
-    }
-    if (condition.id === 'G-VERIFY-01') {
-      return {
-        ...condition,
-        description: `Test coverage FR (C4) ${formatThreshold(thresholds['G-VERIFY-01'].value, '=')}`,
-      };
-    }
-    return condition;
-  });
-}
-
-function formatThreshold(value: number, operator: '>=' | '='): string {
-  return `${operator} ${Number((value * 100).toFixed(2))}%`;
-}
-
-/** 评估 Gate：条件检查 + 豁免匹配 → 三态结果 */
 export interface EvaluateGateOptions {
   persist?: boolean;
 }
@@ -111,39 +63,28 @@ export function evaluateGate(
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   const state = readJsonChecked(statePath, isStageState);
   const stage = state.currentStage;
-
-  // 构建评估上下文（一次解析，全程复用）
-  const rows = parseMatrix(featureId, projectRoot);
-  const rfcStatuses = loadRfcStatuses(featureId, projectRoot);
-  const coverage = getCoverage(featureId, projectRoot, rows, rfcStatuses);
-  const ctx: EvalContext = { featureId, projectRoot, stage, state, coverage, rows, rfcStatuses };
-
   const projectType = getProjectTypeFromConstitution(featureId, projectRoot);
   const profile = state.mergedRules?.profile ?? 'default-simplified';
-  const defs = getConditions(stage, projectType, profile, projectRoot);
-  const conditions: ConditionResult[] = [];
+  const defs = getConditions(stage, projectType, profile);
 
-  for (const def of defs) {
+  const ctx: EvalContext = { featureId, projectRoot, stage, state };
+  const conditions: ConditionResult[] = defs.map((def) => {
     const result = def.evaluate(ctx);
-    const blocking = result.blocking ?? def.blocking ?? true;
-    conditions.push({
+    return {
       id: def.id,
       description: def.description,
       status: result.pass ? 'PASS' : 'FAIL',
       detail: result.detail,
-      scopeFrIds: result.scopeFrIds,
-      blocking,
-    });
-  }
+      blocking: result.blocking ?? def.blocking ?? true,
+    };
+  });
 
-  // Layer2 命令 Gate：从 mergedRules.gateConditions 读取带 command 的条件并执行
-  // 行为：执行所有带 command 的条件，跳过已被 Layer1 评估的重复 ID
   const l2Conditions = (state.mergedRules?.gateConditions?.[stage] ?? []) as Array<{
     id: string;
     description: string;
     command?: string;
   }>;
-  const evaluatedIds = new Set(conditions.map((c) => c.id));
+  const evaluatedIds = new Set(conditions.map((condition) => condition.id));
   for (const l2 of l2Conditions) {
     if (!l2.command || evaluatedIds.has(l2.id)) continue;
     const cmdResult = runCommandGate(l2.command, projectRoot);
@@ -152,65 +93,34 @@ export function evaluateGate(
       description: l2.description,
       status: cmdResult.pass ? 'PASS' : 'FAIL',
       detail: cmdResult.detail,
+      blocking: true,
     });
   }
 
-  // 检查豁免：只匹配 blocking failures
-  const waivers: WaiverRef[] = [];
-  const blockingFailures = conditions.filter((c) => c.status === 'FAIL' && c.blocking !== false);
-
-  if (blockingFailures.length > 0) {
-    const { valid } = validateExceptions(featureId, projectRoot, ctx.rfcStatuses);
-
-    const usedExceptions = new Set<string>();
-    for (const ex of valid) {
-      const matched = blockingFailures.filter(
-        (c) => Array.isArray(c.scopeFrIds) && c.scopeFrIds.includes(ex.frId)
-      );
-      if (matched.length === 0) continue;
-
-      for (const c of matched) {
-        c.status = 'WAIVER';
-      }
-
-      if (!usedExceptions.has(ex.id)) {
-        usedExceptions.add(ex.id);
-        waivers.push({
-          exceptionId: ex.id,
-          rfcId: ex.rfcId,
-          expiresAt: ex.expiresAt,
-          rollbackPoint: ex.rollbackPoint,
-        });
-      }
-    }
-  }
-
-  // 聚合三态结果：warning 不影响 PASS/FAIL 判定
-  const hasBlockingFailure = conditions.some((c) => c.status === 'FAIL' && c.blocking !== false);
-  const hasWaiver = conditions.some((c) => c.status === 'WAIVER');
-  let status: GateStatus;
-  if (hasBlockingFailure) {
-    status = 'FAIL';
-  } else if (hasWaiver) {
-    status = 'PASS_WITH_WAIVER';
-  } else {
-    status = 'PASS';
-  }
+  const hasBlockingFailure = conditions.some(
+    (condition) => condition.status === 'FAIL' && condition.blocking !== false
+  );
+  const hasWarning = conditions.some(
+    (condition) => condition.status === 'FAIL' && condition.blocking === false
+  );
+  const status: GateStatus = hasBlockingFailure ? 'FAIL' : 'PASS';
 
   const gateResult: GateResult = {
     status,
     stage,
     timestamp: new Date().toISOString(),
     conditions,
-    waivers: waivers.length > 0 ? waivers : undefined,
     suggestions: hasBlockingFailure
       ? conditions
-          .filter((c) => c.status === 'FAIL' && c.blocking !== false)
-          .map((c) => `Fix: ${c.description} (${c.detail ?? ''})`)
-      : undefined,
+          .filter((condition) => condition.status === 'FAIL' && condition.blocking !== false)
+          .map((condition) => `Fix: ${condition.description} (${condition.detail ?? ''})`)
+      : hasWarning
+        ? conditions
+            .filter((condition) => condition.status === 'FAIL' && condition.blocking === false)
+            .map((condition) => `Warn: ${condition.description} (${condition.detail ?? ''})`)
+        : undefined,
   };
 
-  // 写入 gate-history.jsonl
   if (options.persist !== false) {
     const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
     appendJsonl(historyPath, {
@@ -223,7 +133,6 @@ export function evaluateGate(
   return gateResult;
 }
 
-/** 读取 Gate 历史记录 */
 export function getGateHistory(featureId: string, projectRoot: string): GateResult[] {
   const historyPath = join(projectRoot, 'specs', featureId, 'gate-history.jsonl');
   if (!exists(historyPath)) return [];
@@ -240,12 +149,9 @@ export function getGateHistory(featureId: string, projectRoot: string): GateResu
         Array.isArray(entry.conditions);
       if (!isGateEval && !isLegacy) continue;
       records.push(entry as unknown as GateResult);
-    } catch (e) {
-      const errorMsg = e instanceof Error ? e.message : String(e);
-      const errorStack = e instanceof Error ? e.stack : undefined;
-      console.error(
-        `[gate-evaluator] Failed to parse gate history line: ${errorMsg}${errorStack ? '\nStack: ' + errorStack : ''}`
-      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(`[gate-evaluator] Failed to parse gate history line: ${message}`);
     }
   }
   return records;

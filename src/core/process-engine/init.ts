@@ -350,11 +350,33 @@ function skeletonTaskPlan(featureId: string, title: string): string {
   );
 }
 
-function skeletonMatrix(): string {
-  return (
-    '| ID | Type | Title | Status | Upstream | Downstream |\n' +
-    '|----|------|-------|--------|----------|------------|\n'
-  );
+function skeletonDocumentLinks(featureId: string): string {
+  return [
+    'version: 1',
+    `featureId: ${featureId}`,
+    'documents:',
+    '  - path: prd.md',
+    '    kind: prd',
+    `    stage: ${Stage.SPECIFY}`,
+    '    references: []',
+    '  - path: spec.md',
+    '    kind: requirements',
+    `    stage: ${Stage.SPECIFY}`,
+    '    references:',
+    '      - prd.md',
+    '  - path: design.md',
+    '    kind: design',
+    `    stage: ${Stage.DESIGN}`,
+    '    references:',
+    '      - spec.md',
+    '  - path: task_plan.md',
+    '    kind: plan',
+    `    stage: ${Stage.PLAN}`,
+    '    references:',
+    '      - spec.md',
+    '      - design.md',
+    '',
+  ].join('\n');
 }
 
 function skeletonPrd(featureId: string, title: string): string {
@@ -785,7 +807,7 @@ function writeFeatureSkeleton(
   const state = createInitialStageState(opts, featureId, mergedRules, backgroundInputStatus);
   writeJson(join(tmpFeatureDir, 'stage-state.json'), state);
   writeMarkdown(join(tmpFeatureDir, 'findings.md'), skeletonFindings(featureId));
-  writeMarkdown(join(tmpFeatureDir, 'traceability-matrix.md'), skeletonMatrix());
+  writeMarkdown(join(tmpFeatureDir, 'document-links.yaml'), skeletonDocumentLinks(featureId));
   writeMarkdown(join(tmpFeatureDir, 'constitution.md'), skeletonConstitution(opts, featureId));
 
   const isLegacyBaseline = featureId === LEGACY_BASELINE_FEATURE_ID;

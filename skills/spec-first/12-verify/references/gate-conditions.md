@@ -64,7 +64,7 @@
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
 | G-WRAP-01 | Implementation coverage (C6) | C6 = 100% | = 100% |
-| G-WRAP-02 | All matrix entries in terminal status | 所有条目状态为终态 | ✅/❌ |
+| G-WRAP-02 | All document links resolved | 所有文档关联均可解析 | ✅/❌ |
 
 ### 07_release
 

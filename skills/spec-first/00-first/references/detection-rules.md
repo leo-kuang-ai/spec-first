@@ -99,6 +99,18 @@
 - 前端依赖含 `antd` / `element-plus` / `arco-design` 时，可标记 `admin`
 - 前端依赖含 `vant` / `nutui` 等移动 Web UI 时，可标记 `h5`
 
+规则补充：
+- 多个子类型同时成立时，优先保留对当前主交付影响最大的一个主子类型
+- 若无法判断主次，不得强行合并为单一结论，保留 `unknown` 或在 `steering.json.tech.constraints` 标记“子类型待确认”
+- 子类型识别失败时，保持空或 `unknown`，不要为了填值而降级为错误类型
+
+判定顺序：
+1. 先判定是否存在明确 CLI 入口；存在时优先标记 `cli-tool`
+2. 再判定前端场景子类型；仅当主类型已是 `frontend` 或 `cross-platform` 时才使用 `admin` / `h5`
+3. 再判定是否仅暴露库构建且缺少明确运行入口；满足时标记 `library`
+4. 最后判定 `service` / `desktop-shell` 等运行形态
+5. 若多个规则同时命中且无法确定主次，保留 `unknown` 并记录冲突证据
+
 ## 5. 混合与多端边界
 
 ### mixed

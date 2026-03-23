@@ -41,6 +41,14 @@ describe('00-first main-thread canonical contracts', () => {
     expect(spec).toContain('主线程只发包，不发长证据');
   });
 
+  it('documents Serena activation and shared evidence pack handoff in execution flow', () => {
+    const flow = read(join(FIRST_REFS, 'execution-flow.md'));
+    expect(flow).toContain('### -1. 激活项目（Serena LSP）');
+    expect(flow).toContain('serena_status');
+    expect(flow).toContain('shared/summary.json');
+    expect(flow).toContain('shared/context.json');
+  });
+
   it('defines the agent output schema', () => {
     const schema = read(AGENT_OUTPUT_SCHEMA);
     expect(schema).toContain('status');

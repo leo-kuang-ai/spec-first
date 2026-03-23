@@ -3,10 +3,8 @@
 ## 总原则
 
 - Skill 定义执行流
-- Skill 负责多 Agent 编排
-- CLI 只负责最小支撑层
-- runtime 是机器真源
 - docs 是人类阅读产物
+- 若需要流程、调用链或架构示意，统一使用 ASCII 文本图，不使用 Mermaid
 
 ## Skill 层执行流
 
@@ -21,10 +19,27 @@
 - 读取 `references/agent-output-schema.md`
 - 主线程只保留契约摘要与波次控制信息，不携带原始长证据正文
 
+### -1. 激活项目（Serena LSP）
+
+- 调用 `mcp__serena__activate_project`
+- 若 30 秒内未收到成功响应则降级到文件工具
+- 降级时写入 `evidence-pack/shared/context.json`：
+  - `serena_status: "unavailable"`
+  - `fallback: "glob-grep-read"`
+- 激活成功时写入 `evidence-pack/shared/context.json`：
+  - `serena_status: "active"`
+- 激活成功时优先读取项目 memory 的摘要信息，不保留完整正文
+
 ### 1. collect evidence pack
 
 - 收集项目结构、关键配置、依赖声明、入口、重要源码证据
+- 先读取 evidence-pack 最小必读层，再按当前 wave 补齐所需证据
+- 最小目标是让主线程和 subagent 能识别项目类型、入口与 wave 相关关键依赖
+- 证据不足时先补齐 evidence pack，不要直接扩大到全文上下文搜集
 - 所有 Agent 共享同一份证据基础
+- 主线程一次性写入 `evidence-pack/shared/summary.json` 和 `evidence-pack/shared/context.json`
+- `shared/summary.json` 由主线程动态生成，subagent 只读，不手工维护
+- `shared/context.json` 仅记录 Serena 可用性、降级原因与本轮关键配置
 
 ### 2. dispatch runtime agents
 

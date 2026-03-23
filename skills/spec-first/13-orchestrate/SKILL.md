@@ -111,7 +111,7 @@ digraph orchestrate_flow {
 ## 证据铁律（阶段推进）
 
 在声明“阶段可推进”前，必须遵循 verify 的五步证据铁律：
-- 先执行 `spec-first gate check <featureId>` 与必要的 `matrix/coverage` 命令
+- 先执行 `spec-first gate check <featureId>` 与必要的 `docs links validate / metrics report` 命令
 - 明确读取并报告退出码
 - 仅当证据为本次会话新鲜执行结果时，才允许进入 `stage advance`
 

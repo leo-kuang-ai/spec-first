@@ -8,7 +8,7 @@ export const EXTENSION_HOOK_SCRIPT = '.spec-first/hooks/extension-hook.mjs';
 
 export const MANAGED_HOOK_COMMAND_MARKERS = [
   'npx spec-first gate check',
-  'npx spec-first matrix check',
+  'npx spec-first docs validate',
   'npx spec-first ai stats',
   `sh ${TASK_CONTEXT_SCRIPT}`,
   `sh ${STOP_GUARD_SCRIPT}`,

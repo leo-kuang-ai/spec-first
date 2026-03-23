@@ -1,0 +1,29 @@
+{
+  "project_type": {
+    "primary": "backend",
+    "subtype": "cli-tool"
+  },
+  "entry_points": {
+    "cli": "src/cli/index.ts",
+    "bin": "dist/cli/index.js"
+  },
+  "core_modules": [
+    "process-engine",
+    "skill-runtime",
+    "ai-orchestrator",
+    "gate-engine",
+    "trace-engine",
+    "change-mgr",
+    "template",
+    "tool-integration",
+    "metrics-engine",
+    "validators",
+    "task-plan",
+    "rules",
+    "batch-executor",
+    "migrations"
+  ],
+  "cli_commands": 27,
+  "skills_count": 20,
+  "gaps": []
+}

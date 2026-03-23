@@ -79,7 +79,7 @@ const SEMANTIC_MAP: Record<string, { command: string; argTemplate: string }> = {
 /** Runtime 路由命令列表（直接映射 CLI 原子命令） */
 const RUNTIME_COMMANDS = new Set([
   'id',
-  'matrix',
+  'docs',
   'stage',
   'rfc',
   'defect',
@@ -378,13 +378,14 @@ export function resolveSkillPath(skillName: string, projectRoot: string): string
 
 /** 在目录中查找匹配的 Skill 文件 */
 function findSkillFile(baseDir: string, skillName: string): string | undefined {
-  // 尝试 NN-skillName/SKILL.md 格式
   if (!exists(baseDir)) return undefined;
+
+  const exact = join(baseDir, skillName, 'SKILL.md');
+  if (exists(exact)) return exact;
 
   try {
     const entries = readdirSync(baseDir);
     for (const entry of entries) {
-      // 匹配 NN-skillName 格式
       if (entry.endsWith(`-${skillName}`)) {
         const skillFile = join(baseDir, entry, 'SKILL.md');
         if (exists(skillFile)) return skillFile;
@@ -884,7 +885,7 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
     const parts = ['<!-- task-runtime-context -->', '## Task Planning Context'];
     parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
     parts.push(`data_source: ${context.source}`);
-    parts.push('required_inputs: spec.md + design.md + traceability-matrix.md');
+    parts.push('required_inputs: spec.md + design.md + document-links.yaml');
     if (context.requiredAssetNames.length > 0) {
       parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
     }

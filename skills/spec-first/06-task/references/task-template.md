@@ -18,7 +18,7 @@
 ### TASK-AUTH-001 — 登录接口实现
 1. 先补 RED 用例并确认失败原因
 2. 只写最小实现让测试转绿
-3. 更新 traceability-matrix.md 与 findings.md
+3. 更新 document-links.yaml 与 findings.md
 
 ## 验证命令
 

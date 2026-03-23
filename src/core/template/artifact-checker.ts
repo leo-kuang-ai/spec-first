@@ -49,9 +49,9 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   { relativePath: 'stage-state.json', stage: Stage.INIT },
   { relativePath: 'constitution.md', stage: Stage.INIT, template: 'init/constitution.md' },
   {
-    relativePath: 'traceability-matrix.md',
+    relativePath: 'document-links.yaml',
     stage: Stage.INIT,
-    template: 'matrix/traceability-matrix.md',
+    template: 'docs/document-links.yaml',
   },
   { relativePath: 'findings.md', stage: Stage.INIT },
   { relativePath: 'task_plan.md', stage: Stage.INIT },

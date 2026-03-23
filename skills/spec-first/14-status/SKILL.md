@@ -1,6 +1,6 @@
 ---
 name: "spec-first:status"
-description: "Use when you need a snapshot of the current feature's stage, coverage, risks, and runtime/docs background health."
+description: "Use when you need a snapshot of the current feature's stage, document links, risks, and runtime/docs background health."
 version: 1.1.0
 last_updated: 2026-03-18
 changelog: |
@@ -341,7 +341,8 @@ digraph status_flow {
 
 - `spec-first stage current`
 - `spec-first metrics health`
-- `spec-first metrics coverage`
+- `spec-first metrics report`
+- `spec-first metrics health`
 - `spec-first feature current`
 - `spec-first gate check`
 

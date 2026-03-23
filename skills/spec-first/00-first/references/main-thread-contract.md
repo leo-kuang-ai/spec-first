@@ -23,8 +23,9 @@
 
 ## 4. 并发上限
 
-- 并发由 `runtime.auto_orchestrate.max_parallel` 控制（默认值见配置；范围通常为 `1-4`）
-- 主线程不得私自提升并发，需要调优必须通过配置变更
+- 并发由 `runtime.auto_orchestrate.max_parallel` 控制，主线程只读取配置值，不自定义扩展
+- 当前可接受的总并发上限由 `references/subagent-architecture.md` 统一定义，固定为 `3`
+- 主线程不得将并发提升到该上限之外；需要调优必须先修改统一契约
 - 主线程只调度，不扩展并发上限，也不携带子任务长上下文
 
 ## 5. 重试规则

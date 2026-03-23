@@ -113,18 +113,6 @@ function seedReleaseDeliverables(featureId: string): void {
   writeFileSync(join(specDir, 'retro.md'), '# Retro\n', 'utf-8');
   writeFileSync(join(specDir, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
   writeFileSync(join(specDir, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');
-  writeFileSync(
-    join(specDir, 'traceability-matrix.md'),
-    [
-      '| ID | Type | Title | Status | Upstream | Downstream |',
-      '|----|------|-------|--------|----------|------------|',
-      '| FR-CLI-001 | FR | CLI governance flow | Accepted |  | TASK-CLI-001,TC-UT-CLI-001 |',
-      '| TASK-CLI-001 | TASK | Implement CLI governance | Accepted | FR-CLI-001 |  |',
-      '| TC-UT-CLI-001 | TC | Verify CLI governance | Accepted | FR-CLI-001 |  |',
-      '',
-    ].join('\n'),
-    'utf-8'
-  );
 }
 
 beforeEach(() => {

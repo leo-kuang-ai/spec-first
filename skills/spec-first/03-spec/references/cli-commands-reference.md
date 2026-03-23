@@ -18,27 +18,12 @@
 **❌ 禁止**:
 - `REQ-PRD` - 不存在此类型，应使用 `REQ`
 
-### Matrix 状态
+### 文档关联索引
 
-**✅ 使用**:
-- `Planned` - 已规划（默认）
-- `Implemented` - 已实现
-- `Verified` - 已验证
-- `Accepted` - 已验收
-- `Deferred` - 已延期
-- `Cancelled` - 已取消
-- `Exception` - 例外处理
-
-**❌ 禁止**:
-- `pending` - 应使用 `Planned`
-- `InProgress` - 应使用 `Implemented`
-- `Completed` - 应使用 `Implemented` 或 `Verified`
-- `Blocked` - 应使用 `Deferred`
-
-### 确认策略
-
-- `matrix update` 必须添加 `--yes`（policy=strict）
-- 串行执行 matrix 操作，避免并行失败级联
+**原则**:
+- 文档关联由 `document-links.yaml` 记录
+- 关联校验优先于手工维护
+- 不在 CLI 中维护矩阵状态值
 
 详见 `references/id-types-and-status.md`
 
@@ -71,47 +56,18 @@ spec-first id next FR AUTH --feature FSREQ-20260309-AUTH-001
 
 ---
 
-### 2. 更新追溯矩阵
+### 2. 查看文档关联
 
 ```bash
-spec-first matrix update <featureId> <id> --title "<title>" --yes
-spec-first matrix update <featureId> <id> --status <status> --yes
-spec-first matrix update <featureId> <id> --upstream <ids> --yes
-spec-first matrix update <featureId> <id> --downstream <ids> --yes
+spec-first docs links show <featureId>
 ```
 
 **参数**:
 - `<featureId>`: Feature ID
-- `<id>`: 追溯 ID（如 FR-AUTH-001）
-- `--title`: 标题
-- `--status`: 状态（Planned/Implemented/Verified/Accepted/Deferred/Cancelled/Exception）
-- `--upstream`: 上游依赖 ID（逗号分隔）
-- `--downstream`: 下游依赖 ID（逗号分隔）
-- `--yes`: 强制确认（必需）
 
-**示例**:
-```bash
-spec-first matrix update FSREQ-20260309-AUTH-001 FR-AUTH-001 \
-  --title "用户登录功能" \
-  --status Planned \
-  --upstream REQ-AUTH-001,REQ-AUTH-002 \
-  --yes
-```
-
-**错误处理**:
-1. 检查 ID 冲突
-2. 使用 `--force` 覆盖（如需要）
-3. 重试 1 次
-4. 失败则标记 `[CLI_ERROR]` 并请求用户介入
-
-**网络超时处理**:
-1. 等待 5 秒重试
-2. 最多 3 次
-3. 失败则标记 `[CLI_ERROR]` 并请求用户介入
-
-**阻断规则**:
-- 不得跳过注册
-- 所有 FR 必须成功注册后才能执行 gate check
+**用途**:
+- 查看当前 feature 的文档引用关系
+- 输出 `document-links.yaml` 的可读视图
 
 ---
 
@@ -127,7 +83,7 @@ spec-first gate check <featureId>
 **检查项**:
 - PRD 存在且 C-PRD ≥ 85%
 - spec.md 存在且包含所有 FR/AC
-- FR 已注册到追溯矩阵
+- document-links.yaml 中的引用可解析
 - spec-review.md 存在（如需要）
 
 **示例**:
@@ -183,9 +139,9 @@ spec-first validate format FSREQ-20260309-AUTH-001
    spec-first id next FR <abbr> --feature <featureId>
    ```
 
-2. **注册到矩阵**（串行，每个 FR 一次）
+2. **查看文档关联**（如需要）
    ```bash
-   spec-first matrix update <featureId> <id> --title "标题" --yes
+   spec-first docs links show <featureId>
    ```
 
 3. **执行 Gate Check**（阻断门禁）

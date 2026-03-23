@@ -193,7 +193,7 @@ stage: <stageId>                  # 对应阶段（utility 类可省略）
 | SCA 范围 | 增量（仅本次变更涉及的产物） | 全量（所有产物） |
 | Gate 条件 | 当前阶段 Exit Gate | 当前 + 所有已通过阶段回归 |
 | 引用深度 | `depth=1`（直接邻居） | `depth=2`（二级关联） |
-| 覆盖率计算 | 仅当前阶段相关指标 | 全部 9 项覆盖率 |
+| 覆盖率计算 | 仅当前阶段相关指标 | 全部健康度指标 |
 | 适用场景 | 日常开发中快速校验 | 阶段切换前 / PR 合并前 |
 
 > 未指定时默认 `quick`。`/spec-first:orchestrate` 在阶段推进前自动使用 `full`。
@@ -207,7 +207,7 @@ stage: <stageId>                  # 对应阶段（utility 类可省略）
 | `/spec-first:stage cancel --feature <featureId> --reason "<reason>"` | `spec-first stage cancel <featureId> --reason "<reason>"` | 取消 Feature |
 | `/spec-first:id ...` | `spec-first id ...` | ID 生成/校验/查询 |
 | `/spec-first:gate ...` | `spec-first gate ...` | Gate 校验 |
-| `/spec-first:matrix ...` | `spec-first matrix ...` | 追踪矩阵校验/导出 |
+| `/spec-first:docs ...` | `spec-first docs ...` | 文档关联校验/展示 |
 | `/spec-first:rfc ...` | `spec-first rfc ...` | 变更管理 |
 | `/spec-first:defect ...` | `spec-first defect ...` | 缺陷管理 |
 
@@ -269,7 +269,7 @@ Phase 4 — 写入交付物
   └── spec-first id next <type> <abbr>（注册新 ID）
 
 Phase 5 — 副作用执行
-  ├── spec-first matrix check <featureId>（更新追踪矩阵）
+  ├── spec-first docs links validate <featureId>（校验文档关联）
   ├── spec-first gate check <featureId>（校验 Gate）
   └── 更新运行态三文件（stage-state.json / findings.md / task_plan.md）
 ```
@@ -376,7 +376,7 @@ context_pack:
     current_phase: "04_implement"
     current_task: "TASK-AUTH-001"
     artifacts:
-      matrix: "specs/<featureId>/traceability-matrix.md"
+      links: "specs/<featureId>/document-links.yaml"
       progress: "specs/<featureId>/stage-state.json"
   references:
     - path: "specs/<featureId>/spec.md"
@@ -413,7 +413,7 @@ context_pack:
 **剪裁算法**：
 1. **L1 全局加载**：始终加载 Constitution 及 Project Meta。
 2. **L2 阶段加载**：仅加载当前阶段强依赖的上游产出物（如 Code 阶段仅需 API 定义，无需 Design 演进历史）。
-3. **L3 邻居加载**：基于 `traceability-matrix.md` 的引用关系，仅提取与 Current ID 直接关联的上下游条目（Depth=1）。
+3. **L3 邻居加载**：基于 `document-links.yaml` 的引用关系，仅提取与 Current ID 直接关联的上下游文档（Depth=1）。
 
 **预算与降级规则**：
 

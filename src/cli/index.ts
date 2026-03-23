@@ -6,7 +6,6 @@
  */
 import { dispatch, registerCommand } from './router.js';
 import { handleId } from './commands/id.js';
-import { handleMatrix, validateMatrixArgs } from './commands/matrix.js';
 import { handleInit } from './commands/init.js';
 import { handleStage } from './commands/stage.js';
 import { handleRfc } from './commands/rfc.js';
@@ -32,12 +31,10 @@ import { handleBatchTest } from './commands/batch-test.js';
 import { handleOnboarding } from './commands/onboarding.js';
 import { handleSkill } from './commands/skill.js';
 import { handleStatus } from './commands/status.js';
+import { handleDocsLinks } from './commands/docs-links.js';
 
 registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
-registerCommand('matrix', '同步追踪矩阵', handleMatrix, {
-  requiresConfirmation: (args) => args[0] === 'update',
-  validateArgs: validateMatrixArgs,
-});
+registerCommand('docs', '文档索引与文档关联校验', handleDocsLinks);
 registerCommand('init', '初始化 Feature 工作区', handleInit, {
   requiresConfirmation: false,
 });

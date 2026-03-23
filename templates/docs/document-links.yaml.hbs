@@ -1,0 +1,18 @@
+version: 1
+featureId: {{featureId}}
+documents:
+  - path: spec.md
+    kind: spec
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references:
+      - spec.md
+  - path: task_plan.md
+    kind: task-plan
+    stage: 03_plan
+    references:
+      - spec.md
+      - design.md

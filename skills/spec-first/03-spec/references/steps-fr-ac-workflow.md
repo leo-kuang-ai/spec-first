@@ -12,7 +12,7 @@
 1. 检查 `specs/{featureId}/` 目录存在
 2. 检查 `stage-state.json` 阶段为 `01_specify`
 3. 检查 `constitution.md` 存在
-4. 检查 `traceability-matrix.md` 存在
+4. 检查 `document-links.yaml` 是否已初始化（如工作区启用了文档关联索引）
 
 **输出**:
 - `findings.md` 记录 Step 0 完成
@@ -280,17 +280,18 @@
 
 ### 3. 用户确认后生成实施计划
 
-### 4. 注册所有 FR 到追踪矩阵
+### 4. 写入 spec.md 并同步文档关联
 
-使用以下 CLI 命令：
+使用以下流程：
 ```bash
 spec-first id next FR <abbr> --feature <featureId>
-spec-first matrix update <featureId> <id> --title "标题" --yes
+spec-first docs links validate <featureId>
 ```
 
 **注意**:
-- matrix update 需要 `--yes` 确认（policy=strict）
-- 串行执行 matrix 操作，避免并行失败
+- FR 确认后必须立即写入 `spec.md`
+- 如存在 `document-links.yaml`，需同步保持引用可验证
+- 不再维护矩阵式注册流程
 
 **错误处理**:
 - ID 生成失败: 检查 Feature 存在性 → 检查 ABBR 格式 → 重试 1 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
@@ -323,7 +324,7 @@ spec-first gate check <featureId>
 
 **输出**:
 - `spec.md` 最终版本
-- `traceability-matrix.md` 注册所有 FR
+- `spec.md` 与 `document-links.yaml` 保持一致
 - `findings.md` 记录 Step 8 完成 + gate check 通过
 
 **格式校验**（落盘后自动执行）:

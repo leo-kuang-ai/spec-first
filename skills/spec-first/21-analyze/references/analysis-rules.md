@@ -12,29 +12,29 @@
 - spec.md 是否存在
 - design.md 是否存在
 - task_plan.md 是否存在
-- traceability-matrix.md 是否存在
+- document-links.yaml 是否存在
 
 **严重度判定**:
 - 缺失 spec.md → `CRITICAL`
 - 缺失 design.md（03_plan 之后）→ `HIGH`
 - 缺失 task_plan.md（03_plan 之后）→ `HIGH`
-- 缺失 matrix → `MEDIUM`
+- 缺失 document-links.yaml → `MEDIUM`
 
 ---
 
 ### 2. 追溯完整性检查
 
 **检查项**:
-- spec.md 中的 FR 是否在 matrix 中
-- design.md 中的 DS 是否在 matrix 中
-- task_plan.md 中的 TASK 是否在 matrix 中
-- matrix 中的 FR 是否在 spec.md 中定义
+- spec.md 中的 FR 是否在 document-links.yaml 中引用
+- design.md 中的 DS 是否在 document-links.yaml 中引用
+- task_plan.md 中的 TASK 是否在 document-links.yaml 中引用
+- document-links.yaml 中的引用是否指向真实文档
 
 **严重度判定**:
 - FR 缺失追溯 → `HIGH`
 - DS 缺失追溯 → `HIGH`
 - TASK 缺失追溯 → `MEDIUM`
-- 孤立的 matrix 条目 → `LOW`
+- 孤立的文档关联条目 → `LOW`
 
 ---
 
@@ -94,8 +94,8 @@
 
 **检测逻辑**:
 1. 提取 spec.md 中所有 FR-XXX
-2. 检查 matrix 中是否有对应的 DS
-3. 检查 matrix 中是否有对应的 TASK
+2. 检查 document-links.yaml 中是否有对应的设计引用
+3. 检查 document-links.yaml 中是否有对应的任务引用
 
 **示例**:
 ```

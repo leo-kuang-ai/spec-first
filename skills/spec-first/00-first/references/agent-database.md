@@ -10,11 +10,14 @@
 ## 输入证据
 
 - ORM schema、migrations、配置、repository/entity 线索
+- Serena 可用时优先使用符号工具，`shared/summary.json` 与 `shared/context.json` 可作为数据库线索起点
 - 只有在必要且安全时才做即时连接探测
 
-## 输出资产
+## 输出约束
 
-- `database-schema.json`
+- 当前任务只负责补足当前 wave 所需证据，帮助生成 `database-schema.json`
+- 具体输出资产定义见 `references/database-conditional-projection.md` 与 `references/database-config.md`
+- 不得把长篇分析回灌主线程
 
 ## 缺口标记
 

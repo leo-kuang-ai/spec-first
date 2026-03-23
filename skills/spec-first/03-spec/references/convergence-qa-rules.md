@@ -156,14 +156,16 @@ Step 6 Q&A Loop（收敛确认）的一问一答策略。
 
 ---
 
-### 注册到追踪矩阵
+### 写入与校验
 
-确认后，立即注册到 `traceability-matrix.md`。
+确认后，立即写入 `spec.md`。
+
+如当前工作区维护 `document-links.yaml`，则同步更新引用并执行校验。
 
 **命令**：
 ```bash
 spec-first id next FR AUTH --feature <featureId>
-spec-first matrix update <featureId> FR-AUTH-001 --title "短信验证码登录" --status Planned
+spec-first docs links validate <featureId>
 ```
 
 ---
@@ -176,7 +178,7 @@ spec-first matrix update <featureId> FR-AUTH-001 --title "短信验证码登录"
 2. **FR 先 AC 后** — FR 确认后再确认 AC
 3. **允许修订** — 用户可以修订，修订后重新确认
 4. **立即写入** — 确认后立即写入 spec.md
-5. **立即注册** — 确认后立即注册到追踪矩阵
+5. **立即同步** — 确认后立即同步到文档关联索引
 
 ### DON'T ❌
 
@@ -184,7 +186,7 @@ spec-first matrix update <featureId> FR-AUTH-001 --title "短信验证码登录"
 2. **不要跳过 AC** — FR 确认后必须确认 AC
 3. **不要拒绝修订** — 用户修订是正常流程
 4. **不要延迟写入** — 确认后立即写入
-5. **不要忘记注册** — 确认后必须注册到矩阵
+5. **不要忘记同步** — 确认后必须同步到文档关联索引
 
 ---
 
@@ -192,4 +194,4 @@ spec-first matrix update <featureId> FR-AUTH-001 --title "短信验证码登录"
 
 - 主文档：`03-spec/SKILL.md` Step 6
 - AC ID 规范：`03-spec/SKILL.md` AC ID 规范章节
-- 追踪矩阵：`traceability-matrix.md`
+- 文档关联索引：`document-links.yaml`

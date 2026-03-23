@@ -1,6 +1,6 @@
 ---
 name: "spec-first:init"
-description: "Use when starting spec-first in a repo, creating a new feature workspace, or routing initialization for a new or existing project."
+description: "Use when you need to locate the project root and initialize a Feature workspace through the guided init flow, including project onboarding, brownfield baseline setup, or new feature creation."
 ---
 
 # Skill: init
@@ -9,21 +9,25 @@ description: "Use when starting spec-first in a repo, creating a new feature wor
 
 - Command: `/spec-first:init`
 
+适用场景：
+- 新项目创建
+- 刚 clone 下来的 git 远程项目
+- 本地存量项目的需求迭代
+- 仅补齐 `.spec-first` 项目壳或 `meta/config.yaml`
+
 ## 背景质量契约
 
-本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)。
-- 关键字段：`backgroundInputStatus` / `background_input_status`
-- 使用原则：`first` 是优先背景输入，不是硬阻断前置；当 `backgroundInputStatus=degraded|blind` 时允许降级初始化，但必须给出补跑 `/spec-first:first` 的建议。
+- 本 skill 遵循 [shared/background-quality-contract.md](../shared/background-quality-contract.md)
+- `backgroundInputStatus` / `background_input_status` 三个值：`full` | `degraded` | `blind`
+- `first` 是优先背景输入，不是硬阻断前置；`degraded`/`blind` 时允许降级初始化，但必须给出补跑 `/spec-first:first` 的建议
 
-## 五轨道自动路由
+## 三轨道自动路由
 
-`spec-first init` 根据项目当前状态自动识别并路由到五条轨道之一：
+`spec-first init` 根据项目当前状态自动识别并路由到三条轨道之一：
 
 | 轨道 | 触发条件 | 主要动作 |
 |------|---------|---------|
-| `no-git` | `.git` 不存在 | 输出 git init 指引，退出 |
-| `project-onboarding` | `.spec-first` 不存在、`meta/config.yaml` 缺失、或 00-first 未完成 | 引导运行 `first` skill |
-| `feature-init-blocked` | 00-first 未完成且携带 `--feat` 参数 | 明确报错，阻止创建 Feature |
+| `project-onboarding` | `.spec-first` 不存在、`meta/config.yaml` 缺失、或 00-first 未完成 | 补齐项目壳并继续 feature-init |
 | `brownfield-baseline` | 存量项目（≥50 源码文件）且尚无基线 Feature | 交互式引导创建 `FSREQ-19700101-LEGACY-BASELINE` |
 | `feature-init` | 健康项目 + 基线已就绪（或 greenfield） | 收集参数并创建新 Feature |
 
@@ -31,84 +35,53 @@ description: "Use when starting spec-first in a repo, creating a new feature wor
 
 ## 执行流程
 
-### no-git 轨道
-
-1. 输出 git init 操作指引
-2. 退出，等待用户完成后重新运行 `/spec-first:init`
-
 ### project-onboarding 轨道
 
-1. 检测缺失项（git / .spec-first / first runtime）
-2. 输出具体的补救命令（`/spec-first:first`）
-3. 退出，等待用户完成前置步骤后重新运行 `/spec-first:init`
-
-### feature-init-blocked 轨道
-
-1. 检测到 `--feat` 参数但 first runtime 不健康
-2. 输出明确错误，引导用户先运行 `/spec-first:first`
-3. 退出，等待用户完成后重新运行 `/spec-first:init`
+1. 检测并补齐 `.spec-first/meta/config.yaml`
+2. 若 first runtime 不完整，则标记降级背景状态并提示补跑 `/spec-first:first`
+3. 继续进入 feature-init 流程，完成参数收集与 Feature 创建
 
 ### brownfield-baseline 轨道
 
 1. 提示用户存量项目尚无基线
 2. 显示将创建的 baseline Feature 参数（featureId: `FSREQ-19700101-LEGACY-BASELINE`，mode: I，size: M）
-3. 提供三个选项：
+3. 先解释为什么建议建基线：把当前系统已有能力盘点成一份可分析起点，后续业务 Feature 基于这份起点继续，不把旧系统当空白项目
+4. 提供三个选项：
    - **[y] 创建基线**：自动生成 baseline Feature，含 `prd.md`（已上线能力摘要）和 `task_plan.md`（基线补齐）
-   - **[s] 跳过**：写入 `baselineSkipped: true` 到 `.spec-first/meta/config.yaml`，下次直接进入 feature-init
+   - **[s] 跳过**：写入 `baselineSkipped: true` 到 `.spec-first/meta/config.yaml`，下次直接进入 feature-init；适合你已经明确要直接推进某个业务需求
    - **[n] 退出**：取消操作
-4. 创建基线后，提示用户完成 `prd.md` 盘点，然后再运行 `/spec-first:init` 创建业务 Feature
+5. 创建基线后，提示用户完成 `prd.md` 盘点，然后再运行 `/spec-first:init` 创建业务 Feature
 
 ### feature-init 轨道
 
-- **P0**: 显示 00-first 摘要（技术栈/代码量/API 端点）
-- **P1**: 读取平台列表 - 扫描 `.spec-first/layer2/*.yaml`
-  - ⚠️ 若目录不存在或为空，进入 Skill 侧的模板补齐流程，再回到 CLI 执行
-  - **关键**：平台模板属于 Skill/工作流决策，不允许脚本根据启发式自动编造
-  - **关键**：必须使用 `platform:` 字段（不是 `name:`），这是 CLI 校验的硬性要求
-- **P2**: 交互式收集参数 - 详见 [interaction-guide.md](references/interaction-guide.md)
-- **P3**: 参数确认 - 回显所有选择后执行
-- **P4**: 执行 CLI - `spec-first init [参数]`
-- **P5**: 验证并输出摘要
+**执行流程**：
+
+1. **检查 runtime 真源**
+   - 完整：显示摘要（如"技术栈: TypeScript, 代码量: 15k LOC, API: 23 端点"）
+   - 不完整：标记 `background_input_status=degraded` 或 `blind`，提示补跑 `/spec-first:first`
+
+2. **扫描平台列表**
+   - 读取 `.spec-first/layer2/*.yaml`，提取 `platform` 字段
+   - 若目录不存在或为空 → 询问用户"需要哪些平台？[h5, java-backend, ios, android]"，然后创建平台 YAML（见 [prerequisites.md](references/prerequisites.md)）
+
+3. **交互式收集参数**
+   - 顺序：feat → mode → size → platforms → title → feature-id → bootstrap
+   - 详见 [interaction-guide.md](references/interaction-guide.md)
+   - **feat 中文输入**：提取关键词首字母生成 3-4 个英文缩写候选（如"首页阶段流转图" → HOMEPAGE / FLOWCHART / STAGEFLOW）
+
+4. **参数确认**
+   - 回显所有选择，询问"确认以上参数？[Y/n]"
+
+5. **执行 CLI**
+   - 组装参数：`spec-first init --feat <FEAT> --mode <N|I> --size <S|M|L> --platforms <逗号分隔>`
+   - 可选参数：`--title`, `--feature-id`, `--bootstrap`
+   - CLI 成功后输出摘要（Feature ID、目录、已创建文件）
+   - 输出格式示例见 [output-format](references/output-format.md)
 
 ## 参数约束
 
-详见 [parameters.md](references/parameters.md)，关键约束：
-- `feat`: `^[A-Z][A-Z0-9]{0,15}$`
-- `platforms`: 必须来自 `.spec-first/layer2/*.yaml`
-- `mode`: N/I，默认 N
-- `size`: S/M/L，默认 M
-
-**Mode I 特性**：Mode I Feature 初始化时额外生成 `impact-analysis.md`（变更影响分析模板）。
+详见 [parameters.md](references/parameters.md)。关键：`feat` 必须 `^[A-Z][A-Z0-9]{0,15}$`，`platforms` 必须来自 `.spec-first/layer2/*.yaml`。
 
 ## 交互要求
 
-**逐步引导**，顺序：feat → mode → size → platforms → title → feature-id → bootstrap
-
-**交互体验**：
-- 显示步骤进度（如 "步骤 1/7"）
-- 提供清晰选项列表（带描述）
-- 支持键盘导航（↑↓选择，Enter确认）
-
-**feat 特殊处理**：中文输入时自动生成 3-4 个英文缩写候选项
-
-详细交互流程见 [interaction-guide.md](references/interaction-guide.md)
-
-## 平台模板策略
-
-- 平台模板选择优先由 Skill / Agent 基于项目事实完成，而不是由 CLI 脚本猜测
-- `backend` / `frontend` / `mobile` 的事实检测可以作为输入，但不能直接替代工作流决策
-- 当模板缺失且证据不足时，Skill 负责补齐模板或请求明确输入；CLI 只负责校验已存在模板和执行已确认参数
-- `docs` 或面向人的说明文档不得反向成为平台模板决策的隐式真源
-
-## 保护规则
-
-- **禁止删除 Feature 目录**
-- **中断恢复**：继续完成初始化，不删除已有内容
-- **空 PRD 处理**：引导用户填充，不判定为"无用 Feature"
-- **基线去重**：`FSREQ-19700101-LEGACY-BASELINE` 已存在时不重复创建
-
-## 成功标准
-
-- CLI 成功退出（exit code = 0）
-- 生成 `specs/{featureId}/` 目录及必需文件
-- `.spec-first/current` 指向新 Feature
+逐步引导，顺序：feat → mode → size → platforms → title → feature-id → bootstrap。详见 [interaction-guide.md](references/interaction-guide.md)

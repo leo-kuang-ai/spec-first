@@ -179,7 +179,7 @@ export interface DefectRecord {
   updatedAt: string;
 }
 
-// ─── 追踪矩阵 ────────────────────────────────────────────
+// ─── 追踪状态 ────────────────────────────────────────────
 export type MatrixStatus =
   | 'Planned'
   | 'Implemented'
@@ -205,15 +205,6 @@ export interface MatrixRow {
   downstream?: string[];
   nfrTag?: string;
   rfcRef?: string;
-}
-
-// ─── 覆盖率指标 ───────────────────────────────────────────
-export interface CoverageMetrics {
-  C3: number; // 任务覆盖率
-  C4: number; // 测试覆盖率 (FR)
-  C6: number; // 实现覆盖率
-  C8: number; // 任务合规率
-  C9: number; // TC 合规率
 }
 
 // ─── Known Exception ──────────────────────────────────────

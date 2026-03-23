@@ -124,8 +124,8 @@ Stage 1 至少回答以下问题：
 | 不确定 | cross（更安全） |
 
 ## CLI 依赖
-- `spec-first metrics coverage`
-- `spec-first matrix check`
+- `spec-first metrics report`
+- `spec-first docs links validate`
 
 ## 输出路径
 - `specs/{featureId}/findings.md`

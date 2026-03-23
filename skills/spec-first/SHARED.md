@@ -1,6 +1,6 @@
 ---
 version: 1.0.0
-last_updated: 2026-03-18
+last_updated: 2026-03-21
 description: Spec-First Skills 共享约束与规则（消除重复）
 ---
 
@@ -118,7 +118,7 @@ P4_WRITE — 写入交付物
   └── spec-first id next <type> <abbr>（注册新 ID）
 
 P5_SIDE_EFFECT — 副作用执行
-  ├── spec-first matrix check <featureId>（校验追踪矩阵）
+  ├── spec-first docs links validate <featureId>（校验文档关联索引）
   ├── spec-first gate check <featureId>（校验 Gate）
   └── 更新运行态文件（findings.md / task_plan.md）
 ```
@@ -187,6 +187,14 @@ P5_SIDE_EFFECT — 副作用执行
 | P5 | 副作用执行失败 | 不回滚 P4 已写入的文件，但警告用户副作用未完成 |
 
 **应用 Skills**: 全部 Skills
+
+---
+
+## 文档图示约定（全局）
+
+- `skills/spec-first` 目录下的 Skill、共享文档与参考文档，在需要表达流程、调用链、架构、时序或 ER 关系时，统一使用 ASCII 文本图或表格，不使用 Mermaid
+- 复杂关系优先拆成列表、矩阵和 ASCII 树形结构，避免依赖渲染器才能理解内容
+
 
 ---
 

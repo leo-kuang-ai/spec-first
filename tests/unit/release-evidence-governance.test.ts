@@ -12,10 +12,8 @@ const FEAT_DIR = join(TMP, 'specs', FEAT);
 beforeEach(() => {
   mkdirSync(join(FEAT_DIR, 'reports'), { recursive: true });
   mkdirSync(join(TMP, 'templates', 'init'), { recursive: true });
-  mkdirSync(join(TMP, 'templates', 'matrix'), { recursive: true });
   mkdirSync(join(TMP, 'templates', 'release'), { recursive: true });
   writeFileSync(join(TMP, 'templates', 'init', 'constitution.md.hbs'), '# {{featureId}}');
-  writeFileSync(join(TMP, 'templates', 'matrix', 'traceability-matrix.md.hbs'), '| {{featureId}} |');
   writeFileSync(join(TMP, 'templates', 'release', 'release-note.md.hbs'), '# release {{featureId}}');
   writeFileSync(join(TMP, 'templates', 'release', 'smoke-test-report.md.hbs'), '# smoke {{featureId}}');
 });

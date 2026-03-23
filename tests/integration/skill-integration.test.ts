@@ -57,9 +57,9 @@ describe('Skill Route Integration', () => {
   });
 
   it('should dispatch runtime command directly', () => {
-    const dispatch = dispatchCommand('matrix check', TMP);
+    const dispatch = dispatchCommand('docs validate', TMP);
     expect(dispatch.route).toBe('runtime');
-    expect(dispatch.command).toBe('matrix');
+    expect(dispatch.command).toBe('docs');
   });
 });
 
