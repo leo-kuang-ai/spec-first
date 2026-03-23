@@ -16,7 +16,7 @@ Spec-First 不是“skill 文档集合”，而是一个分层的研发闭环系
 
 - `docs/first/*` 是阅读输出，不是 machine truth
 - `.spec-first/runtime/first/*` 才是项目级认知真源
-- `stage advance` 不是“看起来可以”，而是必须过依赖检查 + gate 检查 + 阶段机合法转移
+- `stage advance` 不是“看起来可以”，而是必须过 dependency-check + stage-gate 检查 + 阶段机合法转移
 
 ## 2. 代码真相源
 
@@ -288,7 +288,7 @@ findings.md
 | 校验器 | 位置 | 检查什么 | 典型阻断 |
 |---|---|---|---|
 | HARD-GATE | `skill-runtime/hard-gate.ts` | 阶段是否正确、前置文件是否存在、是否需要 worktree | 阶段不对、`spec.md`/`design.md`/`task_plan.md` 缺失、高风险未隔离 |
-| 依赖检查 | `process-engine/dependency-checker.ts` | 下一阶段依赖文件、npm scripts、env vars | 缺文件、空文件、脚本缺失、环境变量缺失 |
+| dependency-check | `process-engine/dependency-checker.ts` | 下一阶段依赖文件、npm scripts、env vars | 缺文件、空文件、脚本缺失、环境变量缺失 |
 | Gate 条件 | `gate-engine/condition-registry.ts` + `gate-evaluator.ts` | stage 级条件、文档存在、引用完整、C10、分析 CRITICAL、release 证据 | 任何 blocking 失败都会让 `PASS` 变 `FAIL` |
 | 文档关联 | `document-links.ts` | `document-links.yaml` 结构、引用闭环、文件存在性 | 断链、重复路径、缺失文档 |
 | `first` runtime 校验 | `first-runtime-validator.ts` + `first-docs-check.ts` | 9 个 runtime 资产和 docs 投影是否完整 | 缺 summary / steering / conventions / critical flows 等 |

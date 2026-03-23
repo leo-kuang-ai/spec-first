@@ -106,7 +106,7 @@ Gate 体系：
 
 ### 3.2 推导关系链
 
-> 下列关系是从 `id-types-and-status.md`、`task_plan.md` 解析器、`MatrixRow` 结构和各 stage gate 的输入要求综合推导出来的，不是单一模块里的一张全局关系表。
+> 下列关系是从 `id-types-and-status.md`、`task_plan.md` 解析器、`MatrixRow` 结构和各 stage-gate 的输入要求综合推导出来的，不是单一模块里的一张全局关系表。
 
 | 推导链 | 依据 | 备注 |
 |---|---|---|
@@ -174,7 +174,7 @@ MatrixRow:
 
 ## 5. Gate 体系总览
 
-### 5.1 阶段 gate 条件 ID
+### 5.1 stage-gate 条件 ID
 
 | 阶段 | gate ID | 直接证据 | 说明 |
 |---|---|---|---|
@@ -210,7 +210,7 @@ MatrixRow:
 |---|---|---|
 | `dependency-check` | `src/core/process-engine/dependency-checker.ts` | advance 前检查下一阶段依赖项 |
 | `hard-gate` | `src/core/skill-runtime/hard-gate.ts` | skill 级入口守卫，阶段不对 / 文件缺失直接阻断 |
-| `confirm-policy` | `src/core/skill-runtime/confirm-policy.ts` | `auto / assisted / strict`，是确认策略，不是 stage gate |
+| `confirm-policy` | `src/core/skill-runtime/confirm-policy.ts` | `auto / assisted / strict`，是确认策略，不是 stage-gate |
 | `goLive check` | `src/core/gate-engine/golive.ts` | 发布前综合检查 |
 
 ## 6. Gate 与 ID 的耦合点
@@ -227,7 +227,7 @@ MatrixRow:
 
 | 节点 | gate / 前置 | 说明 |
 |---|---|---|
-| `07-code` | `design.md`、`task_plan.md`、依赖检查、hard-gate、worktree 高风险守卫 | code 阶段强依赖前序 ID 链 |
+| `07-code` | `design.md`、`task_plan.md`、dependency-check、hard-gate、worktree 高风险守卫 | code 阶段强依赖前序 ID 链 |
 | `12-verify` | `gate check`、`docs links validate`、`metrics report`、TDD 证据 | verify 关注的是“本次新鲜证据” |
 
 ### 6.3 RFC / Exception / Gate
@@ -303,19 +303,20 @@ stage-state.json
 > 说明：
 > - “上游 / 下游”里凡是没有单独持久化关系表支撑的，均标为 `[推导]`
 > - gate 一栏优先写当前代码里的直接门禁；若该 ID 没有专属 gate，则写“由所属 stage / 状态机约束”
+> - `上游 ID / 下游 ID` 两列只写真实 ID；命令、指针、定位方式不要混进 ID 字段里
 
 | ID | 产物 | 上游 skill 节点 | 下游 skill 节点 | 上游 ID | 下游 ID | gate |
 |---|---|---|---|---|---|---|
-| `Feature` | `specs/{featureId}/stage-state.json`、`specs/{featureId}/` 目录根、`.spec-first/current` 指针 | `00-first / 01-init / 17-feature`（[推导]） | 所有依赖 Feature 定位的 skill：`02-catchup / 03-spec / 04-design / 05-research / 06-task / 07-code / 08-review / 10-archive / 11-plan / 12-verify / 13-orchestrate / 14-status / 15-doctor / 16-sync / 17-feature / 20-spec-review / 21-analyze` | `.spec-first/current` / `feature switch` / `feature current` | 所有 Feature 级产物；`spec.md`、`design.md`、`task_plan.md`、`findings.md`、`gate-history.jsonl` 等 | `01-init` 相关 gate；`feature switch` 的 state 校验；`stage-machine.ts` 的阶段迁移约束 |
-| `REQ` | PRD / 需求项（`prd.md` 内的需求条目） | `03-spec` | `04-design`、`20-spec-review` | source requirement / PRD 输入 [推导] | `FR` | `03-spec` 阶段 gate：`G-SPEC-00/01/02/03` + 宪法一致性检查 |
-| `FR` | `spec.md` 中的 FR 片段；`document-links.yaml` 关联 | `03-spec` | `04-design`、`06-task`、`20-spec-review`、`21-analyze` | `REQ` [推导] | `DS`、`TASK`、`TC`（经 traces / 任务拆解 / 测试映射） | `03-spec` 阶段 gate；`G-SPEC-01/02/03`；`03-spec` 的宪法检查 |
-| `DS` | `design.md` 中的 DS 片段；按需 `contracts/*.yaml` | `04-design / 05-research` | `06-task`、`07-code`、`08-review`、`12-verify` | `FR` | `TASK`、实现上下文、测试设计 | `04-design` 阶段 gate；`G-DESIGN-01/02/03`；`hard-gate` 入口校验 spec.md |
-| `TASK` | `task_plan.md` 中的 TASK 表格行 | `06-task` | `07-code`、`11-plan`、`12-verify`、`13-orchestrate`、`08-review` | `DS` + `FR` [推导] | `TC` / 测试步骤；`batch-report` / `checkpoint` | `03_plan` 阶段 gate；`G-PLAN-01/02/03`；`hard-gate` 要求 task_plan.md |
-| `TC` | 测试计划 / 测试用例 ID；可能出现在 `task_plan.md`、测试文档或矩阵中 | `06-task / 03-spec`（[推导]） | `12-verify`、`08-review`、`14-status` | `TASK` / `FR` / `DS` [推导] | `verify` 证据；`Defect.linkedTc`；质量回归 | `05_verify` 阶段 gate；当前内置 registry 为 `G-VERIFY-01/03`，`G-VERIFY-02` 仅见于技能文档未见 registry 注册 |
+| `Feature` | `specs/{featureId}/stage-state.json`、`specs/{featureId}/` 目录根、`.spec-first/current` 指针 | `00-first / 01-init / 17-feature`（[推导]） | 所有依赖 Feature 定位的 skill：`02-catchup / 03-spec / 04-design / 05-research / 06-task / 07-code / 08-review / 10-archive / 11-plan / 12-verify / 13-orchestrate / 14-status / 15-doctor / 16-sync / 17-feature / 20-spec-review / 21-analyze` | `无` | `REQ` | `01-init` 相关 gate；`feature switch` 的 state 校验；`stage-machine.ts` 的阶段迁移约束 |
+| `REQ` | PRD / 需求项（`prd.md` 内的需求条目） | `03-spec` | `04-design`、`20-spec-review` | `Feature` [推导] | `FR` | `03-spec` stage-gate：`G-SPEC-00/01/02/03` + 宪法一致性检查 |
+| `FR` | `spec.md` 中的 FR 片段；`document-links.yaml` 关联 | `03-spec` | `04-design`、`06-task`、`20-spec-review`、`21-analyze` | `REQ` [推导] | `DS`、`TASK`、`TC`（经 traces / 任务拆解 / 测试映射） | `03-spec` stage-gate；`G-SPEC-01/02/03`；`03-spec` 的宪法检查 |
+| `DS` | `design.md` 中的 DS 片段；按需 `contracts/*.yaml` | `04-design / 05-research` | `06-task`、`07-code`、`08-review`、`12-verify` | `FR` | `TASK`、实现上下文、测试设计 | `04-design` 阶段 stage-gate；`G-DESIGN-01/02/03`；`hard-gate` 入口校验 spec.md |
+| `TASK` | `task_plan.md` 中的 TASK 表格行 | `06-task` | `07-code`、`11-plan`、`12-verify`、`13-orchestrate`、`08-review` | `DS / FR` [推导] | `TC` / 测试步骤；`batch-report` / `checkpoint` | `03_plan` 阶段 stage-gate；`G-PLAN-01/02/03`；`hard-gate` 要求 task_plan.md |
+| `TC` | 测试计划 / 测试用例 ID；可能出现在 `task_plan.md`、测试文档或矩阵中 | `06-task / 03-spec`（[推导]） | `12-verify`、`08-review`、`14-status` | `TASK / FR / DS` [推导] | `verify` 证据 | `05_verify` stage-gate；当前内置 registry 为 `G-VERIFY-01/03`，`G-VERIFY-02` 仅见于技能文档未见 registry 注册 |
 | `RFC` | `specs/{featureId}/rfc/RFC-NNN.rfc.json` | `11-plan / 13-orchestrate / 08-review`（[推导]） | `12-verify`、`13-orchestrate`、`10-archive` | `FR` / `DS` 影响分析 [推导] | `known-exceptions.md`；豁免审批；`Gate PASS_WITH_WAIVER` 轨迹 | RFC 状态机：`draft -> approved / rejected -> closed`；`known-exceptions.md` 校验；`gate` 的豁免语义 |
-| `EX` | `specs/{featureId}/known-exceptions.md` 中的 `EX-NNN` | `11-plan / 13-orchestrate / 12-verify`（[推导]，对应豁免评估与消费） | `12-verify`、`13-orchestrate`、`07_release`（通过 gate 结果消费） | `RFC` waiver | `validateExceptions()`；`PASS_WITH_WAIVER`；`gate-history.jsonl` / findings 中的豁免留痕 | `exception-validator.ts`：必须有 approved RFC、未过期、rollbackPoint；不是独立 stage gate，而是豁免校验 gate |
-| `Defect` | `specs/{featureId}/defects/defect-XXX.json` | `08-review`、`12-verify`、`07-code`（[推导]） | `07-code`、`08-review`、`12-verify`、`10-archive` | `verify` / `review` / `运行时发现` [推导] | `linkedFr`、`linkedTc`、修复流程、`escape rate` 统计 | 缺陷状态机：`open -> fixing / wontfix -> fixed -> verified`；终态 `verified / wontfix`；不直接等同于 stage gate |
-| `MatrixRow` | 追踪矩阵行；派生上下文中的 `frRows / dsRows / taskRows / tcRows` | `03-spec / 04-design / 06-task / 12-verify`（[推导]） | `11-plan`、`12-verify`、`13-orchestrate`、`14-status`、`21-analyze` | `spec / design / task / tc` 的追踪输入 [推导] | `upstream-lineage`、覆盖率分析、文档/需求映射 | 无单独 gate；由所在 stage gate 与矩阵消费方共同约束 |
+| `EX` | `specs/{featureId}/known-exceptions.md` 中的 `EX-NNN` | `11-plan / 13-orchestrate / 12-verify`（[推导]，对应豁免评估与消费） | `12-verify`、`13-orchestrate`、`07_release`（通过 gate 结果消费） | `RFC` waiver | `validateExceptions()`；`PASS_WITH_WAIVER`；`gate-history.jsonl` / findings 中的豁免留痕 | `exception-validator.ts`：必须有 approved RFC、未过期、rollbackPoint；不是独立 stage-gate，而是豁免校验 gate |
+| `Defect` | `specs/{featureId}/defects/defect-XXX.json` | `08-review`、`12-verify`、`07-code`（[推导]） | `07-code`、`08-review`、`12-verify`、`10-archive` | `verify` / `review` / `运行时发现` [推导] | `linkedFr`、`linkedTc`、修复流程、`escape rate` 统计 | 缺陷状态机：`open -> fixing / wontfix -> fixed -> verified`；终态 `verified / wontfix`；不直接等同于 stage-gate |
+| `MatrixRow` | 追踪矩阵行；派生上下文中的 `frRows / dsRows / taskRows / tcRows` | `03-spec / 04-design / 06-task / 12-verify`（[推导]） | `11-plan`、`12-verify`、`13-orchestrate`、`14-status`、`21-analyze` | `spec / design / task / tc` 的追踪输入 [推导] | `upstream-lineage`、覆盖率分析、文档/需求映射 | 无单独 gate；由所在 stage-gate 与矩阵消费方共同约束 |
 
 ### 总表解读
 
@@ -333,7 +334,7 @@ MatrixRow
   = 跨 ID 的关系载体
 
 gate
-  = stage gate + 状态机 + 豁免校验 + 依赖检查
+  = stage-gate + 状态机 + 豁免校验 + dependency-check
 ```
 
 ### 总表中的最关键断点
