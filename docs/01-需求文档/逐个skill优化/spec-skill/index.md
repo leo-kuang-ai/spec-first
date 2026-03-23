@@ -1,6 +1,8 @@
 # spec-first skill 文档索引
 
-本目录收纳 `spec-first` 的 skill 全局梳理、节点深挖、产物 ID / Gate 关系梳理，以及后续的收敛改造方案。
+本目录收纳 `spec-first` 的 skill 全局梳理、节点深挖、以及逐个 skill 优化的基础材料。
+
+链路优化相关的文档已单独移动到 [`../链路优化/`](../链路优化/index.md)。
 
 ## 阅读顺序
 
@@ -8,9 +10,10 @@
 2. [spec-first-节点五栏拆解.md](./spec-first-节点五栏拆解.md)
 3. [spec-first-00-first-深挖问题修改验证.md](./spec-first-00-first-深挖问题修改验证.md)
 4. [spec-first-03-04-06-07-12-深挖问题修改验证.md](./spec-first-03-04-06-07-12-深挖问题修改验证.md)
-5. [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
-6. [2026-03-23-id-gate-convergence-plan.md](./2026-03-23-id-gate-convergence-plan.md)
-7. [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](./2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
+5. [spec-first-产物ID与Gate关系梳理.md](../链路优化/spec-first-产物ID与Gate关系梳理.md)
+6. [spec-first-最小保留流程图.md](../链路优化/spec-first-最小保留流程图.md)
+7. [2026-03-23-id-gate-convergence-plan.md](../链路优化/2026-03-23-id-gate-convergence-plan.md)
+8. [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](../链路优化/2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
 
 ## 文档说明
 
@@ -36,17 +39,21 @@
 
 ### 产物与 Gate
 
-- [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
+- [spec-first-产物ID与Gate关系梳理.md](../链路优化/spec-first-产物ID与Gate关系梳理.md)
 
   深度梳理文档产物的 ID 体系、ID 之间的关联关系、以及 gate 关系。
 
+- [spec-first-最小保留流程图.md](../链路优化/spec-first-最小保留流程图.md)
+
+  只保留 `skill` 节点、主交付链、单一 `stage-gate`、缺陷回流和 RFC 豁免的最小流程图。
+
 ### 收敛方案
 
-- [2026-03-23-id-gate-convergence-plan.md](./2026-03-23-id-gate-convergence-plan.md)
+- [2026-03-23-id-gate-convergence-plan.md](../链路优化/2026-03-23-id-gate-convergence-plan.md)
 
   ID / Gate 收敛方案的目标态定义和实施路径。
 
-- [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](./2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
+- [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](../链路优化/2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
 
   更细的改造方案，按 Phase 和 Task 拆成可执行步骤。
 
@@ -56,7 +63,7 @@
 
 1. [spec-first-技能全局梳理.md](./spec-first-技能全局梳理.md)
 2. [spec-first-节点五栏拆解.md](./spec-first-节点五栏拆解.md)
-3. [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
+3. [spec-first-产物ID与Gate关系梳理.md](../链路优化/spec-first-产物ID与Gate关系梳理.md)
 
 ## 状态标记
 
@@ -66,9 +73,10 @@
 - [spec-first-节点五栏拆解.md](./spec-first-节点五栏拆解.md)
 - [spec-first-00-first-深挖问题修改验证.md](./spec-first-00-first-深挖问题修改验证.md)
 - [spec-first-03-04-06-07-12-深挖问题修改验证.md](./spec-first-03-04-06-07-12-深挖问题修改验证.md)
-- [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
-- [2026-03-23-id-gate-convergence-plan.md](./2026-03-23-id-gate-convergence-plan.md)
-- [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](./2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
+- [spec-first-产物ID与Gate关系梳理.md](../链路优化/spec-first-产物ID与Gate关系梳理.md)
+- [spec-first-最小保留流程图.md](../链路优化/spec-first-最小保留流程图.md)
+- [2026-03-23-id-gate-convergence-plan.md](../链路优化/2026-03-23-id-gate-convergence-plan.md)
+- [2026-03-23-id-gate-convergence-detailed-implementation-plan.md](../链路优化/2026-03-23-id-gate-convergence-detailed-implementation-plan.md)
 
 ### 收敛方案
 

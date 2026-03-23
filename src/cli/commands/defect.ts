@@ -156,8 +156,32 @@ function handleList(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const statusFilter = parseFlag(args, '--status') as DefectStatus | undefined;
-  const severityFilter = parseFlag(args, '--severity') as SecuritySeverity | undefined;
+  const statusArg = parseFlag(args, '--status');
+  const severityArg = parseFlag(args, '--severity');
+
+  // 校验 status 参数
+  let statusFilter: DefectStatus | undefined;
+  if (statusArg) {
+    const validStatuses: DefectStatus[] = ['open', 'fixing', 'fixed', 'verified', 'wontfix'];
+    if (!validStatuses.includes(statusArg as DefectStatus)) {
+      console.error(`错误：无效的 status "${statusArg}"`);
+      console.error(`有效值：${validStatuses.join(', ')}`);
+      return ExitCode.VALIDATION_ERROR;
+    }
+    statusFilter = statusArg as DefectStatus;
+  }
+
+  // 校验 severity 参数
+  let severityFilter: SecuritySeverity | undefined;
+  if (severityArg) {
+    const validSeverities: SecuritySeverity[] = ['S1', 'S2', 'S3', 'S4'];
+    if (!validSeverities.includes(severityArg as SecuritySeverity)) {
+      console.error(`错误：无效的 severity "${severityArg}"`);
+      console.error(`有效值：${validSeverities.join(', ')}`);
+      return ExitCode.VALIDATION_ERROR;
+    }
+    severityFilter = severityArg as SecuritySeverity;
+  }
 
   const list = listDefects(featureId, process.cwd(), {
     status: statusFilter,

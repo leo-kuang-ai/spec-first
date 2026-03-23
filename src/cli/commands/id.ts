@@ -14,7 +14,6 @@ import {
   VALID_ID_TYPES,
   VALID_NEXT_ID_TYPES,
   VALID_TC_LEVELS,
-  isIdType,
   isNextIdType,
   isTcLevel,
 } from '../../core/trace-engine/id-taxonomy.js';
@@ -109,7 +108,7 @@ function handleValidate(args: string[]): number {
 function handleSearch(args: string[]): number {
   const query = args[0];
   const feature = parseFlag(args, '--feature');
-  const typeArg = parseFlag(args, '--type')?.toUpperCase();
+  const typeArg = parseFlag(args, '--type');
 
   if (!query || !feature) {
     console.error('用法：spec-first id search <query> --feature <featureId> [--type <type>]');
@@ -119,12 +118,16 @@ function handleSearch(args: string[]): number {
   // 校验 type 参数（如果提供）
   let type: IdType | undefined;
   if (typeArg) {
-    if (!isIdType(typeArg)) {
+    // 大小写不敏感匹配
+    const matched = Array.from(VALID_ID_TYPES).find(
+      (t) => t.toUpperCase() === typeArg.toUpperCase()
+    );
+    if (!matched) {
       console.error(`错误：无效的 type "${typeArg}"`);
       console.error(`有效值：${Array.from(VALID_ID_TYPES).join(', ')}`);
       return ExitCode.VALIDATION_ERROR;
     }
-    type = typeArg as IdType;
+    type = matched;
   }
 
   const resolvedFeatureId = resolveFeatureId(feature, process.cwd()).featureId;
@@ -141,7 +144,7 @@ function handleSearch(args: string[]): number {
 
 function handleList(args: string[]): number {
   const feature = parseFlag(args, '--feature');
-  const typeArg = parseFlag(args, '--type')?.toUpperCase();
+  const typeArg = parseFlag(args, '--type');
 
   if (!feature) {
     console.error('用法：spec-first id list --feature <featureId> [--type <type>]');
@@ -151,12 +154,16 @@ function handleList(args: string[]): number {
   // 校验 type 参数（如果提供）
   let type: IdType | undefined;
   if (typeArg) {
-    if (!isIdType(typeArg)) {
+    // 大小写不敏感匹配
+    const matched = Array.from(VALID_ID_TYPES).find(
+      (t) => t.toUpperCase() === typeArg.toUpperCase()
+    );
+    if (!matched) {
       console.error(`错误：无效的 type "${typeArg}"`);
       console.error(`有效值：${Array.from(VALID_ID_TYPES).join(', ')}`);
       return ExitCode.VALIDATION_ERROR;
     }
-    type = typeArg as IdType;
+    type = matched;
   }
 
   const resolvedFeatureId = resolveFeatureId(feature, process.cwd()).featureId;
