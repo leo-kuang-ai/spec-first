@@ -26,9 +26,7 @@ export function buildCatchupSummary(
   taskContextSummary?: {
     taskId: string;
     contextSize: number;
-    relatedFRCount: number;
-    relatedDSCount: number;
-    relatedAPICount: number;
+    relatedDocumentCount: number;
   },
   backgroundInputStatus?: 'full' | 'degraded' | 'blind'
 ): string {
@@ -53,9 +51,7 @@ export function buildCatchupSummary(
     lines.push(
       `TaskContextPack: ${taskContextSummary.taskId} ` +
         `(size=${taskContextSummary.contextSize}b, ` +
-        `FR=${taskContextSummary.relatedFRCount}, ` +
-        `DS=${taskContextSummary.relatedDSCount}, ` +
-        `API=${taskContextSummary.relatedAPICount})`
+        `documents=${taskContextSummary.relatedDocumentCount})`
     );
   }
 

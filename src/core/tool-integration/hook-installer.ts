@@ -155,13 +155,13 @@ if command -v npx >/dev/null 2>&1; then
   fi
 
   if [ -z "$FEAT_ID" ]; then
-    echo "spec-first: 跳过 matrix 检查（未设置当前 feature）"
+    echo "spec-first: 跳过 docs 校验（未设置当前 feature）"
     exit 0
   fi
 
-  npx spec-first matrix check "$FEAT_ID"
+  npx spec-first docs validate "$FEAT_ID"
   if [ $? -ne 0 ]; then
-    echo "错误：$FEAT_ID 的 spec-first matrix check 失败，已阻止 push。"
+    echo "错误：$FEAT_ID 的 spec-first docs validate 失败，已阻止 push。"
     exit 1
   fi
 fi

@@ -12,21 +12,34 @@ import { syncBackfill } from '../../src/core/change-mgr/sync.js';
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-change-mgr-b');
 const FEAT = 'FSREQ-20260211-AUTH-001';
 
-const SAMPLE_MATRIX = `| ID | Type | Title | Status | Upstream | Downstream |
-|----|------|-------|--------|----------|------------|
-| ${FEAT} | Feature | Auth Module | Planned | | FR-AUTH-001, FR-AUTH-002 |
-| FR-AUTH-001 | FR | Login | Planned | ${FEAT} | DS-AUTH-001, TC-UT-AUTH-001, TC-IT-AUTH-001 |
-| FR-AUTH-002 | FR | Logout | Planned | ${FEAT} | DS-AUTH-002, TC-UT-AUTH-002, TC-IT-AUTH-002 |
-| DS-AUTH-001 | DS | Login Design | Planned | FR-AUTH-001 | |
-| DS-AUTH-002 | DS | Logout Design | Planned | FR-AUTH-002 | |
-| TC-UT-AUTH-001 | TC | UT Login | Planned | FR-AUTH-001 | |
-| TC-UT-AUTH-002 | TC | UT Logout | Planned | FR-AUTH-002 | |
-| TC-IT-AUTH-001 | TC | IT Login | Planned | FR-AUTH-001 | |
-| TC-IT-AUTH-002 | TC | IT Logout | Planned | FR-AUTH-002 | |
+const SAMPLE_LINKS = `version: 1
+featureId: ${FEAT}
+documents:
+  - path: spec.md
+    kind: spec
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references: [spec.md]
+  - path: task_plan.md
+    kind: task-plan
+    stage: 03_plan
+    references: [spec.md, design.md]
+  - path: reports/test-report.md
+    kind: report
+    stage: 05_verify
+    references: [spec.md, task_plan.md]
 `;
 
-function writeMatrix(content: string) {
-  writeFileSync(join(TMP, 'specs', FEAT, 'traceability-matrix.md'), content);
+function writeLinks(content: string) {
+  mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
+  writeFileSync(join(TMP, 'specs', FEAT, 'document-links.yaml'), content);
+  writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# spec');
+  writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design\nspec.md');
+  writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'), '# tasks\nspec.md\ndesign.md');
+  writeFileSync(join(TMP, 'specs', FEAT, 'reports', 'test-report.md'), '# report\nspec.md\ntask_plan.md');
 }
 
 describe('analyzeImpact', () => {
@@ -37,34 +50,32 @@ describe('analyzeImpact', () => {
     rmSync(TMP, { recursive: true, force: true });
   });
   it('should find direct impact from FR change', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    const result = analyzeImpact(FEAT, ['FR-AUTH-001'], TMP);
+    writeLinks(SAMPLE_LINKS);
+    const result = analyzeImpact(FEAT, ['spec.md'], TMP);
     expect(result.directImpact.length).toBeGreaterThan(0);
-    const ids = result.directImpact.map(r => r.id);
-    expect(ids).toContain('DS-AUTH-001');
-    expect(ids).toContain('TC-UT-AUTH-001');
-    expect(ids).toContain('TC-IT-AUTH-001');
+    const ids = result.directImpact.map((r) => r.path);
+    expect(ids).toContain('design.md');
+    expect(ids).toContain('task_plan.md');
   });
   it('should find indirect impact (2nd level)', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    const result = analyzeImpact(FEAT, ['FR-AUTH-001'], TMP);
-    // FR-AUTH-001 upstream is FEAT, FEAT downstream includes FR-AUTH-002
-    expect(result.allAffected.length).toBeGreaterThan(4);
+    writeLinks(SAMPLE_LINKS);
+    const result = analyzeImpact(FEAT, ['spec.md'], TMP);
+    expect(result.allAffected).toContain('reports/test-report.md');
   });
   it('should return empty for unknown ID', () => {
-    writeMatrix(SAMPLE_MATRIX);
+    writeLinks(SAMPLE_LINKS);
     const result = analyzeImpact(FEAT, ['NONEXIST-001'], TMP);
     expect(result.directImpact).toHaveLength(0);
     expect(result.indirectImpact).toHaveLength(0);
   });
-  it('should handle empty matrix', () => {
-    writeMatrix('| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n');
-    const result = analyzeImpact(FEAT, ['FR-AUTH-001'], TMP);
-    expect(result.allAffected).toEqual(['FR-AUTH-001']);
+  it('should handle empty document links', () => {
+    writeLinks(`version: 1\nfeatureId: ${FEAT}\ndocuments: []\n`);
+    const result = analyzeImpact(FEAT, ['spec.md'], TMP);
+    expect(result.allAffected).toEqual(['spec.md']);
   });
   it('should include summary string', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    const result = analyzeImpact(FEAT, ['FR-AUTH-001'], TMP);
+    writeLinks(SAMPLE_LINKS);
+    const result = analyzeImpact(FEAT, ['spec.md'], TMP);
     expect(result.summary).toContain('Changed: 1');
     expect(result.summary).toContain('Direct');
   });
@@ -80,32 +91,32 @@ describe('syncBackfill', () => {
     rmSync(TMP, { recursive: true, force: true });
   });
   it('should update matrix row status', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    const result = syncBackfill(FEAT, ['TC-UT-AUTH-001'], 'Implemented', TMP);
-    expect(result.updatedIds).toContain('TC-UT-AUTH-001');
+    writeLinks(SAMPLE_LINKS);
+    const result = syncBackfill(FEAT, ['reports/test-report.md'], 'Implemented', TMP);
+    expect(result.updatedIds).toContain('reports/test-report.md');
     expect(result.skippedIds).toHaveLength(0);
   });
   it('should skip unknown IDs', () => {
-    writeMatrix(SAMPLE_MATRIX);
+    writeLinks(SAMPLE_LINKS);
     const result = syncBackfill(FEAT, ['NONEXIST-001'], 'Implemented', TMP);
     expect(result.skippedIds).toContain('NONEXIST-001');
     expect(result.updatedIds).toHaveLength(0);
   });
-  it('should skip already-same-status IDs', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    const result = syncBackfill(FEAT, ['TC-UT-AUTH-001'], 'Planned', TMP);
-    expect(result.skippedIds).toContain('TC-UT-AUTH-001');
+  it('should record known documents even when status repeats', () => {
+    writeLinks(SAMPLE_LINKS);
+    const result = syncBackfill(FEAT, ['reports/test-report.md'], 'Planned', TMP);
+    expect(result.updatedIds).toContain('reports/test-report.md');
   });
   it('should write audit log to findings.md', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    syncBackfill(FEAT, ['TC-UT-AUTH-001'], 'Implemented', TMP);
+    writeLinks(SAMPLE_LINKS);
+    syncBackfill(FEAT, ['reports/test-report.md'], 'Implemented', TMP);
     const findings = readFileSync(join(TMP, 'specs', FEAT, 'findings.md'), 'utf-8');
     expect(findings).toContain('Backfill Sync');
-    expect(findings).toContain('TC-UT-AUTH-001');
+    expect(findings).toContain('reports/test-report.md');
   });
   it('should handle multiple IDs', () => {
-    writeMatrix(SAMPLE_MATRIX);
-    const result = syncBackfill(FEAT, ['TC-UT-AUTH-001', 'TC-IT-AUTH-001', 'NONEXIST'], 'Implemented', TMP);
+    writeLinks(SAMPLE_LINKS);
+    const result = syncBackfill(FEAT, ['reports/test-report.md', 'design.md', 'NONEXIST'], 'Implemented', TMP);
     expect(result.updatedIds).toHaveLength(2);
     expect(result.skippedIds).toHaveLength(1);
     expect(result.auditLog).toHaveLength(3);

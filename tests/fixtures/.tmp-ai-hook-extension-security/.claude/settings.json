@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n \"$FEAT\" ]; then npx spec-first matrix check \"$FEAT\" || echo \"spec-first: matrix check 执行失败（已降级）\" >&2; else echo \"spec-first: 跳过 matrix 检查（无当前 feature）\"; fi'"
+            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n \"$FEAT\" ]; then npx spec-first docs validate \"$FEAT\" || echo \"spec-first: docs validate 执行失败（已降级）\" >&2; else echo \"spec-first: 跳过 docs 校验（无当前 feature）\"; fi'"
           }
         ],
         "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"

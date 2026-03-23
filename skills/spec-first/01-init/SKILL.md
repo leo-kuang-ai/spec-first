@@ -1,8 +1,6 @@
 ---
 name: "spec-first:init"
-description: |
-  定位项目根目录并通过交互式引导初始化 Feature 工作区（可选 --bootstrap 执行宿主检查/安装）。
-  触发场景：(1) 首次在项目中使用 spec-first（project-onboarding 轨道）(2) 创建新 Feature 工作区（feature-init 轨道）(3) 存量项目补基线（brownfield-baseline 轨道）(4) 用户说"初始化"、"新建 feature"、"创建工作区"、"spec-first init" (5) 检测到 .spec-first 不存在或 00-first 未完成时的引导入口
+description: "Use when you need to locate the project root and initialize a Feature workspace through the guided init flow, including project onboarding, brownfield baseline setup, or new feature creation."
 ---
 
 # Skill: init
@@ -78,7 +76,7 @@ description: |
    - 组装参数：`spec-first init --feat <FEAT> --mode <N|I> --size <S|M|L> --platforms <逗号分隔>`
    - 可选参数：`--title`, `--feature-id`, `--bootstrap`
    - CLI 成功后输出摘要（Feature ID、目录、已创建文件）
-   - 输出格式示例见 [references/output-format.md](references/output-format.md)
+   - 输出格式示例见 [output-format](references/output-format.md)
 
 ## 参数约束
 

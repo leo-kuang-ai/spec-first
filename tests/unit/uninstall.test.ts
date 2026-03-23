@@ -86,7 +86,7 @@ function setupFixtures(): void {
   writeFileSync(join(PROJECT, '.claude', 'settings.json'), JSON.stringify({
     hooks: {
       PreToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first gate check' }] }],
-      PostToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first matrix check' }] }],
+      PostToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first docs validate' }] }],
       Stop: [{ hooks: [{ type: 'command', command: 'npx spec-first ai stats' }] }],
       SessionStart: [
         { matcher: '*', hooks: [{ type: 'command', command: "SPEC_FIRST_MANAGED_SESSION=1 '/tmp/sf' viewer open --print-url --background 2>/dev/null || true" }] },

@@ -28,9 +28,7 @@ export interface CatchupResult {
   taskContextSummary?: {
     taskId: string;
     contextSize: number;
-    relatedFRCount: number;
-    relatedDSCount: number;
-    relatedAPICount: number;
+    relatedDocumentCount: number;
   };
   completedTasks: number;
   totalTasks: number;
@@ -177,9 +175,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
     ? {
         taskId: taskContextPack.taskId,
         contextSize: taskContextPack.contextSize,
-        relatedFRCount: taskContextPack.relatedFR.length,
-        relatedDSCount: taskContextPack.relatedDS.length,
-        relatedAPICount: taskContextPack.relatedAPI.length,
+        relatedDocumentCount: taskContextPack.relatedDocuments.length,
       }
     : undefined;
 
@@ -262,7 +258,7 @@ export function resetLocks(): void {
 }
 
 function getRequiredFiles(stage: string): string[] {
-  const base = ['stage-state.json', 'constitution.md', 'traceability-matrix.md'];
+  const base = ['stage-state.json', 'constitution.md', 'document-links.yaml'];
   switch (stage) {
     case '01_specify':
       return [...base, 'spec.md'];

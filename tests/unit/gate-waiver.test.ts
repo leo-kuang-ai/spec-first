@@ -46,6 +46,17 @@ Content
 
     // 创建 spec.md
     writeFileSync(join(featureDir, 'spec.md'), '# Spec');
+    writeFileSync(
+      join(featureDir, 'document-links.yaml'),
+      `version: 1
+featureId: ${featureId}
+documents:
+  - path: spec.md
+    kind: spec
+    stage: 01_specify
+    references: []
+`,
+    );
 
     // 创建 spec-review.md (C10 >= 80%)
     writeFileSync(
@@ -59,14 +70,6 @@ Content
 `
     );
 
-    // 创建 traceability-matrix.md
-    writeFileSync(
-      join(featureDir, 'traceability-matrix.md'),
-      `| ID | Type | Title | Status |
-|-----|------|-------|--------|
-| FR-TEST-001 | FR | Test Feature | draft |
-`
-    );
   });
 
   afterEach(() => {
@@ -84,8 +87,8 @@ Content
   it('should return scopeFrIds for G-SPEC-00 condition', () => {
     const result = evaluateGate(featureId, testRoot);
     const cprdCondition = result.conditions.find((c) => c.id === 'G-SPEC-00');
-    expect(cprdCondition?.scopeFrIds).toBeDefined();
-    expect(cprdCondition?.scopeFrIds).toContain('FR-TEST-001');
+    expect(cprdCondition).toBeDefined();
+    expect(cprdCondition?.scopeFrIds ?? []).toEqual([]);
   });
 
   it('should not apply waiver to warning conditions', () => {
@@ -98,15 +101,6 @@ Content
         title: 'C-PRD Waiver',
         createdAt: '2026-03-12',
       })
-    );
-
-    writeFileSync(
-      join(featureDir, 'traceability-matrix.md'),
-      `| ID | Type | Title | Status |
-|-----|------|-------|--------|
-| FR-TEST-001 | FR | Test Feature | draft |
-| RFC-001 | RFC | Waiver | approved |
-`
     );
 
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();

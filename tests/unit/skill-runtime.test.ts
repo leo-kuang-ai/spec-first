@@ -90,9 +90,9 @@ describe('dispatchCommand', () => {
   });
 
   it('should dispatch with namespace prefix', () => {
-    const result = dispatchCommand('spec-first:matrix check', TMP);
+    const result = dispatchCommand('spec-first:docs validate', TMP);
     expect(result.route).toBe('runtime');
-    expect(result.command).toBe('matrix');
+    expect(result.command).toBe('docs');
   });
 
   it('should map semantic subcommand', () => {

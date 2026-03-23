@@ -1,292 +1,166 @@
 /**
- * M6 MetricsEngine 单元测试
- * Health Score + Bottleneck + Metrics CLI
+ * 文档指标 MetricsEngine 单元测试
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { calcHealthScore } from '../../src/core/metrics-engine/health-score.js';
-import { detectBottlenecks, calcReworkRate, calcGateFirstPassRate } from '../../src/core/metrics-engine/bottleneck.js';
-import { handleMetrics } from '../../src/cli/commands/metrics.js';
+import {
+  detectBottlenecks,
+  calcGateFirstPassRate,
+  calcReworkRate,
+} from '../../src/core/metrics-engine/bottleneck.js';
+import { getDocumentMetrics, handleMetrics } from '../../src/cli/commands/metrics.js';
 import { ExitCode } from '../../src/shared/types.js';
-import type { CoverageMetrics } from '../../src/shared/types.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-metrics');
+const FEAT = 'FEAT-TEST';
 
 function withCwd(dir: string, fn: () => number): number {
   const orig = process.cwd;
   process.cwd = () => dir;
-  try { return fn(); } finally { process.cwd = orig; }
-}
-
-/** 构造 CoverageMetrics */
-function makeCoverage(overrides: Partial<Record<string, number>> = {}): CoverageMetrics {
-  const base: Record<string, number> = {
-    C3: 0.9, C4: 0.9, C6: 0.9, C8: 0.9, C9: 0.9,
-    ...overrides,
-  };
-  return base as unknown as CoverageMetrics;
+  try {
+    return fn();
+  } finally {
+    process.cwd = orig;
+  }
 }
 
 beforeEach(() => {
-  mkdirSync(join(TMP, 'specs', 'FEAT-TEST'), { recursive: true });
+  mkdirSync(join(TMP, 'specs', FEAT, 'reports'), { recursive: true });
 });
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
 });
 
-// ─── Health Score Tests ─────────────────────────────────
+function writeStageState() {
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'stage-state.json'),
+    JSON.stringify({
+      featureId: FEAT,
+      currentStage: '03_plan',
+      mode: 'N',
+      size: 'M',
+      platforms: ['h5'],
+      history: [],
+      terminal: false,
+      createdAt: '2026-03-23T00:00:00.000Z',
+      updatedAt: '2026-03-23T00:00:00.000Z',
+    }),
+    'utf-8'
+  );
+}
+
+function writeDocumentLinks(content?: string) {
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'document-links.yaml'),
+    content ??
+      [
+        'version: 1',
+        `featureId: ${FEAT}`,
+        'documents:',
+        '  - path: spec.md',
+        '    kind: requirements',
+        '    stage: 01_specify',
+        '    references: []',
+        '  - path: design.md',
+        '    kind: design',
+        '    stage: 02_design',
+        '    references:',
+        '      - spec.md',
+        '',
+      ].join('\n'),
+    'utf-8'
+  );
+}
 
 describe('calcHealthScore', () => {
-  it('should return high score for full coverage', () => {
-    const coverage = makeCoverage({ C3: 1, C4: 1, C6: 1, C8: 1, C9: 1 });
-    const result = calcHealthScore(coverage, 5, 0);
-    expect(result.H1).toBe(100);
-    expect(result.grade).toBe('A');
-    expect(result.E1).toBe(5);
-    expect(result.Q1).toBe(0);
-  });
-
-  it('should apply escape rate penalty', () => {
-    const coverage = makeCoverage({ C3: 1, C4: 1, C6: 1, C8: 1, C9: 1 });
-    const result = calcHealthScore(coverage, 5, 0.05);
-    // penalty = 0.05 * 200 = 10
-    expect(result.H1).toBe(90);
-    expect(result.grade).toBe('A');
-  });
-
-  it('should cap penalty at 50', () => {
-    const coverage = makeCoverage({ C3: 1, C4: 1, C6: 1, C8: 1, C9: 1 });
-    const result = calcHealthScore(coverage, 5, 0.5);
-    // penalty = min(0.5*200, 50) = 50
-    expect(result.H1).toBe(50);
-    expect(result.grade).toBe('F');
-  });
-
-  it('should return grade B for score 80-89', () => {
-    const coverage = makeCoverage({ C3: 0.8, C4: 0.8, C6: 0.8, C8: 0.8, C9: 0.8 });
-    const result = calcHealthScore(coverage, 3, 0);
+  it('should return high score for complete document flow', () => {
+    const result = calcHealthScore(
+      {
+        declaredDocCount: 2,
+        existingDocCount: 2,
+        linkedDocCount: 1,
+        brokenReferenceCount: 0,
+      },
+      3,
+      0
+    );
     expect(result.H1).toBe(80);
     expect(result.grade).toBe('B');
   });
 
-  it('should return grade F for low coverage', () => {
-    const coverage = makeCoverage({ C3: 0.3, C4: 0.3, C6: 0.3, C8: 0.3, C9: 0.3 });
-    const result = calcHealthScore(coverage, 10, 0);
-    expect(result.H1).toBe(30);
+  it('should penalize broken references', () => {
+    const result = calcHealthScore(
+      {
+        declaredDocCount: 2,
+        existingDocCount: 1,
+        linkedDocCount: 0,
+        brokenReferenceCount: 2,
+      },
+      3,
+      0
+    );
+    expect(result.H1).toBeLessThan(40);
     expect(result.grade).toBe('F');
   });
-
-  it('should include breakdown per metric', () => {
-    const coverage = makeCoverage();
-    const result = calcHealthScore(coverage, 0, 0);
-    expect(result.breakdown).toBeDefined();
-    expect(Object.keys(result.breakdown)).toContain('C3');
-    expect(Object.keys(result.breakdown)).toContain('C9');
-    expect(Object.keys(result.breakdown)).toHaveLength(5);
-  });
 });
-
-// ─── Bottleneck Tests ───────────────────────────────────
 
 describe('detectBottlenecks', () => {
-  it('should return empty for healthy coverage', () => {
-    const coverage = makeCoverage();
-    const result = detectBottlenecks(coverage);
-    expect(result).toHaveLength(0);
+  it('should detect missing documents', () => {
+    const result = detectBottlenecks({
+      declaredDocCount: 3,
+      existingDocCount: 1,
+      linkedDocCount: 1,
+      brokenReferenceCount: 0,
+    });
+    expect(result.find((item) => item.rule === 'R1')).toBeDefined();
   });
 
-  it('should detect R1 task bottleneck', () => {
-    const coverage = makeCoverage({ C3: 0.3 });
-    const result = detectBottlenecks(coverage);
-    const r1 = result.find(b => b.rule === 'R1');
-    expect(r1).toBeDefined();
-    expect(r1!.severity).toBe('high');
-    expect(r1!.description).toContain('task coverage');
-  });
-
-  it('should detect R2 test bottleneck', () => {
-    const coverage = makeCoverage({ C4: 0.4 });
-    const result = detectBottlenecks(coverage);
-    const r2 = result.find(b => b.rule === 'R2');
-    expect(r2).toBeDefined();
-    // C4=0.4 不满足 <0.4, severity 为 medium
-    expect(r2!.severity).toBe('medium');
-  });
-
-  it('should detect R3 implementation lag', () => {
-    const coverage = makeCoverage({ C6: 0.5 });
-    const result = detectBottlenecks(coverage);
-    const r3 = result.find(b => b.rule === 'R3');
-    expect(r3).toBeDefined();
-    // C6=0.5 不满足 <0.5, severity 为 medium
-    expect(r3!.severity).toBe('medium');
-  });
-
-  it('should detect R4 compliance gap', () => {
-    const coverage = makeCoverage({ C8: 0.6 });
-    const result = detectBottlenecks(coverage);
-    const r4 = result.find(b => b.rule === 'R4');
-    expect(r4).toBeDefined();
-    expect(r4!.severity).toBe('medium');
-  });
-
-  it('should detect R5 test traceability gap', () => {
-    const coverage = makeCoverage({ C9: 0.5 });
-    const result = detectBottlenecks(coverage);
-    const r5 = result.find(b => b.rule === 'R5');
-    expect(r5).toBeDefined();
-    expect(r5!.severity).toBe('medium');
-    expect(r5!.description).toContain('test compliance');
-  });
-
-  it('should detect multiple bottlenecks', () => {
-    const coverage = makeCoverage({ C3: 0.3, C4: 0.3, C6: 0.4, C8: 0.5 });
-    const result = detectBottlenecks(coverage);
-    expect(result.length).toBe(4);
+  it('should detect broken references', () => {
+    const result = detectBottlenecks({
+      declaredDocCount: 2,
+      existingDocCount: 2,
+      linkedDocCount: 1,
+      brokenReferenceCount: 1,
+    });
+    expect(result.find((item) => item.rule === 'R2')).toBeDefined();
   });
 });
 
-// ─── Rework & Gate Pass Rate ────────────────────────────
-
-describe('calcReworkRate', () => {
-  it('should return 0 for no tasks', () => {
-    expect(calcReworkRate(0, 0)).toBe(0);
-  });
-  it('should calculate correctly', () => {
+describe('derived metrics', () => {
+  it('should calculate rework rate', () => {
     expect(calcReworkRate(10, 2)).toBeCloseTo(0.2);
   });
-});
 
-describe('calcGateFirstPassRate', () => {
-  it('should return 1 for no gates', () => {
-    expect(calcGateFirstPassRate(0, 0)).toBe(1);
-  });
-  it('should calculate correctly', () => {
+  it('should calculate gate first pass rate', () => {
     expect(calcGateFirstPassRate(10, 8)).toBeCloseTo(0.8);
   });
 });
 
-// ─── Metrics CLI Tests ──────────────────────────────────
-
 describe('handleMetrics', () => {
-  it('should hide archived metrics in default-simplified report', () => {
-    writeFileSync(
-      join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
-      JSON.stringify({
-        featureId: 'FEAT-TEST',
-        currentStage: '03_plan',
-        mergedRules: { profile: 'default-simplified' },
-      }),
-      'utf-8'
-    );
-    writeFileSync(
-      join(TMP, 'specs', 'FEAT-TEST', 'traceability-matrix.md'),
-      '| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n| FR-AUTH-001 | FR | Test | Planned |  | TASK-AUTH-001,TC-UT-AUTH-001 |\n| TASK-AUTH-001 | TASK | Task | Planned | FR-AUTH-001 |  |\n| TC-UT-AUTH-001 | TC | Test | Planned | FR-AUTH-001 |  |\n',
-      'utf-8'
-    );
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
-      logs.push(String(msg ?? ''));
-    });
-    try {
-      const code = withCwd(TMP, () => handleMetrics(['report', 'FEAT-TEST']));
-      expect(code).toBe(ExitCode.SUCCESS);
-      expect(logs.join('\n')).toContain('C3');
-      expect(logs.join('\n')).toContain('C4');
-    } finally {
-      spy.mockRestore();
-    }
-  });
-
   it('should return VALIDATION_ERROR without subcommand', () => {
-    const code = withCwd(TMP, () => handleMetrics([]));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+    expect(withCwd(TMP, () => handleMetrics([]))).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should return VALIDATION_ERROR for unknown subcommand', () => {
-    const code = withCwd(TMP, () => handleMetrics(['unknown']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+  it('should render report from document-links', () => {
+    writeStageState();
+    writeDocumentLinks();
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\n', 'utf-8');
+
+    expect(withCwd(TMP, () => handleMetrics(['report', FEAT]))).toBe(ExitCode.SUCCESS);
   });
 
-  it('should return VALIDATION_ERROR for coverage without featureId', () => {
-    const code = withCwd(TMP, () => handleMetrics(['coverage']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
-  });
+  it('should calculate document metrics explicitly', () => {
+    writeStageState();
+    writeDocumentLinks();
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
 
-  it('should return VALIDATION_ERROR for report without featureId', () => {
-    const code = withCwd(TMP, () => handleMetrics(['report']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
-  });
-
-  it('should return VALIDATION_ERROR for health without featureId', () => {
-    const code = withCwd(TMP, () => handleMetrics(['health']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
-  });
-
-  it('should fail C4=0.67 in 04_implement stage after aligning with verify skill threshold', () => {
-    writeFileSync(
-      join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
-      JSON.stringify({
-        featureId: 'FEAT-TEST',
-        currentStage: '04_implement',
-        mergedRules: { profile: 'default-simplified' },
-      }),
-      'utf-8'
-    );
-    writeFileSync(
-      join(TMP, 'specs', 'FEAT-TEST', 'traceability-matrix.md'),
-      '| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n| FR-AUTH-001 | FR | Test1 | Planned |  | TC-UT-AUTH-001 |\n| FR-AUTH-002 | FR | Test2 | Planned |  | TC-UT-AUTH-002 |\n| FR-AUTH-003 | FR | Test3 | Planned |  |  |\n| TC-UT-AUTH-001 | TC | Test1 | Planned | FR-AUTH-001 |  |\n| TC-UT-AUTH-002 | TC | Test2 | Planned | FR-AUTH-002 |  |\n',
-      'utf-8'
-    );
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
-      logs.push(String(msg ?? ''));
-    });
-    try {
-      const code = withCwd(TMP, () => handleMetrics(['coverage', 'FEAT-TEST']));
-      expect(code).toBe(ExitCode.SUCCESS);
-      const output = logs.join('\n');
-      expect(output).toContain('C4');
-      expect(output).toContain('80%');
-      expect(output).toContain('失败');
-    } finally {
-      spy.mockRestore();
-    }
-  });
-
-  it('should fail C4=0.67 in 05_verify stage', () => {
-    writeFileSync(
-      join(TMP, 'specs', 'FEAT-TEST', 'stage-state.json'),
-      JSON.stringify({
-        featureId: 'FEAT-TEST',
-        currentStage: '05_verify',
-        mergedRules: { profile: 'default-simplified' },
-      }),
-      'utf-8'
-    );
-    writeFileSync(
-      join(TMP, 'specs', 'FEAT-TEST', 'traceability-matrix.md'),
-      '| ID | Type | Title | Status | Upstream | Downstream |\n|----|------|-------|--------|----------|------------|\n| FR-AUTH-001 | FR | Test1 | Planned |  | TC-UT-AUTH-001 |\n| FR-AUTH-002 | FR | Test2 | Planned |  | TC-UT-AUTH-002 |\n| FR-AUTH-003 | FR | Test3 | Planned |  |  |\n| TC-UT-AUTH-001 | TC | Test1 | Planned | FR-AUTH-001 |  |\n| TC-UT-AUTH-002 | TC | Test2 | Planned | FR-AUTH-002 |  |\n',
-      'utf-8'
-    );
-
-    const logs: string[] = [];
-    const spy = vi.spyOn(console, 'log').mockImplementation((msg?: unknown) => {
-      logs.push(String(msg ?? ''));
-    });
-    try {
-      const code = withCwd(TMP, () => handleMetrics(['coverage', 'FEAT-TEST']));
-      expect(code).toBe(ExitCode.SUCCESS);
-      const output = logs.join('\n');
-      expect(output).toContain('C4');
-      expect(output).toContain('100%');
-      expect(output).toContain('失败');
-    } finally {
-      spy.mockRestore();
-    }
+    const metrics = getDocumentMetrics(FEAT, TMP);
+    expect(metrics.declaredDocCount).toBe(2);
+    expect(metrics.existingDocCount).toBe(1);
+    expect(metrics.linkedDocCount).toBe(1);
   });
 });

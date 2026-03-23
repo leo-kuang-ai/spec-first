@@ -40,7 +40,7 @@ C1 = count(FR where status != 'Cancelled') / expected_FR_count
 ### 失败原因
 
 - `spec.md` 不存在或为空
-- FR 未注册到 traceability-matrix.md
+- FR 未注册到 document-links.yaml
 
 ---
 

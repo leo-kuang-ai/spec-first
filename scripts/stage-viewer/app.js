@@ -701,7 +701,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     // 健康分说明文本
     const healthLabelEl = document.querySelector('.health-score-label');
     if (healthLabelEl) {
-      healthLabelEl.innerHTML = '健康分<div style="font-size:10px;color:var(--muted);margin-top:2px;">综合评分基于以下5项指标</div>';
+      healthLabelEl.innerHTML = '文档健康<div style="font-size:10px;color:var(--muted);margin-top:2px;">综合评分基于文档存在、引用与断链情况</div>';
     }
 
     // Progress Ring
@@ -723,20 +723,20 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
     // Profile 显示
     const profileEl = document.getElementById('healthProfile');
     if (profileEl && profile) {
-      const profileText = profile === 'default-simplified' ? '开发友好模式' : profile === 'strict' ? '严格模式' : profile;
-      const tooltip = profile === 'default-simplified' ? '适合快速迭代，部分检查项为警告级别' : '所有检查项均为阻断级别';
+      const profileText = profile === 'default-simplified' ? '文档健康模式' : profile === 'strict' ? '严格模式' : profile;
+      const tooltip = profile === 'default-simplified' ? '适合快速迭代，重点关注文档完整性与引用关系' : '所有检查项均为阻断级别';
       profileEl.innerHTML = `门禁配置: ${profileText} <span style="color:var(--muted);cursor:help;" title="${tooltip}">ⓘ</span>`;
       profileEl.style.display = 'block';
     }
 
-    // Coverage Bars - 只显示核心指标
+    // 文档指标 - 只显示核心指标
     const CORE_METRICS = ['C3', 'C4', 'C6', 'C8', 'C9'];
     const METRIC_NAMES = {
-      C3: '任务覆盖率',
-      C4: '测试覆盖率 (FR)',
-      C6: '实现覆盖率',
-      C8: '任务合规率',
-      C9: 'TC合规率'
+      C3: '文档存在率',
+      C4: '引用覆盖率',
+      C6: '结构完整率',
+      C8: '断链抑制率',
+      C9: '关联完备率'
     };
     const coverageBarsEl = document.getElementById('coverageBars');
     if (coverage) {
@@ -792,7 +792,7 @@ import { FLOW_STAGES, STAGE_ORDER, STAGE_LABEL_MAP } from './stage-constants.js'
       });
       coverageBarsEl.innerHTML = bars.join('');
     } else {
-      coverageBarsEl.innerHTML = '<div class="muted">暂无覆盖率数据</div>';
+      coverageBarsEl.innerHTML = '<div class="muted">暂无文档指标</div>';
     }
 
     // Load defect details

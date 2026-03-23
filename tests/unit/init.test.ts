@@ -70,9 +70,11 @@ describe('init', () => {
     expect(taskPlan).toContain('Task Plan');
     expect(taskPlan).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |');
 
-    // traceability-matrix.md
-    expect(readFileSync(join(result.featureDir, 'traceability-matrix.md'), 'utf-8')).toContain('| ID |');
-
+    // document-links.yaml
+    const documentLinks = readFileSync(join(result.featureDir, 'document-links.yaml'), 'utf-8');
+    expect(documentLinks).toContain('version: 1');
+    expect(documentLinks).toContain(`featureId: ${result.featureId}`);
+    expect(documentLinks).toContain('path: spec.md');
     // constitution.md
     const constitution = readFileSync(join(result.featureDir, 'constitution.md'), 'utf-8');
     expect(constitution).toContain('Constitution');

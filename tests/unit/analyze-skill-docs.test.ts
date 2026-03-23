@@ -37,8 +37,8 @@ describe('21-analyze skill docs consistency', () => {
   it('should make background quality analysis explicit in execution flow', () => {
     const skill = read(SKILL_MD);
 
-    expect(skill).toContain('P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`，并加载 `background_input_status` 与 runtime/docs 背景状态');
-    expect(skill).toContain('P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突、背景质量异常）');
+    expect(skill).toContain('P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`document-links.yaml`，并加载 `background_input_status` 与 runtime/docs 背景状态');
+    expect(skill).toContain('P2: 执行一致性分析（歧义词、文档关联缺口、产物缺失、潜在冲突、背景质量异常）');
     expect(skill).toContain('P5: 输出结论摘要、背景质量结论与后续修复建议');
   });
 

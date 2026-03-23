@@ -79,7 +79,7 @@ const SEMANTIC_MAP: Record<string, { command: string; argTemplate: string }> = {
 /** Runtime 路由命令列表（直接映射 CLI 原子命令） */
 const RUNTIME_COMMANDS = new Set([
   'id',
-  'matrix',
+  'docs',
   'stage',
   'rfc',
   'defect',
@@ -884,7 +884,7 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
     const parts = ['<!-- task-runtime-context -->', '## Task Planning Context'];
     parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
     parts.push(`data_source: ${context.source}`);
-    parts.push('required_inputs: spec.md + design.md + traceability-matrix.md');
+    parts.push('required_inputs: spec.md + design.md + document-links.yaml');
     if (context.requiredAssetNames.length > 0) {
       parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
     }

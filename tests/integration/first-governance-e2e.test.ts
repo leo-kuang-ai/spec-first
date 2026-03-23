@@ -67,18 +67,6 @@ function seedFeatureDeliverables(): void {
   writeFileSync(join(SPEC_DIR, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
   writeFileSync(join(SPEC_DIR, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');
   writeFileSync(
-    join(SPEC_DIR, 'traceability-matrix.md'),
-    [
-      '| ID | Type | Title | Status | Upstream | Downstream |',
-      '|----|------|-------|--------|----------|------------|',
-      '| FR-GOV-001 | FR | Governance flow | Accepted |  | TASK-GOV-001,TC-UT-GOV-001 |',
-      '| TASK-GOV-001 | TASK | Implement governance | Accepted | FR-GOV-001 |  |',
-      '| TC-UT-GOV-001 | TC | Verify governance | Accepted | FR-GOV-001 |  |',
-      '',
-    ].join('\n'),
-    'utf-8'
-  );
-  writeFileSync(
     join(TMP, 'src', 'core', 'skill-runtime', 'first-conventions.ts'),
     'export const marker = "baseline";\n',
     'utf-8'

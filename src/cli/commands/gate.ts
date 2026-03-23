@@ -194,7 +194,7 @@ function handleConditions(args: string[]): number {
   const state = readJson<StageState>(statePath);
   const projectType = getProjectTypeFromConstitution(featureId, cwd);
   const profile = state.mergedRules?.profile ?? 'default-simplified';
-  const defs = getConditions(state.currentStage, projectType, profile, cwd);
+  const defs = getConditions(state.currentStage, projectType, profile);
 
   console.log(`Gate 条件 — ${featureId} (${state.currentStage})\n`);
   for (const d of defs) {

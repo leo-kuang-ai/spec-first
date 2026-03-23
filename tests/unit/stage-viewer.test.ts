@@ -206,43 +206,57 @@ featureId: ${FEAT}
 // ─── getDefaultMetrics 测试 ───────────────────────────────────────
 
 describe('getDefaultMetrics', () => {
-  it('should return default metrics when no matrix file', () => {
+  it('should return default metrics when no document-links file', () => {
     const metrics = getDefaultMetrics(FEAT, TMP);
     expect(metrics.C3).toBe(0);
     expect(metrics.C8).toBe(1); // 默认合规率为 1
   });
 
-  it('should calculate coverage from traceability matrix', () => {
-    const matrix = `# Traceability Matrix
-
-| FR ID | DS | TASK | TC |
-|---|---|---|---|
-| FR-001 | DS-001 | TASK-001 | TC-001 |
-| FR-002 | DS-002 | TASK-002, TASK-003 | TC-002 |
-| FR-003 | DS-003 | TASK-004 | - |
+  it('should calculate metrics from document-links yaml', () => {
+    const documentLinks = `version: 1
+featureId: ${FEAT}
+documents:
+  - path: spec.md
+    kind: requirements
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references:
+      - spec.md
+  - path: task_plan.md
+    kind: plan
+    stage: 03_plan
+    references:
+      - spec.md
+      - design.md
 `;
-    writeFileSync(join(TMP, 'specs', FEAT, 'traceability-matrix.md'), matrix, 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'document-links.yaml'), documentLinks, 'utf-8');
 
     const metrics = getDefaultMetrics(FEAT, TMP);
-
-    // FR: 3, DS: 3, TASK: 4, TC: 2
-    expect(metrics.C3).toBe(1); // 4/3 TASK/FR = 1.33 -> capped at 1
-    expect(metrics.C4).toBeCloseTo(2/3, 2); // 2/3 TC/FR
+    expect(metrics.C3).toBe(1);
+    expect(metrics.C4).toBeCloseTo(2 / 3, 2);
   });
 
-  it('should detect implementation status for C6', () => {
-    const matrix = `# Traceability Matrix
-
-| TASK ID | Status |
-|---|---|
-| TASK-001 | Implemented |
-| TASK-002 | Verified |
-| TASK-003 | Pending |
+  it('should reflect broken references in the metric mix', () => {
+    const documentLinks = `version: 1
+featureId: ${FEAT}
+documents:
+  - path: spec.md
+    kind: requirements
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references:
+      - missing.md
 `;
-    writeFileSync(join(TMP, 'specs', FEAT, 'traceability-matrix.md'), matrix, 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'document-links.yaml'), documentLinks, 'utf-8');
 
     const metrics = getDefaultMetrics(FEAT, TMP);
-    expect(metrics.C6).toBeCloseTo(2/3, 2); // 2 implemented out of 3 tasks
+    expect(metrics.C8).toBeLessThan(1);
   });
 });
 

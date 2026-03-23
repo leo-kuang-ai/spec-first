@@ -62,20 +62,17 @@ describe('nextId', () => {
       .toThrow('无效缩写');
   });
 
-  it('should write to matrix file', () => {
+  it('should write to reservation file', () => {
     nextId({ type: 'FR', abbr: 'AUTH', featureId: FEAT_ID, projectRoot: TMP });
-    const matrixPath = join(SPEC_DIR, 'traceability-matrix.md');
+    const matrixPath = join(SPEC_DIR, '.id-reservations.json');
     const content = readFileSync(matrixPath, 'utf-8');
     expect(content).toContain('FR-AUTH-001');
-    expect(content).toContain('| ID |');
+    expect(content).toContain('reservedIds');
   });
 
-  it('should handle existing matrix with IDs', () => {
-    const matrixPath = join(SPEC_DIR, 'traceability-matrix.md');
-    const existing = '| ID | Type | Title | Status | Upstream | Downstream |\n'
-      + '|----|------|-------|--------|----------|------------|\n'
-      + '| FR-AUTH-001 | FR | Login | Planned |  |  |\n'
-      + '| FR-AUTH-002 | FR | Logout | Planned |  |  |\n';
+  it('should handle existing reserved IDs', () => {
+    const matrixPath = join(SPEC_DIR, '.id-reservations.json');
+    const existing = JSON.stringify({ reservedIds: ['FR-AUTH-001', 'FR-AUTH-002'] }, null, 2);
     writeFileSync(matrixPath, existing, 'utf-8');
 
     const r = nextId({ type: 'FR', abbr: 'AUTH', featureId: FEAT_ID, projectRoot: TMP });

@@ -41,7 +41,35 @@ beforeEach(() => {
   writeFileSync(join(SPEC_DIR, 'findings.md'), '# Findings\n', 'utf-8');
   // 为 DESIGN 阶段准备必需的依赖文件
   writeFileSync(join(SPEC_DIR, 'prd.md'), '# PRD\n', 'utf-8');
-  writeFileSync(join(SPEC_DIR, 'spec.md'), '# Spec\n', 'utf-8');
+  writeFileSync(join(SPEC_DIR, 'spec.md'), 'Feature ID: FSREQ-20260211-ADV-001\n', 'utf-8');
+  writeFileSync(
+    join(SPEC_DIR, 'document-links.yaml'),
+    `version: 1
+featureId: ${FEAT_ID}
+documents:
+  - path: spec.md
+    kind: spec
+    stage: 01_specify
+    references: []
+  - path: design.md
+    kind: design
+    stage: 02_design
+    references: [spec.md]
+  - path: task_plan.md
+    kind: task-plan
+    stage: 03_plan
+    references: [spec.md, design.md]
+  - path: reports/test-report.md
+    kind: report
+    stage: 05_verify
+    references: [task_plan.md]
+  - path: reports/security-scan.md
+    kind: report
+    stage: 05_verify
+    references: [task_plan.md]
+`,
+    'utf-8'
+  );
 });
 
 afterEach(() => {
@@ -77,9 +105,11 @@ describe('advance', () => {
     expect(() => advance('NONEXISTENT', TMP)).toThrow(/未找到 Feature/);
   });
 
-  it('should block when gate result is FAIL', () => {
+  it('should advance SPECIFY → DESIGN when specify gate passes', () => {
     writeState(makeState({ currentStage: Stage.SPECIFY }));
-    expect(() => advance(FEAT_ID, TMP)).toThrow(/Gate 未通过/);
+    const result = advance(FEAT_ID, TMP);
+    expect(result.from).toBe(Stage.SPECIFY);
+    expect(result.to).toBe(Stage.DESIGN);
   });
 
 
@@ -143,10 +173,10 @@ describe('advance', () => {
     writeState(makeState());
     advance(FEAT_ID, TMP);
     resetConfigCache();
-    expect(() => advance(FEAT_ID, TMP)).toThrow(/Gate 未通过/);
+    advance(FEAT_ID, TMP);
     const state = readState();
-    expect(state.currentStage).toBe(Stage.SPECIFY);
-    expect(state.history).toHaveLength(1);
+    expect(state.currentStage).toBe(Stage.DESIGN);
+    expect(state.history).toHaveLength(2);
   });
 
   it('should auto-sync context file when advancing DESIGN → PLAN', () => {
@@ -184,13 +214,6 @@ describe('advance', () => {
       '',
     ].join('\n'), 'utf-8');
     writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n\nConstitution Clause C-1 (v1.0.0)\n\n## API\n', 'utf-8');
-    writeFileSync(join(SPEC_DIR, 'traceability-matrix.md'), [
-      '| ID | Type | Title | Status | Upstream | Downstream |',
-      '|----|------|-------|--------|----------|------------|',
-      '| FR-AUTH-001 | FR | Login | Planned |  | DS-AUTH-001 |',
-      '| DS-AUTH-001 | DS | Auth Design | Planned | FR-AUTH-001 |  |',
-      '',
-    ].join('\n'), 'utf-8');
     writeFileSync(join(TMP, 'CLAUDE.md'), '# CLAUDE\n', 'utf-8');
 
     const result = advance(FEAT_ID, TMP);
@@ -210,18 +233,6 @@ describe('advance', () => {
       'utf-8'
     );
     writeState(makeState({ currentStage: Stage.WRAP_UP }));
-    writeFileSync(
-      join(SPEC_DIR, 'traceability-matrix.md'),
-      [
-        '| ID | Type | Title | Status | Upstream | Downstream |',
-        '|----|------|-------|--------|----------|------------|',
-        '| FR-AUTH-001 | FR | Login | Accepted |  | TASK-AUTH-001,TC-UT-AUTH-001 |',
-        '| TASK-AUTH-001 | TASK | Implement login | Accepted | FR-AUTH-001 |  |',
-        '| TC-UT-AUTH-001 | TC | Login test | Accepted | FR-AUTH-001 |  |',
-        '',
-      ].join('\n'),
-      'utf-8'
-    );
     mkdirSync(join(SPEC_DIR, 'reports'), { recursive: true });
     writeFileSync(join(SPEC_DIR, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');

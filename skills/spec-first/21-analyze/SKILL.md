@@ -1,6 +1,6 @@
 ---
 name: "spec-first:analyze"
-description: "Use when you need a read-only consistency analysis across spec, design, tasks, matrix, and related feature artifacts."
+description: "Use when you need a read-only consistency analysis across spec, design, tasks, document links, and related feature artifacts."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
@@ -8,7 +8,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 # Skill: analyze
 
-对 `spec.md` / `design.md` / `task_plan.md` / 矩阵执行只读一致性分析，输出严重度分级报告。
+对 `spec.md` / `design.md` / `task_plan.md` / `document-links.yaml` 执行只读一致性分析，输出严重度分级报告。
 
 ## 触发条件
 - 阶段: 建议在 03_plan 前后执行（任意阶段可读分析）
@@ -30,8 +30,8 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），收集基础产物路径
-- P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`traceability-matrix.md`，并加载 `background_input_status` 与 runtime/docs 背景状态
-- P2: 执行一致性分析（歧义词、覆盖缺口、产物缺失、潜在冲突、背景质量异常）
+- P1: 读取 `spec.md`、`design.md`、`task_plan.md`、`document-links.yaml`，并加载 `background_input_status` 与 runtime/docs 背景状态
+- P2: 执行一致性分析（歧义词、文档关联缺口、产物缺失、潜在冲突、背景质量异常）
 - P3: 与用户确认高严重度项（CRITICAL/HIGH）
 - P4: 写入 `reports/analysis-report.md`
 - P5: 输出结论摘要、背景质量结论与后续修复建议

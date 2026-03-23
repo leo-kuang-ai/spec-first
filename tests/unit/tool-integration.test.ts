@@ -280,20 +280,28 @@ describe('handleStatus', () => {
     );
   }
 
-  function writeMatrix() {
+  function writeDocumentLinks() {
     writeFileSync(
-      join(TMP, 'specs', FEAT, 'traceability-matrix.md'),
+      join(TMP, 'specs', FEAT, 'document-links.yaml'),
       [
-        '| ID | Type | Title | Status | Upstream | Downstream |',
-        '|----|------|-------|--------|----------|------------|',
-        '| REQ-AUTH-001 | REQ | Login request | Accepted |  | FR-AUTH-001 |',
-        '| FR-AUTH-001 | FR | SMS login | Accepted | REQ-AUTH-001 | DS-AUTH-001,TASK-AUTH-001,TC-UT-AUTH-001 |',
-        '| DS-AUTH-001 | DS | Login design | Accepted | FR-AUTH-001 | TASK-AUTH-001 |',
-        '| TASK-AUTH-001 | TASK | Build login UI | Accepted | FR-AUTH-001,DS-AUTH-001 |  |',
-        '| TASK-AUTH-002 | TASK | Wire SMS API | Implemented | FR-AUTH-001,DS-AUTH-001 |  |',
-        '| TASK-AUTH-003 | TASK | Add retry logic | Planned | FR-AUTH-001,DS-AUTH-001 |  |',
-        '| TASK-AUTH-004 | TASK | Fix flaky test | Deferred | FR-AUTH-001,DS-AUTH-001 |  |',
-        '| TC-UT-AUTH-001 | TC | Login test | Verified | FR-AUTH-001 |  |',
+        'version: 1',
+        `featureId: ${FEAT}`,
+        'documents:',
+        '  - path: spec.md',
+        '    kind: requirements',
+        '    stage: 01_specify',
+        '    references: []',
+        '  - path: design.md',
+        '    kind: design',
+        '    stage: 02_design',
+        '    references:',
+        '      - spec.md',
+        '  - path: task_plan.md',
+        '    kind: plan',
+        '    stage: 03_plan',
+        '    references:',
+        '      - spec.md',
+        '      - design.md',
         '',
       ].join('\n'),
       'utf-8',
@@ -304,7 +312,9 @@ describe('handleStatus', () => {
     writeFeatureState();
     writeRuntimeIndex();
     writeTaskPlan();
-    writeMatrix();
+    writeDocumentLinks();
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
+    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\n', 'utf-8');
     writeDocsOutputs();
     writeFileSync(join(TMP, '.spec-first', 'current'), FEAT, 'utf-8');
     writeFileSync(
@@ -332,7 +342,8 @@ describe('handleStatus', () => {
     expect(stdout).toContain('runtime 真源: current');
     expect(stdout).toContain('docs 输出: ready');
     expect(stdout).toContain('同步状态: ready');
-    expect(stdout).toContain('C1 (Design Coverage): 100.0%');
+    expect(stdout).toContain('声明文档数: 3');
+    expect(stdout).toContain('已存在文档数: 3');
     expect(stdout).toContain('done: 1');
     expect(stdout).toContain('in_progress: 1');
     expect(stdout).toContain('todo: 1');

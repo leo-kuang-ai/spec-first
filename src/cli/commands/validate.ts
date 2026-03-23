@@ -1,10 +1,9 @@
 /**
- * Validate 命令组
- * validate format / validate matrix / validate all
+ * validate 命令组
+ * validate format / validate links / validate all
  */
 import { ExitCode } from '../../shared/types.js';
-import { validateFormat } from '../../core/validators/format-validator.js';
-import { checkMatrix } from '../../core/trace-engine/matrix.js';
+import { validateFormat, validateLinks } from '../../core/validators/format-validator.js';
 import { evaluateGate } from '../../core/gate-engine/gate-evaluator.js';
 
 export interface ValidateOptions {
@@ -16,8 +15,8 @@ export function handleValidate(args: string[], options?: ValidateOptions): numbe
   switch (sub) {
     case 'format':
       return handleFormatValidation(args.slice(1), options);
-    case 'matrix':
-      return handleMatrixValidation(args.slice(1), options);
+    case 'links':
+      return handleLinksValidation(args.slice(1), options);
     case 'all':
       return handleAllValidation(args.slice(1), options);
     default:
@@ -42,33 +41,29 @@ function handleFormatValidation(args: string[], options?: ValidateOptions): numb
 
   const projectRoot = options?.projectRoot ?? process.cwd();
   const result = validateFormat(featureId, projectRoot);
-
   if (result.pass) {
     console.log('✓ 格式校验通过');
     return ExitCode.SUCCESS;
   }
 
   console.error('✗ 格式校验失败：\n');
-  result.errors.forEach((err) => console.error(`  - ${err}`));
+  result.errors.forEach((error) => console.error(`  - ${error}`));
   return ExitCode.VALIDATION_ERROR;
 }
 
-function handleMatrixValidation(args: string[], options?: ValidateOptions): number {
-  const featureId = requireFeatureId(args, '用法：spec-first validate matrix <featureId>');
+function handleLinksValidation(args: string[], options?: ValidateOptions): number {
+  const featureId = requireFeatureId(args, '用法：spec-first validate links <featureId>');
   if (!featureId) return ExitCode.VALIDATION_ERROR;
 
   const projectRoot = options?.projectRoot ?? process.cwd();
-  const result = checkMatrix(featureId, projectRoot);
-  const hasIssues =
-    result.orphans.length > 0 || result.brokenChains.length > 0 || result.vModelPairs.length > 0;
-
-  if (!hasIssues) {
-    console.log('✓ 矩阵校验通过');
+  const result = validateLinks(featureId, projectRoot);
+  if (result.pass) {
+    console.log('✓ 文档关联校验通过');
     return ExitCode.SUCCESS;
   }
 
-  console.error('✗ 矩阵校验失败：\n');
-  result.warnings.forEach((warning) => console.error(`  - ${warning}`));
+  console.error('✗ 文档关联校验失败：\n');
+  result.errors.forEach((error) => console.error(`  - ${error}`));
   return ExitCode.VALIDATION_ERROR;
 }
 
@@ -77,12 +72,11 @@ function handleAllValidation(args: string[], options?: ValidateOptions): number 
   if (!featureId) return ExitCode.VALIDATION_ERROR;
 
   const projectRoot = options?.projectRoot ?? process.cwd();
-
   const formatCode = handleFormatValidation([featureId], options);
   if (formatCode !== ExitCode.SUCCESS) return formatCode;
 
-  const matrixCode = handleMatrixValidation([featureId], options);
-  if (matrixCode !== ExitCode.SUCCESS) return matrixCode;
+  const linksCode = handleLinksValidation([featureId], options);
+  if (linksCode !== ExitCode.SUCCESS) return linksCode;
 
   try {
     const gate = evaluateGate(featureId, projectRoot);
@@ -103,7 +97,7 @@ function handleAllValidation(args: string[], options?: ValidateOptions): number 
 function printValidateHelp(): void {
   console.log('用法：spec-first validate <subcommand>\n');
   console.log('子命令：');
-  console.log('  format    校验产物格式（PRD/ID/路径）');
-  console.log('  matrix    校验追溯矩阵');
+  console.log('  format    校验产物格式');
+  console.log('  links     校验 document-links.yaml');
   console.log('  all       执行全部校验');
 }

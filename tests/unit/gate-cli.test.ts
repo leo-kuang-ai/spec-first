@@ -26,6 +26,28 @@ function writeState(stage: string, mode = 'N', size = 'M') {
   }));
 }
 
+function writeDocumentLinks() {
+  writeFileSync(
+    join(TMP, 'specs', FEAT, 'document-links.yaml'),
+    [
+      'version: 1',
+      `featureId: ${FEAT}`,
+      'documents:',
+      '  - path: spec.md',
+      '    kind: requirements',
+      '    stage: 01_specify',
+      '    references: []',
+      '  - path: design.md',
+      '    kind: design',
+      '    stage: 02_design',
+      '    references:',
+      '      - spec.md',
+      '',
+    ].join('\n'),
+    'utf-8'
+  );
+}
+
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
 });
@@ -76,6 +98,8 @@ describe('handleGate', () => {
 
   it('should print actionable fix steps for C11 warnings', () => {
     writeState('02_design');
+    writeDocumentLinks();
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'design.md'),
       '## Governance\nConstitution Clause P1 (v1.0.0) is applied.',
@@ -98,6 +122,8 @@ describe('handleGate', () => {
 
   it('should persist C11 warnings to findings.md for audit', () => {
     writeState('02_design');
+    writeDocumentLinks();
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'design.md'),
       '## Governance\nConstitution Clause P1 (v1.0.0) is applied.',
@@ -118,7 +144,7 @@ describe('handleGate', () => {
     expect(existsSync(findingsPath)).toBe(true);
     const findings = readFileSync(findingsPath, 'utf-8');
     expect(findings).toContain('Gate Check Remediation');
-    expect(findings).toContain('G-DESIGN-03: Constitution compliance (C11)');
+    expect(findings).toContain('G-DESIGN-03: Constitution compliance (warning)');
     expect(findings).toContain(`create specs/${FEAT}/constitution.md`);
   });
 });

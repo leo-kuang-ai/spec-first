@@ -36,7 +36,12 @@ function cleanupDir(dir: string): void {
 }
 
 function gitInit(dir: string): void {
-  execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
+  try {
+    execFileSync('git', ['init', '-q', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
+  } catch {
+    execFileSync('git', ['init', '-q'], { cwd: dir, stdio: 'ignore' });
+    execFileSync('git', ['checkout', '-b', 'main'], { cwd: dir, stdio: 'ignore' });
+  }
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir, stdio: 'ignore' });
 }

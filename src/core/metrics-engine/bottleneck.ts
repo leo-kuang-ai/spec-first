@@ -1,8 +1,7 @@
 /**
- * Bottleneck Analysis & Metrics Report
- * R1-R5 瓶颈规则 + 健康报告生成
+ * 文档流瓶颈分析
  */
-import type { CoverageMetrics } from '../../shared/types.js';
+import type { DocumentMetrics } from './health-score.js';
 
 export interface Bottleneck {
   rule: string;
@@ -11,81 +10,55 @@ export interface Bottleneck {
   suggestion: string;
 }
 
-export interface MetricsReport {
-  featureId: string;
-  coverage: CoverageMetrics;
-  healthScore: number;
-  grade: string;
-  bottlenecks: Bottleneck[];
-  reworkRate: number;
-  gateFirstPassRate: number;
-}
+export function detectBottlenecks(metrics: DocumentMetrics): Bottleneck[] {
+  const result: Bottleneck[] = [];
 
-/** R1-R5 瓶颈检测规则 */
-export function detectBottlenecks(coverage: CoverageMetrics): Bottleneck[] {
-  const bottlenecks: Bottleneck[] = [];
-  const c = coverage as unknown as Record<string, number>;
-
-  // R1: 需求瓶颈 — C3 < 0.6
-  if (c.C3 < 0.6) {
-    bottlenecks.push({
+  if (metrics.declaredDocCount === 0) {
+    result.push({
       rule: 'R1',
-      description: 'Requirement bottleneck: low task coverage',
-      severity: c.C3 < 0.4 ? 'high' : 'medium',
-      suggestion: 'Review FR→TASK mapping, ensure all FRs are decomposed into executable tasks',
+      description: 'No declared documents in document-links.yaml',
+      severity: 'high',
+      suggestion: '补齐 document-links.yaml 的 documents 列表',
+    });
+    return result;
+  }
+
+  const missingCount = metrics.declaredDocCount - metrics.existingDocCount;
+  if (missingCount > 0) {
+    result.push({
+      rule: 'R1',
+      description: 'Declared documents are missing on disk',
+      severity: missingCount >= 2 ? 'high' : 'medium',
+      suggestion: '补齐缺失文档，或删除无效声明',
     });
   }
 
-  // R2: 测试瓶颈 — C4 < 0.6
-  if (c.C4 < 0.6) {
-    bottlenecks.push({
+  if (metrics.brokenReferenceCount > 0) {
+    result.push({
       rule: 'R2',
-      description: 'Test bottleneck: insufficient test coverage',
-      severity: c.C4 < 0.4 ? 'high' : 'medium',
-      suggestion: 'Add test cases for uncovered FRs',
+      description: 'Broken document references exist',
+      severity: metrics.brokenReferenceCount >= 2 ? 'high' : 'medium',
+      suggestion: '修复 document-links.yaml 中的错误引用',
     });
   }
 
-  // R3: 实现滞后 — C6 < 0.7
-  if (c.C6 < 0.7) {
-    bottlenecks.push({
+  if (metrics.linkedDocCount === 0 && metrics.declaredDocCount > 1) {
+    result.push({
       rule: 'R3',
-      description: 'Implementation lag: tasks not fully implemented',
-      severity: c.C6 < 0.5 ? 'high' : 'medium',
-      suggestion: 'Focus on completing in-progress tasks',
-    });
-  }
-
-  // R4: 合规缺口 — C8 < 0.7
-  if (c.C8 < 0.7) {
-    bottlenecks.push({
-      rule: 'R4',
-      description: 'Compliance gap: task compliance below threshold',
+      description: 'Documents are isolated without references',
       severity: 'medium',
-      suggestion: 'Ensure tasks follow conventions and reference requirements',
+      suggestion: '补齐 design/spec/task_plan 之间的引用关系',
     });
   }
 
-  // R5: 测试追溯缺口 — C9 < 0.7
-  if (c.C9 < 0.7) {
-    bottlenecks.push({
-      rule: 'R5',
-      description: 'Traceability gap: low test compliance',
-      severity: 'medium',
-      suggestion: 'Ensure every TC links back to FRs and eliminate orphan test cases',
-    });
-  }
-
-  return bottlenecks;
+  return result;
 }
 
-/** 计算返工率（目标 <10%） */
 export function calcReworkRate(totalTasks: number, reopenedTasks: number): number {
   if (totalTasks === 0) return 0;
   return reopenedTasks / totalTasks;
 }
 
-/** 计算 Gate 一次通过率（目标 >85%） */
 export function calcGateFirstPassRate(totalGates: number, firstPassGates: number): number {
   if (totalGates === 0) return 1;
   return firstPassGates / totalGates;

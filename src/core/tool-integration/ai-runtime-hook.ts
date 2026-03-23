@@ -63,7 +63,7 @@ export function generateAIHookConfigs(projectRoot: string): AIHookConfig[] {
     {
       type: 'PostToolUse',
       matcher: WRITE_INTENT_MATCHER,
-      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n "$FEAT" ]; then ${bin} matrix check "$FEAT" || echo "spec-first: matrix check 执行失败（已降级）" >&2; else echo "spec-first: 跳过 matrix 检查（无当前 feature）"; fi'`,
+      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n "$FEAT" ]; then ${bin} docs validate "$FEAT" || echo "spec-first: docs validate 执行失败（已降级）" >&2; else echo "spec-first: 跳过 docs 校验（无当前 feature）"; fi'`,
     },
     {
       type: 'PostToolUse',

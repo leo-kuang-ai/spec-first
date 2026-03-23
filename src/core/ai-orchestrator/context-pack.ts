@@ -121,7 +121,7 @@ export function buildContextPack(
     constitution: 'constitution.md',
     current_phase: state.currentStage,
     artifacts: {
-      matrix: `specs/${featureId}/traceability-matrix.md`,
+      documentLinks: `specs/${featureId}/document-links.yaml`,
     },
   };
 
@@ -254,9 +254,7 @@ export interface TaskContextPack {
   taskId: string;
   featureId: string;
   taskContent: string;
-  relatedFR: string[];
-  relatedDS: string[];
-  relatedAPI: string[];
+  relatedDocuments: string[];
   contextSize: number;
 }
 
@@ -280,20 +278,15 @@ export function buildTaskContextPack(
     return null;
   }
 
-  // 2. 从 traceability-matrix 提取关联的 FR/DS/API
-  const matrixPath = join(specDir, 'traceability-matrix.md');
-  const { relatedFR, relatedDS, relatedAPI } = exists(matrixPath)
-    ? extractTaskTraces(readMarkdown(matrixPath), taskId)
-    : { relatedFR: [], relatedDS: [], relatedAPI: [] };
+  // 2. 提取当前任务直接提到的文档名
+  const relatedDocuments = extractTaskDocumentRefs(taskContent);
 
   const pack: TaskContextPack = {
     taskId,
     featureId,
     taskContent,
-    relatedFR,
-    relatedDS,
-    relatedAPI,
-    contextSize: taskContent.length + JSON.stringify({ relatedFR, relatedDS, relatedAPI }).length,
+    relatedDocuments,
+    contextSize: taskContent.length + JSON.stringify({ relatedDocuments }).length,
   };
 
   // 3. 大小检查
@@ -337,36 +330,7 @@ function extractTaskContent(taskPlan: string, taskId: string): string | null {
   return contentLines.length > 0 ? contentLines.join('\n') : null;
 }
 
-/** 从 traceability-matrix 提取 TASK 关联的 FR/DS/API */
-function extractTaskTraces(
-  matrix: string,
-  taskId: string
-): { relatedFR: string[]; relatedDS: string[]; relatedAPI: string[] } {
-  const relatedFR: string[] = [];
-  const relatedDS: string[] = [];
-  const relatedAPI: string[] = [];
-
-  // 简化实现：按行查找包含 taskId 的行，并提取 upstream/downstream
-  const lines = matrix.split('\n');
-  for (const line of lines) {
-    if (line.includes(taskId)) {
-      // 提取 FR 引用
-      const frMatches = line.match(/FR-[A-Z0-9-]+/g);
-      if (frMatches) relatedFR.push(...frMatches);
-
-      // 提取 DS 引用
-      const dsMatches = line.match(/DS-[A-Z0-9-]+/g);
-      if (dsMatches) relatedDS.push(...dsMatches);
-
-      // 提取 API 引用（假设格式为 /api/xxx 或 API-XXX）
-      const apiMatches = line.match(/\/api\/[a-zA-Z0-9-/]+|API-[A-Z0-9-]+/g);
-      if (apiMatches) relatedAPI.push(...apiMatches);
-    }
-  }
-
-  return {
-    relatedFR: [...new Set(relatedFR)],
-    relatedDS: [...new Set(relatedDS)],
-    relatedAPI: [...new Set(relatedAPI)],
-  };
+function extractTaskDocumentRefs(taskContent: string): string[] {
+  const matches = taskContent.match(/\b[a-z0-9_-]+\.(md|ya?ml)\b/gi) ?? [];
+  return [...new Set(matches)];
 }

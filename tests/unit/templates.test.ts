@@ -44,27 +44,22 @@ describe('init templates', () => {
   });
 });
 
-describe('matrix templates', () => {
-  const matrixCtx = {
+describe('document-links template', () => {
+  const docLinksCtx = {
     ...BASE_CTX,
-    rows: [
-      { id: 'FR-AUTH-001', type: 'FR', title: 'Login', status: 'Planned', upstream: '', downstream: 'DS-AUTH-001' },
-      { id: 'DS-AUTH-001', type: 'DS', title: 'Design', status: 'Planned', upstream: 'FR-AUTH-001', downstream: '' },
+    documents: [
+      { path: 'spec.md', kind: 'spec', stage: '01_specify', references: [] },
+      { path: 'design.md', kind: 'design', stage: '02_design', references: ['spec.md'] },
+      { path: 'task_plan.md', kind: 'task-plan', stage: '03_plan', references: ['spec.md', 'design.md'] },
     ],
   };
 
-  it('traceability-matrix.md.hbs should render markdown table', () => {
-    const tpl = compile('matrix/traceability-matrix.md.hbs');
-    const out = tpl(matrixCtx);
-    expect(out).toContain('FR-AUTH-001');
-    expect(out).toContain('| ID |');
-  });
-
-  it('traceability-matrix.yaml.hbs should render YAML', () => {
-    const tpl = compile('matrix/traceability-matrix.yaml.hbs');
-    const out = tpl(matrixCtx);
-    expect(out).toContain('featureId:');
-    expect(out).toContain('FR-AUTH-001');
+  it('document-links.yaml.hbs should render YAML skeleton', () => {
+    const tpl = compile('docs/document-links.yaml.hbs');
+    const out = tpl(docLinksCtx);
+    expect(out).toContain('version: 1');
+    expect(out).toContain('featureId: FSREQ-20260211-AUTH-001');
+    expect(out).toContain('task_plan.md');
   });
 });
 
@@ -115,15 +110,15 @@ describe('metrics template', () => {
       ...BASE_CTX,
       score: 85,
       metrics: [
-        { name: 'C3-任务覆盖率', current: '90%', target: '100%', status: 'FAIL' },
-        { name: 'C4-测试覆盖率', current: '85%', target: '80%', status: 'PASS' },
+        { name: 'C3-文档存在率', current: '90%', target: '100%', status: 'FAIL' },
+        { name: 'C4-引用覆盖率', current: '85%', target: '80%', status: 'PASS' },
       ],
-      bottlenecks: [{ metric: 'C3', description: 'Task coverage below target' }],
-      recommendations: ['Add missing task decomposition'],
+      bottlenecks: [{ metric: 'C3', description: 'Document existence below target' }],
+      recommendations: ['Add missing document references'],
     });
     expect(out).toContain('85 / 100');
-    expect(out).toContain('C3-任务覆盖率');
-    expect(out).toContain('Task coverage below');
+    expect(out).toContain('C3-文档存在率');
+    expect(out).toContain('Document existence below');
   });
 });
 
