@@ -4,7 +4,7 @@ description: "Use when a feature reaches a stage gate and you need evidence-base
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: |
-  v1.1.0: 新增 Announce at Start、When to Use、Gate 条件映射（8 阶段 25+ 条件）、WAIVER 机制详解、失败处理流程、verify 报告格式、覆盖率指标详解（C1-C11）、决策流程图、references/ 目录、hooks 配置、user-invocable 标记
+  v1.1.0: 新增 Announce at Start、When to Use、Gate 条件映射（8 阶段 25+ 条件）、WAIVER 机制详解、失败处理流程、verify 报告格式、文档健康指标详解（D1-D5）、决策流程图、references/ 目录、hooks 配置、user-invocable 标记
   v1.0.0: Initial version with standardized metadata
 user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash"
@@ -37,7 +37,7 @@ metadata:
 
 # Skill: verify
 
-执行阶段验收校验，评估 Gate 条件与覆盖率缺口。
+执行阶段验收校验，评估 Gate 条件与文档健康缺口。
 
 ## Announce at Start
 
@@ -80,7 +80,7 @@ I'm using the verify skill to validate [Feature] stage completion.
 
 **Use this ESPECIALLY when**：
 - 需要确认阶段是否可以推进
-- 需要识别覆盖率缺口
+- 需要识别文档健康缺口
 - 需要获取可执行的修复建议
 - 需要生成验证报告
 
@@ -150,14 +150,14 @@ I'm using the verify skill to validate [Feature] stage completion.
 | TASK 完成 | 测试命令输出 + review 通过 | "代码写完了" |
 | Feature 可归档 | `spec-first gate check <featureId>` + `spec-first docs links validate <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
 
-## TDD 与覆盖率的边界
+## TDD 与文档健康的边界
 
 verify 必须区分：
 
-- 覆盖率指标：C4 / C5 / C6 等结果性指标
+- 门禁信号：C4 / C5 / C6 等结果性指标
 - TDD 证据：`[TDD-RED] / [TDD-WAIVER] / [TDD-GREEN]` 等过程性证据
 
-禁止把“覆盖率达标”表述成“已经遵守 TDD”。
+禁止把“门禁达标”表述成“已经遵守 TDD”。
 如果 `findings.md` 显示存在 TDD 缺口，应在 verify 结论中单列风险，即使 Gate 结果仍然通过。
 
 ## Gate 状态
@@ -191,14 +191,14 @@ verify 必须区分：
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
 | G-DESIGN-01 | design.md exists | ✅/❌ |
-| G-DESIGN-02 | API coverage (C2) | = 100% |
+| G-DESIGN-02 | API contract completeness (C2) | = 100% |
 | G-DESIGN-03 | Constitution compliance (C11) | = 100% |
 
 ### 03_plan
 
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
-| G-PLAN-01 | Task coverage (C3) | = 100% |
+| G-PLAN-01 | Task breakdown completeness (C3) | = 100% |
 | G-PLAN-02 | Task compliance (C8) | = 100% |
 | G-PLAN-03 | Analyze CRITICAL findings | = 0 |
 
@@ -206,16 +206,16 @@ verify 必须区分：
 
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
-| G-IMPL-01 | Unit test coverage (C4) | 读取 gate.thresholds.G-IMPL-01 |
+| G-IMPL-01 | Unit test completeness (C4) | 读取 gate.thresholds.G-IMPL-01 |
 | G-IMPL-02 | PR compliance (C7) | = 100% |
 
 ### 05_verify
 
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
-| G-VERIFY-01 | Test coverage FR (C4) | 读取 gate.thresholds.G-VERIFY-01 |
-| G-VERIFY-02 | Test coverage AC (C5) | ≥ 90% (M/L), 60% (S) |
-| G-VERIFY-03 | TC compliance (C9) | = 100% |
+| G-VERIFY-01 | Test signal for FR (C4) | 读取 gate.thresholds.G-VERIFY-01 |
+| G-VERIFY-02 | Test signal for AC (C5) | ≥ 90% (M/L), 60% (S) |
+| G-VERIFY-03 | Verification evidence completeness (C9) | = 100% |
 
 > `G-IMPL-01` / `G-VERIFY-01` 的阈值真理源为 `.spec-first/meta/config.yaml` 与 `.spec-first/local/config.yaml` 中的 `gate.thresholds`。执行 verify 时读取 `.spec-first/meta/config.yaml` / `.spec-first/local/config.yaml`，再解释 Gate 结果。
 
@@ -223,7 +223,7 @@ verify 必须区分：
 
 | 条件 ID | 描述 | 阈值 |
 |---------|------|------|
-| G-WRAP-01 | Implementation coverage (C6) | = 100% |
+| G-WRAP-01 | Implementation completeness (C6) | = 100% |
 | G-WRAP-02 | All document links resolved | ✅/❌ |
 
 ### 07_release
@@ -299,21 +299,21 @@ digraph verify_failure_flow {
 }
 ```
 
-## 覆盖率指标详解
+## 门禁信号详解
 
 ### C1-C9 指标概览
 
 | 指标 | 名称 | 含义 | 阈值示例 |
 |------|------|------|----------|
-| **C1** | Spec Coverage | 需求覆盖率 | 01_specify: >0% |
-| **C2** | API Coverage | API 设计覆盖率 | 02_design: 100% |
-| **C3** | Task Coverage | 任务覆盖率 | 03_plan: 100% |
-| **C4** | Test Coverage FR | 测试对 FR 覆盖率 | 05_verify: 100% |
-| **C5** | Test Coverage AC | 测试对 AC 覆盖率 | 05_verify: ≥90% |
-| **C6** | Implementation Coverage | 实现覆盖率 | 06_wrap_up: 100% |
+| **C1** | Spec Completeness | 需求完整性 | 01_specify: >0% |
+| **C2** | API Contract Completeness | API 设计完整性 | 02_design: 100% |
+| **C3** | Task Breakdown Completeness | 任务拆解完整性 | 03_plan: 100% |
+| **C4** | FR Test Signal | 测试对 FR 的验证信号 | 05_verify: 100% |
+| **C5** | AC Test Signal | 测试对 AC 的验证信号 | 05_verify: ≥90% |
+| **C6** | Implementation Completeness | 实现完整性 | 06_wrap_up: 100% |
 | **C7** | PR Compliance | PR 合规率 | 04_implement: 100% |
 | **C8** | Task Compliance | 任务合规率 | 03_plan+: 100% |
-| **C9** | TC Compliance | 测试用例合规率 | 05_verify: 100% |
+| **C9** | Verification Evidence Completeness | 验证证据完整性 | 05_verify: 100% |
 
 ### 指标修复命令
 
@@ -396,12 +396,12 @@ digraph verify_flow {
 
 - **Gate 通过**：`spec-first gate check <featureId>` 退出码为 0，且状态为 `PASS` 或 `PASS_WITH_WAIVER`
 - **阶段可推进**：`gate check` 通过；`docs links validate` 按阶段策略执行
-- **覆盖率可接受**：以 `gate check` 对当前阶段的阈值判定为准
+- **门禁可接受**：以 `gate check` 对当前阶段的阈值判定为准
 - **结论可宣告**：以上证据均为本次会话新鲜执行结果（非历史缓存）
 
 ## 判定证据链要求
 
-- 失败条目必须映射到具体 ID（FR/DS/TASK/TC）
+- 失败条目必须映射到具体对象（FR、文档章节、任务、测试证据）
 - 每个失败条目必须附带至少 1 条可执行修复建议
 
 ## 触发条件
@@ -455,7 +455,7 @@ digraph verify_flow {
 - **P2**: 执行 `gate check`、`docs links validate`、`metrics report`，获取验证结果
 - **P3**: 生成校验报告（Gate 评估、文档关联完整性、文档健康缺口、verify-view 重点、修复建议）
 - **P4**: 将校验结果写入 findings.md
-- **P4.5**: 如发现 TDD 过程缺口，单列写入 findings.md，避免被覆盖率结论掩盖
+- **P4.5**: 如发现 TDD 过程缺口，单列写入 findings.md，避免被门禁信号结论掩盖
 - **P5**: 若所有条件满足，建议执行 stage advance
 
 ## CLI 依赖
@@ -474,9 +474,9 @@ digraph verify_flow {
 
 ## 成功标准
 
-- 校验报告已生成，包含 Gate 评估、矩阵完整性、覆盖率缺口
+- 校验报告已生成，包含 Gate 评估、文档关联完整性、文档健康缺口
 - 校验结果已写入 `findings.md`
-- 如存在 TDD 缺口，已与覆盖率问题分开描述
+- 如存在 TDD 缺口，已与门禁信号问题分开描述
 - 声称通过时必须附带本次执行命令输出与退出码
 - 若所有条件满足，已建议执行 `stage advance`
 - FAIL 时必须包含可执行的修复建议
@@ -488,8 +488,8 @@ digraph verify_flow {
 
 1. **执行摘要** — Feature、阶段、状态、退出码、执行时间
 2. **Gate 条件检查** — PASS/WAIVER/FAIL 条目列表
-3. **覆盖率指标** — C1-C9 当前值、阈值、状态
-4. **失败条目详情** — 关联 ID、修复建议
+3. **门禁信号** — C1-C9 当前值、阈值、状态
+4. **失败条目详情** — 关联对象、修复建议
 5. **建议下一步** — 基于结果的可执行建议
 6. **执行证据** — 命令输出、退出码
 
@@ -513,11 +513,11 @@ digraph verify_flow {
 - [G-SPEC-02] FR/NFR IDs assigned ✅ (FR count: 3)
 - [G-SPEC-03] Spec quality score (C10) ✅ (C10=85%)
 
-## 覆盖率指标
+## 门禁信号
 
 | 指标 | 当前值 | 阈值 | 状态 |
 |------|--------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ |
+| C1 (Spec Completeness) | 100% | >0% | ✅ |
 | C10 (Spec Quality) | 85% | ≥80% | ✅ |
 
 ## 建议下一步
@@ -533,7 +533,7 @@ Gate 已通过，可以推进到下一阶段。
 | 模板类型 | 路径 | 用途 |
 |---------|------|------|
 | Gate 条件 | `gate-conditions.md` | 各阶段 Gate 条件定义 |
-| 文档指标 | `coverage-metrics.md` | C1-C11 指标与文档健康说明 |
+| 文档指标 | `coverage-metrics.md` | D1-D5 文档健康说明 |
 | 报告模板 | `verify-report-template.md` | verify 报告格式 |
 
 ## Hooks 行为规范

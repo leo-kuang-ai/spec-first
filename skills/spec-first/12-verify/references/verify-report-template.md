@@ -37,25 +37,35 @@ verify 报告标准格式，确保输出一致性。
   - 影响: {Impact}
   - 修复建议: {Suggestion}
 
-## 覆盖率指标
+## 门禁信号
 
 | 指标 | 当前值 | 阈值 | 状态 |
 |------|--------|------|------|
-| C1 (Spec Coverage) | {value}% | {threshold}% | ✅/❌ |
-| C2 (API Coverage) | {value}% | {threshold}% | ✅/❌ |
-| C3 (Task Coverage) | {value}% | {threshold}% | ✅/❌ |
-| C4 (Test Coverage FR) | {value}% | {threshold}% | ✅/❌ |
-| C5 (Test Coverage AC) | {value}% | {threshold}% | ✅/❌ |
-| C6 (Implementation Coverage) | {value}% | {threshold}% | ✅/❌ |
+| C1 (Spec Completeness) | {value}% | {threshold}% | ✅/❌ |
+| C2 (API Contract Completeness) | {value}% | {threshold}% | ✅/❌ |
+| C3 (Task Breakdown Completeness) | {value}% | {threshold}% | ✅/❌ |
+| C4 (FR Test Signal) | {value}% | {threshold}% | ✅/❌ |
+| C5 (AC Test Signal) | {value}% | {threshold}% | ✅/❌ |
+| C6 (Implementation Completeness) | {value}% | {threshold}% | ✅/❌ |
 | C7 (PR Compliance) | {value}% | {threshold}% | ✅/❌ |
 | C8 (Task Compliance) | {value}% | {threshold}% | ✅/❌ |
-| C9 (TC Compliance) | {value}% | {threshold}% | ✅/❌ |
+| C9 (Verification Evidence Completeness) | {value}% | {threshold}% | ✅/❌ |
+
+## 文档健康指标
+
+| 指标 | 当前值 | 阈值 | 状态 |
+|------|--------|------|------|
+| D1 (Document Completeness) | {value}% | {threshold}% | ✅/❌ |
+| D2 (Document Link Validity) | {value}% | {threshold}% | ✅/❌ |
+| D3 (Gate Pass Rate) | {value}% | {threshold}% | ✅/❌ |
+| D4 (Evidence Completeness) | {value}% | {threshold}% | ✅/❌ |
+| D5 (Findings Freshness) | {value}% | {threshold}% | ✅/❌ |
 
 ## 失败条目详情
 
 ### {FAIL_ID}: {失败描述}
 
-**关联 ID**: {FR/DS/TASK/TC ID}
+**关联对象**: {FR / 文档章节 / TASK / 测试证据}
 **当前状态**: {Status}
 **修复建议**:
 1. {Step 1}
@@ -117,11 +127,11 @@ Gate 检查 — {featureId} ({stage})
 - [G-SPEC-02] FR/NFR IDs assigned ✅ (FR count: 3)
 - [G-SPEC-03] Spec quality score (C10) ✅ (C10=85%)
 
-## 覆盖率指标
+## 门禁信号
 
 | 指标 | 当前值 | 阈值 | 状态 |
 |------|--------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ |
+| C1 (Spec Completeness) | 100% | >0% | ✅ |
 | C10 (Spec Quality) | 85% | ≥80% | ✅ |
 
 ## 建议下一步
@@ -149,25 +159,25 @@ Gate 已通过，可以推进到下一阶段。
 
 ### FAIL 条件
 
-- [G-DESIGN-02] API coverage (C2) ❌
-  - 失败原因: C2=66.7%, uncovered FR: FR-AUTH-003
-  - 影响: 部分 FR 缺少设计规格
-  - 修复建议: 为 FR-AUTH-003 补充 DS
+- [G-DESIGN-02] API contract completeness (C2) ❌
+  - 失败原因: C2=66.7%, missing design detail for FR-AUTH-003
+  - 影响: 部分 FR 缺少设计说明
+  - 修复建议: 为 FR-AUTH-003 补充 design 说明
 
-## 覆盖率指标
+## 门禁信号
 
 | 指标 | 当前值 | 阈值 | 状态 |
 |------|--------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ |
-| C2 (API Coverage) | 66.7% | 100% | ❌ |
+| C1 (Spec Completeness) | 100% | >0% | ✅ |
+| C2 (API Contract Completeness) | 66.7% | 100% | ❌ |
 | C11 (Constitution Compliance) | 100% | 100% | ✅ |
 
 ## 失败条目详情
 
 ### FR-AUTH-003: 密码重置功能
 
-**关联 ID**: FR-AUTH-003
-**当前状态**: 缺少 DS
+**关联对象**: FR-AUTH-003 / design 说明
+**当前状态**: 缺少 design 说明
 **修复建议**:
 1. 运行 `/spec-first:design --focus FR-AUTH-003`
 2. 补充 API 设计（POST /api/auth/password/reset）
@@ -208,11 +218,11 @@ Gate 已通过，可以推进到下一阶段。
   - 批准人: Tech Lead
   - 有效期: 2026-03-31
 
-## 覆盖率指标
+## 门禁信号
 
 | 指标 | 当前值 | 阈值 | 状态 |
 |------|--------|------|------|
-| C1 (Spec Coverage) | 100% | >0% | ✅ |
+| C1 (Spec Completeness) | 100% | >0% | ✅ |
 | C10 (Spec Quality) | 75% | ≥80% | ⚠️ WAIVER |
 
 ## WAIVER 记录
@@ -232,8 +242,8 @@ Gate 已通过，可以推进到下一阶段。
 
 1. **必须包含执行摘要** — Feature、阶段、状态、退出码
 2. **必须列出所有 Gate 条件** — PASS/WAIVER/FAIL
-3. **必须包含覆盖率指标表** — C1-C9 当前值、阈值、状态
-4. **FAIL 时必须包含失败详情** — 关联 ID、修复建议
+3. **必须包含门禁信号表** — C1-C9 当前值、阈值、状态
+4. **FAIL 时必须包含失败详情** — 关联对象、修复建议
 5. **WAIVER 时必须包含豁免记录** — 理由、批准人、有效期
 6. **必须包含执行证据** — 命令输出、退出码
 7. **必须包含建议下一步** — 基于结果的可执行建议

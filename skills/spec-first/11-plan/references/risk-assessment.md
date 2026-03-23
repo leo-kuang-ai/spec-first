@@ -139,7 +139,7 @@
 
 | 风险项 | 等级 | 影响 | 缓解措施 | 状态 |
 |--------|------|------|----------|------|
-| AC-AUTH-001-01 存在歧义 | HIGH | 阻塞设计 | 标记 NEEDS CLARIFICATION | OPEN |
+| AC-01 存在歧义 | HIGH | 阻塞设计 | 标记 NEEDS CLARIFICATION | OPEN |
 | 性能要求未验证 | MEDIUM | 可能返工 | 执行 POC 验证 | OPEN |
 | 第三方 API 稳定性 | LOW | 可用性风险 | 添加重试机制 | MITIGATED |
 ```

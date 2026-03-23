@@ -1,6 +1,6 @@
 ---
 name: "spec-first:sync"
-description: "Use when traceability state, stage status, findings, or runtime/docs sync may be stale and you need to reconcile the current feature."
+description: "Use when document-link state, stage status, findings, or runtime/docs sync may be stale and you need to reconcile the current feature."
 version: 1.1.0
 last_updated: 2026-03-05
 changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/current）
@@ -59,7 +59,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 - `specs/{featureId}/findings.md`
 
 ## 确认策略
-- 推荐: assisted（同步会修改矩阵）
+- 推荐: assisted（同步会修改文档关联索引）
 
 ## 成功标准
 - 同步计划已生成并经用户确认

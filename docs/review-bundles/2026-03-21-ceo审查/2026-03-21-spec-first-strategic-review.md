@@ -435,7 +435,7 @@ tool-integration
 6. `docs/first/external-deps.md` — 从 package.json 提取外部依赖
 7. `docs/first/steering.md` — 从 CLAUDE.md 提取项目导航
 8. `docs/first/summary.md` — 从 .spec-first/runtime/ 提取项目摘要
-9. `docs/runtime/structure-overview.json` — 从目录结构生成
+9. `.spec-first/runtime/first/structure-overview.json` — 从目录结构生成
 10-12. (其他 3 个文档待识别)
 
 **技术选型**

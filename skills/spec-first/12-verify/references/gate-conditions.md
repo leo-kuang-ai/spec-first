@@ -25,7 +25,7 @@
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
 | G-SPEC-01 | spec.md exists | spec.md 文件存在 | ✅/❌ |
-| G-SPEC-02 | FR/NFR IDs assigned | 矩阵中有 FR 条目 | count > 0 |
+| G-SPEC-02 | FR/NFR entries present | spec.md 中有 FR/NFR 条目 | count > 0 |
 | G-SPEC-03 | Spec quality score (C10) | C10 ≥ 80% | ≥ 80% |
 
 ### 02_design
@@ -33,14 +33,14 @@
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
 | G-DESIGN-01 | design.md exists | design.md 文件存在 | ✅/❌ |
-| G-DESIGN-02 | API coverage (C2) | C2 = 100% | = 100% |
+| G-DESIGN-02 | API contract completeness (C2) | C2 = 100% | = 100% |
 | G-DESIGN-03 | Constitution compliance (C11) | C11 = 100% | = 100% |
 
 ### 03_plan
 
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
-| G-PLAN-01 | Task coverage (C3) | C3 = 100% | = 100% |
+| G-PLAN-01 | Task breakdown completeness (C3) | C3 = 100% | = 100% |
 | G-PLAN-02 | Task compliance (C8) | C8 = 100% | = 100% |
 | G-PLAN-03 | Analyze CRITICAL findings | analyze 报告中 CRITICAL = 0 | = 0 |
 
@@ -48,22 +48,22 @@
 
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
-| G-IMPL-01 | Unit test coverage (C4) | C4 满足 `gate.thresholds.G-IMPL-01` | 配置驱动 |
+| G-IMPL-01 | Unit test completeness (C4) | C4 满足 `gate.thresholds.G-IMPL-01` | 配置驱动 |
 | G-IMPL-02 | PR compliance (C7) | C7 = 100% | = 100% |
 
 ### 05_verify
 
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
-| G-VERIFY-01 | Test coverage FR (C4) | C4 满足 `gate.thresholds.G-VERIFY-01` | 配置驱动 |
-| G-VERIFY-02 | Test coverage AC (C5) | C5 ≥ 90% (M/L), 60% (S) | 动态阈值 |
-| G-VERIFY-03 | TC compliance (C9) | C9 = 100% | = 100% |
+| G-VERIFY-01 | Test signal FR (C4) | C4 满足 `gate.thresholds.G-VERIFY-01` | 配置驱动 |
+| G-VERIFY-02 | Test signal AC (C5) | C5 ≥ 90% (M/L), 60% (S) | 动态阈值 |
+| G-VERIFY-03 | Verification evidence completeness (C9) | C9 = 100% | = 100% |
 
 ### 06_wrap_up
 
 | 条件 ID | 描述 | 检查内容 | 阈值 |
 |---------|------|----------|------|
-| G-WRAP-01 | Implementation coverage (C6) | C6 = 100% | = 100% |
+| G-WRAP-01 | Implementation completeness (C6) | C6 = 100% | = 100% |
 | G-WRAP-02 | All document links resolved | 所有文档关联均可解析 | ✅/❌ |
 
 ### 07_release
@@ -138,10 +138,10 @@ def evaluate_gate(feature_id, stage):
 | 失败条件 | 常见原因 | 修复建议 |
 |---------|----------|----------|
 | G-SPEC-02 (FR 未分配) | spec.md 中没有 FR | 运行 `/spec-first:spec` 生成 FR |
-| G-DESIGN-02 (C2 < 100%) | 部分 FR 缺少 DS | 运行 `/spec-first:design` 补充 DS |
+| G-DESIGN-02 (C2 < 100%) | 部分 FR 缺少设计说明 | 运行 `/spec-first:design` 补充设计说明 |
 | G-PLAN-01 (C3 < 100%) | 部分 FR 缺少 TASK | 运行 `/spec-first:task` 拆解任务 |
-| G-IMPL-01 (C4 < configured threshold) | 单测覆盖不足 | 先核对 `gate.thresholds.G-IMPL-01`，再补充单元测试 |
-| G-VERIFY-01 (C4 < configured threshold) | 部分 FR 缺少 TC | 先核对 `gate.thresholds.G-VERIFY-01`，再回到 `task/code` 补齐测试设计与 TDD 证据 |
+| G-IMPL-01 (C4 < configured threshold) | 单测完整性不足 | 先核对 `gate.thresholds.G-IMPL-01`，再补充单元测试 |
+| G-VERIFY-01 (C4 < configured threshold) | 部分 FR 缺少验证证据 | 先核对 `gate.thresholds.G-VERIFY-01`，再回到 `task/code` 补齐测试设计与 TDD 证据 |
 
 > `G-IMPL-01` / `G-VERIFY-01` 的数值阈值不再写死在文档中。唯一真理源为 `.spec-first/meta/config.yaml` 与 `.spec-first/local/config.yaml` 的 `gate.thresholds`。
 

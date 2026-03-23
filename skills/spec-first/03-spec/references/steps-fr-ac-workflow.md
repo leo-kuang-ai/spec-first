@@ -160,9 +160,20 @@
 - 允许用户修订，修订后重新确认
 
 **AC ID 规范**:
-- 命名：`AC-<ABBR>-<FRSEQ>-<NN>`
-- 示例：`FR-AUTH-001` 下的第 1 条 AC 为 `AC-AUTH-001-01`
-- 约束：一个 AC ID 只能映射一条可验证断言
+- 命名：`AC-<NN>`
+- 示例：`FR-AUTH-001` 下的第 1 条 AC 为 `AC-01`
+- 约束：AC 编号只需在单个 FR 内唯一，不再嵌入 FR 序号
+
+### ID 生成与使用位置
+
+| ID 类型 | 生成位置 | 主要使用位置 |
+|--------|----------|--------------|
+| `FR-<ABBR>-NNN` | Step 8 通过 `spec-first id next FR <abbr> --feature <featureId>` 生成 | `spec.md` 的 FR 列表、Step 6 收敛确认、Step 8 最终确认包、`findings.md` 的确认记录 |
+| `AC-<NN>` | Step 6 基于每个 FR 生成 | `spec.md` 的 AC 列表、Step 6 逐条确认、`findings.md` 的确认记录 |
+
+**说明**:
+- 本工作流不生成 `DS`、`TASK`、`TC` ID
+- 这些 ID 如果存在，属于后续 `04-design`、`06-task`、`12-verify` 阶段的产物
 
 **输出**:
 - `spec.md` 完整 FR/AC 列表
@@ -291,13 +302,13 @@ spec-first docs links validate <featureId>
 **注意**:
 - FR 确认后必须立即写入 `spec.md`
 - 如存在 `document-links.yaml`，需同步保持引用可验证
-- 不再维护矩阵式注册流程
+- 不再维护条目级注册流程
 
 **错误处理**:
 - ID 生成失败: 检查 Feature 存在性 → 检查 ABBR 格式 → 重试 1 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
-- Matrix 更新失败: 检查 ID 冲突 → 使用 `--force` 覆盖 → 重试 1 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
+- 文档关联同步失败: 检查 `document-links.yaml` 引用是否可解析 → 重试 1 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
 - 网络超时: 等待 5 秒重试 → 最多 3 次 → 失败则标记 `[CLI_ERROR]` 并请求用户介入
-- **阻断规则**: 不得跳过注册，所有 FR 必须成功注册后才能执行 gate check
+- **阻断规则**: 不得跳过写入与关联校验，所有 FR 必须成功落盘后才能执行 gate check
 
 ### 5. 执行 Gate Check（阻断门禁）
 
@@ -308,13 +319,13 @@ spec-first gate check <featureId>
 **检查项**:
 - PRD 存在且 C-PRD ≥ 85%
 - spec.md 存在且包含所有 FR/AC
-- FR 已注册到追溯矩阵
+- FR 已写入 `spec.md` 且 `document-links.yaml` 可解析
 - spec-review.md 存在（如需要）
 
 **失败处理**:
 - C-PRD < 85%: 返回 Phase 0.3 修正 PRD，重新执行 Phase 0.4-0.6
 - 缺少文件: 补齐后重新执行 gate check
-- FR 未注册: 执行注册后重新执行 gate check
+- FR 未写入 `spec.md`: 补写后重新执行 gate check
 - **不得跳过 gate check 进入下一阶段**
 
 **通过后**:

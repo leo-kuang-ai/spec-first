@@ -126,6 +126,7 @@ spec-first validate format <featureId>
 2. **ID 格式**
    - 无多余连字符
    - 符合规范: `FR-<ABBR>-<NNN>`
+   - AC 符合规范: `AC-<NN>`，且在单个 FR 内唯一
 
 3. **文件路径完整性**
    - 所有引用文件存在

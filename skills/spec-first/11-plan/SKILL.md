@@ -220,7 +220,7 @@ digraph plan_flow {
 
 | 风险项 | 等级 | 影响 | 缓解措施 | 状态 |
 |--------|------|------|----------|------|
-| AC-AUTH-001-01 存在歧义 | HIGH | 阻塞设计 | 标记 NEEDS CLARIFICATION | OPEN |
+| AC-01 存在歧义 | HIGH | 阻塞设计 | 标记 NEEDS CLARIFICATION | OPEN |
 | 性能要求未验证 | MEDIUM | 可能返工 | 执行 POC 验证 | OPEN |
 ```
 
@@ -232,7 +232,7 @@ digraph plan_flow {
 |------|------|------|------|
 | **目标阶段** | enum | 下一步要到达的阶段 | `01_specify` |
 | **下一步动作** | string | 具体要执行的动作 | "生成 FR 定义" |
-| **阻塞项** | array | 当前阻塞的问题列表 | `["AC-AUTH-001-01 歧义"]` |
+| **阻塞项** | array | 当前阻塞的问题列表 | `["AC-01 歧义"]` |
 | **风险等级** | enum | 整体风险等级 | `MEDIUM` |
 | **建议命令** | string | 建议执行的 CLI 命令 | `/spec-first:spec` |
 

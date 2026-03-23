@@ -12,16 +12,16 @@
 Feature: {featureId}
 
 回填项 ({count}):
-- FR-AUTH-001 → 补充文档引用
-- DS-AUTH-003 → 补充文档引用
+- `spec.md` → 补充文档引用
+- `design.md` → 补充文档引用
 
 断链项 ({count}):
-- DS-AUTH-005 (引用断链)
-- TASK-007 (引用断链)
+- `spec.md` → 缺失引用
+- `task_plan.md` → 引用断链
 
 状态更新 ({count}):
-- FR-AUTH-001: Planned → Implemented
-- TASK-AUTH-003: Implemented → Verified
+- `stage-state.json`: currentStage 确认
+- `findings.md`: 新增同步审计记录
 
 是否确认并执行？[Y/n]
 ```

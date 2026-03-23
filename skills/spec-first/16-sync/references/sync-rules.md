@@ -1,6 +1,6 @@
 # 同步规则
 
-> Sync Skill 的矩阵同步与回填规则
+> Sync Skill 的文档关联同步与回填规则
 
 ---
 
@@ -38,8 +38,8 @@
 **定义**: 引用目标不存在或无法解析的文档链接
 
 **示例**:
-- DS-AUTH-005 指向不存在的文档
-- TASK-007 引用了已删除的章节
+- `spec.md` 引用了不存在的 `design.md` 章节
+- `task_plan.md` 引用了已删除的 `spec.md` 小节
 
 **处理**: 提示删除、修正或补齐目标文档
 
@@ -62,16 +62,16 @@
 📋 同步计划
 
 回填项:
-- FR-AUTH-001 → 补充文档引用
-- DS-AUTH-003 → 补充文档引用
+- `spec.md` → 补充指向 `design.md` 的引用
+- `design.md` → 补充指向 `task_plan.md` 的引用
 
 断链项:
-- DS-AUTH-005 (引用断链)
-- TASK-007 (引用断链)
+- `spec.md` → 缺失 `design.md` 引用
+- `task_plan.md` → 指向不存在的 `findings.md` 章节
 
 状态更新:
-- FR-AUTH-001: Planned → Implemented
-- TASK-AUTH-003: Implemented → Verified
+- `stage-state.json`: currentStage 确认
+- `findings.md`: 新增同步审计记录
 
 是否确认并执行？[Y/n]
 ```
@@ -82,7 +82,7 @@
 
 **格式**:
 ```markdown
-## 2026-03-05 矩阵同步
+## 2026-03-05 文档关联同步
 
 **操作**: 回填 + 断链清理
 **回填**: 2 项

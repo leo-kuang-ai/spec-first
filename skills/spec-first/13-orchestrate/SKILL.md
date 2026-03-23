@@ -102,7 +102,7 @@ digraph orchestrate_flow {
 
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），加载当前阶段与状态
-- P1: 加载 stage-state、覆盖率、Gate 历史、任务计划
+- P1: 加载 stage-state、文档健康、Gate 历史、任务计划
 - P2: 生成编排计划：plan -> skill 执行 -> verify -> stage advance
 - P3: 与用户确认编排序列
 - P4: 按序执行调度的子 Skill
