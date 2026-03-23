@@ -236,7 +236,7 @@ digraph task_breakup_flow {
   TooCoarse [label="拆分子任务"];
   TooCoarse -> CheckGranularity;
 
-  CheckDeps [label="依赖检查"];
+  CheckDeps [label="dependency-check"];
   CheckDeps -> HasCycle [label="有依赖"];
   CheckDeps -> ConfirmPlan [label="无依赖"];
 

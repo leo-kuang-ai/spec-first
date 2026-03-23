@@ -167,7 +167,7 @@ reviewed requirement -> focus-requirements -> owner-scoped PRD / handoff
 
 | 输入 | 输出 | gate | 卡点 | 优化项 |
 |---|---|---|---|---|
-| 当前 stage-state；task todo 状态；gate status；dependency check；auto-loop 状态；`background_input_status`；`dependencyStrength` / `riskCategory` / `riskSignals`；`summary.json` | 编排计划；批次检查点；`findings.md` 执行证据；必要时 stage advance；`READY_TO_ADVANCE / AUTO_ADVANCE` 决策 | 必须先用 verify 的新鲜证据；批次结束必须落盘；`--auto-advance` 只有在决策层明确就绪时才推进 | 不能越过检查点“带病推进”；并行任务与高风险变更会提升依赖强度；`07_release / 08_done` 是 runtime 责任链，不再有额外 skill 目录 | 把 `background_status -> dependency_strength -> risk_category -> recommended_action` 的投影链写成标准示例，方便多端一致输出 |
+| 当前 stage-state；task todo 状态；gate status；dependency-check；auto-loop 状态；`background_input_status`；`dependencyStrength` / `riskCategory` / `riskSignals`；`summary.json` | 编排计划；批次检查点；`findings.md` 执行证据；必要时 stage advance；`READY_TO_ADVANCE / AUTO_ADVANCE` 决策 | 必须先用 verify 的新鲜证据；批次结束必须落盘；`--auto-advance` 只有在决策层明确就绪时才推进 | 不能越过检查点“带病推进”；并行任务与高风险变更会提升依赖强度；`07_release / 08_done` 是 runtime 责任链，不再有额外 skill 目录 | 把 `background_status -> dependency_strength -> risk_category -> recommended_action` 的投影链写成标准示例，方便多端一致输出 |
 
 ## 5. 状态、修复、索引与管理
 
@@ -213,7 +213,7 @@ reviewed requirement -> focus-requirements -> owner-scoped PRD / handoff
 
 ```text
 1. stage-machine.ts 只允许 00_init -> 01_specify -> 02_design -> 03_plan -> 04_implement -> 05_verify -> 06_wrap_up -> 07_release -> 08_done，外加每阶段可回到 09_cancelled。
-2. advance.ts 的推进顺序是：依赖检查 -> gate 校验 -> warning 审计 -> 写 stage-state.json / gate-history.jsonl -> 必要时 context sync -> 07_release 自动收口到 08_done。
+2. advance.ts 的推进顺序是：dependency-check -> stage-gate 校验 -> warning 审计 -> 写 stage-state.json / gate-history.jsonl -> 必要时 context sync -> 07_release 自动收口到 08_done。
 3. condition-registry.ts 的内置 Gate 条件只覆盖当前代码中注册的项；skill 文档里出现但 registry 未注册的条件，不应直接当成内置事实。
 4. hard-gate.ts 把 design / code / orchestrate 的前置条件收得很紧，尤其是 spec.md、design.md、task_plan.md、worktree 高风险守卫。
 5. first-runtime-store.ts / first-artifact-mapping.ts / first-docs-check.ts 形成 runtime 真源 -> docs 投影 -> docs 健康校验三层链路，docs 永远不是真源。
@@ -226,4 +226,3 @@ reviewed requirement -> focus-requirements -> owner-scoped PRD / handoff
 2. 再处理控制面节点：`11-plan`、`13-orchestrate`、`14-status`、`16-sync`、`17-feature`
 3. 最后处理边缘与扩展节点：`00-onboarding`、`02-catchup`、`15-doctor`、`20-spec-review`、`21-analyze`、`focus-requirements`
 4. 所有优化都应围绕三件事：节点输入更清楚、输出更可落盘、gate 更可机器验证
-
