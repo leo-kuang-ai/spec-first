@@ -148,18 +148,18 @@ describe('catchup', () => {
   it('should detect current task from task_plan.md', () => {
     writeState('04_implement');
     writeFileSync(join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| ID | Title | Status |\n|---|---|---|\n| TASK-AUTH-001 | Login | In Progress |\n');
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login | in_progress | 正在收口登录接口 | 完成接口实现 |\n');
     writeFileSync(join(TMP, 'specs', FEAT, 'constitution.md'), '# Constitution');
     writeFileSync(join(TMP, 'specs', FEAT, 'document-links.yaml'), 'version: 1\nfeatureId: FSREQ-20260211-AUTH-001\ndocuments: []\n');
     const result = catchup(FEAT, TMP);
-    expect(result.currentTask).toBe('TASK-AUTH-001');
+    expect(result.currentTask).toBe('Login');
   });
 
   it('should include task context summary for current task', () => {
     writeState('04_implement');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| ID | Title | Status |\n|---|---|---|\n| TASK-AUTH-001 | Login API spec.md design.md | In Progress |\n',
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login API spec.md design.md | in_progress | 收口接口实现 | 回补验证 |\n',
       'utf-8',
     );
     writeFileSync(
@@ -187,9 +187,9 @@ documents:
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\nspec.md');
 
     const result = catchup(FEAT, TMP);
-    expect(result.taskContextSummary?.taskId).toBe('TASK-AUTH-001');
+    expect(result.taskContextSummary?.taskId).toBe('Login API spec.md design.md');
     expect(result.taskContextSummary?.relatedDocumentCount).toBeGreaterThan(0);
-    expect(result.summary).toContain('TaskContextPack: TASK-AUTH-001');
+    expect(result.summary).toContain('TaskContextPack: Login API spec.md design.md');
   });
 
   it('should include todo runner summary when todo-state exists', () => {

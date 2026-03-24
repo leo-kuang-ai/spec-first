@@ -268,12 +268,12 @@ describe('handleStatus', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
       [
-        '| Task ID | Title | Status | Depends On | Traces | Owner |',
-        '|---------|-------|--------|------------|--------|-------|',
-        '| TASK-AUTH-001 | Build login UI | done | - | FR-AUTH-001 | dev |',
-        '| TASK-AUTH-002 | Wire SMS API | in_progress | TASK-AUTH-001 | FR-AUTH-001 | dev |',
-        '| TASK-AUTH-003 | Add retry logic | planned | TASK-AUTH-002 | FR-AUTH-001 | dev |',
-        '| TASK-AUTH-004 | Fix flaky test | blocked | TASK-AUTH-002 | FR-AUTH-001 | qa |',
+        '| title | status | summary | next_step | owner |',
+        '|---|---|---|---|---|',
+        '| Build login UI | done | 已完成登录 UI | - | dev |',
+        '| Wire SMS API | in_progress | 正在联调短信 API | 完成响应结构适配 | dev |',
+        '| Add retry logic | todo | 待开始 | 完成短信 API 后开始 | dev |',
+        '| Fix flaky test | blocked | 依赖接口稳定 | 修复接口波动后恢复 | qa |',
         '',
       ].join('\n'),
       'utf-8',
@@ -330,6 +330,14 @@ describe('handleStatus', () => {
         history: [],
         terminal: false,
         title: 'Auth Module',
+        nodes: {
+          '04_implement': {
+            status: 'in_progress',
+            summary: '正在收口短信登录实现与验证前置事项',
+            checklistStatus: 'partial',
+            canMarkDone: false,
+          },
+        },
         createdAt: '2026-02-11T00:00:00Z',
         updatedAt: '2026-02-11T00:00:00Z',
       }),
@@ -338,6 +346,8 @@ describe('handleStatus', () => {
     const { code, stdout } = captureConsole(() => withCwd(TMP, () => handleStatus([])));
 
     expect(code).toBe(ExitCode.SUCCESS);
+    expect(stdout).toContain('节点状态: in_progress');
+    expect(stdout).toContain('节点摘要: 正在收口短信登录实现与验证前置事项');
     expect(stdout).toContain('background_input_status: full');
     expect(stdout).toContain('runtime 真源: current');
     expect(stdout).toContain('docs 输出: ready');
@@ -360,9 +370,9 @@ describe('handleCommit', () => {
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should return VALIDATION_ERROR for invalid task ID', () => {
+  it('should ignore legacy task flags and return git IO error when repository state is unavailable', () => {
     const code = withCwd(TMP, () => handleCommit(['--message', 'test', '--task', 'INVALID']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
+    expect(code).toBe(ExitCode.IO_ERROR);
   });
 });
 

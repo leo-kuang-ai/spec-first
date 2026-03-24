@@ -1,9 +1,9 @@
 import { join } from 'node:path';
 import { exists } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
-import type { StageState } from '../../shared/types.js';
+import type { FeatureState } from '../../shared/types.js';
 import { readJson } from '../../shared/fs-utils.js';
-import { getCurrentTaskId } from '../task-plan/parser.js';
+import { getCurrentTaskTitle } from '../task-plan/parser.js';
 import { type SkillExecutionContext, resolveExecutionFeatureId } from './execution-context.js';
 
 export interface PromptAssemblyContext {
@@ -132,7 +132,7 @@ function readCurrentStage(projectRoot: string, featureId: string): string {
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(statePath)) return 'unknown';
   try {
-    const state = readJson<StageState>(statePath);
+    const state = readJson<FeatureState>(statePath);
     return state.currentStage ?? 'unknown';
   } catch {
     return 'unknown';
@@ -141,7 +141,7 @@ function readCurrentStage(projectRoot: string, featureId: string): string {
 
 function readCurrentTask(projectRoot: string, featureId: string): string {
   if (!featureId || featureId === 'N/A') return 'N/A';
-  return getCurrentTaskId(projectRoot, featureId) ?? 'N/A';
+  return getCurrentTaskTitle(projectRoot, featureId) ?? 'N/A';
 }
 
 function normalizeExecutionContext(

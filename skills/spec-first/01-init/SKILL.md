@@ -2,7 +2,7 @@
 name: "spec-first:init"
 version: "1.1.0"
 lastUpdated: "2026-03-24"
-description: "Initialize Feature workspaces with interactive guided flow. Auto-detects project state and routes to project-onboarding, brownfield-baseline, or feature-init tracks. TRIGGER when: user runs /spec-first:init, initializing new project, creating new feature, or says '初始化'/'init feature'/'新建功能'/'开始新需求'."
+description: "Use when you need to initialize a Feature workspace with guided routing across project-onboarding, brownfield-baseline, or feature-init tracks."
 ---
 
 # Skill: init

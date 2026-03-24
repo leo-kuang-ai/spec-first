@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Stage } from '../../src/shared/types.js';
-import type { StageState } from '../../src/shared/types.js';
+import type { FeatureState } from '../../src/shared/types.js';
 import { advance, cancel } from '../../src/core/process-engine/advance.js';
 import { resetConfigCache } from '../../src/shared/config-schema.js';
 
@@ -10,26 +10,26 @@ const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-advance');
 const FEAT_ID = 'FSREQ-20260211-ADV-001';
 const SPEC_DIR = join(TMP, 'specs', FEAT_ID);
 
-function makeState(overrides: Partial<StageState> = {}): StageState {
+function makeState(overrides: Partial<FeatureState> = {}): FeatureState {
   return {
     featureId: FEAT_ID,
     mode: 'N',
     size: 'S',
     platforms: ['backend'],
     currentStage: Stage.INIT,
-    history: [],
     terminal: false,
+    nodes: { [Stage.INIT]: { status: 'in_progress' } },
     createdAt: '2026-02-11T00:00:00.000Z',
     updatedAt: '2026-02-11T00:00:00.000Z',
     ...overrides,
   };
 }
 
-function writeState(state: StageState): void {
+function writeState(state: FeatureState): void {
   writeFileSync(join(SPEC_DIR, 'stage-state.json'), JSON.stringify(state, null, 2), 'utf-8');
 }
 
-function readState(): StageState {
+function readState(): FeatureState {
   const raw = require('node:fs').readFileSync(join(SPEC_DIR, 'stage-state.json'), 'utf-8');
   return JSON.parse(raw);
 }
@@ -83,16 +83,15 @@ describe('advance', () => {
     const result = advance(FEAT_ID, TMP);
     expect(result.from).toBe(Stage.INIT);
     expect(result.to).toBe(Stage.SPECIFY);
-    expect(result.gateResult).toBe('PASS');
+    expect(result.gateResult).toBe('TRANSITIONED');
     const updated = readState();
     expect(updated.currentStage).toBe(Stage.SPECIFY);
-    expect(updated.history).toHaveLength(1);
   });
 
   it('should ignore legacy force option and still use normal gate path', () => {
     writeState(makeState());
     const result = advance(FEAT_ID, TMP, { force: true } as never);
-    expect(result.gateResult).toBe('PASS');
+    expect(result.gateResult).toBe('TRANSITIONED');
     expect(readState().currentStage).toBe(Stage.SPECIFY);
   });
 
@@ -114,14 +113,14 @@ describe('advance', () => {
 
 
   it('should drop legacy current_stage field when persisting advanced state', () => {
-    const legacy = { ...makeState(), current_stage: Stage.IMPLEMENT } as StageState & { current_stage: Stage };
+    const legacy = { ...makeState(), current_stage: Stage.IMPLEMENT } as FeatureState & { current_stage: Stage };
     writeFileSync(join(SPEC_DIR, 'stage-state.json'), JSON.stringify(legacy, null, 2), 'utf-8');
 
     advance(FEAT_ID, TMP);
 
     const raw = readFileSync(join(SPEC_DIR, 'stage-state.json'), 'utf-8');
     expect(raw).not.toContain('"current_stage"');
-    const updated = JSON.parse(raw) as StageState & { current_stage?: string };
+    const updated = JSON.parse(raw) as FeatureState & { current_stage?: string };
     expect(updated.currentStage).toBe(Stage.SPECIFY);
     expect(updated.current_stage).toBeUndefined();
   });
@@ -133,7 +132,7 @@ describe('advance', () => {
       autoAdvancePolicy: 'assisted',
       lastSuggestedCommand: 'spec-first stage suggest FSREQ-20260211-ADV-001',
       lastVerifiedAt: '2026-03-09T00:00:00.000Z',
-    } as StageState & {
+    } as FeatureState & {
       stageStatus?: string;
       autoAdvancePolicy?: string;
       lastSuggestedCommand?: string;
@@ -143,7 +142,7 @@ describe('advance', () => {
 
     advance(FEAT_ID, TMP);
 
-    const updated = readState() as StageState & {
+    const updated = readState() as FeatureState & {
       backgroundInputStatus?: string;
       stageStatus?: string;
       autoAdvancePolicy?: string;
@@ -157,16 +156,11 @@ describe('advance', () => {
     expect(updated.lastVerifiedAt).toBe('2026-03-09T00:00:00.000Z');
   });
 
-  it('should write gate-history.jsonl on advance', () => {
+  it('should not persist legacy gate-history.jsonl on advance', () => {
     writeState(makeState());
     advance(FEAT_ID, TMP);
     const logPath = join(SPEC_DIR, 'gate-history.jsonl');
-    const lines = require('node:fs').readFileSync(logPath, 'utf-8').trim().split('\n');
-    const entry = JSON.parse(lines[lines.length - 1]);
-    expect(entry.action).toBe('advance');
-    expect(entry.from).toBe(Stage.INIT);
-    expect(entry.to).toBe(Stage.SPECIFY);
-    expect(entry.event).toBe('stage_advance');
+    expect(existsSync(logPath)).toBe(false);
   });
 
   it('should chain multiple advances', () => {
@@ -176,10 +170,9 @@ describe('advance', () => {
     advance(FEAT_ID, TMP);
     const state = readState();
     expect(state.currentStage).toBe(Stage.DESIGN);
-    expect(state.history).toHaveLength(2);
   });
 
-  it('should auto-sync context file when advancing DESIGN → PLAN', () => {
+  it('should not auto-sync legacy context file when advancing DESIGN → PLAN', () => {
     writeState(makeState({ currentStage: Stage.DESIGN }));
     mkdirSync(join(TMP, 'skills', 'spec-first', '03-spec', 'references'), { recursive: true });
     mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
@@ -221,11 +214,10 @@ describe('advance', () => {
     expect(result.to).toBe(Stage.PLAN);
 
     const content = readFileSync(join(TMP, 'CLAUDE.md'), 'utf-8');
-    expect(content).toContain('SPEC-FIRST:BEGIN AUTO-CONTEXT');
-    expect(content).toContain('Spec-First Context Snapshot');
+    expect(content).toBe('# CLAUDE\n');
   });
 
-  it('should auto-advance WRAP_UP → RELEASE → DONE', () => {
+  it('should only transition WRAP_UP → RELEASE in one step', () => {
     mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
     writeFileSync(
       join(TMP, '.spec-first', 'meta', 'config.yaml'),
@@ -241,26 +233,12 @@ describe('advance', () => {
     const result = advance(FEAT_ID, TMP);
 
     expect(result.from).toBe(Stage.WRAP_UP);
-    expect(result.to).toBe(Stage.DONE);
-    expect(result.gateResult).toBe('PASS');
+    expect(result.to).toBe(Stage.RELEASE);
+    expect(result.gateResult).toBe('TRANSITIONED');
 
     const updated = readState();
-    expect(updated.currentStage).toBe(Stage.DONE);
-    expect(updated.terminal).toBe(true);
-
-    const history = readFileSync(join(SPEC_DIR, 'gate-history.jsonl'), 'utf-8');
-    expect(history).toContain('"from":"06_wrap_up"');
-    expect(history).toContain('"to":"07_release"');
-    expect(history).toContain('"from":"07_release"');
-    expect(history).toContain('"to":"08_done"');
-    expect(history).toContain('release_auto_skip');
-    expect(readFileSync(join(SPEC_DIR, 'findings.md'), 'utf-8')).toContain('AUTO_ADVANCE');
-    const cognitionUpdates = readFileSync(
-      join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
-      'utf-8'
-    );
-    expect(cognitionUpdates).toContain(`"featureId":"${FEAT_ID}"`);
-    expect(cognitionUpdates).toContain('"triggerStage":"06_wrap_up"');
+    expect(updated.currentStage).toBe(Stage.RELEASE);
+    expect(updated.terminal).toBe(false);
   });
 });
 
@@ -270,10 +248,9 @@ describe('cancel', () => {
     const result = cancel(FEAT_ID, TMP, 'requirements changed');
     expect(result.from).toBe(Stage.INIT);
     expect(result.to).toBe(Stage.CANCELLED);
-    expect(result.gateResult).toBe('CANCELLED');
+    expect(result.gateResult).toBe('CANCELLED: requirements changed');
     const state = readState();
     expect(state.terminal).toBe(true);
-    expect(state.history[0].reason).toBe('requirements changed');
   });
 
   it('should cancel from mid-stage (IMPLEMENT)', () => {
@@ -292,14 +269,10 @@ describe('cancel', () => {
     expect(() => cancel(FEAT_ID, TMP, 'too late')).toThrow(/终态阶段/);
   });
 
-  it('should write gate-history.jsonl on cancel', () => {
+  it('should not persist legacy gate-history.jsonl on cancel', () => {
     writeState(makeState());
     cancel(FEAT_ID, TMP, 'test cancel');
     const logPath = join(SPEC_DIR, 'gate-history.jsonl');
-    const raw = require('node:fs').readFileSync(logPath, 'utf-8').trim();
-    const entry = JSON.parse(raw);
-    expect(entry.action).toBe('cancel');
-    expect(entry.reason).toBe('test cancel');
-    expect(entry.event).toBe('stage_cancel');
+    expect(existsSync(logPath)).toBe(false);
   });
 });

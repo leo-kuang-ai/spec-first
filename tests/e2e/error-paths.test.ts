@@ -57,7 +57,7 @@ describe('Gate FAIL blocking', () => {
     });
     writeFileSync(join(TMP, 'specs', featureId, 'spec.md'), '# Spec');
     const result = advance(featureId, TMP);
-    expect(result.gateResult).toBe('PASS');
+    expect(result.gateResult).toBe('TRANSITIONED');
   });
 });
 
@@ -72,7 +72,7 @@ describe('Strict advance semantics', () => {
       feat: 'FRC', mode: 'N', size: 'S', platforms: ['h5'], projectRoot: TMP,
     });
     const result = advance(featureId, TMP, { force: true } as never);
-    expect(result.gateResult).toBe('PASS');
+    expect(result.gateResult).toBe('TRANSITIONED');
   });
 });
 

@@ -43,6 +43,45 @@ export type Mode = 'N' | 'I';
 export type Size = 'S' | 'M' | 'L';
 
 export type BackgroundInputStatus = 'full' | 'degraded' | 'blind';
+export type NodeStatus = 'todo' | 'in_progress' | 'done' | 'blocked' | 'skipped';
+export type ChecklistStatus = 'complete' | 'partial' | 'empty';
+
+export interface NodeState {
+  status: NodeStatus;
+  startedAt?: string;
+  completedAt?: string;
+  summary?: string;
+  checklistStatus?: ChecklistStatus;
+  canMarkDone?: boolean;
+}
+
+export interface FeatureState {
+  featureId: string;
+  currentStage: Stage;
+  terminal: boolean;
+  nodes: Partial<Record<Stage, NodeState>>;
+  createdAt: string;
+  updatedAt: string;
+  title?: string;
+  backgroundInputStatus?: BackgroundInputStatus;
+  mode?: Mode;
+  size?: Size;
+  platforms?: string[];
+  stageStatus?: StageStatus;
+  autoAdvancePolicy?: AutoAdvancePolicy;
+  lastVerifiedAt?: string;
+  lastSuggestedCommand?: string;
+  mergedRules?: {
+    profile?: 'default-simplified' | 'strict';
+    gateConditions: Record<string, unknown[]>;
+    deliverables: Record<string, unknown[]>;
+    thresholds: Record<
+      string,
+      { value: number; direction: 'higher_is_better' | 'lower_is_better' }
+    >;
+  };
+  history?: StageHistoryEntry[];
+}
 
 export type StageStatus =
   | 'drafting'
@@ -228,8 +267,6 @@ export interface IdValidationResult {
 export interface FeatureSummary {
   featureId: string;
   title?: string;
-  mode: Mode;
-  size: Size;
   currentStage: Stage;
   terminal: boolean;
   updatedAt: string;

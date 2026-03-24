@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { ExitCode, type BackgroundInputStatus, type StageState } from '../../shared/types.js';
+import { ExitCode, type BackgroundInputStatus, type FeatureState } from '../../shared/types.js';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { currentFeature, resolveFeatureId } from '../../core/process-engine/feature.js';
 import { readTaskPlan } from '../../core/task-plan/parser.js';
@@ -34,9 +34,10 @@ export function handleStatus(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const state = readJson<StageState>(stageStatePath);
+  const state = readJson<FeatureState>(stageStatePath);
   const taskPlan = readTaskPlan(projectRoot, featureId);
   const taskCounts = summarizeTaskCounts(taskPlan);
+  const currentNode = state.nodes?.[state.currentStage];
   const background = readBackgroundLayers(projectRoot, state);
   const metrics = getDocumentMetrics(featureId, projectRoot);
   const health = calcHealthScore(metrics, 0, 0);
@@ -51,10 +52,10 @@ export function handleStatus(args: string[]): number {
           halted: taskCounts.blocked > 0,
           haltReason: taskCounts.blocked > 0 ? 'blocked' : undefined,
           items: taskPlan.tasks.map((task) => ({
-            id: task.id,
+            id: task.title,
             title: task.title,
             status:
-              task.status === 'complete'
+              task.status === 'done'
                 ? 'done'
                 : task.status === 'blocked'
                   ? 'blocked'
@@ -71,10 +72,11 @@ export function handleStatus(args: string[]): number {
   console.log(`Feature ID: ${state.featureId}`);
   console.log(`标题: ${state.title ?? 'N/A'}`);
   console.log(`当前阶段: ${state.currentStage}`);
-  console.log(`阶段状态: ${state.stageStatus ?? 'drafting'}`);
-  console.log(`模式: ${state.mode}`);
-  console.log(`规模: ${state.size}`);
-  console.log(`平台: ${state.platforms.join(', ')}`);
+  console.log(`节点状态: ${currentNode?.status ?? 'unknown'}`);
+  console.log(`节点摘要: ${currentNode?.summary ?? 'N/A'}`);
+  console.log(`模式: ${state.mode ?? 'N/A'}`);
+  console.log(`规模: ${state.size ?? 'N/A'}`);
+  console.log(`平台: ${state.platforms?.join(', ') ?? 'N/A'}`);
   console.log('');
   console.log(`background_input_status: ${background.backgroundInputStatus}`);
   console.log(`runtime 真源: ${background.runtimeTruth}`);
@@ -95,6 +97,14 @@ export function handleStatus(args: string[]): number {
   console.log(`  todo: ${taskCounts.todo}`);
   console.log(`  blocked: ${taskCounts.blocked}`);
   console.log('');
+
+  if (currentNode?.status === 'blocked') {
+    console.log('恢复建议:');
+    console.log('  1. 先解决节点级阻塞原因');
+    console.log('  2. 如存在任务级 blocked，请先更新 task_plan.md 对应行');
+    console.log('  3. 通过 orchestrate/transition 将节点恢复到 in_progress');
+    console.log('');
+  }
 
   if (bottlenecks.length > 0 || background.syncStatus !== 'ready') {
     console.log('风险:');
@@ -133,7 +143,7 @@ function summarizeTaskCounts(
   if (!plan) return counts;
 
   for (const task of plan.tasks) {
-    if (task.status === 'complete') counts.done += 1;
+    if (task.status === 'done') counts.done += 1;
     else if (task.status === 'in_progress') counts.in_progress += 1;
     else if (task.status === 'blocked') counts.blocked += 1;
     else counts.todo += 1;
@@ -142,7 +152,7 @@ function summarizeTaskCounts(
   return counts;
 }
 
-function readBackgroundLayers(projectRoot: string, state: StageState): BackgroundLayers {
+function readBackgroundLayers(projectRoot: string, state: FeatureState): BackgroundLayers {
   const runtimeIndex = readFirstRuntimeIndex(projectRoot);
   if (!runtimeIndex) {
     return {
@@ -165,7 +175,7 @@ function readBackgroundLayers(projectRoot: string, state: StageState): Backgroun
   };
 }
 
-function fallbackSuggestedCommand(currentStage: StageState['currentStage']): string | undefined {
+function fallbackSuggestedCommand(currentStage: FeatureState['currentStage']): string | undefined {
   switch (currentStage) {
     case '00_init':
       return '/spec-first:init';

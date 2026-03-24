@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { ExitCode } from '../../shared/types.js';
 import { exists, ensureDir, readJson } from '../../shared/fs-utils.js';
-import type { StageState } from '../../shared/types.js';
+import type { FeatureState } from '../../shared/types.js';
 import { currentFeature, getFeatureState, resolveFeatureId } from '../../core/process-engine/feature.js';
 
 export function handleFeature(args: string[]): number {
@@ -51,7 +51,7 @@ function handleList(): number {
   for (const entry of entries) {
     const statePath = join(specsDir, entry.name, 'stage-state.json');
     if (!exists(statePath)) continue;
-    const state = readJson<StageState>(statePath);
+    const state = readJson<FeatureState>(statePath);
     console.log(
       state.featureId.padEnd(35) +
         (state.title ?? '').padEnd(25) +
@@ -88,13 +88,13 @@ function handleCurrent(): number {
     return ExitCode.SUCCESS;
   }
 
-  const state = readJson<StageState>(statePath);
+  const state = readJson<FeatureState>(statePath);
   console.log(`当前 Feature：${state.featureId}`);
   console.log('  定位来源：.spec-first/current');
   console.log(`  标题：${state.title ?? 'N/A'}`);
   console.log(`  阶段：${state.currentStage}`);
-  console.log(`  模式：${state.mode}  规模：${state.size}`);
-  console.log(`  平台：${state.platforms.join(', ')}`);
+  console.log(`  模式：${state.mode ?? 'N/A'}  规模：${state.size ?? 'N/A'}`);
+  console.log(`  平台：${state.platforms?.join(', ') ?? 'N/A'}`);
   console.log('  如需重载上下文：/spec-first:catchup');
 
   return ExitCode.SUCCESS;
@@ -117,7 +117,7 @@ function handleSwitch(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  let state: StageState;
+  let state: FeatureState;
   try {
     state = getFeatureState(resolved.featureId, projectRoot);
   } catch (error) {

@@ -246,7 +246,7 @@ describe('dispatchCommand', () => {
   });
 
 
-  it('should upgrade orchestrate dependency strength to L3 when implementation stage has high-risk signals', () => {
+  it('should keep implementation-stage degraded guidance at L2 when only parallel hint exists', () => {
     mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
     writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
@@ -274,16 +274,14 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('skill');
     expect(result.orchestrateBackgroundGuidance).toEqual({
       backgroundStatus: 'degraded',
-      dependencyStrength: 'L3',
-      riskSignals: ['存在并行任务标记'],
-      riskCategory: 'high-risk-implementation',
-      warning: '背景输入不完整，且当前属于高风险改动门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      dependencyStrength: 'L2',
+      warning: '背景输入不完整，建议显式评估风险后再继续当前阶段',
       recommendedAction: 'review-risk',
     });
   });
 
 
-  it('should tag design-stage L3 as formal-design-review', () => {
+  it('should keep design-stage degraded guidance at L2 when only parallel hint exists', () => {
     mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
     writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
@@ -311,15 +309,13 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('skill');
     expect(result.orchestrateBackgroundGuidance).toEqual({
       backgroundStatus: 'degraded',
-      dependencyStrength: 'L3',
-      riskSignals: ['存在并行任务标记'],
-      riskCategory: 'formal-design-review',
-      warning: '背景输入不完整，且当前属于正式设计评审门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      dependencyStrength: 'L2',
+      warning: '背景输入不完整，建议显式评估风险后再继续当前阶段',
       recommendedAction: 'review-risk',
     });
   });
 
-  it('should tag verify-stage L3 as pre-release-verification', () => {
+  it('should keep verify-stage degraded guidance at L2 when only parallel hint exists', () => {
     mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
     writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
@@ -347,10 +343,8 @@ describe('dispatchCommand', () => {
     expect(result.route).toBe('skill');
     expect(result.orchestrateBackgroundGuidance).toEqual({
       backgroundStatus: 'degraded',
-      dependencyStrength: 'L3',
-      riskSignals: ['存在并行任务标记'],
-      riskCategory: 'pre-release-verification',
-      warning: '背景输入不完整，且当前属于上线前 / 高风险验证门槛，并存在高风险信号（存在并行任务标记），建议显式评估风险后再继续当前阶段',
+      dependencyStrength: 'L2',
+      warning: '背景输入不完整，建议显式评估风险后再继续当前阶段',
       recommendedAction: 'review-risk',
     });
   });
@@ -393,13 +387,14 @@ describe('dispatchCommand', () => {
   });
 });
 
-describe('loadSkill hard-gate notice', () => {
-  it('should throw when code hard-gate is BLOCKED', () => {
+describe('loadSkill runtime notices', () => {
+  it('should inject checklist notice instead of blocking code skill', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
-    expect(() => loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false }))
-      .toThrow(/HARD-GATE/);
+    const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
+    expect(content).toContain('skill-checklist-context');
+    expect(content).toContain('can_mark_done: no');
   });
 
   it('should inject PASS hard-gate notice for code when prerequisites are satisfied', () => {
@@ -413,7 +408,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login | in_progress | 正在实现 | 完成实现说明 |\n',
       'utf-8',
     );
     writeFileSync(
@@ -421,12 +416,8 @@ describe('loadSkill hard-gate notice', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
-        '- exit code: 1',
-        '- reason: function not implemented',
+        '## Implementation',
+        '- 已补充实现说明',
         '',
       ].join('\n'),
       'utf-8',
@@ -434,8 +425,8 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
-    expect(content).toContain('HARD-GATE 运行时检查（自动）');
-    expect(content).toContain('检查结果: PASS');
+    expect(content).toContain('skill-checklist-context');
+    expect(content).toContain('can_mark_done: yes');
   });
 
   it('should detect in_progress TASK without trailing table delimiter', () => {
@@ -449,7 +440,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress\n',
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login | in_progress | 正在实现 | 完成实现说明 |\n',
       'utf-8',
     );
     writeFileSync(
@@ -457,12 +448,8 @@ describe('loadSkill hard-gate notice', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
-        '- exit code: 1',
-        '- reason: function not implemented',
+        '## Implementation',
+        '- 已补充实现说明',
         '',
       ].join('\n'),
       'utf-8',
@@ -470,10 +457,10 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
-    expect(content).toContain('检查结果: PASS');
+    expect(content).toContain('can_mark_done: yes');
   });
 
-  it('should detect in_progress TASK when Task ID column is not first', () => {
+  it('should load checklist context when title/status columns are not first', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
@@ -484,7 +471,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| 标题 | 状态 | Task ID |\n|---|---|---|\n| Login | in_progress | TASK-AUTH-001 |\n',
+      '| summary | title | status | next_step |\n|---|---|---|---|\n| 收口中 | Login | in_progress | 完成实现说明 |\n',
       'utf-8',
     );
     writeFileSync(
@@ -492,12 +479,8 @@ describe('loadSkill hard-gate notice', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
-        '- exit code: 1',
-        '- reason: function not implemented',
+        '## Implementation',
+        '- 已补充实现说明',
         '',
       ].join('\n'),
       'utf-8',
@@ -505,7 +488,8 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
-    expect(content).toContain('检查结果: PASS');
+    expect(content).toContain('skill-checklist-context');
+    expect(content).toContain('can_mark_done: yes');
   });
 
   it('should allow orchestrate in non-implement stage when context exists', () => {
@@ -520,8 +504,8 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(skillPath, '# Orchestrate Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
-    expect(content).toContain('HARD-GATE 运行时检查（自动）');
-    expect(content).toContain('检查结果: PASS');
+    expect(content).toContain('readiness-check-context');
+    expect(content).toContain('decision: READY_TO_WORK');
   });
 
   it('should prepend orchestrate background notice when guidance exists', () => {
@@ -666,7 +650,7 @@ describe('loadSkill hard-gate notice', () => {
     expect(content).toContain('entryCategories: runtime-extension');
   });
 
-  it('should throw when review hard-gate is BLOCKED by stage mismatch', () => {
+  it('should allow review skill on stage mismatch and expose checklist context', () => {
     const skillDir = join(TMP, 'skills', 'spec-first', '08-review');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
@@ -678,11 +662,12 @@ describe('loadSkill hard-gate notice', () => {
     );
     writeFileSync(skillPath, '# Review', 'utf-8');
 
-    expect(() => loadSkill(skillPath, { projectRoot: TMP }))
-      .toThrow(/review/);
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('skill-checklist-context');
+    expect(content).toContain('stage: 04_implement');
   });
 
-  it('should block high-risk code execution on protected branch without worktree confirmation', () => {
+  it('should surface safety warning instead of blocking high-risk code execution', () => {
     const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -694,7 +679,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login [P] | in_progress |\n',
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login [P] | in_progress | 风险改造 | 完成实现说明 |\n',
       'utf-8',
     );
     writeFileSync(
@@ -702,12 +687,8 @@ describe('loadSkill hard-gate notice', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
-        '- exit code: 1',
-        '- reason: function not implemented',
+        '## Implementation',
+        '- 风险操作说明',
         '',
       ].join('\n'),
       'utf-8',
@@ -721,8 +702,9 @@ describe('loadSkill hard-gate notice', () => {
     execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
     execSync('git checkout -b main || git checkout main', { cwd: TMP, stdio: 'ignore' });
 
-    expect(() => loadSkill(skillPath, { projectRoot: TMP }))
-      .toThrow(/WORKTREE-CONFIRMED/);
+    const content = loadSkill(skillPath, { projectRoot: TMP });
+    expect(content).toContain('safety-guard-context');
+    expect(content).toContain('当前在保护分支');
   });
 
   it('should block unstable template when kv_cache_hard_gate is enabled', () => {
@@ -750,7 +732,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# design', 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login | in_progress | 正在实现 | 完成实现说明 |\n',
       'utf-8',
     );
     writeFileSync(
@@ -758,11 +740,8 @@ describe('loadSkill hard-gate notice', () => {
       [
         '# Findings',
         '',
-        '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
-        '- TDD-RED',
-        '- command: pnpm test -- tests/auth/login.test.ts',
-        '- exit code: 1',
+        '## Implementation',
+        '- 已补充实现说明',
         '',
       ].join('\n'),
       'utf-8',
@@ -775,7 +754,7 @@ describe('loadSkill hard-gate notice', () => {
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
-    expect(content).toContain('HARD-GATE 运行时检查（自动）');
+    expect(content).toContain('skill-checklist-context');
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
   });
@@ -817,11 +796,11 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
       [
-        '| Task ID | 标题 | 状态 |',
-        '|---|---|---|',
-        '| TASK-AUTH-001 | Login | in_progress |',
+        '| title | status | summary | next_step |',
+        '|---|---|---|---|',
+        '| Login | in_progress | 正在实现 | 完成实现说明 |',
         '',
-        '### TASK-AUTH-001 — Login',
+        '### Login',
         '',
         '**文件清单**：',
         '- Modify: `src/allowed.ts`',
@@ -835,7 +814,7 @@ describe('loadSkill hard-gate notice', () => {
         '# Findings',
         '',
         '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
+        '- TASK: Login',
         '- TDD-RED',
         '- command: pnpm test -- tests/unit/auth.test.ts',
         '- exit code: 1',
@@ -872,11 +851,11 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
       [
-        '| Task ID | 标题 | 状态 |',
-        '|---|---|---|',
-        '| TASK-AUTH-001 | Login | in_progress |',
+        '| title | status | summary | next_step |',
+        '|---|---|---|---|',
+        '| Login | in_progress | 正在实现 | 完成实现说明 |',
         '',
-        '### TASK-AUTH-001 — Login',
+        '### Login',
         '',
         '**文件清单**：',
         '- Modify: `src/allowed.ts`',
@@ -889,7 +868,7 @@ describe('loadSkill hard-gate notice', () => {
         '# Findings',
         '',
         '## TDD Evidence',
-        '- TASK: TASK-AUTH-001',
+        '- TASK: Login',
         '- TDD-RED',
         '- command: pnpm test -- tests/unit/auth.test.ts',
         '- exit code: 1',
@@ -927,7 +906,7 @@ describe('loadSkill hard-gate notice', () => {
     writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = false;\n', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP });
-    expect(content).toContain('HARD-GATE 运行时检查（自动）');
+    expect(content).toContain('skill-checklist-context');
   });
 });
 

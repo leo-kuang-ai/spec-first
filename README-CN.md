@@ -293,3 +293,4 @@ npm run lint
 - [Issue Tracker](https://github.com/sunrain520/spec-first/issues)
 - [English README](./README.md)
 - License：MIT © [leo.kuang](https://github.com/sunrain520)
+> 运行时说明：当前主流程已切换为 `FeatureState / NodeState`、`transition`、`readiness-check` 与节点内 checklist。旧的 `gate / id / trace / document-links` 命令不再属于主 CLI 路径。
