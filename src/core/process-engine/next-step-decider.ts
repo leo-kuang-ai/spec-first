@@ -318,5 +318,5 @@ export function decideNextStep(input: NextStepDecisionInput): NextStepDecision {
 }
 
 function buildAdvanceCommand(featureId?: string): string | undefined {
-  return featureId ? `spec-first stage advance ${featureId}` : undefined;
+  return featureId ? `spec-first transition ${featureId}` : undefined;
 }

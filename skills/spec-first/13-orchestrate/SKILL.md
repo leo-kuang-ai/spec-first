@@ -8,7 +8,14 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 # Skill: orchestrate
 
-编排调度器，驱动 plan -> skill -> verify -> advance 全流程。
+编排调度器，驱动 plan -> skill -> verify -> transition 全流程。
+
+## Node Workflow Update
+
+- orchestrate 只做跨节点 `readiness-check`
+- 技能是否完成由各节点 skill checklist 决定，不再由 hard-gate 阻断
+- 自动推进时执行 `spec-first transition <featureId>`，不再使用 `stage advance`
+- `READY_TO_WORK / READY_TO_ADVANCE / BLOCKED` 是唯一主决策集
 
 ## 输入上下文
 

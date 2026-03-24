@@ -6,7 +6,8 @@ import { handleFirst } from '../../src/cli/commands/first.js';
 import { handleInit } from '../../src/cli/commands/init.js';
 import { handleDone } from '../../src/cli/commands/done.js';
 import { handleStage } from '../../src/cli/commands/stage.js';
-import { Stage, type StageState } from '../../src/shared/types.js';
+import { handleTransition } from '../../src/cli/commands/transition.js';
+import { Stage, type FeatureState } from '../../src/shared/types.js';
 import { seedFirstRuntimeOutputs } from '../helpers/first-runtime-fixture.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-cli-real-flow');
@@ -95,11 +96,12 @@ function getFeatureId(): string {
 
 function writeStageState(featureId: string, currentStage: Stage): void {
   const stagePath = join(TMP, 'specs', featureId, 'stage-state.json');
-  const current = JSON.parse(readFileSync(stagePath, 'utf-8')) as StageState;
-  const nextState: StageState = {
+  const current = JSON.parse(readFileSync(stagePath, 'utf-8')) as FeatureState;
+  const nextState: FeatureState = {
     ...current,
     currentStage,
     terminal: false,
+    nodes: current.nodes ?? {},
     updatedAt: '2026-03-16T00:00:00.000Z',
   };
   writeFileSync(stagePath, JSON.stringify(nextState, null, 2) + '\n', 'utf-8');
@@ -150,7 +152,7 @@ afterEach(() => {
 });
 
 describe('first cli real flow', () => {
-  it('runs first -> init -> done and validates runtime truth through CLI handlers', async () => {
+  it('runs first -> init -> transition and validates node workflow through CLI handlers', async () => {
     expect(handleFirst([])).toBe(0);
 
     const initCode = await handleInit([
@@ -169,35 +171,25 @@ describe('first cli real flow', () => {
     expect(featureId).toMatch(/^FSREQ-/);
     seedReleaseDeliverables(featureId);
     commitAll('baseline');
-    writeStageState(featureId, Stage.WRAP_UP);
+    writeStageState(featureId, Stage.RELEASE);
     writeFileSync(
       join(TMP, 'src', 'core', 'skill-runtime', 'first-conventions.ts'),
       'export const marker = "changed";\n',
       'utf-8'
     );
 
-    expect(handleStage(['advance', featureId])).toBe(0);
+    expect(handleStage(['advance', featureId])).toBe(2);
+    expect(handleTransition([featureId])).toBe(0);
 
     const stageState = JSON.parse(
       readFileSync(join(TMP, 'specs', featureId, 'stage-state.json'), 'utf-8')
-    ) as StageState;
+    ) as FeatureState;
     expect(stageState.currentStage).toBe(Stage.DONE);
     expect(stageState.terminal).toBe(true);
     expect(readFileSync(join(TMP, '.spec-first', 'current'), 'utf-8')).toBe('');
-
-    const updatesLog = readFileSync(
-      join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
-      'utf-8'
-    );
-    expect(updatesLog).toContain('"decision":"must_update"');
-    expect(updatesLog).toContain('"gateStatus":"blocked"');
-    expect(updatesLog).toContain('"updateSource":"governance-wrap-up"');
-
-    const findings = readFileSync(join(TMP, 'specs', featureId, 'findings.md'), 'utf-8');
-    expect(findings).toContain('PROJECT_COGNITION_BLOCKED: must_update');
   });
 
-  it('runs done alias from release without treating docs-only drift as cognition writeback', async () => {
+  it('runs done alias from release and keeps docs drift untouched', async () => {
     expect(handleFirst([])).toBe(0);
 
     const initCode = await handleInit([
@@ -225,15 +217,7 @@ describe('first cli real flow', () => {
 
     const stageState = JSON.parse(
       readFileSync(join(TMP, 'specs', featureId, 'stage-state.json'), 'utf-8')
-    ) as StageState;
+    ) as FeatureState;
     expect(stageState.currentStage).toBe(Stage.DONE);
-
-    const updatesLog = readFileSync(
-      join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
-      'utf-8'
-    );
-    expect(updatesLog).toContain('"decision":"must_not_update"');
-    expect(updatesLog).toContain('"gateStatus":"skipped"');
-    expect(updatesLog).toContain('"updateSource":"governance-done"');
   });
 });

@@ -2,15 +2,35 @@
 
 本目录收纳 `spec-first` 的 ID / Gate / 最小流程 / 收敛方案文档，便于集中阅读和后续迭代。
 
+## 当前主文档
+
+1. [2026-03-24-spec-first-节点化重构PRD.md](./2026-03-24-spec-first-节点化重构PRD.md)
+
+这份 PRD 定义了新的目标态：
+
+- 去掉全流程 ID 关联
+- 去掉产物 ID
+- 去掉流程之间的 gate
+- 去掉 ID 关联矩阵
+- 保留 `8+2` 节点流转
+- 将职责切分为：
+  - `skill` 负责本节点 checklist
+  - `orchestrate` 负责跨节点 readiness-check
+
 ## 阅读顺序
 
-1. [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
-2. [spec-first-最小保留流程图.md](./spec-first-最小保留流程图.md)
-3. [2026-03-23-产物ID与Gate收敛方案.md](./2026-03-23-产物ID与Gate收敛方案.md)
-4. [2026-03-23-产物ID与Gate收敛详细实施方案.md](./2026-03-23-产物ID与Gate收敛详细实施方案.md)
-5. [spec-first-第一批直接迁移实施方案.md](./spec-first-第一批直接迁移实施方案.md)
+1. [2026-03-24-spec-first-节点化重构PRD.md](./2026-03-24-spec-first-节点化重构PRD.md)
+2. [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
+3. [spec-first-最小保留流程图.md](./spec-first-最小保留流程图.md)
+4. [2026-03-23-产物ID与Gate收敛方案.md](./2026-03-23-产物ID与Gate收敛方案.md)
+5. [2026-03-23-产物ID与Gate收敛详细实施方案.md](./2026-03-23-产物ID与Gate收敛详细实施方案.md)
+6. [spec-first-第一批直接迁移实施方案.md](./spec-first-第一批直接迁移实施方案.md)
 
 ## 文档说明
+
+- [2026-03-24-spec-first-节点化重构PRD.md](./2026-03-24-spec-first-节点化重构PRD.md)
+
+  新的目标态 PRD，定义“去 ID / 去 gate / 去 matrix，保留 8+2 节点状态机与两层职责分离”的重构方向。
 
 - [spec-first-产物ID与Gate关系梳理.md](./spec-first-产物ID与Gate关系梳理.md)
 
@@ -34,10 +54,10 @@
 
 ## 当前重点
 
-- 先看 [`spec-first-产物ID与Gate关系梳理.md`](./spec-first-产物ID与Gate关系梳理.md)，它是后续优化链路的事实总图。
-- 再看 [`spec-first-最小保留流程图.md`](./spec-first-最小保留流程图.md)，它定义了最小保留边界。
-- 最后看两份收敛方案，了解已完成的改造路径和兼容策略。
-- 如果你要开始直接迁移，先看 [`spec-first-第一批直接迁移实施方案.md`](./spec-first-第一批直接迁移实施方案.md)。
+- 先看 [`2026-03-24-spec-first-节点化重构PRD.md`](./2026-03-24-spec-first-节点化重构PRD.md)，它定义了新的目标态。
+- 再看 [`spec-first-产物ID与Gate关系梳理.md`](./spec-first-产物ID与Gate关系梳理.md)，理解当前系统的复杂度来源。
+- 再看 [`spec-first-最小保留流程图.md`](./spec-first-最小保留流程图.md)，评估哪些链路仍值得保留。
+- 最后参考历史收敛方案和直接迁移方案，决定需要删除还是重写的部分。
 
 ## GSD 借鉴材料
 

@@ -31,7 +31,14 @@ metadata:
 
 # Skill: status
 
-展示 Feature 状态仪表盘（阶段、覆盖率、健康分、任务进度）。
+展示 Feature 状态仪表盘（当前节点、节点摘要、blocked 引导、任务进度）。
+
+## Node Workflow Update
+
+- `status` 以运行态 `FeatureState.nodes[currentStage]` 作为节点状态真相源
+- `task_plan.md` 只展示任务级进度，不承担节点状态真相源职责
+- 当节点级状态为 `blocked` 时，必须展示恢复执行步骤
+- `status` 不再依赖 gate / trace / matrix 作为主输出
 
 ## 输入上下文
 

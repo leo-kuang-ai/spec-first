@@ -4,7 +4,7 @@
  */
 import { join } from 'node:path';
 import { readdirSync } from 'node:fs';
-import type { StageState, FeatureSummary } from '../../shared/types.js';
+import type { FeatureState, FeatureSummary } from '../../shared/types.js';
 import { readJson, exists, writeMarkdown, readMarkdown, ensureDir } from '../../shared/fs-utils.js';
 
 const CURRENT_FILE = '.spec-first/current';
@@ -14,9 +14,9 @@ const FEATURE_ENV_KEYS = [
   'FEATURE_ID',
 ] as const;
 
-function readValidatedFeatureState(featureDirName: string, projectRoot: string): StageState {
+function readValidatedFeatureState(featureDirName: string, projectRoot: string): FeatureState {
   const stateFile = join(projectRoot, 'specs', featureDirName, 'stage-state.json');
-  const state = readJson<StageState>(stateFile);
+  const state = readJson<FeatureState>(stateFile);
   if (state.featureId !== featureDirName) {
     throw new Error(
       `Feature 目录名与 stage-state.featureId 不一致：目录=${featureDirName}，state=${state.featureId}`
@@ -40,7 +40,7 @@ export function switchFeature(featureId: string, projectRoot: string): void {
 }
 
 /** 读取指定 Feature 的 stage-state.json */
-export function getFeatureState(featureId: string, projectRoot: string): StageState {
+export function getFeatureState(featureId: string, projectRoot: string): FeatureState {
   const p = join(projectRoot, 'specs', featureId, 'stage-state.json');
   if (!exists(p)) {
     throw new Error(`Feature ${featureId} not found`);
@@ -61,7 +61,7 @@ export function listFeatures(projectRoot: string): FeatureSummary[] {
     const stateFile = join(specsDir, entry.name, 'stage-state.json');
     if (!exists(stateFile)) continue;
 
-    let state: StageState;
+    let state: FeatureState;
     try {
       state = readValidatedFeatureState(entry.name, projectRoot);
     } catch {
@@ -70,8 +70,6 @@ export function listFeatures(projectRoot: string): FeatureSummary[] {
     summaries.push({
       featureId: state.featureId,
       title: state.title,
-      mode: state.mode,
-      size: state.size,
       currentStage: state.currentStage,
       terminal: state.terminal,
       updatedAt: state.updatedAt,

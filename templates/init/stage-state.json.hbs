@@ -1,10 +1,21 @@
 {
   "featureId": "{{featureId}}",
   "title": "{{title}}",
+  "currentStage": "00_init",
+  "terminal": false,
+  "nodes": {
+    "00_init": {
+      "status": "in_progress",
+      "summary": "Feature 初始化完成，等待进入 01_specify",
+      "checklistStatus": "partial",
+      "canMarkDone": false
+    }
+  },
+  "createdAt": "{{timestamp}}",
+  "updatedAt": "{{timestamp}}",
   "mode": "{{mode}}",
   "size": "{{size}}",
   "platforms": [{{#each platforms}}"{{this}}"{{#unless @last}}, {{/unless}}{{/each}}],
-  "currentStage": "00_init",
   "history": [
     {
       "from": null,
@@ -12,6 +23,5 @@
       "timestamp": "{{timestamp}}",
       "by": "{{author}}"
     }
-  ],
-  "terminal": false
+  ]
 }

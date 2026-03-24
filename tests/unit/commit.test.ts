@@ -41,15 +41,26 @@ describe('handleCommit', () => {
       return '';
     });
     const message = 'feat: $(touch /tmp/pwned)';
-    const taskId = 'TASK-ABC-1';
 
-    const code = withCwd(TMP, () => handleCommit(['--message', message, '--task', taskId]));
+    const code = withCwd(TMP, () => handleCommit(['--message', message]));
 
     expect(code).toBe(ExitCode.SUCCESS);
     expect(execFileSyncMock).toHaveBeenCalledTimes(2);
-    expect(execFileSyncMock).toHaveBeenCalledWith(
+    expect(execFileSyncMock).toHaveBeenNthCalledWith(
+      1,
       'git',
-      ['commit', '-m', `[${taskId}] ${message}\n\ntraces: ${taskId}`],
+      ['diff', '--cached', '--name-only', '--diff-filter=ACMRD'],
+      expect.objectContaining({
+        cwd: TMP,
+        encoding: 'utf-8',
+        stdio: 'pipe',
+        timeout: 30_000,
+      }),
+    );
+    expect(execFileSyncMock).toHaveBeenNthCalledWith(
+      2,
+      'git',
+      ['commit', '-m', message],
       expect.objectContaining({
         cwd: TMP,
         encoding: 'utf-8',
@@ -65,7 +76,7 @@ describe('handleCommit', () => {
       throw new Error('nothing to commit, working tree clean');
     });
 
-    const code = withCwd(TMP, () => handleCommit(['--message', 'test', '--task', 'TASK-ABC-1']));
+    const code = withCwd(TMP, () => handleCommit(['--message', 'test']));
 
     expect(code).toBe(ExitCode.IO_ERROR);
     expect(execFileSyncMock).toHaveBeenCalledTimes(2);
@@ -77,7 +88,7 @@ describe('handleCommit', () => {
       return '';
     });
 
-    const code = withCwd(TMP, () => handleCommit(['--message', 'feat: auth', '--task', 'TASK-ABC-1']));
+    const code = withCwd(TMP, () => handleCommit(['--message', 'feat: auth']));
 
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
     expect(execFileSyncMock).toHaveBeenCalledTimes(1);
@@ -89,7 +100,7 @@ describe('handleCommit', () => {
       return '';
     });
 
-    const code = withCwd(TMP, () => handleCommit(['--message', 'feat: auth', '--task', 'TASK-ABC-1']));
+    const code = withCwd(TMP, () => handleCommit(['--message', 'feat: auth']));
 
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
     expect(execFileSyncMock).toHaveBeenCalledTimes(1);
@@ -113,7 +124,7 @@ describe('handleCommit', () => {
       return '';
     });
 
-    const code = withCwd(TMP, () => handleCommit(['--message', 'refactor: delete auth', '--task', 'TASK-ABC-1']));
+    const code = withCwd(TMP, () => handleCommit(['--message', 'refactor: delete auth']));
 
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
     expect(execFileSyncMock).toHaveBeenCalledWith(

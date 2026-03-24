@@ -1,27 +1,27 @@
 import { join } from 'node:path';
 import type { TaskNode } from '../batch-executor/types.js';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
-import { splitCanonicalTraceIds } from '../trace-engine/relationship-graph.js';
 
-export type ParsedTaskStatus = 'pending' | 'in_progress' | 'complete' | 'blocked';
+export type ParsedTaskStatus = 'todo' | 'in_progress' | 'done' | 'blocked';
 
 export interface ParsedTaskPlanTask {
-  id: string;
   title: string;
   status: ParsedTaskStatus;
-  dependsOn: string[];
-  traces: string[];
+  summary?: string;
+  next_step?: string;
   owner?: string;
+  notes?: string;
 }
 
 export interface ParsedTaskPlan {
   tasks: ParsedTaskPlanTask[];
-  currentTaskId?: string;
+  currentTaskTitle?: string;
   stats: {
     total: number;
-    completed: number;
+    todo: number;
     inProgress: number;
-    pending: number;
+    done: number;
+    blocked: number;
   };
 }
 
@@ -34,7 +34,7 @@ function splitMarkdownRow(line: string): string[] {
 }
 
 function normalizeHeader(cell: string): string {
-  return cell.toLowerCase().replace(/[\s-]+/g, '_');
+  return cell.trim().toLowerCase().replace(/[\s-]+/g, '_');
 }
 
 export function normalizeTaskPlanStatus(value: string): ParsedTaskStatus {
@@ -42,32 +42,29 @@ export function normalizeTaskPlanStatus(value: string): ParsedTaskStatus {
     .trim()
     .toLowerCase()
     .replace(/[-\s]+/g, '_');
-  if (['complete', 'completed', 'done', 'verified'].includes(normalized)) return 'complete';
-  if (['in_progress', 'wip', 'doing', '进行中'].includes(normalized)) return 'in_progress';
-  if (['blocked'].includes(normalized)) return 'blocked';
-  return 'pending';
+
+  if (['done', 'complete', 'completed', 'verified'].includes(normalized)) return 'done';
+  if (['in_progress', 'inprogress', 'doing', '进行中'].includes(normalized)) return 'in_progress';
+  if (['blocked', 'halted'].includes(normalized)) return 'blocked';
+  return 'todo';
 }
 
 function resolveColumnIndex(
   headers: string[],
-  kind: 'task_id' | 'title' | 'status' | 'depends_on' | 'traces' | 'owner'
+  kind: 'title' | 'status' | 'summary' | 'next_step' | 'owner' | 'notes'
 ): number {
-  const exact = {
-    task_id: ['task_id', 'taskid', 'id'],
+  const aliases = {
     title: ['title', '标题'],
     status: ['status', '状态'],
-    depends_on: ['depends_on', 'depends', '依赖', 'dependson'],
-    traces: ['traces', 'trace', '关联', 'links'],
+    summary: ['summary', '进展', '摘要'],
+    next_step: ['next_step', 'nextstep', '下一步'],
     owner: ['owner', '负责人'],
+    notes: ['notes', '备注'],
   }[kind];
 
-  for (const candidate of exact) {
-    const index = headers.findIndex((header) => header === candidate);
+  for (const alias of aliases) {
+    const index = headers.findIndex((header) => header === alias);
     if (index !== -1) return index;
-  }
-
-  if (kind === 'task_id') {
-    return headers.findIndex((header) => header.includes('task') && header.includes('id'));
   }
 
   return -1;
@@ -75,84 +72,58 @@ function resolveColumnIndex(
 
 export function parseTaskPlanContent(content: string): ParsedTaskPlan {
   const lines = content.split('\n');
-  let headerCells: string[] | undefined;
   const tasks: ParsedTaskPlanTask[] = [];
 
   for (let index = 0; index < lines.length - 1; index++) {
     const header = lines[index]?.trim() ?? '';
     const divider = lines[index + 1]?.trim() ?? '';
-    if (!header.startsWith('|') || !divider.startsWith('|') || !/^\|[\s\-:|]+$/.test(divider))
+    if (!header.startsWith('|') || !divider.startsWith('|') || !/^\|[\s\-:|]+$/.test(divider)) {
       continue;
+    }
 
-    const rawHeaders = splitMarkdownRow(header);
-    const normalizedHeaders = rawHeaders.map(normalizeHeader);
-    const taskIdIdx = resolveColumnIndex(normalizedHeaders, 'task_id');
-    const statusIdx = resolveColumnIndex(normalizedHeaders, 'status');
-    if (taskIdIdx === -1 || statusIdx === -1) continue;
+    const headers = splitMarkdownRow(header).map(normalizeHeader);
+    const titleIdx = resolveColumnIndex(headers, 'title');
+    const statusIdx = resolveColumnIndex(headers, 'status');
+    if (titleIdx === -1 || statusIdx === -1) continue;
 
-    headerCells = normalizedHeaders;
+    const summaryIdx = resolveColumnIndex(headers, 'summary');
+    const nextStepIdx = resolveColumnIndex(headers, 'next_step');
+    const ownerIdx = resolveColumnIndex(headers, 'owner');
+    const notesIdx = resolveColumnIndex(headers, 'notes');
+
     for (let rowIndex = index + 2; rowIndex < lines.length; rowIndex++) {
       const rowLine = lines[rowIndex]?.trim() ?? '';
       if (!rowLine.startsWith('|')) break;
+
       const row = splitMarkdownRow(rowLine);
-      if (row.length === 0) continue;
-      const taskId = row[taskIdIdx]?.match(/TASK-[A-Z0-9-]+/i)?.[0];
-      if (!taskId) continue;
-
-      const titleIdx = resolveColumnIndex(normalizedHeaders, 'title');
-      const dependsIdx = resolveColumnIndex(normalizedHeaders, 'depends_on');
-      const tracesIdx = resolveColumnIndex(normalizedHeaders, 'traces');
-      const ownerIdx = resolveColumnIndex(normalizedHeaders, 'owner');
-
-      const dependsOn =
-        dependsIdx === -1
-          ? []
-          : (row[dependsIdx] ?? '')
-              .split(',')
-              .map((item) => item.trim())
-              .filter((item) => item && item !== '-');
-      const traces =
-        tracesIdx === -1
-          ? []
-          : (row[tracesIdx] ?? '')
-              .split(',')
-              .map((item) => item.trim())
-              .filter((item) => item && item !== '-');
+      const title = row[titleIdx]?.trim();
+      if (!title || title === '-') continue;
 
       tasks.push({
-        id: taskId.toUpperCase(),
-        title: titleIdx === -1 ? taskId : (row[titleIdx] ?? '').trim() || taskId,
+        title,
         status: normalizeTaskPlanStatus(row[statusIdx] ?? ''),
-        dependsOn,
-        traces,
+        summary: summaryIdx === -1 ? undefined : (row[summaryIdx] ?? '').trim() || undefined,
+        next_step: nextStepIdx === -1 ? undefined : (row[nextStepIdx] ?? '').trim() || undefined,
         owner: ownerIdx === -1 ? undefined : (row[ownerIdx] ?? '').trim() || undefined,
+        notes: notesIdx === -1 ? undefined : (row[notesIdx] ?? '').trim() || undefined,
       });
     }
 
     if (tasks.length > 0) break;
   }
 
-  if (!headerCells || tasks.length === 0) {
-    return {
-      tasks: [],
-      stats: { total: 0, completed: 0, inProgress: 0, pending: 0 },
-    };
-  }
-
-  const currentTaskId = tasks.find((task) => task.status === 'in_progress')?.id;
-  const completed = tasks.filter((task) => task.status === 'complete').length;
-  const inProgress = tasks.filter((task) => task.status === 'in_progress').length;
-  const pending = tasks.length - completed - inProgress;
+  const stats = {
+    total: tasks.length,
+    todo: tasks.filter((task) => task.status === 'todo').length,
+    inProgress: tasks.filter((task) => task.status === 'in_progress').length,
+    done: tasks.filter((task) => task.status === 'done').length,
+    blocked: tasks.filter((task) => task.status === 'blocked').length,
+  };
 
   return {
     tasks,
-    currentTaskId,
-    stats: {
-      total: tasks.length,
-      completed,
-      inProgress,
-      pending,
-    },
+    currentTaskTitle: tasks.find((task) => task.status === 'in_progress')?.title,
+    stats,
   };
 }
 
@@ -162,29 +133,19 @@ export function readTaskPlan(projectRoot: string, featureId: string): ParsedTask
   return parseTaskPlanContent(readMarkdown(taskPlanPath));
 }
 
-export function getCurrentTaskId(projectRoot: string, featureId: string): string | undefined {
-  return readTaskPlan(projectRoot, featureId)?.currentTaskId;
+export function getCurrentTaskTitle(projectRoot: string, featureId: string): string | undefined {
+  return readTaskPlan(projectRoot, featureId)?.currentTaskTitle;
 }
 
 export function toTaskNodes(plan: ParsedTaskPlan): TaskNode[] {
-  return plan.tasks.map((task) => {
-    const partitions = splitCanonicalTraceIds(task.traces);
-    return {
-      id: task.id,
-      title: task.title,
-      description: '',
-      acceptanceCriteria: [],
-      dependsOn: task.dependsOn,
-      status:
-        task.status === 'complete'
-          ? 'done'
-          : task.status === 'in_progress'
-            ? 'in_progress'
-            : task.status === 'blocked'
-              ? 'blocked'
-              : 'todo',
-      relatedFR: partitions.relatedFRIds,
-      relatedDS: partitions.relatedDSIds,
-    };
-  });
+  return plan.tasks.map((task) => ({
+    id: task.title,
+    title: task.title,
+    description: task.summary ?? '',
+    acceptanceCriteria: [],
+    dependsOn: [],
+    status: task.status,
+    relatedFR: [],
+    relatedDS: [],
+  }));
 }

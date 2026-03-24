@@ -4,7 +4,7 @@
  * Planning-with-Files P0-2: 5-Question Reboot Test 结构化输出
  */
 import { join } from 'node:path';
-import type { StageState } from '../../shared/types.js';
+import type { FeatureState } from '../../shared/types.js';
 import { readJson, exists, readMarkdown } from '../../shared/fs-utils.js';
 import { loadTodoState, summarizeTodoState } from './todo-runner.js';
 import { readTaskPlan } from '../task-plan/parser.js';
@@ -101,9 +101,9 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
 
   // Step 1: Read stage-state.json
   const statePath = join(specDir, 'stage-state.json');
-  let state: StageState | null = null;
+  let state: FeatureState | null = null;
   if (exists(statePath)) {
-    state = readJson<StageState>(statePath);
+    state = readJson<FeatureState>(statePath);
   } else {
     missingFiles.push('stage-state.json');
   }
@@ -117,7 +117,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   const parsedTaskPlan = readTaskPlan(projectRoot, featureId);
   if (parsedTaskPlan) {
     totalTasks = parsedTaskPlan.stats.total;
-    completedTasks = parsedTaskPlan.stats.completed;
+    completedTasks = parsedTaskPlan.stats.done;
   } else if (!exists(taskPlanPath)) {
     missingFiles.push('task_plan.md');
   }
@@ -165,7 +165,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   }
 
   // Step 4: Locate current task
-  const currentTask = parsedTaskPlan?.currentTaskId;
+  const currentTask = parsedTaskPlan?.currentTaskTitle;
 
   // Step 4.2: 构建 TASK 级独立上下文包（Fresh Context Per Task）
   const taskContextPack = currentTask

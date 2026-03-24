@@ -3,9 +3,9 @@ import { join } from 'node:path';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
 import { readFirstStructureOverview } from './first-runtime-store.js';
 import { type SkillExecutionContext, resolveExecutionFeatureId } from './execution-context.js';
+import { getCurrentTaskTitle } from '../task-plan/parser.js';
 
 const SCOPE_GUARD_SKILLS = new Set(['code', 'review', 'verify']);
-const TASK_SECTION_RE = /^###\s*(TASK-[A-Z0-9-]+)\b.*$/gm;
 
 export interface ScopeGuardDecision {
   active: boolean;
@@ -30,60 +30,20 @@ export class ScopeGuardBlockedError extends Error {
   }
 }
 
-function normalizeTaskStatus(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[-\s]+/g, '_');
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function readCurrentTaskId(taskPlanContent: string): string | undefined {
-  const lines = taskPlanContent.split('\n');
-  const headerLine = lines.find(
-    (line) => line.trim().startsWith('|') && /task id/i.test(line) && /状态|status/i.test(line)
-  );
-  if (!headerLine) return undefined;
-  const headers = headerLine
-    .split('|')
-    .slice(1, -1)
-    .map((cell) => cell.trim().toLowerCase());
-  const taskIdx = headers.findIndex((cell) => cell === 'task id' || cell === 'task');
-  const statusIdx = headers.findIndex((cell) => cell === '状态' || cell === 'status');
-  if (taskIdx === -1 || statusIdx === -1) return undefined;
-
-  const startIndex = lines.indexOf(headerLine);
-  for (let i = startIndex + 1; i < lines.length; i += 1) {
-    const line = lines[i];
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|')) continue;
-    if (/^\|[\s\-:|]+$/.test(trimmed)) continue;
-    const cells = trimmed
-      .split('|')
-      .slice(1, -1)
-      .map((cell) => cell.trim());
-    const status = normalizeTaskStatus(cells[statusIdx] ?? '');
-    if (status !== 'in_progress') continue;
-    const taskIdMatch = (cells[taskIdx] ?? '').match(/TASK-[A-Z0-9-]+/i);
-    if (taskIdMatch?.[0]) return taskIdMatch[0].toUpperCase();
-  }
-  return undefined;
-}
-
-function readTaskSection(taskPlanContent: string, taskId: string): string | undefined {
-  const sections = [...taskPlanContent.matchAll(TASK_SECTION_RE)];
-  if (sections.length === 0) return undefined;
-  for (let i = 0; i < sections.length; i += 1) {
-    const match = sections[i];
-    const currentId = match[1]?.toUpperCase();
-    if (currentId !== taskId) continue;
-    const start = match.index ?? 0;
-    const end =
-      i + 1 < sections.length
-        ? (sections[i + 1].index ?? taskPlanContent.length)
-        : taskPlanContent.length;
-    return taskPlanContent.slice(start, end);
-  }
-  return undefined;
+function readTaskSection(taskPlanContent: string, taskTitle: string): string | undefined {
+  const re = new RegExp(`^###\\s*${escapeRegExp(taskTitle)}\\s*$`, 'gim');
+  const match = re.exec(taskPlanContent);
+  if (!match) return undefined;
+  const start = match.index ?? 0;
+  const rest = taskPlanContent.slice(start + match[0].length);
+  const nextHeaderOffset = rest.search(/\n###\s+/);
+  const end =
+    nextHeaderOffset === -1 ? taskPlanContent.length : start + match[0].length + nextHeaderOffset;
+  return taskPlanContent.slice(start, end);
 }
 
 function parseTaskFiles(taskSection: string | undefined): string[] {
@@ -235,8 +195,8 @@ export function evaluateRuntimeScopeGuard(
   }
 
   const taskPlan = readMarkdown(taskPlanPath);
-  const currentTaskId = readCurrentTaskId(taskPlan);
-  if (!currentTaskId) {
+  const currentTaskTitle = getCurrentTaskTitle(projectRoot, featureId);
+  if (!currentTaskTitle) {
     return {
       active: false,
       blocked: false,
@@ -248,7 +208,7 @@ export function evaluateRuntimeScopeGuard(
     };
   }
 
-  const taskFiles = parseTaskFiles(readTaskSection(taskPlan, currentTaskId));
+  const taskFiles = parseTaskFiles(readTaskSection(taskPlan, currentTaskTitle));
   if (taskFiles.length === 0) {
     return {
       active: false,

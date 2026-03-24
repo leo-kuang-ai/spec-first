@@ -1,24 +1,15 @@
 /**
  * stage CLI 命令组
- * spec-first stage current|suggest|advance|cancel
+ * spec-first stage current|suggest
  */
 import { join } from 'node:path';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { ExitCode } from '../../shared/types.js';
-import {
-  advance,
-  GateUnavailableError,
-  GateFailedError,
-} from '../../core/process-engine/advance.js';
-import { cancel } from '../../core/process-engine/advance.js';
+import { Stage } from '../../shared/types.js';
 import { getFeatureState } from '../../core/process-engine/feature.js';
-import { checkDependencies } from '../../core/process-engine/dependency-checker.js';
-import { decideNextStep, getNextStage } from '../../core/process-engine/next-step-decider.js';
-import { evaluateGate } from '../../core/gate-engine/gate-evaluator.js';
-import { loadTodoState } from '../../core/ai-orchestrator/todo-runner.js';
+import { checkReadiness } from '../../core/process-engine/readiness-check.js';
+import { getNextStages } from '../../core/process-engine/stage-machine.js';
 import { checkHooks } from '../../core/tool-integration/hook-installer.js';
-import { resetConfigCache } from '../../shared/config-schema.js';
-import { parseFlag } from '../parse-utils.js';
 
 /** AI Runtime Hook 类型常量 */
 const AI_HOOK_TYPES = ['PreToolUse', 'PostToolUse', 'Stop'] as const;
@@ -39,9 +30,13 @@ export function handleStage(args: string[]): number {
     case 'suggest':
       return handleSuggest(rest);
     case 'advance':
-      return handleAdvance(rest);
+      console.error('`spec-first stage advance` 已移除；请改用 `spec-first transition <featureId>`。');
+      return ExitCode.VALIDATION_ERROR;
     case 'cancel':
-      return handleCancel(rest);
+      console.error(
+        '`spec-first stage cancel` 已移除；请改用 `spec-first transition cancel <featureId> --reason "<reason>"`。'
+      );
+      return ExitCode.VALIDATION_ERROR;
     default:
       console.error(`未知 stage 子命令：${sub}`);
       printStageHelp();
@@ -118,8 +113,8 @@ function handleCurrent(args: string[]): number {
     console.log(`Feature：${state.featureId}`);
     console.log(`目录：  ${featureDir}`);
     console.log(`阶段：   ${state.currentStage}`);
-    console.log(`平台：   ${state.platforms.join(', ') || '(无)'}`);
-    console.log(`模式：   ${state.mode}  规模：${state.size}`);
+    console.log(`平台：   ${state.platforms?.join(', ') || '(无)'}`);
+    console.log(`模式：   ${state.mode ?? 'N/A'}  规模：${state.size ?? 'N/A'}`);
     console.log(`终态：${state.terminal}`);
 
     const hookStatuses = checkHooks(projectRoot);
@@ -161,44 +156,32 @@ function handleSuggest(args: string[]): number {
 
   try {
     const projectRoot = process.cwd();
-    resetConfigCache();
     const state = getFeatureState(featureId, projectRoot);
-    const upcomingStage = getNextStage(state.currentStage);
-    const nextStep = decideNextStep({
-      featureId,
+    const targetStage = getNextWorkStage(state.currentStage);
+    if (!targetStage) {
+      console.log(`Feature：${state.featureId}`);
+      console.log(`当前阶段：${state.currentStage}`);
+      console.log('决策：BLOCKED');
+      return ExitCode.SUCCESS;
+    }
+    const readiness = checkReadiness({
       currentStage: state.currentStage,
-      stageStatus: state.stageStatus,
-      autoAdvancePolicy: state.autoAdvancePolicy,
-      gateStatus:
-        state.stageStatus === 'ready_to_advance'
-          ? evaluateGate(featureId, projectRoot, { persist: false }).status
-          : undefined,
-      dependencyCheck: upcomingStage
-        ? checkDependencies(
-            featureId,
-            upcomingStage,
-            projectRoot,
-            state.mergedRules?.profile ?? 'default-simplified'
-          )
-        : undefined,
-      todoState: loadTodoState(featureId, projectRoot),
+      targetStage,
+      nodes: state.nodes,
+      artifacts: collectArtifacts(projectRoot, featureId),
+      terminal: state.terminal,
     });
 
     console.log(`Feature：${state.featureId}`);
     console.log(`当前阶段：${state.currentStage}`);
-    console.log(`阶段子状态：${state.stageStatus ?? 'drafting'}`);
-    if (nextStep.nextStage) {
-      console.log(`下一阶段：${nextStep.nextStage}`);
-    }
-    console.log(`决策：${nextStep.decision}`);
-    if (nextStep.suggestedCommand) {
-      console.log(`建议命令：${nextStep.suggestedCommand}`);
-    }
-    if (nextStep.reasons.length > 0) {
-      console.log('阻塞原因：');
-      for (const reason of nextStep.reasons) {
-        console.log(`  - ${reason}`);
-      }
+    console.log(`目标阶段：${readiness.targetStage}`);
+    console.log(`决策：${readiness.decision}`);
+    if (!readiness.checks.previousNodeComplete) {
+      console.log('原因：当前节点未完成，先继续收口本节点。');
+    } else if (!readiness.checks.requiredArtifactsExist) {
+      console.log('原因：目标节点所需产物未齐全。');
+    } else if (!readiness.checks.noActiveWork) {
+      console.log('原因：存在其他活跃中的节点工作。');
     }
 
     return ExitCode.SUCCESS;
@@ -208,54 +191,16 @@ function handleSuggest(args: string[]): number {
   }
 }
 
-function handleAdvance(args: string[]): number {
-  const featureId = args[0];
-  if (!featureId) {
-    console.error('用法：spec-first stage advance <featureId>');
-    return ExitCode.VALIDATION_ERROR;
-  }
-
-  if (args.includes('--force')) {
-    console.error('错误：`stage advance --force` 已移除；请修复 Gate/依赖问题后再推进。');
-    return ExitCode.VALIDATION_ERROR;
-  }
-
-  try {
-    const result = advance(featureId, process.cwd());
-    console.log(`已推进：${result.from} → ${result.to}`);
-    console.log(`Gate：${result.gateResult}`);
-    return ExitCode.SUCCESS;
-  } catch (e) {
-    if (e instanceof GateFailedError) {
-      console.error(`Gate 阻断：${e.message}`);
-      return ExitCode.GATE_FAILED;
-    }
-    if (e instanceof GateUnavailableError) {
-      console.error(`Gate 阻断：${e.message}`);
-      return ExitCode.GATE_FAILED;
-    }
-    console.error(`错误：${(e as Error).message}`);
-    return ExitCode.VALIDATION_ERROR;
-  }
+function getNextWorkStage(stage: Stage): Stage | undefined {
+  return getNextStages(stage).find((candidate) => candidate !== Stage.CANCELLED);
 }
 
-function handleCancel(args: string[]): number {
-  const featureId = args[0];
-  const reason = parseFlag(args, '--reason');
-
-  if (!featureId || !reason) {
-    console.error('用法：spec-first stage cancel <featureId> --reason "<reason>"');
-    return ExitCode.VALIDATION_ERROR;
-  }
-
-  try {
-    const result = cancel(featureId, process.cwd(), reason);
-    console.log(`已取消：${result.from} → ${result.to}`);
-    return ExitCode.SUCCESS;
-  } catch (e) {
-    console.error(`错误：${(e as Error).message}`);
-    return ExitCode.VALIDATION_ERROR;
-  }
+function collectArtifacts(projectRoot: string, featureId: string): string[] {
+  const featureDir = join(projectRoot, 'specs', featureId);
+  if (!existsSync(featureDir)) return [];
+  return readdirSync(featureDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
 }
 
 function printStageHelp(): void {
