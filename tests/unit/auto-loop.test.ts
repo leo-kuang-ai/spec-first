@@ -258,7 +258,7 @@ describe('auto-loop blocked & halt', () => {
 describe('auto-loop post-write guards', () => {
   it('required_mcps 缺失时应阻断并 halt', async () => {
     seedState(makeItems(['T1']));
-    const skillDir = join(TMP, 'skills', 'spec-first', '99-guard');
+    const skillDir = join(TMP, 'skills', '99-guard');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(skillPath, '---\nrequired_mcps:\n  - missing-mcp\n---\n# Guard Skill\n', 'utf-8');
@@ -283,7 +283,7 @@ describe('auto-loop post-write guards', () => {
     seedState(makeItems(['T1']));
     registerAvailableMcp('mcp-a');
 
-    const skillDir = join(TMP, 'skills', 'spec-first', '99-guard');
+    const skillDir = join(TMP, 'skills', '99-guard');
     const skillPath = join(skillDir, 'SKILL.md');
     const outputPath = join(TMP, 'specs', FEAT, 'delivery.md');
     mkdirSync(skillDir, { recursive: true });
@@ -334,7 +334,7 @@ describe('auto-loop post-write guards', () => {
     resetConfigCache();
     seedState(makeItems(['T1']));
 
-    const skillDir = join(TMP, 'skills', 'spec-first', '99-guard');
+    const skillDir = join(TMP, 'skills', '99-guard');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(

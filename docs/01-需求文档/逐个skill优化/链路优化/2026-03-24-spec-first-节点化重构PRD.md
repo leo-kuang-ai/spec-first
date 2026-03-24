@@ -771,6 +771,16 @@ interface FeatureState {
 
 `blocked` 表示节点工作被业务、环境或依赖问题中断，不等同于节点完成。
 
+需要区分两层 `blocked`：
+
+- 任务级 `blocked`：写在 `task_plan.md` 的任务表格中，表示某个任务条目被阻塞
+- 节点级 `blocked`：写在运行态 `NodeState.status` 中，表示整个节点当前无法继续收敛
+
+两者关系如下：
+
+- 任务级 `blocked` 不自动等于节点级 `blocked`
+- 只有当阻塞已经影响整个节点继续推进时，orchestrate 或显式 `transition` 才将节点写为 `blocked`
+
 规则如下：
 
 - `blocked` 只能由 orchestrate 或显式 `transition` 解除
@@ -779,6 +789,19 @@ interface FeatureState {
 - `blocked` 不能直接转为 `done`
 
 如果阻塞解除后节点实际上已经满足完成条件，仍需重新执行本节点 checklist，再按正常完成流程写入 `done`。
+
+对于 `03_plan` 这类带任务表格的节点，还需要区分“任务解阻”和“节点解阻”：
+
+- 任务解阻：通过更新 `task_plan.md` 中对应任务行完成，将任务状态从 `blocked` 改为 `todo / in_progress / done`
+- 节点解阻：仍由 orchestrate 或显式 `transition` 写回运行态，将节点状态从 `blocked` 改为 `in_progress`
+
+只有当关键阻塞已经解除，且整个节点可以继续收敛时，才应解除节点级 `blocked`。
+
+用户引导职责如下：
+
+- `status`：展示当前阻塞摘要、受影响节点或任务、建议下一步动作
+- `orchestrate`：在 `BLOCKED` 场景下输出恢复执行步骤
+- `skill`：只暴露本节点事实和 checklist 结果，不负责流程恢复引导
 
 ### 8.2.11 前置节点状态与推进规则
 

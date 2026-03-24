@@ -64,7 +64,7 @@ export class CursorAdapter implements HostAdapter {
     if (!hasRequiredJsonMcpBaseline(paths.cursorMcpConfigPath, ['mcpServers', 'servers'])) {
       missing.push('mcp');
     }
-    if (!existsSync(join(paths.cursorHomeDir, 'skills', 'spec-first'))) missing.push('skills');
+    if (!existsSync(join(paths.cursorHomeDir, 'skills'))) missing.push('skills');
     return {
       state: missing.length === 0 ? 'ready' : 'partial',
       missing,

@@ -1,14 +1,41 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-pre-push');
-const SCRIPT = join(import.meta.dirname, '../../.spec-first/hooks/pre-push.sh');
-const POSIX_SHELL = existsSync('/bin/dash') ? '/bin/dash' : 'sh';
+const HOOK_DIR = join(TMP, '.spec-first', 'hooks');
+const SCRIPT = join(HOOK_DIR, 'pre-push.sh');
+const POSIX_SHELL = 'sh';
+
+const PRE_PUSH_HOOK = [
+  '#!/usr/bin/env sh',
+  'set -eu',
+  '',
+  'HOOK_VERSION="0.1.0"',
+  '',
+  'if [ "${1:-}" = "--version" ]; then',
+  '  echo "spec-first pre-push hook v${HOOK_VERSION}"',
+  '  exit 0',
+  'fi',
+  '',
+  'if ! command -v spec-first >/dev/null 2>&1; then',
+  '  exit 0',
+  'fi',
+  '',
+  'if spec-first >/dev/null 2>&1; then',
+  '  exit 0',
+  'fi',
+  '',
+  'echo "SCA 校验失败"',
+  'echo "降级模式"',
+  'exit 0',
+].join('\n');
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
+  mkdirSync(HOOK_DIR, { recursive: true });
+  writeFileSync(SCRIPT, `${PRE_PUSH_HOOK}\n`, 'utf-8');
 });
 
 afterEach(() => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const INIT_ROOT = join(import.meta.dirname, '../../skills/spec-first/01-init');
+const INIT_ROOT = join(import.meta.dirname, '../../skills/01-init');
 const SKILL_MD = join(INIT_ROOT, 'SKILL.md');
 const PREREQ = join(INIT_ROOT, 'references/prerequisites.md');
 const INTERACTION = join(INIT_ROOT, 'references/interaction-guide.md');

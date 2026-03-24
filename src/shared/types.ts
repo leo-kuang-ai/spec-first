@@ -104,11 +104,12 @@ export enum ExitCode {
 
 // ─── StageState（stage-state.json 结构）─────────────────
 export interface StageHistoryEntry {
-  from: Stage;
+  from: Stage | null;
   to: Stage;
   timestamp: string;
   gateResult?: string;
   reason?: string;
+  by?: string;
 }
 
 export interface StageState {

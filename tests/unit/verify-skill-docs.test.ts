@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const VERIFY_ROOT = join(import.meta.dirname, '../../skills/spec-first/12-verify');
+const VERIFY_ROOT = join(import.meta.dirname, '../../skills/12-verify');
 const SKILL_MD = join(VERIFY_ROOT, 'SKILL.md');
 const GATE_CONDITIONS = join(VERIFY_ROOT, 'references/gate-conditions.md');
 const COVERAGE = join(VERIFY_ROOT, 'references/coverage-metrics.md');

@@ -34,7 +34,7 @@ beforeEach(() => {
   resetConfigCache();
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   mkdirSync(join(TMP, '.spec-first', 'meta'), { recursive: true });
-  mkdirSync(join(TMP, 'skills', 'spec-first', '07-code'), { recursive: true });
+  mkdirSync(join(TMP, 'skills', '07-code'), { recursive: true });
 });
 
 afterEach(() => {
@@ -115,7 +115,7 @@ describe('dispatchCommand', () => {
       '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
       'utf-8',
     );
-    writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
+    writeFileSync(join(TMP, 'skills', '07-code', 'SKILL.md'), '# Code Skill');
     const result = dispatchCommand('code', TMP);
     expect(result.route).toBe('skill');
     expect(result.skillName).toBe('code');
@@ -123,27 +123,27 @@ describe('dispatchCommand', () => {
   });
 
   it('should resolve exact skill directory names before NN-prefixed matches', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', 'focus-requirements'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', 'focus-requirements'), { recursive: true });
     writeFileSync(
-      join(TMP, 'skills', 'spec-first', 'focus-requirements', 'SKILL.md'),
+      join(TMP, 'skills', 'focus-requirements', 'SKILL.md'),
       '# Focus Requirements',
       'utf-8',
     );
 
     const result = resolveSkillPath('focus-requirements', TMP);
 
-    expect(result).toBe(join(TMP, 'skills', 'spec-first', 'focus-requirements', 'SKILL.md'));
+    expect(result).toBe(join(TMP, 'skills', 'focus-requirements', 'SKILL.md'));
   });
 
   it('should not hard-block code skill at dispatch layer when prerequisites are missing', () => {
-    writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
+    writeFileSync(join(TMP, 'skills', '07-code', 'SKILL.md'), '# Code Skill');
     const result = dispatchCommand('code', TMP);
     expect(result.route).toBe('skill');
   });
 
   it('should not hard-block design skill at dispatch layer on stage mismatch', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), '# Design Skill');
+    mkdirSync(join(TMP, 'skills', '04-design'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '04-design', 'SKILL.md'), '# Design Skill');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -167,32 +167,32 @@ describe('dispatchCommand', () => {
   });
 
   it('should default review layer to cross when --layer is omitted', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), '# Review');
+    mkdirSync(join(TMP, 'skills', '08-review'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '08-review', 'SKILL.md'), '# Review');
     const result = dispatchCommand('review', TMP);
     expect(result.route).toBe('skill');
     expect(result.args).toEqual(['--layer', 'cross']);
   });
 
   it('should default verify layer to completion when --layer is omitted', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '12-verify'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '12-verify', 'SKILL.md'), '# Verify');
+    mkdirSync(join(TMP, 'skills', '12-verify'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '12-verify', 'SKILL.md'), '# Verify');
     const result = dispatchCommand('verify', TMP);
     expect(result.route).toBe('skill');
     expect(result.args).toEqual(['--layer', 'completion']);
   });
 
   it('should reject review with invalid layer value', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), '# Review');
+    mkdirSync(join(TMP, 'skills', '08-review'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '08-review', 'SKILL.md'), '# Review');
     const result = dispatchCommand('review --layer bad', TMP);
     expect(result.route).toBe('error');
     expect(result.error).toContain('Invalid --layer');
   });
 
   it('should reject verify with non-completion layer', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '12-verify'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '12-verify', 'SKILL.md'), '# Verify');
+    mkdirSync(join(TMP, 'skills', '12-verify'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '12-verify', 'SKILL.md'), '# Verify');
     const result = dispatchCommand('verify --layer single', TMP);
     expect(result.route).toBe('error');
     expect(result.error).toContain('Allowed: completion');
@@ -201,24 +201,24 @@ describe('dispatchCommand', () => {
   // ─── Orchestrate 参数校验集成 ─────────────────────────
 
   it('should dispatch orchestrate --auto with parsed args', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     const result = dispatchCommand('orchestrate --auto', TMP);
     expect(result.route).toBe('skill');
     expect(result.orchestrateArgs).toEqual({ mode: 'auto', resume: false });
   });
 
   it('should dispatch orchestrate --auto --resume with parsed args', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     const result = dispatchCommand('orchestrate --auto --resume', TMP);
     expect(result.route).toBe('skill');
     expect(result.orchestrateArgs).toEqual({ mode: 'auto', resume: true });
   });
 
   it('should attach orchestrate background guidance from current feature state', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
     mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
@@ -247,8 +247,8 @@ describe('dispatchCommand', () => {
 
 
   it('should keep implementation-stage degraded guidance at L2 when only parallel hint exists', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
     mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
@@ -282,8 +282,8 @@ describe('dispatchCommand', () => {
 
 
   it('should keep design-stage degraded guidance at L2 when only parallel hint exists', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
     mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
@@ -316,8 +316,8 @@ describe('dispatchCommand', () => {
   });
 
   it('should keep verify-stage degraded guidance at L2 when only parallel hint exists', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     mkdirSync(join(TMP, '.spec-first'), { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), 'FSREQ-20260308-AUTH-001\n');
     mkdirSync(join(TMP, 'specs', 'FSREQ-20260308-AUTH-001'), { recursive: true });
@@ -350,24 +350,24 @@ describe('dispatchCommand', () => {
   });
 
   it('should reject orchestrate with unknown flag', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     const result = dispatchCommand('orchestrate --verbose', TMP);
     expect(result.route).toBe('error');
     expect(result.error).toContain('Unknown orchestrate flag');
   });
 
   it('should reject orchestrate --resume without --auto', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '13-orchestrate', 'SKILL.md'), '# Orchestrate');
     const result = dispatchCommand('orchestrate --resume', TMP);
     expect(result.route).toBe('error');
     expect(result.error).toContain('--resume requires --auto');
   });
 
   it('should dispatch first command as skill route without historical protocol parsing', () => {
-    mkdirSync(join(TMP, 'skills', 'spec-first', '00-first'), { recursive: true });
-    writeFileSync(join(TMP, 'skills', 'spec-first', '00-first', 'SKILL.md'), '# First');
+    mkdirSync(join(TMP, 'skills', '00-first'), { recursive: true });
+    writeFileSync(join(TMP, 'skills', '00-first', 'SKILL.md'), '# First');
     const result = dispatchCommand('first --check-health', TMP);
     expect(result.route).toBe('skill');
     expect(result.skillName).toBe('first');
@@ -389,7 +389,7 @@ describe('dispatchCommand', () => {
 
 describe('loadSkill runtime notices', () => {
   it('should inject checklist notice instead of blocking code skill', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { projectRoot: TMP, enableAssembly: false });
@@ -398,7 +398,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should inject PASS hard-gate notice for code when prerequisites are satisfied', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -430,7 +430,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should detect in_progress TASK without trailing table delimiter', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -461,7 +461,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should load checklist context when title/status columns are not first', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -493,8 +493,8 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should allow orchestrate in non-implement stage when context exists', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md');
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    const skillPath = join(TMP, 'skills', '13-orchestrate', 'SKILL.md');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -509,8 +509,8 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should prepend orchestrate background notice when guidance exists', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '13-orchestrate', 'SKILL.md');
-    mkdirSync(join(TMP, 'skills', 'spec-first', '13-orchestrate'), { recursive: true });
+    const skillPath = join(TMP, 'skills', '13-orchestrate', 'SKILL.md');
+    mkdirSync(join(TMP, 'skills', '13-orchestrate'), { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
       join(TMP, 'specs', FEAT, 'stage-state.json'),
@@ -538,7 +538,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should inject task runtime context even when first runtime is unavailable', () => {
-    const skillDir = join(TMP, 'skills', 'spec-first', '06-task');
+    const skillDir = join(TMP, 'skills', '06-task');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -566,7 +566,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should prefer resolver truth over cached backgroundInputStatus in plan runtime notice', () => {
-    const skillDir = join(TMP, 'skills', 'spec-first', '10-plan');
+    const skillDir = join(TMP, 'skills', '10-plan');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -651,7 +651,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should allow review skill on stage mismatch and expose checklist context', () => {
-    const skillDir = join(TMP, 'skills', 'spec-first', '08-review');
+    const skillDir = join(TMP, 'skills', '08-review');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(skillDir, { recursive: true });
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -668,7 +668,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should surface safety warning instead of blocking high-risk code execution', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
@@ -708,7 +708,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should block unstable template when kv_cache_hard_gate is enabled', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
     writeFileSync(
       join(TMP, '.spec-first', 'meta', 'config.yaml'),
@@ -721,7 +721,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should only warn unstable template when kv_cache_hard_gate is disabled', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(skillPath, 'Date={{DATE_ISO}}\nFeature={{FEATURE_ID}}', 'utf-8');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
     writeFileSync(
@@ -760,7 +760,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should append Next Steps handoff requirement when missing', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
 
     const content = loadSkill(skillPath, { enableAssembly: false });
@@ -769,7 +769,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should inject absolute skill file context for relative reference resolution', () => {
-    const skillDir = join(TMP, 'skills', 'spec-first', '00-first');
+    const skillDir = join(TMP, 'skills', '00-first');
     const skillPath = join(skillDir, 'SKILL.md');
     mkdirSync(join(skillDir, 'references'), { recursive: true });
     writeFileSync(skillPath, '# First Skill', 'utf-8');
@@ -783,7 +783,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should block code when changed files exceed task file list and code-view scope', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     mkdirSync(join(TMP, 'src'), { recursive: true });
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -829,7 +829,7 @@ describe('loadSkill runtime notices', () => {
     writeFileSync(join(TMP, 'README.md'), 'seed\n', 'utf-8');
     writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = true;\n', 'utf-8');
     writeFileSync(join(TMP, 'src', 'out-of-scope.ts'), 'export const other = true;\n', 'utf-8');
-    execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/out-of-scope.ts skills/spec-first/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/out-of-scope.ts skills/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
     execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
     writeFileSync(join(TMP, 'src', 'out-of-scope.ts'), 'export const other = false;\n', 'utf-8');
 
@@ -838,7 +838,7 @@ describe('loadSkill runtime notices', () => {
   });
 
   it('should allow code when changed files stay within task file list or code-view scope', () => {
-    const skillPath = join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md');
+    const skillPath = join(TMP, 'skills', '07-code', 'SKILL.md');
     mkdirSync(join(TMP, 'src', 'feature'), { recursive: true });
     writeFileSync(skillPath, '# Code Skill', 'utf-8');
     writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
@@ -901,7 +901,7 @@ describe('loadSkill runtime notices', () => {
     writeFileSync(join(TMP, 'README.md'), 'seed\n', 'utf-8');
     writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = true;\n', 'utf-8');
     writeFileSync(join(TMP, 'src', 'feature', 'helper.ts'), 'export const helper = true;\n', 'utf-8');
-    execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/feature/helper.ts skills/spec-first/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
+    execSync('git -c core.hooksPath=/dev/null add README.md src/allowed.ts src/feature/helper.ts skills/07-code/SKILL.md specs/FSREQ-20260211-AUTH-001/stage-state.json specs/FSREQ-20260211-AUTH-001/design.md', { cwd: TMP, stdio: 'ignore' });
     execSync('git -c core.hooksPath=/dev/null -c commit.gpgsign=false commit -m "seed"', { cwd: TMP, stdio: 'ignore' });
     writeFileSync(join(TMP, 'src', 'allowed.ts'), 'export const allowed = false;\n', 'utf-8');
 

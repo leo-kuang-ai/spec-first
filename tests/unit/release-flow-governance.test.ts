@@ -6,7 +6,7 @@ import { init } from '../../src/core/process-engine/init.js';
 import { checkGoLive } from '../../src/core/gate-engine/golive.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-release-flow');
-const ROOT = join(import.meta.dirname, '../../skills/spec-first');
+const ROOT = join(import.meta.dirname, '../../skills');
 
 beforeEach(() => {
   mkdirSync(join(TMP, '.spec-first', 'layer2'), { recursive: true });

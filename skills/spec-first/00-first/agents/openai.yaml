@@ -1,7 +1,0 @@
-display_name: First
-short_description: 校验或协调项目级 runtime-first 认知输出与 docs/first 结果
-default_prompt: |
-  遵循 `skills/spec-first/00-first/SKILL.md` 与 `references/execution-and-agent-architecture.md`。
-  先基于同一份 evidence pack 产出 runtime 结果与 docs 结果，直接写入最终路径。
-  单轮并发最多 3 个 Agent，按 `execution-and-agent-architecture.md` 的波次执行。
-  不要递归执行 `spec-first first`；CLI 只负责后续的校验和宿主集成。

@@ -22,9 +22,9 @@ export function calcHealthScore(
   escapeRate: number
 ): HealthScore {
   const existenceRatio =
-    metrics.declaredDocCount === 0 ? 1 : metrics.existingDocCount / metrics.declaredDocCount;
+    metrics.declaredDocCount === 0 ? 0 : metrics.existingDocCount / metrics.declaredDocCount;
   const linkageRatio =
-    metrics.declaredDocCount === 0 ? 1 : metrics.linkedDocCount / metrics.declaredDocCount;
+    metrics.declaredDocCount === 0 ? 0 : metrics.linkedDocCount / metrics.declaredDocCount;
   const referencePenalty = metrics.brokenReferenceCount > 0 ? Math.min(0.3, metrics.brokenReferenceCount * 0.1) : 0;
 
   const weightedScore = Math.max(0, existenceRatio * 0.6 + linkageRatio * 0.4 - referencePenalty);

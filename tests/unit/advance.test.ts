@@ -11,14 +11,15 @@ const FEAT_ID = 'FSREQ-20260211-ADV-001';
 const SPEC_DIR = join(TMP, 'specs', FEAT_ID);
 
 function makeState(overrides: Partial<FeatureState> = {}): FeatureState {
+  const currentStage = overrides.currentStage ?? Stage.INIT;
   return {
     featureId: FEAT_ID,
     mode: 'N',
     size: 'S',
     platforms: ['backend'],
-    currentStage: Stage.INIT,
+    currentStage,
     terminal: false,
-    nodes: { [Stage.INIT]: { status: 'in_progress' } },
+    nodes: { [currentStage]: { status: 'done', checklistStatus: 'complete', canMarkDone: true } },
     createdAt: '2026-02-11T00:00:00.000Z',
     updatedAt: '2026-02-11T00:00:00.000Z',
     ...overrides,
@@ -32,6 +33,23 @@ function writeState(state: FeatureState): void {
 function readState(): FeatureState {
   const raw = require('node:fs').readFileSync(join(SPEC_DIR, 'stage-state.json'), 'utf-8');
   return JSON.parse(raw);
+}
+
+function markCurrentNodeDone(): void {
+  const state = readState();
+  const currentNode = state.nodes?.[state.currentStage] ?? { status: 'done' as const };
+  writeState({
+    ...state,
+    nodes: {
+      ...(state.nodes ?? {}),
+      [state.currentStage]: {
+        ...currentNode,
+        status: 'done',
+        checklistStatus: 'complete',
+        canMarkDone: true,
+      },
+    },
+  });
 }
 
 beforeEach(() => {
@@ -96,7 +114,7 @@ describe('advance', () => {
   });
 
   it('should reject advance from terminal stage', () => {
-    writeState(makeState({ currentStage: Stage.DONE, terminal: true }));
+    writeState(makeState({ currentStage: Stage.DONE, terminal: true, nodes: { [Stage.DONE]: { status: 'done' } } }));
     expect(() => advance(FEAT_ID, TMP)).toThrow(/终态阶段/);
   });
 
@@ -106,6 +124,7 @@ describe('advance', () => {
 
   it('should advance SPECIFY → DESIGN when specify gate passes', () => {
     writeState(makeState({ currentStage: Stage.SPECIFY }));
+    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n', 'utf-8');
     const result = advance(FEAT_ID, TMP);
     expect(result.from).toBe(Stage.SPECIFY);
     expect(result.to).toBe(Stage.DESIGN);
@@ -166,6 +185,8 @@ describe('advance', () => {
   it('should chain multiple advances', () => {
     writeState(makeState());
     advance(FEAT_ID, TMP);
+    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n', 'utf-8');
+    markCurrentNodeDone();
     resetConfigCache();
     advance(FEAT_ID, TMP);
     const state = readState();
@@ -174,11 +195,11 @@ describe('advance', () => {
 
   it('should not auto-sync legacy context file when advancing DESIGN → PLAN', () => {
     writeState(makeState({ currentStage: Stage.DESIGN }));
-    mkdirSync(join(TMP, 'skills', 'spec-first', '03-spec', 'references'), { recursive: true });
-    mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', '03-spec', 'references'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', '04-design'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', '08-review'), { recursive: true });
     writeFileSync(
-      join(TMP, 'skills', 'spec-first', '03-spec', 'references', 'constitution-authority.md'),
+      join(TMP, 'skills', '03-spec', 'references', 'constitution-authority.md'),
       [
         '# Constitution Authority',
         '',
@@ -192,9 +213,9 @@ describe('advance', () => {
       ].join('\n'),
       'utf-8',
     );
-    writeFileSync(join(TMP, 'skills', 'spec-first', '03-spec', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
-    writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', '03-spec', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', '04-design', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', '08-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'constitution.md'), [
       '# Constitution',
       '',
@@ -207,6 +228,7 @@ describe('advance', () => {
       '',
     ].join('\n'), 'utf-8');
     writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n\nConstitution Clause C-1 (v1.0.0)\n\n## API\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'task_plan.md'), '# Task Plan\n', 'utf-8');
     writeFileSync(join(TMP, 'CLAUDE.md'), '# CLAUDE\n', 'utf-8');
 
     const result = advance(FEAT_ID, TMP);
@@ -225,10 +247,11 @@ describe('advance', () => {
       'utf-8'
     );
     writeState(makeState({ currentStage: Stage.WRAP_UP }));
-    mkdirSync(join(SPEC_DIR, 'reports'), { recursive: true });
-    writeFileSync(join(SPEC_DIR, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
-    writeFileSync(join(SPEC_DIR, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');
-    writeFileSync(join(SPEC_DIR, 'retro.md'), '# Retro\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'spec.md'), '# Spec\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'task_plan.md'), '# Task Plan\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'verify.md'), '# Verify\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'wrap_up.md'), '# Wrap Up\n', 'utf-8');
 
     const result = advance(FEAT_ID, TMP);
 

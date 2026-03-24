@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ONBOARDING_ROOT = join(import.meta.dirname, '../../skills/spec-first/00-onboarding');
+const ONBOARDING_ROOT = join(import.meta.dirname, '../../skills/00-onboarding');
 const SKILL_MD = join(ONBOARDING_ROOT, 'SKILL.md');
 const SCENARIO_MAPPING = join(ONBOARDING_ROOT, 'references/scenario-mapping.md');
 

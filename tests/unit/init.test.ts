@@ -21,6 +21,16 @@ import {
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-init');
 
+async function withCwd<T>(dir: string, fn: () => Promise<T>): Promise<T> {
+  const orig = process.cwd;
+  process.cwd = () => dir;
+  try {
+    return await fn();
+  } finally {
+    process.cwd = orig;
+  }
+}
+
 function baseOpts(overrides?: Partial<InitOptions>): InitOptions {
   return {
     feat: 'AUTH',
@@ -57,7 +67,10 @@ describe('init', () => {
     expect(state.mode).toBe('N');
     expect(state.size).toBe('S');
     expect(state.terminal).toBe(false);
-    expect(state.stageStatus).toBe('drafting');
+    expect(state.nodes['00_init'].status).toBe('done');
+    expect(state.nodes['00_init'].checklistStatus).toBe('complete');
+    expect(state.nodes['00_init'].canMarkDone).toBe(true);
+    expect(state.stageStatus).toBeUndefined();
     expect(state.autoAdvancePolicy).toBe('suggest');
     expect(state.mergedRules).toBeDefined();
     expect(state.mergedRules.profile).toBe('default-simplified');
@@ -68,7 +81,8 @@ describe('init', () => {
     expect(readFileSync(join(result.featureDir, 'findings.md'), 'utf-8')).toContain('Findings');
     const taskPlan = readFileSync(join(result.featureDir, 'task_plan.md'), 'utf-8');
     expect(taskPlan).toContain('Task Plan');
-    expect(taskPlan).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |');
+    expect(taskPlan).toContain('| title | status | summary | next_step | owner | notes |');
+    expect(taskPlan).toContain('## Plan Status');
 
     // document-links.yaml
     const documentLinks = readFileSync(join(result.featureDir, 'document-links.yaml'), 'utf-8');
@@ -385,7 +399,9 @@ describe('init CLI diagnostics', () => {
   it('should explain invalid mode and size in feature-init context', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      const code = await handleInit(['--feat', 'AUTH', '--mode', 'X', '--size', 'S', '--platforms', 'h5']);
+      const code = await withCwd(TMP, () =>
+        handleInit(['--feat', 'AUTH', '--mode', 'X', '--size', 'S', '--platforms', 'h5'])
+      );
       expect(code).toBe(2);
       const output = errorSpy.mock.calls.flat().join('\n');
       expect(output).toContain('当前处于 feature-init 参数校验阶段');
@@ -398,7 +414,9 @@ describe('init CLI diagnostics', () => {
   it('should explain platform mismatch in feature-init context', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'ios']);
+      const code = await withCwd(TMP, () =>
+        handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'ios'])
+      );
       expect(code).toBe(2);
       const output = errorSpy.mock.calls.flat().join('\n');
       expect(output).toContain('当前处于 feature-init 参数校验阶段');

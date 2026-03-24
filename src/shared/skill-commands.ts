@@ -2,10 +2,10 @@
  * Spec-First Skill dual-host registrar
  *
  * - Claude Code: <detected claude commands dir>/spec-first/<skill>.md  (=> /spec-first:<skill>)
- * - Codex: <detected codex skills dir>/spec-first/<skill> (copy from user-level dir)
+ * - Codex: <detected codex skills dir>/<skill> (copy from user-level dir)
  * - Project-level: {projectRoot}/.claude/commands/ (Claude Code only)
  *
- * Skills 先从 npm 包同步到用户级固定目录 ~/.spec-first/skills/spec-first/，
+ * Skills 先从 npm 包同步到用户级固定目录 ~/.spec-first/skills/，
  * 命令文件和 Codex skills 统一引用该固定路径，避免 npm 全局路径漂移。
  */
 import {
@@ -32,8 +32,8 @@ const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 function resolveSkillsRoot(): string | undefined {
   const candidates = [
-    join(PKG_ROOT, 'skills', 'spec-first'),
-    join(PKG_ROOT, '..', 'skills', 'spec-first'),
+    join(PKG_ROOT, 'skills'),
+    join(PKG_ROOT, '..', 'skills'),
   ];
   return candidates.find((candidate) => existsSync(candidate));
 }
@@ -41,13 +41,13 @@ function resolveSkillsRoot(): string | undefined {
 /**
  * 将 skills 从 npm 包目录同步到用户级固定目录。
  * 幂等覆盖：每次 update 时用包内最新版本覆盖。
- * 返回用户级 skills 根目录路径（如 ~/.spec-first/skills/spec-first）。
+ * 返回用户级 skills 根目录路径（如 ~/.spec-first/skills）。
  */
 function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | undefined {
   const pkgSkillsRoot = resolveSkillsRoot();
   if (!pkgSkillsRoot) return undefined;
 
-  const targetRoot = join(userSkillsDir, 'spec-first');
+  const targetRoot = userSkillsDir;
   if (dryRun) return targetRoot;
 
   mkdirSync(targetRoot, { recursive: true });
@@ -126,6 +126,7 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   feature: 'Feature 查询/切换命令族',
   'spec-review': '定位 Feature 并执行需求规格质量审查（C10）',
   analyze: '执行跨产物一致性分析并生成分析报告',
+  'integrate-skill': '外部 skill 集成评估与治理报告生成',
 };
 
 /** 验证 Codex SKILL.md 是否包含有效 YAML frontmatter（name + description） */
@@ -379,10 +380,6 @@ function ensureCodexSkills(
     mkdirSync(codexSkillsDir, { recursive: true });
     cleanupLegacyCodexSkills(codexSkillsDir, skills);
   }
-  const namespaceDir = join(codexSkillsDir, 'spec-first');
-  if (!dryRun) {
-    mkdirSync(namespaceDir, { recursive: true });
-  }
   const created: string[] = [];
   const warnings: string[] = [];
 
@@ -391,7 +388,7 @@ function ensureCodexSkills(
       created.push(`spec-first:${entry.skillName}`);
       continue;
     }
-    const target = join(namespaceDir, entry.skillName);
+    const target = join(codexSkillsDir, entry.skillName);
     // 清理旧的 symlink 或目录，统一用 copy 覆盖
     try {
       const st = lstatSync(target);
@@ -425,15 +422,11 @@ function ensureGenericSkills(
   if (!dryRun) {
     mkdirSync(genericSkillsDir, { recursive: true });
   }
-  const namespaceDir = join(genericSkillsDir, 'spec-first');
-  if (!dryRun) {
-    mkdirSync(namespaceDir, { recursive: true });
-  }
 
   const created: string[] = [];
   for (const entry of skills) {
     if (!dryRun) {
-      const target = join(namespaceDir, entry.skillName);
+      const target = join(genericSkillsDir, entry.skillName);
       rmSync(target, { recursive: true, force: true });
       cpSync(entry.skillDir, target, { recursive: true });
     }
@@ -493,6 +486,10 @@ function cleanupLegacyCodexSkills(codexSkillsDir: string, skills: SkillEntry[]):
     const flat = join(codexSkillsDir, `spec-first-${removed}`);
     if (existsSync(nested)) rmSync(nested, { recursive: true, force: true });
     if (existsSync(flat)) rmSync(flat, { recursive: true, force: true });
+  }
+
+  if (existsSync(namespaceDir)) {
+    rmSync(namespaceDir, { recursive: true, force: true });
   }
 }
 

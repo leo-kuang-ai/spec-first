@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const CONTRACT = join(import.meta.dirname, '../../skills/spec-first/shared/orchestration-governance-contract.md');
+const CONTRACT = join(import.meta.dirname, '../../skills/shared/orchestration-governance-contract.md');
 
 function read(path: string): string {
   return readFileSync(path, 'utf-8');

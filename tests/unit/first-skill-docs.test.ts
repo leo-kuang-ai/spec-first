@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const FIRST_ROOT = join(import.meta.dirname, '../../skills/spec-first/00-first');
-const SKILLS_INDEX = join(import.meta.dirname, '../../skills/spec-first/README.md');
+const FIRST_ROOT = join(import.meta.dirname, '../../skills/00-first');
+const SKILLS_INDEX = join(import.meta.dirname, '../../skills/README.md');
 const SKILL_MD = join(FIRST_ROOT, 'SKILL.md');
 const EXECUTION_AND_ARCH = join(FIRST_ROOT, 'references/execution-and-agent-architecture.md');
 const MAIN_THREAD_CONTRACT = join(FIRST_ROOT, 'references/main-thread-and-evidence-contract.md');
@@ -186,9 +186,9 @@ describe('00-first skill docs consistency', () => {
 });
 
 
-const INIT_SKILL = join(import.meta.dirname, '../../skills/spec-first/01-init/SKILL.md');
-const INIT_PREREQ = join(import.meta.dirname, '../../skills/spec-first/01-init/references/prerequisites.md');
-const INIT_OUTPUT = join(import.meta.dirname, '../../skills/spec-first/01-init/references/prerequisites.md');
+const INIT_SKILL = join(import.meta.dirname, '../../skills/01-init/SKILL.md');
+const INIT_PREREQ = join(import.meta.dirname, '../../skills/01-init/references/prerequisites.md');
+const INIT_OUTPUT = join(import.meta.dirname, '../../skills/01-init/references/prerequisites.md');
 
 describe('runtime truth source and docs output model', () => {
   it('documents runtime truth source in 00-first skill', () => {

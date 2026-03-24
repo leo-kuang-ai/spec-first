@@ -51,16 +51,16 @@ function setupFixtures(): void {
   writeFileSync(join(CODEX_SKILLS, 'spec-first', 'init', 'SKILL.md'), '# init');
 
   // Gemini skills
-  mkdirSync(join(GEMINI_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
-  writeFileSync(join(GEMINI_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
+  mkdirSync(join(GEMINI_HOME, 'skills', 'init'), { recursive: true });
+  writeFileSync(join(GEMINI_HOME, 'skills', 'init', 'SKILL.md'), '# init');
 
   // Cursor skills
-  mkdirSync(join(CURSOR_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
-  writeFileSync(join(CURSOR_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
+  mkdirSync(join(CURSOR_HOME, 'skills', 'init'), { recursive: true });
+  writeFileSync(join(CURSOR_HOME, 'skills', 'init', 'SKILL.md'), '# init');
 
   // Generic skills
-  mkdirSync(join(GENERIC_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
-  writeFileSync(join(GENERIC_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
+  mkdirSync(join(GENERIC_HOME, 'skills', 'init'), { recursive: true });
+  writeFileSync(join(GENERIC_HOME, 'skills', 'init', 'SKILL.md'), '# init');
 
   // CC Switch skills
   mkdirSync(join(CC_SWITCH_SKILLS, 'spec-first', 'init'), { recursive: true });
@@ -142,9 +142,9 @@ describe('handleUninstall', () => {
     expect(existsSync(join(SF_SKILLS, 'spec-first'))).toBe(true);
     expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
-    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(true);
-    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(true);
-    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(true);
+    expect(existsSync(join(GEMINI_HOME, 'skills'))).toBe(true);
+    expect(existsSync(join(CURSOR_HOME, 'skills'))).toBe(true);
+    expect(existsSync(join(GENERIC_HOME, 'skills'))).toBe(true);
   });
 
   it('should remove skills cache directory', () => {
@@ -164,18 +164,18 @@ describe('handleUninstall', () => {
 
   it('should remove gemini and cursor skills directories', () => {
     handleUninstall([]);
-    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
-    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
-    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(GEMINI_HOME, 'skills'))).toBe(false);
+    expect(existsSync(join(CURSOR_HOME, 'skills'))).toBe(false);
+    expect(existsSync(join(GENERIC_HOME, 'skills'))).toBe(false);
   });
 
   it('should only remove selected host artifacts when --host gemini,cursor is provided', () => {
     handleUninstall(['--host', 'gemini,cursor']);
-    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
-    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(GEMINI_HOME, 'skills'))).toBe(false);
+    expect(existsSync(join(CURSOR_HOME, 'skills'))).toBe(false);
     expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
-    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(true);
+    expect(existsSync(join(GENERIC_HOME, 'skills'))).toBe(true);
   });
 
   it('should keep shared skills cache and cc-switch skills when uninstall is scoped by --host', () => {
@@ -186,7 +186,7 @@ describe('handleUninstall', () => {
 
   it('should remove generic skills directory when --host generic is provided', () => {
     handleUninstall(['--host', 'generic']);
-    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(GENERIC_HOME, 'skills'))).toBe(false);
     expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
   });
@@ -197,8 +197,8 @@ describe('handleUninstall', () => {
     expect(existsSync(join(CC_SWITCH_SKILLS, 'spec-first'))).toBe(false);
     expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(false);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(false);
-    expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
-    expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(GEMINI_HOME, 'skills'))).toBe(false);
+    expect(existsSync(join(CURSOR_HOME, 'skills'))).toBe(false);
   });
 
   it('should keep claude session hook when selected hosts exclude claude', () => {

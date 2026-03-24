@@ -3,7 +3,8 @@
  * Hook Installer + Commit + Feature CLI + Doctor Extended + AI Runtime Hook
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, symlinkSync, lstatSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync, symlinkSync, lstatSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { installHooks, uninstallHooks, checkHooks } from '../../src/core/tool-integration/hook-installer.js';
 import { generateAIHookConfigs, registerAIHooks, executePreToolUse, executeStopHook } from '../../src/core/tool-integration/ai-runtime-hook.js';
@@ -371,8 +372,13 @@ describe('handleCommit', () => {
   });
 
   it('should ignore legacy task flags and return git IO error when repository state is unavailable', () => {
-    const code = withCwd(TMP, () => handleCommit(['--message', 'test', '--task', 'INVALID']));
-    expect(code).toBe(ExitCode.IO_ERROR);
+    const repoFreeDir = mkdtempSync(join(tmpdir(), 'spec-first-commit-'));
+    try {
+      const code = withCwd(repoFreeDir, () => handleCommit(['--message', 'test', '--task', 'INVALID']));
+      expect(code).toBe(ExitCode.IO_ERROR);
+    } finally {
+      rmSync(repoFreeDir, { recursive: true, force: true });
+    }
   });
 });
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const CONTRACT = join(import.meta.dirname, '../../skills/spec-first/shared/background-quality-contract.md');
+const CONTRACT = join(import.meta.dirname, '../../skills/shared/background-quality-contract.md');
 
 function read(path: string): string {
   return readFileSync(path, 'utf-8');
@@ -38,8 +38,8 @@ describe('background quality shared contract', () => {
   });
 
   it('should anchor init and review to the shared contract', () => {
-    const initSkill = read(join(import.meta.dirname, '../../skills/spec-first/01-init/SKILL.md'));
-    const reviewSkill = read(join(import.meta.dirname, '../../skills/spec-first/08-review/SKILL.md'));
+    const initSkill = read(join(import.meta.dirname, '../../skills/01-init/SKILL.md'));
+    const reviewSkill = read(join(import.meta.dirname, '../../skills/08-review/SKILL.md'));
 
     expect(initSkill).toContain('shared/background-quality-contract.md');
     expect(initSkill).toContain('backgroundInputStatus');
@@ -51,8 +51,8 @@ describe('background quality shared contract', () => {
   });
 
   it('should keep verify aligned with the shared contract', () => {
-    const verifySkill = read(join(import.meta.dirname, '../../skills/spec-first/12-verify/SKILL.md'));
-    const verifyTemplate = read(join(import.meta.dirname, '../../skills/spec-first/12-verify/references/verify-report-template.md'));
+    const verifySkill = read(join(import.meta.dirname, '../../skills/12-verify/SKILL.md'));
+    const verifyTemplate = read(join(import.meta.dirname, '../../skills/12-verify/references/verify-report-template.md'));
 
     expect(verifySkill).toContain('shared/background-quality-contract.md');
     expect(verifySkill).toContain('pre-release-verification');
@@ -61,11 +61,11 @@ describe('background quality shared contract', () => {
   });
 
   it('should keep status and analyze aligned with the shared contract', () => {
-    const statusSkill = read(join(import.meta.dirname, '../../skills/spec-first/14-status/SKILL.md'));
-    const statusTemplate = read(join(import.meta.dirname, '../../skills/spec-first/14-status/references/status-dashboard-template.md'));
-    const analyzeSkill = read(join(import.meta.dirname, '../../skills/spec-first/21-analyze/SKILL.md'));
-    const analyzeRules = read(join(import.meta.dirname, '../../skills/spec-first/21-analyze/references/analysis-rules.md'));
-    const analyzeTemplate = read(join(import.meta.dirname, '../../skills/spec-first/21-analyze/references/report-format.md'));
+    const statusSkill = read(join(import.meta.dirname, '../../skills/14-status/SKILL.md'));
+    const statusTemplate = read(join(import.meta.dirname, '../../skills/14-status/references/status-dashboard-template.md'));
+    const analyzeSkill = read(join(import.meta.dirname, '../../skills/21-analyze/SKILL.md'));
+    const analyzeRules = read(join(import.meta.dirname, '../../skills/21-analyze/references/analysis-rules.md'));
+    const analyzeTemplate = read(join(import.meta.dirname, '../../skills/21-analyze/references/report-format.md'));
 
     expect(statusSkill).toContain('shared/background-quality-contract.md');
     expect(statusTemplate).toContain('background_input_status');
@@ -82,8 +82,8 @@ describe('background quality shared contract', () => {
   });
 
   it('should keep doctor and spec aligned with the shared contract', () => {
-    const doctorSkill = read(join(import.meta.dirname, '../../skills/spec-first/15-doctor/SKILL.md'));
-    const specSkill = read(join(import.meta.dirname, '../../skills/spec-first/03-spec/SKILL.md'));
+    const doctorSkill = read(join(import.meta.dirname, '../../skills/15-doctor/SKILL.md'));
+    const specSkill = read(join(import.meta.dirname, '../../skills/03-spec/SKILL.md'));
 
     expect(doctorSkill).toContain('shared/background-quality-contract.md');
     expect(doctorSkill).toContain('background_input_status');

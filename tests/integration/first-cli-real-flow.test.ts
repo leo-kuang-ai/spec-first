@@ -101,7 +101,15 @@ function writeStageState(featureId: string, currentStage: Stage): void {
     ...current,
     currentStage,
     terminal: false,
-    nodes: current.nodes ?? {},
+    nodes: {
+      ...(current.nodes ?? {}),
+      [currentStage]: {
+        ...(current.nodes?.[currentStage] ?? {}),
+        status: 'done',
+        checklistStatus: 'complete',
+        canMarkDone: true,
+      },
+    },
     updatedAt: '2026-03-16T00:00:00.000Z',
   };
   writeFileSync(stagePath, JSON.stringify(nextState, null, 2) + '\n', 'utf-8');
@@ -109,12 +117,13 @@ function writeStageState(featureId: string, currentStage: Stage): void {
 
 function seedReleaseDeliverables(featureId: string): void {
   const specDir = join(TMP, 'specs', featureId);
-  mkdirSync(join(specDir, 'reports'), { recursive: true });
   writeFileSync(join(specDir, 'findings.md'), '# Findings\n', 'utf-8');
   writeFileSync(join(specDir, 'spec.md'), '# Spec\n', 'utf-8');
-  writeFileSync(join(specDir, 'retro.md'), '# Retro\n', 'utf-8');
-  writeFileSync(join(specDir, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
-  writeFileSync(join(specDir, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');
+  writeFileSync(join(specDir, 'design.md'), '# Design\n', 'utf-8');
+  writeFileSync(join(specDir, 'task_plan.md'), '# Task Plan\n', 'utf-8');
+  writeFileSync(join(specDir, 'verify.md'), '# Verify\n', 'utf-8');
+  writeFileSync(join(specDir, 'wrap_up.md'), '# Wrap Up\n', 'utf-8');
+  writeFileSync(join(specDir, 'release.md'), '# Release\n', 'utf-8');
 }
 
 beforeEach(() => {

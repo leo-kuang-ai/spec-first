@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const FIRST_REFS = join(import.meta.dirname, '../../skills/spec-first/00-first/references');
+const FIRST_REFS = join(import.meta.dirname, '../../skills/00-first/references');
 
 const MAIN_THREAD_CONTRACT = join(FIRST_REFS, 'main-thread-and-evidence-contract.md');
 const EXECUTION_AND_ARCH = join(FIRST_REFS, 'execution-and-agent-architecture.md');

@@ -34,7 +34,7 @@ describe('postinstall', () => {
         claude: false,
         codex: false,
         claudePath: '/tmp/claude/commands/spec-first',
-        codexPath: '/tmp/codex/skills/spec-first',
+        codexPath: '/tmp/codex/skills',
       },
       claudeInstallation: {
         installed: true,
@@ -64,7 +64,7 @@ describe('postinstall', () => {
         claude: false,
         codex: false,
         claudePath: '/tmp/claude/commands/spec-first',
-        codexPath: '/tmp/codex/skills/spec-first',
+        codexPath: '/tmp/codex/skills',
       },
       claudeInstallation: {
         installed: false,
@@ -121,7 +121,7 @@ describe('postinstall', () => {
         claude: true,
         codex: false,
         claudePath: '/tmp/claude/commands/spec-first',
-        codexPath: '/tmp/codex/skills/spec-first',
+        codexPath: '/tmp/codex/skills',
       },
       claudeInstallation: {
         installed: true,
@@ -152,7 +152,7 @@ describe('postinstall', () => {
         claude: true,
         codex: true,
         claudePath: '/tmp/claude/commands/spec-first',
-        codexPath: '/tmp/codex/skills/spec-first',
+        codexPath: '/tmp/codex/skills',
       },
       claudeInstallation: {
         installed: true,

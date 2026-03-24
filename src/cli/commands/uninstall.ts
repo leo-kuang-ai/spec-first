@@ -108,7 +108,7 @@ function removeHostUserArtifacts(
   hosts?: HostId[]
 ): void {
   if (!hosts || hosts.length === 0) {
-    removeDir(`${prefix}Skills 缓存`, join(paths.specFirstSkillsDir, 'spec-first'), dryRun);
+    removeDir(`${prefix}Skills 缓存`, paths.specFirstSkillsDir, dryRun);
   } else {
     console.log(`${prefix}Skills 缓存: 检测到 --host 定向卸载，已跳过`);
   }
@@ -118,28 +118,28 @@ function removeHostUserArtifacts(
     console.log(`${prefix}Claude 命令: 当前宿主集合不包含 claude，跳过`);
   }
   if (shouldIncludeHost(hosts, 'codex')) {
-    removeDir(`${prefix}Codex skills`, join(paths.codexSkillsDir, 'spec-first'), dryRun);
+    removeDir(`${prefix}Codex skills`, paths.codexSkillsDir, dryRun);
   } else {
     console.log(`${prefix}Codex skills: 当前宿主集合不包含 codex，跳过`);
   }
   if (shouldIncludeHost(hosts, 'gemini')) {
-    removeDir(`${prefix}Gemini skills`, join(paths.geminiHomeDir, 'skills', 'spec-first'), dryRun);
+    removeDir(`${prefix}Gemini skills`, join(paths.geminiHomeDir, 'skills'), dryRun);
   } else {
     console.log(`${prefix}Gemini skills: 当前宿主集合不包含 gemini，跳过`);
   }
   if (shouldIncludeHost(hosts, 'cursor')) {
-    removeDir(`${prefix}Cursor skills`, join(paths.cursorHomeDir, 'skills', 'spec-first'), dryRun);
+    removeDir(`${prefix}Cursor skills`, join(paths.cursorHomeDir, 'skills'), dryRun);
   } else {
     console.log(`${prefix}Cursor skills: 当前宿主集合不包含 cursor，跳过`);
   }
   if (shouldIncludeHost(hosts, 'generic')) {
-    removeDir(`${prefix}Generic skills`, join(paths.genericSkillsDir, 'spec-first'), dryRun);
+    removeDir(`${prefix}Generic skills`, paths.genericSkillsDir, dryRun);
   } else {
     console.log(`${prefix}Generic skills: 当前宿主集合不包含 generic，跳过`);
   }
 
   if (paths.ccSwitchInstalled && (!hosts || hosts.length === 0)) {
-    removeDir(`${prefix}CC Switch skills`, join(paths.ccSwitchSkillsDir, 'spec-first'), dryRun);
+    removeDir(`${prefix}CC Switch skills`, paths.ccSwitchSkillsDir, dryRun);
   } else if (paths.ccSwitchInstalled) {
     console.log(`${prefix}CC Switch skills: 检测到 --host 定向卸载，已跳过`);
   }

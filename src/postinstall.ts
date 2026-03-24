@@ -50,7 +50,7 @@ export function isGlobalInstall(context: InstallDetectionContext = {}): boolean 
 export function checkSkillsRegistered(): SkillRegistrationStatus {
   const hostPaths = detectHostPaths();
   const claudePath = join(hostPaths.claudeCommandsDir, 'spec-first');
-  const codexPath = join(hostPaths.codexSkillsDir, 'spec-first');
+  const codexPath = hostPaths.codexSkillsDir;
 
   return {
     claude: existsSync(claudePath),
