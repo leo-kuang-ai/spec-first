@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import { ExitCode, type BackgroundInputStatus, type StageState } from '../../shared/types.js';
+import { ExitCode, type BackgroundInputStatus, type FeatureState } from '../../shared/types.js';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { currentFeature, resolveFeatureId } from '../../core/process-engine/feature.js';
 import { readTaskPlan } from '../../core/task-plan/parser.js';
@@ -34,7 +34,7 @@ export function handleStatus(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const state = readJson<StageState>(stageStatePath);
+  const state = readJson<FeatureState>(stageStatePath);
   const taskPlan = readTaskPlan(projectRoot, featureId);
   const taskCounts = summarizeTaskCounts(taskPlan);
   const background = readBackgroundLayers(projectRoot, state);
@@ -72,9 +72,9 @@ export function handleStatus(args: string[]): number {
   console.log(`标题: ${state.title ?? 'N/A'}`);
   console.log(`当前阶段: ${state.currentStage}`);
   console.log(`阶段状态: ${state.stageStatus ?? 'drafting'}`);
-  console.log(`模式: ${state.mode}`);
-  console.log(`规模: ${state.size}`);
-  console.log(`平台: ${state.platforms.join(', ')}`);
+  console.log(`模式: ${state.mode ?? 'N/A'}`);
+  console.log(`规模: ${state.size ?? 'N/A'}`);
+  console.log(`平台: ${state.platforms?.join(', ') ?? 'N/A'}`);
   console.log('');
   console.log(`background_input_status: ${background.backgroundInputStatus}`);
   console.log(`runtime 真源: ${background.runtimeTruth}`);
@@ -142,7 +142,7 @@ function summarizeTaskCounts(
   return counts;
 }
 
-function readBackgroundLayers(projectRoot: string, state: StageState): BackgroundLayers {
+function readBackgroundLayers(projectRoot: string, state: FeatureState): BackgroundLayers {
   const runtimeIndex = readFirstRuntimeIndex(projectRoot);
   if (!runtimeIndex) {
     return {
@@ -165,7 +165,7 @@ function readBackgroundLayers(projectRoot: string, state: StageState): Backgroun
   };
 }
 
-function fallbackSuggestedCommand(currentStage: StageState['currentStage']): string | undefined {
+function fallbackSuggestedCommand(currentStage: FeatureState['currentStage']): string | undefined {
   switch (currentStage) {
     case '00_init':
       return '/spec-first:init';

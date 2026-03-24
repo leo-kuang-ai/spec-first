@@ -51,7 +51,7 @@ import { type SkillExecutionContext } from './execution-context.js';
 import { REMOVED_SKILLS } from '../rules/truth-source.js';
 import type {
   BackgroundInputStatus as OrchestrateBackgroundInputStatus,
-  StageState,
+  FeatureState,
 } from '../../shared/types.js';
 
 export interface DispatchResult {
@@ -235,7 +235,7 @@ function resolveOrchestrateBackgroundGuidance(executionContext: SkillExecutionCo
 
   try {
     const state = readJson<
-      StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }
+      FeatureState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }
     >(statePath);
     const backgroundStatus = state.backgroundInputStatus ?? 'blind';
     const highRiskAssessment = resolveOrchestrateHighRiskAssessment(projectRoot, featureId);
@@ -999,7 +999,7 @@ function buildReviewRuntimeNotice(executionContext: SkillExecutionContext): stri
       if (highRiskAssessment?.isHighRisk) {
         const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
         if (exists(statePath)) {
-          const state = readJson<StageState>(statePath);
+          const state = readJson<FeatureState>(statePath);
           const riskCategory = resolveOrchestrateRiskCategory(
             state.currentStage,
             highRiskAssessment
@@ -1030,7 +1030,7 @@ function buildPlanRuntimeNotice(executionContext: SkillExecutionContext): string
     if (!exists(statePath)) return undefined;
 
     const state = readJson<
-      StageState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }
+      FeatureState & { backgroundInputStatus?: OrchestrateBackgroundInputStatus }
     >(statePath);
     const context = resolveSkillContext(projectRoot, 'plan', featureId);
     const parts = ['<!-- plan-runtime-context -->', '## Plan Context'];
@@ -1136,7 +1136,7 @@ function buildVerifyRuntimeNotice(executionContext: SkillExecutionContext): stri
     const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
     if (!exists(statePath)) return notice;
 
-    const state = readJson<StageState>(statePath);
+    const state = readJson<FeatureState>(statePath);
     if (state.currentStage !== '05_verify') return notice;
 
     return notice.replace(

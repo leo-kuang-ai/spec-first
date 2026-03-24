@@ -1,4 +1,7 @@
-import { ExitCode } from '../../shared/types.js';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { ExitCode, Stage, type FeatureState } from '../../shared/types.js';
+import { exists } from '../../shared/fs-utils.js';
 import {
   currentFeature,
   getFeatureState,
@@ -8,21 +11,15 @@ import {
   validateOrchestrateArgs,
   OrchestrateArgsError,
 } from '../../core/skill-runtime/orchestrate-args.js';
-import { loadTodoState } from '../../core/ai-orchestrator/todo-runner.js';
 import { runAutoLoop } from '../../core/ai-orchestrator/auto-loop.js';
 import type {
   TaskExecutor,
   AutoLoopResult,
   AutoLoopStatus,
 } from '../../core/ai-orchestrator/auto-loop.js';
-import { evaluateGate } from '../../core/gate-engine/gate-evaluator.js';
-import { checkDependencies } from '../../core/process-engine/dependency-checker.js';
-import {
-  advance,
-  GateFailedError,
-  GateUnavailableError,
-} from '../../core/process-engine/advance.js';
-import { decideNextStep, getNextStage } from '../../core/process-engine/next-step-decider.js';
+import { advance } from '../../core/process-engine/advance.js';
+import { checkReadiness } from '../../core/process-engine/readiness-check.js';
+import { getNextStages } from '../../core/process-engine/stage-machine.js';
 import { loadConfig, resetConfigCache } from '../../shared/config-schema.js';
 
 const AUTO_LOOP_STATUS_MESSAGES: Record<AutoLoopStatus, string> = {
@@ -54,26 +51,31 @@ function resolveFeatureOrCurrent(requested: string | undefined, projectRoot: str
   return resolveFeatureId(current, projectRoot).featureId;
 }
 
+function getForwardStage(currentStage: Stage): Stage | undefined {
+  return getNextStages(currentStage).find((stage) => stage !== Stage.CANCELLED);
+}
+
+function collectArtifacts(projectRoot: string, featureId: string): string[] {
+  const featureDir = join(projectRoot, 'specs', featureId);
+  if (!exists(featureDir)) return [];
+  return readdirSync(featureDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
+}
+
 function printDecision(
   featureId: string,
-  currentStage: string,
-  stageStatus: string | undefined,
-  result: ReturnType<typeof decideNextStep>
+  state: FeatureState,
+  result: ReturnType<typeof checkReadiness>
 ): void {
   console.log(`Feature：${featureId}`);
-  console.log(`当前阶段：${currentStage}`);
-  console.log(`阶段子状态：${stageStatus ?? 'drafting'}`);
-  if (result.nextStage) {
-    console.log(`下一阶段：${result.nextStage}`);
-  }
+  console.log(`当前阶段：${state.currentStage}`);
+  console.log(`目标阶段：${result.targetStage}`);
   console.log(`决策：${result.decision}`);
-  if (result.suggestedCommand) {
-    console.log(`建议命令：${result.suggestedCommand}`);
-  }
-  if (result.reasons.length > 0) {
-    console.log('阻塞原因：');
-    for (const reason of result.reasons) {
-      console.log(`  - ${reason}`);
+  if (result.checks.warnings.length > 0) {
+    console.log('警告：');
+    for (const warning of result.checks.warnings) {
+      console.log(`  - ${warning}`);
     }
   }
 }
@@ -89,7 +91,6 @@ export async function handleOrchestrate(
     const orchestrateArgs = validateOrchestrateArgs(args);
     const featureId = resolveFeatureOrCurrent(pickFeatureToken(args), projectRoot);
 
-    // enabled 配置联动：--auto 标志 OR config enabled=true → auto 模式
     const isAutoMode = orchestrateArgs.mode === 'auto' || cfg.runtime.auto_orchestrate.enabled;
 
     let autoLoopResult: AutoLoopResult | undefined;
@@ -99,11 +100,7 @@ export async function handleOrchestrate(
         projectRoot,
         args: orchestrateArgs,
         executor: options.executor,
-        onIteration: (iteration, state) => {
-          const done = state.items.filter((i) => i.status === 'done').length;
-          const total = state.items.length;
-          console.log(`  [auto-loop] 迭代 ${iteration}: ${done}/${total} 任务完成`);
-        },
+        onIteration: () => undefined,
       });
       console.log(`auto-loop: ${AUTO_LOOP_STATUS_MESSAGES[autoLoopResult.status]}`);
       if (autoLoopResult.haltReason) {
@@ -112,38 +109,31 @@ export async function handleOrchestrate(
     }
 
     const state = getFeatureState(featureId, projectRoot);
-    const upcomingStage = getNextStage(state.currentStage);
-    const decision = decideNextStep({
-      featureId,
+    const nextStage = getForwardStage(state.currentStage);
+    if (!nextStage) {
+      console.log(`Feature：${featureId}`);
+      console.log(`当前阶段：${state.currentStage}`);
+      console.log(`决策：BLOCKED`);
+      return ExitCode.SUCCESS;
+    }
+
+    const readiness = checkReadiness({
       currentStage: state.currentStage,
-      stageStatus: state.stageStatus,
-      autoAdvancePolicy: state.autoAdvancePolicy,
-      gateStatus:
-        state.stageStatus === 'ready_to_advance'
-          ? evaluateGate(featureId, projectRoot, { persist: false }).status
-          : undefined,
-      dependencyCheck: upcomingStage
-        ? checkDependencies(
-            featureId,
-            upcomingStage,
-            projectRoot,
-            state.mergedRules?.profile ?? 'default-simplified'
-          )
-        : undefined,
-      todoState: loadTodoState(featureId, projectRoot),
-      autoLoopStatus: autoLoopResult?.status,
+      targetStage: nextStage,
+      nodes: state.nodes,
+      artifacts: collectArtifacts(projectRoot, featureId),
+      terminal: state.terminal,
     });
 
-    printDecision(featureId, state.currentStage, state.stageStatus, decision);
+    printDecision(featureId, state, readiness);
 
     if (
       orchestrateArgs.autoAdvance === true &&
-      (decision.decision === 'READY_TO_ADVANCE' || decision.decision === 'AUTO_ADVANCE') &&
+      readiness.decision === 'READY_TO_ADVANCE' &&
       (!autoLoopResult || autoLoopResult.status === 'all_done')
     ) {
       const advanceResult = advance(featureId, projectRoot);
       console.log(`已推进：${advanceResult.from} → ${advanceResult.to}`);
-      console.log(`Gate：${advanceResult.gateResult}`);
     }
 
     return ExitCode.SUCCESS;
@@ -151,10 +141,6 @@ export async function handleOrchestrate(
     if (error instanceof OrchestrateArgsError) {
       console.error(error.message);
       return ExitCode.VALIDATION_ERROR;
-    }
-    if (error instanceof GateFailedError || error instanceof GateUnavailableError) {
-      console.error(`Gate 阻断：${error.message}`);
-      return ExitCode.GATE_FAILED;
     }
     console.error(`错误：${(error as Error).message}`);
     return ExitCode.IO_ERROR;

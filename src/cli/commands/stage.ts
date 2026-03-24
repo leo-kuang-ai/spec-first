@@ -118,8 +118,8 @@ function handleCurrent(args: string[]): number {
     console.log(`Feature：${state.featureId}`);
     console.log(`目录：  ${featureDir}`);
     console.log(`阶段：   ${state.currentStage}`);
-    console.log(`平台：   ${state.platforms.join(', ') || '(无)'}`);
-    console.log(`模式：   ${state.mode}  规模：${state.size}`);
+    console.log(`平台：   ${state.platforms?.join(', ') || '(无)'}`);
+    console.log(`模式：   ${state.mode ?? 'N/A'}  规模：${state.size ?? 'N/A'}`);
     console.log(`终态：${state.terminal}`);
 
     const hookStatuses = checkHooks(projectRoot);
