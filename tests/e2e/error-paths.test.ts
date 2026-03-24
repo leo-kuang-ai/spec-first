@@ -12,6 +12,7 @@ import { getFeatureState } from '../../src/core/process-engine/feature.js';
 import { preWriteArchive } from '../../src/core/skill-runtime/phase-machine.js';
 import { createRfc, getRfc, transitionRfc } from '../../src/core/change-mgr/rfc.js';
 import { registerDefect, getDefect, transitionDefect } from '../../src/core/change-mgr/defect.js';
+import type { FeatureState } from '../../src/shared/types.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-e2e-error');
 
@@ -28,10 +29,10 @@ function setupProject(): void {
 beforeEach(() => setupProject());
 afterEach(() => rmSync(TMP, { recursive: true, force: true }));
 
-// ─── Gate FAIL 阻断 ─────────────────────────────────────
+// ─── 节点就绪阻断 ─────────────────────────────────────
 
-describe('Gate FAIL blocking', () => {
-  it('should block advance when gate result is FAIL', () => {
+describe('Node readiness blocking', () => {
+  it('should block advance when current node is not complete', () => {
     writeFileSync(join(TMP, '.spec-first', 'config.yaml'), yaml.dump({
       version: '1.0', project: 'e2e',
       gate: { pilot_mode: false },
@@ -40,14 +41,13 @@ describe('Gate FAIL blocking', () => {
       feat: 'BLK', mode: 'N', size: 'S', platforms: ['h5'], projectRoot: TMP,
     });
     advance(featureId, TMP); // 00_init -> 01_specify
-    // 为 DESIGN 阶段准备必需文件，当前简化模型允许推进
+    // 即使补齐目标节点产物，只要当前节点未完成，仍不能推进
     writeFileSync(join(TMP, 'specs', featureId, 'prd.md'), '# PRD');
     writeFileSync(join(TMP, 'specs', featureId, 'spec.md'), 'Feature ID: BLK\n');
-    const result = advance(featureId, TMP);
-    expect(result.to).toBe('02_design');
+    expect(() => advance(featureId, TMP)).toThrow(/节点未就绪/);
   });
 
-  it('should allow advance with gate PASS', () => {
+  it('should allow advance after current node is explicitly completed', () => {
     writeFileSync(join(TMP, '.spec-first', 'config.yaml'), yaml.dump({
       version: '1.0', project: 'e2e',
       gate: { pilot_mode: true },
@@ -55,9 +55,33 @@ describe('Gate FAIL blocking', () => {
     const { featureId } = init({
       feat: 'PLT', mode: 'N', size: 'S', platforms: ['h5'], projectRoot: TMP,
     });
+    advance(featureId, TMP); // 00_init -> 01_specify
+    const stagePath = join(TMP, 'specs', featureId, 'stage-state.json');
+    const state = JSON.parse(readFileSync(stagePath, 'utf-8')) as FeatureState;
     writeFileSync(join(TMP, 'specs', featureId, 'spec.md'), '# Spec');
+    writeFileSync(
+      stagePath,
+      JSON.stringify(
+        {
+          ...state,
+          nodes: {
+            ...(state.nodes ?? {}),
+            '01_specify': {
+              ...(state.nodes?.['01_specify'] ?? {}),
+              status: 'done',
+              checklistStatus: 'complete',
+              canMarkDone: true,
+            },
+          },
+        },
+        null,
+        2
+      ),
+      'utf-8'
+    );
     const result = advance(featureId, TMP);
     expect(result.gateResult).toBe('TRANSITIONED');
+    expect(result.to).toBe('02_design');
   });
 });
 

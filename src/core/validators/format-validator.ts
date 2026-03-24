@@ -1,11 +1,9 @@
 /**
  * 格式校验器
- * 校验 PRD 章节、文档关联文件、必需字段
+ * 校验 PRD 章节、基础产物与必需字段
  */
 import { join } from 'node:path';
 import { exists, readMarkdown } from '../../shared/fs-utils.js';
-import { loadDocumentLinks, validateDocumentLinksData } from '../document-links.js';
-import yaml from 'js-yaml';
 
 export interface FormatValidationResult {
   pass: boolean;
@@ -17,7 +15,6 @@ export function validateFormat(featureId: string, projectRoot: string): FormatVa
   errors.push(...validatePrdFormat(featureId, projectRoot));
   errors.push(...validateFilePaths(featureId, projectRoot));
   errors.push(...validateRequiredFields(featureId, projectRoot));
-  errors.push(...validateDocumentLinksFormat(featureId, projectRoot));
   return { pass: errors.length === 0, errors };
 }
 
@@ -44,7 +41,7 @@ function validatePrdFormat(featureId: string, projectRoot: string): string[] {
 
 function validateFilePaths(featureId: string, projectRoot: string): string[] {
   const specDir = join(projectRoot, 'specs', featureId);
-  const requiredFiles = ['spec.md', 'document-links.yaml'];
+  const requiredFiles = ['spec.md'];
 
   return requiredFiles
     .filter((file) => !exists(join(specDir, file)))
@@ -58,30 +55,4 @@ function validateRequiredFields(featureId: string, projectRoot: string): string[
   const content = readMarkdown(specPath);
   const hasFeatureIdField = /^(?:\*\*)?Feature ID(?:\*\*)?\s*:/m.test(content);
   return hasFeatureIdField ? [] : ['spec.md 缺少 Feature ID 字段'];
-}
-
-function validateDocumentLinksFormat(featureId: string, projectRoot: string): string[] {
-  const filePath = join(projectRoot, 'specs', featureId, 'document-links.yaml');
-  if (!exists(filePath)) return [];
-
-  try {
-    const raw = readMarkdown(filePath);
-    const parsed = yaml.load(raw, { schema: yaml.JSON_SCHEMA });
-    const result = validateDocumentLinksData(parsed);
-    return result.valid ? [] : result.errors;
-  } catch (error) {
-    return [`document-links.yaml 解析失败：${error instanceof Error ? error.message : String(error)}`];
-  }
-}
-
-export function validateLinks(featureId: string, projectRoot: string): FormatValidationResult {
-  try {
-    loadDocumentLinks(featureId, projectRoot);
-    return { pass: true, errors: [] };
-  } catch (error) {
-    return {
-      pass: false,
-      errors: [error instanceof Error ? error.message : String(error)],
-    };
-  }
 }

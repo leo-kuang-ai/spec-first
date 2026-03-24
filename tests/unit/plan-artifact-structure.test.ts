@@ -18,7 +18,8 @@ afterEach(() => {
 describe('plan artifact structure', () => {
   it('documents task plan structure with implementation and verification fields', () => {
     const template = readFileSync(join(DOC_ROOT, '06-task/references/task-template.md'), 'utf-8');
-    expect(template).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |');
+    expect(template).toContain('| title | status | summary | next_step | owner | notes |');
+    expect(template).toContain('## Plan Status');
     expect(template).toContain('## 实施步骤');
     expect(template).toContain('## 验证命令');
   });
@@ -40,7 +41,8 @@ describe('plan artifact structure', () => {
     expect(findings).toContain('## Plan Summary');
     expect(findings).toContain('## Execution Evidence');
     expect(findings).toContain('## Next Steps');
-    expect(taskPlan).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |');
+    expect(taskPlan).toContain('| title | status | summary | next_step | owner | notes |');
+    expect(taskPlan).toContain('## Plan Status');
     expect(taskPlan).toContain('## 实施步骤');
   });
 });

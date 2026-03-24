@@ -46,4 +46,26 @@ describe('task-plan parser', () => {
       },
     ]);
   });
+
+  it('rejects duplicate task titles', () => {
+    expect(() =>
+      parseTaskPlanContent([
+        '| title | status | summary | next_step |',
+        '|---|---|---|---|',
+        '| 登录接口改造 | todo | - | - |',
+        '| 登录接口改造 | in_progress | - | - |',
+      ].join('\n'))
+    ).toThrow(/标题必须唯一/);
+  });
+
+  it('rejects multiple in_progress tasks', () => {
+    expect(() =>
+      parseTaskPlanContent([
+        '| title | status | summary | next_step |',
+        '|---|---|---|---|',
+        '| A | in_progress | - | - |',
+        '| B | in_progress | - | - |',
+      ].join('\n'))
+    ).toThrow(/最多只能有一个 in_progress/);
+  });
 });

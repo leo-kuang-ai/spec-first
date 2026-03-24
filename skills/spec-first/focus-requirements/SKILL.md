@@ -26,17 +26,17 @@ allowed-tools:
 
 ## 输入上下文
 
-执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+执行此 skill 时，优先从 `.spec-first/runtime/first/` 加载以下产物：
 
 | 产物 | 优先级 | 用途 |
 |------|--------|------|
-| `summary` | **必需** | 项目概览，理解技术栈和模块划分 |
+| `summary` | 推荐 | 项目概览，理解技术栈和模块划分 |
 | `domain-model` | 推荐 | 领域模型，理解业务概念 |
 | `critical-flows` | 推荐 | 关键流程，理解业务链路 |
 | `conventions` | 推荐 | 编码规范，确保输出边界一致 |
 | `entry-guide` | 可选 | 入口指南，快速定位实现位置 |
 
-> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+> **降级模式**: first 产物是"优化"而非"必需"。如果不存在，直接从源需求工作，跳过上下文加载。输出质量可能略低（缺少项目上下文），但功能完整。对于简单需求（如文案更新、UI 微调），降级模式完全够用。
 
 
 ## Preamble (run first)
@@ -144,9 +144,9 @@ work is already done:
 - workspace is already prepared
 
 If the user needs to create the source requirement from scratch, do **not** send
-them to `/spec` (there is no `/spec` skill in this repo). Use `/brainstorm`
-first to create the initial requirement/design doc, then come back here with the
-reviewed source requirement for narrowing.
+them to `/spec` (there is no `/spec` skill in this repo). Use
+`/spec-first:spec` first to create the initial requirement/spec doc, then come
+back here with the reviewed source requirement for narrowing.
 
 If those conditions are not true, stop with `BLOCKED`.
 

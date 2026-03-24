@@ -120,6 +120,14 @@ export function parseTaskPlanContent(content: string): ParsedTaskPlan {
     blocked: tasks.filter((task) => task.status === 'blocked').length,
   };
 
+  const uniqueTitles = new Set(tasks.map((task) => task.title));
+  if (uniqueTitles.size !== tasks.length) {
+    throw new Error('task_plan.md 任务标题必须唯一');
+  }
+  if (stats.inProgress > 1) {
+    throw new Error('task_plan.md 最多只能有一个 in_progress 任务');
+  }
+
   return {
     tasks,
     currentTaskTitle: tasks.find((task) => task.status === 'in_progress')?.title,

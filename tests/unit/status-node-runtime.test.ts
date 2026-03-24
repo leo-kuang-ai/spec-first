@@ -24,11 +24,6 @@ beforeEach(() => {
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
   process.cwd = () => TMP;
   writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
-  writeFileSync(
-    join(TMP, 'specs', FEAT, 'document-links.yaml'),
-    ['version: 1', `featureId: ${FEAT}`, 'documents: []', ''].join('\n'),
-    'utf-8'
-  );
 });
 
 afterEach(() => {
@@ -67,7 +62,41 @@ describe('status node runtime', () => {
     const { code, output } = capture(() => handleStatus([]));
     expect(code).toBe(0);
     expect(output).toContain('节点状态: blocked');
+    expect(output).toContain('文档指标: 不可用');
+    expect(output).toContain('健康分: N/A');
     expect(output).toContain('恢复建议:');
     expect(output).toContain('task_plan.md');
+  });
+
+  it('suggests transition when current node is done and next stage is ready', () => {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        currentStage: '01_specify',
+        terminal: false,
+        nodes: {
+          '01_specify': {
+            status: 'done',
+            summary: '需求规格已完成',
+            checklistStatus: 'complete',
+            canMarkDone: true,
+          },
+        },
+        createdAt: '2026-03-24T00:00:00.000Z',
+        updatedAt: '2026-03-24T00:00:00.000Z',
+      }),
+      'utf-8'
+    );
+    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'task_plan.md'),
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| 设计任务 | todo | 待开始 | 进入设计 |\n',
+      'utf-8'
+    );
+
+    const { code, output } = capture(() => handleStatus([]));
+    expect(code).toBe(0);
+    expect(output).toContain(`建议下一步: spec-first transition ${FEAT}`);
   });
 });

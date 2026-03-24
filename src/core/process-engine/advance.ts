@@ -8,6 +8,8 @@ import { exists, readJson, writeJson, writeMarkdown } from '../../shared/fs-util
 import { isTerminal } from './stage-machine.js';
 import { getNextStage } from './next-step-decider.js';
 import { applyTransition } from './transition.js';
+import { checkReadiness } from './readiness-check.js';
+import { readdirSync } from 'node:fs';
 
 export class GateUnavailableError extends Error {
   constructor(message = 'GateEngine 不可用') {
@@ -47,6 +49,14 @@ function saveState(featureId: string, root: string, state: FeatureState): void {
   writeJson(getStatePath(featureId, root), state);
 }
 
+function collectArtifacts(featureId: string, root: string): string[] {
+  const featureDir = join(root, 'specs', featureId);
+  if (!exists(featureDir)) return [];
+  return readdirSync(featureDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
+}
+
 export function advance(
   featureId: string,
   projectRoot: string,
@@ -62,6 +72,19 @@ export function advance(
   const to = getNextStage(from);
   if (!to) {
     throw new Error(`阶段 ${from} 之后不存在下一阶段`);
+  }
+
+  const readiness = checkReadiness({
+    currentStage: from,
+    targetStage: to,
+    nodes: state.nodes,
+    artifacts: collectArtifacts(featureId, projectRoot),
+    terminal: state.terminal,
+  });
+  if (readiness.decision !== 'READY_TO_ADVANCE') {
+    throw new Error(
+      `节点未就绪，无法推进：decision=${readiness.decision}, previousNodeComplete=${readiness.checks.previousNodeComplete}, requiredArtifactsExist=${readiness.checks.requiredArtifactsExist}`
+    );
   }
 
   const nextState = applyTransition(state, to);
@@ -89,7 +112,7 @@ export function cancel(featureId: string, projectRoot: string, reason: string): 
     throw new Error(`Feature ${featureId} 已处于终态阶段 ${from}`);
   }
 
-  const nextState = applyTransition(state, Stage.CANCELLED);
+  const nextState = applyTransition(state, Stage.CANCELLED, { reason });
   saveState(featureId, projectRoot, nextState);
 
   const currentFile = join(projectRoot, '.spec-first/current');

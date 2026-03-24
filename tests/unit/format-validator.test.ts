@@ -20,8 +20,6 @@ describe('format-validator', () => {
       '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
       'Feature ID: TEST-FEAT-001\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'document-links.yaml'),
-      'version: 1\nfeatureId: TEST-FEAT-001\ndocuments:\n  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: []\n');
 
     const result = validateFormat(FEATURE_ID, TEST_ROOT);
     expect(result.pass).toBe(true);
@@ -33,8 +31,6 @@ describe('format-validator', () => {
       '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
       '**Feature ID**: TEST-FEAT-001\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'document-links.yaml'),
-      'version: 1\nfeatureId: TEST-FEAT-001\ndocuments:\n  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: []\n');
 
     const result = validateFormat(FEATURE_ID, TEST_ROOT);
     expect(result.pass).toBe(true);
@@ -46,8 +42,6 @@ describe('format-validator', () => {
       '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
       '# Spec — FSREQ-20260312-AUTH-001\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'document-links.yaml'),
-      'version: 1\nfeatureId: TEST-FEAT-001\ndocuments:\n  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: []\n');
 
     const result = validateFormat(FEATURE_ID, TEST_ROOT);
     expect(result.pass).toBe(false);
@@ -59,42 +53,10 @@ describe('format-validator', () => {
       '## 1. 业务目标\n');
     writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
       'Feature ID: TEST-FEAT-001\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'document-links.yaml'),
-      'version: 1\nfeatureId: TEST-FEAT-001\ndocuments:\n  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: []\n');
 
     const result = validateFormat(FEATURE_ID, TEST_ROOT);
     expect(result.pass).toBe(false);
     expect(result.errors.some(e => e.includes('2. 功能需求'))).toBe(true);
-  });
-
-  it('should detect broken document reference', () => {
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'),
-      '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
-      'Feature ID: TEST-FEAT-001\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'document-links.yaml'),
-      'version: 1\nfeatureId: TEST-FEAT-001\ndocuments:\n  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: [missing.md]\n');
-
-    const result = validateFormat(FEATURE_ID, TEST_ROOT);
-    expect(result.pass).toBe(false);
-    expect(result.errors.some(e => e.includes('缺失引用'))).toBe(true);
-  });
-
-  it('should detect duplicate document declarations', () => {
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'prd.md'),
-      '## 1. 业务目标\n\n## 2. 功能需求\n\n## 3. 非功能需求\n');
-    writeFileSync(join(TEST_ROOT, 'specs', FEATURE_ID, 'spec.md'),
-      'Feature ID: TEST-FEAT-001\n');
-    writeFileSync(
-      join(TEST_ROOT, 'specs', FEATURE_ID, 'document-links.yaml'),
-      'version: 1\nfeatureId: TEST-FEAT-001\ndocuments:\n'
-      + '  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: []\n'
-      + '  - path: spec.md\n    kind: spec\n    stage: 01_specify\n    references: []\n',
-    );
-
-    const result = validateFormat(FEATURE_ID, TEST_ROOT);
-    expect(result.pass).toBe(false);
-    expect(result.errors.some(e => e.includes('重复文档路径'))).toBe(true);
   });
 
   it('should detect missing required files', () => {

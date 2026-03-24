@@ -19,5 +19,9 @@ describe('applyTransition', () => {
     );
 
     expect(result.currentStage).toBe(Stage.DESIGN);
+    expect(result.nodes[Stage.SPECIFY]?.status).toBe('done');
+    expect(result.nodes[Stage.DESIGN]?.status).toBe('in_progress');
+    expect(result.history?.at(-1)?.from).toBe(Stage.SPECIFY);
+    expect(result.history?.at(-1)?.to).toBe(Stage.DESIGN);
   });
 });

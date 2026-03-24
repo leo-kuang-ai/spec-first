@@ -951,7 +951,7 @@ function buildTaskRuntimeNotice(executionContext: SkillExecutionContext): string
     const parts = ['<!-- task-runtime-context -->', '## Task Planning Context'];
     parts.push(`backgroundInputStatus: ${context.backgroundInputStatus}`);
     parts.push(`data_source: ${context.source}`);
-    parts.push('required_inputs: spec.md + design.md + document-links.yaml');
+    parts.push('required_inputs: spec.md + design.md');
     if (context.requiredAssetNames.length > 0) {
       parts.push(`required_assets: ${context.requiredAssetNames.join(', ')}`);
     }

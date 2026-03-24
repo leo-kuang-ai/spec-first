@@ -15,7 +15,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { Stage } from '../../shared/types.js';
-import type { BackgroundInputStatus, Mode, Size, StageState } from '../../shared/types.js';
+import type { BackgroundInputStatus, FeatureState, Mode, Size } from '../../shared/types.js';
 import {
   writeJson,
   writeMarkdown,
@@ -319,25 +319,33 @@ function skeletonTaskPlan(featureId: string, title: string): string {
     `> ${title}
 
 ` +
-    `## 任务明细
+    `## Plan Status
 
 ` +
-    `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |
+    `- summary: 任务计划待补充
 ` +
-    `|---|---|---|---|---|---|---|---|---|
+    `- next_step: 先补齐汇总任务表格并明确当前执行项
+
 ` +
-    `| TASK-XXX-001 | 初始化基础骨架 | dev | 0.5d | FR-XXX-001 | - | CLI 可初始化并生成骨架 | pnpm test -- tests/unit/init.test.ts | todo |
+    `## 任务总览
+
+` +
+    `| title | status | summary | next_step | owner | notes |
+` +
+    `|---|---|---|---|---|---|
+` +
+    `| 初始化基础骨架 | todo | 待建立最小目录与文档骨架 | 创建并校对 stage-state.json、findings.md、task_plan.md | dev | 可在实施时补充更多说明 |
 
 ` +
     `## 实施步骤
 
 ` +
-    `### TASK-XXX-001 — 初始化基础骨架
+    `### 初始化基础骨架
 
 ` +
     `1. 建立最小骨架与目录
 ` +
-    `2. 补齐追踪关系与必要文档
+    `2. 补齐当前节点所需文档
 ` +
     `3. 记录关键结论到 findings.md
 
@@ -530,13 +538,16 @@ export function skeletonTaskPlanBaseline(featureId: string, title: string): stri
   return (
     `# Task Plan — ${featureId}\n\n` +
     `> ${title}\n\n` +
+    `## Plan Status\n\n` +
+    `- summary: 基线补齐待开始\n` +
+    `- next_step: 先盘点现有能力并更新汇总任务表格\n\n` +
     `## 基线补齐\n\n` +
-    `| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |\n` +
-    `|---|---|---|---|---|---|---|---|---|\n` +
-    `| TASK-LEGACY-001 | 现有能力盘点 | dev | 1d | - | - | 能力清单完整 | - | todo |\n` +
-    `| TASK-LEGACY-002 | 技术债务识别 | dev | 0.5d | - | TASK-LEGACY-001 | 问题清单完整 | - | todo |\n\n` +
+    `| title | status | summary | next_step | owner | notes |\n` +
+    `|---|---|---|---|---|---|\n` +
+    `| 现有能力盘点 | todo | 待梳理现有模块与接口 | 盘点模块、端点、关键能力 | dev | baseline |\n` +
+    `| 技术债务识别 | todo | 待识别遗留问题与风险 | 在盘点完成后整理债务清单 | dev | baseline |\n\n` +
     `## 实施步骤\n\n` +
-    `### TASK-LEGACY-001 — 现有能力盘点\n\n` +
+    `### 现有能力盘点\n\n` +
     `1. 梳理现有模块清单\n` +
     `2. 记录 API 端点与数据模型\n` +
     `3. 更新 findings.md\n\n` +
@@ -759,7 +770,7 @@ function createInitialStageState(
   featureId: string,
   mergedRules: MergedRules,
   backgroundInputStatus: BackgroundInputStatus
-): StageState {
+): FeatureState {
   const now = new Date().toISOString();
   return {
     featureId,
@@ -767,7 +778,6 @@ function createInitialStageState(
     size: opts.size,
     platforms: opts.platforms,
     backgroundInputStatus,
-    stageStatus: 'drafting',
     autoAdvancePolicy: 'suggest',
     mergedRules: {
       profile: mergedRules.profile ?? 'default-simplified',
@@ -776,7 +786,24 @@ function createInitialStageState(
       thresholds: mergedRules.thresholds,
     },
     currentStage: Stage.INIT,
-    history: [],
+    nodes: {
+      [Stage.INIT]: {
+        status: 'done',
+        startedAt: now,
+        completedAt: now,
+        summary: 'Feature 初始化完成，可进入 01_specify',
+        checklistStatus: 'complete',
+        canMarkDone: true,
+      },
+    },
+    history: [
+      {
+        from: null,
+        to: Stage.INIT,
+        timestamp: now,
+        by: opts.author,
+      },
+    ],
     terminal: false,
     title: opts.title,
     createdAt: now,

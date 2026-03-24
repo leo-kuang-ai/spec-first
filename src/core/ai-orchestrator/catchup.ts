@@ -258,7 +258,7 @@ export function resetLocks(): void {
 }
 
 function getRequiredFiles(stage: string): string[] {
-  const base = ['stage-state.json', 'constitution.md', 'document-links.yaml'];
+  const base = ['stage-state.json', 'constitution.md'];
   switch (stage) {
     case '01_specify':
       return [...base, 'spec.md'];

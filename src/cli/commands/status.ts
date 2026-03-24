@@ -1,14 +1,23 @@
 import { join } from 'node:path';
-import { ExitCode, type BackgroundInputStatus, type FeatureState } from '../../shared/types.js';
+import {
+  ExitCode,
+  Stage,
+  type BackgroundInputStatus,
+  type FeatureState,
+  type NodeStatus,
+} from '../../shared/types.js';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { currentFeature, resolveFeatureId } from '../../core/process-engine/feature.js';
 import { readTaskPlan } from '../../core/task-plan/parser.js';
 import { checkFirstDocsExistence } from '../../core/skill-runtime/first-docs-check.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
-import { decideNextStep } from '../../core/process-engine/next-step-decider.js';
 import { detectBottlenecks } from '../../core/metrics-engine/bottleneck.js';
 import { calcHealthScore } from '../../core/metrics-engine/health-score.js';
 import { getDocumentMetrics } from './metrics.js';
+import { checkReadiness } from '../../core/process-engine/readiness-check.js';
+import { getNextStages } from '../../core/process-engine/stage-machine.js';
+import { readdirSync } from 'node:fs';
+import type { DocumentMetrics } from '../../core/metrics-engine/health-score.js';
 
 type CanonicalTaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
 
@@ -39,34 +48,20 @@ export function handleStatus(args: string[]): number {
   const taskCounts = summarizeTaskCounts(taskPlan);
   const currentNode = state.nodes?.[state.currentStage];
   const background = readBackgroundLayers(projectRoot, state);
-  const metrics = getDocumentMetrics(featureId, projectRoot);
-  const health = calcHealthScore(metrics, 0, 0);
-  const bottlenecks = detectBottlenecks(metrics);
-  const decision = decideNextStep({
-    featureId,
-    currentStage: state.currentStage,
-    stageStatus: state.stageStatus,
-    autoAdvancePolicy: state.autoAdvancePolicy,
-    todoState: taskPlan
-      ? {
-          halted: taskCounts.blocked > 0,
-          haltReason: taskCounts.blocked > 0 ? 'blocked' : undefined,
-          items: taskPlan.tasks.map((task) => ({
-            id: task.title,
-            title: task.title,
-            status:
-              task.status === 'done'
-                ? 'done'
-                : task.status === 'blocked'
-                  ? 'blocked'
-                  : task.status === 'in_progress'
-                    ? 'in_progress'
-                    : 'pending',
-          })),
-        }
-      : undefined,
-  });
-  const suggestedCommand = decision.suggestedCommand ?? fallbackSuggestedCommand(state.currentStage);
+  const metrics = safeGetDocumentMetrics(featureId, projectRoot);
+  const health = metrics ? calcHealthScore(metrics, 0, 0) : null;
+  const bottlenecks = metrics ? detectBottlenecks(metrics) : [];
+  const nextStage = getNextStages(state.currentStage).find((stage) => stage !== Stage.CANCELLED);
+  const readiness = nextStage
+    ? checkReadiness({
+        currentStage: state.currentStage,
+        targetStage: nextStage,
+        nodes: state.nodes,
+        artifacts: collectArtifacts(projectRoot, featureId),
+        terminal: state.terminal,
+      })
+    : undefined;
+  const suggestedCommand = resolveSuggestedCommand(featureId, state, currentNode?.status, readiness);
 
   console.log(`# Feature Status Dashboard\n`);
   console.log(`Feature ID: ${state.featureId}`);
@@ -83,13 +78,18 @@ export function handleStatus(args: string[]): number {
   console.log(`docs 输出: ${background.docsOutputs}`);
   console.log(`同步状态: ${background.syncStatus}`);
   console.log('');
-  console.log('文档指标:');
-  console.log(`  声明文档数: ${metrics.declaredDocCount}`);
-  console.log(`  已存在文档数: ${metrics.existingDocCount}`);
-  console.log(`  已建立引用文档数: ${metrics.linkedDocCount}`);
-  console.log(`  坏引用数: ${metrics.brokenReferenceCount}`);
-  console.log('');
-  console.log(`健康分: ${health.H1} (${health.grade})`);
+  if (metrics && health) {
+    console.log('文档指标:');
+    console.log(`  声明文档数: ${metrics.declaredDocCount}`);
+    console.log(`  已存在文档数: ${metrics.existingDocCount}`);
+    console.log(`  已建立引用文档数: ${metrics.linkedDocCount}`);
+    console.log(`  坏引用数: ${metrics.brokenReferenceCount}`);
+    console.log('');
+    console.log(`健康分: ${health.H1} (${health.grade})`);
+  } else {
+    console.log('文档指标: 不可用（缺少 document-links.yaml）');
+    console.log('健康分: N/A');
+  }
   console.log('');
   console.log('任务进度（canonical 状态）:');
   console.log(`  done: ${taskCounts.done}`);
@@ -118,8 +118,11 @@ export function handleStatus(args: string[]): number {
   }
 
   console.log(`建议下一步: ${suggestedCommand ?? '无'}`);
-  if (decision.reasons.length > 0) {
-    console.log(`原因: ${decision.reasons.join('；')}`);
+  if (readiness) {
+    const reasons = summarizeReadinessReasons(readiness);
+    if (reasons.length > 0) {
+      console.log(`原因: ${reasons.join('；')}`);
+    }
   }
 
   return ExitCode.SUCCESS;
@@ -173,6 +176,51 @@ function readBackgroundLayers(projectRoot: string, state: FeatureState): Backgro
     docsOutputs,
     syncStatus: runtimeTruth === 'current' && docsReady ? 'ready' : 'attention',
   };
+}
+
+function collectArtifacts(projectRoot: string, featureId: string): string[] {
+  const featureDir = join(projectRoot, 'specs', featureId);
+  if (!exists(featureDir)) return [];
+  return readdirSync(featureDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
+}
+
+function safeGetDocumentMetrics(featureId: string, projectRoot: string): DocumentMetrics | null {
+  try {
+    return getDocumentMetrics(featureId, projectRoot);
+  } catch (error) {
+    if ((error as Error).message.includes('document-links.yaml')) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+function resolveSuggestedCommand(
+  featureId: string,
+  state: FeatureState,
+  currentStatus: NodeStatus | undefined,
+  readiness?: ReturnType<typeof checkReadiness>
+): string | undefined {
+  if (currentStatus === 'blocked') return '/spec-first:orchestrate';
+  if (!readiness) return undefined;
+  if (readiness.decision === 'READY_TO_ADVANCE') {
+    return `spec-first transition ${featureId}`;
+  }
+  if (readiness.decision === 'BLOCKED') {
+    return '/spec-first:orchestrate';
+  }
+  return fallbackSuggestedCommand(state.currentStage);
+}
+
+function summarizeReadinessReasons(readiness: ReturnType<typeof checkReadiness>): string[] {
+  const reasons: string[] = [];
+  if (!readiness.checks.previousNodeComplete) reasons.push('当前节点未完成');
+  if (!readiness.checks.requiredArtifactsExist) reasons.push('目标节点所需产物未齐全');
+  if (!readiness.checks.noActiveWork) reasons.push('存在其他活跃节点工作');
+  if (!readiness.checks.notTerminal) reasons.push('Feature 已处于终态');
+  return reasons;
 }
 
 function fallbackSuggestedCommand(currentStage: FeatureState['currentStage']): string | undefined {

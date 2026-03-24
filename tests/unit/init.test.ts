@@ -57,7 +57,10 @@ describe('init', () => {
     expect(state.mode).toBe('N');
     expect(state.size).toBe('S');
     expect(state.terminal).toBe(false);
-    expect(state.stageStatus).toBe('drafting');
+    expect(state.nodes['00_init'].status).toBe('done');
+    expect(state.nodes['00_init'].checklistStatus).toBe('complete');
+    expect(state.nodes['00_init'].canMarkDone).toBe(true);
+    expect(state.stageStatus).toBeUndefined();
     expect(state.autoAdvancePolicy).toBe('suggest');
     expect(state.mergedRules).toBeDefined();
     expect(state.mergedRules.profile).toBe('default-simplified');
@@ -68,7 +71,8 @@ describe('init', () => {
     expect(readFileSync(join(result.featureDir, 'findings.md'), 'utf-8')).toContain('Findings');
     const taskPlan = readFileSync(join(result.featureDir, 'task_plan.md'), 'utf-8');
     expect(taskPlan).toContain('Task Plan');
-    expect(taskPlan).toContain('| Task ID | 标题 | Owner | 预计工期 | traces | depends_on | 验收标准 | 验证命令 | 状态 |');
+    expect(taskPlan).toContain('| title | status | summary | next_step | owner | notes |');
+    expect(taskPlan).toContain('## Plan Status');
 
     // document-links.yaml
     const documentLinks = readFileSync(join(result.featureDir, 'document-links.yaml'), 'utf-8');
