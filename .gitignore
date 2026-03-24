@@ -8,3 +8,7 @@ coverage/
 !.spec-first/runtime/first/
 !.spec-first/runtime/first/*.json
 .worktrees/
+
+# IDE and history
+.cursor/
+.history/
