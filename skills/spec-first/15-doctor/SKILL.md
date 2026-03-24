@@ -12,6 +12,17 @@ changelog: |
 
 诊断项目环境与宿主配置；默认只读诊断，显式 `--fix` 时才执行 MCP/skills 修复。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | 可选 | 项目概览，理解技术栈和模块划分 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## 触发条件
 - 阶段: 任意（不限阶段）
 - Command: `/spec-first:doctor`

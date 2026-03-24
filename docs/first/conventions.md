@@ -1,70 +1,48 @@
 # 代码规范
 
-> 本文档基于 `.spec-first/runtime/first/conventions.json` 真源生成
+> 基于 `.spec-first/runtime/first/conventions.json` 生成
 
----
+## TypeScript 规则
 
-## TypeScript 配置
+| 配置项 | 值 |
+|--------|-----|
+| 语言版本 | TypeScript >=5.4 |
+| 严格模式 | `strict: true` |
+| 模块语法 | `verbatimModuleSyntax` |
+| 模块系统 | ESM (`"type": "module"`) |
 
-| 约束 | 值 |
-|------|-----|
-| strict | true |
-| verbatimModuleSyntax | true |
-| target | ES2022 |
-| module | ESNext |
-| isolatedModules | true |
+## 文件命名
 
----
+- 使用 `kebab-case.ts` 格式
+- 示例：`process-engine.ts`、`gate-engine.ts`
 
-## ESLint 规则
+## 导出约定
 
-| 规则 | 级别 | 说明 |
-|------|------|------|
-| no-unused-vars | error | 未使用变量必须 `_` 前缀 |
-| no-explicit-any | warn | 禁止 any 类型 |
-| no-empty | warn | 空块警告（允许空 catch） |
-| no-console | off | 允许 console |
+- **仅使用命名导出**：core 模块禁止使用 `default export`
+- **未使用变量前缀**：使用 `_` 前缀（eslint 规则 `^_`）
 
----
+```typescript
+// 正确
+export function processData() {}
+export const STATUS_ACTIVE = 'active';
 
-## Prettier 配置
+// 错误
+export default function processData() {}
+```
 
-| 选项 | 值 |
-|------|-----|
-| semi | true |
-| singleQuote | true |
-| tabWidth | 2 |
-| printWidth | 100 |
-| trailingComma | es5 |
-| endOfLine | lf |
+## 类型集中管理
 
----
-
-## 命名约定
-
-| 类型 | 约定 |
-|------|------|
-| 文件命名 | kebab-case.ts |
-| Core 模块导出 | Named exports only（禁止 default export） |
-
----
+- 所有核心类型定义集中在 `src/shared/types.ts`
+- 包括：Stage 枚举、ExitCode、ID types
 
 ## 测试规范
 
-| 配置 | 值 |
-|------|-----|
-| Framework | Vitest |
-| Globals | enabled |
-| Coverage Provider | v8 |
-
-### 覆盖率阈值
-
-| 指标 | 阈值 |
-|------|------|
-| Lines | 75% |
-| Functions | 75% |
-| Statements | 75% |
-| Branches | 65% |
+| 配置项 | 值 |
+|--------|-----|
+| 测试框架 | Vitest |
+| 全局变量 | 启用 (`globals: true`) |
+| 覆盖率工具 | v8 |
+| 覆盖率阈值 | 75% |
 
 ### 测试目录结构
 
@@ -77,28 +55,33 @@ tests/
   fixtures/    # 测试固件数据
 ```
 
----
+## Lint/Format
 
-## 配置管理
-
-| 类型 | 位置 |
+| 工具 | 命令 |
 |------|------|
-| 共享类型 | `src/shared/types.ts` |
-| Gate 真理源 | `src/core/rules/truth-source.ts` |
-| Handlebars 模板 | `templates/` |
-| 运行时状态 | `.spec-first/` |
+| ESLint | `npm run lint` |
+| ESLint (自动修复) | `npm run lint:fix` |
+| Prettier | `npm run format` |
 
----
+- Lint 工具链：`eslint` + `typescript-eslint` + `prettier`
 
-## 禁止模式
+## 构建
 
-- Core 模块使用 default export
-- 未加 `_` 前缀的未使用变量
-- 手动编辑 `stage-state.json`
-- 手动编辑 `document-links.yaml`
+| 配置项 | 值 |
+|--------|-----|
+| 打包工具 | tsup |
+| 构建命令 | `npm run build` |
 
----
+## 核心依赖
 
-## 真源
+- `handlebars` - 模板引擎
+- `js-yaml` - YAML 配置解析
+- `semver` - 版本管理
+- `update-notifier` - 更新通知
 
-- `.spec-first/runtime/first/conventions.json`
+## 模板与配置
+
+| 用途 | 工具 |
+|------|------|
+| 模板引擎 | Handlebars |
+| 配置格式 | js-yaml |

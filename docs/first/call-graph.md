@@ -1,152 +1,315 @@
-# 调用图
+# Spec-First 模块调用关系图
 
-> 本文档基于 `.spec-first/runtime/first/critical-flows.json` 和 `structure-overview.json` 真源生成
+> 生成时间: 2026-03-23
+> 数据源: `.spec-first/runtime/first/structure-overview.json`
 
-## 分层架构
+本文档使用 ASCII 文本图展示模块间调用关系与依赖方向。
+
+---
+
+## 整体架构分层
 
 ```
-┌─────────────────────────────────────────────┐
-│                  CLI 层                      │
-│              src/cli/ (29 files)            │
-└─────────────────┬───────────────────────────┘
-                  │ 调用
-                  ▼
-┌─────────────────────────────────────────────┐
-│                 Core 层                      │
-│         src/core/ (14 modules)              │
-└─────────────────┬───────────────────────────┘
-                  │ 依赖
-                  ▼
-┌─────────────────────────────────────────────┐
-│                Shared 层                     │
-│           src/shared/ (7 files)             │
-└─────────────────────────────────────────────┘
++------------------------------------------------------------------+
+|                          CLI Layer                                |
+|  src/cli/                                                         |
+|  - index.ts (命令注册)                                            |
+|  - router.ts (路由分发)                                           |
+|  - commands/ (27+ 命令实现)                                       |
++------------------------------------------------------------------+
+                               |
+                               | 调用
+                               v
++------------------------------------------------------------------+
+|                        Core Layer                                 |
+|  src/core/                                                        |
+|  +----------------------------------------------------------+    |
+|  | process-engine/  (阶段状态机)                             |    |
+|  | - stage-machine.ts  - advance.ts  - init.ts  - feature.ts |    |
+|  +----------------------------------------------------------+    |
+|                               |                                   |
+|                               v                                   |
+|  +----------------------------------------------------------+    |
+|  | gate-engine/  (质量门禁)                                  |    |
+|  | - gate-evaluator.ts  - condition-registry.ts              |    |
+|  +----------------------------------------------------------+    |
+|                               |                                   |
+|                               v                                   |
+|  +----------------------------------------------------------+    |
+|  | trace-engine/  (追溯 ID)                                  |    |
+|  | - id-generator.ts  - id-validator.ts  - id-taxonomy.ts    |    |
+|  +----------------------------------------------------------+    |
+|                               |                                   |
+|                               v                                   |
+|  +----------------------------------------------------------+    |
+|  | skill-runtime/  (Skill 分发)                              |    |
+|  | - dispatcher.ts  - prompt-assembler.ts  - hard-gate.ts    |    |
+|  +----------------------------------------------------------+    |
+|                               |                                   |
+|                               v                                   |
+|  +----------------------------------------------------------+    |
+|  | ai-orchestrator/  (自动循环)                              |    |
+|  | - auto-loop.ts  - catchup.ts  - todo-runner.ts            |    |
+|  +----------------------------------------------------------+    |
+|                               |                                   |
+|                               v                                   |
+|  +----------------------------------------------------------+    |
+|  | 其他 core 模块:                                           |    |
+|  | - change-mgr/  - template/  - tool-integration/            |    |
+|  | - metrics-engine/  - validators/  - task-plan/             |    |
+|  | - rules/  - batch-executor/  - migrations/                 |    |
+|  +----------------------------------------------------------+    |
++------------------------------------------------------------------+
+                               |
+                               | 依赖
+                               v
++------------------------------------------------------------------+
+|                        Shared Layer                               |
+|  src/shared/                                                      |
+|  - types.ts (Stage/ExitCode/ID types)                            |
+|  - logger.ts  - fs-utils.ts  - config-schema.ts                  |
++------------------------------------------------------------------+
 ```
-
-**依赖规则**:
-- CLI 层 → 允许依赖 core, shared
-- Core 层 → 允许依赖 shared
-- Shared 层 → 仅依赖 node:* 和外部依赖
 
 ---
 
 ## 核心模块调用关系
 
-### 1. 状态机调用链
-
 ```
-src/shared/types.ts
-    │ (type_import)
-    ▼
-src/core/process-engine/stage-machine.ts
-    │ (function_call: assertTransitionAllowed)
-    ▼
-src/core/process-engine/advance.ts
-    │ (function_call: evaluateGate)
-    ▼
-src/core/gate-engine/gate-evaluator.ts
-```
-
-### 2. 文档关联与度量调用链
-
-```
-src/core/document-links.ts
-    │ (function_call: loadDocumentLinks)
-    ▼
-src/core/metrics-engine/health-score.ts
-    │ (function_call: calcHealthScore)
-    ▼
-src/core/gate-engine/gate-evaluator.ts
-```
-
-### 3. Skill 路由调用链
-
-```
-src/core/skill-runtime/dispatcher.ts
-    ├─ (function_call) → src/core/skill-runtime/hard-gate.ts
-    ├─ (function_call) → src/core/skill-runtime/prompt-assembler.ts
-    └─ (function_call) → src/core/skill-runtime/scope-guard.ts
-```
-
-### 4. 命令入口调用链
-
-```
-src/cli/index.ts
-    │ (dispatch)
-    ▼
-src/cli/router.ts
-    │ (handler call)
-    ▼
-src/cli/commands/*.ts
+                        +-----------------+
+                        |   src/cli/      |
+                        |  index.ts       |
+                        |  router.ts      |
+                        +--------+--------+
+                                 |
+         +-----------------------+-----------------------+
+         |                       |                       |
+         v                       v                       v
++--------+--------+    +--------+--------+    +--------+--------+
+| init.ts         |    | stage.ts        |    | gate.ts         |
+| (feature init)  |    | (stage advance) |    | (gate check)    |
++--------+--------+    +--------+--------+    +--------+--------+
+         |                       |                       |
+         v                       v                       |
++--------+--------+    +--------+--------+               |
+| process-engine/ |    | process-engine/ |               |
+| init.ts         |    | advance.ts      |<--------------+
++-----------------+    +--------+--------+
+                                |
+                +---------------+---------------+
+                |                               |
+                v                               v
++--------+--------+               +--------+--------+
+| gate-engine/    |               | trace-engine/   |
+| gate-evaluator  |               | id-generator    |
++-----------------+               +-----------------+
+        |                                   |
+        v                                   v
++--------+--------+               +--------+--------+
+| condition-      |               | id-validator    |
+| registry        |               | id-taxonomy     |
++-----------------+               +-----------------+
 ```
 
 ---
 
-## 跨模块依赖矩阵
+## Skill 执行调用链
 
-| 上游模块 | 下游模块 | 依赖类型 |
-|---------|---------|---------|
-| `src/shared/types.ts` | `stage-machine.ts`, `gate-evaluator.ts`, `document-links.ts`, `router.ts` | type_import |
-| `src/core/process-engine/stage-machine.ts` | `advance.ts` | function_call |
-| `src/core/document-links.ts` | `gate-evaluator.ts`, `metrics-engine/health-score.ts` | function_call |
-| `src/core/gate-engine/gate-evaluator.ts` | `advance.ts`, `orchestrate.ts` | function_call |
-| `src/core/skill-runtime/dispatcher.ts` | `hard-gate.ts`, `prompt-assembler.ts`, `scope-guard.ts` | function_call |
-| `src/core/ai-orchestrator/auto-loop.ts` | `orchestrate.ts` | function_call |
-| `src/core/process-engine/feature.ts` | `orchestrate.ts`, `hard-gate.ts` | function_call |
-
----
-
-## 高变更影响文件
-
-| 文件 | 原因 | 风险 |
-|------|------|------|
-| `src/shared/types.ts` | Stage/ID 体系，所有模块依赖 | Critical |
-| `src/core/rules/truth-source.ts` | Gate 真理源，影响 Skill 路由 | High |
-| `src/cli/router.ts` | 命令路由，影响所有 CLI 命令 | High |
-
----
-
-## 模块职责速查
-
-| 模块 | 路径 | 文件数 | 职责 |
-|------|------|-------|------|
-| cli | `src/cli/` | 29 | CLI 入口与命令分发 |
-| process-engine | `src/core/process-engine/` | 8 | 阶段状态机，Feature 生命周期管理 |
-| skill-runtime | `src/core/skill-runtime/` | 25 | Skill 分发、prompt 组装、hard-gate 校验 |
-| gate-engine | `src/core/gate-engine/` | 10 | 阶段质量门禁评估（19 条条件） |
-| trace-engine | `src/core/trace-engine/` | 9 | 追溯 ID 生成/校验/搜索 |
-| document-links | `src/core/document-links.ts` | 1 | 文档关联索引加载与校验 |
-| ai-orchestrator | `src/core/ai-orchestrator/` | 15 | Auto-loop、catchup 上下文恢复 |
-| change-mgr | `src/core/change-mgr/` | 7 | RFC + Defect 状态机 |
-| template | `src/core/template/` | 6 | Handlebars 模板渲染 |
-| tool-integration | `src/core/tool-integration/` | 11 | AI runtime hooks |
-| metrics-engine | `src/core/metrics-engine/` | 3 | 健康度评分、瓶颈检测 |
-| validators | `src/core/validators/` | 1 | 产物格式校验 |
-| task-plan | `src/core/task-plan/` | 1 | task_plan.md 解析 |
-| rules | `src/core/rules/` | 1 | 真理源定义 |
-| batch-executor | `src/core/batch-executor/` | 12 | 批量任务执行 |
-| migrations | `src/core/migrations/` | 7 | 状态文件版本迁移 |
-| host-adapters | `src/core/host-adapters/` | 7 | 宿主适配器 |
+```
++-----------------+      +-----------------+      +-----------------+
+| skill-runtime/  | ---> | skill-runtime/  | ---> | skill-runtime/  |
+| dispatcher.ts   |      | prompt-         |      | execution-      |
+|                 |      | assembler.ts    |      | context.ts      |
++--------+--------+      +--------+--------+      +--------+--------+
+         |                        |                        |
+         v                        v                        v
++--------+--------+      +--------+--------+      +--------+--------+
+| hard-gate.ts    |      | idempotent-     |      | ai-orchestrator/|
+| (前置校验)       |      | write.ts        |      | auto-loop.ts    |
++-----------------+      +-----------------+      +-----------------+
+                                                           |
+                                                           v
+                                                 +--------+--------+
+                                                 | todo-runner.ts  |
+                                                 +-----------------+
+```
 
 ---
 
-## Shared 模块
+## Gate 评估流程调用
 
-| 模块 | 路径 | 职责 |
-|------|------|------|
-| types | `src/shared/types.ts` | 共享类型定义 |
-| fs-utils | `src/shared/fs-utils.ts` | 文件 I/O 封装 |
-| config-schema | `src/shared/config-schema.ts` | 配置加载与校验 |
-| logger | `src/shared/logger.ts` | 日志工具 |
-| validators | `src/shared/validators.ts` | 运行时类型守卫 |
-| host-paths | `src/shared/host-paths.ts` | 宿主路径检测 |
-| host-bootstrap | `src/shared/host-bootstrap.ts` | 宿主引导 |
+```
++-------------------+
+| gate-engine/      |
+| gate-evaluator.ts |
++--------+----------+
+         |
+         | getConditions()
+         v
++--------+----------+     +-------------------+
+| condition-        | --> | constitution-     |
+| registry.ts       |     | validator.ts      |
++-------------------+     +-------------------+
+         |
+         | runCommandGate()
+         v
++--------+----------+
+| command-gate.ts   |
+| (Layer2 命令)      |
++-------------------+
+         |
+         | appendJsonl()
+         v
++--------+----------+
+| gate-history.jsonl|
++-------------------+
+```
 
 ---
 
-## 入口点
+## Auto-Loop 主循环
 
-| 名称 | 路径 | 类型 | 描述 |
-|------|------|------|------|
-| cli | `src/cli/index.ts` | main | CLI 主入口 |
-| bin | `dist/cli/index.js` | executable | 打包后的可执行入口 |
+```
++-------------------+
+| ai-orchestrator/  |
+| auto-loop.ts      |
++--------+----------+
+         |
+         | while (iteration < maxIterations)
+         v
++--------+----------+     +-------------------+
+| pickReadyTodos()  | --> | todo-runner.ts    |
++-------------------+     +--------+----------+
+         |                        |
+         v                        v
++--------+----------+     +--------+----------+
+| watchdog.ts       |     | retry-controller  |
+| (心跳/超时)        |     +-------------------+
++-------------------+
+         |
+         v
++--------+----------+
+| saveTodoState()   |
+| (checkpoint)      |
++-------------------+
+```
+
+---
+
+## ID 生成流程
+
+```
++-------------------+
+| trace-engine/     |
+| id-generator.ts   |
++--------+----------+
+         |
+         | withFileLock()
+         v
++--------+----------+
+| .id.lock          |
++-------------------+
+         |
+         | collectKnownIds()
+         v
++--------+----------+     +-------------------+
+| id-validator.ts   | --> | id-taxonomy.ts    |
+| (校验格式)         |     | (ID 类型定义)      |
++-------------------+     +-------------------+
+         |
+         | reserveId()
+         v
++--------+----------+
+| .id-reservations  |
+| .json             |
++-------------------+
+```
+
+---
+
+## 高风险区域标注
+
+```
+  +============================================================================+
+  ||                        HIGH RISK AREAS                                   ||
+  +============================================================================+
+
+  [1] src/shared/types.ts
+      +------------------------------------------------------------------+
+      | 风险: Stage 枚举、ID 体系变更会影响所有 core 模块                 |
+      | 影响: 全局                                                        |
+      | 调用方: ALL core modules                                          |
+      +------------------------------------------------------------------+
+
+  [2] src/core/rules/truth-source.ts
+      +------------------------------------------------------------------+
+      | 风险: Gate 真理源规则变更影响 stage advance 逻辑                  |
+      | 影响: 流程控制                                                    |
+      | 调用方: gate-engine, process-engine                               |
+      +------------------------------------------------------------------+
+
+  [3] src/core/trace-engine/id-taxonomy.ts
+      +------------------------------------------------------------------+
+      | 风险: ID 类型体系变更影响追溯链和覆盖率计算                       |
+      | 影响: 追溯系统                                                    |
+      | 调用方: trace-engine, validators, metrics-engine                  |
+      +------------------------------------------------------------------+
+
+  [4] src/core/skill-runtime/dispatcher.ts
+      +------------------------------------------------------------------+
+      | 风险: Skill 分发逻辑变更影响所有 Skill 执行                       |
+      | 影响: Skill 系统                                                  |
+      | 调用方: cli/commands, ai-orchestrator                             |
+      +------------------------------------------------------------------+
+
+  [5] src/core/process-engine/stage-machine.ts
+      +------------------------------------------------------------------+
+      | 风险: 阶段转换规则变更影响 Feature 生命周期                       |
+      | 影响: 流程控制                                                    |
+      | 调用方: process-engine/advance, cli/commands/stage                |
+      +------------------------------------------------------------------+
+```
+
+---
+
+## 依赖方向总结
+
+```
+                    +-------------------+
+                    |    src/config/    |
+                    | (配置层，独立)     |
+                    +-------------------+
+
+                    +-------------------+
+                    |    src/shared/    | <--- [例外: id-taxonomy.ts 被 shared/types.ts 依赖]
+                    |   (工具层)         |
+                    +---------+---------+
+                              ^
+                              |
+                              | 依赖方向
+                              |
++-----------------------------+-----------------------------+
+|                                                           |
+|                       src/core/                           |
+|  (业务逻辑层，模块间可横向依赖，不依赖 cli)                |
+|                                                           |
++-----------------------------+-----------------------------+
+                              ^
+                              |
+                              | 调用
+                              |
+                    +---------+---------+
+                    |    src/cli/       |
+                    |   (入口层)         |
+                    +-------------------+
+```
+
+**依赖规则**:
+
+1. **ESM only** - 全项目 `type: module`，使用 `import/export`
+2. **Named exports only** - core 模块禁止使用 default export
+3. **Types centralized** - Stage/ExitCode/ID types 集中于 `src/shared/types.ts`
+4. **模块边界**:
+   - `cli`: 入口层，依赖 core 和 shared，不向上依赖
+   - `core`: 业务逻辑层，模块间可横向依赖，不依赖 cli
+   - `shared`: 工具层，仅依赖 `src/core/trace-engine/id-taxonomy.ts`，无其他业务依赖

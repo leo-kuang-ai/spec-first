@@ -87,6 +87,7 @@ describe('detectHostPaths', () => {
   });
 
   it('should format host path summary for diagnostics', () => {
+    const ccSwitchDataDir = join(TMP, 'cc-switch');
     const paths = detectHostPaths({
       homeDir: join(TMP, 'home'),
       platform: 'linux',
@@ -96,6 +97,21 @@ describe('detectHostPaths', () => {
         CLAUDE_CODE_CONFIG_DIR: join(TMP, 'claude-code'),
         CLAUDE_COMMANDS_DIR: join(TMP, 'claude', 'commands'),
         CLAUDE_SKILLS_DIR: join(TMP, 'claude', 'skills'),
+        CC_SWITCH_DATA_DIR: ccSwitchDataDir,
+      } as NodeJS.ProcessEnv,
+    });
+    mkdirSync(ccSwitchDataDir, { recursive: true });
+    writeFileSync(join(ccSwitchDataDir, 'cc-switch.db'), '', 'utf-8');
+    const installedPaths = detectHostPaths({
+      homeDir: join(TMP, 'home'),
+      platform: 'linux',
+      env: {
+        CODEX_CONFIG_PATH: join(TMP, 'codex', 'config.toml'),
+        CODEX_SKILLS_DIR: join(TMP, 'codex', 'skills'),
+        CLAUDE_CODE_CONFIG_DIR: join(TMP, 'claude-code'),
+        CLAUDE_COMMANDS_DIR: join(TMP, 'claude', 'commands'),
+        CLAUDE_SKILLS_DIR: join(TMP, 'claude', 'skills'),
+        CC_SWITCH_DATA_DIR: ccSwitchDataDir,
       } as NodeJS.ProcessEnv,
     });
 
@@ -106,5 +122,8 @@ describe('detectHostPaths', () => {
     expect(lines).toContain(`Claude 命令目录: ${join(TMP, 'claude', 'commands')}`);
     expect(lines).toContain(`Claude skills: ${join(TMP, 'claude', 'skills')}`);
     expect(lines).toContain(`Generic skills: ${join(TMP, 'home', '.spec-first', 'generic', 'skills')}`);
+    expect(formatHostPathSummary(installedPaths)).toContain(
+      `CC Switch: 已安装 \x1b[32m✔\x1b[0m (${ccSwitchDataDir})`
+    );
   });
 });

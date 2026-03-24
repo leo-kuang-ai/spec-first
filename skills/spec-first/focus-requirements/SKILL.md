@@ -2,8 +2,11 @@
 name: "spec-first:focus-requirements"
 version: 1.0.0
 description: |
-  Use when you need to narrow an already-reviewed requirement into an
-  owner-scoped PRD and thin handoff summaries for downstream review.
+  Narrow an already-reviewed requirement into an owner-scoped PRD and thin
+  handoff summaries for downstream review. Use when splitting requirements
+  by owner, creating focused PRD from global requirements, generating
+  handoff summaries, or when keywords like "owner scope", "requirement focus",
+  "handoff", "side requirements" appear.
 user-invocable: true
 allowed-tools:
   - Bash
@@ -20,6 +23,21 @@ allowed-tools:
 
 - Command: `/spec-first:focus-requirements`
 - P0: 拆分owner范围的PRD
+
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | **必需** | 项目概览，理解技术栈和模块划分 |
+| `domain-model` | 推荐 | 领域模型，理解业务概念 |
+| `critical-flows` | 推荐 | 关键流程，理解业务链路 |
+| `conventions` | 推荐 | 编码规范，确保输出边界一致 |
+| `entry-guide` | 可选 | 入口指南，快速定位实现位置 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
 
 ## Preamble (run first)
 
@@ -106,34 +124,6 @@ REASON: [1-2 sentences]
 ATTEMPTED: [what you tried]
 RECOMMENDATION: [what the user should do next]
 ```
-
-## Telemetry (run last)
-
-After the skill workflow completes (success, error, or abort), log the telemetry event.
-Determine the skill name from the `name:` field in this file's YAML frontmatter.
-Determine the outcome from the workflow result (success if completed normally, error
-if it failed, abort if the user interrupted).
-
-**PLAN MODE EXCEPTION — ALWAYS RUN:** This command writes telemetry to
-`~/.spec-first/analytics/` (user config directory, not project files). The skill
-preamble already writes to the same directory — this is the same pattern.
-Skipping this command loses session duration and outcome data.
-
-Run this bash:
-
-```bash
-_TEL_END=$(date +%s)
-_TEL_DUR=$(( _TEL_END - _TEL_START ))
-rm -f ~/.spec-first/analytics/.pending-"$_SESSION_ID" 2>/dev/null || true
-~/.claude/skills/spec-first/bin/spec-first-telemetry-log \
-  --skill "SKILL_NAME" --duration "$_TEL_DUR" --outcome "OUTCOME" \
-  --used-browse "USED_BROWSE" --session-id "$_SESSION_ID" 2>/dev/null &
-```
-
-Replace `SKILL_NAME` with the actual skill name from frontmatter, `OUTCOME` with
-success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was used.
-If you cannot determine the outcome, use "unknown". This runs in the background and
-never blocks the user.
 
 # /focus-requirements
 
@@ -229,6 +219,8 @@ Write exactly these project files:
 - `handoff/handoff-summary.md`
 
 These three files are the entire output surface for this skill.
+
+> **Path note**: Template and example paths below are relative to the skill installation directory (typically `~/.claude/skills/spec-first/focus-requirements/` or `skills/spec-first/focus-requirements/` within the repo).
 
 Template sources live here:
 - `focus-requirements/templates/focus-requirements.md`

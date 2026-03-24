@@ -2,8 +2,11 @@
 name: "spec-first:focus-requirements"
 version: 1.0.0
 description: |
-  Use when you need to narrow an already-reviewed requirement into an
-  owner-scoped PRD and thin handoff summaries for downstream review.
+  Narrow an already-reviewed requirement into an owner-scoped PRD and thin
+  handoff summaries for downstream review. Use when splitting requirements
+  by owner, creating focused PRD from global requirements, generating
+  handoff summaries, or when keywords like "owner scope", "requirement focus",
+  "handoff", "side requirements" appear.
 user-invocable: true
 allowed-tools:
   - Bash
@@ -20,6 +23,25 @@ allowed-tools:
 
 - Command: `/spec-first:focus-requirements`
 - P0: 拆分owner范围的PRD
+
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | **必需** | 项目概览，理解技术栈和模块划分 |
+| `domain-model` | 推荐 | 领域模型，理解业务概念 |
+| `critical-flows` | 推荐 | 关键流程，理解业务链路 |
+| `conventions` | 推荐 | 编码规范，确保输出边界一致 |
+| `entry-guide` | 可选 | 入口指南，快速定位实现位置 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
+## Preamble (run first)
+
+**语言**: 默认中文回复；技术术语和代码标识符保持英文原文。
 
 ## AskUserQuestion 格式
 
@@ -189,6 +211,8 @@ jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg b
 - `handoff/handoff-summary.md`
 
 这三个文件就是这个技能的全部输出面。
+
+> **路径说明**：下面的模板和示例路径是相对于 skill 安装目录的（通常是 `~/.claude/skills/spec-first/focus-requirements/` 或仓库内的 `skills/spec-first/focus-requirements/`）。
 
 模板来源在这里：
 - `focus-requirements/templates/focus-requirements.md`
@@ -360,3 +384,5 @@ jq -n --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg skill "SKILL_NAME" --arg b
 始终以以下内容结尾：
 - 完成状态
 - 一段简短说明，概括聚焦后的 owner 范围
+- 明确的未决问题或关注点
+- 写出的确切文件

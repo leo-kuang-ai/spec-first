@@ -73,7 +73,9 @@
 
 ### 格式规则
 
-**来源**: 必须来自 `.spec-first/layer2/*.yaml` 文件名
+**来源**: 扫描 `.spec-first/layer2/*.yaml` 文件，读取每个文件的 `platform` 字段值
+
+**关键**: 平台标识以 `platform` 字段值为准，文件名仅用于扫描发现
 
 **格式**: 逗号分隔的平台列表
 
@@ -85,11 +87,11 @@
 
 ### 有效示例
 
-假设 `.spec-first/layer2/` 包含:
-- `h5.yaml`
-- `java-backend.yaml`
-- `ios.yaml`
-- `android.yaml`
+假设 `.spec-first/layer2/` 包含以下文件，且每个文件首字段为 `platform`:
+- `h5.yaml` → `platform: h5`
+- `java-backend.yaml` → `platform: java-backend`
+- `ios.yaml` → `platform: ios`
+- `android.yaml` → `platform: android`
 
 ```
 ✅ h5
@@ -139,15 +141,41 @@
 
 **自动生成格式**: `{PREFIX}-{DATE}-{FEAT}-{SEQ}`
 
-**示例**:
-- `FSREQ-20260305-AUTH-001`
-- `FEAT-20260305-REPORT-001`
+| 字段 | 说明 | 示例 |
+|------|------|------|
+| PREFIX | ID 前缀，默认 `FSREQ` | `FSREQ` / `FEAT` |
+| DATE | 创建日期 (YYYYMMDD) | `20260324` |
+| FEAT | Feature 缩写 | `AUTH` / `REPORT` |
+| SEQ | 当日序号，3位递增 | `001` / `002` |
+
+**SEQ 递增规则**:
+- 扫描 `specs/` 下同前缀、同日期、同 FEAT 的 Feature
+- 取最大序号 +1，无则从 `001` 开始
+
+### 默认前缀选择
+
+| 场景 | 前缀 | 示例 |
+|------|------|------|
+| 常规 Feature | `FSREQ` | `FSREQ-20260324-AUTH-001` |
+| 简化模式 | `FEAT` | `FEAT-20260324-REPORT-001` |
+
+### 特殊 ID：Baseline
+
+**格式**: `FSREQ-19700101-LEGACY-BASELINE`
+
+| 字段 | 值 | 说明 |
+|------|-----|------|
+| PREFIX | `FSREQ` | 固定 |
+| DATE | `19700101` | 固定（表示系统起点） |
+| FEAT | `LEGACY` | 固定（表示存量） |
+| SEQ | `BASELINE` | 固定（非数字，表示基线） |
 
 ### 手动指定
 
 ```
-✅ FEAT-20260305-001
-✅ CUSTOM-ID-001
+✅ FEAT-20260305-001           # 简化格式
+✅ FSREQ-20260305-AUTH-002     # 完整格式
+✅ CUSTOM-ID-001               # 自定义格式
 ```
 
 ---

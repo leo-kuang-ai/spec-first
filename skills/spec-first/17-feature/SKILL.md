@@ -10,6 +10,17 @@ last_updated: "2026-03-17"
 
 - Command: `/spec-first:feature [list|current|switch] [featureId]`
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | 可选 | 项目概览，理解技术栈和模块划分 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## 作用域与副作用
 
 - `list/current` 为只读查询

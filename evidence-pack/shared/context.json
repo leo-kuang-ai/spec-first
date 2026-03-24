@@ -1,11 +1,17 @@
 {
   "serena_status": "active",
   "fallback": null,
-  "key_config": {
-    "type": "module",
-    "node_version": ">=20.0.0",
-    "typescript": "^5.4.0",
-    "bundler": "tsup",
-    "test_framework": "vitest"
-  }
+  "project_path": "/Users/kuang/xiaobu/spec-first",
+  "project_name": "spec-first",
+  "programming_languages": ["typescript"],
+  "file_encoding": "utf-8",
+  "available_memories": [
+    "architecture",
+    "code-review/2026-03-15-core-modules-review",
+    "code_style",
+    "collaboration/linked-doc-update-rule",
+    "project_overview",
+    "suggested_commands",
+    "task_completion_checklist"
+  ]
 }

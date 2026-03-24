@@ -21,7 +21,7 @@ export function handleUninstall(args: string[]): number {
     console.log('  --dry-run     仅输出将清理的内容，不执行删除');
     console.log('  --keep-mcp    保留 MCP 配置（sequential-thinking 等为通用服务）');
     console.log(
-      '  --host <target> 仅清理指定宿主（claude|codex|gemini|cursor|all，可多次/逗号分隔）'
+      '  --host <target> 仅清理指定宿主（claude|codex|gemini|cursor|generic|all，可多次/逗号分隔）'
     );
     return ExitCode.SUCCESS;
   }
@@ -131,6 +131,11 @@ function removeHostUserArtifacts(
     removeDir(`${prefix}Cursor skills`, join(paths.cursorHomeDir, 'skills', 'spec-first'), dryRun);
   } else {
     console.log(`${prefix}Cursor skills: 当前宿主集合不包含 cursor，跳过`);
+  }
+  if (shouldIncludeHost(hosts, 'generic')) {
+    removeDir(`${prefix}Generic skills`, join(paths.genericSkillsDir, 'spec-first'), dryRun);
+  } else {
+    console.log(`${prefix}Generic skills: 当前宿主集合不包含 generic，跳过`);
   }
 
   if (paths.ccSwitchInstalled && (!hosts || hosts.length === 0)) {
@@ -311,7 +316,7 @@ function parseHostTargets(args: string[]): { hosts?: HostId[]; fullUninstall: bo
     hostFlagSeen = true;
     const raw = args[i + 1];
     if (!raw || raw.startsWith('--')) {
-      throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）');
+      throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|generic|all）');
     }
     i += 1;
     for (const part of raw
@@ -321,8 +326,14 @@ function parseHostTargets(args: string[]): { hosts?: HostId[]; fullUninstall: bo
       if (part === 'all') {
         return { fullUninstall: true };
       }
-      if (part !== 'claude' && part !== 'codex' && part !== 'gemini' && part !== 'cursor') {
-        throw new Error(`参数错误：未知 host "${part}"，可选值: claude|codex|gemini|cursor|all`);
+      if (
+        part !== 'claude' &&
+        part !== 'codex' &&
+        part !== 'gemini' &&
+        part !== 'cursor' &&
+        part !== 'generic'
+      ) {
+        throw new Error(`参数错误：未知 host "${part}"，可选值: claude|codex|gemini|cursor|generic|all`);
       }
       values.push(part);
     }
@@ -330,7 +341,7 @@ function parseHostTargets(args: string[]): { hosts?: HostId[]; fullUninstall: bo
 
   if (!hostFlagSeen) return { fullUninstall: true };
   if (values.length === 0) {
-    throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）');
+    throw new Error('参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|generic|all）');
   }
   return { hosts: [...new Set(values)], fullUninstall: false };
 }

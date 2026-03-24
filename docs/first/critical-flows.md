@@ -1,161 +1,263 @@
-# 关键流程
+# Spec-First 关键流程文档
 
-> 本文档基于 `.spec-first/runtime/first/critical-flows.json` 真源生成
+> 生成时间: 2026-03-23
+> 数据源: `.spec-first/runtime/first/critical-flows.json`
 
-## 概述
-
-Spec-First 核心引擎包含 6 个关键流程，按风险等级分类：
-
-| 流程 | 风险等级 | 入口文件 |
-|------|---------|---------|
-| 阶段推进 | Critical | `src/core/process-engine/advance.ts` |
-| Gate 条件评估 | High | `src/core/gate-engine/gate-evaluator.ts` |
-| Skill 三层路由分发 | High | `src/core/skill-runtime/dispatcher.ts` |
-| Auto-Loop 任务编排 | High | `src/core/ai-orchestrator/auto-loop.ts` |
-| 文档关联度量 | High | `src/core/document-links.ts` |
-| CLI 命令分发 | Medium | `src/cli/index.ts` |
+本文档描述 Spec-First 系统的 7 个关键流程，涵盖从 CLI 入口到自动循环执行的完整链路。
 
 ---
 
-## 1. 阶段推进流程
+## 1. Feature 初始化流程 (feature-initialization)
 
-**风险等级**: Critical
+**描述**: Feature 初始化流程：生成 ID → 创建目录结构 → 渲染状态 → 初始化骨架文件
 
-**入口**: `src/core/process-engine/advance.ts:123`
+**入口点**: `src/cli/commands/init.ts:handleInit`
 
-**步骤**:
-1. `loadState()` 加载 `stage-state.json`
-2. `assertTransitionAllowed(from, to)` 状态机校验
-3. `checkDependencies()` 检查目标阶段产物依赖
-4. `evaluateGate()` 执行 Gate 条件评估
-5. `saveState()` 写入 `stage-state.json`（不可逆）
-6. `writeLog()` 写入 `gate-history.jsonl`
-7. `syncAgentContextFromDesign()` 上下文同步（02→03）
+### 关键步骤
 
-**证据**:
-- `src/core/process-engine/advance.ts:123-337`
-- `src/core/process-engine/stage-machine.ts:8-51`
+```
+1. CLI 参数解析 (--feat, --mode, --size, --platforms)
+2. detectInitProjectState() 检测项目成熟度
+3. generateFeatureId() 生成 Feature ID (FSREQ-YYYYMMDD-FEAT-NNN)
+4. init() 创建 specs/{featureId}/ 目录
+5. renderDefaultConfigYaml() 渲染 .spec-first/meta/config.yaml
+6. mergeLayerRules() 合并层级规则
+7. writeJson() 写入 stage-state.json
+8. writeMarkdown() 创建骨架文件 (spec.md, constitution.md)
+9. switchFeature() 更新 .spec-first/current
+```
 
----
+### 风险点
 
-## 2. Gate 条件评估流程
+- Feature ID 冲突（并发初始化同缩写）
+- 目录权限问题
+- stage-state.json 写入失败导致状态不一致
 
-**风险等级**: High
+### 证据文件
 
-**入口**: `src/core/gate-engine/gate-evaluator.ts:106`
-
-**步骤**:
-1. `loadDocumentLinks()` 解析文档关联索引
-2. `loadRfcStatuses()` 加载 RFC 状态
-3. `getCoverage()` 计算 C3/C4/C6/C8/C9
-4. `getConditions()` 获取阶段条件定义（Layer1）
-5. `def.evaluate(ctx)` 遍历执行条件评估
-6. `runCommandGate()` 执行 Layer2 命令 Gate
-7. `validateExceptions()` 匹配豁免
-8. `appendJsonl()` 持久化到 `gate-history.jsonl`
-
-**证据**:
-- `src/core/gate-engine/gate-evaluator.ts:106-224`
-- `src/core/gate-engine/condition-registry.ts:41-407`
+- `src/cli/commands/init.ts`
+- `src/core/process-engine/init.ts`
+- `src/core/process-engine/feature.ts`
+- `src/core/process-engine/layer-merger.ts`
 
 ---
 
-## 3. Skill 三层路由分发
+## 2. 阶段推进流程 (stage-advance)
 
-**风险等级**: High
+**描述**: 阶段推进流程：依赖检查 → Gate 校验 → 状态更新 → 审计日志
 
-**入口**: `src/core/skill-runtime/dispatcher.ts:258`
+**入口点**: `src/core/process-engine/advance.ts:advance`
 
-**步骤**:
-1. 解析命令（提取 `namespace:skillName`）
-2. `SEMANTIC_MAP` 查找复合命令映射
-3. `RUNTIME_COMMANDS` 查找直接 CLI 分发
-4. `resolveSkillPath()` 查找 Skill 文件
-5. `loadSkill()` 加载并组装 prompt
-6. `evaluateSkillHardGate()` Hard-Gate 校验
-7. `evaluateRuntimeScopeGuard()` 作用域守卫
-8. `buildXxxRuntimeNotice()` 注入运行时上下文
+### 关键步骤
 
-**证据**:
-- `src/core/skill-runtime/dispatcher.ts:258-555`
-- `src/core/skill-runtime/hard-gate.ts:163-292`
+```
+1. loadState() 读取 stage-state.json
+2. isTerminal() 检查是否终态
+3. nextStageInChain() 获取下一阶段
+4. assertTransitionAllowed() 校验状态机转换合法性
+5. checkDependencies() 验证目标阶段产物依赖
+6. evaluateGate() 执行 Gate 条件评估 (Layer1 内置 + Layer2 命令)
+7. saveState() 更新 stage-state.json
+8. writeLog() 记录 gate-history.jsonl
+9. [02_design→03_plan] syncAgentContextFromDesign() 同步上下文
+10. [07_release] 自动推进到 08_done
+```
 
----
+### 风险点
 
-## 4. Auto-Loop 任务编排流程
+- Gate 条件评估失败阻断推进
+- GateEngine 不可用时需 pilot_mode 降级
+- 状态机转换违反单向不可逆原则
+- 并发推进导致状态竞争
 
-**风险等级**: High
+### 证据文件
 
-**入口**: `src/core/ai-orchestrator/auto-loop.ts:146`
-
-**步骤**:
-1. `loadTodoState()` 加载 `todo-state.json`
-2. `recoverInterruptedTasks()` 恢复僵尸任务（P9）
-3. `while (iteration < maxIterations)` 主循环
-4. `pickReadyTodos()` 选择就绪任务
-5. `Promise.race([executor(task), timeout])` 执行任务
-6. `runWatchdogCheck()` 超时/心跳检测
-7. `runPostWriteGuards()` 后置守卫
-8. `advanceTodoIteration()` + checkpoint
-
-**证据**:
-- `src/core/ai-orchestrator/auto-loop.ts:146-699`
+- `src/core/process-engine/advance.ts`
+- `src/core/process-engine/stage-machine.ts`
+- `src/core/gate-engine/gate-evaluator.ts`
+- `src/core/process-engine/dependency-checker.ts`
 
 ---
 
-## 5. 文档关联检查流程
+## 3. Gate 质量门禁评估 (gate-evaluation)
 
-**风险等级**: High
+**描述**: Gate 质量门禁评估：读取条件定义 → 逐条评估 → 聚合结果 → 持久化
 
-**入口**: `src/core/document-links.ts:103`
+**入口点**: `src/core/gate-engine/gate-evaluator.ts:evaluateGate`
 
-**步骤**:
-1. `loadDocumentLinks()` 读取 `document-links.yaml`
-2. `validateDocumentLinksData()` 校验结构与引用
-3. `validateStageDocumentLinks()` 校验当前阶段必要文档
-4. `listMissingDocumentFiles()` 发现缺失文件
-5. `findBrokenDocumentReferences()` 发现坏引用
-6. `appendJsonl()` 写入 Gate / 诊断历史
+### 关键步骤
 
-**证据**:
-- `src/core/document-links.ts:55-207`
+```
+1. readJsonChecked() 读取 stage-state.json
+2. getProjectTypeFromConstitution() 从 constitution.md 提取项目类型
+3. getConditions() 获取当前阶段 Gate 条件 (GATE_CONDITIONS registry)
+4. shouldSkipCondition() 按项目类型过滤条件
+5. 遍历条件: def.evaluate(ctx) 执行评估
+6. runCommandGate() 执行 Layer2 命令条件
+7. 聚合结果: hasBlockingFailure / hasWarning
+8. appendJsonl() 持久化到 gate-history.jsonl
+```
 
----
+### 风险点
 
-## 6. CLI 命令分发流程
+- 条件定义缺失或格式错误
+- Layer2 命令执行超时/失败
+- waiver 豁免机制滥用
+- 评估结果与实际产物不一致
 
-**风险等级**: Medium
+### 证据文件
 
-**入口**: `src/cli/index.ts:103`
-
-**步骤**:
-1. `dispatch(process.argv.slice(2))`
-2. 查找命令注册表 `commands.get(cmd)`
-3. `shouldRequireConfirmation()` 校验确认策略
-4. `resolveConfirmPolicy()` 评估 mode/size
-5. `entry.handler(subArgs)` 调用命令处理器
-
-**证据**:
-- `src/cli/index.ts:36-103`
-- `src/cli/router.ts:79-122`
+- `src/core/gate-engine/gate-evaluator.ts`
+- `src/core/gate-engine/condition-registry.ts`
+- `src/core/gate-engine/command-gate.ts`
 
 ---
 
-## 高影响点
+## 4. 追溯 ID 生成流程 (trace-id-generation)
 
-| 文件 | 关键元素 | 风险 | 影响范围 |
-|------|---------|------|---------|
-| `src/shared/types.ts` | Stage 枚举, ExitCode, MatrixStatus | Critical | 阶段定义变更影响所有状态机、Gate 条件 |
-| `src/core/process-engine/stage-machine.ts` | TRANSITIONS 表 | Critical | 转换表变更直接影响 advance 合法性 |
-| `src/core/gate-engine/condition-registry.ts` | GATE_CONDITIONS | High | 新增/删除条件影响所有 Feature 阶段推进 |
-| `src/core/skill-runtime/dispatcher.ts` | RUNTIME_COMMANDS, SEMANTIC_MAP | High | 路由表变更影响所有 Skill 分发 |
-| `src/core/ai-orchestrator/auto-loop.ts` | runAutoLoop() 主循环 | High | 循环逻辑变更影响所有 Auto-Loop 执行 |
-| `src/core/document-links.ts` | loadDocumentLinks(), validateStageDocumentLinks() | High | 文档引用变更直接影响 Gate 校验结果 |
+**描述**: 追溯 ID 生成流程：扫描已有 ID → 计算序号 → 组装 ID → 预留登记
+
+**入口点**: `src/core/trace-engine/id-generator.ts:nextId`
+
+### 关键步骤
+
+```
+1. withFileLock() 获取文件锁 (.id.lock)
+2. validateAbbr() 校验缩写格式
+3. collectKnownIds() 扫描 specs/{featureId}/ 下所有 .md/.yaml/.json
+4. ID_SCAN_PATTERN 正则匹配已有 ID
+5. validateId() 校验已有 ID 有效性
+6. findNextSeq() 计算下一序号
+7. assembleId() 组装 ID (TYPE-ABBR-NNN 或 TC-LEVEL-ABBR-NNN)
+8. validateId() 校验生成 ID
+9. reserveId() 写入 .id-reservations.json
+```
+
+### 风险点
+
+- 并发生成导致 ID 冲突（通过文件锁缓解）
+- ID 格式不符合规范
+- 扫描大目录性能问题
+- 预留文件损坏
+
+### 证据文件
+
+- `src/core/trace-engine/id-generator.ts`
+- `src/core/trace-engine/id-validator.ts`
+- `src/core/trace-engine/id-taxonomy.ts`
 
 ---
 
-## 已知局限
+## 5. Skill 执行流程 (skill-execution)
 
-- **动态调用链**: 基于静态代码分析，未包含运行时动态调用
-- **测试覆盖**: 未分析测试代码中的调用关系
-- **Extension 扩展**: 未深入分析 `extensions.ts` 中的扩展加载机制
+**描述**: Skill 执行流程：解析上下文 → 组装 Prompt → 分发执行 → 写入产物
+
+**入口点**: `src/core/skill-runtime/prompt-assembler.ts:assemblePrompt`
+
+### 关键步骤
+
+```
+1. resolvePromptAssemblyContext() 解析执行上下文
+2. resolveExecutionFeatureId() 获取当前 Feature ID
+3. loadConfig() 读取配置 (token_budget, max_iterations)
+4. readCurrentStage() / readCurrentTask() 读取当前状态
+5. assemblePrompt() 替换模板占位符
+6. validateKvCacheStability() 检查 KV-Cache 稳定性
+7. [待确认] 分发到 AI Host 执行
+8. [待确认] idempotentWrite() 写入产物
+```
+
+### 风险点
+
+- Prompt token 超出预算
+- 动态字段位置影响 KV-Cache 命中率
+- Feature ID 解析失败
+- 产物写入冲突
+
+### 证据文件
+
+- `src/core/skill-runtime/prompt-assembler.ts`
+- `src/core/skill-runtime/execution-context.ts`
+- `src/core/skill-runtime/idempotent-write.ts`
+
+---
+
+## 6. Auto-Loop 自动循环 (auto-loop)
+
+**描述**: Auto-Loop 自动循环：pick 任务 → 执行 → checkpoint → 迭代
+
+**入口点**: `src/core/ai-orchestrator/auto-loop.ts:runAutoLoop`
+
+### 关键步骤
+
+```
+1. loadTodoState() 加载 todo-state.json
+2. recoverInterruptedTasks() 恢复中断任务（P9）
+3. ensureAutoLoopState() 初始化运行态
+4. while (iteration < maxIterations) 主循环
+5. pickReadyTodos() 选择就绪任务
+6. updateHeartbeat() 更新心跳
+7. executor() 执行任务
+8. runFullCompletionDetection() 完成度检测
+9. runSlopCheck() 质量检测
+10. makeRetryDecision() 重试决策
+11. saveTodoState() 保存 checkpoint
+12. runWatchdogCheck() 看门狗检查
+```
+
+### 风险点
+
+- 任务死锁/阻塞
+- 无限重试循环
+- 看门狗超时误判
+- 状态文件损坏导致恢复失败
+
+### 证据文件
+
+- `src/core/ai-orchestrator/auto-loop.ts`
+- `src/core/ai-orchestrator/todo-runner.ts`
+- `src/core/ai-orchestrator/watchdog.ts`
+- `src/core/ai-orchestrator/retry-controller.ts`
+
+---
+
+## 7. CLI 命令路由 (cli-routing)
+
+**描述**: CLI 命令路由：解析参数 → 查找命令 → 确认策略 → 分发执行
+
+**入口点**: `src/cli/router.ts:dispatch`
+
+### 关键步骤
+
+```
+1. process.argv.slice(2) 获取命令参数
+2. commands.get(cmd) 查找注册命令
+3. shouldRequireConfirmation() 检查是否需要确认
+4. resolveConfirmPolicy() 解析确认策略
+5. [需确认] 检查 --yes 标志
+6. entry.handler(subArgs) 执行命令处理器
+7. 返回 ExitCode
+```
+
+### 风险点
+
+- 命令参数解析错误
+- 确认策略绕过
+- 未捕获异常导致进程退出码错误
+
+### 证据文件
+
+- `src/cli/router.ts`
+- `src/cli/index.ts`
+- `src/core/skill-runtime/confirm-policy.ts`
+
+---
+
+## 待分析区域 (Gaps)
+
+| 区域 | 描述 |
+|------|------|
+| skill-execution | Skill 分发到 AI Host 的具体调用链未完全确认，需查看 skill-runtime 完整路由逻辑 |
+| auto-loop | TaskExecutor 具体实现由外部注入，实际执行路径依赖调用方 |
+| change-mgr | RFC/Defect 状态机流程未详细分析，需查看 `change-mgr/rfc-machine.ts` 和 `defect-machine.ts` |
+| batch-executor | 批量执行流程未分析，需查看 `batch-executor/index.ts` |

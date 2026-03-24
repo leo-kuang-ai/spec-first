@@ -39,6 +39,12 @@ export interface HostPaths {
   ccSwitchSkillsDir: string;
 }
 
+const GREEN_CHECK = '\x1b[32m✔\x1b[0m';
+
+function formatInstalledState(installed: boolean): string {
+  return installed ? `已安装 ${GREEN_CHECK}` : '未安装';
+}
+
 export function formatHostPathSummary(paths: HostPaths): string[] {
   return [
     `Codex 配置: ${paths.codexConfigPath}`,
@@ -50,7 +56,7 @@ export function formatHostPathSummary(paths: HostPaths): string[] {
     `Cursor 配置目录: ${paths.cursorConfigDir}`,
     `Generic skills: ${paths.genericSkillsDir}`,
     `spec-first skills: ${paths.specFirstSkillsDir}`,
-    `CC Switch: ${paths.ccSwitchInstalled ? '已安装' : '未安装'} (${paths.ccSwitchDataDir})`,
+    `CC Switch: ${formatInstalledState(paths.ccSwitchInstalled)} (${paths.ccSwitchDataDir})`,
   ];
 }
 

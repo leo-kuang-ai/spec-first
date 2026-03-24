@@ -33,6 +33,20 @@ metadata:
 
 展示 Feature 状态仪表盘（阶段、覆盖率、健康分、任务进度）。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | 推荐 | 项目概览，理解技术栈和模块划分 |
+| `critical-flows` | 可选 | 关键流程，理解业务链路 |
+| `structure-overview` | 可选 | 代码结构，理解模块边界 |
+| `domain-model` | 可选 | 领域模型，理解业务概念 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## Announce at Start
 
 ```

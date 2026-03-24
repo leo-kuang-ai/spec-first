@@ -9,11 +9,10 @@
 
 ## Canonical Contracts
 
-运行时合同不放在 review bundle 中，而是放在 skill 的 canonical references 里：
+运行时合同不放在 review bundle 中,而是放在 skill 的 canonical references 里:
 
-- [main-thread-contract](../../../skills/spec-first/00-first/references/main-thread-contract.md)
-- [evidence-pack-spec](../../../skills/spec-first/00-first/references/evidence-pack-spec.md)
-- [agent-output-schema](../../../skills/spec-first/00-first/references/agent-output-schema.md)
+- [main-thread-and-evidence-contract](../../../skills/spec-first/00-first/references/main-thread-and-evidence-contract.md)
+- [execution-and-agent-architecture](../../../skills/spec-first/00-first/references/execution-and-agent-architecture.md)
 
 ## 范围说明
 

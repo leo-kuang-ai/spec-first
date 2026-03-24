@@ -49,6 +49,20 @@ hooks:
 
 执行技术调研，输出方案对比与推荐结论。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | **必需** | 项目概览，理解技术栈和模块划分 |
+| `critical-flows` | 推荐 | 关键流程，理解业务链路 |
+| `api-contracts` | 推荐 | API 契约，理解接口规范 |
+| `domain-model` | 推荐 | 领域模型，理解业务概念 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## Announce at Start
 
 ```

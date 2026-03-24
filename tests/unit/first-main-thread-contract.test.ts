@@ -4,9 +4,8 @@ import { join } from 'node:path';
 
 const FIRST_REFS = join(import.meta.dirname, '../../skills/spec-first/00-first/references');
 
-const MAIN_THREAD_CONTRACT = join(FIRST_REFS, 'main-thread-contract.md');
-const EVIDENCE_PACK_SPEC = join(FIRST_REFS, 'evidence-pack-spec.md');
-const AGENT_OUTPUT_SCHEMA = join(FIRST_REFS, 'agent-output-schema.md');
+const MAIN_THREAD_CONTRACT = join(FIRST_REFS, 'main-thread-and-evidence-contract.md');
+const EXECUTION_AND_ARCH = join(FIRST_REFS, 'execution-and-agent-architecture.md');
 
 function read(path: string): string {
   return readFileSync(path, 'utf-8');
@@ -15,8 +14,7 @@ function read(path: string): string {
 describe('00-first main-thread canonical contracts', () => {
   it('keeps the canonical contract files in the references tree', () => {
     expect(existsSync(MAIN_THREAD_CONTRACT)).toBe(true);
-    expect(existsSync(EVIDENCE_PACK_SPEC)).toBe(true);
-    expect(existsSync(AGENT_OUTPUT_SCHEMA)).toBe(true);
+    expect(existsSync(EXECUTION_AND_ARCH)).toBe(true);
   });
 
   it('defines the main-thread minimal contract', () => {
@@ -34,23 +32,23 @@ describe('00-first main-thread canonical contracts', () => {
   });
 
   it('defines the evidence pack routing contract', () => {
-    const spec = read(EVIDENCE_PACK_SPEC);
+    const spec = read(MAIN_THREAD_CONTRACT);
     expect(spec).toContain('Evidence Pack 目录结构');
     expect(spec).toContain('runtime wave 可读范围');
     expect(spec).toContain('docs wave 可读范围');
-    expect(spec).toContain('主线程只发包，不发长证据');
+    expect(spec).toContain('主线程只发包,不发长证据');
   });
 
   it('documents Serena activation and shared evidence pack handoff in execution flow', () => {
-    const flow = read(join(FIRST_REFS, 'execution-flow.md'));
-    expect(flow).toContain('### -1. 激活项目（Serena LSP）');
+    const flow = read(EXECUTION_AND_ARCH);
+    expect(flow).toContain('激活项目(Serena LSP)');
     expect(flow).toContain('serena_status');
     expect(flow).toContain('shared/summary.json');
     expect(flow).toContain('shared/context.json');
   });
 
   it('defines the agent output schema', () => {
-    const schema = read(AGENT_OUTPUT_SCHEMA);
+    const schema = read(MAIN_THREAD_CONTRACT);
     expect(schema).toContain('status');
     expect(schema).toContain('artifacts');
     expect(schema).toContain('evidence_paths');

@@ -1,10 +1,8 @@
 {
   "version": "1.0.0",
-  "generated_at": "2026-03-21T00:00:00.000Z",
-  "scope": "first-wave-1",
-  "project": {
-    "name": "spec-first",
-    "type": "cli-tool",
-    "platform": "node"
-  }
+  "generated_at": "2026-03-23T17:40:00.000Z",
+  "scope": "first-skill-project-cognition",
+  "project_type": "node-cli",
+  "entry_points": ["dist/cli/index.js"],
+  "description": "AI-workflow CLI for spec-driven development"
 }

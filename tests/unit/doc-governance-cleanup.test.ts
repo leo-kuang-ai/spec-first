@@ -16,7 +16,7 @@ describe('doc governance cleanup', () => {
       read('AGENTS.md'),
       read('00-onboarding/references/scenario-mapping.md'),
       read('03-spec/references/constitution-authority.md'),
-      read('01-init/references/output-format.md'),
+      read('01-init/references/prerequisites.md'),
       read('02-catchup/SKILL.md'),
       read('02-catchup/references/context-recovery-guide.md'),
     ].join('\n');

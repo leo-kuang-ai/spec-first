@@ -10,6 +10,20 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 对 `spec.md` / `design.md` / `task_plan.md` / `document-links.yaml` 执行只读一致性分析，输出严重度分级报告。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | 推荐 | 项目概览，理解技术栈和模块划分 |
+| `critical-flows` | 推荐 | 关键流程，理解业务链路 |
+| `structure-overview` | 推荐 | 代码结构，理解模块边界 |
+| `domain-model` | 可选 | 领域模型，理解业务概念 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## 触发条件
 - 阶段: 建议在 03_plan 前后执行（任意阶段可读分析）
 - Command: `/spec-first:analyze`

@@ -17,6 +17,10 @@ import {
   readFirstStructureOverview,
 } from './first-runtime-store.js';
 import { CANONICAL_PROJECTION_DOCS } from './first-artifact-mapping.js';
+import {
+  getSkillInputContract,
+  resolveSkillsRoot,
+} from './skill-input-contracts.js';
 import type {
   FirstApiContracts,
   FirstConventions,
@@ -311,10 +315,33 @@ function buildFirstSummaryLite(projectRoot: string): FirstSummaryLite | undefine
 }
 
 /**
- * 解析 skill 的资产契约（从输入矩阵查表）
+ * 解析 skill 的资产契约
+ * 优先级: YAML 配置（存在时）> 硬编码矩阵 > 默认配置
  */
 function resolveSkillAssetContract(skillName: string): SkillAssetContract {
-  return SKILL_INPUT_MATRIX[skillName] ?? { required: [], optional: [] };
+  const skillsRoot = resolveSkillsRoot();
+
+  // 检查 YAML 配置文件是否存在
+  if (skillsRoot) {
+    const yamlPath = join(skillsRoot, 'skill-input-contracts.yaml');
+    if (existsSync(yamlPath)) {
+      // YAML 存在，优先使用
+      const contract = getSkillInputContract(skillName, skillsRoot);
+      return {
+        required: contract.required as RuntimeAssetName[],
+        optional: [...contract.recommended, ...contract.optional] as RuntimeAssetName[],
+      };
+    }
+  }
+
+  // YAML 不存在，回退到硬编码矩阵
+  const hardcoded = SKILL_INPUT_MATRIX[skillName];
+  if (hardcoded) {
+    return hardcoded;
+  }
+
+  // 最终兜底：默认配置
+  return { required: [], optional: [] };
 }
 
 function readRuntimeAssetSnapshot(projectRoot: string): RuntimeAssetSnapshot {

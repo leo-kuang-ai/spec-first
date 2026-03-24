@@ -10,7 +10,7 @@ import { ExitCode } from '../../shared/types.js';
 import { getCliVersion } from '../router.js';
 import { ensureSkillCommands, type SkillHostTarget } from '../../shared/skill-commands.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
-import { detectHostPaths } from '../../shared/host-paths.js';
+import { detectHostPaths, formatHostPathSummary } from '../../shared/host-paths.js';
 import { REQUIRED_MCP_SERVERS, REQUIRED_SKILLS } from '../../config/bootstrap-manifest.js';
 import { installHooks } from '../../core/tool-integration/hook-installer.js';
 import { registerAIHooks } from '../../core/tool-integration/ai-runtime-hook.js';
@@ -118,6 +118,15 @@ async function runUpdate({
   // 9. 摘要
   if (dryRun) {
     console.log('\n（dry-run 模式，未写入任何文件）');
+  }
+
+  // 10. 打印完整安装路径清单
+  if (!quiet) {
+    const hostPaths = detectHostPaths();
+    console.log('\n📦 安装路径清单:');
+    for (const line of formatHostPathSummary(hostPaths)) {
+      console.log(`  ${line}`);
+    }
   }
 
   return ExitCode.SUCCESS;

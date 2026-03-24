@@ -10,6 +10,20 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 同步文档关联索引，回填缺失引用并检测断链项。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | 推荐 | 项目概览，理解技术栈和模块划分 |
+| `entry-guide` | 可选 | 入口指南，快速定位实现位置 |
+| `structure-overview` | 可选 | 代码结构，理解模块边界 |
+| `api-contracts` | 可选 | API 契约，理解接口规范 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## 触发条件
 - 阶段: 任意（不限阶段）
 - Command: `/spec-first:sync`

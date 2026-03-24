@@ -143,7 +143,7 @@ feat: _
 步骤 6/7: Feature ID（可选）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-自动生成: FSREQ-20260310-HOMEPAGE-001
+自动生成: FSREQ-20260324-HOMEPAGE-001
 自定义 ID（直接回车使用自动生成）: _
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -168,7 +168,7 @@ Feature 缩写:  HOMEPAGE
 规模:          M (Medium)
 平台:          admin-frontend, java-backend
 标题:          首页阶段流转图优化
-Feature ID:    FSREQ-20260310-HOMEPAGE-001
+Feature ID:    FSREQ-20260324-HOMEPAGE-001
 宿主检查:      否
 
 确认以上参数？[Y/n]: _

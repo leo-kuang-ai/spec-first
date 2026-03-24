@@ -23,6 +23,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REMOVED_SKILLS } from '../core/rules/truth-source.js';
 import { detectHostPaths } from './host-paths.js';
+import {
+  injectInputContextToAllSkills,
+} from '../core/skill-runtime/skill-input-injector.js';
 
 /** spec-first 包根目录（兼容 dist 产物路径与 src 源码路径） */
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -63,6 +66,23 @@ function syncSkillsToUserDir(userSkillsDir: string, dryRun?: boolean): string | 
   const agentsMd = join(pkgSkillsRoot, 'AGENTS.md');
   if (existsSync(agentsMd)) {
     cpSync(agentsMd, join(targetRoot, 'AGENTS.md'));
+  }
+
+  // 同步 skill-input-contracts.yaml（注入配置）
+  const contractsYaml = join(pkgSkillsRoot, 'skill-input-contracts.yaml');
+  if (existsSync(contractsYaml)) {
+    cpSync(contractsYaml, join(targetRoot, 'skill-input-contracts.yaml'));
+  }
+
+  // 安装时自动注入输入上下文到 SKILL.md
+  try {
+    const results = injectInputContextToAllSkills(targetRoot);
+    const injected = results.filter((r) => r.injected);
+    if (injected.length > 0) {
+      console.log(`  Skill Input Context: ${injected.length} skills injected`);
+    }
+  } catch {
+    // 注入失败不阻塞安装
   }
 
   return targetRoot;

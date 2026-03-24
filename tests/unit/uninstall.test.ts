@@ -8,6 +8,7 @@ const CLAUDE_HOME = join(TMP, '.claude');
 const CODEX_SKILLS = join(TMP, '.codex', 'skills');
 const GEMINI_HOME = join(TMP, '.gemini');
 const CURSOR_HOME = join(TMP, '.cursor');
+const GENERIC_HOME = join(TMP, '.spec-first', 'generic');
 const SF_SKILLS = join(TMP, '.spec-first', 'skills');
 const CC_SWITCH_SKILLS = join(TMP, '.cc-switch', 'skills');
 const PROJECT = join(TMP, 'project');
@@ -18,6 +19,7 @@ vi.mock('../../src/shared/host-paths.js', () => ({
     claudeCommandsDir: join(CLAUDE_HOME, 'commands'),
     codexSkillsDir: CODEX_SKILLS,
     specFirstSkillsDir: SF_SKILLS,
+    genericSkillsDir: join(GENERIC_HOME, 'skills'),
     claudeConfigDir: join(TMP, '.config', 'claude-code'),
     claudeConfigFiles: [
       join(TMP, '.config', 'claude-code', 'mcp.json'),
@@ -55,6 +57,10 @@ function setupFixtures(): void {
   // Cursor skills
   mkdirSync(join(CURSOR_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
   writeFileSync(join(CURSOR_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
+
+  // Generic skills
+  mkdirSync(join(GENERIC_HOME, 'skills', 'spec-first', 'init'), { recursive: true });
+  writeFileSync(join(GENERIC_HOME, 'skills', 'spec-first', 'init', 'SKILL.md'), '# init');
 
   // CC Switch skills
   mkdirSync(join(CC_SWITCH_SKILLS, 'spec-first', 'init'), { recursive: true });
@@ -118,7 +124,7 @@ describe('handleUninstall', () => {
     const code = handleUninstall(['--host']);
     expect(code).toBe(ExitCode.CONFIG_ERROR);
     expect(errSpy).toHaveBeenCalledWith(
-      'uninstall 失败：参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|all）'
+      'uninstall 失败：参数错误：--host 需要一个目标值（claude|codex|gemini|cursor|generic|all）'
     );
   });
 
@@ -127,7 +133,7 @@ describe('handleUninstall', () => {
     const code = handleUninstall(['--host', 'gemni']);
     expect(code).toBe(ExitCode.CONFIG_ERROR);
     expect(errSpy).toHaveBeenCalledWith(
-      'uninstall 失败：参数错误：未知 host "gemni"，可选值: claude|codex|gemini|cursor|all'
+      'uninstall 失败：参数错误：未知 host "gemni"，可选值: claude|codex|gemini|cursor|generic|all'
     );
   });
 
@@ -138,6 +144,7 @@ describe('handleUninstall', () => {
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
     expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(true);
     expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(true);
+    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(true);
   });
 
   it('should remove skills cache directory', () => {
@@ -159,6 +166,7 @@ describe('handleUninstall', () => {
     handleUninstall([]);
     expect(existsSync(join(GEMINI_HOME, 'skills', 'spec-first'))).toBe(false);
     expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(false);
   });
 
   it('should only remove selected host artifacts when --host gemini,cursor is provided', () => {
@@ -167,12 +175,20 @@ describe('handleUninstall', () => {
     expect(existsSync(join(CURSOR_HOME, 'skills', 'spec-first'))).toBe(false);
     expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
     expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
+    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(true);
   });
 
   it('should keep shared skills cache and cc-switch skills when uninstall is scoped by --host', () => {
     handleUninstall(['--host', 'gemini,cursor']);
     expect(existsSync(join(SF_SKILLS, 'spec-first'))).toBe(true);
     expect(existsSync(join(CC_SWITCH_SKILLS, 'spec-first'))).toBe(true);
+  });
+
+  it('should remove generic skills directory when --host generic is provided', () => {
+    handleUninstall(['--host', 'generic']);
+    expect(existsSync(join(GENERIC_HOME, 'skills', 'spec-first'))).toBe(false);
+    expect(existsSync(join(CLAUDE_HOME, 'commands', 'spec-first'))).toBe(true);
+    expect(existsSync(join(CODEX_SKILLS, 'spec-first'))).toBe(true);
   });
 
   it('should treat --host all as full uninstall', () => {

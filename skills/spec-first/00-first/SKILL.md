@@ -27,11 +27,11 @@ spec-first first
 
 ## 正式边界
 
-详见 `references/execution-flow.md` 与 `references/subagent-architecture.md`。
+详见 `references/execution-and-agent-architecture.md`。
 
 - Skill 负责：定义工作流、Agent 分工、证据来源、禁止猜测边界、成功标准与重试原则、"事实检测"与"工作流决策"的分界
 - CLI 负责：启动 `first`、准备最小输入、校验 runtime 结构、检查 docs 是否存在
-- 并发上限与 wave 前置依赖：见 `references/subagent-architecture.md`；主线程调度约束见 `references/main-thread-contract.md`
+- 并发上限与 wave 前置依赖：见 `references/execution-and-agent-architecture.md`；主线程调度约束见 `references/main-thread-and-evidence-contract.md`
 
 ## 正式 contract
 
@@ -40,32 +40,34 @@ spec-first first
 - `docs/first/*.md` 是人类阅读产物，不参与上下文注入，不承载文档真源语义
 - 辅助产物 `docs-index.json` 只服务 docs 阅读建议与快速索引，不参与真源判定
 
-正式 runtime 资产（9 个）与正式 docs 集合（14 个）的完整列表见 `references/subagent-architecture.md`。
+正式 runtime 资产（9 个）与正式 docs 集合（14 个）的完整列表见 `references/execution-and-agent-architecture.md`。
 
 ## 最小执行流
 
-详细执行流见 `references/execution-flow.md`。本文件只保留入口级说明，不重复执行步骤正文。
+详细执行流见 `references/execution-and-agent-architecture.md`。本文件只保留入口级说明，不重复执行步骤正文。
 
 ## 主线程契约
 
 以下文档是 `first` 主线程的 canonical 约束，要求优先读取：
 
-- `references/main-thread-contract.md`
-- `references/evidence-pack-spec.md`
-- `references/agent-output-schema.md`
+- `references/execution-and-agent-architecture.md` (执行流程与 Agent 架构)
+- `references/main-thread-and-evidence-contract.md` (主线程、证据包与输出 Schema)
+- `references/output-consumption-guide.md` (产物消费指南、输入决策、刷新策略)
 
 ## Reference 读取规则
 
-| 场景 | 必须加载 | 按需加载 | 说明 |
-|---|---|---|---|
-| 所有执行 | `execution-flow.md`、`subagent-architecture.md`、`detection-rules.md`、`quality-assurance-rules.md`、`main-thread-contract.md`、`evidence-pack-spec.md`、`agent-output-schema.md` | — | 主线程与 wave 调度的共同契约 |
-| 代码结构分析 | `agents-code-analysis.md` | `structure-analysis.md` | 前者是执行提示，后者是主题规范 |
-| API / 依赖分析 | `agents-api-deps.md` | `api-and-dependencies.md` | 前者是执行提示，后者是主题规范 |
-| 规范与环境 | `agent-guidelines-setup.md` | `conventions-and-setup.md` | 前者是执行提示，后者是主题规范 |
-| 数据库分析 | `agent-database.md` | `database-conditional-projection.md`、`database-config.md` | 前者是执行提示，后者是主题规范 |
-| 领域模型分析 | `agent-domain-model.md` | `domain-model-analysis.md` | 前者是执行提示，后者是主题规范 |
-| 平台映射（低频） | — | `platform-document-mapping.md` | 仅在需要补充文档映射时加载 |
-| 验收阶段 | `testing-strategy.md` | — | 验收阶段的唯一权威 |
+| 场景 | 必须加载 | 说明 |
+|---|---|---|
+| 所有执行 | `execution-and-agent-architecture.md`、`main-thread-and-evidence-contract.md`、`output-consumption-guide.md`、`detection-rules.md`、`quality-assurance-rules.md` | 主线程与 wave 调度、输入决策与刷新策略的共同契约 |
+| 代码结构分析 | `code-structure-analysis.md` | 代码库概览、架构关系、调用链 |
+| API / 依赖分析 | `api-and-dependencies-analysis.md` | API 接口规范与外部依赖 |
+| 规范与环境 | `conventions-and-setup-analysis.md` | 开发规范与本地环境 |
+| 数据库分析 | `database-analysis.md` | 数据库 schema 与条件型产物 |
+| 领域模型分析 | `domain-model-analysis.md` | 领域对象、关系与业务规则 |
+| 平台映射（低频） | `platform-document-mapping.md` | 仅在需要补充文档映射时加载 |
+| 验收阶段 | `testing-strategy.md` | 验收阶段的唯一权威 |
+
+> **注意**: 主题分析文档已合并执行提示与主题规范,提供完整的分析视图。
 
 ## 核心硬约束
 
@@ -75,9 +77,12 @@ spec-first first
 - Skill 工作流直接写入最终 runtime/docs 文件，CLI 不承担文件交付职责
 - docs 不得回灌为真源
 - 需要图示时统一使用 ASCII 文本图，不得新增 Mermaid 代码块
-- 无法确认的结论必须标记 `[待确认]`
+- 无法确认的结论必须标记 `[待确认]`，并附上具体确认方法（如"需读取 X 文件第 N 行"）
 - `database-er.md` 只有在 `databaseSchema.status === healthy` 时才允许产出
 - `api-docs.md` 只服务项目 API 接口规范，不承载外部依赖综述
+- **evidence_path 精度要求**：所有 `evidence_path` 必须包含行号范围（如 `backend/app/models.py:10-25`），禁止只写目录路径（如 `backend/app/`）
+- **惰性证据收集**：Agent 按需读取证据，先查缓存 `evidence-pack/shared/cache.json`，缓存未命中时才读取源文件并写入缓存
+- **证据缓存共享**：所有 Agent 共享同一份证据缓存，禁止重复读取同一文件
 
 ## Common Mistakes
 
@@ -88,3 +93,5 @@ spec-first first
 - 把 Agent 编排逻辑继续下沉到 `src` 代码里
 - 用 Mermaid 代替 ASCII 文本图，导致宿主阅读和复制成本上升
 - runtime 资产完整时重跑 `first`（应改用 `catchup`）
+- `evidence_path` 只写目录路径而非精确文件:行号（导致无法追溯）
+- 标记 `[待确认]` 时不提供确认方法（导致后续无法跟进）

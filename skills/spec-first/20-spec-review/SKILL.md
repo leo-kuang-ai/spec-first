@@ -10,6 +10,20 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 对 `spec.md` 执行"英语单元测试"式质量审查，产出 Checklist 与质量分（C10）。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | **必需** | 项目概览，理解技术栈和模块划分 |
+| `domain-model` | 推荐 | 领域模型，理解业务概念 |
+| `conventions` | 推荐 | 编码规范，确保代码风格一致 |
+| `critical-flows` | 推荐 | 关键流程，理解业务链路 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## 触发条件
 - 阶段: 01_specify（可在 02_design 前重复执行）
 - Command: `/spec-first:spec-review [featureId]`

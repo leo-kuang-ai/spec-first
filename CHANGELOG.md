@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.2.3 2026-03-23 Claude: refactor(skill-input): 按能力属性重新分类优化配置 — 工具型(doctor/feature/onboarding)去项目化 required:[]；质量增强型(analyze/archive)可选上下文提升质量；元治理型(sync/status)轻量上下文；流程型保持完整上下文 (user-visible)
+- v1.2.3 2026-03-23 Claude: docs(skill-input): 新增优化方案文档 — 基于顶尖研发体系视角，输出最小充分上下文设计原则与四层分类框架
+- v1.2.3 2026-03-23 Claude: fix(skill-input): 修复三个设计缺陷 — (High) Windows 路径兼容性；(Medium) YAML 不存在时正确回退到 SKILL_INPUT_MATRIX；(Low) 模板提取到独立文件
+- v1.2.3 2026-03-23 Claude: feat(update): 安装完成时打印完整路径清单 — 调用 formatHostPathSummary() 输出所有宿主路径 (user-visible)
+- v1.2.3 2026-03-23 Claude: fix(skill): inject-context 参数校验 — 未知选项报错、--skills 缺值报错，防止静默吞掉输入错误
+- v1.2.3 2026-03-23 Claude: test(skill-input): 新增 skill-input-contracts.test.ts 和 skill-input-injector.test.ts 单元测试 — 覆盖配置解析、注入逻辑、force 模式、skip_injection 过滤等场景
+- v1.2.3 2026-03-23 Claude: feat(skill-input): 实现输入上下文自描述系统 — 新增 skill-input-contracts.yaml 配置文件、skill-input-contracts.ts 解析器、skill-input-injector.ts 注入器、CLI 子命令 `skill inject-context`，支持 YAML 配置驱动 skill 输入上下文管理 (user-visible)
+- v1.2.3 2026-03-23 Claude: refactor(context-resolver): 优先从 YAML 配置读取 skill 资产契约 — 改造 resolveSkillAssetContract 函数，优先级为 YAML 配置 > 硬编码矩阵
+- v1.2.3 2026-03-23 Claude: feat(skill-commands): 安装时自动注入输入上下文 — 在 syncSkillsToUserDir 中集成注入逻辑，用户执行 spec-first update 时自动为 SKILL.md 注入输入上下文章节 (user-visible)
+- v1.2.3 2026-03-23 Claude: docs(skill): 移动方案文档到 skill-注入 目录 — 将 2026-03-23-skill-input-context-self-description.md 移动到 `docs/01-需求文档/逐个skill优化/skill-注入/`
+- v1.1.4 2026-03-23 Claude: docs(first): 恢复 00-first references 回 skill 原目录 — 将迁移到 `docs/01-需求文档/逐个skill优化/first-skill` 的 references 文档恢复到 `skills/spec-first/00-first/references`，确保 skill 入口与 canonical contract 同目录 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(first-skill): 迁移 first-skill 需求/方案文档到 first-skill-优化 目录 — 将 10 份 first-skill 相关需求、方案、审查与分析文档统一移动到新目录，并同步修正审查报告中的旧路径引用 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(first): 统一 docs/first 次级总览的 28 命令 / 15 模块计数，并补充 batch-test 说明 — 避免 README、API 文档、入口指南与关键流程文档在计数和命令集上出现版本漂移 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(first): 补充 00-first 迁移提案与执行清单的逻辑层/现状 canonical 名称映射说明 — 避免把目标目录树误读为当前物理文件名，并明确 quality-assurance-rules.md / platform-document-mapping.md / database-analysis.md 的现状职责 (user-visible)
+- v1.1.4 2026-03-23 Claude: fix(first): 收口 first 总体执行策略与平台映射旧契约引用 — 将 `00-first总体执行策略.md` 纳入 SKILL 主读取链，修正 `platform-document-mapping.md` 对 `database-config.md` 的残留引用，并补充回归测试防止策略文档孤岛 (user-visible)
+- v1.1.4 2026-03-23 Claude: refactor(first-references): 收敛 00-first references 结构 — 合并 22 个文件为 12 个，新增产物消费指南，更新测试用例与交叉引用 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(first): 新增 00-first 总体执行策略 — 明确 first 的输入决策、执行指南、输出消费与刷新策略，并纳入主线程优先读取列表 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(first): 补全 00-first references 迁移的交叉引用更新 — 在重构提案与迁移清单中显式加入 references 内部交叉引用、SKILL.md Reference 读取规则重写与 Phase 4a/4b 拆分，避免删除旧文件时断链 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(first): 收敛 00-first references 重构提案与迁移清单 — 新增 `00-first-references重构提案.md` 与 `00-first-references迁移执行清单.md`，明确 references 的保留/合并/删除/新增边界与目录重构路径 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(process): 强制每次有效更新记录 CHANGELOG — 明确仓库内代码/文档/配置/技能/测试变更都必须同步追加变更记录，并新增 AGENT.md 执行规则镜像 (user-visible)
+- v1.1.4 2026-03-23 Claude: docs(spec-first): 收敛链路优化与最小保留流程 — 合并落盘 ID/Gate 收敛、最小流程图、迁移优先级表与第一批实施方案；统一主链为 `Feature -> REQ -> FR -> DS -> TASK`，收敛 gate / defect / RFC / confirm-policy 术语边界，并补齐可执行验收命令 (user-visible)
 - v1.1.4 2026-03-20 Claude: docs(first): 主线程上下文收缩 — 新增 main-thread-contract.md、evidence-pack-spec.md、agent-output-schema.md 三个 canonical 契约文档；收敛 SKILL.md 为总入口；压薄 agent-*.md 为核心四小节；明确 runtime/docs 分工边界 (user-visible)
 - v1.1.4 2026-03-20 Claude: fix(lint): 移除 guards.ts 中未使用的 TaskNode 类型导入
 - v1.1.4 2026-03-19 Claude: fix(docs): 修正 pnpm link 开发模式卸载文档误导 — 将"pnpm remove --global"从"自动卸载"分离为独立小节，明确 preuninstall 跳过原因（防误删全局资产）；补充 preuninstall 测试覆盖全局卸载（npm_config_global=true）场景 (user-visible)

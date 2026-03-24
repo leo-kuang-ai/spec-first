@@ -200,7 +200,7 @@ describe('resolveSkillContext', () => {
     expect(result.source).toBe('runtime');
     expect(result.backgroundInputStatus).toBe('full');
     expect(result.requiredAssetNames).toEqual(['summary']);
-    expect(result.optionalAssetNames).toEqual(['domain-model', 'conventions']);
+    expect(result.optionalAssetNames).toEqual(['domain-model', 'conventions', 'critical-flows']);
     expect(result.contextSummary).toContain('spec-first');
     expect(result.docsIndex?.quickStart).toContain('docs/first/README.md');
     expect(result.optional.domainModel?.glossary).toContain('Feature');

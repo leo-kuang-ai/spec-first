@@ -39,6 +39,21 @@ metadata:
 
 执行阶段验收校验，评估 Gate 条件与文档健康缺口。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | **必需** | 项目概览，理解技术栈和模块划分 |
+| `critical-flows` | 推荐 | 关键流程，理解业务链路 |
+| `conventions` | 推荐 | 编码规范，确保代码风格一致 |
+| `entry-guide` | 推荐 | 入口指南，快速定位实现位置 |
+| `database-schema` | 可选 | 数据库结构，理解数据模型 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## Announce at Start
 
 ```

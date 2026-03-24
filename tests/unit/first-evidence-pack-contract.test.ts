@@ -14,16 +14,16 @@ function read(path: string): string {
 
 describe('00-first evidence pack and bundle contract', () => {
   it('describes the evidence pack as a structured handoff', () => {
-    const spec = read(join(FIRST_REFS, 'evidence-pack-spec.md'));
+    const spec = read(join(FIRST_REFS, 'main-thread-and-evidence-contract.md'));
     expect(spec).toContain('manifest.json');
     expect(spec).toContain('shared/');
     expect(spec).toContain('runtime/');
     expect(spec).toContain('docs/');
-    expect(spec).toContain('主线程只发包，不发长证据');
+    expect(spec).toContain('主线程只发包,不发长证据');
   });
 
   it('defines shared summary as a skill-layer execution artifact', () => {
-    const spec = read(join(FIRST_REFS, 'evidence-pack-spec.md'));
+    const spec = read(join(FIRST_REFS, 'main-thread-and-evidence-contract.md'));
     expect(spec).toContain('shared/summary.json');
     expect(spec).toContain('serena_available');
     expect(spec).toContain('Skill 层执行产物');
@@ -33,8 +33,7 @@ describe('00-first evidence pack and bundle contract', () => {
     const readme = read(BUNDLE_README);
     expect(readme).toContain('设计与实施说明');
     expect(readme).toContain('canonical source');
-    expect(readme).toContain('skills/spec-first/00-first/references/main-thread-contract.md');
-    expect(readme).toContain('skills/spec-first/00-first/references/evidence-pack-spec.md');
-    expect(readme).toContain('skills/spec-first/00-first/references/agent-output-schema.md');
+    expect(readme).toContain('skills/spec-first/00-first/references/main-thread-and-evidence-contract.md');
+    expect(readme).toContain('skills/spec-first/00-first/references/execution-and-agent-architecture.md');
   });
 });

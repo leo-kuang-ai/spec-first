@@ -1,172 +1,318 @@
-# Spec-First 架构关系
+# Spec-First 架构文档
 
-> 基于 `.spec-first/runtime/first/critical-flows.json` 真源生成
+> 本文档基于 `.spec-first/runtime/first/structure-overview.json` 生成
 
----
-
-## 核心流程
-
-### 1. CLI 命令分发流程
-
-**入口**：`src/cli/index.ts:103`
-
-**风险等级**：medium
-
-**步骤**：
-1. `dispatch(process.argv.slice(2))`
-2. 查找命令注册表 `commands.get(cmd)`
-3. `shouldRequireConfirmation()` 校验确认策略
-4. `resolveConfirmPolicy()` 评估 mode/size
-5. `entry.handler(subArgs)` 调用命令处理器
-
-**证据**：`src/cli/index.ts:36-103`, `src/cli/router.ts:79-122`
-
----
-
-### 2. 阶段推进流程
-
-**入口**：`src/core/process-engine/advance.ts:123`
-
-**风险等级**：critical（不可逆操作）
-
-**步骤**：
-1. `loadState()` 加载 `stage-state.json`
-2. `assertTransitionAllowed(from, to)` 状态机校验
-3. `checkDependencies()` 检查目标阶段产物依赖
-4. `evaluateGate()` 执行 Gate 条件评估
-5. `saveState()` 写入 `stage-state.json`（不可逆）
-6. `writeLog()` 写入 `gate-history.jsonl`
-7. `syncAgentContextFromDesign()` 上下文同步（02→03）
-
-**证据**：`src/core/process-engine/advance.ts:123-337`, `src/core/process-engine/stage-machine.ts:8-51`
-
----
-
-### 3. Gate 条件评估流程
-
-**入口**：`src/core/gate-engine/gate-evaluator.ts:106`
-
-**风险等级**：high
-
-**步骤**：
-1. `loadDocumentLinks()` 解析文档关联索引
-2. `loadRfcStatuses()` 加载 RFC 状态
-3. `getCoverage()` 计算 C3/C4/C6/C8/C9
-4. `getConditions()` 获取阶段条件定义（Layer1）
-5. `def.evaluate(ctx)` 遍历执行条件评估
-6. `runCommandGate()` 执行 Layer2 命令 Gate
-7. `validateExceptions()` 匹配豁免
-8. `appendJsonl()` 持久化到 `gate-history.jsonl`
-
-**证据**：`src/core/gate-engine/gate-evaluator.ts:106-224`, `src/core/gate-engine/condition-registry.ts:41-407`
-
----
-
-### 4. Skill 三层路由分发
-
-**入口**：`src/core/skill-runtime/dispatcher.ts:258`
-
-**风险等级**：high
-
-**步骤**：
-1. 解析命令（提取 `namespace:skillName`）
-2. `SEMANTIC_MAP` 查找复合命令映射
-3. `RUNTIME_COMMANDS` 查找直接 CLI 分发
-4. `resolveSkillPath()` 查找 Skill 文件
-5. `loadSkill()` 加载并组装 prompt
-6. `evaluateSkillHardGate()` Hard-Gate 校验
-7. `evaluateRuntimeScopeGuard()` 作用域守卫
-8. `buildXxxRuntimeNotice()` 注入运行时上下文
-
-**证据**：`src/core/skill-runtime/dispatcher.ts:258-555`, `src/core/skill-runtime/hard-gate.ts:163-292`
-
----
-
-### 5. Auto-Loop 任务编排流程
-
-**入口**：`src/core/ai-orchestrator/auto-loop.ts:146`
-
-**风险等级**：high
-
-**步骤**：
-1. `loadTodoState()` 加载 `todo-state.json`
-2. `recoverInterruptedTasks()` 恢复僵尸任务（P9）
-3. `while (iteration < maxIterations)` 主循环
-4. `pickReadyTodos()` 选择就绪任务
-5. `Promise.race([executor(task), timeout])` 执行任务
-6. `runWatchdogCheck()` 超时/心跳检测
-7. `runPostWriteGuards()` 后置守卫
-8. `advanceTodoIteration()` + checkpoint
-
-**证据**：`src/core/ai-orchestrator/auto-loop.ts:146-699`
-
----
-
-### 6. 文档关联检查流程
-
-**入口**：`src/core/document-links.ts:103`
-
-**风险等级**：high
-
-**步骤**：
-1. `loadDocumentLinks()` 读取 `document-links.yaml`
-2. `validateDocumentLinksData()` 校验结构与引用
-3. `validateStageDocumentLinks()` 校验当前阶段必要文档
-4. `listMissingDocumentFiles()` 发现缺失文件
-5. `findBrokenDocumentReferences()` 发现坏引用
-6. `appendJsonl()` 写入 Gate / 诊断历史
-
-**证据**：`src/core/document-links.ts:55-207`
-
----
-
-## 高影响点
-
-| 文件 | 关键元素 | 风险等级 | 影响 |
-|------|---------|---------|------|
-| `src/shared/types.ts` | Stage 枚举, ExitCode, MatrixStatus | critical | 阶段定义变更影响所有状态机、Gate 条件 |
-| `src/core/process-engine/stage-machine.ts` | TRANSITIONS 表 | critical | 转换表变更直接影响 advance 合法性 |
-| `src/core/gate-engine/condition-registry.ts` | GATE_CONDITIONS | high | 新增/删除条件影响所有 Feature 阶段推进 |
-| `src/core/skill-runtime/dispatcher.ts` | RUNTIME_COMMANDS, SEMANTIC_MAP | high | 路由表变更影响所有 Skill 分发 |
-| `src/core/ai-orchestrator/auto-loop.ts` | runAutoLoop() 主循环 | high | 循环逻辑变更影响所有 Auto-Loop 执行 |
-| `src/core/document-links.ts` | loadDocumentLinks(), listMissingDocumentFiles() | high | 文档引用变更直接影响 Gate 校验结果 |
-
----
-
-## 跨模块依赖
-
-### 类型依赖
+## 三层架构
 
 ```
-src/shared/types.ts
-    ├── src/core/process-engine/stage-machine.ts
-    ├── src/core/gate-engine/gate-evaluator.ts
-    ├── src/core/document-links.ts
-    └── src/cli/router.ts
++------------------------------------------------------------------+
+|                           用户层                                  |
+|   spec-first <command> [options]                                 |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                        CLI 层 (src/cli/)                          |
+|  +------------------------------------------------------------+  |
+|  |                     命令注册与路由                          |  |
+|  |  index.ts  →  router.ts  →  commands/*.ts                  |  |
+|  +------------------------------------------------------------+  |
+|                              |                                   |
+|                              v                                   |
+|  +------------------------------------------------------------+  |
+|  |                   参数解析与校验                            |  |
+|  |  parse-utils.ts                                            |  |
+|  +------------------------------------------------------------+  |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                       Core 层 (src/core/)                         |
+|                                                                   |
+|  +-------------+  +-------------+  +-------------+  +-----------+ |
+|  |process-engine|  |skill-runtime|  |gate-engine |  |trace-engine| |
+|  |  状态机      |  |  分发器      |  |  门禁      |  |  追溯      | |
+|  +-------------+  +-------------+  +-------------+  +-----------+ |
+|         |                |                |               |       |
+|         v                v                v               v       |
+|  +-------------+  +-------------+  +-------------+  +-----------+ |
+|  |ai-orchestrator| |change-mgr  |  |metrics-engine| |validators | |
+|  |  AI 编排     |  |  变更管理   |  |  度量       |  |  校验     | |
+|  +-------------+  +-------------+  +-------------+  +-----------+ |
+|         |                |                |                       |
+|         v                v                v                       |
+|  +-------------+  +-------------+  +-------------+                |
+|  |template     |  |task-plan    |  |batch-executor|               |
+|  |  模板       |  |  任务计划    |  |  批量执行    |               |
+|  +-------------+  +-------------+  +-------------+                |
+|         |                |                                        |
+|         v                v                                        |
+|  +-------------+  +-------------+  +-------------+                |
+|  |tool-integration|migrations   |  |host-adapters|                |
+|  |  工具集成    |  |  迁移       |  |  宿主适配   |                |
+|  +-------------+  +-------------+  +-------------+                |
+|         |                                                        |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                      Shared 层 (src/shared/)                      |
+|  +------------------------------------------------------------+  |
+|  | types.ts          | logger.ts       | fs-utils.ts          |  |
+|  | 核心类型定义       | 日志工具        | 文件系统工具          |  |
+|  +------------------------------------------------------------+  |
+|  +------------------------------------------------------------+  |
+|  | config-schema.ts  | host-bootstrap.ts                     |  |
+|  | 配置 Schema       | 宿主启动                              |  |
+|  +------------------------------------------------------------+  |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                       Config 层 (src/config/)                     |
+|  bootstrap-manifest.ts                                            |
++------------------------------------------------------------------+
 ```
 
-### 函数调用依赖
+## 模块边界与职责
+
+### CLI 层
 
 ```
-src/core/process-engine/stage-machine.ts
-    └── src/core/process-engine/advance.ts
-
-src/core/document-links.ts
-    ├── src/core/gate-engine/gate-evaluator.ts
-    └── src/core/gate-engine/condition-registry.ts
-
-src/core/gate-engine/gate-evaluator.ts
-    ├── src/core/process-engine/advance.ts
-    └── src/cli/commands/orchestrate.ts
-
-src/core/skill-runtime/dispatcher.ts
-    ├── src/core/skill-runtime/hard-gate.ts
-    ├── src/core/skill-runtime/prompt-assembler.ts
-    └── src/core/skill-runtime/scope-guard.ts
+src/cli/
+├── index.ts          # 命令注册入口
+├── router.ts         # 路由分发
+├── parse-utils.ts    # 参数解析
+└── commands/         # 27+ 命令实现
+    ├── init.ts
+    ├── gate.ts
+    ├── stage.ts
+    ├── feature.ts
+    ├── id.ts
+    └── ...
 ```
 
----
+**职责**:
+- 接收用户命令行输入
+- 解析参数并校验
+- 路由到对应命令处理器
+- 调用 Core 层服务并返回结果
 
-## 数据来源
+**约束**: 依赖 core 和 shared，不向上依赖
 
-- 真源：`.spec-first/runtime/first/critical-flows.json`
+### Core 层
+
+```
+src/core/
+├── process-engine/   # 阶段状态机（8 active + 2 terminal）
+├── skill-runtime/    # Skill 分发、prompt 组装、hard-gate 校验
+├── ai-orchestrator/  # Auto-loop、catchup、context-pack
+├── gate-engine/      # 质量门禁评估（19 条规则）
+├── trace-engine/     # ID 生成/校验/搜索、覆盖率矩阵
+├── change-mgr/       # RFC/Defect 状态机
+├── template/         # Handlebars 渲染
+├── tool-integration/ # AI runtime hooks
+├── metrics-engine/   # 健康度与瓶颈检测
+├── validators/       # 产物格式校验
+├── task-plan/        # task_plan.md 解析
+├── rules/            # 静态规则定义（真理源）
+├── batch-executor/   # 批量任务执行
+├── migrations/       # 状态文件迁移
+└── host-adapters/    # 多宿主适配
+```
+
+**职责**:
+- 实现所有业务逻辑
+- 模块间可横向依赖
+- 不依赖 CLI 层
+
+### Shared 层
+
+```
+src/shared/
+├── types.ts          # Stage/ExitCode/ID 类型定义
+├── logger.ts         # 日志工具
+├── fs-utils.ts       # 文件系统工具
+├── config-schema.ts  # 配置 Schema
+└── host-bootstrap.ts # 宿主启动
+```
+
+**职责**:
+- 提供共享类型定义
+- 提供通用工具函数
+- 无业务依赖（例外: 依赖 `src/core/trace-engine/id-taxonomy.ts`）
+
+### Config 层
+
+```
+src/config/
+└── bootstrap-manifest.ts
+```
+
+**职责**:
+- 项目级配置
+- 启动清单定义
+
+## 依赖方向
+
+```
++----------+     +----------+     +----------+
+|   CLI    | --> |   Core   | --> |  Shared  |
++----------+     +----------+     +----------+
+                      ^               |
+                      |               |
+                      +---------------+
+                    (例外: shared 依赖 core/trace-engine/id-taxonomy.ts)
+
++----------+
+|  Config  | (独立，无依赖)
++----------+
+```
+
+**依赖规则**:
+1. CLI → Core → Shared (主流向)
+2. Shared → Core/trace-engine/id-taxonomy.ts (唯一例外，ID 类型定义)
+3. Config 独立于业务逻辑
+
+## 模块间依赖关系
+
+```
+process-engine ──┬──> shared/types.ts
+                 ├──> gate-engine/*
+                 └──> trace-engine/*
+
+skill-runtime ───┬──> shared/*
+                 ├──> rules/*
+                 └──> task-plan/*
+
+ai-orchestrator ─┬──> shared/*
+                 └──> skill-runtime/*
+
+gate-engine ─────┬──> shared/types.ts
+                 └──> trace-engine/*
+
+trace-engine ────┴──> shared/types.ts
+
+change-mgr ──────┴──> shared/types.ts
+
+template ────────┬──> shared/*
+                 └──> (handlebars)
+
+tool-integration─┬──> shared/*
+                 └──> (external tools)
+
+metrics-engine ──┬──> shared/*
+                 └──> trace-engine/*
+
+validators ──────┬──> shared/*
+                 └──> trace-engine/*
+
+task-plan ───────┴──> shared/*
+
+rules ───────────┴──> (无依赖)
+
+batch-executor ──┴──> shared/*
+
+migrations ──────┴──> shared/*
+
+host-adapters ───┴──> shared/*
+```
+
+## 核心模块详解
+
+### process-engine (流程引擎)
+
+```
++------------------+
+| process-engine   |
++------------------+
+| stage-machine.ts | ─── 阶段状态机 (00_init → 08_done)
+| advance.ts       | ─── 阶段推进逻辑
+| feature.ts       | ─── Feature 生命周期管理
+| init.ts          | ─── 目录初始化
++------------------+
+        │
+        ├──> shared/types.ts (Stage 枚举)
+        ├──> gate-engine (门禁校验)
+        └──> trace-engine (ID 生成)
+```
+
+### skill-runtime (Skill 运行时)
+
+```
++----------------------+
+| skill-runtime        |
++----------------------+
+| dispatcher.ts        | ─── Skill 分发器
+| prompt-assembler.ts  | ─── Prompt 组装
+| hard-gate.ts         | ─── Hard Gate 校验
+| execution-context.ts | ─── 执行上下文
++----------------------+
+        │
+        ├──> shared/*
+        ├──> rules/* (真理源)
+        └──> task-plan/*
+```
+
+### gate-engine (门禁引擎)
+
+```
++-----------------------+
+| gate-engine           |
++-----------------------+
+| gate-evaluator.ts     | ─── 门禁评估器
+| condition-registry.ts | ─── 条件注册表 (19 条)
+| constitution-validator| ─── 宪章校验
+| prd-validator.ts      | ─── PRD 校验
++-----------------------+
+        │
+        ├──> shared/types.ts
+        └──> trace-engine/*
+```
+
+### trace-engine (追溯引擎)
+
+```
++----------------------+
+| trace-engine         |
++----------------------+
+| id-taxonomy.ts       | ─── ID 分类体系 (14 类)
+| id-generator.ts      | ─── ID 生成器
+| id-validator.ts      | ─── ID 校验器
+| relationship-graph.ts| ─── 关系图 (覆盖率矩阵)
++----------------------+
+        │
+        └──> shared/types.ts
+```
+
+## 数据流
+
+```
+用户命令
+    │
+    v
+CLI 解析
+    │
+    v
+Router 分发
+    │
+    v
+Command Handler
+    │
+    ├──> process-engine (阶段管理)
+    ├──> gate-engine (门禁校验)
+    ├──> trace-engine (ID 追溯)
+    ├──> skill-runtime (Skill 执行)
+    └──> template (产物生成)
+    │
+    v
+输出结果
+```
+
+## 设计原则
+
+1. **单向依赖**: CLI → Core → Shared，避免循环依赖
+2. **类型集中**: 所有核心类型定义于 `src/shared/types.ts`
+3. **ESM only**: 全项目使用 ES Module
+4. **Named exports**: Core 模块仅使用命名导出
+5. **真理源**: 静态规则定义于 `src/core/rules/truth-source.ts`

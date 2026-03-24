@@ -1,12 +1,14 @@
 {
-  "project_type": {
-    "primary": "backend",
-    "subtype": "cli-tool"
-  },
-  "entry_points": {
-    "cli": "src/cli/index.ts",
-    "bin": "dist/cli/index.js"
-  },
+  "serena_available": true,
+  "project_type": "node-cli-typescript",
+  "project_name": "spec-first",
+  "version": "1.2.3",
+  "entry_points": ["dist/cli/index.js"],
+  "src_entry": "src/cli/index.ts",
+  "runtime": "node >=20.0.0",
+  "module_system": "ESM",
+  "bundler": "tsup",
+  "test_framework": "vitest",
   "core_modules": [
     "process-engine",
     "skill-runtime",
@@ -23,7 +25,12 @@
     "batch-executor",
     "migrations"
   ],
-  "cli_commands": 27,
-  "skills_count": 20,
-  "gaps": []
+  "gaps": [],
+  "evidence_paths": [
+    "package.json",
+    "README.md",
+    "tsconfig.json",
+    "src/cli/index.ts",
+    "src/core/"
+  ]
 }

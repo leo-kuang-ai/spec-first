@@ -1,112 +1,118 @@
 # 开发指南
 
-> 本文档基于 `.spec-first/runtime/first/conventions.json` 和 `entry-guide.json` 真源生成
+> 基于 `.spec-first/runtime/first/entry-guide.json` 与 `conventions.json` 生成
 
----
+## 环境准备
 
-## 环境要求
+### 系统要求
 
-| 依赖 | 版本 |
-|------|------|
-| Node.js | >=20.0.0 |
-| TypeScript | ^5.4.0 |
-| Module System | ESM |
+- **Runtime**: Node.js >=20.0.0
+- **包管理器**: npm
 
----
-
-## 安装与构建
+### 初始化
 
 ```bash
 # 安装依赖
 npm install
 
-# 构建 CLI
+# 构建项目
 npm run build
 
 # 类型检查
 npm run typecheck
 ```
 
----
+## 常用命令
 
-## 日常命令
+### 构建与类型检查
+
+```bash
+npm run build              # tsup 打包
+npm run typecheck          # tsc --noEmit 类型检查
+```
 
 ### 测试
 
 ```bash
-# 运行全部测试
-npm test
-
-# Watch 模式
-npm run test:watch
-
-# 单文件测试
-npx vitest run tests/unit/<file>.test.ts
-
-# 按名称匹配
-npx vitest run -t "pattern"
-
-# 测试报告
-npm run test:coverage
+npm test                   # vitest run（全量）
+npm run test:watch         # vitest watch 模式
+npx vitest run tests/unit/<file>.test.ts   # 单文件
+npx vitest run -t "pattern"               # 按名称匹配
 ```
 
 ### 代码质量
 
 ```bash
-# ESLint 检查
-npm run lint
-
-# ESLint 自动修复
-npm run lint:fix
-
-# Prettier 格式化
-npm run format
+npm run lint               # eslint src
+npm run lint:fix           # eslint --fix
+npm run format             # prettier 格式化
 ```
 
 ### Spec-First CLI
 
 ```bash
-# 查看当前 feature
-spec-first feature current
+# Feature 管理
+spec-first feature current                          # 查看当前 featureId
+spec-first feature switch <featureId>               # 切换 Feature
 
-# 切换 feature
-spec-first feature switch <featureId>
+# Gate 与阶段
+spec-first gate check --feature <featureId>         # 执行 Gate 校验
+spec-first stage advance --feature <featureId>      # 推进阶段
 
-# Gate 校验
-spec-first gate check --feature <featureId>
-
-# 阶段推进
-spec-first stage advance --feature <featureId>
+# 文档与追溯
+spec-first docs links validate --feature <featureId> # 校验文档关联
+spec-first metrics --feature <featureId>            # 查看覆盖率指标
+spec-first id search <ID>                           # 追溯 ID 上下游
+spec-first id generate <TYPE> --feature <featureId> # 生成新 ID
 ```
-
----
-
-## 环境变量
-
-| 变量名 | 用途 |
-|--------|------|
-| SPEC_FIRST_DEBUG | 调试模式开关 |
-| SPEC_FIRST_SKIP_BOOTSTRAP | 跳过引导 |
-| SPEC_FIRST_INIT_BOOTSTRAP | 初始化时引导 |
-| SPEC_FIRST_BIN | CLI 二进制路径 |
-| VITEST | 测试环境标识 |
-| NODE_ENV | 环境标识 |
-
----
 
 ## 开发流程
 
-1. **创建 Feature** - `spec-first init --feat <NAME>`
-2. **编写需求** - `/spec-first:spec`
-3. **技术设计** - `/spec-first:design`
-4. **任务拆解** - `/spec-first:task`
-5. **实现** - `/spec-first:code`
-6. **验证** - `/spec-first:verify`
-7. **归档** - `/spec-first:archive`
+### 1. 代码变更后自检
 
----
+每次 `src/` 下 `.ts` 文件变更后必须执行：
 
-## 真源
+```bash
+npm run typecheck
+npm test
+```
 
-- `.spec-first/runtime/first/conventions.json`
-- `.spec-first/runtime/first/entry-guide.json`
+### 2. 提交前检查
+
+- 确保所有测试通过
+- 确保 lint 无错误
+- 更新 CHANGELOG.md
+
+### 3. 核心模块变更注意事项
+
+修改以下核心模块时需要特别谨慎：
+
+- `src/core/` - 核心引擎逻辑
+- `src/shared/types.ts` - Stage/ID 体系
+- 任何 `index.ts` 重导出变更
+
+## 禁止操作
+
+以下文件/目录**只能通过 CLI 操作**，禁止手动编辑：
+
+| 文件 | 风险等级 | 正确操作 |
+|------|---------|---------|
+| `stage-state.json` | 高 | `spec-first stage advance` |
+| `document-links.yaml` | 中 | `spec-first docs links validate` |
+| `specs/*/todo-state.json` | 中 | 对应 CLI 子命令 |
+| `specs/*/reports/*` | 中 | 对应 CLI 子命令 |
+
+### 违规后果
+
+手动修改状态文件会导致：
+- Gate 校验失准
+- 覆盖率数据污染
+- 审计日志断裂
+
+### CLI 不可用时的降级策略
+
+| 操作 | 降级策略 |
+|------|---------|
+| `stage advance` | **永不降级**，告知用户 CLI 不可用 |
+| `docs links validate` | 可临时跳过，完成后提醒用户补校验 |
+| 其他状态文件 | 仅读取不写入，告知用户需补 CLI 命令 |

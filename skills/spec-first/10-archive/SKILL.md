@@ -10,6 +10,19 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 归档 Feature 交付物，生成复盘报告与覆盖率总结。
 
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+| `summary` | 必需 | 项目概览，理解技术栈和模块划分 |
+| `structure-overview` | 推荐 | 代码结构，理解模块边界 |
+| `domain-model` | 推荐 | 领域模型，理解业务概念 |
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
+
+
 ## break-loop 核心理念（P1-BL）
 
 > 调试的价值不在于修复这个 bug，而在于让这类 bug 不再重复发生。

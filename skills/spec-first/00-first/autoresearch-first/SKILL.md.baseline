@@ -1,0 +1,92 @@
+---
+name: "spec-first:first"
+description: "Use when onboarding to an unknown codebase, project context is stale or missing, or runtime/docs cognition outputs need to be rebuilt after major changes."
+---
+
+# Skill: first
+
+`first` 是项目级认知 Skill。
+它的职责是定义工作流、多 Agent 编排、约束和成功标准；Skill 工作流直接产出最终 runtime/docs 文件，CLI 只负责最小支撑层：启动、校验和宿主集成。
+
+## 适用场景
+
+**适用**：首次认知、runtime 资产缺失或过期、重大重构后需重建上下文
+
+**不适用**：runtime 资产完整且未发生重大变更（此时用 `spec-first:catchup` 恢复上下文即可）
+
+## 默认模式
+
+- 唯一模式：`deep`
+- 默认就是 `deep`
+
+## 默认入口
+
+```bash
+spec-first first
+```
+
+## 正式边界
+
+详见 `references/execution-and-agent-architecture.md`。
+
+- Skill 负责：定义工作流、Agent 分工、证据来源、禁止猜测边界、成功标准与重试原则、"事实检测"与"工作流决策"的分界
+- CLI 负责：启动 `first`、准备最小输入、校验 runtime 结构、检查 docs 是否存在
+- 并发上限与 wave 前置依赖：见 `references/execution-and-agent-architecture.md`；主线程调度约束见 `references/main-thread-and-evidence-contract.md`
+
+## 正式 contract
+
+- `.spec-first/runtime/first/` 是机器真源
+- `.spec-first/runtime/first/index.json` 是正式索引
+- `docs/first/*.md` 是人类阅读产物，不参与上下文注入，不承载文档真源语义
+- 辅助产物 `docs-index.json` 只服务 docs 阅读建议与快速索引，不参与真源判定
+
+正式 runtime 资产（9 个）与正式 docs 集合（14 个）的完整列表见 `references/execution-and-agent-architecture.md`。
+
+## 最小执行流
+
+详细执行流见 `references/execution-and-agent-architecture.md`。本文件只保留入口级说明，不重复执行步骤正文。
+
+## 主线程契约
+
+以下文档是 `first` 主线程的 canonical 约束，要求优先读取：
+
+- `references/execution-and-agent-architecture.md` (执行流程与 Agent 架构)
+- `references/main-thread-and-evidence-contract.md` (主线程、证据包与输出 Schema)
+- `references/output-consumption-guide.md` (产物消费指南、输入决策、刷新策略)
+
+## Reference 读取规则
+
+| 场景 | 必须加载 | 说明 |
+|---|---|---|
+| 所有执行 | `execution-and-agent-architecture.md`、`main-thread-and-evidence-contract.md`、`output-consumption-guide.md`、`detection-rules.md`、`quality-assurance-rules.md` | 主线程与 wave 调度、输入决策与刷新策略的共同契约 |
+| 代码结构分析 | `code-structure-analysis.md` | 代码库概览、架构关系、调用链 |
+| API / 依赖分析 | `api-and-dependencies-analysis.md` | API 接口规范与外部依赖 |
+| 规范与环境 | `conventions-and-setup-analysis.md` | 开发规范与本地环境 |
+| 数据库分析 | `database-analysis.md` | 数据库 schema 与条件型产物 |
+| 领域模型分析 | `domain-model-analysis.md` | 领域对象、关系与业务规则 |
+| 平台映射（低频） | `platform-document-mapping.md` | 仅在需要补充文档映射时加载 |
+| 验收阶段 | `testing-strategy.md` | 验收阶段的唯一权威 |
+
+> **注意**: 主题分析文档已合并执行提示与主题规范,提供完整的分析视图。
+
+## 核心硬约束
+
+- 以代码、配置、依赖声明和 runtime 真源为准，禁止捏造
+- Skill 定义编排，CLI 不实现多 Agent 调度器
+- 先有 runtime 结果，再允许写入 runtime 真源
+- Skill 工作流直接写入最终 runtime/docs 文件，CLI 不承担文件交付职责
+- docs 不得回灌为真源
+- 需要图示时统一使用 ASCII 文本图，不得新增 Mermaid 代码块
+- 无法确认的结论必须标记 `[待确认]`
+- `database-er.md` 只有在 `databaseSchema.status === healthy` 时才允许产出
+- `api-docs.md` 只服务项目 API 接口规范，不承载外部依赖综述
+
+## Common Mistakes
+
+- 把 CLI 当成项目认知主控，而不是最小支撑层
+- 把 `docs/first/*.md` 当成事实真源使用
+- 在 `databaseSchema.status !== healthy` 时强行消费 `database-er.md`
+- 在 projection/renderer 层补充 runtime 中不存在的新事实
+- 把 Agent 编排逻辑继续下沉到 `src` 代码里
+- 用 Mermaid 代替 ASCII 文本图，导致宿主阅读和复制成本上升
+- runtime 资产完整时重跑 `first`（应改用 `catchup`）

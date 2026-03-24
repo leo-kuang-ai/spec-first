@@ -1,0 +1,23 @@
+{
+  "skill_name": "spec-first:onboarding",
+  "status": "complete",
+  "current_experiment": 0,
+  "baseline_score": 100.0,
+  "best_score": 100.0,
+  "experiments": [
+    {
+      "id": 0,
+      "score": 4,
+      "max_score": 4,
+      "pass_rate": 100.0,
+      "status": "baseline",
+      "description": "code review: 4/4 evals passed — Phase numbering is intentional"
+    }
+  ],
+  "eval_breakdown": [
+    {"name": "E1: Phase 编号连续", "pass_count": 1, "total": 1},
+    {"name": "E2: 无重复定义", "pass_count": 1, "total": 1},
+    {"name": "E3: 场景覆盖完整", "pass_count": 1, "total": 1},
+    {"name": "E4: 错误处理完整", "pass_count": 1, "total": 1}
+  ]
+}

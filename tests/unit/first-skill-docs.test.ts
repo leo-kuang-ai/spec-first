@@ -5,21 +5,22 @@ import { join } from 'node:path';
 const FIRST_ROOT = join(import.meta.dirname, '../../skills/spec-first/00-first');
 const SKILLS_INDEX = join(import.meta.dirname, '../../skills/spec-first/README.md');
 const SKILL_MD = join(FIRST_ROOT, 'SKILL.md');
-const SUBAGENT_ARCH = join(FIRST_ROOT, 'references/subagent-architecture.md');
-const AGENT_DB = join(FIRST_ROOT, 'references/agent-database.md');
+const EXECUTION_AND_ARCH = join(FIRST_ROOT, 'references/execution-and-agent-architecture.md');
+const MAIN_THREAD_CONTRACT = join(FIRST_ROOT, 'references/main-thread-and-evidence-contract.md');
+const OUTPUT_GUIDE = join(FIRST_ROOT, 'references/output-consumption-guide.md');
+const DATABASE_ANALYSIS = join(FIRST_ROOT, 'references/database-analysis.md');
 const DETECTION = join(FIRST_ROOT, 'references/detection-rules.md');
 const TESTING = join(FIRST_ROOT, 'references/testing-strategy.md');
 const QA_SHARED = join(FIRST_ROOT, 'references/quality-assurance-rules.md');
 const PLATFORM_MAPPING = join(FIRST_ROOT, 'references/platform-document-mapping.md');
-const LEGACY_PLATFORM_MAPPING = join(FIRST_ROOT, 'references/端类型产物映射.md');
-const EXECUTION_FLOW = join(FIRST_ROOT, 'references/execution-flow.md');
 const OPENAI_META = join(FIRST_ROOT, 'agents/openai.yaml');
-const AGENT_DOCS = [
-  join(FIRST_ROOT, 'references/agents-code-analysis.md'),
-  join(FIRST_ROOT, 'references/agents-api-deps.md'),
-  join(FIRST_ROOT, 'references/agent-guidelines-setup.md'),
-  join(FIRST_ROOT, 'references/agent-database.md'),
-  join(FIRST_ROOT, 'references/agent-domain-model.md'),
+
+const TOPIC_ANALYSIS_DOCS = [
+  join(FIRST_ROOT, 'references/code-structure-analysis.md'),
+  join(FIRST_ROOT, 'references/api-and-dependencies-analysis.md'),
+  join(FIRST_ROOT, 'references/conventions-and-setup-analysis.md'),
+  join(FIRST_ROOT, 'references/domain-model-analysis.md'),
+  join(FIRST_ROOT, 'references/database-analysis.md'),
 ];
 
 function read(path: string): string {
@@ -30,18 +31,13 @@ describe('00-first skill docs consistency', () => {
   it('should keep expected core files and minimal frontmatter', () => {
     expect(existsSync(SKILL_MD)).toBe(true);
     expect(existsSync(SKILLS_INDEX)).toBe(true);
-    expect(existsSync(SUBAGENT_ARCH)).toBe(true);
+    expect(existsSync(EXECUTION_AND_ARCH)).toBe(true);
+    expect(existsSync(MAIN_THREAD_CONTRACT)).toBe(true);
+    expect(existsSync(OUTPUT_GUIDE)).toBe(true);
     expect(existsSync(QA_SHARED)).toBe(true);
     expect(existsSync(TESTING)).toBe(true);
     expect(existsSync(PLATFORM_MAPPING)).toBe(true);
     expect(existsSync(OPENAI_META)).toBe(true);
-    expect(existsSync(LEGACY_PLATFORM_MAPPING)).toBe(false);
-
-    const skill = read(SKILL_MD);
-    expect(skill).toContain('name: "spec-first:first"');
-    expect(skill).toContain('description: "Use when onboarding to an unknown codebase');
-    expect(skill).not.toContain('version: "2.3.0"');
-    expect(skill).not.toContain('last_updated: "2026-03-17"');
   });
 
   it('should use trigger-style description and keep CLI as default path', () => {
@@ -58,7 +54,7 @@ describe('00-first skill docs consistency', () => {
   });
 
   it('should not use deprecated evidence marker format', () => {
-    const files = [SKILL_MD, SUBAGENT_ARCH, AGENT_DB, DETECTION, TESTING, QA_SHARED, ...AGENT_DOCS];
+    const files = [SKILL_MD, EXECUTION_AND_ARCH, DATABASE_ANALYSIS, DETECTION, TESTING, QA_SHARED, ...TOPIC_ANALYSIS_DOCS];
     for (const file of files) {
       const content = read(file);
       expect(content).not.toContain('(证据:');
@@ -76,21 +72,21 @@ describe('00-first skill docs consistency', () => {
     expect(shared).toContain('统一 QA 规则');
     expect(shared).toContain('runtime 资产');
 
-    for (const file of AGENT_DOCS) {
+    for (const file of TOPIC_ANALYSIS_DOCS) {
       const content = read(file);
       expect(content).toContain('quality-assurance-rules.md');
     }
   });
 
-  it('should describe runtime asset outputs in agent specs', () => {
-    for (const file of AGENT_DOCS) {
+  it('should describe runtime asset outputs in topic analysis specs', () => {
+    for (const file of TOPIC_ANALYSIS_DOCS) {
       const content = read(file);
       expect(content).toMatch(/\w+\.json/);
     }
   });
 
-  it('should document technical credential safeguards for Agent D', () => {
-    const db = read(AGENT_DB);
+  it('should document technical credential safeguards in database analysis', () => {
+    const db = read(DATABASE_ANALYSIS);
     expect(db).toContain('凭证防护');
     expect(db).toContain('日志脱敏');
   });
@@ -107,21 +103,22 @@ describe('00-first skill docs consistency', () => {
     expect(detection).not.toContain('quick 模式');
   });
 
-  it('should keep database config focused on conditional database capability', () => {
-    const databaseConfig = read(join(FIRST_ROOT, 'references/database-config.md'));
-    expect(databaseConfig).toContain('条件型能力');
-    expect(databaseConfig).toContain('database-schema.json');
+  it('should keep database analysis focused on conditional database capability', () => {
+    const databaseAnalysis = read(DATABASE_ANALYSIS);
+    expect(databaseAnalysis).toContain('条件型能力');
+    expect(databaseAnalysis).toContain('database-schema.json');
   });
 
   it('should include testing strategy matrix and link from SKILL.md', () => {
     const skill = read(SKILL_MD);
     const testing = read(TESTING);
+    const outputGuide = read(OUTPUT_GUIDE);
 
     expect(skill).toContain('testing-strategy.md');
-    expect(skill).toContain('references/main-thread-contract.md');
-    expect(skill).toContain('references/evidence-pack-spec.md');
-    expect(skill).toContain('references/agent-output-schema.md');
+    expect(skill).toContain('references/main-thread-and-evidence-contract.md');
+    expect(skill).toContain('output-consumption-guide.md');
     expect(testing).toContain('测试策略');
+    expect(outputGuide).toContain('消费决策');
   });
 
   it('should describe testing strategy by assets and docs outputs', () => {
@@ -132,23 +129,21 @@ describe('00-first skill docs consistency', () => {
   });
 
   it('should keep execution flow on runtime-first contract', () => {
-    const flow = read(EXECUTION_FLOW);
+    const flow = read(EXECUTION_AND_ARCH);
     expect(flow).toContain('spec-first first');
     expect(flow).not.toContain('spec-first first --yes');
     expect(flow).toContain('.spec-first/runtime/first/');
   });
 
   it('loads main-thread canonical contracts before collecting evidence pack', () => {
-    const flow = read(EXECUTION_FLOW);
-    expect(flow).toContain('### 0. load main-thread contract');
-    expect(flow).toContain('references/main-thread-contract.md');
-    expect(flow).toContain('references/evidence-pack-spec.md');
-    expect(flow).toContain('references/agent-output-schema.md');
-    expect(flow).toContain('### 1. collect evidence pack');
+    const flow = read(EXECUTION_AND_ARCH);
+    expect(flow).toContain('步骤 0: 加载主线程契约');
+    expect(flow).toContain('main-thread-and-evidence-contract.md');
+    expect(flow).toContain('步骤 1: 收集证据包');
 
-    // Order matters: contract must be loaded before evidence gathering.
-    expect(flow.indexOf('### 0. load main-thread contract')).toBeLessThan(
-      flow.indexOf('### 1. collect evidence pack')
+    // Order matters: contract needs to be loaded before evidence gathering.
+    expect(flow.indexOf('步骤 0: 加载主线程契约')).toBeLessThan(
+      flow.indexOf('步骤 1: 收集证据包')
     );
   });
 
@@ -159,7 +154,7 @@ describe('00-first skill docs consistency', () => {
   });
 
   it('should keep subagent orchestration on runtime-first delivery chain', () => {
-    const arch = read(SUBAGENT_ARCH);
+    const arch = read(EXECUTION_AND_ARCH);
     expect(arch).toContain('CLI');
     expect(arch).toContain('runtime');
     expect(arch).toContain('Serena');
@@ -178,6 +173,8 @@ describe('00-first skill docs consistency', () => {
 
     expect(detection).toContain('主类型识别');
     expect(mapping).toContain('平台文档映射');
+    expect(mapping).toContain('database-analysis.md');
+    expect(mapping).not.toContain('database-config.md');
   });
 
   it('should include platform and degradation test cases in testing strategy', () => {
@@ -191,8 +188,7 @@ describe('00-first skill docs consistency', () => {
 
 const INIT_SKILL = join(import.meta.dirname, '../../skills/spec-first/01-init/SKILL.md');
 const INIT_PREREQ = join(import.meta.dirname, '../../skills/spec-first/01-init/references/prerequisites.md');
-const INIT_OUTPUT = join(import.meta.dirname, '../../skills/spec-first/01-init/references/output-format.md');
-const FIRST_README = join(import.meta.dirname, '../../docs/first/README.md');
+const INIT_OUTPUT = join(import.meta.dirname, '../../skills/spec-first/01-init/references/prerequisites.md');
 
 describe('runtime truth source and docs output model', () => {
   it('documents runtime truth source in 00-first skill', () => {

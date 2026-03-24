@@ -43,13 +43,13 @@ Spec-First 全链路研发闭环引擎——阶段状态机驱动 Feature 从需
 ✅ 自检清单（回复中必须逐项输出）
 □ 1. npm run typecheck — 已通过 / 已确认无需（原因：____）
 □ 2. npm test — 已通过 / 受影响范围已通过
-□ 3. CHANGELOG.md — 已更新 / 豁免（原因：____）
+□ 3. CHANGELOG.md — 已更新
 □ 4. 变更范围 — 已确认仅限必要文件，无误改/遗漏
 ```
 
-- **CHANGELOG.md 主动更新**：版本号从 `package.json` 读取，Claude 主动追加，无需用户提醒
+- **CHANGELOG.md 主动更新**：版本号从 `package.json` 读取，Claude 主动追加，无需用户提醒；每次对仓库产生有效更新时都必须写入一条记录
   - 格式：`- vX.Y.Z YYYY-MM-DD 作者: 一句话摘要`，用户可见变更末尾加 `(user-visible)`
-  - **豁免条件**（必须全部满足）：① 仅修改 `.md`/`.yaml` 文件，② 不涉及 `package.json`、`src/shared/types.ts`、`src/core/rules/truth-source.ts`，③ 不删除测试用例，④ 不修改覆盖率阈值配置
+  - 豁免仅限纯分析、纯问答、未对仓库落盘任何文件变更的情况
 - **CLAUDE.md 同步提交**：每次 commit 将 CLAUDE.md 纳入提交范围
 
 ---
@@ -243,22 +243,3 @@ tests/fixtures/    # 测试固件数据
 <!-- SPEC-FIRST:BEGIN MANUAL -->
 <!-- 手动补充上下文，请保留此块 -->
 <!-- SPEC-FIRST:END MANUAL -->
-
-<!-- SPEC-FIRST:BEGIN AUTO-CONTEXT -->
-> Auto-synced at 2026-03-19T05:41:30.054Z
-
-## Spec-First Context Snapshot
-- Feature: FSREQ-20260319-WEBSITE-001
-- Stage: 03_plan
-- Design: specs/FSREQ-20260319-WEBSITE-001/design.md
-
-### Design Highlights
-- Design — FSREQ-20260319-WEBSITE-001
-- 1. 技术选型
-- 1.1 核心框架
-- 1.2 设计约束映射
-- 2. 模块划分
-- 3. 设计规格（DS）
-- DS-WEBSITE-001: 首页展示模块
-- DS-WEBSITE-002: 交互式终端演示
-<!-- SPEC-FIRST:END AUTO-CONTEXT -->

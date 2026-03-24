@@ -1,0 +1,17 @@
+## 输入上下文
+
+执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：
+
+| 产物 | 优先级 | 用途 |
+|------|--------|------|
+{{#each required}}
+| `{{this}}` | **必需** | {{lookup ../descriptions this}} |
+{{/each}}
+{{#each recommended}}
+| `{{this}}` | 推荐 | {{lookup ../descriptions this}} |
+{{/each}}
+{{#each optional}}
+| `{{this}}` | 可选 | {{lookup ../descriptions this}} |
+{{/each}}
+
+> **缺失处理**: 如果必需产物不存在，提示用户先执行 `/spec-first:first`
