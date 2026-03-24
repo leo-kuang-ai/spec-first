@@ -19,11 +19,10 @@ import {
 } from './scope-guard.js';
 import {
   assessHighRiskChanges,
-  buildHardGateRuntimeNotice,
-  evaluateSkillHardGate,
-  HardGateBlockedError,
   type HighRiskAssessment,
 } from './hard-gate.js';
+import { buildSafetyNotice, assessSafety } from './safety-guard.js';
+import { buildSkillChecklistContext } from './skill-checklist.js';
 import { loadEnabledExtensions } from '../process-engine/extensions.js';
 import {
   buildBackgroundInputGuidance,
@@ -52,7 +51,11 @@ import { REMOVED_SKILLS } from '../rules/truth-source.js';
 import type {
   BackgroundInputStatus as OrchestrateBackgroundInputStatus,
   FeatureState,
+  NodeState,
+  Stage,
 } from '../../shared/types.js';
+import { checkReadiness, STAGE_ARTIFACT_REQUIREMENTS } from '../process-engine/readiness-check.js';
+import { getNextStages } from '../process-engine/stage-machine.js';
 
 export interface DispatchResult {
   route: 'skill' | 'runtime' | 'error';
@@ -420,11 +423,17 @@ function resolveBundledSkillsRoot(): string | undefined {
 /** 加载 Skill 文件内容（可选动态组装） */
 export function loadSkill(
   skillPath: string,
-  options?: { projectRoot?: string; featureId?: string; enableAssembly?: boolean }
+  options?: {
+    projectRoot?: string;
+    featureId?: string;
+    enableAssembly?: boolean;
+    mode?: 'flow' | 'standalone';
+  }
 ): string {
   let content = ensureNextStepsPolicy(loadSkillTemplate(skillPath));
   const projectRoot = options?.projectRoot;
   const enableAssembly = options?.enableAssembly ?? Boolean(projectRoot);
+  const mode = options?.mode ?? 'flow';
   const executionContext: SkillExecutionContext | undefined = projectRoot
     ? { projectRoot, featureId: options?.featureId }
     : undefined;
@@ -455,14 +464,17 @@ export function loadSkill(
 
   const skillName = inferSkillNameFromPath(skillPath);
   const runtimeContext = executionContext as SkillExecutionContext;
-  const hardGateDecision = evaluateSkillHardGate(skillName, runtimeContext);
-  if (hardGateDecision.severity === 'BLOCKED') {
-    throw new HardGateBlockedError(skillName, hardGateDecision);
-  }
-
   const scopeGuardDecision = evaluateRuntimeScopeGuard(skillName, runtimeContext);
   if (scopeGuardDecision.blocked) {
     throw new ScopeGuardBlockedError(skillName, scopeGuardDecision.unmatchedFiles);
+  }
+
+  const safetyNotice = buildSafetyNotice(
+    assessSafety(skillName, runtimeContext.projectRoot, runtimeContext.featureId),
+    skillName
+  );
+  if (safetyNotice) {
+    content = `${safetyNotice}\n\n${content}`;
   }
 
   const scopeGuardNotice = buildScopeGuardRuntimeNotice(scopeGuardDecision);
@@ -470,9 +482,16 @@ export function loadSkill(
     content = `${scopeGuardNotice}\n\n${content}`;
   }
 
-  const hardGateNotice = buildHardGateRuntimeNotice(skillName, runtimeContext);
-  if (hardGateNotice) {
-    content = `${hardGateNotice}\n\n${content}`;
+  const checklistNotice = buildSkillChecklistContext(skillName, runtimeContext, mode);
+  if (checklistNotice) {
+    content = `${checklistNotice}\n\n${content}`;
+  }
+
+  if (skillName === 'orchestrate' && mode === 'flow') {
+    const readinessNotice = buildReadinessRuntimeNotice(runtimeContext);
+    if (readinessNotice) {
+      content = `${readinessNotice}\n\n${content}`;
+    }
   }
 
   if (skillName === 'first') {
@@ -601,6 +620,53 @@ function formatStageRuntimeNotice(
 
   parts.push(`<!-- /${marker} -->`);
   return parts.join('\n');
+}
+
+function buildReadinessRuntimeNotice(executionContext: SkillExecutionContext): string | undefined {
+  const featureId = resolveCurrentFeatureId(executionContext.projectRoot, executionContext.featureId);
+  if (!featureId) return undefined;
+
+  const statePath = join(executionContext.projectRoot, 'specs', featureId, 'stage-state.json');
+  if (!exists(statePath)) return undefined;
+
+  const state = readJson<Partial<FeatureState>>(statePath);
+  if (!state.currentStage) return undefined;
+
+  const currentStage = state.currentStage as Stage;
+  const currentNode = state.nodes?.[currentStage] ?? { status: 'in_progress' };
+  const candidateTargetStage =
+    currentNode?.status === 'done' || currentNode?.status === 'skipped'
+      ? getNextStages(currentStage)[0] ?? currentStage
+      : currentStage;
+  const artifactRequirements = STAGE_ARTIFACT_REQUIREMENTS[candidateTargetStage] ?? [];
+  const artifactNames = artifactRequirements.filter((artifact) =>
+    exists(join(executionContext.projectRoot, 'specs', featureId, artifact))
+  );
+
+  const readiness = checkReadiness({
+    currentStage,
+    targetStage: candidateTargetStage,
+    nodes: ({ [currentStage]: currentNode, ...(state.nodes ?? {}) } as Partial<
+      Record<Stage, NodeState>
+    >),
+    artifacts: artifactNames,
+    terminal: Boolean(state.terminal),
+  });
+
+  const lines = [
+    '<!-- readiness-check-context -->',
+    '## Readiness Check',
+    `- decision: ${readiness.decision}`,
+    `- current_stage: ${readiness.currentStage}`,
+    `- target_stage: ${readiness.targetStage}`,
+    `- previous_node_complete: ${readiness.checks.previousNodeComplete ? 'yes' : 'no'}`,
+    `- required_artifacts_exist: ${readiness.checks.requiredArtifactsExist ? 'yes' : 'no'}`,
+    `- no_active_work: ${readiness.checks.noActiveWork ? 'yes' : 'no'}`,
+    `- not_terminal: ${readiness.checks.notTerminal ? 'yes' : 'no'}`,
+    '<!-- /readiness-check-context -->',
+  ];
+
+  return lines.join('\n');
 }
 
 function buildSkillFileContextNotice(skillPath: string): string {
