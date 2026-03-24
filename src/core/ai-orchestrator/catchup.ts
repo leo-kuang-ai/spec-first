@@ -117,7 +117,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   const parsedTaskPlan = readTaskPlan(projectRoot, featureId);
   if (parsedTaskPlan) {
     totalTasks = parsedTaskPlan.stats.total;
-    completedTasks = parsedTaskPlan.stats.completed;
+    completedTasks = parsedTaskPlan.stats.done;
   } else if (!exists(taskPlanPath)) {
     missingFiles.push('task_plan.md');
   }
@@ -165,7 +165,7 @@ export function catchup(featureId: string, projectRoot: string): CatchupResult {
   }
 
   // Step 4: Locate current task
-  const currentTask = parsedTaskPlan?.currentTaskId;
+  const currentTask = parsedTaskPlan?.currentTaskTitle;
 
   // Step 4.2: 构建 TASK 级独立上下文包（Fresh Context Per Task）
   const taskContextPack = currentTask

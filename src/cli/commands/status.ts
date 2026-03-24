@@ -51,10 +51,10 @@ export function handleStatus(args: string[]): number {
           halted: taskCounts.blocked > 0,
           haltReason: taskCounts.blocked > 0 ? 'blocked' : undefined,
           items: taskPlan.tasks.map((task) => ({
-            id: task.id,
+            id: task.title,
             title: task.title,
             status:
-              task.status === 'complete'
+              task.status === 'done'
                 ? 'done'
                 : task.status === 'blocked'
                   ? 'blocked'
@@ -133,7 +133,7 @@ function summarizeTaskCounts(
   if (!plan) return counts;
 
   for (const task of plan.tasks) {
-    if (task.status === 'complete') counts.done += 1;
+    if (task.status === 'done') counts.done += 1;
     else if (task.status === 'in_progress') counts.in_progress += 1;
     else if (task.status === 'blocked') counts.blocked += 1;
     else counts.todo += 1;
