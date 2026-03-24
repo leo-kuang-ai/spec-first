@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.2.3 2026-03-24 Claude: docs(focus-requirements): 深度审查 skill 并创建 REVIEW.md — 分析核心价值（需求边界切割器）、发现 7 类问题、输出优化建议与实施路线图 (user-visible)
+- v1.2.3 2026-03-24 Claude: fix(focus-requirements): 移除 Telemetry 死代码 — 引用的脚本路径不存在，删除整个 Telemetry 部分
+- v1.2.3 2026-03-24 Claude: fix(focus-requirements): 同步 SKILL.zh.md — 添加 Preamble 部分、补全"最终回复格式"缺失的两个要点
+- v1.2.3 2026-03-24 Claude: fix(focus-requirements): 增强 description 触发词 — 添加 owner scope、requirement focus、handoff、side requirements 关键词
+- v1.2.3 2026-03-24 Claude: docs(focus-requirements): 明确模板/示例路径语义 — 添加相对于 skill 安装目录的说明注释
 - v1.2.3 2026-03-23 Claude: refactor(skill-input): 按能力属性重新分类优化配置 — 工具型(doctor/feature/onboarding)去项目化 required:[]；质量增强型(analyze/archive)可选上下文提升质量；元治理型(sync/status)轻量上下文；流程型保持完整上下文 (user-visible)
 - v1.2.3 2026-03-23 Claude: docs(skill-input): 新增优化方案文档 — 基于顶尖研发体系视角，输出最小充分上下文设计原则与四层分类框架
 - v1.2.3 2026-03-23 Claude: fix(skill-input): 修复三个设计缺陷 — (High) Windows 路径兼容性；(Medium) YAML 不存在时正确回退到 SKILL_INPUT_MATRIX；(Low) 模板提取到独立文件
