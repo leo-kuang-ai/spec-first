@@ -78,6 +78,16 @@ function printDecision(
       console.log(`  - ${warning}`);
     }
   }
+  if (result.decision === 'BLOCKED') {
+    console.log('恢复执行：');
+    if (!result.checks.previousNodeComplete) {
+      console.log('  1. 继续完成当前节点或将其显式标记为 skipped');
+    }
+    if (!result.checks.requiredArtifactsExist) {
+      console.log('  2. 先补齐目标节点所需产物，再重新运行 orchestrate');
+    }
+    console.log('  3. 若节点级 blocked，先解除阻塞并恢复为 in_progress');
+  }
 }
 
 export async function handleOrchestrate(

@@ -3,8 +3,8 @@ import { beforeEach, afterEach, describe, expect, it } from 'vitest';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { bootstrapFirstRuntime } from '../../src/core/skill-runtime/first-bootstrap.js';
-import { advance } from '../../src/core/process-engine/advance.js';
-import { Stage, type StageState } from '../../src/shared/types.js';
+import { applyProjectCognitionWriteback } from '../../src/core/skill-runtime/first-governance.js';
+import { Stage, type FeatureState } from '../../src/shared/types.js';
 import { seedFirstRuntimeOutputs } from '../helpers/first-runtime-fixture.js';
 
 const TMP = join(import.meta.dirname, '../fixtures/.tmp-first-governance-e2e');
@@ -20,14 +20,14 @@ function initRepo(): void {
 }
 
 function writeStageState(currentStage: Stage): void {
-  const state: StageState = {
+  const state: FeatureState = {
     featureId: FEATURE_ID,
     mode: 'N',
     size: 'M',
     platforms: ['backend'],
     currentStage,
-    history: [],
     terminal: false,
+    nodes: { [currentStage]: { status: 'in_progress' } },
     createdAt: '2026-03-16T00:00:00.000Z',
     updatedAt: '2026-03-16T00:00:00.000Z',
   };
@@ -97,7 +97,7 @@ afterEach(() => {
 });
 
 describe('first governance e2e', () => {
-  it('marks governance blocked when wrap_up advances with first runtime source changes', () => {
+  it('marks governance blocked for wrap_up when first runtime source changes exist', () => {
     writeStageState(Stage.WRAP_UP);
     writeFileSync(
       join(TMP, 'src', 'core', 'skill-runtime', 'first-conventions.ts'),
@@ -105,10 +105,7 @@ describe('first governance e2e', () => {
       'utf-8'
     );
 
-    const result = advance(FEATURE_ID, TMP);
-
-    expect(result.from).toBe(Stage.WRAP_UP);
-    expect(result.to).toBe(Stage.DONE);
+    const result = applyProjectCognitionWriteback(FEATURE_ID, TMP, Stage.WRAP_UP);
 
     const updatesLog = readFileSync(
       join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
@@ -122,16 +119,17 @@ describe('first governance e2e', () => {
     expect(updatesLog).toContain('"updateSource":"governance-wrap-up"');
 
     const findings = readFileSync(join(SPEC_DIR, 'findings.md'), 'utf-8');
-    expect(findings).toContain('PROJECT_COGNITION_BLOCKED: must_update');
+    expect(findings).toContain('# Findings');
 
     const index = JSON.parse(
       readFileSync(join(TMP, '.spec-first', 'runtime', 'first', 'index.json'), 'utf-8')
     ) as { status: string; conventions: { healthy: boolean } };
     expect(index.status).toBe('current');
     expect(index.conventions.healthy).toBe(true);
+    expect(result.gateStatus).toBe('blocked');
   });
 
-  it('marks governance blocked when wrap_up advances with feature artifact updates', () => {
+  it('marks governance blocked when wrap_up detects feature artifact updates', () => {
     writeStageState(Stage.WRAP_UP);
     writeFileSync(
       join(SPEC_DIR, 'design.md'),
@@ -146,10 +144,7 @@ describe('first governance e2e', () => {
       'utf-8'
     );
 
-    const result = advance(FEATURE_ID, TMP);
-
-    expect(result.from).toBe(Stage.WRAP_UP);
-    expect(result.to).toBe(Stage.DONE);
+    const result = applyProjectCognitionWriteback(FEATURE_ID, TMP, Stage.WRAP_UP);
 
     const updatesLog = readFileSync(
       join(TMP, '.spec-first', 'runtime', 'first', 'project-cognition-updates.jsonl'),
@@ -166,16 +161,14 @@ describe('first governance e2e', () => {
     expect(summary).toContain('runtime payload');
     expect(summary).not.toContain('Billing Core');
     expect(summary).not.toContain('/billing/invoices');
+    expect(result.gateStatus).toBe('blocked');
   });
 
-  it('does not rewrite docs outputs when release advances to done with docs-only drift', () => {
-    writeStageState(Stage.RELEASE);
+  it('skips writeback when done checks only see docs-only drift', () => {
+    writeStageState(Stage.DONE);
     writeFileSync(join(TMP, 'docs', 'first', 'README.md'), '# Drifted README\n', 'utf-8');
 
-    const result = advance(FEATURE_ID, TMP);
-
-    expect(result.from).toBe(Stage.RELEASE);
-    expect(result.to).toBe(Stage.DONE);
+    const result = applyProjectCognitionWriteback(FEATURE_ID, TMP, Stage.DONE);
 
     const readme = readFileSync(join(TMP, 'docs', 'first', 'README.md'), 'utf-8');
     expect(readme).toContain('Drifted README');
@@ -190,5 +183,6 @@ describe('first governance e2e', () => {
     expect(updatesLog).toContain('"topicKey":"project-cognition/first"');
     expect(updatesLog).toContain('"assetId":"docs/first/README.md"');
     expect(updatesLog).toContain('"updateSource":"governance-done"');
+    expect(result.gateStatus).toBe('skipped');
   });
 });

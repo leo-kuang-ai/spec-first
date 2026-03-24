@@ -30,7 +30,7 @@ describe('decideNextStep', () => {
 
     expect(result.decision).toBe('READY_TO_ADVANCE');
     expect(result.nextStage).toBe(Stage.PLAN);
-    expect(result.suggestedCommand).toBe('spec-first stage advance FSREQ-20260309-AUTO-001');
+    expect(result.suggestedCommand).toBe('spec-first transition FSREQ-20260309-AUTO-001');
     expect(result.reasons).toEqual([]);
     expect(result.reasonCodes).toEqual([]);
   });
@@ -54,7 +54,7 @@ describe('decideNextStep', () => {
 
     expect(result.decision).toBe('AUTO_ADVANCE');
     expect(result.nextStage).toBe(Stage.IMPLEMENT);
-    expect(result.suggestedCommand).toBe('spec-first stage advance FSREQ-20260309-AUTO-001');
+    expect(result.suggestedCommand).toBe('spec-first transition FSREQ-20260309-AUTO-001');
   });
 
   it('should block when dependencies are missing for design handoff', () => {

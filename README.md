@@ -1,6 +1,8 @@
 # Spec-First — Spec-Driven AI Development Workflow Engine
 
-**Bring structure, traceability, and quality gates to AI-assisted software delivery.**
+**Bring structure and node-based execution control to AI-assisted software delivery.**
+
+> Runtime note: the current workflow has shifted to `FeatureState / NodeState`, `transition`, `readiness-check`, and node-local checklists. Older `gate / id / trace / document-links` commands are historical and no longer part of the primary CLI path.
 
 [![Version](https://img.shields.io/badge/version-v1.1.4-blue)](https://www.npmjs.com/package/spec-first)
 [![npm downloads](https://img.shields.io/npm/dm/spec-first)](https://www.npmjs.com/package/spec-first)

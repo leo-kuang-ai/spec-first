@@ -37,6 +37,7 @@ export function handleStatus(args: string[]): number {
   const state = readJson<FeatureState>(stageStatePath);
   const taskPlan = readTaskPlan(projectRoot, featureId);
   const taskCounts = summarizeTaskCounts(taskPlan);
+  const currentNode = state.nodes?.[state.currentStage];
   const background = readBackgroundLayers(projectRoot, state);
   const metrics = getDocumentMetrics(featureId, projectRoot);
   const health = calcHealthScore(metrics, 0, 0);
@@ -71,7 +72,8 @@ export function handleStatus(args: string[]): number {
   console.log(`Feature ID: ${state.featureId}`);
   console.log(`标题: ${state.title ?? 'N/A'}`);
   console.log(`当前阶段: ${state.currentStage}`);
-  console.log(`阶段状态: ${state.stageStatus ?? 'drafting'}`);
+  console.log(`节点状态: ${currentNode?.status ?? 'unknown'}`);
+  console.log(`节点摘要: ${currentNode?.summary ?? 'N/A'}`);
   console.log(`模式: ${state.mode ?? 'N/A'}`);
   console.log(`规模: ${state.size ?? 'N/A'}`);
   console.log(`平台: ${state.platforms?.join(', ') ?? 'N/A'}`);
@@ -95,6 +97,14 @@ export function handleStatus(args: string[]): number {
   console.log(`  todo: ${taskCounts.todo}`);
   console.log(`  blocked: ${taskCounts.blocked}`);
   console.log('');
+
+  if (currentNode?.status === 'blocked') {
+    console.log('恢复建议:');
+    console.log('  1. 先解决节点级阻塞原因');
+    console.log('  2. 如存在任务级 blocked，请先更新 task_plan.md 对应行');
+    console.log('  3. 通过 orchestrate/transition 将节点恢复到 in_progress');
+    console.log('');
+  }
 
   if (bottlenecks.length > 0 || background.syncStatus !== 'ready') {
     console.log('风险:');

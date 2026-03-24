@@ -5,14 +5,13 @@
  * 解析 process.argv，分发到子命令路由
  */
 import { dispatch, registerCommand } from './router.js';
-import { handleId } from './commands/id.js';
 import { handleInit } from './commands/init.js';
 import { handleStage } from './commands/stage.js';
 import { handleRfc } from './commands/rfc.js';
 import { handleDefect } from './commands/defect.js';
 import { handleMetrics } from './commands/metrics.js';
 import { handleDoctor } from './commands/doctor.js';
-import { handleGate, handleGoLive } from './commands/gate.js';
+import { handleGoLive } from './commands/gate.js';
 import { handleAi } from './commands/ai.js';
 import { handleCommit } from './commands/commit.js';
 import { handleFeature } from './commands/feature.js';
@@ -22,7 +21,6 @@ import { handleViewer } from './commands/viewer.js';
 import { handleUpdate } from './commands/update.js';
 import { handleUninstall } from './commands/uninstall.js';
 import { handleAnalyze } from './commands/analyze.js';
-import { handleTrace } from './commands/trace.js';
 import { handleValidate } from './commands/validate.js';
 import { handleDone } from './commands/done.js';
 import { handleOrchestrate } from './commands/orchestrate.js';
@@ -31,15 +29,16 @@ import { handleBatchTest } from './commands/batch-test.js';
 import { handleOnboarding } from './commands/onboarding.js';
 import { handleSkill } from './commands/skill.js';
 import { handleStatus } from './commands/status.js';
-import { handleDocsLinks } from './commands/docs-links.js';
+import { handleTransition } from './commands/transition.js';
 
-registerCommand('id', '追溯 ID 生成、校验与检索', handleId);
-registerCommand('docs', '文档索引与文档关联校验', handleDocsLinks);
 registerCommand('init', '初始化 Feature 工作区', handleInit, {
   requiresConfirmation: false,
 });
-registerCommand('stage', '阶段流转管理（current/suggest/advance/cancel）', handleStage, {
-  requiresConfirmation: (args) => args[0] === 'advance' || args[0] === 'cancel',
+registerCommand('stage', '阶段查看与推进建议（current/suggest）', handleStage, {
+  requiresConfirmation: false,
+});
+registerCommand('transition', '节点流转与取消入口', handleTransition, {
+  requiresConfirmation: (args) => args[0] === 'cancel' || args[0] !== undefined,
 });
 registerCommand('rfc', 'RFC 变更请求与状态管理', handleRfc, {
   requiresConfirmation: true,
@@ -51,7 +50,6 @@ registerCommand('metrics', '覆盖率度量与健康评分', handleMetrics);
 registerCommand('doctor', '环境诊断与修复', handleDoctor, {
   requiresConfirmation: (args) => args.includes('--fix'),
 });
-registerCommand('gate', '阶段质量门禁评估', handleGate);
 registerCommand('golive', '上线就绪检查与批准', handleGoLive);
 registerCommand('done', '将 Feature 从 07_release 收口到 08_done', handleDone, {
   requiresConfirmation: true,
@@ -85,9 +83,6 @@ registerCommand('uninstall', '清理宿主配置（卸载前执行）', handleUn
   requiresConfirmation: true,
 });
 registerCommand('analyze', '跨产物一致性分析', handleAnalyze);
-registerCommand('trace', '追溯链修复与校验', handleTrace, {
-  requiresConfirmation: (args) => args[0] === 'repair',
-});
 registerCommand('validate', '产物格式校验', handleValidate);
 registerCommand('first', '项目首轮认知 runtime/docs 校验', handleFirst, {
   requiresConfirmation: false,

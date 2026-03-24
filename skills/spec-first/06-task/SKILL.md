@@ -40,6 +40,13 @@ metadata:
 
 将需求拆解为可执行的 TASK 任务清单。
 
+## Node Workflow Update
+
+- `task_plan.md` 现在以汇总任务表格作为唯一主视图，canonical 列为 `title / status / summary / next_step`
+- 不再维护 `TASK ID`、`depends_on`、`traces`、`document-links.yaml` 作为执行前置
+- 任务级状态只使用 `todo / in_progress / blocked / done`
+- 节点级状态只写入运行态 `stage-state.json -> nodes["03_plan"]`
+
 ## 输入上下文
 
 执行此 skill 时，从 `.spec-first/runtime/first/` 加载以下产物：

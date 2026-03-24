@@ -24,7 +24,7 @@ beforeEach(() => {
   );
   writeFileSync(
     join(TMP, 'specs', FEAT, 'task_plan.md'),
-    '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | in_progress |\n',
+    '| title | status | summary | next_step |\n|---|---|---|---|\n| Login | in_progress | 收口登录接口 | 完成实现 |\n',
     'utf-8',
   );
 });
@@ -52,7 +52,7 @@ describe('prompt assembler', () => {
     const ctx = resolvePromptAssemblyContext(TMP);
     expect(ctx.featureId).toBe(FEAT);
     expect(ctx.currentStage).toBe('04_implement');
-    expect(ctx.currentTask).toBe('TASK-AUTH-001');
+    expect(ctx.currentTask).toBe('Login');
     expect(ctx.tokenBudget).toBe(12000);
     expect(ctx.maxIterations).toBe(7);
     expect(ctx.maxSelfCorrection).toBe(3); // min(max_self_corrections=4, max_retry_per_task=3)
@@ -62,7 +62,7 @@ describe('prompt assembler', () => {
     const out = assemblePrompt('feat={{FEATURE_ID}} stage={{CURRENT_STAGE}} task={{CURRENT_TASK}} max={{MAX_ITERATIONS}} self={{MAX_SELF_CORRECTION}}', {
       featureId: FEAT,
       currentStage: '04_implement',
-      currentTask: 'TASK-AUTH-001',
+      currentTask: 'Login',
       tokenBudget: 12000,
       maxIterations: 7,
       maxSelfCorrection: 4,
@@ -71,7 +71,7 @@ describe('prompt assembler', () => {
 
     expect(out).toContain(`feat=${FEAT}`);
     expect(out).toContain('stage=04_implement');
-    expect(out).toContain('task=TASK-AUTH-001');
+    expect(out).toContain('task=Login');
     expect(out).toContain('max=7');
     expect(out).toContain('self=4');
   });
@@ -89,7 +89,7 @@ describe('prompt assembler', () => {
   it('should resolve N/A when no in_progress task exists', () => {
     writeFileSync(
       join(TMP, 'specs', FEAT, 'task_plan.md'),
-      '| Task ID | 标题 | 状态 |\n|---|---|---|\n| TASK-AUTH-001 | Login | complete |\n',
+      '| title | status | summary | next_step |\n|---|---|---|---|\n| Login | done | 已完成 | - |\n',
       'utf-8',
     );
 

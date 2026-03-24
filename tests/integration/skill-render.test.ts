@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { ExitCode } from '../../src/shared/types.js';
@@ -209,6 +209,12 @@ describe('handleSkill render', () => {
   it('renders packaged first skill from the published dist entry when local skills are absent', () => {
     const isolatedCwd = mkdtempSync(join(tmpdir(), 'spec-first-skill-render-'));
     const cliEntry = join(import.meta.dirname, '../../dist/cli/index.js');
+    if (!existsSync(cliEntry)) {
+      execFileSync('pnpm', ['-s', 'build'], {
+        cwd: join(import.meta.dirname, '../..'),
+        stdio: 'pipe',
+      });
+    }
 
     const output = execFileSync(process.execPath, [cliEntry, 'skill', 'render', 'first'], {
       cwd: isolatedCwd,

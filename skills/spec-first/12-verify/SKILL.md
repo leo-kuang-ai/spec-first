@@ -37,6 +37,12 @@ metadata:
 
 # Skill: verify
 
+## Node Workflow Update
+
+- verify 的职责从“阶段 gate”收敛为“节点完成校验与验证证据整理”
+- 输出应支持 orchestrate 的 `readiness-check`，而不是直接驱动 `stage advance`
+- 若验证结论允许继续推进，建议命令应为 `spec-first transition <featureId>`
+
 执行阶段验收校验，评估 Gate 条件与文档健康缺口。
 
 ## 输入上下文

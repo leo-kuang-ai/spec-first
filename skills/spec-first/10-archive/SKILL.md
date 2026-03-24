@@ -8,6 +8,11 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 
 # Skill: archive
 
+## Node Workflow Update
+
+- archive 负责 `06_wrap_up` 节点的总结与归档，不再依赖 gate 通过后再执行
+- 若 wrap-up 已完成，后续推进建议使用 `spec-first transition <featureId>`
+
 归档 Feature 交付物，生成复盘报告与覆盖率总结。
 
 ## 输入上下文
