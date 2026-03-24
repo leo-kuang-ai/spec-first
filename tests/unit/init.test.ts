@@ -21,6 +21,16 @@ import {
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-init');
 
+async function withCwd<T>(dir: string, fn: () => Promise<T>): Promise<T> {
+  const orig = process.cwd;
+  process.cwd = () => dir;
+  try {
+    return await fn();
+  } finally {
+    process.cwd = orig;
+  }
+}
+
 function baseOpts(overrides?: Partial<InitOptions>): InitOptions {
   return {
     feat: 'AUTH',
@@ -389,7 +399,9 @@ describe('init CLI diagnostics', () => {
   it('should explain invalid mode and size in feature-init context', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      const code = await handleInit(['--feat', 'AUTH', '--mode', 'X', '--size', 'S', '--platforms', 'h5']);
+      const code = await withCwd(TMP, () =>
+        handleInit(['--feat', 'AUTH', '--mode', 'X', '--size', 'S', '--platforms', 'h5'])
+      );
       expect(code).toBe(2);
       const output = errorSpy.mock.calls.flat().join('\n');
       expect(output).toContain('当前处于 feature-init 参数校验阶段');
@@ -402,7 +414,9 @@ describe('init CLI diagnostics', () => {
   it('should explain platform mismatch in feature-init context', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     try {
-      const code = await handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'ios']);
+      const code = await withCwd(TMP, () =>
+        handleInit(['--feat', 'AUTH', '--mode', 'N', '--size', 'S', '--platforms', 'ios'])
+      );
       expect(code).toBe(2);
       const output = errorSpy.mock.calls.flat().join('\n');
       expect(output).toContain('当前处于 feature-init 参数校验阶段');

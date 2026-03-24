@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const FIRST_REFS = join(import.meta.dirname, '../../skills/spec-first/00-first/references');
+const FIRST_REFS = join(import.meta.dirname, '../../skills/00-first/references');
 const BUNDLE_README = join(
   import.meta.dirname,
   '../../docs/review-bundles/2026-03-20-first-subagent/README.md'
@@ -33,7 +33,7 @@ describe('00-first evidence pack and bundle contract', () => {
     const readme = read(BUNDLE_README);
     expect(readme).toContain('设计与实施说明');
     expect(readme).toContain('canonical source');
-    expect(readme).toContain('skills/spec-first/00-first/references/main-thread-and-evidence-contract.md');
-    expect(readme).toContain('skills/spec-first/00-first/references/execution-and-agent-architecture.md');
+    expect(readme).toContain('skills/00-first/references/main-thread-and-evidence-contract.md');
+    expect(readme).toContain('skills/00-first/references/execution-and-agent-architecture.md');
   });
 });

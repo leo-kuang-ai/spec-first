@@ -158,8 +158,8 @@ describe('host adapters', () => {
     existsSyncMock.mockImplementation((path: string) => {
       if (path === '/tmp/gemini/settings.json') return false;
       if (path === '/tmp/cursor/mcp.json') return false;
-      if (path === '/tmp/gemini/skills/spec-first') return false;
-      if (path === '/tmp/cursor/skills/spec-first') return false;
+      if (path === '/tmp/gemini/skills') return false;
+      if (path === '/tmp/cursor/skills') return false;
       return (
         path.includes('/tmp/gemini') ||
         path.includes('/tmp/cursor') ||

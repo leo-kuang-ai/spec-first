@@ -359,19 +359,15 @@ export function resolveSkillPath(skillName: string, projectRoot: string): string
     const direct = join(ext.skillsDir, extReq.skill, 'SKILL.md');
     if (exists(direct)) return direct;
 
-    const prefixed = join(ext.skillsDir, 'spec-first');
-    const byPrefixed = findSkillFile(prefixed, extReq.skill);
-    if (byPrefixed) return byPrefixed;
-
     return findSkillFile(ext.skillsDir, extReq.skill);
   }
 
   // 项目本地 skills/ 优先
-  const localPattern = join(projectRoot, 'skills', 'spec-first');
+  const localPattern = join(projectRoot, 'skills');
   const localPath = findSkillFile(localPattern, skillName);
   if (localPath) return localPath;
 
-  // 包级 skills/ 回退：从当前模块位置向上搜索可用的 skills/spec-first
+  // 包级 skills/ 回退：从当前模块位置向上搜索可用的 skills/
   const pkgPattern = resolveBundledSkillsRoot();
   const pkgPath = pkgPattern ? findSkillFile(pkgPattern, skillName) : undefined;
   if (pkgPath) return pkgPath;
@@ -402,11 +398,11 @@ function findSkillFile(baseDir: string, skillName: string): string | undefined {
 
 function resolveBundledSkillsRoot(): string | undefined {
   // 兼容源码执行（src/core/skill-runtime）与发布包执行（dist/cli/index.js）
-  // 不再依赖固定的 ../.. 层级，而是从当前模块位置逐级向上查找 skills/spec-first。
+  // 不再依赖固定的 ../.. 层级，而是从当前模块位置逐级向上查找 skills/。
   let currentDir = dirname(fileURLToPath(import.meta.url));
 
   while (true) {
-    const candidate = join(currentDir, 'skills', 'spec-first');
+    const candidate = join(currentDir, 'skills');
     if (exists(candidate)) {
       return candidate;
     }
@@ -695,7 +691,7 @@ function buildSkillFileContextNotice(skillPath: string): string {
 
 function isSpecFirstSkillPath(skillPath: string): boolean {
   const normalized = skillPath.replace(/\\/g, '/');
-  return /\/skills\/spec-first\/\d+-[^/]+\/SKILL\.md$/.test(normalized);
+  return /\/skills\/\d+-[^/]+\/SKILL\.md$/.test(normalized);
 }
 
 function appendDocsIndexHints(parts: string[], context: ResolvedSkillContext): void {
@@ -1248,7 +1244,7 @@ function loadSkillTemplate(skillPath: string): string {
 function resolveSharedSkillPath(skillPath: string): string | undefined {
   const normalized = skillPath.replace(/\\/g, '/');
   if (normalized.endsWith('/SHARED.md')) return undefined;
-  const match = normalized.match(/^(.*\/skills\/spec-first)\/\d+-[^/]+\/SKILL\.md$/);
+  const match = normalized.match(/^(.*\/skills)\/\d+-[^/]+\/SKILL\.md$/);
   if (!match) return undefined;
   const sharedPath = join(match[1], 'SHARED.md');
   return exists(sharedPath) ? sharedPath : undefined;

@@ -124,9 +124,9 @@
 ## 影响范围
 
 **修改文件**:
-- `skills/spec-first/20-spec-review/SKILL.md`
+- `skills/20-spec-review/SKILL.md`
 
 **新增文档**:
-- `skills/spec-first/20-spec-review/references/feature-location.md`（可选）
+- `skills/20-spec-review/references/feature-location.md`（可选）
 
 **兼容性**: 向后兼容，显式参数仍然有效

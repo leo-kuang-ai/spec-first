@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const SPEC_SKILL = join(import.meta.dirname, '../../skills/spec-first/03-spec/SKILL.md');
-const DESIGN_SKILL = join(import.meta.dirname, '../../skills/spec-first/04-design/SKILL.md');
-const CODE_REVIEW_SKILL = join(import.meta.dirname, '../../skills/spec-first/08-review/SKILL.md');
-const VERIFY_SKILL = join(import.meta.dirname, '../../skills/spec-first/12-verify/SKILL.md');
+const SPEC_SKILL = join(import.meta.dirname, '../../skills/03-spec/SKILL.md');
+const DESIGN_SKILL = join(import.meta.dirname, '../../skills/04-design/SKILL.md');
+const CODE_REVIEW_SKILL = join(import.meta.dirname, '../../skills/08-review/SKILL.md');
+const VERIFY_SKILL = join(import.meta.dirname, '../../skills/12-verify/SKILL.md');
 
 function read(path: string): string {
   return readFileSync(path, 'utf-8');

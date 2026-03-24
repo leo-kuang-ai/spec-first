@@ -478,7 +478,7 @@ Phase 2: Implementation
 
 并行标记、用户故事标记、交接选项和日志格式见：
 
-- [coordination-conventions.md](/Users/kuang/xiaobu/spec-first/skills/spec-first/06-task/references/coordination-conventions.md)
+- [coordination-conventions.md](/Users/kuang/xiaobu/spec-first/skills/06-task/references/coordination-conventions.md)
 
 ## Hooks 行为规范
 

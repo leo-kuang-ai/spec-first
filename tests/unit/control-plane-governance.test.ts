@@ -27,9 +27,9 @@ describe('control plane governance', () => {
 
   it('removes legacy split feature commands from control docs', () => {
     const docs = [
-      readFileSync(join(ROOT, 'skills/spec-first/11-plan/SKILL.md'), 'utf-8'),
-      readFileSync(join(ROOT, 'skills/spec-first/13-orchestrate/SKILL.md'), 'utf-8'),
-      readFileSync(join(ROOT, 'skills/spec-first/14-status/SKILL.md'), 'utf-8'),
+      readFileSync(join(ROOT, 'skills/11-plan/SKILL.md'), 'utf-8'),
+      readFileSync(join(ROOT, 'skills/13-orchestrate/SKILL.md'), 'utf-8'),
+      readFileSync(join(ROOT, 'skills/14-status/SKILL.md'), 'utf-8'),
     ].join('\n');
 
     expect(docs).not.toContain('/spec-first:test');

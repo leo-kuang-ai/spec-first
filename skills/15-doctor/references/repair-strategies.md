@@ -113,7 +113,7 @@ args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 **安装方法**:
 ```bash
 # 从包级路径复制到自动识别出的宿主 skills 目录
-cp -r /path/to/spec-first/skills/spec-first/* "{detected_skills_dir}/"
+cp -r /path/to/spec-first/skills/* "{detected_skills_dir}/"
 
 # 或从 Git 仓库克隆到自动识别出的宿主 skills 目录
 git clone https://github.com/spec-first/skills "{detected_skills_dir}/spec-first"

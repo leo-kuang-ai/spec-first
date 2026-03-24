@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const DESIGN_ROOT = join(import.meta.dirname, '../../skills/spec-first/04-design');
+const DESIGN_ROOT = join(import.meta.dirname, '../../skills/04-design');
 const SKILL_MD = join(DESIGN_ROOT, 'SKILL.md');
 const GATE_RULES = join(DESIGN_ROOT, 'references/gate-rules.md');
 const CONSTRAINTS = join(DESIGN_ROOT, 'references/design-constraints.md');

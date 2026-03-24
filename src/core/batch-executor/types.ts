@@ -1,6 +1,6 @@
 /**
  * 批量执行器类型定义
- * @see skills/spec-first/07-code v2.0.0
+ * @see skills/07-code v2.0.0
  */
 
 export type TaskStatus = 'todo' | 'in_progress' | 'done' | 'blocked';

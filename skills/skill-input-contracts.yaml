@@ -14,7 +14,7 @@
 #   - 无需修改代码
 #
 # 文件位置:
-#   skills/spec-first/skill-input-contracts.yaml
+#   skills/skill-input-contracts.yaml
 # ============================================================
 
 # 全局开关：是否自动把契约注入到各个 SKILL.md 中

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const CATCHUP_ROOT = join(import.meta.dirname, '../../skills/spec-first/02-catchup');
+const CATCHUP_ROOT = join(import.meta.dirname, '../../skills/02-catchup');
 const SKILL_MD = join(CATCHUP_ROOT, 'SKILL.md');
 
 function read(path: string): string {

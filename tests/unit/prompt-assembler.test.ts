@@ -35,7 +35,7 @@ afterEach(() => {
 
 describe('prompt assembler', () => {
   it('should prepend SHARED.md when loading a spec-first skill', () => {
-    const skillsRoot = join(TMP, 'skills', 'spec-first');
+    const skillsRoot = join(TMP, 'skills');
     const skillPath = join(skillsRoot, '00-first', 'SKILL.md');
 
     mkdirSync(join(skillsRoot, '00-first'), { recursive: true });

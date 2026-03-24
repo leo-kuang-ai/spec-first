@@ -64,7 +64,7 @@ export class GeminiAdapter implements HostAdapter {
     if (!hasRequiredJsonMcpBaseline(paths.geminiSettingsPath, ['mcpServers', 'mcp_servers'])) {
       missing.push('mcp');
     }
-    if (!existsSync(join(paths.geminiHomeDir, 'skills', 'spec-first'))) missing.push('skills');
+    if (!existsSync(join(paths.geminiHomeDir, 'skills'))) missing.push('skills');
     return {
       state: missing.length === 0 ? 'ready' : 'partial',
       missing,

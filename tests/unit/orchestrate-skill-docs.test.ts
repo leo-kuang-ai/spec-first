@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ORCHESTRATE_ROOT = join(import.meta.dirname, '../../skills/spec-first/13-orchestrate');
+const ORCHESTRATE_ROOT = join(import.meta.dirname, '../../skills/13-orchestrate');
 const SKILL_MD = join(ORCHESTRATE_ROOT, 'SKILL.md');
 
 function read(path: string): string {

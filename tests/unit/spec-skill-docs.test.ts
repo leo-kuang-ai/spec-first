@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const SPEC_ROOT = join(import.meta.dirname, '../../skills/spec-first/03-spec');
+const SPEC_ROOT = join(import.meta.dirname, '../../skills/03-spec');
 const SKILL_MD = join(SPEC_ROOT, 'SKILL.md');
 const QUESTION_GATE = join(SPEC_ROOT, 'references/question-gate-rules.md');
 const FINAL_CONFIRM = join(SPEC_ROOT, 'references/final-confirmation-template.md');

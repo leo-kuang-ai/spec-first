@@ -6,9 +6,9 @@
 
 ## 审查清单来源
 
-**主清单**: `skills/spec-first/03-spec/references/spec-review-checklist.md`
+**主清单**: `skills/03-spec/references/spec-review-checklist.md`
 
-**术语表**: `skills/spec-first/03-spec/references/test-level-glossary.md`
+**术语表**: `skills/03-spec/references/test-level-glossary.md`
 
 ---
 

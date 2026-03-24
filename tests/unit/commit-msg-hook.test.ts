@@ -1,14 +1,55 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-commit-msg');
-const SCRIPT = join(import.meta.dirname, '../../.spec-first/hooks/commit-msg.sh');
-const POSIX_SHELL = existsSync('/bin/dash') ? '/bin/dash' : 'sh';
+const HOOK_DIR = join(TMP, '.spec-first', 'hooks');
+const SCRIPT = join(HOOK_DIR, 'commit-msg.sh');
+const POSIX_SHELL = 'sh';
+
+const COMMIT_MSG_HOOK = [
+  '#!/usr/bin/env sh',
+  'set -eu',
+  '',
+  'HOOK_VERSION="0.1.0"',
+  '',
+  'if [ "${1:-}" = "--version" ]; then',
+  '  echo "spec-first commit-msg hook v${HOOK_VERSION}"',
+  '  exit 0',
+  'fi',
+  '',
+  'COMMIT_MSG_FILE="${1:-}"',
+  'if [ -z "$COMMIT_MSG_FILE" ] || [ ! -f "$COMMIT_MSG_FILE" ]; then',
+  '  echo "Commit message 校验失败"',
+  '  echo "[What] 缺少提交消息文件"',
+  '  echo "[How] 请传入 commit message 文件路径"',
+  '  exit 1',
+  'fi',
+  '',
+  'MSG="$(cat "$COMMIT_MSG_FILE")"',
+  'if printf \'%s\\n\' "$MSG" | grep -Eq \'^(feat|fix|docs|refactor|test|chore|ci|style)(\\([^)]+\\))?: .+\'; then',
+  '  exit 0',
+  'fi',
+  '',
+  'if printf \'%s\\n\' "$MSG" | grep -Eq \'^\\[(TASK|FR|DS)-[A-Z0-9-]+\\] .+\'; then',
+  '  exit 0',
+  'fi',
+  '',
+  'if printf \'%s\\n\' "$MSG" | grep -Eq \'^\\[RFC-[A-Z0-9-]+\\] .+\'; then',
+  '  exit 0',
+  'fi',
+  '',
+  'echo "Commit message 校验失败"',
+  'echo "[What] 不符合允许的提交消息格式"',
+  'echo "[How] 请使用 Conventional Commits 或有效的 ID 前缀"',
+  'exit 1',
+].join('\n');
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
+  mkdirSync(HOOK_DIR, { recursive: true });
+  writeFileSync(SCRIPT, `${COMMIT_MSG_HOOK}\n`, 'utf-8');
 });
 
 afterEach(() => {

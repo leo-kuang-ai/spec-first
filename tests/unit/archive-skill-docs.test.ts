@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ARCHIVE_ROOT = join(import.meta.dirname, '../../skills/spec-first/10-archive');
+const ARCHIVE_ROOT = join(import.meta.dirname, '../../skills/10-archive');
 const SKILL_MD = join(ARCHIVE_ROOT, 'SKILL.md');
 const RETRO_TEMPLATE = join(ARCHIVE_ROOT, 'references/retro-template.md');
 

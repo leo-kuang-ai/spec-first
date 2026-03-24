@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ROOT = join(import.meta.dirname, '../../skills/spec-first');
+const ROOT = join(import.meta.dirname, '../../skills');
 const README = join(ROOT, 'README.md');
 
 describe('v2 flow governance', () => {

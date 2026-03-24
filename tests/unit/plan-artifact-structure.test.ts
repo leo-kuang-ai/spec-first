@@ -3,7 +3,7 @@ import { readFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { init } from '../../src/core/process-engine/init.js';
 
-const DOC_ROOT = join(import.meta.dirname, '../../skills/spec-first');
+const DOC_ROOT = join(import.meta.dirname, '../../skills');
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-plan-artifact-structure');
 
 beforeEach(() => {

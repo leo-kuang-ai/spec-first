@@ -1,5 +1,4 @@
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import { detectHostPaths, type HostPaths } from '../../shared/host-paths.js';
 import { hasRequiredCodexMcpBaseline } from '../../shared/host-mcp-baseline.js';
 import { getHostCapability } from '../tool-integration/capability-matrix.js';
@@ -50,7 +49,7 @@ export class CodexAdapter implements HostAdapter {
     if (!hasRequiredCodexMcpBaseline(paths.codexConfigPath)) {
       missing.push('mcp');
     }
-    if (!existsSync(join(paths.codexSkillsDir, 'spec-first'))) {
+    if (!existsSync(paths.codexSkillsDir)) {
       missing.push('skills');
     }
 
