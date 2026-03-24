@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const DOCTOR_ROOT = join(import.meta.dirname, '../../skills/spec-first/15-doctor');
+const DOCTOR_ROOT = join(import.meta.dirname, '../../skills/15-doctor');
 const SKILL_MD = join(DOCTOR_ROOT, 'SKILL.md');
 const RULES = join(DOCTOR_ROOT, 'references/diagnostic-rules.md');
 

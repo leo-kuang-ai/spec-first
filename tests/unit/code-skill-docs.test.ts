@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const CODE_ROOT = join(import.meta.dirname, '../../skills/spec-first/07-code');
+const CODE_ROOT = join(import.meta.dirname, '../../skills/07-code');
 const SKILL_MD = join(CODE_ROOT, 'SKILL.md');
 const STANDARDS = join(CODE_ROOT, 'references/code-standards.md');
 const DIFF_TEMPLATE = join(CODE_ROOT, 'references/diff-template.md');

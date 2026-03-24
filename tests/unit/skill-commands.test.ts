@@ -52,7 +52,7 @@ describe('ensureSkillCommands', () => {
 
     const commandName = first.codex[0];
     const skillName = commandName.split(':')[1];
-    const target = join(process.env.CODEX_SKILLS_DIR as string, 'spec-first', skillName);
+    const target = join(process.env.CODEX_SKILLS_DIR as string, skillName);
     expect(existsSync(target)).toBe(true);
 
     rmSync(target, { recursive: true, force: true });
@@ -97,7 +97,7 @@ describe('ensureSkillCommands', () => {
   it('should replace stale codex skill directory with fresh copied content', () => {
     ensureSkillCommands(TMP, { global: true });
     const skillName = 'doctor';
-    const target = join(process.env.CODEX_SKILLS_DIR as string, 'spec-first', skillName);
+    const target = join(process.env.CODEX_SKILLS_DIR as string, skillName);
 
     rmSync(target, { recursive: true, force: true });
     mkdirSync(target, { recursive: true });
@@ -116,7 +116,7 @@ describe('ensureSkillCommands', () => {
     ensureSkillCommands(TMP, { global: true });
 
     const skill = readFileSync(
-      join(process.env.CODEX_SKILLS_DIR as string, 'spec-first', 'task', 'SKILL.md'),
+      join(process.env.CODEX_SKILLS_DIR as string, 'task', 'SKILL.md'),
       'utf-8',
     );
 
@@ -130,7 +130,7 @@ describe('ensureSkillCommands', () => {
 
 
   it('should prune removed skills from user-level spec-first skills root', () => {
-    const userRoot = join(process.env.SPEC_FIRST_SKILLS_DIR as string, 'spec-first');
+    const userRoot = process.env.SPEC_FIRST_SKILLS_DIR as string;
     mkdirSync(join(userRoot, '09-test'), { recursive: true });
     mkdirSync(join(userRoot, '08-code-review'), { recursive: true });
     writeFileSync(join(userRoot, '09-test', 'SKILL.md'), '# legacy', 'utf-8');
@@ -150,7 +150,7 @@ describe('ensureSkillCommands', () => {
     expect(result.cursor).toHaveLength(0);
 
     const skillName = result.generic[0].split(':')[1];
-    const target = join(process.env.SPEC_FIRST_GENERIC_SKILLS_DIR as string, 'spec-first', skillName, 'SKILL.md');
+    const target = join(process.env.SPEC_FIRST_GENERIC_SKILLS_DIR as string, skillName, 'SKILL.md');
     expect(existsSync(target)).toBe(true);
   });
 
@@ -165,10 +165,10 @@ describe('ensureSkillCommands', () => {
     const geminiSkillName = result.gemini[0].split(':')[1];
     const cursorSkillName = result.cursor[0].split(':')[1];
     expect(
-      existsSync(join(process.env.GEMINI_HOME as string, 'skills', 'spec-first', geminiSkillName, 'SKILL.md'))
+      existsSync(join(process.env.GEMINI_HOME as string, 'skills', geminiSkillName, 'SKILL.md'))
     ).toBe(true);
     expect(
-      existsSync(join(process.env.CURSOR_HOME as string, 'skills', 'spec-first', cursorSkillName, 'SKILL.md'))
+      existsSync(join(process.env.CURSOR_HOME as string, 'skills', cursorSkillName, 'SKILL.md'))
     ).toBe(true);
   });
 });

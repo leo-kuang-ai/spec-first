@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const FEATURE_ROOT = join(import.meta.dirname, '../../skills/spec-first/17-feature');
+const FEATURE_ROOT = join(import.meta.dirname, '../../skills/17-feature');
 const SKILL_MD = join(FEATURE_ROOT, 'SKILL.md');
 const OUTPUT = join(FEATURE_ROOT, 'references/output-format.md');
 const SUBCOMMANDS = join(FEATURE_ROOT, 'references/subcommands.md');

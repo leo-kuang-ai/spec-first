@@ -98,15 +98,15 @@ describe('update and doctor baseline integration', () => {
     const updateCode = await handleUpdate(['--host', 'gemini,cursor', '--skip-mcp', '--skip-hooks']);
     expect(updateCode).toBe(0);
 
-    expect(existsSync(join(TMP, 'home', '.gemini', 'skills', 'spec-first', 'doctor', 'SKILL.md'))).toBe(true);
-    expect(existsSync(join(TMP, 'home', '.cursor', 'skills', 'spec-first', 'doctor', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(TMP, 'home', '.gemini', 'skills', 'doctor', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(TMP, 'home', '.cursor', 'skills', 'doctor', 'SKILL.md'))).toBe(true);
 
     const geminiSkill = readFileSync(
-      join(TMP, 'home', '.gemini', 'skills', 'spec-first', 'doctor', 'SKILL.md'),
+      join(TMP, 'home', '.gemini', 'skills', 'doctor', 'SKILL.md'),
       'utf-8',
     );
     const cursorSkill = readFileSync(
-      join(TMP, 'home', '.cursor', 'skills', 'spec-first', 'doctor', 'SKILL.md'),
+      join(TMP, 'home', '.cursor', 'skills', 'doctor', 'SKILL.md'),
       'utf-8',
     );
     expect(geminiSkill).toContain('# Skill: doctor');

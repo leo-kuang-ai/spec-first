@@ -195,11 +195,11 @@ describe('advance', () => {
 
   it('should not auto-sync legacy context file when advancing DESIGN → PLAN', () => {
     writeState(makeState({ currentStage: Stage.DESIGN }));
-    mkdirSync(join(TMP, 'skills', 'spec-first', '03-spec', 'references'), { recursive: true });
-    mkdirSync(join(TMP, 'skills', 'spec-first', '04-design'), { recursive: true });
-    mkdirSync(join(TMP, 'skills', 'spec-first', '08-review'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', '03-spec', 'references'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', '04-design'), { recursive: true });
+    mkdirSync(join(TMP, 'skills', '08-review'), { recursive: true });
     writeFileSync(
-      join(TMP, 'skills', 'spec-first', '03-spec', 'references', 'constitution-authority.md'),
+      join(TMP, 'skills', '03-spec', 'references', 'constitution-authority.md'),
       [
         '# Constitution Authority',
         '',
@@ -213,9 +213,9 @@ describe('advance', () => {
       ].join('\n'),
       'utf-8',
     );
-    writeFileSync(join(TMP, 'skills', 'spec-first', '03-spec', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
-    writeFileSync(join(TMP, 'skills', 'spec-first', '04-design', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
-    writeFileSync(join(TMP, 'skills', 'spec-first', '08-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', '03-spec', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', '04-design', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
+    writeFileSync(join(TMP, 'skills', '08-review', 'SKILL.md'), 'See constitution-authority.md', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'constitution.md'), [
       '# Constitution',
       '',

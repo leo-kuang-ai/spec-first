@@ -82,7 +82,7 @@ AI-assisted coding makes the marginal cost of completeness near-zero. When you p
 
 ## Search Before Building
 
-Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `~/.claude/skills/spec-first/ETHOS.md` for the full philosophy.
+Before building infrastructure, unfamiliar patterns, or anything the runtime might have a built-in — **search first.** Read `~/.claude/skills/ETHOS.md` for the full philosophy.
 
 **Three layers of knowledge:**
 - **Layer 1** (tried and true — in distribution). Don't reinvent the wheel. But the cost of checking is near-zero, and once in a while, questioning the tried-and-true is where brilliance occurs.
@@ -220,7 +220,7 @@ Write exactly these project files:
 
 These three files are the entire output surface for this skill.
 
-> **Path note**: Template and example paths below are relative to the skill installation directory (typically `~/.claude/skills/spec-first/focus-requirements/` or `skills/spec-first/focus-requirements/` within the repo).
+> **Path note**: Template and example paths below are relative to the skill installation directory (typically `~/.claude/skills/focus-requirements/` or `skills/focus-requirements/` within the repo).
 
 Template sources live here:
 - `focus-requirements/templates/focus-requirements.md`

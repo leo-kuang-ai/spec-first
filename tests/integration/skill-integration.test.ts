@@ -17,8 +17,8 @@ const FEAT = 'FSREQ-20260211-AUTH-001';
 beforeEach(() => {
   mkdirSync(join(TMP, 'specs', FEAT), { recursive: true });
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
-  mkdirSync(join(TMP, 'skills', 'spec-first', '07-code'), { recursive: true });
-  writeFileSync(join(TMP, 'skills', 'spec-first', '07-code', 'SKILL.md'), '# Code Skill');
+  mkdirSync(join(TMP, 'skills', '07-code'), { recursive: true });
+  writeFileSync(join(TMP, 'skills', '07-code', 'SKILL.md'), '# Code Skill');
   writeFileSync(join(TMP, '.spec-first', 'current'), `${FEAT}\n`, 'utf-8');
   writeFileSync(
     join(TMP, 'specs', FEAT, 'stage-state.json'),

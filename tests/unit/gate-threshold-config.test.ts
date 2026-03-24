@@ -132,7 +132,7 @@ describe('gate thresholds from config', () => {
     expect(targets.find((target) => target.key === 'C4')?.target).toBe(0.95);
 
     const skillDoc = readFileSync(
-      join(process.cwd(), 'skills', 'spec-first', '12-verify', 'SKILL.md'),
+      join(process.cwd(), 'skills', '12-verify', 'SKILL.md'),
       'utf-8'
     );
     expect(skillDoc).toContain('读取 `.spec-first/meta/config.yaml` / `.spec-first/local/config.yaml`');

@@ -23,7 +23,7 @@ describe('postinstall host bootstrap integration', () => {
         claude: false,
         codex: false,
         claudePath: '/tmp/claude/commands/spec-first',
-        codexPath: '/tmp/codex/skills/spec-first',
+        codexPath: '/tmp/codex/skills',
       },
       claudeInstallation: {
         installed: true,
@@ -49,7 +49,7 @@ describe('postinstall host bootstrap integration', () => {
         claude: false,
         codex: false,
         claudePath: '/tmp/claude/commands/spec-first',
-        codexPath: '/tmp/codex/skills/spec-first',
+        codexPath: '/tmp/codex/skills',
       },
       claudeInstallation: {
         installed: false,

@@ -281,7 +281,7 @@ npm run lint
 
 - [完整项目介绍](./PROJECT-INTRODUCTION.md)
 - [用户文档](./docs/07-用户文档/)
-- [Skill 目录](./skills/spec-first/README.md)
+- [Skill 目录](./skills/README.md)
 - [CLI 命令参考](./docs/07-用户文档/CLI命令参考手册.md)
 
 ---

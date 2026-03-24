@@ -114,55 +114,55 @@ export function getC11FailureFixHints(featureId: string, failures: string[]): st
     }
     if (failure === 'constitution-authority.md missing') {
       push(
-        'skills/spec-first/03-spec/references/constitution-authority.md: create authority mapping doc'
+        'skills/03-spec/references/constitution-authority.md: create authority mapping doc'
       );
       continue;
     }
     if (failure === 'constitution-authority.md missing Level 0-3 hierarchy') {
       push(
-        'skills/spec-first/03-spec/references/constitution-authority.md: add Level 0-3 hierarchy'
+        'skills/03-spec/references/constitution-authority.md: add Level 0-3 hierarchy'
       );
       continue;
     }
     if (failure === 'constitution-authority.md missing conflict arbitration rule') {
       push(
-        'skills/spec-first/03-spec/references/constitution-authority.md: add conflict arbitration rule'
+        'skills/03-spec/references/constitution-authority.md: add conflict arbitration rule'
       );
       continue;
     }
     if (failure === '03-spec/SKILL.md missing') {
       push(
-        'skills/spec-first/03-spec/SKILL.md: restore skill doc and reference constitution-authority.md'
+        'skills/03-spec/SKILL.md: restore skill doc and reference constitution-authority.md'
       );
       continue;
     }
     if (failure === '03-spec/SKILL.md missing constitution-authority reference') {
       push(
-        'skills/spec-first/03-spec/SKILL.md: add reference to references/constitution-authority.md'
+        'skills/03-spec/SKILL.md: add reference to references/constitution-authority.md'
       );
       continue;
     }
     if (failure === '04-design/SKILL.md missing') {
       push(
-        'skills/spec-first/04-design/SKILL.md: restore skill doc and reference constitution-authority.md'
+        'skills/04-design/SKILL.md: restore skill doc and reference constitution-authority.md'
       );
       continue;
     }
     if (failure === '04-design/SKILL.md missing constitution-authority reference') {
       push(
-        'skills/spec-first/04-design/SKILL.md: add reference to ../03-spec/references/constitution-authority.md'
+        'skills/04-design/SKILL.md: add reference to ../03-spec/references/constitution-authority.md'
       );
       continue;
     }
     if (failure === '08-review/SKILL.md missing') {
       push(
-        'skills/spec-first/08-review/SKILL.md: restore skill doc and reference constitution-authority.md'
+        'skills/08-review/SKILL.md: restore skill doc and reference constitution-authority.md'
       );
       continue;
     }
     if (failure === '08-review/SKILL.md missing constitution-authority reference') {
       push(
-        'skills/spec-first/08-review/SKILL.md: add reference to ../03-spec/references/constitution-authority.md'
+        'skills/08-review/SKILL.md: add reference to ../03-spec/references/constitution-authority.md'
       );
       continue;
     }
@@ -177,17 +177,10 @@ function evaluateConstitutionAuthorityMapping(projectRoot: string): {
   failures: string[];
 } {
   const failures: string[] = [];
-  const authorityRefPath = join(
-    projectRoot,
-    'skills',
-    'spec-first',
-    '03-spec',
-    'references',
-    'constitution-authority.md'
-  );
-  const specSkillPath = join(projectRoot, 'skills', 'spec-first', '03-spec', 'SKILL.md');
-  const designSkillPath = join(projectRoot, 'skills', 'spec-first', '04-design', 'SKILL.md');
-  const codeReviewSkillPath = join(projectRoot, 'skills', 'spec-first', '08-review', 'SKILL.md');
+  const authorityRefPath = join(projectRoot, 'skills', '03-spec', 'references', 'constitution-authority.md');
+  const specSkillPath = join(projectRoot, 'skills', '03-spec', 'SKILL.md');
+  const designSkillPath = join(projectRoot, 'skills', '04-design', 'SKILL.md');
+  const codeReviewSkillPath = join(projectRoot, 'skills', '08-review', 'SKILL.md');
 
   if (!exists(authorityRefPath)) {
     failures.push('constitution-authority.md missing');

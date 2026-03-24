@@ -2,10 +2,11 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { ensureManagedHookScripts } from '../../src/core/tool-integration/ai-runtime-hook-scripts.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-task-context');
 const FEAT = 'FSREQ-20260226-AUTH-001';
-const SCRIPT = join(import.meta.dirname, '../../.spec-first/hooks/task-context.sh');
+const SCRIPT = join(TMP, '.spec-first/hooks/task-context.sh');
 
 function writeTaskPlan(rows: string[]): void {
   const content = [
@@ -30,6 +31,7 @@ function writeTaskPlan(rows: string[]): void {
 
 beforeEach(() => {
   mkdirSync(TMP, { recursive: true });
+  ensureManagedHookScripts(TMP, false);
 });
 
 afterEach(() => {

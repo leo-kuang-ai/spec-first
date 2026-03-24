@@ -90,9 +90,7 @@ try {
   mkdirSync(join(installedPkgDir, 'dist'), { recursive: true });
   mkdirSync(join(installedPkgDir, 'skills'), { recursive: true });
   cpSync(join(repoRoot, 'dist'), join(installedPkgDir, 'dist'), { recursive: true });
-  cpSync(join(repoRoot, 'skills', 'spec-first'), join(installedPkgDir, 'skills', 'spec-first'), {
-    recursive: true,
-  });
+  cpSync(join(repoRoot, 'skills'), join(installedPkgDir, 'skills'), { recursive: true });
   cpSync(join(repoRoot, 'package.json'), join(installedPkgDir, 'package.json'));
 
   const repoNodeModules = join(repoRoot, 'node_modules');
@@ -103,8 +101,8 @@ try {
 
   const requiredFilePaths = [
     'dist/cli/index.js',
-    'skills/spec-first/00-first/SKILL.md',
-    'skills/spec-first/00-first/references/main-thread-contract.md',
+    'skills/00-first/SKILL.md',
+    'skills/00-first/references/main-thread-and-evidence-contract.md',
   ];
 
   const requiredFiles = requiredFilePaths.map((relativePath) => join(installedPkgDir, relativePath));
@@ -152,7 +150,7 @@ try {
   const requiredSnippets = [
     '<!-- skill-files-context -->',
     'skill_path:',
-    '/skills/spec-first/00-first/SKILL.md',
+    '/skills/00-first/SKILL.md',
     'references_root:',
     'main-thread-contract.md',
   ];

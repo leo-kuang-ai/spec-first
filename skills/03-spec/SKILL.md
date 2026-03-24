@@ -293,7 +293,7 @@ spec-first validate format <featureId>
 
 ## 参考文档
 
-**路径基准**: 相对于 `skills/spec-first/03-spec/` 目录
+**路径基准**: 相对于 `skills/03-spec/` 目录
 
 ### 主文档必须发现（Primary References）
 

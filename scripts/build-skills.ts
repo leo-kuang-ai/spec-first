@@ -1,13 +1,13 @@
 /**
  * Skill Build Script
  * Dev-time skills → Deploy-time skills 自动扁平化
- * Dev:    skills/spec-first/NN-cmd/SKILL.md
+ * Dev:    skills/NN-cmd/SKILL.md
  * Deploy: .claude/commands/spec-first/cmd.md
  */
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'node:fs';
 import { join, basename } from 'node:path';
 
-const SRC_DIR = join(import.meta.dirname, '..', 'skills', 'spec-first');
+const SRC_DIR = join(import.meta.dirname, '..', 'skills');
 const DEPLOY_DIR = join(import.meta.dirname, '..', '.claude', 'commands', 'spec-first');
 
 function build(): void {
@@ -19,7 +19,7 @@ function build(): void {
   mkdirSync(DEPLOY_DIR, { recursive: true });
 
   const entries = readdirSync(SRC_DIR, { withFileTypes: true })
-    .filter(e => e.isDirectory() && !e.name.startsWith('_'))
+    .filter(e => e.isDirectory() && !e.name.startsWith('_') && existsSync(join(SRC_DIR, e.name, 'SKILL.md')))
     .sort((a, b) => a.name.localeCompare(b.name));
 
   let count = 0;

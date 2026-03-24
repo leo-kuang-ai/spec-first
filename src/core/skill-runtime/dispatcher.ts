@@ -359,10 +359,6 @@ export function resolveSkillPath(skillName: string, projectRoot: string): string
     const direct = join(ext.skillsDir, extReq.skill, 'SKILL.md');
     if (exists(direct)) return direct;
 
-    const prefixed = join(ext.skillsDir, 'spec-first');
-    const byPrefixed = findSkillFile(prefixed, extReq.skill);
-    if (byPrefixed) return byPrefixed;
-
     return findSkillFile(ext.skillsDir, extReq.skill);
   }
 

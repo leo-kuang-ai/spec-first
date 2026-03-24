@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-const ROOT = join(import.meta.dirname, '../../skills/spec-first');
+const ROOT = join(import.meta.dirname, '../../skills');
 const SKILL_DIRS = readdirSync(ROOT, { withFileTypes: true })
   .filter((entry) => entry.isDirectory() && /^\d\d-/.test(entry.name))
   .map((entry) => entry.name)
