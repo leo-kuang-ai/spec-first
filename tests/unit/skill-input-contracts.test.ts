@@ -7,12 +7,14 @@ import {
   shouldInjectInputContext,
   getAssetDescription,
   clearConfigCache,
+  resolveSkillsRoot,
   type SkillInputContractsConfig,
 } from '../../src/core/skill-runtime/skill-input-contracts.js';
 
 const TEST_DIR = join(import.meta.dirname, '__test_skill_contracts__');
 const CONFIG_PATH = join(TEST_DIR, 'skill-input-contracts.yaml');
-const REPO_SKILLS_ROOT = join(import.meta.dirname, '../../skills/spec-first');
+const REPO_SKILLS_ROOT = join(import.meta.dirname, '../../skills');
+const FLAT_SKILLS_ROOT = join(TEST_DIR, 'skills');
 
 function createTestConfig(content: string): void {
   mkdirSync(TEST_DIR, { recursive: true });
@@ -101,6 +103,12 @@ skills:
     });
   });
 
+  describe('resolveSkillsRoot', () => {
+    it('should resolve the flat skills root', () => {
+      expect(resolveSkillsRoot()).toBe(REPO_SKILLS_ROOT);
+    });
+  });
+
   describe('getSkillInputContract', () => {
     it('should return skill-specific config when defined', () => {
       createTestConfig(`
@@ -132,36 +140,73 @@ skills:
       expect(contract.required).toContain('default-required');
     });
 
-    it('should match the final repo strategy for key skills', () => {
-      const focusRequirements = getSkillInputContract('focus-requirements', REPO_SKILLS_ROOT);
+    it('should match the flat-root strategy for key skills', () => {
+      mkdirSync(FLAT_SKILLS_ROOT, { recursive: true });
+      writeFileSync(
+        join(FLAT_SKILLS_ROOT, 'skill-input-contracts.yaml'),
+        `
+auto_inject: true
+skip_injection:
+  - first
+  - init
+defaults:
+  required: [summary]
+  recommended: []
+  optional: []
+skills:
+  focus-requirements:
+    required: [summary]
+    recommended: [domain-model, critical-flows, conventions]
+    optional: [entry-guide]
+  feature:
+    required: []
+    recommended: []
+    optional: [summary]
+  archive:
+    required: [summary]
+    recommended: [structure-overview, domain-model]
+    optional: []
+  status:
+    required: []
+    recommended: [summary]
+    optional: [critical-flows, structure-overview, domain-model]
+  sync:
+    required: []
+    recommended: [summary]
+    optional: [entry-guide, structure-overview, api-contracts]
+`,
+        'utf-8'
+      );
+
+      const focusRequirements = getSkillInputContract('focus-requirements', FLAT_SKILLS_ROOT);
       expect(focusRequirements).toEqual({
         required: ['summary'],
         recommended: ['domain-model', 'critical-flows', 'conventions'],
         optional: ['entry-guide'],
       });
 
-      const feature = getSkillInputContract('feature', REPO_SKILLS_ROOT);
+      const feature = getSkillInputContract('feature', FLAT_SKILLS_ROOT);
       expect(feature).toEqual({
         required: [],
         recommended: [],
         optional: ['summary'],
       });
 
-      const archive = getSkillInputContract('archive', REPO_SKILLS_ROOT);
+      const archive = getSkillInputContract('archive', FLAT_SKILLS_ROOT);
       expect(archive).toEqual({
         required: ['summary'],
         recommended: ['structure-overview', 'domain-model'],
         optional: [],
       });
 
-      const status = getSkillInputContract('status', REPO_SKILLS_ROOT);
+      const status = getSkillInputContract('status', FLAT_SKILLS_ROOT);
       expect(status).toEqual({
         required: [],
         recommended: ['summary'],
         optional: ['critical-flows', 'structure-overview', 'domain-model'],
       });
 
-      const sync = getSkillInputContract('sync', REPO_SKILLS_ROOT);
+      const sync = getSkillInputContract('sync', FLAT_SKILLS_ROOT);
       expect(sync).toEqual({
         required: [],
         recommended: ['summary'],

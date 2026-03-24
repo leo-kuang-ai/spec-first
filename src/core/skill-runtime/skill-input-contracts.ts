@@ -40,10 +40,10 @@ let cachedConfig: SkillInputContractsConfig | null = null;
  * 获取 skills root 目录（即使 YAML 不存在也返回目录）
  */
 export function resolveSkillsRoot(): string | null {
-  // 从当前模块向上查找 skills/spec-first 目录
+  // 从当前模块向上查找 skills/ 目录
   let currentDir = import.meta.dirname;
   while (currentDir) {
-    const skillsRoot = join(currentDir, 'skills', 'spec-first');
+    const skillsRoot = join(currentDir, 'skills');
     // 只要目录存在就返回，不要求 YAML 存在
     if (existsSync(skillsRoot)) {
       return skillsRoot;

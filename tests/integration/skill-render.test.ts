@@ -1,6 +1,5 @@
-import { execFileSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { ExitCode } from '../../src/shared/types.js';
@@ -130,16 +129,18 @@ function seedCanonicalRuntime(): void {
 }
 
 beforeEach(() => {
-  mkdirSync(join(TMP, 'skills', 'spec-first', '01-spec'), { recursive: true });
-  mkdirSync(join(TMP, 'skills', 'spec-first', '10-plan'), { recursive: true });
+  mkdirSync(join(TMP, 'skills', '00-first'), { recursive: true });
+  mkdirSync(join(TMP, 'skills', '03-spec'), { recursive: true });
+  mkdirSync(join(TMP, 'skills', '11-plan'), { recursive: true });
   mkdirSync(join(TMP, 'specs', FEATURE_ID), { recursive: true });
   mkdirSync(join(TMP, 'specs', EXPLICIT_FEATURE_ID), { recursive: true });
   mkdirSync(join(TMP, '.spec-first'), { recursive: true });
   seedCanonicalRuntime();
 
   writeFileSync(join(TMP, '.spec-first', 'current'), `${FEATURE_ID}\n`, 'utf-8');
-  writeFileSync(join(TMP, 'skills', 'spec-first', '01-spec', 'SKILL.md'), '# Spec Skill\n\nOriginal spec body.\n', 'utf-8');
-  writeFileSync(join(TMP, 'skills', 'spec-first', '10-plan', 'SKILL.md'), '# Plan Skill\n\nOriginal plan body.\n', 'utf-8');
+  writeFileSync(join(TMP, 'skills', '00-first', 'SKILL.md'), '# First Skill\n\nOriginal first body.\n', 'utf-8');
+  writeFileSync(join(TMP, 'skills', '03-spec', 'SKILL.md'), '# Spec Skill\n\nOriginal spec body.\n', 'utf-8');
+  writeFileSync(join(TMP, 'skills', '11-plan', 'SKILL.md'), '# Plan Skill\n\nOriginal plan body.\n', 'utf-8');
   writeFileSync(
     join(TMP, 'specs', FEATURE_ID, 'stage-state.json'),
     JSON.stringify({
@@ -206,23 +207,17 @@ describe('handleSkill render', () => {
     expect(rendered).toContain('project_name: spec-first');
   });
 
-  it('renders packaged first skill from the published dist entry when local skills are absent', () => {
-    const isolatedCwd = mkdtempSync(join(tmpdir(), 'spec-first-skill-render-'));
-    const cliEntry = join(import.meta.dirname, '../../dist/cli/index.js');
-    if (!existsSync(cliEntry)) {
-      execFileSync('pnpm', ['-s', 'build'], {
-        cwd: join(import.meta.dirname, '../..'),
-        stdio: 'pipe',
-      });
-    }
+  it('renders first skill from a flat local skills root', async () => {
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(process, 'cwd').mockReturnValue(TMP);
 
-    const output = execFileSync(process.execPath, [cliEntry, 'skill', 'render', 'first'], {
-      cwd: isolatedCwd,
-      encoding: 'utf8',
-    });
+    const { handleSkill } = await import('../../src/cli/commands/skill.js');
+    const exitCode = handleSkill(['render', 'first']);
+    const output = stdout.mock.calls[0]?.[0];
 
+    expect(exitCode).toBe(ExitCode.SUCCESS);
     expect(output).toContain('<!-- skill-files-context -->');
     expect(output).toContain('skill_path:');
-    expect(output).toContain('/skills/spec-first/00-first/SKILL.md');
+    expect(output).toContain('/skills/00-first/SKILL.md');
   });
 });
