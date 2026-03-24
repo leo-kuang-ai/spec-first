@@ -28,6 +28,7 @@ import { handleFirst } from './commands/first.js';
 import { handleBatchTest } from './commands/batch-test.js';
 import { handleOnboarding } from './commands/onboarding.js';
 import { handleSkill } from './commands/skill.js';
+import { handleIntegrateSkill } from './commands/integrate-skill.js';
 import { handleStatus } from './commands/status.js';
 import { handleTransition } from './commands/transition.js';
 
@@ -90,6 +91,12 @@ registerCommand('first', '项目首轮认知 runtime/docs 校验', handleFirst, 
 registerCommand('onboarding', '新手引导 - 交互式场景识别与学习路径推荐', handleOnboarding);
 registerCommand('batch-test', '批量执行测试（临时命令）', handleBatchTest);
 registerCommand('skill', '动态渲染 skill 内容', handleSkill);
+registerCommand('integrate-skill', '外部 skill 集成到 spec-first 治理资产（report-only MVP）', handleIntegrateSkill, {
+  requiresConfirmation: (args) => {
+    if (args.includes('--help') || args.includes('-h')) return false;
+    return args[0] !== undefined && !args[0].startsWith('-');
+  },
+});
 registerCommand('status', '当前 Feature 状态概览与风险快照', handleStatus);
 
 const code = await dispatch(process.argv.slice(2));

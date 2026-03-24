@@ -1,0 +1,47 @@
+# Skill Integration Report: {{requestedName}}
+
+## Source
+- Requested name: {{requestedName}}
+- Final name: {{finalName}}
+- Mode: {{mode}}
+
+## Skill summary
+- Name: {{profile.name}}
+- Description: {{profile.description}}
+- Keywords: {{#each profile.keywords}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+
+## Category/stage
+- Category: {{targetConfig.category}}
+- Primary stage: {{targetConfig.primaryStage}}
+- Related stages: {{#each targetConfig.relatedStages}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+
+## Conflicts
+{{#if conflicts.length}}
+{{#each conflicts}}
+- [{{severity}}] {{type}}: {{message}}
+{{/each}}
+{{else}}
+- None
+{{/if}}
+
+## Generated files
+{{#if fileWrites.length}}
+{{#each fileWrites}}
+- {{path}} ({{kind}})
+{{/each}}
+{{else}}
+- None
+{{/if}}
+
+## Review checklist
+- Check whether the source skill should remain draft-only.
+- Check whether the category and stage mapping are correct.
+- Check whether the generated guideline or draft would overlap with an existing spec-first skill.
+
+## Recommendation
+{{#if conflicts.length}}
+Review conflicts before promotion.
+{{else}}
+Proceed to the next review step.
+{{/if}}
+

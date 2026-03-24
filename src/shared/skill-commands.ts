@@ -126,6 +126,7 @@ const SKILL_DESCRIPTION_ZH: Readonly<Record<string, string>> = {
   feature: 'Feature 查询/切换命令族',
   'spec-review': '定位 Feature 并执行需求规格质量审查（C10）',
   analyze: '执行跨产物一致性分析并生成分析报告',
+  'integrate-skill': '外部 skill 集成评估与治理报告生成',
 };
 
 /** 验证 Codex SKILL.md 是否包含有效 YAML frontmatter（name + description） */

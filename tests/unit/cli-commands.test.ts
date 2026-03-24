@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { handleId } from '../../src/cli/commands/id.js';
 import { handleAnalyze } from '../../src/cli/commands/analyze.js';
 import { handleDocsLinks } from '../../src/cli/commands/docs-links.js';
 import { handleTrace } from '../../src/cli/commands/trace.js';
+import { handleIntegrateSkill } from '../../src/cli/commands/integrate-skill.js';
+import { dispatch, registerCommand } from '../../src/cli/router.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-cli-cmd');
 const FEAT_ID = 'FSREQ-20260211-AUTH-001';
@@ -119,5 +121,50 @@ describe('handleAnalyze', () => {
     writeFileSync(join(SPEC_DIR, 'task_plan.md'), '# Task Plan\n', 'utf-8');
     const code = handleAnalyze([FEAT_ID]);
     expect(code).toBe(0);
+  });
+});
+
+describe('handleIntegrateSkill', () => {
+  it('should dispatch integrate-skill through the router with confirmation', async () => {
+    const sourceDir = join(TMP, 'external-skills', 'frontend-design');
+    mkdirSync(sourceDir, { recursive: true });
+    writeFileSync(
+      join(sourceDir, 'SKILL.md'),
+      `---
+name: frontend-design
+description: Use when integrating a frontend design skill into spec-first.
+---
+
+# Skill: frontend-design
+
+- P0: 生成 report-only 集成报告并检查冲突
+- Command: \`/spec-first:integrate-skill frontend-design\`
+`,
+      'utf-8'
+    );
+
+    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    registerCommand('integrate-skill-router', 'Integrate external skill', handleIntegrateSkill, {
+      requiresConfirmation: true,
+    });
+
+    try {
+      const code = await dispatch([
+        'integrate-skill-router',
+        'frontend-design',
+        '--source',
+        sourceDir,
+        '--report-only',
+        '--yes',
+      ]);
+
+      expect(code).toBe(0);
+      expect(errSpy).not.toHaveBeenCalled();
+      expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Integration Result: SUCCESS'));
+    } finally {
+      logSpy.mockRestore();
+      errSpy.mockRestore();
+    }
   });
 });
