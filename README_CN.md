@@ -1,22 +1,14 @@
 <p align="center">
-<picture>
-<source srcset="assets/spec.png" media="(prefers-color-scheme: dark)">
-<source srcset="assets/spec.png" media="(prefers-color-scheme: light)">
-<img src="assets/spec.png" alt="spec-first Logo" width="500" style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
-</picture>
-</p>
-
-<p align="center">
 <strong>给 AI 立规矩的开源框架</strong><br/>
 <sub>支持 Claude Code、Cursor、OpenCode、iFlow、Codex、Kilo、Kiro、Gemini CLI、Antigravity、Qoder 和 CodeBuddy。</sub>
 </p>
 
 <p align="center">
 <a href="./README.md">English</a> •
-<a href="https://docs.trytrellis.app/zh">文档</a> •
-<a href="https://docs.trytrellis.app/zh/guide/ch02-quick-start">快速开始</a> •
-<a href="https://docs.trytrellis.app/zh/guide/ch13-multi-platform">支持平台</a> •
-<a href="https://docs.trytrellis.app/zh/guide/ch08-real-world">使用场景</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md">文档</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md">快速开始</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md">支持平台</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md">使用场景</a> •
 <a href="#wechat-group">微信群</a>
 </p>
 
@@ -24,21 +16,13 @@
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/v/@leokuang/spec-first.svg?style=flat-square&color=2563eb" alt="npm version" /></a>
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/dw/@leokuang/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
 <a href="https://github.com/sunrain520/spec-first/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
-<a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/leokuang/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
-<a href="https://docs.trytrellis.app/zh"><img src="https://img.shields.io/badge/docs-trytrellis.app-0f766e?style=flat-square" alt="docs" /></a>
+<a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
 <a href="https://discord.com/invite/tWcCZ3aRHc"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
-<a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/leokuang/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
-<a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/leokuang/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
-<a href="https://deepwiki.com/leokuang/spec-first"><img src="https://img.shields.io/badge/Ask-DeepWiki-blue?style=flat-square" alt="Ask DeepWiki" /></a>
-<a href="https://chatgpt.com/?q=Explain+the+project+leokuang/spec-first+on+GitHub"><img src="https://img.shields.io/badge/Ask-ChatGPT-74aa9c?style=flat-square&logo=openai&logoColor=white" alt="Ask ChatGPT" /></a>
-</p>
-
-<p align="center">
-<img src="assets/spec-demo-zh.gif" alt="spec-first 工作流演示" width="100%">
-</p>
-
-<p align="center">
-<img src="assets/spec-demo-zh.gif" alt="spec-first 工作流演示" width="100%">
+<a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/sunrain520/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
+<a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/sunrain520/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
+<a href="https://deepwiki.com/sunrain520/spec-first"><img src="https://img.shields.io/badge/Ask-DeepWiki-blue?style=flat-square" alt="Ask DeepWiki" /></a>
+<a href="https://chatgpt.com/?q=Explain+the+project+sunrain520/spec-first+on+GitHub"><img src="https://img.shields.io/badge/Ask-ChatGPT-74aa9c?style=flat-square&logo=openai&logoColor=white" alt="Ask ChatGPT" /></a>
 </p>
 
 ## 为什么用 spec-first？
@@ -59,18 +43,18 @@
 npm install -g @leokuang/spec-first@latest
 
 # 2. 在仓库里初始化
-spec init -u your-name
+spec-first init -u your-name
 
 # 3. 或者按你实际使用的平台初始化
-spec init --cursor --opencode --codex -u your-name
+spec-first init --cursor --opencode --codex -u your-name
 ```
 
 - `-u your-name` 会创建 `.spec-first/workspace/your-name/`，用来保存个人 journal 和会话连续性。
 - 平台参数可以自由组合。当前可选项包括 `--cursor`、`--opencode`、`--iflow`、`--codex`、`--kilo`、`--kiro`、`--gemini`、`--antigravity`、`--qoder` 和 `--codebuddy`。
 - 更完整的安装步骤、各平台入口命令和升级方式放在文档站：
-  [快速开始](https://docs.trytrellis.app/zh/guide/ch02-quick-start) •
-  [支持平台](https://docs.trytrellis.app/zh/guide/ch13-multi-platform) •
-  [使用场景](https://docs.trytrellis.app/zh/guide/ch08-real-world)
+  [快速开始](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) •
+  [支持平台](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) •
+  [使用场景](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md)
 
 ## 使用场景
 
@@ -118,17 +102,17 @@ Spec 默认是空模板——需要根据你的项目技术栈和团队规范来
 
 ```bash
 # 从自定义仓库拉取模板
-spec init --registry https://github.com/your-org/your-spec-templates
+spec-first init --registry https://github.com/your-org/your-spec-templates
 ```
 
-浏览可用模板和了解如何发布你自己的模板，请查看 [Spec 模板页面](https://docs.trytrellis.app/zh/templates/specs-index)。
+浏览可用模板和了解如何发布你自己的模板，请查看 [Spec 模板页面](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md)。
 
 ## 最新进展
 
+- **v0.4.0-beta.8**：增强 CLI 输出、改进技能发现、优化归档和文档链接契约、整合工作区更新。
 - **v0.3.6**：任务生命周期 hooks、自定义模板仓库（`--registry`）、父子 subtask、修复 CC v2.1.63+ PreToolUse hook 失效。
 - **v0.3.5**：修复 Kilo workflows 删除迁移清单字段名。
 - **v0.3.4**：Qoder 平台支持、Kilo workflows 迁移、record-session 任务感知。
-- **v0.3.1**：`spec update` 后台 watch 模式、`.gitignore` 处理改善、文档更新。
 - **v0.3.0**：支持平台从 2 个扩展到 10 个、Windows 兼容、远程 Spec 模板、`/spec:brainstorm`。
 
 ## 常见问题
@@ -163,16 +147,15 @@ spec init --registry https://github.com/your-org/your-spec-templates
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=leokuang/spec-first&type=Date)](https://star-history.com/#leokuang/spec-first&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=sunrain520/spec-first&type=Date)](https://star-history.com/#sunrain520/spec-first&Date)
 
 ## 社区与资源
 
-- [官方文档](https://docs.trytrellis.app/zh) - 产品说明、安装指南和架构文档
-- [快速开始](https://docs.trytrellis.app/zh/guide/ch02-quick-start) - 快速在仓库里跑起来
-- [支持平台](https://docs.trytrellis.app/zh/guide/ch13-multi-platform) - 各平台的接入方式和命令差异
-- [使用场景](https://docs.trytrellis.app/zh/guide/ch08-real-world) - 看 spec-first 在真实任务里怎么落地
-- [更新日志](https://docs.trytrellis.app/zh/changelog/v0.3.6) - 跟踪当前版本变化
-- [Tech Blog](https://docs.trytrellis.app/zh/blog) - 设计思路和技术文章
+- [官方文档](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md) - 产品说明和工作流分析
+- [快速开始](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) - 在现有仓库里快速接入
+- [支持平台](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) - 各平台的接入方式和命令差异
+- [使用场景](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md) - 看 spec-first 在真实任务里怎么落地
+- [Marketplace](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md) - 模板包和安装说明
 - [GitHub Issues](https://github.com/sunrain520/spec-first/issues) - 提 Bug 或功能建议
 - [Discord](https://discord.com/invite/tWcCZ3aRHc) - 加入社区讨论
 

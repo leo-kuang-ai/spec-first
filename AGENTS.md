@@ -10,12 +10,11 @@ Use the `/spec:start` command when starting a new session to:
 
 Use `@/.spec-first/` to learn:
 - Development workflow (`workflow.md`)
-- Project structure guidelines (`structure/`)
-- Session traces (`agent-traces/`)
+- Runtime layout (`layer2/`, `meta/`, `runtime/`)
+- Generated workflow templates (`packages/cli/src/templates/spec-first/`)
+- Project docs and migration notes (`docs/`)
 
-If you're using Codex, project-scoped helpers may also live in:
-- `.agents/skills/` for reusable spec-first skills
-- `.codex/agents/` for optional custom subagents
+If you're using Codex, project-scoped helpers may live in the generated spec-first assets or in repository-specific workflow files.
 
 Keep this managed block so 'spec update' can refresh the instructions.
 

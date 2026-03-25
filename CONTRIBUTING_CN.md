@@ -9,7 +9,7 @@
 提交 Bug 前，请先查看 [已有 Issues](https://github.com/sunrain520/spec-first/issues) 避免重复。
 
 报告 Bug 时请包含：
-- spec-first 版本 (`spec --version`)
+- spec-first 版本 (`spec-first --version`)
 - Node.js 版本 (`node --version`)
 - 操作系统
 - 复现步骤
@@ -82,23 +82,32 @@ pnpm typecheck   # TypeScript 类型检查
 
 ```
 spec-first/
-├── src/                    # TypeScript 源代码
-│   ├── cli/                # CLI 入口
-│   ├── commands/           # CLI 命令 (init, update)
-│   ├── configurators/      # 模板应用逻辑
-│   ├── templates/          # 安装到用户项目的模板 ←
-│   └── utils/              # 工具函数
-├── .claude/                # Claude Code 配置（项目自用）←
-│   ├── agents/             # Agent 定义
-│   ├── commands/           # 斜杠命令
-│   └── hooks/              # Python Hook 脚本
-├── .spec-first/               # spec-first 工作流（项目自用）←
-│   ├── scripts/            # Bash 脚本
-│   └── spec/               # Spec 文件模板
-└── docs/                   # 文档
+├── packages/
+│   └── cli/
+│       ├── src/               # TypeScript 源代码
+│       │   ├── commands/      # CLI 命令 (init, update)
+│       │   ├── configurators/ # 模板应用逻辑
+│       │   ├── templates/     # 安装到用户项目的模板
+│       │   ├── utils/         # 工具函数
+│       │   └── types/         # 共享 TypeScript 类型
+│       ├── bin/               # CLI 入口
+│       ├── scripts/           # 构建 / 发布辅助脚本
+│       └── test/              # 单测、集成测试和回归测试
+├── .claude/                   # Claude Code 配置（项目自用）
+│   ├── agents/                # Agent 定义
+│   ├── commands/              # 斜杠命令
+│   └── hooks/                 # Python Hook 脚本
+├── .cursor/                   # Cursor 命令模板
+├── .spec-first/               # spec-first 工作流（项目自用）
+│   ├── hooks/                 # 运行时 Hooks
+│   ├── layer2/                # 共享资产层
+│   ├── meta/                  # 元数据
+│   └── runtime/               # 运行时状态
+├── docs/                     # 文档
+└── marketplace/              # 模板市场和 specs
 ```
 
-> **重要：** 修改 `.claude/`、`.spec-first/` 或 `.cursor/` 时，请检查是否需要同步更新 `src/templates/`。项目使用自己的配置文件，但模板才是安装到用户项目的内容。
+> **重要：** 修改 `.claude/`、`.cursor/`、`.spec-first/` 或 `packages/cli/src/templates/` 时，请检查是否需要同步更新生成模板。项目使用自己的配置文件，但模板才是安装到用户项目的内容。
 
 ## 提交规范
 
@@ -125,7 +134,7 @@ docs(readme): update quick start instructions
 
 ## Pull Request 流程
 
-1. **从 `main` 创建分支**
+1. **从默认分支创建分支**（当前仓库为 `master`）
    ```bash
    git checkout -b feat/your-feature-name
    ```
@@ -142,7 +151,7 @@ docs(readme): update quick start instructions
    git push origin feat/your-feature-name
    ```
 
-5. **向 `main` 分支发起 Pull Request**
+5. **向默认分支发起 Pull Request**（当前仓库为 `master`）
    - 提供清晰的变更描述
    - 关联相关 Issue
    - UI 变更请附截图

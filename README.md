@@ -1,39 +1,27 @@
 <p align="center">
-<picture>
-<source srcset="assets/spec.png" media="(prefers-color-scheme: dark)">
-<source srcset="assets/spec.png" media="(prefers-color-scheme: light)">
-<img src="assets/spec.png" alt="spec-first Logo" width="500" style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;">
-</picture>
-</p>
-
-<p align="center">
 <strong>A multi-platform AI coding framework that rules</strong><br/>
 <sub>Supports Claude Code, Cursor, OpenCode, iFlow, Codex, Kilo, Kiro, Gemini CLI, Antigravity, Qoder, and CodeBuddy.</sub>
 </p>
 
 <p align="center">
 <a href="./README_CN.md">简体中文</a> •
-<a href="https://docs.trytrellis.app/">Docs</a> •
-<a href="https://docs.trytrellis.app/guide/ch02-quick-start">Quick Start</a> •
-<a href="https://docs.trytrellis.app/guide/ch13-multi-platform">Supported Platforms</a> •
-<a href="https://docs.trytrellis.app/guide/ch08-real-world">Use Cases</a>
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md">Docs</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md">Quick Start</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md">Supported Platforms</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md">Use Cases</a>
 </p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/v/@leokuang/spec-first.svg?style=flat-square&color=2563eb" alt="npm version" /></a>
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/dw/@leokuang/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
 <a href="https://github.com/sunrain520/spec-first/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
-<a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/leokuang/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
-<a href="https://docs.trytrellis.app/"><img src="https://img.shields.io/badge/docs-trytrellis.app-0f766e?style=flat-square" alt="docs" /></a>
+<a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
 <a href="https://discord.com/invite/tWcCZ3aRHc"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
-<a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/leokuang/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
-<a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/leokuang/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
-<a href="https://deepwiki.com/leokuang/spec-first"><img src="https://img.shields.io/badge/Ask-DeepWiki-blue?style=flat-square" alt="Ask DeepWiki" /></a>
-<a href="https://chatgpt.com/?q=Explain+the+project+leokuang/spec-first+on+GitHub"><img src="https://img.shields.io/badge/Ask-ChatGPT-74aa9c?style=flat-square&logo=openai&logoColor=white" alt="Ask ChatGPT" /></a>
-</p>
-
-<p align="center">
-<img src="assets/spec-demo.gif" alt="spec-first workflow demo" width="100%">
+<a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/sunrain520/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
+<a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/sunrain520/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
+<a href="https://deepwiki.com/sunrain520/spec-first"><img src="https://img.shields.io/badge/Ask-DeepWiki-blue?style=flat-square" alt="Ask DeepWiki" /></a>
+<a href="https://chatgpt.com/?q=Explain+the+project+sunrain520/spec-first+on+GitHub"><img src="https://img.shields.io/badge/Ask-ChatGPT-74aa9c?style=flat-square&logo=openai&logoColor=white" alt="Ask ChatGPT" /></a>
 </p>
 
 ## Why spec-first?
@@ -54,18 +42,18 @@
 npm install -g @leokuang/spec-first@latest
 
 # 2. Initialize in your repo
-spec init -u your-name
+spec-first init -u your-name
 
 # 3. Or initialize with the platforms you actually use
-spec init --cursor --opencode --codex -u your-name
+spec-first init --cursor --opencode --codex -u your-name
 ```
 
 - `-u your-name` creates `.spec-first/workspace/your-name/` for personal journals and session continuity.
 - Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
 - For platform-specific setup, entry commands, and upgrade paths, use the docs:
-  [Quick Start](https://docs.trytrellis.app/guide/ch02-quick-start) •
-  [Supported Platforms](https://docs.trytrellis.app/guide/ch13-multi-platform) •
-  [Real-World Scenarios](https://docs.trytrellis.app/guide/ch08-real-world)
+  [Quick Start](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) •
+  [Supported Platforms](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) •
+  [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md)
 
 ## Use Cases
 
@@ -113,18 +101,18 @@ Specs ship as empty templates by default — they are meant to be customized for
 
 ```bash
 # Fetch templates from a custom registry
-spec init --registry https://github.com/your-org/your-spec-templates
+spec-first init --registry https://github.com/your-org/your-spec-templates
 ```
 
-Browse available templates and learn how to publish your own on the [Spec Templates page](https://docs.trytrellis.app/templates/specs-index).
+Browse available templates and learn how to publish your own on the [Spec Templates page](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md).
 
 ## What's New
 
-- **v0.3.6**: task lifecycle hooks, custom template registries (`--registry`), parent-child subtasks, fix PreToolUse hook for CC v2.1.63+.
-- **v0.3.5**: hotfix for delete migration manifest field name (Kilo workflows).
+- **v0.4.0-beta.8**: Enhanced CLI output, improved skill discovery, refined archive and docs-link contracts, consolidated workspace updates.
+- **v0.3.6**: Task lifecycle hooks, custom template registries (`--registry`), parent-child subtasks, fix PreToolUse hook for CC v2.1.63+.
+- **v0.3.5**: Hotfix for delete migration manifest field name (Kilo workflows).
 - **v0.3.4**: Qoder platform support, Kilo workflows migration, record-session task awareness.
-- **v0.3.1**: background watch mode for `spec update`, improved `.gitignore` handling, docs refresh.
-- **v0.3.0**: platform support expanded from 2 to 10, Windows compatibility, remote spec templates, `/spec:brainstorm`.
+- **v0.3.0**: Platform support expanded from 2 to 10, Windows compatibility, remote spec templates, `/spec:brainstorm`.
 
 ## FAQ
 
@@ -158,16 +146,15 @@ Yes. Personal workspace journals stay separate per developer, while shared specs
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=leokuang/spec-first&type=Date)](https://star-history.com/#leokuang/spec-first&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=sunrain520/spec-first&type=Date)](https://star-history.com/#sunrain520/spec-first&Date)
 
 ## Community & Resources
 
-- [Official Docs](https://docs.trytrellis.app/) - Product docs, setup guides, and architecture
-- [Quick Start](https://docs.trytrellis.app/guide/ch02-quick-start) - Get spec-first running in a repo fast
-- [Supported Platforms](https://docs.trytrellis.app/guide/ch13-multi-platform) - Platform-specific setup and command details
-- [Real-World Scenarios](https://docs.trytrellis.app/guide/ch08-real-world) - See how the workflow plays out in practice
-- [Changelog](https://docs.trytrellis.app/changelog/v0.3.6) - Track current releases and updates
-- [Tech Blog](https://docs.trytrellis.app/blog) - Product thinking and technical writeups
+- [Official Docs](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md) - Product docs and workflow analysis
+- [Quick Start](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) - First-time setup for existing projects
+- [Supported Platforms](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) - Platform-specific setup and command details
+- [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md) - See how the workflow plays out in practice
+- [Marketplace](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md) - Template packs and installation guidance
 - [GitHub Issues](https://github.com/sunrain520/spec-first/issues) - Report bugs or request features
 - [Discord](https://discord.com/invite/tWcCZ3aRHc) - Join the community
 

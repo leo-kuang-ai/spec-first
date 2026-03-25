@@ -82,23 +82,32 @@ pnpm typecheck   # TypeScript type checking
 
 ```
 spec-first/
-├── src/                    # TypeScript source code
-│   ├── cli/                # CLI entry point
-│   ├── commands/           # CLI commands (init, update)
-│   ├── configurators/      # Template application logic
-│   ├── templates/          # Templates copied to user projects ←
-│   └── utils/              # Utility functions
-├── .claude/                # Claude Code config (project's own) ←
-│   ├── agents/             # Agent definitions
-│   ├── commands/           # Slash commands
-│   └── hooks/              # Python hook scripts
-├── .spec-first/               # spec-first workflow (project's own) ←
-│   ├── scripts/            # Bash scripts
-│   └── spec/               # Spec file templates
-└── docs/                   # Documentation
+├── packages/
+│   └── cli/
+│       ├── src/               # TypeScript source code
+│       │   ├── commands/      # CLI commands (init, update)
+│       │   ├── configurators/ # Template application logic
+│       │   ├── templates/     # Templates copied to user projects
+│       │   ├── utils/         # Utility functions
+│       │   └── types/         # Shared TypeScript types
+│       ├── bin/               # CLI entry point
+│       ├── scripts/           # Build/release helper scripts
+│       └── test/              # Unit, integration, and regression tests
+├── .claude/                   # Claude Code config (project's own)
+│   ├── agents/                # Agent definitions
+│   ├── commands/              # Slash commands
+│   └── hooks/                 # Python hook scripts
+├── .cursor/                   # Cursor command templates
+├── .spec-first/               # spec-first workflow (project's own)
+│   ├── hooks/                 # Runtime hooks
+│   ├── layer2/                # Shared asset layers
+│   ├── meta/                  # Meta/runtime metadata
+│   └── runtime/               # Runtime state
+├── docs/                     # Documentation
+└── marketplace/              # Template marketplace and specs
 ```
 
-> **Important:** When modifying `.claude/`, `.spec-first/`, or `.cursor/`, check if the same changes need to be applied to `src/templates/`. The project uses its own config files, but templates are what gets installed to user projects.
+> **Important:** When modifying `.claude/`, `.cursor/`, `.spec-first/`, or `packages/cli/src/templates/`, check if the same changes need to be applied to the generated templates. The project uses its own config files, but templates are what get installed to user projects.
 
 ## Commit Guidelines
 
@@ -125,7 +134,7 @@ docs(readme): update quick start instructions
 
 ## Pull Request Process
 
-1. **Create a branch** from `main`
+1. **Create a branch** from the default branch (`master` in this repository)
    ```bash
    git checkout -b feat/your-feature-name
    ```
@@ -142,7 +151,7 @@ docs(readme): update quick start instructions
    git push origin feat/your-feature-name
    ```
 
-5. **Open a Pull Request** against `main` branch
+5. **Open a Pull Request** against the default branch (`master`)
    - Provide a clear description of changes
    - Reference any related issues
    - Include screenshots for UI changes

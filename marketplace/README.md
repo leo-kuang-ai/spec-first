@@ -1,6 +1,6 @@
 # spec-first Marketplace
 
-Downloadable templates for Claude Code users.
+Downloadable templates and specs for spec-first users.
 
 ## Structure
 
@@ -17,7 +17,7 @@ marketplace/
 ### Install via npx skills
 
 ```bash
-npx skills add leokuang/spec-first/marketplace
+npx skills add sunrain520/spec-first/marketplace
 ```
 
 ### Manual Installation
