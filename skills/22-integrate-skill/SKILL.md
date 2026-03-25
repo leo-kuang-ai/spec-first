@@ -33,7 +33,7 @@ user-invocable: true
 - Command: `/spec-first:integrate-skill <skill-name> [options]`
 
 ```text
-/spec-first:integrate-skill <skill-name> [--source <path>] [--target <guideline|draft|both>] [--report-only] [--allow-missing-source] [--dry-run] [--rename <new-name>] [--yes]
+/spec-first:integrate-skill <skill-name> [--source <path>] [--target <guideline|draft|both>] [--report-only] [--dry-run] [--rename <new-name>] [--yes]
 ```
 
 ## 当前约束

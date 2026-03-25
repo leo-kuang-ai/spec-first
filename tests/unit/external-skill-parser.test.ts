@@ -10,8 +10,6 @@ describe('parseExternalSkill', () => {
     const resolved = resolveExternalSkillSource({
       skillName: 'frontend-design',
       source: join(FIXTURES, 'frontend-design'),
-      reportOnly: false,
-      allowMissingSource: false,
     });
 
     if (resolved.kind !== 'resolved') {
@@ -31,8 +29,6 @@ describe('parseExternalSkill', () => {
     const resolved = resolveExternalSkillSource({
       skillName: 'mcp-builder',
       source: join(FIXTURES, 'mcp-builder'),
-      reportOnly: false,
-      allowMissingSource: false,
     });
 
     if (resolved.kind !== 'resolved') {

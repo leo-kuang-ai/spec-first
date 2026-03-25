@@ -46,11 +46,17 @@ function resolveFromCandidate(
   return buildResolvedSource(requestedName, candidate, skillMdPath);
 }
 
-function discoverExternalRoots(): string[] {
+function discoverExternalRoots(skillName: string): string[] {
   const home = process.env.HOME?.trim();
-  if (!home) return [];
+  const roots = [join(process.cwd(), skillName)];
+  if (!home) return roots;
 
-  return [join(home, '.agents', 'skills'), join(home, '.codex', 'skills')];
+  roots.push(
+    join(home, '.spec-first', 'skills', skillName),
+    join(home, '.agents', 'skills', skillName),
+    join(home, '.codex', 'skills', skillName)
+  );
+  return roots;
 }
 
 export function resolveExternalSkillSource(
@@ -61,14 +67,6 @@ export function resolveExternalSkillSource(
   if (explicitSource) {
     const explicitResolved = resolve(explicitSource);
     if (!existsSync(explicitResolved)) {
-      if (input.reportOnly && input.allowMissingSource) {
-        return {
-          kind: 'missing',
-          requestedName: input.skillName,
-          reason: 'source-not-found',
-          sourcePath: explicitResolved,
-        };
-      }
       throw new Error(`SOURCE_NOT_FOUND: ${input.skillName} (${explicitResolved})`);
     }
 
@@ -77,18 +75,9 @@ export function resolveExternalSkillSource(
     throw new Error(`SOURCE_INVALID: ${input.skillName} (${explicitResolved})`);
   }
 
-  for (const root of discoverExternalRoots()) {
-    const candidate = join(root, input.skillName);
+  for (const candidate of discoverExternalRoots(input.skillName)) {
     const result = resolveFromCandidate(input.skillName, candidate);
     if (result) return { kind: 'resolved', source: result };
-  }
-
-  if (input.reportOnly && input.allowMissingSource) {
-    return {
-      kind: 'missing',
-      requestedName: input.skillName,
-      reason: 'source-not-found',
-    };
   }
 
   throw new Error(`SOURCE_NOT_FOUND: ${input.skillName}`);

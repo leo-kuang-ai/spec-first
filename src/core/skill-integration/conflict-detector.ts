@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import type { IntegrationStage } from './types.js';
 
 export interface SkillConflict {
@@ -54,19 +54,32 @@ function lower(text: string): string {
   return text.toLowerCase();
 }
 
+function normalizeSkillIdentifier(value: string): string {
+  return lower(value)
+    .replace(/^["']|["']$/g, '')
+    .replace(/^.*:/, '')
+    .replace(/^\d+-/, '')
+    .trim();
+}
+
 export function detectSkillIntegrationConflicts(
   input: ConflictDetectionInput
 ): SkillConflict[] {
   const conflicts: SkillConflict[] = [];
   const skillsRoot = join(input.projectRoot, 'skills');
-  const normalizedTarget = lower(input.skillName);
+  const normalizedTarget = normalizeSkillIdentifier(input.skillName);
 
   for (const skillFile of collectSkillFiles(skillsRoot)) {
     const content = readFileSync(skillFile, 'utf-8');
-    const dirName = lower(skillFile.split('/').at(-2) ?? '');
-    const fileContent = lower(content);
+    const dirName = normalizeSkillIdentifier(basename(dirname(skillFile)));
+    const declaredNames = [
+      ...content.matchAll(/^name:\s*["']?(.+?)["']?\s*$/gim),
+      ...content.matchAll(/^#\s*Skill:\s*(.+?)\s*$/gim),
+    ]
+      .map((match) => normalizeSkillIdentifier(match[1] ?? ''))
+      .filter(Boolean);
 
-    if (dirName === normalizedTarget || fileContent.includes(`name: "${normalizedTarget}"`) || fileContent.includes(`name: '${normalizedTarget}'`)) {
+    if ([dirName, ...declaredNames].some((name) => name === normalizedTarget)) {
       conflicts.push({
         type: 'name-conflict',
         severity: 'error',
@@ -80,6 +93,7 @@ export function detectSkillIntegrationConflicts(
       input.profile.primaryStage,
       ...input.profile.relatedStages,
     ]);
+    const fileContent = lower(content);
     const overlapHit =
       [...stageTokens].some((stage) => stage !== 'none' && fileContent.includes(stage)) ||
       input.profile.keywords.some((keyword) => fileContent.includes(lower(keyword))) ||
@@ -108,4 +122,3 @@ export function detectSkillIntegrationConflicts(
 
   return conflicts;
 }
-
