@@ -159,9 +159,9 @@ if command -v npx >/dev/null 2>&1; then
     exit 0
   fi
 
-  npx spec-first docs validate "$FEAT_ID"
+  npx spec-first validate links "$FEAT_ID"
   if [ $? -ne 0 ]; then
-    echo "错误：$FEAT_ID 的 spec-first docs validate 失败，已阻止 push。"
+    echo "错误：$FEAT_ID 的 spec-first validate links 失败，已阻止 push。"
     exit 1
   fi
 fi

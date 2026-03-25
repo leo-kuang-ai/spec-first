@@ -144,7 +144,8 @@ describe('update and doctor baseline integration', () => {
     expect(updateCode).toBe(0);
 
     const projectSettings = readFileSync(join(TMP, '.claude', 'settings.json'), 'utf-8');
-    expect(projectSettings).toContain('npx spec-first gate check');
+    expect(projectSettings).toContain('npx spec-first status');
+    expect(projectSettings).toContain('npx spec-first validate links');
     expect(existsSync(join(TMP, 'home', '.claude', 'settings.json'))).toBe(false);
     expect(existsSync(join(TMP, '.git', 'hooks', 'pre-commit'))).toBe(true);
   });

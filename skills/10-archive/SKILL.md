@@ -98,7 +98,7 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 ## CLI 依赖
 - `spec-first metrics report`
 - `spec-first gate check`
-- `spec-first stage advance`
+- `spec-first transition <featureId>`
 
 ## 输出路径
 - `specs/{featureId}/retro.md`
@@ -113,5 +113,5 @@ changelog: v1.1.0 - 新增自动 Feature 定位（优先读取 .spec-first/curre
 ## 成功标准
 - `retro.md` 已写入，包含覆盖率报告和经验教训
 - 运行态文件按组合门槛完成归档
-- `gate check` 通过后 `stage advance` 已执行，阶段推进至 07_release
+- `gate check` 通过后 `transition` 已执行，阶段推进至 07_release
 - 若涉及宪法知识回写：主副本更新策略已执行并可审计

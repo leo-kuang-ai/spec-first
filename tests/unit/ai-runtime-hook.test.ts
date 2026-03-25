@@ -33,7 +33,7 @@ describe('registerAIHooks', () => {
     expect(preEntries[1].matcher).toBe(preEntries[0].matcher);
     expect(preEntries[0].hooks[0]).toHaveProperty('type', 'command');
     expect(preEntries[0].hooks[0].command).toContain('task-context.sh');
-    expect(preEntries[1].hooks[0].command).toContain('npx spec-first gate check');
+    expect(preEntries[1].hooks[0].command).toContain('npx spec-first status');
 
     const stopEntries = settings.hooks.Stop;
     expect(stopEntries).toHaveLength(2);

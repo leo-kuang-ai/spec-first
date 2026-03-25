@@ -15,7 +15,7 @@ describe('truth source governance', () => {
     expect(PRIMARY_STAGE_SKILL['04_implement']).toBe('code');
     expect(PRIMARY_STAGE_SKILL['05_verify']).toBe('verify');
     expect(PRIMARY_STAGE_SKILL['06_wrap_up']).toBe('archive');
-    expect(PRIMARY_STAGE_SKILL['07_release']).toBe('golive');
+    expect(PRIMARY_STAGE_SKILL['07_release']).toBe('done');
   });
 
   it('tracks removed legacy skills explicitly', () => {
@@ -34,7 +34,7 @@ describe('truth source governance', () => {
     expect(DELIVERY_ROUTE.slice(-4)).toEqual([
       { stage: '05_verify', command: 'verify', route: 'skill' },
       { stage: '06_wrap_up', command: 'archive', route: 'skill' },
-      { stage: '07_release', command: 'golive', route: 'runtime' },
+      { stage: '07_release', command: 'done', route: 'runtime' },
       { stage: '08_done', command: 'done', route: 'runtime' },
     ]);
     expect(RELEASE_REQUIRED_ARTIFACTS).toEqual([

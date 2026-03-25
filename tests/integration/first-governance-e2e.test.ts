@@ -63,7 +63,7 @@ function seedFeatureDeliverables(): void {
   );
   writeFileSync(join(SPEC_DIR, 'findings.md'), '# Findings\n', 'utf-8');
   writeFileSync(join(SPEC_DIR, 'spec.md'), '# Spec\n', 'utf-8');
-  writeFileSync(join(SPEC_DIR, 'retro.md'), '# Retro\n', 'utf-8');
+  writeFileSync(join(SPEC_DIR, 'wrap_up.md'), '# Wrap Up\n', 'utf-8');
   writeFileSync(join(SPEC_DIR, 'reports', 'release-note.md'), '# Release\n', 'utf-8');
   writeFileSync(join(SPEC_DIR, 'reports', 'smoke-test-report.md'), '# Smoke\n', 'utf-8');
   writeFileSync(

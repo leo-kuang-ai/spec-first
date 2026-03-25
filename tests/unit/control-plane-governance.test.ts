@@ -6,17 +6,17 @@ import { extractFiveQuestions } from '../../src/core/ai-orchestrator/catchup-sum
 const ROOT = join(import.meta.dirname, '../../');
 
 describe('control plane governance', () => {
-  it('routes catchup next actions to archive and golive in late stages', () => {
+  it('routes catchup next actions to archive and done in late stages', () => {
     const wrap = extractFiveQuestions('FSREQ-20260307-AUTH-001', '06_wrap_up', undefined, '', []);
     expect(wrap.nextAction.answer).toBe('执行 /spec-first:archive');
 
     const release = extractFiveQuestions('FSREQ-20260307-AUTH-001', '07_release', undefined, '', []);
-    expect(release.nextAction.answer).toBe('执行 spec-first golive check FSREQ-20260307-AUTH-001');
+    expect(release.nextAction.answer).toBe('执行 spec-first done FSREQ-20260307-AUTH-001');
   });
 
   it('routes done stage to status-style confirmation instead of further advance', () => {
     const done = extractFiveQuestions('FSREQ-20260307-AUTH-001', '08_done', undefined, '', []);
-    expect(done.nextAction.answer).toBe('执行 spec-first stage current FSREQ-20260307-AUTH-001 确认已完成状态');
+    expect(done.nextAction.answer).toBe('执行 spec-first done FSREQ-20260307-AUTH-001');
   });
 
   it('keeps session-start routing table aligned with v2 commands', () => {

@@ -6,6 +6,15 @@ import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  formatBullet,
+  formatKeyValue,
+  formatSubBullet,
+  icon,
+  joinSections,
+  renderBrandBanner,
+  renderSection,
+} from './shared/cli-output.js';
 import { detectHostPaths } from './shared/host-paths.js';
 import { detectGlobalInstall, type InstallDetectionContext } from './shared/install-detection.js';
 import { resolveHostAdapterStatuses } from './core/host-adapters/registry.js';
@@ -97,7 +106,7 @@ export function runUpdate(): void {
       stdio: 'inherit',
     });
   } catch {
-    console.error('❌ 基线能力自动补齐失败，请手动执行: spec-first update');
+    console.error(`${icon('warn')} 基线补齐失败，请运行: spec-first update`);
   }
 }
 
@@ -117,37 +126,48 @@ export function printInstallGuide(options: {
     return;
   }
 
-  console.log('\n📦 spec-first 安装完成！\n');
+  const sections: string[] = [
+    renderBrandBanner('安装后提示'),
+    renderSection(`${icon('warn')} 安装状态:`, [
+      formatBullet('基线能力尚未完整注册到 Claude Code / Codex。'),
+      formatBullet(`建议命令: spec-first update`),
+    ]),
+  ];
 
-  // skills 未注册的情况
-  console.log('⚠️  基线能力尚未完整注册到 Claude Code/Codex');
-  console.log('\n请执行以下命令完成注册：');
-  console.log('   spec-first update\n');
-
-  // CC Switch 检测
   if (ccSwitchInstalled.installed) {
-    console.log('✅ 检测到 CC Switch 安装');
-    console.log(`   数据目录: ${ccSwitchInstalled.dataDir}`);
-    console.log(`   Skills 目录: ${ccSwitchInstalled.skillsDir}`);
-    console.log('   提示: CC Switch 会自动同步 skills 到各个 CLI 工具\n');
-  }
-
-  // Claude Code 安装检测
-  if (!claudeInstalled.installed) {
-    console.log('💡 提示：未检测到 Claude Code 安装');
-    console.log('   - 如果您使用 Claude Code，请先安装：https://claude.ai/code');
-    console.log(
-      '   - 或使用 CC Switch 统一管理多个 CLI 工具：https://github.com/farion1231/cc-switch'
+    sections.push(
+      renderSection(`${icon('ok')} CC Switch:`, [
+        formatKeyValue('数据目录', ccSwitchInstalled.dataDir),
+        formatKeyValue('Skills 目录', ccSwitchInstalled.skillsDir),
+        formatSubBullet('CC Switch 可以自动同步 Skills 到支持的 CLI。'),
+      ])
     );
-    console.log('   - 安装后重新运行 spec-first update\n');
-  } else if (!ccSwitchInstalled.installed) {
-    console.log('✅ 检测到 Claude Code 安装');
-    console.log(`   配置目录: ${claudeInstalled.configDir}`);
-    console.log(`   命令目录: ${claudeInstalled.commandsDir}\n`);
   }
 
-  console.log('💡 提示：spec-first 的必备 Skills + 核心 MCP 属于基线能力。');
-  console.log('   如未自动补齐，请优先执行 spec-first update\n');
+  if (!claudeInstalled.installed) {
+    sections.push(
+      renderSection(`${icon('info')} Claude Code:`, [
+        formatBullet('当前机器未检测到 Claude Code。'),
+        formatSubBullet('如果你会用 Claude Code，先安装它: https://claude.ai/code'),
+        formatSubBullet('也可以用 CC Switch 统一管理多个 CLI: https://github.com/farion1231/cc-switch'),
+        formatSubBullet('安装后执行: spec-first update'),
+      ])
+    );
+  } else if (!ccSwitchInstalled.installed) {
+    sections.push(
+      renderSection(`${icon('ok')} Claude Code:`, [
+        formatKeyValue('配置目录', claudeInstalled.configDir),
+        formatKeyValue('命令目录', claudeInstalled.commandsDir),
+      ])
+    );
+  }
+
+  sections.push(
+    renderSection(`${icon('info')} 为什么要更新:`, [
+      formatBullet('必备 Skills + 核心 MCP 服务都算基线能力。'),
+      formatBullet('如果注册不完整，请运行: spec-first update'),
+    ])
+  );
 
   const stableHosts = hostStatuses.filter((entry) => entry.id === 'claude' || entry.id === 'codex');
   const experimentalHosts = hostStatuses.filter(
@@ -157,46 +177,53 @@ export function printInstallGuide(options: {
   );
 
   if (stableHosts.length > 0) {
-    console.log('宿主基线状态：');
+    const stableLines: string[] = [];
     for (const entry of stableHosts) {
       const missing =
         entry.missingBaseline.length > 0
           ? `missing=${entry.missingBaseline.join('+')}`
           : 'missing=(none)';
-      console.log(
-        `   ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
+      stableLines.push(
+        formatBullet(
+          `${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
+        )
       );
       if (entry.baselineState !== 'ready') {
-        console.log(`   - ${entry.remediation}`);
+        stableLines.push(formatSubBullet(entry.remediation));
       }
     }
-    console.log('');
+    sections.push(renderSection(`${icon('info')} 稳定宿主状态:`, stableLines));
   }
 
   if (experimentalHosts.length > 0) {
-    console.log('实验宿主提示：');
+    const experimentalLines: string[] = [];
     for (const entry of experimentalHosts) {
       const missing =
         entry.missingBaseline.length > 0
           ? `missing=${entry.missingBaseline.join('+')}`
           : 'missing=(none)';
-      console.log(
-        `   ${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
+      experimentalLines.push(
+        formatBullet(
+          `${entry.id}: ${entry.detected ? 'detected' : 'planned'}, baseline=${entry.baselineState}, ${missing}`
+        )
       );
-      console.log(`   - ${entry.remediation}`);
+      experimentalLines.push(formatSubBullet(entry.remediation));
     }
-    console.log('');
+    sections.push(renderSection(`${icon('info')} 实验宿主提示:`, experimentalLines));
   }
 
-  // 显示检测到的路径信息（调试用）
   if (process.env.SPEC_FIRST_DEBUG) {
-    console.log('🔍 调试信息：');
-    console.log(`   全局安装检测: ${isGlobal ? '是' : '否'}`);
-    console.log(`   Claude skills: ${skillsRegistered.claude ? '已注册' : '未注册'}`);
-    console.log(`   Codex skills: ${skillsRegistered.codex ? '已注册' : '未注册'}`);
-    console.log(`   CC Switch: ${ccSwitchInstalled.installed ? '已安装' : '未安装'}`);
-    console.log('');
+    sections.push(
+      renderSection(`${icon('info')} 调试信息:`, [
+        formatKeyValue('全局安装', isGlobal ? 'yes' : 'no'),
+        formatKeyValue('Claude Skills', skillsRegistered.claude ? 'registered' : 'not registered'),
+        formatKeyValue('Codex Skills', skillsRegistered.codex ? 'registered' : 'not registered'),
+        formatKeyValue('CC Switch', ccSwitchInstalled.installed ? 'installed' : 'not installed'),
+      ])
+    );
   }
+
+  console.log(joinSections(...sections));
 }
 
 function getMissingStableHostRegistrations(skillsRegistered: SkillRegistrationStatus): string[] {

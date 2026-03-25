@@ -102,11 +102,12 @@ describe('postinstall', () => {
 
     const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
     expect(execFileSync).not.toHaveBeenCalled();
+    expect(output).toContain('spec-first | 安装后提示');
     expect(output).toContain('spec-first update');
-    expect(output).toContain('基线能力');
-    expect(output).toContain('宿主基线状态：');
+    expect(output).toContain('基线能力尚未完整注册到 Claude Code / Codex。');
+    expect(output).toContain('稳定宿主状态:');
     expect(output).toContain('claude: detected, baseline=ready, missing=(none)');
-    expect(output).toContain('实验宿主提示：');
+    expect(output).toContain('实验宿主提示:');
     expect(output).toContain('gemini: detected, baseline=partial, missing=skills+mcp');
   });
 
@@ -137,7 +138,7 @@ describe('postinstall', () => {
     });
 
     const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
-    expect(output).toContain('基线能力尚未完整注册到 Claude Code/Codex');
+    expect(output).toContain('基线能力尚未完整注册到 Claude Code / Codex。');
     expect(output).toContain('spec-first update');
   });
 

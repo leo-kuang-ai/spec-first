@@ -235,12 +235,12 @@ src/core/skill-runtime/prompt-assembler.ts:177 assemblePrompt()
 |------|------|
 | 查看当前 Feature | `spec-first feature current` |
 | 切换 Feature | `spec-first feature switch <featureId>` |
-| Gate 校验 | `spec-first gate check --feature <featureId>` |
-| 推进阶段 | `spec-first stage advance --feature <featureId>` |
-| 校验文档关联 | `spec-first docs links validate --feature <featureId>` |
-| 查看覆盖率 | `spec-first metrics --feature <featureId>` |
-| 追溯 ID | `spec-first id search <ID>` |
-| 生成 ID | `spec-first id generate <TYPE> --feature <featureId>` |
+| 状态概览 | `spec-first status <featureId>` |
+| 推进节点 | `spec-first transition <featureId>` |
+| 校验文档关联 | `spec-first validate links <featureId>` |
+| 校验产物格式 | `spec-first validate format <featureId>` |
+| 收口到 08_done | `spec-first done <featureId>` |
+| 查看追踪矩阵 | `spec-first matrix check <featureId>` |
 | 创建缺陷 | `spec-first defect create --feature <featureId>` |
 | 创建 RFC | `spec-first rfc create --feature <featureId>` |
 

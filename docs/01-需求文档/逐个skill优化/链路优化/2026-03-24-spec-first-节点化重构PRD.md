@@ -4,6 +4,8 @@
 >
 > 状态：Draft
 >
+> 实现备注：截至 2026-03-25，主流程已切到 `FeatureState / NodeState`、`transition`、`readiness-check`、`skill-checklist`、`safety-guard` 与 `status`；旧 `gate / id / trace / metrics` 主命令已退场，文档关联校验折叠到 `validate links`。
+>
 > 目标：将当前 `spec-first` 从“ID + matrix + gate 驱动的强治理流程”重构为“8+2 节点状态机 + skill 本地闭环 + orchestrate 轻量准入”的弱耦合流程系统。
 
 ---
@@ -1214,9 +1216,9 @@ loadSkill(skillPath, { projectRoot, featureId, mode }) {
 | `spec-first gate check` | 删除 | 无 | gate 体系退场，能力由 `skill checklist + readiness-check` 替代 |
 | `spec-first id generate` | 删除 | 无 | 去 ID 后不再保留 |
 | `spec-first stage advance` | 替换 | `spec-first transition` | 主流程推进统一改为 transition 语义 |
-| `spec-first metrics` | 删除或并入 `status` | `spec-first status` | 若只保留节点完成度与当前状态统计，应并入 `status` |
+| `spec-first metrics` | 删除 | 无 | 文档关联健康分不再作为主路径能力，保留为退场壳仅用于提示迁移 |
 | `spec-first trace validate` | 删除 | 无 | 不再保留 trace 主路径能力 |
-| `spec-first links validate` | 删除 | 无 | `document-links.yaml` 退场 |
+| `spec-first links validate` | 替换 | `spec-first validate links` | 文档关联校验并入 validate 命令组 |
 
 CLI 改造约束：
 

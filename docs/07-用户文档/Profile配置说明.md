@@ -104,14 +104,14 @@ profile: strict  # 或 default-simplified
 # 阶段推进（依赖检查）
 spec-first stage advance <featureId>
 
-# 健康度评分
-spec-first metrics health <featureId>
+# 节点状态
+spec-first status <featureId>
 
-# 瓶颈分析
-spec-first metrics bottleneck <featureId>
+# 文档关联校验
+spec-first validate links <featureId>
 
-# Gate 评估
-spec-first gate check <featureId> <stage>
+# 取消 / 推进
+spec-first transition <featureId>
 ```
 
 ## 常见问题

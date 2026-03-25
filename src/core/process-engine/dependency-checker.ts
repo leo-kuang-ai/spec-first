@@ -37,7 +37,7 @@ const DEFAULT_STAGE_DEPENDENCIES: StageDependency[] = [
   },
   {
     stage: Stage.WRAP_UP,
-    files: ['specs/{featureId}/retro.md'],
+    files: ['specs/{featureId}/wrap_up.md'],
   },
   {
     stage: Stage.RELEASE,

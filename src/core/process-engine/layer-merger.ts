@@ -67,7 +67,7 @@ function layer0Deliverables(): Record<string, Deliverable[]> {
     ],
     '03_plan': [{ name: 'task_plan.md', required: true, description: '任务计划' }],
     '05_verify': [{ name: 'reports/test-report.md', required: true, description: '测试报告' }],
-    '06_wrap_up': [{ name: 'retro.md', required: true, description: '归档复盘记录' }],
+    '06_wrap_up': [{ name: 'wrap_up.md', required: true, description: '归档复盘记录' }],
     '07_release': RELEASE_REQUIRED_ARTIFACTS.map((name) => ({
       name,
       required: true,

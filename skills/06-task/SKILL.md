@@ -25,7 +25,7 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: reminder
-          message: "[task] 文件已更新，检查是否同步 document-links.yaml"
+          message: "[task] 文件已更新，检查是否同步 validate links 证据"
   Stop:
     - hooks:
         - type: checkpoint
@@ -152,7 +152,7 @@ I'm using the task skill to break down [Feature] into executable tasks.
 | 运行测试 | `pnpm vitest run tests/unit/auth.test.ts` | 2-5 分钟 |
 | 本地验证 | `curl http://localhost:3000/api/login` | 2-5 分钟 |
 | 提交代码 | git commit | 2-5 分钟 |
-| 更新文档关联 | Sync `document-links.yaml` | 2-5 分钟 |
+| 更新文档关联 | Sync `validate links` 证据 | 2-5 分钟 |
 | 记录结论 | Update `findings.md` with next step | 2-5 分钟 |
 
 ## Task Structure Detail
@@ -351,7 +351,7 @@ task 阶段只输出执行计划，不输出实现代码：
 ## 背景输入
 
 - 背景质量字段与枚举遵循 `../shared/background-quality-contract.md`
-- 必须读取 `spec.md` + `design.md` + `task_plan.md` + `document-links.yaml`
+- 必须读取 `spec.md` + `design.md` + `task_plan.md` + `validate links` 证据
 - 输入元数据字段使用 `backgroundInputStatus`
 - 若需输出用户可见背景字段，统一使用 `background_input_status`
 - `backgroundInputStatus` 属于输入层字段，不替代文档输出字段命名
@@ -360,17 +360,16 @@ task 阶段只输出执行计划，不输出实现代码：
 ## 执行阶段
 
 - **P0**: 定位 Feature，校验阶段为 03_plan
-- **P1**: 从 `spec.md` / `design.md` / `document-links.yaml` 加载需求与设计输入
+- **P1**: 从 `spec.md` / `design.md` / `validate links` 证据加载需求与设计输入
 - **P2**: 生成 TASK 拆解，映射到源文档与关联索引（ID、标题、工期、依赖）
 - **P3**: 与用户确认任务计划
-- **P4**: 将 TASK 写入 `task_plan.md` 并刷新 `document-links.yaml`
+- **P4**: 将 TASK 写入 `task_plan.md` 并刷新 `validate links` 证据
 - **P5**: 执行 review checklist 自检
 
 ## CLI 依赖
 
-- `spec-first id next TASK <abbr> --feature <featureId>`
-- `spec-first docs links validate <featureId>`
-- `spec-first docs links show <featureId>`
+- `spec-first status <featureId>`
+- `spec-first validate links <featureId>`
 - `spec-first validate format <featureId>`
 
 ## 输出路径
@@ -387,10 +386,10 @@ task 阶段只输出执行计划，不输出实现代码：
 ## 成功标准
 
 - `task_plan.md` 已写入，包含所有 TASK 定义（ID、标题、Owner、工期、依赖、验收标准、验证命令、状态）
-- 所有 TASK 已通过 `id next TASK` 注册
-- `document-links.yaml` 已更新，任务与源文档关联完整
-- `docs links validate` 与格式校验通过
-- Gate 校验显示 `C3 (Task Coverage) = 100%`
+- 所有 TASK 已写入 `task_plan.md`
+- 任务与源文档关联已通过 `validate links`
+- `validate format` 与格式校验通过
+- 节点 readiness 显示 `C3 (Task Coverage) = 100%`
 - Review Checklist 已通过自检
 
 **格式校验（P4 落盘后自动执行）**:
@@ -495,7 +494,7 @@ Phase 2: Implementation
 
 | 匹配工具 | 提醒内容 | 目的 |
 |---------|---------|------|
-| `Write` / `Edit` | 文件已更新，检查是否同步 document-links.yaml | 确保关联同步 |
+| `Write` / `Edit` | 文件已更新，检查是否同步 validate links 证据 | 确保关联同步 |
 
 ### Stop（会话结束前检查）
 
@@ -513,7 +512,7 @@ Phase 2: Implementation
 
 1. **读取 `findings.md`** — 查看上次结论
 2. **读取 `task_plan.md`** — 查看当前任务列表
-3. **读取 `document-links.yaml`** — 查看已注册的文档关联
+3. **读取 `validate links` 证据** — 查看已通过的文档关联结果
 4. **继续从断点开始** — 根据 `下一步` 字段恢复
 
 ### 中断前必须落盘

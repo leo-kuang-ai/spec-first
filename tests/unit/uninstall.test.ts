@@ -91,8 +91,8 @@ function setupFixtures(): void {
   mkdirSync(join(PROJECT, '.claude'), { recursive: true });
   writeFileSync(join(PROJECT, '.claude', 'settings.json'), JSON.stringify({
     hooks: {
-      PreToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first gate check' }] }],
-      PostToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first docs validate' }] }],
+      PreToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first status' }] }],
+      PostToolUse: [{ matcher: 'write|edit', hooks: [{ type: 'command', command: 'npx spec-first validate links' }] }],
       Stop: [{ hooks: [{ type: 'command', command: 'npx spec-first ai stats' }] }],
       SessionStart: [
         { matcher: '*', hooks: [{ type: 'command', command: "SPEC_FIRST_MANAGED_SESSION=1 '/tmp/sf' viewer open --print-url --background 2>/dev/null || true" }] },
@@ -211,7 +211,7 @@ describe('handleUninstall', () => {
     handleUninstall(['--host', 'gemini,cursor']);
     const settings = JSON.parse(readFileSync(join(PROJECT, '.claude', 'settings.json'), 'utf-8'));
     expect(settings.hooks.PreToolUse).toHaveLength(1);
-    expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('npx spec-first gate check');
+    expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('npx spec-first status');
   });
 
   it('should remove claude session hook when selected hosts include claude', () => {

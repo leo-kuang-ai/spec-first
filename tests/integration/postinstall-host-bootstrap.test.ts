@@ -66,6 +66,6 @@ describe('postinstall host bootstrap integration', () => {
     const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
     expect(execFileSync).not.toHaveBeenCalled();
     expect(output).toContain('spec-first update');
-    expect(output).toContain('基线能力');
+    expect(output).toContain('基线能力尚未完整注册到 Claude Code / Codex。');
   });
 });

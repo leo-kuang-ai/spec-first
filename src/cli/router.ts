@@ -18,11 +18,13 @@ interface CommandEntry {
   handler: CommandHandler;
   requiresConfirmation?: ConfirmationRequirement;
   validateArgs?: ArgsValidator;
+  hidden?: boolean;
 }
 
 interface RegisterCommandOptions {
   requiresConfirmation?: ConfirmationRequirement;
   validateArgs?: ArgsValidator;
+  hidden?: boolean;
 }
 
 const commands = new Map<string, CommandEntry>();
@@ -39,6 +41,7 @@ export function registerCommand(
     handler,
     requiresConfirmation: options?.requiresConfirmation,
     validateArgs: options?.validateArgs,
+    hidden: options?.hidden,
   });
 }
 
@@ -125,6 +128,7 @@ function printHelp(): void {
   console.log('用法：spec-first <command> <subcommand> [args] [--flags]\n');
   console.log('命令：');
   for (const [name, entry] of commands) {
+    if (entry.hidden) continue;
     console.log(`  ${name.padEnd(14)} ${entry.description}`);
   }
 }

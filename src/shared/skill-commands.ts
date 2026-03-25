@@ -26,16 +26,13 @@ import { detectHostPaths } from './host-paths.js';
 import {
   injectInputContextToAllSkills,
 } from '../core/skill-runtime/skill-input-injector.js';
+import { resolveSkillRootUpwards } from './skill-root.js';
 
 /** spec-first 包根目录（兼容 dist 产物路径与 src 源码路径） */
 const PKG_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 function resolveSkillsRoot(): string | undefined {
-  const candidates = [
-    join(PKG_ROOT, 'skills'),
-    join(PKG_ROOT, '..', 'skills'),
-  ];
-  return candidates.find((candidate) => existsSync(candidate));
+  return resolveSkillRootUpwards(PKG_ROOT);
 }
 
 /**

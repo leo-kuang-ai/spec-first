@@ -6,7 +6,7 @@ export const PRIMARY_STAGE_SKILL = {
   '04_implement': 'code',
   '05_verify': 'verify',
   '06_wrap_up': 'archive',
-  '07_release': 'golive',
+  '07_release': 'done',
   '08_done': 'done',
 } as const;
 
@@ -30,7 +30,7 @@ export const DELIVERY_ROUTE = [
   { stage: '04_implement', command: 'code', route: 'skill' },
   { stage: '05_verify', command: 'verify', route: 'skill' },
   { stage: '06_wrap_up', command: 'archive', route: 'skill' },
-  { stage: '07_release', command: 'golive', route: 'runtime' },
+  { stage: '07_release', command: 'done', route: 'runtime' },
   { stage: '08_done', command: 'done', route: 'runtime' },
 ] as const;
 
@@ -59,14 +59,10 @@ export function getSuggestedCommandForStage(stage: string, featureId?: string): 
     return `/spec-first:${route.command}`;
   }
 
-  if (route.command === 'golive') {
-    return featureId ? `spec-first golive check ${featureId}` : 'spec-first golive check';
-  }
-
   if (route.command === 'done') {
     return featureId
-      ? `spec-first stage current ${featureId} 确认已完成状态`
-      : 'spec-first feature current';
+      ? `spec-first done ${featureId}`
+      : 'spec-first done';
   }
 
   return featureId

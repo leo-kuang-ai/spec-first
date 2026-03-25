@@ -125,18 +125,18 @@ digraph orchestrate_flow {
 
 ## 执行阶段
 - P0: 定位 Feature（优先读取 `.spec-first/current`，无则交互式提示），加载当前阶段与状态
-- P1: 加载 stage-state、文档健康、Gate 历史、任务计划
-- P2: 生成编排计划：plan -> skill 执行 -> verify -> stage advance
+- P1: 加载 stage-state、节点 readiness、任务计划
+- P2: 生成编排计划：plan -> skill 执行 -> verify -> transition
 - P3: 与用户确认编排序列
 - P4: 按序执行调度的子 Skill
-- P5: Gate 通过后推进阶段
+- P5: readiness 通过后推进阶段
 
 ## 证据铁律（阶段推进）
 
 在声明“阶段可推进”前，必须遵循 verify 的五步证据铁律：
-- 先执行 `spec-first gate check <featureId>` 与必要的 `docs links validate / metrics report` 命令
+- 先执行 `spec-first status <featureId>` 与必要的 `spec-first validate links <featureId>` / `spec-first validate format <featureId>` 命令
 - 明确读取并报告退出码
-- 仅当证据为本次会话新鲜执行结果时，才允许进入 `stage advance`
+- 仅当证据为本次会话新鲜执行结果时，才允许进入 `spec-first transition <featureId>`
 
 ## 上下文裁剪规则（Fresh Context Per Task）
 
@@ -191,13 +191,13 @@ TASK 执行由 `todo-runner` 驱动，状态流转如下：
 |-----------|------|
 | \"先把后续批次跑完再统一看\" | 无检查点就不可审计，必须批次收口后再继续 |
 | \"这个阻塞先忽略，后面一起修\" | 阻塞项不清零不得推进批次 |
-| \"只要大方向没问题就能 advance\" | `stage advance` 只能基于证据铁律，不接受方向性判断 |
+| \"只要大方向没问题就能 advance\" | `transition` 只能基于证据铁律，不接受方向性判断 |
 
 ## CLI 依赖
 - `spec-first stage current`
-- `spec-first stage advance`
-- `spec-first gate check`
-- `spec-first metrics health`
+- `spec-first transition`
+- `spec-first status`
+- `spec-first validate links`
 
 ## 输出路径
 - `specs/{featureId}/findings.md`
@@ -209,7 +209,7 @@ TASK 执行由 `todo-runner` 驱动，状态流转如下：
 - 编排计划已生成并经用户确认
 - 所有调度的子 Skill 执行成功
 - `verify` 校验通过且证据链完整
-- `stage advance` 已执行，阶段已推进
+- `transition` 已执行，阶段已推进
 
 ## 编排规则
 - 主调度器：根据当前阶段分派对应 Skill

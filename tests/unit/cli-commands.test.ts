@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { handleId } from '../../src/cli/commands/id.js';
 import { handleAnalyze } from '../../src/cli/commands/analyze.js';
 import { handleDocsLinks } from '../../src/cli/commands/docs-links.js';
+import { handleDocs } from '../../src/cli/commands/docs-links.js';
 import { handleTrace } from '../../src/cli/commands/trace.js';
 import { handleIntegrateSkill } from '../../src/cli/commands/integrate-skill.js';
 import { dispatch, registerCommand } from '../../src/cli/router.js';
@@ -40,70 +41,34 @@ afterEach(() => {
 });
 
 describe('handleId', () => {
-  it('should validate a valid ID', () => {
-    expect(handleId(['validate', 'FR-AUTH-001'])).toBe(0);
-  });
-
-  it('should reject invalid ID', () => {
-    expect(handleId(['validate', 'INVALID'])).toBe(2);
-  });
-
-  it('should return error for missing subcommand', () => {
+  it('should retire the ID command family', () => {
+    expect(handleId(['validate', 'FR-AUTH-001'])).toBe(2);
+    expect(handleId(['next', 'FR', 'AUTH', '--feature', FEAT_ID])).toBe(2);
+    expect(handleId(['search', 'AUTH', '--feature', FEAT_ID])).toBe(2);
+    expect(handleId(['list', '--feature', FEAT_ID])).toBe(2);
     expect(handleId(['unknown'])).toBe(2);
-  });
-
-  it('should generate next ID', () => {
-    const code = handleId(['next', 'FR', 'AUTH', '--feature', FEAT_ID]);
-    expect(code).toBe(0);
-  });
-
-  it('should search IDs', () => {
-    const code = handleId(['search', 'AUTH', '--feature', FEAT_ID]);
-    expect(code).toBe(0);
-  });
-
-  it('should list IDs', () => {
-    const code = handleId(['list', '--feature', FEAT_ID]);
-    expect(code).toBe(0);
   });
 });
 
 describe('handleDocsLinks', () => {
-  it('should validate document links', () => {
-    const code = handleDocsLinks(['validate', FEAT_ID]);
-    expect(code).toBe(0);
-  });
-
-  it('should show document links', () => {
-    const code = handleDocsLinks(['show', FEAT_ID]);
-    expect(code).toBe(0);
-  });
-
-  it('should return validation error when references are broken', () => {
-    writeFileSync(
-      join(SPEC_DIR, 'document-links.yaml'),
-      DOCUMENT_LINKS.replace('      - spec.md', '      - missing.md'),
-      'utf-8'
-    );
-    const code = handleDocsLinks(['validate', FEAT_ID]);
-    expect(code).toBe(2);
-  });
-
-  it('should return error for missing featureId', () => {
+  it('should retire document-links command family', () => {
+    expect(handleDocsLinks(['validate', FEAT_ID])).toBe(2);
+    expect(handleDocsLinks(['show', FEAT_ID])).toBe(2);
+    expect(handleDocsLinks(['unknown'])).toBe(2);
     expect(handleDocsLinks(['validate'])).toBe(2);
   });
+});
 
-  it('should return error for unknown subcommand', () => {
-    expect(handleDocsLinks(['unknown'])).toBe(2);
+describe('handleDocs', () => {
+  it('should retire docs command family', () => {
+    expect(handleDocs(['links', 'validate', FEAT_ID])).toBe(2);
+    expect(handleDocs(['unknown'])).toBe(2);
   });
 });
 
 describe('handleTrace', () => {
-  it('should validate document links through trace validate', () => {
-    expect(handleTrace(['validate', FEAT_ID])).toBe(0);
-  });
-
-  it('should reject trace fix because auto repair was removed', () => {
+  it('should retire trace command family', () => {
+    expect(handleTrace(['validate', FEAT_ID])).toBe(2);
     expect(handleTrace(['fix', FEAT_ID])).toBe(2);
   });
 });

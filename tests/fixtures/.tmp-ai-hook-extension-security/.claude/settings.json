@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n \"$FEAT\" ] && npx spec-first gate check \"$FEAT\" || echo \"spec-first: 跳过 gate 检查（无当前 feature）\"'"
+            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n \"$FEAT\" ] && npx spec-first status \"$FEAT\" || echo \"spec-first: 跳过状态检查（无当前 feature）\"'"
           }
         ],
         "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n \"$FEAT\" ]; then npx spec-first docs validate \"$FEAT\" || echo \"spec-first: docs validate 执行失败（已降级）\" >&2; else echo \"spec-first: 跳过 docs 校验（无当前 feature）\"; fi'"
+            "command": "sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n \"$FEAT\" ]; then npx spec-first validate links \"$FEAT\" || echo \"spec-first: validate links 执行失败（已降级）\" >&2; else echo \"spec-first: 跳过文档关联校验（无当前 feature）\"; fi'"
           }
         ],
         "matcher": "write|edit|create|update|delete|move|rename|multiedit|multi_edit|notebook_edit|str_replace|insert|append"

@@ -178,7 +178,7 @@ function handleInjectContext(args: string[]): number {
   const skillsRoot = resolveSkillsRoot();
 
   if (!skillsRoot) {
-    console.error('Skills root not found - looking for skills/ directory');
+    console.error('Skills root not found - looking for a skill collection root');
     console.error('Tip: Run this command from spec-first package root or installation directory');
     return ExitCode.VALIDATION_ERROR;
   }

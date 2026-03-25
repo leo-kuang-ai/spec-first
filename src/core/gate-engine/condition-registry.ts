@@ -204,9 +204,9 @@ GATE_CONDITIONS['05_verify' as Stage] = [
 GATE_CONDITIONS['06_wrap_up' as Stage] = [
   {
     id: 'G-WRAP-01',
-    description: 'retro.md exists',
+    description: 'wrap_up.md exists',
     evaluate: (ctx) => ({
-      pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, 'retro.md')),
+      pass: exists(join(ctx.projectRoot, 'specs', ctx.featureId, 'wrap_up.md')),
     }),
   },
   {

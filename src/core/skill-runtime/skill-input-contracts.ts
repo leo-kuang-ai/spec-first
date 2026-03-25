@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
+import { resolveSkillRootUpwards } from '../../shared/skill-root.js';
 
 export interface SkillInputContract {
   required: string[];
@@ -40,19 +41,8 @@ let cachedConfig: SkillInputContractsConfig | null = null;
  * 获取 skills root 目录（即使 YAML 不存在也返回目录）
  */
 export function resolveSkillsRoot(): string | null {
-  // 从当前模块向上查找 skills/ 目录
-  let currentDir = import.meta.dirname;
-  while (currentDir) {
-    const skillsRoot = join(currentDir, 'skills');
-    // 只要目录存在就返回，不要求 YAML 存在
-    if (existsSync(skillsRoot)) {
-      return skillsRoot;
-    }
-    const parentDir = join(currentDir, '..');
-    if (parentDir === currentDir) break;
-    currentDir = parentDir;
-  }
-  return null;
+  const skillsRoot = resolveSkillRootUpwards(import.meta.dirname);
+  return skillsRoot ?? null;
 }
 
 /**

@@ -78,7 +78,7 @@ const ARTIFACT_DEFS: readonly ArtifactDef[] = [
   },
   { relativePath: 'reports/uat-signoff.md', stage: Stage.VERIFY },
   // 06_wrap_up
-  { relativePath: 'retro.md', stage: Stage.WRAP_UP },
+  { relativePath: 'wrap_up.md', stage: Stage.WRAP_UP },
   // 07_release
   ...RELEASE_REQUIRED_ARTIFACTS.map((relativePath) => ({
     relativePath,

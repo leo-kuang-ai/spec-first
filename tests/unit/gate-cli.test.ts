@@ -69,83 +69,10 @@ describe('handleGate', () => {
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should return VALIDATION_ERROR for check without featureId', () => {
-    const code = withCwd(TMP, () => handleGate(['check']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
-  });
-
-  it('should return SUCCESS for gate check on 00_init', () => {
-    writeState('00_init');
-    const code = withCwd(TMP, () => handleGate(['check', FEAT]));
-    expect(code).toBe(ExitCode.SUCCESS);
-  });
-
-  it('should return SUCCESS for gate history (empty)', () => {
-    const code = withCwd(TMP, () => handleGate(['history', FEAT]));
-    expect(code).toBe(ExitCode.SUCCESS);
-  });
-
-  it('should return SUCCESS for gate conditions', () => {
-    writeState('00_init');
-    const code = withCwd(TMP, () => handleGate(['conditions', FEAT]));
-    expect(code).toBe(ExitCode.SUCCESS);
-  });
-
-  it('should return IO_ERROR for conditions when state missing', () => {
-    const code = withCwd(TMP, () => handleGate(['conditions', FEAT]));
-    expect(code).toBe(ExitCode.IO_ERROR);
-  });
-
-  it('should print actionable fix steps for C11 warnings', () => {
-    writeState('02_design');
-    writeDocumentLinks();
-    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
-    writeFileSync(
-      join(TMP, 'specs', FEAT, 'design.md'),
-      '## Governance\nConstitution Clause P1 (v1.0.0) is applied.',
-      'utf-8',
-    );
-
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const code = withCwd(TMP, () => handleGate(['check', FEAT]));
-      const output = logSpy.mock.calls.flat().join('\n');
-      expect(code).toBe(ExitCode.SUCCESS);
-      expect(output).toContain('可执行修复步骤：');
-      expect(output).toContain(`create specs/${FEAT}/constitution.md`);
-    } finally {
-      logSpy.mockRestore();
-      errSpy.mockRestore();
-    }
-  });
-
-  it('should persist C11 warnings to findings.md for audit', () => {
-    writeState('02_design');
-    writeDocumentLinks();
-    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
-    writeFileSync(
-      join(TMP, 'specs', FEAT, 'design.md'),
-      '## Governance\nConstitution Clause P1 (v1.0.0) is applied.',
-      'utf-8',
-    );
-
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    try {
-      const code = withCwd(TMP, () => handleGate(['check', FEAT]));
-      expect(code).toBe(ExitCode.SUCCESS);
-    } finally {
-      logSpy.mockRestore();
-      errSpy.mockRestore();
-    }
-
-    const findingsPath = join(TMP, 'specs', FEAT, 'findings.md');
-    expect(existsSync(findingsPath)).toBe(true);
-    const findings = readFileSync(findingsPath, 'utf-8');
-    expect(findings).toContain('Gate Check Remediation');
-    expect(findings).toContain('G-DESIGN-03: Constitution compliance (warning)');
-    expect(findings).toContain(`create specs/${FEAT}/constitution.md`);
+  it('should retire check/history/conditions entry points', () => {
+    expect(withCwd(TMP, () => handleGate(['check', FEAT]))).toBe(ExitCode.VALIDATION_ERROR);
+    expect(withCwd(TMP, () => handleGate(['history', FEAT]))).toBe(ExitCode.VALIDATION_ERROR);
+    expect(withCwd(TMP, () => handleGate(['conditions', FEAT]))).toBe(ExitCode.VALIDATION_ERROR);
   });
 });
 
@@ -157,22 +84,9 @@ describe('handleGoLive', () => {
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should return VALIDATION_ERROR without featureId', () => {
-    const code = withCwd(TMP, () => handleGoLive(['check']));
-    expect(code).toBe(ExitCode.VALIDATION_ERROR);
-  });
-
-  it('should print confirm-policy using the canonical label when degraded', () => {
-    writeState('05_verify');
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
-
-    try {
-      const code = withCwd(TMP, () => handleGoLive(['check', FEAT]));
-      expect(code).toBe(ExitCode.VALIDATION_ERROR);
-      expect(logSpy.mock.calls.flat().join('\n')).toContain('confirm-policy 已降级为');
-    } finally {
-      logSpy.mockRestore();
-    }
+  it('should retire go-live entry point', () => {
+    expect(withCwd(TMP, () => handleGoLive(['check']))).toBe(ExitCode.VALIDATION_ERROR);
+    expect(withCwd(TMP, () => handleGoLive(['check', FEAT]))).toBe(ExitCode.VALIDATION_ERROR);
   });
 });
 

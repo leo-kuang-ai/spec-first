@@ -134,9 +134,9 @@ describe('handleUpdate', () => {
     const output = logSpy.mock.calls.map(([msg]) => String(msg)).join('\n');
 
     expect(ensureHostBootstrap).toHaveBeenCalled();
-    expect(output).toContain('Component Plan:');
-    expect(output).toContain('baseline=skills, mcp');
-    expect(output).toContain('optional=hooks, viewer');
+    expect(output).toContain('组件计划:');
+    expect(output).toContain('baseline: skills, mcp');
+    expect(output).toContain('optional: hooks, viewer');
     vi.restoreAllMocks();
   });
 

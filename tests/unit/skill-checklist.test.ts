@@ -67,4 +67,72 @@ describe('skill checklist', () => {
     expect(notice).toContain('stage: 03_plan');
     expect(notice).toContain('can_mark_done: yes');
   });
+
+  it('marks spec checklist complete when background, goals and scope are present', () => {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        currentStage: '01_specify',
+        terminal: false,
+        nodes: {
+          '01_specify': { status: 'in_progress', summary: '需求收口中' },
+        },
+        createdAt: '2026-03-24T00:00:00.000Z',
+        updatedAt: '2026-03-24T00:00:00.000Z',
+      }),
+      'utf-8'
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'spec.md'),
+      [
+        '# Spec',
+        '## 背景',
+        '这是一个足够长的背景描述，确保检查通过。'.repeat(4),
+        '## 目标',
+        '明确目标并缩小范围。'.repeat(4),
+        '## 范围',
+        '定义边界与非目标。'.repeat(4),
+      ].join('\n\n'),
+      'utf-8'
+    );
+
+    const result = evaluateSkillChecklist('spec', { projectRoot: TMP, featureId: FEAT });
+    expect(result?.overallStatus).toBe('complete');
+    expect(result?.canMarkDone).toBe(true);
+  });
+
+  it('accepts wrap_up.md as wrap-up input for archive skill', () => {
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'stage-state.json'),
+      JSON.stringify({
+        featureId: FEAT,
+        currentStage: '06_wrap_up',
+        terminal: false,
+        nodes: {
+          '06_wrap_up': { status: 'in_progress', summary: '收尾中' },
+        },
+        createdAt: '2026-03-24T00:00:00.000Z',
+        updatedAt: '2026-03-24T00:00:00.000Z',
+      }),
+      'utf-8'
+    );
+    writeFileSync(
+      join(TMP, 'specs', FEAT, 'wrap_up.md'),
+      [
+        '# Wrap Up',
+        '## 最终交付摘要',
+        '交付已完成，记录总结。'.repeat(4),
+        '## 剩余问题',
+        '暂无。'.repeat(4),
+        '## 后续建议',
+        '保持当前节奏。'.repeat(4),
+      ].join('\n\n'),
+      'utf-8'
+    );
+
+    const result = evaluateSkillChecklist('archive', { projectRoot: TMP, featureId: FEAT });
+    expect(result?.overallStatus).toBe('complete');
+    expect(result?.canMarkDone).toBe(true);
+  });
 });

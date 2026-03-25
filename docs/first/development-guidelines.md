@@ -76,21 +76,22 @@ spec-first feature current                          # 查看当前 featureId
 spec-first feature switch <featureId>               # 切换 Feature
 ```
 
-### Gate 与阶段
+### 节点与推进
 
 ```bash
-spec-first gate check --feature <featureId>         # 执行 Gate 校验
-spec-first gate check --feature <featureId> --stage 03_plan  # 指定阶段
-spec-first stage advance --feature <featureId>      # 推进阶段（须先通过 Gate）
+spec-first status <featureId>                       # 查看节点状态与任务进度
+spec-first transition <featureId>                   # 推进节点 / 取消 Feature
+spec-first validate format <featureId>              # 校验产物格式
+spec-first validate links <featureId>               # 校验文档关联
+spec-first done <featureId>                         # 收口到 08_done
 ```
 
 ### 文档与追溯
 
 ```bash
-spec-first docs links validate --feature <featureId> # 校验文档关联
-spec-first metrics --feature <featureId>            # 查看 C3/C4/C6/C8/C9
-spec-first id search FR-UIOPT-001                   # 追溯 ID 上下游
-spec-first id generate FR --feature <featureId>     # 生成新 FR ID
+spec-first validate links --feature <featureId>     # 校验文档关联
+spec-first status <featureId>                       # 查看节点与任务概览
+spec-first transition <featureId>                   # 推进或取消节点
 ```
 
 ### 变更与缺陷
@@ -144,7 +145,7 @@ spec-first rfc create --feature <featureId>         # 创建变更请求
 | 文件 | 风险等级 | 正确操作 |
 |------|---------|---------|
 | `stage-state.json` | 高 | `spec-first stage advance` |
-| `document-links.yaml` | 中 | `spec-first docs links validate` |
+| `document-links.yaml` | 中 | `spec-first validate links` |
 | `specs/*/todo-state.json` | 中 | 对应 CLI 子命令 |
 | `specs/*/reports/*` | 中 | 对应 CLI 子命令 |
 
@@ -160,7 +161,7 @@ spec-first rfc create --feature <featureId>         # 创建变更请求
 | 操作 | 降级策略 |
 |------|---------|
 | `stage advance` | **永不降级**，告知用户 CLI 不可用 |
-| `docs links validate` | 可临时跳过，完成后提醒用户补校验 |
+| `validate links` | 可临时跳过，完成后提醒用户补校验 |
 | 其他状态文件 | 仅读取不写入，告知用户需补 CLI 命令 |
 
 **证据**: `CLAUDE.md:10-25 (禁止操作)`

@@ -62,8 +62,7 @@ describe('status node runtime', () => {
     const { code, output } = capture(() => handleStatus([]));
     expect(code).toBe(0);
     expect(output).toContain('节点状态: blocked');
-    expect(output).toContain('文档指标: 不可用');
-    expect(output).toContain('健康分: N/A');
+    expect(output).toContain('文档指标: 已退场');
     expect(output).toContain('恢复建议:');
     expect(output).toContain('task_plan.md');
   });

@@ -35,7 +35,7 @@ interface CandidateItem {
   evidence: string;
 }
 
-const FEATURE_ARTIFACTS = ['spec.md', 'design.md', 'task_plan.md', 'retro.md'] as const;
+const FEATURE_ARTIFACTS = ['spec.md', 'design.md', 'task_plan.md', 'wrap_up.md'] as const;
 
 const MODULE_SECTION_PATTERNS = [/模块/, /module/, /架构/, /architecture/, /组件/, /component/];
 const API_SECTION_PATTERNS = [/api/i, /接口/, /endpoint/i, /route/i];

@@ -7,6 +7,15 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
+import {
+  formatBullet,
+  formatKeyValue,
+  formatSubBullet,
+  icon,
+  joinSections,
+  renderBrandBanner,
+  renderSection,
+} from '../../shared/cli-output.js';
 import { getCliVersion } from '../router.js';
 import { ensureSkillCommands, type SkillHostTarget } from '../../shared/skill-commands.js';
 import { ensureHostBootstrap } from '../../shared/host-bootstrap.js';
@@ -95,38 +104,38 @@ async function runUpdate({
 }: UpdateOptions): Promise<number> {
   const cwd = process.cwd();
   const log = quiet ? () => {} : console.log.bind(console);
-  const prefix = dryRun ? '[dry-run] ' : '';
 
   // 1. 版本升级检查（fire-and-forget，notify 读缓存文件，实际检查在 detached 子进程）
   void checkForUpdates();
 
-  // 2. 输出当前版本号
-  log(`spec-first v${getCliVersion()}`);
+  // 2. 输出品牌头与当前版本
+  log(renderBrandBanner('更新'));
 
   // 3. 安装场景补齐项目基础配置（仅缺失时创建）
-  ensureProjectInstallScaffold({ cwd, dryRun, log, prefix });
+  ensureProjectInstallScaffold({ cwd, dryRun, log, prefix: dryRun ? '[DRY-RUN] ' : '' });
 
   // 3.5. 模板哈希比对与变更检测（T1 集成）
-  await checkTemplateChanges({ cwd, dryRun, log, prefix });
+  await checkTemplateChanges({ cwd, dryRun, log, prefix: dryRun ? '[DRY-RUN] ' : '' });
 
   // 3.6. Manifest 迁移执行（T2 集成）
-  checkAndExecuteManifests({ cwd, dryRun, log, prefix });
+  checkAndExecuteManifests({ cwd, dryRun, log, prefix: dryRun ? '[DRY-RUN] ' : '' });
 
   // 4-8. 宿主集成刷新（Skills/MCP/Hooks）
-  refreshHostIntegrations({ cwd, dryRun, skipMcp, skipHooks, hosts, components, log, prefix });
+  refreshHostIntegrations({ cwd, dryRun, skipMcp, skipHooks, hosts, components, log });
 
   // 9. 摘要
   if (dryRun) {
-    console.log('\n（dry-run 模式，未写入任何文件）');
+    console.log(renderSection(`${icon('dry')} Dry run preview`, [formatBullet('No files were written.')]));
   }
 
   // 10. 打印完整安装路径清单
   if (!quiet) {
     const hostPaths = detectHostPaths();
-    console.log('\n📦 安装路径清单:');
-    for (const line of formatHostPathSummary(hostPaths)) {
-      console.log(`  ${line}`);
-    }
+    console.log(
+      joinSections(
+        renderSection(`${icon('info')} 安装路径:`, formatHostPathSummary(hostPaths).map(formatBullet)),
+      )
+    );
   }
 
   return ExitCode.SUCCESS;
@@ -141,7 +150,6 @@ function refreshHostIntegrations({
   hosts,
   components,
   log,
-  prefix,
 }: {
   cwd: string;
   dryRun: boolean;
@@ -150,7 +158,6 @@ function refreshHostIntegrations({
   hosts?: SkillHostTarget[];
   components?: UpdateComponent[];
   log: (...args: unknown[]) => void;
-  prefix: string;
 }): void {
   // Skills 同步
   const hostPaths = detectHostPaths();
@@ -161,21 +168,29 @@ function refreshHostIntegrations({
   const genericCount = skills.generic?.length ?? 0;
   const geminiCount = skills.gemini?.length ?? 0;
   const cursorCount = skills.cursor?.length ?? 0;
-  log(`${prefix}Component Plan:`);
-  log(`  baseline=${installPlan.baseline.join(', ')}`);
-  log(`  optional=${installPlan.optional.length > 0 ? installPlan.optional.join(', ') : '(none)'}`);
-  log(`${prefix}Skills:`);
-  log(`  external-required: ${REQUIRED_SKILLS.length} baseline`);
-  log(
-    `  spec-first-builtins: claude=${skills.claude.length}, codex=${skills.codex.length}, gemini=${geminiCount}, cursor=${cursorCount}, generic=${genericCount}`
+  const sections: string[] = [];
+  sections.push(
+    renderSection(`${icon('info')} 更新概览:`, [
+      formatKeyValue('version', `v${getCliVersion()}`),
+      formatKeyValue('sync root', hostPaths.specFirstSkillsDir),
+    ])
   );
-  log(`  sync-root: ${hostPaths.specFirstSkillsDir}`);
-  if (skills.codexWarnings.length > 0) {
-    log(`  ⚠ Codex skill 验证失败 (${skills.codexWarnings.length}):`);
-    for (const w of skills.codexWarnings) log(`    - ${w}`);
-  }
+  sections.push(
+    renderSection(`${icon('info')} 组件计划:`, [
+      formatKeyValue('baseline', installPlan.baseline.join(', ')),
+      formatKeyValue('optional', installPlan.optional.length > 0 ? installPlan.optional.join(', ') : '(none)'),
+    ])
+  );
+  sections.push(
+    renderSection(`${icon('ok')} 能力同步:`, [
+      formatKeyValue('external-required', `${REQUIRED_SKILLS.length} baseline`),
+      formatKeyValue(
+        'spec-first-builtins',
+        `claude=${skills.claude.length}, codex=${skills.codex.length}, gemini=${geminiCount}, cursor=${cursorCount}, generic=${genericCount}`
+      ),
+    ])
+  );
 
-  // MCP 配置补齐
   if (!skipMcp) {
     // update 仅做“存在性检查 + 缺失补齐”，不做二进制探测（避免 npx/uvx 网络阻塞）
     const mcp = ensureHostBootstrap({ dryRun, hosts: selectedHostIds, checkBinaries: false });
@@ -193,62 +208,84 @@ function refreshHostIntegrations({
     const mcpHostCount = new Set(
       mcpEntries.map((entry) => entry.host).filter((host) => host !== 'Common')
     ).size;
-    log(`${prefix}Baseline Bootstrap:`);
-    log(
-      `  skills: ${skillEntries.length} checked, ${skillFixed} fixed, ${skillWarnings} warnings, ${skillErrors} errors`
-    );
-    log(
-      `  mcp: ${mcpEntries.length}/${REQUIRED_MCP_SERVERS.length * mcpHostCount} host entries checked, ${fixed} fixed, ${warnings} warnings, ${errors} errors`
+    sections.push(
+      renderSection(`${icon('ok')} 基线补齐:`, [
+        formatKeyValue(
+          'skills',
+          `${skillEntries.length} checked, ${skillFixed} fixed, ${skillWarnings} warnings, ${skillErrors} errors`
+        ),
+        formatKeyValue(
+          'mcp',
+          `${mcpEntries.length}/${REQUIRED_MCP_SERVERS.length * mcpHostCount} host entries checked, ${fixed} fixed, ${warnings} warnings, ${errors} errors`
+        ),
+      ])
     );
   } else {
-    log(`${prefix}MCP: skipped`);
+    sections.push(renderSection(`${icon('skip')} 基线补齐:`, [formatBullet('MCP: skipped')]));
   }
 
-  log(`${prefix}Hosts:`);
+  const hostLines: string[] = [];
   for (const status of resolveHostAdapterStatuses(selectedHostIds)) {
-    log(`  ${formatHostUpdateSummary(status)}`);
+    hostLines.push(formatBullet(formatHostUpdateSummary(status)));
     const remediation = formatHostUpdateRemediation(status);
-    if (remediation) {
-      log(`    -> ${remediation}`);
-    }
+    if (remediation) hostLines.push(formatSubBullet(remediation));
+  }
+  if (hostLines.length > 0) {
+    sections.push(renderSection(`${icon('info')} 宿主状态:`, hostLines));
   }
 
   const shouldRunHooks = !skipHooks && installPlan.optional.includes('hooks');
   const shouldRunViewer = installPlan.optional.includes('viewer');
+  const integrationLines: string[] = [];
 
   // Git hooks
   if (shouldRunHooks && existsSync(join(cwd, '.git'))) {
     const hooks = installHooks(cwd, { dryRun });
-    log(`${prefix}Git Hooks: ${hooks.length} installed`);
+    integrationLines.push(formatKeyValue('Git hooks', `${hooks.length} installed`));
   } else {
-    log(`${prefix}Git Hooks: skipped${shouldRunHooks ? '（非 Git 仓库）' : '（组件未启用）'}`);
+    integrationLines.push(
+      formatKeyValue('Git hooks', `skipped${shouldRunHooks ? ' (not a git repo)' : ' (component disabled)'}`)
+    );
   }
 
   // AI Runtime Hooks
   if (shouldRunHooks) {
     const ai = registerAIHooks(cwd, { dryRun });
-    log(`${prefix}AI Hooks: ${ai.registered.length} registered`);
-    for (const w of ai.warnings) log(`  ⚠ ${w}`);
+    integrationLines.push(formatKeyValue('AI hooks', `${ai.registered.length} registered`));
+    for (const w of ai.warnings) integrationLines.push(formatSubBullet(`WARN: ${w}`));
   } else {
-    log(`${prefix}AI Hooks: skipped（组件未启用）`);
+    integrationLines.push(formatKeyValue('AI hooks', 'skipped (component disabled)'));
   }
 
   // SessionStart Hook
   if (shouldRunViewer && shouldApplyClaudeHome) {
     const session = registerSessionHooks({ dryRun });
-    log(`${prefix}Session Hook: ${session.registered.length} registered`);
-    for (const w of session.warnings) log(`  ⚠ ${w}`);
+    integrationLines.push(formatKeyValue('Session hook', `${session.registered.length} registered`));
+    for (const w of session.warnings) integrationLines.push(formatSubBullet(`WARN: ${w}`));
   } else if (shouldRunViewer) {
-    log(`${prefix}Session Hook: skipped（当前宿主集合不包含 claude）`);
+    integrationLines.push(formatKeyValue('Session hook', 'skipped (claude is not selected)'));
   } else {
-    log(`${prefix}Session Hook: skipped（组件未启用）`);
+    integrationLines.push(formatKeyValue('Session hook', 'skipped (component disabled)'));
   }
 
   if (shouldRunViewer && shouldApplyClaudeHome) {
-    log(`${prefix}Viewer: managed via viewer command, no additional install step`);
+    integrationLines.push(formatKeyValue('Viewer', 'managed by viewer command, no extra install step'));
   } else if (shouldRunViewer) {
-    log(`${prefix}Viewer: skipped（当前宿主集合不包含 claude）`);
+    integrationLines.push(formatKeyValue('Viewer', 'skipped (claude is not selected)'));
   }
+
+  sections.push(renderSection(`${icon('info')} Hooks 与 Viewer:`, integrationLines));
+
+  if (skills.codexWarnings.length > 0) {
+    sections.push(
+      renderSection(`${icon('warn')} Codex Skill 校验:`, [
+        formatKeyValue('warnings', `${skills.codexWarnings.length}`),
+        ...skills.codexWarnings.map((w) => formatBullet(w)),
+      ])
+    );
+  }
+
+  log(joinSections(...sections));
 }
 
 // ─── 模板变更检测（T1 集成）────────────────────────────────

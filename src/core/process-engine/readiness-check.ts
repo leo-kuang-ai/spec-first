@@ -28,7 +28,7 @@ export const STAGE_ARTIFACT_REQUIREMENTS: Record<Stage, string[]> = {
   [Stage.PLAN]: ['spec.md', 'design.md'],
   [Stage.IMPLEMENT]: ['spec.md', 'design.md', 'task_plan.md'],
   [Stage.VERIFY]: ['spec.md', 'design.md', 'task_plan.md'],
-  [Stage.WRAP_UP]: ['spec.md', 'design.md', 'task_plan.md', 'verify.md'],
+  [Stage.WRAP_UP]: ['spec.md', 'design.md', 'task_plan.md', 'wrap_up.md'],
   [Stage.RELEASE]: ['spec.md', 'design.md', 'task_plan.md', 'verify.md', 'wrap_up.md'],
   [Stage.DONE]: [],
   [Stage.CANCELLED]: [],
