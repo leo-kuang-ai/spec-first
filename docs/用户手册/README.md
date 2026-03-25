@@ -30,10 +30,10 @@
 
 ## 其他文档
 
-- [快速开始指南](../trellis-first-time-existing-project.md)
-- [工作流分析](../trellis-workflow-analysis.md)
+- [快速开始指南](../spec-first-first-time-existing-project.md)
+- [工作流分析](../spec-first-workflow-analysis.md)
 - [多平台架构](../多平台集成架构/multi-platform-architecture.md)
-- [使用场景](../trellis-existing-project-iteration.md)
+- [使用场景](../spec-first-existing-project-iteration.md)
 
 ## 获取帮助
 
