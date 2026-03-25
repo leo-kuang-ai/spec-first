@@ -102,7 +102,7 @@ If you added a new section or the spec status changed, update the category's `in
 
 ## Quality Checklist
 
-Before finishing your spec update:
+Before finishing your spec-first update:
 
 - [ ] Is the content specific and actionable?
 - [ ] Did you include a code example?
@@ -115,7 +115,7 @@ Before finishing your spec update:
 
 ## Relationship to Other Commands
 
-- `/spec:break-loop` - Analyzes bugs deeply, often reveals spec updates needed
+- `/spec:break-loop` - Analyzes bugs deeply, often reveals spec-first updates needed
 - `/spec:update-spec` - Actually makes the updates (this command)
 - `/spec:finish-work` - Reminds you to check if specs need updates
 

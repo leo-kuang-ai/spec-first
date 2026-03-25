@@ -5,18 +5,18 @@
 
 <p align="center">
 <a href="./README_CN.md">简体中文</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md">Docs</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md">Quick Start</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md">Supported Platforms</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md">Use Cases</a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md">Docs</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md">Quick Start</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md">Supported Platforms</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md">Use Cases</a>
 </p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/v/@leokuang/spec-first.svg?style=flat-square&color=2563eb" alt="npm version" /></a>
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/dw/@leokuang/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
-<a href="https://github.com/sunrain520/spec-first/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
 <a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
 <a href="https://discord.com/invite/tWcCZ3aRHc"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
 <a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/sunrain520/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
 <a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/sunrain520/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
@@ -51,9 +51,9 @@ spec-first init --cursor --opencode --codex -u your-name
 - `-u your-name` creates `.spec-first/workspace/your-name/` for personal journals and session continuity.
 - Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
 - For platform-specific setup, entry commands, and upgrade paths, use the docs:
-  [Quick Start](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) •
-  [Supported Platforms](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) •
-  [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md)
+  [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) •
+  [Supported Platforms](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
+  [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md)
 
 ## Use Cases
 
@@ -104,7 +104,7 @@ Specs ship as empty templates by default — they are meant to be customized for
 spec-first init --registry https://github.com/your-org/your-spec-templates
 ```
 
-Browse available templates and learn how to publish your own on the [Spec Templates page](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md).
+Browse available templates and learn how to publish your own on the [Spec Templates page](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md).
 
 ## What's New
 
@@ -150,16 +150,16 @@ Yes. Personal workspace journals stay separate per developer, while shared specs
 
 ## Community & Resources
 
-- [Official Docs](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md) - Product docs and workflow analysis
-- [Quick Start](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) - First-time setup for existing projects
-- [Supported Platforms](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) - Platform-specific setup and command details
-- [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md) - See how the workflow plays out in practice
-- [Marketplace](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md) - Template packs and installation guidance
+- [Official Docs](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md) - Product docs and workflow analysis
+- [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) - First-time setup for existing projects
+- [Supported Platforms](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) - Platform-specific setup and command details
+- [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md) - See how the workflow plays out in practice
+- [Marketplace](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md) - Template packs and installation guidance
 - [GitHub Issues](https://github.com/sunrain520/spec-first/issues) - Report bugs or request features
 - [Discord](https://discord.com/invite/tWcCZ3aRHc) - Join the community
 
 <p align="center">
 <a href="https://github.com/sunrain520/spec-first">Official Repository</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/LICENSE">AGPL-3.0 License</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE">AGPL-3.0 License</a> •
 Built by <a href="https://github.com/mindfold-ai">Mindfold</a>
 </p>

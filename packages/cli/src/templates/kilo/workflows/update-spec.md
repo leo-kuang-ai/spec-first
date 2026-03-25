@@ -248,7 +248,7 @@ If you're unsure what to update, answer these prompts:
 
 ## Quality Checklist
 
-Before finishing your spec update:
+Before finishing your spec-first update:
 
 - [ ] Is the content specific and actionable?
 - [ ] Did you include a code example?
@@ -269,7 +269,7 @@ Development Flow:
   (deep bug analysis)
 ```
 
-- `/spec:break-loop` - Analyzes bugs deeply, often reveals spec updates needed
+- `/spec:break-loop` - Analyzes bugs deeply, often reveals spec-first updates needed
 - `/spec:update-spec` - Actually makes the updates (this command)
 - `/spec:finish-work` - Reminds you to check if specs need updates
 

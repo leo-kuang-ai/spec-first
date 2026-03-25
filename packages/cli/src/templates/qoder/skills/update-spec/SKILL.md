@@ -253,7 +253,7 @@ If you're unsure what to update, answer these prompts:
 
 ## Quality Checklist
 
-Before finishing your spec update:
+Before finishing your spec-first update:
 
 - [ ] Is the content specific and actionable?
 - [ ] Did you include a code example?

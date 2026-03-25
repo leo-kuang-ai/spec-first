@@ -5,19 +5,19 @@
 
 <p align="center">
 <a href="./README.md">English</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md">文档</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md">快速开始</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md">支持平台</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md">使用场景</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md">文档</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md">快速开始</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md">支持平台</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md">使用场景</a> •
 <a href="#wechat-group">微信群</a>
 </p>
 
 <p align="center">
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/v/@leokuang/spec-first.svg?style=flat-square&color=2563eb" alt="npm version" /></a>
 <a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/dw/@leokuang/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
-<a href="https://github.com/sunrain520/spec-first/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
 <a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
-<a href="https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
 <a href="https://discord.com/invite/tWcCZ3aRHc"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
 <a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/sunrain520/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
 <a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/sunrain520/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
@@ -52,9 +52,9 @@ spec-first init --cursor --opencode --codex -u your-name
 - `-u your-name` 会创建 `.spec-first/workspace/your-name/`，用来保存个人 journal 和会话连续性。
 - 平台参数可以自由组合。当前可选项包括 `--cursor`、`--opencode`、`--iflow`、`--codex`、`--kilo`、`--kiro`、`--gemini`、`--antigravity`、`--qoder` 和 `--codebuddy`。
 - 更完整的安装步骤、各平台入口命令和升级方式放在文档站：
-  [快速开始](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) •
-  [支持平台](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) •
-  [使用场景](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md)
+  [快速开始](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) •
+  [支持平台](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
+  [使用场景](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md)
 
 ## 使用场景
 
@@ -105,7 +105,7 @@ Spec 默认是空模板——需要根据你的项目技术栈和团队规范来
 spec-first init --registry https://github.com/your-org/your-spec-templates
 ```
 
-浏览可用模板和了解如何发布你自己的模板，请查看 [Spec 模板页面](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md)。
+浏览可用模板和了解如何发布你自己的模板，请查看 [Spec 模板页面](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md)。
 
 ## 最新进展
 
@@ -151,11 +151,11 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 
 ## 社区与资源
 
-- [官方文档](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-workflow-analysis.md) - 产品说明和工作流分析
-- [快速开始](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-first-time-existing-project.md) - 在现有仓库里快速接入
-- [支持平台](https://github.com/sunrain520/spec-first/blob/main/docs/多平台集成架构/multi-platform-architecture.md) - 各平台的接入方式和命令差异
-- [使用场景](https://github.com/sunrain520/spec-first/blob/main/docs/trellis-existing-project-iteration.md) - 看 spec-first 在真实任务里怎么落地
-- [Marketplace](https://github.com/sunrain520/spec-first/blob/main/marketplace/README.md) - 模板包和安装说明
+- [官方文档](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md) - 产品说明和工作流分析
+- [快速开始](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) - 在现有仓库里快速接入
+- [支持平台](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) - 各平台的接入方式和命令差异
+- [使用场景](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md) - 看 spec-first 在真实任务里怎么落地
+- [Marketplace](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md) - 模板包和安装说明
 - [GitHub Issues](https://github.com/sunrain520/spec-first/issues) - 提 Bug 或功能建议
 - [Discord](https://discord.com/invite/tWcCZ3aRHc) - 加入社区讨论
 
@@ -169,6 +169,6 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 
 <p align="center">
 <a href="https://github.com/sunrain520/spec-first">官方仓库</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/main/LICENSE">AGPL-3.0 License</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE">AGPL-3.0 License</a> •
 Built by <a href="https://github.com/mindfold-ai">Mindfold</a>
 </p>

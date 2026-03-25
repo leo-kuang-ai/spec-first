@@ -178,7 +178,7 @@ export class SpecFirstContext {
   /**
    * Check if this is a spec-first-managed project
    */
-  isTrellisProject() {
+  isSpecFirstProject() {
     return existsSync(join(this.directory, ".spec-first"))
   }
 
@@ -210,7 +210,7 @@ export class SpecFirstContext {
    */
   shouldSkipHook(hookName) {
     // Not a spec-first project? Skip.
-    if (!this.isTrellisProject()) {
+    if (!this.isSpecFirstProject()) {
       debugLog("context", `shouldSkipHook(${hookName}): skip - not spec-first project`)
       return true
     }

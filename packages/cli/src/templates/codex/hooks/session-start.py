@@ -51,8 +51,8 @@ def run_script(script_path: Path) -> str:
         return "No context available"
 
 
-def _get_task_status(trellis_dir: Path) -> str:
-    current_task_file = trellis_dir / ".current-task"
+def _get_task_status(spec_first_dir: Path) -> str:
+    current_task_file = spec_first_dir / ".current-task"
     if not current_task_file.is_file():
         return "Status: NO ACTIVE TASK\nNext: Describe what you want to work on"
 
@@ -63,9 +63,9 @@ def _get_task_status(trellis_dir: Path) -> str:
     if Path(task_ref).is_absolute():
         task_dir = Path(task_ref)
     elif task_ref.startswith(".spec-first/"):
-        task_dir = trellis_dir.parent / task_ref
+        task_dir = spec_first_dir.parent / task_ref
     else:
-        task_dir = trellis_dir / "tasks" / task_ref
+        task_dir = spec_first_dir / "tasks" / task_ref
     if not task_dir.is_dir():
         return f"Status: STALE POINTER\nTask: {task_ref}\nNext: Task directory not found. Run: python3 ./.spec-first/scripts/task.py finish"
 
@@ -112,7 +112,7 @@ def main() -> None:
     except (json.JSONDecodeError, KeyError):
         project_dir = Path(".").resolve()
 
-    trellis_dir = project_dir / ".spec-first"
+    spec_first_dir = project_dir / ".spec-first"
     codex_dir = project_dir / ".codex"
 
     output = StringIO()
@@ -125,12 +125,12 @@ Read and follow all instructions below carefully.
 """)
 
     output.write("<current-state>\n")
-    context_script = trellis_dir / "scripts" / "get_context.py"
+    context_script = spec_first_dir / "scripts" / "get_context.py"
     output.write(run_script(context_script))
     output.write("\n</current-state>\n\n")
 
     output.write("<workflow>\n")
-    workflow_content = read_file(trellis_dir / "workflow.md", "No workflow.md found")
+    workflow_content = read_file(spec_first_dir / "workflow.md", "No workflow.md found")
     output.write(workflow_content)
     output.write("\n</workflow>\n\n")
 
@@ -138,7 +138,7 @@ Read and follow all instructions below carefully.
     output.write("**Note**: The guidelines below are index files — they list available guideline documents and their locations.\n")
     output.write("During actual development, you MUST read the specific guideline files listed in each index's Pre-Development Checklist.\n\n")
 
-    spec_dir = trellis_dir / "spec"
+    spec_dir = spec_first_dir / "spec"
     if spec_dir.is_dir():
         for sub in sorted(spec_dir.iterdir()):
             if not sub.is_dir() or sub.name.startswith("."):
@@ -178,7 +178,7 @@ Read and follow all instructions below carefully.
         output.write(read_file(start_skill))
         output.write("\n</instructions>\n\n")
 
-    task_status = _get_task_status(trellis_dir)
+    task_status = _get_task_status(spec_first_dir)
     output.write(f"<task-status>\n{task_status}\n</task-status>\n\n")
 
     output.write("""<ready>

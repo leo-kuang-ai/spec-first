@@ -120,6 +120,6 @@ Three levels of insight:
 
 2. **Sync templates** - After updating `.spec-first/spec/`, sync to `src/templates/markdown/spec/`
 
-3. **Commit the spec updates** - This is the primary output, not just the analysis text
+3. **Commit the spec-first updates** - This is the primary output, not just the analysis text
 
 > **The analysis is worthless if it stays in chat. The value is in the updated specs.**

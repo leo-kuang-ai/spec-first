@@ -148,7 +148,7 @@ docs(readme): update quick start instructions
 
 4. **Push to your fork**
    ```bash
-   git push origin feat/your-feature-name
+   git push github feat/your-feature-name
    ```
 
 5. **Open a Pull Request** against the default branch (`master`)

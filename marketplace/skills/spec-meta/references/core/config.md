@@ -36,7 +36,7 @@ default_package: <package-name>
 
 # --- Update ---
 update:
-  skip:                            # Files/dirs to permanently exclude from `spec update`
+  skip:                            # Files/dirs to permanently exclude from `spec-first update`
     - <path>
 
 # --- Task Lifecycle Hooks ---
@@ -96,7 +96,7 @@ default_package: cli
 
 ### Update Skip
 
-Permanently exclude files or directories from `spec update`:
+Permanently exclude files or directories from `spec-first update`:
 
 ```yaml
 update:

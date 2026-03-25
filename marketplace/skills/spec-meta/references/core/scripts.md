@@ -269,10 +269,10 @@ from common.types import TaskData, TaskInfo, AgentRecord
 
 ```python
 from common.paths import (
-    TRELLIS_DIR,      # .spec-first/
-    WORKSPACE_DIR,    # .spec-first/workspace/
-    TASKS_DIR,        # .spec-first/tasks/
-    SPEC_DIR,         # .spec-first/spec/
+    DIR_WORKFLOW,     # .spec-first/
+    DIR_WORKSPACE,    # .spec-first/workspace/
+    DIR_TASKS,        # .spec-first/tasks/
+    DIR_SPEC,         # .spec-first/spec/
 )
 ```
 

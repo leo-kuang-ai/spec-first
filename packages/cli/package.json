@@ -1,6 +1,6 @@
 {
   "name": "@leokuang/spec-first",
-  "version": "0.4.0-beta.8",
+  "version": "1.3.0",
   "description": "Spec-driven AI development workflow that improves delivery quality through executable project standards",
   "type": "module",
   "main": "./dist/index.js",
@@ -27,12 +27,12 @@
     "lint:py": "basedpyright",
     "lint:all": "pnpm lint && pnpm lint:py",
     "prepublishOnly": "pnpm test && pnpm run build && cp ../../README.md ../../LICENSE .",
-    "release": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version patch && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push origin main --tags",
-    "release:minor": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version minor && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push origin main --tags",
-    "release:major": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version major && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push origin main --tags",
-    "release:beta": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version prerelease --preid beta && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push origin HEAD --tags",
-    "release:rc": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version prerelease --preid rc && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push origin HEAD --tags",
-    "release:promote": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version \"$(node -p \"require('./package.json').version.replace(/-.*/, '')\")\" && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push origin main --tags",
+    "release": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version patch && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push github master --tags",
+    "release:minor": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version minor && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push github master --tags",
+    "release:major": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version major && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push github master --tags",
+    "release:beta": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version prerelease --preid beta && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push github HEAD --tags",
+    "release:rc": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version prerelease --preid rc && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push github HEAD --tags",
+    "release:promote": "pnpm test && git add -A -- ':!docs-site' && (git diff-index --quiet HEAD || git commit -m 'chore: pre-release updates') && pnpm version --no-git-tag-version \"$(node -p \"require('./package.json').version.replace(/-.*/, '')\")\" && V=$(node -p \"require('./package.json').version\") && git add package.json && git commit -m \"$V\" && git tag \"v$V\" && git push github master --tags",
     "manifest": "node scripts/create-manifest.js"
   },
   "keywords": [

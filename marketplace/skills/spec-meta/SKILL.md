@@ -14,7 +14,7 @@ description: "Meta-skill for understanding and customizing Mindfold spec-first �
 | **Min Claude Code Version** | 1.0.0+           |
 | **Min Node.js Version**     | >=18.17.0        |
 
-> ⚠️ **Version Mismatch Warning**: If your spec-first CLI version differs from above, some features may not work as documented. Run `spec --version` to check.
+> ⚠️ **Version Mismatch Warning**: If your spec-first CLI version differs from above, some features may not work as documented. Run `spec-first --version` to check.
 
 ---
 
@@ -155,7 +155,7 @@ description: |
 
 ## Base Version
 
-spec-first version: X.X.X (from package.json or spec --version)
+spec-first version: X.X.X (from package.json or spec-first --version)
 Date initialized: YYYY-MM-DD
 
 ## Customizations

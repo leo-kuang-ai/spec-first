@@ -57,7 +57,7 @@ What the command produces.
 
 ## Step 2: Mirror to Other Platforms (Optional)
 
-Commands are automatically mirrored to configured platforms by `spec init` and `spec update`. Each platform uses its own format:
+Commands are automatically mirrored to configured platforms by `spec-first init` and `spec-first update`. Each platform uses its own format:
 
 | Platform    | Path                                            | Format   |
 | ----------- | ----------------------------------------------- | -------- |

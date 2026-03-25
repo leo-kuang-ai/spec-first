@@ -148,7 +148,7 @@ docs(readme): update quick start instructions
 
 4. **推送到你的 Fork**
    ```bash
-   git push origin feat/your-feature-name
+   git push github feat/your-feature-name
    ```
 
 5. **向默认分支发起 Pull Request**（当前仓库为 `master`）

@@ -1,0 +1,43 @@
+# spec-first 用户手册
+
+本目录包含 spec-first 的完整用户文档。
+
+## 文档列表
+
+- [用户手册](./用户手册.md) - 完整的用户指南，包含安装、配置、使用和故障排除
+
+## 快速导航
+
+### 安装相关
+- [系统要求](./用户手册.md#系统要求)
+- [npm 安装](./用户手册.md#npm-安装推荐)
+- [源码安装](./用户手册.md#源码安装)
+- [yarn 安装](./用户手册.md#yarn-安装)
+
+### 使用相关
+- [快速开始](./用户手册.md#快速开始)
+- [初始化配置](./用户手册.md#初始化配置)
+- [常用命令](./用户手册.md#常用命令)
+- [配置说明](./用户手册.md#配置说明)
+
+### 维护相关
+- [更新升级](./用户手册.md#更新升级)
+- [卸载](./用户手册.md#卸载)
+
+### 问题解决
+- [常见问题](./用户手册.md#常见问题)
+- [故障排除](./用户手册.md#故障排除)
+
+## 其他文档
+
+- [快速开始指南](../trellis-first-time-existing-project.md)
+- [工作流分析](../trellis-workflow-analysis.md)
+- [多平台架构](../多平台集成架构/multi-platform-architecture.md)
+- [使用场景](../trellis-existing-project-iteration.md)
+
+## 获取帮助
+
+- **命令行帮助**: `spec-first --help`
+- **GitHub Issues**: https://github.com/sunrain520/spec-first/issues
+- **Discord**: https://discord.com/invite/tWcCZ3aRHc
+- **官方文档**: https://github.com/sunrain520/spec-first

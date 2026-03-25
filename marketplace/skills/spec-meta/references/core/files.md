@@ -98,9 +98,9 @@ taosu
 
 ### `.template-hashes.json`
 
-**Purpose**: Track template file versions for `spec update`.
+**Purpose**: Track template file versions for `spec-first update`.
 
-**Created by**: `spec init` or `spec update`
+**Created by**: `spec-first init` or `spec-first update`
 
 **Format**: JSON object mapping file paths to SHA-256 hashes.
 
@@ -108,13 +108,13 @@ taosu
 {
   ".spec-first/workflow.md": "028891d1fe839a266...",
   ".claude/hooks/session-start.py": "0a9899e80f6bfe15...",
-  ".claude/commands/start.md": "d1276dcbff880299..."
+  ".claude/commands/spec/start.md": "d1276dcbff880299..."
 }
 ```
 
 **Used by**:
 
-- `spec update` - Detect which files have been modified
+- `spec-first update` - Detect which files have been modified
 - Determines if files can be auto-updated or need conflict resolution
 
 **Behavior**:
@@ -128,7 +128,7 @@ taosu
 
 **Purpose**: Track installed spec-first CLI version.
 
-**Created by**: `spec init` or `spec update`
+**Created by**: `spec-first init` or `spec-first update`
 
 **Format**: Plain text, semver version string.
 
@@ -138,7 +138,7 @@ taosu
 
 **Used by**:
 
-- `spec update` - Determine if update is needed
+- `spec-first update` - Determine if update is needed
 - Version mismatch detection
 
 ---
@@ -184,7 +184,7 @@ taosu
 
 **Purpose**: Main workflow documentation for developers and AI.
 
-**Created by**: `spec init`
+**Created by**: `spec-first init`
 
 **Content sections**:
 
@@ -206,7 +206,7 @@ taosu
 
 **Purpose**: Project-level spec-first configuration.
 
-**Created by**: `spec init`
+**Created by**: `spec-first init`
 
 **Format**: YAML
 
@@ -257,7 +257,7 @@ session:
 
 **Purpose**: Configure Multi-Session and Ralph Loop.
 
-**Created by**: `spec init`
+**Created by**: `spec-first init`
 
 **Format**: YAML
 
@@ -345,7 +345,7 @@ Automation scripts.
 
 ## Template Files
 
-These files are managed by `spec update`:
+These files are managed by `spec-first update`:
 
 | File                            | Purpose                    |
 | ------------------------------- | -------------------------- |
@@ -380,7 +380,7 @@ These files are managed by `spec update`:
 
 ## File Lifecycle
 
-### Created by `spec init`
+### Created by `spec-first init`
 
 ```
 .spec-first/

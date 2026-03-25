@@ -28,7 +28,7 @@ spec-first v0.4.0 supports **11 platforms**. The key differentiator is **hook su
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         TRELLIS FEATURE LAYERS                           │
+│                       SPEC-FIRST FEATURE LAYERS                          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  ┌────────────────────────────────────────────────────────────────────┐ │
@@ -120,14 +120,14 @@ All features work automatically. Hooks provide context injection and quality enf
 
 ```bash
 # Initialize
-spec init -u your-name           # Claude Code (default)
-spec init --iflow -u your-name   # iFlow
+spec-first init -u your-name           # Claude Code (default)
+spec-first init --iflow -u your-name   # iFlow
 ```
 
 ### Cursor
 
 ```bash
-spec init --cursor -u your-name
+spec-first init --cursor -u your-name
 ```
 
 - **Works**: Workspace, tasks, specs, commands (read via `.cursor/commands/spec-*.md`)
@@ -137,7 +137,7 @@ spec init --cursor -u your-name
 ### OpenCode
 
 ```bash
-spec init --opencode -u your-name
+spec-first init --opencode -u your-name
 ```
 
 - **Works**: Workspace, tasks, specs, agents, commands
@@ -146,7 +146,7 @@ spec init --opencode -u your-name
 ### Codex
 
 ```bash
-spec init --codex -u your-name
+spec-first init --codex -u your-name
 ```
 
 - Platform-specific skills in `.codex/skills/` + shared skills in `.agents/skills/`
@@ -157,7 +157,7 @@ spec init --codex -u your-name
 ### Qoder
 
 ```bash
-spec init --qoder -u your-name
+spec-first init --qoder -u your-name
 ```
 
 - Skills-based platform with templates at `.qoder/skills/{name}/SKILL.md`
@@ -166,7 +166,7 @@ spec init --qoder -u your-name
 ### CodeBuddy (Tencent Cloud)
 
 ```bash
-spec init --codebuddy -u your-name
+spec-first init --codebuddy -u your-name
 ```
 
 - Nested slash commands at `.codebuddy/commands/spec/{name}.md`
@@ -175,10 +175,10 @@ spec init --codebuddy -u your-name
 ### Kilo, Kiro, Gemini CLI, Antigravity
 
 ```bash
-spec init --kilo -u your-name
-spec init --kiro -u your-name
-spec init --gemini -u your-name
-spec init --antigravity -u your-name
+spec-first init --kilo -u your-name
+spec-first init --kiro -u your-name
+spec-first init --gemini -u your-name
+spec-first init --antigravity -u your-name
 ```
 
 - Each platform uses its native command format

@@ -190,7 +190,7 @@ describe("regression: add_session.py runtime branch context (issue-106)", () => 
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  function writeTrellisScripts(): void {
+  function writeSpecFirstScripts(): void {
     const scriptsDir = path.join(tmpDir, ".spec-first", "scripts");
     for (const [relativePath, content] of getAllScripts()) {
       const absPath = path.join(scriptsDir, relativePath);
@@ -249,7 +249,7 @@ ${separator}
     taskBranch?: string;
     taskBaseBranch?: string;
   }): void {
-    writeTrellisScripts();
+    writeSpecFirstScripts();
 
     fs.mkdirSync(path.join(tmpDir, ".spec-first", "workspace", "test-dev"), {
       recursive: true,

@@ -66,9 +66,9 @@ def run_script(script_path: Path) -> str:
         return "No context available"
 
 
-def _get_task_status(trellis_dir: Path) -> str:
+def _get_task_status(spec_first_dir: Path) -> str:
     """Check current task status and return structured status string."""
-    current_task_file = trellis_dir / ".current-task"
+    current_task_file = spec_first_dir / ".current-task"
     if not current_task_file.is_file():
         return "Status: NO ACTIVE TASK\nNext: Describe what you want to work on"
 
@@ -80,9 +80,9 @@ def _get_task_status(trellis_dir: Path) -> str:
     if Path(task_ref).is_absolute():
         task_dir = Path(task_ref)
     elif task_ref.startswith(".spec-first/"):
-        task_dir = trellis_dir.parent / task_ref
+        task_dir = spec_first_dir.parent / task_ref
     else:
-        task_dir = trellis_dir / "tasks" / task_ref
+        task_dir = spec_first_dir / "tasks" / task_ref
     if not task_dir.is_dir():
         return f"Status: STALE POINTER\nTask: {task_ref}\nNext: Task directory not found. Run: python3 ./.spec-first/scripts/task.py finish"
 
@@ -120,13 +120,13 @@ def _get_task_status(trellis_dir: Path) -> str:
     return f"Status: READY\nTask: {task_title}\nNext: Continue with implement or check"
 
 
-def _load_trellis_config(trellis_dir: Path) -> tuple:
+def _load_spec_first_config(spec_first_dir: Path) -> tuple:
     """Load spec-first config for session-start decisions.
 
     Returns:
         (is_mono, packages_dict, spec_scope, task_pkg, default_pkg)
     """
-    scripts_dir = trellis_dir / "scripts"
+    scripts_dir = spec_first_dir / "scripts"
     if str(scripts_dir) not in sys.path:
         sys.path.insert(0, str(scripts_dir))
 
@@ -134,7 +134,7 @@ def _load_trellis_config(trellis_dir: Path) -> tuple:
         from common.config import get_default_package, get_packages, get_spec_scope, is_monorepo  # type: ignore[import-not-found]
         from common.paths import get_current_task  # type: ignore[import-not-found]
 
-        repo_root = trellis_dir.parent
+        repo_root = spec_first_dir.parent
         is_mono = is_monorepo(repo_root)
         packages = get_packages(repo_root) or {}
         scope = get_spec_scope(repo_root)
@@ -160,12 +160,12 @@ def _load_trellis_config(trellis_dir: Path) -> tuple:
         return False, {}, None, None, None
 
 
-def _check_legacy_spec(trellis_dir: Path, is_mono: bool, packages: dict) -> str | None:
+def _check_legacy_spec_layout(spec_first_dir: Path, is_mono: bool, packages: dict) -> str | None:
     """Check for legacy spec directory structure in monorepo."""
     if not is_mono or not packages:
         return None
 
-    spec_dir = trellis_dir / "spec"
+    spec_dir = spec_first_dir / "spec"
     if not spec_dir.is_dir():
         return None
 
@@ -260,11 +260,11 @@ def main():
 
     # iFlow don't have an env for project, use `.` instead
     project_dir = Path(".").resolve()
-    trellis_dir = project_dir / ".spec-first"
+    spec_first_dir = project_dir / ".spec-first"
     iflow_dir = project_dir / ".iflow"
 
     # Load config for scope filtering and legacy detection
-    is_mono, packages, scope_config, task_pkg, default_pkg = _load_trellis_config(trellis_dir)
+    is_mono, packages, scope_config, task_pkg, default_pkg = _load_spec_first_config(spec_first_dir)
     allowed_pkgs = _resolve_spec_scope(is_mono, packages, scope_config, task_pkg, default_pkg)
 
     output = StringIO()
@@ -277,17 +277,17 @@ Read and follow all instructions below carefully.
 """)
 
     # Legacy migration warning
-    legacy_warning = _check_legacy_spec(trellis_dir, is_mono, packages)
+    legacy_warning = _check_legacy_spec_layout(spec_first_dir, is_mono, packages)
     if legacy_warning:
         output.write(f"<migration-warning>\n{legacy_warning}\n</migration-warning>\n\n")
 
     output.write("<current-state>\n")
-    context_script = trellis_dir / "scripts" / "get_context.py"
+    context_script = spec_first_dir / "scripts" / "get_context.py"
     output.write(run_script(context_script))
     output.write("\n</current-state>\n\n")
 
     output.write("<workflow>\n")
-    workflow_content = read_file(trellis_dir / "workflow.md", "No workflow.md found")
+    workflow_content = read_file(spec_first_dir / "workflow.md", "No workflow.md found")
     output.write(workflow_content)
     output.write("\n</workflow>\n\n")
 
@@ -295,7 +295,7 @@ Read and follow all instructions below carefully.
     output.write("**Note**: The guidelines below are index files — they list available guideline documents and their locations.\n")
     output.write("During actual development, you MUST read the specific guideline files listed in each index's Pre-Development Checklist.\n\n")
 
-    spec_dir = trellis_dir / "spec"
+    spec_dir = spec_first_dir / "spec"
     if spec_dir.is_dir():
         for sub in sorted(spec_dir.iterdir()):
             if not sub.is_dir() or sub.name.startswith("."):
@@ -338,7 +338,7 @@ Read and follow all instructions below carefully.
     output.write("\n</instructions>\n\n")
 
     # R2: Check task status and inject structured tag
-    task_status = _get_task_status(trellis_dir)
+    task_status = _get_task_status(spec_first_dir)
     output.write(f"<task-status>\n{task_status}\n</task-status>\n\n")
 
     output.write("""<ready>

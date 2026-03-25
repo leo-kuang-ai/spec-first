@@ -59,7 +59,7 @@ If this change touches infra or cross-layer contracts, this is a blocking checkl
 - [ ] Includes required tests and assertion points
 
 **Block Rule**:
-In pipeline mode, the finish agent will automatically detect and execute spec updates when gaps are found.
+In pipeline mode, the finish agent will automatically detect and execute spec-first updates when gaps are found.
 If running this checklist manually, ensure spec sync is complete before committing — run `/spec:update-spec` if needed.
 
 ### 3. API Changes
