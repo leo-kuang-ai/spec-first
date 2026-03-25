@@ -1,5 +1,0 @@
-experiment	score	max_score	pass_rate	status	description
-0	5	6	83.3%	baseline	original skill — evaluated on spec-first project existing artifacts
-1	6	6	100.0%	keep	evaluated on Hr360_temp project — all evals passed
-2	6	6	100.0%	keep	added evidence_path precision + confirm_method for gaps
-3	6	6	100.0%	keep	added lazy evidence collection + shared cache mechanism
