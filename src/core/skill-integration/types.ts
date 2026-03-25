@@ -39,22 +39,11 @@ export interface ResolvedExternalSkillSource {
   source: ExternalSkillSource;
 }
 
-export interface MissingExternalSkillSource {
-  kind: 'missing';
-  requestedName: string;
-  reason: 'source-not-found';
-  sourcePath?: string;
-}
-
-export type ExternalSkillSourceResolution =
-  | ResolvedExternalSkillSource
-  | MissingExternalSkillSource;
+export type ExternalSkillSourceResolution = ResolvedExternalSkillSource;
 
 export interface ResolveExternalSkillSourceInput {
   skillName: string;
   source?: string;
-  reportOnly: boolean;
-  allowMissingSource: boolean;
 }
 
 export interface ExternalExampleFile {

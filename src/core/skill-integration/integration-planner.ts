@@ -2,8 +2,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import yaml from 'js-yaml';
 import type {
+  ExternalSkillSource,
   ExternalSkillProfile,
-  ExternalSkillSourceResolution,
   IntegrationCategory,
   IntegrationStage,
 } from './types.js';
@@ -40,8 +40,8 @@ export interface IntegrationPlan {
 export interface BuildIntegrationPlanInput {
   projectRoot: string;
   skillName: string;
-  source: ExternalSkillSourceResolution;
-  profile?: Pick<
+  source: ExternalSkillSource;
+  profile: Pick<
     ExternalSkillProfile,
     | 'name'
     | 'description'
@@ -63,7 +63,6 @@ export interface BuildIntegrationPlanInput {
   };
   target: 'guideline' | 'draft' | 'both';
   reportOnly: boolean;
-  allowMissingSource: boolean;
   rename?: string;
 }
 
@@ -119,52 +118,6 @@ function resolveTargetConfig(
 }
 
 export function buildIntegrationPlan(input: BuildIntegrationPlanInput): IntegrationPlan {
-  if (input.source.kind === 'missing') {
-    if (!input.allowMissingSource) {
-      throw new Error(`SOURCE_NOT_FOUND: ${input.skillName}`);
-    }
-
-    const placeholderProfile: ExternalSkillProfile = {
-      name: input.skillName,
-      sourcePath: input.source.sourcePath ?? '',
-      commands: [],
-      frontmatter: {},
-      concepts: [],
-      practices: [],
-      caveats: [],
-      examples: [],
-      tools: [],
-      keywords: [],
-      suggestedCategory: 'generic',
-      primaryStage: 'none',
-      relatedStages: [],
-      parserWarnings: ['source missing'],
-    };
-
-    const targetConfig = resolveTargetConfig(input.projectRoot, 'generic', placeholderProfile);
-    return {
-      requestedName: input.skillName,
-      finalName: input.rename ?? input.skillName,
-      mode: 'report-only',
-      profile: placeholderProfile,
-      targetConfig,
-      conflicts: [],
-      fileWrites: [
-        {
-          path: join('docs', 'reports', 'skill-integrations', `${new Date().toISOString().slice(0, 10)}-${input.rename ?? input.skillName}.md`),
-          kind: 'report',
-          overwrite: false,
-          content: '',
-        },
-      ],
-      reviewFocus: ['review missing source handling'],
-    };
-  }
-
-  if (!input.profile) {
-    throw new Error(`SOURCE_INVALID: ${input.skillName}`);
-  }
-
   const profile: ExternalSkillProfile = {
     ...input.profile,
     suggestedCategory: input.profile.suggestedCategory ?? input.profile.category ?? 'generic',
@@ -192,18 +145,23 @@ export function buildIntegrationPlan(input: BuildIntegrationPlanInput): Integrat
   const targetConfig = resolveTargetConfig(input.projectRoot, category, profile);
   const finalName = input.rename ?? input.skillName;
 
-    return {
-      requestedName: input.skillName,
-      finalName,
-      mode: 'report-only',
-      profile,
-      targetConfig,
-      conflicts,
-      fileWrites: [
+  return {
+    requestedName: input.skillName,
+    finalName,
+    mode: 'report-only',
+    profile,
+    targetConfig,
+    conflicts,
+    fileWrites: [
       {
-        path: join('docs', 'reports', 'skill-integrations', `${new Date().toISOString().slice(0, 10)}-${finalName}.md`),
+        path: join(
+          'docs',
+          'reports',
+          'skill-integrations',
+          `${new Date().toISOString().slice(0, 10)}-${finalName}.md`
+        ),
         kind: 'report',
-        overwrite: false,
+        overwrite: true,
         content: '',
       },
     ],

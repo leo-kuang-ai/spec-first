@@ -15,7 +15,6 @@ export interface IntegrateSkillCliOptions {
   target?: 'guideline' | 'draft' | 'both';
   category?: IntegrationCategory;
   reportOnly: boolean;
-  allowMissingSource: boolean;
   dryRun: boolean;
   rename?: string;
 }
@@ -35,14 +34,9 @@ export function runIntegrateSkill(
   const sourceResolution = resolveExternalSkillSource({
     skillName: options.skillName,
     source: options.source,
-    reportOnly: options.reportOnly,
-    allowMissingSource: options.allowMissingSource,
   });
 
-  const profile =
-    sourceResolution.kind === 'resolved'
-      ? parseExternalSkill(sourceResolution.source)
-      : undefined;
+  const profile = parseExternalSkill(sourceResolution.source);
 
   const mapped = profile
     ? mapSkillCategory({
@@ -56,18 +50,15 @@ export function runIntegrateSkill(
   const plan = buildIntegrationPlan({
     projectRoot,
     skillName: options.skillName,
-    source: sourceResolution,
-    profile: profile
-      ? {
-          ...profile,
-          suggestedCategory: options.category ?? mapped?.category ?? profile.suggestedCategory,
-          primaryStage: mapped?.primaryStage ?? profile.primaryStage,
-          relatedStages: mapped?.relatedStages ?? profile.relatedStages,
-        }
-      : undefined,
+    source: sourceResolution.source,
+    profile: {
+      ...profile,
+      suggestedCategory: options.category ?? mapped?.category ?? profile.suggestedCategory,
+      primaryStage: mapped?.primaryStage ?? profile.primaryStage,
+      relatedStages: mapped?.relatedStages ?? profile.relatedStages,
+    },
     target: options.target ?? 'guideline',
     reportOnly: options.reportOnly,
-    allowMissingSource: options.allowMissingSource,
     rename: options.rename,
   });
 

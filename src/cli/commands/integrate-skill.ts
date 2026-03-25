@@ -17,7 +17,6 @@ function parseIntegrateSkillArgs(args: string[]): IntegrateSkillCliOptions | nul
     target: parseTarget(parseFlag(args, '--target')),
     category: parseCategory(parseFlag(args, '--category')),
     reportOnly: hasFlag(args, '--report-only'),
-    allowMissingSource: hasFlag(args, '--allow-missing-source'),
     dryRun: hasFlag(args, '--dry-run'),
     rename: parseFlag(args, '--rename'),
   };
@@ -29,7 +28,6 @@ function isSupportedFlag(arg: string): boolean {
     '--target',
     '--category',
     '--report-only',
-    '--allow-missing-source',
     '--dry-run',
     '--rename',
     '--yes',
@@ -76,12 +74,18 @@ export function handleIntegrateSkill(args: string[]): number {
     return ExitCode.VALIDATION_ERROR;
   }
 
-  const result = runIntegrateSkill(parsed);
-  if (result.output) {
-    console.log(result.output);
-  }
+  try {
+    const result = runIntegrateSkill(parsed);
+    if (result.output) {
+      console.log(result.output);
+    }
 
-  return result.exitCode === 0 ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
+    return result.exitCode === 0 ? ExitCode.SUCCESS : ExitCode.VALIDATION_ERROR;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(message);
+    return ExitCode.VALIDATION_ERROR;
+  }
 }
 
 function printHelp(): void {
@@ -92,7 +96,6 @@ function printHelp(): void {
   --target <guideline|draft|both>
   --category <frontend|backend|testing|documentation|workflow|generic>
   --report-only                仅生成报告（MVP 唯一支持模式）
-  --allow-missing-source       允许 source 缺失时生成空报告骨架
   --dry-run                    只预览，不落盘
   --rename <new-name>          冲突时改名
   --yes                        跳过路由确认（全局确认参数）

@@ -16,55 +16,47 @@ afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
 });
 
+function createProfile() {
+  return {
+    name: 'frontend-design',
+    description: 'Frontend design guidance',
+    sourcePath: FRONTEND_SOURCE,
+    commands: ['/spec-first:frontend-design'],
+    frontmatter: {},
+    concepts: [],
+    practices: [],
+    caveats: [],
+    examples: [],
+    tools: [],
+    keywords: ['frontend', 'design', 'ui'],
+    primaryStage: 'design' as const,
+    relatedStages: ['code' as const],
+    parserWarnings: [],
+    suggestedCategory: 'frontend' as const,
+  };
+}
+
 describe('buildIntegrationPlan', () => {
   it('forces report-only mode when requested', () => {
     const plan = buildIntegrationPlan({
       projectRoot: TMP,
       skillName: 'frontend-design',
       source: {
-        kind: 'resolved',
-        source: {
-          requestedName: 'frontend-design',
-          resolvedName: 'frontend-design',
-          sourcePath: FRONTEND_SOURCE,
-          sourceType: 'local-directory',
-          skillMdPath: join(FRONTEND_SOURCE, 'SKILL.md'),
-        },
+        requestedName: 'frontend-design',
+        resolvedName: 'frontend-design',
+        sourcePath: FRONTEND_SOURCE,
+        sourceType: 'local-directory',
+        skillMdPath: join(FRONTEND_SOURCE, 'SKILL.md'),
       },
-      profile: {
-        name: 'frontend-design',
-        category: 'frontend',
-        primaryStage: 'design',
-        relatedStages: ['code'],
-        keywords: ['frontend', 'design', 'ui'],
-        commands: ['/spec-first:frontend-design'],
-      },
+      profile: createProfile(),
       target: 'guideline',
       reportOnly: true,
-      allowMissingSource: false,
     });
 
     expect(plan.mode).toBe('report-only');
     expect(plan.fileWrites).toHaveLength(1);
     expect(plan.fileWrites[0].kind).toBe('report');
-  });
-
-  it('throws when the source is missing and allowMissingSource is false', () => {
-    expect(() =>
-      buildIntegrationPlan({
-        projectRoot: TMP,
-        skillName: 'missing-skill',
-        source: {
-          kind: 'missing',
-          requestedName: 'missing-skill',
-          reason: 'source-not-found',
-        },
-        profile: undefined,
-        target: 'guideline',
-        reportOnly: false,
-        allowMissingSource: false,
-      })
-    ).toThrow(/SOURCE_NOT_FOUND/);
+    expect(plan.fileWrites[0].overwrite).toBe(true);
   });
 
   it('throws when the target name conflicts and rename is missing', () => {
@@ -80,28 +72,19 @@ describe('buildIntegrationPlan', () => {
         projectRoot: TMP,
         skillName: 'frontend-design',
         source: {
-          kind: 'resolved',
-          source: {
-            requestedName: 'frontend-design',
-            resolvedName: 'frontend-design',
-            sourcePath: FRONTEND_SOURCE,
-            sourceType: 'local-directory',
-            skillMdPath: join(FRONTEND_SOURCE, 'SKILL.md'),
-          },
+          requestedName: 'frontend-design',
+          resolvedName: 'frontend-design',
+          sourcePath: FRONTEND_SOURCE,
+          sourceType: 'local-directory',
+          skillMdPath: join(FRONTEND_SOURCE, 'SKILL.md'),
         },
         profile: {
-          name: 'frontend-design',
-          category: 'frontend',
-          primaryStage: 'design',
-          relatedStages: ['code'],
+          ...createProfile(),
           keywords: ['frontend', 'design'],
-          commands: ['/spec-first:frontend-design'],
         },
         target: 'draft',
         reportOnly: true,
-        allowMissingSource: false,
       })
     ).toThrow(/INTEGRATE_SKILL_CONFLICT/);
   });
 });
-

@@ -6,12 +6,16 @@ import { runIntegrateSkill } from '../../src/core/skill-integration/service.js';
 
 const TMP = join(import.meta.dirname, '../../tests/fixtures/.tmp-integrate-skill');
 const SOURCE_DIR = join(TMP, 'external-skills', 'frontend-design');
+const HOME_ROOT = join(TMP, 'home');
+const INSTALLED_SOURCE_DIR = join(HOME_ROOT, '.spec-first', 'skills', 'frontend-design');
 const REPORT_DATE = new Date().toISOString().slice(0, 10);
 
 const origCwd = process.cwd;
+const origHome = process.env.HOME;
 
 beforeEach(() => {
   mkdirSync(SOURCE_DIR, { recursive: true });
+  mkdirSync(INSTALLED_SOURCE_DIR, { recursive: true });
   writeFileSync(
     join(SOURCE_DIR, 'SKILL.md'),
     `---
@@ -26,12 +30,32 @@ description: Use when integrating a frontend design skill into spec-first.
 `,
     'utf-8'
   );
+  writeFileSync(
+    join(INSTALLED_SOURCE_DIR, 'SKILL.md'),
+    `---
+name: frontend-design
+description: Use when integrating a frontend design skill into spec-first.
+---
+
+# Skill: frontend-design
+
+- P0: 生成 report-only 集成报告并检查冲突
+- Command: \`/spec-first:integrate-skill frontend-design\`
+`,
+    'utf-8'
+  );
   process.cwd = () => TMP;
+  process.env.HOME = HOME_ROOT;
 });
 
 afterEach(() => {
   rmSync(TMP, { recursive: true, force: true });
   process.cwd = origCwd;
+  if (origHome === undefined) {
+    delete process.env.HOME;
+  } else {
+    process.env.HOME = origHome;
+  }
   vi.restoreAllMocks();
 });
 
@@ -44,7 +68,6 @@ describe('runIntegrateSkill', () => {
         target: 'guideline',
         category: 'frontend',
         reportOnly: true,
-        allowMissingSource: false,
         dryRun: false,
       },
       TMP
@@ -95,5 +118,22 @@ describe('handleIntegrateSkill', () => {
     } finally {
       errSpy.mockRestore();
     }
+  });
+
+  it('should resolve from ~/.spec-first/skills when --source is omitted', () => {
+    const result = runIntegrateSkill(
+      {
+        skillName: 'frontend-design',
+        target: 'guideline',
+        category: 'frontend',
+        reportOnly: true,
+        dryRun: true,
+      },
+      TMP
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(result.sourceResolution?.kind).toBe('resolved');
+    expect(result.plan?.requestedName).toBe('frontend-design');
   });
 });
