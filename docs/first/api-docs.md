@@ -68,15 +68,16 @@ spec-first stage cancel --reason <reason>   # 取消 Feature
 | `--reason <reason>` | 阶段变更原因 |
 | `--yes` | 跳过确认 |
 
-#### gate
+#### status / transition / validate
 
-阶段质量门禁评估。
+节点状态、推进与校验。
 
 ```bash
-spec-first gate check --feature <featureId>           # 执行 Gate 校验
-spec-first gate history --feature <featureId>         # 查看历史记录
-spec-first gate conditions --feature <featureId>      # 查看门禁条件
-spec-first gate validate-config --feature <featureId> # 校验配置
+spec-first status <featureId>                 # 查看节点状态
+spec-first transition <featureId>             # 推进或取消节点
+spec-first validate format <featureId>        # 校验产物格式
+spec-first validate links <featureId>         # 校验文档关联
+spec-first done <featureId>                   # 收口到 08_done
 ```
 
 | 选项 | 说明 |
@@ -147,29 +148,12 @@ spec-first status --feature <featureId> --json
 | `id` | 追溯 ID 生成、校验与检索 | `next`, `validate`, `search`, `list` |
 | `trace` | 追溯链修复与校验 | `validate` |
 
-#### id
-
-追溯 ID 管理。
-
-```bash
-spec-first id next --feature <featureId> --type <type>  # 生成下一个 ID
-spec-first id validate <id>                             # 校验 ID 格式
-spec-first id search <id>                               # 搜索 ID 上下游
-spec-first id list --feature <featureId>                # 列出所有 ID
-```
-
-| 选项 | 说明 |
-|------|------|
-| `--feature <featureId>` | 指定 Feature |
-| `--type <type>` | ID 类型（FR/DS/TASK/TC/RFC/REQ/SYS/ARCH/MOD/ATP/STP/ITP/UTP） |
-| `--level <UT\|IT\|E2E\|ST>` | 测试级别 |
-
 #### trace
 
 追溯链校验。
 
 ```bash
-spec-first trace validate --feature <featureId>
+spec-first validate links <featureId>
 ```
 
 ---
@@ -185,11 +169,12 @@ spec-first trace validate --feature <featureId>
 
 #### metrics
 
-覆盖率度量与健康评分。
+节点健康与产物校验。
 
 ```bash
-spec-first metrics coverage --feature <featureId>  # 覆盖率（C3/C4/C6/C8/C9）
-spec-first metrics health --feature <featureId>    # 健康度（H1）与瓶颈（R1-R5）
+spec-first status <featureId>              # 节点状态与任务进度
+spec-first validate format <featureId>     # 产物格式
+spec-first validate links <featureId>      # 文档关联
 ```
 
 | 选项 | 说明 |

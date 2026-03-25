@@ -10,7 +10,7 @@ user-invocable: true
 allowed-tools: "Read, Write, Edit, Bash"
 hooks:
   PreToolUse:
-    - matcher: "spec-first (gate|metrics|docs)"
+    - matcher: "spec-first (status|transition|validate)"
       hooks:
         - type: reminder
           message: "[verify] 执行验证命令后必须完整记录输出到 findings.md"
@@ -107,7 +107,7 @@ I'm using the verify skill to validate [Feature] stage completion.
 
 ## 工具选择策略
 
-- CLI / gate / metrics / docs links 校验：
+- CLI / status / transition / validate 校验：
   - 优先使用 `spec-first` 命令
 - 浏览器交互验收与页面验证：
   - 宿主支持时优先 `playwright-mcp`
@@ -151,9 +151,9 @@ I'm using the verify skill to validate [Feature] stage completion.
 
 ### 正确的表述方式
 
-- ✅ "Gate check 返回 PASS，退出码 0"
+- ✅ "节点 readiness 返回 READY_TO_ADVANCE，退出码 0"
 - ✅ "C2=100%, C3=100%, 所有条件满足"
-- ✅ "执行命令 `spec-first gate check {featureId}` 输出显示..."
+- ✅ "执行命令 `spec-first status {featureId}` / `spec-first validate links {featureId}` 输出显示..."
 
 ## 文件系统即外部记忆
 
@@ -165,11 +165,11 @@ I'm using the verify skill to validate [Feature] stage completion.
 
 | 声明 | 需要的证据 | 不充分的证据 |
 |------|-----------|-------------|
-| Gate 通过 | `spec-first gate check <featureId>` 输出: `PASS` 或 `PASS_WITH_WAIVER` | "我检查过了"、"应该没问题" |
-| 文档关联达标 | `spec-first docs links validate <featureId>` + 当前阶段 `gate check` 判定通过 | "所有文档都已关联" |
-| 阶段可推进 | `gate check` 退出码 0（`PASS/PASS_WITH_WAIVER`）+ `docs links validate` 满足当前阶段策略 | "上一轮通过了" |
+| 节点可推进 | `spec-first status <featureId>` 输出节点为 READY_TO_ADVANCE | "我检查过了"、"应该没问题" |
+| 文档关联达标 | `spec-first validate links <featureId>` 输出通过 | "所有文档都已关联" |
+| 阶段可推进 | `status` 与 `validate links` 的当前证据满足策略 | "上一轮通过了" |
 | TASK 完成 | 测试命令输出 + review 通过 | "代码写完了" |
-| Feature 可归档 | `spec-first gate check <featureId>` + `spec-first docs links validate <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
+| Feature 可归档 | `spec-first status <featureId>` + `spec-first validate links <featureId>` + 归档产物证据 | "所有 TASK 都标记完成了" |
 
 ## TDD 与文档健康的边界
 
@@ -364,12 +364,12 @@ digraph verify_flow {
   LocateFeature -> LoadStage [label="读取阶段状态"];
 
   LoadStage [label="加载阶段"];
-  LoadStage -> GetConditions [label="获取 Gate 条件"];
+  LoadStage -> GetConditions [label="获取 readiness 条件"];
 
   GetConditions [label="获取条件定义"];
-  GetConditions -> RunGateCheck [label="执行 gate check"];
+  GetConditions -> RunGateCheck [label="执行 status / validate"];
 
-  RunGateCheck [label="运行 gate check 命令"];
+  RunGateCheck [label="运行 status / validate 命令"];
   RunGateCheck -> ReadOutput [label="读取完整输出"];
 
   ReadOutput [label="检查输出"];
@@ -415,9 +415,9 @@ digraph verify_flow {
 
 ## 量化通过条件
 
-- **Gate 通过**：`spec-first gate check <featureId>` 退出码为 0，且状态为 `PASS` 或 `PASS_WITH_WAIVER`
-- **阶段可推进**：`gate check` 通过；`docs links validate` 按阶段策略执行
-- **门禁可接受**：以 `gate check` 对当前阶段的阈值判定为准
+- **节点可推进**：`spec-first status <featureId>` 显示 READY_TO_ADVANCE，且 `validate links` 按阶段策略执行
+- **阶段可推进**：`status` 与 `validate links` 的当前证据满足策略
+- **门禁可接受**：以节点 readiness 和产物校验结果为准
 - **结论可宣告**：以上证据均为本次会话新鲜执行结果（非历史缓存）
 
 ## 判定证据链要求
@@ -458,7 +458,7 @@ digraph verify_flow {
 
 ### Layer 3: 完成检查（Completion）
 
-- 目标：阶段推进前统一验收（gate check + docs links validate + 文档健康判定）
+- 目标：阶段推进前统一验收（status + validate links + 产物健康判定）
 - 推荐入口：`/spec-first:verify --layer completion`
 
 > 说明：当前 runtime 仅开放 verify 的 completion 层；single/cross 由 review 承载。
@@ -473,7 +473,7 @@ digraph verify_flow {
 
 - **P0**: 定位 Feature，加载当前阶段
 - **P1**: 加载 `verify-view`、文档关联、文档健康指标、Gate 条件
-- **P2**: 执行 `gate check`、`docs links validate`、`metrics report`，获取验证结果
+- **P2**: 执行 `status`、`validate links`、`validate format`，获取验证结果
 - **P3**: 生成校验报告（Gate 评估、文档关联完整性、文档健康缺口、verify-view 重点、修复建议）
 - **P4**: 将校验结果写入 findings.md
 - **P4.5**: 如发现 TDD 过程缺口，单列写入 findings.md，避免被门禁信号结论掩盖
@@ -481,9 +481,9 @@ digraph verify_flow {
 
 ## CLI 依赖
 
-- `spec-first gate check`
-- `spec-first docs links validate`
-- `spec-first metrics report`
+- `spec-first status`
+- `spec-first validate links`
+- `spec-first validate format`
 
 ## 输出路径
 

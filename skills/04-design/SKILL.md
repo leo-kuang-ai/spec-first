@@ -189,7 +189,7 @@ digraph design_flow {
   WriteDesign [label="写入 design.md"];
   WriteDesign -> GateCheck;
 
-  GateCheck [label="gate check"];
+  GateCheck [label="status / validate links"];
   GateCheck -> Done [label="PASS"];
   GateCheck -> FixGap [label="FAIL"];
 
@@ -210,10 +210,9 @@ digraph design_flow {
 - P5: 执行文档关联校验，检查孤立文档与缺失引用
 
 ## CLI 依赖
-- `spec-first id next DS <abbr> --feature <featureId>`
-- `spec-first docs links validate`
-- `spec-first docs links show`
-- `spec-first metrics report`
+- `spec-first validate links <featureId>`
+- `spec-first status <featureId>`
+- `spec-first validate format <featureId>`
 
 ## 输出路径
 - `specs/{featureId}/document-links.yaml`
@@ -225,9 +224,9 @@ digraph design_flow {
 
 ## 成功标准
 - `design.md` 已写入，包含模块划分、API 设计、数据模型
-- 所有 DS 已通过 `id next DS` 注册
-- `document-links.yaml` 已更新，设计文档引用完整
-- 文档关联校验通过，无孤立项
+- 所有 DS 已写入 `design.md` 并通过格式校验
+- `validate links` 已通过，设计文档引用完整
+- 无孤立项或未解析引用
 - 无与当前交付无关的投机性架构层
 
 **格式校验（P4 落盘后自动执行）**:

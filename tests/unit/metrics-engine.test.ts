@@ -144,13 +144,9 @@ describe('handleMetrics', () => {
     expect(withCwd(TMP, () => handleMetrics([]))).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should render report from document-links', () => {
-    writeStageState();
-    writeDocumentLinks();
-    writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
-    writeFileSync(join(TMP, 'specs', FEAT, 'design.md'), '# Design\n', 'utf-8');
-
-    expect(withCwd(TMP, () => handleMetrics(['report', FEAT]))).toBe(ExitCode.SUCCESS);
+  it('should return VALIDATION_ERROR for retired metrics command', () => {
+    expect(withCwd(TMP, () => handleMetrics(['report', FEAT]))).toBe(ExitCode.VALIDATION_ERROR);
+    expect(withCwd(TMP, () => handleMetrics(['health', FEAT]))).toBe(ExitCode.VALIDATION_ERROR);
   });
 
   it('should calculate document metrics explicitly', () => {

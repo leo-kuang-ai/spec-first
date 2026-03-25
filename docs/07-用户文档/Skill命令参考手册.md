@@ -2,7 +2,9 @@
 
 > **版本**: v2.1 | **日期**: 2026-03-09
 > **基准**: 当前代码实现（src/cli/commands/*.ts + skills/spec-first/*.md）
-> **总览**: 20 个 Skill（6 阶段执行模型） + 22 个 CLI 命令组（53 子命令）
+> **总览**: 20 个 Skill（6 阶段执行模型） + 当前 CLI 主入口与少量退场兼容入口
+
+> **说明**: 旧的 `gate / id / metrics / trace / golive / docs links` 命令族已退场，本文后续仅保留为历史参考；当前主入口请优先理解 `status / transition / validate / done`。
 
 ---
 
@@ -27,21 +29,21 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 |---|-------|------|------|---------|--------|---------|
 | 01 | init | `/spec-first:init` | any | strict | stage-state.json, constitution.md, trace-matrix.yaml | `spec-first init` |
 | 02 | catchup | `/spec-first:catchup` | any | assisted | stage-state.json（恢复摘要追加） | `ai catchup`, `stage current` |
-| 03 | spec | `/spec-first:spec` | 01_specify | strict/assisted | spec.md, trace-matrix.yaml | `id next FR`, `matrix update`, `matrix check` |
-| 04 | design | `/spec-first:design` | 02_design | strict | design.md, trace-matrix.yaml | `id next DS`, `matrix update`, `metrics coverage` |
+| 03 | spec | `/spec-first:spec` | 01_specify | strict/assisted | spec.md, trace-matrix.yaml | `status`, `validate format`, `validate links` |
+| 04 | design | `/spec-first:design` | 02_design | strict | design.md, trace-matrix.yaml | `validate links`, `status` |
 | 05 | research | `/spec-first:research` | any | assisted | research.md | `ai context` |
-| 06 | task | `/spec-first:task` | 03_plan | assisted | task_plan.md, trace-matrix.yaml | `id next TASK`, `matrix update`, `metrics coverage` |
+| 06 | task | `/spec-first:task` | 03_plan | assisted | task_plan.md, trace-matrix.yaml | `status`, `validate links` |
 | 07 | code | `/spec-first:code` | 04_implement | strict/assisted | 源代码, task_plan.md, stage-state.json | `commit`, `matrix update`, `ai context` |
-| 08 | review | `/spec-first:review` | 04_implement | assisted | review-report.md | `metrics coverage`, `matrix check` |
-| 10 | archive | `/spec-first:archive` | 06_wrap_up | strict | retro.md | `metrics report`, `gate check`, `stage advance` |
+| 08 | review | `/spec-first:review` | 04_implement | assisted | review-report.md | `status`, `validate format`, `validate links` |
+| 10 | archive | `/spec-first:archive` | 06_wrap_up | strict | retro.md | `status`, `validate links`, `done` |
 
 ### 1.2 编排 Skill（3 条）
 
 | # | Skill | 命令 | confirm | 说明 | CLI 依赖 |
 |---|-------|------|---------|------|---------|
 | 11 | plan | `/spec-first:plan` | assisted | 生成执行计划（支持多需求切换），写入 stage-state.json | `feature list`, `feature switch`, `feature current`, `stage current`, `metrics health`, `doctor` |
-| 12 | verify | `/spec-first:verify` | auto | 校验报告（Gate + 矩阵 + 覆盖率缺口），写入 findings.md | `gate check`, `matrix check`, `metrics coverage` |
-| 13 | orchestrate | `/spec-first:orchestrate` | strict | 主编排器：plan → 阶段 Skill → verify → advance | `stage current/advance`, `gate check`, `metrics health` |
+| 12 | verify | `/spec-first:verify` | auto | 校验报告（节点完成度 + 校验缺口），写入 findings.md | `status`, `validate format`, `validate links` |
+| 13 | orchestrate | `/spec-first:orchestrate` | strict | 主编排器：plan → 阶段 Skill → verify → transition | `status`, `transition`, `validate links` |
 
 ### 1.3 辅助 Skill（6 条）
 
@@ -49,9 +51,9 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 |---|-------|------|---------|------|---------|
 | 00 | first | `/spec-first:first` | auto | 项目快速认知（生成技术栈、架构文档） | 无 |
 | 00 | onboarding | `/spec-first:onboarding` | auto | 新手引导（场景识别与学习路径推荐） | 无 |
-| 14 | status | `/spec-first:status` | auto | 状态仪表盘（只读，不写文件） | `stage current`, `metrics health`, `feature current` |
+| 14 | status | `/spec-first:status` | auto | 状态仪表盘（只读，不写文件） | `status`, `feature current`, `validate links` |
 | 15 | doctor | `/spec-first:doctor` | auto | 环境诊断（只读，不写文件） | `spec-first doctor` |
-| 16 | sync | `/spec-first:sync` | assisted | 矩阵同步回填，审计日志写入 findings.md | `matrix update`, `matrix check`, `rfc list` |
+| 16 | sync | `/spec-first:sync` | assisted | 节点/文档同步回填，审计日志写入 findings.md | `status`, `validate links`, `rfc list` |
 | 17 | feature | `/spec-first:feature` | auto | Feature 查询/切换命令族 | `feature list/switch/current` |
 
 ### 1.4 质量保障 Skill（2 条）
@@ -126,24 +128,14 @@ P5_SIDE_EFFECT 矩阵校验、Gate 检查、更新运行态文件
 |------|------|------|
 | `spec-first init` | `--feat <abbr>` 必填；`--mode <N\|I>` 默认 N；`--size <S\|M\|L>` 默认 M；`--platforms <p1,p2,...>`；`[--feature-id <id>]`；`[--title <title>]` | 初始化 Feature 工作区，生成 stage-state.json + constitution.md |
 
-### 3.2 id（4 条）
+### 3.2 状态与校验（4 条）
 
 | 命令 | 参数 | 说明 |
 |------|------|------|
-| `spec-first id next` | `<type> <abbr> --feature <featureId> [--level <UT\|IT\|E2E\|ST>]`；type: FR\|DS\|TASK\|TC\|RFC；`--level` 仅 TC 需要 | 生成下一个全局唯一 ID |
-| `spec-first id validate` | `<id>` | 校验 ID 格式合法性 |
-| `spec-first id search` | `<query> --feature <featureId> [--type <type>]` | 模糊搜索已注册 ID |
-| `spec-first id list` | `--feature <featureId> [--type <type>]` | 列出已注册 ID |
-
-ID 格式规则：
-
-| 类型 | 格式 | 示例 |
-|------|------|------|
-| FR | `FR-<ABBR>-NNN` | FR-AUTH-001 |
-| DS | `DS-<ABBR>-NNN` | DS-AUTH-001 |
-| TASK | `TASK-<ABBR>-NNN` | TASK-AUTH-001 |
-| TC | `TC-<LEVEL>-<ABBR>-NNN` | TC-UT-AUTH-001 |
-| RFC | `RFC-NNN` | RFC-001 |
+| `spec-first status` | `<featureId>` | 查看节点状态与任务进度 |
+| `spec-first validate format` | `<featureId>` | 校验产物格式 |
+| `spec-first validate links` | `<featureId>` | 校验文档关联 |
+| `spec-first transition` | `<featureId>` | 推进或取消节点 |
 
 ### 3.3 stage（3 条）
 
@@ -165,39 +157,20 @@ ID 格式规则：
 | `spec-first matrix export` | `<featureId> [--format <markdown\|yaml>]` | 导出追踪矩阵 |
 | `spec-first matrix update` | `<featureId> <id> [--status <status>] [--title <title>] [--upstream <ids>] [--downstream <ids>]` | 更新矩阵行 |
 
-### 3.5 gate（3 条）
+### 3.5 已退场命令
 
-| 命令 | 参数 | 说明 |
-|------|------|------|
-| `spec-first gate check` | `<featureId>` | 校验当前阶段 Gate 条件 |
-| `spec-first gate conditions` | `<featureId>` | 查看 Gate 条件定义 |
-| `spec-first gate history` | `<featureId>` | 查看 Gate 评估历史 |
+以下命令族已退场，仅作为历史兼容说明：
 
-Gate 结果：`PASS`（通过）| `PASS_WITH_WAIVER`（有豁免的通过）| `FAIL`（阻断）
+- `spec-first gate`
+- `spec-first golive`
+- `spec-first metrics`
 
-### 3.6 golive（1 条）
+当前请优先使用：
 
-| 命令 | 参数 | 说明 |
-|------|------|------|
-| `spec-first golive check` | `<featureId>` | 上线前检查（Gate 全通过、覆盖率达标、无未关闭缺陷） |
-
-### 3.7 metrics（3 条）
-
-| 命令 | 参数 | 说明 |
-|------|------|------|
-| `spec-first metrics coverage` | `<featureId>` | 计算核心 5 项覆盖率指标 |
-| `spec-first metrics report` | `<featureId>` | 生成综合度量报告 |
-| `spec-first metrics health` | `<featureId>` | 健康分（加权综合评分） |
-
-核心 5 项覆盖率指标：
-
-| 指标 | 含义 |
-|------|------|
-| C3 Task Coverage | 被 TASK 覆盖的 FR 比例 |
-| C4 Test Coverage (FR) | 被 TC 覆盖的 FR 比例 |
-| C6 Impl Coverage | 已实现的 TASK 比例 |
-| C8 Task Compliance | 关联 DS/FR 的 TASK 比例 |
-| C9 TC Compliance | 关联 AC/FR 的 TC 比例 |
+- `spec-first status <featureId>`
+- `spec-first validate format <featureId>`
+- `spec-first validate links <featureId>`
+- `spec-first done <featureId>`
 
 > **注意**：历史版本的 C1/C2/C5/C7 已归档，当前版本使用核心 5 指标。
 

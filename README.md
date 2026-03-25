@@ -23,15 +23,15 @@ Spec-First solves this at the process level, not the prompt level:
 | Symptom | Root Cause | Spec-First Solution |
 |---|---|---|
 | AI generates code inconsistent with earlier decisions | No persistent semantic context between sessions | `specs/<featureId>/` directory as the single source of truth across all sessions |
-| Unvalidated AI output reaches production | No enforcement layer between generation and commit | Stage-gated state machine — each stage requires explicit gate passage before advancing |
-| "Why was this written this way?" is unanswerable | No artifact linkage from requirements to implementation | 14-type traceability ID system covering the full FR → DS → TASK → TC chain |
+| Unvalidated AI output reaches production | No enforcement layer between generation and commit | Node-based state machine with node-local checklists and readiness checks |
+| "Why was this written this way?" is unanswerable | No artifact linkage from requirements to implementation | Node summaries, task plans, and stage artifacts keep the delivery story readable |
 | Every developer prompts AI differently | No shared execution protocol | 20 Skills with a unified 6-phase execution model (P0–P5) |
 
 ---
 
 ## How It Works
 
-Spec-First wraps your AI workflow in a structured state machine. A feature begins at `00_init` and can only advance when each stage's quality gate passes.
+Spec-First wraps your AI workflow in a structured state machine. A feature begins at `00_init` and advances when the current node is complete and the target node is ready.
 
 ```
 [Idea] → 00_init → 01_specify → 02_design → 03_plan → 04_implement → 05_verify → 06_wrap_up → 07_release → 08_done
@@ -46,8 +46,8 @@ P0  LOCATE       — Resolve the active feature and validate the current stage
 P1  CONTEXT      — Load the spec directory, prior artifacts, and run history
 P2  GENERATE     — AI inference produces a structured draft artifact
 P3  CONFIRM      — User reviews, iterates, or rejects (multi-round supported)
-P4  WRITE        — Finalized artifact is written and traceability IDs are registered
-P5  SIDE EFFECTS — Sync tracking matrix, trigger gate evaluation, update runtime state
+P4  WRITE        — Finalized artifact is written and node summary is updated
+P5  SIDE EFFECTS — Sync runtime state, refresh readiness notice, update surrounding notices
 ```
 
 This means every AI action is **locatable, context-aware, confirmable, and auditable**.
@@ -123,9 +123,10 @@ It compresses the original requirement into an owner-scoped PRD, side requiremen
 ```bash
 spec-first feature current          # Which feature am I on?
 spec-first stage current            # Which stage is active?
-spec-first gate                     # Are all gate conditions passing?
-spec-first metrics report           # Coverage and health score
-spec-first golive check <featureId> # Pre-release readiness check
+spec-first status                   # Node summary, task progress, and next step
+spec-first transition <featureId>   # Move to the next node
+spec-first validate format <featureId> # Validate artifact format
+spec-first validate links <featureId>  # Validate document links when present
 ```
 
 ---
@@ -145,19 +146,19 @@ Every feature advances through eight active stages — each with blocking gate c
 | `04_implement` | Spec-linked code commits | `/spec-first:code` |
 | `05_verify` | Test cases and document-link evidence | `/spec-first:verify` |
 | `06_wrap_up` | Retrospective document | `/spec-first:archive` |
-| `07_release` | Smoke test report + release note | `spec-first golive check` |
+| `07_release` | Smoke test report + release note | `spec-first done` |
 | `08_done` | *(terminal)* | `spec-first done` |
 | `09_cancelled` | *(terminal)* | `spec-first stage cancel` |
 
-### Quality Gates
+### Node Readiness & Validation
 
-Each stage defines blocking conditions that must pass before the stage can advance. Gate evaluation is deterministic and CI-compatible.
+`status` shows the current node summary and next suggested action. `transition` moves to the next node. `validate` handles artifact format and document-link checks when those artifacts are present.
 
 ```bash
-spec-first gate                              # Evaluate current stage
-spec-first gate --stage 04_implement         # Evaluate a specific stage
-spec-first golive check <featureId>          # Full pre-release gate (07_release)
-spec-first metrics report --feature <featureId>  # Generate document-link metrics report
+spec-first status                             # Show node summary and next step
+spec-first transition <featureId>             # Advance to the next node
+spec-first validate format <featureId>        # Validate artifact format
+spec-first validate links <featureId>         # Validate document-link YAML
 ```
 
 ### Full-Lifecycle Traceability
@@ -174,9 +175,9 @@ Feature                                    ← feature-level tracking
 14 ID types in total. Every ID is registered, searchable, and validated.
 
 ```bash
-spec-first id generate FR        # Generate a new requirement ID
-spec-first id verify FR-001      # Confirm ID is registered and linked
-spec-first docs links validate   # Validate document-link index
+spec-first status                    # Inspect node and task progress
+spec-first transition <featureId>     # Advance the feature node
+spec-first validate links <featureId> # Validate document-link YAML when used
 ```
 
 ### 20 Built-in Skills
@@ -187,7 +188,7 @@ Skills are the AI-facing interface. Each Skill executes the deterministic P0–P
 |---|---|
 | **Onboarding** | `onboarding`, `first` |
 | **Core Stages** | `init`, `spec`, `design`, `research`, `task`, `code`, `review`, `archive`, `catchup` |
-| **Orchestration** | `plan`, `verify`, `orchestrate`, `status`, `sync`, `feature`, `doctor` |
+| **Orchestration** | `plan`, `verify`, `orchestrate`, `status`, `transition`, `sync`, `feature`, `doctor` |
 | **Quality** | `spec-review`, `analyze` |
 
 ### Host Integration and Automation

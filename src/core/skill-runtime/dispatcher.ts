@@ -82,14 +82,10 @@ const SEMANTIC_MAP: Record<string, { command: string; argTemplate: string }> = {
 
 /** Runtime 路由命令列表（直接映射 CLI 原子命令） */
 const RUNTIME_COMMANDS = new Set([
-  'id',
   'docs',
   'stage',
   'rfc',
   'defect',
-  'metrics',
-  'gate',
-  'golive',
   'ai',
   'commit',
   'feature',

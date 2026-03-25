@@ -9,6 +9,7 @@
 > - 用户应使用协同 Skill：`/plan`、`/verify`、`/orchestrate`
 > - 本文档面向 Skill 开发者和系统维护者
 > - 不覆盖外部 AI 资源 `.claude/commands/*`、`.claude/skills/*`、`.claude/hooks/*`
+> - 当前主流程已迁移到 `status / transition / validate / done`；`id / gate / golive / metrics / trace / docs links` 仅保留为历史兼容说明
 
 ---
 
@@ -21,7 +22,7 @@
   ↓
 阶段 Skill: /skill 01-spec-write, /skill 02-design-write, ...
   ↓
-CLI 命令层（本文档）: spec-first init, spec-first id next, ...
+CLI 命令层（本文档）: spec-first init, spec-first status, spec-first transition, spec-first validate, ...
 ```
 
 ## 命令总览
@@ -144,69 +145,32 @@ spec-first stage cancel <featureId> --reason "原因"
 
 ---
 
-## 3. `spec-first id`
+## 3. 已退场：`spec-first id`
 
-### 3.1 生成下一个 ID
+`spec-first id` 已退场。当前需要查看节点/产物信息时，请改用：
 
-```bash
-spec-first id next <type> <abbr> --feature <featureId> [--level <UT|IT|E2E|ST>]
-```
-
-| 参数/选项 | 必填 | 说明 |
-|---|---|---|
-| `<type>` | 是 | `FR`/`DS`/`TASK`/`TC`/`RFC`/`REQ`/`SYS`/`ARCH`/`MOD`/`ATP`/`STP`/`ITP`/`UTP` |
-| `<abbr>` | 是 | FEAT 缩写 |
-| `--feature <featureId>` | 是 | Feature ID |
-| `--level <UT\|IT\|E2E\|ST>` | 否 | TC 级别（仅 type=TC 时需要） |
-
-### 3.2 校验 ID 格式
-
-```bash
-spec-first id validate <id>
-```
-
-### 3.3 搜索 ID
-
-```bash
-spec-first id search <query> --feature <featureId> [--type <type>]
-```
-
-### 3.4 列出 ID
-
-```bash
-spec-first id list --feature <featureId> [--type <type>]
-```
+- `spec-first status <featureId>` 查看节点状态与任务进度
+- `spec-first validate format <featureId>` 校验产物格式
+- `spec-first validate links <featureId>` 校验文档关联
+- `spec-first transition <featureId>` 推进或取消节点
 
 ---
 
 ## 4. `spec-first gate`
 
-### 4.1 执行 Gate 校验
-
-```bash
-spec-first gate check <featureId>
-```
-
-### 4.2 查看阶段 Gate 条件
-
-```bash
-spec-first gate conditions <featureId>
-```
-
-### 4.3 查看 Gate 历史
-
-```bash
-spec-first gate history <featureId>
-```
+`spec-first gate` 已退场。当前推进链路请使用：
+- `spec-first status <featureId>` 查看节点状态
+- `spec-first transition <featureId>` 推进或取消节点
+- `spec-first validate links <featureId>` 校验文档关联
 
 ---
 
-## 5. `spec-first golive`
+## 5. 已退场：`spec-first golive`
 
-### 5.1 上线就绪检查
+`spec-first golive` 已退场，收口到 08_done 请使用：
 
 ```bash
-spec-first golive check <featureId>
+spec-first done <featureId>
 ```
 
 ---
@@ -233,24 +197,14 @@ spec-first matrix update <featureId> <rowId> [options]
 
 ---
 
-## 7. `spec-first metrics`
+## 7. 已退场：`spec-first metrics`
 
-### 7.1 查看覆盖率
-
-```bash
-spec-first metrics coverage <featureId> [--json]
-```
-
-### 7.2 生成度量报告
+`spec-first metrics` 已退场。当前建议使用：
 
 ```bash
-spec-first metrics report <featureId>
-```
-
-### 7.3 查看健康分
-
-```bash
-spec-first metrics health <featureId>
+spec-first status <featureId>
+spec-first validate format <featureId>
+spec-first validate links <featureId>
 ```
 
 ---
@@ -449,18 +403,12 @@ spec-first analyze <featureId>
 
 ---
 
-## 17. `spec-first trace`
+## 17. 已退场：`spec-first trace`
 
-### 17.1 修复追溯链
-
-```bash
-spec-first trace fix <featureId>
-```
-
-### 17.2 校验追溯链
+`spec-first trace` 已退场，文档关联与追溯校验统一使用：
 
 ```bash
-spec-first trace validate <featureId>
+spec-first validate links <featureId>
 ```
 
 ---
@@ -492,13 +440,13 @@ spec-first validate all <featureId>
 | 阶段 | 常用命令 |
 |---|---|
 | `00_init` | `spec-first init ...` |
-| `01_specify` | `spec-first id next FR ...`、`spec-first id validate ...` |
-| `02_design` | `spec-first id next DS ...`、`spec-first matrix check ...` |
-| `03_plan` | `spec-first id next TASK ...`、`spec-first metrics coverage ...` |
-| `04_implement` | `spec-first stage current ...`、`spec-first matrix export ...` |
-| `05_verify` | `spec-first metrics report ...`、`spec-first gate check ...` |
-| `06_wrap_up` | `spec-first matrix check ...`、`spec-first gate history ...` |
-| `07_release` | `spec-first gate check ...`、`spec-first stage advance ...` |
+| `01_specify` | `spec-first status ...`、`spec-first validate format ...` |
+| `02_design` | `spec-first validate links ...`、`spec-first matrix check ...` |
+| `03_plan` | `spec-first status ...`、`spec-first validate links ...` |
+| `04_implement` | `spec-first status ...`、`spec-first matrix export ...` |
+| `05_verify` | `spec-first validate format ...`、`spec-first validate links ...` |
+| `06_wrap_up` | `spec-first status ...`、`spec-first validate links ...` |
+| `07_release` | `spec-first transition ...`、`spec-first done ...` |
 | 任意阶段（变更） | `spec-first rfc ...`、`spec-first defect ...` |
 | 任意阶段（AI） | `spec-first ai context ...`、`spec-first ai catchup ...` |
 

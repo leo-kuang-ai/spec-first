@@ -361,11 +361,11 @@ digraph status_flow {
 ## CLI 依赖
 
 - `spec-first stage current`
-- `spec-first metrics health`
-- `spec-first metrics report`
-- `spec-first metrics health`
+- `spec-first status`
+- `spec-first validate format`
+- `spec-first validate links`
 - `spec-first feature current`
-- `spec-first gate check`
+- `spec-first transition`
 
 ## 输出路径
 

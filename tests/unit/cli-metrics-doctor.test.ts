@@ -64,10 +64,10 @@ describe('handleMetrics', () => {
     expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
-  it('should return SUCCESS with valid document links', () => {
+  it('should return VALIDATION_ERROR for retired metrics command', () => {
     writeFileSync(join(TMP, 'specs', FEAT, 'spec.md'), '# Spec\n', 'utf-8');
     const code = withCwd(TMP, () => handleMetrics(['report', FEAT]));
-    expect(code).toBe(ExitCode.SUCCESS);
+    expect(code).toBe(ExitCode.VALIDATION_ERROR);
   });
 
   it('should return VALIDATION_ERROR when feature does not exist', () => {

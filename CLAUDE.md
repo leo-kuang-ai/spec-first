@@ -13,14 +13,14 @@ Spec-First 全链路研发闭环引擎——阶段状态机驱动 Feature 从需
 | 禁止手动编辑的文件 | 正确操作 | 风险等级 |
 |-------------------|---------|---------|
 | `stage-state.json` | `spec-first stage advance` | 🔴 高（状态机不可逆） |
-| `document-links.yaml` | `spec-first docs links validate` | 🟠 中（引用会失准） |
+| `document-links.yaml` | `spec-first validate links` | 🟠 中（引用会失准） |
 | `specs/` 下状态与报告文件（`todo-state.json`、`reports/`） | 对应 CLI 子命令 | 🟠 中 |
 
 > **可以编辑**：`specs/{featureId}/` 下的规范产物（`spec.md`、`design.md`、`task_plan.md`、`prd.md` 等文档）。
 >
 > **CLI 不可用时的降级**（按风险分层）：
 > - `stage advance`：**永不降级**，直接告知用户 CLI 不可用，等待人工操作
-> - `docs links validate`：可临时跳过，记录原因，任务完成后提醒用户手动补校验
+> - `validate links`：可临时跳过，记录原因，任务完成后提醒用户手动补校验
 > - 其他状态文件：仅读取不写入，告知用户需补 CLI 命令
 
 **违规后果**：手动修改状态文件会导致 Gate 校验失准、覆盖率数据污染、审计日志断裂。如用户坚持要求手动编辑，Claude 应明确说明风险并拒绝执行，建议改为使用对应 CLI 命令。
@@ -149,13 +149,11 @@ npm run format             # prettier 格式化
 # Spec-First CLI（常用，含参数示例）
 spec-first feature current                          # 查看当前 featureId
 spec-first feature switch FSREQ-20260313-UIOPT-001  # 切换 Feature
-spec-first gate check --feature <featureId>         # 执行 Gate 校验
-spec-first gate check --feature <featureId> --stage 03_plan  # 指定阶段
-spec-first docs links validate --feature <featureId> # 校验文档关联
-spec-first stage advance --feature <featureId>      # 推进阶段（须先通过 Gate）
-spec-first metrics --feature <featureId>            # 查看 C3/C4/C6/C8/C9
-spec-first id search FR-UIOPT-001                   # 追溯某 ID 的上下游
-spec-first id generate FR --feature <featureId>     # 生成新 FR ID
+spec-first status <featureId>                       # 查看节点状态与任务进度
+spec-first transition <featureId>                   # 推进节点 / 取消 Feature
+spec-first validate format <featureId>              # 校验产物格式
+spec-first validate links <featureId>               # 校验文档关联
+spec-first done <featureId>                         # 收口到 08_done
 spec-first defect create --feature <featureId>      # 创建缺陷记录
 spec-first rfc create --feature <featureId>         # 创建变更请求
 ```

@@ -8,6 +8,8 @@
 
 **spec-first** 是一个 AI-workflow CLI 工具，为 AI 时代的研发团队提供规范驱动开发（Spec-Driven Development）的完整解决方案。
 
+> 运行时说明：当前主流程已切换为 `FeatureState / NodeState`、`transition`、`readiness-check` 与节点内 checklist。旧的 `gate / id / trace / document-links / metrics / golive` 命令已退场，不再作为主入口展示。
+
 **核心价值**：
 - **阶段状态机** — 驱动 Feature 从需求到上线的完整生命周期
 - **质量门禁** — 自动化校验规范合规性，防止不合格产物流转
@@ -168,19 +170,18 @@ V-Model 追溯:
 |------|------|------|
 | **核心流程** | `init` | 初始化 Feature 或项目 |
 | | `stage` | 阶段查看与推进建议 |
-| | `gate` | Gate 校验与 GoLive |
+| | `transition` | 节点流转与取消 |
 | | `feature` | Feature 管理（list/switch/current） |
 | | `done` | 完成 Feature |
 | **追溯管理** | `trace` | 追溯矩阵查看 |
-| | `id` | ID 生成/搜索/校验 |
+| | `validate` | 产物格式与文档关联校验 |
 | | `defect` | 缺陷跟踪 |
 | | `rfc` | RFC 变更请求管理 |
 | **AI 调度** | `skill` | Skill 调用 |
 | | `ai` | AI 会话恢复与 catchup |
 | | `orchestrate` | 受控编排 |
 | | `first` | 项目首轮认知校验 |
-| **文档管理** | `docs-links` | 文档关联校验 |
-| | `viewer` | 文档查看器 |
+| **文档管理** | `viewer` | 文档查看器 |
 | **指标分析** | `metrics` | 覆盖率度量 |
 | | `analyze` | 跨产物一致性分析 |
 | | `status` | 状态概览 |
@@ -260,9 +261,11 @@ npm run format             # prettier 格式化
 # Spec-First CLI
 spec-first feature current                    # 查看当前 featureId
 spec-first feature switch <featureId>         # 切换 Feature
-spec-first gate check --feature <featureId>   # 执行 Gate 校验
-spec-first stage advance --feature <featureId> # 推进阶段（须先通过 Gate）
-spec-first id search FR-xxx                   # 追溯某 ID 的上下游
+spec-first status <featureId>                 # 查看节点状态与任务进度
+spec-first transition <featureId>             # 推进节点 / 取消 Feature
+spec-first validate format <featureId>        # 执行产物格式校验
+spec-first validate links <featureId>         # 执行文档关联校验
+spec-first done <featureId>                   # 推进到 08_done
 ```
 
 **证据**: `package.json:9-29`, `CLAUDE.md:115-132`
@@ -306,7 +309,7 @@ tests/        # 测试目录
 | 文件 | 正确操作 | 风险等级 |
 |------|---------|---------|
 | `stage-state.json` | `spec-first stage advance` | 高（状态机不可逆） |
-| `document-links.yaml` | `spec-first docs links validate` | 中（引用会失准） |
+| `document-links.yaml` | `spec-first validate links` | 中（引用会失准） |
 | `specs/*/todo-state.json` | 对应 CLI 子命令 | 中 |
 
 **证据**: `CLAUDE.md:10-25`

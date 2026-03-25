@@ -1,3 +1,4 @@
+import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   ExitCode,
@@ -11,13 +12,8 @@ import { currentFeature, resolveFeatureId } from '../../core/process-engine/feat
 import { readTaskPlan } from '../../core/task-plan/parser.js';
 import { checkFirstDocsExistence } from '../../core/skill-runtime/first-docs-check.js';
 import { readFirstRuntimeIndex } from '../../core/skill-runtime/first-runtime-store.js';
-import { detectBottlenecks } from '../../core/metrics-engine/bottleneck.js';
-import { calcHealthScore } from '../../core/metrics-engine/health-score.js';
-import { getDocumentMetrics } from './metrics.js';
 import { checkReadiness } from '../../core/process-engine/readiness-check.js';
 import { getNextStages } from '../../core/process-engine/stage-machine.js';
-import { readdirSync } from 'node:fs';
-import type { DocumentMetrics } from '../../core/metrics-engine/health-score.js';
 
 type CanonicalTaskStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
 
@@ -48,9 +44,6 @@ export function handleStatus(args: string[]): number {
   const taskCounts = summarizeTaskCounts(taskPlan);
   const currentNode = state.nodes?.[state.currentStage];
   const background = readBackgroundLayers(projectRoot, state);
-  const metrics = safeGetDocumentMetrics(featureId, projectRoot);
-  const health = metrics ? calcHealthScore(metrics, 0, 0) : null;
-  const bottlenecks = metrics ? detectBottlenecks(metrics) : [];
   const nextStage = getNextStages(state.currentStage).find((stage) => stage !== Stage.CANCELLED);
   const readiness = nextStage
     ? checkReadiness({
@@ -78,18 +71,7 @@ export function handleStatus(args: string[]): number {
   console.log(`docs 输出: ${background.docsOutputs}`);
   console.log(`同步状态: ${background.syncStatus}`);
   console.log('');
-  if (metrics && health) {
-    console.log('文档指标:');
-    console.log(`  声明文档数: ${metrics.declaredDocCount}`);
-    console.log(`  已存在文档数: ${metrics.existingDocCount}`);
-    console.log(`  已建立引用文档数: ${metrics.linkedDocCount}`);
-    console.log(`  坏引用数: ${metrics.brokenReferenceCount}`);
-    console.log('');
-    console.log(`健康分: ${health.H1} (${health.grade})`);
-  } else {
-    console.log('文档指标: 不可用（缺少 document-links.yaml）');
-    console.log('健康分: N/A');
-  }
+  console.log('文档指标: 已退场（不再依赖 document-links.yaml）');
   console.log('');
   console.log('任务进度（canonical 状态）:');
   console.log(`  done: ${taskCounts.done}`);
@@ -106,11 +88,8 @@ export function handleStatus(args: string[]): number {
     console.log('');
   }
 
-  if (bottlenecks.length > 0 || background.syncStatus !== 'ready') {
+  if (background.syncStatus !== 'ready') {
     console.log('风险:');
-    for (const bottleneck of bottlenecks) {
-      console.log(`  [${bottleneck.severity}] ${bottleneck.rule}: ${bottleneck.description}`);
-    }
     if (background.runtimeTruth !== 'current') console.log('  [medium] runtime 真源异常');
     if (background.docsOutputs === 'missing') console.log('  [medium] docs 输出缺失');
     if (background.syncStatus === 'attention') console.log('  [medium] 同步状态异常');
@@ -184,17 +163,6 @@ function collectArtifacts(projectRoot: string, featureId: string): string[] {
   return readdirSync(featureDir, { withFileTypes: true })
     .filter((entry) => entry.isFile())
     .map((entry) => entry.name);
-}
-
-function safeGetDocumentMetrics(featureId: string, projectRoot: string): DocumentMetrics | null {
-  try {
-    return getDocumentMetrics(featureId, projectRoot);
-  } catch (error) {
-    if ((error as Error).message.includes('document-links.yaml')) {
-      return null;
-    }
-    throw error;
-  }
 }
 
 function resolveSuggestedCommand(

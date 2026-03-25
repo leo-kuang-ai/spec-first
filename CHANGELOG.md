@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- v1.2.4 2026-03-25 Claude: docs(architecture): 完善系统架构重构文档 — 修正实施清单中的文件操作类型、补充 pnpm 依赖说明、拆分 Task 3 为两个子任务降低变更风险、补充实施原则
 - v1.2.3 2026-03-24 Claude: docs(focus-requirements): 深度审查 skill 并创建 REVIEW.md — 分析核心价值（需求边界切割器）、发现 7 类问题、输出优化建议与实施路线图 (user-visible)
 - v1.2.3 2026-03-24 Claude: fix(focus-requirements): 移除 Telemetry 死代码 — 引用的脚本路径不存在，删除整个 Telemetry 部分
 - v1.2.3 2026-03-24 Claude: fix(focus-requirements): 同步 SKILL.zh.md — 添加 Preamble 部分、补全"最终回复格式"缺失的两个要点

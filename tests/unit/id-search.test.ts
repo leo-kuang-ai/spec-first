@@ -90,22 +90,13 @@ describe('listIds', () => {
 
 
 import { handleId } from '../../src/cli/commands/id.js';
-import { vi } from 'vitest';
 
 describe('id command feature resolution', () => {
-  it('should resolve feature prefix for id list', () => {
-    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    const code = withCwd(TMP, () => handleId(['list', '--feature', 'FSREQ-20260211-AUT']));
-    expect(code).toBe(0);
-    expect(log.mock.calls.some((call) => String(call[0]).includes('FR-AUTH-001'))).toBe(true);
-    log.mockRestore();
+  it('should retire id list command', () => {
+    expect(withCwd(TMP, () => handleId(['list', '--feature', 'FSREQ-20260211-AUT']))).toBe(2);
   });
 
-  it('should resolve feature prefix for id search', () => {
-    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    const code = withCwd(TMP, () => handleId(['search', 'AUTH', '--feature', 'FSREQ-20260211-AUT']));
-    expect(code).toBe(0);
-    expect(log.mock.calls.some((call) => String(call[0]).includes('FR-AUTH-001'))).toBe(true);
-    log.mockRestore();
+  it('should retire id search command', () => {
+    expect(withCwd(TMP, () => handleId(['search', 'AUTH', '--feature', 'FSREQ-20260211-AUT']))).toBe(2);
   });
 });

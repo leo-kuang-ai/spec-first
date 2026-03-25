@@ -353,8 +353,7 @@ describe('handleStatus', () => {
     expect(stdout).toContain('runtime 真源: current');
     expect(stdout).toContain('docs 输出: ready');
     expect(stdout).toContain('同步状态: ready');
-    expect(stdout).toContain('声明文档数: 3');
-    expect(stdout).toContain('已存在文档数: 3');
+    expect(stdout).toContain('文档指标: 已退场');
     expect(stdout).toContain('done: 1');
     expect(stdout).toContain('in_progress: 1');
     expect(stdout).toContain('todo: 1');
