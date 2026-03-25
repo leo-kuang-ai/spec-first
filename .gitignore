@@ -13,3 +13,4 @@ coverage/
 # IDE and history
 .cursor/
 .history/
+.planning/
