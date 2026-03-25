@@ -98,7 +98,7 @@ Depending on the platforms you enable, spec-first also creates tool-specific int
 
 At a high level, the workflow is simple:
 
-1. Define standards in specs.
+1. Define standards in specs. `spec-first init` creates the initial `.spec-first/spec/` skeleton; later learning is written back with `$update-spec` / `/spec:update-spec`.
 2. Start or refine work from a task PRD.
 3. Let spec-first inject the right context for the current task.
 4. Use checks, journals, and worktrees to keep quality and continuity intact.
@@ -113,6 +113,8 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 ```
 
 Browse available templates and learn how to publish your own on the [Spec Templates page](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md).
+
+`spec-first update` upgrades the framework and platform wiring. It does not rewrite your project `spec/` files; knowledge capture happens through `$update-spec` / `/spec:update-spec`.
 
 ## FAQ
 
