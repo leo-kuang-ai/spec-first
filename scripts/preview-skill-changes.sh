@@ -28,8 +28,6 @@ for old, new in [
     ("spec init", "spec-first init"),
     ("spec update", "spec-first update"),
     ("spec --version", "spec-first --version"),
-    ("@mindfoldhq/trellis", "spec-first"),
-    ("TRELLIS FEATURE LAYERS", "SPEC-FIRST FEATURE LAYERS"),
 ]:
     text = text.replace(old, new)
 path.write_text(text, encoding="utf-8")

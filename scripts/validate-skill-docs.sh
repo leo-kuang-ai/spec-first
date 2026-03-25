@@ -16,8 +16,6 @@ LEGACY_PATTERNS=(
   "\\bspec init\\b"
   "\\bspec update\\b"
   "spec --version"
-  "@mindfoldhq/trellis"
-  "TRELLIS FEATURE LAYERS"
 )
 
 found=0

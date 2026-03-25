@@ -5,11 +5,11 @@
 
 <p align="center">
 <a href="./README.md">English</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md">文档</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md">快速开始</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md">文档</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md">快速开始</a> •
 <a href="https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md">支持平台</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md">使用场景</a> •
-<a href="#wechat-group">微信群</a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md">使用场景</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md">记忆体系</a> •
 </p>
 
 <p align="center">
@@ -17,8 +17,7 @@
 <a href="https://www.npmjs.com/package/spec-first"><img src="https://img.shields.io/npm/dw/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
 <a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
 <a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
-<a href="https://discord.com/invite/tWcCZ3aRHc"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
 <a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/sunrain520/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
 <a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/sunrain520/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
 <a href="https://deepwiki.com/sunrain520/spec-first"><img src="https://img.shields.io/badge/Ask-DeepWiki-blue?style=flat-square" alt="Ask DeepWiki" /></a>
@@ -52,9 +51,17 @@ spec-first init --cursor --opencode --codex -u your-name
 - `-u your-name` 会创建 `.spec-first/workspace/your-name/`，用来保存个人 journal 和会话连续性。
 - 平台参数可以自由组合。当前可选项包括 `--cursor`、`--opencode`、`--iflow`、`--codex`、`--kilo`、`--kiro`、`--gemini`、`--antigravity`、`--qoder` 和 `--codebuddy`。
 - 更完整的安装步骤、各平台入口命令和升级方式放在文档站：
-  [快速开始](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) •
+  [快速开始](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) •
   [支持平台](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
-  [使用场景](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md)
+  [使用场景](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) •
+  [记忆体系](https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md)
+
+## 核心文档
+
+- [工作流分析](https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md) - 说明 init、任务、上下文、会话记录是怎么串起来的
+- [首次接入已有项目流程分析](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) - 现有仓库第一次接入时该怎么做
+- [记忆体系分析](https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md) - 说明项目知识、任务、workspace、journal 如何形成可恢复记忆
+- [已存在项目需求迭代流程分析](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) - 说明日常需求迭代的任务驱动流程
 
 ## 使用场景
 
@@ -107,14 +114,6 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 
 浏览可用模板和了解如何发布你自己的模板，请查看 [Spec 模板页面](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md)。
 
-## 最新进展
-
-- **v0.4.0-beta.8**：增强 CLI 输出、改进技能发现、优化归档和文档链接契约、整合工作区更新。
-- **v0.3.6**：任务生命周期 hooks、自定义模板仓库（`--registry`）、父子 subtask、修复 CC v2.1.63+ PreToolUse hook 失效。
-- **v0.3.5**：修复 Kilo workflows 删除迁移清单字段名。
-- **v0.3.4**：Qoder 平台支持、Kilo workflows 迁移、record-session 任务感知。
-- **v0.3.0**：支持平台从 2 个扩展到 10 个、Windows 兼容、远程 Spec 模板、`/spec:brainstorm`。
-
 ## 常见问题
 
 <details>
@@ -151,24 +150,16 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 
 ## 社区与资源
 
-- [官方文档](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md) - 产品说明和工作流分析
-- [快速开始](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) - 在现有仓库里快速接入
+- [工作流分析](https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md) - 产品说明和工作流分析
+- [首次接入已有项目流程分析](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) - 在现有仓库里快速接入
 - [支持平台](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) - 各平台的接入方式和命令差异
-- [使用场景](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md) - 看 spec-first 在真实任务里怎么落地
+- [记忆体系分析](https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md) - 项目知识、任务和会话历史如何留存
+- [已存在项目需求迭代流程分析](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) - 看 spec-first 在真实任务里怎么落地
 - [Marketplace](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md) - 模板包和安装说明
 - [GitHub Issues](https://github.com/sunrain520/spec-first/issues) - 提 Bug 或功能建议
-- [Discord](https://discord.com/invite/tWcCZ3aRHc) - 加入社区讨论
-
-<a id="wechat-group"></a>
-
-### 微信群
-
-<p align="center">
-<img src="assets/wx_link3.jpg" alt="spec-first AI 框架中文社群二维码" width="260" />
-</p>
 
 <p align="center">
 <a href="https://github.com/sunrain520/spec-first">官方仓库</a> •
 <a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE">AGPL-3.0 License</a> •
-Built by <a href="https://github.com/mindfold-ai">Mindfold</a>
+Built by <a href="https://github.com/sunrain520">sunrain520</a>
 </p>

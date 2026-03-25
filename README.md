@@ -1,14 +1,15 @@
 <p align="center">
-<strong>A multi-platform AI coding framework that rules</strong><br/>
+<strong>A multi-platform AI coding workflow for specs, tasks, and session history</strong><br/>
 <sub>Supports Claude Code, Cursor, OpenCode, iFlow, Codex, Kilo, Kiro, Gemini CLI, Antigravity, Qoder, and CodeBuddy.</sub>
 </p>
 
 <p align="center">
 <a href="./README_CN.md">简体中文</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md">Docs</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md">Quick Start</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md">Docs</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md">Quick Start</a> •
 <a href="https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md">Supported Platforms</a> •
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md">Use Cases</a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md">Use Cases</a> •
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md">Memory</a>
 </p>
 
 <p align="center">
@@ -16,8 +17,7 @@
 <a href="https://www.npmjs.com/package/spec-first"><img src="https://img.shields.io/npm/dw/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
 <a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
 <a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
-<a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
-<a href="https://discord.com/invite/tWcCZ3aRHc"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat-square&logo=discord&logoColor=white" alt="Discord" /></a>
+<a href="https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
 <a href="https://github.com/sunrain520/spec-first/issues"><img src="https://img.shields.io/github/issues/sunrain520/spec-first?style=flat-square&color=e67e22" alt="open issues" /></a>
 <a href="https://github.com/sunrain520/spec-first/pulls"><img src="https://img.shields.io/github/issues-pr/sunrain520/spec-first?style=flat-square&color=9b59b6" alt="open PRs" /></a>
 <a href="https://deepwiki.com/sunrain520/spec-first"><img src="https://img.shields.io/badge/Ask-DeepWiki-blue?style=flat-square" alt="Ask DeepWiki" /></a>
@@ -51,9 +51,17 @@ spec-first init --cursor --opencode --codex -u your-name
 - `-u your-name` creates `.spec-first/workspace/your-name/` for personal journals and session continuity.
 - Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
 - For platform-specific setup, entry commands, and upgrade paths, use the docs:
-  [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) •
+  [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) •
   [Supported Platforms](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
-  [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md)
+  [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) •
+  [Memory System](https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md)
+
+## Core Docs
+
+- [Workflow Analysis](https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md) - How the init, task, context, and session pipeline fits together
+- [First-Time Existing Project](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) - What to do before the first real task in an existing repo
+- [Memory System](https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md) - How specs, tasks, workspaces, and journals form recoverable memory
+- [Existing Project Iteration](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) - The task-driven flow for day-to-day delivery
 
 ## Use Cases
 
@@ -106,14 +114,6 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 
 Browse available templates and learn how to publish your own on the [Spec Templates page](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md).
 
-## What's New
-
-- **v0.4.0-beta.8**: Enhanced CLI output, improved skill discovery, refined archive and docs-link contracts, consolidated workspace updates.
-- **v0.3.6**: Task lifecycle hooks, custom template registries (`--registry`), parent-child subtasks, fix PreToolUse hook for CC v2.1.63+.
-- **v0.3.5**: Hotfix for delete migration manifest field name (Kilo workflows).
-- **v0.3.4**: Qoder platform support, Kilo workflows migration, record-session task awareness.
-- **v0.3.0**: Platform support expanded from 2 to 10, Windows compatibility, remote spec templates, `/spec:brainstorm`.
-
 ## FAQ
 
 <details>
@@ -150,16 +150,16 @@ Yes. Personal workspace journals stay separate per developer, while shared specs
 
 ## Community & Resources
 
-- [Official Docs](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md) - Product docs and workflow analysis
-- [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-first-time-existing-project.md) - First-time setup for existing projects
+- [Official Docs](https://github.com/sunrain520/spec-first/blob/master/docs/工作流分析.md) - Product docs and workflow analysis
+- [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) - First-time setup for existing projects
 - [Supported Platforms](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) - Platform-specific setup and command details
-- [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/trellis-existing-project-iteration.md) - See how the workflow plays out in practice
+- [Memory System](https://github.com/sunrain520/spec-first/blob/master/docs/记忆体系分析.md) - How project knowledge, tasks, and journals stay recoverable
+- [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) - See how the workflow plays out in practice
 - [Marketplace](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md) - Template packs and installation guidance
 - [GitHub Issues](https://github.com/sunrain520/spec-first/issues) - Report bugs or request features
-- [Discord](https://discord.com/invite/tWcCZ3aRHc) - Join the community
 
 <p align="center">
 <a href="https://github.com/sunrain520/spec-first">Official Repository</a> •
 <a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE">AGPL-3.0 License</a> •
-Built by <a href="https://github.com/mindfold-ai">Mindfold</a>
+Built by <a href="https://github.com/sunrain520">sunrain520</a>
 </p>
