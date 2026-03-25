@@ -48,6 +48,7 @@ function initGlobalDeveloper(name: string, lang: string = "zh"): void {
 
   console.log();
   console.log(chalk.green(`✓ Global developer initialized`));
+  console.log(chalk.gray(`  spec-first v${VERSION}`));
   console.log();
   console.log(chalk.white("  Developer:"), chalk.cyan(name));
   console.log(chalk.white("  Language:"), chalk.cyan(lang === "zh" ? "中文" : "English"));
