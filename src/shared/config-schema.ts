@@ -133,7 +133,7 @@ export const DEFAULT_SPEC_FIRST_CONFIG: SpecFirstConfig = {
         npmScripts: ['test'],
       },
       '06_wrap_up': {
-        files: ['specs/{featureId}/retro.md'],
+        files: ['specs/{featureId}/wrap_up.md'],
       },
       '07_release': {
         files: RELEASE_REQUIRED_ARTIFACTS.map((item) => `specs/{featureId}/${item}`),

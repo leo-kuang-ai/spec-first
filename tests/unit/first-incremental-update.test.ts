@@ -61,14 +61,14 @@ describe('first-incremental-update', () => {
         type: 'convention',
         action: 'add',
         target: 'All billing writes require audit trail',
-        evidence: `specs/${FEATURE_ID}/retro.md#L8`,
+        evidence: `specs/${FEATURE_ID}/wrap_up.md#L8`,
         featureId: FEATURE_ID,
       },
       {
         type: 'risk',
         action: 'add',
         target: 'Invoice replay can duplicate settlement',
-        evidence: `specs/${FEATURE_ID}/retro.md#L4`,
+        evidence: `specs/${FEATURE_ID}/wrap_up.md#L4`,
         featureId: FEATURE_ID,
       },
     ]);

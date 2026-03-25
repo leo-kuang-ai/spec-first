@@ -15,4 +15,17 @@ describe('checkReadiness', () => {
     expect(result.decision).toBe('READY_TO_ADVANCE');
     expect(result.targetStage).toBe(Stage.DESIGN);
   });
+
+  it('requires wrap_up.md for wrap-up readiness', () => {
+    const result = checkReadiness({
+      currentStage: Stage.WRAP_UP,
+      targetStage: Stage.RELEASE,
+      nodes: { [Stage.WRAP_UP]: { status: 'done' } },
+      artifacts: ['spec.md', 'design.md', 'task_plan.md', 'verify.md', 'wrap_up.md'],
+      terminal: false,
+    });
+
+    expect(result.decision).toBe('READY_TO_ADVANCE');
+    expect(result.targetStage).toBe(Stage.RELEASE);
+  });
 });

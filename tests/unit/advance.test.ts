@@ -251,7 +251,7 @@ describe('advance', () => {
     writeFileSync(join(SPEC_DIR, 'design.md'), '# Design\n', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'task_plan.md'), '# Task Plan\n', 'utf-8');
     writeFileSync(join(SPEC_DIR, 'verify.md'), '# Verify\n', 'utf-8');
-    writeFileSync(join(SPEC_DIR, 'retro.md'), '# Retro\n', 'utf-8');
+    writeFileSync(join(SPEC_DIR, 'wrap_up.md'), '# Wrap Up\n', 'utf-8');
 
     const result = advance(FEAT_ID, TMP);
 

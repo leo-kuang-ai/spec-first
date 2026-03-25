@@ -7,6 +7,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { exists, readJson } from '../../shared/fs-utils.js';
 import { loadConfig } from '../../shared/config-schema.js';
+import { resolveSkillRootWithin, resolveSkillRootUpwards } from '../../shared/skill-root.js';
 import {
   assemblePrompt,
   resolvePromptAssemblyContext,
@@ -54,7 +55,7 @@ import type {
   NodeState,
   Stage,
 } from '../../shared/types.js';
-import { checkReadiness, STAGE_ARTIFACT_REQUIREMENTS } from '../process-engine/readiness-check.js';
+import { checkReadiness } from '../process-engine/readiness-check.js';
 import { getNextStages } from '../process-engine/stage-machine.js';
 
 export interface DispatchResult {
@@ -362,13 +363,13 @@ export function resolveSkillPath(skillName: string, projectRoot: string): string
     return findSkillFile(ext.skillsDir, extReq.skill);
   }
 
-  // 项目本地 skills/ 优先
-  const localPattern = join(projectRoot, 'skills');
-  const localPath = findSkillFile(localPattern, skillName);
+  // 项目本地 skill collection 优先
+  const localPattern = resolveSkillRootWithin(projectRoot);
+  const localPath = localPattern ? findSkillFile(localPattern, skillName) : undefined;
   if (localPath) return localPath;
 
-  // 包级 skills/ 回退：从当前模块位置向上搜索可用的 skills/
-  const pkgPattern = resolveBundledSkillsRoot();
+  // 包级 skill collection 回退：从当前模块位置向上搜索可用的 skill collection
+  const pkgPattern = resolveSkillRootUpwards(dirname(fileURLToPath(import.meta.url)));
   const pkgPath = pkgPattern ? findSkillFile(pkgPattern, skillName) : undefined;
   if (pkgPath) return pkgPath;
 
@@ -394,26 +395,6 @@ function findSkillFile(baseDir: string, skillName: string): string | undefined {
     // 目录不存在
   }
   return undefined;
-}
-
-function resolveBundledSkillsRoot(): string | undefined {
-  // 兼容源码执行（src/core/skill-runtime）与发布包执行（dist/cli/index.js）
-  // 不再依赖固定的 ../.. 层级，而是从当前模块位置逐级向上查找 skills/。
-  let currentDir = dirname(fileURLToPath(import.meta.url));
-
-  while (true) {
-    const candidate = join(currentDir, 'skills');
-    if (exists(candidate)) {
-      return candidate;
-    }
-
-    const parentDir = dirname(currentDir);
-    if (parentDir === currentDir) {
-      return undefined;
-    }
-
-    currentDir = parentDir;
-  }
 }
 
 /** 加载 Skill 文件内容（可选动态组装） */
@@ -634,10 +615,7 @@ function buildReadinessRuntimeNotice(executionContext: SkillExecutionContext): s
     currentNode?.status === 'done' || currentNode?.status === 'skipped'
       ? getNextStages(currentStage)[0] ?? currentStage
       : currentStage;
-  const artifactRequirements = STAGE_ARTIFACT_REQUIREMENTS[candidateTargetStage] ?? [];
-  const artifactNames = artifactRequirements.filter((artifact) =>
-    exists(join(executionContext.projectRoot, 'specs', featureId, artifact))
-  );
+  const artifactNames = collectFeatureArtifacts(executionContext.projectRoot, featureId);
 
   const readiness = checkReadiness({
     currentStage,
@@ -663,6 +641,15 @@ function buildReadinessRuntimeNotice(executionContext: SkillExecutionContext): s
   ];
 
   return lines.join('\n');
+}
+
+function collectFeatureArtifacts(projectRoot: string, featureId: string): string[] {
+  const featureDir = join(projectRoot, 'specs', featureId);
+  if (!exists(featureDir)) return [];
+
+  return readdirSync(featureDir, { withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name);
 }
 
 function buildSkillFileContextNotice(skillPath: string): string {

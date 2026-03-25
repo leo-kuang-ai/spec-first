@@ -33,7 +33,7 @@ describe('release evidence governance', () => {
 
   it('exposes wrap-up and release deliverables from merged rules', () => {
     const rules = mergeLayerRules('N', 'S', [], TMP);
-    expect(rules.deliverables['06_wrap_up'].some((item) => item.name === 'retro.md')).toBe(true);
+    expect(rules.deliverables['06_wrap_up'].some((item) => item.name === 'wrap_up.md')).toBe(true);
     expect(rules.deliverables['07_release'].map((item) => item.name)).toEqual([
       'reports/smoke-test-report.md',
       'reports/release-note.md',

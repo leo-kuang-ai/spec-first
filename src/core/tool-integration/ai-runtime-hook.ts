@@ -58,12 +58,12 @@ export function generateAIHookConfigs(projectRoot: string): AIHookConfig[] {
     {
       type: 'PreToolUse',
       matcher: WRITE_INTENT_MATCHER,
-      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} gate check "$FEAT" || echo "spec-first: 跳过 gate 检查（无当前 feature）"'`,
+      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); [ -n "$FEAT" ] && ${bin} status "$FEAT" || echo "spec-first: 跳过状态检查（无当前 feature）"'`,
     },
     {
       type: 'PostToolUse',
       matcher: WRITE_INTENT_MATCHER,
-      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n "$FEAT" ]; then ${bin} docs validate "$FEAT" || echo "spec-first: docs validate 执行失败（已降级）" >&2; else echo "spec-first: 跳过 docs 校验（无当前 feature）"; fi'`,
+      command: `sh -c 'FEAT=$(head -1 .spec-first/current 2>/dev/null); if [ -n "$FEAT" ]; then ${bin} validate links "$FEAT" || echo "spec-first: validate links 执行失败（已降级）" >&2; else echo "spec-first: 跳过文档关联校验（无当前 feature）"; fi'`,
     },
     {
       type: 'PostToolUse',
@@ -145,7 +145,7 @@ export function registerAIHooks(
   const claudeDir = join(projectRoot, '.claude');
   if (!exists(claudeDir)) {
     warnings.push('未找到 .claude/ 目录 —— AI Hooks 需要 Claude Code 环境');
-    warnings.push('已降级：Gate 校验回退为 Layer B CLI 命令');
+    warnings.push('已降级：状态校验回退为 Layer B CLI 命令');
     return { registered, warnings };
   }
 
@@ -190,7 +190,7 @@ export function registerAIHooks(
   return { registered, warnings };
 }
 
-/** 模拟 PreToolUse Hook 执行：检查 Gate 条件 */
+/** 模拟 PreToolUse Hook 执行：检查当前状态 */
 export function executePreToolUse(featureId: string, projectRoot: string): AIHookResult {
   // 简化实现：检查 stage-state 是否存在
   const statePath = join(projectRoot, 'specs', featureId, 'stage-state.json');
@@ -206,7 +206,7 @@ export function executePreToolUse(featureId: string, projectRoot: string): AIHoo
   return {
     type: 'PreToolUse',
     success: true,
-    message: 'Gate 预检查通过',
+    message: '状态预检查通过',
   };
 }
 

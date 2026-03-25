@@ -54,7 +54,7 @@ describe('first-change-detection', () => {
       'utf-8'
     );
     writeFileSync(
-      join(TMP, 'specs', FEATURE_ID, 'retro.md'),
+      join(TMP, 'specs', FEATURE_ID, 'wrap_up.md'),
       [
         '# Retro',
         '## 风险',

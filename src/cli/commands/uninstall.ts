@@ -8,6 +8,15 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ExitCode } from '../../shared/types.js';
+import {
+  formatBullet,
+  formatKeyValue,
+  formatSubBullet,
+  icon,
+  joinSections,
+  renderBrandBanner,
+  renderSection,
+} from '../../shared/cli-output.js';
 import { detectHostPaths } from '../../shared/host-paths.js';
 import { uninstallHooks } from '../../core/tool-integration/hook-installer.js';
 import { isManagedSessionStartEntry } from '../../core/tool-integration/session-hook-managed.js';
@@ -59,43 +68,54 @@ interface HookEntry {
 
 function runUninstall({ dryRun, keepMcp, hosts, fullUninstall }: UninstallOptions): number {
   const cwd = process.cwd();
-  const prefix = dryRun ? '[dry-run] ' : '';
+  const prefix = dryRun ? '[DRY-RUN] ' : '';
   const paths = detectHostPaths();
   const scopedHosts = fullUninstall ? undefined : hosts;
 
-  console.log('spec-first uninstall — 清理宿主配置\n');
+  console.log(
+    joinSections(
+      renderBrandBanner('卸载'),
+      renderSection(`${icon('info')} 清理概览:`, [
+        formatKeyValue('模式', dryRun ? '仅预览' : '执行清理'),
+        formatKeyValue('范围', scopedHosts && scopedHosts.length > 0 ? scopedHosts.join(', ') : '全部宿主'),
+        formatKeyValue('MCP', keepMcp ? '按请求保留' : '保留共享服务'),
+      ])
+    )
+  );
 
   removeHostUserArtifacts(paths, dryRun, prefix, scopedHosts);
   removeClaudeHomeArtifacts(paths.claudeHomeDir, dryRun, prefix, scopedHosts);
   if (scopedHosts && scopedHosts.length > 0) {
-    console.log(`${prefix}Project-local Hooks: 检测到 --host 定向卸载，已跳过`);
+    console.log(`${prefix}${icon('skip')} 项目级 hooks: 定向卸载时跳过`);
   } else {
     removeProjectLocalArtifacts(cwd, dryRun, prefix);
   }
 
   // 9. MCP 配置提示
   if (keepMcp) {
-    console.log(`${prefix}MCP 配置: 已保留（--keep-mcp）`);
+    console.log(renderSection(`${icon('ok')} MCP 配置:`, [formatBullet('已按 --keep-mcp 保留。')]));
   } else {
     console.log(
-      `${prefix}MCP 配置: sequential-thinking/context7/serena/fetch/playwright-mcp 为通用服务，已保留`
+      renderSection(`${icon('info')} MCP 配置:`, [
+        formatBullet('已保留共享服务: sequential-thinking, context7, serena, fetch, playwright-mcp。'),
+        formatSubBullet('如需删除，请手动编辑以下文件:'),
+        ...paths.claudeConfigFiles.map((f) => formatSubBullet(f)),
+        formatSubBullet(paths.codexConfigPath),
+        formatSubBullet(paths.geminiSettingsPath),
+        formatSubBullet(paths.cursorMcpConfigPath),
+      ])
     );
-    console.log('  如需清理，请手动编辑:');
-    for (const f of paths.claudeConfigFiles) {
-      console.log(`    ${f}`);
-    }
-    console.log(`    ${paths.codexConfigPath}`);
-    console.log(`    ${paths.geminiSettingsPath}`);
-    console.log(`    ${paths.cursorMcpConfigPath}`);
   }
 
-  console.log('');
   if (dryRun) {
-    console.log('（dry-run 模式，未执行任何删除）');
+    console.log(renderSection(`${icon('dry')} 预览完成:`, [formatBullet('未删除任何文件。')]));
   } else {
-    console.log('清理完成。运行以下命令完成卸载：');
-    console.log('  npm uninstall -g spec-first');
-    console.log('  # 或 pnpm remove --global spec-first');
+    console.log(
+      renderSection(`${icon('next')} 下一步:`, [
+        formatBullet('npm uninstall -g spec-first'),
+        formatBullet('pnpm remove --global spec-first'),
+      ])
+    );
   }
 
   return ExitCode.SUCCESS;

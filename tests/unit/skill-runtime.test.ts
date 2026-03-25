@@ -135,6 +135,19 @@ describe('dispatchCommand', () => {
     expect(result).toBe(join(TMP, 'skills', 'focus-requirements', 'SKILL.md'));
   });
 
+  it('should resolve skill files from a renamed local skill collection root', () => {
+    mkdirSync(join(TMP, 'skill-pack', 'focus-requirements'), { recursive: true });
+    writeFileSync(
+      join(TMP, 'skill-pack', 'focus-requirements', 'SKILL.md'),
+      '# Focus Requirements',
+      'utf-8',
+    );
+
+    const result = resolveSkillPath('focus-requirements', TMP);
+
+    expect(result).toBe(join(TMP, 'skill-pack', 'focus-requirements', 'SKILL.md'));
+  });
+
   it('should not hard-block code skill at dispatch layer when prerequisites are missing', () => {
     writeFileSync(join(TMP, 'skills', '07-code', 'SKILL.md'), '# Code Skill');
     const result = dispatchCommand('code', TMP);

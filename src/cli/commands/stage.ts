@@ -209,6 +209,6 @@ function printStageHelp(): void {
 子命令：
   current   查看当前阶段
   suggest   输出当前阶段建议与阻塞原因
-  advance   推进到下一阶段
-  cancel    取消 Feature`);
+  transition 已迁移到 spec-first transition <featureId>
+  cancel    已迁移到 spec-first transition cancel <featureId> --reason "<reason>"`);
 }
