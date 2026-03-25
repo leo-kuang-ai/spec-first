@@ -1,6 +1,6 @@
 {
   "name": "spec-first",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Spec-driven AI development workflow that improves delivery quality through executable project standards",
   "type": "module",
   "main": "./dist/index.js",
