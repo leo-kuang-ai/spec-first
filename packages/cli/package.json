@@ -78,6 +78,7 @@
   "files": [
     "dist",
     "bin",
+    "scripts/postinstall.mjs",
     "README.md",
     "LICENSE"
   ],
