@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.2",
+  "description": "Windows compatibility fixes",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(templates): use python3 consistently for Windows compatibility\n- fix(update): move breaking change warnings to bottom of output\n\n**Docs:**\n- Add cross-platform thinking guide",
+  "migrations": [],
+  "notes": "No migration required."
+}

@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.9",
+  "description": "OpenCode platform support",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "Added OpenCode platform support:\n\n**New Features:**\n- `spec-first init --opencode` - Initialize project for OpenCode\n- `--platform opencode` flag for plan.py, start.py\n- Complete `.opencode/` templates (agents, commands, plugins)\n- Session ID extraction and resume for OpenCode (`ses_xxx` format)\n- CLI adapter abstraction (`cli_adapter.py`)\n\n**Changes:**\n- Agent definitions use `permission:` format instead of deprecated `tools:`\n- Agents no longer hardcode `model:` field, inherit from user's global config\n- `status.py` outputs platform-specific resume commands\n\n**OpenCode Usage:**\n```bash\n# Initialize\nspec-first init --opencode\n\n# Multi-agent with OpenCode\npython3 .spec-first/scripts/multi_agent/plan.py --platform opencode ...\npython3 .spec-first/scripts/multi_agent/start.py --platform opencode ...\n```\n\n**Note:** Full subagent context injection requires oh-my-opencode (omo). Without omo, agents use Self-Loading fallback.",
+  "migrations": [],
+  "notes": "New platform support. No migration required for existing Claude Code users."
+}

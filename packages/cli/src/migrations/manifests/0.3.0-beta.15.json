@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.15",
+  "description": "Add cli_adapter.py to update system",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(update): add missing cli_adapter.py to template files\n\nThis file is used by task.py and multi_agent scripts but was not being updated.",
+  "migrations": [],
+  "notes": "No migration required."
+}

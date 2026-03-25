@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-rc.6",
+  "description": "4 new platforms: Kilo, Kiro, Gemini CLI, Antigravity",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**New Platforms:**\n- feat(kilo): add Kilo CLI as commands-only platform (.kilocode/commands/spec/)\n- feat(kiro): add Kiro Code as skills-based platform (.kiro/skills/)\n- feat(gemini): add Gemini CLI as first TOML-format command platform (.gemini/commands/spec/*.toml)\n- feat(antigravity): add Antigravity as workflow-based platform (.agent/workflows/)\n\n**Bug Fixes:**\n- fix(scripts): remove non-existent spec/shared/ references from init-context defaults\n- fix(templates): correct iflow start/finish-work template content\n- fix(docs): correct license badge from FSL to AGPL-3.0\n- fix(init): fix start process flow (#48)\n\n**Tests:**\n- Added 50+ new tests covering all 4 new platforms (templates, configurators, init integration, regression)",
+  "migrations": [],
+  "notes": "No migration required. New platform templates only — existing projects unaffected. Run `spec-first init --kilo`, `--kiro`, `--gemini`, or `--antigravity` to add new platform support."
+}

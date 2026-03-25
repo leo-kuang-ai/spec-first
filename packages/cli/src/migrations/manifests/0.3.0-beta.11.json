@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.11",
+  "description": "Windows UTF-8 encoding support",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(hooks): add Windows UTF-8 encoding support",
+  "migrations": [],
+  "notes": "No migration required."
+}

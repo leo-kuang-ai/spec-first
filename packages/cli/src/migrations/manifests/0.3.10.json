@@ -1,0 +1,9 @@
+{
+  "version": "0.3.10",
+  "description": "HTTPS registry URLs, record-session wording fix",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(init): accept HTTPS URLs for --registry option — auto-converts GitHub/GitLab/Bitbucket URLs to giget format (#87)\n- fix(templates): clarify record-session commit rule so AI models run metadata scripts without refusing (#88)",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync updated record-session templates."
+}

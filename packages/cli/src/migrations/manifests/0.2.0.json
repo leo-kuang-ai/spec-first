@@ -1,0 +1,49 @@
+{
+  "version": "0.2.0",
+  "description": "Comprehensive naming redesign for clarity",
+  "migrations": [
+    {
+      "type": "rename-dir",
+      "from": ".spec-first/agent-traces",
+      "to": ".spec-first/workspace",
+      "description": "Rename agent-traces to workspace (developer work records)"
+    },
+    {
+      "type": "rename-dir",
+      "from": ".spec-first/structure",
+      "to": ".spec-first/spec",
+      "description": "Rename structure to spec (development guidelines)"
+    },
+    {
+      "type": "rename-dir",
+      "from": ".spec-first/backlog",
+      "to": ".spec-first/tasks",
+      "description": "Rename backlog to tasks (unified task tracking)"
+    },
+    {
+      "type": "rename",
+      "from": ".spec-first/scripts/feature.sh",
+      "to": ".spec-first/scripts/task.sh",
+      "description": "Rename feature.sh to task.sh"
+    },
+    {
+      "type": "rename",
+      "from": ".spec-first/scripts/common/backlog.sh",
+      "to": ".spec-first/scripts/common/task-queue.sh",
+      "description": "Rename backlog.sh to task-queue.sh"
+    },
+    {
+      "type": "rename",
+      "from": ".spec-first/scripts/common/feature-utils.sh",
+      "to": ".spec-first/scripts/common/task-utils.sh",
+      "description": "Rename feature-utils.sh to task-utils.sh"
+    },
+    {
+      "type": "rename",
+      "from": ".spec-first/.current-feature",
+      "to": ".spec-first/.current-task",
+      "description": "Rename .current-feature to .current-task"
+    }
+  ],
+  "notes": "Complex migrations (features→tasks, traces→journal) require running scripts/migrate-features-to-tasks.sh"
+}

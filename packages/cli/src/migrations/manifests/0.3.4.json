@@ -1,0 +1,21 @@
+{
+  "version": "0.3.4",
+  "description": "Qoder platform, Kilo workflows, record-session task awareness",
+  "breaking": false,
+  "recommendMigrate": true,
+  "changelog": "**Enhancements:**\n- feat(platform): add Qoder support as skills-based platform (.qoder/skills/)\n- feat(record-session): enforce task archive check before recording; add --mode record for focused context output\n- feat(record-session): sync record-session prompt across all 9 platforms\n- feat(task): auto-commit after archive, add --no-commit flag\n\n**Bug Fixes:**\n- fix(kilo): rename commands/spec/ to workflows/ to match Kilo official spec\n- fix(iflow): add IFLOW_NON_INTERACTIVE check in session-start hook\n- fix(multi-agent): clear CLAUDECODE env var to allow nested CLI launch\n- fix(update): skip workflow.md and workspace/index.md during update (user-customizable content)",
+  "migrations": [
+    {
+      "type": "rename-dir",
+      "from": ".kilocode/commands/spec",
+      "to": ".kilocode/workflows",
+      "description": "Kilo uses workflows/ instead of commands/spec/ per official spec"
+    },
+    {
+      "type": "delete",
+      "from": ".kilocode/commands",
+      "description": "Remove empty commands/ directory after workflow migration"
+    }
+  ],
+  "notes": "Kilo users: run spec-first update to migrate commands/spec/ to workflows/. New Qoder platform available via --qoder flag."
+}

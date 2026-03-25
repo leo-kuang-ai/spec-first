@@ -1,0 +1,14 @@
+{
+  "include": [
+    ".spec-first/scripts/**/*.py",
+    ".claude/hooks/**/*.py",
+    "packages/cli/src/templates/**/*.py",
+  ],
+  "exclude": ["**/node_modules", "**/__pycache__", "dist"],
+  "typeCheckingMode": "standard",
+  "pythonVersion": "3.10",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "reportUnusedVariable": true,
+  "reportUnusedImport": "warning",
+}

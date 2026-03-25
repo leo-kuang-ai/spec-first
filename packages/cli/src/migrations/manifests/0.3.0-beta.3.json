@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.3",
+  "description": "Breaking change warning and docs update",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(update): show breaking change warning before confirm prompt\n\n**Docs:**\n- Update backend specs for shell-to-python migration",
+  "migrations": [],
+  "notes": "No migration required."
+}

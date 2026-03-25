@@ -1,0 +1,21 @@
+{
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "build": "pnpm --filter @leokuang/spec-first build",
+    "test": "pnpm --filter @leokuang/spec-first test",
+    "lint": "pnpm --filter @leokuang/spec-first lint",
+    "typecheck": "pnpm --filter @leokuang/spec-first typecheck",
+    "snapshot:create": "bash scripts/create-snapshot.sh",
+    "snapshot:diff": "bash scripts/diff-snapshots.sh",
+    "snapshot:test-rollback": "bash scripts/test-rollback.sh",
+    "release": "pnpm --filter @leokuang/spec-first release",
+    "release:minor": "pnpm --filter @leokuang/spec-first release:minor",
+    "release:beta": "pnpm --filter @leokuang/spec-first release:beta",
+    "release:rc": "pnpm --filter @leokuang/spec-first release:rc"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  }
+}

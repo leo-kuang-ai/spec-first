@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.8",
+  "description": "Task commands now support task name lookup",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "All task commands (start, init-context, set-branch, etc.) now support task name in addition to full path. Example: `python3 task.py start my-task` instead of `python3 task.py start .spec-first/tasks/01-31-my-task`.",
+  "migrations": [],
+  "notes": "Usability improvement. No migration required."
+}

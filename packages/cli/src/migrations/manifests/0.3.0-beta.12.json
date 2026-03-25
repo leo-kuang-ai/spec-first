@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.12",
+  "description": "Windows compatibility & multi-model support improvements",
+  "breaking": false,
+  "recommendMigrate": true,
+  "changelog": "**Bug Fixes:**\n\n1. **Windows Hook JSON Parse Error** (b282b14)\n   - Fixed `Unexpected end of string` error when parsing hook output\n   - Replaced backslash characters (`\\--`, `\\->`) in markdown templates\n   - These caused JSON serialization issues on Windows\n\n2. **Cross-Platform Script Paths** (19f8a68)\n   - Fixed `python3` command not found on Windows\n   - Scripts now use platform-specific command paths via cli_adapter\n\n3. **Multi-Agent GPT/Codex Compatibility** (14bfbe9)\n   - Fixed dispatch agent getting stuck with \"Start the pipeline\" prompt\n   - GPT/Codex models were misinterpreting \"pipeline\" as CI/CD\n   - New prompt explicitly guides models to follow agent instructions\n\n**Known Issue:**\n- Windows users may still experience hook failures due to Claude Code bug (#18469)\n- Workaround: Use `cmd.exe /c python ...` in hook command",
+  "migrations": [],
+  "notes": "Recommended for Windows users and those using GPT/Codex models with multi-agent pipeline."
+}

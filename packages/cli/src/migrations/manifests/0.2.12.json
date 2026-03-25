@@ -1,0 +1,9 @@
+{
+  "version": "0.2.12",
+  "description": "Init file conflict handling improvement",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(init): use writeFile for all file copies to allow user choice on conflicts",
+  "migrations": [],
+  "notes": "No migration required."
+}

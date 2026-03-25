@@ -1,0 +1,9 @@
+{
+  "version": "0.3.3",
+  "description": "Init download UX, update spec protection, and Windows encoding fixes",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- feat(init): add proxy detection with undici ProxyAgent for fetch/giget network calls\n- feat(init): add 5s timeout with live countdown for template index fetch\n- feat(init): add 30s timeout for template downloads via Promise.race\n- feat(init): show source URL and retry hint on download failure\n- feat(init): eliminate double-fetch by passing pre-fetched SpecTemplate to downloadTemplateById\n- feat(update): skip .spec-first/spec/ directory entirely — user-customized content is no longer overwritten\n- feat(update): set up proxy before npm version check\n\n**Bug Fixes:**\n- fix(scripts): centralize Windows stdio UTF-8 encoding in common/__init__.py — adds stdin to fix garbled Chinese text when piping via stdin on Windows\n- fix(scripts): remove inline encoding code from add_session.py and git_context.py\n- fix(templates): remove auto-commit details from all 8 platform record-session templates to prevent AI misusing --no-commit flag\n\n**Dependencies:**\n- Add undici ^6.21.0 for ProxyAgent support\n- Bump engines.node from >=18.0.0 to >=18.17.0 (required by undici v6)",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync updated scripts and templates. Node.js >=18.17.0 is now required."
+}

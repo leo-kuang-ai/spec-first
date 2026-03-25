@@ -1,0 +1,9 @@
+{
+  "version": "0.3.7",
+  "description": "Smart update protection, session-start task awareness, improved start flow",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- feat(update): user-deleted files are now preserved — if you intentionally deleted a file, spec-first update won't re-add it\n- feat(update): config.yaml `update.skip` support — specify files or directories to permanently exclude from updates\n- feat(hooks): session-start hooks now inject `<task-status>` with structured state (NO ACTIVE TASK / NOT READY / READY / COMPLETED), enabling AI to auto-resume tasks\n- feat(hooks): dynamic spec directory discovery in session-start, supporting monorepo package layouts\n- feat(start): brainstorm enforcement — complex tasks now automatically trigger brainstorm flow across all platforms",
+  "migrations": [],
+  "notes": "Run spec-first update to sync updated hook scripts and command templates."
+}

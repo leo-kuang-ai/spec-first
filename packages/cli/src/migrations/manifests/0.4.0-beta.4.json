@@ -1,0 +1,9 @@
+{
+  "version": "0.4.0-beta.4",
+  "description": "Git repo context for monorepo packages + improved init-context hints",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- feat(context): show git status and recent commits for independent sub-repo packages (config `git: true`)\n- feat(task): init-context now lists auto-injected defaults and available spec files to guide AI agents\n- feat(commands): add /spec:publish-skill slash command\n- feat(marketplace): add cc-codex-spec-bootstrap skill\n\n**Bug Fixes:**\n- fix(context): use _is_true_config_value for isGitRepo consistency (case-insensitive)",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync. Projects with independent git sub-repos can now add `git: true` to package config to see their status in session context."
+}

@@ -1,0 +1,228 @@
+{
+  "version": "0.4.0-beta.1",
+  "description": "Monorepo support, unified commands, safe-file-delete, worktree submodule awareness",
+  "breaking": true,
+  "recommendMigrate": true,
+  "changelog": "**Enhancements:**\n- feat(init): auto-detect monorepo (pnpm/npm/Cargo/Go/uv workspaces + git submodules)\n- feat(init): generate per-package spec directories and config.yaml with packages list\n- feat(update): new safe-file-delete migration type — auto-removes deprecated files when content hash matches\n- feat(update): PROTECTED_PATHS prevents migrations from touching user data (.spec-first/workspace, spec, tasks)\n- feat(update): config.yaml update.skip to exclude paths from safe-file-delete and template updates\n- feat(commands): merge before-backend-dev + before-frontend-dev into unified before-dev (all 9 platforms)\n- feat(commands): merge check-backend + check-frontend into unified check (all 9 platforms)\n- feat(scripts): worktree agents auto-initialize git submodules for task packages\n- feat(scripts): session-start hook supports spec_scope filtering for monorepo\n- feat(scripts): task.py and add_session.py support --package for monorepo context\n\n**Internal:**\n- refactor(scripts): Python scripts restructured — shared io/log/git modules, TypedDict type safety, god modules split into focused modules. All entry paths unchanged.\n\n**Bug Fixes:**\n- fix(update): allow rename/rename-dir migrations to target protected paths (0.2.0 compat)\n- fix(update): warn when config.yaml parse fails instead of silently disabling update.skip\n- fix(scripts): preserve git submodule status prefix character (.strip → .rstrip)",
+  "notes": "Run `spec-first update` to sync new unified commands. Old before-backend-dev, before-frontend-dev, check-backend, check-frontend files will be auto-deleted if unmodified.",
+  "migrationGuide": "## Command Consolidation\n\nThe following commands have been merged:\n\n| Old (removed) | New (replacement) |\n|---------------|-------------------|\n| `before-backend-dev` | `before-dev` |\n| `before-frontend-dev` | `before-dev` |\n| `check-backend` | `check` |\n| `check-frontend` | `check` |\n\n### If you never customized these commands\n\nNo action needed. `spec-first update` will:\n1. Auto-delete the old files (hash-verified, only if unmodified)\n2. Write the new unified `before-dev` and `check` commands\n\n### If you customized the old commands\n\nThe old files will NOT be deleted (hash mismatch protection). You need to:\n1. Open the new `before-dev` / `check` command file\n2. Merge your customizations from the old backend/frontend variants into the unified file\n3. Delete the old files manually once merged\n\n### Affected paths per platform\n\n- **Claude**: `.claude/commands/spec/`\n- **Cursor**: `.cursor/commands/`\n- **iFlow**: `.iflow/commands/spec/`\n- **OpenCode**: `.opencode/commands/spec/`\n- **Gemini**: `.gemini/commands/spec/`\n- **Kilo**: `.kilocode/workflows/`\n- **Codex**: `.agents/skills/`\n- **Kiro**: `.kiro/skills/`\n- **Qoder**: `.qoder/skills/`\n\n## Python Scripts Refactoring\n\nAll `.spec-first/scripts/` files have been restructured internally. **No action needed** — all entry paths (`python3 .spec-first/scripts/task.py`, etc.) remain unchanged. `spec-first update` will sync the new scripts automatically.",
+  "aiInstructions": "When helping users migrate to v0.4.0-beta.1:\n\n1. **Check for customized old commands**: Run `git diff` or compare file hashes to see if the user modified before-backend-dev, before-frontend-dev, check-backend, or check-frontend files.\n2. **If customized**: Help merge their customizations into the new unified `before-dev` and `check` files. The new files use `python3 ./.spec-first/scripts/get_context.py --mode packages` to auto-detect which specs to load, replacing the hardcoded backend/frontend split.\n3. **If not customized**: Just run `spec-first update` — safe-file-delete will handle cleanup automatically.\n4. **Python scripts**: No user action needed. The refactoring preserves all entry paths. If the user has custom scripts that import from `.spec-first/scripts/common/`, they may need to update imports (e.g., `from common.io import read_json` instead of inline `_read_json_file`).",
+  "migrations": [
+    {
+      "type": "safe-file-delete",
+      "from": ".claude/commands/spec/before-backend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["7e35444de2a5779ef39944f17f566ea21d2ed7f4994246f4cfe6ebf9a11dd3e3"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".claude/commands/spec/before-frontend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["a6225f9d123dbd4a7aec822652030cae50be3f5b308297015e04d42b23a27b2a"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".claude/commands/spec/check-backend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["7a2efa8423e2115d2d60c9f9810c3553be8eb80e229e407739cf1ed25d940230"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".claude/commands/spec/check-frontend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["5e8e3b682032ba0dd6bb843dd4826fff0159f78a7084964ccb119c6cf98b3d91"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".cursor/commands/spec-before-backend-dev.md",
+      "description": "Replaced by spec-before-dev.md",
+      "allowed_hashes": ["7e35444de2a5779ef39944f17f566ea21d2ed7f4994246f4cfe6ebf9a11dd3e3"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".cursor/commands/spec-before-frontend-dev.md",
+      "description": "Replaced by spec-before-dev.md",
+      "allowed_hashes": ["a6225f9d123dbd4a7aec822652030cae50be3f5b308297015e04d42b23a27b2a"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".cursor/commands/spec-check-backend.md",
+      "description": "Replaced by spec-check.md",
+      "allowed_hashes": ["7a2efa8423e2115d2d60c9f9810c3553be8eb80e229e407739cf1ed25d940230"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".cursor/commands/spec-check-frontend.md",
+      "description": "Replaced by spec-check.md",
+      "allowed_hashes": ["5e8e3b682032ba0dd6bb843dd4826fff0159f78a7084964ccb119c6cf98b3d91"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".iflow/commands/spec/before-backend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["7e35444de2a5779ef39944f17f566ea21d2ed7f4994246f4cfe6ebf9a11dd3e3"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".iflow/commands/spec/before-frontend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["a6225f9d123dbd4a7aec822652030cae50be3f5b308297015e04d42b23a27b2a"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".iflow/commands/spec/check-backend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["7a2efa8423e2115d2d60c9f9810c3553be8eb80e229e407739cf1ed25d940230"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".iflow/commands/spec/check-frontend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["5e8e3b682032ba0dd6bb843dd4826fff0159f78a7084964ccb119c6cf98b3d91"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".opencode/commands/spec/before-backend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["7e35444de2a5779ef39944f17f566ea21d2ed7f4994246f4cfe6ebf9a11dd3e3"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".opencode/commands/spec/before-frontend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["a6225f9d123dbd4a7aec822652030cae50be3f5b308297015e04d42b23a27b2a"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".opencode/commands/spec/check-backend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["7a2efa8423e2115d2d60c9f9810c3553be8eb80e229e407739cf1ed25d940230"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".opencode/commands/spec/check-frontend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["5e8e3b682032ba0dd6bb843dd4826fff0159f78a7084964ccb119c6cf98b3d91"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kilocode/workflows/before-backend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["7e35444de2a5779ef39944f17f566ea21d2ed7f4994246f4cfe6ebf9a11dd3e3"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kilocode/workflows/before-frontend-dev.md",
+      "description": "Replaced by before-dev.md",
+      "allowed_hashes": ["a6225f9d123dbd4a7aec822652030cae50be3f5b308297015e04d42b23a27b2a"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kilocode/workflows/check-backend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["7a2efa8423e2115d2d60c9f9810c3553be8eb80e229e407739cf1ed25d940230"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kilocode/workflows/check-frontend.md",
+      "description": "Replaced by check.md",
+      "allowed_hashes": ["5e8e3b682032ba0dd6bb843dd4826fff0159f78a7084964ccb119c6cf98b3d91"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".gemini/commands/spec/before-backend-dev.toml",
+      "description": "Replaced by before-dev.toml",
+      "allowed_hashes": ["c384cda35b0e57de4a84d2812d59fd223c998be2aaa16a0620d7b987a08f6e33"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".gemini/commands/spec/before-frontend-dev.toml",
+      "description": "Replaced by before-dev.toml",
+      "allowed_hashes": ["3e1ad82280f2aaabe60b93ec3e76c1017ef6282319d061e1a3de556b421317e2"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".gemini/commands/spec/check-backend.toml",
+      "description": "Replaced by check.toml",
+      "allowed_hashes": ["8f872a2eea659abce0cbdc40ee6a197e70ffa4a4e0cbdc42ea9bb026af1cfe79"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".gemini/commands/spec/check-frontend.toml",
+      "description": "Replaced by check.toml",
+      "allowed_hashes": ["4fb9eecf75f5efc0d9a38becc459d503261ecc5e69906cdfc489b2ef065944a6"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".agents/skills/before-backend-dev/SKILL.md",
+      "description": "Replaced by before-dev skill",
+      "allowed_hashes": ["4537ccee0071353beee636a052c01642a27a87b6b0a73e7bc872b2501547fa64"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".agents/skills/before-frontend-dev/SKILL.md",
+      "description": "Replaced by before-dev skill",
+      "allowed_hashes": ["679c1708a4d9fbad5214db299a38366581684a9383cf51a5d8ac21f890d6ba0d"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".agents/skills/check-backend/SKILL.md",
+      "description": "Replaced by check skill",
+      "allowed_hashes": ["9b312cfd7a07ed036769b387d84d642cd5e20f06b88e7b6a4626705fa8beb6fa"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".agents/skills/check-frontend/SKILL.md",
+      "description": "Replaced by check skill",
+      "allowed_hashes": ["27b75f9eea472ed104f39a65bb78ae559cfe8730c85e0742e55fd575a4a2f854"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kiro/skills/before-backend-dev/SKILL.md",
+      "description": "Replaced by before-dev skill",
+      "allowed_hashes": ["4537ccee0071353beee636a052c01642a27a87b6b0a73e7bc872b2501547fa64"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kiro/skills/before-frontend-dev/SKILL.md",
+      "description": "Replaced by before-dev skill",
+      "allowed_hashes": ["679c1708a4d9fbad5214db299a38366581684a9383cf51a5d8ac21f890d6ba0d"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kiro/skills/check-backend/SKILL.md",
+      "description": "Replaced by check skill",
+      "allowed_hashes": ["9b312cfd7a07ed036769b387d84d642cd5e20f06b88e7b6a4626705fa8beb6fa"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".kiro/skills/check-frontend/SKILL.md",
+      "description": "Replaced by check skill",
+      "allowed_hashes": ["27b75f9eea472ed104f39a65bb78ae559cfe8730c85e0742e55fd575a4a2f854"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".qoder/skills/before-backend-dev/SKILL.md",
+      "description": "Replaced by before-dev skill",
+      "allowed_hashes": ["4537ccee0071353beee636a052c01642a27a87b6b0a73e7bc872b2501547fa64"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".qoder/skills/before-frontend-dev/SKILL.md",
+      "description": "Replaced by before-dev skill",
+      "allowed_hashes": ["679c1708a4d9fbad5214db299a38366581684a9383cf51a5d8ac21f890d6ba0d"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".qoder/skills/check-backend/SKILL.md",
+      "description": "Replaced by check skill",
+      "allowed_hashes": ["9b312cfd7a07ed036769b387d84d642cd5e20f06b88e7b6a4626705fa8beb6fa"]
+    },
+    {
+      "type": "safe-file-delete",
+      "from": ".qoder/skills/check-frontend/SKILL.md",
+      "description": "Replaced by check skill",
+      "allowed_hashes": ["27b75f9eea472ed104f39a65bb78ae559cfe8730c85e0742e55fd575a4a2f854"]
+    }
+  ]
+}

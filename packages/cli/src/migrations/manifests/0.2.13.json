@@ -1,0 +1,9 @@
+{
+  "version": "0.2.13",
+  "description": "Hotfix release",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "Hotfix release with minor improvements.",
+  "migrations": [],
+  "notes": "No migration required."
+}

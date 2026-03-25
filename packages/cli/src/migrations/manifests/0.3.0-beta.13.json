@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.13",
+  "description": "Cursor platform support & base_branch auto-recording",
+  "breaking": false,
+  "recommendMigrate": true,
+  "changelog": "**Features:**\n\n1. **Cursor Platform Support** (5357e98)\n   - Added Cursor as a supported platform alongside Claude Code and OpenCode\n   - task.py now auto-detects platform based on config directories\n   - Cursor uses flat command structure: `.cursor/commands/spec-<name>.md`\n\n2. **Auto-record base_branch on Task Creation** (e38578b)\n   - Creating a task now automatically records the current branch as `base_branch`\n   - PRs will target the correct branch where user was working\n   - Syncs with main branch 0.2.15 changes\n\n3. **set-base-branch Command** (e38578b)\n   - New command to manually change PR target branch\n   - Usage: `python3 task.py set-base-branch <task-dir> <branch>`\n\n**Bug Fixes:**\n\n1. **OpenCode Agent Path Fixes** (5357e98)\n   - Fixed hardcoded task directory paths in OpenCode agent docs\n   - Changed from `.spec-first/workspace/{developer}/tasks/` to `.spec-first/tasks/`\n   - Cleaned up unused hardcoded constants in plan.py and start.py",
+  "migrations": [],
+  "notes": "Recommended for Cursor users and multi-agent pipeline users who need correct PR targeting."
+}

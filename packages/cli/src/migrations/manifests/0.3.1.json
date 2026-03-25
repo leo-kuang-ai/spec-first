@@ -1,0 +1,9 @@
+{
+  "version": "0.3.1",
+  "description": "SessionStart reinject on clear/compact + spec template project-type awareness",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- feat(hooks): SessionStart hook now fires on `clear` and `compact` events in addition to `startup` — ensures context is always re-injected after session reset (Claude + iFlow)\n\n**Bug Fixes:**\n- fix(iflow): command templates now write to `.iflow/commands/spec/` subdirectory (was missing `spec/` prefix)\n- fix(update): `collectTemplateFiles()` now checks `fs.existsSync` for backend/frontend spec dirs — prevents ghost spec files on project types that don't have them\n- fix(init): `createSpecTemplates()` respects project type — backend-only projects skip frontend spec, vice versa\n- fix(templates): removed dead `guidesCrossPlatformThinkingGuideContent` export and dead links in guides/index.md.txt",
+  "migrations": [],
+  "notes": "No migration required. Template-level changes only — run `spec-first update` to sync. The settings.json changes (clear/compact matchers) will be applied automatically if the file hasn't been user-modified."
+}

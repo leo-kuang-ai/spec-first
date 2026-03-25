@@ -1,0 +1,9 @@
+{
+  "version": "0.3.8",
+  "description": "Fix YAML parser quote stripping",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(scripts): parse_simple_yaml greedy .strip() destroys nested quotes — replaced with _unquote() helper\n- fix(update): loadUpdateSkipPaths now strips surrounding quotes from skip paths",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync the fixed YAML parser to your project."
+}

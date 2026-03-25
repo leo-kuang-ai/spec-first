@@ -1,0 +1,9 @@
+{
+  "version": "0.3.2",
+  "description": "Auto-commit workspace changes after record-session",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- feat(scripts): add auto-commit for workspace changes after record-session — journal/index changes are now automatically committed, keeping the working directory clean\n- feat(scripts): add `.spec-first/config.yaml` for project-level settings (session_commit_message, max_journal_lines)\n- feat(scripts): add `--no-commit` flag to `add_session.py` to skip auto-commit\n- feat(scripts): add `common/config.py` module for reading config.yaml with sensible defaults\n- feat(templates): update all 8 platform record-session templates with auto-commit documentation",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync new files (config.yaml, config.py) and updated templates."
+}

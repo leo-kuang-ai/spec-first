@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-rc.1",
+  "description": "Fix CLI version comparison for prerelease versions",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix: CLI startup incorrectly reports rc version as older than beta (e.g., 0.3.0-rc.0 < 0.3.0-beta.16)\n- fix: deduplicate compareVersions — extract to shared utils/compare-versions.ts (was duplicated 3x with inconsistent implementations)\n\n**Root Cause:**\n- cli/index.ts used a simplified compareVersions that ignored prerelease identifiers, parsing \"0.3.0-rc.0\" as [0, 3, 0, 0] and \"0.3.0-beta.16\" as [0, 3, 0, 16], concluding rc < beta\n- commands/update.ts and migrations/index.ts had the correct full implementation but it was not shared",
+  "migrations": [],
+  "notes": "No migration required. Hotfix for version comparison bug introduced in rc.0."
+}

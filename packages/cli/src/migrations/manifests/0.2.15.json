@@ -1,0 +1,33 @@
+{
+  "version": "0.2.15",
+  "description": "Fix task directory paths, base_branch auto-detection, and migration bug",
+  "migrations": [],
+  "changelog": [
+    {
+      "type": "fix",
+      "scope": "agents",
+      "description": "Correct task directory path in dispatch.md and plan.md (was .spec-first/workspace/{dev}/tasks/, now .spec-first/tasks/)"
+    },
+    {
+      "type": "fix",
+      "scope": "scripts",
+      "description": "Remove hardcoded 'taosu' in status.sh help example"
+    },
+    {
+      "type": "fix",
+      "scope": "task",
+      "description": "Auto-record current branch as base_branch when creating task, so PR targets correct branch"
+    },
+    {
+      "type": "fix",
+      "scope": "update",
+      "description": "Remove unsupported 'update' migration type that caused 'path argument undefined' error"
+    },
+    {
+      "type": "feat",
+      "scope": "task",
+      "description": "Add set-base-branch command to manually override PR target branch"
+    }
+  ],
+  "notes": "Key fix: When user creates a task on branch A, base_branch is now automatically set to A. Worktree creates feature branch based on A, and PR will target A."
+}

@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.10",
+  "description": "Windows UTF-8 encoding fix",
+  "breaking": false,
+  "recommendMigrate": true,
+  "changelog": "Fixed Windows encoding issues:\n\n**Bug Fix:**\n- Fixed `UnicodeEncodeError: 'gbk' codec can't encode character` on Windows\n- Fixed `SyntaxWarning` corrupting hook JSON output on Python 3.12+\n\n**Root Cause:**\n- Windows console defaults to GBK encoding, fails on Chinese characters in git commits/task names\n- Python 3.12+ warns on invalid escape sequences, stderr corrupts hook output\n\n**Files Fixed:**\n- All hooks: session-start.py, inject-subagent-context.py, ralph-loop.py\n- All scripts: git_context.py, task.py, add_session.py\n\n**Technical Details:**\n- Added `# -*- coding: utf-8 -*-` encoding declaration\n- Force stdout to UTF-8 on Windows using `io.TextIOWrapper`\n- Suppress Python warnings with `warnings.filterwarnings(\"ignore\")`",
+  "migrations": [],
+  "notes": "Bug fix for Windows users. Strongly recommended to upgrade."
+}

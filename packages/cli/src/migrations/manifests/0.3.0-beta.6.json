@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.6",
+  "description": "Init conflict handling & spec-meta skill",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Features:**\n- feat(skill): add spec-meta skill documenting spec-first system\n\n**Bug Fixes:**\n- fix(init): use writeFile for all file copies to allow user choice on conflicts",
+  "migrations": [],
+  "notes": "No migration required."
+}

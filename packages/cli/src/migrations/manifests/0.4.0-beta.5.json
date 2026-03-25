@@ -1,0 +1,9 @@
+{
+  "version": "0.4.0-beta.5",
+  "description": "UX improvements: renamed template picker label + iFlow CLI agent fix",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- fix(init): rename \"empty templates\" to \"from scratch\" in template picker for clearer UX\n\n**Bug Fixes:**\n- fix(iflow): correct CLI agent invocation syntax in cli_adapter.py (#95)",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync."
+}

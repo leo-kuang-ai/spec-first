@@ -1,0 +1,9 @@
+{
+  "version": "0.3.6",
+  "description": "Task lifecycle hooks, custom template registries, and parent-child subtasks",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Enhancements:**\n- feat(init): add --registry flag for custom spec template sources (GitHub, GitLab, Bitbucket). Supports marketplace mode (index.json) and direct download mode\n- feat(task): add task lifecycle hooks via config.yaml (after_create, after_start, after_finish, after_archive) with TASK_JSON_PATH env var. Ships with Linear sync hook example\n- feat(task): add parent-child subtask support (add-subtask, remove-subtask commands, children/parent/meta fields in task.json)\n- docs(record-session): clarify archive judgment based on work status, not task.json status field\n\n**Bug Fixes:**\n- fix(hooks): PreToolUse context injection broken by Claude Code v2.1.63 Task→Agent tool rename. Implement/check/debug/research agents now correctly receive injected code-spec context",
+  "migrations": [],
+  "notes": "Run spec-first update to sync updated hook scripts and command templates. Critical: fixes PreToolUse context injection for CC v2.1.63+."
+}

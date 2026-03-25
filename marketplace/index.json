@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "electron-fullstack",
+      "type": "spec",
+      "name": "Electron + React + TypeScript",
+      "description": "Full-stack Electron desktop app with React frontend and SQLite backend",
+      "path": "marketplace/specs/electron-fullstack",
+      "tags": ["electron", "react", "typescript", "sqlite"]
+    },
+    {
+      "id": "nextjs-fullstack",
+      "type": "spec",
+      "name": "Next.js + oRPC + PostgreSQL",
+      "description": "Full-stack Next.js application with oRPC API layer, Drizzle ORM, and PostgreSQL",
+      "path": "marketplace/specs/nextjs-fullstack",
+      "tags": ["nextjs", "react", "typescript", "orpc", "drizzle", "postgresql"]
+    },
+    {
+      "id": "cf-workers-fullstack",
+      "type": "spec",
+      "name": "Cloudflare Workers + Hono + Turso",
+      "description": "Full-stack Cloudflare Workers application with Hono framework, Drizzle ORM, and Turso database",
+      "path": "marketplace/specs/cf-workers-fullstack",
+      "tags": ["cloudflare", "workers", "hono", "drizzle", "turso", "react", "typescript"]
+    },
+    {
+      "id": "spec-meta",
+      "type": "skill",
+      "name": "spec-first Meta Skill",
+      "description": "Meta-skill for understanding and customizing spec-first workflows",
+      "path": "marketplace/skills/spec-meta",
+      "tags": ["spec", "meta", "workflow", "customization"]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "version": "0.4.0-beta.3",
+  "description": "Fix spec-first update skipping unregistered scripts, merge v0.3.10 fixes",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(update): use getAllScripts() as single source of truth — 11 Python scripts were silently skipped by `spec-first update` because they weren't registered in the manual file list\n\n**Merged from v0.3.10:**\n- fix(init): accept HTTPS URLs for --registry option (#87)\n- fix(templates): clarify record-session commit rule for AI model compatibility (#88)",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync all Python scripts that may have been missed in previous updates."
+}

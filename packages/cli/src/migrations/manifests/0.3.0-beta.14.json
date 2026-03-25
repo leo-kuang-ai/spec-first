@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.14",
+  "description": "Fix update error for 0.2.x users & add missing manifests",
+  "breaking": false,
+  "recommendMigrate": true,
+  "changelog": "**Bug Fixes:**\n- fix(update): add defensive check for undefined item.from in orphanedMigrations\n- Add missing manifests: 0.2.12, 0.2.13, 0.3.0-beta.1~6, 0.3.0-beta.11\n\nFixes \"path argument must be of type string\" error when upgrading from 0.2.12/0.2.13.",
+  "migrations": [],
+  "notes": "Recommended for users who encountered update errors from 0.2.x versions."
+}

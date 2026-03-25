@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.1",
+  "description": "Breaking change warning UX improvement",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(update): re-show breaking change warning before confirm prompt",
+  "migrations": [],
+  "notes": "No migration required."
+}

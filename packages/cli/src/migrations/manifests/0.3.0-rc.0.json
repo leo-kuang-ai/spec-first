@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-rc.0",
+  "description": "Registry refactor, bug fixes, test coverage, release tooling",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**New Features:**\n- feat(init): support remote spec templates from docs repo\n- feat(scripts): create-manifest.js supports beta/rc/release workflows\n- feat(scripts): add release:rc script to package.json\n\n**Bug Fixes:**\n- fix: template placeholder roundtrip — collectTemplates settings now resolve {{PYTHON_CMD}} correctly\n- fix: remove stale cross-platform-thinking-guide.md reference from update command\n- fix: tool flags (--claude etc.) now take precedence over -y default\n- fix: Windows python3 command compatibility ({{PYTHON_CMD}} placeholder)\n\n**Refactor:**\n- refactor: centralized platform registry pattern (replaces scattered init/update logic)\n- refactor: extract resolvePlaceholders to shared.ts, remove templates.ts dispatcher\n- refactor: simplify tool selection with data-driven approach\n- refactor: extract VERSION constant to src/constants/version.ts\n\n**Testing:**\n- 312 tests across 17 files (unit, integration, regression)\n- @vitest/coverage-v8 with pnpm test:coverage\n\n**Documentation:**\n- docs: add .spec-first/spec/unit-test/ conventions (4 files)\n- docs: update platform-integration.md with registry pattern, known gaps, CliFlag type\n- docs: integrate test guidance into workflow commands (start, check-backend, finish-work)",
+  "migrations": [],
+  "notes": "No migration required. First release candidate — feature complete, stabilization phase."
+}

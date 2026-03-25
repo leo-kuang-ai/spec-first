@@ -1,0 +1,9 @@
+{
+  "version": "0.4.0-beta.2",
+  "description": "Fix scoped npm package names in monorepo spec directory paths",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(init): strip npm scope prefix (@scope/name → name) from monorepo package directory names — prevents nested @scope/ directories in .spec-first/spec/ and config.yaml",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync. If you ran `spec-first init` on a monorepo with scoped packages (e.g. @scope/name), you may need to manually rename existing `.spec-first/spec/@scope/name/` directories to `.spec-first/spec/name/` and update the keys in `.spec-first/config.yaml`."
+}

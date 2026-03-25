@@ -1,0 +1,9 @@
+{
+  "version": "0.3.0-beta.16",
+  "description": "iFlow CLI support and update mechanism fix",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**New Features:**\n- feat(cli): add iFlow CLI support (#22)\n\n**Bug Fixes:**\n- fix: Windows stdout encoding in iFlow hooks (use reconfigure pattern)\n- fix: sync update-spec.md to iFlow templates\n- fix: lint errors (non-null assertion, unused param)\n- fix(update): only update templates for configured platforms\n\n**Documentation:**\n- docs: add platform-integration.md spec for adding new CLI platforms",
+  "migrations": [],
+  "notes": "No migration required. Update mechanism now only updates platforms that have existing directories."
+}

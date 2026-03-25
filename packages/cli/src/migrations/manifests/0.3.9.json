@@ -1,0 +1,9 @@
+{
+  "version": "0.3.9",
+  "description": "Fix iFlow hook matcher naming",
+  "breaking": false,
+  "recommendMigrate": false,
+  "changelog": "**Bug Fixes:**\n- fix(cli): correct iFlow SessionStart hook matcher from `compact` to `compress` to match actual Claude Code event name",
+  "migrations": [],
+  "notes": "Run `spec-first update` to sync the corrected hook matcher to your project."
+}
