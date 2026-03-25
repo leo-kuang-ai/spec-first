@@ -12,6 +12,7 @@
     "access": "public"
   },
   "scripts": {
+    "postinstall": "node scripts/postinstall.mjs",
     "build": "tsc && pnpm run copy-templates",
     "copy-templates": "node scripts/copy-templates.js",
     "dev": "tsc --watch",
