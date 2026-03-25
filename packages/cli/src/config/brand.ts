@@ -7,7 +7,7 @@
 
 export const BRAND = {
   displayName: "spec-first",
-  packageName: "@leokuang/spec-first",
+  packageName: "spec-first",
   cliCommand: "spec-first",
   workflowRoot: ".spec-first",
   slashNamespace: "spec",

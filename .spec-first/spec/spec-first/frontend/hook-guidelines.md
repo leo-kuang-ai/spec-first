@@ -6,46 +6,122 @@
 
 ## Overview
 
-<!--
-Document your project's hook conventions here.
-
-Questions to answer:
-- What custom hooks do you have?
-- How do you handle data fetching?
-- What are the naming conventions?
-- How do you share stateful logic?
--->
-
-(To be filled by the team)
+**Note**: This is a CLI project without React hooks. The patterns below describe CLI "hooks" - scripts that run at specific lifecycle events.
 
 ---
 
-## Custom Hook Patterns
+## CLI Hooks
 
-<!-- How to create and structure custom hooks -->
+This project supports Python hooks that run during AI tool lifecycle:
 
-(To be filled by the team)
+| Hook | When | Purpose |
+|------|------|---------|
+| `session-start.py` | Session starts | Inject context into AI |
+| `inject-subagent-context.py` | Before agent calls | Add code-spec to prompts |
+| `ralph-loop.py` | After responses | Detect infinite loops |
 
 ---
 
-## Data Fetching
+## Hook Structure
 
-<!-- How data fetching is handled (React Query, SWR, etc.) -->
+```python
+#!/usr/bin/env python3
+"""
+Hook: session-start
+When: At the start of each AI session
+Purpose: Inject project context and guidelines
+"""
 
-(To be filled by the team)
+import sys
+import json
+
+def main():
+    # Read hook input from stdin
+    input_data = json.loads(sys.stdin.read())
+
+    # Process and respond
+    response = {
+        "status": "success",
+        "message": "Context injected"
+    }
+
+    # Output response
+    print(json.dumps(response))
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## Hook Patterns
+
+### Context Injection
+
+```python
+def inject_context():
+    """Read project state and inject into AI context"""
+    context = {
+        "developer": get_developer(),
+        "current_task": get_current_task(),
+        "guidelines": read_guidelines(),
+    }
+    return format_context(context)
+```
+
+### Error Handling
+
+```python
+def safe_hook_operation():
+    """Hooks should never crash the parent process"""
+    try:
+        # Operation
+        return {"status": "success"}
+    except Exception as e:
+        # Return error, don't raise
+        return {"status": "error", "message": str(e)}
+```
 
 ---
 
 ## Naming Conventions
 
-<!-- Hook naming rules (use*, etc.) -->
-
-(To be filled by the team)
+| Type | Convention | Example |
+|------|------------|---------|
+| Hook files | kebab-case | `session-start.py` |
+| Functions | snake_case | `get_developer()` |
+| Constants | UPPER_SNAKE | `DEFAULT_TIMEOUT` |
 
 ---
 
 ## Common Mistakes
 
-<!-- Hook-related mistakes your team has made -->
+### Don't: Raise exceptions
 
-(To be filled by the team)
+```python
+# Bad: Will crash the AI tool
+def hook():
+    raise Exception("Something went wrong")
+```
+
+### Do: Return error status
+
+```python
+# Good: Graceful error handling
+def hook():
+    try:
+        # ...
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+```
+
+---
+
+## Examples from Codebase
+
+| File | Purpose |
+|------|---------|
+| `.claude/hooks/session-start.py` | Inject spec-first context |
+| `.claude/hooks/inject-subagent-context.py` | Add code-spec to agents |
+| `.claude/hooks/ralph-loop.py` | Detect conversation loops |

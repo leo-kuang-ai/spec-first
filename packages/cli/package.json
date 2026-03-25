@@ -1,5 +1,5 @@
 {
-  "name": "@leokuang/spec-first",
+  "name": "spec-first",
   "version": "1.3.0",
   "description": "Spec-driven AI development workflow that improves delivery quality through executable project standards",
   "type": "module",

@@ -12,8 +12,8 @@
 </p>
 
 <p align="center">
-<a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/v/@leokuang/spec-first.svg?style=flat-square&color=2563eb" alt="npm version" /></a>
-<a href="https://www.npmjs.com/package/@leokuang/spec-first"><img src="https://img.shields.io/npm/dw/@leokuang/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
+<a href="https://www.npmjs.com/package/spec-first"><img src="https://img.shields.io/npm/v/spec-first.svg?style=flat-square&color=2563eb" alt="npm version" /></a>
+<a href="https://www.npmjs.com/package/spec-first"><img src="https://img.shields.io/npm/dw/spec-first?style=flat-square&color=cb3837&label=downloads" alt="npm downloads" /></a>
 <a href="https://github.com/sunrain520/spec-first/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-16a34a.svg?style=flat-square" alt="license" /></a>
 <a href="https://github.com/sunrain520/spec-first/stargazers"><img src="https://img.shields.io/github/stars/sunrain520/spec-first?style=flat-square&color=eab308" alt="stars" /></a>
 <a href="https://github.com/sunrain520/spec-first/blob/master/docs/trellis-workflow-analysis.md"><img src="https://img.shields.io/badge/docs-github%20docs-0f766e?style=flat-square" alt="docs" /></a>
@@ -39,7 +39,7 @@
 
 ```bash
 # 1. Install spec-first
-npm install -g @leokuang/spec-first@latest
+npm install -g spec-first@latest
 
 # 2. Initialize in your repo
 spec-first init -u your-name

@@ -1,0 +1,2554 @@
+╭─── Claude Code v2.1.78 ──────────────────────────────────────────────────────╮
+│                               │ Tips for getting started                     │
+│         Welcome back!         │ Run /init to create a CLAUDE.md file with i… │
+│                               │ ──────────────────────────────────────────── │
+│            ▐▛███▜▌            │ Recent activity                              │
+│           ▝▜█████▛▘           │ No recent activity                           │
+│             ▘▘ ▝▝             │                                              │
+│                               │                                              │
+│   GLM-5 · API Usage Billing   │                                              │
+│      ~/xiaobu/spec-first      │                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+❯ /spec:start                                                                   
+
+⏺ Session Context Summary
+
+  Developer: kuang
+  Branch: master
+  Working Directory: 102 uncommitted changes
+
+  Active Task Found
+
+  Task: Bootstrap Guidelines (00-bootstrap-guidelines)
+  Status: in_progress - NOT READY
+  Description: Fill in project development guidelines for AI agents
+
+  The task has a prd.md file with details. Context is not yet configured (no
+  jsonl files).
+
+  Available Guidelines
+
+  - Frontend: Component guidelines, hooks, state management, quality guidelines
+  (all "To fill")
+  - Backend: Directory structure, database, error handling, quality guidelines,
+  logging (all "To fill")
+  - Guides: Code reuse thinking, cross-layer thinking
+
+  ---
+  What would you like to do?
+
+  1. Continue the active task (Bootstrap Guidelines) - I'll read the PRD and
+  help you fill in the project guidelines
+  2. Work on something new - Describe what you'd like to build or fix
+
+❯ 中文回复                                                                      
+
+⏺ 会话上下文摘要
+
+  开发者: kuang
+  分支: master
+  工作目录: 102 个未提交的变更
+
+  发现活动任务
+
+  任务: Bootstrap Guidelines (00-bootstrap-guidelines)
+  状态: in_progress - 尚未就绪
+  描述: 为 AI 代理填写项目开发指南
+
+  该任务有 prd.md 文件包含详情。上下文尚未配置（没有 jsonl 文件）。
+
+  可用指南
+
+  - 前端: 组件指南、Hooks、状态管理、质量指南（均为"待填写"）
+  - 后端: 目录结构、数据库、错误处理、质量指南、日志（均为"待填写"）
+  - 思考指南: 代码复用思考、跨层思考
+
+  ---
+  您想做什么？
+
+  1. 继续活动任务（Bootstrap Guidelines）- 我会读取 PRD 并帮您填写项目指南
+  2. 开始新工作 - 描述您想构建或修复的内容
+
+❯ /git-push                                                                     
+
+⏺ 我来帮您执行 git 提交和推送操作。
+
+⏺ Bash(git status && echo "---REMOTES---" && git remote -v && echo
+      "---BRANCH---" && git branch --show-current)
+  ⎿  On branch master
+     Your branch is up to date with 'github/master'.
+     … +80 lines (ctrl+o to expand)
+
+⏺ Bash(git diff --stat HEAD)
+  ⎿   .claude/agents/check.md                            |   6 +-
+      .claude/agents/debug.md                            |   6 +-
+      .claude/agents/dispatch.md                         |  17 +-
+     … +70 lines (ctrl+o to expand)
+
+⏺ Git 状态摘要：
+
+  ┌──────────┬───────────────────────────────────────────────────────┐
+  │   项目   │                         内容                          │
+  ├──────────┼───────────────────────────────────────────────────────┤
+  │ 当前分支 │ master                                                │
+  ├──────────┼───────────────────────────────────────────────────────┤
+  │ 远程仓库 │ github (https://github.com/sunrain520/spec-first.git) │
+  ├──────────┼───────────────────────────────────────────────────────┤
+  │ 修改文件 │ 82 个文件 (+500, -576)                                │
+  ├──────────┼───────────────────────────────────────────────────────┤
+  │ 新增文件 │ .spec-first/ 初始化目录、spec 命令目录等              │
+  ├──────────┼───────────────────────────────────────────────────────┤
+  │ 删除文件 │ 旧的 spec-first/trellis 命令目录                      │
+  └──────────┴───────────────────────────────────────────────────────┘
+
+  改动分析：
+  - 重构命令结构：将 spec-first/ 命令迁移到 spec/ 目录
+  - 删除冗余命令：合并 before-backend-dev, before-frontend-dev, check-backend,
+  check-frontend
+  - 新增 .spec-first/ 初始化结构和脚本
+  - 更新所有模板文件以适配新结构
+
+  ---
+  生成的 Commit Message：
+  refactor(cli): 重构命令结构，统一 spec 工作流
+
+  - 将 spec-first/ 命令迁移到 spec/ 目录
+  - 合并 before-backend-dev/before-frontend-dev/check-backend/check-frontend 为
+  before-dev/check
+  - 新增 .spec-first/ 初始化目录和脚本
+  - 更新所有模板文件以适配新结构
+  - 清理冗余的命令定义
+
+  是否执行提交并推送到 github？
+
+✻ Cogitated for 33s
+
+❯ 推送                                                                          
+
+⏺ Bash(git add .)
+  ⎿  (No output)
+
+⏺ Bash(git commit -m "$(cat <<'EOF'
+      refactor(cli): 重构命令结构，统一 spec 工作流…)
+  ⎿  [master a4e8033] refactor(cli): 重构命令结构，统一 spec 工作流
+      268 files changed, 34964 insertions(+), 576 deletions(-)
+      delete mode 100644 .claude/commands/spec-first/analyze.md
+     … +199 lines (ctrl+o to expand)
+
+⏺ Bash(git push github master)
+  ⎿  To https://github.com/sunrain520/spec-first.git
+        866d90f..a4e8033  master -> master
+
+⏺ ✅ 推送完成！
+
+  ┌──────────┬───────────────────────────────────────────────┐
+  │   项目   │                     结果                      │
+  ├──────────┼───────────────────────────────────────────────┤
+  │ Commit   │ a4e8033                                       │
+  ├──────────┼───────────────────────────────────────────────┤
+  │ Message  │ refactor(cli): 重构命令结构，统一 spec 工作流 │
+  ├──────────┼───────────────────────────────────────────────┤
+  │ 文件变更 │ 268 files (+34964, -576)                      │
+  ├──────────┼───────────────────────────────────────────────┤
+  │ 远程仓库 │ github ✓                                      │
+  └──────────┴───────────────────────────────────────────────┘
+
+  本次提交包含：
+  - 新增 13 个 spec/ 命令
+  - 新增 .spec-first/ 初始化结构和脚本
+  - 删除旧的 spec-first/ 命令目录
+  - 合并冗余命令
+
+✻ Crunched for 43s
+
+❯ 推送到03-24分支,当前在这个分支                                                
+
+⏺ Bash(git branch --show-current && git status --short)
+  ⎿  master
+
+⏺ 当前实际在 master 分支。您是想：
+
+  1. 创建并推送到新的 03-24 分支 - 基于 master 创建
+  2. 切换到已存在的 03-24 分支并推送
+
+  请确认您的意图？
+
+❯ 2                                                                             
+
+⏺ Bash(git branch -a | grep "03-24")
+  ⎿    leo-2026-03-24
+     + leo-2026-03-24-node-workflow-exec
+       remotes/github/leo-2026-03-24
+       remotes/github/leo-2026-03-24-node-workflow-exec
+
+⏺ 找到两个 03-24 相关分支：
+  1. leo-2026-03-24
+  2. leo-2026-03-24-node-workflow-exec
+
+  您想切换到哪个分支？
+
+❯ /spec:start                                                                   
+
+⏺ Bash(python3 ./.spec-first/scripts/get_context.py)
+  ⎿  ========================================
+     SESSION CONTEXT
+     ========================================
+     … +31 lines (ctrl+o to expand)
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ 会话上下文
+
+  开发者: kuang
+  分支: master
+  工作目录: 干净
+
+  活动任务
+
+  任务: Bootstrap Guidelines (00-bootstrap-guidelines)
+  状态: in_progress
+  目标: 填充项目开发指南，让 AI 代理理解项目的编码规范
+
+  任务内容：
+  - 分析现有代码库，发现编码模式
+  - 将模式填充到 .spec-first/spec/spec-first/backend/ 和 frontend/ 目录
+  - 基于现有代码提取约定，而不是从头编写
+
+  ---
+  您想做什么？
+
+  1. 继续 Bootstrap Guidelines 任务 - 我会分析代码库并帮您填充开发指南
+  2. 开始新工作 - 描述您想构建或修复的内容
+
+✻ Brewed for 48s
+
+❯ Bootstrap Guidelines                                                          
+
+⏺ 好的，我来继续 Bootstrap Guidelines 任务。
+
+  首先分析代码库中的实际模式，然后填充指南文件。
+
+⏺ Searched for 2 patterns, read 2 files (ctrl+o to expand)
+
+⏺ 让我分析代码库中的实际模式：
+
+⏺ Read 5 files (ctrl+o to expand)
+
+⏺ 现在我已分析完代码库，开始填充指南文件。
+
+⏺ Read 3 files (ctrl+o to expand)
+
+⏺ Write(.spec-first/spec/spec-first/backend/directory-structure.md)
+  ⎿  Added 83 lines, removed 21 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's backend directory structure here.     
+        9 +This is a TypeScript CLI project using Node.js ESM modules.   
+          +The codebase follows a feature-based organization with clear  
+          +separation between CLI, commands, configurators, templates,   
+          +and utilities.                                                
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- How are modules/packages organized?                         
+       13 -- Where does business logic live?                             
+       14 -- Where are API endpoints defined?                            
+       15 -- How are utilities and helpers organized?                    
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13  ## Directory Layout                                           
+       14                                                                
+       15  ```                                                           
+       16 -<!-- Replace with your actual structure -->                   
+       17 -src/                                                          
+       18 -├── ...                                                       
+       19 -└── ...                                                       
+       16 +packages/cli/src/                                             
+       17 +├── cli/                    # CLI entry point and command     
+          +definitions                                                   
+       18 +│   └── index.ts            # Commander.js setup, option      
+          +parsing                                                       
+       19 +├── commands/               # Command implementations (init,  
+          +update)                                                       
+       20 +│   ├── init.ts             # `spec-first init` command       
+       21 +│   └── update.ts           # `spec-first update` command     
+       22 +├── configurators/          # Platform-specific configuration 
+          + logic                                                        
+       23 +│   ├── index.ts            # Platform registry and helper    
+          +functions                                                     
+       24 +│   ├── claude.ts           # Claude Code configurator        
+       25 +│   ├── cursor.ts           # Cursor configurator             
+       26 +│   ├── iflow.ts            # iFlow CLI configurator          
+       27 +│   └── ...                 # Other platform configurators    
+       28 +├── templates/              # Template files for each         
+          +platform                                                      
+       29 +│   ├── claude/             # Claude Code templates           
+       30 +│   ├── cursor/             # Cursor templates                
+       31 +│   ├── common/             # Shared templates                
+       32 +│   └── ...                 # Other platform templates        
+       33 +├── types/                  # TypeScript type definitions     
+       34 +│   ├── ai-tools.ts         # AI tool types and registry      
+       35 +│   └── migration.ts        # Migration types                 
+       36 +├── utils/                  # Utility functions               
+       37 +│   ├── file-writer.ts      # File writing with conflict      
+          +handling                                                      
+       38 +│   ├── project-detector.ts # Project type detection          
+       39 +│   ├── template-fetcher.ts # Remote template downloading     
+       40 +│   └── ...                 # Other utilities                 
+       41 +├── constants/              # Constants and configuration     
+       42 +│   ├── paths.ts            # Path constants                  
+       43 +│   └── version.ts          # Version info                    
+       44 +├── config/                 # Branding and config             
+       45 +│   └── brand.ts            # Brand configuration             
+       46 +└── index.ts                # Package entry point             
+       47  ```                                                           
+       48                                                                
+       49  ---                                                           
+       50                                                                
+       51  ## Module Organization                                        
+       52                                                                
+       53 -<!-- How should new features/modules be organized? -->        
+       53 +### Adding a New Platform                                     
+       54                                                                
+       55 -(To be filled by the team)                                    
+       55 +When adding a new AI tool platform:                           
+       56                                                                
+       57 +1. **Add to types**: Update `AI_TOOLS` in                     
+          +`src/types/ai-tools.ts`                                       
+       58 +2. **Create configurator**: Add                               
+          +`src/configurators/{platform}.ts`                             
+       59 +3. **Create templates**: Add `src/templates/{platform}/`      
+       60 +4. **Register**: Add to `PLATFORM_FUNCTIONS` in               
+          +`src/configurators/index.ts`                                  
+       61 +5. **Add CLI flag**: Update `src/cli/index.ts` and            
+          +`InitOptions` in `src/commands/init.ts`                       
+       62 +                                                              
+       63 +### Feature Module Pattern                                    
+       64 +                                                              
+       65 +Each major feature should follow this pattern:                
+       66 +                                                              
+       67 +```                                                           
+       68 +feature/                                                      
+       69 +├── index.ts          # Public exports                        
+       70 +├── types.ts          # Feature-specific types                
+       71 +├── implementation.ts # Core logic                            
+       72 +└── utils.ts          # Feature utilities                     
+       73 +```                                                           
+       74 +                                                              
+       75  ---                                                           
+       76                                                                
+       77  ## Naming Conventions                                         
+       78                                                                
+       79 -<!-- File and folder naming rules -->                         
+       79 +| Type | Convention | Example |                               
+       80 +|------|------------|---------|                               
+       81 +| Files | kebab-case | `file-writer.ts`,                      
+          +`project-detector.ts` |                                       
+       82 +| Directories | kebab-case | `configurators/`, `multi-agent/` 
+          + |                                                            
+       83 +| Functions | camelCase | `getPythonCommand()`, `writeFile()` 
+          + |                                                            
+       84 +| Classes/Types | PascalCase | `AITool`, `WriteOptions`,      
+          +`InitOptions` |                                               
+       85 +| Constants | UPPER_SNAKE_CASE | `AI_TOOLS`,                  
+          +`PLATFORM_FUNCTIONS`, `DIR_NAMES` |                           
+       86 +| Private module vars | camelCase with leading underscore |   
+          +`_cliFlagCheck` |                                             
+       87                                                                
+       88 -(To be filled by the team)                                    
+       88 +---                                                           
+       89                                                                
+       90 +## Import Style                                               
+       91 +                                                              
+       92 +```typescript                                                 
+       93 +// 1. Node.js built-ins (with "node:" prefix)                 
+       94 +import fs from "node:fs";                                     
+       95 +import path from "node:path";                                 
+       96 +                                                              
+       97 +// 2. External packages                                       
+       98 +import chalk from "chalk";                                    
+       99 +import { Command } from "commander";                          
+      100 +                                                              
+      101 +// 3. Internal modules (with .js extension for ESM)           
+      102 +import { init } from "../commands/init.js";                   
+      103 +import { BRAND } from "../config/brand.js";                   
+      104 +```                                                           
+      105 +                                                              
+      106 +**Important**: Always use `.js` extension in imports even for 
+          + `.ts` files (required for ESM compatibility).                
+      107 +                                                              
+      108  ---                                                           
+      109                                                                
+      110  ## Examples                                                   
+      111                                                                
+      112 -<!-- Link to well-organized modules as examples -->           
+      112 +### Well-organized modules                                    
+      113                                                                
+      114 -(To be filled by the team)                                    
+      114 +- **`src/configurators/index.ts`** - Clean registry pattern   
+          +with derived helpers                                          
+      115 +- **`src/types/ai-tools.ts`** - Single source of truth for    
+          +platform data                                                 
+      116 +- **`src/utils/file-writer.ts`** - Focused utility with clear 
+          + interface                                                    
+
+⏺ Write(.spec-first/spec/spec-first/backend/error-handling.md)
+  ⎿  Added 149 lines, removed 21 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's error handling conventions here.      
+        9 +This CLI project uses a straightforward error handling        
+          +approach:                                                     
+       10 +- Try-catch for operations that may fail                      
+       11 +- `chalk.red()` for user-facing error messages                
+       12 +- `process.exit(1)` for fatal errors                          
+       13 +- Graceful fallbacks where possible                           
+       14                                                                
+       15 -Questions to answer:                                          
+       16 -- What error types do you define?                             
+       17 -- How are errors propagated?                                  
+       18 -- How are errors logged?                                      
+       19 -- How are errors returned to clients?                         
+       20 --->                                                           
+       15 +---                                                           
+       16                                                                
+       17 -(To be filled by the team)                                    
+       17 +## Error Patterns                                             
+       18                                                                
+       19 ----                                                           
+       19 +### CLI Command Error Handling                                
+       20                                                                
+       21 -## Error Types                                                
+       21 +```typescript                                                 
+       22 +// Example from src/cli/index.ts                              
+       23 +.action(async (options: Record<string, unknown>) => {         
+       24 +  try {                                                       
+       25 +    await init(options);                                      
+       26 +  } catch (error) {                                           
+       27 +    console.error(                                            
+       28 +      chalk.red("Error:"),                                    
+       29 +      error instanceof Error ? error.message : error,         
+       30 +    );                                                        
+       31 +    process.exit(1);                                          
+       32 +  }                                                           
+       33 +});                                                           
+       34 +```                                                           
+       35                                                                
+       36 -<!-- Custom error classes/types -->                           
+       36 +### Utility Function Error Handling                           
+       37                                                                
+       38 -(To be filled by the team)                                    
+       38 +```typescript                                                 
+       39 +// Return boolean for success/failure, don't throw            
+       40 +function createBootstrapTask(cwd: string, developer: string): 
+          + boolean {                                                    
+       41 +  try {                                                       
+       42 +    // ... operation                                          
+       43 +    return true;                                              
+       44 +  } catch {                                                   
+       45 +    return false;  // Silent failure, caller handles          
+       46 +  }                                                           
+       47 +}                                                             
+       48 +```                                                           
+       49                                                                
+       50 +### Detection Functions                                       
+       51 +                                                              
+       52 +```typescript                                                 
+       53 +// Return undefined/null on failure, don't throw              
+       54 +function getPythonCommand(): string {                         
+       55 +  try {                                                       
+       56 +    execSync("python3 --version", { stdio: "pipe" });         
+       57 +    return "python3";                                         
+       58 +  } catch {                                                   
+       59 +    try {                                                     
+       60 +      execSync("python --version", { stdio: "pipe" });        
+       61 +      return "python";                                        
+       62 +    } catch {                                                 
+       63 +      return "python3";  // Default, let it fail with clear   
+          +error later                                                   
+       64 +    }                                                         
+       65 +  }                                                           
+       66 +}                                                             
+       67 +```                                                           
+       68 +                                                              
+       69  ---                                                           
+       70                                                                
+       71 -## Error Handling Patterns                                    
+       71 +## Error Message Style                                        
+       72                                                                
+       73 -<!-- Try-catch patterns, error propagation -->                
+       73 +### User-Facing Errors                                        
+       74                                                                
+       75 -(To be filled by the team)                                    
+       75 +```typescript                                                 
+       76 +// Good: Clear, actionable error message                      
+       77 +console.log(                                                  
+       78 +  chalk.red(                                                  
+       79 +    "Error: --monorepo specified but no monorepo              
+          +configuration found.",                                        
+       80 +  ),                                                          
+       81 +);                                                            
+       82 +return;                                                       
+       83                                                                
+       84 +// Good: Suggests next action                                 
+       85 +console.log(                                                  
+       86 +  chalk.red(                                                  
+       87 +    "Error: Registry is a marketplace with multiple           
+          +templates. " +                                                
+       88 +      "Use --template <id> to specify which one.",            
+       89 +  ),                                                          
+       90 +);                                                            
+       91 +```                                                           
+       92 +                                                              
+       93 +### Network Errors                                            
+       94 +                                                              
+       95 +```typescript                                                 
+       96 +// Distinguish between "not found" and "network issue"        
+       97 +if (probeResult.isNotFound) {                                 
+       98 +  // Expected: no index.json → direct download mode           
+       99 +} else {                                                      
+      100 +  // Transient error → abort, don't misclassify               
+      101 +  console.log(                                                
+      102 +    chalk.red(                                                
+      103 +      "Error: Could not reach registry (network issue). Check 
+          + your connection.",                                           
+      104 +    ),                                                        
+      105 +  );                                                          
+      106 +  return;                                                     
+      107 +}                                                             
+      108 +```                                                           
+      109 +                                                              
+      110  ---                                                           
+      111                                                                
+      112 -## API Error Responses                                        
+      112 +## Common Patterns                                            
+      113                                                                
+      114 -<!-- Standard error response format -->                       
+      114 +### Silent Fallback Pattern                                   
+      115                                                                
+      116 -(To be filled by the team)                                    
+      116 +```typescript                                                 
+      117 +// Try to detect, fall back gracefully                        
+      118 +let developerName = options.user;                             
+      119 +if (!developerName) {                                         
+      120 +  try {                                                       
+      121 +    developerName = execSync("git config user.name", {        
+          +encoding: "utf-8" }).trim();                                  
+      122 +  } catch {                                                   
+      123 +    // Git not available or no user.name configured           
+      124 +    // Will prompt user later                                 
+      125 +  }                                                           
+      126 +}                                                             
+      127 +```                                                           
+      128                                                                
+      129 +### Early Return Pattern                                      
+      130 +                                                              
+      131 +```typescript                                                 
+      132 +// Check preconditions, return early on error                 
+      133 +if (tools.length === 0) {                                     
+      134 +  console.log(chalk.yellow("No tools selected. At least one   
+          +tool is required."));                                         
+      135 +  return;                                                     
+      136 +}                                                             
+      137 +```                                                           
+      138 +                                                              
+      139  ---                                                           
+      140                                                                
+      141  ## Common Mistakes                                            
+      142                                                                
+      143 -<!-- Error handling mistakes your team has made -->           
+      143 +### Don't: Swallow errors silently in critical paths          
+      144                                                                
+      145 -(To be filled by the team)                                    
+      145 +```typescript                                                 
+      146 +// Bad: Silent failure in important operation                 
+      147 +try {                                                         
+      148 +  await criticalOperation();                                  
+      149 +} catch {                                                     
+      150 +  // User never knows something went wrong                    
+      151 +}                                                             
+      152 +```                                                           
+      153 +                                                              
+      154 +### Do: Log or return status                                  
+      155 +                                                              
+      156 +```typescript                                                 
+      157 +// Good: Inform user or return status                         
+      158 +try {                                                         
+      159 +  await criticalOperation();                                  
+      160 +} catch (error) {                                             
+      161 +  console.log(chalk.yellow(`Warning: ${error}`));             
+      162 +}                                                             
+      163 +```                                                           
+      164 +                                                              
+      165 +### Don't: Throw without context                              
+      166 +                                                              
+      167 +```typescript                                                 
+      168 +// Bad                                                        
+      169 +throw new Error("Failed");                                    
+      170 +```                                                           
+      171 +                                                              
+      172 +### Do: Include actionable context                            
+      173 +                                                              
+      174 +```typescript                                                 
+      175 +// Good                                                       
+      176 +console.log(                                                  
+      177 +  chalk.red("Error: Could not reach registry. Check your      
+          +connection and try again."),                                  
+      178 +);                                                            
+      179 +```                                                           
+
+⏺ Write(.spec-first/spec/spec-first/backend/quality-guidelines.md)
+  ⎿  Added 174 lines, removed 19 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's quality standards here.               
+        9 +This project emphasizes clean, maintainable TypeScript code   
+          +with strong typing and clear patterns. Code should be         
+          +self-documenting with minimal comments needed.                
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What patterns are forbidden?                                
+       13 -- What linting rules do you enforce?                          
+       14 -- What are your testing requirements?                         
+       15 -- What code review standards apply?                           
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13  ## Forbidden Patterns                                         
+       14                                                                
+       15 -<!-- Patterns that should never be used and why -->           
+       15 +### Never use `any` without justification                     
+       16                                                                
+       17 -(To be filled by the team)                                    
+       17 +```typescript                                                 
+       18 +// Bad                                                        
+       19 +function process(data: any) { ... }                           
+       20                                                                
+       21 +// Good                                                       
+       22 +function process(data: Record<string, unknown>) { ... }       
+       23 +// Or define a proper type                                    
+       24 +interface ProcessData { ... }                                 
+       25 +function process(data: ProcessData) { ... }                   
+       26 +```                                                           
+       27 +                                                              
+       28 +### Never ignore TypeScript errors                            
+       29 +                                                              
+       30 +```typescript                                                 
+       31 +// Bad                                                        
+       32 +// @ts-ignore                                                 
+       33 +someUntypedCall();                                            
+       34 +                                                              
+       35 +// Good: Fix the type or use proper assertion                 
+       36 +(someUntypedCall() as ExpectedType);                          
+       37 +```                                                           
+       38 +                                                              
+       39 +### Never use `var`                                           
+       40 +                                                              
+       41 +```typescript                                                 
+       42 +// Bad                                                        
+       43 +var x = 1;                                                    
+       44 +                                                              
+       45 +// Good                                                       
+       46 +const x = 1;                                                  
+       47 +let y; // Only if reassignment needed                         
+       48 +```                                                           
+       49 +                                                              
+       50 +### Never mix CommonJS and ESM                                
+       51 +                                                              
+       52 +```typescript                                                 
+       53 +// Bad                                                        
+       54 +const fs = require("fs");                                     
+       55 +module.exports = { ... };                                     
+       56 +                                                              
+       57 +// Good                                                       
+       58 +import fs from "node:fs";                                     
+       59 +export { ... };                                               
+       60 +```                                                           
+       61 +                                                              
+       62  ---                                                           
+       63                                                                
+       64  ## Required Patterns                                          
+       65                                                                
+       66 -<!-- Patterns that must always be used -->                    
+       66 +### Use const assertions for readonly data                    
+       67                                                                
+       68 -(To be filled by the team)                                    
+       68 +```typescript                                                 
+       69 +// Good                                                       
+       70 +const AI_TOOLS = {                                            
+       71 +  "claude-code": { ... },                                     
+       72 +} as const;                                                   
+       73                                                                
+       74 +type AITool = keyof typeof AI_TOOLS;                          
+       75 +```                                                           
+       76 +                                                              
+       77 +### Use explicit return types for public functions            
+       78 +                                                              
+       79 +```typescript                                                 
+       80 +// Good                                                       
+       81 +export function getConfiguredPlatforms(cwd: string):          
+          +Set<AITool> {                                                 
+       82 +  // ...                                                      
+       83 +}                                                             
+       84 +                                                              
+       85 +// Also good for async                                        
+       86 +export async function init(options: InitOptions):             
+          +Promise<void> {                                               
+       87 +  // ...                                                      
+       88 +}                                                             
+       89 +```                                                           
+       90 +                                                              
+       91 +### Use type guards for error handling                        
+       92 +                                                              
+       93 +```typescript                                                 
+       94 +// Good                                                       
+       95 +catch (error) {                                               
+       96 +  console.error(                                              
+       97 +    chalk.red("Error:"),                                      
+       98 +    error instanceof Error ? error.message : error,           
+       99 +  );                                                          
+      100 +}                                                             
+      101 +```                                                           
+      102 +                                                              
+      103 +### Use descriptive variable names                            
+      104 +                                                              
+      105 +```typescript                                                 
+      106 +// Bad                                                        
+      107 +const d = detectMonorepo(cwd);                                
+      108 +for (const p of d) { ... }                                    
+      109 +                                                              
+      110 +// Good                                                       
+      111 +const detectedPackages = detectMonorepo(cwd);                 
+      112 +for (const pkg of detectedPackages) { ... }                   
+      113 +```                                                           
+      114 +                                                              
+      115  ---                                                           
+      116                                                                
+      117  ## Testing Requirements                                       
+      118                                                                
+      119 -<!-- What level of testing is expected -->                    
+      119 +### Test file location                                        
+      120                                                                
+      121 -(To be filled by the team)                                    
+      121 +```                                                           
+      122 +packages/cli/                                                 
+      123 +├── src/                                                      
+      124 +│   └── utils/                                                
+      125 +│       └── compare-versions.ts                               
+      126 +└── test/                                                     
+      127 +    └── compare-versions.test.ts                              
+      128 +```                                                           
+      129                                                                
+      130 +### Test naming                                               
+      131 +                                                              
+      132 +```typescript                                                 
+      133 +// Test file: {module}.test.ts                                
+      134 +describe("compareVersions", () => {                           
+      135 +  it("should return positive when a > b", () => {             
+      136 +    expect(compareVersions("2.0.0",                           
+          +"1.0.0")).toBeGreaterThan(0);                                 
+      137 +  });                                                         
+      138 +});                                                           
+      139 +```                                                           
+      140 +                                                              
+      141  ---                                                           
+      142                                                                
+      143  ## Code Review Checklist                                      
+      144                                                                
+      145 -<!-- What reviewers should check -->                          
+      145 +- [ ] No `any` types without justification                    
+      146 +- [ ] Imports use `.js` extension for ESM                     
+      147 +- [ ] Error messages use `chalk.red()` and are user-friendly  
+      148 +- [ ] Functions have explicit return types                    
+      149 +- [ ] No unused variables or imports                          
+      150 +- [ ] Constants use `UPPER_SNAKE_CASE`                        
+      151 +- [ ] Files use `kebab-case`                                  
+      152 +- [ ] No console.log in library code (use chalk for CLI       
+          +output)                                                       
+      153 +- [ ] Try-catch wraps operations that may fail                
+      154 +- [ ] Early returns used to reduce nesting                    
+      155                                                                
+      156 -(To be filled by the team)                                    
+      156 +---                                                           
+      157 +                                                              
+      158 +## Linting                                                    
+      159 +                                                              
+      160 +Run before committing:                                        
+      161 +                                                              
+      162 +```bash                                                       
+      163 +npm run lint                                                  
+      164 +npm run typecheck                                             
+      165 +```                                                           
+      166 +                                                              
+      167 +---                                                           
+      168 +                                                              
+      169 +## Common Mistakes                                            
+      170 +                                                              
+      171 +### Forgetting `.js` extension in imports                     
+      172 +                                                              
+      173 +```typescript                                                 
+      174 +// Bad - will fail at runtime                                 
+      175 +import { init } from "../commands/init";                      
+      176 +                                                              
+      177 +// Good                                                       
+      178 +import { init } from "../commands/init.js";                   
+      179 +```                                                           
+      180 +                                                              
+      181 +### Not handling undefined                                    
+      182 +                                                              
+      183 +```typescript                                                 
+      184 +// Bad                                                        
+      185 +const name = options.user.trim();                             
+      186 +                                                              
+      187 +// Good                                                       
+      188 +const name = options.user?.trim() ?? "default";               
+      189 +```                                                           
+      190 +                                                              
+      191 +### Overly nested code                                        
+      192 +                                                              
+      193 +```typescript                                                 
+      194 +// Bad                                                        
+      195 +if (condition1) {                                             
+      196 +  if (condition2) {                                           
+      197 +    if (condition3) {                                         
+      198 +      doSomething();                                          
+      199 +    }                                                         
+      200 +  }                                                           
+      201 +}                                                             
+      202 +                                                              
+      203 +// Good                                                       
+      204 +if (!condition1 || !condition2 || !condition3) return;        
+      205 +doSomething();                                                
+      206 +```                                                           
+
+⏺ Write(.spec-first/spec/spec-first/backend/logging-guidelines.md)
+  ⎿  Error writing file
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Write(.spec-first/spec/spec-first/backend/logging-guidelines.md)
+  ⎿  Added 126 lines, removed 23 lines
+        1  # Logging Guidelines                                          
+        2                                                                
+        3 -> How logging is done in this project.                        
+        3 +> Structured logging patterns for this CLI project.           
+        4                                                                
+        5  ---                                                           
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's logging conventions here.             
+        9 +This is a CLI tool, so logging = console output. We use       
+          +`chalk` for colored, user-friendly messages. Logging should   
+          +be informative but not verbose.                               
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What logging library do you use?                            
+       13 -- What are the log levels and when to use each?               
+       14 -- What should be logged?                                      
+       15 -- What should NOT be logged (PII, secrets)?                   
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13  ## Log Levels                                                 
+       14                                                                
+       15 -<!-- When to use each level: debug, info, warn, error -->     
+       15 +### Info (blue)                                               
+       16                                                                
+       17 -(To be filled by the team)                                    
+       17 +For progress updates and successful operations:               
+       18                                                                
+       19 ----                                                           
+       19 +```typescript                                                 
+       20 +console.log(chalk.blue("📁 Creating workflow structure...")); 
+       21 +console.log(chalk.blue("📝 Configuring Claude Code..."));     
+       22 +console.log(chalk.blue("👤 Developer:"),                      
+          +chalk.gray(developerName));                                   
+       23 +```                                                           
+       24                                                                
+       25 -## Structured Logging                                         
+       25 +### Success (green)                                           
+       26                                                                
+       27 -<!-- Log format, required fields -->                          
+       27 +For completed operations:                                     
+       28                                                                
+       29 -(To be filled by the team)                                    
+       29 +```typescript                                                 
+       30 +console.log(chalk.green("   ✓ All files created               
+          +successfully"));                                              
+       31 +console.log(chalk.green(`   ${result.message}`));             
+       32 +```                                                           
+       33                                                                
+       34 +### Warning (yellow)                                          
+       35 +                                                              
+       36 +For non-fatal issues or important notices:                    
+       37 +                                                              
+       38 +```typescript                                                 
+       39 +console.log(chalk.yellow("No tools selected. At least one     
+          +tool is required."));                                         
+       40 +console.log(chalk.yellow(`  ↻ Overwritten: ${displayPath}`)); 
+       41 +console.log(chalk.yellow('📌 Windows detected: Using "python" 
+          + for hooks'));                                                
+       42 +```                                                           
+       43 +                                                              
+       44 +### Error (red)                                               
+       45 +                                                              
+       46 +For failures that stop execution:                             
+       47 +                                                              
+       48 +```typescript                                                 
+       49 +console.error(chalk.red("Error:"), error instanceof Error ?   
+          +error.message : error);                                       
+       50 +console.log(chalk.red("Error: Could not reach registry. Check 
+          + your connection."));                                         
+       51 +```                                                           
+       52 +                                                              
+       53 +### Muted (gray)                                              
+       54 +                                                              
+       55 +For secondary information:                                    
+       56 +                                                              
+       57 +```typescript                                                 
+       58 +console.log(chalk.gray("   Using proxy: proxy.example.com")); 
+       59 +console.log(chalk.gray("   This may take a moment on slow     
+          +connections."));                                              
+       60 +```                                                           
+       61 +                                                              
+       62  ---                                                           
+       63                                                                
+       64 -## What to Log                                                
+       64 +## Formatting Patterns                                        
+       65                                                                
+       66 -<!-- Important events to log -->                              
+       66 +### Status Icons                                              
+       67                                                                
+       68 -(To be filled by the team)                                    
+       68 +```typescript                                                 
+       69 +console.log(chalk.green("  ✓"), "Success message");           
+       70 +console.log(chalk.yellow("  ↻"), "Overwritten");              
+       71 +console.log(chalk.blue("  +"), "Appended");                   
+       72 +console.log(chalk.gray("  ○"), "Skipped");                    
+       73 +console.log(chalk.red("  ✗"), "Error message");               
+       74 +```                                                           
+       75                                                                
+       76 +### Key-Value Pairs                                           
+       77 +                                                              
+       78 +```typescript                                                 
+       79 +// Good: Label + value                                        
+       80 +console.log(chalk.blue("👤 Developer:"),                      
+          +chalk.gray(developerName));                                   
+       81 +console.log(chalk.gray(`   - ${pkg.name}`) + chalk.gray(`     
+          +(${pkg.path})`));                                             
+       82 +```                                                           
+       83 +                                                              
+       84  ---                                                           
+       85                                                                
+       86  ## What NOT to Log                                            
+       87                                                                
+       88 -<!-- Sensitive data, PII, secrets -->                         
+       88 +### Don't log sensitive data                                  
+       89                                                                
+       90 -(To be filled by the team)                                    
+       90 +```typescript                                                 
+       91 +// Bad                                                        
+       92 +console.log(`API key: ${apiKey}`);                            
+       93 +                                                              
+       94 +// Good                                                       
+       95 +console.log(`Using proxy: ${maskProxyUrl(proxyUrl)}`);        
+       96 +```                                                           
+       97 +                                                              
+       98 +### Don't log raw objects                                     
+       99 +                                                              
+      100 +```typescript                                                 
+      101 +// Bad                                                        
+      102 +console.log(result);                                          
+      103 +                                                              
+      104 +// Good                                                       
+      105 +console.log(chalk.green(`   ${result.message}`));             
+      106 +```                                                           
+      107 +                                                              
+      108 +### Don't log in library code                                 
+      109 +                                                              
+      110 +```typescript                                                 
+      111 +// Bad in utility functions                                   
+      112 +export function writeFile() {                                 
+      113 +  console.log("Writing file...");  // Too verbose             
+      114 +}                                                             
+      115 +                                                              
+      116 +// Good: Let caller decide what to log                        
+      117 +export async function writeFile(): Promise<boolean> {         
+      118 +  // ... silent operation, return status                      
+      119 +}                                                             
+      120 +```                                                           
+      121 +                                                              
+      122 +---                                                           
+      123 +                                                              
+      124 +## Common Patterns                                            
+      125 +                                                              
+      126 +### Progress indicator                                        
+      127 +                                                              
+      128 +```typescript                                                 
+      129 +// Ticker for long operations                                 
+      130 +const ticker = setInterval(() => {                            
+      131 +  elapsed++;                                                  
+      132 +  process.stdout.write(`\r${chalk.gray(`Loading...            
+          +${elapsed}s/${timeout}s`)}`);                                 
+      133 +}, 1000);                                                     
+      134 +// ... operation ...                                          
+      135 +clearInterval(ticker);                                        
+      136 +process.stdout.write("\r\x1b[2K");  // Clear line             
+      137 +```                                                           
+      138 +                                                              
+      139 +### Silent mode                                               
+      140 +                                                              
+      141 +```typescript                                                 
+      142 +// Use stdio: "pipe" for silent operations                    
+      143 +execSync(command, { stdio: "pipe" });                         
+      144 +```                                                           
+      145 +                                                              
+      146 +---                                                           
+      147 +                                                              
+      148 +## Examples from Codebase                                     
+      149 +                                                              
+      150 +| File | Usage |                                              
+      151 +|------|-------|                                              
+      152 +| `src/cli/index.ts` | Command startup, version check |       
+      153 +| `src/commands/init.ts` | Progress through init steps |      
+      154 +| `src/utils/file-writer.ts` | File operation status |        
+
+⏺ Read 3 files (ctrl+o to expand)
+
+⏺ Write(.spec-first/spec/spec-first/backend/database-guidelines.md)
+  ⎿  Added 33 lines, removed 25 lines
+       6                                                                 
+       7  ## Overview                                                    
+       8                                                                 
+       9 -<!--                                                           
+      10 -Document your project's database conventions here.             
+       9 +**This project does not use a database.** It is a CLI tool     
+         +that operates on the filesystem and does not persist data.     
+      10                                                                 
+      11 -Questions to answer:                                           
+      12 -- What ORM/query library do you use?                           
+      13 -- How are migrations managed?                                  
+      14 -- What are the naming conventions for tables/columns?          
+      15 -- How do you handle transactions?                              
+      16 --->                                                            
+      17 -                                                               
+      18 -(To be filled by the team)                                     
+      19 -                                                               
+      11  ---                                                            
+      12                                                                 
+      13 -## Query Patterns                                              
+      13 +## Data Persistence                                            
+      14                                                                 
+      15 -<!-- How should queries be written? Batch operations? -->      
+      15 +Instead of a database, this project uses:                      
+      16                                                                 
+      17 -(To be filled by the team)                                     
+      17 +| Storage | Purpose |                                          
+      18 +|---------|---------|                                          
+      19 +| `.spec-first/tasks/*.json` | Task tracking |                 
+      20 +| `.spec-first/workspace/*/journal-*.md` | Session journals |  
+      21 +| `.spec-first/.version` | Version tracking |                  
+      22 +| `.spec-first/.developer` | Developer identity |              
+      23 +| `config.yaml` | Project configuration |                      
+      24                                                                 
+      25  ---                                                            
+      26                                                                 
+      27 -## Migrations                                                  
+      27 +## File-based Data Patterns                                    
+      28                                                                 
+      29 -<!-- How to create and run migrations -->                      
+      29 +When working with JSON files:                                  
+      30                                                                 
+      31 -(To be filled by the team)                                     
+      31 +```typescript                                                  
+      32 +// Read                                                        
+      33 +const content = fs.readFileSync(filePath, "utf-8");            
+      34 +const data = JSON.parse(content) as TaskJson;                  
+      35                                                                 
+      36 ----                                                            
+      36 +// Write                                                       
+      37 +fs.writeFileSync(filePath, JSON.stringify(taskJson, null, 2),  
+         +"utf-8");                                                      
+      38 +```                                                            
+      39                                                                 
+      40 -## Naming Conventions                                          
+      40 +### Safe file operations                                       
+      41                                                                 
+      42 -<!-- Table names, column names, index names -->                
+      42 +```typescript                                                  
+      43 +// Check existence first                                       
+      44 +if (!fs.existsSync(filePath)) {                                
+      45 +  return; // or handle missing file                            
+      46 +}                                                              
+      47                                                                 
+      48 -(To be filled by the team)                                     
+      48 +// Use recursive for directories                               
+      49 +fs.mkdirSync(dirPath, { recursive: true });                    
+      50 +```                                                            
+      51                                                                 
+      52  ---                                                            
+      53                                                                 
+      54 -## Common Mistakes                                             
+      54 +## No Migrations Needed                                        
+      55                                                                 
+      56 -<!-- Database-related mistakes your team has made -->          
+      57 -                                                               
+      58 -(To be filled by the team)                                     
+      56 +Since there is no database, schema changes are handled by:     
+      57 +1. Updating TypeScript interfaces                              
+      58 +2. Providing default values for new fields                     
+      59 +3. Version compatibility in `update` command                   
+
+⏺ Write(.spec-first/spec/spec-first/frontend/type-safety.md)
+  ⎿  Added 189 lines, removed 21 lines
+        1  # Type Safety                                                 
+        2                                                                
+        3 -> Type safety patterns in this project.                       
+        3 +> Type safety patterns in this TypeScript CLI project.        
+        4                                                                
+        5  ---                                                           
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's type safety conventions here.         
+        9 +This project uses TypeScript with strict mode. Strong typing  
+          +is enforced throughout, with minimal use of `any`. Types are  
+          +centralized in `src/types/` and derived from data where       
+          +possible.                                                     
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What type system do you use?                                
+       13 -- How are types organized?                                    
+       14 -- What validation library do you use?                         
+       15 -- How do you handle type inference?                           
+       16 --->                                                           
+       11 +---                                                           
+       12                                                                
+       13 -(To be filled by the team)                                    
+       13 +## Type Organization                                          
+       14                                                                
+       15 +### Central types directory                                   
+       16 +                                                              
+       17 +```                                                           
+       18 +src/types/                                                    
+       19 +├── ai-tools.ts      # Platform types and registry            
+       20 +└── migration.ts     # Migration types                        
+       21 +```                                                           
+       22 +                                                              
+       23 +### Inline types for local use                                
+       24 +                                                              
+       25 +```typescript                                                 
+       26 +// In the file that uses them                                 
+       27 +interface InitAnswers {                                       
+       28 +  tools: string[];                                            
+       29 +  template?: string;                                          
+       30 +}                                                             
+       31 +                                                              
+       32 +interface TaskJson {                                          
+       33 +  id: string;                                                 
+       34 +  name: string;                                               
+       35 +  status: string;                                             
+       36 +  // ...                                                      
+       37 +}                                                             
+       38 +```                                                           
+       39 +                                                              
+       40  ---                                                           
+       41                                                                
+       42 -## Type Organization                                          
+       42 +## Key Patterns                                               
+       43                                                                
+       44 -<!-- Where types are defined, shared types vs local types --> 
+       44 +### Const assertions for registries                           
+       45                                                                
+       46 -(To be filled by the team)                                    
+       46 +```typescript                                                 
+       47 +// Single source of truth                                     
+       48 +export const AI_TOOLS = {                                     
+       49 +  "claude-code": {                                            
+       50 +    name: "Claude Code",                                      
+       51 +    configDir: ".claude",                                     
+       52 +    // ...                                                    
+       53 +  },                                                          
+       54 +  // ...                                                      
+       55 +} as const;                                                   
+       56                                                                
+       57 +// Derived type                                               
+       58 +export type AITool = keyof typeof AI_TOOLS;                   
+       59 +```                                                           
+       60 +                                                              
+       61 +### Union types from const                                    
+       62 +                                                              
+       63 +```typescript                                                 
+       64 +// From const object                                          
+       65 +export type CliFlag =                                         
+       66 +  | "claude"                                                  
+       67 +  | "cursor"                                                  
+       68 +  | "opencode"                                                
+       69 +  // ...                                                      
+       70 +                                                              
+       71 +// From array                                                 
+       72 +export const PLATFORM_IDS = Object.keys(AI_TOOLS) as          
+          +AITool[];                                                     
+       73 +```                                                           
+       74 +                                                              
+       75 +### Type-safe config interfaces                               
+       76 +                                                              
+       77 +```typescript                                                 
+       78 +export interface AIToolConfig {                               
+       79 +  name: string;                                               
+       80 +  templateDirs: TemplateDir[];                                
+       81 +  configDir: string;                                          
+       82 +  supportsAgentSkills?: boolean;                              
+       83 +  cliFlag: CliFlag;                                           
+       84 +  defaultChecked: boolean;                                    
+       85 +  hasPythonHooks: boolean;                                    
+       86 +}                                                             
+       87 +```                                                           
+       88 +                                                              
+       89  ---                                                           
+       90                                                                
+       91 -## Validation                                                 
+       91 +## Compile-time Validation                                    
+       92                                                                
+       93 -<!-- Runtime validation patterns (Zod, Yup, io-ts, etc.) -->  
+       93 +### Exhaustive checks                                         
+       94                                                                
+       95 -(To be filled by the team)                                    
+       95 +```typescript                                                 
+       96 +// Ensure all CliFlags are in InitOptions                     
+       97 +type _AssertCliFlagsInOptions = [CliFlag] extends [keyof      
+          +InitOptions]                                                  
+       98 +  ? true                                                      
+       99 +  : "ERROR: CliFlag has values not present in InitOptions";   
+      100 +const _cliFlagCheck: _AssertCliFlagsInOptions = true;         
+      101 +```                                                           
+      102                                                                
+      103 +### Record types for registries                               
+      104 +                                                              
+      105 +```typescript                                                 
+      106 +export const AI_TOOLS: Record<AITool, AIToolConfig> = {       
+      107 +  // TypeScript ensures all AITool keys are covered           
+      108 +};                                                            
+      109 +```                                                           
+      110 +                                                              
+      111  ---                                                           
+      112                                                                
+      113 -## Common Patterns                                            
+      113 +## Type Guards                                                
+      114                                                                
+      115 -<!-- Type utilities, generics, type guards -->                
+      115 +### Error handling                                            
+      116                                                                
+      117 -(To be filled by the team)                                    
+      117 +```typescript                                                 
+      118 +// Type-safe error handling                                   
+      119 +catch (error) {                                               
+      120 +  const message = error instanceof Error                      
+      121 +    ? error.message                                           
+      122 +    : String(error);                                          
+      123 +}                                                             
+      124 +```                                                           
+      125                                                                
+      126 +### Type predicates (when needed)                             
+      127 +                                                              
+      128 +```typescript                                                 
+      129 +function isAITool(value: string): value is AITool {           
+      130 +  return value in AI_TOOLS;                                   
+      131 +}                                                             
+      132 +```                                                           
+      133 +                                                              
+      134  ---                                                           
+      135                                                                
+      136  ## Forbidden Patterns                                         
+      137                                                                
+      138 -<!-- any, type assertions, etc. -->                           
+      138 +### No unchecked any                                          
+      139                                                                
+      140 -(To be filled by the team)                                    
+      140 +```typescript                                                 
+      141 +// Bad                                                        
+      142 +function process(data: any) { ... }                           
+      143 +                                                              
+      144 +// Good                                                       
+      145 +function process(data: unknown) {                             
+      146 +  if (typeof data === "string") { ... }                       
+      147 +}                                                             
+      148 +```                                                           
+      149 +                                                              
+      150 +### No type assertions without validation                     
+      151 +                                                              
+      152 +```typescript                                                 
+      153 +// Bad                                                        
+      154 +const config = JSON.parse(content) as AIToolConfig;           
+      155 +                                                              
+      156 +// Good - validate first or use unknown                       
+      157 +const config: AIToolConfig = JSON.parse(content);             
+      158 +// Or better: use a validation library for external data      
+      159 +```                                                           
+      160 +                                                              
+      161 +### No non-null assertions                                    
+      162 +                                                              
+      163 +```typescript                                                 
+      164 +// Bad                                                        
+      165 +const value = options.user!;                                  
+      166 +                                                              
+      167 +// Good                                                       
+      168 +const value = options.user ?? "default";                      
+      169 +```                                                           
+      170 +                                                              
+      171 +---                                                           
+      172 +                                                              
+      173 +## Common Patterns                                            
+      174 +                                                              
+      175 +### Options type pattern                                      
+      176 +                                                              
+      177 +```typescript                                                 
+      178 +interface InitOptions {                                       
+      179 +  cursor?: boolean;                                           
+      180 +  claude?: boolean;                                           
+      181 +  yes?: boolean;                                              
+      182 +  force?: boolean;                                            
+      183 +  // ...                                                      
+      184 +}                                                             
+      185 +                                                              
+      186 +// Usage                                                      
+      187 +async function init(options: InitOptions): Promise<void> {    
+      188 +  if (options.force) { ... }                                  
+      189 +}                                                             
+      190 +```                                                           
+      191 +                                                              
+      192 +### Return type unions                                        
+      193 +                                                              
+      194 +```typescript                                                 
+      195 +// Clear success/failure                                      
+      196 +interface SuccessResult {                                     
+      197 +  success: true;                                              
+      198 +  message: string;                                            
+      199 +  skipped?: boolean;                                          
+      200 +}                                                             
+      201 +                                                              
+      202 +interface FailureResult {                                     
+      203 +  success: false;                                             
+      204 +  message: string;                                            
+      205 +}                                                             
+      206 +                                                              
+      207 +type TemplateResult = SuccessResult | FailureResult;          
+      208 +```                                                           
+      209 +                                                              
+      210 +---                                                           
+      211 +                                                              
+      212 +## Examples from Codebase                                     
+      213 +                                                              
+      214 +| File | Pattern |                                            
+      215 +|------|---------|                                            
+      216 +| `src/types/ai-tools.ts` | Const assertion + derived types | 
+      217 +| `src/cli/index.ts` | Compile-time assertion |               
+      218 +| `src/utils/file-writer.ts` | Options interface + return     
+          +type |                                                        
+      219 +| `src/commands/init.ts` | Complex options interface |        
+
+⏺ Write(.spec-first/spec/spec-first/frontend/directory-structure.md)
+  ⎿  Added 89 lines, removed 21 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's frontend directory structure here.    
+        9 +**Note**: This is primarily a CLI backend project with no     
+          +traditional frontend (React/Vue/etc.). The "frontend"         
+          +patterns here refer to the TypeScript module organization     
+          +used throughout the codebase.                                 
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- Where do components live?                                   
+       13 -- How are features/modules organized?                         
+       14 -- Where are shared utilities?                                 
+       15 -- How are assets organized?                                   
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13  ## Directory Layout                                           
+       14                                                                
+       15  ```                                                           
+       16 -<!-- Replace with your actual structure -->                   
+       17 -src/                                                          
+       18 -├── ...                                                       
+       19 -└── ...                                                       
+       16 +packages/cli/src/                                             
+       17 +├── cli/                    # CLI entry point                 
+       18 +│   └── index.ts            # Commander.js setup              
+       19 +├── commands/               # Command implementations         
+       20 +│   ├── init.ts             # spec-first init                 
+       21 +│   └── update.ts           # spec-first update               
+       22 +├── configurators/          # Platform configuration          
+       23 +│   ├── index.ts            # Platform registry               
+       24 +│   ├── claude.ts           # Claude Code setup               
+       25 +│   ├── cursor.ts           # Cursor setup                    
+       26 +│   └── shared.ts           # Shared utilities                
+       27 +├── templates/              # Template content                
+       28 +│   ├── claude/             # Claude templates                
+       29 +│   ├── cursor/             # Cursor templates                
+       30 +│   ├── common/             # Shared templates                
+       31 +│   └── extract.ts          # Template extraction             
+       32 +├── types/                  # TypeScript types                
+       33 +│   ├── ai-tools.ts         # Platform types                  
+       34 +│   └── migration.ts        # Migration types                 
+       35 +├── utils/                  # Utility functions               
+       36 +│   ├── file-writer.ts      # File operations                 
+       37 +│   ├── project-detector.ts # Detection logic                 
+       38 +│   └── template-fetcher.ts # Remote templates                
+       39 +├── constants/              # Constants                       
+       40 +│   ├── paths.ts            # Path constants                  
+       41 +│   └── version.ts          # Version info                    
+       42 +└── config/                 # Configuration                   
+       43 +    └── brand.ts            # Branding config                 
+       44  ```                                                           
+       45                                                                
+       46  ---                                                           
+       47                                                                
+       48  ## Module Organization                                        
+       49                                                                
+       50 -<!-- How should new features be organized? -->                
+       50 +### Entry Points                                              
+       51                                                                
+       52 -(To be filled by the team)                                    
+       52 +- `src/index.ts` - Package entry, re-exports version          
+       53 +- `src/cli/index.ts` - CLI entry with Commander setup         
+       54                                                                
+       55 +### Feature Modules                                           
+       56 +                                                              
+       57 +Each feature follows this pattern:                            
+       58 +                                                              
+       59 +```                                                           
+       60 +feature/                                                      
+       61 +├── index.ts          # Public API                            
+       62 +├── types.ts          # Feature types (if needed)             
+       63 +├── implementation.ts # Core logic                            
+       64 +└── utils.ts          # Feature utilities (if needed)         
+       65 +```                                                           
+       66 +                                                              
+       67 +### Adding a New Platform                                     
+       68 +                                                              
+       69 +1. Add to `src/types/ai-tools.ts`:                            
+       70 +   - Add to `AITool` type                                     
+       71 +   - Add to `CliFlag` type                                    
+       72 +   - Add config to `AI_TOOLS`                                 
+       73 +                                                              
+       74 +2. Create configurator `src/configurators/{platform}.ts`      
+       75 +                                                              
+       76 +3. Create templates `src/templates/{platform}/`               
+       77 +                                                              
+       78 +4. Register in `src/configurators/index.ts`                   
+       79 +                                                              
+       80 +5. Add CLI flag in `src/cli/index.ts`                         
+       81 +                                                              
+       82 +6. Add to `InitOptions` in `src/commands/init.ts`             
+       83 +                                                              
+       84  ---                                                           
+       85                                                                
+       86  ## Naming Conventions                                         
+       87                                                                
+       88 -<!-- File and folder naming rules -->                         
+       88 +| Type | Convention | Example |                               
+       89 +|------|------------|---------|                               
+       90 +| Directories | kebab-case | `configurators/`, `multi-agent/` 
+          + |                                                            
+       91 +| Files | kebab-case | `file-writer.ts`,                      
+          +`project-detector.ts` |                                       
+       92 +| Functions | camelCase | `getConfiguredPlatforms()` |        
+       93 +| Types/Interfaces | PascalCase | `AIToolConfig`,             
+          +`InitOptions` |                                               
+       94 +| Constants | UPPER_SNAKE_CASE | `AI_TOOLS`, `DIR_NAMES` |    
+       95                                                                
+       96 -(To be filled by the team)                                    
+       96 +---                                                           
+       97                                                                
+       98 +## Import Patterns                                            
+       99 +                                                              
+      100 +```typescript                                                 
+      101 +// 1. Node built-ins with "node:" prefix                      
+      102 +import fs from "node:fs";                                     
+      103 +import path from "node:path";                                 
+      104 +                                                              
+      105 +// 2. External packages                                       
+      106 +import chalk from "chalk";                                    
+      107 +import { Command } from "commander";                          
+      108 +                                                              
+      109 +// 3. Internal modules with .js extension                     
+      110 +import { init } from "../commands/init.js";                   
+      111 +import { BRAND } from "../config/brand.js";                   
+      112 +```                                                           
+      113 +                                                              
+      114  ---                                                           
+      115                                                                
+      116  ## Examples                                                   
+      117                                                                
+      118 -<!-- Link to well-organized modules as examples -->           
+      118 +### Well-organized modules                                    
+      119                                                                
+      120 -(To be filled by the team)                                    
+      120 +- `src/configurators/index.ts` - Clean registry pattern       
+      121 +- `src/types/ai-tools.ts` - Single source of truth            
+      122 +- `src/utils/file-writer.ts` - Focused utility module         
+
+⏺ Read 4 files (ctrl+o to expand)
+
+⏺ Write(.spec-first/spec/spec-first/frontend/component-guidelines.md)
+  ⎿  Added 84 lines, removed 26 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's component conventions here.           
+        9 +**Note**: This is a CLI project with no traditional UI        
+          +components (React/Vue/etc.). The patterns below apply to the  
+          +modular organization of CLI features.                         
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What component patterns do you use?                         
+       13 -- How are props defined?                                      
+       14 -- How do you handle composition?                              
+       15 -- What accessibility standards apply?                         
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13 -## Component Structure                                        
+       13 +## CLI "Components"                                           
+       14                                                                
+       15 -<!-- Standard structure of a component file -->               
+       15 +In this CLI context, "components" are feature modules:        
+       16                                                                
+       17 -(To be filled by the team)                                    
+       17 +```                                                           
+       18 +feature/                                                      
+       19 +├── index.ts          # Public API (like component export)    
+       20 +├── types.ts          # Types (like props interface)          
+       21 +├── implementation.ts # Core logic (like component body)      
+       22 +└── utils.ts          # Helpers (like utility functions)      
+       23 +```                                                           
+       24                                                                
+       25  ---                                                           
+       26                                                                
+       27 -## Props Conventions                                          
+       27 +## Module Interface Pattern                                   
+       28                                                                
+       29 -<!-- How props should be defined and typed -->                
+       29 +### Public API                                                
+       30                                                                
+       31 -(To be filled by the team)                                    
+       31 +```typescript                                                 
+       32 +// feature/index.ts - Public interface                        
+       33 +export { mainFunction, helperFunction } from                  
+          +"./implementation.js";                                        
+       34 +export type { FeatureOptions, FeatureResult } from            
+          +"./types.js";                                                 
+       35 +```                                                           
+       36                                                                
+       37 +### Options pattern (like Props)                              
+       38 +                                                              
+       39 +```typescript                                                 
+       40 +// feature/types.ts                                           
+       41 +export interface FeatureOptions {                             
+       42 +  required: string;                                           
+       43 +  optional?: boolean;                                         
+       44 +  withDefault?: number;  // Provide default                   
+       45 +}                                                             
+       46 +                                                              
+       47 +export interface FeatureResult {                              
+       48 +  success: boolean;                                           
+       49 +  data?: string;                                              
+       50 +  error?: string;                                             
+       51 +}                                                             
+       52 +```                                                           
+       53 +                                                              
+       54  ---                                                           
+       55                                                                
+       56 -## Styling Patterns                                           
+       56 +## Implementation Patterns                                    
+       57                                                                
+       58 -<!-- How styles are applied (CSS modules, styled-components,  
+          -Tailwind, etc.) -->                                           
+       58 +### Function signature                                        
+       59                                                                
+       60 -(To be filled by the team)                                    
+       60 +```typescript                                                 
+       61 +// Clear, typed function with options                         
+       62 +export async function runFeature(                             
+       63 +  options: FeatureOptions,                                    
+       64 +): Promise<FeatureResult> {                                   
+       65 +  const { required, optional = false, withDefault = 0 } =     
+          +options;                                                      
+       66                                                                
+       67 ----                                                           
+       67 +  // Implementation                                           
+       68                                                                
+       69 -## Accessibility                                              
+       69 +  return { success: true, data: "result" };                   
+       70 +}                                                             
+       71 +```                                                           
+       72                                                                
+       73 -<!-- A11y requirements and patterns -->                       
+       73 +### Error handling                                            
+       74                                                                
+       75 -(To be filled by the team)                                    
+       75 +```typescript                                                 
+       76 +// Return error in result, don't throw                        
+       77 +export async function safeOperation(): Promise<FeatureResult> 
+          + {                                                            
+       78 +  try {                                                       
+       79 +    // ...                                                    
+       80 +    return { success: true };                                 
+       81 +  } catch (error) {                                           
+       82 +    return {                                                  
+       83 +      success: false,                                         
+       84 +      error: error instanceof Error ? error.message :         
+          +"Unknown error",                                              
+       85 +    };                                                        
+       86 +  }                                                           
+       87 +}                                                             
+       88 +```                                                           
+       89                                                                
+       90  ---                                                           
+       91                                                                
+       92  ## Common Mistakes                                            
+       93                                                                
+       94 -<!-- Component-related mistakes your team has made -->        
+       94 +### Don't: Export everything                                  
+       95                                                                
+       96 -(To be filled by the team)                                    
+       96 +```typescript                                                 
+       97 +// Bad: Exposing internals                                    
+       98 +export * from "./implementation.js";                          
+       99 +```                                                           
+      100 +                                                              
+      101 +### Do: Explicit public API                                   
+      102 +                                                              
+      103 +```typescript                                                 
+      104 +// Good: Controlled interface                                 
+      105 +export { mainFunction } from "./implementation.js";           
+      106 +export type { Options } from "./types.js";                    
+      107 +```                                                           
+      108 +                                                              
+      109 +---                                                           
+      110 +                                                              
+      111 +## Examples from Codebase                                     
+      112 +                                                              
+      113 +| Module | Pattern |                                          
+      114 +|--------|---------|                                          
+      115 +| `src/configurators/` | Registry pattern with                
+          +platform-specific modules |                                   
+      116 +| `src/utils/file-writer.ts` | Options + result pattern |     
+      117 +| `src/templates/extract.ts` | Pure functions with clear      
+          +types |                                                       
+
+⏺ Write(.spec-first/spec/spec-first/frontend/hook-guidelines.md)
+  ⎿  Added 96 lines, removed 20 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's hook conventions here.                
+        9 +**Note**: This is a CLI project without React hooks. The      
+          +patterns below describe CLI "hooks" - scripts that run at     
+          +specific lifecycle events.                                    
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What custom hooks do you have?                              
+       13 -- How do you handle data fetching?                            
+       14 -- What are the naming conventions?                            
+       15 -- How do you share stateful logic?                            
+       16 --->                                                           
+       11 +---                                                           
+       12                                                                
+       13 -(To be filled by the team)                                    
+       13 +## CLI Hooks                                                  
+       14                                                                
+       15 +This project supports Python hooks that run during AI tool    
+          +lifecycle:                                                    
+       16 +                                                              
+       17 +| Hook | When | Purpose |                                     
+       18 +|------|------|---------|                                     
+       19 +| `session-start.py` | Session starts | Inject context into   
+          +AI |                                                          
+       20 +| `inject-subagent-context.py` | Before agent calls | Add     
+          +code-spec to prompts |                                        
+       21 +| `ralph-loop.py` | After responses | Detect infinite loops | 
+       22 +                                                              
+       23  ---                                                           
+       24                                                                
+       25 -## Custom Hook Patterns                                       
+       25 +## Hook Structure                                             
+       26                                                                
+       27 -<!-- How to create and structure custom hooks -->             
+       27 +```python                                                     
+       28 +#!/usr/bin/env python3                                        
+       29 +"""                                                           
+       30 +Hook: session-start                                           
+       31 +When: At the start of each AI session                         
+       32 +Purpose: Inject project context and guidelines                
+       33 +"""                                                           
+       34                                                                
+       35 -(To be filled by the team)                                    
+       35 +import sys                                                    
+       36 +import json                                                   
+       37                                                                
+       38 +def main():                                                   
+       39 +    # Read hook input from stdin                              
+       40 +    input_data = json.loads(sys.stdin.read())                 
+       41 +                                                              
+       42 +    # Process and respond                                     
+       43 +    response = {                                              
+       44 +        "status": "success",                                  
+       45 +        "message": "Context injected"                         
+       46 +    }                                                         
+       47 +                                                              
+       48 +    # Output response                                         
+       49 +    print(json.dumps(response))                               
+       50 +                                                              
+       51 +if __name__ == "__main__":                                    
+       52 +    main()                                                    
+       53 +```                                                           
+       54 +                                                              
+       55  ---                                                           
+       56                                                                
+       57 -## Data Fetching                                              
+       57 +## Hook Patterns                                              
+       58                                                                
+       59 -<!-- How data fetching is handled (React Query, SWR, etc.)    
+          --->                                                           
+       59 +### Context Injection                                         
+       60                                                                
+       61 -(To be filled by the team)                                    
+       61 +```python                                                     
+       62 +def inject_context():                                         
+       63 +    """Read project state and inject into AI context"""       
+       64 +    context = {                                               
+       65 +        "developer": get_developer(),                         
+       66 +        "current_task": get_current_task(),                   
+       67 +        "guidelines": read_guidelines(),                      
+       68 +    }                                                         
+       69 +    return format_context(context)                            
+       70 +```                                                           
+       71                                                                
+       72 +### Error Handling                                            
+       73 +                                                              
+       74 +```python                                                     
+       75 +def safe_hook_operation():                                    
+       76 +    """Hooks should never crash the parent process"""         
+       77 +    try:                                                      
+       78 +        # Operation                                           
+       79 +        return {"status": "success"}                          
+       80 +    except Exception as e:                                    
+       81 +        # Return error, don't raise                           
+       82 +        return {"status": "error", "message": str(e)}         
+       83 +```                                                           
+       84 +                                                              
+       85  ---                                                           
+       86                                                                
+       87  ## Naming Conventions                                         
+       88                                                                
+       89 -<!-- Hook naming rules (use*, etc.) -->                       
+       89 +| Type | Convention | Example |                               
+       90 +|------|------------|---------|                               
+       91 +| Hook files | kebab-case | `session-start.py` |              
+       92 +| Functions | snake_case | `get_developer()` |                
+       93 +| Constants | UPPER_SNAKE | `DEFAULT_TIMEOUT` |               
+       94                                                                
+       95 -(To be filled by the team)                                    
+       96 -                                                              
+       95  ---                                                           
+       96                                                                
+       97  ## Common Mistakes                                            
+       98                                                                
+       99 -<!-- Hook-related mistakes your team has made -->             
+       99 +### Don't: Raise exceptions                                   
+      100                                                                
+      101 -(To be filled by the team)                                    
+      101 +```python                                                     
+      102 +# Bad: Will crash the AI tool                                 
+      103 +def hook():                                                   
+      104 +    raise Exception("Something went wrong")                   
+      105 +```                                                           
+      106 +                                                              
+      107 +### Do: Return error status                                   
+      108 +                                                              
+      109 +```python                                                     
+      110 +# Good: Graceful error handling                               
+      111 +def hook():                                                   
+      112 +    try:                                                      
+      113 +        # ...                                                 
+      114 +        return {"status": "success"}                          
+      115 +    except Exception as e:                                    
+      116 +        return {"status": "error", "message": str(e)}         
+      117 +```                                                           
+      118 +                                                              
+      119 +---                                                           
+      120 +                                                              
+      121 +## Examples from Codebase                                     
+      122 +                                                              
+      123 +| File | Purpose |                                            
+      124 +|------|---------|                                            
+      125 +| `.claude/hooks/session-start.py` | Inject spec-first        
+          +context |                                                     
+      126 +| `.claude/hooks/inject-subagent-context.py` | Add code-spec  
+          +to agents |                                                   
+      127 +| `.claude/hooks/ralph-loop.py` | Detect conversation loops | 
+
+⏺ Write(.spec-first/spec/spec-first/frontend/state-management.md)
+  ⎿  Added 106 lines, removed 21 lines
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's state management conventions here.    
+        9 +**Note**: This is a CLI project without traditional frontend  
+          +state management. State is managed through files and          
+          +environment variables.                                        
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What state management solution do you use?                  
+       13 -- How is local vs global state decided?                       
+       14 -- How do you handle server state?                             
+       15 -- What are the patterns for derived state?                    
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13  ## State Categories                                           
+       14                                                                
+       15 -<!-- Local state, global state, server state, URL state -->   
+       15 +### 1. Project State (Files)                                  
+       16                                                                
+       17 -(To be filled by the team)                                    
+       17 +| File | State | Purpose |                                    
+       18 +|------|-------|---------|                                    
+       19 +| `.spec-first/.developer` | Developer identity | Who is      
+          +working |                                                     
+       20 +| `.spec-first/.current-task` | Current task path | What is   
+          +being worked on |                                             
+       21 +| `.spec-first/tasks/*/task.json` | Task state | Task         
+          +progress tracking |                                           
+       22 +| `.spec-first/.version` | Version | Update tracking |        
+       23 +| `config.yaml` | Configuration | Project settings |          
+       24                                                                
+       25 +### 2. Session State (In-memory)                              
+       26 +                                                              
+       27 +- CLI options parsed from command line                        
+       28 +- Write mode (ask/force/skip)                                 
+       29 +- Selected platforms                                          
+       30 +- Template choices                                            
+       31 +                                                              
+       32 +### 3. Environment State                                      
+       33 +                                                              
+       34 +```typescript                                                 
+       35 +// Process-based state                                        
+       36 +const cwd = process.cwd();                                    
+       37 +const isWindows = process.platform === "win32";               
+       38 +const pythonCmd = getPythonCommand();  // "python3" or        
+          +"python"                                                      
+       39 +```                                                           
+       40 +                                                              
+       41  ---                                                           
+       42                                                                
+       43 -## When to Use Global State                                   
+       43 +## File-based State Patterns                                  
+       44                                                                
+       45 -<!-- Criteria for promoting state to global -->               
+       45 +### Read state                                                
+       46                                                                
+       47 -(To be filled by the team)                                    
+       47 +```typescript                                                 
+       48 +function getCurrentTask(cwd: string): string | null {         
+       49 +  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);   
+       50 +  if (!fs.existsSync(filePath)) return null;                  
+       51 +  return fs.readFileSync(filePath, "utf-8").trim();           
+       52 +}                                                             
+       53 +```                                                           
+       54                                                                
+       55 +### Write state                                               
+       56 +                                                              
+       57 +```typescript                                                 
+       58 +function setCurrentTask(cwd: string, taskPath: string): void  
+          +{                                                             
+       59 +  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);   
+       60 +  fs.writeFileSync(filePath, taskPath, "utf-8");              
+       61 +}                                                             
+       62 +```                                                           
+       63 +                                                              
+       64 +### Clear state                                               
+       65 +                                                              
+       66 +```typescript                                                 
+       67 +function clearCurrentTask(cwd: string): void {                
+       68 +  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);   
+       69 +  if (fs.existsSync(filePath)) {                              
+       70 +    fs.unlinkSync(filePath);                                  
+       71 +  }                                                           
+       72 +}                                                             
+       73 +```                                                           
+       74 +                                                              
+       75  ---                                                           
+       76                                                                
+       77 -## Server State                                               
+       77 +## Global Module State                                        
+       78                                                                
+       79 -<!-- How server data is cached and synchronized -->           
+       79 +For CLI-wide settings during execution:                       
+       80                                                                
+       81 -(To be filled by the team)                                    
+       81 +```typescript                                                 
+       82 +// Global write mode (shared across file operations)          
+       83 +let globalWriteMode: WriteMode = "ask";                       
+       84                                                                
+       85 +export function setWriteMode(mode: WriteMode): void {         
+       86 +  globalWriteMode = mode;                                     
+       87 +}                                                             
+       88 +                                                              
+       89 +export function getWriteMode(): WriteMode {                   
+       90 +  return globalWriteMode;                                     
+       91 +}                                                             
+       92 +```                                                           
+       93 +                                                              
+       94  ---                                                           
+       95                                                                
+       96 +## State Flow                                                 
+       97 +                                                              
+       98 +```                                                           
+       99 +1. CLI Start                                                  
+      100 +   ↓                                                          
+      101 +2. Parse options → Set global state (write mode)              
+      102 +   ↓                                                          
+      103 +3. Read project state (.developer, .current-task)             
+      104 +   ↓                                                          
+      105 +4. Execute commands → Update files                            
+      106 +   ↓                                                          
+      107 +5. Write new state (tasks, version)                           
+      108 +```                                                           
+      109 +                                                              
+      110 +---                                                           
+      111 +                                                              
+      112  ## Common Mistakes                                            
+      113                                                                
+      114 -<!-- State management mistakes your team has made -->         
+      114 +### Don't: Store state in global variables across runs        
+      115                                                                
+      116 -(To be filled by the team)                                    
+      116 +```typescript                                                 
+      117 +// Bad: Lost between CLI invocations                          
+      118 +let currentTask = "task-1";                                   
+      119 +```                                                           
+      120 +                                                              
+      121 +### Do: Persist to files                                      
+      122 +                                                              
+      123 +```typescript                                                 
+      124 +// Good: Survives across sessions                             
+      125 +fs.writeFileSync(".spec-first/.current-task", "task-1");      
+      126 +```                                                           
+      127 +                                                              
+      128 +---                                                           
+      129 +                                                              
+      130 +## Examples from Codebase                                     
+      131 +                                                              
+      132 +| Module | State Type |                                       
+      133 +|--------|------------|                                       
+      134 +| `src/utils/file-writer.ts` | Global write mode |            
+      135 +| `src/commands/init.ts` | Developer, task creation |         
+      136 +| `.spec-first/scripts/task.py` | Task state management |     
+
+⏺ Write(.spec-first/spec/spec-first/frontend/quality-guidelines.md)
+  ⎿  Added 151 lines, removed 20 lines
+        1  # Quality Guidelines                                          
+        2                                                                
+        3 -> Code quality standards for frontend development.            
+        3 +> Code quality standards for frontend/CLI development.        
+        4                                                                
+        5  ---                                                           
+        6                                                                
+        7  ## Overview                                                   
+        8                                                                
+        9 -<!--                                                          
+       10 -Document your project's quality standards here.               
+        9 +This project emphasizes clean TypeScript with strong typing,  
+          +clear patterns, and self-documenting code.                    
+       10                                                                
+       11 -Questions to answer:                                          
+       12 -- What patterns are forbidden?                                
+       13 -- What linting rules do you enforce?                          
+       14 -- What are your testing requirements?                         
+       15 -- What code review standards apply?                           
+       16 --->                                                           
+       17 -                                                              
+       18 -(To be filled by the team)                                    
+       19 -                                                              
+       11  ---                                                           
+       12                                                                
+       13  ## Forbidden Patterns                                         
+       14                                                                
+       15 -<!-- Patterns that should never be used and why -->           
+       15 +### Never use `any` without justification                     
+       16                                                                
+       17 -(To be filled by the team)                                    
+       17 +```typescript                                                 
+       18 +// Bad                                                        
+       19 +function process(data: any) { ... }                           
+       20                                                                
+       21 +// Good                                                       
+       22 +function process(data: Record<string, unknown>) { ... }       
+       23 +```                                                           
+       24 +                                                              
+       25 +### Never mix import styles                                   
+       26 +                                                              
+       27 +```typescript                                                 
+       28 +// Bad                                                        
+       29 +const fs = require("fs");                                     
+       30 +import path from "node:path";                                 
+       31 +                                                              
+       32 +// Good                                                       
+       33 +import fs from "node:fs";                                     
+       34 +import path from "node:path";                                 
+       35 +```                                                           
+       36 +                                                              
+       37 +### Never use `var`                                           
+       38 +                                                              
+       39 +```typescript                                                 
+       40 +// Bad                                                        
+       41 +var x = 1;                                                    
+       42 +                                                              
+       43 +// Good                                                       
+       44 +const x = 1;                                                  
+       45 +```                                                           
+       46 +                                                              
+       47 +### Never forget `.js` extension                              
+       48 +                                                              
+       49 +```typescript                                                 
+       50 +// Bad - ESM will fail                                        
+       51 +import { init } from "../commands/init";                      
+       52 +                                                              
+       53 +// Good                                                       
+       54 +import { init } from "../commands/init.js";                   
+       55 +```                                                           
+       56 +                                                              
+       57  ---                                                           
+       58                                                                
+       59  ## Required Patterns                                          
+       60                                                                
+       61 -<!-- Patterns that must always be used -->                    
+       61 +### Explicit return types                                     
+       62                                                                
+       63 -(To be filled by the team)                                    
+       63 +```typescript                                                 
+       64 +// Required for public functions                              
+       65 +export function getToolConfig(tool: AITool): AIToolConfig {   
+       66 +  return AI_TOOLS[tool];                                      
+       67 +}                                                             
+       68                                                                
+       69 +export async function init(options: InitOptions):             
+          +Promise<void> {                                               
+       70 +  // ...                                                      
+       71 +}                                                             
+       72 +```                                                           
+       73 +                                                              
+       74 +### Const assertions for registries                           
+       75 +                                                              
+       76 +```typescript                                                 
+       77 +// Use as const for immutable data                            
+       78 +export const AI_TOOLS = {                                     
+       79 +  "claude-code": { ... },                                     
+       80 +} as const;                                                   
+       81 +```                                                           
+       82 +                                                              
+       83 +### Error type guards                                         
+       84 +                                                              
+       85 +```typescript                                                 
+       86 +catch (error) {                                               
+       87 +  const message = error instanceof Error                      
+       88 +    ? error.message                                           
+       89 +    : String(error);                                          
+       90 +}                                                             
+       91 +```                                                           
+       92 +                                                              
+       93  ---                                                           
+       94                                                                
+       95  ## Testing Requirements                                       
+       96                                                                
+       97 -<!-- What level of testing is expected -->                    
+       97 +### Test file location                                        
+       98                                                                
+       99 -(To be filled by the team)                                    
+       99 +```                                                           
+      100 +packages/cli/                                                 
+      101 +├── src/                                                      
+      102 +│   └── utils/                                                
+      103 +│       └── compare-versions.ts                               
+      104 +└── test/                                                     
+      105 +    └── compare-versions.test.ts                              
+      106 +```                                                           
+      107                                                                
+      108 +### Test naming                                               
+      109 +                                                              
+      110 +```typescript                                                 
+      111 +describe("compareVersions", () => {                           
+      112 +  it("should return positive when a > b", () => {             
+      113 +    expect(compareVersions("2.0.0",                           
+          +"1.0.0")).toBeGreaterThan(0);                                 
+      114 +  });                                                         
+      115 +});                                                           
+      116 +```                                                           
+      117 +                                                              
+      118  ---                                                           
+      119                                                                
+      120  ## Code Review Checklist                                      
+      121                                                                
+      122 -<!-- What reviewers should check -->                          
+      122 +- [ ] No `any` types without justification                    
+      123 +- [ ] Imports use `.js` extension                             
+      124 +- [ ] Functions have explicit return types                    
+      125 +- [ ] No unused variables or imports                          
+      126 +- [ ] Constants use `UPPER_SNAKE_CASE`                        
+      127 +- [ ] Files use `kebab-case`                                  
+      128 +- [ ] Error handling uses type guards                         
+      129 +- [ ] Early returns used to reduce nesting                    
+      130 +- [ ] No console.log in library code                          
+      131                                                                
+      132 -(To be filled by the team)                                    
+      132 +---                                                           
+      133 +                                                              
+      134 +## Linting                                                    
+      135 +                                                              
+      136 +```bash                                                       
+      137 +npm run lint                                                  
+      138 +npm run typecheck                                             
+      139 +```                                                           
+      140 +                                                              
+      141 +---                                                           
+      142 +                                                              
+      143 +## Common Mistakes                                            
+      144 +                                                              
+      145 +### Forgetting optional chaining                              
+      146 +                                                              
+      147 +```typescript                                                 
+      148 +// Bad                                                        
+      149 +const name = options.user.trim();                             
+      150 +                                                              
+      151 +// Good                                                       
+      152 +const name = options.user?.trim() ?? "default";               
+      153 +```                                                           
+      154 +                                                              
+      155 +### Overly nested code                                        
+      156 +                                                              
+      157 +```typescript                                                 
+      158 +// Bad                                                        
+      159 +if (a) {                                                      
+      160 +  if (b) {                                                    
+      161 +    if (c) {                                                  
+      162 +      doSomething();                                          
+      163 +    }                                                         
+      164 +  }                                                           
+      165 +}                                                             
+      166 +                                                              
+      167 +// Good                                                       
+      168 +if (!a || !b || !c) return;                                   
+      169 +doSomething();                                                
+      170 +```                                                           
+      171 +                                                              
+      172 +### Swallowing errors silently                                
+      173 +                                                              
+      174 +```typescript                                                 
+      175 +// Bad                                                        
+      176 +try { ... } catch {}                                          
+      177 +                                                              
+      178 +// Good                                                       
+      179 +try { ... } catch (e) {                                       
+      180 +  console.log(chalk.yellow(`Warning: ${e}`));                 
+      181 +}                                                             
+      182 +```                                                           
+
+⏺ Write(.spec-first/spec/spec-first/backend/index.md)
+  ⎿  Added 45 lines, removed 14 lines
+       6                                                                 
+       7  ## Overview                                                    
+       8                                                                 
+       9 -This directory contains guidelines for backend development.    
+         -Fill in each file with your project's specific conventions.    
+       9 +This directory contains guidelines for the TypeScript CLI      
+         +backend. Guidelines are based on actual codebase patterns.     
+      10                                                                 
+      11  ---                                                            
+      12                                                                 
+     ...
+      14                                                                 
+      15  | Guide | Description | Status |                               
+      16  |-------|-------------|--------|                               
+      17 -| [Directory Structure](./directory-structure.md) | Module     
+         -organization and file layout | To fill |                       
+      18 -| [Database Guidelines](./database-guidelines.md) | ORM        
+         -patterns, queries, migrations | To fill |                      
+      19 -| [Error Handling](./error-handling.md) | Error types, handling
+         - strategies | To fill |                                        
+      20 -| [Quality Guidelines](./quality-guidelines.md) | Code         
+         -standards, forbidden patterns | To fill |                      
+      21 -| [Logging Guidelines](./logging-guidelines.md) | Structured   
+         -logging, log levels | To fill |                                
+      17 +| [Directory Structure](./directory-structure.md) | Module     
+         +organization and file layout | ✅ Filled |                     
+      18 +| [Database Guidelines](./database-guidelines.md) | File-based 
+         +state (no database) | ✅ Filled |                              
+      19 +| [Error Handling](./error-handling.md) | Error types, handling
+         + strategies | ✅ Filled |                                      
+      20 +| [Quality Guidelines](./quality-guidelines.md) | Code         
+         +standards, forbidden patterns | ✅ Filled |                    
+      21 +| [Logging Guidelines](./logging-guidelines.md) | CLI output   
+         +with chalk | ✅ Filled |                                       
+      22                                                                 
+      23  ---                                                            
+      24                                                                 
+      25 -## How to Fill These Guidelines                                
+      25 +## Pre-Development Checklist                                   
+      26                                                                 
+      27 -For each guideline file:                                       
+      27 +Before implementing backend features, read:                    
+      28                                                                 
+      29 -1. Document your project's **actual conventions** (not ideals) 
+      30 -2. Include **code examples** from your codebase                
+      31 -3. List **forbidden patterns** and why                         
+      32 -4. Add **common mistakes** your team has made                  
+      29 +- [ ] [Directory Structure](./directory-structure.md) -        
+         +Understand module organization                                 
+      30 +- [ ] [Error Handling](./error-handling.md) - Learn error      
+         +patterns                                                       
+      31 +- [ ] [Quality Guidelines](./quality-guidelines.md) - Review   
+         +forbidden patterns                                             
+      32                                                                 
+      33 -The goal is to help AI assistants and new team members         
+         -understand how YOUR project works.                             
+      33 +---                                                            
+      34                                                                 
+      35 +## Quick Reference                                             
+      36 +                                                               
+      37 +### File Naming                                                
+      38 +                                                               
+      39 +```                                                            
+      40 +kebab-case.ts    // All files                                  
+      41 +```                                                            
+      42 +                                                               
+      43 +### Import Style                                               
+      44 +                                                               
+      45 +```typescript                                                  
+      46 +import fs from "node:fs";                    // Node built-ins 
+      47 +import chalk from "chalk";                   // External       
+      48 +import { init } from "../commands/init.js";  // Internal       
+         +(.js!)                                                         
+      49 +```                                                            
+      50 +                                                               
+      51 +### Function Pattern                                           
+      52 +                                                               
+      53 +```typescript                                                  
+      54 +export async function command(options: Options): Promise<void> 
+         + {                                                             
+      55 +  try {                                                        
+      56 +    // Implementation                                          
+      57 +  } catch (error) {                                            
+      58 +    console.error(                                             
+      59 +      chalk.red("Error:"),                                     
+      60 +      error instanceof Error ? error.message : error,          
+      61 +    );                                                         
+      62 +    process.exit(1);                                           
+      63 +  }                                                            
+      64 +}                                                              
+      65 +```                                                            
+      66 +                                                               
+      67  ---                                                            
+      68                                                                 
+      69 -**Language**: All documentation should be                      
+         -written in **English**.                                        
+      69 +**Language**: All documentation written in **English**.        
+
+⏺ Write(.spec-first/spec/spec-first/frontend/index.md)
+  ⎿  Added 51 lines, removed 16 lines
+       1  # Frontend Development Guidelines                              
+       2                                                                 
+       3 -> Best practices for frontend development in this project.     
+       3 +> Best practices for frontend/CLI development in this project. 
+       4                                                                 
+       5  ---                                                            
+       6                                                                 
+       7  ## Overview                                                    
+       8                                                                 
+       9 -This directory contains guidelines for frontend development.   
+         -Fill in each file with your project's specific conventions.    
+       9 +**Note**: This is a CLI project without traditional frontend   
+         +UI. These guidelines cover TypeScript patterns used throughout 
+         + the codebase.                                                 
+      10                                                                 
+      11  ---                                                            
+      12                                                                 
+     ...
+      14                                                                 
+      15  | Guide | Description | Status |                               
+      16  |-------|-------------|--------|                               
+      17 -| [Directory Structure](./directory-structure.md) | Module     
+         -organization and file layout | To fill |                       
+      18 -| [Component Guidelines](./component-guidelines.md) | Component
+         - patterns, props, composition | To fill |                      
+      19 -| [Hook Guidelines](./hook-guidelines.md) | Custom hooks, data 
+         -fetching patterns | To fill |                                  
+      20 -| [State Management](./state-management.md) | Local state,     
+         -global state, server state | To fill |                         
+      21 -| [Quality Guidelines](./quality-guidelines.md) | Code         
+         -standards, forbidden patterns | To fill |                      
+      22 -| [Type Safety](./type-safety.md) | Type patterns, validation  
+         -| To fill |                                                    
+      17 +| [Directory Structure](./directory-structure.md) | Module     
+         +organization and file layout | ✅ Filled |                     
+      18 +| [Component Guidelines](./component-guidelines.md) | Module   
+         +interface patterns | ✅ Filled |                               
+      19 +| [Hook Guidelines](./hook-guidelines.md) | CLI hooks (Python  
+         +scripts) | ✅ Filled |                                         
+      20 +| [State Management](./state-management.md) | File-based state 
+         +patterns | ✅ Filled |                                         
+      21 +| [Quality Guidelines](./quality-guidelines.md) | Code         
+         +standards, forbidden patterns | ✅ Filled |                    
+      22 +| [Type Safety](./type-safety.md) | TypeScript conventions |   
+         +✅ Filled |                                                    
+      23                                                                 
+      24  ---                                                            
+      25                                                                 
+      26 -## How to Fill These Guidelines                                
+      26 +## Pre-Development Checklist                                   
+      27                                                                 
+      28 -For each guideline file:                                       
+      28 +Before implementing features, read:                            
+      29                                                                 
+      30 -1. Document your project's **actual conventions** (not ideals) 
+      31 -2. Include **code examples** from your codebase                
+      32 -3. List **forbidden patterns** and why                         
+      33 -4. Add **common mistakes** your team has made                  
+      30 +- [ ] [Type Safety](./type-safety.md) - Understand typing      
+         +patterns                                                       
+      31 +- [ ] [Directory Structure](./directory-structure.md) - Know   
+         +where files go                                                 
+      32 +- [ ] [Quality Guidelines](./quality-guidelines.md) - Review   
+         +standards                                                      
+      33                                                                 
+      34 -The goal is to help AI assistants and new team members         
+         -understand how YOUR project works.                             
+      34 +---                                                            
+      35                                                                 
+      36 +## Quick Reference                                             
+      37 +                                                               
+      38 +### Type Pattern                                               
+      39 +                                                               
+      40 +```typescript                                                  
+      41 +// Const assertion for registries                              
+      42 +export const AI_TOOLS = {                                      
+      43 +  "claude-code": { ... },                                      
+      44 +} as const;                                                    
+      45 +                                                               
+      46 +export type AITool = keyof typeof AI_TOOLS;                    
+      47 +```                                                            
+      48 +                                                               
+      49 +### Options Pattern                                            
+      50 +                                                               
+      51 +```typescript                                                  
+      52 +interface FeatureOptions {                                     
+      53 +  required: string;                                            
+      54 +  optional?: boolean;                                          
+      55 +  withDefault?: number;                                        
+      56 +}                                                              
+      57 +                                                               
+      58 +export async function feature(options: FeatureOptions):        
+         +Promise<Result> {                                              
+      59 +  const { required, optional = false, withDefault = 0 } =      
+         +options;                                                       
+      60 +  // ...                                                       
+      61 +}                                                              
+      62 +```                                                            
+      63 +                                                               
+      64 +### Return Type Union                                          
+      65 +                                                               
+      66 +```typescript                                                  
+      67 +type Result =                                                  
+      68 +  | { success: true; data: string }                            
+      69 +  | { success: false; error: string };                         
+      70 +```                                                            
+      71 +                                                               
+      72  ---                                                            
+      73                                                                 
+      74 -**Language**: All documentation should be                      
+         -written in **English**.                                        
+      74 +**Language**: All documentation written in **English**.        
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Write(.spec-first/tasks/00-bootstrap-guidelines/task.json)
+  ⎿  Added 17 lines, removed 7 lines
+       2    "id": "00-bootstrap-guidelines",                             
+       3    "name": "Bootstrap Guidelines",                              
+       4    "description": "Fill in project development guidelines for   
+          AI agents",                                                    
+       5 -  "status": "in_progress",                                     
+       5 +  "status": "completed",                                       
+       6    "dev_type": "docs",                                          
+       7    "priority": "P1",                                            
+       8    "creator": "kuang",                                          
+       9    "assignee": "kuang",                                         
+      10    "createdAt": "2026-03-25",                                   
+      11 -  "completedAt": null,                                         
+      11 +  "completedAt": "2026-03-25",                                 
+      12    "commit": null,                                              
+      13    "subtasks": [                                                
+      14      {                                                          
+      15        "name": "Fill guidelines for @leokuang/spec-first",      
+      16 -      "status": "pending"                                      
+      16 +      "status": "completed"                                    
+      17      },                                                         
+      18      {                                                          
+      19        "name": "Add code examples",                             
+      20 -      "status": "pending"                                      
+      20 +      "status": "completed"                                    
+      21      }                                                          
+      22    ],                                                           
+      23    "children": [],                                              
+      24    "parent": null,                                              
+      25    "relatedFiles": [                                            
+      26 -    ".spec-first/spec/spec-first/"                             
+      26 +    ".spec-first/spec/spec-first/backend/directory-structure.md
+         +",                                                             
+      27 +    ".spec-first/spec/spec-first/backend/error-handling.md",   
+      28 +                                                               
+         +".spec-first/spec/spec-first/backend/quality-guidelines.md",   
+      29 +                                                               
+         +".spec-first/spec/spec-first/backend/logging-guidelines.md",   
+      30 +                                                               
+         +".spec-first/spec/spec-first/backend/database-guidelines.md",  
+      31 +                                                               
+         +".spec-first/spec/spec-first/frontend/directory-structure.md", 
+      32 +    ".spec-first/spec/spec-first/frontend/type-safety.md",     
+      33 +    ".spec-first/spec/spec-first/frontend/component-guidelines 
+         +.md",                                                          
+      34 +    ".spec-first/spec/spec-first/frontend/hook-guidelines.md", 
+      35 +                                                               
+         +".spec-first/spec/spec-first/frontend/state-management.md",    
+      36 +                                                               
+         +".spec-first/spec/spec-first/frontend/quality-guidelines.md"   
+      37    ],                                                           
+      38 -  "notes": "First-time setup task created by spec-first init   
+         -(frontend project)",                                           
+      38 +  "notes": "Filled all backend and frontend guidelines with    
+         +actual codebase patterns",                                     
+      39    "meta": {}                                                   
+      40 -}                                                              
+      40   No newline at end of file                                     
+      41 +}                                                              
+
+⏺ Bash(python3 ./.spec-first/scripts/task.py finish && python3
+      ./.spec-first/scripts/task.py archive 00-bootstrap-guidelines)
+  ⎿  ✓ Cleared current task (was: .spec-first/tasks/00-bootstrap-guidelines
+     )
+     Archived: 00-bootstrap-guidelines -> archive/2026-03/
+     … +2 lines (ctrl+o to expand)
+
+⏺ ✅ Bootstrap Guidelines 任务完成！
+
+  已填充的指南文件
+
+  Backend (5 个文件)
+
+  ┌────────────────────────┬──────────────────────────────────┐
+  │          文件          │               内容               │
+  ├────────────────────────┼──────────────────────────────────┤
+  │ directory-structure.md │ 模块组织、命名约定、导入风格     │
+  ├────────────────────────┼──────────────────────────────────┤
+  │ error-handling.md      │ 错误处理模式、CLI 错误输出       │
+  ├────────────────────────┼──────────────────────────────────┤
+  │ quality-guidelines.md  │ 禁止模式、必需模式、代码审查清单 │
+  ├────────────────────────┼──────────────────────────────────┤
+  │ logging-guidelines.md  │ chalk 输出风格、日志级别         │
+  ├────────────────────────┼──────────────────────────────────┤
+  │ database-guidelines.md │ 文件存储模式（无数据库）         │
+  └────────────────────────┴──────────────────────────────────┘
+
+  Frontend (6 个文件)
+
+  ┌─────────────────────────┬───────────────────────────────────────┐
+  │          文件           │                 内容                  │
+  ├─────────────────────────┼───────────────────────────────────────┤
+  │ directory-structure.md  │ 目录布局、添加新平台流程              │
+  ├─────────────────────────┼───────────────────────────────────────┤
+  │ type-safety.md          │ TypeScript 类型模式、const assertions │
+  ├─────────────────────────┼───────────────────────────────────────┤
+  │ component-guidelines.md │ 模块接口模式                          │
+  ├─────────────────────────┼───────────────────────────────────────┤
+  │ hook-guidelines.md      │ CLI hooks (Python 脚本)               │
+  ├─────────────────────────┼───────────────────────────────────────┤
+  │ state-management.md     │ 文件状态管理                          │
+  ├─────────────────────────┼───────────────────────────────────────┤
+  │ quality-guidelines.md   │ 代码标准、lint 规则                   │
+  └─────────────────────────┴───────────────────────────────────────┘
+
+  ---
+  后续步骤
+
+  1. 测试更改 - 运行 npm run lint && npm run typecheck
+  2. 提交代码 - 使用 /git-push 提交
+  3. 记录会话 - 使用 /spec:record-session
+
+  需要我执行哪个步骤？
+
+✻ Worked for 9m 20s
+
+❯ 1                                                                             
+
+⏺ Bash(npm run lint 2>&1 | head -50)
+  ⎿  > lint
+     > pnpm --filter spec-first lint
+     … +3 lines (ctrl+o to expand)
+
+⏺ Bash(npm run typecheck 2>&1 | head -50)
+  ⎿  > typecheck
+     > pnpm --filter spec-first typecheck
+     … +4 lines (ctrl+o to expand)
+
+⏺ ✅ 所有检查通过！
+
+  ┌───────────┬─────────┐
+  │   检查    │  状态   │
+  ├───────────┼─────────┤
+  │ Lint      │ ✅ 通过 │
+  ├───────────┼─────────┤
+  │ TypeCheck │ ✅ 通过 │
+  └───────────┴─────────┘
+
+  ---
+  下一步
+
+  2. 提交代码 - 使用 /git-push 提交
+  3. 记录会话 - 使用 /spec:record-session
+
+  需要执行哪个？

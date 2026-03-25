@@ -1,12 +1,12 @@
 # Frontend Development Guidelines
 
-> Best practices for frontend development in this project.
+> Best practices for frontend/CLI development in this project.
 
 ---
 
 ## Overview
 
-This directory contains guidelines for frontend development. Fill in each file with your project's specific conventions.
+**Note**: This is a CLI project without traditional frontend UI. These guidelines cover TypeScript patterns used throughout the codebase.
 
 ---
 
@@ -14,26 +14,61 @@ This directory contains guidelines for frontend development. Fill in each file w
 
 | Guide | Description | Status |
 |-------|-------------|--------|
-| [Directory Structure](./directory-structure.md) | Module organization and file layout | To fill |
-| [Component Guidelines](./component-guidelines.md) | Component patterns, props, composition | To fill |
-| [Hook Guidelines](./hook-guidelines.md) | Custom hooks, data fetching patterns | To fill |
-| [State Management](./state-management.md) | Local state, global state, server state | To fill |
-| [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | To fill |
-| [Type Safety](./type-safety.md) | Type patterns, validation | To fill |
+| [Directory Structure](./directory-structure.md) | Module organization and file layout | ✅ Filled |
+| [Component Guidelines](./component-guidelines.md) | Module interface patterns | ✅ Filled |
+| [Hook Guidelines](./hook-guidelines.md) | CLI hooks (Python scripts) | ✅ Filled |
+| [State Management](./state-management.md) | File-based state patterns | ✅ Filled |
+| [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | ✅ Filled |
+| [Type Safety](./type-safety.md) | TypeScript conventions | ✅ Filled |
 
 ---
 
-## How to Fill These Guidelines
+## Pre-Development Checklist
 
-For each guideline file:
+Before implementing features, read:
 
-1. Document your project's **actual conventions** (not ideals)
-2. Include **code examples** from your codebase
-3. List **forbidden patterns** and why
-4. Add **common mistakes** your team has made
-
-The goal is to help AI assistants and new team members understand how YOUR project works.
+- [ ] [Type Safety](./type-safety.md) - Understand typing patterns
+- [ ] [Directory Structure](./directory-structure.md) - Know where files go
+- [ ] [Quality Guidelines](./quality-guidelines.md) - Review standards
 
 ---
 
-**Language**: All documentation should be written in **English**.
+## Quick Reference
+
+### Type Pattern
+
+```typescript
+// Const assertion for registries
+export const AI_TOOLS = {
+  "claude-code": { ... },
+} as const;
+
+export type AITool = keyof typeof AI_TOOLS;
+```
+
+### Options Pattern
+
+```typescript
+interface FeatureOptions {
+  required: string;
+  optional?: boolean;
+  withDefault?: number;
+}
+
+export async function feature(options: FeatureOptions): Promise<Result> {
+  const { required, optional = false, withDefault = 0 } = options;
+  // ...
+}
+```
+
+### Return Type Union
+
+```typescript
+type Result =
+  | { success: true; data: string }
+  | { success: false; error: string };
+```
+
+---
+
+**Language**: All documentation written in **English**.

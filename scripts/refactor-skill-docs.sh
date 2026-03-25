@@ -38,7 +38,7 @@ replacements = [
     ("spec init", "spec-first init"),
     ("spec update", "spec-first update"),
     ("spec --version", "spec-first --version"),
-    ("@mindfoldhq/trellis", "@leokuang/spec-first"),
+    ("@mindfoldhq/trellis", "spec-first"),
     ("TRELLIS FEATURE LAYERS", "SPEC-FIRST FEATURE LAYERS"),
 ]
 
