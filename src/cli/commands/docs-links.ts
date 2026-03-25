@@ -18,6 +18,16 @@ export function handleDocsLinks(args: string[]): number {
   }
 }
 
+export function handleDocs(args: string[]): number {
+  const sub = args[0];
+  if (sub !== 'links') {
+    printHelp();
+    if (sub) console.error(`未知 docs 子命令：${sub}`);
+    return ExitCode.VALIDATION_ERROR;
+  }
+  return handleDocsLinks(args.slice(1));
+}
+
 function handleValidate(args: string[]): number {
   const featureId = args[0];
   if (!featureId) {

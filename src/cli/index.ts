@@ -11,7 +11,7 @@ import { handleRfc } from './commands/rfc.js';
 import { handleDefect } from './commands/defect.js';
 import { handleMetrics } from './commands/metrics.js';
 import { handleDoctor } from './commands/doctor.js';
-import { handleGoLive } from './commands/gate.js';
+import { handleGate, handleGoLive } from './commands/gate.js';
 import { handleAi } from './commands/ai.js';
 import { handleCommit } from './commands/commit.js';
 import { handleFeature } from './commands/feature.js';
@@ -31,6 +31,7 @@ import { handleSkill } from './commands/skill.js';
 import { handleIntegrateSkill } from './commands/integrate-skill.js';
 import { handleStatus } from './commands/status.js';
 import { handleTransition } from './commands/transition.js';
+import { handleDocs } from './commands/docs-links.js';
 
 registerCommand('init', '初始化 Feature 工作区', handleInit, {
   requiresConfirmation: false,
@@ -48,6 +49,7 @@ registerCommand('defect', '缺陷跟踪与状态管理', handleDefect, {
   requiresConfirmation: true,
 });
 registerCommand('metrics', '覆盖率度量与健康评分', handleMetrics);
+registerCommand('gate', 'Gate 条件校验与历史查询', handleGate);
 registerCommand('doctor', '环境诊断与修复', handleDoctor, {
   requiresConfirmation: (args) => args.includes('--fix'),
 });
@@ -85,6 +87,7 @@ registerCommand('uninstall', '清理宿主配置（卸载前执行）', handleUn
 });
 registerCommand('analyze', '跨产物一致性分析', handleAnalyze);
 registerCommand('validate', '产物格式校验', handleValidate);
+registerCommand('docs', '文档关联校验与展示', handleDocs);
 registerCommand('first', '项目首轮认知 runtime/docs 校验', handleFirst, {
   requiresConfirmation: false,
 });

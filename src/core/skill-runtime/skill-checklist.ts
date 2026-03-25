@@ -153,8 +153,8 @@ const CHECKLISTS: Record<Stage, ChecklistDefinition> = {
   },
   [Stage.WRAP_UP]: {
     requiredChecks: [
-      fileExists('wrap-up-exists', 'wrap_up.md 文件存在', 'wrap_up.md'),
-      fileNonEmpty('wrap-up-non-empty', 'wrap_up.md 非空', 'wrap_up.md'),
+      fileExists('retro-exists', 'retro.md 文件存在', 'retro.md'),
+      fileNonEmpty('retro-non-empty', 'retro.md 非空', 'retro.md'),
     ],
   },
   [Stage.RELEASE]: {

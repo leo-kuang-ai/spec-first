@@ -122,7 +122,7 @@ function seedReleaseDeliverables(featureId: string): void {
   writeFileSync(join(specDir, 'design.md'), '# Design\n', 'utf-8');
   writeFileSync(join(specDir, 'task_plan.md'), '# Task Plan\n', 'utf-8');
   writeFileSync(join(specDir, 'verify.md'), '# Verify\n', 'utf-8');
-  writeFileSync(join(specDir, 'wrap_up.md'), '# Wrap Up\n', 'utf-8');
+  writeFileSync(join(specDir, 'retro.md'), '# Retro\n', 'utf-8');
   writeFileSync(join(specDir, 'release.md'), '# Release\n', 'utf-8');
 }
 

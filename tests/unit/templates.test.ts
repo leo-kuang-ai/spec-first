@@ -45,20 +45,29 @@ describe('init templates', () => {
 });
 
 describe('document-links template', () => {
-  const docLinksCtx = {
-    ...BASE_CTX,
-    documents: [
-      { path: 'spec.md', kind: 'spec', stage: '01_specify', references: [] },
-      { path: 'design.md', kind: 'design', stage: '02_design', references: ['spec.md'] },
-      { path: 'task_plan.md', kind: 'task-plan', stage: '03_plan', references: ['spec.md', 'design.md'] },
-    ],
-  };
+const docLinksCtx = {
+  ...BASE_CTX,
+  documents: [
+    { path: 'prd.md', kind: 'prd', stage: '01_specify', references: [] },
+    { path: 'spec.md', kind: 'spec', stage: '01_specify', references: [] },
+    { path: 'design.md', kind: 'design', stage: '02_design', references: ['spec.md'] },
+    {
+      path: 'findings.md',
+      kind: 'findings',
+      stage: '03_plan',
+      references: ['prd.md', 'spec.md', 'design.md', 'task_plan.md'],
+    },
+    { path: 'task_plan.md', kind: 'task-plan', stage: '03_plan', references: ['spec.md', 'design.md'] },
+  ],
+};
 
   it('document-links.yaml.hbs should render YAML skeleton', () => {
     const tpl = compile('docs/document-links.yaml.hbs');
     const out = tpl(docLinksCtx);
     expect(out).toContain('version: 1');
     expect(out).toContain('featureId: FSREQ-20260211-AUTH-001');
+    expect(out).toContain('prd.md');
+    expect(out).toContain('findings.md');
     expect(out).toContain('task_plan.md');
   });
 });

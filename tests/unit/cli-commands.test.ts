@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { handleId } from '../../src/cli/commands/id.js';
 import { handleAnalyze } from '../../src/cli/commands/analyze.js';
 import { handleDocsLinks } from '../../src/cli/commands/docs-links.js';
+import { handleDocs } from '../../src/cli/commands/docs-links.js';
 import { handleTrace } from '../../src/cli/commands/trace.js';
 import { handleIntegrateSkill } from '../../src/cli/commands/integrate-skill.js';
 import { dispatch, registerCommand } from '../../src/cli/router.js';
@@ -95,6 +96,17 @@ describe('handleDocsLinks', () => {
 
   it('should return error for unknown subcommand', () => {
     expect(handleDocsLinks(['unknown'])).toBe(2);
+  });
+});
+
+describe('handleDocs', () => {
+  it('should dispatch docs links validate', () => {
+    const code = handleDocs(['links', 'validate', FEAT_ID]);
+    expect(code).toBe(0);
+  });
+
+  it('should reject unknown docs subcommand', () => {
+    expect(handleDocs(['unknown'])).toBe(2);
   });
 });
 
