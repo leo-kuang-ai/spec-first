@@ -41,16 +41,35 @@
 # 1. Install spec-first
 npm install -g spec-first@latest
 
-# 2. Initialize in your repo
-spec-first init -u your-name
+# 2. Set global identity (once, works for all projects)
+spec-first init --global -u your-name
 
-# 3. Or initialize with the platforms you actually use
-spec-first init --cursor --opencode --codex -u your-name
+# 3. Initialize in your repo (uses global identity automatically)
+spec-first init --claude
 ```
 
-- `-u your-name` creates `.spec-first/workspace/your-name/` for personal journals and session continuity.
-- Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
-- For platform-specific setup, entry commands, and upgrade paths, use the docs:
+### Global Identity Options
+
+```bash
+# With language preference (default: zh)
+spec-first init --global -u your-name --lang en
+
+# Per-project override (optional)
+spec-first init -u other-name
+```
+
+**Identity Priority**: Project-level > Global > Git config
+
+### Platform Selection
+
+```bash
+# Initialize with specific platforms
+spec-first init --cursor --opencode --codex
+```
+
+Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
+
+For platform-specific setup, entry commands, and upgrade paths, use the docs:
   [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) •
   [Supported Platforms](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
   [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) •

@@ -43,17 +43,28 @@ function initGlobalDeveloper(name: string, lang: string = "zh"): void {
 
   // Write global developer file
   const now = new Date().toISOString();
-  fs.writeFileSync(
-    globalDevFile,
-    `name=${name}\nlang=${lang}\ninitialized_at=${now}\n`,
-    "utf-8",
-  );
+  const content = `name=${name}\nlang=${lang}\ninitialized_at=${now}\n`;
+  fs.writeFileSync(globalDevFile, content, "utf-8");
 
-  console.log(chalk.green(`✓ Global developer initialized: ${name}`));
-  console.log(chalk.gray(`  Language: ${lang}`));
-  console.log(chalk.gray(`  File: ${globalDevFile}`));
   console.log();
-  console.log("All projects will now use this identity by default.");
+  console.log(chalk.green(`✓ Global developer initialized`));
+  console.log();
+  console.log(chalk.white("  Developer:"), chalk.cyan(name));
+  console.log(chalk.white("  Language:"), chalk.cyan(lang === "zh" ? "中文" : "English"));
+  console.log(chalk.white("  File:"), chalk.gray(globalDevFile));
+  console.log();
+  console.log(chalk.gray("  ┌─────────────────────────────────────────────────┐"));
+  console.log(chalk.gray("  │ File content:                                   │"));
+  console.log(chalk.gray("  │") + chalk.white(`  name=${name}`.padEnd(48) + chalk.gray("│")));
+  console.log(chalk.gray("  │") + chalk.white(`  lang=${lang}`.padEnd(48) + chalk.gray("│")));
+  console.log(chalk.gray("  │") + chalk.white(`  initialized_at=${now.slice(0, 19)}Z`.padEnd(41) + chalk.gray("│")));
+  console.log(chalk.gray("  └─────────────────────────────────────────────────┘"));
+  console.log();
+  console.log(chalk.white("All projects will now use this identity by default."));
+  console.log();
+  console.log(chalk.gray("Next steps:"));
+  console.log(chalk.cyan(`  cd your-project && ${BRAND.cliCommand} init --claude`));
+  console.log();
 }
 
 /**
