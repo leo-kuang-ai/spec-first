@@ -1,0 +1,40 @@
+{
+  "id": "00-bootstrap-guidelines",
+  "name": "Bootstrap Guidelines",
+  "description": "Fill in project development guidelines for AI agents",
+  "status": "completed",
+  "dev_type": "docs",
+  "priority": "P1",
+  "creator": "kuang",
+  "assignee": "kuang",
+  "createdAt": "2026-03-25",
+  "completedAt": "2026-03-25",
+  "commit": null,
+  "subtasks": [
+    {
+      "name": "Fill guidelines for @leokuang/spec-first",
+      "status": "completed"
+    },
+    {
+      "name": "Add code examples",
+      "status": "completed"
+    }
+  ],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [
+    ".spec-first/spec/spec-first/backend/directory-structure.md",
+    ".spec-first/spec/spec-first/backend/error-handling.md",
+    ".spec-first/spec/spec-first/backend/quality-guidelines.md",
+    ".spec-first/spec/spec-first/backend/logging-guidelines.md",
+    ".spec-first/spec/spec-first/backend/database-guidelines.md",
+    ".spec-first/spec/spec-first/frontend/directory-structure.md",
+    ".spec-first/spec/spec-first/frontend/type-safety.md",
+    ".spec-first/spec/spec-first/frontend/component-guidelines.md",
+    ".spec-first/spec/spec-first/frontend/hook-guidelines.md",
+    ".spec-first/spec/spec-first/frontend/state-management.md",
+    ".spec-first/spec/spec-first/frontend/quality-guidelines.md"
+  ],
+  "notes": "Filled all backend and frontend guidelines with actual codebase patterns",
+  "meta": {}
+}
