@@ -41,16 +41,35 @@
 # 1. 安装 spec-first
 npm install -g spec-first@latest
 
-# 2. 在仓库里初始化
-spec-first init -u your-name
+# 2. 设置全局身份（只需一次，所有项目通用）
+spec-first init --global -u your-name
 
-# 3. 或者按你实际使用的平台初始化
-spec-first init --cursor --opencode --codex -u your-name
+# 3. 在仓库里初始化（自动使用全局身份）
+spec-first init --claude
 ```
 
-- `-u your-name` 会创建 `.spec-first/workspace/your-name/`，用来保存个人 journal 和会话连续性。
-- 平台参数可以自由组合。当前可选项包括 `--cursor`、`--opencode`、`--iflow`、`--codex`、`--kilo`、`--kiro`、`--gemini`、`--antigravity`、`--qoder` 和 `--codebuddy`。
-- 更完整的安装步骤、各平台入口命令和升级方式放在文档站：
+### 全局身份选项
+
+```bash
+# 指定语言偏好（默认：zh）
+spec-first init --global -u your-name --lang en
+
+# 项目级别覆盖（可选）
+spec-first init -u other-name
+```
+
+**身份读取优先级**：项目级 > 全局 > Git 配置
+
+### 平台选择
+
+```bash
+# 按实际使用的平台初始化
+spec-first init --cursor --opencode --codex
+```
+
+平台参数可以自由组合。当前可选项包括 `--cursor`、`--opencode`、`--iflow`、`--codex`、`--kilo`、`--kiro`、`--gemini`、`--antigravity`、`--qoder` 和 `--codebuddy`。
+
+更完整的安装步骤、各平台入口命令和升级方式放在文档站：
   [快速开始](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) •
   [支持平台](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
   [使用场景](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) •

@@ -1,5 +1,6 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import readline from "node:readline";
 import chalk from "chalk";
@@ -459,10 +460,54 @@ export async function init(options: InitOptions): Promise<void> {
   }
   setWriteMode(writeMode);
 
-  // Detect developer name from git config or options
+  // Detect developer name with fallback chain: -u > project > global > git
   let developerName = options.user;
+  let developerSource = "";
+
   if (!developerName) {
-    // Only detect from git if current directory is a git repo
+    // 1. Check project-level .developer file
+    const projectDevFile = path.join(cwd, DIR_NAMES.WORKFLOW, ".developer");
+    if (fs.existsSync(projectDevFile)) {
+      try {
+        const content = fs.readFileSync(projectDevFile, "utf-8");
+        for (const line of content.split("\n")) {
+          if (line.startsWith("name=")) {
+            developerName = line.split("=", 2)[1]?.trim();
+            developerSource = " (project)";
+            break;
+          }
+        }
+      } catch {
+        // Ignore read errors
+      }
+    }
+  }
+
+  if (!developerName) {
+    // 2. Check global ~/.spec-first/.developer
+    const globalDevFile = path.join(
+      os.homedir(),
+      DIR_NAMES.WORKFLOW,
+      ".developer",
+    );
+    if (fs.existsSync(globalDevFile)) {
+      try {
+        const content = fs.readFileSync(globalDevFile, "utf-8");
+        for (const line of content.split("\n")) {
+          if (line.startsWith("name=")) {
+            developerName = line.split("=", 2)[1]?.trim();
+            developerSource = " (global)";
+            break;
+          }
+        }
+      } catch {
+        // Ignore read errors
+      }
+    }
+  }
+
+  if (!developerName) {
+    // 3. Fallback to git config
     const isGitRepo = fs.existsSync(path.join(cwd, ".git"));
     if (isGitRepo) {
       try {
@@ -470,6 +515,7 @@ export async function init(options: InitOptions): Promise<void> {
           cwd,
           encoding: "utf-8",
         }).trim();
+        developerSource = " (from git)";
       } catch {
         // Git not available or no user.name configured
       }
@@ -477,14 +523,15 @@ export async function init(options: InitOptions): Promise<void> {
   }
 
   if (developerName) {
-    console.log(chalk.blue("👤 Developer:"), chalk.gray(developerName));
+    console.log(chalk.blue("👤 Developer:"), chalk.gray(developerName + developerSource));
   } else if (!options.yes) {
     // Ask for developer name if not detected and not in yes mode
       console.log(
         chalk.gray(
           "\nspec-first supports team collaboration - each developer has their own\n" +
           `workspace directory (${PATHS.WORKSPACE}/{name}/) to track AI sessions.\n` +
-          "Tip: Usually this is your git username (git config user.name).\n",
+          "Tip: Set up global identity once: spec-first init --global -u <name>\n" +
+          "     Or use git username: git config user.name\n",
       ),
     );
     developerName = await askInput("Your name: ");

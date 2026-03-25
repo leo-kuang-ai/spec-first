@@ -4,7 +4,8 @@ Common path utilities for spec-first workflow.
 
 Provides:
     get_repo_root          - Get repository root directory
-    get_developer          - Get developer name
+    get_developer          - Get developer name (project > global > git)
+    get_global_developer   - Get global developer name
     get_workspace_dir      - Get developer workspace directory
     get_tasks_dir          - Get tasks directory
     get_active_journal_file - Get current journal file
@@ -12,6 +13,7 @@ Provides:
 
 from __future__ import annotations
 
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -34,6 +36,9 @@ FILE_DEVELOPER = ".developer"
 FILE_CURRENT_TASK = ".current-task"
 FILE_TASK_JSON = "task.json"
 FILE_JOURNAL_PREFIX = "journal-"
+
+# Global config directory (user home)
+GLOBAL_CONFIG_DIR = Path.home() / DIR_WORKFLOW
 
 
 # =============================================================================
@@ -63,28 +68,31 @@ def get_repo_root(start_path: Path | None = None) -> Path:
 
 
 # =============================================================================
-# Developer
+# Global Developer (User Home)
 # =============================================================================
 
-def get_developer(repo_root: Path | None = None) -> str | None:
-    """Get developer name from .developer file.
-
-    Args:
-        repo_root: Repository root path. Defaults to auto-detected.
+def get_global_developer_file() -> Path:
+    """Get global developer file path (~/.spec-first/.developer).
 
     Returns:
-        Developer name or None if not initialized.
+        Path to global developer file.
     """
-    if repo_root is None:
-        repo_root = get_repo_root()
+    return GLOBAL_CONFIG_DIR / FILE_DEVELOPER
 
-    dev_file = repo_root / DIR_WORKFLOW / FILE_DEVELOPER
 
-    if not dev_file.is_file():
+def get_global_developer() -> str | None:
+    """Get developer name from global config (~/.spec-first/.developer).
+
+    Returns:
+        Developer name or None if not set globally.
+    """
+    global_dev_file = get_global_developer_file()
+
+    if not global_dev_file.is_file():
         return None
 
     try:
-        content = dev_file.read_text(encoding="utf-8")
+        content = global_dev_file.read_text(encoding="utf-8")
         for line in content.splitlines():
             if line.startswith("name="):
                 return line.split("=", 1)[1].strip()
@@ -94,16 +102,115 @@ def get_developer(repo_root: Path | None = None) -> str | None:
     return None
 
 
-def check_developer(repo_root: Path | None = None) -> bool:
-    """Check if developer is initialized.
+def get_global_lang() -> str:
+    """Get language preference from global config.
+
+    Returns:
+        Language code ('zh' or 'en'), defaults to 'zh'.
+    """
+    global_dev_file = get_global_developer_file()
+
+    if not global_dev_file.is_file():
+        return "zh"
+
+    try:
+        content = global_dev_file.read_text(encoding="utf-8")
+        for line in content.splitlines():
+            if line.startswith("lang="):
+                lang = line.split("=", 1)[1].strip()
+                return lang if lang in ("zh", "en") else "zh"
+    except (OSError, IOError):
+        pass
+
+    return "zh"
+
+
+def check_global_developer() -> bool:
+    """Check if global developer is configured.
+
+    Returns:
+        True if global developer is set.
+    """
+    return get_global_developer() is not None
+
+
+# =============================================================================
+# Developer (Project-level with Global Fallback)
+# =============================================================================
+
+def get_developer(repo_root: Path | None = None) -> str | None:
+    """Get developer name with fallback chain.
+
+    Priority:
+        1. Project-level: .spec-first/.developer
+        2. Global: ~/.spec-first/.developer
 
     Args:
         repo_root: Repository root path. Defaults to auto-detected.
 
     Returns:
-        True if developer is initialized.
+        Developer name or None if not initialized anywhere.
+    """
+    if repo_root is None:
+        repo_root = get_repo_root()
+
+    # 1. Check project-level first
+    dev_file = repo_root / DIR_WORKFLOW / FILE_DEVELOPER
+    if dev_file.is_file():
+        try:
+            content = dev_file.read_text(encoding="utf-8")
+            for line in content.splitlines():
+                if line.startswith("name="):
+                    return line.split("=", 1)[1].strip()
+        except (OSError, IOError):
+            pass
+
+    # 2. Fallback to global
+    return get_global_developer()
+
+
+def check_developer(repo_root: Path | None = None) -> bool:
+    """Check if developer is initialized (project or global).
+
+    Args:
+        repo_root: Repository root path. Defaults to auto-detected.
+
+    Returns:
+        True if developer is initialized anywhere.
     """
     return get_developer(repo_root) is not None
+
+
+def get_lang(repo_root: Path | None = None) -> str:
+    """Get language preference with fallback chain.
+
+    Priority:
+        1. Project-level: .spec-first/.developer (lang=)
+        2. Global: ~/.spec-first/.developer (lang=)
+
+    Args:
+        repo_root: Repository root path. Defaults to auto-detected.
+
+    Returns:
+        Language code ('zh' or 'en'), defaults to 'zh'.
+    """
+    if repo_root is None:
+        repo_root = get_repo_root()
+
+    # 1. Check project-level first
+    dev_file = repo_root / DIR_WORKFLOW / FILE_DEVELOPER
+    if dev_file.is_file():
+        try:
+            content = dev_file.read_text(encoding="utf-8")
+            for line in content.splitlines():
+                if line.startswith("lang="):
+                    lang = line.split("=", 1)[1].strip()
+                    return lang if lang in ("zh", "en") else "zh"
+        except (OSError, IOError):
+            pass
+
+    # 2. Fallback to global
+    return get_global_lang()
 
 
 # =============================================================================

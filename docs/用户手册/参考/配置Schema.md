@@ -39,8 +39,11 @@
 │   ├── get_context.py
 │   └── add_session.py
 ├── workspace/           # 开发者工作空间
-│   ├── index.md
+│   ├── index.md         # 工作空间总索引
 │   └── {developer}/
+│       ├── index.md     # 该开发者的会话索引
+│       ├── journal-1.md
+│       └── journal-N.md
 ├── tasks/               # 任务跟踪
 │   ├── {MM}-{DD}-{name}/
 │   │   └── task.json
@@ -338,7 +341,7 @@ current
 
 | 目录 | 说明 | 保护原因 |
 |------|------|----------|
-| `workspace/` | 开发者工作空间 | 个人会话记录 |
+| `workspace/` | 开发者工作空间 | 个人会话索引与日志 |
 | `tasks/` | 任务跟踪 | 项目任务数据 |
 | `spec/` | 开发规范 | 自定义项目规范 |
 | `.developer` | 开发者身份 | 个人配置 |
@@ -351,7 +354,7 @@ current
 
 ```yaml
 # 推荐配置
-session_commit_message: "docs: update development journal"
+session_commit_message: "docs: update session journal"
 max_journal_lines: 2000  # 保持默认，避免单个文件过大
 ```
 
