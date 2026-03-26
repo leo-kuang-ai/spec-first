@@ -206,8 +206,9 @@ def cmd_create(args: argparse.Namespace) -> int:
     print("", file=sys.stderr)
     print(colored("Next steps:", Colors.BLUE), file=sys.stderr)
     print("  1. Create prd.md with requirements", file=sys.stderr)
-    print("  2. Run: python3 task.py init-context <dir> <dev_type>", file=sys.stderr)
-    print("  3. Run: python3 task.py start <dir>", file=sys.stderr)
+    print("  2. Run: python3 ./.spec-first/scripts/task.py init-context <dir> <dev_type>", file=sys.stderr)
+    print("  3. Run: python3 ./.spec-first/scripts/current_task.py list", file=sys.stderr)
+    print("     Then: python3 ./.spec-first/scripts/current_task.py switch <selection>", file=sys.stderr)
     print("", file=sys.stderr)
 
     # Output relative path for script chaining
@@ -446,7 +447,7 @@ def cmd_set_branch(args: argparse.Namespace) -> int:
 
     if not branch:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py set-branch <task-dir> <branch-name>")
+        print("Usage: python3 ./.spec-first/scripts/task.py set-branch <task-dir> <branch-name>")
         return 1
 
     task_json = target_dir / FILE_TASK_JSON
@@ -480,8 +481,8 @@ def cmd_set_base_branch(args: argparse.Namespace) -> int:
 
     if not base_branch:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py set-base-branch <task-dir> <base-branch>")
-        print("Example: python3 task.py set-base-branch <dir> develop")
+        print("Usage: python3 ./.spec-first/scripts/task.py set-base-branch <task-dir> <base-branch>")
+        print("Example: python3 ./.spec-first/scripts/task.py set-base-branch <dir> develop")
         print()
         print("This sets the target branch for PR (the branch your feature will merge into).")
         return 1
@@ -515,7 +516,7 @@ def cmd_set_scope(args: argparse.Namespace) -> int:
 
     if not scope:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py set-scope <task-dir> <scope>")
+        print("Usage: python3 ./.spec-first/scripts/task.py set-scope <task-dir> <scope>")
         return 1
 
     task_json = target_dir / FILE_TASK_JSON

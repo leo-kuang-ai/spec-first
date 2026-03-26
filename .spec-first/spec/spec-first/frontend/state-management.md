@@ -1,136 +1,200 @@
-# State Management
+# Data Persistence
 
-> How state is managed in this project.
+> How data is persisted in Python scripts.
 
 ---
 
 ## Overview
 
-**Note**: This is a CLI project without traditional frontend state management. State is managed through files and environment variables.
+This project uses file-based persistence for all data. There is no database or in-memory state management beyond the script execution.
 
 ---
 
-## State Categories
+## Data Storage Locations
 
-### 1. Project State (Files)
-
-| File | State | Purpose |
-|------|-------|---------|
-| `.spec-first/.developer` | Developer identity | Who is working |
-| `.spec-first/.current-task` | Current task path | What is being worked on |
-| `.spec-first/tasks/*/task.json` | Task state | Task progress tracking |
-| `.spec-first/.version` | Version | Update tracking |
-| `config.yaml` | Configuration | Project settings |
-
-### 2. Session State (In-memory)
-
-- CLI options parsed from command line
-- Write mode (ask/force/skip)
-- Selected platforms
-- Template choices
-
-### 3. Environment State
-
-```typescript
-// Process-based state
-const cwd = process.cwd();
-const isWindows = process.platform === "win32";
-const pythonCmd = getPythonCommand();  // "python3" or "python"
-```
+| Data Type | Location | Format |
+|-----------|----------|--------|
+| Configuration | `.spec-first/config.yaml` | YAML |
+| Developer identity | `.spec-first/.developer` | Plain text |
+| Current task | `.spec-first/.current-task` | Plain text |
+| Task definitions | `.spec-first/tasks/*/task.json` | JSON |
+| Task PRDs | `.spec-first/tasks/*/prd.md` | Markdown |
+| Session journals | `.spec-first/workspace/*/journal-*.md` | Markdown |
+| Context files | `.spec-first/*.jsonl` | JSONL |
 
 ---
 
-## File-based State Patterns
+## File-Based State Patterns
 
-### Read state
+### Reading State
 
-```typescript
-function getCurrentTask(cwd: string): string | null {
-  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);
-  if (!fs.existsSync(filePath)) return null;
-  return fs.readFileSync(filePath, "utf-8").trim();
-}
+```python
+from pathlib import Path
+import json
+
+def get_current_task(repo_root: Path) -> str | None:
+    """Get current task slug from .current-task file."""
+    current_task_file = repo_root / ".spec-first" / ".current-task"
+    if current_task_file.exists():
+        return current_task_file.read_text(encoding="utf-8").strip()
+    return None
+
+def get_task_data(repo_root: Path, task_slug: str) -> dict:
+    """Read task.json for a task."""
+    task_file = repo_root / ".spec-first" / "tasks" / task_slug / "task.json"
+    if task_file.exists():
+        return json.loads(task_file.read_text(encoding="utf-8"))
+    return {}
 ```
 
-### Write state
+### Writing State
 
-```typescript
-function setCurrentTask(cwd: string, taskPath: string): void {
-  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);
-  fs.writeFileSync(filePath, taskPath, "utf-8");
-}
-```
+```python
+def set_current_task(repo_root: Path, task_slug: str) -> None:
+    """Set current task in .current-task file."""
+    current_task_file = repo_root / ".spec-first" / ".current-task"
+    current_task_file.write_text(task_slug, encoding="utf-8")
 
-### Clear state
-
-```typescript
-function clearCurrentTask(cwd: string): void {
-  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-}
+def update_task_status(repo_root: Path, task_slug: str, status: str) -> None:
+    """Update task status in task.json."""
+    task_file = repo_root / ".spec-first" / "tasks" / task_slug / "task.json"
+    data = json.loads(task_file.read_text(encoding="utf-8"))
+    data["status"] = status
+    task_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
 ```
 
 ---
 
-## Global Module State
+## JSONL Append Pattern
 
-For CLI-wide settings during execution:
+For audit logs and context files, use append-only JSONL:
 
-```typescript
-// Global write mode (shared across file operations)
-let globalWriteMode: WriteMode = "ask";
+```python
+def append_to_jsonl(repo_root: Path, filename: str, entry: dict) -> None:
+    """Append entry to JSONL file."""
+    jsonl_path = repo_root / ".spec-first" / filename
+    line = json.dumps(entry, ensure_ascii=False)
+    with open(jsonl_path, "a", encoding="utf-8") as f:
+        f.write(line + "\n")
 
-export function setWriteMode(mode: WriteMode): void {
-  globalWriteMode = mode;
-}
+def read_jsonl(repo_root: Path, filename: str) -> list[dict]:
+    """Read all entries from JSONL file."""
+    jsonl_path = repo_root / ".spec-first" / filename
+    if not jsonl_path.exists():
+        return []
 
-export function getWriteMode(): WriteMode {
-  return globalWriteMode;
-}
+    entries = []
+    with open(jsonl_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                entries.append(json.loads(line))
+    return entries
 ```
 
 ---
 
-## State Flow
+## Task Switching Contract
 
+When setting the current task (`task.py start`), the following validation is **required**:
+
+### Validation Requirements
+
+```python
+def cmd_start(args: argparse.Namespace) -> int:
+    """Set current task with validation."""
+    repo_root = get_repo_root()
+    full_path = resolve_task_dir(args.dir, repo_root)
+
+    # 1. Must be a directory
+    if not full_path.is_dir():
+        print(f"Error: Task not found: {args.dir}", file=sys.stderr)
+        return 1
+
+    # 2. Must contain task.json (validates it's a real task directory)
+    task_json_path = full_path / "task.json"
+    if not task_json_path.is_file():
+        print(f"Error: Not a valid task directory (missing task.json): {args.dir}", file=sys.stderr)
+        return 1
+
+    # 3. task.json must be readable and valid JSON
+    try:
+        data = json.loads(task_json_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as e:
+        print(f"Error: Invalid task.json: {e}", file=sys.stderr)
+        return 1
+
+    # Now safe to set current task
+    set_current_task(task_dir, repo_root)
+    return 0
 ```
-1. CLI Start
-   ↓
-2. Parse options → Set global state (write mode)
-   ↓
-3. Read project state (.developer, .current-task)
-   ↓
-4. Execute commands → Update files
-   ↓
-5. Write new state (tasks, version)
+
+### Why This Matters
+
+- **Prevents wrong state**: Without validation, any directory can become "current task"
+- **Hook safety**: Session hooks read `.current-task` and expect valid task structure
+- **Context injection**: Agent context depends on valid task.jsonl paths in task directory
+
+### Wrong vs Correct
+
+```python
+# ❌ Wrong - only checks if directory exists
+if not full_path.is_dir():
+    return 1
+set_current_task(str(full_path), repo_root)
+
+# ✅ Correct - validates task directory structure
+if not full_path.is_dir():
+    return 1
+task_json = full_path / "task.json"
+if not task_json.is_file():
+    print("Error: Not a valid task directory (missing task.json)", file=sys.stderr)
+    return 1
+set_current_task(str(full_path.relative_to(repo_root)), repo_root)
 ```
+
+---
+
+## Concurrency Considerations
+
+Since CLI tools are typically single-user:
+
+- **No locking needed** - One user at a time
+- **Atomic writes** - Write complete file at once
+- **No transactions** - Each operation is independent
 
 ---
 
 ## Common Mistakes
 
-### Don't: Store state in global variables across runs
+### 1. Not Checking File Existence
 
-```typescript
-// Bad: Lost between CLI invocations
-let currentTask = "task-1";
+```python
+# ❌ Wrong - will crash
+data = json.loads(Path("task.json").read_text())
+
+# ✅ Correct
+task_file = Path("task.json")
+data = json.loads(task_file.read_text()) if task_file.exists() else {}
 ```
 
-### Do: Persist to files
+### 2. Missing Encoding
 
-```typescript
-// Good: Survives across sessions
-fs.writeFileSync(".spec-first/.current-task", "task-1");
+```python
+# ❌ Wrong - platform-dependent
+content = path.read_text()
+
+# ✅ Correct
+content = path.read_text(encoding="utf-8")
 ```
 
----
+### 3. Not Creating Parent Directories
 
-## Examples from Codebase
+```python
+# ❌ Wrong - fails if directory doesn't exist
+Path("new/dir/file.txt").write_text("content")
 
-| Module | State Type |
-|--------|------------|
-| `src/utils/file-writer.ts` | Global write mode |
-| `src/commands/init.ts` | Developer, task creation |
-| `.spec-first/scripts/task.py` | Task state management |
+# ✅ Correct
+path = Path("new/dir/file.txt")
+path.parent.mkdir(parents=True, exist_ok=True)
+path.write_text("content", encoding="utf-8")
+```

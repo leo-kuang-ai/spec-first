@@ -1,49 +1,53 @@
 # Directory Structure
 
-> How backend code is organized in this project.
+> How TypeScript/Node.js code is organized in this project.
 
 ---
 
 ## Overview
 
-This is a TypeScript CLI project using Node.js ESM modules. The codebase follows a feature-based organization with clear separation between CLI, commands, configurators, templates, and utilities.
+spec-first is a multi-platform AI coding workflow tool distributed as an npm package. The codebase follows a modular architecture with clear separation between CLI, commands, configurators, templates, and utilities.
 
 ---
 
 ## Directory Layout
 
 ```
-packages/cli/src/
-├── cli/                    # CLI entry point and command definitions
-│   └── index.ts            # Commander.js setup, option parsing
-├── commands/               # Command implementations (init, update)
-│   ├── init.ts             # `spec-first init` command
-│   └── update.ts           # `spec-first update` command
-├── configurators/          # Platform-specific configuration logic
-│   ├── index.ts            # Platform registry and helper functions
-│   ├── claude.ts           # Claude Code configurator
-│   ├── cursor.ts           # Cursor configurator
-│   ├── iflow.ts            # iFlow CLI configurator
-│   └── ...                 # Other platform configurators
-├── templates/              # Template files for each platform
-│   ├── claude/             # Claude Code templates
-│   ├── cursor/             # Cursor templates
-│   ├── common/             # Shared templates
-│   └── ...                 # Other platform templates
-├── types/                  # TypeScript type definitions
-│   ├── ai-tools.ts         # AI tool types and registry
-│   └── migration.ts        # Migration types
-├── utils/                  # Utility functions
-│   ├── file-writer.ts      # File writing with conflict handling
-│   ├── project-detector.ts # Project type detection
-│   ├── template-fetcher.ts # Remote template downloading
-│   └── ...                 # Other utilities
-├── constants/              # Constants and configuration
-│   ├── paths.ts            # Path constants
-│   └── version.ts          # Version info
-├── config/                 # Branding and config
-│   └── brand.ts            # Brand configuration
-└── index.ts                # Package entry point
+packages/cli/
+├── src/
+│   ├── cli/                    # CLI entry point and command parsing
+│   │   └── index.ts            # Commander CLI setup
+│   ├── commands/               # CLI command implementations
+│   │   ├── init.ts             # `spec-first init` command
+│   │   └── update.ts           # `spec-first update` command
+│   ├── configurators/          # Platform-specific setup functions
+│   │   ├── index.ts            # Exports PLATFORM_FUNCTIONS registry
+│   │   ├── claude.ts           # Claude Code configuration
+│   │   ├── cursor.ts           # Cursor configuration
+│   │   ├── codex.ts            # Codex CLI configuration
+│   │   └── ...                 # Other platform configurators
+│   ├── templates/              # Template files for each platform
+│   │   ├── claude/             # Claude Code templates
+│   │   │   ├── commands/       # Slash commands (.md)
+│   │   │   ├── agents/         # Agent definitions (.md)
+│   │   │   ├── hooks/          # Python hooks (.py)
+│   │   │   └── settings.json   # Hook configurations
+│   │   ├── spec-first/         # Core spec-first templates
+│   │   │   └── scripts/        # Python runtime scripts
+│   │   └── index.ts            # Template exports
+│   ├── types/                  # TypeScript type definitions
+│   │   ├── ai-tools.ts         # Platform registry (AI_TOOLS)
+│   │   └── migration.ts        # Migration types
+│   ├── utils/                  # Shared utilities
+│   │   ├── file-writer.ts      # File writing with conflict handling
+│   │   ├── template-fetcher.ts # Template download utilities
+│   │   └── project-detector.ts # Monorepo/package detection
+│   ├── config/                 # Configuration constants
+│   │   ├── brand.ts            # Branding constants
+│   │   └── paths.ts            # Path constants
+│   ├── constants/              # Other constants
+│   └── migrations/             # Migration manifests
+└── test/                       # Vitest tests (mirrors src/ structure)
 ```
 
 ---
@@ -52,25 +56,49 @@ packages/cli/src/
 
 ### Adding a New Platform
 
-When adding a new AI tool platform:
+When adding a new AI tool platform, follow this pattern:
 
-1. **Add to types**: Update `AI_TOOLS` in `src/types/ai-tools.ts`
-2. **Create configurator**: Add `src/configurators/{platform}.ts`
-3. **Create templates**: Add `src/templates/{platform}/`
-4. **Register**: Add to `PLATFORM_FUNCTIONS` in `src/configurators/index.ts`
-5. **Add CLI flag**: Update `src/cli/index.ts` and `InitOptions` in `src/commands/init.ts`
+1. **Add entry to `AI_TOOLS` registry** in `src/types/ai-tools.ts`:
 
-### Feature Module Pattern
+```typescript
+"new-tool": {
+  name: "New Tool",
+  templateDirs: ["common", "new-tool"],
+  configDir: ".new-tool",
+  cliFlag: "new-tool",
+  defaultChecked: false,
+  hasPythonHooks: false,
+},
+```
 
-Each major feature should follow this pattern:
+2. **Create configurator** in `src/configurators/new-tool.ts`:
+
+```typescript
+export async function configureNewTool(cwd: string): Promise<void> {
+  // Copy templates to target directory
+}
+```
+
+3. **Create templates** in `src/templates/new-tool/`:
 
 ```
-feature/
-├── index.ts          # Public exports
-├── types.ts          # Feature-specific types
-├── implementation.ts # Core logic
-└── utils.ts          # Feature utilities
+src/templates/new-tool/
+├── commands/spec/    # Platform-specific commands
+└── index.ts          # Template exports
 ```
+
+4. **Register in `src/configurators/index.ts`**:
+
+```typescript
+import { configureNewTool } from "./new-tool.js";
+
+export const PLATFORM_FUNCTIONS: Record<CliFlag, PlatformConfigFn> = {
+  // ...
+  newTool: configureNewTool,
+};
+```
+
+5. **Add CLI flag** in `src/cli/index.ts` and `src/commands/init.ts`
 
 ---
 
@@ -78,32 +106,32 @@ feature/
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Files | kebab-case | `file-writer.ts`, `project-detector.ts` |
-| Directories | kebab-case | `configurators/`, `multi-agent/` |
-| Functions | camelCase | `getPythonCommand()`, `writeFile()` |
-| Classes/Types | PascalCase | `AITool`, `WriteOptions`, `InitOptions` |
-| Constants | UPPER_SNAKE_CASE | `AI_TOOLS`, `PLATFORM_FUNCTIONS`, `DIR_NAMES` |
-| Private module vars | camelCase with leading underscore | `_cliFlagCheck` |
+| File names | `kebab-case.ts` | `file-writer.ts`, `project-detector.ts` |
+| Class names | `PascalCase` | `ProcessEngine`, `TemplateFetcher` |
+| Function names | `camelCase` | `getToolConfig()`, `writeFile()` |
+| Constants | `SCREAMING_SNAKE_CASE` | `AI_TOOLS`, `TIMEOUTS`, `PATHS` |
+| Interfaces | `PascalCase` (no `I` prefix) | `AIToolConfig`, `WriteOptions` |
+| Types | `PascalCase` | `AITool`, `CliFlag`, `WriteMode` |
+| Enums | `PascalCase` | Not used (prefer union types) |
 
 ---
 
-## Import Style
+## Import Patterns
+
+Use ESM with `.js` extensions (required for TypeScript ESM):
 
 ```typescript
-// 1. Node.js built-ins (with "node:" prefix)
+// ✅ Correct - use node: prefix for built-ins
 import fs from "node:fs";
 import path from "node:path";
 
-// 2. External packages
-import chalk from "chalk";
-import { Command } from "commander";
+// ✅ Correct - use .js extension for local imports
+import { writeFile } from "../utils/file-writer.js";
+import { AI_TOOLS } from "../types/ai-tools.js";
 
-// 3. Internal modules (with .js extension for ESM)
-import { init } from "../commands/init.js";
-import { BRAND } from "../config/brand.js";
+// ❌ Wrong - missing .js extension
+import { writeFile } from "../utils/file-writer";
 ```
-
-**Important**: Always use `.js` extension in imports even for `.ts` files (required for ESM compatibility).
 
 ---
 
@@ -111,6 +139,12 @@ import { BRAND } from "../config/brand.js";
 
 ### Well-organized modules
 
-- **`src/configurators/index.ts`** - Clean registry pattern with derived helpers
-- **`src/types/ai-tools.ts`** - Single source of truth for platform data
-- **`src/utils/file-writer.ts`** - Focused utility with clear interface
+- **`src/types/ai-tools.ts`** - Single source of truth for platform registry
+- **`src/utils/file-writer.ts`** - Focused utility with clear responsibilities
+- **`src/configurators/claude.ts`** - Clean configurator pattern
+
+### Key patterns
+
+1. **Registry pattern**: `AI_TOOLS` in `src/types/ai-tools.ts` is the single source of truth
+2. **Configurator pattern**: Each platform has a dedicated configurator function
+3. **Template organization**: Templates are grouped by platform and type

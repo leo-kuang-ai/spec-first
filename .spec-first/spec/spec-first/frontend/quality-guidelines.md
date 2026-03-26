@@ -1,182 +1,180 @@
-# Quality Guidelines
+# Python Quality Guidelines
 
-> Code quality standards for frontend/CLI development.
+> Code quality standards for Python scripts.
 
 ---
 
 ## Overview
 
-This project emphasizes clean TypeScript with strong typing, clear patterns, and self-documenting code.
+Python scripts in this project should be clean, type-safe, and follow modern Python 3.10+ conventions.
+
+---
+
+## Development Commands
+
+```bash
+# Type checking
+pnpm lint:py                 # basedpyright on Python files
+
+# Or run directly
+basedpyright .spec-first/scripts/
+```
 
 ---
 
 ## Forbidden Patterns
 
-### Never use `any` without justification
+### 1. Bare Except
 
-```typescript
-// Bad
-function process(data: any) { ... }
+```python
+# ❌ Wrong - catches everything including KeyboardInterrupt
+try:
+    do_something()
+except:
+    pass
 
-// Good
-function process(data: Record<string, unknown>) { ... }
+# ✅ Correct - specific exceptions
+try:
+    do_something()
+except (OSError, IOError) as e:
+    print(f"Error: {e}", file=sys.stderr)
 ```
 
-### Never mix import styles
+### 2. Mutable Default Arguments
 
-```typescript
-// Bad
-const fs = require("fs");
-import path from "node:path";
+```python
+# ❌ Wrong - shared mutable state
+def process(items: list = []) -> list:
+    items.append("new")
+    return items
 
-// Good
-import fs from "node:fs";
-import path from "node:path";
+# ✅ Correct - None default
+def process(items: list | None = None) -> list:
+    items = items or []
+    items.append("new")
+    return items
 ```
 
-### Never use `var`
+### 3. Missing Type Hints
 
-```typescript
-// Bad
-var x = 1;
+```python
+# ❌ Wrong - no type hints
+def get_config(repo_root):
+    return read_yaml(repo_root / "config.yaml")
 
-// Good
-const x = 1;
+# ✅ Correct - with type hints
+def get_config(repo_root: Path | None = None) -> dict:
+    return read_yaml(repo_root / "config.yaml")
 ```
 
-### Never forget `.js` extension
+### 4. String Path Concatenation
 
-```typescript
-// Bad - ESM will fail
-import { init } from "../commands/init";
+```python
+# ❌ Wrong - platform-specific
+path = root + "/" + filename
 
-// Good
-import { init } from "../commands/init.js";
+# ✅ Correct - use pathlib
+path = root / filename
+```
+
+### 5. Implicit Encoding
+
+```python
+# ❌ Wrong - platform-dependent encoding
+content = file.read()
+
+# ✅ Correct - explicit UTF-8
+content = file.read(encoding="utf-8")
 ```
 
 ---
 
 ## Required Patterns
 
-### Explicit return types
+### 1. Shebang and Module Docstring
 
-```typescript
-// Required for public functions
-export function getToolConfig(tool: AITool): AIToolConfig {
-  return AI_TOOLS[tool];
-}
+```python
+#!/usr/bin/env python3
+"""
+Module description.
 
-export async function init(options: InitOptions): Promise<void> {
-  // ...
-}
+Usage: python3 .spec-first/scripts/module.py [args]
+"""
+
+from __future__ import annotations
 ```
 
-### Const assertions for registries
+### 2. Type Hints with Modern Syntax
 
-```typescript
-// Use as const for immutable data
-export const AI_TOOLS = {
-  "claude-code": { ... },
-} as const;
+```python
+# ✅ Required - Python 3.10+ union syntax
+def get_task(repo_root: Path | None = None) -> dict | None:
+    ...
 ```
 
-### Error type guards
+### 3. Explicit Encoding
 
-```typescript
-catch (error) {
-  const message = error instanceof Error
-    ? error.message
-    : String(error);
-}
+```python
+# ✅ Required - always specify encoding
+content = path.read_text(encoding="utf-8")
+path.write_text(content, encoding="utf-8")
+```
+
+### 4. Exit Code for CLI Scripts
+
+```python
+def main() -> int:
+    """Main entry point."""
+    try:
+        # Do work
+        return 0
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+
+if __name__ == "__main__":
+    sys.exit(main())
 ```
 
 ---
 
-## Testing Requirements
+## Code Organization
 
-### Test file location
+### Import Order
 
+```python
+# 1. Future imports
+from __future__ import annotations
+
+# 2. Standard library (alphabetical)
+import json
+import sys
+from pathlib import Path
+
+# 3. Local imports (alphabetical)
+from .config import get_config
+from .paths import get_repo_root
 ```
-packages/cli/
-├── src/
-│   └── utils/
-│       └── compare-versions.ts
-└── test/
-    └── compare-versions.test.ts
-```
 
-### Test naming
+### Module Structure
 
-```typescript
-describe("compareVersions", () => {
-  it("should return positive when a > b", () => {
-    expect(compareVersions("2.0.0", "1.0.0")).toBeGreaterThan(0);
-  });
-});
+```python
+# 1. Docstring
+# 2. Imports
+# 3. Constants
+# 4. Private functions
+# 5. Public functions
+# 6. main() if CLI script
 ```
 
 ---
 
 ## Code Review Checklist
 
-- [ ] No `any` types without justification
-- [ ] Imports use `.js` extension
-- [ ] Functions have explicit return types
-- [ ] No unused variables or imports
-- [ ] Constants use `UPPER_SNAKE_CASE`
-- [ ] Files use `kebab-case`
-- [ ] Error handling uses type guards
-- [ ] Early returns used to reduce nesting
-- [ ] No console.log in library code
-
----
-
-## Linting
-
-```bash
-npm run lint
-npm run typecheck
-```
-
----
-
-## Common Mistakes
-
-### Forgetting optional chaining
-
-```typescript
-// Bad
-const name = options.user.trim();
-
-// Good
-const name = options.user?.trim() ?? "default";
-```
-
-### Overly nested code
-
-```typescript
-// Bad
-if (a) {
-  if (b) {
-    if (c) {
-      doSomething();
-    }
-  }
-}
-
-// Good
-if (!a || !b || !c) return;
-doSomething();
-```
-
-### Swallowing errors silently
-
-```typescript
-// Bad
-try { ... } catch {}
-
-// Good
-try { ... } catch (e) {
-  console.log(chalk.yellow(`Warning: ${e}`));
-}
-```
+- [ ] Uses `pathlib.Path` for all paths
+- [ ] Has explicit `encoding="utf-8"` for file operations
+- [ ] Uses modern type hints (`Path | None` not `Optional[Path]`)
+- [ ] Handles exceptions specifically (no bare except)
+- [ ] Returns proper exit codes (0 for success, non-zero for error)
+- [ ] No mutable default arguments
+- [ ] Has module docstring

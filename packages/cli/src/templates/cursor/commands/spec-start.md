@@ -2,6 +2,8 @@
 
 Initialize your AI development session and begin working on tasks.
 
+If you need to choose between existing tasks, use `current-task` first. This page describes the low-level start/resume flow after you already know the exact task.
+
 ---
 
 ## Operation Types

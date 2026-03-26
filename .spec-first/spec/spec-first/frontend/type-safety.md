@@ -1,219 +1,204 @@
-# Type Safety
+# Python Type Safety
 
-> Type safety patterns in this TypeScript CLI project.
+> Type safety patterns in Python scripts.
 
 ---
 
 ## Overview
 
-This project uses TypeScript with strict mode. Strong typing is enforced throughout, with minimal use of `any`. Types are centralized in `src/types/` and derived from data where possible.
+This project uses Python 3.10+ type hints with basedpyright for type checking. All scripts should have comprehensive type annotations.
+
+---
+
+## Type System
+
+### Modern Union Syntax
+
+```python
+# ✅ Correct - Python 3.10+ syntax
+def get_task(repo_root: Path | None = None) -> dict | None:
+    ...
+
+# ❌ Wrong - old typing module syntax
+from typing import Optional, Union
+def get_task(repo_root: Optional[Path] = None) -> Optional[dict]:
+    ...
+```
+
+### Collection Types
+
+```python
+# ✅ Correct - lowercase built-ins
+def get_tasks() -> list[dict]:
+    ...
+
+def get_packages() -> dict[str, str]:
+    ...
+
+# ❌ Wrong - typing module (deprecated in 3.9+)
+from typing import List, Dict
+def get_tasks() -> List[Dict]:
+    ...
+```
 
 ---
 
 ## Type Organization
 
-### Central types directory
+### Types Module
 
-```
-src/types/
-├── ai-tools.ts      # Platform types and registry
-└── migration.ts     # Migration types
-```
+Shared types go in `common/types.py`:
 
-### Inline types for local use
+```python
+# common/types.py
+from __future__ import annotations
+from enum import Enum
+from dataclasses import dataclass
 
-```typescript
-// In the file that uses them
-interface InitAnswers {
-  tools: string[];
-  template?: string;
-}
+class TaskStatus(str, Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
 
-interface TaskJson {
-  id: string;
-  name: string;
-  status: string;
-  // ...
-}
-```
-
----
-
-## Key Patterns
-
-### Const assertions for registries
-
-```typescript
-// Single source of truth
-export const AI_TOOLS = {
-  "claude-code": {
-    name: "Claude Code",
-    configDir: ".claude",
-    // ...
-  },
-  // ...
-} as const;
-
-// Derived type
-export type AITool = keyof typeof AI_TOOLS;
+@dataclass
+class Task:
+    name: str
+    slug: str
+    status: TaskStatus
+    created: str
+    owner: str | None = None
 ```
 
-### Union types from const
+### Local Types
 
-```typescript
-// From const object
-export type CliFlag =
-  | "claude"
-  | "cursor"
-  | "opencode"
-  // ...
+Types used in only one module can be defined locally:
 
-// From array
-export const PLATFORM_IDS = Object.keys(AI_TOOLS) as AITool[];
-```
-
-### Type-safe config interfaces
-
-```typescript
-export interface AIToolConfig {
-  name: string;
-  templateDirs: TemplateDir[];
-  configDir: string;
-  supportsAgentSkills?: boolean;
-  cliFlag: CliFlag;
-  defaultChecked: boolean;
-  hasPythonHooks: boolean;
-}
-```
-
----
-
-## Compile-time Validation
-
-### Exhaustive checks
-
-```typescript
-// Ensure all CliFlags are in InitOptions
-type _AssertCliFlagsInOptions = [CliFlag] extends [keyof InitOptions]
-  ? true
-  : "ERROR: CliFlag has values not present in InitOptions";
-const _cliFlagCheck: _AssertCliFlagsInOptions = true;
-```
-
-### Record types for registries
-
-```typescript
-export const AI_TOOLS: Record<AITool, AIToolConfig> = {
-  // TypeScript ensures all AITool keys are covered
-};
-```
-
----
-
-## Type Guards
-
-### Error handling
-
-```typescript
-// Type-safe error handling
-catch (error) {
-  const message = error instanceof Error
-    ? error.message
-    : String(error);
-}
-```
-
-### Type predicates (when needed)
-
-```typescript
-function isAITool(value: string): value is AITool {
-  return value in AI_TOOLS;
-}
-```
-
----
-
-## Forbidden Patterns
-
-### No unchecked any
-
-```typescript
-// Bad
-function process(data: any) { ... }
-
-// Good
-function process(data: unknown) {
-  if (typeof data === "string") { ... }
-}
-```
-
-### No type assertions without validation
-
-```typescript
-// Bad
-const config = JSON.parse(content) as AIToolConfig;
-
-// Good - validate first or use unknown
-const config: AIToolConfig = JSON.parse(content);
-// Or better: use a validation library for external data
-```
-
-### No non-null assertions
-
-```typescript
-// Bad
-const value = options.user!;
-
-// Good
-const value = options.user ?? "default";
+```python
+def process() -> None:
+    # Local type alias
+    JsonValue = str | int | float | bool | None | list["JsonValue"] | dict[str, "JsonValue"]
+    data: JsonValue = json.loads(content)
 ```
 
 ---
 
 ## Common Patterns
 
-### Options type pattern
+### Type Guards
 
-```typescript
-interface InitOptions {
-  cursor?: boolean;
-  claude?: boolean;
-  yes?: boolean;
-  force?: boolean;
-  // ...
-}
+```python
+def is_valid_task(data: dict) -> bool:
+    """Type guard for Task structure."""
+    required = {"name", "slug", "status", "created"}
+    return all(key in data for key in required)
 
-// Usage
-async function init(options: InitOptions): Promise<void> {
-  if (options.force) { ... }
-}
+def process_task(data: dict) -> None:
+    if not is_valid_task(data):
+        raise ValueError("Invalid task structure")
+    # Now we know data has required fields
 ```
 
-### Return type unions
+### Optional Handling
 
-```typescript
-// Clear success/failure
-interface SuccessResult {
-  success: true;
-  message: string;
-  skipped?: boolean;
-}
+```python
+def get_config(repo_root: Path | None = None) -> dict:
+    """Get config with None handling."""
+    root = repo_root or get_repo_root()  # Provide default
+    config_path = root / "config.yaml"
+    if config_path.exists():
+        return parse_yaml(config_path.read_text(encoding="utf-8"))
+    return {}  # Return empty dict instead of None
+```
 
-interface FailureResult {
-  success: false;
-  message: string;
-}
+### Narrow Types
 
-type TemplateResult = SuccessResult | FailureResult;
+```python
+def process_status(status: str) -> TaskStatus:
+    """Convert string to enum with validation."""
+    try:
+        return TaskStatus(status)
+    except ValueError:
+        valid = [s.value for s in TaskStatus]
+        raise ValueError(f"Invalid status: {status}. Valid: {valid}")
 ```
 
 ---
 
-## Examples from Codebase
+## Validation
 
-| File | Pattern |
-|------|---------|
-| `src/types/ai-tools.ts` | Const assertion + derived types |
-| `src/cli/index.ts` | Compile-time assertion |
-| `src/utils/file-writer.ts` | Options interface + return type |
-| `src/commands/init.ts` | Complex options interface |
+### Simple Validation
+
+```python
+def validate_task(data: dict) -> Task:
+    """Validate and construct Task from dict."""
+    if not isinstance(data, dict):
+        raise TypeError("Task must be a dict")
+
+    name = data.get("name")
+    if not isinstance(name, str):
+        raise TypeError("Task.name must be a string")
+
+    # ... more validation
+
+    return Task(
+        name=name,
+        slug=data["slug"],
+        status=TaskStatus(data.get("status", "pending")),
+        created=data.get("created", ""),
+        owner=data.get("owner"),
+    )
+```
+
+---
+
+## Forbidden Patterns
+
+### 1. Any Type
+
+```python
+# ❌ Wrong - loses type safety
+def process(data: any) -> any:
+    ...
+
+# ✅ Correct - use specific types or generics
+def process(data: dict) -> dict:
+    ...
+
+# ✅ Or use unknown for truly unknown data
+def parse(data: str) -> object:
+    return json.loads(data)
+```
+
+### 2. Missing Return Type
+
+```python
+# ❌ Wrong - no return type
+def get_task(slug):
+    return tasks.get(slug)
+
+# ✅ Correct - explicit return type
+def get_task(slug: str) -> dict | None:
+    return tasks.get(slug)
+```
+
+### 3. Type: Ignore Comments
+
+```python
+# ❌ Wrong - silences type checker
+data = json.loads(content)  # type: ignore
+
+# ✅ Correct - fix the underlying issue
+data: dict = json.loads(content)  # Or validate at runtime
+```
+
+---
+
+## Type Checking Commands
+
+```bash
+# Run type checker
+basedpyright .spec-first/scripts/
+
+# Check specific file
+basedpyright .spec-first/scripts/task.py
+```

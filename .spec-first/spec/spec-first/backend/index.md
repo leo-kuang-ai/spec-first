@@ -1,12 +1,15 @@
 # Backend Development Guidelines
 
-> Best practices for backend development in this project.
+> Best practices for TypeScript/Node.js development in this project.
 
 ---
 
 ## Overview
 
-This directory contains guidelines for the TypeScript CLI backend. Guidelines are based on actual codebase patterns.
+spec-first is a multi-platform AI coding workflow CLI tool. The backend consists of:
+
+- **TypeScript/Node.js CLI** (`packages/cli/src/`)
+- **Python scripts** (`.spec-first/scripts/`)
 
 ---
 
@@ -15,55 +18,63 @@ This directory contains guidelines for the TypeScript CLI backend. Guidelines ar
 | Guide | Description | Status |
 |-------|-------------|--------|
 | [Directory Structure](./directory-structure.md) | Module organization and file layout | ✅ Filled |
-| [Database Guidelines](./database-guidelines.md) | File-based state (no database) | ✅ Filled |
+| [Database Guidelines](./database-guidelines.md) | File-based data storage patterns | ✅ Filled |
 | [Error Handling](./error-handling.md) | Error types, handling strategies | ✅ Filled |
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | ✅ Filled |
-| [Logging Guidelines](./logging-guidelines.md) | CLI output with chalk | ✅ Filled |
+| [Logging Guidelines](./logging-guidelines.md) | Console output, JSONL audit logs | ✅ Filled |
 
 ---
 
 ## Pre-Development Checklist
 
-Before implementing backend features, read:
+Before starting backend work, read:
 
-- [ ] [Directory Structure](./directory-structure.md) - Understand module organization
-- [ ] [Error Handling](./error-handling.md) - Learn error patterns
-- [ ] [Quality Guidelines](./quality-guidelines.md) - Review forbidden patterns
+1. [Directory Structure](./directory-structure.md) - Understand module organization
+2. [Quality Guidelines](./quality-guidelines.md) - Know the forbidden patterns
+3. [Error Handling](./error-handling.md) - Use consistent error patterns
 
 ---
 
 ## Quick Reference
 
-### File Naming
-
-```
-kebab-case.ts    // All files
-```
-
-### Import Style
+### TypeScript Conventions
 
 ```typescript
-import fs from "node:fs";                    // Node built-ins
-import chalk from "chalk";                   // External
-import { init } from "../commands/init.js";  // Internal (.js!)
+// Use node: prefix for built-ins
+import fs from "node:fs";
+import path from "node:path";
+
+// Use .js extension for local imports
+import { writeFile } from "../utils/file-writer.js";
+
+// Use as const for registries
+export const AI_TOOLS = { ... } as const;
+
+// Use chalk for error messages
+console.error(chalk.red("Error: Something went wrong"));
 ```
 
-### Function Pattern
+### Python Conventions
 
-```typescript
-export async function command(options: Options): Promise<void> {
-  try {
-    // Implementation
-  } catch (error) {
-    console.error(
-      chalk.red("Error:"),
-      error instanceof Error ? error.message : error,
-    );
-    process.exit(1);
-  }
-}
+```python
+# Use pathlib for paths
+from pathlib import Path
+
+# Use type hints
+def get_config(repo_root: Path | None = None) -> dict:
+    ...
+
+# Print errors to stderr
+print(f"Error: {message}", file=sys.stderr)
 ```
 
 ---
 
-**Language**: All documentation written in **English**.
+## Development Commands
+
+```bash
+pnpm build      # Compile TypeScript
+pnpm test       # Run tests
+pnpm lint       # Check code style
+pnpm typecheck  # Type check
+```

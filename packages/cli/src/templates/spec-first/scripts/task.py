@@ -9,7 +9,7 @@ Usage:
     python3 task.py add-context <dir> <file> <path> [reason] # Add jsonl entry
     python3 task.py validate <dir>              # Validate jsonl files
     python3 task.py list-context <dir>          # List jsonl entries
-    python3 task.py start <dir>                 # Set as current task
+    python3 task.py start <dir>                 # Set as current task (low-level, exact path/name only)
     python3 task.py finish                      # Clear current task
     python3 task.py set-branch <dir> <branch>   # Set git branch
     python3 task.py set-base-branch <dir> <branch>  # Set PR target branch
@@ -40,7 +40,7 @@ from common.paths import (
     set_current_task,
     clear_current_task,
 )
-from common.task_utils import resolve_task_dir, run_task_hooks
+from common.task_utils import run_task_hooks
 from common.tasks import iter_active_tasks, children_progress
 
 # Import command handlers from split modules (also re-exports for plan.py compatibility)
@@ -65,6 +65,33 @@ from common.task_context import (
 # Command: start / finish
 # =============================================================================
 
+def _resolve_exact_start_path(task_input: str, repo_root: Path) -> Path:
+    """Resolve a task path for start without suffix-based lookup."""
+    tasks_dir = get_tasks_dir(repo_root)
+    token = task_input.strip().rstrip("/")
+    if not token:
+        return Path()
+
+    if token.startswith("/"):
+        candidate = Path(token)
+    elif token.startswith(".spec-first/") or "/" in token:
+        candidate = repo_root / token
+    else:
+        candidate = tasks_dir / token
+
+    try:
+        candidate = candidate.resolve()
+    except (OSError, RuntimeError):
+        return Path()
+
+    try:
+        candidate.relative_to(tasks_dir.resolve())
+    except ValueError:
+        return Path()
+
+    return candidate
+
+
 def cmd_start(args: argparse.Namespace) -> int:
     """Set current task."""
     repo_root = get_repo_root()
@@ -74,12 +101,22 @@ def cmd_start(args: argparse.Namespace) -> int:
         print(colored("Error: task directory or name required", Colors.RED))
         return 1
 
-    # Resolve task directory (supports task name, relative path, or absolute path)
-    full_path = resolve_task_dir(task_input, repo_root)
+    # Resolve task directory using exact matching only (no suffix lookup)
+    full_path = _resolve_exact_start_path(task_input, repo_root)
 
     if not full_path.is_dir():
         print(colored(f"Error: Task not found: {task_input}", Colors.RED))
-        print("Hint: Use task name (e.g., 'my-task') or full path (e.g., '.spec-first/tasks/01-31-my-task')")
+        print(
+            "Hint: Use ./.spec-first/scripts/current_task.py list/switch for the user-facing flow, "
+            "or pass an exact task directory/path.",
+        )
+        return 1
+
+    # Validate task.json exists (ensures it's a valid task directory)
+    task_json_path = full_path / FILE_TASK_JSON
+    if not task_json_path.is_file():
+        print(colored(f"Error: Not a valid task directory (missing task.json): {task_input}", Colors.RED))
+        print("Hint: Create task with 'task.py create' first")
         return 1
 
     # Convert to relative path for storage
@@ -264,6 +301,10 @@ def show_usage() -> None:
     """Show usage help."""
     print("""Task Management Script for Multi-Agent Pipeline
 
+Low-level task primitive. For the user-facing switch flow, use:
+  python3 ./.spec-first/scripts/current_task.py list
+  python3 ./.spec-first/scripts/current_task.py switch <selection>
+
 Usage:
   python3 task.py create <title>                     Create new task directory
   python3 task.py create <title> --package <pkg>     Create task for a specific package
@@ -273,7 +314,7 @@ Usage:
   python3 task.py add-context <dir> <jsonl> <path> [reason]  Add entry to jsonl
   python3 task.py validate <dir>                     Validate jsonl files
   python3 task.py list-context <dir>                 List jsonl entries
-  python3 task.py start <dir>                        Set as current task
+  python3 task.py start <dir>                        Set as current task (low-level, exact path/name only)
   python3 task.py finish                             Clear current task
   python3 task.py set-branch <dir> <branch>          Set git branch for multi-agent
   python3 task.py set-scope <dir> <scope>            Set scope for PR title
@@ -302,7 +343,7 @@ Examples:
   python3 task.py init-context .spec-first/tasks/01-21-add-login backend --package cli
   python3 task.py add-context <dir> implement .spec-first/spec/cli/backend/auth.md "Auth guidelines"
   python3 task.py set-branch <dir> task/add-login
-  python3 task.py start .spec-first/tasks/01-21-add-login
+  python3 task.py start .spec-first/tasks/01-21-add-login   # low-level exact path
   python3 task.py create-pr                          # Uses current task
   python3 task.py create-pr <dir> --dry-run          # Preview without changes
   python3 task.py finish

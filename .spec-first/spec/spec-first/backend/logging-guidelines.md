@@ -1,154 +1,155 @@
 # Logging Guidelines
 
-> Structured logging patterns for this CLI project.
+> How logging is done in this project.
 
 ---
 
 ## Overview
 
-This is a CLI tool, so logging = console output. We use `chalk` for colored, user-friendly messages. Logging should be informative but not verbose.
+This CLI tool uses console output for user-facing messages. The logging approach is simple and focused on developer experience:
+
+- **No logging library** - Use `console.log/error` directly
+- **Color-coded output** - Use `chalk` for visual distinction
+- **Structured data** - Use JSONL files for audit logs
+
+---
+
+## Console Output Patterns
+
+### TypeScript (CLI)
+
+```typescript
+import chalk from "chalk";
+
+// Success messages (green)
+console.log(chalk.green("✓ Created: .claude/"));
+console.log(chalk.green("  ✓ Initialized spec-first"));
+
+// Warning/changed files (yellow)
+console.log(chalk.yellow("  ↻ Overwritten: .claude/settings.json"));
+
+// Info/appended files (blue)
+console.log(chalk.blue("  + Appended: .spec-first/workflow.md"));
+
+// Skip messages (gray)
+console.log(chalk.gray("  ○ Skipped: .claude/commands/ (already exists)"));
+
+// Error messages (red)
+console.error(chalk.red("Error: Failed to fetch templates"));
+console.error(chalk.red(`Error: ${error.message}`));
+```
+
+### Python (Scripts)
+
+```python
+import sys
+
+# Regular output
+print(f"Task: {task_name}")
+
+# Warning to stderr
+print(f"Warning: {message}", file=sys.stderr)
+
+# Error and exit
+print(f"Error: {message}", file=sys.stderr)
+sys.exit(1)
+```
 
 ---
 
 ## Log Levels
 
-### Info (blue)
+| Level | Function | Color | When to Use |
+|-------|----------|-------|-------------|
+| Success | `console.log(chalk.green(...))` | Green | Operation completed successfully |
+| Info | `console.log(...)` | Default | General information |
+| Warning | `console.log(chalk.yellow(...))` | Yellow | Non-fatal issues, skipped files |
+| Error | `console.error(chalk.red(...))` | Red | Fatal errors, failures |
 
-For progress updates and successful operations:
+---
 
-```typescript
-console.log(chalk.blue("📁 Creating workflow structure..."));
-console.log(chalk.blue("📝 Configuring Claude Code..."));
-console.log(chalk.blue("👤 Developer:"), chalk.gray(developerName));
+## Structured Logging (JSONL)
+
+For audit trails and context injection, use JSONL files:
+
+```jsonl
+// .spec-first/implement.jsonl
+{"file": "src/commands/init.ts", "reason": "CLI init command implementation"}
+{"file": "src/types/ai-tools.ts", "reason": "Platform registry for AI tools"}
 ```
 
-### Success (green)
+```python
+# Writing JSONL
+import json
 
-For completed operations:
+with open("implement.jsonl", "a", encoding="utf-8") as f:
+    f.write(json.dumps({"file": path, "reason": reason}) + "\n")
 
-```typescript
-console.log(chalk.green("   ✓ All files created successfully"));
-console.log(chalk.green(`   ${result.message}`));
-```
-
-### Warning (yellow)
-
-For non-fatal issues or important notices:
-
-```typescript
-console.log(chalk.yellow("No tools selected. At least one tool is required."));
-console.log(chalk.yellow(`  ↻ Overwritten: ${displayPath}`));
-console.log(chalk.yellow('📌 Windows detected: Using "python" for hooks'));
-```
-
-### Error (red)
-
-For failures that stop execution:
-
-```typescript
-console.error(chalk.red("Error:"), error instanceof Error ? error.message : error);
-console.log(chalk.red("Error: Could not reach registry. Check your connection."));
-```
-
-### Muted (gray)
-
-For secondary information:
-
-```typescript
-console.log(chalk.gray("   Using proxy: proxy.example.com"));
-console.log(chalk.gray("   This may take a moment on slow connections."));
+# Reading JSONL
+entries = []
+with open("implement.jsonl", "r", encoding="utf-8") as f:
+    for line in f:
+        if line.strip():
+            entries.append(json.loads(line))
 ```
 
 ---
 
-## Formatting Patterns
+## What to Log
 
-### Status Icons
+### CLI Output
 
-```typescript
-console.log(chalk.green("  ✓"), "Success message");
-console.log(chalk.yellow("  ↻"), "Overwritten");
-console.log(chalk.blue("  +"), "Appended");
-console.log(chalk.gray("  ○"), "Skipped");
-console.log(chalk.red("  ✗"), "Error message");
-```
+- File operations (created, overwritten, skipped, appended)
+- Progress indicators
+- Error messages with context
+- Final status summary
 
-### Key-Value Pairs
+### JSONL Audit Logs
 
-```typescript
-// Good: Label + value
-console.log(chalk.blue("👤 Developer:"), chalk.gray(developerName));
-console.log(chalk.gray(`   - ${pkg.name}`) + chalk.gray(` (${pkg.path})`));
-```
+- Files included in context for AI agents
+- Task state changes
+- Configuration values used
 
 ---
 
 ## What NOT to Log
 
-### Don't log sensitive data
-
-```typescript
-// Bad
-console.log(`API key: ${apiKey}`);
-
-// Good
-console.log(`Using proxy: ${maskProxyUrl(proxyUrl)}`);
-```
-
-### Don't log raw objects
-
-```typescript
-// Bad
-console.log(result);
-
-// Good
-console.log(chalk.green(`   ${result.message}`));
-```
-
-### Don't log in library code
-
-```typescript
-// Bad in utility functions
-export function writeFile() {
-  console.log("Writing file...");  // Too verbose
-}
-
-// Good: Let caller decide what to log
-export async function writeFile(): Promise<boolean> {
-  // ... silent operation, return status
-}
-```
+- **Secrets**: API keys, tokens, passwords
+- **User data**: File contents (only paths)
+- **Internal state**: Debug info (use `--verbose` flag if needed)
 
 ---
 
-## Common Patterns
+## Common Mistakes
 
-### Progress indicator
-
-```typescript
-// Ticker for long operations
-const ticker = setInterval(() => {
-  elapsed++;
-  process.stdout.write(`\r${chalk.gray(`Loading... ${elapsed}s/${timeout}s`)}`);
-}, 1000);
-// ... operation ...
-clearInterval(ticker);
-process.stdout.write("\r\x1b[2K");  // Clear line
-```
-
-### Silent mode
+### 1. Missing Color for Errors
 
 ```typescript
-// Use stdio: "pipe" for silent operations
-execSync(command, { stdio: "pipe" });
+// ❌ Wrong - hard to spot
+console.error("Error: Failed to write file");
+
+// ✅ Correct - visually distinct
+console.error(chalk.red("Error: Failed to write file"));
 ```
 
----
+### 2. Missing Context
 
-## Examples from Codebase
+```typescript
+// ❌ Wrong - no context
+console.error(chalk.red("Failed to fetch"));
 
-| File | Usage |
-|------|-------|
-| `src/cli/index.ts` | Command startup, version check |
-| `src/commands/init.ts` | Progress through init steps |
-| `src/utils/file-writer.ts` | File operation status |
+// ✅ Correct - includes context
+console.error(chalk.red(`Failed to fetch template from ${url}`));
+```
+
+### 3. Over-logging
+
+```typescript
+// ❌ Wrong - too verbose
+console.log("Step 1: checking file");
+console.log("Step 2: reading content");
+console.log("Step 3: writing file");
+
+// ✅ Correct - concise
+console.log(chalk.green(`  ✓ Updated: ${filename}`));
+```

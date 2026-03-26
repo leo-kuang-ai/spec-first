@@ -17,9 +17,9 @@ Use this skill when the user wants to inspect active tasks or switch the current
 
 Show the active task list so the user can choose where to switch next.
 
-### `switch <task>`
+### `switch <selection>`
 
-Change the active task by updating:
+Change the active task by updating the current pointer after the user picks a task from the list.
 
 ```text
 .spec-first/.current-task
@@ -47,7 +47,9 @@ When the user says:
 
 Use `switch`.
 
-If the user gives only a task name or path, treat it as `switch` by default.
+After `list` is shown, treat the user’s chosen entry as the explicit selection and switch to it.
+
+If the requested task is already the current task, report that it is already active instead of rewriting the pointer.
 
 ---
 
@@ -56,23 +58,25 @@ If the user gives only a task name or path, treat it as `switch` by default.
 ### 1. List tasks
 
 ```bash
-python3 ./.spec-first/scripts/task.py list
+python3 ./.spec-first/scripts/current_task.py list
 ```
 
 Use this to show active tasks and the current one.
 
-### 2. Switch task
+### 2. Switch task from the selected entry
 
 ```bash
-python3 ./.spec-first/scripts/task.py start <task-dir-or-name>
+python3 ./.spec-first/scripts/current_task.py switch <selection>
 ```
 
 Examples:
 
 ```bash
-python3 ./.spec-first/scripts/task.py start my-task
-python3 ./.spec-first/scripts/task.py start .spec-first/tasks/03-25-my-task
+python3 ./.spec-first/scripts/current_task.py switch 1
+python3 ./.spec-first/scripts/current_task.py switch .spec-first/tasks/03-25-my-task
 ```
+
+If the selected entry is already the current task, stop after reporting that it is already active.
 
 ### 3. Optional follow-up
 
@@ -91,19 +95,20 @@ Do not run it automatically unless the user explicitly asks.
 ### Input
 
 - `list`
-- `switch <task>`
-- bare task name or task path
+- `switch`
+- selected task entry after listing
 
 ### Output
 
 - For `list`: active tasks and current task
-- For `switch`: confirmation of the new current task
+- For `switch`: confirmation of the selected task and the new current task
 - Optional note if the target task should be initialized
 
 ### Side Effects
 
 - `list`: no state change
 - `switch`: writes `.spec-first/.current-task`
+- selecting the current task: no state change, report already active
 
 ### No Side Effects
 
@@ -151,8 +156,8 @@ If the target task has no `init-context` files yet, switching alone may not prov
 
 | Command | Purpose |
 |---------|---------|
-| `python3 ./.spec-first/scripts/task.py list` | Show active tasks |
-| `python3 ./.spec-first/scripts/task.py start <task>` | Set current task |
+| `python3 ./.spec-first/scripts/current_task.py list` | Show active tasks |
+| `python3 ./.spec-first/scripts/current_task.py switch <selection>` | Set current task |
 | `python3 ./.spec-first/scripts/task.py init-context <task> <type>` | Prepare task context |
 | `python3 ./.spec-first/scripts/task.py finish` | Clear current task |
 
@@ -162,10 +167,12 @@ If the target task has no `init-context` files yet, switching alone may not prov
 
 When switching, keep the response short and explicit:
 
-1. Confirm the target task
+1. Confirm the selected task
 2. Show the exact command or action used
 3. State the new current task
 4. Mention whether `init-context` is recommended next
+
+If the selected task is already current, say that explicitly and do not rewrite the pointer.
 
 Example:
 

@@ -20,6 +20,7 @@ import {
   getDeveloperScript,
   initDeveloperScript,
   taskScript,
+  currentTaskScript,
   getContextScript,
   addSessionScript,
   createBootstrapScript,
@@ -55,6 +56,7 @@ describe("spec template constants", () => {
     getDeveloperScript,
     initDeveloperScript,
     taskScript,
+    currentTaskScript,
     getContextScript,
     addSessionScript,
     createBootstrapScript,
@@ -117,6 +119,7 @@ describe("getAllScripts", () => {
     expect(scripts.has("common/__init__.py")).toBe(true);
     expect(scripts.has("common/paths.py")).toBe(true);
     expect(scripts.has("task.py")).toBe(true);
+    expect(scripts.has("current_task.py")).toBe(true);
     expect(scripts.has("get_developer.py")).toBe(true);
     expect(scripts.has("multi_agent/start.py")).toBe(true);
   });
@@ -138,5 +141,6 @@ describe("getAllScripts", () => {
     expect(scripts.get("__init__.py")).toBe(scriptsInit);
     expect(scripts.get("common/__init__.py")).toBe(commonInit);
     expect(scripts.get("task.py")).toBe(taskScript);
+    expect(scripts.get("current_task.py")).toBe(currentTaskScript);
   });
 });

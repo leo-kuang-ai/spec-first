@@ -8,6 +8,7 @@ const EXPECTED_SKILL_NAMES = [
   "check",
   "check-cross-layer",
   "create-command",
+  "current-task",
   "finish-work",
   "integrate-skill",
   "onboard",

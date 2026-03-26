@@ -1,12 +1,14 @@
-# Frontend Development Guidelines
+# Python Scripts Guidelines
 
-> Best practices for frontend/CLI development in this project.
+> Best practices for Python scripts in this project.
 
 ---
 
 ## Overview
 
-**Note**: This is a CLI project without traditional frontend UI. These guidelines cover TypeScript patterns used throughout the codebase.
+This directory contains guidelines for Python scripts in `.spec-first/scripts/`. These scripts provide runtime utilities for task management, context retrieval, and session recording.
+
+**Note**: This project does not have a traditional frontend (React/Vue). The "frontend" layer here refers to Python scripts that are copied to user projects.
 
 ---
 
@@ -14,61 +16,75 @@
 
 | Guide | Description | Status |
 |-------|-------------|--------|
-| [Directory Structure](./directory-structure.md) | Module organization and file layout | ✅ Filled |
-| [Component Guidelines](./component-guidelines.md) | Module interface patterns | ✅ Filled |
-| [Hook Guidelines](./hook-guidelines.md) | CLI hooks (Python scripts) | ✅ Filled |
-| [State Management](./state-management.md) | File-based state patterns | ✅ Filled |
+| [Directory Structure](./directory-structure.md) | Script organization and file layout | ✅ Filled |
+| [Module Guidelines](./component-guidelines.md) | Module structure, function patterns | ✅ Filled |
+| [Hook Guidelines](./hook-guidelines.md) | Lifecycle hooks implementation | ✅ Filled |
+| [Data Persistence](./state-management.md) | File-based state patterns | ✅ Filled |
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | ✅ Filled |
-| [Type Safety](./type-safety.md) | TypeScript conventions | ✅ Filled |
+| [Type Safety](./type-safety.md) | Type hints, validation | ✅ Filled |
 
 ---
 
 ## Pre-Development Checklist
 
-Before implementing features, read:
+Before working on Python scripts, read:
 
-- [ ] [Type Safety](./type-safety.md) - Understand typing patterns
-- [ ] [Directory Structure](./directory-structure.md) - Know where files go
-- [ ] [Quality Guidelines](./quality-guidelines.md) - Review standards
+1. [Module Guidelines](./component-guidelines.md) - Understand module structure
+2. [Quality Guidelines](./quality-guidelines.md) - Know the forbidden patterns
+3. [Type Safety](./type-safety.md) - Use proper type hints
 
 ---
 
 ## Quick Reference
 
-### Type Pattern
+### Python Conventions
 
-```typescript
-// Const assertion for registries
-export const AI_TOOLS = {
-  "claude-code": { ... },
-} as const;
+```python
+# Use pathlib for paths
+from pathlib import Path
 
-export type AITool = keyof typeof AI_TOOLS;
+# Use modern type hints
+def get_task(slug: str) -> dict | None:
+    ...
+
+# Explicit UTF-8 encoding
+content = path.read_text(encoding="utf-8")
+
+# Print errors to stderr
+print(f"Error: {message}", file=sys.stderr)
 ```
 
-### Options Pattern
+### CLI Script Template
 
-```typescript
-interface FeatureOptions {
-  required: string;
-  optional?: boolean;
-  withDefault?: number;
-}
+```python
+#!/usr/bin/env python3
+"""Script description."""
 
-export async function feature(options: FeatureOptions): Promise<Result> {
-  const { required, optional = false, withDefault = 0 } = options;
-  // ...
-}
-```
+from __future__ import annotations
 
-### Return Type Union
+import argparse
+import sys
+from pathlib import Path
 
-```typescript
-type Result =
-  | { success: true; data: string }
-  | { success: false; error: string };
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("arg", help="Argument")
+    args = parser.parse_args()
+    # Implementation
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
 ```
 
 ---
 
-**Language**: All documentation written in **English**.
+## Development Commands
+
+```bash
+# Type checking
+pnpm lint:py
+
+# Run script directly
+python3 .spec-first/scripts/task.py list
+```

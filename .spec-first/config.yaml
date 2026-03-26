@@ -56,4 +56,4 @@ max_journal_lines: 2000
 packages:
   spec-first:
     path: packages/cli
-default_package: @leokuang/spec-first
+default_package: spec-first

@@ -72,7 +72,7 @@ def is_safe_task_path(task_path: str, repo_root: Path | None = None) -> bool:
 # =============================================================================
 
 def find_task_by_name(task_name: str, tasks_dir: Path) -> Path | None:
-    """Find task directory by name (exact or suffix match).
+    """Find task directory by name (legacy exact or suffix match).
 
     Args:
         task_name: Task name to find.
@@ -89,7 +89,7 @@ def find_task_by_name(task_name: str, tasks_dir: Path) -> Path | None:
     if exact_match.is_dir():
         return exact_match
 
-    # Try suffix match (e.g., "my-task" matches "01-21-my-task")
+    # Try suffix match (legacy compatibility, e.g., "my-task" matches "01-21-my-task")
     for d in tasks_dir.iterdir():
         if d.is_dir() and d.name.endswith(f"-{task_name}"):
             return d

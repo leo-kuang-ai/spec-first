@@ -1,24 +1,22 @@
-# Hook Guidelines
+# Python Hook Guidelines
 
-> How hooks are used in this project.
+> How hooks are implemented in this project.
 
 ---
 
 ## Overview
 
-**Note**: This is a CLI project without React hooks. The patterns below describe CLI "hooks" - scripts that run at specific lifecycle events.
+Hooks are Python scripts that run at specific lifecycle events. They are stored in `.claude/hooks/` and configured in `.claude/settings.json`.
 
 ---
 
-## CLI Hooks
+## Hook Types
 
-This project supports Python hooks that run during AI tool lifecycle:
-
-| Hook | When | Purpose |
-|------|------|---------|
-| `session-start.py` | Session starts | Inject context into AI |
-| `inject-subagent-context.py` | Before agent calls | Add code-spec to prompts |
-| `ralph-loop.py` | After responses | Detect infinite loops |
+| Hook | When it runs | Purpose |
+|------|-------------|---------|
+| `session-start.py` | At session start | Inject context into conversation |
+| `inject-subagent-context.py` | Before agent spawn | Add code-spec to agent context |
+| `ralph-loop.py` | After agent completion | Check for infinite loops |
 
 ---
 
@@ -27,101 +25,182 @@ This project supports Python hooks that run during AI tool lifecycle:
 ```python
 #!/usr/bin/env python3
 """
-Hook: session-start
-When: At the start of each AI session
-Purpose: Inject project context and guidelines
+Hook description.
+
+Runs when: [event trigger]
+Purpose: [what it does]
 """
 
-import sys
+from __future__ import annotations
+
 import json
+import os
+import sys
+from pathlib import Path
 
-def main():
-    # Read hook input from stdin
-    input_data = json.loads(sys.stdin.read())
 
-    # Process and respond
-    response = {
-        "status": "success",
-        "message": "Context injected"
-    }
+def main() -> int:
+    """Main hook entry point."""
+    # 1. Get context from environment or stdin
+    session_file = os.environ.get("CLAUDE_SESSION_FILE")
+    if not session_file:
+        return 0  # No context, skip silently
 
-    # Output response
-    print(json.dumps(response))
+    # 2. Read session data
+    session_path = Path(session_file)
+    if not session_path.exists():
+        return 0
+
+    session_data = json.loads(session_path.read_text(encoding="utf-8"))
+
+    # 3. Process and output
+    context = build_context(session_data)
+    if context:
+        print(context)
+
+    return 0
+
+
+def build_context(session: dict) -> str | None:
+    """Build context string from session data."""
+    # Implementation
+    return None
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
 ```
 
 ---
 
-## Hook Patterns
+## Context Injection Pattern
 
-### Context Injection
+### Reading Current Task
 
 ```python
-def inject_context():
-    """Read project state and inject into AI context"""
-    context = {
-        "developer": get_developer(),
-        "current_task": get_current_task(),
-        "guidelines": read_guidelines(),
-    }
-    return format_context(context)
+def get_current_task(repo_root: Path) -> dict | None:
+    """Get current task from .spec-first/.current-task."""
+    current_task_file = repo_root / ".spec-first" / ".current-task"
+    if not current_task_file.exists():
+        return None
+
+    task_slug = current_task_file.read_text(encoding="utf-8").strip()
+    task_file = repo_root / ".spec-first" / "tasks" / task_slug / "task.json"
+
+    if task_file.exists():
+        return json.loads(task_file.read_text(encoding="utf-8"))
+    return None
 ```
 
-### Error Handling
+### Reading JSONL Context
 
 ```python
-def safe_hook_operation():
-    """Hooks should never crash the parent process"""
-    try:
-        # Operation
-        return {"status": "success"}
-    except Exception as e:
-        # Return error, don't raise
-        return {"status": "error", "message": str(e)}
+def get_jsonl_context(repo_root: Path, filename: str) -> list[dict]:
+    """Read context entries from JSONL file."""
+    jsonl_path = repo_root / ".spec-first" / filename
+    if not jsonl_path.exists():
+        return []
+
+    entries = []
+    with open(jsonl_path, "r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                entries.append(json.loads(line))
+    return entries
+```
+
+### Building Context Output
+
+```python
+def build_context(repo_root: Path) -> str:
+    """Build formatted context for injection."""
+    task = get_current_task(repo_root)
+    if not task:
+        return ""
+
+    lines = ["## Current Task\n"]
+    lines.append(f"- **Name**: {task.get('name', 'Unknown')}")
+    lines.append(f"- **Status**: {task.get('status', 'pending')}")
+
+    # Add PRD if exists
+    prd_path = repo_root / ".spec-first" / "tasks" / task["slug"] / "prd.md"
+    if prd_path.exists():
+        lines.append(f"\n### PRD\n{prd_path.read_text(encoding='utf-8')}")
+
+    return "\n".join(lines)
 ```
 
 ---
 
-## Naming Conventions
+## Configuration
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Hook files | kebab-case | `session-start.py` |
-| Functions | snake_case | `get_developer()` |
-| Constants | UPPER_SNAKE | `DEFAULT_TIMEOUT` |
+Hooks are registered in `.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [".claude/hooks/session-start.py"]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [".claude/hooks/inject-subagent-context.py"]
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Best Practices
+
+1. **Fail silently** - Hooks should not break the session on error
+2. **Return 0** - Always return 0 on success, non-zero on error
+3. **Use stdout** - Context output goes to stdout
+4. **Use stderr** - Debug/logging goes to stderr
+5. **Check file existence** - Always check before reading files
 
 ---
 
 ## Common Mistakes
 
-### Don't: Raise exceptions
+### 1. Not Handling Missing Files
 
 ```python
-# Bad: Will crash the AI tool
-def hook():
-    raise Exception("Something went wrong")
+# ❌ Wrong - will crash if file missing
+data = json.loads(Path("config.json").read_text())
+
+# ✅ Correct - handle missing files
+config_path = Path("config.json")
+if config_path.exists():
+    data = json.loads(config_path.read_text(encoding="utf-8"))
+else:
+    data = {}
 ```
 
-### Do: Return error status
+### 2. Printing to Wrong Stream
 
 ```python
-# Good: Graceful error handling
-def hook():
-    try:
-        # ...
-        return {"status": "success"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+# ❌ Wrong - debug output appears in context
+print("Debug: processing...")
+
+# ✅ Correct - debug goes to stderr
+print("Debug: processing...", file=sys.stderr)
 ```
 
----
+### 3. Not Returning Exit Code
 
-## Examples from Codebase
+```python
+# ❌ Wrong - implicit None
+if __name__ == "__main__":
+    main()
 
-| File | Purpose |
-|------|---------|
-| `.claude/hooks/session-start.py` | Inject spec-first context |
-| `.claude/hooks/inject-subagent-context.py` | Add code-spec to agents |
-| `.claude/hooks/ralph-loop.py` | Detect conversation loops |
+# ✅ Correct - explicit exit code
+if __name__ == "__main__":
+    sys.exit(main())
+```

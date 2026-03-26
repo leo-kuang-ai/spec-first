@@ -6,174 +6,170 @@
 
 ## Overview
 
-This CLI project uses a straightforward error handling approach:
-- Try-catch for operations that may fail
-- `chalk.red()` for user-facing error messages
-- `process.exit(1)` for fatal errors
-- Graceful fallbacks where possible
+This CLI tool uses a straightforward error handling approach optimized for developer experience:
+
+- Use `chalk.red()` for error messages to make them visually distinct
+- Use `process.exit(1)` for fatal errors
+- Handle expected errors gracefully with informative messages
+- Let unexpected errors propagate with full stack traces
 
 ---
 
 ## Error Patterns
 
-### CLI Command Error Handling
+### CLI Error Messages
+
+Use `chalk.red()` for error output:
 
 ```typescript
-// Example from src/cli/index.ts
-.action(async (options: Record<string, unknown>) => {
-  try {
-    await init(options);
-  } catch (error) {
-    console.error(
-      chalk.red("Error:"),
-      error instanceof Error ? error.message : error,
-    );
-    process.exit(1);
-  }
-});
+import chalk from "chalk";
+
+// ✅ Correct - clear error message with chalk
+console.error(chalk.red("Error: Template not found"));
+process.exit(1);
+
+// ❌ Wrong - no visual distinction
+console.error("Error: Template not found");
+process.exit(1);
 ```
 
-### Utility Function Error Handling
+### File Operation Errors
+
+Handle file system errors with context:
 
 ```typescript
-// Return boolean for success/failure, don't throw
-function createBootstrapTask(cwd: string, developer: string): boolean {
-  try {
-    // ... operation
+// From src/utils/file-writer.ts
+export async function writeFile(
+  filePath: string,
+  content: string,
+  options?: { executable?: boolean },
+): Promise<boolean> {
+  const exists = fs.existsSync(filePath);
+
+  if (!exists) {
+    fs.writeFileSync(filePath, content);
     return true;
-  } catch {
-    return false;  // Silent failure, caller handles
   }
+
+  // Handle conflicts based on mode
+  const existingContent = fs.readFileSync(filePath, "utf-8");
+  if (existingContent === content) {
+    return false; // Skip silently if identical
+  }
+
+  // Interactive prompt for conflicts
+  // ...
 }
 ```
 
-### Detection Functions
+### Configuration Errors
+
+Validate and report configuration issues:
 
 ```typescript
-// Return undefined/null on failure, don't throw
-function getPythonCommand(): string {
-  try {
-    execSync("python3 --version", { stdio: "pipe" });
-    return "python3";
-  } catch {
-    try {
-      execSync("python --version", { stdio: "pipe" });
-      return "python";
-    } catch {
-      return "python3";  // Default, let it fail with clear error later
-    }
-  }
-}
+// From .spec-first/scripts/common/config.py
+def validate_package(package: str, repo_root: Path | None = None) -> bool:
+    """Check if a package name is valid in this project."""
+    packages = get_packages(repo_root)
+    if packages is None:
+        return True  # Single-repo, no validation needed
+    return package in packages
 ```
 
 ---
 
-## Error Message Style
+## Error Types
 
-### User-Facing Errors
+This project uses simple error handling without custom error classes:
 
-```typescript
-// Good: Clear, actionable error message
-console.log(
-  chalk.red(
-    "Error: --monorepo specified but no monorepo configuration found.",
-  ),
-);
-return;
-
-// Good: Suggests next action
-console.log(
-  chalk.red(
-    "Error: Registry is a marketplace with multiple templates. " +
-      "Use --template <id> to specify which one.",
-  ),
-);
-```
-
-### Network Errors
-
-```typescript
-// Distinguish between "not found" and "network issue"
-if (probeResult.isNotFound) {
-  // Expected: no index.json → direct download mode
-} else {
-  // Transient error → abort, don't misclassify
-  console.log(
-    chalk.red(
-      "Error: Could not reach registry (network issue). Check your connection.",
-    ),
-  );
-  return;
-}
-```
+| Situation | Pattern |
+|-----------|---------|
+| Invalid CLI arguments | Print usage + `process.exit(1)` |
+| File not found | `chalk.red()` + `process.exit(1)` |
+| Network errors | Retry with timeout, then fail |
+| Configuration errors | Warning message + graceful fallback |
 
 ---
 
-## Common Patterns
+## Logging Patterns
 
-### Silent Fallback Pattern
+### Console Output
 
 ```typescript
-// Try to detect, fall back gracefully
-let developerName = options.user;
-if (!developerName) {
-  try {
-    developerName = execSync("git config user.name", { encoding: "utf-8" }).trim();
-  } catch {
-    // Git not available or no user.name configured
-    // Will prompt user later
-  }
-}
+// Success messages
+console.log(chalk.green("✓ Created: .claude/"));
+
+// Warning messages
+console.log(chalk.yellow("  ↻ Overwritten: .claude/settings.json"));
+
+// Info messages
+console.log(chalk.blue("  + Appended: .spec-first/workflow.md"));
+
+// Skip messages
+console.log(chalk.gray("  ○ Skipped: .claude/commands/ (already exists)"));
+
+// Error messages
+console.error(chalk.red("Error: Failed to fetch templates"));
 ```
 
-### Early Return Pattern
+### Python Scripts
 
-```typescript
-// Check preconditions, return early on error
-if (tools.length === 0) {
-  console.log(chalk.yellow("No tools selected. At least one tool is required."));
-  return;
-}
+```python
+import sys
+
+# Warning to stderr
+print(f"Warning: {message}", file=sys.stderr)
+
+# Error and exit
+print(f"Error: {message}", file=sys.stderr)
+sys.exit(1)
 ```
 
 ---
 
 ## Common Mistakes
 
-### Don't: Swallow errors silently in critical paths
+### 1. Silent Failures
 
 ```typescript
-// Bad: Silent failure in important operation
+// ❌ Wrong - silent failure
 try {
-  await criticalOperation();
+  fs.writeFileSync(path, content);
 } catch {
-  // User never knows something went wrong
+  // Error is swallowed
 }
-```
 
-### Do: Log or return status
-
-```typescript
-// Good: Inform user or return status
+// ✅ Correct - report the error
 try {
-  await criticalOperation();
+  fs.writeFileSync(path, content);
 } catch (error) {
-  console.log(chalk.yellow(`Warning: ${error}`));
+  console.error(chalk.red(`Failed to write ${path}: ${error}`));
+  process.exit(1);
 }
 ```
 
-### Don't: Throw without context
+### 2. Missing Error Context
 
 ```typescript
-// Bad
-throw new Error("Failed");
+// ❌ Wrong - no context
+console.error(chalk.red("Failed to fetch"));
+
+// ✅ Correct - includes context
+console.error(chalk.red(`Failed to fetch template from ${url}: ${error.message}`));
 ```
 
-### Do: Include actionable context
+### 3. Incorrect Exit Codes
 
 ```typescript
-// Good
-console.log(
-  chalk.red("Error: Could not reach registry. Check your connection and try again."),
-);
+// ❌ Wrong - continues after error
+if (!config) {
+  console.error(chalk.red("Config not found"));
+}
+// Code continues...
+
+// ✅ Correct - exits on fatal error
+if (!config) {
+  console.error(chalk.red("Config not found"));
+  process.exit(1);
+}
 ```
