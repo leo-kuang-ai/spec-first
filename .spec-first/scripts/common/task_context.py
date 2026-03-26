@@ -102,7 +102,7 @@ def cmd_init_context(args: argparse.Namespace) -> int:
 
     if not dev_type:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py init-context <task-dir> <dev_type>")
+        print("Usage: python3 ./.spec-first/scripts/task.py init-context <task-dir> <dev_type>")
         print("  dev_type: backend | frontend | fullstack | test | docs")
         return 1
 
@@ -221,8 +221,8 @@ def cmd_init_context(args: argparse.Namespace) -> int:
 
     print(colored("Next steps:", Colors.BLUE))
     print("  1. Review the spec files above and add relevant ones for your task:")
-    print(f"     python3 task.py add-context <dir> implement <spec-path> \"<reason>\"")
-    print("  2. Set as current: python3 task.py start <dir>")
+    print(f"     python3 ./.spec-first/scripts/task.py add-context <dir> implement <spec-path> \"<reason>\"")
+    print("  2. Set as current: python3 ./.spec-first/scripts/current_task.py switch <selection>")
 
     return 0
 

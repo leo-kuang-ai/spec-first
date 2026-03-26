@@ -7,8 +7,8 @@ Unified entrypoint for inspecting active tasks and switching the current task
 pointer without exposing suffix-based lookup rules.
 
 Usage:
-    python3 current_task.py list
-    python3 current_task.py switch <selection>
+    python3 ./.spec-first/scripts/current_task.py list
+    python3 ./.spec-first/scripts/current_task.py switch <selection>
 
 Selection rules:
     - numeric index from the printed task list
@@ -195,21 +195,13 @@ def cmd_switch(args: argparse.Namespace) -> int:
     selection = getattr(args, "selection", None)
 
     if not selection:
-        _print_task_list(repo_root)
-        print()
-        print(
-            colored(
-                "Error: selection required. Use a number, an exact task name, or a task path.",
-                Colors.RED,
-            ),
-        )
-        return 1
+        return _print_task_list(repo_root)
 
     task_dir = _resolve_selection(selection, repo_root)
     if not task_dir:
         print(colored(f"Error: task not found: {selection}", Colors.RED))
         print(
-            "Hint: choose a number from `current_task.py list`, or pass an exact task directory/path",
+            "Hint: choose a number from `./.spec-first/scripts/current_task.py list`, or pass an exact task directory/path",
         )
         return 1
 
