@@ -1,0 +1,45 @@
+{
+  "id": "phase1-minimal-loop",
+  "name": "phase1-minimal-loop",
+  "title": "Phase 1: 建立最小闭环 - Compiler + Contract + Enforcement",
+  "description": "",
+  "status": "planning",
+  "dev_type": "backend",
+  "scope": null,
+  "package": "spec-first",
+  "priority": "P2",
+  "creator": "kuang",
+  "assignee": "kuang",
+  "createdAt": "2026-03-26",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "leo-2026-03-26-Harness",
+  "worktree_path": null,
+  "current_phase": 0,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

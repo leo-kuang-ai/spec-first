@@ -1,0 +1,62 @@
+{
+  "id": "test-phase1",
+  "name": "test-phase1",
+  "title": "Test Phase 1 Compiler",
+  "description": "",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": "spec-first",
+  "priority": "P2",
+  "creator": "kuang",
+  "assignee": "kuang",
+  "createdAt": "2026-03-26",
+  "completedAt": "2026-03-26",
+  "branch": null,
+  "base_branch": "leo-2026-03-26-Harness",
+  "worktree_path": null,
+  "current_phase": 0,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check",
+      "loop": {
+        "max": 5,
+        "gate": "lint_and_typecheck_pass"
+      }
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "workflow_type": "default",
+  "decision_hints": {
+    "implement": {
+      "mode": "standard"
+    },
+    "check": {
+      "verify_commands": [
+        "pnpm lint",
+        "pnpm typecheck"
+      ]
+    }
+  },
+  "evidence": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}
