@@ -71,6 +71,36 @@ describe("current_task.py integration", () => {
     ).toBe(".spec-first/tasks/03-26-current-task");
   });
 
+  it("switches by exact repo-relative path", async () => {
+    await setupProject();
+    writeTask("03-26-current-task");
+
+    const output = execFileSync(
+      "python3",
+      ["./.spec-first/scripts/current_task.py", "switch", ".spec-first/tasks/03-26-current-task"],
+      { cwd: tmpDir, encoding: "utf-8" },
+    );
+    expect(output).toContain("Current task set to: 03-26-current-task");
+    expect(
+      fs.readFileSync(path.join(tmpDir, DIR_NAMES.WORKFLOW, ".current-task"), "utf-8").trim(),
+    ).toBe(".spec-first/tasks/03-26-current-task");
+  });
+
+  it("switches by absolute path inside the repository", async () => {
+    await setupProject();
+    const taskDir = writeTask("03-26-current-task");
+
+    const output = execFileSync(
+      "python3",
+      ["./.spec-first/scripts/current_task.py", "switch", taskDir],
+      { cwd: tmpDir, encoding: "utf-8" },
+    );
+    expect(output).toContain("Current task set to: 03-26-current-task");
+    expect(
+      fs.readFileSync(path.join(tmpDir, DIR_NAMES.WORKFLOW, ".current-task"), "utf-8").trim(),
+    ).toBe(".spec-first/tasks/03-26-current-task");
+  });
+
   it("switch without selection lists tasks and succeeds", async () => {
     await setupProject();
     writeTask("03-26-current-task");

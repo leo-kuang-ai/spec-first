@@ -148,7 +148,7 @@ This will:
 1. Stage and commit all changes (excluding workspace)
 2. Push to origin
 3. Create a Draft PR using `gh pr create`
-4. Update task.json with status="review", pr_url, and current_phase
+4. Update task.json with status="completed", pr_url, and current_phase
 
 **Note**: This is the only action that performs git commit, as it's the final step after all implementation and checks are complete.
 

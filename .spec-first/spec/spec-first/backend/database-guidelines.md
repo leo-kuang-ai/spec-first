@@ -1,104 +1,51 @@
 # Database Guidelines
 
-> Data storage patterns for this project.
+> Database patterns and conventions for this project.
 
 ---
 
 ## Overview
 
-**This project does not use a database.**
+<!--
+Document your project's database conventions here.
 
-spec-first is a CLI tool that uses the file system for all data storage:
+Questions to answer:
+- What ORM/query library do you use?
+- How are migrations managed?
+- What are the naming conventions for tables/columns?
+- How do you handle transactions?
+-->
 
-- **Configuration**: YAML files (`.spec-first/config.yaml`)
-- **Task tracking**: JSON files (`.spec-first/tasks/*/task.json`)
-- **Session records**: Markdown files (`.spec-first/workspace/*/journal-*.md`)
-- **Audit logs**: JSONL files (`.spec-first/*.jsonl`)
-
----
-
-## File-Based Data Patterns
-
-### Configuration Files
-
-```yaml
-# .spec-first/config.yaml
-session_commit_message: "chore: record journal"
-max_journal_lines: 2000
-
-packages:
-  cli:
-    path: packages/cli
-  docs-site:
-    path: docs-site
-    type: submodule
-```
-
-### Task Files
-
-```json
-// .spec-first/tasks/00-bootstrap-guidelines/task.json
-{
-  "name": "Bootstrap Guidelines",
-  "slug": "00-bootstrap-guidelines",
-  "status": "in_progress",
-  "created": "2026-03-25",
-  "owner": "kuang"
-}
-```
-
-### JSONL Audit Logs
-
-```jsonl
-// .spec-first/implement.jsonl
-{"file": ".spec-first/spec/backend/directory-structure.md", "reason": "Backend directory structure guidelines"}
-{"file": ".spec-first/spec/backend/error-handling.md", "reason": "Error handling patterns"}
-```
+(To be filled by the team)
 
 ---
 
-## Python Script Data Access
+## Query Patterns
 
-The Python scripts in `.spec-first/scripts/` handle file-based data:
+<!-- How should queries be written? Batch operations? -->
 
-```python
-# From .spec-first/scripts/common/config.py
-def _load_config(repo_root: Path | None = None) -> dict:
-    """Load and parse config.yaml. Returns empty dict on any error."""
-    config_file = _get_config_path(repo_root)
-    try:
-        content = config_file.read_text(encoding="utf-8")
-        return parse_simple_yaml(content)
-    except (OSError, IOError):
-        return {}
-```
+(To be filled by the team)
 
 ---
 
-## Data Migration Pattern
+## Migrations
 
-For schema changes, use migration manifests:
+<!-- How to create and run migrations -->
 
-```json
-// src/migrations/manifests/0.4.0.json
-{
-  "version": "0.4.0",
-  "migrations": [
-    {
-      "type": "rename_file",
-      "from": ".spec-first/commands/",
-      "to": ".spec-first/claude/commands/"
-    }
-  ]
-}
-```
+(To be filled by the team)
 
 ---
 
-## Best Practices
+## Naming Conventions
 
-1. **File locking**: Not needed - CLI is single-user
-2. **Atomic writes**: Write to temp file, then rename
-3. **Encoding**: Always use UTF-8
-4. **Line endings**: LF (Unix style)
-5. **JSON formatting**: 2-space indent
+<!-- Table names, column names, index names -->
+
+(To be filled by the team)
+
+---
+
+## Common Mistakes
+
+<!-- Database-related mistakes your team has made -->
+
+(To be filled by the team)

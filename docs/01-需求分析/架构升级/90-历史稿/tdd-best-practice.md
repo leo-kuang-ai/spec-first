@@ -1,6 +1,6 @@
 # TDD 最佳实践方案：借鉴 Superpowers
 
-> **版本**: 1.0 | **日期**: 2026-03-26 | **目标**: 为 spec-first 项目引入 TDD 机制
+> **版本**: 1.1 | **日期**: 2026-03-26 | **目标**: 为 spec-first 项目引入 TDD 机制，并将其纳入最小 Harness Engineering 骨架
 
 ---
 
@@ -59,6 +59,62 @@
 | "测试和实现同源，TDD 没用" | 测试失败验证了测试本身的有效性 |
 | "lint + typecheck 足够" | 静态检查无法发现业务逻辑错误 |
 | "人工 review 兜底" | 人工效率低，容易遗漏 |
+
+### 1.4 从 Harness Engineering 看 TDD
+
+TDD 在这个项目里不应被理解成“多写一点测试”，而应被理解成：
+
+> 用最小的工程约束，把行为验证前移到实现阶段。
+
+如果只在 prompt 里写“建议先写测试”，它仍然只是倡议，不是 harness。
+
+真正的 Harness Engineering 需要三层同时成立：
+
+1. **Policy**
+   - task 在创建或 planning 时就确定 TDD 强度
+   - 例如 `implement.mode = direct / tdd_recommended / tdd_required`
+
+2. **Execution**
+   - implement agent 按 RED → GREEN → REFACTOR 执行
+   - bug fix 场景优先写复现测试
+
+3. **Enforcement**
+   - check 阶段必须运行验证命令
+   - 没有 fresh verification evidence，不能宣称完成
+
+这也是为什么当前推荐路线不是“先新增独立 test phase”，而是：
+
+- implement phase 显式引入 TDD 模式
+- check phase 对测试执行做硬门控
+
+### 1.5 TDD 解决什么，不解决什么
+
+TDD 的价值很高，但它不是万能药。
+
+它主要解决：
+
+1. 行为目标更清晰
+2. 回归保护更早建立
+3. bug fix 有可重复的复现手段
+4. “我觉得应该对”变成“我看到了 RED/GREEN 证据”
+
+它不直接解决：
+
+1. 需求理解本身是否正确
+2. 测试覆盖是否完整
+3. 跨层交互是否全部正确
+4. 多平台差异是否全部被验证
+
+因此，TDD 不能替代：
+
+- `check.verify_commands`
+- cross-layer check
+- integration / e2e 验证
+- 人工 review
+
+最合理的关系是：
+
+> TDD 负责把验证前移，check gate 负责把验证兜住。
 
 ---
 
@@ -267,7 +323,82 @@
   ✅ 渐进式引入 TDD 文化
 ```
 
-### 3.2 实施优先级
+### 3.2 与当前整体架构的对齐方式
+
+为了避免把系统做重，TDD 方案需要和当前总架构保持一致。
+
+#### Layer 1: Workflow Topology
+
+`next_action` 不需要为了 TDD 引入独立 `tdd` phase。
+
+原因：
+
+1. TDD 本质上是 implement 的执行模式
+2. 不是所有任务都需要独立 test phase
+3. 过早增加 phase 会让主 workflow 膨胀
+
+#### Layer 2: Phase Policy
+
+TDD 最适合先落在 `decision_hints.implement`：
+
+```json
+{
+  "decision_hints": {
+    "implement": {
+      "mode": "tdd_recommended",
+      "must_show_red_green": false
+    }
+  }
+}
+```
+
+推荐枚举：
+
+- `direct`
+- `tdd_recommended`
+- `tdd_required`
+
+#### Layer 3: Runtime Enforcement
+
+runtime 不负责“替 agent 做 TDD”，但负责把边界固定下来：
+
+1. `inject-subagent-context.py` 注入 implement/check policy
+2. `ralph-loop.py` 执行 `check.verify_commands`
+
+也就是说：
+
+- TDD 证据主要发生在 implement
+- 质量 gate 真正发生在 check
+
+#### Layer 4: LLM Autonomy
+
+LLM 仍然保留执行自主性，例如：
+
+- 写什么测试用例
+- 如何拆 RED/GREEN 步骤
+- 先修复哪个失败
+- 如何最小实现通过测试
+
+但它不再决定：
+
+- 这次到底要不要跑验证
+- 测试要求是否可以跳过
+
+### 3.3 TDD 强度的场景化建议
+
+第一阶段不建议所有任务一刀切 `tdd_required`。
+
+更稳的做法是按场景分层：
+
+| 场景 | 推荐模式 | 原因 |
+|------|----------|------|
+| bug fix | `tdd_required` | 先复现再修复，避免“修好了但没真正复现过” |
+| 新功能且需求明确 | `tdd_recommended` | 能前移验证，但不必把所有任务都变成铁律 |
+| API / 核心逻辑变更 | `tdd_recommended` 或 `tdd_required` | 回归风险高，收益明显 |
+| 快速原型 | `direct` | 目标是探索，不是立即建立强约束 |
+| UI-only / 生成类任务 | `direct` 或 `tdd_recommended` | 更适合 snapshot / integration，而非硬性 unit-first |
+
+### 3.4 实施优先级
 
 | 优先级 | 改进 | 改动量 | 效果 |
 |--------|------|--------|------|
@@ -324,6 +455,39 @@ Completion Markers:
 ---
 
 ### 4.2 Phase 2: Implement 鼓励 TDD (P1)
+
+推荐先把 implement 的 TDD 接入做成 policy 驱动，而不是纯 prompt 追加。
+
+建议最小落地方式：
+
+```json
+{
+  "decision_hints": {
+    "implement": {
+      "mode": "tdd_recommended"
+    },
+    "check": {
+      "verify_commands": ["pnpm lint", "pnpm typecheck", "pnpm test"]
+    }
+  }
+}
+```
+
+如果是 bug fix，可以升级为：
+
+```json
+{
+  "decision_hints": {
+    "implement": {
+      "mode": "tdd_required",
+      "must_show_red_green": true
+    },
+    "check": {
+      "verify_commands": ["pnpm lint", "pnpm typecheck", "pnpm test"]
+    }
+  }
+}
+```
 
 **修改 `implement.md`:**
 
@@ -518,6 +682,27 @@ Different phases run different test layers:
 - Scope: Full workflows, multi-platform compatibility
 - Speed: Slow (< 5min)
 ```
+
+---
+
+## 5. 当前建议的最终收口
+
+结合当前项目整体方案，这篇文档的最终结论应收口为三点：
+
+1. **TDD 要引入，但不先引入重型 test phase**
+   - 先把 TDD 做成 implement 的 phase policy
+
+2. **check 必须承担硬门控责任**
+   - `check.verify_commands` 才是真正的 enforcement 核心
+
+3. **TDD 是 Harness Engineering 的一部分，不是全部**
+   - TDD 负责前移验证
+   - runtime gate 负责阻止跳过验证
+   - cross-layer / integration / review 仍然是必要补充
+
+一句话总结：
+
+> 在 spec-first 里引入 TDD，最佳实践不是“先加一个 test phase”，而是“把 TDD 作为 implement 的策略模式引入，再用 check gate 保证验证真的发生”。 
 
 ---
 

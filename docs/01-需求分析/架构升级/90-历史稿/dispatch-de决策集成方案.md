@@ -2,6 +2,58 @@
 
 > **目标**: 让 dispatch 从"纯调度器"升级为"智能调度器"，采用 Harness Engineering 模式
 
+> **状态说明**
+> 本文档保留为第一版分析稿，用于说明“为什么 spec-first 需要显式决策层”。
+> 它不再代表当前推荐落地方案。
+>
+> 当前推荐方案见：
+>
+> - [dispatch-runtime完整技术方案.md](/Users/kuang/xiaobu/spec-first/docs/01-需求分析/架构升级/dispatch-runtime完整技术方案.md)
+> - [phase-decision-guide.md](/Users/kuang/xiaobu/spec-first/docs/01-需求分析/架构升级/phase-decision-guide.md)
+> - [decision-hints-schema.md](/Users/kuang/xiaobu/spec-first/docs/01-需求分析/架构升级/decision-hints-schema.md)
+
+---
+
+## 0. 如何阅读本文档
+
+这篇文档的价值主要在于提出了两个正确问题：
+
+1. `spec-first` 需要显式决策层，不能继续只靠 agent 临场判断
+2. TDD、测试层级、跨层检查等工程约束，应该被文档化和结构化
+
+但本文档的最终落点已经被后续方案修正。
+
+### 0.1 本文仍然有效的部分
+
+以下判断仍然成立：
+
+1. 需要引入 Harness Engineering 思想
+2. 需要把 TDD / test layer / cross-layer check 显式化
+3. 需要引入 `decision_hints` 这类结构化 policy
+4. 不能继续把关键工程约束完全交给 agent 自觉执行
+
+### 0.2 本文已被修正的部分
+
+以下落点不再推荐：
+
+1. 不再建议让 `dispatch` 升级为“智能调度器”
+2. 不再建议让 `dispatch` 成为主要决策中心
+3. 不再建议把执行逻辑主要放在 `dispatch` prompt 拼装里
+4. 不再建议把 `phase-decision-guide.md` 作为 `dispatch` 的执行脚本
+
+### 0.3 当前更准确的收口
+
+后续方案将这篇文档的核心思想重新落到了更稳定的控制面：
+
+- `next_action` 负责 workflow topology
+- `task.json.decision_hints` 负责最小 phase policy
+- runtime hooks 负责 enforcement
+- `dispatch` 保持纯调度
+
+也就是说：
+
+> Harness Engineering 的方向保留，但实现落点从 `dispatch` 下沉到了 `task metadata + runtime hooks`。
+
 ---
 
 ## 1. 什么是 Harness Engineering？
@@ -384,6 +436,29 @@ Harness Engineering = 用文档约束行为
 改进前: AI 自己判断 (不可靠)
 改进后: 文档定义规则 → dispatch 传递 → agent 执行 (可靠)
 ```
+
+### 6.4 结合当前方案后的最终修正
+
+如果结合当前项目代码和后续文档收敛，这篇文档的最终结论应改写为：
+
+1. **方向正确**
+   - 需要显式决策层
+   - 需要引入 Harness Engineering
+   - 需要把 TDD 和验证要求文档化、结构化
+
+2. **落点修正**
+   - 不让 `dispatch` 变成智能调度器
+   - 不让 `dispatch` 成为 prompt 级决策中心
+   - 把主要能力放到 `task.json.decision_hints + runtime hooks`
+
+3. **工程收口**
+   - `dispatch` 只保留 pure dispatcher 职责
+   - `decision_hints` 只保留最小 contract
+   - `check.verify_commands` 才是最关键的硬门控字段
+
+一句话总结本文在今天的定位：
+
+> 这是一篇提出问题很对、但最终落点已被后续方案修正的历史方案文档。
 
 ---
 
