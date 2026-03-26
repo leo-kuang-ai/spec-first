@@ -43,6 +43,9 @@ class TaskData(TypedDict, total=False):
     worktree_path: str | None
     current_phase: int
     next_action: list[dict]
+    workflow_type: str  # Phase 1: "default" | "quick-fix" | "docs-only"
+    decision_hints: dict  # Phase 1: {implement, check}
+    evidence: dict | None  # Phase 1 预留，Phase 3 实现
     commit: str | None
     pr_url: str | None
     subtasks: list[str]

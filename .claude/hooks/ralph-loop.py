@@ -77,13 +77,29 @@ def get_current_task(repo_root: str) -> str | None:
         return None
 
 
-def get_verify_commands(repo_root: str) -> list[str]:
+def get_verify_commands(repo_root: str, task_dir: str | None = None) -> list[str]:
     """
-    Read verify commands from worktree.yaml.
+    Read verify commands with fallback priority:
+    1. task.json decision_hints.check.verify_commands (if task_dir provided)
+    2. worktree.yaml verify section
+    3. Empty list (use completion markers)
+    """
+    # Priority 1: task.json decision_hints
+    if task_dir:
+        task_json_path = os.path.join(repo_root, task_dir, "task.json")
+        if os.path.exists(task_json_path):
+            try:
+                with open(task_json_path, "r", encoding="utf-8") as f:
+                    task_data = json.load(f)
+                hints = task_data.get("decision_hints", {})
+                check_hints = hints.get("check", {})
+                commands = check_hints.get("verify_commands", [])
+                if commands:
+                    return commands
+            except Exception:
+                pass
 
-    Returns list of commands to run, or empty list if not configured.
-    Uses simple YAML parsing without external dependencies.
-    """
+    # Priority 2: worktree.yaml
     yaml_path = os.path.join(repo_root, WORKTREE_YAML)
     if not os.path.exists(yaml_path):
         return []
@@ -323,7 +339,7 @@ def main():
         sys.exit(0)
 
     # Check if verify commands are configured
-    verify_commands = get_verify_commands(repo_root)
+    verify_commands = get_verify_commands(repo_root, task_dir)
 
     if verify_commands:
         # Use programmatic verification
