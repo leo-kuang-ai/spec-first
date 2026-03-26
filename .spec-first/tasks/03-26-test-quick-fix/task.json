@@ -1,0 +1,57 @@
+{
+  "id": "test-quick-fix",
+  "name": "test-quick-fix",
+  "title": "测试 quick-fix workflow",
+  "description": "",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "kuang",
+  "assignee": "kuang",
+  "createdAt": "2026-03-26",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "leo-2026-03-26-Harness",
+  "worktree_path": null,
+  "current_phase": 0,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check",
+      "loop": {
+        "max": 3,
+        "gate": "lint_and_typecheck_pass"
+      }
+    },
+    {
+      "phase": 3,
+      "action": "create-pr"
+    }
+  ],
+  "workflow_type": "quick-fix",
+  "decision_hints": {
+    "implement": {
+      "mode": "standard"
+    },
+    "check": {
+      "verify_commands": [
+        "pnpm lint"
+      ]
+    }
+  },
+  "evidence": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}
