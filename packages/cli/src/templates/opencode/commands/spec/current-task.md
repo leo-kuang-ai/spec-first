@@ -6,11 +6,34 @@ Use this command when the user wants to inspect active tasks or switch the curre
 
 ---
 
+## Execution Protocol
+
+**When this skill is invoked:**
+
+1. **Execute** `python3 ./.spec-first/scripts/current_task.py list --json`
+2. **Parse the JSON output** and format it as a table in your response
+3. **Display the table** with these rules:
+   - Use markdown table format (auto-width, no truncation)
+   - Columns: (empty for arrow), #, Task, Description, Status, Pri
+   - Mark current task with → in the first column
+   - Do NOT truncate descriptions - let them wrap naturally
+   - Add "Total: N active task(s)" and "→ = Current Task" after the table
+4. **After the table**, ask: "Would you like to switch to a different task?"
+
+---
+
 ## What This Command Does
 
 ### `list`
 
-Show the active task list so the user can choose where to switch next.
+Fetch the active task list as JSON, then format the table in the prompt response. The table includes:
+- Task number (for easy selection)
+- Task name
+- Description (from task.json)
+- Status (in_progress, planning, completed, etc.)
+- Priority (P1, P2, etc.)
+
+Use plain `list` when a raw text list is needed.
 
 ### `switch <selection>`
 
@@ -56,10 +79,34 @@ If the requested task is already the current task, report that it is already act
 ### 1. List tasks
 
 ```bash
-python3 ./.spec-first/scripts/current_task.py list
+python3 ./.spec-first/scripts/current_task.py list --json
 ```
 
-Use this to show active tasks and the current one.
+Parse the JSON output and render the table in the response. Do not print raw JSON to the user.
+
+After showing the table, simply ask if the user wants to switch to a different task or needs help with the current one.
+
+Expected table format:
+
+```
+┌─ Active Tasks Overview
+
+#    Task                           Description                         Status       Pri
+──────────────────────────────────────────────────────────────────────────────────────────
+★ 1   00-bootstrap-guidelines        Fill in project development gui...  in_progress  P1
+  2   03-26-current-task-skill       current-task skill                  completed    P2
+
+Total: 2 active task(s)
+★ = Current Task
+```
+
+The ★ symbol marks the current active task.
+
+Use plain `list` for raw text output:
+
+```bash
+python3 ./.spec-first/scripts/current_task.py list
+```
 
 ### 2. Switch task from the selected entry
 
@@ -98,7 +145,7 @@ Do not run it automatically unless the user explicitly asks.
 
 ### Output
 
-- For `list`: active tasks and current task
+ - For `list`: agent-formatted task table and current task
 - For `switch`: confirmation of the selected task and the new current task
 - Optional note if the target task should be initialized
 
@@ -154,7 +201,8 @@ If the target task has no `init-context` files yet, switching alone may not prov
 
 | Command | Purpose |
 |---------|---------|
-| `python3 ./.spec-first/scripts/current_task.py list` | Show active tasks |
+| `python3 ./.spec-first/scripts/current_task.py list --json` | Fetch active tasks for agent-side table formatting |
+| `python3 ./.spec-first/scripts/current_task.py list` | Show active tasks in plain-text list format |
 | `python3 ./.spec-first/scripts/current_task.py switch <selection>` | Set current task |
 | `python3 ./.spec-first/scripts/task.py init-context <task> <type>` | Prepare task context |
 | `python3 ./.spec-first/scripts/task.py finish` | Clear current task |

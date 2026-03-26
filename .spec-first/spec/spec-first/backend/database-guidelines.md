@@ -6,46 +6,35 @@
 
 ## Overview
 
-<!--
-Document your project's database conventions here.
+**N/A - This project does not use a database.**
 
-Questions to answer:
-- What ORM/query library do you use?
-- How are migrations managed?
-- What are the naming conventions for tables/columns?
-- How do you handle transactions?
--->
+This is a CLI tool that operates on the file system:
+- Configuration files (JSON, YAML, Markdown)
+- Template files
+- User project files
 
-(To be filled by the team)
+All data persistence is file-based.
 
 ---
 
 ## Query Patterns
 
-<!-- How should queries be written? Batch operations? -->
-
-(To be filled by the team)
+N/A
 
 ---
 
 ## Migrations
 
-<!-- How to create and run migrations -->
-
-(To be filled by the team)
+N/A
 
 ---
 
 ## Naming Conventions
 
-<!-- Table names, column names, index names -->
-
-(To be filled by the team)
+N/A
 
 ---
 
 ## Common Mistakes
 
-<!-- Database-related mistakes your team has made -->
-
-(To be filled by the team)
+N/A

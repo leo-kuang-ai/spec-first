@@ -61,43 +61,7 @@ def _collect_visible_tasks(tasks_dir: Path):
     return rows, tasks, statuses
 
 
-def _print_task_table(repo_root: Path, rows, current_task) -> None:
-    """Print tasks in table format with descriptions."""
-    print(colored("┌─ Active Tasks Overview", Colors.BLUE))
-    print()
-
-    header = f"{'#':<4} {'Task':<30} {'Description':<35} {'Status':<12} {'Pri':<4}"
-    print(colored(header, Colors.CYAN))
-    print("─" * 90)
-
-    for number, task, indent in rows:
-        task_path = _task_relative_path(task.directory, repo_root)
-        is_current = task_path == current_task
-
-        prefix = "  " * indent
-        task_name = f"{prefix}{task.dir_name}"
-        if len(task_name) > 29:
-            task_name = task_name[:26] + "..."
-
-        desc = task.description or task.title or "-"
-        if len(desc) > 34:
-            desc = desc[:31] + "..."
-
-        status = task.status if len(task.status) <= 11 else task.status[:8] + "..."
-        priority = task.priority or "-"
-
-        if is_current:
-            line = colored(f"{number:<4} {task_name:<30} {desc:<35} {status:<12} {priority:<4} ← current", Colors.GREEN)
-        else:
-            line = f"{number:<4} {task_name:<30} {desc:<35} {status:<12} {priority:<4}"
-
-        print(line)
-
-    print()
-    print(f"Total: {len(rows)} active task(s)")
-
-
-def _print_task_list(repo_root: Path, table: bool = True) -> int:
+def _print_task_list(repo_root: Path) -> int:
     tasks_dir = get_tasks_dir(repo_root)
     current_task = get_current_task(repo_root)
     rows, _, statuses = _collect_visible_tasks(tasks_dir)
@@ -108,10 +72,6 @@ def _print_task_list(repo_root: Path, table: bool = True) -> int:
         print("  (no active tasks)")
         print()
         print("Total: 0 task(s)")
-        return 0
-
-    if table:
-        _print_task_table(repo_root, rows, current_task)
         return 0
 
     print(colored("Active tasks:", Colors.BLUE))
@@ -229,8 +189,32 @@ def _switch_to_task(task_dir: Path, repo_root: Path) -> int:
 
 def cmd_list(args: argparse.Namespace) -> int:
     repo_root = get_repo_root()
-    use_list = getattr(args, "list", False)
-    return _print_task_list(repo_root, table=not use_list)
+    json_output = getattr(args, "json", False)
+
+    if json_output:
+        import json
+        tasks_dir = get_tasks_dir(repo_root)
+        current_task = get_current_task(repo_root)
+        rows, _, _ = _collect_visible_tasks(tasks_dir)
+
+        tasks_data = []
+        for number, task, indent in rows:
+            task_path = _task_relative_path(task.directory, repo_root)
+            tasks_data.append({
+                "number": number,
+                "name": task.dir_name,
+                "description": task.description or task.title or "",
+                "status": task.status,
+                "priority": task.priority or "-",
+                "package": task.package or "-",
+                "is_current": task_path == current_task,
+                "indent": indent
+            })
+
+        print(json.dumps({"tasks": tasks_data, "total": len(rows)}, ensure_ascii=False))
+        return 0
+
+    return _print_task_list(repo_root)
 
 
 def cmd_switch(args: argparse.Namespace) -> int:
@@ -256,7 +240,8 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command")
 
     list_parser = subparsers.add_parser("list", help="List active tasks")
-    list_parser.add_argument("--list", action="store_true", help="Display tasks in list format (default is table)")
+    list_parser.add_argument("--list", action="store_true", help="Deprecated: plain-text list output is now the default")
+    list_parser.add_argument("--json", action="store_true", help="Output tasks in JSON format")
 
     switch_parser = subparsers.add_parser("switch", help="Switch to a selected task")
     switch_parser.add_argument("selection", nargs="?", help="Task number, exact name, or exact path")

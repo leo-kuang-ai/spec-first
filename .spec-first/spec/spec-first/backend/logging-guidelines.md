@@ -6,46 +6,84 @@
 
 ## Overview
 
-<!--
-Document your project's logging conventions here.
+This is a CLI tool that uses `console.log` with `chalk` for colored output.
 
-Questions to answer:
-- What logging library do you use?
-- What are the log levels and when to use each?
-- What should be logged?
-- What should NOT be logged (PII, secrets)?
--->
+**No structured logging library** - Simple console output is sufficient for CLI tools.
 
-(To be filled by the team)
+**Color conventions:**
+- `chalk.green()` - Success messages
+- `chalk.red()` - Errors
+- `chalk.yellow()` - Warnings
+- `chalk.gray()` - Secondary info
+- `chalk.cyan()` - Highlighted values
+- `chalk.white()` - Normal text
 
 ---
 
 ## Log Levels
 
-<!-- When to use each level: debug, info, warn, error -->
+### Success (Green)
 
-(To be filled by the team)
+```typescript
+console.log(chalk.green(`✅ Global developer initialized`));
+```
+
+Use for: Successful operations, completion messages
+
+### Error (Red)
+
+```typescript
+console.log(chalk.red("Error: Invalid input"));
+```
+
+Use for: Validation errors, fatal errors
+
+### Warning (Yellow)
+
+```typescript
+console.log(chalk.yellow(`Global developer already set: ${existingName}`));
+```
+
+Use for: Non-fatal issues, deprecation notices
+
+### Info (Gray)
+
+```typescript
+console.log(chalk.gray(`  File: ${globalDevFile}`));
+```
+
+Use for: Secondary information, file paths, hints
 
 ---
 
 ## Structured Logging
 
-<!-- Log format, required fields -->
-
-(To be filled by the team)
+N/A - This is a CLI tool using simple console output with chalk colors.
 
 ---
 
 ## What to Log
 
-<!-- Important events to log -->
+- Command execution start/completion
+- File operations (created, updated, deleted)
+- Configuration changes
+- User prompts and responses
+- Success/failure status
 
-(To be filled by the team)
+**Example:** `src/cli/index.ts:50-53`
+
+```typescript
+console.log(chalk.green(`✅ Global developer initialized`));
+console.log(chalk.gray(`   spec-first v${VERSION}`));
+console.log();
+console.log(chalk.white("  👤 Developer:"), chalk.cyan(name));
+```
 
 ---
 
 ## What NOT to Log
 
-<!-- Sensitive data, PII, secrets -->
-
-(To be filled by the team)
+- User's file contents (may contain secrets)
+- API keys or tokens
+- Personal identifiable information
+- Full file paths in production (use relative paths)

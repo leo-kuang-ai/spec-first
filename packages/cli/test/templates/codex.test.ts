@@ -57,6 +57,13 @@ describe("codex getAllSkills", () => {
       expect(skill.content).not.toContain('model: "opus"');
     }
   });
+
+  it("formats current-task tables in the skill instead of relying on script table output", () => {
+    const currentTaskSkill = getAllSkills().find((skill) => skill.name === "current-task");
+    expect(currentTaskSkill?.content).toContain("current_task.py list --json");
+    expect(currentTaskSkill?.content).toContain("Parse the JSON output");
+    expect(currentTaskSkill?.content).not.toContain("python3 ./.spec-first/scripts/current_task.py list` | Show active tasks |");
+  });
 });
 
 describe("codex getAllAgents", () => {

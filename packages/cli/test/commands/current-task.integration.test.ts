@@ -57,8 +57,11 @@ describe("current_task.py integration", () => {
       ["./.spec-first/scripts/current_task.py", "list"],
       { cwd: tmpDir, encoding: "utf-8" },
     );
+    expect(listOutput).toContain("Active tasks:");
     expect(listOutput).toContain("03-26-current-task");
     expect(listOutput).toContain(".spec-first/tasks/03-26-current-task");
+    expect(listOutput).not.toContain("Active Tasks Overview");
+    expect(listOutput).not.toContain("Description");
 
     const switchOutput = execFileSync(
       "python3",
