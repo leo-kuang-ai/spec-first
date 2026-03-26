@@ -4,47 +4,27 @@
 
 set -eu
 
-# 跨平台项目根目录发现
-find_root() {
-  dir="$(pwd)"
-  while [ "$dir" != "/" ] && [ -n "$dir" ]; do
-    [ -d "$dir/.spec-first" ] && printf '%s' "$dir" && return 0
-    parent="$(dirname "$dir")"
-    [ "$parent" = "$dir" ] && break
-    dir="$parent"
-  done
-  git rev-parse --show-toplevel 2>/dev/null && return 0
-  return 1
-}
+. "$(dirname "$0")/current-task-common.sh"
 
-ROOT="$(find_root)" || exit 0
+ROOT="$(spec_first_find_root)" || exit 0
 cd "$ROOT" 2>/dev/null || exit 0
 
-FEAT="$(head -1 .spec-first/current 2>/dev/null || true)"
-FILE="specs/$FEAT/task_plan.md"
-[ -n "$FEAT" ] && [ -f "$FILE" ] || exit 0
+TASK_DIR="$(spec_first_current_task_dir "$ROOT")" || exit 0
+TASK_JSON="$(spec_first_task_json_path "$TASK_DIR")"
+[ -f "$TASK_JSON" ] || exit 0
+
+TASK_META="$(spec_first_task_metadata "$TASK_JSON" "$TASK_DIR")" || exit 0
+eval "$TASK_META"
 
 echo "=== 进度同步提醒 ==="
-echo "文件已修改。如果此次修改完成了一个 TASK 或 AC，请检查是否需要更新 task_plan.md 中的完成状态。"
-echo "当前 in_progress TASK:"
-awk -F'|' '
-  BEGIN { found=0 }
-  /^\|/ && !/---/ {
-    taskid=""; title=""; status=""
-    for (i=1; i<=NF; i++) {
-      c=$i; gsub(/^[ \t]+|[ \t]+$/, "", c)
-      s=tolower(c)
-      if (c ~ /^TASK-/ && taskid == "") taskid=c
-      if (s=="in_progress" || s=="in progress") status=c
-      if (title=="" && c!~/^TASK-/ && s!="status" && s!="in_progress" && s!="in progress" && c!="") title=c
-    }
-    if (taskid!="" && status!="") {
-      printf("  - %s | %s | %s\n", taskid, title, status)
-      found=1
-      exit
-    }
-  }
-  END {
-    if (!found) print "  (无 in_progress TASK)"
-  }
-' "$FILE"
+echo "当前任务: ${task_title:-unknown} (${task_dir_name:-unknown})"
+echo "状态: ${task_status:-unknown}"
+echo "当前阶段: ${task_phase:-0}/${task_next_action_count:-0}"
+if [ -n "${task_next_actions:-}" ]; then
+  echo "后续动作: ${task_next_actions}"
+fi
+echo "上下文文件: ${task_context_summary:-implement.jsonl ✗ | check.jsonl ✗ | debug.jsonl ✗}"
+
+if [ "${task_has_implement:-0}" = "0" ] || [ "${task_has_check:-0}" = "0" ] || [ "${task_has_debug:-0}" = "0" ]; then
+  echo "提示：当前任务的上下文仍不完整，必要时运行 init-context 补齐。" >&2
+fi

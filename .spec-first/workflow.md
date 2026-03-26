@@ -184,13 +184,6 @@ python3 ./.spec-first/scripts/current_task.py list
 
 # Create new task (creates directory with task.json)
 python3 ./.spec-first/scripts/task.py create "<title>" --slug <task-name>
-
-# Create task with specific workflow type (Phase 1 feature)
-python3 ./.spec-first/scripts/task.py create "<title>" --slug <name> --workflow <type>
-# Workflow types:
-#   default     - Standard development (implement → check → finish)
-#   quick-fix   - Fast fixes (lighter verification, only lint)
-#   docs-only   - Documentation changes (minimal checks)
 ```
 
 ---
@@ -321,10 +314,7 @@ tasks/
 
 **Commands**:
 ```bash
-# Create task directory
-python3 ./.spec-first/scripts/task.py create "<title>" [--slug <name>] [--workflow <type>]
-# Workflow types: default (standard), quick-fix (fast), docs-only (minimal)
-
+python3 ./.spec-first/scripts/task.py create "<title>" [--slug <name>]   # Create task directory
 python3 ./.spec-first/scripts/task.py archive <name>  # Archive to archive/{year-month}/
 python3 ./.spec-first/scripts/current_task.py list    # List active tasks
 python3 ./.spec-first/scripts/task.py list-archive    # List archived tasks
@@ -391,8 +381,7 @@ python3 ./.spec-first/scripts/add_session.py    # Record session
 
 # Task management
 python3 ./.spec-first/scripts/current_task.py list      # List tasks
-python3 ./.spec-first/scripts/task.py create "<title>" [--workflow <type>] # Create task
-# Workflow types: default, quick-fix, docs-only
+python3 ./.spec-first/scripts/task.py create "<title>" # Create task
 
 # Slash commands
 /spec:finish-work          # Pre-commit checklist

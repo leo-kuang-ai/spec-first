@@ -51,9 +51,3 @@ max_journal_lines: 2000
 
 # Default package used when --package is not specified.
 # default_package: frontend
-
-# Auto-detected monorepo packages
-packages:
-  spec-first:
-    path: packages/cli
-default_package: spec-first
