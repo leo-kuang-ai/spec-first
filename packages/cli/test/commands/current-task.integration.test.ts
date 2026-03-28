@@ -7,6 +7,9 @@ import { execFileSync } from "node:child_process";
 import { init } from "../../src/commands/init.js";
 import { DIR_NAMES } from "../../src/constants/paths.js";
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const noop = () => {};
+
 describe("current_task.py integration", () => {
   let tmpDir: string;
 
@@ -39,8 +42,8 @@ describe("current_task.py integration", () => {
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "spec-current-task-"));
     vi.spyOn(process, "cwd").mockReturnValue(tmpDir);
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
   });
 
   afterEach(() => {
@@ -57,8 +60,9 @@ describe("current_task.py integration", () => {
       ["./.spec-first/scripts/current_task.py", "list"],
       { cwd: tmpDir, encoding: "utf-8" },
     );
+    expect(listOutput).toContain("Active Tasks Overview");
     expect(listOutput).toContain("03-26-current-task");
-    expect(listOutput).toContain(".spec-first/tasks/03-26-current-task");
+    expect(listOutput).toContain("Description");
 
     const switchOutput = execFileSync(
       "python3",
@@ -110,7 +114,7 @@ describe("current_task.py integration", () => {
       ["./.spec-first/scripts/current_task.py", "switch"],
       { cwd: tmpDir, encoding: "utf-8" },
     );
-    expect(output).toContain("Active tasks:");
+    expect(output).toContain("Active Tasks Overview");
     expect(output).toContain("03-26-current-task");
   });
 

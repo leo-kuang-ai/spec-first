@@ -9,6 +9,7 @@ const EXPECTED_COMMAND_NAMES = [
   "check-cross-layer",
   "check",
   "create-command",
+  "current-task",
   "finish-work",
   "integrate-skill",
   "onboard",

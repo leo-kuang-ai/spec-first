@@ -377,6 +377,10 @@ def main() -> int:
     p_create.add_argument("--description", "-d", help="Task description")
     p_create.add_argument("--parent", help="Parent task directory (establishes subtask link)")
     p_create.add_argument("--package", help="Package name for monorepo projects")
+    p_create.add_argument("--workflow", "-w",
+                          choices=["default", "quick-fix", "docs-only"],
+                          default="default",
+                          help="Workflow type (default: default)")
 
     # init-context
     p_init = subparsers.add_parser("init-context", help="Initialize context files")

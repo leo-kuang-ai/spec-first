@@ -58,10 +58,26 @@ If the requested task is already the current task, report that it is already act
 ### 1. List tasks
 
 ```bash
-python3 ./.spec-first/scripts/current_task.py list
+python3 ./.spec-first/scripts/current_task.py list --json
 ```
 
-Use this to show active tasks and the current one.
+Parse the JSON output and format it as a table in the response. The Bash script should only provide structured data, not a preformatted table.
+
+Display the table using this format:
+
+```text
+┌─ Active Tasks Overview
+
+#    Task                           Description                         Status       Pri
+──────────────────────────────────────────────────────────────────────────────────────────
+★ 1   task-name                      task description...                 in_progress  P1
+  2   another-task                   another description...              completed    P2
+
+Total: N active task(s)
+★ = Current Task
+```
+
+After the table, ask whether the user wants to continue with the current task, switch to another task, or start something new.
 
 ### 2. Switch task from the selected entry
 
@@ -100,7 +116,7 @@ Do not run it automatically unless the user explicitly asks.
 
 ### Output
 
-- For `list`: active tasks and current task
+- For `list`: agent-formatted task table and current task
 - For `switch`: confirmation of the selected task and the new current task
 - Optional note if the target task should be initialized
 
@@ -156,7 +172,8 @@ If the target task has no `init-context` files yet, switching alone may not prov
 
 | Command | Purpose |
 |---------|---------|
-| `python3 ./.spec-first/scripts/current_task.py list` | Show active tasks |
+| `python3 ./.spec-first/scripts/current_task.py list --json` | Fetch active tasks for agent-side table formatting |
+| `python3 ./.spec-first/scripts/current_task.py list` | Show active tasks in plain-text list format |
 | `python3 ./.spec-first/scripts/current_task.py switch <selection>` | Set current task |
 | `python3 ./.spec-first/scripts/task.py init-context <task> <type>` | Prepare task context |
 | `python3 ./.spec-first/scripts/task.py finish` | Clear current task |

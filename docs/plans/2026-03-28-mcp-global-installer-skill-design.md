@@ -1,0 +1,300 @@
+# MCP 全局安装 Skill 设计
+
+## 背景
+
+你提供的 `docs/01-需求分析/MCP工具/mcp工具.md` 定义了一组“必装 MCP”工具，以及它们的启动命令和适配场景。当前仓库里已经有多平台模板体系，`packages/cli/src/templates` 也已经清晰区分了 Claude、Cursor、Codex、Kiro、iFlow、Gemini、Kilo、Qoder、CodeBuddy、Antigravity、OpenCode 等平台。
+
+这次要设计的是一个 **全局安装 skill**：它不安装编程工具本身，只负责识别用户机器上已存在的平台，然后让用户选择要把必装 MCP 安装到哪些平台里。若对应 MCP 已存在，则执行更新；若不存在，则执行安装。
+
+---
+
+## 目标
+
+| 目标 | 说明 |
+|---|---|
+| 全局安装 | 默认作用于全局配置，不做项目内局部安装 |
+| 平台自动识别 | 先检测本机已存在的平台，再展示可选安装目标 |
+| 用户确认 | 只对用户选择的平台执行变更 |
+| 必装优先 | `Serena`、`GitNexus`、`ABCoder`、`Sequential Thinking`、`Context7` 作为 v1 必装集 |
+| 幂等更新 | 已存在的 MCP 走更新，不重复插入 |
+| 健壮性 | 每个平台独立备份、校验、失败回滚 |
+| 可观测 | 输出成功、更新、跳过、失败的分项结果 |
+
+---
+
+## 平台映射
+
+`packages/cli/src/templates` 里的目录名可以直接作为平台识别线索。外部平台候选如下：
+
+| 模板目录 | 对应平台 | 配置路径 | 探测条件 |
+|---|---|---|---|
+| `claude` | Claude Code | `~/.claude/settings.json` | 文件存在且可写 |
+| `cursor` | Cursor | `~/.cursor/mcp.json` 或 `.cursor/mcp.json` | 全局或项目级，优先全局 |
+| `windsurf` | Windsurf | `~/.windsurf/mcp.json` | 文件存在且可写 |
+| `kiro` | Kiro Code | `~/.kiro/settings/mcp.json` 或 `.kiro/settings/mcp.json` | 全局或项目级，优先全局 |
+| `codex` | Codex | 项目级 `mcp.json` | 仅项目级，不做全局 |
+| `iflow` | iFlow CLI | 待确认 | 待确认 |
+| `gemini` | Gemini CLI | 待确认 | 待确认 |
+| `kilo` | Kilo CLI | 待确认 | 待确认 |
+| `qoder` | Qoder | 待确认 | 待确认 |
+| `codebuddy` | CodeBuddy | 待确认 | 待确认 |
+| `antigravity` | Antigravity | 待确认 | 待确认 |
+| `opencode` | OpenCode | 待确认 | 待确认 |
+
+以下目录不视为外部平台候选：
+
+| 模板目录 | 原因 |
+|---|---|
+| `markdown` | 共享文档模板层 |
+| `spec-first` | 仓库核心工作流模板层 |
+
+**v1 优先支持平台**：Claude Code、Cursor、Windsurf、Kiro（配置路径已确认）
+
+**配置路径参考来源**：
+- [Kiro MCP Configuration](https://kiro.dev)
+- [Cursor MCP Setup Guide](https://cursor.sh/docs)
+
+---
+
+## 架构
+
+### 1. 平台探测层
+
+先扫描本机平台的已知配置目录和标记文件，判断哪些平台已安装、哪些平台可写。只有“已安装且可写”的平台才进入后续安装选择。
+
+### 2. MCP 规范化层
+
+把 `mcp工具.md` 的工具表转换成统一的内部数据结构，至少包含：
+
+| 字段 | 说明 |
+|---|---|
+| `id` | 工具标识，例如 `serena` |
+| `name` | 显示名称 |
+| `category` | `required` / `recommended` / `optional` |
+| `command` | 启动命令 |
+| `args` | 启动参数 |
+| `notes` | 工具说明 |
+
+**v1 必装工具元数据**：
+
+```json
+{
+  "serena": {
+    "id": "serena",
+    "name": "Serena",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@anthropic-ai/serena-mcp"],
+    "notes": "符号级精确编辑引擎"
+  },
+  "gitnexus": {
+    "id": "gitnexus",
+    "name": "GitNexus",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@anthropic-ai/gitnexus-mcp"],
+    "notes": "代码知识图谱 / 架构引擎"
+  },
+  "abcoder": {
+    "id": "abcoder",
+    "name": "ABCoder",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@anthropic-ai/abcoder-mcp"],
+    "notes": "跨语言语义增强 + Code-RAG"
+  },
+  "sequential-thinking": {
+    "id": "sequential-thinking",
+    "name": "Sequential Thinking",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+    "notes": "动态反思性问题解决"
+  },
+  "context7": {
+    "id": "context7",
+    "name": "Context7",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@upstash/context7-mcp"],
+    "notes": "最新框架文档查询"
+  }
+}
+```
+
+### 3. 平台适配层
+
+每个平台一个适配器，负责把统一 MCP 定义写成平台自己的配置格式。适配器只管：
+
+1. 读取现有配置
+2. 生成目标配置
+3. 合并或替换对应 MCP
+4. 写回并验证
+
+**配置格式示例**：
+
+**Claude Code / Cursor / Windsurf（通用 JSON 格式）**：
+```json
+{
+  "mcpServers": {
+    "serena": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/serena-mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}
+```
+
+**平台特定差异**：
+- Claude Code: 支持 `disabled` 和 `autoApprove` 字段
+- Cursor / Windsurf: 基础格式，可能有平台特定扩展字段
+- 适配器需要保留平台特定字段，只更新 MCP 定义部分
+
+### 4. 保护层
+
+保护层负责：
+
+1. 写前备份
+2. 临时文件写入
+3. 原子替换
+4. 写后读取校验
+5. 失败回滚
+
+---
+
+## 流程
+
+```text
+启动 skill
+  ↓
+探测本机平台
+  ↓
+过滤出“已安装且可写”的平台
+  ↓
+向用户展示多选列表
+  ↓
+用户选择目标平台
+  ↓
+对每个平台独立执行：
+  1. 读取当前配置
+  2. 生成目标 MCP 列表
+  3. 比较现状
+  4. 安装或更新
+  5. 写后校验
+  6. 失败则回滚
+  ↓
+汇总结果并输出
+```
+
+---
+
+## 安装策略
+
+### 已存在时更新
+
+如果目标 MCP 已存在：
+
+- 定义一致，则跳过
+- 定义不同，则按最新定义覆盖更新
+
+### 不存在时安装
+
+如果目标 MCP 不存在：
+
+- 追加到平台配置
+- 保持其他 MCP 不变
+
+### 写入策略
+
+- 写入前先备份当前文件
+- 先写临时文件
+- 校验临时文件格式正确后再替换原文件
+- 替换后立即重新读取，确认目标条目已落盘
+
+---
+
+## 异常处理
+
+每个平台都必须单独处理异常，避免一个平台失败拖垮整批安装。
+
+| 异常 | 处理方式 |
+|---|---|
+| 配置文件不存在 | 创建新配置或新目录，再写入 |
+| 配置文件不可写 | 标记失败，不修改内容 |
+| 解析失败 | 回滚备份，并提示文件损坏 |
+| 写入失败 | 删除临时文件，回滚备份 |
+| 校验失败 | 视为安装失败，回滚备份 |
+| 外部并发修改 | 重新读取后再合并一次 |
+
+如果某个平台失败：
+
+- 该平台回滚
+- 其他平台继续执行
+- 最终结果里保留失败原因
+
+---
+
+## 输出
+
+安装结束后，skill 要输出一份简洁但完整的结果摘要：
+
+| 分类 | 说明 |
+|---|---|
+| 成功安装 | 新增了哪些 MCP |
+| 成功更新 | 哪些 MCP 定义发生了更新 |
+| 无变化 | 哪些 MCP 已存在且无需改动 |
+| 失败回滚 | 哪些平台失败、为什么失败 |
+
+如果没有检测到任何可写平台，要明确提示：
+
+> 未检测到可安装目标平台，未执行任何写入操作。
+
+---
+
+## 验证
+
+每个平台写完后，都要做结果验证：
+
+1. 重新读取平台配置
+2. 确认目标 MCP 条目存在
+3. 确认启动命令和参数完整
+4. 确认未破坏平台内其他条目
+
+**平台验证命令**：
+
+| 平台 | 验证命令 | 说明 |
+|------|---------|------|
+| Claude Code | `claude mcp list` | 列出已安装的 MCP 服务器 |
+| Cursor | 读取配置文件验证 | 无专用命令，通过配置文件校验 |
+| Windsurf | 读取配置文件验证 | 无专用命令，通过配置文件校验 |
+
+如果平台支持列出已安装 MCP 的命令，也应在条件允许时执行二次验证。
+
+---
+
+## 推荐的 v1 必装集
+
+根据 `mcp工具.md`，v1 只纳入这 5 个必装项：
+
+| 工具 | 角色 |
+|---|---|
+| `Serena` | 符号级精确编辑 |
+| `GitNexus` | 代码知识图谱 / 架构分析 |
+| `ABCoder` | 跨语言语义增强 |
+| `Sequential Thinking` | 反思性多步骤推理 |
+| `Context7` | 最新框架文档查询 |
+
+---
+
+## 设计原则
+
+1. 先发现，再选择，再执行。
+2. 平台级隔离，失败不互相污染。
+3. 更新必须幂等。
+4. 回滚必须可用。
+5. 不把“可选工具”混进“必装工具”。
+6. 不把“平台识别”扩展成“平台安装”。

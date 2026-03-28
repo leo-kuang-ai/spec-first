@@ -33,6 +33,7 @@ import {
   getAllCommands as getClaudeCommands,
   getAllAgents as getClaudeAgents,
   getAllHooks as getClaudeHooks,
+  getAllSkillFiles as getClaudeSkillFiles,
 } from "../src/templates/claude/index.js";
 import {
   settingsTemplate as iflowSettingsTemplate,
@@ -857,6 +858,14 @@ describe("regression: backslash in markdown templates (beta.12)", () => {
     }
   });
 
+  it("[normalize-requirements-docs] Claude skill asset templates do not contain problematic backslash sequences", () => {
+    const skillFiles = getClaudeSkillFiles();
+    for (const skillFile of skillFiles) {
+      expect(skillFile.content).not.toContain("\\--");
+      expect(skillFile.content).not.toContain("\\->");
+    }
+  });
+
   it("[beta.12] iFlow hook templates do not contain problematic backslash sequences", () => {
     const hooks = getIflowHooks();
     for (const hook of hooks) {
@@ -1205,6 +1214,18 @@ describe("regression: collectTemplates paths match init directory structure (0.3
     expect(keys.some((key) => key.startsWith(".codex/hooks/"))).toBe(true);
     expect(keys).toContain(".codex/hooks.json");
     expect(keys).toContain(".codex/config.toml");
+  });
+
+  it("[claude-skills] collectTemplates tracks Claude skill assets recursively", () => {
+    const templates = collectPlatformTemplates("claude-code");
+    expect(templates).toBeInstanceOf(Map);
+    if (!templates) return;
+
+    const keys = [...templates.keys()];
+    expect(keys).toContain(".claude/skills/normalize-requirements-docs/SKILL.md");
+    expect(keys).toContain(
+      ".claude/skills/normalize-requirements-docs/templates/normalized-source.md",
+    );
   });
 });
 

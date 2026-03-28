@@ -31,4 +31,10 @@ describe("qoder getAllSkills", () => {
       expect(skill.content.length).toBeGreaterThan(0);
     }
   });
+
+  it("formats current-task tables in the skill instead of relying on script table output", () => {
+    const currentTaskSkill = getAllSkills().find((skill) => skill.name === "current-task");
+    expect(currentTaskSkill?.content).toContain("current_task.py list --json");
+    expect(currentTaskSkill?.content).toContain("Parse the JSON output");
+  });
 });

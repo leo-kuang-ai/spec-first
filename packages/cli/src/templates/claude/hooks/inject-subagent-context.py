@@ -173,6 +173,21 @@ def read_file_content(base_path: str, file_path: str) -> str | None:
     return None
 
 
+def get_decision_hints(repo_root: str, task_dir: str, agent_type: str) -> dict:
+    """Get decision_hints for specific agent from task.json"""
+    task_json_path = os.path.join(repo_root, task_dir, FILE_TASK_JSON)
+    if not os.path.exists(task_json_path):
+        return {}
+
+    try:
+        with open(task_json_path, "r", encoding="utf-8") as f:
+            task_data = json.load(f)
+        hints = task_data.get("decision_hints", {})
+        return hints.get(agent_type, {})
+    except Exception:
+        return {}
+
+
 def read_directory_contents(
     base_path: str, dir_path: str, max_files: int = 20
 ) -> list[tuple[str, str]]:
@@ -449,8 +464,14 @@ def get_debug_context(repo_root: str, task_dir: str) -> str:
     return "\n\n".join(context_parts)
 
 
-def build_implement_prompt(original_prompt: str, context: str) -> str:
+def build_implement_prompt(original_prompt: str, context: str, hints: dict) -> str:
     """Build complete prompt for Implement"""
+    hints_section = ""
+    if hints:
+        hints_section = "\n\n## Task-Level Policy\n\n"
+        for key, value in hints.items():
+            hints_section += f"- **{key}**: {value}\n"
+
     return f"""# Implement Agent Task
 
 You are the Implement Agent in the Multi-Agent Pipeline.
@@ -459,7 +480,7 @@ You are the Implement Agent in the Multi-Agent Pipeline.
 
 All the information you need has been prepared for you:
 
-{context}
+{context}{hints_section}
 
 ---
 
@@ -483,8 +504,14 @@ All the information you need has been prepared for you:
 - Report list of modified/created files when done"""
 
 
-def build_check_prompt(original_prompt: str, context: str) -> str:
+def build_check_prompt(original_prompt: str, context: str, hints: dict) -> str:
     """Build complete prompt for Check"""
+    hints_section = ""
+    if hints:
+        hints_section = "\n\n## Task-Level Policy\n\n"
+        for key, value in hints.items():
+            hints_section += f"- **{key}**: {value}\n"
+
     return f"""# Check Agent Task
 
 You are the Check Agent in the Multi-Agent Pipeline (code and cross-layer checker).
@@ -493,7 +520,7 @@ You are the Check Agent in the Multi-Agent Pipeline (code and cross-layer checke
 
 All check specs and dev specs you need:
 
-{context}
+{context}{hints_section}
 
 ---
 
@@ -754,7 +781,8 @@ def main():
     if subagent_type == AGENT_IMPLEMENT:
         assert task_dir is not None  # validated above
         context = get_implement_context(repo_root, task_dir)
-        new_prompt = build_implement_prompt(original_prompt, context)
+        hints = get_decision_hints(repo_root, task_dir, "implement")
+        new_prompt = build_implement_prompt(original_prompt, context, hints)
     elif subagent_type == AGENT_CHECK:
         assert task_dir is not None  # validated above
         if is_finish_phase:
@@ -764,7 +792,8 @@ def main():
         else:
             # Regular check phase: use check context (full specs for self-fix loop)
             context = get_check_context(repo_root, task_dir)
-            new_prompt = build_check_prompt(original_prompt, context)
+            hints = get_decision_hints(repo_root, task_dir, "check")
+            new_prompt = build_check_prompt(original_prompt, context, hints)
     elif subagent_type == AGENT_DEBUG:
         assert task_dir is not None  # validated above
         context = get_debug_context(repo_root, task_dir)
