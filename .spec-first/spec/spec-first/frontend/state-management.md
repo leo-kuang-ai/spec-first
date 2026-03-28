@@ -6,131 +6,46 @@
 
 ## Overview
 
-**Note**: This is a CLI project without traditional frontend state management. State is managed through files and environment variables.
+<!--
+Document your project's state management conventions here.
+
+Questions to answer:
+- What state management solution do you use?
+- How is local vs global state decided?
+- How do you handle server state?
+- What are the patterns for derived state?
+-->
+
+(To be filled by the team)
 
 ---
 
 ## State Categories
 
-### 1. Project State (Files)
+<!-- Local state, global state, server state, URL state -->
 
-| File | State | Purpose |
-|------|-------|---------|
-| `.spec-first/.developer` | Developer identity | Who is working |
-| `.spec-first/.current-task` | Current task path | What is being worked on |
-| `.spec-first/tasks/*/task.json` | Task state | Task progress tracking |
-| `.spec-first/.version` | Version | Update tracking |
-| `config.yaml` | Configuration | Project settings |
-
-### 2. Session State (In-memory)
-
-- CLI options parsed from command line
-- Write mode (ask/force/skip)
-- Selected platforms
-- Template choices
-
-### 3. Environment State
-
-```typescript
-// Process-based state
-const cwd = process.cwd();
-const isWindows = process.platform === "win32";
-const pythonCmd = getPythonCommand();  // "python3" or "python"
-```
+(To be filled by the team)
 
 ---
 
-## File-based State Patterns
+## When to Use Global State
 
-### Read state
+<!-- Criteria for promoting state to global -->
 
-```typescript
-function getCurrentTask(cwd: string): string | null {
-  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);
-  if (!fs.existsSync(filePath)) return null;
-  return fs.readFileSync(filePath, "utf-8").trim();
-}
-```
-
-### Write state
-
-```typescript
-function setCurrentTask(cwd: string, taskPath: string): void {
-  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);
-  fs.writeFileSync(filePath, taskPath, "utf-8");
-}
-```
-
-### Clear state
-
-```typescript
-function clearCurrentTask(cwd: string): void {
-  const filePath = path.join(cwd, PATHS.CURRENT_TASK_FILE);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-  }
-}
-```
+(To be filled by the team)
 
 ---
 
-## Global Module State
+## Server State
 
-For CLI-wide settings during execution:
+<!-- How server data is cached and synchronized -->
 
-```typescript
-// Global write mode (shared across file operations)
-let globalWriteMode: WriteMode = "ask";
-
-export function setWriteMode(mode: WriteMode): void {
-  globalWriteMode = mode;
-}
-
-export function getWriteMode(): WriteMode {
-  return globalWriteMode;
-}
-```
-
----
-
-## State Flow
-
-```
-1. CLI Start
-   ↓
-2. Parse options → Set global state (write mode)
-   ↓
-3. Read project state (.developer, .current-task)
-   ↓
-4. Execute commands → Update files
-   ↓
-5. Write new state (tasks, version)
-```
+(To be filled by the team)
 
 ---
 
 ## Common Mistakes
 
-### Don't: Store state in global variables across runs
+<!-- State management mistakes your team has made -->
 
-```typescript
-// Bad: Lost between CLI invocations
-let currentTask = "task-1";
-```
-
-### Do: Persist to files
-
-```typescript
-// Good: Survives across sessions
-fs.writeFileSync(".spec-first/.current-task", "task-1");
-```
-
----
-
-## Examples from Codebase
-
-| Module | State Type |
-|--------|------------|
-| `src/utils/file-writer.ts` | Global write mode |
-| `src/commands/init.ts` | Developer, task creation |
-| `.spec-first/scripts/task.py` | Task state management |
+(To be filled by the team)

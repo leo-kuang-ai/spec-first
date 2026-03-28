@@ -1,6 +1,6 @@
 {
   "name": "spec-first",
-  "version": "1.3.0",
+  "version": "1.3.8",
   "description": "Spec-driven AI development workflow that improves delivery quality through executable project standards",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,6 +12,7 @@
     "access": "public"
   },
   "scripts": {
+    "postinstall": "node scripts/postinstall.mjs",
     "build": "tsc && pnpm run copy-templates",
     "copy-templates": "node scripts/copy-templates.js",
     "dev": "tsc --watch",
@@ -77,6 +78,7 @@
   "files": [
     "dist",
     "bin",
+    "scripts/postinstall.mjs",
     "README.md",
     "LICENSE"
   ],

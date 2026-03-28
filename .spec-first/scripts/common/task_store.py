@@ -48,11 +48,36 @@ from .task_utils import (
     resolve_task_dir,
     run_task_hooks,
 )
+from .workflow_templates import (
+    get_workflow,
+    get_next_action_from_workflow,
+)
 
 
 # =============================================================================
 # Helper Functions
 # =============================================================================
+
+DEFAULT_DECISION_HINTS = {
+    "default": {
+        "implement": {"mode": "standard"},
+        "check": {"verify_commands": ["pnpm lint", "pnpm typecheck"]}
+    },
+    "quick-fix": {
+        "implement": {"mode": "standard"},
+        "check": {"verify_commands": ["pnpm lint"]}
+    },
+    "docs-only": {
+        "implement": {"mode": "standard"},
+        "check": {"verify_commands": ["pnpm lint"]}
+    }
+}
+
+
+def generate_default_hints(workflow_type: str) -> dict:
+    """Generate default decision_hints based on workflow_type."""
+    return DEFAULT_DECISION_HINTS.get(workflow_type, DEFAULT_DECISION_HINTS["default"])
+
 
 def _slugify(title: str) -> str:
     """Convert title to slug (only works with ASCII)."""
@@ -144,6 +169,16 @@ def cmd_create(args: argparse.Namespace) -> int:
     _, branch_out, _ = run_git(["branch", "--show-current"], cwd=repo_root)
     current_branch = branch_out.strip() or "main"
 
+    # Compile workflow contract (Phase 1)
+    workflow_type = getattr(args, "workflow", "default")
+    workflow = get_workflow(workflow_type)
+    if not workflow:
+        print(colored(f"Error: Unknown workflow type: {workflow_type}", Colors.RED), file=sys.stderr)
+        return 1
+
+    next_action = get_next_action_from_workflow(workflow)
+    decision_hints = generate_default_hints(workflow_type)
+
     task_data = {
         "id": slug,
         "name": slug,
@@ -162,12 +197,10 @@ def cmd_create(args: argparse.Namespace) -> int:
         "base_branch": current_branch,
         "worktree_path": None,
         "current_phase": 0,
-        "next_action": [
-            {"phase": 1, "action": "implement"},
-            {"phase": 2, "action": "check"},
-            {"phase": 3, "action": "finish"},
-            {"phase": 4, "action": "create-pr"},
-        ],
+        "next_action": next_action,
+        "workflow_type": workflow_type,
+        "decision_hints": decision_hints,
+        "evidence": None,
         "commit": None,
         "pr_url": None,
         "subtasks": [],
@@ -206,8 +239,9 @@ def cmd_create(args: argparse.Namespace) -> int:
     print("", file=sys.stderr)
     print(colored("Next steps:", Colors.BLUE), file=sys.stderr)
     print("  1. Create prd.md with requirements", file=sys.stderr)
-    print("  2. Run: python3 task.py init-context <dir> <dev_type>", file=sys.stderr)
-    print("  3. Run: python3 task.py start <dir>", file=sys.stderr)
+    print("  2. Run: python3 ./.spec-first/scripts/task.py init-context <dir> <dev_type>", file=sys.stderr)
+    print("  3. Run: python3 ./.spec-first/scripts/current_task.py list", file=sys.stderr)
+    print("     Then: python3 ./.spec-first/scripts/current_task.py switch <selection>", file=sys.stderr)
     print("", file=sys.stderr)
 
     # Output relative path for script chaining
@@ -446,7 +480,7 @@ def cmd_set_branch(args: argparse.Namespace) -> int:
 
     if not branch:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py set-branch <task-dir> <branch-name>")
+        print("Usage: python3 ./.spec-first/scripts/task.py set-branch <task-dir> <branch-name>")
         return 1
 
     task_json = target_dir / FILE_TASK_JSON
@@ -480,8 +514,8 @@ def cmd_set_base_branch(args: argparse.Namespace) -> int:
 
     if not base_branch:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py set-base-branch <task-dir> <base-branch>")
-        print("Example: python3 task.py set-base-branch <dir> develop")
+        print("Usage: python3 ./.spec-first/scripts/task.py set-base-branch <task-dir> <base-branch>")
+        print("Example: python3 ./.spec-first/scripts/task.py set-base-branch <dir> develop")
         print()
         print("This sets the target branch for PR (the branch your feature will merge into).")
         return 1
@@ -515,7 +549,7 @@ def cmd_set_scope(args: argparse.Namespace) -> int:
 
     if not scope:
         print(colored("Error: Missing arguments", Colors.RED))
-        print("Usage: python3 task.py set-scope <task-dir> <scope>")
+        print("Usage: python3 ./.spec-first/scripts/task.py set-scope <task-dir> <scope>")
         return 1
 
     task_json = target_dir / FILE_TASK_JSON

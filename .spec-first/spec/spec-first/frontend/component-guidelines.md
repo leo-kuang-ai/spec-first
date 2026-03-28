@@ -6,112 +6,54 @@
 
 ## Overview
 
-**Note**: This is a CLI project with no traditional UI components (React/Vue/etc.). The patterns below apply to the modular organization of CLI features.
+<!--
+Document your project's component conventions here.
+
+Questions to answer:
+- What component patterns do you use?
+- How are props defined?
+- How do you handle composition?
+- What accessibility standards apply?
+-->
+
+(To be filled by the team)
 
 ---
 
-## CLI "Components"
+## Component Structure
 
-In this CLI context, "components" are feature modules:
+<!-- Standard structure of a component file -->
 
-```
-feature/
-├── index.ts          # Public API (like component export)
-├── types.ts          # Types (like props interface)
-├── implementation.ts # Core logic (like component body)
-└── utils.ts          # Helpers (like utility functions)
-```
+(To be filled by the team)
 
 ---
 
-## Module Interface Pattern
+## Props Conventions
 
-### Public API
+<!-- How props should be defined and typed -->
 
-```typescript
-// feature/index.ts - Public interface
-export { mainFunction, helperFunction } from "./implementation.js";
-export type { FeatureOptions, FeatureResult } from "./types.js";
-```
-
-### Options pattern (like Props)
-
-```typescript
-// feature/types.ts
-export interface FeatureOptions {
-  required: string;
-  optional?: boolean;
-  withDefault?: number;  // Provide default
-}
-
-export interface FeatureResult {
-  success: boolean;
-  data?: string;
-  error?: string;
-}
-```
+(To be filled by the team)
 
 ---
 
-## Implementation Patterns
+## Styling Patterns
 
-### Function signature
+<!-- How styles are applied (CSS modules, styled-components, Tailwind, etc.) -->
 
-```typescript
-// Clear, typed function with options
-export async function runFeature(
-  options: FeatureOptions,
-): Promise<FeatureResult> {
-  const { required, optional = false, withDefault = 0 } = options;
+(To be filled by the team)
 
-  // Implementation
+---
 
-  return { success: true, data: "result" };
-}
-```
+## Accessibility
 
-### Error handling
+<!-- A11y requirements and patterns -->
 
-```typescript
-// Return error in result, don't throw
-export async function safeOperation(): Promise<FeatureResult> {
-  try {
-    // ...
-    return { success: true };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-```
+(To be filled by the team)
 
 ---
 
 ## Common Mistakes
 
-### Don't: Export everything
+<!-- Component-related mistakes your team has made -->
 
-```typescript
-// Bad: Exposing internals
-export * from "./implementation.js";
-```
-
-### Do: Explicit public API
-
-```typescript
-// Good: Controlled interface
-export { mainFunction } from "./implementation.js";
-export type { Options } from "./types.js";
-```
-
----
-
-## Examples from Codebase
-
-| Module | Pattern |
-|--------|---------|
-| `src/configurators/` | Registry pattern with platform-specific modules |
-| `src/utils/file-writer.ts` | Options + result pattern |
-| `src/templates/extract.ts` | Pure functions with clear types |
+(To be filled by the team)

@@ -25,7 +25,39 @@ function readTemplate(relativePath: string): string {
 
 function listFiles(dir: string): string[] {
   try {
-    return readdirSync(join(__dirname, dir));
+    return readdirSync(join(__dirname, dir), { withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => entry.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+function listDirectories(dir: string): string[] {
+  try {
+    return readdirSync(join(__dirname, dir), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+function listFilesRecursive(dir: string): string[] {
+  const root = join(__dirname, dir);
+
+  try {
+    return readdirSync(root, { withFileTypes: true })
+      .flatMap((entry) => {
+        const relativePath = `${dir}/${entry.name}`;
+        if (entry.isDirectory()) {
+          return listFilesRecursive(relativePath);
+        }
+        return [relativePath];
+      })
+      .sort((a, b) => a.localeCompare(b));
   } catch {
     return [];
   }
@@ -47,6 +79,22 @@ export interface CommandTemplate {
  */
 export interface AgentTemplate {
   name: string;
+  content: string;
+}
+
+/**
+ * Skill template with name and content
+ */
+export interface SkillTemplate {
+  name: string;
+  content: string;
+}
+
+/**
+ * Skill file template with target path and content
+ */
+export interface SkillFileTemplate {
+  targetPath: string;
   content: string;
 }
 
@@ -94,6 +142,38 @@ export function getAllAgents(): AgentTemplate[] {
   }
 
   return agents;
+}
+
+/**
+ * Get top-level Claude skills from skills/<name>/SKILL.md
+ */
+export function getAllSkills(): SkillTemplate[] {
+  const skills: SkillTemplate[] = [];
+
+  for (const name of listDirectories("skills")) {
+    const content = readTemplate(`skills/${name}/SKILL.md`);
+    skills.push({ name, content });
+  }
+
+  return skills;
+}
+
+/**
+ * Get all Claude skill files for recursive template tracking.
+ */
+export function getAllSkillFiles(): SkillFileTemplate[] {
+  const files: SkillFileTemplate[] = [];
+
+  for (const name of listDirectories("skills")) {
+    for (const targetPath of listFilesRecursive(`skills/${name}`)) {
+      files.push({
+        targetPath,
+        content: readTemplate(targetPath),
+      });
+    }
+  }
+
+  return files;
 }
 
 /**

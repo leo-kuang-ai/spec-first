@@ -41,16 +41,35 @@
 # 1. Install spec-first
 npm install -g spec-first@latest
 
-# 2. Initialize in your repo
-spec-first init -u your-name
+# 2. Set global identity (once, works for all projects)
+spec-first init --global -u your-name
 
-# 3. Or initialize with the platforms you actually use
-spec-first init --cursor --opencode --codex -u your-name
+# 3. Initialize in your repo (uses global identity automatically)
+spec-first init --claude
 ```
 
-- `-u your-name` creates `.spec-first/workspace/your-name/` for personal journals and session continuity.
-- Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
-- For platform-specific setup, entry commands, and upgrade paths, use the docs:
+### Global Identity Options
+
+```bash
+# With language preference (default: zh)
+spec-first init --global -u your-name --lang en
+
+# Per-project override (optional)
+spec-first init -u other-name
+```
+
+**Identity Priority**: Project-level > Global > Git config
+
+### Platform Selection
+
+```bash
+# Initialize with specific platforms
+spec-first init --cursor --opencode --codex
+```
+
+Platform flags can be mixed and matched. Current options include `--cursor`, `--opencode`, `--iflow`, `--codex`, `--kilo`, `--kiro`, `--gemini`, `--antigravity`, `--qoder`, and `--codebuddy`.
+
+For platform-specific setup, entry commands, and upgrade paths, use the docs:
   [Quick Start](https://github.com/sunrain520/spec-first/blob/master/docs/首次接入已有项目流程分析.md) •
   [Supported Platforms](https://github.com/sunrain520/spec-first/blob/master/docs/多平台集成架构/multi-platform-architecture.md) •
   [Real-World Scenarios](https://github.com/sunrain520/spec-first/blob/master/docs/已存在项目需求迭代流程分析.md) •
@@ -98,7 +117,7 @@ Depending on the platforms you enable, spec-first also creates tool-specific int
 
 At a high level, the workflow is simple:
 
-1. Define standards in specs.
+1. Define standards in specs. `spec-first init` creates the initial `.spec-first/spec/` skeleton; later learning is written back with `$update-spec` / `/spec:update-spec`.
 2. Start or refine work from a task PRD.
 3. Let spec-first inject the right context for the current task.
 4. Use checks, journals, and worktrees to keep quality and continuity intact.
@@ -113,6 +132,8 @@ spec-first init --registry https://github.com/your-org/your-spec-templates
 ```
 
 Browse available templates and learn how to publish your own on the [Spec Templates page](https://github.com/sunrain520/spec-first/blob/master/marketplace/README.md).
+
+`spec-first update` upgrades the framework and platform wiring. It does not rewrite your project `spec/` files; knowledge capture happens through `$update-spec` / `/spec:update-spec`.
 
 ## FAQ
 

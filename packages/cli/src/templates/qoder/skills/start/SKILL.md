@@ -7,6 +7,8 @@ description: "Initializes an AI development session by reading workflow guides, 
 
 Initialize your AI development session and begin working on tasks.
 
+If you need to choose between existing tasks, use `current-task` first. This skill describes the low-level start/resume flow after you already know the exact task.
+
 ---
 
 ## Operation Types

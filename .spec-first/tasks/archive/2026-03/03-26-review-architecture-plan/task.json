@@ -1,0 +1,45 @@
+{
+  "id": "review-architecture-plan",
+  "name": "review-architecture-plan",
+  "title": "深度审查：整体方案-目标架构与三阶段实施",
+  "description": "",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": "spec-first",
+  "priority": "P2",
+  "creator": "kuang",
+  "assignee": "kuang",
+  "createdAt": "2026-03-26",
+  "completedAt": "2026-03-26",
+  "branch": null,
+  "base_branch": "leo-2026-03-26-Harness",
+  "worktree_path": null,
+  "current_phase": 0,
+  "next_action": [
+    {
+      "phase": 1,
+      "action": "implement"
+    },
+    {
+      "phase": 2,
+      "action": "check"
+    },
+    {
+      "phase": 3,
+      "action": "finish"
+    },
+    {
+      "phase": 4,
+      "action": "create-pr"
+    }
+  ],
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

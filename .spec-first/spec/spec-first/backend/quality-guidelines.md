@@ -1,206 +1,236 @@
 # Quality Guidelines
 
-> Code quality standards for backend development.
+> Code quality standards for TypeScript/Node.js development.
 
 ---
 
 ## Overview
 
-This project emphasizes clean, maintainable TypeScript code with strong typing and clear patterns. Code should be self-documenting with minimal comments needed.
+This project enforces quality through:
+
+- **TypeScript strict mode** - Type safety at compile time
+- **ESLint** - Code style and common mistake prevention
+- **Vitest** - Unit and integration tests
+- **pnpm** - Deterministic dependency management
+
+---
+
+## Development Commands
+
+```bash
+# Build (compile TypeScript + copy templates)
+pnpm build
+
+# Run tests
+pnpm test                    # All tests
+pnpm test:watch              # Watch mode
+vitest run test/path.test.ts # Single test file
+
+# Code quality
+pnpm lint                    # ESLint on src/ and test/
+pnpm lint:fix                # Auto-fix lint issues
+pnpm typecheck               # TypeScript type check
+pnpm format                  # Prettier format
+
+# Python scripts (in .spec-first/scripts/)
+pnpm lint:py                 # basedpyright on Python files
+```
 
 ---
 
 ## Forbidden Patterns
 
-### Never use `any` without justification
+### 1. Missing `.js` Extension in Imports
 
 ```typescript
-// Bad
+// ❌ Wrong - will fail at runtime in ESM
+import { writeFile } from "./utils/file-writer";
+
+// ✅ Correct - include .js extension
+import { writeFile } from "./utils/file-writer.js";
+```
+
+### 2. Using Non-Node Prefixed Built-ins
+
+```typescript
+// ❌ Wrong
+import fs from "fs";
+import path from "path";
+
+// ✅ Correct - use node: prefix
+import fs from "node:fs";
+import path from "node:path";
+```
+
+### 3. Mutable Exports
+
+```typescript
+// ❌ Wrong - mutable export
+export let config = {};
+
+// ✅ Correct - const export
+export const config = {};
+
+// ✅ Better - function getter
+export function getConfig() {
+  return { ... };
+}
+```
+
+### 4. Any Type
+
+```typescript
+// ❌ Wrong
 function process(data: any) { ... }
 
-// Good
-function process(data: Record<string, unknown>) { ... }
-// Or define a proper type
-interface ProcessData { ... }
-function process(data: ProcessData) { ... }
+// ✅ Correct - use specific type or generic
+function process<T>(data: T): T { ... }
+// or
+function process(data: unknown) {
+  if (typeof data === "string") { ... }
+}
 ```
 
-### Never ignore TypeScript errors
+### 5. Synchronous File Operations in Hot Paths
 
 ```typescript
-// Bad
-// @ts-ignore
-someUntypedCall();
+// ❌ Wrong - blocks event loop
+fs.readFileSync(path, "utf-8");
 
-// Good: Fix the type or use proper assertion
-(someUntypedCall() as ExpectedType);
-```
+// ✅ Acceptable in CLI (not performance critical)
+// CLI tools are short-lived, sync is acceptable
 
-### Never use `var`
-
-```typescript
-// Bad
-var x = 1;
-
-// Good
-const x = 1;
-let y; // Only if reassignment needed
-```
-
-### Never mix CommonJS and ESM
-
-```typescript
-// Bad
-const fs = require("fs");
-module.exports = { ... };
-
-// Good
-import fs from "node:fs";
-export { ... };
+// ✅ Correct for libraries
+await fs.promises.readFile(path, "utf-8");
 ```
 
 ---
 
 ## Required Patterns
 
-### Use const assertions for readonly data
+### 1. Const Assertions for Registries
 
 ```typescript
-// Good
-const AI_TOOLS = {
+// ✅ Required - use as const for type inference
+export const AI_TOOLS = {
   "claude-code": { ... },
+  cursor: { ... },
 } as const;
-
-type AITool = keyof typeof AI_TOOLS;
 ```
 
-### Use explicit return types for public functions
+### 2. Explicit Return Types for Public Functions
 
 ```typescript
-// Good
-export function getConfiguredPlatforms(cwd: string): Set<AITool> {
+// ✅ Required - explicit return type
+export async function configureClaude(cwd: string): Promise<void> {
   // ...
 }
 
-// Also good for async
-export async function init(options: InitOptions): Promise<void> {
-  // ...
+// ✅ Also acceptable for simple functions
+export function getVersion(): string {
+  return VERSION;
 }
 ```
 
-### Use type guards for error handling
+### 3. Error Handling with chalk
 
 ```typescript
-// Good
-catch (error) {
-  console.error(
-    chalk.red("Error:"),
-    error instanceof Error ? error.message : error,
-  );
-}
-```
+// ✅ Required - use chalk for error messages
+import chalk from "chalk";
 
-### Use descriptive variable names
-
-```typescript
-// Bad
-const d = detectMonorepo(cwd);
-for (const p of d) { ... }
-
-// Good
-const detectedPackages = detectMonorepo(cwd);
-for (const pkg of detectedPackages) { ... }
+console.error(chalk.red("Error: Something went wrong"));
+process.exit(1);
 ```
 
 ---
 
 ## Testing Requirements
 
-### Test file location
+### Test Structure
+
+Tests should mirror the source structure:
 
 ```
-packages/cli/
-├── src/
-│   └── utils/
-│       └── compare-versions.ts
-└── test/
-    └── compare-versions.test.ts
+test/
+├── commands/
+│   └── init.test.ts      # Tests for src/commands/init.ts
+├── configurators/
+│   └── cursor.test.ts    # Tests for src/configurators/cursor.ts
+└── utils/
+    └── file-writer.test.ts
 ```
 
-### Test naming
+### Test Patterns
 
 ```typescript
-// Test file: {module}.test.ts
-describe("compareVersions", () => {
-  it("should return positive when a > b", () => {
-    expect(compareVersions("2.0.0", "1.0.0")).toBeGreaterThan(0);
+// Use Vitest
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+
+describe("file-writer", () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "test-"));
+  });
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  });
+
+  it("should write new file", async () => {
+    const filePath = path.join(tempDir, "test.txt");
+    await writeFile(filePath, "content");
+    expect(fs.readFileSync(filePath, "utf-8")).toBe("content");
   });
 });
 ```
+
+### Coverage Expectations
+
+- **New features**: Must include tests
+- **Bug fixes**: Should include regression test
+- **Refactors**: Existing tests should pass
+
+---
+
+## Dogfooding Synchronization
+
+> This project uses spec-first itself (dogfooding). Template changes must be synced.
+
+### Sync Checklist
+
+When adding new scripts or templates to `packages/cli/src/templates/spec-first/`:
+
+- [ ] Sync scripts: `cp packages/cli/src/templates/spec-first/scripts/*.py .spec-first/scripts/`
+- [ ] Sync workflow: `cp packages/cli/src/templates/spec-first/workflow.md .spec-first/workflow.md`
+- [ ] Verify sync: `diff -r packages/cli/src/templates/spec-first/scripts/ .spec-first/scripts/`
+
+### Known Sync Issues
+
+| File | Template Path | Dogfooding Path | Status |
+|------|---------------|-----------------|--------|
+| `current_task.py` | `templates/spec-first/scripts/` | `.spec-first/scripts/` | ✅ Synced |
+| `create_bootstrap.py` | `templates/spec-first/scripts/` | `.spec-first/scripts/` | ✅ Synced |
+
+### Prevention Mechanism
+
+> **Root Cause**: Change Propagation Failure - new templates added but dogfooding project not updated.
+
+**Prevention**: After adding new templates, always sync to `.spec-first/` directory.
 
 ---
 
 ## Code Review Checklist
 
-- [ ] No `any` types without justification
-- [ ] Imports use `.js` extension for ESM
-- [ ] Error messages use `chalk.red()` and are user-friendly
-- [ ] Functions have explicit return types
-- [ ] No unused variables or imports
-- [ ] Constants use `UPPER_SNAKE_CASE`
-- [ ] Files use `kebab-case`
-- [ ] No console.log in library code (use chalk for CLI output)
-- [ ] Try-catch wraps operations that may fail
-- [ ] Early returns used to reduce nesting
-
----
-
-## Linting
-
-Run before committing:
-
-```bash
-npm run lint
-npm run typecheck
-```
-
----
-
-## Common Mistakes
-
-### Forgetting `.js` extension in imports
-
-```typescript
-// Bad - will fail at runtime
-import { init } from "../commands/init";
-
-// Good
-import { init } from "../commands/init.js";
-```
-
-### Not handling undefined
-
-```typescript
-// Bad
-const name = options.user.trim();
-
-// Good
-const name = options.user?.trim() ?? "default";
-```
-
-### Overly nested code
-
-```typescript
-// Bad
-if (condition1) {
-  if (condition2) {
-    if (condition3) {
-      doSomething();
-    }
-  }
-}
-
-// Good
-if (!condition1 || !condition2 || !condition3) return;
-doSomething();
-```
+- [ ] TypeScript compiles without errors (`pnpm typecheck`)
+- [ ] ESLint passes (`pnpm lint`)
+- [ ] Tests pass (`pnpm test`)
+- [ ] Imports use `.js` extension
+- [ ] Built-ins use `node:` prefix
+- [ ] Error messages use `chalk.red()`
+- [ ] Public functions have explicit return types
+- [ ] Registry objects use `as const`
+- [ ] Dogfooding synced (if templates changed)

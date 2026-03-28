@@ -8,6 +8,7 @@ const EXPECTED_SKILL_NAMES = [
   "check",
   "check-cross-layer",
   "create-command",
+  "current-task",
   "finish-work",
   "integrate-skill",
   "onboard",
@@ -29,5 +30,11 @@ describe("qoder getAllSkills", () => {
       expect(skill.name.length).toBeGreaterThan(0);
       expect(skill.content.length).toBeGreaterThan(0);
     }
+  });
+
+  it("formats current-task tables in the skill instead of relying on script table output", () => {
+    const currentTaskSkill = getAllSkills().find((skill) => skill.name === "current-task");
+    expect(currentTaskSkill?.content).toContain("current_task.py list --json");
+    expect(currentTaskSkill?.content).toContain("Parse the JSON output");
   });
 });

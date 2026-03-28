@@ -9,6 +9,7 @@ import {
 } from "../../src/configurators/index.js";
 import { AI_TOOLS } from "../../src/types/ai-tools.js";
 import { setWriteMode } from "../../src/utils/file-writer.js";
+import { getAllSkillFiles as getAllClaudeSkillFiles } from "../../src/templates/claude/index.js";
 import {
   getAllAgents as getAllCodexAgents,
   getAllSkills,
@@ -443,6 +444,15 @@ describe("configurePlatform", () => {
     // Should be valid JSON
     const content = fs.readFileSync(settingsPath, "utf-8");
     expect(() => JSON.parse(content)).not.toThrow();
+  });
+
+  it("claude-code configuration includes skill assets", async () => {
+    await configurePlatform("claude-code", tmpDir);
+
+    for (const skillFile of getAllClaudeSkillFiles()) {
+      const targetPath = path.join(tmpDir, ".claude", skillFile.targetPath);
+      expect(fs.existsSync(targetPath)).toBe(true);
+    }
   });
 
   it("cursor configuration includes commands directory", async () => {

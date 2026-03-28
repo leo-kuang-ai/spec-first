@@ -38,6 +38,7 @@ import {
   getAllAgents as getClaudeAgents,
   getAllCommands as getClaudeCommands,
   getAllHooks as getClaudeHooks,
+  getAllSkillFiles as getClaudeSkillFiles,
   getSettingsTemplate as getClaudeSettings,
 } from "../templates/claude/index.js";
 import { getAllCommands as getCursorCommands } from "../templates/cursor/index.js";
@@ -89,6 +90,10 @@ const PLATFORM_FUNCTIONS: Record<AITool, PlatformFunctions> = {
       // Agents
       for (const agent of getClaudeAgents()) {
         files.set(`.claude/agents/${agent.name}.md`, agent.content);
+      }
+      // Skills
+      for (const skillFile of getClaudeSkillFiles()) {
+        files.set(`.claude/${skillFile.targetPath}`, skillFile.content);
       }
       // Hooks
       for (const hook of getClaudeHooks()) {

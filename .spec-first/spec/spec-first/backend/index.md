@@ -6,7 +6,7 @@
 
 ## Overview
 
-This directory contains guidelines for the TypeScript CLI backend. Guidelines are based on actual codebase patterns.
+This directory contains guidelines for backend development. Fill in each file with your project's specific conventions.
 
 ---
 
@@ -15,55 +15,24 @@ This directory contains guidelines for the TypeScript CLI backend. Guidelines ar
 | Guide | Description | Status |
 |-------|-------------|--------|
 | [Directory Structure](./directory-structure.md) | Module organization and file layout | ✅ Filled |
-| [Database Guidelines](./database-guidelines.md) | File-based state (no database) | ✅ Filled |
+| [Database Guidelines](./database-guidelines.md) | ORM patterns, queries, migrations | ✅ N/A (CLI tool) |
 | [Error Handling](./error-handling.md) | Error types, handling strategies | ✅ Filled |
 | [Quality Guidelines](./quality-guidelines.md) | Code standards, forbidden patterns | ✅ Filled |
-| [Logging Guidelines](./logging-guidelines.md) | CLI output with chalk | ✅ Filled |
+| [Logging Guidelines](./logging-guidelines.md) | Structured logging, log levels | ✅ Filled |
 
 ---
 
-## Pre-Development Checklist
+## How to Fill These Guidelines
 
-Before implementing backend features, read:
+For each guideline file:
 
-- [ ] [Directory Structure](./directory-structure.md) - Understand module organization
-- [ ] [Error Handling](./error-handling.md) - Learn error patterns
-- [ ] [Quality Guidelines](./quality-guidelines.md) - Review forbidden patterns
+1. Document your project's **actual conventions** (not ideals)
+2. Include **code examples** from your codebase
+3. List **forbidden patterns** and why
+4. Add **common mistakes** your team has made
 
----
-
-## Quick Reference
-
-### File Naming
-
-```
-kebab-case.ts    // All files
-```
-
-### Import Style
-
-```typescript
-import fs from "node:fs";                    // Node built-ins
-import chalk from "chalk";                   // External
-import { init } from "../commands/init.js";  // Internal (.js!)
-```
-
-### Function Pattern
-
-```typescript
-export async function command(options: Options): Promise<void> {
-  try {
-    // Implementation
-  } catch (error) {
-    console.error(
-      chalk.red("Error:"),
-      error instanceof Error ? error.message : error,
-    );
-    process.exit(1);
-  }
-}
-```
+The goal is to help AI assistants and new team members understand how YOUR project works.
 
 ---
 
-**Language**: All documentation written in **English**.
+**Language**: All documentation should be written in **English**.

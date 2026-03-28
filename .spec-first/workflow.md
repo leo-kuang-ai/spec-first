@@ -49,7 +49,7 @@ python3 ./.spec-first/scripts/get_context.py
 
 # Or check manually:
 python3 ./.spec-first/scripts/get_developer.py      # Your identity
-python3 ./.spec-first/scripts/task.py list          # Active tasks
+python3 ./.spec-first/scripts/current_task.py list  # Active tasks
 git status && git log --oneline -10              # Git state
 ```
 
@@ -180,7 +180,7 @@ Use the task management script:
 
 ```bash
 # List active tasks
-python3 ./.spec-first/scripts/task.py list
+python3 ./.spec-first/scripts/current_task.py list
 
 # Create new task (creates directory with task.json)
 python3 ./.spec-first/scripts/task.py create "<title>" --slug <task-name>
@@ -194,7 +194,7 @@ python3 ./.spec-first/scripts/task.py create "<title>" --slug <task-name>
 
 ```
 1. Create or select task
-   --> python3 ./.spec-first/scripts/task.py create "<title>" --slug <name> or list
+   --> python3 ./.spec-first/scripts/task.py create "<title>" --slug <name> or current_task.py list
 
 2. Write code according to guidelines
    --> Read .spec-first/spec/ docs relevant to your task
@@ -316,7 +316,7 @@ tasks/
 ```bash
 python3 ./.spec-first/scripts/task.py create "<title>" [--slug <name>]   # Create task directory
 python3 ./.spec-first/scripts/task.py archive <name>  # Archive to archive/{year-month}/
-python3 ./.spec-first/scripts/task.py list            # List active tasks
+python3 ./.spec-first/scripts/current_task.py list    # List active tasks
 python3 ./.spec-first/scripts/task.py list-archive    # List archived tasks
 ```
 
@@ -380,7 +380,7 @@ python3 ./.spec-first/scripts/get_context.py    # Get full context
 python3 ./.spec-first/scripts/add_session.py    # Record session
 
 # Task management
-python3 ./.spec-first/scripts/task.py list      # List tasks
+python3 ./.spec-first/scripts/current_task.py list      # List tasks
 python3 ./.spec-first/scripts/task.py create "<title>" # Create task
 
 # Slash commands

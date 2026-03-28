@@ -13,3 +13,8 @@ coverage/
 # IDE and history
 .cursor/
 .history/
+.planning/
+
+# Python bytecode caches
+**/__pycache__/
+**/*.pyc
