@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**目标：** 构建一个 marketplace skill，用来检测本机已安装的 AI 编程平台，让用户选择目标平台，并以全局方式安装或更新必装 MCP，同时保证可回滚。
+**目标：** 构建一个 marketplace skill，用来检测本机已安装的 AI 编程平台，让用户选择目标平台，并以全局方式安装或更新 v1 必装 MCP，同时保证可回滚。
 
 **架构：** 这个 skill 只以文档形式存在，放在 `marketplace/skills/mcp-global-installer/`。它使用从 `docs/01-需求分析/MCP工具/mcp工具.md` 提取的固定 MCP 注册表，结合现有模板/平台矩阵做平台检测，并采用按平台拆分的适配器模型，保证每个宿主运行时都能独立、安全地更新。
 
