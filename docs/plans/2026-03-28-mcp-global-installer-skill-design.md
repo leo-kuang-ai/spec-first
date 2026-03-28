@@ -26,19 +26,20 @@
 
 `packages/cli/src/templates` 里的目录名可以直接作为平台识别线索。外部平台候选如下：
 
-| 模板目录 | 对应平台 |
-|---|---|
-| `claude` | Claude Code |
-| `cursor` | Cursor |
-| `codex` | Codex |
-| `iflow` | iFlow CLI |
-| `gemini` | Gemini CLI |
-| `kilo` | Kilo CLI |
-| `kiro` | Kiro Code |
-| `qoder` | Qoder |
-| `codebuddy` | CodeBuddy |
-| `antigravity` | Antigravity |
-| `opencode` | OpenCode |
+| 模板目录 | 对应平台 | 配置路径 | 探测条件 |
+|---|---|---|---|
+| `claude` | Claude Code | `~/.claude/settings.json` | 文件存在且可写 |
+| `cursor` | Cursor | `~/.cursor/mcp.json` 或 `.cursor/mcp.json` | 全局或项目级，优先全局 |
+| `windsurf` | Windsurf | `~/.windsurf/mcp.json` | 文件存在且可写 |
+| `kiro` | Kiro Code | `~/.kiro/settings/mcp.json` 或 `.kiro/settings/mcp.json` | 全局或项目级，优先全局 |
+| `codex` | Codex | 项目级 `mcp.json` | 仅项目级，不做全局 |
+| `iflow` | iFlow CLI | 待确认 | 待确认 |
+| `gemini` | Gemini CLI | 待确认 | 待确认 |
+| `kilo` | Kilo CLI | 待确认 | 待确认 |
+| `qoder` | Qoder | 待确认 | 待确认 |
+| `codebuddy` | CodeBuddy | 待确认 | 待确认 |
+| `antigravity` | Antigravity | 待确认 | 待确认 |
+| `opencode` | OpenCode | 待确认 | 待确认 |
 
 以下目录不视为外部平台候选：
 
@@ -46,6 +47,12 @@
 |---|---|
 | `markdown` | 共享文档模板层 |
 | `spec-first` | 仓库核心工作流模板层 |
+
+**v1 优先支持平台**：Claude Code、Cursor、Windsurf、Kiro（配置路径已确认）
+
+**配置路径参考来源**：
+- [Kiro MCP Configuration](https://kiro.dev)
+- [Cursor MCP Setup Guide](https://cursor.sh/docs)
 
 ---
 
@@ -68,6 +75,53 @@
 | `args` | 启动参数 |
 | `notes` | 工具说明 |
 
+**v1 必装工具元数据**：
+
+```json
+{
+  "serena": {
+    "id": "serena",
+    "name": "Serena",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@anthropic-ai/serena-mcp"],
+    "notes": "符号级精确编辑引擎"
+  },
+  "gitnexus": {
+    "id": "gitnexus",
+    "name": "GitNexus",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@anthropic-ai/gitnexus-mcp"],
+    "notes": "代码知识图谱 / 架构引擎"
+  },
+  "abcoder": {
+    "id": "abcoder",
+    "name": "ABCoder",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@anthropic-ai/abcoder-mcp"],
+    "notes": "跨语言语义增强 + Code-RAG"
+  },
+  "sequential-thinking": {
+    "id": "sequential-thinking",
+    "name": "Sequential Thinking",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+    "notes": "动态反思性问题解决"
+  },
+  "context7": {
+    "id": "context7",
+    "name": "Context7",
+    "category": "required",
+    "command": "npx",
+    "args": ["-y", "@upstash/context7-mcp"],
+    "notes": "最新框架文档查询"
+  }
+}
+```
+
 ### 3. 平台适配层
 
 每个平台一个适配器，负责把统一 MCP 定义写成平台自己的配置格式。适配器只管：
@@ -76,6 +130,29 @@
 2. 生成目标配置
 3. 合并或替换对应 MCP
 4. 写回并验证
+
+**配置格式示例**：
+
+**Claude Code / Cursor / Windsurf（通用 JSON 格式）**：
+```json
+{
+  "mcpServers": {
+    "serena": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/serena-mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}
+```
+
+**平台特定差异**：
+- Claude Code: 支持 `disabled` 和 `autoApprove` 字段
+- Cursor / Windsurf: 基础格式，可能有平台特定扩展字段
+- 适配器需要保留平台特定字段，只更新 MCP 定义部分
 
 ### 4. 保护层
 
@@ -186,6 +263,14 @@
 2. 确认目标 MCP 条目存在
 3. 确认启动命令和参数完整
 4. 确认未破坏平台内其他条目
+
+**平台验证命令**：
+
+| 平台 | 验证命令 | 说明 |
+|------|---------|------|
+| Claude Code | `claude mcp list` | 列出已安装的 MCP 服务器 |
+| Cursor | 读取配置文件验证 | 无专用命令，通过配置文件校验 |
+| Windsurf | 读取配置文件验证 | 无专用命令，通过配置文件校验 |
 
 如果平台支持列出已安装 MCP 的命令，也应在条件允许时执行二次验证。
 

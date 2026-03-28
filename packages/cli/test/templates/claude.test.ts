@@ -4,6 +4,8 @@ import {
   getAllCommands,
   getAllAgents,
   getAllHooks,
+  getAllSkillFiles,
+  getAllSkills,
   getSettingsTemplate,
 } from "../../src/templates/claude/index.js";
 
@@ -108,6 +110,43 @@ describe("getAllAgents", () => {
       expect(agent.name.length).toBeGreaterThan(0);
       expect(agent.content.length).toBeGreaterThan(0);
     }
+  });
+});
+
+// =============================================================================
+// getAllSkills — reads Claude skill templates
+// =============================================================================
+
+describe("getAllSkills", () => {
+  it("includes normalize-requirements-docs with non-empty content", () => {
+    const skills = getAllSkills();
+    const skill = skills.find((entry) => entry.name === "normalize-requirements-docs");
+
+    expect(skill).toBeDefined();
+    expect(skill?.content.length).toBeGreaterThan(0);
+    expect(skill?.content).toContain("spec:normalize-requirements-docs");
+    expect(skill?.content).toContain("Converted Markdown Content");
+    expect(skill?.content).toContain("Image / Diagram Notes");
+    expect(skill?.content).toContain("Clarifications");
+    expect(skill?.content).toContain("next available version");
+    expect(skill?.content).toContain("Source Language Detection Rules");
+    expect(skill?.content).not.toContain("Task Breakdown");
+    expect(skill?.content).not.toContain("Review Gate Checklist");
+  });
+});
+
+describe("getAllSkillFiles", () => {
+  it("includes the full normalize-requirements-docs asset tree", () => {
+    const files = getAllSkillFiles();
+    const paths = files.map((entry) => entry.targetPath);
+
+    expect(paths).toContain("skills/normalize-requirements-docs/SKILL.md");
+    expect(paths).toContain(
+      "skills/normalize-requirements-docs/templates/normalized-source.md",
+    );
+    expect(paths).toContain(
+      "skills/normalize-requirements-docs/templates/examples/hk-us-brokerage-normalized-source.example.md",
+    );
   });
 });
 
