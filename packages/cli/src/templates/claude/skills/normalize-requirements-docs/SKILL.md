@@ -29,7 +29,10 @@ It does:
 - convert source documents into Markdown
 - preserve original structure, ordering, and meaning
 - preserve file and section hierarchy inside one output document
-- analyze screenshots, diagrams, and embedded visuals only as needed to preserve source content
+- preserve original heading hierarchy, exact heading text, and original naming conventions
+- restore tables, sample data, remarks, and special markers completely
+- convert screenshots, diagrams, and embedded visuals into ASCII descriptions and structure-preserving notes when they carry source meaning
+- preserve field rules, display rules, operation rules, developer notes, naming conventions, and shared-component references
 - record unclear or unreadable areas without guessing
 
 It does **not**:
@@ -83,6 +86,9 @@ The output file MUST follow the original document's structure:
 2. **Original document content** - exact structure as in source
    - Preserve all original section headings and numbering
    - Preserve heading depth hierarchy
+   - Map level-1 / level-2 / level-3 headings to `#` / `##` / `###`, and continue deeper levels accordingly
+   - Keep exact heading text, naming style, and numbering format unchanged
+   - Restore source tables completely in standard Markdown-table format
    - Place images inline at their original positions
 3. **Appendix: Clarifications** - at the end, only if there are unclear items
 
@@ -123,14 +129,32 @@ Examples:
    - Preserve original order and hierarchy as much as possible.
    - **Preserve original heading numbering** (e.g., "一、", "3.1", "3.11") exactly as in source
    - **Preserve original heading depth** - do not flatten or nest differently
+   - **Preserve exact heading text and naming conventions** - do not rewrite, simplify, or normalize title wording
+   - Map level-1 / level-2 / level-3 headings to `#` / `##` / `###`, and continue deeper levels accordingly
    - Map source headings to appropriate Markdown levels (H1-H6) based on their actual depth in the source
+   - **Preserve original lists, line breaks, paragraphing, and text-image adjacency**
 
-3. **Visual evidence is part of the source**
-   - Screenshots, diagrams, redlines, and annotated images must be converted into notes when they carry requirement content.
-   - Do not drop visible labels, numbers, statuses, or marked changes.
+3. **Tables must be restored completely**
+   - Preserve table structure, columns, rows, content, sample data, and remarks from the source.
+   - Restore them using standard Markdown-table syntax.
+   - Preserve line breaks, segmented content, special symbols, and mixed Chinese/English text inside cells when possible.
+   - Do not rewrite tables as prose summaries or flattened lists just because the layout is inconvenient.
+
+4. **Visual evidence is part of the source**
+   - When screenshots, annotated images, flow diagrams, or page prototypes carry requirement content, convert their visible information into ASCII descriptions.
+   - Do not drop layout regions, labels, buttons, form fields, prompts, sample data, states, or marked changes.
    - Treat visual evidence as primary-source material, not decorative attachment, when it contains requirement meaning.
+   - **Images must be processed inline at their original positions** - do not collect them at the end.
+   - After the ASCII description, extract image-borne core requirement points, design requirements, and developer notes only when they can be directly confirmed from the image or its annotations.
+   - Preserve special visual annotations exactly, such as "no yellow highlight needed for dev wireframe", sticky-bottom alignment notes, or red warning text.
 
-4. **Unclear points must be recorded, not guessed**
+5. **Content and implementation detail must be preserved completely**
+   - Preserve permissions, field rules, display requirements, operation behavior, validation rules, region-specific field requirements, newly added field markers, filename conventions, and shared-component references.
+   - Preserve required / optional flags, trim rules, length bounds, uppercase normalization, uniqueness checks, centered display, truncation, hover popovers, enable / disable states, export actions, add / edit behavior, and similar rules.
+   - Preserve special markers such as required stars, red warning text, region tags, export filenames, and code-length limits.
+   - Preserve original bilingual wording, special symbols, inline annotations, and date markers such as `/`, `￮`, `→`, English comments, and "2026.2.24 added".
+
+6. **Unclear points must be recorded, not guessed**
    - If content is blurry, incomplete, contradictory, or unreadable, record that in `Clarifications`.
    - Never fabricate missing text, rules, thresholds, or flow steps.
    - Do not place uncertainty wording such as `unclear`, `unknown`, `not confirmed`, `may`, or `possibly` inside `Converted Markdown Content`.
@@ -138,7 +162,7 @@ Examples:
    - Move uncertainty into `Clarifications` or `Visual-only implications`.
    - Do not add unresolved image-context notes such as "reference position unclear" or "needs confirmation" inside the image-notes body.
 
-5. **Keep the output in the source language by default**
+7. **Keep the output in the source language by default**
    - The normalized Markdown should follow the dominant source language unless the user explicitly requests translation.
 
 ## Required Behavior
@@ -197,23 +221,27 @@ For each meaningful image or diagram:
 - Notes (grounded visible observations only)
 
 **Add when applicable:**
-- ASCII layout (when UI structure or flow diagram carries requirement meaning)
+- ASCII layout (when UI structure, page prototype, or flow diagram carries requirement meaning)
 - Image role (when it adds useful clarity)
 - Current vs target state (only with explicit before/after evidence)
 - Change points (only when source shows actual changes)
 - Visual-only implications (only when image implies something text doesn't state)
+- Image-borne core requirement points / design requirements / developer notes (only when directly confirmable from the image or annotations)
 
 **Process flow:**
 1. Extract readable text via OCR
-2. Record directly visible content in Notes
-3. Add ASCII diagram if flow/structure would be lost without it
-4. Mark inferred content separately as visual-only implications
-5. Move unreadable/ambiguous items to Clarifications
+2. Use ASCII to reconstruct visible layout, regions, controls, fields, prompts, sample data, and annotations
+3. Record directly visible content in Notes
+4. Add ASCII diagram or ASCII page layout if structure would otherwise be lost
+5. After the ASCII description, extract directly grounded core requirement points / design requirements / developer notes
+6. Mark inferred content separately as visual-only implications
+7. Move unreadable/ambiguous items to Clarifications
 
 **Notes rules:**
 - Use Notes only for directly visible, grounded observations
 - Do not put unreadable details, uncertainty, or questions in Notes
 - Move unresolved items to Clarifications
+- If the image contains explicit developer notes, redlines, yellow-highlight instructions, or "do not implement" notes, preserve them accurately in Notes or the immediate image-following text
 
 **Decorative images:**
 - Note as decorative, no further analysis required
@@ -232,7 +260,9 @@ If image is too blurry, cropped, or ambiguous:
 - low-confidence OCR
 - values that cannot be read reliably
 
-If there are no clarifications, keep the section and state `None`.
+If there are no clarifications:
+- do not add an empty appendix just for symmetry
+- omit the `Clarifications` appendix entirely
 
 ### Source Anchor Format
 
@@ -327,15 +357,26 @@ For each source file, in sequence:
 - headings, paragraphs, lists, tables, callouts
 - preserve original order and nesting
 - preserve file hierarchy in output
+- map level-1 / level-2 / level-3 headings to `#` / `##` / `###`
+- keep exact heading text, heading numbering, and naming conventions unchanged
+- preserve list structure, line breaks, and paragraph logic from the source
+
+**Restore tables:**
+- preserve table structure, columns, cell content, sample data, and remarks completely
+- use standard Markdown-table syntax
+- preserve line breaks, segmented content, special symbols, and mixed-language content inside cells where possible
+- do not collapse tables into summaries, bullets, or prose
 
 **Process images inline:**
 
 When encountering an image in the source document:
 1. **Extract**: OCR visible text
-2. **Observe**: Record directly visible content in `Notes`
-3. **Structure**: Add ASCII layout if UI/flow structure carries requirement meaning
-4. **Infer**: Mark visual-only implications separately (only when image shows something text doesn't)
-5. **Clarify**: Move unreadable/ambiguous items to `Clarifications`
+2. **ASCII description**: Reconstruct page layout, regions, action buttons, form fields, prompts, sample data, and key annotations with ASCII
+3. **Observe**: Record directly visible content in `Notes`
+4. **Extract image points**: After the ASCII description, list directly confirmable core requirement points / design requirements / developer notes from the image
+5. **Structure**: Add ASCII layout or ASCII flow when UI structure, page prototype, or process structure carries requirement meaning
+6. **Infer**: Mark visual-only implications separately (only when image shows something text doesn't)
+7. **Clarify**: Move unreadable/ambiguous items to `Clarifications`
 
 **Image placement rule:**
 - **Place image notes at the exact location where the image appears in the source document**
@@ -367,24 +408,39 @@ Whenever content is unclear, contradictory, truncated, or low-confidence:
 - Do not place uncertainty in `Converted Markdown Content` or `Notes`
 - Move all unresolved items to `Clarifications`
 
+Must preserve:
+- original ordering
+- original section nesting
+- original relative file hierarchy inside `Converted Markdown Content`
+- original field rules, display rules, operation rules, developer notes, naming conventions, and shared-component references
+- original special markers, red warning text, required stars, region tags, export filename rules, and code-length limits
+- original bilingual content, special symbols, sample data, and date markers
+
 ### Step 4: Self-check and complete
 
 Verify before finishing:
 - [ ] Output language matches source language (unless user requested translation)
 - [ ] Original hierarchy recoverable in `Converted Markdown Content`
+- [ ] Exact heading text, numbering, and naming conventions remain unchanged
 - [ ] Not a compressed shorthand (detail preserved)
+- [ ] Table structure, columns, content, sample data, and remarks are fully restored
 - [ ] Image evidence preserved where meaningful
-- [ ] Screenshots translated to explicit text notes
+- [ ] Screenshots translated to ASCII + explicit text notes
+- [ ] Image-borne core requirement points / design requirements / developer notes are captured accurately
 - [ ] No major source content silently dropped
 - [ ] Unclear items captured, not guessed
 - [ ] `Notes` contains only grounded visible observations
+- [ ] Special markers, red warning text, filename conventions, and code-length limits are preserved
 - [ ] No completion-status section in output file
 
 Minimum acceptance invariants:
 - [ ] Every source file has destination in output
 - [ ] Every meaningful image has notes or explicit decorative classification
+- [ ] Every requirement-bearing image has an ASCII description
 - [ ] `Converted Markdown Content` contains no uncertainty wording
 - [ ] Every clarification row includes valid source anchor
+- [ ] All level-1 / level-2 / level-3 headings are mapped correctly
+- [ ] All source tables are restored in Markdown format
 - [ ] Output file contains no completion-status section
 
 If any check fails, revise before completing.
@@ -411,17 +467,21 @@ When tools are partially unavailable, continue with reduced capability:
 
 Degraded mode allows partial success rather than complete failure.
 
-The final file should contain exactly these semantic sections:
-- topic
-- document metadata
-- source manifest
-- converted Markdown content
-- image / diagram notes
-- clarifications
+## Output Composition
 
-Write the section titles in the output language instead of keeping fixed English headings.
+The final file should be composed of:
+- YAML front matter metadata
+- a Markdown body that follows the source document's original order and hierarchy
+- inline image ASCII descriptions, image-derived points, and any necessary image notes
+- a `Clarifications` appendix only when unresolved issues actually exist
+
+Do not force the output into fixed report-style section names.
+Do not pull image content, tables, diagrams, or screenshots into a separate summary section.
+Section titles must follow the output language and should preserve the source titles whenever possible.
 
 ## Completion Status Protocol
+
+These statuses belong only in the final assistant response, not inside the output Markdown file:
 
 Use exactly one:
 - `DONE`
