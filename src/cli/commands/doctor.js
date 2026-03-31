@@ -65,12 +65,14 @@ function runDoctor(argv) {
       checkProjectDeveloper(projectRoot, adapter),
       checkManagedState(projectRoot, adapter),
       ...runtimeChecks,
-      checkInstalledSkills(projectRoot, adapter),
-      checkInstalledAgents(projectRoot, adapter),
     ];
     if (adapter.hasCommands) {
-      platformChecks.splice(3 + runtimeChecks.length, 0, checkGeneratedCommands(projectRoot, adapter));
+      platformChecks.push(checkGeneratedCommands(projectRoot, adapter));
     }
+    platformChecks.push(
+      checkInstalledSkills(projectRoot, adapter),
+      checkInstalledAgents(projectRoot, adapter),
+    );
 
     for (const check of platformChecks) {
       const label = check.level.toUpperCase().padEnd(7);
