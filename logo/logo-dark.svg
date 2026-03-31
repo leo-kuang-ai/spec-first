@@ -1,0 +1,35 @@
+<svg
+  width="232"
+  height="60"
+  viewBox="0 0 232 60"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="spec-first"
+>
+  <!-- ─── Mark: lighter on dark background ─── -->
+  <rect x="0" y="6" width="48" height="48" rx="10" fill="#4338ca"/>
+
+  <!-- Vertical accent bar -->
+  <rect x="10" y="16" width="3" height="21" rx="1.5" fill="#c7d2fe"/>
+
+  <!-- Spec line 1 -->
+  <rect x="17" y="16" width="23" height="3.5" rx="1.75" fill="#ffffff"/>
+
+  <!-- Spec line 2 -->
+  <rect x="17" y="25" width="17" height="3" rx="1.5" fill="#c7d2fe" opacity="0.7"/>
+
+  <!-- Spec line 3 -->
+  <rect x="17" y="33" width="11" height="2.5" rx="1.25" fill="#a5b4fc" opacity="0.45"/>
+
+  <!-- ─── Wordmark (for dark bg) ─── -->
+  <text
+    x="62"
+    y="39"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="26"
+    letter-spacing="-0.5"
+  >
+    <tspan fill="#ffffff" font-weight="700">spec</tspan><tspan fill="#a5b4fc" font-weight="400">-first</tspan>
+  </text>
+</svg>

@@ -1,0 +1,49 @@
+<svg width="232" height="60" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first">
+  <defs>
+    <clipPath id="p-clip">
+      <rect x="0" y="6" width="48" height="48" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Mark: deep space -->
+  <rect x="0" y="6" width="48" height="48" rx="10" fill="#0f172a"/>
+
+  <g clip-path="url(#p-clip)">
+
+    <!-- ── Input: one white beam (the raw requirement) ── -->
+    <line x1="0" y1="28" x2="16" y2="28"
+      stroke="#f0f4ff" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- ── Prism: the AI intelligence structure ── -->
+    <polygon points="24,11 6,51 38,51"
+      fill="none" stroke="#4f46e5" stroke-width="1.5"
+      stroke-linejoin="round" opacity="0.75"/>
+
+    <!-- ── Refraction inside (AI processing — slight angle, dashed) ── -->
+    <line x1="16" y1="28" x2="30" y2="29"
+      stroke="#818cf8" stroke-width="1"
+      stroke-opacity="0.45" stroke-dasharray="2,2"/>
+
+    <!-- ── Output: spec spectrum (5 workflow layers) ── -->
+    <!-- brainstorm → plan → work → review → compound -->
+    <line x1="30" y1="29" x2="60" y2="10" stroke="#c4b5fd" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="29" x2="60" y2="17" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="29" x2="60" y2="24" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="29" x2="60" y2="31" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="30" y1="29" x2="60" y2="38" stroke="#4338ca" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Entry point: where requirement meets intelligence -->
+    <circle cx="16" cy="28" r="2" fill="#f0f4ff" opacity="0.7"/>
+
+    <!-- Exit node: where structured output begins -->
+    <circle cx="30" cy="29" r="2.5" fill="#818cf8" opacity="0.65"/>
+
+  </g>
+
+  <!-- Wordmark -->
+  <text x="62" y="39"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="26" letter-spacing="-0.5">
+    <tspan fill="#1e1b4b" font-weight="700">spec</tspan><tspan fill="#6366f1" font-weight="400">-first</tspan>
+  </text>
+</svg>

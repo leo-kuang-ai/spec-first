@@ -1,0 +1,34 @@
+<svg width="232" height="60" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first — bowerbird">
+  <defs>
+    <clipPath id="b-clip">
+      <rect x="0" y="6" width="48" height="48" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Mark: indigo (bowerbirds love blue) -->
+  <rect x="0" y="6" width="48" height="48" rx="10" fill="#4338ca"/>
+
+  <!-- Bird (clipped) -->
+  <g clip-path="url(#b-clip)" fill="#e0e7ff">
+    <!-- Body: plump, slightly rotated -->
+    <ellipse cx="19" cy="35" rx="12" ry="8" transform="rotate(-10 19 35)"/>
+    <!-- Head: slightly smaller than raven → cuter -->
+    <circle cx="29" cy="19" r="8"/>
+    <!-- Beak: short — bowerbird has modest bill -->
+    <polygon points="37,16 44,19 37,22"/>
+    <!-- Tail: rounded fan (not a raptor wedge) -->
+    <ellipse cx="9" cy="41" rx="6" ry="4" transform="rotate(25 9 41)"/>
+    <!-- Bower arch below bird (tiny — the spec structure it builds) -->
+    <path d="M 10 50 Q 24 42 38 50" stroke="#c7d2fe" stroke-width="2" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- Eye -->
+  <circle cx="30" cy="17" r="1.8" fill="#4338ca"/>
+
+  <!-- Wordmark -->
+  <text x="62" y="39"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="26" letter-spacing="-0.5">
+    <tspan fill="#1e1b4b" font-weight="700">spec</tspan><tspan fill="#6366f1" font-weight="400">-first</tspan>
+  </text>
+</svg>

@@ -1,0 +1,29 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first">
+  <rect width="48" height="48" rx="10" fill="#0f172a"/>
+
+  <!-- Input beam -->
+  <line x1="0" y1="22" x2="16" y2="22" stroke="#f0f4ff" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Prism -->
+  <polygon points="24,5 6,45 38,45"
+    fill="none" stroke="#4f46e5" stroke-width="1.5"
+    stroke-linejoin="round" opacity="0.75"/>
+
+  <!-- Refraction inside -->
+  <line x1="16" y1="22" x2="30" y2="23"
+    stroke="#818cf8" stroke-width="1"
+    stroke-opacity="0.45" stroke-dasharray="2,2"/>
+
+  <!-- Output spectrum -->
+  <line x1="30" y1="23" x2="56" y2="4"  stroke="#c4b5fd" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="30" y1="23" x2="56" y2="11" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="30" y1="23" x2="56" y2="18" stroke="#818cf8" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="30" y1="23" x2="56" y2="25" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="30" y1="23" x2="56" y2="32" stroke="#4338ca" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Entry point -->
+  <circle cx="16" cy="22" r="2" fill="#f0f4ff" opacity="0.7"/>
+
+  <!-- Exit node -->
+  <circle cx="30" cy="23" r="2.5" fill="#818cf8" opacity="0.65"/>
+</svg>

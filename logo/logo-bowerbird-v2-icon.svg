@@ -1,0 +1,29 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first icon">
+  <rect width="48" height="48" rx="10" fill="#3730a3"/>
+
+  <!-- Bower arch -->
+  <path d="M 9,48 L 9,37 C 9,19 39,19 39,37 L 39,48"
+    fill="none" stroke="#818cf8" stroke-width="3.5"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Blue decorative objects at bower entrance -->
+  <circle cx="16" cy="44" r="2.2" fill="#6366f1"/>
+  <circle cx="24" cy="45.5" r="2.5" fill="#6366f1"/>
+  <circle cx="32" cy="44" r="2.2" fill="#6366f1"/>
+
+  <!-- Legs -->
+  <line x1="20" y1="34" x2="17" y2="38" stroke="#c7d2fe" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="23" y1="34" x2="25" y2="38" stroke="#c7d2fe" stroke-width="1.5" stroke-linecap="round"/>
+
+  <!-- Body -->
+  <ellipse cx="21" cy="28" rx="9" ry="6" fill="#f0f4ff" transform="rotate(-10 21 28)"/>
+
+  <!-- Head -->
+  <circle cx="28" cy="19" r="8" fill="#f0f4ff"/>
+
+  <!-- Beak -->
+  <polygon points="35,17 43,19 35,21" fill="#f0f4ff"/>
+
+  <!-- Eye -->
+  <circle cx="30" cy="17" r="2.1" fill="#3730a3"/>
+</svg>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>spec-first — logo 预览</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    h1 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 8px 24px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .rationale {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .divider { border: none; border-top: 1px solid #f1f5f9; }
+    .dark-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .card-dark {
+      background: #0f172a;
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .label-dark { color: #475569; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <h1>动物 Logo — 亮色背景</h1>
+
+  <div class="grid">
+
+    <!-- RAVEN -->
+    <div class="card">
+      <div>
+        <div class="label">乌鸦 · Raven</div>
+        <div class="name" style="margin-top:4px">智识 · 工具使用 · 极简</div>
+      </div>
+      <svg width="200" height="52" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="r-clip"><rect x="0" y="6" width="48" height="48" rx="10"/></clipPath></defs>
+        <rect x="0" y="6" width="48" height="48" rx="10" fill="#0f172a"/>
+        <g clip-path="url(#r-clip)" fill="#f1f5f9">
+          <ellipse cx="18" cy="36" rx="11" ry="7" transform="rotate(-15 18 36)"/>
+          <circle cx="30" cy="20" r="9"/>
+          <polygon points="37,16 47,20 37,24"/>
+          <polygon points="10,40 3,52 18,46"/>
+        </g>
+        <circle cx="32" cy="18" r="2" fill="#0f172a"/>
+        <text x="62" y="39" font-family="-apple-system, sans-serif" font-size="26" letter-spacing="-0.5">
+          <tspan fill="#1e1b4b" font-weight="700">spec</tspan><tspan fill="#6366f1" font-weight="400">-first</tspan>
+        </text>
+      </svg>
+      <hr class="divider">
+      <div class="rationale">黑色剪影，最高视觉对比。鸦科鸟类 IQ 极高，多步骤规划是本能——先想后动。</div>
+    </div>
+
+    <!-- BOWERBIRD -->
+    <div class="card">
+      <div>
+        <div class="label">园丁鸟 · Bowerbird</div>
+        <div class="name" style="margin-top:4px">先造 spec 再交配</div>
+      </div>
+      <svg width="200" height="52" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="b-clip"><rect x="0" y="6" width="48" height="48" rx="10"/></clipPath></defs>
+        <rect x="0" y="6" width="48" height="48" rx="10" fill="#4338ca"/>
+        <g clip-path="url(#b-clip)" fill="#e0e7ff">
+          <ellipse cx="19" cy="35" rx="12" ry="8" transform="rotate(-10 19 35)"/>
+          <circle cx="29" cy="19" r="8"/>
+          <polygon points="37,16 44,19 37,22"/>
+          <ellipse cx="9" cy="41" rx="6" ry="4" transform="rotate(25 9 41)"/>
+          <path d="M 10 50 Q 24 42 38 50" stroke="#c7d2fe" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </g>
+        <circle cx="30" cy="17" r="1.8" fill="#4338ca"/>
+        <text x="62" y="39" font-family="-apple-system, sans-serif" font-size="26" letter-spacing="-0.5">
+          <tspan fill="#1e1b4b" font-weight="700">spec</tspan><tspan fill="#6366f1" font-weight="400">-first</tspan>
+        </text>
+      </svg>
+      <hr class="divider">
+      <div class="rationale">自然界唯一「先建 spec 展示台再执行」的生物。图标内小拱门 = bower，直接呼应项目理念。</div>
+    </div>
+
+    <!-- FALCON -->
+    <div class="card">
+      <div>
+        <div class="label">隼 · Falcon</div>
+        <div class="name" style="margin-top:4px">观察 → 锁定 → 精准出击</div>
+      </div>
+      <svg width="200" height="52" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="f-clip"><rect x="0" y="6" width="48" height="48" rx="10"/></clipPath></defs>
+        <rect x="0" y="6" width="48" height="48" rx="10" fill="#1e293b"/>
+        <g clip-path="url(#f-clip)" fill="#f1f5f9">
+          <ellipse cx="18" cy="33" rx="10" ry="7" transform="rotate(-20 18 33)"/>
+          <circle cx="29" cy="17" r="7"/>
+          <polygon points="36,14 43,17 36,19"/>
+          <polygon points="8,37 4,50 15,43"/>
+          <polygon points="14,27 8,23 20,25" opacity="0.6"/>
+        </g>
+        <circle cx="30" cy="15" r="1.8" fill="#1e293b"/>
+        <rect x="23" y="19" width="7" height="2.5" rx="1.25" fill="#1e293b" transform="rotate(-8 23 19)"/>
+        <text x="62" y="39" font-family="-apple-system, sans-serif" font-size="26" letter-spacing="-0.5">
+          <tspan fill="#1e1b4b" font-weight="700">spec</tspan><tspan fill="#6366f1" font-weight="400">-first</tspan>
+        </text>
+      </svg>
+      <hr class="divider">
+      <div class="rationale">脸颊标志性深色纹（malar stripe）使其辨识度极高。流线型，强调效率和精准。</div>
+    </div>
+
+  </div>
+
+  <h1>暗色背景效果</h1>
+
+  <div class="dark-row">
+
+    <!-- RAVEN dark bg -->
+    <div class="card-dark">
+      <div class="label-dark">乌鸦 · 暗色</div>
+      <svg width="200" height="52" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="r2-clip"><rect x="0" y="6" width="48" height="48" rx="10"/></clipPath></defs>
+        <rect x="0" y="6" width="48" height="48" rx="10" fill="#1e293b"/>
+        <g clip-path="url(#r2-clip)" fill="#f1f5f9">
+          <ellipse cx="18" cy="36" rx="11" ry="7" transform="rotate(-15 18 36)"/>
+          <circle cx="30" cy="20" r="9"/>
+          <polygon points="37,16 47,20 37,24"/>
+          <polygon points="10,40 3,52 18,46"/>
+        </g>
+        <circle cx="32" cy="18" r="2" fill="#1e293b"/>
+        <text x="62" y="39" font-family="-apple-system, sans-serif" font-size="26" letter-spacing="-0.5">
+          <tspan fill="#f8fafc" font-weight="700">spec</tspan><tspan fill="#a5b4fc" font-weight="400">-first</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <!-- BOWERBIRD dark bg -->
+    <div class="card-dark">
+      <div class="label-dark">园丁鸟 · 暗色</div>
+      <svg width="200" height="52" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="b2-clip"><rect x="0" y="6" width="48" height="48" rx="10"/></clipPath></defs>
+        <rect x="0" y="6" width="48" height="48" rx="10" fill="#312e81"/>
+        <g clip-path="url(#b2-clip)" fill="#e0e7ff">
+          <ellipse cx="19" cy="35" rx="12" ry="8" transform="rotate(-10 19 35)"/>
+          <circle cx="29" cy="19" r="8"/>
+          <polygon points="37,16 44,19 37,22"/>
+          <ellipse cx="9" cy="41" rx="6" ry="4" transform="rotate(25 9 41)"/>
+          <path d="M 10 50 Q 24 42 38 50" stroke="#c7d2fe" stroke-width="2" stroke-linecap="round" fill="none"/>
+        </g>
+        <circle cx="30" cy="17" r="1.8" fill="#312e81"/>
+        <text x="62" y="39" font-family="-apple-system, sans-serif" font-size="26" letter-spacing="-0.5">
+          <tspan fill="#f8fafc" font-weight="700">spec</tspan><tspan fill="#a5b4fc" font-weight="400">-first</tspan>
+        </text>
+      </svg>
+    </div>
+
+    <!-- FALCON dark bg -->
+    <div class="card-dark">
+      <div class="label-dark">隼 · 暗色</div>
+      <svg width="200" height="52" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><clipPath id="f2-clip"><rect x="0" y="6" width="48" height="48" rx="10"/></clipPath></defs>
+        <rect x="0" y="6" width="48" height="48" rx="10" fill="#0f172a"/>
+        <g clip-path="url(#f2-clip)" fill="#f1f5f9">
+          <ellipse cx="18" cy="33" rx="10" ry="7" transform="rotate(-20 18 33)"/>
+          <circle cx="29" cy="17" r="7"/>
+          <polygon points="36,14 43,17 36,19"/>
+          <polygon points="8,37 4,50 15,43"/>
+          <polygon points="14,27 8,23 20,25" opacity="0.6"/>
+        </g>
+        <circle cx="30" cy="15" r="1.8" fill="#0f172a"/>
+        <rect x="23" y="19" width="7" height="2.5" rx="1.25" fill="#0f172a" transform="rotate(-8 23 19)"/>
+        <text x="62" y="39" font-family="-apple-system, sans-serif" font-size="26" letter-spacing="-0.5">
+          <tspan fill="#f8fafc" font-weight="700">spec</tspan><tspan fill="#a5b4fc" font-weight="400">-first</tspan>
+        </text>
+      </svg>
+    </div>
+
+  </div>
+
+</body>
+</html>

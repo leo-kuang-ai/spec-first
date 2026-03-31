@@ -1,0 +1,45 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first">
+  <defs>
+    <linearGradient id="arc-g" x1="42" y1="38" x2="6" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#4338ca" stop-opacity="0.45"/>
+      <stop offset="55%"  stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <radialGradient id="tip-g" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#c4b5fd" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#c4b5fd" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="48" height="48" rx="10" fill="#0f172a"/>
+
+  <!-- Concentric rings at pivot -->
+  <circle cx="24" cy="6"  r="9"  fill="none" stroke="#4338ca" stroke-width="0.75" opacity="0.5"/>
+  <circle cx="24" cy="6"  r="14" fill="none" stroke="#312e81" stroke-width="0.5"  opacity="0.3"/>
+
+  <!-- Arc with gradient -->
+  <path d="M 6,38 Q 24,50 42,38" fill="none" stroke="url(#arc-g)" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Reasoning nodes -->
+  <circle cx="33" cy="43" r="1.5" fill="#6366f1" opacity="0.55"/>
+  <circle cx="24" cy="44" r="2"   fill="#818cf8" opacity="0.8"/>
+  <circle cx="15" cy="43" r="1.5" fill="#a78bfa"/>
+
+  <!-- Legs -->
+  <line x1="24" y1="6" x2="10" y2="36" stroke="#e0e7ff" stroke-width="3"   stroke-linecap="butt"/>
+  <line x1="24" y1="6" x2="38" y2="36" stroke="#e0e7ff" stroke-width="2.5" stroke-linecap="butt"/>
+
+  <!-- Tips -->
+  <polygon points="8,36 12,36 10,44"  fill="#a5b4fc"/>
+  <polygon points="37,36 39,36 38,47" fill="#c7d2fe"/>
+
+  <!-- Pivot -->
+  <circle cx="24" cy="6" r="5" fill="#c7d2fe"/>
+  <circle cx="24" cy="6" r="2" fill="#0f172a"/>
+
+  <!-- Active tip glow + spark -->
+  <circle cx="10" cy="44" r="5" fill="url(#tip-g)"/>
+  <line x1="10" y1="44" x2="6"  y2="41" stroke="#c4b5fd" stroke-width="1"    stroke-linecap="round" opacity="0.85"/>
+  <line x1="10" y1="44" x2="5"  y2="44" stroke="#c4b5fd" stroke-width="0.75" stroke-linecap="round" opacity="0.65"/>
+  <line x1="10" y1="44" x2="6"  y2="47" stroke="#c4b5fd" stroke-width="1"    stroke-linecap="round" opacity="0.5"/>
+</svg>

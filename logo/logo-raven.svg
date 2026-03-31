@@ -1,0 +1,32 @@
+<svg width="232" height="60" viewBox="0 0 232 60" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first — raven">
+  <defs>
+    <clipPath id="r-clip">
+      <rect x="0" y="6" width="48" height="48" rx="10"/>
+    </clipPath>
+  </defs>
+
+  <!-- Mark: near-black -->
+  <rect x="0" y="6" width="48" height="48" rx="10" fill="#0f172a"/>
+
+  <!-- Bird (clipped to mark) -->
+  <g clip-path="url(#r-clip)" fill="#f1f5f9">
+    <!-- Body: angled ellipse -->
+    <ellipse cx="18" cy="36" rx="11" ry="7" transform="rotate(-15 18 36)"/>
+    <!-- Head: large round (raven has big head) -->
+    <circle cx="30" cy="20" r="9"/>
+    <!-- Beak: heavy triangle pointing right -->
+    <polygon points="37,16 47,20 37,24"/>
+    <!-- Tail: wedge at lower-left -->
+    <polygon points="10,40 3,52 18,46"/>
+  </g>
+
+  <!-- Eye (punched out of head) -->
+  <circle cx="32" cy="18" r="2" fill="#0f172a"/>
+
+  <!-- Wordmark -->
+  <text x="62" y="39"
+    font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="26" letter-spacing="-0.5">
+    <tspan fill="#1e1b4b" font-weight="700">spec</tspan><tspan fill="#6366f1" font-weight="400">-first</tspan>
+  </text>
+</svg>

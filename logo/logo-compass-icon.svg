@@ -1,0 +1,19 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="spec-first icon">
+  <rect width="48" height="48" rx="10" fill="#1e1b4b"/>
+
+  <!-- Arc: the drawn spec -->
+  <path d="M 6,38 Q 24,50 42,38"
+    fill="none" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Left leg (pencil) -->
+  <line x1="24" y1="6" x2="10" y2="36" stroke="#e0e7ff" stroke-width="3" stroke-linecap="butt"/>
+  <polygon points="8,36 12,36 10,44" fill="#a5b4fc"/>
+
+  <!-- Right leg (needle) -->
+  <line x1="24" y1="6" x2="38" y2="36" stroke="#e0e7ff" stroke-width="2.5" stroke-linecap="butt"/>
+  <polygon points="37,36 39,36 38,47" fill="#c7d2fe"/>
+
+  <!-- Pivot -->
+  <circle cx="24" cy="6" r="5" fill="#c7d2fe"/>
+  <circle cx="24" cy="6" r="2" fill="#1e1b4b"/>
+</svg>
