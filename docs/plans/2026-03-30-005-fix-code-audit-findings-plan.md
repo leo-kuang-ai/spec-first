@@ -1,7 +1,7 @@
 ---
 title: fix: 清理代码审计发现
 type: fix
-status: active
+status: completed
 date: 2026-03-30
 origin: docs/brainstorms/2026-03-30-code-audit-report.md
 ---
