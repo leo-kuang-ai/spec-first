@@ -131,7 +131,6 @@ function parseInitArgs(argv) {
     help: false,
     claude: false,
     codex: false,
-    force: false,
     user: '',
     lang: '',
     unknown: [],
@@ -152,11 +151,6 @@ function parseInitArgs(argv) {
 
     if (arg === '--codex') {
       parsed.codex = true;
-      continue;
-    }
-
-    if (arg === '--force') {
-      parsed.force = true;
       continue;
     }
 

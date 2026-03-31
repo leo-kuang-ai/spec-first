@@ -256,7 +256,7 @@ spec-first/                        .claude/ or .codex/
 | 命令 | 参数 | 描述 |
 |------|------|------|
 | `spec-first doctor` | `--claude` or `--codex` | 检查环境和项目状态；无参数时自动检测当前项目中的已初始化平台 |
-| `spec-first init` | `--claude` or `--codex`, `-u`, `--lang`, `--force` | 同步命令、技能、代理与项目开发者元数据到项目 |
+| `spec-first init` | `--claude` or `--codex`, `-u`, `--lang` | 同步命令、技能、代理与项目开发者元数据到项目 |
 | `spec-first clean` | `--claude` or `--codex` | 移除受管资产，保留自定义内容 |
 
 ---
