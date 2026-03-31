@@ -1,3 +1,6 @@
+const fs = require('node:fs');
+const path = require('node:path');
+
 const PlatformAdapter = require('./base');
 
 /**
@@ -47,9 +50,6 @@ class ClaudeAdapter extends PlatformAdapter {
   }
 
   inspect(projectRoot) {
-    const fs = require('node:fs');
-    const path = require('node:path');
-
     const runtimeDir = path.join(projectRoot, this.runtimeRoot);
     const commandDir = path.join(projectRoot, this.commandRoot);
     const skillsDir = path.join(projectRoot, this.skillsRoot);
