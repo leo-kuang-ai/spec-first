@@ -7,7 +7,7 @@ console.log(`
 ║                                                            ║
 ║   🚀 Spec-First v${pkg.version} installed successfully!          ║
 ║                                                            ║
-║   📦 Harness Engineering for Claude Code                  ║
+║   📦 Harness Engineering for Claude Code & Codex         ║
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
 
@@ -15,7 +15,8 @@ console.log(`
 
   1️⃣  Initialize in your project:
      $ cd your-project
-     $ spec-first init
+     $ spec-first init --claude   # for Claude Code
+     $ spec-first init --codex    # for Codex
 
   2️⃣  Start your first spec workflow:
      $ /spec:brainstorm
