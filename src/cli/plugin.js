@@ -196,7 +196,7 @@ function inspectInstalledAssets(projectRoot, adapter) {
   return {
     commands: adapter.hasCommands
       ? inspectCommands(projectRoot, commands, adapter)
-      : { targetRoot: adapter.commandRoot, entries: [], missing: [] },
+      : { targetRoot: path.join(projectRoot, adapter.commandRoot), entries: [], missing: [] },
     skills: inspectSkills(projectRoot, skills, adapter),
     agents: inspectAgents(projectRoot, agents, adapter),
   };
@@ -277,6 +277,3 @@ function isTextFile(filePath) {
   return TEXT_FILE_EXTENSIONS.has(path.extname(filePath));
 }
 
-function adaptClaudeRuntimeContent(content) {
-  return content.replace(/\bspec-first:([a-z-]+):([a-z-]+)\b/g, '$1:$2');
-}

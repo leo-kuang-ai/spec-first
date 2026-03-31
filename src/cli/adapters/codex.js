@@ -98,11 +98,7 @@ class CodexAdapter extends PlatformAdapter {
   }
 
   syncRuntimeFiles(projectRoot) {
-    removeManagedDirectory(path.join(projectRoot, this.legacyCommandRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyCodexSkillsRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyMarketplaceRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyPluginRoot), projectRoot);
-    removeManagedDirectory(path.join(projectRoot, this.legacyPluginRootAlt), projectRoot);
+    this.removeRuntimeFiles(projectRoot);
     return [];
   }
 
@@ -132,7 +128,6 @@ function rewriteSharedPaths(content) {
     .replace(/\.claude\/skills\//g, '.agents/skills/')
     .replace(/\.codex\/skills\//g, '.agents/skills/')
     .replace(/\.claude\/agents\//g, '.codex/agents/')
-    .replace(/\.codex\/agents\//g, '.codex/agents/')
     .replace(/--claude\b/g, '--codex');
 }
 
@@ -187,7 +182,7 @@ function removeManagedDirectory(directoryPath, projectRoot) {
 
 function removeEmptyParents(startPath, stopRoot) {
   let current = startPath;
-  while (current.startsWith(stopRoot) && current !== stopRoot) {
+  while (current.startsWith(stopRoot + path.sep) && current !== stopRoot) {
     if (!fs.existsSync(current)) {
       current = path.dirname(current);
       continue;
