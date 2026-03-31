@@ -1,7 +1,7 @@
 ---
 title: Spec-First Codex 平台支持实现计划
 date: 2026-03-30
-status: active
+status: completed
 origin: docs/brainstorms/2026-03-30-codex-support-requirements.md
 ---
 
