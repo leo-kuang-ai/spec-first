@@ -1,17 +1,17 @@
 {
   "schema_version": "graph-quality/v1",
-  "generated_at": "2026-04-27T10:46:55.041Z",
-  "generation_id": "20260427104654868",
+  "generated_at": "2026-04-27T10:46:48.101Z",
+  "generation_id": "20260427104647597",
   "repo_root": "/Users/kuang/xiaobu/spec-first",
   "advisory": true,
   "coverage": {
     "final_input_count": 226,
     "parsed_count": 226,
-    "changed_parsed_count": 0,
+    "changed_parsed_count": 25,
     "skipped_count": 0,
     "no_parser_count": 0,
     "parse_error_count": 5,
-    "module_only_count": 0,
+    "module_only_count": 8,
     "skipped_sensitive_count": 3,
     "parser_success_rate": 1,
     "samples": {
@@ -28,7 +28,7 @@
   },
   "graph": {
     "node_count": 1066,
-    "edge_count": 2779,
+    "edge_count": 2711,
     "nodes_by_kind": {
       "module": 226,
       "function": 745,
@@ -39,9 +39,9 @@
     },
     "edges_by_kind": {
       "contains": 830,
-      "calls": 811,
+      "calls": 794,
       "defined_in": 840,
-      "imports_from": 298
+      "imports_from": 247
     },
     "confidence_distribution": {
       "nodes": {
@@ -49,35 +49,34 @@
       },
       "edges": {
         "Observed": 1394,
-        "Inferred": 1385
+        "Inferred": 1317
       }
     },
     "edge_resolution_methods": {
       "direct_target_id": 1394,
       "module_path_exact": 840,
-      "relative_path_extension_probe": 298,
-      "symbol_unique": 247
+      "relative_path_extension_probe": 247,
+      "symbol_unique": 230
     }
   },
   "unresolved_edges": {
-    "count": 3910,
-    "rate": 0.5845,
+    "count": 604,
+    "rate": 0.1822,
     "by_kind": {
-      "imports_from": 417,
-      "calls": 3483,
-      "contains": 10
+      "imports_from": 45,
+      "calls": 559
     },
     "by_reason": {
-      "no_match": 3825,
-      "ambiguous": 85
+      "no_match": 593,
+      "ambiguous": 11
     },
     "by_target_category": {
-      "symbol_or_unknown": 3904,
-      "relative_or_local": 6
+      "symbol_or_unknown": 600,
+      "relative_or_local": 4
     },
     "repo_package_roots": [],
     "by_resolution_method": {
-      "unresolved": 3910
+      "unresolved": 604
     },
     "samples": [
       {
@@ -183,33 +182,33 @@
     "samples": []
   },
   "communities": {
-    "count": 9,
+    "count": 13,
     "status": "available",
     "by_health": {
-      "scattered": 8,
+      "scattered": 12,
       "isolated": 1
     },
     "by_source": {
-      "hybrid": 8,
+      "hybrid": 12,
       "directory": 1
     },
     "by_algorithm": {
       "directory_with_graph_hints": 6,
-      "directory_bfs_refinement": 3
+      "directory_bfs_refinement": 7
     }
   },
   "flows": {
-    "count": 84,
+    "count": 92,
     "status": "available",
     "by_entry_source": {
       "cli_like": 56,
-      "zero_in_degree_calls": 19,
+      "zero_in_degree_calls": 27,
       "test_like": 9
     },
     "by_entry_confidence": {
-      "Inferred": 84
+      "Inferred": 92
     },
-    "truncated_count": 0
+    "truncated_count": 1
   },
   "warnings": [
     {
@@ -217,8 +216,18 @@
       "count": 3
     },
     {
+      "type": "high_unresolved_edge_rate",
+      "scope": "last_build",
+      "rate": 0.6156982670744139,
+      "unresolved_count": 604
+    },
+    {
       "type": "parse_error_files",
       "count": 5
+    },
+    {
+      "type": "module_only_files",
+      "count": 8
     }
   ],
   "limitations": [
@@ -239,7 +248,7 @@
     },
     {
       "code": "unresolved-edges",
-      "count": 3910
+      "count": 604
     }
   ]
 }

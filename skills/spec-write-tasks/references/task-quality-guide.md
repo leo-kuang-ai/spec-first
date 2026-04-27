@@ -159,6 +159,14 @@ Bad stop signals:
 - if scope changes,
 - ask the user when needed.
 
+When a stop signal triggers, choose the right destination based on the root cause:
+
+| Type | Example trigger | Recommended destination |
+|------|----------------|------------------------|
+| Plan boundary unclear | Need a new public API or CLI command not declared by the source plan | Return to `spec-plan` |
+| Task split or files incorrect | Task's declared `files` insufficient to achieve `done_signal` | Rerun `spec-write-tasks` |
+| Product or architecture decision needed | Implementation reveals two valid approaches that affect the interface design | User confirmation |
+
 ## Bad Smells
 
 | Bad smell | Why dangerous | Fix |

@@ -270,7 +270,7 @@ Every generated task must include `stop_if`. Common stop signals:
 - the task's `done_signal` cannot be proven by the available tests or verification path,
 - execution reveals a conflict between the source plan's scope boundary and the real code.
 
-When a stop signal triggers, return to `spec-plan` or rerun `spec-write-tasks`. Do not expand scope in place.
+When a stop signal triggers, route based on the root cause: plan boundary unclear → return to `spec-plan`; task split or files incorrect → rerun `spec-write-tasks`; product or architecture decision needed → user confirmation. Do not expand scope in place.
 
 ## Lint Boundary
 

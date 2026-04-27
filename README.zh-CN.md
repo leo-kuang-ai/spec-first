@@ -247,6 +247,7 @@ iOS 仓库会自动检测（`Podfile.lock` / `.xcodeproj`），并自动应用 P
 - **Git 仓库**：`spec-first init` 会读取 `git config user.name`，`graph-bootstrap` 依赖 `git ls-files`，因此不支持非 Git 目录
 - 至少安装 **Claude Code** 或 **Codex** 之一
 - 磁盘空间：可选 CRG 原生模块安装成功时，大约需要 60–120 MB 的 `node_modules`
+- Windows CRG 原生模块兜底：推荐 Node 22/24；如果必须源码编译，需要安装 VS Build Tools 2022 并勾选 **Desktop development with C++**。不推荐 Node 21，因为 `better-sqlite3@12.x` 没有 Node ABI v120 的 Windows 预编译包。
 
 ### 1. 安装
 
@@ -255,7 +256,7 @@ npm install -g spec-first
 spec-first -v
 ```
 
-> **`postinstall` 说明：** 安装器会执行 `bin/postinstall.js`，打印安装确认卡片，并在可选 CRG 原生模块存在时裁剪掉除当前平台之外的 `tree-sitter` 预编译产物。如果当前平台缺少预构建包或本机没有编译工具链，npm 仍可完成安装；CRG 缺失的原生模块会通过 `spec-first doctor` 报告，核心 `init` / `doctor` / `clean` 流程保持可用。
+> **`postinstall` 说明：** 安装器会执行 `bin/postinstall.js`，打印安装确认卡片，裁剪掉除当前平台之外的 `tree-sitter` 预编译产物，并探测 CRG 原生模块状态。安装器不会默认关闭 TLS 校验，也不会默认触发耗时源码编译。如果当前平台缺少预构建包或本机没有编译工具链，npm 仍可完成安装；CRG 原生模块状态会通过 `spec-first doctor` 报告，核心 `init` / `doctor` / `clean` 流程保持可用。
 
 ### 2. 检查环境
 
@@ -263,10 +264,21 @@ spec-first -v
 spec-first doctor
 spec-first doctor --claude   # 只检查 Claude
 spec-first doctor --codex    # 只检查 Codex
+spec-first doctor --json     # 包含 native_modules CRG readiness 事实
 ```
 
 如果 `doctor` 报告 `legacy managed state`，请重新运行 `init`。这是唯一受支持的升级路径，它会先执行一次受管 hard reset，再重建运行时。
 `doctor --json` 还会把 workflow verification evidence 作为结构化事实暴露出来：schema 有效性、freshness、`fallback_reason`，以及 `evidence_age_summary`（`oldest_*` / `newest_*` + `max_age_ms`），避免下游 workflow 自己猜证据是否过期。
+
+如果 `doctor` 报告 CRG 原生模块 `unavailable` 或 `degraded`，修复需要显式执行：
+
+```bash
+spec-first doctor --repair-native
+spec-first doctor --repair-native --mirror=npmmirror      # 网络受限环境
+spec-first doctor --repair-native --build-from-source     # 需要 C++ 编译工具链
+```
+
+`tree-sitter-kotlin@0.3.8` 当前没有 Windows 预编译包。没有本机 C++ 工具链时，Kotlin 文件会退回 module-level CRG indexing；其他语言 parser 仍可继续工作。
 
 ### 3. 初始化项目
 

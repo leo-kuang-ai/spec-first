@@ -1,17 +1,17 @@
 {
   "schema_version": "graph-quality/v1",
-  "generated_at": "2026-04-27T10:46:55.041Z",
-  "generation_id": "20260427104654868",
+  "generated_at": "2026-04-27T10:46:49.619Z",
+  "generation_id": "20260427104648394",
   "repo_root": "/Users/kuang/xiaobu/spec-first",
   "advisory": true,
   "coverage": {
     "final_input_count": 226,
-    "parsed_count": 226,
-    "changed_parsed_count": 0,
+    "parsed_count": 233,
+    "changed_parsed_count": 221,
     "skipped_count": 0,
     "no_parser_count": 0,
     "parse_error_count": 5,
-    "module_only_count": 0,
+    "module_only_count": 55,
     "skipped_sensitive_count": 3,
     "parser_success_rate": 1,
     "samples": {
@@ -27,41 +27,45 @@
     }
   },
   "graph": {
-    "node_count": 1066,
-    "edge_count": 2779,
+    "node_count": 1073,
+    "edge_count": 2790,
     "nodes_by_kind": {
       "module": 226,
       "function": 745,
       "class": 19,
       "method": 69,
       "struct": 2,
-      "interface": 5
+      "interface": 5,
+      "external_dependency": 7
     },
     "edges_by_kind": {
       "contains": 830,
       "calls": 811,
       "defined_in": 840,
-      "imports_from": 298
+      "imports_from": 298,
+      "imports_external": 11
     },
     "confidence_distribution": {
       "nodes": {
-        "Observed": 1066
+        "Observed": 1066,
+        "Inferred": 7
       },
       "edges": {
         "Observed": 1394,
-        "Inferred": 1385
+        "Inferred": 1396
       }
     },
     "edge_resolution_methods": {
       "direct_target_id": 1394,
       "module_path_exact": 840,
       "relative_path_extension_probe": 298,
-      "symbol_unique": 247
+      "symbol_unique": 247,
+      "external_dependency_stub": 11
     }
   },
   "unresolved_edges": {
     "count": 3910,
-    "rate": 0.5845,
+    "rate": 0.5836,
     "by_kind": {
       "imports_from": 417,
       "calls": 3483,
@@ -173,14 +177,46 @@
     ]
   },
   "retrieval_index": {
-    "fts_indexed": 1066,
+    "fts_indexed": 1073,
     "fts_skipped": 0,
     "coverage_status": "available"
   },
   "external_dependencies": {
-    "count": 0,
-    "by_category": {},
-    "samples": []
+    "count": 7,
+    "by_category": {
+      "third_party_external_candidate": 6,
+      "platform_external": 1
+    },
+    "samples": [
+      {
+        "name": "google",
+        "category": "third_party_external_candidate"
+      },
+      {
+        "name": "urllib",
+        "category": "third_party_external_candidate"
+      },
+      {
+        "name": "stdio",
+        "category": "third_party_external_candidate"
+      },
+      {
+        "name": "helper",
+        "category": "third_party_external_candidate"
+      },
+      {
+        "name": "kotlin",
+        "category": "platform_external"
+      },
+      {
+        "name": "com.example",
+        "category": "third_party_external_candidate"
+      },
+      {
+        "name": "AppDelegate",
+        "category": "third_party_external_candidate"
+      }
+    ]
   },
   "communities": {
     "count": 9,
@@ -217,8 +253,23 @@
       "count": 3
     },
     {
+      "type": "high_unresolved_edge_rate",
+      "scope": "last_build",
+      "rate": 0.5594505651738446,
+      "unresolved_count": 3910
+    },
+    {
       "type": "parse_error_files",
       "count": 5
+    },
+    {
+      "type": "module_only_files",
+      "count": 55
+    },
+    {
+      "type": "force_rebuild_partial",
+      "no_parser_count": 0,
+      "parse_error_count": 5
     }
   ],
   "limitations": [

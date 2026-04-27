@@ -3,6 +3,7 @@
 const { openDb } = require('../cli/open-db');
 const { makeEnvelope } = require('../cli/envelope');
 const { searchNodes } = require('../search');
+const { tokenizeQuery } = require('../retrieval/tokenize');
 
 function parseArgs(argv) {
   const options = { query: '', limit: 10, detail: 'minimal' };
@@ -60,25 +61,34 @@ function run(argv) {
     }
   };
 
-  const exactRows = db.prepare(`
-    SELECT id, name, file_path, kind, line_start, line_end, retrieval_text
-    FROM nodes
-    WHERE id = ? OR name = ? OR file_path = ?
-    LIMIT ?
-  `).all(query, query, query, options.limit);
-  for (const row of exactRows) {
-    addCandidate(row, 100, ['exact id/name/path match']);
+  const exactQueries = [
+    { sql: 'SELECT id, name, file_path, kind, line_start, line_end, retrieval_text FROM nodes WHERE id = ? LIMIT ?', evidence: 'exact id match' },
+    { sql: 'SELECT id, name, file_path, kind, line_start, line_end, retrieval_text FROM nodes WHERE name = ? LIMIT ?', evidence: 'exact name match' },
+    { sql: 'SELECT id, name, file_path, kind, line_start, line_end, retrieval_text FROM nodes WHERE file_path = ? LIMIT ?', evidence: 'exact path match' },
+  ];
+  for (const exact of exactQueries) {
+    for (const row of db.prepare(exact.sql).all(query, options.limit)) {
+      addCandidate(row, 100, [exact.evidence]);
+    }
   }
 
-  const like = `%${query.replace(/[%_]/g, '')}%`;
-  const lexicalRows = db.prepare(`
-    SELECT id, name, file_path, kind, line_start, line_end, retrieval_text
-    FROM nodes
-    WHERE name LIKE ? OR file_path LIKE ?
-    LIMIT ?
-  `).all(like, like, options.limit * 2);
-  for (const row of lexicalRows) {
-    addCandidate(row, row.file_path === query ? 95 : 70, ['lexical name/path match']);
+  const lexicalTerms = [...new Set([query, ...tokenizeQuery(query).filter((term) => term.length >= 3)])];
+  for (let termIndex = 0; termIndex < lexicalTerms.length; termIndex++) {
+    const term = lexicalTerms[termIndex];
+    const like = `%${term.replace(/[%_]/g, '')}%`;
+    const lexicalRows = db.prepare(`
+      SELECT id, name, file_path, kind, line_start, line_end, retrieval_text
+      FROM nodes
+      WHERE name LIKE ? OR file_path LIKE ? OR retrieval_text LIKE ?
+      LIMIT ?
+    `).all(like, like, like, options.limit * 2);
+    for (const row of lexicalRows) {
+      addCandidate(
+        row,
+        row.file_path === query ? 95 : (term === query ? 70 : Math.max(62, 68 - termIndex * 2)),
+        [term === query ? 'lexical name/path match' : `lexical token match: ${term}`]
+      );
+    }
   }
 
   for (const row of searchNodes(db, query, { limit: options.limit * 2 })) {
@@ -89,7 +99,9 @@ function run(argv) {
       kind: row.kind,
       retrieval_text: row.snippet,
       snippet: row.snippet,
-    }, 50 + Math.min(row.score || 0, 20), ['fts retrieval_text match']);
+    }, 50 + Math.min(row.score || 0, 20), row.matched_terms && row.matched_terms.length > 0
+      ? row.matched_terms.map((term) => `fts token match: ${term}`)
+      : ['fts retrieval_text match']);
   }
 
   const items = Array.from(candidates.values())

@@ -280,4 +280,126 @@ describe('resolveEdges', () => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  test('Java/Kotlin 全限定 import 可解析到仓库内符号节点', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'crg-graph-'));
+    const dbPath = path.join(tmpDir, 'graph.db');
+    const db = initDatabase(dbPath);
+
+    try {
+      upsertNodes(db, [
+        {
+          id: 'trade/src/main/java/com/example/trade/LoginProvider.kt#module#LoginProvider.kt#L0',
+          file_path: 'trade/src/main/java/com/example/trade/LoginProvider.kt',
+          name: 'LoginProvider.kt',
+          kind: 'module',
+        },
+        {
+          id: 'trade/src/main/java/com/example/trade/LoginProvider.kt#class#LoginProvider#L12',
+          file_path: 'trade/src/main/java/com/example/trade/LoginProvider.kt',
+          name: 'LoginProvider',
+          kind: 'class',
+          line_start: 12,
+          line_end: 60,
+        },
+        {
+          id: 'app/src/main/java/com/example/app/AppEntry.java#module#AppEntry.java#L0',
+          file_path: 'app/src/main/java/com/example/app/AppEntry.java',
+          name: 'AppEntry.java',
+          kind: 'module',
+        },
+      ]);
+
+      const result = resolveEdges(db, [
+        {
+          source_id: 'app/src/main/java/com/example/app/AppEntry.java#module#AppEntry.java#L0',
+          target_name: 'com.example.trade.LoginProvider',
+          target_path_raw: 'com.example.trade.LoginProvider',
+          kind: 'imports_from',
+        },
+      ], tmpDir);
+
+      expect(result.unresolvedCount).toBe(0);
+      expect(result.resolved).toEqual([
+        expect.objectContaining({
+          target_id: 'trade/src/main/java/com/example/trade/LoginProvider.kt#class#LoginProvider#L12',
+          resolution_method: 'jvm_fqn_symbol',
+          inference_reason: 'jvm_fqn_import_path',
+        }),
+      ]);
+    } finally {
+      db.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test('外部 import 生成 external dependency stub 而不是 unresolved 噪声', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'crg-graph-'));
+    const dbPath = path.join(tmpDir, 'graph.db');
+    const db = initDatabase(dbPath);
+
+    try {
+      upsertNodes(db, [
+        {
+          id: 'app/src/main/java/com/example/app/AppEntry.java#module#AppEntry.java#L0',
+          file_path: 'app/src/main/java/com/example/app/AppEntry.java',
+          name: 'AppEntry.java',
+          kind: 'module',
+        },
+        {
+          id: 'app/src/main/java/com/example/app/Profile.java#module#Profile.java#L0',
+          file_path: 'app/src/main/java/com/example/app/Profile.java',
+          name: 'Profile.java',
+          kind: 'module',
+        },
+      ]);
+
+      const result = resolveEdges(db, [
+        {
+          source_id: 'app/src/main/java/com/example/app/AppEntry.java#module#AppEntry.java#L0',
+          target_name: 'android.content.Context',
+          target_path_raw: 'android.content.Context',
+          kind: 'imports_from',
+        },
+        {
+          source_id: 'app/src/main/java/com/example/app/AppEntry.java#module#AppEntry.java#L0',
+          target_name: 'retrofit2.http.GET',
+          target_path_raw: 'retrofit2.http.GET',
+          kind: 'imports_from',
+        },
+        {
+          source_id: 'app/src/main/java/com/example/app/AppEntry.java#module#AppEntry.java#L0',
+          target_name: 'com.example.missing.InternalApi',
+          target_path_raw: 'com.example.missing.InternalApi',
+          kind: 'imports_from',
+        },
+      ], tmpDir);
+
+      expect(result.unresolvedCount).toBe(1);
+      expect(result.unresolved[0]).toEqual(expect.objectContaining({
+        target_path_raw: 'com.example.missing.InternalApi',
+        target_category: 'repo_internal_candidate',
+        target_package_root: 'com.example',
+      }));
+      expect(result.inferredNodes).toEqual(expect.arrayContaining([
+        expect.objectContaining({ id: 'external:platform_external:android', kind: 'external_dependency' }),
+        expect.objectContaining({ id: 'external:third_party_external_candidate:retrofit2', kind: 'external_dependency' }),
+      ]));
+      expect(result.resolved).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          target_id: 'external:platform_external:android',
+          kind: 'imports_external',
+          resolution_method: 'external_dependency_stub',
+        }),
+        expect.objectContaining({
+          target_id: 'external:third_party_external_candidate:retrofit2',
+          kind: 'imports_external',
+          resolution_method: 'external_dependency_stub',
+        }),
+      ]));
+    } finally {
+      db.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

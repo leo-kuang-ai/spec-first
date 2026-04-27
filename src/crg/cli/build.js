@@ -450,9 +450,19 @@ async function runBuildAsync(argv) {
       }
 
       // no_parser / parse_error 属于退化结果：
-      // 当前阶段不覆盖旧事实，只显式输出质量告警，等待用户/工作流修复依赖或重试 build。
+      // 已有旧事实时不覆盖；没有旧事实时保留 module 级 fallback，避免文件从查询面完全消失。
       // 其余结果（ok / module_only）视为可重建，参与文件级局部替换。
       if (qualityStatus === 'no_parser' || qualityStatus === 'parse_error') {
+        if (!existingGraphPaths.includes(file) && Array.isArray(result.nodes) && result.nodes.length > 0) {
+          parsedChanged.push(file);
+          rebuildableFiles.push(file);
+          if (quality.parsed_samples.length < 10) quality.parsed_samples.push(file);
+          for (const node of result.nodes) {
+            node.parser_quality = qualityStatus;
+            node.generation_id = generationId;
+          }
+          allNodes.push(...result.nodes.filter((node) => node.kind === 'module'));
+        }
         continue;
       }
 
@@ -477,7 +487,10 @@ async function runBuildAsync(argv) {
     }
 
     // 批量解析边并写入
-    const { resolved, unresolvedCount, unresolved } = resolveEdges(db, allRawEdges, repoRoot);
+    const { resolved, unresolvedCount, unresolved, inferredNodes = [] } = resolveEdges(db, allRawEdges, repoRoot);
+    if (inferredNodes.length > 0) {
+      upsertNodes(db, inferredNodes);
+    }
     upsertEdges(db, resolved);
     // 仅在实际处理了文件时更新 unresolved_edge_count：
     //   增量构建 0 变更时 unresolvedCount=0，不代表真实情况，保留上一次全量构建的值

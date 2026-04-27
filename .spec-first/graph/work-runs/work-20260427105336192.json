@@ -1,0 +1,9 @@
+{
+  "schema_version": "crg-work-run/v1",
+  "run_id": "work-20260427105336192",
+  "generated_at": "2026-04-27T10:53:36.192Z",
+  "work_start_ref": "878b0415761286c627d61074e463b33b468e288d",
+  "plan": null,
+  "task_pack": "/Users/kuang/xiaobu/spec-first/docs/tasks/2026-04-27-003-fix-spec-write-tasks-prose-contracts-tasks.md",
+  "planned_surface_source": "plan"
+}

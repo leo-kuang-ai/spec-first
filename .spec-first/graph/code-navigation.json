@@ -1,12 +1,18 @@
 {
   "schema_version": "code-navigation/v1",
-  "generated_at": "2026-04-27T03:41:28.563Z",
-  "generation_id": "20260427034128141",
+  "generated_at": "2026-04-27T10:46:55.063Z",
+  "generation_id": "20260427104654868",
   "entrypoints": [
     {
       "id": "src/crg/cli/build.js#function#runBuildAsync#L308",
       "name": "runBuildAsync",
       "file_path": "src/crg/cli/build.js",
+      "kind": "function"
+    },
+    {
+      "id": "src/crg/graph.js#function#resolveEdges#L284",
+      "name": "resolveEdges",
+      "file_path": "src/crg/graph.js",
       "kind": "function"
     },
     {
@@ -19,12 +25,6 @@
       "id": "src/cli/task-pack.js#function#validateTaskPackContract#L419",
       "name": "validateTaskPackContract",
       "file_path": "src/cli/task-pack.js",
-      "kind": "function"
-    },
-    {
-      "id": "src/crg/graph.js#function#resolveEdges#L157",
-      "name": "resolveEdges",
-      "file_path": "src/crg/graph.js",
       "kind": "function"
     },
     {
@@ -35,12 +35,15 @@
     }
   ],
   "test_roots": [
+    "tests/contracts/crg-cli-v1.test.js",
     "tests/integration/verification-gate.integration.test.js",
     "tests/unit/agent-audit-contracts.test.js",
     "tests/unit/agent-native-architecture-contracts.test.js",
     "tests/unit/agent-support-contracts.test.js",
+    "tests/unit/ai-dev-quality-gate.test.js",
     "tests/unit/best-practices-researcher-contracts.test.js",
     "tests/unit/branch-protection-policy.test.js",
+    "tests/unit/browser-helper-tool-contracts.test.js",
     "tests/unit/change-surface.test.js",
     "tests/unit/changelog-format.test.js",
     "tests/unit/changelog-skill-contracts.test.js",
@@ -51,16 +54,19 @@
     "tests/unit/crg-artifact-paths.test.js",
     "tests/unit/crg-bfs-queue-source.test.js",
     "tests/unit/crg-build-cli.test.js",
-    "tests/unit/crg-build-unresolved-consistency.test.js",
-    "tests/unit/crg-changes.test.js",
-    "tests/unit/crg-characterization.test.js",
-    "tests/unit/crg-chunking.test.js"
+    "tests/unit/crg-build-unresolved-consistency.test.js"
   ],
   "high_risk_nodes": [
     {
       "id": "src/crg/cli/build.js#function#runBuildAsync#L308",
       "name": "runBuildAsync",
       "file_path": "src/crg/cli/build.js",
+      "kind": "function"
+    },
+    {
+      "id": "src/crg/graph.js#function#resolveEdges#L284",
+      "name": "resolveEdges",
+      "file_path": "src/crg/graph.js",
       "kind": "function"
     },
     {
@@ -73,12 +79,6 @@
       "id": "src/cli/task-pack.js#function#validateTaskPackContract#L419",
       "name": "validateTaskPackContract",
       "file_path": "src/cli/task-pack.js",
-      "kind": "function"
-    },
-    {
-      "id": "src/crg/graph.js#function#resolveEdges#L157",
-      "name": "resolveEdges",
-      "file_path": "src/crg/graph.js",
       "kind": "function"
     },
     {
@@ -122,17 +122,17 @@
     {
       "community_id": "tests",
       "label": "tests",
-      "file_count": 101
+      "file_count": 105
     },
     {
       "community_id": "crg/0",
       "label": "crg/0",
-      "file_count": 67
+      "file_count": 75
     },
     {
       "community_id": "cli",
       "label": "cli",
-      "file_count": 21
+      "file_count": 24
     },
     {
       "community_id": "skills",
@@ -147,38 +147,38 @@
   ],
   "top_flows": [
     {
-      "flow_id": "flow:src/cli/index.js#function#runCli#L10:23",
-      "entry_node": "src/cli/index.js#function#runCli#L10",
-      "name": "runCli",
-      "criticality": 0.63,
-      "node_count": 20
-    },
-    {
-      "flow_id": "flow:src/crg/hooks/before-work.js#function#runHook#L8:71",
-      "entry_node": "src/crg/hooks/before-work.js#function#runHook#L8",
-      "name": "runHook",
-      "criticality": 0.63,
-      "node_count": 20
-    },
-    {
-      "flow_id": "flow:src/crg/cli/context.js#function#run#L41:40",
-      "entry_node": "src/crg/cli/context.js#function#run#L41",
+      "flow_id": "flow:src/crg/commands/workflow-context.js#function#run#L6:61",
+      "entry_node": "src/crg/commands/workflow-context.js#function#run#L6",
       "name": "run",
-      "criticality": 0.6,
+      "criticality": 0.7424999999999999,
       "node_count": 20
+    },
+    {
+      "flow_id": "flow:src/crg/commands/search.js#function#run#L13:59",
+      "entry_node": "src/crg/commands/search.js#function#run#L13",
+      "name": "run",
+      "criticality": 0.7388888888888888,
+      "node_count": 18
+    },
+    {
+      "flow_id": "flow:src/crg/commands/detect-changes.js#function#run#L23:48",
+      "entry_node": "src/crg/commands/detect-changes.js#function#run#L23",
+      "name": "run",
+      "criticality": 0.7374999999999999,
+      "node_count": 19
     },
     {
       "flow_id": "flow:src/crg/cli/postprocess.js#function#run#L102:41",
       "entry_node": "src/crg/cli/postprocess.js#function#run#L102",
       "name": "run",
-      "criticality": 0.6,
+      "criticality": 0.735,
       "node_count": 20
     },
     {
       "flow_id": "flow:src/crg/commands/review-context.js#function#run#L117:58",
       "entry_node": "src/crg/commands/review-context.js#function#run#L117",
       "name": "run",
-      "criticality": 0.6,
+      "criticality": 0.735,
       "node_count": 20
     }
   ],

@@ -38,6 +38,16 @@ describe('crg migrations', () => {
 
       const sourceKindColumns = db.prepare("PRAGMA index_info('idx_edges_source_kind')").all();
       expect(sourceKindColumns.map((row) => row.name)).toEqual(['source_id', 'kind']);
+
+      const nodeIndexNames = db.prepare("PRAGMA index_list('nodes')").all().map((row) => row.name);
+      expect(nodeIndexNames).toContain('idx_nodes_name');
+
+      const unresolvedIndexNames = db.prepare("PRAGMA index_list('unresolved_edges')").all().map((row) => row.name);
+      expect(unresolvedIndexNames).toEqual(expect.arrayContaining([
+        'idx_unresolved_edges_source_id',
+        'idx_unresolved_edges_target_path',
+        'idx_unresolved_edges_target_category',
+      ]));
     } finally {
       db.close();
       fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -62,6 +72,8 @@ describe('crg migrations', () => {
 
       const unresolvedColumns = db.prepare('PRAGMA table_info(unresolved_edges)').all().map((row) => row.name);
       expect(unresolvedColumns).toEqual(expect.arrayContaining([
+        'target_category',
+        'target_package_root',
         'reason',
         'confidence',
         'resolution_method',

@@ -129,6 +129,8 @@ const DDL_STATEMENTS = [
     edge_kind TEXT NOT NULL,
     target_name TEXT,
     target_path_raw TEXT,
+    target_category TEXT,
+    target_package_root TEXT,
     reason TEXT,
     confidence TEXT DEFAULT 'Unknown',
     resolution_method TEXT DEFAULT 'unresolved',
@@ -163,6 +165,7 @@ const DDL_STATEMENTS = [
 
   // 索引
   `CREATE INDEX IF NOT EXISTS idx_nodes_file_path ON nodes(file_path)`,
+  `CREATE INDEX IF NOT EXISTS idx_nodes_name ON nodes(name)`,
   `CREATE INDEX IF NOT EXISTS idx_nodes_kind ON nodes(kind)`,
   // Pass5 community 传播：WHERE file_path = ? AND kind = 'module' → 覆盖索引，避免全表扫描
   `CREATE INDEX IF NOT EXISTS idx_nodes_file_path_kind ON nodes(file_path, kind)`,
@@ -175,7 +178,9 @@ const DDL_STATEMENTS = [
   // F3/F5 assessNodeRisk：edges WHERE kind IN ('calls','imports_from') 过滤
   `CREATE INDEX IF NOT EXISTS idx_edges_kind ON edges(kind)`,
   `CREATE INDEX IF NOT EXISTS idx_unresolved_edges_source_file ON unresolved_edges(source_file)`,
+  `CREATE INDEX IF NOT EXISTS idx_unresolved_edges_source_id ON unresolved_edges(source_id)`,
   `CREATE INDEX IF NOT EXISTS idx_unresolved_edges_kind ON unresolved_edges(edge_kind)`,
+  `CREATE INDEX IF NOT EXISTS idx_unresolved_edges_target_path ON unresolved_edges(target_path_raw)`,
   `CREATE INDEX IF NOT EXISTS idx_chunks_node_id ON chunks(node_id)`,
   `CREATE INDEX IF NOT EXISTS idx_chunks_file_path ON chunks(file_path)`,
 ];
@@ -266,11 +271,14 @@ function initDatabase(dbPath) {
   ]);
 
   addMissingColumns('unresolved_edges', [
+    { name: 'target_category', ddl: 'target_category TEXT' },
+    { name: 'target_package_root', ddl: 'target_package_root TEXT' },
     { name: 'reason', ddl: 'reason TEXT' },
     { name: 'confidence', ddl: "confidence TEXT DEFAULT 'Unknown'" },
     { name: 'resolution_method', ddl: "resolution_method TEXT DEFAULT 'unresolved'" },
     { name: 'evidence', ddl: "evidence TEXT DEFAULT '[]'" },
   ]);
+  db.exec('CREATE INDEX IF NOT EXISTS idx_unresolved_edges_target_category ON unresolved_edges(target_category)');
 
   const nodeColumns = db.prepare(`PRAGMA table_info(nodes)`).all().map((column) => column.name);
   if (!nodeColumns.includes('generation_id')) {

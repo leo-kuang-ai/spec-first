@@ -47,4 +47,13 @@ describe('package install contracts', () => {
       }
     }
   });
+
+  test('postinstall keeps native repair behind explicit opt-in flags', () => {
+    const source = fs.readFileSync(path.join(REPO_ROOT, 'bin', 'postinstall.js'), 'utf8');
+
+    expect(source).toContain('SPEC_FIRST_NATIVE_REPAIR');
+    expect(source).toContain('SPEC_FIRST_NATIVE_BUILD_FROM_SOURCE');
+    expect(source).not.toContain("NODE_TLS_REJECT_UNAUTHORIZED: '0'");
+    expect(source).not.toContain('NODE_TLS_REJECT_UNAUTHORIZED=0');
+  });
 });

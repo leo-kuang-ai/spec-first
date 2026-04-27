@@ -1,9 +1,9 @@
 {
-  "generation_id": "20260427034128141",
-  "db_path": ".spec-first/graph/generations/20260427034128141/graph.db",
-  "promoted_at": "2026-04-27T03:41:28.552Z",
+  "generation_id": "20260427104654868",
+  "db_path": ".spec-first/graph/generations/20260427104654868/graph.db",
+  "promoted_at": "2026-04-27T10:46:55.050Z",
   "status": "healthy",
-  "node_count": 1030,
-  "edge_count": 2651,
-  "quality_path": ".spec-first/graph/generations/20260427034128141/graph-quality.json"
+  "node_count": 1066,
+  "edge_count": 2779,
+  "quality_path": ".spec-first/graph/generations/20260427104654868/graph-quality.json"
 }

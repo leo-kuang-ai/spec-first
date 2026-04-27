@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint:skill-entrypoints": "node scripts/lint-skill-entrypoints.js",
-    "typecheck": "node --check bin/spec-first.js && node --check bin/postinstall.js && node --check scripts/lint-skill-entrypoints.js && node --check scripts/run-ai-dev-quality-gate.js",
+    "typecheck": "node --check bin/spec-first.js && node --check bin/postinstall.js && node --check src/cli/native-modules.js && node --check scripts/lint-skill-entrypoints.js && node --check scripts/run-ai-dev-quality-gate.js",
     "build": "npm pack --dry-run",
     "release:publish": "node scripts/release-publish.cjs",
     "test:unit": "bash tests/unit/developer.sh && bash tests/unit/lang-policy.sh && bash tests/unit/mcp-setup.sh && bash tests/unit/version-reminder.sh && npx jest tests/unit --runInBand",

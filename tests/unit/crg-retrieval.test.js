@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const { initDatabase } = require('../../src/crg/migrations');
 const { upsertNodes, upsertEdges, upsertChunks } = require('../../src/crg/graph');
+const { rebuildFTS, searchNodes } = require('../../src/crg/search');
 const { retrieveContext } = require('../../src/crg/retrieval/api');
 const { buildQueryPlan } = require('../../src/crg/retrieval/query-plan');
 
@@ -77,6 +78,45 @@ describe('crg retrieval', () => {
       expect(result.ranked_context[0].file_path).toBe('src/cli/index.js');
       expect(result.ranked_context.some((item) => item.file_path === 'src/crg/router.js')).toBe(true);
       expect(result.ranked_context.some((item) => item.file_path === 'docs/README.md')).toBe(false);
+    } finally {
+      db.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test('FTS 多词 query 会拆 token 召回候选', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'crg-retrieval-'));
+    const db = initDatabase(path.join(tmpDir, 'graph.db'));
+
+    try {
+      upsertNodes(db, [
+        {
+          id: 'app/src/main/java/com/example/LoginHelper.kt#function#postLogin#L10',
+          file_path: 'app/src/main/java/com/example/LoginHelper.kt',
+          name: 'postLogin',
+          kind: 'function',
+          line_start: 10,
+          line_end: 20,
+          retrieval_text: 'postLogin user login auth',
+        },
+        {
+          id: 'app/src/main/java/com/example/Feed.kt#function#renderFeed#L1',
+          file_path: 'app/src/main/java/com/example/Feed.kt',
+          name: 'renderFeed',
+          kind: 'function',
+          line_start: 1,
+          line_end: 8,
+          retrieval_text: 'feed render timeline',
+        },
+      ]);
+      rebuildFTS(db);
+
+      const results = searchNodes(db, 'login auth sign in', { limit: 5 });
+
+      expect(results.map((item) => item.node_id)).toContain(
+        'app/src/main/java/com/example/LoginHelper.kt#function#postLogin#L10'
+      );
+      expect(results[0].matched_terms).toEqual(expect.arrayContaining(['login']));
     } finally {
       db.close();
       fs.rmSync(tmpDir, { recursive: true, force: true });

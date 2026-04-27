@@ -12,21 +12,17 @@
  */
 
 const path = require('path');
+const { tokenizeQuery } = require('./retrieval/tokenize');
 
-/**
- * 关键词搜索（FTS5 MATCH）
- *
- * @param {import('better-sqlite3').Database} db
- * @param {string} keyword - FTS5 查询关键词（支持 AND/OR/前缀* 等 FTS5 语法）
- * @param {object} [options]
- * @param {string} [options.kind] - 过滤 kind（如 'function', 'class'）
- * @param {number} [options.limit=20] - 最大返回数
- * @returns {Array<{ node_id: string, name: string, file_path: string, kind: string, score: number, snippet: string }>}
- */
-function searchNodes(db, keyword, { kind, limit = 20 } = {}) {
-  if (!keyword || !keyword.trim()) return [];
+function buildSearchTerms(keyword) {
+  const normalized = String(keyword || '').trim();
+  if (!normalized) return [];
+  const tokens = tokenizeQuery(normalized).filter((term) => term.length >= 3);
+  if (tokens.length <= 1) return [normalized];
+  return [...new Set([normalized, ...tokens])];
+}
 
-  // 构建 SQL：FTS5 JOIN nodes，可选 kind 过滤
+function runFtsQuery(db, keyword, { kind, limit }) {
   // 将关键词包裹为 FTS5 短语查询（去除双引号），防止 NOT/NEAR/column-filter 操作符注入
   const safeKeyword = '"' + keyword.replace(/"/g, '') + '"';
 
@@ -50,14 +46,52 @@ function searchNodes(db, keyword, { kind, limit = 20 } = {}) {
   `;
   params.push(limit);
 
+  return db.prepare(sql).all(...params);
+}
+
+/**
+ * 关键词搜索（FTS5 MATCH）
+ *
+ * @param {import('better-sqlite3').Database} db
+ * @param {string} keyword - FTS5 查询关键词（支持 AND/OR/前缀* 等 FTS5 语法）
+ * @param {object} [options]
+ * @param {string} [options.kind] - 过滤 kind（如 'function', 'class'）
+ * @param {number} [options.limit=20] - 最大返回数
+ * @returns {Array<{ node_id: string, name: string, file_path: string, kind: string, score: number, snippet: string }>}
+ */
+function searchNodes(db, keyword, { kind, limit = 20 } = {}) {
+  if (!keyword || !keyword.trim()) return [];
+
   try {
-    const rows = db.prepare(sql).all(...params);
+    const terms = buildSearchTerms(keyword);
+    const candidates = new Map();
+    terms.forEach((term, index) => {
+      const rows = runFtsQuery(db, term, { kind, limit: limit * 2 });
+      for (const row of rows) {
+        const existing = candidates.get(row.node_id);
+        const score = (row.score || 0) + (terms.length - index) * 0.01;
+        if (!existing) {
+          candidates.set(row.node_id, {
+            ...row,
+            score,
+            matched_terms: [term],
+          });
+        } else {
+          existing.score += score;
+          existing.matched_terms = [...new Set([...(existing.matched_terms || []), term])];
+        }
+      }
+    });
+
     // snippet：搜索结果无存储代码文本，以 "kind: name" 作为上下文摘要
-    return rows.map(row => ({
-      ...row,
-      score: Math.round(row.score * 1000) / 1000,
-      snippet: row.retrieval_text || `${row.kind}: ${row.name}`,
-    }));
+    return [...candidates.values()]
+      .sort((left, right) => right.score - left.score)
+      .slice(0, limit)
+      .map(row => ({
+        ...row,
+        score: Math.round(row.score * 1000) / 1000,
+        snippet: row.retrieval_text || `${row.kind}: ${row.name}`,
+      }));
   } catch (err) {
     // FTS5 查询语法错误時，返回空结果而非崩溃
     if (err.message && err.message.includes('fts5')) {

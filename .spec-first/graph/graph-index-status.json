@@ -1,13 +1,13 @@
 {
   "schema_version": "graph-index-status/v1",
-  "generated_at": "2026-04-27T03:41:28.563Z",
-  "generation_id": "20260427034128141",
+  "generated_at": "2026-04-27T10:46:55.063Z",
+  "generation_id": "20260427104654868",
   "state": "degraded",
   "stats": {
-    "node_count": 1030,
-    "edge_count": 2651,
-    "community_count": 15,
-    "flow_count": 90
+    "node_count": 1066,
+    "edge_count": 2779,
+    "community_count": 9,
+    "flow_count": 84
   },
   "artifacts": {
     "quality": ".spec-first/graph/graph-quality.json"
@@ -27,16 +27,8 @@
       "message": "{\"type\":\"skipped_sensitive\",\"count\":3}"
     },
     {
-      "code": "high_unresolved_edge_rate",
-      "message": "{\"type\":\"high_unresolved_edge_rate\",\"scope\":\"last_build\",\"rate\":0.5307150050352467,\"unresolved_count\":527}"
-    },
-    {
       "code": "parse_error_files",
-      "message": "{\"type\":\"parse_error_files\",\"count\":4}"
-    },
-    {
-      "code": "module_only_files",
-      "message": "{\"type\":\"module_only_files\",\"count\":17}"
+      "message": "{\"type\":\"parse_error_files\",\"count\":5}"
     }
   ]
 }

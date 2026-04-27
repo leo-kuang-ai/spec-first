@@ -47,6 +47,52 @@ function ratio(numerator, denominator) {
   return Number((numerator / denominator).toFixed(4));
 }
 
+function inferJvmPackageRoots(nodeRows) {
+  const counts = {};
+  for (const row of nodeRows || []) {
+    const filePath = row.file_path || '';
+    const match = filePath.match(/(?:^|\/)src\/(?:main|test|androidTest)\/(?:java|kotlin)\/(.+)\.(?:java|kt)$/);
+    if (!match) continue;
+    const parts = match[1].split('/');
+    if (parts.length < 3) continue;
+    const root = parts.slice(0, 2).join('.');
+    counts[root] = (counts[root] || 0) + 1;
+  }
+  return Object.entries(counts)
+    .filter(([, count]) => count >= 2)
+    .map(([root]) => root);
+}
+
+function classifyUnresolvedTarget(row, repoPackageRoots) {
+  const target = String(row && row.target_path_raw || row && row.target_name || '').replace(/^`|`$/g, '');
+  if (!target) return 'unknown';
+  if (/^(java|javax|android|androidx|kotlin|kotlinx)\./.test(target)) {
+    return 'platform_external';
+  }
+  if (repoPackageRoots.some((root) => target === root || target.startsWith(`${root}.`))) {
+    return 'repo_internal_candidate';
+  }
+  if (target.startsWith('.') || target.startsWith('/')) {
+    return 'relative_or_local';
+  }
+  if (/^[a-zA-Z_][\w$]*(\.[a-zA-Z_][\w$]*)+/.test(target)) {
+    return 'third_party_external_candidate';
+  }
+  return 'symbol_or_unknown';
+}
+
+function countUnresolvedTargetCategories(unresolvedRows, repoPackageRoots) {
+  const rows = Array.isArray(unresolvedRows) ? unresolvedRows : [];
+  const categories = {};
+  for (const row of rows) {
+    const category = row.target_category || (row.edge_kind === 'imports_from'
+      ? classifyUnresolvedTarget(row, repoPackageRoots)
+      : 'symbol_or_unknown');
+    categories[category] = (categories[category] || 0) + 1;
+  }
+  return categories;
+}
+
 function buildGraphQualityReport(db, {
   repoRoot,
   generationId,
@@ -55,9 +101,9 @@ function buildGraphQualityReport(db, {
   postprocessStats = {},
   warnings = [],
 } = {}) {
-  const nodeRows = safeAll(db, 'SELECT kind, parser_quality, confidence, source_tier FROM nodes');
+  const nodeRows = safeAll(db, 'SELECT kind, name, parser_quality, confidence, source_tier, file_path, inference_reason FROM nodes');
   const edgeRows = safeAll(db, 'SELECT kind, confidence, resolution_method FROM edges');
-  const unresolvedRows = safeAll(db, 'SELECT edge_kind, source_file, reason, confidence, resolution_method FROM unresolved_edges');
+  const unresolvedRows = safeAll(db, 'SELECT edge_kind, source_file, target_name, target_path_raw, target_category, target_package_root, reason, confidence, resolution_method FROM unresolved_edges');
   const communityRows = safeAll(db, 'SELECT health_status, community_source, algorithm, cohesion FROM communities');
   const flowRows = safeAll(db, 'SELECT entry_source, entry_confidence, truncated FROM flows');
   const ftsRow = safeGet(db, 'SELECT COUNT(*) AS count FROM fts_nodes');
@@ -73,6 +119,9 @@ function buildGraphQualityReport(db, {
   const parseErrorCount = buildSnapshot.parse_error_count ?? 0;
   const skippedCount = buildSnapshot.skipped_count ?? 0;
   const skippedSensitiveCount = buildSnapshot.skipped_sensitive_count ?? 0;
+  const repoPackageRoots = inferJvmPackageRoots(nodeRows);
+  const unresolvedTargetCategories = countUnresolvedTargetCategories(unresolvedRows, repoPackageRoots);
+  const externalDependencyRows = nodeRows.filter((row) => row.kind === 'external_dependency');
 
   const limitations = [];
   if (nodeCount === 0) {
@@ -132,6 +181,8 @@ function buildGraphQualityReport(db, {
       rate: ratio(unresolvedCount, unresolvedCount + edgeCount),
       by_kind: countBy(unresolvedRows, 'edge_kind'),
       by_reason: countBy(unresolvedRows, 'reason'),
+      by_target_category: unresolvedTargetCategories,
+      repo_package_roots: normalizeSamples(repoPackageRoots, 10),
       by_resolution_method: countBy(unresolvedRows, 'resolution_method'),
       samples: normalizeSamples(safeAll(db, `
         SELECT source_id, source_file, edge_kind, target_name, target_path_raw, reason, evidence
@@ -143,6 +194,14 @@ function buildGraphQualityReport(db, {
       fts_indexed: postprocessStats.fts_indexed ?? (ftsRow ? ftsRow.count : 0),
       fts_skipped: postprocessStats.fts_skipped ?? 0,
       coverage_status: nodeCount > 0 && (postprocessStats.fts_indexed ?? (ftsRow ? ftsRow.count : 0)) === 0 ? 'unknown' : 'available',
+    },
+    external_dependencies: {
+      count: externalDependencyRows.length,
+      by_category: countBy(externalDependencyRows, 'inference_reason'),
+      samples: normalizeSamples(externalDependencyRows.map((row) => ({
+        name: row.name,
+        category: row.inference_reason || 'unknown',
+      }))),
     },
     communities: {
       count: communityRows.length,
@@ -179,6 +238,7 @@ function summarizeGraphQuality(report) {
       count: report.unresolved_edges.count,
       rate: report.unresolved_edges.rate,
       by_reason: report.unresolved_edges.by_reason,
+      by_target_category: report.unresolved_edges.by_target_category,
     } : null,
     graph: report.graph ? {
       node_count: report.graph.node_count,
@@ -187,6 +247,7 @@ function summarizeGraphQuality(report) {
     } : null,
     communities: report.communities || null,
     flows: report.flows || null,
+    external_dependencies: report.external_dependencies || null,
     limitations: normalizeSamples(report.limitations, 8),
   };
 }
@@ -230,6 +291,7 @@ function writeGraphQualityReport(db, options = {}) {
 
 module.exports = {
   buildGraphQualityReport,
+  classifyUnresolvedTarget,
   readGraphQuality,
   summarizeGraphQuality,
   writeGraphQualityReport,

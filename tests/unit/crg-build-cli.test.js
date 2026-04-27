@@ -538,10 +538,12 @@ describe('crg build/stats cli', () => {
       module_only_count: 1,
     });
     expect(deleteStaleNodes).toHaveBeenNthCalledWith(1, expect.any(Object), []);
-    expect(deleteStaleNodes).toHaveBeenNthCalledWith(2, expect.any(Object), ['src/c.rb']);
-    expect(upsertNodes).toHaveBeenCalledWith(expect.any(Object), [
-      expect.objectContaining({ id: 'src/c.rb#module#c.rb#L0' }),
-    ]);
+    expect(deleteStaleNodes).toHaveBeenNthCalledWith(2, expect.any(Object), ['src/a.swift', 'src/b.kt', 'src/c.rb']);
+    expect(upsertNodes).toHaveBeenCalledWith(expect.any(Object), expect.arrayContaining([
+      expect.objectContaining({ id: 'src/a.swift#module#a.swift#L0', parser_quality: 'no_parser' }),
+      expect.objectContaining({ id: 'src/b.kt#module#b.kt#L0', parser_quality: 'parse_error' }),
+      expect.objectContaining({ id: 'src/c.rb#module#c.rb#L0', parser_quality: 'module_only' }),
+    ]));
     expect(replaceUnresolvedEdges).toHaveBeenCalledWith(expect.any(Object), [
       expect.objectContaining({ source_file: 'src/c.rb', edge_kind: 'imports_from', target_name: 'json' }),
       expect.objectContaining({ source_file: 'src/c.rb', edge_kind: 'imports_from', target_name: 'yaml' }),

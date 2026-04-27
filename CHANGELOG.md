@@ -1,6 +1,11 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.0 2026-04-27 20:00:00 leokuang: docs(task-pack): 新增 2026-04-27-003 任务包——6 tasks / 5 waves，覆盖 spec-write-tasks prose 修复 R1–R8
+- v1.6.0 2026-04-27 19:45:00 leokuang: docs(plan): 新增 2026-04-27-003 计划——修复 spec-write-tasks skill prose 的 8 处不一致（orientation_evidence 层级、stop_if 路由、draft 术语、wave serialize 规则、JSON/Markdown sync、semantic_posture 定义、R7 UX、schema 迁移占位）
+- v1.6.0 2026-04-27 18:20:00 leokuang: fix(crg): 为 graph.db 补充 unresolved 查询索引与目标分类字段，外部依赖改为显式 stub 节点，并在解析失败时保留文件级 fallback 节点 (user-visible)
+- v1.6.0 2026-04-27 18:00:33 leokuang: 增强 Windows npm 安装健壮性，postinstall 改为原生依赖探测优先，新增 doctor native matrix / 显式 repair 指引，并扩展 npm install CI 到 Node 24 与 native facts 校验 (user-visible)
+- v1.6.0 2026-04-27 17:37:24 leokuang: fix(crg): 改善 locate 多词自然语言召回，新增 unresolved 目标分桶，并支持 Java/Kotlin FQN import 解析到仓库内符号 (user-visible)
 - v1.6.0 2026-04-27 09:30:00 leokuang: feat(spec-standards): promote 3 new formal standards to docs/specs/common/ — cli-command-safety, nodejs-conventions, secret-redaction; index rebuilt (10 specs, 18 rules) (user-visible)
 - v1.6.0 2026-04-27 15:53:49 leokuang: docs(claude-runtime): 新增 Claude Code 上下文频繁 compact 根因分析与彻底解决方案，明确 command thin wrapper、workflow 按需加载、context budget doctor 与语义保真验证路线 (user-visible)
 - v1.6.0 2026-04-27 15:52:17 leokuang: docs(spec-standards): 新增完整规范系统剩余工作路线图，明确 dogfood、Profile Registry、manual normalize、refresh proposal、sync、shared attach 与发布标准 (user-visible)

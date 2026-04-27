@@ -1,7 +1,7 @@
 {
   "schema_version": "repo-topology/v1",
   "repo_root": "/Users/kuang/xiaobu/spec-first",
-  "generated_at": "2026-04-27T03:41:28.548Z",
+  "generated_at": "2026-04-27T10:46:55.041Z",
   "kind": "single_repo",
   "detectors": [
     "maven"

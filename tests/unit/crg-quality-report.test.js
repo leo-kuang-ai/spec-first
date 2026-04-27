@@ -67,4 +67,111 @@ describe('crg graph quality report', () => {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
   });
+
+  test('unresolved imports 会按平台、仓库内候选和第三方依赖分桶', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'crg-quality-'));
+    const db = initDatabase(path.join(tmpDir, 'graph.db'));
+
+    try {
+      upsertNodes(db, [
+        {
+          id: 'app/src/main/java/com/example/app/LoginHelper.kt#module#LoginHelper.kt#L0',
+          file_path: 'app/src/main/java/com/example/app/LoginHelper.kt',
+          name: 'LoginHelper.kt',
+          kind: 'module',
+        },
+        {
+          id: 'app/src/main/java/com/example/app/Profile.kt#module#Profile.kt#L0',
+          file_path: 'app/src/main/java/com/example/app/Profile.kt',
+          name: 'Profile.kt',
+          kind: 'module',
+        },
+      ]);
+      replaceUnresolvedEdges(db, [
+        {
+          source_id: 'app/src/main/java/com/example/app/Profile.kt#module#Profile.kt#L0',
+          source_file: 'app/src/main/java/com/example/app/Profile.kt',
+          edge_kind: 'imports_from',
+          target_name: 'com.example.app.LoginHelper',
+          target_path_raw: 'com.example.app.LoginHelper',
+          reason: 'no_match',
+        },
+        {
+          source_id: 'app/src/main/java/com/example/app/Profile.kt#module#Profile.kt#L0',
+          source_file: 'app/src/main/java/com/example/app/Profile.kt',
+          edge_kind: 'imports_from',
+          target_name: 'android.content.Context',
+          target_path_raw: 'android.content.Context',
+          reason: 'no_match',
+        },
+        {
+          source_id: 'app/src/main/java/com/example/app/Profile.kt#module#Profile.kt#L0',
+          source_file: 'app/src/main/java/com/example/app/Profile.kt',
+          edge_kind: 'imports_from',
+          target_name: 'retrofit2.http.GET',
+          target_path_raw: 'retrofit2.http.GET',
+          reason: 'no_match',
+        },
+      ]);
+
+      const report = buildGraphQualityReport(db, {
+        repoRoot: tmpDir,
+        generationId: 'gen-1',
+        buildSnapshot: { final_input_count: 2, parsed_count: 2 },
+      });
+
+      expect(report.unresolved_edges.by_target_category).toEqual(expect.objectContaining({
+        repo_internal_candidate: 1,
+        platform_external: 1,
+        third_party_external_candidate: 1,
+      }));
+      expect(report.unresolved_edges.repo_package_roots).toContain('com.example');
+    } finally {
+      db.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test('报告 external dependency stub 分布', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'crg-quality-'));
+    const db = initDatabase(path.join(tmpDir, 'graph.db'));
+
+    try {
+      upsertNodes(db, [
+        {
+          id: 'external:platform_external:android',
+          file_path: 'external/platform_external/android',
+          name: 'android',
+          kind: 'external_dependency',
+          inference_reason: 'platform_external',
+          source_tier: 'external_dependency',
+        },
+        {
+          id: 'external:third_party_external_candidate:retrofit2',
+          file_path: 'external/third_party_external_candidate/retrofit2',
+          name: 'retrofit2',
+          kind: 'external_dependency',
+          inference_reason: 'third_party_external_candidate',
+          source_tier: 'external_dependency',
+        },
+      ]);
+
+      const report = buildGraphQualityReport(db, {
+        repoRoot: tmpDir,
+        generationId: 'gen-1',
+        buildSnapshot: { final_input_count: 2, parsed_count: 2 },
+      });
+
+      expect(report.external_dependencies).toEqual(expect.objectContaining({
+        count: 2,
+        by_category: expect.objectContaining({
+          platform_external: 1,
+          third_party_external_candidate: 1,
+        }),
+      }));
+    } finally {
+      db.close();
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
 });

@@ -3,6 +3,7 @@
 const path = require('node:path');
 const pkg = require('../package.json');
 const { execFileSync, spawnSync } = require('node:child_process');
+const { buildNativeDiagnostics, formatNativeSummary, hostMirrorEnv, windowsBuildToolsHint } = require('../src/cli/native-modules');
 
 const ver = `spec-first v${pkg.version}`;
 const LINE = '─'.repeat(50);
@@ -31,11 +32,11 @@ try {
   // 裁剪失败不影响安装
 }
 
-// 修复 CRG 原生模块（better-sqlite3 是 optionalDependency，安装失败时主动修复）
+// 检查 CRG 原生模块。默认只探测和提示；耗时编译/镜像下载必须显式 opt-in。
 try {
-  repairCrgNativeModule();
+  checkCrgNativeModules();
 } catch (_) {
-  // 修复异常不影响主安装流程（postinstall 失败会导致整体安装报错）
+  // native 探测失败不影响主安装流程（postinstall 失败会导致整体安装报错）
 }
 
 function probeBetterSqlite() {
@@ -65,18 +66,18 @@ function repairCrgNativeModule() {
 
   const sqliteDir = findBetterSqliteDir();
   if (!sqliteDir) {
-    showCrgHint(null);
+    showCrgHint();
     return;
   }
 
   process.stdout.write('  正在修复 CRG 原生模块 (better-sqlite3)...\n');
 
-  // Strategy 1: prebuild-install + SSL bypass（覆盖企业代理 / 证书拦截场景）
+  // Strategy 1: prebuild-install（可通过 SPEC_FIRST_NATIVE_MIRROR=npmmirror 选择国内镜像）
   const prebuildBin = findPrebuildInstallBin(sqliteDir);
   if (prebuildBin) {
     const r1 = spawnSync(process.execPath, [prebuildBin, '--tag-prefix', 'v'], {
       cwd: sqliteDir,
-      env: { ...process.env, NODE_TLS_REJECT_UNAUTHORIZED: '0' },
+      env: { ...process.env, ...hostMirrorEnv(process.env.SPEC_FIRST_NATIVE_MIRROR) },
       timeout: 60000,
       encoding: 'utf8',
     });
@@ -86,7 +87,12 @@ function repairCrgNativeModule() {
     }
   }
 
-  // Strategy 2: node-gyp rebuild（需要 C++ 编译环境）
+  if (process.env.SPEC_FIRST_NATIVE_BUILD_FROM_SOURCE !== '1') {
+    showCrgHint();
+    return;
+  }
+
+  // Strategy 2: node-gyp rebuild（需要 C++ 编译环境，必须显式 opt-in）
   const r2 = spawnSync('node-gyp', ['rebuild', '--release'], {
     cwd: sqliteDir,
     timeout: 120000,
@@ -98,46 +104,66 @@ function repairCrgNativeModule() {
     return;
   }
 
-  showCrgHint(sqliteDir);
+  showCrgHint();
 }
 
-function showCrgHint(sqliteDir) {
-  const plat = process.platform;
-  const prebuildBin = sqliteDir ? (findPrebuildInstallBin(sqliteDir) || path.join(sqliteDir, 'node_modules', 'prebuild-install', 'bin.js')) : null;
-  const rebuildCmd = prebuildBin
-    ? `node "${prebuildBin}" --tag-prefix v`
-    : `npm rebuild better-sqlite3`;
+function checkCrgNativeModules() {
+  const diagnostics = buildNativeDiagnostics();
+  if (diagnostics.crg_status === 'ready') return;
 
+  process.stdout.write(
+    `  注意: CRG 原生模块状态 ${formatNativeSummary(diagnostics)}\n` +
+    `  spec-first init / doctor / clean 正常；CRG 可能降级或暂不可用\n`
+  );
+
+  const hint = windowsBuildToolsHint();
+  if (hint) {
+    process.stdout.write(`  Windows: ${hint}\n`);
+  }
+
+  if (process.env.SPEC_FIRST_NATIVE_REPAIR === '1') {
+    repairCrgNativeModule();
+    return;
+  }
+
+  process.stdout.write(
+    `  如需重试 native 修复: spec-first doctor --repair-native\n` +
+    `  国内镜像: spec-first doctor --repair-native --mirror=npmmirror\n\n`
+  );
+}
+
+function showCrgHint() {
+  const plat = process.platform;
   let sslFixLines;
   if (plat === 'win32') {
     sslFixLines = [
-      `  CMD:         set NODE_TLS_REJECT_UNAUTHORIZED=0 && ${rebuildCmd}`,
-      `  PowerShell:  $env:NODE_TLS_REJECT_UNAUTHORIZED='0'; ${rebuildCmd}`,
+      `  CMD:         spec-first doctor --repair-native --mirror=npmmirror`,
+      `  PowerShell:  spec-first doctor --repair-native --mirror=npmmirror`,
     ];
   } else {
-    sslFixLines = [`               NODE_TLS_REJECT_UNAUTHORIZED=0 ${rebuildCmd}`];
+    sslFixLines = [`               spec-first doctor --repair-native --mirror=npmmirror`];
   }
 
   let compilerHint;
   if (plat === 'win32') {
     compilerHint = `  2. 安装 VS Build Tools 2022（勾选"Desktop development with C++"）后:\n` +
                    `     https://aka.ms/vs/17/release/vs_BuildTools.exe\n` +
-                   `     npm rebuild better-sqlite3`;
+                   `     spec-first doctor --repair-native --build-from-source`;
   } else if (plat === 'darwin') {
     compilerHint = `  2. 安装 Xcode 命令行工具后:\n` +
                    `     xcode-select --install\n` +
-                   `     npm rebuild better-sqlite3`;
+                   `     spec-first doctor --repair-native --build-from-source`;
   } else {
     compilerHint = `  2. 安装 C++ 编译环境后:\n` +
                    `     apt-get install -y build-essential python3  # Debian/Ubuntu\n` +
-                   `     npm rebuild better-sqlite3`;
+                   `     spec-first doctor --repair-native --build-from-source`;
   }
 
   process.stdout.write(
     `  注意: CRG 原生模块 (better-sqlite3) 不可用\n` +
     `  spec-first init / doctor / clean 正常，spec-first crg 暂不可用\n\n` +
     `  修复方法（任选一）:\n` +
-    `  1. 绕过 SSL 重新下载预编译包:\n` +
+    `  1. 使用镜像重新下载预编译包:\n` +
     sslFixLines.join('\n') + '\n' +
     compilerHint + '\n\n'
   );

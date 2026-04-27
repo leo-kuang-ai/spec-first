@@ -1,7 +1,7 @@
 {
   "schema_version": "graph-quality/v1",
-  "generated_at": "2026-04-27T10:46:55.041Z",
-  "generation_id": "20260427104654868",
+  "generated_at": "2026-04-27T10:46:54.744Z",
+  "generation_id": "20260427104654589",
   "repo_root": "/Users/kuang/xiaobu/spec-first",
   "advisory": true,
   "coverage": {

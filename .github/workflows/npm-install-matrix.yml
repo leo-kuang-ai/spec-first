@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        node: [20, 22]
+        node: [20, 22, 24]
 
     steps:
       - name: Checkout
@@ -114,6 +114,34 @@ jobs:
           runCli(['-v']);
 
           const installedPackage = require(path.join(packageRoot, 'package.json'));
+          const doctor = spawnSync(shim, ['doctor', '--json'], {
+            encoding: 'utf8',
+            shell: process.platform === 'win32',
+            env: {
+              ...process.env,
+              SPEC_FIRST_VERSION_REMINDER_LATEST: installedPackage.version,
+            },
+          });
+          if (doctor.status !== 0) {
+            process.stdout.write(doctor.stdout || '');
+            process.stderr.write(doctor.stderr || '');
+            process.exit(doctor.status || 1);
+          }
+
+          const doctorPayload = JSON.parse(doctor.stdout);
+          if (!doctorPayload.native_modules || !doctorPayload.native_modules.node) {
+            throw new Error('doctor --json did not include native_modules facts');
+          }
+          if (!['ready', 'degraded', 'unavailable'].includes(doctorPayload.native_modules.crg_status)) {
+            throw new Error(`unexpected native_modules.crg_status: ${doctorPayload.native_modules.crg_status}`);
+          }
+          if (!Array.isArray(doctorPayload.native_modules.modules) || doctorPayload.native_modules.modules.length === 0) {
+            throw new Error('doctor --json native_modules.modules is empty');
+          }
+          if (process.platform === 'win32' && !['22', '24'].includes(String(process.versions.node.split('.')[0]))) {
+            console.log('Windows Node 20 remains a compatibility lane; Node 22/24 are recommended for CRG native prebuilds.');
+          }
+
           for (const name of Object.keys(installedPackage.optionalDependencies || {})) {
             if (name !== 'better-sqlite3' && name !== 'tree-sitter' && !name.startsWith('tree-sitter-')) {
               continue;

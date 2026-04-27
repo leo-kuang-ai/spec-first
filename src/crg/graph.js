@@ -139,6 +139,133 @@ function deleteStaleNodes(db, deletedPaths) {
   deleteAll(deletedPaths);
 }
 
+function deriveJvmPackagePath(filePath) {
+  const normalized = String(filePath || '').replace(/\\/g, '/');
+  const match = normalized.match(/(?:^|\/)src\/(?:main|test|androidTest)\/(?:java|kotlin)\/(.+)\.(?:java|kt)$/);
+  if (!match) return null;
+  const parts = match[1].split('/');
+  if (parts.length < 2) return null;
+  return parts.slice(0, -1).join('.');
+}
+
+function inferJvmPackageRootsFromRows(rows) {
+  const counts = Object.create(null);
+  for (const row of rows || []) {
+    const packagePath = deriveJvmPackagePath(row.file_path);
+    if (!packagePath) continue;
+    const parts = packagePath.split('.');
+    if (parts.length < 2) continue;
+    const root = parts.slice(0, 2).join('.');
+    counts[root] = (counts[root] || 0) + 1;
+  }
+  return Object.entries(counts)
+    .filter(([, count]) => count >= 2)
+    .map(([root]) => root);
+}
+
+function classifyExternalImportTarget(rawPath, repoPackageRoots = []) {
+  const normalized = String(rawPath || '').replace(/^`|`$/g, '').replace(/\.\*$/, '');
+  if (!normalized || normalized.startsWith('.') || normalized.startsWith('/')) return null;
+  const platformMatch = normalized.match(/^(java|javax|android|androidx|kotlin|kotlinx)(?:\.|$)/);
+  if (platformMatch) {
+    return {
+      category: 'platform_external',
+      packageName: platformMatch[1],
+    };
+  }
+  if (repoPackageRoots.some((root) => normalized === root || normalized.startsWith(`${root}.`))) {
+    return null;
+  }
+  if (!/^[A-Za-z_][\w$]*(\.[A-Za-z_][\w$]*)+/.test(normalized)) return null;
+  const parts = normalized.split('.');
+  const packageName = parts[0] === 'com' && parts.length >= 2
+    ? parts.slice(0, 2).join('.')
+    : parts[0];
+  return {
+    category: 'third_party_external_candidate',
+    packageName,
+  };
+}
+
+function classifyUnresolvedImportTarget(rawPath, repoPackageRoots = []) {
+  const normalized = String(rawPath || '').replace(/^`|`$/g, '').replace(/\.\*$/, '');
+  if (!normalized) {
+    return { category: 'unknown', packageRoot: null };
+  }
+  if (normalized.startsWith('.') || normalized.startsWith('/')) {
+    return { category: 'relative_or_local', packageRoot: null };
+  }
+  const platformMatch = normalized.match(/^(java|javax|android|androidx|kotlin|kotlinx)(?:\.|$)/);
+  if (platformMatch) {
+    return { category: 'platform_external', packageRoot: platformMatch[1] };
+  }
+  const repoRoot = repoPackageRoots.find((root) => normalized === root || normalized.startsWith(`${root}.`));
+  if (repoRoot) {
+    return { category: 'repo_internal_candidate', packageRoot: repoRoot };
+  }
+  if (/^[A-Za-z_][\w$]*(\.[A-Za-z_][\w$]*)+/.test(normalized)) {
+    const parts = normalized.split('.');
+    const packageRoot = parts[0] === 'com' && parts.length >= 2
+      ? parts.slice(0, 2).join('.')
+      : parts[0];
+    return { category: 'third_party_external_candidate', packageRoot };
+  }
+  return { category: 'symbol_or_unknown', packageRoot: null };
+}
+
+function buildExternalDependencyNode({ category, packageName, target }) {
+  const safePackageName = String(packageName || 'unknown').replace(/[^\w.-]+/g, '_');
+  const id = `external:${category}:${safePackageName}`;
+  return {
+    id,
+    file_path: `external/${category}/${safePackageName}`,
+    name: safePackageName,
+    kind: 'external_dependency',
+    line_start: 0,
+    line_end: 0,
+    is_test: 0,
+    parser_quality: 'external',
+    summary: `external dependency ${safePackageName}`,
+    retrieval_text: `${safePackageName} ${target || ''} external dependency ${category}`.trim(),
+    confidence: 'Inferred',
+    source_tier: 'external_dependency',
+    evidence: [`external import target: ${target || safePackageName}`],
+    inference_reason: category,
+  };
+}
+
+function chooseNearestCandidate(candidates, srcFilePath) {
+  if (!candidates || candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+
+  const priority = { class: 4, interface: 4, function: 3, module: 1 };
+  const srcDir = srcFilePath && srcFilePath.includes('/')
+    ? srcFilePath.split('/').slice(0, -1).join('/')
+    : '';
+  const srcSegs = srcDir ? srcDir.split('/') : [];
+  let best = null;
+  let bestLen = -1;
+  let bestPriority = -1;
+  for (const candidate of candidates) {
+    const filePath = candidate.file_path || '';
+    const candidateDir = filePath.includes('/')
+      ? filePath.split('/').slice(0, -1).join('/')
+      : '';
+    const candidateSegs = candidateDir ? candidateDir.split('/') : [];
+    let common = 0;
+    while (common < srcSegs.length && common < candidateSegs.length && srcSegs[common] === candidateSegs[common]) {
+      common++;
+    }
+    const candidatePriority = priority[candidate.kind] || 0;
+    if (common > bestLen || (common === bestLen && candidatePriority > bestPriority)) {
+      bestLen = common;
+      bestPriority = candidatePriority;
+      best = candidate;
+    }
+  }
+  return best;
+}
+
 /**
  * 将 rawEdges 解析为可入库的 canonical edges
  *
@@ -246,6 +373,70 @@ function resolveEdges(db, rawEdges, repoRoot) {
   // ------------------------------------------------------------------
   const symbolCache = Object.create(null);
   const { resolveTsconfigImport } = require('./resolvers/tsconfig');
+  let jvmFqnCache = null;
+  let jvmPackageRoots = null;
+  const inferredNodes = new Map();
+
+  const loadJvmNodeRows = () => db.prepare(`
+    SELECT id, file_path, name, kind
+    FROM nodes
+    WHERE file_path LIKE '%.java' OR file_path LIKE '%.kt'
+  `).all();
+
+  const getJvmPackageRoots = () => {
+    if (jvmPackageRoots) return jvmPackageRoots;
+    jvmPackageRoots = inferJvmPackageRootsFromRows(loadJvmNodeRows());
+    return jvmPackageRoots;
+  };
+
+  const buildJvmFqnCache = () => {
+    if (jvmFqnCache) return jvmFqnCache;
+    const rows = loadJvmNodeRows();
+    const byFqn = new Map();
+    const add = (fqn, row) => {
+      if (!fqn) return;
+      if (!byFqn.has(fqn)) byFqn.set(fqn, []);
+      byFqn.get(fqn).push(row);
+    };
+
+    for (const row of rows) {
+      const packagePath = deriveJvmPackagePath(row.file_path);
+      if (!packagePath) continue;
+      if (row.kind === 'module') {
+        const basename = row.file_path.split('/').pop().replace(/\.(java|kt)$/, '');
+        add(`${packagePath}.${basename}`, row);
+      } else if (['class', 'interface', 'function'].includes(row.kind)) {
+        add(`${packagePath}.${row.name}`, row);
+      }
+    }
+    jvmFqnCache = byFqn;
+    jvmPackageRoots = inferJvmPackageRootsFromRows(rows);
+    return jvmFqnCache;
+  };
+
+  const resolveJvmFqnImport = (rawPath, srcFilePath) => {
+    const normalized = String(rawPath || '').replace(/^`|`$/g, '').replace(/\.\*$/, '');
+    if (!/^[A-Za-z_][\w$]*(\.[A-Za-z_][\w$]*)+$/.test(normalized)) return null;
+    if (/^(java|javax|android|androidx|kotlin|kotlinx)\./.test(normalized)) return null;
+    const cache = buildJvmFqnCache();
+    let lookup = normalized.replace(/\.\*$/, '');
+    while (lookup.includes('.')) {
+      const candidates = cache.get(lookup);
+      const best = chooseNearestCandidate(candidates, srcFilePath);
+      if (best) {
+        return {
+          target_id: best.id,
+          resolution_method: best.kind === 'module' ? 'jvm_fqn_module' : 'jvm_fqn_symbol',
+          inference_reason: 'jvm_fqn_import_path',
+          evidence: [`JVM import ${normalized} resolved by package path to ${best.id}`],
+        };
+      }
+      const next = lookup.split('.').slice(0, -1).join('.');
+      if (next === lookup) break;
+      lookup = next;
+    }
+    return null;
+  };
 
   // 全局查询：返回所有同名节点（非 module）
   const getAllSymbolRows = db.prepare(
@@ -283,6 +474,7 @@ function resolveEdges(db, rawEdges, repoRoot) {
     let confidence = 'Inferred';
     let inferenceReason = null;
     const evidence = [];
+    let edgeKind = raw.kind || 'unknown';
 
     // 阶段0：raw edge 已自带 target_id
     if (raw.target_id && hasNode(raw.target_id)) {
@@ -359,6 +551,34 @@ function resolveEdges(db, rawEdges, repoRoot) {
 
     if (!targetId && raw.target_path_raw && raw.source_id) {
       const sourceFile = raw.source_id.split('#', 1)[0] || '';
+      const resolvedJvmFqn = resolveJvmFqnImport(raw.target_path_raw, sourceFile);
+      if (resolvedJvmFqn && resolvedJvmFqn.target_id) {
+        targetId = resolvedJvmFqn.target_id;
+        resolutionMethod = resolvedJvmFqn.resolution_method;
+        inferenceReason = resolvedJvmFqn.inference_reason;
+        evidence.push(...resolvedJvmFqn.evidence);
+      }
+    }
+
+    if (!targetId && raw.kind === 'imports_from' && raw.target_path_raw) {
+      const external = classifyExternalImportTarget(raw.target_path_raw, getJvmPackageRoots());
+      if (external) {
+        const node = buildExternalDependencyNode({
+          ...external,
+          target: raw.target_path_raw,
+        });
+        inferredNodes.set(node.id, node);
+        targetId = node.id;
+        resolutionMethod = 'external_dependency_stub';
+        confidence = 'Inferred';
+        inferenceReason = external.category;
+        evidence.push(`external dependency stub: ${external.packageName}`);
+        edgeKind = 'imports_external';
+      }
+    }
+
+    if (!targetId && raw.target_path_raw && raw.source_id) {
+      const sourceFile = raw.source_id.split('#', 1)[0] || '';
       const resolvedAlias = resolveTsconfigImport(db, {
         repoRoot,
         sourceFile,
@@ -395,12 +615,17 @@ function resolveEdges(db, rawEdges, repoRoot) {
         : evidence.some((item) => String(item).includes('ambiguous'))
           ? 'ambiguous'
           : 'no_match';
+      const targetClassification = raw.kind === 'imports_from'
+        ? classifyUnresolvedImportTarget(raw.target_path_raw || raw.target_name, getJvmPackageRoots())
+        : { category: 'symbol_or_unknown', packageRoot: null };
       unresolved.push({
         source_id: raw.source_id,
         source_file: raw.source_id ? raw.source_id.split('#', 1)[0] : '',
         edge_kind: raw.kind,
         target_name: raw.target_name || null,
         target_path_raw: raw.target_path_raw || null,
+        target_category: targetClassification.category,
+        target_package_root: targetClassification.packageRoot,
         reason: unresolvedReason,
         confidence: 'Unknown',
         resolution_method: 'unresolved',
@@ -410,12 +635,12 @@ function resolveEdges(db, rawEdges, repoRoot) {
     }
 
     // 边 id = source_id:target_id:kind（确保幂等）
-    const edgeId = `${raw.source_id}:${targetId}:${raw.kind}`;
+    const edgeId = `${raw.source_id}:${targetId}:${edgeKind}`;
     resolved.push({
       id: edgeId,
       source_id: raw.source_id,
       target_id: targetId,
-      kind: raw.kind,
+      kind: edgeKind,
       weight: 1.0,
       confidence,
       resolution_method: resolutionMethod || 'unknown',
@@ -424,7 +649,7 @@ function resolveEdges(db, rawEdges, repoRoot) {
     });
   }
 
-  return { resolved, unresolvedCount, unresolved };
+  return { resolved, unresolvedCount, unresolved, inferredNodes: [...inferredNodes.values()] };
 }
 
 /**
@@ -495,8 +720,8 @@ function replaceUnresolvedEdges(db, rows) {
   const insert = db.prepare(`
     INSERT INTO unresolved_edges (
       source_id, source_file, edge_kind, target_name, target_path_raw,
-      reason, confidence, resolution_method, evidence
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      target_category, target_package_root, reason, confidence, resolution_method, evidence
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const runAll = db.transaction((items) => {
@@ -508,6 +733,8 @@ function replaceUnresolvedEdges(db, rows) {
         row.edge_kind,
         row.target_name || null,
         row.target_path_raw || null,
+        row.target_category || null,
+        row.target_package_root || null,
         row.reason || 'no_match',
         row.confidence || 'Unknown',
         row.resolution_method || 'unresolved',
@@ -527,4 +754,6 @@ module.exports = {
   resolveEdges,
   setUnresolvedEdgeCount,
   replaceUnresolvedEdges,
+  classifyExternalImportTarget,
+  classifyUnresolvedImportTarget,
 };

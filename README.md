@@ -247,6 +247,7 @@ These `/spec:*` and `$spec-*` surfaces are generated runtime workflow entrypoint
 - **Git repository** — `spec-first init` reads `git config user.name` and `graph-bootstrap` depends on `git ls-files`, so non-Git directories are not supported
 - At least one of **Claude Code** or **Codex**
 - Disk: roughly 60–120 MB of `node_modules` when optional CRG native modules install successfully
+- Windows CRG native fallback: Node 22/24 are the recommended lines; source builds require VS Build Tools 2022 with **Desktop development with C++**. Node 21 is not recommended because `better-sqlite3@12.x` does not publish a Node ABI v120 Windows prebuild.
 
 ### 1. Install
 
@@ -255,7 +256,7 @@ npm install -g spec-first
 spec-first -v
 ```
 
-> **`postinstall` note:** The installer runs `bin/postinstall.js`, prints an install confirmation card, and trims native `tree-sitter` prebuilds for platforms other than yours when those optional CRG modules are present. If a platform lacks a native prebuild or compiler toolchain, npm can still complete the install; CRG reports the missing native module through `spec-first doctor` while the core `init` / `doctor` / `clean` flow remains available.
+> **`postinstall` note:** The installer runs `bin/postinstall.js`, prints an install confirmation card, trims native `tree-sitter` prebuilds for platforms other than yours, and probes CRG native modules. It does **not** default to TLS bypasses or long source builds. If a platform lacks a native prebuild or compiler toolchain, npm can still complete the install; CRG reports native readiness through `spec-first doctor` while the core `init` / `doctor` / `clean` flow remains available.
 
 ### 2. Check the environment
 
@@ -263,10 +264,21 @@ spec-first -v
 spec-first doctor
 spec-first doctor --claude   # Claude-only scope
 spec-first doctor --codex    # Codex-only scope
+spec-first doctor --json     # includes native_modules CRG readiness facts
 ```
 
 If `doctor` reports `legacy managed state`, run `init` again. This is the only supported upgrade path — it performs a managed hard reset before rebuilding the runtime.
 `doctor --json` also exposes workflow verification evidence as structured facts: schema validity, freshness, `fallback_reason`, and `evidence_age_summary` (`oldest_*` / `newest_*` + `max_age_ms`) so downstream workflows do not need to infer evidence staleness heuristically.
+
+If `doctor` reports CRG native modules as `unavailable` or `degraded`, repair is explicit:
+
+```bash
+spec-first doctor --repair-native
+spec-first doctor --repair-native --mirror=npmmirror      # restricted networks
+spec-first doctor --repair-native --build-from-source     # requires C++ build tools
+```
+
+`tree-sitter-kotlin@0.3.8` currently ships no Windows prebuild. Without a local C++ toolchain, Kotlin files fall back to module-level CRG indexing; other language parsers can still work.
 
 ### 3. Initialize a project
 

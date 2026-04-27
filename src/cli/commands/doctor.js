@@ -11,6 +11,7 @@ const { inspectManagedSessionStartHook } = require('../claude-settings');
 const { resolveWorkflowArtifactDir } = require('../../crg/artifact-paths');
 const { buildGraphStatus } = require('../../crg/workflow-context/status');
 const { validateAgainstSchema } = require('../../contracts/schema-validator');
+const { buildNativeDiagnostics, formatNativeSummary, repairBetterSqliteNative } = require('../native-modules');
 
 const VERIFICATION_EVIDENCE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const VERIFICATION_EVIDENCE_SCHEMA_PATH = path.join(
@@ -34,7 +35,7 @@ function runDoctor(argv) {
   }
 
   if (parsed.unknown.length > 0) {
-    console.error('Usage: spec-first doctor [--claude|--codex] [--json]');
+    console.error('Usage: spec-first doctor [--claude|--codex] [--json] [--repair-native] [--mirror=npmmirror] [--build-from-source]');
     return 1;
   }
 
@@ -52,8 +53,19 @@ function runDoctor(argv) {
 
   if (platforms.length === 0) {
     if (parsed.json) {
-      printDoctorJson(buildDoctorReport({ projectRoot, platforms }));
+      const repairResult = parsed.repairNative ? repairBetterSqliteNative({
+        mirror: parsed.mirror,
+        buildFromSource: parsed.buildFromSource,
+      }) : null;
+      printDoctorJson(buildDoctorReport({ projectRoot, platforms, repairResult }));
       return 0;
+    }
+
+    if (parsed.repairNative) {
+      printNativeRepairResult(repairBetterSqliteNative({
+        mirror: parsed.mirror,
+        buildFromSource: parsed.buildFromSource,
+      }));
     }
 
     console.log('No spec-first platform detected in this project.');
@@ -61,11 +73,19 @@ function runDoctor(argv) {
     return 0;
   }
 
-  const report = buildDoctorReport({ projectRoot, platforms });
+  const repairResult = parsed.repairNative ? repairBetterSqliteNative({
+    mirror: parsed.mirror,
+    buildFromSource: parsed.buildFromSource,
+  }) : null;
+  const report = buildDoctorReport({ projectRoot, platforms, repairResult });
 
   if (parsed.json) {
     printDoctorJson(report);
     return report.has_error ? 1 : 0;
+  }
+
+  if (repairResult) {
+    printNativeRepairResult(repairResult);
   }
 
   for (const check of report.common_checks) {
@@ -395,8 +415,9 @@ function checkPluginManifest() {
 
 function checkCrgNativeModules() {
   // 检查 CRG CLI 路由器是否可执行
-  // shell:true 确保 Windows 上能找到 spec-first.cmd wrapper
-  const cli = spawnSync('spec-first', ['crg', '--help'], { encoding: 'utf8', timeout: 5000, shell: true });
+  // 使用当前包内 bin，避免 doctor 在开发仓库或版本管理器下误调用旧的全局 wrapper。
+  const cliPath = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
+  const cli = spawnSync(process.execPath, [cliPath, 'crg', '--help'], { encoding: 'utf8', timeout: 5000 });
   if (cli.status !== 0) {
     return {
       level: 'WARNING',
@@ -406,33 +427,32 @@ function checkCrgNativeModules() {
     };
   }
 
-  // 检查 better-sqlite3 原生模块
-  // 用 process.execPath 而非裸 'node'，在版本管理器（nvm/fnm）环境下更可靠
-  const sqlite = spawnSync(process.execPath, ['-e', "try{require('better-sqlite3')}catch{process.exit(1)}"], { timeout: 5000 });
-  if (sqlite.status !== 0) {
+  const diagnostics = buildNativeDiagnostics();
+  if (diagnostics.crg_status === 'unavailable') {
     return {
       level: 'WARNING',
-      name: 'CRG (better-sqlite3)',
-      message: 'native module not loadable',
-      fix: 'Run: npm rebuild better-sqlite3 (requires C++ build tools)',
+      name: 'CRG native modules',
+      message: formatNativeSummary(diagnostics),
+      fix: 'Run `spec-first doctor --repair-native`; on restricted networks use `--mirror=npmmirror`; for source builds add `--build-from-source`.',
+      details: diagnostics,
     };
   }
 
-  // 检查 tree-sitter 原生模块
-  const ts = spawnSync(process.execPath, ['-e', "try{require('tree-sitter')}catch{process.exit(1)}"], { timeout: 5000 });
-  if (ts.status !== 0) {
+  if (diagnostics.crg_status === 'degraded') {
     return {
       level: 'WARNING',
-      name: 'CRG (tree-sitter)',
-      message: 'native module not loadable',
-      fix: 'Run: npm rebuild tree-sitter (requires C++ build tools)',
+      name: 'CRG native modules',
+      message: formatNativeSummary(diagnostics),
+      fix: 'Optional parser modules are unavailable; install C++ build tools and rebuild only if that language coverage is required.',
+      details: diagnostics,
     };
   }
 
   return {
     level: 'PASS',
-    name: 'CRG',
-    message: 'CLI + native modules ready',
+    name: 'CRG native modules',
+    message: 'ready',
+    details: diagnostics,
   };
 }
 
@@ -465,7 +485,7 @@ function buildDoctorCommonChecks(projectRoot) {
   ].filter(Boolean);
 }
 
-function buildDoctorReport({ projectRoot, platforms }) {
+function buildDoctorReport({ projectRoot, platforms, repairResult = null }) {
   const commonChecks = buildDoctorCommonChecks(projectRoot);
   const platformChecksByPlatform = {};
   const runtimeChecksByPlatform = {};
@@ -537,6 +557,8 @@ function buildDoctorReport({ projectRoot, platforms }) {
     decision_input_health: 'not_checked',
     workflow_runnability: workflowRunnability.status,
     workflow_runnability_basis: workflowRunnability.basis,
+    native_modules: extractNativeDiagnostics(commonChecks),
+    native_repair: repairResult,
     common_checks: commonChecks,
     platform_checks: platformChecksByPlatform,
     checks: allChecks,
@@ -562,11 +584,23 @@ function printDoctorJson(report) {
     decision_input_health: report.decision_input_health,
     workflow_runnability: report.workflow_runnability,
     workflow_runnability_basis: report.workflow_runnability_basis,
+    native_modules: report.native_modules,
+    native_repair: report.native_repair,
     checks: report.checks,
     common_checks: report.common_checks,
     platform_checks: report.platform_checks,
     warnings: report.warnings,
   }, null, 2));
+}
+
+function extractNativeDiagnostics(commonChecks) {
+  const nativeCheck = commonChecks.find((check) => check.name === 'CRG native modules');
+  return nativeCheck && nativeCheck.details ? nativeCheck.details : null;
+}
+
+function printNativeRepairResult(result) {
+  const label = result.ok ? 'PASS   ' : 'WARNING';
+  console.log(`${label} CRG native repair: ${result.message}`);
 }
 
 function computeWorkflowRunnability({
@@ -1055,7 +1089,7 @@ function printHelp() {
     '🩺 spec-first doctor',
     '',
     '📘 Usage:',
-    '  spec-first doctor [--claude|--codex] [--json]',
+    '  spec-first doctor [--claude|--codex] [--json] [--repair-native] [--mirror=npmmirror] [--build-from-source]',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
@@ -1075,6 +1109,9 @@ function parseDoctorArgs(argv) {
     claude: false,
     codex: false,
     json: false,
+    repairNative: false,
+    buildFromSource: false,
+    mirror: null,
     unknown: [],
   };
 
@@ -1087,6 +1124,17 @@ function parseDoctorArgs(argv) {
       parsed.codex = true;
     } else if (arg === '--json') {
       parsed.json = true;
+    } else if (arg === '--repair-native') {
+      parsed.repairNative = true;
+    } else if (arg === '--build-from-source') {
+      parsed.buildFromSource = true;
+    } else if (arg.startsWith('--mirror=')) {
+      const mirror = arg.slice('--mirror='.length);
+      if (mirror === 'npmmirror') {
+        parsed.mirror = mirror;
+      } else {
+        parsed.unknown.push(arg);
+      }
     } else {
       parsed.unknown.push(arg);
     }
