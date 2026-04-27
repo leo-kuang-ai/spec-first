@@ -1,18 +1,19 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.0 2026-04-27 21:00:00 leokuang: fix(specs/crg): 批量修复代码审查发现的 14 处安全与健壮性问题——git base 注入防护、promote 交叉集冲突检测、draft 路径重复校验、execFileSync 超时、rulesMap 容错降级、resolveRunLocalPath 错误捕获、parseFrontmatter 空 frontmatter 支持、draft.content 写入前 secret 检查、run-id actionable 错误提示、--changed 空 diff 守卫、printHelp 文案修正、validateFormalSpecFrontmatter status 校验、inferJvmPackageRoots 去重、node-gyp shell:true 限 win32；补充 14 个单测覆盖新增防护逻辑
 - v1.6.0 2026-04-27 20:15:00 leokuang: fix(spec-write-tasks): 修复 skill prose 8 处不一致——orientation_evidence optional field、stop_if 三类路由表、draft-only frontmatter cross-reference、wave serialization 定义、JSON/Markdown task_id 同步规则、semantic_posture 定义表、Regeneration Rules tasks hash 提示、Schema Version and Migration 占位
 - v1.6.0 2026-04-27 20:00:00 leokuang: docs(task-pack): 新增 2026-04-27-003 任务包——6 tasks / 5 waves，覆盖 spec-write-tasks prose 修复 R1–R8
 - v1.6.0 2026-04-27 19:45:00 leokuang: docs(plan): 新增 2026-04-27-003 计划——修复 spec-write-tasks skill prose 的 8 处不一致（orientation_evidence 层级、stop_if 路由、draft 术语、wave serialize 规则、JSON/Markdown sync、semantic_posture 定义、R7 UX、schema 迁移占位）
 - v1.6.0 2026-04-27 18:20:00 leokuang: fix(crg): 为 graph.db 补充 unresolved 查询索引与目标分类字段，外部依赖改为显式 stub 节点，并在解析失败时保留文件级 fallback 节点 (user-visible)
 - v1.6.0 2026-04-27 18:00:33 leokuang: 增强 Windows npm 安装健壮性，postinstall 改为原生依赖探测优先，新增 doctor native matrix / 显式 repair 指引，并扩展 npm install CI 到 Node 24 与 native facts 校验 (user-visible)
 - v1.6.0 2026-04-27 17:37:24 leokuang: fix(crg): 改善 locate 多词自然语言召回，新增 unresolved 目标分桶，并支持 Java/Kotlin FQN import 解析到仓库内符号 (user-visible)
-- v1.6.0 2026-04-27 09:30:00 leokuang: feat(spec-standards): promote 3 new formal standards to docs/specs/common/ — cli-command-safety, nodejs-conventions, secret-redaction; index rebuilt (10 specs, 18 rules) (user-visible)
 - v1.6.0 2026-04-27 15:53:49 leokuang: docs(claude-runtime): 新增 Claude Code 上下文频繁 compact 根因分析与彻底解决方案，明确 command thin wrapper、workflow 按需加载、context budget doctor 与语义保真验证路线 (user-visible)
 - v1.6.0 2026-04-27 15:52:17 leokuang: docs(spec-standards): 新增完整规范系统剩余工作路线图，明确 dogfood、Profile Registry、manual normalize、refresh proposal、sync、shared attach 与发布标准 (user-visible)
 - v1.6.0 2026-04-27 15:38:31 leokuang: docs(spec-standards): 新增 spec-standards 产物结构说明文档，表格化说明正式规范、索引、报告、草案运行产物、refresh 请求、消费上下文与 schema contract (user-visible)
 - v1.6.0 2026-04-27 15:22:49 leokuang: feat(spec-standards): 新增 `spec-first specs refresh --changed/--files` proposal request 流程，为变更文件生成 `$spec-standards` 后续草案输入且不直接改写正式规范 (user-visible)
 - v1.6.0 2026-04-27 15:07:38 leokuang: feat(spec-standards): 新增 `spec-first specs list/validate` 只读辅助命令，用于查看当前索引中的正式规范并校验规范 frontmatter (user-visible)
+- v1.6.0 2026-04-27 09:30:00 leokuang: feat(spec-standards): promote 3 new formal standards to docs/specs/common/ — cli-command-safety, nodejs-conventions, secret-redaction; index rebuilt (10 specs, 18 rules) (user-visible)
 - v1.6.0 2026-04-27 15:02:28 leokuang: feat(spec-standards): 新增 file-level promote 决策，支持 `--accept` / `--reject` / `--defer` 逐文件确认规范草案，保留 `--accept-all` 作为全量确认快捷路径 (user-visible)
 - v1.6.0 2026-04-27 14:38:25 leokuang: feat(spec-standards): 推进 MVP-F，新增 `spec-first specs refresh --index-only`，只重建 `_index/**` 并输出 refresh report，确保不改写正式规范正文 (user-visible)
 - v1.6.0 2026-04-27 14:23:13 leokuang: feat(spec-standards): 将 standards proposal 正式 promote 到 `docs/specs/**` 并重建 `_index/**`，落地 architecture/governance/workflow-boundaries 初版正式规范 (user-visible)

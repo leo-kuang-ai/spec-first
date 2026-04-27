@@ -1,6 +1,7 @@
 ---
 spec_id: nodejs-conventions
 title: Node.js Conventions
+status: active
 source: extracted
 confirmation_status: confirmed
 lifecycle_status: active

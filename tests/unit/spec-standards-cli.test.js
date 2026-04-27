@@ -19,6 +19,8 @@ const {
   writeProposal,
 } = require('../../src/cli/commands/specs');
 
+const { classifyUnresolvedImportTarget } = require('../../src/crg/graph');
+
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const FIXTURE_ROOT = path.join(REPO_ROOT, 'tests', 'fixtures', 'specs');
 
@@ -707,5 +709,273 @@ describe('spec-first specs MVP-A helper', () => {
     } finally {
       fs.rmSync(targetRoot, { recursive: true, force: true });
     }
+  });
+});
+
+// SECRET_PATTERNS tests (Fix 15a)
+describe('SECRET_PATTERNS', () => {
+  // Access the patterns indirectly by testing containsSecretLikeValue through validateProposalPayload
+  function makeBarePayload(targetRoot) {
+    const targetSlug = deriveTargetSlug(targetRoot);
+    return {
+      schema_version: 'standards-proposal-payload/v1',
+      run_id: '20260101-000000-abcdef',
+      target_slug: targetSlug,
+      target_repo: targetRoot,
+      consumer: 'spec-standards',
+      evidence_mode: 'direct-only',
+      preview_markdown: 'preview',
+      detected_profiles: [],
+      evidence_map: {
+        version: 1,
+        run_id: '20260101-000000-abcdef',
+        target_slug: targetSlug,
+        consumer: 'spec-standards',
+        evidence_mode: 'direct-only',
+        drafts: [],
+      },
+      drafts: [
+        {
+          path: 'drafts/common/test.md',
+          source: 'extracted',
+          confirmation_status: 'confirmed',
+          lifecycle_status: 'draft',
+          content: '---\nspec_id: test\nsource: extracted\nconfirmation_status: confirmed\nlifecycle_status: draft\n---\n# Test\n',
+        },
+      ],
+      rejected: null,
+    };
+  }
+
+  test('pattern 1: PEM private key header is detected', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = makeBarePayload(targetRoot);
+      payload.preview_markdown = '-----BEGIN RSA PRIVATE KEY-----\nMIIE...';
+      const errors = validateProposalPayload(payload, {
+        runId: payload.run_id,
+        targetRoot,
+        targetSlug: deriveTargetSlug(targetRoot),
+      });
+      expect(errors.join('\n')).toContain('secret-like value');
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('pattern 2: API token prefix is detected', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = makeBarePayload(targetRoot);
+      payload.preview_markdown = 'token=sk-AbcDef1234567890abcdef12345';
+      const errors = validateProposalPayload(payload, {
+        runId: payload.run_id,
+        targetRoot,
+        targetSlug: deriveTargetSlug(targetRoot),
+      });
+      expect(errors.join('\n')).toContain('secret-like value');
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('pattern 3: password assignment is detected', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = makeBarePayload(targetRoot);
+      payload.preview_markdown = 'password: supersecret123';
+      const errors = validateProposalPayload(payload, {
+        runId: payload.run_id,
+        targetRoot,
+        targetSlug: deriveTargetSlug(targetRoot),
+      });
+      expect(errors.join('\n')).toContain('secret-like value');
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('pattern 4: env-style SECRET assignment is detected', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = makeBarePayload(targetRoot);
+      payload.preview_markdown = 'DB_SECRET=somevalue123';
+      const errors = validateProposalPayload(payload, {
+        runId: payload.run_id,
+        targetRoot,
+        targetSlug: deriveTargetSlug(targetRoot),
+      });
+      expect(errors.join('\n')).toContain('secret-like value');
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('benign strings do not trigger secret detection', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = makeBarePayload(targetRoot);
+      payload.preview_markdown = 'This is a benign string with no secrets at all.';
+      const errors = validateProposalPayload(payload, {
+        runId: payload.run_id,
+        targetRoot,
+        targetSlug: deriveTargetSlug(targetRoot),
+      });
+      expect(errors.join('\n')).not.toContain('secret-like value');
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+});
+
+// promote overwrite guard tests (Fix 15b)
+describe('promote overwrite guard', () => {
+  test('promote refuses to overwrite an existing manual spec file', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = loadPayloadFixture('proposal-payload-valid.json', targetRoot);
+      const payloadPath = writePayloadFile(targetRoot, payload);
+      writeProposal({ 'run-id': payload.run_id, target: targetRoot, payload: payloadPath });
+
+      // Pre-create the destination file as a manual spec
+      initSpecs({ target: targetRoot });
+      const destPath = path.join(targetRoot, 'docs', 'specs', 'common', 'architecture.md');
+      fs.writeFileSync(destPath, [
+        '---',
+        'spec_id: common-architecture',
+        'title: Architecture',
+        'source: manual',
+        'confirmation_status: manual',
+        'lifecycle_status: active',
+        'level: L4',
+        'priority: 100',
+        'severity: high',
+        'confidence: high',
+        'status: active',
+        '---',
+        '# Architecture (manual)',
+        '',
+      ].join('\n'), 'utf8');
+
+      expect(() => {
+        promoteRun({ 'run-id': payload.run_id, target: targetRoot, 'accept-all': true });
+      }).toThrow(/Refusing to overwrite manual\/custom standard/);
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('promote refuses to overwrite a spec in the custom/ directory', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      // Build a payload whose draft lands in custom/
+      const payload = loadPayloadFixture('proposal-payload-valid.json', targetRoot);
+      payload.drafts[0].path = 'drafts/custom/architecture.md';
+      const draftContent = payload.drafts[0].content
+        .replace(/^source: .*$/m, 'source: extracted')
+        .replace(/^confirmation_status: .*$/m, 'confirmation_status: confirmed')
+        .replace(/^lifecycle_status: .*$/m, 'lifecycle_status: active');
+      payload.drafts[0].content = draftContent;
+      payload.drafts[0].source = 'extracted';
+      payload.drafts[0].confirmation_status = 'confirmed';
+      payload.drafts[0].lifecycle_status = 'active';
+      const payloadPath = writePayloadFile(targetRoot, payload);
+      writeProposal({ 'run-id': payload.run_id, target: targetRoot, payload: payloadPath });
+
+      // Pre-create the destination file in custom/
+      initSpecs({ target: targetRoot });
+      const destPath = path.join(targetRoot, 'docs', 'specs', 'custom', 'architecture.md');
+      fs.writeFileSync(destPath, '# Custom Architecture\n', 'utf8');
+
+      expect(() => {
+        promoteRun({ 'run-id': payload.run_id, target: targetRoot, 'accept-all': true });
+      }).toThrow(/Refusing to overwrite/);
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+});
+
+// promote not_selected branch (Fix 15c)
+describe('promote not_selected branch', () => {
+  test('draft not in any decision set gets status not_selected in skipped', () => {
+    const targetRoot = makeTempRepo();
+    try {
+      const payload = loadPayloadFixture('proposal-payload-valid.json', targetRoot);
+      // Add a second draft so there is one to accept and one to leave unselected
+      payload.drafts.push({
+        path: 'drafts/backend/api.md',
+        source: 'extracted',
+        confirmation_status: 'confirmed',
+        lifecycle_status: 'active',
+        content: [
+          '---',
+          'spec_id: backend-api',
+          'title: Backend API',
+          'source: extracted',
+          'confirmation_status: confirmed',
+          'lifecycle_status: active',
+          'level: L3',
+          'priority: 80',
+          'severity: medium',
+          'confidence: medium',
+          'status: active',
+          '---',
+          '# Backend API',
+          '',
+        ].join('\n'),
+      });
+      const payloadPath = writePayloadFile(targetRoot, payload);
+      writeProposal({ 'run-id': payload.run_id, target: targetRoot, payload: payloadPath });
+
+      // Only accept the first draft; the second is neither accepted, rejected, nor deferred
+      const result = promoteRun({
+        'run-id': payload.run_id,
+        target: targetRoot,
+        accept: 'drafts/common/architecture.md',
+      });
+
+      const notSelected = result.skipped.find((entry) => entry.path === 'drafts/backend/api.md');
+      expect(notSelected).toBeDefined();
+      expect(notSelected.reason).toBe('not_selected');
+    } finally {
+      fs.rmSync(targetRoot, { recursive: true, force: true });
+    }
+  });
+});
+
+// classifyUnresolvedImportTarget tests (Fix 15d)
+describe('classifyUnresolvedImportTarget', () => {
+  test('platform_external: java.util.List', () => {
+    const result = classifyUnresolvedImportTarget('java.util.List', []);
+    expect(result.category).toBe('platform_external');
+    expect(result.packageRoot).toBe('java');
+  });
+
+  test('platform_external: kotlin.collections.Map', () => {
+    const result = classifyUnresolvedImportTarget('kotlin.collections.Map', []);
+    expect(result.category).toBe('platform_external');
+    expect(result.packageRoot).toBe('kotlin');
+  });
+
+  test('repo_internal_candidate: matches known package root', () => {
+    const result = classifyUnresolvedImportTarget('com.example.service.UserService', ['com.example']);
+    expect(result.category).toBe('repo_internal_candidate');
+    expect(result.packageRoot).toBe('com.example');
+  });
+
+  test('third_party_external_candidate: unknown qualified name', () => {
+    const result = classifyUnresolvedImportTarget('org.springframework.web.bind.annotation.RestController', []);
+    expect(result.category).toBe('third_party_external_candidate');
+  });
+
+  test('relative_or_local: relative path', () => {
+    const result = classifyUnresolvedImportTarget('./utils/helper', []);
+    expect(result.category).toBe('relative_or_local');
+  });
+
+  test('unknown: empty string', () => {
+    const result = classifyUnresolvedImportTarget('', []);
+    expect(result.category).toBe('unknown');
   });
 });

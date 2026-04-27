@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const artifactPaths = require('../artifact-paths');
 const { GRAPH_QUALITY_FILE = 'graph-quality.json', resolveGraphDir } = artifactPaths;
+const { inferJvmPackageRootsFromRows } = require('../graph');
 
 function graphQualityPath(repoRoot, options = {}) {
   if (typeof artifactPaths.resolveGraphQuality === 'function') {
@@ -45,22 +46,6 @@ function normalizeSamples(items, limit = 10) {
 function ratio(numerator, denominator) {
   if (!denominator) return 0;
   return Number((numerator / denominator).toFixed(4));
-}
-
-function inferJvmPackageRoots(nodeRows) {
-  const counts = {};
-  for (const row of nodeRows || []) {
-    const filePath = row.file_path || '';
-    const match = filePath.match(/(?:^|\/)src\/(?:main|test|androidTest)\/(?:java|kotlin)\/(.+)\.(?:java|kt)$/);
-    if (!match) continue;
-    const parts = match[1].split('/');
-    if (parts.length < 3) continue;
-    const root = parts.slice(0, 2).join('.');
-    counts[root] = (counts[root] || 0) + 1;
-  }
-  return Object.entries(counts)
-    .filter(([, count]) => count >= 2)
-    .map(([root]) => root);
 }
 
 function classifyUnresolvedTarget(row, repoPackageRoots) {
@@ -119,7 +104,7 @@ function buildGraphQualityReport(db, {
   const parseErrorCount = buildSnapshot.parse_error_count ?? 0;
   const skippedCount = buildSnapshot.skipped_count ?? 0;
   const skippedSensitiveCount = buildSnapshot.skipped_sensitive_count ?? 0;
-  const repoPackageRoots = inferJvmPackageRoots(nodeRows);
+  const repoPackageRoots = inferJvmPackageRootsFromRows(nodeRows);
   const unresolvedTargetCategories = countUnresolvedTargetCategories(unresolvedRows, repoPackageRoots);
   const externalDependencyRows = nodeRows.filter((row) => row.kind === 'external_dependency');
 

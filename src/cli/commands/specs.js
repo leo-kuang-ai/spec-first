@@ -122,7 +122,7 @@ function printHelp(withErrorPrefix = false) {
     'Proposal artifacts are written under:',
     '  .spec-first/workflows/spec-standards/<target-slug>/<run-id>/',
     '',
-    'Only promote writes formal standards under docs/specs/**, and it requires --accept-all.',
+    'Only promote writes formal standards under docs/specs/**, and it requires --accept-all or at least one --accept/--reject/--defer.',
     'Resolve reads docs/specs/_index/** and writes optional consumer context; it is not a hard gate.',
     'Check writes docs/specs/reports/spec-check-report.{json,md}; it is review assistance, not a hard gate.',
     'Refresh --index-only rebuilds indexes; refresh --changed writes a proposal request without modifying standards.',
@@ -171,7 +171,7 @@ function writeProposal(options) {
 
   const runDir = context.runDir;
   if (fs.existsSync(runDir)) {
-    throw new Error(`Proposal run already exists: ${runDir}`);
+    throw new Error(`Proposal run already exists at ${runDir}. Remove the directory or use a different --run-id.`);
   }
 
   const baseDir = context.baseDir;
@@ -206,6 +206,9 @@ function writeProposal(options) {
     writeJson(path.join(tmpDir, 'evidence-map.json'), payload.evidence_map);
 
     for (const draft of payload.drafts) {
+      if (containsSecretLikeValue(draft.content)) {
+        throw new Error(`Draft "${draft.path}" contains a potentially sensitive value and will not be written.`);
+      }
       const draftPath = resolveRunLocalPath(tmpDir, draft.path, 'drafts');
       writeText(draftPath, draft.content);
     }
@@ -382,6 +385,11 @@ function promoteRun(options) {
 
   if (!acceptAll && acceptedDrafts.size === 0 && rejectedDrafts.size === 0 && deferredDrafts.size === 0) {
     throw new Error('promote requires --accept-all or at least one of --accept/--reject/--defer. Review preview.md and drafts before confirming.');
+  }
+
+  const intersection = [...acceptedDrafts].filter((d) => rejectedDrafts.has(d) || deferredDrafts.has(d));
+  if (intersection.length > 0) {
+    throw new Error(`Draft paths appear in multiple decision sets: ${intersection.join(', ')}`);
   }
 
   const context = resolveCommandContext(options, { requirePayload: false });
@@ -579,9 +587,14 @@ function resolveSpecs(options) {
   }
 
   const specsIndex = readJsonFile(specsIndexPath);
-  const rulesMap = fs.existsSync(rulesMapPath)
-    ? readJsonFile(rulesMapPath)
-    : { rules: [], dependencies: {} };
+  let rulesMap = { rules: [], dependencies: {} };
+  try {
+    rulesMap = fs.existsSync(rulesMapPath)
+      ? readJsonFile(rulesMapPath)
+      : { rules: [], dependencies: {} };
+  } catch (_) {
+    // malformed rules-map.json — degrade gracefully
+  }
   const taskTokens = tokenize(`${task} ${files.join(' ')}`);
   const scored = (specsIndex.specs || []).map((spec) => scoreSpecForTask(spec, {
     task,
@@ -680,6 +693,9 @@ function resolveSpecs(options) {
 function checkSpecs(options) {
   const targetRoot = resolveTargetRoot(options);
   const files = resolveCheckFiles(targetRoot, options);
+  if ((options.changed === true || options.changed === 'true') && files.length === 0) {
+    return { ok: false, error: 'no changed files found — working tree may be clean or --base ref returned no diff' };
+  }
   const task = typeof options.task === 'string' && options.task.trim()
     ? options.task.trim()
     : 'check changed files against project standards';
@@ -697,9 +713,14 @@ function checkSpecs(options) {
   const specsIndexPath = path.join(targetRoot, 'docs', 'specs', '_index', 'specs-index.json');
   const rulesMapPath = path.join(targetRoot, 'docs', 'specs', '_index', 'rules-map.json');
   const specsIndex = readJsonFile(specsIndexPath);
-  const rulesMap = fs.existsSync(rulesMapPath)
-    ? readJsonFile(rulesMapPath)
-    : { rules: [] };
+  let rulesMap = { rules: [] };
+  try {
+    rulesMap = fs.existsSync(rulesMapPath)
+      ? readJsonFile(rulesMapPath)
+      : { rules: [] };
+  } catch (_) {
+    // malformed rules-map.json — degrade gracefully
+  }
   const indexedByPath = new Map((specsIndex.specs || []).map((entry) => [entry.path, entry]));
   const rulesBySpecPath = groupRulesBySpecPath(rulesMap.rules || []);
   const loaded = [
@@ -912,7 +933,7 @@ function refreshChangedSpecs(options) {
   const baseDir = resolveWorkflowArtifactDir(targetRoot, 'spec-standards-refresh', targetSlug);
   const runDir = path.join(baseDir, runId);
   if (fs.existsSync(runDir)) {
-    throw new Error(`Refresh run already exists: ${runDir}`);
+    throw new Error(`Refresh run already exists at ${runDir}. Remove the directory or use a different --run-id.`);
   }
 
   const generatedAt = new Date().toISOString();
@@ -1151,6 +1172,11 @@ function validateProposalPayload(payload, context) {
     errors.push('drafts must contain at least one draft');
   } else {
     payload.drafts.forEach((draft, index) => validateDraft(draft, index, errors));
+    const draftPaths = payload.drafts.map((d) => d.path);
+    const uniquePaths = new Set(draftPaths);
+    if (uniquePaths.size !== draftPaths.length) {
+      errors.push('payload.drafts contains duplicate path values');
+    }
   }
 
   if (payload.rejected && typeof payload.rejected !== 'object') {
@@ -1314,13 +1340,17 @@ function validateFormalSpecFrontmatter(frontmatter, rel, errors) {
   if (frontmatter.confidence && !['low', 'medium', 'high'].includes(frontmatter.confidence)) {
     errors.push(`${rel} frontmatter confidence has invalid value`);
   }
+  if (!frontmatter.status || !['active', 'deprecated', 'draft'].includes(frontmatter.status)) {
+    errors.push(`${rel} spec_frontmatter.status must be one of: active, deprecated, draft`);
+  }
 }
 
 function parseFrontmatter(content) {
   if (typeof content !== 'string' || !content.startsWith('---\n')) {
     return null;
   }
-  const end = content.indexOf('\n---', 4);
+  // Search from index 3 so that empty frontmatter (---\n---\n) is handled correctly
+  const end = content.indexOf('\n---', 3);
   if (end === -1) return null;
   const raw = content.slice(4, end);
   const data = {};
@@ -1339,7 +1369,8 @@ function parseFrontmatterBlock(content) {
   if (typeof content !== 'string' || !content.startsWith('---\n')) {
     return null;
   }
-  const end = content.indexOf('\n---', 4);
+  // Search from index 3 so that empty frontmatter (---\n---\n) is handled correctly
+  const end = content.indexOf('\n---', 3);
   if (end === -1) return null;
   return content.slice(4, end);
 }
@@ -1610,10 +1641,16 @@ function resolveCheckFiles(targetRoot, options) {
 }
 
 function getGitChangedFiles(targetRoot, base) {
+  const baseStr = String(base);
+  if (!baseStr || baseStr.startsWith('-')) {
+    throw new Error(`Invalid --base value: "${baseStr}". Base ref must not start with '-'.`);
+  }
   try {
-    const output = execFileSync('git', ['-C', targetRoot, 'diff', '--name-only', String(base), '--'], {
+    const output = execFileSync('git', ['-C', targetRoot, 'diff', '--name-only', baseStr, '--'], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 30000,
+      maxBuffer: 10 * 1024 * 1024,
     });
     return output
       .split(/\r?\n/)
@@ -1969,7 +2006,11 @@ function renderSpecsIndexMarkdown(indexed) {
 }
 
 function resolveRunLocalPath(runDir, relativePath, expectedTopDir) {
-  validateRunLocalDraftPath(relativePath, 'draft.path', []);
+  const pathErrors = [];
+  validateRunLocalDraftPath(relativePath, 'draft.path', pathErrors);
+  if (pathErrors.length > 0) {
+    throw new Error(pathErrors[0]);
+  }
   const normalized = path.posix.normalize(relativePath.replace(/\\/g, '/'));
   if (!normalized.startsWith(`${expectedTopDir}/`)) {
     throw new Error(`Path must stay under ${expectedTopDir}/: ${relativePath}`);

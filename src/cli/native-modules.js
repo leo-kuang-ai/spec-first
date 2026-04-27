@@ -301,7 +301,7 @@ function repairBetterSqliteNative(options = {}) {
     cwd: info.packageDir,
     timeout: 120000,
     encoding: 'utf8',
-    shell: true,
+    shell: process.platform === 'win32',
   });
   if (rebuild.status === 0 && probeRequire('better-sqlite3').ok) {
     return {

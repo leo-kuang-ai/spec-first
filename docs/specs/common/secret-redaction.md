@@ -1,6 +1,7 @@
 ---
 spec_id: secret-redaction
 title: Secret Redaction Policy
+status: active
 source: extracted
 confirmation_status: confirmed
 lifecycle_status: active

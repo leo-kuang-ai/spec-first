@@ -1,6 +1,7 @@
 ---
 spec_id: cli-command-safety
 title: CLI Command Safety
+status: active
 source: extracted
 confirmation_status: confirmed
 lifecycle_status: active

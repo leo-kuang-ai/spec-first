@@ -756,4 +756,5 @@ module.exports = {
   replaceUnresolvedEdges,
   classifyExternalImportTarget,
   classifyUnresolvedImportTarget,
+  inferJvmPackageRootsFromRows,
 };
