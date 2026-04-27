@@ -113,7 +113,7 @@ Choose exactly one branch:
 - `compile`: the plan is clear enough; generate an executable task pack.
 - `skip`: the plan is small or task-pack value is low; recommend direct `spec-work`.
 - `return-to-plan`: key scope, verification, architecture, or contract decisions are missing; recommend revising `spec-plan`.
-- `draft-only`: a non-executable draft can help discussion, but it must not be handed to `spec-work`.
+- `draft-only`: a non-executable draft can help discussion, but it must not be handed to `spec-work`. → When producing a draft: use `status: "draft"` and `mode: "transient"` in the task pack frontmatter (see `task-pack-schema.md` frontmatter). Note: `task_pack_validity: draft` in the Final Decision Envelope is a separate runtime concept in a different context — the two uses of "draft" do not need to be unified.
 
 Only continue with unresolved information when it is explicitly an implementation-time unknown. Record that risk in the relevant task's `risk_note` and `stop_if`. Do not use a task pack to invent decisions the plan did not make.
 
@@ -125,7 +125,7 @@ This is an LLM semantic analysis order, not a script state machine. It does not 
 2. Identify foundations: find shared schemas, contracts, adapters, fixtures, test helpers, and CLI surfaces.
 3. Identify executable slices: decide whether each unit should remain one task, split into story tasks, or merge with a nearby unit.
 4. Build the dependency graph: record only real output dependencies, not preferred ordering.
-5. Assign waves: avoid shared files inside a wave; if files overlap, serialize or mark the overlap explicitly.
+5. Assign waves: avoid shared files inside a wave; if files overlap, serialize or mark the overlap explicitly. Serialize means: move the later task to `wave + 1`. Mark explicitly means: record the overlapping file and reason in the affected task's `notes` field.
 6. Write task cards: each task must state goal, files, context_refs, test_focus, done_signal, and stop_if.
 7. Run the quality pass: check traceability, scope, granularity, dependency accuracy, verification, and consumption readiness.
 
@@ -212,6 +212,15 @@ next_action: spec-work-task-pack | review-task-pack | spec-work-plan | revise-pl
 ```
 
 `next_action: spec-work-task-pack` is allowed only when `deterministic_handoff: true` and `semantic_posture` is `generated-this-run` or `reviewed-existing`. `deterministic_handoff` proves identity, freshness, and structure only; it does not prove semantic task quality.
+
+`semantic_posture` value definitions:
+
+| Value | Triggering condition |
+| --- | --- |
+| `generated-this-run` | `spec-write-tasks` generated the task pack in this run |
+| `reviewed-existing` | This run read an existing task pack and reviewed its task quality semantically — not just structure and hash |
+| `unchecked-existing` | This run only validated structure and hash; task split semantics were not reviewed |
+| `not-applicable` | No task pack was generated or reviewed (e.g., `decision: skip`) |
 
 ## Required Task Card Semantics
 

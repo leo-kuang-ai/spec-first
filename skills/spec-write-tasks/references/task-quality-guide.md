@@ -103,7 +103,7 @@ Use these field-level checks before handing a task pack to `spec-work`:
 | Field | Good value | Reject or revise when |
 | --- | --- | --- |
 | `context_refs` | Names the smallest plan sections, code files, contracts, CRG evidence, or pattern docs needed for this task | It points only to the whole plan, lists every reference, or omits code/context needed to understand file boundaries |
-| `orientation_evidence` | Records provider, posture, evidence_refs, and limitations for bounded source orientation used to compile task boundaries | It claims CRG/LSP/direct reads as scope authority, omits limitations, or lists broad repo exploration with no task-boundary impact |
+| `orientation_evidence` | Optional task field. Records provider, posture, evidence_refs, and limitations for bounded source orientation used to make this task's file boundaries accurate. Complements the document-level `## Orientation Evidence` section at task granularity. | It claims CRG/LSP/direct reads as scope authority, omits limitations, or lists broad repo exploration with no task-boundary impact |
 | `entry_hint` | Names where to start reading, such as a source section, helper, schema, or existing test pattern | It becomes a step-by-step implementation script or shell-command choreography |
 | `test_focus` | States the primary verification surface and behavior category | It says only "tests" or requires acceptance criteria not present in the source plan |
 | `done_signal` | Can be observed through tests, CLI output, diff shape, document structure, or review | It is subjective, such as "works", "complete", or "looks good" |

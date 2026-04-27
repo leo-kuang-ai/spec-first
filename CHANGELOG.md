@@ -1,6 +1,7 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.0 2026-04-27 20:15:00 leokuang: fix(spec-write-tasks): 修复 skill prose 8 处不一致——orientation_evidence optional field、stop_if 三类路由表、draft-only frontmatter cross-reference、wave serialization 定义、JSON/Markdown task_id 同步规则、semantic_posture 定义表、Regeneration Rules tasks hash 提示、Schema Version and Migration 占位
 - v1.6.0 2026-04-27 20:00:00 leokuang: docs(task-pack): 新增 2026-04-27-003 任务包——6 tasks / 5 waves，覆盖 spec-write-tasks prose 修复 R1–R8
 - v1.6.0 2026-04-27 19:45:00 leokuang: docs(plan): 新增 2026-04-27-003 计划——修复 spec-write-tasks skill prose 的 8 处不一致（orientation_evidence 层级、stop_if 路由、draft 术语、wave serialize 规则、JSON/Markdown sync、semantic_posture 定义、R7 UX、schema 迁移占位）
 - v1.6.0 2026-04-27 18:20:00 leokuang: fix(crg): 为 graph.db 补充 unresolved 查询索引与目标分类字段，外部依赖改为显式 stub 节点，并在解析失败时保留文件级 fallback 节点 (user-visible)

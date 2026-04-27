@@ -55,6 +55,18 @@ describe('spec-write-tasks contracts', () => {
     expect(skill).toContain('Prefer CRG evidence when graph state is ready');
     expect(skill).toContain('Serena/LSP may be introduced as a Phase 2 orientation provider');
     expect(skill).toContain('Phase 2 provider rule');
+    // T003: draft-only frontmatter cross-reference (§3.1 fix)
+    expect(skill).toContain('status: "draft"');
+    expect(skill).toContain('mode: "transient"');
+    expect(skill).toContain('task_pack_validity: draft');
+    // T004: wave serialization definition (§3.3 fix)
+    expect(skill).toContain('wave + 1');
+    // T005: semantic_posture definition table (§3.7 fix)
+    expect(skill).toContain('generated-this-run');
+    expect(skill).toContain('reviewed-existing');
+    expect(skill).toContain('unchecked-existing');
+    // T002: stop_if routing routing sentence (§3.5 fix)
+    expect(skill).toContain('rerun `spec-write-tasks`');
   });
 
   test('task pack schema requires executable handoff metadata and quality structures', () => {
@@ -84,6 +96,19 @@ describe('spec-write-tasks contracts', () => {
     expect(schema).toContain('Granularity Guide');
     expect(schema).toContain('Scripts must not judge task splitting quality');
     expect(schema).toContain('If `spec_id` does not match the current source plan, execution must be rejected');
+    // T001: orientation_evidence in Optional Task Fields (§3.2 fix)
+    expect(schema).toContain('orientation_evidence');
+    expect(schema).toContain('Optional task-level record');
+    // T004: wave serialization definition (§3.3 fix)
+    expect(schema).toContain('wave + 1');
+    // T005: task_id consistency rule (§3.6 fix)
+    expect(schema).toContain('JSON block is authoritative');
+    expect(schema).toContain('two sets are equal');
+    // T005: Regeneration Rules tasks hash hint (§3.4 fix)
+    expect(schema).toContain('spec-first tasks hash');
+    // T005: Schema Version and Migration section (§4.2 fix)
+    expect(schema).toContain('Schema Version and Migration');
+    expect(schema).toContain('task-pack/v1');
   });
 
   test('quality guide owns quality examples without redefining schema fields', () => {
@@ -100,6 +125,12 @@ describe('spec-write-tasks contracts', () => {
     expect(guide).toContain('orientation_evidence');
     expect(guide).toContain('provider, posture, evidence_refs, and limitations');
     expect(guide).toContain('without turning CRG/LSP/current code state into source-plan scope');
+    // T001: orientation_evidence labelled as optional task field (§3.2 fix)
+    expect(guide).toContain('Optional task field');
+    // T002: stop_if routing classification table (§3.5 fix)
+    expect(guide).toContain('Plan boundary unclear');
+    expect(guide).toContain('Recommended destination');
+    expect(guide).toContain('Rerun `spec-write-tasks`');
   });
 
   test('spec-work variants validate task packs before creating execution tasks', () => {

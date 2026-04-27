@@ -112,7 +112,7 @@ Task Graph explains:
 A wave is an execution grouping, not a state machine.
 
 - Same-wave tasks should avoid shared files.
-- If files overlap, serialize the tasks or mark the overlap explicitly.
+- If files overlap, serialize the tasks or mark the overlap explicitly. Serialize means: move the later task to `wave + 1`. Mark explicitly means: record the overlapping file and reason in the affected task's `notes` field.
 - Hidden dependencies must not be hidden behind wave labels.
 
 ## Task Pack Contract
@@ -177,6 +177,7 @@ These fields may be added when useful, but they do not replace required fields:
 | `notes` | Additional context for human readers |
 | `review_focus` | Specific review concern |
 | `handoff_owner` | Suggested executor type when relevant |
+| `orientation_evidence` | Optional task-level record of bounded source orientation used to make this task's file boundaries accurate. Records `provider`, `posture`, `evidence_refs`, and `limitations` at task granularity. Complements the document-level `## Orientation Evidence` section; neither replaces the other. |
 
 ### Recommended Human-Readable Task Card Example
 
@@ -280,7 +281,8 @@ Scripts may check:
 - dependencies point to existing tasks,
 - files use concrete repo-relative paths,
 - each task is listed in exactly one matching execution wave,
-- same-wave file overlap is absent or serialized.
+- same-wave file overlap is absent or serialized,
+- `task_id` values in the `Task Pack Contract` JSON block and in the human-readable `Task Cards` Markdown are consistent; if they conflict, the JSON block is authoritative. Scripts may check that the two sets are equal.
 
 Scripts must not judge task splitting quality, business boundaries, or whether parallelization is semantically appropriate. Those are LLM judgments.
 
@@ -309,3 +311,11 @@ If `source_plan_hash` does not match, execution must be rejected and the task pa
 If `spec_id` does not match the current source plan, execution must be rejected as wrong-chain handoff and the task pack must be rebuilt from the source plan.
 
 If execution triggers a task's `stop_if`, return to `spec-plan` or rerun `spec-write-tasks`.
+
+When a plan edit is cosmetic (for example, whitespace or a comment in the frontmatter), run `spec-first tasks hash <plan-path>` before deciding whether to rebuild: if the hash is unchanged, no rebuild is needed; if the hash changed, the hard rejection rule above applies and the task pack must be rebuilt. Note: `spec-first tasks validate` checks structural validity only — it cannot determine whether a plan change affects task file sets or done signals, so it is not the right tool for this check.
+
+## Schema Version and Migration
+
+The `schema_version` field lives inside the `Task Pack Contract` JSON block (not in the frontmatter). Its current value is `"task-pack/v1"`.
+
+If the schema is upgraded to v2, the handling strategy for v1 task packs (reject, downgrade, migrate) must be documented in the updated `task-pack-schema.md` at that time. `validateTaskPackContract` already emits an error when `schema_version` does not match `task-pack/v1`, so any v1 task pack encountering a v2 validator will be rejected and must be rebuilt.
