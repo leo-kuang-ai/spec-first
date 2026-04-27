@@ -37,6 +37,20 @@ describe('spec-plan CRG hook contract', () => {
   });
 });
 
+describe('spec-plan standards resolve contract', () => {
+  test('uses indexed standards as optional planning input without full-loading or hard gates', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('Standards Resolve Context (Optional)');
+    expect(text).toContain('docs/specs/_index/specs-index.json');
+    expect(text).toContain('spec-first specs resolve --target=<repo> --task="<planning context summary>" --consumer spec-plan --task-id=<plan-or-spec-id>');
+    expect(text).toContain('Do not read all of `docs/specs/**`');
+    expect(text).toContain('Treat `metadata.hard_gate=false` as binding');
+    expect(text).toContain('spec-first specs index --target=<repo>');
+    expect(text).toContain('Do not block planning');
+  });
+});
+
 describe('spec_id planning contract', () => {
   test('requirements capture creates a local spec chain identity without a registry', () => {
     const text = fs.readFileSync(REQUIREMENTS_CAPTURE_PATH, 'utf8');

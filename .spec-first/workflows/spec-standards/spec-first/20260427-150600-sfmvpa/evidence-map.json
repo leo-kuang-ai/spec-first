@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "run_id": "20260427-150600-sfmvpa",
+  "target_slug": "spec-first",
+  "target_repo": "/Users/kuang/xiaobu/spec-first",
+  "consumer": "spec-standards",
+  "evidence_mode": "crg-first",
+  "crg": {
+    "generation_id": "20260427070209285",
+    "stats": {
+      "node_count": 1037,
+      "edge_count": 2667,
+      "community_count": 15,
+      "flow_count": 92
+    }
+  },
+  "drafts": [
+    {
+      "path": "drafts/testing-layers.md",
+      "evidence_kind": "observed",
+      "source_queries": [
+        "spec-first crg workflow-context --stage=plan --repo=<target>",
+        "direct read: CLAUDE.md 测试与验证策略章节",
+        "direct read: package.json scripts",
+        "direct read: tests/ 目录结构"
+      ],
+      "limitations": []
+    },
+    {
+      "path": "drafts/changelog-iron-law.md",
+      "evidence_kind": "observed",
+      "source_queries": [
+        "direct read: CHANGELOG.md 格式头部",
+        "direct read: tests/unit/changelog-format.test.js",
+        "direct read: CLAUDE.md Changelog 治理规则章节"
+      ],
+      "limitations": []
+    }
+  ]
+}

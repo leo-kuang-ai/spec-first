@@ -16,6 +16,23 @@ This command takes a work document (plan, task pack, or specification) or a bare
 
 When a CRG graph is available, use `spec-first crg hook before-work --plan=<plan.md> --repo=<repo>` before implementation, or `spec-first crg hook before-work --task-pack=<tasks.md> --repo=<repo>` when executing a derived task pack. If opened at a parent workspace root, first run `spec-first crg workspace context --root=<workspace> --task="<task>"`; require an explicit child repo choice from the advisory candidates before editing files or running repo-local hooks. For multi-child tasks, decompose into explicit sequential repo-local work runs; do not create one hidden combined workspace work-run. After implementation, use `spec-first crg hook after-work --work-run=<id> --repo=<repo>` or pass an explicit base with `--since=<base>`. Hook output is advisory context for comparing planned surface and actual blast radius; it must not override the plan or replace LLM judgment. If graph state is unavailable, continue with targeted direct repo reads and do not read old Stage-0 docs as fallback.
 
+## Standards Resolve Anchors
+
+When formal standards exist, use them as scoped implementation input:
+
+```bash
+spec-first specs resolve --target=<repo> --task="<work task or plan summary>" --files="<planned or changed files>" --consumer spec-work --task-id=<task-or-plan-id>
+```
+
+Run this after reading the plan/task pack and before coding when `docs/specs/_index/specs-index.json` exists. Read only the files listed in the generated `implement.jsonl`:
+- `mode=full` means load the standard before implementing the relevant task.
+- `mode=summary` means read only the `Summary for Agent` section when possible, or skim narrowly for the relevant rule.
+- Do not read all of `docs/specs/**`.
+- Treat `metadata.hard_gate=false` as binding: standards guide implementation, but the LLM still decides how they apply to the current change.
+- If a standard conflicts with the plan, stop and surface the conflict instead of silently changing scope.
+
+If `docs/specs/` exists but `_index/specs-index.json` is missing, suggest `spec-first specs index --target=<repo>` and continue with AGENTS.md, CRG evidence, and local patterns. Missing standards never blocks work.
+
 ## Input Document
 
 <input_document> #$ARGUMENTS </input_document>

@@ -1,0 +1,45 @@
+{
+  "schema_version": "detected-profiles/v1",
+  "profiles": [
+    {
+      "id": "nodejs-cli",
+      "scope": [
+        "cli",
+        "common"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "bin/spec-first.js",
+        "src/cli/index.js",
+        "package.json"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "workflow-engine",
+      "scope": [
+        "workflows",
+        "standards"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "skills/",
+        "agents/",
+        "templates/"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "test-framework-jest",
+      "scope": [
+        "testing"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "tests/unit/",
+        "package.json"
+      ],
+      "limitations": []
+    }
+  ]
+}

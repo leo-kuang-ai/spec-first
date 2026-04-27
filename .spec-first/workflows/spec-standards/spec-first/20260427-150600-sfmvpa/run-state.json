@@ -1,0 +1,11 @@
+{
+  "schema_version": "standards-run-state/v1",
+  "run_id": "20260427-150600-sfmvpa",
+  "target_slug": "spec-first",
+  "target_repo": "/Users/kuang/xiaobu/spec-first",
+  "consumer": "spec-standards",
+  "status": "completed",
+  "evidence_mode": "crg-first",
+  "started_at": "2026-04-27T07:19:53.401Z",
+  "completed_at": "2026-04-27T07:19:53.401Z"
+}

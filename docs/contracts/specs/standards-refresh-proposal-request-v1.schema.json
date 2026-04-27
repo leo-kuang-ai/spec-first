@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "standards-refresh-proposal-request-v1.schema.json",
+  "title": "Spec-first standards refresh proposal request v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "target_slug",
+    "run_id",
+    "mode",
+    "hard_gate",
+    "task",
+    "changed_files",
+    "base",
+    "source_index",
+    "resolve_result",
+    "proposal_instruction"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "standards-refresh-proposal-request/v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "target_slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^\\d{8}-\\d{6}-[a-z0-9]{6,12}$"
+    },
+    "mode": {
+      "const": "changed"
+    },
+    "hard_gate": {
+      "const": false
+    },
+    "task": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changed_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "base": {
+      "type": ["string", "null"]
+    },
+    "source_index": {
+      "const": "docs/specs/_index/specs-index.json"
+    },
+    "resolve_result": {
+      "type": "object"
+    },
+    "proposal_instruction": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

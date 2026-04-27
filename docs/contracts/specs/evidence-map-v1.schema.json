@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "evidence-map-v1.schema.json",
+  "title": "evidence-map/v1",
+  "type": "object",
+  "required": [
+    "version",
+    "run_id",
+    "target_slug",
+    "consumer",
+    "evidence_mode",
+    "drafts"
+  ],
+  "properties": {
+    "version": { "const": 1 },
+    "run_id": {
+      "type": "string",
+      "pattern": "^\\d{8}-\\d{6}-[a-z0-9]{6,12}$"
+    },
+    "target_slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+    },
+    "target_repo": { "type": "string" },
+    "consumer": { "const": "spec-standards" },
+    "evidence_mode": {
+      "type": "string",
+      "enum": ["crg-first", "direct-only", "mixed"]
+    },
+    "crg": { "type": "object" },
+    "drafts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "evidence_kind": {
+            "type": "string",
+            "enum": ["observed", "inferred", "manual", "imported", "ambiguous"]
+          },
+          "source_queries": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "limitations": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -116,6 +116,7 @@ Ideate → Brainstorm → Plan → Work → Review → Compound
 | 入口 | 适用场景 | 产物 | 稳定性 |
 |------|----------|------|--------|
 | `/spec:graph-bootstrap` · `$spec-graph-bootstrap` | 你需要为 plan / work / review 准备 CRG graph-backed query evidence | `.spec-first/graph/graph.db`、`graph-index-status.json`、`code-navigation.json`、`repo-topology.json`、`graph-operations.jsonl`；workspace root 使用 `.spec-first/workspace/*` | **主要 CRG 入口** |
+| `/spec:standards` · `$spec-standards` | 你需要先基于 CRG 生成项目规范草案，再经人工确认沉淀到 `docs/specs/**`，并按任务解析/检查/刷新/查看/校验规范资产 | `.spec-first/workflows/spec-standards/<target-slug>/<run-id>/**` proposal 产物；确认 promote 后写入 `docs/specs/**` + `_index/**`；`spec-first specs resolve` 可写 `.spec-first/workflows/<consumer>/<task-id>/` 任务上下文；`spec-first specs refresh --changed` 写入 `.spec-first/workflows/spec-standards-refresh/<target-slug>/<run-id>/**` proposal request；`check/refresh` 写入 `docs/specs/reports/**`；list/validate 只读 | **preview-first 规范路径** |
 | `/spec:compound` · `$spec-compound` | 你完成或重新发现了可复用解决方案，希望后续 workflow 能检索到 | `docs/solutions/**/*.md` 结构化 learning 文档 | **补充型知识路径** |
 
 这些入口是 `spec-first init` 安装出来的宿主 workflow entrypoint，不是根级 `spec-first` CLI 子命令。
@@ -203,7 +204,7 @@ iOS 仓库会自动检测（`Podfile.lock` / `.xcodeproj`），并自动应用 P
 | **Task-pack 工具链** (`spec-first tasks`) | 对 source plan 做 canonical hash，并在 `spec-work` 消费派生 task pack 前完成校验 |
 | **Session / PR 辅助技能** | session 历史检索、PR 描述 / 反馈处理和浏览器证据都留在受管 skill 里，而不是临时 prompt |
 | **双平台支持** | 一套方法论同时覆盖 Claude Code（`/spec:*`）与 Codex（`$spec-*`）。Claude 使用 `SessionStart` hook + bare-agent rewrite；Codex 使用 `.agents/skills/` discovery + 显式 `.codex/agents/...` path rewrite |
-| **能力层资产** | 仓库内置源码资产共 `40` 个 skills、`51` 个 agents、`0` 个 agent support files。运行时交付会按双宿主治理过滤：当前版本在 Claude 侧安装 `19` 个 commands + `2` 个 standalone skills + `2` 个 agent-facing internal skills，在 Codex 侧安装 `19` 个 workflow skills + `2` 个 standalone skills + `2` 个 agent-facing internal skills；两侧都会安装 `51` 个 agents |
+| **能力层资产** | 仓库内置源码资产共 `41` 个 skills、`51` 个 agents、`0` 个 agent support files。运行时交付会按双宿主治理过滤：当前版本在 Claude 侧安装 `20` 个 commands + `2` 个 standalone skills + `2` 个 agent-facing internal skills，在 Codex 侧安装 `20` 个 workflow skills + `2` 个 standalone skills + `2` 个 agent-facing internal skills；两侧都会安装 `51` 个 agents |
 | **运行时治理** | 受管资产记录在 `state.json` 中，可安全同步、刷新、恢复与清理 |
 
 ## 核心工作流
@@ -218,6 +219,7 @@ iOS 仓库会自动检测（`Podfile.lock` / `.xcodeproj`），并自动应用 P
 |------|-------------|-------|----------|----------|
 | 宿主准备 | `/spec:mcp-setup` → restart | `$spec-mcp-setup` → restart | 宿主专属 readiness ledger：`~/.claude/spec-first/host-setup.json` 或 `~/.codex/spec-first/host-setup.json` | **Code-hard**（bootstrap gate 会检查它） |
 | CRG 图引导 | `/spec:graph-bootstrap` | `$spec-graph-bootstrap` | `graph.db` + graph status/navigation/operations artifacts | 宿主就绪 + CRG runtime workflow contract |
+| 规范草案 | `/spec:standards` | `$spec-standards` | `.spec-first/workflows/spec-standards/<target-slug>/<run-id>/**`；显式 promote 后写入 `docs/specs/**`；`spec-first specs resolve` 可写 `.spec-first/workflows/<consumer>/<task-id>/`；`spec-first specs refresh --changed` 写入 `.spec-first/workflows/spec-standards-refresh/<target-slug>/<run-id>/**`；`check/refresh` 写入辅助报告 | **SKILL.md** + `spec-first specs` helper contract |
 | Ideate | `/spec:ideate` | `$spec-ideate` | `docs/ideation/*.md` | **SKILL.md** contract |
 | Brainstorm | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/*.md` | **SKILL.md** contract |
 | Plan | `/spec:plan` | `$spec-plan` | `docs/plans/*.md` | **SKILL.md** contract |
@@ -319,7 +321,7 @@ spec-first clean --claude   # 或 --codex
 
 `clean` 会移除上表中“`clean` 可移除”列标记为可删的所有内容，然后打印本次删除了哪个平台的受管资产。受管范围之外的自定义资产不会受影响。语言策略块仍需手动删除；你可以在 `CLAUDE.md` / `AGENTS.md` 中搜索 `<!-- spec-first:lang:`。
 `init --dry-run` 与 `clean --dry-run` 现在都会预览来自同一份 operation plan 的 file-level 变更面，因此 preview/apply 漂移被压缩到可测试、可回归的边界内。
-当前运行时交付会按宿主治理分流：Claude 会写入 `19` 个 command、`4` 个 skill directories 和 `51` 个 agent；Codex 不生成 command 目录，而是写入 `23` 个 skill directories，并安装同样的 `51` 个 agent。
+当前运行时交付会按宿主治理分流：Claude 会写入 `20` 个 command、`4` 个 skill directories 和 `51` 个 agent；Codex 不生成 command 目录，而是写入 `24` 个 skill directories，并安装同样的 `51` 个 agent。
 
 #### 示例输出
 
@@ -327,7 +329,7 @@ spec-first clean --claude   # 或 --codex
 $ spec-first init --claude
 
 🪝 Installed Claude SessionStart matcher in .claude/settings.json
-📦 Generated 19 command file(s) in .claude/commands/spec
+📦 Generated 20 command file(s) in .claude/commands/spec
 🧩 Generated 4 skill directory(ies) in .claude/skills
 🤖 Generated 51 agent file(s) in .claude/agents
 🪪 Wrote project developer profile:

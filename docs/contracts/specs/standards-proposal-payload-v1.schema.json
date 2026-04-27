@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "standards-proposal-payload-v1.schema.json",
+  "title": "standards-proposal-payload/v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "target_slug",
+    "target_repo",
+    "consumer",
+    "evidence_mode",
+    "preview_markdown",
+    "detected_profiles",
+    "evidence_map",
+    "drafts",
+    "rejected"
+  ],
+  "properties": {
+    "schema_version": { "const": "standards-proposal-payload/v1" },
+    "run_id": {
+      "type": "string",
+      "pattern": "^\\d{8}-\\d{6}-[a-z0-9]{6,12}$"
+    },
+    "target_slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+    },
+    "target_repo": { "type": "string" },
+    "consumer": { "const": "spec-standards" },
+    "evidence_mode": {
+      "type": "string",
+      "enum": ["crg-first", "direct-only", "mixed"]
+    },
+    "graph": {
+      "type": "object",
+      "properties": {
+        "generation_id": { "type": "string" },
+        "quality_band": {
+          "type": "string",
+          "enum": ["strong", "usable", "weak", "unavailable"]
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "preview_markdown": { "type": "string" },
+    "detected_profiles": {
+      "type": "array",
+      "items": { "$ref": "./detected-profiles-v1.schema.json#/$defs/profile" }
+    },
+    "evidence_map": { "$ref": "./evidence-map-v1.schema.json" },
+    "drafts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "content",
+          "source",
+          "confirmation_status",
+          "lifecycle_status",
+          "evidence_refs"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^drafts/.*\\.md$"
+          },
+          "content": { "type": "string" },
+          "source": {
+            "type": "string",
+            "enum": ["template", "extracted", "manual", "imported", "generated"]
+          },
+          "confirmation_status": {
+            "type": "string",
+          "enum": ["manual", "confirmed", "inferred", "uncertain", "conflict", "rejected"]
+          },
+          "lifecycle_status": {
+            "type": "string",
+          "enum": ["draft", "active", "deprecated", "overridden"]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "rejected": {
+      "type": "object",
+      "properties": {
+        "inferred_rules_markdown": { "type": "string" },
+        "uncertain_rules_markdown": { "type": "string" },
+        "conflicts_markdown": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}

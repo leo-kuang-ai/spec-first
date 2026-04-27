@@ -1,0 +1,57 @@
+{
+  "schema_version": "standards-proposal-payload/v1",
+  "run_id": "20260427-090015-a1b2c3",
+  "target_slug": "__TARGET_SLUG__",
+  "target_repo": "__TARGET_REPO__",
+  "consumer": "spec-standards",
+  "evidence_mode": "crg-first",
+  "graph": {
+    "generation_id": "20260427034128141",
+    "quality_band": "usable",
+    "limitations": []
+  },
+  "preview_markdown": "# Standards Proposal Preview\n\n- Evidence mode: crg-first\n",
+  "detected_profiles": [
+    {
+      "id": "node-commonjs-cli",
+      "scope": ["backend", "cli"],
+      "confidence": "high",
+      "evidence": ["package.json", "bin/spec-first.js"],
+      "limitations": []
+    }
+  ],
+  "evidence_map": {
+    "version": 1,
+    "run_id": "20260427-090015-a1b2c3",
+    "target_slug": "__TARGET_SLUG__",
+    "target_repo": "__TARGET_REPO__",
+    "consumer": "spec-standards",
+    "evidence_mode": "crg-first",
+    "drafts": [
+      {
+        "path": "drafts/common/architecture.md",
+        "evidence_kind": "observed",
+        "source_queries": [
+          "spec-first crg workflow-context --stage=plan --repo=<target>"
+        ],
+        "limitations": []
+      }
+    ]
+  },
+  "drafts": [
+    {
+      "path": "drafts/common/architecture.md",
+      "content": "---\nspec_id: common-architecture\ntitle: Architecture\nsource: extracted\nconfirmation_status: inferred\nlifecycle_status: active\nlevel: L3\npriority: 80\nseverity: medium\nconfidence: medium\nstatus: active\n---\n# Architecture\n\n## Summary for Agent\n\n- Use this draft as proposal-only input until promoted.\n",
+      "source": "extracted",
+      "confirmation_status": "inferred",
+      "lifecycle_status": "active",
+      "evidence_refs": ["evidence_map.drafts[0]"]
+    }
+  ],
+  "rejected": {
+    "inferred_rules_markdown": "No entries in this run.\n",
+    "uncertain_rules_markdown": "No entries in this run.\n",
+    "conflicts_markdown": "No entries in this run.\n"
+  },
+  "limitations": []
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "standards-promote-report/v1",
+  "run_id": "20260427-150600-sfmvpa",
+  "target_slug": "spec-first",
+  "promoted": [
+    "docs/specs/changelog-iron-law.md",
+    "docs/specs/testing-layers.md"
+  ],
+  "skipped": [],
+  "index": {
+    "ok": true,
+    "specs_count": 7,
+    "rules_count": 12,
+    "source_specs_hash": "be7700aabcc61b3595981d8bdece6208275170ccf4c3d21ec3a5ca0dc0bd162c",
+    "index_dir": "docs/specs/_index"
+  },
+  "promoted_at": "2026-04-27T07:22:56.626Z"
+}

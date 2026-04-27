@@ -191,6 +191,23 @@ Collect:
 - AGENTS.md guidance that materially affects the plan, with CLAUDE.md used only as compatibility fallback when present
 - Institutional learnings from `docs/solutions/`
 
+#### 1.1a Standards Resolve Context (Optional)
+
+If `docs/specs/_index/specs-index.json` exists in the target repo, resolve task-specific standards before finalizing the plan:
+
+```bash
+spec-first specs resolve --target=<repo> --task="<planning context summary>" --consumer spec-plan --task-id=<plan-or-spec-id>
+```
+
+Use the resulting `resolve-result.json` as standards input:
+- Read `load_full` standards when they directly constrain the planned change.
+- Read `load_summary` standards for background constraints and cross-cutting defaults.
+- Do not read all of `docs/specs/**`.
+- Treat `metadata.hard_gate=false` as binding: standards are planning inputs, not an automatic fail gate.
+- If a resolved standard conflicts with the intended plan, call out the conflict and ask for human judgment instead of silently overriding the plan.
+
+If `docs/specs/` exists but `_index/specs-index.json` is missing, mention that `spec-first specs index --target=<repo>` would enable standards resolve. Do not block planning. If no formal standards exist, continue with AGENTS.md guidance, local patterns, CRG evidence, and direct repo reads.
+
 **Slack context** (opt-in) — never auto-dispatch. Route by condition:
 
 - **Tools available + user asked**: Dispatch `spec-slack-researcher` with the planning context summary in parallel with other Phase 1.1 agents. If the origin document has a Slack context section, pass it verbatim so the researcher focuses on gaps. Include findings in consolidation.

@@ -42,6 +42,13 @@
       "skill": "spec-graph-bootstrap"
     },
     {
+      "name": "standards",
+      "filename": "standards.md",
+      "description": "Run the Spec-First standards proposal workflow",
+      "argumentHint": "[target repo path]",
+      "skill": "spec-standards"
+    },
+    {
       "name": "ideate",
       "filename": "ideate.md",
       "description": "Run the Spec-First ideation workflow",
@@ -172,6 +179,7 @@
     "spec-sessions",
     "spec-setup",
     "spec-slack-research",
+    "spec-standards",
     "spec-update",
     "spec-write-tasks",
     "spec-work",

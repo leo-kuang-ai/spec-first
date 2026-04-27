@@ -19,6 +19,20 @@ describe('spec-code-review CRG hook contract', () => {
   });
 });
 
+describe('spec-code-review standards resolve contract', () => {
+  test('passes check.jsonl to project-standards without full-loading docs/specs or making a hard gate', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('spec-first specs resolve --target=<repo> --task="review current diff" --files="<changed files>" --consumer spec-code-review --task-id=<run-id>');
+    expect(text).toContain('Pass the generated `check.jsonl` path and the `resolve-result.json` summary');
+    expect(text).toContain('Do not read all of `docs/specs/**`');
+    expect(text).toContain('Treat `metadata.hard_gate=false` as binding');
+    expect(text).toContain('A `confidence-first 100` standards finding must quote or cite the specific loaded standard path/rule');
+    expect(text).toContain('<resolved-standards-context>');
+    expect(text).toContain('spec-first specs index --target=<repo>');
+  });
+});
+
 describe('spec-code-review CE sync contracts', () => {
   test('uses tmp run artifacts and best-judgment routing without bulk preview', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');

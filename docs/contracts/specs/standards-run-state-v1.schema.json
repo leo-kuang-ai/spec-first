@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "standards-run-state-v1.schema.json",
+  "title": "standards-run-state/v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "target_slug",
+    "target_repo",
+    "consumer",
+    "status",
+    "evidence_mode",
+    "started_at",
+    "completed_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "standards-run-state/v1" },
+    "run_id": {
+      "type": "string",
+      "pattern": "^\\d{8}-\\d{6}-[a-z0-9]{6,12}$"
+    },
+    "target_slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$"
+    },
+    "target_repo": { "type": "string" },
+    "consumer": { "const": "spec-standards" },
+    "status": {
+      "type": "string",
+      "enum": ["running", "completed", "failed"]
+    },
+    "evidence_mode": {
+      "type": "string",
+      "enum": ["crg-first", "direct-only", "mixed"]
+    },
+    "started_at": { "type": "string" },
+    "completed_at": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": "detected-profiles/v1",
+  "profiles": [
+    {
+      "id": "node-commonjs-cli",
+      "scope": [
+        "backend",
+        "cli"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "package.json: type=commonjs, bin.spec-first=bin/spec-first.js, engines.node>=20",
+        "src/cli/commands/ 目录包含 doctor.js, init.js, clean.js, specs.js",
+        "bin/spec-first.js 入口"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "workflow-tool",
+      "scope": [
+        "workflows",
+        "standards",
+        "agents"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "skills/, agents/, templates/ 作为源码真相源目录",
+        "spec-first init --claude/--codex 同步到 .claude/, .codex/",
+        "src/crg/ 中的 CRG 图引擎",
+        "skills/ 下的 workflow/standalone 结构"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "multi-layer-test",
+      "scope": [
+        "testing"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "tests/unit/ (Jest + shell), tests/smoke/, tests/integration/, tests/e2e/",
+        "npm test 依次运行: test:unit && test:smoke && test:integration && test:e2e:crg",
+        "CLAUDE.md 测试策略章节将变更面映射到测试层",
+        "tests/unit/changelog-format.test.js 验证治理合约"
+      ],
+      "limitations": []
+    }
+  ]
+}

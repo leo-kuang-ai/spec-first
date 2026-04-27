@@ -1,0 +1,23 @@
+{
+  "schema_version": "standards-refresh-report/v1",
+  "generated_at": "2026-04-27T07:09:00.029Z",
+  "target_slug": "spec-first",
+  "mode": "index-only",
+  "hard_gate": false,
+  "updated_indexes": [
+    "docs/specs/_index/specs-index.json",
+    "docs/specs/_index/rules-map.json",
+    "docs/specs/_index/profiles.json",
+    "docs/specs/_index/last-scan.json",
+    "docs/specs/_index/specs-index.md"
+  ],
+  "modified_standards": [],
+  "manual_overwrites": [],
+  "index": {
+    "ok": true,
+    "specs_count": 5,
+    "rules_count": 3,
+    "source_specs_hash": "73de62cc09af82d1720860cf6c43520ca8d042a8871bed8798434cfa0a17d50b",
+    "index_dir": "docs/specs/_index"
+  }
+}

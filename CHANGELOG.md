@@ -1,6 +1,21 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.0 2026-04-27 09:30:00 leokuang: feat(spec-standards): promote 3 new formal standards to docs/specs/common/ — cli-command-safety, nodejs-conventions, secret-redaction; index rebuilt (10 specs, 18 rules) (user-visible)
+- v1.6.0 2026-04-27 15:53:49 leokuang: docs(claude-runtime): 新增 Claude Code 上下文频繁 compact 根因分析与彻底解决方案，明确 command thin wrapper、workflow 按需加载、context budget doctor 与语义保真验证路线 (user-visible)
+- v1.6.0 2026-04-27 15:52:17 leokuang: docs(spec-standards): 新增完整规范系统剩余工作路线图，明确 dogfood、Profile Registry、manual normalize、refresh proposal、sync、shared attach 与发布标准 (user-visible)
+- v1.6.0 2026-04-27 15:38:31 leokuang: docs(spec-standards): 新增 spec-standards 产物结构说明文档，表格化说明正式规范、索引、报告、草案运行产物、refresh 请求、消费上下文与 schema contract (user-visible)
+- v1.6.0 2026-04-27 15:22:49 leokuang: feat(spec-standards): 新增 `spec-first specs refresh --changed/--files` proposal request 流程，为变更文件生成 `$spec-standards` 后续草案输入且不直接改写正式规范 (user-visible)
+- v1.6.0 2026-04-27 15:07:38 leokuang: feat(spec-standards): 新增 `spec-first specs list/validate` 只读辅助命令，用于查看当前索引中的正式规范并校验规范 frontmatter (user-visible)
+- v1.6.0 2026-04-27 15:02:28 leokuang: feat(spec-standards): 新增 file-level promote 决策，支持 `--accept` / `--reject` / `--defer` 逐文件确认规范草案，保留 `--accept-all` 作为全量确认快捷路径 (user-visible)
+- v1.6.0 2026-04-27 14:38:25 leokuang: feat(spec-standards): 推进 MVP-F，新增 `spec-first specs refresh --index-only`，只重建 `_index/**` 并输出 refresh report，确保不改写正式规范正文 (user-visible)
+- v1.6.0 2026-04-27 14:23:13 leokuang: feat(spec-standards): 将 standards proposal 正式 promote 到 `docs/specs/**` 并重建 `_index/**`，落地 architecture/governance/workflow-boundaries 初版正式规范 (user-visible)
+- v1.6.0 2026-04-27 14:16:01 leokuang: feat(spec-standards): 推进 MVP-E，新增轻量 `spec-first specs check`，复用 resolve 生成规范审查辅助报告与 spec-check 上下文，保持 `hard_gate=false` 且不引入规则引擎 (user-visible)
+- v1.6.0 2026-04-27 14:02:07 leokuang: feat(spec-standards): 推进 MVP-D，将 `spec-first specs resolve` 接入 plan/work/review skill 合同，要求按 `load_full`/`load_summary`/JSONL 精准加载正式规范且保持 `metadata.hard_gate=false` (user-visible)
+- v1.6.0 2026-04-27 13:46:55 leokuang: feat(spec-standards): 推进 MVP-C，新增 `spec-first specs resolve` 按任务与文件从正式规范索引生成 full/summary/reference 加载计划，并可输出 plan/work/review 消费的 JSONL 上下文 (user-visible)
+- v1.6.0 2026-04-27 13:20:32 leokuang: feat(spec-standards): 推进 MVP-B，新增 `spec-first specs init/promote/index`，要求 `--accept-all` 显式人工确认后才写入 `docs/specs/**` 并重建 `_index/**` (user-visible)
+- v1.6.0 2026-04-27 13:02:01 leokuang: docs(audit): 新增 src/cli 深度审查与分阶段优化计划，收口 asset control plane、init/doctor 事务边界和 helper 分层建议 (user-visible)
+- v1.6.0 2026-04-27 13:01:02 leokuang: feat(spec-standards): 新增 `$spec-standards` workflow 与 MVP-A `spec-first specs write-proposal/validate-run` helper，固化 proposal schema、路径/redaction 校验、fixtures、运行时治理和 artifacts 文档 (user-visible)
 - v1.6.0 2026-04-27 12:49:30 leokuang: docs(git-npm): 更新发布后收尾规则，要求真实发版成功后立即补提 release snapshot；master 为直提分支时再次提交 master 对齐已发布 tarball (user-visible)
 - v1.6.0 2026-04-27 12:40:36 leokuang: release: 发布 spec-first 1.6.0，并基于当前 master 快照完成 npm 发版 (user-visible)
 - v1.5.9 2026-04-27 11:33:52 leokuang: docs(spec-mcp-setup): 优化最终 readiness 表格展示契约，新增 Type 列区分 MCP 与 helper，统一 n/a 显示并避免 optional MCP 被误读为 baseline 失败 (user-visible)

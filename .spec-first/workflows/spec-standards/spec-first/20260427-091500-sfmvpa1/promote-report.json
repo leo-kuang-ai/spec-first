@@ -1,0 +1,19 @@
+{
+  "schema_version": "standards-promote-report/v1",
+  "run_id": "20260427-091500-sfmvpa1",
+  "target_slug": "spec-first",
+  "promoted": [
+    "docs/specs/common/cli-command-safety.md",
+    "docs/specs/common/nodejs-conventions.md",
+    "docs/specs/common/secret-redaction.md"
+  ],
+  "skipped": [],
+  "index": {
+    "ok": true,
+    "specs_count": 10,
+    "rules_count": 18,
+    "source_specs_hash": "bb8583560a1c14d7ea9c474df17c83ddb03cae18a198926ec4ba6efd61fcf1c6",
+    "index_dir": "docs/specs/_index"
+  },
+  "promoted_at": "2026-04-27T09:22:40.118Z"
+}

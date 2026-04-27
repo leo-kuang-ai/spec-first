@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spec-frontmatter-v1.schema.json",
+  "title": "spec-frontmatter/v1",
+  "type": "object",
+  "required": [
+    "spec_id",
+    "title",
+    "source",
+    "confirmation_status",
+    "lifecycle_status",
+    "level",
+    "scope",
+    "priority",
+    "severity",
+    "confidence",
+    "status"
+  ],
+  "properties": {
+    "spec_id": { "type": "string" },
+    "title": { "type": "string" },
+    "source": {
+      "type": "string",
+      "enum": ["template", "extracted", "manual", "imported", "generated"]
+    },
+    "confirmation_status": {
+      "type": "string",
+      "enum": ["manual", "confirmed", "inferred", "uncertain", "conflict", "rejected"]
+    },
+    "lifecycle_status": {
+      "type": "string",
+      "enum": ["draft", "active", "deprecated", "overridden"]
+    },
+    "level": {
+      "type": "string",
+      "enum": ["L0", "L1", "L2", "L3", "L4"]
+    },
+    "scope": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "priority": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "low", "medium", "high", "critical"]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "deprecated", "draft"]
+    }
+  },
+  "additionalProperties": true
+}

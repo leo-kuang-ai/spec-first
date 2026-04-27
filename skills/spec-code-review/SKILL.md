@@ -393,12 +393,24 @@ This is progress reporting, not a blocking confirmation.
 
 ### Stage 3b: Discover project standards paths
 
-Before spawning sub-agents, find the file paths (not contents) of all relevant standards files for the `project-standards` persona. Use the native file-search/glob tool to locate:
+Before spawning sub-agents, prepare scoped project standards input for the `project-standards` persona.
+
+If `docs/specs/_index/specs-index.json` exists, resolve review-specific standards first:
+
+```bash
+spec-first specs resolve --target=<repo> --task="review current diff" --files="<changed files>" --consumer spec-code-review --task-id=<run-id>
+```
+
+Pass the generated `check.jsonl` path and the `resolve-result.json` summary to the `project-standards` persona. The persona reads only the listed standards files, honoring `full` vs `summary` modes. Do not read all of `docs/specs/**`. Treat `metadata.hard_gate=false` as binding: resolved standards focus review attention, but findings still require reviewer judgment and diff evidence. A `confidence-first 100` standards finding must quote or cite the specific loaded standard path/rule.
+
+If `docs/specs/` exists but `_index/specs-index.json` is missing, note that `spec-first specs index --target=<repo>` would enable standards resolve, then continue with the fallback below.
+
+Fallback path discovery for repos without formal standards index:
 
 1. Use the native file-search tool (e.g., Glob in Claude Code) to find all `**/CLAUDE.md` and `**/AGENTS.md` in the repo.
 2. Filter to those whose directory is an ancestor of at least one changed file. A standards file governs all files below it (e.g., `plugins/spec-first/AGENTS.md` applies to everything under `plugins/spec-first/`).
 
-Pass the resulting path list to the `project-standards` persona inside a `<standards-paths>` block in its review context (see Stage 4). The persona reads the files itself, targeting only the sections relevant to the changed file types. This keeps the orchestrator's work cheap (path discovery only) and avoids bloating the subagent prompt with content the reviewer may not fully need.
+Pass the resulting path list to the `project-standards` persona inside a `<standards-paths>` block in its review context (see Stage 4). When standards resolve ran, also pass a `<resolved-standards-context>` block with the `resolve-result.json` and `check.jsonl` paths. The persona reads the files itself, targeting only the sections relevant to the changed file types. This keeps the orchestrator's work cheap and avoids bloating the subagent prompt with content the reviewer may not fully need.
 
 ### Stage 4: Spawn sub-agents
 

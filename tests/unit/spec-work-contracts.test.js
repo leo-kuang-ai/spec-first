@@ -20,6 +20,20 @@ describe('spec-work CRG hook contract', () => {
   });
 });
 
+describe('spec-work standards resolve contract', () => {
+  test('consumes implement.jsonl from specs resolve without turning standards into a gate', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('Standards Resolve Anchors');
+    expect(text).toContain('spec-first specs resolve --target=<repo> --task="<work task or plan summary>" --files="<planned or changed files>" --consumer spec-work --task-id=<task-or-plan-id>');
+    expect(text).toContain('docs/specs/_index/specs-index.json');
+    expect(text).toContain('generated `implement.jsonl`');
+    expect(text).toContain('Do not read all of `docs/specs/**`');
+    expect(text).toContain('Treat `metadata.hard_gate=false` as binding');
+    expect(text).toContain('Missing standards never blocks work');
+  });
+});
+
 describe('spec-work task-pack identity contract', () => {
   test('rejects missing or mismatched spec_id before creating execution tasks', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');

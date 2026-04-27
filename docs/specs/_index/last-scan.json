@@ -1,0 +1,48 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-04-27T09:22:40.112Z",
+  "source_specs_hash": "bb8583560a1c14d7ea9c474df17c83ddb03cae18a198926ec4ba6efd61fcf1c6",
+  "source_files": [
+    {
+      "path": "docs/specs/architecture.md",
+      "sha256": "04ff545f650d33eee29409cc645eca65925b9c04bc5b98527e0d4dc848a1e3ae"
+    },
+    {
+      "path": "docs/specs/changelog-iron-law.md",
+      "sha256": "2f1b5ac0e588d4b439ee86bb21ca64fc55c8df110de2b605d0f8b2d01af4e1b3"
+    },
+    {
+      "path": "docs/specs/common/cli-command-safety.md",
+      "sha256": "43c21d36e99b0f30f7965212273a50c9f783761de3d330954c085675a860a81b"
+    },
+    {
+      "path": "docs/specs/common/nodejs-conventions.md",
+      "sha256": "f513247e0967d6003e4c72ccbc15fc3db6357f1d13c082004c40e177cb461dae"
+    },
+    {
+      "path": "docs/specs/common/secret-redaction.md",
+      "sha256": "ce2df21dddb23515ea945100ea15c938c86d7fc045e52bfc316f10236d505457"
+    },
+    {
+      "path": "docs/specs/governance.md",
+      "sha256": "3ca2156d44125d53dbd072c054db281df4884a472cebf2e586dd44099435a1e8"
+    },
+    {
+      "path": "docs/specs/README.md",
+      "sha256": "dfb7343e25aff3043e8f4a934fd8d8cbf7168756a5795100743b1170fbd45619"
+    },
+    {
+      "path": "docs/specs/SPEC.md",
+      "sha256": "f5d1e5506b34169033d270ca9974e8e80cc3d8bfb024956d89d480674bca1eea"
+    },
+    {
+      "path": "docs/specs/testing-layers.md",
+      "sha256": "5fea0e3fc26b9fd9ae38cddd1debda1aa3c4dd36a3956f7877369c161d4ce142"
+    },
+    {
+      "path": "docs/specs/workflow-boundaries.md",
+      "sha256": "3f671701e3fc672c00544a6d597581facd32a97a1a76c39442bae77e21c29ef9"
+    }
+  ],
+  "freshness": "fresh"
+}

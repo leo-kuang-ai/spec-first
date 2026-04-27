@@ -1,0 +1,49 @@
+{
+  "schema_version": "detected-profiles/v1",
+  "profiles": [
+    {
+      "id": "node-commonjs-cli",
+      "scope": [
+        "backend",
+        "cli"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "package.json: type=commonjs, bin.spec-first=bin/spec-first.js, engines.node>=20",
+        "src/cli/commands/ directory with doctor.js, init.js, clean.js, specs.js",
+        "bin/spec-first.js entrypoint"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "workflow-tool",
+      "scope": [
+        "workflows",
+        "standards",
+        "agents"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "skills/, agents/, templates/ as source-of-truth asset directories",
+        "spec-first init --claude/--codex syncs to .claude/, .codex/",
+        "CRG graph engine in src/crg/",
+        "workflow/standalone structure under skills/"
+      ],
+      "limitations": []
+    },
+    {
+      "id": "multi-layer-test",
+      "scope": [
+        "testing"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "tests/unit/ (Jest + shell), tests/smoke/, tests/integration/, tests/e2e/",
+        "npm test runs: test:unit && test:smoke && test:integration && test:e2e:crg",
+        "CLAUDE.md section on test strategy maps change surface to test layers",
+        "tests/unit/changelog-format.test.js verifies governance contracts"
+      ],
+      "limitations": []
+    }
+  ]
+}
