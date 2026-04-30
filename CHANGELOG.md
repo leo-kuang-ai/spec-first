@@ -1,6 +1,8 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.1 2026-05-01 03:26:11 leokuang: fix(task-pack): 为 optional quality fields 增加确定性类型校验，并补 CLI JSON 与路径段回归测试 (user-visible)
+- v1.6.1 2026-05-01 02:32:58 leokuang: fix(spec-write-tasks): 30 轮审查收紧 task-pack 字段层级、standalone 入口边界、validator 路径与空任务校验，并补逐轮记录 (user-visible)
 - v1.6.1 2026-04-30 16:48:00 leokuang: fix(spec-mcp-setup): 将 ast-grep global skill 安装改回直接 timeout 执行，避免嵌套 shell 影响慢路径探测与日志一致性 (user-visible)
 - v1.6.1 2026-04-30 16:34:00 leokuang: fix(spec-mcp-setup): 将 helper 安装超时包装切换到非登录 shell，避免 `bash -lc` 的启动副作用吞掉 `run_install_command` 路径日志 (user-visible)
 - v1.6.1 2026-04-30 16:12:00 leokuang: fix(spec-mcp-setup): 将 helper 安装超时保护扩展到所有 run_install_command 路径，避免 gh/jq/vhs/silicon/ffmpeg/ast-grep 在安装阶段无界阻塞 (user-visible)

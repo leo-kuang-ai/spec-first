@@ -31,11 +31,12 @@ If a missing item is a true implementation-time unknown, keep the task pack deri
 
 ## Traceability Rules
 
-Every task should point back to at least one source anchor:
+Every executable task should point back to at least one deterministic source anchor:
 
 - `source_unit` when the plan has implementation units,
-- `requirement_refs` when the plan has requirements or acceptance examples,
-- `context_refs` when the source is a section, contract, research note, or code pattern.
+- `requirement_refs` when the plan has requirements or acceptance examples.
+
+Use `context_refs` for the smallest plan sections, contracts, research notes, or code patterns the executor must read. Current deterministic validation treats `context_refs` as auxiliary context, not as a replacement for `source_unit` or `requirement_refs`.
 
 Every requirement should be covered by at least one task unless it is explicitly `non-goal`, `already satisfied`, or `deferred`.
 
@@ -102,7 +103,7 @@ Use these field-level checks before handing a task pack to `spec-work`:
 
 | Field | Good value | Reject or revise when |
 | --- | --- | --- |
-| `context_refs` | Names the smallest plan sections, code files, contracts, or pattern docs needed for this task | It points only to the whole plan, lists every reference, or omits code/context needed to understand file boundaries |
+| `context_refs` | Names the smallest plan sections, code files, contracts, or pattern docs needed for this task; auxiliary to `source_unit` / `requirement_refs` | It points only to the whole plan, lists every reference, omits code/context needed to understand file boundaries, or is used as the only executable source anchor |
 | `orientation_evidence` | Records provider, posture, evidence_refs, and limitations for bounded source orientation used to compile task boundaries | It claims LSP/direct reads as scope authority, omits limitations, or lists broad repo exploration with no task-boundary impact |
 | `entry_hint` | Names where to start reading, such as a source section, helper, schema, or existing test pattern | It becomes a step-by-step implementation script or shell-command choreography |
 | `test_focus` | States the primary verification surface and behavior category | It says only "tests" or requires acceptance criteria not present in the source plan |
@@ -166,7 +167,7 @@ Bad stop signals:
 | Task repeats plan prose | No context compression | Replace with source anchors and an execution slice |
 | Goal has multiple unrelated verbs | Task is too large | Split by validation point or file boundary |
 | Dependencies encode preference | Reduces parallelism | Keep only real output dependencies |
-| `files` uses broad globs | Execution boundary is weak | Use concrete repo-relative paths or narrow directories |
+| `files` uses broad globs, directories, or shorthand paths | Execution boundary is weak and deterministic validation cannot prove overlap safely | Use non-empty concrete repo-relative POSIX file paths |
 | `context_refs` lists everything | Executor still has to read the whole plan | Keep only task-critical refs |
 | Orientation Evidence is missing or overclaims | Executor cannot tell why boundaries are accurate, or evidence becomes a second plan | Record bounded provider/evidence/limitations and keep the source plan authoritative |
 | `done_signal` is subjective | Cannot verify completion | Use test, diff, CLI, docs, or review signals |

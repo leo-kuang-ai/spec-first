@@ -58,7 +58,11 @@ describe('spec-write-tasks contracts', () => {
     expect(skill).toContain('Do not let LSP references automatically expand task scope');
     expect(skill).toContain('top-level `target_repo` for single-repo work or per-unit `target_repo` for cross-repo work');
     expect(skill).toContain('do not invent child repo targets while deriving tasks');
-    expect(skill).toContain('validate `target_repo` inheritance or per-task `target_repo` values');
+    expect(skill).toContain('inspect `target_repo` inheritance or per-task `target_repo` values');
+    expect(skill).toContain('current deterministic validation does not prove workspace repo scope');
+    expect(skill).toContain('Deterministic contract fields validated by `spec-first tasks validate`');
+    expect(skill).toContain('LLM/human quality fields that should be present when they reduce execution context');
+    expect(skill).toContain('The deterministic validator only proves frontmatter identity/freshness plus the `Task Pack Contract` machine-readable structure');
     expect(skill).not.toContain('spec-first ' + 'crg hook');
     expect(skill).not.toContain('$spec-' + 'graph' + '-bootstrap');
     expect(skill).not.toContain('/spec:' + 'graph' + '-bootstrap');
@@ -86,13 +90,15 @@ describe('spec-write-tasks contracts', () => {
     expect(schema).toContain('transient slices are not stable `spec-work` input');
     expect(schema).toContain('do not write an executable handoff');
     expect(schema).toContain('Traceability Matrix');
-    expect(schema).toContain('Every task card must include these fields');
+    expect(schema).toContain('Current deterministic validation only checks frontmatter identity/freshness and the `Task Pack Contract` JSON structure');
+    expect(schema).toContain('Executable task cards must include these deterministic fields');
+    expect(schema).toContain('Quality Task Fields');
     expect(schema).toContain('MVP required task fields');
     expect(schema).toContain('Wave ids must be strings or numbers.');
-    expect(schema).toContain('Concrete repo-relative POSIX file paths; no globs, directories, `..`, `...`, or backslash separators');
+    expect(schema).toContain('Non-empty concrete repo-relative POSIX file paths; no globs, directories, `.`, `..`, `...`, or backslash separators');
     expect(schema).toContain('Boolean hint for whether the task can run in parallel');
     expect(schema).toContain('`stop_if`');
-    expect(schema).toContain('Optional Task Fields');
+    expect(schema).toContain('`target_repo`');
     expect(schema).toContain('| `test_focus` | Primary verification focus |');
     expect(schema).toContain('Granularity Guide');
     expect(schema).toContain('Scripts must not judge task splitting quality');
@@ -111,6 +117,8 @@ describe('spec-write-tasks contracts', () => {
     expect(guide).toContain('### Bad');
     expect(guide).toContain('Field Writing Guide');
     expect(guide).toContain('Task Pack Review Checklist');
+    expect(guide).toContain('Current deterministic validation treats `context_refs` as auxiliary context, not as a replacement for `source_unit` or `requirement_refs`.');
+    expect(guide).toContain('Use non-empty concrete repo-relative POSIX file paths');
     expect(guide).toContain('orientation_evidence');
     expect(guide).toContain('provider, posture, evidence_refs, and limitations');
     expect(guide).toContain('without turning LSP/current code state into source-plan scope');
@@ -140,7 +148,9 @@ describe('spec-write-tasks contracts', () => {
       expect(skill).toContain('do not create execution tasks until the task-pack validation checks above have passed');
       expect(skill).toContain('optional task-pack suitability check before `before-work --plan`');
       expect(skill).toContain('offer the diversion once only when the plan has strong signals');
+      expect(skill).toContain('load the standalone `spec-write-tasks` skill with the plan path');
       expect(skill).toContain('do not prompt again in this work run');
+      expect(skill).not.toContain('run `spec-write-tasks <plan-path>`');
     }
   });
 
@@ -150,6 +160,7 @@ describe('spec-write-tasks contracts', () => {
     expect(metadata).toContain('Compile settled plans into optional derived task packs');
     expect(metadata).toContain('first decide whether task compilation is warranted');
     expect(metadata).toContain('the appropriate spec-work workflow');
+    expect(metadata).toContain('allow_implicit_invocation: false');
     expect(metadata).not.toContain('$spec-work');
     expect(metadata).not.toContain('/spec:work');
   });
@@ -172,6 +183,7 @@ describe('spec-write-tasks contracts', () => {
       expect(runtimeSkill).not.toContain('source_plan_hash: pending-tooling');
       expect(runtimeMetadata).toContain('first decide whether task compilation is warranted');
       expect(runtimeMetadata).toContain('the appropriate spec-work workflow');
+      expect(runtimeMetadata).toContain('allow_implicit_invocation: false');
       expect(runtimeMetadata).not.toContain('$spec-work');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });

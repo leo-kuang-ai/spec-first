@@ -4,4 +4,4 @@ interface:
   default_prompt: "Use the spec-write-tasks standalone skill to first decide whether task compilation is warranted, then compile a settled plan into a derived task pack for the appropriate spec-work workflow only when the plan is large, dependency-heavy, or benefits from explicit execution waves."
 
 policy:
-  allow_implicit_invocation: true
+  allow_implicit_invocation: false

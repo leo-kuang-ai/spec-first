@@ -1,6 +1,6 @@
 ---
 name: spec-write-tasks
-description: "Compile a settled spec-plan into a derived task pack for spec-work, or validate an existing task pack before execution. Use when the user asks to split a plan into tasks, write task docs, hand a plan to work through tasks, or when work should accept plan/task-pack input. Keep plan as the single source of truth; tasks are derived and optional."
+description: "Compile a settled spec-plan into an optional derived task pack for spec-work, or validate an existing task pack before execution. Use when the user asks to split a plan into tasks, write task docs, or when a work suitability check concludes a task pack would materially reduce execution risk or context load. Keep plan as the single source of truth; tasks are derived and optional."
 argument-hint: "[plan doc path, task-pack path, or task-splitting request]"
 ---
 
@@ -16,6 +16,7 @@ It does not execute code. It compresses a settled plan into a task pack that is 
 - The plan is large enough that direct execution would force the executor to understand and split it at the same time.
 - The plan has multiple implementation units, clear dependency chains, or clear file boundaries.
 - A standalone task document would be useful as input to `spec-work`.
+- A work suitability check has already found strong signals that task compilation would materially reduce execution risk or context load.
 - The right next step is to decide whether task compilation is worthwhile, not to force task generation by default.
 
 ## When To Skip
@@ -75,7 +76,7 @@ When the input is `docs/tasks/*-tasks.md` or a file whose frontmatter has `type:
 
 1. Read the task pack frontmatter, `source_plan`, and source plan.
 2. Validate `generated_by: spec-write-tasks`, `mode/status`, `spec_id`, `source_plan`, `source_plan_hash`, required task-card fields, dependency references, and repo-relative `files`.
-2a. In workspace contexts, validate `target_repo` inheritance or per-task `target_repo` values before treating the task pack as executable.
+2a. In workspace contexts, inspect `target_repo` inheritance or per-task `target_repo` values before treating the task pack as executable; current deterministic validation does not prove workspace repo scope, so missing or ambiguous repo scope is a semantic handoff failure.
 3. If deterministic hash tooling is unavailable, report the task pack as unverifiable handoff. Do not normalize and continue.
 4. If `source_plan_hash` does not match the current source plan, stop. Do not normalize and continue; require rebuilding from the source plan.
 5. If the task pack lacks `spec_id`, report it as missing identity and not executable handoff. Do not normalize and continue.
@@ -124,7 +125,7 @@ This is an LLM semantic analysis order, not a script state machine. It does not 
 2. Identify foundations: find shared schemas, contracts, adapters, fixtures, test helpers, and CLI surfaces.
 3. Identify executable slices: decide whether each unit should remain one task, split into story tasks, or merge with a nearby unit.
 4. Build the dependency graph: record only real output dependencies, not preferred ordering.
-5. Assign waves: avoid shared files inside a wave; if files overlap, serialize or mark the overlap explicitly.
+5. Assign waves: avoid shared files inside a wave; executable task packs must serialize overlapping files into different waves because deterministic validation rejects same-wave file overlap.
 6. Write task cards: each task must state goal, files, context_refs, test_focus, done_signal, and stop_if.
 7. Run the quality pass: check traceability, scope, granularity, dependency accuracy, verification, and consumption readiness.
 
@@ -147,8 +148,8 @@ See [Task Quality Guide](references/task-quality-guide.md) for detailed quality 
 
 ## Task Splitting Principles
 
-- Identify foundation tasks first: test fixtures, schemas, contracts, CLI surfaces, shared helpers.
-- Then identify user-verifiable story slices or plan implementation units.
+- Create foundation tasks only when the source plan already requires shared fixtures, schemas, contracts, CLI surfaces, or helpers that multiple later tasks truly depend on.
+- Otherwise prefer closed user-verifiable story slices or plan implementation units.
 - Add integration, docs, release-surface, or polish tasks last.
 - Merge continuous changes in the same module.
 - Merge related changes on the same test surface.
@@ -180,6 +181,8 @@ The body must include:
 - Orientation Evidence
 - Validation Notes
 - Regeneration Rules
+
+The deterministic validator only proves frontmatter identity/freshness plus the `Task Pack Contract` machine-readable structure. The other body sections are LLM/human handoff quality requirements and must not be described as CLI-validated unless a future validator explicitly checks them.
 
 When writing a task pack, read [Task Pack Schema](references/task-pack-schema.md) and use its frontmatter, task-card fields, and regeneration rules.
 
@@ -214,22 +217,31 @@ next_action: spec-work-task-pack | review-task-pack | spec-work-plan | revise-pl
 
 ## Required Task Card Semantics
 
-Every task card must express:
+Executable task cards have two layers:
+
+1. Deterministic contract fields validated by `spec-first tasks validate`: `task_id`, `dependencies`, non-empty concrete `files`, `goal`, `test_focus`, `done_signal`, `wave`, `stop_if`, plus at least one source anchor through `source_unit` or `requirement_refs`.
+2. LLM/human quality fields that should be present when they reduce execution context: `context_refs`, `entry_hint`, `parallelizable`, `risk_note`, `notes`, `review_focus`, `handoff_owner`, and workspace-scoped `target_repo` when applicable.
+
+Every executable task card must express:
 
 - `task_id`: stable identifier.
-- `source_unit`: matching plan U-ID; use `null` when no U-ID exists and point `context_refs` to the source section.
-- `requirement_refs`: related requirements or acceptance refs.
+- `source_unit`: matching plan U-ID when available.
+- `requirement_refs`: related requirements or acceptance refs; required when `source_unit` is absent.
 - `goal`: one-sentence task goal.
 - `dependencies`: prerequisite task IDs.
-- `files`: repo-relative paths the task is allowed to touch.
-- `context_refs`: plan sections, code patterns, contracts, research, or references the executor must read.
-- `entry_hint`: where to start reading; not a step-by-step implementation script.
+- `files`: non-empty concrete repo-relative POSIX file paths the task is allowed to touch.
 - `test_focus`: primary verification focus.
 - `done_signal`: observable completion signal.
-- `parallelizable`: whether the task can run in parallel.
-- `risk_note`: main risk.
 - `stop_if`: condition that should send execution back to `spec-plan` or user confirmation.
 - `wave`: execution wave.
+
+Add these quality fields when useful, but do not imply the CLI validator proves their semantic adequacy:
+
+- `context_refs`: plan sections, code patterns, contracts, research, or references the executor must read.
+- `entry_hint`: where to start reading; not a step-by-step implementation script.
+- `parallelizable`: whether the task can run in parallel.
+- `risk_note`: main risk.
+- `target_repo`: selected child repo in parent-workspace contexts.
 
 ## Drift And Hash
 

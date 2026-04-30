@@ -28,20 +28,30 @@ source_sections:
 ---
 ```
 
-### Required Frontmatter
+### Deterministic Frontmatter
+
+These fields are required for executable handoff and are validated by `spec-first tasks validate`:
 
 | Field | Meaning |
 | --- | --- |
-| `title` | Task pack title |
 | `type` | Must be `task-pack` |
-| `status` | Executable handoff must be `derived`; unverified drafts must use `draft` |
-| `date` | Generation date |
+| `status` | Executable handoff must be `derived`; unverified drafts must use `draft` and are reported as non-executable by the validator |
 | `spec_id` | Spec-chain identity copied from the source plan; executable handoff requires it |
 | `source_plan` | Concrete repo-relative POSIX file path to the single source plan |
 | `source_plan_hash` | Canonical source plan body hash; executable handoff must use `sha256:<64-hex>` |
 | `generated_by` | Must be `spec-write-tasks` |
 | `mode` | Executable handoff must be `derived`; transient slices are not stable `spec-work` input |
+
+### Human-Readable Frontmatter
+
+These fields improve review and regeneration quality, but current deterministic validation does not prove them:
+
+| Field | Meaning |
+| --- | --- |
+| `title` | Task pack title |
+| `date` | Generation date |
 | `source_sections` | Plan sections actually consumed by this task pack |
+| `target_repo` | Selected child repo for parent-workspace single-repo work, when applicable |
 
 `spec_id` and `source_plan_hash` have separate jobs. `spec_id` identifies the requirements/plan/task-pack chain; `source_plan_hash` proves the task pack is still derived from the current source plan body. A task pack whose `spec_id` does not match the source plan is a wrong-chain handoff. A task pack whose hash does not match is stale.
 
@@ -68,6 +78,8 @@ If the current environment cannot produce a verifiable hash, do not write an exe
 8. `Orientation Evidence`
 9. `Validation Notes`
 10. `Regeneration Rules`
+
+Current deterministic validation only checks frontmatter identity/freshness and the `Task Pack Contract` JSON structure. The surrounding body sections remain required for high-quality LLM/human handoff, but they are review requirements rather than proof supplied by `spec-first tasks validate`.
 
 ## Source Summary
 
@@ -113,7 +125,7 @@ A wave is an execution grouping, not a state machine.
 
 - Wave ids must be strings or numbers.
 - Same-wave tasks should avoid shared files.
-- If files overlap, serialize the tasks or mark the overlap explicitly.
+- If files overlap, serialize the tasks into different waves; executable task packs do not support same-wave overlap markers.
 - Hidden dependencies must not be hidden behind wave labels.
 
 ## Task Pack Contract
@@ -146,38 +158,39 @@ Executable task packs must include exactly one fenced JSON block under `## Task 
 }
 ```
 
-MVP required task fields are `task_id`, `dependencies`, `files`, `goal`, `test_focus`, `done_signal`, `wave`, and `stop_if`, plus at least one source anchor through `source_unit` or `requirement_refs`.
+MVP required task fields are `task_id`, `dependencies`, non-empty concrete `files`, `goal`, `test_focus`, `done_signal`, `wave`, and `stop_if`, plus at least one source anchor through `source_unit` or `requirement_refs`. The deterministic validator treats `context_refs`, `entry_hint`, `parallelizable`, and `risk_note` as quality fields rather than hard executable fields.
 
 ## Task Cards
 
-Every task card must include these fields:
+Executable task cards must include these deterministic fields:
 
 | Field | Meaning |
 | --- | --- |
 | `task_id` | Stable identifier such as `T001` |
-| `source_unit` | Matching plan `U-ID`; use `null` when none exists |
-| `requirement_refs` | Related Requirements Trace / acceptance refs |
+| `source_unit` | Matching plan `U-ID` when available |
+| `requirement_refs` | Related Requirements Trace / acceptance refs; required when `source_unit` is absent |
 | `goal` | Task goal |
 | `dependencies` | Prerequisite task IDs |
-| `files` | Concrete repo-relative POSIX file paths; no globs, directories, `..`, `...`, or backslash separators |
-| `context_refs` | Plan sections, code patterns, contracts, research, or references the executor must read |
-| `entry_hint` | Suggested place to begin reading; not implementation steps |
+| `files` | Non-empty concrete repo-relative POSIX file paths; no globs, directories, `.`, `..`, `...`, or backslash separators |
 | `test_focus` | Primary verification focus |
 | `done_signal` | Observable completion signal |
-| `parallelizable` | Boolean hint for whether the task can run in parallel |
-| `risk_note` | Main risk |
 | `stop_if` | Condition that should send execution back to the plan or user confirmation |
 | `wave` | Execution wave |
 
-### Optional Task Fields
+### Quality Task Fields
 
-These fields may be added when useful, but they do not replace required fields:
+These fields should be added when useful for context compression, review, or workspace safety, but current deterministic validation does not prove their semantic adequacy:
 
 | Field | Meaning |
 | --- | --- |
+| `context_refs` | Plan sections, code patterns, contracts, research, or references the executor must read |
+| `entry_hint` | Suggested place to begin reading; not implementation steps |
+| `parallelizable` | Boolean hint for whether the task can run in parallel |
+| `risk_note` | Main risk |
 | `notes` | Additional context for human readers |
 | `review_focus` | Specific review concern |
 | `handoff_owner` | Suggested executor type when relevant |
+| `target_repo` | Selected child repo in parent-workspace contexts |
 
 ### Recommended Human-Readable Task Card Example
 
@@ -187,8 +200,8 @@ These fields may be added when useful, but they do not replace required fields:
   goal: Establish the core data structure and boundary contract
   dependencies: []
   files:
-    - src/cli/...
-    - tests/unit/...
+    - src/cli/task-pack.js
+    - tests/unit/task-pack-command.test.js
   requirement_refs:
     - R1
   context_refs:

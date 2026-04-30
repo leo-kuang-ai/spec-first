@@ -237,6 +237,32 @@ describe('task pack hash and validation', () => {
     }
   });
 
+  test('source plan path must not contain dot, parent, or empty segments', () => {
+    const segmentCases = [
+      'tests/fixtures/spec-write-tasks/valid/../valid/source-plan.md',
+      'tests/fixtures/spec-write-tasks//valid/source-plan.md',
+    ];
+
+    for (const sourcePlan of segmentCases) {
+      const tmp = copyFixtureProject();
+      try {
+        const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+        fs.writeFileSync(taskPackPath, fs.readFileSync(taskPackPath, 'utf8').replace(
+          'source_plan: tests/fixtures/spec-write-tasks/valid/source-plan.md',
+          `source_plan: ${sourcePlan}`
+        ));
+
+        const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+        expect(result.deterministic_handoff).toBe(false);
+        expect(result.validation.source_plan_path).toBe('invalid');
+        expect(result.errors.map((error) => error.code)).toContain('task-pack-source-plan-invalid');
+      } finally {
+        fs.rmSync(tmp, { recursive: true, force: true });
+      }
+    }
+  });
+
   test('missing Task Pack Contract is rejected', () => {
     const tmp = copyFixtureProject();
     try {
@@ -322,6 +348,121 @@ describe('task pack hash and validation', () => {
 
       expect(result.deterministic_handoff).toBe(false);
       expect(result.errors.map((error) => error.code)).toContain('task-pack-task-file-not-concrete');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('task file paths must not contain dot, parent, or empty segments', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks[0].files = ['src/../package.json', './src/cli/task-pack.js', 'src//cli/task-pack.js'];
+      });
+
+      const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+      expect(result.deterministic_handoff).toBe(false);
+      expect(result.errors.filter((error) => error.code === 'task-pack-task-file-not-concrete')).toHaveLength(3);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('task files must include at least one concrete file path', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks[0].files = [];
+      });
+
+      const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+      expect(result.deterministic_handoff).toBe(false);
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-task-files-empty');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('task pack contract must include at least one task and execution wave', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks = [];
+        contract.execution_waves = [];
+      });
+
+      const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+      expect(result.deterministic_handoff).toBe(false);
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-contract-tasks-empty');
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-contract-execution-waves-empty');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('documented optional task fields are accepted by the validator', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks[0].notes = 'Human-readable context.';
+        contract.tasks[0].review_focus = 'Check task pack boundary clarity.';
+        contract.tasks[0].handoff_owner = 'executor';
+        contract.tasks[0].target_repo = 'packages/spec-first';
+      });
+
+      const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+      expect(result.deterministic_handoff).toBe(true);
+      expect(result.limitations.map((limitation) => limitation.code)).not.toContain('task-pack-task-unknown-field');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('optional quality fields must be strings when provided', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks[0].notes = ['not string'];
+        contract.tasks[0].review_focus = { text: 'not string' };
+        contract.tasks[0].handoff_owner = 123;
+        contract.tasks[0].target_repo = false;
+      });
+
+      const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+      expect(result.deterministic_handoff).toBe(false);
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-task-notes-invalid');
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-task-review-focus-invalid');
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-task-handoff-owner-invalid');
+      expect(result.errors.map((error) => error.code)).toContain('task-pack-task-target-repo-invalid');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('validate --json reports invalid optional quality field types', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks[0].target_repo = { repo: 'bad' };
+      });
+
+      const { code, stdout } = captureStdout(() => runTasks(['validate', taskPackPath, '--repo', tmp, '--json']));
+      const payload = JSON.parse(stdout);
+
+      expect(code).toBe(1);
+      expect(payload.deterministic_handoff).toBe(false);
+      expect(payload.errors.map((error) => error.code)).toContain('task-pack-task-target-repo-invalid');
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }

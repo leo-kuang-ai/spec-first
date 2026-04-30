@@ -26,6 +26,10 @@ const ALLOWED_TASK_FIELDS = new Set([
   'entry_hint',
   'parallelizable',
   'risk_note',
+  'notes',
+  'review_focus',
+  'handoff_owner',
+  'target_repo',
 ]);
 
 function normalizeNewlines(text) {
@@ -194,6 +198,8 @@ function isConcreteRepoRelativeFile(filePath) {
   if (filePath.includes('...')) return false;
   if (/[*?[\]{}]/.test(filePath)) return false;
   if (filePath.endsWith('/')) return false;
+  const segments = filePath.split('/');
+  if (segments.some((segment) => segment === '..' || segment === '' || segment === '.')) return false;
   const normalized = path.normalize(filePath);
   if (normalized === '.' || normalized.startsWith('..')) return false;
   return true;
@@ -230,6 +236,19 @@ function validateStringArray(value, field, task, errors) {
         task_id: task.task_id || null,
         field,
         value: item,
+      });
+    }
+  }
+}
+
+function validateOptionalStringFields(task, fields, errors) {
+  for (const field of fields) {
+    const value = task[field];
+    if (value === undefined || value === null || value === '') continue;
+    if (!isNonEmptyString(value)) {
+      addFinding(errors, `task-pack-task-${field.replace(/_/g, '-')}-invalid`, `Task '${task.task_id || '<unknown>'}' '${field}' must be a non-empty string when provided.`, {
+        task_id: task.task_id || null,
+        field,
       });
     }
   }
@@ -429,9 +448,15 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
     addFinding(errors, 'task-pack-contract-tasks-invalid', 'Task Pack Contract tasks must be an array.');
     return;
   }
+  if (contract.tasks.length === 0) {
+    addFinding(errors, 'task-pack-contract-tasks-empty', 'Task Pack Contract tasks must include at least one task.');
+  }
   if (!Array.isArray(contract.execution_waves)) {
     addFinding(errors, 'task-pack-contract-execution-waves-invalid', 'Task Pack Contract execution_waves must be an array.');
     return;
+  }
+  if (contract.execution_waves.length === 0) {
+    addFinding(errors, 'task-pack-contract-execution-waves-empty', 'Task Pack Contract execution_waves must include at least one wave.');
   }
 
   const taskIds = new Set();
@@ -493,14 +518,15 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
       }
     }
 
-    for (const field of ['source_unit', 'entry_hint', 'risk_note']) {
-      if (task[field] !== undefined && task[field] !== null && task[field] !== '' && !isNonEmptyString(task[field])) {
-        addFinding(errors, `task-pack-task-${field.replace(/_/g, '-')}-invalid`, `Task '${task.task_id || '<unknown>'}' '${field}' must be a non-empty string when provided.`, {
-          task_id: task.task_id || null,
-          field,
-        });
-      }
-    }
+    validateOptionalStringFields(task, [
+      'source_unit',
+      'entry_hint',
+      'risk_note',
+      'notes',
+      'review_focus',
+      'handoff_owner',
+      'target_repo',
+    ], errors);
 
     if (task.parallelizable !== undefined && typeof task.parallelizable !== 'boolean') {
       addFinding(errors, 'task-pack-task-parallelizable-invalid', `Task '${task.task_id || '<unknown>'}' 'parallelizable' must be a boolean when provided.`, {
@@ -552,6 +578,10 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
 
     if (!Array.isArray(task.files)) {
       addFinding(errors, 'task-pack-task-files-invalid', `Task '${task.task_id || '<unknown>'}' files must be an array.`, {
+        task_id: task.task_id || null,
+      });
+    } else if (task.files.length === 0) {
+      addFinding(errors, 'task-pack-task-files-empty', `Task '${task.task_id || '<unknown>'}' files must include at least one concrete repo-relative file path.`, {
         task_id: task.task_id || null,
       });
     } else {
