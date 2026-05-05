@@ -553,6 +553,14 @@ not_reviewed disclosure
 
 ## 11. 最小落地顺序
 
+本地再生成 G0-G6.5 preview artifacts 使用：
+
+```bash
+npm run docs:ecc-governance
+```
+
+该命令只更新 `docs/02-架构设计/ECC集成/generated/` 下的治理预览产物，不写 generated runtime，不新增 ECC command / agent / skill runtime 入口。
+
 推荐顺序：
 
 ```text

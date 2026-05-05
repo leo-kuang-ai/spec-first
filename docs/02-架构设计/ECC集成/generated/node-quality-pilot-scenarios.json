@@ -1,0 +1,30 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.node-quality-pilot-scenarios",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "scenarios": [
+    {
+      "workflow": "spec-code-review",
+      "input_signal": "auth/session/runtime code changed",
+      "expected_quality_gain": "security, correctness, and testing findings have evidence and not_reviewed disclosure",
+      "must_not": "select more than workflow cap or let agent output final merge verdict"
+    },
+    {
+      "workflow": "spec-plan",
+      "input_signal": "new API and data model plan",
+      "expected_quality_gain": "architecture/API/data decisions include evidence, alternatives, risks, and test strategy",
+      "must_not": "override repository facts with ECC best practice"
+    },
+    {
+      "workflow": "spec-doc-review",
+      "input_signal": "large requirements document with scope and security implications",
+      "expected_quality_gain": "coherence, feasibility, scope, and security-lens findings are deduped and ranked",
+      "must_not": "replace doc-review native schema or skip deferred questions"
+    },
+    {
+      "workflow": "spec-skill-audit",
+      "input_signal": "skill/agent prompt governance change",
+      "expected_quality_gain": "agent-native, standards, CLI readiness, security, and simplicity checks prevent overreach",
+      "must_not": "depend on cached runtime skill definitions instead of fresh source"
+    }
+  ]
+}

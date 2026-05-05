@@ -8,6 +8,7 @@
   },
   "scripts": {
     "lint:skill-entrypoints": "node scripts/lint-skill-entrypoints.js",
+    "docs:ecc-governance": "node scripts/generate-ecc-governance-preview.js",
     "docs:runtime-catalog": "node scripts/generate-runtime-capability-catalog.js",
     "typecheck": "node scripts/typecheck-js.js",
     "build": "npm pack --dry-run",
@@ -30,6 +31,7 @@
     "src/",
     "agents/",
     "docs/contracts/verifiers/",
+    "scripts/generate-ecc-governance-preview.js",
     "scripts/generate-runtime-capability-catalog.js",
     "scripts/typecheck-js.js",
     "skills/",

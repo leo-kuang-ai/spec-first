@@ -1,0 +1,788 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.ecc-agent-overlap-matrix",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "source": {
+    "ecc_root": "/Users/kuang/xiaobu/everything-claude-code",
+    "source_revision": "841beea45cb25ba51f29fa45b7e272938d19b80a",
+    "worktree_dirty": true
+  },
+  "ecc_agent_count": 48,
+  "entries": [
+    {
+      "ecc_agent": "a11y-architect",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/a11y-architect.md",
+      "description": "Accessibility Architect specializing in WCAG 2.2 compliance for Web and Native platforms. Use PROACTIVELY when designing UI components, establishing design systems, or auditing code for inclusive user experiences.",
+      "spec_first_agents": [
+        "spec-design-lens-reviewer",
+        "spec-design-implementation-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-design-lens-reviewer, spec-design-implementation-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "architect",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/architect.md",
+      "description": "Software architecture specialist for system design, scalability, and technical decision-making. Use PROACTIVELY when planning new features, refactoring large systems, or making architectural decisions.",
+      "spec_first_agents": [
+        "spec-architecture-strategist"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-architecture-strategist",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "build-error-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/build-error-resolver.md",
+      "description": "Build and TypeScript error resolution specialist. Use PROACTIVELY when build fails or type errors occur. Fixes build/type errors only with minimal diffs, no architectural edits. Focuses on getting the build green quickly.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; keep checklist/reference until stack opt-in",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "chief-of-staff",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/chief-of-staff.md",
+      "description": "Personal communication chief of staff that triages email, Slack, LINE, and Messenger. Classifies messages into 4 tiers (skip/info_only/meeting_info/action_required), generates draft replies, and enforces post-send follow-through via hooks. Use when managing multi-channel communication workflows.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "reference_only",
+      "priority": "P3",
+      "reason": "organizational operations role outside current R&D expert pack scope",
+      "migration_notes": [
+        "keep inventory/reference only",
+        "do not enter capability pack, router, or runtime roadmap"
+      ]
+    },
+    {
+      "ecc_agent": "code-architect",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/code-architect.md",
+      "description": "Designs feature architectures by analyzing existing codebase patterns and conventions, then providing implementation blueprints with concrete files, interfaces, data flow, and build order.",
+      "spec_first_agents": [
+        "spec-architecture-strategist"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-architecture-strategist",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "code-explorer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/code-explorer.md",
+      "description": "Deeply analyzes existing codebase features by tracing execution paths, mapping architecture layers, and documenting dependencies to inform new development.",
+      "spec_first_agents": [
+        "spec-repo-research-analyst"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-repo-research-analyst",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "code-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/code-reviewer.md",
+      "description": "Expert code review specialist. Proactively reviews code for quality, security, and maintainability. Use immediately after writing or modifying code. MUST BE USED for all code changes.",
+      "spec_first_agents": [
+        "spec-correctness-reviewer",
+        "spec-testing-reviewer",
+        "spec-maintainability-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-correctness-reviewer, spec-testing-reviewer, spec-maintainability-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "code-simplifier",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/code-simplifier.md",
+      "description": "Simplifies and refines code for clarity, consistency, and maintainability while preserving behavior. Focus on recently modified code unless instructed otherwise.",
+      "spec_first_agents": [
+        "spec-code-simplicity-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-code-simplicity-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "comment-analyzer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/comment-analyzer.md",
+      "description": "Analyze code comments for accuracy, completeness, maintainability, and comment rot risk.",
+      "spec_first_agents": [
+        "spec-pr-comment-resolver",
+        "spec-previous-comments-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P2",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-pr-comment-resolver, spec-previous-comments-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "conversation-analyzer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/conversation-analyzer.md",
+      "description": "Use this agent when analyzing conversation transcripts to find behaviors worth preventing with hooks. Triggered by /hookify without arguments.",
+      "spec_first_agents": [
+        "spec-session-historian"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-session-historian",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "cpp-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/cpp-build-resolver.md",
+      "description": "C++ build, CMake, and compilation error resolution specialist. Fixes build errors, linker issues, and template errors with minimal changes. Use when C++ builds fail.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "cpp-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/cpp-reviewer.md",
+      "description": "Expert C++ code reviewer specializing in memory safety, modern C++ idioms, concurrency, and performance. Use for all C++ code changes. MUST BE USED for C++ projects.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "language reviewer not present in current source agents",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "csharp-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/csharp-reviewer.md",
+      "description": "Expert C# code reviewer specializing in .NET conventions, async patterns, security, nullable reference types, and performance. Use for all C# code changes. MUST BE USED for C# projects.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "language reviewer not present in current source agents",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "dart-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/dart-build-resolver.md",
+      "description": "Dart/Flutter build, analysis, and dependency error resolution specialist. Fixes `dart analyze` errors, Flutter compilation failures, pub dependency conflicts, and build_runner issues with minimal, surgical changes. Use when Dart/Flutter builds fail.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "database-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/database-reviewer.md",
+      "description": "PostgreSQL database specialist for query optimization, schema design, security, and performance. Use PROACTIVELY when writing SQL, creating migrations, designing schemas, or troubleshooting database performance. Incorporates Supabase best practices.",
+      "spec_first_agents": [
+        "spec-data-integrity-guardian",
+        "spec-data-migrations-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-data-integrity-guardian, spec-data-migrations-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "doc-updater",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/doc-updater.md",
+      "description": "Documentation and codemap specialist. Use PROACTIVELY for updating codemaps and documentation. Runs /update-codemaps and /update-docs, generates docs/CODEMAPS/*, updates READMEs and guides.",
+      "spec_first_agents": [
+        "spec-coherence-reviewer",
+        "spec-learnings-researcher"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-coherence-reviewer, spec-learnings-researcher",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "docs-lookup",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/docs-lookup.md",
+      "description": "When the user asks how to use a library, framework, or API or needs up-to-date code examples, use Context7 MCP to fetch current documentation and return answers with examples. Invoke for docs/API/setup questions.",
+      "spec_first_agents": [
+        "spec-framework-docs-researcher",
+        "spec-web-researcher"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-framework-docs-researcher, spec-web-researcher",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "e2e-runner",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/e2e-runner.md",
+      "description": "End-to-end testing specialist using Vercel Agent Browser (preferred) with Playwright fallback. Use PROACTIVELY for generating, maintaining, and running E2E tests. Manages test journeys, quarantines flaky tests, uploads artifacts (screenshots, videos, traces), and ensures critical user flows work.",
+      "spec_first_agents": [
+        "spec-testing-reviewer",
+        "spec-deployment-verification-agent"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-testing-reviewer, spec-deployment-verification-agent",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "flutter-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/flutter-reviewer.md",
+      "description": "Flutter and Dart code reviewer. Reviews Flutter code for widget best practices, state management patterns, Dart idioms, performance pitfalls, accessibility, and clean architecture violations. Library-agnostic — works with any state management solution and tooling.",
+      "spec_first_agents": [
+        "spec-design-implementation-reviewer"
+      ],
+      "overlap_status": "partial_match",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "frontend/app expertise partially covered by design and mobile reviewers",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "gan-evaluator",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/gan-evaluator.md",
+      "description": "GAN Harness — Evaluator agent. Tests the live running application via Playwright, scores against rubric, and provides actionable feedback to the Generator.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_profile",
+      "priority": "P3",
+      "reason": "experimental harness reference only",
+      "migration_notes": [
+        "keep as preview candidate only",
+        "require pilot evidence before prompt/runtime changes"
+      ]
+    },
+    {
+      "ecc_agent": "gan-generator",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/gan-generator.md",
+      "description": "GAN Harness — Generator agent. Implements features according to the spec, reads evaluator feedback, and iterates until quality threshold is met.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_profile",
+      "priority": "P3",
+      "reason": "experimental harness reference only",
+      "migration_notes": [
+        "keep as preview candidate only",
+        "require pilot evidence before prompt/runtime changes"
+      ]
+    },
+    {
+      "ecc_agent": "gan-planner",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/gan-planner.md",
+      "description": "GAN Harness — Planner agent. Expands a one-line prompt into a full product specification with features, sprints, evaluation criteria, and design direction.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_profile",
+      "priority": "P3",
+      "reason": "experimental harness reference only",
+      "migration_notes": [
+        "keep as preview candidate only",
+        "require pilot evidence before prompt/runtime changes"
+      ]
+    },
+    {
+      "ecc_agent": "go-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/go-build-resolver.md",
+      "description": "Go build, vet, and compilation error resolution specialist. Fixes build errors, go vet issues, and linter warnings with minimal changes. Use when Go builds fail.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "go-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/go-reviewer.md",
+      "description": "Expert Go code reviewer specializing in idiomatic Go, concurrency patterns, error handling, and performance. Use for all Go code changes. MUST BE USED for Go projects.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "language reviewer not present in current source agents",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "harness-optimizer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/harness-optimizer.md",
+      "description": "Analyze and improve the local agent harness configuration for reliability, cost, and throughput.",
+      "spec_first_agents": [
+        "spec-agent-native-reviewer",
+        "spec-cli-agent-readiness-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-agent-native-reviewer, spec-cli-agent-readiness-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "healthcare-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/healthcare-reviewer.md",
+      "description": "Reviews healthcare application code for clinical safety, CDSS accuracy, PHI compliance, and medical data integrity. Specialized for EMR/EHR, clinical decision support, and health information systems.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "reference_only",
+      "priority": "P3",
+      "reason": "healthcare domain excluded from current R&D-focused integration",
+      "migration_notes": [
+        "keep inventory/reference only",
+        "do not enter capability pack, router, or runtime roadmap"
+      ]
+    },
+    {
+      "ecc_agent": "java-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/java-build-resolver.md",
+      "description": "Java/Maven/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors, Java compiler errors, and Maven/Gradle issues with minimal changes. Use when Java or Spring Boot builds fail.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "java-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/java-reviewer.md",
+      "description": "Expert Java and Spring Boot code reviewer specializing in layered architecture, JPA patterns, security, and concurrency. Use for all Java code changes. MUST BE USED for Spring Boot projects.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "language reviewer not present in current source agents",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "kotlin-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/kotlin-build-resolver.md",
+      "description": "Kotlin/Gradle build, compilation, and dependency error resolution specialist. Fixes build errors, Kotlin compiler errors, and Gradle issues with minimal changes. Use when Kotlin builds fail.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "kotlin-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/kotlin-reviewer.md",
+      "description": "Kotlin and Android/KMP code reviewer. Reviews Kotlin code for idiomatic patterns, coroutine safety, Compose best practices, clean architecture violations, and common Android pitfalls.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "language reviewer not present in current source agents",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "loop-operator",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/loop-operator.md",
+      "description": "Operate autonomous agent loops, monitor progress, and intervene safely when loops stall.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_profile",
+      "priority": "P3",
+      "reason": "autonomous loop reference for spec-optimize only",
+      "migration_notes": [
+        "keep as preview candidate only",
+        "require pilot evidence before prompt/runtime changes"
+      ]
+    },
+    {
+      "ecc_agent": "opensource-forker",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/opensource-forker.md",
+      "description": "Fork any project for open-sourcing. Copies files, strips secrets and credentials (20+ patterns), replaces internal references with placeholders, generates .env.example, and cleans git history. First stage of the opensource-pipeline skill.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "open-source release capability requires explicit opt-in",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "opensource-packager",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/opensource-packager.md",
+      "description": "Generate complete open-source packaging for a sanitized project. Produces CLAUDE.md, setup.sh, README.md, LICENSE, CONTRIBUTING.md, and GitHub issue templates. Makes any repo immediately usable with Claude Code. Third stage of the opensource-pipeline skill.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "open-source release capability requires explicit opt-in",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "opensource-sanitizer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/opensource-sanitizer.md",
+      "description": "Verify an open-source fork is fully sanitized before release. Scans for leaked secrets, PII, internal references, and dangerous files using 20+ regex patterns. Generates a PASS/FAIL/PASS-WITH-WARNINGS report. Second stage of the opensource-pipeline skill. Use PROACTIVELY before any public release.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "open-source release capability requires explicit opt-in",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "performance-optimizer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/performance-optimizer.md",
+      "description": "Performance analysis and optimization specialist. Use PROACTIVELY for identifying bottlenecks, optimizing slow code, reducing bundle sizes, and improving runtime performance. Profiling, memory leaks, render optimization, and algorithmic improvements.",
+      "spec_first_agents": [
+        "spec-performance-reviewer",
+        "spec-performance-oracle"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-performance-reviewer, spec-performance-oracle",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "planner",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/planner.md",
+      "description": "Expert planning specialist for complex features and refactoring. Use PROACTIVELY when users request feature implementation, architectural changes, or complex refactoring. Automatically activated for planning tasks.",
+      "spec_first_agents": [
+        "spec-architecture-strategist",
+        "spec-feasibility-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-architecture-strategist, spec-feasibility-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "pr-test-analyzer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/pr-test-analyzer.md",
+      "description": "Review pull request test coverage quality and completeness, with emphasis on behavioral coverage and real bug prevention.",
+      "spec_first_agents": [
+        "spec-testing-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-testing-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "python-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/python-reviewer.md",
+      "description": "Expert Python code reviewer specializing in PEP 8 compliance, Pythonic idioms, type hints, security, and performance. Use for all Python code changes. MUST BE USED for Python projects.",
+      "spec_first_agents": [
+        "spec-kieran-python-reviewer"
+      ],
+      "overlap_status": "partial_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "partially covered by existing generalized or personal-name spec-first reviewer",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-kieran-python-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "pytorch-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/pytorch-build-resolver.md",
+      "description": "PyTorch runtime, CUDA, and training error resolution specialist. Fixes tensor shape mismatches, device errors, gradient issues, DataLoader problems, and mixed precision failures with minimal changes. Use when PyTorch training or inference crashes.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "refactor-cleaner",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/refactor-cleaner.md",
+      "description": "Dead code cleanup and consolidation specialist. Use PROACTIVELY for removing unused code, duplicates, and refactoring. Runs analysis tools (knip, depcheck, ts-prune) to identify dead code and safely removes it.",
+      "spec_first_agents": [
+        "spec-maintainability-reviewer",
+        "spec-code-simplicity-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-maintainability-reviewer, spec-code-simplicity-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "rust-build-resolver",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/rust-build-resolver.md",
+      "description": "Rust build, compilation, and dependency error resolution specialist. Fixes cargo build errors, borrow checker issues, and Cargo.toml problems with minimal changes. Use when Rust builds fail.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "build resolver capability; stack-specific opt-in only",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "rust-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/rust-reviewer.md",
+      "description": "Expert Rust code reviewer specializing in ownership, lifetimes, error handling, unsafe usage, and idiomatic patterns. Use for all Rust code changes. MUST BE USED for Rust projects.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "optional_lens",
+      "priority": "P2",
+      "reason": "language reviewer not present in current source agents",
+      "migration_notes": [
+        "keep as optional lens/checklist",
+        "require explicit project or workflow enablement",
+        "do not enter P0/P1 default router"
+      ]
+    },
+    {
+      "ecc_agent": "security-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/security-reviewer.md",
+      "description": "Security vulnerability detection and remediation specialist. Use PROACTIVELY after writing code that handles user input, authentication, API endpoints, or sensitive data. Flags secrets, SSRF, injection, unsafe crypto, and OWASP Top 10 vulnerabilities.",
+      "spec_first_agents": [
+        "spec-security-reviewer",
+        "spec-security-lens-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-security-reviewer, spec-security-lens-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "seo-specialist",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/seo-specialist.md",
+      "description": "SEO specialist for technical SEO audits, on-page optimization, structured data, Core Web Vitals, and content/keyword mapping. Use for site audits, meta tag reviews, schema markup, sitemap and robots issues, and SEO remediation plans.",
+      "spec_first_agents": [],
+      "overlap_status": "missing_in_spec_first",
+      "integration_action": "reference_only",
+      "priority": "P3",
+      "reason": "media/growth domain excluded from current R&D-focused integration",
+      "migration_notes": [
+        "keep inventory/reference only",
+        "do not enter capability pack, router, or runtime roadmap"
+      ]
+    },
+    {
+      "ecc_agent": "silent-failure-hunter",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/silent-failure-hunter.md",
+      "description": "Review code for silent failures, swallowed errors, bad fallbacks, and missing error propagation.",
+      "spec_first_agents": [
+        "spec-reliability-reviewer",
+        "spec-correctness-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-reliability-reviewer, spec-correctness-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "tdd-guide",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/tdd-guide.md",
+      "description": "Test-Driven Development specialist enforcing write-tests-first methodology. Use PROACTIVELY when writing new features, fixing bugs, or refactoring code. Ensures 80%+ test coverage.",
+      "spec_first_agents": [
+        "spec-testing-reviewer"
+      ],
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "same R&D review domain already covered by spec-first source agents",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-testing-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "type-design-analyzer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/type-design-analyzer.md",
+      "description": "Analyze type design for encapsulation, invariant expression, usefulness, and enforcement.",
+      "spec_first_agents": [
+        "spec-kieran-typescript-reviewer",
+        "spec-api-contract-reviewer"
+      ],
+      "overlap_status": "partial_match",
+      "integration_action": "enhance_existing",
+      "priority": "P0",
+      "reason": "partially covered by existing generalized or personal-name spec-first reviewer",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-kieran-typescript-reviewer, spec-api-contract-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    },
+    {
+      "ecc_agent": "typescript-reviewer",
+      "ecc_source_file": "/Users/kuang/xiaobu/everything-claude-code/agents/typescript-reviewer.md",
+      "description": "Expert TypeScript/JavaScript code reviewer specializing in type safety, async correctness, Node/web security, and idiomatic patterns. Use for all TypeScript and JavaScript code changes. MUST BE USED for TypeScript/JavaScript projects.",
+      "spec_first_agents": [
+        "spec-kieran-typescript-reviewer"
+      ],
+      "overlap_status": "partial_match",
+      "integration_action": "enhance_existing",
+      "priority": "P1",
+      "reason": "partially covered by existing generalized or personal-name spec-first reviewer",
+      "migration_notes": [
+        "do not create a new ECC agent",
+        "merge stronger checklist/rubric into spec-kieran-typescript-reviewer",
+        "preserve workflow-native output schema"
+      ]
+    }
+  ]
+}

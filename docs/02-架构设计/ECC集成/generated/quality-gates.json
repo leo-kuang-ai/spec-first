@@ -1,0 +1,101 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.quality-gates",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "gates": [
+    {
+      "gate": "Source Evidence Gate",
+      "check": "ECC 清单数量与 provider source 可追溯",
+      "failure": "标记 stale，重新生成或回读 source"
+    },
+    {
+      "gate": "Workflow Compatibility Gate",
+      "check": "不覆盖现有 persona catalog、workflow-native schema 或 synthesis 输出",
+      "failure": "阻断进入 prompt/runtime，先补 adapter"
+    },
+    {
+      "gate": "Overlap Gate",
+      "check": "direct_match 不新增 agent，native 不被 ECC 覆盖，profile 不进默认路由",
+      "failure": "阻断该 entry 进入 registry"
+    },
+    {
+      "gate": "Rubric Extraction Gate",
+      "check": "每个 ECC skill 采纳项有 source、target、dedupe、quality_node、adoption_action",
+      "failure": "不写入 agent prompt，只保留 candidate"
+    },
+    {
+      "gate": "Naming Gate",
+      "check": "canonical_id 产品化，个人名只保留在 origin_aliases",
+      "failure": "阻断 runtimeName 推广"
+    },
+    {
+      "gate": "Router Gate",
+      "check": "candidate facts 有 reason_code、budget_hint、degraded_mode，脚本不输出 selected_agents",
+      "failure": "降级为 checklist mode 或减少候选"
+    },
+    {
+      "gate": "Context Gate",
+      "check": "只给 selected experts 构造 context pack",
+      "failure": "不加载全量 ECC skills / agents"
+    },
+    {
+      "gate": "Finding Compatibility Gate",
+      "check": "保留 workflow-native schema，并生成 Finding Core compatibility view",
+      "failure": "不更新 reviewer prompt，只补 adapter 草案"
+    },
+    {
+      "gate": "Finding Evidence Gate",
+      "check": "finding 有 severity、confidence、evidence、recommendation、not_reviewed 或 native 等价字段",
+      "failure": "降级为 advisory 或 reject"
+    },
+    {
+      "gate": "Synthesis Gate",
+      "check": "最终 verdict 只能由 Skill 输出，必须说明 adopt/reject/downgrade",
+      "failure": "不写 durable final report"
+    },
+    {
+      "gate": "Standards Gate",
+      "check": "standards 写入必须 preview-first + human confirmation",
+      "failure": "只生成 standards candidate"
+    },
+    {
+      "gate": "Capability Plugin Gate",
+      "check": "capability pack pack-gated、source-attributed、workflow-compatible、doctor-able/clean-able",
+      "failure": "只能保留 preview，不进入 runtime"
+    },
+    {
+      "gate": "Opt-in Gate",
+      "check": "研发向 optional pack、style profile、missing_in_spec_first 显式启用；excluded domain references 不进能力包",
+      "failure": "默认 disabled / checklist mode"
+    },
+    {
+      "gate": "Host Compatibility Gate",
+      "check": "每个 pack 声明 Claude / Codex 支持度、fallback 和 unsupported reason",
+      "failure": "host 不支持时降级为 checklist/reference"
+    },
+    {
+      "gate": "Source Freshness Gate",
+      "check": "每个 ECC 采纳项声明 source file、revision、loaded_from、freshness、runtime_cached",
+      "failure": "freshness 不足时只保留 candidate"
+    },
+    {
+      "gate": "Command Idea Gate",
+      "check": "ECC commands 只进入 idea matrix，不进入 command registry 或 runtime command surface",
+      "failure": "阻断 /ecc:*、$ecc-* 或 runtime command 生成"
+    },
+    {
+      "gate": "Runtime Merge Gate",
+      "check": "未来 runtime delivery 必须 managed marker merge、add-only config merge、preview-first",
+      "failure": "阻断 silent overwrite 用户配置或 generated runtime"
+    },
+    {
+      "gate": "Runtime Gate",
+      "check": "未显式启用 capability pack 时不得生成 ECC runtime asset",
+      "failure": "doctor 报告 residual / drift"
+    },
+    {
+      "gate": "Fresh-source Eval Gate",
+      "check": "agent/skill prose 改动后必须用当前磁盘 source 做 fresh-source eval",
+      "failure": "记录未执行原因，不能声称通过"
+    }
+  ]
+}

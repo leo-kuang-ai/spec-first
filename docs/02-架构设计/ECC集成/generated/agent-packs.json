@@ -1,0 +1,508 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.agent-packs",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "pack_count": 14,
+  "excluded_domain_references": [
+    "business operations",
+    "media/growth",
+    "finance",
+    "logistics",
+    "healthcare",
+    "web3"
+  ],
+  "packs": [
+    {
+      "id": "product-scope-pack",
+      "name": "Product & Scope Pack",
+      "priority": "P0",
+      "type": "core",
+      "default_enabled": true,
+      "default_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "agents": [
+        "spec-product-lens-reviewer",
+        "spec-scope-guardian-reviewer",
+        "spec-spec-flow-analyzer"
+      ],
+      "quality_nodes": [
+        "Spec",
+        "Brainstorm",
+        "Doc Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "default_candidate_pool_skill_still_selects",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "document-quality-pack",
+      "name": "Document Quality Pack",
+      "priority": "P0",
+      "type": "core",
+      "default_enabled": true,
+      "default_workflows": [
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "agents": [
+        "spec-coherence-reviewer",
+        "spec-feasibility-reviewer",
+        "spec-adversarial-document-reviewer",
+        "spec-security-lens-reviewer"
+      ],
+      "quality_nodes": [
+        "Spec",
+        "Plan",
+        "Doc Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "default_candidate_pool_skill_still_selects",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "engineering-quality-pack",
+      "name": "Engineering Quality Pack",
+      "priority": "P0",
+      "type": "core",
+      "default_enabled": true,
+      "default_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "agents": [
+        "spec-correctness-reviewer",
+        "spec-testing-reviewer",
+        "spec-maintainability-reviewer",
+        "spec-reliability-reviewer",
+        "spec-code-simplicity-reviewer",
+        "spec-adversarial-reviewer"
+      ],
+      "quality_nodes": [
+        "Code",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "default_candidate_pool_skill_still_selects",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "architecture-contract-pack",
+      "name": "Architecture & Contract Pack",
+      "priority": "P0",
+      "type": "core",
+      "default_enabled": true,
+      "default_workflows": [
+        "spec-plan",
+        "spec-code-review"
+      ],
+      "agents": [
+        "spec-architecture-strategist",
+        "spec-api-contract-reviewer",
+        "spec-repo-research-analyst",
+        "spec-git-history-analyzer"
+      ],
+      "quality_nodes": [
+        "Codebase",
+        "Graph",
+        "Plan",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "default_candidate_pool_skill_still_selects",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "governance-pack",
+      "name": "Governance Pack",
+      "priority": "P0",
+      "type": "core",
+      "default_enabled": true,
+      "default_workflows": [
+        "spec-skill-audit",
+        "spec-update",
+        "spec-compound",
+        "spec-code-review"
+      ],
+      "agents": [
+        "spec-project-standards-reviewer",
+        "spec-agent-native-reviewer",
+        "spec-cli-readiness-reviewer",
+        "spec-cli-agent-readiness-reviewer",
+        "spec-learnings-researcher",
+        "spec-pattern-recognition-specialist"
+      ],
+      "quality_nodes": [
+        "Knowledge",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "default_candidate_pool_skill_still_selects",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "security-deep-pack",
+      "name": "Security Deep Pack",
+      "priority": "P1",
+      "type": "conditional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-code-review",
+        "spec-plan",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "auth",
+        "authorization",
+        "permission",
+        "token",
+        "secret",
+        "pii",
+        "external_input"
+      ],
+      "agents": [
+        "spec-security-reviewer",
+        "spec-security-sentinel"
+      ],
+      "quality_nodes": [
+        "Plan",
+        "Code",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "data-pack",
+      "name": "Data Pack",
+      "priority": "P1",
+      "type": "conditional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-plan",
+        "spec-code-review"
+      ],
+      "trigger_signals": [
+        "database",
+        "migration",
+        "sql",
+        "schema",
+        "production_data",
+        "etl"
+      ],
+      "agents": [
+        "spec-data-integrity-guardian",
+        "spec-data-migrations-reviewer",
+        "spec-data-migration-expert",
+        "spec-schema-drift-detector",
+        "spec-deployment-verification-agent"
+      ],
+      "quality_nodes": [
+        "Codebase",
+        "Plan",
+        "Code",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "performance-pack",
+      "name": "Performance Pack",
+      "priority": "P1",
+      "type": "conditional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "performance",
+        "cache",
+        "loop",
+        "render",
+        "concurrency",
+        "io"
+      ],
+      "agents": [
+        "spec-performance-reviewer",
+        "spec-performance-oracle"
+      ],
+      "quality_nodes": [
+        "Plan",
+        "Code",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "frontend-app-pack",
+      "name": "Frontend / App Pack",
+      "priority": "P1",
+      "type": "conditional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-app-consistency-audit",
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "ui",
+        "tsx",
+        "design",
+        "mobile",
+        "ios",
+        "kmp",
+        "frontend_async"
+      ],
+      "agents": [
+        "spec-design-lens-reviewer",
+        "spec-design-implementation-reviewer",
+        "spec-design-iterator",
+        "spec-swift-ios-reviewer",
+        "spec-julik-frontend-races-reviewer"
+      ],
+      "quality_nodes": [
+        "Spec",
+        "Plan",
+        "Code",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "language-pack",
+      "name": "Language Pack",
+      "priority": "P1",
+      "type": "conditional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-code-review"
+      ],
+      "trigger_signals": [
+        "typescript",
+        "python",
+        "rails",
+        "language_specific"
+      ],
+      "agents": [
+        "spec-kieran-typescript-reviewer",
+        "spec-kieran-python-reviewer",
+        "spec-kieran-rails-reviewer"
+      ],
+      "quality_nodes": [
+        "Code",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "research-pack",
+      "name": "Research Pack",
+      "priority": "P1",
+      "type": "conditional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-plan",
+        "spec-doc-review",
+        "spec-code-review"
+      ],
+      "trigger_signals": [
+        "new_framework",
+        "uncertain_api",
+        "external_research",
+        "source_freshness"
+      ],
+      "agents": [
+        "spec-best-practices-researcher",
+        "spec-framework-docs-researcher",
+        "spec-web-researcher",
+        "spec-session-historian"
+      ],
+      "quality_nodes": [
+        "Codebase",
+        "Plan",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "team-context-pack",
+      "name": "Team Context Pack",
+      "priority": "P2",
+      "type": "optional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-brainstorm",
+        "spec-plan",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "explicit_slack",
+        "issues",
+        "prior_comments",
+        "team_context"
+      ],
+      "agents": [
+        "spec-slack-researcher",
+        "spec-issue-intelligence-analyst",
+        "spec-previous-comments-reviewer",
+        "spec-pr-comment-resolver"
+      ],
+      "quality_nodes": [
+        "Spec",
+        "Plan",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "external-design-pack",
+      "name": "External Design Pack",
+      "priority": "P2",
+      "type": "optional",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-app-consistency-audit",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "figma",
+        "external_design"
+      ],
+      "agents": [
+        "spec-figma-design-sync"
+      ],
+      "quality_nodes": [
+        "Spec",
+        "Plan",
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    },
+    {
+      "id": "style-profile-pack",
+      "name": "Style Profile Pack",
+      "priority": "P3",
+      "type": "style_profile",
+      "default_enabled": false,
+      "default_workflows": [
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "explicit_style_profile"
+      ],
+      "agents": [
+        "spec-dhh-rails-reviewer",
+        "spec-ankane-readme-writer"
+      ],
+      "quality_nodes": [
+        "Review"
+      ],
+      "missing_agents": [],
+      "activation_policy": "explicit_or_risk_triggered_after_pilot",
+      "runtime_delivery": "none_in_v1",
+      "host_support": {
+        "claude": "supported",
+        "codex": "supported",
+        "fallback": "reference_only",
+        "unsupported_reason_code": null
+      }
+    }
+  ]
+}

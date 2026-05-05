@@ -1,0 +1,393 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.completion-audit",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "objective": "$spec-work docs/02-架构设计/ECC集成/ECCAgent重叠治理V1技术方案.md 完成全部开发工作,做好审查",
+  "concrete_deliverables": [
+    "G0-G6.5 preview artifacts generated under docs/02-架构设计/ECC集成/generated",
+    "deterministic source scanner implemented without runtime delivery",
+    "contract tests cover source/runtime boundaries and generated artifact shape",
+    "50-round review checklist recorded"
+  ],
+  "prompt_to_artifact_checklist": [
+    {
+      "requirement": "G0 current source inventory",
+      "evidence": "current-agent-inventory.json/md"
+    },
+    {
+      "requirement": "G1 ECC overlap matrix",
+      "evidence": "ecc-agent-overlap-matrix.json/md"
+    },
+    {
+      "requirement": "G1.5 ECC rubric extraction matrix",
+      "evidence": "ecc-rubric-extraction-matrix.json/md"
+    },
+    {
+      "requirement": "G1.6 ECC command idea matrix",
+      "evidence": "ecc-command-idea-matrix.json/md"
+    },
+    {
+      "requirement": "G2 agent packs preview",
+      "evidence": "agent-packs.json/md"
+    },
+    {
+      "requirement": "G3 registry preview + drift policy",
+      "evidence": "agent-registry.json"
+    },
+    {
+      "requirement": "G4 router candidate facts",
+      "evidence": "router-candidate-policy.json/md"
+    },
+    {
+      "requirement": "G5 finding schema compatibility",
+      "evidence": "finding-compatibility-policy.json/md"
+    },
+    {
+      "requirement": "G6 skill synthesis policy",
+      "evidence": "synthesis-policy.json/md"
+    },
+    {
+      "requirement": "G6.5 host compatibility + runtime merge policy preview",
+      "evidence": "capability-host-compatibility.md and capability-runtime-merge-policy.md"
+    },
+    {
+      "requirement": "Quality gates and pilot scenarios",
+      "evidence": "quality-gates.json/md and node-quality-pilot-scenarios.json/md"
+    },
+    {
+      "requirement": "50-round review",
+      "evidence": "completion-audit.md"
+    }
+  ],
+  "generated_artifacts": [
+    "agent-packs.json",
+    "agent-packs.md",
+    "agent-registry.json",
+    "capability-host-compatibility.md",
+    "capability-runtime-merge-policy.md",
+    "completion-audit.json",
+    "completion-audit.md",
+    "context-pack.schema.json",
+    "context-pack.schema.md",
+    "current-agent-inventory.json",
+    "current-agent-inventory.md",
+    "ecc-agent-overlap-matrix.json",
+    "ecc-agent-overlap-matrix.md",
+    "ecc-command-idea-matrix.json",
+    "ecc-command-idea-matrix.md",
+    "ecc-rubric-extraction-matrix.json",
+    "ecc-rubric-extraction-matrix.md",
+    "finding-compatibility-policy.json",
+    "finding-compatibility-policy.md",
+    "node-quality-pilot-scenarios.json",
+    "node-quality-pilot-scenarios.md",
+    "quality-gates.json",
+    "quality-gates.md",
+    "router-candidate-policy.json",
+    "router-candidate-policy.md",
+    "synthesis-policy.json",
+    "synthesis-policy.md"
+  ],
+  "review_round_count": 50,
+  "review_rounds": [
+    {
+      "round": 1,
+      "question": "G0 inventory 是否覆盖 51 个 source agent",
+      "evidence": "current-agent-inventory.json 记录 agent_count，测试校验数量",
+      "status": "covered"
+    },
+    {
+      "round": 2,
+      "question": "G0 是否每个 agent 有唯一 id",
+      "evidence": "inventory generator 从 frontmatter name / 文件名提取并做唯一性检查",
+      "status": "covered"
+    },
+    {
+      "round": 3,
+      "question": "G0 是否处理个人名 agent",
+      "evidence": "kieran / dhh / ankane / julik 均映射 rename_generic 或 style_profile",
+      "status": "covered"
+    },
+    {
+      "round": 4,
+      "question": "G0 是否区分 source 与 runtime",
+      "evidence": "所有 source_file 指向 agents/*.agent.md，不引用 .claude/.codex runtime 作为 source",
+      "status": "covered"
+    },
+    {
+      "round": 5,
+      "question": "G1 是否覆盖 48 个 ECC agents",
+      "evidence": "overlap matrix 记录 ecc_agent_count 和每个 ECC agent entry",
+      "status": "covered"
+    },
+    {
+      "round": 6,
+      "question": "G1 direct_match 是否禁止新增 agent",
+      "evidence": "direct_match entry 的 integration_action 为 enhance_existing",
+      "status": "covered"
+    },
+    {
+      "round": 7,
+      "question": "G1 missing_in_spec_first 是否有 reason",
+      "evidence": "missing/reference/optional entries 都有 reason",
+      "status": "covered"
+    },
+    {
+      "round": 8,
+      "question": "G1 style/domain 是否不进 P0/P1",
+      "evidence": "seo/healthcare/GAN/style 均为 reference_only 或 P3",
+      "status": "covered"
+    },
+    {
+      "round": 9,
+      "question": "G1 spec_first_native 是否不被 ECC 覆盖",
+      "evidence": "native agents 只在 registry 标记 native，不映射 ECC 覆盖",
+      "status": "covered"
+    },
+    {
+      "round": 10,
+      "question": "G1 overlap 是否保留多目标关系",
+      "evidence": "code-reviewer 等映射到多个 spec-first reviewer",
+      "status": "covered"
+    },
+    {
+      "round": 11,
+      "question": "G1.5 是否只提取高价值研发样本",
+      "evidence": "rubric matrix 首批限定 security/testing/API/data/frontend/architecture/research/governance",
+      "status": "covered"
+    },
+    {
+      "round": 12,
+      "question": "G1.5 是否有 source_file",
+      "evidence": "每条 adopted/deferred/rejected entry 都有 ecc_source_file 或 reason",
+      "status": "covered"
+    },
+    {
+      "round": 13,
+      "question": "G1.5 是否有 freshness",
+      "evidence": "每条 entry 有 source_revision、loaded_from、freshness、runtime_cached",
+      "status": "covered"
+    },
+    {
+      "round": 14,
+      "question": "G1.5 是否防止全量 prompt 注入",
+      "evidence": "matrix 只记录摘要和 target，不保存 ECC skill 正文",
+      "status": "covered"
+    },
+    {
+      "round": 15,
+      "question": "G1.5 是否排除非研发领域",
+      "evidence": "excluded entries 不进入 capability pack 或 router candidate",
+      "status": "covered"
+    },
+    {
+      "round": 16,
+      "question": "G1.6 是否覆盖 68 个 ECC commands",
+      "evidence": "command idea matrix 记录 command_count 和所有 command entry",
+      "status": "covered"
+    },
+    {
+      "round": 17,
+      "question": "G1.6 是否禁止 command import",
+      "evidence": "adoption_action 仅 enhance_existing_workflow/reference_only/rejected",
+      "status": "covered"
+    },
+    {
+      "round": 18,
+      "question": "G1.6 是否禁止 /ecc 或 $ecc",
+      "evidence": "生成器不创建 command template 或 runtime registry",
+      "status": "covered"
+    },
+    {
+      "round": 19,
+      "question": "G1.6 是否区分 Claude/Codex command parity",
+      "evidence": "command matrix 声明 legacy prompt reference only",
+      "status": "covered"
+    },
+    {
+      "round": 20,
+      "question": "G1.6 是否映射到现有 workflow",
+      "evidence": "command ideas 只指向 spec-* workflow 或 reference_only",
+      "status": "covered"
+    },
+    {
+      "round": 21,
+      "question": "G2 是否生成 P0/P1/P2/P3 pack preview",
+      "evidence": "agent-packs.json 包含 core/conditional/optional/style_profile",
+      "status": "covered"
+    },
+    {
+      "round": 22,
+      "question": "G2 P0 是否默认 enabled",
+      "evidence": "core packs default_enabled=true，仅为候选池，不绕过 Skill",
+      "status": "covered"
+    },
+    {
+      "round": 23,
+      "question": "G2 P2/P3 是否默认 disabled",
+      "evidence": "optional/style packs default_enabled=false",
+      "status": "covered"
+    },
+    {
+      "round": 24,
+      "question": "G2 excluded domain 是否不在 pack 中",
+      "evidence": "excluded domain references 独立记录，不生成 capability pack",
+      "status": "covered"
+    },
+    {
+      "round": 25,
+      "question": "G2 style profile 是否不能 blocker",
+      "evidence": "style-profile-pack policy 记录 blocker 禁止",
+      "status": "covered"
+    },
+    {
+      "round": 26,
+      "question": "G3 registry 是否覆盖所有 source agents",
+      "evidence": "agent-registry.json entries 与 inventory agent_count 一致",
+      "status": "covered"
+    },
+    {
+      "round": 27,
+      "question": "G3 registry 是否有 source_revision",
+      "evidence": "registry metadata 写入 source_revision 与 stale_policy",
+      "status": "covered"
+    },
+    {
+      "round": 28,
+      "question": "G3 registry 是否不是 source-of-truth",
+      "evidence": "registry metadata 声明 source wins",
+      "status": "covered"
+    },
+    {
+      "round": 29,
+      "question": "G3 routable agent 是否有 workflows/forbidden_actions",
+      "evidence": "每个 entry 有 allowed_workflows、trigger_signals、forbidden_actions",
+      "status": "covered"
+    },
+    {
+      "round": 30,
+      "question": "G3 synthesis_ready 是否声明 output_schema",
+      "evidence": "registry entries 统一声明 workflow-native schema compatibility",
+      "status": "covered"
+    },
+    {
+      "round": 31,
+      "question": "G4 router 是否只输出 candidate facts",
+      "evidence": "router-candidate-policy 明确 candidate_agents/reason_code/budget_hint/degraded_mode",
+      "status": "covered"
+    },
+    {
+      "round": 32,
+      "question": "G4 router 是否不输出 selected_agents",
+      "evidence": "测试扫描 generated artifacts 禁止 selected_agents 字段出现在 router output schema",
+      "status": "covered"
+    },
+    {
+      "round": 33,
+      "question": "G4 是否有低风险 typo 场景",
+      "evidence": "pilot scenarios 覆盖低风险 docs typo 不调用重专家",
+      "status": "covered"
+    },
+    {
+      "round": 34,
+      "question": "G4 是否有风险触发场景",
+      "evidence": "pilot scenarios 覆盖 auth/API/migration/tsx/skill 变更",
+      "status": "covered"
+    },
+    {
+      "round": 35,
+      "question": "G5 是否保留 workflow-native schema",
+      "evidence": "finding-compatibility-policy 明确 native schema wins",
+      "status": "covered"
+    },
+    {
+      "round": 36,
+      "question": "G5 是否不反向改写 native finding",
+      "evidence": "Finding Core 仅 compatibility view",
+      "status": "covered"
+    },
+    {
+      "round": 37,
+      "question": "G5 是否有 evidence/confidence/not_reviewed",
+      "evidence": "policy 明确 core 字段和降级规则",
+      "status": "covered"
+    },
+    {
+      "round": 38,
+      "question": "G6 synthesis 是否不是拼接长文",
+      "evidence": "synthesis-policy 包含 merge/dedupe/rank/downgrade/reject/adopt",
+      "status": "covered"
+    },
+    {
+      "round": 39,
+      "question": "G6 Skill 是否保持最终裁判",
+      "evidence": "synthesis-policy 明确 final verdict belongs to Skill",
+      "status": "covered"
+    },
+    {
+      "round": 40,
+      "question": "G6 是否保留 code-review/doc-review 特有字段",
+      "evidence": "policy 明确 autofix_class/owner/finding_type/deferred_questions 不丢失",
+      "status": "covered"
+    },
+    {
+      "round": 41,
+      "question": "G6.5 是否生成 host compatibility preview",
+      "evidence": "capability-host-compatibility.md 覆盖每个 pack host_support",
+      "status": "covered"
+    },
+    {
+      "round": 42,
+      "question": "G6.5 是否生成 runtime merge policy preview",
+      "evidence": "capability-runtime-merge-policy.md 覆盖 marker/add-only/preview-first",
+      "status": "covered"
+    },
+    {
+      "round": 43,
+      "question": "G6.5 是否不实现 runtime delivery",
+      "evidence": "runtime_delivery=none_in_v1，lifecycle doctor/clean/state=future",
+      "status": "covered"
+    },
+    {
+      "round": 44,
+      "question": "双宿主是否同时覆盖 Claude/Codex",
+      "evidence": "host_support 为每个 pack 提供 claude/codex/fallback/unsupported_reason_code",
+      "status": "covered"
+    },
+    {
+      "round": 45,
+      "question": "source freshness 是否区分 provider source 与 runtime cache",
+      "evidence": "loaded_from=provider_source，runtime_cached=false",
+      "status": "covered"
+    },
+    {
+      "round": 46,
+      "question": "插件化是否不是 ECC 整包安装",
+      "evidence": "capability provider 只进 inventory/rubric，runtime delivery pack-gated",
+      "status": "covered"
+    },
+    {
+      "round": 47,
+      "question": "业务运营/媒体/金融/物流/医疗/web3 是否不集成",
+      "evidence": "excluded domain refs 不进入 capability pack/router/runtime roadmap",
+      "status": "covered"
+    },
+    {
+      "round": 48,
+      "question": "generated runtime 是否未被触碰",
+      "evidence": "生成路径限定 docs/02-架构设计/ECC集成/generated",
+      "status": "covered"
+    },
+    {
+      "round": 49,
+      "question": "CHANGELOG 是否记录 source 变更",
+      "evidence": "CHANGELOG 顶部新增 docs(ecc) 记录",
+      "status": "covered"
+    },
+    {
+      "round": 50,
+      "question": "完成审查是否有 prompt-to-artifact checklist",
+      "evidence": "completion-audit.md 映射目标、文件、gate、测试和证据",
+      "status": "covered"
+    }
+  ]
+}

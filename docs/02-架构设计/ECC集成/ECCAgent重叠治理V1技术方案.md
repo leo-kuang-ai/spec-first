@@ -1855,6 +1855,22 @@ origin_aliases:
 
 ## 20. 开发任务拆分
 
+### G0-G6.5 本地生成命令
+
+G0-G6.5 的 preview artifacts 由 source 脚本生成，不手写 runtime：
+
+```bash
+npm run docs:ecc-governance
+```
+
+该命令只写入：
+
+```text
+docs/02-架构设计/ECC集成/generated/
+```
+
+它不生成 `/ecc:*`、`$ecc-*`、`.claude/`、`.codex/`、`.agents/skills/` 或任何 runtime command registry entry。
+
 ### G0: 盘点当前 Agent
 
 目标：

@@ -1,0 +1,78 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.router-candidate-policy",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "owner_boundary": "scripts_prepare_candidate_facts_llm_skill_decides",
+  "router_output_schema": {
+    "candidate_agents": [],
+    "reason_code": "",
+    "budget_hint": "",
+    "degraded_mode": {},
+    "excluded_by_policy": []
+  },
+  "forbidden_fields": [
+    "selected_agents",
+    "final_verdict",
+    "confirmed_standards_write"
+  ],
+  "workflow_caps": {
+    "spec-brainstorm": 3,
+    "spec-doc-review": 4,
+    "spec-plan": 5,
+    "spec-write-tasks": 4,
+    "spec-work": 2,
+    "spec-debug": 4,
+    "spec-code-review": 5,
+    "spec-app-consistency-audit": 6,
+    "spec-skill-audit": 5
+  },
+  "scenario_matrix": [
+    {
+      "scenario": "src/auth/session.ts",
+      "expected_candidate_agents": [
+        "spec-security-reviewer",
+        "spec-correctness-reviewer",
+        "spec-testing-reviewer"
+      ]
+    },
+    {
+      "scenario": "openapi.yaml",
+      "expected_candidate_agents": [
+        "spec-api-contract-reviewer",
+        "spec-testing-reviewer"
+      ]
+    },
+    {
+      "scenario": "migrations/20260505.sql",
+      "expected_candidate_agents": [
+        "spec-data-migrations-reviewer",
+        "spec-data-integrity-guardian"
+      ]
+    },
+    {
+      "scenario": "skills/spec-plan/SKILL.md",
+      "expected_candidate_agents": [
+        "spec-agent-native-reviewer",
+        "spec-coherence-reviewer",
+        "spec-code-simplicity-reviewer"
+      ]
+    },
+    {
+      "scenario": "src/ui/Widget.tsx",
+      "expected_candidate_agents": [
+        "spec-julik-frontend-races-reviewer",
+        "spec-testing-reviewer",
+        "spec-design-lens-reviewer"
+      ]
+    },
+    {
+      "scenario": "docs/readme-typo.md",
+      "expected_candidate_agents": [
+        "spec-coherence-reviewer"
+      ]
+    },
+    {
+      "scenario": "docs/typo.md low-risk",
+      "expected_candidate_agents": []
+    }
+  ]
+}

@@ -1,0 +1,2506 @@
+{
+  "schema_version": "spec-first.ecc-governance-preview.v1.agent-registry-preview",
+  "generated_from": "scripts/generate-ecc-governance-preview.js",
+  "source_revision": "1431e7bbe9013de8c9e1ff491c311bafa3b7736d",
+  "worktree_dirty": true,
+  "stale_policy": "source_wins_registry_is_preview_snapshot",
+  "runtime_delivery": "none_in_v1",
+  "entry_count": 51,
+  "entries": [
+    {
+      "id": "spec-adversarial-document-reviewer",
+      "canonical_id": "adversarial-document-expert",
+      "source_file": "agents/spec-adversarial-document-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-adversarial-document-reviewer"
+        ]
+      },
+      "pack": "document-quality-pack",
+      "packs": [
+        "document-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-adversarial-reviewer",
+      "canonical_id": "adversarial-expert",
+      "source_file": "agents/spec-adversarial-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-adversarial-reviewer"
+        ]
+      },
+      "pack": "engineering-quality-pack",
+      "packs": [
+        "engineering-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-agent-native-reviewer",
+      "canonical_id": "agent-native-expert",
+      "source_file": "agents/spec-agent-native-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-agent-native-reviewer"
+        ]
+      },
+      "pack": "governance-pack",
+      "packs": [
+        "governance-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-compound",
+        "spec-skill-audit",
+        "spec-update"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-ankane-readme-writer",
+      "canonical_id": "readme-style-profile-ankane",
+      "source_file": "agents/spec-ankane-readme-writer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-ankane-readme-writer"
+        ]
+      },
+      "pack": "style-profile-pack",
+      "packs": [
+        "style-profile-pack"
+      ],
+      "priority": "P3",
+      "overlap_status": "style_profile",
+      "integration_action": "optional_profile",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "explicit_style_profile"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-api-contract-reviewer",
+      "canonical_id": "api-contract-expert",
+      "source_file": "agents/spec-api-contract-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-api-contract-reviewer"
+        ]
+      },
+      "pack": "architecture-contract-pack",
+      "packs": [
+        "architecture-contract-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-architecture-strategist",
+      "canonical_id": "architecture-strategist",
+      "source_file": "agents/spec-architecture-strategist.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-architecture-strategist"
+        ]
+      },
+      "pack": "architecture-contract-pack",
+      "packs": [
+        "architecture-contract-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-best-practices-researcher",
+      "canonical_id": "best-practices-researcher",
+      "source_file": "agents/spec-best-practices-researcher.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-best-practices-researcher"
+        ]
+      },
+      "pack": "research-pack",
+      "packs": [
+        "research-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "external_research",
+        "new_framework",
+        "source_freshness",
+        "uncertain_api"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-cli-agent-readiness-reviewer",
+      "canonical_id": "cli-agent-readiness-expert",
+      "source_file": "agents/spec-cli-agent-readiness-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-cli-agent-readiness-reviewer"
+        ]
+      },
+      "pack": "governance-pack",
+      "packs": [
+        "governance-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-compound",
+        "spec-skill-audit",
+        "spec-update"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-cli-readiness-reviewer",
+      "canonical_id": "cli-readiness-expert",
+      "source_file": "agents/spec-cli-readiness-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-cli-readiness-reviewer"
+        ]
+      },
+      "pack": "governance-pack",
+      "packs": [
+        "governance-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-compound",
+        "spec-skill-audit",
+        "spec-update"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-code-simplicity-reviewer",
+      "canonical_id": "code-simplicity-expert",
+      "source_file": "agents/spec-code-simplicity-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-code-simplicity-reviewer"
+        ]
+      },
+      "pack": "engineering-quality-pack",
+      "packs": [
+        "engineering-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-coherence-reviewer",
+      "canonical_id": "coherence-expert",
+      "source_file": "agents/spec-coherence-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-coherence-reviewer"
+        ]
+      },
+      "pack": "document-quality-pack",
+      "packs": [
+        "document-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-correctness-reviewer",
+      "canonical_id": "correctness-expert",
+      "source_file": "agents/spec-correctness-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-correctness-reviewer"
+        ]
+      },
+      "pack": "engineering-quality-pack",
+      "packs": [
+        "engineering-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-data-integrity-guardian",
+      "canonical_id": "data-integrity-guardian",
+      "source_file": "agents/spec-data-integrity-guardian.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-data-integrity-guardian"
+        ]
+      },
+      "pack": "data-pack",
+      "packs": [
+        "data-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "database",
+        "etl",
+        "migration",
+        "production_data",
+        "schema",
+        "sql"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-data-migration-expert",
+      "canonical_id": "data-migration-expert",
+      "source_file": "agents/spec-data-migration-expert.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-data-migration-expert"
+        ]
+      },
+      "pack": "data-pack",
+      "packs": [
+        "data-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "database",
+        "etl",
+        "migration",
+        "production_data",
+        "schema",
+        "sql"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-data-migrations-reviewer",
+      "canonical_id": "data-migrations-expert",
+      "source_file": "agents/spec-data-migrations-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-data-migrations-reviewer"
+        ]
+      },
+      "pack": "data-pack",
+      "packs": [
+        "data-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "database",
+        "etl",
+        "migration",
+        "production_data",
+        "schema",
+        "sql"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-deployment-verification-agent",
+      "canonical_id": "deployment-verification-agent",
+      "source_file": "agents/spec-deployment-verification-agent.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-deployment-verification-agent"
+        ]
+      },
+      "pack": "data-pack",
+      "packs": [
+        "data-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "database",
+        "etl",
+        "migration",
+        "production_data",
+        "schema",
+        "sql"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-design-implementation-reviewer",
+      "canonical_id": "design-implementation-expert",
+      "source_file": "agents/spec-design-implementation-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-design-implementation-reviewer"
+        ]
+      },
+      "pack": "frontend-app-pack",
+      "packs": [
+        "frontend-app-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-app-consistency-audit",
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "design",
+        "frontend_async",
+        "ios",
+        "kmp",
+        "mobile",
+        "tsx",
+        "ui"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-design-iterator",
+      "canonical_id": "design-iterator",
+      "source_file": "agents/spec-design-iterator.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-design-iterator"
+        ]
+      },
+      "pack": "frontend-app-pack",
+      "packs": [
+        "frontend-app-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-app-consistency-audit",
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "design",
+        "frontend_async",
+        "ios",
+        "kmp",
+        "mobile",
+        "tsx",
+        "ui"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-design-lens-reviewer",
+      "canonical_id": "design-lens-expert",
+      "source_file": "agents/spec-design-lens-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-design-lens-reviewer"
+        ]
+      },
+      "pack": "frontend-app-pack",
+      "packs": [
+        "frontend-app-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-app-consistency-audit",
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "design",
+        "frontend_async",
+        "ios",
+        "kmp",
+        "mobile",
+        "tsx",
+        "ui"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-dhh-rails-reviewer",
+      "canonical_id": "rails-style-profile-dhh",
+      "source_file": "agents/spec-dhh-rails-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-dhh-rails-reviewer"
+        ]
+      },
+      "pack": "style-profile-pack",
+      "packs": [
+        "style-profile-pack"
+      ],
+      "priority": "P3",
+      "overlap_status": "style_profile",
+      "integration_action": "optional_profile",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "explicit_style_profile"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-feasibility-reviewer",
+      "canonical_id": "feasibility-expert",
+      "source_file": "agents/spec-feasibility-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-feasibility-reviewer"
+        ]
+      },
+      "pack": "document-quality-pack",
+      "packs": [
+        "document-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-figma-design-sync",
+      "canonical_id": "figma-design-sync",
+      "source_file": "agents/spec-figma-design-sync.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-figma-design-sync"
+        ]
+      },
+      "pack": "external-design-pack",
+      "packs": [
+        "external-design-pack"
+      ],
+      "priority": "P2",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-app-consistency-audit",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "external_design",
+        "figma"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-framework-docs-researcher",
+      "canonical_id": "framework-docs-researcher",
+      "source_file": "agents/spec-framework-docs-researcher.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-framework-docs-researcher"
+        ]
+      },
+      "pack": "research-pack",
+      "packs": [
+        "research-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "external_research",
+        "new_framework",
+        "source_freshness",
+        "uncertain_api"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-git-history-analyzer",
+      "canonical_id": "git-history-analyzer",
+      "source_file": "agents/spec-git-history-analyzer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-git-history-analyzer"
+        ]
+      },
+      "pack": "architecture-contract-pack",
+      "packs": [
+        "architecture-contract-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-issue-intelligence-analyst",
+      "canonical_id": "issue-intelligence-analyst",
+      "source_file": "agents/spec-issue-intelligence-analyst.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-issue-intelligence-analyst"
+        ]
+      },
+      "pack": "team-context-pack",
+      "packs": [
+        "team-context-pack"
+      ],
+      "priority": "P2",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "explicit_slack",
+        "issues",
+        "prior_comments",
+        "team_context"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-julik-frontend-races-reviewer",
+      "canonical_id": "frontend-async-race-expert",
+      "source_file": "agents/spec-julik-frontend-races-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-julik-frontend-races-reviewer"
+        ]
+      },
+      "pack": "frontend-app-pack",
+      "packs": [
+        "frontend-app-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "partial_match",
+      "integration_action": "rename_generic",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-app-consistency-audit",
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "design",
+        "frontend_async",
+        "ios",
+        "kmp",
+        "mobile",
+        "tsx",
+        "ui"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-kieran-python-reviewer",
+      "canonical_id": "python-expert",
+      "source_file": "agents/spec-kieran-python-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-kieran-python-reviewer"
+        ]
+      },
+      "pack": "language-pack",
+      "packs": [
+        "language-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "partial_match",
+      "integration_action": "rename_generic",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review"
+      ],
+      "trigger_signals": [
+        "language_specific",
+        "python",
+        "rails",
+        "typescript"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-kieran-rails-reviewer",
+      "canonical_id": "rails-convention-expert",
+      "source_file": "agents/spec-kieran-rails-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-kieran-rails-reviewer"
+        ]
+      },
+      "pack": "language-pack",
+      "packs": [
+        "language-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "partial_match",
+      "integration_action": "rename_generic",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review"
+      ],
+      "trigger_signals": [
+        "language_specific",
+        "python",
+        "rails",
+        "typescript"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-kieran-typescript-reviewer",
+      "canonical_id": "typescript-expert",
+      "source_file": "agents/spec-kieran-typescript-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-kieran-typescript-reviewer"
+        ]
+      },
+      "pack": "language-pack",
+      "packs": [
+        "language-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "partial_match",
+      "integration_action": "rename_generic",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review"
+      ],
+      "trigger_signals": [
+        "language_specific",
+        "python",
+        "rails",
+        "typescript"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-learnings-researcher",
+      "canonical_id": "learnings-researcher",
+      "source_file": "agents/spec-learnings-researcher.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-learnings-researcher"
+        ]
+      },
+      "pack": "governance-pack",
+      "packs": [
+        "governance-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-compound",
+        "spec-skill-audit",
+        "spec-update"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-maintainability-reviewer",
+      "canonical_id": "maintainability-expert",
+      "source_file": "agents/spec-maintainability-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-maintainability-reviewer"
+        ]
+      },
+      "pack": "engineering-quality-pack",
+      "packs": [
+        "engineering-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-pattern-recognition-specialist",
+      "canonical_id": "pattern-recognition-specialist",
+      "source_file": "agents/spec-pattern-recognition-specialist.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-pattern-recognition-specialist"
+        ]
+      },
+      "pack": "governance-pack",
+      "packs": [
+        "governance-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-compound",
+        "spec-skill-audit",
+        "spec-update"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-performance-oracle",
+      "canonical_id": "performance-oracle",
+      "source_file": "agents/spec-performance-oracle.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-performance-oracle"
+        ]
+      },
+      "pack": "performance-pack",
+      "packs": [
+        "performance-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "cache",
+        "concurrency",
+        "io",
+        "loop",
+        "performance",
+        "render"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-performance-reviewer",
+      "canonical_id": "performance-expert",
+      "source_file": "agents/spec-performance-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-performance-reviewer"
+        ]
+      },
+      "pack": "performance-pack",
+      "packs": [
+        "performance-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "cache",
+        "concurrency",
+        "io",
+        "loop",
+        "performance",
+        "render"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-pr-comment-resolver",
+      "canonical_id": "pr-comment-resolver",
+      "source_file": "agents/spec-pr-comment-resolver.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-pr-comment-resolver"
+        ]
+      },
+      "pack": "team-context-pack",
+      "packs": [
+        "team-context-pack"
+      ],
+      "priority": "P2",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "explicit_slack",
+        "issues",
+        "prior_comments",
+        "team_context"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-previous-comments-reviewer",
+      "canonical_id": "previous-comments-expert",
+      "source_file": "agents/spec-previous-comments-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-previous-comments-reviewer"
+        ]
+      },
+      "pack": "team-context-pack",
+      "packs": [
+        "team-context-pack"
+      ],
+      "priority": "P2",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "explicit_slack",
+        "issues",
+        "prior_comments",
+        "team_context"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-product-lens-reviewer",
+      "canonical_id": "product-lens-expert",
+      "source_file": "agents/spec-product-lens-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-product-lens-reviewer"
+        ]
+      },
+      "pack": "product-scope-pack",
+      "packs": [
+        "product-scope-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-project-standards-reviewer",
+      "canonical_id": "project-standards-expert",
+      "source_file": "agents/spec-project-standards-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-project-standards-reviewer"
+        ]
+      },
+      "pack": "governance-pack",
+      "packs": [
+        "governance-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-compound",
+        "spec-skill-audit",
+        "spec-update"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-reliability-reviewer",
+      "canonical_id": "reliability-expert",
+      "source_file": "agents/spec-reliability-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-reliability-reviewer"
+        ]
+      },
+      "pack": "engineering-quality-pack",
+      "packs": [
+        "engineering-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-repo-research-analyst",
+      "canonical_id": "repo-research-analyst",
+      "source_file": "agents/spec-repo-research-analyst.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-repo-research-analyst"
+        ]
+      },
+      "pack": "architecture-contract-pack",
+      "packs": [
+        "architecture-contract-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-schema-drift-detector",
+      "canonical_id": "generated-artifact-drift-expert",
+      "source_file": "agents/spec-schema-drift-detector.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-schema-drift-detector"
+        ]
+      },
+      "pack": "data-pack",
+      "packs": [
+        "data-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "partial_match",
+      "integration_action": "rename_generic",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "database",
+        "etl",
+        "migration",
+        "production_data",
+        "schema",
+        "sql"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-scope-guardian-reviewer",
+      "canonical_id": "scope-guardian-expert",
+      "source_file": "agents/spec-scope-guardian-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-scope-guardian-reviewer"
+        ]
+      },
+      "pack": "product-scope-pack",
+      "packs": [
+        "product-scope-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-security-lens-reviewer",
+      "canonical_id": "security-lens-expert",
+      "source_file": "agents/spec-security-lens-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-security-lens-reviewer"
+        ]
+      },
+      "pack": "document-quality-pack",
+      "packs": [
+        "document-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-security-reviewer",
+      "canonical_id": "security-expert",
+      "source_file": "agents/spec-security-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-security-reviewer"
+        ]
+      },
+      "pack": "security-deep-pack",
+      "packs": [
+        "security-deep-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "auth",
+        "authorization",
+        "external_input",
+        "permission",
+        "pii",
+        "secret",
+        "token"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-security-sentinel",
+      "canonical_id": "security-sentinel",
+      "source_file": "agents/spec-security-sentinel.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-security-sentinel"
+        ]
+      },
+      "pack": "security-deep-pack",
+      "packs": [
+        "security-deep-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "auth",
+        "authorization",
+        "external_input",
+        "permission",
+        "pii",
+        "secret",
+        "token"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-session-historian",
+      "canonical_id": "session-historian",
+      "source_file": "agents/spec-session-historian.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-session-historian"
+        ]
+      },
+      "pack": "research-pack",
+      "packs": [
+        "research-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "external_research",
+        "new_framework",
+        "source_freshness",
+        "uncertain_api"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-slack-researcher",
+      "canonical_id": "slack-researcher",
+      "source_file": "agents/spec-slack-researcher.agent.md",
+      "origin": {
+        "source": "spec-first-native",
+        "origin_aliases": [
+          "spec-slack-researcher"
+        ]
+      },
+      "pack": "team-context-pack",
+      "packs": [
+        "team-context-pack"
+      ],
+      "priority": "P2",
+      "overlap_status": "spec_first_native",
+      "integration_action": "keep_as_is",
+      "governance_state": "normalized",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "explicit_slack",
+        "issues",
+        "prior_comments",
+        "team_context"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-spec-flow-analyzer",
+      "canonical_id": "spec-flow-analyzer",
+      "source_file": "agents/spec-spec-flow-analyzer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-spec-flow-analyzer"
+        ]
+      },
+      "pack": "product-scope-pack",
+      "packs": [
+        "product-scope-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-brainstorm",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-swift-ios-reviewer",
+      "canonical_id": "swift-ios-expert",
+      "source_file": "agents/spec-swift-ios-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-swift-ios-reviewer"
+        ]
+      },
+      "pack": "frontend-app-pack",
+      "packs": [
+        "frontend-app-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-app-consistency-audit",
+        "spec-code-review",
+        "spec-doc-review"
+      ],
+      "trigger_signals": [
+        "design",
+        "frontend_async",
+        "ios",
+        "kmp",
+        "mobile",
+        "tsx",
+        "ui"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-testing-reviewer",
+      "canonical_id": "testing-expert",
+      "source_file": "agents/spec-testing-reviewer.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-testing-reviewer"
+        ]
+      },
+      "pack": "engineering-quality-pack",
+      "packs": [
+        "engineering-quality-pack"
+      ],
+      "priority": "P0",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
+      "trigger_signals": [],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    },
+    {
+      "id": "spec-web-researcher",
+      "canonical_id": "web-researcher",
+      "source_file": "agents/spec-web-researcher.agent.md",
+      "origin": {
+        "source": "spec-first-native-or-ecc-inspired",
+        "origin_aliases": [
+          "spec-web-researcher"
+        ]
+      },
+      "pack": "research-pack",
+      "packs": [
+        "research-pack"
+      ],
+      "priority": "P1",
+      "overlap_status": "direct_match",
+      "integration_action": "enhance_existing",
+      "governance_state": "routable",
+      "allowed_workflows": [
+        "spec-code-review",
+        "spec-doc-review",
+        "spec-plan"
+      ],
+      "trigger_signals": [
+        "external_research",
+        "new_framework",
+        "source_freshness",
+        "uncertain_api"
+      ],
+      "required_inputs": [
+        "current_workflow_goal",
+        "diff_or_document_excerpt",
+        "available_evidence"
+      ],
+      "optional_inputs": [
+        "plan_excerpt",
+        "graph_facts",
+        "repo_profile",
+        "test_results",
+        "rubric_excerpt"
+      ],
+      "forbidden_actions": [
+        "write_files",
+        "modify_repo_profile",
+        "change_workflow_state",
+        "run_destructive_command",
+        "generate_runtime_asset"
+      ],
+      "output_schema": "workflow-native schema with spec-first.finding-core compatibility view",
+      "no_pack_reason": null
+    }
+  ]
+}
