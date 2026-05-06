@@ -1,6 +1,7 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.3 2026-05-06 14:28:38 leokuang: docs(ecc): 新增 ECC 打包后功能验证指南，明确 runtime 指引、pilot facts、degraded 和无原始 ECC runtime 污染的验收方式 (user-visible)
 - v1.6.3 2026-05-06 13:16:40 leokuang: feat(ecc): 增加 ECC workflow pilot brief V9B，完成 plan/doc-review/skill-audit 只读 workflow 接入 (user-visible)
 - v1.6.3 2026-05-06 12:53:33 leokuang: feat(ecc): 增加 ECC code-review pilot brief V9A 只读 workflow 接入脚本、schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 11:46:47 leokuang: feat(ecc): 增加 ECC Optional Pack brief V8 只读预览脚本、schema 和契约测试 (user-visible)
