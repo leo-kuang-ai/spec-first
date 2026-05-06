@@ -78,6 +78,16 @@ tests/unit/ecc-router-candidate-contracts.test.js
 
 V3 脚本只读取治理预览产物并输出 advisory `candidate_agents`。它不输出 `selected_agents`，不写 runtime mirror，不新增 ECC command / skill / agent 入口，也不把脚本升级为最终专家裁判。
 
+V4 已新增 Finding Core projection source contract 与本地预览脚本：
+
+```text
+src/cli/contracts/agent-registry/finding-core.schema.json
+scripts/project-ecc-finding-core.js
+tests/unit/ecc-finding-core-contracts.test.js
+```
+
+V4 脚本只读取 `spec-code-review` / `spec-doc-review` workflow-native reviewer JSON，并投影为只读 Finding Core compatibility view。它不替换 native finding schema，不改 reviewer prompt，不写 runtime mirror，也不输出最终 review verdict。
+
 ECC 侧证据 source：
 
 ```text
@@ -632,6 +642,28 @@ V3: 将 router candidate policy 升级为可执行的候选事实预览脚本和
   不改 generated runtime
   不新增 ECC command surface
   不替换 workflow-native reviewer catalog
+```
+
+V4 当前完成项：
+
+```text
+V4: 将 code-review / doc-review native findings 只读投影为 Finding Core compatibility view
+产物:
+  src/cli/contracts/agent-registry/finding-core.schema.json
+  scripts/project-ecc-finding-core.js
+  tests/unit/ecc-finding-core-contracts.test.js
+验证:
+  npx jest tests/unit/ecc-finding-core-contracts.test.js tests/unit/ecc-agent-registry-contracts.test.js --runInBand
+  npm run typecheck
+边界:
+  workflow-native schema wins
+  输出 finding_core，不输出 final_verdict
+  保留 code-review 的 autofix_class / owner / requires_verification / pre_existing
+  保留 doc-review 的 finding_type / deferred_questions
+  severity_display / confidence_display 只是 compatibility labels
+  不改 generated runtime
+  不新增 ECC command surface
+  不修改 reviewer prompt
 ```
 
 ## 12. 最终效果

@@ -1045,6 +1045,7 @@ src/cli/contracts/agent-registry/routing-policy.schema.json
 src/cli/contracts/agent-registry/finding.schema.json
 src/cli/contracts/agent-registry/router-candidate-input.schema.json
 src/cli/contracts/agent-registry/router-candidate-output.schema.json
+src/cli/contracts/agent-registry/finding-core.schema.json
 ```
 
 ### 12.2 Registry Entry
@@ -2445,9 +2446,21 @@ npx jest tests/unit/ecc-router-candidate-contracts.test.js tests/unit/ecc-agent-
 ```text
 目标：让专家输出可合成，同时保留 workflow-native schema
 产物：
-  finding-core.schema.json
+  src/cli/contracts/agent-registry/finding-core.schema.json
+  scripts/project-ecc-finding-core.js
+  tests/unit/ecc-finding-core-contracts.test.js
   native-schema-adapter notes
-  selected workflow prompt updates after pilot
+```
+
+状态：已进入 V4 Finding Core projection。V4 只把 `spec-code-review` / `spec-doc-review` 的 workflow-native reviewer JSON 只读投影为 `spec-first.finding-core-projection.v1` compatibility view，用于后续 synthesis、metrics 和 pilot 观察。
+
+V4 明确不替换 `skills/spec-code-review/references/findings-schema.json` 或 `skills/spec-doc-review/references/findings-schema.json`；不反向改写 native finding；不修改 reviewer prompt；不输出 `final_verdict`、`selected_agents` 或 confirmed standards 写入；不写 `.claude/`、`.codex/`、`.agents/skills/`。`severity_display` 与 `confidence_display` 只是 deterministic display labels，最终 blocking / accepted / rejected 仍由 Skill Synthesis 判断。
+
+当前 V4 验证覆盖：
+
+```text
+npx jest tests/unit/ecc-finding-core-contracts.test.js tests/unit/ecc-agent-registry-contracts.test.js --runInBand
+npm run typecheck
 ```
 
 ### R5: Skill Synthesis

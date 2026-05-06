@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/finding-core.schema.json",
+  "title": "spec-first Finding Core projection",
+  "description": "Read-only compatibility projection from workflow-native findings into a cross-workflow Finding Core view. Native workflow schemas remain authoritative.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_from",
+    "workflow",
+    "native_schema",
+    "source_artifacts",
+    "native_summary",
+    "finding_core",
+    "requires_skill_synthesis",
+    "forbidden_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.finding-core-projection.v1"
+    },
+    "generated_from": {
+      "const": "scripts/project-ecc-finding-core.js"
+    },
+    "workflow": {
+      "enum": [
+        "spec-code-review",
+        "spec-doc-review"
+      ]
+    },
+    "native_schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "native_schema",
+        "finding_core_schema"
+      ],
+      "properties": {
+        "native_schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finding_core_schema": {
+          "const": "src/cli/contracts/agent-registry/finding-core.schema.json"
+        }
+      }
+    },
+    "native_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewer",
+        "finding_count",
+        "residual_risks",
+        "testing_gaps",
+        "deferred_questions"
+      ],
+      "properties": {
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finding_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "residual_risks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "testing_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deferred_questions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "finding_core": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "workflow",
+          "agent_id",
+          "native_schema",
+          "native_finding_ref",
+          "category",
+          "title",
+          "severity_native",
+          "severity_display",
+          "confidence_native",
+          "confidence_display",
+          "projection_status",
+          "evidence",
+          "impact",
+          "recommendation",
+          "not_reviewed",
+          "adapter_notes",
+          "native_preserved"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "spec-first.finding-core.v1"
+          },
+          "workflow": {
+            "enum": [
+              "spec-code-review",
+              "spec-doc-review"
+            ]
+          },
+          "agent_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "native_schema": {
+            "type": "string",
+            "minLength": 1
+          },
+          "native_finding_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity_native": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "severity_display": {
+            "enum": [
+              "blocker",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "confidence_native": {
+            "enum": [
+              0,
+              25,
+              50,
+              75,
+              100
+            ]
+          },
+          "confidence_display": {
+            "enum": [
+              "reject",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "projection_status": {
+            "enum": [
+              "projected",
+              "degraded_missing_evidence",
+              "rejected_by_native_confidence"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "value",
+                "trust_level"
+              ],
+              "properties": {
+                "type": {
+                  "const": "native_evidence"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "trust_level": {
+                  "const": "primary"
+                }
+              }
+            }
+          },
+          "impact": {
+            "type": "string"
+          },
+          "recommendation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "not_reviewed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "adapter_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "native_preserved": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "requires_skill_synthesis": {
+      "const": true
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
