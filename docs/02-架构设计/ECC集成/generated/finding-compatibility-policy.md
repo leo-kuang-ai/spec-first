@@ -4,6 +4,7 @@
 
 ```json
 {
+  "$schema": "../../../../src/cli/contracts/agent-registry/finding.schema.json",
   "schema_version": "spec-first.ecc-governance-preview.v1.finding-compatibility-policy",
   "generated_from": "scripts/generate-ecc-governance-preview.js",
   "boundary": "workflow_native_schema_wins",

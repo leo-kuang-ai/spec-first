@@ -1,7 +1,8 @@
 {
+  "$schema": "../../../../src/cli/contracts/agent-registry/agent-registry.schema.json",
   "schema_version": "spec-first.ecc-governance-preview.v1.agent-registry-preview",
   "generated_from": "scripts/generate-ecc-governance-preview.js",
-  "source_revision": "1431e7bbe9013de8c9e1ff491c311bafa3b7736d",
+  "source_revision": "f3e3fdc7be1ee724505a6eb7be7c2aa7edfe4b06",
   "worktree_dirty": true,
   "stale_policy": "source_wins_registry_is_preview_snapshot",
   "runtime_delivery": "none_in_v1",

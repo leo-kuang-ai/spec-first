@@ -56,6 +56,17 @@ docs/02-架构设计/ECC集成/ECC斜杠命令清单.md
 docs/02-架构设计/ECC集成/ECC子代理清单.md
 ```
 
+V2 已新增 agent registry source contracts：
+
+```text
+src/cli/contracts/agent-registry/agent-registry.schema.json
+src/cli/contracts/agent-registry/agent-packs.schema.json
+src/cli/contracts/agent-registry/routing-policy.schema.json
+src/cli/contracts/agent-registry/finding.schema.json
+```
+
+这些 schema 是 source contract，只验证治理预览产物的机器可读形状和边界；它们不表示 capability pack 已进入 runtime delivery。
+
 ECC 侧证据 source：
 
 ```text
@@ -577,6 +588,19 @@ G6.5: 建立 runtime merge policy preview，约束 marker merge 和 add-only con
 G7: 通过 pilot 验证 code-review / plan / doc-review 节点质量增益
 G8: 再决定是否把少数 optional lens 升级为 runtime capability
 G9: 若进入 runtime，补 pack-aware init / doctor / clean / state
+```
+
+V2 当前完成项：
+
+```text
+V2: 将 agent-registry / agent-packs / routing-policy / finding compatibility 预览产物升级为 source schema contract
+验证:
+  tests/unit/ecc-agent-registry-contracts.test.js
+边界:
+  不改 generated runtime
+  不新增 ECC command surface
+  不让 router 输出 selected_agents
+  不替换 workflow-native finding schema
 ```
 
 ## 12. 最终效果

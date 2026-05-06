@@ -978,6 +978,7 @@ function buildAgentPacks(inventory) {
     },
   }));
   return {
+    $schema: '../../../../src/cli/contracts/agent-registry/agent-packs.schema.json',
     schema_version: `${SCHEMA_VERSION}.agent-packs`,
     generated_from: 'scripts/generate-ecc-governance-preview.js',
     pack_count: packs.length,
@@ -1028,6 +1029,7 @@ function buildAgentRegistry(inventory, packs) {
     };
   });
   return {
+    $schema: '../../../../src/cli/contracts/agent-registry/agent-registry.schema.json',
     schema_version: `${SCHEMA_VERSION}.agent-registry-preview`,
     generated_from: 'scripts/generate-ecc-governance-preview.js',
     source_revision: sourceRevision(REPO_ROOT),
@@ -1041,6 +1043,7 @@ function buildAgentRegistry(inventory, packs) {
 
 function buildRouterPolicy() {
   return {
+    $schema: '../../../../src/cli/contracts/agent-registry/routing-policy.schema.json',
     schema_version: `${SCHEMA_VERSION}.router-candidate-policy`,
     generated_from: 'scripts/generate-ecc-governance-preview.js',
     owner_boundary: 'scripts_prepare_candidate_facts_llm_skill_decides',
@@ -1103,6 +1106,7 @@ function buildContextPackSchema() {
 
 function buildFindingCompatibilityPolicy() {
   return {
+    $schema: '../../../../src/cli/contracts/agent-registry/finding.schema.json',
     schema_version: `${SCHEMA_VERSION}.finding-compatibility-policy`,
     generated_from: 'scripts/generate-ecc-governance-preview.js',
     boundary: 'workflow_native_schema_wins',

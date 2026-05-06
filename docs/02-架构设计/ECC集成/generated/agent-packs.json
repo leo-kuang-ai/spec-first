@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../src/cli/contracts/agent-registry/agent-packs.schema.json",
   "schema_version": "spec-first.ecc-governance-preview.v1.agent-packs",
   "generated_from": "scripts/generate-ecc-governance-preview.js",
   "pack_count": 14,

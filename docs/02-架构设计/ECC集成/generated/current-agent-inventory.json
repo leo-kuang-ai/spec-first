@@ -3,7 +3,7 @@
   "generated_from": "scripts/generate-ecc-governance-preview.js",
   "source": {
     "agents_dir": "agents",
-    "source_revision": "1431e7bbe9013de8c9e1ff491c311bafa3b7736d",
+    "source_revision": "f3e3fdc7be1ee724505a6eb7be7c2aa7edfe4b06",
     "worktree_dirty": true
   },
   "agent_count": 51,

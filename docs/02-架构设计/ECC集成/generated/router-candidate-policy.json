@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../../src/cli/contracts/agent-registry/routing-policy.schema.json",
   "schema_version": "spec-first.ecc-governance-preview.v1.router-candidate-policy",
   "generated_from": "scripts/generate-ecc-governance-preview.js",
   "owner_boundary": "scripts_prepare_candidate_facts_llm_skill_decides",

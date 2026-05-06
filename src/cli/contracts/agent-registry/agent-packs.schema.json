@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/agent-packs.schema.json",
+  "title": "spec-first agent capability packs governance preview contract",
+  "description": "Machine-readable contract for logical agent/capability pack preview artifacts. Packs are governance groupings until an explicit runtime delivery version exists.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "generated_from",
+    "pack_count",
+    "excluded_domain_references",
+    "packs"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../../../../src/cli/contracts/agent-registry/agent-packs.schema.json"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "generated_from": {
+      "const": "scripts/generate-ecc-governance-preview.js"
+    },
+    "pack_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "excluded_domain_references": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "packs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "priority",
+          "type",
+          "default_enabled",
+          "default_workflows",
+          "agents",
+          "quality_nodes",
+          "missing_agents",
+          "activation_policy",
+          "runtime_delivery",
+          "host_support"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "priority": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "type": {
+            "enum": [
+              "core",
+              "conditional",
+              "optional",
+              "style_profile"
+            ]
+          },
+          "default_enabled": {
+            "type": "boolean"
+          },
+          "default_workflows": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trigger_signals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "agents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "quality_nodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "missing_agents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "activation_policy": {
+            "type": "string",
+            "minLength": 1
+          },
+          "runtime_delivery": {
+            "const": "none_in_v1"
+          },
+          "host_support": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "claude",
+              "codex",
+              "fallback",
+              "unsupported_reason_code"
+            ],
+            "properties": {
+              "claude": {
+                "enum": [
+                  "supported",
+                  "unsupported"
+                ]
+              },
+              "codex": {
+                "enum": [
+                  "supported",
+                  "unsupported"
+                ]
+              },
+              "fallback": {
+                "enum": [
+                  "reference_only",
+                  "checklist_only"
+                ]
+              },
+              "unsupported_reason_code": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/routing-policy.schema.json",
+  "title": "spec-first agent router candidate policy preview contract",
+  "description": "Machine-readable contract for candidate routing facts. Scripts may prepare candidates and reason codes; Skills and LLMs own expert selection and final synthesis.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "generated_from",
+    "owner_boundary",
+    "router_output_schema",
+    "forbidden_fields",
+    "workflow_caps",
+    "scenario_matrix"
+  ],
+  "properties": {
+    "$schema": {
+      "const": "../../../../src/cli/contracts/agent-registry/routing-policy.schema.json"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "generated_from": {
+      "const": "scripts/generate-ecc-governance-preview.js"
+    },
+    "owner_boundary": {
+      "const": "scripts_prepare_candidate_facts_llm_skill_decides"
+    },
+    "router_output_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_agents",
+        "reason_code",
+        "budget_hint",
+        "degraded_mode",
+        "excluded_by_policy"
+      ],
+      "properties": {
+        "candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason_code": {
+          "type": "string"
+        },
+        "budget_hint": {
+          "type": "string"
+        },
+        "degraded_mode": {
+          "type": "object"
+        },
+        "excluded_by_policy": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "forbidden_fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "workflow_caps": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "scenario_matrix": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "scenario",
+          "expected_candidate_agents"
+        ],
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_candidate_agents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -2402,10 +2402,18 @@ V1 完成时应满足：
 ```text
 目标：让 agent 有身份、有来源、有边界
 产物：
-  agent-registry-preview.json
-  agent-registry-preview.schema.json
-  naming-policy.md
+  src/cli/contracts/agent-registry/agent-registry.schema.json
+  src/cli/contracts/agent-registry/agent-packs.schema.json
+  src/cli/contracts/agent-registry/routing-policy.schema.json
+  src/cli/contracts/agent-registry/finding.schema.json
+  docs/02-架构设计/ECC集成/generated/agent-registry.json
+  docs/02-架构设计/ECC集成/generated/agent-packs.json
+  tests/unit/ecc-agent-registry-contracts.test.js
 ```
+
+状态：已进入 V2 source contract。V2 只把 registry / packs / router candidate / finding compatibility 的机器可读形状升级为正式 contract，并让对应 generated artifacts 声明 `$schema`。V2 仍不交付 runtime capability pack，不修改 `.claude/`、`.codex/`、`.agents/skills/`，不新增 `/ecc:*` 或 `$ecc-*`。
+
+V2 对 R3/R4 只做 schema 准备：`routing-policy.schema.json` 和 `finding.schema.json` 约束 preview artifact 形状，但不让脚本选择最终专家，也不替换 workflow-native finding schema。实际 workflow 接入仍属于 R3/R5。
 
 ### R3: Router Candidate Policy
 

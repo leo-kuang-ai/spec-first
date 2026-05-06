@@ -1,6 +1,7 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.3 2026-05-06 09:10:02 leokuang: feat(ecc): 增加 ECC agent registry V2 source contracts、schema 绑定和契约测试 (user-visible)
 - v1.6.3 2026-05-05 21:57:48 leokuang: docs(ecc): 落地 ECC G0-G6.5 治理预览生成器、全量 generated artifacts、契约测试和 50 轮完成审查 (user-visible)
 - v1.6.3 2026-05-05 21:05:10 leokuang: chore(gitnexus): 刷新 AGENTS/CLAUDE 入口文档中的本地 GitNexus 索引统计
 - v1.6.3 2026-05-05 20:56:14 leokuang: fix(graph-bootstrap): 修复 GitNexus repo label 投影时序耦合，setup 支持 git remote 推导并让 bootstrap 输出 stale label 诊断 (user-visible)
