@@ -81,7 +81,7 @@ Future Roadmap:
 
 V1 不要求一次性改完 runtime、CLI router、全部 agent prompt 或所有 workflow。任何扩大到 runtime delivery、pack lifecycle、agent filtering、doctor/clean 的工作，都必须等 G0-G6.5 pilot 证明节点质量增益后再进入 Future Roadmap。
 
-截至 2026-05-06，V1-V7 pilot 已落地为 source contracts 与只读预览脚本：
+截至 2026-05-06，V1-V8 pilot 已落地为 source contracts 与只读预览脚本：
 
 ```text
 V1 governance preview:
@@ -104,6 +104,9 @@ V6 Graph-aware Expert brief:
 
 V7 Standards-aware Expert brief:
   scripts/prepare-ecc-standards-expert-brief.js
+
+V8 Optional Pack brief:
+  scripts/prepare-ecc-optional-pack-brief.js
 ```
 
 这些脚本均是 preview-first / read-only deterministic fact preparers，不新增 ECC runtime，不替 Skill 做最终专家选择、finding 裁判、影响面结论或 standards 写入。
@@ -2635,6 +2638,53 @@ V7 的关键降级规则：
   显式启用
   不进入 baseline
 ```
+
+状态：已进入 V8 Optional Pack brief pilot。V8 消费治理预览中的 optional pack registry：
+
+```text
+docs/02-架构设计/ECC集成/generated/agent-registry.json
+docs/02-架构设计/ECC集成/generated/agent-packs.json
+```
+
+并可选消费 V3 router candidate facts：
+
+```text
+src/cli/contracts/agent-registry/router-candidate-output.schema.json
+```
+
+输出：
+
+```text
+src/cli/contracts/agent-registry/optional-pack-brief.schema.json
+scripts/prepare-ecc-optional-pack-brief.js
+tests/unit/ecc-optional-pack-brief-contracts.test.js
+```
+
+V8 只负责把 P2/P3 optional pack 的显式启用请求、router 候选、connector evidence type、allowed use、activation state、confidence ceiling、max severity、required disclosures 和 forbidden claims 编译成专家可读 briefing facts。
+
+V8 明确不做：
+
+```text
+不把 optional pack 加入 baseline
+不写 runtime pack activation
+不查询 Slack / issues / Figma 等外部 connector
+不生成 /ecc:* 或 $ecc-* command
+不输出 selected_agents
+不输出 final_verdict
+不把 router candidate 当作 activation
+不让 style profile 产生 blocker 或 required fix
+不修改 generated runtime mirror
+```
+
+V8 的关键启用规则：
+
+| Pack | 默认状态 | 显式启用方式 | 证据要求 | 使用边界 |
+| --- | --- | --- | --- | --- |
+| `team-context-pack` | disabled | `--enable-pack team-context-pack`、显式 team/slack/issues 信号或指定 agent | `slack` / `issues` / `pr_comments` 至少一种 evidence type | 有证据时作为 connector evidence context；无证据时 reference-only |
+| `external-design-pack` | disabled | `--enable-pack external-design-pack`、显式 Figma / external design 信号或指定 agent | `figma` evidence type | 有 Figma evidence 时作为 connector evidence context；无证据时 reference-only |
+| `style-profile-pack` | disabled | `--enable-pack style-profile-pack`、显式 style profile 信号或指定 style agent | 无 connector 要求 | 只能 style advisory，max severity 为 `note` |
+
+V8 将 “relevant” 与 “activated” 明确分开：router facts 可以让 optional pack 进入 `eligible`，但不能自动启用；只有显式 pack、显式 agent 或显式信号才能进入 `activated` 或 `activated_reference_only`。这保证插件化能力可插拔，但不会污染默认 workflow、不会扩大上下文预算，也不会把外部 connector 的缺失伪装成已验证事实。
 
 ### R9: Capability Plugin Runtime
 

@@ -1,0 +1,462 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/optional-pack-brief.schema.json",
+  "title": "spec-first Optional Capability Pack brief",
+  "description": "Read-only optional capability pack activation and evidence-use briefing facts. Optional packs remain explicit opt-in and do not enter baseline runtime delivery.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_from",
+    "workflow",
+    "source_artifacts",
+    "input_summary",
+    "optional_pack_policy",
+    "router_context",
+    "optional_pack_context",
+    "decision_boundary",
+    "forbidden_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.optional-pack-brief.v1"
+    },
+    "generated_from": {
+      "const": "scripts/prepare-ecc-optional-pack-brief.js"
+    },
+    "workflow": {
+      "enum": [
+        "spec-brainstorm",
+        "spec-plan",
+        "spec-doc-review",
+        "spec-code-review",
+        "spec-app-consistency-audit"
+      ]
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry",
+        "packs",
+        "optional_pack_brief_schema",
+        "router_candidate_schema"
+      ],
+      "properties": {
+        "registry": {
+          "type": "string"
+        },
+        "packs": {
+          "type": "string"
+        },
+        "optional_pack_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/optional-pack-brief.schema.json"
+        },
+        "router_candidate_schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed_files",
+        "risk_signals",
+        "enabled_packs",
+        "enabled_agents",
+        "evidence_types",
+        "router_candidates_available"
+      ],
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enabled_packs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enabled_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "router_candidates_available": {
+          "type": "boolean"
+        }
+      }
+    },
+    "optional_pack_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_baseline_enabled",
+        "explicit_activation_required",
+        "router_candidate_is_not_activation",
+        "runtime_delivery",
+        "connector_queries_allowed",
+        "requires_skill_decision"
+      ],
+      "properties": {
+        "default_baseline_enabled": {
+          "const": false
+        },
+        "explicit_activation_required": {
+          "const": true
+        },
+        "router_candidate_is_not_activation": {
+          "const": true
+        },
+        "runtime_delivery": {
+          "const": "none_in_v1"
+        },
+        "connector_queries_allowed": {
+          "const": false
+        },
+        "requires_skill_decision": {
+          "const": true
+        }
+      }
+    },
+    "router_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "workflow",
+        "reason_code",
+        "candidate_agents",
+        "optional_candidate_agents",
+        "non_optional_candidate_agents",
+        "excluded_optional_agents",
+        "requires_skill_decision"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "workflow": {
+          "type": "string"
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optional_candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_optional_candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excluded_optional_agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "agent_id",
+              "reason_code"
+            ],
+            "properties": {
+              "agent_id": {
+                "type": "string"
+              },
+              "reason_code": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "requires_skill_decision": {
+          "type": "boolean"
+        }
+      }
+    },
+    "optional_pack_context": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pack_id",
+          "name",
+          "priority",
+          "type",
+          "workflow_allowed",
+          "default_enabled",
+          "baseline_eligible",
+          "explicit_activation_required",
+          "activation_state",
+          "activation_basis",
+          "trigger_hits",
+          "router_candidate_agent_ids",
+          "enabled_agent_ids",
+          "allowed_use",
+          "confidence_ceiling",
+          "max_severity",
+          "connector_requirements",
+          "required_disclosures",
+          "fallback_guidance",
+          "forbidden_claims",
+          "agents"
+        ],
+        "properties": {
+          "pack_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "P2",
+              "P3"
+            ]
+          },
+          "type": {
+            "enum": [
+              "optional",
+              "style_profile"
+            ]
+          },
+          "workflow_allowed": {
+            "type": "boolean"
+          },
+          "default_enabled": {
+            "const": false
+          },
+          "baseline_eligible": {
+            "const": false
+          },
+          "explicit_activation_required": {
+            "const": true
+          },
+          "activation_state": {
+            "enum": [
+              "inactive",
+              "eligible",
+              "activated",
+              "activated_reference_only"
+            ]
+          },
+          "activation_basis": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "explicit_pack",
+                "explicit_agent",
+                "explicit_signal",
+                "router_candidate"
+              ]
+            }
+          },
+          "trigger_hits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "router_candidate_agent_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "enabled_agent_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowed_use": {
+            "enum": [
+              "unavailable",
+              "activation_candidate_only",
+              "reference_only",
+              "connector_evidence_context",
+              "style_advisory"
+            ]
+          },
+          "confidence_ceiling": {
+            "enum": [
+              "medium",
+              "low",
+              "unknown"
+            ]
+          },
+          "max_severity": {
+            "enum": [
+              "medium",
+              "note"
+            ]
+          },
+          "connector_requirements": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "connector_mode",
+              "required_any_evidence_types",
+              "provided_evidence_types",
+              "missing_evidence_types",
+              "evidence_satisfied"
+            ],
+            "properties": {
+              "connector_mode": {
+                "enum": [
+                  "optional_connector",
+                  "none",
+                  "unknown"
+                ]
+              },
+              "required_any_evidence_types": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "provided_evidence_types": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "missing_evidence_types": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "evidence_satisfied": {
+                "type": "boolean"
+              }
+            }
+          },
+          "required_disclosures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fallback_guidance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_claims": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "agents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "agent_id",
+                "canonical_id",
+                "priority",
+                "allowed_workflows",
+                "allowed_use",
+                "activation_state",
+                "max_severity"
+              ],
+              "properties": {
+                "agent_id": {
+                  "type": "string"
+                },
+                "canonical_id": {
+                  "type": "string"
+                },
+                "priority": {
+                  "type": "string"
+                },
+                "allowed_workflows": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "allowed_use": {
+                  "type": "string"
+                },
+                "activation_state": {
+                  "type": "string"
+                },
+                "max_severity": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "decision_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_skill_decision",
+        "requires_expert_judgment",
+        "forbidden_outputs"
+      ],
+      "properties": {
+        "requires_skill_decision": {
+          "const": true
+        },
+        "requires_expert_judgment": {
+          "const": true
+        },
+        "forbidden_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

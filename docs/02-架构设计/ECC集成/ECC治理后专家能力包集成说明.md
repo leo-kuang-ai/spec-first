@@ -138,6 +138,27 @@ conflict / deprecated / drifted -> 只能作为 risk context
 unknown -> 只能作为 question context
 ```
 
+V8 已新增 Optional Pack brief source contract 与本地预览脚本：
+
+```text
+src/cli/contracts/agent-registry/optional-pack-brief.schema.json
+scripts/prepare-ecc-optional-pack-brief.js
+tests/unit/ecc-optional-pack-brief-contracts.test.js
+```
+
+V8 脚本只读取治理预览中的 `agent-registry.json`、`agent-packs.json`，并可选读取 V3 router candidate facts，输出只读 optional pack activation/evidence-use briefing facts。它只提供 optional pack 是否 workflow-allowed、是否显式启用、router 是否只给出 eligible、connector evidence type 是否满足、allowed use、confidence ceiling、max severity、required disclosures 和 forbidden claims，不写 runtime activation，不查询 Slack / issues / Figma，不输出 `selected_agents` 或 `final_verdict`，也不生成 `/ecc:*` 或 `$ecc-*`。
+
+V8 的集成效果是让 Team Context、External Design、Style Profile 等插件化能力保持“可插拔但不默认污染 baseline”：
+
+```text
+router candidate -> eligible，不等于 activated
+explicit enable + connector evidence -> connector_evidence_context
+explicit enable + missing connector evidence -> reference_only
+style profile -> style_advisory，max severity 只能是 note
+default workflow -> optional pack disabled
+runtime delivery -> none_in_v1
+```
+
 ECC 侧证据 source：
 
 ```text

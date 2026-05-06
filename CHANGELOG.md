@@ -1,6 +1,7 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.3 2026-05-06 11:46:47 leokuang: feat(ecc): 增加 ECC Optional Pack brief V8 只读预览脚本、schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 11:21:26 leokuang: feat(ecc): 增加 ECC Standards-aware Expert brief V7 只读预览脚本、schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 10:54:43 leokuang: feat(ecc): 增加 ECC Graph-aware Expert brief V6 只读预览脚本、schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 10:23:41 leokuang: feat(ecc): 增加 ECC Skill Synthesis brief V5 只读预览脚本、schema 和契约测试 (user-visible)
