@@ -67,6 +67,17 @@ src/cli/contracts/agent-registry/finding.schema.json
 
 这些 schema 是 source contract，只验证治理预览产物的机器可读形状和边界；它们不表示 capability pack 已进入 runtime delivery。
 
+V3 已新增 router candidate source contracts 与本地预览脚本：
+
+```text
+src/cli/contracts/agent-registry/router-candidate-input.schema.json
+src/cli/contracts/agent-registry/router-candidate-output.schema.json
+scripts/route-ecc-agent-candidates.js
+tests/unit/ecc-router-candidate-contracts.test.js
+```
+
+V3 脚本只读取治理预览产物并输出 advisory `candidate_agents`。它不输出 `selected_agents`，不写 runtime mirror，不新增 ECC command / skill / agent 入口，也不把脚本升级为最终专家裁判。
+
 ECC 侧证据 source：
 
 ```text
@@ -601,6 +612,26 @@ V2: 将 agent-registry / agent-packs / routing-policy / finding compatibility �
   不新增 ECC command surface
   不让 router 输出 selected_agents
   不替换 workflow-native finding schema
+```
+
+V3 当前完成项：
+
+```text
+V3: 将 router candidate policy 升级为可执行的候选事实预览脚本和输入/输出 schema
+产物:
+  src/cli/contracts/agent-registry/router-candidate-input.schema.json
+  src/cli/contracts/agent-registry/router-candidate-output.schema.json
+  scripts/route-ecc-agent-candidates.js
+  tests/unit/ecc-router-candidate-contracts.test.js
+验证:
+  npx jest tests/unit/ecc-router-candidate-contracts.test.js tests/unit/ecc-agent-registry-contracts.test.js --runInBand
+边界:
+  输出 candidate_agents，不输出 selected_agents
+  输出 requires_skill_decision: true
+  只消费 docs/02-架构设计/ECC集成/generated/ 下的治理预览产物
+  不改 generated runtime
+  不新增 ECC command surface
+  不替换 workflow-native reviewer catalog
 ```
 
 ## 12. 最终效果

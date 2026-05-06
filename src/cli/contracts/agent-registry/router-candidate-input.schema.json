@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/router-candidate-input.schema.json",
+  "title": "spec-first agent router candidate input",
+  "description": "Input facts for the V3 preview router candidate projector. Scripts receive workflow, changed files, and risk signals; Skills still decide selected experts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workflow"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "workflow": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stage": {
+      "type": "string"
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risk_signals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "available_evidence": {
+      "type": "object"
+    },
+    "max_candidates": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

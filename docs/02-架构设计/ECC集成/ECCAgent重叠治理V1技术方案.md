@@ -1043,6 +1043,8 @@ src/cli/contracts/agent-registry/agent-registry.schema.json
 src/cli/contracts/agent-registry/agent-packs.schema.json
 src/cli/contracts/agent-registry/routing-policy.schema.json
 src/cli/contracts/agent-registry/finding.schema.json
+src/cli/contracts/agent-registry/router-candidate-input.schema.json
+src/cli/contracts/agent-registry/router-candidate-output.schema.json
 ```
 
 ### 12.2 Registry Entry
@@ -2420,9 +2422,22 @@ V2 对 R3/R4 只做 schema 准备：`routing-policy.schema.json` 和 `finding.sc
 ```text
 目标：让 skill 可以基于候选 facts 动态选择专家
 产物：
-  routing-policy.md
-  candidate-router policy
-  file/risk signal matrix
+  docs/02-架构设计/ECC集成/generated/router-candidate-policy.json
+  docs/02-架构设计/ECC集成/generated/router-candidate-policy.md
+  src/cli/contracts/agent-registry/router-candidate-input.schema.json
+  src/cli/contracts/agent-registry/router-candidate-output.schema.json
+  scripts/route-ecc-agent-candidates.js
+  tests/unit/ecc-router-candidate-contracts.test.js
+```
+
+状态：已进入 V3 router candidate preview。V3 只把 `workflow`、`changed_files`、`risk_signals` 和现有 governance preview artifacts 投影为 advisory `candidate_agents`、`reason_code`、`budget_hint`、`excluded_by_policy` 和 `requires_skill_decision: true`。
+
+V3 明确不输出 `selected_agents`、`final_verdict` 或 confirmed standards 写入字段；不修改 `.claude/`、`.codex/`、`.agents/skills/`；不新增 `/ecc:*` 或 `$ecc-*`；不替换 `spec-code-review`、`spec-plan`、`spec-doc-review` 等 workflow-native reviewer catalog。Skill 仍基于候选事实、用户意图、现有 workflow contract 和可用证据做最终专家选择与 synthesis。
+
+当前 V3 验证覆盖：
+
+```text
+npx jest tests/unit/ecc-router-candidate-contracts.test.js tests/unit/ecc-agent-registry-contracts.test.js --runInBand
 ```
 
 ### R4: Finding Schema Compatibility

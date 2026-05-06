@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/router-candidate-output.schema.json",
+  "title": "spec-first agent router candidate output",
+  "description": "Output facts from the V3 preview router candidate projector. Candidate facts are advisory and never final selected agents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_from",
+    "workflow",
+    "source_artifacts",
+    "input_summary",
+    "candidate_limit",
+    "candidate_agents",
+    "reason_code",
+    "budget_hint",
+    "degraded_mode",
+    "excluded_by_policy",
+    "requires_skill_decision",
+    "forbidden_fields"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.agent-router-candidates.v1"
+    },
+    "generated_from": {
+      "const": "scripts/route-ecc-agent-candidates.js"
+    },
+    "workflow": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry",
+        "packs",
+        "policy"
+      ],
+      "properties": {
+        "registry": {
+          "type": "string"
+        },
+        "packs": {
+          "type": "string"
+        },
+        "policy": {
+          "type": "string"
+        }
+      }
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed_files",
+        "risk_signals",
+        "inferred_signals"
+      ],
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inferred_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "candidate_limit": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "candidate_agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "canonical_id",
+          "priority",
+          "packs",
+          "reason_codes",
+          "score",
+          "budget_hint"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "canonical_id": {
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "packs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reason_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "score": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "budget_hint": {
+            "enum": [
+              "tiny",
+              "small",
+              "medium",
+              "high"
+            ]
+          }
+        }
+      }
+    },
+    "reason_code": {
+      "type": "string"
+    },
+    "budget_hint": {
+      "enum": [
+        "tiny",
+        "small",
+        "medium",
+        "high"
+      ]
+    },
+    "degraded_mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "reasons"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "excluded_by_policy": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "reason_code"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason_code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "requires_skill_decision": {
+      "const": true
+    },
+    "forbidden_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
