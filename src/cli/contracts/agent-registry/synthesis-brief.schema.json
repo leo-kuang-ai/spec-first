@@ -1,0 +1,489 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/synthesis-brief.schema.json",
+  "title": "spec-first Skill Synthesis brief",
+  "description": "Read-only synthesis briefing facts for Skill-owned merge, dedupe, rank, adopt, reject, downgrade, and final summary decisions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_from",
+    "workflow",
+    "source_artifacts",
+    "input_summary",
+    "router_context",
+    "finding_facts",
+    "merge_candidate_groups",
+    "rank_bucket_hints",
+    "attention_hints",
+    "synthesis_decision_slots",
+    "requires_skill_synthesis",
+    "forbidden_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.synthesis-brief.v1"
+    },
+    "generated_from": {
+      "const": "scripts/prepare-ecc-synthesis-brief.js"
+    },
+    "workflow": {
+      "enum": [
+        "spec-code-review",
+        "spec-doc-review"
+      ]
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_core_schema",
+        "synthesis_brief_schema",
+        "router_candidate_schema"
+      ],
+      "properties": {
+        "finding_core_schema": {
+          "const": "src/cli/contracts/agent-registry/finding-core.schema.json"
+        },
+        "synthesis_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/synthesis-brief.schema.json"
+        },
+        "router_candidate_schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "projection_count",
+        "finding_count",
+        "workflows",
+        "agents"
+      ],
+      "properties": {
+        "projection_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "finding_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "router_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "reason_code",
+        "candidate_agents",
+        "requires_skill_decision"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "budget_hint",
+              "reason_codes"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "budget_hint": {
+                "enum": [
+                  "tiny",
+                  "small",
+                  "medium",
+                  "high"
+                ]
+              },
+              "reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "requires_skill_decision": {
+          "type": "boolean"
+        }
+      }
+    },
+    "finding_facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ref",
+          "workflow",
+          "agent_id",
+          "native_finding_ref",
+          "category",
+          "title",
+          "severity_display",
+          "confidence_display",
+          "projection_status",
+          "evidence_count",
+          "target",
+          "merge_hint_key",
+          "rank_hint",
+          "attention_flags",
+          "native_preserved",
+          "adapter_notes"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "workflow": {
+            "enum": [
+              "spec-code-review",
+              "spec-doc-review"
+            ]
+          },
+          "agent_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "native_finding_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity_display": {
+            "enum": [
+              "blocker",
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "confidence_display": {
+            "enum": [
+              "reject",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "projection_status": {
+            "enum": [
+              "projected",
+              "degraded_missing_evidence",
+              "rejected_by_native_confidence"
+            ]
+          },
+          "evidence_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "target": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "value"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "file_line",
+                  "file",
+                  "section",
+                  "evidence",
+                  "title"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            }
+          },
+          "merge_hint_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rank_hint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "bucket",
+              "reason_codes"
+            ],
+            "properties": {
+              "bucket": {
+                "enum": [
+                  "blocking_attention",
+                  "high_attention",
+                  "medium_attention",
+                  "advisory_attention"
+                ]
+              },
+              "reason_codes": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "attention_flags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "native_preserved": {
+            "type": "object"
+          },
+          "adapter_notes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "merge_candidate_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "merge_hint_key",
+          "reason_code",
+          "finding_refs",
+          "agent_ids",
+          "requires_skill_decision"
+        ],
+        "properties": {
+          "merge_hint_key": {
+            "type": "string"
+          },
+          "reason_code": {
+            "type": "string"
+          },
+          "finding_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "agent_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requires_skill_decision": {
+            "const": true
+          }
+        }
+      }
+    },
+    "rank_bucket_hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "blocking_attention_refs",
+        "high_attention_refs",
+        "medium_attention_refs",
+        "advisory_attention_refs"
+      ],
+      "properties": {
+        "blocking_attention_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "high_attention_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "medium_attention_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "advisory_attention_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "attention_hints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "degraded_refs",
+        "rejected_by_native_confidence_refs",
+        "missing_evidence_refs",
+        "pre_existing_refs",
+        "verification_required_refs",
+        "missing_recommendation_refs",
+        "router_candidate_without_finding_refs",
+        "finding_agent_outside_router_refs"
+      ],
+      "properties": {
+        "degraded_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rejected_by_native_confidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "pre_existing_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verification_required_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_recommendation_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "router_candidate_without_finding_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "finding_agent_outside_router_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "synthesis_decision_slots": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "must_be_filled_by_skill",
+        "merge",
+        "adopt",
+        "reject",
+        "downgrade",
+        "upgrade",
+        "final_summary"
+      ],
+      "properties": {
+        "must_be_filled_by_skill": {
+          "const": true
+        },
+        "merge": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "adopt": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reject": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "downgrade": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "upgrade": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "final_summary": {
+          "type": "null"
+        }
+      }
+    },
+    "requires_skill_synthesis": {
+      "const": true
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

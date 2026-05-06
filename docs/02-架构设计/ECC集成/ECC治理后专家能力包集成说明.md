@@ -88,6 +88,16 @@ tests/unit/ecc-finding-core-contracts.test.js
 
 V4 脚本只读取 `spec-code-review` / `spec-doc-review` workflow-native reviewer JSON，并投影为只读 Finding Core compatibility view。它不替换 native finding schema，不改 reviewer prompt，不写 runtime mirror，也不输出最终 review verdict。
 
+V5 已新增 Skill Synthesis brief source contract 与本地预览脚本：
+
+```text
+src/cli/contracts/agent-registry/synthesis-brief.schema.json
+scripts/prepare-ecc-synthesis-brief.js
+tests/unit/ecc-synthesis-brief-contracts.test.js
+```
+
+V5 脚本只读取 V4 Finding Core projection，并可选读取 V3 router candidate facts，输出只读 synthesis briefing facts。它只提供 merge candidate、rank bucket、degraded / pre-existing / verification-required 等提示，不输出最终 verdict，不采纳或拒绝 finding，不写 runtime mirror，也不修改 reviewer prompt。
+
 ECC 侧证据 source：
 
 ```text
@@ -661,6 +671,27 @@ V4: 将 code-review / doc-review native findings 只读投影为 Finding Core co
   保留 code-review 的 autofix_class / owner / requires_verification / pre_existing
   保留 doc-review 的 finding_type / deferred_questions
   severity_display / confidence_display 只是 compatibility labels
+  不改 generated runtime
+  不新增 ECC command surface
+  不修改 reviewer prompt
+```
+
+V5 当前完成项：
+
+```text
+V5: 将 Finding Core projections 组织成 Skill Synthesis brief facts
+产物:
+  src/cli/contracts/agent-registry/synthesis-brief.schema.json
+  scripts/prepare-ecc-synthesis-brief.js
+  tests/unit/ecc-synthesis-brief-contracts.test.js
+验证:
+  npx jest tests/unit/ecc-synthesis-brief-contracts.test.js tests/unit/ecc-finding-core-contracts.test.js tests/unit/ecc-router-candidate-contracts.test.js --runInBand
+  npm run typecheck
+边界:
+  输出 synthesis brief，不输出 final_verdict
+  输出 candidate merge/rank/degraded hints，不输出 adopt/reject/downgrade 结论
+  可消费 router candidates，但仍不输出 selected_agents
+  Skill 必须填充 synthesis_decision_slots
   不改 generated runtime
   不新增 ECC command surface
   不修改 reviewer prompt

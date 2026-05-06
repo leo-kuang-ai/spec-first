@@ -1,6 +1,7 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.6.3 2026-05-06 10:23:41 leokuang: feat(ecc): 增加 ECC Skill Synthesis brief V5 只读预览脚本、schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 10:04:45 leokuang: feat(ecc): 增加 ECC Finding Core V4 只读投影脚本、schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 09:34:00 leokuang: feat(ecc): 增加 ECC router candidate V3 预览脚本、输入输出 schema 和契约测试 (user-visible)
 - v1.6.3 2026-05-06 09:10:02 leokuang: feat(ecc): 增加 ECC agent registry V2 source contracts、schema 绑定和契约测试 (user-visible)

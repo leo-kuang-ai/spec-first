@@ -1046,6 +1046,7 @@ src/cli/contracts/agent-registry/finding.schema.json
 src/cli/contracts/agent-registry/router-candidate-input.schema.json
 src/cli/contracts/agent-registry/router-candidate-output.schema.json
 src/cli/contracts/agent-registry/finding-core.schema.json
+src/cli/contracts/agent-registry/synthesis-brief.schema.json
 ```
 
 ### 12.2 Registry Entry
@@ -2471,6 +2472,21 @@ npm run typecheck
   spec-code-review
   spec-plan
   spec-doc-review
+产物：
+  src/cli/contracts/agent-registry/synthesis-brief.schema.json
+  scripts/prepare-ecc-synthesis-brief.js
+  tests/unit/ecc-synthesis-brief-contracts.test.js
+```
+
+状态：已进入 V5 Skill Synthesis brief pilot。V5 消费 V4 `finding_core` compatibility view，并可选消费 V3 router candidate facts，输出 `spec-first.synthesis-brief.v1` 只读 briefing facts。该 brief 只提供 merge candidate、rank bucket、degraded / pre-existing / verification-required / missing-recommendation 等 synthesis hints，以及必须由 Skill 填写的 decision slots。
+
+V5 明确不输出 `final_verdict`、`selected_agents`、confirmed standards 写入或最终 adopt / reject / downgrade 结论；不修改 `spec-code-review` / `spec-doc-review` reviewer prompt；不替换 workflow-native schema；不写 `.claude/`、`.codex/`、`.agents/skills/`。脚本负责确定性事实整理，Skill Synthesis 仍负责语义裁判。
+
+当前 V5 验证覆盖：
+
+```text
+npx jest tests/unit/ecc-synthesis-brief-contracts.test.js tests/unit/ecc-finding-core-contracts.test.js tests/unit/ecc-router-candidate-contracts.test.js --runInBand
+npm run typecheck
 ```
 
 ### R6: Graph-aware Experts
