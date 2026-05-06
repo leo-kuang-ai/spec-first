@@ -77,6 +77,11 @@ describe('spec-plan context orientation contract', () => {
     expect(text).toContain('dirty-uncertain');
     expect(text).toContain('do not let scripts or graph facts choose semantically between child repos');
     expect(text).toContain('A cross-repo plan must name `target_repo` per implementation unit');
+    expect(text).toContain('ECC Governance Facts (Optional, Advisory)');
+    expect(text).toContain('scripts/prepare-ecc-workflow-pilot-brief.js --workflow spec-plan');
+    expect(text).toContain('candidate facts, not selected research agents');
+    expect(text).toContain('Optional-pack `eligible` is not activation');
+    expect(text).toContain('Pilot failure is never a planning failure and never justifies skipping Phase 1 research');
     expect(text).not.toContain('spec-first ' + 'crg hook');
     expect(text).not.toContain('$spec-' + 'graph' + '-bootstrap');
     expect(text).not.toContain('/spec:' + 'graph' + '-bootstrap');

@@ -64,6 +64,26 @@ For task-pack review, verify that it is derived rather than a second plan:
 - dependency and wave claims are plausible from file ownership and shared surfaces,
 - deterministic identity/freshness issues belong to `spec-first tasks validate --json`, while semantic task quality remains reviewer judgment.
 
+### ECC Governance Pilot Facts (Optional, Advisory)
+
+After Phase 1 has read and classified the document, and before selecting conditional personas, optionally prepare ECC governance pilot facts when the current checkout provides the source script:
+
+```
+node scripts/prepare-ecc-workflow-pilot-brief.js --workflow spec-doc-review --target-path "<document-path>" --risk-signal "<signal>"
+```
+
+Use only the document path, document type, explicit risk signals you can defend from the document, and explicit optional-pack evidence flags the user or workflow already provided. Do not pass the full document body, connector payloads, reviewer JSON, or prior decision-primer content into this pilot step.
+
+The brief is advisory only:
+
+- `router_candidate_facts.candidate_agents` and `expert_candidate_guidance` are candidate facts, not selected document reviewers.
+- Graph, standards, and optional-pack sections define allowed use, confidence ceilings, required disclosures, fallback guidance, and forbidden claims; they do not make document findings or final review verdicts.
+- Optional-pack `eligible` is not activation. Team context, external design, and style profiles still require explicit enablement and appropriate evidence before use.
+- The skill still owns conditional persona selection, dispatch, synthesis, safe-auto behavior, final report wording, and whether a finding survives.
+- Do not run external connectors from this step, do not call graph providers from this step, do not modify repo-profile, and do not write `.claude/`, `.codex/`, `.agents/skills/`, or other runtime assets.
+
+If the script is absent, fails, or returns degraded component status, continue with the existing document-review persona selection and disclose the limitation in Coverage as `ECC governance pilot facts unavailable` or `ECC governance pilot facts degraded: <reason>`. Pilot failure is never a document-review failure and never justifies skipping persona selection.
+
 ### Select Conditional Personas
 
 Analyze the document content to determine which conditional personas to activate. Check for these signals:

@@ -81,7 +81,7 @@ Future Roadmap:
 
 V1 不要求一次性改完 runtime、CLI router、全部 agent prompt 或所有 workflow。任何扩大到 runtime delivery、pack lifecycle、agent filtering、doctor/clean 的工作，都必须等 G0-G6.5 pilot 证明节点质量增益后再进入 Future Roadmap。
 
-截至 2026-05-06，V1-V9A pilot 已落地为 source contracts 与只读预览脚本：
+截至 2026-05-06，V1-V9B pilot 已落地为 source contracts 与只读预览脚本：
 
 ```text
 V1 governance preview:
@@ -110,6 +110,9 @@ V8 Optional Pack brief:
 
 V9A Code-review pilot brief:
   scripts/prepare-ecc-code-review-pilot-brief.js
+
+V9B Workflow pilot brief:
+  scripts/prepare-ecc-workflow-pilot-brief.js
 ```
 
 这些脚本均是 preview-first / read-only deterministic fact preparers，不新增 ECC runtime，不替 Skill 做最终专家选择、finding 裁判、影响面结论或 standards 写入。
@@ -2739,6 +2742,74 @@ optional eligible -> activation candidate only，不等于 optional pack activat
 ```
 
 这一步的价值不是“让 JS 自动选 reviewer”，而是把 ECC 治理后的专家能力包第一次接入真实 `spec-code-review` 节点：脚本准备边界清晰的 facts，Skill 根据现有 workflow contract、用户意图、diff、persona catalog 和可用证据做最终判断。
+
+### V9B: Workflow Pilot Brief
+
+状态：已进入 V9B workflow pilot completion。V9B 将 V9A 的真实 workflow 接入模式扩展到 V1 当前要求覆盖的剩余节点：
+
+```text
+spec-plan
+spec-doc-review
+spec-skill-audit
+```
+
+产物：
+
+```text
+src/cli/contracts/agent-registry/workflow-pilot-brief.schema.json
+scripts/prepare-ecc-workflow-pilot-brief.js
+tests/unit/ecc-workflow-pilot-brief-contracts.test.js
+```
+
+接入点：
+
+```text
+skills/spec-plan/SKILL.md
+skills/spec-doc-review/SKILL.md
+skills/spec-skill-audit/SKILL.md
+```
+
+V9B 只负责把 V3 / V6 / V7 / V8 中适用于当前 workflow 的 projection facts 聚合成 `spec-first.workflow-pilot-brief.v1`：
+
+```text
+router_candidate_facts
+graph_expert_brief      # spec-plan / spec-doc-review
+standards_expert_brief  # spec-plan / spec-doc-review / spec-skill-audit
+optional_pack_brief     # spec-plan / spec-doc-review
+expert_candidate_guidance
+component_status
+degraded_mode
+```
+
+`spec-skill-audit` 不使用 graph 或 optional-pack 组件；这些组件在 V9B 中以 `unsupported_for_workflow` 跳过，不构成 degraded failure。
+
+V9B 明确不做：
+
+```text
+不输出 selected_agents
+不输出 final_verdict
+不替换 spec-plan research agent selection
+不替换 spec-doc-review persona selection
+不替换 spec-skill-audit expert rubric judgment
+不替换 workflow-native synthesis
+不激活 optional pack
+不查询 Slack / issues / Figma connector
+不调用 graph provider
+不写 repo-profile
+不写 .claude / .codex / .agents/skills runtime mirror
+不新增 /ecc:* 或 $ecc-* command
+```
+
+V9B 完成后，V1 当前 pilot 覆盖达到：
+
+| Workflow | Pilot 接入状态 | 使用方式 |
+| --- | --- | --- |
+| `spec-code-review` | V9A 已接入 | Stage 2c advisory facts，Stage 3 仍由 Skill 选 reviewer |
+| `spec-plan` | V9B 已接入 | Phase 1 research 前 advisory facts，research agent 选择仍由 Skill 决定 |
+| `spec-doc-review` | V9B 已接入 | Phase 1 文档分类后 advisory facts，conditional persona selection 仍由 Skill 决定 |
+| `spec-skill-audit` | V9B 已接入 | deterministic fact collection 后 advisory facts，audit verdict 仍由 Skill 决定 |
+
+这意味着 G7 pilot coverage 已完成到 source workflow 层：ECC 专家能力包已经作为治理后的 evidence-use/candidate-guidance 接入研发核心节点，但仍不是 runtime agent 自动安装、自动执行或 ECC 原始资产镜像。
 
 ### R9: Capability Plugin Runtime
 

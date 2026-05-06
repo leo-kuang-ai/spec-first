@@ -183,6 +183,41 @@ runtime delivery -> none_in_v9a
 
 V9A 不复制 ECC 原始 agents，不新增 `/ecc:*` 或 `$ecc-*`，不查询外部 connector，不调用 graph provider，不写 repo-profile，不写 `.claude/`、`.codex/`、`.agents/skills/` runtime mirror，也不替换 `spec-code-review` 既有 persona catalog、always-on reviewer 规则、dispatch boundary、native finding schema 或 synthesis 规则。
 
+V9B 已新增 workflow pilot brief source contract、本地预览脚本，并接入 `spec-plan`、`spec-doc-review`、`spec-skill-audit` workflow source：
+
+```text
+src/cli/contracts/agent-registry/workflow-pilot-brief.schema.json
+scripts/prepare-ecc-workflow-pilot-brief.js
+tests/unit/ecc-workflow-pilot-brief-contracts.test.js
+skills/spec-plan/SKILL.md
+skills/spec-doc-review/SKILL.md
+skills/spec-skill-audit/SKILL.md
+```
+
+V9B 脚本只聚合适用于当前 workflow 的 V3 router candidate facts、V6 graph evidence-use brief、V7 standards evidence-use brief 和 V8 optional pack brief，输出 `spec-first.workflow-pilot-brief.v1`。其中 `spec-skill-audit` 只消费 router + standards facts，graph / optional pack 以 `unsupported_for_workflow` 跳过，不构成失败。
+
+V9B 的集成效果是完成 V1 当前研发核心节点的 pilot 覆盖：
+
+```text
+spec-code-review -> V9A Stage 2c advisory facts
+spec-plan -> V9B Phase 1 research 前 advisory facts
+spec-doc-review -> V9B Phase 1 文档分类后 advisory facts
+spec-skill-audit -> V9B deterministic fact collection 后 advisory facts
+```
+
+所有接入点都保持同一裁判边界：
+
+```text
+router candidate facts -> 候选解释，不等于 selected_agents
+graph / standards facts -> evidence-use 上限，不等于 semantic conclusion
+optional eligible -> 不等于 activation
+component failure -> degraded continue，不阻断 workflow
+workflow source -> 仍由 Skill 做最终 expert selection / synthesis / verdict
+runtime delivery -> none_in_v9b
+```
+
+V9B 不复制 ECC 原始 agents，不新增 `/ecc:*` 或 `$ecc-*`，不查询外部 connector，不调用 graph provider，不写 repo-profile，不写 `.claude/`、`.codex/`、`.agents/skills/` runtime mirror，也不替换 `spec-plan` research agents、`spec-doc-review` persona catalog、`spec-skill-audit` rubric judgment 或任何 workflow-native synthesis 规则。
+
 ECC 侧证据 source：
 
 ```text

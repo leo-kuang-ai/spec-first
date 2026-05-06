@@ -52,6 +52,11 @@ describe('spec-doc-review best-judgment wording contract', () => {
     expect(skill).toContain('derived rather than a second plan');
     expect(skill).toContain('Task Pack Contract');
     expect(skill).toContain('spec-first tasks validate --json');
+    expect(skill).toContain('ECC Governance Pilot Facts (Optional, Advisory)');
+    expect(skill).toContain('scripts/prepare-ecc-workflow-pilot-brief.js --workflow spec-doc-review');
+    expect(skill).toContain('candidate facts, not selected document reviewers');
+    expect(skill).toContain('Optional-pack `eligible` is not activation');
+    expect(skill).toContain('Pilot failure is never a document-review failure and never justifies skipping persona selection');
   });
 
   test('doc review uses bounded persona dispatch with Codex-capable report-only fallback', () => {

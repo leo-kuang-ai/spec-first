@@ -141,11 +141,18 @@ When the user explicitly asks for patch preview, it may also write:
    node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --target skills/<skill-name>
    ```
 
-6. Read `skill-audit-summary.md`, `skill-improvement-plan.md`, and the JSON reports relevant to the user's question.
-7. Review the deterministic findings using `references/expert-audit-rubric.md`.
-8. Treat scorecards as signals, not gates.
-9. For each P0/P1 finding you surface to the user, include signal, file/section evidence, counter-evidence status, decision, reason, recommendation, and confidence.
-10. Do not modify source files unless the user separately asks to apply a specific fix.
+6. Optionally prepare ECC governance pilot facts when the current checkout provides the source script:
+
+   ```bash
+   node scripts/prepare-ecc-workflow-pilot-brief.js --workflow spec-skill-audit --context-path skills/ --risk-signal harness_governance
+   ```
+
+   This brief is advisory only. `router_candidate_facts.candidate_agents` and `expert_candidate_guidance` are candidate facts, not selected auditors; standards context defines allowed use, confidence ceilings, required disclosures, fallback guidance, and forbidden claims, not final audit verdicts. `spec-skill-audit` does not use graph or optional-pack components in this pilot; those components may be skipped as unsupported without degrading the audit. Do not run external connectors, call graph providers, modify repo-profile, or write `.claude/`, `.codex/`, `.agents/skills/`, or other runtime assets from this step. If the script is absent, fails, or returns degraded component status, continue with the existing audit process and disclose the limitation as `ECC governance pilot facts unavailable` or `ECC governance pilot facts degraded: <reason>`.
+7. Read `skill-audit-summary.md`, `skill-improvement-plan.md`, and the JSON reports relevant to the user's question.
+8. Review the deterministic findings using `references/expert-audit-rubric.md`.
+9. Treat scorecards as signals, not gates.
+10. For each P0/P1 finding you surface to the user, include signal, file/section evidence, counter-evidence status, decision, reason, recommendation, and confidence.
+11. Do not modify source files unless the user separately asks to apply a specific fix.
 
 ## Governance
 

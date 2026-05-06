@@ -199,6 +199,26 @@ Prepare a concise planning context summary (a paragraph or two) to pass as input
 - If an origin document exists, summarize the problem frame, requirements, and key decisions from that document
 - Otherwise use the feature description directly
 
+#### 1.1 Pilot: ECC Governance Facts (Optional, Advisory)
+
+Before dispatching Phase 1 research agents, optionally prepare ECC governance pilot facts when the current checkout provides the source script:
+
+```
+node scripts/prepare-ecc-workflow-pilot-brief.js --workflow spec-plan --target-path "<origin-or-plan-path>" --context-path "<relevant-path>" --risk-signal "<signal>"
+```
+
+Use only the planning context summary, origin/plan path, repo-relative context paths, explicit risk signals you can defend from the current planning context, and explicit optional-pack evidence flags the user or workflow already provided. Do not pass full source files, Slack messages, connector payloads, or generated plan drafts into this pilot step.
+
+The brief is advisory only:
+
+- `router_candidate_facts.candidate_agents` and `expert_candidate_guidance` are candidate facts, not selected research agents.
+- Graph, standards, and optional-pack sections define allowed use, confidence ceilings, required disclosures, fallback guidance, and forbidden claims; they do not make architecture decisions or semantic plan conclusions.
+- Optional-pack `eligible` is not activation. Team context, external design, and style profiles still require explicit enablement and appropriate evidence before use.
+- The skill still owns research-agent selection, fallback mode, plan synthesis, final plan wording, and all assumptions / decisions.
+- Do not run external connectors from this step, do not call graph providers from this step, do not modify repo-profile, and do not write `.claude/`, `.codex/`, `.agents/skills/`, or other runtime assets.
+
+If the script is absent, fails, or returns degraded component status, continue with the existing planning research process and disclose the limitation in the plan's evidence notes as `ECC governance pilot facts unavailable` or `ECC governance pilot facts degraded: <reason>`. Pilot failure is never a planning failure and never justifies skipping Phase 1 research.
+
 Planning research agents are read-only. A direct plan workflow invocation authorizes this documented research phase when host capability exists; do not ask for a second subagent confirmation. Use the active host's agent-dispatch primitive when available (including `spawn_agent` where provided), omit permission-mode overrides, and keep dispatch bounded to the named research agents below. Do not downgrade solely because the host is Codex.
 
 If dispatch is unavailable, explicitly disabled, or fails for a non-capacity reason, run the same research sequentially in the current agent by reading the corresponding agent profile and applying it inline as an explicit fallback. Plan generation must still complete when research dispatch is unavailable; dispatch improves latency and context separation, not correctness.

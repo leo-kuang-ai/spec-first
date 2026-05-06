@@ -1,0 +1,556 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/workflow-pilot-brief.schema.json",
+  "title": "spec-first ECC workflow pilot brief",
+  "description": "Read-only ECC governance pilot facts for spec-plan, spec-doc-review, and spec-skill-audit. Candidate facts inform workflow expert selection, but the workflow skill remains responsible for selection, dispatch, synthesis, and final artifacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_from",
+    "workflow",
+    "source_artifacts",
+    "input_summary",
+    "component_status",
+    "router_candidate_facts",
+    "graph_expert_brief",
+    "standards_expert_brief",
+    "optional_pack_brief",
+    "expert_candidate_guidance",
+    "decision_boundary",
+    "degraded_mode",
+    "forbidden_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.workflow-pilot-brief.v1"
+    },
+    "generated_from": {
+      "const": "scripts/prepare-ecc-workflow-pilot-brief.js"
+    },
+    "workflow": {
+      "enum": [
+        "spec-plan",
+        "spec-doc-review",
+        "spec-skill-audit"
+      ]
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry",
+        "packs",
+        "policy",
+        "workflow_pilot_brief_schema",
+        "router_candidate_schema",
+        "graph_expert_brief_schema",
+        "standards_expert_brief_schema",
+        "optional_pack_brief_schema"
+      ],
+      "properties": {
+        "registry": {
+          "type": "string"
+        },
+        "packs": {
+          "type": "string"
+        },
+        "policy": {
+          "type": "string"
+        },
+        "workflow_pilot_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/workflow-pilot-brief.schema.json"
+        },
+        "router_candidate_schema": {
+          "const": "src/cli/contracts/agent-registry/router-candidate-output.schema.json"
+        },
+        "graph_expert_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/graph-expert-brief.schema.json"
+        },
+        "standards_expert_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/standards-expert-brief.schema.json"
+        },
+        "optional_pack_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/optional-pack-brief.schema.json"
+        }
+      }
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "target_path",
+        "changed_files",
+        "context_paths",
+        "routing_paths",
+        "risk_signals",
+        "enabled_packs",
+        "enabled_agents",
+        "evidence_types",
+        "router_candidates_supplied",
+        "allow_fallback_vocabulary"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string"
+        },
+        "target_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "routing_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enabled_packs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enabled_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "router_candidates_supplied": {
+          "type": "boolean"
+        },
+        "allow_fallback_vocabulary": {
+          "type": "boolean"
+        }
+      }
+    },
+    "component_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "router_candidates",
+        "graph_expert_brief",
+        "standards_expert_brief",
+        "optional_pack_brief"
+      ],
+      "properties": {
+        "router_candidates": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "available",
+            "skipped",
+            "reason_code",
+            "readiness_status",
+            "confidence",
+            "item_count",
+            "error"
+          ],
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "skipped": {
+              "type": "boolean"
+            },
+            "reason_code": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "readiness_status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "confidence": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "item_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "graph_expert_brief": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "available",
+            "skipped",
+            "reason_code",
+            "readiness_status",
+            "confidence",
+            "item_count",
+            "error"
+          ],
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "skipped": {
+              "type": "boolean"
+            },
+            "reason_code": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "readiness_status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "confidence": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "item_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "standards_expert_brief": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "available",
+            "skipped",
+            "reason_code",
+            "readiness_status",
+            "confidence",
+            "item_count",
+            "error"
+          ],
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "skipped": {
+              "type": "boolean"
+            },
+            "reason_code": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "readiness_status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "confidence": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "item_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "optional_pack_brief": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "available",
+            "skipped",
+            "reason_code",
+            "readiness_status",
+            "confidence",
+            "item_count",
+            "error"
+          ],
+          "properties": {
+            "available": {
+              "type": "boolean"
+            },
+            "skipped": {
+              "type": "boolean"
+            },
+            "reason_code": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "readiness_status": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "confidence": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "item_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "router_candidate_facts": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "graph_expert_brief": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "standards_expert_brief": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "optional_pack_brief": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "expert_candidate_guidance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "agent_id",
+          "canonical_id",
+          "priority",
+          "reason_codes",
+          "budget_hint",
+          "candidate_only",
+          "requires_skill_decision",
+          "graph_context_available",
+          "standards_context_available",
+          "optional_context_available",
+          "confidence_ceiling",
+          "allowed_use",
+          "required_disclosures",
+          "fallback_guidance",
+          "forbidden_claims"
+        ],
+        "properties": {
+          "agent_id": {
+            "type": "string"
+          },
+          "canonical_id": {
+            "type": "string"
+          },
+          "priority": {
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "reason_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "budget_hint": {
+            "enum": [
+              "tiny",
+              "small",
+              "medium",
+              "high"
+            ]
+          },
+          "candidate_only": {
+            "const": true
+          },
+          "requires_skill_decision": {
+            "const": true
+          },
+          "graph_context_available": {
+            "type": "boolean"
+          },
+          "standards_context_available": {
+            "type": "boolean"
+          },
+          "optional_context_available": {
+            "type": "boolean"
+          },
+          "confidence_ceiling": {
+            "enum": [
+              "unknown",
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "allowed_use": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "required_disclosures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fallback_guidance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "forbidden_claims": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "decision_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_skill_decision",
+        "requires_expert_selection_by_skill",
+        "router_candidate_is_not_selection",
+        "optional_candidate_is_not_activation",
+        "component_failure_is_degraded_mode",
+        "connector_queries_allowed",
+        "runtime_delivery",
+        "forbidden_outputs"
+      ],
+      "properties": {
+        "requires_skill_decision": {
+          "const": true
+        },
+        "requires_expert_selection_by_skill": {
+          "const": true
+        },
+        "router_candidate_is_not_selection": {
+          "const": true
+        },
+        "optional_candidate_is_not_activation": {
+          "const": true
+        },
+        "component_failure_is_degraded_mode": {
+          "const": true
+        },
+        "connector_queries_allowed": {
+          "const": false
+        },
+        "runtime_delivery": {
+          "const": "none_in_v9b"
+        },
+        "forbidden_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "degraded_mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "reasons"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
