@@ -117,6 +117,27 @@ stale / dirty graph -> 只能 orientation_only
 missing / blocked graph -> 不得做 graph-backed impact claim
 ```
 
+V7 已新增 Standards-aware Expert brief source contract 与本地预览脚本：
+
+```text
+src/cli/contracts/agent-registry/standards-expert-brief.schema.json
+scripts/prepare-ecc-standards-expert-brief.js
+tests/unit/ecc-standards-expert-brief-contracts.test.js
+```
+
+V7 脚本只读取 `.spec-first/standards/*`、`.spec-first/specs/repo-profile.yaml` 和 `skills/spec-standards/scripts/validate-artifacts.js` 的 validator 结果，并可选读取 V3 router candidate facts，输出只读 standards evidence-use briefing facts。它只提供 standards artifact status、validator trust level、candidate consumption mode、confidence ceiling、required disclosures、fallback guidance、allowed standards artifact use 和 forbidden claims，不运行 `spec-standards`，不写 `.spec-first/standards/*`，不修改 repo-profile，不输出 `selected_agents`、`final_verdict`、`confirmed_standards_write` 或 `repo_profile_writeback`。
+
+V7 的集成效果是让 Governance、Architecture & Contract、Engineering Quality、Document Quality、Skill Audit 等研发专家能力包在消费项目规范时统一遵守 preview-first 和 trust-level 边界：
+
+```text
+trusted + confirmed -> 可作为 hard context
+trusted + observed/imported/suggested -> 仍只能 advisory
+degraded / stale -> 全部 standards candidate 降级为 advisory
+missing / invalid -> 不得形成 standards-backed hard constraint
+conflict / deprecated / drifted -> 只能作为 risk context
+unknown -> 只能作为 question context
+```
+
 ECC 侧证据 source：
 
 ```text

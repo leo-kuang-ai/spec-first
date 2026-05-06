@@ -81,7 +81,7 @@ Future Roadmap:
 
 V1 不要求一次性改完 runtime、CLI router、全部 agent prompt 或所有 workflow。任何扩大到 runtime delivery、pack lifecycle、agent filtering、doctor/clean 的工作，都必须等 G0-G6.5 pilot 证明节点质量增益后再进入 Future Roadmap。
 
-截至 2026-05-06，V1-V6 pilot 已落地为 source contracts 与只读预览脚本：
+截至 2026-05-06，V1-V7 pilot 已落地为 source contracts 与只读预览脚本：
 
 ```text
 V1 governance preview:
@@ -101,6 +101,9 @@ V5 Skill Synthesis brief:
 
 V6 Graph-aware Expert brief:
   scripts/prepare-ecc-graph-expert-brief.js
+
+V7 Standards-aware Expert brief:
+  scripts/prepare-ecc-standards-expert-brief.js
 ```
 
 这些脚本均是 preview-first / read-only deterministic fact preparers，不新增 ECC runtime，不替 Skill 做最终专家选择、finding 裁判、影响面结论或 standards 写入。
@@ -2572,6 +2575,57 @@ V6 的关键降级规则：
 要求：
   standards 写入必须 preview-first
 ```
+
+状态：已进入 V7 Standards-aware Expert brief pilot。V7 消费 `spec-standards` 生成的 standards artifacts：
+
+```text
+.spec-first/standards/project-shape.json
+.spec-first/standards/standards-plan.json
+.spec-first/standards/glue-map.json
+.spec-first/standards/standards-candidates.json
+.spec-first/standards/standards-preview.md
+.spec-first/standards/standards-update-decision.json
+.spec-first/standards/imported-standards.json
+.spec-first/specs/repo-profile.yaml
+```
+
+并输出：
+
+```text
+src/cli/contracts/agent-registry/standards-expert-brief.schema.json
+scripts/prepare-ecc-standards-expert-brief.js
+tests/unit/ecc-standards-expert-brief-contracts.test.js
+```
+
+V7 只负责把 standards artifacts 是否存在、validator 结果、trust level、candidate status、allowed use、confidence ceiling、required disclosures、fallback guidance 和 forbidden claims 编译成专家可读 briefing facts。
+
+V7 明确不做：
+
+```text
+不运行 spec-standards workflow
+不写 .spec-first/standards/*
+不修改 .spec-first/specs/repo-profile.yaml
+不输出 selected_agents
+不输出 final_verdict
+不输出 confirmed_standards_write
+不输出 repo_profile_writeback
+不把 observed / imported / suggested candidate 当作 hard constraint
+不替 Skill 判断标准是否采纳、废弃或提升 severity
+不修改 reviewer prompt
+不修改 generated runtime mirror
+```
+
+V7 的关键降级规则：
+
+| standards_readiness.status | 使用边界 | confidence ceiling |
+| --- | --- | --- |
+| `trusted` | `confirmed` candidate 可作为 hard context；`observed` / `imported` / `suggested` 仍只作 advisory | `high` |
+| `degraded` | validator 只以 degraded trust 通过，所有 candidate 包括 confirmed 都只能作 advisory | `medium` |
+| `stale` | update decision 建议 refresh，现有 candidate 只能作 advisory | `low` |
+| `missing` | candidates 或 preview 缺失，不得形成 standards-backed hard constraint | `unknown` |
+| `invalid` | validator fail，不得基于 standards candidate 输出高置信 blocker | `unknown` |
+
+这一步让 `spec-project-standards-reviewer`、`spec-architecture-strategist`、`spec-api-contract-reviewer`、`spec-testing-reviewer`、`spec-code-simplicity-reviewer`、`spec-correctness-reviewer`、`spec-security-reviewer`、`spec-coherence-reviewer`、`spec-feasibility-reviewer`、`spec-scope-guardian-reviewer`、`spec-agent-native-reviewer`、`spec-cli-readiness-reviewer`、`spec-cli-agent-readiness-reviewer`、`spec-security-sentinel` 等研发专家在消费 standards evidence 时统一遵守 preview-first、trust-level 和 advisory/hard 边界。最终是否把某条标准升级为 blocker、写入计划或沉淀为 confirmed standards，仍由 Skill Synthesis 与用户确认流程决定。
 
 ### R8: Optional Packs
 
