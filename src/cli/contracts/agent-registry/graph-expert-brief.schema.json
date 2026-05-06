@@ -1,0 +1,488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec-first.dev/contracts/agent-registry/graph-expert-brief.schema.json",
+  "title": "spec-first Graph-aware Expert brief",
+  "description": "Read-only graph readiness and evidence-use briefing facts for graph-aware expert capability packs. Skills and experts still own semantic judgment.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_from",
+    "workflow",
+    "source_artifacts",
+    "input_summary",
+    "git_snapshot",
+    "graph_readiness",
+    "provider_readiness",
+    "capability_summary",
+    "router_context",
+    "expert_graph_context",
+    "non_graph_agents",
+    "decision_boundary",
+    "forbidden_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "spec-first.graph-expert-brief.v1"
+    },
+    "generated_from": {
+      "const": "scripts/prepare-ecc-graph-expert-brief.js"
+    },
+    "workflow": {
+      "enum": [
+        "spec-plan",
+        "spec-code-review",
+        "spec-doc-review"
+      ]
+    },
+    "source_artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "graph_facts",
+        "provider_status",
+        "impact_capabilities",
+        "graph_expert_brief_schema",
+        "router_candidate_schema"
+      ],
+      "properties": {
+        "graph_facts": {
+          "const": ".spec-first/graph/graph-facts.json"
+        },
+        "provider_status": {
+          "const": ".spec-first/graph/provider-status.json"
+        },
+        "impact_capabilities": {
+          "const": ".spec-first/impact/bootstrap-impact-capabilities.json"
+        },
+        "graph_expert_brief_schema": {
+          "const": "src/cli/contracts/agent-registry/graph-expert-brief.schema.json"
+        },
+        "router_candidate_schema": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed_files",
+        "risk_signals",
+        "router_candidates_available"
+      ],
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "risk_signals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "router_candidates_available": {
+          "type": "boolean"
+        }
+      }
+    },
+    "git_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "current_revision",
+        "current_worktree_dirty",
+        "current_worktree_status_hash"
+      ],
+      "properties": {
+        "current_revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "current_worktree_dirty": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "current_worktree_status_hash": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "graph_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "confidence",
+        "limitations_required",
+        "reason_codes",
+        "freshness",
+        "limitations"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "primary",
+            "degraded-fallback",
+            "no-source",
+            "stale",
+            "dirty-uncertain",
+            "missing",
+            "blocked"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "unknown"
+          ]
+        },
+        "limitations_required": {
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "freshness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source_revision",
+            "source_revision_matches",
+            "worktree_dirty_at_bootstrap",
+            "worktree_status_hash",
+            "worktree_status_hash_matches"
+          ],
+          "properties": {
+            "source_revision": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_revision_matches": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "worktree_dirty_at_bootstrap": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "worktree_status_hash": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "worktree_status_hash_matches": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "provider_readiness": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "graph_ready",
+          "query_ready",
+          "status",
+          "confidence",
+          "limitations"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "minLength": 1
+          },
+          "graph_ready": {
+            "type": "boolean"
+          },
+          "query_ready": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          },
+          "confidence": {
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "unknown"
+            ]
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "capability_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "query_global_graph",
+        "impact_context",
+        "context_selection",
+        "impact_radius",
+        "review_support",
+        "primary_providers"
+      ],
+      "properties": {
+        "query_global_graph": {
+          "type": "boolean"
+        },
+        "impact_context": {
+          "type": "boolean"
+        },
+        "context_selection": {
+          "enum": [
+            "full",
+            "partial",
+            "none",
+            "unknown"
+          ]
+        },
+        "impact_radius": {
+          "enum": [
+            "full",
+            "partial",
+            "none",
+            "unknown"
+          ]
+        },
+        "review_support": {
+          "enum": [
+            "full",
+            "partial",
+            "none",
+            "unknown"
+          ]
+        },
+        "primary_providers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "router_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "reason_code",
+        "candidate_agents",
+        "graph_aware_candidate_agents",
+        "non_graph_candidate_agents",
+        "requires_skill_decision"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "graph_aware_candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "non_graph_candidate_agents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requires_skill_decision": {
+          "type": "boolean"
+        }
+      }
+    },
+    "expert_graph_context": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "agent_id",
+          "graph_use_case",
+          "required_capabilities",
+          "confidence_ceiling",
+          "required_disclosures",
+          "fallback_guidance",
+          "allowed_graph_artifacts",
+          "forbidden_claims",
+          "requires_expert_judgment"
+        ],
+        "properties": {
+          "agent_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "graph_use_case": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required_capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence_ceiling": {
+            "enum": [
+              "high",
+              "medium",
+              "low",
+              "unknown"
+            ]
+          },
+          "required_disclosures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fallback_guidance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowed_graph_artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "path",
+                "allowed_use"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "allowed_use": {
+                  "enum": [
+                    "primary_evidence",
+                    "orientation_only",
+                    "unavailable"
+                  ]
+                }
+              }
+            }
+          },
+          "forbidden_claims": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requires_expert_judgment": {
+            "const": true
+          }
+        }
+      }
+    },
+    "non_graph_agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "agent_id",
+          "reason_code"
+        ],
+        "properties": {
+          "agent_id": {
+            "type": "string"
+          },
+          "reason_code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decision_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_skill_decision",
+        "requires_expert_judgment",
+        "forbidden_outputs"
+      ],
+      "properties": {
+        "requires_skill_decision": {
+          "const": true
+        },
+        "requires_expert_judgment": {
+          "const": true
+        },
+        "forbidden_outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "forbidden_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

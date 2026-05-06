@@ -98,6 +98,25 @@ tests/unit/ecc-synthesis-brief-contracts.test.js
 
 V5 脚本只读取 V4 Finding Core projection，并可选读取 V3 router candidate facts，输出只读 synthesis briefing facts。它只提供 merge candidate、rank bucket、degraded / pre-existing / verification-required 等提示，不输出最终 verdict，不采纳或拒绝 finding，不写 runtime mirror，也不修改 reviewer prompt。
 
+V6 已新增 Graph-aware Expert brief source contract 与本地预览脚本：
+
+```text
+src/cli/contracts/agent-registry/graph-expert-brief.schema.json
+scripts/prepare-ecc-graph-expert-brief.js
+tests/unit/ecc-graph-expert-brief-contracts.test.js
+```
+
+V6 脚本只读取 `.spec-first/graph/graph-facts.json`、`.spec-first/graph/provider-status.json`、`.spec-first/impact/bootstrap-impact-capabilities.json`，并可选读取 V3 router candidate facts，输出只读 graph evidence-use briefing facts。它只提供 graph readiness、provider readiness、capability summary、confidence ceiling、required disclosures、fallback guidance 和 allowed graph artifact use，不调用 provider 命令，不写 `.spec-first/graph/*`，不输出 `selected_agents`、`final_verdict` 或 semantic impact conclusion。
+
+V6 的集成效果是让 Architecture & Contract、Engineering Quality、Repo Research、API Contract、Testing 等研发专家能力包在消费 graph facts 时统一遵守 freshness 和 degraded-mode 边界：
+
+```text
+fresh graph -> 可作为 bounded evidence
+degraded graph -> 必须披露并降低 confidence
+stale / dirty graph -> 只能 orientation_only
+missing / blocked graph -> 不得做 graph-backed impact claim
+```
+
 ECC 侧证据 source：
 
 ```text

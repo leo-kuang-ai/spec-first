@@ -81,6 +81,30 @@ Future Roadmap:
 
 V1 不要求一次性改完 runtime、CLI router、全部 agent prompt 或所有 workflow。任何扩大到 runtime delivery、pack lifecycle、agent filtering、doctor/clean 的工作，都必须等 G0-G6.5 pilot 证明节点质量增益后再进入 Future Roadmap。
 
+截至 2026-05-06，V1-V6 pilot 已落地为 source contracts 与只读预览脚本：
+
+```text
+V1 governance preview:
+  scripts/generate-ecc-governance-preview.js
+
+V2 registry contracts:
+  src/cli/contracts/agent-registry/*.schema.json
+
+V3 router candidate facts:
+  scripts/route-ecc-agent-candidates.js
+
+V4 Finding Core compatibility projection:
+  scripts/project-ecc-finding-core.js
+
+V5 Skill Synthesis brief:
+  scripts/prepare-ecc-synthesis-brief.js
+
+V6 Graph-aware Expert brief:
+  scripts/prepare-ecc-graph-expert-brief.js
+```
+
+这些脚本均是 preview-first / read-only deterministic fact preparers，不新增 ECC runtime，不替 Skill 做最终专家选择、finding 裁判、影响面结论或 standards 写入。
+
 ---
 
 ## 1. Graph Readiness
@@ -2496,6 +2520,50 @@ npm run typecheck
 要求：
   graph 不可用时 confidence 降级
 ```
+
+状态：已进入 V6 Graph-aware Expert brief pilot。V6 消费 canonical graph/readiness artifacts：
+
+```text
+.spec-first/graph/graph-facts.json
+.spec-first/graph/provider-status.json
+.spec-first/impact/bootstrap-impact-capabilities.json
+```
+
+并输出：
+
+```text
+src/cli/contracts/agent-registry/graph-expert-brief.schema.json
+scripts/prepare-ecc-graph-expert-brief.js
+tests/unit/ecc-graph-expert-brief-contracts.test.js
+```
+
+V6 只负责把 graph freshness、provider readiness、capability support、confidence ceiling、required disclosures、fallback guidance 和 allowed graph artifact use 编译成专家可读 briefing facts。
+
+V6 明确不做：
+
+```text
+不调用 GitNexus / code-review-graph provider 命令
+不写 .spec-first/graph/* 或 .spec-first/impact/*
+不把 live MCP 成功回写为 query_ready=true
+不输出 selected_agents
+不输出 final_verdict
+不输出 semantic impact conclusion
+不修改 reviewer prompt
+不修改 generated runtime mirror
+```
+
+V6 的关键降级规则：
+
+| graph_readiness.status | 使用边界 | confidence ceiling |
+| --- | --- | --- |
+| `primary` | 可作为 bounded graph evidence，但仍需引用当前文件、diff 或 docs | `high` |
+| `degraded-fallback` | 必须披露 degraded，local source / diff / tests 为主证据 | `medium` |
+| `no-source` | 不做 GitNexus process routing 影响面声明 | `low` |
+| `stale` | 只做 orientation，必须基于当前 source 复核 | `low` |
+| `dirty-uncertain` | 只做 orientation，worktree fingerprint 不匹配必须披露 | `low` |
+| `missing` / `blocked` | 不做 graph-backed impact claim | `unknown` |
+
+这一步让 `spec-architecture-strategist`、`spec-repo-research-analyst`、`spec-api-contract-reviewer`、`spec-testing-reviewer`、`spec-correctness-reviewer`、`spec-code-simplicity-reviewer` 等专家在消费 graph facts 时有统一的 freshness 与证据使用边界，但最终语义判断仍由专家和 Skill Synthesis 完成。
 
 ### R7: Standards-aware Experts
 
