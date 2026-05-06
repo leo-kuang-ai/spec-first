@@ -382,9 +382,29 @@ Locate the plan document so Stage 6 can verify requirements completeness. Check 
 
 If a plan is found, read its **Requirements** section — `## Requirements` in current plans, `## Requirements Trace` in legacy ones — and the R-IDs (R1, R2, etc.) listed there, plus **Implementation Units** (items listed under the `## Implementation Units` section). Store the extracted requirements list and `plan_source` for Stage 6. Do not block the review if no plan is found — requirements verification is additive, not required.
 
+### Stage 2c: ECC governance pilot facts (optional, advisory)
+
+After Stage 1 has established `BASE`, changed files, diff scope, mode, and untracked-file handling, and before Stage 3 reviewer selection, optionally prepare ECC governance pilot facts when the current checkout provides the source script:
+
+```
+node scripts/prepare-ecc-code-review-pilot-brief.js --base "$BASE" --mode "<interactive|autofix|report-only|headless>" --changed-file "<path>" --risk-signal "<signal>"
+```
+
+Use only changed file paths, the resolved base, mode, explicit risk signals you can defend from the current review context, and explicit optional-pack evidence flags the user or workflow already provided. Do not pass the full diff, PR comment bodies, connector payloads, or reviewer JSON into this pilot step.
+
+The brief is advisory only:
+
+- `router_candidate_facts.candidate_agents` and `reviewer_candidate_guidance` are candidate facts, not `selected_agents`.
+- Graph, standards, and optional-pack sections define allowed use, confidence ceilings, required disclosures, fallback guidance, and forbidden claims; they do not make semantic review findings.
+- Optional-pack `eligible` is not activation. Team context, external design, and style profile packs still require explicit enablement and appropriate evidence before use.
+- The skill still owns reviewer selection, dispatch, synthesis, final report wording, and whether a finding survives.
+- Do not run external connectors from this step, do not call graph providers from this step, do not modify repo-profile, and do not write `.claude/`, `.codex/`, `.agents/skills/`, or other runtime assets.
+
+If the script is absent, fails, or returns degraded component status, continue with the existing reviewer-selection process and disclose the limitation in Coverage as `ECC governance pilot facts unavailable` or `ECC governance pilot facts degraded: <reason>`. Pilot failure is never a review failure and never justifies skipping Stage 3.
+
 ### Stage 3: Select reviewers
 
-Read the diff and file list from Stage 1. The 4 always-on personas and 2 Spec-First always-on agents are automatic. For each cross-cutting and stack-specific conditional persona in the persona catalog included below, decide whether the diff warrants it. This is agent judgment, not keyword matching.
+Read the diff and file list from Stage 1. The 4 always-on personas and 2 Spec-First always-on agents are automatic. For each cross-cutting and stack-specific conditional persona in the persona catalog included below, decide whether the diff warrants it. This is agent judgment, not keyword matching. If Stage 2c produced ECC governance pilot facts, use them only as additional evidence-use guidance and candidate rationale; do not let them override the persona catalog, always-on reviewer rules, host dispatch boundary, or Skill synthesis authority.
 
 **File-type awareness for conditional selection:** Instruction-prose files (Markdown skill definitions, JSON schemas, config files) are product code but do not benefit from runtime-focused reviewers. The adversarial reviewer's techniques (race conditions, cascade failures, abuse cases) target executable code behavior. For diffs that only change instruction-prose files, skip adversarial unless the prose describes auth, payment, or data-mutation behavior. Count only executable code lines toward line-count thresholds.
 

@@ -81,7 +81,7 @@ Future Roadmap:
 
 V1 不要求一次性改完 runtime、CLI router、全部 agent prompt 或所有 workflow。任何扩大到 runtime delivery、pack lifecycle、agent filtering、doctor/clean 的工作，都必须等 G0-G6.5 pilot 证明节点质量增益后再进入 Future Roadmap。
 
-截至 2026-05-06，V1-V8 pilot 已落地为 source contracts 与只读预览脚本：
+截至 2026-05-06，V1-V9A pilot 已落地为 source contracts 与只读预览脚本：
 
 ```text
 V1 governance preview:
@@ -107,6 +107,9 @@ V7 Standards-aware Expert brief:
 
 V8 Optional Pack brief:
   scripts/prepare-ecc-optional-pack-brief.js
+
+V9A Code-review pilot brief:
+  scripts/prepare-ecc-code-review-pilot-brief.js
 ```
 
 这些脚本均是 preview-first / read-only deterministic fact preparers，不新增 ECC runtime，不替 Skill 做最终专家选择、finding 裁判、影响面结论或 standards 写入。
@@ -2685,6 +2688,57 @@ V8 的关键启用规则：
 | `style-profile-pack` | disabled | `--enable-pack style-profile-pack`、显式 style profile 信号或指定 style agent | 无 connector 要求 | 只能 style advisory，max severity 为 `note` |
 
 V8 将 “relevant” 与 “activated” 明确分开：router facts 可以让 optional pack 进入 `eligible`，但不能自动启用；只有显式 pack、显式 agent 或显式信号才能进入 `activated` 或 `activated_reference_only`。这保证插件化能力可插拔，但不会污染默认 workflow、不会扩大上下文预算，也不会把外部 connector 的缺失伪装成已验证事实。
+
+### V9A: Code-review Pilot Brief
+
+状态：已进入 V9A code-review workflow pilot。V9A 将 V3 / V6 / V7 / V8 的只读 projection facts 聚合成 `spec-code-review` 专用 briefing facts：
+
+```text
+src/cli/contracts/agent-registry/code-review-pilot-brief.schema.json
+scripts/prepare-ecc-code-review-pilot-brief.js
+tests/unit/ecc-code-review-pilot-brief-contracts.test.js
+```
+
+V9A 是真实 workflow source 的最小接入层：`skills/spec-code-review/SKILL.md` 在 Stage 1 diff scope 之后、Stage 3 reviewer selection 之前，可以读取该 brief 作为 advisory facts。
+
+V9A 只负责把以下 facts 组合起来：
+
+```text
+router_candidate_facts
+graph_expert_brief
+standards_expert_brief
+optional_pack_brief
+reviewer_candidate_guidance
+component_status
+degraded_mode
+```
+
+V9A 明确不做：
+
+```text
+不输出 selected_agents
+不输出 final_verdict
+不替换 spec-code-review persona catalog
+不替换 always-on reviewer 规则
+不替换 code-review native findings schema
+不激活 optional pack
+不查询 Slack / issues / Figma connector
+不调用 graph provider
+不写 repo-profile
+不写 .claude / .codex / .agents/skills runtime mirror
+```
+
+V9A 的 workflow 规则：
+
+```text
+brief ready -> Skill 可把 reviewer_candidate_guidance 作为候选解释、证据使用上限和 disclosure 输入
+brief degraded -> Skill 继续按现有 reviewer selection 执行，并在 Coverage 披露 degraded reason
+brief missing / script unavailable -> Skill 继续按现有 reviewer selection 执行
+router candidate -> candidate only，不等于 selected reviewer
+optional eligible -> activation candidate only，不等于 optional pack activated
+```
+
+这一步的价值不是“让 JS 自动选 reviewer”，而是把 ECC 治理后的专家能力包第一次接入真实 `spec-code-review` 节点：脚本准备边界清晰的 facts，Skill 根据现有 workflow contract、用户意图、diff、persona catalog 和可用证据做最终判断。
 
 ### R9: Capability Plugin Runtime
 

@@ -36,6 +36,11 @@ describe('spec-code-review context orientation contract', () => {
     expect(text).toContain('degraded-fallback or definitions-only limitations');
     expect(text).toContain('autofix review must not edit a child repo unless that repo is explicit');
     expect(text).toContain('risk assessments must remain scoped to the repo that owns the file');
+    expect(text).toContain('ECC governance pilot facts (optional, advisory)');
+    expect(text).toContain('scripts/prepare-ecc-code-review-pilot-brief.js');
+    expect(text).toContain('candidate facts, not `selected_agents`');
+    expect(text).toContain('Optional-pack `eligible` is not activation');
+    expect(text).toContain('Pilot failure is never a review failure and never justifies skipping Stage 3');
     expect(text).not.toContain('spec-first ' + 'crg hook');
     expect(text).not.toContain('$spec-' + 'graph' + '-bootstrap');
     expect(text).not.toContain('/spec:' + 'graph' + '-bootstrap');

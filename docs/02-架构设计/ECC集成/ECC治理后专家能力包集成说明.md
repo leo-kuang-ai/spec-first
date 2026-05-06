@@ -159,6 +159,30 @@ default workflow -> optional pack disabled
 runtime delivery -> none_in_v1
 ```
 
+V9A 已新增 code-review pilot brief source contract、本地预览脚本，并接入 `spec-code-review` workflow source：
+
+```text
+src/cli/contracts/agent-registry/code-review-pilot-brief.schema.json
+scripts/prepare-ecc-code-review-pilot-brief.js
+tests/unit/ecc-code-review-pilot-brief-contracts.test.js
+skills/spec-code-review/SKILL.md
+```
+
+V9A 脚本只聚合 V3 router candidate facts、V6 graph evidence-use brief、V7 standards evidence-use brief 和 V8 optional pack brief，输出 `spec-first.code-review-pilot-brief.v1`。它只提供 `reviewer_candidate_guidance`、component degraded status、confidence ceiling、allowed use、required disclosures、fallback guidance 和 forbidden claims。
+
+V9A 的集成效果是让 ECC 治理后的专家能力包第一次进入真实 `spec-code-review` 节点，但仍保持 Skill 裁判权：
+
+```text
+router candidate facts -> reviewer 候选解释，不等于 selected_agents
+graph / standards facts -> evidence-use 上限，不等于 semantic finding
+optional eligible -> 不等于 activation
+component failure -> degraded continue，不阻断 review
+workflow source -> Stage 2c advisory facts，Stage 3 仍由 Skill 选 reviewer
+runtime delivery -> none_in_v9a
+```
+
+V9A 不复制 ECC 原始 agents，不新增 `/ecc:*` 或 `$ecc-*`，不查询外部 connector，不调用 graph provider，不写 repo-profile，不写 `.claude/`、`.codex/`、`.agents/skills/` runtime mirror，也不替换 `spec-code-review` 既有 persona catalog、always-on reviewer 规则、dispatch boundary、native finding schema 或 synthesis 规则。
+
 ECC 侧证据 source：
 
 ```text
