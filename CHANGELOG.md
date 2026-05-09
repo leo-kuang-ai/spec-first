@@ -1,6 +1,9 @@
 # Changelog
 
 - 记录格式：`- v版本号 YYYY-MM-DD HH:MM:SS 作者: 变更摘要 [(user-visible)]`
+- v1.8.0 2026-05-08 18:59:12 leokuang: docs(plan): 更新 graph-bootstrap provider failure 诊断计划，明确 GitNexus repair 清理位于 spec-mcp-setup projection 之后、analyze 之前，并采用 workflow 交互确认 + 脚本 preview/confirm 参数模型 (user-visible)
+- v1.8.0 2026-05-08 18:53:48 leokuang: docs(plan): 调整 graph-bootstrap provider failure 诊断计划，明确 GitNexus 版本升级后推荐显式清理 `.gitnexus` 并重建，但不由 bootstrap 自动删除 provider index (user-visible)
+- v1.8.0 2026-05-08 18:46:42 leokuang: docs(plan): 新增 graph-bootstrap provider failure 诊断优化计划，覆盖 GitNexus `.gitnexus/lbug` bootstrap storage failure、PyPI/TLS network failure、Bash/PowerShell parity 与父 workspace advisory 边界 (user-visible)
 - v1.8.0 2026-05-08 12:28:24 leokuang: docs(plan): 按 implementation-readiness review 修订三份 governance plan，补齐 001 高风险 env propagation audit、002 GitNexus provider prose 独立 ownership 与 RC.85 pending argv 状态、003 作为 002 graph evidence policy consumer 的 preflight/test 约束 (user-visible)
 - v1.8.0 2026-05-08 12:18:00 leokuang: docs(plan): 同步 skill/agent 质量治理计划、doc 2 deferred tracker 与 reviewer dispatch failure solution 的 revision 3 linkage，避免 plan-prose 状态被误读为 source 行为已落地 (user-visible)
 - v1.8.0 2026-05-08 12:01:27 leokuang: fix(init): 父级多仓 workspace 下 `init --codex|--claude` 先刷新 parent host runtime assets，再执行 child repo 初始化并仅写父级 advisory summary，避免父目录 `$spec-*` 继续加载 stale `.agents/skills` (user-visible)
