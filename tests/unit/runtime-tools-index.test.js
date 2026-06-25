@@ -19,6 +19,8 @@ function managedRuntimeToolsBlock() {
 }
 
 describe('runtime tools instruction cleanup', () => {
+  const retiredProvider = ['Git', 'Nexus'].join('');
+
   test('exports marker constants and cleanup helper', () => {
     const runtimeToolsIndex = require('../../src/cli/runtime-tools-index');
 
@@ -47,14 +49,15 @@ describe('runtime tools instruction cleanup', () => {
     expect(updated).not.toContain(RUNTIME_TOOLS_END);
   });
 
-  test('repairs partial managed markers by stripping standalone marker lines', () => {
+  test('repairs partial managed start marker by removing retired section body', () => {
     const corrupted = [
       '# Header',
       '',
       RUNTIME_TOOLS_START,
-      '## Runtime Tools',
+      '## Runtime Code Intelligence Tools',
       '',
-      '- Keep this user-authored prose.',
+      `- 局部规则要求改 symbol 前做 ${retiredProvider} impact。`,
+      '- 若 CLI 不可用，会记录为工具不可用。',
       '',
       '## Next',
       '',
@@ -64,11 +67,29 @@ describe('runtime tools instruction cleanup', () => {
     const updated = removeManagedRuntimeToolsBlock(corrupted);
 
     expect(updated).toContain('# Header');
-    expect(updated).toContain('## Runtime Tools');
-    expect(updated).toContain('Keep this user-authored prose.');
     expect(updated).toContain('## Next');
     expect(updated).toContain('Keep this next section.');
     expect(updated).not.toContain(RUNTIME_TOOLS_START);
+    expect(updated).not.toContain('Runtime Code Intelligence Tools');
+    expect(updated).not.toContain(retiredProvider);
+  });
+
+  test('repairs dangling managed start marker at end of file by removing retired tail', () => {
+    const corrupted = [
+      '# Header',
+      '',
+      RUNTIME_TOOLS_START,
+      '## Runtime Code Intelligence Tools',
+      '',
+      `- ${retiredProvider} impact is retired.`,
+      '',
+    ].join('\n');
+
+    const updated = removeManagedRuntimeToolsBlock(corrupted);
+
+    expect(updated).toContain('# Header');
+    expect(updated).not.toContain(RUNTIME_TOOLS_START);
+    expect(updated).not.toContain(retiredProvider);
   });
 
   test('strips an orphaned end marker', () => {

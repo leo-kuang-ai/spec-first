@@ -99,14 +99,17 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
 ```text
 粗 PRD / draft / 会议记录 / 截图 / PDF / 多来源材料
   -> PRD Sanitization
-  -> Problem / Outcome Framing
   -> Source-first Evidence Calibration
+  -> Requirement Analysis Gate
+     -> 建立需求理解地图
+     -> 识别不确定点 / 冲突点
+     -> 决定哪些产品 / 设计 / 技术问题必须 grill
+  -> Product / Design / Technical Grill
   -> Preliminary Diagnosis
   -> Progressive Detail Ladder
   -> optional Large-input Map-Reduce
-  -> Deep Requirements Grill
   -> Context / ADR Topology Adapter
-  -> PRD Rewrite
+  -> PRD Rewrite 或 Analysis Conclusion
   -> Final Readiness Diagnosis
   -> Handoff
 ```
@@ -138,8 +141,14 @@ flowchart TD
   E --> F["Source-first Evidence Calibration<br/>source / docs / tests / contracts / prior PRDs<br/>context / ADR / glossary when relevant"]
   F --> F1["Evidence Tags<br/>confirmed-source / user-stated / source-candidate<br/>external-research / assumption"]
   F1 --> F2["Current System Snapshot<br/>只写影响 PRD 的 confirmed 或显式标注 claim"]
+  F2 --> RAG["Requirement Analysis Gate<br/>资料 -> 需求理解地图<br/>识别不确定点 / 冲突点<br/>决定产品 / 设计 / 技术 grill 问题"]
+  RAG --> RAG1["Run-local map<br/>input inventory / source authority<br/>target surface / current-state summary<br/>change delta / module map<br/>open decisions / design coverage / API coverage<br/>risk -> PRD write target"]
+  RAG1 --> RAG2{"有 owner-owned open decision<br/>会改变 WHAT / acceptance / scope / authority?"}
+  RAG2 -->|是| I2
+  RAG2 -->|source 可闭合| G
+  RAG2 -->|缺系统/产品锚点| G0
 
-  F2 --> G{"Preliminary Diagnosis<br/>只决定展开层级"}
+  G{"Preliminary Diagnosis<br/>只决定展开层级"}
   G -->|缺目标用户 / 产品问题 / 系统锚点 / 核心场景| G0["route-out to brainstorm<br/>不伪造 PRD closure"]
   G -->|source 已闭合| G1["L0 source-resolved PRD"]
   G -->|claim 需 evidence/gap/write target 对齐| G2["L1 shared understanding map<br/>run-local scratch"]
@@ -166,31 +175,34 @@ flowchart TD
 
   I{"Domain / terminology / contradiction / hard boundary?"}
   I -->|source-answerable| I1["先查 source / docs / tests / contracts / glossary<br/>不问 owner"]
-  I -->|PRD write target 依赖 owner 决策| I2["Requirements Scenario Grill<br/>一次一个问题<br/>绑定 gap / source attempt / write target<br/>给 recommended_answer / consequence / closure state"]
+  I -->|PRD write target 依赖产品/设计/技术决策| I2["Product / Design / Technical Grill<br/>一次一个问题<br/>绑定 gap / source attempt / write target<br/>给 recommended_answer / consequence / closure state"]
   I -->|rough / draft / reference-claims<br/>或需要持续裁决| I3["Deep grill-with-docs mode<br/>持续 one-question-at-a-time<br/>等待反馈<br/>必要时 inline 更新 CONTEXT.md / CONTEXT-MAP.md / ADR"]
   I1 --> J
   I2 --> J
   I3 --> J
 
-  J["Phase 3<br/>Draft / Refine / Split"] --> J1{"选择 output_shape"}
+  J["Phase 3<br/>Draft / Refine / Split<br/>只有 Requirement Analysis Gate 闭合或显式阻塞后进入"] --> J1{"选择 output_shape"}
   J1 -->|bypass| C4
   J1 -->|compact-prd| J2["Core sections<br/>Summary / Change Delta / Requirements<br/>Acceptance Examples / Scope Boundaries<br/>Evidence And Assumptions"]
   J1 -->|normal-prd| J3["Core + triggered sections<br/>Problem Frame / Current Snapshot / Glossary<br/>Decision Notes / Actors / Use Cases / Exceptions<br/>Outstanding Questions / Planning Recheck"]
   J1 -->|topology-heavy-prd| J5["Topology sections<br/>Change Topology / Surface Map<br/>Producer Artifact Consumer<br/>Source-Of-Truth Resolution / Negative Acceptance"]
+  J1 -->|analysis conclusion| J8["Analysis conclusion<br/>不写 final PRD<br/>列出 blockers / open decisions / next grill question / route"]
   J2 --> J6["写入或更新 PRD artifact<br/>docs/brainstorms/*-requirements.md<br/>artifact_kind: prd-requirements"]
   J3 --> J6
   J5 --> J6
+  J8 --> J4
   H5 --> J6
 
   J6 --> K["Phase 4<br/>Readiness And Handoff"]
-  K --> K1["Script-owned advisory facts<br/>check-prd-artifact.js: frontmatter / core sections / R-AE trace / placeholder / feature slice trace<br/>readiness declaration gaps / design-source coverage declaration gaps<br/>check-glossary-drift.js: avoid term literal hits when glossary exists"]
-  K1 --> K2["LLM-owned readiness lens<br/>Core Pack always<br/>conditional packs only when triggered<br/>script findings do not decide readiness"]
-  K2 --> K3{"readiness_outcome"}
-  K3 -->|ready-for-planning| K4["Handoff to current host plan workflow<br/>Claude: /spec:plan<br/>Codex: $spec-plan"]
-  K3 -->|revise-prd| K5["修 PRD gaps<br/>把 source-resolved gaps / owner answers / assumptions 写回 PRD-local sections"]
-  K3 -->|ask-owner| K6["问最小 blocking question<br/>或记录 accepted assumption / Outstanding Question"]
-  K3 -->|doc-review| K7["Handoff to document review<br/>Claude: /spec:doc-review<br/>Codex: $spec-doc-review"]
-  K3 -->|route-out| C2
+  K --> K1["Producer-local finalize<br/>finalize-prd-artifact.js<br/>calls check-prd-artifact.js<br/>writes ready receipt only when producer blocking reasons are clear"]
+  K1 --> K2["Script-owned facts<br/>frontmatter / core sections / R-AE trace / feature slice trace<br/>readiness declarations / ready receipt freshness<br/>design-source accounting / glossary drift"]
+  K2 --> K3["LLM-owned readiness lens<br/>Core Pack always<br/>conditional packs only when triggered<br/>semantic readiness consumes finalize receipt"]
+  K3 --> K8{"readiness_outcome"}
+  K8 -->|ready-for-planning| K4["Handoff to current host plan workflow<br/>Claude: /spec:plan<br/>Codex: $spec-plan"]
+  K8 -->|revise-prd| K5["修 PRD gaps<br/>把 source-resolved gaps / owner answers / assumptions 写回 PRD-local sections"]
+  K8 -->|ask-owner| K6["问最小 blocking question<br/>或记录 accepted assumption / Outstanding Question"]
+  K8 -->|doc-review| K7["Handoff to document review<br/>Claude: /spec:doc-review<br/>Codex: $spec-doc-review"]
+  K8 -->|route-out| C2
   K4 --> L["Closeout Summary<br/>sections / requirement count / acceptance count<br/>priority / NFR / assumptions / outstanding questions<br/>trace gaps / planning would invent WHAT?"]
   K5 --> K
   K6 --> K
@@ -201,9 +213,10 @@ flowchart TD
 
 读图时要注意三条边界：
 
+- `Requirement Analysis Gate` 是写 PRD 前的主路径：先把资料变成需求理解地图，再识别不确定点和冲突点，最后决定哪些产品、设计或技术问题必须启动 grill；它不是持久 schema。
 - `Preliminary Diagnosis` 只决定走 compact、Map-Reduce、P0/P1 packs、deep grill、blocker cluster 还是 route-out；它不能宣布 `ready-for-planning`。
 - Map rows、Reduce outputs、shared understanding map、question card 和 Framing Gate 都是 run-local scratch；只有能减少 planning 发明 WHAT 的结论才写回 PRD sections。
-- `check-prd-artifact.js` 和 `check-glossary-drift.js` 只报告 script-owned facts；是否构成 readiness blocker、是否需要 owner 决策、是否能交给 planning，仍由 readiness lens 做语义判断。
+- `finalize-prd-artifact.js` 是 `$spec-prd` producer-local ready 出口；`check-prd-artifact.js` 和 `check-glossary-drift.js` 只报告 script-owned facts。脚本可以拒绝未过出口不变量的 ready 盖章，但是否需要 owner 决策、是否能交给 planning，仍由 readiness lens 做语义判断。
 
 ### 1. PRD Sanitization
 
@@ -419,6 +432,8 @@ PRD rewrite 后再判断是否可以进入 planning：
 - P0/P1 触发项是否已解决、假设化或显式阻塞。
 
 只有当 `spec-plan` 不再需要补产品行为时，才能 `ready-for-planning`。
+
+`ready-for-planning` 不是 LLM 自己写 frontmatter 就成立。PRD artifact 必须带有当前 producer-local finalize receipt，例如 `readiness_verified_by: check-prd-artifact.js`、`readiness_checker_schema`、`readiness_prd_hash` 和 `readiness_inputs_hash`。缺 receipt、receipt 陈旧、design-source 未 accounting、grill closure 未声明或 Requirement Analysis Gate 未闭合时，只能继续修 PRD、继续问 owner，或降级为 checkpoint。
 
 ## 使用建议
 

@@ -28,12 +28,15 @@ target_surface: generic
 status: draft
 evidence_grade: mixed
 created: YYYY-MM-DD
+source_inputs:
+  - path/to/original-input.md
 ---
 ```
 
 Default path: `docs/brainstorms/YYYY-MM-DD-NNN-<slug>-requirements.md`.
 
 `artifact_kind: prd-requirements` marks a PRD-grade requirements origin that the current host's plan workflow can consume as requirements. Do not create `docs/prds/`.
+`source_inputs` lists original PRD/source/design input files that are locatable inside the target repo; omit only when no original input file is locatable, and record that limitation in readiness. The producer-local Stop hook uses this field to pass `--inputs` into finalize/checker so input-side design-source accounting is actually enforced.
 
 ## Output Shape
 
@@ -233,11 +236,19 @@ write_mode:
 clarification_evidence:
 preflight_sweep_closure: closed | degraded | blocked | missing
 design_source_coverage:
+readiness_verified_by:
+readiness_checker_schema:
+readiness_prd_hash:
+readiness_inputs_hash:
 first_unclosed_owner_question:
 recommended default:
-can_enter_spec-plan:
+can_enter_spec_plan:
 why_not:
 ```
+
+`preflight_sweep_closure` is the compatibility field for Requirement Analysis Gate closure. It must summarize whether the run-local map from materials to requirement understanding, uncertainty/contradiction points, product/design/technical grill decisions, and PRD write targets is closed, degraded, blocked, or missing. Do not add a second persistent analysis schema to the PRD.
+
+The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 
 Use the surface lens and project-local overlay to add only the conditional sections the increment needs.
 
@@ -436,7 +447,7 @@ Every PRD handoff should report:
 - feature items without acceptance examples
 - current-state claims without confirmed evidence
 
-When a PRD artifact path exists, seed deterministic counts and trace facts from `skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>` before adding LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Preflight Sweep closed, degraded, blocked, or is missing; this is a lightweight declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
+When a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--check-only` for preview. The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js` before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
 
 The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, and feature-to-R/AE trace gaps. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
 

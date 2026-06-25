@@ -96,6 +96,16 @@
           "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning"],
           "must_not": ["must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure"]
         }
+      },
+      {
+        "id": "analysis-gate-skipped-final-prd-rejected",
+        "requires": {
+          "case_type": "failure",
+          "quality_buckets": ["failure", "readiness-fail"],
+          "coverage_tags": ["readiness", "requirement-analysis-gate"],
+          "expected": ["Requirement Analysis Gate map is required before final-prd or ready-for-planning", "must identify uncertainty/contradiction points and product/design/technical grill decisions before PRD draft"],
+          "must_not": ["must not read materials directly into a final PRD without the requirement understanding map and grill decision"]
+        }
       }
     ],
     "boundary": "Fixture metadata is deterministic coverage evidence only; it is not a semantic judge or runtime state machine."
@@ -262,6 +272,16 @@
       "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning", "input_scan_attempted=false on a final UI/design-surface PRD is must-not-ready-until-confirmed"],
       "must_not": ["must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure", "must not treat route-out or bypass as an authoring-stage grill exemption"],
       "coverage_tags": ["readiness", "design-source", "preflight"]
+    },
+    {
+      "id": "analysis-gate-skipped-final-prd-rejected",
+      "intent": "validate",
+      "case_type": "failure",
+      "quality_buckets": ["failure", "readiness-fail"],
+      "input_shape": "agent reads source docs and current code, writes a polished final PRD, but never builds the requirement understanding map, never identifies uncertainty/contradiction points, and never decides whether product/design/technical grill is required",
+      "expected": ["Requirement Analysis Gate map is required before final-prd or ready-for-planning", "must identify uncertainty/contradiction points and product/design/technical grill decisions before PRD draft", "preflight_sweep_closure is the compatibility declaration for Requirement Analysis Gate closure"],
+      "must_not": ["must not read materials directly into a final PRD without the requirement understanding map and grill decision", "must not treat source reading plus polished writing as equivalent to Requirement Analysis Gate closure"],
+      "coverage_tags": ["readiness", "requirement-analysis-gate"]
     },
     {
       "id": "code-alignment-what-not-how",

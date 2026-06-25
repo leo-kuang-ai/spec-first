@@ -7,11 +7,14 @@ const { spawnSync } = require('node:child_process');
 
 const {
   SESSION_START_COMMAND,
+  PRD_READINESS_GUARD_COMMAND,
   SPEC_PLAN_GUARD_COMMAND,
+  buildManagedPrdReadinessGuardMatcher,
   buildManagedSessionStartMatcher,
   buildManagedSpecPlanGuardMatcher,
   getClaudeSettingsPath,
   inspectManagedClaudeHooks,
+  inspectManagedPrdReadinessGuardHook,
   inspectManagedSessionStartHook,
   inspectManagedSpecPlanGuardHook,
   removeManagedSessionStartHook,
@@ -64,6 +67,9 @@ describe('claude settings', () => {
           UserPromptExpansion: [
             buildManagedSpecPlanGuardMatcher(),
           ],
+          Stop: [
+            buildManagedPrdReadinessGuardMatcher(),
+          ],
         },
       });
     } finally {
@@ -111,7 +117,8 @@ describe('claude settings', () => {
       const settings = readJson(settingsPath);
 
       expect(settings.permissions).toEqual({ allow: ['Read(*)'] });
-      expect(settings.hooks.Stop).toHaveLength(1);
+      expect(settings.hooks.Stop).toHaveLength(2);
+      expect(settings.hooks.Stop[1]).toEqual(buildManagedPrdReadinessGuardMatcher());
       expect(settings.hooks.SessionStart).toHaveLength(2);
       expect(settings.hooks.SessionStart[1]).toEqual(buildManagedSessionStartMatcher());
       expect(settings.hooks.UserPromptExpansion).toEqual([
@@ -134,6 +141,8 @@ describe('claude settings', () => {
       expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(SESSION_START_COMMAND);
       expect(settings.hooks.UserPromptExpansion).toHaveLength(1);
       expect(settings.hooks.UserPromptExpansion[0].hooks[0].command).toBe(SPEC_PLAN_GUARD_COMMAND);
+      expect(settings.hooks.Stop).toHaveLength(1);
+      expect(settings.hooks.Stop[0].hooks[0].command).toBe(PRD_READINESS_GUARD_COMMAND);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -201,6 +210,18 @@ describe('claude settings', () => {
               ],
             },
           ],
+          Stop: [
+            buildManagedPrdReadinessGuardMatcher(),
+            {
+              matcher: '.*',
+              hooks: [
+                {
+                  type: 'command',
+                  command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/custom-stop',
+                },
+              ],
+            },
+          ],
         },
       }, null, 2)}\n`, 'utf8');
 
@@ -226,6 +247,17 @@ describe('claude settings', () => {
                 {
                   type: 'command',
                   command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/custom-prompt',
+                },
+              ],
+            },
+          ],
+          Stop: [
+            {
+              matcher: '.*',
+              hooks: [
+                {
+                  type: 'command',
+                  command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/custom-stop',
                 },
               ],
             },
@@ -291,10 +323,20 @@ describe('claude settings', () => {
           eventName: 'UserPromptExpansion',
           displayName: 'UserPromptExpansion spec-plan guard',
         },
+        {
+          status: 'installed',
+          message: 'managed Stop PRD readiness guard matcher present',
+          eventName: 'Stop',
+          displayName: 'Stop PRD readiness guard',
+        },
       ]);
       expect(inspectManagedSpecPlanGuardHook(projectRoot)).toEqual({
         status: 'missing',
         message: '`hooks.UserPromptExpansion` array missing',
+      });
+      expect(inspectManagedPrdReadinessGuardHook(projectRoot)).toEqual({
+        status: 'installed',
+        message: 'managed Stop PRD readiness guard matcher present',
       });
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });

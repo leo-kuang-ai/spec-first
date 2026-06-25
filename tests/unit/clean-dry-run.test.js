@@ -93,6 +93,7 @@ describe('clean --dry-run', () => {
       expect(result.stdout).toContain('.claude/spec-first/state.json');
       expect(result.stdout).toContain('.claude/hooks/session-start');
       expect(result.stdout).toContain('.claude/hooks/spec-plan-guard');
+      expect(result.stdout).toContain('.claude/hooks/prd-readiness-guard');
       expect(result.stdout).toContain('.claude/settings.json');
       expect(result.stdout).toContain('CLAUDE.md');
       expect(result.stdout).toContain('Custom assets outside the spec-first managed set would remain untouched.');
@@ -133,6 +134,7 @@ describe('clean --dry-run', () => {
         '.claude/spec-first/state.json',
         '.claude/hooks/session-start',
         '.claude/hooks/spec-plan-guard',
+        '.claude/hooks/prd-readiness-guard',
         '.claude/settings.json',
       ];
       for (const relativePath of removedPaths) {

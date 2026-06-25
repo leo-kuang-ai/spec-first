@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const CORE_SECTIONS = [
   'Summary',
@@ -23,6 +24,36 @@ const EVIDENCE_TAGS = [
   'external-research',
   'assumption',
 ];
+
+const BLOCKING_REASON_CODES = new Set([
+  'core_section_missing',
+  'write_mode_undeclared',
+  'clarification_evidence_undeclared',
+  'clarification_trace_absent',
+  'can_enter_spec_plan_undeclared',
+  'preflight_sweep_closure_absent',
+  'design_source_inventory_undeclared',
+  'design_source_coverage_undeclared',
+  'design_sources_read_undeclared',
+  'design_sources_unread_undeclared',
+  'design_source_unaccounted',
+  'input_refs_unavailable',
+  'prd_readiness_declarations_evaded',
+  'ready_receipt_absent',
+  'ready_receipt_stale',
+  'finalize_required',
+]);
+
+const MACHINE_READY_FIELDS = new Set([
+  'status',
+  'readiness_verified_by',
+  'readiness_verified_at',
+  'readiness_checker_schema',
+  'readiness_finding_count',
+  'readiness_blocking_count',
+  'readiness_prd_hash',
+  'readiness_inputs_hash',
+]);
 
 function parseArgs(argv) {
   const args = { target: null, inputs: [], error: null };
@@ -56,6 +87,10 @@ function splitLines(text) {
   return text.split(/\r?\n/);
 }
 
+function sha256(text) {
+  return `sha256:${crypto.createHash('sha256').update(text).digest('hex')}`;
+}
+
 function parseFrontmatter(lines) {
   if (lines[0] !== '---') {
     return { present: false, fields: {}, startLine: null, endLine: null };
@@ -80,6 +115,45 @@ function parseFrontmatter(lines) {
     startLine: 1,
     endLine: endIndex + 1,
   };
+}
+
+function normalizeForReceipt(text) {
+  const lines = splitLines(text);
+  const frontmatter = parseFrontmatter(lines);
+  if (!frontmatter.present || !frontmatter.endLine) {
+    return text.trim();
+  }
+
+  const keptFrontmatter = ['---'];
+  for (let i = 1; i < frontmatter.endLine - 1; i += 1) {
+    const match = lines[i].match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (match && MACHINE_READY_FIELDS.has(match[1])) {
+      continue;
+    }
+    keptFrontmatter.push(lines[i]);
+  }
+  keptFrontmatter.push('---');
+
+  return [
+    ...keptFrontmatter,
+    ...lines.slice(frontmatter.endLine),
+  ].join('\n').trim();
+}
+
+function computeInputsHash(inputPaths) {
+  if (!Array.isArray(inputPaths) || inputPaths.length === 0) {
+    return sha256('');
+  }
+
+  const entries = inputPaths.map((inputPath) => {
+    const resolved = path.resolve(inputPath);
+    try {
+      return `${inputPath}\n${sha256(fs.readFileSync(resolved, 'utf8'))}`;
+    } catch (err) {
+      return `${inputPath}\nmissing`;
+    }
+  });
+  return sha256(entries.join('\n'));
 }
 
 function parseHeadings(lines) {
@@ -335,6 +409,8 @@ function detectFeatureSliceGaps(lines, headings) {
 function buildReport(target, text, options = {}) {
   const inputPaths = Array.isArray(options.inputs) ? options.inputs : [];
   const inputScan = scanInputDesignRefs(inputPaths);
+  const prdHash = sha256(normalizeForReceipt(text));
+  const inputsHash = computeInputsHash(inputPaths);
   const normalizedTarget = target.split(path.sep).join('/');
   const lines = splitLines(text);
   const frontmatter = parseFrontmatter(lines);
@@ -376,10 +452,11 @@ function buildReport(target, text, options = {}) {
   const clarificationEvidenceDeclaredValid = Boolean(clarificationEvidenceValue);
   const clarificationEvidenceSubstantive = clarificationEvidenceDeclaredValid
     && clarificationEvidenceValue !== 'skipped';
-  const canEnterSpecPlanDeclaredValid = hasValidDeclaration(text, 'can_enter_spec-plan', [
+  const canEnterSpecPlanValue = extractDeclarationValue(text, 'can_enter_spec[-_]?plan', [
     'yes',
     'no',
   ]);
+  const canEnterSpecPlanDeclaredValid = Boolean(canEnterSpecPlanValue);
   const preflightSweepClosureValue = extractDeclarationValue(text, 'preflight_sweep_closure', [
     'closed',
     'degraded',
@@ -396,6 +473,16 @@ function buildReport(target, text, options = {}) {
     || /\bready-for-planning\b/i.test(text);
   const prdShaped = missingCoreSections.length === 0 && requirementIds.length > 0;
   const writeModeIsFinalPrd = writeModeValue === 'final-prd';
+  const claimsReady = frontmatter.fields.status === 'ready-for-planning'
+    || writeModeIsFinalPrd
+    || canEnterSpecPlanValue === 'yes';
+  const readyReceiptPresent = frontmatter.fields.readiness_verified_by === 'check-prd-artifact.js'
+    && frontmatter.fields.readiness_checker_schema === 'spec-prd-artifact-check.v1'
+    && Boolean(frontmatter.fields.readiness_prd_hash)
+    && Boolean(frontmatter.fields.readiness_inputs_hash);
+  const readyReceiptCurrent = readyReceiptPresent
+    && frontmatter.fields.readiness_prd_hash === prdHash
+    && frontmatter.fields.readiness_inputs_hash === inputsHash;
 
   const findings = [];
   if (!frontmatter.present) {
@@ -461,6 +548,17 @@ function buildReport(target, text, options = {}) {
   if (inputScan.input_scan_degraded) {
     findings.push({ reason_code: 'input_scan_degraded' });
   }
+  if (claimsReady && !readyReceiptPresent) {
+    findings.push({ reason_code: 'ready_receipt_absent' });
+  } else if (claimsReady && !readyReceiptCurrent) {
+    findings.push({ reason_code: 'ready_receipt_stale' });
+  }
+
+  const blockingReasons = [...new Set(
+    findings
+      .map((finding) => finding.reason_code)
+      .filter((reasonCode) => BLOCKING_REASON_CODES.has(reasonCode)),
+  )].sort();
 
   return {
     schema_version: 'spec-prd-artifact-check.v1',
@@ -490,8 +588,16 @@ function buildReport(target, text, options = {}) {
       clarification_evidence: clarificationEvidenceValue,
       clarification_trace_present: clarificationEvidenceSubstantive,
       can_enter_spec_plan_declared_valid: canEnterSpecPlanDeclaredValid,
+      can_enter_spec_plan: canEnterSpecPlanValue,
       preflight_sweep_closure: preflightSweepClosureValue,
       preflight_sweep_closure_declared_valid: preflightSweepClosureDeclaredValid,
+      ready_claim_present: claimsReady,
+      ready_receipt_present: readyReceiptPresent,
+      ready_receipt_current: readyReceiptCurrent,
+      ready_receipt_prd_hash: prdHash,
+      ready_receipt_inputs_hash: inputsHash,
+      blocking_reason_codes: blockingReasons,
+      blocking_finding_count: blockingReasons.length,
       design_source_refs_present: designSourceRefsPresent,
       design_source_inventory_declared: designSourceInventoryDeclared,
       design_source_coverage_declared: designSourceCoverageDeclared,
@@ -534,5 +640,9 @@ if (require.main === module) {
 }
 
 module.exports = {
+  BLOCKING_REASON_CODES,
   buildReport,
+  computeInputsHash,
+  normalizeForReceipt,
+  sha256,
 };

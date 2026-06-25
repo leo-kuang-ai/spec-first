@@ -172,7 +172,7 @@ $spec-brainstorm "改进 onboarding"
 | Refresh stale learnings | `/spec:compound-refresh` | `$spec-compound-refresh` | 更新、合并或退役 solution docs |
 | Read release notes | `/spec:release-notes` | `$spec-release-notes` | 指定版本变更摘要 |
 
-想要选项、批判或意外方向，还没确定问题框架时，用 `ideate`。已经有粗略产品问题或功能想法，需要 actors、flows、边界和 acceptance examples 时，用 `brainstorm`。已有系统增量或粗糙 PRD 需要 current-state evidence 和 change delta 时，用 `prd`；面对超大或多来源需求文档时，`prd` 的目标是先做 source-first evidence、Map-Reduce 归约、Deep Requirements Grill 和 PRD-local closure，再交给 planning。已有 requirements、plan 或 task 文档，需要找缺口时，用 `doc-review`。不要把 `brainstorm` 当作所有不清楚请求的默认入口。
+想要选项、批判或意外方向，还没确定问题框架时，用 `ideate`。已经有粗略产品问题或功能想法，需要 actors、flows、边界和 acceptance examples 时，用 `brainstorm`。已有系统增量或粗糙 PRD 需要 current-state evidence 和 change delta 时，用 `prd`；面对超大或多来源需求文档时，`prd` 的目标是先做 source-first evidence 和 Requirement Analysis Gate，把资料归约成需求理解地图、识别不确定点/冲突点、决定产品/设计/技术 grill 问题，再写 PRD 或分析结论并交给 planning。PRD 不能只靠模型写入 `status: ready-for-planning` 就算规划就绪；artifact readiness 必须带有 `finalize-prd-artifact.js` 产生的 producer-local finalize receipt。已有 requirements、plan 或 task 文档，需要找缺口时，用 `doc-review`。不要把 `brainstorm` 当作所有不清楚请求的默认入口。
 
 PRD 需求文档质量增强流程见 [用户手册：PRD 需求文档质量增强流程](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/22-PRD%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3%E8%B4%A8%E9%87%8F%E5%A2%9E%E5%BC%BA%E6%B5%81%E7%A8%8B.md)。
 

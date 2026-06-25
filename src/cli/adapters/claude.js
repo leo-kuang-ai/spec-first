@@ -8,6 +8,8 @@ const SESSION_START_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'temp
 const SESSION_START_RELATIVE_PATH = '.claude/hooks/session-start';
 const SPEC_PLAN_GUARD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'claude', 'hooks', 'spec-plan-guard');
 const SPEC_PLAN_GUARD_RELATIVE_PATH = '.claude/hooks/spec-plan-guard';
+const PRD_READINESS_GUARD_TEMPLATE_PATH = path.join(__dirname, '..', '..', '..', 'templates', 'claude', 'hooks', 'prd-readiness-guard');
+const PRD_READINESS_GUARD_RELATIVE_PATH = '.claude/hooks/prd-readiness-guard';
 const SESSION_START_CLI_PLACEHOLDER = '__SPEC_FIRST_CLI_PATH__';
 const TRUSTED_SPEC_FIRST_CLI_PATH = path.join(__dirname, '..', '..', '..', 'bin', 'spec-first.js');
 const MANAGED_HOOK_FILES = [
@@ -20,6 +22,11 @@ const MANAGED_HOOK_FILES = [
     relativePath: SPEC_PLAN_GUARD_RELATIVE_PATH,
     displayName: 'UserPromptExpansion spec-plan guard',
     render: renderSpecPlanGuardHookTemplate,
+  },
+  {
+    relativePath: PRD_READINESS_GUARD_RELATIVE_PATH,
+    displayName: 'Stop PRD readiness guard',
+    render: renderPrdReadinessGuardHookTemplate,
   },
 ];
 
@@ -315,6 +322,10 @@ function renderSessionStartHookTemplate() {
 
 function renderSpecPlanGuardHookTemplate() {
   return fs.readFileSync(SPEC_PLAN_GUARD_TEMPLATE_PATH, 'utf8');
+}
+
+function renderPrdReadinessGuardHookTemplate() {
+  return fs.readFileSync(PRD_READINESS_GUARD_TEMPLATE_PATH, 'utf8');
 }
 
 function summarizeOperations(operations) {

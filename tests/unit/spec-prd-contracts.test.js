@@ -235,6 +235,7 @@ describe('spec-prd workflow contracts', () => {
       'skills/spec-prd/references/product-expert-lens.md',
       'skills/spec-prd/scripts/check-glossary-drift.js',
       'skills/spec-prd/scripts/check-prd-artifact.js',
+      'skills/spec-prd/scripts/finalize-prd-artifact.js',
       'skills/spec-prd/scripts/run-evals.js',
     ]);
     expect(references).toEqual([
@@ -248,7 +249,7 @@ describe('spec-prd workflow contracts', () => {
       'skills/spec-prd/references/prd-readiness-lens.md',
       'skills/spec-prd/references/product-expert-lens.md',
     ]);
-    expect(sourceFiles).toHaveLength(13);
+    expect(sourceFiles).toHaveLength(14);
     expect(fs.existsSync(path.join(SKILL_DIR, 'templates', 'standard'))).toBe(false);
   });
 
@@ -355,7 +356,7 @@ describe('spec-prd workflow contracts', () => {
       'triggered P0/P1 pack closure',
       'do not create standalone context, ADR, or runtime artifacts',
       'do not copy run-local scratch into the PRD by default',
-      'skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>',
+      'skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>',
       'edit generated runtime mirrors',
     ]);
     expect(text).not.toContain('Adaptive product expert lens');
@@ -457,6 +458,19 @@ describe('spec-prd workflow contracts', () => {
       'valid non-`skipped` value',
       'Route-out and bypass are pre-authoring exits, not grill exemptions',
       'Preflight Sweep',
+      'Requirement Analysis Gate',
+      'materials -> requirement understanding map -> uncertainty/contradiction identification -> decide which product/design/technical decisions must be asked through grill -> then write the PRD or analysis conclusion',
+      'input_inventory',
+      'source_authority_order',
+      'target_surface_anchor',
+      'current_state_summary',
+      'change_delta',
+      'module_map',
+      'open_decisions',
+      'design_coverage',
+      'api_coverage',
+      'risk_to_prd_write_target',
+      'source-backed no-question reason',
       'Input Inventory',
       'Authority Classification',
       'Target Surface Anchor',
@@ -466,8 +480,13 @@ describe('spec-prd workflow contracts', () => {
       'Owner Question Gate',
       'Domain/Glossary Gate',
       'Topology/Producer-Consumer Gate',
+      'Design Coverage Gate',
+      'API/Contract Coverage Gate',
       'Large Input/Resume Gate',
+      'owner-owned open decisions',
       'preflight_sweep_closure_absent',
+      'preflight_sweep_closure` remains the lightweight compatibility declaration for Requirement Analysis Gate closure',
+      'start grill before PRD draft',
       'An owner who has not capped a branch that still has reachable sub-decisions prevents `final-prd`',
       'relentless fallback when the owner gives no cap/continue signal',
       'pre_prd_clarification_status=checkpoint-blocked',
@@ -770,6 +789,8 @@ describe('spec-prd workflow contracts', () => {
       'write_mode',
       'clarification_evidence',
       'preflight_sweep_closure',
+      'compatibility field for Requirement Analysis Gate closure',
+      'materials to requirement understanding, uncertainty/contradiction points, product/design/technical grill decisions, and PRD write targets',
       'design_source_coverage',
       'first_unclosed_owner_question',
       'why_not',
@@ -804,8 +825,10 @@ describe('spec-prd workflow contracts', () => {
     ]);
     expectContainsAll(closeout, [
       'Every PRD handoff should report',
-      'seed deterministic counts and trace facts from `skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>`',
+      'run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout',
+      'The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js`',
       'Use `preflight_sweep_closure`',
+      'Phase 1 Requirement Analysis Gate closed',
       'not a second PRD artifact topology',
       'Resolved before planning',
       'Still carried',
@@ -917,7 +940,13 @@ describe('spec-prd workflow contracts', () => {
       '`change delta and boundary clarity`',
       '`planning-invention and trace risk`',
       '`pre-prd clarification closure`',
-      '`preflight-sweep closure`',
+      '`requirement-analysis-gate closure`',
+      'Requirement Analysis Gate must have closed or visibly carried the requirement understanding map',
+      'Source Authority Order',
+      'Module Map',
+      'Open Decisions',
+      'Design Coverage',
+      'API Coverage',
       '`wording and testability`',
       'INVEST, EARS, and Gherkin-style wording are optional clarity anchors, not scoring rubrics',
       '`interaction and exception readiness`',
@@ -971,7 +1000,7 @@ describe('spec-prd workflow contracts', () => {
       '`internal-tool quality signals`',
       'internal workflow/skill/runtime quality signals',
       '`project-local overlay check`',
-      'Frontmatter `status` is document lifecycle posture',
+      'Frontmatter `status` is machine-owned once a PRD artifact exists',
       '`question`, `recommended_answer`, `source_tag`, `chosen_answer`, `consequence`, and `deferred_reason`',
       'readiness must not require `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` in normal PRD mode',
       'Implementation-ready or direct route-out is a route-out/bypass exception',
@@ -1040,12 +1069,12 @@ describe('spec-prd workflow contracts', () => {
       expect(runtimeTemplate).toContain(surface);
     }
     // 人类镜像的证据 tag 词表必须与 runtime 脚本枚举(check-prd-artifact.js EVIDENCE_TAGS)一致,
-    // 且不得保留已废弃的 stale 词 gitnexus-pointer。仅守 evidence-tag 词表,
+    // 且不得保留已废弃的 stale provider pointer。仅守 evidence-tag 词表,
     // 不约束 README 声明的证券行业列/C1-C12 清单等项目本地 overlay。
     for (const tag of ['confirmed-source', 'user-stated', 'source-candidate', 'external-research', 'assumption']) {
       expect(humanCore).toContain(tag);
     }
-    expect(humanCore).not.toContain('gitnexus-pointer');
+    expect(humanCore).not.toContain([['git', 'nexus'].join(''), 'pointer'].join('-'));
   });
 
   test('routing and downstream plan intake know prd-requirements boundaries', () => {
@@ -1131,6 +1160,7 @@ describe('spec-prd workflow contracts', () => {
       'owner-question-avoidance',
       'direct-route-out',
       'no-fixed-cap',
+      'requirement-analysis-gate',
     ]);
     expectQualityBuckets(examples, [
       'brownfield-create',
@@ -1289,6 +1319,21 @@ describe('spec-prd workflow contracts', () => {
           ]),
         }),
       }),
+      expect.objectContaining({
+        id: 'analysis-gate-skipped-final-prd-rejected',
+        requires: expect.objectContaining({
+          case_type: 'failure',
+          quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
+          coverage_tags: expect.arrayContaining(['readiness', 'requirement-analysis-gate']),
+          expected: expect.arrayContaining([
+            'Requirement Analysis Gate map is required before final-prd or ready-for-planning',
+            'must identify uncertainty/contradiction points and product/design/technical grill decisions before PRD draft',
+          ]),
+          must_not: expect.arrayContaining([
+            'must not read materials directly into a final PRD without the requirement understanding map and grill decision',
+          ]),
+        }),
+      }),
     ]));
     expect(findEvalCase(examples, 'product-judgment-naming-only-rejected')).toMatchObject({
       case_type: 'failure',
@@ -1354,6 +1399,13 @@ describe('spec-prd workflow contracts', () => {
       expected: [
         'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness',
         'preflight_sweep_closure missing or blocked prevents ready-for-planning',
+      ],
+    });
+    expectEvalCase(examples, 'analysis-gate-skipped-final-prd-rejected', {
+      tags: ['readiness', 'requirement-analysis-gate'],
+      expected: [
+        'Requirement Analysis Gate map is required before final-prd or ready-for-planning',
+        'must identify uncertainty/contradiction points and product/design/technical grill decisions before PRD draft',
       ],
     });
     expectEvalCase(examples, 'structured-input-how-demotion', {
@@ -2184,7 +2236,10 @@ describe('spec-prd workflow contracts', () => {
       expect(good.facts.preflight_sweep_closure_declared_valid).toBe(true);
       expect(good.facts.design_source_refs_present).toBe(false);
       expect(good.facts.input_scan_attempted).toBe(false);
-      expect(good.findings).toEqual([]);
+      expect(good.facts.ready_claim_present).toBe(true);
+      expect(good.facts.ready_receipt_present).toBe(false);
+      expect(good.facts.blocking_reason_codes).toEqual(['ready_receipt_absent']);
+      expect(good.findings).toEqual([{ reason_code: 'ready_receipt_absent' }]);
 
       const badPrd = path.join(tmpDir, 'bad-requirements.md');
       fs.writeFileSync(
@@ -2845,17 +2900,20 @@ describe('spec-prd workflow contracts', () => {
   test('Phase 4 is a mandatory checker gate before any planning handoff', () => {
     const skill = read(SKILL_PATH);
     expectContainsAll(skill, [
-      'Phase 4 is a mandatory gate, not an optional closeout.',
-      'Self-declaring readiness or recommending planning without an executed checker result',
-      'A handoff that names no checker result has not passed Phase 4.',
+      'Phase 4 is a mandatory producer-local gate, not an optional closeout.',
+      'Self-declaring readiness or recommending planning without an executed checker/finalize receipt',
+      'A handoff that names no finalize/checker receipt has not passed Phase 4.',
       'anchors core sections on their canonical English token',
-      'node skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>',
+      'node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>',
       'Source-path rewrite must project this operational path',
       'clarification_trace_absent',
       'design_source_unaccounted',
       'input_refs_unavailable',
       'input_scan_degraded',
       'prd_readiness_declarations_evaded',
+      'ready_receipt_absent',
+      'ready_receipt_stale',
+      'finalize_required',
       'preflight_sweep_closure_absent',
       'input_scan_attempted=false',
     ]);
@@ -2864,27 +2922,31 @@ describe('spec-prd workflow contracts', () => {
       skillName: 'spec-prd',
       isWorkflowSkill: true,
     });
-    expect(claudeRendered).toContain('node .claude/spec-first/workflows/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>');
+    expect(claudeRendered).toContain('node .claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>');
 
     const codexRendered = getAdapter('codex').transformSkillContent(skill, {
       skillName: 'spec-prd',
       isWorkflowSkill: true,
     });
-    expect(codexRendered).toContain('node .agents/skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>');
+    expect(codexRendered).toContain('node .agents/skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>');
 
     const readiness = read(READINESS_PATH);
     expectContainsAll(readiness, [
       'is required before this lens can emit `ready-for-planning`, not optional',
-      'an artifact-backed PRD with no executed checker result is itself not ready',
+      'an artifact-backed PRD with no current producer-local finalize receipt is itself not ready',
       're-anchor the heading rather than ignore it',
       'clarification_trace_absent',
       'design_source_unaccounted',
       'input_refs_unavailable',
       'input_scan_degraded',
       'prd_readiness_declarations_evaded',
+      'ready_receipt_absent',
+      'ready_receipt_stale',
+      'finalize_required',
       'preflight_sweep_closure_absent',
       'input_scan_attempted=false',
-      'preflight-sweep closure',
+      'Requirement Analysis Gate closure',
+      '`requirement-analysis-gate closure`',
       'owner acceptance',
     ]);
 

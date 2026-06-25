@@ -109,7 +109,7 @@ function validDirectEvidenceUsed() {
 
 function validGraphEvidenceUsed() {
   return {
-    capabilities_used: ['GitNexus context'],
+    capabilities_used: ['CodeGraph context'],
     evidence_grade: 'session-local',
     evidence_posture: 'fallback',
     freshness_state: 'fresh',
