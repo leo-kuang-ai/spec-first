@@ -55,7 +55,7 @@ Figma is optional per run, per user, per host, and per OS:
 - do not write OS-specific installation commands into this reference or generated PRDs
 - do not store maintainer-local identity probe output, account names, team ids, auth state, or successful tool probes in long-lived contracts or eval fixtures
 
-When design tools are unavailable, degrade loudly and continue with screenshot, exported context, local `figma-context:<path>`, reference-claim, or owner description.
+When design tools are unavailable, degrade loudly and continue with screenshot, exported context, local `figma-context:<path>`, reference-claim, or owner description. Degraded design evidence is not silently planning-ready: unread inventory items default to blocking readiness until owner explicitly accepts the degraded risk, and the PRD records `design_sources_unread`, degraded reason, readiness consequence, and any remaining Planning Recheck / Outstanding Questions residue.
 
 ## External Evidence Interface
 
@@ -100,6 +100,7 @@ When the run cannot fetch remote design context because it is headless, report-o
 - put unresolved design claims into `Planning Recheck` or `Outstanding Questions`
 - state that design-source capability was not semantically verified in closeout when it matters
 - if unread design-source inventory items affect page structure, state, interaction, acceptance, or scope, do not mark the PRD `ready-for-planning`
+- owner-accepted degradation is the only ready-for-planning release valve; record the owner decision and keep unread design residue visible
 
 ## Route-Out Boundary
 

@@ -273,9 +273,9 @@ downstream_confirmation_risk -> claim -> evidence/source -> gap
 
 核心字段是：
 
-- `write_mode=ask-owner-first`：最高风险 gap 可以由一个 owner 问题关闭时，先问这一题并等待，不直接写 final PRD。
-- `write_mode=checkpoint-prd`：多来源、长链路或 true headless 恢复场景下的中间态，只能作为恢复点，必须写 `can_enter_spec-plan: no` 和 `next_owner_question`。
-- `write_mode=final-prd`：只有 load-bearing WHAT 已由 source evidence、owner answer 或 evidence-backed accepted assumption 闭合时才可使用。
+- `write_mode=ask-owner-first`：表示下一步是继续 relentless 深挖最高风险分支，**不是**"问一个就停下来不写"。澄清默认持续深挖，分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。
+- `write_mode=checkpoint-prd`：relentless 兜底——当 owner 未给出 cap/continue 信号(不在场/headless，或软封顶选择点后持续沉默，可观测信号相同)时停在此恢复点,必须写 `can_enter_spec-plan: no`、`next_owner_question` 和 `pre_prd_clarification_status=checkpoint-blocked`,绝不静默判 ready;也用于多来源/长链路/true headless 恢复。
+- `write_mode=final-prd`：只有**每个 load-bearing 分支都到达 Canonical 停点**(source evidence、owner answer、evidence-backed accepted assumption 或 owner 封顶)时才可使用;owner 未封顶且分支仍有可深挖子决策时不得 final-prd。
 - `write_mode=route-out`：输入属于 brainstorm、plan、work、debug 或无 durable PRD 价值时路由出去。
 - `clarification_evidence=asked-owner`：本轮实际通过 blocking question tool 或 chat fallback 问过 owner 并获得回答。
 - `clarification_evidence=source-proven-no-ask`：无需 owner 提问，因为 source refs 已能闭合相关 WHAT。
@@ -348,7 +348,7 @@ Deep Requirements Grill 是 `grill-with-docs` 思想在需求文档阶段的主�
 - code contradiction：用户说法和现有代码冲突时，要求明确以哪个为准。
 - decision closure：owner answer 必须落回 PRD section，而不是停留在聊天里。
 
-正常 PRD run 不再用固定问题数量作为停止条件，也不把“看起来小”当作跳过澄清的理由。每个 owner 问题都必须绑定命名 gap、已做 source attempt、PRD write target 和 closure state；只要 PRD 模版的 actor、flow、state、exception、permission、scope、acceptance、release slice、术语或决策后果还依赖 owner 裁决，就进入 `grill-with-docs` 深度模式并继续一次一个问题。只有缺系统/产品锚点、属于 broad discovery、下一问无法关闭或缩窄命名 gap，或没有可负责提问序列时，才输出 prioritized blocker cluster、推荐下一 route、accepted assumptions 和 affected write targets，并且不标记 `ready-for-planning`。
+正常 PRD run 的澄清姿态是 **relentless（理解透才停）**：默认沿每个 load-bearing 分支一次一个问题深挖到底，而不是"够写 PRD 就停"。固定问题数量、"看起来小"、"够写某个 section"、"只问了一个关键问题"、"问题序列变长"、"不影响当前发布切片" 都**不是停止理由**——它们只影响提问顺序。每个 owner 问题仍必须绑定命名 gap、已做 source attempt、PRD write target 和 closure state；一个分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。当 owner 未给出 cap/continue 信号时，落 `write_mode=checkpoint-prd` 兜底，绝不静默判 `ready-for-planning`。只有缺系统/产品锚点、属于 broad discovery、或没有可负责提问序列时，才 `route-out` 到 prioritized blocker cluster 并推荐下一 route。`ready-for-planning` 要求每个 load-bearing 分支都到达 Canonical 停点（含 owner 已封顶）。
 
 ## Context / ADR Topology Adapter
 

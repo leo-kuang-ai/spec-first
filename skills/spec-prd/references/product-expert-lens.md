@@ -11,7 +11,7 @@ This file is the single canonical source for product-expert judgment in `spec-pr
 - Detect load-bearing ambiguity across actor, trigger, happy path, state transition, empty/failure/permission cases, rollout slice, non-goals, metric, and acceptance.
 - Challenge vague product terms before they reach PRD sections.
 - Rank gaps by downstream confirmation risk, not by checklist completeness.
-- Produce the next owner question only when it can close or narrow a named PRD write target.
+- Order owner questions by `downstream_confirmation_risk`; ranking sets which gap to grill first, not whether to keep grilling. Grilling continues by default until a branch reaches a legal stop point in SKILL.md `Canonical: 四个合法停点`.
 - Preserve accepted assumptions, owner decisions, blockers, and unresolved questions in PRD-local sections.
 - Close with which downstream confirmations have been eliminated and which remain explicit handoff boundaries.
 
@@ -40,15 +40,16 @@ Fields are authoring scratch, not persistent schema:
 - `gap` names the missing or contradictory WHAT.
 - `owner_question_or_assumption` is either one source-backed owner question or a safe labeled assumption.
 - `PRD_write_target` is the standard PRD section the answer will update.
-- `closure_state` reuses the existing owner-question states: `closed`, `narrowed`, `accepted-assumption`, `outstanding-question`, `blocker`, or `route-out`.
+- `closure_state` reuses the existing owner-question states: `closed`, `narrowed`, `accepted-assumption`, `owner-capped`, `outstanding-question`, `blocker`, or `route-out`.
 
 Contract tests may lock the field anchors and consumption direction. They must not lock semantic sorting results, product judgment content, or exact question wording.
 
 ## Interface Invariants
 
 - Every gap that enters Requirements Grill must bind to `PRD_write_target`.
-- A gap that cannot bind to a write target stays inside the Lens for more reduction or is carried as `Outstanding Questions`, blocker, accepted assumption, or route-out.
-- `downstream_confirmation_risk` controls next-question ordering and handoff priority. It is not a score, enum, schema, or deterministic readiness verdict.
+- Risk -> PRD Write Target Map is a mandatory run-local interface before durable write-in: each load-bearing risk either names the PRD section it will update, becomes an owner question/accepted assumption/blocker, or routes out.
+- A load-bearing gap that cannot yet bind to a write target is not dropped or parked as a stop reason: keep grilling to bind it, or carry it visibly as `Outstanding Questions`, blocker, accepted assumption, or route-out. "Not yet bindable" never ends a branch.
+- `downstream_confirmation_risk` controls next-question ordering and handoff priority. It does not control whether to keep grilling — grilling continues by default until a branch reaches a legal stop point in SKILL.md `Canonical: 四个合法停点`. It is not a score, enum, schema, or deterministic readiness verdict.
 - Requirements Grill consumes only `gap + owner_question_or_assumption + PRD_write_target`.
 - Standard PRD Write-In consumes only `PRD_write_target + closure_state`.
 - Readiness consumes `closure_state` plus remaining handoff residue that would make planning/work invent WHAT.

@@ -25,9 +25,21 @@ const EVIDENCE_TAGS = [
 ];
 
 function parseArgs(argv) {
-  const args = { target: null, error: null };
-  for (const arg of argv) {
-    if (!args.target) {
+  const args = { target: null, inputs: [], error: null };
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === '--inputs') {
+      const value = argv[i + 1];
+      if (!value || value.startsWith('--')) {
+        args.error = 'missing value for --inputs';
+        break;
+      }
+      args.inputs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
+      i += 1;
+    } else if (arg.startsWith('--')) {
+      args.error = `unknown option: ${arg}`;
+      break;
+    } else if (!args.target) {
       args.target = arg;
     } else {
       // 只接受单个位置参数:多余的目标路径会被静默丢弃,反而让错误调用
@@ -84,8 +96,33 @@ function parseHeadings(lines) {
   return headings;
 }
 
+// 去掉标题前导的序号/标点装饰("一、""(1)""1." 与残留 # 空白),
+// 用于在保留英文锚点的前提下识别本地化标题。
+function stripHeadingDecoration(title) {
+  return title
+    .replace(/^[#\s]*/, '')
+    .replace(/^[（(]?\s*(?:[0-9]+|[一二三四五六七八九十百零]+)\s*[)）.、．:：]\s*/u, '')
+    .trim();
+}
+
+// 标题命中 canonical core section 的规则:精确相等,或去装饰后以英文锚点开头
+// 且锚点后是非字母数字边界。这样 `## Summary(文档概要)`、`## 一、Summary 概要`
+// 命中 Summary,而 `## Non-Functional Requirements` 不会被误判为 Requirements。
+function matchHeadingTitle(headingTitle, wantedTitle) {
+  if (headingTitle === wantedTitle) return true;
+  const stripped = stripHeadingDecoration(headingTitle);
+  if (stripped === wantedTitle) return true;
+  const lowerStripped = stripped.toLowerCase();
+  const lowerWanted = wantedTitle.toLowerCase();
+  if (lowerStripped.startsWith(lowerWanted)) {
+    const rest = stripped.slice(wantedTitle.length);
+    if (rest === '' || /^[^A-Za-z0-9]/.test(rest)) return true;
+  }
+  return false;
+}
+
 function sectionRange(lines, headings, title) {
-  const heading = headings.find((entry) => entry.title === title);
+  const heading = headings.find((entry) => matchHeadingTitle(entry.title, title));
   if (!heading) return null;
   const startIndex = heading.line - 1;
   const next = headings.find((entry) => (
@@ -154,10 +191,15 @@ function stripFencedCode(text) {
 }
 
 function hasValidDeclaration(text, fieldPattern, values) {
+  return Boolean(extractDeclarationValue(text, fieldPattern, values));
+}
+
+function extractDeclarationValue(text, fieldPattern, values) {
   const body = stripFencedCode(text);
   const valuePattern = values.map((value) => value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|');
   const regex = new RegExp(`^\\s*(?:[-*]\\s*)?${fieldPattern}\\s*:\\s*(${valuePattern})\\s*$`, 'im');
-  return regex.test(body);
+  const match = body.match(regex);
+  return match ? match[1].trim() : null;
 }
 
 function hasConcreteFieldBlock(text, fieldPattern) {
@@ -189,7 +231,35 @@ function hasConcreteFieldBlock(text, fieldPattern) {
 
 function detectDesignSourceRefs(text) {
   const body = stripFencedCode(text);
-  return /figma\.com|figma\s+(?:node|file)|node-id=|design-source|design_source_inventory|design_sources_|Design\s*\/\s*UX Evidence Hook/i.test(body);
+  return /figma\.com|figma\s+(?:node|file)|figma\s+\d+-\d+|node-id=|design-source|design_source_inventory|design_sources_|Design\s*\/\s*UX Evidence Hook/i.test(body);
+}
+
+function scanInputDesignRefs(inputPaths) {
+  const inputRefsUsed = [];
+  let inputDesignRefsPresent = false;
+  let inputScanDegraded = false;
+
+  inputPaths.forEach((inputPath) => {
+    const pathDesignSignal = /figma|design|设计稿/i.test(inputPath);
+    try {
+      const text = fs.readFileSync(path.resolve(inputPath), 'utf8');
+      inputRefsUsed.push(inputPath);
+      if (pathDesignSignal || detectDesignSourceRefs(text)) {
+        inputDesignRefsPresent = true;
+      }
+    } catch (err) {
+      inputScanDegraded = true;
+      if (pathDesignSignal) {
+        inputDesignRefsPresent = true;
+      }
+    }
+  });
+
+  return {
+    input_refs_used: inputRefsUsed,
+    input_design_refs_present: inputDesignRefsPresent,
+    input_scan_degraded: inputScanDegraded,
+  };
 }
 
 function detectDesignSourceInventory(text) {
@@ -262,13 +332,15 @@ function detectFeatureSliceGaps(lines, headings) {
   });
 }
 
-function buildReport(target, text) {
+function buildReport(target, text, options = {}) {
+  const inputPaths = Array.isArray(options.inputs) ? options.inputs : [];
+  const inputScan = scanInputDesignRefs(inputPaths);
   const normalizedTarget = target.split(path.sep).join('/');
   const lines = splitLines(text);
   const frontmatter = parseFrontmatter(lines);
   const headings = parseHeadings(lines);
   const missingCoreSections = CORE_SECTIONS.filter((section) => (
-    !headings.some((heading) => heading.title === section)
+    !headings.some((heading) => matchHeadingTitle(heading.title, section))
   ));
   const requirementIds = uniqueMatches(text, /\b(R-\d{2,})\b/g);
   const acceptanceIds = uniqueMatches(text, /\b(AE-\d{2,})\b/g);
@@ -287,23 +359,34 @@ function buildReport(target, text) {
   const planningRecheckPresent = sectionPresent(lines, headings, 'Planning Recheck');
   const outstandingQuestionCount = countSectionRows(lines, headings, 'Outstanding Questions');
   const planningRecheckCount = countSectionRows(lines, headings, 'Planning Recheck');
-  const writeModeDeclaredValid = hasValidDeclaration(text, 'write_mode', [
+  const writeModeValue = extractDeclarationValue(text, 'write_mode', [
     'ask-owner-first',
     'checkpoint-prd',
     'final-prd',
     'route-out',
     'not-run',
   ]);
-  const clarificationEvidenceDeclaredValid = hasValidDeclaration(text, 'clarification_evidence', [
+  const writeModeDeclaredValid = Boolean(writeModeValue);
+  const clarificationEvidenceValue = extractDeclarationValue(text, 'clarification_evidence', [
     'asked-owner',
     'source-proven-no-ask',
     'headless-degraded-logged',
     'skipped',
   ]);
+  const clarificationEvidenceDeclaredValid = Boolean(clarificationEvidenceValue);
+  const clarificationEvidenceSubstantive = clarificationEvidenceDeclaredValid
+    && clarificationEvidenceValue !== 'skipped';
   const canEnterSpecPlanDeclaredValid = hasValidDeclaration(text, 'can_enter_spec-plan', [
     'yes',
     'no',
   ]);
+  const preflightSweepClosureValue = extractDeclarationValue(text, 'preflight_sweep_closure', [
+    'closed',
+    'degraded',
+    'blocked',
+    'missing',
+  ]);
+  const preflightSweepClosureDeclaredValid = Boolean(preflightSweepClosureValue);
   const designSourceRefsPresent = detectDesignSourceRefs(text);
   const designSourceInventoryDeclared = detectDesignSourceInventory(text);
   const designSourceCoverageDeclared = detectDesignSourceCoverage(text);
@@ -311,6 +394,8 @@ function buildReport(target, text) {
   const designSourcesUnreadPresent = detectDesignSourcesUnread(text);
   const needsReadinessDeclarations = frontmatter.fields.artifact_kind === 'prd-requirements'
     || /\bready-for-planning\b/i.test(text);
+  const prdShaped = missingCoreSections.length === 0 && requirementIds.length > 0;
+  const writeModeIsFinalPrd = writeModeValue === 'final-prd';
 
   const findings = [];
   if (!frontmatter.present) {
@@ -343,8 +428,17 @@ function buildReport(target, text) {
   if (needsReadinessDeclarations && !clarificationEvidenceDeclaredValid) {
     findings.push({ reason_code: 'clarification_evidence_undeclared' });
   }
+  if (needsReadinessDeclarations && writeModeIsFinalPrd && !clarificationEvidenceSubstantive) {
+    findings.push({ reason_code: 'clarification_trace_absent' });
+  }
   if (needsReadinessDeclarations && !canEnterSpecPlanDeclaredValid) {
     findings.push({ reason_code: 'can_enter_spec_plan_undeclared' });
+  }
+  if (prdShaped && !needsReadinessDeclarations) {
+    findings.push({ reason_code: 'prd_readiness_declarations_evaded' });
+  }
+  if ((prdShaped || writeModeIsFinalPrd || needsReadinessDeclarations) && !preflightSweepClosureDeclaredValid) {
+    findings.push({ reason_code: 'preflight_sweep_closure_absent' });
   }
   if (designSourceRefsPresent && !designSourceInventoryDeclared) {
     findings.push({ reason_code: 'design_source_inventory_undeclared' });
@@ -357,6 +451,15 @@ function buildReport(target, text) {
   }
   if (designSourceRefsPresent && !designSourcesUnreadPresent) {
     findings.push({ reason_code: 'design_sources_unread_undeclared' });
+  }
+  if (inputScan.input_design_refs_present && !designSourceInventoryDeclared) {
+    findings.push({ reason_code: 'design_source_unaccounted' });
+  }
+  if (inputPaths.length > 0 && inputScan.input_refs_used.length === 0) {
+    findings.push({ reason_code: 'input_refs_unavailable' });
+  }
+  if (inputScan.input_scan_degraded) {
+    findings.push({ reason_code: 'input_scan_degraded' });
   }
 
   return {
@@ -382,8 +485,13 @@ function buildReport(target, text) {
       planning_recheck_present: planningRecheckPresent,
       planning_recheck_count: planningRecheckCount,
       write_mode_declared_valid: writeModeDeclaredValid,
+      write_mode: writeModeValue,
       clarification_evidence_declared_valid: clarificationEvidenceDeclaredValid,
+      clarification_evidence: clarificationEvidenceValue,
+      clarification_trace_present: clarificationEvidenceSubstantive,
       can_enter_spec_plan_declared_valid: canEnterSpecPlanDeclaredValid,
+      preflight_sweep_closure: preflightSweepClosureValue,
+      preflight_sweep_closure_declared_valid: preflightSweepClosureDeclaredValid,
       design_source_refs_present: designSourceRefsPresent,
       design_source_inventory_declared: designSourceInventoryDeclared,
       design_source_coverage_declared: designSourceCoverageDeclared,
@@ -391,6 +499,10 @@ function buildReport(target, text) {
       design_sources_unread_present: designSourcesUnreadPresent,
       placeholder_line_count: placeholderLines.length,
       feature_slice_trace_gap_count: featureSliceGaps.length,
+      input_scan_attempted: inputPaths.length > 0,
+      input_refs_used: inputScan.input_refs_used,
+      input_design_refs_present: inputScan.input_design_refs_present,
+      input_scan_degraded: inputScan.input_scan_degraded,
     },
     findings,
   };
@@ -402,7 +514,7 @@ function main() {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
     }
-    process.stderr.write('usage: check-prd-artifact.js <target-prd-path>\n');
+    process.stderr.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]...\n');
     process.exit(2);
   }
 
@@ -414,7 +526,7 @@ function main() {
     process.exit(2);
   }
 
-  process.stdout.write(JSON.stringify(buildReport(args.target, targetText), null, 2) + '\n');
+  process.stdout.write(JSON.stringify(buildReport(args.target, targetText, { inputs: args.inputs }), null, 2) + '\n');
 }
 
 if (require.main === module) {

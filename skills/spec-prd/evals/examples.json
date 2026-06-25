@@ -43,8 +43,8 @@
           "case_type": "boundary",
           "quality_buckets": ["refine"],
           "coverage_tags": ["readiness", "boundary"],
-          "expected": ["write_mode=ask-owner-first even for large input when gap is closable by one question"],
-          "must_not": ["must not jump to checkpoint-prd merely because input is large"]
+          "expected": ["large input keeps relentless grilling by default", "ask-owner-first means keep grilling the highest-risk branch, not ask one question then stop", "a branch stops only at a Canonical stop point"],
+          "must_not": ["must not stop grilling merely because one key question was asked", "must not jump to checkpoint-prd merely because input is large"]
         }
       },
       {
@@ -85,6 +85,16 @@
           "coverage_tags": ["readiness", "owner-question-avoidance"],
           "expected": ["design_source_inventory must include explicit input refs, Figma-discoverable nodes, and design-dependent states referenced by requirements"],
           "must_not": ["must not mark ready-for-planning when unread design nodes are omitted from design_source_coverage"]
+        }
+      },
+      {
+        "id": "preflight-grill-design-gate-ready-rejected",
+        "requires": {
+          "case_type": "failure",
+          "quality_buckets": ["failure", "readiness-fail"],
+          "coverage_tags": ["readiness", "design-source", "preflight"],
+          "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning"],
+          "must_not": ["must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure"]
         }
       }
     ],
@@ -198,9 +208,9 @@
       "intent": "refine",
       "case_type": "boundary",
       "quality_buckets": ["refine"],
-      "input_shape": "large multi-doc input and the highest_risk_gap is closable by one owner question",
-      "expected": ["write_mode=ask-owner-first even for large input when gap is closable by one question"],
-      "must_not": ["must not jump to checkpoint-prd merely because input is large"],
+      "input_shape": "large multi-doc input with a high-risk branch plus more reachable load-bearing sub-decisions",
+      "expected": ["large input keeps relentless grilling by default", "ask-owner-first means keep grilling the highest-risk branch, not ask one question then stop", "a branch stops only at a Canonical stop point"],
+      "must_not": ["must not stop grilling merely because one key question was asked", "must not jump to checkpoint-prd merely because input is large"],
       "coverage_tags": ["readiness", "boundary"]
     },
     {
@@ -242,6 +252,16 @@
       "expected": ["design_source_inventory must include explicit input refs, Figma-discoverable nodes, and design-dependent states referenced by requirements", "unread design nodes omitted from coverage block readiness"],
       "must_not": ["must not mark ready-for-planning when unread design nodes are omitted from design_source_coverage", "must not treat a self-reported read-only list as full design coverage"],
       "coverage_tags": ["readiness", "owner-question-avoidance"]
+    },
+    {
+      "id": "preflight-grill-design-gate-ready-rejected",
+      "intent": "validate",
+      "case_type": "failure",
+      "quality_buckets": ["failure", "readiness-fail"],
+      "input_shape": "PRD-shaped output skips grill trace, omits artifact readiness declarations, ignores input-side Figma/design refs, lacks preflight_sweep_closure, and still returns ready-for-planning",
+      "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning", "input_scan_attempted=false on a final UI/design-surface PRD is must-not-ready-until-confirmed"],
+      "must_not": ["must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure", "must not treat route-out or bypass as an authoring-stage grill exemption"],
+      "coverage_tags": ["readiness", "design-source", "preflight"]
     },
     {
       "id": "code-alignment-what-not-how",
@@ -704,8 +724,8 @@
       "case_type": "failure",
       "quality_buckets": ["refine", "readiness-fail", "failure"],
       "input_shape": "rough PRD has multiple interacting load-bearing gaps across actors, scope, acceptance, and release",
-      "expected": ["no fixed owner-question count as the stop condition", "continue one-question-at-a-time only while each question closes or narrows a named gap", "not ready-for-planning until closure"],
-      "must_not": ["must not mark the PRD ready-for-planning while trace or closure gaps remain"],
+      "expected": ["no fixed owner-question count as the stop condition", "continue one-question-at-a-time relentlessly by default, walking down each branch", "a branch stops only at a Canonical stop point (leaf, source-resolved, owner-capped, how-pushdown)", "not ready-for-planning until every load-bearing branch reaches a Canonical stop point"],
+      "must_not": ["must not mark the PRD ready-for-planning while a reachable load-bearing branch is uncapped", "must not stop a branch merely because the next question would not change a write target"],
       "coverage_tags": ["boundary", "failure", "no-fixed-cap"]
     },
     {

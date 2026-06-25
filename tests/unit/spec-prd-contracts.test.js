@@ -9,6 +9,7 @@ const {
   buildFilteredAssetSet,
   loadPluginManifest,
 } = require('../../src/cli/plugin');
+const { getAdapter } = require('../../src/cli/adapters');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const SKILL_DIR = path.join(REPO_ROOT, 'skills', 'spec-prd');
@@ -94,6 +95,13 @@ const FRESH_SOURCE_EVAL_CLARIFICATION_EVIDENCE_PATH = path.join(
   'validation',
   'spec-prd',
   'fresh-source-eval-2026-06-24-clarification-evidence.md',
+);
+const FRESH_SOURCE_EVAL_RELENTLESS_GRILL_PATH = path.join(
+  REPO_ROOT,
+  'docs',
+  'validation',
+  'spec-prd',
+  'fresh-source-eval-2026-06-25-relentless-grill.md',
 );
 
 function read(filePath) {
@@ -253,12 +261,13 @@ describe('spec-prd workflow contracts', () => {
 
   test('entrypoint exposes compact workflow contract summary and decision-tree intake', () => {
     const text = read(SKILL_PATH);
-    const firstHundredFortyLines = text.split(/\r?\n/).slice(0, 140).join('\n');
+    // 入口锚点窗口:relentless-grill 改动新增了 Canonical 四停点核心块,窗口从 140 放宽到 155
+    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 155).join('\n');
     const phaseOne = extractMarkdownSection(text, '### Phase 1: Current-State Analysis');
 
     expect(text).toContain('name: spec-prd');
-    expect(firstHundredFortyLines).toMatch(/## Purpose/);
-    expect(firstHundredFortyLines).toMatch(/## Workflow Contract Summary/);
+    expect(entrypointHeadLines).toMatch(/## Purpose/);
+    expect(entrypointHeadLines).toMatch(/## Workflow Contract Summary/);
     for (const field of [
       'When To Use',
       'When Not To Use',
@@ -269,9 +278,9 @@ describe('spec-prd workflow contracts', () => {
       'Workflow',
       'Downstream Consumers',
     ]) {
-      expect(firstHundredFortyLines.toLowerCase()).toContain(field.toLowerCase());
+      expect(entrypointHeadLines.toLowerCase()).toContain(field.toLowerCase());
     }
-    expectContainsAll(firstHundredFortyLines, [
+    expectContainsAll(entrypointHeadLines, [
       'docs/brainstorms/*-requirements.md',
       'artifact_kind: prd-requirements',
       'Do not create `docs/prds/`',
@@ -285,8 +294,8 @@ describe('spec-prd workflow contracts', () => {
       'input_posture: resume-prd | reference-claims | wrong-stage | pure-text | no-input',
       'output_shape: bypass | compact-prd | normal-prd | topology-heavy-prd',
       'quality_diagnosis: not-run | minor-gaps | material-gaps | blockers | ready',
-      'pre_prd_clarification_status: not-needed | source-resolved | asked-owner | blocker-cluster | route-out | not-run',
-      'owner_question_progress: not-needed | source-resolved | closed | narrowed | accepted-assumption | outstanding-question | blocker | route-out',
+      'pre_prd_clarification_status: not-needed | source-resolved | asked-owner | blocker-cluster | checkpoint-blocked | route-out | not-run',
+      'owner_question_progress: not-needed | source-resolved | closed | narrowed | accepted-assumption | owner-capped | outstanding-question | blocker | route-out',
       'write_mode: ask-owner-first | checkpoint-prd | final-prd | route-out | not-run',
       'highest_risk_gap:',
       'next_owner_question:',
@@ -309,9 +318,9 @@ describe('spec-prd workflow contracts', () => {
       'authoring discipline, not a new schema or security parser',
     ]);
     expect(phaseOne.indexOf('Run PRD Sanitization')).toBeLessThan(phaseOne.indexOf('Use `evidence-and-topology.md`'));
-    expect(firstHundredFortyLines).not.toContain('Input Mode Table');
-    expect(firstHundredFortyLines).not.toContain('Tie-Break Rules');
-    expect(firstHundredFortyLines).not.toContain('current year is 2026');
+    expect(entrypointHeadLines).not.toContain('Input Mode Table');
+    expect(entrypointHeadLines).not.toContain('Tie-Break Rules');
+    expect(entrypointHeadLines).not.toContain('current year is 2026');
     expect(text).toContain('screenshots/OCR, PDFs, meeting notes, chat logs');
     expect(text).toContain('`code-align` is validation posture, not a fourth public intent');
   });
@@ -346,7 +355,7 @@ describe('spec-prd workflow contracts', () => {
       'triggered P0/P1 pack closure',
       'do not create standalone context, ADR, or runtime artifacts',
       'do not copy run-local scratch into the PRD by default',
-      'scripts/check-prd-artifact.js <prd-path>',
+      'skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>',
       'edit generated runtime mirrors',
     ]);
     expect(text).not.toContain('Adaptive product expert lens');
@@ -439,16 +448,36 @@ describe('spec-prd workflow contracts', () => {
       'reuse existing Decision Card fields and do not add phase-status enums, progress files, or transcripts',
       'route-out, bypass, and source-proven paths use one concise reason instead of full ceremony',
       'Pre-Write Closure Gate',
-      'write_mode=ask-owner-first',
-      'highest-risk gap can be closed by one owner question',
-      'large input is not permission to skip the owner question',
+      'Canonical: 四个合法停点',
+      'keep grilling the highest-risk branch, not "ask one question then stop drafting"',
       'write_mode=checkpoint-prd',
       'write_mode=final-prd',
-      'source evidence, owner answer, or evidence-backed `accepted-assumption`',
-      'Outstanding Questions, Planning Recheck, blocker cluster, or route-out residue still in the PRD prevents `final-prd`',
-      'set `write_mode=checkpoint-prd` when preserving recoverable PRD context is necessary while keeping `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`',
+      'every load-bearing branch has reached a Canonical stop point',
+      'grill trace is mandatory',
+      'valid non-`skipped` value',
+      'Route-out and bypass are pre-authoring exits, not grill exemptions',
+      'Preflight Sweep',
+      'Input Inventory',
+      'Authority Classification',
+      'Target Surface Anchor',
+      'Current-State Evidence',
+      'Change Delta',
+      'Risk -> PRD Write Target Map',
+      'Owner Question Gate',
+      'Domain/Glossary Gate',
+      'Topology/Producer-Consumer Gate',
+      'Large Input/Resume Gate',
+      'preflight_sweep_closure_absent',
+      'An owner who has not capped a branch that still has reachable sub-decisions prevents `final-prd`',
+      'relentless fallback when the owner gives no cap/continue signal',
+      'pre_prd_clarification_status=checkpoint-blocked',
     ]);
+    // 旧止损语义已被翻转:这些反向锚点不得复活
+    expect(skill).not.toContain('large input is not permission to skip the owner question');
+    expect(skill).not.toContain('highest-risk gap can be closed by one owner question');
     expect(skill).not.toContain('degrade to `revise-prd`, `ask-owner`, `checkpoint-prd`, or `route-out`');
+    // 字段去重:不得引入 grill_depth_state 独立字段
+    expect(skill).not.toContain('grill_depth_state');
   });
 
   test('evidence and topology reference preserves source truth and system-shape boundaries', () => {
@@ -500,8 +529,8 @@ describe('spec-prd workflow contracts', () => {
       'Source-Of-Truth Resolution',
       'Negative Space',
       'Ask only questions that decide scope, behavior, source-of-truth, or acceptance',
-      'If the owner-question sequence would become a long form',
-      'stop and inspect the progress contract instead of counting questions',
+      'A lengthening owner-question sequence is not a stop reason; grilling continues relentlessly by default',
+      'a branch stops only at a legal stop point in SKILL.md `Canonical: 四个合法停点`',
       'source attempt already made',
       'PRD write target it changes',
       'load `grill-with-docs-integration.md` and continue one-question-at-a-time',
@@ -533,7 +562,7 @@ describe('spec-prd workflow contracts', () => {
       'Auto-load `grill-with-docs-integration.md` for rough PRD',
       'Ask at most one question at a time.',
       'Each question must bind to a `gap id`, a source attempt, a PRD write target, and a progress state',
-      'Continue only while the next question can close or narrow a named load-bearing gap for the current release slice.',
+      'Continue relentlessly by default, walking down each branch.',
       'write_target: Summary | Problem Frame | Current System Snapshot | Change Delta | Requirements | Acceptance Examples',
       'This format is for asking the owner, not a third persistent field set.',
       'compress it into that section\'s existing fields and do not add new fields',
@@ -565,7 +594,7 @@ describe('spec-prd workflow contracts', () => {
       'concrete scenario stress',
       'code contradiction surfacing',
       'skip low-value questions',
-      'Every load-bearing grill question must close before planning',
+      'Every load-bearing branch must reach a legal stop point in SKILL.md `Canonical: 四个合法停点` before planning',
       'For PRD authoring/refinement, apply these seven `grill-with-docs` actions to every requirement branch',
       'Do not require the user to name `grill-with-docs`',
       'Grill-With-Docs Integration Trigger',
@@ -592,7 +621,7 @@ describe('spec-prd workflow contracts', () => {
       'Sharpen fuzzy language',
       'Discuss concrete scenarios',
       'Cross-reference with code',
-      'Continue this loop only while the next question closes or narrows a named load-bearing branch',
+      'Continue this loop relentlessly by default, walking down each branch.',
       'create a root `CONTEXT.md` lazily when the first project-specific term is resolved',
       '`CONTEXT.md` is a glossary and nothing else',
       'update the relevant `CONTEXT.md` inline before continuing the interview',
@@ -608,7 +637,7 @@ describe('spec-prd workflow contracts', () => {
       'deep clarification through `grill-with-docs-integration.md` is the default path',
       'compact output is only a source-resolved PRD shape',
       'persist results into existing PRD sections',
-      'Stop rather than interview indefinitely',
+      'Continue one-question-at-a-time relentlessly by default',
     ]);
     expect(domainLanguage).not.toContain('default create `CONTEXT.md`');
     expect(domainLanguage).not.toContain('always create ADR');
@@ -740,6 +769,7 @@ describe('spec-prd workflow contracts', () => {
       'can_enter_spec-plan: no',
       'write_mode',
       'clarification_evidence',
+      'preflight_sweep_closure',
       'design_source_coverage',
       'first_unclosed_owner_question',
       'why_not',
@@ -751,6 +781,7 @@ describe('spec-prd workflow contracts', () => {
       'read_status',
       'PRD write target',
       'readiness consequence',
+      'Design-source inventory is mandatory whenever design input exists',
     ]);
     expectContainsAll(featureSlices, [
       'Feature Slices are context and handoff units',
@@ -773,7 +804,9 @@ describe('spec-prd workflow contracts', () => {
     ]);
     expectContainsAll(closeout, [
       'Every PRD handoff should report',
-      'seed deterministic counts and trace facts from `scripts/check-prd-artifact.js <prd-path>`',
+      'seed deterministic counts and trace facts from `skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>`',
+      'Use `preflight_sweep_closure`',
+      'not a second PRD artifact topology',
       'Resolved before planning',
       'Still carried',
       'planning_would_invent_what',
@@ -802,6 +835,7 @@ describe('spec-prd workflow contracts', () => {
       'PRD_write_target -> closure_state',
       'not persistent schema',
       'Every gap that enters Requirements Grill must bind to `PRD_write_target`',
+      'Risk -> PRD Write Target Map is a mandatory run-local interface',
       'Requirements Grill consumes only `gap + owner_question_or_assumption + PRD_write_target`',
       'Product Judgment Dimensions',
       'user/problem/outcome clarity',
@@ -847,6 +881,9 @@ describe('spec-prd workflow contracts', () => {
       'Figma-discoverable nodes',
       'design-dependent states referenced by requirements',
       'must block `ready-for-planning`',
+      'Degraded design evidence is not silently planning-ready',
+      'owner explicitly accepts the degraded risk',
+      'owner-accepted degradation is the only ready-for-planning release valve',
     ]);
     expectContainsAll(checkpoint, [
       '`checkpoint-prd` is not a final PRD',
@@ -880,6 +917,7 @@ describe('spec-prd workflow contracts', () => {
       '`change delta and boundary clarity`',
       '`planning-invention and trace risk`',
       '`pre-prd clarification closure`',
+      '`preflight-sweep closure`',
       '`wording and testability`',
       'INVEST, EARS, and Gherkin-style wording are optional clarity anchors, not scoring rubrics',
       '`interaction and exception readiness`',
@@ -918,7 +956,7 @@ describe('spec-prd workflow contracts', () => {
       'every owner question closes or narrows a named gap with a PRD write target',
       '`domain-grill and decision-note adequacy`',
       '`deep requirements grill closure`',
-      'Questions that cannot close or narrow a named gap stop as blockers/deferred questions',
+      'each reach a legal stop point in SKILL.md `Canonical: 四个合法停点`',
       '`context/adr topology adapter boundary`',
       '`context/adr artifact mode boundary`',
       'P1 Conditional Pack',
@@ -1174,7 +1212,7 @@ describe('spec-prd workflow contracts', () => {
           quality_buckets: expect.arrayContaining(['refine']),
           coverage_tags: expect.arrayContaining(['readiness', 'boundary']),
           expected: expect.arrayContaining([
-            'write_mode=ask-owner-first even for large input when gap is closable by one question',
+            'ask-owner-first means keep grilling the highest-risk branch, not ask one question then stop',
           ]),
           must_not: expect.arrayContaining([
             'must not jump to checkpoint-prd merely because input is large',
@@ -1237,6 +1275,20 @@ describe('spec-prd workflow contracts', () => {
           ]),
         }),
       }),
+      expect.objectContaining({
+        id: 'preflight-grill-design-gate-ready-rejected',
+        requires: expect.objectContaining({
+          case_type: 'failure',
+          quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
+          coverage_tags: expect.arrayContaining(['readiness', 'design-source', 'preflight']),
+          expected: expect.arrayContaining([
+            'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness',
+          ]),
+          must_not: expect.arrayContaining([
+            'must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure',
+          ]),
+        }),
+      }),
     ]));
     expect(findEvalCase(examples, 'product-judgment-naming-only-rejected')).toMatchObject({
       case_type: 'failure',
@@ -1266,7 +1318,7 @@ describe('spec-prd workflow contracts', () => {
     expectEvalCase(examples, 'large-input-ask-owner-priority', {
       tags: ['readiness', 'boundary'],
       expected: [
-        'write_mode=ask-owner-first even for large input when gap is closable by one question',
+        'ask-owner-first means keep grilling the highest-risk branch, not ask one question then stop',
       ],
     });
     expectEvalCase(examples, 'prd-owned-question-nonblocking-ready-rejected', {
@@ -1295,6 +1347,13 @@ describe('spec-prd workflow contracts', () => {
       expected: [
         'design_source_inventory must include explicit input refs, Figma-discoverable nodes, and design-dependent states referenced by requirements',
         'unread design nodes omitted from coverage block readiness',
+      ],
+    });
+    expectEvalCase(examples, 'preflight-grill-design-gate-ready-rejected', {
+      tags: ['readiness', 'design-source', 'preflight'],
+      expected: [
+        'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness',
+        'preflight_sweep_closure missing or blocked prevents ready-for-planning',
       ],
     });
     expectEvalCase(examples, 'structured-input-how-demotion', {
@@ -1410,8 +1469,9 @@ describe('spec-prd workflow contracts', () => {
       tags: ['failure', 'no-fixed-cap'],
       expected: [
         'no fixed owner-question count as the stop condition',
-        'continue one-question-at-a-time only while each question closes or narrows a named gap',
-        'not ready-for-planning until closure',
+        'continue one-question-at-a-time relentlessly by default, walking down each branch',
+        'a branch stops only at a Canonical stop point (leaf, source-resolved, owner-capped, how-pushdown)',
+        'not ready-for-planning until every load-bearing branch reaches a Canonical stop point',
       ],
     });
     expectEvalCase(examples, 'requirements-grill-context-artifact-triggered', {
@@ -1824,6 +1884,30 @@ describe('spec-prd workflow contracts', () => {
     expect(artifact).not.toContain('status: passed');
   });
 
+  test('relentless grill eval artifact records not-run honestly with supersedes and structural-gate limitation', () => {
+    const artifact = read(FRESH_SOURCE_EVAL_RELENTLESS_GRILL_PATH);
+
+    expectContainsAll(artifact, [
+      'fresh_source_eval:',
+      'schema_version: fresh-source-eval-record.v1',
+      'producer: spec-work',
+      'authority_level: advisory',
+      'status: not_run',
+      'supersedes: docs/validation/spec-prd/fresh-source-eval-2026-06-23-grill-first-clarification.md',
+      'skills/spec-prd/SKILL.md',
+      'skills/spec-prd/references/grill-with-docs-integration.md',
+      'skills/spec-prd/references/prd-readiness-lens.md',
+      'runtime_paths_checked: []',
+      'Canonical: 四个合法停点',
+      'owner-capped',
+      'checkpoint-blocked',
+      'STRUCTURAL-GATE-SKIPPABLE',
+      'dispatch_authorization_missing',
+    ]);
+    // 诚实边界:not_run 记录不得谎称语义 dispatch eval 通过
+    expect(artifact).not.toContain('status: passed');
+  });
+
   test('product expert lens eval artifact records dispatched provenance and advisory authority', () => {
     const artifact = read(FRESH_SOURCE_EVAL_PRODUCT_EXPERT_LENS_PATH);
 
@@ -2070,6 +2154,7 @@ describe('spec-prd workflow contracts', () => {
           'write_mode: final-prd',
           'clarification_evidence: asked-owner',
           'can_enter_spec-plan: yes',
+          'preflight_sweep_closure: closed',
           'design_source_coverage: not-needed',
           '',
         ].join('\n'),
@@ -2090,9 +2175,15 @@ describe('spec-prd workflow contracts', () => {
       expect(good.facts.outstanding_questions_count).toBe(1);
       expect(good.facts.planning_recheck_present).toBe(false);
       expect(good.facts.write_mode_declared_valid).toBe(true);
+      expect(good.facts.write_mode).toBe('final-prd');
       expect(good.facts.clarification_evidence_declared_valid).toBe(true);
+      expect(good.facts.clarification_evidence).toBe('asked-owner');
+      expect(good.facts.clarification_trace_present).toBe(true);
       expect(good.facts.can_enter_spec_plan_declared_valid).toBe(true);
+      expect(good.facts.preflight_sweep_closure).toBe('closed');
+      expect(good.facts.preflight_sweep_closure_declared_valid).toBe(true);
       expect(good.facts.design_source_refs_present).toBe(false);
+      expect(good.facts.input_scan_attempted).toBe(false);
       expect(good.findings).toEqual([]);
 
       const badPrd = path.join(tmpDir, 'bad-requirements.md');
@@ -2290,6 +2381,242 @@ describe('spec-prd workflow contracts', () => {
         expect.objectContaining({ reason_code: 'clarification_evidence_undeclared' }),
         expect.objectContaining({ reason_code: 'can_enter_spec_plan_undeclared' }),
       ]));
+
+      const minimalPrd = (readinessLines, extraSections = []) => [
+        '---',
+        'artifact_kind: prd-requirements',
+        '---',
+        '',
+        '## Summary',
+        'A minimal PRD-shaped artifact.',
+        '',
+        '## Change Delta',
+        '| item | current | target | delta | evidence |',
+        '| --- | --- | --- | --- | --- |',
+        '| Import | absent | available | extend | user-stated |',
+        '',
+        '## Requirements',
+        '| id | priority | requirement | rationale/source |',
+        '| --- | --- | --- | --- |',
+        '| R-01 | P0 | Users can import a CSV file. | user-stated |',
+        '',
+        '## Acceptance Examples',
+        'AE-01（对应 R-01）',
+        '',
+        '## Scope Boundaries',
+        'No background scheduling.',
+        '',
+        '## Evidence And Assumptions',
+        '| claim | tag | source / owner | note |',
+        '| --- | --- | --- | --- |',
+        '| CSV import is requested. | user-stated | owner | direct request |',
+        '',
+        ...extraSections,
+        '## Readiness Self-Check',
+        ...readinessLines,
+      ].join('\n');
+
+      const skippedFinalPrd = path.join(tmpDir, 'skipped-final-prd.md');
+      fs.writeFileSync(
+        skippedFinalPrd,
+        minimalPrd([
+          'write_mode: final-prd',
+          'clarification_evidence: skipped',
+          'can_enter_spec-plan: yes',
+          'preflight_sweep_closure: closed',
+        ]),
+        'utf8',
+      );
+      const skippedFinal = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, skippedFinalPrd], { encoding: 'utf8' }));
+      expect(skippedFinal.facts.clarification_evidence_declared_valid).toBe(true);
+      expect(skippedFinal.facts.clarification_trace_present).toBe(false);
+      expect(skippedFinal.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'clarification_trace_absent' }),
+      ]));
+
+      const missingClarificationFinalPrd = path.join(tmpDir, 'missing-clarification-final-prd.md');
+      fs.writeFileSync(
+        missingClarificationFinalPrd,
+        minimalPrd([
+          'write_mode: final-prd',
+          'can_enter_spec-plan: yes',
+          'preflight_sweep_closure: closed',
+        ]),
+        'utf8',
+      );
+      const missingClarificationFinal = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, missingClarificationFinalPrd], { encoding: 'utf8' }));
+      expect(missingClarificationFinal.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'clarification_evidence_undeclared' }),
+        expect.objectContaining({ reason_code: 'clarification_trace_absent' }),
+      ]));
+
+      const checkpointSkippedPrd = path.join(tmpDir, 'checkpoint-skipped-prd.md');
+      fs.writeFileSync(
+        checkpointSkippedPrd,
+        minimalPrd([
+          'write_mode: checkpoint-prd',
+          'clarification_evidence: skipped',
+          'can_enter_spec-plan: no',
+          'preflight_sweep_closure: blocked',
+        ]),
+        'utf8',
+      );
+      const checkpointSkipped = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, checkpointSkippedPrd], { encoding: 'utf8' }));
+      expect(checkpointSkipped.findings.map((finding) => finding.reason_code)).not.toContain('clarification_trace_absent');
+
+      const evadedDeclarationsPrd = path.join(tmpDir, 'evaded-declarations-prd.md');
+      fs.writeFileSync(
+        evadedDeclarationsPrd,
+        [
+          '---',
+          'status: draft',
+          '---',
+          '',
+          '## Summary',
+          'Looks like a PRD but evades artifact_kind and readiness literal triggers.',
+          '',
+          '## Change Delta',
+          '| item | current | target | delta | evidence |',
+          '| --- | --- | --- | --- | --- |',
+          '| Import | absent | available | extend | user-stated |',
+          '',
+          '## Requirements',
+          '| id | priority | requirement | rationale/source |',
+          '| --- | --- | --- | --- |',
+          '| R-01 | P0 | Users can import a CSV file. | user-stated |',
+          '',
+          '## Acceptance Examples',
+          'AE-01（对应 R-01）',
+          '',
+          '## Scope Boundaries',
+          'No background scheduling.',
+          '',
+          '## Evidence And Assumptions',
+          '| claim | tag | source / owner | note |',
+          '| --- | --- | --- | --- |',
+          '| CSV import is requested. | user-stated | owner | direct request |',
+        ].join('\n'),
+        'utf8',
+      );
+      const evadedDeclarations = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, evadedDeclarationsPrd], { encoding: 'utf8' }));
+      expect(evadedDeclarations.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'prd_readiness_declarations_evaded' }),
+      ]));
+
+      const nonPrdShape = path.join(tmpDir, 'non-prd-shape.md');
+      fs.writeFileSync(nonPrdShape, '# Notes\n\nNo requirement ids here.\n', 'utf8');
+      const nonPrdShapeReport = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, nonPrdShape], { encoding: 'utf8' }));
+      expect(nonPrdShapeReport.findings.map((finding) => finding.reason_code)).not.toContain('prd_readiness_declarations_evaded');
+
+      const missingPreflightPrd = path.join(tmpDir, 'missing-preflight-prd.md');
+      fs.writeFileSync(
+        missingPreflightPrd,
+        minimalPrd([
+          'write_mode: final-prd',
+          'clarification_evidence: source-proven-no-ask',
+          'can_enter_spec-plan: yes',
+        ]),
+        'utf8',
+      );
+      const missingPreflight = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, missingPreflightPrd], { encoding: 'utf8' }));
+      expect(missingPreflight.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'preflight_sweep_closure_absent' }),
+      ]));
+
+      const figmaInput = path.join(tmpDir, 'source_docs', 'Figma-市场页设计稿链接.md');
+      fs.mkdirSync(path.dirname(figmaInput), { recursive: true });
+      fs.writeFileSync(figmaInput, 'Figma 114-17842\n', 'utf8');
+
+      const inputDesignUnaccountedPrd = path.join(tmpDir, 'input-design-unaccounted.md');
+      fs.writeFileSync(
+        inputDesignUnaccountedPrd,
+        minimalPrd([
+          'write_mode: final-prd',
+          'clarification_evidence: source-proven-no-ask',
+          'can_enter_spec-plan: yes',
+          'preflight_sweep_closure: closed',
+        ]),
+        'utf8',
+      );
+      const inputDesignUnaccounted = JSON.parse(execFileSync('node', [
+        PRD_ARTIFACT_SCRIPT_PATH,
+        inputDesignUnaccountedPrd,
+        '--inputs',
+        figmaInput,
+      ], { encoding: 'utf8' }));
+      expect(inputDesignUnaccounted.facts.input_scan_attempted).toBe(true);
+      expect(inputDesignUnaccounted.facts.input_design_refs_present).toBe(true);
+      expect(inputDesignUnaccounted.facts.input_refs_used).toEqual([figmaInput]);
+      expect(inputDesignUnaccounted.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'design_source_unaccounted' }),
+      ]));
+
+      const inputDesignAccountedPrd = path.join(tmpDir, 'input-design-accounted.md');
+      fs.writeFileSync(
+        inputDesignAccountedPrd,
+        minimalPrd(
+          [
+            'write_mode: final-prd',
+            'clarification_evidence: source-proven-no-ask',
+            'can_enter_spec-plan: yes',
+            'preflight_sweep_closure: closed',
+          ],
+          [
+            '## Design Source Coverage',
+            'design_source_inventory:',
+            '- source_or_node: Figma 114-17842',
+            '  read_status: degraded',
+            '',
+            'design_sources_read:',
+            '- none',
+            '',
+            'design_sources_unread:',
+            '- Figma 114-17842 -> tool unavailable -> owner accepted degraded coverage',
+            '',
+            'design_source_coverage: degraded status recorded',
+            '',
+          ],
+        ),
+        'utf8',
+      );
+      const inputDesignAccounted = JSON.parse(execFileSync('node', [
+        PRD_ARTIFACT_SCRIPT_PATH,
+        inputDesignAccountedPrd,
+        '--inputs',
+        figmaInput,
+      ], { encoding: 'utf8' }));
+      expect(inputDesignAccounted.findings.map((finding) => finding.reason_code)).not.toContain('design_source_unaccounted');
+
+      const missingInput = path.join(tmpDir, 'missing-input.md');
+      const degradedInput = JSON.parse(execFileSync('node', [
+        PRD_ARTIFACT_SCRIPT_PATH,
+        goodPrd,
+        '--inputs',
+        missingInput,
+      ], { encoding: 'utf8' }));
+      expect(degradedInput.facts.input_scan_attempted).toBe(true);
+      expect(degradedInput.facts.input_scan_degraded).toBe(true);
+      expect(degradedInput.findings).toEqual(expect.arrayContaining([
+        expect.objectContaining({ reason_code: 'input_refs_unavailable' }),
+        expect.objectContaining({ reason_code: 'input_scan_degraded' }),
+      ]));
+
+      const commaInputs = JSON.parse(execFileSync('node', [
+        PRD_ARTIFACT_SCRIPT_PATH,
+        inputDesignUnaccountedPrd,
+        '--inputs',
+        `${missingInput},${figmaInput}`,
+      ], { encoding: 'utf8' }));
+      const repeatedInputs = JSON.parse(execFileSync('node', [
+        PRD_ARTIFACT_SCRIPT_PATH,
+        inputDesignUnaccountedPrd,
+        '--inputs',
+        missingInput,
+        '--inputs',
+        figmaInput,
+      ], { encoding: 'utf8' }));
+      expect(commaInputs.facts.input_refs_used).toEqual(repeatedInputs.facts.input_refs_used);
+      expect(commaInputs.facts.input_design_refs_present).toBe(repeatedInputs.facts.input_design_refs_present);
 
       const figmaWithoutCoverage = path.join(tmpDir, 'figma-without-coverage.md');
       fs.writeFileSync(
@@ -2510,6 +2837,136 @@ describe('spec-prd workflow contracts', () => {
       expect(figmaCovered.findings.map((finding) => finding.reason_code)).not.toContain('design_source_coverage_undeclared');
       expect(figmaCovered.findings.map((finding) => finding.reason_code)).not.toContain('design_sources_read_undeclared');
       expect(figmaCovered.findings.map((finding) => finding.reason_code)).not.toContain('design_sources_unread_undeclared');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  test('Phase 4 is a mandatory checker gate before any planning handoff', () => {
+    const skill = read(SKILL_PATH);
+    expectContainsAll(skill, [
+      'Phase 4 is a mandatory gate, not an optional closeout.',
+      'Self-declaring readiness or recommending planning without an executed checker result',
+      'A handoff that names no checker result has not passed Phase 4.',
+      'anchors core sections on their canonical English token',
+      'node skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>',
+      'Source-path rewrite must project this operational path',
+      'clarification_trace_absent',
+      'design_source_unaccounted',
+      'input_refs_unavailable',
+      'input_scan_degraded',
+      'prd_readiness_declarations_evaded',
+      'preflight_sweep_closure_absent',
+      'input_scan_attempted=false',
+    ]);
+
+    const claudeRendered = getAdapter('claude').transformSkillContent(skill, {
+      skillName: 'spec-prd',
+      isWorkflowSkill: true,
+    });
+    expect(claudeRendered).toContain('node .claude/spec-first/workflows/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>');
+
+    const codexRendered = getAdapter('codex').transformSkillContent(skill, {
+      skillName: 'spec-prd',
+      isWorkflowSkill: true,
+    });
+    expect(codexRendered).toContain('node .agents/skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>');
+
+    const readiness = read(READINESS_PATH);
+    expectContainsAll(readiness, [
+      'is required before this lens can emit `ready-for-planning`, not optional',
+      'an artifact-backed PRD with no executed checker result is itself not ready',
+      're-anchor the heading rather than ignore it',
+      'clarification_trace_absent',
+      'design_source_unaccounted',
+      'input_refs_unavailable',
+      'input_scan_degraded',
+      'prd_readiness_declarations_evaded',
+      'preflight_sweep_closure_absent',
+      'input_scan_attempted=false',
+      'preflight-sweep closure',
+      'owner acceptance',
+    ]);
+
+    const template = read(OUTPUT_TEMPLATE_PATH);
+    expectContainsAll(template, [
+      'Keep the canonical English anchor token in every core-section heading',
+      'Do not freelance a section structure that omits these anchors.',
+    ]);
+  });
+
+  test('PRD artifact checker anchors core sections on canonical token across localized headings', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'prd-artifact-anchor-'));
+    try {
+      // 双语标题保留英文锚点 -> 全部 core section 命中
+      const bilingual = path.join(tmpDir, 'bilingual-requirements.md');
+      fs.writeFileSync(
+        bilingual,
+        [
+          '---',
+          'artifact_kind: prd-requirements',
+          '---',
+          '',
+          '## Summary（文档概要）',
+          'x',
+          '## 一、Change Delta 变更范围',
+          'x',
+          '## Requirements 需求',
+          'x',
+          '## Acceptance Examples 验收',
+          'x',
+          '## Scope Boundaries 范围边界',
+          'x',
+          '## Evidence And Assumptions 证据与假设',
+          'x',
+          '',
+        ].join('\n'),
+        'utf8',
+      );
+      const bi = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, bilingual], { encoding: 'utf8' }));
+      expect(bi.facts.core_sections_missing).toEqual([]);
+
+      // `Non-Functional Requirements` 不得冒充 core `Requirements`
+      const nonFunctional = path.join(tmpDir, 'non-functional.md');
+      fs.writeFileSync(
+        nonFunctional,
+        ['---', 'artifact_kind: prd-requirements', '---', '', '## Summary', 'x', '## Non-Functional Requirements', 'x', ''].join('\n'),
+        'utf8',
+      );
+      const nf = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, nonFunctional], { encoding: 'utf8' }));
+      expect(nf.facts.core_sections_missing).toContain('Requirements');
+
+      // 复现 motivating 故障形态:纯中文标题(无英文锚点)+ 缺 readiness 声明 ->
+      // 闸必须当场拦截,而不是全绿。证明真实根因是"闸没被运行",不是"闸全绿"。
+      const localizedOnly = path.join(tmpDir, 'kaz-shape-requirements.md');
+      fs.writeFileSync(
+        localizedOnly,
+        [
+          '---',
+          'artifact_kind: prd-requirements',
+          '---',
+          '',
+          '## 一、文档概要',
+          'x',
+          '## 三、范围（Scope）',
+          'x',
+          '## 五、通用需求',
+          '| id | priority | requirement | source |',
+          '| --- | --- | --- | --- |',
+          '| R-01 | P0 | 游客可见行情 | user-stated |',
+          '',
+          '## 十二、待澄清问题',
+          'x',
+          '',
+        ].join('\n'),
+        'utf8',
+      );
+      const kaz = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, localizedOnly], { encoding: 'utf8' }));
+      const kazCodes = kaz.findings.map((finding) => finding.reason_code);
+      expect(kazCodes).toContain('core_section_missing');
+      expect(kazCodes).toContain('write_mode_undeclared');
+      expect(kazCodes).toContain('clarification_evidence_undeclared');
+      expect(kaz.findings.length).toBeGreaterThan(0);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }

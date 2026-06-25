@@ -42,7 +42,7 @@ Choose the standard PRD output shape after source-first grilling has either clos
 | Shape | Use when | Default content |
 | --- | --- | --- |
 | `bypass` | The request is a clear bugfix, tiny script/docs edit, or implementation-ready task where PRD authoring adds no durable WHAT value. | No PRD artifact; provide an explicit plan/work/debug handoff reason. |
-| `compact-prd` | A source-resolved brownfield increment needs durable WHAT trace but no owner interview, broad surface, or topology risk. | Standard core sections with source evidence, acceptance, scope, and assumptions sufficient for planning. |
+| `compact-prd` | Every relevant branch is already source-resolved (Canonical stop 2) so no owner interview is needed, and there is no broad surface or topology risk. Relentless grilling is still the default — compact is the shape that source evidence earned, not a shortcut past clarification. | Standard core sections with source evidence, acceptance, scope, and assumptions sufficient for planning. |
 | `normal-prd` | An ordinary product/system increment needs planning-ready requirements, acceptance, and scope. | Core sections plus triggered surface/domain sections. |
 | `topology-heavy-prd` | Workflow, contract, migration, replace, remove, source-of-truth, or mixed-surface changes could leave active surfaces or consumers ambiguous. | Core sections plus topology, surface map, producer/consumer, source-of-truth, negative acceptance, and decision notes as needed. |
 
@@ -60,6 +60,8 @@ Every PRD artifact includes the standard core sections unless it is a route-out/
 - `## Evidence And Assumptions`
 
 Compact PRDs may omit non-load-bearing conditional detail, but they still need enough evidence, acceptance, and scope boundary for planning. Bypass output writes no PRD artifact.
+
+Keep the canonical English anchor token in every core-section heading even when writing a localized PRD: the deterministic `check-prd-artifact.js` matches each heading on that token. A localized gloss is fine when it follows the anchor — `## Summary（文档概要）` or `## Change Delta 变更范围` both anchor — but a heading that drops the English token (for example `## 一、文档概要`) reports `core_section_missing` and blocks readiness. Do not freelance a section structure that omits these anchors.
 
 ## Conditional Sections
 
@@ -223,10 +225,13 @@ design_sources_unread:
 
 design_source_coverage: <read/unread/status summary>
 
+Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source.
+
 ## Readiness Self-Check
 
 write_mode:
 clarification_evidence:
+preflight_sweep_closure: closed | degraded | blocked | missing
 design_source_coverage:
 first_unclosed_owner_question:
 recommended default:
@@ -298,7 +303,7 @@ Large-input Map-Reduce results must enter final PRD rewrite through the same sec
 
 For oversized, multi-source, long-chain, or resume-risk runs, `large-input-checkpoint.md` may write reduced candidates earlier as PRD checkpoints. Ordinary short PRDs still wait until closure before durable write-in. Checkpoint content uses existing sections and source refs; it never creates a transcript or progress schema.
 
-When the run uses `checkpoint-prd`, write it as a recovery checkpoint, not a final PRD. A checkpoint-prd must include `can_enter_spec-plan: no`, `next_owner_question`, open owner/source gaps, and `write_mode=checkpoint-prd` in `Readiness Self-Check` or closeout. It is not a final PRD and must not be presented as planning-ready.
+When the run uses `checkpoint-prd`, write it as a recovery checkpoint, not a final PRD. A checkpoint-prd must include `can_enter_spec-plan: no`, `next_owner_question`, open owner/source gaps, and `write_mode=checkpoint-prd` in `Readiness Self-Check` or closeout. It is not a final PRD and must not be presented as planning-ready. The relentless fallback uses this shape: when the owner gives no cap/continue signal — whether absent/headless or silent after a soft-cap offer (the observable signal is the same) — stop here with `pre_prd_clarification_status=checkpoint-blocked` rather than silently emitting `ready-for-planning`.
 
 ## P0 PRD Quality Packs
 
@@ -431,7 +436,7 @@ Every PRD handoff should report:
 - feature items without acceptance examples
 - current-state claims without confirmed evidence
 
-When a PRD artifact path exists, seed deterministic counts and trace facts from `scripts/check-prd-artifact.js <prd-path>` before adding LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT.
+When a PRD artifact path exists, seed deterministic counts and trace facts from `skills/spec-prd/scripts/check-prd-artifact.js <prd-path> --inputs <input-path>` before adding LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Preflight Sweep closed, degraded, blocked, or is missing; this is a lightweight declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
 
 The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, and feature-to-R/AE trace gaps. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
 
