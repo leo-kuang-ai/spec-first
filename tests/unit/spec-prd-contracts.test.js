@@ -2198,9 +2198,14 @@ describe('spec-prd workflow contracts', () => {
           '| Failed-row feedback is desired. | assumption | owner | needs confirmation |',
           '',
           '## Outstanding Questions',
-          '| question | blocks planning? | recommended default | owner |',
-          '| --- | --- | --- | --- |',
-          '| Should failed-row feedback show row numbers? | no | show row count only | owner |',
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-1 | Should failed-row feedback show row numbers? | Acceptance Examples | no | owner-answered | no | closed | show row count only |',
+          '',
+          '## Owner Decision Trace',
+          '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+          '| --- | --- | --- | --- | --- | --- |',
+          '| Should failed-row feedback show row numbers? | owner | show row count only | Acceptance Examples | AE-02 covers count-only | closed |',
           '',
           '## Readiness Self-Check',
           'write_mode: final-prd',
@@ -3029,6 +3034,170 @@ describe('spec-prd workflow contracts', () => {
       expect(kazCodes).toContain('write_mode_undeclared');
       expect(kazCodes).toContain('clarification_evidence_undeclared');
       expect(kaz.findings.length).toBeGreaterThan(0);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+
+  // 004 closure-contract:剃刀 + how-pushdown 后门 + source ref 形似 + design + inputs-hash。
+  it('enforces the closure-disposition razor and its blockers', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'prd-closure-contract-'));
+    const run = (file) => JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, file], { encoding: 'utf8' }));
+    const codes = (r) => r.facts.blocking_reason_codes;
+
+    // 构造一个 ready-claiming PRD 骨架,只替换 OQ + trace 段。
+    const buildPrd = ({ oq, trace, designCoverage }) => [
+      '---',
+      'spec_id: 2026-06-25-900-razor',
+      'artifact_kind: prd-requirements',
+      'status: ready-for-planning',
+      '---',
+      '',
+      '## Summary',
+      'Anchored brownfield increment.',
+      '## Change Delta',
+      '| item | current | target | delta | evidence |',
+      '| --- | --- | --- | --- | --- |',
+      '| x | a | b | extend | user-stated |',
+      '## Requirements',
+      '| id | priority | requirement | rationale/source |',
+      '| --- | --- | --- | --- |',
+      '| R-01 | P0 | Observable behavior | user-stated |',
+      '## Acceptance Examples',
+      'AE-01（对应 R-01）Given x When y Then z',
+      '## Scope Boundaries',
+      '### In Scope',
+      '### Out Of Scope',
+      '## Evidence And Assumptions',
+      '| claim | tag | source / owner | note |',
+      '| --- | --- | --- | --- |',
+      '| c | user-stated | owner | n |',
+      '## Outstanding Questions',
+      ...oq,
+      ...(trace || []),
+      '## Readiness Self-Check',
+      'write_mode: final-prd',
+      'clarification_evidence: asked-owner',
+      'can_enter_spec-plan: yes',
+      'preflight_sweep_closure: closed',
+      `design_source_coverage: ${designCoverage || 'not-needed'}`,
+      '',
+    ].join('\n');
+
+    try {
+      // 1) 19:07 形态:非阻塞 load-bearing OQ,无合法 disposition -> open_oq_without_owner_closure
+      const shape1907 = path.join(tmpDir, 'a-requirements.md');
+      fs.writeFileSync(shape1907, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-2 | 中台持仓接口是否可用 | Requirements | no |  | no | closed | 本期降级隐藏 |',
+        ],
+      }), 'utf8');
+      expect(codes(run(shape1907))).toContain('open_oq_without_owner_closure');
+
+      // 2) 同一 OQ 用 owner-answered + 有效 trace -> 清除该 blocker
+      const owned = path.join(tmpDir, 'b-requirements.md');
+      fs.writeFileSync(owned, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-2 | 中台持仓接口是否可用 | Requirements | no | owner-answered | no | closed | 本期降级隐藏 |',
+        ],
+        trace: [
+          '## Owner Decision Trace',
+          '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+          '| --- | --- | --- | --- | --- | --- |',
+          '| 中台持仓接口是否可用 | owner | 本期降级隐藏 | Requirements | R-01 covers degrade | closed |',
+        ],
+      }), 'utf8');
+      expect(codes(run(owned))).not.toContain('open_oq_without_owner_closure');
+
+      // 3) how-pushdown 后门:命中 WHAT 词表 + claims-ready -> how_pushdown_touches_what(blocking)
+      const pushdown = path.join(tmpDir, 'c-requirements.md');
+      fs.writeFileSync(pushdown, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-4 | 行情权限 availability 如何取 | Requirements | no | implementation-only-how-pushdown | no | closed | 实现期定 |',
+        ],
+      }), 'utf8');
+      expect(codes(run(pushdown))).toContain('how_pushdown_touches_what');
+
+      // 4) source-resolved 证据形似:vague prose -> 仍 block;checkable ref -> 清除
+      const vague = path.join(tmpDir, 'd-requirements.md');
+      fs.writeFileSync(vague, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-5 | 模块枚举本期范围 | 见文档 | no | source-resolved | no | closed | 已确认 |',
+        ],
+      }), 'utf8');
+      expect(codes(run(vague))).toContain('open_oq_without_owner_closure');
+
+      const refOk = path.join(tmpDir, 'e-requirements.md');
+      fs.writeFileSync(refOk, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-5 | 模块枚举本期范围 | docs/contracts/enum.md:12 | no | source-resolved | no | closed | docs/contracts/enum.md:12 |',
+        ],
+      }), 'utf8');
+      expect(codes(run(refOk))).not.toContain('open_oq_without_owner_closure');
+
+      // 4b) 散文式 'word/word'(and/or、input/output)不算 checkable ref,仍 block
+      const proseSlash = path.join(tmpDir, 'e2-requirements.md');
+      fs.writeFileSync(proseSlash, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-5 | scope of module | handled case-by-case | no | source-resolved | no | closed | per existing and/or default |',
+        ],
+      }), 'utf8');
+      expect(codes(run(proseSlash))).toContain('open_oq_without_owner_closure');
+
+      // 5) checkpoint 带 residue 不被 ready blocker 误伤(非 claims-ready)
+      const checkpoint = path.join(tmpDir, 'f-requirements.md');
+      fs.writeFileSync(checkpoint, [
+        '---', 'spec_id: 2026-06-25-901-cp', 'artifact_kind: prd-requirements', 'status: draft', '---', '',
+        '## Summary', 'x', '## Change Delta', '| item | current | target | delta | evidence |', '| --- | --- | --- | --- | --- |', '| x | a | b | extend | user-stated |',
+        '## Requirements', '| id | priority | requirement | rationale/source |', '| --- | --- | --- | --- |', '| R-01 | P0 | b | user-stated |',
+        '## Acceptance Examples', 'AE-01（对应 R-01）Given x When y Then z',
+        '## Scope Boundaries', '### In Scope', '### Out Of Scope',
+        '## Evidence And Assumptions', '| claim | tag | source / owner | note |', '| --- | --- | --- | --- |', '| c | user-stated | owner | n |',
+        '## Outstanding Questions',
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-2 | 中台持仓接口 | Requirements | yes |  | yes | unclosed | 待定 |',
+        '## Readiness Self-Check',
+        'write_mode: checkpoint-prd', 'clarification_evidence: asked-owner', 'can_enter_spec-plan: no', 'preflight_sweep_closure: blocked', 'design_source_coverage: not-needed', '',
+      ].join('\n'), 'utf8');
+      const cp = run(checkpoint);
+      expect(cp.facts.blocking_outstanding_question_count).toBeGreaterThanOrEqual(0);
+      expect(codes(cp)).not.toContain('open_oq_without_owner_closure');
+      expect(codes(cp)).not.toContain('blocking_outstanding_question_present');
+      expect(codes(cp)).not.toContain('checkpoint_claims_ready');
+
+      // 6) design partial + unread 非空 + 无 owner acceptance -> 两个 design blocker
+      const designBad = path.join(tmpDir, 'g-requirements.md');
+      fs.writeFileSync(designBad, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+        ],
+        designCoverage: 'visual-read=partial',
+      }).replace('## Readiness Self-Check', 'design_sources_unread:\n- node-123 设计稿未读\n## Readiness Self-Check'), 'utf8');
+      const dCodes = codes(run(designBad));
+      expect(dCodes).toContain('design_partial_coverage_unaccepted');
+      expect(dCodes).toContain('design_unread_without_owner_acceptance');
+
+      // 7) inputs-hash 相对/绝对路径一致
+      const inputFile = path.join(tmpDir, 'input.md');
+      fs.writeFileSync(inputFile, 'design figma node-id=1-2', 'utf8');
+      const absRun = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, owned, '--inputs', inputFile], { encoding: 'utf8' }));
+      const relRun = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, owned, '--inputs', path.relative(process.cwd(), inputFile)], { encoding: 'utf8', cwd: process.cwd() }));
+      expect(absRun.facts.ready_receipt_inputs_hash).toBe(relRun.facts.ready_receipt_inputs_hash);
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }

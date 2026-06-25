@@ -444,3 +444,15 @@ PRD rewrite 后再判断是否可以进入 planning：
 - 术语或决策可沉淀时：先 PRD-local closure，再 preview-first 提出 context/ADR promotion。
 
 这套流程的价值是让需求文档先“变硬”：证据来源、术语、场景、冲突、假设和决策后果都进入 PRD，再交给 planning 和实现。它提升的不是单个 PRD 的字数，而是后续研发链路的输入质量。
+
+## Closure-disposition 剃刀(用户可见行为)
+
+从 004 起,`$spec-prd` 的 ready 判定用一把剃刀:**任一未决问题(Outstanding Question)默认不算 ready**,只有显式声明一个合法 `closure_disposition` 并附证据才算非阻塞:
+
+- `source-resolved` / `source-backed-non-WHAT-assumption`:附可核查引用(仓库路径、URL、`file:line` 或锚点);
+- `owner-answered` / `owner-capped` / `owner-accepted-assumption`:在 Owner Decision Trace 里有对应行;
+- `implementation-only-how-pushdown`:声明 `planning_would_invent_what=no`,且不触及接口可用性/权限/范围/数据权威/降级显示/埋点(否则在 ready PRD 中视为矛盾被阻断)。
+
+“我判断它是规划期并行项”不是合法 disposition——这正是过去把未确认接口/权限问题自降级为非阻塞却从未问 owner 的失败形态。`blocks_planning=no` 必须由合法 disposition 派生,没有“随手判非阻塞”的自由。
+
+实操:先 source-first 把能查的查掉,把不可约的 owner 决策攒到最后一次性做成决策就绪 Brief(决策 | 推荐答案 | 影响的写入目标 | 不答会让规划发明什么)再问 owner;owner 不在场/headless 时只能停在 `checkpoint-prd`,不能自行标 ready。脚本只做确定性结构检查(token 与证据格是否在),不替你判断问题是否重要——语义仍由你和 owner 承担。

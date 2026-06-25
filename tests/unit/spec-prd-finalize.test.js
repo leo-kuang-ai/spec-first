@@ -145,4 +145,82 @@ date: 2026-06-25
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
+
+  // 004:checkpoint-closeout 拆分。合法 checkpoint 是 non-ready 但允许 closeout(exit 0);
+  // 自称 ready 的 checkpoint 是矛盾,必须阻断。
+  test('valid checkpoint can close out (can_finalize=false but should_block_closeout=false)', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'checkpoint-requirements.md');
+    try {
+      write(prdPath, `---
+artifact_kind: prd-requirements
+spec_id: cp-fixture
+title: Checkpoint Fixture
+date: 2026-06-25
+status: draft
+---
+
+# Checkpoint Fixture
+
+## Summary
+未闭合的 checkpoint。
+
+## Change Delta
+extend。
+
+## Requirements
+| id | priority | requirement | rationale/source |
+| --- | --- | --- | --- |
+| R-01 | P0 | b | user-stated |
+
+## Acceptance Examples
+AE-01（对应 R-01）Given x When y Then z
+
+## Scope Boundaries
+### In Scope
+### Out Of Scope
+
+## Evidence And Assumptions
+| claim | tag | source / owner | note |
+| --- | --- | --- | --- |
+| c | user-stated | owner | n |
+
+## Outstanding Questions
+| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| OQ-2 | 中台持仓接口 | Requirements | yes |  | yes | unclosed | 待定 |
+
+## Readiness Self-Check
+- write_mode: checkpoint-prd
+- clarification_evidence: asked-owner
+- can_enter_spec_plan: no
+- preflight_sweep_closure: blocked
+`);
+      const receipt = finalizePrd(prdPath, [], { checkOnly: true });
+      expect(receipt.can_finalize).toBe(false);
+      expect(receipt.should_block_closeout).toBe(false);
+      expect(receipt.can_closeout).toBe(true);
+      expect(receipt.status).toBe('checkpoint-closeout');
+      // checkpoint check-only 不写 ready receipt
+      expect(fs.readFileSync(prdPath, 'utf8')).not.toContain('readiness_verified_by');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('checkpoint that claims ready is blocked (checkpoint_claims_ready)', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'cp-claims-ready-requirements.md');
+    try {
+      write(prdPath, validReadyIntentPrd('status: ready-for-planning\n').replace(
+        '- write_mode: final-prd',
+        '- write_mode: checkpoint-prd',
+      ));
+      const receipt = finalizePrd(prdPath, [], { checkOnly: true });
+      expect(receipt.should_block_closeout).toBe(true);
+      expect(receipt.blocking_reason_codes).toContain('checkpoint_claims_ready');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
 });

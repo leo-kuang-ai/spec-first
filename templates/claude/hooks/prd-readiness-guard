@@ -36,8 +36,7 @@ const blocked = [];
 for (const relativePrdPath of prdPaths) {
   const absolutePrdPath = path.join(projectDir, relativePrdPath);
   const inputs = extractSourceInputs(absolutePrdPath)
-    .map((inputPath) => path.join(projectDir, inputPath))
-    .filter((inputPath) => fs.existsSync(inputPath));
+    .map((inputPath) => (path.isAbsolute(inputPath) ? inputPath : path.join(projectDir, inputPath)));
   const args = [finalizeScript, absolutePrdPath, '--check-only'];
   if (inputs.length > 0) {
     args.push('--inputs', inputs.join(','));

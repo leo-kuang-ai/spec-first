@@ -42,7 +42,73 @@ const BLOCKING_REASON_CODES = new Set([
   'ready_receipt_absent',
   'ready_receipt_stale',
   'finalize_required',
+  // 004 closure-contract:剃刀与 closure 矛盾类 blocker(只在 artifact 自称 ready/final 时生效)
+  'open_oq_without_owner_closure',
+  'how_pushdown_touches_what',
+  'owner_decision_trace_required_but_absent',
+  'design_unread_without_owner_acceptance',
+  'design_partial_coverage_unaccepted',
+  'preflight_closure_contradicted',
+  'checkpoint_claims_ready',
 ]);
+
+// 004:Outstanding Questions 表的 header-aware 解析。只认下面这张冻结的最小别名表;
+// 扩展别名必须先加 fixture。canonical key -> 允许的 header 文本(小写匹配)。
+const OQ_HEADER_ALIASES = {
+  id: ['id', '编号'],
+  question: ['question', '问题'],
+  prd_write_target: ['prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
+  owner_status: ['owner_status', 'owner status', 'owner状态', '澄清状态'],
+  blocks_planning: ['blocks_planning', 'blocks planning?', 'blocks planning', '是否阻塞规划', '阻塞规划'],
+  closure_disposition: ['closure_disposition', 'disposition', 'closure disposition', '闭合方式', '闭合依据'],
+  planning_would_invent_what: ['planning_would_invent_what', 'planning would invent what?', 'planning would invent what', '是否会发明what', '会否发明what'],
+  closure_state: ['closure_state', 'closure state', '闭合状态'],
+  recommended_default: ['recommended_default', 'recommended default', 'deferred_reason', 'deferred reason', '推荐默认', '延后原因', '默认/延后原因'],
+};
+
+const TRACE_HEADER_ALIASES = {
+  question: ['question', '问题'],
+  owner_answer: ['owner_answer', 'owner answer', 'owner_answer/source', 'owner回答', '回答/来源'],
+  chosen_answer: ['chosen_answer', 'chosen answer', '采纳答案', '最终答案'],
+  prd_write_target: ['prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
+  consequence: ['consequence', 'readiness consequence', '影响', '后果'],
+  closure_state: ['closure_state', 'closure state', '闭合状态'],
+};
+
+// 合法 closure disposition(剃刀的唯一出口)。源类需要形似引用证据,owner 类需要 trace row。
+const LEGAL_DISPOSITIONS = new Set([
+  'source-resolved',
+  'owner-answered',
+  'owner-capped',
+  'owner-accepted-assumption',
+  'source-backed-non-what-assumption',
+  'implementation-only-how-pushdown',
+]);
+const SOURCE_DISPOSITIONS = new Set(['source-resolved', 'source-backed-non-what-assumption']);
+const OWNER_DISPOSITIONS = new Set(['owner-answered', 'owner-capped', 'owner-accepted-assumption']);
+
+// how-pushdown 误分类词表(冻结契约,扩展须加 fixture):命中且 claims-ready 即三重合取矛盾。
+const WHAT_TOUCHING_KEYWORDS = [
+  'interface', '接口', 'availability', '可用性', 'permission', '权限',
+  'scope', '范围', 'source-of-truth', '数据权威', 'fallback', '降级',
+  'analytics', '埋点', '指标',
+];
+
+// source 类 disposition 的证据 cell 须形似可核查引用:URL / 带扩展名的文件路径 / file:line /
+// 多段路径 / 锚点 id。按 whitespace 切 token 后逐个判,避免散文里的 `and/or`、`input/output`、
+// `n/a` 这类带斜杠词被误判为 ref(那是上一轮 source-ref-shape fix 想堵的廉价伪造)。
+function looksLikeCheckableRef(text) {
+  if (!text) return false;
+  const tokens = String(text).trim().split(/\s+/).filter(Boolean);
+  return tokens.some((tok) => {
+    if (/^https?:\/\/\S+/i.test(tok)) return true; // URL
+    if (/[\w-]+\.[a-z0-9]+(?::\d+)?$/i.test(tok)) return true; // file.ext 或 file.ext:line
+    if (/^#[\w-]+$/.test(tok)) return true; // 锚点 id
+    // 多段路径(>=2 个斜杠,如 src/cli/foo);单斜杠的散文词(and/or)不算
+    if ((tok.match(/\//g) || []).length >= 2) return true;
+    return false;
+  });
+}
 
 const MACHINE_READY_FIELDS = new Set([
   'status',
@@ -147,10 +213,11 @@ function computeInputsHash(inputPaths) {
 
   const entries = inputPaths.map((inputPath) => {
     const resolved = path.resolve(inputPath);
+    // 004:用 resolved 绝对路径作为身份(相对/绝对调用产生同一 hash),内容缺失时回退 resolved。
     try {
-      return `${inputPath}\n${sha256(fs.readFileSync(resolved, 'utf8'))}`;
+      return `${resolved}\n${sha256(fs.readFileSync(resolved, 'utf8'))}`;
     } catch (err) {
-      return `${inputPath}\nmissing`;
+      return `${resolved}\nmissing`;
     }
   });
   return sha256(entries.join('\n'));
@@ -256,6 +323,169 @@ function countSectionRows(lines, headings, title) {
   return section ? tableRows(section.text).length : 0;
 }
 
+// 004:把 Markdown 表按表头别名解析成 {key: value} 行。返回 { headerMap, rows }。
+// headerMap: canonical key -> 列下标;rows: 每行是 canonical key -> cell 文本。
+// 未识别的表头被忽略;识别不到任何 canonical 列时 headerMap 为空。
+function parseHeaderedTable(text, aliasTable) {
+  const rawLines = splitLines(text).filter((line) => {
+    const t = line.trim();
+    return t.startsWith('|') && t.endsWith('|');
+  });
+  if (rawLines.length === 0) return { headerMap: {}, rows: [] };
+
+  const toCells = (line) => line.trim().slice(1, -1).split('|').map((c) => c.trim());
+  const headerCells = toCells(rawLines[0]);
+  const headerMap = {};
+  headerCells.forEach((cell, index) => {
+    const norm = cell.toLowerCase().trim();
+    for (const [key, aliases] of Object.entries(aliasTable)) {
+      if (aliases.includes(norm)) {
+        if (!(key in headerMap)) headerMap[key] = index;
+        break;
+      }
+    }
+  });
+
+  const rows = [];
+  for (let i = 1; i < rawLines.length; i += 1) {
+    const cells = toCells(rawLines[i]);
+    if (isTableSeparator(cells)) continue;
+    const row = {};
+    for (const [key, idx] of Object.entries(headerMap)) {
+      row[key] = (cells[idx] || '').trim();
+    }
+    rows.push(row);
+  }
+  return { headerMap, rows };
+}
+
+function normalizeBool(value) {
+  const v = String(value || '').toLowerCase().trim();
+  if (['yes', 'true', 'y', '是'].includes(v)) return true;
+  if (['no', 'false', 'n', '否'].includes(v)) return false;
+  return null;
+}
+
+// 空值归一:none/无/空/n-a/[]/占位 都视为空。
+function isEmptyish(value) {
+  const v = String(value || '').toLowerCase().trim();
+  if (!v) return true;
+  return ['none', 'no', '无', '空', 'n/a', 'na', 'not-needed', 'not applicable', '[]', '-'].includes(v)
+    || /^<.*>$/.test(v);
+}
+
+// 解析 Owner Decision Trace:返回带 chosen_answer + write target 的非空 row 数。
+function parseOwnerDecisionTrace(lines, headings) {
+  const section = sectionRange(lines, headings, 'Owner Decision Trace')
+    || sectionRange(lines, headings, 'Decision Notes');
+  if (!section) return { present: false, validRows: 0, rows: [] };
+  const { headerMap, rows } = parseHeaderedTable(section.text, TRACE_HEADER_ALIASES);
+  if (Object.keys(headerMap).length === 0) return { present: true, validRows: 0, rows: [] };
+  const validRows = rows.filter((row) => (
+    !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target)
+  ));
+  return { present: true, validRows: validRows.length, rows };
+}
+
+// 004:Outstanding Questions 的剃刀分析。claimsReady 决定矛盾类是否升级为 blocker。
+// 返回 facts + 触发的 reason_codes(blocker 与 advisory 混在一起,由调用方按 BLOCKING set 过滤)。
+function analyzeOutstandingQuestions(lines, headings, options) {
+  const claimsReady = Boolean(options.claimsReady);
+  const ownerTrace = parseOwnerDecisionTrace(lines, headings);
+  const facts = {
+    outstanding_question_closure_contract_present: false,
+    outstanding_question_rows: 0,
+    outstanding_question_missing_closure_count: 0,
+    blocking_outstanding_question_count: 0,
+    planning_invention_question_count: 0,
+    unclosed_owner_question_count: 0,
+    open_oq_without_owner_closure_count: 0,
+    how_pushdown_touches_what_count: 0,
+    possible_misclassified_how_pushdown_count: 0,
+    owner_decision_trace_present: ownerTrace.present && ownerTrace.validRows > 0,
+  };
+  const reasonCodes = new Set();
+
+  const section = sectionRange(lines, headings, 'Outstanding Questions');
+  if (!section) {
+    return { facts, reasonCodes: [...reasonCodes] };
+  }
+  const { headerMap, rows } = parseHeaderedTable(section.text, OQ_HEADER_ALIASES);
+  facts.outstanding_question_rows = rows.length;
+
+  // closure contract 是否齐备:必须能识别到 blocks_planning / closure_disposition / closure_state
+  const hasClosureContract = ['blocks_planning', 'closure_disposition', 'closure_state']
+    .every((k) => k in headerMap);
+  facts.outstanding_question_closure_contract_present = hasClosureContract;
+  if (rows.length > 0 && !hasClosureContract && claimsReady) {
+    reasonCodes.add('outstanding_question_closure_undeclared');
+  }
+
+  rows.forEach((row) => {
+    const blocks = normalizeBool(row.blocks_planning);
+    const invents = normalizeBool(row.planning_would_invent_what);
+    const closure = String(row.closure_state || '').toLowerCase().trim();
+    const disposition = String(row.closure_disposition || '').toLowerCase().trim();
+    const isNonBlocking = blocks === false || closure === 'closed';
+    const text = `${row.question || ''} ${row.prd_write_target || ''}`.toLowerCase();
+    const hitsWhat = WHAT_TOUCHING_KEYWORDS.some((kw) => text.includes(kw));
+
+    // 缺必填声明
+    if (hasClosureContract && (blocks === null || isEmptyish(row.closure_disposition))) {
+      facts.outstanding_question_missing_closure_count += 1;
+    }
+    // 显式 blocking / 会发明 WHAT / 未闭合
+    if (blocks === true) {
+      facts.blocking_outstanding_question_count += 1;
+      if (claimsReady) reasonCodes.add('blocking_outstanding_question_present');
+    }
+    if (invents === true) {
+      facts.planning_invention_question_count += 1;
+      if (claimsReady) reasonCodes.add('planning_invention_question_present');
+    }
+    if (['unclosed', 'blocker', 'unknown', 'headless-degraded'].includes(closure)) {
+      facts.unclosed_owner_question_count += 1;
+      if (claimsReady) reasonCodes.add('unclosed_owner_question_present');
+    }
+
+    // 剃刀:非阻塞 open OQ 必须带合法 disposition + 证据
+    if (isNonBlocking) {
+      let dispositionOk = LEGAL_DISPOSITIONS.has(disposition);
+      if (dispositionOk && SOURCE_DISPOSITIONS.has(disposition)) {
+        // 源类需要形似引用证据(write target / recommended_default 任一形似 ref,或 trace 命中)
+        const refCandidate = `${row.prd_write_target || ''} ${row.recommended_default || ''}`;
+        dispositionOk = looksLikeCheckableRef(refCandidate);
+      }
+      if (dispositionOk && OWNER_DISPOSITIONS.has(disposition)) {
+        // owner 类需要至少一条有效 owner trace row
+        dispositionOk = ownerTrace.validRows > 0;
+      }
+      if (!dispositionOk) {
+        facts.open_oq_without_owner_closure_count += 1;
+        if (claimsReady) reasonCodes.add('open_oq_without_owner_closure');
+      }
+      // how-pushdown 残余旋钮:命中 WHAT 词表
+      if (disposition === 'implementation-only-how-pushdown' && hitsWhat) {
+        if (claimsReady) {
+          facts.how_pushdown_touches_what_count += 1;
+          reasonCodes.add('how_pushdown_touches_what');
+        } else {
+          facts.possible_misclassified_how_pushdown_count += 1;
+        }
+      }
+    }
+  });
+
+  // asked-owner / answered|capped 依赖 owner answer 时必须有 trace
+  const needTrace = options.clarificationAskedOwner
+    || rows.some((r) => ['answered', 'capped'].includes(String(r.owner_status || '').toLowerCase().trim()));
+  if (needTrace && !(ownerTrace.present && ownerTrace.validRows > 0)) {
+    if (claimsReady) reasonCodes.add('owner_decision_trace_required_but_absent');
+  }
+
+  return { facts, reasonCodes: [...reasonCodes] };
+}
+
 function sectionPresent(lines, headings, title) {
   return Boolean(sectionRange(lines, headings, title));
 }
@@ -356,6 +586,47 @@ function detectDesignSourcesRead(text) {
 
 function detectDesignSourcesUnread(text) {
   return hasConcreteFieldBlock(text, 'design_sources_unread');
+}
+
+// 004:design_sources_unread 经空值归一后是否仍非空(none/无/空 不算)。
+function designUnreadNonEmpty(text) {
+  const lines = splitLines(stripFencedCode(text));
+  const fieldRegex = /^\s*(?:[-*]\s*)?design_sources_unread\s*:\s*(.*)$/i;
+  for (let i = 0; i < lines.length; i += 1) {
+    const match = lines[i].match(fieldRegex);
+    if (!match) continue;
+    const inline = match[1].trim();
+    if (inline) return !isEmptyish(inline);
+    // 多行 list 形式:看下一非空行是否为实质 list item
+    for (let j = i + 1; j < lines.length; j += 1) {
+      const t = lines[j].trim();
+      if (!t) continue;
+      if (/^#{1,6}\s/.test(t)) break;
+      if (/^[A-Za-z_][\w-]*\s*:/.test(t)) break;
+      if (/^[-*]\s+\S/.test(t)) return !isEmptyish(t.replace(/^[-*]\s+/, ''));
+      break;
+    }
+    return false;
+  }
+  return false;
+}
+
+// 004:design_source_coverage 是否声明 partial/degraded。
+function designCoveragePartial(text) {
+  const body = stripFencedCode(text);
+  return splitLines(body).some((line) => {
+    if (!/^\s*(?:[-*]\s*)?design_source_coverage\s*:/i.test(line)) return false;
+    return /\b(partial|degraded)\b/i.test(line) || /visual-read\s*=\s*partial/i.test(line);
+  });
+}
+
+// 004:owner 是否明确接受了 degraded/unread design 风险。
+function designDegradedOwnerAccepted(text) {
+  const body = stripFencedCode(text);
+  return splitLines(body).some((line) => {
+    if (!/(design_degraded_owner_acceptance|owner\s*acceptance|设计降级owner接受|owner接受降级)/i.test(line)) return false;
+    return normalizeBool(line.slice(line.indexOf(':') + 1)) === true;
+  });
 }
 
 function countAssumptionRows(lines, headings) {
@@ -554,6 +825,41 @@ function buildReport(target, text, options = {}) {
     findings.push({ reason_code: 'ready_receipt_stale' });
   }
 
+  // 004 closure-contract:剃刀 + closure 矛盾分析。
+  const writeModeIsCheckpoint = writeModeValue === 'checkpoint-prd';
+  const oqAnalysis = analyzeOutstandingQuestions(lines, headings, {
+    claimsReady,
+    clarificationAskedOwner: clarificationEvidenceValue === 'asked-owner',
+  });
+  oqAnalysis.reasonCodes.forEach((reason_code) => findings.push({ reason_code }));
+
+  // design unread / partial 未被 owner 接受
+  const designUnread = designUnreadNonEmpty(text);
+  const designPartial = designCoveragePartial(text);
+  const designAccepted = designDegradedOwnerAccepted(text);
+  if (claimsReady && designUnread && !designAccepted) {
+    findings.push({ reason_code: 'design_unread_without_owner_acceptance' });
+  }
+  if (claimsReady && designPartial && !designAccepted) {
+    findings.push({ reason_code: 'design_partial_coverage_unaccepted' });
+  }
+
+  // checkpoint 自称 ready 是矛盾
+  if (writeModeIsCheckpoint && claimsReady) {
+    findings.push({ reason_code: 'checkpoint_claims_ready' });
+  }
+
+  // preflight_sweep_closure=closed 却仍有 closure blocker = 自相矛盾
+  const closureBlockerPresent = findings.some((f) => (
+    ['open_oq_without_owner_closure', 'how_pushdown_touches_what', 'blocking_outstanding_question_present',
+      'planning_invention_question_present', 'unclosed_owner_question_present',
+      'owner_decision_trace_required_but_absent', 'design_unread_without_owner_acceptance',
+      'design_partial_coverage_unaccepted'].includes(f.reason_code)
+  ));
+  if (preflightSweepClosureValue === 'closed' && closureBlockerPresent && claimsReady) {
+    findings.push({ reason_code: 'preflight_closure_contradicted' });
+  }
+
   const blockingReasons = [...new Set(
     findings
       .map((finding) => finding.reason_code)
@@ -603,6 +909,19 @@ function buildReport(target, text, options = {}) {
       design_source_coverage_declared: designSourceCoverageDeclared,
       design_sources_read_present: designSourcesReadPresent,
       design_sources_unread_present: designSourcesUnreadPresent,
+      design_sources_unread_non_empty: designUnread,
+      design_coverage_partial: designPartial,
+      design_degraded_owner_accepted: designAccepted,
+      outstanding_question_closure_contract_present: oqAnalysis.facts.outstanding_question_closure_contract_present,
+      outstanding_question_rows: oqAnalysis.facts.outstanding_question_rows,
+      outstanding_question_missing_closure_count: oqAnalysis.facts.outstanding_question_missing_closure_count,
+      blocking_outstanding_question_count: oqAnalysis.facts.blocking_outstanding_question_count,
+      planning_invention_question_count: oqAnalysis.facts.planning_invention_question_count,
+      unclosed_owner_question_count: oqAnalysis.facts.unclosed_owner_question_count,
+      open_oq_without_owner_closure_count: oqAnalysis.facts.open_oq_without_owner_closure_count,
+      how_pushdown_touches_what_count: oqAnalysis.facts.how_pushdown_touches_what_count,
+      possible_misclassified_how_pushdown_count: oqAnalysis.facts.possible_misclassified_how_pushdown_count,
+      owner_decision_trace_present: oqAnalysis.facts.owner_decision_trace_present,
       placeholder_line_count: placeholderLines.length,
       feature_slice_trace_gap_count: featureSliceGaps.length,
       input_scan_attempted: inputPaths.length > 0,

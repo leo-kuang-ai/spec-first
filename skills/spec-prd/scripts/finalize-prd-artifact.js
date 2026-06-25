@@ -119,12 +119,31 @@ function buildFinalizeReceipt(target, text, inputs) {
     ...missingReadyIntentReasons,
   ])].sort();
 
+  // 004:把 closeout 许可与 ready finalization 拆开。合法 checkpoint(write_mode=checkpoint-prd
+  // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
+  // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
+  // 与 receipt-only 原因本身不阻断 checkpoint closeout——它们只意味着"还没 ready",而非"非法"。
+  const isValidCheckpoint = facts.write_mode === 'checkpoint-prd'
+    && facts.can_enter_spec_plan === 'no'
+    && facts.ready_claim_present !== true;
+  const closeoutBlockingReasons = isValidCheckpoint
+    ? blockingReasons.filter((reasonCode) => (
+      reasonCode !== 'finalize_required' && !RECEIPT_ONLY_REASONS.has(reasonCode)
+    ))
+    : blockingReasons;
+  const shouldBlockCloseout = closeoutBlockingReasons.length > 0;
+
   return {
     schema_version: 'spec-prd-finalize.v1',
     target,
-    status: blockingReasons.length === 0 ? 'finalizable' : 'blocked',
+    status: blockingReasons.length === 0
+      ? 'finalizable'
+      : (isValidCheckpoint && !shouldBlockCloseout ? 'checkpoint-closeout' : 'blocked'),
     can_finalize: blockingReasons.length === 0,
+    can_closeout: !shouldBlockCloseout,
+    should_block_closeout: shouldBlockCloseout,
     blocking_reason_codes: blockingReasons,
+    closeout_blocking_reason_codes: closeoutBlockingReasons,
     checker: {
       schema_version: initialReport.schema_version,
       finding_count: initialReport.findings.length,
@@ -183,7 +202,9 @@ function main() {
   }
 
   process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
-  process.exit(receipt.can_finalize ? 0 : 1);
+  // 004:exit code 由 should_block_closeout 驱动,而非 can_finalize。合法 checkpoint(non-ready
+  // 但允许 closeout)exit 0;只有 ready 矛盾 exit 1。Stop hook 只消费 exit code,不解析 JSON。
+  process.exit(receipt.should_block_closeout ? 1 : 0);
 }
 
 if (require.main === module) {
