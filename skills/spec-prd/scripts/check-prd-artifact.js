@@ -8,6 +8,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+const MAX_INPUT_SCAN_BYTES = 5 * 1024 * 1024;
+
 const CORE_SECTIONS = [
   'Summary',
   'Change Delta',
@@ -27,22 +29,29 @@ const EVIDENCE_TAGS = [
 
 const BLOCKING_REASON_CODES = new Set([
   'core_section_missing',
+  'forbidden_prds_path',
   'write_mode_undeclared',
   'clarification_evidence_undeclared',
   'clarification_trace_absent',
   'can_enter_spec_plan_undeclared',
   'preflight_sweep_closure_absent',
+  'preflight_sweep_closure_blocked',
   'design_source_inventory_undeclared',
   'design_source_coverage_undeclared',
   'design_sources_read_undeclared',
   'design_sources_unread_undeclared',
   'design_source_unaccounted',
   'input_refs_unavailable',
+  'input_scan_degraded',
   'prd_readiness_declarations_evaded',
   'ready_receipt_absent',
   'ready_receipt_stale',
   'finalize_required',
   // 004 closure-contract:剃刀与 closure 矛盾类 blocker(只在 artifact 自称 ready/final 时生效)
+  'outstanding_question_closure_undeclared',
+  'blocking_outstanding_question_present',
+  'planning_invention_question_present',
+  'unclosed_owner_question_present',
   'open_oq_without_owner_closure',
   'how_pushdown_touches_what',
   'owner_decision_trace_required_but_absent',
@@ -206,20 +215,105 @@ function normalizeForReceipt(text) {
   ].join('\n').trim();
 }
 
-function computeInputsHash(inputPaths) {
+function findProjectRootFromTarget(target) {
+  const resolvedTarget = path.resolve(target);
+  const parts = resolvedTarget.split(path.sep);
+  for (let idx = parts.length - 2; idx >= 0; idx -= 1) {
+    if (parts[idx] === 'docs' && ['brainstorms', 'prds'].includes(parts[idx + 1])) {
+      const rootParts = parts.slice(0, idx);
+      return rootParts.length === 0 ? path.sep : rootParts.join(path.sep) || path.sep;
+    }
+  }
+  return path.dirname(resolvedTarget);
+}
+
+function realpathOrResolved(filePath) {
+  try {
+    return fs.realpathSync.native(filePath);
+  } catch (err) {
+    return path.resolve(filePath);
+  }
+}
+
+function isWithinRoot(candidatePath, rootPath) {
+  const relative = path.relative(rootPath, candidatePath);
+  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function resolveInputFile(inputPath, projectRoot) {
+  const root = realpathOrResolved(projectRoot);
+  const candidates = path.isAbsolute(inputPath)
+    ? [path.resolve(inputPath)]
+    : [path.resolve(projectRoot, inputPath), path.resolve(inputPath)];
+  const resolved = candidates.find((candidate) => fs.existsSync(candidate)) || candidates[0];
+  const pathDesignSignal = /figma|design|设计稿/i.test(inputPath);
+
+  let real;
+  let stats;
+  try {
+    real = fs.realpathSync.native(resolved);
+    stats = fs.statSync(real);
+  } catch (err) {
+    return {
+      status: 'missing',
+      resolved,
+      pathDesignSignal,
+      reason: 'missing_or_unreadable',
+    };
+  }
+
+  if (!isWithinRoot(real, root)) {
+    return {
+      status: 'rejected',
+      resolved,
+      real,
+      pathDesignSignal,
+      reason: 'outside_project_root',
+    };
+  }
+
+  if (!stats.isFile()) {
+    return {
+      status: 'rejected',
+      resolved,
+      real,
+      pathDesignSignal,
+      reason: 'not_regular_file',
+    };
+  }
+
+  if (stats.size > MAX_INPUT_SCAN_BYTES) {
+    return {
+      status: 'rejected',
+      resolved,
+      real,
+      pathDesignSignal,
+      reason: 'input_too_large',
+    };
+  }
+
+  return {
+    status: 'ok',
+    resolved,
+    real,
+    pathDesignSignal,
+  };
+}
+
+function computeInputsHash(inputPaths, options = {}) {
   if (!Array.isArray(inputPaths) || inputPaths.length === 0) {
     return sha256('');
   }
+  const projectRoot = options.projectRoot ? path.resolve(options.projectRoot) : process.cwd();
 
   const entries = inputPaths.map((inputPath) => {
-    const resolved = path.resolve(inputPath);
-    // 004:用 resolved 绝对路径作为身份(相对/绝对调用产生同一 hash),内容缺失时回退 resolved。
-    try {
-      return `${resolved}\n${sha256(fs.readFileSync(resolved, 'utf8'))}`;
-    } catch (err) {
-      return `${resolved}\nmissing`;
+    const input = resolveInputFile(inputPath, projectRoot);
+    // 004:只用可读且在项目根内的输入计算 hash;失败输入由 degraded findings 表达。
+    if (input.status !== 'ok') {
+      return null;
     }
-  });
+    return `${input.resolved}\n${sha256(fs.readFileSync(input.real, 'utf8'))}`;
+  }).filter(Boolean);
   return sha256(entries.join('\n'));
 }
 
@@ -376,13 +470,12 @@ function isEmptyish(value) {
 
 // 解析 Owner Decision Trace:返回带 chosen_answer + write target 的非空 row 数。
 function parseOwnerDecisionTrace(lines, headings) {
-  const section = sectionRange(lines, headings, 'Owner Decision Trace')
-    || sectionRange(lines, headings, 'Decision Notes');
+  const section = sectionRange(lines, headings, 'Owner Decision Trace');
   if (!section) return { present: false, validRows: 0, rows: [] };
   const { headerMap, rows } = parseHeaderedTable(section.text, TRACE_HEADER_ALIASES);
   if (Object.keys(headerMap).length === 0) return { present: true, validRows: 0, rows: [] };
   const validRows = rows.filter((row) => (
-    !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target)
+    !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence)
   ));
   return { present: true, validRows: validRows.length, rows };
 }
@@ -538,24 +631,24 @@ function detectDesignSourceRefs(text) {
   return /figma\.com|figma\s+(?:node|file)|figma\s+\d+-\d+|node-id=|design-source|design_source_inventory|design_sources_|Design\s*\/\s*UX Evidence Hook/i.test(body);
 }
 
-function scanInputDesignRefs(inputPaths) {
+function scanInputDesignRefs(inputPaths, projectRoot) {
   const inputRefsUsed = [];
   let inputDesignRefsPresent = false;
   let inputScanDegraded = false;
 
   inputPaths.forEach((inputPath) => {
-    const pathDesignSignal = /figma|design|设计稿/i.test(inputPath);
-    try {
-      const text = fs.readFileSync(path.resolve(inputPath), 'utf8');
+    const input = resolveInputFile(inputPath, projectRoot);
+    if (input.status === 'ok') {
+      const text = fs.readFileSync(input.real, 'utf8');
       inputRefsUsed.push(inputPath);
-      if (pathDesignSignal || detectDesignSourceRefs(text)) {
+      if (input.pathDesignSignal || detectDesignSourceRefs(text)) {
         inputDesignRefsPresent = true;
       }
-    } catch (err) {
-      inputScanDegraded = true;
-      if (pathDesignSignal) {
-        inputDesignRefsPresent = true;
-      }
+      return;
+    }
+    inputScanDegraded = true;
+    if (input.pathDesignSignal) {
+      inputDesignRefsPresent = true;
     }
   });
 
@@ -679,9 +772,10 @@ function detectFeatureSliceGaps(lines, headings) {
 
 function buildReport(target, text, options = {}) {
   const inputPaths = Array.isArray(options.inputs) ? options.inputs : [];
-  const inputScan = scanInputDesignRefs(inputPaths);
+  const projectRoot = findProjectRootFromTarget(target);
+  const inputScan = scanInputDesignRefs(inputPaths, projectRoot);
   const prdHash = sha256(normalizeForReceipt(text));
-  const inputsHash = computeInputsHash(inputPaths);
+  const inputsHash = computeInputsHash(inputPaths, { projectRoot });
   const normalizedTarget = target.split(path.sep).join('/');
   const lines = splitLines(text);
   const frontmatter = parseFrontmatter(lines);
@@ -797,6 +891,9 @@ function buildReport(target, text, options = {}) {
   }
   if ((prdShaped || writeModeIsFinalPrd || needsReadinessDeclarations) && !preflightSweepClosureDeclaredValid) {
     findings.push({ reason_code: 'preflight_sweep_closure_absent' });
+  }
+  if (claimsReady && preflightSweepClosureValue === 'blocked') {
+    findings.push({ reason_code: 'preflight_sweep_closure_blocked' });
   }
   if (designSourceRefsPresent && !designSourceInventoryDeclared) {
     findings.push({ reason_code: 'design_source_inventory_undeclared' });

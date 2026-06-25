@@ -1312,7 +1312,7 @@ describe('spec-prd workflow contracts', () => {
           quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
           coverage_tags: expect.arrayContaining(['readiness', 'design-source', 'preflight']),
           expected: expect.arrayContaining([
-            'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness',
+            'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, preflight_sweep_closure_absent, and preflight_sweep_closure_blocked must be consumed by readiness',
           ]),
           must_not: expect.arrayContaining([
             'must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure',
@@ -1397,7 +1397,7 @@ describe('spec-prd workflow contracts', () => {
     expectEvalCase(examples, 'preflight-grill-design-gate-ready-rejected', {
       tags: ['readiness', 'design-source', 'preflight'],
       expected: [
-        'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness',
+        'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, preflight_sweep_closure_absent, and preflight_sweep_closure_blocked must be consumed by readiness',
         'preflight_sweep_closure missing or blocked prevents ready-for-planning',
       ],
     });
@@ -2661,6 +2661,63 @@ describe('spec-prd workflow contracts', () => {
         expect.objectContaining({ reason_code: 'input_scan_degraded' }),
       ]));
 
+      const outsideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'prd-outside-input-'));
+      try {
+        const outsideInput = path.join(outsideDir, 'external-design.md');
+        fs.writeFileSync(outsideInput, 'Figma design: node-id=9-9\n', 'utf8');
+
+        const outsideInputRun = JSON.parse(execFileSync('node', [
+          PRD_ARTIFACT_SCRIPT_PATH,
+          inputDesignAccountedPrd,
+          '--inputs',
+          outsideInput,
+        ], { encoding: 'utf8' }));
+        expect(outsideInputRun.facts.input_scan_attempted).toBe(true);
+        expect(outsideInputRun.facts.input_refs_used).toEqual([]);
+        expect(outsideInputRun.facts.input_design_refs_present).toBe(true);
+        expect(outsideInputRun.findings).toEqual(expect.arrayContaining([
+          expect.objectContaining({ reason_code: 'input_refs_unavailable' }),
+          expect.objectContaining({ reason_code: 'input_scan_degraded' }),
+        ]));
+
+        const mixedOutsideInputRun = JSON.parse(execFileSync('node', [
+          PRD_ARTIFACT_SCRIPT_PATH,
+          inputDesignAccountedPrd,
+          '--inputs',
+          `${outsideInput},${figmaInput}`,
+        ], { encoding: 'utf8' }));
+        expect(mixedOutsideInputRun.facts.input_refs_used).toEqual([figmaInput]);
+        expect(mixedOutsideInputRun.facts.ready_receipt_inputs_hash)
+          .toBe(inputDesignAccounted.facts.ready_receipt_inputs_hash);
+        expect(mixedOutsideInputRun.findings).toEqual(expect.arrayContaining([
+          expect.objectContaining({ reason_code: 'input_scan_degraded' }),
+        ]));
+
+        const symlinkInput = path.join(tmpDir, 'source_docs', 'symlink-design.md');
+        let symlinkCreated = false;
+        try {
+          fs.symlinkSync(outsideInput, symlinkInput);
+          symlinkCreated = true;
+        } catch (err) {
+          expect(['EACCES', 'EPERM', 'ENOTSUP'].includes(err.code)).toBe(true);
+        }
+        if (symlinkCreated) {
+          const symlinkInputRun = JSON.parse(execFileSync('node', [
+            PRD_ARTIFACT_SCRIPT_PATH,
+            inputDesignAccountedPrd,
+            '--inputs',
+            symlinkInput,
+          ], { encoding: 'utf8' }));
+          expect(symlinkInputRun.facts.input_refs_used).toEqual([]);
+          expect(symlinkInputRun.findings).toEqual(expect.arrayContaining([
+            expect.objectContaining({ reason_code: 'input_refs_unavailable' }),
+            expect.objectContaining({ reason_code: 'input_scan_degraded' }),
+          ]));
+        }
+      } finally {
+        fs.rmSync(outsideDir, { recursive: true, force: true });
+      }
+
       const commaInputs = JSON.parse(execFileSync('node', [
         PRD_ARTIFACT_SCRIPT_PATH,
         inputDesignUnaccountedPrd,
@@ -2915,6 +2972,11 @@ describe('spec-prd workflow contracts', () => {
       'design_source_unaccounted',
       'input_refs_unavailable',
       'input_scan_degraded',
+      'preflight_sweep_closure_blocked',
+      'outstanding_question_closure_undeclared',
+      'blocking_outstanding_question_present',
+      'planning_invention_question_present',
+      'unclosed_owner_question_present',
       'prd_readiness_declarations_evaded',
       'ready_receipt_absent',
       'ready_receipt_stale',
@@ -2944,6 +3006,11 @@ describe('spec-prd workflow contracts', () => {
       'design_source_unaccounted',
       'input_refs_unavailable',
       'input_scan_degraded',
+      'preflight_sweep_closure_blocked',
+      'outstanding_question_closure_undeclared',
+      'blocking_outstanding_question_present',
+      'planning_invention_question_present',
+      'unclosed_owner_question_present',
       'prd_readiness_declarations_evaded',
       'ready_receipt_absent',
       'ready_receipt_stale',
@@ -3112,6 +3179,43 @@ describe('spec-prd workflow contracts', () => {
         ],
       }), 'utf8');
       expect(codes(run(owned))).not.toContain('open_oq_without_owner_closure');
+
+      const decisionNotesOnly = path.join(tmpDir, 'b2-requirements.md');
+      fs.writeFileSync(decisionNotesOnly, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-2 | 中台持仓接口是否可用 | Requirements | no | owner-answered | no | closed | 本期降级隐藏 |',
+        ],
+        trace: [
+          '## Decision Notes',
+          '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+          '| --- | --- | --- | --- | --- | --- |',
+          '| 中台持仓接口是否可用 | owner | 本期降级隐藏 | Requirements | R-01 covers degrade | closed |',
+        ],
+      }), 'utf8');
+      const decisionNotesCodes = codes(run(decisionNotesOnly));
+      expect(decisionNotesCodes).toContain('open_oq_without_owner_closure');
+      expect(decisionNotesCodes).toContain('owner_decision_trace_required_but_absent');
+
+      const traceMissingConsequence = path.join(tmpDir, 'b3-requirements.md');
+      fs.writeFileSync(traceMissingConsequence, buildPrd({
+        oq: [
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '| --- | --- | --- | --- | --- | --- | --- | --- |',
+          '| OQ-2 | 中台持仓接口是否可用 | Requirements | no | owner-answered | no | closed | 本期降级隐藏 |',
+        ],
+        trace: [
+          '## Owner Decision Trace',
+          '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+          '| --- | --- | --- | --- | --- | --- |',
+          '| 中台持仓接口是否可用 | owner | 本期降级隐藏 | Requirements |  | closed |',
+        ],
+      }), 'utf8');
+      const missingConsequence = run(traceMissingConsequence);
+      expect(missingConsequence.facts.owner_decision_trace_present).toBe(false);
+      expect(codes(missingConsequence)).toContain('open_oq_without_owner_closure');
+      expect(codes(missingConsequence)).toContain('owner_decision_trace_required_but_absent');
 
       // 3) how-pushdown 后门:命中 WHAT 词表 + claims-ready -> how_pushdown_touches_what(blocking)
       const pushdown = path.join(tmpDir, 'c-requirements.md');

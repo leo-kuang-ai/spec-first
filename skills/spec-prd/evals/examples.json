@@ -93,7 +93,7 @@
           "case_type": "failure",
           "quality_buckets": ["failure", "readiness-fail"],
           "coverage_tags": ["readiness", "design-source", "preflight"],
-          "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning"],
+          "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, preflight_sweep_closure_absent, and preflight_sweep_closure_blocked must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning"],
           "must_not": ["must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure"]
         }
       },
@@ -269,7 +269,7 @@
       "case_type": "failure",
       "quality_buckets": ["failure", "readiness-fail"],
       "input_shape": "PRD-shaped output skips grill trace, omits artifact readiness declarations, ignores input-side Figma/design refs, lacks preflight_sweep_closure, and still returns ready-for-planning",
-      "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, and preflight_sweep_closure_absent must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning", "input_scan_attempted=false on a final UI/design-surface PRD is must-not-ready-until-confirmed"],
+      "expected": ["checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, preflight_sweep_closure_absent, and preflight_sweep_closure_blocked must be consumed by readiness", "preflight_sweep_closure missing or blocked prevents ready-for-planning", "input_scan_attempted=false on a final UI/design-surface PRD is must-not-ready-until-confirmed"],
       "must_not": ["must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure", "must not treat route-out or bypass as an authoring-stage grill exemption"],
       "coverage_tags": ["readiness", "design-source", "preflight"]
     },

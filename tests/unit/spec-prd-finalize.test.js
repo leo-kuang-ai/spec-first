@@ -122,6 +122,94 @@ date: 2026-06-25
     }
   });
 
+  test('finalize blocks final PRDs when preflight sweep closure is blocked', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'blocked-preflight-requirements.md');
+
+    try {
+      write(prdPath, validReadyIntentPrd().replace(
+        '- preflight_sweep_closure: closed',
+        '- preflight_sweep_closure: blocked',
+      ));
+
+      const receipt = finalizePrd(prdPath, [], { checkOnly: true });
+
+      expect(receipt.can_finalize).toBe(false);
+      expect(receipt.should_block_closeout).toBe(true);
+      expect(receipt.closeout_blocking_reason_codes).toContain('preflight_sweep_closure_blocked');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('finalize blocks closeout when any source input scan degrades', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'degraded-input-requirements.md');
+    const readableInput = path.join(tempDir, 'source_docs', 'context.md');
+    const missingInput = path.join(tempDir, 'source_docs', 'missing.md');
+
+    try {
+      write(prdPath, validReadyIntentPrd());
+      write(readableInput, 'source evidence without design refs\n');
+
+      const receipt = finalizePrd(prdPath, [readableInput, missingInput], { checkOnly: true });
+
+      expect(receipt.can_finalize).toBe(false);
+      expect(receipt.should_block_closeout).toBe(true);
+      expect(receipt.closeout_blocking_reason_codes).toContain('input_scan_degraded');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('finalize blocks explicit outstanding-question blockers even with degraded preflight sweep', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'oq-blocker-requirements.md');
+
+    try {
+      write(prdPath, validReadyIntentPrd()
+        .replace('- preflight_sweep_closure: closed', '- preflight_sweep_closure: degraded')
+        .replace('## Readiness Self-Check', [
+          '## Outstanding Questions',
+          '',
+          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+          '|---|---|---|---|---|---|---|---|',
+          '| OQ-10 | Owner must choose fallback behavior | Requirements | yes |  | yes | unclosed | TBD |',
+          '',
+          '## Readiness Self-Check',
+        ].join('\n')));
+
+      const receipt = finalizePrd(prdPath, [], { checkOnly: true });
+
+      expect(receipt.can_finalize).toBe(false);
+      expect(receipt.should_block_closeout).toBe(true);
+      expect(receipt.closeout_blocking_reason_codes).toEqual(expect.arrayContaining([
+        'blocking_outstanding_question_present',
+        'planning_invention_question_present',
+        'unclosed_owner_question_present',
+      ]));
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('finalize blocks PRD artifacts written under docs/prds', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'prds', 'illegal-ready-requirements.md');
+
+    try {
+      write(prdPath, validReadyIntentPrd());
+
+      const receipt = finalizePrd(prdPath, [], { checkOnly: true });
+
+      expect(receipt.can_finalize).toBe(false);
+      expect(receipt.should_block_closeout).toBe(true);
+      expect(receipt.closeout_blocking_reason_codes).toContain('forbidden_prds_path');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('finalize writes a machine-owned ready receipt when deterministic blockers are absent', () => {
     const tempDir = makeTempDir();
     const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'ready-requirements.md');
