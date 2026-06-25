@@ -32,13 +32,16 @@
 | 改动 | 需要的证据 |
 | --- | --- |
 | `description` / route 边界 | trigger/boundary eval，near-neighbor case，`npm run lint:skill-entrypoints` |
+| branch / context pointer / information hierarchy | branch list or reviewer note，`SKILL.md` pointer 说明读取条件，failure/expected eval 覆盖弱 pointer 或 sprawl 风险 |
 | source/runtime 边界 | contract test 或 runtime sync test，禁止手改 generated mirrors |
 | 新增 standalone skill | `skills-governance.json`、runtime catalog、public workflow summary test |
 | 新增 reference | `SKILL.md` 有清晰读取条件；quick validate 通过 |
 | 新增 eval | normalized cases valid；覆盖 positive、negative/near-neighbor 或 boundary |
 | 可分发 package | 官方 `quick_validate.py`；可行时 package smoke，确认不依赖 maintainer-only evidence |
 | 写入脚本或 shell 行为 | 脚本语法/单测、安全边界、失败 reason_code |
-| 复杂或高风险语义行为 | forward-testing 或人工 reviewer note；若未执行，记录 `not_checked_with_reason` |
+| 复杂或高风险语义行为 | fresh-source eval、forward-testing 或人工 reviewer note；若未执行，记录 `not_checked_with_reason` |
+
+如果改动来自外部 skill 借鉴，证据还要说明 external benchmark -> local fit 的转换结果：哪些 pattern 被吸收，哪些 invocation 假设、wording 或平台能力没有复制。
 
 ## Packaging Readiness
 
@@ -63,6 +66,15 @@
 
 不要把 fixture 或 recorded sample 描述成 provider-backed model evidence；没有真实 runner 时标记为 review input。
 
+## Skill Quality Eval Boundary
+
+当本次改动改变 skill 写作方法、触发边界、信息层级或 completion criteria 时，优先补结构性 eval fixture。fixture 至少覆盖一个会漂移的行为，而不是只重复 happy path：
+
+- `failure`：弱 context pointer、模糊 completion criterion、over-split granularity、package leak、auto-rewrite audit。
+- `expected`：branch-first 资源分配、sentence-level no-op pruning、source/runtime closeout、near-neighbor route。
+
+这些 fixture 是维护者 review input；没有真实 runner 或 fresh-source eval 时，不要把它描述成已证明模型行为改善。
+
 ## Forward Testing Boundary
 
 使用 forward-testing 只验证 skill 是否能泛化，不把它变成泄漏答案的二次 review。
@@ -71,6 +83,8 @@
 - 使用新上下文或 subagent 时，传入 skill 路径、真实请求形态和 raw artifact；不要传入预期答案、已知 bug、intended fix 或上轮结论。
 - 如果 forward-testing 会耗时很长、需要额外授权或会修改生产系统，先把拟运行 prompt 和风险交给用户确认。
 - 结果只作为语义证据；仍需结合 source patch、contract tests、quick validate 和 audit smoke 判断是否可交付。
+
+fresh-source eval 与 forward-testing 一样只提供语义证据。修改 skill/agent prose 后，如果宿主调度能力、时间或授权不足，记录 `not_checked_with_reason`；不要用当前会话已加载的旧 skill 行为冒充 fresh-source 验证。
 
 ## Closeout
 

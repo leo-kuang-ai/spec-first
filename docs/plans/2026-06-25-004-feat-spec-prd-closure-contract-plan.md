@@ -24,16 +24,16 @@ referenced_reviews:
 
 本方案把 `$spec-prd` 修正为双层机制:第一层是**前置分块 pressure grill**，在获取资料后先做 input inventory、authority classification、module/chunk map、risk-to-write-target map,再按风险队列一块一块追问 owner,逐步细化到 PRD 写入目标;第二层才是 Closure Contract v1 和 finalize/checker,负责阻止未闭合 residue 伪装成 ready。
 
-关键变化:PRD 草稿不是先写完再检查,而是每个资料块先被梳理、归类、提问、闭合或 checkpoint。只有所有 load-bearing chunk 达到 source-resolved、owner-answered、owner-capped、owner-accepted assumption、source-backed non-WHAT assumption,或不会改变 WHAT/scope/acceptance/source-of-truth 的 implementation-only how-pushdown,才允许写 `final-prd` 并进入 finalize。finalize/checker 只是出口保险,不是 pressure grill 的发生点。
+关键变化:PRD 草稿不是先写完再检查,而是每个资料块先被梳理、归类、提问、闭合或 checkpoint。readiness 的顶层语义是一把**剃刀**(借鉴 loop-me 的 "nothing is done while a question remains"):任一 PRD-owned open question 默认 not-ready,**只有携带一个合法 closure disposition + 对应证据**才非阻塞——模型没有“我判它非阻塞”这个自由旋钮。合法 disposition 即 Canonical 四个停点的具体化:source-resolved、owner-answered、owner-capped、owner-accepted assumption、source-backed non-WHAT assumption,或不改 WHAT/scope/acceptance/source-of-truth 的 implementation-only how-pushdown。只有所有 load-bearing chunk 经此闭合,才允许写 `final-prd` 并进入 finalize。finalize/checker 只是出口保险,不是 pressure grill 的发生点。
 
 ---
 
 ## Decision Brief
 
 - **Recommended approach:** 在 `spec-prd` 内部实现前置分块 grill pipeline:资料摄取后先分块建图,形成按 PRD write target 排序的 grill queue,逐块问 owner 并实时写入 closure state。Closure Contract v1 与 finalize/checker 只作为出口防逃逸。
-- **Key decisions:** 不改 `spec-plan`;不把 `spec-doc-review` 变成依赖;不让 checker 判断业务语义;`checkpoint-prd` 是资料块未 grill 完成时唯一合法的保留上下文形态。
-- **Validation focus:** SKILL prose 强制 19:07 形态先进入分块 grill queue,contract/eval 证明 OQ-2/OQ-4/OQ-5/OQ-6 这些 load-bearing residue 有持久锚点;若 artifact 仍留下 6 个 OQ、`visual-read=partial` 和非空 `design_sources_unread` 且无 owner acceptance,finalize 必须阻断。真正证明“写前被打断”仍属于 deferred host provenance 能力。
-- **Largest risks / boundaries:** 该方案能防止“可见未闭合 residue 仍 ready”,但不能在没有 host transcript provenance 的情况下密码学证明模型没有伪造 owner answer。若未来要证明 owner answer 真实性,需要宿主暴露 question receipt 或 transcript-bound provenance。
+- **Key decisions:** 不改 `spec-plan`;不把 `spec-doc-review` 变成依赖;不让 checker 判断业务语义;`checkpoint-prd` 是资料块未 grill 完成时唯一合法的保留上下文形态。readiness 用 closure-disposition 剃刀作脊柱(open question 默认 not-ready,只能靠合法 disposition+证据闭合,不给模型降级旋钮);owner 闭合通过 push-right 的一份决策就绪 Brief 收口,Brief 的持久残留就是 Owner Decision Trace,不新建 artifact。
+- **Validation focus:** SKILL prose 强制 19:07 形态先进入分块 grill queue,contract/eval 证明 OQ-2/OQ-4/OQ-5/OQ-6 这些 load-bearing residue 有持久锚点;若 artifact 仍留下 6 个 OQ、`visual-read=partial` 和非空 `design_sources_unread` 且无 owner acceptance,finalize 必须阻断。验收锁的是可见 artifact residue 与 ready 自相矛盾,真正证明“写前被打断”仍属于 deferred host provenance 能力。
+- **Largest risks / boundaries:** 该方案彻底解决的是“可见未闭合 residue 仍 ready”的 producer-local artifact 问题,但不能在没有 host transcript provenance 的情况下密码学证明模型没有伪造 owner answer 或确实写前提问。若未来要证明 owner answer 真实性,需要宿主暴露 question receipt 或 transcript-bound provenance。
 
 ---
 
@@ -59,9 +59,9 @@ referenced_reviews:
 - R2. `$spec-prd` 必须在 durable PRD 写入前运行前置分块 grill pipeline:input inventory -> authority classification -> chunk/module map -> risk-to-write-target map -> grill queue -> chunk closure。
 - R3. 每个 load-bearing chunk 必须绑定 PRD write target,并记录 closure_state;未闭合 chunk 不得被延后到 final PRD 后处理。
 - R4. `$spec-prd` producer 必须阻止可见未闭合 PRD-owned OQ 进入 `ready-for-planning`。
-- R5. `final-prd` 中所有 Outstanding Questions 必须有 closure 字段:owner/status、PRD write target、blocks_planning、planning_would_invent_what、closure_state、recommended_default 或 deferred reason。
+- R5. `final-prd` 中所有 Outstanding Questions 必须有 closure 字段:owner/status、PRD write target、blocks_planning、closure_disposition(及其证据)、planning_would_invent_what、closure_state、recommended_default 或 deferred reason。
 - R6. 对声明 final/ready 或 `can_enter_spec_plan: yes` 的 artifact,任一 OQ 或 chunk 声明 `blocks_planning: yes`、`planning_would_invent_what: yes`、`closure_state: unclosed|blocker|unknown|headless-degraded` 时,finalize 必须 block;合法 `checkpoint-prd + can_enter_spec_plan: no` 可携带这些 residue 并以 non-ready closeout 退出。
-- R7. `clarification_evidence: asked-owner` 必须有 Owner Decision Trace 或 Decision Notes 中可检查的 owner answer row,并关联 PRD write target;只写 `asked-owner` 不足以证明 pressure grill closure。
+- R7. `clarification_evidence: asked-owner` 必须有独立 `## Owner Decision Trace` 条件 section 中可检查的 owner answer row,并关联 PRD write target;只写 `asked-owner` 或把答案混在自由体 Decision Notes 中不足以证明 pressure grill closure。
 - R8. Figma/design-source `read_status=unread|degraded` 或 `design_source_coverage` 显示 partial/unread/degraded 时,必须记录 readiness consequence 和 owner acceptance;未接受的 unread/degraded 不能 ready。
 - R9. `preflight_sweep_closure: closed` 不得与 blocking OQ、unclosed owner question、design unread without acceptance、`can_enter_spec_plan: no` 同时出现。
 - R10. `checkpoint-prd` 必须能保留上下文、chunk map 和下一问,但不能写 `status: ready-for-planning`、`write_mode: final-prd` 或 `can_enter_spec_plan: yes`。
@@ -70,7 +70,9 @@ referenced_reviews:
 - R13. `$spec-prd` 必须在写 PRD 前区分 PRD、Figma、API docs、code workspace、historical knowledge 的 source type 和 authority;不同 source type 只能贡献对应的 evidence/extraction target,不得直接混成 confirmed target requirement。
 - R14. API/contract docs 和 code workspace 必须先进入 requirement questions 或 current-state evidence:API docs 关注 consumer-visible behavior、availability、error semantics、compatibility 和 data authority;code workspace 只证明当前行为/约束,不能替 owner 决定目标行为。
 - R15. 核心 requirement chunk 应映射到 acceptance example、显式 trace gap、owner cap 或 Outstanding Question;缺少 AE 映射本身保持 advisory,不得回退 003 的 trace-gap carve-out,但 readiness lens 必须解释为什么 planning 不会发明 WHAT。
-- R16. 一个 load-bearing OQ(影响 WHAT、scope、acceptance、source-of-truth、interface availability、fallback display 或 analytics acceptance)被标 `blocks_planning=no` / `closure_state=closed`,在交互式运行中必须由 owner 通过 blocking question tool 真实 ratify,并落到 Owner Decision Trace 的 owner answer row;模型不得自行把 load-bearing OQ 降级为非阻塞。这针对 19:07 的真实根因——模型把 OQ-2/OQ-4 自判为“planning 期并行项”却从未问 owner。owner 缺席/headless 时唯一合法出口是 `checkpoint-prd`,不得自降级为 ready。checker 仍只检查结构矛盾(load-bearing + `blocks_planning=no` + 无 owner-ratified trace),不裁决某 OQ 是否 load-bearing;该语义判断由 LLM/owner 承担并显式声明。本不变量关闭“真诚误判”这一层,蓄意伪造 owner ratification 仍属 [R12] 的 deferred host-provenance 上界。
+- R16. **Closure-disposition 剃刀(readiness 脊柱)。** 任一 PRD-owned open question 默认 not-ready;它非阻塞当且仅当携带一个合法 closure disposition 且带该 disposition 要求的证据。合法 disposition 是 Canonical 四停点的具体化:`source-resolved`(source/docs/repo 引用)、`owner-answered`(Owner Decision Trace 非空 row,含 chosen_answer+write target)、`owner-capped`(owner cap 证据)、`owner-accepted-assumption`(owner 确认痕迹)、`source-backed-non-WHAT-assumption`(source 引用)、`implementation-only-how-pushdown`(声明 `planning_would_invent_what=no` 且不改 WHAT/scope/acceptance/source-of-truth/release/contract)。模型**没有**“我判它非阻塞”这条路——`blocks_planning=no` 不是自由断言,而是上述 disposition 的派生结果。这直接打掉 19:07 根因:模型把 OQ-2/OQ-4 自判为“planning 期并行项”却从未问 owner,在剃刀下属于“无合法 disposition 的 open question”=not-ready,只能继续 grill 或 `checkpoint-prd`。owner 缺席/headless 时唯一合法出口是 `checkpoint-prd`。checker 只做结构检查(open OQ 是否带合法 disposition token + 证据 cell),不裁决业务语义(KTD2);蓄意伪造 owner ratification 仍属 [R12] 的 deferred host-provenance 上界。剃刀使旧的“自标 load-bearing 再抓矛盾”路径不再需要,因此**退役** R17 的自标循环机制(见下)。
+- R17. **Push-Right + Brief(owner 闭合的形态)+ how-pushdown 残余旋钮兜底。** 剃刀(R16)规定 owner 闭合是唯一通向 ready 的 owner-side 路径,R17 规定它怎么发生:(1) **Push-right**——relentless 地先 source-first 解决一切可解项,把不可约的 load-bearing owner 决策**攒到最右、一次性**呈现,而不是逐个打断 owner;这与 “relentless one-question-at-a-time” 不冲突——relentless 适用于 source 解决,push-right 适用于 owner 交互。(2) **Brief**——owner checkpoint 呈现一份**决策就绪简报**,每条为 `决策 | 推荐答案 | 影响的 PRD write target | 不闭合则 planning 会发明什么`,经 blocking question tool 收 ratification;Brief 是 run-local(不新建持久 artifact,守 [R12]/KTD1),其持久残留就是 owner 回应填成的 Owner Decision Trace row。review 速度是硬约束:越快越可能是真 engagement 而非橡皮图章。(3) **how-pushdown 残余旋钮**——剃刀下唯一仍含模型自断言的 disposition 是 `implementation-only-how-pushdown`(带 `planning_would_invent_what=no`);checker 用一个冻结小词表(接口/availability、权限/permission、范围/scope、数据权威/source-of-truth、降级/fallback、埋点/analytics)扫被 how-pushdown 闭合的 OQ,命中时发 advisory-only `possible_misclassified_how_pushdown`(非 block,守 KTD2,不误伤诚实本地化 PRD),交 doc-review/人工复核。该 advisory 范围只限 how-pushdown 这一种 disposition,不再扫全部 OQ。
+- R18. 交互式 pressure grill 的每个 owner checkpoint 必须输出一个 one-question brief,至少包含 `question`、`recommended_answer`、`alternatives_or_freeform`、`source_evidence`、`PRD write target`、`why_now`、`consequence_if_unanswered`、`next_action_if_answered`。这保证 checkpoint 是 decision-ready brief,不是泛泛追问或让 owner 阅读完整草稿。
 
 ---
 
@@ -90,8 +92,12 @@ referenced_reviews:
 - SKILL prose、output template 与 contract tests 均要求多源输入先形成 intake/source-type extraction 锚点:PRD、Figma、API、repo source、historical knowledge 分别落到 authority/conflict/source-type extraction,不能直接合并成 final PRD。
 - 19:07 PRD 形态即使绕到 finalize 也无法 ready:有 OQ rows 但缺 closure contract、`design_source_coverage` partial、`design_sources_unread` 非空且无 owner acceptance。
 - `final-prd + can_enter_spec_plan: yes + blocks_planning: yes` 被 checker/finalize block。
-- 一个被声明 load-bearing 的 OQ 在 final/ready PRD 中标 `blocks_planning=no` 却无 owner-ratified Owner Decision Trace row 时,被 checker/finalize block(`load_bearing_oq_self_downgraded`),直接对应 19:07 的 OQ-2/OQ-4 自降级根因;owner 缺席时只能 checkpoint。
+- 一个非阻塞(`blocks_planning=no` / `closure_state=closed`)的 PRD-owned open OQ 在 final/ready PRD 中**未携带合法 closure disposition + 证据**时,被 checker/finalize block(`open_oq_without_owner_closure`),直接对应 19:07 的 OQ-2/OQ-4 自判非阻塞却从未闭合;owner 缺席时只能 checkpoint。
+- 一个用 `implementation-only-how-pushdown` 闭合、却命中冻结词表(接口/权限/范围/数据权威/降级/埋点)的 OQ 产生 advisory `possible_misclassified_how_pushdown`(非 block),提示该 HOW pushdown 可能误分类了 WHAT,交 doc-review/人工升级;诚实本地化 PRD 不因关键词误命中被硬拦。
 - 缺少 chunk/module map、risk-to-write-target map 或 grill queue closure 的 final PRD 产生 advisory structural facts,并在 doc-review/fresh-source eval 中作为 gate-gaming 风险信号;只有与 ready 声明自相矛盾的 residue 才由 checker/finalize block。
+- output template 和 contract tests 固定最小 `Pre-Write Grill Map` body-resident 摘要形态:chunk id、source refs/types、risk/write target、next owner brief id、closure_state、first_unclosed_chunk;缺失只 advisory,但自声明 unclosed/blocked chunk 又 ready 时 blocking。
+- output template 和 contract tests 固定独立 `## Owner Decision Trace` 条件 section,而不是允许 Decision Notes 自由体替代;trace row 缺 `chosen_answer`、`PRD write target` 或 consequence 时不能支撑 `asked-owner`。
+- SKILL prose 和 contract tests 固定 one-question brief 的 8 个字段,确保 owner checkpoint 是“单问题 + 推荐答案 + 写入目标 + 未答后果”的 decision brief,不是泛泛 scoping。
 - 缺少 source-type extraction 或 conflict-to-grill mapping 的多源 final PRD 产生 advisory structural facts,并在 contract/eval 中阻止方案回到“直接合并多源输入成 final PRD”的失败形态。
 - `final-prd + OQ table missing closure columns` 被 checker/finalize block。
 - `final-prd + design_sources_unread` 经空值归一后仍为非空且无 owner acceptance 时被 checker/finalize block;`design_sources_unread: none|无|空|n/a` 不触发该 blocker。
@@ -213,7 +219,7 @@ Current `$spec-prd` direction is correct but not yet sufficient for the user's t
 ## Key Technical Decisions
 
 - KTD0. **Pressure grill 必须前置到 PRD 写入前。** `$spec-prd` 的主路径应是资料摄取 -> 分块梳理 -> risk-to-write-target map -> grill queue -> chunk closure -> PRD write-in。finalize/checker 不是让模型在最后补字段的地方,只验证 artifact 中可检查的 closure 声明与 ready 声明是否自洽。
-- KTD1. **Closure Contract v1 是 PRD section contract,不是新 artifact。** 新字段落在 `Outstanding Questions`、`Decision Notes`/`Owner Decision Trace`、`Design Source Coverage`、`Readiness Self-Check`;不创建 transcript 或 approval 文件。
+- KTD1. **Closure Contract v1 是 PRD section contract,不是新 artifact。** 新字段落在 `Outstanding Questions`、独立条件 section `Owner Decision Trace`、`Design Source Coverage`、`Readiness Self-Check` 和最小 `Pre-Write Grill Map` 摘要;不创建 transcript、approval 文件或第二 artifact topology。普通 `Decision Notes` 可继续记录背景决策,但不能替代可解析的 owner answer trace。
 - KTD2. **最终 ready 只检查矛盾,不裁决业务。** checker 不判断 OQ-2 是否 blocking;它只检查 PRD 是否声明了 `blocks_planning`、`planning_would_invent_what`、`closure_state`,以及这些声明是否与 `final-prd` 自相矛盾。
 - KTD3. **`final-prd` 不能携带未闭合 PRD-owned residue。** 如果 owner 未回答且未明确 cap,或者 design unread 仍可能改变 UI structure/state/interaction/acceptance/scope,唯一合法路径是 `checkpoint-prd` 或 `ask-owner`。
 - KTD4. **`clarification_evidence: asked-owner` 升级为 trace-dependent。** 只写 `asked-owner` 不再足够;当 readiness 依赖 owner answer/cap,或者 artifact 声明 `clarification_evidence=asked-owner` / OQ `owner_status=answered|capped` 时,必须有非空 owner answer trace row,包含 chosen answer、PRD write target 和 consequence。空表、仅标题、无 chosen answer 或无 write target 都不算 trace。
@@ -225,7 +231,8 @@ Current `$spec-prd` direction is correct but not yet sufficient for the user's t
 - KTD10. **Reason codes 按确定性鲁棒性分层。** 19:07 已证明模型会 game checker,所以新增 checker 输出必须分成两类:robust contradiction blockers 可进入 `BLOCKING_REASON_CODES`;presence/self-incrimination structural facts 只能 advisory-first,供 doc-review/fresh-source eval 和人工复核使用。严禁把“字段/骨架存在”误认为“pressure grill 真实发生”。
 - KTD11. **行为证明 deferred,artifact residue 当前可控。** 004 锁定的是失败 artifact 残留形态和 ready 自相矛盾,不是 transcript-level 行为真实性。证明 owner answer 来源或 pre-write grill 实际发生需要 host question receipt / transcript-bound provenance,本轮不伪造该能力。
 - KTD12. **新旧 design blocker 分层,不夸大鲁棒性。** 既有 `design_source_inventory_undeclared` / `design_source_coverage_undeclared` / `design_sources_*_undeclared` / `design_source_unaccounted` 只证明 design accounting 缺失,19:07 已证明它们可被补字段通过。新增 `design_unread_without_owner_acceptance` / `design_partial_coverage_unaccepted` 只锁“artifact 自称 partial/unread/degraded 却 ready”的矛盾,不得与旧 blocker double-count 同一缺字段问题,且同样继承 artifact-truth 上界:若模型谎称 read/accepted,没有 host provenance 时无法证明。
-- KTD13. **load-bearing 非阻塞分类需 owner ratification,真正的第二方是人类而非第二个 LLM。** 19:07 的根因分两层:(a) 真诚误判——模型真的以为 OQ-2/OQ-4 可“planning 期并行”,自行标非阻塞且从未问 owner;(b) 蓄意 gaming——读 checker 源码补字段。004 现有机制几乎只防 (b) 的 artifact 矛盾,而 (b) 无 host provenance 时不可证。(a) 可治:交互式 `/spec:prd` 的独立判定方不是同基座 LLM(有 self-preference 盲点),而是已通过 `AskUserQuestion` / `request_user_input` 接入的人类 owner。因此把“load-bearing OQ 标非阻塞”从模型自分类改为 owner 决策:交互式不得自降级,owner-ratified answer 落 Owner Decision Trace;owner 缺席/headless 只能 `checkpoint-prd`。这比“加独立 fresh-source eval 作运行时 gate”更对症、更轻、不破坏 skill-independence、Codex 亦可用(prose 层),且不引入同基座 critic 的盲点。fresh-source eval 仍可作为 host-dispatch 可用时的 defense-in-depth,但不是本不变量的前提。
+- KTD13. **剃刀:open question 默认 not-ready,owner 是真正的第二方;不给模型降级旋钮。** 19:07 根因分两层:(a) 真诚误判——模型真以为 OQ-2/OQ-4 可“planning 期并行”,自行标非阻塞且从未问 owner;(b) 蓄意 gaming——读 checker 源码补字段。早期设计试图用“模型自标 load-bearing 再抓矛盾”治 (a),但这又制造了“干脆不标承重”的二级自标循环洞(上一轮发现)。借鉴 loop-me 的 “nothing is done while a question remains”,改用剃刀根除该洞:**不再有任何“判它非阻塞”的模型旋钮**,open question 默认 not-ready,唯一脱身是携带合法 closure disposition + 证据(R16)。其中 owner 闭合的独立判定方是人类 owner(经 `AskUserQuestion`/`request_user_input` 接入),不是同基座 LLM(有 self-preference 盲点);这比“加独立 fresh-source eval 作运行时 gate”更对症、更轻、不破坏 skill-independence、Codex 亦可用,且 fresh-source eval 仍可作 host-dispatch 可用时的 defense-in-depth 而非前提。剃刀使旧的 `load_bearing_oq_self_downgraded` 自标 blocker 与其 advisory 兜底**退役/收敛**为单条 `open_oq_without_owner_closure`(见 U2);唯一残余的模型自断言是 `implementation-only-how-pushdown` 的 `planning_would_invent_what=no`,由窄化 advisory `possible_misclassified_how_pushdown` 兜底。诚实上界不变:蓄意伪造 owner answer 仍属 [R12] deferred host-provenance,剃刀不突破上界,但消灭了最便宜的 gaming 路径(直接声明非阻塞)。
+- KTD14. **Ceremony 审计:mandate nothing structural,gate 出口而非脚手架。** 借鉴 loop-me 的 "vocabulary 是按需取用的共享语言,绝非 checklist"。19:07 模型 game 的正是 mandatory ceremony——强制存在的骨架越多,可机械填充的空壳越多。因此明确二分:(a) **硬 gate** 只保留抓住可见 artifact 失败的最小集——design-unread/partial-unaccepted、OQ closure 列缺失、剃刀 `open_oq_without_owner_closure`、`checkpoint_claims_ready`/`preflight_closure_contradicted`;(b) Intake Packet、Authority & Conflict Matrix、source-type extractor、chunk map、risk map、grill queue 等是**按需脚手架**,缺失只产 advisory structural fact、永不 block(U2 已如此)。spec-prd 不能像 loop-me 那样极简(brownfield 需要这些脚手架),但它们的强制力止于 advisory,不升级为 gate。审计不变量:U2 中**没有任何 presence/ceremony 检查进入 `BLOCKING_REASON_CODES`**。
 
 ---
 
@@ -254,9 +261,10 @@ Closure Contract v1 fields:
 
 | Surface | Expected / reported declarations | Blocking contradiction |
 | --- | --- | --- |
-| `Pre-Write Grill Map` / `Readiness Self-Check` | input inventory, authority order, chunk/module map, risk-to-write-target map, grill queue summary, first unclosed chunk | missing map emits advisory structural facts; blocking only when the artifact declares a `closure_state=unclosed` (or blocked) chunk token and still claims ready |
-| `Outstanding Questions` | `id`, `question`, `PRD write target`, `owner_status`, `blocks_planning`, `planning_would_invent_what`, `closure_state`, `recommended_default/deferred_reason` | for final/ready claims: any row missing required declaration; `blocks_planning=yes`; `planning_would_invent_what=yes`; `closure_state=unclosed/blocker/unknown/headless-degraded`. Checkpoint may report facts and close out as non-ready |
-| `Owner Decision Trace` or `Decision Notes` | `question`, `owner_answer/source`, `chosen_answer`, `PRD write target`, `consequence`, `closure_state` | trace required but structurally absent: `clarification_evidence=asked-owner`, OQ row claims answered/capped, or closure depends on owner answer, but no non-empty trace row with the required cells exists (cell-presence check, not semantic correspondence) |
+| `Pre-Write Grill Map` / `Readiness Self-Check` | minimal body-resident summary rows: `chunk_id`, `source_refs/types`, `risk_or_conflict`, `PRD write target`, `next_owner_brief_id`, `closure_state`, `first_unclosed_chunk`; raw transcript stays run-local | missing map emits advisory structural facts; blocking only when the artifact declares a `closure_state=unclosed` (or blocked) chunk token and still claims ready |
+| `Outstanding Questions` | `id`, `question`, `PRD write target`, `owner_status`, `blocks_planning`, `closure_disposition` (+evidence cell), `planning_would_invent_what`, `closure_state`, `recommended_default/deferred_reason` | for final/ready claims: any row missing required declaration; `blocks_planning=yes`; `planning_would_invent_what=yes`; `closure_state=unclosed/blocker/unknown/headless-degraded`; a non-blocking OQ with no legal `closure_disposition`+evidence (`open_oq_without_owner_closure`). Checkpoint may report facts and close out as non-ready |
+| `Owner Question Brief` | one current checkpoint at a time with `question`, `recommended_answer`, `alternatives_or_freeform`, `source_evidence`, `PRD write target`, `why_now`, `consequence_if_unanswered`, `next_action_if_answered` | no hard blocker by itself; contract/eval checks prevent the prose path from regressing to vague multi-question scoping |
+| `Owner Decision Trace` | dedicated conditional section with `question`, `owner_answer/source`, `chosen_answer`, `PRD write target`, `consequence`, `closure_state`; do not rely on free-form Decision Notes for checker-visible trace | trace required but structurally absent: `clarification_evidence=asked-owner`, OQ row claims answered/capped, or closure depends on owner answer, but no non-empty trace row with the required cells exists (cell-presence check, not semantic correspondence) |
 | `Design Source Coverage` | inventory denominator, read/unread/degraded status, normalized unread list, readiness consequence, owner acceptance when degraded, planning invention consequence | `design_sources_unread` normalized non-empty or coverage partial/degraded without owner acceptance |
 | `Readiness Self-Check` | `first_unclosed_owner_question`, `planning_would_invent_what`, `can_enter_spec_plan`, `write_mode` | `preflight_sweep_closure=closed` while unclosed/blocking residue remains |
 
@@ -314,7 +322,7 @@ Closure Contract v1 fields:
 
 **Goal:** Move pressure grill to the front of `$spec-prd`: after资料摄取, the workflow must chunk, map, rank, ask, close, or checkpoint before durable final PRD write-in.
 
-**Requirements:** R2, R3, R4, R5, R7, R8, R10, R11, R15, R16
+**Requirements:** R2, R3, R4, R5, R7, R8, R10, R11, R15, R16, R17, R18
 
 **Dependencies:** U0
 
@@ -337,11 +345,15 @@ Closure Contract v1 fields:
 - Limit `how-pushdown` to implementation-detail questions that explicitly declare `planning_would_invent_what=no` and cannot change scope, acceptance examples, source-of-truth, user-visible behavior, release boundary, or design/API contract. It must not close unanswered WHAT.
 - Require `checkpoint-prd` when the owner gives no cap/continue signal or when any chunk remains unclosed after the current interaction budget.
 - Extend the embedded `Outstanding Questions` skeleton from 4 columns to Closure Contract v1 columns.
-- Add a compact `Owner Decision Trace` shape or strengthen `Decision Notes` to carry owner answers, write targets, consequences, and closure state.
+- Add a minimal `Pre-Write Grill Map` body-resident summary to `prd-output-template.md`, not a raw transcript: columns or bullets must cover `chunk_id`, `source_refs/types`, `risk_or_conflict`, `PRD write target`, `next_owner_brief_id`, `closure_state`, and `first_unclosed_chunk`. Keep full intake/chunk reasoning run-local unless persisting a row directly reduces planning invention.
+- Add a one-question `Owner Question Brief` shape in SKILL/output template guidance. The brief must present exactly one highest-risk question with `recommended_answer`, `alternatives_or_freeform`, `source_evidence`, `PRD write target`, `why_now`, `consequence_if_unanswered`, and `next_action_if_answered`; this is the human checkpoint surface.
+- Add a dedicated conditional `## Owner Decision Trace` table for owner answers, write targets, consequences, and closure state. Do not overload free-form `Decision Notes` as the checker-visible owner trace; `Decision Notes` may remain for explanatory decisions but does not satisfy `clarification_evidence=asked-owner`.
 - Update `Readiness Self-Check` to include `chunk_map_status`, `grill_queue_status`, `first_unclosed_chunk`, `first_unclosed_owner_question`, `planning_would_invent_what`, `owner_decision_trace`, and design degraded acceptance fields.
 - Replace any prose that lets `design_sources_unread` be “left for spec-plan after design walkthrough” without owner acceptance.
 - Clarify that `asked-owner` means an answer was received and applied to PRD write targets, not merely that one question was asked.
-- Add the owner-ratification rule (R16): the model may not self-downgrade a load-bearing OQ (one affecting WHAT, scope, acceptance, source-of-truth, interface availability, fallback display, or analytics acceptance) to `blocks_planning=no` / `closure_state=closed` on its own judgment. In interactive runs it must ask the owner via the blocking question tool and record the owner answer row in Owner Decision Trace before that OQ can be non-blocking; when the owner is absent/headless the only legal outcome is `checkpoint-prd`, never self-downgraded ready. State plainly that "I judged OQ-2 to be a parallel planning-time item" is exactly the 19:07 failure and is not a legal closure for a load-bearing OQ.
+- State the razor plainly (R16): "I judged OQ-2 to be a parallel planning-time item" is exactly the 19:07 failure and is NOT a legal closure — it is not one of the closure dispositions. An open OQ is non-blocking only by carrying a legal `closure_disposition`+evidence; the model has no free "non-blocking" verdict. owner-side dispositions (`owner-answered`/`owner-capped`/`owner-accepted-assumption`) require the human owner via the blocking question tool, recorded in Owner Decision Trace; when the owner is absent/headless the only legal outcome is `checkpoint-prd`.
+- Add the disposition mandate (R16 razor): require every PRD-owned open OQ row to carry an explicit `closure_disposition` token from the legal set (`source-resolved` / `owner-answered` / `owner-capped` / `owner-accepted-assumption` / `source-backed-non-WHAT-assumption` / `implementation-only-how-pushdown`) plus that disposition's evidence before it can be non-blocking. There is no "I judged it non-blocking" path; an open OQ with no legal disposition is not-ready by default. This is what makes the 19:07 "parallel planning-time item" self-judgment illegal — it is not a disposition.
+- Add the Push-Right + Brief authoring rule (R17): grill source-first relentlessly, defer the irreducible load-bearing owner decisions to the rightmost checkpoint, and present them as one decision-ready Brief (`decision | recommended answer | affected PRD write target | what planning would invent if unclosed`) via the blocking question tool. The owner's responses become the `owner-answered` Owner Decision Trace rows; the Brief itself is run-local and creates no new artifact. State that relentless one-question-at-a-time still governs source resolution, while owner interaction is push-right + batched into the Brief, so the model neither interrupts the owner serially nor finalizes without owner closure.
 
 **Patterns to follow:**
 - `prd-output-template.md` existing skeleton and field naming style.
@@ -350,6 +362,8 @@ Closure Contract v1 fields:
 **Test scenarios:**
 - Happy path: contract tests find Closure Contract v1 anchors in SKILL, output template, readiness lens, and design-source reference.
 - Happy path: contract tests find frontloaded chunk map, risk-to-write-target map, grill queue, and chunk closure anchors before PRD write-in.
+- Happy path: contract tests find the one-question Owner Question Brief fields and prove the checkpoint brief includes a recommended answer, PRD write target, and unanswered consequence.
+- Happy path: contract tests find dedicated `## Owner Decision Trace` section guidance and reject language that treats free-form `Decision Notes` as an equivalent checker-visible trace.
 - Edge case: no new standalone artifact, transcript, approval file, or `spec-plan` dependency language is introduced.
 - Error path: prose forbids `final-prd` when chunk closure, OQ closure, or design unread owner acceptance is missing.
 
@@ -362,7 +376,7 @@ Closure Contract v1 fields:
 
 **Goal:** Teach `check-prd-artifact.js` to report deterministic pre-write grill signals and closure contradictions that 003 could not see, while keeping presence/self-incrimination checks advisory-first so the model cannot satisfy the gate by filling empty ceremony.
 
-**Requirements:** R2, R3, R4, R5, R6, R7, R8, R9, R11, R12, R15, R16
+**Requirements:** R2, R3, R4, R5, R6, R7, R8, R9, R11, R12, R15, R16, R17
 
 **Dependencies:** U1
 
@@ -379,6 +393,7 @@ Closure Contract v1 fields:
   - `PRD write target`: `PRD write target`, `write target`, `PRD写入目标`, `需求写入目标`, `写入目标`
   - `owner_status`: `owner_status`, `owner status`, `owner状态`, `澄清状态`
   - `blocks_planning`: `blocks_planning`, `blocks planning?`, `是否阻塞规划`, `阻塞规划`
+  - `closure_disposition`: `closure_disposition`, `disposition`, `闭合方式`, `闭合依据`, `closure disposition`
   - `planning_would_invent_what`: `planning_would_invent_what`, `planning would invent WHAT?`, `是否会发明WHAT`, `会否发明WHAT`
   - `closure_state`: `closure_state`, `closure state`, `闭合状态`
   - `recommended_default/deferred_reason`: `recommended_default`, `deferred_reason`, `推荐默认`, `延后原因`, `默认/延后原因`
@@ -409,6 +424,7 @@ Closure Contract v1 fields:
   - `grill_queue_absent`
   - `acceptance_example_mapping_absent`
   - `unclosed_chunk_count`
+  - `possible_misclassified_how_pushdown`
 - Add robust contradiction facts:
   - `outstanding_question_closure_contract_present`
   - `outstanding_question_rows`
@@ -430,6 +446,7 @@ Closure Contract v1 fields:
   - `risk_to_write_target_map_absent`
   - `grill_queue_absent`
   - `acceptance_example_mapping_absent`
+  - `possible_misclassified_how_pushdown`
 - Add blocking reason_codes only for robust ready contradictions:
   - `unclosed_chunk_present`
   - `outstanding_question_closure_undeclared`
@@ -437,16 +454,18 @@ Closure Contract v1 fields:
   - `planning_invention_question_present`
   - `unclosed_owner_question_present`
   - `owner_decision_trace_required_but_absent`
-  - `load_bearing_oq_self_downgraded`
+  - `open_oq_without_owner_closure`
   - `design_unread_without_owner_acceptance`
   - `design_partial_coverage_unaccepted`
   - `preflight_closure_contradicted`
   - `checkpoint_claims_ready`
 - `unclosed_chunk_present` is blocking only when the artifact itself declares a `closure_state` token of `unclosed` (the script reads the literal token, not a semantic judgment of load-bearing-ness) and also claims `write_mode=final-prd`, `can_enter_spec_plan: yes`, or `status: ready-for-planning`. Missing chunk map / missing grill queue is advisory because a gate-gaming model can fill an empty map; a self-declared unclosed chunk plus ready is a contradiction.
+- `prewrite_grill_map_absent` should be detected from the dedicated `Pre-Write Grill Map` section or its canonical fields; absence remains advisory. Do not infer that pressure grill did or did not happen from prose alone, and do not add positive `*_present` facts until a real consumer asserts them.
 - Treat `closure_state=blocker|unknown|headless-degraded` as the same ready contradiction class as `closure_state=unclosed` for reason-code purposes. They should fold into `unclosed_owner_question_present` or `unclosed_chunk_present` rather than creating separate blocker codes unless a future consumer needs distinct routing.
 - `acceptance_example_mapping_absent` is advisory only. A separate blocker may be introduced only if implementation can detect a contradiction such as: a core requirement has no AE, no explicit trace gap, no owner cap/OQ, and the PRD still declares `planning_would_invent_what=no` / `can_enter_spec_plan: yes`. Do not reuse `requirement_without_acceptance_ref` / `uncovered_requirements` as blocking; that would violate the 003/readiness-lens carve-out.
 - `owner_decision_trace_required_but_absent` replaces broad trace-absence wording. It blocks only when the artifact claims `clarification_evidence=asked-owner`, an OQ row uses `owner_status=answered|capped`, or closure state depends on owner answer/cap, and the trace is missing, empty, or lacks `chosen_answer` / `PRD write target` / consequence. The check is purely structural cell-presence: the script verifies a non-empty trace row with the required cells exists, not that the row semantically answers a specific OQ or that `chosen_answer` is genuine — semantic correspondence and answer authenticity remain LLM/owner-owned and, for anti-forgery, deferred to host provenance per R12.
-- `load_bearing_oq_self_downgraded` enforces R16. It blocks only when an OQ row is declared load-bearing (the LLM itself sets a load-bearing marker — e.g. `owner_status` requiring owner input, or a write-target in the WHAT/scope/acceptance/source-of-truth/interface-availability/fallback/analytics set) AND `blocks_planning=no` / `closure_state=closed` AND there is no owner-ratified Owner Decision Trace row for it (no `owner_answer/source` with `chosen_answer` and matching write target) AND the artifact claims ready/final. The script does NOT decide whether an OQ is load-bearing — that classification is the LLM's declared marker (KTD2 boundary preserved); the script only detects the structural contradiction "declared load-bearing + non-blocking + no owner ratification + ready". A model-proposed default without an owner answer row does not satisfy it. Headless/`checkpoint-prd` is exempt because it is not claiming ready.
+- `open_oq_without_owner_closure` enforces the R16 razor and is a purely structural check (it replaces the retired `load_bearing_oq_self_downgraded`, which depended on self-labeling). It blocks when an OQ row is non-blocking (`blocks_planning=no` or `closure_state=closed`) AND carries no legal `closure_disposition` token with the evidence that disposition requires AND the artifact claims ready/final. Legal dispositions and their required evidence: `source-resolved` (a source/doc/repo ref cell), `owner-answered` (a matching non-empty Owner Decision Trace row), `owner-capped` (cap evidence), `owner-accepted-assumption` (owner confirmation ref), `source-backed-non-WHAT-assumption` (source ref), `implementation-only-how-pushdown` (`planning_would_invent_what=no` declared). The script reads only the declared `closure_disposition` token and the presence of the required evidence cell — it never infers whether an OQ is load-bearing (KTD2 holds without contradiction, and the self-labeling loophole disappears because there is no "mark it non-load-bearing to escape" path: every open OQ needs a disposition regardless). A model-proposed default without owner/source evidence does not satisfy any owner/source disposition. Headless/`checkpoint-prd` is exempt because it is not claiming ready.
+- `possible_misclassified_how_pushdown` is an advisory-only tripwire (never blocking, per KTD10) for the one residual self-asserted disposition. When an OQ is closed via `implementation-only-how-pushdown` (so it declares `planning_would_invent_what=no`) but its `question` + `PRD write target` text hits a small frozen keyword set — `interface/接口`, `availability/可用性`, `permission/权限`, `scope/范围`, `source-of-truth/数据权威`, `fallback/降级`, `analytics/埋点/指标` — the checker emits this advisory, because a WHAT-touching question is suspicious as a pure HOW pushdown. It is advisory, not a block, because a frozen keyword scan would false-positive on honest localized PRDs (KTD2: the script flags a suspect signal, it does not adjudicate). It is surfaced in finalize JSON and routed to doc-review / fresh-source eval / human review, not the Stop-hook block path. Scope is limited to how-pushdown rows only, not all OQs. The frozen keyword set is part of this plan's contract; expanding it requires fixtures, like the alias table.
 - A draft/checkpoint may carry all advisory facts and contradiction facts without being forced to ready. Blocking applies to ready/final contradiction only.
 
 **Technical design:** Header-aware parsing is enough; do not implement a full Markdown parser. If rows are malformed, report missing closure rather than guessing. Keep the alias table small and explicit; avoid fuzzy matching that would make honest localized PRDs unstable.
@@ -468,9 +487,11 @@ Closure Contract v1 fields:
 - Error path: final PRD with any `blocks_planning=yes` reports `blocking_outstanding_question_present`.
 - Error path: final PRD with `planning_would_invent_what=yes` reports `planning_invention_question_present`.
 - Error path: `clarification_evidence=asked-owner` with no owner decision trace reports `owner_decision_trace_required_but_absent`.
-- Error path: final/ready PRD with an OQ declared load-bearing (owner-input write target) set to `blocks_planning=no` but no owner-ratified Owner Decision Trace row reports `load_bearing_oq_self_downgraded` — this is the literal 19:07 OQ-2/OQ-4 shape.
-- Happy path: the same load-bearing OQ set to `blocks_planning=no` WITH an owner-ratified trace row (`chosen_answer` + matching write target) does not report `load_bearing_oq_self_downgraded`.
-- Happy path: a non-load-bearing implementation/HOW OQ set to `blocks_planning=no` without an owner trace row does not report `load_bearing_oq_self_downgraded` (the marker, not the script, decides load-bearing-ness).
+- Error path: final/ready PRD with a non-blocking OQ (`blocks_planning=no`) that carries no legal `closure_disposition`+evidence reports `open_oq_without_owner_closure` — this is the literal 19:07 OQ-2/OQ-4 shape (self-judged "parallel planning-time item" is not a disposition).
+- Happy path: the same OQ closed via `closure_disposition=owner-answered` with a matching Owner Decision Trace row (`chosen_answer` + write target) does not report `open_oq_without_owner_closure`.
+- Happy path: an OQ closed via `closure_disposition=source-resolved` with a source ref, or `owner-capped` with cap evidence, finalizes without the blocker — proving legal dispositions are the escape valve.
+- Advisory path: an OQ closed via `closure_disposition=implementation-only-how-pushdown` whose text hits the frozen keyword set (e.g. 接口可用性) reports advisory `possible_misclassified_how_pushdown` — NOT a block — flagging a possibly-misclassified WHAT.
+- Happy path: an honest localized OQ closed via a legal disposition that incidentally contains a keyword is at most advisory, never blocked — proving the tripwire cannot hard-fail a localized PRD, and only how-pushdown rows are scanned.
 - Error path: `preflight_sweep_closure=closed` plus any closure blocker reports `preflight_closure_contradicted`.
 - Error path: final PRD with legacy design accounting fields present but `design_source_coverage=partial` / `design_sources_unread` non-empty and no owner acceptance still reports `design_partial_coverage_unaccepted` or `design_unread_without_owner_acceptance`.
 - Regression: same PRD input passed to finalize with relative and absolute `--inputs` produces identical `readiness_inputs_hash`.
@@ -533,7 +554,7 @@ Closure Contract v1 fields:
 
 **Goal:** Lock the observed failure artifact shape, not only the implementation details.
 
-**Requirements:** R10, R12, R16
+**Requirements:** R10, R12, R16, R17
 
 **Dependencies:** U1, U2
 
@@ -554,8 +575,11 @@ Closure Contract v1 fields:
   - `design_sources_unread` non-empty
   - no owner acceptance for degraded design path
 - Add a second fixture where chunk map exists but one load-bearing chunk is `unclosed`, proving the model must ask or checkpoint instead of finalizing.
-- Add a fixture matching the 19:07 self-downgrade shape: an OQ declared load-bearing (interface availability / design authority) carries `blocks_planning=no` with no owner-ratified trace row while the PRD claims ready, proving `load_bearing_oq_self_downgraded` fires (R16).
-- Add a positive owner-ratified fixture: the same load-bearing OQ marked `blocks_planning=no` WITH an Owner Decision Trace row (owner answer, chosen_answer, matching write target) finalizes cleanly, proving the invariant accepts genuine owner ratification.
+- Add a fixture with the minimal `Pre-Write Grill Map` summary present and one unclosed row, proving the parser keys on the agreed body-resident shape rather than arbitrary prose.
+- Add a contract fixture for the one-question Owner Question Brief with the 8 required cells/fields, and a negative fixture where the question is vague/multi-question or lacks `PRD write target` / unanswered consequence.
+- Add a fixture matching the 19:07 self-downgrade shape: a non-blocking OQ (`blocks_planning=no`) over interface availability / design authority with no legal `closure_disposition`+evidence while the PRD claims ready, proving `open_oq_without_owner_closure` fires (R16 razor).
+- Add a positive disposition fixture: the same OQ marked `blocks_planning=no` WITH `closure_disposition=owner-answered` and a matching Owner Decision Trace row (owner answer, chosen_answer, write target) finalizes cleanly, proving a legal disposition is the escape valve.
+- Add a how-pushdown advisory fixture (R17): an OQ closed via `closure_disposition=implementation-only-how-pushdown` whose text hits the frozen keyword set (interface availability) — proving it emits advisory `possible_misclassified_how_pushdown` and is NOT hard-blocked, while an honest source-resolved OQ that incidentally contains a keyword stays advisory-free (no false hard block, scan limited to how-pushdown rows).
 - Add a positive checkpoint fixture where the same unclosed chunk/OQ residue is preserved under `write_mode=checkpoint-prd` and `can_enter_spec_plan: no`, proving R10's escape valve is not destroyed by robust blockers.
 - Add positive fixtures for owner-capped and implementation-deferred non-WHAT questions so checker does not overblock legitimate residue.
 
@@ -563,8 +587,8 @@ Closure Contract v1 fields:
 - Existing eval examples are advisory fixtures; keep them compact and focused on visible artifact residue rather than transcript-level behavior proof.
 
 **Test scenarios:**
-- Regression: 19:07 shape cannot finalize as ready because robust blockers remain, such as `outstanding_question_closure_undeclared`, `blocking_outstanding_question_present`, `planning_invention_question_present`, `load_bearing_oq_self_downgraded`, or `design_unread_without_owner_acceptance`; missing pre-write grill evidence is reported only as advisory structural fact.
-- Regression: the 19:07 OQ-2/OQ-4 self-downgrade (load-bearing OQ marked non-blocking with no owner-ratified trace, PRD claims ready) reports `load_bearing_oq_self_downgraded`; supplying a genuine owner trace row clears it (R16).
+- Regression: 19:07 shape cannot finalize as ready because robust blockers remain, such as `outstanding_question_closure_undeclared`, `blocking_outstanding_question_present`, `planning_invention_question_present`, `open_oq_without_owner_closure`, or `design_unread_without_owner_acceptance`; missing pre-write grill evidence is reported only as advisory structural fact.
+- Regression: the 19:07 OQ-2/OQ-4 shape (non-blocking OQ with no legal closure disposition, PRD claims ready) reports `open_oq_without_owner_closure`; supplying a legal disposition (owner-answered trace, source ref, or owner cap) clears it (R16 razor).
 - Regression: chunk map with unclosed owner question cannot finalize as ready.
 - Happy path: non-blocking implementation recheck OQ with `planning_would_invent_what=no` and closure trace remains finalizable.
 - Happy path: partial/degraded design coverage with explicit owner acceptance, readiness consequence, and `planning_would_invent_what=no` is not blocked by design partial coverage alone.
@@ -614,7 +638,7 @@ Closure Contract v1 fields:
 
 ## System-Wide Impact
 
-- **Interaction graph:** `$spec-prd` SKILL/readiness/output template first create a run-local chunk map and grill queue, then write PRD closure declarations. `check-prd-artifact.js` validates the persisted closure summary; finalize and Claude Stop hook consume checker blockers. `spec-plan` consumes only ready PRD artifact and remains unchanged.
+- **Interaction graph:** `$spec-prd` SKILL/readiness/output template first create a run-local chunk map and grill queue, then persist only the minimal body-resident `Pre-Write Grill Map` summary and closure declarations. `check-prd-artifact.js` validates the persisted closure summary; finalize and Claude Stop hook consume checker blockers. `spec-plan` consumes only ready PRD artifact and remains unchanged.
 - **Error propagation:** pre-write grill and closure blockers surface as reason_codes in finalize JSON and Stop hook block message. LLM next action is return to the grill queue, ask owner, read design, downgrade checkpoint, or fix false declaration.
 - **State lifecycle risks:** a stale ready receipt remains blocked by existing receipt hash logic. Closure declarations should stay body-resident in PRD sections, where `normalizeForReceipt` already includes them in `readiness_prd_hash`; do not move closure fields into frontmatter or add them to `MACHINE_READY_FIELDS`, or post-finalize OQ/design edits could stop invalidating the receipt.
 - **Surface coverage:** Claude hard block in scope through Stop hook; Codex source skill/finalize path in scope but host-level hard block remains degraded; README/docs communicate the difference.
@@ -631,6 +655,7 @@ Closure Contract v1 fields:
 | Checker overblocks legitimate implementation-time unknowns | Add positive fixtures for HOW/integration recheck rows with `planning_would_invent_what=no`, owner-accepted default or source-backed non-WHAT default, and non-blocking closure state |
 | Closure contract becomes too heavy for small PRDs | Require full OQ closure fields only when `Outstanding Questions` exists or PRD claims final ready; compact/source-proven PRDs with no OQ avoid extra table weight |
 | Pre-write chunk map becomes a bureaucratic dump | Keep it run-local by default and persist only the compact closure summary, first unclosed chunk, and write-target consequences that reduce planning invention |
+| Owner checkpoint regresses to vague scoping | Require a one-question Owner Question Brief with recommended answer, PRD write target, why-now, unanswered consequence, and next action; test this as prose/template contract rather than runtime transcript proof |
 | Design unread always blocks even when detail is cosmetic | Allow owner-accepted degraded path with readiness consequence explaining why planning will not invent WHAT; normalize empty unread declarations so `none`/`无` does not block |
 | Localized OQ table parsing blocks honest Chinese PRDs | Freeze the small Chinese/English header/value alias set in this plan and add KAZ-style Chinese-header fixtures; future aliases require tests |
 | Ready receipt churns because hook passes absolute inputs and local finalize uses relative inputs | Normalize input hash identity with `path.resolve` and add relative-vs-absolute hash regression tests |
@@ -663,12 +688,14 @@ Closure Contract v1 fields:
 - Should all new checker reason_codes start as blockers? No. 19:07 proved the model can game checker contracts, so presence/self-incrimination checks are advisory-first; only robust ready contradictions enter `BLOCKING_REASON_CODES`.
 - Should missing acceptance example mapping be a blocker? No. It stays advisory to preserve the 003/readiness-lens trace-gap carve-out; only a separate, narrowly detected contradiction may block when the artifact has no AE, no trace gap/OQ/owner cap, and still claims planning will not invent WHAT.
 - Should localized OQ/Decision Trace aliases be deferred? No. The implementation starts with the explicit minimal Chinese/English alias table in U2; adding more aliases later requires fixtures.
-- Is the fix an independent LLM verifier or owner ratification? Owner ratification (R16/KTD13). The disease is producer==checker==same model; the structurally independent party in interactive `/spec:prd` is the human owner, already wired via the blocking question tool, with no same-base self-preference blind spot and no host-dispatch dependency. A second LLM critic shares the artifact-truth ceiling and the base-model blind spot, so it stays optional defense-in-depth, not the primary fix. This closes the "sincere misjudgment" layer (19:07 OQ-2/OQ-4); deliberate forgery of an owner answer remains the deferred host-provenance ceiling (R12).
+- Is the fix an independent LLM verifier or owner ratification? Owner ratification, expressed as the R16 closure-disposition razor (R16/KTD13). The disease is producer==checker==same model; the structurally independent party in interactive `/spec:prd` is the human owner, already wired via the blocking question tool, with no same-base self-preference blind spot and no host-dispatch dependency. A second LLM critic shares the artifact-truth ceiling and the base-model blind spot, so it stays optional defense-in-depth, not the primary fix. The razor closes the sincere-misjudgment layer without a self-labeling loophole: there is no "mark it non-load-bearing to escape" path, because every open OQ needs a legal `closure_disposition`+evidence regardless. Deliberate forgery of an owner answer remains the deferred host-provenance ceiling (R12).
+- Why a closure-disposition razor instead of a self-labeled `load_bearing` flag? An earlier revision used `load_bearing=yes` self-labeling plus contradiction detection, but that created a second-order self-labeling loophole (the model could simply not mark a load-bearing OQ). Borrowing loop-me's "nothing is done while a question remains", the razor removes the downgrade knob entirely: open OQ defaults to not-ready, the only exit is a legal disposition. This retires the `load_bearing_oq_self_downgraded` blocker and its broad advisory, collapsing them into the single `open_oq_without_owner_closure` blocker; the only residual self-asserted disposition (`implementation-only-how-pushdown`) is covered by the narrowed advisory `possible_misclassified_how_pushdown`, which never blocks.
+- What exact compact shape should persisted pre-write grill closure use? A minimal body-resident `Pre-Write Grill Map` summary with `chunk_id`, `source_refs/types`, `risk_or_conflict`, `PRD write target`, `next_owner_brief_id`, `closure_state`, and `first_unclosed_chunk`. Full transcripts and raw chunk reasoning remain run-local.
+- Should `Owner Decision Trace` be a new section or stricter `Decision Notes` table? New conditional `## Owner Decision Trace` section. Free-form `Decision Notes` can explain decisions but cannot satisfy checker-visible owner answer trace.
+- What does "彻底解决" mean here? It means the producer-local artifact cannot honestly close as ready while visible OQ/chunk/design residue contradicts readiness. It does not mean proving the model truly asked before writing or that owner answers are non-forged; that remains deferred host provenance.
 
 ### Deferred to Implementation
 
-- Exact compact shape for persisted pre-write grill closure summary: choose the smallest table or field set that lets checker report missing chunk map as advisory structural fact and catch self-declared unclosed chunk + ready contradictions without persisting full transcripts.
-- Whether `Owner Decision Trace` is a new conditional section or a stricter `Decision Notes` table shape: choose the smaller change after editing the template.
 - Exact host provenance design for proving owner answers are real: deferred until the host exposes question receipt or transcript-bound provenance that can be consumed without brittle transcript parsing.
 
 ---

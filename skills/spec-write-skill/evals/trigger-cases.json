@@ -112,6 +112,75 @@
       "boundary_note": "Future outline requests are pre-build design, not source mutation.",
       "forbidden_signals": ["create skills/", "write SKILL.md"],
       "reason_code": "future-outline-vs-build"
+    },
+    {
+      "id": "weak-context-pointer-failure",
+      "case_id": "WRITE-SKILL-FAIL-001",
+      "case_type": "failure",
+      "input": "把长规则下沉到 references/rubric.md，但 SKILL.md 只写“详见参考文件”，不说明何时读取。",
+      "prompt": "把长规则下沉到 references/rubric.md，但 SKILL.md 只写“详见参考文件”，不说明何时读取。",
+      "coverage_tags": ["failure", "boundary"],
+      "expected_outcome": "requires-pointer-sharpening",
+      "expected_result": "requires-pointer-sharpening",
+      "expected_mode": "revise-skill",
+      "boundary_note": "Must-have references need context pointer wording that states when to read and what judgment it supports.",
+      "forbidden_signals": ["hide must-have reference behind vague pointer", "create unreferenced reference"],
+      "reason_code": "weak-context-pointer"
+    },
+    {
+      "id": "branch-first-resource-allocation",
+      "case_id": "WRITE-SKILL-EXPECTED-001",
+      "case_type": "expected",
+      "input": "迁移一个 skill，同时支持 new-skill、revise-skill 和 package-readiness 三种路径，要求保持 SKILL.md 精简。",
+      "prompt": "迁移一个 skill，同时支持 new-skill、revise-skill 和 package-readiness 三种路径，要求保持 SKILL.md 精简。",
+      "coverage_tags": ["expected", "boundary"],
+      "expected_outcome": "branch-first-resource-allocation",
+      "expected_result": "branch-first-resource-allocation",
+      "expected_mode": "migrate-skill",
+      "boundary_note": "The authoring flow should list real branches before deciding what stays in SKILL.md and what moves to references/evals.",
+      "reason_code": "branch-first-information-hierarchy"
+    },
+    {
+      "id": "vague-completion-criterion-failure",
+      "case_id": "WRITE-SKILL-FAIL-002",
+      "case_type": "failure",
+      "input": "新增写入脚本步骤，完成条件只写“检查脚本可以工作”。",
+      "prompt": "新增写入脚本步骤，完成条件只写“检查脚本可以工作”。",
+      "coverage_tags": ["failure", "expected"],
+      "expected_outcome": "requires-clarity-and-demand",
+      "expected_result": "requires-clarity-and-demand",
+      "expected_mode": "revise-skill",
+      "boundary_note": "High-risk write or shell steps need completion criteria with clarity and demand, not just an action label.",
+      "forbidden_signals": ["accept vague completion criterion", "done when checked"],
+      "reason_code": "vague-completion-criterion"
+    },
+    {
+      "id": "over-split-granularity-failure",
+      "case_id": "WRITE-SKILL-FAIL-003",
+      "case_type": "failure",
+      "input": "为了模块化，把同一个 source skill 的两个同义触发表达拆成两个 standalone skills。",
+      "prompt": "为了模块化，把同一个 source skill 的两个同义触发表达拆成两个 standalone skills。",
+      "coverage_tags": ["failure", "boundary"],
+      "expected_outcome": "do-not-split",
+      "expected_result": "do-not-split",
+      "expected_mode": "revise-skill",
+      "boundary_note": "Granularity changes need independent invocation or sequence-risk evidence; synonym splitting increases governance and cognitive load.",
+      "forbidden_signals": ["split for modularity only", "duplicate same branch as separate skill"],
+      "reason_code": "over-split-granularity"
+    },
+    {
+      "id": "sentence-level-no-op-pruning",
+      "case_id": "WRITE-SKILL-EXPECTED-002",
+      "case_type": "expected",
+      "input": "优化一个 skill 的 prose，发现多句“要认真、要清晰、要全面”没有改变触发、读取、写入、判断、验证或 handoff。",
+      "prompt": "优化一个 skill 的 prose，发现多句“要认真、要清晰、要全面”没有改变触发、读取、写入、判断、验证或 handoff。",
+      "coverage_tags": ["expected", "failure"],
+      "expected_outcome": "delete-no-op-sentences",
+      "expected_result": "delete-no-op-sentences",
+      "expected_mode": "revise-skill",
+      "boundary_note": "No-op pruning happens sentence by sentence; weak leading words should be deleted or replaced with project vocabulary that changes behavior.",
+      "forbidden_signals": ["polish no-op sentence", "keep weak leading word"],
+      "reason_code": "leading-word-no-op"
     }
   ]
 }

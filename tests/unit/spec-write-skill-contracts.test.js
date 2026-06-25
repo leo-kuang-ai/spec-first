@@ -43,7 +43,11 @@ describe('spec-write-skill contract', () => {
     expect(skill).toContain('[Skill Quality Vocabulary](references/skill-quality-vocabulary.md)');
     expect(skill).toContain('[Delivery Gates](references/delivery-gates.md)');
     expect(skill).toContain('描述是 trigger contract');
+    expect(skill).toContain('先列真实 branch');
+    expect(skill).toContain('context pointer 何时读取');
     expect(skill).toContain('completion criterion');
+    expect(skill).toContain('clarity(done/not done) 与 demand');
+    expect(skill).toContain('sentence-level no-op pruning');
     expect(skill).toContain('至少 1 个 should-trigger 示例');
     expect(skill).toContain('forward-testing');
     expect(skill).toContain('`do-not-create-skill`');
@@ -60,11 +64,14 @@ describe('spec-write-skill contract', () => {
     for (const snippet of [
       'Description As Trigger Contract',
       'Information Hierarchy',
+      'Context Pointer Wording',
       'Completion Criteria',
-      'Granularity',
-      'Pruning And Co-location',
+      'Branch',
+      'Sentence-Level No-Op',
+      'Pruning',
+      'Co-location',
       'Leading Words',
-      'Failure Modes',
+      'Failure Mode:',
       'Spec-First Closeout Checklist',
     ]) {
       expect(vocabulary).toContain(snippet);
@@ -75,10 +82,13 @@ describe('spec-write-skill contract', () => {
       'do-not-create-skill',
       'Intent Dialogue',
       'Reference Scan',
+      'Branch And Pointer Design',
       'Skill Creator Compatibility',
       'frontmatter `name`、治理记录和 runtime catalog 必须一致',
       'frontmatter 只放 `name` 和 `description`',
       '$CODEX_HOME/skills',
+      'weak-context-pointer',
+      'vague-completion-criterion',
       'Anti-Pattern Families',
       'one-off-vs-reusable',
       'document-export-vs-agent-skill',
@@ -95,7 +105,9 @@ describe('spec-write-skill contract', () => {
       '`governed`',
       'Resource Boundary',
       'Gate Selection',
+      'branch / context pointer / information hierarchy',
       'Packaging Readiness',
+      'Skill Quality Eval Boundary',
       'Output Eval Boundary',
       'Forward Testing Boundary',
       'not_checked_with_reason',
@@ -126,6 +138,14 @@ describe('spec-write-skill contract', () => {
     expect(JSON.stringify(cases)).toContain('explain-not-package');
     expect(JSON.stringify(cases)).toContain('document-export-vs-agent-skill');
     expect(JSON.stringify(cases)).toContain('future-outline-vs-build');
+    expect(JSON.stringify(cases)).toContain('weak-context-pointer');
+    expect(JSON.stringify(cases)).toContain('branch-first-information-hierarchy');
+    expect(JSON.stringify(cases)).toContain('vague-completion-criterion');
+    expect(JSON.stringify(cases)).toContain('over-split-granularity');
+    expect(JSON.stringify(cases)).toContain('leading-word-no-op');
+
+    const tags = [...new Set(cases.cases.flatMap((entry) => entry.coverage_tags))];
+    expect(tags).toEqual(expect.arrayContaining(['failure', 'expected']));
   });
 
   test('governance registers the skill as dual-host standalone delivery', () => {

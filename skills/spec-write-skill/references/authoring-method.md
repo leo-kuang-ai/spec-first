@@ -79,6 +79,29 @@
 
 明确记录不借鉴什么：完整 SkillOps 平台、装饰性 reports、未请求 adapters、未验证 public claims、照搬外部 wording。
 
+外部 benchmark 只能提供 pattern，不能直接提供 spec-first entry surface。迁移前先重判：
+
+- invocation：它在原宿主里靠什么触发，spec-first 中应落到 `workflow_command`、`standalone_skill` 还是 `internal_only`。
+- information hierarchy：哪些内容是所有 branch 必读，哪些只属于某个 branch，应下沉到 `references/`。
+- steering：哪些 wording 真正改变触发、completion criterion、legwork 或 handoff。
+- pruning：哪些句子只是解释背景、重复原文身份或模型默认行为。
+
+如果 local fit 后只能保留外部措辞而不能产生新的 spec-first 行为，不要借鉴。
+
+## 3.5 Branch And Pointer Design
+
+写 source 前先列 branch，再分配资源。常见 branch 包括 `new-skill`、`revise-skill`、`migrate-skill`、`audit-remediation`、`package-readiness`；只有输入、步骤、输出或验证不同，才算真实 branch。
+
+对每个 branch 判断：
+
+- 必走步骤是否需要留在 `SKILL.md`。
+- 条件细节是否可下沉到 `references/`。
+- context pointer 是否说明“何时读取”和“读完用于什么判断”。
+- must-have reference 是否被弱 pointer 隐藏；若是，先 sharpen wording，仍不可靠才 inline。
+- 是否需要 eval 记录 positive、negative/near-neighbor、boundary、failure 或 expected behavior。
+
+不要用“多建一个 reference”掩盖 branch 不清，也不要用“全部 inline”逃避 pointer wording 设计。
+
 ## 4. Authoring Discipline
 
 每个新增指令、文件、脚本、eval 或治理规则，都必须追溯到用户真实 recurring job。
@@ -88,6 +111,8 @@
 - 改现有 skill 时只动直接服务本次目标的文件。
 - 每个 meaningful change 绑定一种检查：route evidence、sample run、resource-boundary check、governance check、package smoke 或 reviewer note。
 - 暂不可验证的想法进入 next-step candidate，不进 baseline。
+- 改 prose 时做 sentence-level no-op pruning：逐句问它是否改变触发、读取、写入、判断、验证或 handoff；没有改变就删除，不优先润色。
+- 写 completion criterion 时同时检查 clarity 和 demand；只有动作名、没有 done signal 的句子不算完成条件。
 
 ## 5. Anti-Pattern Families
 
@@ -99,3 +124,7 @@
 - `future-outline-vs-build`：用户只要未来构思，却提前写 source。
 - `audit-not-authoring`：只要审计 finding，却直接改 source。
 - `runtime-mirror-patch`：把 generated runtime mirror 当 source 修。
+- `weak-context-pointer`：must-have reference 被弱 pointer 隐藏，导致 agent 不稳定读取。
+- `over-split-granularity`：没有独立触发或 sequence 风险，却为了模块化新增 skill。
+- `vague-completion-criterion`：步骤只有动作名，没有清晰和有要求的完成条件。
+- `leading-word-no-op`：把弱口号当 leading word，实际不改变行为。
