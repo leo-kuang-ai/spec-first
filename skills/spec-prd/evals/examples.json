@@ -1018,6 +1018,25 @@
       "expected": ["source-resolvable gaps must be closed source-first before any owner interaction", "the question should have been answered by reading the repo/docs/contract and recorded as source-resolved with a checkable ref"],
       "must_not": ["must not escalate a gap to the owner when source/docs/repo can answer it", "must not treat over-blocking or owner-spamming as the safe default just because under-asking failed in 19:07"],
       "coverage_tags": ["readiness", "anti-over-blocking", "source-first"]
+    },
+    {
+      "id": "one-round-scoping-then-checkpoint-rejected",
+      "intent": "create",
+      "case_type": "failure",
+      "quality_buckets": ["failure", "grill-quality"],
+      "input_shape": "Model reads 6 input documents, asks the owner one batch of 3 scoping questions (delivery range, MVP scope, dependency availability), receives answers, then immediately writes a checkpoint PRD with the load-bearing architecture / interface / state questions (HSMarketMainViewController reuse boundary, 中台持仓接口契约 availability) still in the Outstanding Questions table untouched as 'planning-time items', claiming clarification_evidence: asked-owner",
+      "expected": ["load-bearing OQs about interface availability, architecture boundary, and external dependency contracts must be grilled to a Canonical stop point before checkpoint is written", "asked-owner requires that the model actually asked the load-bearing OQs and received owner answers — asking 3 scoping questions then parking interface/dependency OQs is not asked-owner", "the correct action is to keep grilling: ask about OQ-01 (reuse boundary) and OQ-02 (持仓接口契约) before writing any PRD, not after", "if the owner is unavailable for those questions, the legal outcome is write_mode=checkpoint-prd + next_owner_question pointing at the unanswered load-bearing OQ, not a PRD that silently assumes those OQs are planning-time items"],
+      "must_not": ["must not treat 'planning can handle it in parallel' as a legal stop reason for a load-bearing branch", "must not claim clarification_evidence: asked-owner when load-bearing OQs about interface availability or external dependency contracts were never asked", "must not write a checkpoint that parks interface / architecture / dependency OQs as non-blocking without a legal closure_disposition for each one"],
+      "coverage_tags": ["grill-quality", "checkpoint-misuse", "asked-owner-fidelity", "load-bearing-oq"]
+    },
+    {
+      "id": "checkpoint-after-full-grill-accepted",
+      "intent": "create",
+      "case_type": "positive",
+      "quality_buckets": ["checkpoint"],
+      "input_shape": "Model reads input documents, grills the owner on every load-bearing branch (reuse boundary, interface contract, dependency availability) one at a time, receives answers on scope and delivery range, then discovers that the owner is unable to answer OQ about 中台接口契约 in this session. Model writes a checkpoint PRD with write_mode=checkpoint-prd, can_enter_spec_plan=no, next_owner_question naming the unanswered OQ, and all other load-bearing branches either closed by source evidence or owner answer",
+      "expected": ["checkpoint after exhausting the grill on answerable branches is the correct use of checkpoint-prd", "the outstanding OQ in the checkpoint must be the specific unanswered load-bearing question, not a bucket of unasked questions", "next_owner_question must name the exact question that blocks ready-for-planning", "all other load-bearing branches must have a legal closure_disposition with evidence"],
+      "coverage_tags": ["checkpoint", "grill-quality", "legal-checkpoint-use"]
     }
   ],
   "skill": "spec-prd",
