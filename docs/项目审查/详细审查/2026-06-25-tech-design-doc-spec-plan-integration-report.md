@@ -3,7 +3,7 @@
 > 生成时间：2026-06-25 17:10:45  
 > 研究对象：微信公众号文章《技术方案设计文档》（原创：语霖，公众号：语霖 爱语霖爱生活，2026-06-15）  
 > 目标项目：`spec-first`  
-> 目标 skill：`/Users/kuang/xiaobu/spec-first/skills/spec-plan/`  
+> 目标 skill：`skills/spec-plan/`
 > 输出定位：可落地改造建议，供后续进入 `$spec-plan` / `$spec-work` 形成源码改造计划。
 
 ---
@@ -397,16 +397,16 @@ skills/spec-plan/references/enterprise-plan-review.md
 ### 7.1 建议修改文件
 
 ```text
-/Users/kuang/xiaobu/spec-first/skills/spec-plan/SKILL.md
-/Users/kuang/xiaobu/spec-first/skills/spec-plan/references/plan-template.md
-/Users/kuang/xiaobu/spec-first/skills/spec-plan/references/deepening-workflow.md
-/Users/kuang/xiaobu/spec-first/skills/spec-plan/references/planning-flow.md
+skills/spec-plan/SKILL.md
+skills/spec-plan/references/plan-template.md
+skills/spec-plan/references/deepening-workflow.md
+skills/spec-plan/references/planning-flow.md
 ```
 
 ### 7.2 建议新增文件
 
 ```text
-/Users/kuang/xiaobu/spec-first/skills/spec-plan/references/enterprise-plan-review.md
+skills/spec-plan/references/enterprise-plan-review.md
 ```
 
 ### 7.3 最小可行改造方案

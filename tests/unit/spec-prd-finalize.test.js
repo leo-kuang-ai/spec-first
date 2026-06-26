@@ -4,7 +4,10 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const { buildReport } = require('../../skills/spec-prd/scripts/check-prd-artifact');
+const {
+  buildReport,
+  BLOCKING_REASON_CODES,
+} = require('../../skills/spec-prd/scripts/check-prd-artifact');
 const { finalizePrd } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
 
 function makeTempDir() {
@@ -310,5 +313,227 @@ AE-01（对应 R-01）Given x When y Then z
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+});
+
+// U7 (R20 / S5):checker BLOCKING freeze + characterization baseline。
+// 这一组是确定性回归网,防 1064 行 checker 的 blocking 集合或 closure 形态静默漂移。
+// freeze 写法:断言「当前真实输出」整集,任何增删都会 fail,强制 reviewer 显式确认。
+// 这里的集合是 baseline(intended change 时同步更新并在 PR 做 diff review),不是不可变契约。
+describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
+  // 复用 closure-disposition razor 同款 ready-claiming PRD 骨架,只换 OQ/trace/design 段。
+  function buildClosurePrd({ oq, trace, designCoverage, readinessExtra }) {
+    return [
+      '---',
+      'spec_id: 2026-06-25-900-frz',
+      'artifact_kind: prd-requirements',
+      'status: ready-for-planning',
+      '---',
+      '',
+      '## Summary',
+      'Anchored brownfield increment.',
+      '## Change Delta',
+      '| item | current | target | delta | evidence |',
+      '| --- | --- | --- | --- | --- |',
+      '| x | a | b | extend | user-stated |',
+      '## Requirements',
+      '| id | priority | requirement | rationale/source |',
+      '| --- | --- | --- | --- |',
+      '| R-01 | P0 | Observable behavior | user-stated |',
+      '## Acceptance Examples',
+      'AE-01（对应 R-01）Given x When y Then z',
+      '## Scope Boundaries',
+      '### In Scope',
+      '### Out Of Scope',
+      '## Evidence And Assumptions',
+      '| claim | tag | source / owner | note |',
+      '| --- | --- | --- | --- |',
+      '| c | user-stated | owner | n |',
+      '## Outstanding Questions',
+      ...oq,
+      ...(trace || []),
+      '## Readiness Self-Check',
+      'write_mode: final-prd',
+      'clarification_evidence: asked-owner',
+      'can_enter_spec-plan: yes',
+      'preflight_sweep_closure: closed',
+      `design_source_coverage: ${designCoverage || 'not-needed'}`,
+      ...(readinessExtra || []),
+      '',
+    ].join('\n');
+  }
+
+  const blockingSetOf = (prd) =>
+    [...buildReport('docs/brainstorms/frz-requirements.md', prd).facts.blocking_reason_codes].sort();
+
+  // freeze-1:BLOCKING_REASON_CODES 整集 freeze。
+  // 守 KTD14 审计不变量——这张清单里不得出现任何 presence/ceremony reason_code
+  // (intake_packet_absent / chunk_map_absent / grill_queue_absent / prewrite_grill_map_absent /
+  //  source_type_extraction_absent / conflict_to_grill_mapping_absent / acceptance_example_mapping_absent /
+  //  possible_misclassified_how_pushdown 等都必须留在 advisory,永不进 BLOCKING)。
+  it('freezes the exact BLOCKING_REASON_CODES set (KTD14 audit invariant)', () => {
+    const frozen = [
+      'core_section_missing',
+      'forbidden_prds_path',
+      'write_mode_undeclared',
+      'clarification_evidence_undeclared',
+      'clarification_trace_absent',
+      'can_enter_spec_plan_undeclared',
+      'preflight_sweep_closure_absent',
+      'preflight_sweep_closure_blocked',
+      'design_source_inventory_undeclared',
+      'design_source_coverage_undeclared',
+      'design_sources_read_undeclared',
+      'design_sources_unread_undeclared',
+      'design_source_unaccounted',
+      'input_refs_unavailable',
+      'input_scan_degraded',
+      'prd_readiness_declarations_evaded',
+      'ready_receipt_absent',
+      'ready_receipt_stale',
+      'finalize_required',
+      'outstanding_question_closure_undeclared',
+      'blocking_outstanding_question_present',
+      'planning_invention_question_present',
+      'unclosed_owner_question_present',
+      'open_oq_without_owner_closure',
+      'how_pushdown_touches_what',
+      'owner_decision_trace_required_but_absent',
+      'design_unread_without_owner_acceptance',
+      'design_partial_coverage_unaccepted',
+      'preflight_closure_contradicted',
+      'checkpoint_claims_ready',
+    ];
+    expect([...BLOCKING_REASON_CODES].sort()).toEqual([...frozen].sort());
+
+    // 守 KTD14:presence/ceremony advisory code 绝不出现在 BLOCKING 集合。
+    const ceremonyAdvisory = [
+      'intake_packet_absent',
+      'source_authority_matrix_absent',
+      'source_type_extraction_absent',
+      'conflict_to_grill_mapping_absent',
+      'prewrite_grill_map_absent',
+      'chunk_map_absent',
+      'risk_to_write_target_map_absent',
+      'grill_queue_absent',
+      'acceptance_example_mapping_absent',
+      'possible_misclassified_how_pushdown',
+    ];
+    for (const code of ceremonyAdvisory) {
+      expect(BLOCKING_REASON_CODES.has(code)).toBe(false);
+    }
+  });
+
+  // freeze-2:代表性 closure 形态的 blocking 整集 characterization。
+  // .toContain 只证「某 code 在」,这里证「整集恰好是这些」——多报/少报未被单测断言的 code 都会 fail。
+  it('characterizes the 19:07 self-downgrade shape blocking set', () => {
+    const shape1907 = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-2 | 中台持仓接口是否可用 | Requirements | no |  | no | closed | 本期降级隐藏 |',
+      ],
+    });
+    expect(blockingSetOf(shape1907)).toEqual([
+      'open_oq_without_owner_closure',
+      'owner_decision_trace_required_but_absent',
+      'preflight_closure_contradicted',
+      'ready_receipt_absent',
+    ]);
+  });
+
+  it('characterizes the how-pushdown backdoor shape blocking set', () => {
+    const pushdown = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-4 | 行情权限 availability 如何取 | Requirements | no | implementation-only-how-pushdown | no | closed | 实现期定 |',
+      ],
+    });
+    expect(blockingSetOf(pushdown)).toEqual([
+      'how_pushdown_touches_what',
+      'owner_decision_trace_required_but_absent',
+      'preflight_closure_contradicted',
+      'ready_receipt_absent',
+    ]);
+  });
+
+  it('characterizes the design partial/unread-without-acceptance shape blocking set', () => {
+    const designBad = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: ['design_sources_unread:', '- node-123 未读'],
+    });
+    expect(blockingSetOf(designBad)).toEqual([
+      'design_partial_coverage_unaccepted',
+      'design_source_inventory_undeclared',
+      'design_sources_read_undeclared',
+      'design_unread_without_owner_acceptance',
+      'owner_decision_trace_required_but_absent',
+      'preflight_closure_contradicted',
+      'ready_receipt_absent',
+    ]);
+  });
+
+  // 合法 checkpoint:带 residue 但非 claims-ready,任何 ready blocker 都不得触发(空集)。
+  it('characterizes the valid checkpoint shape as carrying zero blocking codes', () => {
+    const checkpoint = [
+      '---',
+      'spec_id: 2026-06-25-901-cp',
+      'artifact_kind: prd-requirements',
+      'status: draft',
+      '---',
+      '',
+      '## Summary',
+      'x',
+      '## Change Delta',
+      '| item | current | target | delta | evidence |',
+      '| --- | --- | --- | --- | --- |',
+      '| x | a | b | extend | user-stated |',
+      '## Requirements',
+      '| id | priority | requirement | rationale/source |',
+      '| --- | --- | --- | --- |',
+      '| R-01 | P0 | b | user-stated |',
+      '## Acceptance Examples',
+      'AE-01（对应 R-01）Given x When y Then z',
+      '## Scope Boundaries',
+      '### In Scope',
+      '### Out Of Scope',
+      '## Evidence And Assumptions',
+      '| claim | tag | source / owner | note |',
+      '| --- | --- | --- | --- |',
+      '| c | user-stated | owner | n |',
+      '## Outstanding Questions',
+      '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+      '| --- | --- | --- | --- | --- | --- | --- | --- |',
+      '| OQ-2 | 中台持仓接口 | Requirements | yes |  | yes | unclosed | 待定 |',
+      '## Readiness Self-Check',
+      'write_mode: checkpoint-prd',
+      'clarification_evidence: asked-owner',
+      'can_enter_spec-plan: no',
+      'preflight_sweep_closure: blocked',
+      'design_source_coverage: not-needed',
+      '',
+    ].join('\n');
+    expect(blockingSetOf(checkpoint)).toEqual([]);
+  });
+
+  // freeze-3:preflight_closure_contradicted 直接断言。
+  // 它是 30 个 blocking code 里此前 golden 无直接覆盖的一个(contracts/finalize 双零)。
+  // 形态:preflight_sweep_closure=closed 与一个仍在的 closure blocker(open OQ)矛盾。
+  it('directly asserts preflight_closure_contradicted on a closed-sweep-with-residue shape', () => {
+    const contradicted = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-2 | 中台持仓接口是否可用 | Requirements | no |  | no | closed | 本期降级隐藏 |',
+      ],
+    });
+    const report = buildReport('docs/brainstorms/frz-requirements.md', contradicted);
+    expect(report.facts.blocking_reason_codes).toContain('preflight_closure_contradicted');
   });
 });

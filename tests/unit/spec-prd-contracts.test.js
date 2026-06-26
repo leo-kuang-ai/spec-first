@@ -613,7 +613,7 @@ describe('spec-prd workflow contracts', () => {
       'concrete scenario stress',
       'code contradiction surfacing',
       'skip low-value questions',
-      'Every load-bearing branch must reach a legal stop point in SKILL.md `Canonical: 四个合法停点` before planning',
+      'Every load-bearing branch must reach a legal stop point defined in SKILL.md `Canonical: 四个合法停点` before planning',
       'For PRD authoring/refinement, apply these seven `grill-with-docs` actions to every requirement branch',
       'Do not require the user to name `grill-with-docs`',
       'Grill-With-Docs Integration Trigger',
@@ -882,6 +882,18 @@ describe('spec-prd workflow contracts', () => {
       'Escalation To Product Reviewer',
       'dispatch_authorization_missing',
       'adversarial product-review posture',
+      // U1 (discovery surfacing / S4b + B1):双座位 forcing-function + 多义嗅探。
+      // 锁 prose 结构锚点与绑 write target 不变量,不锁语义结果/问题措辞/gap 数量。
+      'referent ambiguity',
+      'change-verb ambiguity',
+      'recall sniff cues, not a per-requirement checklist',
+      'the implementer seat',
+      'the test-author seat',
+      'one concrete gap bound to `PRD_write_target` or an explicit `none-found`',
+      'the premature-none-found failure, not a legal outcome',
+      'names the specific source / current-state evidence the seat checked',
+      'that stays the deferred artifact-truth ceiling, not something this lens gates',
+      'not a new dimension list, per-requirement matrix, checklist, persona, or dispatch',
     ]);
     expect(productLens).not.toContain('Adaptive Product Expert Lens');
     expect(productLens).not.toContain('Figma link');
@@ -1372,6 +1384,43 @@ describe('spec-prd workflow contracts', () => {
         'PRD-owned owner questions must be grilled or block readiness',
         'Planning Recheck only carries HOW or integration recheck after product default and acceptance are closed',
       ],
+    });
+    // U6 (R19 / O7):eval 取向对称三类 case。断言 case id 存在 + coverage_tags,
+    // 不断言 reason_code——examples.json 是 examples-as-context、语义 eval,reason_code
+    // 精确断言归确定性测试层(spec-prd-finalize.test.js 的 U7 freeze)。
+    expectEvalCase(examples, 'how-pushdown-backdoor-touches-what-rejected', {
+      tags: ['readiness', 'owner-question-avoidance', 'how-pushdown'],
+      expected: [
+        'implementation-only-how-pushdown is illegal for a question whose own text is about WHAT-bearing surface',
+        'the honest fix is to switch to a source-resolved/owner-answered disposition with evidence, or stop as checkpoint-prd',
+      ],
+    });
+    expect(findEvalCase(examples, 'how-pushdown-backdoor-touches-what-rejected')).toMatchObject({
+      case_type: 'failure',
+      quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
+    });
+    expectEvalCase(examples, 'nonblocking-oq-with-legal-disposition-ready-accepted', {
+      tags: ['readiness', 'legal-disposition', 'anti-over-blocking'],
+      expected: [
+        'a non-blocking OQ closed by a legal disposition plus evidence is a valid ready state, not a gate-gaming escape',
+        'this case shows what legitimate non-blocking ready looks like so the model neither over-blocks nor waters down',
+      ],
+    });
+    expect(findEvalCase(examples, 'nonblocking-oq-with-legal-disposition-ready-accepted')).toMatchObject({
+      case_type: 'positive',
+      quality_buckets: ['validate'],
+    });
+    expectEvalCase(examples, 'source-resolvable-gap-escalated-to-owner-rejected', {
+      tags: ['readiness', 'anti-over-blocking', 'source-first'],
+      expected: [
+        'source-resolvable gaps must be closed source-first before any owner interaction',
+      ],
+    });
+    expect(findEvalCase(examples, 'source-resolvable-gap-escalated-to-owner-rejected')).toMatchObject({
+      case_type: 'failure',
+      must_not: expect.arrayContaining([
+        'must not treat over-blocking or owner-spamming as the safe default just because under-asking failed in 19:07',
+      ]),
     });
     expectEvalCase(examples, 'figma-unread-prd-ready-rejected', {
       tags: ['readiness', 'owner-question-avoidance'],
@@ -3260,6 +3309,32 @@ describe('spec-prd workflow contracts', () => {
       }), 'utf8');
       expect(codes(run(proseSlash))).toContain('open_oq_without_owner_closure');
 
+      // 4c) bullet-OQ 旁路修复(对应 2026-06-26 16:46 真实运行):OQ 段以 bullet 形式
+      //     列出 load-bearing 未决问题、标散文「非阻塞」,parseHeaderedTable 得 0 行会
+      //     绕过逐行剃刀;ready PRD 必须仍被 outstanding_question_closure_undeclared 拦。
+      const bulletBypass = path.join(tmpDir, 'e3-requirements.md');
+      fs.writeFileSync(bulletBypass, buildPrd({
+        oq: [
+          '- **OQ-2**:市场页是否挂载于现有 market Tab?规划期澄清,非阻塞。',
+          '- **OQ-3**:中台持仓接口是否就绪?未就绪时降级策略?规划期澄清,非阻塞。',
+        ],
+      }), 'utf8');
+      expect(codes(run(bulletBypass))).toContain('outstanding_question_closure_undeclared');
+
+      // 4d) 反向:bullet-OQ 但非 claims-ready(draft)不触发,且仅列 emptiness 标记不误报
+      const bulletDraft = path.join(tmpDir, 'e4-requirements.md');
+      fs.writeFileSync(bulletDraft, [
+        '---', 'spec_id: 2026-06-25-902-bd', 'artifact_kind: prd-requirements', 'status: draft', '---', '',
+        '## Summary', 'x', '## Change Delta', '| item | current | target | delta | evidence |', '| --- | --- | --- | --- | --- |', '| x | a | b | extend | user-stated |',
+        '## Requirements', '| id | priority | requirement | rationale/source |', '| --- | --- | --- | --- |', '| R-01 | P0 | b | user-stated |',
+        '## Acceptance Examples', 'AE-01（对应 R-01）Given x When y Then z',
+        '## Scope Boundaries', '### In Scope', '### Out Of Scope',
+        '## Evidence And Assumptions', '| claim | tag | source / owner | note |', '| --- | --- | --- | --- |', '| c | user-stated | owner | n |',
+        '## Outstanding Questions', '- **OQ-2**:待澄清问题。',
+        '## Readiness Self-Check', 'write_mode: checkpoint-prd', 'can_enter_spec-plan: no', '',
+      ].join('\n'), 'utf8');
+      expect(codes(run(bulletDraft))).not.toContain('outstanding_question_closure_undeclared');
+
       // 5) checkpoint 带 residue 不被 ready blocker 误伤(非 claims-ready)
       const checkpoint = path.join(tmpDir, 'f-requirements.md');
       fs.writeFileSync(checkpoint, [
@@ -3305,5 +3380,77 @@ describe('spec-prd workflow contracts', () => {
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
+  });
+});
+
+// U8 (R21 / S4a):停点 SSOT 防漂移 lint。
+// SKILL.md `Canonical: 四个合法停点` 是四元组停点的唯一真相源,他处只能 by-reference。
+// 这条 lint 只锁「四元组四词在同一行枚举式共现」这一字面形态——绝不锁 posture 措辞
+// (relentless / keep going by default 等对抗早停先验的 load-bearing 强化),绝不升级为语义复述检测,
+// 绝不进 artifact BLOCKING_REASON_CODES(那会违反 KTD14)。它是 source-lint,不是 checker reason_code。
+describe('spec-prd canonical stop-point SSOT anti-drift lint (U8/R21)', () => {
+  // 四个停点 token。判据:同一行同时出现全部四个 = 四元组逐字复述(疑似漂移)。
+  const STOP_TOKENS = [/\bleaf\b/, /\bsource-resolved\b/, /\bowner-capped\b/, /how-pushdown/];
+
+  // 豁免落点:四元组的合法定义点与 fixture,允许全词共现。
+  // - SKILL.md `## Canonical: 四个合法停点` 小节内部(定义 + Light contract field mapping)
+  // - evals/examples.json 的 fixture(eval 语料本就要复现 Canonical 措辞)
+  function collectStopPointFourTupleLines() {
+    const files = [];
+    const refsDir = path.join(SKILL_DIR, 'references');
+    for (const f of fs.readdirSync(refsDir)) {
+      if (f.endsWith('.md')) files.push(path.join(refsDir, f));
+    }
+    files.push(SKILL_PATH);
+    files.push(EVALS_PATH);
+
+    const hits = [];
+    for (const file of files) {
+      const lines = fs.readFileSync(file, 'utf8').split('\n');
+      // 标记 SKILL.md 的 Canonical 小节范围(豁免区)。
+      let inCanonical = false;
+      lines.forEach((line, idx) => {
+        if (file === SKILL_PATH) {
+          if (/^##\s+Canonical:\s*四个合法停点/.test(line)) {
+            inCanonical = true;
+            return;
+          }
+          if (inCanonical && /^##\s+/.test(line)) {
+            inCanonical = false;
+          }
+        }
+        const allFour = STOP_TOKENS.every((re) => re.test(line));
+        if (!allFour) return;
+        const isExempt =
+          (file === SKILL_PATH && inCanonical) ||
+          file === EVALS_PATH;
+        if (!isExempt) {
+          hits.push(`${path.relative(REPO_ROOT, file)}:${idx + 1}`);
+        }
+      });
+    }
+    return hits;
+  }
+
+  test('no reference file restates the four-tuple stop points outside the canonical SSOT', () => {
+    const violations = collectStopPointFourTupleLines();
+    expect(violations).toEqual([]);
+  });
+
+  test('the canonical SSOT itself still defines the four stop points', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    // 定义点必须仍在,否则 by-reference 指针会悬空。
+    expect(skill).toContain('## Canonical: 四个合法停点');
+    const canonicalSection = skill.slice(skill.indexOf('## Canonical: 四个合法停点'));
+    for (const re of STOP_TOKENS) {
+      expect(re.test(canonicalSection)).toBe(true);
+    }
+  });
+
+  test('posture wording is not touched by the lint (lint locks only the four-token enumeration)', () => {
+    // 反向保护:posture 句(relentless 等)单独出现不应被判为违规。
+    const postureOnly = 'walk down each load-bearing branch one question at a time, relentless by default';
+    const allFour = STOP_TOKENS.every((reToken) => reToken.test(postureOnly));
+    expect(allFour).toBe(false);
   });
 });

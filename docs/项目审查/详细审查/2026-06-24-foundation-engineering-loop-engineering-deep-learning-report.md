@@ -275,7 +275,7 @@ AI Coding 进入 Agent 时代后，执行门槛大幅下降。任何人都可以
 
 ### 4.4 对 Claw 当前能力边界的提醒
 
-结合已有项目记忆，用户当前核心场景是：抓取微信/网页文章全文，按六段式生成结构化 Markdown 报告，自动关联前序知识链，写入 `/Users/kuang/xiaobu/spec-first-doc/claw/YYYY-MM-DD/`，并更新索引。
+结合已有项目记忆，用户当前核心场景是：抓取微信/网页文章全文，按六段式生成结构化 Markdown 报告，自动关联前序知识链，写入 `~/xiaobu/spec-first-doc/claw/YYYY-MM-DD/`，并更新索引。
 
 这个场景如果只做成 Work Skill，会很快变成“拿到链接就产报告”的流水线。Foundation Engineering 提醒我们：流水线前面必须有一层判断：
 

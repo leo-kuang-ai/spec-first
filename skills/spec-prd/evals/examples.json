@@ -989,6 +989,35 @@
       "input_shape": "normal PRD increment in repo with no CONTEXT.md, CONTEXT-MAP.md, or docs/adr",
       "expected": ["no-topology fallback", "PRD-local closure", "no CONTEXT.md creation", "no ADR creation", "planning readiness not blocked by missing topology"],
       "coverage_tags": ["boundary", "topology-adapter"]
+    },
+    {
+      "id": "how-pushdown-backdoor-touches-what-rejected",
+      "intent": "validate",
+      "case_type": "failure",
+      "quality_buckets": ["failure", "readiness-fail"],
+      "input_shape": "ready-for-planning PRD closes a load-bearing OQ about interface availability / permission / scope / source-of-truth / fallback / analytics by labeling it closure_disposition=implementation-only-how-pushdown with planning_would_invent_what=no",
+      "expected": ["implementation-only-how-pushdown is illegal for a question whose own text is about WHAT-bearing surface (interface availability, permission, scope, data authority, fallback, analytics)", "the honest fix is to switch to a source-resolved/owner-answered disposition with evidence, or stop as checkpoint-prd"],
+      "must_not": ["must not reach ready-for-planning by relabeling a WHAT-bearing owner question as a pure HOW detail", "must not treat 'planning invents nothing' as self-evident when the question text decides product behavior"],
+      "coverage_tags": ["readiness", "owner-question-avoidance", "how-pushdown"]
+    },
+    {
+      "id": "nonblocking-oq-with-legal-disposition-ready-accepted",
+      "intent": "validate",
+      "case_type": "positive",
+      "quality_buckets": ["validate"],
+      "input_shape": "ready-for-planning PRD carries non-blocking Outstanding Questions that do NOT touch WHAT/acceptance/data authority/scope, each closed by a legal closure_disposition with its evidence: source-resolved with a checkable ref, owner-answered with a matching Owner Decision Trace row, or owner-accepted-assumption recorded as a declared recommended-default the owner confirmed",
+      "expected": ["a non-blocking OQ closed by a legal disposition plus evidence is a valid ready state, not a gate-gaming escape", "declare-default closure means the model stated the assumed default and consequence and the owner confirmed it, strictly better than silently baking it in", "this case shows what legitimate non-blocking ready looks like so the model neither over-blocks nor waters down"],
+      "coverage_tags": ["readiness", "legal-disposition", "anti-over-blocking"]
+    },
+    {
+      "id": "source-resolvable-gap-escalated-to-owner-rejected",
+      "intent": "validate",
+      "case_type": "failure",
+      "quality_buckets": ["validate", "failure"],
+      "input_shape": "PRD raises an owner question whose answer is already determinable from repo/docs/contracts (e.g. current entry behavior, existing enum, declared API error semantics) and interrupts the owner with it instead of resolving it source-first",
+      "expected": ["source-resolvable gaps must be closed source-first before any owner interaction", "the question should have been answered by reading the repo/docs/contract and recorded as source-resolved with a checkable ref"],
+      "must_not": ["must not escalate a gap to the owner when source/docs/repo can answer it", "must not treat over-blocking or owner-spamming as the safe default just because under-asking failed in 19:07"],
+      "coverage_tags": ["readiness", "anti-over-blocking", "source-first"]
     }
   ],
   "skill": "spec-prd",

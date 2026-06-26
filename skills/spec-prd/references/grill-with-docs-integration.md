@@ -28,7 +28,7 @@ PRD authoring keeps questions one-at-a-time and persists closure into the PRD. F
 - PRD mode finds actor, flow, scope, acceptance, permission, release-slice, or decision-intersection questions that need guided owner adjudication
 - multiple load-bearing PRD gaps interact, so asking only one static blocking question would leave planning to invent WHAT
 
-Do not skip this mode merely because the input looks small. First perform source-first confirmation. If source evidence fully closes the relevant PRD write targets, produce the standard compact/normal PRD without owner interview. If any owner decision is still needed, continue the one-question-at-a-time session relentlessly by default; a branch stops only at a legal stop point in SKILL.md `Canonical: 四个合法停点` (leaf, source-resolved, owner-capped, how-pushdown).
+Do not skip this mode merely because the input looks small. First perform source-first confirmation. If source evidence fully closes the relevant PRD write targets, produce the standard compact/normal PRD without owner interview. If any owner decision is still needed, continue the one-question-at-a-time session relentlessly by default; a branch stops only at a legal stop point defined in SKILL.md `Canonical: 四个合法停点`.
 
 ## Original Behavior Contract
 
@@ -56,7 +56,7 @@ During the session, use the project language and docs as active constraints:
 - **Discuss concrete scenarios.** Invent scenarios that stress boundaries between concepts, including happy path, permission/role edge, state transition, exception/failure, negative acceptance, and cross-context handoff, only when the scenario can change acceptance, scope, terminology, or a boundary decision.
 - **Cross-reference with code.** When the user states current behavior, check source/docs/tests/contracts where feasible. If code contradicts the statement, surface the contradiction with evidence and ask which source should win.
 
-Continue this loop relentlessly by default, walking down each branch. A branch stops only at a legal stop point in SKILL.md `Canonical: 四个合法停点`: leaf, source-resolved, owner-capped (including the interactive soft-cap), or how-pushdown. "The next question would only expand scope" or "does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` (anchor missing, broad discovery, non-adjudicable) ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per `Canonical: 四个合法停点`, never silently emit ready.
+Continue this loop relentlessly by default, walking down each branch. A branch stops only at a legal stop point defined in SKILL.md `Canonical: 四个合法停点` (the owner-capped stop point includes the interactive soft-cap). "The next question would only expand scope" or "does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` (anchor missing, broad discovery, non-adjudicable) ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per `Canonical: 四个合法停点`, never silently emit ready.
 
 ## Context Topology
 

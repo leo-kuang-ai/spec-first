@@ -708,7 +708,7 @@ Closure Contract v1 fields:
 - (可能)Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(仅当 freeze 需调整 export;实测 `BLOCKING_REASON_CODES` 已在 `module.exports`,故 U7 默认**纯测试增量、无需碰 source**)
 
 **Approach:**
-- **freeze-1:** 对 `BLOCKING_REASON_CODES` 做数组(集合)相等断言——逐一列出当前 31 个 blocking code 并 `toEqual`/`toStrictEqual` 整集,任何增删都会 fail,强制 reviewer 显式确认。守 KTD14 审计不变量:断言中不得出现任何 presence/ceremony code。该常量已在 `check-prd-artifact.js` 的 `module.exports`(实测确认),测试可直接 require,无需改 source export 面。
+- **freeze-1:** 对 `BLOCKING_REASON_CODES` 做数组(集合)相等断言——逐一列出当前 30 个 blocking code(实测 `BLOCKING_REASON_CODES.size===30`)并 `toEqual`/`toStrictEqual` 整集,任何增删都会 fail,强制 reviewer 显式确认。守 KTD14 审计不变量:断言中不得出现任何 presence/ceremony code。该常量已在 `check-prd-artifact.js` 的 `module.exports`(实测确认),测试可直接 require,无需改 source export 面。
 - **freeze-2:** 选 3–5 个代表性 PRD 输入(ready 正常态 / 19:07 失败态 / 合法 checkpoint / 一个 how-pushdown block / 一个 design-unread block),对其 `facts.blocking_reason_codes` + 关键 advisory finding 的 reason_code 拼写做 characterization 断言(baseline 语义,非逐字节全输出)。fixture 头部注释写明:这是 baseline,intended change 时同步更新并在 PR 做 diff review;非不可变 freeze。
 - **freeze-3(补缺口):** 为 `preflight_closure_contradicted` 补一条直接命中断言(当前在 contracts/finalize 双零,是 11 个 blocking code 里唯一 golden 无直接覆盖的)。
 - **不做:** 18 个逐字节 `toEqual` fixture(维护熵过高,prosecutor 已证);parity 矩阵(`runtime-*-contracts.test.js` 已覆盖)。

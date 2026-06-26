@@ -88,7 +88,7 @@ Question cadence:
 - Use the parent skill Interaction Method for every owner question; its platform blocking question tool requirement applies before the cadence rules below.
 - Ask at most one question at a time.
 - Each question must bind to a `gap id`, a source attempt, a PRD write target, and a progress state: `closed`, `narrowed`, `accepted assumption`, `Outstanding Question`, `blocker`, or `route-out`.
-- Continue relentlessly by default, walking down each branch. A branch stops only at a legal stop point in SKILL.md `Canonical: 四个合法停点` (leaf, source-resolved, owner-capped, how-pushdown). "Does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per Canonical, never silently emit ready.
+- Continue relentlessly by default, walking down each branch. A branch stops only at a legal stop point defined in SKILL.md `Canonical: 四个合法停点`. "Does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per Canonical, never silently emit ready.
 - Always give a `recommended_answer` unless there is no defensible default.
 - If the owner says "you decide", use the recommended answer only when evidence supports it or it is safely labeled as an assumption.
 
@@ -180,7 +180,7 @@ For PRD authoring/refinement, apply these seven `grill-with-docs` actions to eve
 6. Use concrete scenario stress for happy path, permission/state boundary, exception/failure, and negative acceptance, only when the scenario can affect acceptance, scope, terminology, or a boundary decision.
 7. Perform code contradiction surfacing with evidence tags and consequences.
 
-Every load-bearing branch must reach a legal stop point in SKILL.md `Canonical: 四个合法停点` before planning: leaf, source-resolved, owner-capped, or how-pushdown (with `Outstanding Questions` / accepted assumption / blocker cluster as the visible residue of an owner-capped or route-out branch). Track the closure state in run-local progress and persist only the resolved content into PRD-local sections. If any load-bearing branch with reachable sub-decisions has not reached a Canonical stop point — including an owner who has not capped it — the PRD is not `ready-for-planning`; when the owner gives no cap/continue signal, fall back to checkpoint per Canonical.
+Every load-bearing branch must reach a legal stop point defined in SKILL.md `Canonical: 四个合法停点` before planning (with `Outstanding Questions` / accepted assumption / blocker cluster as the visible residue of an owner-capped or route-out branch). Track the closure state in run-local progress and persist only the resolved content into PRD-local sections. If any load-bearing branch with reachable sub-decisions has not reached a Canonical stop point — including an owner who has not capped it — the PRD is not `ready-for-planning`; when the owner gives no cap/continue signal, fall back to checkpoint per Canonical.
 
 Domain Grill and Pre-PRD Clarification share cadence and source-first discipline but have different centers of gravity: Domain Grill handles terminology, source/user/glossary contradiction, source-of-truth, ownership, permission/state/exception edges, and hard product boundaries; Pre-PRD Clarification handles rough PRD completeness, scenario coverage, acceptance, scope, and write-target closure.
 

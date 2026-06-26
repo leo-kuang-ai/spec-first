@@ -280,6 +280,8 @@ downstream_confirmation_risk -> claim -> evidence/source -> gap
 
 这让 owner 问题不再是 checklist 式追问，而是围绕“哪个问题会让 planning / work 发明 WHAT”排序。已经成型或已决策的输入会被综合进标准 PRD sections；其中 implementation/testing/API/schema/task 细节会降级为 HOW，除非它改变 scope、acceptance 或 source-of-truth。
 
+**双座位再读(逼出所有该问的问题)。** product-only 视角天然会漏掉"实现者/测试者才会问"的 load-bearing 问题(典型如:某个接口是否可用、未就绪时怎么降级、某条需求有没有可观测信号能写断言)。所以 Lens 对每条 load-bearing 需求,除产品座位外,还从**实现者座位**("哪个未命名的接口可用性/权限/状态/数据权威/降级会逼我发明产品行为")与**测试作者座位**("哪条需求没有可观测信号让我写 pass/fail 断言")各读一遍,每座位产出"一个绑 PRD write target 的具体 gap"或显式 `none-found`。关键约束:`none-found` 只有在真正对着该需求的 source/现状证据跑过反事实问题之后才合法——因为"产品侧看着已说清"就跳过,是过早 none-found 的退化,不算合法结局。它还会嗅 brownfield 多义:"与 X 一致"而 repo 里 X 有多实现、add/extend/replace/remove 未言明。这一层只负责把问题**逼出来**绑到 write target;问题是否真闭合由出口的 closure 剃刀(见末节)保证。两层分工:Lens 逼出全部问题(surfacing),剃刀保证每个写下来的问题真闭合(closure)。
+
 ## 写前门槛与澄清证据
 
 `$spec-prd` 现在在写 PRD 前先做一个轻量的 run-local 判定，避免“材料看起来完整，所以直接生成 PRD”。这个判定不新增持久状态机，也不要求每次都表演式提问；它只要求在提问、写 PRD、readiness 和 handoff 这些会改变用户可见结果的动作前，先说明理由和关键字段。

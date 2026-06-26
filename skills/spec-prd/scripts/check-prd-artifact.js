@@ -514,6 +514,26 @@ function analyzeOutstandingQuestions(lines, headings, options) {
     reasonCodes.add('outstanding_question_closure_undeclared');
   }
 
+  // 004 修补(bullet-OQ 旁路):OQ 段以非表格形式(bullet / 编号 / 裸 OQ 编号)列出未决
+  // 问题时,parseHeaderedTable 得到 0 行,会整段绕过下面的逐行剃刀,使 load-bearing OQ
+  // 标「非阻塞」散文即可混入 ready。这本身就是「claims-ready 却携带未声明 closure 的
+  // 未决问题」——与逐行剃刀同类的确定性矛盾(段有未决问题内容 + 自称 ready + 无 closure
+  // 表),非 ceremony-presence 检查。复用 outstanding_question_closure_undeclared,不新增
+  // BLOCKING code。只在 claims-ready 时升级 blocker;draft / checkpoint 不触发。
+  if (rows.length === 0 && claimsReady) {
+    const nonTableOpenQuestions = splitLines(section.text).some((line) => {
+      const t = line.trim();
+      if (!t) return false;
+      const isListItemOrOqId = /^([-*+]|\d+\.)\s+/.test(t) || /\bOQ[-\s]?\d/i.test(t);
+      if (!isListItemOrOqId) return false;
+      const body = t.replace(/^([-*+]|\d+\.)\s+/, '');
+      return !isEmptyish(body);
+    });
+    if (nonTableOpenQuestions) {
+      reasonCodes.add('outstanding_question_closure_undeclared');
+    }
+  }
+
   rows.forEach((row) => {
     const blocks = normalizeBool(row.blocks_planning);
     const invents = normalizeBool(row.planning_would_invent_what);
