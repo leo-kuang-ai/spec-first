@@ -14,6 +14,11 @@ referenced_reviews:
     role: origin
     scope: in
     addresses_findings: ["PRESSURE-GRILL-SKIPPED-AFTER-FINALIZE-GUARD"]
+  - ref: docs/项目审查/详细审查/2026-06-26-spec-prd-10轮SE深度审查.md
+    role: cross-reference
+    scope: in
+    addresses_findings: ["O7-eval-orientation", "S5-golden-freeze", "S4a-ssot-prune"]
+    deferred_findings: ["B1-declare-default-cut", "B2-anti-lowquality-cut", "S3-dangling-ref-cut", "S4c-disposition-what-string-cut", "S6-nfr-sweep-cut", "S4b-dev-test-forcing-function-handoff", "B1-ambiguity-sniff-handoff", "C-seam-coreSections-consumer-drift-defer"]
 ---
 
 # feat: spec-prd 前置分块 pressure grill 与 closure contract
@@ -74,6 +79,16 @@ referenced_reviews:
 - R17. **Push-Right + Brief(owner 闭合的形态)+ how-pushdown 残余旋钮兜底。** 剃刀(R16)规定 owner 闭合是唯一通向 ready 的 owner-side 路径,R17 规定它怎么发生:(1) **Push-right**——relentless 地先 source-first 解决一切可解项,把不可约的 load-bearing owner 决策**攒到最右、一次性**呈现,而不是逐个打断 owner;这与 “relentless one-question-at-a-time” 不冲突——relentless 适用于 source 解决,push-right 适用于 owner 交互。(2) **Brief**——owner checkpoint 呈现一份**决策就绪简报**,每条为 `决策 | 推荐答案 | 影响的 PRD write target | 不闭合则 planning 会发明什么`,经 blocking question tool 收 ratification;Brief 是 run-local(不新建持久 artifact,守 [R12]/KTD1),其持久残留就是 owner 回应填成的 Owner Decision Trace row。review 速度是硬约束:越快越可能是真 engagement 而非橡皮图章。(3) **how-pushdown 残余旋钮**——剃刀下唯一仍含模型自断言的 disposition 是 `implementation-only-how-pushdown`(带 `planning_would_invent_what=no`);checker 用一个冻结小词表(接口/availability、权限/permission、范围/scope、数据权威/source-of-truth、降级/fallback、埋点/analytics)扫被 how-pushdown 闭合的 OQ。命中且 artifact 已 claims-ready 时,三重合取构成自相矛盾,发 **blocking** `how_pushdown_touches_what`(不破坏 KTD2:三个确定性事实合取,非语义裁决);命中但仍是 draft/checkpoint(未 claims-ready)时只发 advisory `possible_misclassified_how_pushdown`,交 doc-review/人工。该机制范围只限 how-pushdown 这一种 disposition,不扫全部 OQ。
 - R18. 交互式 pressure grill 的每个 owner checkpoint 必须输出一个 one-question brief,至少包含 `question`、`recommended_answer`、`alternatives_or_freeform`、`source_evidence`、`PRD write target`、`why_now`、`consequence_if_unanswered`、`next_action_if_answered`。这保证 checkpoint 是 decision-ready brief,不是泛泛追问或让 owner 阅读完整草稿。边界澄清:R17/R18 的 Brief 是 prose-level 交互质量规范,**不是可被 checker 验证的 enforcement**——Brief 本身 run-local、checker 看不见,其唯一持久残留是 Owner Decision Trace row(真伪仍属 [R12] 上界)。它对症 19:07 的“只问 3 个 scoping 问题”,规范人机交互质量,但不计入硬 gate 防护栈;不要把它当作能强制 grill 真实发生的机制(那是已被证失败的 prose 自律同层)。
 
+### Post-Implementation Hardening Requirements(R19–R21,来自 10 轮 SE 深度审查)
+
+> 这三条是 U0–U5 落地后、经 `docs/项目审查/详细审查/2026-06-26-spec-prd-10轮SE深度审查.md` 终轮收口筛出的**对已建 closure 机制的加固/纠偏**,不扩 closure scope、不新增 BLOCKING、不改既有 ready 判定。承载于 follow-up units U6–U8。审查从 9 条候选收敛到这 3.5 条 KEEP 的依据见该文档「终轮收口结论」。
+
+- R19. **(O7,eval 取向纠偏)** `$spec-prd` 的 eval fixture 取向当前结构性偏防御(anti-over-blocking 方向的硬 `must_not` 为 0),奖励梯度单向助推 closure 偏置——能抓 19:07 的“放水”,却对“过度阻塞 / 把 source-resolvable 问题升级成 owner 打扰 / 把合法 disposition 误判为 blocker”零惩罚。必须在 `examples.json` 的 `cases[]` 净增 3 条恢复梯度对称的自然语言 case:(a) how-pushdown 后门失败、(b) 合法非阻塞正向锚(合并 declare-default,展示 `closure_disposition` 合法非阻塞 ready 长什么样)、(c) anti-over-blocking 失败(source-resolvable gap 被升级成 owner 打扰)。约束:全进 `cases[]` 不进 `sentinel_cases`,零 `reason_code` token(reason_code 精确断言归 R20 的确定性测试层,不进 examples.json),复用现有 `quality_buckets` 不新增 bucket,守 examples-as-context 定位与反 scorecard 封板。
+- R20. **(S5,确定性回归 freeze)** `check-prd-artifact.js` 是 1064 行高熵脚本,当前测试全是 `arrayContaining`/`toMatchObject` 部分匹配,无一处锁 `BLOCKING_REASON_CODES` 完整集合,任何 advisory finding 的 reason_code 拼写或 facts 字段名静默漂移(下游 doc-review 消费这些)都抓不到。必须补:(1) `BLOCKING_REASON_CODES` 数组相等断言(真 freeze,不可变),守 KTD14 审计不变量(无 presence/ceremony 进 BLOCKING);(2) 3–5 个代表性 characterization fixture(baseline 语义,随 intended change 同步并 diff review,头部注释写明 carve-out)。**不做** 18 个逐字节 fixture(维护熵过高)与 parity 矩阵(已被 `runtime-*-contracts.test.js` 覆盖)。`preflight_closure_contradicted` 当前在两个测试文件命中双零(11 个 blocking code 里唯一 golden 无直接断言的),必须在本轮补一条直接断言。
+- R21. **(S4a,SSOT 净减 + lint 降级)** `SKILL.md`「Canonical 四个合法停点」已声明 "Other references point here by reference and must not restate this four-tuple",但 6+ reference 文件内联复述整段四元组措辞且无防漂移 lint。必须删冗余四元组 gloss(只删括号四元组枚举,**保留 posture 句 + by-reference 指针**;posture 是对抗早停先验的 load-bearing 强化,绝不压);SSOT 唯一性 lint **只能落到 advisory/test 层,绝不进 artifact `BLOCKING_REASON_CODES`**(否则违反 KTD14),且只锁四元组字面、绝不升级为语义复述检测、绝不锁 posture 词。
+
+
+
 ---
 
 ## Scope Boundaries
@@ -83,6 +98,8 @@ referenced_reviews:
 - 不把 checker 做成产品语义裁判,不让它判断 OQ-2 是否真的 blocking;它只判断 PRD 自己声明的 closure 与 ready 是否矛盾。
 - 不依赖 Figma provider 一定可用。provider 不可用时允许 `checkpoint-prd` 或 owner-accepted degraded path,但不允许静默 ready。
 - 不在 Codex 中虚构 Claude Stop hook 等价能力。Codex 仍依赖 `$spec-prd` closeout/finalize 路径和 tests,直到宿主有可 block closeout 的 primitive。
+- 不把 discovery 侧增强(主动多义嗅探、dev/test forcing-function、隐含假设挖掘)并入本 closure plan。10 轮审查的 S4b/B1 存活项属 discovery scope,塞进 closure plan 会膨胀边界、违反 80/20;它们作为头号遗留 handoff 交独立 discovery-side plan(见 Alternative Approaches 与 Open Questions),R1 红线照旧。
+- 不因 R19–R21 加固而新增任何 BLOCKING reason_code、改既有 ready 判定、或把 advisory finding 升 blocking。R19 只动 eval fixture,R20 只加测试与 freeze 断言,R21 只删冗余 prose + advisory/test 层 lint;三者均 behavior-preserving over 已部署 checker 行为。
 
 ---
 
@@ -641,7 +658,112 @@ Closure Contract v1 fields:
 
 ---
 
-## System-Wide Impact
+## Post-Implementation Hardening Units(U6–U8,10 轮 SE 审查存活项)
+
+> U0–U5 已实现并落盘(见 CHANGELOG `02:34:51` 与 `03:40:09` 两条)。U6–U8 是终轮收口筛出的加固/纠偏,**互相独立、可单独落地、不依赖彼此**,且都不扩 closure scope。落地优先级与依据见 `docs/项目审查/详细审查/2026-06-26-spec-prd-10轮SE深度审查.md` 终轮收口。建议顺序:U7(无前置、可自动验证、守成)→ U6(gated by U7 的 freeze 基线)→ U8(独立 prose 净减)。「只做一个 unit 就停」做 U7。
+
+### U6. Eval Orientation Symmetry(承接 R19 / O7)
+
+**Goal:** 把 `$spec-prd` 的 eval 取向从单向"防放水"补成双向"既防放水也防过度阻塞",恢复奖励梯度对称,正面回应"充分发挥 LLM 能力 vs closure 偏置"。
+
+**Requirements:** R19
+
+**Dependencies:** U1, U2(被测行为已落盘);建议在 U7 freeze 基线之后落,以便 fixture 改动有回归网
+
+**Files:**
+- Modify: `skills/spec-prd/evals/examples.json`
+- Modify: `tests/unit/spec-prd-contracts.test.js`
+
+**Approach:**
+- 在 `cases[]`(非 `sentinel_cases`)净增 3 条,全自然语言断言、零 `reason_code` token、复用现有 `quality_buckets`:
+  - **(a) how-pushdown 后门失败**:OQ 用 `closure_disposition=implementation-only-how-pushdown` 闭合,但 question/write-target 文本触及接口可用性/权限/范围/数据权威/降级/埋点之一,且 PRD claims ready;`expected` 描述"必须改用 source/owner disposition 或 checkpoint",`quality_buckets:[failure, readiness-fail]`。
+  - **(b) 合法非阻塞正向锚(合并 declare-default)**:OQ 标 `blocks_planning=no` + 合法 `closure_disposition`(覆盖 source-resolved / owner-answered / owner-accepted-assumption via declared-default)+ 证据 = 合法 ready;`quality_buckets:[validate]`。必须与既有 `prd-owned-question-nonblocking-ready-rejected`(`examples.json:227`)严格互补——仅在不触及 WHAT/acceptance/数据权威/范围时才合法非阻塞。
+  - **(c) anti-over-blocking 失败**:一个 source-resolvable gap(repo/docs 能答)被升级成 owner 打扰而非 source-first 解决;`must_not` 描述"must not 把可由 source 解决的 gap 抛给 owner",`quality_buckets:[validate, failure]`。降级为普通 `cases[]`,**不设 sentinel**。
+- contract test 侧:断言这 3 个新 case id 存在且 `coverage_tags` 含 `anti-over-blocking`/`legal-disposition`/`how-pushdown` 之一;**不**断言任何 reason_code。
+
+**Patterns to follow:**
+- 既有 `cases[]` 的自然语言 `expected`/`must_not` 写法;`examples.json:3` "not a runtime state machine" 定位。
+
+**Test scenarios:**
+- 三条新 case 通过 `run-evals.js` 结构契约(bucket 齐全、sentinel 不变、coverage_tag 合规)。
+- 不触发 `case_contract` 连锁:不新增 `required_quality_buckets` / `must_not_required_quality_buckets`,不动 `sentinel_cases`。
+- 负向:任何把 `reason_code` token 写进 `expected`/`must_not` 的写法被本 unit 显式禁止(评审锚点)。
+
+**Verification:**
+- `node skills/spec-prd/scripts/run-evals.js --json`
+- `npx jest tests/unit/spec-prd-contracts.test.js --runInBand`
+
+---
+
+### U7. Checker BLOCKING Freeze And Characterization Baseline(承接 R20 / S5)
+
+**Goal:** 给 1064 行 checker 建确定性回归 freeze,防 `BLOCKING_REASON_CODES` 集合与 advisory reason_code 拼写/facts 字段名静默漂移;这是 U6 与未来任何 checker 改动的回归网。
+
+**Requirements:** R20
+
+**Dependencies:** None(纯增量测试,写完即绿,无前置)
+
+**Files:**
+- Modify: `tests/unit/spec-prd-contracts.test.js` 或 `tests/unit/spec-prd-finalize.test.js`
+- (可能)Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(仅当 freeze 需调整 export;实测 `BLOCKING_REASON_CODES` 已在 `module.exports`,故 U7 默认**纯测试增量、无需碰 source**)
+
+**Approach:**
+- **freeze-1:** 对 `BLOCKING_REASON_CODES` 做数组(集合)相等断言——逐一列出当前 31 个 blocking code 并 `toEqual`/`toStrictEqual` 整集,任何增删都会 fail,强制 reviewer 显式确认。守 KTD14 审计不变量:断言中不得出现任何 presence/ceremony code。该常量已在 `check-prd-artifact.js` 的 `module.exports`(实测确认),测试可直接 require,无需改 source export 面。
+- **freeze-2:** 选 3–5 个代表性 PRD 输入(ready 正常态 / 19:07 失败态 / 合法 checkpoint / 一个 how-pushdown block / 一个 design-unread block),对其 `facts.blocking_reason_codes` + 关键 advisory finding 的 reason_code 拼写做 characterization 断言(baseline 语义,非逐字节全输出)。fixture 头部注释写明:这是 baseline,intended change 时同步更新并在 PR 做 diff review;非不可变 freeze。
+- **freeze-3(补缺口):** 为 `preflight_closure_contradicted` 补一条直接命中断言(当前在 contracts/finalize 双零,是 11 个 blocking code 里唯一 golden 无直接覆盖的)。
+- **不做:** 18 个逐字节 `toEqual` fixture(维护熵过高,prosecutor 已证);parity 矩阵(`runtime-*-contracts.test.js` 已覆盖)。
+
+**Patterns to follow:**
+- 既有 `spec-prd-finalize.test.js` 的 `execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, file])` 真跑 checker 模式;`spec-prd-contracts.test.js:3110` 既有 closure-razor 动态 golden 写法。
+
+**Test scenarios:**
+- freeze-1:故意往 `BLOCKING_REASON_CODES` 加一个伪 code → 断言 fail(证明 freeze 生效)。
+- freeze-2:改 checker 让某 advisory reason_code 拼写漂移 → characterization 断言 fail。
+- freeze-3:`preflight_sweep_closure=closed` + 任一 closure blocker 的 fixture → 命中 `preflight_closure_contradicted`。
+- Regression:全部既有 `spec-prd-*` 测试保持绿(纯增量,不改既有断言)。
+
+**Verification:**
+- `node --check skills/spec-prd/scripts/check-prd-artifact.js`
+- `npx jest tests/unit/spec-prd-contracts.test.js tests/unit/spec-prd-finalize.test.js --runInBand`
+
+---
+
+### U8. Stop-Point SSOT Prune And Anti-Drift Lint(承接 R21 / S4a)
+
+**Goal:** 落实 SKILL.md 自声明的"四元组 SSOT,他处只 by-reference",删冗余四元组复述(净 prose 减),加只锁字面的防漂移 lint——不进 BLOCKING,不锁 posture。
+
+**Requirements:** R21
+
+**Dependencies:** None(纯 prose + test 层,独立)
+
+**Files:**
+- Modify: `skills/spec-prd/references/product-expert-lens.md`
+- Modify: `skills/spec-prd/references/prd-readiness-lens.md`
+- Modify: `skills/spec-prd/references/grill-with-docs-integration.md`
+- Modify: `skills/spec-prd/references/domain-language-and-decision-ledger.md`
+- Modify: `skills/spec-prd/references/evidence-and-topology.md`
+- Test: `tests/unit/spec-prd-contracts.test.js`
+
+**Approach:**
+- 实现前先 `rg` 重新枚举四元组逐字复述的真实落点(审查记 7 处真违反,实现期以当前磁盘为准),逐处**只删括号四元组枚举**,**保留 posture 句**(对抗早停先验的 load-bearing 强化)与 by-reference 指针。
+- 加一个 blocking-it() 级别的 **source-lint test**(非 artifact checker):断言四个停点 token(leaf / source-resolved / owner-capped / how-pushdown)四词同段共现次数 == 豁免集(canonical 区 + fixture + 合规指针),其余为 0。lint 只锁四元组字面,**绝不锁 posture 词、绝不升级为语义复述检测、绝不进 `BLOCKING_REASON_CODES`**。
+- 删改后跑 fresh-source eval 验证:净减 prose 不抬高早停率(本仓无法自动验证语义,宿主缺 dispatch 时按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 记 `not_run` + 原因,不得声称通过)。
+
+**Patterns to follow:**
+- `product-expert-lens.md:5` "single canonical source...must not create a second canonical lens" 红线;既有 contract test 子串锚点止于「Canonical: 四个合法停点」、不含四元组(故删 gloss 破坏零个现有测试)。
+
+**Test scenarios:**
+- source-lint:故意在某 reference 内联复述完整四元组 → lint fail。
+- Regression:删 gloss 后既有 `spec-prd-contracts.test.js` 全绿(子串锚点不含四元组)。
+- 负向:lint 不因 posture 措辞(relentless / 绝不早停)误报。
+
+**Verification:**
+- `npx jest tests/unit/spec-prd-contracts.test.js --runInBand`
+- fresh-source eval(host dispatch 可用时)或记 `not_run` + 原因
+
+---
+
+
 
 - **Interaction graph:** `$spec-prd` SKILL/readiness/output template first create a run-local chunk map and grill queue, then persist only the minimal body-resident `Pre-Write Grill Map` summary and closure declarations. `check-prd-artifact.js` validates the persisted closure summary; finalize and Claude Stop hook consume checker blockers. `spec-plan` consumes only ready PRD artifact and remains unchanged.
 - **Error propagation:** pre-write grill and closure blockers surface as reason_codes in finalize JSON and Stop hook block message. LLM next action is return to the grill queue, ask owner, read design, downgrade checkpoint, or fix false declaration.
@@ -680,6 +802,19 @@ Closure Contract v1 fields:
 - **Persist a full interview transcript artifact:** deferred. It may improve provenance later, but adds topology and privacy overhead beyond the current 80/20 fix.
 - **Parse host session transcript in Stop hook:** deferred. It is host-specific and brittle; closure contract should stay artifact-owned until a stable question receipt primitive exists.
 
+### Rejected by the 10-round SE review(记录拒绝理由,避免后续轮重提)
+
+这些是 10 轮审查中被对抗综合判为 cargo-cult / 过度设计 / 与已落机制重叠而 **CUT** 的候选项。它们曾在不同轮被提出,终轮收口逐一否决,登记于此防止未来 plan 重新引入:
+
+- **B1 declare-default bullet(给隐含假设加 declare-default 责任项):** CUT。与 `prd-output-template.md:213` 的 disposition 枚举 + R16 六 disposition 逐字级重叠;隐含假设挖掘本身属 discovery scope,作为 handoff 而非 closure plan 内的 bullet。
+- **B2 反低质 advisory facts(AC 可观察性 3 码 + 覆盖 roll-up 1 码):** CUT。`uncovered_requirements` + acceptance count 已 seed;roll-up 是二次汇总,零真实事故锚点,advisory + Gherkin opt-in 使其只在窄条件触发,ROI 不足。
+- **S3 `dangling_acceptance_ref` checker + 内部矛盾处置 prose:** CUT/DEFER。与 `requirement_without_acceptance_ref` 同维度;R↔R/AE↔R 语义一致性已被 LLM 通读 + grill + readiness-lens:49 覆盖,加确定性反向 checker 边际价值低。
+- **S4(c) disposition `planning_would_invent_what` 布尔升为强制 WHAT 串:** CUT。`normalizeBool` + how_pushdown 三重合取已够;升为强制串只增诚实 PRD 填写负担、不防任何已观察失败。
+- **S6 NFR 静默类别 sweep:** CUT。与 `prd-readiness-lens.md:71` + template NFR pack + how_pushdown 冻结词表 `availability` 三处影子重叠;NFR 主场段更是空段陷阱(早先已 REJECT)。
+- **依赖关系建模 / 优先级方法学(MoSCoW/WSJF/Kano):** REJECT。排序/依赖是 plan(HOW)职责;加权 priority 撞反 scorecard 封板,定性 priority 列已够。
+- **为 11 个 closure reason_code 各补 1:1 eval fixture / 给 examples.json 加 reason_code token / 常驻 fresh-source runner:** REJECT(永久)。reason_code 精确断言归确定性测试层(U7);examples.json 是 examples-as-context、非 checker 影子单测;常驻 runner 违反 80/20 且踩 `evaluation-governance.md:40` 已封板的 over-engineering。
+- **checker god-module(1064 行)完整拆分 / finalize-checker 双判定语义收敛:** DEFER / REJECT。双判定"divergence trap"经四角色 + 实测证伪(收敛=鸡生蛋死锁或检测面坍塌);god-module 拆分因测试是 CLI 黑盒、拆分得不到内部回归保护而 DEFER 为预案,U7 freeze 是其前置。
+
 ---
 
 ## Open Questions
@@ -702,6 +837,16 @@ Closure Contract v1 fields:
 ### Deferred to Implementation
 
 - Exact host provenance design for proving owner answers are real: deferred until the host exposes question receipt or transcript-bound provenance that can be consumed without brittle transcript parsing.
+- **(C-接缝,R8 / DEFER-to-narrow-ADD)** producer 的 `CORE_SECTIONS` 与 consumer `skills/spec-plan/references/planning-flow.md` 期望段名之间存在一条窄 drift 缝:两者若未来分叉,当前无测试可抓。10 轮审查判 **DEFER 而非 ADD**——理由:(1) 接缝可消费性已被三层覆盖(producer `CORE_SECTIONS` + R↔AE trace、consumer `planning-flow.md:73` PRD handoff entropy check、跨文锚点测试 `tests/unit/spec-prd-contracts.test.js:1080`),防护边际近零;(2) 落地前置需先 export `CORE_SECTIONS`(实测 `check-prd-artifact.js` 仅 export `BLOCKING_REASON_CODES`/`buildReport`/`computeInputsHash`/`normalizeForReceipt`/`sha256`,`CORE_SECTIONS` 仍是模块内常量、未导出),改动面外溢 checker 公共面。若未来真要落,形态须是**单向**交集断言(只断言 producer `CORE_SECTIONS` ⊇ consumer 期望的最小段集),严守 R1——绝不把 consumer 期望写回 producer、不锁 consumer 内部措辞,只锁段名最小集。
+
+### Handoff to a Separate Discovery-Side Plan(10 轮审查头号遗留)
+
+10 轮审查的中心论点是 **discovery 与 closure 的机制密度结构性不对称**:本 plan(004)是 closure-contract,9 轮诚实净增几乎全落在 closure/checker/eval/golden 侧;真正最高 ROI 的方向——补 discovery 侧、释放 LLM 主动澄清——超出 004 的 closure scope,**不并入本 plan**(否则 closure plan 膨胀、违反 explicit boundaries 与 80/20)。以下作为独立 discovery-side plan 的 origin 证据交接:
+
+- **S4(b) dev/test forcing-function:** product-only lens 天然欠权重接口可用性/权限边界——19:07 被自降的 OQ-2/OQ-4 正是这类 dev-座位 gap。设计形态=把 lens 既有 `downstream_confirmation_risk` 引擎换"实现者/测试作者"两座位再读同一需求,每个 load-bearing 需求产出"一个绑 PRD write target 的具体 gap 或 explicit-none-found",merge 进 `product-expert-lens.md` 不扩独立维度。这是唯一有真实事故锚点的 discovery 项,discovery plan 的首工作项。
+- **B1 主动多义嗅探(referent / change-verb ambiguity):** brownfield 真空——"和 X 一致"而 repo 里 X 有 v1/v2 多实现、"add/extend/replace/remove"未言明。设计形态=升级 `product-expert-lens.md` 嗅措辞 prose + downstream-reader persona,命中走既有 Run-Local Interface 绑 write target,checker 零新增(语义歧义脚本检不出,强做必假阳)。
+- **共同约束:** R1 红线照旧(spec-prd 产物形态不被 spec-plan 反向耦合);prose/lens 改动的语义效果本仓无法自动验证,落地须 fresh-source eval 或记 `not_run`;形态守 `product-expert-lens.md:5` 单 canonical lens 红线,不新建第二 lens。
+- **为何不在 004 做:** closure 侧边际已递减到近零,再加 gate 只会喂大可机械填充的空壳(KTD14 已警告);discovery 增强的验证形态(fresh-source eval)与 closure 的确定性测试形态不同,混在一个 plan 里 golden diff 无法区分。
 
 ---
 
@@ -717,6 +862,7 @@ Closure Contract v1 fields:
 ## Sources & References
 
 - Related plan: `docs/plans/2026-06-25-003-feat-spec-prd-stop-hook-and-highrisk-review-gate-plan.md`
+- 10-round SE review (R19–R21 / U6–U8 origin): `docs/项目审查/详细审查/2026-06-26-spec-prd-10轮SE深度审查.md`
 - Role contract: `docs/10-prompt/结构化项目角色契约.md`
 - PRD workflow source: `skills/spec-prd/SKILL.md`
 - PRD output template: `skills/spec-prd/references/prd-output-template.md`
