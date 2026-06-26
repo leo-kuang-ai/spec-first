@@ -13,6 +13,13 @@ const RECEIPT_ONLY_REASONS = new Set([
   'ready_receipt_stale',
 ]);
 
+// checkpoint closeout 额外豁免:input-side 核算信号只在 PRD 声称 ready 时才需确证;
+// 一个还没 ready 的 checkpoint 允许 input 扫描降级(仍在 grill 未读全 inputs)。
+const CHECKPOINT_INPUT_SCAN_EXEMPT = new Set([
+  'input_scan_degraded',
+  'input_refs_unavailable',
+]);
+
 function parseArgs(argv) {
   const args = { target: null, inputs: [], checkOnly: false, error: null };
   for (let i = 0; i < argv.length; i += 1) {
@@ -128,7 +135,9 @@ function buildFinalizeReceipt(target, text, inputs) {
     && facts.ready_claim_present !== true;
   const closeoutBlockingReasons = isValidCheckpoint
     ? blockingReasons.filter((reasonCode) => (
-      reasonCode !== 'finalize_required' && !RECEIPT_ONLY_REASONS.has(reasonCode)
+      reasonCode !== 'finalize_required'
+      && !RECEIPT_ONLY_REASONS.has(reasonCode)
+      && !CHECKPOINT_INPUT_SCAN_EXEMPT.has(reasonCode)
     ))
     : blockingReasons;
   const shouldBlockCloseout = closeoutBlockingReasons.length > 0;

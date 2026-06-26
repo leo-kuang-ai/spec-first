@@ -299,6 +299,30 @@ AE-01（对应 R-01）Given x When y Then z
     }
   });
 
+  // 232726 日志复现:input_scan_degraded 不应卡死合法 checkpoint。
+  // input-side 核算信号只在 PRD 声称 ready 时才有意义;checkpoint 尚在 grill、允许 input 扫描降级。
+  test('valid checkpoint with degraded source input can still close out', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'cp-degraded-input-requirements.md');
+    const missingInput = path.join(tempDir, 'source_docs', 'missing.md');
+    try {
+      write(prdPath, validReadyIntentPrd()
+        .replace('- write_mode: final-prd', '- write_mode: checkpoint-prd')
+        .replace('- can_enter_spec_plan: yes', '- can_enter_spec_plan: no'));
+      const receipt = finalizePrd(prdPath, [missingInput], { checkOnly: true });
+      // input 解析失败 → blocking_reason_codes 含 input_scan_degraded
+      expect(receipt.blocking_reason_codes).toContain('input_scan_degraded');
+      // 合法 checkpoint 的 closeout 不受 input-side 信号影响
+      expect(receipt.should_block_closeout).toBe(false);
+      expect(receipt.can_closeout).toBe(true);
+      expect(receipt.status).toBe('checkpoint-closeout');
+      expect(receipt.closeout_blocking_reason_codes).not.toContain('input_scan_degraded');
+      expect(receipt.closeout_blocking_reason_codes).not.toContain('input_refs_unavailable');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('checkpoint that claims ready is blocked (checkpoint_claims_ready)', () => {
     const tempDir = makeTempDir();
     const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'cp-claims-ready-requirements.md');
