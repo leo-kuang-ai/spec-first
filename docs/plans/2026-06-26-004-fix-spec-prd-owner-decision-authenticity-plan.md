@@ -2,7 +2,7 @@
 spec_id: spec-prd-owner-decision-authenticity
 title: "fix: spec-prd owner-decision 真实性闸(transcript-provenance + 逐行绑定 + 回滚门槛)"
 type: fix
-status: active
+status: completed
 date: 2026-06-26
 plan_depth: deep
 author: leokuang
@@ -98,9 +98,16 @@ referenced_reviews:
 ## 落地顺序(最小可维护)
 1. ✅ **F-L1 逐行绑定**(已完成,artifact 层,双宿主,真实文件验证)。
 2. ✅ **F-L2′ owner-answer fidelity prose**(已完成,prose forcing,承认天花板)。
-3. ⏳ **fresh-source eval 回归**:21:16 L2′ 形态(owner 答必读→PRD 写已放宽)固化为 eval 夹具,防复发。
-4. ⏳ **F-L3 回滚门槛**(待评估,artifact 层,解耦排期)。
-5. ⏳ **(a) transcript 语义比对**:仅当确证 Stop payload 含 transcript_path 后再评估,非当前范围。
+3. ✅ **fresh-source eval 回归**:commit 74c85079 新增 eval cases `one-round-scoping-then-checkpoint-rejected`(failure:问1轮就写 checkpoint,load-bearing OQ 未问)和 `checkpoint-after-full-grill-accepted`(positive:穷尽 grill 后合法 checkpoint),固化232726/231339失败模式防复发。
+4. ✅ **Checkpoint-as-escape prose**:commit 74c85079 在 SKILL.md Canonical 四停点后新增 anti-pattern 锚点,明确 checkpoint 不是 grill 的替代。
+5. ✅ **input_scan_degraded 不卡 checkpoint**:commit 53fc501b 新增 `CHECKPOINT_INPUT_SCAN_EXEMPT` Set,合法 checkpoint 可正常 closeout。
+6. ✅ **Phase 4 doc-review 触发条件**:SKILL.md Phase 4 新增明确触发信号——grill trace 交互少于 load-bearing OQ 数、design 未读无 owner 接受、或 trace row 未逐行绑定 owner-* OQ 时强烈建议走 doc-review。
+
+**⏳ 待 host-provenance primitive 就位**(deferred capability gate):
+- Stop hook payload 已确证含 `transcript_path`(官方 hook-development skill 实证)。
+- 目前 transcript 语义消费撞 KTD2(「gate the exits, not the thinking」);LLM-judge hook 方向已裁决否决。
+- 当 Claude 提供**per-question verified receipt** 或 **transcript-bound provenance token**(而非 model-self-reported text),可在 Stop hook 侧做确定性 provenance 闸:验证每条 owner-* OQ trace row 对应的 AskUserQuestion receipt,无需语义判断。
+- 在此之前:L2′(owner 决策被改写)/ grill 充分性 / Figma 真读——靠 prose + eval + doc-review 人工审计防御纵深,不做硬 gate。
 
 ## Non-goals
 - 不把 checker 做成"验证 owner 是否真回答"的测谎仪(撞 R12)。
