@@ -479,6 +479,52 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
     ]);
   });
 
+  // F-L1 characterization:21:16 KAZ 形态——多条 owner-* OQ,但 Owner Decision Trace
+  // 只有一条不点名这些 OQ 的全局行。逐行绑定前全部放行(全局开关);绑定后每条 fire
+  // open_oq_without_owner_closure。证明 L1 全局放行洞已堵,且复用既有 code(不碰 30-set)。
+  it('characterizes the 21:16 unbound owner-capped shape (F-L1 per-row binding)', () => {
+    const unbound = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-2 | 中台持仓接口契约未给出 | R-05 | no | owner-capped | no | open | 规划并行 |',
+        '| OQ-4 | 时段判定数据来源 | R-12 | no | owner-capped | no | open | 接口确认 |',
+      ],
+      trace: [
+        '## Owner Decision Trace',
+        '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+        '| --- | --- | --- | --- | --- | --- |',
+        '| 交付范围如何界定 | owner | 仅 App 端 | Producer 边界 | 不展开后台 | closed |',
+      ],
+    });
+    const report = buildReport('docs/brainstorms/frz-requirements.md', unbound);
+    expect(report.facts.blocking_reason_codes).toContain('open_oq_without_owner_closure');
+    expect(report.facts.open_oq_without_owner_closure_count).toBe(2);
+  });
+
+  // F-L1 反向:合法绑定不被误杀。owner-* OQ 各有一条 verbatim-question 或 id-reference
+  // 绑定的 trace 行 → 不 fire open_oq_without_owner_closure。守「不向诚实作者收 ceremony 税」。
+  it('does not fire open_oq_without_owner_closure when each owner-* OQ binds a trace row (F-L1)', () => {
+    const bound = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-2 | 中台持仓接口是否可用 | Requirements | no | owner-answered | no | closed | 本期降级隐藏 |',
+        '| OQ-3 | 范围如何界定 | Scope Boundaries | no | owner-capped | no | closed | 仅 App 端 |',
+      ],
+      trace: [
+        '## Owner Decision Trace',
+        '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+        '| --- | --- | --- | --- | --- | --- |',
+        '| 中台持仓接口是否可用 | owner | 本期降级隐藏 | Requirements | AE 覆盖隐藏态 | closed |',
+        '| OQ-3 范围 | owner | 仅 App 端 | Scope Boundaries | 后台另起 surface | closed |',
+      ],
+    });
+    const report = buildReport('docs/brainstorms/frz-requirements.md', bound);
+    expect(report.facts.blocking_reason_codes).not.toContain('open_oq_without_owner_closure');
+    expect(report.facts.open_oq_without_owner_closure_count).toBe(0);
+  });
+
   // 合法 checkpoint:带 residue 但非 claims-ready,任何 ready blocker 都不得触发(空集)。
   it('characterizes the valid checkpoint shape as carrying zero blocking codes', () => {
     const checkpoint = [

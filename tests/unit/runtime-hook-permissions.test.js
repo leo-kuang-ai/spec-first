@@ -36,7 +36,7 @@ describe('runtime hook permissions', () => {
       expect(withProject(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'claude' }))).toBe(0);
 
       const plan = getAdapter('claude').planRuntimeFilesSync(projectRoot);
-      for (const relativePath of ['.claude/hooks/session-start', '.claude/hooks/spec-plan-guard', '.claude/hooks/prd-readiness-guard']) {
+      for (const relativePath of ['.claude/hooks/session-start', '.claude/hooks/spec-plan-guard', '.claude/hooks/prd-prewrite-guard', '.claude/hooks/prd-readiness-guard']) {
         const hookPath = path.join(projectRoot, relativePath);
         const expected = plan.operations.find((operation) => operation.path === relativePath).contents;
         const actual = fs.readFileSync(hookPath, 'utf8');
@@ -62,6 +62,7 @@ describe('runtime hook permissions', () => {
       const hookPaths = [
         path.join(projectRoot, '.claude', 'hooks', 'session-start'),
         path.join(projectRoot, '.claude', 'hooks', 'spec-plan-guard'),
+        path.join(projectRoot, '.claude', 'hooks', 'prd-prewrite-guard'),
         path.join(projectRoot, '.claude', 'hooks', 'prd-readiness-guard'),
       ];
       for (const hookPath of hookPaths) {
@@ -99,8 +100,10 @@ describe('runtime hook permissions', () => {
       }
 
       const guardPath = path.join(projectRoot, '.claude', 'hooks', 'spec-plan-guard');
+      const prewriteGuardPath = path.join(projectRoot, '.claude', 'hooks', 'prd-prewrite-guard');
       const prdGuardPath = path.join(projectRoot, '.claude', 'hooks', 'prd-readiness-guard');
       fs.chmodSync(guardPath, 0o644);
+      fs.chmodSync(prewriteGuardPath, 0o644);
       fs.chmodSync(prdGuardPath, 0o644);
 
       const checks = adapter.inspectRuntimeFiles(projectRoot);
@@ -110,6 +113,12 @@ describe('runtime hook permissions', () => {
         message: 'managed UserPromptExpansion spec-plan guard hook is not executable',
       });
       expect(guardCheck.fix).toContain('spec-first init');
+      const prewriteGuardCheck = checks.find((check) => check.name === '.claude/hooks/prd-prewrite-guard');
+      expect(prewriteGuardCheck).toMatchObject({
+        level: 'WARNING',
+        message: 'managed PreToolUse PRD prewrite guard hook is not executable',
+      });
+      expect(prewriteGuardCheck.fix).toContain('spec-first init');
       const prdGuardCheck = checks.find((check) => check.name === '.claude/hooks/prd-readiness-guard');
       expect(prdGuardCheck).toMatchObject({
         level: 'WARNING',

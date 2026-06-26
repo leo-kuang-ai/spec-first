@@ -29,9 +29,10 @@ describe('runtime plan contracts', () => {
       const plan = adapter.planRuntimeFilesSync(projectRoot);
       const sessionStart = plan.operations.find((operation) => operation.path === '.claude/hooks/session-start');
       const specPlanGuard = plan.operations.find((operation) => operation.path === '.claude/hooks/spec-plan-guard');
+      const prdPrewriteGuard = plan.operations.find((operation) => operation.path === '.claude/hooks/prd-prewrite-guard');
       const prdReadinessGuard = plan.operations.find((operation) => operation.path === '.claude/hooks/prd-readiness-guard');
 
-      expect(plan.operations).toHaveLength(3);
+      expect(plan.operations).toHaveLength(4);
       expect(sessionStart).toMatchObject({
         kind: 'write_file',
         path: '.claude/hooks/session-start',
@@ -41,6 +42,12 @@ describe('runtime plan contracts', () => {
       expect(specPlanGuard).toMatchObject({
         kind: 'write_file',
         path: '.claude/hooks/spec-plan-guard',
+        reason: 'managed_runtime_hook',
+        mode: 0o755,
+      });
+      expect(prdPrewriteGuard).toMatchObject({
+        kind: 'write_file',
+        path: '.claude/hooks/prd-prewrite-guard',
         reason: 'managed_runtime_hook',
         mode: 0o755,
       });
@@ -64,10 +71,13 @@ describe('runtime plan contracts', () => {
       expect(specPlanGuard.contents).toContain("fs.readFileSync(0, 'utf8')");
       expect(specPlanGuard.contents).not.toContain('SPEC_FIRST_HOOK_INPUT');
       expect(specPlanGuard.contents).not.toContain('"decision"');
+      expect(prdPrewriteGuard.contents).toContain('PRD prewrite guard blocked Write');
+      expect(prdPrewriteGuard.contents).toContain('write_mode: checkpoint-prd');
+      expect(prdPrewriteGuard.contents).toContain('check-prd-artifact.js');
       expect(prdReadinessGuard.contents).toContain('PRD readiness guard blocked closeout');
       expect(prdReadinessGuard.contents).toContain('finalize-prd-artifact.js');
       expect(prdReadinessGuard.contents).toContain("decision: 'block'");
-      expect(plan.summary).toEqual({ write_file: 3 });
+      expect(plan.summary).toEqual({ write_file: 4 });
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -84,11 +94,12 @@ describe('runtime plan contracts', () => {
       const adapter = getAdapter('claude');
       const plan = adapter.planRuntimeFilesSync(projectRoot);
 
-      expect(plan.operations).toHaveLength(3);
+      expect(plan.operations).toHaveLength(4);
       expect(plan.operations.find((operation) => operation.path === '.claude/hooks/session-start').kind).toBe('update_file');
       expect(plan.operations.find((operation) => operation.path === '.claude/hooks/spec-plan-guard').kind).toBe('write_file');
+      expect(plan.operations.find((operation) => operation.path === '.claude/hooks/prd-prewrite-guard').kind).toBe('write_file');
       expect(plan.operations.find((operation) => operation.path === '.claude/hooks/prd-readiness-guard').kind).toBe('write_file');
-      expect(plan.summary).toEqual({ update_file: 1, write_file: 2 });
+      expect(plan.summary).toEqual({ update_file: 1, write_file: 3 });
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -111,11 +122,16 @@ describe('runtime plan contracts', () => {
       },
       {
         kind: 'remove_file',
+        path: '.claude/hooks/prd-prewrite-guard',
+        reason: 'managed_runtime_hook',
+      },
+      {
+        kind: 'remove_file',
         path: '.claude/hooks/prd-readiness-guard',
         reason: 'managed_runtime_hook',
       },
     ]);
-    expect(plan.summary).toEqual({ remove_file: 3 });
+    expect(plan.summary).toEqual({ remove_file: 4 });
   });
 
   test('Codex runtime plans retain legacy cleanup while adding SessionStart hook assets', () => {

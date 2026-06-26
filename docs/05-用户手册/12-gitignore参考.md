@@ -28,6 +28,7 @@
 .claude/agents/
 .claude/hooks/session-start
 .claude/hooks/spec-plan-guard
+.claude/hooks/prd-prewrite-guard
 .claude/hooks/prd-readiness-guard
 .claude/tasks/
 .claude/worktrees/
@@ -79,6 +80,7 @@ graphify-out/.graphify_python
     spec-first/                     # runtime state/profile，忽略
     agents/                         # generated runtime，忽略
     hooks/session-start             # generated runtime hook，忽略
+    hooks/prd-prewrite-guard        # generated runtime hook，忽略
     hooks/prd-readiness-guard        # generated runtime hook，忽略
     tasks/ worktrees/               # host-local scratch，忽略
 

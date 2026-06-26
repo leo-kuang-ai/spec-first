@@ -7,13 +7,16 @@ const { spawnSync } = require('node:child_process');
 
 const {
   SESSION_START_COMMAND,
+  PRD_PREWRITE_GUARD_COMMAND,
   PRD_READINESS_GUARD_COMMAND,
   SPEC_PLAN_GUARD_COMMAND,
+  buildManagedPrdPrewriteGuardMatcher,
   buildManagedPrdReadinessGuardMatcher,
   buildManagedSessionStartMatcher,
   buildManagedSpecPlanGuardMatcher,
   getClaudeSettingsPath,
   inspectManagedClaudeHooks,
+  inspectManagedPrdPrewriteGuardHook,
   inspectManagedPrdReadinessGuardHook,
   inspectManagedSessionStartHook,
   inspectManagedSpecPlanGuardHook,
@@ -52,6 +55,19 @@ function writeRenderedSpecPlanGuardHook(projectRoot, transform = (content) => co
   return writeRenderedHook(projectRoot, '.claude/hooks/spec-plan-guard', transform);
 }
 
+function writeRenderedPrdPrewriteGuardHook(projectRoot, transform = (content) => content) {
+  return writeRenderedHook(projectRoot, '.claude/hooks/prd-prewrite-guard', transform);
+}
+
+function installPrdCheckerRuntime(projectRoot) {
+  const scriptDir = path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-prd', 'scripts');
+  fs.mkdirSync(scriptDir, { recursive: true });
+  fs.copyFileSync(
+    path.join(REPO_ROOT, 'skills', 'spec-prd', 'scripts', 'check-prd-artifact.js'),
+    path.join(scriptDir, 'check-prd-artifact.js'),
+  );
+}
+
 describe('claude settings', () => {
   test('creates managed Claude hook matchers in an empty settings file', () => {
     const projectRoot = makeTempDir();
@@ -66,6 +82,9 @@ describe('claude settings', () => {
           ],
           UserPromptExpansion: [
             buildManagedSpecPlanGuardMatcher(),
+          ],
+          PreToolUse: [
+            buildManagedPrdPrewriteGuardMatcher(),
           ],
           Stop: [
             buildManagedPrdReadinessGuardMatcher(),
@@ -124,6 +143,9 @@ describe('claude settings', () => {
       expect(settings.hooks.UserPromptExpansion).toEqual([
         buildManagedSpecPlanGuardMatcher(),
       ]);
+      expect(settings.hooks.PreToolUse).toEqual([
+        buildManagedPrdPrewriteGuardMatcher(),
+      ]);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -141,6 +163,8 @@ describe('claude settings', () => {
       expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(SESSION_START_COMMAND);
       expect(settings.hooks.UserPromptExpansion).toHaveLength(1);
       expect(settings.hooks.UserPromptExpansion[0].hooks[0].command).toBe(SPEC_PLAN_GUARD_COMMAND);
+      expect(settings.hooks.PreToolUse).toHaveLength(1);
+      expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe(PRD_PREWRITE_GUARD_COMMAND);
       expect(settings.hooks.Stop).toHaveLength(1);
       expect(settings.hooks.Stop[0].hooks[0].command).toBe(PRD_READINESS_GUARD_COMMAND);
     } finally {
@@ -210,6 +234,18 @@ describe('claude settings', () => {
               ],
             },
           ],
+          PreToolUse: [
+            buildManagedPrdPrewriteGuardMatcher(),
+            {
+              matcher: 'Read',
+              hooks: [
+                {
+                  type: 'command',
+                  command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/custom-pretool',
+                },
+              ],
+            },
+          ],
           Stop: [
             buildManagedPrdReadinessGuardMatcher(),
             {
@@ -247,6 +283,17 @@ describe('claude settings', () => {
                 {
                   type: 'command',
                   command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/custom-prompt',
+                },
+              ],
+            },
+          ],
+          PreToolUse: [
+            {
+              matcher: 'Read',
+              hooks: [
+                {
+                  type: 'command',
+                  command: '"$CLAUDE_PROJECT_DIR"/.claude/hooks/custom-pretool',
                 },
               ],
             },
@@ -308,6 +355,7 @@ describe('claude settings', () => {
       const settingsPath = getClaudeSettingsPath(projectRoot);
       const settings = readJson(settingsPath);
       delete settings.hooks.UserPromptExpansion;
+      delete settings.hooks.PreToolUse;
       fs.writeFileSync(settingsPath, `${JSON.stringify(settings, null, 2)}\n`, 'utf8');
 
       expect(inspectManagedClaudeHooks(projectRoot)).toEqual([
@@ -324,6 +372,12 @@ describe('claude settings', () => {
           displayName: 'UserPromptExpansion spec-plan guard',
         },
         {
+          status: 'missing',
+          message: '`hooks.PreToolUse` array missing',
+          eventName: 'PreToolUse',
+          displayName: 'PreToolUse PRD prewrite guard',
+        },
+        {
           status: 'installed',
           message: 'managed Stop PRD readiness guard matcher present',
           eventName: 'Stop',
@@ -333,6 +387,10 @@ describe('claude settings', () => {
       expect(inspectManagedSpecPlanGuardHook(projectRoot)).toEqual({
         status: 'missing',
         message: '`hooks.UserPromptExpansion` array missing',
+      });
+      expect(inspectManagedPrdPrewriteGuardHook(projectRoot)).toEqual({
+        status: 'missing',
+        message: '`hooks.PreToolUse` array missing',
       });
       expect(inspectManagedPrdReadinessGuardHook(projectRoot)).toEqual({
         status: 'installed',
@@ -691,6 +749,97 @@ describe('claude settings', () => {
           hook_event_name: 'UserPromptExpansion',
           command_name: 'spec:work',
           permission_mode: 'bypassPermissions',
+        }),
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(result.stdout).toBe('');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('prd prewrite guard blocks first Write of ready/final PRD artifacts', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      installPrdCheckerRuntime(projectRoot);
+      const hookPath = writeRenderedPrdPrewriteGuardHook(projectRoot);
+      const result = spawnSync('bash', [hookPath], {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          CLAUDE_PROJECT_DIR: projectRoot,
+        },
+        input: JSON.stringify({
+          hook_event_name: 'PreToolUse',
+          tool_name: 'Write',
+          tool_input: {
+            file_path: path.join(projectRoot, 'docs', 'brainstorms', 'kaz-market-requirements.md'),
+            content: [
+              '---',
+              'artifact_kind: prd-requirements',
+              'status: ready-for-planning',
+              '---',
+              '',
+              '## Summary',
+              'x',
+              '## Readiness Self-Check',
+              'write_mode: final-prd',
+              'clarification_evidence: skipped',
+              'can_enter_spec_plan: yes',
+              '',
+            ].join('\n'),
+          },
+        }),
+      });
+
+      expect(result.status).toBe(2);
+      expect(result.stdout).toBe('');
+      expect(result.stderr).toContain('PRD prewrite guard blocked Write');
+      expect(result.stderr).toContain('Requirements Grill first');
+      expect(result.stderr).toContain('checker_blocking_reason_codes');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('prd prewrite guard permits non-ready checkpoint PRD writes', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      installPrdCheckerRuntime(projectRoot);
+      const hookPath = writeRenderedPrdPrewriteGuardHook(projectRoot);
+      const result = spawnSync('bash', [hookPath], {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          CLAUDE_PROJECT_DIR: projectRoot,
+        },
+        input: JSON.stringify({
+          hook_event_name: 'PreToolUse',
+          tool_name: 'Write',
+          tool_input: {
+            file_path: 'docs/brainstorms/kaz-market-requirements.md',
+            content: [
+              '---',
+              'artifact_kind: prd-requirements',
+              'status: draft',
+              '---',
+              '',
+              '## Summary',
+              'checkpoint',
+              '## Readiness Self-Check',
+              'write_mode: checkpoint-prd',
+              'clarification_evidence: asked-owner',
+              'can_enter_spec_plan: no',
+              'preflight_sweep_closure: blocked',
+              '',
+            ].join('\n'),
+          },
         }),
       });
 

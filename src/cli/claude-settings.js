@@ -7,8 +7,9 @@ const SESSION_START_MATCHER = 'startup|resume|clear|compact';
 const SPEC_PLAN_COMMAND_NAME = 'spec:plan';
 const SESSION_START_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/session-start';
 const SPEC_PLAN_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/spec-plan-guard';
+const PRD_PREWRITE_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-prewrite-guard';
 const PRD_READINESS_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-readiness-guard';
-const MANAGED_HOOK_PATH_PATTERN = /(^|[^A-Za-z0-9_])\.claude\/hooks\/(?:session-start|spec-plan-guard|prd-readiness-guard)(\s|"|$)/;
+const MANAGED_HOOK_PATH_PATTERN = /(^|[^A-Za-z0-9_])\.claude\/hooks\/(?:session-start|spec-plan-guard|prd-prewrite-guard|prd-readiness-guard)(\s|"|$)/;
 
 const MANAGED_HOOK_DEFINITIONS = [
   {
@@ -20,6 +21,11 @@ const MANAGED_HOOK_DEFINITIONS = [
     eventName: 'UserPromptExpansion',
     displayName: 'UserPromptExpansion spec-plan guard',
     buildMatcher: buildManagedSpecPlanGuardMatcher,
+  },
+  {
+    eventName: 'PreToolUse',
+    displayName: 'PreToolUse PRD prewrite guard',
+    buildMatcher: buildManagedPrdPrewriteGuardMatcher,
   },
   {
     eventName: 'Stop',
@@ -47,6 +53,18 @@ function buildManagedSpecPlanGuardMatcher() {
       {
         type: 'command',
         command: SPEC_PLAN_GUARD_COMMAND,
+      },
+    ],
+  };
+}
+
+function buildManagedPrdPrewriteGuardMatcher() {
+  return {
+    matcher: 'Write',
+    hooks: [
+      {
+        type: 'command',
+        command: PRD_PREWRITE_GUARD_COMMAND,
       },
     ],
   };
@@ -83,7 +101,7 @@ function isManagedHookForRemoval(hook) {
   if (!hook || typeof hook !== 'object' || hook.type !== 'command' || typeof hook.command !== 'string') {
     return false;
   }
-  return [SESSION_START_COMMAND, SPEC_PLAN_GUARD_COMMAND].some((command) => (
+  return [SESSION_START_COMMAND, SPEC_PLAN_GUARD_COMMAND, PRD_PREWRITE_GUARD_COMMAND].some((command) => (
     hook.command === command || hook.command.startsWith(`${command} `)
   )) || [PRD_READINESS_GUARD_COMMAND].some((command) => (
     hook.command === command || hook.command.startsWith(`${command} `)
@@ -190,8 +208,12 @@ function inspectManagedSpecPlanGuardHook(projectRoot) {
   return inspectManagedHookDefinition(projectRoot, MANAGED_HOOK_DEFINITIONS[1]);
 }
 
-function inspectManagedPrdReadinessGuardHook(projectRoot) {
+function inspectManagedPrdPrewriteGuardHook(projectRoot) {
   return inspectManagedHookDefinition(projectRoot, MANAGED_HOOK_DEFINITIONS[2]);
+}
+
+function inspectManagedPrdReadinessGuardHook(projectRoot) {
+  return inspectManagedHookDefinition(projectRoot, MANAGED_HOOK_DEFINITIONS[3]);
 }
 
 function inspectManagedHookDefinition(projectRoot, definition) {
@@ -391,12 +413,15 @@ module.exports = {
   SESSION_START_MATCHER,
   SPEC_PLAN_COMMAND_NAME,
   SPEC_PLAN_GUARD_COMMAND,
+  PRD_PREWRITE_GUARD_COMMAND,
   PRD_READINESS_GUARD_COMMAND,
+  buildManagedPrdPrewriteGuardMatcher,
   buildManagedPrdReadinessGuardMatcher,
   buildManagedSessionStartMatcher,
   buildManagedSpecPlanGuardMatcher,
   getClaudeSettingsPath,
   inspectManagedClaudeHooks,
+  inspectManagedPrdPrewriteGuardHook,
   inspectManagedPrdReadinessGuardHook,
   inspectManagedSessionStartHook,
   inspectManagedSpecPlanGuardHook,

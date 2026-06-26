@@ -468,15 +468,43 @@ function isEmptyish(value) {
     || /^<.*>$/.test(v);
 }
 
+// 一条 Owner Decision Trace 行是否有效:chosen_answer + write target + consequence 三非空。
+function isValidTraceRow(row) {
+  return !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence);
+}
+
+// F-L1 逐行绑定:一条 owner-* OQ 是否能绑定到一条可核验 trace 行。
+// 仅两条信号(均为 artifact 内部引用一致性,非会话事件):
+// (a) question-match:normalize 后 exact 相等(trim+collapse+lowercase,非 substring);
+// (b) id-reference:oq.id 非空且作为 bounded token 出现在 trace 任一可识别 cell(防 OQ-2 误配 OQ-20)。
+// 硬性不做 write-target-token-overlap:Requirements/Acceptance Examples 等泛目标会让一行重盖无限 OQ,
+// 是全局开关的软重生。语义严格限定为「这条 OQ 是否指向一条真实 trace 行」,不证明 owner 真实决策。
+function traceRowBindsOq(traceRow, oqRow) {
+  const normalize = (s) => String(s || '').trim().replace(/\s+/g, ' ').toLowerCase();
+  const oqQuestion = normalize(oqRow.question);
+  if (oqQuestion && normalize(traceRow.question) === oqQuestion) {
+    return true;
+  }
+  const oqId = String(oqRow.id || '').trim();
+  const idMatch = oqId.match(/OQ-?0*(\d+)/i);
+  if (idMatch) {
+    const n = idMatch[1];
+    const tokenRegex = new RegExp(`(^|[^\\w-])OQ-?0*${n}(?![0-9])`, 'i');
+    const cells = `${traceRow.question || ''} ${traceRow.chosen_answer || ''} ${traceRow.prd_write_target || ''} ${traceRow.consequence || ''}`;
+    if (tokenRegex.test(cells)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // 解析 Owner Decision Trace:返回带 chosen_answer + write target 的非空 row 数。
 function parseOwnerDecisionTrace(lines, headings) {
   const section = sectionRange(lines, headings, 'Owner Decision Trace');
   if (!section) return { present: false, validRows: 0, rows: [] };
   const { headerMap, rows } = parseHeaderedTable(section.text, TRACE_HEADER_ALIASES);
   if (Object.keys(headerMap).length === 0) return { present: true, validRows: 0, rows: [] };
-  const validRows = rows.filter((row) => (
-    !isEmptyish(row.chosen_answer) && !isEmptyish(row.prd_write_target) && !isEmptyish(row.consequence)
-  ));
+  const validRows = rows.filter(isValidTraceRow);
   return { present: true, validRows: validRows.length, rows };
 }
 
@@ -570,8 +598,8 @@ function analyzeOutstandingQuestions(lines, headings, options) {
         dispositionOk = looksLikeCheckableRef(refCandidate);
       }
       if (dispositionOk && OWNER_DISPOSITIONS.has(disposition)) {
-        // owner 类需要至少一条有效 owner trace row
-        dispositionOk = ownerTrace.validRows > 0;
+        // F-L1:owner 类需要一条【可核验绑定该 OQ】的有效 trace 行,而非任意一条全局有效行。
+        dispositionOk = ownerTrace.rows.some((tr) => isValidTraceRow(tr) && traceRowBindsOq(tr, row));
       }
       if (!dispositionOk) {
         facts.open_oq_without_owner_closure_count += 1;

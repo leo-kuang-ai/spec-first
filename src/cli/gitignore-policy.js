@@ -13,6 +13,7 @@ const SPEC_FIRST_GITIGNORE_SECTIONS = [
       '.claude/agents/',
       '.claude/hooks/session-start',
       '.claude/hooks/spec-plan-guard',
+      '.claude/hooks/prd-prewrite-guard',
       '.claude/hooks/prd-readiness-guard',
       '.claude/tasks/',
       '.claude/worktrees/',

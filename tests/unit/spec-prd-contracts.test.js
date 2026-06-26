@@ -457,6 +457,18 @@ describe('spec-prd workflow contracts', () => {
       'grill trace is mandatory',
       'valid non-`skipped` value',
       'Route-out and bypass are pre-authoring exits, not grill exemptions',
+      'Claude runtime mutation guard',
+      '`prd-prewrite-guard`',
+      '`PreToolUse` guard for `Write`',
+      'blocks first writes of `docs/brainstorms/*-requirements.md` PRD artifacts',
+      'does not judge product semantics or prove an owner really answered',
+      'Owner-answer fidelity (no reversal)',
+      'Turning a real "must do X" reply into "owner accepted skipping X" is the worst observed failure',
+      'the relaxation must be a new owner reply, never your own rewrite of the old one',
+      'it cannot verify that the row faithfully reflects what the owner actually said',
+      'a matching Owner Decision Trace row',
+      'A single global trace row does not close every owner question at once',
+      'artifact-internal referential consistency',
       'Preflight Sweep',
       'Requirement Analysis Gate',
       'materials -> requirement understanding map -> uncertainty/contradiction identification -> decide which product/design/technical decisions must be asked through grill -> then write the PRD or analysis conclusion',
@@ -490,6 +502,8 @@ describe('spec-prd workflow contracts', () => {
       'An owner who has not capped a branch that still has reachable sub-decisions prevents `final-prd`',
       'relentless fallback when the owner gives no cap/continue signal',
       'pre_prd_clarification_status=checkpoint-blocked',
+      'Do not satisfy the Pre-Write Closure Gate by writing a ready/final PRD first',
+      'hosts without an equivalent pre-tool guard',
     ]);
     // 旧止损语义已被翻转:这些反向锚点不得复活
     expect(skill).not.toContain('large input is not permission to skip the owner question');
