@@ -104,9 +104,11 @@ describe('prompt examples baseline contracts', () => {
     expect(payload.skill).toBe('using-spec-first');
     expect(Array.isArray(payload.cases)).toBe(true);
     expect(payload.cases.length).toBeGreaterThanOrEqual(5);
-    expect(payload.cases.length).toBeLessThanOrEqual(10);
+    expect(payload.cases.length).toBeLessThanOrEqual(14);
     expect(skillPrompt).toContain('skills/using-spec-first/evals/routing-cases.json');
     expect(skillPrompt).toContain('not a deterministic router');
+    expect(skillPrompt).toContain('External issue or PR material is an input surface, not a separate public workflow.');
+    expect(skillPrompt).toContain('Do not invent an external issue/PR-specific `/spec:*` or `$spec-*` entrypoint');
 
     const casesById = new Map(payload.cases.map((entry) => [entry.id, entry]));
     for (const id of [
@@ -142,6 +144,38 @@ describe('prompt examples baseline contracts', () => {
       artifact_expected: true,
     });
     expect(casesById.get('cross-file-contract-change-routes-work').boundary_note).toContain('contract/runtime delivery changes');
+
+    expect(casesById.get('external-bug-issue-routes-debug')).toMatchObject({
+      expected_outcome: 'public_workflow',
+      public_workflow_required: true,
+      expected_entrypoint: '$spec-debug',
+      artifact_expected: true,
+    });
+    expect(casesById.get('external-bug-issue-routes-debug').boundary_note).toContain('current source, tests, logs, or owner evidence');
+
+    expect(casesById.get('external-enhancement-issue-routes-prd')).toMatchObject({
+      expected_outcome: 'public_workflow',
+      public_workflow_required: true,
+      expected_entrypoint: '$spec-prd',
+      artifact_expected: true,
+    });
+    expect(casesById.get('external-enhancement-issue-routes-prd').boundary_note).toContain('not directly to implementation');
+
+    expect(casesById.get('external-pr-diff-routes-code-review')).toMatchObject({
+      expected_outcome: 'public_workflow',
+      public_workflow_required: true,
+      expected_entrypoint: '$spec-code-review',
+      artifact_expected: true,
+    });
+    expect(casesById.get('external-pr-diff-routes-code-review').boundary_note).toContain('untrusted inputs');
+
+    expect(casesById.get('external-ready-brief-routes-work')).toMatchObject({
+      expected_outcome: 'public_workflow',
+      public_workflow_required: true,
+      expected_entrypoint: '$spec-work',
+      artifact_expected: true,
+    });
+    expect(casesById.get('external-ready-brief-routes-work').boundary_note).toContain('ordinary execution input');
 
     expect(casesById.get('explicit-spec-plan-honored')).toMatchObject({
       expected_outcome: 'public_workflow',

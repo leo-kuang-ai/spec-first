@@ -1,6 +1,6 @@
 # 业界调研阅读指南
 
-本目录收集 2026-06-19 至 2026-06-20 围绕 AI Coding Harness、SDD、spec-first 演进路线和团队采纳阻力的 8 篇调研文章。
+本目录收集 2026-06-19 至 2026-06-21 围绕 AI Coding Harness、SDD、spec-first 演进路线、存量项目阶段适配与团队采纳阻力的 10 篇调研文章。
 
 这些文档是架构启发和路线判断输入，不是当前工程 contract。引用其中结论前，先回到当前 source-of-truth 复核：`docs/10-prompt/结构化项目角色契约.md`、`skills/`、`src/cli/`、`docs/contracts/`、`README.md` 和 `CHANGELOG.md`。
 
@@ -30,16 +30,18 @@
 | 6 | [2026-06-19-spec-first-最大杠杆点-活契约层与-delta-累积演进.md](./2026-06-19-spec-first-最大杠杆点-活契约层与-delta-累积演进.md) | 理解“被开发系统行为真相单源”为什么是高杠杆项。注意它是输入论证，不是最终 P0 排序。 | Behavior Contract + Delta 是后续乘数项；进入实现前先证明 P0 evidence loop 和用户痛点。 |
 | 7 | [2026-06-19-expert-coding-harness-spec-first-skill-mapping.md](./2026-06-19-expert-coding-harness-spec-first-skill-mapping.md) | 需要吸收外部 skill / hook / rubric 时再读。重点是映射到既有 workflow 节点，而不是扩更多 public workflow。 | 可吸收 task handoff、review order、agent/tool security lens；新增 agent 必须先有 spec-first 侧失败实例或评估证据。 |
 | 8 | [2026-06-19-ponytail-yagni-spec-first-skill-source-integration-plan.md.md](./2026-06-19-ponytail-yagni-spec-first-skill-source-integration-plan.md.md) | 需要最小实现、YAGNI、code-simplicity、Ponytail 方法论时读。 | 最小必要性治理是专项增强，不应挤掉证据闭环、P-friction 和 PRD 质量证明主线。 |
+| 9 | [2026-06-21-spec-first-综合优先级建议-源码级深度解读.md](./2026-06-21-spec-first-综合优先级建议-源码级深度解读.md) | 前 8 篇的源码级复核收口；本 README §0「三个急需增强点」的出处。明确多处缺口已部分闭合（spec-debug 默认扫 docs/solutions、spec-plan PRD handoff entropy check），把建议从「新增」降级为「扩既有表面」。 | P0-A~P0-D + P1-A~F 优先级总表；config-protection 须改写为既有 secret-deny-patterns + mutation gate；自动 scorecard settled out-of-scope 但可重开；P0-C 须有能否决「加默认」类 P1 的权力。 |
+| 10 | [2026-06-21-openspec-spec-first-存量项目规范初始化与阶段适配报告.md](./2026-06-21-openspec-spec-first-存量项目规范初始化与阶段适配报告.md) | 回答 OpenSpec 是否只适合 0-1、spec-first 处于什么阶段、历史存量如何初始化。 | OpenSpec 擅长增量 delta 治理但缺历史 baseline 初始化；spec-first 是 1-10 brownfield harness，缺「当前能力行为真相」层；推荐 capability inventory → baseline evidence → reviewed current capability spec 的 docs-first governed proposal（非可发布 skill）。 |
 
 ## 按目的跳读
 
 | 目的 | 建议读法 |
 | --- | --- |
-| 只想知道当前演进优先级 | 读顺序 1 和 2，再看本 README 的“三个急需增强点”。 |
-| 复核行业对标证据链 | 读顺序 3、4，再按需要进入 5、7、8。 |
-| 研究 behavior contract / Delta | 读顺序 5、6，然后回到顺序 1 看最终优先级修正。 |
+| 只想知道当前演进优先级 | 读顺序 1、2 和 9，再看本 README 的“三个急需增强点”。 |
+| 复核行业对标证据链 | 读顺序 3、4，再按需要进入 5、7、8、10。 |
+| 研究 behavior contract / Delta | 读顺序 5、6、10，然后回到顺序 1 和 9 看最终优先级修正。 |
 | 改进 skill / agent / review rubric | 读顺序 7，再回到当前 `skills/`、`agents/` 和 `src/cli/contracts/dual-host-governance/skills-governance.json` 复核现状。 |
-| 改进最小实现纪律 | 读顺序 8，再回到 `spec-plan`、`spec-work`、`spec-code-review` source 判断是否已有承接点。 |
+| 改进最小实现纪律 | 读顺序 8、9，再回到 `spec-plan`、`spec-work`、`spec-code-review` source 判断是否已有承接点。 |
 
 ## 三个急需增强点
 
@@ -81,7 +83,7 @@
 - `src/cli/helpers/honest-closeout.js` 已对 `passed` validation claim 做聚合防 cherry-pick：run summary 总体不是 passed 时会降级为 `run-summary-checks-uncovered`。
 - `src/cli/helpers/verification-run-summary.js` 只允许 `spec-work`、`spec-debug`、`spec-code-review` 三个 workflow。
 - `src/cli/helpers/spec-work-run-artifact.js` 的 producer 仍固定服务 `spec-work` closeout，源码注释也说明若未来接 debug/review run artifact，需要同步放宽硬编码。
-- 当前本地 `.spec-first/workflows` 有 31 个 `run.json`、33 个 `verification-run-summary.json`、7 个 `honest-closeout.json`；claim 统计仍集中在 validation/review/knowledge/impact，没有 artifact quality 或 contract coverage。
+- 当前本地 `.spec-first/workflows` 有 42 个 `run.json`、45 个 `verification-run-summary.json`、12 个 `honest-closeout.json`；claim 统计仍集中在 validation/review/knowledge/impact，没有 artifact quality 或 contract coverage。
 
 最小落地：
 
@@ -105,7 +107,7 @@
 
 当前源码现状：
 
-- 当前本地 run evidence 已增长到 31 条 `run.json`，其中 `workflow_integrated=true` 为 29 条，已足够做第一轮摩擦审计。
+- 当前本地 run evidence 已增长到 42 条 `run.json`，其中 `workflow_integrated=true` 为 39 条（`false` 3 条），已足够做第一轮摩擦审计。
 - `skills/spec-debug/SKILL.md` 已默认扫描 `docs/solutions/` frontmatter 作为 debugging orientation source。
 - `skills/spec-work/SKILL.md` 只有 recall trust boundary：当 learnings 被携带或召回时如何信任它；没有像 debug 那样默认激活 `docs/solutions/` recall。
 
@@ -139,9 +141,9 @@
 
 ## 本次复核记录
 
-本 README 的排序基于 2026-06-21 的只读复核：
+本 README 的排序基于 2026-06-21 的只读复核，篇数、日期范围与 run evidence 计数于 2026-06-28 重新校正（新增 2 篇 2026-06-21 文档纳入阅读顺序）：
 
-- 已读本目录 8 篇调研文章和 `docs/10-prompt/结构化项目角色契约.md`。
+- 已读本目录 10 篇调研文章和 `docs/10-prompt/结构化项目角色契约.md`。
 - 已核 `honest-closeout`、`verification-run-summary`、`spec-work-run-artifact`、`spec-prd` evaluation governance、eval fixture contract、P-friction backlog、`spec-work` / `spec-debug` recall 边界。
-- 已统计当前 `.spec-first/workflows`：31 个 `run.json`、33 个 `verification-run-summary.json`、7 个 `honest-closeout.json`。
+- 已统计当前 `.spec-first/workflows`：42 个 `run.json`、45 个 `verification-run-summary.json`、12 个 `honest-closeout.json`。
 - Graphify 已尝试作为导航候选，但结果偏泛化，只作为 low-utility advisory；结论来自 direct source reads 和 deterministic file statistics。

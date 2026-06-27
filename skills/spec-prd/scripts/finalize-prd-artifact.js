@@ -16,7 +16,7 @@ const {
 } = require('./lib/reason-codes');
 
 function parseArgs(argv) {
-  const args = { target: null, inputs: [], checkOnly: false, help: false, error: null };
+  const args = { target: null, inputs: [], checkOnly: false, refreshInputsHash: false, help: false, error: null };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--help' || arg === '-h') {
@@ -32,6 +32,8 @@ function parseArgs(argv) {
       i += 1;
     } else if (arg === '--check-only') {
       args.checkOnly = true;
+    } else if (arg === '--refresh-inputs-hash') {
+      args.refreshInputsHash = true;
     } else if (arg.startsWith('--')) {
       args.error = `unknown option: ${arg}`;
       break;
@@ -105,7 +107,7 @@ function upsertFrontmatterFields(text, fields) {
   ].join('\n');
 }
 
-function buildFinalizeReceipt(target, text, inputs) {
+function buildFinalizeReceipt(target, text, inputs, options = {}) {
   const initialReport = buildReport(target, text, { inputs });
   const facts = initialReport.facts;
   const readyStatusClaimPresent = frontmatterHasReadyStatus(text);
@@ -130,6 +132,12 @@ function buildFinalizeReceipt(target, text, inputs) {
     ...missingDesignInputScanReasons,
   ])].sort();
 
+  // --refresh-inputs-hash: 当 PRD 内容未变但 inputs 文件被修改导致 ready_receipt_stale 时，
+  // 允许只刷新 inputs hash。条件: 唯一阻断码是 ready_receipt_stale(无结构问题)。
+  const canRefreshInputsHash = options.refreshInputsHash === true
+    && blockingReasons.length === 1
+    && blockingReasons[0] === 'ready_receipt_stale';
+
   // 004:把 closeout 许可与 ready finalization 拆开。合法 checkpoint(write_mode=checkpoint-prd
   // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
   // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
@@ -153,16 +161,18 @@ function buildFinalizeReceipt(target, text, inputs) {
       && !isReceiptOnly(reasonCode)
       && !isCheckpointInputScanExempt(reasonCode)
     ))
-    : blockingReasons;
+    : (canRefreshInputsHash
+      ? blockingReasons.filter((reasonCode) => reasonCode !== 'ready_receipt_stale')
+      : blockingReasons);
   const shouldBlockCloseout = closeoutBlockingReasons.length > 0;
 
   return {
     schema_version: 'spec-prd-finalize.v1',
     target,
-    status: blockingReasons.length === 0
+    status: blockingReasons.length === 0 || canRefreshInputsHash
       ? 'finalizable'
       : (isValidCheckpoint && !shouldBlockCloseout ? 'checkpoint-closeout' : 'blocked'),
-    can_finalize: blockingReasons.length === 0,
+    can_finalize: blockingReasons.length === 0 || canRefreshInputsHash,
     can_closeout: !shouldBlockCloseout,
     should_block_closeout: shouldBlockCloseout,
     blocking_reason_codes: blockingReasons,
@@ -181,7 +191,7 @@ function buildFinalizeReceipt(target, text, inputs) {
 function finalizePrd(target, inputs, options = {}) {
   const targetPath = path.resolve(target);
   const text = fs.readFileSync(targetPath, 'utf8');
-  const receipt = buildFinalizeReceipt(target, text, inputs);
+  const receipt = buildFinalizeReceipt(target, text, inputs, { refreshInputsHash: options.refreshInputsHash });
 
   if (!receipt.can_finalize || options.checkOnly) {
     return receipt;
@@ -210,8 +220,9 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     process.stdout.write('finalize-prd-artifact.js — write or check a machine-owned ready receipt for a PRD artifact.\n');
-    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--check-only]\n');
-    process.stdout.write('  --check-only  preview the receipt without writing; exit 0 = closeout allowed, 1 = should_block_closeout, 2 = usage error.\n');
+    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--check-only] [--refresh-inputs-hash]\n');
+    process.stdout.write('  --check-only           preview the receipt without writing; exit 0 = closeout allowed, 1 = should_block_closeout, 2 = usage error.\n');
+    process.stdout.write('  --refresh-inputs-hash  allow re-finalizing when only ready_receipt_stale blocks (PRD unchanged, inputs file modified).\n');
     process.exit(0);
   }
   if (args.error || !args.target) {
@@ -224,7 +235,7 @@ function main() {
 
   let receipt;
   try {
-    receipt = finalizePrd(args.target, args.inputs, { checkOnly: args.checkOnly });
+    receipt = finalizePrd(args.target, args.inputs, { checkOnly: args.checkOnly, refreshInputsHash: args.refreshInputsHash });
   } catch (err) {
     process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
     process.exit(2);

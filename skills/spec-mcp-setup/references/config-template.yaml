@@ -1,6 +1,15 @@
 # Spec-First -- local project config
 # Copy to .spec-first/config.local.yaml in your project root.
-# All settings are optional. Invalid values are ignored or fall back per setting.
+# All settings are optional. This file is a local-only override, not a
+# team-shared source of truth. Invalid values are ignored or fall back per
+# setting.
+
+# --- Local execution overrides ---
+# Current supported consumer: src/verification/profile-loader.js reads this
+# key as a local execution preference. Keep it commented until you have created
+# the referenced profile in your own checkout.
+
+# verification_profile_path: .spec-first/verification-profile.local.json
 
 # --- Document rendering ---
 # Current spec-first workflows write markdown canonical artifacts. These output
@@ -11,3 +20,9 @@
 
 # plan_output: html          # reserved: md | html (default remains md)
 # brainstorm_output: html    # reserved: md | html (default remains md)
+
+# --- Project workflow conventions ---
+# Do not store team-shared tracker policy, label vocabulary, external PR
+# request-surface policy, issue acceptance rules, or rejected-scope decisions in
+# this local file. Put durable team conventions in source-tracked project docs
+# with explicit downstream consumers and tests.

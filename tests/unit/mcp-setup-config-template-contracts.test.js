@@ -28,8 +28,41 @@ const CHECK_HEALTH_PATH = path.join(
   'scripts',
   'check-health',
 );
+const SKILL_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  'skills',
+  'spec-mcp-setup',
+  'SKILL.md',
+);
 
 describe('spec-mcp-setup config template contract', () => {
+  test('runtime setup posture keeps deterministic facts separate from conventions', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('Setup Posture And Project Conventions');
+    expect(text).toContain('Explore -> Present -> Decide -> Write');
+    expect(text).toContain('local-only overrides');
+    expect(text).toContain('verification_profile_path');
+    expect(text).toContain('Document output/provider keys in the template are reserved future hints');
+    expect(text).toContain('Missing local config is not a blocker');
+    expect(text).toContain('deterministic existence facts only');
+    expect(text).toContain('Setup must not judge whether terminology is correct');
+    expect(text).toContain('treat `.spec-first/config.local.yaml` as team-shared workflow policy');
+    expect(text).toContain('decide issue/PR category, state, scope, accept/reject status, or implementation truth');
+  });
+
+  test('local execution override documents the current verification profile consumer', () => {
+    const text = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+
+    expect(text).toContain('This file is a local-only override');
+    expect(text).toContain('# --- Local execution overrides ---');
+    expect(text).toContain('Current supported consumer: src/verification/profile-loader.js reads this');
+    expect(text).toContain('# verification_profile_path: .spec-first/verification-profile.local.json');
+    expect(text).not.toMatch(/^verification_profile_path:/m);
+  });
+
   test('document rendering hints stay inactive and spec-first scoped', () => {
     const text = fs.readFileSync(TEMPLATE_PATH, 'utf8');
 
@@ -46,6 +79,19 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).not.toContain('.compound-engineering');
     expect(text).not.toMatch(/\bce-[a-z]/);
     expect(text).not.toContain('exclusive format');
+  });
+
+  test('team-shared workflow policy is excluded from local config', () => {
+    const text = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+
+    expect(text).toContain('Do not store team-shared tracker policy');
+    expect(text).toContain('label vocabulary');
+    expect(text).toContain('external PR');
+    expect(text).toContain('rejected-scope decisions');
+    expect(text).toContain('source-tracked project docs');
+    expect(text).not.toMatch(/^tracker_policy:/m);
+    expect(text).not.toMatch(/^label_mapping:/m);
+    expect(text).not.toMatch(/^external_pr_discovery:/m);
   });
 
   test('local config example mirrors the source template when present', () => {

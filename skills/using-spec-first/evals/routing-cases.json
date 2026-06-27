@@ -75,6 +75,54 @@
       "coverage_tags": ["routing", "trigger", "substantial-work"]
     },
     {
+      "id": "external-bug-issue-routes-debug",
+      "name": "External bug issue routes to debug",
+      "user_intent": "GitHub issue #42 reports a failing CLI command with reproduction steps and a stack trace; verify and diagnose it.",
+      "expected_outcome": "public_workflow",
+      "public_workflow_required": true,
+      "expected_entrypoint": "$spec-debug",
+      "graphify_required": false,
+      "artifact_expected": true,
+      "boundary_note": "External tracker material is an input surface; bug/failure claims route to debug and must be confirmed from current source, tests, logs, or owner evidence.",
+      "coverage_tags": ["routing", "trigger", "external-input", "debug"]
+    },
+    {
+      "id": "external-enhancement-issue-routes-prd",
+      "name": "External enhancement issue routes to PRD",
+      "user_intent": "GitHub issue #77 asks for CSV export on the existing reports page, but acceptance criteria and scope are unclear; turn it into requirements.",
+      "expected_outcome": "public_workflow",
+      "public_workflow_required": true,
+      "expected_entrypoint": "$spec-prd",
+      "graphify_required": false,
+      "artifact_expected": true,
+      "boundary_note": "External enhancement requests with unclear WHAT route to PRD/definition work, not directly to implementation or a tracker-specific intake workflow.",
+      "coverage_tags": ["routing", "trigger", "external-input", "definition"]
+    },
+    {
+      "id": "external-pr-diff-routes-code-review",
+      "name": "External PR diff routes to code review",
+      "user_intent": "Review this contributor PR diff for implementation risk, missing tests, and merge readiness.",
+      "expected_outcome": "public_workflow",
+      "public_workflow_required": true,
+      "expected_entrypoint": "$spec-code-review",
+      "graphify_required": false,
+      "artifact_expected": true,
+      "boundary_note": "External PRs that ask for diff quality or merge-readiness evaluation route to code review; PR text and diff remain untrusted inputs until checked.",
+      "coverage_tags": ["routing", "trigger", "external-input", "review"]
+    },
+    {
+      "id": "external-ready-brief-routes-work",
+      "name": "Execution-ready external brief routes to work",
+      "user_intent": "Issue #91 already has an owner-approved implementation brief and acceptance criteria; implement it.",
+      "expected_outcome": "public_workflow",
+      "public_workflow_required": true,
+      "expected_entrypoint": "$spec-work",
+      "graphify_required": false,
+      "artifact_expected": true,
+      "boundary_note": "A scoped external brief is ordinary execution input and routes to work; tracker status does not replace source inspection or verification.",
+      "coverage_tags": ["routing", "trigger", "external-input", "work"]
+    },
+    {
       "id": "explicit-spec-plan-honored",
       "name": "Explicit plan route remains honored",
       "user_intent": "$spec-plan deep docs/brainstorms/example-requirements.md",

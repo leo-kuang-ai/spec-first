@@ -104,6 +104,10 @@ module.exports = {
       ],
       pattern: 'passive-quality-feedback',
     },
+    'eval fixture 基础设施（`skills/spec-prd/evals/`，by `test:eval-fixtures`）': {
+      type: 'path',
+      anyOf: ['skills/spec-prd/evals/examples.json'],
+    },
   },
   'Governance Harness': {
     redaction: {

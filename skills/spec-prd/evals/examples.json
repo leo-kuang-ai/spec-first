@@ -2395,6 +2395,61 @@
         "readiness",
         "owner-answer-fidelity"
       ]
+    },
+    {
+      "id": "direct-write-skips-phase1-rejected",
+      "intent": "create",
+      "case_type": "failure",
+      "quality_buckets": [
+        "failure",
+        "grill-quality"
+      ],
+      "input_shape": "Model reads 7 source documents for a brownfield increment, outputs 'materials read, producing PRD now', then immediately writes a checkpoint PRD to docs/brainstorms/*-requirements.md with write_mode=checkpoint-prd and can_enter_spec_plan=no, but with no Decision Card (write_mode / highest_risk_gap / next_action / why planning will not invent WHAT) emitted before the Write, no Requirement Analysis Gate map fields visible in the conversation, no Requirements Grill, and Outstanding Questions table containing load-bearing interface and dependency questions that were never asked to the owner",
+      "expected": [
+        "Phase 1 Requirement Analysis Gate map must run before the first durable Write: materials -> requirement understanding map -> uncertainty/contradiction identification -> decide which decisions must be grilled",
+        "a compact run-local Decision Card (write_mode, highest_risk_gap, next_action, why planning will not invent WHAT) must be emitted in the conversation before the first Write",
+        "load-bearing OQs about interface availability, dependency contracts, or owner-owned gaps must reach a Canonical stop point or be explicitly deferred via legal checkpoint (owner genuinely unavailable) before writing",
+        "the correct action is: output Requirement Analysis Gate map, run Product Expert Lens, begin Requirements Grill for each load-bearing branch, then write PRD or ask-owner-first"
+      ],
+      "must_not": [
+        "must not treat 'directory is empty' or 'materials are clear' as a reason to skip Phase 1 and write directly",
+        "must not write any PRD (even checkpoint-prd) without first emitting a Decision Card in the conversation",
+        "must not treat write_mode=checkpoint-prd as a Phase 1 bypass — checkpoint is a recovery shape after Phase 1 analysis, not a substitute for it",
+        "must not confuse satisfying checker reason_codes (format compliance) with running Phase 1 substantive analysis"
+      ],
+      "coverage_tags": [
+        "grill-quality",
+        "phase1-skip",
+        "direct-write-anti-pattern",
+        "decision-card-required"
+      ]
+    },
+    {
+      "id": "fake-asked-owner-without-interaction-rejected",
+      "intent": "create",
+      "case_type": "failure",
+      "quality_buckets": [
+        "failure",
+        "readiness-fail"
+      ],
+      "input_shape": "Model reads source materials, writes checkpoint PRD, then declares clarification_evidence: asked-owner in frontmatter, but Owner Decision Trace contains only 'pending owner' rows for all owner-* OQs — no real owner reply was received in the session. The model self-populated asked-owner to satisfy the checker without performing actual owner interaction.",
+      "expected": [
+        "clarification_evidence: asked-owner is only valid when the owner actually replied in this session — a real owner answer was received and recorded",
+        "Owner Decision Trace rows must reflect verbatim owner answers, not 'pending owner' placeholders",
+        "when no owner interaction occurred, the legal value is headless-degraded-logged (with listed owner questions) or the PRD must stay at checkpoint-prd + can_enter_spec_plan: no + next_owner_question",
+        "a mismatch between asked-owner and pending-owner trace rows is an owner-answer fidelity violation"
+      ],
+      "must_not": [
+        "must not self-declare clarification_evidence: asked-owner when no owner reply was received in this session",
+        "must not use asked-owner to satisfy the checker while Owner Decision Trace rows show pending owner",
+        "must not treat writing asked-owner as equivalent to having received and recorded an owner answer"
+      ],
+      "coverage_tags": [
+        "readiness",
+        "asked-owner-fidelity",
+        "clarification-evidence",
+        "owner-interaction-required"
+      ]
     }
   ],
   "skill": "spec-prd",

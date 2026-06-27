@@ -88,6 +88,8 @@ if (blocked.length > 0) {
     ].filter(Boolean)),
     '',
     'Next action: return to `$spec-prd`, fix the listed readiness/design/grill/finalize gaps, then run the producer-local finalize path again.',
+    'Phase 1 restore point if grill was skipped: (1) emit a run-local Decision Card (write_mode / highest_risk_gap / next_action / why planning will not invent WHAT); (2) emit the Requirement Analysis Gate map; (3) begin Requirements Grill on each load-bearing branch before re-finalizing.',
+    'Legal enum values: write_mode = checkpoint-prd | final-prd | ask-owner-first | route-out; can_enter_spec_plan = yes | no; clarification_evidence = asked-owner | source-proven-no-ask | headless-degraded-logged; preflight_sweep_closure = closed | degraded | blocked.',
   ];
   block(lines.join('\n'));
 }

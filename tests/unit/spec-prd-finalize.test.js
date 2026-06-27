@@ -1,5 +1,6 @@
 'use strict';
 
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -9,6 +10,8 @@ const {
   BLOCKING_REASON_CODES,
 } = require('../../skills/spec-prd/scripts/check-prd-artifact');
 const { finalizePrd } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
+
+const FINALIZE_SCRIPT = path.join(__dirname, '..', '..', 'skills', 'spec-prd', 'scripts', 'finalize-prd-artifact.js');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-prd-finalize-'));
@@ -859,5 +862,147 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
     expect(advisory.limit).toBe(32);
     // 守 KTD14:advisory 不进 BLOCKING 集合,不翻转 should_block_closeout。
     expect(report.facts.blocking_reason_codes).not.toContain('input_scan_input_count_capped');
+  });
+
+  // --refresh-inputs-hash: 当 inputs 文件被修改后 ready_receipt_stale 死锁时，允许只刷新 inputs hash。
+  test('--refresh-inputs-hash allows re-finalizing when only ready_receipt_stale blocks', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'stale-inputs-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'plan.md');
+    try {
+      write(inputPath, 'original content\n');
+      write(prdPath, validReadyIntentPrd());
+
+      // 首次 finalize，写入 receipt
+      const first = finalizePrd(prdPath, [inputPath]);
+      expect(first.can_finalize).toBe(true);
+      expect(first.status).toBe('finalized');
+
+      // 修改 inputs 文件 → ready_receipt_stale
+      write(inputPath, 'modified content\n');
+      const stale = finalizePrd(prdPath, [inputPath], { checkOnly: true });
+      expect(stale.blocking_reason_codes).toContain('ready_receipt_stale');
+      expect(stale.can_finalize).toBe(false);
+
+      // --refresh-inputs-hash 打破死锁
+      const refreshed = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true });
+      expect(refreshed.can_finalize).toBe(true);
+      expect(refreshed.status).toBe('finalized');
+      expect(refreshed.blocking_reason_codes).toContain('ready_receipt_stale'); // 仍报告，但不阻断
+      expect(refreshed.closeout_blocking_reason_codes).not.toContain('ready_receipt_stale');
+      expect(refreshed.should_block_closeout).toBe(false);
+
+      // 刷新后 check-only 应通过
+      const after = finalizePrd(prdPath, [inputPath], { checkOnly: true });
+      expect(after.can_finalize).toBe(true);
+      expect(after.blocking_reason_codes).not.toContain('ready_receipt_stale');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--refresh-inputs-hash CLI exits 0 after refreshing stale inputs receipt', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'stale-inputs-cli-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'plan.md');
+    try {
+      write(inputPath, 'original content\n');
+      write(prdPath, validReadyIntentPrd());
+      expect(finalizePrd(prdPath, [inputPath]).status).toBe('finalized');
+
+      write(inputPath, 'modified content\n');
+      const result = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--inputs',
+        inputPath,
+        '--refresh-inputs-hash',
+      ], { encoding: 'utf8' });
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      const receipt = JSON.parse(result.stdout);
+      expect(receipt.status).toBe('finalized');
+      expect(receipt.wrote_ready_receipt).toBe(true);
+      expect(receipt.blocking_reason_codes).toContain('ready_receipt_stale');
+      expect(receipt.closeout_blocking_reason_codes).not.toContain('ready_receipt_stale');
+      expect(receipt.should_block_closeout).toBe(false);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  // P1-2 回归:散文字符串形式的 design_sources_read 不应视为已声明
+  test('design_sources_read with prose value (not list) reports design_sources_read_undeclared', () => {
+    const prd = `---
+artifact_kind: prd-requirements
+spec_id: design-read-prose-fixture
+source_inputs:
+  - docs/design-input.md
+design_sources_unread:
+  - figma://abc node 1:2
+design_sources_unread_reason: not read
+design_sources_read: Figma 画布未直接读取（画布需规划前获取），设计稿链接已记录
+---
+
+# Design Read Prose Fixture
+
+##    Résumé
+
+Test.
+
+## Change Delta
+
+| item | current | target | delta | evidence |
+| --- | --- | --- | --- | --- |
+
+## Requirements
+
+| id | priority | requirement | rationale/source |
+| --- | --- | --- | --- |
+
+## Acceptance Examples
+
+| id | covers | example |
+| --- | --- | --- |
+
+## Scope Boundaries
+
+In scope: test.
+
+## Evidence And Assumptions
+
+| type | item | evidence |
+| --- | --- | --- |
+
+## Readiness Self-Check
+
+- write_mode: final-prd
+- clarification_evidence: asked-owner
+- can_enter_spec_plan: yes
+- preflight_sweep_closure: closed
+`;
+    const report = buildReport('docs/brainstorms/design-read-prose-requirements.md', prd);
+    expect(report.facts.design_sources_read_present).toBe(false);
+    expect(report.facts.blocking_reason_codes).toContain('design_sources_read_undeclared');
+  });
+
+  test('--refresh-inputs-hash does NOT allow finalizing when other blocking codes exist', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'stale-blocked-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'plan.md');
+    try {
+      write(inputPath, 'content\n');
+      // PRD 有结构问题(缺 preflight_sweep_closure)
+      const brokenPrd = validReadyIntentPrd()
+        .replace('- preflight_sweep_closure: closed', '- preflight_sweep_closure: blocked');
+      write(prdPath, brokenPrd);
+
+      const receipt = finalizePrd(prdPath, [inputPath], { refreshInputsHash: true });
+      expect(receipt.can_finalize).toBe(false);
+      expect(receipt.should_block_closeout).toBe(true);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 });

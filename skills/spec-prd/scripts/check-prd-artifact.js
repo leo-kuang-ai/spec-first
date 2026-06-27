@@ -701,7 +701,27 @@ function detectDesignSourceCoverage(text) {
 }
 
 function detectDesignSourcesRead(text) {
-  return hasConcreteFieldBlock(text, 'design_sources_read');
+  // 比 hasConcreteFieldBlock 更严格:只接受 none/n/a 标记或 YAML 列表声明,
+  // 拒绝散文字符串(如"Figma 画布未直接读取")——散文被误判为"已声明"会掩盖 read_undeclared。
+  const lines = splitLines(stripFencedCode(text));
+  const fieldRegex = /^\s*(?:[-*]\s*)?design_sources_read\s*:\s*(.*)$/i;
+  for (let i = 0; i < lines.length; i += 1) {
+    const match = lines[i].match(fieldRegex);
+    if (!match) continue;
+    const inline = match[1].trim();
+    if (/^none$|^n\/a$/i.test(inline)) return true; // none/n/a 是合法的"无"声明
+    if (inline) continue; // 行内有散文值 → 不算合法声明,继续找下一行
+    // 无行内值 → 查下一个非空行是否是列表项
+    for (let j = i + 1; j < lines.length; j += 1) {
+      const trimmed = lines[j].trim();
+      if (!trimmed) continue;
+      if (/^#{1,6}\s+/.test(trimmed)) break;
+      if (/^\s*-\s+\S/.test(lines[j])) return true;
+      if (/^[A-Za-z_][A-Za-z0-9_-]*\s*:/.test(trimmed)) break;
+      break;
+    }
+  }
+  return false;
 }
 
 function detectDesignSourcesUnread(text) {

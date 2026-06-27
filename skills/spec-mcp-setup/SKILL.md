@@ -45,6 +45,19 @@ Optional provider readiness is reported through `provider_readiness[]` (`provide
 
 Project-local setup writes `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, and when applicable `.spec-first/workspace/scenario-fingerprint-setup.json`. The readiness ledger and runtime capabilities include `generated_runtime_manifest.status` (`current`, `stale`, `missing`, or `unknown`) based only on `state.manifestVersion` versus the bundled manifest version; this is a deterministic freshness fact, not proof that generated prose is semantically correct. Scenario fingerprint wrapper failures are warn-and-continue: report `scenario_fingerprint_setup` status and keep the rest of setup actionable instead of blocking ordinary direct-evidence workflows.
 
+## Setup Posture And Project Conventions
+
+Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture:
+
+1. **Explore** host, target repo, generated runtime manifest, existing setup facts, `.spec-first/config.local.yaml`, verification profile visibility, provider artifacts, and project instructions.
+2. **Present** discovered facts, missing dependencies, local-only overrides, provider first-generation/refresh actions, generated runtime freshness, and explicit non-actions before applying setup changes.
+3. **Decide** only where the runtime setup workflow has authority: install/verify helper tools, configure host MCP/runtime wiring, refresh setup-owned facts, or choose a documented degraded path. Team workflow conventions and semantic project decisions remain LLM/owner judgment in downstream workflows.
+4. **Write** only setup-owned facts, supported local config examples, host runtime config through documented targets, and generated runtime refreshes through `spec-first init`. Do not write team-shared tracker policy, label vocabulary, external PR request-surface policy, issue acceptance decisions, or durable rejected-scope decisions from setup.
+
+`.spec-first/config.local.yaml` is a local-only override file, not team-shared source of truth. The current supported consumer key is `verification_profile_path`, read by the verification profile loader as a local execution preference. Document output/provider keys in the template are reserved future hints unless an implemented consumer and focused tests exist. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
+
+If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a team standards index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
+
 ## Workflow Modes
 
 - `--check`: inspect current dependency/runtime status only; do not write setup facts, host config, or install tools.
@@ -155,6 +168,8 @@ Setup does not:
 - run provider first generation from `--check`, `--plan`, `--verify-only`, or invalid explicit workspace override paths;
 - treat provider indexes or query probes as semantic code evidence;
 - treat setup facts as semantic code evidence;
+- treat `.spec-first/config.local.yaml` as team-shared workflow policy;
+- decide issue/PR category, state, scope, accept/reject status, or implementation truth;
 - hand-edit generated runtime mirrors as source;
 - block ordinary plan/work/review/debug when direct source evidence is sufficient.
 
