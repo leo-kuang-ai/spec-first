@@ -485,6 +485,98 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
     }
   });
 
+  // freeze-facts:facts key-set 整集 freeze。下游 finalize/prewrite-guard/doc-review 按字段名读
+  // facts(write_mode/ready_claim_present/blocking_reason_codes/design_source_refs_present 等),
+  // 字段 rename 会静默翻转 hook exit code。本断言把 facts 完整 key 集冻结——任何增删字段都 fail,
+  // 强制 reviewer 显式确认 + 同步下游消费方。与 BLOCKING freeze 同范式。
+  it('freezes the exact facts key-set (downstream contract freeze)', () => {
+    const prd = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-01 | q | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      trace: [
+        '## Owner Decision Trace',
+        '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+        '| --- | --- | --- | --- | --- | --- |',
+        '| OQ-01 | owner | a | Requirements | c | closed |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: [
+        'design_source_inventory:',
+        '- source_or_node: n',
+        '  read_status: read',
+        'design_sources_read:',
+        '- x -> y -> z',
+        'design_sources_unread:',
+        '- none',
+        'design_source_coverage: read',
+      ],
+    });
+    const factsKeys = Object.keys(buildReport('docs/brainstorms/frz-facts-requirements.md', prd).facts).sort();
+    const frozenKeys = [
+      'acceptance_ids',
+      'artifact_kind',
+      'assumption_row_count',
+      'blocking_finding_count',
+      'blocking_outstanding_question_count',
+      'blocking_reason_codes',
+      'can_enter_spec_plan',
+      'can_enter_spec_plan_declared_valid',
+      'clarification_evidence',
+      'clarification_evidence_declared_valid',
+      'clarification_trace_present',
+      'core_sections_missing',
+      'core_sections_present',
+      'design_coverage_partial',
+      'design_degraded_owner_accepted',
+      'design_source_coverage_declared',
+      'design_source_inventory_declared',
+      'design_source_refs_present',
+      'design_sources_read_present',
+      'design_sources_unread_non_empty',
+      'design_sources_unread_present',
+      'evidence_tags_present',
+      'feature_slice_trace_gap_count',
+      'frontmatter_present',
+      'how_pushdown_touches_what_count',
+      'input_design_refs_present',
+      'input_refs_used',
+      'input_scan_attempted',
+      'input_scan_degraded',
+      'nfr_count',
+      'nfr_ids',
+      'open_oq_without_owner_closure_count',
+      'outstanding_question_closure_contract_present',
+      'outstanding_question_count',
+      'outstanding_question_missing_closure_count',
+      'outstanding_question_rows',
+      'outstanding_questions_count',
+      'outstanding_questions_present',
+      'owner_decision_trace_present',
+      'placeholder_line_count',
+      'planning_invention_question_count',
+      'planning_recheck_count',
+      'planning_recheck_present',
+      'possible_misclassified_how_pushdown_count',
+      'preflight_sweep_closure',
+      'preflight_sweep_closure_declared_valid',
+      'priority_distribution',
+      'ready_claim_present',
+      'ready_receipt_current',
+      'ready_receipt_inputs_hash',
+      'ready_receipt_prd_hash',
+      'ready_receipt_present',
+      'requirement_ids',
+      'unclosed_owner_question_count',
+      'uncovered_requirements',
+      'write_mode',
+      'write_mode_declared_valid',
+    ];
+    expect(factsKeys).toEqual(frozenKeys);
+  });
+
   // freeze-2:代表性 closure 形态的 blocking 整集 characterization。
   // .toContain 只证「某 code 在」,这里证「整集恰好是这些」——多报/少报未被单测断言的 code 都会 fail。
   it('characterizes the 19:07 self-downgrade shape blocking set', () => {
@@ -747,5 +839,25 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
     });
     const report = buildReport('docs/brainstorms/frz-requirements.md', contradicted);
     expect(report.facts.blocking_reason_codes).toContain('preflight_closure_contradicted');
+  });
+
+  // #14:inputs 数量超 MAX_INPUT_COUNT(32) emit advisory input_scan_input_count_capped(非 BLOCKING,守 KTD14)。
+  it('emits input_scan_input_count_capped advisory when --inputs exceeds MAX_INPUT_COUNT', () => {
+    const inputs = Array.from({ length: 33 }, (_, i) => `docs/x${i}.md`);
+    const prd = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-01 | q | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      designCoverage: 'not-needed',
+    });
+    const report = buildReport('docs/brainstorms/frz-input-count-requirements.md', prd, { inputs });
+    const advisory = report.findings.find((f) => f.reason_code === 'input_scan_input_count_capped');
+    expect(advisory).toBeDefined();
+    expect(advisory.count).toBe(33);
+    expect(advisory.limit).toBe(32);
+    // 守 KTD14:advisory 不进 BLOCKING 集合,不翻转 should_block_closeout。
+    expect(report.facts.blocking_reason_codes).not.toContain('input_scan_input_count_capped');
   });
 });

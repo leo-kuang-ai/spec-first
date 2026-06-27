@@ -9,6 +9,9 @@ const path = require('path');
 const crypto = require('crypto');
 
 const MAX_INPUT_SCAN_BYTES = 5 * 1024 * 1024;
+// inputs 数量软上限:超过不阻塞(避免误杀合法多源),只 emit advisory finding input_scan_input_count_capped
+// 提示 agent 减少 inputs 或提 timeout 预算(配合 prd-readiness-guard 5000ms 超时分支)。
+const MAX_INPUT_COUNT = 32;
 
 const CORE_SECTIONS = [
   'Summary',
@@ -1014,6 +1017,11 @@ function buildReport(target, text, options = {}) {
   }
   if (inputScan.input_scan_degraded) {
     findings.push({ reason_code: 'input_scan_degraded' });
+  }
+  // inputs 数量软上限(advisory,非 BLOCKING——守 KTD14,不阻塞合法多源)。
+  // 超限提示 agent 减少 inputs 或提高 hook timeout 预算(配合 finalize_check_timeout)。
+  if (inputPaths.length > MAX_INPUT_COUNT) {
+    findings.push({ reason_code: 'input_scan_input_count_capped', count: inputPaths.length, limit: MAX_INPUT_COUNT });
   }
   if (claimsReady && !readyReceiptPresent) {
     findings.push({ reason_code: 'ready_receipt_absent' });
