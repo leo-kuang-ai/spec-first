@@ -702,7 +702,7 @@ Choose one path:
 Before first durable PRD Write:
 - write_mode:
 - highest_risk_gap:
-- next_action: ask-owner | checkpoint | final-write | route-out
+- next_action: ask-owner-first | checkpoint-prd | final-prd | route-out
 - why planning will not invent WHAT:
 ```
 

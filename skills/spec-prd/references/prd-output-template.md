@@ -210,11 +210,11 @@ Then <observable outcome or explicit non-goal>
 | id | question | PRD write target | owner_status | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default/deferred_reason |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-Closure-disposition razor: an open question defaults to not-ready. It is non-blocking only when it carries one legal `closure_disposition` plus that disposition's evidence — `source-resolved` (a checkable ref: path/URL/`file:line`/anchor), `owner-answered` (a matching Owner Decision Trace row), `owner-capped`, `owner-accepted-assumption`, `source-backed-non-WHAT-assumption` (checkable ref), or `implementation-only-how-pushdown` (`planning_would_invent_what=no`, and it must not touch interface/permission/scope/source-of-truth/fallback/analytics — that is a blocking contradiction in a ready PRD). "I judged it a parallel planning-time item" is not a disposition. The model has no free non-blocking verdict; without a legal disposition the only path is to keep grilling or `checkpoint-prd`.
+Closure-disposition razor: see SKILL.md `Closure-disposition razor` for the legal disposition set (single source of truth). For this template's evidence shape: a `source-resolved` / `source-backed-non-WHAT-assumption` cell needs a checkable ref (path/URL/`file:line`/anchor), an `owner-answered` / `owner-capped` / `owner-accepted-assumption` row needs a matching Owner Decision Trace row below, and `implementation-only-how-pushdown` needs `planning_would_invent_what=no` (touching interface/permission/scope/source-of-truth/fallback/analytics is a blocking contradiction in a ready PRD). "I judged it a parallel planning-time item" is not a disposition; without a legal disposition the only path is to keep grilling or `checkpoint-prd`.
 
 ## Owner Decision Trace
 
-Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answered|capped`, or closure depends on an owner answer. Each row records the owner's actual decision; the checker verifies the row is structurally present (it cannot verify the answer is genuine — that stays owner-owned).
+Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answered|capped`, or closure depends on an owner answer. Each row records the owner's actual decision; the checker verifies the row is structurally present (it cannot verify the answer is genuine — that stays owner-owned). Header alias: `check-prd-artifact.js` `TRACE_HEADER_ALIASES` also accepts `decision` / `决策` as the `question` column header.
 
 | question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |
 | --- | --- | --- | --- | --- | --- |

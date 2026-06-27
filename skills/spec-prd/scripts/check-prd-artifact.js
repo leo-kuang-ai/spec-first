@@ -76,7 +76,7 @@ const OQ_HEADER_ALIASES = {
 };
 
 const TRACE_HEADER_ALIASES = {
-  question: ['question', '问题'],
+  question: ['question', 'decision', '问题', '决策'],
   owner_answer: ['owner_answer', 'owner answer', 'owner_answer/source', 'owner回答', '回答/来源'],
   chosen_answer: ['chosen_answer', 'chosen answer', '采纳答案', '最终答案'],
   prd_write_target: ['prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
@@ -131,10 +131,13 @@ const MACHINE_READY_FIELDS = new Set([
 ]);
 
 function parseArgs(argv) {
-  const args = { target: null, inputs: [], error: null };
+  const args = { target: null, inputs: [], help: false, error: null };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--inputs') {
+    if (arg === '--help' || arg === '-h') {
+      args.help = true;
+      return args;
+    } else if (arg === '--inputs') {
       const value = argv[i + 1];
       if (!value || value.startsWith('--')) {
         args.error = 'missing value for --inputs';
@@ -765,12 +768,14 @@ function designCoveragePartial(text) {
 function designDegradedOwnerAccepted(text) {
   const body = stripFencedCode(text);
   const lines = splitLines(body);
-  const hasAcceptanceRef = designDegradedOwnerAcceptanceRefPresent(lines);
   const hasTraceAcceptance = ownerTraceHasDesignDegradedAcceptance(lines);
-  return hasTraceAcceptance || lines.some((line) => {
+  return hasTraceAcceptance || lines.some((line, index) => {
     if (!/(design_degraded_owner_acceptance|owner\s*acceptance|设计降级owner接受|owner接受降级)/i.test(line)) return false;
-    const value = line.slice(line.indexOf(':') + 1);
-    return designAcceptanceBoolTrue(value) && (hasAcceptanceRef || hasDesignAcceptanceReference(line));
+    const colonIndex = line.indexOf(':');
+    if (colonIndex === -1) return false;
+    const value = line.slice(colonIndex + 1);
+    return designAcceptanceBoolTrue(value)
+      && (hasDesignAcceptanceReference(line) || designDegradedOwnerAcceptanceRefNear(lines, index));
   });
 }
 
@@ -778,11 +783,16 @@ function designAcceptanceBoolTrue(value) {
   return normalizeBool(value) === true || /^\s*(?:true|yes)\b/i.test(String(value || ''));
 }
 
-function designDegradedOwnerAcceptanceRefPresent(lines) {
-  return lines.some((line) => {
-    if (!/^\s*(?:[-*]\s*)?design_degraded_owner_acceptance_ref\s*:/i.test(line)) return false;
-    return hasDesignAcceptanceReference(line.slice(line.indexOf(':') + 1));
-  });
+function designDegradedOwnerAcceptanceRefNear(lines, index) {
+  const start = Math.max(0, index - 2);
+  const end = Math.min(lines.length - 1, index + 2);
+  for (let i = start; i <= end; i += 1) {
+    if (i === index) continue;
+    const line = lines[i];
+    if (!/^\s*(?:[-*]\s*)?design_degraded_owner_acceptance_ref\s*:/i.test(line)) continue;
+    if (hasDesignAcceptanceReference(line.slice(line.indexOf(':') + 1))) return true;
+  }
+  return false;
 }
 
 function hasDesignAcceptanceReference(text) {
@@ -792,12 +802,21 @@ function hasDesignAcceptanceReference(text) {
 
 function ownerTraceHasDesignDegradedAcceptance(lines) {
   const headings = parseHeadings(lines);
-  const section = sectionRange(lines, headings, 'Owner Decision Trace');
-  if (!section) return false;
-  return tableRows(section.text).some((cells) => {
-    const row = cells.join(' ');
+  const ownerTrace = parseOwnerDecisionTrace(lines, headings);
+  return ownerTrace.rows.some((traceRow) => {
+    if (!isValidTraceRow(traceRow)) return false;
+    if (String(traceRow.closure_state || '').toLowerCase().trim() !== 'closed') return false;
+    const row = [
+      traceRow.question,
+      traceRow.owner_answer,
+      traceRow.chosen_answer,
+      traceRow.prd_write_target,
+      traceRow.consequence,
+      traceRow.closure_state,
+    ].join(' ');
     if (!/(design|figma|degraded|unread|设计|降级|未读)/i.test(row)) return false;
     if (/(reject|rejected|not accept|拒绝|不接受|未接受)/i.test(row)) return false;
+    if (!hasDesignAcceptanceReference(row)) return false;
     return /\b(?:accept|accepted|accepts|relax|relaxed)\b|接受|同意|放宽/i.test(row);
   });
 }
@@ -1112,6 +1131,12 @@ function buildReport(target, text, options = {}) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
+  if (args.help) {
+    process.stdout.write('check-prd-artifact.js — produce deterministic readiness facts for a PRD artifact.\n');
+    process.stdout.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]...\n');
+    process.stdout.write('  emits facts JSON on stdout; exit 0 regardless of findings (failures surface as facts.blocking_reason_codes).\n');
+    process.exit(0);
+  }
   if (args.error || !args.target) {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);

@@ -21,10 +21,13 @@ const CHECKPOINT_INPUT_SCAN_EXEMPT = new Set([
 ]);
 
 function parseArgs(argv) {
-  const args = { target: null, inputs: [], checkOnly: false, error: null };
+  const args = { target: null, inputs: [], checkOnly: false, help: false, error: null };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--inputs') {
+    if (arg === '--help' || arg === '-h') {
+      args.help = true;
+      return args;
+    } else if (arg === '--inputs') {
       const value = argv[i + 1];
       if (!value || value.startsWith('--')) {
         args.error = 'missing value for --inputs';
@@ -136,6 +139,16 @@ function buildFinalizeReceipt(target, text, inputs) {
   // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
   // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
   // 与 receipt-only 原因本身不阻断 checkpoint closeout——它们只意味着"还没 ready",而非"非法"。
+  // 004:把 closeout 许可与 ready finalization 拆开。合法 checkpoint(write_mode=checkpoint-prd
+  // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
+  // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
+  // 与 receipt-only 原因本身不阻断 checkpoint closeout——它们只意味着"还没 ready",而非"非法"。
+  //
+  // closeout 豁免只覆盖 checkpoint-prd,不覆盖 ask-owner-first / route-out —— 这是 intended:
+  // ask-owner-first 是进行中的 grill 状态(SKILL.md:133 "keep grilling the highest-risk branch,
+  // not ask one question then stop"),不是 closeout 出口;route-out 是写前 route,不产出 PRD。
+  // 模型若要结束一个 ask-owner-first 运行,应先转 checkpoint-prd 保上下文,再 closeout。
+  // 这避免把"还在问"误当"可以收口"。
   const isValidCheckpoint = facts.write_mode === 'checkpoint-prd'
     && facts.can_enter_spec_plan === 'no'
     && facts.ready_claim_present !== true;
@@ -200,6 +213,12 @@ function finalizePrd(target, inputs, options = {}) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
+  if (args.help) {
+    process.stdout.write('finalize-prd-artifact.js — write or check a machine-owned ready receipt for a PRD artifact.\n');
+    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--check-only]\n');
+    process.stdout.write('  --check-only  preview the receipt without writing; exit 0 = closeout allowed, 1 = should_block_closeout, 2 = usage error.\n');
+    process.exit(0);
+  }
   if (args.error || !args.target) {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
@@ -217,8 +236,10 @@ function main() {
   }
 
   process.stdout.write(`${JSON.stringify(receipt, null, 2)}\n`);
-  // 004:exit code 由 should_block_closeout 驱动,而非 can_finalize。合法 checkpoint(non-ready
-  // 但允许 closeout)exit 0;只有 ready 矛盾 exit 1。Stop hook 只消费 exit code,不解析 JSON。
+  // 004:exit code 由 should_block_closeout 驱动,而非 can_finalize。
+  // exit 0 = closeout 放行(含合法 checkpoint);exit 1 = should_block_closeout(ready 矛盾),
+  //   此时 stdout JSON 必须保留 —— prd-readiness-guard 解析 blocking_reason_codes 拼 block 文案;
+  // exit 2 = usage/runtime 错误(stderr)。Stop hook 同时消费 exit code 与 stdout JSON。
   process.exit(receipt.should_block_closeout ? 1 : 0);
 }
 

@@ -52,6 +52,17 @@ for (const relativePrdPath of prdPaths) {
     continue;
   }
 
+  // timeout:spawnSync 超时返回 status===null + signal==='SIGTERM' + 空 stdout/stderr。
+  // 与真实 readiness gap(exit 1 + stdout JSON)区分,给 agent 可定位的 reason_code。
+  if (result.status === null || (result.signal && result.signal !== null)) {
+    blocked.push({
+      path: relativePrdPath,
+      reasonCodes: ['finalize_check_timeout'],
+      stderr: 'finalize --check-only exceeded the 5000ms hook budget (likely large PRD or many --inputs); rerun the producer-local finalize path directly with a higher timeout or fewer inputs.',
+    });
+    continue;
+  }
+
   const parsed = parseJsonObject(result.stdout);
   const reasonCodes = Array.isArray(parsed.blocking_reason_codes)
     ? parsed.blocking_reason_codes

@@ -174,4 +174,40 @@ source_inputs:
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
   });
+
+  test('reports finalize_check_timeout instead of finalize_check_failed when finalize exceeds the hook budget', () => {
+    // 回归:spawnSync 超时(status===null)退化为通用 finalize_check_failed,agent 无法区分超时与真实 gap。
+    // 修复:超时分支 emit finalize_check_timeout。
+    const projectRoot = makeTempDir();
+    try {
+      installRuntimeScripts(projectRoot);
+      // 装一个会 sleep 超过 5000ms 预算的 finalize stub
+      const scriptsDir = path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-prd', 'scripts');
+      fs.writeFileSync(
+        path.join(scriptsDir, 'finalize-prd-artifact.js'),
+        "require('node:timers').setTimeout(() => process.exit(0), 6000);\n",
+      );
+      write(path.join(projectRoot, 'docs', 'brainstorms', 'timeout-requirements.md'),
+        '---\nartifact_kind: prd-requirements\n---\n# x\n');
+
+      const init = spawnSync('git', ['init', '-q'], {
+        cwd: projectRoot, encoding: 'utf8',
+        env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', HOME: path.join(projectRoot, 'home') },
+      });
+      expect(init.status).toBe(0);
+
+      const result = spawnSync(HOOK_TEMPLATE, {
+        cwd: projectRoot, encoding: 'utf8', timeout: 15000,
+        env: { ...process.env, CLAUDE_PROJECT_DIR: projectRoot },
+      });
+
+      expect(result.status).toBe(0);
+      const payload = JSON.parse(result.stdout);
+      expect(payload.decision).toBe('block');
+      expect(payload.reason).toContain('finalize_check_timeout');
+      expect(payload.reason).not.toContain('finalize_check_failed');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
 });

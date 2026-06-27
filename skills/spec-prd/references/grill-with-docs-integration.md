@@ -7,6 +7,7 @@ This reference preserves the original `grill-with-docs` behavior inside `spec-pr
 ## Contents
 
 - [Trigger Boundary](#trigger-boundary)
+- [Embedded Upstream Source Snapshot](#embedded-upstream-source-snapshot)
 - [Original Behavior Contract](#original-behavior-contract)
 - [Source-First Session Rules](#source-first-session-rules)
 - [Context Topology](#context-topology)
@@ -29,6 +30,123 @@ PRD authoring keeps questions one-at-a-time and persists closure into the PRD. F
 - multiple load-bearing PRD gaps interact, so asking only one static blocking question would leave planning to invent WHAT
 
 Do not skip this mode merely because the input looks small. First perform source-first confirmation. If source evidence fully closes the relevant PRD write targets, produce the standard compact/normal PRD without owner interview. If any owner decision is still needed, continue the one-question-at-a-time session relentlessly by default; a branch stops only at a legal stop point defined in SKILL.md `Canonical: 四个合法停点`.
+
+## Embedded Upstream Source Snapshot
+
+This section is the package-local source snapshot for the upstream benchmark. It makes `spec-prd` self-contained at runtime: agents read this reference, not `/Users/kuang/xiaobu/skills/...`, to recover the original `grill-with-docs` execution discipline. The snapshot anchors behavior only; the adapted `spec-prd` rules below remain the executable local contract. Do not expose these upstream files as separate public entrypoints, and do not copy their artifact topology over the PRD chain.
+
+Snapshot source paths and date:
+
+- `/Users/kuang/xiaobu/skills/skills/engineering/grill-with-docs/SKILL.md`
+- `/Users/kuang/xiaobu/skills/skills/productivity/grilling/SKILL.md`
+- `/Users/kuang/xiaobu/skills/skills/engineering/domain-modeling/SKILL.md`
+- snapshot_date: `2026-06-27`
+
+### Upstream `grill-with-docs/SKILL.md`
+
+```md
+---
+name: grill-with-docs
+description: A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.
+disable-model-invocation: true
+---
+
+Run a `/grilling` session, using the `/domain-modeling` skill.
+```
+
+### Upstream `grilling/SKILL.md`
+
+```md
+---
+name: grilling
+description: Interview the user relentlessly about a plan or design. Use when the user wants to stress-test a plan before building, or uses any 'grill' trigger phrases.
+---
+
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+
+Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
+
+If a question can be answered by exploring the codebase, explore the codebase instead.
+```
+
+### Upstream `domain-modeling/SKILL.md`
+
+```md
+---
+name: domain-modeling
+description: Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.
+---
+
+# Domain Modeling
+
+Actively build and sharpen the project's domain model as you design. This is the *active* discipline — challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `CONTEXT.md` for vocabulary is not this skill — that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+
+## File structure
+
+Most repos have a single context:
+
+```
+/
+├── CONTEXT.md
+├── docs/
+│   └── adr/
+│       ├── 0001-event-sourced-orders.md
+│       └── 0002-postgres-for-write-model.md
+└── src/
+```
+
+If a `CONTEXT-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+
+```
+/
+├── CONTEXT-MAP.md
+├── docs/
+│   └── adr/                          ← system-wide decisions
+├── src/
+│   ├── ordering/
+│   │   ├── CONTEXT.md
+│   │   └── docs/adr/                 ← context-specific decisions
+│   └── billing/
+│       ├── CONTEXT.md
+│       └── docs/adr/
+```
+
+Create files lazily — only when you have something to write. If no `CONTEXT.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+
+## During the session
+
+### Challenge against the glossary
+
+When the user uses a term that conflicts with the existing language in `CONTEXT.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?"
+
+### Sharpen fuzzy language
+
+When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+
+### Discuss concrete scenarios
+
+When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+
+### Cross-reference with code
+
+When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
+
+### Update CONTEXT.md inline
+
+When a term is resolved, update `CONTEXT.md` right there. Don't batch these up — capture them as they happen. Use the format in [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+
+`CONTEXT.md` should be totally devoid of implementation details. Do not treat `CONTEXT.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+
+### Offer ADRs sparingly
+
+Only offer to create an ADR when all three are true:
+
+1. **Hard to reverse** — the cost of changing your mind later is meaningful
+2. **Surprising without context** — a future reader will wonder "why did they do it this way?"
+3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
+
+If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+```
 
 ## Original Behavior Contract
 
@@ -53,7 +171,7 @@ During the session, use the project language and docs as active constraints:
 
 - **Challenge against the glossary.** When user wording conflicts with existing `CONTEXT.md`, `CONTEXT-MAP.md`, context-specific `CONTEXT.md`, `docs/contracts/domain-glossary.md`, or ADR wording, call it out immediately and ask which meaning is intended.
 - **Sharpen fuzzy language.** When a term is vague or overloaded, propose a precise canonical term and list avoid terms or aliases.
-- **Discuss concrete scenarios.** Invent scenarios that stress boundaries between concepts, including happy path, permission/role edge, state transition, exception/failure, negative acceptance, and cross-context handoff, only when the scenario can change acceptance, scope, terminology, or a boundary decision.
+- **Discuss concrete scenarios.** Invent scenarios that stress boundaries between concepts — happy path, permission/role edge, state transition, exception/failure, negative acceptance, and cross-context handoff — for each load-bearing requirement before it reaches a Canonical stop point. Each scenario must either expose a gap (routed to an Outstanding Question, blocker, or `checkpoint-prd`) or confirm a named PRD write target; a scenario that neither exposes a gap nor confirms a target is ceremony and is skipped. Do not skip scenario invention on a branch that has not reached a legal stop point in SKILL.md `Canonical: 四个合法停点`; "the requirement looks settled" is not a stop reason, it only reorders which scenario to run next.
 - **Cross-reference with code.** When the user states current behavior, check source/docs/tests/contracts where feasible. If code contradicts the statement, surface the contradiction with evidence and ask which source should win.
 
 Continue this loop relentlessly by default, walking down each branch. A branch stops only at a legal stop point defined in SKILL.md `Canonical: 四个合法停点` (the owner-capped stop point includes the interactive soft-cap). "The next question would only expand scope" or "does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` (anchor missing, broad discovery, non-adjudicable) ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per `Canonical: 四个合法停点`, never silently emit ready.

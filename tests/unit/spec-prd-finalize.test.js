@@ -571,6 +571,25 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
     expect(referencedReport.facts.blocking_reason_codes).not.toContain('design_partial_coverage_unaccepted');
     expect(referencedReport.facts.blocking_reason_codes).not.toContain('design_unread_without_owner_acceptance');
 
+    const distantRefAcceptance = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: [
+        'design_degraded_owner_acceptance_ref: #D-1',
+        'unrelated_field: keep',
+        'another_unrelated_field: keep',
+        'design_sources_unread:',
+        '- node-123 未读',
+        'design_degraded_owner_acceptance: true',
+      ],
+    });
+    expect(buildReport('docs/brainstorms/design-acceptance-requirements.md', distantRefAcceptance)
+      .facts.design_degraded_owner_accepted).toBe(false);
+
     const blockingOwnerTrace = buildClosurePrd({
       oq: [
         '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
@@ -587,6 +606,24 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       readinessExtra: ['design_sources_unread:', '- node-123 未读'],
     });
     expect(buildReport('docs/brainstorms/design-acceptance-requirements.md', blockingOwnerTrace)
+      .facts.design_degraded_owner_accepted).toBe(false);
+
+    const openAcceptedOwnerTrace = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      trace: [
+        '## Owner Decision Trace',
+        '| decision | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+        '| --- | --- | --- | --- | --- | --- |',
+        '| D-1 design degraded | owner accepted | 同意降级使用文字稿 | Design Source Coverage | design risk accepted | open |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: ['design_sources_unread:', '- node-123 未读'],
+    });
+    expect(buildReport('docs/brainstorms/design-acceptance-requirements.md', openAcceptedOwnerTrace)
       .facts.design_degraded_owner_accepted).toBe(false);
 
     const acceptedOwnerTrace = buildClosurePrd({
