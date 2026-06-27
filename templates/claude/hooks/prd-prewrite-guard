@@ -7,6 +7,16 @@ node /dev/fd/3 "$project_dir" 3<<'EOF'
 const fs = require('node:fs');
 const path = require('node:path');
 
+// 路口路由信号3 的 owner-owned gap 词表。与 check-prd-artifact.js:100 WHAT_TOUCHING_KEYWORDS
+// 同步(冻结契约,扩展须两边同步 + 加 fixture)。限定扫 Outstanding Questions 区域 + frontmatter
+// gap 字段,不扫 Requirements 正文(这些词在需求陈述里常见,全文扫会假阳使 final-prd 首次写几乎不可达)。
+// 必须声明在调用 ownerOwnedGapKeywordHit 的顶层执行段之前,否则触发 const TDZ。
+const WHAT_TOUCHING_KEYWORDS = [
+  'interface', '接口', 'availability', '可用性', 'permission', '权限',
+  'scope', '范围', 'source-of-truth', '数据权威', 'fallback', '降级',
+  'analytics', '埋点', '指标',
+];
+
 const projectDir = process.argv[2];
 const rawInput = readStdin();
 const input = parseJsonObject(rawInput);
@@ -48,17 +58,46 @@ const machineReceipt = /^\s*readiness_verified_by\s*:|^\s*readiness_verified_at\
 const firstWrite = !fs.existsSync(absoluteTarget);
 const checkerFacts = tryBuildCheckerFacts(relativeTarget, content);
 const readyIntent = checkerFacts && checkerFacts.ready_claim_present === true;
+const hasDurableWriteMode = checkerFacts
+  && typeof checkerFacts.write_mode === 'string'
+  && checkerFacts.write_mode.length > 0
+  && checkerFacts.write_mode !== 'not-run';
+const missingWriteModeOnFirstWrite = firstWrite && checkerFacts !== null && !hasDurableWriteMode;
 
-if (readyStatus || machineReceipt || (firstWrite && readyIntent)) {
+// 路口路由文案:首次写带"该 grill"信号却直写 final-prd → 已被 readyIntent 拦(Codex 全禁 final
+// 首次写,因 checker 把 final-prd 当 claimsReady),此处只给命中信号的拦截加明确 grill 路由文案,
+// 不改变"所有 final-prd 首次写被拦"的现有语义。信号只判结构,不判 grill 律是否真执行(R12 天花板)。
+const hasDesignSignal = checkerFacts && checkerFacts.design_source_refs_present === true;
+const multiSourceCount = countMultiSourceInputs(content);
+const hasOwnerOwnedGap = ownerOwnedGapKeywordHit(content);
+const hasOutstandingQuestions = checkerFacts && checkerFacts.outstanding_questions_present === true;
+const hasGrillSignal = hasDesignSignal || multiSourceCount >= 2 || hasOwnerOwnedGap || hasOutstandingQuestions;
+const finalPrdOnFirstWriteWithSignal = firstWrite
+  && checkerFacts !== null
+  && checkerFacts.write_mode === 'final-prd'
+  && hasGrillSignal;
+
+if (readyStatus || machineReceipt || (firstWrite && readyIntent) || missingWriteModeOnFirstWrite) {
   const reasonLines = [
     '[spec-first] PRD prewrite guard blocked Write.',
     `Target: ${relativeTarget}`,
     '',
+    'A new PRD artifact must declare a durable-write path in `write_mode` before the first durable Write.',
     'A new PRD artifact must not be written as ready/final in the same Write call.',
+  ];
+  if (finalPrdOnFirstWriteWithSignal) {
+    reasonLines.push(
+      '',
+      'This first PRD write carries a grill signal — design source refs, multi-source inputs, an owner-owned gap, or outstanding questions are present.',
+      '`final-prd` is never allowed on the first Write (it self-claims ready). Route into the Requirements Grill instead: `write_mode: ask-owner-first` to ask the next load-bearing owner question through the Interaction Method, or `write_mode: checkpoint-prd` with `can_enter_spec_plan: no` and `next_owner_question` to preserve recoverable context. `final-prd` is allowed only later, after every load-bearing branch reaches a Canonical stop point and no grill signal remains.',
+    );
+  }
+  reasonLines.push(
+    '',
     'Do not repair this by only changing enum values, deleting rich requirements, or rewriting the PRD into a checker-friendly skeleton.',
     'Run the `$spec-prd` pre-write Requirements Grill first, then choose the correct path: `ask-owner-first` to ask the next load-bearing owner question; `write_mode: checkpoint-prd` to preserve recoverable context with `can_enter_spec_plan: no` and `next_owner_question`; `route-out` when PRD authoring adds no durable WHAT value; or `final-prd` only after every load-bearing branch is closed.',
     'After all load-bearing branches are closed, update the existing artifact and run the producer-local finalize path. `status: ready-for-planning` and `readiness_verified_*` are machine-owned receipt fields.',
-  ];
+  );
   if (checkerFacts && Array.isArray(checkerFacts.blocking_reason_codes) && checkerFacts.blocking_reason_codes.length > 0) {
     reasonLines.push('', `checker_blocking_reason_codes: ${checkerFacts.blocking_reason_codes.join(', ')}`);
   }
@@ -87,6 +126,57 @@ function parseJsonObject(raw) {
 function isWithinRoot(candidatePath, rootPath) {
   const relative = path.relative(rootPath, candidatePath);
   return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+// 信号2:source_inputs frontmatter 列表项数。≥2 项即多源信号(偏严,符合"尽可能澄清")。
+function countMultiSourceInputs(text) {
+  const lines = text.split(/\r?\n/);
+  if (lines[0] !== '---') return 0;
+  const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+  if (fmEnd === -1) return 0;
+  const fm = lines.slice(1, fmEnd);
+  const start = fm.findIndex((line) => /^source_inputs:\s*$/.test(line));
+  if (start === -1) return 0;
+  let count = 0;
+  for (let i = start + 1; i < fm.length; i += 1) {
+    const line = fm[i];
+    if (/^[A-Za-z0-9_-]+:\s*/.test(line)) break;
+    if (/^\s*-\s+(.+?)\s*$/.test(line) || /^\s*path:\s+(.+?)\s*$/.test(line)) count += 1;
+  }
+  return count;
+}
+
+// 信号3:扫"模型自述未决区域"——Outstanding Questions section 文本 + frontmatter
+// next_owner_question / highest_risk_gap 字段值。不扫 Requirements 正文(避免假阳)。
+function ownerOwnedGapKeywordHit(text) {
+  const lines = text.split(/\r?\n/);
+  const candidates = [];
+
+  // frontmatter gap 字段值
+  if (lines[0] === '---') {
+    const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+    if (fmEnd !== -1) {
+      const fm = lines.slice(1, fmEnd);
+      for (const line of fm) {
+        const m = line.match(/^\s*(next_owner_question|highest_risk_gap|preflight_sweep_closure)\s*:\s*(.*)$/i);
+        if (m && m[2]) candidates.push(m[2]);
+      }
+    }
+  }
+
+  // Outstanding Questions section 文本(到下一个 ## 或文末)
+  const oqStart = lines.findIndex((line) => /^##\s+Outstanding Questions/i.test(line));
+  if (oqStart !== -1) {
+    let end = lines.length;
+    for (let i = oqStart + 1; i < lines.length; i += 1) {
+      if (/^##\s/.test(lines[i])) { end = i; break; }
+    }
+    candidates.push(lines.slice(oqStart, end).join('\n'));
+  }
+
+  if (candidates.length === 0) return false;
+  const lower = candidates.join('\n').toLowerCase();
+  return WHAT_TOUCHING_KEYWORDS.some((kw) => lower.includes(kw.toLowerCase()));
 }
 
 function tryBuildCheckerFacts(relativeTarget, content) {
