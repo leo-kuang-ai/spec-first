@@ -61,10 +61,14 @@ function writeRenderedPrdPrewriteGuardHook(projectRoot, transform = (content) =>
 
 function installPrdCheckerRuntime(projectRoot) {
   const scriptDir = path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-prd', 'scripts');
-  fs.mkdirSync(scriptDir, { recursive: true });
+  fs.mkdirSync(path.join(scriptDir, 'lib'), { recursive: true });
   fs.copyFileSync(
     path.join(REPO_ROOT, 'skills', 'spec-prd', 'scripts', 'check-prd-artifact.js'),
     path.join(scriptDir, 'check-prd-artifact.js'),
+  );
+  fs.copyFileSync(
+    path.join(REPO_ROOT, 'skills', 'spec-prd', 'scripts', 'lib', 'reason-codes.js'),
+    path.join(scriptDir, 'lib', 'reason-codes.js'),
   );
 }
 

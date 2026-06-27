@@ -8,6 +8,7 @@ const { spawnSync } = require('node:child_process');
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const HOOK_TEMPLATE = path.join(REPO_ROOT, 'templates', 'claude', 'hooks', 'prd-prewrite-guard');
 const CHECKER_SCRIPT = path.join(REPO_ROOT, 'skills', 'spec-prd', 'scripts', 'check-prd-artifact.js');
+const REASON_CODES_LIB = path.join(REPO_ROOT, 'skills', 'spec-prd', 'scripts', 'lib', 'reason-codes.js');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-prd-prewrite-'));
@@ -20,8 +21,9 @@ function write(filePath, content) {
 
 function installRuntimeChecker(projectRoot) {
   const scriptsDir = path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-prd', 'scripts');
-  fs.mkdirSync(scriptsDir, { recursive: true });
+  fs.mkdirSync(path.join(scriptsDir, 'lib'), { recursive: true });
   fs.copyFileSync(CHECKER_SCRIPT, path.join(scriptsDir, 'check-prd-artifact.js'));
+  fs.copyFileSync(REASON_CODES_LIB, path.join(scriptsDir, 'lib', 'reason-codes.js'));
 }
 
 function runHook(projectRoot, filePath, content, toolName = 'Write') {

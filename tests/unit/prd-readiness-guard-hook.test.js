@@ -19,11 +19,14 @@ function write(filePath, content) {
   fs.writeFileSync(filePath, content, 'utf8');
 }
 
+const REASON_CODES_LIB = path.join(REPO_ROOT, 'skills', 'spec-prd', 'scripts', 'lib', 'reason-codes.js');
+
 function installRuntimeScripts(projectRoot) {
   const scriptsDir = path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-prd', 'scripts');
-  fs.mkdirSync(scriptsDir, { recursive: true });
+  fs.mkdirSync(path.join(scriptsDir, 'lib'), { recursive: true });
   fs.copyFileSync(CHECKER_SCRIPT, path.join(scriptsDir, 'check-prd-artifact.js'));
   fs.copyFileSync(FINALIZE_SCRIPT, path.join(scriptsDir, 'finalize-prd-artifact.js'));
+  fs.copyFileSync(REASON_CODES_LIB, path.join(scriptsDir, 'lib', 'reason-codes.js'));
 }
 
 function readyIntentPrd(inputField) {

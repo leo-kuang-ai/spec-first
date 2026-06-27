@@ -8,6 +8,13 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+// reason-code 分类法(BLOCKING 阻断码 + closure/receipt/checkpoint 子集分类器)的单一真相源。
+// 本脚本与 finalize-prd-artifact.js 共同消费 ./lib/reason-codes,消除分类法双归属漂移。
+const {
+  BLOCKING_REASON_CODES,
+  isClosureBlocker,
+} = require('./lib/reason-codes');
+
 const MAX_INPUT_SCAN_BYTES = 5 * 1024 * 1024;
 // inputs 数量软上限:超过不阻塞(避免误杀合法多源),只 emit advisory finding input_scan_input_count_capped
 // 提示 agent 减少 inputs 或提 timeout 预算(配合 prd-readiness-guard 5000ms 超时分支)。
@@ -29,40 +36,6 @@ const EVIDENCE_TAGS = [
   'external-research',
   'assumption',
 ];
-
-const BLOCKING_REASON_CODES = new Set([
-  'core_section_missing',
-  'forbidden_prds_path',
-  'write_mode_undeclared',
-  'clarification_evidence_undeclared',
-  'clarification_trace_absent',
-  'can_enter_spec_plan_undeclared',
-  'preflight_sweep_closure_absent',
-  'preflight_sweep_closure_blocked',
-  'design_source_inventory_undeclared',
-  'design_source_coverage_undeclared',
-  'design_sources_read_undeclared',
-  'design_sources_unread_undeclared',
-  'design_source_unaccounted',
-  'input_refs_unavailable',
-  'input_scan_degraded',
-  'prd_readiness_declarations_evaded',
-  'ready_receipt_absent',
-  'ready_receipt_stale',
-  'finalize_required',
-  // 004 closure-contract:剃刀与 closure 矛盾类 blocker(只在 artifact 自称 ready/final 时生效)
-  'outstanding_question_closure_undeclared',
-  'blocking_outstanding_question_present',
-  'planning_invention_question_present',
-  'unclosed_owner_question_present',
-  'open_oq_without_owner_closure',
-  'how_pushdown_touches_what',
-  'owner_decision_trace_required_but_absent',
-  'design_unread_without_owner_acceptance',
-  'design_partial_coverage_unaccepted',
-  'preflight_closure_contradicted',
-  'checkpoint_claims_ready',
-]);
 
 // 004:Outstanding Questions 表的 header-aware 解析。只认下面这张冻结的最小别名表;
 // 扩展别名必须先加 fixture。canonical key -> 允许的 header 文本(小写匹配)。
@@ -1053,13 +1026,9 @@ function buildReport(target, text, options = {}) {
     findings.push({ reason_code: 'checkpoint_claims_ready' });
   }
 
-  // preflight_sweep_closure=closed 却仍有 closure blocker = 自相矛盾
-  const closureBlockerPresent = findings.some((f) => (
-    ['open_oq_without_owner_closure', 'how_pushdown_touches_what', 'blocking_outstanding_question_present',
-      'planning_invention_question_present', 'unclosed_owner_question_present',
-      'owner_decision_trace_required_but_absent', 'design_unread_without_owner_acceptance',
-      'design_partial_coverage_unaccepted'].includes(f.reason_code)
-  ));
+  // preflight_sweep_closure=closed 却仍有 closure blocker = 自相矛盾。
+  // 子集定义在 ./lib/reason-codes(单一真相源),取代原内联 8 码数组,防漂移。
+  const closureBlockerPresent = findings.some((f) => isClosureBlocker(f.reason_code));
   if (preflightSweepClosureValue === 'closed' && closureBlockerPresent && claimsReady) {
     findings.push({ reason_code: 'preflight_closure_contradicted' });
   }
@@ -1170,8 +1139,19 @@ if (require.main === module) {
 
 module.exports = {
   BLOCKING_REASON_CODES,
+  LEGAL_DISPOSITIONS,
+  OQ_HEADER_ALIASES,
+  TRACE_HEADER_ALIASES,
   buildReport,
   computeInputsHash,
   normalizeForReceipt,
   sha256,
+  // 纯函数:供 in-process 单测直测 edge case,不参与 buildReport 编排(零行为变更)。
+  parseHeaderedTable,
+  looksLikeCheckableRef,
+  traceRowBindsOq,
+  isEmptyish,
+  matchHeadingTitle,
+  stripHeadingDecoration,
+  analyzeOutstandingQuestions,
 };

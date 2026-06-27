@@ -236,6 +236,7 @@ describe('spec-prd workflow contracts', () => {
       'skills/spec-prd/scripts/check-glossary-drift.js',
       'skills/spec-prd/scripts/check-prd-artifact.js',
       'skills/spec-prd/scripts/finalize-prd-artifact.js',
+      'skills/spec-prd/scripts/lib/reason-codes.js',
       'skills/spec-prd/scripts/run-evals.js',
     ]);
     expect(references).toEqual([
@@ -249,14 +250,15 @@ describe('spec-prd workflow contracts', () => {
       'skills/spec-prd/references/prd-readiness-lens.md',
       'skills/spec-prd/references/product-expert-lens.md',
     ]);
-    expect(sourceFiles).toHaveLength(14);
+    expect(sourceFiles).toHaveLength(15);
     expect(fs.existsSync(path.join(SKILL_DIR, 'templates', 'standard'))).toBe(false);
   });
 
   test('evaluation governance records the current spec-prd source topology', () => {
     const governance = read(EVALUATION_GOVERNANCE_PATH);
 
-    expect(governance).toContain('compressed 13-file source topology (`SKILL.md` + 9 references + 3 scripts)');
+    expect(governance).toContain('compressed source topology (`SKILL.md` + 9 references + 4 scripts plus the `scripts/lib/reason-codes.js` readiness reason-code 分类法 module');
+    expect(governance).not.toContain('compressed 13-file source topology');
     expect(governance).not.toContain('compressed 10-file source topology');
   });
 

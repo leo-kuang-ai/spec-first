@@ -8,17 +8,12 @@ const {
   buildReport,
 } = require('./check-prd-artifact');
 
-const RECEIPT_ONLY_REASONS = new Set([
-  'ready_receipt_absent',
-  'ready_receipt_stale',
-]);
-
-// checkpoint closeout 额外豁免:input-side 核算信号只在 PRD 声称 ready 时才需确证;
-// 一个还没 ready 的 checkpoint 允许 input 扫描降级(仍在 grill 未读全 inputs)。
-const CHECKPOINT_INPUT_SCAN_EXEMPT = new Set([
-  'input_scan_degraded',
-  'input_refs_unavailable',
-]);
+// reason-code 分类法(receipt-only / checkpoint-input-scan-exempt 子集 + 分类器)的
+// 单一真相源在 ./lib/reason-codes,与 check-prd-artifact.js 共同消费,消除双归属漂移。
+const {
+  isReceiptOnly,
+  isCheckpointInputScanExempt,
+} = require('./lib/reason-codes');
 
 function parseArgs(argv) {
   const args = { target: null, inputs: [], checkOnly: false, help: false, error: null };
@@ -115,7 +110,7 @@ function buildFinalizeReceipt(target, text, inputs) {
   const facts = initialReport.facts;
   const readyStatusClaimPresent = frontmatterHasReadyStatus(text);
   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
-    !RECEIPT_ONLY_REASONS.has(reasonCode)
+    !isReceiptOnly(reasonCode)
   ));
   const receiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     reasonCode === 'ready_receipt_stale'
@@ -155,8 +150,8 @@ function buildFinalizeReceipt(target, text, inputs) {
   const closeoutBlockingReasons = isValidCheckpoint
     ? blockingReasons.filter((reasonCode) => (
       reasonCode !== 'finalize_required'
-      && !RECEIPT_ONLY_REASONS.has(reasonCode)
-      && !CHECKPOINT_INPUT_SCAN_EXEMPT.has(reasonCode)
+      && !isReceiptOnly(reasonCode)
+      && !isCheckpointInputScanExempt(reasonCode)
     ))
     : blockingReasons;
   const shouldBlockCloseout = closeoutBlockingReasons.length > 0;
