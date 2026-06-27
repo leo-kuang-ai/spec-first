@@ -2,8 +2,9 @@
 spec_id: spec-debug-discipline-borrow-from-diagnosing-bugs
 title: "feat: spec-debug 借鉴 diagnosing-bugs 强化反馈环纪律、性能回归与 correct seam 判断"
 type: feat
-status: partially-shipped
+status: completed
 date: 2026-06-27
+completed: 2026-06-28
 plan_depth: standard
 author: leokuang
 target_repo: "."
@@ -279,6 +280,20 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 
 **限制声明**：若宿主缺少 dispatch primitive、runtime 无法调用，或用户显式禁用 helper agents，必须记录未执行原因，不能声称通过。
 
+#### 执行结果（2026-06-28，三轮 fresh-source eval）
+
+按 checklist 的"larger workflow changes 至少一次 judge/human agreement check"要求，执行了**三轮不同镜头**的 fresh-source eval（每轮一个全新只读 subagent，注入改后磁盘源码，无宿主 skill-discovery 缓存）：
+
+| Round | 镜头 | 模型 | 场景 | 结果 |
+| --- | --- | --- | --- | --- |
+| 1 | neutral 行为姿态 | sonnet | 6+1 debug 场景（含反向回归） | `passed`，7/7 produces_intent，0 findings |
+| 2 | adversarial 证伪 | sonnet | 5 个对抗场景（militant-vs-LLM-decides / HITL-vs-readiness 张力 / shallow-seam 诱惑跳过 / 2-hypothesis gap / perf-vs-optimize 撞车） | `passed`，5/5 produces_intent，0 findings |
+| 3 | implementation-readiness deciding vote | opus | 2-hypothesis gap 是否需源码补一句 + spot-check 前两轮 3 个最强判定 | `passed`，decision_on_D=benign（显式 default 覆盖、非靠缺席隐式），3 spot-check 全 confirmed，0 findings |
+
+**综合判定：`fresh_source_eval: passed`**。13 个独立判定点全 produces_intent/confirmed/benign，跨 neutral/adversarial/deciding-vote 三镜头零分歧。最薄弱点（2-hypothesis gap）经 opus deciding vote 判定为由 Phase 2 显式 default（form hypotheses → predictions → causal chain gate）覆盖，补一句会 over-specify 已被 default+exception 结构覆盖的边界，故**无源码修复**。
+
+**代理强度边界（仍成立）**：fresh-source eval 验证的是源码可读性与意图传达，**不验证宿主运行时 description 改动后的实际分发命中率**。运行时触发观察（Step 2）仍为 deferred——需在新会话实测 `slow`/`performance regression` 触发是否命中 spec-debug 及与 spec-optimize 的路由消歧，本会话 agent 无法开新会话（已缓存旧定义），记录为 `not_run: requires new-session observation by user`。此 deferred 子项不影响 fresh-source eval 本身的 passed 状态。
+
 ### 治理验证
 
 - `npm run lint:skill-entrypoints`：skill 入口治理校验（**仅校验标题与 legacy slash 命令模式，不读 description 触发词内容**——已核实 `scripts/lint-skill-entrypoints.config.json` blockedPatterns 不含 description/trigger 检查；不得把触发面校验归于此项）。
@@ -317,7 +332,7 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 - [x] investigation-techniques.md 含提复现率重构 + tighten 三轴 + tagged-prefix 纪律（增量插入，未破坏既有结构）。
 - [x] `references/perf-regression.md` 新增，含基线测量 → 统计时计（p50/p95 多次采样 + **平台条件化环境隔离** + 明确阈值 + **阈值噪声带 inconclusive 边界纪律（exit 125 skip）**）→ 二分定位 → 先量后修，并交叉引用既有 references；Decision Brief 含「perf 独立成文件 vs 节」的实质理由声明。
 - [x] `scripts/hitl-loop.template.sh` 新增，统一仓库 shell 风格（`#!/bin/bash` + `set -euo pipefail`），`bash -n` 通过。
-- [ ] fresh-source eval 已执行并记录结果（或明确记录未执行原因）——代理强度边界已声明、未执行已记录，但 fresh-source eval 行为语义验证本身未运行。
+- [x] fresh-source eval 已执行并记录结果——三轮不同镜头（neutral/adversarial/deciding-vote）全 `passed`、零 findings，结果记录于 Verification Plan「执行结果」段；运行时触发观察（Step 2）仍 deferred（需新会话实测，本会话 agent 无法开新会话），记录为 `not_run: requires new-session observation by user`，不影响 eval 本身的 passed 状态。
 - [x] `spec-first init` 刷新 generated mirrors，`cmp` 与 source 一致（仅路径重写差异，语义一致）。
 - [x] `npm run typecheck`、`npm run lint:skill-entrypoints` 通过。
 - [x] `CHANGELOG.md` 已追加条目，用户可见变化标 `(user-visible)`。
@@ -326,9 +341,10 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 
 ## Status
 
-`status: partially-shipped` — Step 1-8 源码落地完成（SKILL.md Phase 1-4 改动 + investigation-techniques 增量 + 新增 perf-regression.md / hitl-loop.template.sh + CHANGELOG + spec-first init mirror 刷新 + spec-debug-contracts/plan-status-taxonomy/changelog-format 22 绿）。已完成三轮修订：
+`status: completed` — Step 1-8 源码落地完成 + fresh-source eval 三轮通过。已完成四轮修订：
 1. 首轮设计审查修订（P1-1 perf 统计时计 / P1-2 correct seam 锁住能锁的 / P1-3 假设重排折叠进 smart-escalation / P2-1 tighten 三轴改 framing 句 / P2-2 description 触发面验证 / P2-3 checklist 分工措辞 / P3 措辞与 shell 风格）。
 2. `/spec:doc-review` 对抗审查（coherence / feasibility / scope-guardian / adversarial 四视角）：应用 1 个 safe_auto + 7 个 manual 修正——perf 环境隔离平台条件化、militant 与 LLM-decides 真兼容（强制度落产物约束）、fresh-source eval 代理强度边界声明、lint 触发面虚假保证纠正 + spec-optimize 路由消歧、bisect 阈值噪声带边界纪律、浅测试假信心 blocking-advisory 防护、perf 独立成文件理由声明。
 3. `/spec:code-review`（correctness / testing / maintainability / project-standards / agent-native + learnings-researcher）Auto-resolve 落地 10 个 finding：HITL 模板诚实标注为 human-operated（非 agent-runnable）、no-loop+no-evidence 分支补 AFK fallback、perf 命令名纠正（cpupower/cpufreq-set）+ 权限前置 + 降级模式、bisect 噪声带补 exit 125 skip wrapper、三轴去重改交叉引用、9 项新行为 + description 触发面 + dead-link 补 spec-debug-contracts 断言（11→17）、契约测试去掉冻结的过期 flat-list 改锁菜单 cue、plan status 改 partially-shipped 并勾选已满足项。
+4. fresh-source eval 三轮（neutral sonnet / adversarial sonnet / deciding-vote opus）：13 个独立判定点全 `passed`、零 findings、零分歧；2-hypothesis gap 经 opus deciding vote 判定为由 Phase 2 显式 default 覆盖、无源码修复。`fresh_source_eval: passed`。
 
-未完成 gate（致 partially-shipped）：fresh-source eval 行为语义验证本身未运行（代理强度边界已声明，运行时触发 hit-rate 未观察，记录为 deferred；待网络恢复后补真实运行时触发观察）。改动尚未 commit（工作树 staged）。
+Deferred 子项（不影响 completed）：运行时触发观察（Step 2）仍为 `not_run: requires new-session observation by user`——本会话 agent 无法开新会话（已缓存旧 spec-debug 定义）；需用户在新会话实测 `slow`/`performance regression` 触发是否命中 spec-debug 及与 spec-optimize 的路由消歧。此为 plan 已声明的代理强度边界，fresh-source eval 本身的 passed 状态不覆盖运行时分发通道。
