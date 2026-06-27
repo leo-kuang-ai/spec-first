@@ -1,7 +1,7 @@
 ---
 title: "refactor: 拆分 buildReport God 函数并集中 claimsReady 策略"
 type: refactor
-status: active
+status: completed
 date: 2026-06-28
 spec_id: 2026-06-28-002-refactor-spec-prd-buildreport-decompose
 ---

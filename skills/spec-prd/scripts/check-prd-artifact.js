@@ -845,13 +845,11 @@ function detectFeatureSliceGaps(lines, headings) {
   });
 }
 
-function buildReport(target, text, options = {}) {
-  const inputPaths = Array.isArray(options.inputs) ? options.inputs : [];
-  const projectRoot = findProjectRootFromTarget(target);
-  const inputScan = scanInputDesignRefs(inputPaths, projectRoot);
-  const prdHash = sha256(normalizeForReceipt(text));
-  const inputsHash = computeInputsHash(inputPaths, { projectRoot });
+// 阶段一:纯文本解析。接受 target 字符串 + text 字符串,不做任何 I/O,
+// 返回后续阶段所需的全部文本派生结构体。
+function parseStructure(target, text) {
   const normalizedTarget = target.split(path.sep).join('/');
+  const prdHash = sha256(normalizeForReceipt(text));
   const lines = splitLines(text);
   const frontmatter = parseFrontmatter(lines);
   const headings = parseHeadings(lines);
@@ -876,32 +874,19 @@ function buildReport(target, text, options = {}) {
   const outstandingQuestionCount = countSectionRows(lines, headings, 'Outstanding Questions');
   const planningRecheckCount = countSectionRows(lines, headings, 'Planning Recheck');
   const writeModeValue = extractDeclarationValue(text, 'write_mode', [
-    'ask-owner-first',
-    'checkpoint-prd',
-    'final-prd',
-    'route-out',
-    'not-run',
+    'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
   ]);
   const writeModeDeclaredValid = Boolean(writeModeValue);
   const clarificationEvidenceValue = extractDeclarationValue(text, 'clarification_evidence', [
-    'asked-owner',
-    'source-proven-no-ask',
-    'headless-degraded-logged',
-    'skipped',
+    'asked-owner', 'source-proven-no-ask', 'headless-degraded-logged', 'skipped',
   ]);
   const clarificationEvidenceDeclaredValid = Boolean(clarificationEvidenceValue);
   const clarificationEvidenceSubstantive = clarificationEvidenceDeclaredValid
     && clarificationEvidenceValue !== 'skipped';
-  const canEnterSpecPlanValue = extractDeclarationValue(text, 'can_enter_spec[-_]?plan', [
-    'yes',
-    'no',
-  ]);
+  const canEnterSpecPlanValue = extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']);
   const canEnterSpecPlanDeclaredValid = Boolean(canEnterSpecPlanValue);
   const preflightSweepClosureValue = extractDeclarationValue(text, 'preflight_sweep_closure', [
-    'closed',
-    'degraded',
-    'blocked',
-    'missing',
+    'closed', 'degraded', 'blocked', 'missing',
   ]);
   const preflightSweepClosureDeclaredValid = Boolean(preflightSweepClosureValue);
   const designSourceRefsPresent = detectDesignSourceRefs(text);
@@ -913,6 +898,7 @@ function buildReport(target, text, options = {}) {
     || /\bready-for-planning\b/i.test(text);
   const prdShaped = missingCoreSections.length === 0 && requirementIds.length > 0;
   const writeModeIsFinalPrd = writeModeValue === 'final-prd';
+  const writeModeIsCheckpoint = writeModeValue === 'checkpoint-prd';
   const claimsReady = frontmatter.fields.status === 'ready-for-planning'
     || writeModeIsFinalPrd
     || canEnterSpecPlanValue === 'yes';
@@ -920,188 +906,232 @@ function buildReport(target, text, options = {}) {
     && frontmatter.fields.readiness_checker_schema === 'spec-prd-artifact-check.v1'
     && Boolean(frontmatter.fields.readiness_prd_hash)
     && Boolean(frontmatter.fields.readiness_inputs_hash);
-  const readyReceiptCurrent = readyReceiptPresent
-    && frontmatter.fields.readiness_prd_hash === prdHash
-    && frontmatter.fields.readiness_inputs_hash === inputsHash;
-
-  const findings = [];
-  if (!frontmatter.present) {
-    findings.push({ reason_code: 'frontmatter_missing', line: 1 });
-  }
-  if (frontmatter.present && frontmatter.fields.artifact_kind !== 'prd-requirements') {
-    findings.push({
-      reason_code: 'artifact_kind_missing_or_wrong',
-      expected: 'prd-requirements',
-      actual: frontmatter.fields.artifact_kind || null,
-      line: frontmatter.startLine,
-    });
-  }
-  if (/^docs\/prds\//.test(normalizedTarget) || normalizedTarget.includes('/docs/prds/')) {
-    findings.push({ reason_code: 'forbidden_prds_path', path: normalizedTarget });
-  }
-  missingCoreSections.forEach((section) => {
-    findings.push({ reason_code: 'core_section_missing', section });
-  });
-  uncoveredRequirements.forEach((requirement_id) => {
-    findings.push({ reason_code: 'requirement_without_acceptance_ref', requirement_id });
-  });
-  placeholderLines.forEach((line) => {
-    findings.push({ reason_code: 'placeholder_or_todo_present', line });
-  });
-  featureSliceGaps.forEach((finding) => findings.push(finding));
-  if (needsReadinessDeclarations && !writeModeDeclaredValid) {
-    findings.push({ reason_code: 'write_mode_undeclared' });
-  }
-  if (needsReadinessDeclarations && !clarificationEvidenceDeclaredValid) {
-    findings.push({ reason_code: 'clarification_evidence_undeclared' });
-  }
-  if (needsReadinessDeclarations && writeModeIsFinalPrd && !clarificationEvidenceSubstantive) {
-    findings.push({ reason_code: 'clarification_trace_absent' });
-  }
-  if (needsReadinessDeclarations && !canEnterSpecPlanDeclaredValid) {
-    findings.push({ reason_code: 'can_enter_spec_plan_undeclared' });
-  }
-  if (prdShaped && !needsReadinessDeclarations) {
-    findings.push({ reason_code: 'prd_readiness_declarations_evaded' });
-  }
-  if ((prdShaped || writeModeIsFinalPrd || needsReadinessDeclarations) && !preflightSweepClosureDeclaredValid) {
-    findings.push({ reason_code: 'preflight_sweep_closure_absent' });
-  }
-  if (claimsReady && preflightSweepClosureValue === 'blocked') {
-    findings.push({ reason_code: 'preflight_sweep_closure_blocked' });
-  }
-  if (designSourceRefsPresent && !designSourceInventoryDeclared) {
-    findings.push({ reason_code: 'design_source_inventory_undeclared' });
-  }
-  if (designSourceRefsPresent && !designSourceCoverageDeclared) {
-    findings.push({ reason_code: 'design_source_coverage_undeclared' });
-  }
-  if (designSourceRefsPresent && !designSourcesReadPresent) {
-    findings.push({ reason_code: 'design_sources_read_undeclared' });
-  }
-  if (designSourceRefsPresent && !designSourcesUnreadPresent) {
-    findings.push({ reason_code: 'design_sources_unread_undeclared' });
-  }
-  if (inputScan.input_design_refs_present && !designSourceInventoryDeclared) {
-    findings.push({ reason_code: 'design_source_unaccounted' });
-  }
-  if (inputPaths.length > 0 && inputScan.input_refs_used.length === 0) {
-    findings.push({ reason_code: 'input_refs_unavailable' });
-  }
-  if (inputScan.input_scan_degraded) {
-    findings.push({ reason_code: 'input_scan_degraded' });
-  }
-  // inputs 数量软上限(advisory,非 BLOCKING——守 KTD14,不阻塞合法多源)。
-  // 超限提示 agent 减少 inputs 或提高 hook timeout 预算(配合 finalize_check_timeout)。
-  if (inputPaths.length > MAX_INPUT_COUNT) {
-    findings.push({ reason_code: 'input_scan_input_count_capped', count: inputPaths.length, limit: MAX_INPUT_COUNT });
-  }
-  if (claimsReady && !readyReceiptPresent) {
-    findings.push({ reason_code: 'ready_receipt_absent' });
-  } else if (claimsReady && !readyReceiptCurrent) {
-    findings.push({ reason_code: 'ready_receipt_stale' });
-  }
-
-  // 004 closure-contract:剃刀 + closure 矛盾分析。
-  const writeModeIsCheckpoint = writeModeValue === 'checkpoint-prd';
-  const oqAnalysis = analyzeOutstandingQuestions(lines, headings, {
-    claimsReady,
-    clarificationAskedOwner: clarificationEvidenceValue === 'asked-owner',
-  });
-  oqAnalysis.reasonCodes.forEach((reason_code) => findings.push({ reason_code }));
-
-  // design unread / partial 未被 owner 接受
   const designUnread = designUnreadNonEmpty(text);
   const designPartial = designCoveragePartial(text);
   const designAccepted = designDegradedOwnerAccepted(text);
-  if (claimsReady && designUnread && !designAccepted) {
+  return {
+    target, normalizedTarget, prdHash, lines, frontmatter, headings,
+    missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
+    evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
+    outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
+    writeModeValue, writeModeDeclaredValid, clarificationEvidenceValue,
+    clarificationEvidenceDeclaredValid, clarificationEvidenceSubstantive,
+    canEnterSpecPlanValue, canEnterSpecPlanDeclaredValid,
+    preflightSweepClosureValue, preflightSweepClosureDeclaredValid,
+    designSourceRefsPresent, designSourceInventoryDeclared, designSourceCoverageDeclared,
+    designSourcesReadPresent, designSourcesUnreadPresent,
+    needsReadinessDeclarations, prdShaped, writeModeIsFinalPrd, writeModeIsCheckpoint,
+    claimsReady, readyReceiptPresent, designUnread, designPartial, designAccepted,
+  };
+}
+
+// 阶段二:I/O + facts 计算。接受 parseStructure 结果 + inputs 数组,
+// 执行 I/O(input 扫描、hash 计算)和 OQ 分析,返回 { facts, oqAnalysis }。
+// facts 含 ready_claim_present 等 policy 派生布尔,供 gateReadyClaims/deriveFindings 消费。
+function computeFacts(structure, inputPaths, options) {
+  const projectRoot = options.projectRoot || findProjectRootFromTarget(structure.target);
+  const inputScan = scanInputDesignRefs(inputPaths, projectRoot);
+  const inputsHash = computeInputsHash(inputPaths, { projectRoot });
+  const readyReceiptCurrent = structure.readyReceiptPresent
+    && structure.frontmatter.fields.readiness_prd_hash === structure.prdHash
+    && structure.frontmatter.fields.readiness_inputs_hash === inputsHash;
+  const oqAnalysis = analyzeOutstandingQuestions(structure.lines, structure.headings, {
+    claimsReady: structure.claimsReady,
+    clarificationAskedOwner: structure.clarificationEvidenceValue === 'asked-owner',
+  });
+  const facts = {
+    frontmatter_present: structure.frontmatter.present,
+    artifact_kind: structure.frontmatter.fields.artifact_kind || null,
+    core_sections_present: CORE_SECTIONS.filter((s) => !structure.missingCoreSections.includes(s)),
+    core_sections_missing: structure.missingCoreSections,
+    requirement_ids: structure.requirementIds,
+    acceptance_ids: structure.acceptanceIds,
+    nfr_ids: structure.nfrIds,
+    uncovered_requirements: structure.uncoveredRequirements,
+    evidence_tags_present: structure.evidenceTagHits,
+    priority_distribution: structure.priorities,
+    nfr_count: structure.nfrIds.length,
+    assumption_row_count: structure.assumptionRowCount,
+    outstanding_question_count: structure.outstandingQuestionCount,
+    outstanding_questions_present: structure.outstandingQuestionsPresent,
+    outstanding_questions_count: structure.outstandingQuestionCount,
+    planning_recheck_present: structure.planningRecheckPresent,
+    planning_recheck_count: structure.planningRecheckCount,
+    write_mode_declared_valid: structure.writeModeDeclaredValid,
+    write_mode: structure.writeModeValue,
+    clarification_evidence_declared_valid: structure.clarificationEvidenceDeclaredValid,
+    clarification_evidence: structure.clarificationEvidenceValue,
+    clarification_trace_present: structure.clarificationEvidenceSubstantive,
+    can_enter_spec_plan_declared_valid: structure.canEnterSpecPlanDeclaredValid,
+    can_enter_spec_plan: structure.canEnterSpecPlanValue,
+    preflight_sweep_closure: structure.preflightSweepClosureValue,
+    preflight_sweep_closure_declared_valid: structure.preflightSweepClosureDeclaredValid,
+    ready_claim_present: structure.claimsReady,
+    ready_receipt_present: structure.readyReceiptPresent,
+    ready_receipt_current: readyReceiptCurrent,
+    ready_receipt_prd_hash: structure.prdHash,
+    ready_receipt_inputs_hash: inputsHash,
+    // blocking_reason_codes / blocking_finding_count:由 buildReport 在 findings 收集后填入
+    design_source_refs_present: structure.designSourceRefsPresent,
+    design_source_inventory_declared: structure.designSourceInventoryDeclared,
+    design_source_coverage_declared: structure.designSourceCoverageDeclared,
+    design_sources_read_present: structure.designSourcesReadPresent,
+    design_sources_unread_present: structure.designSourcesUnreadPresent,
+    design_sources_unread_non_empty: structure.designUnread,
+    design_coverage_partial: structure.designPartial,
+    design_degraded_owner_accepted: structure.designAccepted,
+    outstanding_question_closure_contract_present: oqAnalysis.facts.outstanding_question_closure_contract_present,
+    outstanding_question_rows: oqAnalysis.facts.outstanding_question_rows,
+    outstanding_question_missing_closure_count: oqAnalysis.facts.outstanding_question_missing_closure_count,
+    blocking_outstanding_question_count: oqAnalysis.facts.blocking_outstanding_question_count,
+    planning_invention_question_count: oqAnalysis.facts.planning_invention_question_count,
+    unclosed_owner_question_count: oqAnalysis.facts.unclosed_owner_question_count,
+    open_oq_without_owner_closure_count: oqAnalysis.facts.open_oq_without_owner_closure_count,
+    how_pushdown_touches_what_count: oqAnalysis.facts.how_pushdown_touches_what_count,
+    possible_misclassified_how_pushdown_count: oqAnalysis.facts.possible_misclassified_how_pushdown_count,
+    owner_decision_trace_present: oqAnalysis.facts.owner_decision_trace_present,
+    placeholder_line_count: structure.placeholderLines.length,
+    feature_slice_trace_gap_count: structure.featureSliceGaps.length,
+    input_scan_attempted: inputPaths.length > 0,
+    input_refs_used: inputScan.input_refs_used,
+    input_design_refs_present: inputScan.input_design_refs_present,
+    input_scan_degraded: inputScan.input_scan_degraded,
+  };
+  return { facts, oqAnalysis };
+}
+
+// claimsReady-gated findings(阶段三的子段):仅在 artifact 自称 ready 时检查的
+// 矛盾类 blocker。由 deriveFindings 调用,不直接从 buildReport 调用。
+// 读 facts.ready_claim_present 作为闸;claimsReady=false 时直接返回 []。
+function gateReadyClaims(facts, oqAnalysis) {
+  if (!facts.ready_claim_present) return [];
+  const findings = [];
+  if (facts.preflight_sweep_closure === 'blocked') {
+    findings.push({ reason_code: 'preflight_sweep_closure_blocked' });
+  }
+  if (!facts.ready_receipt_present) {
+    findings.push({ reason_code: 'ready_receipt_absent' });
+  } else if (!facts.ready_receipt_current) {
+    findings.push({ reason_code: 'ready_receipt_stale' });
+  }
+  oqAnalysis.reasonCodes.forEach((reason_code) => findings.push({ reason_code }));
+  if (facts.design_sources_unread_non_empty && !facts.design_degraded_owner_accepted) {
     findings.push({ reason_code: 'design_unread_without_owner_acceptance' });
   }
-  if (claimsReady && designPartial && !designAccepted) {
+  if (facts.design_coverage_partial && !facts.design_degraded_owner_accepted) {
     findings.push({ reason_code: 'design_partial_coverage_unaccepted' });
   }
-
   // checkpoint 自称 ready 是矛盾
-  if (writeModeIsCheckpoint && claimsReady) {
+  if (facts.write_mode === 'checkpoint-prd') {
     findings.push({ reason_code: 'checkpoint_claims_ready' });
   }
-
   // preflight_sweep_closure=closed 却仍有 closure blocker = 自相矛盾。
-  // 子集定义在 ./lib/reason-codes(单一真相源),取代原内联 8 码数组,防漂移。
+  // 子集定义在 ./lib/reason-codes(单一真相源),防漂移。
   const closureBlockerPresent = findings.some((f) => isClosureBlocker(f.reason_code));
-  if (preflightSweepClosureValue === 'closed' && closureBlockerPresent && claimsReady) {
+  if (facts.preflight_sweep_closure === 'closed' && closureBlockerPresent) {
     findings.push({ reason_code: 'preflight_closure_contradicted' });
   }
+  return findings;
+}
 
+// 阶段三:findings 构建。接受 facts + structure + oqAnalysis + inputPaths,
+// 返回完整 findings 数组。claimsReady-gated 部分委托给 gateReadyClaims。
+function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
+  const findings = [];
+  // 基础结构 findings
+  if (!structure.frontmatter.present) {
+    findings.push({ reason_code: 'frontmatter_missing', line: 1 });
+  }
+  if (structure.frontmatter.present && structure.frontmatter.fields.artifact_kind !== 'prd-requirements') {
+    findings.push({
+      reason_code: 'artifact_kind_missing_or_wrong',
+      expected: 'prd-requirements',
+      actual: structure.frontmatter.fields.artifact_kind || null,
+      line: structure.frontmatter.startLine,
+    });
+  }
+  if (/^\/docs\/prds\//.test(structure.normalizedTarget) || structure.normalizedTarget.includes('/docs/prds/')) {
+    findings.push({ reason_code: 'forbidden_prds_path', path: structure.normalizedTarget });
+  }
+  structure.missingCoreSections.forEach((section) => {
+    findings.push({ reason_code: 'core_section_missing', section });
+  });
+  structure.uncoveredRequirements.forEach((requirement_id) => {
+    findings.push({ reason_code: 'requirement_without_acceptance_ref', requirement_id });
+  });
+  structure.placeholderLines.forEach((line) => {
+    findings.push({ reason_code: 'placeholder_or_todo_present', line });
+  });
+  structure.featureSliceGaps.forEach((finding) => findings.push(finding));
+  // readiness 声明 findings
+  if (structure.needsReadinessDeclarations && !structure.writeModeDeclaredValid) {
+    findings.push({ reason_code: 'write_mode_undeclared' });
+  }
+  if (structure.needsReadinessDeclarations && !structure.clarificationEvidenceDeclaredValid) {
+    findings.push({ reason_code: 'clarification_evidence_undeclared' });
+  }
+  if (structure.needsReadinessDeclarations && structure.writeModeIsFinalPrd
+    && !structure.clarificationEvidenceSubstantive) {
+    findings.push({ reason_code: 'clarification_trace_absent' });
+  }
+  if (structure.needsReadinessDeclarations && !structure.canEnterSpecPlanDeclaredValid) {
+    findings.push({ reason_code: 'can_enter_spec_plan_undeclared' });
+  }
+  if (structure.prdShaped && !structure.needsReadinessDeclarations) {
+    findings.push({ reason_code: 'prd_readiness_declarations_evaded' });
+  }
+  if ((structure.prdShaped || structure.writeModeIsFinalPrd || structure.needsReadinessDeclarations)
+    && !structure.preflightSweepClosureDeclaredValid) {
+    findings.push({ reason_code: 'preflight_sweep_closure_absent' });
+  }
+  // design source findings
+  if (structure.designSourceRefsPresent && !structure.designSourceInventoryDeclared) {
+    findings.push({ reason_code: 'design_source_inventory_undeclared' });
+  }
+  if (structure.designSourceRefsPresent && !structure.designSourceCoverageDeclared) {
+    findings.push({ reason_code: 'design_source_coverage_undeclared' });
+  }
+  if (structure.designSourceRefsPresent && !structure.designSourcesReadPresent) {
+    findings.push({ reason_code: 'design_sources_read_undeclared' });
+  }
+  if (structure.designSourceRefsPresent && !structure.designSourcesUnreadPresent) {
+    findings.push({ reason_code: 'design_sources_unread_undeclared' });
+  }
+  if (facts.input_design_refs_present && !structure.designSourceInventoryDeclared) {
+    findings.push({ reason_code: 'design_source_unaccounted' });
+  }
+  // input scan findings
+  if (inputPaths.length > 0 && facts.input_refs_used.length === 0) {
+    findings.push({ reason_code: 'input_refs_unavailable' });
+  }
+  if (facts.input_scan_degraded) {
+    findings.push({ reason_code: 'input_scan_degraded' });
+  }
+  // inputs 数量软上限(advisory,非 BLOCKING——守 KTD14,不阻塞合法多源)。
+  if (inputPaths.length > MAX_INPUT_COUNT) {
+    findings.push({ reason_code: 'input_scan_input_count_capped', count: inputPaths.length, limit: MAX_INPUT_COUNT });
+  }
+  // claimsReady-gated findings(委托给 gateReadyClaims)
+  findings.push(...gateReadyClaims(facts, oqAnalysis));
+  return findings;
+}
+
+// buildReport:三阶段的薄外壳。维持与历史版本相同的公开接口和返回形状。
+function buildReport(target, text, options = {}) {
+  const inputPaths = Array.isArray(options.inputs) ? options.inputs : [];
+  const structure = parseStructure(target, text);
+  const { facts, oqAnalysis } = computeFacts(structure, inputPaths, options);
+  const findings = deriveFindings(facts, structure, oqAnalysis, inputPaths);
   const blockingReasons = [...new Set(
-    findings
-      .map((finding) => finding.reason_code)
-      .filter((reasonCode) => BLOCKING_REASON_CODES.has(reasonCode)),
+    findings.map((f) => f.reason_code).filter((c) => BLOCKING_REASON_CODES.has(c)),
   )].sort();
-
+  facts.blocking_reason_codes = blockingReasons;
+  facts.blocking_finding_count = blockingReasons.length;
   return {
     schema_version: 'spec-prd-artifact-check.v1',
     target,
     status: 'checked',
-    facts: {
-      frontmatter_present: frontmatter.present,
-      artifact_kind: frontmatter.fields.artifact_kind || null,
-      core_sections_present: CORE_SECTIONS.filter((section) => !missingCoreSections.includes(section)),
-      core_sections_missing: missingCoreSections,
-      requirement_ids: requirementIds,
-      acceptance_ids: acceptanceIds,
-      nfr_ids: nfrIds,
-      uncovered_requirements: uncoveredRequirements,
-      evidence_tags_present: evidenceTagHits,
-      priority_distribution: priorities,
-      nfr_count: nfrIds.length,
-      assumption_row_count: assumptionRowCount,
-      outstanding_question_count: outstandingQuestionCount,
-      outstanding_questions_present: outstandingQuestionsPresent,
-      outstanding_questions_count: outstandingQuestionCount,
-      planning_recheck_present: planningRecheckPresent,
-      planning_recheck_count: planningRecheckCount,
-      write_mode_declared_valid: writeModeDeclaredValid,
-      write_mode: writeModeValue,
-      clarification_evidence_declared_valid: clarificationEvidenceDeclaredValid,
-      clarification_evidence: clarificationEvidenceValue,
-      clarification_trace_present: clarificationEvidenceSubstantive,
-      can_enter_spec_plan_declared_valid: canEnterSpecPlanDeclaredValid,
-      can_enter_spec_plan: canEnterSpecPlanValue,
-      preflight_sweep_closure: preflightSweepClosureValue,
-      preflight_sweep_closure_declared_valid: preflightSweepClosureDeclaredValid,
-      ready_claim_present: claimsReady,
-      ready_receipt_present: readyReceiptPresent,
-      ready_receipt_current: readyReceiptCurrent,
-      ready_receipt_prd_hash: prdHash,
-      ready_receipt_inputs_hash: inputsHash,
-      blocking_reason_codes: blockingReasons,
-      blocking_finding_count: blockingReasons.length,
-      design_source_refs_present: designSourceRefsPresent,
-      design_source_inventory_declared: designSourceInventoryDeclared,
-      design_source_coverage_declared: designSourceCoverageDeclared,
-      design_sources_read_present: designSourcesReadPresent,
-      design_sources_unread_present: designSourcesUnreadPresent,
-      design_sources_unread_non_empty: designUnread,
-      design_coverage_partial: designPartial,
-      design_degraded_owner_accepted: designAccepted,
-      outstanding_question_closure_contract_present: oqAnalysis.facts.outstanding_question_closure_contract_present,
-      outstanding_question_rows: oqAnalysis.facts.outstanding_question_rows,
-      outstanding_question_missing_closure_count: oqAnalysis.facts.outstanding_question_missing_closure_count,
-      blocking_outstanding_question_count: oqAnalysis.facts.blocking_outstanding_question_count,
-      planning_invention_question_count: oqAnalysis.facts.planning_invention_question_count,
-      unclosed_owner_question_count: oqAnalysis.facts.unclosed_owner_question_count,
-      open_oq_without_owner_closure_count: oqAnalysis.facts.open_oq_without_owner_closure_count,
-      how_pushdown_touches_what_count: oqAnalysis.facts.how_pushdown_touches_what_count,
-      possible_misclassified_how_pushdown_count: oqAnalysis.facts.possible_misclassified_how_pushdown_count,
-      owner_decision_trace_present: oqAnalysis.facts.owner_decision_trace_present,
-      placeholder_line_count: placeholderLines.length,
-      feature_slice_trace_gap_count: featureSliceGaps.length,
-      input_scan_attempted: inputPaths.length > 0,
-      input_refs_used: inputScan.input_refs_used,
-      input_design_refs_present: inputScan.input_design_refs_present,
-      input_scan_degraded: inputScan.input_scan_degraded,
-    },
+    facts,
     findings,
   };
 }
@@ -1146,7 +1176,12 @@ module.exports = {
   computeInputsHash,
   normalizeForReceipt,
   sha256,
-  // 纯函数:供 in-process 单测直测 edge case,不参与 buildReport 编排(零行为变更)。
+  // 三阶段函数:供 in-process 单测直接调用,不影响 buildReport 编排。
+  parseStructure,
+  computeFacts,
+  deriveFindings,
+  gateReadyClaims,
+  // 基础纯函数:供 in-process 单测直测 edge case。
   parseHeaderedTable,
   looksLikeCheckableRef,
   traceRowBindsOq,

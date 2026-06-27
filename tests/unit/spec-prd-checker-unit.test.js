@@ -1,11 +1,11 @@
 'use strict';
 
-// P1: checker 纯函数 in-process 单测。
-// 之前 contracts 测试 100% 走 execFileSync 子进程端到端,根因是纯函数未导出;
-// 只能通过 buildReport 间接触达,edge case 靠整份 PRD fixture 偶然覆盖。
-// 此文件 in-process 直测纯函数分支逻辑,不构造整份 PRD,可断点调试、快且稳。
+// P1/P2: checker 纯函数 in-process 单测。
+// P1: 基础纯函数(looksLikeCheckableRef/traceRowBindsOq/isEmptyish/matchHeadingTitle/parseHeaderedTable)
+// P2: 三阶段函数 gateReadyClaims — 无需整份 PRD fixture,直接传构造 facts 对象即可断言
 
 const {
+  gateReadyClaims,
   looksLikeCheckableRef,
   traceRowBindsOq,
   isEmptyish,
@@ -169,5 +169,97 @@ describe('parseHeaderedTable', () => {
     const { headerMap, rows } = parseHeaderedTable('', OQ_HEADER_ALIASES);
     expect(headerMap).toEqual({});
     expect(rows).toEqual([]);
+  });
+});
+
+// ────────────────────────────────────────────────────────
+// P2: gateReadyClaims — claimsReady-gated findings 单测
+// 直接传构造 facts + 空 oqAnalysis,无需整份 PRD fixture。
+// ────────────────────────────────────────────────────────
+
+function makeOqAnalysis(reasonCodes = []) {
+  return { reasonCodes, facts: {} };
+}
+
+function baseFacts(overrides = {}) {
+  return {
+    ready_claim_present: true,
+    preflight_sweep_closure: 'closed',
+    ready_receipt_present: true,
+    ready_receipt_current: true,
+    design_sources_unread_non_empty: false,
+    design_coverage_partial: false,
+    design_degraded_owner_accepted: false,
+    write_mode: 'final-prd',
+    ...overrides,
+  };
+}
+
+describe('gateReadyClaims', () => {
+  test('claimsReady=false → 空数组', () => {
+    const facts = baseFacts({ ready_claim_present: false });
+    expect(gateReadyClaims(facts, makeOqAnalysis())).toEqual([]);
+  });
+
+  test('全条件正常 → 空数组', () => {
+    expect(gateReadyClaims(baseFacts(), makeOqAnalysis())).toEqual([]);
+  });
+
+  test('preflight_sweep_closure=blocked → preflight_sweep_closure_blocked', () => {
+    const findings = gateReadyClaims(baseFacts({ preflight_sweep_closure: 'blocked' }), makeOqAnalysis());
+    expect(findings.map((f) => f.reason_code)).toContain('preflight_sweep_closure_blocked');
+  });
+
+  test('ready_receipt_present=false → ready_receipt_absent', () => {
+    const findings = gateReadyClaims(
+      baseFacts({ ready_receipt_present: false }),
+      makeOqAnalysis(),
+    );
+    expect(findings.map((f) => f.reason_code)).toContain('ready_receipt_absent');
+  });
+
+  test('ready_receipt_present=true + current=false → ready_receipt_stale', () => {
+    const findings = gateReadyClaims(
+      baseFacts({ ready_receipt_present: true, ready_receipt_current: false }),
+      makeOqAnalysis(),
+    );
+    expect(findings.map((f) => f.reason_code)).toContain('ready_receipt_stale');
+  });
+
+  test('oqAnalysis reasonCodes 透传到 findings', () => {
+    const oq = makeOqAnalysis(['blocking_outstanding_question_present']);
+    const findings = gateReadyClaims(baseFacts(), oq);
+    expect(findings.map((f) => f.reason_code)).toContain('blocking_outstanding_question_present');
+  });
+
+  test('design_unread + !accepted → design_unread_without_owner_acceptance', () => {
+    const findings = gateReadyClaims(
+      baseFacts({ design_sources_unread_non_empty: true, design_degraded_owner_accepted: false }),
+      makeOqAnalysis(),
+    );
+    expect(findings.map((f) => f.reason_code)).toContain('design_unread_without_owner_acceptance');
+  });
+
+  test('design_partial + accepted → 不触发 design_partial_coverage_unaccepted', () => {
+    const findings = gateReadyClaims(
+      baseFacts({ design_coverage_partial: true, design_degraded_owner_accepted: true }),
+      makeOqAnalysis(),
+    );
+    expect(findings.map((f) => f.reason_code)).not.toContain('design_partial_coverage_unaccepted');
+  });
+
+  test('write_mode=checkpoint-prd + claimsReady → checkpoint_claims_ready', () => {
+    const findings = gateReadyClaims(
+      baseFacts({ write_mode: 'checkpoint-prd' }),
+      makeOqAnalysis(),
+    );
+    expect(findings.map((f) => f.reason_code)).toContain('checkpoint_claims_ready');
+  });
+
+  test('preflight=closed + closure blocker → preflight_closure_contradicted', () => {
+    // 注入一个 closure blocker code，触发 preflight_closure_contradicted
+    const oq = makeOqAnalysis(['open_oq_without_owner_closure']);
+    const findings = gateReadyClaims(baseFacts({ preflight_sweep_closure: 'closed' }), oq);
+    expect(findings.map((f) => f.reason_code)).toContain('preflight_closure_contradicted');
   });
 });
