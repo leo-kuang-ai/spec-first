@@ -55,8 +55,9 @@ if (readyStatus || machineReceipt || (firstWrite && readyIntent)) {
     `Target: ${relativeTarget}`,
     '',
     'A new PRD artifact must not be written as ready/final in the same Write call.',
-    'Run the `$spec-prd` pre-write Requirements Grill first. If a PRD context must be preserved before owner closure, write a non-ready checkpoint (`write_mode: checkpoint-prd`, `can_enter_spec_plan: no`) instead.',
-    'After all load-bearing branches are closed, update the existing artifact and run the producer-local finalize path; `status: ready-for-planning` and `readiness_verified_*` are machine-owned receipt fields.',
+    'Do not repair this by only changing enum values, deleting rich requirements, or rewriting the PRD into a checker-friendly skeleton.',
+    'Run the `$spec-prd` pre-write Requirements Grill first, then choose the correct path: `ask-owner-first` to ask the next load-bearing owner question; `write_mode: checkpoint-prd` to preserve recoverable context with `can_enter_spec_plan: no` and `next_owner_question`; `route-out` when PRD authoring adds no durable WHAT value; or `final-prd` only after every load-bearing branch is closed.',
+    'After all load-bearing branches are closed, update the existing artifact and run the producer-local finalize path. `status: ready-for-planning` and `readiness_verified_*` are machine-owned receipt fields.',
   ];
   if (checkerFacts && Array.isArray(checkerFacts.blocking_reason_codes) && checkerFacts.blocking_reason_codes.length > 0) {
     reasonLines.push('', `checker_blocking_reason_codes: ${checkerFacts.blocking_reason_codes.join(', ')}`);

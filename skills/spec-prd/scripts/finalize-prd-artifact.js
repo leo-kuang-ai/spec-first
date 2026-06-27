@@ -120,10 +120,16 @@ function buildFinalizeReceipt(target, text, inputs) {
   ));
   const readyIntentPresent = facts.write_mode === 'final-prd' && facts.can_enter_spec_plan === 'yes';
   const missingReadyIntentReasons = readyIntentPresent ? [] : ['finalize_required'];
+  const missingDesignInputScanReasons = readyIntentPresent
+    && facts.design_source_refs_present === true
+    && facts.input_scan_attempted === false
+    ? ['input_refs_unavailable']
+    : [];
   const blockingReasons = [...new Set([
     ...nonReceiptBlockingReasons,
     ...receiptBlockingReasons,
     ...missingReadyIntentReasons,
+    ...missingDesignInputScanReasons,
   ])].sort();
 
   // 004:把 closeout 许可与 ready finalization 拆开。合法 checkpoint(write_mode=checkpoint-prd

@@ -764,9 +764,41 @@ function designCoveragePartial(text) {
 // 004:owner 是否明确接受了 degraded/unread design 风险。
 function designDegradedOwnerAccepted(text) {
   const body = stripFencedCode(text);
-  return splitLines(body).some((line) => {
+  const lines = splitLines(body);
+  const hasAcceptanceRef = designDegradedOwnerAcceptanceRefPresent(lines);
+  const hasTraceAcceptance = ownerTraceHasDesignDegradedAcceptance(lines);
+  return hasTraceAcceptance || lines.some((line) => {
     if (!/(design_degraded_owner_acceptance|owner\s*acceptance|设计降级owner接受|owner接受降级)/i.test(line)) return false;
-    return normalizeBool(line.slice(line.indexOf(':') + 1)) === true;
+    const value = line.slice(line.indexOf(':') + 1);
+    return designAcceptanceBoolTrue(value) && (hasAcceptanceRef || hasDesignAcceptanceReference(line));
+  });
+}
+
+function designAcceptanceBoolTrue(value) {
+  return normalizeBool(value) === true || /^\s*(?:true|yes)\b/i.test(String(value || ''));
+}
+
+function designDegradedOwnerAcceptanceRefPresent(lines) {
+  return lines.some((line) => {
+    if (!/^\s*(?:[-*]\s*)?design_degraded_owner_acceptance_ref\s*:/i.test(line)) return false;
+    return hasDesignAcceptanceReference(line.slice(line.indexOf(':') + 1));
+  });
+}
+
+function hasDesignAcceptanceReference(text) {
+  const value = String(text || '');
+  return looksLikeCheckableRef(value) || /\b(?:OQ|D)-\d+\b/i.test(value);
+}
+
+function ownerTraceHasDesignDegradedAcceptance(lines) {
+  const headings = parseHeadings(lines);
+  const section = sectionRange(lines, headings, 'Owner Decision Trace');
+  if (!section) return false;
+  return tableRows(section.text).some((cells) => {
+    const row = cells.join(' ');
+    if (!/(design|figma|degraded|unread|设计|降级|未读)/i.test(row)) return false;
+    if (/(reject|rejected|not accept|拒绝|不接受|未接受)/i.test(row)) return false;
+    return /\b(?:accept|accepted|accepts|relax|relaxed)\b|接受|同意|放宽/i.test(row);
   });
 }
 

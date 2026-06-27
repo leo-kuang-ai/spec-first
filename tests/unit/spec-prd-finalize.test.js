@@ -165,6 +165,43 @@ date: 2026-06-25
     }
   });
 
+  test('finalize blocks final design PRDs when no source input scan was attempted', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'design-no-input-scan-requirements.md');
+    const designInput = path.join(tempDir, 'source_docs', 'design.md');
+    const designPrd = validReadyIntentPrd().replace('## Readiness Self-Check', [
+      '## Design Source Coverage',
+      'design_source_inventory:',
+      '- source_or_node: Figma node 1:2',
+      '  read_status: read',
+      '',
+      'design_sources_read:',
+      '- source_docs/design.md -> Design Source Coverage -> source-candidate/provider_untrusted',
+      '',
+      'design_sources_unread:',
+      '- none',
+      '',
+      'design_source_coverage: read status confirmed',
+      '',
+      '## Readiness Self-Check',
+    ].join('\n'));
+
+    try {
+      write(prdPath, designPrd);
+      write(designInput, 'Figma node 1:2\n');
+
+      const withoutInputs = finalizePrd(prdPath, [], { checkOnly: true });
+      expect(withoutInputs.can_finalize).toBe(false);
+      expect(withoutInputs.should_block_closeout).toBe(true);
+      expect(withoutInputs.blocking_reason_codes).toContain('input_refs_unavailable');
+
+      const withInputs = finalizePrd(prdPath, [designInput], { checkOnly: true });
+      expect(withInputs.blocking_reason_codes).not.toContain('input_refs_unavailable');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('finalize blocks explicit outstanding-question blockers even with degraded preflight sweep', () => {
     const tempDir = makeTempDir();
     const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'oq-blocker-requirements.md');
@@ -501,6 +538,74 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'preflight_closure_contradicted',
       'ready_receipt_absent',
     ]);
+  });
+
+  it('does not treat naked design degraded owner acceptance as verified evidence', () => {
+    const nakedAcceptance = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: ['design_sources_unread:', '- node-123 未读', 'design_degraded_owner_acceptance: true'],
+    });
+    const nakedReport = buildReport('docs/brainstorms/design-acceptance-requirements.md', nakedAcceptance);
+    expect(nakedReport.facts.design_degraded_owner_accepted).toBe(false);
+    expect(nakedReport.facts.blocking_reason_codes).toEqual(expect.arrayContaining([
+      'design_partial_coverage_unaccepted',
+      'design_unread_without_owner_acceptance',
+    ]));
+
+    const referencedAcceptance = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: ['design_sources_unread:', '- node-123 未读', 'design_degraded_owner_acceptance: true #D-1'],
+    });
+    const referencedReport = buildReport('docs/brainstorms/design-acceptance-requirements.md', referencedAcceptance);
+    expect(referencedReport.facts.design_degraded_owner_accepted).toBe(true);
+    expect(referencedReport.facts.blocking_reason_codes).not.toContain('design_partial_coverage_unaccepted');
+    expect(referencedReport.facts.blocking_reason_codes).not.toContain('design_unread_without_owner_acceptance');
+
+    const blockingOwnerTrace = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      trace: [
+        '## Owner Decision Trace',
+        '| decision | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+        '| --- | --- | --- | --- | --- | --- |',
+        '| D-1 design unread | owner | 必须先读 Figma | Design Source Coverage | 未满足则不能 ready | open |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: ['design_sources_unread:', '- node-123 未读'],
+    });
+    expect(buildReport('docs/brainstorms/design-acceptance-requirements.md', blockingOwnerTrace)
+      .facts.design_degraded_owner_accepted).toBe(false);
+
+    const acceptedOwnerTrace = buildClosurePrd({
+      oq: [
+        '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| OQ-6 | 文案 | Requirements | no | source-resolved | no | closed | docs/x.md:1 |',
+      ],
+      trace: [
+        '## Owner Decision Trace',
+        '| decision | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+        '| --- | --- | --- | --- | --- | --- |',
+        '| D-1 design degraded | owner accepted | 同意降级使用文字稿 | Design Source Coverage | design risk accepted | closed |',
+      ],
+      designCoverage: 'visual-read=partial',
+      readinessExtra: ['design_sources_unread:', '- node-123 未读'],
+    });
+    expect(buildReport('docs/brainstorms/design-acceptance-requirements.md', acceptedOwnerTrace)
+      .facts.design_degraded_owner_accepted).toBe(true);
   });
 
   // F-L1 characterization:21:16 KAZ 形态——多条 owner-* OQ,但 Owner Decision Trace

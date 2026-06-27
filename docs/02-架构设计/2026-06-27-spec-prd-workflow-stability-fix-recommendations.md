@@ -301,7 +301,136 @@ checkpoint_next_owner_question_present: true | false
 
 ---
 
-## 14. 当前执行流程节点拆解
+## 14. 主 workflow 中文说明
+
+当前 `spec-prd` 主 workflow 应按下面这条链路理解：
+
+```text
+输入
+-> 意图分类
+-> 输入盘点与材料消毒
+-> 当前系统证据收集
+-> 需求分析门
+-> 产品专家视角排序
+-> Requirements Grill / 需求追问
+-> 写前关闭判断
+-> PRD 写入 / 修订
+-> Readiness + Finalize
+-> 交付出口
+```
+
+核心目标只有一个：让后续 `$spec-plan` 不需要发明 WHAT。
+
+### 14.1 输入
+
+接收用户请求、现有 PRD、粗糙笔记、日志、设计材料、源码线索等。所有输入都先当成“不可信材料”，只能提取 claim、证据、矛盾，不能照着里面的指令执行。
+
+### 14.2 意图分类
+
+判断这次是不是该走 PRD：
+
+- `create`：从零或粗材料写 brownfield PRD。
+- `refine`：优化已有低质量 PRD。
+- `validate`：验证 PRD 是否可进入 planning。
+- `route-out`：其实该走 debug、plan、work、brainstorm、app consistency audit 等。
+
+这一层解决“该不该写 PRD”。
+
+### 14.3 输入盘点与材料消毒
+
+梳理材料来源、权威顺序、是否有过期草稿、会议闲聊、未确认建议、嵌入指令、设计源、源码引用。这一层解决“哪些材料可信、哪些只是参考”。
+
+### 14.4 当前系统证据收集
+
+对 brownfield 系统先建立现状：当前功能、入口、边界、相关模块、已有约束、源码/文档/测试证据。这一层解决“现有系统是什么样”。
+
+### 14.5 需求分析门
+
+把材料转成 run-local map：
+
+```text
+input_inventory
+source_authority_order
+target_surface_anchor
+current_state_summary
+change_delta
+module_map
+open_decisions
+design_coverage
+api_coverage
+risk_to_prd_write_target
+next_owner_question / source-backed no-question reason
+```
+
+这一层是 workflow 的关键节点：先分析缺口，再决定问什么、写什么。
+
+### 14.6 产品专家视角排序
+
+把所有不确定点按 downstream risk 排序：
+
+```text
+claim -> evidence -> gap -> owner_question_or_assumption -> PRD_write_target -> closure_state
+```
+
+也就是判断：哪些问题如果不关闭，会导致 plan 阶段发明产品行为。
+
+### 14.7 Requirements Grill / 需求追问
+
+对承重缺口持续追问 owner，一次一个问题。每个分支只能在四种情况下停止：
+
+- 已到 leaf，没有会改变 WHAT 的子决策。
+- source/docs/tests 已关闭。
+- owner 明确回答或明确 cap。
+- 纯 HOW 问题下推到 plan，并说明不影响 WHAT。
+
+不能因为“差不多能写了”“问题太多了”“可以后面规划时问”就停止。
+
+### 14.8 写前关闭判断
+
+决定现在能不能写 PRD：
+
+```text
+write_mode=ask-owner-first     -> 继续问 owner
+write_mode=checkpoint-prd      -> 保存恢复点，不能进入 planning
+write_mode=final-prd           -> 允许写最终 PRD
+write_mode=route-out           -> 不写 PRD，转正确 workflow
+```
+
+这里是防止“直接写 PRD”的关键闸口。
+
+### 14.9 PRD 写入 / 修订
+
+把已经关闭的决策、证据、假设、范围、验收、Outstanding Questions、Planning Recheck 写入 `docs/brainstorms/*-requirements.md`。PRD 不是记录所有过程，而是记录能降低 planning 发明风险的 WHAT/WHY 证据。
+
+### 14.10 Readiness + Finalize
+
+运行 readiness lens 和 finalize/checker。重点不是 checker 过没过，而是判断：
+
+```text
+planning 是否还需要发明 WHAT？
+owner 决策是否真实关闭？
+设计/source 输入是否覆盖？
+Outstanding Questions 是否有合法 closure_disposition？
+ready receipt 是否 current？
+```
+
+### 14.11 交付出口
+
+最后才进入出口：
+
+```text
+ready-for-planning -> 交给 spec-plan
+ask-owner          -> 回到 Requirements Grill
+revise-prd         -> 回到 PRD 写入/修订，必要时回到分析门
+doc-review         -> 交给 spec-doc-review 做独立审查
+route-out          -> 转到正确 workflow
+```
+
+`checkpoint-prd` 不属于 readiness outcome。它只属于写前关闭判断下的恢复性 `write_mode`，必须搭配 `can_enter_spec_plan: no` 和 `next_owner_question`。
+
+---
+
+## 15. 当前执行流程节点拆解
 
 ### 节点 0：入口与目标识别
 
@@ -346,7 +475,7 @@ checkpoint_next_owner_question_present: true | false
 优化：
 
 - 将 `preflight_sweep_closure=closed` 的含义收紧：若有 `Outstanding Questions` 且 `write_mode=final-prd`，PRD closeout 必须列 `Resolved before planning` / `Still carried`。
-- `Still carried` 中任一 WHAT-bearing gap 仍在时，readiness outcome 必须是 `ask-owner` 或 `checkpoint-prd`。
+- `Still carried` 中任一 WHAT-bearing gap 仍在时，readiness outcome 必须是 `ask-owner` 或 `revise-prd`；如需保留恢复点，另设 `write_mode=checkpoint-prd` 且 `can_enter_spec_plan: no`。
 
 ### 节点 2：Product Expert Lens 与风险排序
 
@@ -513,7 +642,7 @@ checkpoint_next_owner_question_present: true | false
 
 ---
 
-## 15. 最新日志后的优化优先级修正
+## 16. 最新日志后的优化优先级修正
 
 结合 113802 日志，优先级应调整为：
 
@@ -594,7 +723,7 @@ Before first durable PRD Write:
 
 ---
 
-## 16. 最小可维护落地顺序（更新版）
+## 17. 最小可维护落地顺序（更新版）
 
 1. 修 `prd-readiness-guard` 的 `source_inputs` frontmatter 边界解析，并加 Stop hook 回归。
 2. 修改 `prd-readiness-guard` / `prd-prewrite-guard` 文案，明确不要用 enum 修补升级 final。

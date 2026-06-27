@@ -67,6 +67,8 @@ if (blocked.length > 0) {
   const lines = [
     '[spec-first] PRD readiness guard blocked closeout.',
     'Changed PRD artifacts cannot be closed as ready until `$spec-prd` producer-local finalize passes.',
+    'Do not repair this by only changing enum values to `final-prd`, deleting detailed requirements, or treating checker reason_codes as the workflow.',
+    'Choose the correct path: ask the next load-bearing owner question, preserve a non-ready checkpoint with `next_owner_question`, revise the PRD while keeping source/design gaps visible, or finalize only after all load-bearing gaps are closed and original inputs were scanned.',
     '',
     ...blocked.flatMap((entry) => [
       `- ${entry.path}`,
@@ -114,13 +116,24 @@ function extractSourceInputs(prdPath) {
     return [];
   }
   const lines = text.split(/\r?\n/);
-  const start = lines.findIndex((line) => /^(source_inputs|prd_input):\s*$/.test(line));
+  // 必须以 frontmatter 开头
+  if (lines[0] !== '---') {
+    return [];
+  }
+  // 找到 frontmatter 结束边界（第二个 ---），只在 frontmatter 内扫描，防止
+  // source_inputs 是最后一个 frontmatter 字段时正文 bullet 被误读为输入路径
+  const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+  if (fmEnd === -1) {
+    return [];
+  }
+  const fmLines = lines.slice(1, fmEnd);
+  const start = fmLines.findIndex((line) => /^(source_inputs|prd_input):\s*$/.test(line));
   if (start === -1) {
     return [];
   }
   const inputs = [];
-  for (let i = start + 1; i < lines.length; i += 1) {
-    const line = lines[i];
+  for (let i = start + 1; i < fmLines.length; i += 1) {
+    const line = fmLines[i];
     if (/^[A-Za-z0-9_-]+:\s*/.test(line)) {
       break;
     }
