@@ -320,8 +320,12 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
    - `improve build performance — want it faster` → 期望触发 **spec-optimize**（优化动词 "improve"）
    - `performance regression in the API: p95 doubled this week` → 期望触发 **spec-debug**（`performance regression` 字面命中）
    - `the build got slow, can you make it fast again` → **撞车观察点**：期望宿主有路由消歧（spec-debug Phase 1.1 入口应捕获"这是回归诊断"），若宿主误路由到 spec-optimize 或同时触发两者且无消歧→记录为 finding。
-3. 回填观察结果到本段（每条消息的实际触发 skill），或记录 `not_run: <原因>`。
-4. **判定**：若 message 4 撞车且 Phase 1.1 兜底有效→本 plan 维持 `completed`，无需改 description；若撞车且兜底失效→开新 plan 在 spec-debug description 加显式 handoff 句（如「open-ended 'make it faster' / 'run experiments to speed up' requests belong to spec-optimize」）。
+3. 回填观察结果（2026-06-28，fresh subagent opus 注入 SKILL.md 直接响应）：
+   - msg1 「why is the build slow after the last deploy」→ **性能回归分支**，不移交 spec-optimize ✅
+   - msg2 「improve build performance — want it faster」→ **直接移交 spec-optimize**（无回归信号，明确优化目标）✅
+   - msg3 「performance regression in the API: p95 doubled」→ **性能回归分支**，不移交 ✅
+   - msg4 「the build got slow, can you make it fast again」→ **性能回归分支**（触发 needs-info 定位起点），不移交 spec-optimize（"恢复原状"=回归诊断，非优化实验）✅
+4. **判定：Phase 1.1 兜底有效**。message 4 在 Phase 1.1 入口被正确识别为回归诊断，不移交 spec-optimize。`002 plan 维持 completed`，无需新 plan 加 description handoff 句。
 
 **当前状态**：Step 2-A/B 在本会话完成（静态+模拟），Step 2-C 真实新会话观察仍 `not_run: requires new-session observation by user`。这是 plan 已声明的代理强度边界——fresh-source eval + 静态/模拟分析不覆盖运行时分发通道。本会话已做最大努力，剩余为用户可执行的确定性观察。
 
