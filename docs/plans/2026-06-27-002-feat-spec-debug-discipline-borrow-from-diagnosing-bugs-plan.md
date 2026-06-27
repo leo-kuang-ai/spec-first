@@ -303,6 +303,28 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 - 确认未引入新 typed agent、未改 scenario capability / context governance / 双宿主约束。
 - `spec-first init` 刷新 generated mirrors 后，`cmp` 确认 `.claude/`、`.codex/`、`.agents/skills/spec-debug/**` 与 source 一致。
 
+#### 运行时触发观察执行结果（2026-06-28，Step 2-A/B + 用户观察清单 2-C）
+
+**Step 2-A 静态路由消歧分析**：对照 spec-debug（`why is this slow` / `performance regression` + debug/fail/errors 触发词）与 spec-optimize（`build performance` / `optimizing` / `measurable outcome` 触发词）description——触发**短语零完全重叠**，但 `performance` 是共享 token（spec-debug "performance regression" / spec-optimize "build performance"）。语义边界由动词区分：诊断动词（"why" / "figure out why" / "got slow"）→ spec-debug；优化动词（"improve" / "optimize" / "run experiments" / "make it faster"）→ spec-optimize。Phase 1.1 入口消歧句（SKILL.md:188 `Distinguish from spec-optimize ... this is diagnosing WHY ... not running optimization experiments`）作为 description 路由的二次兜底。
+
+**Step 2-B fresh-subagent 路由模拟（opus，10 条用户消息）**：10 条消息中 9 条干净路由（诊断动词→spec-debug / 优化动词→spec-optimize），**1 条真实撞车**——message 8「the build got slow, can you make it fast again」：第一从句「got slow」命中 spec-debug `performance regression`/`why is this slow`，第二从句「build」+「make it fast」命中 spec-optimize `build performance`，description-only matcher 看到两者无 tie-breaker。**finding P2**：message 8 类请求跨 skill 撞车。
+
+**B 的 finding 处理决策**：B 明确「no source fix strictly required if Phase 1.1 disambiguation is reliably present at session start」。Phase 1.1 入口消歧句已在 source（SKILL.md:188），是 description 撞车的已落地兜底。**本会话不改 description**——改 description 是独立 source 改动，需自己的 plan/review，且会重置依赖 description 的 fresh-source eval。把"是否在 spec-debug description 加显式 handoff 句"作为 Step 2-C 真实新会话观察的**判定依据**：若观察确认 message 8 类请求撞车且 Phase 1.1 兜底有效→不改；若撞车且兜底失效→开新 plan 加 description handoff 句。
+
+**Step 2-C 用户可复现观察清单（本会话 agent 无法开新会话，需用户在新会话执行）**：
+
+本会话 agent 已缓存改前 spec-debug 定义，无法 fresh-load；运行时分发命中率只能由用户在新会话观察。执行步骤：
+1. 开一个**全新会话**（确保加载改后 spec-debug runtime mirror——已核实 `.claude/spec-first/workflows/spec-debug/SKILL.md` description 含 `why is this slow` / `performance regression`）。
+2. 依次发以下 4 条用户消息，观察宿主实际把哪个 skill 加载进上下文（看 `/spec:*` 触发建议或 skill 被注入的信号）：
+   - `why is the build slow after the last deploy` → 期望触发 **spec-debug**（诊断动词 "why"）
+   - `improve build performance — want it faster` → 期望触发 **spec-optimize**（优化动词 "improve"）
+   - `performance regression in the API: p95 doubled this week` → 期望触发 **spec-debug**（`performance regression` 字面命中）
+   - `the build got slow, can you make it fast again` → **撞车观察点**：期望宿主有路由消歧（spec-debug Phase 1.1 入口应捕获"这是回归诊断"），若宿主误路由到 spec-optimize 或同时触发两者且无消歧→记录为 finding。
+3. 回填观察结果到本段（每条消息的实际触发 skill），或记录 `not_run: <原因>`。
+4. **判定**：若 message 4 撞车且 Phase 1.1 兜底有效→本 plan 维持 `completed`，无需改 description；若撞车且兜底失效→开新 plan 在 spec-debug description 加显式 handoff 句（如「open-ended 'make it faster' / 'run experiments to speed up' requests belong to spec-optimize」）。
+
+**当前状态**：Step 2-A/B 在本会话完成（静态+模拟），Step 2-C 真实新会话观察仍 `not_run: requires new-session observation by user`。这是 plan 已声明的代理强度边界——fresh-source eval + 静态/模拟分析不覆盖运行时分发通道。本会话已做最大努力，剩余为用户可执行的确定性观察。
+
 ### 不执行项
 
 - 不跑 `quick_validate.py`（PATH 中不可用，无等价仓内脚本），明确记录而非静默跳过。
@@ -341,10 +363,11 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 
 ## Status
 
-`status: completed` — Step 1-8 源码落地完成 + fresh-source eval 三轮通过。已完成四轮修订：
+`status: completed` — Step 1-8 源码落地完成 + fresh-source eval 三轮通过 + Step 2-A/B 运行时触发观察的本会话可做部分完成。已完成四轮修订 + Step 2 部分推进：
 1. 首轮设计审查修订（P1-1 perf 统计时计 / P1-2 correct seam 锁住能锁的 / P1-3 假设重排折叠进 smart-escalation / P2-1 tighten 三轴改 framing 句 / P2-2 description 触发面验证 / P2-3 checklist 分工措辞 / P3 措辞与 shell 风格）。
 2. `/spec:doc-review` 对抗审查（coherence / feasibility / scope-guardian / adversarial 四视角）：应用 1 个 safe_auto + 7 个 manual 修正——perf 环境隔离平台条件化、militant 与 LLM-decides 真兼容（强制度落产物约束）、fresh-source eval 代理强度边界声明、lint 触发面虚假保证纠正 + spec-optimize 路由消歧、bisect 阈值噪声带边界纪律、浅测试假信心 blocking-advisory 防护、perf 独立成文件理由声明。
 3. `/spec:code-review`（correctness / testing / maintainability / project-standards / agent-native + learnings-researcher）Auto-resolve 落地 10 个 finding：HITL 模板诚实标注为 human-operated（非 agent-runnable）、no-loop+no-evidence 分支补 AFK fallback、perf 命令名纠正（cpupower/cpufreq-set）+ 权限前置 + 降级模式、bisect 噪声带补 exit 125 skip wrapper、三轴去重改交叉引用、9 项新行为 + description 触发面 + dead-link 补 spec-debug-contracts 断言（11→17）、契约测试去掉冻结的过期 flat-list 改锁菜单 cue、plan status 改 partially-shipped 并勾选已满足项。
 4. fresh-source eval 三轮（neutral sonnet / adversarial sonnet / deciding-vote opus）：13 个独立判定点全 `passed`、零 findings、零分歧；2-hypothesis gap 经 opus deciding vote 判定为由 Phase 2 显式 default 覆盖、无源码修复。`fresh_source_eval: passed`。
+5. Step 2 运行时触发观察：**2-A 静态路由消歧分析**完成（触发短语零完全重叠、`performance` 共享 token、动词区分诊断/优化、Phase 1.1 入口消歧兜底）；**2-B fresh-subagent 路由模拟（opus，10 条消息）**完成——9 条干净路由 + 1 条真实撞车（message 8「the build got slow, make it fast again」跨 spec-debug/spec-optimize，P2 finding），处理决策为不改 description、靠 Phase 1.1 兜底（B 明确「no source fix strictly required if Phase 1.1 reliably present」）；**2-C 真实新会话触发观察**仍 `not_run: requires new-session observation by user`——本会话 agent 无法开新会话，已写成用户可复现观察清单（治理验证段「Step 2-C」4 步骤）。
 
-Deferred 子项（不影响 completed）：运行时触发观察（Step 2）仍为 `not_run: requires new-session observation by user`——本会话 agent 无法开新会话（已缓存旧 spec-debug 定义）；需用户在新会话实测 `slow`/`performance regression` 触发是否命中 spec-debug 及与 spec-optimize 的路由消歧。此为 plan 已声明的代理强度边界，fresh-source eval 本身的 passed 状态不覆盖运行时分发通道。
+Deferred 子项（不影响 completed）：Step 2-C 真实新会话触发观察——用户在新会话执行观察清单（4 条消息实测 + 判定逻辑），结果决定是否需开新 plan 在 spec-debug description 加显式 handoff 句。此为 plan 已声明的代理强度边界：fresh-source eval + 静态/模拟分析（2-A/B）不覆盖运行时分发通道，需用户观察关闭。
