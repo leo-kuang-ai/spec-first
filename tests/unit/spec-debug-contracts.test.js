@@ -107,7 +107,7 @@ describe('spec-debug branch-aware handoff contract', () => {
 
     expect(text).toContain('Feedback Loop And Hypothesis Ledger');
     expect(text).toContain('Before declaring root cause or proposing a fix, establish or attempt the smallest feedback loop that can observe the symptom');
-    expect(text).toContain('a failing test, CLI invocation, HTTP/browser script, trace replay, throwaway harness, property/fuzz loop');
+    expect(text).toContain('Try these reproducers in roughly this order until you have one that goes red on the bug');
     expect(text).toContain('record `feedback_loop_not_possible` with the exact missing condition');
     expect(text).toContain('do not pretend a loop exists');
     expect(text).toContain('`hypothesis`, `prediction`, `evidence_for`, `evidence_against`, `probe_result`, and `final_root_cause`');
@@ -126,6 +126,71 @@ describe('spec-debug branch-aware handoff contract', () => {
     expect(text).toContain('For uncertain links in the chain');
     expect(text).toContain('Do not proceed to Phase 3 until you can explain the full causal chain');
     expect(text).toContain('with no gaps');
+  });
+
+  test('feedback-loop discipline and binary split land the borrowed sharpness without losing the militant-LLM-decides balance', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    // Ordered feedback-loop menu with the new tail items (#3)
+    expect(text).toContain('Try these reproducers in roughly this order until you have one that goes red on the bug');
+    expect(text).toContain('Bisection harness');
+    expect(text).toContain('Differential loop');
+    expect(text).toContain('HITL bash script');
+    // feedback_loop_not_possible binary split (#3)
+    expect(text).toContain('No loop AND no captured evidence');
+    expect(text).toContain('No loop BUT captured evidence exists');
+    // Readiness checklist four items (#3)
+    expect(text).toContain('Red-capable');
+    expect(text).toContain('Deterministic');
+    expect(text).toContain('Agent-runnable');
+    expect(text).toContain('Feedback loop readiness checklist');
+    // Militant artifact constraint reconciled with LLM-decides (#3)
+    expect(text).toContain('do not submit a root-cause-confirmed claim and do not close the causal chain gate');
+  });
+
+  test('correct-seam judgment locks what it can and flags what it cannot', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    expect(text).toContain('lock what you can, flag what you can');
+    expect(text).toContain('blocking advisory');
+    expect(text).toContain('this test does not cover the full call chain');
+  });
+
+  test('Phase 4 cleanup checklist and Phase 2 folded hypothesis re-ranking exist', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    expect(text).toContain('Cleanup checklist (closing hygiene');
+    expect(text).toContain('tagged debug logs from this run (unique prefix');
+    expect(text).toContain('Pre-test hypothesis re-ranking (folded into this escalation moment');
+  });
+
+  test('Phase 1.1 routes perf-regression and HITL reproduction to their load-bearing targets', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    expect(text).toContain('references/perf-regression.md');
+    expect(text).toContain('scripts/hitl-loop.template.sh');
+  });
+
+  test('description frontmatter declares the slow/performance-regression trigger surface', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    // Parse frontmatter between the first two '---' lines.
+    const lines = text.split('\n');
+    const close = lines.indexOf('---', 1);
+    expect(close).toBeGreaterThan(0);
+    const frontmatter = lines.slice(0, close).join('\n');
+    expect(frontmatter).toContain('why is this slow');
+    expect(frontmatter).toContain('performance regression');
+  });
+
+  test('SKILL.md reference pointers resolve to existing files (dead-link guard)', () => {
+    const fs_ = require('node:fs');
+    const skillDir = path.join(__dirname, '..', '..', 'skills', 'spec-debug');
+    const text = fs_.readFileSync(SKILL_PATH, 'utf8');
+    const refs = [];
+    const refRe = /`((?:references|scripts)\/[^`]+)`/g;
+    let m;
+    while ((m = refRe.exec(text)) !== null) refs.push(m[1]);
+    expect(refs.length).toBeGreaterThan(0);
+    for (const ref of refs) {
+      const resolved = path.join(skillDir, ref);
+      expect(fs_.existsSync(resolved)).toBe(true);
+    }
   });
 
   test('debug summary discloses direct evidence and residual risk', () => {

@@ -36,6 +36,8 @@ console.error('DEBUG [operation]:', { value, cwd: process.cwd(), stack });
 
 Use `console.error()` in tests — logger output may be suppressed. Log before the dangerous operation, not after it fails.
 
+**Tagged-prefix discipline for temporary debug logs.** Give every temporary debug log you add this run the **same unique prefix**, e.g. `[DEBUG-a4f2]`. At the end of the run, cleanup is a single `grep -rn '[DEBUG-a4f2]' .` to confirm zero hits. Untagged logs survive; tagged logs die. This is distinct from defense-in-depth's layer-4 *diagnostic breadcrumb*, which is a **permanent** forensic capture left in the code on purpose — do not grep-remove breadcrumbs, only your temporary debug probes.
+
 ---
 
 ## Multi-Component Boundary Instrumentation
@@ -102,7 +104,7 @@ The test command should exit 0 for good, non-zero for bad.
 
 ## Intermittent Bug Techniques
 
-When a bug does not reproduce reliably after 2-3 attempts:
+When a bug does not reproduce reliably after 2-3 attempts: the goal is to **raise the reproduction rate**, not to wait for a clean repro. A 1% flake is not debuggable; a 50% flake is. Loop the trigger 100×, parallelize, add stress, inject sleeps to widen timing windows — keep raising the rate until it is debuggable. Then tighten the loop along three axes: **faster** (cache setup, skip unrelated init, narrow scope), **sharper** (assert the specific symptom, not "didn't crash"), **more deterministic** (pin time, seed RNG, isolate filesystem, freeze network). A 30-second flaky loop is barely better than none; a 2-second deterministic one is a debugging superpower.
 
 **Logging traps.** Add targeted logging at the suspected failure point and run the scenario repeatedly. Capture the state that differs between passing and failing runs.
 

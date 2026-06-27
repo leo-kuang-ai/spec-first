@@ -1,6 +1,6 @@
 ---
 name: spec-debug
-description: 'Systematically find root causes and fix bugs. Use when debugging errors, investigating test failures, reproducing bugs from issue trackers (GitHub, Linear, Jira), or when stuck on a problem after failed fix attempts. Also use when the user says ''debug this'', ''why is this failing'', ''fix this bug'', ''trace this error'', or pastes stack traces, error messages, or issue references.'
+description: 'Systematically find root causes and fix bugs. Use when debugging errors, investigating test failures, reproducing bugs from issue trackers (GitHub, Linear, Jira), or when stuck on a problem after failed fix attempts. Also use when the user says ''debug this'', ''why is this failing'', ''fix this bug'', ''trace this error'', ''why is this slow'', or reports a ''performance regression'', or pastes stack traces, error messages, or issue references.'
 argument-hint: "[issue reference, error message, test path, or description of broken behavior]"
 ---
 
@@ -71,7 +71,7 @@ These principles govern every phase. They are repeated at decision points becaus
 
 | 红旗念头 | 停下来做什么 |
 | --- | --- |
-| 「我看出 bug 了,跳过复现」 | 先建立最小复现或明确记录 `feedback_loop_not_possible`;没有复现就不能声明 root cause confirmed。 |
+| 「我看出 bug 了,跳过复现」 | 先建立最小复现或按二分路径索取捕获证据。没有 red-capable 命令且无捕获证据时,stop 并说明,向用户索取环境/产物/埋点许可;在获得之一前**不得提交 root-cause-confirmed 声明、不得关闭 causal chain gate**(可形成 working hypothesis,但不得声明 confirmed);不要假装有环。 |
 | 「root cause 很明显」 | 用源码、日志、测试或运行值补齐 causal chain;不把直觉当 evidence。 |
 | 「修完了,手测一下就行」 | 复跑同一个反馈回路并留下 confirmed evidence;不能只写 freeform「tests passed」。 |
 
@@ -125,7 +125,34 @@ All phases self-size — a simple bug flows through them in seconds, a complex b
 
 ## Feedback Loop And Hypothesis Ledger
 
-Before declaring root cause or proposing a fix, establish or attempt the smallest feedback loop that can observe the symptom: a failing test, CLI invocation, HTTP/browser script, trace replay, throwaway harness, property/fuzz loop, or another concrete reproducer. If no loop can be created in the current environment, record `feedback_loop_not_possible` with the exact missing condition and continue with bounded evidence; do not pretend a loop exists.
+Before declaring root cause or proposing a fix, establish or attempt the smallest feedback loop that can observe the symptom. Try these reproducers in roughly this order until you have one that goes red on the bug:
+
+1. **Failing test** at whatever seam reaches the bug — unit, integration, e2e.
+2. **Curl / HTTP script** against a running dev server.
+3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
+4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
+5. **Replay a captured trace** — save a real network request / payload / event log to disk; replay it through the code path in isolation.
+6. **Throwaway harness** — spin up a minimal subset of the system (one service, mocked deps) exercising the bug code path with a single function call.
+7. **Property / fuzz loop** — if the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
+8. **Bisection harness** — if the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
+9. **Differential loop** — run the same input through old-version vs new-version (or two configs) and diff outputs.
+10. **HITL bash script** — last resort. If a human must click, this is a **human-operated** script: the user runs `scripts/hitl-loop.template.sh`, follows the prompts, and the captured `KEY=VALUE` output is read back to you afterward. It is not an unattended command you launch — `read` blocks on a TTY and an agent tool call with closed stdin exits immediately under `set -e`. If no operator is present, treat as `feedback_loop_not_possible` with `reason=hitl_no_operator`.
+
+If no loop can be created in the current environment, split on whether you have any captured evidence of the symptom:
+
+- **No loop AND no captured evidence** (no trace, error payload, screen recording, or core dump) → **stop and say so explicitly**. List what you tried, then ask the user for (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. **Before obtaining one of these, do not submit a root-cause-confirmed claim and do not close the causal chain gate** (you may form a working hypothesis, but you must not declare the causal chain confirmed). This militant force lands on the verifiable artifact constraint (no confirmed-claim), not on a thought-level "do not generate hypotheses" ban — keeping it compatible with "LLM decides" while preventing the direct-to-hypothesis shortcut. **AFK fallback:** if the user is absent and no blocking-question response is available, do not block indefinitely — mirror Phase 2's AFK pattern: record `feedback_loop_not_possible` with `reason=no_loop_no_evidence`, mark the causal chain `degraded`/`advisory` only, state the residual risk, and end the run with the best working hypothesis clearly labeled unconfirmed. Do not promote the hypothesis to confirmed.
+- **No loop BUT captured evidence exists** → record `feedback_loop_not_possible` with the exact missing condition and continue with bounded evidence; do not pretend a loop exists. Do not promote unconfirmed causal links to confirmed.
+
+### Feedback loop readiness checklist
+
+Name **one command** — a script path, a test invocation, a curl — that you have **already run at least once** (paste the invocation and its output). It must be:
+
+- [ ] **Red-capable** — drives the actual bug code path and asserts the **user's exact symptom**, so it can go red on this bug and green once fixed. Not "runs without erroring" — it must be able to catch this specific bug.
+- [ ] **Deterministic** — same verdict every run (for flaky bugs: a pinned, high reproduction rate per the Intermittent reframe).
+- [ ] **Fast** — seconds, not minutes.
+- [ ] **Agent-runnable** — you can run it unattended. The HITL bash script (`scripts/hitl-loop.template.sh`) is the human-operated last resort for bugs that inherently need a human to click through a repro; it is not itself unattended — you read its captured output afterward, and if no operator is present you fall back to `feedback_loop_not_possible`.
+
+If you catch yourself reading code to build a theory before a red-capable command exists, **stop — jumping straight to a hypothesis is the failure this skill prevents.** Treat the loop as a product: once you have one, tighten it along three axes (faster / sharper / more deterministic) — see `references/investigation-techniques.md` → Intermittent Bug Techniques for the framing (single source for the three-axes tagline). A 30-second flaky loop is barely better than none; a 2-second deterministic one is a debugging superpower.
 
 Maintain a lightweight hypothesis ledger for non-obvious bugs: `hypothesis`, `prediction`, `evidence_for`, `evidence_against`, `probe_result`, and `final_root_cause`. The ledger is working evidence, not a durable schema. Evidence must come from reproduction, source reads, tests, logs, runtime values, diffs, or user-provided artifacts before it can close a causal-chain link. After a fix, rerun the same feedback loop or state why it cannot be rerun before handoff.
 
@@ -156,12 +183,13 @@ Read the full conversation — the original description AND every comment, with 
 
 #### 1.1 Reproduce the bug
 
-Confirm the bug exists and understand its behavior. Run the test, trigger the error, follow reported reproduction steps — whatever matches the input.
+Confirm the bug exists and understand its behavior. Treat reproduction as a claim verification gate: if the reporter's steps do not reproduce or lack enough detail to attempt, that is a strong `needs-info` signal — surface it before investing in deep tracing of a possibly-mis-described bug. Run the test, trigger the error, follow reported reproduction steps — whatever matches the input.
 
+- **Performance regression (symptom is regressing slowness, not an error/crash):** take the perf branch — establish a baseline measurement before investigating, because logging instrumentation that works for correctness bugs is usually the wrong tool here. See `references/perf-regression.md` (measure first, fix second; statistical timing, bisection). Distinguish from `spec-optimize` (optimizing a measurable outcome) — this is diagnosing *why* a regression happened, not running optimization experiments.
 - **Browser bugs:** Prefer `agent-browser` if installed. Otherwise use whatever works — MCP browser tools, direct URL testing, screenshot capture, etc.
-- **Manual setup required:** If reproduction needs specific conditions the agent cannot create alone (data states, user roles, external services, environment config), document the exact setup steps and guide the user through them. Clear step-by-step instructions save significant time even when the process is fully manual.
-- **Does not reproduce after 2-3 attempts:** Read `references/investigation-techniques.md` for intermittent-bug techniques.
-- **Cannot reproduce at all in this environment:** Document what was tried and what conditions appear to be missing.
+- **Manual setup required:** If reproduction needs specific conditions the agent cannot create alone (data states, user roles, external services, environment config), document the exact setup steps and drive the user through them with `scripts/hitl-loop.template.sh` so the loop stays structured — captured `KEY=VALUE` output feeds back to you. Clear step-by-step instructions save significant time even when the process is fully manual.
+- **Does not reproduce after 2-3 attempts:** Read `references/investigation-techniques.md` for intermittent-bug techniques (goal: raise the reproduction rate, not wait for a clean repro).
+- **Cannot reproduce at all in this environment:** Document what was tried and what conditions appear to be missing; apply the `feedback_loop_not_possible` binary split from the Feedback Loop section.
 
 #### 1.2 Verify environment sanity
 
@@ -269,6 +297,8 @@ If 2-3 hypotheses are exhausted without confirmation, diagnose why:
 
 **Parallel investigation option:** When hypotheses are evidence-bottlenecked across clearly independent subsystems, dispatch read-only sub-agents in parallel, each with an explicit hypothesis and structured evidence-return format. No code edits by sub-agents, and skip this when hypotheses depend on each other's outcomes. If the platform does not support parallel sub-agent dispatch, run the same hypothesis probes sequentially in ranked-likelihood order instead — the parallelism is a latency optimization, not a correctness requirement.
 
+**Pre-test hypothesis re-ranking (folded into this escalation moment, not a separate interrupt):** when 3+ competing hypotheses have each survived one prediction probe without confirmation, surface the ranked list to the user as part of presenting the diagnosis — their domain knowledge can re-rank instantly ("we just deployed a change to #3") or rule out an already-exhausted hypothesis. This is a cheap checkpoint riding on an escalation you were already doing, not a new question point. Do not present it for single-hypothesis or obviously-clear bugs; do not block if the user is AFK — proceed with your own ranking. The trigger is "already at smart escalation with a scattered hypothesis set," not a fresh "3+ hypotheses" threshold.
+
 Present the diagnosis to the user before proceeding.
 
 ---
@@ -286,12 +316,17 @@ If the user chose "Diagnosis only" at the end of Phase 2, skip this phase and go
 
 **Test-first:**
 1. Read the nearby or project-level testing convention before adding a reproduction test; match the existing test style, fixture pattern, and command shape
-2. Write a failing test that captures the bug (or use the existing failing test)
-3. Verify it fails for the right reason — the root cause, not unrelated setup
-4. Implement the minimal fix — address the root cause and nothing else
-5. Verify the test passes
-6. Self-review every changed line against the root cause; remove only debris introduced by this fix and do not refactor unrelated code
-7. Run the broader test suite for regressions
+2. **Judge the correct seam before writing the failing test** — does the seam exercise the bug's real call pattern at the real call site? Apply "lock what you can, flag what you can't":
+   - **Correct seam exists** → write the failing test there, proceed normally.
+   - **Only a shallow seam exists** (single-caller test, but the bug needs a multi-caller chain) → **still write** the failing test, but annotate in the test comment / PR that "this test does not cover the full call chain; it locks only this layer," and flag the architecture gap to Phase 4 as a `blocking advisory` (not ordinary advisory). The PR body must state "this PR locks only the shallow layer; architecture gap X remains, tracked at [issue link]" so the shallow test's apparent-coverage signal cannot swallow the architecture flag. Do not skip the test because the seam is shallow.
+   - **No seam that can fail-for-the-right-reason exists at all** → record "no correct seam = architecture finding," do not write a fake test, flag to Phase 4. This is the only case where you skip the regression test entirely.
+   Obvious single-point bugs still go through the fast-path failing test; the correct-seam judgment only bites on non-obvious multi-caller-chain bugs.
+3. Write a failing test that captures the bug (or use the existing failing test) at the chosen seam
+4. Verify it fails for the right reason — the root cause, not unrelated setup
+5. Implement the minimal fix — address the root cause and nothing else
+6. Verify the test passes
+7. Self-review every changed line against the root cause; remove only debris introduced by this fix and do not refactor unrelated code; clean up any tagged debug logs you added this run (grep the unique prefix you used, per `references/investigation-techniques.md`)
+8. Run the broader test suite for regressions
 
 **Review scope:** For non-trivial fixes, run the host's lightweight code review or the current host's code-review entrypoint when the touched surface is sensitive, broad, or user-facing. Do not invoke a full review ritual for an obvious mechanical fix after the focused test and self-review have covered it.
 
@@ -324,6 +359,15 @@ Analyze how this was introduced and what allowed it to survive. Note any systemi
 ```
 
 When validation was run, prefer a structured `verification-run-summary.v1` ref in the summary or attached handoff evidence instead of a freeform "tests passed" claim. Use `honest-closeout.v1` only as the verdict helper for structured claims; if no structured claim or evidence exists, mark the closeout as `degraded` rather than upgrading confidence.
+
+**Cleanup checklist (closing hygiene, separate from the Debug Summary above).** The Debug Summary is the external handoff conclusion (Problem/Root Cause/Fix/Confidence/verification-run-summary); this checklist is the internal closing-hygiene pass — verify before declaring done:
+
+- [ ] All tagged debug logs from this run (unique prefix, e.g. `[DEBUG-a4f2]`) removed — `grep` the prefix and confirm zero hits.
+- [ ] Throwaway prototypes / harnesses deleted or moved to a clearly-marked debug location.
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns.
+- [ ] A correct-seam gap (if any) is flagged in the Debug Summary's `claims_remaining_advisory` or Prevention section; when a shallow-layer test exists, the architecture gap is marked **blocking advisory** with a PR-body note and a tracking issue link (per Phase 3 correct-seam), not ordinary advisory.
+
+The original-repro-no-longer-reproduces and regression-test-passing signals live in the Debug Summary's `verification-run-summary` — do not duplicate them here.
 
 **If Phase 3 was skipped** (user chose "Diagnosis only" in Phase 2), stop after the summary — the user already told you they were taking it from here. Do not prompt.
 
