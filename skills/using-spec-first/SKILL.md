@@ -31,21 +31,21 @@ Core boundary: scripts and CLI commands prepare deterministic facts; the LLM dec
 
 When editing or reviewing this routing prompt, or when running fresh-source eval for routing posture drift, read `skills/using-spec-first/evals/examples.json` as examples-as-context. These examples are not a routing state machine, automatic workflow selector, or semantic readiness gate for ordinary requests.
 
-For lightweight-route regressions, also read `skills/using-spec-first/evals/routing-cases.json`. These cases are machine-judgable guardrails for direct-answer, bounded-read, and explicit-route outcomes; they are not a deterministic router or a replacement for LLM judgment.
-
-For routing-discipline regressions, read `skills/using-spec-first/evals/routing-discipline-cases.json`. These cases target multi-intent conflict, automatic chaining pressure, standalone/internal helper confusion, dispatch authorization, parent-workspace write scope, and setup-hijack boundaries; they are structural output-eval fixtures, not a runtime router.
+For lightweight-route regressions, also read `skills/using-spec-first/evals/routing-cases.json`. For routing-discipline regressions, read `skills/using-spec-first/evals/routing-discipline-cases.json`. These eval fixtures are structural output-eval guardrails, not a runtime router.
 
 ## Reference Files
 
-Keep this `SKILL.md` focused on trigger, output, and branch-selection posture. Read references only when their boundary is directly relevant:
+Keep this `SKILL.md` focused on the routing map and runtime-safe stubs; detailed boundaries live in references. Read a reference only when its boundary is directly relevant:
 
 - `skills/using-spec-first/references/scenario-fingerprint-routing.md`: when `.spec-first/workspace/scenario-fingerprint*.json` already exists or setup/workspace state affects route trust.
 - `skills/using-spec-first/references/user-next-step-guide-mode.md`: when the user asks what to run next, which workflow applies, or asks for guide-only output.
 - `skills/using-spec-first/references/multi-session-awareness.md`: before substantial file-writing work when opt-in session records may affect coordination disclosure.
 - `skills/using-spec-first/references/codex-startup-reminder-boundary.md`: before a top-level Codex orchestrator enters a public `$spec-*` workflow and startup reminder evidence may be relevant.
-- `skills/using-spec-first/references/routing-red-flags.md`: when editing or reviewing routing posture and anti-rationalization reminders.
+- `skills/using-spec-first/references/routing-red-flags.md`: when editing or reviewing routing posture, anti-rationalization reminders, or the Hard Rules.
 - `skills/using-spec-first/references/output-risk-profile.md`: when editing, reviewing, or evaluating this routing skill; it names likely output failures and matching checks.
 - `skills/using-spec-first/references/maintenance-and-fresh-source-eval.md`: when changing this skill, host bootstrap prose, dispatch boundaries, route map entries, or source/runtime guidance.
+- `skills/using-spec-first/references/scope-guards.md`: when scope/risk classification, substantial-work thresholds, lightweight-direct-outcome allowance, subagent/active-workflow non-reroute, skill-trigger vs workflow admission, or parent-workspace write boundaries are in question.
+- `skills/using-spec-first/references/dispatch-boundaries.md`: when workflow dispatch admission, Codex `spawn_agent` authorization, host surface entrypoint spelling, or Codex startup-reminder boundary details are in question.
 
 ## Source Of Truth And Runtime Surface
 
@@ -55,64 +55,13 @@ The managed bootstrap blocks in `CLAUDE.md` and `AGENTS.md` are the using-spec-f
 
 Runtime copies under `.claude/`, `.codex/`, and `.agents/skills/` are generated mirrors. Repair stale or missing runtime guidance with `spec-first init` after choosing the target host; do not hand-edit generated mirrors as the source of truth.
 
-Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`) are excluded from default workflow context. Route to setup/update/runtime-drift/audit/governance-health workflows, or require a precise user-named path, before treating those directories as evidence.
+Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`) are excluded from default workflow context. Route to setup/update/runtime-drift/audit/governance-health workflows, or require a precise user-named path, before treating those directories as evidence. For source changes, keep changelog entries compact and consume changelog history through the latest relevant window / summary-first rules in `docs/contracts/context-governance.md`.
 
 ## Scope Guards
 
-### If You Are Already In A Workflow
+Detailed scope-guards rules — If You Are Already In A Workflow, If You Are A Subagent, What Counts as Substantial Work, Lightweight Direct Outcomes, Spec-First Self-Work, Skill Trigger vs Workflow Admission, and Parent Workspace Direct Reads — live in `skills/using-spec-first/references/scope-guards.md`. The runtime-safe anchors below stay in this SKILL so the runtime transform preserves them.
 
-If a public `spec-first` workflow is already active, do not restart entry routing on every step. Follow the active workflow's `SKILL.md`.
-
-Re-run entry routing only when the user changes the goal, the active workflow explicitly hands off, or the current request is clearly outside the active workflow's scope.
-
-### If You Are A Subagent
-
-If you were dispatched as a subagent or worker for a specific bounded task, do not restart workflow routing unless the parent explicitly asked you to choose a workflow. Complete the assigned task within its scope and report back.
-
-### What Counts as Substantial Work
-
-Treat these as substantial work:
-
-- non-trivial or risky edits that need an engineering loop: multi-file changes, architecture or contract changes, governance/runtime delivery changes, unclear root cause, sensitive areas, or changes likely to require planning, debugging, review, or migration judgment
-- starting implementation, debugging, review, planning, setup, update, bootstrap, optimization, or context-capture workflows
-- running commands that change project state or depend on workflow context
-- making architectural, prompt, workflow, governance, or contract decisions
-- creating, refreshing, or retiring durable project knowledge
-
-These are not substantial work:
-
-- lightweight factual answers
-- brief explanations with no workflow leverage
-- quick questions where `spec-first` provides no meaningful routing benefit
-- showing command output or answering a narrow "where is X used?" question without edits
-- clearly scoped, single-point, low-risk code/prose/config edits such as a typo, comment, constant, or local single-function fix, provided the root cause and target file are clear and no architecture, contract, governance, runtime delivery, multi-file, or sensitive-surface judgment is needed
-
-### Lightweight Direct Outcomes
-
-`using-spec-first` has valid non-workflow outcomes. When the current request is lightweight, answer directly or perform a bounded read instead of creating a public workflow artifact.
-
-Direct-answer / bounded-read cases include greetings, current-context or current-instruction explanations, narrow code-location lookups such as "where is X used?", and summarizing or reorganizing the current conversation or a user-provided single document. These requests may still use ordinary source tools such as `rg` or precise file reads when needed, but they do not require brainstorm, plan, work, review, Graphify, or durable artifacts by default.
-
-Clearly scoped small edits may also proceed as normal execution without opening a public workflow. Direct execution still carries the local engineering discipline: update `CHANGELOG.md` when project policy requires it, use the narrowest meaningful verification, respect source/runtime boundaries, and avoid generated mirror patches as source fixes.
-
-If a lightweight request turns into non-trivial or risky editing, planning, review, debugging, setup, source/runtime judgment, multi-file spread, unclear root cause, or another substantial state-changing action, reclassify it at that point and route normally.
-
-### Spec-First Self-Work
-
-Work on `spec-first` itself is substantial when it changes skills, agents, prompt/workflow prose, host instruction blocks, `init`/`doctor`/`clean` behavior, governance contracts, architecture, source/runtime policy, or runtime delivery rules.
-
-Before self-work that changes architecture, prompt, workflow, contract, source/runtime governance, or evolution policy, read `docs/10-prompt/结构化项目角色契约.md` and use it as the judgment baseline.
-
-Clearly scoped, single-point, low-risk ordinary code/prose corrections in `spec-first` itself may proceed directly when they do not touch prompt/workflow/contract/governance/runtime delivery semantics and do not expand beyond the known target. Keep the same local discipline: source-of-truth edits, `CHANGELOG.md` when required, narrow verification, and reclassification if the change becomes substantial.
-
-Route substantial concrete implementation or prose changes to:
-
-- Claude: `/spec:work`
-- Codex: `$spec-work`
-
-Route unresolved policy, architecture, or scope questions to `spec-brainstorm` or `spec-plan` based on whether the WHAT or HOW is unclear. Route review-only requests by artifact type: code/diff/PR quality review to `spec-code-review`, requirements/plan/Markdown review to `spec-doc-review`, and skill/agent asset governance audits to `spec-skill-audit`. If the request asks for review plus concrete revisions, route to work and keep a review posture during execution.
-
-For source changes, update source-of-truth files, the narrowest contract tests, and `CHANGELOG.md` when project policy requires it. Keep changelog entries compact and consume changelog history through the latest relevant window / summary-first rules in `docs/contracts/context-governance.md`. Do not modify generated `.claude/`, `.codex/`, or `.agents/skills/` mirrors just to refresh runtime behavior. If runtime drift must be repaired after source validation, use `spec-first init` with the target host selected as a runtime regeneration step, not as the source fix.
+A skill trigger is source/methodology loading; it is not automatically public workflow admission. Public workflow admission happens only when the current intent actually matches a public `/spec:*` or `$spec-*` workflow, or the user explicitly invokes one and the route is safe. Admission authorizes that workflow to run under its own contract; it does not create a plan/task/review artifact inside this governor and does not grant host-level subagent dispatch beyond the dispatch rules below.
 
 ## Multi-Session Awareness
 
@@ -122,7 +71,7 @@ Before substantial work that will write files, optionally check whether other ag
 spec-first session list --json
 ```
 
-If `active_count >= 2`, emit one short advisory line naming the count and a concrete next-action choice. Do not block, do not lock, do not auto-defer — the LLM decides whether to proceed in parallel with disclosure or to coordinate. For active_count interpretation, missing-command behavior, wording examples, and subagent/headless exclusions, read `skills/using-spec-first/references/multi-session-awareness.md`.
+If `active_count >= 2`, emit one short advisory line naming the count and a concrete next-action choice. Do not block, do not lock, do not auto-defer. For active_count interpretation, missing-command behavior, wording examples, and subagent/headless exclusions, read `skills/using-spec-first/references/multi-session-awareness.md`.
 
 ## Decision Output Contract
 
@@ -136,12 +85,6 @@ If the user explicitly invokes a workflow (`/spec:*` or `$spec-*`), honor that r
 
 If the user asks only for guidance about the next step, use User Next-Step Guide Mode instead of starting the workflow. If the user directly describes clear work, normal entry routing may announce the chosen workflow and continue under this contract.
 
-## Skill Trigger vs Workflow Admission
-
-A skill trigger is source/methodology loading; it is not automatically public workflow admission. Reading this SKILL, loading an examples file, or matching a skill description can help classify the request while still producing a direct answer, bounded read, or normal execution when no public workflow adds value.
-
-Public workflow admission happens only when the current intent actually matches a public `/spec:*` or `$spec-*` workflow, or the user explicitly invokes one and the route is safe. Admission to a workflow authorizes that workflow to run under its own contract; it does not create a plan/task/review artifact inside this governor and does not grant host-level subagent dispatch beyond the dispatch rules below.
-
 ## User Next-Step Guide Mode
 
 Use this mode when the user explicitly asks what to run next, which `spec-first` command to use, which workflow applies, or says they do not know the next step.
@@ -149,8 +92,6 @@ Use this mode when the user explicitly asks what to run next, which `spec-first`
 This mode is read-only. It may inspect lightweight context that is already available, but it must not create brainstorm, plan, task, review, solution, or runtime artifacts. It recommends the next public workflow entrypoint; the selected workflow performs the actual work.
 
 Output exactly one best next entrypoint, one concrete reason, and one next action. Do not print the full workflow menu.
-
-Use a compact, user-visible shape so the answer is easy to scan:
 
 ```text
 推荐入口: <current-host entrypoint>
@@ -162,9 +103,7 @@ In English-language repos, use `Recommended entrypoint`, `Reason`, and `Next act
 
 ## Scenario Fingerprint Routing
 
-When `.spec-first/workspace/scenario-fingerprint.json` or `.spec-first/workspace/scenario-fingerprint-setup.json` is already present, treat it as advisory deterministic context for guide mode and entry routing. Do not run setup, clean, external-tool commands, or runtime regeneration just to create a fingerprint from this entry governor.
-
-Scenario fingerprints are not gates, approvals, or source scope authority. Route output still remains one entrypoint, one reason, and one next action. For layer priority, missing-artifact compatibility, scenario-aware checks, and foreign residual repair wording, read `skills/using-spec-first/references/scenario-fingerprint-routing.md`.
+When `.spec-first/workspace/scenario-fingerprint.json` or `.spec-first/workspace/scenario-fingerprint-setup.json` is already present, treat it as advisory deterministic context for guide mode and entry routing. Do not run setup, clean, external-tool commands, or runtime regeneration just to create a fingerprint from this entry governor. Scenario fingerprints are not gates, approvals, or source scope authority. For layer priority, missing-artifact compatibility, scenario-aware checks, and foreign residual repair wording, read `skills/using-spec-first/references/scenario-fingerprint-routing.md`.
 
 ## Routing Rules
 
@@ -232,13 +171,9 @@ If the user asks a read-only codebase question from a parent workspace containin
 
 Routing into a public workflow authorizes that workflow to run. It does not by itself override host-level subagent tool contracts. In Codex, call `spawn_agent` only when the current request explicitly asks for subagents, delegated work, parallel agents, persona reviewer dispatch, or when an upstream workflow delegates from an already authorized multi-agent context whose visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording.
 
-Some public workflows prefer multi-persona or research phases when host capability and authorization are both present, for example `$spec-doc-review` multi-persona document reviewers, `$spec-code-review` reviewer personas, `$spec-plan` research agents, and `$spec-ideate` grounding or ideation agents. If authorization is absent, use that workflow's documented single-agent/report-only or inline-checklist fallback and record the concrete fallback reason instead of treating the workflow itself as failed.
-
 When Codex fallback is caused by missing dispatch authorization, record `dispatch_authorization_missing` and make the opt-in path user-visible: for multi-persona or subagent review, ask for `subagents`, `personas`, delegated review, or parallel agents in the request.
 
-If the user names `spec-doc-review` in a document-review request without the `$` prefix, normalize it to the current host's public document-review entrypoint when the intent is clearly to run that workflow. Do not invent extra dispatch authorization from normalization; the selected workflow owns reviewer selection, bounded parallelism when authorized, synthesis, artifacts, fallback, and final judgment.
-
-If the user explicitly asks for report-only/no-agents mode, the host lacks a dispatch primitive, the runtime cannot call it, explicit dispatch authorization is absent, or the workflow's own safety boundary is not satisfied, follow that workflow's documented fallback instead of dispatching.
+For multi-persona/research phases, `$spec-doc-review` normalization, report-only fallback, and the full dispatch-boundary detail, read `skills/using-spec-first/references/dispatch-boundaries.md`.
 
 ### Host Surface
 
@@ -252,8 +187,6 @@ If the user explicitly asks for report-only/no-agents mode, the host lacks a dis
 ### Codex Startup Reminder Boundary
 
 Codex currently uses managed instruction guidance for startup reminders, not a verified deterministic SessionStart hook.
-
-When a top-level Codex orchestrator is about to route into a public `$spec-*` workflow and the `spec-first` CLI is available, it may run:
 
 ```bash
 spec-first startup-reminder --codex
@@ -272,16 +205,7 @@ If this guidance has already been injected through `CLAUDE.md`, `AGENTS.md`, or 
 
 ## Hard Rules
 
-1. `workflow-first` does not mean `brainstorming-first`.
-2. Do **not** make `spec-brainstorm` the universal default front door.
-3. Do **not** adopt the `using-superpowers` rule that "if there is a 1% chance a skill applies, you must invoke it."
-4. Do **not** turn ordinary lightweight requests into mandatory workflow traffic.
-5. Do **not** describe `using-spec-first` itself as a command-backed workflow.
-6. Do **not** write Codex entrypoints as `/spec:*`.
-7. Do **not** write Claude workflow entrypoints as `$spec-*`.
-8. Do **not** expose internal-only skills as user entrypoints. This includes delegated helpers such as `git-worktree`.
-9. Do **not** route to hidden helper skills such as git, browser, image, proof, xcode, or bug-report helpers unless a public workflow explicitly delegates to them.
-10. Do **not** run `spec-first init`, `clean`, update, or other state-changing commands just because this governor matched; first route to the appropriate workflow or ask a narrow confirmation when required.
+The Hard Rules (workflow-first ≠ brainstorming-first; no default `spec-brainstorm`; no `using-superpowers` 1% rule; no turning lightweight requests into workflow traffic; no describing `using-spec-first` as a command-backed workflow; no Codex entrypoints as `/spec:*`; no Claude entrypoints as `$spec-*`; no exposing internal-only skills such as `git-worktree`; no routing to hidden helper skills; no state-changing commands just because this governor matched) live in `skills/using-spec-first/references/routing-red-flags.md`.
 
 ## Routing Red Flags
 

@@ -231,7 +231,7 @@ PR 应说明变更的 command、skill、agent 或文档面，列出实际执行�
 <!-- spec-first:bootstrap:start -->
 ## Workflow 入口治理
 
-- 本 block 是 using-spec-first 的最小入口锚点(随会话启动注入,启动即在场);完整路由表、边界细节和例外仍在 `skills/using-spec-first/SKILL.md`
+- 本 block 是 using-spec-first 的最小入口锚点(随会话启动注入,启动即在场);完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`
 - **何时进入 workflow**:substantial work（需要工程闭环的非平凡/有风险编辑、启动 implementation/debug/review/plan/setup/update/optimization/知识沉淀、运行改状态命令、架构/prompt/workflow/contract 决策、durable knowledge 增删）前先判断是否进入公开 spec-first workflow
 - **何时直接做**:轻量事实问答、当前上下文解释、窄定位查询（where is X used）、当前对话/用户给定单文档整理、明确单点低风险小改动可直接回答、bounded read 或正常执行;小改动仍遵守 CHANGELOG、最窄验证和 source/runtime 边界;workflow-first 不等于 brainstorming-first
 - **何时不重新分流**:已在公开 workflow 内（按其 SKILL 继续,仅在用户改目标/显式 handoff/明显越界时重路由）或作为 bounded subagent/worker 被派遣（完成 bounded 任务即可,不重启路由)

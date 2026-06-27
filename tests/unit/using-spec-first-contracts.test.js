@@ -18,6 +18,8 @@ const USING_SPEC_FIRST_REFERENCES = [
   'routing-red-flags.md',
   'output-risk-profile.md',
   'maintenance-and-fresh-source-eval.md',
+  'scope-guards.md',
+  'dispatch-boundaries.md',
 ];
 const GOVERNANCE_PATH = path.join(
   REPO_ROOT,
@@ -368,5 +370,39 @@ describe('using-spec-first contracts', () => {
     }
 
     expect(offenders).toEqual([]);
+  });
+
+  // R1 drift-detection:被下沉到 references 的关键 Hard Rule / scope-guard / dispatch
+  // 断言串必须实际存在于对应 reference 文件,防 reference 被清空后并集 containsAll
+  // 靠 SKILL 残留静默通过(SKILL 主面只留概述指针,不应逐字重复完整断言串)。
+  test('sunk assertion strings live in their registered reference, not just the SKILL union', () => {
+    const routingRedFlags = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'routing-red-flags.md',
+    ));
+    const scopeGuards = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'scope-guards.md',
+    ));
+    const dispatchBoundaries = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'dispatch-boundaries.md',
+    ));
+
+    // Hard Rules 完整断言串必须在 routing-red-flags.md(SKILL 主面仅留概述指针)
+    expect(routingRedFlags).toContain('Do **not** make `spec-brainstorm` the universal default front door.');
+    expect(routingRedFlags).toContain('Do **not** adopt the `using-superpowers` rule');
+    expect(routingRedFlags).toContain('Do **not** write Codex entrypoints as `/spec:*`.');
+    expect(routingRedFlags).toContain('Do **not** write Claude workflow entrypoints as `$spec-*`.');
+    expect(routingRedFlags).toContain('Do **not** expose internal-only skills as user entrypoints.');
+    expect(routingRedFlags).toContain('`git-worktree`');
+
+    // Scope Guards 详细规则必须在 scope-guards.md(SKILL 主面仅留指针)
+    expect(scopeGuards).toContain('If You Are Already In A Workflow');
+    expect(scopeGuards).toContain('Lightweight Direct Outcomes');
+    expect(scopeGuards).toContain('reclassify it at that point and route normally');
+    expect(scopeGuards).toContain('Parent Workspace Direct Reads');
+    expect(scopeGuards).toContain('A skill trigger is source/methodology loading');
+
+    // Dispatch 详细 elaboration 必须在 dispatch-boundaries.md
+    expect(dispatchBoundaries).toContain('record `dispatch_authorization_missing` and make the opt-in path user-visible');
+    expect(dispatchBoundaries).toContain('$spec-doc-review` means the document-review workflow');
   });
 });

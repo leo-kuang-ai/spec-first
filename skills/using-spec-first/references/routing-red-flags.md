@@ -11,3 +11,16 @@ These reminders are advisory. They help prevent rationalizing around the entry-g
 | "The task is vague, but I can probably implement something." | Use `brainstorm` or `plan` before work. |
 | "A helper skill exists, so I should expose it." | Only public workflows are user entrypoints; internal helpers stay hidden. |
 | "I should run init/update now." | Route to `update` or `setup` first unless the user explicitly requested the command. |
+
+## Hard Rules
+
+1. `workflow-first` does not mean `brainstorming-first`.
+2. Do **not** make `spec-brainstorm` the universal default front door.
+3. Do **not** adopt the `using-superpowers` rule that "if there is a 1% chance a skill applies, you must invoke it."
+4. Do **not** turn ordinary lightweight requests into mandatory workflow traffic.
+5. Do **not** describe `using-spec-first` itself as a command-backed workflow.
+6. Do **not** write Codex entrypoints as `/spec:*`.
+7. Do **not** write Claude workflow entrypoints as `$spec-*`.
+8. Do **not** expose internal-only skills as user entrypoints. This includes delegated helpers such as `git-worktree`.
+9. Do **not** route to hidden helper skills such as git, browser, image, proof, xcode, or bug-report helpers unless a public workflow explicitly delegates to them.
+10. Do **not** run `spec-first init`, `clean`, update, or other state-changing commands just because this governor matched; first route to the appropriate workflow or ask a narrow confirmation when required.

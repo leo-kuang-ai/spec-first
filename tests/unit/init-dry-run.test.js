@@ -430,7 +430,7 @@ describe('init --dry-run', () => {
       expect(claudeInstruction).toContain('不默认进入 `spec-brainstorm`');
       expect(claudeInstruction).toContain('只读定位也应使用 bounded direct reads 并说明目标 repo 假设');
       expect(claudeInstruction).toContain('最小入口锚点');
-      expect(claudeInstruction).toContain('完整路由表、边界细节和例外仍在 `skills/using-spec-first/SKILL.md`');
+      expect(claudeInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
       expect(claudeInstruction).not.toContain('入口映射(意图→入口)');
       expect(claudeInstruction).toContain('target_repo');
       expect(claudeInstruction).toContain('/spec:optimize');
@@ -598,7 +598,7 @@ describe('init --dry-run', () => {
       expect(codexInstruction).toContain('不默认进入 `spec-brainstorm`');
       expect(codexInstruction).toContain('只读定位也应使用 bounded direct reads 并说明目标 repo 假设');
       expect(codexInstruction).toContain('最小入口锚点');
-      expect(codexInstruction).toContain('完整路由表、边界细节和例外仍在 `skills/using-spec-first/SKILL.md`');
+      expect(codexInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
       expect(codexInstruction).not.toContain('入口映射(意图→入口)');
       expect(codexInstruction).toContain('target_repo');
       expect(codexInstruction).toContain('$spec-optimize');

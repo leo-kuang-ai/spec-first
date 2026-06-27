@@ -50,7 +50,7 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('如何路由');
     expect(twice).toContain('常见入口锚点');
     expect(twice).toContain('反合理化红旗');
-    expect(twice).toContain('完整路由表、边界细节和例外仍在 `skills/using-spec-first/SKILL.md`');
+    expect(twice).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
     expect(twice).toContain('substantial work');
     expect(twice).toContain('不默认进入 `spec-brainstorm`');
     expect(twice).toContain('不自动串联多个 workflow');
@@ -104,6 +104,7 @@ describe('instruction bootstrap', () => {
     expect(updated).not.toContain('## Workflow Entry Governance (managed by spec-first)');
     expect(updated).toContain('Codex workflow entrypoints use `$spec-*`');
     expect(updated).toContain('minimal entry anchor');
+    expect(updated).toContain('the full route map lives in `skills/using-spec-first/SKILL.md`, with boundary details and exceptions in its registered `references/*.md`');
     expect(updated).toContain('skills/using-spec-first/SKILL.md');
     expect(updated).toContain('startup-reminder --codex');
     expect(updated).toContain('must not block routing');
