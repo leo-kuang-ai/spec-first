@@ -78,6 +78,59 @@ In scope: 页面。
 }
 
 describe('Claude PRD readiness guard hook', () => {
+  test('source_inputs as last frontmatter field does not treat body bullets as input paths', () => {
+    // 回归：source_inputs 是 frontmatter 最后一项时，--- 后的正文 bullet
+    // 不应被误读为 input path，否则会产生假的 input_scan_degraded
+    const projectRoot = makeTempDir();
+    try {
+      installRuntimeScripts(projectRoot);
+      // PRD：source_inputs 是 frontmatter 最后一项，其后紧跟 --- 和带 bullet 的正文
+      // source_inputs 无实际 item（空列表），正文有 bullet；
+      // 旧代码会把正文 bullet 当 input path → input_scan_degraded；修复后不会
+      const prdContent = `---
+artifact_kind: prd-requirements
+spec_id: frontmatter-last-input
+title: Frontmatter Last Input Test
+date: 2026-06-27
+write_mode: checkpoint-prd
+can_enter_spec_plan: no
+source_inputs:
+---
+
+# 需求
+
+- 目标：展示市场页
+- **NG-1**：不实现交易功能
+`;
+      write(path.join(projectRoot, 'docs', 'brainstorms', 'frontmatter-last-input-requirements.md'), prdContent);
+
+      const init = spawnSync('git', ['init', '-q'], {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', HOME: path.join(projectRoot, 'home') },
+      });
+      expect(init.status).toBe(0);
+
+      const result = spawnSync(HOOK_TEMPLATE, {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        timeout: 8000,
+        env: { ...process.env, CLAUDE_PROJECT_DIR: projectRoot },
+      });
+
+      // 无论阻断与否，reason 里不能出现 input_scan_degraded
+      // （只有正文 bullet 被误读为不存在的路径才会触发该 code）
+      if (result.stdout) {
+        const payload = JSON.parse(result.stdout);
+        if (payload.decision === 'block') {
+          expect(payload.reason).not.toContain('input_scan_degraded');
+        }
+      }
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test.each(['source_inputs', 'prd_input'])('passes %s into finalize so input-only Figma refs block ready closeout', (inputField) => {
     const projectRoot = makeTempDir();
 

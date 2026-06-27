@@ -1,0 +1,169 @@
+#!/bin/bash
+set -euo pipefail
+
+project_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+
+node /dev/fd/3 "$project_dir" 3<<'EOF'
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawnSync } = require('node:child_process');
+
+const projectDir = process.argv[2];
+const finalizeScript = path.join(
+  projectDir,
+  '.claude',
+  'spec-first',
+  'workflows',
+  'spec-prd',
+  'scripts',
+  'finalize-prd-artifact.js',
+);
+
+const prdPaths = changedPrdArtifacts(projectDir);
+if (prdPaths.length === 0) {
+  process.exit(0);
+}
+
+if (!fs.existsSync(finalizeScript)) {
+  block([
+    '[spec-first] PRD readiness guard blocked closeout.',
+    `Missing managed spec-prd finalize script: ${path.relative(projectDir, finalizeScript)}`,
+    'Run `spec-first init` to refresh Claude runtime assets, then rerun `$spec-prd` finalize.',
+  ].join('\n'));
+}
+
+const blocked = [];
+for (const relativePrdPath of prdPaths) {
+  const absolutePrdPath = path.join(projectDir, relativePrdPath);
+  const inputs = extractSourceInputs(absolutePrdPath)
+    .map((inputPath) => (path.isAbsolute(inputPath) ? inputPath : path.join(projectDir, inputPath)));
+  const args = [finalizeScript, absolutePrdPath, '--check-only'];
+  if (inputs.length > 0) {
+    args.push('--inputs', inputs.join(','));
+  }
+
+  const result = spawnSync(process.execPath, args, {
+    cwd: projectDir,
+    encoding: 'utf8',
+    timeout: 5000,
+  });
+
+  if (result.status === 0) {
+    continue;
+  }
+
+  const parsed = parseJsonObject(result.stdout);
+  const reasonCodes = Array.isArray(parsed.blocking_reason_codes)
+    ? parsed.blocking_reason_codes
+    : ['finalize_check_failed'];
+  blocked.push({
+    path: relativePrdPath,
+    reasonCodes,
+    stderr: String(result.stderr || '').trim(),
+  });
+}
+
+if (blocked.length > 0) {
+  const lines = [
+    '[spec-first] PRD readiness guard blocked closeout.',
+    'Changed PRD artifacts cannot be closed as ready until `$spec-prd` producer-local finalize passes.',
+    '',
+    ...blocked.flatMap((entry) => [
+      `- ${entry.path}`,
+      `  reason_codes: ${entry.reasonCodes.join(', ')}`,
+      entry.stderr ? `  stderr: ${entry.stderr}` : '',
+    ].filter(Boolean)),
+    '',
+    'Next action: return to `$spec-prd`, fix the listed readiness/design/grill/finalize gaps, then run the producer-local finalize path again.',
+  ];
+  block(lines.join('\n'));
+}
+
+function changedPrdArtifacts(cwd) {
+  const result = spawnSync('git', ['status', '--porcelain', '-z', '--untracked-files=all', '--', 'docs/brainstorms'], {
+    cwd,
+    encoding: 'utf8',
+    timeout: 2000,
+  });
+  if (result.status !== 0 || typeof result.stdout !== 'string') {
+    return [];
+  }
+
+  const entries = result.stdout.split('\0').filter(Boolean);
+  const paths = [];
+  for (let i = 0; i < entries.length; i += 1) {
+    const entry = entries[i];
+    const status = entry.slice(0, 2);
+    let filePath = entry.slice(3);
+    if (status.includes('R') || status.includes('C')) {
+      i += 1;
+      filePath = entries[i] || filePath;
+    }
+    if (/^docs\/brainstorms\/.+-requirements\.md$/.test(filePath)) {
+      paths.push(filePath);
+    }
+  }
+  return [...new Set(paths)].sort();
+}
+
+function extractSourceInputs(prdPath) {
+  let text;
+  try {
+    text = fs.readFileSync(prdPath, 'utf8');
+  } catch {
+    return [];
+  }
+  const lines = text.split(/\r?\n/);
+  // 必须以 frontmatter 开头
+  if (lines[0] !== '---') {
+    return [];
+  }
+  // 找到 frontmatter 结束边界（第二个 ---）
+  const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+  if (fmEnd === -1) {
+    return [];
+  }
+  // 只在 frontmatter 内扫描，防止正文 bullet 被误读为输入路径
+  const fmLines = lines.slice(1, fmEnd);
+  const start = fmLines.findIndex((line) => /^(source_inputs|prd_input):\s*$/.test(line));
+  if (start === -1) {
+    return [];
+  }
+  const inputs = [];
+  for (let i = start + 1; i < fmLines.length; i += 1) {
+    const line = fmLines[i];
+    if (/^[A-Za-z0-9_-]+:\s*/.test(line)) {
+      break;
+    }
+    const match = line.match(/^\s*-\s+(.+?)\s*$/)
+      || line.match(/^\s*path:\s+(.+?)\s*$/);
+    if (match) {
+      const value = match[1]
+        .replace(/^path:\s*/, '')
+        .replace(/^["']|["']$/g, '')
+        .trim();
+      if (value) {
+        inputs.push(value);
+      }
+    }
+  }
+  return inputs;
+}
+
+function block(reason) {
+  process.stdout.write(JSON.stringify({
+    decision: 'block',
+    reason,
+  }));
+  process.exit(0);
+}
+
+function parseJsonObject(raw) {
+  try {
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+EOF
