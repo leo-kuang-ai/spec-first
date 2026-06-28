@@ -453,6 +453,20 @@ function validateRoleContractSection5(sectionText) {
 }
 
 describe('contract-drift-guard harness declaration probes', () => {
+  test('role contract revision-history anchor is present when referenced', () => {
+    const contract = fs.readFileSync(ROLE_CONTRACT_PATH, 'utf8');
+    const revisionHistory = markdownSection(contract, '## 12. 修订历史').text;
+
+    expect(contract).toContain('修订历史见 §12');
+    expect(markdownSection(contract, '## 11. 修订纪律（本文件的自指 gate）').text).toContain('价值权重与边界条款');
+    expect(revisionHistory).toContain('Origin / 证据');
+    expect(revisionHistory).toContain('多 agent 审查指出“修订历史见 §12”但文件缺少 §12');
+    expect(revisionHistory).toContain('机械补齐 §12 修订历史锚点');
+    expect(revisionHistory).toContain('后续修订若新增/修改价值权重、边界条款或机械锚定条款');
+    expect(revisionHistory.split(/\r?\n/).filter((line) => line.startsWith('| 2026-06-28 | v2.0 |')).length)
+      .toBeGreaterThanOrEqual(3);
+  });
+
   test('parses §2 terms by layer while keeping backticks and term-local aspirational markers', () => {
     const terms = parseHarnessTerms(`
 ## 2. 核心链路与 Harness 层

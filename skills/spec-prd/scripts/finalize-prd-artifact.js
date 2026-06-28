@@ -114,9 +114,12 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     !isReceiptOnly(reasonCode)
   ));
+  // ready_receipt_absent 在写入模式不阻断 finalize(写入即补 receipt),但 check-only 预览时保留阻断
+  // (声称 ready 却没 receipt 是矛盾态,预览应警告)。这避免循环依赖:模型写 status: ready-for-planning
+  // 后跑 finalize 写入,旧逻辑因 ready_receipt_absent 进 blockingReasons → can_finalize=false → 永远写不了 receipt。
   const receiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     reasonCode === 'ready_receipt_stale'
-      || (readyStatusClaimPresent && reasonCode === 'ready_receipt_absent')
+    || (options.checkOnly === true && readyStatusClaimPresent && reasonCode === 'ready_receipt_absent')
   ));
   const readyIntentPresent = facts.write_mode === 'final-prd' && facts.can_enter_spec_plan === 'yes';
   const missingReadyIntentReasons = readyIntentPresent ? [] : ['finalize_required'];
@@ -191,7 +194,7 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
 function finalizePrd(target, inputs, options = {}) {
   const targetPath = path.resolve(target);
   const text = fs.readFileSync(targetPath, 'utf8');
-  const receipt = buildFinalizeReceipt(target, text, inputs, { refreshInputsHash: options.refreshInputsHash });
+  const receipt = buildFinalizeReceipt(target, text, inputs, { refreshInputsHash: options.refreshInputsHash, checkOnly: options.checkOnly });
 
   if (!receipt.can_finalize || options.checkOnly) {
     return receipt;

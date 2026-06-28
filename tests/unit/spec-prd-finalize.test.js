@@ -68,6 +68,9 @@ In scope: 新页面。
 - clarification_evidence: asked-owner
 - can_enter_spec_plan: yes
 - preflight_sweep_closure: closed
+- decision_card_highest_risk_gap: owner 确认持仓接口口径
+- decision_card_next_action: final-prd
+- decision_card_why_no_invention: 三个 load-bearing OQ 已 owner 闭合,plan 无需发明 WHAT
 `;
 }
 
@@ -91,6 +94,34 @@ describe('spec-prd producer-local finalize', () => {
 
       expect(receipt.can_finalize).toBe(false);
       expect(receipt.blocking_reason_codes).toContain('ready_receipt_absent');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  // 写入模式首次写 receipt 不死锁:声称 ready 但 receipt 不存在时,写入应允许(check-only 才阻断)。
+  // 修复 2026-06-28 日志暴露的循环依赖:旧逻辑 ready_receipt_absent 进 blockingReasons → can_finalize=false → 永远写不了 receipt。
+  test('finalize WRITE mode breaks the ready_receipt_absent deadlock (first receipt write allowed)', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'first-receipt-requirements.md');
+
+    try {
+      write(prdPath, validReadyIntentPrd('status: ready-for-planning\n'));
+
+      // check-only 仍阻断(矛盾态预警)
+      const preview = finalizePrd(prdPath, [], { checkOnly: true });
+      expect(preview.can_finalize).toBe(false);
+
+      // 写入模式:首次写 receipt 允许,不死锁
+      const wrote = finalizePrd(prdPath, []);
+      expect(wrote.can_finalize).toBe(true);
+      expect(wrote.status).toBe('finalized');
+      expect(wrote.wrote_ready_receipt).toBe(true);
+
+      // 写入后 receipt 已存在,check-only 通过
+      const after = finalizePrd(prdPath, [], { checkOnly: true });
+      expect(after.can_finalize).toBe(true);
+      expect(after.blocking_reason_codes).not.toContain('ready_receipt_absent');
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -421,6 +452,9 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'clarification_evidence: asked-owner',
       'can_enter_spec-plan: yes',
       'preflight_sweep_closure: closed',
+      'decision_card_highest_risk_gap: test risk gap',
+      'decision_card_next_action: final-prd',
+      'decision_card_why_no_invention: plan will not invent WHAT',
       `design_source_coverage: ${designCoverage || 'not-needed'}`,
       ...(readinessExtra || []),
       '',
@@ -445,6 +479,7 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'can_enter_spec_plan_undeclared',
       'preflight_sweep_closure_absent',
       'preflight_sweep_closure_blocked',
+      'decision_card_undeclared',
       'design_source_inventory_undeclared',
       'design_source_coverage_undeclared',
       'design_sources_read_undeclared',
@@ -532,6 +567,10 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'clarification_trace_present',
       'core_sections_missing',
       'core_sections_present',
+      'decision_card_highest_risk_gap_present',
+      'decision_card_next_action',
+      'decision_card_present',
+      'decision_card_why_no_invention_present',
       'design_coverage_partial',
       'design_degraded_owner_accepted',
       'design_source_coverage_declared',
@@ -981,6 +1020,9 @@ In scope: test.
 - clarification_evidence: asked-owner
 - can_enter_spec_plan: yes
 - preflight_sweep_closure: closed
+- decision_card_highest_risk_gap: owner 确认持仓接口口径
+- decision_card_next_action: final-prd
+- decision_card_why_no_invention: 三个 load-bearing OQ 已 owner 闭合,plan 无需发明 WHAT
 `;
     const report = buildReport('docs/brainstorms/design-read-prose-requirements.md', prd);
     expect(report.facts.design_sources_read_present).toBe(false);
@@ -1004,5 +1046,176 @@ In scope: test.
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+});
+
+// A: check-prd-artifact.js --stdin 写前 dry-run lint
+// 模型在正式 Write 前先 pipe draft 拿全部 findings,消除"写→Stop hook 拦→修一个→再拦"循环。
+describe('check-prd-artifact --stdin dry-run', () => {
+  const CHECK_SCRIPT = path.join(__dirname, '..', '..', 'skills', 'spec-prd', 'scripts', 'check-prd-artifact.js');
+
+  test('--stdin reads PRD content from stdin and emits all findings at once', () => {
+    const badPrd = `---
+artifact_kind: prd-requirements
+spec_id: stdin-fixture
+---
+
+# Bad
+
+## Summary
+
+缺核心 section 和 readiness 声明。
+`;
+    const result = spawnSync(process.execPath, [CHECK_SCRIPT, 'docs/brainstorms/stdin-fixture-requirements.md', '--stdin'], {
+      input: badPrd,
+      encoding: 'utf8',
+    });
+    expect(result.status).toBe(0);
+    expect(result.stderr).toBe('');
+    const report = JSON.parse(result.stdout);
+    // 一次性暴露全部 blocking codes(写前就能看到,而非被 Stop hook 一个一个拦)
+    expect(report.facts.blocking_reason_codes).toEqual(expect.arrayContaining([
+      'core_section_missing',
+      'write_mode_undeclared',
+      'can_enter_spec_plan_undeclared',
+      'clarification_evidence_undeclared',
+      'preflight_sweep_closure_absent',
+    ]));
+    expect(report.findings.length).toBeGreaterThan(5);
+  });
+
+  test('--stdin on a compliant draft reports zero blocking codes', () => {
+    const goodPrd = `---
+artifact_kind: prd-requirements
+spec_id: stdin-good
+status: draft
+write_mode: checkpoint-prd
+can_enter_spec_plan: no
+clarification_evidence: source-proven-no-ask
+preflight_sweep_closure: closed
+source_inputs:
+  - docs/input.md
+---
+
+# Good
+
+## Summary
+
+合规 draft。
+
+## Change Delta
+
+| item | current | target | delta | evidence |
+| --- | --- | --- | --- | --- |
+
+## Requirements
+
+| id | priority | requirement | rationale/source |
+| --- | --- | --- | --- |
+| R-01 | P0 | test | source |
+
+## Acceptance Examples
+
+| id | covers | example |
+| --- | --- | --- |
+| AE-01 | R-01 | test |
+
+## Scope Boundaries
+
+In scope: test.
+
+## Evidence And Assumptions
+
+| type | item | evidence |
+| --- | --- | --- |
+| confirmed-source | test | source |
+`;
+    const result = spawnSync(process.execPath, [CHECK_SCRIPT, 'docs/brainstorms/stdin-good-requirements.md', '--stdin'], {
+      input: goodPrd,
+      encoding: 'utf8',
+    });
+    expect(result.status).toBe(0);
+    const report = JSON.parse(result.stdout);
+    expect(report.facts.blocking_reason_codes).toEqual([]);
+  });
+});
+
+// Decision Card 三要素 artifact 验证:Phase 1 中间产物从对话外化为可验证字段。
+describe('check-prd-artifact decision_card verification', () => {
+  const baseFinalPrd = `---
+artifact_kind: prd-requirements
+spec_id: dc-fixture
+status: ready-for-planning
+source_inputs:
+  - docs/input.md
+---
+
+# DC Fixture
+
+## Summary
+
+x
+
+## Change Delta
+
+| item | current | target | delta | evidence |
+| --- | --- | --- | --- | --- |
+
+## Requirements
+
+| id | priority | requirement | rationale/source |
+| --- | --- | --- | --- |
+| R-01 | P0 | t | s |
+
+## Acceptance Examples
+
+| id | covers | example |
+| --- | --- | --- |
+| AE-01 | R-01 | t |
+
+## Scope Boundaries
+
+In scope: t.
+
+## Evidence And Assumptions
+
+| type | item | evidence |
+| --- | --- | --- |
+| confirmed-source | t | s |
+
+## Readiness Self-Check
+
+- write_mode: final-prd
+- clarification_evidence: asked-owner
+- can_enter_spec_plan: yes
+- preflight_sweep_closure: closed`;
+
+  test('final-prd missing all decision_card fields → decision_card_undeclared', () => {
+    const report = buildReport('docs/brainstorms/dc-missing-requirements.md', baseFinalPrd);
+    expect(report.facts.blocking_reason_codes).toContain('decision_card_undeclared');
+    expect(report.facts.decision_card_present).toBe(false);
+  });
+
+  test('final-prd with all three decision_card fields passes', () => {
+    const good = baseFinalPrd + '\n- decision_card_highest_risk_gap: owner 接口口径\n- decision_card_next_action: final-prd\n- decision_card_why_no_invention: OQ 已闭合';
+    const report = buildReport('docs/brainstorms/dc-good-requirements.md', good);
+    expect(report.facts.decision_card_present).toBe(true);
+    expect(report.facts.blocking_reason_codes).not.toContain('decision_card_undeclared');
+  });
+
+  test('final-prd with partial decision_card fields still fails', () => {
+    const partial = baseFinalPrd + '\n- decision_card_highest_risk_gap: gap only';
+    const report = buildReport('docs/brainstorms/dc-partial-requirements.md', partial);
+    expect(report.facts.decision_card_present).toBe(false);
+    expect(report.facts.blocking_reason_codes).toContain('decision_card_undeclared');
+  });
+
+  test('checkpoint-prd does NOT require decision_card (still grilling)', () => {
+    const checkpoint = baseFinalPrd
+      .replace('status: ready-for-planning', 'status: checkpoint')
+      .replace('- write_mode: final-prd', '- write_mode: checkpoint-prd')
+      .replace('- can_enter_spec_plan: yes', '- can_enter_spec_plan: no');
+    const report = buildReport('docs/brainstorms/dc-checkpoint-requirements.md', checkpoint);
+    expect(report.facts.blocking_reason_codes).not.toContain('decision_card_undeclared');
   });
 });

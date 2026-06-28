@@ -16,8 +16,20 @@ const {
   writeInstructionBootstrap,
 } = require('../../src/cli/instruction-bootstrap');
 
+const REPO_ROOT = path.join(__dirname, '..', '..');
+
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-bootstrap-'));
+}
+
+function managedBootstrapBlock(content) {
+  const start = content.indexOf(BOOTSTRAP_START);
+  const end = content.indexOf(BOOTSTRAP_END);
+
+  expect(start).not.toBe(-1);
+  expect(end).toBeGreaterThan(start);
+
+  return content.slice(start, end + BOOTSTRAP_END.length);
 }
 
 describe('instruction bootstrap', () => {
@@ -49,6 +61,10 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('何时直接做');
     expect(twice).toContain('如何路由');
     expect(twice).toContain('常见入口锚点');
+    expect(twice).toContain('外部 issue/PR 输入');
+    expect(twice).toContain('issue/PR 是 input surface,不是独立 workflow');
+    expect(twice).toContain('不得为外部 issue/PR 新增专用 public workflow 入口');
+    expect(twice).toContain('也不得把 reporter 命令当 confirmed truth');
     expect(twice).toContain('反合理化红旗');
     expect(twice).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
     expect(twice).toContain('substantial work');
@@ -83,6 +99,7 @@ describe('instruction bootstrap', () => {
     expect(twice).not.toContain('$spec-update` 由用户自主决策升级');
     expect(twice).not.toContain('spec-next');
     expect(twice).not.toContain('spec-guide');
+    expect(twice).not.toContain('spec-intake');
     expect(twice).not.toContain('User Next-Step Guide Mode');
     expect(twice).not.toContain('discovered child repo');
     expect(twice).not.toContain('高级路由');
@@ -117,9 +134,13 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('`.spec-first/governance/**`');
     expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`)');
     expect(updated).toContain('Common entry anchors');
+    expect(updated).toContain('External issue/PR inputs');
+    expect(updated).toContain('issue/PR material is an input surface, not a separate workflow');
+    expect(updated).toContain('do not add an external issue/PR-specific public workflow entrypoint, tracker state, label/comment mutation path, or treat reporter commands as confirmed truth');
     expect(updated).toContain('optimization→`$spec-optimize`');
     expect(updated).not.toContain('priority rules, and red flags');
     expect(updated).not.toContain('Entry map (intent→entrypoint)');
+    expect(updated).not.toContain('spec-intake');
     expect(updated).not.toContain('Claude workflow 入口使用 `/spec:*`');
   });
 
@@ -377,6 +398,22 @@ describe('instruction bootstrap', () => {
     }
   });
 
+  test('checked-in host instruction bootstrap matches the current generator', () => {
+    expect(inspectInstructionBootstrap(REPO_ROOT, getAdapter('claude'))).toEqual({
+      status: 'installed',
+      message: 'managed bootstrap block present',
+    });
+    expect(inspectInstructionBootstrap(REPO_ROOT, getAdapter('codex'))).toEqual({
+      status: 'installed',
+      message: 'managed bootstrap block present',
+    });
+
+    expect(managedBootstrapBlock(fs.readFileSync(path.join(REPO_ROOT, 'CLAUDE.md'), 'utf8')))
+      .toBe(buildBootstrapBlock('claude', 'zh'));
+    expect(managedBootstrapBlock(fs.readFileSync(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8')))
+      .toBe(buildBootstrapBlock('codex', 'zh'));
+  });
+
   test('Codex bootstrap includes best-effort top-level startup version reminder guidance', () => {
     const codexZh = buildBootstrapBlock('codex', 'zh');
     const codexEn = buildBootstrapBlock('codex', 'en');
@@ -426,6 +463,8 @@ describe('instruction bootstrap', () => {
           expect(block).toContain('何时直接做');
           expect(block).toContain('如何路由');
           expect(block).toContain('常见入口锚点');
+          expect(block).toContain('外部 issue/PR 输入');
+          expect(block).toContain('issue/PR 是 input surface,不是独立 workflow');
           expect(block).toContain('反合理化红旗');
           expect(block).toContain('可直接回答、bounded read 或正常执行');
           expect(block).toContain('明确单点低风险小改动');
@@ -435,6 +474,8 @@ describe('instruction bootstrap', () => {
           expect(block).toContain('When to just answer');
           expect(block).toContain('How to route');
           expect(block).toContain('Common entry anchors');
+          expect(block).toContain('External issue/PR inputs');
+          expect(block).toContain('issue/PR material is an input surface, not a separate workflow');
           expect(block).toContain('Anti-rationalization red flags');
           expect(block).toContain('does NOT mean brainstorming-first');
           expect(block).toContain('clearly scoped low-risk small edits');
@@ -445,6 +486,7 @@ describe('instruction bootstrap', () => {
         expect(block).not.toMatch(/1%/);
         expect(block).not.toMatch(/any chance.*must invoke/i);
         expect(block).not.toMatch(/任何可能.*必须/);
+        expect(block).not.toContain('spec-intake');
         // R5: subagent 豁免在场
         expect(block.toLowerCase()).toContain('bounded subagent');
       }
@@ -508,8 +550,8 @@ describe('instruction bootstrap', () => {
       const codex = buildBootstrapBlock('codex', lang);
       // 把入口语法差异归一化后,四段核心语义点应两端都在
       const segmentProbes = lang === 'zh'
-        ? ['何时进入 workflow', '何时直接做', '如何路由', '反合理化红旗', '常见入口锚点', 'bounded subagent']
-        : ['When to enter a workflow', 'When to just answer', 'How to route', 'Anti-rationalization red flags', 'Common entry anchors', 'bounded subagent'];
+        ? ['何时进入 workflow', '何时直接做', '如何路由', '反合理化红旗', '常见入口锚点', '外部 issue/PR 输入', 'bounded subagent']
+        : ['When to enter a workflow', 'When to just answer', 'How to route', 'Anti-rationalization red flags', 'Common entry anchors', 'External issue/PR inputs', 'bounded subagent'];
       for (const probe of segmentProbes) {
         expect(claude).toContain(probe);
         expect(codex).toContain(probe);

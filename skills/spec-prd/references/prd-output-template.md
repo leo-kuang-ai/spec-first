@@ -36,7 +36,7 @@ source_inputs:
 Default path: `docs/brainstorms/YYYY-MM-DD-NNN-<slug>-requirements.md`.
 
 `artifact_kind: prd-requirements` marks a PRD-grade requirements origin that the current host's plan workflow can consume as requirements. Do not create `docs/prds/`.
-`source_inputs` lists original PRD/source/design input files that are locatable inside the target repo; omit only when no original input file is locatable, and record that limitation in readiness. The producer-local Stop hook uses this field to pass `--inputs` into finalize/checker so input-side design-source accounting is actually enforced.
+`source_inputs` lists original PRD/source/design input files that are locatable inside the target repo; omit only when no original input file is locatable, and record that limitation in readiness. The producer-local Stop hook uses this field to pass `--inputs` into finalize/checker so input-side design-source accounting is actually enforced. This field name is a hard contract — the Stop hook reads only `source_inputs:` (or legacy `prd_input:`); alternate names like `origin_docs:` are NOT recognized and cause the hook to extract zero inputs, producing `input_refs_unavailable` + `ready_receipt_stale`. Always use `source_inputs:`.
 
 ## Output Shape
 
@@ -244,6 +244,9 @@ Design-source inventory is mandatory whenever design input exists, even when acc
 write_mode:
 clarification_evidence:
 preflight_sweep_closure: closed | degraded | blocked | missing
+decision_card_highest_risk_gap:
+decision_card_next_action: ask-owner-first | checkpoint-prd | final-prd | route-out
+decision_card_why_no_invention:
 design_source_coverage:
 readiness_verified_by:
 readiness_checker_schema:
@@ -256,6 +259,8 @@ why_not:
 ```
 
 `preflight_sweep_closure` is the compatibility field for Requirement Analysis Gate closure. It must summarize whether the run-local map from materials to requirement understanding, uncertainty/contradiction points, product/design/technical grill decisions, and PRD write targets is closed, degraded, blocked, or missing. Do not add a second persistent analysis schema to the PRD.
+
+`decision_card_*` fields persist the Phase 1 Decision Card (highest_risk_gap / next_action / why_no_invention) into the artifact so Phase 1 entry is machine-verifiable. `write_mode` doubles as the Decision Card's write_mode element (not redeclared). Required when `write_mode=final-prd` or `status=ready-for-planning`; the checker reports `decision_card_undeclared` if any field is missing or empty. `checkpoint-prd` is exempt (still grilling, the card may be incomplete).
 
 The `readiness_verified_*` fields are producer-local machine receipt fields. Do not fill or invent them manually; they are written or confirmed by `skills/spec-prd/scripts/finalize-prd-artifact.js` after `check-prd-artifact.js` reports no producer blocking reasons. If the PRD is still a checkpoint, keep `can_enter_spec_plan: no` and omit the ready receipt.
 

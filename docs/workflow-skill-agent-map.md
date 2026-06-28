@@ -9,7 +9,7 @@ Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowled
 
 | 链路节点 | 对应 Workflow | 说明 |
 |---------|-------------|------|
-| Codebase | `/spec:update`、`/spec:mcp-setup` | 建立运行时基线，修复 runtime drift |
+| Codebase | 终端 `spec-first update`、`/spec:mcp-setup` | 建立运行时基线，修复 runtime drift |
 | Context | direct source reads / `rg` / ast-grep / git diff / tests/logs | 为需求、计划、执行和审查准备可验证的源码与测试证据 |
 | Spec | `/spec:brainstorm`、`/spec:prd`、`/spec:ideate` | 需求探索与 PRD 产出 |
 | Plan | `/spec:plan` | 将需求转化为结构化实施计划 |
@@ -39,7 +39,6 @@ Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowled
 | `/spec:sessions` | spec-sessions | 搜索并综合历史 coding agent 会话，回答关于过去工作的问题 | spec-session-historian |
 | `/spec:slack-research` | spec-slack-research | 搜索 Slack 组织上下文，返回经解读的 research digest | spec-slack-researcher |
 | `/spec:mcp-setup` | spec-mcp-setup | 安装、配置并验证 spec-first 工作流所需宿主运行时，建立就绪基线 | 无 |
-| `/spec:update` | spec-update | 检查 CLI 版本是否最新，运行时资产过期时给出刷新建议 | 无 |
 | `/spec:skill-audit` | spec-skill-audit | 审计 skill 资产的源码质量、触发精度、边界契约与双宿主一致性 | 无 |
 | `/spec:app-consistency-audit` | spec-app-consistency-audit | 对移动 App 的 PRD、Figma、源码、路由、架构边界等做静态一致性审查 | 无（专家判断由 skill-local prompts 承载） |
 | `/spec:release-notes` | spec-release-notes | 总结最近的 spec-first 发布，或带版本引用回答关于某次历史发布的具体问题 | 无（`disable-model-invocation`，纯检索，不自动触发） |

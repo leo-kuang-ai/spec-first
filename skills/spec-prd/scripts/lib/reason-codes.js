@@ -22,6 +22,7 @@ const BLOCKING_REASON_CODES = new Set([
   'can_enter_spec_plan_undeclared',
   'preflight_sweep_closure_absent',
   'preflight_sweep_closure_blocked',
+  'decision_card_undeclared',
   'design_source_inventory_undeclared',
   'design_source_coverage_undeclared',
   'design_sources_read_undeclared',

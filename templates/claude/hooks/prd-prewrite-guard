@@ -103,6 +103,44 @@ if (readyStatus || machineReceipt || (firstWrite && readyIntent) || missingWrite
   if (checkerFacts && Array.isArray(checkerFacts.blocking_reason_codes) && checkerFacts.blocking_reason_codes.length > 0) {
     reasonLines.push('', `checker_blocking_reason_codes: ${checkerFacts.blocking_reason_codes.join(', ')}`);
   }
+  reasonLines.push(
+    '',
+    'Write-before dry-run (recommended): pipe your draft through `node skills/spec-prd/scripts/check-prd-artifact.js docs/brainstorms/<slug>-requirements.md --stdin` BEFORE the durable Write to see ALL findings at once and fix them in one pass instead of one-per-Stop-hook-cycle.',
+    '',
+    'Compliant skeleton to copy verbatim (fill the angle-bracket placeholders, keep every token exact):',
+    '```yaml',
+    '---',
+    'spec_id: <YYYY-MM-DD-NNN-slug>',
+    'artifact_kind: prd-requirements',
+    'target_surface: <App|H5/PC|Admin|Backend/Java|CLI/DevTool|Mixed|Generic>',
+    'status: draft            # never write ready-for-planning on first Write',
+    'evidence_grade: mixed',
+    'created: <YYYY-MM-DD>',
+    'source_inputs:           # HARD CONTRACT — Stop hook reads this; origin_docs/origin_docs are NOT recognized',
+    '  - <path/to/original-input.md>',
+    'write_mode: checkpoint-prd   # checkpoint-prd | final-prd | ask-owner-first | route-out',
+    'can_enter_spec_plan: no      # yes | no',
+    'clarification_evidence: <asked-owner | source-proven-no-ask | headless-degraded-logged>',
+    'preflight_sweep_closure: <closed | degraded | blocked>',
+    'next_owner_question: <one load-bearing question or none>',
+    '---',
+    '',
+    '## Summary',
+    '## Change Delta',
+    '## Requirements',
+    '## Acceptance Examples',
+    '## Scope Boundaries',
+    '## Evidence And Assumptions',
+    '',
+    '## Outstanding Questions   # if present, use canonical headers (aliases include underscored forms):',
+    '| id | question | prd write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
+    '',
+    '## Owner Decision Trace    # required when any OQ uses owner-* disposition; bind each OQ by verbatim question or OQ-id:',
+    '| question | owner_answer | chosen_answer | prd write target | consequence | closure_state |',
+    '| --- | --- | --- | --- | --- | --- |',
+    '```',
+  );
   block(reasonLines.join('\n'));
 }
 

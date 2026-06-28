@@ -37,9 +37,20 @@ const SKILL_PATH = path.join(
   'SKILL.md',
 );
 
+function markdownSection(content, heading) {
+  const lines = content.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === heading);
+  if (start === -1) {
+    throw new Error(`Missing section: ${heading}`);
+  }
+  const end = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
+  return lines.slice(start, end === -1 ? lines.length : end).join('\n');
+}
+
 describe('spec-mcp-setup config template contract', () => {
   test('runtime setup posture keeps deterministic facts separate from conventions', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const setupDoesNot = markdownSection(text, '## Boundaries').split('Setup does not:')[1];
 
     expect(text).toContain('Setup Posture And Project Conventions');
     expect(text).toContain('Explore -> Present -> Decide -> Write');
@@ -49,8 +60,8 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).toContain('Missing local config is not a blocker');
     expect(text).toContain('deterministic existence facts only');
     expect(text).toContain('Setup must not judge whether terminology is correct');
-    expect(text).toContain('treat `.spec-first/config.local.yaml` as team-shared workflow policy');
-    expect(text).toContain('decide issue/PR category, state, scope, accept/reject status, or implementation truth');
+    expect(setupDoesNot).toContain('treat `.spec-first/config.local.yaml` as team-shared workflow policy');
+    expect(setupDoesNot).toContain('decide issue/PR category, state, scope, accept/reject status, or implementation truth');
   });
 
   test('local execution override documents the current verification profile consumer', () => {

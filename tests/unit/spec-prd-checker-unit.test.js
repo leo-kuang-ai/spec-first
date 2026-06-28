@@ -170,6 +170,29 @@ describe('parseHeaderedTable', () => {
     expect(headerMap).toEqual({});
     expect(rows).toEqual([]);
   });
+
+  // 回归:prd_write_target 下划线别名(2026-06-28 日志暴露:模型写下划线版导致 trace 表 0 validRows 雪崩)
+  test('OQ 表 prd_write_target 下划线版别名识别', () => {
+    const table = [
+      '| id | question | prd_write_target | blocks_planning | closure_disposition |',
+      '|----|----------|------------------|-----------------|---------------------|',
+      '| OQ-1 | auth scope? | R-01 permission | yes | owner-answered |',
+    ].join('\n');
+    const { headerMap, rows } = parseHeaderedTable(table, OQ_HEADER_ALIASES);
+    expect(headerMap).toHaveProperty('prd_write_target');
+    expect(rows[0].prd_write_target).toBe('R-01 permission');
+  });
+
+  test('TRACE 表 prd_write_target 下划线版别名识别', () => {
+    const table = [
+      '| question | owner_answer | chosen_answer | prd_write_target | consequence | closure_state |',
+      '|----------|--------------|---------------|-------------------|-------------|----------------|',
+      '| OQ-1 auth | owner said X | X | R-01 | must gate | closed |',
+    ].join('\n');
+    const { headerMap, rows } = parseHeaderedTable(table, TRACE_HEADER_ALIASES);
+    expect(headerMap).toHaveProperty('prd_write_target');
+    expect(rows[0].prd_write_target).toBe('R-01');
+  });
 });
 
 // ────────────────────────────────────────────────────────

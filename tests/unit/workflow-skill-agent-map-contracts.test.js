@@ -40,6 +40,18 @@ describe('workflow-skill-agent-map coverage', () => {
     expect(missing).toEqual([]);
   });
 
+  test('map 不暴露 governance 之外的退役 slash workflow', () => {
+    const mapContent = fs.readFileSync(MAP_PATH, 'utf8');
+    const allowed = new Set(publicWorkflowSkills().map(slashCommandFor));
+    const commands = Array.from(mapContent.matchAll(/`(\/spec:[a-z0-9-]+)`/g), (match) => match[1]);
+    const unexpected = [...new Set(commands)]
+      .filter((command) => !allowed.has(command))
+      .sort((a, b) => a.localeCompare(b));
+
+    expect(unexpected).toEqual([]);
+    expect(mapContent).not.toContain('/spec:update');
+  });
+
   test('回归锚点:此前漏掉的三个 workflow 现已收录', () => {
     const mapContent = fs.readFileSync(MAP_PATH, 'utf8');
     for (const command of ['/spec:compound-refresh', '/spec:release-notes', '/spec:polish-beta']) {

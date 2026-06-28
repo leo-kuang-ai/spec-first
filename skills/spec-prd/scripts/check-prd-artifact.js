@@ -42,7 +42,7 @@ const EVIDENCE_TAGS = [
 const OQ_HEADER_ALIASES = {
   id: ['id', '编号'],
   question: ['question', '问题'],
-  prd_write_target: ['prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
+  prd_write_target: ['prd_write_target', 'prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
   owner_status: ['owner_status', 'owner status', 'owner状态', '澄清状态'],
   blocks_planning: ['blocks_planning', 'blocks planning?', 'blocks planning', '是否阻塞规划', '阻塞规划'],
   closure_disposition: ['closure_disposition', 'disposition', 'closure disposition', '闭合方式', '闭合依据'],
@@ -55,7 +55,7 @@ const TRACE_HEADER_ALIASES = {
   question: ['question', 'decision', '问题', '决策'],
   owner_answer: ['owner_answer', 'owner answer', 'owner_answer/source', 'owner回答', '回答/来源'],
   chosen_answer: ['chosen_answer', 'chosen answer', '采纳答案', '最终答案'],
-  prd_write_target: ['prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
+  prd_write_target: ['prd_write_target', 'prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标'],
   consequence: ['consequence', 'readiness consequence', '影响', '后果'],
   closure_state: ['closure_state', 'closure state', '闭合状态'],
 };
@@ -107,12 +107,14 @@ const MACHINE_READY_FIELDS = new Set([
 ]);
 
 function parseArgs(argv) {
-  const args = { target: null, inputs: [], help: false, error: null };
+  const args = { target: null, inputs: [], stdin: false, help: false, error: null };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--help' || arg === '-h') {
       args.help = true;
       return args;
+    } else if (arg === '--stdin') {
+      args.stdin = true;
     } else if (arg === '--inputs') {
       const value = argv[i + 1];
       if (!value || value.startsWith('--')) {
@@ -909,6 +911,17 @@ function parseStructure(target, text) {
     'closed', 'degraded', 'blocked', 'missing',
   ]);
   const preflightSweepClosureDeclaredValid = Boolean(preflightSweepClosureValue);
+  // Decision Card 三要素(write_mode 复用既有字段,这里只持久化对话独有的三要素):
+  // highest_risk_gap / next_action / why_no_invention。把 Phase 1 中间产物从"对话语义"
+  // 外化为"artifact 可验证事实",防模型压缩 Phase 1 直接到 Write(R12 天花板内可推一步)。
+  const decisionCardHighestRiskGap = hasConcreteFieldBlock(text, 'decision_card_highest_risk_gap');
+  const decisionCardNextAction = extractDeclarationValue(text, 'decision_card_next_action', [
+    'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out',
+  ]);
+  const decisionCardWhyNoInvention = hasConcreteFieldBlock(text, 'decision_card_why_no_invention');
+  const decisionCardPresent = decisionCardHighestRiskGap
+    && Boolean(decisionCardNextAction)
+    && decisionCardWhyNoInvention;
   const designSourceRefsPresent = detectDesignSourceRefs(text);
   const designSourceInventoryDeclared = detectDesignSourceInventory(text);
   const designSourceCoverageDeclared = detectDesignSourceCoverage(text);
@@ -938,6 +951,7 @@ function parseStructure(target, text) {
     clarificationEvidenceDeclaredValid, clarificationEvidenceSubstantive,
     canEnterSpecPlanValue, canEnterSpecPlanDeclaredValid,
     preflightSweepClosureValue, preflightSweepClosureDeclaredValid,
+    decisionCardHighestRiskGap, decisionCardNextAction, decisionCardWhyNoInvention, decisionCardPresent,
     designSourceRefsPresent, designSourceInventoryDeclared, designSourceCoverageDeclared,
     designSourcesReadPresent, designSourcesUnreadPresent,
     needsReadinessDeclarations, prdShaped, writeModeIsFinalPrd, writeModeIsCheckpoint,
@@ -986,6 +1000,10 @@ function computeFacts(structure, inputPaths, options) {
     can_enter_spec_plan: structure.canEnterSpecPlanValue,
     preflight_sweep_closure: structure.preflightSweepClosureValue,
     preflight_sweep_closure_declared_valid: structure.preflightSweepClosureDeclaredValid,
+    decision_card_present: structure.decisionCardPresent,
+    decision_card_highest_risk_gap_present: structure.decisionCardHighestRiskGap,
+    decision_card_next_action: structure.decisionCardNextAction,
+    decision_card_why_no_invention_present: structure.decisionCardWhyNoInvention,
     ready_claim_present: structure.claimsReady,
     ready_receipt_present: structure.readyReceiptPresent,
     ready_receipt_current: readyReceiptCurrent,
@@ -1104,6 +1122,14 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
     && !structure.preflightSweepClosureDeclaredValid) {
     findings.push({ reason_code: 'preflight_sweep_closure_absent' });
   }
+  // Decision Card 三要素:Phase 1 中间产物持久化为 artifact 可验证字段。
+  // 触发条件收窄到 ready 门槛(claimsReady 或 final-prd):checkpoint 允许还在 grill 中,
+  // Decision Card 可能未完全成型,不强制;只有声称 ready/final 时才要求已落地,
+  // 防模型压缩 Phase 1 直接到 Write 后直接 ready(把 Decision Card 留在对话里不可验证)。
+  if ((structure.claimsReady || structure.writeModeIsFinalPrd)
+    && !structure.decisionCardPresent) {
+    findings.push({ reason_code: 'decision_card_undeclared' });
+  }
   // design source findings
   if (structure.designSourceRefsPresent && !structure.designSourceInventoryDeclared) {
     findings.push({ reason_code: 'design_source_inventory_undeclared' });
@@ -1160,7 +1186,8 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     process.stdout.write('check-prd-artifact.js — produce deterministic readiness facts for a PRD artifact.\n');
-    process.stdout.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]...\n');
+    process.stdout.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--stdin]\n');
+    process.stdout.write('  --stdin   read PRD content from stdin instead of <target-prd-path> file (target path still required as a virtual path for path-based checks). Enables write-before-dry-run: pipe a draft through this to see ALL findings at once before the durable Write.\n');
     process.stdout.write('  emits facts JSON on stdout; exit 0 regardless of findings (failures surface as facts.blocking_reason_codes).\n');
     process.exit(0);
   }
@@ -1168,8 +1195,23 @@ function main() {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
     }
-    process.stderr.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]...\n');
+    process.stderr.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--stdin]\n');
     process.exit(2);
+  }
+
+  const emitReport = (targetText) => {
+    const report = buildReport(args.target, targetText, { inputs: args.inputs });
+    process.stdout.write(JSON.stringify(report, null, 2) + '\n');
+  };
+
+  if (args.stdin) {
+    // --stdin: 从 stdin 读 PRD 内容,target 作为虚拟路径(用于 forbidden_prds_path 等路径校验)。
+    // 写前 dry-run: 模型在正式 Write 前先 pipe draft,一次性拿到全部 findings,避免"写→Stop hook 拦→修一个→再拦"循环。
+    let data = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => { data += chunk; });
+    process.stdin.on('end', () => { emitReport(data); });
+    return;
   }
 
   let targetText;
@@ -1180,7 +1222,7 @@ function main() {
     process.exit(2);
   }
 
-  process.stdout.write(JSON.stringify(buildReport(args.target, targetText, { inputs: args.inputs }), null, 2) + '\n');
+  emitReport(targetText);
 }
 
 if (require.main === module) {
