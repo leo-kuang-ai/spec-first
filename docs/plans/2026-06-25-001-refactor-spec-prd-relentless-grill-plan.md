@@ -2,11 +2,20 @@
 spec_id: 2026-06-25-001-spec-prd-relentless-grill
 title: "refactor: spec-prd 完整集成 grill-with-docs relentless 思想"
 type: refactor
-status: active
+status: completed
 created: 2026-06-25
 plan_depth: deep
 target_repo: spec-first
 origin: none (plan-local spec_id; 无 origin requirements doc,身份未继承)
+completed_at: 2026-06-29
+completion_evidence:
+  - "U1 已落地:SKILL.md:135 唯一标题 ### Canonical: 四个合法停点(grep 计数=1);owner_question_progress 仅新增 owner-capped(SKILL.md:124/137);pre_prd_clarification_status 新增兜底值 checkpoint-blocked(SKILL.md:133/139);旧锚点 large input is not permission to skip 已删;grill_depth_state 不存在(负向满足)"
+  - "U2 已落地:grill-with-docs-integration.md 与 domain-language-and-decision-ledger.md 旧止损锚点(Continue this loop only while/Stop rather than interview indefinitely/Continue only while the next question can close or narrow)均已删(grep=0),含 relentless 默认 + 引用 canonical 四停点"
+  - "U3 已落地:evidence-and-topology.md 旧锚点 If the owner-question sequence would become a long form 已删;product-expert-lens.md:44 closure_state 含 owner-capped(与 SKILL owner_question_progress 字段一致)"
+  - "U4 已落地:prd-readiness-lens.md:50 含 checkpoint-blocked 兜底 + owner 未给信号→checkpoint;prd-output-template.md 无 grill_depth_state"
+  - "U5 已落地:契约测试含 canonical 标题唯一性断言(contracts:455/572/636);examples.json 旧锚点 ask-owner-first even for large input 已删;not.toContain 负向断言守护新语义;33 测试全绿"
+  - "U6 已落地:CHANGELOG 含 relentless 记录;fresh-source-eval-2026-06-25-relentless-grill.md 存在;用户手册 22 含 canonical/relentless 措辞"
+  - "验证:npx jest tests/unit/spec-prd-contracts.test.js 33 测试全绿"
 ---
 
 # refactor: spec-prd 完整集成 grill-with-docs relentless 思想

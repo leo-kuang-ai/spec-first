@@ -2,11 +2,19 @@
 spec_id: spec-prd-closure-contract
 title: "feat: spec-prd 前置分块 pressure grill 与 closure contract"
 type: feat
-status: active
+status: completed
 date: 2026-06-25
 plan_depth: deep
 author: leokuang
 target_repo: "."
+completed_at: 2026-06-29
+completion_evidence:
+  - "U0–U5 已实现落盘(CHANGELOG 02:34:51 与 03:40:09 两条)"
+  - "U7 Checker BLOCKING Freeze + Characterization 已落地:spec-prd-finalize.test.js 含 freeze-1(BLOCKING_REASON_CODES 集合相等)/freeze-2(facts key-set freeze)/5 个 characterization fixture/freeze-3(preflight_closure_contradicted 直接断言)"
+  - "U6 Eval Orientation Symmetry 已落地:examples.json 含 nonblocking-oq-with-legal-disposition-ready-accepted case,coverage_tags 含 legal-disposition/anti-over-blocking"
+  - "U8 Stop-Point SSOT Prune + Anti-Drift Lint 已落地:spec-prd-contracts.test.js:3424 含 'spec-prd canonical stop-point SSOT anti-drift lint (U8/R21)' 2 个测试"
+  - "验证: npx jest spec-prd-finalize spec-prd-contracts 67 测试全绿"
+---
 related_plans:
   - docs/plans/2026-06-25-003-feat-spec-prd-stop-hook-and-highrisk-review-gate-plan.md
 referenced_reviews:

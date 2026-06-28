@@ -378,11 +378,11 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 ### 总体结论
 
-> Closeout 状态：本汇总保留原始取证发现，同时标注本次 staged closeout 已处理的项。`docs/workflow-skill-agent-map.md` 中 `/spec:update` / `spec-update` workflow 暴露已修正为终端 `spec-first update` CLI 口径；checked-in `CLAUDE.md` / `AGENTS.md` bootstrap 与 generator 的中文 repo-state faithfulness 测试已补强。
+> Closeout 状态：本汇总保留原始取证发现，同时标注本次 staged closeout 已处理的项。`docs/workflow-skill-agent-map.md` 中 `/spec:update` / `spec-update` stale **盘面已无**（核对确认，Codebase 行已写 `终端 spec-first update`；归因不确定——可能本次 closeout 修正或并发会话修正，详见附录 B P0-1 归因澄清）；checked-in `CLAUDE.md` / `AGENTS.md` bootstrap 与 generator 的中文 repo-state faithfulness 测试已补强（核对确认 `instruction-bootstrap.test.js:401-415` 已 byte-faithful 守护）。
 
 `spec-first` 的 skill 体系已经具备较强的工程化骨架：37 个 source skill 均纳入 governance registry，public workflow / standalone / internal-only 有基本分层；source/runtime 边界、context exclusion、scenario capability、eval fixture contract、reviewer guard coverage 等关键治理面都已存在。当前主要问题不是“缺 workflow”，而是四类质量债：
 
-1. **入口与公共文档漂移曾存在**：原始取证发现 `docs/workflow-skill-agent-map.md` 暴露 `/spec:update`，与当前 CLI-only update 口径冲突；本次 closeout 已修正该入口面，剩余工作是长期保持治理 registry / map 防漂移。
+1. **入口与公共文档漂移曾存在，盘面已无**：原始取证发现 `docs/workflow-skill-agent-map.md` 暴露 `/spec:update`，与当前 CLI-only update 口径冲突；当前盘面已无该 stale（核对确认，归因见附录 B P0-1），剩余工作是长期保持治理 registry / map 防漂移（防回归 test 见 P2）。
 2. **确定性 audit 信号误报率高**：P0/P1 候选里存在明显反证，scanner 需要把 guardrail/prohibition/template placeholder 与真实风险分开。
 3. **eval 覆盖不均衡**：15/37 ready，22/37 missing；高风险 public workflow 中 `spec-mcp-setup`、`spec-optimize`、`spec-compound-refresh` 等优先级高。
 4. **bootstrap/runtime drift 防线已补强一层**：已有 generator tests，本次 closeout 已补 checked-in host docs 与 generator 的中文 repo-state faithfulness 断言；runtime `using-spec-first` drift 仍按 source-first 规则刷新，不手改 generated mirrors。
@@ -399,9 +399,9 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
    - Consumer：host entry docs、SessionStart injection。
    - 验证：聚焦 `tests/unit/instruction-bootstrap.test.js`。
 3. **仍开放**：调整 security/runtime governance scanner，避免把“禁止手改 generated runtime”的说明报成 P0。
-   - Evidence：`spec-compound:85`、`spec-mcp-setup:34`、`provider-tools.json:56` 均是反向说明。
+   - Evidence：`spec-compound:85`、`spec-mcp-setup:34`、`provider-tools.json:56` 均是反向说明；全仓实扫确认这三行恰为仓库仅有的 3 个 P0，三层 negation 对其全部失效（根因 `PROHIBITION_HINTS` 未收录 `does not`/`excludes`/`are not source`，详见附录 B P0-3）。
    - Consumer：`spec-skill-audit` summary、release governance。
-   - 验证：新增 false-positive fixture + `tests/unit/skill-audit-scripts.test.js`。
+   - 验证：扩展 `PROHIBITION_HINTS`/allowlist + 新增 false-positive fixture + `tests/unit/skill-audit-scripts.test.js`，并全仓实扫确认三行 P0 已降级。
 
 #### P1：补高风险 workflow 的语义回归网
 4. 给 `spec-mcp-setup` 增加最小 eval seed。
@@ -478,11 +478,11 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - `skills/spec-work/SKILL.md:158` — "Large" bare-prompt 路由允许用户覆盖 plan 建议而继续， sanctioned 的 plan-while-execute 漂移。
 - **补充优化点（P1）**：plan-only 路径在 intake 记录 `plan_body_hash`，中途 plan body 变化即拒绝继续（对齐 task-pack `source_plan_hash`）。
 
-### D. Review→Knowledge：doc-review 完全无 learning-capture，headless/autofix 静默丢弃
-- `skills/spec-code-review/SKILL.md:852-857` — code-review Stage 6 item 8 "Learning Capture Recommendation" 被显式降级为 advisory，`report-only`/`autofix`/`headless` 模式下**完全抑制**——恰恰是流水线无人值守模式，已解决问题永不沉淀。
-- `skills/spec-doc-review/SKILL.md:43` — doc-review 的 Downstream Consumers **未列 `spec-compound`**，全文无 learning-capture 步骤——最常发现可复用架构教训的 skill 反而零沉淀路径。**这是单一最大 dead-sediment 来源。**
+### D. Review→Knowledge：doc-review 完全无 learning-capture，headless/autofix 沉淀高概率不发生
+- `skills/spec-code-review/SKILL.md:853-857` — code-review Stage 6 item 8 "Learning Capture Recommendation" 被显式降级为 advisory（`:853` 明确 "not a finding, not residual actionable work, not a verdict input, not a merge gate"）；`report-only`/`autofix`/`headless` 模式下**提问被抑制，但 learning-worthy evidence 存在时仍允许至多一行 advisory line**（`:857`）——非初稿所写"完全抑制"，但无人值守模式下沉淀仅靠单行 advisory 触发、无强制步骤，已解决问题高概率不沉淀。
+- `skills/spec-doc-review/SKILL.md:43` — doc-review 的 Downstream Consumers **未列 `spec-compound`**，全文无 learning-capture 步骤（`grep "compound|learning|sediment|capture"` 实扫返回空）——最常发现可复用架构教训的 skill 反而零沉淀路径。**这是单一最大 dead-sediment 来源。**
 - `skills/spec-code-review/SKILL.md:864` — Verdict 与是否捕获 learning 无依赖，merge 不受未沉淀阻塞。
-- **补充优化点（P0，合并入上文知识闭环增强）**：为 `spec-doc-review` 增 Stage-6 等价 "Learning Capture Recommendation"；将 review→compound 至少作为 `downstream-resolver`/`human` 残留可执行项输出，使其在 headless/autofix 模式存活而非被静默丢弃。
+- **补充优化点（P0，合并入上文知识闭环增强）**：为 `spec-doc-review` 增 Stage-6 等价 "Learning Capture Recommendation"；将 review→compound 至少作为 `downstream-resolver`/`human` 残留可执行项输出，使其在 headless/autofix 模式存活而非仅靠 advisory 单行自生自灭。
 
 ### E. compound schema↔corpus 分歧与 validator 空转
 - `skills/spec-compound/references/schema.yaml:71-90` — `component` enum 高度 Rails/app 专属（`rails_model`/`brief_system`/`email_processing`…），而 `docs/solutions/` 实际类目为 `architecture-patterns/conventions/developer-experience/tooling-decisions/workflow-issues`——schema 假设的 bug-track 类目目录（`build-errors/` 等）**在 corpus 中不存在**。
@@ -499,10 +499,10 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - **补充优化点（P1）**：统一召回机制（debug 也走 learnings-researcher 或统一 flat-scan 契约）；standalone work 加 "无 plan-provided learnings 则先 bounded frontmatter scan" 显式步骤；将 discoverability 维护从 compound 内移出至 `spec-first init`/hook，使其不依赖可选的 compound。
 
 ### G. PRD owner-answer fidelity 与 brainstorm gate 无确定性 backstop
-- `skills/spec-prd/check-prd-artifact.js:461-478` — `traceRowBindsOq` 只查 referential 一致（OQ id/问题字串出现在 trace 行），**不查 owner 是否真的回答**；`SKILL.md:196` 承认 owner-answer fidelity 是 producer-side rule、checker 不强制——reversal anti-pattern 不可检测。
-- `check-prd-artifact.js:451-453` — 仅要求 `chosen_answer` 非空，不要求 `owner_answer` 非空/non-`isEmptyish`——"trace 行存在但记录无答案" 的反转形状漏检。
-- `skills/spec-brainstorm/references/requirements-capture.md:215-273` — brainstorm readiness gate **完全 LLM-judged**，无确定性预扫；PRD checker 已有的轻量检查（placeholder/TODO regex、`Resolve Before Planning` 段存在、`spec_id`、R-ID 格式）可移植。
-- `skills/spec-brainstorm/references/handoff.md:27` — 允许把 `Resolve Before Planning` 项 convert 为 decision/assumption/Deferred 后再显示 Plan 选项，**转换未记入文档、不可查**——brainstorm 侧的 "checkpoint-as-escape" 同构漏洞。
+- `skills/spec-prd/check-prd-artifact.js:463-480` — `traceRowBindsOq` 只查 referential 一致（OQ id/问题字串出现在 trace 行），**不查 owner 是否真的回答**；`SKILL.md:196` 承认 owner-answer fidelity 是 producer-side rule、checker 不强制——reversal anti-pattern 不可检测。
+- `check-prd-artifact.js:452-454` — `isValidTraceRow` 要求 `chosen_answer`/`prd_write_target`/`consequence` **三字段同时**非空（非初稿所写"仅 chosen_answer"），但 `owner_answer` **不在校验链**——"trace 行存在但记录无答案" 的反转形状漏检。
+- `skills/spec-brainstorm/references/requirements-capture.md:215-273` — brainstorm readiness gate **完全 LLM-judged**（`:217` 明示 "not a script"）；`:227-231` 虽有 "Pre-scan" 子节（占位符/字面矛盾/prose economy），但由 LLM 阅读执行、非脚本运行，无确定性 gate（初稿"无确定性预扫"漏报该子节存在）；PRD checker 已有的轻量检查（placeholder/TODO regex、`Resolve Before Planning` 段存在、`spec_id`、R-ID 格式）可移植为脚本。
+- `skills/spec-brainstorm/references/handoff.md:26-28` — 允许把 `Resolve Before Planning` 项 convert 为 decision/assumption/Deferred 后再显示 Plan 选项；转换产物（decision/assumption 条目）会写入文档对应段，proceed-at-risk 路径也要求 record（`requirements-capture.md:264`），但**转换事件本身无独立审计痕迹**——无法回溯某 Decision 原为 RBP 转换项（初稿"转换未记入文档、不可查"过强，实为"产物记入、事件不可追溯"），brainstorm 侧的 "checkpoint-as-escape" 同构漏洞。
 - **补充优化点（P1）**：`check-prd-artifact.js` 对 `owner-*` disposition 要求 `owner_answer` 非空；为 brainstorm 加轻量确定性预扫（移植 PRD 模式），并把 convert 写入 `Outstanding Questions` 的 `closure_disposition` 后才允许 menu 重渲。
 
 ### 附录小结：对上文汇总报告的优先级补强
@@ -514,7 +514,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 ## 附录 B：最高杠杆 P0 逐项优化设计
 
-> 本附录对上文「最高杠杆 P0（合并执行）」4 项逐个深度核实真实源码状态、诊断根因、给出优化设计。**核实结论：4 项中有 3 项主体前提失实（P0-1、P0-2 主体、P0-3 主体），仅 P0-4 全部成立。** Spec-First Evolution Architect 必须以可验证事实优先于模型猜测——不在错误前提上"优化"不存在的问题，对真缺口给方案，对误报给纠正。证据均带 `file:line`，可在仓库复验。
+> 本附录对上文「最高杠杆 P0（合并执行）」4 项逐个深度核实真实源码状态、诊断根因、给出优化设计。**核实结论（2026-06-28 元审查校正后）：P0-1 盘面已无 stale（Round 2 取证过时）、P0-2 主体已 byte-faithful 满足（Round 1/8 漏读）、P0-3 主体成立（初稿曾误判失实，已据全仓实扫反转，恢复 P0）、P0-4 三子项成立（4b/4c 有措辞修正）。** Spec-First Evolution Architect 必须以可验证事实优先于模型猜测——不在错误前提上"优化"不存在的问题，对真缺口给方案，对误报给纠正；但"核实"本身也必须落到对具体 case 的实测，而非对机制结构的转述（P0-3 即为反例）。证据均带 `file:line`，可在仓库复验。
 
 ### P0-1 修正 `docs/workflow-skill-agent-map.md` 残留 `/spec:update` stale 入口
 
@@ -559,23 +559,29 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 ### P0-3 audit scanner 把"禁止手改 runtime"说明报成 P0
 
-**真实状态：scanner 已有三层 negation + 6 个 false-positive fixtures，该误报已被处理。**
-- `skills/spec-skill-audit/scripts/lib/security-patterns.js:90-121` `classifyPatternContext`：命中行含 `PROHIBITION_HINTS`（`do not/never/avoid/must not/will not/forbid` + 中文 `禁止/不要/不得/避免/不允许/只建议`）即降级 P3。
-- `scan-instruction-security.js:69-83` `classifyFileContext`：`/references/`、`/evals/`、`/examples/` 路径强制 P3。
-- `scan-instruction-security.js:85-100` `classifySectionContext`：`when not/do not/not to use` 标题降级 P3，但有 `hasExecutableExceptionCue`（`exception/except/unless/if the user insists/例外/除非`）保留原严重度——精确区分"禁止说明"与"禁止但带可执行例外"。
-- `tests/unit/skill-audit-scripts.test.js:636-710,876-909` 已有 6 个 false-positive suppression fixtures，含 "hand-edit generated runtime mirrors" 行断言无 P0。
-- 并发审查报告 Round 3"scanner 缺少 negation/fixture/allowlist 分类""误报反证停留在 LLM 手工层"结论**错误**——三层 negation 已机械落地，非 LLM 手工。
+> **2026-06-28 元审查校正**：本节初稿曾依据"三层 negation 机制存在"推断"对三行边界说明生效"，得出"误报已被处理、Round 3 错误"的结论。经 fresh-source 全仓实扫复核，**该结论方向反转**——三层 negation 对这三行全部失效，三行 P0 仍为 live 误报。本节已据此重写，恢复 Round 3 的 P0 定级。教训：验证"机制存在" ≠ 验证"机制对特定 case 生效"，附录 B 的核实标准自身在此项上未落实。
 
-**真实残留（成立，但 P1 非 P0）**：
-- Markdown link checker 对 `{url}`/`{older_url}` template placeholder 无感知 → `markdown.js:8` `LOCAL_LINK_PATTERN` 把 `{url}` 当本地路径，`fs.existsSync` 假，`lint-skill-structure.js:142-153` 报 P2 `broken_local_link`。`skills/spec-release-notes/SKILL.md` 的 `[Full release notes ->]({url})` 受影响。**P1**。
+**真实状态：三层 negation 机制存在，但对这三行全部失效，三行 P0 仍为 live 误报（P0 保留）。**
+- 经全仓实扫 `scanInstructionSecurity` 复核，当前仓库**仅有 3 个 P0 finding，全部 `runtime_governance`，且正是 Round 3 点名的三行**：`spec-compound/SKILL.md:85`、`spec-mcp-setup/SKILL.md:34`、`spec-mcp-setup/provider-tools.json:56`——无任何 allowlist 豁免，三层 negation 全部返回 `actionable_pattern`（不降级）。
+- `skills/spec-skill-audit/scripts/lib/security-patterns.js:75-121` `classifyPatternContext`：`PROHIBITION_HINTS`（`do not/never/avoid/must not/will not/forbid` + 中文 `禁止/不要/不得/避免/不允许/只建议`）命中即降级 P3。**根因缺口**：三行用的是 `excludes`/`are not source`/`does not`，而 `does not` **不匹配** 正则 `/\bdo not\b/i`（`PROHIBITION_HINTS` 未收录 `excludes`/`are not source`/`does not`）。
+- `scan-instruction-security.js:69-83` `classifyFileContext`：`/references/`、`/evals/`、`/examples/` 路径强制 P3。**对这三行失效**：三文件均不在这三类路径下。
+- `scan-instruction-security.js:85-100` `classifySectionContext`：`when not/do not/not to use` 标题降级 P3（`hasExecutableExceptionCue` 保留原严重度）。**对这三行失效**：相关标题不含这些短语。
+- `tests/unit/skill-audit-scripts.test.js:636-909` 共 6 个相关测试，其中纯 suppression fixture 4 个（含 "hand-edit generated runtime mirrors" 行断言无 P0，断言在 `:708`）。**但这些 fixture 覆盖的是 PROHIBITION_HINTS 已命中的措辞**，未覆盖 `does not`/`excludes`/`are not source` 这类缺口措辞，故三行 P0 漏网。
+- **结论**：Round 3"scanner 缺少能 catch 这类的 negation/fixture/allowlist 分类""误报反证停留在 LLM 手工层"**结论正确**。附录 B 初稿的相反结论**错误**——它只验证"机制存在"未跑实扫，犯了自己批评的同类错误。
+
+**真实残留（成立，P2 非 P1）**：
+- Markdown link checker 对 `{url}`/`{older_url}` template placeholder 无感知 → `markdown.js:8` `LOCAL_LINK_PATTERN` 把 `{url}` 当本地路径；实际 `fs.existsSync` 在 `parse-skill-md.js:33` 判定（`markdown.js:104` 是硬编码 `false`，喂给 `parse-skill-md` 覆盖），`lint-skill-structure.js:145` 报 **P2** `broken_local_link`。经实测对 `spec-release-notes` 产出 **4 个 P2**（`{url}`×2 + `{older_url}`×2，均在代码块/反引号 span 内，因 `extractLocalLinks` 不跳过代码块）。`skills/spec-release-notes/SKILL.md:132/137/202` 的占位（实为 Unicode 箭头 `→` 非初稿所写 ASCII `->`）受影响。**严重度为 P2**（初稿误标 P1）。
 
 **优化设计**：
-- **Goals**：消除 template placeholder 误报；不引入新分类层（三层已够）。
-- **Non-goals**：不重构已健全的 severity 分类。
-- **方案**：`markdown.js` `extractLocalLinks` 增 placeholder 跳过——链接目标匹配 `/^\{[a-z_]+\}$/` 或含 `{...}` template 段时，标记 `templated_placeholder: true` 并跳过 `exists` 判定（不进 broken 队列）。加 fixture：`[x]({url})` 不产 `broken_local_link`。
-- **风险**：低。需确认不漏报真实本地路径误写。
-- **落地**：`skills/spec-skill-audit/scripts/lib/markdown.js` + `tests/unit/skill-audit-scripts.test.js`；验证 `npx jest tests/unit/skill-audit-scripts.test.js`。
-- **结论**：P0-3 主体（runtime governance P0 误报）**已满足，移除**；`{url}` placeholder 误报降为 **P1**。
+- **Goals**：消除三行 runtime governance P0 误报；消除 template placeholder 误报。
+- **Non-goals**：不重构三层 severity 分类主体（结构健全，仅补缺口）。
+- **方案**：
+  1. `security-patterns.js` `PROHIBITION_HINTS` 增补 `does not`/`are not (source)/`excludes`/`not source` 等边界措辞（中英），或新增 `BOUNDARY_HINTS` 分类，命中即降 P3。加 fixture：含 `does not auto-add`/`are not source`/`excludes generated mirrors` 的行不产 P0。
+  2. 或为这三类 generated-runtime 边界文件建 allowlist（`isDetectorOwnSource` 扩展），显式豁免边界说明行。
+  3. `markdown.js` `extractLocalLinks` 增 placeholder 跳过——链接目标匹配 `/^\{[a-z_]+\}$/` 或含 `{...}` template 段时，标记 `templated_placeholder: true` 并跳过 `exists` 判定；且应跳过代码块/反引号 span 内的链接。加 fixture：`[x]({url})` 不产 `broken_local_link`。
+- **风险**：补 `PROHIBITION_HINTS` 需避免把真实禁止性安全指令也降级——应以"边界/否定说明"语境（generated runtime / source-of-truth 段）收紧，而非泛匹配。中。
+- **落地**：`skills/spec-skill-audit/scripts/lib/security-patterns.js` + `skills/spec-skill-audit/scripts/lib/markdown.js` + `tests/unit/skill-audit-scripts.test.js`；验证 `npx jest tests/unit/skill-audit-scripts.test.js` + 全仓实扫确认三行 P0 已降级。
+- **结论**：P0-3 主体（runtime governance P0 误报）**未满足，保留 P0**；`{url}` placeholder 误报**P2**（非初稿所标 P1）。
 
 ### P0-4 handoff 确定性补强（Spec→Plan / Tasks→Work / Review→Knowledge）
 
@@ -601,7 +607,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 #### P0-4b Tasks→Work `semantic_posture`/`dispatch_authorization` 两端复验
 
-**根因**：envelope 声明（`spec-write-tasks/SKILL.md:99-105`）含 `reason_code/next_action/semantic_posture/dispatch_authorization`，但 CLI（`task-pack.js`）只产 `task_pack_validity`/`deterministic_handoff`，其余 LLM 自报；硬规则只守 `deterministic_handoff`。`semantic_posture`（决定能否进 `spec-work-task-pack`）与 `dispatch_authorization`（决定能否链式进 doc-review）两端无 CLI 校验 → `unchecked-existing` 包可被标 `reviewed-existing` 通过执行；standalone 触发可误设 `authorized` 静默链式。
+**根因**：envelope 声明（`spec-write-tasks/SKILL.md:100-105`）含 `reason_code/next_action/semantic_posture/dispatch_authorization`，但 CLI（`task-pack.js`）不产这四个字段（`grep "semantic_posture|dispatch_authorization|reason_code|next_action" src/cli/task-pack.js` 实扫返回空），由 LLM 自报；`deriveValidity`（`task-pack.js:348-360`）仅产 `valid/wrong-chain/stale/unverifiable/invalid`，硬规则只守 `deterministic_handoff`（`SKILL.md:104`）。（注：CLI 另产 `validation` 块/`errors`/`limitations`/`validity_scope` 等确定性字段，初稿"只产 task_pack_validity 与 deterministic_handoff"措辞过窄。）`semantic_posture`（决定能否进 `spec-work-task-pack`）与 `dispatch_authorization`（决定能否链式进 doc-review）两端无 CLI 校验 → `unchecked-existing` 包可被标 `reviewed-existing` 通过执行。`dispatch_authorization: authorized` 可被 LLM 误设而静默链式——注 `execution-handoff-contract.md:75` 明确禁止 standalone skill trigger 作为 authorization，故误设是 LLM 违反 prose 的风险，非源码允许路径；准确表述是"LLM 若违反 :75 prose 可误设 `authorized` 且无确定性拦截"。
 
 **优化设计**：
 - **Goals**：让 envelope 的 routing 字段从 LLM 自报变为 CLI 可证/可拒；Work 侧复验 `semantic_posture`。
@@ -615,15 +621,15 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 #### P0-4c doc-review 增 learning-capture
 
-**根因**：`spec-doc-review/SKILL.md` Downstream Consumers 未列 `spec-compound`，全文无 learning-capture 步骤——最常发现可复用架构/需求教训的 skill 反而零沉淀路径。code-review 已有 Stage 6 item 8 完整三段式可移植。
+**根因**：`spec-doc-review/SKILL.md` Downstream Consumers 未列 `spec-compound`，全文无 learning-capture 步骤（`grep` 实扫返回空）——最常发现可复用架构/需求教训的 skill 反而零沉淀路径。code-review 已有 Stage 6 item 8 完整三段式可移植；code-review 在 headless/autofix 模式仍有"至多一行 advisory"许可（`:857`），doc-review 连这步都没有。
 
 **优化设计**：
-- **Goals**：让 doc-review 在发现可复用教训时输出 learning-capture 建议；headless/autofix 模式下不静默丢弃（至少留一条 advisory 行或残留项）。
+- **Goals**：让 doc-review 在发现可复用教训时输出 learning-capture 建议；headless/autofix 模式下至少留一条 advisory 行或残留项，不静默丢弃。
 - **Non-goals**：不自动跑 `spec-compound`、不写 `docs/solutions/`（与 code-review 一致，保持 user's choice）。
 - **方案**：
   1. `spec-doc-review/SKILL.md` Downstream Consumers 增 `spec-compound`。
   2. 移植 `spec-code-review:853-857` 三段式（Skip silently / Offer neutrally / Lean into）为 doc-review 的 review-output section；doc-review 的"可复用"门槛侧重架构决策/契约/边界教训（而非 code-review 的 finding 模式）。
-  3. headless/autofix 模式：当 learning-worthy evidence 存在时，至少输出一条 advisory 行（对齐 code-review `:857`），而非完全静默——闭合"无人值守模式永不沉淀"。
+  3. headless/autofix 模式：当 learning-worthy evidence 存在时，至少输出一条 advisory 行（对齐 code-review `:857`），而非完全静默——闭合"无人值守模式永不沉淀"。注：code-review 现状已允许 advisory 单行，本项目标是让 doc-review 达到同等基线，而非改 code-review。
 - **风险**：doc-review 与 code-review 的 learning 门槛不同，需按 doc 语境裁剪三段式示例，避免照搬 code 语境。中低。
 - **落地**：`skills/spec-doc-review/SKILL.md` + `evals/`（加 learning-capture trigger case）；验证 fresh-source eval（改了 skill prose 语义，必须 fresh-source eval，见 CLAUDE.md Agent/Skill 变更验证）。
 
@@ -636,11 +642,15 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 | 原 P0 项 | 真实状态 | 处置 |
 | --- | --- | --- |
-| P0-1 map `/spec:update` stale | **已不存在**（盘面已无） | 移除；防回归 test 降 P2 |
-| P0-2 bootstrap faithfulness test | **已存在且 byte-faithful**（`instruction-bootstrap.test.js:392-397` + `instruction-bootstrap.js:65-76`） | 移除主体；3 条细分点降 P1 |
-| P0-3 audit scanner runtime 误报 | **已有三层 negation + 6 fixtures** | 移除主体；`{url}` placeholder 误报降 P1 |
-| P0-4 handoff 确定性（a/b/c） | **三子项全部成立** | 保留 P0，按 4a→4c→4b 执行 |
+| P0-1 map `/spec:update` stale | **盘面已无**（grep 返回空；Round 2 取证过时） | 移除；防回归 test 降 P2。归因澄清见下 |
+| P0-2 bootstrap faithfulness test | **已存在且 byte-faithful**（`instruction-bootstrap.test.js:401-415` + `instruction-bootstrap.js:38-82`） | 移除主体；3 条细分点降 P1 |
+| P0-3 audit scanner runtime 误报 | **三层 negation 存在但对三行失效，P0 仍为 live 误报**（全仓实扫确认） | **保留 P0**；`{url}` placeholder 误报为 P2 |
+| P0-4 handoff 确定性（a/b/c） | **三子项成立，4b/4c 有措辞修正** | 保留 P0，按 4a→4c→4b 执行 |
 
-**核心教训**：审查报告（含本会话前期 subagent 与并发会话 Round 3/8）在 P0-1/P0-2/P0-3 上基于过时状态或漏读源码，产出"优化不存在问题"的风险。Spec-First Evolution Architect 的纠正依据是 `file:line` 源码事实：`grep` 盘面、读 helper 函数体、读 test 断言语义——而非转述 audit 快照。后续 `$spec-work` 接手时，应先按本附录 B 校正后的清单执行，避免在已满足项上浪费工程量。
+**核心教训（双层）**：
+1. 审查报告（含本会话前期 subagent 与并发会话 Round 3/8）在 P0-1/P0-2 上基于过时状态或漏读源码，产出"优化不存在问题"的风险。Spec-First Evolution Architect 的纠正依据是 `file:line` 源码事实：`grep` 盘面、读 helper 函数体、读 test 断言语义——而非转述 audit 快照。
+2. **附录 B 自身同样在 P0-3 上犯了同类错误**：初稿依据"三层 negation 机制存在"就推断"对三行生效"，未跑全仓实扫即称"Round 3 错误、误报已处理"，结论方向反转。验证"机制存在" ≠ 验证"机制对特定 case 生效"——核实必须落到对具体 case 的实测，而非对机制结构的转述。这是本次元审查最重要的方法论修正点。
 
-**真正待执行的 P0**：仅 P0-4（a/b/c）。其余降为 P1/P2 细分点见上文汇总报告与附录 A。
+**真正待执行的 P0**：**P0-3（scanner 误报治理）+ P0-4（a/b/c）**。其余降为 P1/P2 细分点见上文汇总报告与附录 A。初稿所写"仅 P0-4"**不准确**，已校正。
+
+**P0-1 归因澄清**：汇总报告称"本次 closeout 已修正"该 map stale，附录 B 初稿称"推测被并发会话修正或 Round 2 基于更早瞬态"——两者归因不一致。经核对，当前盘面确无 stale（Codebase 行 `:12` 写 `终端 spec-first update、/spec:mcp-setup`，文件 mtime `Jun 28 06:25:17`），但无法从盘面判定是哪一方修正；建议两处统一为"盘面已无 stale，Round 2 取证基于更早瞬态"，避免虚报修正动作。

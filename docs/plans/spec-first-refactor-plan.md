@@ -1,4 +1,16 @@
-# using-spec-first + runtime setup 姿态重构目标架构
+---
+title: "using-spec-first + runtime setup 姿态重构目标架构"
+type: refactor
+status: completed
+date: 2026-06-25
+spec_id: 2026-06-25-spec-first-refactor
+completed_at: 2026-06-29
+completion_evidence:
+  - "Phase 0 已落地:删除独立 external issue/PR 状态机入口;skills/spec-intake 不存在;无 spec:intake/\$spec-intake 入口;无 tracker mutation 实现"
+  - "Phase 1 已落地:using-spec-first/SKILL.md:135 含 ### External Issue / PR Inputs 段(bug→debug/enhancement→prd/PR→code-review/execution-ready→work);bootstrap 含 external issue/PR input-surface boundary;routing-cases.json 14 cases 含 external/issue/PR/tracker 相关"
+  - "Phase 2 已落地:spec-mcp-setup/SKILL.md:50 含 Explore -> Present -> Decide -> Write posture;config-template.yaml 含 verification_profile_path consumer map"
+  - "验证:npx jest using-spec-first-contracts spec-dispatch-boundary-contracts 17 测试全绿"
+---
 
 > 参考蓝本：`skills/skills/engineering/ask-matt` 的 flow map、`skills/skills/engineering/triage` 的 verify-before-work / needs-info / durable handoff 思想，以及 `skills/skills/engineering/setup-matt-pocock-skills` 的 repo-local setup posture。
 > 适配目标：`spec-first` 的 spec-driven workflow harness，而不是 issue tracker triage product。
