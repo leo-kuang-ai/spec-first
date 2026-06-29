@@ -29,11 +29,6 @@ const HOST_RULES = [
     from: '本文件为 Claude Code 在本仓库工作时提供项目级执行指引。',
     to: '本文件为 Codex 和其他 AI agent 在本仓库工作时提供项目级执行指引。',
   },
-  {
-    id: 'bootstrap-hint',
-    from: '下方 managed bootstrap block 只提供 Claude 的启动提醒和入口锚点。',
-    to: '下方 managed bootstrap block 只提供 Codex 和其他 agent host 的启动提醒和入口锚点。',
-  },
 ];
 
 function splitHandwritten(content, file) {

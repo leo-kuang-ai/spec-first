@@ -21,7 +21,7 @@ function fakeClaude(managed = FAKE_MANAGED) {
     '',
     '本文件为 Claude Code 在本仓库工作时提供项目级执行指引。它不是完整角色契约。',
     '',
-    'substantial work 前先判断。完整入口策略由 skills 维护;下方 managed bootstrap block 只提供 Claude 的启动提醒和入口锚点。',
+    'substantial work 前先判断。完整入口策略由 skills 维护。',
     '',
     managed,
   ].join('\n');
@@ -38,7 +38,6 @@ describe('sync-instruction-files derive', () => {
     expect(derived).not.toContain('# CLAUDE.md');
     expect(derived).toContain('本文件为 Codex 和其他 AI agent 在本仓库工作时提供项目级执行指引。');
     expect(derived).not.toContain('本文件为 Claude Code 在本仓库工作时提供项目级执行指引。');
-    expect(derived).toContain('只提供 Codex 和其他 agent host 的启动提醒和入口锚点。');
     expect(derived).toContain('从 CLAUDE.md 自动派生');
   });
 

@@ -22,10 +22,13 @@
 - 工程落地能力
 - 用户研发效率与质量
 - 可复用的工程知识沉淀
+- harness 价值的可采纳性、可外部验证性与表达可信度
 
 核心判断问题：
 
 > 这次改动是否让 AI coding 从一次性对话，进一步走向可治理、可验证、可复用、可沉淀的工程闭环？
+
+能力建设 ≠ 已兑现使命：除了问「这是否让 harness 更强」，还要问「这是否让 harness 的价值更可被目标用户与决策者识别、试用、评估」。
 
 ## 核心哲学
 
@@ -45,6 +48,8 @@ Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 可信证据优先于自动化便利，清晰边界优先于功能完整，可验证事实优先于模型猜测，用户真实研发增益优先于架构炫技。`preview-first` 优先于 `silent write`，`source-first` 优先于 runtime patch。
 
+禁止：让脚本做语义决策；让 LLM 伪造确定性校验；用刚性状态图规定 workflow 路径；把本可确定性强制的不变量退化为「全凭 LLM 自觉」；把 advisory facts 当 confirmed truth；让 provider 内部实现泄漏成 workflow contract；把 internal helper 暴露成用户入口；把历史 docs 当作当前 runtime contract；把 transcript 中的声明（「我已完成 X」）当作 outcome 证据。
+
 ## 职责边界
 
 Scripts 和 tools 负责确定性工作：
@@ -62,6 +67,10 @@ LLM 和 agents 负责语义判断：
 
 不要让脚本模拟架构判断、业务优先级、review 结论或语义范围。不要让 LLM 假装执行过确定性校验，也不要编造命令结果。Advisory facts 不是 confirmed truth。
 
+Gate 原则是 **gate the exits, not the thinking**：硬卡出口与副作用，不硬卡推理。硬 gate（确定性可判定，不通过即阻断 / 不可 close）只放五类：mutation（写删文件、改 host runtime、跑危险命令）、verification（声明完成 / 测试通过 / 修复必须有 confirmed evidence）、source/runtime（禁止把 generated runtime mirror 当 source 修）、handoff（跨 workflow 或 context-reset 的 artifact 必须带 summary、source refs、freshness、limitations）、knowledge promotion（只有 verified、可复用、带 invalidation condition 的经验进入 durable knowledge）。其余如需求是否明确、计划是否合理、任务拆分粒度、review finding 是否成立、root cause 是否被证据支持，留给 LLM 语义判断，不脚本化、不画死状态图。缺 runtime 强制能力时，verification / handoff / knowledge-promotion gate 降级为响亮约定，必须显式声明未强制及原因，不得静默放行或伪造已硬强制。
+
+Artifact 是 workflow 留下的证据或产物，必须标注类型并据此对待：advisory（输入线索，不等于 confirmed truth）、confirmed（有验证依据）、generated、degraded。
+
 ## 系统边界
 
 `spec-first` 应成为 workflow harness、project intelligence layer、skill/agent/tool coordination layer、spec/plan/task/review/knowledge 的结构化连接层，以及 AI coding 的证据闭环。
@@ -69,6 +78,8 @@ LLM 和 agents 负责语义判断：
 `spec-first` 不应成为 prompt collection、agent collection、强状态机、中心化流程引擎、复杂规则引擎、无边界脚本堆，或替代 LLM 判断的硬编码专家系统。
 
 ast-grep、browser tooling 和其他 MCP providers 是外部或辅助能力。Downstream workflows 应消费 source refs、direct evidence、readiness facts、degraded-mode status 和 reason_code，不应依赖 provider 内部实现细节。
+
+宿主 primitive（subagent、in-loop review、skills、MCP、plan mode、session resume、hooks、agent team 原生协调）正在商品化。新增能力前先问：这是否在重建宿主即将免费提供的能力？价值应上移到宿主不拥有的层——跨宿主证据/验证/知识闭环、source/runtime 同源纪律、治理外显——差异化锚点优先放在 standards-native（AGENTS.md / SKILL.md / MCP 兼容）。
 
 ## Source 与 Runtime
 
@@ -142,12 +153,6 @@ Generated runtime assets 包括：
 - 只有在解释非显然行为时才添加注释。
 - 避免无关重构、speculative fallback、一次性抽象。
 
-## Workflow 入口治理
-
-substantial work 前，先判断是否应进入公开 spec-first workflow。明确单点、低风险的小代码/文案/config 修正可直接执行，但仍遵守 CHANGELOG、最窄验证和 source/runtime 边界；一旦范围、风险、根因或架构/contract/governance 影响不清晰，重新路由。完整入口策略由 `skills/using-spec-first/SKILL.md` 维护；下方 managed bootstrap block 只提供 Claude 的启动提醒和入口锚点。
-
-本仓库的 prompt/workflow/contract/governance/skill/agent prose、runtime delivery 与架构改动通常走当前 host 的 work workflow；明确单点低风险的普通代码/文案修正可直接做。具体文档审查走 doc-review；bug/失败走 debug；setup/update/runtime repair 走 mcp-setup 或 update。不要把 brainstorm workflow 当作默认入口，也不要把 internal helper skills 暴露为用户入口。
-
 ## 任务分级
 
 根据任务大小调整审查和验证强度：
@@ -157,6 +162,8 @@ substantial work 前，先判断是否应进入公开 spec-first workflow。明�
 - 大型任务：新增 skill 或 agent 体系、CLI 重构、provider/readiness 协议变更、source-of-truth 变更、runtime generation 变更、核心 workflow 变更、删除/迁移。必须明确 goals/non-goals、artifact contracts、failure modes、migration strategy、test plan、downstream consumer checks，并审查是否过度设计。
 
 遵循 80/20 原则：用最小 durable mechanism 解决高频、高价值、真实研发问题。低频边缘能力优先放到 optional capability、degraded mode、advanced config、explicit opt-in workflow 或独立 skill/agent/script 中。
+
+标注为 aspirational / degraded / 待数据积累 是诚实降级，不是免责声明。能力一旦机制就位，就负有向兑现推进的义务：要么有明确的数据积累/激活路径，要么显式记录为何暂缓及重估条件。禁止把「机制就位」当作终态长期搁置。新增 aspirational 能力时，必须同时回答它如何、在什么条件下从 aspirational 变 confirmed。
 
 ## Agent 与 Skill 变更验证
 
