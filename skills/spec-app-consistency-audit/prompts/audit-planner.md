@@ -35,7 +35,7 @@
 
 ## 规划边界
 
-- Scripts prepare facts；你负责语义选择专家。
+- Scripts enforce deterministic invariants and prepare facts；你负责确定性地板之上的语义专家选择。
 - `selected_experts` 是你的判断，不是脚本硬规则。
 - `skipped_experts` 必须写清缺失的 evidence、能力不可用或不启用原因。
 - `audit-plan` 不确认 issue，不改变 contract_status，不生成 finding。

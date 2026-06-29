@@ -388,4 +388,16 @@ describe('spec-work host entrypoint contract', () => {
     expect(text).toContain('something the user can immediately run or approve');
     expect(text).toContain('do not give a menu of every possible workflow');
   });
+
+  test('task-pack evidence recheck does not delegate semantic quality to CLI', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    // spec-work must require evidence recheck after deterministic validation
+    expect(text).toContain('deterministic identity, freshness, and structure checks are necessary but not sufficient');
+    expect(text).toContain('reviewed-existing');
+    expect(text).toContain('unchecked-existing');
+    // CLI must not judge semantic sufficiency
+    expect(text).not.toContain('CLI proves semantic');
+    expect(text).not.toContain('validator certifies semantic');
+  });
 });

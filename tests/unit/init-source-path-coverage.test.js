@@ -66,7 +66,9 @@ describe('init source path coverage', () => {
     expect(codexAssets.commands).toEqual([]);
 
     for (const command of commands) {
-      expect(fs.existsSync(path.join(REPO_ROOT, 'templates/claude/commands/spec', command.filename))).toBe(true);
+      const hasTemplate = fs.existsSync(path.join(REPO_ROOT, 'templates/droid/commands/spec', command.filename));
+      const hasSkillSource = fs.existsSync(path.join(REPO_ROOT, 'skills', command.skill, 'SKILL.md'));
+      expect(hasTemplate || hasSkillSource).toBe(true);
       expect(claudeAssets.workflowSkills).toContain(command.skill);
       expect(codexAssets.workflowSkills).toContain(command.skill);
     }

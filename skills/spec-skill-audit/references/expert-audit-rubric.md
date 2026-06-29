@@ -4,7 +4,7 @@ Use deterministic reports as evidence, not as final judgment.
 
 ## Core Principle
 
-Scripts prepare facts. The LLM decides whether those facts imply a real quality issue.
+Scripts enforce mechanically decidable invariants and prepare facts. The LLM decides whether those facts imply a real quality issue above that floor.
 
 ## Skill Authoring Quality Rule
 

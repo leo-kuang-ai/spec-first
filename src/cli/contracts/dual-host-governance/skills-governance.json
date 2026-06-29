@@ -345,12 +345,12 @@
     },
     {
       "skill_name": "spec-write-tasks",
-      "entry_surface": "standalone_skill",
-      "command_name": null,
+      "entry_surface": "workflow_command",
+      "command_name": "write-tasks",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "skill",
+        "claude": "command",
         "codex": "skill"
       }
     },

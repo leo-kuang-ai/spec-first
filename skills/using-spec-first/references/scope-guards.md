@@ -30,6 +30,25 @@ These are not substantial work:
 - showing command output or answering a narrow "where is X used?" question without edits
 - clearly scoped, single-point, low-risk code/prose/config edits such as a typo, comment, constant, or local single-function fix, provided the root cause and target file are clear and no architecture, contract, governance, runtime delivery, multi-file, or sensitive-surface judgment is needed
 
+## Sensitive Surfaces
+
+A **sensitive surface** is any area where an edit's blast radius, reversibility cost, or governance weight exceeds an ordinary local change — so the change is substantial work even when the diff looks small. Do not rationalize a sensitive-surface change as "non-sensitive" just because it touches few lines.
+
+Sensitive surfaces include:
+
+- **Architecture / contracts:** source-of-truth schemas, `src/cli/contracts/**`, public CLI/JSON shapes, cross-module interfaces, or anything downstream consumers depend on.
+- **Governance / routing:** entry-routing prose, red flags, `skills-governance.json`, bootstrap blocks, host instruction managed slices.
+- **Runtime delivery:** generated mirror generation logic, `init`/`doctor`/`clean` behavior, source→runtime projection.
+- **Security / safety:** auth, credential handling, secret-deny patterns, security scanners, destructive command paths.
+- **Multi-file / wide blast radius:** changes that ripple across many files, or whose rollback is coupled.
+
+Examples:
+
+- Sensitive (route, do not treat as small): editing `routing-red-flags.md` route targets, changing a task-pack validator field, adjusting `skills-governance.json`, modifying a security scanner pattern.
+- Not sensitive (clearly scoped small edit may proceed directly): fixing a typo in a doc paragraph, correcting a comment, renaming a local variable inside one function, adjusting a single non-contract constant.
+
+When in doubt, treat the surface as sensitive and route rather than editing directly.
+
 ## Lightweight Direct Outcomes
 
 `using-spec-first` has valid non-workflow outcomes. When the current request is lightweight, answer directly or perform a bounded read instead of creating a public workflow artifact.

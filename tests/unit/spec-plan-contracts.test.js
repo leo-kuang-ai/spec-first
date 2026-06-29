@@ -501,6 +501,23 @@ describe('spec_id planning contract', () => {
     expect(text).toContain('Use a new `spec_id` only when deliberately creating a new spec chain outside the deepening path');
   });
 
+  test('origin_grade is visible in plan frontmatter and non-blocking for brainstorm-grade origins', () => {
+    const flow = fs.readFileSync(PLANNING_FLOW_PATH, 'utf8');
+    const template = fs.readFileSync(PLAN_TEMPLATE_PATH, 'utf8');
+
+    // planning-flow must distinguish PRD-grade vs brainstorm-grade and record origin_grade
+    expect(flow).toContain('origin_grade: prd');
+    expect(flow).toContain('origin_grade: brainstorm');
+    expect(flow).toContain('origin_grade: legacy');
+    // brainstorm-grade must remain valid — not blocked
+    expect(flow).toContain('valid direct planning input');
+    expect(flow).not.toContain('reject brainstorm-grade');
+    // plan template must expose origin_grade as a frontmatter field
+    expect(template).toContain('origin_grade:');
+    // origin_grade is advisory, not a gate
+    expect(template).toMatch(/origin_grade.*not a gate/);
+  });
+
   test('handoff work entrypoint remains host-neutral', () => {
     const text = fs.readFileSync(PLAN_HANDOFF_PATH, 'utf8');
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
@@ -530,7 +547,7 @@ describe('spec_id planning contract', () => {
     expect(combined).toContain('**Compile task pack with `spec-write-tasks`** - Recommended when source plan structure shows high execution complexity');
     expect(combined).toContain('many implementation units, declared `Files`, dependency chains, cross-module surfaces, broad verification spread, or `plan_depth: deep`');
     expect(combined).toContain('this reduces single-run context load, broad review scope, and coupled rollback cost');
-    expect(handoff).toContain('Load the standalone `spec-write-tasks` skill with the plan path.');
+    expect(handoff).toContain('Invoke the `spec-write-tasks` workflow with the plan path.');
     expect(handoff).toContain('If it writes an executable task pack with matching `spec_id` and verifiable `source_plan_hash`');
     expect(handoff).toContain('when it resolves to `review-task-pack`, surface the copy-ready current-host doc-review invocation');
     expect(handoff).toContain('unless the invoking parent workflow or user explicitly authorized that single bounded continuation');

@@ -124,6 +124,15 @@ function collectFiles(config = loadConfig()) {
       continue;
     }
 
+    // scanRoot 可以是目录(递归 walk)或单个文件(如 CLAUDE.md/AGENTS.md host 入口文档)
+    const stat = fs.statSync(absoluteRoot);
+    if (stat.isFile()) {
+      if (config.markdownExtensions.includes(path.extname(absoluteRoot))) {
+        files.push(absoluteRoot);
+      }
+      continue;
+    }
+
     walk(absoluteRoot, (filePath) => {
       if (config.markdownExtensions.includes(path.extname(filePath))) {
         files.push(filePath);

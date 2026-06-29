@@ -1,9 +1,11 @@
 'use strict';
 
 // U1: reason-codes 分类法模块单元测试。
-// 锁定分类器对全 30 码的真值表 + 三个子集 ⊆ BLOCKING 不变量 + 子集两两不相交。
+// 锁定分类器语义真值表 + 三个子集 ⊆ BLOCKING 不变量 + 子集两两不相交。
 // 这是迁移后的护栏:closure-blocker 子集从内联数组改为派生分类器,
 // 若子集成员错配会静默改变 preflight_closure_contradicted 触发条件,本测试护栏之。
+// BLOCKING_REASON_CODES 整集 freeze 由 spec-prd-finalize.test.js (U7/R20) 负责;
+// 本模块不重复锁数量,避免每次合法增码都在两处同步。
 
 const {
   BLOCKING_REASON_CODES,
@@ -87,10 +89,6 @@ describe('reason-codes 子集不变量', () => {
     receipt.forEach((c) => expect(closure).not.toContain(c));
     exempt.forEach((c) => expect(closure).not.toContain(c));
     exempt.forEach((c) => expect(receipt).not.toContain(c));
-  });
-
-  test('BLOCKING_REASON_CODES 规模为 30(防迁移丢码)', () => {
-    expect(BLOCKING_REASON_CODES.size).toBe(30);
   });
 
   test('CLOSURE_BLOCKER 子集规模为 8(与前述内联数组一致)', () => {

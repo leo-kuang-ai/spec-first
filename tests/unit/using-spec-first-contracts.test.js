@@ -453,4 +453,46 @@ describe('using-spec-first contracts', () => {
     expect(dispatchBoundaries).toContain('record `dispatch_authorization_missing` and make the opt-in path user-visible');
     expect(dispatchBoundaries).toContain('$spec-doc-review` means the document-review workflow');
   });
+
+  // R-05: 红旗不得含反转 skill 名 bug-report，真实名是 report-bug
+  test('routing red flags use the real report-bug skill name, not the reversed bug-report', () => {
+    const routingRedFlags = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'routing-red-flags.md',
+    ));
+
+    expect(routingRedFlags).toContain('report-bug helpers');
+    expect(routingRedFlags).not.toContain('bug-report');
+  });
+
+  // R-07: 红旗 route target 不得用裸名 update/setup，应指向明确入口
+  test('routing red flags route target uses explicit setup entrypoints, not bare names', () => {
+    const routingRedFlags = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'routing-red-flags.md',
+    ));
+
+    expect(routingRedFlags).toContain('`spec-first update`');
+    expect(routingRedFlags).toContain('`/spec:mcp-setup`');
+    expect(routingRedFlags).not.toContain('Route to `update` or `setup` first');
+  });
+
+  // R-06: sensitive surfaces 必须在 scope-guards.md 有定义与举例
+  test('sensitive surfaces are defined with examples in scope-guards', () => {
+    const scopeGuards = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'scope-guards.md',
+    ));
+    const routingRedFlags = read(path.join(
+      REPO_ROOT, 'skills', 'using-spec-first', 'references', 'routing-red-flags.md',
+    ));
+
+    // 定义段存在
+    expect(scopeGuards).toContain('## Sensitive Surfaces');
+    expect(scopeGuards).toContain('A **sensitive surface** is any area where');
+    // 含分类与举例
+    expect(scopeGuards).toContain('Architecture / contracts');
+    expect(scopeGuards).toContain('Governance / routing');
+    expect(scopeGuards).toContain('Runtime delivery');
+    expect(scopeGuards).toMatch(/Not sensitive/);
+    // 红旗引用定义而非重复
+    expect(routingRedFlags).toContain('defined in `scope-guards.md`');
+  });
 });

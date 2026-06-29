@@ -56,6 +56,17 @@
       "source_note": "current source/runtime governance rule: AGENTS.md and thin governance contract",
       "id": "runtime-mirror-confusion-is-high-risk",
       "coverage_tags": ["boundary", "failure"]
+    },
+    {
+      "name": "learning-capture recommendation is advisory and non-gating",
+      "user_intent": "spec-doc-review 在 headless 模式发现可复用的 source/runtime 边界教训。",
+      "expected_posture": "输出至多一行 advisory 行，指向 spec-compound，包含 learning candidate、证据路径、建议动作和用户选择记录方式。不自动运行 spec-compound，不自动写 docs/solutions/，不把 learning capture 作为 verdict input 或 review gate。",
+      "boundary_note": "learning capture 永远不应成为阻断 review 完成的 gate，也不应在任何模式（interactive、headless、safe_auto）下自动执行 compound。",
+      "negative_signal": "自动运行 spec-compound 或把 learning-capture recommendation 当作 P0/P1 finding 或 merge gate。",
+      "context_snippets": ["Learning Capture Recommendation", "at most one advisory line", "Do not automatically run"],
+      "source_note": "R4 / AE-04 — learning-capture advisory path",
+      "id": "learning-capture-advisory-non-gating",
+      "coverage_tags": ["boundary", "learning-capture"]
     }
   ],
   "source_refs": ["skills/spec-doc-review/SKILL.md"],

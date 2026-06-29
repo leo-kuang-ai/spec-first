@@ -45,7 +45,15 @@ Before asking planning questions, search `docs/brainstorms/` for files matching 
 - It was created within the last 30 days; use judgment to override if the document is clearly still relevant or clearly stale
 - It appears to cover the same user problem or scope
 
-If multiple source documents match, ask which one to use using the platform's blocking question tool when available. Otherwise, present numbered options in chat and wait for the user's reply before proceeding.
+**Origin grade:** For each candidate, read minimal frontmatter to classify its origin grade:
+
+- `artifact_kind: prd-requirements` with a ready receipt (`can_enter_spec_plan: yes`) → **PRD-grade**. Label it clearly when presenting options and record `origin_grade: prd` in the produced plan frontmatter.
+- No `artifact_kind`, brainstorm-only frontmatter, or any other kind → **brainstorm-grade**. Record `origin_grade: brainstorm` in the plan frontmatter. Brainstorm-grade is a valid direct planning input; do not reject or block it.
+- Legacy documents without `spec_id` or `artifact_kind` → record `origin_grade: legacy` in the plan frontmatter.
+
+When both PRD-grade and brainstorm-grade candidates match the same topic, prefer the PRD-grade candidate and note its higher evidence strength. When no PRD-grade candidate exists, plan from the brainstorm-grade candidate directly.
+
+If multiple source documents match, ask which one to use using the platform's blocking question tool when available. Otherwise, present numbered options in chat — labeling each with its origin grade — and wait for the user's reply before proceeding.
 
 ### 0.3 Use the Source Document as Primary Input
 

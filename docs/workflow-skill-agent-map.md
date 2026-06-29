@@ -13,7 +13,7 @@ Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowled
 | Context | direct source reads / `rg` / ast-grep / git diff / tests/logs | 为需求、计划、执行和审查准备可验证的源码与测试证据 |
 | Spec | `/spec:brainstorm`、`/spec:prd`、`/spec:ideate` | 需求探索与 PRD 产出 |
 | Plan | `/spec:plan` | 将需求转化为结构化实施计划 |
-| Tasks | `spec-write-tasks` | 将计划编译为可执行任务包（standalone） |
+| Tasks | `/spec:write-tasks` | 将计划编译为可执行任务包（可选派生层） |
 | Code | `/spec:work` | 系统化执行开发任务 |
 | Review | `/spec:code-review`、`/spec:doc-review` | 多 persona 并行审查代码与文档 |
 | Knowledge | `/spec:compound`、`/spec:sessions` | 沉淀可复用工程知识到 docs/solutions/ |
@@ -28,7 +28,7 @@ Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowled
 | `/spec:prd` | spec-prd | 将增量需求或粗糙 PRD 转化为规范需求文档，供 spec-plan 消费 | 无 |
 | `/spec:ideate` | spec-ideate | 进入 brainstorm 前发散生成候选想法并批判性筛选，产出带排名的 ideation artifact | spec-learnings-researcher、spec-web-researcher（默认）；spec-issue-intelligence-analyst（用户引用 issue tracker 时）；spec-slack-researcher（opt-in） |
 | `/spec:plan` | spec-plan | 为多步骤任务创建结构化实施计划，或对现有计划做深化审查 | spec-repo-research-analyst、spec-learnings-researcher、spec-spec-flow-analyzer（条件）；spec-slack-researcher（opt-in）；spec-best-practices-researcher、spec-framework-docs-researcher（外部研究有价值时） |
-| `spec-write-tasks` | spec-write-tasks | 将已定稿的 spec-plan 编译为派生任务包，或验证现有任务包完整性 | 无 |
+| `/spec:write-tasks` | spec-write-tasks | 将已定稿的 spec-plan 编译为派生任务包，或验证现有任务包完整性 | 无 |
 | `/spec:work` | spec-work | 接收任务包或计划，系统化执行开发工作，保证质量交付 | spec-figma-design-sync（UI 工作按需） |
 | `/spec:code-review` | spec-code-review | 多 persona 并行代码审查，置信度门控，合并去重，可选自动修复 | spec-correctness-reviewer、spec-testing-reviewer、spec-maintainability-reviewer、spec-project-standards-reviewer、spec-agent-native-reviewer、spec-learnings-researcher（默认核心）；spec-security-reviewer、spec-performance-reviewer、spec-api-contract-reviewer、spec-data-migrations-reviewer、spec-reliability-reviewer、spec-adversarial-reviewer、spec-cli-readiness-reviewer、spec-cli-agent-readiness-reviewer、spec-previous-comments-reviewer（条件 cross-cutting）；spec-dhh-rails-reviewer、spec-kieran-rails-reviewer、spec-kieran-python-reviewer、spec-kieran-typescript-reviewer、spec-julik-frontend-races-reviewer、spec-swift-ios-reviewer（stack-specific 条件）；spec-schema-drift-detector、spec-deployment-verification-agent（含迁移文件时） |
 | `/spec:doc-review` | spec-doc-review | 多 persona 并行文档审查，发现一致性、可行性、范围、安全等问题，可选自动修复 | spec-coherence-reviewer、spec-feasibility-reviewer（always-on）；spec-product-lens-reviewer、spec-design-lens-reviewer、spec-security-lens-reviewer、spec-scope-guardian-reviewer、spec-adversarial-document-reviewer（条件激活） |

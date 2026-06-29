@@ -2,7 +2,7 @@
 
 `context-request.v1` 和 `context-bundle.v1` 是 `spec-first` 的轻量上下文包合同。它们用于把当前任务需要的 related paths、artifact summaries、evidence paths 和 full-read triggers 放进一个可审查 envelope 中。
 
-这不是中心化 Context Router，也不是 workflow 状态机。脚本只准备确定性路径、预算和 reason；LLM 仍决定哪些上下文足以支持当前 plan、work、review 或 compound 判断。
+这不是中心化 Context Router，也不是 workflow 状态机。脚本只强制可机械判定的不变量并准备确定性路径、预算和 reason；LLM 仍决定这些上下文是否足以支持当前 plan、work、review 或 compound 判断。
 
 它是 AI Coding Harness 的 Context Harness 传递层；目录级 Harness map 见 `docs/contracts/ai-coding-harness.md`。
 

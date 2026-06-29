@@ -87,9 +87,41 @@ const PROHIBITION_HINTS = [
   /只建议/,
 ];
 
+// 边界说明词：声明路径"不是"source 或"排除"这些路径
+// 仅在当前行不含"动词直接指向 runtime 路径"时降级，防止混合行误降
+const BOUNDARY_HINTS = [
+  /\bare not\b/i,
+  /\bdoes not\b/i,
+  /\bexcludes?\b/i,
+  /\bnot source\b/i,
+  /\bnot owned\b/i,
+];
+
+// 写入动词直接指向 runtime 路径（动词在前→路径在后）。
+// 只守 verb-before-path 形态:这是真实危险写入指令的常见形态（"edit .claude/x"、"overwrite .codex/y"）。
+// 不扩展到 path-before-verb 双向匹配——因为 runtime 边界 prose 普遍是 "path ... are not source.
+// If scripts change, update source first" 形态（路径在前、动词在后但动词宾语是 source 而非 runtime path），
+// 双向匹配会把这类合法边界说明误判为 actionable，重新打破 R-01 的核心降级目标。
+// 取舍:宁可漏掉罕见的 path-before-verb 危险指令（仍可被其他 dangerous pattern 或 review 捕获），
+// 也不重新淹没高频边界 prose。
+const DIRECT_WRITE_TO_RUNTIME = new RegExp(
+  `${EN_RUNTIME_WRITE_VERB_PATTERN}[^\\n]*${RUNTIME_PATH_PATTERN}`,
+  'i'
+);
+
 function classifyPatternContext(line) {
   const text = String(line || '');
+
   if (PROHIBITION_HINTS.some((hint) => hint.test(text))) {
+    return {
+      context: 'prohibited_pattern',
+      severityOverride: 'P3',
+      confidence: 'medium',
+    };
+  }
+
+  // 边界说明词仅在行内无"写入动词直接指向 runtime 路径"时降级，防止混合行误降
+  if (BOUNDARY_HINTS.some((hint) => hint.test(text)) && !DIRECT_WRITE_TO_RUNTIME.test(text)) {
     return {
       context: 'prohibited_pattern',
       severityOverride: 'P3',
@@ -123,4 +155,5 @@ function classifyPatternContext(line) {
 module.exports = {
   classifyPatternContext,
   DANGEROUS_PATTERNS,
+  BOUNDARY_HINTS,
 };

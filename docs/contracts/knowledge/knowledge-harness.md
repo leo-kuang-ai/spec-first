@@ -6,7 +6,7 @@
 
 - 让 `Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge` 的最后一环可发现、可回源、可失效。
 - 把 context budget、artifact summary、docs/solutions recall 和 verified promotion 放到明确的 source/runtime/provider 边界内。
-- 保持 Scripts prepare deterministic facts、LLM workflows decide semantic meaning：脚本只准备路径、budget、reason code 和校验事实；LLM 判断是否相关、是否需展开、是否可确认。
+- 保持 scripts enforce deterministic invariants、scripts prepare facts、LLM workflows decide semantic adequacy above that floor：脚本强制可机械判定的不变量并准备路径、budget、reason code 和校验事实；LLM 判断是否相关、是否需展开、是否可确认。
 
 ## 非目标
 

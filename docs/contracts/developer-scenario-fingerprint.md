@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Scenario fingerprints are deterministic advisory facts that describe the developer workspace shape before downstream workflows decide what direct evidence is enough. Scripts prepare these facts; LLM workflows decide routing, fallback, and risk posture.
+Scenario fingerprints are deterministic advisory facts that describe the developer workspace shape before downstream workflows decide what direct evidence is enough. Setup scripts enforce schema/path invariants and prepare these facts; LLM workflows decide routing, fallback, and risk posture above that floor.
 
 Fingerprints are not gates, not approvals, and not external-tool internals. They describe workspace/developer context, not repository-wide evidence authority.
 

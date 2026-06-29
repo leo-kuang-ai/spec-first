@@ -29,4 +29,25 @@ describe('project review docs contracts', () => {
       }
     }
   });
+
+  // R-37: README 必须有审查索引与 active recommendations 指针,且最新审查在索引中在场。
+  test('review README carries an index and active-recommendations pointer with the latest review present', () => {
+    const readmePath = path.join(PROJECT_REVIEW_DOCS_ROOT, 'README.md');
+    const readme = fs.readFileSync(readmePath, 'utf8');
+
+    // active recommendations 指针段在场
+    expect(readme).toContain('Active Recommendations');
+    // 审查索引段在场
+    expect(readme).toContain('审查索引');
+
+    // 最新审查文档(按文件名日期排序的最大者)必须出现在 README 索引中
+    const reviewFiles = fs.readdirSync(PROJECT_REVIEW_DOCS_ROOT)
+      .filter((name) => name.endsWith('.md') && name !== 'README.md' && /^\d{4}-\d{2}-\d{2}/.test(name))
+      .sort();
+    const latest = reviewFiles[reviewFiles.length - 1];
+    expect(latest).toBeDefined();
+    // 索引以链接形式引用最新审查(去掉 .md 后缀的链接 target)
+    const latestLinkTarget = `(${latest})`;
+    expect(readme).toContain(latestLinkTarget);
+  });
 });

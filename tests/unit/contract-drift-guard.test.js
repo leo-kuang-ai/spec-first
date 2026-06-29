@@ -421,9 +421,16 @@ function validateWorkflowCommandParity({
 
   const expectedSet = new Set(expectedCommands);
   const templateSet = new Set(templateCommands);
+  const commandToSkill = Object.fromEntries(
+    workflowRecords.filter((r) => r.command_name).map((r) => [r.command_name, r.skill_name])
+  );
   for (const command of [...expectedSet].sort((a, b) => a.localeCompare(b))) {
     if (!templateSet.has(command)) {
-      errors.push({ reason: 'missing_claude_command_template', command });
+      const skillName = commandToSkill[command];
+      const skillMdPath = skillName && path.join(REPO_ROOT, 'skills', skillName, 'SKILL.md');
+      if (!skillMdPath || !fs.existsSync(skillMdPath)) {
+        errors.push({ reason: 'missing_claude_command_template', command });
+      }
     }
   }
   for (const command of [...templateSet].sort((a, b) => a.localeCompare(b))) {

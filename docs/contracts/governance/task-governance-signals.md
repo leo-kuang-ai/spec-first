@@ -49,7 +49,7 @@ Cross-contract note: `collection_status` deliberately shares the `unavailable` v
 
 The JSON schema in `task-governance-signals.schema.json` is the canonical field definition. Other docs may describe consumption, but must not redefine field shape.
 
-The contract intentionally has no `score` and no numeric `confidence`. Scripts prepare facts; the LLM decides plan depth.
+The contract intentionally has no `score` and no numeric `confidence`. Scripts enforce schema/shape invariants and expose facts; the LLM decides plan-depth adequacy above that floor.
 
 ## Consumers
 

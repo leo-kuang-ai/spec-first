@@ -40,7 +40,7 @@ Detect mode and document type, select reviewer personas, dispatch with bounded p
 
 ### Downstream Consumers
 
-`spec-plan`, `spec-work`, task-pack validation/rebuild decisions, human document owners, and code-review handoffs when document findings imply implementation risk.
+`spec-plan`, `spec-work`, task-pack validation/rebuild decisions, human document owners, code-review handoffs when document findings imply implementation risk, and `spec-compound` when accepted review findings become reusable knowledge.
 
 ## Scenario Capability
 
@@ -284,6 +284,20 @@ Before dispatch, read `references/decision-primer.md` and build `{decision_prime
 After all dispatched agents return, read `references/synthesis-and-presentation.md` for the synthesis pipeline (validate, anchor-based gate, dedup, cross-persona agreement promotion, resolve contradictions, auto-promotion, route by three tiers with FYI subsection), `safe_auto` fix application, headless-envelope output, and the handoff to the routing question.
 
 For the four-option routing question and per-finding walk-through (interactive mode), read `references/walkthrough.md`. For the bulk-action preview used by Auto-resolve with best judgment, Append-to-Open-Questions, and walk-through `Auto-resolve with best judgment on the rest`, read `references/bulk-preview.md`. Do not load these files before agent dispatch completes.
+
+### Learning Capture Recommendation
+
+After synthesis and presentation, decide whether the current review produced a reusable lesson about document structure, architecture, contracts, handoff boundaries, or review heuristics. This recommendation is advisory only: it is not a finding, not residual actionable work, not a verdict input, not an autofix item, and not a review gate.
+
+Use a three-tier judgment:
+
+- **Skip silently** for mechanical copy edits, one-off wording fixes, or non-generalizable findings. If the lesson cannot be stated in one sentence, skip rather than offer.
+- **Offer neutrally** when the lesson can be stated in one sentence — a repeated document-scope boundary, reusable contract clarification, handoff lesson, or source/runtime boundary finding worth remembering.
+- **Lean into the offer** when the same lesson appears across 3+ findings, or reveals a wrong assumption about a shared contract, workflow, or scope boundary.
+
+When offering, phrase it as the user's choice to run the current host's `spec-compound` entrypoint with a brief context hint. Include the candidate lesson, evidence path, suggested action, and how the user's choice should be recorded.
+
+In headless and report-only paths, include at most one advisory line when learning-worthy evidence exists — never ask a question. Do not automatically run `spec-compound`, do not write `docs/solutions/`, and do not make learning capture a verdict input or gate in any path including headless and `safe_auto`.
 
 ---
 

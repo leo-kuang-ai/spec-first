@@ -14,6 +14,7 @@ const {
   parseHeaderedTable,
   OQ_HEADER_ALIASES,
   TRACE_HEADER_ALIASES,
+  WHAT_TOUCHING_KEYWORDS,
 } = require('../../skills/spec-prd/scripts/check-prd-artifact');
 
 describe('looksLikeCheckableRef', () => {
@@ -284,5 +285,54 @@ describe('gateReadyClaims', () => {
     const oq = makeOqAnalysis(['open_oq_without_owner_closure']);
     const findings = gateReadyClaims(baseFacts({ preflight_sweep_closure: 'closed' }), oq);
     expect(findings.map((f) => f.reason_code)).toContain('preflight_closure_contradicted');
+  });
+});
+
+// 冻结契约 content freeze:OQ/Trace header alias 表与 how-pushdown 词表的完整内容。
+// 注释声称"扩展须加 fixture",本测试把这个承诺变成可执行断言。
+// 变更任何别名或关键词时必须同步更新此处,防止静默漂移。
+describe('header alias 表与 WHAT_TOUCHING_KEYWORDS content freeze', () => {
+  test('OQ_HEADER_ALIASES canonical keys 集合不变', () => {
+    expect(Object.keys(OQ_HEADER_ALIASES).sort()).toEqual([
+      'blocks_planning', 'closure_disposition', 'closure_state',
+      'id', 'owner_status', 'planning_would_invent_what',
+      'prd_write_target', 'question', 'recommended_default',
+    ]);
+  });
+
+  test('OQ_HEADER_ALIASES 各 key 别名表内容不变', () => {
+    expect(OQ_HEADER_ALIASES.id).toEqual(['id', '编号']);
+    expect(OQ_HEADER_ALIASES.question).toEqual(['question', '问题']);
+    expect(OQ_HEADER_ALIASES.prd_write_target).toEqual(['prd_write_target', 'prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标']);
+    expect(OQ_HEADER_ALIASES.owner_status).toEqual(['owner_status', 'owner status', 'owner状态', '澄清状态']);
+    expect(OQ_HEADER_ALIASES.blocks_planning).toEqual(['blocks_planning', 'blocks planning?', 'blocks planning', '是否阻塞规划', '阻塞规划']);
+    expect(OQ_HEADER_ALIASES.closure_disposition).toEqual(['closure_disposition', 'disposition', 'closure disposition', '闭合方式', '闭合依据']);
+    expect(OQ_HEADER_ALIASES.planning_would_invent_what).toEqual(['planning_would_invent_what', 'planning would invent what?', 'planning would invent what', '是否会发明what', '会否发明what']);
+    expect(OQ_HEADER_ALIASES.closure_state).toEqual(['closure_state', 'closure state', '闭合状态']);
+    expect(OQ_HEADER_ALIASES.recommended_default).toEqual(['recommended_default', 'recommended default', 'deferred_reason', 'deferred reason', '推荐默认', '延后原因', '默认/延后原因']);
+  });
+
+  test('TRACE_HEADER_ALIASES canonical keys 集合不变', () => {
+    expect(Object.keys(TRACE_HEADER_ALIASES).sort()).toEqual([
+      'chosen_answer', 'closure_state', 'consequence',
+      'owner_answer', 'prd_write_target', 'question',
+    ]);
+  });
+
+  test('TRACE_HEADER_ALIASES 各 key 别名表内容不变', () => {
+    expect(TRACE_HEADER_ALIASES.question).toEqual(['question', 'decision', '问题', '决策']);
+    expect(TRACE_HEADER_ALIASES.owner_answer).toEqual(['owner_answer', 'owner answer', 'owner_answer/source', 'owner回答', '回答/来源']);
+    expect(TRACE_HEADER_ALIASES.chosen_answer).toEqual(['chosen_answer', 'chosen answer', '采纳答案', '最终答案']);
+    expect(TRACE_HEADER_ALIASES.prd_write_target).toEqual(['prd_write_target', 'prd write target', 'write target', 'prd写入目标', '需求写入目标', '写入目标']);
+    expect(TRACE_HEADER_ALIASES.consequence).toEqual(['consequence', 'readiness consequence', '影响', '后果']);
+    expect(TRACE_HEADER_ALIASES.closure_state).toEqual(['closure_state', 'closure state', '闭合状态']);
+  });
+
+  test('WHAT_TOUCHING_KEYWORDS 词表内容不变(how-pushdown 误分类冻结契约)', () => {
+    expect(WHAT_TOUCHING_KEYWORDS).toEqual([
+      'interface', '接口', 'availability', '可用性', 'permission', '权限',
+      'scope', '范围', 'source-of-truth', '数据权威', 'fallback', '降级',
+      'analytics', '埋点', '指标',
+    ]);
   });
 });

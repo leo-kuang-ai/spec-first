@@ -74,6 +74,43 @@ describe('task pack hash and validation', () => {
     }));
   });
 
+  test('valid task pack includes reason_code: task_pack_validated', () => {
+    const result = validateTaskPack(VALID_TASK_PACK, { repoRoot: REPO_ROOT });
+
+    expect(result.reason_code).toBe('task_pack_validated');
+  });
+
+  test('stale task pack reports reason_code: stale_hash', () => {
+    const tmp = copyFixtureProject();
+    try {
+      fs.appendFileSync(path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/source-plan.md'), '\nChanged after task compilation.\n');
+      const result = validateTaskPack(path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md'), { repoRoot: tmp });
+
+      expect(result.reason_code).toBe('stale_hash');
+      expect(result.task_pack_validity).toBe('stale');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('evidence metadata field with non-object value fails shape-check', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const packPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      const content = fs.readFileSync(packPath, 'utf8');
+      const updated = content.replace(
+        '"stop_if": "Validation requires judging task splitting quality."',
+        '"stop_if": "Validation requires judging task splitting quality.", "semantic_posture_evidence": "not-an-object"'
+      );
+      fs.writeFileSync(packPath, updated);
+      const result = validateTaskPack(packPath, { repoRoot: tmp });
+
+      expect(result.errors.some((e) => e.code && e.code.includes('semantic-posture-evidence-invalid'))).toBe(true);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   test('stale task pack is rejected', () => {
     const tmp = copyFixtureProject();
     try {

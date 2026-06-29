@@ -104,7 +104,9 @@ describe('prompt examples baseline contracts', () => {
     expect(payload.skill).toBe('using-spec-first');
     expect(Array.isArray(payload.cases)).toBe(true);
     expect(payload.cases.length).toBeGreaterThanOrEqual(5);
-    expect(payload.cases.length).toBeLessThanOrEqual(14);
+    // R-11: 上限留 breathing margin。当前 14 条;上限设 20 仍防无限膨胀,
+    // 但补 routing case 时不再触顶破测。
+    expect(payload.cases.length).toBeLessThanOrEqual(20);
     expect(skillPrompt).toContain('skills/using-spec-first/evals/routing-cases.json');
     expect(skillPrompt).toContain('not a deterministic router');
     expect(skillPrompt).toContain('External issue or PR material is an input surface, not a separate public workflow.');

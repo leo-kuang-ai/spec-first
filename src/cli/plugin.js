@@ -124,7 +124,8 @@ function buildPluginManifestFromSources() {
 
       const filename = `${record.command_name}.md`;
       const templatePath = path.join(REPO_ROOT, SOURCE_DIRECTORIES.commands, filename);
-      const metadata = readCommandTemplateMetadata(templatePath, record.command_name);
+      const skillSourcePath = path.join(REPO_ROOT, SOURCE_DIRECTORIES.skills, record.skill_name, 'SKILL.md');
+      const metadata = readCommandTemplateMetadata(templatePath, record.command_name, skillSourcePath);
 
       return {
         name: record.command_name,
@@ -155,19 +156,24 @@ function readJsonFile(filePath, label) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-function readCommandTemplateMetadata(templatePath, commandName) {
-  if (!fs.existsSync(templatePath)) {
+function readCommandTemplateMetadata(templatePath, commandName, skillSourcePath) {
+  const sourcePath = fs.existsSync(templatePath) ? templatePath
+    : (skillSourcePath && fs.existsSync(skillSourcePath)) ? skillSourcePath
+    : null;
+
+  if (!sourcePath) {
     throw new Error(`Bundled workflow command template not found for "${commandName}": ${templatePath}`);
   }
 
-  const { frontmatter } = splitMarkdownFrontmatter(fs.readFileSync(templatePath, 'utf8'));
+  const { frontmatter } = splitMarkdownFrontmatter(fs.readFileSync(sourcePath, 'utf8'));
   const fields = parseSimpleFrontmatterFields(frontmatter);
 
   if (typeof fields.description !== 'string' || fields.description.length === 0) {
     throw new Error(`Bundled workflow command template "${commandName}" is missing description frontmatter.`);
   }
   if (typeof fields['argument-hint'] !== 'string') {
-    throw new Error(`Bundled workflow command template "${commandName}" is missing argument-hint frontmatter.`);
+    // SKILL.md fallback: allow missing argument-hint, default to empty string
+    fields['argument-hint'] = '';
   }
 
   return fields;
@@ -554,7 +560,19 @@ function readBundledCommandTemplate(commandName) {
     throw new Error(`Unknown bundled command template: ${commandName}`);
   }
 
-  return fs.readFileSync(path.join(getBundledPath('commands'), command.filename), 'utf8');
+  const templatePath = path.join(getBundledPath('commands'), command.filename);
+  if (fs.existsSync(templatePath)) {
+    return fs.readFileSync(templatePath, 'utf8');
+  }
+
+  // 无独立模板文件时，用 SKILL.md 内容（frontmatter 已在 buildPluginManifestFromSources 验证）
+  const skillPath = path.join(getBundledPath('skills'), command.skill, 'SKILL.md');
+  if (fs.existsSync(skillPath)) {
+    return fs.readFileSync(skillPath, 'utf8');
+  }
+
+  // 最后回退：生成最小 frontmatter
+  return `---\ndescription: ${JSON.stringify(command.description)}\nargument-hint: ${JSON.stringify(command.argumentHint)}\n---\n`;
 }
 
 function readBundledSkillSource(skillName) {

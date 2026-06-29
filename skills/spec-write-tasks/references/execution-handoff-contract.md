@@ -63,6 +63,10 @@ Copy `deterministic_handoff` and each `validation` field from the CLI JSON outpu
 
 `next_action: spec-work-task-pack` is allowed only when `deterministic_handoff: true` and `semantic_posture` is `generated-this-run` or `reviewed-existing`. `deterministic_handoff` proves identity, freshness, and structure only; it does not prove semantic task quality.
 
+`semantic_posture: reviewed-existing` must carry evidence metadata or a verifiable review-outcome reference. A bare `reviewed-existing` claim without current evidence metadata is not sufficient for `next_action: spec-work-task-pack`; treat it as `unchecked-existing` instead. `semantic_posture: generated-this-run` with a current-run hash is sufficient without a separate evidence object.
+
+`dispatch_authorization: authorized` must carry a bounded continuation reference or doc-review outcome reference. If absent, report `dispatch_authorization: missing` rather than proceeding to `spec-work-task-pack`.
+
 ## High-Risk Review Handoff
 
 Use `next_action: review-task-pack` as the decisive handoff recommendation for high-risk task packs.

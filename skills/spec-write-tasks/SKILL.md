@@ -102,6 +102,8 @@ Required posture:
 - run `spec-first tasks hash <plan-path>` when computing or comparing `source_plan_hash`;
 - never self-report `deterministic_handoff: true` without CLI JSON evidence;
 - allow `next_action: spec-work-task-pack` only for valid deterministic handoff plus semantic posture `generated-this-run` or `reviewed-existing`.
+- for `semantic_posture: reviewed-existing`, the envelope must carry evidence metadata or a verifiable review-outcome reference; a bare `reviewed-existing` claim without current evidence is not eligible for `next_action: spec-work-task-pack`.
+- for `dispatch_authorization: authorized`, the envelope must carry a bounded continuation reference or doc-review outcome reference; absent that, report `dispatch_authorization: missing`.
 
 High-risk packs return `next_action: review-task-pack` with one reason and a copy-ready current-host doc-review invocation. Do not auto-dispatch review unless the explicit bounded continuation conditions in [Execution Handoff Contract](references/execution-handoff-contract.md) are met.
 

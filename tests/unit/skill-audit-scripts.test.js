@@ -553,6 +553,100 @@ describe('spec-skill-audit scripts', () => {
 	    ]));
 	  });
 
+  test('markdown link checker skips {url} placeholders and code-block links but keeps real broken links (R-40)', () => {
+    write(path.join(repoRoot, 'skills', 'link-placeholder', 'SKILL.md'), [
+      '---',
+      'name: link-placeholder',
+      'description: Audit markdown link checker placeholder and code-block handling.',
+      '---',
+      '',
+      '# Link Placeholder',
+      '',
+      'See the [full release notes →]({url}) and [older]({older_url}).',
+      '',
+      'A real broken link: [missing doc](./does-not-exist.md).',
+      '',
+      '```md',
+      '[example link](./inside-code-block.md)',
+      '```',
+      '',
+    ].join('\n'));
+
+    const inventory = collectSkillFacts({ repoRoot });
+    const findings = lintSkillStructure(inventory);
+    const brokenLinks = findings.filter(
+      (f) => f.category === 'broken_local_link' && f.skill_id === 'link-placeholder',
+    );
+    const brokenTargets = brokenLinks.map((f) => f.evidence[0].excerpt);
+
+    // placeholder 与代码块内链接不报
+    expect(brokenTargets.some((t) => t.includes('{url}'))).toBe(false);
+    expect(brokenTargets.some((t) => t.includes('{older_url}'))).toBe(false);
+    expect(brokenTargets.some((t) => t.includes('inside-code-block'))).toBe(false);
+    // 真实本地 broken link 仍报
+    expect(brokenTargets.some((t) => t.includes('does-not-exist.md'))).toBe(true);
+  });
+
+  test('section lint downgrades missing_section severity for internal_only skills (R-25)', () => {
+    // 合成 inventory:同一缺 section 的 skill,分别带 internal_only 与 workflow_command entry_surface。
+    const baseSkill = (id) => ({
+      skill_id: id,
+      skill_file: `skills/${id}/SKILL.md`,
+      source_path: `skills/${id}`,
+      has_skill_md: true,
+      frontmatter: { name: id },
+      sections: [], // 全缺 section
+      has_scripts: false,
+      has_references: false,
+      has_examples: false,
+      local_links: [],
+    });
+    const inventory = {
+      repo_root: repoRoot,
+      skills: [baseSkill('internal-helper'), baseSkill('public-flow')],
+    };
+    const entrySurfaceMap = new Map([
+      ['internal-helper', 'internal_only'],
+      ['public-flow', 'workflow_command'],
+    ]);
+
+    const findings = lintSkillStructure(inventory, { entrySurfaceMap });
+    const missingFor = (id, title) => findings.find(
+      (f) => f.category === 'missing_section' && f.skill_id === id && f.title === `Missing ${title} section`,
+    );
+
+    // When To Use 原 P1:internal_only 降为 P2,public workflow 保持 P1
+    expect(missingFor('internal-helper', 'When To Use').severity).toBe('P2');
+    expect(missingFor('public-flow', 'When To Use').severity).toBe('P1');
+    // Purpose 原 P2:internal_only 降为 P3,public workflow 保持 P2
+    expect(missingFor('internal-helper', 'Purpose').severity).toBe('P3');
+    expect(missingFor('public-flow', 'Purpose').severity).toBe('P2');
+  });
+
+  test('section lint stays conservative (no downgrade) when entry_surface is unknown (R-25)', () => {
+    const inventory = {
+      repo_root: repoRoot,
+      skills: [{
+        skill_id: 'unknown-surface',
+        skill_file: 'skills/unknown-surface/SKILL.md',
+        source_path: 'skills/unknown-surface',
+        has_skill_md: true,
+        frontmatter: { name: 'unknown-surface' },
+        sections: [],
+        has_scripts: false,
+        has_references: false,
+        has_examples: false,
+        local_links: [],
+      }],
+    };
+    // 空 map:未知 entry_surface 不降级
+    const findings = lintSkillStructure(inventory, { entrySurfaceMap: new Map() });
+    const whenToUse = findings.find(
+      (f) => f.category === 'missing_section' && f.title === 'Missing When To Use section',
+    );
+    expect(whenToUse.severity).toBe('P1');
+  });
+
   test('allows governed internal skill frontmatter runtime aliases', () => {
     write(path.join(repoRoot, 'skills', 'spec-dhh-rails-style', 'SKILL.md'), [
       '---',
@@ -707,6 +801,75 @@ describe('spec-skill-audit scripts', () => {
 
     expect(runtimeFindings.some((finding) => finding.severity === 'P0')).toBe(false);
     expect(runtimeFindings.some((finding) => finding.evidence[0].excerpt.includes('spec-update'))).toBe(false);
+  });
+
+  test('downgrades boundary-exclusion statements about generated-runtime paths to non-P0', () => {
+    // 已知误报模式：边界说明含 "are not source" / "excludes" + runtime 路径 + write 动词
+    write(path.join(repoRoot, 'skills', 'boundary-exclusion', 'SKILL.md'), [
+      '---',
+      'name: boundary-exclusion',
+      'description: Skill with boundary prose declaring what generated mirrors are not.',
+      '---',
+      '',
+      '## Runtime Context Exclusion',
+      '',
+      'Generated runtime mirrors under `.claude/`, `.codex/`, and `.agents/skills/` are not source. If setup prose or scripts change, update source first and use `spec-first init` only for runtime regeneration.',
+      '',
+      'Ordinary context excludes `.claude/**`, `.codex/**`, and `.agents/skills/**` by default.',
+      '',
+      'Provider-owned output does not auto-add, commit, or promote generated runtime paths.',
+      '',
+    ].join('\n'));
+
+    const findings = scanInstructionSecurity({
+      repoRoot,
+      inventory: { skills: [{ skill_id: 'boundary-exclusion', source_path: 'skills/boundary-exclusion' }] },
+    });
+    const runtimeFindings = findings.filter((f) => f.category === 'runtime_governance');
+
+    expect(runtimeFindings.some((f) => f.severity === 'P0')).toBe(false);
+  });
+
+  test('preserves P0 for direct instruction to edit generated-runtime paths without boundary context', () => {
+    write(path.join(repoRoot, 'skills', 'direct-runtime-edit', 'SKILL.md'), [
+      '---',
+      'name: direct-runtime-edit',
+      'description: Skill that directly instructs editing runtime mirrors.',
+      '---',
+      '',
+      '## Workflow',
+      '',
+      'Edit `.claude/commands/spec/update.md` directly to patch the command.',
+      '',
+    ].join('\n'));
+
+    const findings = scanInstructionSecurity({
+      repoRoot,
+      inventory: { skills: [{ skill_id: 'direct-runtime-edit', source_path: 'skills/direct-runtime-edit' }] },
+    });
+
+    expect(findings.some((f) => f.category === 'runtime_governance' && f.severity === 'P0')).toBe(true);
+  });
+
+  test('preserves P0 when boundary hint and direct write instruction coexist in same line', () => {
+    write(path.join(repoRoot, 'skills', 'mixed-boundary-edit', 'SKILL.md'), [
+      '---',
+      'name: mixed-boundary-edit',
+      'description: Skill with mixed boundary and write instruction.',
+      '---',
+      '',
+      '## Workflow',
+      '',
+      'This skill excludes `.claude/` from context reads; edit `.claude/CLAUDE.md` to update configuration.',
+      '',
+    ].join('\n'));
+
+    const findings = scanInstructionSecurity({
+      repoRoot,
+      inventory: { skills: [{ skill_id: 'mixed-boundary-edit', source_path: 'skills/mixed-boundary-edit' }] },
+    });
+
+    expect(findings.some((f) => f.category === 'runtime_governance' && f.severity === 'P0')).toBe(true);
   });
 
 	  test('does not classify process.env reads as .env file access', () => {

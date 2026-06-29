@@ -1,0 +1,40 @@
+{
+  "schema_version": "spec-first.workflow-eval-fixtures.v1",
+  "skill": "spec-compound-refresh",
+  "description": "Examples-as-context for spec-compound-refresh trigger, boundary, and knowledge-promotion judgment coverage. They are not a deterministic router or an auto-promotion gate.",
+  "source_refs": [
+    "skills/spec-compound-refresh/SKILL.md",
+    "docs/contracts/knowledge/knowledge-harness.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "refresh-stale-learning-trigger",
+      "input": "A docs/solutions learning references a file and flag that no longer exist; refresh the durable knowledge.",
+      "coverage_tags": ["trigger"],
+      "expected_outcome": "Re-validate the learning against current source/test evidence, update or invalidate it, and rerun the validator after consolidating or replacing entries."
+    },
+    {
+      "id": "refresh-not-initial-capture-boundary",
+      "input": "Capture a brand-new lesson from the work I just finished.",
+      "coverage_tags": ["boundary", "compound-routing"],
+      "expected_outcome": "Initial capture of a new lesson belongs to spec-compound; refresh re-validates and maintains existing durable knowledge.",
+      "boundary_note": "compound-refresh maintains existing learnings; first-time capture is spec-compound.",
+      "forbidden_signals": ["refresh-as-initial-capture"]
+    },
+    {
+      "id": "review-report-promotion-unverified",
+      "input": "Promote the recommendations from this review report straight into docs/solutions as durable learnings.",
+      "coverage_tags": ["boundary", "promotion-judgment"],
+      "expected_outcome": "A review-report candidate must be evidence-verified and reproducible before promotion; surface it as a user-owned promotion decision, not an automatic write.",
+      "boundary_note": "Review recommendations are candidate evidence, not confirmed durable knowledge; promotion stays user-owned and evidence-backed.",
+      "forbidden_signals": ["auto-write-docs-solutions", "promote-unverified-recommendation", "review-report-as-confirmed-truth"]
+    },
+    {
+      "id": "review-report-promotion-verified",
+      "input": "This review finding has been confirmed against source and a regression test; should it become a durable learning?",
+      "coverage_tags": ["expected", "promotion-judgment"],
+      "expected_outcome": "A verified, reusable, evidence-backed lesson with invalidation context is a valid promotion candidate; still record it as a user-owned choice rather than an automatic action."
+    }
+  ]
+}

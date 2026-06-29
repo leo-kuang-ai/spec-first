@@ -515,6 +515,36 @@ describe('instruction bootstrap', () => {
       'mcp-setup', 'debug', 'code-review', 'doc-review', 'brainstorm', 'prd',
       'plan', 'work', 'optimize', 'ideate', 'compound', 'compound-refresh',
     ];
+    // R-09: CURATED_CORE 不得相对 governance registry 静默 stale。
+    // 从 skills-governance.json 派生全部 workflow_command 集合,断言
+    // CURATED_CORE 与显式 non-core 集严格二分该全集(无遗漏、无重叠、无幽灵)。
+    // registry 新增/退役 workflow_command 时,本断言失败直到有人显式归类,
+    // 消除硬编码数组与 registry 的 silent drift。
+    const governance = JSON.parse(fs.readFileSync(
+      path.join(__dirname, '..', '..', 'src', 'cli', 'contracts', 'dual-host-governance', 'skills-governance.json'),
+      'utf8',
+    ));
+    const allWorkflowCommands = new Set(
+      governance.skills
+        .filter((s) => s.entry_surface === 'workflow_command')
+        .map((s) => s.command_name),
+    );
+    // 显式 non-core workflow_command:有 workflow_command 入口但不进 bootstrap 锚点集
+    const NON_CORE_WORKFLOW_COMMANDS = [
+      'app-consistency-audit', 'polish-beta', 'release-notes',
+      'sessions', 'skill-audit', 'slack-research', 'write-tasks',
+    ];
+    // 每个 CURATED_CORE 必须是真实 registry workflow_command(抓幽灵/拼写漂移)
+    for (const id of CURATED_CORE) {
+      expect(allWorkflowCommands.has(id)).toBe(true);
+    }
+    // core + non-core 必须正好覆盖全部 workflow_command(抓 registry 新增未归类)
+    const classified = new Set([...CURATED_CORE, ...NON_CORE_WORKFLOW_COMMANDS]);
+    expect([...allWorkflowCommands].sort()).toEqual([...classified].sort());
+    // 无重叠:core 与 non-core 互斥
+    for (const id of NON_CORE_WORKFLOW_COMMANDS) {
+      expect(CURATED_CORE.includes(id)).toBe(false);
+    }
     // 守护:CURATED_CORE 本身必须都在 SKILL Route Map 内(否则列表自身 stale)
     for (const id of CURATED_CORE) {
       expect(skillIds.has(id)).toBe(true);
@@ -538,6 +568,12 @@ describe('instruction bootstrap', () => {
         expect(blockIds.size).toBeLessThan(skillIds.size);
         expect(blockIds.has('sessions')).toBe(false);
         expect(blockIds.has('release-notes')).toBe(false);
+        // R-08: 非 curated-core 的 workflow_command skill 也必须缺席 bootstrap block
+        // (这些有 workflow_command 入口但非高频核心,不应进 progressive-disclosure 锚点集)
+        expect(blockIds.has('slack-research')).toBe(false);
+        expect(blockIds.has('skill-audit')).toBe(false);
+        expect(blockIds.has('app-consistency-audit')).toBe(false);
+        expect(blockIds.has('polish-beta')).toBe(false);
         expect(block).not.toContain(lang === 'zh' ? '入口映射(意图→入口)' : 'Entry map (intent→entrypoint)');
       }
     }
@@ -555,6 +591,35 @@ describe('instruction bootstrap', () => {
       for (const probe of segmentProbes) {
         expect(claude).toContain(probe);
         expect(codex).toContain(probe);
+      }
+    }
+  });
+
+  // R-10: 两条 load-bearing 红旗必须在 bootstrap 内联或有 intentional deferral 记录。
+  // routing-red-flags.md 有 7 条红旗;bootstrap 的 "反合理化红旗" 行内联 5 条措辞,
+  // 但两条 load-bearing 红旗 (vague→brainstorm/plan、run-init-now→route first)
+  // 不在那 5 条措辞里,而是被 "何时进入 workflow" + "常见入口锚点" 两段语义覆盖。
+  // 本测试守护这种 intentional deferral:这两条红旗的语义必须在 bootstrap 在场,
+  // 即使不在红旗措辞行内;若被静默删除则失败。
+  test('load-bearing red flags (vague-route, run-init-route-first) stay covered in bootstrap (R-10)', () => {
+    for (const host of ['claude', 'codex']) {
+      for (const lang of ['zh', 'en']) {
+        const block = buildBootstrapBlock(host, lang);
+        if (lang === 'en') {
+          // vague→brainstorm/plan: "When to enter" 含 plan/brainstorm 作为 substantial-work 入口
+          expect(block).toMatch(/starting [^\n]*plan/i);
+          expect(block).toMatch(/definition→[^\n]*brainstorm/i);
+          // run-init-now→route first: "running state-changing commands" + setup 锚点
+          expect(block).toMatch(/running state-changing commands/i);
+          expect(block).toMatch(/setup\/runtime→[^\n]*mcp-setup/i);
+        } else {
+          // vague→brainstorm/plan
+          expect(block).toMatch(/启动 [^\n]*plan/i);
+          expect(block).toMatch(/定义→[^\n]*brainstorm/i);
+          // run-init-now→route first
+          expect(block).toMatch(/运行改状态命令/);
+          expect(block).toMatch(/setup\/runtime→[^\n]*mcp-setup/i);
+        }
       }
     }
   });

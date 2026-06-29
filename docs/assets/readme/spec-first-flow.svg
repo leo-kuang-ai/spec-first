@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
   <title id="title">spec-first engineering loop</title>
-  <desc id="desc">A blueprint-style diagram: spec-first is an AI Coding Harness that turns a one-off AI chat into a repository-backed engineering loop. Requirements, Plan, Tasks, Code, Review, and Knowledge stay connected while scripts prepare facts and LLMs decide.</desc>
+  <desc id="desc">A blueprint-style diagram: spec-first is an AI Coding Harness that turns a one-off AI chat into a repository-backed engineering loop. Requirements, Plan, Tasks, Code, Review, and Knowledge stay connected while scripts enforce deterministic invariants, prepare facts, and LLMs judge semantic adequacy above that floor.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FBFF"/>
@@ -50,7 +50,7 @@
   <rect width="1200" height="675" fill="url(#grid)" opacity="0.7"/>
 
   <text x="600" y="62" class="h1">AI Coding Harness for repo-backed work</text>
-  <text x="600" y="92" class="h2">scripts prepare facts · LLMs decide · artifacts stay in your repository</text>
+  <text x="600" y="92" class="h2">deterministic gates · LLM judgment · artifacts stay in your repository</text>
 
   <!-- input: the problem (warm = before) -->
   <g transform="translate(56 251)">
@@ -116,6 +116,6 @@
   <!-- single differentiator caption (no duplicate sequence ribbon) -->
   <g transform="translate(360 586)">
     <rect x="0" y="0" width="480" height="44" rx="22" fill="#E0F2FE" stroke="#38BDF8" stroke-width="1.4"/>
-    <text x="240" y="28" class="mono" style="font-size:14px">scripts prepare facts · the LLM decides</text>
+    <text x="240" y="28" class="mono" style="font-size:13px">scripts gate exits · LLM judges adequacy</text>
   </g>
 </svg>

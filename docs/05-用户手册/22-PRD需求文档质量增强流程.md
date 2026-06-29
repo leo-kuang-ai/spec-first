@@ -1,14 +1,16 @@
-# PRD 需求文档质量增强流程
+# 研发侧需求澄清与计划准入流程
 
-本页总结 `$spec-prd` 面向粗 PRD、超大需求文档和多来源材料时的目标工作方式。它对应当前 `spec-prd` 需求质量增强方案：把 `grill-with-docs` 的 source-first、术语校准、场景压力测试、代码矛盾核对和决策闭环能力前置到需求文档阶段，让后续 `spec-plan`、task pack 和 `spec-work` 消费更稳定的 WHAT/WHY 输入。
+本页总结 `$spec-prd` 在产品或 owner 已提供 PRD、需求材料、会议纪要、设计说明或系统增量说明后，研发侧如何做 intake、澄清、source-first 校准、owner 决策追踪和 `spec-plan` 计划准入判断。它对应当前 `spec-prd` 需求质量增强方案：把 `grill-with-docs` 的 source-first、术语校准、场景压力测试、代码矛盾核对和决策闭环能力前置到研发进入 planning 前，让后续 `spec-plan`、task pack 和 `spec-work` 消费更稳定的 WHAT/WHY 输入。
+
+`$spec-prd` 不是替产品写 PRD。产品 PRD 或需求材料是输入 source；`$spec-prd` 输出的是研发侧 clarified requirements / planning-readiness artifact，记录 current-state evidence、Change Delta、owner 决策、未闭合问题和是否可以进入计划。当前产物路径仍复用 `docs/brainstorms/*-requirements.md`，frontmatter 仍兼容历史字段 `artifact_kind: prd-requirements`，这是 artifact 兼容字段，不代表新增产品 PRD 真相源。
 
 > 注意：本页描述的是用户手册层面的流程意图和设计边界。具体可用行为以当前版本的 `skills/spec-prd/` source、生成后的宿主 runtime 和 release notes 为准。
 
 ## 设计思想与思路
 
-这套流程的出发点是：研发质量很大程度取决于输入质量。一个 PRD 如果在用户、目标、范围、术语、现有系统行为、异常、验收和决策后果上含糊，后续 plan、task 和实现就会被迫补 WHAT，导致返工、误实现或 review 时才发现需求不稳。
+这套流程的出发点是：研发质量很大程度取决于输入质量。产品 PRD 或需求材料如果在用户、目标、范围、术语、现有系统行为、异常、验收和决策后果上含糊，后续 plan、task 和实现就会被迫补 WHAT，导致返工、误实现或 review 时才发现需求不稳。
 
-它把“读需求”拆成三类工作：先理解材料在说什么，再用代码和文档证据校准它是否成立，最后只把真正需要业务裁决的问题交给 owner。这样 `$spec-prd` 输出的是可交给 planning 的需求判断，而不是一份未经压测的长摘要。
+它把研发侧“读需求”拆成三类工作：先理解产品材料在说什么，再用代码和文档证据校准它是否与现有系统成立，最后只把真正需要业务裁决的问题交给 owner。这样 `$spec-prd` 输出的是可交给 planning 的需求澄清判断，而不是一份未经压测的长摘要，也不是替产品重写一版 PRD。
 
 设计上遵循七个原则。
 
@@ -18,17 +20,17 @@
 
 这个过程有一个明确目标：让后续研发不再猜。它不是把文档“摘要得更短”，而是把需求里的事实、假设、冲突、术语、场景和决策后果变成可以被计划和实现消费的结构化输入。
 
-### 2. 先完整澄清，再按标准 PRD 模版写入
+### 2. 先完整澄清，再写入研发侧澄清产物
 
-PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一版轻文档，而是先把需求澄清到后续 planning 不需要补发明 WHAT，再按标准 PRD 模版写入。Progressive Detail Ladder 现在用于选择澄清方式和证据归约方式，而不是给粗输入找轻量捷径：
+PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快替产品写一版轻文档，而是先把产品材料澄清到后续 planning 不需要补发明 WHAT，再写入研发侧 clarified requirements / planning-readiness artifact。Progressive Detail Ladder 现在用于选择澄清方式和证据归约方式，而不是给粗输入找轻量捷径：
 
-- source 已经完全闭合的需求可以直接写 L0 source-resolved PRD。
+- source 已经完全闭合的需求可以直接写 L0 source-resolved 澄清产物。
 - 有少量不确定性时进入 shared understanding map。
 - 超大或多来源材料才进入 Map-Reduce。
 - 只有影响 planning invention 的问题才触发 P0/P1 packs。
 - rough PRD、draft、reference-claims、resume-prd、pure-text 和多来源材料默认进入 `grill-with-docs` 的 one-question-at-a-time 深度澄清；如果缺系统/产品锚点、属于 broad discovery、下一问无法关闭命名 gap 或没有可负责的提问序列，才输出 blocker cluster / route-out。
 
-这让流程按证据和决策展开，但最终仍回到标准 PRD 模版输出。
+这让流程按证据和决策展开，但最终回到研发侧澄清产物与 readiness 判断输出。
 
 ### 3. Map-Reduce 是证据归约，不是分段摘要
 
@@ -37,8 +39,8 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
 这里的 Map-Reduce 只做 run-local evidence reduction：
 
 - Map 从每个 chunk 抽取带 `source_ref` 的需求原子。
-- Shuffle 按 actor、flow、feature、data、state、permission、exception、PRD section 和 source contradiction 聚组。
-- Reduce 合并重复、保留冲突，并输出 blockers、assumptions、owner questions 和 PRD write targets。
+- Shuffle 按 actor、flow、feature、data、state、permission、exception、澄清产物 section 和 source contradiction 聚组。
+- Reduce 合并重复、保留冲突，并输出 blockers、assumptions、owner questions 和 clarification write targets。
 
 它保留 Map-Reduce 思想，但不新增持久 schema、JSON contract、向量索引、脚本 reducer 或独立 artifact。
 
@@ -59,9 +61,9 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
 - 挑战 glossary 冲突和模糊词。
 - 用具体场景压测边界。
 - 对照代码暴露矛盾。
-- 把决议落回 PRD section。
+- 把决议落回研发侧澄清产物 section。
 
-这样做的目标是把需求文档先压实，再交给后续流程。
+这样做的目标是把需求澄清先压实，再交给后续流程。
 
 ### 6. PRD-local closure 优先，知识晋升 preview-first
 
@@ -70,7 +72,7 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
 所以这里采用 adapter 思路：
 
 - 已有 `CONTEXT.md` / `CONTEXT-MAP.md` / ADR 先作为 evidence。
-- 本轮 PRD 的术语和决策先在 PRD-local sections 闭环。
+- 本轮需求澄清的术语和决策先在 PRD-local sections 闭环。
 - 只有稳定术语或 hard decision 满足晋升条件时，才生成 preview-first promotion candidate。
 - 不 silent write，不把 context/ADR 设为 readiness 前置条件。
 
@@ -84,7 +86,7 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
 
 ## 解决什么问题
 
-很多研发返工不是因为 plan 不会拆任务，而是因为 PRD 还没把关键 WHAT 说清楚：
+很多研发返工不是因为 plan 不会拆任务，而是因为产品需求材料还没把关键 WHAT 说清楚：
 
 - 谁是目标用户、操作者、受益方和下游消费者不清楚。
 - 需求描述和现有代码、文档、测试或历史 PRD 矛盾。
@@ -92,7 +94,7 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
 - 术语模糊，例如“账户”“订单”“取消”“审批”在不同上下文里含义不同。
 - 权限、状态、异常、负向验收、发布切片和 owner 决策没有闭环。
 
-目标是在需求文档阶段把这些 load-bearing gaps 解决或显式暴露，而不是让 `spec-plan` 或实现阶段替 PRD 发明产品行为。
+目标是在研发侧需求澄清阶段把这些 load-bearing gaps 解决或显式暴露，而不是让 `spec-plan` 或实现阶段替产品材料发明产品行为。
 
 ## 完整流程
 
@@ -109,7 +111,7 @@ PRD 输入有大小和风险差异，但 `$spec-prd` 的目标不是尽快写一
   -> Progressive Detail Ladder
   -> optional Large-input Map-Reduce
   -> Context / ADR Topology Adapter
-  -> PRD Rewrite 或 Analysis Conclusion
+  -> Clarified Requirements Write-In 或 Analysis Conclusion
   -> Final Readiness Diagnosis
   -> Handoff
 ```
@@ -126,7 +128,7 @@ flowchart TD
   C -->|no-input| C1["询问 target increment 或 PRD path<br/>暂停运行"]
   C -->|wrong-stage| C2["Route out<br/>brainstorm / app-consistency-audit / plan / work / debug"]
   C -->|implementation-ready 或低风险小修| C3{"durable WHAT record 有价值吗?"}
-  C3 -->|否| C4["bypass<br/>不写 PRD artifact<br/>记录 reason / handoff target<br/>说明 downstream 不会 invent WHAT"]
+  C3 -->|否| C4["bypass<br/>不写 clarified-requirements artifact<br/>记录 reason / handoff target<br/>说明 downstream 不会 invent WHAT"]
   C3 -->|是| D
   C -->|create / refine / validate| D["Run-local Decision Card<br/>intent / input_posture / output_shape<br/>topology / surface_lens / evidence_depth<br/>quality / clarification / readiness"]
   C -->|oversized initial PRD| C5["先建议 semantic split boundaries"]
@@ -142,7 +144,7 @@ flowchart TD
   F --> F1["Evidence Tags<br/>confirmed-source / user-stated / source-candidate<br/>external-research / assumption"]
   F1 --> F2["Current System Snapshot<br/>只写影响 PRD 的 confirmed 或显式标注 claim"]
   F2 --> RAG["Requirement Analysis Gate<br/>资料 -> 需求理解地图<br/>识别不确定点 / 冲突点<br/>决定产品 / 设计 / 技术 grill 问题"]
-  RAG --> RAG1["Run-local map<br/>input inventory / source authority<br/>target surface / current-state summary<br/>change delta / module map<br/>open decisions / design coverage / API coverage<br/>risk -> PRD write target"]
+  RAG --> RAG1["Run-local map<br/>input inventory / source authority<br/>target surface / current-state summary<br/>change delta / module map<br/>open decisions / design coverage / API coverage<br/>risk -> clarification write target"]
   RAG1 --> RAG2{"有 owner-owned open decision<br/>会改变 WHAT / acceptance / scope / authority?"}
   RAG2 -->|是| I2
   RAG2 -->|source 可闭合| G
@@ -175,7 +177,7 @@ flowchart TD
 
   I{"Domain / terminology / contradiction / hard boundary?"}
   I -->|source-answerable| I1["先查 source / docs / tests / contracts / glossary<br/>不问 owner"]
-  I -->|PRD write target 依赖产品/设计/技术决策| I2["Product / Design / Technical Grill<br/>一次一个问题<br/>绑定 gap / source attempt / write target<br/>给 recommended_answer / consequence / closure state"]
+  I -->|clarification write target 依赖产品/设计/技术决策| I2["Product / Design / Technical Grill<br/>一次一个问题<br/>绑定 gap / source attempt / write target<br/>给 recommended_answer / consequence / closure state"]
   I -->|rough / draft / reference-claims<br/>或需要持续裁决| I3["Deep grill-with-docs mode<br/>持续 one-question-at-a-time<br/>等待反馈<br/>必要时 inline 更新 CONTEXT.md / CONTEXT-MAP.md / ADR"]
   I1 --> J
   I2 --> J
@@ -186,8 +188,8 @@ flowchart TD
   J1 -->|compact-prd| J2["Core sections<br/>Summary / Change Delta / Requirements<br/>Acceptance Examples / Scope Boundaries<br/>Evidence And Assumptions"]
   J1 -->|normal-prd| J3["Core + triggered sections<br/>Problem Frame / Current Snapshot / Glossary<br/>Decision Notes / Actors / Use Cases / Exceptions<br/>Outstanding Questions / Planning Recheck"]
   J1 -->|topology-heavy-prd| J5["Topology sections<br/>Change Topology / Surface Map<br/>Producer Artifact Consumer<br/>Source-Of-Truth Resolution / Negative Acceptance"]
-  J1 -->|analysis conclusion| J8["Analysis conclusion<br/>不写 final PRD<br/>列出 blockers / open decisions / next grill question / route"]
-  J2 --> J6["写入或更新 PRD artifact<br/>docs/brainstorms/*-requirements.md<br/>artifact_kind: prd-requirements"]
+  J1 -->|analysis conclusion| J8["Analysis conclusion<br/>不写 final clarified artifact<br/>列出 blockers / open decisions / next grill question / route"]
+  J2 --> J6["写入或更新 clarified-requirements artifact<br/>docs/brainstorms/*-requirements.md<br/>artifact_kind: prd-requirements"]
   J3 --> J6
   J5 --> J6
   J8 --> J4
@@ -199,7 +201,7 @@ flowchart TD
   K2 --> K3["LLM-owned readiness lens<br/>Core Pack always<br/>conditional packs only when triggered<br/>semantic readiness consumes finalize receipt"]
   K3 --> K8{"readiness_outcome"}
   K8 -->|ready-for-planning| K4["Handoff to current host plan workflow<br/>Claude: /spec:plan<br/>Codex: $spec-plan"]
-  K8 -->|revise-prd| K5["修 PRD gaps<br/>把 source-resolved gaps / owner answers / assumptions 写回 PRD-local sections"]
+  K8 -->|revise-prd| K5["修 clarified-requirements gaps<br/>把 source-resolved gaps / owner answers / assumptions 写回 PRD-local sections"]
   K8 -->|ask-owner| K6["问最小 blocking question<br/>或记录 accepted assumption / Outstanding Question"]
   K8 -->|doc-review| K7["Handoff to document review<br/>Claude: /spec:doc-review<br/>Codex: $spec-doc-review"]
   K8 -->|route-out| C2
@@ -213,9 +215,9 @@ flowchart TD
 
 读图时要注意三条边界：
 
-- `Requirement Analysis Gate` 是写 PRD 前的主路径：先把资料变成需求理解地图，再识别不确定点和冲突点，最后决定哪些产品、设计或技术问题必须启动 grill；它不是持久 schema。
+- `Requirement Analysis Gate` 是写入研发侧澄清产物前的主路径：先把资料变成需求理解地图，再识别不确定点和冲突点，最后决定哪些产品、设计或技术问题必须启动 grill；它不是持久 schema。
 - `Preliminary Diagnosis` 只决定走 compact、Map-Reduce、P0/P1 packs、deep grill、blocker cluster 还是 route-out；它不能宣布 `ready-for-planning`。
-- Map rows、Reduce outputs、shared understanding map、question card 和 Framing Gate 都是 run-local scratch；只有能减少 planning 发明 WHAT 的结论才写回 PRD sections。
+- Map rows、Reduce outputs、shared understanding map、question card 和 Framing Gate 都是 run-local scratch；只有能减少 planning 发明 WHAT 的结论才写回 PRD-local sections。
 - `finalize-prd-artifact.js` 是 `$spec-prd` producer-local ready 出口；`check-prd-artifact.js` 和 `check-glossary-drift.js` 只报告 script-owned facts。脚本可以拒绝未过出口不变量的 ready 盖章，但是否需要 owner 决策、是否能交给 planning，仍由 readiness lens 做语义判断。
 
 ### 1. PRD Sanitization
@@ -227,7 +229,7 @@ flowchart TD
 - 未确认 claim、临时结论、冲突说法。
 - 嵌入在文档里的 agent 指令、shell 命令或 workflow 指令。
 
-PRD 只承载产品 WHAT/WHY、current-state evidence、acceptance 和 scope boundary。实现 HOW 进入后续 plan/work。
+研发侧澄清产物只承载产品 WHAT/WHY、current-state evidence、acceptance、scope boundary、owner 决策和 planning-readiness 判断。实现 HOW 进入后续 plan/work。
 
 ### 2. Problem / Outcome Framing
 
@@ -237,7 +239,7 @@ PRD 只承载产品 WHAT/WHY、current-state evidence、acceptance 和 scope bou
 - 期望产生什么可观察结果？
 - 哪些行为、权限、状态或验收会因此变化？
 
-如果缺少目标用户、产品问题、系统锚点或核心场景，应该路由回 `$spec-brainstorm`，而不是硬写 PRD。
+如果缺少目标用户、产品问题、系统锚点或核心场景，应该路由回 `$spec-brainstorm`，而不是硬写研发侧澄清产物。
 
 ### 3. Source-first Evidence Calibration
 
@@ -261,37 +263,37 @@ Preliminary Diagnosis 只决定“怎么澄清、怎么归约证据、是否 rou
 - 哪些 P0/P1 packs 被触发。
 - 是否要进入 deep grill、route-out 或输出 blocker cluster。
 
-最终能否进入 planning，只能在 rewrite 后由 Final Readiness Diagnosis 判断。
+最终能否进入 planning，只能在澄清产物写入或更新后由 Final Readiness Diagnosis 判断。
 
 ### 5. Product Expert Lens
 
 `$spec-prd` 的默认热路径现在是：
 
 ```text
-Product Expert Lens -> Requirements Grill -> Standard PRD Write-In -> Readiness Lens
+Product Expert Lens -> Requirements Grill -> Engineering Clarification Write-In -> Readiness Lens
 ```
 
-Product Expert Lens 不是一个新的公开 workflow，也不是默认独立 reviewer。它是需求澄清前的产品判断层：先识别用户、场景、结果、范围、权限、异常、验收和 downstream confirmation risk，再把每个 load-bearing gap 绑定到具体 PRD write target。Requirements Grill 只消费它产出的最小接口：
+Product Expert Lens 不是一个新的公开 workflow，也不是默认独立 reviewer。它是需求澄清前的产品判断层：先识别用户、场景、结果、范围、权限、异常、验收和 downstream confirmation risk，再把每个 load-bearing gap 绑定到具体澄清写入目标。Requirements Grill 只消费它产出的最小接口：
 
 ```text
 downstream_confirmation_risk -> claim -> evidence/source -> gap
-  -> owner_question_or_assumption -> PRD_write_target -> closure_state
+  -> owner_question_or_assumption -> clarification_write_target -> closure_state
 ```
 
-这让 owner 问题不再是 checklist 式追问，而是围绕“哪个问题会让 planning / work 发明 WHAT”排序。已经成型或已决策的输入会被综合进标准 PRD sections；其中 implementation/testing/API/schema/task 细节会降级为 HOW，除非它改变 scope、acceptance 或 source-of-truth。
+这让 owner 问题不再是 checklist 式追问，而是围绕“哪个问题会让 planning / work 发明 WHAT”排序。已经成型或已决策的输入会被综合进研发侧澄清产物 sections；其中 implementation/testing/API/schema/task 细节会降级为 HOW，除非它改变 scope、acceptance 或 source-of-truth。
 
-**双座位再读(逼出所有该问的问题)。** product-only 视角天然会漏掉"实现者/测试者才会问"的 load-bearing 问题(典型如:某个接口是否可用、未就绪时怎么降级、某条需求有没有可观测信号能写断言)。所以 Lens 对每条 load-bearing 需求,除产品座位外,还从**实现者座位**("哪个未命名的接口可用性/权限/状态/数据权威/降级会逼我发明产品行为")与**测试作者座位**("哪条需求没有可观测信号让我写 pass/fail 断言")各读一遍,每座位产出"一个绑 PRD write target 的具体 gap"或显式 `none-found`。关键约束:`none-found` 只有在真正对着该需求的 source/现状证据跑过反事实问题之后才合法——因为"产品侧看着已说清"就跳过,是过早 none-found 的退化,不算合法结局。它还会嗅 brownfield 多义:"与 X 一致"而 repo 里 X 有多实现、add/extend/replace/remove 未言明。这一层只负责把问题**逼出来**绑到 write target;问题是否真闭合由出口的 closure 剃刀(见末节)保证。两层分工:Lens 逼出全部问题(surfacing),剃刀保证每个写下来的问题真闭合(closure)。
+**双座位再读(逼出所有该问的问题)。** product-only 视角天然会漏掉"实现者/测试者才会问"的 load-bearing 问题(典型如:某个接口是否可用、未就绪时怎么降级、某条需求有没有可观测信号能写断言)。所以 Lens 对每条 load-bearing 需求,除产品座位外,还从**实现者座位**("哪个未命名的接口可用性/权限/状态/数据权威/降级会逼我发明产品行为")与**测试作者座位**("哪条需求没有可观测信号让我写 pass/fail 断言")各读一遍,每座位产出"一个绑定澄清写入目标的具体 gap"或显式 `none-found`。关键约束:`none-found` 只有在真正对着该需求的 source/现状证据跑过反事实问题之后才合法——因为"产品侧看着已说清"就跳过,是过早 none-found 的退化,不算合法结局。它还会嗅 brownfield 多义:"与 X 一致"而 repo 里 X 有多实现、add/extend/replace/remove 未言明。这一层只负责把问题**逼出来**绑到写入目标;问题是否真闭合由出口的 closure 剃刀(见末节)保证。两层分工:Lens 逼出全部问题(surfacing),剃刀保证每个写下来的问题真闭合(closure)。
 
 ## 写前门槛与澄清证据
 
-`$spec-prd` 现在在写 PRD 前先做一个轻量的 run-local 判定，避免“材料看起来完整，所以直接生成 PRD”。这个判定不新增持久状态机，也不要求每次都表演式提问；它只要求在提问、写 PRD、readiness 和 handoff 这些会改变用户可见结果的动作前，先说明理由和关键字段。
+`$spec-prd` 现在在写入研发侧澄清产物前先做一个轻量的 run-local 判定，避免“材料看起来完整，所以直接生成 ready 文档”。这个判定不新增持久状态机，也不要求每次都表演式提问；它只要求在提问、写入澄清产物、readiness 和 handoff 这些会改变用户可见结果的动作前，先说明理由和关键字段。
 
 核心字段是：
 
 - `write_mode=ask-owner-first`：表示下一步是继续 relentless 深挖最高风险分支，**不是**"问一个就停下来不写"。澄清默认持续深挖，分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。
 - `write_mode=checkpoint-prd`：relentless 兜底——当 owner 未给出 cap/continue 信号(不在场/headless，或软封顶选择点后持续沉默，可观测信号相同)时停在此恢复点,必须写 `can_enter_spec-plan: no`、`next_owner_question` 和 `pre_prd_clarification_status=checkpoint-blocked`,绝不静默判 ready;也用于多来源/长链路/true headless 恢复。
 - `write_mode=final-prd`：只有**每个 load-bearing 分支都到达 Canonical 停点**(source evidence、owner answer、evidence-backed accepted assumption 或 owner 封顶)时才可使用;owner 未封顶且分支仍有可深挖子决策时不得 final-prd。
-- `write_mode=route-out`：输入属于 brainstorm、plan、work、debug 或无 durable PRD 价值时路由出去。
+- `write_mode=route-out`：输入属于 brainstorm、plan、work、debug 或无 durable clarified-requirements 价值时路由出去。
 - `clarification_evidence=asked-owner`：本轮实际通过 blocking question tool 或 chat fallback 问过 owner 并获得回答。
 - `clarification_evidence=source-proven-no-ask`：无需 owner 提问，因为 source refs 已能闭合相关 WHAT。
 - `clarification_evidence=headless-degraded-logged`：确实无法等待用户时才允许降级，并且必须记录降级原因和被降级问题清单。
@@ -299,7 +301,7 @@ downstream_confirmation_risk -> claim -> evidence/source -> gap
 
 Codex 或当前 host 没有 blocking question tool，不等于 true headless。只要还能在 chat 里等待用户，就必须用 `question_delivery=chat-fallback` 问一个 source-backed owner question。只有明确 headless/report-only、上游禁止交互或运行时无法接收回复时，才可用 `question_delivery=true-headless-unavailable`。
 
-source 已闭合的简单需求不需要反复问 owner，这属于 `source-proven-no-ask`，不是跳过流程。相反，如果问题会改变用户行为、范围、验收、数据权威、接口可用性、降级展示、埋点验收或 source-of-truth，它就是 PRD-owned 问题，必须在 PRD 输出过程中逐一确认、写成有证据的 accepted assumption，或阻塞 readiness；不能放进 `Planning Recheck` 后宣称 `ready-for-planning`。
+source 已闭合的简单需求不需要反复问 owner，这属于 `source-proven-no-ask`，不是跳过流程。相反，如果问题会改变用户行为、范围、验收、数据权威、接口可用性、降级展示、埋点验收或 source-of-truth，它就是 owner-owned / product-owned 问题，必须在澄清产物输出过程中逐一确认、写成有证据的 accepted assumption，或阻塞 readiness；不能放进 `Planning Recheck` 后宣称 `ready-for-planning`。
 
 ## Progressive Detail Ladder
 
@@ -307,12 +309,12 @@ source 已闭合的简单需求不需要反复问 owner，这属于 `source-prov
 
 | Level | 触发 | 停止条件 | 输出 |
 | --- | --- | --- | --- |
-| L0 source-resolved PRD | 输入锚点清楚且 source/owner context 已证明关键需求 | 不会让 planning 发明 WHAT，且无需 owner interview | 标准 core sections 的 compact/normal PRD |
+| L0 source-resolved clarified artifact | 输入锚点清楚且 source/owner context 已证明关键需求 | 不会让 planning 发明 WHAT，且无需 owner interview | core sections 的 compact/normal clarified artifact |
 | L1 shared understanding map | claim 需要对齐 evidence/gap/write target | gap 已解决、假设化或升级 | run-local shared understanding |
 | L2 large-input Map-Reduce | 超大、多来源或无法整体可靠判断 | reduced candidates 保留 source refs 和 conflicts | run-local Map/Reduce 结果 |
 | L3 P0 packs | problem/outcome、metric、NFR、trace、owner closure 会影响 planning | P0 gap 已闭环或显式阻塞 | PRD-local core sections |
 | L4 P1 packs | actor/design/release/change-management 信号明确且有后果 | conditional detail 被捕获或延后 | PRD-local conditional sections |
-| L5 deep grill / blocker route-out | PRD 模版仍依赖 owner 决策、交互 gap、source/user 矛盾、术语/范围/验收不稳，或缺系统/产品锚点 | 有锚点且下一问可关闭或缩窄命名 gap 时进入 one-question-at-a-time；否则 route 明确且不输出 ready | guided owner adjudication，或 blockers、assumptions、affected write targets |
+| L5 deep grill / blocker route-out | 澄清产物仍依赖 owner 决策、交互 gap、source/user 矛盾、术语/范围/验收不稳，或缺系统/产品锚点 | 有锚点且下一问可关闭或缩窄命名 gap 时进入 one-question-at-a-time；否则 route 明确且不输出 ready | guided owner adjudication，或 blockers、assumptions、affected write targets |
 
 ## 超大文档的 Map-Reduce
 
@@ -329,11 +331,11 @@ Reduce output:
   affected_write_targets
 ```
 
-Map 负责从 chunk 里抽取需求原子并保留来源。Shuffle 按 actor、flow、feature、data、state、permission、exception、PRD section 和 source contradiction 聚组。Reduce 合并重复、保留冲突，并输出 blockers、assumptions、owner questions 和 PRD write targets。Reduce output 随后进入 Product Expert Lens 的风险排序，而不是绕过产品判断直接写入 PRD。
+Map 负责从 chunk 里抽取需求原子并保留来源。Shuffle 按 actor、flow、feature、data、state、permission、exception、澄清产物 section 和 source contradiction 聚组。Reduce 合并重复、保留冲突，并输出 blockers、assumptions、owner questions 和 clarification write targets。Reduce output 随后进入 Product Expert Lens 的风险排序，而不是绕过产品判断直接写入澄清产物。
 
 这些都是 run-local scratch，不是持久 schema、JSON contract 或新 artifact。
 
-长链路、超大或多来源 PRD 可以把 reduced candidates 提前写入 PRD 文件本身作为 checkpoint：已闭合内容进入正式 sections，未确认内容进入 `Evidence And Assumptions`，owner 决策进入 `Outstanding Questions`，planning-time advisory 项进入 `Planning Recheck`。checkpoint PRD 不是 final PRD，不能进入 `$spec-plan`；它必须保留下一步 owner/source 问题和 `can_enter_spec-plan: no`。resume 时优先按 `source_ref` 恢复；如果 source_ref stale、缺失或冲突，则 degraded 重新归约相关 chunk 并记录原因。普通短 PRD 仍然闭合后再写，不新增 transcript 或 progress schema。`Planning Recheck` 是 `$spec-prd` producer-side advisory handoff：它说明下游在选 HOW 前必须复核，不等于 `$spec-plan` 已经完成 re-confirm。
+长链路、超大或多来源材料可以把 reduced candidates 提前写入澄清产物作为 checkpoint：已闭合内容进入正式 sections，未确认内容进入 `Evidence And Assumptions`，owner 决策进入 `Outstanding Questions`，planning-time advisory 项进入 `Planning Recheck`。checkpoint artifact 不是 final-ready 澄清产物，不能进入 `$spec-plan`；它必须保留下一步 owner/source 问题和 `can_enter_spec-plan: no`。resume 时优先按 `source_ref` 恢复；如果 source_ref stale、缺失或冲突，则 degraded 重新归约相关 chunk 并记录原因。普通短需求仍然闭合后再写，不新增 transcript 或 progress schema。`Planning Recheck` 是 `$spec-prd` producer-side advisory handoff：它说明下游在选 HOW 前必须复核，不等于 `$spec-plan` 已经完成 re-confirm。
 
 ## 设计源 / Figma 输入
 
@@ -341,16 +343,16 @@ Map 负责从 chunk 里抽取需求原子并保留来源。Shuffle 按 actor、f
 
 ```text
 URL parse -> tool discovery -> auth/access probe -> fetch or degraded reason
-  -> design-WHAT extraction -> code/owner reconciliation -> PRD write targets / Planning Recheck
+  -> design-WHAT extraction -> code/owner reconciliation -> clarification write targets / Planning Recheck
 ```
 
-设计源证据默认是 `source-candidate` / `provider_untrusted`，直到经过代码、文档或 owner 决策校准。工具不可用、未授权、无访问权限或 headless 无法抓取时，不阻断 PRD；它会 loud degrade 到截图、导出 context、本地 `figma-context:<path>`、reference-claim 或 owner 描述。`spec-prd` 只提取 PRD facts，例如 entry、state、copy、empty/error/loading、permission、i18n、accessibility 和 acceptance；PRD/Figma/source 一致性审计仍应 route 到 `$spec-app-consistency-audit`。
+设计源证据默认是 `source-candidate` / `provider_untrusted`，直到经过代码、文档或 owner 决策校准。工具不可用、未授权、无访问权限或 headless 无法抓取时，不阻断需求澄清；它会 loud degrade 到截图、导出 context、本地 `figma-context:<path>`、reference-claim 或 owner 描述。`spec-prd` 只提取会影响 WHAT/WHY、entry、state、copy、empty/error/loading、permission、i18n、accessibility 和 acceptance 的事实；PRD/Figma/source 一致性审计仍应 route 到 `$spec-app-consistency-audit`。
 
-如果 Figma 或其它 design-source 会影响页面结构、二级页/详情页入口、模块状态、错误/空/加载态、交互触发、验收或范围，`$spec-prd` 必须先建立 `design_source_inventory` 分母，再记录 `design_sources_read`、`design_sources_unread` 和 `design_source_coverage`。每个条目应说明 `source_or_node`、`read_status`、影响的 PRD write target、未读原因、evidence level 和 readiness consequence。未读节点仍会改变 WHAT 或 acceptance 时，readiness 不得返回 `ready-for-planning`；这些问题不能只作为 non-blocking `Planning Recheck` 后移给 `$spec-plan`。
+如果 Figma 或其它 design-source 会影响页面结构、二级页/详情页入口、模块状态、错误/空/加载态、交互触发、验收或范围，`$spec-prd` 必须先建立 `design_source_inventory` 分母，再记录 `design_sources_read`、`design_sources_unread` 和 `design_source_coverage`。每个条目应说明 `source_or_node`、`read_status`、影响的 clarification write target、未读原因、evidence level 和 readiness consequence。未读节点仍会改变 WHAT 或 acceptance 时，readiness 不得返回 `ready-for-planning`；这些问题不能只作为 non-blocking `Planning Recheck` 后移给 `$spec-plan`。
 
 ## Deep Requirements Grill
 
-Deep Requirements Grill 是 `grill-with-docs` 思想在需求文档阶段的主路径。它不是 PRD 写完后的 review，而是 rewrite 前确认 shared understanding；rough PRD、draft、reference-claims、resume-prd、pure-text 和多来源材料默认先经过它，再按标准 PRD 模版写入。
+Deep Requirements Grill 是 `grill-with-docs` 思想在研发侧需求澄清阶段的主路径。它不是澄清产物写完后的 review，而是写入前确认 shared understanding；rough PRD、draft、reference-claims、resume-prd、pure-text 和多来源材料默认先经过它，再写入研发侧澄清产物。
 
 核心动作：
 
@@ -361,9 +363,9 @@ Deep Requirements Grill 是 `grill-with-docs` 思想在需求文档阶段的主�
 - fuzzy term sharpening：把“账户”“订单”“审批”等模糊词锐化为 canonical term。
 - scenario stress：用具体 actor、flow、state、exception、permission 场景压测边界。
 - code contradiction：用户说法和现有代码冲突时，要求明确以哪个为准。
-- decision closure：owner answer 必须落回 PRD section，而不是停留在聊天里。
+- decision closure：owner answer 必须落回 PRD-local section，而不是停留在聊天里。
 
-正常 PRD run 的澄清姿态是 **relentless（理解透才停）**：默认沿每个 load-bearing 分支一次一个问题深挖到底，而不是"够写 PRD 就停"。固定问题数量、"看起来小"、"够写某个 section"、"只问了一个关键问题"、"问题序列变长"、"不影响当前发布切片" 都**不是停止理由**——它们只影响提问顺序。每个 owner 问题仍必须绑定命名 gap、已做 source attempt、PRD write target 和 closure state；一个分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。当 owner 未给出 cap/continue 信号时，落 `write_mode=checkpoint-prd` 兜底，绝不静默判 `ready-for-planning`。只有缺系统/产品锚点、属于 broad discovery、或没有可负责提问序列时，才 `route-out` 到 prioritized blocker cluster 并推荐下一 route。`ready-for-planning` 要求每个 load-bearing 分支都到达 Canonical 停点（含 owner 已封顶）。
+正常需求澄清 run 的姿态是 **relentless（理解透才停）**：默认沿每个 load-bearing 分支一次一个问题深挖到底，而不是"够写某个 section 就停"。固定问题数量、"看起来小"、"只问了一个关键问题"、"问题序列变长"、"不影响当前发布切片" 都**不是停止理由**——它们只影响提问顺序。每个 owner 问题仍必须绑定命名 gap、已做 source attempt、clarification write target 和 closure state；一个分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。当 owner 未给出 cap/continue 信号时，落 `write_mode=checkpoint-prd` 兜底，绝不静默判 `ready-for-planning`。只有缺系统/产品锚点、属于 broad discovery、或没有可负责提问序列时，才 `route-out` 到 prioritized blocker cluster 并推荐下一 route。`ready-for-planning` 要求每个 load-bearing 分支都到达 Canonical 停点（含 owner 已封顶）。
 
 ## Context / ADR Topology Adapter
 
@@ -426,7 +428,7 @@ user-repo/
 
 ## Final Readiness Diagnosis
 
-PRD rewrite 后再判断是否可以进入 planning：
+研发侧澄清产物写入或更新后再判断是否可以进入 planning：
 
 - actor、flow、state、exception、permission、scope、acceptance 是否闭环。
 - load-bearing questions 是否由 source、owner answer、accepted assumption、Outstanding Question 或 blocker cluster 处理。
@@ -435,17 +437,17 @@ PRD rewrite 后再判断是否可以进入 planning：
 
 只有当 `spec-plan` 不再需要补产品行为时，才能 `ready-for-planning`。
 
-`ready-for-planning` 不是 LLM 自己写 frontmatter 就成立。PRD artifact 必须带有当前 producer-local finalize receipt，例如 `readiness_verified_by: check-prd-artifact.js`、`readiness_checker_schema`、`readiness_prd_hash` 和 `readiness_inputs_hash`。缺 receipt、receipt 陈旧、design-source 未 accounting、grill closure 未声明或 Requirement Analysis Gate 未闭合时，只能继续修 PRD、继续问 owner，或降级为 checkpoint。
+`ready-for-planning` 不是 LLM 自己写 frontmatter 就成立。clarified-requirements artifact 必须带有当前 producer-local finalize receipt，例如 `readiness_verified_by: check-prd-artifact.js`、`readiness_checker_schema`、`readiness_prd_hash` 和 `readiness_inputs_hash`。缺 receipt、receipt 陈旧、design-source 未 accounting、grill closure 未声明或 Requirement Analysis Gate 未闭合时，只能继续修澄清产物、继续问 owner，或降级为 checkpoint。
 
 ## 使用建议
 
-- source 已完全闭合的需求：可直接写 L0 source-resolved PRD；否则先 grill，再写标准 PRD。
+- source 已完全闭合的需求：可直接写 L0 source-resolved 澄清产物；否则先 grill，再写研发侧澄清产物。
 - 多来源或超大文档：先做 Map-Reduce，再做 Deep Requirements Grill。
 - source 能回答的问题：不要问 owner。
-- owner 问题不能关闭或缩窄命名 gap：有足够锚点且可裁决时进入 `grill-with-docs` 一问一答；否则输出 blocker cluster、Outstanding Questions 或 route-out。每个问题都需要 source attempt、PRD write target 和 closure state。
+- owner 问题不能关闭或缩窄命名 gap：有足够锚点且可裁决时进入 `grill-with-docs` 一问一答；否则输出 blocker cluster、Outstanding Questions 或 route-out。每个问题都需要 source attempt、clarification write target 和 closure state。
 - 术语或决策可沉淀时：先 PRD-local closure，再 preview-first 提出 context/ADR promotion。
 
-这套流程的价值是让需求文档先“变硬”：证据来源、术语、场景、冲突、假设和决策后果都进入 PRD，再交给 planning 和实现。它提升的不是单个 PRD 的字数，而是后续研发链路的输入质量。
+这套流程的价值是让需求澄清先“变硬”：证据来源、术语、场景、冲突、假设和决策后果都进入研发侧澄清产物，再交给 planning 和实现。它提升的不是单个 PRD 的字数，而是后续研发链路的输入质量。
 
 ## Closure-disposition 剃刀(用户可见行为)
 
@@ -453,7 +455,7 @@ PRD rewrite 后再判断是否可以进入 planning：
 
 - `source-resolved` / `source-backed-non-WHAT-assumption`:附可核查引用(仓库路径、URL、`file:line` 或锚点);
 - `owner-answered` / `owner-capped` / `owner-accepted-assumption`:在 Owner Decision Trace 里有对应行;
-- `implementation-only-how-pushdown`:声明 `planning_would_invent_what=no`,且不触及接口可用性/权限/范围/数据权威/降级显示/埋点(否则在 ready PRD 中视为矛盾被阻断)。
+- `implementation-only-how-pushdown`:声明 `planning_would_invent_what=no`,且不触及接口可用性/权限/范围/数据权威/降级显示/埋点(否则在 ready clarified artifact 中视为矛盾被阻断)。
 
 “我判断它是规划期并行项”不是合法 disposition——这正是过去把未确认接口/权限问题自降级为非阻塞却从未问 owner 的失败形态。`blocks_planning=no` 必须由合法 disposition 派生,没有“随手判非阻塞”的自由。
 

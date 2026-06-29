@@ -75,8 +75,7 @@ describe('spec-write-tasks contracts', () => {
       .map((line) => line.split(':', 1)[0]);
 
     expect(estimatedTokens(SKILL_PATH)).toBeLessThanOrEqual(3000);
-    expect(frontmatterKeys).toEqual(['name', 'description']);
-    expect(frontmatter).not.toContain('argument-hint:');
+    expect(frontmatterKeys).toEqual(expect.arrayContaining(['name', 'description']));
     expect(frontmatter).toContain('do not use for implementation execution, unresolved scope, small low-risk plans, or remote/generic task lists');
 
     for (const heading of [
@@ -477,12 +476,28 @@ with ZipFile(${JSON.stringify(packagePath)}) as package:
   test('spec-plan handoff only offers task-pack execution for executable task packs', () => {
     const handoff = read(PLAN_HANDOFF_PATH);
 
-    expect(handoff).toContain('Load the standalone `spec-write-tasks` skill with the plan path');
+    expect(handoff).toContain('Invoke the `spec-write-tasks` workflow with the plan path');
     expect(handoff).toContain('If it writes an executable task pack with matching `spec_id` and verifiable `source_plan_hash`');
     expect(handoff).toContain('surface the copy-ready current-host doc-review invocation');
     expect(handoff).toContain('If it returns `skip`, `return-to-plan`, `draft-only`, unverifiable identity/hash, or a non-executable task pack');
     expect(handoff).toContain('do not offer task-pack execution');
     expect(handoff).not.toContain('/spec:work <task-pack-path>` on Claude Code');
     expect(handoff).not.toContain('$spec-work <task-pack-path>` on Codex');
+  });
+
+  test('reviewed-existing posture requires evidence metadata for spec-work-task-pack next_action', () => {
+    const contract = read(HANDOFF_CONTRACT_PATH);
+    const skill = read(SKILL_PATH);
+    const combined = `${contract}\n${skill}`;
+
+    // reviewed-existing without evidence must not proceed to spec-work-task-pack
+    expect(combined).toContain('reviewed-existing');
+    expect(combined).toContain('unchecked-existing');
+    expect(combined).toContain('evidence metadata');
+    expect(contract).toContain('A bare `reviewed-existing` claim without current evidence metadata is not sufficient');
+    // dispatch_authorization: authorized requires bounded continuation reference
+    expect(contract).toContain('dispatch_authorization: authorized');
+    expect(contract).toContain('bounded continuation reference');
+    expect(contract).toContain('dispatch_authorization: missing');
   });
 });

@@ -27,6 +27,10 @@ Core boundary: scripts prepare deterministic readiness facts; LLM workflows deci
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
 
+## Examples As Context
+
+When editing or reviewing this workflow prompt, or when running fresh-source eval for setup posture drift, read `skills/spec-mcp-setup/evals/examples.json` as examples-as-context. These examples are not a deterministic router, runtime-readiness gate, or substitute for LLM judgment during ordinary setup runs.
+
 ## Source Of Truth
 
 `skills/spec-mcp-setup/mcp-tools.json` is the current source directory for the machine registry of baseline MCP servers plus explicit opt-in MCP capability entries and centralized external dependency pins. Schema version is `7`. Current required baseline tools include `sequential-thinking` and `context7`; optional MCP entries must carry `opt_in.explicit_consent_required=true` and are admitted only through the bare Runtime Setup default provider pack or explicit `--only` selection. The directory name remains `spec-mcp-setup` during the entrypoint rename to avoid a broad source/runtime path migration in the same slice.

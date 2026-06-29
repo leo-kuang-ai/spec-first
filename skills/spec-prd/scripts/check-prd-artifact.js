@@ -1234,6 +1234,7 @@ module.exports = {
   LEGAL_DISPOSITIONS,
   OQ_HEADER_ALIASES,
   TRACE_HEADER_ALIASES,
+  WHAT_TOUCHING_KEYWORDS,
   buildReport,
   computeInputsHash,
   normalizeForReceipt,

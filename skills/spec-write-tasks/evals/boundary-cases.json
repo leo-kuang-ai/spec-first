@@ -2,6 +2,16 @@
   "schema_version": "spec-first.spec-write-tasks-boundary-cases.v1",
   "cases": [
     {
+      "id": "requirements-definition-routes-to-prd",
+      "input": "Turn these rough product notes into structured requirements I can build from, then break them into tasks.",
+      "context": "The input is unsettled WHAT (product requirements), not a settled local source plan ready for task compilation.",
+      "expected_decision": "return-to-plan",
+      "expected_next_action": "Route requirements definition to spec-prd (or spec-brainstorm); task compilation needs a settled source plan, not raw product notes.",
+      "boundary_note": "spec-write-tasks compiles a settled plan into a derived task pack; defining or refining requirements is owned by spec-prd, not write-tasks.",
+      "forbidden_signals": ["author-requirements-in-task-pack", "compile-from-unsettled-what", "invent-acceptance-criteria"],
+      "coverage_tags": ["boundary"]
+    },
+    {
       "id": "implementation-request",
       "input": "Implement the plan now.",
       "context": "The user is asking for execution, not task-pack compilation or validation.",
@@ -59,6 +69,16 @@
       "boundary_note": "Low-risk executable packs should not force doc-review handoff.",
       "forbidden_signals": ["review-task-pack-by-default", "auto-doc-review"],
       "coverage_tags": ["boundary", "handoff"]
+    },
+    {
+      "id": "reviewed-existing-without-evidence",
+      "input": "Task pack claims semantic_posture: reviewed-existing but no review actually happened this run.",
+      "context": "The task pack was generated in a previous session and has reviewed-existing posture but carries no evidence metadata or review outcome reference.",
+      "expected_decision": "compile",
+      "expected_next_action": "Treat posture as unchecked-existing; route to review or regeneration before spec-work-task-pack.",
+      "boundary_note": "A bare reviewed-existing claim without current evidence metadata is not eligible for next_action: spec-work-task-pack. Deterministic handoff proves identity, freshness, and structure only.",
+      "forbidden_signals": ["allow-spec-work-with-bare-reviewed-existing"],
+      "coverage_tags": ["boundary", "handoff", "evidence"]
     }
   ],
   "skill": "spec-write-tasks",

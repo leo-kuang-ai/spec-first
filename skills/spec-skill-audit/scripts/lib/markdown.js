@@ -25,8 +25,8 @@ function parseSkillMarkdown(content, options = {}) {
   const body = split.body;
   const headings = extractHeadings(body);
   const sections = extractSections(body, headings);
-  const links = extractLocalLinks(body, skillDir, repoRoot);
   const codeBlocks = extractCodeBlocks(body);
+  const links = extractLocalLinks(body, skillDir, repoRoot, codeBlocks);
   const pathReferences = extractPathReferences(content);
 
   return {
@@ -86,13 +86,30 @@ function extractSections(body, headings) {
   return sections;
 }
 
-function extractLocalLinks(body, skillDir, repoRoot) {
+function extractLocalLinks(body, skillDir, repoRoot, codeBlocks = []) {
   const links = [];
+  const text = String(body || '');
   let match;
 
-  while ((match = LOCAL_LINK_PATTERN.exec(String(body || ''))) !== null) {
+  // 代码块行区间集合:落在其中的 markdown 链接不算真实本地链接(R-40)
+  const codeBlockLineRanges = (codeBlocks || []).map((block) => {
+    const startLine = block.line;
+    const blockLineCount = String(block.text || '').split(/\r?\n/).length;
+    // block.line 是 ``` 起始行;块体加首尾围栏约占 blockLineCount + 2 行
+    return { start: startLine, end: startLine + blockLineCount + 1 };
+  });
+  const isInCodeBlock = (line) => codeBlockLineRanges.some((r) => line >= r.start && line <= r.end);
+
+  while ((match = LOCAL_LINK_PATTERN.exec(text)) !== null) {
     const rawTarget = match[1].trim();
     if (isExternalLink(rawTarget) || rawTarget.startsWith('#')) continue;
+
+    // 跳过 {url}/{older_url} 等 placeholder:含 {...} 占位的 target 不是本地路径(R-40)
+    if (/\{[^}]*\}/.test(rawTarget)) continue;
+
+    // 跳过代码块内链接:示例代码里的 markdown 链接不是真实本地引用(R-40)
+    const line = text.slice(0, match.index).split(/\r?\n/).length;
+    if (isInCodeBlock(line)) continue;
 
     const cleanTarget = rawTarget.split('#')[0].trim();
     if (!cleanTarget) continue;

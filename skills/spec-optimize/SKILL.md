@@ -47,6 +47,10 @@ Validate the spec and budget, establish the baseline, run bounded experiments, m
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
 
+## Examples As Context
+
+When editing or reviewing this workflow prompt, or when running fresh-source eval for optimization posture drift, read `skills/spec-optimize/evals/examples.json` as examples-as-context. These examples are not a deterministic router or substitute for LLM judgment during ordinary optimization runs.
+
 ## Interaction Method
 
 Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.

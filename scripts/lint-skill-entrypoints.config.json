@@ -1,6 +1,8 @@
 {
   "scanRoots": [
-    "skills"
+    "skills",
+    "CLAUDE.md",
+    "AGENTS.md"
   ],
   "markdownExtensions": [
     ".md"

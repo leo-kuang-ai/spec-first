@@ -25,7 +25,7 @@ It is not a command-backed workflow, slash command, or `$spec-*` workflow. It do
 | Workflow | Read only enough facts to classify intent, apply explicit-route normalization and routing priority, announce the chosen route only when useful, then let the selected workflow own execution. |
 | Downstream consumers | Public `$spec-*` / `/spec:*` workflows, standalone skills such as `spec-write-tasks`, and human users asking for the next step. |
 
-Core boundary: scripts and CLI commands prepare deterministic facts; the LLM decides the workflow recommendation. This governor must not fabricate command results, infer runtime readiness without evidence, or replace downstream workflow judgment with a local routing checklist.
+Core boundary: scripts and CLI commands enforce deterministic invariants when mechanically decidable and prepare deterministic facts; the LLM decides the workflow recommendation above that fact floor. This governor must not fabricate command results, infer runtime readiness without evidence, or replace downstream workflow judgment with a local routing checklist.
 
 ## Examples As Context
 
@@ -226,7 +226,7 @@ Anti-rationalization reminders are advisory, not a deterministic router. Direct 
 
 `using-spec-first` governs **entry routing only**. It does not create plans, task packs, review reports, setup reports, or durable knowledge. It only decides entry routing or gives a next-step recommendation.
 
-Scripts and CLI commands may prepare deterministic facts for downstream workflows. This skill should not ask the agent to fabricate command results, infer runtime readiness without evidence, or replace downstream workflow judgment with a local routing checklist.
+Scripts and CLI commands may enforce deterministic invariants and prepare deterministic facts for downstream workflows. This skill should not ask the agent to fabricate command results, infer runtime readiness without evidence, or replace downstream workflow judgment with a local routing checklist.
 
 When a workflow is selected, that workflow owns its artifacts, validation evidence, and final judgment. Do not use this governor to create pseudo-plan, pseudo-task, or pseudo-review artifacts.
 

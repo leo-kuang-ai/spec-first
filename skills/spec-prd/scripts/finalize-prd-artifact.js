@@ -145,10 +145,6 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
   // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
   // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
   // 与 receipt-only 原因本身不阻断 checkpoint closeout——它们只意味着"还没 ready",而非"非法"。
-  // 004:把 closeout 许可与 ready finalization 拆开。合法 checkpoint(write_mode=checkpoint-prd
-  // + can_enter_spec_plan: no + 不自称 ready)是一个合法的 non-ready 出口:can_finalize=false
-  // 但 should_block_closeout=false。只有真正的 ready 矛盾才阻断 closeout。`finalize_required`
-  // 与 receipt-only 原因本身不阻断 checkpoint closeout——它们只意味着"还没 ready",而非"非法"。
   //
   // closeout 豁免只覆盖 checkpoint-prd,不覆盖 ask-owner-first / route-out —— 这是 intended:
   // ask-owner-first 是进行中的 grill 状态(SKILL.md:133 "keep grilling the highest-risk branch,

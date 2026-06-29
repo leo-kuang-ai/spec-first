@@ -37,6 +37,14 @@
       "coverage_tags": ["boundary", "failure"],
       "expected_outcome": "Record the missing reproduction condition and avoid claiming confirmed root cause.",
       "boundary_note": "Unreproducible bugs need honest degraded evidence, not fabricated causality."
+    },
+    {
+      "id": "optimize-working-target-boundary",
+      "input": "This code works but feels slow and bloated; clean it up and make it faster.",
+      "coverage_tags": ["boundary", "optimize-routing"],
+      "expected_outcome": "Route improvement of working code to spec-optimize; debug owns broken behavior with an unresolved root cause, not optimization of a working target.",
+      "boundary_note": "A working-but-suboptimal target is optimization work, not root-cause debugging.",
+      "forbidden_signals": ["debug-as-optimize", "invent-a-bug-to-justify-debug"]
     }
   ]
 }

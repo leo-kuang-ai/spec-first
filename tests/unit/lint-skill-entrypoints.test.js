@@ -1,8 +1,11 @@
 'use strict';
 
+const path = require('node:path');
 const {
   analyzeContent,
   buildRules,
+  collectFiles,
+  loadConfig,
 } = require('../../scripts/lint-skill-entrypoints');
 
 function testConfig() {
@@ -120,5 +123,19 @@ describe('lint skill entrypoints', () => {
     );
 
     expect(findings).toEqual([]);
+  });
+
+  // R-12: scanRoots 必须覆盖 CLAUDE.md/AGENTS.md host 入口文档,
+  // 且 collectFiles 必须支持文件级 scanRoot(不只是目录递归)。
+  test('scanRoots cover host entry docs and file-level scanRoot is collected', () => {
+    const config = loadConfig();
+
+    expect(config.scanRoots).toContain('CLAUDE.md');
+    expect(config.scanRoots).toContain('AGENTS.md');
+
+    const files = collectFiles(config);
+    const collected = files.map((f) => path.basename(f));
+    expect(collected).toContain('CLAUDE.md');
+    expect(collected).toContain('AGENTS.md');
   });
 });

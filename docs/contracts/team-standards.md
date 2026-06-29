@@ -20,7 +20,7 @@
 
 | 层级 | Source | 主要内容 | 消费规则 |
 | --- | --- | --- | --- |
-| 1 | `docs/10-prompt/结构化项目角色契约.md` | spec-first 演化判断、source/runtime、Scripts prepare / LLM decides 等最高治理基线 | 架构、prompt、workflow、contract、治理取舍时优先；不是具体团队规范库 |
+| 1 | `docs/10-prompt/结构化项目角色契约.md` | spec-first 演化判断、source/runtime、deterministic floor / LLM semantic judgment 等最高治理基线 | 架构、prompt、workflow、contract、治理取舍时优先；不是具体团队规范库 |
 | 2 | 根级 `AGENTS.md` / `CLAUDE.md` | 当前 host 执行指令、高优先级入口规则、语言策略、source/runtime 纪律 | host instruction hard context；不要整段复制到 `docs/standards/**` |
 | 3 | `docs/contracts/team-standards.md` | standards 的语义合同、字段、trust、lifecycle、promotion、selection contract | 定义如何解释和消费规范，不承载大量具体规则 |
 | 4 | `docs/standards/**` | 经确认的长期团队规范、端侧差异、architecture/design/coding/testing/review/security 规则 | 只有 `trust=confirmed,lifecycle_state=active` 且 scope 命中才可成为 hard project context |

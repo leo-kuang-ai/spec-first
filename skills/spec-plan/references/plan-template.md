@@ -12,6 +12,7 @@ status: active  # active | partially-shipped | completed | superseded
 date: YYYY-MM-DD
 spec_id: YYYY-MM-DD-NNN-<slug>
 origin: docs/brainstorms/YYYY-MM-DD-NNN-<slug>-requirements.md  # include when planning from a requirements doc
+origin_grade: prd | brainstorm | legacy  # set from Phase 0.2 candidate discovery; visible to downstream workflows, not a gate
 deepened: YYYY-MM-DD  # optional, set when the confidence-first check substantively strengthens the plan
 implements_schemas: []  # optional; include only repo-relative contract schema paths this plan actually implements
 ---

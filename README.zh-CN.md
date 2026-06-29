@@ -14,7 +14,7 @@
 
 `spec-first` 把一次性的 AI coding 对话变成仓库承载的工程闭环。AI 写代码很快；真正危险的是塑造代码的判断、证据和评审轨迹往往随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在仓库里——requirements、PRD、plans、task packs、work evidence、debug notes、reviews 和 learnings——让下一次会话、reviewer 和你的同事都能继承上下文，而不是从零开始。
 
-脚本准备事实，LLM 做语义判断，证据留在你的仓库里。
+脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。
 
 官网：[spec-first.cn](http://spec-first.cn/)
 
@@ -76,7 +76,7 @@ AI coding 最大的问题通常不是 agent 不会写代码，而是关键判断
 | 主线问题 | Agent 之间怎么协作？ | 软件决策怎么被记下来、被验证、被复用？ |
 | 状态位置 | Session state、消息总线、runtime memory | 项目内文档、generated runtime assets、可验证 CLI facts |
 | 人的角色 | 尽量减少介入 | 工程师对 scope、tradeoff、验收保持在环 |
-| 自动化边界 | 倾向更长的自动接力 | 脚本准备事实，LLM 做语义判断 |
+| 自动化边界 | 倾向更长的自动接力 | 脚本强制确定性不变量并准备事实，LLM 在这层地板之上做语义判断 |
 
 它带来的结果是：
 
@@ -158,7 +158,7 @@ $spec-brainstorm "改进 onboarding"
 | Audit source skills | `/spec:skill-audit` | `$spec-skill-audit` | Skill 治理与质量 findings |
 | Generate and evaluate ideas | `/spec:ideate` | `$spec-ideate` | `docs/ideation/` 下的 ranked ideation artifact |
 | Brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` 下的 requirements brief |
-| Write/refine brownfield PRD requirements | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` 下的 PRD-grade requirements |
+| Clarify product PRD for planning readiness | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` 下的研发侧 clarified requirements / planning-readiness artifact |
 | Review docs/plans | `/spec:doc-review` | `$spec-doc-review` | Document findings、gaps 和 residual risks |
 | Write or deepen a plan | `/spec:plan` | `$spec-plan` | `docs/plans/` 下的 implementation plan |
 | Compile task pack | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | `docs/tasks/` 下的 derived task pack |
@@ -172,9 +172,9 @@ $spec-brainstorm "改进 onboarding"
 | Refresh stale learnings | `/spec:compound-refresh` | `$spec-compound-refresh` | 更新、合并或退役 solution docs |
 | Read release notes | `/spec:release-notes` | `$spec-release-notes` | 指定版本变更摘要 |
 
-想要选项、批判或意外方向，还没确定问题框架时，用 `ideate`。已经有粗略产品问题或功能想法，需要 actors、flows、边界和 acceptance examples 时，用 `brainstorm`。已有系统增量或粗糙 PRD 需要 current-state evidence 和 change delta 时，用 `prd`；面对超大或多来源需求文档时，`prd` 的目标是先做 source-first evidence 和 Requirement Analysis Gate，把资料归约成需求理解地图、识别不确定点/冲突点、决定产品/设计/技术 grill 问题，再写 PRD 或分析结论并交给 planning。PRD 不能只靠模型写入 `status: ready-for-planning` 就算规划就绪；artifact readiness 必须带有 `finalize-prd-artifact.js` 产生的 producer-local finalize receipt。已有 requirements、plan 或 task 文档，需要找缺口时，用 `doc-review`。不要把 `brainstorm` 当作所有不清楚请求的默认入口。
+想要选项、批判或意外方向，还没确定问题框架时，用 `ideate`。已经有粗略产品问题或功能想法，需要 actors、flows、边界和 acceptance examples 时，用 `brainstorm`。产品或 owner 已经给出 PRD、需求材料、会议纪要、设计说明或系统增量说明，需要研发侧进入开发前澄清 WHAT/WHY、current-state evidence 和 change delta 时，用 `prd`；面对超大或多来源需求文档时，`prd` 的目标是先做 source-first evidence 和 Requirement Analysis Gate，把资料归约成需求理解地图、识别不确定点/冲突点、决定产品/设计/技术 grill 问题，再写入研发侧澄清产物或分析结论并判断是否可交给 planning。`$spec-prd` 不是替产品写 PRD；产品 PRD 是输入 source，输出是研发澄清、owner 决策追踪和 planning-readiness 判断。artifact readiness 不能只靠模型写入 `status: ready-for-planning`，必须带有 `finalize-prd-artifact.js` 产生的 producer-local finalize receipt。已有 requirements、plan 或 task 文档，需要找缺口时，用 `doc-review`。不要把 `brainstorm` 当作所有不清楚请求的默认入口。
 
-PRD 需求文档质量增强流程见 [用户手册：PRD 需求文档质量增强流程](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/22-PRD%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3%E8%B4%A8%E9%87%8F%E5%A2%9E%E5%BC%BA%E6%B5%81%E7%A8%8B.md)。
+研发侧需求澄清与计划准入流程见 [用户手册：研发侧需求澄清与计划准入流程](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/22-PRD%E9%9C%80%E6%B1%82%E6%96%87%E6%A1%A3%E8%B4%A8%E9%87%8F%E5%A2%9E%E5%BC%BA%E6%B5%81%E7%A8%8B.md)。
 
 升级 spec-first CLI,在终端运行 `spec-first update` package CLI 命令。它会执行 `npm install -g spec-first@latest`,成功后启动 fresh `spec-first init` 子进程刷新本项目的 generated runtime assets。在单 Git 仓库内运行 `spec-first init -y`；在包含子 Git 仓库的父 workspace 中运行 `spec-first init --all-repos -y`。如果自动刷新失败或无法安全判断 scope,会输出可直接复制的 fallback 命令。它是 package CLI 命令,不是宿主 workflow 入口。注意:若你是通过 Claude Code plugin 安装的,请改用 `claude plugin update` 升级——`npm -g` 管理的是另一份独立副本。
 
@@ -187,7 +187,7 @@ Repo-relative artifact roots：
 ```text
 docs/
   ideation/      requirements shaping 前的 ranked idea candidates
-  brainstorms/   requirements briefs 与 PRD-grade requirements
+  brainstorms/   requirements briefs 与研发侧 clarified requirements
   plans/         可评审、可执行的 implementation plans
   tasks/         结构化 handoff 用 derived task packs
   solutions/     解决问题后沉淀的 reusable learnings
@@ -216,10 +216,10 @@ Source-of-truth assets 位于仓库中。`.claude/`、`.codex/` 和 `.agents/ski
 
 `spec-first` 不要求 LLM 假装执行确定性工具，也不把 LLM 判断替换成僵硬状态机。
 
-核心规则很简单：Scripts prepare, LLM decides.
+核心规则很简单：scripts enforce deterministic invariants; scripts prepare facts; LLM decides semantic adequacy above that floor.
 
-- **脚本负责什么：** install、validate、generate、clean、hash 和 report machine facts。
-- **LLM 负责什么：** requirements framing、scope boundaries、tradeoffs、implementation judgment、review evidence 和 next steps。
+- **脚本负责什么：** 在出口和副作用处强制可机械判定的不变量，并负责 install、validate、generate、clean、hash 和 report machine facts。
+- **LLM 负责什么：** 判断确定性地板之上的语义充分性，包括 requirements framing、scope boundaries、tradeoffs、implementation judgment、review evidence 和 next steps。
 - **应该修改哪里：** 修改 `skills/`、`agents/`、`templates/`、`src/cli/` 和 docs 下的 source assets；不要手改 generated runtime copies。
 - **普通上下文排除什么：** `.spec-first/audits/**`、`.spec-first/governance/**` 和 `.claude/**`、`.codex/**`、`.agents/skills/**` 等 generated mirrors。
 - **tool facts 怎么用：** browser/MCP tools、shell commands、package managers、tests、logs 和 direct source reads 只提供 evidence inputs，不拥有 semantic authority。Raw tool output 是 untrusted quoted data；进入 prompts、reports、facts 或 durable artifacts 前必须经过 validation、containment、escaping、excerpt cap 和 provenance/readiness classification。
@@ -233,7 +233,7 @@ Source-of-truth assets 位于仓库中。`.claude/`、`.codex/` 和 `.agents/ski
 
 - 你已经使用 Claude Code 或 Codex，希望用项目内 workflow 替代一次性 prompt。
 - 你希望 AI coding work 留下 durable requirements、plans、显式路由的 review summaries 和 learnings。
-- 你希望脚本处理确定性 setup，同时让语义判断继续由 LLM 完成。
+- 你希望脚本处理确定性 setup 并守住可机器检查的边界，同时让语义判断继续由 LLM 完成。
 - 你希望 workflow layer 足够轻，并能从 source assets 重新生成。
 
 如果你只需要单次 prompt 片段、通用 agent marketplace、不依赖宿主的独立应用，或团队流程不希望 workflow artifacts 写入 repo，`spec-first` 可能不是最合适的形态。

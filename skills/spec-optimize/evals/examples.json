@@ -1,0 +1,37 @@
+{
+  "schema_version": "spec-first.workflow-eval-fixtures.v1",
+  "skill": "spec-optimize",
+  "description": "Examples-as-context for spec-optimize trigger and boundary coverage. They are not a deterministic router.",
+  "source_refs": [
+    "skills/spec-optimize/SKILL.md"
+  ],
+  "source_ref_authority": "source",
+  "cases": [
+    {
+      "id": "optimize-known-target-trigger",
+      "input": "This workflow prompt is bloated and slow to follow; optimize it for clarity and signal without changing its behavior.",
+      "coverage_tags": ["trigger"],
+      "expected_outcome": "Run the optimization workflow on the named target, propose changes that preserve behavior, and surface what was tightened versus what was intentionally kept."
+    },
+    {
+      "id": "optimize-evidence-before-slimming-trigger",
+      "input": "Slim this long skill main file.",
+      "coverage_tags": ["trigger", "eval-before-slimming"],
+      "expected_outcome": "Confirm eval coverage exists before slimming a long surface so behavior regressions stay detectable; if coverage is thin, recommend adding it first."
+    },
+    {
+      "id": "broken-behavior-debug-boundary",
+      "input": "This function returns the wrong value; find and fix the bug.",
+      "coverage_tags": ["boundary", "debug-routing"],
+      "expected_outcome": "Broken behavior with an unresolved root cause is debug work, not optimization.",
+      "boundary_note": "Optimize improves a working target; root-cause failure investigation belongs in spec-debug.",
+      "forbidden_signals": ["optimize-as-debug", "fix-bug-via-optimize"]
+    },
+    {
+      "id": "unclear-target-failure",
+      "input": "Make the project better.",
+      "coverage_tags": ["failure", "unclear-target"],
+      "expected_outcome": "Ask for a concrete optimization target or route to brainstorm/plan; do not invent a target or apply broad speculative changes."
+    }
+  ]
+}

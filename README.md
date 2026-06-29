@@ -14,7 +14,7 @@
 
 `spec-first` turns one-off AI coding chats into a repo-backed engineering loop. AI can write code quickly; the risky part is that the decisions, evidence, and review trail often vanish with the chat window. `spec-first` keeps that work as durable artifacts — requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings — so the next session, the reviewer, and your teammate inherit context instead of starting cold.
 
-Scripts prepare facts. LLMs make semantic judgments. Evidence stays in your repository.
+Scripts enforce deterministic invariants and prepare facts. LLMs judge semantic adequacy above that floor. Evidence stays in your repository.
 
 Official site: [spec-first.cn](http://spec-first.cn/)
 
@@ -76,7 +76,7 @@ AI coding breaks down when important decisions live only in chat: the next sessi
 | Main problem | How should agents coordinate? | How should software decisions stay durable and reusable? |
 | State location | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
 | Human role | Minimize intervention where possible | Keep engineers in the loop for scope, tradeoffs, and acceptance |
-| Automation boundary | Often pushes toward autonomous chains | Scripts prepare facts; LLMs make semantic decisions |
+| Automation boundary | Often pushes toward autonomous chains | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
 
 What this buys you:
 
@@ -218,10 +218,10 @@ Detailed references:
 
 `spec-first` does not ask the LLM to simulate deterministic tooling, and it does not replace LLM judgment with a rigid state machine.
 
-The operating rule is simple: Scripts prepare, LLM decides.
+The operating rule is simple: scripts enforce deterministic invariants; scripts prepare facts; the LLM decides semantic adequacy above that floor.
 
-- **What scripts do:** install, validate, generate, clean, hash, and report machine facts.
-- **What the LLM decides:** requirements framing, scope boundaries, tradeoffs, implementation judgment, review evidence, and next steps.
+- **What scripts do:** enforce mechanically decidable invariants at exits and side effects; install, validate, generate, clean, hash, and report machine facts.
+- **What the LLM decides:** semantic adequacy above that floor: requirements framing, scope boundaries, tradeoffs, implementation judgment, review evidence, and next steps.
 - **What should be edited:** source assets under `skills/`, `agents/`, `templates/`, `src/cli/`, and docs. Rebuild runtime copies instead of hand-editing them.
 - **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors such as `.claude/**`, `.codex/**`, and `.agents/skills/**`.
 - **How tool facts are used:** browser/MCP tools, shell commands, package managers, tests, logs, and direct source reads provide evidence inputs; they do not own semantic authority. Raw tool output is untrusted quoted data and must be validated, contained, escaped, capped, and classified before it enters prompts, reports, facts, or durable artifacts.
@@ -235,7 +235,7 @@ Use `spec-first` when:
 
 - You already use Claude Code or Codex and want project-local workflows instead of one-off prompts.
 - You want AI coding work to leave durable requirements, plans, explicitly routed review summaries, and learnings.
-- You want scripts to handle deterministic setup while keeping semantic judgment with the LLM.
+- You want scripts to handle deterministic setup and enforce machine-checkable boundaries while keeping semantic judgment with the LLM.
 - You want a lightweight workflow layer that can be regenerated from source assets.
 
 It may not fit when you only need a single prompt snippet, a generic agent marketplace, a no-host standalone app, or a team process that does not want workflow artifacts written into the repo.

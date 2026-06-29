@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const path = require('node:path');
 
 const { createFinding } = require('./lib/finding');
 
@@ -15,6 +16,16 @@ const REQUIRED_SECTIONS = [
   { normalized: 'failure-modes', title: 'Failure Modes', severity: 'P2' },
 ];
 
+// R-25: internal_only skill 缺 section 的风险低于 public workflow——这些 skill 不是
+// 用户入口,缺 When-To-Use/Outputs 等 section 不应与 public workflow 同级淹没 audit 信号。
+// 对 internal_only,missing_section severity 整体降一级(P1→P2、P2→P3)。
+// 其他 entry_surface(workflow_command/standalone_skill)或未知 entry_surface 保持原 severity(保守)。
+const SECTION_SEVERITY_DOWNGRADE = { P1: 'P2', P2: 'P3' };
+
+function downgradeSeverity(severity) {
+  return SECTION_SEVERITY_DOWNGRADE[severity] || severity;
+}
+
 // 目录名与 frontmatter name 故意不一致的已治理别名。
 // spec-dhh-rails-style 目录承载 name: dhh-rails-style:改 name 会破坏既有 runtime 引用契约
 // (best-practices-researcher 等按 dhh-rails-style 引用),故保留别名而非强制同名。
@@ -22,19 +33,46 @@ const ALLOWED_FRONTMATTER_NAME_ALIASES = new Map([
   ['spec-dhh-rails-style', 'dhh-rails-style'],
 ]);
 
-function lintSkillStructure(inventory) {
+function lintSkillStructure(inventory, options = {}) {
   const findings = [];
+  // R-25: 解析 entry_surface 映射(skill_name → entry_surface)。
+  // 优先用调用方传入的 map;否则从 repo_root 下的 governance registry 派生;
+  // 解析失败时为空 map,各 skill 走"未知 entry_surface 不降级"的保守分支。
+  const entrySurfaceMap = options.entrySurfaceMap
+    || loadEntrySurfaceMap(inventory.repo_root || process.cwd());
 
   for (const skill of inventory.skills || []) {
-    findings.push(...lintSingleSkill(skill));
+    findings.push(...lintSingleSkill(skill, entrySurfaceMap));
   }
 
   return findings;
 }
 
-function lintSingleSkill(skill) {
+function loadEntrySurfaceMap(repoRoot) {
+  const map = new Map();
+  try {
+    const governancePath = path.join(
+      repoRoot, 'src', 'cli', 'contracts', 'dual-host-governance', 'skills-governance.json',
+    );
+    const governance = JSON.parse(fs.readFileSync(governancePath, 'utf8'));
+    for (const entry of governance.skills || []) {
+      if (entry.skill_name && entry.entry_surface) {
+        map.set(entry.skill_name, entry.entry_surface);
+      }
+    }
+  } catch (_error) {
+    // 保守:无法读取 governance 时返回空 map,不降级任何 skill 的 finding
+  }
+  return map;
+}
+
+function lintSingleSkill(skill, entrySurfaceMap = new Map()) {
   const findings = [];
   const evidenceFile = skill.skill_file || skill.source_path;
+  // skill_id 即目录名;governance 用 skill_name(spec-* 前缀)。两者在本 repo 对齐:
+  // 目录名 = skill_name。internal_only 才降级,其余(含未知)保持原 severity。
+  const entrySurface = entrySurfaceMap.get(skill.skill_id) || null;
+  const isInternalOnly = entrySurface === 'internal_only';
 
   if (!skill.has_skill_md) {
     findings.push(createFinding({
@@ -114,8 +152,9 @@ function lintSingleSkill(skill) {
   const sectionNames = new Set((skill.sections || []).map((section) => section.normalized));
   for (const section of REQUIRED_SECTIONS) {
     if (sectionNames.has(section.normalized)) continue;
+    const severity = isInternalOnly ? downgradeSeverity(section.severity) : section.severity;
     findings.push(createFinding({
-      severity: section.severity,
+      severity,
       category: 'missing_section',
       skill_id: skill.skill_id,
       title: `Missing ${section.title} section`,

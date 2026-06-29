@@ -200,6 +200,8 @@ These fields should be added when useful for context compression, review, or wor
 | `review_focus` | Specific review concern for mini review or final shipping review |
 | `handoff_owner` | Suggested executor type when relevant |
 | `target_repo` | Selected child repo in parent-workspace contexts |
+| `semantic_posture_evidence` | Object carrying provenance metadata for `semantic_posture` claims (source, producer, evidence_ref, checked_at, reason_code, limitations). CLI shape-checks only; semantic adequacy is LLM/human judgment. |
+| `dispatch_authorization_evidence` | Object carrying provenance metadata for `dispatch_authorization` claims (same shape as `semantic_posture_evidence`). CLI shape-checks only. |
 
 ### Recommended Human-Readable Task Card Example
 

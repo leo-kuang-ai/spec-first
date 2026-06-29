@@ -46,6 +46,10 @@ Select scope, inspect supporting learnings before derived patterns, classify eac
 Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
 Overrides: none
 
+## Examples As Context
+
+When editing or reviewing this workflow prompt, or when running fresh-source eval for refresh/promotion posture drift, read `skills/spec-compound-refresh/evals/examples.json` as examples-as-context. These examples are not a deterministic router, an auto-promotion gate, or a substitute for LLM/human judgment during ordinary refresh runs.
+
 ## Support Files
 
 These files are the durable contract for the workflow. Read them on-demand at the step that needs them — do not bulk-load at skill start.

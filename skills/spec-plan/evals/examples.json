@@ -120,6 +120,18 @@
       "coverage_tags": ["boundary", "review-routing"],
       "expected_outcome": "Route independent plan review to spec-doc-review.",
       "boundary_note": "Review-only requests should not silently become planning or implementation."
+    },
+    {
+      "id": "prd-grade-origin-labeled",
+      "input": "Create a plan from docs/brainstorms/2026-06-01-001-example-requirements.md (artifact_kind: prd-requirements, can_enter_spec_plan: yes).",
+      "coverage_tags": ["trigger", "planning", "origin-grade"],
+      "expected_outcome": "Discover the PRD-grade origin, label it origin_grade: prd in the plan frontmatter, and carry forward R/F/AE trace. Do not block or require re-grilling of already-closed owner decisions."
+    },
+    {
+      "id": "brainstorm-grade-origin-accepted",
+      "input": "Create a plan from docs/brainstorms/2026-06-01-001-example-requirements.md (no artifact_kind, no ready receipt).",
+      "coverage_tags": ["trigger", "planning", "origin-grade", "brainstorm"],
+      "expected_outcome": "Accept the brainstorm-grade origin as a valid planning input; record origin_grade: brainstorm in the plan frontmatter. Do not reject, block, or route away only because the origin is not PRD-grade."
     }
   ]
 }

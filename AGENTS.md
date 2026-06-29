@@ -8,7 +8,7 @@
 
 处理任何涉及 spec-first 演化、架构判断、prompt / workflow / contract 设计、治理规则取舍的工作前，必须先阅读 `docs/10-prompt/结构化项目角色契约.md`。
 
-该文档是项目角色与演化判断基线的 source of truth，用于校准系统目标、脚本与 LLM 职责分工、source/runtime 边界，以及 **Light contract + Explicit boundaries + Let the LLM decide** 的含义。
+该文档是项目角色与演化判断基线的 source of truth，用于校准系统目标、脚本与 LLM 职责分工、source/runtime 边界，以及 **Light contract + Explicit boundaries + Deterministic floor, LLM semantic judgment** 的含义。
 
 如果本文件与 `docs/10-prompt/结构化项目角色契约.md` 冲突，优先按角色契约执行，再调整本文件或当前执行方案。
 
@@ -35,7 +35,7 @@
 
 - **Light contract**：contract 必须轻量、明确、可维护。
 - **Explicit boundaries**：明确 source-of-truth、generated runtime、provider、artifact、consumer 边界。
-- **Scripts prepare, LLM decides**：脚本产出确定性事实，LLM 做语义判断。
+- **Scripts enforce deterministic invariants; scripts prepare facts; LLM decides semantic adequacy above that floor**：脚本强制确定性不变量并准备事实，LLM 判断这层确定性地板之上的语义充分性。
 
 核心 workflow 链路：
 

@@ -24,6 +24,6 @@ Before editing this skill, answer:
 1. Does the change reduce ambiguity or maintenance risk more than it increases initial-load cost?
 2. Is the new detail needed in `SKILL.md`, or can it live in `references/`?
 3. Can the claim be checked with source reads, JSON fixture validation, focused Jest, or fresh-source eval?
-4. Does the change preserve `Light contract + Explicit boundaries + Scripts prepare, LLM decides`?
+4. Does the change preserve `Light contract + Explicit boundaries + scripts enforce deterministic invariants; scripts prepare facts; LLM decides semantic adequacy above that floor`?
 
 If the answer is unclear, keep the change as a candidate next step instead of shipping it into the baseline.

@@ -28,7 +28,7 @@
 | --- | --- | --- | --- | --- |
 | `docs/ideation/*-ideation.md` | 主动想法探索与候选方向收敛 | `/spec:ideate` 或 `$spec-ideate` | 保存候选想法、批判、排序、被拒原因和进入 brainstorm 的 handoff；不是 requirements、plan 或代码 | 通常提交，作为后续 brainstorm/plan 的背景输入 |
 | `docs/brainstorms/*-requirements.md` | 需求成型 | `/spec:brainstorm` 或 `$spec-brainstorm` | 保存一个已选想法的问题框架、actors、flows、边界、非目标和验收样例 | 通常提交，作为 plan 的上游输入 |
-| `docs/brainstorms/*-requirements.md` | PRD-grade requirements | `/spec:prd` 或 `$spec-prd` | 保存已有系统增量的 current-state evidence、Change Delta、优先级、验收、Evidence And Assumptions；frontmatter 使用 `artifact_kind: prd-requirements`，仍不是 `docs/prds/` | 通常提交，作为 plan 的上游输入；也可先进入 doc review |
+| `docs/brainstorms/*-requirements.md` | 研发侧 clarified requirements / planning-readiness artifact | `/spec:prd` 或 `$spec-prd` | 保存产品 PRD 或需求材料进入研发前的 current-state evidence、Change Delta、owner 决策追踪、优先级、验收、Evidence And Assumptions；frontmatter 兼容使用历史字段 `artifact_kind: prd-requirements`，不代表替产品写 PRD，也不新增 `docs/prds/` | 通常提交，作为 plan 的上游输入；也可先进入 doc review |
 | `docs/plans/*-plan.md` | 实施规划 | `/spec:plan` 或 `$spec-plan` | 保存实施单元、取舍、验证范围、风险、非目标和证据限制 | 通常提交，作为 work 或 write-tasks 的上游输入 |
 | `docs/tasks/*-tasks.md` | 任务包派生 | standalone `write-tasks` skill | 保存从 plan 派生的 executable handoff、依赖、任务身份和 freshness contract | 视团队协作需要提交 |
 | `docs/solutions/**/*` | 知识沉淀 | `/spec:compound` 或 `$spec-compound` | 保存已解决问题的可复用工程经验 | 通常提交 |
@@ -38,7 +38,7 @@
 | 目录类型 | 主要作用 | 典型后续用途 |
 | --- | --- | --- |
 | `docs/ideation/` | 候选方向与想法排序 | `spec-brainstorm` 选择一个想法继续成型；维护者回看被拒绝方向与取舍理由 |
-| `docs/brainstorms/` | 需求成型 brief 与 PRD-grade requirements | `spec-plan`、doc review、后续维护者复核 scope、acceptance examples、Change Delta 和 evidence posture |
+| `docs/brainstorms/` | 需求成型 brief 与研发侧 clarified requirements | `spec-plan`、doc review、后续维护者复核 scope、acceptance examples、Change Delta、owner 决策和 evidence posture |
 | `docs/plans/` / `docs/tasks/` | 计划与可执行任务交接 | `spec-work`、standalone `write-tasks`、code/doc review；计划中的 evidence posture 说明 direct source reads、验证命令、限制和源码验证要求 |
 | `docs/solutions/` | 可复用工程知识 | 后续 brainstorm/plan/work/debug/review 复用经验 |
 | `config/` | setup-owned machine facts | mcp-setup 前置校验、host readiness 指针、required helper readiness、candidate `native_tools[]` / `native_resources[]`、fallback 能力判断 |

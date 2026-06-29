@@ -35,6 +35,9 @@ const ALLOWED_TASK_FIELDS = new Set([
   'review_focus',
   'handoff_owner',
   'target_repo',
+  // 语义姿态证据元数据：CLI 只验证字段形状，不判断语义充分性
+  'semantic_posture_evidence',
+  'dispatch_authorization_evidence',
 ]);
 // Object.freeze does not block Set.add/delete, so null out the mutators to keep
 // the exported allow-list immutable. .has()/iteration remain available.
@@ -359,6 +362,19 @@ function deriveValidity(errors, validation) {
   return 'invalid';
 }
 
+function deriveReasonCode(validity, errors) {
+  if (validity === 'valid') return 'task_pack_validated';
+  if (validity === 'wrong-chain') return 'wrong_chain';
+  if (validity === 'stale') return 'stale_hash';
+  if (validity === 'unverifiable') return 'unverifiable_hash';
+  // invalid: inspect first deterministic error code for a more specific reason
+  const first = errors[0] && errors[0].code;
+  if (first === 'task-pack-source-plan-file-missing' || first === 'task-pack-source-plan-missing') return 'source_plan_missing';
+  if (first === 'task-pack-missing-spec-id' || first === 'source-plan-missing-spec-id') return 'missing_spec_id';
+  if (first && first.includes('contract')) return 'invalid_contract';
+  return 'invalid_contract';
+}
+
 function validateTaskPack(taskPackPath, options = {}) {
   const repoRoot = path.resolve(options.repoRoot || process.cwd());
   const resolvedTaskPackPath = path.resolve(taskPackPath || '');
@@ -527,6 +543,7 @@ function validateTaskPack(taskPackPath, options = {}) {
   }
 
   result.task_pack_validity = deriveValidity(errors, validation);
+  result.reason_code = deriveReasonCode(result.task_pack_validity, errors);
   result.deterministic_handoff = result.task_pack_validity === 'valid';
   return result;
 }
@@ -650,6 +667,20 @@ function validateTaskPackContract(contract, repoRoot, errors, limitations) {
         task_id: task.task_id || null,
         field: 'parallelizable',
       });
+    }
+
+    // 证据元数据字段：CLI 只验证形状（必须为对象），不判断语义充分性
+    for (const evidenceField of ['semantic_posture_evidence', 'dispatch_authorization_evidence']) {
+      const value = task[evidenceField];
+      if (value !== undefined && value !== null) {
+        if (typeof value !== 'object' || Array.isArray(value)) {
+          addFinding(errors, `task-pack-task-${evidenceField.replace(/_/g, '-')}-invalid`,
+            `Task '${task.task_id || '<unknown>'}' '${evidenceField}' must be an object when provided.`, {
+              task_id: task.task_id || null,
+              field: evidenceField,
+            });
+        }
+      }
     }
 
     for (const field of REQUIRED_TASK_FIELDS) {
