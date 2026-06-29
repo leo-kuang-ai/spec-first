@@ -1,7 +1,7 @@
 ---
 title: "refactor: README adoption-first 二次重设计"
 type: refactor
-status: active
+status: completed
 date: 2026-06-30
 spec_id: 2026-06-30-001-readme-adoption-first-redesign
 origin: docs/brainstorms/2026-06-30-001-readme-adoption-first-redesign-requirements.md
@@ -13,6 +13,15 @@ origin_grade: brainstorm
 ## Summary
 
 将 `README.md` 与 `README.zh-CN.md` 从“完整解释 spec-first”进一步收敛为 adoption-first 开源入口：前半段优先服务首次评估与 first success path，后半段保留 Trust Model、Operating Model、workflow、CLI 和贡献者深度信息。实现策略是重排与收紧现有 README 内容，不新增 runtime/CLI/workflow surface，也不新增图片资产。
+
+---
+
+## Completion Evidence
+
+- **Status:** completed 2026-06-30.
+- **Primary restructure (U1–U3 structural body):** already landed via commit `adb7008b` + matrix automation (CHANGELOG v1.12.0 2026-06-30 01:14:17). Adoption-first opening order, npm download badges, 90-second visible-effect framing, compact Problem/Why/Quickstart funnel, and Trust/Operating Model progressive disclosure were in place at session start; twelve of R1–R13 were satisfied structurally before this run.
+- **Residual R11 mirror fix (this run):** prior execution left two bilingual-mirror defects — the English "Why spec-first?" funnel carried a stray Chinese team-standards bullet (8 vs ZH 7) and the English Documentation section lacked the team-standards links present in ZH. Fixed by converting the EN bullet to English, adding the matching ZH funnel bullet (both sides 8), adding Team Standards Contract/Index links to EN Documentation, and relocating (not deleting) the test-guarded Chinese substring into an EN Documentation `<sub>` note per KTD6.
+- **Verification:** `npx jest tests/unit/package-install-contracts.test.js tests/unit/context-governance-contracts.test.js tests/unit/team-standards-governance-contracts.test.js tests/unit/release-continuity-guard.test.js tests/unit/contract-drift-guard.test.js tests/unit/changelog-format.test.js --runInBand` (37 passed); `git diff --check` clean; bilingual H2 (11=11) and funnel bullet (8=8) counts compared. CHANGELOG updated (user-visible). No generated runtime mirrors changed; no `spec-first init` required.
 
 ---
 

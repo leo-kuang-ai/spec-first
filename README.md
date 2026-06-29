@@ -59,7 +59,7 @@ Current mechanisms you can inspect today:
 - Task-pack handoffs now recommend splitting from source-plan structure and recommend document review for high-risk packs while keeping the engineer in the loop.
 - Work, review, debug, optimize, and compound workflows preserve evidence and learning.
 - Knowledge handoffs stay summary-first, and recalled `docs/solutions/` learnings remain advisory until reconfirmed from source evidence.
-- 团队开发规范可以放在 `docs/contracts/team-standards.md` 与 `docs/standards/**`，由 workflow 按 scope 选择 confirmed 规则；这是 source 文档，不是新的 `$spec-*` public workflow。
+- Team standards live as source docs under `docs/contracts/team-standards.md` and `docs/standards/**`; workflows pick the confirmed rules in scope rather than adding a new entrypoint.
 - One source asset set supports Claude Code `/spec:*` entries and Codex `$spec-*` entries without hand-maintaining generated runtime copies.
 
 These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.
@@ -258,6 +258,10 @@ Learn the model:
 - [Verification Profile Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/verification/verification-profile.md)
 - [Verification Run Summary Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/verification/verification-run-summary.md)
 - [Honest Closeout Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
+- [Team Standards Contract](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/team-standards.md)
+- [Team Standards Index](https://github.com/sunrain520/spec-first/blob/main/docs/standards/index.md)
+
+<sub>团队开发规范可以放在 `docs/contracts/team-standards.md` 与 `docs/standards/**`，由 workflow 按 scope 选择 confirmed 规则；这是 source 文档，不是新的 `$spec-*` public workflow。</sub>
 
 Use workflows:
 
