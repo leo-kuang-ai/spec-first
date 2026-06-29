@@ -118,30 +118,22 @@ $spec-brainstorm "改进 onboarding"
 
 ## Workflow Entry Points
 
-这张表是公开入口的唯一映射表。共享 prose 优先说“当前宿主”；具体 `/spec:*` 与 `$spec-*` 映射集中放在这里和 init/runtime 指引中。
+这张表是研发主链路入口映射，遵循工程闭环 `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge`。共享 prose 优先说“当前宿主”；具体 `/spec:*` 与 `$spec-*` 映射集中放在这里和 init/runtime 指引中。完整公开入口集合与路由规则可在宿主会话中询问——`using-spec-first` 会推荐一个入口并说明原因。
 
-| Intent | Claude Code | Codex | Expected result |
+| 阶段 | Claude Code | Codex | Expected result |
 |---|---|---|---|
-| Runtime setup for required harness readiness | `/spec:mcp-setup` | `$spec-mcp-setup` | 必备 harness runtime facts、MCP/helper readiness 和 setup-owned config artifacts |
-| Search agent session history | `/spec:sessions` | `$spec-sessions` | 会话历史答案和恢复上下文 |
-| Research Slack context | `/spec:slack-research` | `$spec-slack-research` | Slack 工具可用时生成组织上下文 digest |
-| Audit source skills | `/spec:skill-audit` | `$spec-skill-audit` | Skill 治理与质量 findings |
-| Write source skills | `/spec:write-skill` | `$spec-write-skill` | source-first skill 编写、迁移和 audit remediation |
-| Generate and evaluate ideas | `/spec:ideate` | `$spec-ideate` | `docs/ideation/` 下的 ranked ideation artifact |
-| Brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` 下的 requirements brief |
-| Clarify product PRD for planning readiness | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` 下的研发侧 clarified requirements / planning-readiness artifact |
-| Review docs/plans | `/spec:doc-review` | `$spec-doc-review` | Document findings、gaps 和 residual risks |
-| Write or deepen a plan | `/spec:plan` | `$spec-plan` | `docs/plans/` 下的 implementation plan |
-| Compile task pack | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | `docs/tasks/` 下的 derived task pack |
-| Audit App consistency | `/spec:app-consistency-audit` | `$spec-app-consistency-audit` | Static App consistency report 和 run-scoped audit evidence |
-| Debug a failure or bug | `/spec:debug` | `$spec-debug` | Root cause、fix 和 verification evidence |
-| Execute work | `/spec:work` | `$spec-work` | Scoped source changes、tests 和 verification notes |
-| Optimize a measurable outcome | `/spec:optimize` | `$spec-optimize` | Metric-driven experiment loop 和 retained improvements |
-| Polish browser-visible UI beta | `/spec:polish-beta` | `$spec-polish-beta` | Browser-visible UI polish pass |
-| Review code | `/spec:code-review` | `$spec-code-review` | Structured findings 和 residual risks |
-| Capture learning | `/spec:compound` | `$spec-compound` | `docs/solutions/` 下的 reusable learning |
-| Refresh stale learnings | `/spec:compound-refresh` | `$spec-compound-refresh` | 更新、合并或退役 solution docs |
-| Read release notes | `/spec:release-notes` | `$spec-release-notes` | 指定版本变更摘要 |
+| Spec — 生成与评估点子 | `/spec:ideate` | `$spec-ideate` | `docs/ideation/` 下的 ranked ideation artifact |
+| Spec — brainstorm 需求 | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` 下的 requirements brief |
+| Spec — brownfield PRD 需求 | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` 下的研发侧 clarified requirements / planning-readiness artifact |
+| Plan — 定 HOW | `/spec:plan` | `$spec-plan` | `docs/plans/` 下的 implementation plan |
+| Tasks — 可选派生 | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | `docs/tasks/` 下的 derived task pack |
+| Code — 执行 | `/spec:work` | `$spec-work` | Scoped source changes、tests 和 verification notes |
+| Review — 代码 | `/spec:code-review` | `$spec-code-review` | Structured findings 和 residual risks |
+| Review — 文档/计划 | `/spec:doc-review` | `$spec-doc-review` | Document findings、gaps 和 residual risks |
+| Knowledge — 沉淀 | `/spec:compound` | `$spec-compound` | `docs/solutions/` 下的 reusable learning |
+| Knowledge — 刷新 | `/spec:compound-refresh` | `$spec-compound-refresh` | 更新、合并或退役 solution docs |
+
+研发旁路 / 支撑入口（按需触发，非主链路骨架）：`/spec:mcp-setup`（runtime 环境与必备 harness、MCP/helper readiness）、`/spec:debug`（执行前失败诊断）、`/spec:optimize`（指标驱动优化）、`/spec:polish-beta`（浏览器可见 UI）、`/spec:write-skill`（编写或修复 source skill）。
 
 想要选项、批判或意外方向，还没确定问题框架时，用 `ideate`。已经有粗略产品问题或功能想法，需要 actors、flows、边界和 acceptance examples 时，用 `brainstorm`。产品或 owner 已经给出 PRD、需求材料、会议纪要、设计说明或系统增量说明，需要研发侧进入开发前澄清 WHAT/WHY、current-state evidence 和 change delta 时，用 `prd`；面对超大或多来源需求文档时，`prd` 的目标是先做 source-first evidence 和 Requirement Analysis Gate，把资料归约成需求理解地图、识别不确定点/冲突点、决定产品/设计/技术 grill 问题，再写入研发侧澄清产物或分析结论并判断是否可交给 planning。`$spec-prd` 不是替产品写 PRD；产品 PRD 是输入 source，输出是研发澄清、owner 决策追踪和 planning-readiness 判断。artifact readiness 不能只靠模型写入 `status: ready-for-planning`，必须带有 `finalize-prd-artifact.js` 产生的 producer-local finalize receipt。已有 requirements、plan 或 task 文档，需要找缺口时，用 `doc-review`。不要把 `brainstorm` 当作所有不清楚请求的默认入口。
 

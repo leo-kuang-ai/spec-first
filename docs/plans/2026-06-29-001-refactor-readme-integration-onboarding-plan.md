@@ -1,7 +1,7 @@
 ---
 title: "refactor: README 集成上手渐进披露重排"
 type: refactor
-status: active
+status: completed
 date: 2026-06-29
 spec_id: 2026-06-29-001-readme-integration-onboarding-refactor
 origin: docs/brainstorms/2026-06-29-001-readme-integration-onboarding-refactor-requirements.md

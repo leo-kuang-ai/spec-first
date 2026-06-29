@@ -119,30 +119,22 @@ Detailed walkthrough: [Chinese First Workflow Walkthrough](https://github.com/su
 
 ## Workflow Entry Points
 
-Use this single table as the public entrypoint map. Shared prose should say "current host"; concrete `/spec:*` and `$spec-*` mappings belong here and in init/runtime guidance.
+This table is the R&D main-chain entrypoint map, following the engineering loop `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge`. Shared prose should say "current host"; concrete `/spec:*` and `$spec-*` mappings belong here and in init/runtime guidance. For the complete public entrypoint set and routing rules, ask in the host session — `using-spec-first` recommends one entrypoint with a reason.
 
-| Intent | Claude Code | Codex | Expected result |
+| Stage | Claude Code | Codex | Expected result |
 |---|---|---|---|
-| Runtime setup for required harness readiness | `/spec:mcp-setup` | `$spec-mcp-setup` | Required harness runtime facts, MCP/helper readiness, and setup-owned config artifacts |
-| Search agent session history | `/spec:sessions` | `$spec-sessions` | Session history answers and recovery context |
-| Research Slack context | `/spec:slack-research` | `$spec-slack-research` | Organizational context digest when Slack tools are available |
-| Audit source skills | `/spec:skill-audit` | `$spec-skill-audit` | Skill governance and quality findings |
-| Write source skills | `/spec:write-skill` | `$spec-write-skill` | Source-first skill authoring, migration, and audit remediation |
-| Generate and evaluate ideas | `/spec:ideate` | `$spec-ideate` | Ranked ideation artifact under `docs/ideation/` |
-| Brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | Requirements brief under `docs/brainstorms/` |
-| Write/refine brownfield PRD requirements | `/spec:prd` | `$spec-prd` | PRD-grade requirements under `docs/brainstorms/` |
-| Review docs/plans | `/spec:doc-review` | `$spec-doc-review` | Document findings, gaps, and residual risks |
-| Write or deepen a plan | `/spec:plan` | `$spec-plan` | Implementation plan under `docs/plans/` |
-| Compile task pack | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | Derived task pack under `docs/tasks/` |
-| Audit App consistency | `/spec:app-consistency-audit` | `$spec-app-consistency-audit` | Static App consistency report and run-scoped audit evidence |
-| Debug a failure or bug | `/spec:debug` | `$spec-debug` | Root cause, fix, and verification evidence |
-| Execute work | `/spec:work` | `$spec-work` | Scoped source changes, tests, and verification notes |
-| Optimize a measurable outcome | `/spec:optimize` | `$spec-optimize` | Metric-driven experiment loop and retained improvements |
-| Polish browser-visible UI beta | `/spec:polish-beta` | `$spec-polish-beta` | Browser-visible UI polish pass |
-| Review code | `/spec:code-review` | `$spec-code-review` | Structured findings and residual risks |
-| Capture learning | `/spec:compound` | `$spec-compound` | Reusable learning under `docs/solutions/` |
-| Refresh stale learnings | `/spec:compound-refresh` | `$spec-compound-refresh` | Updated, merged, or retired solution docs |
-| Read release notes | `/spec:release-notes` | `$spec-release-notes` | Version-specific change summary |
+| Spec — generate and evaluate ideas | `/spec:ideate` | `$spec-ideate` | Ranked ideation artifact under `docs/ideation/` |
+| Spec — brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | Requirements brief under `docs/brainstorms/` |
+| Spec — brownfield PRD requirements | `/spec:prd` | `$spec-prd` | PRD-grade requirements under `docs/brainstorms/` |
+| Plan — define HOW | `/spec:plan` | `$spec-plan` | Implementation plan under `docs/plans/` |
+| Tasks — optional, derived | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | Derived task pack under `docs/tasks/` |
+| Code — execute | `/spec:work` | `$spec-work` | Scoped source changes, tests, and verification notes |
+| Review — code | `/spec:code-review` | `$spec-code-review` | Structured findings and residual risks |
+| Review — docs/plans | `/spec:doc-review` | `$spec-doc-review` | Document findings, gaps, and residual risks |
+| Knowledge — capture learning | `/spec:compound` | `$spec-compound` | Reusable learning under `docs/solutions/` |
+| Knowledge — refresh learnings | `/spec:compound-refresh` | `$spec-compound-refresh` | Updated, merged, or retired solution docs |
+
+R&D side / support entrypoints (triggered on demand, not part of the main-chain skeleton): `/spec:mcp-setup` (runtime environment plus required harness and MCP/helper readiness), `/spec:debug` (failure diagnosis before execution), `/spec:optimize` (metric-driven optimization), `/spec:polish-beta` (browser-visible UI), and `/spec:write-skill` (author or fix source skills).
 
 Use `ideate` when you want options, critiques, or surprising directions before committing to a problem frame. Use `brainstorm` when you already have a rough problem or feature and need actors, flows, boundaries, and acceptance examples. Use `prd` for existing-system increments or rough PRDs that need current-state evidence and change delta; for oversized or multi-source requirement documents, `prd` should first run source-first evidence and the Requirement Analysis Gate, turn materials into a requirement understanding map, identify uncertainty or contradiction points, decide which product/design/technical questions must be grilled, then write a PRD or analysis conclusion before planning. A PRD is not planning-ready just because the model writes `status: ready-for-planning`; artifact readiness requires the producer-local finalize receipt from `finalize-prd-artifact.js`. Use `doc-review` when a requirements, plan, or task document already exists and needs gap-finding. Do not make `brainstorm` the default entrypoint for every unclear request.
 
