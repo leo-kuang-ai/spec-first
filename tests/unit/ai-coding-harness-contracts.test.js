@@ -16,8 +16,8 @@ describe('AI Coding Harness contract', () => {
     expect(contract).toContain('AI Coding Harness for spec-driven software engineering');
     expect(contract).toContain('Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge');
     expect(contract).toContain('不是新的 workflow、command、state machine、universal schema');
-    expect(contract).toContain('Scripts prepare deterministic facts');
-    expect(contract).toContain('LLM workflows decide semantic meaning');
+    expect(contract).toContain('Scripts enforce deterministic invariants and prepare deterministic facts');
+    expect(contract).toContain('LLM workflows decide semantic adequacy above that floor');
     expect(contract).toContain('External tools and providers do not own scope authority');
   });
 

@@ -306,4 +306,43 @@ For larger `Deep` plans, extend the core template only when useful with sections
 ## Operational / Rollout Notes
 
 - [Monitoring, migration, feature flag, or rollout considerations]
+
+---
+
+## Existing Capability / Reuse Analysis
+
+<!-- Optional. Include only when the plan proposes new files, references, agents, skills,
+     scripts, helpers, templates, workflows, schemas, artifact contracts, source-of-truth
+     entries, or source/runtime projection surfaces. Keep small plans to one KTD or
+     Implementation Unit `Reuse decision:` bullet instead of this section. -->
+
+- **Inventory:** [Existing capability, file, reference, or extension point inspected]
+- **Decision:** [`reuse` / `extend` / `new` and why]
+- **Source-of-truth:** [Where the boundary will live after this plan]
+- **Rejected owner:** [Existing surface considered but not used, with boundary reason]
+- **Work-phase recheck:** [What `spec-work` must recheck in current source before implementing a `new` surface, and how to report a stale decision or deviation]
+
+---
+
+## Enterprise Risk Appendix
+
+- [Required only when enterprise high-risk triggers span several sections or units. Summarize trigger -> invariant -> plan-time decision -> open/deferred item.]
+
+---
+
+## API Contract Appendix
+
+- [Required only for API/schema/event/RPC/exported contract changes where compatibility, versioning, idempotency, or consumer impact needs focused review.]
+
+---
+
+## Data Migration & Rollback Appendix
+
+- [Required only for DDL, backfill, irreversible data changes, cache consistency, or production data transformation. Include sequence, backup/rollback posture, verification query, and consistency window.]
+
+---
+
+## Scheduled Job Appendix
+
+- [Required only for recurring jobs, delayed workers, cleanup tasks, retries, or catch-up behavior. Include idempotency, overlap protection, monitoring, failure alerting, and catch-up behavior.]
 ```

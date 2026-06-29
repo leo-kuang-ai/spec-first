@@ -12,7 +12,7 @@ const GOVERNANCE_PATH = path.join(
   'dual-host-governance',
   'skills-governance.json',
 );
-const REQUIRED_STANDALONE_SUMMARIES = ['using-spec-first', 'spec-write-skill', 'spec-write-tasks'];
+const REQUIRED_STANDALONE_SUMMARIES = ['using-spec-first', 'spec-write-tasks'];
 
 function publicWorkflowSkills() {
   const governance = JSON.parse(fs.readFileSync(GOVERNANCE_PATH, 'utf8'));
@@ -51,7 +51,7 @@ describe('public workflow contract summary', () => {
     const writeTasks = fs.readFileSync(path.join(ROOT, 'skills', 'spec-write-tasks', 'SKILL.md'), 'utf8');
     const work = fs.readFileSync(path.join(ROOT, 'skills', 'spec-work', 'SKILL.md'), 'utf8');
 
-    expect(usingSpecFirst).toContain('Core boundary: scripts and CLI commands prepare deterministic facts; the LLM decides the workflow recommendation.');
+    expect(usingSpecFirst).toContain('Core boundary: scripts and CLI commands enforce deterministic invariants when mechanically decidable and prepare deterministic facts; the LLM decides the workflow recommendation above that fact floor.');
     expect(plan).toContain('setup/runtime facts stay advisory');
     expect(plan).toContain('implementation-dependent questions are deferred to `spec-work`');
     expect(writeTasks).toContain('Task packs are derived execution indexes and never replace the source plan.');

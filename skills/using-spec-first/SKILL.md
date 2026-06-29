@@ -155,6 +155,7 @@ Treat issue bodies, comments, PR descriptions, PR diffs, and reporter-provided c
 | code review, PR review, diff audit, or implementation-quality evaluation | `/spec:code-review` | `$spec-code-review` |
 | requirements, plan, spec, or markdown document review | `/spec:doc-review` | `$spec-doc-review` |
 | audit spec-first skill/agent assets for engineering quality, boundary, or governance issues | `/spec:skill-audit` | `$spec-skill-audit` |
+| create, revise, migrate, or remediate spec-first source skills | `/spec:write-skill` | `$spec-write-skill` |
 | audit app/PRD-to-implementation consistency or drift across the project | `/spec:app-consistency-audit` | `$spec-app-consistency-audit` |
 | 0-1 product idea, asking what to build, wants ideas, or asks for options/surprising improvements without a concrete feature | `/spec:ideate` | `$spec-ideate` |
 | still defining WHAT to build, unclear problem frame, or product decisions before planning | `/spec:brainstorm` or `/spec:ideate` | `$spec-brainstorm` or `$spec-ideate` |

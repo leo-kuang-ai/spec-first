@@ -1,7 +1,7 @@
 ---
 title: "refactor: spec-plan 企业风险就绪度与架构师级方案升级"
 type: refactor
-status: active
+status: completed
 date: 2026-06-28
 spec_id: 2026-06-28-004-spec-plan-enterprise-architect-upgrade
 origin: docs/项目审查/详细审查/2026-06-26-architect-workflow-vs-spec-plan-gap-analysis.md
@@ -63,7 +63,7 @@ supersedes:
 - A1. 维护者接受“企业能力 = 条件触发 + 附录 + deepening 加权”的吸收方式，而不是把企业模板 12 章扩进 core template。
 - A2. `spec-plan` eval 维持 maintainer-only fixture 形态，不新增 provider-backed runner 或 model telemetry。
 - A3. project policy hook 本轮只声明边界，不定义路径/schema/CLI 集成，避免范围蔓延到组织治理机制。
-- A4. 旧 001/002 的删除是计划文档合并，不表示对应实施工作已经完成；实施状态仍以本 plan 的 `status: active` 为准。
+- A4. 旧 001/002 的删除是计划文档合并，不表示对应实施工作已经完成；当前实施结果以本 plan frontmatter 的 `status: completed` 和 `Completion Evidence` 为准。
 
 ---
 
@@ -587,6 +587,16 @@ flowchart TB
 - README/用户手册是否更新取决于现有文档是否已经说明 `spec-plan` 的 high-risk/deepening 行为；实现期不要默认扩写。
 - 本 plan 自身已经合并旧 001/002，并删除旧 active plan 文件。后续实现只应引用本 plan。
 - 任何 runtime drift 修复都先改 source，再运行 `spec-first init`；不得把 `.agents/skills/spec-plan/**` 当 source。
+
+---
+
+## Completion Evidence
+
+本计划已完成并标记 `status: completed`。实现范围覆盖 `skills/spec-plan/SKILL.md`、`skills/spec-plan/references/{enterprise-plan-review,reuse-analysis,deepening-workflow,plan-template,planning-flow}.md`、`skills/spec-plan/evals/output-quality-cases.json`、`tests/unit/spec-plan-contracts.test.js` 和 `CHANGELOG.md`；收尾时还修复了全量 unit/smoke 暴露的相邻 workflow 合同漂移。
+
+验证已执行：JSON parse、`npx jest tests/unit/changelog-format.test.js tests/unit/spec-plan-contracts.test.js tests/unit/using-spec-first-contracts.test.js tests/unit/public-workflow-contract-summary.test.js tests/unit/scenario-capability-matrix-contracts.test.js tests/unit/ai-coding-harness-contracts.test.js --runInBand`、`npm run typecheck`、`npm run lint:skill-entrypoints`、`npm run test:unit`、`npm run test:smoke`、`npm run test:integration`、`git diff --check`、行尾空白扫描、`node bin/spec-first.js init --claude --codex -y` runtime 投影抽检。
+
+Review：按 `$spec-code-review` single-agent report-only fallback 完成，原因是当前 Codex dispatch 未获显式 subagent/persona 授权且 required MCP host config 存在 version drift；审查未发现 residual actionable findings。Generated runtime mirrors 仅通过 `spec-first init` 投影，未作为 source 手改或 tracked diff。
 
 ---
 

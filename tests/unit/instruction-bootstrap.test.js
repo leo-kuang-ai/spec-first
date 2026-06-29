@@ -532,7 +532,7 @@ describe('instruction bootstrap', () => {
     // 显式 non-core workflow_command:有 workflow_command 入口但不进 bootstrap 锚点集
     const NON_CORE_WORKFLOW_COMMANDS = [
       'app-consistency-audit', 'polish-beta', 'release-notes',
-      'sessions', 'skill-audit', 'slack-research', 'write-tasks',
+      'sessions', 'skill-audit', 'slack-research', 'write-skill', 'write-tasks',
     ];
     // 每个 CURATED_CORE 必须是真实 registry workflow_command(抓幽灵/拼写漂移)
     for (const id of CURATED_CORE) {

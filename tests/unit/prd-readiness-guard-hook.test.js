@@ -178,6 +178,57 @@ source_inputs:
     }
   });
 
+  test('exempts brainstorm requirements docs without artifact_kind: prd-requirements', () => {
+    // 回归:docs/brainstorms/*-requirements.md 同时承载 brainstorm brief 与 PRD;
+    // 仅凭路径选文件会把 brainstorm 产物拖进 PRD finalize,误报 core_section_missing。
+    // 修复:guard 选文件阶段按 artifact_kind: prd-requirements 过滤,brainstorm 产物豁免。
+    const projectRoot = makeTempDir();
+    try {
+      installRuntimeScripts(projectRoot);
+      // brainstorm 产物 frontmatter 只有 date/topic/spec_id,无 artifact_kind
+      const brainstormContent = `---
+date: 2026-06-29
+topic: readme-refactor
+spec_id: 2026-06-29-001-readme-refactor
+---
+
+# README 重构
+
+## Summary
+
+重排 README。
+
+## Requirements
+
+- R1. 重排首屏。
+`;
+      write(
+        path.join(projectRoot, 'docs', 'brainstorms', '2026-06-29-001-readme-refactor-requirements.md'),
+        brainstormContent,
+      );
+
+      const init = spawnSync('git', ['init', '-q'], {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', HOME: path.join(projectRoot, 'home') },
+      });
+      expect(init.status).toBe(0);
+
+      const result = spawnSync(HOOK_TEMPLATE, {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        timeout: 8000,
+        env: { ...process.env, CLAUDE_PROJECT_DIR: projectRoot },
+      });
+
+      expect(result.status).toBe(0);
+      // 豁免 = 无 block 输出(hook 直接 exit 0,不写 decision JSON)
+      expect(result.stdout.trim()).toBe('');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('reports finalize_check_timeout instead of finalize_check_failed when finalize exceeds the hook budget', () => {
     // 回归:spawnSync 超时(status===null)退化为通用 finalize_check_failed,agent 无法区分超时与真实 gap。
     // 修复:超时分支 emit finalize_check_timeout。

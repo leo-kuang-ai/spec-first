@@ -114,11 +114,26 @@ function changedPrdArtifacts(cwd) {
       i += 1;
       filePath = entries[i] || filePath;
     }
-    if (/^docs\/brainstorms\/.+-requirements\.md$/.test(filePath)) {
+    if (/^docs\/brainstorms\/.+-requirements\.md$/.test(filePath)
+      && isPrdArtifact(path.join(cwd, filePath))) {
       paths.push(filePath);
     }
   }
   return [...new Set(paths)].sort();
+}
+
+// docs/brainstorms/*-requirements.md 同时承载 $spec-brainstorm 的需求 brief 与
+// $spec-prd 的 PRD-grade 需求,仅凭路径无法区分。只有显式标注
+// artifact_kind: prd-requirements 的文件才是 PRD artifact、才进 finalize gate;
+// 无该字段的 brainstorm 产物豁免。判别字段与 prd-prewrite-guard 保持一致。
+function isPrdArtifact(absolutePath) {
+  let content;
+  try {
+    content = fs.readFileSync(absolutePath, 'utf8');
+  } catch {
+    return false;
+  }
+  return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(content);
 }
 
 function extractSourceInputs(prdPath) {

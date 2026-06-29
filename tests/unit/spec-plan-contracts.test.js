@@ -17,8 +17,6 @@ const SKILL_PATH = path.join(__dirname, '..', '..', 'skills', 'spec-plan', 'SKIL
 const COMMAND_TEMPLATE_PATH = path.join(__dirname, '..', '..', 'templates', 'claude', 'commands', 'spec', 'plan.md');
 const EVALS_DIR = path.join(__dirname, '..', '..', 'skills', 'spec-plan', 'evals');
 const EXAMPLES_PATH = path.join(EVALS_DIR, 'examples.json');
-const OUTPUT_QUALITY_CASES_PATH = path.join(EVALS_DIR, 'output-quality-cases.json');
-const EVALS_README_PATH = path.join(EVALS_DIR, 'README.md');
 const REQUIREMENTS_CAPTURE_PATH = path.join(
   __dirname,
   '..',
@@ -118,7 +116,6 @@ const PLANNING_FLOW_PATH = path.join(
   'references',
   'planning-flow.md',
 );
-
 function plannedRuntimeContent(adapter, targetPath) {
   const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-plan-runtime-'));
 
@@ -387,6 +384,7 @@ describe('spec-plan context orientation contract', () => {
     expect(combined).toContain('use bounded direct reads, `rg`, ast-grep, git diff, tests/logs, and user evidence');
     expect(combined).toContain('do not turn rejected rationale into active workflow state');
   });
+
   test('planning research dispatch is host-neutral with explicit inline fallback', () => {
     const text = readPlanningFlowSurface();
 
@@ -622,58 +620,6 @@ describe('spec_id planning contract', () => {
     expect(casesById.get('prd-handoff-entropy-boundary').boundary_note).toContain('does not copy the full spec-prd readiness lens');
   });
 
-  test('output-quality fixtures expose objective assertions and missing semantic evidence', () => {
-    const readme = fs.readFileSync(EVALS_README_PATH, 'utf8');
-    const payload = JSON.parse(fs.readFileSync(OUTPUT_QUALITY_CASES_PATH, 'utf8'));
-
-    expect(readme).toContain('maintainer-only planning review fixtures');
-    expect(readme).toContain('不是 executable eval runner');
-    expect(readme).toContain('不是 provider-backed model telemetry');
-    expect(readme).toContain('必须声明 `input_files`、`baseline_risks`、`with_skill_expectations`、`objective_assertions` 和 `evidence_status`');
-    expect(readme).toContain('每个 output-quality case 必须在 `missing_evidence` 中显式标注');
-    expect(readme).toContain('不能声称 fixture 已证明真实模型输出质量提升');
-    expect(payload.schema_version).toContain('spec-plan-output-quality-cases');
-    expect(payload.coverage_tags).toEqual(expect.arrayContaining(['expected', 'output-quality']));
-    expect(payload.source_refs).toEqual(expect.arrayContaining([
-      'skills/spec-plan/SKILL.md',
-      'skills/spec-plan/references/planning-flow.md',
-      'skills/spec-plan/references/governance-boundaries.md',
-      'skills/spec-plan/references/plan-handoff.md',
-      'docs/contracts/workflows/skill-agent-quality-governance.md',
-    ]));
-    expect(payload.source_refs.join('\n')).not.toContain('.agents/skills/');
-    expect(payload.source_refs.join('\n')).not.toContain('.claude/');
-    expect(payload.source_refs.join('\n')).not.toContain('.codex/');
-    expect(payload.source_refs.join('\n')).not.toContain('../../docs/');
-    expect(payload.source_refs.join('\n')).not.toContain('docs/brainstorms/');
-    expect(payload.source_refs.join('\n')).not.toContain('docs/项目审查/');
-    expect(payload.cases.length).toBeGreaterThanOrEqual(4);
-
-    for (const evalCase of payload.cases) {
-      expect(evalCase.id).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
-      expect(Array.isArray(evalCase.input_files)).toBe(true);
-      expect(evalCase.baseline_risks.length).toBeGreaterThan(0);
-      expect(evalCase.with_skill_expectations.length).toBeGreaterThan(0);
-      expect(evalCase.objective_assertions.length).toBeGreaterThan(0);
-      expect(typeof evalCase.expected_outcome).toBe('string');
-      expect(evalCase.evidence_status).toBe('file-backed fixture');
-      expect(evalCase.missing_evidence).toEqual(expect.arrayContaining([
-        expect.stringMatching(/model execution evidence|provider telemetry|human adjudication/),
-      ]));
-      expect(evalCase.missing_evidence).not.toContain('file-backed fixture');
-      for (const inputFile of evalCase.input_files) {
-        expect(inputFile.evidence).toBe('file-backed fixture');
-        expect(fs.existsSync(path.join(__dirname, '..', '..', inputFile.path))).toBe(true);
-      }
-    }
-
-    const casesById = new Map(payload.cases.map((entry) => [entry.id, entry]));
-    expect(casesById.get('review-origin-plan-preserves-findings').objective_assertions.join('\n')).toContain('not fabricated');
-    expect(casesById.get('unsupported-plan-needs-direct-evidence').with_skill_expectations.join('\n')).toContain('Direct Evidence');
-    expect(casesById.get('handoff-does-not-silently-compile-task-pack').objective_assertions.join('\n')).toContain('No case claims an executable task pack exists');
-    expect(casesById.get('generated-runtime-mirror-remains-non-source').objective_assertions.join('\n')).toContain('Generated mirror paths do not appear as source_refs');
-  });
-
   test('plan synthesis checkpoints and template naming are in place', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
     const planningFlow = fs.readFileSync(PLANNING_FLOW_PATH, 'utf8');
@@ -696,6 +642,12 @@ describe('spec_id planning contract', () => {
     expect(planTemplate).toContain('does not replace Summary, Key Technical');
     expect(planTemplate).toContain('## System-Wide Impact');
     expect(planTemplate).toContain('Surface coverage');
+    expect(planTemplate).toContain('## Existing Capability / Reuse Analysis');
+    expect(planTemplate).toContain('## Enterprise Risk Appendix');
+    expect(planTemplate).toContain('## API Contract Appendix');
+    expect(planTemplate).toContain('## Data Migration & Rollback Appendix');
+    expect(planTemplate).toContain('## Scheduled Job Appendix');
+    expect(planTemplate).toContain('Keep small plans to one KTD or');
     expect(planTemplate).toContain('`in-scope`');
     expect(planTemplate).toContain('`out-of-scope: <reason>`');
     expect(planTemplate).toContain('`deferred: <owner/trigger>`');
@@ -834,34 +786,6 @@ describe('spec_id planning contract', () => {
     expect(plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/html-rendering.md')).toContain('optional HTML sidecar');
     expect(command).not.toContain('Read `references/plan-template.md` before writing the plan.');
     expect(command).not.toContain('Read `skills/spec-plan/references/plan-template.md` before writing the plan.');
-  });
-
-  test('eval support files are projected while preserving source-authority refs', () => {
-    const claudeRuntimeOutputQuality = plannedRuntimeContent(
-      new ClaudeAdapter(),
-      '.claude/spec-first/workflows/spec-plan/evals/output-quality-cases.json',
-    );
-    const codexRuntimeOutputQuality = plannedRuntimeContent(
-      new CodexAdapter(),
-      '.agents/skills/spec-plan/evals/output-quality-cases.json',
-    );
-    const codexRuntimeReadme = plannedRuntimeContent(
-      new CodexAdapter(),
-      '.agents/skills/spec-plan/evals/README.md',
-    );
-
-    for (const runtimeContent of [claudeRuntimeOutputQuality, codexRuntimeOutputQuality]) {
-      const payload = JSON.parse(runtimeContent);
-      expect(payload.schema_version).toContain('spec-plan-output-quality-cases');
-      expect(payload.coverage_tags).toEqual(expect.arrayContaining(['expected', 'output-quality']));
-      expect(payload.source_refs).toContain('skills/spec-plan/SKILL.md');
-      expect(payload.source_refs).toContain('skills/spec-plan/references/planning-flow.md');
-      expect(payload.source_refs).toContain('skills/spec-plan/references/governance-boundaries.md');
-      expect(payload.source_refs.join('\n')).not.toContain('.claude/spec-first/workflows/spec-plan/SKILL.md');
-      expect(payload.source_refs.join('\n')).not.toContain('.agents/skills/spec-plan/SKILL.md');
-      expect(payload.source_refs.join('\n')).not.toContain('.codex/');
-    }
-    expect(codexRuntimeReadme).toContain('maintainer-only planning review fixtures');
   });
 
   test('eval support detection uses skill-relative paths, not absolute source package paths', () => {

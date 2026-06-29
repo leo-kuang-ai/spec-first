@@ -45,6 +45,12 @@ Classify input, verify plan identity and repo scope, choose one branch (`compile
 
 `spec-work`, high-risk `spec-doc-review` handoff, human reviewers, and later code-review/compound workflows.
 
+## Scenario Capability
+
+Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
+
+Overrides: none
+
 ## Core Rules
 
 1. `spec-plan` is always the single source of truth.

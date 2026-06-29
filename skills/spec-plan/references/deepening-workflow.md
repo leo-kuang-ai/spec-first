@@ -2,6 +2,8 @@
 
 This file contains the confidence-check execution path (5.3.3-5.3.7). Load it only when the deepening gate at 5.3.2 determines that deepening is warranted.
 
+When confidence gaps involve enterprise high-risk triggers, read `skills/spec-plan/references/enterprise-plan-review.md` and treat it as the readiness lens for plan-time completeness. Keep the full trigger matrix in that reference; this file only owns scoring and specialist mapping.
+
 ## 5.3.3 Score Confidence-first Gaps
 
 Use a checklist-first, risk-weighted scoring pass.
@@ -10,6 +12,8 @@ For each section, compute:
 - **Trigger count** - number of checklist problems that apply
 - **Risk bonus** - add 1 if the topic is high-risk and this section is materially relevant to that risk
 - **Critical-section bonus** - add 1 for `Key Technical Decisions`, `Implementation Units`, `System-Wide Impact`, `Risks & Dependencies`, or `Open Questions` in `Standard` or `Deep` plans
+
+Enterprise high-risk triggers also add risk bonus when materially relevant (money, security/permissions, migration/DDL, high concurrency, async/MQ, state machines, scheduled jobs, rollout, privacy, data/ML consistency — the full trigger matrix lives only in `skills/spec-plan/references/enterprise-plan-review.md`).
 
 Treat a section as a candidate if:
 - it hits **2+ total points**, or
@@ -29,6 +33,8 @@ If the plan already has a `deepened:` date:
 - Units do not clearly advance the traced requirements
 - Origin requirements are not clearly carried forward
 - Origin A/F/AE IDs (when supplied by the upstream brainstorm) are not preserved where planning decisions touch them, or are referenced inconsistently across Requirements, units, and test scenarios
+- PRD-grade or review-origin functionality is not mapped to a plan section, U-ID, Open Question, or explicit deferment
+- Enterprise high-risk triggers are present but the plan has no concrete plan-time decision, parameter, failure path, observation condition, or rollback/compensation condition
 
 **Context & Research / Sources & References**
 - Relevant repo patterns are named but never used in decisions or implementation units
@@ -41,6 +47,7 @@ If the plan already has a `deepened:` date:
 - Rationale does not explain tradeoffs or rejected alternatives
 - The decision does not connect back to scope, requirements, or origin context
 - An obvious design fork exists but the plan never addresses why one path won
+- A high-risk KTD lacks an explicit trade-off: what the chosen design buys, what it sacrifices, and why alternatives were rejected
 
 **Open Questions**
 - Product blockers are hidden as assumptions
@@ -70,18 +77,22 @@ If the plan already has a `deepened:` date:
 - Existing U-IDs were renumbered after a unit was reordered, split, or deleted (U-IDs are stable: never renumber existing IDs; gaps from deletions are preserved; new units take the next unused number)
 - Existing `spec_id` was regenerated or changed during deepening. `spec_id` identifies the spec chain; deepening strengthens the same plan and must preserve it.
 - A unit realizing an origin Key Flow does not cite the F-ID, or a unit enforcing an origin Acceptance Example does not cite the AE-ID, when origin supplies them
+- Units that touch API contracts, authz, migration/backfill, async retry, scheduled jobs, rollout gates, or state lifecycle do not name the relevant idempotency, compatibility, observability, rollback, or final-failure decision
 
 **System-Wide Impact**
 - Affected interfaces, callbacks, middleware, entry points, or parity surfaces are missing
 - Failure propagation is underexplored
 - State lifecycle, caching, or data integrity risks are absent where relevant
 - Integration coverage is weak for cross-layer work
+- API contract compatibility, state lifecycle, data migration rollback, observability, rollout gate, or requirements coverage is missing for enterprise high-risk triggers
 
 **Risks & Dependencies / Documentation / Operational Notes**
 - Risks are listed without mitigation
 - Rollout, monitoring, migration, or support implications are missing when warranted
 - External dependency assumptions are weak or unstated
 - Security, privacy, performance, or data risks are absent where they obviously apply
+- Privacy-sensitive flows through logs, analytics, third parties, clients, exports, caches, or telemetry are present but not named
+- Data/ML changes lack schema evolution, backfill, online/offline consistency, compatibility window, or verification posture
 
 Use the plan's own `Context & Research` and `Sources & References` as evidence. If those sections cite a pattern, learning, or risk that never affects decisions, implementation units, or verification, treat that as a confidence-first gap.
 
@@ -131,6 +142,9 @@ Use fully-qualified agent names inside dispatch prompts or agent invocations.
   - `spec-performance-oracle` for scalability, latency, throughput, and resource-risk analysis
   - `spec-security-sentinel` for auth, validation, exploit surfaces, and security boundary review
   - `spec-data-integrity-guardian` for migrations, persistent state safety, consistency, and data lifecycle risks
+
+**Enterprise trigger-to-specialist mapping**
+- For enterprise high-risk triggers, reuse the trigger-to-specialist mapping in `skills/spec-plan/references/enterprise-plan-review.md` (Specialist Reuse); the canonical mapping lives there, not duplicated here. The pre-existing per-section specialist guidance below still applies to ordinary deepening.
 
 **Risks & Dependencies / Operational Notes**
 - Use the specialist that matches the actual risk:

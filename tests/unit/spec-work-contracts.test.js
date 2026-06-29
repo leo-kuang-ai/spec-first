@@ -120,6 +120,18 @@ describe('spec-work context orientation contract', () => {
     }
     expect(shipping).toContain('Omit the section when the ordinary changed-file/test summary is enough');
   });
+
+  test('rechecks reuse decisions before implementing new source surfaces', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('`## Existing Capability / Reuse Analysis`');
+    expect(text).toContain('`Reuse decision:`');
+    expect(text).toContain('`Work-phase recheck:` field');
+    expect(text).toContain('recheck the current source-of-truth before implementing that new surface');
+    expect(text).toContain('If current source makes the plan\'s `new` decision stale');
+    expect(text).toContain('prefer `reuse` or `extend`');
+    expect(text).toContain('explain the deviation in closeout with direct source evidence');
+  });
 });
 
 describe('spec-work run artifact boundary contract', () => {

@@ -12,9 +12,7 @@
 
 **面向 Claude Code 与 Codex 的 AI Coding Harness。**
 
-`spec-first` 把一次性的 AI coding 对话变成仓库承载的工程闭环。AI 写代码很快；真正危险的是塑造代码的判断、证据和评审轨迹往往随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在仓库里——requirements、PRD、plans、task packs、work evidence、debug notes、reviews 和 learnings——让下一次会话、reviewer 和你的同事都能继承上下文，而不是从零开始。
-
-脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。
+`spec-first` 把一次性的 AI coding 对话变成仓库承载的工程闭环。脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。
 
 官网：[spec-first.cn](http://spec-first.cn/)
 
@@ -30,43 +28,13 @@
 
 <sub>维护的演示素材位：配图由 source-controlled SVG（[spec-first-flow.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg)）生成并转为 PNG，使其在 GitHub 和 npm 包页面都能正常显示；未来可直接替换为终端录屏，不需要重排页面结构。</sub>
 
-## 跑通第一条闭环
+## 你遇到的问题
 
-安装、初始化一个测试仓库、重启宿主后，在宿主会话里运行一个 workflow 入口。第一次可见结果会是写进仓库的 Markdown artifact，而不是某个隐藏的 memory cell。
+AI 写代码很快；真正危险的是塑造代码的判断、证据和评审轨迹往往随对话窗口一起消失：下一次会话缺上下文，reviewer 看不到计划为什么变化，团队也很难复用一次成功经验。
 
-在当前宿主会话中输入：
-
-```text
-$spec-brainstorm "Improve onboarding for first-time CLI users"
-```
-
-Claude Code 用户可改用：
-
-```text
-/spec:brainstorm "Improve onboarding for first-time CLI users"
-```
-
-第一次 brainstorm 通常只生成一个 requirements brief：
-
-```text
-docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md
-```
-
-随后进入当前宿主的 plan 入口继续推进。更长的链路后续可能增加 `docs/plans/`、`docs/tasks/`、代码/测试改动、structured work evidence、review findings、debug notes 和 `docs/solutions/` learnings，但不是每个 workflow 都写入所有 artifact。
-
-完整走查见 [首次工作流走查](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)。产物归属见 [产物目录](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md)。
-
-## 什么会留在本地仓库里
-
-![spec-first artifact trail: requirements, plans, tasks, local work evidence, review/debug notes, and learnings stay with the repository context](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.png)
-
-当一个判断必须活过当前聊天窗口时，`spec-first` 就有价值：为什么选这个 scope、检查过哪些证据、实际跑了哪些验证、review 发现了什么、下一次团队应该复用什么经验。
-
-<sub>配图源：[spec-first-artifact-trail.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.svg)。图中路径是代表性 artifact roots；`docs/` artifacts 是团队共享面，`.spec-first/workflows/` 是 repo-local runtime evidence，默认被 gitignore。</sub>
+`spec-first` 把这些工作作为持久 artifact 留在仓库里——requirements、PRD、plans、task packs、work evidence、debug notes、reviews 和 learnings——让下一次会话、reviewer 和你的同事都能继承上下文，而不是从零开始。
 
 ## 为什么使用 spec-first？
-
-AI coding 最大的问题通常不是 agent 不会写代码，而是关键判断只停留在聊天窗口里：下一次会话缺上下文，reviewer 看不到计划为什么变化，团队也很难复用一次成功经验。
 
 `spec-first` 让软件生命周期本身保持可读，同时不把 prose 当成证明：
 
@@ -132,7 +100,7 @@ spec-first init
 
 用户级语言同步只在明确 opt-in 后向 Codex / Claude 用户 instruction 文件写入 language-only managed block,并在全局 developer profile 记录 `sync_user_language=true`,供后续 init 静默维护。`--no-sync-user-language` 会记录 `false`,并从受支持宿主移除 spec-first 写过的用户语言 block。这是 instruction guidance,不是通过 hook 强制改写回答语言。
 
-重启宿主或新开会话，让宿主加载刚生成的 runtime assets。
+重启宿主或新开会话，让宿主加载刚生成的 runtime assets。随后在宿主会话里运行第一个 workflow 入口。第一次可见结果会是写进仓库的 Markdown artifact，而不是某个隐藏的 memory cell。
 
 宿主内 workflow 入口不是 shell 命令：
 
@@ -144,7 +112,9 @@ spec-first init
 $spec-brainstorm "改进 onboarding"
 ```
 
-当 `docs/brainstorms/` 下出现 requirements brief，第一次接入就完成了。如果不确定该用哪个 workflow，可以在宿主会话中直接描述任务或询问下一步；`using-spec-first` 会推荐一个公开入口并说明原因。
+第一次 brainstorm 通常只在 `docs/brainstorms/` 下生成一个 requirements brief。随后进入当前宿主的 plan 入口继续推进。更长的链路后续可能增加 `docs/plans/`、`docs/tasks/`、代码/测试改动、structured work evidence、review findings、debug notes 和 `docs/solutions/` learnings，但不是每个 workflow 都写入所有 artifact。如果不确定该用哪个 workflow，可以在宿主会话中直接描述任务或询问下一步；`using-spec-first` 会推荐一个公开入口并说明原因。
+
+完整走查见 [首次工作流走查](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)。产物归属见 [产物目录](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md)。
 
 ## Workflow Entry Points
 
@@ -156,6 +126,7 @@ $spec-brainstorm "改进 onboarding"
 | Search agent session history | `/spec:sessions` | `$spec-sessions` | 会话历史答案和恢复上下文 |
 | Research Slack context | `/spec:slack-research` | `$spec-slack-research` | Slack 工具可用时生成组织上下文 digest |
 | Audit source skills | `/spec:skill-audit` | `$spec-skill-audit` | Skill 治理与质量 findings |
+| Write source skills | `/spec:write-skill` | `$spec-write-skill` | source-first skill 编写、迁移和 audit remediation |
 | Generate and evaluate ideas | `/spec:ideate` | `$spec-ideate` | `docs/ideation/` 下的 ranked ideation artifact |
 | Brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` 下的 requirements brief |
 | Clarify product PRD for planning readiness | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` 下的研发侧 clarified requirements / planning-readiness artifact |
@@ -181,6 +152,12 @@ $spec-brainstorm "改进 onboarding"
 ## 产物与工作方式
 
 `spec-first` 有两类 durable surface：仓库内 workflow artifacts 和 generated host runtime assets。
+
+当一个判断必须活过当前聊天窗口时，`spec-first` 就有价值：为什么选这个 scope、检查过哪些证据、实际跑了哪些验证、review 发现了什么、下一次团队应该复用什么经验。
+
+![spec-first artifact trail: requirements, plans, tasks, local work evidence, review/debug notes, and learnings stay with the repository context](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.png)
+
+<sub>配图源：[spec-first-artifact-trail.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.svg)。图中路径是代表性 artifact roots；`docs/` artifacts 是团队共享面，`.spec-first/workflows/` 是 repo-local runtime evidence，默认被 gitignore。</sub>
 
 Repo-relative artifact roots：
 

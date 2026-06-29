@@ -152,6 +152,8 @@ Classify the work into one of these plan depths:
 - **Standard** - normal feature or bounded refactor with some technical decisions to document
 - **Deep** - cross-cutting, strategic, high-risk, or highly ambiguous implementation work
 
+Enterprise high-risk triggers are an advisory signal toward `Standard` or `Deep` (money, security/permissions/audit, privacy/personal-data flow, migration/DDL, high concurrency, async/MQ, state machines, scheduled jobs, rollout, data/ML consistency, etc. — the full trigger matrix lives only in `skills/spec-plan/references/enterprise-plan-review.md`). When a trigger is present, read `skills/spec-plan/references/enterprise-plan-review.md` before finalizing section depth, deepening targets, appendices, or handoff blockers. The LLM still decides final depth; no helper or script may force `Deep` on its own.
+
 Confirm the helper candidate or explicitly override it with a short reason, for example: "Using Standard despite candidate lightweight because the request touches a public CLI contract." If the helper is unavailable, continue with direct evidence and record `task-governance-signals unavailable` as degraded advisory evidence rather than inventing candidate facts.
 
 When the helper signal exposes a governance miss worth observing, the LLM may record a small advisory shadow hit after the planning decision is made:
@@ -268,6 +270,18 @@ Look for signals such as:
 When the signal is clear, carry it forward silently in the relevant implementation units.
 
 Ask the user only if the posture would materially change sequencing or risk and cannot be responsibly inferred.
+
+### 1.1c Existing Capability / Reuse Analysis Trigger
+
+When the emerging plan proposes a new file, reference, agent, skill, script, helper, template, workflow, schema, artifact contract, source-of-truth entry, or source/runtime projection surface, read `skills/spec-plan/references/reuse-analysis.md` and record the smallest useful `reuse / extend / new` decision.
+
+The result should stay right-sized:
+
+- Small and medium plans can carry one `Key Technical Decisions` entry or a `Reuse decision:` bullet inside the relevant Implementation Unit `Approach`.
+- Deep plans or plans with several new surfaces may use an optional `## Existing Capability / Reuse Analysis` section.
+- Lightweight plans, single-line prose fixes, changelog-only updates, and single existing-file edits do not need a long reuse matrix.
+
+The lens decides ownership fit, not business priority. Scripts may verify that the reference exists and that required anchors are present; they must not decide semantic justification for a new surface.
 
 ### 1.2 Decide on External Research
 

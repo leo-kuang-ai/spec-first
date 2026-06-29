@@ -10,7 +10,12 @@ export HOME="$ISOLATED_HOME"
 
 export SPEC_FIRST_VERSION_REMINDER_LATEST="$(node -p "require('$REPO_ROOT/package.json').version")"
 expected_version="$SPEC_FIRST_VERSION_REMINDER_LATEST"
-expected_command_count="$(find "$REPO_ROOT/templates/claude/commands/spec" -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')"
+expected_command_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+process.stdout.write(String(buildFilteredAssetSet('claude').commands.length));
+NODE
+)"
 expected_agent_count="$(find "$REPO_ROOT/agents" -type f -name '*.md' | wc -l | tr -d ' ')"
 expected_workflow_skill_count="$(node - "$REPO_ROOT" <<'NODE'
 const repoRoot = process.argv[2];
@@ -171,7 +176,7 @@ claude_output="$(run_programmatic_init "$TMP_DIR" claude kuang en)"
 grep -q "Generated ${expected_command_count} command file(s)" <<<"$claude_output"
 grep -q "Generated ${expected_claude_skill_count} skill directory(ies)" <<<"$claude_output"
 grep -q "Generated ${expected_agent_count} agent file(s)" <<<"$claude_output"
-for file in brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish-beta.md release-notes.md sessions.md slack-research.md work.md; do
+for file in brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish-beta.md release-notes.md sessions.md slack-research.md work.md write-tasks.md; do
   test -f "$TMP_DIR/.claude/commands/spec/$file"
 done
 test ! -e "$TMP_DIR/.claude/commands/spec/"standards".md"

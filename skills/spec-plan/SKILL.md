@@ -70,6 +70,10 @@ When editing or reviewing this workflow prompt, or when running fresh-source eva
 
 **STOP. Before broad context gathering, domain interpretation, upstream artifact intake, or optional capability consumption, read `skills/spec-plan/references/governance-boundaries.md`.** This runtime-copied reference carries the planning governance boundaries for context orientation, decision ledgers, runtime mirror exclusion, summary-first handoff, recall trust, and optional capability evidence. Do not duplicate those boundaries in this spine.
 
+**STOP. Before proposing a new file, reference, agent, skill, script, helper, template, workflow, schema, artifact contract, source-of-truth entry, or source/runtime projection surface, read `skills/spec-plan/references/reuse-analysis.md`.** Use it as a lightweight Decision Lens for `reuse / extend / new` choices; do not duplicate its ownership table or non-goals in this spine.
+
+**STOP. When a plan hits enterprise high-risk triggers such as money, permissions, migrations, high QPS, async events, state machines, scheduled jobs, rollout, privacy, or data/ML consistency, read `skills/spec-plan/references/enterprise-plan-review.md`.** Use it as a conditional readiness lens; do not inline its trigger matrix in this spine.
+
 ## Interaction Method
 
 When asking the user a question, use the platform's blocking question tool: `AskUserQuestion` in Claude Code or `request_user_input` in Codex. In Claude Code interactive planning, `AskUserQuestion` is a deferred tool; call `ToolSearch` with query `select:AskUserQuestion` once at the start of the interactive flow, before the first clarification, scope-confirmation, doc-review routing, or final handoff question. Do not wait until the first question site to load the schema.
@@ -108,6 +112,8 @@ Every plan should contain:
 - Explicit test file paths for feature-bearing implementation units
 - Decisions with rationale, not just tasks
 - Existing patterns or code references to follow
+- A `reuse / extend / new` decision when the plan proposes a new source surface
+- Enterprise / High-Risk Readiness when enterprise triggers apply (see `skills/spec-plan/references/enterprise-plan-review.md`)
 - Enumerated test scenarios for each feature-bearing unit, specific enough that an implementer knows exactly what to test without inventing coverage themselves
 - Clear dependencies and sequencing
 

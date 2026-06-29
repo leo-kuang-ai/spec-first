@@ -12,9 +12,7 @@
 
 **AI Coding Harness for Claude Code and Codex.**
 
-`spec-first` turns one-off AI coding chats into a repo-backed engineering loop. AI can write code quickly; the risky part is that the decisions, evidence, and review trail often vanish with the chat window. `spec-first` keeps that work as durable artifacts — requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings — so the next session, the reviewer, and your teammate inherit context instead of starting cold.
-
-Scripts enforce deterministic invariants and prepare facts. LLMs judge semantic adequacy above that floor. Evidence stays in your repository.
+`spec-first` turns one-off AI coding chats into a repo-backed engineering loop. Scripts enforce deterministic invariants and prepare facts. LLMs judge semantic adequacy above that floor. Evidence stays in your repository.
 
 Official site: [spec-first.cn](http://spec-first.cn/)
 
@@ -30,43 +28,13 @@ The point is not another prompt snippet or autonomous agent team. `spec-first` g
 
 <sub>Maintained demo slot: the diagram is generated from a source-controlled SVG ([spec-first-flow.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg)) and rendered to PNG so it shows on both GitHub and the npm package page; a future terminal recording can replace this position without restructuring the page.</sub>
 
-## Try The First Loop
+## The Problem
 
-Install, initialize a test repository, restart your host, then run one workflow entry from the host session. The first visible result is a Markdown artifact in your repo, not a hidden memory cell.
+AI can write code quickly. The risky part is that the decisions, evidence, and review trail often vanish with the chat window: the next session starts cold, reviewers cannot see why a plan changed, and teams cannot reuse what worked.
 
-In your current host session:
-
-```text
-$spec-brainstorm "Improve onboarding for first-time CLI users"
-```
-
-Claude Code users can run:
-
-```text
-/spec:brainstorm "Improve onboarding for first-time CLI users"
-```
-
-The first brainstorm run usually creates one requirements brief:
-
-```text
-docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md
-```
-
-From there, continue to the current host's plan entrypoint. A longer chain may add `docs/plans/`, `docs/tasks/`, code/test changes, structured work evidence, review findings, debug notes, and `docs/solutions/` learnings, but not every workflow writes every artifact.
-
-Detailed walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
-
-## What Stays Repo-Local
-
-![spec-first artifact trail: requirements, plans, tasks, local work evidence, review/debug notes, and learnings stay with the repository context](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.png)
-
-`spec-first` is useful when a decision must survive the current chat: why a scope was chosen, what evidence was checked, which validation actually ran, what review found, and what the team should remember next time.
-
-<sub>Diagram source: [spec-first-artifact-trail.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.svg). The paths shown are representative artifact roots; `docs/` artifacts are the team-sharing surface, while `.spec-first/workflows/` is repo-local runtime evidence and is gitignored by default.</sub>
+`spec-first` keeps that work as durable artifacts — requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings — so the next session, the reviewer, and your teammate inherit context instead of starting cold.
 
 ## Why spec-first?
-
-AI coding breaks down when important decisions live only in chat: the next session lacks context, reviewers cannot see why a plan changed, and teams cannot reuse what worked.
 
 `spec-first` keeps the software lifecycle legible without pretending that prose alone is proof:
 
@@ -133,7 +101,7 @@ spec-first init
 
 User-level language sync writes only a language preference block to Codex / Claude user instruction files after explicit opt-in, then records `sync_user_language=true` in the global developer profile for later init runs. `--no-sync-user-language` records `false` and removes spec-first's user-language block from supported hosts. This is instruction guidance, not hook-based language enforcement.
 
-Restart the host or open a new session so it loads the generated runtime assets.
+Restart the host or open a new session so it loads the generated runtime assets. Then run your first workflow entry from inside the host session. The first visible result is a Markdown artifact in your repo, not a hidden memory cell.
 
 Host-session workflow entries are not shell commands:
 
@@ -145,7 +113,9 @@ Host-session workflow entries are not shell commands:
 $spec-brainstorm "Improve onboarding"
 ```
 
-You are done with the first pass when a requirements brief appears under `docs/brainstorms/`. If you are not sure which workflow to use, describe the task or ask what to run next in the host session; `using-spec-first` will recommend one public entrypoint with a reason.
+The first brainstorm run usually creates one requirements brief under `docs/brainstorms/`. From there, continue to the current host's plan entrypoint. A longer chain may add `docs/plans/`, `docs/tasks/`, code/test changes, structured work evidence, review findings, debug notes, and `docs/solutions/` learnings, but not every workflow writes every artifact. If you are not sure which workflow to use, describe the task or ask what to run next in the host session; `using-spec-first` will recommend one public entrypoint with a reason.
+
+Detailed walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
 
 ## Workflow Entry Points
 
@@ -157,6 +127,7 @@ Use this single table as the public entrypoint map. Shared prose should say "cur
 | Search agent session history | `/spec:sessions` | `$spec-sessions` | Session history answers and recovery context |
 | Research Slack context | `/spec:slack-research` | `$spec-slack-research` | Organizational context digest when Slack tools are available |
 | Audit source skills | `/spec:skill-audit` | `$spec-skill-audit` | Skill governance and quality findings |
+| Write source skills | `/spec:write-skill` | `$spec-write-skill` | Source-first skill authoring, migration, and audit remediation |
 | Generate and evaluate ideas | `/spec:ideate` | `$spec-ideate` | Ranked ideation artifact under `docs/ideation/` |
 | Brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | Requirements brief under `docs/brainstorms/` |
 | Write/refine brownfield PRD requirements | `/spec:prd` | `$spec-prd` | PRD-grade requirements under `docs/brainstorms/` |
@@ -182,6 +153,12 @@ To upgrade the spec-first CLI, run the `spec-first update` package CLI command i
 ## Operating Model
 
 `spec-first` has two durable surfaces: repo-local workflow artifacts and generated host runtime assets.
+
+`spec-first` is useful when a decision must survive the current chat: why a scope was chosen, what evidence was checked, which validation actually ran, what review found, and what the team should remember next time.
+
+![spec-first artifact trail: requirements, plans, tasks, local work evidence, review/debug notes, and learnings stay with the repository context](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.png)
+
+<sub>Diagram source: [spec-first-artifact-trail.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-artifact-trail.svg). The paths shown are representative artifact roots; `docs/` artifacts are the team-sharing surface, while `.spec-first/workflows/` is repo-local runtime evidence and is gitignored by default.</sub>
 
 Repo-relative artifact roots:
 

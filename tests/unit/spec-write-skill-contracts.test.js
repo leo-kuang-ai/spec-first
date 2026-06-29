@@ -6,7 +6,7 @@ const path = require('node:path');
 
 const ClaudeAdapter = require('../../src/cli/adapters/claude');
 const CodexAdapter = require('../../src/cli/adapters/codex');
-const { syncSkills } = require('../../src/cli/plugin');
+const { syncBundledAssets } = require('../../src/cli/plugin');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
 const GOVERNANCE_PATH = path.join(
@@ -27,16 +27,18 @@ function readAbsolute(filePath) {
 }
 
 describe('spec-write-skill contract', () => {
-  test('defines a standalone authoring workflow without becoming a public command', () => {
+  test('defines a public authoring workflow without replacing audit or ordinary work', () => {
     const skill = read('skills/spec-write-skill/SKILL.md');
     const vocabulary = read('skills/spec-write-skill/references/skill-quality-vocabulary.md');
     const authoringMethod = read('skills/spec-write-skill/references/authoring-method.md');
     const deliveryGates = read('skills/spec-write-skill/references/delivery-gates.md');
 
     expect(skill).toContain('name: spec-write-skill');
-    expect(skill).toContain('写 skill 的 standalone skill');
+    expect(skill).toContain('写 skill 的公开 workflow');
+    expect(skill).toContain('Claude 入口是 `/spec:write-skill`');
+    expect(skill).toContain('Codex 入口是 `$spec-write-skill`');
     expect(skill).toContain('先判断是否值得做成 skill');
-    expect(skill).toContain('不是公开 Claude `/spec:*` 或 Codex `$spec-*` workflow');
+    expect(skill).toContain('不是 `spec-skill-audit` 的替代品');
     expect(skill).toContain('Source of truth 是 `skills/`');
     expect(skill).toContain('src/cli/contracts/dual-host-governance/skills-governance.json');
     expect(skill).toContain('[Authoring Method](references/authoring-method.md)');
@@ -58,9 +60,6 @@ describe('spec-write-skill contract', () => {
     expect(skill).toContain('不照搬 `yao-meta-skill` 的完整 SkillOps 平台');
     expect(skill).toContain('新增 skill 必须更新 `skills-governance.json`');
     expect(skill).toContain('不要手改 `.claude/`、`.codex/` 或 `.agents/skills/`');
-    expect(skill).not.toContain('/spec:write-skill');
-    expect(skill).not.toContain('$spec-write-skill');
-
     for (const snippet of [
       'Description As Trigger Contract',
       'Information Hierarchy',
@@ -148,7 +147,7 @@ describe('spec-write-skill contract', () => {
     expect(tags).toEqual(expect.arrayContaining(['failure', 'expected']));
   });
 
-  test('governance registers the skill as dual-host standalone delivery', () => {
+  test('governance registers the skill as dual-host workflow command delivery', () => {
     const governance = JSON.parse(readAbsolute(GOVERNANCE_PATH));
     const record = governance.skills.find((candidate) =>
       candidate.skill_name === 'spec-write-skill',
@@ -156,26 +155,34 @@ describe('spec-write-skill contract', () => {
 
     expect(record).toEqual({
       skill_name: 'spec-write-skill',
-      entry_surface: 'standalone_skill',
-      command_name: null,
+      entry_surface: 'workflow_command',
+      command_name: 'write-skill',
       host_scope: 'dual_host',
       owner_host: null,
       host_delivery: {
-        claude: 'skill',
+        claude: 'command',
         codex: 'skill',
       },
     });
   });
 
-  test('runtime sync delivers the standalone skill and package-local reference to both hosts', () => {
+  test('runtime sync delivers the workflow command and package-local references to both hosts', () => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-write-skill-runtime-'));
 
     try {
-      for (const [adapter, runtimeSkillRoot] of [
-        [new ClaudeAdapter(), path.join(projectRoot, '.claude', 'skills', 'spec-write-skill')],
-        [new CodexAdapter(), path.join(projectRoot, '.agents', 'skills', 'spec-write-skill')],
+      for (const [adapter, runtimeSkillRoot, runtimeCommandPath] of [
+        [
+          new ClaudeAdapter(),
+          path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-write-skill'),
+          path.join(projectRoot, '.claude', 'commands', 'spec', 'write-skill.md'),
+        ],
+        [
+          new CodexAdapter(),
+          path.join(projectRoot, '.agents', 'skills', 'spec-write-skill'),
+          null,
+        ],
       ]) {
-        syncSkills(projectRoot, adapter);
+        syncBundledAssets(projectRoot, adapter);
 
         const runtimeSkill = readAbsolute(path.join(runtimeSkillRoot, 'SKILL.md'));
         const runtimeAuthoring = readAbsolute(path.join(runtimeSkillRoot, 'references', 'authoring-method.md'));
@@ -183,10 +190,15 @@ describe('spec-write-skill contract', () => {
         const runtimeVocabulary = readAbsolute(path.join(runtimeSkillRoot, 'references', 'skill-quality-vocabulary.md'));
 
         expect(runtimeSkill).toContain('name: spec-write-skill');
-        expect(runtimeSkill).toContain('不是公开 Claude `/spec:*` 或 Codex `$spec-*` workflow');
+        expect(runtimeSkill).toContain('写 skill 的公开 workflow');
         expect(runtimeAuthoring).toContain('Skill Creator Compatibility');
         expect(runtimeDelivery).toContain('Forward Testing Boundary');
         expect(runtimeVocabulary).toContain('Description As Trigger Contract');
+        if (runtimeCommandPath) {
+          const runtimeCommand = readAbsolute(runtimeCommandPath);
+          expect(runtimeCommand).toContain('Write, revise, migrate, or remediate spec-first source skills');
+          expect(runtimeCommand).toContain('写 skill 的公开 workflow');
+        }
       }
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
