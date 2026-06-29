@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 
 const { validateAgainstSchema } = require('../../src/contracts/schema-validator');
@@ -20,6 +21,7 @@ const {
   getEnvValue,
   normalizeArtifactFileName,
   resolveNpmCliPath,
+  runWindowsCmdShim,
 } = require('../../scripts/npm-install-matrix-smoke');
 
 const VALID_PACK_FILES = [
@@ -81,13 +83,48 @@ describe('npm install matrix smoke script', () => {
     })).toBe('C:\\npm\\bin\\npm-cli.js');
   });
 
-  test('quotes Windows cmd shim path with spaces as one command line', () => {
-    expect(buildCmdCommandLine('C:\\Temp\\prefix with spaces\\spec-first.cmd', ['--help'])).toBe('"C:\\Temp\\prefix with spaces\\spec-first.cmd" "--help"');
+  test('builds Windows cmd call line for a shim path with spaces', () => {
+    expect(buildCmdCommandLine('C:\\Temp\\prefix with spaces\\spec-first.cmd', ['--help'])).toBe('call "C:\\Temp\\prefix with spaces\\spec-first.cmd" "--help"');
+  });
+
+  test('runs Windows cmd shim through cmd /d /c call without /s', () => {
+    if (process.platform === 'win32') return;
+
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-cmd-shim-'));
+    const fakeComspec = path.join(tempDir, 'fake-cmd.js');
+    const argsPath = path.join(tempDir, 'args.json');
+
+    try {
+      fs.writeFileSync(fakeComspec, [
+        '#!/usr/bin/env node',
+        'const fs = require("node:fs");',
+        'fs.writeFileSync(process.env.SPEC_FIRST_CAPTURE_ARGS, JSON.stringify(process.argv.slice(2)));',
+        '',
+      ].join('\n'));
+      fs.chmodSync(fakeComspec, 0o755);
+
+      runWindowsCmdShim('C:\\Temp\\prefix with spaces\\spec-first.cmd', ['--help'], {
+        env: {
+          ...process.env,
+          ComSpec: fakeComspec,
+          SPEC_FIRST_CAPTURE_ARGS: argsPath,
+        },
+        stdio: 'pipe',
+      });
+
+      expect(JSON.parse(fs.readFileSync(argsPath, 'utf8'))).toEqual([
+        '/d',
+        '/c',
+        'call "C:\\Temp\\prefix with spaces\\spec-first.cmd" "--help"',
+      ]);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   test('optional CI artifact writer stores JSON summaries in a workspace directory', () => {
     const previous = process.env.SPEC_FIRST_SMOKE_ARTIFACT_DIR;
-    const artifactDir = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'spec-first-smoke-artifacts-'));
+    const artifactDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-smoke-artifacts-'));
 
     try {
       process.env.SPEC_FIRST_SMOKE_ARTIFACT_DIR = artifactDir;
@@ -343,6 +380,8 @@ describe('npm install matrix smoke script', () => {
     expect(workflow).not.toContain('shell: process.platform ===');
     expect(script).not.toContain('shell: process.platform ===');
     expect(script).toContain('shell: false');
+    expect(script).toContain("['/d', '/c', buildCmdCommandLine(shim, args)]");
+    expect(script).toContain("return ['call', command, ...args]");
     expect(script).toContain('prefix with spaces');
     expect(script).toContain('workspace [win64] 中文 (paren)');
     expect(script).toContain('runInstalledProgrammaticInitResult');

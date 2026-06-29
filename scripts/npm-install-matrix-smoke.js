@@ -116,12 +116,14 @@ function quoteCmdArg(value) {
 }
 
 function buildCmdCommandLine(command, args) {
-  return [command, ...args].map(quoteCmdArg).join(' ');
+  return ['call', command, ...args].map((part, index) => (
+    index === 0 ? part : quoteCmdArg(part)
+  )).join(' ');
 }
 
 function runWindowsCmdShim(shim, args, options = {}) {
   const comspec = getEnvValue(options.env || process.env, 'ComSpec') || 'cmd.exe';
-  return runChild(comspec, ['/d', '/s', '/c', buildCmdCommandLine(shim, args)], {
+  return runChild(comspec, ['/d', '/c', buildCmdCommandLine(shim, args)], {
     ...options,
     stdio: options.stdio || 'inherit',
   });

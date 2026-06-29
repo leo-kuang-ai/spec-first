@@ -3,16 +3,19 @@
 # spec-first
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm yearly downloads](https://img.shields.io/npm/dy/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm weekly downloads](https://img.shields.io/npm/dw/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/main/LICENSE)
 [![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/main/package.json)
-[![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml)
+[![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
 [![docs](https://img.shields.io/badge/docs-spec--first.cn-0b7285.svg)](http://spec-first.cn/)
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
 **面向 Claude Code 与 Codex 的 AI Coding Harness。**
 
-`spec-first` 把一次性的 AI coding 对话变成仓库承载的工程闭环。脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。
+`spec-first` 让 Claude Code 和 Codex 在真实项目中更容易被信任：一次性的 AI coding 对话会变成仓库承载的 requirements、plans、scoped work、review 和 reusable learning 闭环。脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。
 
 官网：[spec-first.cn](http://spec-first.cn/)
 
@@ -24,29 +27,31 @@
 
 ![spec-first engineering loop](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.png)
 
-重点不是再提供一组 prompt 片段或 autonomous agent team，而是给你已有的 Claude Code 或 Codex 会话加上一条可治理的工程闭环：定义问题、规划方案、必要时拆 task、执行、评审，并把经验沉淀下来。
+首次评估时，重点不应该是 agent 数量或 prompt 库，而是一次 workflow 是否会留下可复用的东西。健康的第一圈会给你已有的 Claude Code 或 Codex 会话加上一条可治理路径：定义问题、规划方案、必要时拆 task、执行、评审，并把经验沉淀下来。
+
+最小成功信号是具体可检查的：安装和 init 后，在宿主里运行一个 workflow，然后查看它写入仓库的 Markdown artifact，通常位于 `docs/brainstorms/` 或 `docs/plans/`。更深的治理内容可以稍后再读；第一次试用先确认工作是否变得可检查。
 
 <sub>维护的演示素材位：配图由 source-controlled SVG（[spec-first-flow.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg)）生成并转为 PNG，使其在 GitHub 和 npm 包页面都能正常显示；未来可直接替换为终端录屏，不需要重排页面结构。</sub>
 
 ## 你遇到的问题
 
-AI 写代码很快；真正危险的是塑造代码的判断、证据和评审轨迹往往随对话窗口一起消失：下一次会话缺上下文，reviewer 看不到计划为什么变化，团队也很难复用一次成功经验。
+AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么选这个 scope、检查过哪些证据、哪些 review finding 重要、下一位 agent 或同事应该继承什么上下文。
 
-`spec-first` 把这些工作作为持久 artifact 留在仓库里——requirements、PRD、plans、task packs、work evidence、debug notes、reviews 和 learnings——让下一次会话、reviewer 和你的同事都能继承上下文，而不是从零开始。
+如果没有仓库承载的轨迹，这些上下文会随聊天窗口一起消失。下一次会话缺上下文，reviewer 看不到计划为什么变化，团队也很难复用一次成功经验。`spec-first` 把这些工作作为持久 artifact 留在仓库里：requirements、PRD、plans、task packs、work evidence、debug notes、reviews 和 learnings。
 
 ## 为什么使用 spec-first？
 
-`spec-first` 让软件生命周期本身保持可读，同时不把 prose 当成证明：
+`spec-first` 让软件生命周期本身保持可读，同时不把 prose 当成证明。它不是替代 Claude Code 或 Codex，而是给这些宿主加上一层项目内 harness。
 
-| 问题 | Agent 编排工具 | spec-first |
+| 采纳时真正关心的问题 | Prompt pack / agent 编排 | spec-first |
 |---|---|---|
-| 核心对象 | Agent、role、team、queue | Requirement、plan、task pack、diff、review、bug、learning |
-| 主线问题 | Agent 之间怎么协作？ | 软件决策怎么被记下来、被验证、被复用？ |
-| 状态位置 | Session state、消息总线、runtime memory | 项目内文档、generated runtime assets、可验证 CLI facts |
-| 人的角色 | 尽量减少介入 | 工程师对 scope、tradeoff、验收保持在环 |
-| 自动化边界 | 倾向更长的自动接力 | 脚本强制确定性不变量并准备事实，LLM 在这层地板之上做语义判断 |
+| 第一次跑完能得到什么？ | 更好的聊天答案或 agent transcript | 仓库内 artifact，例如 requirements brief 或 plan |
+| 决策和证据在哪里？ | Session state、消息总线、runtime memory | 项目内文档、generated runtime assets、可验证 CLI facts |
+| 人要 review 什么？ | 通常是最终 diff 或 agent 输出 | Requirements、plans、task packs、diff、review findings、bugs 和 learnings |
+| 谁守住机械边界？ | 主要靠模型自觉或自定义 glue | 脚本强制确定性不变量并准备事实，LLM 在这层地板之上做语义判断 |
+| Claude Code 与 Codex 怎么对齐？ | 分开 setup 和维护 prompt | 一套 source assets 重新生成两个宿主的 runtime surface |
 
-它带来的结果是：
+你今天就能检查的当前机制：
 
 - requirements 变成持久 brief，而不是会话里消失的 prompt。
 - plans 和 task packs 把模糊意图变成可评审、可执行的上下文。
@@ -56,7 +61,11 @@ AI 写代码很快；真正危险的是塑造代码的判断、证据和评审�
 - knowledge handoff 默认 summary-first，召回的 `docs/solutions/` learning 在回源确认前保持 advisory。
 - 一套 source assets 同时支持 Claude Code 的 `/spec:*` 入口和 Codex 的 `$spec-*` 入口，不需要手工维护生成副本。
 
+这些是当前 repo 机制，不是“已经被外部采纳数据证明”的效果宣称。先相信 artifacts、tests 和 source/runtime boundaries，再相信任何营销句子。
+
 ## 快速开始
+
+最快路径：安装 CLI，运行 `doctor`，运行 `init`，重启宿主，在宿主里跑一个 workflow，然后查看仓库内 artifact。
 
 前置条件：
 
@@ -100,6 +109,12 @@ spec-first init
 
 用户级语言同步只在明确 opt-in 后向 Codex / Claude 用户 instruction 文件写入 language-only managed block,并在全局 developer profile 记录 `sync_user_language=true`,供后续 init 静默维护。`--no-sync-user-language` 会记录 `false`,并从受支持宿主移除 spec-first 写过的用户语言 block。这是 instruction guidance,不是通过 hook 强制改写回答语言。
 
+`spec-first init` 完成后，一个健康的首次 setup 应该是具体且可检查的：
+
+- 选中的宿主会获得 runtime entries，例如 Claude Code 的 `/spec:*` commands 或 Codex 的 `$spec-*` skills。
+- Generated runtime copies 位于 `.claude/`、`.codex/` 或 `.agents/skills/`，可通过 `spec-first init` 重建。
+- 后续 workflow artifacts 会留在目标 Git repo 中，例如 `docs/brainstorms/`、`docs/plans/`、`docs/tasks/`、`docs/solutions/` 和 `.spec-first/workflows/`。
+
 重启宿主或新开会话，让宿主加载刚生成的 runtime assets。随后在宿主会话里运行第一个 workflow 入口。第一次可见结果会是写进仓库的 Markdown artifact，而不是某个隐藏的 memory cell。
 
 宿主内 workflow 入口不是 shell 命令：
@@ -113,6 +128,22 @@ $spec-brainstorm "改进 onboarding"
 ```
 
 第一次 brainstorm 通常只在 `docs/brainstorms/` 下生成一个 requirements brief。随后进入当前宿主的 plan 入口继续推进。更长的链路后续可能增加 `docs/plans/`、`docs/tasks/`、代码/测试改动、structured work evidence、review findings、debug notes 和 `docs/solutions/` learnings，但不是每个 workflow 都写入所有 artifact。如果不确定该用哪个 workflow，可以在宿主会话中直接描述任务或询问下一步；`using-spec-first` 会推荐一个公开入口并说明原因。
+
+第一次可期待的 artifact 形态：
+
+```text
+docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
+```
+
+阅读完整入口表之前，可先按这个快速路由选择第一个 workflow：
+
+| 你的第一个任务是... | 从这里开始... |
+|---|---|
+| 粗略想法、功能方向或产品变化 | `/spec:brainstorm` 或 `$spec-brainstorm` |
+| 已有 PRD、需求笔记或 brownfield change request | `/spec:prd` 或 `$spec-prd` |
+| bug、失败测试、堆栈或异常行为 | `/spec:debug` 或 `$spec-debug` |
+| 已定计划、task pack 或范围明确的实现请求 | `/spec:work` 或 `$spec-work` |
+| 需要审查的文档、计划、task pack、diff 或实现 | `/spec:doc-review`、`$spec-doc-review`、`/spec:code-review` 或 `$spec-code-review` |
 
 完整走查见 [首次工作流走查](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md)。产物归属见 [产物目录](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md)。
 

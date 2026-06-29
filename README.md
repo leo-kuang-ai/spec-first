@@ -3,16 +3,19 @@
 # spec-first
 
 [![npm version](https://img.shields.io/npm/v/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm yearly downloads](https://img.shields.io/npm/dy/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm monthly downloads](https://img.shields.io/npm/dm/spec-first.svg)](https://www.npmjs.com/package/spec-first)
+[![npm weekly downloads](https://img.shields.io/npm/dw/spec-first.svg)](https://www.npmjs.com/package/spec-first)
 [![license](https://img.shields.io/npm/l/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/main/LICENSE)
 [![node](https://img.shields.io/node/v/spec-first.svg)](https://github.com/sunrain520/spec-first/blob/main/package.json)
-[![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml)
+[![CI](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml/badge.svg?branch=master)](https://github.com/sunrain520/spec-first/actions/workflows/npm-install-matrix.yml?query=branch%3Amaster)
 [![docs](https://img.shields.io/badge/docs-spec--first.cn-0b7285.svg)](http://spec-first.cn/)
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
 **AI Coding Harness for Claude Code and Codex.**
 
-`spec-first` turns one-off AI coding chats into a repo-backed engineering loop. Scripts enforce deterministic invariants and prepare facts. LLMs judge semantic adequacy above that floor. Evidence stays in your repository.
+`spec-first` makes Claude Code and Codex easier to trust on real projects: one-off AI coding chats become a repo-backed loop of requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor. Evidence stays in your repository.
 
 Official site: [spec-first.cn](http://spec-first.cn/)
 
@@ -24,29 +27,31 @@ Official site: [spec-first.cn](http://spec-first.cn/)
 
 ![spec-first engineering loop](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.png)
 
-The point is not another prompt snippet or autonomous agent team. `spec-first` gives your existing Claude Code or Codex session a governed loop: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
+The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code or Codex session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
+
+The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
 
 <sub>Maintained demo slot: the diagram is generated from a source-controlled SVG ([spec-first-flow.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg)) and rendered to PNG so it shows on both GitHub and the npm package page; a future terminal recording can replace this position without restructuring the page.</sub>
 
 ## The Problem
 
-AI can write code quickly. The risky part is that the decisions, evidence, and review trail often vanish with the chat window: the next session starts cold, reviewers cannot see why a plan changed, and teams cannot reuse what worked.
+AI can write code quickly. The expensive part is preserving the judgment around the code: why this scope, what evidence was checked, which review findings mattered, and what the next agent or teammate should inherit.
 
-`spec-first` keeps that work as durable artifacts — requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings — so the next session, the reviewer, and your teammate inherit context instead of starting cold.
+Without a repo-backed trail, that context disappears with the chat window. The next session starts cold, reviewers cannot see why a plan changed, and teams cannot reuse what worked. `spec-first` keeps that work as durable artifacts: requirements, PRDs, plans, task packs, work evidence, debugging notes, reviews, and learnings.
 
 ## Why spec-first?
 
-`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof:
+`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code or Codex; it gives those hosts a project-local harness.
 
-| Question | Agent orchestration tools | spec-first |
+| Adoption question | Prompt pack / agent orchestration | spec-first |
 |---|---|---|
-| Primary unit | Agent, role, team, queue | Requirement, plan, task pack, diff, review, bug, learning |
-| Main problem | How should agents coordinate? | How should software decisions stay durable and reusable? |
-| State location | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
-| Human role | Minimize intervention where possible | Keep engineers in the loop for scope, tradeoffs, and acceptance |
-| Automation boundary | Often pushes toward autonomous chains | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
+| What do I get after the first run? | A better chat answer or agent transcript | A repo-local artifact such as a requirements brief or plan |
+| Where do decisions and evidence live? | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
+| What does the human review? | Often the final diff or agent output | Requirements, plans, task packs, diffs, review findings, bugs, and learnings |
+| Who enforces mechanical boundaries? | Mostly model discipline or custom glue | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
+| How do Claude Code and Codex stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates both host runtime surfaces |
 
-What this buys you:
+Current mechanisms you can inspect today:
 
 - Requirements become durable briefs instead of disappearing prompts.
 - Plans and task packs turn vague intent into reviewable execution context.
@@ -57,7 +62,11 @@ What this buys you:
 - 团队开发规范可以放在 `docs/contracts/team-standards.md` 与 `docs/standards/**`，由 workflow 按 scope 选择 confirmed 规则；这是 source 文档，不是新的 `$spec-*` public workflow。
 - One source asset set supports Claude Code `/spec:*` entries and Codex `$spec-*` entries without hand-maintaining generated runtime copies.
 
+These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.
+
 ## Quickstart
+
+Fast path: install the CLI, run `doctor`, run `init`, restart the host, run one host workflow, then inspect the repo-local artifact.
 
 Prerequisites:
 
@@ -101,6 +110,12 @@ spec-first init
 
 User-level language sync writes only a language preference block to Codex / Claude user instruction files after explicit opt-in, then records `sync_user_language=true` in the global developer profile for later init runs. `--no-sync-user-language` records `false` and removes spec-first's user-language block from supported hosts. This is instruction guidance, not hook-based language enforcement.
 
+After `spec-first init`, a healthy first setup is concrete and inspectable:
+
+- The selected host gets runtime entries such as Claude Code `/spec:*` commands or Codex `$spec-*` skills.
+- Generated runtime copies live under `.claude/`, `.codex/`, or `.agents/skills/` and can be rebuilt with `spec-first init`.
+- Future workflow artifacts stay in the target Git repo under paths such as `docs/brainstorms/`, `docs/plans/`, `docs/tasks/`, `docs/solutions/`, and `.spec-first/workflows/`.
+
 Restart the host or open a new session so it loads the generated runtime assets. Then run your first workflow entry from inside the host session. The first visible result is a Markdown artifact in your repo, not a hidden memory cell.
 
 Host-session workflow entries are not shell commands:
@@ -114,6 +129,22 @@ $spec-brainstorm "Improve onboarding"
 ```
 
 The first brainstorm run usually creates one requirements brief under `docs/brainstorms/`. From there, continue to the current host's plan entrypoint. A longer chain may add `docs/plans/`, `docs/tasks/`, code/test changes, structured work evidence, review findings, debug notes, and `docs/solutions/` learnings, but not every workflow writes every artifact. If you are not sure which workflow to use, describe the task or ask what to run next in the host session; `using-spec-first` will recommend one public entrypoint with a reason.
+
+Expected first artifact shape:
+
+```text
+docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
+```
+
+Use this quick route before reading the full entrypoint table:
+
+| If your first task is... | Start with... |
+|---|---|
+| A rough idea, feature, or product change | `/spec:brainstorm` or `$spec-brainstorm` |
+| An existing PRD, requirement note, or brownfield change request | `/spec:prd` or `$spec-prd` |
+| A bug, failing test, stack trace, or abnormal behavior | `/spec:debug` or `$spec-debug` |
+| A settled plan, task pack, or scoped implementation request | `/spec:work` or `$spec-work` |
+| A document, plan, task pack, diff, or implementation that needs review | `/spec:doc-review`, `$spec-doc-review`, `/spec:code-review`, or `$spec-code-review` |
 
 Detailed walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
 

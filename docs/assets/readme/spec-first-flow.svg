@@ -1,121 +1,125 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
   <title id="title">spec-first engineering loop</title>
-  <desc id="desc">A blueprint-style diagram: spec-first is an AI Coding Harness that turns a one-off AI chat into a repository-backed engineering loop. Requirements, Plan, Tasks, Code, Review, and Knowledge stay connected while scripts enforce deterministic invariants, prepare facts, and LLMs judge semantic adequacy above that floor.</desc>
+  <desc id="desc">spec-first 将一次性 AI 对话整理成仓库内可追踪的工程闭环：输入需求或问题，经过需求、计划、任务、实现、审查和知识沉淀，最终留下可复用的仓库上下文。</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#F8FBFF"/>
-      <stop offset="0.55" stop-color="#EFF6FF"/>
-      <stop offset="1" stop-color="#ECFEFF"/>
+    <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7F7F8"/>
+      <stop offset="1" stop-color="#ECEEF1"/>
     </linearGradient>
-    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#2563EB"/>
-      <stop offset="0.5" stop-color="#06B6D4"/>
-      <stop offset="1" stop-color="#14B8A6"/>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4F9CF9"/>
+      <stop offset="0.52" stop-color="#45B97C"/>
+      <stop offset="1" stop-color="#F2A23A"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#1E3A5F" flood-opacity="0.14"/>
+    <filter id="cardShadow" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="0" dy="18" stdDeviation="24" flood-color="#162033" flood-opacity="0.12"/>
     </filter>
-    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="4" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#162033" flood-opacity="0.10"/>
     </filter>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB"/>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7A8594"/>
     </marker>
-    <marker id="arrowLoop" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0EA5E9"/>
-    </marker>
-    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-      <path d="M 32 0 H 0 V 32" fill="none" stroke="#D8E8FA" stroke-width="1"/>
-    </pattern>
     <style>
-      .h1 { fill:#0F172A; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size:32px; font-weight:800; text-anchor:middle; }
-      .h2 { fill:#475569; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size:17px; font-weight:650; text-anchor:middle; }
-      .label { fill:#0F172A; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size:21px; font-weight:800; text-anchor:middle; }
-      .stage { fill:#1E3A5F; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size:16px; font-weight:750; text-anchor:middle; }
-      .small { fill:#475569; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size:15px; font-weight:650; text-anchor:middle; }
-      .mono { fill:#164E63; font-family:"SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size:14px; font-weight:700; text-anchor:middle; }
-      .node { fill:#FFFFFF; stroke:#2563EB; stroke-width:2; filter:url(#shadow); }
-      .node-amber { fill:#FFFBEB; stroke:#D97706; stroke-width:2; filter:url(#shadow); }
-      .node-teal { fill:#F0FDFA; stroke:#0D9488; stroke-width:2; filter:url(#shadow); }
-      .wire { fill:none; stroke:url(#line); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#arrow); }
-      .loop { fill:none; stroke:#0EA5E9; stroke-width:3.6; stroke-linecap:round; marker-end:url(#arrowLoop); }
+      text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; letter-spacing:0; }
+      .title { fill:#111827; font-size:38px; font-weight:760; text-anchor:middle; }
+      .subtitle { fill:#667085; font-size:17px; font-weight:500; text-anchor:middle; }
+      .kicker { fill:#8A94A3; font-size:13px; font-weight:650; text-anchor:middle; }
+      .h { fill:#111827; font-size:21px; font-weight:720; text-anchor:middle; }
+      .body { fill:#5F6B7A; font-size:14px; font-weight:520; text-anchor:middle; }
+      .small { fill:#7A8594; font-size:12px; font-weight:540; text-anchor:middle; }
+      .mono { font-family:"SFMono-Regular", ui-monospace, Menlo, Consolas, monospace; fill:#3F4A58; font-size:12px; font-weight:650; text-anchor:middle; }
+      .card { fill:#FFFFFF; stroke:#FFFFFF; stroke-width:1; filter:url(#cardShadow); }
+      .chip { fill:#F4F6F8; stroke:#E4E7EC; stroke-width:1; }
+      .chip-blue { fill:#EEF6FF; stroke:#C8DFFC; stroke-width:1; }
+      .chip-green { fill:#EFF8F2; stroke:#CDE9D6; stroke-width:1; }
+      .chip-orange { fill:#FFF5E6; stroke:#F7D9A8; stroke-width:1; }
+      .line { fill:none; stroke:#9AA4B2; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#arrow); }
     </style>
   </defs>
 
-  <rect width="1200" height="675" fill="url(#bg)"/>
-  <rect width="1200" height="675" fill="url(#grid)" opacity="0.7"/>
+  <rect width="1200" height="675" fill="url(#page)"/>
+  <circle cx="196" cy="180" r="126" fill="#FFFFFF" opacity="0.65"/>
+  <circle cx="1054" cy="512" r="154" fill="#FFFFFF" opacity="0.50"/>
 
-  <text x="600" y="62" class="h1">AI Coding Harness for repo-backed work</text>
-  <text x="600" y="92" class="h2">deterministic gates · LLM judgment · artifacts stay in your repository</text>
+  <text x="600" y="66" class="title">把 AI 对话变成工程闭环</text>
+  <text x="600" y="99" class="subtitle">从需求到知识沉淀，关键上下文留在仓库里，而不是散落在一次会话里</text>
 
-  <!-- input: the problem (warm = before) -->
-  <g transform="translate(56 251)">
-    <rect class="node-amber" x="0" y="0" width="196" height="150" rx="11"/>
-    <text x="98" y="44" class="label">AI chat</text>
-    <text x="98" y="78" class="small">fast code</text>
-    <text x="98" y="104" class="small">lost context</text>
-    <text x="98" y="130" class="small">thin review trail</text>
-  </g>
-
-  <!-- output: the outcome (cool = after) -->
-  <g transform="translate(948 251)">
-    <rect class="node-teal" x="0" y="0" width="196" height="150" rx="11"/>
-    <text x="98" y="44" class="label">Repo memory</text>
-    <text x="98" y="78" class="small">durable decisions</text>
-    <text x="98" y="104" class="small">verified evidence</text>
-    <text x="98" y="130" class="small">team handoff</text>
-  </g>
-
-  <path class="wire" d="M 252 326 C 312 318 350 318 396 328"/>
-  <path class="wire" d="M 804 328 C 850 318 888 318 948 326"/>
-
-  <!-- loop card -->
-  <g transform="translate(400 116)">
-    <rect x="0" y="0" width="400" height="424" rx="18" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.6" filter="url(#shadow)"/>
-
-    <!-- one continuous clockwise ring (two arcs => two arrowheads) signals "loop" at thumbnail size -->
-    <path class="loop" d="M 200 120 A 92 92 0 0 1 200 304"/>
-    <path class="loop" d="M 200 304 A 92 92 0 0 1 200 120"/>
-
-    <!-- core -->
-    <circle cx="200" cy="212" r="64" fill="#0F172A" stroke="#22D3EE" stroke-width="3" filter="url(#softGlow)"/>
-    <text x="200" y="207" class="label" style="fill:#F8FAFC; font-size:20px">spec-first</text>
-    <text x="200" y="231" class="small" style="fill:#A5F3FC; font-size:13px">harness</text>
-
-    <!-- 6 stages, clockwise = canonical order: Requirements -> Plan -> Tasks -> Code -> Review -> Knowledge -->
-    <g transform="translate(142 36)">
-      <rect class="node" x="0" y="0" width="116" height="46" rx="9"/>
-      <text x="58" y="29" class="stage">Requirements</text>
+  <g transform="translate(58 202)">
+    <rect class="card" x="0" y="0" width="218" height="226" rx="28"/>
+    <text x="109" y="46" class="kicker">输入</text>
+    <text x="109" y="78" class="h">一次请求</text>
+    <g transform="translate(34 108)">
+      <rect class="chip-orange" x="0" y="0" width="150" height="34" rx="17"/>
+      <text x="75" y="22" class="body">功能想法</text>
     </g>
-    <g transform="translate(286 110)">
-      <rect class="node" x="0" y="0" width="104" height="46" rx="9"/>
-      <text x="52" y="29" class="stage">Plan</text>
-    </g>
-    <g transform="translate(286 268)">
-      <rect class="node" x="0" y="0" width="104" height="46" rx="9"/>
-      <text x="52" y="29" class="stage">Tasks</text>
-    </g>
-    <g transform="translate(142 342)">
-      <rect class="node" x="0" y="0" width="116" height="46" rx="9"/>
-      <text x="58" y="29" class="stage">Code</text>
-    </g>
-    <g transform="translate(10 268)">
-      <rect class="node" x="0" y="0" width="104" height="46" rx="9"/>
-      <text x="52" y="29" class="stage">Review</text>
-    </g>
-    <g transform="translate(10 110)">
-      <rect class="node" x="0" y="0" width="104" height="46" rx="9"/>
-      <text x="52" y="29" class="stage">Knowledge</text>
+    <g transform="translate(34 152)">
+      <rect class="chip" x="0" y="0" width="150" height="34" rx="17"/>
+      <text x="75" y="22" class="body">Bug / 堆栈</text>
     </g>
   </g>
 
-  <!-- single differentiator caption (no duplicate sequence ribbon) -->
-  <g transform="translate(360 586)">
-    <rect x="0" y="0" width="480" height="44" rx="22" fill="#E0F2FE" stroke="#38BDF8" stroke-width="1.4"/>
-    <text x="240" y="28" class="mono" style="font-size:13px">scripts gate exits · LLM judges adequacy</text>
+  <path class="line" d="M 276 315 C 314 303 346 303 380 315"/>
+
+  <g transform="translate(380 142)">
+    <rect class="card" x="0" y="0" width="440" height="346" rx="32"/>
+    <text x="220" y="48" class="kicker">spec-first 工作台</text>
+    <text x="220" y="80" class="h">轻契约连接主链路</text>
+    <text x="220" y="108" class="body">Codebase → Spec → Plan → Tasks → Code → Review → Knowledge</text>
+
+    <g transform="translate(42 144)">
+      <rect class="chip-blue" x="0" y="0" width="106" height="54" rx="18" filter="url(#softShadow)"/>
+      <text x="53" y="24" class="body">需求</text>
+      <text x="53" y="42" class="small">Spec</text>
+    </g>
+    <g transform="translate(167 144)">
+      <rect class="chip-blue" x="0" y="0" width="106" height="54" rx="18" filter="url(#softShadow)"/>
+      <text x="53" y="24" class="body">计划</text>
+      <text x="53" y="42" class="small">Plan</text>
+    </g>
+    <g transform="translate(292 144)">
+      <rect class="chip-blue" x="0" y="0" width="106" height="54" rx="18" filter="url(#softShadow)"/>
+      <text x="53" y="24" class="body">任务</text>
+      <text x="53" y="42" class="small">Tasks</text>
+    </g>
+    <g transform="translate(42 216)">
+      <rect class="chip-green" x="0" y="0" width="106" height="54" rx="18" filter="url(#softShadow)"/>
+      <text x="53" y="24" class="body">实现</text>
+      <text x="53" y="42" class="small">Code</text>
+    </g>
+    <g transform="translate(167 216)">
+      <rect class="chip-orange" x="0" y="0" width="106" height="54" rx="18" filter="url(#softShadow)"/>
+      <text x="53" y="24" class="body">审查</text>
+      <text x="53" y="42" class="small">Review</text>
+    </g>
+    <g transform="translate(292 216)">
+      <rect class="chip-green" x="0" y="0" width="106" height="54" rx="18" filter="url(#softShadow)"/>
+      <text x="53" y="24" class="body">沉淀</text>
+      <text x="53" y="42" class="small">Knowledge</text>
+    </g>
+
+    <rect x="54" y="300" width="332" height="28" rx="14" fill="url(#accent)" opacity="0.18"/>
+    <text x="220" y="319" class="mono">scripts 准备事实 · LLM 判断充分性</text>
+  </g>
+
+  <path class="line" d="M 820 315 C 854 303 886 303 924 315"/>
+
+  <g transform="translate(924 202)">
+    <rect class="card" x="0" y="0" width="218" height="226" rx="28"/>
+    <text x="109" y="46" class="kicker">结果</text>
+    <text x="109" y="78" class="h">仓库上下文</text>
+    <g transform="translate(34 108)">
+      <rect class="chip-green" x="0" y="0" width="150" height="34" rx="17"/>
+      <text x="75" y="22" class="body">可验证证据</text>
+    </g>
+    <g transform="translate(34 152)">
+      <rect class="chip-blue" x="0" y="0" width="150" height="34" rx="17"/>
+      <text x="75" y="22" class="body">可复用记忆</text>
+    </g>
+  </g>
+
+  <g transform="translate(262 552)">
+    <rect x="0" y="0" width="676" height="50" rx="25" fill="#FFFFFF" opacity="0.86" stroke="#E4E7EC"/>
+    <text x="338" y="31" class="mono">/spec:* for Claude Code · $spec-* for Codex · artifacts stay repo-local</text>
   </g>
 </svg>
