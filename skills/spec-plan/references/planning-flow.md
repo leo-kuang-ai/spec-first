@@ -64,10 +64,20 @@ If a relevant requirements document exists:
 3. If the origin uses `artifact_kind: prd-requirements`, run a consumer-only receipt verification before treating R/AE/Scope/Evidence as confirmed:
 
    ```bash
-   node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path> --verify-receipt
+   if [ -f skills/spec-prd/scripts/finalize-prd-artifact.js ]; then
+     PRD_FINALIZER=skills/spec-prd/scripts/finalize-prd-artifact.js
+   elif [ -f .agents/skills/spec-prd/scripts/finalize-prd-artifact.js ]; then
+     PRD_FINALIZER=.agents/skills/spec-prd/scripts/finalize-prd-artifact.js
+   elif [ -f .claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js ]; then
+     PRD_FINALIZER=.claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js
+   else
+     echo "spec-prd receipt verifier not found" >&2
+     exit 2
+   fi
+   node "$PRD_FINALIZER" <prd-path> --inputs <input-path> --verify-receipt
    ```
 
-   Use every locatable path from the origin frontmatter `source_inputs:` (or legacy `prd_input:`) as `--inputs`; if no input path is locatable, run the command only when useful for diagnostics but record `origin_verification_status: degraded` with reason `input_side_recheck_degraded`. A zero exit means `origin_verification_status: verified`. A non-zero exit means `unverified` or `degraded`; read stdout JSON for `reason_codes`, route back to `$spec-prd` or `$spec-doc-review`, or continue only with an explicit degraded assumption. Do not use `--check-only` as a consumer pass signal: checkpoint closeout can exit cleanly while still being not planning-ready.
+   Use every locatable path from the origin frontmatter `source_inputs:` (or legacy `prd_input:`) as `--inputs`; if no input path is locatable, run the command only when useful for diagnostics but record `origin_verification_status: degraded` with reason `input_side_recheck_degraded`. Exit code `0` means parse stdout JSON and set `origin_verification_status: verified`. Exit code `1` means parse stdout JSON for `origin_verification_status` and `reason_codes`; route back to `$spec-prd` or `$spec-doc-review`, or continue only with an explicit degraded/unverified assumption. Exit code `2` is a verifier usage/runtime failure and stdout JSON is not guaranteed; fix the path, flags, or missing runtime first, and if it cannot run, record `origin_verification_status: degraded` with reason `verifier_unavailable` rather than presenting the origin as verified. Do not use `--check-only` as a consumer pass signal: checkpoint closeout can exit cleanly while still being not planning-ready.
 4. Carry forward all of the following:
    - `spec_id` when the origin frontmatter contains one. Preserve it exactly in the plan frontmatter; it is the cross-artifact identity for this spec chain.
    - Problem frame

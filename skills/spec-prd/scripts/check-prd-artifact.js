@@ -44,6 +44,9 @@ const SECTION_ID_BY_TITLE = {
   'Feature Slices': 'feature_slices',
 };
 
+const TITLE_BY_SECTION_ID = Object.fromEntries(
+  Object.entries(SECTION_ID_BY_TITLE).map(([title, sectionId]) => [sectionId, title]),
+);
 const KNOWN_SECTION_IDS = new Set(Object.values(SECTION_ID_BY_TITLE));
 const MACHINE_SECTION_IDS = new Set([
   'outstanding_questions',
@@ -362,6 +365,10 @@ function parseHeadings(lines) {
   return headings;
 }
 
+function isSectionIdComment(line) {
+  return /^\s*<!--\s*prd:section=[a-z0-9_-]+\s*-->\s*$/i.test(line);
+}
+
 // 去掉标题前导的序号/标点装饰("一、""(1)""1." 与残留 # 空白),
 // 用于在保留英文锚点的前提下识别本地化标题。
 function stripHeadingDecoration(title) {
@@ -387,10 +394,32 @@ function matchHeadingTitle(headingTitle, wantedTitle) {
   return false;
 }
 
+function canonicalTitleForHeading(headingTitle) {
+  return Object.keys(SECTION_ID_BY_TITLE).find((title) => matchHeadingTitle(headingTitle, title)) || null;
+}
+
+function sectionIdentityMismatchForHeading(heading) {
+  if (!heading.sectionId || !KNOWN_SECTION_IDS.has(heading.sectionId)) return null;
+  const actualTitle = canonicalTitleForHeading(heading.title);
+  if (!actualTitle) return null;
+  const actualSectionId = SECTION_ID_BY_TITLE[actualTitle];
+  if (actualSectionId === heading.sectionId) return null;
+  return {
+    section_id: heading.sectionId,
+    expected_title: TITLE_BY_SECTION_ID[heading.sectionId] || null,
+    actual_section_id: actualSectionId,
+    actual_title: actualTitle,
+    title: heading.title,
+    line: heading.line,
+    section_id_line: heading.sectionIdLine,
+  };
+}
+
 function matchSectionIdentity(heading, wantedTitle) {
   if (matchHeadingTitle(heading.title, wantedTitle)) return true;
   const wantedSectionId = SECTION_ID_BY_TITLE[wantedTitle];
-  return Boolean(wantedSectionId && heading.sectionId === wantedSectionId);
+  if (!wantedSectionId || heading.sectionId !== wantedSectionId) return false;
+  return !sectionIdentityMismatchForHeading(heading);
 }
 
 function sectionRange(lines, headings, title) {
@@ -944,11 +973,16 @@ function parseStructure(target, text) {
   const orphanSectionIds = headings.orphanSectionIds || [];
   const sectionIdCounts = {};
   const unknownSectionIds = [];
+  const sectionIdTitleMismatches = [];
   headings.forEach((heading) => {
     if (!heading.sectionId) return;
     sectionIdCounts[heading.sectionId] = (sectionIdCounts[heading.sectionId] || 0) + 1;
     if (!KNOWN_SECTION_IDS.has(heading.sectionId)) {
       unknownSectionIds.push({ section_id: heading.sectionId, line: heading.sectionIdLine });
+    }
+    const mismatch = sectionIdentityMismatchForHeading(heading);
+    if (mismatch) {
+      sectionIdTitleMismatches.push(mismatch);
     }
   });
   const duplicateSectionIds = Object.entries(sectionIdCounts)
@@ -969,7 +1003,8 @@ function parseStructure(target, text) {
     !new RegExp(`\\b${id}\\b`).test(acceptanceText)
   ));
   const evidenceTagHits = EVIDENCE_TAGS.filter((tag) => text.includes(tag));
-  const placeholderLines = lineNumbersFor(lines, /<[^>\n]+>|\bTODO\b|\bTBD\b|\bpending-tooling\b/i);
+  const placeholderLines = lineNumbersFor(lines, /<[^>\n]+>|\bTODO\b|\bTBD\b|\bpending-tooling\b/i)
+    .filter((lineNumber) => !isSectionIdComment(lines[lineNumber - 1]));
   const featureSliceGaps = detectFeatureSliceGaps(lines, headings);
   const priorities = priorityDistribution(lines, headings);
   const assumptionRowCount = countAssumptionRows(lines, headings);
@@ -1011,7 +1046,14 @@ function parseStructure(target, text) {
   const designSourcesUnreadPresent = detectDesignSourcesUnread(text);
   const needsReadinessDeclarations = frontmatter.fields.artifact_kind === 'prd-requirements'
     || /\bready-for-planning\b/i.test(text);
-  const prdShaped = missingCoreSections.length === 0 && requirementIds.length > 0;
+  const requirementsPathShaped = /(?:^|\/)[^/]*requirements\.md$/i.test(normalizedTarget);
+  const partialPrdStructure = missingCoreSections.length < CORE_SECTIONS.length;
+  const prdShaped = requirementIds.length > 0 && (
+    frontmatter.fields.artifact_kind === 'prd-requirements'
+    || acceptanceIds.length > 0
+    || requirementsPathShaped
+    || partialPrdStructure
+  );
   const writeModeIsFinalPrd = writeModeValue === 'final-prd';
   const writeModeIsCheckpoint = writeModeValue === 'checkpoint-prd';
   const claimsReady = frontmatter.fields.status === 'ready-for-planning'
@@ -1045,10 +1087,18 @@ function parseStructure(target, text) {
         machineSectionIdentityMissing.push(sectionId);
       }
     });
+    sectionIdTitleMismatches.forEach((entry) => {
+      [entry.section_id, entry.actual_section_id].forEach((sectionId) => {
+        if (MACHINE_SECTION_IDS.has(sectionId) && !machineSectionIdentityMissing.includes(sectionId)) {
+          machineSectionIdentityMissing.push(sectionId);
+        }
+      });
+    });
   }
   return {
     target, normalizedTarget, prdHash, lines, frontmatter, headings,
     unknownSectionIds, duplicateSectionIds, duplicateMachineSectionIds, orphanSectionIds,
+    sectionIdTitleMismatches,
     missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
     evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
     outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
@@ -1216,6 +1266,18 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   });
   structure.orphanSectionIds.forEach((entry) => {
     findings.push({ reason_code: 'section_id_orphaned', section: entry.sectionId, line: entry.line });
+  });
+  structure.sectionIdTitleMismatches.forEach((entry) => {
+    findings.push({
+      reason_code: 'section_id_title_mismatch',
+      section: entry.section_id,
+      actual_section: entry.actual_section_id,
+      expected_title: entry.expected_title,
+      actual_title: entry.actual_title,
+      title: entry.title,
+      line: entry.line,
+      section_id_line: entry.section_id_line,
+    });
   });
   structure.machineSectionIdentityMissing.forEach((sectionId) => {
     findings.push({ reason_code: 'machine_section_identity_missing', section: sectionId });

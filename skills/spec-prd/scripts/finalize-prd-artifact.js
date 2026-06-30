@@ -285,7 +285,8 @@ function verifyPrdReceipt(target, inputs, options = {}) {
     checker: {
       schema_version: report.schema_version,
       finding_count: report.findings.length,
-      blocking_finding_count: nonReceiptBlockingReasons.length,
+      blocking_finding_count: facts.blocking_reason_codes.length,
+      non_receipt_blocking_finding_count: nonReceiptBlockingReasons.length,
       blocking_reason_codes: facts.blocking_reason_codes,
       prd_hash: facts.ready_receipt_prd_hash,
       inputs_hash: facts.ready_receipt_inputs_hash,
@@ -302,7 +303,7 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     process.stdout.write('finalize-prd-artifact.js — write or check a machine-owned ready receipt for a PRD artifact.\n');
-    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--check-only | --verify-receipt] [--refresh-inputs-hash]\n');
+    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... ([--check-only] [--refresh-inputs-hash] | --verify-receipt)\n');
     process.stdout.write('  --check-only           preview the receipt without writing; exit 0 = closeout allowed, 1 = should_block_closeout, 2 = usage error.\n');
     process.stdout.write('  --verify-receipt       consumer-only read check; exit 0 = verified PRD origin, 1 = unverified/degraded, 2 = usage error.\n');
     process.stdout.write('  --refresh-inputs-hash  allow re-finalizing when only ready_receipt_stale blocks (PRD unchanged, inputs file modified).\n');
@@ -312,7 +313,7 @@ function main() {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
     }
-    process.stderr.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]] [--check-only | --verify-receipt]\n');
+    process.stderr.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... ([--check-only] [--refresh-inputs-hash] | --verify-receipt)\n');
     process.exit(2);
   }
 

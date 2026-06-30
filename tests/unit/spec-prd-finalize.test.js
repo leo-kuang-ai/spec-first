@@ -342,6 +342,64 @@ date: 2026-06-25
     }
   });
 
+  test('--verify-receipt reports stale receipt as a receipt blocker in checker counts', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-stale-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'input.md');
+
+    try {
+      write(inputPath, 'source evidence\n');
+      write(prdPath, validReadyIntentPrd());
+      expect(finalizePrd(prdPath, [inputPath]).status).toBe('finalized');
+      write(inputPath, 'source evidence changed\n');
+
+      const verification = verifyPrdReceipt(prdPath, [inputPath]);
+
+      expect(verification.verified).toBe(false);
+      expect(verification.origin_verification_status).toBe('unverified');
+      expect(verification.reason_codes).toContain('ready_receipt_stale');
+      expect(verification.checker.blocking_reason_codes).toContain('ready_receipt_stale');
+      expect(verification.checker.blocking_finding_count).toBe(1);
+      expect(verification.checker.non_receipt_blocking_finding_count).toBe(0);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--verify-receipt rejects PRDs that gained checker blockers after finalization', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-blocked-after-finalize-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'input.md');
+
+    try {
+      write(inputPath, 'source evidence\n');
+      write(prdPath, validReadyIntentPrd());
+      expect(finalizePrd(prdPath, [inputPath]).status).toBe('finalized');
+      const finalized = fs.readFileSync(prdPath, 'utf8');
+      write(prdPath, finalized.replace(
+        '- preflight_sweep_closure: closed',
+        '- preflight_sweep_closure: blocked',
+      ));
+
+      const verification = verifyPrdReceipt(prdPath, [inputPath]);
+
+      expect(verification.verified).toBe(false);
+      expect(verification.origin_verification_status).toBe('unverified');
+      expect(verification.reason_codes).toEqual(expect.arrayContaining([
+        'preflight_sweep_closure_blocked',
+        'ready_receipt_stale',
+      ]));
+      expect(verification.checker.blocking_reason_codes).toEqual(expect.arrayContaining([
+        'preflight_sweep_closure_blocked',
+        'ready_receipt_stale',
+      ]));
+      expect(verification.checker.blocking_finding_count).toBe(2);
+      expect(verification.checker.non_receipt_blocking_finding_count).toBe(1);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('--verify-receipt does not treat checkpoint closeout as verified origin', () => {
     const tempDir = makeTempDir();
     const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-checkpoint-requirements.md');
@@ -454,6 +512,23 @@ date: 2026-06-25
       ], { encoding: 'utf8' });
       expect(usage.status).toBe(2);
       expect(usage.stderr).toContain('--verify-receipt cannot be combined');
+
+      const refreshUsage = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--verify-receipt',
+        '--refresh-inputs-hash',
+      ], { encoding: 'utf8' });
+      expect(refreshUsage.status).toBe(2);
+      expect(refreshUsage.stderr).toContain('--verify-receipt cannot be combined');
+
+      const help = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        '--help',
+      ], { encoding: 'utf8' });
+      expect(help.status).toBe(0);
+      expect(help.stdout).toContain('([--check-only] [--refresh-inputs-hash] | --verify-receipt)');
+      expect(help.stdout).not.toContain('[--check-only | --verify-receipt] [--refresh-inputs-hash]');
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }

@@ -499,21 +499,28 @@ describe('spec_id planning contract', () => {
     expect(text).toContain('Use a new `spec_id` only when deliberately creating a new spec chain outside the deepening path');
   });
 
-  test('origin_grade is visible in plan frontmatter and non-blocking for brainstorm-grade origins', () => {
+  test('origin metadata is visible in plan frontmatter and non-blocking for brainstorm-grade origins', () => {
     const flow = fs.readFileSync(PLANNING_FLOW_PATH, 'utf8');
     const template = fs.readFileSync(PLAN_TEMPLATE_PATH, 'utf8');
+    const sections = fs.readFileSync(PLAN_SECTIONS_PATH, 'utf8');
 
     // planning-flow must distinguish PRD-grade vs brainstorm-grade and record origin_grade
     expect(flow).toContain('origin_grade: prd');
     expect(flow).toContain('origin_grade: brainstorm');
     expect(flow).toContain('origin_grade: legacy');
+    expect(flow).toContain('origin_verification_status: verified');
+    expect(flow).toContain('verifier_unavailable');
     // brainstorm-grade must remain valid — not blocked
     expect(flow).toContain('valid direct planning input');
     expect(flow).not.toContain('reject brainstorm-grade');
-    // plan template must expose origin_grade as a frontmatter field
+    // plan template must expose origin metadata as frontmatter fields
     expect(template).toContain('origin_grade:');
+    expect(template).toContain('origin_verification_status:');
+    expect(template).toContain('origin_verification_reason_codes:');
     // origin_grade is advisory, not a gate
     expect(template).toMatch(/origin_grade.*not a gate/);
+    expect(sections).toContain('origin_verification_status');
+    expect(sections).toContain('origin_verification_reason_codes');
   });
 
   test('handoff work entrypoint remains host-neutral', () => {
@@ -772,13 +779,19 @@ describe('spec_id planning contract', () => {
 
   test('Claude command projection points plan template reference at the workflow runtime copy', () => {
     const command = plannedRuntimeContent(new ClaudeAdapter(), '.claude/commands/spec/plan.md');
+    const claudePlanningFlow = plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/planning-flow.md');
+    const codexPlanningFlow = plannedRuntimeContent(new CodexAdapter(), '.agents/skills/spec-plan/references/planning-flow.md');
 
     expect(command).toContain('read `.claude/spec-first/workflows/spec-plan/references/planning-flow.md`');
     expect(command).toContain('Read `.claude/spec-first/workflows/spec-plan/references/plan-sections.md` before writing the plan.');
     expect(command).toContain('Read `.claude/spec-first/workflows/spec-plan/references/markdown-rendering.md` before writing the canonical markdown plan.');
     expect(command).toContain('Read `.claude/spec-first/workflows/spec-plan/references/plan-template.md` before writing the plan.');
-    expect(plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/planning-flow.md')).toContain('read `.claude/spec-first/workflows/spec-plan/references/synthesis-summary.md`');
-    expect(plannedRuntimeContent(new CodexAdapter(), '.agents/skills/spec-plan/references/planning-flow.md')).toContain('read `.agents/skills/spec-plan/references/synthesis-summary.md`');
+    expect(claudePlanningFlow).toContain('read `.claude/spec-first/workflows/spec-plan/references/synthesis-summary.md`');
+    expect(codexPlanningFlow).toContain('read `.agents/skills/spec-plan/references/synthesis-summary.md`');
+    expect(claudePlanningFlow).toContain('.claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js');
+    expect(codexPlanningFlow).toContain('.agents/skills/spec-prd/scripts/finalize-prd-artifact.js');
+    expect(claudePlanningFlow).toContain('PRD_FINALIZER');
+    expect(codexPlanningFlow).toContain('PRD_FINALIZER');
     expect(plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/plan-sections.md')).toContain('Markdown remains the canonical plan artifact.');
     expect(plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/plan-sections.md')).toContain('conditional surface-coverage lens');
     expect(plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/plan-template.md')).toContain('- **Surface coverage:**');

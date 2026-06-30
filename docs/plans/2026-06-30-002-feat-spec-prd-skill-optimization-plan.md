@@ -429,7 +429,7 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - Test: `tests/unit/spec-prd-contracts.test.js` 或新增 spec-plan consume contract fixture(origin 无有效 receipt 不得标 ready/confirmed)
 
 **Approach:**
-- 可执行路径:`node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path> --verify-receipt`(D-03 形态),按 U8 三态 exit code 分支。
+- 可执行路径:先解析当前可用的 `PRD_FINALIZER`(`skills/spec-prd/scripts/finalize-prd-artifact.js` source checkout,`.agents/skills/spec-prd/scripts/finalize-prd-artifact.js` Codex runtime,或 `.claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js` Claude runtime),再执行 `node "$PRD_FINALIZER" <prd-path> --inputs <input-path> --verify-receipt`(D-03 形态),按 U8 三态 exit code 分支。
 - 缺 receipt/stale/blocker/inputs freshness 不可确认/安全区块不可定位 → 不发明 WHAT,route back to `$spec-prd` 或 `$spec-doc-review`;用户明确接受才 degraded,记 `unverified-prd-origin`/`origin_grade: prd`/`origin_verification_status: degraded`。
 - 保留 clarified-requirements IDs;缺映射记 coverage gap,不用 plan 新编号掩盖。
 - Downstream Sync Impact Map:source/design/owner decision/R/AE 变化时识别 stale plan/task 或标 `downstream_sync_unknown`。

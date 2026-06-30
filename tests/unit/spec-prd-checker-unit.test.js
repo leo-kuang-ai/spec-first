@@ -227,6 +227,17 @@ describe('section id identity and localized PRD facts', () => {
     expect(report.facts.blocking_reason_codes).not.toContain('machine_section_identity_missing');
   });
 
+  test('section-id comments are machine anchors, not placeholder findings', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-comments-requirements.md',
+      sectionIdChineseReadyPrd(),
+    );
+
+    expect(report.findings.map((finding) => finding.reason_code))
+      .not.toContain('placeholder_or_todo_present');
+    expect(report.facts.placeholder_line_count).toBe(0);
+  });
+
   test('parseStructure prdShaped uses section-id rather than English heading tokens only', () => {
     const structure = parseStructure(
       'docs/brainstorms/section-id-requirements.md',
@@ -236,6 +247,47 @@ describe('section id identity and localized PRD facts', () => {
     expect(structure.missingCoreSections).toEqual([]);
     expect(structure.uncoveredRequirements).toEqual([]);
     expect(structure.prdShaped).toBe(true);
+  });
+
+  test('localized requirements-shaped drafts still trigger readiness evasion blockers', () => {
+    const report = buildReport(
+      'docs/brainstorms/localized-draft-requirements.md',
+      [
+        '---',
+        'title: Localized Draft',
+        '---',
+        '',
+        '# Localized Draft',
+        '',
+        '## 需求列表',
+        '| ID | Priority | Requirement |',
+        '| --- | --- | --- |',
+        '| R-01 | P0 | 展示 fallback 状态 |',
+        '',
+        '## 验收样例',
+        '| ID | Covers | Example |',
+        '| --- | --- | --- |',
+        '| AE-01 | R-01 | Given fallback When page opens Then show fallback copy |',
+      ].join('\n'),
+    );
+
+    expect(report.facts.core_sections_missing).toEqual([
+      'Summary',
+      'Change Delta',
+      'Requirements',
+      'Acceptance Examples',
+      'Scope Boundaries',
+      'Evidence And Assumptions',
+    ]);
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ reason_code: 'prd_readiness_declarations_evaded' }),
+      expect.objectContaining({ reason_code: 'preflight_sweep_closure_absent' }),
+    ]));
+    expect(report.facts.blocking_reason_codes).toEqual(expect.arrayContaining([
+      'prd_readiness_declarations_evaded',
+      'preflight_sweep_closure_absent',
+    ]));
+    expect(report.facts.blocking_reason_codes).not.toContain('core_section_missing');
   });
 
   test('section-id drives planning recheck and feature slice derived facts', () => {
@@ -300,6 +352,52 @@ describe('section id identity and localized PRD facts', () => {
     expect(report.facts.blocking_reason_codes).not.toContain('machine_section_identity_missing');
   });
 
+  test('localized section-id OQ table still emits blocking OQ reason codes', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-oq-blockers-requirements.md',
+      sectionIdChineseReadyPrd({
+        readiness: [
+          '- write_mode: final-prd',
+          '- clarification_evidence: asked-owner',
+          '- can_enter_spec_plan: yes',
+          '- preflight_sweep_closure: degraded',
+          '- decision_card_highest_risk_gap: unresolved fallback behavior',
+          '- decision_card_next_action: final-prd',
+          '- decision_card_why_no_invention: OQ-01 remains open',
+        ],
+      }).replace(
+        '| OQ-01 | fallback copy source | Requirements | no | owner-answered | no | closed | OQ-01 owner trace |',
+        '| OQ-01 | fallback copy source | Requirements | yes |  | yes | unclosed | TBD |',
+      ),
+    );
+
+    expect(report.facts.blocking_reason_codes).toEqual(expect.arrayContaining([
+      'blocking_outstanding_question_present',
+      'planning_invention_question_present',
+      'unclosed_owner_question_present',
+    ]));
+  });
+
+  test('design source refs require design_source_coverage section identity on final-ready path', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-design-missing-identity-requirements.md',
+      sectionIdChineseReadyPrd({
+        extraSections: [
+          'Design source: https://figma.com/file/abc',
+          '',
+        ],
+      }),
+    );
+
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'design_source_coverage',
+      }),
+    ]));
+    expect(report.facts.blocking_reason_codes).toContain('machine_section_identity_missing');
+  });
+
   test('orphan, unknown, and duplicate non-machine section ids are advisory findings', () => {
     const report = buildReport(
       'docs/brainstorms/section-id-advisory-requirements.md',
@@ -327,6 +425,32 @@ describe('section id identity and localized PRD facts', () => {
     expect(report.facts.blocking_reason_codes).not.toContain('section_id_duplicate');
     expect(report.facts.blocking_reason_codes).not.toContain('section_id_unknown');
     expect(report.facts.blocking_reason_codes).not.toContain('section_id_orphaned');
+  });
+
+  test('known section-id/title contradictions on machine sections fail closed', () => {
+    const prd = sectionIdChineseReadyPrd()
+      .replace(
+        '<!-- prd:section=outstanding_questions -->\n## 未决问题',
+        '<!-- prd:section=outstanding_questions -->\n## Readiness Self-Check',
+      );
+
+    const report = buildReport(
+      'docs/brainstorms/mismatched-machine-section-id-requirements.md',
+      prd,
+    );
+
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        reason_code: 'section_id_title_mismatch',
+        section: 'outstanding_questions',
+        actual_section: 'readiness_self_check',
+      }),
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'outstanding_questions',
+      }),
+    ]));
+    expect(report.facts.blocking_reason_codes).toContain('machine_section_identity_missing');
   });
 
   test('source_inputs is frontmatter accounting, not a valid body section id', () => {

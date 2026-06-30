@@ -83,6 +83,9 @@ Required metadata:
 Optional but stable metadata:
 
 - `origin` - repo-relative upstream requirements path.
+- `origin_grade` - source category from Phase 0.2 candidate discovery: `prd`, `brainstorm`, or `legacy`. It is advisory classification, not a readiness gate.
+- `origin_verification_status` - consumer receipt verification posture for PRD-grade origins: `verified`, `unverified`, `degraded`, or `not-applicable`.
+- `origin_verification_reason_codes` - receipt verifier `reason_codes`, or explicit degraded reasons such as `input_side_recheck_degraded` or `verifier_unavailable`.
 - `deepened` - date when confidence-first deepening substantively strengthened the plan.
 - `implements_schemas` - repo-relative schema paths actually implemented by the plan.
 
