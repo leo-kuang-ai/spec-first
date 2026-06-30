@@ -95,6 +95,7 @@ artifact_kind: prd-requirements
 spec_id: frontmatter-last-input
 title: Frontmatter Last Input Test
 date: 2026-06-27
+status: ready-for-planning
 write_mode: checkpoint-prd
 can_enter_spec_plan: no
 source_inputs:
@@ -129,6 +130,52 @@ source_inputs:
           expect(payload.reason).not.toContain('input_scan_degraded');
         }
       }
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('does not block closeout for unfinished non-ready PRD artifacts from another session', () => {
+    const projectRoot = makeTempDir();
+    try {
+      installRuntimeScripts(projectRoot);
+      const unfinishedPrd = `---
+artifact_kind: prd-requirements
+spec_id: parallel-session-unfinished
+title: Parallel Session Unfinished
+date: 2026-06-30
+status: draft
+write_mode: checkpoint-prd
+can_enter_spec_plan: no
+---
+
+# Parallel Session Unfinished
+
+## Summary
+
+另一个会话留下的半成品 PRD,当前会话不应被它阻塞。
+`;
+      write(
+        path.join(projectRoot, 'docs', 'brainstorms', 'parallel-session-unfinished-requirements.md'),
+        unfinishedPrd,
+      );
+
+      const init = spawnSync('git', ['init', '-q'], {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', HOME: path.join(projectRoot, 'home') },
+      });
+      expect(init.status).toBe(0);
+
+      const result = spawnSync(HOOK_TEMPLATE, {
+        cwd: projectRoot,
+        encoding: 'utf8',
+        timeout: 8000,
+        env: { ...process.env, CLAUDE_PROJECT_DIR: projectRoot },
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.stdout.trim()).toBe('');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -242,7 +289,7 @@ spec_id: 2026-06-29-001-readme-refactor
         "require('node:timers').setTimeout(() => process.exit(0), 6000);\n",
       );
       write(path.join(projectRoot, 'docs', 'brainstorms', 'timeout-requirements.md'),
-        '---\nartifact_kind: prd-requirements\n---\n# x\n');
+        '---\nartifact_kind: prd-requirements\nstatus: ready-for-planning\n---\n# x\n');
 
       const init = spawnSync('git', ['init', '-q'], {
         cwd: projectRoot, encoding: 'utf8',

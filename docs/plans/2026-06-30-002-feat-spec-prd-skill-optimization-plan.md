@@ -5,7 +5,8 @@ status: active
 date: 2026-06-30
 spec_id: 2026-06-28-prd-skill-optimization
 origin: docs/01-需求分析/16.spec-prd-skill-optimization/2026-06-28-prd-skill专业化与稳定性优化方案.md
-origin_grade: legacy
+origin_grade: brainstorm
+deepened: 2026-06-30
 ---
 
 # feat: spec-prd 研发侧澄清专业化与稳定性优化
@@ -18,10 +19,10 @@ origin_grade: legacy
 
 ## Decision Brief
 
-- **Recommended approach:** 严格按 P0 → P0.5 → P1 → P2 分阶段交付,每阶段独立可发布;P0 内再分 required(交付门槛)与 opportunistic cleanup(顺手做,不阻塞)。所有新增 lens/字段一律 LLM-owned,绝不进入 `BLOCKING_REASON_CODES`。
-- **Key decisions:** (1) section-id 解析改造是 P0 的载重单元,必须同步重算所有依赖 section identity 的派生 facts,不能只降级 finding;(2) 普通 core heading 降级是 stage 2,必须等机器安全区块 fail-closed fixtures 通过;(3) `spec-plan` 消费端用只读 `--verify-receipt` 语义,不复制 readiness lens。详见 Key Technical Decisions。
-- **Validation focus:** checker 行为 fixtures(中文标题 + section id 正确推导 / 机器安全区块 fail-closed)、`spec-prd-reason-code-parity` 与 `spec-prd-finalize` freeze、`run-evals --json`、`lint:skill-entrypoints`;P2 才补样本 fresh-source eval 与效果指标。
-- **Largest risks / boundaries:** 最大风险是 section-id 改造遗漏某条派生 fact(如 `acceptanceSection`/`uncoveredRequirements`)导致 ready 路径误判;缓解是先扩 `matchHeadingTitle`/`sectionRange` 解析层并以 fixtures 全覆盖派生 facts。边界:本轮不做脚本名/字段名/路径大规模重命名(D-01),不新增第二模板拓扑或语义 checker。
+- **Recommended approach:** 严格按 P0a → P0b → P0.5 → P1 → P2 分阶段交付,每阶段独立可发布;P0a 是 required stage1(识别 + 安全 fail-closed),P0b 是普通 core heading 降级的独立 landing,opportunistic cleanup 顺手做但不阻塞。所有新增 lens/字段一律 LLM-owned,绝不进入 `BLOCKING_REASON_CODES`。
+- **Key decisions:** (1) section-id 解析改造是 P0a 的载重单元,必须同步重算所有依赖 section identity 的派生 facts,不能只降级 finding;(2) 普通 core heading 降级是 P0b/stage2 独立 landing,必须等机器安全区块 fail-closed fixtures 通过;(3) `spec-plan` 消费端用只读 `--verify-receipt` 语义,不复制 readiness lens。详见 Key Technical Decisions。
+- **Validation focus:** checker 行为 fixtures(中文标题 + section id 正确推导 / OQ-Trace razor 在纯中文标题下不静默失效 / 机器安全区块 fail-closed)、`spec-prd-checker-unit` + `spec-prd-contracts`(后者按 good/bad fixture **执行** checker,属回归面)、两个 hook 测试(`prd-prewrite-guard-hook` / `prd-readiness-guard-hook`)、`spec-prd-reason-code-parity` 与 `spec-prd-finalize` freeze、`lint:skill-entrypoints`;`run-evals --json` 只守 eval fixture 契约、**不**消费 checker facts,不能当 checker 回归证据;P2 才补样本 fresh-source eval 与效果指标。
+- **Largest risks / boundaries:** 最大风险是 section-id 改造遗漏依赖 section identity 的派生 fact——尤其整条 `analyzeOutstandingQuestions` OQ/Trace razor 与 `ownerTraceHasDesignDegradedAcceptance` 的独立 re-parse:纯中文 OQ/Trace 标题会让安全 razor **静默失效(no-op)而非 fail-closed**,直接违背 KTD3;缓解是 U2 全量枚举依赖 fact、U3 按**每条 OQ/Trace reason code** 补纯中文 fixture。次大风险是 stage2(U7)与 stage1(U3)部分落地削弱安全 gate——整集 BLOCKING freeze 可能在 U3 fixture 缺失下**假绿**(安全区块经 OQ/trace 码间接阻断),故 U7 硬前置改为**专门**的安全区块 fail-closed fixture 而非整集 freeze。边界:本轮不做脚本名/字段名/路径大规模重命名(D-01),不新增第二模板拓扑或语义 checker。
 
 ---
 
@@ -82,7 +83,7 @@ owner 已在 §17 用 `grill-with-docs` 确认 12 条决策(D-01~D-12)。本计�
 
 ### Deferred to Follow-Up Work
 
-- reason-code 分类法从 exact freeze 改为"命名语义子集 + 复现形态":origin §10 P1 第 20 项明确单列设计与测试任务,**不并入 P0**;本计划 P0 只修正"不要把 43/历史数字当语义上限"的表述。
+- reason-code 分类法从 exact freeze 改为"命名语义子集 + 复现形态":origin §10 P1 第 20 项明确单列设计与测试任务,**不并入 P0**;本计划保留 exact freeze 机制,只修正"不要把 43/历史数字当语义上限"的表述。U3 如新增 `machine_section_identity_missing`,属于现有 exact freeze 下的普通结构性码增量,不是分类法重构。
 - ADR 候选(§17.3):保留历史字段 + 语义迁移、普通 core heading 降级 + section id 引入——是否落 ADR 留实施阶段判断。
 - 重命名 ADR/plan:仅当后续 ≥3 次出现 owner 把 `$spec-prd` 输出当产品 PRD source 的真实误用才启动(origin §11 末行)。
 
@@ -92,7 +93,8 @@ owner 已在 §17 用 `grill-with-docs` 确认 12 条决策(D-01~D-12)。本计�
 
 本计划按阶段完成,各阶段 DoD 见 origin §14(DoD-P0 / DoD-P0.5 / DoD-P1 / DoD-P2)。frontmatter `status` 推进规则:
 
-- P0 + P0.5 source 实施验证通过 → 可独立标 `partially-shipped`(P1/P2 未完成)。
+- P0a(stage1) + P0.5 source 实施验证通过 → 可独立标 `partially-shipped`(P0b/P1/P2 未完成也不反向阻塞)。
+- P0b(U7 普通 core heading 降级)在 U3 专门安全区块 fail-closed fixture 绿后独立 landing;不得与 U3 同一 landing 合入。
 - P1 lens 与多端视图落地并通过 contract/eval → 继续 `partially-shipped`。
 - P2 行为有效性证据(≥5 类样本 fresh-source eval + 效果指标 baseline)完成 → `completed`。
 - 任一阶段:source 变更已验证且已运行 `spec-first init` 刷新 runtime mirror,CHANGELOG 记录"未手改 generated runtime mirrors;runtime refreshed by init"。
@@ -106,8 +108,8 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - target_repo: spec-first(当前仓库,非父级 workspace)
 - evidence_sources: 直接源码读取 + rg/grep + git rev-parse
 - source_refs: skills/spec-prd/SKILL.md, skills/spec-prd/scripts/check-prd-artifact.js (1255 行), skills/spec-prd/scripts/finalize-prd-artifact.js (259 行), skills/spec-prd/scripts/lib/reason-codes.js (101 行), skills/spec-prd/references/prd-output-template.md, skills/spec-prd/references/prd-readiness-lens.md, skills/spec-plan/references/planning-flow.md, docs/需求文档模版/标准模版/, tests/unit/spec-prd-*.test.js
-- current_revision: 765cfac3
-- worktree_status: M CHANGELOG.md;?? docs/brainstorms/2026-06-30-002-...requirements.md(均与本计划无关)
+- current_revision: 351f4e56
+- worktree_status: MM CHANGELOG.md;MM docs/brainstorms/2026-06-30-002-...requirements.md(无关并发/既有改动);M docs/plans/2026-06-30-002-feat-spec-prd-skill-optimization-plan.md(本计划修订)
 - confidence: high(P0/P0.5 锚点为已读源码);medium(P1/P2 为 lens prose 设计,行为有效性需 P2 eval 证明)
 - limitations: 未执行 fresh-source eval(归 P2);未 dispatch 研究 subagent(用户未授权,记 `dispatch_authorization_missing`,用 inline bounded reads 代偿)
 
@@ -118,20 +120,22 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - repo_scope: skills/spec-prd/**、skills/spec-plan/references/planning-flow.md、docs/需求文档模版/标准模版/**、tests/unit/spec-prd-*
 - source_reads_completed:
   - `check-prd-artifact.js`:`CORE_SECTIONS`(L23-30,6 项);`parseHeadings`(L301-313,只认 `^#{2,6}` heading,无 section-id 识别);`stripHeadingDecoration`+`matchHeadingTitle`(L317-338,**已支持**去序号装饰 + 英文锚点前缀匹配,如 `## 一、Summary 概要` 命中 Summary);`sectionRange`(L340-353,基于 `matchHeadingTitle`);`parseStructure`(L872-960)派生 `missingCoreSections`/`acceptanceSection`/`uncoveredRequirements`/`prdShaped` 全部经由 `matchHeadingTitle`;`deriveFindings`(L1094-1096)emit `core_section_missing`(当前是 BLOCKING)
-  - `lib/reason-codes.js`:`BLOCKING_REASON_CODES`(43 码,含 `core_section_missing`);`CLOSURE_BLOCKER_REASON_CODES`/`RECEIPT_ONLY_REASONS`/`CHECKPOINT_INPUT_SCAN_EXEMPT` 子集 + 分类器——**已是 check 与 finalize 共享单一真相源**(origin §3.4 弱点 5/6、§10 P0 cleanup 第 1 项的"双归属"工程债已部分被 plan 001 关闭)
+  - `lib/reason-codes.js`:`BLOCKING_REASON_CODES`(经确定性核查 **31 码**,含 `core_section_missing`);`CLOSURE_BLOCKER_REASON_CODES`/`RECEIPT_ONLY_REASONS`/`CHECKPOINT_INPUT_SCAN_EXEMPT` 子集 + 分类器——**已是 check 与 finalize 共享单一真相源**(origin §3.4 弱点 5/6、§10 P0 cleanup 第 1 项的"双归属"工程债已部分被 plan 001 关闭)
   - `finalize-prd-artifact.js`:`--check-only`(L33-34,preview 不写,exit 0=closeout allowed / 1=should_block_closeout / 2=usage);`buildFinalizeReceipt`(L110-188)区分 `can_finalize`/`can_closeout`/`should_block_closeout`,合法 checkpoint closeout 已实现;**无 `--verify-receipt` 选项**(R6/P0.5 需新增 consumer 语义)
   - `SKILL.md`:Phase 0/1/2/3/4 现名为 Classify Intent / Current-State Analysis / Change Delta And Domain Language / Draft Refine Or Split / Readiness And Handoff;L237 明确写"checker anchors core sections on canonical English token...localized PRD must keep that token...otherwise core_section_missing"——这是本计划要迁移的 prose
   - `planning-flow.md`:L48-54 已有 origin grade(prd/brainstorm/legacy)与 PRD-grade `can_enter_spec_plan: yes` 识别;**无消费端 receipt verify 步骤**(R6/P0.5 需补)
   - template lib:仅 `00-通用` / `10-App` / `20-Admin` / `30-Backend` / `90-证券附录` + README;**缺 40-H5-PC / 50-CLI-DevTool / 60-Mixed**(P1)
   - tests:`spec-prd-reason-code-parity.test.js`(锁 SKILL+lens prose 覆盖全部 BLOCKING_REASON_CODES);`spec-prd-finalize.test.js`(L418 起 BLOCKING 整集 freeze + characterization);`spec-prd-contracts.test.js`(L1099-1108 锁 human core template 与 runtime template 共享 section 名)
-- source_reads_required: 实施 P0 单元前需补读 `check-prd-artifact.js` 的 `gateReadyClaims`/OQ 分析段(L450-620)、`spec-prd-checker-unit.test.js` fixtures 结构,确认 section-id 改造不破坏 OQ/Trace 推导
+- source_reads_required: 实施 P0 单元前需补读 `check-prd-artifact.js` 的 `gateReadyClaims`(符号锚点,~L1044)、`analyzeOutstandingQuestions`(~L494)/`parseOwnerDecisionTrace`(~L483)/`ownerTraceHasDesignDegradedAcceptance`(~L801)段、`spec-prd-checker-unit.test.js` fixtures 结构,确认 section-id 改造不破坏 OQ/Trace 推导。注:原计划引用的 `L450-620` 实为 `analyzeOutstandingQuestions` 区段而非 `gateReadyClaims`(深化已校正,统一改用符号锚点防行号漂移)
 - commands_or_tools_used: `rg`/`grep -n`、`wc -l`、`ls`、`git rev-parse --short HEAD`、`git status --short`
 - impact_on_plan: 校正三处方案快照偏差(见下),使 P0 U1/U2 锚点指向当前真实代码而非 origin 的 2026-06-28 描述
 - key_findings:
   1. **校正一**:checker 已支持带英文锚点的本地化标题(`stripHeadingDecoration`+`matchHeadingTitle`)。真正 gap 是**纯中文标题无英文 token**(如 `## 需求概述`)仍 `core_section_missing`。section-id(`<!-- prd:section=summary -->`)的价值是让纯中文标题可被定位,与现有本地化匹配**叠加**而非替换。
   2. **校正二**:reason-codes 已拆 `lib/`、buildReport 已三阶段解构(origin §10 P0 cleanup 第 2 项"删 finalize 重复注释"、弱点 5"单文件职责重"部分已被 plan 001/002 关闭)。本计划不重做拆分,只在现有 `lib/reason-codes.js` 与三阶段结构上扩展。
-  3. **校正三**:当前 `BLOCKING_REASON_CODES` 是 43 码(origin 提到的 30/31 是更早历史值)。reason-code freeze 测试锁"当前真实整集";本计划 P0 只修正 prose 表述,不改 freeze 机制本身。
+  3. **校正三**:当前 `BLOCKING_REASON_CODES` 经确定性核查是 **31 码**(origin 叙述的"30/31"反而接近真值;计划早期误记 43,本次深化已校正)。reason-code freeze 测试锁"当前真实整集";本计划不重构 freeze 机制。除 U3 可能新增 `machine_section_identity_missing` 这类结构性 deterministic blocker 外,不把历史偶然数字当语义上限,也不在 P0 引入"语义子集 + 复现形态"分类法。
   4. `--verify-receipt` 不存在,需 P0.5 新增 consumer-only 语义(只读已有 receipt,不写首次 receipt)。
+  5. **深化补证(2026-06-30,Agent 源码复核)**:U2 依赖 section identity 的派生 fact 清单不只 4 项——经 `sectionRange()`→`matchHeadingTitle()` 单一 chokepoint,还包含 `assumptionRowCount`/`priority_distribution`/`feature_slice_trace_gap_count`/`outstanding_questions_present`+count/`planning_recheck_present`+count、整条 `analyzeOutstandingQuestions` OQ razor、以及 `ownerTraceHasDesignDegradedAcceptance` 的**独立** `parseHeadings` re-parse(`design_degraded_owner_accepted` 第二条定位依赖)。design source 检测(`detectDesignSourceRefs` 等)是**全文 regex 扫描、非 section-scoped**,不受影响——原"source/design accounting"措辞偏宽,已在 U2 校正。
+  6. **深化补证**:两个 Claude hook 直接耦合 checker——`prd-prewrite-guard` 内联 `require(checker).buildReport().facts`(读 `ready_claim_present`/`write_mode`/`design_source_refs_present`/`outstanding_questions_present`/`blocking_reason_codes`),`prd-readiness-guard` `spawn finalize --check-only` 读 exit code + stdout。故 hook 单测须纳入 U1–U3/U7 回归;且 hook 运行时从 generated runtime mirror 解析 checker,source 改动需 `spec-first init` 后才在真实会话生效。
 - limitations: 未运行测试套件(计划阶段不执行验证);未读 `domain-language-and-decision-ledger.md` 全文(23K,按需在实施时读);fresh-source eval 与效果指标 baseline 归 P2,本计划不产出。
 
 ---
@@ -166,9 +170,9 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - **KTD2 — 两阶段降级,stage1 只加识别不降级,stage2 才降级普通 core heading。** stage1:checker 同时识别旧英文标题、本地化标题、section id,并同步重算 `missingCoreSections`/`acceptanceSection`/`uncoveredRequirements`/`prdShaped`/OQ/Trace/Readiness/source-design accounting。stage2:确认机器安全区块 fail-closed fixtures 通过后,才把普通 `core_section_missing` 从 blocking 降为 advisory `template_structure_hint`(或受 `strict_template_check` 控制)。理由:防止安全区块在降级过程中被绕过(R3/D-02 两阶段兼容)。
 - **KTD3 — 机器安全区块"存在"定义 = canonical heading 或 section id 任一可解析,两者皆无则 fail closed。** `Readiness Self-Check`/`Outstanding Questions`/`Owner Decision Trace`/`source_inputs` accounting/`Design Source Coverage` 在 `can_enter_spec_plan: yes` 或 `write_mode=final-prd` 时必须可定位。理由:这是 producer exit 的 deterministic invariant,不是模板语义判断(R3 / origin §7.4)。
 - **KTD4 — Coverage Pack / Owner Packet / 所有 P1 lens 一律 LLM-owned 人读声明块,checker 最多 advisory presence。** 新增 reason code 全部不进 `BLOCKING_REASON_CODES`;`status=filled` 必须带 `source_tag`+`evidence_ref` 防自证。理由:Scripts prepare, LLM decides(R4/R5/R8/R26 / D-05/D-10)。
-- **KTD5 — `spec-plan` 消费端 `--verify-receipt` 是只读复验,不写首次 receipt、不复制 readiness lens。** 新增 finalize consumer 模式只读已有 receipt/current hashes/blockers/机器安全区块可定位性;首次 ready 仍由 `$spec-prd` 非 `--check-only` finalize 写入。`--check-only`(producer preview)不得不经收紧直接当消费端通过信号。理由:轻耦合 receipt 协议(R6/D-03 / §17.2)。
+- **KTD5 — `spec-plan` 消费端 `--verify-receipt` 是只读复验,不写首次 receipt、不复制 readiness lens。** 新增 finalize consumer 模式只读已有 receipt/current hashes/blockers/机器安全区块可定位性;首次 ready 仍由 `$spec-prd` 非 `--check-only` finalize 写入。`--check-only`(producer preview)不得不经收紧直接当消费端通过信号。**exit-code 契约本轮 plan-time 钉定(不 defer,因 U9 据此分支):`verified=0` / `unverified≠0` / `usage=2`;degraded(如缺 `--inputs`)必须 `≠0`,强制 `spec-plan` 走显式 owner-accept 降级而非静默放行。** verified 判定 = `can_enter_spec_plan==='yes'` AND `ready_receipt_current===true` AND 无 non-receipt-only blocking code AND 机器安全区块可定位;**不复用** `should_block_closeout`(它对合法 checkpoint 放行,会把 checkpoint 误判 verified)。理由:轻耦合 receipt 协议 + producer↔consumer 契约不可留空缝(R6/D-03 / §17.2)。
 - **KTD6 — `clarification_view`(端族)与 `clarification_profile`(澄清深度)正交,二者均不进 blocking。** view ∈ {Generic/App/H5-PC/Admin/Backend/CLI-DevTool/Mixed};profile ∈ {compact-brownfield-increment / ai-executable-product-clarification / frontend-ux-heavy / backend-contract-heavy / export-output-heavy}。竞品/商业化/0-1 方向 route out 到 `$spec-brainstorm`/`$spec-ideate`,不做内部 `strategy-discovery` profile。理由:D-06/D-07 owner 确认。
-- **KTD7 — reason-code 本轮保留当前 exact freeze,只修 prose 表述。** P0 仅修正"不要把历史偶然数字当语义上限"的措辞;"命名语义子集 + 复现形态"分类法单列 P1 设计任务,不并入 P0。理由:origin §10 P0 第 10 项 + Deferred to Follow-Up Work(D 决策未要求本轮改 freeze 机制)。
+- **KTD7 — reason-code 本轮保留 exact freeze 机制,不做分类法重构。** P0a/U3 若现有码无法表达 machine-owned section identity 缺失,允许新增结构性 blocker `machine_section_identity_missing`,但必须按现有 exact freeze + prose parity 更新;除此之外,P0 只修正"不要把历史偶然数字当语义上限"的措辞。"命名语义子集 + 复现形态"分类法单列 P1 设计任务,不并入 P0。理由:origin §10 P0 第 10 项 + U3 fail-closed 需要 deterministic identity signal。
 - **KTD8 — Reuse 决策:全部 extend,零 new source-of-truth。** section-id 解析扩 `check-prd-artifact.js` 现有函数;coverage pack/lens 扩 `prd-output-template.md`/`prd-readiness-lens.md`;消费端复验扩 `finalize-prd-artifact.js` + `planning-flow.md`;多端视图扩 `docs/需求文档模版/标准模版/`(已有目录)。唯一"new file"是 3 个 human-facing 模板(40/50/60),落在已存在的展示层目录,不构成新 runtime contract 或 artifact topology。理由:R26 Light contract + origin §5.1 架构。
 
 ---
@@ -177,7 +181,7 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 > 单元按交付阶段分组(P0 → P0.5 → P1 → P2)。U-ID 跨阶段连续不复用。feature-bearing 单元含测试场景;纯 docs/prose 单元标注 `Test expectation`。
 
-### Phase P0 — 边界修正与最小稳定性锚点(required 交付门槛)
+### Phase P0a — stage1 边界修正与最小稳定性锚点(required 交付门槛)
 
 ### U1. checker 新增 section-id 解析层(stage1 识别,不降级)
 
@@ -189,7 +193,7 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 **Files:**
 - Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(`parseHeadings`/`matchHeadingTitle`/`sectionRange` 或新增等价 section-identity index;固定 section id registry:summary/change_delta/requirements/acceptance_examples/scope_boundaries/evidence_assumptions/outstanding_questions/owner_decision_trace/readiness_self_check/source_inputs/design_source_coverage)
-- Test: `tests/unit/spec-prd-checker-unit.test.js`
+- Test: `tests/unit/spec-prd-checker-unit.test.js`, `tests/unit/spec-prd-contracts.test.js`(按 good/bad fixture 执行 checker,属回归面), `tests/unit/prd-prewrite-guard-hook.test.js`, `tests/unit/prd-readiness-guard-hook.test.js`(hook 直接/间接消费 checker facts,见 System-Wide Impact)
 
 **Approach:**
 - section id 注释默认绑定其后第一个 Markdown heading;注释与 heading 间只允许空行。
@@ -204,7 +208,7 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - Edge case: 孤立 section id(后面无 heading)/ 重复 section id → advisory finding,不崩溃。
 - Error path: 重复 machine-owned section id(两个 `prd:section=readiness_self_check`)在 final-ready 路径 → fail closed。
 
-**Verification:** 新 fixtures 全绿;现有 checker-unit 测试无回归。
+**Verification:** 新 fixtures 全绿;现有 checker-unit 测试无回归;`spec-prd-contracts`(fixture 执行)+ 两个 hook 单测纳入回归。注:hook 在真实会话从 generated runtime mirror(`.claude/spec-first/...`)解析 checker,source 改动后需 `spec-first init` 刷新 mirror 才反映新行为(见 Documentation/Operational Notes)。
 
 ---
 
@@ -217,20 +221,28 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 **Dependencies:** U1
 
 **Files:**
-- Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(`parseStructure` 中 `missingCoreSections` L878、`acceptanceSection`/`acceptanceText`/`uncoveredRequirements` L884-888、`prdShaped` L932;OQ/Trace/Readiness sectionPresent 与 source/design accounting)
-- Test: `tests/unit/spec-prd-checker-unit.test.js`
+- Modify: `skills/spec-prd/scripts/check-prd-artifact.js` — **所有经 `sectionRange()`→`matchHeadingTitle()` 单一 chokepoint 定位 section 的派生 fact 都必须同时认 section id**。完整清单(经 Agent 源码复核,符号锚点防行号漂移):
+  - `parseStructure`:`missingCoreSections`、`acceptanceSection`/`acceptanceText`/`uncoveredRequirements`、`prdShaped`、`assumptionRowCount`(`countAssumptionRows` ~L822)、`priority_distribution`(`priorityDistribution` ~L830)、`feature_slice_trace_gap_count`(`detectFeatureSliceGaps` ~L843)、`outstanding_questions_present`+count、`planning_recheck_present`+count(`sectionPresent`/`countSectionRows`)
+  - `computeFacts`→`analyzeOutstandingQuestions`(~L494)整条 OQ razor:`blocking_outstanding_question_count`、`open_oq_without_owner_closure_count`、`unclosed_owner_question_count`、`planning_invention_question_count`、`how_pushdown_touches_what_count`、`owner_decision_trace_present`(经 `sectionRange(...,'Outstanding Questions')` 与 `parseOwnerDecisionTrace` ~L483 `sectionRange(...,'Owner Decision Trace')`)
+  - `ownerTraceHasDesignDegradedAcceptance`(~L801)**独立再跑 `parseHeadings`**(不接收已解析 headings)→ `design_degraded_owner_accepted` 有第二条独立 Owner-Decision-Trace 定位依赖,必须一并改
+- Test: `tests/unit/spec-prd-checker-unit.test.js`, `tests/unit/spec-prd-contracts.test.js`(按 fixture 执行 checker)
 
 **Approach:**
 - `missingCoreSections` 用"canonical title 或 section id 任一命中"判存在。
 - `acceptanceSection` 用 section id `acceptance_examples` 驱动 `uncoveredRequirements` 推导(不能因中文标题漏算验收覆盖)。
 - 不得只改 `core_section_missing` 输出级别而留派生 facts 用旧 heading 推导(会导致 ready 路径误判)。
+- **最高风险**:纯中文 OQ/Trace 标题不得让 `analyzeOutstandingQuestions` razor 退化为 no-op(静默放行)——razor 的所有计数与 `gateReadyClaims` 阻断必须在中文标题下与英文等值,否则安全 razor 静默失效而非 fail-closed(违背 KTD3)。
+- **方案措辞校正**:design source 检测(`detectDesignSourceRefs`/`detectDesignSourceInventory`)是**全文 regex 扫描、非 section-scoped**,不受 section-id 影响;只有经 Owner-Decision-Trace 路由的 `design_degraded_owner_accepted` 是 section 依赖。
 
 **Test scenarios:**
 - Happy path: 中文标题 + section id PRD → `missingCoreSections` 为空、`acceptanceSection` 正确、`uncoveredRequirements` 按 section id 推导。
+- Happy path: 纯中文 `## 未决问题` + `prd:section=outstanding_questions` 含 blocking OQ → `blocking_outstanding_question_count`/`open_oq_without_owner_closure_count` 正确计数,不因中文标题归零。
 - Edge case: 中文 `## 验收样例` + `prd:section=acceptance_examples` 含 R-01 → R-01 不被误报 `requirement_without_acceptance_ref`。
+- Edge case: 纯中文 `## Owner 决策追踪` + `prd:section=owner_decision_trace` → `design_degraded_owner_accepted` 的**独立** re-parse 也命中(回归保护 `ownerTraceHasDesignDegradedAcceptance`)。
+- Edge case: `assumptionRowCount`/`priority_distribution`/`feature_slice_trace_gap_count`/`planning_recheck` 在纯中文 + section id 下与英文标题等值。
 - Integration: `prdShaped` 在纯中文 + section id 下为 true(配合 requirementIds>0)。
 
-**Verification:** 派生 facts fixtures 全绿;`buildReport` 公开接口/返回形状不变。
+**Verification:** 派生 facts fixtures 全绿(覆盖上面**完整清单**,不止 4 项);`buildReport` 公开接口/返回形状不变,且 **`facts` 字段名集合不删不改名**——prewrite-guard 对 `ready_claim_present`/`write_mode`/`design_source_refs_present`/`outstanding_questions_present`/`blocking_reason_codes` 做 `=== true` 判定,字段消失即等价信号关闭且不报错,故须断言字段名集合稳定。
 
 ---
 
@@ -243,19 +255,31 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 **Dependencies:** U1, U2
 
 **Files:**
-- Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(`gateReadyClaims` 及 OQ/Trace/Readiness/`source_inputs`/`Design Source Coverage` 定位逻辑)
-- Test: `tests/unit/spec-prd-checker-unit.test.js`, `tests/unit/spec-prd-finalize.test.js`
+- Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(`gateReadyClaims` ~L1044 及 OQ/Trace/Readiness/`source_inputs`/`Design Source Coverage` 定位逻辑)
+- Modify(if needed): `skills/spec-prd/scripts/lib/reason-codes.js`(仅当现有码无法表达 section identity 缺失时,新增结构性 blocker `machine_section_identity_missing`;它不是 checklist/lens 语义码)
+- Modify(if new blocker added): `skills/spec-prd/SKILL.md` + `prd-readiness-lens.md` reason-code prose parity
+- Test: `tests/unit/spec-prd-checker-unit.test.js`, `tests/unit/spec-prd-finalize.test.js`, `tests/unit/spec-prd-reason-code-parity.test.js`, `tests/unit/prd-prewrite-guard-hook.test.js`, `tests/unit/prd-readiness-guard-hook.test.js`
 
 **Approach:**
 - 机器安全区块"存在" = canonical heading 或 section id 任一可解析(KTD3)。
-- `can_enter_spec_plan: yes` / `write_mode=final-prd` 时两者皆无 → 阻断 ready receipt(沿用现有 BLOCKING 码,不新增语义码)。
+- `can_enter_spec_plan: yes` / `write_mode=final-prd` 时两者皆无 → 阻断 ready receipt。优先复用现有 BLOCKING 码;若缺失的是"section identity 本身"且现有码只覆盖字段内容/row 矛盾,使用结构性 blocker `machine_section_identity_missing` 承载 deterministic invariant,不得把它扩展为 checklist 内容质量判断。
+- **Reason-code mapping(实施时不可留给猜测):**
+  | Machine-owned identity | Missing/unlocatable final-ready outcome |
+  | --- | --- |
+  | `Readiness Self-Check` / `readiness_self_check` | `machine_section_identity_missing(section=readiness_self_check)`;字段级缺失仍继续 emit `write_mode_undeclared` / `can_enter_spec_plan_undeclared` / `preflight_sweep_closure_absent` 等现有码 |
+  | `Outstanding Questions` / `outstanding_questions` | `machine_section_identity_missing(section=outstanding_questions)`;section 可定位后,表结构/row closure 继续使用现有 `outstanding_question_*` / `*_owner_question_*` / `how_pushdown_touches_what` 码 |
+  | `Owner Decision Trace` / `owner_decision_trace` | 当 owner trace 被 OQ disposition、`clarification_evidence=asked-owner` 或 design-degraded acceptance 需要时,缺 identity emit `machine_section_identity_missing(section=owner_decision_trace)` 并保留现有 `owner_decision_trace_required_but_absent` 语义 |
+  | frontmatter `source_inputs` accounting | frontmatter key 是 canonical locator;缺/不可复验继续走 `input_refs_unavailable` / `input_scan_degraded` / U8 `input_side_recheck_degraded`,不新增 body-section ceremony |
+  | `Design Source Coverage` / `design_source_coverage` | 当 design refs 存在且 final-ready 时,缺 heading/id emit `machine_section_identity_missing(section=design_source_coverage)`;field-level inventory/read/unread/coverage 仍用现有 design-source blocker |
+- 安全区块经 OQ/trace reason code **间接**阻断(非独立"安全区块可定位"布尔),故必须有**专门** fixture 逐条断言纯中文标题下每条 OQ/Trace BLOCKING 码仍触发;**整集 BLOCKING freeze 全绿不充分**(那些码仍在 set 内,U3 fixture 缺失也可假绿)。此专门 fixture 是 U7 stage2 降级的**硬前置**。
 
 **Test scenarios:**
 - Happy path: final-ready PRD 机器安全区块用 section id 标注 → 可定位,不阻断。
-- Error path: final-ready PRD 的 `Readiness Self-Check` 既无 canonical heading 又无 section id → fail closed,保留对应 BLOCKING 码。
+- Error path(专门安全 fixture,U7 硬前置): final-ready PRD 的 `Readiness Self-Check`/`Outstanding Questions`/`Owner Decision Trace` 既无 canonical heading 又无 section id → fail closed,按上表 emit 结构性 identity blocker,并在 section 可定位但内容有风险时逐条保留对应 OQ/Trace BLOCKING 码。
+- Error path(逐 reason code): 纯中文 OQ/Trace 标题但缺 section id 于 final-ready → `analyzeOutstandingQuestions` razor 仍按每条 reason code 阻断,不静默 no-op。
 - Edge case: 纯中文普通 core 标题无 section id 但机器安全区块有 canonical heading → 普通 section 走兼容,安全区块仍 fail-closed 通过。
 
-**Verification:** 安全区块 fail-closed fixtures 全绿(这是 U7 stage2 降级的前置门槛)。
+**Verification:** **专门**安全区块 fail-closed fixtures 全绿(含 `machine_section_identity_missing` 映射与逐条 OQ/Trace 码,非整集 freeze;这是 U7 stage2 降级的硬前置门槛);若新增 blocker,finalize freeze + reason-code parity 同步;hook 单测无回归。
 
 ---
 
@@ -317,7 +341,7 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 **Files:**
 - Modify: `docs/需求文档模版/标准模版/README.md`
-- Modify(仅当字面存在): reason-code 数量表述。注:经核查 `30`/`31` 字面值**不在** `lib/reason-codes.js` 或 `check-prd-artifact.js` 源码中(它们是 origin 叙述里的历史概念);若实施时在 prose(SKILL/lens/docs 注释)发现"30/31 码上限"类表述则改为"语义子集 freeze,非数量上限",否则本子项 no-op。
+- Modify(仅当字面存在): reason-code 数量表述。**澄清两个不同概念**(回应 doc-review P3):(a)`BLOCKING_REASON_CODES` 当前 Set **条目数 = 31**(确定性核查值,会随真实安全码增删变化,非上限);(b)源码中**没有**把 `30`/`31` 这类数字硬编码为"码数上限"。二者不矛盾——freeze 测试锁的是"当前真实整集"(语义子集),不是某个固定数量。若实施时在 prose(SKILL/lens/docs 注释)发现"30/31 码上限"类表述,则改为"语义子集 freeze,非数量上限",否则本子项 no-op。
 - Modify(cleanup,条件性): `### Out Of Scope` advisory presence anchor(emit `out_of_scope_subsection_absent`,非 BLOCKING);OQ/Trace header alias + WHAT_TOUCHING_KEYWORDS 内容 freeze 测试
 
 **Approach:**
@@ -330,7 +354,9 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 ---
 
-### U7. stage2 — 普通 core heading 缺失从 blocking 降为 advisory
+### Phase P0b — stage2 普通 core heading 降级(独立 landing,不与 U3 同合入)
+
+### U7. 普通 core heading 缺失从 blocking 降为 advisory
 
 **Goal:** 确认 U3 机器安全区块 fail-closed fixtures 通过后,把普通 `core_section_missing` 从 blocking 降为 advisory `template_structure_hint`(或受 `strict_template_check=false` 控制)。
 
@@ -342,18 +368,19 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - Modify: `skills/spec-prd/scripts/check-prd-artifact.js`(`deriveFindings` 中 `core_section_missing` 级别)
 - Modify: `skills/spec-prd/scripts/lib/reason-codes.js`(从 `BLOCKING_REASON_CODES` 移出 `core_section_missing`,新增 advisory `template_structure_hint`)
 - Modify: `skills/spec-prd/SKILL.md` + `prd-readiness-lens.md`(prose parity 同步)
-- Test: `tests/unit/spec-prd-finalize.test.js`(BLOCKING freeze 整集更新)、`spec-prd-reason-code-parity.test.js`
+- Test: `tests/unit/spec-prd-finalize.test.js`(BLOCKING freeze 整集更新)、`spec-prd-reason-code-parity.test.js`、`tests/unit/prd-prewrite-guard-hook.test.js`、`tests/unit/prd-readiness-guard-hook.test.js`(降级改 `blocking_reason_codes`,两 hook 均消费)
 
 **Approach:**
 - 普通 core section 缺失 → advisory;machine-owned section identity 仍 fail closed(U3 不受影响)。
 - BLOCKING freeze 测试整集相应更新,reviewer 显式确认增删。
+- **Landing gating invariant(硬前置,不可仅靠 prose 依赖)**:U7 **不得与 U3 在同一 landing 合入**;U7 的硬前置是 U3 的**专门**安全区块 fail-closed fixture(逐条 OQ/Trace 码)已变绿——**整集 BLOCKING freeze 全绿不充分**,因为安全区块经 OQ/trace 码间接阻断,可在 U3 fixture 缺失下假绿。
 
 **Test scenarios:**
 - Happy path: 缺普通 core heading 且无 section id → 只报 advisory `template_structure_hint`,不阻断。
-- Error path: 机器安全区块缺失 → 仍 fail closed(回归保护 U3)。
-- Integration: BLOCKING freeze 整集断言更新后全绿,prose parity 同步。
+- Error path: 机器安全区块缺失 → 仍 fail closed(回归保护 U3 的专门安全 fixture,非整集 freeze)。
+- Integration: BLOCKING freeze 整集断言更新后全绿,prose parity 同步;hook 单测无回归。
 
-**Verification:** finalize freeze + parity 全绿;确认 `core_section_missing` 不再 BLOCKING、安全区块码仍 BLOCKING。
+**Verification:** finalize freeze + parity + hook 单测全绿;确认 `core_section_missing` 不再 BLOCKING、安全区块 OQ/trace 码仍 BLOCKING;reviewer checklist 显式确认 U3 专门安全 fixture 为绿(非仅整集 freeze)。
 
 ---
 
@@ -373,17 +400,19 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 **Approach:**
 - `--verify-receipt`:只读,不调用 `upsertFrontmatterFields`,不写 receipt。
-- 收紧语义:不得把 `--check-only` 的 `should_block_closeout=false` 误读成 receipt verified。
-- 无 `--inputs` 或 inputs 不可读 → 记 `input_side_recheck_degraded`,不把 inputs freshness 当 confirmed。
+- **exit-code 三态(KTD5,本轮钉定)**:`verified=0` / `unverified≠0` / `usage=2`;degraded **必须非 0**(防消费端把 degraded 当 verified 静默放行)。
+- **verified 判定独立组合**:`can_enter_spec_plan==='yes'` + `ready_receipt_current===true` + 无 non-receipt-only blocker + 机器安全区块可定位;**不复用** `should_block_closeout`(现有 `--check-only` 对合法 checkpoint 返回 `should_block_closeout=false`/exit 0,naive 复用会把 checkpoint 误判 verified)。
+- 无 `--inputs` 或 inputs 不可读 → 记 `input_side_recheck_degraded`,exit 非 0,不把 inputs freshness 当 confirmed。
 - 输出 `origin_verification_status: verified | unverified | degraded`(与 `origin_grade` 分离)。
 
 **Test scenarios:**
-- Happy path: 有效 receipt + current hashes + 无 blocker → verified。
+- Happy path: 有效 receipt + current hashes + 无 blocker + 安全区块可定位 → verified,exit 0。
 - Error path: 缺 receipt / stale receipt / checker blocker / 机器安全区块不可定位 → unverified,exit 非 0。
-- Edge case: 无 `--inputs` → degraded + `input_side_recheck_degraded`,不报 verified。
+- Error path(契约关键): 合法 checkpoint(`can_enter_spec_plan: no`,`should_block_closeout=false`)→ unverified(非 0),**不得**因 `should_block_closeout=false` 报 verified。
+- Edge case: 无 `--inputs` → degraded + `input_side_recheck_degraded`,exit 非 0,不报 verified。
 - Edge case: `--verify-receipt` 不写文件(读 mtime/hash 前后一致)。
 
-**Verification:** consumer verify fixtures 全绿;确认不写盘。
+**Verification:** consumer verify fixtures 全绿;确认不写盘;三态 exit code 与 verified 判定组合断言齐全。
 
 ---
 
@@ -396,11 +425,11 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 **Dependencies:** U8
 
 **Files:**
-- Modify: `skills/spec-plan/references/planning-flow.md`(0.2/0.3 PRD-grade origin 段加 verify-receipt 步骤 + route-back 规则 + `unverified-prd-origin`/`origin_verification_status` + Downstream Sync Impact Map + R/AE/BR/NFR trace 保留)
+- Modify: `skills/spec-plan/references/planning-flow.md`(0.2/0.3 PRD-grade origin 段加 verify-receipt 步骤 + route-back 规则 + `unverified-prd-origin`/`origin_verification_status` + Downstream Sync Impact Map + R/AE/BR/NFR trace 保留)。**并收紧现有无条件继承**:当前 `can_enter_spec_plan: yes` 段(~planning-flow.md L50)直接记 `origin_grade: prd` 并(~L73)无条件继承 R/F/AE/Scope,**无任何复验步骤**——必须改为 `origin_grade: prd` 仅表来源类别,继承 confirmed trace 前须 `origin_verification_status: verified`;`unverified`/`degraded` 时不得把 origin R/AE/Scope 当 confirmed。
 - Test: `tests/unit/spec-prd-contracts.test.js` 或新增 spec-plan consume contract fixture(origin 无有效 receipt 不得标 ready/confirmed)
 
 **Approach:**
-- 可执行路径:`node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path> --verify-receipt`(D-03 形态)。
+- 可执行路径:`node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path> --verify-receipt`(D-03 形态),按 U8 三态 exit code 分支。
 - 缺 receipt/stale/blocker/inputs freshness 不可确认/安全区块不可定位 → 不发明 WHAT,route back to `$spec-prd` 或 `$spec-doc-review`;用户明确接受才 degraded,记 `unverified-prd-origin`/`origin_grade: prd`/`origin_verification_status: degraded`。
 - 保留 clarified-requirements IDs;缺映射记 coverage gap,不用 plan 新编号掩盖。
 - Downstream Sync Impact Map:source/design/owner decision/R/AE 变化时识别 stale plan/task 或标 `downstream_sync_unknown`。
@@ -423,7 +452,7 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 - Modify: `skills/spec-prd/SKILL.md` 或 `prd-readiness-lens.md`(Codex degraded enforcement 段)
 - Modify: `skills/spec-plan/references/planning-flow.md`(Codex 下 verify 必需)
 
-**Approach:** 落 origin §8.3 文案;关联内存 [[codex-spec-prd-stability-review]] 的 P0-B 残洞实施时回查。
+**Approach:** 落 origin §8.3 文案;关联内存 [[codex-spec-prd-stability-review]] 的 P0-B 残洞实施时回查。**degraded 有两个面**:Codex 既无 PreToolUse prewrite guard(`prd-prewrite-guard`),也无 Stop closeout guard(`prd-readiness-guard`,Claude 下由 `finalize --check-only` 自动触发);Codex 下 producer finalize 与 consumer verify 全为约定、无机械兜底。`SKILL.md`(~L188)现仅在 prewrite 处提 degraded,需补 Stop/closeout 这半边,避免 Codex 用户误以为 closeout 仍有机械保护。
 
 **Test scenarios:** Test expectation: prose-only,无 checker 断言;若有 dual-host contract test 则锁"不暗示 Codex 同等保护"。
 
@@ -511,6 +540,8 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 **Approach:** 全部 LLM/readiness 字段;Gherkin/INVEST 仅写作建议(R14 不强制);Scope Guard P1 才要求中高风险说明 appetite/no-gos/rabbit holes。
 
+**Sizing / cohesion 说明(回应 doc-review P2):** 本单元聚合 9 条节点(R14/R15/R17/R18/R20/R21/R23/R24/R25)是有意为之——它们全是 `prd-readiness-lens.md` / `prd-output-template.md` 的**无代码 LLM-owned 人读字段**,共享同一 review surface(readiness/doc-review),彼此**无 inter-field 依赖**,也都遵守"不进 BLOCKING"同一边界。拆成 9 个微单元会违反"避免 micro-step"。执行时可作为 1 个提交落地;若单提交过大,允许按 concern 切片(建议分组:① intake_mode/clarification_budget/review_gate_mode;② interaction_findings/regression guard;③ rollout/supporting_evidence_refs/handoff_context_slice/scope guard),切片**不新增 U-ID**、不改依赖,仅为提交粒度便利。
+
 **Test scenarios:** Test expectation: 所有字段缺失/不匹配最多 advisory;checker 不新增 BLOCKING。
 
 **Verification:** parity + contracts 通过。
@@ -549,11 +580,12 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 **Dependencies:** U15
 
 **Files:**
-- Create: 样本 clarified-requirements 产物(docs/brainstorms/*-requirements.md 或 eval fixtures,合成样本标 synthetic_reason)
+- Create: 样本 clarified-requirements 产物,优先放 `skills/spec-prd/evals/fixtures/` 或 `docs/validation/spec-prd-samples/`;合成样本标 `synthetic_reason`。
+- Avoid by default: 不把 synthetic eval 样本直接落到 `docs/brainstorms/*-requirements.md`,因为 `spec-plan` 会搜索该 glob 作为真实 planning candidate。若确需放入 `docs/brainstorms/`,必须加 `doc_role: eval-fixture` / `artifact_kind: eval-sample` 等排除标记,并同步 U9 的 `planning-flow.md` 候选过滤规则,避免污染真实 requirements discovery。
 
 **Test scenarios:** Test expectation: 样本是 eval 输入,非 contract test;每样本记 source refs/degraded mode。
 
-**Verification:** 5 类样本就绪。
+**Verification:** 5 类样本就绪;确认 synthetic 样本不会被 `spec-plan` 普通 requirements discovery 当作可规划 origin。
 
 ---
 
@@ -599,13 +631,15 @@ P2 不得反向阻塞 P0 source 修复(origin §14 开头)。
 
 ```mermaid
 flowchart TD
-  subgraph P0[P0 边界修正 required]
+  subgraph P0A[P0a stage1 required]
     U1[U1 section-id 解析层] --> U2[U2 重算派生 facts]
     U2 --> U3[U3 机器安全区块 fail-closed]
-    U3 --> U7[U7 stage2 普通 core 降级]
     U4[U4 template Coverage Pack/Display Protocol]
     U1 --> U5[U5 SKILL 视图选择+prose 迁移]
     U6[U6 README+reason-code 表述+cleanup]
+  end
+  subgraph P0B[P0b 独立 landing]
+    U3 --> U7[U7 stage2 普通 core 降级]
   end
   subgraph P05[P0.5 消费端闸口]
     U3 --> U8[U8 finalize --verify-receipt]
@@ -627,19 +661,19 @@ flowchart TD
   end
 ```
 
-关键路径:`U1→U2→U3` 是 P0 载重链(section identity + 安全区块),`U3` 同时门控 `U7`(stage2 降级前置)与 `U8`(消费端复验依赖安全区块定位)。`U4` 可与 U1-U3 并行启动。
+关键路径:`U1→U2→U3` 是 P0a 载重链(section identity + 安全区块),`U3` 同时门控 `U7`(P0b 独立 landing,不得与 U3 同合入)与 `U8`(消费端复验依赖安全区块定位)。`U4` 可与 U1-U3 并行启动。
 
 ---
 
 ## System-Wide Impact
 
-- **Interaction graph:** `check-prd-artifact.js` 的 `parseStructure`/`deriveFindings` 被 `finalize-prd-artifact.js` 与 Claude `prd-prewrite-guard`/`prd-readiness-guard` hooks 消费;section-id 改造影响这两条下游。`spec-plan` 经 `--verify-receipt` 新增对 finalize 的只读依赖。
-- **Error propagation:** stage1(U1-U3)不改 ready 判定结果,只扩识别能力;stage2(U7)改 BLOCKING 整集——必须经 freeze 测试整集更新让 reviewer 显式确认。
-- **State lifecycle risks:** 最大风险是 U2 漏改某条依赖 section identity 的派生 fact(如 `prdShaped`/`uncoveredRequirements`),导致纯中文 PRD 误判 ready/not-ready。缓解:U1-U3 fixtures 覆盖每条派生 fact。
-- **API surface parity:** `buildReport` 公开接口/返回形状不变(U2 验证项);`finalize` 新增 `--verify-receipt` 是新增 flag,不改现有 `--check-only`/`--refresh-inputs-hash` 行为。
-- **Surface coverage:** spec-prd skill(prose + checker)→ in-scope;spec-plan(消费端)→ in-scope(P0.5);human-facing 模板库 → in-scope(P1);generated runtime mirror(`.claude`/`.codex`/`.agents/skills`)→ deferred: `spec-first init` 实施收尾刷新(D-12);Codex hooks → out-of-scope: 无等价 primitive,声明 degraded(U10)。
+- **Interaction graph:** `check-prd-artifact.js` 的 `buildReport`(`parseStructure`/`computeFacts`/`deriveFindings`)被三类下游消费:(1)`finalize-prd-artifact.js` 内部调用;(2)`prd-prewrite-guard` hook **内联 `require(checker).buildReport().facts`**(直接耦合 `facts` 字段名);(3)`prd-readiness-guard` hook `spawn finalize --check-only` 读 exit code + stdout;(4)`spec-prd-contracts.test.js` 按 good/bad fixture **执行** checker(回归面)。section-id 改造影响全部四条。`spec-plan` 经 `--verify-receipt` 新增对 finalize 的只读依赖。注:`run-evals.js` **不**消费 checker facts(只校验 eval fixture JSON 结构),不能当 checker 行为回归证据。
+- **Error propagation:** stage1(U1-U3)对既有 anchored good/bad fixtures 的 `blocking_reason_codes` 必须逐位不变,但会新增专门 fixture 证明 final-ready 且 machine-owned section identity 不可定位时 fail closed(`machine_section_identity_missing` 或现有码映射)。stage2(U7)改 BLOCKING 整集——必须经 freeze 测试整集更新让 reviewer 显式确认;且 U7 硬前置是 U3 的**专门**安全区块 fail-closed fixture 为绿,**整集 freeze 全绿不充分**(安全区块经 OQ/trace 码间接阻断,可在 U3 fixture 缺失下假绿)。
+- **State lifecycle risks:** 最大风险是 U2 漏改依赖 section identity 的派生 fact——尤其整条 `analyzeOutstandingQuestions` OQ/Trace razor 与 `ownerTraceHasDesignDegradedAcceptance` 的独立 re-parse:纯中文 OQ/Trace 标题会让安全 razor **静默失效(no-op)而非 fail-closed**,导致纯中文 PRD 误判 ready。缓解:U2 全量枚举 + U3 按每条 OQ/Trace reason code 补纯中文 fixture。
+- **API surface parity:** `buildReport` 公开接口/返回形状不变(U2 验证项);**`facts` 字段名集合不删不改名**(prewrite-guard 对缺失字段做 `=== true` 判定会静默失效);`finalize` 新增 `--verify-receipt` 是新增 flag、三态 exit code(verified=0/unverified≠0/usage=2)是 producer↔consumer 契约本轮钉定,不改现有 `--check-only`/`--refresh-inputs-hash` 行为。
+- **Surface coverage:** spec-prd skill(prose + checker)→ in-scope;spec-plan(消费端)→ in-scope(P0.5);human-facing 模板库 → in-scope(P1);generated runtime mirror(`.claude`/`.codex`/`.agents/skills`)→ deferred: `spec-first init` 实施收尾刷新(D-12);Codex hooks → out-of-scope: **prewrite + readiness 两个 hook 均无等价 primitive**,Codex 下 producer finalize 与 consumer verify 全为约定、无机械兜底,声明 degraded(U10)。
 - **Integration coverage:** dual-host(Claude/Codex)影响在 U10 显式声明;`spec-first init` 后需 doctor 复查 runtime drift(实施收尾,非本计划单元)。
-- **Unchanged invariants:** `artifact_kind: prd-requirements`、`write_mode` 合法值、receipt schema `spec-prd-finalize.v1`/`spec-prd-artifact-check.v1`、`docs/brainstorms/*-requirements.md` 路径、现有 `--check-only` 语义、现有本地化标题匹配(`matchHeadingTitle`)——全部本计划显式不改(D-01)。
+- **Unchanged invariants:** `artifact_kind: prd-requirements`、`write_mode` 合法值、receipt schema `spec-prd-finalize.v1`/`spec-prd-artifact-check.v1`、`docs/brainstorms/*-requirements.md` 路径、现有 `--check-only` 语义、现有本地化标题匹配(`matchHeadingTitle`)、`WHAT_TOUCHING_KEYWORDS` 双写(`check-prd-artifact.js` + `prd-prewrite-guard` hook,冻结契约;若改需两边同步 + 加 fixture)——全部本计划显式不改(D-01)。
 
 ---
 
@@ -647,15 +681,18 @@ flowchart TD
 
 | Risk | Mitigation |
 |------|------------|
-| U2 漏改某条依赖 section identity 的派生 fact → 纯中文 PRD ready 误判 | U1-U3 fixtures 覆盖 `missingCoreSections`/`acceptanceSection`/`uncoveredRequirements`/`prdShaped`/OQ/Trace/Readiness/source-design accounting 每条;buildReport 返回形状回归断言 |
-| stage2(U7)降级误删机器安全区块保护 | U7 强依赖 U3 fail-closed fixtures 先通过;BLOCKING freeze 整集断言强制 reviewer 显式确认增删 |
+| U2 漏改某条依赖 section identity 的派生 fact → 纯中文 PRD ready 误判 | U1-U3 fixtures 覆盖**完整**派生清单(`missingCoreSections`/`acceptanceSection`/`uncoveredRequirements`/`prdShaped`/`assumptionRowCount`/`priority_distribution`/`feature_slice_trace_gap_count`/`outstanding`+`planning_recheck` present/count/OQ razor 全量/`ownerTraceHasDesignDegradedAcceptance`);buildReport 返回形状回归断言 |
+| OQ/Trace razor 在纯中文标题下静默 no-op(最高危,违背 KTD3) | U2 全量枚举 razor facts;U3 按**每条** OQ/Trace reason code 补纯中文 fixture;U3 专门安全区块 fail-closed fixture |
+| stage2(U7)降级误删机器安全区块保护 | U7 不得与 U3 同一 landing 合入;U7 硬前置是 U3 **专门**安全区块 fail-closed fixture 绿(逐条 OQ/trace 码);**整集 freeze 全绿不充分**(安全区块间接阻断,可在 U3 fixture 缺失下假绿) |
+| section-id 重算误删/改名 `facts` 字段 → prewrite-guard 信号静默失效 | U2 验证断言 `facts` 字段名集合不变;`buildReport` 返回形状回归 |
+| `--verify-receipt` degraded 被消费端误当 verified | exit-code 三态钉定 degraded≠0(KTD5/U8);U9 收紧 planning-flow 无条件继承(继承 confirmed trace 需 `origin_verification_status: verified`);U8 verified 判定不复用 `should_block_closeout` |
 | 新增 lens/字段被误做成 blocking | U4/U12/U13/U14 contract test 显式锁"不进 BLOCKING";`spec-prd-reason-code-parity` 守 prose/code 一致 |
 | `--verify-receipt` 误写盘或误把 `--check-only` 当通过信号 | U8 fixtures 断言不写盘(mtime/hash 前后一致)+ 收紧语义测试 |
 | Codex 无 hook 被暗示同等保护 | U10 显式 `codex_prd_guard: not_available`;文档审查检查无误导性表述 |
 | 方案 2026-06-28 快照偏差导致按过时描述实施 | 已在 Direct Evidence 校正 3 处;实施前 U1/U3/U8 补读 `gateReadyClaims`/OQ 段与现有 fixtures |
 | P1/P2 lens 沦为仪式化自证 | 首批只把 Coverage Pack/Owner Packet/Interaction Analysis 当 load-bearing,P2 用样本 eval 证明能发现遗漏;其余先 advisory |
 | 多端视图变第二 canonical source | 模板库只承载展示;runtime contract 仍 `prd-output-template.md`;drift test 只锁共同骨架与 lens 名 |
-| reason-code freeze 被误改 | KTD7:本轮保留 exact freeze 只修 prose;"语义子集 + 复现形态"分类法单列 Deferred Follow-Up,不并入 P0 |
+| reason-code freeze 被误改 | KTD7:本轮保留 exact freeze 机制;U3 如新增 `machine_section_identity_missing` 必须同步 freeze/parity,但"语义子集 + 复现形态"分类法单列 Deferred Follow-Up,不并入 P0 |
 
 ---
 
@@ -666,12 +703,13 @@ flowchart TD
 - 是否从零造 section-id 解析层?→ 否。当前已有 `matchHeadingTitle` 本地化匹配,只叠加 section-id 识别闭合纯中文 gap(KTD1,Direct Evidence 校正一)。
 - 是否本轮重做 checker 模块拆分?→ 否。plan 001/002 已拆 `lib/reason-codes.js` 与三阶段 buildReport;本计划在现有结构上扩展(校正二)。
 - 消费端复验用什么形态?→ 新增 finalize `--verify-receipt` 只读模式(KTD5/D-03),不复制 readiness lens。
-- reason-code 是否本轮改 freeze 机制?→ 否,只修 prose 表述;分类法重构单列 Follow-Up(KTD7)。
+- reason-code 是否本轮改 freeze 机制?→ 否,保留 exact freeze 机制;U3 如新增 `machine_section_identity_missing` 按现有 freeze/parity 同步,分类法重构单列 Follow-Up(KTD7)。
+- `--verify-receipt` exit-code 约定?→ **已 plan-time 钉定**(深化校正,不再 defer,因 U9 据此分支):`verified=0` / `unverified≠0` / `usage=2`,degraded **必须非 0**;verified 判定不复用 `should_block_closeout`(KTD5/U8)。
+- U2 依赖 section identity 的派生 fact 是否只有 4 项?→ 否,完整清单已在 U2 枚举(含整条 OQ razor + `ownerTraceHasDesignDegradedAcceptance` 独立 re-parse);design source 检测是全文扫描、不受影响(深化校正)。
 
 ### Deferred to Implementation
 
 - `template_structure_hint` 与 `out_of_scope_subsection_absent` 的精确 finding payload 形状 → U7/U6 实施时按现有 finding 结构定。
-- `--verify-receipt` 的 exit code 约定(verified=0 / unverified/degraded≠0 的具体值)→ U8 实施时与现有 finalize exit 语义对齐。
 - section id registry 是否需要在 conditional section 扩展 → P0 只固定 12 个 P0 section id;其余按同规则后续扩(origin §7.4)。
 - `spec-first init` 后 runtime drift 是否一次性刷新还是分阶段 → 实施收尾按 D-12 判断,每阶段 source 验证后刷新。
 
@@ -683,6 +721,7 @@ flowchart TD
 - 影响 README/docs 的单元(U6 README、U11 模板 index)同步更新。
 - 各阶段 source 验证通过后运行 `spec-first init` 刷新 generated runtime mirrors;CHANGELOG 记"未手改 generated runtime mirrors;runtime refreshed by init"(D-12)。仅改方案文档时不运行 init。
 - Agent/skill prose 变更(U5/U10/U12-U15)受会话缓存影响:行为语义验证用 fresh-source eval(归 P2 U17),不依赖当前会话缓存的 typed-agent 调用。
+- 两个 Claude hook(`prd-prewrite-guard` 内联 `require(checker).buildReport().facts`;`prd-readiness-guard` `spawn finalize --check-only`)运行时从 **generated runtime mirror**(`.claude/spec-first/...`)解析 checker。U1–U3/U7 改 source 后,真实会话中的 hook 行为需先 `spec-first init` 刷新 mirror 才反映新 checker;hook 单测(`prd-prewrite-guard-hook`/`prd-readiness-guard-hook`)纳入 U1–U3/U7 回归。
 
 ---
 
@@ -693,6 +732,4 @@ flowchart TD
 - Related tests: `tests/unit/spec-prd-checker-unit.test.js`, `spec-prd-finalize.test.js`, `spec-prd-reason-code-parity.test.js`, `spec-prd-contracts.test.js`, `spec-prd-evals-unit.test.js`
 - Template lib: `docs/需求文档模版/标准模版/`
 - Institutional: [[codex-spec-prd-stability-review]], [[op-season2-delivery]]
-- Verification commands(实施时): `npx jest tests/unit/spec-prd-*.test.js --runInBand`, `node skills/spec-prd/scripts/run-evals.js --json`, `npm run lint:skill-entrypoints`, `git diff --check`, `npx jest tests/unit/changelog-format.test.js --runInBand`
-
-
+- Verification commands(实施时): `npx jest tests/unit/spec-prd-*.test.js tests/unit/prd-prewrite-guard-hook.test.js tests/unit/prd-readiness-guard-hook.test.js --runInBand`, `node skills/spec-prd/scripts/run-evals.js --json`, `npm run lint:skill-entrypoints`, `node bin/spec-first.js init -y --claude --codex`(source 验证后刷新 runtime mirrors), `node bin/spec-first.js doctor --claude --json`, `node bin/spec-first.js doctor --codex --json`, `git diff --check`, `npx jest tests/unit/changelog-format.test.js --runInBand`

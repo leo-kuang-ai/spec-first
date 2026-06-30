@@ -77,7 +77,7 @@ for (const relativePrdPath of prdPaths) {
 if (blocked.length > 0) {
   const lines = [
     '[spec-first] PRD readiness guard blocked closeout.',
-    'Changed PRD artifacts cannot be closed as ready until `$spec-prd` producer-local finalize passes.',
+    'Changed PRD artifacts that claim ready/final cannot close out until `$spec-prd` producer-local finalize passes.',
     'Do not repair this by only changing enum values to `final-prd`, deleting detailed requirements, or treating checker reason_codes as the workflow.',
     'Choose the correct path: ask the next load-bearing owner question, preserve a non-ready checkpoint with `next_owner_question`, revise the PRD while keeping source/design gaps visible, or finalize only after all load-bearing gaps are closed and original inputs were scanned.',
     '',
@@ -115,7 +115,7 @@ function changedPrdArtifacts(cwd) {
       filePath = entries[i] || filePath;
     }
     if (/^docs\/brainstorms\/.+-requirements\.md$/.test(filePath)
-      && isPrdArtifact(path.join(cwd, filePath))) {
+      && isReadyClaimPrdArtifact(path.join(cwd, filePath))) {
       paths.push(filePath);
     }
   }
@@ -123,17 +123,53 @@ function changedPrdArtifacts(cwd) {
 }
 
 // docs/brainstorms/*-requirements.md 同时承载 $spec-brainstorm 的需求 brief 与
-// $spec-prd 的 PRD-grade 需求,仅凭路径无法区分。只有显式标注
-// artifact_kind: prd-requirements 的文件才是 PRD artifact、才进 finalize gate;
-// 无该字段的 brainstorm 产物豁免。判别字段与 prd-prewrite-guard 保持一致。
-function isPrdArtifact(absolutePath) {
+// $spec-prd 的 PRD-grade 需求,仅凭路径无法区分。Stop hook 只守 ready/final 出口:
+// 普通 draft/checkpoint PRD 不应在多会话共享 checkout 时阻断其他会话 closeout。
+function isReadyClaimPrdArtifact(absolutePath) {
   let content;
   try {
     content = fs.readFileSync(absolutePath, 'utf8');
   } catch {
     return false;
   }
-  return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(content);
+  if (!/^\s*artifact_kind:\s*prd-requirements\s*$/im.test(content)) {
+    return false;
+  }
+
+  return frontmatterFieldValue(content, 'status').toLowerCase() === 'ready-for-planning'
+    || hasFrontmatterMachineReceipt(content)
+    || /^\s*(?:-\s*)?write_mode:\s*final-prd\s*$/im.test(content)
+    || /^\s*(?:-\s*)?can_enter_spec_plan:\s*yes\s*$/im.test(content)
+    || /^\s*(?:-\s*)?readiness_outcome:\s*ready-for-planning\s*$/im.test(content);
+}
+
+function hasFrontmatterMachineReceipt(text) {
+  return [
+    'readiness_verified_by',
+    'readiness_verified_at',
+    'readiness_checker_schema',
+    'readiness_prd_hash',
+    'readiness_inputs_hash',
+  ].some((fieldName) => frontmatterFieldValue(text, fieldName) !== '');
+}
+
+function frontmatterFieldValue(text, fieldName) {
+  const lines = text.split(/\r?\n/);
+  if (lines[0] !== '---') {
+    return '';
+  }
+  const fmEnd = lines.findIndex((line, i) => i > 0 && line === '---');
+  if (fmEnd === -1) {
+    return '';
+  }
+  const pattern = new RegExp(`^\\s*${fieldName}:\\s*(.*)$`, 'i');
+  for (let i = 1; i < fmEnd; i += 1) {
+    const match = lines[i].match(pattern);
+    if (match) {
+      return match[1].trim();
+    }
+  }
+  return '';
 }
 
 function extractSourceInputs(prdPath) {
