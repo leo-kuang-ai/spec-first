@@ -54,7 +54,14 @@ if (!mutation.currentContent && !mutation.candidateContent && mutation.mutatedFr
 }
 
 const identityText = [mutation.candidateContent, mutation.currentContent].filter(Boolean).join('\n');
-if (!isPrdRequirementsArtifact(identityText)) {
+const prdIdentityPresent = isPrdRequirementsArtifact(identityText);
+const readyOrReceiptSignal = hasReadyOrReceiptMutationSignal(
+  [
+    mutation.candidateContent,
+    ...mutation.mutatedFragments,
+  ].filter(Boolean).join('\n'),
+);
+if (!prdIdentityPresent && !readyOrReceiptSignal) {
   process.exit(0);
 }
 
@@ -66,7 +73,7 @@ if (mutation.reconstructionDegraded) {
       '',
       'The hook could not reconstruct the full candidate PRD content for this mutation, but the edit payload directly changes machine-owned ready/final receipt fields.',
       '`status: ready-for-planning`, `readiness_*` receipt fields, and the `write_mode=final-prd` + `can_enter_spec_plan=yes` ready pair are producer-owned. Do not write them through Claude file mutation tools.',
-      'Run the producer-local finalize path instead: `node skills/spec-prd/scripts/finalize-prd-artifact.js docs/brainstorms/<slug>-requirements.md --inputs <input-path>`.',
+      'Run the producer-local finalize path instead: `node .claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js docs/brainstorms/<slug>-requirements.md --inputs <input-path>`.',
       '',
       'reconstruction_status: degraded',
     ];
@@ -84,27 +91,30 @@ const readyStatus = /^\s*status:\s*ready-for-planning\s*$/im.test(content);
 const machineReceipt = hasMachineReceiptField(content);
 const firstWrite = !fs.existsSync(absoluteTarget);
 const checkerFacts = tryBuildCheckerFacts(relativeTarget, content);
-const readyIntent = checkerFacts && checkerFacts.ready_claim_present === true;
+const fallbackFacts = checkerFacts || buildFallbackFacts(content);
+const readyIntent = fallbackFacts.ready_claim_present === true;
 const hasDurableWriteMode = checkerFacts
   && typeof checkerFacts.write_mode === 'string'
   && checkerFacts.write_mode.length > 0
   && checkerFacts.write_mode !== 'not-run';
-const missingWriteModeOnFirstWrite = firstWrite && checkerFacts !== null && !hasDurableWriteMode;
+const hasFallbackDurableWriteMode = fallbackFacts.write_mode_declared_valid === true
+  && fallbackFacts.write_mode !== 'not-run';
+const missingWriteModeOnFirstWrite = firstWrite
+  && (checkerFacts !== null ? !hasDurableWriteMode : !hasFallbackDurableWriteMode);
 
 // 路口路由文案:首次写带"该 grill"信号却直写 final-prd → 已被 readyIntent 拦(Codex 全禁 final
 // 首次写,因 checker 把 final-prd 当 claimsReady),此处只给命中信号的拦截加明确 grill 路由文案,
 // 不改变"所有 final-prd 首次写被拦"的现有语义。信号只判结构,不判 grill 律是否真执行(R12 天花板)。
-const hasDesignSignal = checkerFacts && checkerFacts.design_source_refs_present === true;
+const hasDesignSignal = fallbackFacts.design_source_refs_present === true;
 const multiSourceCount = countMultiSourceInputs(content);
 const hasOwnerOwnedGap = ownerOwnedGapKeywordHit(content);
-const hasOutstandingQuestions = checkerFacts && checkerFacts.outstanding_questions_present === true;
+const hasOutstandingQuestions = fallbackFacts.outstanding_questions_present === true;
 const hasGrillSignal = hasDesignSignal || multiSourceCount >= 2 || hasOwnerOwnedGap || hasOutstandingQuestions;
 const finalPrdOnFirstWriteWithSignal = firstWrite
-  && checkerFacts !== null
-  && checkerFacts.write_mode === 'final-prd'
+  && fallbackFacts.write_mode === 'final-prd'
   && hasGrillSignal;
 
-if (readyStatus || machineReceipt || (firstWrite && readyIntent) || missingWriteModeOnFirstWrite) {
+if (readyStatus || machineReceipt || readyIntent || missingWriteModeOnFirstWrite) {
   const reasonLines = [
     `[spec-first] PRD prewrite guard blocked ${toolName}.`,
     `Target: ${relativeTarget}`,
@@ -133,7 +143,7 @@ if (readyStatus || machineReceipt || (firstWrite && readyIntent) || missingWrite
   }
   reasonLines.push(
     '',
-    'Write-before dry-run (recommended): pipe your draft through `node skills/spec-prd/scripts/check-prd-artifact.js docs/brainstorms/<slug>-requirements.md --stdin` BEFORE the durable Write to see ALL findings at once and fix them in one pass instead of one-per-Stop-hook-cycle.',
+    'Write-before dry-run (recommended): pipe your draft through `node .claude/spec-first/workflows/spec-prd/scripts/check-prd-artifact.js docs/brainstorms/<slug>-requirements.md --stdin` BEFORE the durable Write to see ALL findings at once and fix them in one pass instead of one-per-Stop-hook-cycle.',
     '',
     'Compliant skeleton to copy verbatim (fill the angle-bracket placeholders, keep every token exact):',
     '```yaml',
@@ -141,13 +151,17 @@ if (readyStatus || machineReceipt || (firstWrite && readyIntent) || missingWrite
     'spec_id: <YYYY-MM-DD-NNN-slug>',
     'artifact_kind: prd-requirements',
     'target_surface: <App|H5/PC|Admin|Backend/Java|CLI/DevTool|Mixed|Generic>',
-    'status: draft            # never write ready-for-planning on first Write',
+    '# status must remain draft until the producer-local finalize path writes the receipt.',
+    'status: draft',
     'evidence_grade: mixed',
     'created: <YYYY-MM-DD>',
-    'source_inputs:           # HARD CONTRACT — Stop hook reads this; origin_docs/origin_docs are NOT recognized',
+    '# HARD CONTRACT: Stop hook reads source_inputs; origin_doc/origin_docs are NOT recognized.',
+    'source_inputs:',
     '  - <path/to/original-input.md>',
-    'write_mode: checkpoint-prd   # checkpoint-prd | final-prd | ask-owner-first | route-out',
-    'can_enter_spec_plan: no      # yes | no',
+    '# Allowed write_mode values: checkpoint-prd | final-prd | ask-owner-first | route-out.',
+    'write_mode: checkpoint-prd',
+    '# Allowed can_enter_spec_plan values: yes | no.',
+    'can_enter_spec_plan: no',
     'clarification_evidence: <asked-owner | source-proven-no-ask | headless-degraded-logged>',
     'preflight_sweep_closure: <closed | degraded | blocked>',
     'next_owner_question: <one load-bearing question or none>',
@@ -259,8 +273,45 @@ function hasReadyOrReceiptMutationSignal(text) {
   if (!text) return false;
   if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
   if (hasMachineReceiptField(text)) return true;
-  return /^\s*write_mode:\s*final-prd\s*$/im.test(text)
-    && /^\s*can_enter_spec[-_]?plan:\s*yes\s*$/im.test(text);
+  return extractDeclarationValue(text, 'write_mode', [
+    'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
+  ]) === 'final-prd'
+    || extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']) === 'yes';
+}
+
+function buildFallbackFacts(text) {
+  const writeMode = extractDeclarationValue(text, 'write_mode', [
+    'ask-owner-first', 'checkpoint-prd', 'final-prd', 'route-out', 'not-run',
+  ]);
+  const canEnterSpecPlan = extractDeclarationValue(text, 'can_enter_spec[-_]?plan', ['yes', 'no']);
+  return {
+    write_mode: writeMode,
+    write_mode_declared_valid: Boolean(writeMode),
+    ready_claim_present: /^\s*status:\s*ready-for-planning\s*$/im.test(text)
+      || writeMode === 'final-prd'
+      || canEnterSpecPlan === 'yes',
+    design_source_refs_present: detectDesignSourceRefs(text),
+    outstanding_questions_present: /^##\s+Outstanding Questions/im.test(text),
+  };
+}
+
+function extractDeclarationValue(text, fieldPattern, values) {
+  const valuePattern = values.map(escapeRegExp).join('|');
+  const regex = new RegExp(`^\\s*(?:[-*]\\s*)?${fieldPattern}\\s*:\\s*(${valuePattern})\\s*$`, 'im');
+  const match = stripFencedCode(text).match(regex);
+  return match ? match[1].trim() : null;
+}
+
+function stripFencedCode(text) {
+  return String(text || '').replace(/```[\s\S]*?```/g, '');
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+function detectDesignSourceRefs(text) {
+  return /(?:figma\.com|mastergo\.com|js\.design|sketch\.cloud|axure|modao|摹客|蓝湖|lanhuapp|设计稿|design source|design link)/i.test(text);
 }
 
 function buildCandidateContent(currentToolName, currentToolInput, absolutePath) {

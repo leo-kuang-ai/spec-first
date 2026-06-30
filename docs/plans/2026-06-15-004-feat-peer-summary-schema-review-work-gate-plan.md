@@ -1,26 +1,26 @@
 ---
 title: "feat: peer-session-summary 结构化输出 schema + review→work handoff gate（评估/决策 plan）"
 type: feat
-status: completed  # 作为「决策 plan」：评估完成，结论 DEFERRED；非 build greenlit
+status: completed  # 作为「决策/评估 plan」：评估与收口已完成；结论是不开发，非 build 交付
 date: 2026-06-15
 spec_id: 2026-06-15-004-peer-summary-schema-review-work-gate
 ---
 
 # feat: peer-session-summary 结构化输出 schema + review→work handoff gate
 
-> **本 plan 已转为「决策/评估 plan」，不是直接 build plan。** 经 `/spec:doc-review`（5 reviewer 多视角 + 对抗）与痛点证据门检索后，结论是 reasoned-defer，对齐同日 plan 002 立的证据纪律。下方 Implementation Units 保留为「若重启会怎么建」的设计存档，**当前不进入开发**。
+> **本 plan 已完成为「决策/评估 plan」，不是直接 build plan。** 经 `/spec:doc-review`（5 reviewer 多视角 + 对抗）与痛点证据门检索后，结论已收口为当前不开发，对齐同日 plan 002 立的证据纪律。下方 Implementation Units 保留为「若重启会怎么建」的设计存档，**当前不进入开发，也不作为 active backlog**。
 
-> **决策结论：DEFERRED（reasoned defer，2026-06-15）。** 痛点证据门未达标：`docs/solutions/` + `docs/12-bug分析/` 对「review findings 跨轮/跨会话丢失」与「peer 历史不可结构化消费」两类痛点 **0 条 confirmed 失败记录**（≥3 阈值未达）；唯一邻近记录 `reviewer-dispatch-failure-2026-05-07.md` 反向证明「findings 没丢，只降级了交叉验证」；且 `docs/solutions/architecture-patterns/ai-reviewer-capability-borrowing-gates-2026-06-09.md` **已显式拒绝**为本地单会话 CLI 借鉴「增量复审/carry findings forward」，判定该痛点未被证实。按角色契约 §10（能力↔采纳平衡、证据门优先）与 plan 002 先例，**P1-3、P0-2 均暂缓**，非否决。**重启条件：** 累计 ≥3 条 confirmed 失败记录落 `docs/solutions/` 或 `docs/12-bug分析/`（标 `review-finding-lost` / `peer-context-drift` 关键词），证明跨会话 finding 丢失或 peer 历史重读是真实高频痛点；届时重启评估，并先修下方 doc-review 暴露的 5 处设计硬伤。
+> **完成结论：COMPLETED DECISION（not planned，2026-06-30 收口；原评估 2026-06-15）。** 痛点证据门未达标：`docs/solutions/` + `docs/12-bug分析/` 对「review findings 跨轮/跨会话丢失」与「peer 历史不可结构化消费」两类痛点 **0 条 confirmed 失败记录**（≥3 阈值未达）；唯一邻近记录 `reviewer-dispatch-failure-2026-05-07.md` 反向证明「findings 没丢，只降级了交叉验证」；且 `docs/solutions/architecture-patterns/ai-reviewer-capability-borrowing-gates-2026-06-09.md` **已显式拒绝**为本地单会话 CLI 借鉴「增量复审/carry findings forward」，判定该痛点未被证实。按角色契约 §10（能力↔采纳平衡、证据门优先）与 plan 002 先例，**P1-3、P0-2 均不开发 / 不进入当前 backlog**，非永久否决。**重启条件：** 累计 ≥3 条 confirmed 失败记录落 `docs/solutions/` 或 `docs/12-bug分析/`（标 `review-finding-lost` / `peer-context-drift` 关键词），证明跨会话 finding 丢失或 peer 历史重读是真实高频痛点；届时重启评估，并先修下方 doc-review 暴露的 5 处设计硬伤。
 
 > **doc-review 暴露、重启前必须先修的硬伤（存档）：** ① schema 混入 live-session 字段（`last_heartbeat_at`、`status: active|closed`）泄漏被排除的 P0-1 语义，需删；② P1-3 无接线消费者、两交付物互不喂养（P0-2 不消费 `peer-session-summary.open_findings`）；③ P0-2 确定性牙齿够不到其 motivating 的跨会话痛点；④ `verification_status: pass|fail` 把 historian 的*综述推断*伪装成 confirmed 执行事实；⑤ U3 动 `spec-work/SKILL.md` 前，plan-001 改动必须先 commit。
 
 ## Summary
 
-> ⚠️ 以下为 DEFERRED 设计存档，描述「若重启会建什么」，非当前交付承诺。
+> ⚠️ 以下为已完成决策后的设计存档，描述「若重启会建什么」，非当前交付承诺。
 
 把多轮讨论收敛出的「Loop Context 进化」前两项落地：(1) 给 `spec-sessions` 历史综述加一个**命名的结构化 output_schema**（`peer-session-summary.v1`），让 `spec-work`/`spec-debug`/`spec-compound` 在同一会话内确定性消费 peer 历史，而不是每次解析散文；(2) 把 review→work 这条边锚定为角色契约 §4 第 4 类 **handoff gate**——`spec-work` 启动 preflight 必须对可发现的 review findings 显式表态。
 
-**为何暂缓（结论先行）：** 两项的核心论证都依赖「跨会话/跨轮 finding 丢失」这一痛点，而该痛点在本仓库institutional history 中 0 confirmed 记录，且有一条邻近能力的显式拒绝在先。能力本身廉价、契约对齐，但按项目自己的证据门（plan 002 / §10），证据不足时正确动作是带重启条件的 reasoned-defer，而不是先建地基。
+**为何完成为不开发（结论先行）：** 两项的核心论证都依赖「跨会话/跨轮 finding 丢失」这一痛点，而该痛点在本仓库 institutional history 中 0 confirmed 记录，且有一条邻近能力的显式拒绝在先。能力本身廉价、契约对齐，但按项目自己的证据门（plan 002 / §10），证据不足时正确动作是把评估完成为 not planned，并保留带重启条件的设计存档，而不是先建地基。
 
 ---
 
@@ -73,17 +73,17 @@ spec_id: 2026-06-15-004-peer-summary-schema-review-work-gate
 
 ---
 
-## Completion Criteria
+## Decision Completion Criteria
 
-本计划实现 source-owned 契约（`peer-session-summary.md`）与 workflow prose gate，"completed" 需满足：
+本计划的 `status: completed` 表示「评估/决策已完成」，不是实现交付完成。完成依据：
 
-- `docs/contracts/workflows/peer-session-summary.md` 存在且被 `spec-sessions` SKILL 引用为可选 output_schema。
-- `spec-work` SKILL preflight 含 review→work handoff gate 段落，且明确标注强制度（loud convention + 窄确定性辅助）。
-- 对应 contract/unit 测试通过；`npm run test:unit` 绿。
-- `spec-first init` 重新生成 runtime 后，Claude 与 Codex runtime mirror 与 source 一致（无 drift）。
-- `CHANGELOG.md` 记录两项变更。
+- 痛点证据门已完成检索：`docs/solutions/` + `docs/12-bug分析/` 对 `review-finding-lost` / `peer-context-drift` 相关 confirmed 失败记录为 0，未达到 ≥3 条重启阈值。
+- `/spec:doc-review` 已暴露重启前必须先修的 5 处设计硬伤，并在本文顶部存档。
+- 最终结论已明确：`peer-session-summary.v1` 与 `review→work handoff gate` 当前不开发、不进入 active backlog；Implementation Units 仅保留为 future restart design archive。
+- 重启条件已明确：未来累计 ≥3 条 confirmed 失败记录后重新评估，并先修本文记录的设计硬伤。
+- `CHANGELOG.md` 已记录本次决策收口。
 
-若只落地 P1-3 而 P0-2 延后，使用 `status: partially-shipped` 并在此说明剩余 gate。
+若未来重启并实际 build，必须新开或重开实施计划；不得把本文的 `status: completed` 解读为 `peer-session-summary.md`、`spec-work` handoff gate、测试或 runtime mirror 已交付。
 
 ---
 

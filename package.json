@@ -66,6 +66,7 @@
     "scripts/lint-skill-entrypoints.config.json",
     "scripts/lint-skill-entrypoints.js",
     "scripts/npm-install-matrix-smoke.js",
+    "scripts/probe-claude-hook-payload.js",
     "scripts/release-publish.cjs",
     "scripts/run-ai-dev-benchmark-fixtures.js",
     "scripts/run-ai-dev-quality-gate.js",

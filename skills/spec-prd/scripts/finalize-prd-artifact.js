@@ -6,6 +6,7 @@ const path = require('path');
 
 const {
   buildReport,
+  extractSourceInputsFromFrontmatterText,
 } = require('./check-prd-artifact');
 
 // reason-code 分类法(receipt-only / checkpoint-input-scan-exempt 子集 + 分类器)的
@@ -19,6 +20,7 @@ function parseArgs(argv) {
   const args = {
     target: null,
     inputs: [],
+    inputsFromFrontmatter: false,
     checkOnly: false,
     verifyReceipt: false,
     refreshInputsHash: false,
@@ -38,6 +40,8 @@ function parseArgs(argv) {
       }
       args.inputs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
       i += 1;
+    } else if (arg === '--inputs-from-frontmatter') {
+      args.inputsFromFrontmatter = true;
     } else if (arg === '--check-only') {
       args.checkOnly = true;
     } else if (arg === '--verify-receipt') {
@@ -58,6 +62,36 @@ function parseArgs(argv) {
     args.error = '--verify-receipt cannot be combined with --check-only or --refresh-inputs-hash';
   }
   return args;
+}
+
+function resolveEffectiveInputs(target, inputs, options = {}) {
+  const suppliedInputs = Array.isArray(inputs) ? inputs : [];
+  if (suppliedInputs.length > 0 || options.inputsFromFrontmatter !== true) {
+    return {
+      inputs: suppliedInputs,
+      source: suppliedInputs.length > 0 ? 'cli' : 'none',
+      frontmatter: { present: false, field: null, inputs: [] },
+    };
+  }
+
+  const targetPath = path.resolve(target);
+  let text = '';
+  try {
+    text = fs.readFileSync(targetPath, 'utf8');
+  } catch {
+    return {
+      inputs: [],
+      source: 'none',
+      frontmatter: { present: false, field: null, inputs: [] },
+    };
+  }
+
+  const frontmatter = extractSourceInputsFromFrontmatterText(text);
+  return {
+    inputs: frontmatter.inputs,
+    source: frontmatter.inputs.length > 0 ? 'frontmatter' : 'none',
+    frontmatter,
+  };
 }
 
 function splitLines(text) {
@@ -121,7 +155,11 @@ function upsertFrontmatterFields(text, fields) {
 }
 
 function buildFinalizeReceipt(target, text, inputs, options = {}) {
-  const initialReport = buildReport(target, text, { inputs });
+  const initialReport = buildReport(target, text, {
+    inputs,
+    inputsFromFrontmatter: options.inputsFromFrontmatter,
+    originalInputs: options.originalInputs,
+  });
   const facts = initialReport.facts;
   const readyStatusClaimPresent = frontmatterHasReadyStatus(text);
   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
@@ -194,8 +232,32 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
       finding_count: initialReport.findings.length,
       blocking_finding_count: blockingReasons.length,
       reason_codes: [...new Set(initialReport.findings.map((finding) => finding.reason_code))].sort(),
+      findings: initialReport.findings.map((finding) => ({
+        reason_code: finding.reason_code,
+        section: finding.section,
+        section_id: finding.section_id,
+        expected_shape: finding.expected_shape,
+        remediation_hint: finding.remediation_hint,
+      })).filter((finding) => finding.expected_shape || finding.remediation_hint),
       prd_hash: facts.ready_receipt_prd_hash,
       inputs_hash: facts.ready_receipt_inputs_hash,
+      inputs_source: facts.inputs_from_frontmatter_used_count > 0
+        ? 'frontmatter'
+        : (facts.inputs_argument_count > 0 ? 'cli' : 'none'),
+      inputs_argument_count: facts.inputs_argument_count,
+      inputs_from_frontmatter_used_count: facts.inputs_from_frontmatter_used_count,
+      input_diagnostics: {
+        source_inputs_present: facts.source_inputs_present,
+        source_inputs_field: facts.source_inputs_field,
+        frontmatter_source_input_count: facts.frontmatter_source_input_count,
+        inputs_argument_count: facts.inputs_argument_count,
+        effective_input_count: facts.effective_input_count,
+        inputs_from_frontmatter_requested: facts.inputs_from_frontmatter_requested,
+        inputs_from_frontmatter_used_count: facts.inputs_from_frontmatter_used_count,
+        input_scan_status: facts.input_scan_status,
+        receipt_stale_possible_due_to_missing_inputs: facts.receipt_stale_possible_due_to_missing_inputs,
+        hint: facts.input_scan_hint,
+      },
     },
   };
 }
@@ -203,7 +265,13 @@ function buildFinalizeReceipt(target, text, inputs, options = {}) {
 function finalizePrd(target, inputs, options = {}) {
   const targetPath = path.resolve(target);
   const text = fs.readFileSync(targetPath, 'utf8');
-  const receipt = buildFinalizeReceipt(target, text, inputs, { refreshInputsHash: options.refreshInputsHash, checkOnly: options.checkOnly });
+  const effectiveInputs = resolveEffectiveInputs(target, inputs, options);
+  const receipt = buildFinalizeReceipt(target, text, effectiveInputs.inputs, {
+    refreshInputsHash: options.refreshInputsHash,
+    checkOnly: options.checkOnly,
+    inputsFromFrontmatter: effectiveInputs.source === 'frontmatter',
+    originalInputs: inputs,
+  });
 
   if (!receipt.can_finalize || options.checkOnly) {
     return receipt;
@@ -231,7 +299,12 @@ function finalizePrd(target, inputs, options = {}) {
 function verifyPrdReceipt(target, inputs, options = {}) {
   const targetPath = path.resolve(target);
   const text = fs.readFileSync(targetPath, 'utf8');
-  const report = buildReport(target, text, { inputs });
+  const effectiveInputs = resolveEffectiveInputs(target, inputs, options);
+  const report = buildReport(target, text, {
+    inputs: effectiveInputs.inputs,
+    inputsFromFrontmatter: effectiveInputs.source === 'frontmatter',
+    originalInputs: inputs,
+  });
   const facts = report.facts;
   const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
     !isReceiptOnly(reasonCode)
@@ -239,7 +312,7 @@ function verifyPrdReceipt(target, inputs, options = {}) {
   const reasonCodes = new Set();
   let originVerificationStatus = 'unverified';
 
-  if (inputs.length === 0) {
+  if (effectiveInputs.inputs.length === 0) {
     originVerificationStatus = 'degraded';
     reasonCodes.add('input_side_recheck_degraded');
   }
@@ -280,7 +353,7 @@ function verifyPrdReceipt(target, inputs, options = {}) {
     can_enter_spec_plan: facts.can_enter_spec_plan,
     ready_receipt_present: facts.ready_receipt_present,
     ready_receipt_current: facts.ready_receipt_current,
-    input_side_recheck_attempted: inputs.length > 0,
+    input_side_recheck_attempted: effectiveInputs.inputs.length > 0,
     reason_codes: [...reasonCodes].sort(),
     checker: {
       schema_version: report.schema_version,
@@ -290,6 +363,11 @@ function verifyPrdReceipt(target, inputs, options = {}) {
       blocking_reason_codes: facts.blocking_reason_codes,
       prd_hash: facts.ready_receipt_prd_hash,
       inputs_hash: facts.ready_receipt_inputs_hash,
+      inputs_source: facts.inputs_from_frontmatter_used_count > 0
+        ? 'frontmatter'
+        : (facts.inputs_argument_count > 0 ? 'cli' : 'none'),
+      inputs_argument_count: facts.inputs_argument_count,
+      inputs_from_frontmatter_used_count: facts.inputs_from_frontmatter_used_count,
     },
     producer: {
       mode: 'verify-receipt',
@@ -303,25 +381,30 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     process.stdout.write('finalize-prd-artifact.js — write or check a machine-owned ready receipt for a PRD artifact.\n');
-    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... ([--check-only] [--refresh-inputs-hash] | --verify-receipt)\n');
+    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--inputs-from-frontmatter] ([--check-only] [--refresh-inputs-hash] | --verify-receipt)\n');
     process.stdout.write('  --check-only           preview the receipt without writing; exit 0 = closeout allowed, 1 = should_block_closeout, 2 = usage error.\n');
     process.stdout.write('  --verify-receipt       consumer-only read check; exit 0 = verified PRD origin, 1 = unverified/degraded, 2 = usage error.\n');
     process.stdout.write('  --refresh-inputs-hash  allow re-finalizing when only ready_receipt_stale blocks (PRD unchanged, inputs file modified).\n');
+    process.stdout.write('  --inputs-from-frontmatter  use source_inputs/prd_input frontmatter paths when no --inputs are supplied.\n');
     process.exit(0);
   }
   if (args.error || !args.target) {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
     }
-    process.stderr.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... ([--check-only] [--refresh-inputs-hash] | --verify-receipt)\n');
+    process.stderr.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--inputs-from-frontmatter] ([--check-only] [--refresh-inputs-hash] | --verify-receipt)\n');
     process.exit(2);
   }
 
   let receipt;
   try {
     receipt = args.verifyReceipt
-      ? verifyPrdReceipt(args.target, args.inputs)
-      : finalizePrd(args.target, args.inputs, { checkOnly: args.checkOnly, refreshInputsHash: args.refreshInputsHash });
+      ? verifyPrdReceipt(args.target, args.inputs, { inputsFromFrontmatter: args.inputsFromFrontmatter })
+      : finalizePrd(args.target, args.inputs, {
+        checkOnly: args.checkOnly,
+        refreshInputsHash: args.refreshInputsHash,
+        inputsFromFrontmatter: args.inputsFromFrontmatter,
+      });
   } catch (err) {
     process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
     process.exit(2);
@@ -345,6 +428,7 @@ if (require.main === module) {
 module.exports = {
   buildFinalizeReceipt,
   finalizePrd,
+  resolveEffectiveInputs,
   verifyPrdReceipt,
   upsertFrontmatterFields,
 };

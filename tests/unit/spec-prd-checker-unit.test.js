@@ -7,6 +7,7 @@
 const {
   buildReport,
   parseStructure,
+  extractSourceInputsFromFrontmatterText,
   gateReadyClaims,
   looksLikeCheckableRef,
   traceRowBindsOq,
@@ -543,6 +544,115 @@ describe('section id identity and localized PRD facts', () => {
       }),
     ]));
     expect(report.facts.blocking_reason_codes).toContain('machine_section_identity_missing');
+  });
+});
+
+describe('source input diagnostics and remediation hints', () => {
+  test('extractSourceInputsFromFrontmatterText matches Stop hook frontmatter-only source_inputs parsing', () => {
+    const parsed = extractSourceInputsFromFrontmatterText([
+      '---',
+      'artifact_kind: prd-requirements',
+      'source_inputs:',
+      '  - docs/design.md',
+      '  - path: docs/brief.md',
+      '---',
+      '',
+      '- docs/body-bullet-must-not-be-read.md',
+    ].join('\n'));
+
+    expect(parsed).toEqual({
+      present: true,
+      field: 'source_inputs',
+      inputs: ['docs/design.md', 'docs/brief.md'],
+    });
+  });
+
+  test('extractSourceInputsFromFrontmatterText supports legacy prd_input and stops at next frontmatter field', () => {
+    const parsed = extractSourceInputsFromFrontmatterText([
+      '---',
+      'artifact_kind: prd-requirements',
+      'prd_input:',
+      '  path: docs/legacy.md',
+      'title: Next Field',
+      '---',
+    ].join('\n'));
+
+    expect(parsed).toEqual({
+      present: true,
+      field: 'prd_input',
+      inputs: ['docs/legacy.md'],
+    });
+  });
+
+  test('checker reports source_inputs diagnostics when --inputs is omitted', () => {
+    const report = buildReport(
+      'docs/brainstorms/source-inputs-diagnostic-requirements.md',
+      sectionIdChineseReadyPrd({
+        frontmatter: [
+          'source_inputs:',
+          '  - docs/design.md',
+        ],
+      }),
+    );
+
+    expect(report.facts.source_inputs_present).toBe(true);
+    expect(report.facts.frontmatter_source_input_count).toBe(1);
+    expect(report.facts.inputs_argument_count).toBe(0);
+    expect(report.facts.inputs_from_frontmatter_requested).toBe(false);
+    expect(report.facts.input_scan_status).toBe('no_inputs_argument');
+    expect(report.facts.receipt_stale_possible_due_to_missing_inputs).toBe(true);
+    expect(report.facts.input_scan_hint).toBe('Pass --inputs from source_inputs/prd_input or use --inputs-from-frontmatter.');
+  });
+
+  test('checker can consume frontmatter source_inputs as effective inputs', () => {
+    const report = buildReport(
+      'docs/brainstorms/source-inputs-consumed-requirements.md',
+      sectionIdChineseReadyPrd({
+        frontmatter: [
+          'source_inputs:',
+          '  - docs/design.md',
+        ],
+      }),
+      { inputsFromFrontmatter: true },
+    );
+
+    expect(report.facts.source_inputs_present).toBe(true);
+    expect(report.facts.inputs_argument_count).toBe(0);
+    expect(report.facts.inputs_from_frontmatter_requested).toBe(true);
+    expect(report.facts.inputs_from_frontmatter_used_count).toBe(1);
+    expect(report.facts.input_scan_attempted).toBe(true);
+    expect(report.facts.input_scan_status).toBe('frontmatter_inputs');
+    expect(report.facts.input_scan_hint).toBeNull();
+  });
+
+  test('selected checker findings include remediation hints without changing reason codes', () => {
+    const report = buildReport(
+      'docs/brainstorms/remediation-hint-requirements.md',
+      sectionIdChineseReadyPrd({
+        readiness: [
+          '- write_mode: final-prd',
+          '- clarification_evidence: asked-owner',
+          '- can_enter_spec_plan: yes',
+          '- preflight_sweep_closure: degraded',
+          '- decision_card_highest_risk_gap: owner disposition in OQ',
+          '- decision_card_next_action: final-prd',
+          '- decision_card_why_no_invention: OQ-01 claims owner closure',
+        ],
+      }).replace(
+        '| OQ-01 | fallback copy source | Requirements | no | owner-answered | no | closed | OQ-01 owner trace |',
+        '| OQ-01 | fallback copy source | Requirements | no | owner-answered | no | closed | missing trace |',
+      ).replace(
+        '| fallback copy source | owner | use owner copy | Requirements | R-01 copy fixed | closed |',
+        '',
+      ),
+    );
+
+    const finding = report.findings.find((entry) => entry.reason_code === 'open_oq_without_owner_closure');
+    expect(finding).toEqual(expect.objectContaining({
+      reason_code: 'open_oq_without_owner_closure',
+      expected_shape: expect.any(String),
+      remediation_hint: expect.any(String),
+    }));
   });
 });
 

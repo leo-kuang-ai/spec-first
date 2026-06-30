@@ -133,7 +133,14 @@ const MACHINE_READY_FIELDS = new Set([
 ]);
 
 function parseArgs(argv) {
-  const args = { target: null, inputs: [], stdin: false, help: false, error: null };
+  const args = {
+    target: null,
+    inputs: [],
+    inputsFromFrontmatter: false,
+    stdin: false,
+    help: false,
+    error: null,
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--help' || arg === '-h') {
@@ -149,6 +156,8 @@ function parseArgs(argv) {
       }
       args.inputs.push(...value.split(',').map((entry) => entry.trim()).filter(Boolean));
       i += 1;
+    } else if (arg === '--inputs-from-frontmatter') {
+      args.inputsFromFrontmatter = true;
     } else if (arg.startsWith('--')) {
       args.error = `unknown option: ${arg}`;
       break;
@@ -197,6 +206,45 @@ function parseFrontmatter(lines) {
     startLine: 1,
     endLine: endIndex + 1,
   };
+}
+
+function extractSourceInputsFromFrontmatterText(text) {
+  const lines = splitLines(text);
+  if (lines[0] !== '---') {
+    return { present: false, field: null, inputs: [] };
+  }
+
+  const fmEnd = lines.findIndex((line, index) => index > 0 && line === '---');
+  if (fmEnd === -1) {
+    return { present: false, field: null, inputs: [] };
+  }
+
+  const fmLines = lines.slice(1, fmEnd);
+  const start = fmLines.findIndex((line) => /^(source_inputs|prd_input):\s*$/.test(line));
+  if (start === -1) {
+    return { present: false, field: null, inputs: [] };
+  }
+
+  const fieldMatch = fmLines[start].match(/^(source_inputs|prd_input):\s*$/);
+  const inputs = [];
+  for (let i = start + 1; i < fmLines.length; i += 1) {
+    const line = fmLines[i];
+    if (/^[A-Za-z0-9_-]+:\s*/.test(line)) {
+      break;
+    }
+    const match = line.match(/^\s*-\s+(.+?)\s*$/)
+      || line.match(/^\s*path:\s+(.+?)\s*$/);
+    if (!match) continue;
+    const value = match[1]
+      .replace(/^path:\s*/, '')
+      .replace(/^["']|["']$/g, '')
+      .trim();
+    if (value) {
+      inputs.push(value);
+    }
+  }
+
+  return { present: true, field: fieldMatch[1], inputs };
 }
 
 function normalizeForReceipt(text) {
@@ -1120,6 +1168,16 @@ function parseStructure(target, text) {
 // facts 含 ready_claim_present 等 policy 派生布尔,供 gateReadyClaims/deriveFindings 消费。
 function computeFacts(structure, inputPaths, options) {
   const projectRoot = options.projectRoot || findProjectRootFromTarget(structure.target);
+  const frontmatterInputs = structure.frontmatterInputs || { present: false, field: null, inputs: [] };
+  const inputsFromFrontmatterRequested = options.inputsFromFrontmatter === true;
+  const inputsArgumentCount = Array.isArray(options.originalInputs)
+    ? options.originalInputs.length
+    : inputPaths.length;
+  const frontmatterInputCount = frontmatterInputs.inputs.length;
+  const sourceInputsPresent = frontmatterInputs.present;
+  const inputsFromFrontmatterUsedCount = inputsFromFrontmatterRequested && inputsArgumentCount === 0
+    ? frontmatterInputCount
+    : 0;
   const inputScan = scanInputDesignRefs(inputPaths, projectRoot);
   const inputsHash = computeInputsHash(inputPaths, { projectRoot });
   const readyReceiptCurrent = structure.readyReceiptPresent
@@ -1186,7 +1244,22 @@ function computeFacts(structure, inputPaths, options) {
     owner_decision_trace_present: oqAnalysis.facts.owner_decision_trace_present,
     placeholder_line_count: structure.placeholderLines.length,
     feature_slice_trace_gap_count: structure.featureSliceGaps.length,
+    source_inputs_present: sourceInputsPresent,
+    source_inputs_field: frontmatterInputs.field,
+    frontmatter_source_input_count: frontmatterInputCount,
+    inputs_argument_count: inputsArgumentCount,
+    effective_input_count: inputPaths.length,
+    inputs_from_frontmatter_requested: inputsFromFrontmatterRequested,
+    inputs_from_frontmatter_used_count: inputsFromFrontmatterUsedCount,
     input_scan_attempted: inputPaths.length > 0,
+    input_scan_status: inputPaths.length > 0
+      ? (inputsFromFrontmatterUsedCount > 0 ? 'frontmatter_inputs' : 'cli_inputs')
+      : (sourceInputsPresent ? 'no_inputs_argument' : 'no_inputs_declared'),
+    receipt_stale_possible_due_to_missing_inputs: sourceInputsPresent && inputsArgumentCount === 0
+      && !inputsFromFrontmatterRequested,
+    input_scan_hint: sourceInputsPresent && inputsArgumentCount === 0 && !inputsFromFrontmatterRequested
+      ? 'Pass --inputs from source_inputs/prd_input or use --inputs-from-frontmatter.'
+      : null,
     input_refs_used: inputScan.input_refs_used,
     input_design_refs_present: inputScan.input_design_refs_present,
     input_scan_degraded: inputScan.input_scan_degraded,
@@ -1226,6 +1299,46 @@ function gateReadyClaims(facts, oqAnalysis) {
     findings.push({ reason_code: 'preflight_closure_contradicted' });
   }
   return findings;
+}
+
+const REMEDIATION_BY_REASON_CODE = {
+  decision_card_undeclared: {
+    expected_shape: 'Readiness Self-Check includes decision_card_highest_risk_gap, decision_card_next_action, and decision_card_why_no_invention before a ready/final claim.',
+    remediation_hint: 'Add the missing Decision Card fields, or keep write_mode as checkpoint-prd with can_enter_spec_plan: no until the highest-risk gap is explicit.',
+  },
+  open_oq_without_owner_closure: {
+    expected_shape: 'Each non-blocking open OQ has a legal closure_disposition with checkable source evidence or a matching Owner Decision Trace row.',
+    remediation_hint: 'Add a matching Owner Decision Trace row for the OQ id/question, add a checkable source reference for source-resolved closure, or keep the PRD as checkpoint-prd.',
+  },
+  owner_decision_trace_required_but_absent: {
+    expected_shape: 'asked-owner or owner-* OQ closure is backed by an Owner Decision Trace section with a non-empty chosen answer, write target, and consequence.',
+    remediation_hint: 'Add Owner Decision Trace rows that bind to the relevant OQ ids/questions, or change the closure disposition/evidence to a source-backed non-owner path.',
+  },
+  design_source_coverage_undeclared: {
+    expected_shape: 'Design Source Coverage declares design_source_coverage with a machine keyword such as read, unread, partial, or degraded.',
+    remediation_hint: 'Add Design Source Coverage with design_source_inventory, design_source_coverage, design_sources_read, and design_sources_unread fields.',
+  },
+  design_sources_unread_undeclared: {
+    expected_shape: 'Design Source Coverage explicitly declares design_sources_unread as none/n/a or as a concrete list with reasons.',
+    remediation_hint: 'Add design_sources_unread: none when all design inputs were read, or list unread/degraded sources and their readiness consequence.',
+  },
+  design_partial_coverage_unaccepted: {
+    expected_shape: 'Partial/degraded design coverage is accepted by owner evidence before a ready/final claim.',
+    remediation_hint: 'Add an Owner Decision Trace row or design_degraded_owner_acceptance_ref showing owner acceptance, or keep the artifact as checkpoint-prd.',
+  },
+  ready_receipt_stale: {
+    expected_shape: 'readiness_prd_hash and readiness_inputs_hash match the current PRD body and current effective inputs.',
+    remediation_hint: 'Rerun finalize with the same effective inputs used to create the PRD, or use --inputs-from-frontmatter when source_inputs/prd_input is present.',
+  },
+  input_refs_unavailable: {
+    expected_shape: 'At least one supplied input path is readable, inside the project root, and scanned by the checker.',
+    remediation_hint: 'Pass readable repo-local paths through --inputs, fix missing/out-of-root paths, or use --inputs-from-frontmatter when source_inputs/prd_input is present.',
+  },
+};
+
+function enrichFinding(finding) {
+  const remediation = REMEDIATION_BY_REASON_CODE[finding.reason_code];
+  return remediation ? { ...finding, ...remediation } : finding;
 }
 
 // 阶段三:findings 构建。接受 facts + structure + oqAnalysis + inputPaths,
@@ -1340,14 +1453,23 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
   }
   // claimsReady-gated findings(委托给 gateReadyClaims)
   findings.push(...gateReadyClaims(facts, oqAnalysis));
-  return findings;
+  return findings.map(enrichFinding);
 }
 
 // buildReport:三阶段的薄外壳。维持与历史版本相同的公开接口和返回形状。
 function buildReport(target, text, options = {}) {
-  const inputPaths = Array.isArray(options.inputs) ? options.inputs : [];
   const structure = parseStructure(target, text);
-  const { facts, oqAnalysis } = computeFacts(structure, inputPaths, options);
+  structure.frontmatterInputs = extractSourceInputsFromFrontmatterText(text);
+  const suppliedInputs = Array.isArray(options.inputs) ? options.inputs : [];
+  const originalInputs = Array.isArray(options.originalInputs) ? options.originalInputs : suppliedInputs;
+  const inputPaths = options.inputsFromFrontmatter === true && originalInputs.length === 0
+    ? (suppliedInputs.length > 0 ? suppliedInputs : structure.frontmatterInputs.inputs)
+    : suppliedInputs;
+  const reportOptions = {
+    ...options,
+    originalInputs,
+  };
+  const { facts, oqAnalysis } = computeFacts(structure, inputPaths, reportOptions);
   const findings = deriveFindings(facts, structure, oqAnalysis, inputPaths);
   const blockingReasons = [...new Set(
     findings.map((f) => f.reason_code).filter((c) => BLOCKING_REASON_CODES.has(c)),
@@ -1367,8 +1489,9 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     process.stdout.write('check-prd-artifact.js — produce deterministic readiness facts for a PRD artifact.\n');
-    process.stdout.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--stdin]\n');
-    process.stdout.write('  --stdin   read PRD content from stdin instead of <target-prd-path> file (target path still required as a virtual path for path-based checks). Enables write-before-dry-run: pipe a draft through this to see ALL findings at once before the durable Write.\n');
+    process.stdout.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--inputs-from-frontmatter] [--stdin]\n');
+    process.stdout.write('  --inputs-from-frontmatter  use source_inputs/prd_input frontmatter paths when no --inputs are supplied.\n');
+    process.stdout.write('  --stdin                    read PRD content from stdin instead of <target-prd-path> file (target path still required as a virtual path for path-based checks). Enables write-before-dry-run: pipe a draft through this to see ALL findings at once before the durable Write.\n');
     process.stdout.write('  emits facts JSON on stdout; exit 0 regardless of findings (failures surface as facts.blocking_reason_codes).\n');
     process.exit(0);
   }
@@ -1376,12 +1499,15 @@ function main() {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
     }
-    process.stderr.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--stdin]\n');
+    process.stderr.write('usage: check-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--inputs-from-frontmatter] [--stdin]\n');
     process.exit(2);
   }
 
   const emitReport = (targetText) => {
-    const report = buildReport(args.target, targetText, { inputs: args.inputs });
+    const report = buildReport(args.target, targetText, {
+      inputs: args.inputs,
+      inputsFromFrontmatter: args.inputsFromFrontmatter,
+    });
     process.stdout.write(JSON.stringify(report, null, 2) + '\n');
   };
 
@@ -1418,6 +1544,7 @@ module.exports = {
   WHAT_TOUCHING_KEYWORDS,
   buildReport,
   computeInputsHash,
+  extractSourceInputsFromFrontmatterText,
   normalizeForReceipt,
   sha256,
   // 三阶段函数:供 in-process 单测直接调用,不影响 buildReport 编排。

@@ -9,7 +9,7 @@ const {
   buildReport,
   BLOCKING_REASON_CODES,
 } = require('../../skills/spec-prd/scripts/check-prd-artifact');
-const { finalizePrd, verifyPrdReceipt } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
+const { finalizePrd, verifyPrdReceipt, resolveEffectiveInputs } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
 
 const FINALIZE_SCRIPT = path.join(__dirname, '..', '..', 'skills', 'spec-prd', 'scripts', 'finalize-prd-artifact.js');
 
@@ -805,14 +805,21 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'design_sources_read_present',
       'design_sources_unread_non_empty',
       'design_sources_unread_present',
+      'effective_input_count',
       'evidence_tags_present',
       'feature_slice_trace_gap_count',
       'frontmatter_present',
+      'frontmatter_source_input_count',
       'how_pushdown_touches_what_count',
       'input_design_refs_present',
       'input_refs_used',
       'input_scan_attempted',
       'input_scan_degraded',
+      'input_scan_hint',
+      'input_scan_status',
+      'inputs_argument_count',
+      'inputs_from_frontmatter_requested',
+      'inputs_from_frontmatter_used_count',
       'nfr_count',
       'nfr_ids',
       'open_oq_without_owner_closure_count',
@@ -836,7 +843,10 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'ready_receipt_inputs_hash',
       'ready_receipt_prd_hash',
       'ready_receipt_present',
+      'receipt_stale_possible_due_to_missing_inputs',
       'requirement_ids',
+      'source_inputs_field',
+      'source_inputs_present',
       'unclosed_owner_question_count',
       'uncovered_requirements',
       'write_mode',
@@ -1195,6 +1205,104 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       expect(receipt.blocking_reason_codes).toContain('ready_receipt_stale');
       expect(receipt.closeout_blocking_reason_codes).not.toContain('ready_receipt_stale');
       expect(receipt.should_block_closeout).toBe(false);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('finalize resolves effective inputs from source_inputs frontmatter on request', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'frontmatter-inputs-requirements.md');
+    const inputPath = path.join(tempDir, 'docs', 'brief.md');
+    try {
+      write(inputPath, 'Owner brief source for frontmatter input hashing.\n');
+      write(prdPath, validReadyIntentPrd([
+        'source_inputs:',
+        '  - docs/brief.md',
+        '',
+      ].join('\n')));
+
+      const resolved = resolveEffectiveInputs(prdPath, [], { inputsFromFrontmatter: true });
+      expect(resolved.inputs).toEqual(['docs/brief.md']);
+      expect(resolved.source).toBe('frontmatter');
+
+      const receipt = finalizePrd(prdPath, [], { inputsFromFrontmatter: true });
+      expect(receipt.status).toBe('finalized');
+      expect(receipt.checker.inputs_source).toBe('frontmatter');
+      expect(receipt.checker.inputs_from_frontmatter_used_count).toBe(1);
+
+      const verification = verifyPrdReceipt(prdPath, [], { inputsFromFrontmatter: true });
+      expect(verification.verified).toBe(true);
+      expect(verification.input_side_recheck_attempted).toBe(true);
+      expect(verification.checker.inputs_source).toBe('frontmatter');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('finalize check-only explains stale receipt risk when frontmatter source_inputs exist but --inputs is omitted', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'missing-input-args-requirements.md');
+    const inputPath = path.join(tempDir, 'docs', 'brief.md');
+    try {
+      write(inputPath, 'Owner brief source for missing input diagnostics.\n');
+      write(prdPath, validReadyIntentPrd([
+        'source_inputs:',
+        '  - docs/brief.md',
+        '',
+      ].join('\n')));
+
+      const receipt = finalizePrd(prdPath, [], { checkOnly: true });
+      expect(receipt.checker.input_diagnostics).toEqual(expect.objectContaining({
+        source_inputs_present: true,
+        frontmatter_source_input_count: 1,
+        inputs_argument_count: 0,
+        input_scan_status: 'no_inputs_argument',
+        receipt_stale_possible_due_to_missing_inputs: true,
+      }));
+      expect(receipt.checker.input_diagnostics.hint)
+        .toBe('Pass --inputs from source_inputs/prd_input or use --inputs-from-frontmatter.');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--inputs-from-frontmatter CLI finalizes and verifies with legacy prd_input', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'legacy-prd-input-requirements.md');
+    const inputPath = path.join(tempDir, 'docs', 'legacy-input.md');
+    try {
+      write(inputPath, 'legacy source input for receipt hash.\n');
+      write(prdPath, validReadyIntentPrd([
+        'prd_input:',
+        '  path: docs/legacy-input.md',
+        '',
+      ].join('\n')));
+
+      const finalized = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--inputs-from-frontmatter',
+      ], { encoding: 'utf8' });
+
+      expect(finalized.status).toBe(0);
+      expect(finalized.stderr).toBe('');
+      const receipt = JSON.parse(finalized.stdout);
+      expect(receipt.status).toBe('finalized');
+      expect(receipt.checker.inputs_source).toBe('frontmatter');
+      expect(receipt.checker.inputs_from_frontmatter_used_count).toBe(1);
+
+      const verified = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--inputs-from-frontmatter',
+        '--verify-receipt',
+      ], { encoding: 'utf8' });
+
+      expect(verified.status).toBe(0);
+      const verification = JSON.parse(verified.stdout);
+      expect(verification.verified).toBe(true);
+      expect(verification.checker.inputs_source).toBe('frontmatter');
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }

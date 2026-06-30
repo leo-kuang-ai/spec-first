@@ -374,6 +374,7 @@ describe('spec-prd workflow contracts', () => {
       'do not create standalone context, ADR, or runtime artifacts',
       'do not copy run-local scratch into the PRD by default',
       'skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>',
+      '--inputs-from-frontmatter',
       'edit generated runtime mirrors',
     ]);
     expect(text).not.toContain('Adaptive product expert lens');
@@ -878,6 +879,7 @@ describe('spec-prd workflow contracts', () => {
     expectContainsAll(closeout, [
       'Every PRD handoff should report',
       'run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout',
+      '`--inputs-from-frontmatter`',
       'The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js`',
       'Use `preflight_sweep_closure`',
       'Phase 1 Requirement Analysis Gate closed',
@@ -3210,6 +3212,7 @@ describe('spec-prd workflow contracts', () => {
       'anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id',
       'machine-owned safety sections must remain locatable before final ready',
       'node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>',
+      '--inputs-from-frontmatter',
       '.agents/skills/spec-prd/scripts/finalize-prd-artifact.js',
       '.claude/spec-first/workflows/spec-prd/scripts/finalize-prd-artifact.js',
       'codex_prd_guard: not_available',
@@ -3247,6 +3250,7 @@ describe('spec-prd workflow contracts', () => {
     const readiness = read(READINESS_PATH);
     expectContainsAll(readiness, [
       'is required before this lens can emit `ready-for-planning`, not optional',
+      '`--inputs-from-frontmatter`',
       'an artifact-backed PRD with no current producer-local finalize receipt is itself not ready',
       'machine-owned section identity',
       'anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id',
