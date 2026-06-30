@@ -267,6 +267,7 @@ flowchart TB
 - 新 reference 包含四类 signal：project-specific terms、confusing aliases、boundary scenarios / code-doc contradictions、ADR-worthy hard decisions。
 - 定义目标顺序：solution doc first、existing `CONCEPTS.md` update-only、existing context/ADR preview candidate only。
 - 明确不依赖外部 `/Users/.../domain-modeling` 路径，不复制它的 entrypoint 或 file topology。
+- 新 reference 必须包含可操作的判断启发式：至少 3 个"应该捕获"正面示例（说明为何是 project-specific）、至少 2 个"不应捕获"反面示例（通用工程词汇、或已存在于 `CONCEPTS.md` 的词）；明确规则：凡在主流工程词汇表中已有标准定义的词汇，不捕获。
 
 **Patterns to follow:**
 - `skills/spec-compound/references/concepts-vocabulary.md` 的 update-only 和 advisory 语气。
@@ -381,6 +382,7 @@ flowchart TB
 - Edge case: `mode:autofix` 只报告 discoverability/context/ADR recommendation，不做额外项目配置写入。
 - Error path: compound-refresh 不创建 `_archived/`、不创建 `CONTEXT.md`、不写 ADR。
 - Integration: compound 与 refresh vocabulary references 保持共同的 advisory wording，但不强行字节相等。
+- Contract anchor：refresh 的 `concepts-vocabulary.md` 的 string assertion 检查包含"advisory"或"update-only"相关措辞（与 compound 语义对齐）；同时不包含允许"创建 CONTEXT.md"或"写入 ADR"的命令式措辞。
 
 **Verification:**
 - `npx jest tests/unit/spec-compound-contracts.test.js --runInBand`
@@ -403,7 +405,7 @@ flowchart TB
 
 **Approach:**
 - 添加正例：solved problem clarifies a project-specific term, updates existing `CONCEPTS.md`, and records source refs.
-- 添加反例：general engineering term is not promoted; routine decision does not create ADR; missing `CONTEXT.md` does not trigger bootstrap.
+- 添加反例：general engineering term is not promoted; routine decision does not create ADR; missing `CONTEXT.md` does not trigger bootstrap; **过度输出反例**：一次 compound run 涉及多个词汇，其中只有 1 个是 project-specific term，其余 4 个是通用工程词汇——预期行为是只推荐更新 1 个词，其余记录"通用词汇，不捕获"，而非全部推荐（anti-pattern）。
 - fresh-source eval 使用当前磁盘 source，让独立 reviewer 检查主产物、advisory vocabulary、context/ADR candidate 和 source/runtime 边界。
 
 **Patterns to follow:**
@@ -418,7 +420,7 @@ flowchart TB
 
 **Verification:**
 - `npx jest tests/unit/spec-compound-contracts.test.js tests/unit/workflow-eval-readiness-contracts.test.js --runInBand`
-- Fresh-source eval report saved or explicit `not_run` reason recorded.
+- Fresh-source eval：**必须执行**；仅在以下明确技术障碍下可记录 `not_run`：(a) 宿主 dispatch primitive 不可用；(b) 当前语义变更完全被 contract tests 覆盖且无 LLM-judged 边界。不得以"没有明确授权"或"时间有限"为由 skip。
 
 ---
 
@@ -504,6 +506,7 @@ flowchart TB
 
 - 完成 U1-U3，建立 `domain-model-capture` reference、Phase 2.4 扩展和 context/ADR preview-only 规则。
 - 验证重点：主产物不变、无仓外 runtime 依赖、无默认 context/ADR 写入。
+- **Phase 1 Closeout Gate**（进入 Phase 2 的前提）：contract tests 全部通过 + fresh-source eval 通过或有明确 `not_run` 技术障碍说明 + 至少一次人工 review 在真实 solved-problem context 下的 compound 输出，确认主产物未变形、`CONCEPTS.md` 更新是 update-only、无 ADR/`CONTEXT.md` 默认写入。满足以上条件后才推进 Phase 2；否则应回到 planning 修正。
 
 ### Phase 2: Refresh Alignment And Eval
 
@@ -523,6 +526,7 @@ flowchart TB
 - 后续实施如果改 `skills/spec-compound/**`，应更新 `CHANGELOG.md`，并在 closeout 说明是否刷新 generated runtime mirrors。
 - 如果实施发现 `CONTEXT.md`/ADR 写入必须成为用户显式能力，应先回到 planning 或 PRD，不在本方案内扩大。
 - 如果 `CONCEPTS.md` 被更新，full compound mode 的 discoverability check 应检查 host instruction 是否让 agent 能找到该 advisory vocabulary；lightweight mode 只输出 tip。
+- **实施前 Dirty Worktree 检查清单**：(1) `git diff --name-only HEAD` 确认当前改动范围；(2) 将无关改动 stash 或创建隔离 worktree；(3) 实施完成后只 stage 本计划 Files 列表中的文件；(4) commit 前运行 `git diff --name-only --staged` 核验文件范围。
 
 ---
 
