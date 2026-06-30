@@ -47,7 +47,7 @@ Before asking planning questions, search `docs/brainstorms/` for files matching 
 
 **Origin grade:** For each candidate, read minimal frontmatter to classify its origin grade:
 
-- `artifact_kind: prd-requirements` with a ready receipt (`can_enter_spec_plan: yes`) → **PRD-grade**. Label it clearly when presenting options and record `origin_grade: prd` in the produced plan frontmatter.
+- `artifact_kind: prd-requirements` with `can_enter_spec_plan: yes` → **PRD-grade candidate**. Label it clearly when presenting options and record `origin_grade: prd` in the produced plan frontmatter, but treat that as source category only until the consumer receipt verification below sets `origin_verification_status: verified`.
 - No `artifact_kind`, brainstorm-only frontmatter, or any other kind → **brainstorm-grade**. Record `origin_grade: brainstorm` in the plan frontmatter. Brainstorm-grade is a valid direct planning input; do not reject or block it.
 - Legacy documents without `spec_id` or `artifact_kind` → record `origin_grade: legacy` in the plan frontmatter.
 
@@ -61,7 +61,14 @@ If a relevant requirements document exists:
 
 1. Read it thoroughly
 2. Announce that it will serve as the origin document for planning
-3. Carry forward all of the following:
+3. If the origin uses `artifact_kind: prd-requirements`, run a consumer-only receipt verification before treating R/AE/Scope/Evidence as confirmed:
+
+   ```bash
+   node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path> --verify-receipt
+   ```
+
+   Use every locatable path from the origin frontmatter `source_inputs:` (or legacy `prd_input:`) as `--inputs`; if no input path is locatable, run the command only when useful for diagnostics but record `origin_verification_status: degraded` with reason `input_side_recheck_degraded`. A zero exit means `origin_verification_status: verified`. A non-zero exit means `unverified` or `degraded`; read stdout JSON for `reason_codes`, route back to `$spec-prd` or `$spec-doc-review`, or continue only with an explicit degraded assumption. Do not use `--check-only` as a consumer pass signal: checkpoint closeout can exit cleanly while still being not planning-ready.
+4. Carry forward all of the following:
    - `spec_id` when the origin frontmatter contains one. Preserve it exactly in the plan frontmatter; it is the cross-artifact identity for this spec chain.
    - Problem frame
    - Actors (A-IDs), Key Flows (F-IDs), and Acceptance Examples (AE-IDs) when present; preserve these as constraints that implementation units must honor
@@ -70,15 +77,17 @@ If a relevant requirements document exists:
    - Key decisions and rationale
    - Dependencies or assumptions
    - Outstanding questions, preserving whether they are blocking or deferred
-   - If the origin uses `artifact_kind: prd-requirements`, treat it as a PRD-grade requirements origin, not as a separate planning artifact class; inherit the existing `spec_id`, R/F/AE references, Scope Boundaries, Evidence And Assumptions, trace self-check summary, and any project-local `US-*` / `FEAT-*` / `NFR-*` auxiliary trace mappings instead of rebuilding identity or silently dropping trace gaps.
+   - If the origin uses `artifact_kind: prd-requirements`, treat it as a PRD-grade requirements origin, not as a separate planning artifact class. Inherit the existing `spec_id`, R/F/AE references, Scope Boundaries, Evidence And Assumptions, trace self-check summary, and any project-local `US-*` / `FEAT-*` / `NFR-*` auxiliary trace mappings as confirmed only when `origin_verification_status: verified`; when `unverified` or `degraded`, preserve the IDs as advisory trace, record `unverified-prd-origin`, and do not silently convert origin R/AE/Scope into confirmed plan scope.
    - If that PRD-grade origin includes `## Feature Slices`, preserve feature IDs, requirement refs, acceptance refs, and source/evidence pointers in the plan Context, Sources, Requirements, or Implementation Units where relevant. Feature slices are PRD-origin trace, not a new planning-owned artifact class.
    - If the origin uses `document_role: split-summary`, treat it as a navigation and boundary artifact; do not default to implementation planning from it. Prefer a concrete `document_role: child-prd` source, and preserve `child_id`, `parent_spec_id`, `source_prd`, and `split_summary` trace in the plan Context / Sources.
    - If the origin is a review or audit report and the plan addresses specific findings, carry those finding ids into plan frontmatter through `referenced_reviews[].addresses_findings` or `referenced_reviews[].deferred_findings` as defined in `docs/contracts/workflows/review-closure-traceability.md`.
-4. Use the source document as the primary input to planning and research
-5. Reference important carried-forward decisions in the plan with `(see origin: <source-path>)`
-6. Do not silently omit source content. Before finalizing, scan each section of the origin document to verify nothing was dropped.
+5. Use the source document as the primary input to planning and research
+6. Reference important carried-forward decisions in the plan with `(see origin: <source-path>)`
+7. Do not silently omit source content. Before finalizing, scan each section of the origin document to verify nothing was dropped.
 
-When planning from a PRD-grade origin, run a PRD handoff entropy check before inventing WHAT. If the plan would need to choose a canonical term, source-of-truth, domain ownership, hard decision consequence, missing slice acceptance, missing slice source, or missing slice scope that the PRD did not settle, route to PRD refine or emit an inline PRD feedback candidate instead of deciding it in the plan. Keep this as a handoff boundary only: do not run a separate grill workflow in `spec-plan`, do not copy the full `spec-prd` readiness lens or Feature Slice Pack, do not generate program slices or task packs during planning, and do not auto-write back to the PRD.
+For a PRD-grade origin, also write a compact Downstream Sync Impact Map in the plan context or assumptions when source/design/owner-decision/R/AE changes could make existing plans, task packs, or work stale. If the impact cannot be determined, record `downstream_sync_unknown` rather than inventing freshness.
+
+When planning from a PRD-grade origin, run a PRD handoff entropy check before inventing WHAT. If the plan would need to choose a canonical term, source-of-truth, domain ownership, hard decision consequence, missing slice acceptance, missing slice source, or missing slice scope that the PRD did not settle, route to PRD refine or emit an inline PRD feedback candidate instead of deciding it in the plan. Keep this as a handoff boundary only: do not run a separate grill workflow in `spec-plan`, do not copy the full `spec-prd` readiness lens or Feature Slice Pack, do not generate program slices or task packs during planning, and do not auto-write back to the PRD. On Codex, this receipt verification is mandatory handoff discipline but not hook-enforced; if it cannot run, say that the path is degraded and do not present the origin as verified.
 
 If the origin requirements document is a legacy document without `spec_id`, do not edit the origin by default. Generate a new plan-local `spec_id`, note in the plan that origin identity was not inherited, and treat the requirements-to-plan link as weak trace. If the user explicitly asks to backfill the origin requirements document, handle that as a separate scoped edit.
 

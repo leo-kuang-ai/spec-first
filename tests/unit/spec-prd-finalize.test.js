@@ -9,7 +9,7 @@ const {
   buildReport,
   BLOCKING_REASON_CODES,
 } = require('../../skills/spec-prd/scripts/check-prd-artifact');
-const { finalizePrd } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
+const { finalizePrd, verifyPrdReceipt } = require('../../skills/spec-prd/scripts/finalize-prd-artifact');
 
 const FINALIZE_SCRIPT = path.join(__dirname, '..', '..', 'skills', 'spec-prd', 'scripts', 'finalize-prd-artifact.js');
 
@@ -61,6 +61,18 @@ In scope: 新页面。
 | Type | Item | Evidence |
 |---|---|---|
 | confirmed-source | 当前入口存在 | source |
+
+## Outstanding Questions
+
+| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |
+|---|---|---|---|---|---|---|---|
+| OQ-10 | Owner confirmed target page behavior | Requirements | no | owner-answered | no | closed | see Owner Decision Trace |
+
+## Owner Decision Trace
+
+| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |
+|---|---|---|---|---|---|
+| Owner confirmed target page behavior | owner | show new page | Requirements | R-10 and AE-10 are stable | closed |
 
 ## Readiness Self-Check
 
@@ -150,10 +162,11 @@ date: 2026-06-25
 
       expect(receipt.can_finalize).toBe(false);
       expect(receipt.blocking_reason_codes).toEqual(expect.arrayContaining([
-        'core_section_missing',
         'write_mode_undeclared',
         'can_enter_spec_plan_undeclared',
       ]));
+      expect(receipt.blocking_reason_codes).not.toContain('core_section_missing');
+      expect(receipt.checker.reason_codes).toContain('template_structure_hint');
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -243,15 +256,10 @@ date: 2026-06-25
     try {
       write(prdPath, validReadyIntentPrd()
         .replace('- preflight_sweep_closure: closed', '- preflight_sweep_closure: degraded')
-        .replace('## Readiness Self-Check', [
-          '## Outstanding Questions',
-          '',
-          '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
-          '|---|---|---|---|---|---|---|---|',
+        .replace(
+          '| OQ-10 | Owner confirmed target page behavior | Requirements | no | owner-answered | no | closed | see Owner Decision Trace |',
           '| OQ-10 | Owner must choose fallback behavior | Requirements | yes |  | yes | unclosed | TBD |',
-          '',
-          '## Readiness Self-Check',
-        ].join('\n')));
+        ));
 
       const receipt = finalizePrd(prdPath, [], { checkOnly: true });
 
@@ -303,6 +311,149 @@ date: 2026-06-25
       expect(report.facts.ready_receipt_present).toBe(true);
       expect(report.facts.ready_receipt_current).toBe(true);
       expect(report.facts.blocking_reason_codes).toEqual([]);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--verify-receipt verifies a current ready receipt without writing', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-ready-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'input.md');
+
+    try {
+      write(inputPath, 'source evidence\n');
+      write(prdPath, validReadyIntentPrd());
+      expect(finalizePrd(prdPath, [inputPath]).status).toBe('finalized');
+      const before = fs.readFileSync(prdPath, 'utf8');
+      const beforeStat = fs.statSync(prdPath).mtimeMs;
+
+      const verification = verifyPrdReceipt(prdPath, [inputPath]);
+      const after = fs.readFileSync(prdPath, 'utf8');
+      const afterStat = fs.statSync(prdPath).mtimeMs;
+
+      expect(verification.verified).toBe(true);
+      expect(verification.origin_verification_status).toBe('verified');
+      expect(verification.reason_codes).toEqual([]);
+      expect(after).toBe(before);
+      expect(afterStat).toBe(beforeStat);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--verify-receipt does not treat checkpoint closeout as verified origin', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-checkpoint-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'input.md');
+
+    try {
+      write(inputPath, 'source evidence\n');
+      write(prdPath, validReadyIntentPrd()
+        .replace('- write_mode: final-prd', '- write_mode: checkpoint-prd')
+        .replace('- can_enter_spec_plan: yes', '- can_enter_spec_plan: no'));
+
+      const closeout = finalizePrd(prdPath, [inputPath], { checkOnly: true });
+      expect(closeout.should_block_closeout).toBe(false);
+
+      const verification = verifyPrdReceipt(prdPath, [inputPath]);
+      expect(verification.verified).toBe(false);
+      expect(verification.origin_verification_status).toBe('unverified');
+      expect(verification.reason_codes).toContain('can_enter_spec_plan_not_yes');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--verify-receipt requires prd-requirements artifact kind', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-wrong-kind-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'input.md');
+
+    try {
+      write(inputPath, 'source evidence\n');
+      write(prdPath, validReadyIntentPrd()
+        .replace('artifact_kind: prd-requirements', 'artifact_kind: eval-sample'));
+      const finalizePreview = finalizePrd(prdPath, [inputPath], { checkOnly: true });
+      expect(finalizePreview.can_closeout).toBe(false);
+
+      const verification = verifyPrdReceipt(prdPath, [inputPath]);
+      expect(verification.verified).toBe(false);
+      expect(verification.origin_verification_status).toBe('unverified');
+      expect(verification.artifact_kind).toBe('eval-sample');
+      expect(verification.reason_codes).toContain('artifact_kind_missing_or_wrong');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--verify-receipt degrades without inputs even when receipt hashes currently match empty inputs', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-no-inputs-requirements.md');
+
+    try {
+      write(prdPath, validReadyIntentPrd());
+      expect(finalizePrd(prdPath, []).status).toBe('finalized');
+
+      const verification = verifyPrdReceipt(prdPath, []);
+      expect(verification.verified).toBe(false);
+      expect(verification.origin_verification_status).toBe('degraded');
+      expect(verification.reason_codes).toContain('input_side_recheck_degraded');
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('--verify-receipt CLI exit codes distinguish verified, unverified, degraded, and usage', () => {
+    const tempDir = makeTempDir();
+    const prdPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-cli-requirements.md');
+    const checkpointPath = path.join(tempDir, 'docs', 'brainstorms', 'verify-cli-checkpoint-requirements.md');
+    const inputPath = path.join(tempDir, 'source_docs', 'input.md');
+
+    try {
+      write(inputPath, 'source evidence\n');
+      write(prdPath, validReadyIntentPrd());
+      expect(finalizePrd(prdPath, [inputPath]).status).toBe('finalized');
+
+      const verified = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--inputs',
+        inputPath,
+        '--verify-receipt',
+      ], { encoding: 'utf8' });
+      expect(verified.status).toBe(0);
+      expect(JSON.parse(verified.stdout).origin_verification_status).toBe('verified');
+
+      write(checkpointPath, validReadyIntentPrd()
+        .replace('- write_mode: final-prd', '- write_mode: checkpoint-prd')
+        .replace('- can_enter_spec_plan: yes', '- can_enter_spec_plan: no'));
+      const unverified = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        checkpointPath,
+        '--inputs',
+        inputPath,
+        '--verify-receipt',
+      ], { encoding: 'utf8' });
+      expect(unverified.status).toBe(1);
+      expect(JSON.parse(unverified.stdout).origin_verification_status).toBe('unverified');
+
+      const degraded = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--verify-receipt',
+      ], { encoding: 'utf8' });
+      expect(degraded.status).toBe(1);
+      expect(JSON.parse(degraded.stdout).reason_codes).toContain('input_side_recheck_degraded');
+
+      const usage = spawnSync(process.execPath, [
+        FINALIZE_SCRIPT,
+        prdPath,
+        '--verify-receipt',
+        '--check-only',
+      ], { encoding: 'utf8' });
+      expect(usage.status).toBe(2);
+      expect(usage.stderr).toContain('--verify-receipt cannot be combined');
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -471,7 +622,7 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
   //  possible_misclassified_how_pushdown 等都必须留在 advisory,永不进 BLOCKING)。
   it('freezes the exact BLOCKING_REASON_CODES set (KTD14 audit invariant)', () => {
     const frozen = [
-      'core_section_missing',
+      'machine_section_identity_missing',
       'forbidden_prds_path',
       'write_mode_undeclared',
       'clarification_evidence_undeclared',
@@ -630,6 +781,7 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       ],
     });
     expect(blockingSetOf(shape1907)).toEqual([
+      'machine_section_identity_missing',
       'open_oq_without_owner_closure',
       'owner_decision_trace_required_but_absent',
       'preflight_closure_contradicted',
@@ -647,6 +799,7 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
     });
     expect(blockingSetOf(pushdown)).toEqual([
       'how_pushdown_touches_what',
+      'machine_section_identity_missing',
       'owner_decision_trace_required_but_absent',
       'preflight_closure_contradicted',
       'ready_receipt_absent',
@@ -668,6 +821,7 @@ describe('spec-prd checker BLOCKING freeze + characterization (U7/R20)', () => {
       'design_source_inventory_undeclared',
       'design_sources_read_undeclared',
       'design_unread_without_owner_acceptance',
+      'machine_section_identity_missing',
       'owner_decision_trace_required_but_absent',
       'preflight_closure_contradicted',
       'ready_receipt_absent',
@@ -1075,12 +1229,13 @@ spec_id: stdin-fixture
     const report = JSON.parse(result.stdout);
     // 一次性暴露全部 blocking codes(写前就能看到,而非被 Stop hook 一个一个拦)
     expect(report.facts.blocking_reason_codes).toEqual(expect.arrayContaining([
-      'core_section_missing',
       'write_mode_undeclared',
       'can_enter_spec_plan_undeclared',
       'clarification_evidence_undeclared',
       'preflight_sweep_closure_absent',
     ]));
+    expect(report.facts.blocking_reason_codes).not.toContain('core_section_missing');
+    expect(report.findings.map((finding) => finding.reason_code)).toContain('template_structure_hint');
     expect(report.findings.length).toBeGreaterThan(5);
   });
 

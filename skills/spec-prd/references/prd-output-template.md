@@ -9,6 +9,8 @@ This file owns the output shape, section skeleton, surface lenses, and embedded 
 - [Default Frontmatter](#default-frontmatter)
 - [Output Shape](#output-shape)
 - [Core Sections](#core-sections)
+- [Clarification Checklist Display Protocol](#clarification-checklist-display-protocol)
+- [Engineering Clarification Coverage Pack](#engineering-clarification-coverage-pack)
 - [Conditional Sections](#conditional-sections)
 - [Surface Lenses](#surface-lenses)
 - [Product Expert Lens Write-In](#product-expert-lens-write-in)
@@ -27,6 +29,8 @@ artifact_kind: prd-requirements
 target_surface: generic
 status: draft
 evidence_grade: mixed
+source_authority: product-owned | engineering-owned | mixed | unknown
+readiness_authority: engineering-owned
 created: YYYY-MM-DD
 source_inputs:
   - path/to/original-input.md
@@ -64,7 +68,66 @@ Every PRD artifact includes the standard core sections unless it is a route-out/
 
 Compact PRDs may omit non-load-bearing conditional detail, but they still need enough evidence, acceptance, and scope boundary for planning. Bypass output writes no PRD artifact.
 
-Keep the canonical English anchor token in every core-section heading even when writing a localized PRD: the deterministic `check-prd-artifact.js` matches each heading on that token. A localized gloss is fine when it follows the anchor — `## Summary（文档概要）` or `## Change Delta 变更范围` both anchor — but a heading that drops the English token (for example `## 一、文档概要`) reports `core_section_missing` and blocks readiness. Do not freelance a section structure that omits these anchors.
+Keep every core section machine-locatable with either the canonical heading (`## Summary`) or a section id comment immediately before a localized heading, for example `<!-- prd:section=summary -->` followed by `## 需求概述`. Ordinary core-section gaps produce advisory `template_structure_hint` findings; final-ready machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must still be locatable or the checker blocks with `machine_section_identity_missing`.
+
+## Clarification Checklist Display Protocol
+
+Show the selected `clarification_view` and its checklist before or during authoring when it helps the owner see what is being clarified. The checklist is a human-facing display surface: it names likely questions, surfaces omissions, and routes unresolved items into existing PRD sections. It is not a script-owned quality score, not a required heading set, and not a `BLOCKING_REASON_CODES` source.
+
+Use these views without creating a second template tree:
+
+| clarification_view | Use when | Display focus |
+| --- | --- | --- |
+| `Generic` | Surface is unknown or narrow enough for the core skeleton | target user, change delta, requirements, acceptance, scope, evidence, OQ closure |
+| `App` | Native/mobile client behavior changes | entry, navigation, state, copy, loading/empty/error, permissions, rollout, accessibility, i18n |
+| `H5/PC` | Web or desktop-browser surface changes | routes, forms, browser back/refresh, responsive viewports, login/session state, sharing/SEO when relevant |
+| `Admin` | Internal operations, review, or management surfaces | menu placement, roles, list/search/filter/export, forms, audit, bulk action, maker-checker when relevant |
+| `Backend/Java` | Service/platform behavior visible to products or downstream consumers | state semantics, idempotency, compatibility, error outcomes, observability expectations, operational readiness |
+| `CLI/DevTool` | Developer or agent-facing command/workflow changes | command entry, args/config, preview-first, logs, cross-platform behavior, failure recovery, upgrade/runtime projection |
+| `Mixed` | Cross-surface or producer/consumer changes | source-of-truth, cross-surface consistency, contract expectations, async sync, degradation, end-to-end acceptance |
+
+## Engineering Clarification Coverage Pack
+
+For P0, include a compact Coverage Pack in `Evidence And Assumptions`, `Readiness Self-Check`, or closeout when the PRD would otherwise hide planning-critical uncertainty. Each row carries `status`, `source_tag`, `evidence_ref`, `deferred_owner`, and `deferred_unblock_condition`. `status=filled` still needs a source tag and evidence ref; otherwise it is only self-claiming prose. Scripts may report deterministic structure facts, but they do not validate coverage-pack semantics.
+
+| coverage item | What it proves for planning |
+| --- | --- |
+| `source_authority` | Whether product-owned input, engineering-owned source evidence, or a mixed authority trail owns the claim |
+| `current_state` | Which current-system facts were confirmed, candidate-only, or unresolved |
+| `change_delta` | What is kept, extended, replaced, removed, or unknown |
+| `requirements_acceptance` | Which R/AE links are closed and which carry explicit trace gaps |
+| `owner_oq_trace` | Which owner decisions or OQs still affect WHAT, acceptance, scope, authority, or defaults |
+| `evidence_refs` | Which source/design/owner refs planning must re-read or can treat as confirmed |
+
+For medium/high/regulated risk, UI-heavy, tool/export-heavy, workflow/contract, or mixed-surface PRDs, expand to the full 16-dimension Coverage Pack, the full LLM-owned coverage lens below. This is not a universal template and not a checker gate; use only rows that reduce planning invention and collapse clearly irrelevant rows to `not-applicable` with a short reason.
+
+| full coverage item | What planning needs to know |
+| --- | --- |
+| `source_authority` | product-owned, engineering-owned, mixed, or unknown authority for each load-bearing claim |
+| `current_state` | confirmed current behavior, candidate-only facts, contradictions, and stale evidence |
+| `change_delta` | keep/extend/replace/remove/unknown boundaries |
+| `requirements_acceptance` | R/AE trace closure or explicit trace gaps |
+| `scope_boundaries` | in scope, out of scope, no-gos, rabbit holes, and appetite when risk warrants it |
+| `owner_oq_trace` | owner-owned decisions, recommended defaults, accepted assumptions, and unresolved blockers |
+| `stakeholders_actors` | beneficiary, operator, admin, downstream consumer, owner, and support roles when distinct |
+| `interaction_exception` | states, errors, empty/loading/permission, retry, cancellation, partial success, and failure visibility |
+| `data_compliance_security` | privacy, permissions, audit, compliance, money/trading, data sensitivity, retention, and export boundaries |
+| `nfr_operational` | product-level performance, reliability, observability, rollout, backout, and support expectations |
+| `design_source` | design refs read/unread/degraded, affected PRD write targets, and readiness consequence |
+| `cross_surface_consistency` | producer/consumer, source-of-truth, async sync, mixed surface consistency, and allowed differences |
+| `release_rollout` | feature flags, gray release, user cohorts, migration, compatibility, and rollback user impact |
+| `regression_guard` | unchanged behavior, old data, old clients, old commands, and negative acceptance |
+| `handoff_context_slice` | concise source refs, decisions, constraints, trace gaps, and recheck items for `spec-plan` |
+| `supporting_evidence_refs` | first-class index of source/design/owner/external refs with authority and freshness |
+
+Suggested row shape:
+
+```markdown
+| coverage_item | status | source_tag | evidence_ref | deferred_owner | deferred_unblock_condition |
+| --- | --- | --- | --- | --- | --- |
+```
+
+`status` values should stay human-readable: `filled`, `not-applicable`, `deferred-with-owner`, `deferred-with-source-recheck`, or `degraded`. Do not use this table to self-certify readiness; weak rows are readiness/doc-review concerns only when they leave planning to invent WHAT.
 
 ## Conditional Sections
 
@@ -365,8 +428,62 @@ Run these only when the input surface warrants them and the detail reduces plann
 | Design / UX Evidence Hook | App/H5/PC/Admin, screenshots, design links, exported design context, page description, or interaction-state input | use `design-source-evidence.md` External Evidence Interface to choose `Interaction Requirements`, `Use Cases`, `Acceptance Examples`, `Evidence And Assumptions`, or `Planning Recheck`; list `design_source_inventory`, `design_sources_read`, `design_sources_unread`, `source_or_node`, `read_status`, PRD write target, evidence level, unread reason, and readiness consequence |
 | Prioritization / Release Slice | Many requirements, multiple goals, multi-surface scope, or release order affects scope or acceptance | `Feature Slices`, `Scope Boundaries`, `Release / Operation Readiness` |
 | Change Management | `resume-prd`, existing PRD path, multi-round refine, new meeting/screenshot/review conclusion, or changed owner decision | `Change Delta`, `Decision Notes`, `Evidence And Assumptions` |
+| Requirements Quality Rubric | PRD wording is vague, multi-meaning, too broad, mixed with HOW, or hard to test | rewrite Requirements / Acceptance Examples; use Necessary, Single, Unambiguous, Complete, Feasible, Verifiable, and WHAT-not-HOW as review words, not scoring fields |
+| Clarification Risk Tier | scope, compliance, money/trading, mixed-surface, migration, runtime, or owner ambiguity affects how deep to clarify | `Readiness Self-Check`, `Evidence And Assumptions`, and triggered conditional sections |
+| Living Requirements Lifecycle | existing PRD is updated, superseded, reopened, partially invalidated, or consumed by downstream plans/tasks | `Change Delta`, `Decision Notes`, `Evidence And Assumptions`, closeout summary |
+| Interaction Analysis | requirements conflict, duplicate, hide assumptions, mismatch terminology, or miss edge cases | `Requirements`, `Acceptance Examples`, `Decision Notes`, `Outstanding Questions` |
+| Regression Guard | bugfix, brownfield increment, replace/remove, runtime/tooling, or compatibility-sensitive change | `Scope Boundaries`, `Negative Acceptance`, `Acceptance Examples`, `Release / Operation Readiness` |
+| Supporting Evidence Refs | source/design/owner/external refs are numerous or authority/freshness differs | `Evidence And Assumptions`, `Planning Recheck`, closeout summary |
+| Handoff Context Slice | downstream `spec-plan` should not re-read the whole PRD to find decisions and trace gaps | closeout summary or `Readiness Self-Check` |
 
 Actor alignment distinguishes beneficiary, operator, admin, downstream consumer, and owner only when the distinction changes WHAT or acceptance. Design evidence loads `design-source-evidence.md` and consumes only its External Evidence Interface, especially `extracted_design_what` and `affected_PRD_write_targets`; the detailed extraction list stays in that reference. Fetched design context remains `source-candidate` / `provider_untrusted` until source/owner reconciliation; unresolved design claims go to `Planning Recheck` or `Outstanding Questions`. It routes consistency audit to `spec-app-consistency-audit`; PRD/design-source/source consistency remains outside `spec-prd`. Release slices are PRD handoff units, never tasks or implementation units. Change Management preserves stable R/AE IDs and records added, replaced, deprecated, or still-unconfirmed deltas instead of silently rewriting old requirements.
+
+`clarification_risk_tier` is LLM-owned and advisory. Use `low` for narrow source-resolved increments, `medium` for ordinary feature changes with owner decisions, `high` for mixed-surface/migration/source-of-truth/runtime or broad release risk, and `regulated` for money movement, trading, privacy, legal/compliance, audit, or safety-sensitive scope. Higher tier increases review/eval depth; it does not bypass owner-owned blockers or machine receipts.
+
+`clarification_budget` and `review_gate_mode` right-size the expression, not the truth requirement. Suggested values:
+
+| field | values | meaning |
+| --- | --- | --- |
+| `intake_mode` | feature / bugfix / design-first / requirements-first / quick-compact | why this run entered PRD clarification |
+| `clarification_budget` | compact / standard / deep | how much explanatory surface is warranted |
+| `review_gate_mode` | self-check / doc-review / fresh-source-eval / owner-review | what review posture is expected before planning |
+
+Living lifecycle fields are optional unless the PRD updates an existing requirements artifact; use `requirements_lifecycle` to name the lifecycle status:
+
+```text
+requirements_lifecycle: baseline | supersedes | amendment | reopened | invalidated | archived
+supersedes:
+reopened_reason:
+invalidation_condition:
+last_validated:
+downstream_sync_impact:
+```
+
+Use `downstream_sync_unknown` when affected plans/tasks/artifacts cannot be determined from current evidence. Do not claim downstream sync is complete without direct source or deterministic artifact evidence.
+
+Supporting evidence refs should be indexed when the PRD has more than a few sources:
+
+```markdown
+| ref_id | source_type | authority | freshness | consumed_by | notes |
+| --- | --- | --- | --- | --- | --- |
+```
+
+`source_type` may be `product-prd`, `owner-answer`, `source-code`, `test`, `design`, `external-research`, or `prior-artifact`. `authority` and `freshness` are LLM-owned judgments over evidence, not checker facts.
+
+The handoff context slice is a compact downstream reading map:
+
+```text
+handoff_context_slice:
+- confirmed WHAT:
+- owner decisions:
+- accepted assumptions:
+- source refs to re-read:
+- unresolved WHAT blockers:
+- planning recheck items:
+- degraded facts:
+```
+
+Do not put implementation steps, file lists, or task sequencing in the handoff context slice; that is `spec-plan` territory.
 
 ## Context / ADR Notes
 

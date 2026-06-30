@@ -5,6 +5,8 @@
 // P2: 三阶段函数 gateReadyClaims — 无需整份 PRD fixture,直接传构造 facts 对象即可断言
 
 const {
+  buildReport,
+  parseStructure,
   gateReadyClaims,
   looksLikeCheckableRef,
   traceRowBindsOq,
@@ -16,6 +18,80 @@ const {
   TRACE_HEADER_ALIASES,
   WHAT_TOUCHING_KEYWORDS,
 } = require('../../skills/spec-prd/scripts/check-prd-artifact');
+
+function sectionIdChineseReadyPrd(overrides = {}) {
+  const readiness = overrides.readiness || [
+    '- write_mode: final-prd',
+    '- clarification_evidence: asked-owner',
+    '- can_enter_spec_plan: yes',
+    '- preflight_sweep_closure: closed',
+    '- decision_card_highest_risk_gap: owner confirmed fallback',
+    '- decision_card_next_action: final-prd',
+    '- decision_card_why_no_invention: OQ-01 is closed by owner trace',
+  ];
+  return [
+    '---',
+    'artifact_kind: prd-requirements',
+    'spec_id: section-id-fixture',
+    'title: Section ID Fixture',
+    'date: 2026-06-30',
+    ...(overrides.frontmatter || []),
+    '---',
+    '',
+    '# Section ID Fixture',
+    '',
+    '<!-- prd:section=summary -->',
+    '## 需求概述',
+    '纯中文标题,依靠 section id 提供机器 identity。',
+    '',
+    '<!-- prd:section=change_delta -->',
+    '## 变更差异',
+    '| item | current | target | delta | evidence |',
+    '| --- | --- | --- | --- | --- |',
+    '| x | old | new | extend | user-stated |',
+    '',
+    '<!-- prd:section=requirements -->',
+    '## 需求列表',
+    '| ID | Priority | Requirement | Source |',
+    '| --- | --- | --- | --- |',
+    '| R-01 | P0 | 展示 fallback 状态 | user-stated |',
+    '',
+    '<!-- prd:section=acceptance_examples -->',
+    '## 验收样例',
+    '| ID | Covers | Example |',
+    '| --- | --- | --- |',
+    '| AE-01 | R-01 | Given fallback When page opens Then show fallback copy |',
+    '',
+    '<!-- prd:section=scope_boundaries -->',
+    '## 范围边界',
+    'In scope: fallback copy.',
+    '',
+    '<!-- prd:section=evidence_assumptions -->',
+    '## 证据与假设',
+    '| Type | Item | Evidence |',
+    '| --- | --- | --- |',
+    '| assumption | fallback copy | owner |',
+    '',
+    '<!-- prd:section=outstanding_questions -->',
+    '## 未决问题',
+    '| id | question | PRD write target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended default |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |',
+    '| OQ-01 | fallback copy source | Requirements | no | owner-answered | no | closed | OQ-01 owner trace |',
+    '',
+    '<!-- prd:section=owner_decision_trace -->',
+    '## Owner 决策追踪',
+    '| question | owner_answer/source | chosen_answer | PRD write target | consequence | closure_state |',
+    '| --- | --- | --- | --- | --- | --- |',
+    '| fallback copy source | owner | use owner copy | Requirements | R-01 copy fixed | closed |',
+    ...(overrides.ownerTraceRows || []),
+    '',
+    ...(overrides.extraSections || []),
+    '<!-- prd:section=readiness_self_check -->',
+    '## 就绪自检',
+    ...readiness,
+    '',
+  ].join('\n');
+}
 
 describe('looksLikeCheckableRef', () => {
   test('URL 形似可核查引用', () => {
@@ -121,6 +197,228 @@ describe('matchHeadingTitle / stripHeadingDecoration', () => {
   test('stripHeadingDecoration 剥离序号装饰', () => {
     expect(stripHeadingDecoration('一、需求概要')).toBe('需求概要');
     expect(stripHeadingDecoration('## Summary')).toBe('Summary');
+  });
+});
+
+describe('section id identity and localized PRD facts', () => {
+  test('section-id lets pure Chinese headings satisfy core sections and derived facts', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-requirements.md',
+      sectionIdChineseReadyPrd(),
+    );
+
+    expect(report.facts.core_sections_missing).toEqual([]);
+    expect(report.facts.core_sections_present).toEqual([
+      'Summary',
+      'Change Delta',
+      'Requirements',
+      'Acceptance Examples',
+      'Scope Boundaries',
+      'Evidence And Assumptions',
+    ]);
+    expect(report.facts.uncovered_requirements).toEqual([]);
+    expect(report.facts.assumption_row_count).toBe(1);
+    expect(report.facts.priority_distribution).toEqual({ P0: 1 });
+    expect(report.facts.outstanding_questions_present).toBe(true);
+    expect(report.facts.outstanding_questions_count).toBe(1);
+    expect(report.facts.owner_decision_trace_present).toBe(true);
+    expect(report.facts.open_oq_without_owner_closure_count).toBe(0);
+    expect(report.facts.blocking_reason_codes).not.toContain('core_section_missing');
+    expect(report.facts.blocking_reason_codes).not.toContain('machine_section_identity_missing');
+  });
+
+  test('parseStructure prdShaped uses section-id rather than English heading tokens only', () => {
+    const structure = parseStructure(
+      'docs/brainstorms/section-id-requirements.md',
+      sectionIdChineseReadyPrd(),
+    );
+
+    expect(structure.missingCoreSections).toEqual([]);
+    expect(structure.uncoveredRequirements).toEqual([]);
+    expect(structure.prdShaped).toBe(true);
+  });
+
+  test('section-id drives planning recheck and feature slice derived facts', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-derived-facts-requirements.md',
+      sectionIdChineseReadyPrd({
+        extraSections: [
+          '<!-- prd:section=planning_recheck -->',
+          '## 规划复核',
+          '| item | why recheck | required before | blocks planning? |',
+          '| --- | --- | --- | --- |',
+          '| source refresh | confirm current route | planning | no |',
+          '',
+          '<!-- prd:section=feature_slices -->',
+          '## 功能切片',
+          'feature_id: FS-01',
+          'title: fallback copy',
+          'requirement_refs: R-01',
+          '',
+        ],
+      }),
+    );
+
+    expect(report.facts.planning_recheck_present).toBe(true);
+    expect(report.facts.planning_recheck_count).toBe(1);
+    expect(report.facts.feature_slice_trace_gap_count).toBe(1);
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ reason_code: 'feature_slice_missing_acceptance_trace' }),
+    ]));
+  });
+
+  test('owner trace design-degraded acceptance uses section-id on pure Chinese heading', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-design-accepted-requirements.md',
+      sectionIdChineseReadyPrd({
+        ownerTraceRows: [
+          '| accept degraded Figma read for OQ-02 | owner accepted unread Figma https://figma.com/file/abc | accepted degraded design coverage | Design Source Coverage | OQ-02 accepted degraded design risk | closed |',
+        ],
+        extraSections: [
+          '<!-- prd:section=design_source_coverage -->',
+          '## 设计源覆盖',
+          'design_source_inventory:',
+          '- source_or_node: https://figma.com/file/abc',
+          '  read_status: unread',
+          '  PRD write target: Acceptance Examples',
+          '  evidence_level: provider_untrusted',
+          '  unread_reason: tool unavailable',
+          '  readiness consequence: owner accepted degraded risk in OQ-02',
+          'design_sources_read:',
+          '- none',
+          'design_sources_unread:',
+          '- https://figma.com/file/abc unread because tool unavailable',
+          'design_source_coverage: partial',
+          '',
+        ],
+      }),
+    );
+
+    expect(report.facts.design_source_refs_present).toBe(true);
+    expect(report.facts.design_degraded_owner_accepted).toBe(true);
+    expect(report.facts.blocking_reason_codes).not.toContain('design_partial_coverage_unaccepted');
+    expect(report.facts.blocking_reason_codes).not.toContain('machine_section_identity_missing');
+  });
+
+  test('orphan, unknown, and duplicate non-machine section ids are advisory findings', () => {
+    const report = buildReport(
+      'docs/brainstorms/section-id-advisory-requirements.md',
+      [
+        sectionIdChineseReadyPrd(),
+        '',
+        '<!-- prd:section=summary -->',
+        '## 另一个概要',
+        'duplicate summary id',
+        '',
+        '<!-- prd:section=unknown_section -->',
+        '## 未知区块',
+        'unknown id',
+        '',
+        '<!-- prd:section=source_inputs -->',
+        'orphan because the next nonblank line is not a heading',
+      ].join('\n'),
+    );
+
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ reason_code: 'section_id_duplicate', section: 'summary' }),
+      expect.objectContaining({ reason_code: 'section_id_unknown', section_id: 'unknown_section' }),
+      expect.objectContaining({ reason_code: 'section_id_orphaned', section: 'source_inputs' }),
+    ]));
+    expect(report.facts.blocking_reason_codes).not.toContain('section_id_duplicate');
+    expect(report.facts.blocking_reason_codes).not.toContain('section_id_unknown');
+    expect(report.facts.blocking_reason_codes).not.toContain('section_id_orphaned');
+  });
+
+  test('source_inputs is frontmatter accounting, not a valid body section id', () => {
+    const report = buildReport(
+      'docs/brainstorms/source-inputs-section-id-requirements.md',
+      [
+        sectionIdChineseReadyPrd(),
+        '',
+        '<!-- prd:section=source_inputs -->',
+        '## 错误的正文输入来源锚点',
+        'source_inputs belongs in frontmatter.',
+      ].join('\n'),
+    );
+
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ reason_code: 'section_id_unknown', section_id: 'source_inputs' }),
+    ]));
+    expect(report.facts.blocking_reason_codes).not.toContain('section_id_unknown');
+  });
+
+  test('duplicate machine-owned section id fails closed on final-ready path', () => {
+    const report = buildReport(
+      'docs/brainstorms/duplicate-machine-section-id-requirements.md',
+      [
+        sectionIdChineseReadyPrd(),
+        '',
+        '<!-- prd:section=readiness_self_check -->',
+        '## 第二个自检',
+        '- duplicate machine section',
+      ].join('\n'),
+    );
+
+    expect(report.facts.blocking_reason_codes).toContain('machine_section_identity_missing');
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'readiness_self_check',
+      }),
+    ]));
+  });
+
+  test('final-ready machine-owned sections fail closed when neither canonical heading nor section-id exists', () => {
+    const prd = sectionIdChineseReadyPrd()
+      .replace('<!-- prd:section=outstanding_questions -->\n', '')
+      .replace('<!-- prd:section=owner_decision_trace -->\n', '')
+      .replace('<!-- prd:section=readiness_self_check -->\n', '');
+    const report = buildReport('docs/brainstorms/missing-machine-section-id-requirements.md', prd);
+
+    expect(report.facts.blocking_reason_codes).toContain('machine_section_identity_missing');
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'outstanding_questions',
+      }),
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'owner_decision_trace',
+      }),
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'readiness_self_check',
+      }),
+    ]));
+  });
+
+  test('owner-owned OQ disposition requires Owner Decision Trace identity even without global asked-owner evidence', () => {
+    const prd = sectionIdChineseReadyPrd({
+      readiness: [
+        '- write_mode: final-prd',
+        '- clarification_evidence: source-proven-no-ask',
+        '- can_enter_spec_plan: yes',
+        '- preflight_sweep_closure: closed',
+        '- decision_card_highest_risk_gap: owner disposition in OQ',
+        '- decision_card_next_action: final-prd',
+        '- decision_card_why_no_invention: OQ-01 claims owner closure',
+      ],
+    })
+      .replace('<!-- prd:section=owner_decision_trace -->\n', '')
+      .replace('## Owner 决策追踪', '## 决策追踪');
+
+    const report = buildReport(
+      'docs/brainstorms/owner-oq-needs-trace-identity-requirements.md',
+      prd,
+    );
+
+    expect(report.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        reason_code: 'machine_section_identity_missing',
+        section: 'owner_decision_trace',
+      }),
+    ]));
+    expect(report.facts.blocking_reason_codes).toContain('machine_section_identity_missing');
   });
 });
 

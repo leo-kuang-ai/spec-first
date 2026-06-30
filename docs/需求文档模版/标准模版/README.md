@@ -26,6 +26,7 @@ industry: securities
 - `skills/spec-prd/references/prd-output-template.md` 是 `spec-prd` 的 **runtime authoring contract**，其中包含 core section、surface lens、project-local overlay 叠加机制和 embedded runtime skeleton，不依赖本 `docs/` 路径。
 - **分层 drift 范围**：通用骨架（core section + surface lens + overlay 叠加机制）由 `prd-output-template.md` 内置、随 workflow assets 分发，drift test 只锁定 embedded runtime skeleton 与本目录通用部分一致；证券行业 C1-C12 checklist 是本仓库项目本地 overlay 示例，不随通用 runtime 默认分发，也不是合规/法务事实源。下游项目可提供自己的本地 overlay。
 - 本目录新增或调整通用 core section、surface lens 后，应同步评估并更新 `skills/spec-prd/references/prd-output-template.md`；新增或调整证券 checklist 时，只需评估项目本地 overlay 与 docs mirror，不要求 runtime 内置。
+- 本目录里的 checklist 是澄清展示与评审提示，不是 checker 语义校验源。脚本只检查确定性结构与 machine-owned safety section；普通 core-section 缺口最多给 `template_structure_hint`，内容质量由 `$spec-prd` readiness / `$spec-doc-review` 语义判断。
 
 使用前必须先确定四个边界：
 
@@ -46,6 +47,9 @@ industry: securities
 | `10-App客户端需求模板.md` | App/客户端增量需求 | App lens（展业地/灰度/适当性/风险揭示/行情交易/多语言/交互细节） |
 | `20-Admin中后台需求模板.md` | Admin/中后台增量需求 | Admin lens（菜单/权限矩阵/任务队列/四眼复核/列表/表单/审计/导出） |
 | `30-Backend中台服务需求模板.md` | 后台/中台服务增量需求 | Backend lens（状态语义/业务契约/订单资金一致性/风控/对账/配置/上线） |
+| `40-H5-PC端需求模板.md` | H5/PC 浏览器端增量需求 | H5/PC lens（路由/表单/响应式/浏览器行为/登录态/分享/SEO） |
+| `50-CLI-DevTool需求模板.md` | CLI、开发者工具、agent-facing workflow 需求 | CLI/DevTool lens（命令/参数/preview-first/输出契约/失败恢复/双宿主） |
+| `60-Mixed跨端需求模板.md` | 多端/跨系统/producer-consumer 需求 | Mixed lens（source-of-truth/跨端一致性/异步同步/降级/E2E 验收） |
 | `90-证券行业需求关注点与参考附录.md` | 共享行业清单、枚举、术语、监管参考 | securities reference lens |
 
 选模板步骤：
@@ -53,13 +57,7 @@ industry: securities
 1. 先判断 surface。单端明确 → 用对应 lens 模板；多端/跨系统 → 用 `00-通用` + 按需叠加多个 lens 的关注点。
 2. 所有 lens 模板都以 `00-通用` 的 **core section** 为底；lens 模板只在其上叠加 surface 专属 section。
 3. 写任何证券行业 PRD 前，先读 `90-证券行业需求关注点与参考附录.md` 的横切清单；命中的行业项必须回填到正文。
-4. **H5/PC、CLI/DevTool、Mixed 不单独建模板**（原始素材未覆盖，不臆造）：用 `00-通用` 模板，叠加下表关注点。
-
-| 未建专属模板的 surface | 用什么 | 关注点叠加 |
-| --- | --- | --- |
-| H5/PC | `00-通用` | 路由、表单、响应式、浏览器返回、登录态、刷新、SEO/分享、多视口、风险揭示展示一致性 |
-| CLI/DevTool | `00-通用` | 命令入口、参数、配置、dry-run/preview-first、日志、跨平台、失败恢复、升级路径 |
-| Mixed/跨端 | `00-通用` + 多 lens | source-of-truth、跨端一致性、契约期望、异步同步、降级策略、端到端验收 |
+4. **H5/PC、CLI/DevTool、Mixed 已按扁平文件命名补齐专属 human-facing 模板**。它们仍以 `00-通用` 的 core section 为底，只补 surface 专属澄清视图；不构成第二 runtime template tree。
 
 ## 三、证券 PRD 的最小完成标准
 

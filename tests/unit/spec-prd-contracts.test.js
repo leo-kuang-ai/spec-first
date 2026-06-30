@@ -41,6 +41,9 @@ const SPEC_PLAN_PATH = path.join(REPO_ROOT, 'skills', 'spec-plan', 'SKILL.md');
 const SPEC_PLAN_PLANNING_FLOW_PATH = path.join(REPO_ROOT, 'skills', 'spec-plan', 'references', 'planning-flow.md');
 const HUMAN_TEMPLATE_INDEX_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', 'README.md');
 const HUMAN_TEMPLATE_CORE_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', '00-通用增量需求模板.md');
+const HUMAN_TEMPLATE_H5_PC_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', '40-H5-PC端需求模板.md');
+const HUMAN_TEMPLATE_CLI_DEVTOOL_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', '50-CLI-DevTool需求模板.md');
+const HUMAN_TEMPLATE_MIXED_PATH = path.join(REPO_ROOT, 'docs', '需求文档模版', '标准模版', '60-Mixed跨端需求模板.md');
 const USER_MANUAL_PATH = path.join(
   REPO_ROOT,
   'docs',
@@ -95,6 +98,13 @@ const FRESH_SOURCE_EVAL_CLARIFICATION_EVIDENCE_PATH = path.join(
   'validation',
   'spec-prd',
   'fresh-source-eval-2026-06-24-clarification-evidence.md',
+);
+const FRESH_SOURCE_EVAL_SKILL_OPTIMIZATION_P2_PATH = path.join(
+  REPO_ROOT,
+  'docs',
+  'validation',
+  'spec-prd',
+  'fresh-source-eval-2026-06-30-skill-optimization-p2.md',
 );
 const FRESH_SOURCE_EVAL_RELENTLESS_GRILL_PATH = path.join(
   REPO_ROOT,
@@ -264,8 +274,8 @@ describe('spec-prd workflow contracts', () => {
 
   test('entrypoint exposes compact workflow contract summary and decision-tree intake', () => {
     const text = read(SKILL_PATH);
-    // 入口锚点窗口:relentless-grill 改动新增了 Canonical 四停点核心块,窗口从 140 放宽到 155
-    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 155).join('\n');
+    // 入口锚点窗口:保留到 Phase 0 compact decision tree 结束。
+    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 170).join('\n');
     const phaseOne = extractMarkdownSection(text, '### Phase 1: Current-State Analysis');
 
     expect(text).toContain('name: spec-prd');
@@ -296,6 +306,8 @@ describe('spec-prd workflow contracts', () => {
       'embedded agent instructions',
       'input_posture: resume-prd | reference-claims | wrong-stage | pure-text | no-input',
       'output_shape: bypass | compact-prd | normal-prd | topology-heavy-prd',
+      'clarification_view: Generic | App | H5/PC | Admin | Backend/Java | CLI/DevTool | Mixed',
+      'clarification_profile: compact-brownfield-increment',
       'quality_diagnosis: not-run | minor-gaps | material-gaps | blockers | ready',
       'pre_prd_clarification_status: not-needed | source-resolved | asked-owner | blocker-cluster | checkpoint-blocked | route-out | not-run',
       'owner_question_progress: not-needed | source-resolved | closed | narrowed | accepted-assumption | owner-capped | outstanding-question | blocker | route-out',
@@ -309,6 +321,8 @@ describe('spec-prd workflow contracts', () => {
       'Which PRD operation?',
       'What input posture?',
       'Split or continue?',
+      'Select `intake_mode`, `clarification_view`, `clarification_profile`, `clarification_budget`, `clarification_risk_tier`, and `review_gate_mode` before gathering evidence',
+      'never enters `BLOCKING_REASON_CODES`',
     ]);
     expectContainsAll(phaseOne, [
       'PRD Sanitization',
@@ -981,6 +995,22 @@ describe('spec-prd workflow contracts', () => {
       'source-candidate, local pattern, code-index pointer',
       '`change delta and boundary clarity`',
       '`planning-invention and trace risk`',
+      '`coverage pack adequacy`',
+      'Engineering Clarification Coverage Pack',
+      '`source_authority`, `current_state`, `change_delta`, `requirements_acceptance`, `owner_oq_trace`, and `evidence_refs`',
+      'not as a deterministic pass/fail table',
+      '`full coverage triggered adequacy`',
+      'full 16-dimension Engineering Clarification Coverage Pack',
+      '`requirements quality rubric`',
+      '`clarification risk tier`',
+      '`right-size budget`',
+      '`interaction analysis`',
+      '`regression guard`',
+      '`living lifecycle`',
+      '`supporting evidence refs`',
+      '`handoff context slice`',
+      'not a numeric scorecard or checker rule',
+      'must not contain implementation steps, task sequencing, or file-level HOW',
       '`pre-prd clarification closure`',
       '`requirement-analysis-gate closure`',
       'Requirement Analysis Gate must have closed or visibly carried the requirement understanding map',
@@ -1089,13 +1119,24 @@ describe('spec-prd workflow contracts', () => {
   test('human template mirror points to the embedded runtime skeleton instead of a second template tree', () => {
     const templateIndex = read(HUMAN_TEMPLATE_INDEX_PATH);
     const humanCore = read(HUMAN_TEMPLATE_CORE_PATH);
+    const h5Pc = read(HUMAN_TEMPLATE_H5_PC_PATH);
+    const cliDevtool = read(HUMAN_TEMPLATE_CLI_DEVTOOL_PATH);
+    const mixed = read(HUMAN_TEMPLATE_MIXED_PATH);
     const runtimeTemplate = read(OUTPUT_TEMPLATE_PATH);
 
     expect(templateIndex).toContain('human-facing 标准模板库');
     expect(templateIndex).toContain('skills/spec-prd/references/prd-output-template.md');
     expect(templateIndex).toContain('embedded runtime skeleton');
     expect(templateIndex).toContain('不作为 packaged runtime 的必需读取路径');
+    expect(templateIndex).toContain('checklist 是澄清展示与评审提示，不是 checker 语义校验源');
+    expectContainsAll(templateIndex, [
+      '40-H5-PC端需求模板.md',
+      '50-CLI-DevTool需求模板.md',
+      '60-Mixed跨端需求模板.md',
+      '不构成第二 runtime template tree',
+    ]);
     expect(templateIndex).not.toContain('skills/spec-prd/templates/standard/');
+    expect(templateIndex).not.toContain('H5/PC、CLI/DevTool、Mixed 不单独建模板');
     for (const section of [
       'Summary',
       'Change Delta',
@@ -1110,6 +1151,9 @@ describe('spec-prd workflow contracts', () => {
     for (const surface of ['App', 'Admin', 'Backend', 'H5/PC', 'CLI/DevTool', 'Mixed']) {
       expect(runtimeTemplate).toContain(surface);
     }
+    expectContainsAll(h5Pc, ['target_surface: h5-pc', '路由、入口与导航', '响应式与可读性']);
+    expectContainsAll(cliDevtool, ['target_surface: cli', 'Preview / Mutation Boundary', '双宿主与 runtime 投射']);
+    expectContainsAll(mixed, ['target_surface: mixed', 'Source-Of-Truth Resolution', '跨端一致性矩阵']);
     // 人类镜像的证据 tag 词表必须与 runtime 脚本枚举(check-prd-artifact.js EVIDENCE_TAGS)一致,
     // 且不得保留已废弃的 stale provider pointer。仅守 evidence-tag 词表,
     // 不约束 README 声明的证券行业列/C1-C12 清单等项目本地 overlay。
@@ -1135,7 +1179,14 @@ describe('spec-prd workflow contracts', () => {
     expectContainsAll(specPlan, [
       '`artifact_kind: prd-requirements`',
       'PRD-grade requirements origin',
-      'inherit the existing `spec_id`',
+      'PRD-grade candidate',
+      '`origin_grade: prd`',
+      '`origin_verification_status: verified`',
+      'node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path> --verify-receipt',
+      '`unverified-prd-origin`',
+      '`downstream_sync_unknown`',
+      'Do not use `--check-only` as a consumer pass signal',
+      'Inherit the existing `spec_id`',
       'R/F/AE',
       'Scope Boundaries',
       'Evidence And Assumptions',
@@ -1232,6 +1283,41 @@ describe('spec-prd workflow contracts', () => {
         'Product Expert Lens',
         'downstream_confirmation_risk',
         'PRD_write_target',
+      ],
+    });
+    expectEvalCase(examples, 'localized-section-id-ready-accepted', {
+      tags: ['readiness', 'p0-pack'],
+      expected: [
+        'canonical heading or section id is sufficient for section identity',
+        'machine-owned safety sections must remain locatable before final ready',
+      ],
+    });
+    expectEvalCase(examples, 'p1-full-coverage-risk-tier', {
+      tags: ['p1-pack', 'readiness'],
+      expected: [
+        'full 16-dimension Coverage Pack is a triggered LLM-owned lens',
+        'clarification_risk_tier controls review depth',
+      ],
+    });
+    expectEvalCase(examples, 'codex-degraded-receipt-gate', {
+      tags: ['workflow-runtime-quality', 'readiness'],
+      expected: [
+        'Codex degraded enforcement must be explicit',
+        '--verify-receipt is the consumer-only read check',
+      ],
+    });
+    expectEvalCase(examples, 'handoff-context-slice-no-how', {
+      tags: ['p1-pack', 'traceability'],
+      expected: [
+        'handoff_context_slice should reduce spec-plan intake questions',
+        'context slice carries confirmed WHAT and residue',
+      ],
+    });
+    expectEvalCase(examples, 'interaction-analysis-conflict-caught', {
+      tags: ['p1-pack', 'readiness'],
+      expected: [
+        'Requirement Interaction Analysis catches conflict',
+        'checker must not gain semantic blockers',
       ],
     });
     expect(examples.case_contract.sentinel_cases).toEqual(expect.arrayContaining([
@@ -2101,6 +2187,36 @@ describe('spec-prd workflow contracts', () => {
     expect(artifact).not.toContain('status: not_run');
   });
 
+  test('skill optimization P2 eval artifact records samples, fallback, metrics, and boundaries', () => {
+    const artifact = read(FRESH_SOURCE_EVAL_SKILL_OPTIMIZATION_P2_PATH);
+
+    expectContainsAll(artifact, [
+      'fresh_source_eval:',
+      'schema_version: fresh-source-eval-record.v1',
+      'producer: spec-work',
+      'freshness: current-worktree',
+      'authority_level: advisory',
+      'reason_code: fresh-source-eval-single-agent-fallback',
+      'status: passed',
+      'dispatch_authorization_missing',
+      'single-orchestrator read-only review',
+      'generated_runtime_mirrors: not_used_as_source',
+      'docs/validation/spec-prd/samples/2026-06-30-admin-export-clarified-requirements.md',
+      'docs/validation/spec-prd/samples/2026-06-30-app-design-source-clarified-requirements.md',
+      'docs/validation/spec-prd/samples/2026-06-30-backend-idempotency-clarified-requirements.md',
+      'docs/validation/spec-prd/samples/2026-06-30-cli-verify-receipt-clarified-requirements.md',
+      'docs/validation/spec-prd/samples/2026-06-30-mixed-source-of-truth-clarified-requirements.md',
+      'baseline_unavailable',
+      'plan_what_questions_count',
+      'plan_invented_what_findings_count',
+      'localized_heading_false_block_count',
+      'ready_clarification_p0_p1_review_findings_count',
+      'context_slice_followup_questions_count',
+      'artifact_kind: eval-sample',
+      'not production user PRDs',
+    ]);
+  });
+
   test('project domain glossary artifact defines the cross-PRD canonical layer with light contract', () => {
     const glossary = read(GLOSSARY_PATH);
 
@@ -2357,7 +2473,7 @@ describe('spec-prd workflow contracts', () => {
       const bad = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, badPrd], { encoding: 'utf8' }));
       expect(bad.findings).toEqual(expect.arrayContaining([
         expect.objectContaining({ reason_code: 'artifact_kind_missing_or_wrong' }),
-        expect.objectContaining({ reason_code: 'core_section_missing', section: 'Change Delta' }),
+        expect.objectContaining({ reason_code: 'template_structure_hint', section: 'Change Delta' }),
         expect.objectContaining({ reason_code: 'requirement_without_acceptance_ref', requirement_id: 'R-01' }),
         expect.objectContaining({ reason_code: 'placeholder_or_todo_present' }),
         expect.objectContaining({ reason_code: 'feature_slice_missing_acceptance_trace' }),
@@ -3047,9 +3163,13 @@ describe('spec-prd workflow contracts', () => {
       'Phase 4 is a mandatory producer-local gate, not an optional closeout.',
       'Self-declaring readiness or recommending planning without an executed checker/finalize receipt',
       'A handoff that names no finalize/checker receipt has not passed Phase 4.',
-      'anchors core sections on their canonical English token',
+      'anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id',
+      'machine-owned safety sections must remain locatable before final ready',
       'node skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>',
       'Source-path rewrite must project this operational path',
+      'codex_prd_guard: not_available',
+      'no managed Stop closeout guard',
+      'consumer `--verify-receipt`',
       'clarification_trace_absent',
       'design_source_unaccounted',
       'input_refs_unavailable',
@@ -3083,7 +3203,8 @@ describe('spec-prd workflow contracts', () => {
     expectContainsAll(readiness, [
       'is required before this lens can emit `ready-for-planning`, not optional',
       'an artifact-backed PRD with no current producer-local finalize receipt is itself not ready',
-      're-anchor the heading rather than ignore it',
+      'machine-owned section identity',
+      'anchors PRD sections by canonical heading or `<!-- prd:section=... -->` section id',
       'clarification_trace_absent',
       'design_source_unaccounted',
       'input_refs_unavailable',
@@ -3106,8 +3227,26 @@ describe('spec-prd workflow contracts', () => {
 
     const template = read(OUTPUT_TEMPLATE_PATH);
     expectContainsAll(template, [
-      'Keep the canonical English anchor token in every core-section heading',
-      'Do not freelance a section structure that omits these anchors.',
+      'Keep every core section machine-locatable with either the canonical heading',
+      'a section id comment immediately before a localized heading',
+      'Ordinary core-section gaps produce advisory `template_structure_hint` findings',
+      'machine safety sections such as Outstanding Questions, Owner Decision Trace, Readiness Self-Check, and Design Source Coverage must still be locatable',
+      '## Clarification Checklist Display Protocol',
+      '## Engineering Clarification Coverage Pack',
+      'Scripts may report deterministic structure facts, but they do not validate coverage-pack semantics',
+      'full 16-dimension Coverage Pack',
+      '`clarification_risk_tier`',
+      '`intake_mode`',
+      '`clarification_budget`',
+      '`review_gate_mode`',
+      '`requirements_lifecycle`',
+      '`downstream_sync_unknown`',
+      '`supporting_evidence_refs`',
+      'handoff_context_slice',
+      'Requirements Quality Rubric',
+      'Regression Guard',
+      '`source_authority`',
+      '`owner_oq_trace`',
     ]);
   });
 
@@ -3179,7 +3318,7 @@ describe('spec-prd workflow contracts', () => {
       );
       const kaz = JSON.parse(execFileSync('node', [PRD_ARTIFACT_SCRIPT_PATH, localizedOnly], { encoding: 'utf8' }));
       const kazCodes = kaz.findings.map((finding) => finding.reason_code);
-      expect(kazCodes).toContain('core_section_missing');
+      expect(kazCodes).toContain('template_structure_hint');
       expect(kazCodes).toContain('write_mode_undeclared');
       expect(kazCodes).toContain('clarification_evidence_undeclared');
       expect(kaz.findings.length).toBeGreaterThan(0);

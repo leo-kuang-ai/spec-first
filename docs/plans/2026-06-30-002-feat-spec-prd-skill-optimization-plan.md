@@ -1,7 +1,7 @@
 ---
 title: "feat: spec-prd 研发侧澄清专业化与稳定性优化"
 type: feat
-status: active
+status: completed
 date: 2026-06-30
 spec_id: 2026-06-28-prd-skill-optimization
 origin: docs/01-需求分析/16.spec-prd-skill-optimization/2026-06-28-prd-skill专业化与稳定性优化方案.md

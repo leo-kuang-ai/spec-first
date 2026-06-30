@@ -2450,6 +2450,113 @@
         "clarification-evidence",
         "owner-interaction-required"
       ]
+    },
+    {
+      "id": "localized-section-id-ready-accepted",
+      "intent": "validate",
+      "case_type": "positive",
+      "quality_buckets": [
+        "validate",
+        "readiness-fail"
+      ],
+      "input_shape": "PRD artifact uses pure Chinese headings for Summary, Requirements, Acceptance Examples, Outstanding Questions, Owner Decision Trace, and Readiness Self-Check, each preceded by the matching <!-- prd:section=... --> section id. It has final-prd readiness declarations, legal OQ closure, and no open owner-owned WHAT gaps.",
+      "expected": [
+        "canonical heading or section id is sufficient for section identity",
+        "pure localized headings are valid when they carry the matching section id",
+        "machine-owned safety sections must remain locatable before final ready",
+        "ordinary localized core heading gaps are advisory template_structure_hint only when section identity is absent"
+      ],
+      "must_not": [
+        "must not require English visible heading text when section id identity is present",
+        "must not downgrade machine-owned safety section identity to advisory in a final-ready PRD"
+      ],
+      "coverage_tags": [
+        "readiness",
+        "p0-pack",
+        "localized-section-id"
+      ]
+    },
+    {
+      "id": "p1-full-coverage-risk-tier",
+      "intent": "create",
+      "case_type": "positive",
+      "quality_buckets": [
+        "brownfield-create",
+        "p1-pack"
+      ],
+      "input_shape": "High-risk mixed-surface PRD with clarification_risk_tier=high, source/design/owner refs, cross-surface source-of-truth risk, rollout/backout concern, and a full Engineering Clarification Coverage Pack that marks source_authority, current_state, change_delta, requirements_acceptance, scope_boundaries, owner_oq_trace, cross_surface_consistency, regression_guard, handoff_context_slice, and supporting_evidence_refs.",
+      "expected": [
+        "full 16-dimension Coverage Pack is a triggered LLM-owned lens, not a universal template",
+        "clarification_risk_tier controls review depth without relaxing owner blockers or machine receipts",
+        "supporting_evidence_refs distinguishes product-owned, owner-owned, source-confirmed, design-derived, external, stale, and degraded refs",
+        "weak rows become readiness/doc-review concerns only when planning would invent WHAT"
+      ],
+      "coverage_tags": [
+        "p1-pack",
+        "readiness",
+        "traceability"
+      ]
+    },
+    {
+      "id": "codex-degraded-receipt-gate",
+      "intent": "validate",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "validate",
+        "workflow-runtime-quality"
+      ],
+      "input_shape": "Codex run prepares a PRD origin for spec-plan. There is no managed PreToolUse prewrite guard and no Stop closeout guard. The PRD closeout records codex_prd_guard: not_available, runs current-source finalize/verify commands when possible, and treats producer finalize plus spec-plan --verify-receipt as mandatory handoff discipline rather than hook-enforced protection.",
+      "expected": [
+        "Codex degraded enforcement must be explicit, not implied equal protection with Claude",
+        "--verify-receipt is the consumer-only read check for spec-plan origin verification",
+        "--check-only remains producer closeout preview and must not be used as a consumer pass signal",
+        "degraded verification such as missing inputs is not a verified origin"
+      ],
+      "coverage_tags": [
+        "workflow-runtime-quality",
+        "readiness",
+        "anti-over-blocking"
+      ]
+    },
+    {
+      "id": "handoff-context-slice-no-how",
+      "intent": "create",
+      "case_type": "boundary",
+      "quality_buckets": [
+        "brownfield-create",
+        "p1-pack"
+      ],
+      "input_shape": "Long clarified requirements artifact includes a handoff_context_slice with confirmed WHAT, owner decisions, accepted assumptions, source refs to re-read, unresolved blockers, Planning Recheck items, degraded facts, and downstream_sync_unknown, but no implementation files, task sequencing, database schema, or API field design.",
+      "expected": [
+        "handoff_context_slice should reduce spec-plan intake questions without becoming implementation planning",
+        "downstream_sync_unknown is acceptable when affected plans/tasks cannot be verified",
+        "context slice carries confirmed WHAT and residue, not task sequencing or file-level HOW"
+      ],
+      "coverage_tags": [
+        "p1-pack",
+        "traceability",
+        "readiness"
+      ]
+    },
+    {
+      "id": "interaction-analysis-conflict-caught",
+      "intent": "refine",
+      "case_type": "positive",
+      "quality_buckets": [
+        "refine",
+        "p1-pack"
+      ],
+      "input_shape": "Draft PRD contains two requirements that conflict on fallback display, one duplicated term for account/customer, and one hidden assumption about return-from-risk-assessment refresh. The refined PRD records Interaction Analysis findings, updates Requirements and Acceptance Examples, and carries only HOW/source freshness checks to Planning Recheck.",
+      "expected": [
+        "Requirement Interaction Analysis catches conflict, duplication, hidden assumption, missing edge case, and terminology mismatch when triggered",
+        "interaction findings must write back to Requirements, Acceptance Examples, Decision Notes, Outstanding Questions, or Planning Recheck",
+        "checker must not gain semantic blockers for interaction analysis"
+      ],
+      "coverage_tags": [
+        "p1-pack",
+        "readiness",
+        "traceability"
+      ]
     }
   ],
   "skill": "spec-prd",

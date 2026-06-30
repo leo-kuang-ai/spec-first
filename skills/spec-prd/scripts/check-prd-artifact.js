@@ -29,6 +29,29 @@ const CORE_SECTIONS = [
   'Evidence And Assumptions',
 ];
 
+const SECTION_ID_BY_TITLE = {
+  Summary: 'summary',
+  'Change Delta': 'change_delta',
+  Requirements: 'requirements',
+  'Acceptance Examples': 'acceptance_examples',
+  'Scope Boundaries': 'scope_boundaries',
+  'Evidence And Assumptions': 'evidence_assumptions',
+  'Outstanding Questions': 'outstanding_questions',
+  'Owner Decision Trace': 'owner_decision_trace',
+  'Readiness Self-Check': 'readiness_self_check',
+  'Design Source Coverage': 'design_source_coverage',
+  'Planning Recheck': 'planning_recheck',
+  'Feature Slices': 'feature_slices',
+};
+
+const KNOWN_SECTION_IDS = new Set(Object.values(SECTION_ID_BY_TITLE));
+const MACHINE_SECTION_IDS = new Set([
+  'outstanding_questions',
+  'owner_decision_trace',
+  'readiness_self_check',
+  'design_source_coverage',
+]);
+
 const EVIDENCE_TAGS = [
   'confirmed-source',
   'user-stated',
@@ -300,15 +323,42 @@ function computeInputsHash(inputPaths, options = {}) {
 
 function parseHeadings(lines) {
   const headings = [];
+  const orphanSectionIds = [];
+  let pendingSection = null;
   lines.forEach((line, index) => {
+    const sectionMatch = line.match(/^\s*<!--\s*prd:section=([a-z0-9_-]+)\s*-->\s*$/i);
+    if (sectionMatch) {
+      if (pendingSection) {
+        orphanSectionIds.push(pendingSection);
+      }
+      pendingSection = {
+        sectionId: sectionMatch[1].toLowerCase(),
+        line: index + 1,
+      };
+      return;
+    }
+
     const match = line.match(/^(#{2,6})\s+(.+?)\s*$/);
-    if (!match) return;
+    if (!match) {
+      if (pendingSection && line.trim() !== '') {
+        orphanSectionIds.push(pendingSection);
+        pendingSection = null;
+      }
+      return;
+    }
     headings.push({
       level: match[1].length,
       title: match[2].trim(),
       line: index + 1,
+      sectionId: pendingSection ? pendingSection.sectionId : null,
+      sectionIdLine: pendingSection ? pendingSection.line : null,
     });
+    pendingSection = null;
   });
+  if (pendingSection) {
+    orphanSectionIds.push(pendingSection);
+  }
+  headings.orphanSectionIds = orphanSectionIds;
   return headings;
 }
 
@@ -337,8 +387,14 @@ function matchHeadingTitle(headingTitle, wantedTitle) {
   return false;
 }
 
+function matchSectionIdentity(heading, wantedTitle) {
+  if (matchHeadingTitle(heading.title, wantedTitle)) return true;
+  const wantedSectionId = SECTION_ID_BY_TITLE[wantedTitle];
+  return Boolean(wantedSectionId && heading.sectionId === wantedSectionId);
+}
+
 function sectionRange(lines, headings, title) {
-  const heading = headings.find((entry) => matchHeadingTitle(entry.title, title));
+  const heading = headings.find((entry) => matchSectionIdentity(entry, title));
   if (!heading) return null;
   const startIndex = heading.line - 1;
   const next = headings.find((entry) => (
@@ -487,6 +543,16 @@ function parseOwnerDecisionTrace(lines, headings) {
   if (Object.keys(headerMap).length === 0) return { present: true, validRows: 0, rows: [] };
   const validRows = rows.filter(isValidTraceRow);
   return { present: true, validRows: validRows.length, rows };
+}
+
+function ownerDecisionTraceNeededByOutstandingQuestions(lines, headings) {
+  const section = sectionRange(lines, headings, 'Outstanding Questions');
+  if (!section) return false;
+  const { rows } = parseHeaderedTable(section.text, OQ_HEADER_ALIASES);
+  return rows.some((row) => (
+    OWNER_DISPOSITIONS.has(String(row.closure_disposition || '').toLowerCase().trim())
+    || ['answered', 'capped'].includes(String(row.owner_status || '').toLowerCase().trim())
+  ));
 }
 
 // 004:Outstanding Questions 的剃刀分析。claimsReady 决定矛盾类是否升级为 blocker。
@@ -875,8 +941,24 @@ function parseStructure(target, text) {
   const lines = splitLines(text);
   const frontmatter = parseFrontmatter(lines);
   const headings = parseHeadings(lines);
+  const orphanSectionIds = headings.orphanSectionIds || [];
+  const sectionIdCounts = {};
+  const unknownSectionIds = [];
+  headings.forEach((heading) => {
+    if (!heading.sectionId) return;
+    sectionIdCounts[heading.sectionId] = (sectionIdCounts[heading.sectionId] || 0) + 1;
+    if (!KNOWN_SECTION_IDS.has(heading.sectionId)) {
+      unknownSectionIds.push({ section_id: heading.sectionId, line: heading.sectionIdLine });
+    }
+  });
+  const duplicateSectionIds = Object.entries(sectionIdCounts)
+    .filter(([, count]) => count > 1)
+    .map(([sectionId]) => sectionId)
+    .sort();
+  const duplicateMachineSectionIds = duplicateSectionIds
+    .filter((sectionId) => MACHINE_SECTION_IDS.has(sectionId));
   const missingCoreSections = CORE_SECTIONS.filter((section) => (
-    !headings.some((heading) => matchHeadingTitle(heading.title, section))
+    !sectionRange(lines, headings, section)
   ));
   const requirementIds = uniqueMatches(text, /\b(R-\d{2,})\b/g);
   const acceptanceIds = uniqueMatches(text, /\b(AE-\d{2,})\b/g);
@@ -942,8 +1024,31 @@ function parseStructure(target, text) {
   const designUnread = designUnreadNonEmpty(text);
   const designPartial = designCoveragePartial(text);
   const designAccepted = designDegradedOwnerAccepted(text);
+  const ownerDecisionTraceNeeded = clarificationEvidenceValue === 'asked-owner'
+    || ownerDecisionTraceNeededByOutstandingQuestions(lines, headings);
+  const machineSectionIdentityMissing = [];
+  if (claimsReady) {
+    if (!sectionRange(lines, headings, 'Readiness Self-Check')) {
+      machineSectionIdentityMissing.push('readiness_self_check');
+    }
+    if (!sectionRange(lines, headings, 'Outstanding Questions')) {
+      machineSectionIdentityMissing.push('outstanding_questions');
+    }
+    if (ownerDecisionTraceNeeded && !sectionRange(lines, headings, 'Owner Decision Trace')) {
+      machineSectionIdentityMissing.push('owner_decision_trace');
+    }
+    if (designSourceRefsPresent && !sectionRange(lines, headings, 'Design Source Coverage')) {
+      machineSectionIdentityMissing.push('design_source_coverage');
+    }
+    duplicateMachineSectionIds.forEach((sectionId) => {
+      if (!machineSectionIdentityMissing.includes(sectionId)) {
+        machineSectionIdentityMissing.push(sectionId);
+      }
+    });
+  }
   return {
     target, normalizedTarget, prdHash, lines, frontmatter, headings,
+    unknownSectionIds, duplicateSectionIds, duplicateMachineSectionIds, orphanSectionIds,
     missingCoreSections, requirementIds, acceptanceIds, nfrIds, uncoveredRequirements,
     evidenceTagHits, placeholderLines, featureSliceGaps, priorities, assumptionRowCount,
     outstandingQuestionsPresent, planningRecheckPresent, outstandingQuestionCount, planningRecheckCount,
@@ -956,6 +1061,7 @@ function parseStructure(target, text) {
     designSourcesReadPresent, designSourcesUnreadPresent,
     needsReadinessDeclarations, prdShaped, writeModeIsFinalPrd, writeModeIsCheckpoint,
     claimsReady, readyReceiptPresent, designUnread, designPartial, designAccepted,
+    machineSectionIdentityMissing,
   };
 }
 
@@ -1092,7 +1198,7 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
     findings.push({ reason_code: 'forbidden_prds_path', path: structure.normalizedTarget });
   }
   structure.missingCoreSections.forEach((section) => {
-    findings.push({ reason_code: 'core_section_missing', section });
+    findings.push({ reason_code: 'template_structure_hint', section });
   });
   structure.uncoveredRequirements.forEach((requirement_id) => {
     findings.push({ reason_code: 'requirement_without_acceptance_ref', requirement_id });
@@ -1101,6 +1207,19 @@ function deriveFindings(facts, structure, oqAnalysis, inputPaths) {
     findings.push({ reason_code: 'placeholder_or_todo_present', line });
   });
   structure.featureSliceGaps.forEach((finding) => findings.push(finding));
+  structure.unknownSectionIds.forEach((entry) => {
+    findings.push({ reason_code: 'section_id_unknown', section_id: entry.section_id, line: entry.line });
+  });
+  structure.duplicateSectionIds.forEach((sectionId) => {
+    if (MACHINE_SECTION_IDS.has(sectionId)) return;
+    findings.push({ reason_code: 'section_id_duplicate', section: sectionId });
+  });
+  structure.orphanSectionIds.forEach((entry) => {
+    findings.push({ reason_code: 'section_id_orphaned', section: entry.sectionId, line: entry.line });
+  });
+  structure.machineSectionIdentityMissing.forEach((sectionId) => {
+    findings.push({ reason_code: 'machine_section_identity_missing', section: sectionId });
+  });
   // readiness 声明 findings
   if (structure.needsReadinessDeclarations && !structure.writeModeDeclaredValid) {
     findings.push({ reason_code: 'write_mode_undeclared' });

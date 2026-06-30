@@ -16,7 +16,15 @@ const {
 } = require('./lib/reason-codes');
 
 function parseArgs(argv) {
-  const args = { target: null, inputs: [], checkOnly: false, refreshInputsHash: false, help: false, error: null };
+  const args = {
+    target: null,
+    inputs: [],
+    checkOnly: false,
+    verifyReceipt: false,
+    refreshInputsHash: false,
+    help: false,
+    error: null,
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--help' || arg === '-h') {
@@ -32,6 +40,8 @@ function parseArgs(argv) {
       i += 1;
     } else if (arg === '--check-only') {
       args.checkOnly = true;
+    } else if (arg === '--verify-receipt') {
+      args.verifyReceipt = true;
     } else if (arg === '--refresh-inputs-hash') {
       args.refreshInputsHash = true;
     } else if (arg.startsWith('--')) {
@@ -43,6 +53,9 @@ function parseArgs(argv) {
       args.error = `unexpected extra argument: ${arg}`;
       break;
     }
+  }
+  if (!args.error && args.verifyReceipt && (args.checkOnly || args.refreshInputsHash)) {
+    args.error = '--verify-receipt cannot be combined with --check-only or --refresh-inputs-hash';
   }
   return args;
 }
@@ -215,12 +228,83 @@ function finalizePrd(target, inputs, options = {}) {
   };
 }
 
+function verifyPrdReceipt(target, inputs, options = {}) {
+  const targetPath = path.resolve(target);
+  const text = fs.readFileSync(targetPath, 'utf8');
+  const report = buildReport(target, text, { inputs });
+  const facts = report.facts;
+  const nonReceiptBlockingReasons = facts.blocking_reason_codes.filter((reasonCode) => (
+    !isReceiptOnly(reasonCode)
+  ));
+  const reasonCodes = new Set();
+  let originVerificationStatus = 'unverified';
+
+  if (inputs.length === 0) {
+    originVerificationStatus = 'degraded';
+    reasonCodes.add('input_side_recheck_degraded');
+  }
+  if (facts.input_scan_degraded === true) {
+    originVerificationStatus = 'degraded';
+    reasonCodes.add('input_side_recheck_degraded');
+  }
+  if (facts.artifact_kind !== 'prd-requirements') {
+    reasonCodes.add('artifact_kind_missing_or_wrong');
+  }
+  if (facts.can_enter_spec_plan !== 'yes') {
+    reasonCodes.add('can_enter_spec_plan_not_yes');
+  }
+  if (!facts.ready_receipt_present) {
+    reasonCodes.add('ready_receipt_absent');
+  } else if (!facts.ready_receipt_current) {
+    reasonCodes.add('ready_receipt_stale');
+  }
+  nonReceiptBlockingReasons.forEach((reasonCode) => reasonCodes.add(reasonCode));
+
+  const verified = originVerificationStatus !== 'degraded'
+    && facts.artifact_kind === 'prd-requirements'
+    && facts.can_enter_spec_plan === 'yes'
+    && facts.ready_receipt_current === true
+    && nonReceiptBlockingReasons.length === 0;
+  if (verified) {
+    originVerificationStatus = 'verified';
+    reasonCodes.clear();
+  }
+
+  return {
+    schema_version: 'spec-prd-receipt-verification.v1',
+    target,
+    status: originVerificationStatus,
+    origin_verification_status: originVerificationStatus,
+    verified,
+    artifact_kind: facts.artifact_kind,
+    can_enter_spec_plan: facts.can_enter_spec_plan,
+    ready_receipt_present: facts.ready_receipt_present,
+    ready_receipt_current: facts.ready_receipt_current,
+    input_side_recheck_attempted: inputs.length > 0,
+    reason_codes: [...reasonCodes].sort(),
+    checker: {
+      schema_version: report.schema_version,
+      finding_count: report.findings.length,
+      blocking_finding_count: nonReceiptBlockingReasons.length,
+      blocking_reason_codes: facts.blocking_reason_codes,
+      prd_hash: facts.ready_receipt_prd_hash,
+      inputs_hash: facts.ready_receipt_inputs_hash,
+    },
+    producer: {
+      mode: 'verify-receipt',
+      read_only: true,
+      project_root: options.projectRoot || null,
+    },
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
     process.stdout.write('finalize-prd-artifact.js — write or check a machine-owned ready receipt for a PRD artifact.\n');
-    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--check-only] [--refresh-inputs-hash]\n');
+    process.stdout.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]]... [--check-only | --verify-receipt] [--refresh-inputs-hash]\n');
     process.stdout.write('  --check-only           preview the receipt without writing; exit 0 = closeout allowed, 1 = should_block_closeout, 2 = usage error.\n');
+    process.stdout.write('  --verify-receipt       consumer-only read check; exit 0 = verified PRD origin, 1 = unverified/degraded, 2 = usage error.\n');
     process.stdout.write('  --refresh-inputs-hash  allow re-finalizing when only ready_receipt_stale blocks (PRD unchanged, inputs file modified).\n');
     process.exit(0);
   }
@@ -228,13 +312,15 @@ function main() {
     if (args.error) {
       process.stderr.write(`${args.error}\n`);
     }
-    process.stderr.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]] [--check-only]\n');
+    process.stderr.write('usage: finalize-prd-artifact.js <target-prd-path> [--inputs <input-path>[,<input-path>...]] [--check-only | --verify-receipt]\n');
     process.exit(2);
   }
 
   let receipt;
   try {
-    receipt = finalizePrd(args.target, args.inputs, { checkOnly: args.checkOnly, refreshInputsHash: args.refreshInputsHash });
+    receipt = args.verifyReceipt
+      ? verifyPrdReceipt(args.target, args.inputs)
+      : finalizePrd(args.target, args.inputs, { checkOnly: args.checkOnly, refreshInputsHash: args.refreshInputsHash });
   } catch (err) {
     process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);
     process.exit(2);
@@ -245,6 +331,9 @@ function main() {
   // exit 0 = closeout 放行(含合法 checkpoint);exit 1 = should_block_closeout(ready 矛盾),
   //   此时 stdout JSON 必须保留 —— prd-readiness-guard 解析 blocking_reason_codes 拼 block 文案;
   // exit 2 = usage/runtime 错误(stderr)。Stop hook 同时消费 exit code 与 stdout JSON。
+  if (args.verifyReceipt) {
+    process.exit(receipt.verified ? 0 : 1);
+  }
   process.exit(receipt.should_block_closeout ? 1 : 0);
 }
 
@@ -255,5 +344,6 @@ if (require.main === module) {
 module.exports = {
   buildFinalizeReceipt,
   finalizePrd,
+  verifyPrdReceipt,
   upsertFrontmatterFields,
 };

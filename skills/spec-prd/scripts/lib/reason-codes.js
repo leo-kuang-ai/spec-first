@@ -14,7 +14,7 @@
 // 整集 freeze 由 spec-prd-finalize.test.js 锁定。增删码须同步 prose 与 freeze 测试。
 const BLOCKING_REASON_CODES = new Set([
   // 基础结构 / 声明类
-  'core_section_missing',
+  'machine_section_identity_missing',
   'forbidden_prds_path',
   'write_mode_undeclared',
   'clarification_evidence_undeclared',
