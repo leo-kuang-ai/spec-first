@@ -2141,7 +2141,7 @@ Codex 侧的 `spec-first init` 曾短暂生成 `/spec:*` compatibility command f
 
 ### 更新内容
 
-在执行 `doctor`、`init`、`clean`、`update` 等真实命令前，CLI 会先经过 package-level 24h gate；gate 允许时再异步向 npm registry 查询 `spec-first` 的最新版本，若当前版本落后则通过 stderr 输出一行更新提醒。`--help` 和 `--version` 不触发检查，避免打扰只需信息查询的场景。会话启动路径还会通过 `startup-reminder` 对 Claude/Codex runtime 版本做只读提醒。
+在执行 `doctor`、`init`、`clean`、`update` 等真实命令前，CLI 会先经过 package-level 24h gate；gate 允许时再异步向 npm registry 查询 `spec-first` 的最新版本，若当前版本落后则通过 stderr 输出一行更新提醒，并统一引导用户运行 `spec-first update`。`--help` 和 `--version` 不触发检查，避免打扰只需信息查询的场景。会话启动路径还会通过 `startup-reminder` 对 Claude/Codex runtime 版本做只读提醒。
 
 ### 主要能力
 
@@ -2153,6 +2153,8 @@ Codex 侧的 `spec-first init` 曾短暂生成 `/spec:*` compatibility command f
   startup reminder 使用 host scope（`startup.claude` / `startup.codex`）并写入 `~/.claude/spec-first/startup-version-reminder.json` 或 `~/.codex/spec-first/startup-version-reminder.json`；CLI reminder 使用 package scope（`cli.package`）并写入 `~/.spec-first/version-reminder.json`。每个 scope 内的任意 attempt 结果都会暂停 24h 内重复 lookup，包括已提示、已是最新、网络失败或慢网超时前的 attempt。状态可写时，同 scope attempt 会先通过短时本地 lock 完成 claim，避免并发进程同时进入 lookup。
 - startup 与 CLI scope 分离：
   后台 startup/offline attempt 不会抑制用户显式运行的 `doctor` / `update` 检查；CLI attempt 也不会抑制后续 session-start startup 检查。成功执行 `spec-first update` 后会清理 CLI package gate。
+- 支持显式禁用与自动化跳过：
+  设置 `SPEC_FIRST_NO_UPDATE_NOTIFIER=1` 会禁用 CLI 与 startup 两条提醒路径，并且不会写入 attempt state 或触发网络查询。普通 CLI reminder 在 `CI=true` 或 stderr 非 TTY 时默认跳过；startup reminder 只尊重显式 opt-out，不把 host hook 的非 TTY 输出误判为自动化跳过。
 - 支持测试环境 override：
   通过 `SPEC_FIRST_VERSION_REMINDER_LATEST` 环境变量注入版本，测试无需真实网络请求
 - 提醒输出到 stderr：

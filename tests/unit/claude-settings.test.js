@@ -100,6 +100,18 @@ describe('claude settings', () => {
     }
   });
 
+  test('prd prewrite matcher covers Write, Edit, and MultiEdit mutation tools', () => {
+    const matcher = buildManagedPrdPrewriteGuardMatcher();
+
+    expect(matcher.matcher).toBe('Write|Edit|MultiEdit');
+    expect(matcher.hooks).toEqual([
+      {
+        type: 'command',
+        command: PRD_PREWRITE_GUARD_COMMAND,
+      },
+    ]);
+  });
+
   test('appends the managed matcher without disturbing user hooks or permissions', () => {
     const projectRoot = makeTempDir();
     const settingsPath = getClaudeSettingsPath(projectRoot);

@@ -25,12 +25,13 @@ const toolInput = input.tool_input && typeof input.tool_input === 'object' && !A
   ? input.tool_input
   : {};
 
-if (!['Write', 'Edit', 'MultiEdit'].includes(toolName)) {
+if (toolName !== 'Write') {
   process.exit(0);
 }
 
 const targetPath = typeof toolInput.file_path === 'string' ? toolInput.file_path : '';
-if (!targetPath) {
+const content = typeof toolInput.content === 'string' ? toolInput.content : '';
+if (!targetPath || !content) {
   process.exit(0);
 }
 
@@ -48,40 +49,12 @@ if (!/^docs\/brainstorms\/.+-requirements\.md$/.test(relativeTarget)) {
   process.exit(0);
 }
 
-const mutation = buildCandidateContent(toolName, toolInput, absoluteTarget);
-if (!mutation.currentContent && !mutation.candidateContent && mutation.mutatedFragments.length === 0) {
-  process.exit(0);
-}
-
-const identityText = [mutation.candidateContent, mutation.currentContent].filter(Boolean).join('\n');
-if (!isPrdRequirementsArtifact(identityText)) {
-  process.exit(0);
-}
-
-if (mutation.reconstructionDegraded) {
-  if (hasReadyOrReceiptMutationSignal(mutation.mutatedFragments.join('\n'))) {
-    const reasonLines = [
-      `[spec-first] PRD prewrite guard blocked ${toolName}.`,
-      `Target: ${relativeTarget}`,
-      '',
-      'The hook could not reconstruct the full candidate PRD content for this mutation, but the edit payload directly changes machine-owned ready/final receipt fields.',
-      '`status: ready-for-planning`, `readiness_*` receipt fields, and the `write_mode=final-prd` + `can_enter_spec_plan=yes` ready pair are producer-owned. Do not write them through Claude file mutation tools.',
-      'Run the producer-local finalize path instead: `node skills/spec-prd/scripts/finalize-prd-artifact.js docs/brainstorms/<slug>-requirements.md --inputs <input-path>`.',
-      '',
-      'reconstruction_status: degraded',
-    ];
-    block(reasonLines.join('\n'));
-  }
-  process.exit(0);
-}
-
-const content = mutation.candidateContent || '';
-if (!content) {
+if (!/^\s*artifact_kind:\s*prd-requirements\s*$/im.test(content)) {
   process.exit(0);
 }
 
 const readyStatus = /^\s*status:\s*ready-for-planning\s*$/im.test(content);
-const machineReceipt = hasMachineReceiptField(content);
+const machineReceipt = /^\s*readiness_verified_by\s*:|^\s*readiness_verified_at\s*:|^\s*readiness_checker_schema\s*:|^\s*readiness_prd_hash\s*:|^\s*readiness_inputs_hash\s*:/im.test(content);
 const firstWrite = !fs.existsSync(absoluteTarget);
 const checkerFacts = tryBuildCheckerFacts(relativeTarget, content);
 const readyIntent = checkerFacts && checkerFacts.ready_claim_present === true;
@@ -106,12 +79,11 @@ const finalPrdOnFirstWriteWithSignal = firstWrite
 
 if (readyStatus || machineReceipt || (firstWrite && readyIntent) || missingWriteModeOnFirstWrite) {
   const reasonLines = [
-    `[spec-first] PRD prewrite guard blocked ${toolName}.`,
+    '[spec-first] PRD prewrite guard blocked Write.',
     `Target: ${relativeTarget}`,
     '',
     'A new PRD artifact must declare a durable-write path in `write_mode` before the first durable Write.',
-    'A PRD artifact must not be written or mutated into ready/final state through Claude file mutation tools.',
-    '`status: ready-for-planning` and `readiness_*` receipt fields are machine-owned; use the producer-local finalize path after the Requirements Grill and readiness lens pass.',
+    'A new PRD artifact must not be written as ready/final in the same Write call.',
   ];
   if (finalPrdOnFirstWriteWithSignal) {
     reasonLines.push(
@@ -245,132 +217,6 @@ function ownerOwnedGapKeywordHit(text) {
   if (candidates.length === 0) return false;
   const lower = candidates.join('\n').toLowerCase();
   return WHAT_TOUCHING_KEYWORDS.some((kw) => lower.includes(kw.toLowerCase()));
-}
-
-function isPrdRequirementsArtifact(text) {
-  return /^\s*artifact_kind:\s*prd-requirements\s*$/im.test(text);
-}
-
-function hasMachineReceiptField(text) {
-  return /^\s*(?:readiness_verified_by|readiness_verified_at|readiness_checker_schema|readiness_finding_count|readiness_blocking_count|readiness_prd_hash|readiness_inputs_hash)\s*:/im.test(text);
-}
-
-function hasReadyOrReceiptMutationSignal(text) {
-  if (!text) return false;
-  if (/^\s*status:\s*ready-for-planning\s*$/im.test(text)) return true;
-  if (hasMachineReceiptField(text)) return true;
-  return /^\s*write_mode:\s*final-prd\s*$/im.test(text)
-    && /^\s*can_enter_spec[-_]?plan:\s*yes\s*$/im.test(text);
-}
-
-function buildCandidateContent(currentToolName, currentToolInput, absolutePath) {
-  if (currentToolName === 'Write') {
-    const writeContent = typeof currentToolInput.content === 'string' ? currentToolInput.content : '';
-    return {
-      candidateContent: writeContent,
-      currentContent: '',
-      mutatedFragments: writeContent ? [writeContent] : [],
-      reconstructionDegraded: false,
-    };
-  }
-
-  const currentContent = readExistingFile(absolutePath);
-  if (!currentContent) {
-    return {
-      candidateContent: '',
-      currentContent: '',
-      mutatedFragments: collectMutationFragments(currentToolName, currentToolInput),
-      reconstructionDegraded: true,
-    };
-  }
-
-  if (currentToolName === 'Edit') {
-    const edit = normalizeEdit(currentToolInput);
-    const fragments = edit ? [edit.newString] : collectMutationFragments(currentToolName, currentToolInput);
-    const applied = edit ? applySingleEdit(currentContent, edit) : null;
-    return {
-      candidateContent: applied && applied.ok ? applied.text : '',
-      currentContent,
-      mutatedFragments: fragments,
-      reconstructionDegraded: !applied || !applied.ok,
-    };
-  }
-
-  if (currentToolName === 'MultiEdit') {
-    const edits = Array.isArray(currentToolInput.edits)
-      ? currentToolInput.edits.map(normalizeEdit).filter(Boolean)
-      : [];
-    let nextContent = currentContent;
-    let degraded = edits.length === 0;
-
-    for (const edit of edits) {
-      const applied = applySingleEdit(nextContent, edit);
-      if (!applied.ok) {
-        degraded = true;
-        break;
-      }
-      nextContent = applied.text;
-    }
-
-    return {
-      candidateContent: degraded ? '' : nextContent,
-      currentContent,
-      mutatedFragments: edits.map((edit) => edit.newString),
-      reconstructionDegraded: degraded,
-    };
-  }
-
-  return {
-    candidateContent: '',
-    currentContent,
-    mutatedFragments: collectMutationFragments(currentToolName, currentToolInput),
-    reconstructionDegraded: true,
-  };
-}
-
-function readExistingFile(absolutePath) {
-  try {
-    if (!fs.existsSync(absolutePath)) return '';
-    return fs.readFileSync(absolutePath, 'utf8');
-  } catch {
-    return '';
-  }
-}
-
-function normalizeEdit(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
-  if (typeof value.old_string !== 'string' || typeof value.new_string !== 'string') return null;
-  if (value.old_string.length === 0) return null;
-  return {
-    oldString: value.old_string,
-    newString: value.new_string,
-    replaceAll: value.replace_all === true,
-  };
-}
-
-function applySingleEdit(text, edit) {
-  if (!text.includes(edit.oldString)) {
-    return { ok: false, text };
-  }
-  if (edit.replaceAll) {
-    return { ok: true, text: text.split(edit.oldString).join(edit.newString) };
-  }
-  return { ok: true, text: text.replace(edit.oldString, edit.newString) };
-}
-
-function collectMutationFragments(currentToolName, currentToolInput) {
-  if (currentToolName === 'Write') {
-    return typeof currentToolInput.content === 'string' ? [currentToolInput.content] : [];
-  }
-  if (currentToolName === 'Edit') {
-    return typeof currentToolInput.new_string === 'string' ? [currentToolInput.new_string] : [];
-  }
-  if (currentToolName === 'MultiEdit' && Array.isArray(currentToolInput.edits)) {
-    return currentToolInput.edits
-      .map((entry) => (entry && typeof entry.new_string === 'string' ? entry.new_string : ''))
-      .filter(Boolean);
-  }
-  return [];
 }
 
 function tryBuildCheckerFacts(relativeTarget, content) {

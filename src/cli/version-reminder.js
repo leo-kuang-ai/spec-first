@@ -10,6 +10,7 @@ const CLI_VERSION_REMINDER_SCOPE = 'cli.package';
 const UNKNOWN_RUNTIME_VERSION = 'unknown-runtime-version';
 const DEFAULT_VERSION_REMINDER_TIMEOUT_MS = 2000;
 const REMINDER_ATTEMPT_LOCK_STALE_MS = 5 * 60 * 1000;
+const VERSION_REMINDER_OPT_OUT_ENV = 'SPEC_FIRST_NO_UPDATE_NOTIFIER';
 
 // 默认网络超时；可经 SPEC_FIRST_VERSION_REMINDER_TIMEOUT_MS 覆盖(慢网调大、CI 调小)。
 // 350ms 曾导致在常见网络下查询 registry.npmjs.org(实测约 630ms)每次静默超时,提醒形同虚设。
@@ -25,10 +26,9 @@ function shouldNotifyVersionReminder(currentVersion, latestVersion) {
 }
 
 function formatVersionReminder({ packageName, currentVersion, latestVersion }) {
-  const upgradeCommand = `npm install -g ${packageName}@latest`;
   return [
     `Update available for ${packageName}: ${currentVersion} -> ${latestVersion}`,
-    `Upgrade with: ${upgradeCommand}`,
+    `Run \`spec-first update\` to upgrade, or set ${VERSION_REMINDER_OPT_OUT_ENV}=1 to disable update checks.`,
   ].join('\n');
 }
 
@@ -46,6 +46,10 @@ async function maybeShowVersionReminder(options = {}) {
     : VERSION_REMINDER_ATTEMPT_COOLDOWN_MS;
 
   if (!packageName || !currentVersion) {
+    return false;
+  }
+
+  if (shouldSkipCliVersionReminder(options)) {
     return false;
   }
 
@@ -106,6 +110,10 @@ async function maybeShowStartupVersionReminder(options = {}) {
 async function buildStartupVersionReminder(options = {}) {
   const host = normalizeHost(options.host);
   if (!host) {
+    return null;
+  }
+
+  if (isVersionReminderOptedOut(options)) {
     return null;
   }
 
@@ -424,6 +432,41 @@ function recordReminderAttempt(state, { scope, nowMs }) {
   };
 }
 
+function shouldSkipCliVersionReminder(options = {}) {
+  if (isVersionReminderOptedOut(options)) {
+    return true;
+  }
+  if (isTruthyEnvValue(resolveEnvValue('CI', options))) {
+    return true;
+  }
+
+  const output = options.output || process.stderr;
+  return output && output.isTTY === false;
+}
+
+function isVersionReminderOptedOut(options = {}) {
+  return isTruthyEnvValue(resolveEnvValue(VERSION_REMINDER_OPT_OUT_ENV, options));
+}
+
+function resolveEnvValue(name, options = {}) {
+  const env = options.env || process.env;
+  return env && Object.prototype.hasOwnProperty.call(env, name)
+    ? env[name]
+    : undefined;
+}
+
+function isTruthyEnvValue(value) {
+  if (typeof value !== 'string') {
+    return Boolean(value);
+  }
+
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+  return normalized !== '0' && normalized !== 'false' && normalized !== 'no' && normalized !== 'off';
+}
+
 function clearStartupVersionReminderCooldown(options = {}) {
   const host = normalizeHost(options.host);
   if (!host) {
@@ -737,8 +780,10 @@ module.exports = {
   defaultLookupLatestVersion,
   formatVersionReminder,
   formatStartupVersionReminder,
+  isVersionReminderOptedOut,
   maybeShowVersionReminder,
   maybeShowStartupVersionReminder,
   resolveVersionReminderTimeoutMs,
+  shouldSkipCliVersionReminder,
   shouldNotifyVersionReminder,
 };

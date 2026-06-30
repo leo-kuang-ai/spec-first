@@ -476,8 +476,10 @@ describe('spec-prd workflow contracts', () => {
       'Route-out and bypass are pre-authoring exits, not grill exemptions',
       'Claude runtime mutation guard',
       '`prd-prewrite-guard`',
-      '`PreToolUse` guard for `Write`',
-      'blocks first writes of `docs/brainstorms/*-requirements.md` PRD artifacts',
+      '`PreToolUse` guard for `Write|Edit|MultiEdit`',
+      'self-claim machine ready/final state through Claude file mutation tools',
+      'reconstructs candidate content from `old_string` / `new_string` edits when possible',
+      'Codex enforcement as degraded',
       'does not judge product semantics or prove an owner really answered',
       'Owner-answer fidelity (no reversal)',
       'Turning a real "must do X" reply into "owner accepted skipping X" is the worst observed failure',
@@ -513,6 +515,8 @@ describe('spec-prd workflow contracts', () => {
       'Domain/Glossary Gate',
       'Topology/Producer-Consumer Gate',
       'Design Coverage Gate',
+      'build the existing `design_source_inventory` per source / node / state',
+      'load-bearing unread/degraded design items without owner acceptance',
       'API/Contract Coverage Gate',
       'Large Input/Resume Gate',
       'owner-owned open decisions',
@@ -844,9 +848,13 @@ describe('spec-prd workflow contracts', () => {
       'design_source_inventory',
       'source_or_node',
       'read_status',
-      'PRD write target',
-      'readiness consequence',
+      'affected_prd_write_targets',
+      'extracted_design_what',
+      'unread_or_degraded_reason',
+      'readiness_consequence',
+      'owner_authority_needed',
       'Design-source inventory is mandatory whenever design input exists',
+      'Design/source authority razor',
     ]);
     expectContainsAll(featureSlices, [
       'Feature Slices are context and handoff units',
@@ -954,12 +962,15 @@ describe('spec-prd workflow contracts', () => {
       'design_sources_unread',
       'source_or_node',
       'read_status',
-      'PRD write target',
+      'affected PRD write targets',
+      'extracted design WHAT',
       'readiness consequence',
+      'owner-authority-needed',
       'explicit input refs',
       'Figma-discoverable nodes',
       'design-dependent states referenced by requirements',
       'must block `ready-for-planning`',
+      'not `source-resolved`',
       'Degraded design evidence is not silently planning-ready',
       'owner explicitly accepts the degraded risk',
       'owner-accepted degradation is the only ready-for-planning release valve',
@@ -1092,6 +1103,8 @@ describe('spec-prd workflow contracts', () => {
       'blocks planning? no',
       'Figma/design-source',
       'page structure, state, interaction, acceptance, or scope',
+      'cannot treat it as `source-resolved`',
+      'bound Owner Decision Trace row for that exact conflict',
       'headless-degraded-logged',
       'source-proven-no-ask',
       'clarification_evidence_undeclared',
@@ -1444,9 +1457,26 @@ describe('spec-prd workflow contracts', () => {
           coverage_tags: expect.arrayContaining(['readiness', 'design-source', 'preflight']),
           expected: expect.arrayContaining([
             'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, preflight_sweep_closure_absent, and preflight_sweep_closure_blocked must be consumed by readiness',
+            'Design Coverage Gate must run in Phase 1 before final-prd when design input is present',
           ]),
           must_not: expect.arrayContaining([
             'must not mark ready-for-planning after reading inputs directly into final-prd without non-skipped clarification evidence, input scan coverage, and preflight closure',
+          ]),
+        }),
+      }),
+      expect.objectContaining({
+        id: 'design-requirements-conflict-source-resolved-rejected',
+        requires: expect.objectContaining({
+          case_type: 'failure',
+          quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
+          coverage_tags: expect.arrayContaining(['readiness', 'design-source', 'owner-answer-fidelity']),
+          expected: expect.arrayContaining([
+            'design-source vs requirements conflict that changes WHAT or acceptance is owner-authority-needed, not source-resolved',
+            'owner-* closure is valid only when Owner Decision Trace binds to the exact conflict',
+          ]),
+          must_not: expect.arrayContaining([
+            'must not mark ready-for-planning by declaring design wins over requirements as source-resolved',
+            'must not use owner-answered or owner-accepted-assumption without a real owner answer for that exact conflict',
           ]),
         }),
       }),
@@ -1546,6 +1576,7 @@ describe('spec-prd workflow contracts', () => {
       expected: [
         'Figma/design-source nodes affecting UI structure, state, interaction, acceptance, or scope must be read during PRD output or block readiness',
         'unread design nodes must map to PRD write targets with source/node id, unread reason, evidence level, and readiness consequence',
+        'load-bearing unread/degraded design inventory items block final-prd unless owner-accepted with residue',
       ],
     });
     expectEvalCase(examples, 'core-declarations-omitted-ready-rejected', {
@@ -1560,6 +1591,7 @@ describe('spec-prd workflow contracts', () => {
       expected: [
         'design_source_inventory must include explicit input refs, Figma-discoverable nodes, and design-dependent states referenced by requirements',
         'unread design nodes omitted from coverage block readiness',
+        'Phase 1 Design Coverage Gate builds per-source/per-node/per-state inventory before durable PRD write',
       ],
     });
     expectEvalCase(examples, 'preflight-grill-design-gate-ready-rejected', {
@@ -1567,6 +1599,15 @@ describe('spec-prd workflow contracts', () => {
       expected: [
         'checker findings clarification_trace_absent, design_source_unaccounted, input_scan_degraded, prd_readiness_declarations_evaded, preflight_sweep_closure_absent, and preflight_sweep_closure_blocked must be consumed by readiness',
         'preflight_sweep_closure missing or blocked prevents ready-for-planning',
+        'Design Coverage Gate must run in Phase 1 before final-prd when design input is present',
+      ],
+    });
+    expectEvalCase(examples, 'design-requirements-conflict-source-resolved-rejected', {
+      tags: ['readiness', 'design-source', 'owner-answer-fidelity'],
+      expected: [
+        'design-source vs requirements conflict that changes WHAT or acceptance is owner-authority-needed, not source-resolved',
+        'owner-* closure is valid only when Owner Decision Trace binds to the exact conflict',
+        'without owner answer the legal outcome is ask-owner-first or checkpoint-prd',
       ],
     });
     expectEvalCase(examples, 'analysis-gate-skipped-final-prd-rejected', {

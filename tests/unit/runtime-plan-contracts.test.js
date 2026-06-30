@@ -71,7 +71,9 @@ describe('runtime plan contracts', () => {
       expect(specPlanGuard.contents).toContain("fs.readFileSync(0, 'utf8')");
       expect(specPlanGuard.contents).not.toContain('SPEC_FIRST_HOOK_INPUT');
       expect(specPlanGuard.contents).not.toContain('"decision"');
-      expect(prdPrewriteGuard.contents).toContain('PRD prewrite guard blocked Write');
+      expect(prdPrewriteGuard.contents).toContain("['Write', 'Edit', 'MultiEdit']");
+      expect(prdPrewriteGuard.contents).toContain('PRD prewrite guard blocked ${toolName}');
+      expect(prdPrewriteGuard.contents).toContain('reconstruction_status: degraded');
       expect(prdPrewriteGuard.contents).toContain('write_mode: checkpoint-prd');
       expect(prdPrewriteGuard.contents).toContain('check-prd-artifact.js');
       expect(prdReadinessGuard.contents).toContain('PRD readiness guard blocked closeout');

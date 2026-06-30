@@ -26,7 +26,7 @@ function installRuntimeChecker(projectRoot) {
   fs.copyFileSync(REASON_CODES_LIB, path.join(scriptsDir, 'lib', 'reason-codes.js'));
 }
 
-function runHook(projectRoot, filePath, content, toolName = 'Write') {
+function runHook(projectRoot, filePath, content, toolName = 'Write', toolInputOverrides = {}) {
   return spawnSync('bash', [HOOK_TEMPLATE], {
     cwd: projectRoot,
     encoding: 'utf8',
@@ -36,6 +36,7 @@ function runHook(projectRoot, filePath, content, toolName = 'Write') {
       tool_input: {
         file_path: filePath,
         content,
+        ...toolInputOverrides,
       },
     }),
     env: {
@@ -43,6 +44,18 @@ function runHook(projectRoot, filePath, content, toolName = 'Write') {
       CLAUDE_PROJECT_DIR: projectRoot,
     },
   });
+}
+
+function runEditHook(projectRoot, filePath, oldString, newString, extra = {}) {
+  return runHook(projectRoot, filePath, '', 'Edit', {
+    old_string: oldString,
+    new_string: newString,
+    ...extra,
+  });
+}
+
+function runMultiEditHook(projectRoot, filePath, edits) {
+  return runHook(projectRoot, filePath, '', 'MultiEdit', { edits });
 }
 
 function prdWithReadiness(readinessLines = []) {
@@ -252,6 +265,138 @@ describe('Claude PRD prewrite guard hook', () => {
         '# Missing artifact kind\n',
       );
       expect(missingArtifactKind.status).toBe(0);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('blocks Edit that mutates an existing PRD into ready status', () => {
+    const projectRoot = makeTempDir();
+    const relativePath = 'docs/brainstorms/edit-ready-requirements.md';
+    const prdPath = path.join(projectRoot, relativePath);
+
+    try {
+      installRuntimeChecker(projectRoot);
+      write(prdPath, prdWithReadiness([
+        'write_mode: checkpoint-prd',
+        'can_enter_spec_plan: no',
+      ]));
+
+      const result = runEditHook(
+        projectRoot,
+        relativePath,
+        'artifact_kind: prd-requirements',
+        'artifact_kind: prd-requirements\nstatus: ready-for-planning',
+      );
+
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain('PRD prewrite guard blocked Edit');
+      expect(result.stderr).toContain('machine-owned');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('allows Edit that changes ordinary PRD prose without touching ready fields', () => {
+    const projectRoot = makeTempDir();
+    const relativePath = 'docs/brainstorms/edit-prose-requirements.md';
+    const prdPath = path.join(projectRoot, relativePath);
+
+    try {
+      installRuntimeChecker(projectRoot);
+      write(prdPath, prdWithReadiness([
+        'write_mode: checkpoint-prd',
+        'can_enter_spec_plan: no',
+      ]));
+
+      const result = runEditHook(projectRoot, relativePath, 'Test PRD.', 'Updated test PRD.');
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('blocks MultiEdit that adds machine receipt fields', () => {
+    const projectRoot = makeTempDir();
+    const relativePath = 'docs/brainstorms/multiedit-receipt-requirements.md';
+    const prdPath = path.join(projectRoot, relativePath);
+
+    try {
+      installRuntimeChecker(projectRoot);
+      write(prdPath, prdWithReadiness([
+        'write_mode: checkpoint-prd',
+        'can_enter_spec_plan: no',
+      ]));
+
+      const result = runMultiEditHook(projectRoot, relativePath, [
+        {
+          old_string: 'artifact_kind: prd-requirements',
+          new_string: 'artifact_kind: prd-requirements\nreadiness_verified_by: check-prd-artifact.js',
+        },
+        {
+          old_string: 'Test PRD.',
+          new_string: 'Updated test PRD.',
+        },
+      ]);
+
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain('PRD prewrite guard blocked MultiEdit');
+      expect(result.stderr).toContain('readiness_*');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('blocks reconstruction-degraded Edit when payload directly writes ready fields', () => {
+    const projectRoot = makeTempDir();
+    const relativePath = 'docs/brainstorms/edit-degraded-ready-requirements.md';
+    const prdPath = path.join(projectRoot, relativePath);
+
+    try {
+      installRuntimeChecker(projectRoot);
+      write(prdPath, prdWithReadiness([
+        'write_mode: checkpoint-prd',
+        'can_enter_spec_plan: no',
+      ]));
+
+      const result = runEditHook(
+        projectRoot,
+        relativePath,
+        'missing old string',
+        'status: ready-for-planning',
+      );
+
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain('reconstruction_status: degraded');
+      expect(result.stderr).toContain('PRD prewrite guard blocked Edit');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('allows reconstruction-degraded Edit when payload does not touch ready fields', () => {
+    const projectRoot = makeTempDir();
+    const relativePath = 'docs/brainstorms/edit-degraded-prose-requirements.md';
+    const prdPath = path.join(projectRoot, relativePath);
+
+    try {
+      installRuntimeChecker(projectRoot);
+      write(prdPath, prdWithReadiness([
+        'write_mode: checkpoint-prd',
+        'can_enter_spec_plan: no',
+      ]));
+
+      const result = runEditHook(
+        projectRoot,
+        relativePath,
+        'missing old string',
+        'Updated ordinary prose.',
+      );
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }

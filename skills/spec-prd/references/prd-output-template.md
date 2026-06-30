@@ -275,6 +275,8 @@ Then <observable outcome or explicit non-goal>
 
 Closure-disposition razor: see SKILL.md `Closure-disposition razor` for the legal disposition set (single source of truth). For this template's evidence shape: a `source-resolved` / `source-backed-non-WHAT-assumption` cell needs a checkable ref (path/URL/`file:line`/anchor), an `owner-answered` / `owner-capped` / `owner-accepted-assumption` row needs a matching Owner Decision Trace row below, and `implementation-only-how-pushdown` needs `planning_would_invent_what=no` (touching interface/permission/scope/source-of-truth/fallback/analytics is a blocking contradiction in a ready PRD). "I judged it a parallel planning-time item" is not a disposition; without a legal disposition the only path is to keep grilling or `checkpoint-prd`.
 
+Design/source authority razor: a design-source fact can be `source-resolved` only when it answers a fact without contradicting another product/owner/source contract. If design evidence conflicts with requirements, owner decisions, API/source contracts, source-of-truth, fallback display, analytics, or user-visible interaction in a way that changes WHAT, acceptance, or scope, record it as an owner-authority-needed OQ/Decision Note. It may use `owner-answered` only when Owner Decision Trace binds to that exact conflict and records the actual owner answer; otherwise keep `ask-owner-first` or `checkpoint-prd`.
+
 ## Owner Decision Trace
 
 Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answered|capped`, or closure depends on an owner answer. Each row records the owner's actual decision; the checker verifies the row is structurally present (it cannot verify the answer is genuine — that stays owner-owned). Header alias: `check-prd-artifact.js` `TRACE_HEADER_ALIASES` also accepts `decision` / `决策` as the `question` column header.
@@ -287,10 +289,15 @@ Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answe
 design_source_inventory:
 - source_or_node: <explicit input ref, Figma-discoverable node, or design-dependent state referenced by requirements>
   read_status: read | unread | degraded
-  PRD write target: <Interaction Requirements | Use Cases | Acceptance Examples | Evidence And Assumptions | Planning Recheck | Outstanding Questions>
+  affected_prd_write_targets: <Interaction Requirements | Use Cases | Acceptance Examples | Evidence And Assumptions | Planning Recheck | Outstanding Questions>
+  extracted_design_what:
   evidence_level: source-candidate/provider_untrusted | confirmed owner/source | assumption
-  unread_reason:
-  readiness consequence:
+  unread_or_degraded_reason:
+  readiness_consequence:
+  conflicts:
+    - contradicts: <requirement/source/owner/API contract>
+      owner_authority_needed: yes | no
+      readiness_consequence:
 
 design_sources_read:
 - <source_or_node + affected PRD write target + evidence level>

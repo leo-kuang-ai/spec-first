@@ -30,7 +30,7 @@ URL parse -> tool discovery -> auth/access probe -> node-level context fetch or 
 - `code/owner reconciliation`: compare design-source claims with current source/docs when relevant, and ask owner only for target behavior decisions that source cannot answer.
 - `PRD write targets / Planning Recheck`: write confirmed or accepted design facts into `Interaction Requirements`, `Use Cases`, `Acceptance Examples`, `Evidence And Assumptions`, or `Planning Recheck`.
 
-Before reporting design coverage, build `design_source_inventory` first. The inventory is the denominator for coverage and must include explicit input refs, Figma-discoverable nodes from the file/page/frame when accessible, and design-dependent states referenced by requirements such as secondary pages, detail pages, module failure states, loading states, empty states, and error states. Each item records `source_or_node`, `read_status`, PRD write target, evidence level, unread reason, and readiness consequence. Then list `design_sources_read`, `design_sources_unread`, and `design_source_coverage`; a read-only list is not full coverage if unread design-dependent nodes were omitted.
+Build `design_source_inventory` during the Phase 1 Requirement Analysis Gate, before the first durable PRD write. The inventory is the denominator for coverage and must include explicit input refs, Figma-discoverable nodes from the file/page/frame when accessible, and design-dependent states referenced by requirements such as secondary pages, detail pages, module failure states, loading states, empty states, and error states. Each item records `source_or_node`, `read_status`, affected PRD write targets, extracted design WHAT, evidence level, unread/degraded reason, readiness consequence, and any conflict entry with `owner_authority_needed`. Then list `design_sources_read`, `design_sources_unread`, and `design_source_coverage`; a read-only list is not full coverage if unread design-dependent nodes were omitted.
 
 ## Advisory Posture
 
@@ -42,6 +42,7 @@ Design-source facts are advisory until confirmed:
 - code/source contradictions must be surfaced rather than silently normalized
 - unconfirmed design WHAT goes to `Planning Recheck`, `Evidence And Assumptions`, `Outstanding Questions`, or a source-backed owner question
 - unread design nodes that can change UI structure, state, interaction, acceptance, or scope must block `ready-for-planning` until read, owner-confirmed, or explicitly downgraded with a readiness consequence
+- design evidence that contradicts product requirements, owner decisions, API/source contracts, source-of-truth, fallback display, analytics, or user-visible interaction in a way that changes WHAT, acceptance, or scope is owner-authority-needed, not `source-resolved`; `owner-*` closure is valid only when the trace binds to the exact conflict and records a real owner answer
 
 Do not present design evidence as confirmed project scope merely because a tool can read it.
 
@@ -73,6 +74,8 @@ design_source:
   design_source_coverage:
   extracted_design_what:
   affected_PRD_write_targets:
+  conflicts:
+    owner_authority_needed:
   reconciliation_needed:
 ```
 

@@ -60,7 +60,7 @@ function buildManagedSpecPlanGuardMatcher() {
 
 function buildManagedPrdPrewriteGuardMatcher() {
   return {
-    matcher: 'Write',
+    matcher: 'Write|Edit|MultiEdit',
     hooks: [
       {
         type: 'command',

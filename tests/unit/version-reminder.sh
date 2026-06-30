@@ -156,7 +156,9 @@ EOF
 assert_contains "formatted reminder names package" "spec-first" "$formatted_output"
 assert_contains "formatted reminder includes current version" "1.4.0" "$formatted_output"
 assert_contains "formatted reminder includes latest version" "1.4.1" "$formatted_output"
-assert_contains "formatted reminder includes upgrade hint" "npm install -g spec-first@latest" "$formatted_output"
+assert_contains "formatted reminder includes update command" "spec-first update" "$formatted_output"
+assert_contains "formatted reminder includes opt-out env" "SPEC_FIRST_NO_UPDATE_NOTIFIER=1" "$formatted_output"
+assert_not_contains "formatted reminder avoids direct npm install" "npm install -g spec-first@latest" "$formatted_output"
 
 echo "3. maybeShowVersionReminder"
 notify_output="$(
@@ -188,7 +190,9 @@ notify_printed=$(node -e "const data = JSON.parse(process.argv[1]); process.stdo
 notify_captured=$(node -e "const data = JSON.parse(process.argv[1]); process.stdout.write(data.captured);" "$notify_output")
 assert_output "outdated version prints a reminder" "true" "$notify_printed"
 assert_contains "outdated reminder has update text" "Update available for spec-first" "$notify_captured"
-assert_contains "outdated reminder has upgrade hint" "npm install -g spec-first@latest" "$notify_captured"
+assert_contains "outdated reminder has update command" "spec-first update" "$notify_captured"
+assert_contains "outdated reminder has opt-out env" "SPEC_FIRST_NO_UPDATE_NOTIFIER=1" "$notify_captured"
+assert_not_contains "outdated reminder avoids direct npm install" "npm install -g spec-first@latest" "$notify_captured"
 
 skip_output="$(
   node - "$REPO_ROOT" "$TMP_DIR" <<'EOF'
@@ -1255,6 +1259,7 @@ const { runCli } = require(path.join(repoRoot, 'src/cli'));
     stderr += chunk;
     return true;
   };
+  Object.defineProperty(process.stderr, 'isTTY', { value: true, configurable: true });
   os.userInfo = () => ({ homedir: path.join(tmpDir, 'home-runcli') });
   os.homedir = () => path.join(tmpDir, 'home-runcli');
 
