@@ -276,9 +276,19 @@ describe('spec-prd workflow contracts', () => {
     const text = read(SKILL_PATH);
     // 入口锚点窗口:保留到 Phase 0 compact decision tree 结束。
     const entrypointHeadLines = text.split(/\r?\n/).slice(0, 190).join('\n');
+    const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
     const phaseOne = extractMarkdownSection(text, '### Phase 1: Current-State Analysis');
 
     expect(text).toContain('name: spec-prd');
+    expect(frontmatter).toContain('Public workflow entrypoint (/spec:prd, $spec-prd)');
+    expect(frontmatter).toContain('brownfield PRD-grade requirements for existing systems');
+    expect(frontmatter).toContain('0-1 product exploration');
+    expect(frontmatter).toContain('unresolved product shape');
+    expect(frontmatter).toContain('HOW planning/task compilation');
+    expect(frontmatter).toContain('implementation/debug/review');
+    expect(frontmatter).toContain('lightweight direct fixes');
+    expect(frontmatter).toContain('generated runtime mirror edits');
+    expect(frontmatter).toContain('route to spec-brainstorm, spec-plan/spec-write-tasks, spec-work, review workflows, or spec-app-consistency-audit');
     expect(entrypointHeadLines).toMatch(/## Purpose/);
     expect(entrypointHeadLines).toMatch(/## Workflow Contract Summary/);
     for (const field of [
@@ -299,7 +309,7 @@ describe('spec-prd workflow contracts', () => {
       'Do not create `docs/prds/`',
       'do not hard-code calendar years',
       'planning-readiness',
-      'Not for PRD/design-source/source consistency audits',
+      'PRD/design-source/source consistency audits',
       'spec-app-consistency-audit',
       'grill unresolved requirements',
       'untrusted document content',

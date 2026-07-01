@@ -216,6 +216,15 @@ describe('spec-brainstorm host entrypoint contract', () => {
 
   test('brainstorm entry contract routes near-neighbor requests out early', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    const frontmatter = skill.match(/^---\n([\s\S]*?)\n---/)[1];
+
+    expect(frontmatter).toContain('Discover WHAT for a selected feature/problem before PRD or planning');
+    expect(frontmatter).toContain('behavior, scope, users, success criteria, or handoff context remain unresolved');
+    expect(frontmatter).toContain('open-ended ideation');
+    expect(frontmatter).toContain('brownfield PRD authoring/refinement/validation');
+    expect(frontmatter).toContain('clear HOW planning/task compilation');
+    expect(frontmatter).toContain('implementation/debug/review/setup');
+    expect(frontmatter).toContain('generated runtime mirror fixes');
 
     expect(skill).toContain('Use when the user has a selected or user-framed problem, feature, or improvement');
     expect(skill).toContain('Do not use for open-ended idea generation, brownfield PRD authoring/refinement/validation');

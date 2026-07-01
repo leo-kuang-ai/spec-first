@@ -201,11 +201,13 @@ describe('spec-plan context orientation contract', () => {
 
     expect(frontmatter).toContain('name: spec-plan');
     expect(frontmatter).toContain('description:');
-    expect(frontmatter).toContain('needs a HOW plan');
+    expect(frontmatter).toContain('structured HOW plan');
     expect(frontmatter).toContain('deepen an existing plan');
     expect(frontmatter).toContain('spec-brainstorm for unresolved WHAT/product exploration');
     expect(frontmatter).toContain('spec-work for implementation or tests');
     expect(frontmatter).toContain('spec-doc-review for independent plan review');
+    expect(frontmatter).toContain('spec-write-tasks for task-pack compilation');
+    expect(frontmatter).toContain('Do not use for generated runtime mirror fixes');
     expect(frontmatter).not.toContain('plan a trip');
     expect(frontmatter).not.toContain('create a study plan');
     expect(frontmatter).not.toContain('break this down');

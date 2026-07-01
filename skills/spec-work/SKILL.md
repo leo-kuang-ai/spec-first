@@ -1,16 +1,16 @@
 ---
 name: spec-work
-description: Execute work efficiently while maintaining quality and finishing features
+description: "Execute a settled plan, validated task pack, spec path, or concrete implementation request in the current repo. Do not use when WHAT/HOW is unresolved, target repo scope is ambiguous, task-pack freshness is stale/unverifiable, scope would expand beyond the plan, or the fix requires hand-editing generated runtime mirrors."
 argument-hint: "[Plan doc path or description of work. Blank to auto use latest plan doc]"
 ---
 
 # Work Execution Command
 
-Execute work efficiently while maintaining quality and finishing features.
+Execute settled implementation work within validated scope.
 
 ## Introduction
 
-This command takes a work document (plan, task pack, or specification) or a bare prompt describing the work, and executes it systematically. The focus is on **shipping complete features** by understanding requirements quickly, following existing patterns, and maintaining quality throughout.
+This command takes a settled plan, validated task pack, spec path, or concrete implementation request and executes it systematically within the current repo scope. It preserves the source plan/task boundary, follows existing patterns, verifies with evidence, and routes back to planning when WHAT/HOW or scope is not settled.
 
 ## Workflow Contract Summary
 

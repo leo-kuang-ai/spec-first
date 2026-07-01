@@ -38,7 +38,7 @@ Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 2026-07-01 owner 决策：反向提升 `spec-write-tasks` 为 public workflow。当前 source surface 已按该决策修复：`using-spec-first`、README/用户手册、`spec-work` handoff、task-pack handoff contract、workflow map、metadata 和测试已收敛到 `/spec:write-tasks` / `$spec-write-tasks`。剩余不是 source 口径问题，而是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新。
 
-当前 F2-F4 的全景文档 polish 已修复：`docs/workflow-skill-agent-map.md` 已把 `Context` 从顺序链路节点调整为横切 Harness layer，Knowledge 行已覆盖 `spec-compound-refresh`，Review 描述已补 dispatch 授权与 fallback 边界。仍待处理的是 F5 tentative trigger polish；它属于 discovery variance 风险，不是当前执行错误。
+当前 F2-F5 的后续优化已在 source 层修复：`docs/workflow-skill-agent-map.md` 已把 `Context` 从顺序链路节点调整为横切 Harness layer，Knowledge 行已覆盖 `spec-compound-refresh`，Review 描述已补 dispatch 授权与 fallback 边界；核心链路 9 个 skill 的 frontmatter description 也已补齐最容易误触发的 positive/negative trigger boundary。剩余不是 source 口径问题，而是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新。
 
 ## 审查范围
 
@@ -189,24 +189,37 @@ Knowledge 不只是“写入新 learning”，还包括让旧 learning 与当前
 
 已把 `docs/workflow-skill-agent-map.md` 的 Review 描述改为“结构化审查；dispatch 可用且授权时使用多 persona，否则走 report-only / inline fallback”。同步收敛 `docs/workflow-enhancement-proposals.md` 的 Review 当前能力描述，避免把 fallback 误读成质量下降或 workflow 失败。
 
-### F5 P2：部分核心 skill frontmatter trigger 过窄或过泛，依赖 body 才能完整表达边界
+### F5 P2：部分核心 skill frontmatter trigger 过窄或过泛，依赖 body 才能完整表达边界（source fixed）
 
-**结论：tentative。**
+**结论：fixed at source。**
 
 **证据**
 
-skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 ready，但 trigger discovery readiness 多为 partial，常见缺项是 frontmatter negative boundary 或显式 positive/negative trigger examples。核心样例：
+skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 ready，但 trigger discovery readiness 多为 partial，常见缺项是 frontmatter negative boundary 或显式 positive/negative trigger examples。原始核心样例：
 
 - `spec-plan`、`spec-work`、`spec-code-review`、`spec-doc-review`、`spec-compound` 的 frontmatter description 不足以单独呈现所有 near-neighbor 边界。
 - `spec-work` 的 description 是 “Execute work efficiently while maintaining quality and finishing features”，比 body contract 宽；body 在 `skills/spec-work/SKILL.md:13-39` 才给出真正的 when-to-use / when-not-to-use / failure modes。
+- Owner 随后要求把剩余核心链路 skill 也做同类优化；`spec-brainstorm`、`spec-prd`、`spec-write-tasks`、`spec-compound-refresh` 本体边界强，但仍可通过 frontmatter trigger contract 降低 discovery variance。
 
 **反证检查**
 
 每个核心 skill 的前 120 行都有 Workflow Contract Summary，且 body 边界强。这个问题不是当前运行错误，而是 discovery 层 variance risk。
 
-**建议**
+**修复记录**
 
-后续做轻量统一：不要求 frontmatter 承载完整合同，但应在 description 中包含最容易误触发的 negative boundary，尤其是 work/review/plan/doc-review 之间的邻近边界。
+本轮没有重写 workflow 执行逻辑，主要按 `spec-write-skill` 的 “description as trigger contract” 规则做轻量 source polish，并同步收敛 `spec-work` 第一屏正文概述，避免旧的泛化执行口径继续稀释触发边界：
+
+1. `skills/spec-plan/SKILL.md`：把入口明确为 structured HOW plan，并补 `spec-write-tasks` task-pack compilation 与 generated runtime mirror fix 的负向边界。
+2. `skills/spec-work/SKILL.md`：把入口收敛到 settled plan、validated task pack、spec path 或 concrete implementation request；排除 WHAT/HOW 未定、target repo 不清、task pack stale/unverifiable、scope expansion 和手改 generated runtime mirrors；第一屏正文概述同步强调 validated scope 和 route-back-to-planning。
+3. `skills/spec-code-review/SKILL.md`：明确只审 code diffs、PRs 或 branch implementation changes；排除文档审查、实现执行、未定计划和 commit/push/PR creation。
+4. `skills/spec-doc-review/SKILL.md`：明确审 requirements、plans、task packs 或 Markdown planning artifacts；排除 code diff/PR/branch implementation review、implementation execution 和 PR merge-readiness code review，并保留 dispatch 授权/fallback 口径。
+5. `skills/spec-compound/SKILL.md`：限定为 just-solved、source-confirmed、reusable team knowledge；排除 active debugging、unresolved hypotheses、one-off summaries/transcript archiving、mandatory completion gates，并把 stale knowledge 路由到 `spec-compound-refresh`。
+6. `skills/spec-brainstorm/SKILL.md`：把入口明确为 selected feature/problem 的 WHAT discovery before PRD/planning；排除 open-ended ideation、brownfield PRD、HOW planning/task compilation、implementation/debug/review/setup、runtime mirror fix、factual answer 和 cleanup。
+7. `skills/spec-prd/SKILL.md`：把入口明确为 brownfield PRD-grade requirements planning-readiness；排除 0-1 product exploration、unresolved product shape、HOW planning/task compilation、implementation/debug/review、lightweight direct fixes、runtime mirror edits 和 design/source consistency audit，并补 near-neighbor route hints。
+8. `skills/spec-write-tasks/SKILL.md`：把入口明确为 `/spec:write-tasks` / `$spec-write-tasks` public workflow、settled local plan 和 existing local task pack；排除 plan authoring、implementation、unresolved scope、small low-risk plans、progress/approval state、remote/generic task lists 和 runtime mirror edits。
+9. `skills/spec-compound-refresh/SKILL.md`：把入口明确为现有 `docs/solutions/` learning/pattern docs 的 stale/drift/overlap/inaccuracy refresh；排除 new learning capture、active debugging、general refactor/migration/code-review、非 `docs/solutions/` doc sweep、transcript archive、mandatory completion gate 和 runtime mirror edits。
+
+对应新增或调整 focused contract tests，锁住上述 frontmatter trigger contract，避免后续退回宽泛摘要式 description。`docs/catalog/runtime-capabilities.md` 已通过 `npm run docs:runtime-catalog` 从 source 重新生成，保持 `/spec:write-tasks` catalog 描述一致。
 
 ## 非 Findings：当前流程做得好的地方
 
@@ -249,7 +262,7 @@ skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 re
 1. **P1 已按 owner 决策修复 source surface：** `spec-write-tasks` 入口已收敛为 `/spec:write-tasks` / `$spec-write-tasks` public workflow；后续需要用非 dry-run `spec-first init` 刷新 generated runtime mirrors。
 2. **全景文档已修复：** canonical 7 节点主链路、Context 横切层、Knowledge capture/refresh/recall 和 Review fallback 表达已对齐。
 3. **保持 runtime catalog 与 tests 锁步：** 让 `runtime-capability-catalog`、`workflow-skill-agent-map`、`spec-work`、`using-spec-first` 对同一 public surface 有一致断言。
-4. **最后做 trigger polish：** 优先补 work/plan/review/doc-review 的 frontmatter negative boundary，降低 discovery variance。
+4. **trigger polish 已 source-fixed：** 5 个核心 skill 的 frontmatter description 已补近邻负向边界，并以 focused contract tests 锁定。
 
 ## 验证记录
 
@@ -292,9 +305,21 @@ skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 re
 - `docs/workflow-skill-agent-map.md` 和 `docs/workflow-enhancement-proposals.md` 中已无旧的 `Codebase → Context` 顺序链路或无 fallback 的“多 persona 并行”当前口径。
 - `rg` 仍命中本报告中的修复前证据快照、source-fixed 标题和历史问题说明，属于保留审查证据，不代表当前用户面文档仍漂移。
 
+### 2026-07-01 skill trigger polish validation
+
+已执行：
+
+- `npx jest tests/unit/spec-plan-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-compound-contracts.test.js --runInBand`
+- `npx jest tests/unit/spec-brainstorm-contracts.test.js tests/unit/spec-brainstorm-routing-contracts.test.js tests/unit/spec-prd-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-compound-contracts.test.js --runInBand`
+- `npm run lint:skill-entrypoints`
+- `npm run docs:runtime-catalog`
+- `npx jest tests/unit/spec-plan-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-compound-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
+- `npx jest tests/unit/spec-brainstorm-contracts.test.js tests/unit/spec-brainstorm-routing-contracts.test.js tests/unit/spec-prd-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-plan-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-compound-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
+- `git diff --check -- CHANGELOG.md docs/catalog/runtime-capabilities.md skills/spec-brainstorm/SKILL.md skills/spec-prd/SKILL.md skills/spec-write-tasks/SKILL.md skills/spec-plan/SKILL.md skills/spec-work/SKILL.md skills/spec-code-review/SKILL.md skills/spec-doc-review/SKILL.md skills/spec-compound/SKILL.md skills/spec-compound-refresh/SKILL.md tests/unit/spec-brainstorm-contracts.test.js tests/unit/spec-brainstorm-routing-contracts.test.js tests/unit/spec-prd-contracts.test.js tests/unit/spec-write-tasks-contracts.test.js tests/unit/spec-plan-contracts.test.js tests/unit/spec-work-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/spec-doc-review-contracts.test.js tests/unit/spec-compound-contracts.test.js docs/项目审查/2026-07-01-core-workflow-skill-flow-audit.md`
+
 Remediation limits：
 
-- 未运行完整 `npm test`；本轮只跑 entry surface、workflow invocation、runtime catalog、eval fixture 与 changelog 相关聚焦验证。
+- 未运行完整 `npm test`；本轮按阶段运行了 public surface、workflow invocation、runtime catalog、eval fixture、workflow map、skill trigger contract 与 changelog 相关聚焦验证。
 - fresh-source eval 状态为 `not_run`：当前 Codex 请求未明示 subagents/personas/delegated review 授权，且本轮以 source reads + 静态 contract/Jest 验证收敛 public surface。
 - 未运行非 dry-run `spec-first init`，未手改 `.claude/`、`.codex/` 或 `.agents/skills/` generated runtime mirrors。dry-run 显示 runtime 需要按 source 重新投射；实际刷新应由后续 `spec-first init` 执行。
 
@@ -311,4 +336,4 @@ Review challenges code/docs
 Knowledge captures and refreshes verified learnings
 ```
 
-原始审查需要优先修的是 public surface 与导航文档，而不是重写这些核心 skill。Remediation 后，当前 source surface 已按 owner 决策收敛到 `/spec:write-tasks` / `$spec-write-tasks` public workflow，F2-F4 的全景文档 polish 也已完成；剩余风险主要是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新，以及 F5 的 trigger discovery polish 仍待后续轻量处理。
+原始审查需要优先修的是 public surface、导航文档和 discovery 触发边界，而不是重写这些核心 skill。Remediation 后，当前 source surface 已按 owner 决策收敛到 `/spec:write-tasks` / `$spec-write-tasks` public workflow，F2-F4 的全景文档 polish 已完成，F5 的 trigger discovery polish 也已覆盖核心链路 9 个 skill。剩余风险主要是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新，以及 fresh-source eval 未执行。

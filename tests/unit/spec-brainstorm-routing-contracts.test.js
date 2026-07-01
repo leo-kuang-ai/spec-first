@@ -44,8 +44,10 @@ describe('spec-brainstorm routing boundary contract', () => {
   test('frontmatter and entry contract narrow brainstorm to selected WHAT discovery', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
 
-    expect(skill).toContain('Explore a selected or user-framed feature/problem through collaborative WHAT discovery');
-    expect(skill).toContain('planning handoff context remain unresolved');
+    expect(skill).toContain('Discover WHAT for a selected feature/problem before PRD or planning');
+    expect(skill).toContain('success criteria, or handoff context remain unresolved');
+    expect(skill).toContain('clear HOW planning/task compilation');
+    expect(skill).toContain('generated runtime mirror fixes');
     expect(skill).toContain('Do not use for open-ended idea generation');
     expect(skill).toContain('brownfield PRD authoring/refinement/validation');
     expect(skill).toContain('clear implementation planning');

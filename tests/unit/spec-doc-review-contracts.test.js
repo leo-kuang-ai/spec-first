@@ -37,6 +37,20 @@ const COHERENCE_REVIEWER_PATH = path.join(
   'spec-coherence-reviewer.agent.md',
 );
 
+describe('spec-doc-review frontmatter trigger contract', () => {
+  test('description distinguishes document review from code review and implementation', () => {
+    const skill = fs.readFileSync(DOC_REVIEW_FILES[0], 'utf8');
+    const frontmatter = skill.match(/^---\n([\s\S]*?)\n---/)[1];
+
+    expect(frontmatter).toContain('requirements, plans, task packs, or Markdown planning artifacts');
+    expect(frontmatter).toContain('coherence, feasibility, scope, risk, and downstream readiness');
+    expect(frontmatter).toContain('code diff/PR/branch implementation review');
+    expect(frontmatter).toContain('implementation execution');
+    expect(frontmatter).toContain('PR merge-readiness code review');
+    expect(frontmatter).toContain('single-agent report-only review');
+  });
+});
+
 describe('spec-doc-review best-judgment wording contract', () => {
   test('user-visible doc review paths no longer expose LFG wording', () => {
     const combined = DOC_REVIEW_FILES.map((filePath) => fs.readFileSync(filePath, 'utf8')).join('\n');

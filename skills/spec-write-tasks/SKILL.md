@@ -1,6 +1,6 @@
 ---
 name: spec-write-tasks
-description: "Compile a settled spec-plan into an optional derived task pack for spec-work, or validate an existing task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for implementation execution, unresolved scope, small low-risk plans, or remote/generic task lists. Keep plan as the single source of truth; tasks are derived and optional."
+description: "Public workflow entrypoint (/spec:write-tasks, $spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional."
 ---
 
 # `spec-write-tasks`

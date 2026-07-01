@@ -1,6 +1,6 @@
 ---
 name: spec-prd
-description: "Public workflow entrypoint (/spec:prd): create, write, refine, or validate planning-readiness of brownfield PRD-grade requirements for existing systems before implementation planning. Not for PRD/design-source/source consistency audits; use spec-app-consistency-audit."
+description: "Public workflow entrypoint (/spec:prd, $spec-prd): create, write, refine, or validate planning-readiness of brownfield PRD-grade requirements for existing systems before implementation planning. Do not use for 0-1 product exploration, unresolved product shape, HOW planning/task compilation, implementation/debug/review, lightweight direct fixes, generated runtime mirror edits, or PRD/design-source/source consistency audits; route to spec-brainstorm, spec-plan/spec-write-tasks, spec-work, review workflows, or spec-app-consistency-audit as appropriate."
 ---
 
 # Brownfield PRD Requirements

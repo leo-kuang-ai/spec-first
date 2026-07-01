@@ -1,6 +1,6 @@
 ---
 name: spec-plan
-description: "Create a structured plan when the user has a clear goal, requirements document, brainstorm/PRD handoff, feature, bug, or project that needs a HOW plan; also deepen an existing plan when the user asks to strengthen the plan as a whole. Prefer spec-brainstorm for unresolved WHAT/product exploration, spec-work for implementation or tests, and spec-doc-review for independent plan review."
+description: "Create a structured HOW plan when the user has a clear goal, requirements document, brainstorm/PRD handoff, feature, bug, or project; also deepen an existing plan when asked to strengthen the plan as a whole. Prefer spec-brainstorm for unresolved WHAT/product exploration, spec-work for implementation or tests, spec-doc-review for independent plan review, and spec-write-tasks for task-pack compilation. Do not use for generated runtime mirror fixes."
 ---
 
 # Create Technical Plan

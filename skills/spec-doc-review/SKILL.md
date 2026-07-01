@@ -1,6 +1,6 @@
 ---
 name: spec-doc-review
-description: Review requirements, plan, or task-pack documents using persona reviewers that surface role-specific issues. When reviewer dispatch is available and explicitly authorized for the current host, run bounded parallel reviewers; when dispatch is unavailable, unauthorized, explicitly disabled, or unsafe, fall back to a single-agent report-only review instead of bypassing host boundaries.
+description: "Review requirements, plans, task packs, or Markdown planning artifacts for coherence, feasibility, scope, risk, and downstream readiness. Do not use for code diff/PR/branch implementation review, implementation execution, or PR merge-readiness code review. When reviewer dispatch is available and explicitly authorized for the current host, run bounded parallel reviewers; when dispatch is unavailable, unauthorized, explicitly disabled, or unsafe, fall back to a single-agent report-only review instead of bypassing host boundaries."
 argument-hint: "[mode:headless] [path/to/document.md]"
 ---
 

@@ -44,6 +44,33 @@ function sectionBetween(text, startNeedle, endNeedle) {
   return text.slice(start, end);
 }
 
+describe('spec-work frontmatter trigger contract', () => {
+  test('description names executable inputs and near-neighbor exclusions', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
+
+    expect(frontmatter).toContain('settled plan');
+    expect(frontmatter).toContain('validated task pack');
+    expect(frontmatter).toContain('concrete implementation request');
+    expect(frontmatter).toContain('WHAT/HOW is unresolved');
+    expect(frontmatter).toContain('target repo scope is ambiguous');
+    expect(frontmatter).toContain('stale/unverifiable');
+    expect(frontmatter).toContain('scope would expand beyond the plan');
+    expect(frontmatter).toContain('generated runtime mirrors');
+  });
+
+  test('first-screen summary matches the settled-scope execution boundary', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const intro = sectionBetween(text, '# Work Execution Command', '## Workflow Contract Summary');
+
+    expect(intro).toContain('Execute settled implementation work within validated scope.');
+    expect(intro).toContain('settled plan, validated task pack, spec path, or concrete implementation request');
+    expect(intro).toContain('routes back to planning when WHAT/HOW or scope is not settled');
+    expect(intro).not.toContain('Execute work efficiently while maintaining quality and finishing features');
+    expect(intro).not.toContain('shipping complete features');
+  });
+});
+
 describe('spec-work context orientation contract', () => {
   test('uses plan/task-pack guided direct reads without hidden hooks', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');

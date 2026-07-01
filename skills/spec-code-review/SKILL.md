@@ -1,6 +1,6 @@
 ---
 name: spec-code-review
-description: "Structured code review using tiered persona agents, confidence-gated findings, and a merge/dedup pipeline. Use when reviewing code changes before creating a PR."
+description: "Review code diffs, PRs, or branch implementation changes using tiered persona reviewers, confidence-gated findings, and merge/dedup synthesis. Do not use for requirements/plan/task-pack document review, implementation execution, planning unresolved work, or commit/push/PR creation."
 argument-hint: "[blank to review current branch, or provide PR link]"
 ---
 

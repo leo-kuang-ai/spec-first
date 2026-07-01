@@ -1,6 +1,6 @@
 ---
 name: spec-brainstorm
-description: "Explore a selected or user-framed feature/problem through collaborative WHAT discovery before requirements or planning. Use when behavior, scope, users, success criteria, or planning handoff context remain unresolved. Not for ideation, PRD, planning, execution/debug/review/setup, factual answers, or cleanup."
+description: "Discover WHAT for a selected feature/problem before PRD or planning when behavior, scope, users, success criteria, or handoff context remain unresolved. Do not use for open-ended ideation, brownfield PRD authoring/refinement/validation, clear HOW planning/task compilation, implementation/debug/review/setup, generated runtime mirror fixes, factual answers, or cleanup."
 argument-hint: "[feature/problem]"
 ---
 

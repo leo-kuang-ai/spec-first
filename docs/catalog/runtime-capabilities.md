@@ -51,7 +51,7 @@
 | slack-research | spec-slack-research | /spec:slack-research | $spec-slack-research | claude=command; codex=skill | no | Search Slack for interpreted organizational context |
 | work | spec-work | /spec:work | $spec-work | claude=command; codex=skill | no | Run the Spec-First execution workflow |
 | write-skill | spec-write-skill | /spec:write-skill | $spec-write-skill | claude=command; codex=skill | no | Write, revise, migrate, or remediate spec-first source skills |
-| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | claude=command; codex=skill | no | Compile a settled spec-plan into an optional derived task pack for spec-work, or validate an existing task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for implementation execution, unresolved scope, small low-risk plans, or remote/generic task lists. Keep plan as the single source of truth; tasks are derived and optional. |
+| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | claude=command; codex=skill | no | Public workflow entrypoint (/spec:write-tasks, $spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
 
 ## Standalone Skills
 

@@ -76,7 +76,17 @@ describe('spec-write-tasks contracts', () => {
 
     expect(estimatedTokens(SKILL_PATH)).toBeLessThanOrEqual(3000);
     expect(frontmatterKeys).toEqual(expect.arrayContaining(['name', 'description']));
-    expect(frontmatter).toContain('do not use for implementation execution, unresolved scope, small low-risk plans, or remote/generic task lists');
+    expect(frontmatter).toContain('Public workflow entrypoint (/spec:write-tasks, $spec-write-tasks)');
+    expect(frontmatter).toContain('settled local spec-plan');
+    expect(frontmatter).toContain('existing local task pack');
+    expect(frontmatter).toContain('explicit plan-splitting/task-doc requests');
+    expect(frontmatter).toContain('high-complexity work suitability');
+    expect(frontmatter).toContain('do not use for plan authoring, implementation execution, unresolved scope');
+    expect(frontmatter).toContain('small low-risk plans');
+    expect(frontmatter).toContain('progress/approval state');
+    expect(frontmatter).toContain('remote/generic task lists');
+    expect(frontmatter).toContain('generated runtime mirror edits');
+    expect(frontmatter).toContain('Keep the plan as single source of truth');
 
     for (const heading of [
       '## Workflow Contract Summary',

@@ -132,6 +132,41 @@ function plannedRuntimeContent(adapter, targetPath) {
   }
 }
 
+describe('spec-compound frontmatter trigger contract', () => {
+  test('description limits compound to verified reusable learnings', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
+
+    expect(frontmatter).toContain('just-solved');
+    expect(frontmatter).toContain('source-confirmed');
+    expect(frontmatter).toContain('reusable team knowledge');
+    expect(frontmatter).toContain('docs/solutions/');
+    expect(frontmatter).toContain('active debugging');
+    expect(frontmatter).toContain('unresolved hypotheses');
+    expect(frontmatter).toContain('one-off summaries or transcript archiving');
+    expect(frontmatter).toContain('mandatory completion gates');
+    expect(frontmatter).toContain('spec-compound-refresh');
+  });
+
+  test('compound-refresh description limits refresh to existing solution docs', () => {
+    const text = fs.readFileSync(COMPOUND_REFRESH_SKILL_PATH, 'utf8');
+    const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
+
+    expect(frontmatter).toContain('existing learning or pattern docs under docs/solutions/');
+    expect(frontmatter).toContain('stale, outdated, overlapping, drifted, inaccurate');
+    expect(frontmatter).toContain('refresh/consolidation against the current codebase');
+    expect(frontmatter).toContain('docs/solutions/ refresh/audit/sweep/cleanup/consolidation requests');
+    expect(frontmatter).toContain('narrow stale-doc hint from spec-compound');
+    expect(frontmatter).toContain('new learning capture');
+    expect(frontmatter).toContain('active debugging');
+    expect(frontmatter).toContain('general refactor/migration/code-review work');
+    expect(frontmatter).toContain('non-docs/solutions documentation sweeps');
+    expect(frontmatter).toContain('transcript archiving');
+    expect(frontmatter).toContain('mandatory completion gates');
+    expect(frontmatter).toContain('generated runtime mirror edits');
+  });
+});
+
 describe('spec-compound host entrypoint contract', () => {
   test('usage and follow-up guidance use current-host entrypoint wording', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');

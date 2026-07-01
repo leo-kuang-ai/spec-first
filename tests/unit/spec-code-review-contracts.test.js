@@ -15,6 +15,19 @@ function renderWorkflowSkill(platform) {
   });
 }
 
+describe('spec-code-review frontmatter trigger contract', () => {
+  test('description distinguishes code review from docs, work, planning, and shipping', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
+
+    expect(frontmatter).toContain('code diffs, PRs, or branch implementation changes');
+    expect(frontmatter).toContain('requirements/plan/task-pack document review');
+    expect(frontmatter).toContain('implementation execution');
+    expect(frontmatter).toContain('planning unresolved work');
+    expect(frontmatter).toContain('commit/push/PR creation');
+  });
+});
+
 describe('spec-code-review context orientation contract', () => {
   test('starts from diff evidence and keeps findings reviewer-owned', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');

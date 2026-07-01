@@ -1,6 +1,6 @@
 ---
 name: spec-compound
-description: Document a recently solved problem to compound your team's knowledge
+description: "Document a just-solved, source-confirmed problem as reusable team knowledge in docs/solutions/. Do not use for active debugging, unresolved hypotheses, one-off summaries or transcript archiving, mandatory completion gates, or refreshing existing learnings; use spec-compound-refresh for stale knowledge."
 ---
 
 # Compound Knowledge
