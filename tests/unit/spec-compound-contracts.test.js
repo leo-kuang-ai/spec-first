@@ -70,6 +70,7 @@ const COMPOUND_REFRESH_RESOLUTION_TEMPLATE_PATH = path.join(
   'assets',
   'resolution-template.md',
 );
+const EXTERNAL_LOCAL_PATH_PATTERN = /(?:\/Users\/|\/home\/|\/private\/var\/|[A-Za-z]:\\Users\\)/;
 const COMPOUND_SCHEMA_PATH = path.join(
   __dirname,
   '..',
@@ -248,7 +249,7 @@ describe('spec-compound host entrypoint contract', () => {
     expect(reference).toContain('timeout, retry, refactor');
     expect(reference).toContain('Terms already present in `CONCEPTS.md` when the solved lesson adds no durable precision');
     expect(reference).toContain('Domain model capture: <scanned, no qualifying signals');
-    expect(reference).not.toContain('/Users/kuang/xiaobu/skills');
+    expect(combined).not.toMatch(EXTERNAL_LOCAL_PATH_PATTERN);
 
     expect(combined).not.toContain('Update CONTEXT.md inline');
     expect(combined).not.toContain('Create files lazily');
@@ -348,7 +349,7 @@ describe('spec-compound host entrypoint contract', () => {
     expect(reference).toContain('If this refresh added, refined, or scrubbed entries in `CONCEPTS.md`');
     expect(reference).toContain('skip discoverability maintenance to avoid instruction-file churn');
     expect(reference).toContain('In `mode:autofix`, report a discoverability recommendation only');
-    expect(reference).not.toContain('/Users/kuang/xiaobu/skills');
+    expect(reference).not.toMatch(EXTERNAL_LOCAL_PATH_PATTERN);
     expect(reference).not.toContain('ce-compound-refresh');
     expect(reference).not.toContain('mode:headless');
   });

@@ -26,6 +26,8 @@ Spawned for medium, broad, sensitive, or unclear reviews. The Stage 3 scale-awar
 
 Spawned when the orchestrator identifies relevant patterns in the diff. The orchestrator reads the full diff and reasons about selection -- this is agent judgment, not keyword matching.
 
+Diff Boundary Review, Graph-Assisted Impact Review, and first-class test gaps do not add a new persona in Phase A. They are cross-cutting lenses applied by the orchestrator, `diff-scope.md`, and the selected reviewers. When boundary or graph impact signals make the diff sensitive, broad, public-contract-facing, source/runtime-facing, or missing-test-heavy, use the full default core plus applicable conditionals rather than the low-risk minimum set.
+
 **CLI readiness boundary:** Keep `cli-readiness` because this repository ships a CLI/workflow harness. CLI-facing changes must still be reviewed for autonomous-agent usability, parseable output, non-interactive behavior, bounded output, and actionable errors. Do not delete this selector without a separate spec-first product decision and replacement review coverage.
 
 | Persona | Agent | Select when diff touches... |
@@ -67,4 +69,5 @@ These Spec-First conditional agents provide specialized analysis beyond what the
 2. **For each cross-cutting conditional persona**, the orchestrator reads the diff and decides whether the persona's domain is relevant. This is a judgment call, not a keyword match.
 3. **For each stack-specific conditional persona**, use file types and changed patterns as a starting point, then decide whether the diff actually introduces meaningful work for that reviewer. Do not spawn language-specific reviewers just because one config or generated file happens to match the extension.
 4. **For Spec-First conditional agents**, spawn when the diff includes migration files (`db/migrate/*.rb`), schema dumps (`db/schema.rb`, `structure.sql`), or data backfill scripts. Do not spawn these agents for model/query-only changes without migration artifacts.
-5. **Announce the team** before spawning with the selected core tier and a one-line justification per conditional reviewer selected.
+5. **Boundary/graph escalation.** If Stage 2c has `authorized_scope_source: explicit-touch-set | declared-files-only | inferred-plan` and the diff touches files or behavior outside that source, keep the full default core even for a small diff. If graph-assisted candidates identify public contracts, source/runtime surfaces, security/permission paths, or untested high-impact symbols, use the full default core and add the relevant conditional persona.
+6. **Announce the team** before spawning with the selected core tier and a one-line justification per conditional reviewer selected.

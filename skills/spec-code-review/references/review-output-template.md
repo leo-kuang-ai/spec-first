@@ -12,6 +12,12 @@ Use this **exact format** when presenting synthesized review findings. Findings 
 **Scope:** merge-base with the review base branch -> working tree (14 files, 342 lines)
 **Intent:** Add order export endpoint with CSV and JSON format support
 **Mode:** autofix
+**scope_boundary:** concern
+**authorized_scope_source:** inferred-plan
+**finding_type:** missing_verification
+**graph_assist:** used
+**graph_reason_code:** candidate_results
+**expansion_budget:** max_5_high_impact_symbols
 
 **Reviewers:** correctness, testing, maintainability, security, api-contract
 - security -- new public endpoint accepts user-provided format parameter
@@ -90,6 +96,21 @@ Use this **exact format** when presenting synthesized review findings. Findings 
 ### Coverage
 
 - Direct evidence: <source refs/checks/logs used | limitations>
+- scope_boundary_evidence: plan R2/U1 covers `orders_controller.rb`; `export_helper.rb` is adjacent but not declared
+- provider_untrusted.summaries[]: code-graph returned `OrderExportService -> CsvWriter` and candidate `export_service_test.rb`; direct source confirmed the caller but no test covers concurrent export
+- expansion_budget: max_5_high_impact_symbols
+- changed_symbols: `OrdersController#export`, `OrderExportService#call`
+- changed_entrypoints: `GET /api/orders/export`
+- changed_contracts: CSV export response contract
+- symbol_mapping_status: mapped
+- impact_chain_candidates: `OrdersController#export -> OrderExportService#call`
+- blast_radius_candidates: export endpoint and CSV writer
+- caller_callee_paths: `OrdersController#export -> OrderExportService#call -> CsvWriter.write`
+- affected_test_candidates: `test/controllers/orders_controller_test.rb`, `test/services/order_export_service_test.rb`
+- tests_for_query_result: controller export tests found; no concurrent export assertion confirmed
+- missing_test_confirmation: no targeted test confirms concurrent export behavior
+- review_priority_candidates: `OrdersController#export` (public endpoint + auth risk), `OrderExportService#call` (memory risk + missing test)
+- test_gaps: No test for concurrent export requests
 - Suppressed: 2 findings below anchor 75 (1 at anchor 50, 1 at anchor 25)
 - Residual risks: No rate limiting on export endpoint
 - Testing gaps: No test for concurrent export requests
@@ -136,6 +157,9 @@ This fails because: no pipe-delimited tables, no severity-grouped `###` headers,
 - **Route column** shows the synthesized handling decision as ``<autofix_class> -> <owner>``.
 - **Header includes** scope, intent, and reviewer team with per-conditional justifications
 - **Mode line** -- include `interactive`, `autofix`, `report-only`, or `headless`
+- **Stable boundary fields** -- include `scope_boundary`, `authorized_scope_source`, and Coverage `scope_boundary_evidence`
+- **Stable finding type fields** -- include derived `finding_type` labels when scope-boundary or verification findings are present
+- **Stable graph fields** -- always include `graph_assist`, `graph_reason_code`, and `expansion_budget`; include Coverage `provider_untrusted.summaries[]` and candidate fields when graph/code-graph candidates shaped review focus, fallback happened, or limitations need to be explicit
 - **Applied Fixes section** -- include only when a fix phase ran in this review invocation
 - **Residual Actionable Work section** -- include only when unresolved actionable findings were handed off for later work
 - **Pre-existing section** -- separate table, no confidence-first column (these are informational)
@@ -144,7 +168,7 @@ This fails because: no pipe-delimited tables, no severity-grouped `###` headers,
 - **Agent-Native Gaps section** -- results from spec-agent-native-reviewer. Omit if no gaps found.
 - **Schema Drift Check section** -- results from spec-schema-drift-detector. Omit if the agent did not run.
 - **Deployment Notes section** -- key checklist items from spec-deployment-verification-agent. Omit if the agent did not run.
-- **Coverage section** -- direct evidence posture, suppressed count, residual risks, testing gaps, failed reviewers
+- **Coverage section** -- direct evidence posture, suppressed count, residual risks, first-class `test_gaps`, failed reviewers, boundary fields, graph fallback/candidate fields, and limitations
 - **Rule Maturity Candidates section** -- optional; include only when confirmed findings or resource advisory meet the noise filter and have durable evidence refs
 - **Summary uses blockquotes** for verdict, reasoning, and fix order
 - **Horizontal rule** (`---`) separates findings from verdict

@@ -34,6 +34,13 @@ Runtime mirrors were not treated as source evidence. Final closeout separately r
 
 ## Reviewer Result
 
+Execution record:
+
+- Mode: fresh-source eval using a bounded read-only reviewer over current disk source; runtime mirrors were excluded from eval evidence.
+- Dispatch boundary: the reviewer was asked to evaluate only the listed source paths, not to edit files, create context/ADR artifacts, or rely on current-session cached skill text.
+- Reviewer prompt summary: verify that Domain Model Capture is an adapted discipline inside `spec-compound`, preserves one primary `docs/solutions/` learning, keeps `CONCEPTS.md` update-only advisory, treats `CONTEXT.md`/`CONTEXT-MAP.md`/`docs/adr/**` as preview-only candidates, keeps scripts/tests at deterministic-anchor level, and aligns `spec-compound-refresh` without rerunning full capture.
+- Reviewer output artifact: the raw reviewer transcript was not stored as a separate durable artifact; the material result is preserved below as a structured excerpt plus the exact source paths cited. This validation record is therefore the audit artifact.
+
 ```yaml
 fresh_source_eval:
   status: passed
@@ -58,14 +65,25 @@ Evidence cited by the reviewer:
 - `skills/spec-compound-refresh/references/concepts-vocabulary.md`
 - `tests/unit/spec-compound-contracts.test.js`
 
+Reviewer raw-result excerpt:
+
+```text
+Verdict: passed.
+No P0/P1 findings.
+The source defines Domain Model Capture as package-local and self-contained, keeps one primary docs/solutions learning, keeps CONCEPTS.md advisory/update-only, and keeps context/ADR as preview-only candidates. Refresh collects vocabulary/domain drift but does not rerun full Domain Model Capture. Tests lock deterministic anchors while leaving term qualification and ADR candidacy to LLM semantic judgment.
+```
+
 ## Final Fixes After Review
 
 The review passes raised P2/P3 concerns, all addressed in source and contract tests:
 
-- Lightweight compound output now includes `Context/ADR candidates: <none | preview only — path/reason/evidence>`, matching full success and alternate full output examples.
-- `spec-compound-refresh` discoverability now triggers only when refresh added, refined, or scrubbed entries in an existing `CONCEPTS.md`, or when the user explicitly asked for vocabulary discoverability maintenance. A scan with no qualifying terms does not create instruction-file churn.
-- Domain Model Capture output now uses the same three-line order and enum across the entrypoint and reference: `Domain model capture`, `CONCEPTS.md`, then `Context/ADR candidates`.
-- Contract tests now validate those three output sections by section and enforce field order, instead of treating the global example count as the contract.
+| Finding | Resolution evidence |
+| --- | --- |
+| Lightweight compound output omitted explicit context/ADR candidate status. | `skills/spec-compound/SKILL.md` lightweight output now includes `Context/ADR candidates: <none | preview only — path/reason/evidence>`; `tests/unit/spec-compound-contracts.test.js` checks lightweight, full success, and alternate output sections. |
+| `spec-compound-refresh` discoverability could create instruction-file churn after a no-op vocabulary scan. | `skills/spec-compound-refresh/SKILL.md` and `skills/spec-compound-refresh/references/concepts-vocabulary.md` now trigger discoverability only after added/refined/scrubbed entries or explicit vocabulary discoverability maintenance; contract tests assert the narrowed wording. |
+| Domain Model Capture output order and enum could drift between entrypoint and reference. | `skills/spec-compound/SKILL.md` and `skills/spec-compound/references/domain-model-capture.md` now use the same three-line order: `Domain model capture`, `CONCEPTS.md`, then `Context/ADR candidates`; tests enforce section-local order. |
+| Contract tests over-counted global examples instead of checking the relevant output templates. | `tests/unit/spec-compound-contracts.test.js` now validates the required fields inside each output block rather than relying on global occurrence counts. |
+| Later report-only review found the validation record was too thin to audit and path-leak checks were too narrow. | This file now preserves the reviewer prompt summary, structured result excerpt, and fix mapping; `tests/unit/spec-compound-contracts.test.js` now rejects broad external local path patterns such as `/Users/`, `/home/`, `/private/var/`, and Windows user-home paths in the relevant source surfaces. |
 
 The final source audit confirmed these fixes from current disk source and locked them with `tests/unit/spec-compound-contracts.test.js` assertions.
 
@@ -75,7 +93,7 @@ Final checks run for this closeout:
 
 - `npx jest tests/unit/spec-compound-contracts.test.js tests/unit/concepts-vocabulary-contracts.test.js tests/unit/workflow-eval-readiness-contracts.test.js tests/unit/changelog-format.test.js tests/unit/plan-status-taxonomy.test.js --runInBand` — passed.
 - `npm run lint:skill-entrypoints` — passed.
-- `python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-compound` — passed.
+- skill-creator `quick_validate.py skills/spec-compound` helper — passed.
 - `git diff --check -- CHANGELOG.md docs/plans/2026-07-01-001-feat-spec-compound-domain-modeling-capture-plan.md docs/validation/spec-compound/fresh-source-eval-2026-07-01-domain-model-capture.md skills/spec-compound/SKILL.md skills/spec-compound/references/domain-model-capture.md skills/spec-compound/references/concepts-vocabulary.md skills/spec-compound/evals/examples.json skills/spec-compound-refresh/SKILL.md skills/spec-compound-refresh/references/concepts-vocabulary.md tests/unit/spec-compound-contracts.test.js` — passed.
 - `node bin/spec-first.js init -y --claude` — passed.
 - `node bin/spec-first.js init -y --codex` — passed.

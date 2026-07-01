@@ -214,7 +214,7 @@ Every terminal path of Interactive mode emits the same completion report structu
 
 ### Coverage section
 
-Carry forward the existing Coverage data (suppressed-finding count, residual risks, testing gaps, failed reviewers) and add one new element:
+Carry forward the existing Coverage data (suppressed-finding count, residual risks, testing gaps, failed reviewers), plus any Stage 6 stable boundary/graph fields such as `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, `finding_type`, `graph_assist`, `graph_reason_code`, `provider_untrusted.summaries[]`, `symbol_mapping_status`, `tests_for_query_result`, `missing_test_confirmation`, `review_priority_candidates`, and `test_gaps`. Add one new element:
 
 - **Framing-enrichment gaps:** count of findings where reviewer-return detail and optional artifact lookup returned no match. Name the personas contributing those gaps so the data feeds any future persona-upgrade decision. A trail of gaps per run tells the team which persona agents still need attention.
 

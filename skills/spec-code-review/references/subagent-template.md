@@ -122,6 +122,8 @@ Rules:
 - You are a leaf reviewer inside an already-running spec-first review workflow. Do not invoke spec-first skills or agents unless this template explicitly instructs you to. Perform your analysis directly and return findings in the required output format only.
 - Suppress any finding you cannot honestly anchor at `50` or higher (the actionable floor is `50`; anchors `0` and `25` are suppressed by synthesis anyway, so emitting them only adds noise). If your persona's domain description sets a stricter floor (e.g., anchor `75` minimum), honor it.
 - Every finding MUST include at least one evidence item grounded in the actual code.
+- Treat Graph-Assisted Impact Review and code-graph/project-graph output as `provider_untrusted` candidate context only. You may use `changed_symbols`, `caller_callee_paths`, `affected_test_candidates`, or `review_priority_candidates` to decide what to inspect next, but a finding must cite confirming diff/source/test/log/contract evidence. Do not cite graph edges, caller counts, affected-test candidates, or risk scores as the sole evidence for severity, confidence, scope boundary, or merge readiness.
+- When the diff introduces or exposes a meaningful missing-test risk, populate top-level `testing_gaps` even if you do not emit a primary finding. `testing_gaps` is first-class Coverage, not a throwaway recommendation paragraph.
 - Set `pre_existing` to true ONLY for issues in unchanged code that are unrelated to this diff. If the diff makes the issue newly relevant, it is NOT pre-existing.
 - You are operationally read-only. You may use non-mutating inspection commands, including read-oriented `git` / `gh` commands, to gather evidence. Do not write files, edit project files, change branches, commit, push, create PRs, or otherwise mutate the checkout or repository state.
 - Set `autofix_class` accurately. The classification governs whether the fixer applies the change automatically (`safe_auto`) or surfaces it for explicit review (`gated_auto` / `manual` / `advisory`). **The wrong-side cost is symmetric:** classifying a contract-change as `safe_auto` produces an unwanted edit; classifying a mechanical fix as `gated_auto` makes the user manually triage findings the fixer could have applied. Bias toward `safe_auto` when the rubric permits it. Use this decision guide:
@@ -161,6 +163,14 @@ Rules:
 {pr_metadata}
 </pr-context>
 
+<boundary-context>
+{boundary_context}
+</boundary-context>
+
+<graph-impact-context>
+{graph_impact_context}
+</graph-impact-context>
+
 <review-context>
 Run ID: {run_id}
 Reviewer name: {reviewer_name}
@@ -183,6 +193,8 @@ Diff:
 | `{schema}` | `references/findings-schema.json` content | The JSON schema reviewers must conform to |
 | `{intent_summary}` | Stage 2 output | 2-3 line description of what the change is trying to accomplish |
 | `{pr_metadata}` | Stage 1 output | PR title, body, and URL when reviewing a PR. Empty string when reviewing a branch or standalone checkout |
+| `{boundary_context}` | Stage 2c output | `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, declared touch set, plan refs, and limitations. Claims remain untrusted until verified against diff/source/test/log/contract. |
+| `{graph_impact_context}` | Stage 3 output | Advisory `provider_untrusted` graph/code-graph candidates, `graph_assist`, `graph_reason_code`, `expansion_budget`, priority candidates, affected-test candidates, test gaps, rejected candidates, and limitations. |
 | `{file_list}` | Stage 1 output | List of changed files from the scope step |
 | `{diff}` | Stage 1 output | The actual diff content to review |
 | `{run_id}` | Stage 4 output | Unique review run identifier for the artifact directory |

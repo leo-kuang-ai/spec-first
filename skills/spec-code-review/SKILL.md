@@ -24,7 +24,7 @@ Current branch diff, PR URL/number, branch target, or explicit `base:<sha-or-ref
 
 ### Outputs
 
-A merged findings report with severity, confidence, evidence, `autofix_class`, owner routing, residual status, and Coverage; structured headless/autofix output when a mode token requests it; `safe_auto` edits only when the selected mode allows mutation.
+A merged findings report with severity, confidence, evidence, `autofix_class`, owner routing, residual status, Diff Boundary Review, Graph-Assisted Impact Review Coverage, first-class `test_gaps`, and Coverage; structured headless/autofix output when a mode token requests it; `safe_auto` edits only when the selected mode allows mutation.
 
 ### Artifacts
 
@@ -104,9 +104,40 @@ Code Review does not require external-tool readiness before reviewer dispatch. U
 
 When review runs from a parent workspace containing multiple independent Git repos, group changed files by Git repo and keep file references, suggested fixes, and risk assessments scoped to the repo that owns the file. For read-only review questions without a diff, ask for or infer only bounded candidate repos from the user request and direct file discovery. Autofix review must not edit a child repo unless that repo is explicit in the diff or `target_repo` scope.
 
+## Diff Boundary Review
+
+Every review treats "did the diff stay inside the authorized work?" as a first-class review axis, not as incidental intent checking.
+
+Compute and carry these run-level fields from Stage 2 through Stage 6:
+
+- `scope_boundary`: `clean | concern | violation | unknown`
+- `authorized_scope_source`: `explicit-touch-set | declared-files-only | inferred-plan | diff-only | unknown`
+- `scope_boundary_evidence`: compact source refs, plan refs, declared files, diff files, or limitation notes that justify the boundary verdict
+
+Boundary verdict rules:
+
+- Use `clean` only when an explicit touch set, declared files, or plan requirements directly cover the changed files and behavior. A diff-only inference is never enough for `clean`.
+- Use `unknown` when no plan, task, PR intent, explicit touch set, or declared file list exists. Do not label thin intent as clean.
+- Use `concern` when the diff plausibly reaches outside stated intent but needs owner or plan confirmation before calling it unauthorized.
+- Use `violation` when direct diff/source/plan evidence shows an unauthorized file, behavior, source/runtime boundary change, generated runtime edit, or requirement omission.
+- Implementer reports, PR prose, commit messages, or work closeouts are claim sources only. Verify them against diff/source/test/log/contract evidence before using them to lower boundary risk.
+
+Stage 5 synthesis derives `finding_type` for surfaced findings without changing `references/findings-schema.json`. Minimum derived labels are `scope_creep`, `unauthorized_file_change`, `unverifiable_claim`, and `missing_verification`. High-confidence scope-boundary findings must remain in the primary finding set; do not silently demote them into residual risks or testing gaps only. Schema promotion is deferred until report/headless consumers prove they need reviewer-return fields.
+
 ## Capability-Class Evidence Boundary
 
 Follows `docs/contracts/project-graph-consumption.md`. When setup/runtime facts expose optional `capability-class` candidates such as `code-graph` or `project-graph`, use them only as advisory review inputs through their native MCP or CLI surface. Confirm freshness through `readiness_status`, lifecycle display bits, and direct source/test/log evidence before relying on impact, affected-test, or ownership candidates; provider self-reported freshness is not a confirmed review fact. A `stale` graph still serves exploration-tier orientation when you annotate that it lags HEAD, but a review conclusion must be re-grounded regardless. When the capability is missing, when readiness facts are unavailable or self-reported as `unknown`/`unverified`, on call failure, or when disabled/unsafe, continue with bounded diff/source reads, `rg`, ast-grep, package/test facts, and logs. Record any used candidate in Coverage as `provider_untrusted`; never-block review on its availability, and keep setup-side `lifecycle.fallback_used` separate from consumption-side fallback notes.
+
+Graph-Assisted Impact Review is a bounded advisory lens for impact-sensitive diffs. Trigger it for shared helpers, public APIs, workflow/contract/source-runtime changes, exported symbols, CLI/runtime generation, security/permission surfaces, cross-module changes, or owner-requested impact review. Classify graph use with stable Coverage fields:
+
+- `graph_assist`: `used | fallback | not_applicable`
+- `graph_reason_code`: `candidate_results | provider_missing | readiness_unknown | stale | call_failed | disabled_or_unsafe | markdown_only_diff | no_candidates`
+- `provider_untrusted.summaries[]`: query/tool summary, accepted candidates, rejected candidates, freshness/readiness notes, and limitations
+- `expansion_budget`: minimal-first budget used for candidate expansion, normally `max_5_high_impact_symbols`
+
+Candidate fields, when present, are advisory only: `changed_symbols`, `changed_entrypoints`, `changed_contracts`, `symbol_mapping_status`, `tests_for_query_result`, `missing_test_confirmation`, `impact_chain_candidates`, `blast_radius_candidates`, `affected_test_candidates`, `caller_callee_paths`, `review_priority_candidates`, `test_gaps`, and `limitations`. These shrink the next direct read; they do not prove affected tests, ownership, severity, confidence, scope boundary, merge readiness, or a confirmed finding.
+
+Use minimal-first expansion: start with at most 5 high-impact symbols or entrypoints. Expand callers, flows, source snippets, and affected-test candidates only for medium/high risk, public/contract/source-runtime/security/permission changes, explicit test gaps, or owner-requested impact review. Ordinary docs-only/prose-only diffs can use `graph_assist: not_applicable` with `graph_reason_code: markdown_only_diff`; source-runtime instruction prose such as `skills/**`, workflow contracts, templates, runtime projection source, or CLI/workflow harness docs remains impact-sensitive and should use `fallback/readiness_unknown` when provider readiness is unknown. `graph_assist: used` requires `graph_reason_code: candidate_results` plus at least one of `changed_symbols`, `caller_callee_paths`, or `affected_test_candidates`; `no_candidates` proves only that the provider path ran.
 
 ## Progress Reporting Boundary
 
@@ -474,6 +505,18 @@ Locate the plan document so Stage 6 can verify requirements completeness. Check 
 
 If a plan is found, read its **Requirements** section — `## Requirements` in current plans, `## Requirements Trace` in legacy ones — and the R-IDs (R1, R2, etc.) listed there, plus **Implementation Units** under the `## Implementation Units` section. Recognize both current heading-style units (`### U1. [Name]`) and legacy list-item units (`- U1. **[Name]**`); the reader must remain compatible with older plans while new plans use heading-style units. Store the extracted requirements list, implementation unit IDs/titles, and `plan_source` for Stage 6. Do not block the review if no plan is found — requirements verification is additive, not required.
 
+### Stage 2c: Boundary source discovery
+
+Build the Diff Boundary Review input from the strongest available source:
+
+1. Explicit touch set or task pack declared files -> `authorized_scope_source: explicit-touch-set`.
+2. PR/work/plan text with concrete declared files only -> `authorized_scope_source: declared-files-only`.
+3. Plan requirements and implementation units that imply file or behavior scope -> `authorized_scope_source: inferred-plan`.
+4. Diff and branch/commit intent only -> `authorized_scope_source: diff-only`.
+5. No usable scope signal -> `authorized_scope_source: unknown`.
+
+Record `scope_boundary_evidence` as a compact list. It may include plan requirement IDs, implementation unit IDs, declared file paths, diff files, user-stated intent, and limitations. Do not record implementer claims as confirmed evidence unless they were checked against diff/source/test/log/contract. If the strongest source is `diff-only` or `unknown`, initialize `scope_boundary: unknown` unless Stage 5 later finds direct evidence for `concern` or `violation`.
+
 ### Stage 3: Select reviewers
 
 Read the diff and file list from Stage 1. Start with the deterministic scale-aware reviewer preflight below, then decide which conditional reviewers fit the diff. Conditional selection is agent judgment, not keyword matching.
@@ -576,6 +619,21 @@ When the diff is broad or impact-sensitive, Stage 3 records direct evidence targ
 - Workspace multi-repo diff -> resolve direct evidence per child repo and keep findings scoped to the child repo that owns the file.
 
 Direct evidence targets are review focus, not scope expansion. Do not raise a finding solely from a name match; every finding must be confirmed by diff/source/test/contract/log evidence before it enters the merged finding set.
+
+#### Graph-assisted impact candidates
+
+For impact-sensitive diffs, decide whether Graph-Assisted Impact Review applies. Reuse `docs/contracts/project-graph-consumption.md`; do not introduce a graph-specific evidence schema and do not read raw project-graph artifact JSON.
+
+When a capability-class provider is ready and relevant, gather a minimal candidate set and record:
+
+- `changed_symbols`, `changed_entrypoints`, and `changed_contracts` when the diff can be mapped to source symbols or contract surfaces.
+- `symbol_mapping_status`: `mapped | degraded | not_applicable`, with a limitation when large hunks, Markdown/prose, generated files, or provider gaps prevent reliable symbol mapping.
+- `caller_callee_paths`, `impact_chain_candidates`, and `blast_radius_candidates` only within the minimal-first budget.
+- `affected_test_candidates`, `tests_for_query_result`, `missing_test_confirmation`, and `test_gaps` when candidate tests exist, when expected tests are missing, or when provider/read evidence cannot identify or confirm a test path.
+- `review_priority_candidates` ordered by impact, publicness, contract/source-runtime sensitivity, security/permission risk, and missing-test signal.
+- `limitations` explaining unsupported file types, stale/unknown readiness, no candidates, or bounded sampling.
+
+Every graph-derived candidate is `provider_untrusted` until confirmed by bounded source/test/log/contract evidence. A reviewer may use candidates to choose which files to inspect next, but a finding that cites graph impact must cite the confirming source, diff, test, log, or contract evidence as the finding evidence.
 
 ### Stage 3b: Discover project standards paths
 
@@ -696,7 +754,9 @@ Spawn each selected persona reviewer using the subagent template included below.
 4. PR metadata: title, body, and URL when reviewing a PR (empty string otherwise). Passed in a `<pr-context>` block so reviewers can verify code against stated intent
 5. Review context: intent summary, file list, diff
 6. Run ID, review artifact directory, and reviewer name for correlation and parent-owned artifact filenames
-7. **For `project-standards` only:** the standards file path list from Stage 3b, wrapped in a `<standards-paths>` block appended to the review context
+7. Boundary context from Stage 2c, wrapped in `<boundary-context>`: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, declared files/touch set when known, plan requirement or implementation-unit refs, and limitations.
+8. Graph impact context from Stage 3, wrapped in `<graph-impact-context>`: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, candidate fields, rejected candidates, test candidates, `test_gaps`, and limitations. This context is advisory/provider_untrusted unless confirmed by direct evidence.
+9. **For `project-standards` only:** the standards file path list from Stage 3b, wrapped in a `<standards-paths>` block appended to the review context
 
 Persona sub-agents are **read-only** with respect to the project and the filesystem: they review and return structured JSON. They do not edit project files, write temp artifacts, or propose refactors. Artifact persistence is parent/orchestrator-owned so reviewer capability frontmatter does not need broad `Write`.
 
@@ -758,6 +818,11 @@ Convert multiple reviewer JSON returns into one deduplicated, confidence-gated f
 4. **Separate pre-existing.** Pull out findings with `pre_existing: true` into a separate list.
 5. **Resolve disagreements.** When reviewers flag the same code region but disagree on severity, autofix_class, or owner, annotate the Reviewer column with the disagreement (e.g., "security (P0), correctness (P1) -- kept P0"). This transparency helps the user understand why a finding was routed the way it was.
 6. **Normalize routing.** For each merged finding, set the final `autofix_class`, `owner`, and `requires_verification`. If reviewers disagree, keep the most conservative route. Synthesis may narrow a finding from `safe_auto` to `gated_auto` or `manual`, but must not widen it without new evidence.
+6a. **Derive Phase A report labels.** Add synthesis-owned labels for report/headless output without requiring leaf reviewers to return new schema fields:
+   - `finding_type`: derive at least `scope_creep`, `unauthorized_file_change`, `unverifiable_claim`, and `missing_verification` when the finding evidence supports those meanings. Other findings may omit the label.
+   - `scope_boundary`: keep the run-level value from Stage 2c unless a surviving finding proves `concern` or `violation`.
+   - `authorized_scope_source`: carry the Stage 2c source value unchanged so downstream readers can tell whether the boundary verdict came from an explicit touch set, declared files, an inferred plan, diff-only context, or unknown scope.
+   High-confidence `scope_creep` and `unauthorized_file_change` findings are primary findings. Do not reroute them into `residual_risks`, `testing_gaps`, or advisory-only prose just because they are governance findings.
 6b. **Derive the recommended action.** Interactive mode's walk-through and best-judgment paths present a per-finding recommended action (Apply / Defer / Skip / Acknowledge). The recommendation is derived from the normalized `autofix_class` and the presence of `suggested_fix` using this mapping:
 
 | `autofix_class` | `suggested_fix` present? | Recommended action |
@@ -791,7 +856,8 @@ Demotion is intentionally narrow. The conservative scope (testing/maintainabilit
    - residual actionable queue: unresolved `gated_auto` or `manual` findings whose owner is `downstream-resolver`
    - report-only queue: `advisory` findings plus anything owned by `human` or `release`
 9. **Sort and number.** Order by severity (P0 first) -> anchor (descending) -> file path -> line number, then assign monotonically increasing `#` values across the full primary finding set in that sorted order. Do not restart numbering inside each severity table or autofix/routing bucket. If later sections repeat a finding (for example Residual Actionable Work after `safe_auto` fixes are applied), reuse the same stable `#` so users and downstream workflows can reference findings by `#` after the autofix loop rewrites the report.
-10. **Collect coverage data.** Union residual_risks and testing_gaps across reviewers.
+10. **Collect coverage data.** Union residual_risks and testing_gaps across reviewers. Keep `test_gaps` as a first-class Coverage signal: include reviewer `testing_gaps`, graph-assisted `affected_test_candidates` gaps, direct-evidence missing-test observations, and any requirement/plan verification gaps that are not already primary findings. Do not hide test gaps only in recommendations prose.
+10a. **Collect graph-assisted coverage data.** Carry `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, `changed_symbols`, `changed_entrypoints`, `changed_contracts`, `symbol_mapping_status`, `impact_chain_candidates`, `blast_radius_candidates`, `caller_callee_paths`, `affected_test_candidates`, `tests_for_query_result`, `missing_test_confirmation`, `review_priority_candidates`, `test_gaps`, and `limitations` into Stage 6. If graph candidates were rejected because direct evidence did not confirm them, list the rejection in `provider_untrusted.summaries[]` instead of creating a finding.
 11. **Preserve Spec-First agent artifacts.** Keep the learnings, agent-native, schema-drift, and deployment-verification outputs alongside the merged finding set. Do not drop unstructured agent output just because it does not match the persona JSON schema.
 
 ### Stage 5b: Validation pass (externalizing modes only)
@@ -830,7 +896,7 @@ The best-judgment path skips Stage 5b deliberately. Running validators before fi
 4. **Collect verdicts.** Each validator returns `{ "validated": true | false, "reason": "<one sentence>" }`.
    - `validated: true` -> finding survives unchanged into the next phase (Stage 6 for headless/autofix, dispatch for interactive)
    - `validated: false` -> finding is dropped; record the validator's reason in Coverage
-   - Validator failure (timeout, dispatch error, malformed JSON) -> drop the finding with reason "validator failed"; conservative bias is correct
+   - Validator failure (timeout, dispatch error, malformed JSON) -> keep the finding, mark validation as `degraded/unvalidated`, and record the validator failure reason in Coverage. Do not treat infrastructure failure as counter-evidence. P0/P1 unvalidated findings must remain visible and should keep the verdict at "Not ready" or "Ready with fixes" unless another confirmed resolution exists.
 5. **Use mid-tier model for validators.** Same model class (sonnet) the persona reviewers use. Validators are read-only — same constraints as persona reviewers. They may use non-mutating inspection commands (Read, Grep, Glob, git blame, gh).
 6. **Record metrics for Coverage.** Total dispatched, validated true count, validated false count (with reasons), failures, and over-budget drops.
 
@@ -860,7 +926,10 @@ Assemble the final report using **pipe-delimited markdown tables for findings** 
 11. **Deployment Notes.** If spec-deployment-verification-agent ran, surface the key Go/No-Go items: blocking pre-deploy checks, the most important verification queries, rollback caveats, and monitoring focus areas. Keep the checklist actionable rather than dropping it into Coverage.
 12. **Resource Advisory.** If `resource-governance-lens` returned `status=advisory`, list the advisory dimensions and reason codes using `subject_path` for the file under discussion and `evidence_ref` for the proof source. Do not convert resource advisories into blocking findings unless a reviewer independently confirms a concrete code-review issue. A `status=unavailable` result (for example a non-git target) is a non-blocking degraded posture, not a fast-fail signal: note it in Coverage and continue; the helper exit code stays `0` for `ok`, `advisory`, and `unavailable`.
 13. **Rule Maturity Candidates.** Include only when the confirmed findings or resource advisory meet the rule-maturity noise filter: P1/P2 repeated governance gap, same low-level issue appears at least twice, or a registered contract / plan non-goal is clearly violated. For each candidate list `rule_id`, `evidence_ref`, `reason_code`, `human_review_kind`, and `similar_existing_rule_ids`; use durable repo-readable evidence refs, never session-only summaries, raw lens stdout, `/tmp` files, or "see above". This section is an advisory queue for humans, not a finding, not a verdict input, and not an automatic `adjudicate`, `promote`, or `demote` action.
-14. **Coverage.** Suppressed count by anchor (e.g., "N findings suppressed at anchor 50, M at anchor 25"), mode-aware demotion count (interactive/report-only) or suppression count (headless/autofix), validator drop count and reasons (when Stage 5b ran), validator over-budget drops (when the 15-cap fired), residual risks, testing gaps, failed/timed-out reviewers, resource lens status/reason codes, direct evidence posture, and any intent uncertainty carried by non-interactive modes. Include `Direct evidence: <source refs/checks/logs used> | limitations: <reason>` when coverage depends on bounded direct evidence; for multi-repo review, report evidence per child repo. External-tool evidence is advisory whenever it is degraded or unconfirmed by source.
+14. **Coverage.** Suppressed count by anchor (e.g., "N findings suppressed at anchor 50, M at anchor 25"), mode-aware demotion count (interactive/report-only) or suppression count (headless/autofix), validator drop count and reasons (when Stage 5b ran), validator over-budget drops (when the 15-cap fired), residual risks, first-class `test_gaps`, failed/timed-out reviewers, resource lens status/reason codes, direct evidence posture, Diff Boundary Review fields, Graph-Assisted Impact Review fields, and any intent uncertainty carried by non-interactive modes. Include `Direct evidence: <source refs/checks/logs used> | limitations: <reason>` when coverage depends on bounded direct evidence; for multi-repo review, report evidence per child repo. External-tool evidence is advisory whenever it is degraded or unconfirmed by source.
+   - Stable boundary fields: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, and run-level `finding_type` summaries for derived boundary/verification labels.
+   - Stable graph fields: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, and any populated candidate fields from `changed_symbols`, `changed_entrypoints`, `changed_contracts`, `symbol_mapping_status`, `impact_chain_candidates`, `blast_radius_candidates`, `caller_callee_paths`, `affected_test_candidates`, `tests_for_query_result`, `missing_test_confirmation`, `review_priority_candidates`, `test_gaps`, and `limitations`.
+   - Do not let downstream-consumption gates depend on human-only prose. If a value is meant for automation or headless callers, render it with the stable field name above.
 15. **Verdict.** Ready to merge / Ready with fixes / Not ready. Fix order if applicable. When an `explicit` plan has unaddressed requirements, the verdict must reflect it — a PR that's code-clean but missing planned requirements is "Not ready" unless the omission is intentional. When an `inferred` plan has unaddressed requirements, note it in the verdict reasoning but do not block on it alone.
 
 When the review established targeted validation, surface that as a structured `verification-run-summary.v1` ref in Coverage or artifact handoff instead of a freeform "tests passed" claim. If the review closeout is based on structured claims, use `honest-closeout.v1`; when structured claim or evidence objects are missing, mark the closeout `degraded` rather than quietly implying verification.
@@ -881,6 +950,12 @@ Intent: <intent-summary>
 Reviewers: <reviewer-list with conditional justifications>
 Verdict: <Ready to merge | Ready with fixes | Not ready>
 Artifact: <review-artifact-dir>/
+scope_boundary: <clean | concern | violation | unknown>
+authorized_scope_source: <explicit-touch-set | declared-files-only | inferred-plan | diff-only | unknown>
+finding_type: <derived labels present in this report, or none>
+graph_assist: <used | fallback | not_applicable>
+graph_reason_code: <candidate_results | provider_missing | readiness_unknown | stale | call_failed | disabled_or_unsafe | markdown_only_diff | no_candidates>
+expansion_budget: <max_5_high_impact_symbols | not_applicable | other explicit budget>
 
 Applied N safe_auto fixes.
 
@@ -929,6 +1004,21 @@ Testing gaps:
 - <gap>
 
 Coverage:
+- scope_boundary_evidence: <plan refs / declared files / diff refs / limitations>
+- provider_untrusted.summaries[]: <graph/code-graph candidate summary, rejected candidate, freshness, or limitation>
+- expansion_budget: <max_5_high_impact_symbols | not_applicable | other explicit budget>
+- changed_symbols: <symbol candidates or none>
+- changed_entrypoints: <entrypoint candidates or none>
+- changed_contracts: <contract candidates or none>
+- symbol_mapping_status: <mapped | degraded | not_applicable>
+- impact_chain_candidates: <impact chain candidates or none>
+- blast_radius_candidates: <blast radius candidates or none>
+- caller_callee_paths: <path candidates or none>
+- affected_test_candidates: <test candidates or none>
+- tests_for_query_result: <confirmed tests for candidates or none>
+- missing_test_confirmation: <unconfirmed or missing test evidence or none>
+- review_priority_candidates: <risk-ranked candidates or none>
+- test_gaps: <first-class test gaps or none>
 - Suppressed: <N> findings below anchor 75 (P0 at anchor 50+ retained)
 - Mode-aware demotion suppressions: <N> findings suppressed (testing/maintainability advisory P2-P3)
 - Validator drops: <N> findings rejected by Stage 5b validator

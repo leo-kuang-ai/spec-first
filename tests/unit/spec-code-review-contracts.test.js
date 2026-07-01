@@ -449,6 +449,207 @@ describe('spec-code-review CE sync contracts', () => {
     expect(text).toContain('confirmed by diff/source/test/contract/log evidence');
   });
 
+  test('phase A boundary graph and test-gap contracts have stable report fields', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    const diffScope = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'diff-scope.md'),
+      'utf8',
+    );
+    const template = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'review-output-template.md'),
+      'utf8',
+    );
+    const subagentTemplate = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
+      'utf8',
+    );
+    const walkthrough = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'walkthrough.md'),
+      'utf8',
+    );
+    const catalog = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
+      'utf8',
+    );
+
+    for (const field of [
+      'scope_boundary',
+      'authorized_scope_source',
+      'scope_boundary_evidence',
+      'graph_assist',
+      'graph_reason_code',
+      'expansion_budget',
+      'provider_untrusted.summaries[]',
+      'changed_symbols',
+      'changed_entrypoints',
+      'changed_contracts',
+      'symbol_mapping_status',
+      'impact_chain_candidates',
+      'blast_radius_candidates',
+      'caller_callee_paths',
+      'affected_test_candidates',
+      'tests_for_query_result',
+      'missing_test_confirmation',
+      'review_priority_candidates',
+      'test_gaps',
+    ]) {
+      expect(skill).toContain(field);
+      expect(template).toContain(field);
+    }
+
+    expect(skill).toContain('`scope_boundary`: `clean | concern | violation | unknown`');
+    expect(skill).toContain('`authorized_scope_source`: `explicit-touch-set | declared-files-only | inferred-plan | diff-only | unknown`');
+    expect(skill).toContain('Use `clean` only when an explicit touch set, declared files, or plan requirements directly cover the changed files and behavior.');
+    expect(skill).toContain('A diff-only inference is never enough for `clean`.');
+    expect(skill).toContain('Implementer reports, PR prose, commit messages, or work closeouts are claim sources only.');
+    expect(skill).toContain('Minimum derived labels are `scope_creep`, `unauthorized_file_change`, `unverifiable_claim`, and `missing_verification`.');
+    expect(skill).toContain('High-confidence scope-boundary findings must remain in the primary finding set');
+    expect(skill).toContain('Stage 5 synthesis derives `finding_type`');
+    expect(skill).toContain('finding_type: <derived labels present in this report, or none>');
+
+    expect(skill).toContain('Graph-Assisted Impact Review is a bounded advisory lens');
+    expect(skill).toContain('`graph_assist`: `used | fallback | not_applicable`');
+    expect(skill).toContain('`graph_reason_code`: `candidate_results | provider_missing | readiness_unknown | stale | call_failed | disabled_or_unsafe | markdown_only_diff | no_candidates`');
+    expect(skill).toContain('`expansion_budget`: minimal-first budget used for candidate expansion');
+    expect(skill).toContain('`graph_assist: used` requires `graph_reason_code: candidate_results` plus at least one of `changed_symbols`, `caller_callee_paths`, or `affected_test_candidates`');
+    expect(skill).toContain('`no_candidates` proves only that the provider path ran.');
+    expect(skill).toContain('Use minimal-first expansion: start with at most 5 high-impact symbols or entrypoints.');
+    expect(skill).toContain('Ordinary docs-only/prose-only diffs can use `graph_assist: not_applicable`');
+    expect(skill).toContain('source-runtime instruction prose such as `skills/**`, workflow contracts, templates, runtime projection source, or CLI/workflow harness docs remains impact-sensitive');
+    expect(skill).toContain('do not read raw project-graph artifact JSON');
+    expect(skill).toContain('`symbol_mapping_status`: `mapped | degraded | not_applicable`');
+    expect(skill).toContain('`tests_for_query_result`, `missing_test_confirmation`, and `test_gaps`');
+    expect(skill).toContain('Keep `test_gaps` as a first-class Coverage signal');
+    expect(skill).toContain('wrapped in `<boundary-context>`');
+    expect(skill).toContain('wrapped in `<graph-impact-context>`');
+    expect(skill).toContain('Validator failure (timeout, dispatch error, malformed JSON) -> keep the finding');
+    expect(skill).toContain('Do not treat infrastructure failure as counter-evidence.');
+
+    expect(diffScope).toContain('### Boundary (authorized scope)');
+    expect(diffScope).toContain('Use the resolved `BASE:`, `FILES:`, and `DIFF:` markers passed by the parent orchestrator.');
+    expect(diffScope).toContain('Do not recompute the diff range');
+    expect(diffScope).toContain('If an explicit touch set or declared file list exists');
+    expect(diffScope).toContain('scope_boundary: unknown');
+    expect(diffScope).toContain('Implementer summaries, commit messages, or PR prose are claims to verify, not proof.');
+
+    expect(subagentTemplate).toContain('Treat Graph-Assisted Impact Review and code-graph/project-graph output as `provider_untrusted` candidate context only.');
+    expect(subagentTemplate).toContain('<boundary-context>');
+    expect(subagentTemplate).toContain('{boundary_context}');
+    expect(subagentTemplate).toContain('<graph-impact-context>');
+    expect(subagentTemplate).toContain('{graph_impact_context}');
+    expect(subagentTemplate).toContain('a finding must cite confirming diff/source/test/log/contract evidence');
+    expect(subagentTemplate).toContain('populate top-level `testing_gaps`');
+    expect(walkthrough).toContain('Stage 6 stable boundary/graph fields');
+    expect(walkthrough).toContain('scope_boundary');
+    expect(walkthrough).toContain('graph_assist');
+    expect(walkthrough).toContain('missing_test_confirmation');
+
+    expect(catalog).toContain('Diff Boundary Review, Graph-Assisted Impact Review, and first-class test gaps do not add a new persona in Phase A.');
+    expect(catalog).toContain('Boundary/graph escalation');
+  });
+
+  test('phase A eval fixtures and adoption readout cover R-30 floor without overclaiming', () => {
+    const examplesPath = path.join(
+      __dirname,
+      '..',
+      '..',
+      'skills',
+      'spec-code-review',
+      'evals',
+      'examples.json',
+    );
+    const examples = JSON.parse(fs.readFileSync(examplesPath, 'utf8'));
+    const cases = new Map(examples.cases.map((fixture) => [fixture.id, fixture]));
+    const readoutPath = path.join(
+      __dirname,
+      '..',
+      '..',
+      'docs',
+      'validation',
+      'spec-code-review',
+      'phase-a-boundary-graph-readout.md',
+    );
+    const readout = fs.readFileSync(readoutPath, 'utf8');
+
+    for (const id of [
+      'phase-a-scope-violation-with-explicit-touch-set',
+      'phase-a-graph-candidate-rejected-with-test-gap',
+      'phase-a-graph-provider-fallback-with-degraded-symbol-mapping',
+      'phase-a-clean-diff-noise-floor',
+    ]) {
+      expect(cases.has(id)).toBe(true);
+      const fixture = cases.get(id);
+      expect(fixture).toHaveProperty('diff_or_input');
+      expect(fixture).toHaveProperty('expected_scope_boundary');
+      expect(fixture).toHaveProperty('authorized_scope_source');
+      expect(fixture).toHaveProperty('must_find');
+      expect(fixture).toHaveProperty('must_not_find');
+      expect(fixture).toHaveProperty('expected_coverage_signals');
+      expect(fixture).toHaveProperty('expected_graph_assist');
+      expect(fixture).toHaveProperty('expected_reason_code');
+      expect(fixture).toHaveProperty('expected_symbol_mapping');
+      expect(fixture).toHaveProperty('expected_test_gaps');
+      expect(fixture).toHaveProperty('expected_review_priority_candidates');
+      expect(fixture).toHaveProperty('expected_expansion_budget');
+      expect(fixture).toHaveProperty('limitations');
+    }
+
+    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').expected_scope_boundary).toBe('violation');
+    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').provider_readiness).toBe('unknown');
+    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').expected_graph_assist).toBe('fallback');
+    expect(cases.get('phase-a-scope-violation-with-explicit-touch-set').expected_reason_code).toBe('readiness_unknown');
+    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_graph_assist).toBe('used');
+    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_reason_code).toBe('candidate_results');
+    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_symbol_mapping).toContain('changed_symbols');
+    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_review_priority_candidates.length).toBeGreaterThan(0);
+    expect(cases.get('phase-a-graph-candidate-rejected-with-test-gap').expected_expansion_budget).toBe('max_5_high_impact_symbols');
+    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').expected_graph_assist).toBe('fallback');
+    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').provider_readiness).toBe('unknown');
+    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').expected_symbol_mapping).toContain('symbol_mapping_status=degraded');
+    expect(cases.get('phase-a-graph-provider-fallback-with-degraded-symbol-mapping').must_not_find).toContain('graph_assist=used');
+    expect(cases.get('phase-a-clean-diff-noise-floor').must_not_find).toContain('graph_assist=used');
+
+    expect(readout).toContain('scope_boundary: violation');
+    expect(readout).toContain('scope_boundary: unknown');
+    expect(readout).toContain('graph_assist: fallback');
+    expect(readout).toContain('graph_assist: used');
+    expect(readout).toContain('provider_untrusted.summaries[]');
+    expect(readout).toContain('test_gaps');
+    expect(readout).toContain('pilot limitation');
+    expect(readout).toContain('does not prove durable graph impact capability');
+  });
+
+  test('phase A fixture graph combinations stay semantically consistent', () => {
+    const examples = JSON.parse(fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'evals', 'examples.json'),
+      'utf8',
+    ));
+    const phaseACases = examples.cases.filter((fixture) => fixture.coverage_tags.includes('phase-a-floor'));
+
+    for (const fixture of phaseACases) {
+      if (fixture.expected_graph_assist === 'used') {
+        expect(fixture.expected_reason_code).toBe('candidate_results');
+        const candidateSignals = [
+          ...(fixture.expected_symbol_mapping || []),
+          ...(fixture.expected_coverage_signals || []),
+        ].join(' ');
+        expect(candidateSignals).toMatch(/changed_symbols|caller_callee_paths|affected_test_candidates/);
+        expect(fixture.expected_expansion_budget).toBe('max_5_high_impact_symbols');
+      }
+
+      if (fixture.expected_graph_assist === 'fallback') {
+        expect(fixture.expected_reason_code).not.toBe('candidate_results');
+        expect(fixture.limitations.length).toBeGreaterThan(0);
+        expect(['unknown', 'missing', undefined]).toContain(fixture.provider_readiness);
+      }
+
+      if (fixture.expected_graph_assist === 'not_applicable') {
+        expect(fixture.expected_reason_code).toBe('markdown_only_diff');
+        expect(fixture.expected_expansion_budget).toBe('not_applicable');
+      }
+    }
+  });
+
   test('Codex reviewer dispatch avoids fork_context and agent_type parameter conflicts', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');
     const codexRuntime = renderWorkflowSkill('codex');

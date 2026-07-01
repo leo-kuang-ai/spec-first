@@ -1,7 +1,7 @@
 ---
 title: "feat: Strengthen spec-code-review boundary, graph impact, and eval harness"
 type: feat
-status: active
+status: completed
 date: 2026-07-01
 spec_id: 2026-06-30-004-spec-code-review-superpowers60-integration
 origin: docs/brainstorms/2026-06-30-004-spec-code-review-superpowers60-integration-requirements.md
@@ -22,7 +22,7 @@ implements_schemas: []
 
 本方案把 Superpowers 6.0 与 code-review-graph 的高价值机制吸收到 `spec-code-review`，但把当前可执行范围收敛为 **Phase A implementation plan with roadmap appendix**：首批只改 review-only 能力，包括 Diff Boundary Review、Graph-Assisted Impact Review、diff hunk 到 changed symbol 的降级映射、risk-ranked review priorities、test gaps 一等 Coverage、report/headless 稳定字段，以及 R-30 的最小 fixture/adoption floor。
 
-Phase B/C/D 保留为 roadmap anchors，不作为本计划当前 Implementation Units。这样能让首批交付补上“完整 diff 视角 + 影响面候选 + 不伪造 clean”的审查质量短板，同时避免把 Expected Touch Set、progress ledger 或完整 eval harness 偷偷并入 Phase A。
+Phase B/C/D 保留为 roadmap anchors，不作为本计划当前 Implementation Units。这样能让首批交付补上“完整 diff 视角 + 影响面候选 + 不伪造 clean”的审查质量短板，同时避免把 Expected Touch Set、progress ledger 或完整 eval harness 偷偷并入 Phase A。其中 Graph-Assisted Impact Review 的 impact 质量取决于 provider 就绪度:provider 不可用时按 fallback/consumption 契约降级(见 Success Metrics),Phase A 不因此声称已交付跨源影响面能力。
 
 ---
 
@@ -46,6 +46,8 @@ Superpowers 6.0 实测中，质量提升来自 reviewer 读取完整 diff 和 re
 ---
 
 ## Requirements
+
+> 说明:本文档正文引用的 `R-xx`(带连字符)沿用 origin PRD 2026-06-30-004 的需求编号;本 plan 自身的需求命名空间为 `R1`–`R17`(不带连字符)。
 
 - R1. Phase A 必须增加 Diff Boundary Review 轴，检查 diff 是否超出任务/计划/声明授权边界；无 explicit touch set 时不得输出 `scope_boundary=clean`。
 - R2. Phase A 必须输出 `scope_boundary: clean | concern | violation | unknown` 及依据等级：`explicit-touch-set`、`declared-files-only`、`inferred-plan`、`diff-only`、`unknown`。
@@ -207,7 +209,7 @@ Superpowers 6.0 实测中，质量提升来自 reviewer 读取完整 diff 和 re
 | Persona selection/catalog | Read and modify `persona-catalog.md` only if scope/graph triggers affect reviewer choice | Avoid unnecessary catalog churn, but require an explicit unchanged decision. |
 | `finding_type` | Reuse Stage 5 synthesis first; defer reviewer-return schema upgrade | `findings-schema.json` is consumed by every reviewer and validator. A derived synthesis label satisfies Phase A reporting while avoiding premature schema churn. |
 | `scope_boundary` / `authorized_scope_source` | Extend Stage 6 Coverage and report/headless stable field block | Coverage already owns direct evidence posture, limitations, suppressed findings, residual risks, and testing gaps. Stable names are needed for downstream readability without changing reviewer schema. |
-| Graph-Assisted Impact Review | Extend direct evidence routing and Coverage while reusing `docs/contracts/project-graph-consumption.md` | The contract already defines candidate-only provider use. A separate graph evidence schema would violate R-14/R-28. |
+| Graph-Assisted Impact Review | Extend direct evidence routing and Coverage while reusing `docs/contracts/project-graph-consumption.md` | The contract already defines candidate-only provider use. A separate graph evidence schema would violate origin R-14/R-28. |
 | Phase A eval gates | Extend `skills/spec-code-review/evals/examples.json`, add minimal source-owned fixture contract if needed, and add focused tests/readout | Current examples are examples-as-context. Phase A needs a small deterministic floor without inventing the Phase D platform. |
 | Adoption readout / golden report | Create source-owned validation readout and update report template examples | This is the user-visible proof that the workflow output improved, not just internal prose. |
 | Phase D eval harness | Roadmap anchor with default producer/artifact choices; separate plan before implementation | A real corpus/scorecard/trace likely exceeds examples and should not be smuggled into Phase A. |
@@ -681,3 +683,18 @@ Residual risks after integration:
 - **Spec-code-review tests:** `tests/unit/spec-code-review-contracts.test.js`
 - **Graph consumption tests:** `tests/unit/project-graph-consumption-contracts.test.js`
 - **Setup facts helper:** `src/cli/helpers/setup-facts.js`
+
+---
+
+## Completion Evidence
+
+Phase A review-only scope completed on 2026-07-01.
+
+- Implemented U1-U3 in `skills/spec-code-review/SKILL.md`, `references/diff-scope.md`, `references/subagent-template.md`, `references/persona-catalog.md`, and `references/review-output-template.md`: stable boundary fields, derived `finding_type`, graph candidate/fallback fields, symbol mapping degraded/mapped status, test confirmation fields, minimal-first expansion, and first-class `test_gaps`.
+- Implemented U4-U5 in `skills/spec-code-review/evals/examples.json`, `tests/unit/spec-code-review-contracts.test.js`, and `docs/validation/spec-code-review/phase-a-boundary-graph-readout.md`: Phase A fixture floor, adoption readout, cost/time notes, fallback honesty, no-overclaim limitations, and report/headless field anchors.
+- Multi-agent code review ran with scope/boundary, graph/evidence, and test/delivery lenses. Accepted P1/P2 findings were fixed: stable `finding_type` output, complete graph candidate fields, degraded symbol mapping/test-confirmation fields, fallback fixture coverage, cost/time notes, and runtime projection closeout.
+- A second full-code review pass covered the whole `spec-code-review` skill surface with workflow-logic, contract/detail, and adversarial failure-mode lenses. Accepted findings were fixed: source-runtime instruction-prose graph fallback semantics, report/headless stable field coverage, leaf `<boundary-context>` / `<graph-impact-context>` handoff, validator-failure retention, `expansion_budget` definition, fixture combination consistency, and parent-owned diff scope.
+- Verification passed: focused Jest contract suites, changelog format, eval fixture contract, provider capability contract, skill entrypoint lint, typecheck, JSON parse check, scoped diff whitespace scans, and generated runtime projection via `node bin/spec-first.js init -y --codex` and `node bin/spec-first.js init -y --claude` with no tracked generated runtime diff.
+- Full `npm run test:unit` was attempted and failed on unrelated dirty-worktree docs/project-review/docs-solutions contract failures; this Phase A slice's previously failing eval/provider tests now pass in focused verification.
+
+Phase B/C/D remain roadmap anchors and are not completed by this plan status update.
