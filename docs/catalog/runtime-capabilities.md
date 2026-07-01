@@ -59,7 +59,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 
 | Skill | Claude Delivery | Codex Delivery | Description |
 |---|---|---|---|
-| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | Govern team development standards as source documents: query confirmed standards, audit standards health, draft candidates, and prepare promotion/deprecation proposals without restoring spec-standards. |
+| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore /spec:standards, $spec-standards, skills/spec-standards/, or treat advisory candidates as hard context. |
 | using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | Use before substantial work in a spec-first project, and when users ask what spec-first workflow or command to run next. Decide whether to route into a public spec-first workflow before non-trivial or risky edits, running state-changing commands, debugging, reviewing, planning, setup, update, or architecture/prompt/workflow decisions. |
 
 ## Internal Skill Governance

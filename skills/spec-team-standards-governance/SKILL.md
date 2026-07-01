@@ -1,11 +1,18 @@
 ---
 name: spec-team-standards-governance
-description: "Govern team development standards as source documents: query confirmed standards, audit standards health, draft candidates, and prepare promotion/deprecation proposals without restoring spec-standards."
+description: "Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore /spec:standards, $spec-standards, skills/spec-standards/, or treat advisory candidates as hard context."
 ---
 
 # Spec Team Standards Governance
 
-Use this standalone skill when the user asks to query, initialize, audit, propose, promote, or deprecate team development standards. It is a source-maintenance method, not a public Claude `/spec:*` or Codex `$spec-*` workflow and not the retired `spec-standards` workflow.
+Use this standalone skill when the user asks to query, initialize, audit, propose, promote, or deprecate source-backed team development standards. It is a source-maintenance method, not a public Claude `/spec:*` or Codex `$spec-*` workflow and not the retired `spec-standards` workflow.
+
+## When To Use / When Not To Use
+
+- Use for standards governance work on `docs/contracts/team-standards.md`, `docs/standards/**`, candidate evidence, health audits, or promotion/deprecation proposals.
+- Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution; those route to their own public `$spec-*` workflow.
+- Do not use to create, restore, or recommend `/spec:standards`, `$spec-standards`, `skills/spec-standards/`, or `.spec-first/standards/`.
+- Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.
 
 ## Hard Boundaries
 
@@ -49,24 +56,19 @@ Read only the references required by the active mode. Never load every reference
 2. Read `docs/contracts/team-standards.md`.
 3. For standards selection, read `docs/standards/index.md` before rule files. If the index is missing, stale or scope is unknown, use the fallback modes from the contract.
 4. Read only mode-specific references from the loading map.
-5. Produce the mode output with `matched_rule_ids`, `matched_files`, `excluded_rule_ids`, `uncertainty_reason`, `fallback_mode`, `limitations`, and `source_refs_used` when applicable.
-6. For candidate/proposal outputs, include `authority_tier`, owner status, `why_not_confirmed`, pre-write gate result, decision trace and next action.
-7. For V2 acquisition or replay outputs, include `acquisition_id`, single extraction target, source anchors, evidence quality, replay status, owner-edit status, limitations and whether samples were sufficient.
-8. If source edits are authorized by an outer source-edit workflow, keep writes scoped to `docs/standards/**`, this skill's source files, tests, docs and `CHANGELOG.md`; never patch runtime mirrors.
+5. Produce the mode output per the Output Contract, including the mode-specific fields for the active mode; never emit a field you cannot back with `source_refs_used`.
+6. If source edits are authorized by an outer source-edit workflow, keep writes scoped to `docs/standards/**`, this skill's source files, tests, docs and `CHANGELOG.md`; never patch runtime mirrors.
 
 ## Output Contract
 
-Every output should include:
+This section is the single source of truth for output fields. Every output includes `mode`; `status` (`completed`, `degraded`, `blocked`, or `proposal-only`); `source_refs_used`; `fallback_mode`; `limitations`; and `next_action`.
 
-- `mode`
-- `status`: `completed`, `degraded`, `blocked`, or `proposal-only`
-- `source_refs_used`
-- `matched_rule_ids` / `candidate_ids` / `proposal_ids` as applicable
-- `acquisition_id` / `replay_case_ids` when evaluating V2 acquisition quality
-- `fallback_mode` and `limitations`
-- `next_action`
+Add the fields required by the active mode:
 
-For promotion/deprecation proposals, include `gate_results`, `confidence.signals`, `autonomy.mode`, `next_action`, `outcome`, `decision_trace`, and the diff/source files that a source-edit workflow would update.
+- `query` / `audit`: `matched_rule_ids`, `matched_files`, `excluded_rule_ids`, `uncertainty_reason`.
+- `init` / `propose`: `candidate_ids`, `authority_tier`, owner status, `why_not_confirmed`, pre-write gate result, `decision_trace`.
+- `promote` / `deprecate`: `proposal_ids`, `gate_results`, `confidence.signals`, `autonomy.mode`, `outcome`, `decision_trace`, owner status, and the diff/source files that a source-edit workflow would update.
+- `eval/replay`: `acquisition_id`, `replay_case_ids`, single extraction target, source anchors, evidence quality, replay status, owner-edit status, and whether samples were sufficient.
 
 ## Failure Modes
 

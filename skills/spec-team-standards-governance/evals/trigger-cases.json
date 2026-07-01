@@ -46,6 +46,20 @@
       "reason_code": "review-not-acquisition"
     },
     {
+      "id": "trigger-near-002",
+      "case_id": "TRIGGER-NEAR-002",
+      "case_type": "near-neighbor",
+      "input": "Please bring back /spec:standards and create skills/spec-standards so standards governance has a public workflow again.",
+      "prompt": "Please bring back /spec:standards and create skills/spec-standards so standards governance has a public workflow again.",
+      "source_refs": ["docs/contracts/team-standards.md", "src/cli/contracts/dual-host-governance/skills-governance.json"],
+      "coverage_tags": ["trigger", "boundary", "retired-surface"],
+      "expected_outcome": "boundary",
+      "expected_result": "boundary",
+      "expected_mode": "blocked-or-route-to-write-skill-for-source-patch-only",
+      "boundary_note": "The retired spec-standards workflow and runtime surface must not be restored; only source-backed standards governance may be edited under a source-edit workflow.",
+      "reason_code": "retired-spec-standards-surface"
+    },
+    {
       "id": "trigger-boundary-001",
       "case_id": "TRIGGER-BOUNDARY-001",
       "case_type": "boundary",
