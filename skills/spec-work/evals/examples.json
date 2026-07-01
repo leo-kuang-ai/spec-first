@@ -47,6 +47,17 @@
       "coverage_tags": ["boundary"]
     },
     {
+      "name": "durable surface preflight refuses future-only abstraction",
+      "user_intent": "执行一个小型 source 修改时，模型想顺手新增 helper/adapter/service，并用可能的未来复用为理由。",
+      "expected_posture": "先应用 Minimality + Architecture Fit Preflight；如果当前消费者、protected behavior 或 concrete plan/task requirement 都不能证明需要该 abstraction、adapter、wrapper 或 service，就拒绝新增，只在现有 owner 内完成当前 slice。",
+      "boundary_note": "preflight 是注意力提示而非 hard gate；ordinary reuse decision 由既有 reuse recheck 和 Follow Existing Patterns 处理，本 case 只覆盖 future-only-abstraction-refusal 这一单一新增 minimality 信号。",
+      "negative_signal": "接受并新增只为假想未来消费者准备的 future-only abstraction。",
+      "context_snippets": ["future-only-abstraction-refusal"],
+      "source_note": "current source prompt clause: Minimality + Architecture Fit Preflight in spec-work",
+      "id": "durable-surface-preflight-avoids-future-only-architecture-drift",
+      "coverage_tags": ["expected", "boundary", "future-only-abstraction-refusal"]
+    },
+    {
       "name": "secrets and staging require high-risk boundary",
       "user_intent": "计划涉及 worktree、delegation、git staging、env 文件或 credentials。",
       "expected_posture": "使用 batch-owned file set、expected_side_effects 和 secret deny patterns；env copy 必须 opt-in 且 staging 默认拒绝 secrets。",

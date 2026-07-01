@@ -231,6 +231,72 @@ describe('spec-code-review CE sync contracts', () => {
     expect(template).toContain('The "I need `<specific input>` before I can commit" framing is a soft punt');
     expect(template).toContain('Pair `manual` with a concrete `suggested_fix` whenever you can defend one');
     expect(template).toContain('Imperfect information is not grounds for omission');
+    expect(template).toContain('do not force a decision');
+  });
+
+  test('leaf reviewers may propose finding-scoped structural fixes but not speculative refactors', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    const template = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
+      'utf8',
+    );
+
+    expect(skill).toContain('must not propose unrelated or speculative refactors');
+    expect(skill).toContain('may propose the smallest finding-scoped structural fix');
+    expect(skill).toContain('mechanical helper extraction');
+    expect(template).toContain('Helper extraction is `safe_auto` when the duplication is identical');
+    expect(template).toContain('Pair `manual` with a concrete `suggested_fix` whenever you can defend one');
+    expect(skill).not.toContain('or propose refactors. Artifact persistence');
+  });
+
+  test('pre-existing findings are routed independently from confidence zero', () => {
+    const schema = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'findings-schema.json'),
+      'utf8',
+    );
+    const template = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'subagent-template.md'),
+      'utf8',
+    );
+    const diffScope = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'diff-scope.md'),
+      'utf8',
+    );
+
+    expect(schema).toContain('False positive or non-finding -- do not report');
+    expect(schema).toContain('Pre-existing status is represented separately by the `pre_existing` boolean');
+    expect(schema).toContain('Pre-existing findings are routed separately and do not count toward the review verdict.');
+    expect(template).toContain('Pre-existing status is represented separately by `pre_existing: true`');
+    expect(diffScope).toContain('Mark these as `"pre_existing": true` in your output.');
+    expect(schema).not.toContain('False positive or pre-existing -- do not report');
+    expect(schema).not.toContain('or a pre-existing issue this PR did not introduce');
+  });
+
+  test('merge validation keeps current full schema detail fields while allowing explicit legacy degradation', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const schema = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'findings-schema.json'),
+      'utf8',
+    );
+
+    expect(schema).toContain('"why_it_matters"');
+    expect(schema).toContain('"evidence"');
+    expect(text).toContain('Per-finding required for current full reviewer returns');
+    expect(text).toContain('why_it_matters, evidence, confidence');
+    expect(text).toContain('Legacy/compact degraded returns');
+    expect(text).toContain('Headless output, tracker externalization');
+    expect(text).toContain('must not claim full-schema validation');
+    expect(text).toContain('Validate current reviewer returns against the full schema');
+  });
+
+  test('cross-reviewer agreement does not promote interpretive findings to certainty', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('promote the merged finding by one anchor step up to the high-confidence tier');
+    expect(text).toContain('`50 -> 75`, `75 -> 75`, `100 -> 100`');
+    expect(text).toContain('does not by itself satisfy the `100` anchor');
+    expect(text).toContain('Promote to `100` only when the merged direct evidence independently meets that bar');
+    expect(text).not.toContain('`50 -> 75`, `75 -> 100`, `100 -> 100`');
   });
 
   test('maintainability reviewer targets structural simplification without gaining write access', () => {
@@ -365,6 +431,19 @@ describe('spec-code-review CE sync contracts', () => {
     }
   });
 
+  test('tracker defer durable tickets do not rely on session artifacts as continuation truth', () => {
+    const text = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'tracker-defer.md'),
+      'utf8',
+    );
+
+    expect(text).toContain('Include enough inline evidence for the ticket to remain understandable without opening the session artifact.');
+    expect(text).toContain('preserve the title, one-sentence problem statement, suggested fix when present, at least one compact evidence item');
+    expect(text).toContain('Do not rely on a session-scoped spec-code-review run artifact as the only continuation target');
+    expect(text).toContain('never as the durable source of truth');
+    expect(text).not.toContain('continued in spec-code-review run artifact');
+  });
+
   test('bulk preview remains option-C only after best-judgment migration', () => {
     const bulkPreview = fs.readFileSync(
       path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'bulk-preview.md'),
@@ -395,7 +474,9 @@ describe('spec-code-review CE sync contracts', () => {
       expect(content).toContain('Runtime readiness preflight');
       expect(content).toContain('spec-mcp-setup');
       expect(content).toContain('detect-tools.sh');
-      expect(content).toContain('host_config_status: ready | fallback-active | not-required');
+      expect(content).toContain('host_config_status: ready | fallback-active | registry-args-drift | not-required');
+      expect(content).toContain('acceptable-but-degraded');
+      expect(content).toContain('do not treat it as unsafe by itself');
       expect(content).toContain('host_config_status: action-required | precedence-blocked');
       expect(content).toContain('not safe for multi-persona dispatch');
       expect(content).toContain('runtime boundary issue');
@@ -406,6 +487,9 @@ describe('spec-code-review CE sync contracts', () => {
       expect(content).toContain('single_agent_report_only_fallback: true');
       expect(content).toContain('runtime readiness preflight unavailable');
       expect(content).toContain('MCP startup incomplete');
+      expect(content).toContain('fallback is mode-aware');
+      expect(content).toContain('Review failed (headless mode). Reason: required MCP runtime not ready');
+      expect(content).toContain('Mutating review requires safe reviewer/fixer dispatch capability');
     }
 
     expect(text).toContain('bash skills/spec-mcp-setup/scripts/detect-tools.sh');
@@ -413,6 +497,18 @@ describe('spec-code-review CE sync contracts', () => {
     expect(codexRuntime).toContain('bash .agents/skills/spec-mcp-setup/scripts/detect-tools.sh');
     expect(codexRuntime).toContain('| Claude runtime | `bash .claude/spec-first/workflows/spec-mcp-setup/scripts/detect-tools.sh` |');
     expect(codexRuntime).not.toContain('| Claude runtime | `bash .agents/skills/spec-mcp-setup/scripts/detect-tools.sh` |');
+  });
+
+  test('trivial PR skip pre-check does not bypass dispatch authorization', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const skipRuleStart = text.indexOf('**Trivial-PR judgment**');
+    const skipRuleEnd = text.indexOf('When any skip rule fires', skipRuleStart);
+    const skipRule = text.slice(skipRuleStart, skipRuleEnd);
+
+    expect(skipRule).toContain('make a conservative inline orchestrator judgment');
+    expect(skipRule).toContain('Do not call `Agent`, `Task`, `spawn_agent`, or an equivalent dispatch primitive');
+    expect(skipRule).toContain('Stage 4 dispatch gate');
+    expect(skipRule).not.toContain('spawn a lightweight sub-agent');
   });
 
   test('preflight consumes plan and work direct evidence once and reports Coverage posture', () => {
@@ -619,6 +715,23 @@ describe('spec-code-review CE sync contracts', () => {
     expect(readout).toContain('does not prove durable graph impact capability');
   });
 
+  test('changelog path references to untracked artifacts stay boundary concerns', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(skill).toContain('When `CHANGELOG.md`, release notes, review docs, or validation docs add repo-relative path references');
+    expect(skill).toContain('referenced artifacts that are claimed as shipped are in `FILES:` / tracked diff');
+    expect(skill).toContain('already tracked by `git ls-files -- <path>`');
+    expect(skill).toContain('exists only in `UNTRACKED:`');
+    expect(skill).toContain('`scope_boundary: concern`');
+    expect(skill).toContain('`finding_type: untracked_referenced_artifact`');
+    expect(skill).toContain('Changelog/release-note path reference check');
+    expect(skill).toContain('If `CHANGELOG.md` or a release-note/validation doc is in `FILES:`');
+    expect(skill).toContain('Compare to `FILES:`, `git ls-files -- <path>`, and `UNTRACKED:`');
+    expect(skill).toContain('untracked-referenced-artifact:<path>');
+    expect(skill).toContain('workflow-local and does not require a findings-schema change');
+    expect(skill).toContain('do not stage the artifact');
+  });
+
   test('phase A fixture graph combinations stay semantically consistent', () => {
     const examples = JSON.parse(fs.readFileSync(
       path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'evals', 'examples.json'),
@@ -720,6 +833,8 @@ describe('spec-code-review CE sync contracts', () => {
     expect(codexRuntime).not.toContain('bash scripts/resolve-base.sh');
     expect(script).toContain('Usage from source: bash skills/spec-code-review/scripts/resolve-base.sh');
     expect(script).toContain('Runtime adapters rewrite that source path');
+    expect(script).toContain('gh pr view --json baseRefName,url --jq');
+    expect(script).not.toContain('jq -r');
   });
 
   test('previous-comments reviewer is gated by actual prior feedback', () => {
@@ -855,6 +970,21 @@ describe('spec-code-review CE sync contracts', () => {
     expect(text).toContain('supports reviewer dispatch but not parallel sub-agents');
     expect(text).toContain('dispatch reviewers sequentially through the same Stage 4 scheduler');
     expect(text).toContain('If the platform has no dispatch primitive, or dispatch is explicitly disabled or unsafe, use the Stage 4 single-agent report-only fallback');
+  });
+
+  test('validator budget cap skips validation without dropping surviving findings', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('dispatch validators only for the highest-severity 15');
+    expect(text).toContain('Do not drop the remainder.');
+    expect(text).toContain('validation_skipped/over_budget');
+    expect(text).toContain('carry it unchanged into the next phase');
+    expect(text).toContain('The cap limits validator fan-out only');
+    expect(text).toContain('must not erase already-surviving findings from headless, autofix, ticket, or final-report outputs');
+    expect(text).toContain('over-budget validation skips');
+    expect(text).toContain('Validator over-budget skips');
+    expect(text).not.toContain('Drop the remainder and record the over-budget count');
+    expect(text).not.toContain('Validator over-budget drops');
   });
 
   test('code-review dispatch is analysis-only and mutation is mode-bound', () => {

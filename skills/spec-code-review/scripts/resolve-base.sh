@@ -17,14 +17,16 @@ set -euo pipefail
 REVIEW_BASE_BRANCH=""
 PR_BASE_REPO=""
 PR_BASE_REMOTE=""
+PR_URL=""
 BASE_REF=""
 
 # Step 1: Try PR metadata (handles fork workflows)
 if command -v gh >/dev/null 2>&1; then
-  PR_META=$(gh pr view --json baseRefName,url 2>/dev/null || true)
+  PR_META=$(gh pr view --json baseRefName,url --jq '[.baseRefName // "", .url // ""] | @tsv' 2>/dev/null || true)
   if [ -n "$PR_META" ]; then
-    REVIEW_BASE_BRANCH=$(echo "$PR_META" | jq -r '.baseRefName // empty' 2>/dev/null || true)
-    PR_BASE_REPO=$(echo "$PR_META" | jq -r '.url // empty' 2>/dev/null | sed -n 's#https://github.com/\([^/]*/[^/]*\)/pull/.*#\1#p' || true)
+    REVIEW_BASE_BRANCH=$(printf '%s\n' "$PR_META" | awk -F '\t' '{print $1}' || true)
+    PR_URL=$(printf '%s\n' "$PR_META" | awk -F '\t' '{print $2}' || true)
+    PR_BASE_REPO=$(printf '%s\n' "$PR_URL" | sed -n 's#https://github.com/\([^/]*/[^/]*\)/pull/.*#\1#p' || true)
   fi
 fi
 

@@ -80,6 +80,12 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
    Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output). The `git-commit-push-pr` skill will ask whether to capture evidence only when evidence is possible.
 
+1.5. **Check Changelog And Release Path References**
+
+   When `CHANGELOG.md` or release notes are touched, inspect added lines for newly added repo-relative artifact/source path references. Confirm each referenced path that is claimed as shipped is inside the final shipping boundary: already tracked (`git ls-files -- <path>`), present in tracked diff (`git diff --name-only <base>`), or explicitly staged for the commit (`git diff --cached --name-only`). Also compare against `git ls-files --others --exclude-standard`.
+
+   If a new path reference appears only as an untracked file, do not mark the work complete, commit, create a PR, or report the changelog entry as shipped. Choose one: stage/commit the artifact, remove/defer the changelog reference, or record it as excluded/not-shipping and keep `Next action` user-visible. This is a shipping-boundary check, not a semantic judgment about document quality.
+
 2. **Resolve Completion Status Target**
 
    If the work input is a plan/spec document with YAML frontmatter, update that document's `status` only after all scoped work, verification, and required review are complete:

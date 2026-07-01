@@ -121,6 +121,7 @@ Boundary verdict rules:
 - Use `concern` when the diff plausibly reaches outside stated intent but needs owner or plan confirmation before calling it unauthorized.
 - Use `violation` when direct diff/source/plan evidence shows an unauthorized file, behavior, source/runtime boundary change, generated runtime edit, or requirement omission.
 - Implementer reports, PR prose, commit messages, or work closeouts are claim sources only. Verify them against diff/source/test/log/contract evidence before using them to lower boundary risk.
+- When `CHANGELOG.md`, release notes, review docs, or validation docs add repo-relative path references, verify referenced artifacts that are claimed as shipped are in `FILES:` / tracked diff, already tracked by `git ls-files -- <path>`, or explicitly declared excluded/not-shipping. If a newly referenced path exists only in `UNTRACKED:`, set `scope_boundary: concern`, derive `finding_type: untracked_referenced_artifact` alongside `missing_verification`, and keep it actionable until the artifact is staged/tracked or the reference is removed/deferred. Do not lower this to `clean` only because the file exists on disk.
 
 Stage 5 synthesis derives `finding_type` for surfaced findings without changing `references/findings-schema.json`. Minimum derived labels are `scope_creep`, `unauthorized_file_change`, `unverifiable_claim`, and `missing_verification`. High-confidence scope-boundary findings must remain in the primary finding set; do not silently demote them into residual risks or testing gaps only. Schema promotion is deferred until report/headless consumers prove they need reviewer-return fields.
 
@@ -349,7 +350,7 @@ gh pr view <number-or-url> --json state,title,body,files
 Apply skip rules in order:
 
 - `state` is `CLOSED` or `MERGED` -> stop with message `PR is closed/merged; not reviewing.`
-- **Trivial-PR judgment**: spawn a lightweight sub-agent (use `model: haiku` in Claude Code; on other platforms use a host-provided cheap stable alias or omit the model parameter) with the PR title, body, and changed file paths. The agent's task: "Is this an automated or trivial PR that does not warrant a code review? Consider: dependency lock-file or manifest-only bumps, automated release commits, chore version increments with no substantive code changes. When in doubt, answer no — false negatives (skipped reviews that should have run) are more costly than false positives (unnecessary reviews)." If the judgment returns yes: stop with message `PR appears to be a trivial automated PR; not reviewing. Run without a PR argument to review the current branch, or pass base:<ref> if review is intended.`
+- **Trivial-PR judgment**: make a conservative inline orchestrator judgment from the PR title, body, and changed file paths. Do not call `Agent`, `Task`, `spawn_agent`, or an equivalent dispatch primitive in this Stage 1 skip pre-check; reviewer dispatch authorization is not established until the Stage 4 dispatch gate. Consider dependency lock-file or manifest-only bumps, automated release commits, and chore version increments with no substantive code changes. When in doubt, answer no — skipped reviews that should have run are more costly than unnecessary reviews. If the judgment returns yes: stop with message `PR appears to be a trivial automated PR; not reviewing. Run without a PR argument to review the current branch, or pass base:<ref> if review is intended.`
 
 When any skip rule fires, emit the message and stop without dispatching reviewers, switching the checkout, or running scope detection. **Standalone branch mode and `base:` mode are unaffected** -- they always run the full review. **Draft PRs are reviewed normally** -- draft status is not a skip condition; early feedback on in-progress work is valuable.
 
@@ -517,6 +518,8 @@ Build the Diff Boundary Review input from the strongest available source:
 
 Record `scope_boundary_evidence` as a compact list. It may include plan requirement IDs, implementation unit IDs, declared file paths, diff files, user-stated intent, and limitations. Do not record implementer claims as confirmed evidence unless they were checked against diff/source/test/log/contract. If the strongest source is `diff-only` or `unknown`, initialize `scope_boundary: unknown` unless Stage 5 later finds direct evidence for `concern` or `violation`.
 
+**Changelog/release-note path reference check:** If `CHANGELOG.md` or a release-note/validation doc is in `FILES:`, inspect added lines for newly added repo-relative source/artifact path references (backtick paths, Markdown links, or plain path-like refs such as `docs/...`, `skills/...`, `src/...`, `templates/...`, `agents/...`, `tests/...`). Compare to `FILES:`, `git ls-files -- <path>`, and `UNTRACKED:`. A referenced path that exists only in `UNTRACKED:` is excluded from review and shipping scope; initialize or raise `scope_boundary: concern`, add `untracked-referenced-artifact:<path>` to `scope_boundary_evidence`, and derive `finding_type: untracked_referenced_artifact`. The derived label is workflow-local and does not require a findings-schema change. In `mode:headless` or `mode:autofix`, do not stage the artifact; report the boundary concern and continue only within the tracked review scope.
+
 ### Stage 3: Select reviewers
 
 Read the diff and file list from Stage 1. Start with the deterministic scale-aware reviewer preflight below, then decide which conditional reviewers fit the diff. Conditional selection is agent judgment, not keyword matching.
@@ -663,7 +666,7 @@ If the target repo was selected with an explicit `--repo` / child scope earlier 
 
 Interpret the JSON facts narrowly:
 
-- `host_config_status: ready | fallback-active | not-required` means the host config is acceptable for dispatch.
+- `host_config_status: ready | fallback-active | registry-args-drift | not-required` means the host config is acceptable for dispatch. `registry-args-drift` is acceptable-but-degraded: record the tool id, `result`, `reason_code`, and next action posture in Coverage, but do not treat it as unsafe by itself.
 - `host_config_status: action-required | precedence-blocked`, missing required dependencies, or a non-ready required MCP project status means the current runtime is not safe for multi-persona dispatch.
 - A required MCP startup/config failure is a **runtime boundary issue**, not a code-review finding. Record it once in Coverage with the tool id, status, and next action.
 - Missing optional external-tool evidence does not by itself disable reviewer dispatch; it only limits the review claims and should be carried into Coverage when relevant.
@@ -675,7 +678,13 @@ After `detect-tools.sh` and before reviewer dispatch, consolidate direct handoff
 - Before consuming work artifact evidence, confirm it is bound to the current review scope: explicit path/run id came from this handoff, or artifact `plan_path` / `source_refs` reasonably match the current `plan:`, review base, and changed files. If the reader returns not-found/not-readable, direct evidence is missing, schema/shape is unavailable, or scope mismatches, record the limitation and do not inject the artifact evidence into reviewer prompts.
 - Carry the consolidated direct evidence posture to Stage 6 Coverage. Do not ask each persona reviewer to repeat the same setup preflight.
 
-When a required MCP server is not host-config-ready before dispatch, do not spawn reviewer agents in Codex or Claude. Set `single_agent_report_only_fallback: true`, treat the effective mode as report-only, and run the selected persona lenses inline with bounded direct repo reads. This avoids multiplying the same MCP startup failure across every leaf reviewer. If the preflight script is missing or cannot run, do not invent readiness facts; record `runtime readiness preflight unavailable` in Coverage and continue only if the host has not already reported MCP startup failure in the current session. If the host has already reported `MCP startup incomplete` or equivalent startup failure, use the single-agent report-only fallback.
+When a required MCP server is not host-config-ready before dispatch, do not spawn reviewer agents in Codex or Claude. This is a runtime boundary issue, and the fallback is mode-aware:
+
+- **Interactive/report-only:** set `single_agent_report_only_fallback: true`, treat the effective mode as report-only, and run the selected persona lenses inline with bounded direct repo reads. This avoids multiplying the same MCP startup failure across every leaf reviewer.
+- **Headless:** emit `Review failed (headless mode). Reason: required MCP runtime not ready: <tool id> <status>/<reason_code>.` Stop without dispatching reviewers, applying fixes, creating `<review-artifact-dir>/`, or claiming "Review complete".
+- **Autofix:** emit `Review failed. Reason: required MCP runtime not ready: <tool id> <status>/<reason_code>. Mutating review requires safe reviewer/fixer dispatch capability.` Stop without dispatching reviewers, applying fixes, or writing run artifacts.
+
+If the preflight script is missing or cannot run, do not invent readiness facts; record `runtime readiness preflight unavailable` in Coverage and continue only if the host has not already reported MCP startup failure in the current session and the selected mode can safely continue without mutation. If the host has already reported `MCP startup incomplete` or equivalent startup failure, apply the same mode-aware fallback above.
 
 ### Dispatch capability gate
 
@@ -753,12 +762,12 @@ Spawn each selected persona reviewer using the subagent template included below.
 3. The JSON output contract from the findings schema included below
 4. PR metadata: title, body, and URL when reviewing a PR (empty string otherwise). Passed in a `<pr-context>` block so reviewers can verify code against stated intent
 5. Review context: intent summary, file list, diff
-6. Run ID, review artifact directory, and reviewer name for correlation and parent-owned artifact filenames
+6. Run ID and review artifact directory for modes that create run artifacts, plus reviewer name for correlation and parent-owned artifact filenames
 7. Boundary context from Stage 2c, wrapped in `<boundary-context>`: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, declared files/touch set when known, plan requirement or implementation-unit refs, and limitations.
 8. Graph impact context from Stage 3, wrapped in `<graph-impact-context>`: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, candidate fields, rejected candidates, test candidates, `test_gaps`, and limitations. This context is advisory/provider_untrusted unless confirmed by direct evidence.
 9. **For `project-standards` only:** the standards file path list from Stage 3b, wrapped in a `<standards-paths>` block appended to the review context
 
-Persona sub-agents are **read-only** with respect to the project and the filesystem: they review and return structured JSON. They do not edit project files, write temp artifacts, or propose refactors. Artifact persistence is parent/orchestrator-owned so reviewer capability frontmatter does not need broad `Write`.
+Persona sub-agents are **read-only** with respect to the project and the filesystem: they review and return structured JSON. They do not edit project files or write temp artifacts. They must not propose unrelated or speculative refactors, but may propose the smallest finding-scoped structural fix when it is grounded in the diff and surrounding code (for example a mechanical helper extraction that the schema's `suggested_fix` rules allow). Artifact persistence is parent/orchestrator-owned so reviewer capability frontmatter does not need broad `Write`.
 
 Read-only here means **non-mutating**, not "no shell access." Reviewer sub-agents may use non-mutating inspection commands when needed to gather evidence or verify scope, including read-oriented `git` / `gh` usage such as `git diff`, `git show`, `git blame`, `git log`, and `gh pr view`. They must not edit project files, change branches, commit, push, create PRs, or otherwise mutate the checkout or repository state.
 
@@ -804,7 +813,8 @@ Convert multiple reviewer JSON returns into one deduplicated, confidence-gated f
 
 1. **Validate.** Check each reviewer return for required top-level and per-finding fields, plus value constraints. Drop malformed returns or findings. Record the drop count.
    - **Top-level required:** reviewer (string), findings (array), residual_risks (array), testing_gaps (array). Drop the entire return if any are missing or wrong type.
-   - **Per-finding required:** title, severity, file, line, confidence, autofix_class, owner, requires_verification, pre_existing
+   - **Per-finding required for current full reviewer returns:** title, severity, file, line, why_it_matters, evidence, confidence, autofix_class, owner, requires_verification, pre_existing
+   - **Legacy/compact degraded returns:** if a returned finding has valid merge-tier fields but lacks detail-tier fields (`why_it_matters`, `evidence`), keep it only when the current output mode can safely omit detail and record the degradation in Coverage. Headless output, tracker externalization, and any surface that needs ticket/body detail should treat missing detail as degraded and must not claim full-schema validation.
    - **Value constraints:**
      - severity: P0 | P1 | P2 | P3
      - autofix_class: safe_auto | gated_auto | manual | advisory
@@ -812,9 +822,9 @@ Convert multiple reviewer JSON returns into one deduplicated, confidence-gated f
      - confidence: integer in {0, 25, 50, 75, 100}
      - line: positive integer
      - pre_existing, requires_verification: boolean
-   - Validate against the full schema when reviewers return full JSON. If a detail-tier field is malformed but the merge-tier fields are valid, keep the finding only when the missing detail can be safely omitted from the current output mode and record the degradation in Coverage.
+   - Validate current reviewer returns against the full schema. If a detail-tier field is malformed but the merge-tier fields are valid, keep the finding only under the legacy/compact degraded rule above.
 2. **Deduplicate.** Compute fingerprint: `normalize(file) + line_bucket(line, +/-3) + normalize(title)`. When fingerprints match, merge: keep highest severity, keep highest anchor, note which reviewers flagged it. Dedup runs over the full validated set (including anchor 50) so cross-reviewer promotion in step 3 can lift matching anchor-50 findings into the actionable tier.
-3. **Cross-reviewer agreement.** When 2+ independent reviewers flag the same issue (same fingerprint), promote the merged finding by one anchor step: `50 -> 75`, `75 -> 100`, `100 -> 100`. Cross-reviewer corroboration is a stronger signal than any single reviewer's anchor; the promotion routes a previously-soft finding into the actionable tier or strengthens its already-actionable position. Note the agreement in the Reviewer column of the output (e.g., "security, correctness").
+3. **Cross-reviewer agreement.** When 2+ independent reviewers flag the same issue (same fingerprint), promote the merged finding by one anchor step up to the high-confidence tier: `50 -> 75`, `75 -> 75`, `100 -> 100`. Cross-reviewer corroboration is a stronger signal than any single reviewer's anchor, but it does not by itself satisfy the `100` anchor's "verifiable from code alone, no interpretation required" bar. Promote to `100` only when the merged direct evidence independently meets that bar. Note the agreement in the Reviewer column of the output (e.g., "security, correctness").
 4. **Separate pre-existing.** Pull out findings with `pre_existing: true` into a separate list.
 5. **Resolve disagreements.** When reviewers flag the same code region but disagree on severity, autofix_class, or owner, annotate the Reviewer column with the disagreement (e.g., "security (P0), correctness (P1) -- kept P0"). This transparency helps the user understand why a finding was routed the way it was.
 6. **Normalize routing.** For each merged finding, set the final `autofix_class`, `owner`, and `requires_verification`. If reviewers disagree, keep the most conservative route. Synthesis may narrow a finding from `safe_auto` to `gated_auto` or `manual`, but must not widen it without new evidence.
@@ -887,7 +897,7 @@ The best-judgment path skips Stage 5b deliberately. Running validators before fi
 1. **Select findings to validate.**
    - **headless/autofix:** All survivors of Stage 5.
    - **interactive File-tickets (option C):** All pending findings regardless of recommended action. Option C externalizes every finding as a ticket, so every finding needs validation.
-2. **Apply dispatch budget cap.** If the selected set exceeds 15 findings, validate the highest-severity 15 (P0 first, then P1, then P2, then P3, breaking ties by anchor descending). Drop the remainder and record the over-budget count for the Coverage section. The blunt drop is intentional; a review producing 15+ surviving findings is already in territory where a second wave would not change the user's triage approach.
+2. **Apply dispatch budget cap.** If the selected set exceeds 15 findings, dispatch validators only for the highest-severity 15 (P0 first, then P1, then P2, then P3, breaking ties by anchor descending). Do not drop the remainder. Mark each over-budget finding as `validation_skipped/over_budget`, carry it unchanged into the next phase, and record the skipped count for the Coverage section. The cap limits validator fan-out only; it must not erase already-surviving findings from headless, autofix, ticket, or final-report outputs.
 3. **Spawn validators with bounded parallelism.** One sub-agent per finding, dispatched independently using the validator template and the same bounded scheduler from Stage 4. Each validator receives:
    - The finding's title, severity, file, line, suggested_fix, original reviewer name, and confidence-first anchor
    - `why_it_matters` when available — loaded from the reviewer return. If the return has only merge-tier fields because a legacy reviewer/template was used, omit it and record the degradation. The validator proceeds without it, using the diff and cited code directly.
@@ -898,7 +908,7 @@ The best-judgment path skips Stage 5b deliberately. Running validators before fi
    - `validated: false` -> finding is dropped; record the validator's reason in Coverage
    - Validator failure (timeout, dispatch error, malformed JSON) -> keep the finding, mark validation as `degraded/unvalidated`, and record the validator failure reason in Coverage. Do not treat infrastructure failure as counter-evidence. P0/P1 unvalidated findings must remain visible and should keep the verdict at "Not ready" or "Ready with fixes" unless another confirmed resolution exists.
 5. **Use mid-tier model for validators.** Same model class (sonnet) the persona reviewers use. Validators are read-only — same constraints as persona reviewers. They may use non-mutating inspection commands (Read, Grep, Glob, git blame, gh).
-6. **Record metrics for Coverage.** Total dispatched, validated true count, validated false count (with reasons), failures, and over-budget drops.
+6. **Record metrics for Coverage.** Total dispatched, validated true count, validated false count (with reasons), failures, and over-budget validation skips.
 
 **Why per-finding bounded dispatch (not batched):** Independence is the point. A single batched validator looking at all findings together pattern-matches across them and recreates the persona-bias problem. Per-finding dispatch preserves fresh context while the scheduler respects harness limits. Per-file batching is a plausible future optimization for reviews with many findings clustered in few files; not implemented today.
 
@@ -926,7 +936,7 @@ Assemble the final report using **pipe-delimited markdown tables for findings** 
 11. **Deployment Notes.** If spec-deployment-verification-agent ran, surface the key Go/No-Go items: blocking pre-deploy checks, the most important verification queries, rollback caveats, and monitoring focus areas. Keep the checklist actionable rather than dropping it into Coverage.
 12. **Resource Advisory.** If `resource-governance-lens` returned `status=advisory`, list the advisory dimensions and reason codes using `subject_path` for the file under discussion and `evidence_ref` for the proof source. Do not convert resource advisories into blocking findings unless a reviewer independently confirms a concrete code-review issue. A `status=unavailable` result (for example a non-git target) is a non-blocking degraded posture, not a fast-fail signal: note it in Coverage and continue; the helper exit code stays `0` for `ok`, `advisory`, and `unavailable`.
 13. **Rule Maturity Candidates.** Include only when the confirmed findings or resource advisory meet the rule-maturity noise filter: P1/P2 repeated governance gap, same low-level issue appears at least twice, or a registered contract / plan non-goal is clearly violated. For each candidate list `rule_id`, `evidence_ref`, `reason_code`, `human_review_kind`, and `similar_existing_rule_ids`; use durable repo-readable evidence refs, never session-only summaries, raw lens stdout, `/tmp` files, or "see above". This section is an advisory queue for humans, not a finding, not a verdict input, and not an automatic `adjudicate`, `promote`, or `demote` action.
-14. **Coverage.** Suppressed count by anchor (e.g., "N findings suppressed at anchor 50, M at anchor 25"), mode-aware demotion count (interactive/report-only) or suppression count (headless/autofix), validator drop count and reasons (when Stage 5b ran), validator over-budget drops (when the 15-cap fired), residual risks, first-class `test_gaps`, failed/timed-out reviewers, resource lens status/reason codes, direct evidence posture, Diff Boundary Review fields, Graph-Assisted Impact Review fields, and any intent uncertainty carried by non-interactive modes. Include `Direct evidence: <source refs/checks/logs used> | limitations: <reason>` when coverage depends on bounded direct evidence; for multi-repo review, report evidence per child repo. External-tool evidence is advisory whenever it is degraded or unconfirmed by source.
+14. **Coverage.** Suppressed count by anchor (e.g., "N findings suppressed at anchor 50, M at anchor 25"), mode-aware demotion count (interactive/report-only) or suppression count (headless/autofix), validator drop count and reasons (when Stage 5b ran), validator over-budget validation skips (when the 15-cap fired), residual risks, first-class `test_gaps`, failed/timed-out reviewers, resource lens status/reason codes, direct evidence posture, Diff Boundary Review fields, Graph-Assisted Impact Review fields, and any intent uncertainty carried by non-interactive modes. Include `Direct evidence: <source refs/checks/logs used> | limitations: <reason>` when coverage depends on bounded direct evidence; for multi-repo review, report evidence per child repo. External-tool evidence is advisory whenever it is degraded or unconfirmed by source.
    - Stable boundary fields: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, and run-level `finding_type` summaries for derived boundary/verification labels.
    - Stable graph fields: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, and any populated candidate fields from `changed_symbols`, `changed_entrypoints`, `changed_contracts`, `symbol_mapping_status`, `impact_chain_candidates`, `blast_radius_candidates`, `caller_callee_paths`, `affected_test_candidates`, `tests_for_query_result`, `missing_test_confirmation`, `review_priority_candidates`, `test_gaps`, and `limitations`.
    - Do not let downstream-consumption gates depend on human-only prose. If a value is meant for automation or headless callers, render it with the stable field name above.
@@ -1023,7 +1033,7 @@ Coverage:
 - Mode-aware demotion suppressions: <N> findings suppressed (testing/maintainability advisory P2-P3)
 - Validator drops: <N> findings rejected by Stage 5b validator
   - <file:line> -- <reason>
-- Validator over-budget drops: <N> findings exceeded the 15-cap and were not validated
+- Validator over-budget skips: <N> findings exceeded the 15-cap, were marked `validation_skipped/over_budget`, and still appear in the output
 - Untracked files excluded: <file1>, <file2>
 - Failed reviewers: <reviewer>
 

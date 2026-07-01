@@ -4,6 +4,15 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SKILL_PATH = path.join(__dirname, '..', '..', 'skills', 'spec-work', 'SKILL.md');
+const EVAL_EXAMPLES_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  'skills',
+  'spec-work',
+  'evals',
+  'examples.json',
+);
 const SHIPPING_WORKFLOW_PATH = path.join(
   __dirname,
   '..',
@@ -22,6 +31,18 @@ const TRACKER_DEFER_PATH = path.join(
   'references',
   'tracker-defer.md',
 );
+
+function countOccurrences(text, needle) {
+  return text.split(needle).length - 1;
+}
+
+function sectionBetween(text, startNeedle, endNeedle) {
+  const start = text.indexOf(startNeedle);
+  const end = text.indexOf(endNeedle, start + startNeedle.length);
+  expect(start).toBeGreaterThanOrEqual(0);
+  expect(end).toBeGreaterThan(start);
+  return text.slice(start, end);
+}
 
 describe('spec-work context orientation contract', () => {
   test('uses plan/task-pack guided direct reads without hidden hooks', () => {
@@ -134,6 +155,207 @@ describe('spec-work context orientation contract', () => {
   });
 });
 
+describe('spec-work minimality and architecture-fit preflight contract', () => {
+  test('defines a single preflight section and invokes it before implementation in the task loop', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const heading = '## Minimality + Architecture Fit Preflight';
+
+    expect(countOccurrences(text, heading)).toBe(1);
+    expect(text.indexOf('## Feedback Loop And Vertical Slices')).toBeLessThan(text.indexOf(heading));
+    expect(text.indexOf(heading)).toBeLessThan(text.indexOf('## Anti-Rationalization Red Flags'));
+
+    const taskLoop = sectionBetween(
+      text,
+      '1. **Task Execution Loop**',
+      '   When a unit carries an `Execution note`',
+    );
+    const pointer = 'apply `Minimality + Architecture Fit Preflight`';
+    expect(taskLoop).toContain('Find existing test files for implementation files being changed');
+    expect(taskLoop).toContain('Implement following existing conventions');
+    expect(taskLoop.indexOf(pointer)).toBeGreaterThanOrEqual(0);
+    expect(taskLoop.indexOf(pointer)).toBeLessThan(taskLoop.indexOf('Implement following existing conventions'));
+    for (const surface of [
+      'dependency',
+      'file',
+      'abstraction',
+      'configuration',
+      'helper',
+      'wrapper',
+      'public contract',
+      'schema/runtime/config surface',
+      'source-of-truth entry',
+      'workflow handoff',
+      'provider boundary',
+      'generated runtime delivery',
+    ]) {
+      expect(taskLoop).toContain(surface);
+    }
+    expect(taskLoop).not.toContain(heading);
+
+    const followPatterns = sectionBetween(
+      text,
+      '3. **Follow Existing Patterns**',
+      '4. **Test Continuously**',
+    );
+    expect(followPatterns).not.toContain(pointer);
+    expect(text.indexOf('3. **Follow Existing Patterns**')).toBeLessThan(
+      text.indexOf('4. **Test Continuously**'),
+    );
+    expect(text.indexOf('4. **Test Continuously**')).toBeLessThan(
+      text.indexOf('5. **Simplify as You Go**'),
+    );
+    expect(text).toContain('**Test Discovery**');
+  });
+
+  test('keeps preflight semantic, evidence-based, and bounded to plan authorization', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const section = sectionBetween(
+      text,
+      '## Minimality + Architecture Fit Preflight',
+      '## Anti-Rationalization Red Flags',
+    );
+
+    expect(section).toContain('attention prompt');
+    expect(section).toContain('not a gate');
+    expect(section).toContain('not a script-owned semantic decision');
+    expect(section).toContain('not a note required for every line of code');
+    for (const check of [
+      'Scope need',
+      'Existing capability',
+      'Future-only abstraction',
+      'Architecture evidence',
+      'Authorization boundary',
+    ]) {
+      expect(section).toContain(check);
+    }
+    expect(section).toContain('work-phase reuse recheck');
+    expect(section).toContain('`Follow Existing Patterns`');
+    expect(section).toContain('`Anti-Rationalization Red Flags`');
+    expect(section).toContain('imagined future consumers');
+    for (const evidence of [
+      'source path',
+      'matched confirmed standard rule ID',
+      'explicit plan/task decision',
+      'owner/source module boundary',
+      'nearby pattern',
+      'Generic best-practice language is not enough',
+    ]) {
+      expect(section).toContain(evidence);
+    }
+    expect(section).toContain('confirmed active standard or source-of-truth first');
+    expect(section).toContain('explicit plan/task decision second');
+    expect(section).toContain('owner/source module boundary third');
+    expect(section).toContain('nearby pattern last');
+    expect(section).toContain('stop with the user-facing handoff contract');
+    expect(section).toContain('return to `spec-plan` or task-pack regeneration');
+    for (const field of [
+      '`question`',
+      '`recommended_answer`',
+      '`source_tag`',
+      '`chosen_answer`',
+      '`consequence`',
+      '`deferred_reason`',
+    ]) {
+      expect(section).toContain(field);
+    }
+    expect(section).toContain('ordinary small non-durable edits');
+  });
+
+  test('classifies simplification work with review-tier-independent residual sinks', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    const section = sectionBetween(
+      text,
+      '5. **Simplify as You Go**',
+      '6. **Figma Design Sync**',
+    );
+
+    for (const label of ['`remove-now`', '`minimality-debt`', '`protected`', '`architecture-mismatch`']) {
+      expect(section).toContain(label);
+    }
+    expect(section).toContain('rerun the same feedback loop');
+    expect(section).toContain('existing `deferred_follow_up[]` closeout field');
+    expect(section).toContain('existing `trigger-deferred-follow-up` sink');
+    expect(section).not.toContain('closeout residuals');
+    for (const field of ['`title`', '`reason`', '`evidence path`', '`suggested owner`']) {
+      expect(section).toContain(field);
+    }
+    expect(section).toContain('Tier 2 code review residual handling');
+    expect(section).toContain('PR Known Residuals');
+    expect(section).toContain('tracker-defer');
+    expect(section).toContain('does not create a new debt store');
+    expect(section).toContain('run-artifact field');
+    for (const protectedReason of [
+      'security validation',
+      'data-loss prevention',
+      'accessibility',
+      'observability',
+      'required verification',
+      '`protected-gap`',
+    ]) {
+      expect(section).toContain(protectedReason);
+    }
+    expect(section).toContain('wrong layer');
+    expect(section).toContain('bypasses source/runtime ownership');
+    expect(section).toContain('duplicates an owner');
+    expect(section).toContain('cross-boundary coupling');
+    expect(section).toContain('stop to `spec-plan` or task-pack regeneration');
+    expect(section).toContain('not a design authorization source');
+  });
+
+  test('does not introduce a minimality subsystem, schema, command, or runtime-source edit path', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).not.toContain('minimality_mode');
+    expect(text).not.toContain('spec-work minimality-audit');
+    expect(text).not.toContain('spec-work minimality-review');
+    expect(text).not.toContain('spec-work minimality-debt');
+    expect(text).not.toContain('minimality-audit');
+    expect(text).not.toContain('minimality-gain');
+    expect(text).not.toContain('minimality CLI');
+    expect(text).not.toContain('minimality schema');
+    expect(text).not.toContain('minimality task-pack field');
+    expect(text).not.toContain('minimality run artifact');
+    expect(text).not.toContain('skills/spec-work/references/minimality');
+  });
+
+  test('eval example focuses only future-only abstraction refusal', () => {
+    const payload = JSON.parse(fs.readFileSync(EVAL_EXAMPLES_PATH, 'utf8'));
+    const example = payload.examples.find(
+      (entry) => entry.id === 'durable-surface-preflight-avoids-future-only-architecture-drift',
+    );
+
+    expect(payload.examples).toHaveLength(6);
+    expect(example).toBeTruthy();
+    expect(example.coverage_tags).toEqual([
+      'expected',
+      'boundary',
+      'future-only-abstraction-refusal',
+    ]);
+    expect(example.context_snippets).toEqual(['future-only-abstraction-refusal']);
+    expect(example.expected_posture).toContain('当前消费者');
+    expect(example.expected_posture).toContain('concrete plan/task requirement');
+    expect(example.boundary_note).toContain('future-only-abstraction-refusal');
+    expect(example.negative_signal).toContain('future-only abstraction');
+    for (const deferredSnippet of [
+      'architecture-fit stop-back',
+      'protected-code keep',
+      'small-change-zero-note',
+    ]) {
+      expect(example.context_snippets).not.toContain(deferredSnippet);
+      expect(example.coverage_tags).not.toContain(deferredSnippet);
+      expect(example.expected_posture).not.toContain(deferredSnippet);
+    }
+    expect(example.negative_signal).not.toContain('runtime 行为证明');
+    expect(payload.source_refs).toEqual(['skills/spec-work/SKILL.md']);
+    expect(payload.source_refs).not.toEqual(expect.arrayContaining([
+      '.agents/skills/spec-work/SKILL.md',
+      '.claude/skills/spec-work/SKILL.md',
+      '.codex/skills/spec-work/SKILL.md',
+      'docs/plans/2026-07-01-003-feat-spec-work-minimality-architecture-fit-plan.md',
+    ]));
+  });
+});
+
 describe('spec-work run artifact boundary contract', () => {
   test('keeps run artifact integration bounded to durable closeout evidence', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');
@@ -221,6 +443,22 @@ describe('spec-work requirements and shipping policy contract', () => {
     expect(shipping).toContain('If a check was not run, say `not run` with the concrete reason from `verification-run-summary.v1`.');
     expect(shipping).toContain('If a validation claim lacks structured evidence, say `degraded` with the `honest-closeout.v1` reason code.');
     expect(shipping).toContain('omit `Next action` instead of inventing follow-up work');
+  });
+
+  test('shipping closeout checks changelog path refs are inside the tracked or staged boundary', () => {
+    const shipping = fs.readFileSync(SHIPPING_WORKFLOW_PATH, 'utf8');
+
+    expect(shipping).toContain('Check Changelog And Release Path References');
+    expect(shipping).toContain('When `CHANGELOG.md` or release notes are touched');
+    expect(shipping).toContain('newly added repo-relative artifact/source path references');
+    expect(shipping).toContain('already tracked (`git ls-files -- <path>`)');
+    expect(shipping).toContain('present in tracked diff (`git diff --name-only <base>`)');
+    expect(shipping).toContain('explicitly staged for the commit (`git diff --cached --name-only`)');
+    expect(shipping).toContain('git ls-files --others --exclude-standard');
+    expect(shipping).toContain('appears only as an untracked file');
+    expect(shipping).toContain('do not mark the work complete, commit, create a PR, or report the changelog entry as shipped');
+    expect(shipping).toContain('stage/commit the artifact, remove/defer the changelog reference, or record it as excluded/not-shipping');
+    expect(shipping).toContain('shipping-boundary check, not a semantic judgment');
   });
 
   test('shipping notification can recommend compound only for reusable lessons', () => {

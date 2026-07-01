@@ -80,6 +80,20 @@ Before changing behavior, establish or attempt the smallest feedback loop that c
 
 Prefer vertical tracer bullets when scope permits: close one behavior with its implementation, verification, and necessary docs/handoff evidence before broadening to the next behavior. Do not split work into "write all tests first across every unit, then implement everything" when independent vertical slices can be verified. Docs-only and config-only tasks use docs contract checks, schema/help/render checks, or diff-shape checks as the feedback loop; do not force TDD where no behavior-bearing code changes.
 
+## Minimality + Architecture Fit Preflight
+
+Before adding or changing a durable surface, run this as an attention prompt. Durable surfaces include a dependency, file, abstraction, configuration, helper, wrapper, public contract, schema/runtime/config surface, source-of-truth entry, workflow handoff, provider boundary, or generated runtime delivery. This is not a gate, not a script-owned semantic decision, and not a note required for every line of code.
+
+Use three minimality checks and two architecture-fit checks:
+
+- **Scope need:** Is the durable surface required by the active plan/task, current failing feedback loop, or user request? If not, stop or record it as follow-up instead of expanding scope.
+- **Existing capability:** Before creating new surface area, apply the existing work-phase reuse recheck, `Follow Existing Patterns`, and `Anti-Rationalization Red Flags` rather than duplicating those rules here. Prefer reuse, extension, deletion, configuration, platform/standard-library capability, or an already installed dependency when current source evidence supports it.
+- **Future-only abstraction:** Do not add an abstraction, adapter, wrapper, service, option, or generalized API only for imagined future consumers. Current consumers, protected behavior, or a concrete plan/task requirement must justify it.
+- **Architecture evidence:** Architecture fit must cite direct evidence such as a source path, matched confirmed standard rule ID, explicit plan/task decision, owner/source module boundary, or nearby pattern. Generic best-practice language is not enough.
+- **Authorization boundary:** If the implementation needs a new public contract, cross-module abstraction, schema/runtime/config surface, source-of-truth entry, workflow handoff, provider boundary, or generated runtime delivery change that the plan/task did not authorize, stop with the user-facing handoff contract and return to `spec-plan` or task-pack regeneration.
+
+Use this precedence when evidence conflicts: confirmed active standard or source-of-truth first, explicit plan/task decision second, owner/source module boundary third, nearby pattern last. A single suspicious nearby pattern is not hard context. When preflight changes direction, rejects obvious overbuild, or preserves non-obvious protected code, carry a compact decision note using the existing Decision Ledger fields: `question`, `recommended_answer`, `source_tag`, `chosen_answer`, `consequence`, and `deferred_reason`. For ordinary small non-durable edits, keep the run quiet.
+
 ## Anti-Rationalization Red Flags
 
 | 红旗念头 | 停下来做什么 |
@@ -387,6 +401,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
      - **If the unit's work is already present and matches the plan's intent** (files exist with the expected capability, or the unit's `Verification` criteria are already satisfied by the current code), the work has likely shipped on a prior branch or session. Verify it matches, mark the task complete, and move on. Do not silently reimplement.
      - Look for similar patterns in codebase
      - Find existing test files for implementation files being changed (Test Discovery — see below)
+     - Before adding or changing a dependency, file, abstraction, configuration, helper, wrapper, public contract, schema/runtime/config surface, source-of-truth entry, workflow handoff, provider boundary, or generated runtime delivery, apply `Minimality + Architecture Fit Preflight`
      - Implement following existing conventions
      - Add, update, or remove tests to match implementation changes (see Test Discovery below)
      - Run System-Wide Test Check (see below)
@@ -486,6 +501,15 @@ Determine how to proceed based on what was provided in `<input_document>`.
    After completing a cluster of related implementation units (or every 2-3 units), review recently changed files for simplification opportunities — consolidate duplicated patterns, extract shared helpers, and improve code reuse and efficiency. This is especially valuable when using subagents, since each agent works with isolated context and can't see patterns emerging across units.
 
    Don't simplify after every single unit — early patterns may look duplicated but diverge intentionally in later units. Wait for a natural phase boundary or when you notice accumulated complexity.
+
+   Classify each simplification finding before acting:
+
+   | Class | What to do |
+   | --- | --- |
+   | `remove-now` | Remove current-run dead code, duplicate wrapper logic, unused files, or speculative options that are inside scope, then rerun the same feedback loop. |
+   | `minimality-debt` | If simplification is real but out of current scope, record it in the existing `deferred_follow_up[]` closeout field with `title`, `reason`, `evidence path`, and `suggested owner`. This uses the existing `trigger-deferred-follow-up` sink and does not create a new debt store, persistent minimality artifact, or run-artifact field. If Tier 2 code review residual handling runs, merge and deduplicate it there; if a PR is created or updated, carry it into PR Known Residuals; if tracker defer is selected, reuse the existing tracker-defer path. |
+   | `protected` | Keep code that protects security validation, data-loss prevention, accessibility, observability, required verification, or other confirmed owner constraints. If the protection is incomplete, record a `protected-gap` residual or review focus rather than deleting it for lower LOC. |
+   | `architecture-mismatch` | If the current diff places logic in the wrong layer, bypasses source/runtime ownership, duplicates an owner, or creates cross-boundary coupling, fix it in scope when the existing plan/task authorizes the correction. If a new architecture decision is needed, stop to `spec-plan` or task-pack regeneration; review may carry residual/follow-up focus for implemented diffs, but it is not a design authorization source. |
 
    If a simplify skill or equivalent capability is available, use it. Otherwise, review the changed files yourself for reuse and consolidation opportunities.
 
