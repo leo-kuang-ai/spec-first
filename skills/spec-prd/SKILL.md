@@ -86,6 +86,18 @@ Follows `docs/contracts/project-graph-consumption.md`: `capability-class` candid
 6. **No second PRD artifact topology** - Keep the PRD chain: `docs/brainstorms/*-requirements.md` -> plan -> tasks -> work -> review -> knowledge. `grill-with-docs` context or ADR updates are supporting source docs when explicitly triggered, not replacement PRD artifacts.
 7. **reason-then-act / 先规划后执行** - Before a user-visible side effect, write the reason and the relevant run-local field, then act: owner question -> `highest_risk_gap` / `next_owner_question` / `question_delivery`; PRD write -> `write_mode`; readiness -> checker findings plus `readiness_outcome` / `can_enter_spec-plan`; handoff -> `readiness_outcome` and next action. Rule: reuse existing Decision Card fields and do not add phase-status enums, progress files, or transcripts. For lightweight branches, route-out, bypass, and source-proven paths use one concise reason instead of full ceremony.
 
+## Execution Compass
+
+这张表是 `$spec-prd` 的运行速查，不是第二状态机、持久 artifact、schema 或 progress ledger。详细规则仍以各 Phase、`Canonical: 四个合法停点`、reference 和 checker/finalize 脚本为准。
+
+| Gate | 进入下一步前必须完成 | 合法下一步 |
+| --- | --- | --- |
+| Intake | 判定 route-out/bypass、`intent`、`input_posture`、split posture，并说明为什么 PRD 会或不会增加 durable WHAT 价值。 | 进入 Phase 1；或用当前 host 的 brainstorm/app-audit/plan/work/debug route-out。 |
+| Phase 1+ durable action | 先展示可见任务清单，覆盖 load-bearing OQ/source work、PRD write target、owner question 和 finalize/checker gap。 | 继续 source-first evidence / Requirements Grill；轻量 route-out 可用一句理由收口。 |
+| 🔴 First durable PRD Write | 已有 Requirement Analysis Gate map、Product Expert Lens risk->write-target 结果、Decision Card，以及 Pre-Write Closure Gate 结论。 | `ask-owner-first`、`checkpoint-prd`、`final-prd` 或 `route-out`；不得先写 ready/final PRD 等 Phase 4 补救。 |
+| Owner question | 使用 Interaction Method；一次只问一个 source-backed owner question，记录 `question_delivery` 和具体 PRD write target。 | 收到答案后绑定 Owner Decision Trace；不能等待时按真实降级记录并写非 ready residue。 |
+| 🔴 Phase 4 closeout | 已运行 readiness lens；有 PRD artifact 时执行 finalize/checker，并报告 finding count、blocking `reason_codes`、receipt status 和 `readiness_outcome`。 | 只有 receipt 与 LLM readiness judgment 同时支持时才 hand off to plan；否则 `revise-prd` / `ask-owner` / `doc-review` / `route-out`。 |
+
 ## User-Visible Execution UX Protocol
 
 This protocol is run-local presentation discipline for `$spec-prd`; it reuses the Decision Card, task-list-first discipline, `write_mode`, `question_delivery`, `clarification_evidence`, `readiness_outcome`, finalize, and checker fields already defined here. It is not a progress ledger, run artifact, transcript schema, phase-status enum, central state machine, public workflow entrypoint, second PRD artifact topology, or permission to edit generated runtime mirrors.
@@ -162,6 +174,20 @@ Field mapping (Light contract): leaf -> `owner_question_progress=closed`; source
 
 **Direct-write-after-read anti-pattern (observed failure — 2026-06-28 run).** Reading source materials and immediately writing a PRD without emitting a run-local Decision Card is a Phase 1 skip violation. The observable trigger is reasoning like "directory is empty / materials are clear / writing PRD now" with no Requirement Analysis Gate map, no Product Expert Lens ranking, no Requirements Grill, and no Decision Card with `write_mode` / `highest_risk_gap` / `next_action` / `why planning will not invent WHAT`. This is distinct from checkpoint-as-escape (which starts grill then exits early) — this failure skips Phase 1 entirely. The minimum evidence of Phase 1 entry before a first durable Write is: (a) a Decision Card in the conversation with `write_mode`, `highest_risk_gap`, `next_action`, and `why planning will not invent WHAT`; (b) at least one Requirement Analysis Gate field visible (`open_decisions` or `next_owner_question`); (c) for inputs with design refs, multiple sources, or owner-owned gaps — a grill question to the owner or a source-resolved gap trace. If none are present, stop before the first Write and run Phase 1 first. A write_mode=checkpoint-prd does not exempt Phase 1 — checkpoint is a recovery shape after Phase 1 analysis, not a bypass of it.
 
+## Failure-Mode Blacklist
+
+以下捷径是已观察到的 `$spec-prd` 失败模式。命中任一项时，停止当前输出路径，执行恢复动作；不要用更漂亮的 PRD 文案掩盖证据缺口。
+
+| Blacklisted shortcut | Observable trigger | Required recovery |
+| --- | --- | --- |
+| Direct write after read | 读完材料就写 PRD，缺少 Decision Card、Requirement Analysis Gate map、Product Expert Lens ranking 或 grill trace。 | 回到 Phase 1，先产出 run-local map、highest-risk gap、next owner/source action，再决定 `write_mode`。 |
+| Checkpoint as escape | 只问过泛化 scoping 问题，就把未问的 load-bearing OQ 塞进 checkpoint 或 Outstanding Questions，并声称 `clarification_evidence: asked-owner`。 | 继续按最高风险 owner/source gap 逐个 grill；只有真实 headless/no-reply 或 large-input recovery 才写 non-ready checkpoint。 |
+| Fake headless | chat 可以等待用户，却声明 `question_delivery=true-headless-unavailable`。 | 使用 blocking question tool 或 `question_delivery=chat-fallback`；等待一个 source-backed owner answer。 |
+| Owner answer laundering | owner 要求补读设计/source，输出却改写成 owner 接受跳过。 | 保留原意为 blocking residue；无法满足时写 non-ready checkpoint，并询问 owner 是否提供输入或明确放宽。 |
+| Design evidence laundering | UI/design input 未读、降级或冲突，却标成 confirmed scope 或 source-resolved。 | 读取/记录 `design_source_inventory`；不可读时写 `design_sources_unread`、原因、readiness consequence 和 owner acceptance 需求。 |
+| Checker/finalize evasion | 没有当前 finalize/checker receipt 就声明 `ready-for-planning`、`final-prd` 或 `can_enter_spec_plan: yes`。 | 运行 producer-local finalize/checker；无法运行时降级为 `revise-prd` 或 `ask-owner`，并报告原因。 |
+| Runtime mirror patch | 通过 `.claude/`、`.codex/` 或 `.agents/skills/` runtime mirror 修 PRD workflow 行为。 | 回到 `skills/spec-prd/**` source；需要刷新 runtime 时由 `spec-first init` 投影。 |
+
 ## Execution Flow
 
 ### Phase 0: Classify Intent And Input Mode
@@ -207,7 +233,7 @@ Before the first durable PRD Write in an authoring/refinement run, emit a compac
 
 Run the **Pre-Write Closure Gate** before durable PRD write-in. Relentless grilling continues by default; `write_mode=ask-owner-first` means keep grilling the highest-risk branch, not "ask one question then stop drafting". Use `write_mode=checkpoint-prd` as the relentless fallback when the owner gives no cap/continue signal (absent/headless, or silent after a soft-cap offer), or for true large-input recovery that cannot wait, and mark it a recovery checkpoint (`can_enter_spec-plan: no` + `next_owner_question`) rather than a final PRD. Use `write_mode=final-prd` only when every load-bearing branch has reached a Canonical stop point (source evidence, owner answer, evidence-backed `accepted-assumption`, or owner cap); Outstanding Questions, Planning Recheck, blocker cluster, or route-out residue still in the PRD prevents `final-prd`. An owner who has not capped a branch that still has reachable sub-decisions prevents `final-prd`. Use `write_mode=route-out` when the input is wrong-stage or no PRD artifact would add durable WHAT value.
 
-Do not satisfy the Pre-Write Closure Gate by writing a ready/final PRD first and relying on Phase 4 to catch it later. On Claude, the `prd-prewrite-guard` blocks the direct `Write` shape for new PRD artifacts; on hosts without an equivalent pre-tool guard, treat the same rule as a loud convention and report the degraded enforcement boundary rather than silently continuing.
+🔴 **STOP — Pre-Write Closure Gate**: Do not satisfy the Pre-Write Closure Gate by writing a ready/final PRD first and relying on Phase 4 to catch it later. On Claude, the `prd-prewrite-guard` blocks the direct `Write` shape for new PRD artifacts; on hosts without an equivalent pre-tool guard, treat the same rule as a loud convention and report the degraded enforcement boundary rather than silently continuing.
 
 Codex degraded enforcement boundary: set `codex_prd_guard: not_available` in closeout when relevant. Codex has no equivalent managed PreToolUse prewrite guard and no managed Stop closeout guard for PRD readiness; producer finalize and `spec-plan` consumer `--verify-receipt` are mandatory handoff discipline but are not mechanically hook-enforced in Codex. Do not imply equal protection with Claude, do not self-fill ready receipt fields, and do not hand off to planning without running the current-source finalize/verify commands or explicitly reporting the degraded reason.
 
@@ -251,7 +277,7 @@ For oversized initial PRDs, produce a split-decision recommendation first. Write
 
 ### Phase 4: Readiness And Handoff
 
-Phase 4 is a mandatory producer-local gate, not an optional closeout. Do not declare the PRD done, call it a "standard PRD", write confirmed ready fields, or offer a planning handoff (including `/spec:plan`) before you have actually run the readiness lens and, when a PRD artifact path exists, executed the producer-local finalize path. Producing the artifact and updating the changelog is not the end of the run; entering Phase 4 is. Self-declaring readiness or recommending planning without an executed checker/finalize receipt and a stated readiness outcome is a Phase 4 violation, even when the draft looks complete.
+🔴 **STOP — Phase 4 Mandatory Gate**: Phase 4 is a mandatory producer-local gate, not an optional closeout. Do not declare the PRD done, call it a "standard PRD", write confirmed ready fields, or offer a planning handoff (including `/spec:plan`) before you have actually run the readiness lens and, when a PRD artifact path exists, executed the producer-local finalize path. Producing the artifact and updating the changelog is not the end of the run; entering Phase 4 is. Self-declaring readiness or recommending planning without an executed checker/finalize receipt and a stated readiness outcome is a Phase 4 violation, even when the draft looks complete.
 
 Run the readiness lens before recommending planning:
 
