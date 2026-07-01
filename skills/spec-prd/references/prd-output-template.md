@@ -153,7 +153,7 @@ Include these only when they reduce planning invention:
 - `## Planning Recheck`
 - `## Feature Slices`
 
-Success Metrics are conditional. When present, each goal should be measurable: metric, target value, and when available, current baseline and measurement window, with leading/lagging type for core goals. If there is no credible metric source, write an observable measurement口径 or record the assumption; do not invent target values.
+Success Metrics are conditional. When present, each goal should be measurable: metric, target value, and when available, current baseline and measurement window, with leading/lagging type for core goals. If there is no credible metric source, write an observable measurement definition or record the assumption; do not invent target values.
 
 Trigger `## Goals / Success Metrics` when a planning-bound objective says improve, optimize, reduce, lower, accelerate, stabilize, prove, preserve, avoid regression, reduce drift, reduce prompt/runtime load, increase coverage, or similar and that objective affects priority, acceptance, or release confidence. For internal tools, workflows, skills, prompts, and runtime projection changes, acceptable observable signals include hot-path load or anchor count, output-drift or boundary regression cases, source/reference contract coverage, runtime projection or generated-mirror drift checks, eval fixture coverage, fresh-source eval status, and downstream consumer compatibility. When no credible baseline or target exists, write an observable signal or assumption; never invent a numeric target.
 

@@ -56,7 +56,7 @@ When a new PRD's term conflicts with an existing canonical entry, surface it imm
 
 ## Requirements Scenario Grill
 
-> `spec-prd/SKILL.md` Phase 2 也把这套机制称为 Requirements Grill / Domain Grill Gate,readiness lens 用 `domain-grill coverage` 指代同一覆盖检查。三者是同一流程,不是独立概念。本文件是 PRD-local trigger / cadence / question format 的权威定义;`grill-with-docs-integration.md` 是 sustained interview 与 context/ADR 行为的权威定义;SKILL.md 只做摘要引用。
+> `spec-prd/SKILL.md` Phase 2 also calls this mechanism the Requirements Grill / Domain Grill Gate, and the readiness lens refers to the same coverage check as `domain-grill coverage`. The three are one process, not separate concepts. This file is the authoritative definition of the PRD-local trigger / cadence / question format; `grill-with-docs-integration.md` is the authoritative definition of sustained interview and context/ADR behavior; SKILL.md only references a summary.
 
 Use concrete scenarios to stress-test requirements and domain boundaries whenever they can make the standard PRD more precise. Prioritize scenarios that change or confirm a PRD write target. Examples:
 
@@ -88,7 +88,7 @@ Question cadence:
 - Use the parent skill Interaction Method for every owner question; its platform blocking question tool requirement applies before the cadence rules below.
 - Ask at most one question at a time.
 - Each question must bind to a `gap id`, a source attempt, a PRD write target, and a progress state: `closed`, `narrowed`, `accepted assumption`, `Outstanding Question`, `blocker`, or `route-out`.
-- Continue relentlessly by default, walking down each branch. A branch stops only at a legal stop point defined in SKILL.md `Canonical: 四个合法停点`. "Does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per Canonical, never silently emit ready.
+- Continue relentlessly by default, walking down each branch. A branch stops only at a legal stop point defined in SKILL.md `Canonical: Four Legal Stop Points`. "Does not affect the current release slice" reorders questions, it does not stop a branch; only `route-out` ends a branch without a Canonical stop point. When the owner gives no cap/continue signal, fall back to checkpoint per Canonical, never silently emit ready.
 - Always give a `recommended_answer` unless there is no defensible default.
 - If the owner says "you decide", use the recommended answer only when evidence supports it or it is safely labeled as an assumption.
 
@@ -166,13 +166,13 @@ For oversized, multi-source, or resume-risk PRDs, load `large-input-checkpoint.m
 
 Before asking, sort gaps by acceptance impact, behavior/scope irreversibility, number of affected PRD sections, source contradiction, and release/planning consequence. This triage is **ordering, not filtering**: it decides which gap to grill first, never which load-bearing gap to skip. Resolve source/docs/tests/contracts/glossary/prior-PRD-answerable gaps first. Owner questions are for product decisions, not facts already available from source.
 
-Normal PRD authoring/refinement asks load-bearing questions one at a time using the run-local question format above, relentlessly by default. A question is allowed only after a source attempt. A load-bearing gap that does not yet bind to a PRD write target is not dropped — keep grilling to bind it or carry it visibly. If any standard-template section still depends on owner adjudication and the target surface is anchored, load `grill-with-docs-integration.md` and continue one-question-at-a-time. A branch stops only at a legal stop point in SKILL.md `Canonical: 四个合法停点`. If the anchor is missing, the issue is broad product discovery, or no defensible question sequence exists, `route-out` to a prioritized blocker cluster with recommended route, acceptable assumptions when defensible, and affected write targets ("would only expand scope" / "does not affect the current release slice" reorders, it is not by itself a stop). Do not mark the PRD `ready-for-planning` until every load-bearing branch reaches a Canonical stop point.
+Normal PRD authoring/refinement asks load-bearing questions one at a time using the run-local question format above, relentlessly by default. A question is allowed only after a source attempt. A load-bearing gap that does not yet bind to a PRD write target is not dropped — keep grilling to bind it or carry it visibly. If any standard-template section still depends on owner adjudication and the target surface is anchored, load `grill-with-docs-integration.md` and continue one-question-at-a-time. A branch stops only at a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`. If the anchor is missing, the issue is broad product discovery, or no defensible question sequence exists, `route-out` to a prioritized blocker cluster with recommended route, acceptable assumptions when defensible, and affected write targets ("would only expand scope" / "does not affect the current release slice" reorders, it is not by itself a stop). Do not mark the PRD `ready-for-planning` until every load-bearing branch reaches a Canonical stop point.
 
 ### Deep Requirements Grill
 
 For PRD authoring/refinement, apply these seven `grill-with-docs` actions to every requirement branch that can affect the standard PRD template, with special attention to load-bearing WHAT and planning-readiness gaps:
 
-1. Keep one-question-at-a-time progression, relentlessly by default: progress one owner question at a time and walk down each branch until it reaches a legal stop point in SKILL.md `Canonical: 四个合法停点`.
+1. Keep one-question-at-a-time progression, relentlessly by default: progress one owner question at a time and walk down each branch until it reaches a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`.
 2. Provide `recommended_answer` and `why_recommended` whenever defensible.
 3. Perform source/code/docs/tests/contracts lookup before asking owner; inspect glossary and prior PRDs when relevant.
 4. Run a glossary conflict challenge against existing glossary/context wording instead of normalizing drift.
@@ -180,7 +180,7 @@ For PRD authoring/refinement, apply these seven `grill-with-docs` actions to eve
 6. Use concrete scenario stress for happy path, permission/state boundary, exception/failure, and negative acceptance, only when the scenario can affect acceptance, scope, terminology, or a boundary decision.
 7. Perform code contradiction surfacing with evidence tags and consequences.
 
-Every load-bearing branch must reach a legal stop point defined in SKILL.md `Canonical: 四个合法停点` before planning (with `Outstanding Questions` / accepted assumption / blocker cluster as the visible residue of an owner-capped or route-out branch). Track the closure state in run-local progress and persist only the resolved content into PRD-local sections. If any load-bearing branch with reachable sub-decisions has not reached a Canonical stop point — including an owner who has not capped it — the PRD is not `ready-for-planning`; when the owner gives no cap/continue signal, fall back to checkpoint per Canonical.
+Every load-bearing branch must reach a legal stop point defined in SKILL.md `Canonical: Four Legal Stop Points` before planning (with `Outstanding Questions` / accepted assumption / blocker cluster as the visible residue of an owner-capped or route-out branch). Track the closure state in run-local progress and persist only the resolved content into PRD-local sections. If any load-bearing branch with reachable sub-decisions has not reached a Canonical stop point — including an owner who has not capped it — the PRD is not `ready-for-planning`; when the owner gives no cap/continue signal, fall back to checkpoint per Canonical.
 
 Domain Grill and Pre-PRD Clarification share cadence and source-first discipline but have different centers of gravity: Domain Grill handles terminology, source/user/glossary contradiction, source-of-truth, ownership, permission/state/exception edges, and hard product boundaries; Pre-PRD Clarification handles rough PRD completeness, scenario coverage, acceptance, scope, and write-target closure.
 
