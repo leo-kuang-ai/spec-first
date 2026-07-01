@@ -24,6 +24,22 @@ A small set of load-bearing skill structures that preserve core judgment, eviden
 
 Avoid: using steel frame to mean merely shorter prose. A steel-frame refactor must show where each removed rule's protected boundary migrated and how contract tests still cover the capability.
 
+### Front Controller
+
+A compact workflow skill entry that owns route admission, the execution spine, boundary reminders, and reference-trigger decisions without carrying every scenario-specific rule itself.
+
+### Triggered Reference
+
+A deferred workflow reference loaded only when its trigger signal appears. It keeps the hot path small while preserving specialized judgment for design evidence, large inputs, readiness, topology, or governance.
+
+### Deterministic Gate
+
+A script, hook, or verifier boundary that blocks an exit based on mechanically checkable facts such as schema fields, receipts, paths, hashes, or reason codes. It must not replace LLM semantic judgment above the fact floor.
+
+### Eval Regression
+
+A fixture, test, or fresh-source evaluation that proves a prompt or workflow refactor kept protected behavior intact. It is useful for guarding route boundaries, source/runtime rules, handoff discipline, and known failure modes during prompt compression.
+
 ## Roles And Capabilities
 
 ### Skill

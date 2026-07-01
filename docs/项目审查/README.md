@@ -8,14 +8,16 @@
 
 最新审查及其衍生的 active recommendations 由下游 PRD / plan 承接，避免在历史报告里反复检索：
 
-- **spec-skill 体系健壮性/稳定性优化**（最新）：审查见 [2026-06-28-spec-skill-健壮性稳定性优化审查.md](2026-06-28-spec-skill-健壮性稳定性优化审查.md)；需求化为 PRD `docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md`（40 条 requirement，R-01~R-40）。落地进度：Slice A'（R-01~R-04）、Slice B（R-40）、Slice C（R-05~R-12）、Slice D（R-24/R-25/R-26/R-37/R-38）已完成；Slice E（R-13~R-23、R-27~R-36/R-39）为 backlog。
+- **AI 专家与工程效能综合审查**（最新）：审查见 [2026-07-02-ai-expert-engineering-effectiveness-review.md](2026-07-02-ai-expert-engineering-effectiveness-review.md)；核心建议是把下一阶段从继续堆机制转向证明真实工程效能，优先接通 workflow outcome 评测、采集真实用户摩擦数据、收敛 closeout/knowledge 证据闭环，并补齐 OSS/组织治理低成本信号。
+- **spec-skill 体系健壮性/稳定性优化**：审查见 [2026-06-28-spec-skill-健壮性稳定性优化审查.md](2026-06-28-spec-skill-健壮性稳定性优化审查.md)；需求化为 PRD `docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md`（40 条 requirement，R-01~R-40）。落地进度：Slice A'（R-01~R-04）、Slice B（R-40）、Slice C（R-05~R-12）、Slice D（R-24/R-25/R-26/R-37/R-38）已完成；Slice E（R-13~R-23、R-27~R-36/R-39）为 backlog。
 - 其余历史报告的建议若仍 active，应在对应 PRD/plan 的 frontmatter `referenced_reviews` 中追溯，不在本 README 重复展开。
 
 ## 审查索引（按日期倒序）
 
 | 日期 | 审查文档 | 主题 |
 | --- | --- | --- |
-| 2026-06-28 | [spec-skill-健壮性稳定性优化审查](2026-06-28-spec-skill-健壮性稳定性优化审查.md) | skill 体系健壮性/稳定性/确定性 gate 加固（最新，已转 PRD） |
+| 2026-07-02 | [AI 专家与工程效能综合审查](2026-07-02-ai-expert-engineering-effectiveness-review.md) | 任务建模、上下文治理、执行控制、评测反馈、知识进化与工程效能综合评估 |
+| 2026-06-28 | [spec-skill-健壮性稳定性优化审查](2026-06-28-spec-skill-健壮性稳定性优化审查.md) | skill 体系健壮性/稳定性/确定性 gate 加固（已转 PRD） |
 | 2026-06-20 | [using-spec-first-skill-optimization-suggestions](2026-06-20-using-spec-first-skill-optimization-suggestions.md) | using-spec-first 入口路由优化建议 |
 | 2026-06-20 | [spec-skill-audit-skill-optimization-suggestions](2026-06-20-spec-skill-audit-skill-optimization-suggestions.md) | spec-skill-audit 优化建议 |
 | 2026-06-20 | [spec-prd-skill-optimization-suggestions](2026-06-20-spec-prd-skill-optimization-suggestions.md) | spec-prd 优化建议 |

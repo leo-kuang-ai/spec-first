@@ -168,10 +168,15 @@ describe('team standards governance source contract', () => {
     );
 
     expect(skill).toContain('name: spec-team-standards-governance');
+    expect(skill).toContain('Govern source-backed team development standards');
     expect(skill).not.toContain('name: team-standards-governance');
+    expect(skill).toContain('## When To Use / When Not To Use');
+    expect(skill).toContain('Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution');
     expect(skill).toContain('not a public Claude `/spec:*` or Codex `$spec-*` workflow');
     expect(skill).toContain('not the retired `spec-standards` workflow');
     expect(skill).toContain('Do not create Claude `/spec:standards`, Codex `$spec-standards`');
+    expect(skill).toContain('Do not use to create, restore, or recommend `/spec:standards`, `$spec-standards`, `skills/spec-standards/`, or `.spec-first/standards/`.');
+    expect(skill).toContain('Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.');
     expect(skill).toContain('requires an active Claude `/spec:work`, Codex `$spec-work`');
     expect(skill).toContain('Never load every reference by default');
     expect(skill).toContain('references/meta-prompt-governance.md');
@@ -336,6 +341,13 @@ describe('team standards governance source contract', () => {
       'should-not-trigger',
       'near-neighbor',
       'boundary',
+    ]));
+    expect(triggerCases.cases).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        case_id: 'TRIGGER-NEAR-002',
+        reason_code: 'retired-spec-standards-surface',
+        expected_result: 'boundary',
+      }),
     ]));
 
     expect(outputCases.schema_version).toBe('team-standards-output-evals/v1');

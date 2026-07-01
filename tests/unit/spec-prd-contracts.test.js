@@ -477,6 +477,7 @@ describe('spec-prd workflow contracts', () => {
 
   test('clarification evidence write-mode contract blocks silent final PRD shortcuts', () => {
     const skill = read(SKILL_PATH);
+    const readiness = read(READINESS_PATH);
 
     expectContainsAll(skill, [
       'reason-then-act',
@@ -514,8 +515,9 @@ describe('spec-prd workflow contracts', () => {
       'artifact-internal referential consistency',
       'Checkpoint-as-escape anti-pattern',
       'Writing a checkpoint is not a substitute for grill',
-      'asked-owner` means the model asked and received answers on the load-bearing OQs',
-      'legal use of checkpoint is **only** when',
+      'Observed Failure Details',
+      'Direct-write-after-read anti-pattern',
+      'not a bypass',
       'Requirement Analysis Gate',
       'materials -> requirement understanding map -> uncertainty/contradiction identification -> decide which product/design/technical decisions must be asked through grill -> then write the PRD or analysis conclusion',
       'input_inventory',
@@ -552,6 +554,15 @@ describe('spec-prd workflow contracts', () => {
       'pre_prd_clarification_status=checkpoint-blocked',
       'Do not satisfy the Pre-Write Closure Gate by writing a ready/final PRD first',
       'hosts without an equivalent pre-tool guard',
+    ]);
+    expectContainsAll(readiness, [
+      '## Observed Failure Details',
+      'Observed in 232726 / 231339 runs',
+      'asked-owner` means the owner answered the load-bearing OQs',
+      'The legal use of checkpoint is **only** when',
+      'Observed in the 2026-06-28 run',
+      'direct-write-after-read skips Phase 1 entirely',
+      '`write_mode=checkpoint-prd` does not exempt Phase 1',
     ]);
     // 旧止损语义已被翻转:这些反向锚点不得复活
     expect(skill).not.toContain('large input is not permission to skip the owner question');
@@ -3404,20 +3415,10 @@ describe('spec-prd workflow contracts', () => {
       'codex_prd_guard: not_available',
       'no managed Stop closeout guard',
       'consumer `--verify-receipt`',
-      'clarification_trace_absent',
-      'design_source_unaccounted',
-      'input_refs_unavailable',
-      'input_scan_degraded',
-      'preflight_sweep_closure_blocked',
-      'outstanding_question_closure_undeclared',
-      'blocking_outstanding_question_present',
-      'planning_invention_question_present',
-      'unclosed_owner_question_present',
-      'prd_readiness_declarations_evaded',
-      'ready_receipt_absent',
-      'ready_receipt_stale',
-      'finalize_required',
-      'preflight_sweep_closure_absent',
+      'any blocking `reason_codes` from `scripts/lib/reason-codes.js`',
+      'Consume the full list through `prd-readiness-lens.md`',
+      'The readiness orchestrator must consume declaration findings',
+      'Phase 4 must not return `ready-for-planning`',
       'input_scan_attempted=false',
     ]);
 

@@ -290,7 +290,7 @@ downstream_confirmation_risk -> claim -> evidence/source -> gap
 
 核心字段是：
 
-- `write_mode=ask-owner-first`：表示下一步是继续 relentless 深挖最高风险分支，**不是**"问一个就停下来不写"。澄清默认持续深挖，分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。
+- `write_mode=ask-owner-first`：表示下一步是继续 relentless 深挖最高风险分支，**不是**"问一个就停下来不写"。澄清默认持续深挖，分支只在 `Canonical: Four Legal Stop Points`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。
 - `write_mode=checkpoint-prd`：relentless 兜底——当 owner 未给出 cap/continue 信号(不在场/headless，或软封顶选择点后持续沉默，可观测信号相同)时停在此恢复点,必须写 `can_enter_spec-plan: no`、`next_owner_question` 和 `pre_prd_clarification_status=checkpoint-blocked`,绝不静默判 ready;也用于多来源/长链路/true headless 恢复。
 - `write_mode=final-prd`：只有**每个 load-bearing 分支都到达 Canonical 停点**(source evidence、owner answer、evidence-backed accepted assumption 或 owner 封顶)时才可使用;owner 未封顶且分支仍有可深挖子决策时不得 final-prd。
 - `write_mode=route-out`：输入属于 brainstorm、plan、work、debug 或无 durable clarified-requirements 价值时路由出去。
@@ -377,7 +377,7 @@ Deep Requirements Grill 是 `grill-with-docs` 思想在研发侧需求澄清阶�
 - code contradiction：用户说法和现有代码冲突时，要求明确以哪个为准。
 - decision closure：owner answer 必须落回 PRD-local section，而不是停留在聊天里。
 
-正常需求澄清 run 的姿态是 **relentless（理解透才停）**：默认沿每个 load-bearing 分支一次一个问题深挖到底，而不是"够写某个 section 就停"。固定问题数量、"看起来小"、"只问了一个关键问题"、"问题序列变长"、"不影响当前发布切片" 都**不是停止理由**——它们只影响提问顺序。每个 owner 问题仍必须绑定命名 gap、已做 source attempt、clarification write target 和 closure state；一个分支只在 `Canonical: 四个合法停点`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。当 owner 未给出 cap/continue 信号时，落 `write_mode=checkpoint-prd` 兜底，绝不静默判 `ready-for-planning`。只有缺系统/产品锚点、属于 broad discovery、或没有可负责提问序列时，才 `route-out` 到 prioritized blocker cluster 并推荐下一 route。`ready-for-planning` 要求每个 load-bearing 分支都到达 Canonical 停点（含 owner 已封顶）。
+正常需求澄清 run 的姿态是 **relentless（理解透才停）**：默认沿每个 load-bearing 分支一次一个问题深挖到底，而不是"够写某个 section 就停"。固定问题数量、"看起来小"、"只问了一个关键问题"、"问题序列变长"、"不影响当前发布切片" 都**不是停止理由**——它们只影响提问顺序。每个 owner 问题仍必须绑定命名 gap、已做 source attempt、clarification write target 和 closure state；一个分支只在 `Canonical: Four Legal Stop Points`(leaf / source-resolved / owner-capped / how-pushdown)之一才停。当 owner 未给出 cap/continue 信号时，落 `write_mode=checkpoint-prd` 兜底，绝不静默判 `ready-for-planning`。只有缺系统/产品锚点、属于 broad discovery、或没有可负责提问序列时，才 `route-out` 到 prioritized blocker cluster 并推荐下一 route。`ready-for-planning` 要求每个 load-bearing 分支都到达 Canonical 停点（含 owner 已封顶）。
 
 ## Context / ADR Topology Adapter
 

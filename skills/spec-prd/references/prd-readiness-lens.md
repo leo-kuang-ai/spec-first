@@ -14,6 +14,7 @@ Load this reference before handing a PRD to planning, document review, or done.
 - [Domain And Decision Pack](#domain-and-decision-pack)
 - [P1 Conditional Pack](#p1-conditional-pack)
 - [Metrics And Overlay Pack](#metrics-and-overlay-pack)
+- [Observed Failure Details](#observed-failure-details)
 - [Outcomes](#outcomes)
 
 ## Base Gate
@@ -42,6 +43,22 @@ Closeout must show the finalize/checker summary facts before any planning handof
 Closure-disposition razor (004): see SKILL.md `Closure-disposition razor` for the legal disposition set and evidence requirements (single source of truth). The deterministic checker only reads the declared token and evidence-cell presence (KTD2); it does not adjudicate whether a question is load-bearing or whether an owner answer is genuine. The model has no free non-blocking verdict — `blocks_planning=no` is derived from a disposition, never asserted. Deliberate forgery of an owner answer remains beyond artifact-level proof until host question-receipt / transcript-bound provenance exists.
 
 `placeholder_or_todo_present` and `requirement_without_acceptance_ref` / `uncovered_requirements` hits that correspond to an intentional placeholder inside the embedded template skeleton, an explicitly recorded trace gap, or an item deliberately deferred to `Outstanding Questions` are expected advisory noise: record the rationale, do not fabricate an acceptance reference or delete a deliberate trace-gap marker to zero the findings array. The Core Pack already blesses "an explicit trace gap" as a valid readiness state, so silencing the script would invert it from an advisory fact into a coercive gate that drives the WHAT decision instead of informing it. Feature Slice trace gaps are already honored script-side, so this carve-out's load-bearing scope is the placeholder and uncovered-requirement paths plus the recorded-trace-gap state.
+
+## Observed Failure Details
+
+Load this section when a run is about to write a checkpoint, first durable PRD draft, or ready handoff after shallow grilling.
+
+### Checkpoint-as-escape anti-pattern
+
+Observed in 232726 / 231339 runs: the agent asked one batch of broad scoping questions, received answers on scope/range, then immediately wrote a checkpoint while load-bearing interface, architecture, and dependency OQs remained untouched in the Outstanding Questions table. Claiming `clarification_evidence: asked-owner` in that shape is a violation: `asked-owner` means the owner answered the load-bearing OQs, not that some other questions were asked while the rest were parked.
+
+The legal use of checkpoint is **only** when the owner is genuinely unavailable mid-grill, including true headless/no-reply after a soft-cap offer, or when a large input requires preserving partial context across sessions. In all other cases, each load-bearing OQ must reach a Canonical stop point before the branch may close. "The OQ is a planning-time item" and "the OQ can be clarified in parallel with planning" are not checkpoint justifications; they are the failure mode the closure-disposition razor exists to prevent.
+
+### Direct-write-after-read anti-pattern
+
+Observed in the 2026-06-28 run: the agent read source materials and immediately wrote a PRD without emitting a run-local Decision Card. The observable trigger is reasoning like "directory is empty", "materials are clear", or "writing PRD now" with no Requirement Analysis Gate map, Product Expert Lens ranking, Requirements Grill, or Decision Card carrying `write_mode`, `highest_risk_gap`, `next_action`, and `why planning will not invent WHAT`.
+
+This differs from checkpoint-as-escape: checkpoint-as-escape starts the grill and exits early, while direct-write-after-read skips Phase 1 entirely. Minimum evidence of Phase 1 before the first durable Write is: a Decision Card in conversation, at least one Requirement Analysis Gate field such as `open_decisions` or `next_owner_question`, and for inputs with design refs, multiple sources, or owner-owned gaps, either an owner grill question or a source-resolved gap trace. If none are present, stop before the first Write and run Phase 1 first. `write_mode=checkpoint-prd` does not exempt Phase 1.
 
 ### Core Pack
 

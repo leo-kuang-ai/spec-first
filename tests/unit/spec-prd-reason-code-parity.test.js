@@ -1,15 +1,15 @@
 'use strict';
 
 // P0#1: reason_code prose↔code parity 闸。
-// 守护 BLOCKING_REASON_CODES(code 冻结真相)与 prose 复述(SKILL.md Phase 4 列表 +
-// prd-readiness-lens.md must-not-ready 列表)的边界。prose 是人/agent 可读副本,
-// code 是可执行真相;新增/重命名 blocker 码忘记同步 prose 会让读者以为某码可 ready
-// 或困惑为何 ready 失败。此测试锁 missing 方向(code 的每个码都被 prose 列出),
+// 守护 BLOCKING_REASON_CODES(code 冻结真相)与 readiness lens prose 复述的边界。
+// code 是可执行真相;readiness lens 是人/agent 可读副本。SKILL.md 入口只保留
+// hot-path pointer,避免把完整 reason_code 列表复制进 front controller。
+// 新增/重命名 blocker 码忘记同步 readiness lens 会让读者以为某码可 ready
+// 或困惑为何 ready 失败。此测试锁 missing 方向(code 的每个码都被 lens prose 列出),
 // 这是高危害漂移;extra 方向(prose 多列不存在的码)风险低且段落混有字段名 token 易误报,
 // 留人工 review。
 //
-// 锚点段落:SKILL.md "If the checker/finalize path returns" 句、
-// lens.md "The readiness orchestrator must consume declaration findings" 句。
+// 锚点段落:lens.md "The readiness orchestrator must consume declaration findings" 句。
 // 段落里反引号 token 含字段名(如 design_sources_unread),故只数 code Set 认识的码。
 
 const fs = require('node:fs');
@@ -46,11 +46,13 @@ function blockingCodesInProse(text, anchor) {
 describe('spec-prd reason_code prose↔code parity', () => {
   const codeSet = new Set(BLOCKING_REASON_CODES);
 
-  test('SKILL.md Phase 4 must-not-ready 列表覆盖全部 BLOCKING_REASON_CODES', () => {
+  test('SKILL.md Phase 4 points to readiness lens instead of duplicating BLOCKING_REASON_CODES', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    expect(skill).toContain('If the checker/finalize path returns any blocking `reason_codes` from `scripts/lib/reason-codes.js`');
+    expect(skill).toContain('Consume the full list through `prd-readiness-lens.md`');
+    expect(skill).toContain('Phase 4 must not return `ready-for-planning`');
     const proseCodes = blockingCodesInProse(skill, 'If the checker/finalize path returns');
-    const missing = [...codeSet].filter((c) => !proseCodes.has(c));
-    expect(missing).toEqual([]);
+    expect(proseCodes.size).toBe(0);
   });
 
   test('prd-readiness-lens.md must-not-ready 列表覆盖全部 BLOCKING_REASON_CODES', () => {
