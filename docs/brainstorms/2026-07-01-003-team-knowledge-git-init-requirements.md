@@ -18,6 +18,8 @@ spec_id: 2026-07-01-003-team-knowledge-git-init
 
 真实团队知识不应打进 `spec-first` npm 包，也不应默认复制进每个业务项目。更合适的 v1 形态是：团队知识本身作为独立 Git 工程治理，开发者本机只缓存一份共享 checkout，多个业务项目通过 `docs/knowledge/sources.yaml` 引用同一团队知识源。后续 workflow 运行时通过用户级 registry 找到本地 checkout 后，再按触发词读取少量经验卡。
 
+团队公共知识库不应替代项目内知识。`docs/standards/**` 和 `docs/solutions/**` 仍跟随业务项目仓库，分别承载项目 confirmed standards 和项目经验沉淀；团队公共知识 Git 仓库只承载跨项目可复用的 shared standards 与 shared experiences。`spec-first` 只提供接入、解析、筛选、trust 边界和治理合同，不拥有真实业务知识。
+
 ---
 
 ## Actors
@@ -59,6 +61,13 @@ spec_id: 2026-07-01-003-team-knowledge-git-init
   - **Steps:** workflow 先识别自身 stage；从用户请求、origin artifact、diff、路径或任务文本中提取 surface、domain、trigger；调用共同 resolver 获取候选 cards；只加载少量高相关 cards；记录 used cards 和 excluded candidate reason；把 cards 作为风险提醒、检查清单或根因假设消费。
   - **Outcome:** 不同 skill 使用同一套知识解析与 trust 边界，而不是各自发明读取规则或全量扫描知识库。
   - **Covered by:** R17, R18, R19, R20, R21, R22, R23, R24
+
+- F5. 项目经验晋升为团队共享经验或规范
+  - **Trigger:** 某个项目通过 `$spec-compound` 或 `$spec-compound-refresh` 在 `docs/solutions/**` 中沉淀的问题经验被多次复用，或 owner 判断它具有跨项目价值。
+  - **Actors:** A2, A3, A5
+  - **Steps:** 项目经验先保持在项目 `docs/solutions/**`；若具备跨项目复用价值，提炼为团队知识仓库中的 shared experience card；若需要成为强约束，再通过 team standards governance 提议晋升为 shared standard；项目采用共享标准时仍要在项目侧显式记录或选择启用。
+  - **Outcome:** 项目经验不会自动污染全团队，团队共享知识也不会越过项目 source-of-truth 和 owner 决策。
+  - **Covered by:** R25, R26, R27, R28, R29, R30, R31, R32
 
 ---
 
@@ -147,6 +156,48 @@ flowchart TD
 
 ---
 
+## Knowledge Scope Governance
+
+团队知识治理分为四类：共享规范、项目规范、共享经验、项目经验。它们的 source-of-truth、trust 和消费边界不同，workflow 不得混用。
+
+| Knowledge type | Source | Default trust | Scope | Consumer rule |
+| --- | --- | --- | --- | --- |
+| Shared standards | `team-ai-knowledge/standards/**` | confirmed after owner review | 跨项目 | 只有被项目显式采用、scope 命中且 lifecycle active 时，才作为 hard context。 |
+| Project standards | `docs/standards/**` | confirmed | 当前项目 | 优先于共享经验；按 `docs/contracts/team-standards.md` 的 selection contract 消费。 |
+| Shared experiences | `team-ai-knowledge/experiences/**` 或 `packs/*/cards/*.md` | advisory | 跨项目 | 只作为风险提醒、checklist 或 hypothesis；必须回源确认。 |
+| Project experiences | `docs/solutions/**` | advisory | 当前项目 | 跟随项目仓库演进；可被 recall，但不自动晋升为团队共享知识。 |
+
+消费优先级应保持：
+
+```text
+当前用户指令 / 当前需求 / 当前源码 / 当前测试 / 当前日志
+  > 项目 confirmed standards
+  > 项目显式采用的共享 confirmed standards
+  > 项目 experiences
+  > 共享 experiences
+```
+
+当共享规范与项目规范冲突时，workflow 不得自动裁决。它必须记录 conflict、source refs、affected scope 和 owner next action；冲突解决前不得 hard enforce 任一方。
+
+```mermaid
+flowchart TD
+  A[一次问题解决] --> B[沉淀到项目 docs/solutions]
+  B --> C{是否具备跨项目复用价值?}
+  C -->|否| D[保留为项目经验 advisory]
+  C -->|是| E[提炼为团队 shared experience]
+  E --> F{是否需要成为强约束?}
+  F -->|否| G[保持 shared experience advisory]
+  F -->|是| H[进入 team standards governance]
+  H --> I{owner review 是否通过?}
+  I -->|否| J[保留 proposal / rejected / conflict]
+  I -->|是| K[成为 shared standard confirmed]
+  K --> L{项目是否显式采用?}
+  L -->|否| M[不作为该项目 hard context]
+  L -->|是| N[项目 workflow 按 scope 消费]
+```
+
+---
+
 ## Requirements
 
 **Init 交互与输入**
@@ -185,6 +236,16 @@ flowchart TD
 - R23. `$spec-compound` 和 `$spec-compound-refresh` 可以产出、刷新、合并、废弃或建议迁移 cards，但经验卡晋升为 confirmed standards 仍必须走 team standards governance。
 - R24. 所有消费知识的 workflow 应复用共同 resolver 或等价的统一解析合同；不得各自发明 `sources.yaml`、registry、catalog、manifest 或 card frontmatter 的读取语义。
 
+**知识作用域与治理**
+- R25. `spec-first` 必须区分共享规范、项目规范、共享经验和项目经验；不得把团队公共知识仓库、项目 `docs/standards/**` 和项目 `docs/solutions/**` 合并成单一知识真相源。
+- R26. 项目 `docs/standards/**` 继续作为项目 confirmed standards 的 source surface，并按 `docs/contracts/team-standards.md` 的 trust、lifecycle、scope selection 和 conflict contract 消费。
+- R27. 项目 `docs/solutions/**` 继续作为项目经验沉淀和 recall source，默认 advisory，必须跟随项目仓库演进，不得被 `spec-first init` 复制进团队公共知识仓库。
+- R28. 团队公共知识仓库可以提供 shared standards 与 shared experiences；shared experiences 默认 advisory，shared standards 只有经过 owner review、lifecycle active、scope 命中并被项目显式采用后，才能作为项目 hard context。
+- R29. 知识消费优先级必须保持：当前用户指令/需求/源码/测试/日志优先，其次项目 confirmed standards，其次项目显式采用的共享 confirmed standards，其次项目 experiences，最后共享 experiences。
+- R30. 当项目规范与共享规范冲突时，workflow 必须记录 conflict、source refs、affected scope 和 owner next action；冲突解决前不得自动选择任一规则 hard enforce。
+- R31. 项目经验晋升链路必须是 `docs/solutions/**` 项目经验 -> shared experience -> shared standard proposal -> owner-reviewed shared standard；不得从一次 Bug 或单次 review finding 直接晋升为团队 confirmed standard。
+- R32. `spec-first` npm 包不得打包真实 shared standards、shared experiences、project standards 或 project experiences；它只交付 schema、模板、resolver、校验器和 workflow 消费合同。
+
 ---
 
 ## Acceptance Examples
@@ -200,6 +261,10 @@ flowchart TD
 - AE9. **Covers R19, R20, R21.** Given `$spec-plan` 从需求中识别到订单、金额和多端展示风险，when 知识 resolver 命中相关 cards，then plan 可以把它们转成风险、测试场景和任务验收点，但必须标明这些来自 advisory cards。
 - AE10. **Covers R22.** Given `$spec-code-review` 命中接口字段和 UI 展示 cards，when review 输出 finding，then finding 必须引用当前 diff/source/test/log 证据，不能只引用 card。
 - AE11. **Covers R23, R24.** Given `$spec-compound` 从已解决 Bug 中沉淀新经验，when 需要新增团队知识，then 它应产出 card 草稿或 contribution 建议，并复用统一 card 合同，而不是直接写 confirmed standard。
+- AE12. **Covers R25, R26, R27, R32.** Given 业务项目已有 `docs/standards/**` 和 `docs/solutions/**`，when 用户运行 `spec-first init` 加载团队知识库，then init 只写 `docs/knowledge/sources.yaml` 并配置用户级 checkout，不复制项目经验或真实团队知识正文，也不改变项目 standards/solutions 的 source-of-truth。
+- AE13. **Covers R28, R29.** Given 项目显式采用了团队 shared standard，when `$spec-plan` 或 `$spec-work` 消费知识，then 当前需求、源码、测试和项目 confirmed standards 仍优先；scope 命中的 adopted shared standard 才能作为 hard context。
+- AE14. **Covers R30.** Given shared standard 和 project standard 对同一金额计算规则冲突，when workflow 命中两者，then 输出 conflict 和 owner next action，不自动选择任一规则。
+- AE15. **Covers R31.** Given 某个项目 `docs/solutions/**` 中的 Bug 经验被多次复用，when 团队想共享它，then 先提炼为 shared experience advisory；只有经过 standards governance 和 owner review 后，才可能成为 shared standard。
 
 ---
 
@@ -213,6 +278,7 @@ flowchart TD
 - 失败路径可恢复：clone/校验失败时不留下半成品项目配置。
 - 后续 planning 可以直接围绕 init 参数、缓存目录、配置 schema、校验器和测试面做实现。
 - 各 workflow 的团队知识使用边界清晰：入口路由不读知识，需求/计划/执行/review/debug/compound 按共同 Knowledge Intake 合同少量加载并保持 advisory。
+- 项目 `docs/standards/**`、项目 `docs/solutions/**`、团队 shared standards 和团队 shared experiences 的 source-of-truth、trust 和消费优先级清晰，不形成多真相源。
 
 ---
 
@@ -224,6 +290,8 @@ flowchart TD
 - v1 不要求一次性交付所有 workflow 的自动召回；首期只需保证运行时有可解析的本地 checkout 路径、统一 resolver 合同和各 workflow 的消费边界。
 - v1 不执行知识仓库中的脚本、hooks 或任意二进制。
 - v1 不把 cards 升级为 `docs/standards/**` confirmed rule；标准晋升仍走 team standards governance。
+- v1 不迁移、复制或集中管理项目 `docs/solutions/**`；项目经验仍跟随项目仓库。
+- v1 不把团队 shared standards 自动注入所有项目；项目必须显式采用后才可作为 hard context。
 
 ---
 
@@ -235,6 +303,8 @@ flowchart TD
 - `init` 只做首次加载和 ensure，不做静默更新。
 - cards 默认 `advisory`，不能绕过 Knowledge Harness 的 recall trust boundary。
 - 各 skill 使用知识库时先识别 stage/surface/domain/trigger，再少量加载 cards；`using-spec-first` 明确不读取团队知识库。
+- 项目内 `docs/standards/**` 和 `docs/solutions/**` 跟随项目走；团队公共知识仓库只承载跨项目 shared standards 与 shared experiences；`spec-first` 只承载机制与合同。
+- 共享经验只能提醒，项目经验只能在当前项目内作为 recall；任何跨项目强约束都必须通过 standards governance 和项目显式采用。
 
 ---
 
@@ -243,6 +313,8 @@ flowchart TD
 - 依赖用户本机已有 Git 凭据；`spec-first` 不保存 token。
 - 依赖团队知识仓库遵循 `catalog.yaml` + `packs/<pack-id>/manifest.yaml` + cards 的文件结构。
 - 依赖 `docs/contracts/knowledge/knowledge-harness.md` 的 file-first、recall-as-advisory 和 verified promotion 边界。
+- 依赖 `docs/contracts/team-standards.md` 对 `docs/standards/**` 的 trust、lifecycle、scope selection、conflict 和 promotion 语义。
+- 依赖 `docs/solutions/**` 继续作为项目级 durable learning，不被团队知识 init 流程接管。
 - 假设 v1 只支持 `type: experience-cards`，其他 pack type 后续再扩展。
 - 接受 shared-latest 的语义：经验卡是团队公共 advisory 资产，后续更新可能影响所有引用同一 ref 的项目；v1 不提供完全可复现知识版本锁定能力。
 
@@ -265,6 +337,8 @@ flowchart TD
 - [Affects R2, R10][Technical] `catalog.yaml` + `packs/<pack-id>/manifest.yaml` + cards 的最小校验 schema 由谁定义（`spec-first` 侧最小合同 vs 团队仓库自带）、校验深度到哪一层（仅 catalog 存在性 vs pack manifest vs 单卡 frontmatter），以及默认 pack 在 catalog 中如何声明。
 - [Affects R1, R3][Scope] 多 host（同时选 Claude + Codex）与 `--all-repos` / `--repo` workspace 模式下，知识加载问题问几次、写几份 `sources.yaml`（每子 repo 一份 vs 父 workspace 一份）、共享 checkout 是否跨子 repo 复用；v1 是否先限定为 single-repo 单 host，多 host / workspace 场景显式降级或延后。
 - [Affects R6, R14][Technical] 用户级 `registry.json` 的最小字段集（如 source id、规范化 url、ref、checkout_path、last_synced_at、schema_version）与多 source 条目结构。
+- [Affects R28, R29][Technical] 项目显式采用 shared standard 的记录位置，是复用 `docs/knowledge/sources.yaml`、项目 `docs/standards/index.md`，还是新增独立 adoption manifest。
+- [Affects R30][Technical] shared standard 与 project standard 冲突时，resolver 输出的 conflict JSON 字段形态和 downstream workflow 展示格式。
 
 ---
 
@@ -273,6 +347,7 @@ flowchart TD
 - `docs/contracts/knowledge/knowledge-harness.md`
 - `docs/contracts/context-bundle.md`
 - `docs/contracts/team-standards.md`
+- `docs/solutions/**`
 - `src/cli/commands/init.js`
 - `src/cli/state.js`
 - 仓库外本地 demo 工程 `team-ai-knowledge-demo`，用于验证团队知识 Git 仓库结构与示例 cards；它是 session-local 示例，不作为本需求文档的 repo-relative source ref。
