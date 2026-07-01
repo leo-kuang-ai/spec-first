@@ -472,6 +472,9 @@ describe('spec-prd workflow contracts', () => {
       'write_mode=checkpoint-prd',
       'write_mode=final-prd',
       'every load-bearing branch has reached a Canonical stop point',
+      '`closure_state` is not a second disposition vocabulary',
+      'Use only `open`, `closed`, `deferred`, or `blocked`',
+      '`deferred` without a legal disposition stays non-ready',
       'grill trace is mandatory',
       'valid non-`skipped` value',
       'Route-out and bypass are pre-authoring exits, not grill exemptions',
@@ -3296,6 +3299,14 @@ describe('spec-prd workflow contracts', () => {
       'Regression Guard',
       '`source_authority`',
       '`owner_oq_trace`',
+      'Copy this machine field block when any design link, screenshot, exported design context, or design-dependent UI state is present',
+      'Keep the field names exact; use `- none` rather than omitting an empty list.',
+      'design_source_coverage: read | unread | partial | degraded | not-applicable',
+      'design_degraded_owner_acceptance_ref: <Owner Decision Trace row, checkable owner ref, or none>',
+      '`partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance',
+      'Vocabulary boundary: `closure_disposition` says why an OQ can be non-blocking; `closure_state` says what remains for handoff.',
+      'Legal `closure_state` values are `open`, `closed`, `deferred`, or `blocked`.',
+      'Do not put `owner-accepted-assumption`, `owner-capped`, `source-resolved`, or `implementation-only-how-pushdown` in `closure_state`.',
     ]);
   });
 

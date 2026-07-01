@@ -4,6 +4,8 @@
 
 For `spec-compound`, vocabulary maintenance is update-only. If `CONCEPTS.md` does not already exist at the repo root, do not create or bootstrap it during learning capture. Record `CONCEPTS.md: not present; no vocabulary maintenance applied` and continue. A downstream project does not need this file for `spec-first` to work.
 
+This reference owns only `CONCEPTS.md` inclusion and refinement. Broader domain-model signals such as boundary scenarios, code/doc contradictions, existing `CONTEXT.md` evidence, or ADR candidates are handled by `references/domain-model-capture.md`; do not turn this file into a context or decision-log owner.
+
 ## When To Read This Reference
 
 Read this file after the solution doc is written or updated, before reporting completion, whenever the repo root contains `CONCEPTS.md`. Do not skip the read by assuming no terms qualify from memory.
@@ -13,6 +15,8 @@ Read this file after the solution doc is written or updated, before reporting co
 A term qualifies when its meaning is project-specific enough that a new engineer would need it defined to follow source, plans, reviews, tickets, or future learning docs. Good candidates include named workflow concepts, artifact types, status/lifecycle concepts, domain entities, and terms that are easy to confuse with a nearby project-specific term.
 
 Do not add general programming vocabulary, ordinary English, one-off variable names, file paths, class names, function signatures, config values, owners, dates, version-specific claims, or raw implementation details. If a term only matters because of one exact source path, cite that path in the solution doc instead of promoting it to vocabulary.
+
+Do not add mainstream engineering terms that already have standard definitions outside this project, even when the project uses them frequently. Examples include timeout, retry, refactor, parser, migration, error handler, configuration, CLI flag, and utility helper.
 
 ## How To Update
 

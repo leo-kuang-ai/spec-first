@@ -1,7 +1,7 @@
 ---
 title: "feat: Integrate domain-modeling discipline into spec-compound"
 type: feat
-status: active
+status: completed
 date: 2026-07-01
 spec_id: 2026-07-01-001-spec-compound-domain-modeling-capture
 origin_verification_status: not-applicable
@@ -537,6 +537,16 @@ flowchart TB
 - **Source-of-truth:** `skills/spec-compound/SKILL.md` 和 `skills/spec-compound/references/domain-model-capture.md`；`skills/spec-compound/references/concepts-vocabulary.md` 继续只拥有 `CONCEPTS.md` update-only 规则。
 - **Rejected owner:** `docs/10-prompt/结构化项目角色契约.md` 不承载执行细节；`docs/contracts/context-governance.md` 只承载上下文读取边界；`spec-prd` 的 grill reference 是相邻 precedent，不是 compound source。
 - **Work-phase recheck:** `spec-work` 实施前必须重读 target source。如果发现当前 `spec-compound` 已新增等价 reference，应优先复用/扩展而不是再建新文件，并在 closeout 说明计划偏离。
+
+---
+
+## Completion Evidence
+
+- **Completed scope:** Implemented U1-U6 in source-of-truth files only. Added `skills/spec-compound/references/domain-model-capture.md`; updated `spec-compound` Phase 2.4 to Domain Model And Vocabulary Capture; kept `CONCEPTS.md` update-only advisory; kept `CONTEXT.md`, `CONTEXT-MAP.md`, and `docs/adr/**` as preview-only candidates; aligned `spec-compound-refresh` vocabulary/domain drift handling without running full Domain Model Capture from refresh.
+- **Tests and checks:** `npx jest tests/unit/spec-compound-contracts.test.js tests/unit/concepts-vocabulary-contracts.test.js tests/unit/workflow-eval-readiness-contracts.test.js tests/unit/changelog-format.test.js tests/unit/plan-status-taxonomy.test.js --runInBand` passed; `npm run lint:skill-entrypoints` passed; `python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-compound` passed; scoped `git diff --check` passed.
+- **Review and eval:** Multi-agent review findings were addressed, including full-mode output coverage, over-broad `CONCEPTS.md` discoverability, eval fixture coverage, negative context/ADR assertions, lightweight output `Context/ADR candidates`, refresh discoverability narrowing, Domain Model Capture output enum/order consistency, and section-scoped output-template tests. Fresh-source eval record: `docs/validation/spec-compound/fresh-source-eval-2026-07-01-domain-model-capture.md`.
+- **Runtime posture:** Generated mirrors under `.claude/`, `.codex/`, and `.agents/skills/` were not hand-edited. Runtime was refreshed from source with `node bin/spec-first.js init -y --claude` and `node bin/spec-first.js init -y --codex`; `git diff --name-only -- .claude .codex .agents/skills` returned no tracked runtime diff. `rg` confirmed the generated Claude/Codex runtime mirrors contain `Domain Model And Vocabulary Capture`, `references/domain-model-capture.md`, unified `Domain model capture` output, and `Context/ADR candidates` anchors.
+- **Plan deviation:** A1 originally described this as plan-only. The subsequent execution request authorized implementation, so the plan is now marked completed with source/test/validation evidence.
 
 ---
 

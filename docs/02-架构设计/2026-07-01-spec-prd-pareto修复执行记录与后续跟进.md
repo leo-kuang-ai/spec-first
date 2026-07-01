@@ -122,12 +122,19 @@ node scripts/probe-claude-hook-payload.js --output .spec-first/diagnostics/claud
 
 ## 4. 后续跟进项
 
+### 4.1 已在后续轻量轮完成
+
+| 项 | 完成内容 | 验证 |
+| --- | --- | --- |
+| Stop hook display 消费 `remediation_hint` | Claude `prd-prewrite-guard` 保留 checker report，并在 block stderr 中显示最多 3 条 compact `checker_remediation_hints`。 | `tests/unit/prd-prewrite-guard-hook.test.js` |
+| PRD-LOG-007 Design Source Coverage 可复制模板 | `prd-output-template.md` 将 Design Source Coverage 收紧为可复制 machine field block，明确 `- none`、coverage enum、`design_degraded_owner_acceptance_ref` 与 partial/degraded ready 边界。 | `tests/unit/spec-prd-contracts.test.js` |
+| PRD-LOG-008a OQ closure vocabulary 收敛 | `SKILL.md` 与模板明确 `closure_disposition` 是关闭理由，`closure_state` 只允许 `open/closed/deferred/blocked`，不把 owner/source disposition 写进 state。 | `tests/unit/spec-prd-contracts.test.js` |
+
+### 4.2 仍保留跟进
+
 | 项 | 建议优先级 | 触发条件 | 下一步 |
 | --- | --- | --- | --- |
-| Stop hook display 消费 `remediation_hint` | P1 | 用户仍需要读 checker 源码才能修 ready blocker | 在 `prd-readiness-guard` block 文案中显示 compact hints；补 hook display tests |
-| PRD-LOG-007 Design Source Coverage 可复制模板 | P1 | 继续出现字段 keyword/shape 返工 | 更新 `prd-output-template.md` 的机器字段块；补 prose contract tests |
 | PRD-LOG-004 通用 OQ self-close 防护 | P1 gated | 多个样本证明非设计 OQ 自闭合导致 planning 发明 WHAT | 先做 replay matrix / fresh-source eval，再决定 skill prose 或 checker advisory |
-| PRD-LOG-008a OQ closure vocabulary 收敛 | P1 | `closure_state=open` 与 owner accepted/deferred 混写继续造成误读 | 先改 prose/template guidance，不直接 blocking |
 | PRD-LOG-008b checker advisory | P2 | vocabulary prose 后仍高频误写 | 只做 advisory finding，不进入 blocking set |
 | PRD-LOG-009 视觉资产协议 | P2 | 多个 UI-heavy PRD 证明现有 design inventory 不够表达 viewport/state/export freshness | 先复用 design inventory；必要时再设计独立协议 |
 | `Update` matcher 扩展 | P1 gated | probe 证明确有 raw `tool_name=Update` 且 payload 可重建或可 fail-closed | 加 raw fixture，再扩 `src/cli/claude-settings.js` matcher 与 hook tests |
@@ -142,6 +149,8 @@ node scripts/probe-claude-hook-payload.js --output .spec-first/diagnostics/claud
 npx jest tests/unit/spec-prd-checker-unit.test.js tests/unit/spec-prd-finalize.test.js --runInBand
 npx jest tests/unit/claude-hook-payload-probe.test.js --runInBand
 npx jest tests/unit/spec-prd-checker-unit.test.js tests/unit/spec-prd-finalize.test.js tests/unit/spec-prd-contracts.test.js tests/unit/claude-hook-payload-probe.test.js --runInBand
+npx jest tests/unit/prd-prewrite-guard-hook.test.js --runInBand
+npx jest tests/unit/spec-prd-contracts.test.js --runInBand
 node skills/spec-prd/scripts/run-evals.js --json
 node --check scripts/probe-claude-hook-payload.js && node --check skills/spec-prd/scripts/check-prd-artifact.js && node --check skills/spec-prd/scripts/finalize-prd-artifact.js
 npm run typecheck

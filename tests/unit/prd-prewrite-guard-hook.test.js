@@ -611,6 +611,32 @@ describe('Claude PRD prewrite guard hook', () => {
     }
   });
 
+  test('prints checker remediation hints when blocking findings include them', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      installRuntimeChecker(projectRoot);
+
+      const result = runHook(
+        projectRoot,
+        'docs/brainstorms/remediation-hint-requirements.md',
+        prdWithReadiness([
+          'write_mode: final-prd',
+          'clarification_evidence: asked-owner',
+          'can_enter_spec_plan: yes',
+          'preflight_sweep_closure: closed',
+        ]),
+      );
+
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain('checker_remediation_hints:');
+      expect(result.stderr).toContain('decision_card_undeclared');
+      expect(result.stderr).toContain('Add the missing Decision Card fields');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   // 路口路由矩阵:首次写带"该 grill"信号却直写 final-prd → 拦,逼 ask-owner-first/checkpoint-prd。
   function buildSignalPrd({ writeMode, sourceInputs, designLink, oqSection, oqText }) {
     const fm = [

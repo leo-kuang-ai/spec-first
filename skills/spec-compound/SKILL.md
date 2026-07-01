@@ -75,6 +75,7 @@ These files are the durable contract for the workflow. Read them on-demand at th
 
 - `references/schema.yaml` — canonical frontmatter fields and enum values (read when validating YAML)
 - `references/yaml-schema.md` — category mapping from problem_type to directory (read when classifying)
+- `references/domain-model-capture.md` — domain signal scan, boundary scenarios, code cross-reference, and context/ADR preview-only rules (read in Phase 2.4 when the solved lesson exposes qualifying domain-model signals)
 - `references/concepts-vocabulary.md` — advisory `CONCEPTS.md` inclusion and update-only rules (read in Phase 2.4 when `CONCEPTS.md` exists)
 - `assets/resolution-template.md` — section structure for new docs (read when assembling)
 
@@ -136,7 +137,7 @@ If the user says yes, invoke `spec-sessions` in Phase 1 with the narrow problem 
 <critical_requirement>
 **The primary output is ONE file - the final documentation.**
 
-Phase 1 subagents return TEXT DATA to the orchestrator. They must NOT use Write, Edit, or create any files. Only the orchestrator writes files: the solution doc in Phase 2, an update-only refinement to an existing repo-root `CONCEPTS.md` in Phase 2.4 when qualifying terms surface, and — if the Discoverability Check finds a gap — a small edit to a project instruction file (AGENTS.md or CLAUDE.md). The vocabulary and instruction-file edits are maintenance side effects, not second deliverables; the primary output remains one `docs/solutions/` learning document.
+Phase 1 subagents return TEXT DATA to the orchestrator. They must NOT use Write, Edit, or create any files. Only the orchestrator writes files: the solution doc in Phase 2, an update-only refinement to an existing repo-root `CONCEPTS.md` in Phase 2.4 when qualifying terms surface, and — if the Discoverability Check finds a gap — a small edit to a project instruction file (AGENTS.md or CLAUDE.md). Domain model capture may fold boundary scenarios, code contradictions, rationale, or ADR-worthy candidate wording into the solution doc; ordinary compound runs do not create or edit `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/**`. The vocabulary and instruction-file edits are maintenance side effects, not second deliverables; the primary output remains one `docs/solutions/` learning document.
 </critical_requirement>
 
 ### Phase 0.5: Auto Memory Scan
@@ -298,16 +299,20 @@ When creating a new doc, preserve the section order from `assets/resolution-temp
 
 </sequential_tasks>
 
-### Phase 2.4: Vocabulary Capture
+### Phase 2.4: Domain Model And Vocabulary Capture
 
-After the learning is written or updated, check whether `CONCEPTS.md` exists at the repo root.
+After the learning is written or updated, run a scoped Domain Model Capture scan for the solved lesson's vocabulary and decision signals.
 
+- If the lesson exposes project-specific terms, confusing aliases, boundary scenarios, code/doc contradictions, or a hard decision candidate, read `references/domain-model-capture.md` and apply its four actions: glossary challenge, fuzzy term sharpening, scenario stress, and code cross-reference.
+- Fold source-confirmed boundary scenarios, contradictions, rationale, and rejected alternatives into the solution doc first. The primary output remains one `docs/solutions/` learning document; do not add a second primary artifact or new frontmatter schema field for domain capture.
 - If `CONCEPTS.md` exists, read `references/concepts-vocabulary.md`, scan the new learning plus the source-confirming context for qualifying project-specific terms, and add or refine only those entries.
 - If `CONCEPTS.md` does not exist, do not create or bootstrap it from `spec-compound`. Record `CONCEPTS.md: not present; no vocabulary maintenance applied` and continue.
 - Keep the scan scoped to the new learning's vocabulary neighborhood. Do not run a repo-wide concept sweep, do not seed core nouns outside the solved problem area, and do not add `(see CONCEPTS.md)` pointers to learning docs.
 - If the reference criteria produce no qualifying terms, record `CONCEPTS.md: scanned, no qualifying terms` rather than silently skipping the step.
+- If `CONTEXT.md` or `CONTEXT-MAP.md` already exists and is directly relevant, it may be read as advisory vocabulary evidence. Do not create, bootstrap, or edit `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/**` from an ordinary compound run.
+- Report context or ADR follow-ups as preview-first candidates only. An ADR candidate must satisfy all three conditions from `references/domain-model-capture.md`: hard to reverse, surprising without context, and real tradeoff. If any condition is missing, keep the rationale in the solution doc.
 
-Vocabulary capture is advisory maintenance. It must not change the learning's frontmatter schema, duplicate the learning content, or become a mandatory completion gate for projects without `CONCEPTS.md`.
+Domain model and vocabulary capture is advisory maintenance. It must not turn `CONCEPTS.md` into a PRD, ADR, workflow contract, source-of-truth override, setup requirement, or mandatory downstream project file. It must not make context topology or ADR files a completion gate for projects that have not adopted them.
 
 ### Phase 2.5: Selective Refresh Check
 
@@ -391,7 +396,7 @@ After the learning is written and the refresh decision is made, check whether th
       ```
    c. In full mode, explain to the user why this matters — agents working in this repo (including fresh sessions, other tools, or collaborators without the plugin) won't know to check `docs/solutions/` unless the instruction file surfaces it. Show the proposed change and where it would go, then use the platform's blocking question tool to get consent before making the edit: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to presenting the proposal in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. In lightweight mode, output a one-liner note and move on
 
-5. If `CONCEPTS.md` exists at repo root, run a parallel discoverability check for it. Assess whether the substantive instruction file would lead an agent to discover the repo-local advisory vocabulary. Use the same edit-placement and consent flow as the `docs/solutions/` check. Skip this step entirely if `CONCEPTS.md` does not exist; do not nag for an artifact the project has not adopted.
+5. If this compound run added or refined entries in an existing repo-root `CONCEPTS.md`, or the user explicitly asked for vocabulary discoverability maintenance, run a parallel discoverability check for it. Assess whether the substantive instruction file would lead an agent to discover the repo-local advisory vocabulary. Use the same edit-placement and consent flow as the `docs/solutions/` check. Skip this step when `CONCEPTS.md` does not exist or when the Phase 2.4 result was only `scanned, no qualifying terms`; do not nag for an artifact the project has not adopted and do not create instruction-file churn for a no-op vocabulary scan.
 
 ### Phase 3: Optional Enhancement
 
@@ -431,7 +436,7 @@ The orchestrator (main conversation) performs ALL of the following in one sequen
    - New promote required fields: `invalidation_condition` and `source_refs`
    - Bug track: Problem, root cause, solution with key code snippets, one prevention tip
    - Knowledge track: Context, guidance with key examples, one applicability note
-4. **Vocabulary capture (update-only)**: if `CONCEPTS.md` exists at repo root, read `references/concepts-vocabulary.md`, scan the new doc and source-confirming context for qualifying terms, and add or refine entries using the same criteria as Phase 2.4. Do not create or bootstrap `CONCEPTS.md` in lightweight mode. Record the outcome in the output, such as `CONCEPTS.md: updated — 1 refined`, `CONCEPTS.md: scanned, no qualifying terms`, or `CONCEPTS.md: not present; no vocabulary maintenance applied`.
+4. **Domain model and vocabulary capture (solution-first, update-only)**: if the new doc exposes project-specific terms, confusing aliases, boundary scenarios, code/doc contradictions, or an ADR-worthy hard decision candidate, read `references/domain-model-capture.md` and fold qualifying source-confirmed signals into the learning. If `CONCEPTS.md` exists at repo root, read `references/concepts-vocabulary.md`, scan the new doc and source-confirming context for qualifying terms, and add or refine entries using the same criteria as Phase 2.4. Do not create or bootstrap `CONCEPTS.md`, `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/**` in lightweight mode. Record the outcome in the output, such as `Domain model capture: folded into learning`, `CONCEPTS.md: updated — 1 refined`, `CONCEPTS.md: scanned, no qualifying terms`, or `CONCEPTS.md: not present; no vocabulary maintenance applied`.
 5. **Skip specialized agent reviews** (Phase 3) to conserve context
 
 **Lightweight output:**
@@ -441,7 +446,11 @@ The orchestrator (main conversation) performs ALL of the following in one sequen
 File created:
 - docs/solutions/[category]/[filename].md
 
+Domain model capture: <scanned, no qualifying signals | folded into learning | context/ADR preview candidates reported>
+
 CONCEPTS.md: <updated — N added/refined | scanned, no qualifying terms | not present; no vocabulary maintenance applied>
+
+Context/ADR candidates: <none | preview only — path/reason/evidence>
 
 [If discoverability check found instruction files don't surface the knowledge store:]
 Tip: Your AGENTS.md/CLAUDE.md doesn't surface docs/solutions/ to agents —
@@ -456,7 +465,7 @@ Note: This was created in lightweight mode. For richer documentation
 re-run the current host's compound entrypoint in a fresh session.
 ```
 
-**No subagents are launched. No parallel tasks. One primary solution doc is written; optional maintenance writes may update an existing `CONCEPTS.md` or a project instruction file under the documented rules.**
+**No subagents are launched. No parallel tasks. One primary solution doc is written; optional maintenance writes may update an existing `CONCEPTS.md` or a project instruction file under the documented rules. Context and ADR outputs are preview-only candidates unless the user explicitly scopes a separate follow-up.**
 
 In lightweight mode, the overlap check is skipped (no Related Docs Finder subagent). This means lightweight mode may create a doc that overlaps with an existing one. That is acceptable — `spec-compound-refresh` will catch it later. Only suggest `spec-compound-refresh` if there is an obvious narrow refresh target. Do not broaden into a large refresh sweep from a lightweight session.
 
@@ -520,7 +529,7 @@ Knowledge track:
 |----------|-----------|
 | Subagents write files like `context-analysis.md`, `solution-draft.md` | Subagents return text data; orchestrator writes one final file |
 | Research and assembly run in parallel | Research completes → then assembly runs |
-| Multiple files created during workflow | One solution doc written or updated: `docs/solutions/[category]/[filename].md` (plus optional maintenance writes: update-only `CONCEPTS.md` refinement when the file already exists, and a small project instruction-file edit for discoverability) |
+| Multiple files created during workflow | One solution doc written or updated: `docs/solutions/[category]/[filename].md` (plus optional maintenance writes: update-only `CONCEPTS.md` refinement when the file already exists, and a small project instruction-file edit for discoverability). Context and ADR follow-ups are preview-only candidates, not default writes |
 | Creating a new doc when an existing doc covers the same problem | Check overlap assessment; update the existing doc when overlap is high |
 
 ## Success Output
@@ -543,6 +552,10 @@ Specialized Agent Reviews (Auto-Triggered):
 
 File created:
 - docs/solutions/performance-issues/n-plus-one-brief-generation.md
+
+Domain model capture: <scanned, no qualifying signals | folded into learning | context/ADR preview candidates reported>
+CONCEPTS.md: <updated — N added/refined | scanned, no qualifying terms | not present; no vocabulary maintenance applied>
+Context/ADR candidates: <none | preview only — path/reason/evidence>
 
 This documentation will be searchable for future reference when similar
 issues occur in the Email Processing or Brief System modules.
@@ -568,6 +581,10 @@ Overlap detected: docs/solutions/performance-issues/n-plus-one-queries.md
 
 File updated:
 - docs/solutions/performance-issues/n-plus-one-queries.md (added last_updated: 2026-03-24)
+
+Domain model capture: <scanned, no qualifying signals | folded into learning | context/ADR preview candidates reported>
+CONCEPTS.md: <updated — N added/refined | scanned, no qualifying terms | not present; no vocabulary maintenance applied>
+Context/ADR candidates: <none | preview only — path/reason/evidence>
 ```
 
 ## The Compounding Philosophy

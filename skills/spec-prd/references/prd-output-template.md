@@ -275,6 +275,8 @@ Then <observable outcome or explicit non-goal>
 
 Closure-disposition razor: see SKILL.md `Closure-disposition razor` for the legal disposition set (single source of truth). For this template's evidence shape: a `source-resolved` / `source-backed-non-WHAT-assumption` cell needs a checkable ref (path/URL/`file:line`/anchor), an `owner-answered` / `owner-capped` / `owner-accepted-assumption` row needs a matching Owner Decision Trace row below, and `implementation-only-how-pushdown` needs `planning_would_invent_what=no` (touching interface/permission/scope/source-of-truth/fallback/analytics is a blocking contradiction in a ready PRD). "I judged it a parallel planning-time item" is not a disposition; without a legal disposition the only path is to keep grilling or `checkpoint-prd`.
 
+Vocabulary boundary: `closure_disposition` says why an OQ can be non-blocking; `closure_state` says what remains for handoff. Legal `closure_state` values are `open`, `closed`, `deferred`, or `blocked`. Do not put `owner-accepted-assumption`, `owner-capped`, `source-resolved`, or `implementation-only-how-pushdown` in `closure_state`.
+
 Design/source authority razor: a design-source fact can be `source-resolved` only when it answers a fact without contradicting another product/owner/source contract. If design evidence conflicts with requirements, owner decisions, API/source contracts, source-of-truth, fallback display, analytics, or user-visible interaction in a way that changes WHAT, acceptance, or scope, record it as an owner-authority-needed OQ/Decision Note. It may use `owner-answered` only when Owner Decision Trace binds to that exact conflict and records the actual owner answer; otherwise keep `ask-owner-first` or `checkpoint-prd`.
 
 ## Owner Decision Trace
@@ -285,6 +287,8 @@ Required when `clarification_evidence=asked-owner`, an OQ is `owner_status=answe
 | --- | --- | --- | --- | --- | --- |
 
 ## Design Source Coverage
+
+Copy this machine field block when any design link, screenshot, exported design context, or design-dependent UI state is present. Keep the field names exact; use `- none` rather than omitting an empty list.
 
 design_source_inventory:
 - source_or_node: <explicit input ref, Figma-discoverable node, or design-dependent state referenced by requirements>
@@ -303,11 +307,12 @@ design_sources_read:
 - <source_or_node + affected PRD write target + evidence level>
 
 design_sources_unread:
-- <source_or_node + unread reason + readiness consequence>
+- <source_or_node + unread/degraded reason + readiness consequence, or none>
 
-design_source_coverage: <read/unread/status summary>
+design_source_coverage: read | unread | partial | degraded | not-applicable
+design_degraded_owner_acceptance_ref: <Owner Decision Trace row, checkable owner ref, or none>
 
-Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source.
+Design-source inventory is mandatory whenever design input exists, even when access is degraded or unread. Put unread/degraded refs in `design_sources_unread` with readiness consequence rather than omitting the design source. `partial` or `degraded` coverage can only support `final-prd` when `design_degraded_owner_acceptance_ref` binds to real owner acceptance for that exact residue; otherwise keep `write_mode: checkpoint-prd` and `can_enter_spec_plan: no`.
 
 ## Readiness Self-Check
 

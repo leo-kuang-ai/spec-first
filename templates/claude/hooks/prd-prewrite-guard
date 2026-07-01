@@ -90,7 +90,8 @@ if (!content) {
 const readyStatus = /^\s*status:\s*ready-for-planning\s*$/im.test(content);
 const machineReceipt = hasMachineReceiptField(content);
 const firstWrite = !fs.existsSync(absoluteTarget);
-const checkerFacts = tryBuildCheckerFacts(relativeTarget, content);
+const checkerReport = tryBuildCheckerReport(relativeTarget, content);
+const checkerFacts = checkerReport ? checkerReport.facts : null;
 const fallbackFacts = checkerFacts || buildFallbackFacts(content);
 const readyIntent = fallbackFacts.ready_claim_present === true;
 const hasDurableWriteMode = checkerFacts
@@ -140,6 +141,10 @@ if (readyStatus || machineReceipt || readyIntent || missingWriteModeOnFirstWrite
   );
   if (checkerFacts && Array.isArray(checkerFacts.blocking_reason_codes) && checkerFacts.blocking_reason_codes.length > 0) {
     reasonLines.push('', `checker_blocking_reason_codes: ${checkerFacts.blocking_reason_codes.join(', ')}`);
+  }
+  const remediationLines = formatRemediationHints(checkerReport);
+  if (remediationLines.length > 0) {
+    reasonLines.push('', 'checker_remediation_hints:', ...remediationLines);
   }
   reasonLines.push(
     '',
@@ -424,7 +429,7 @@ function collectMutationFragments(currentToolName, currentToolInput) {
   return [];
 }
 
-function tryBuildCheckerFacts(relativeTarget, content) {
+function tryBuildCheckerReport(relativeTarget, content) {
   const checkerPath = path.join(
     normalizedRoot,
     '.claude',
@@ -438,10 +443,23 @@ function tryBuildCheckerFacts(relativeTarget, content) {
     if (!fs.existsSync(checkerPath)) return null;
     // eslint-disable-next-line global-require, import/no-dynamic-require
     const { buildReport } = require(checkerPath);
-    return buildReport(relativeTarget, content).facts;
+    return buildReport(relativeTarget, content);
   } catch {
     return null;
   }
+}
+
+function formatRemediationHints(report) {
+  if (!report || !Array.isArray(report.findings)) return [];
+  return report.findings
+    .filter((finding) => finding && (finding.expected_shape || finding.remediation_hint))
+    .slice(0, 3)
+    .map((finding) => {
+      const parts = [`- ${finding.reason_code || 'unknown'}`];
+      if (finding.expected_shape) parts.push(`expected: ${finding.expected_shape}`);
+      if (finding.remediation_hint) parts.push(`fix: ${finding.remediation_hint}`);
+      return parts.join(' | ');
+    });
 }
 
 function block(reason) {
