@@ -267,7 +267,7 @@ describe('spec-prd workflow contracts', () => {
   test('evaluation governance records the current spec-prd source topology', () => {
     const governance = read(EVALUATION_GOVERNANCE_PATH);
 
-    expect(governance).toContain('compressed source topology (`SKILL.md` + 9 references + 4 scripts plus the `scripts/lib/reason-codes.js` readiness reason-code 分类法 module');
+    expect(governance).toContain('compressed source topology (`SKILL.md` + 9 references + 4 scripts plus the `scripts/lib/reason-codes.js` readiness reason-code taxonomy module');
     expect(governance).not.toContain('compressed 13-file source topology');
     expect(governance).not.toContain('compressed 10-file source topology');
   });
@@ -275,7 +275,7 @@ describe('spec-prd workflow contracts', () => {
   test('entrypoint exposes compact workflow contract summary and decision-tree intake', () => {
     const text = read(SKILL_PATH);
     // 入口锚点窗口:保留到 Phase 0 compact decision tree 结束。
-    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 190).join('\n');
+    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 230).join('\n');
     const frontmatter = text.match(/^---\n([\s\S]*?)\n---/)[1];
     const phaseOne = extractMarkdownSection(text, '### Phase 1: Current-State Analysis');
 
@@ -333,6 +333,16 @@ describe('spec-prd workflow contracts', () => {
       'Split or continue?',
       'Select `intake_mode`, `clarification_view`, `clarification_profile`, `clarification_budget`, `clarification_risk_tier`, and `review_gate_mode` before gathering evidence',
       'never enters `BLOCKING_REASON_CODES`',
+      '## Execution Compass',
+      'not a second state machine, persistent artifact, schema, or progress ledger',
+      'First durable PRD Write',
+      'Requirement Analysis Gate map',
+      'Product Expert Lens risk->write-target result',
+      'Pre-Write Closure Gate',
+      '`ask-owner-first`, `checkpoint-prd`, `final-prd`, or `route-out`',
+      'Phase 4 closeout',
+      'finding count',
+      'receipt status',
     ]);
     expectContainsAll(phaseOne, [
       'PRD Sanitization',
@@ -469,7 +479,7 @@ describe('spec-prd workflow contracts', () => {
     const skill = read(SKILL_PATH);
 
     expectContainsAll(skill, [
-      'reason-then-act / 先规划后执行',
+      'reason-then-act',
       'owner question -> `highest_risk_gap` / `next_owner_question` / `question_delivery`',
       'PRD write -> `write_mode`',
       'readiness -> checker findings plus `readiness_outcome` / `can_enter_spec-plan`',
@@ -477,7 +487,7 @@ describe('spec-prd workflow contracts', () => {
       'reuse existing Decision Card fields and do not add phase-status enums, progress files, or transcripts',
       'route-out, bypass, and source-proven paths use one concise reason instead of full ceremony',
       'Pre-Write Closure Gate',
-      'Canonical: 四个合法停点',
+      'Canonical: Four Legal Stop Points',
       'keep grilling the highest-risk branch, not "ask one question then stop drafting"',
       'write_mode=checkpoint-prd',
       'write_mode=final-prd',
@@ -549,6 +559,47 @@ describe('spec-prd workflow contracts', () => {
     expect(skill).not.toContain('degrade to `revise-prd`, `ask-owner`, `checkpoint-prd`, or `route-out`');
     // 字段去重:不得引入 grill_depth_state 独立字段
     expect(skill).not.toContain('grill_depth_state');
+  });
+
+  test('execution compass and failure blacklist encode the hot path recovery actions', () => {
+    const skill = read(SKILL_PATH);
+
+    expectContainsAll(skill, [
+      '## Execution Compass',
+      'This table is the run-local quick reference for `$spec-prd`',
+      'not a second state machine, persistent artifact, schema, or progress ledger',
+      'First durable PRD Write',
+      'Requirement Analysis Gate map',
+      'Product Expert Lens risk->write-target result',
+      'Decision Card',
+      'Pre-Write Closure Gate conclusion',
+      'do not write a ready/final PRD first and rely on Phase 4 remediation',
+      'Owner question',
+      'ask one source-backed owner question at a time',
+      'Phase 4 closeout',
+      'readiness lens',
+      'finalize/checker',
+      'finding count',
+      'blocking `reason_codes`',
+      'receipt status',
+      'Hand off to plan only when the receipt and the LLM readiness judgment both support it',
+      '## Failure-Mode Blacklist',
+      'stop the current output path and run the recovery action',
+      'Direct write after read',
+      'Return to Phase 1',
+      'Checkpoint as escape',
+      'Keep grilling the highest-risk owner/source gap one at a time',
+      'Fake headless',
+      'question_delivery=chat-fallback',
+      'Owner answer laundering',
+      'Preserve the original intent as blocking residue',
+      'Design evidence laundering',
+      'design_source_inventory',
+      'Checker/finalize evasion',
+      'Run the producer-local finalize/checker',
+      'Runtime mirror patch',
+      'Return to `skills/spec-prd/**` source',
+    ]);
   });
 
   test('user-visible execution UX protocol exposes progress without adding workflow state', () => {
@@ -672,7 +723,7 @@ describe('spec-prd workflow contracts', () => {
       'Negative Space',
       'Ask only questions that decide scope, behavior, source-of-truth, or acceptance',
       'A lengthening owner-question sequence is not a stop reason; grilling continues relentlessly by default',
-      'a branch stops only at a legal stop point in SKILL.md `Canonical: 四个合法停点`',
+      'a branch stops only at a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`',
       'source attempt already made',
       'PRD write target it changes',
       'load `grill-with-docs-integration.md` and continue one-question-at-a-time',
@@ -737,7 +788,7 @@ describe('spec-prd workflow contracts', () => {
       'concrete scenario stress',
       'code contradiction surfacing',
       'skip low-value questions',
-      'Every load-bearing branch must reach a legal stop point defined in SKILL.md `Canonical: 四个合法停点` before planning',
+      'Every load-bearing branch must reach a legal stop point defined in SKILL.md `Canonical: Four Legal Stop Points` before planning',
       'For PRD authoring/refinement, apply these seven `grill-with-docs` actions to every requirement branch',
       'Do not require the user to name `grill-with-docs`',
       'Grill-With-Docs Integration Trigger',
@@ -1170,7 +1221,7 @@ describe('spec-prd workflow contracts', () => {
       'every owner question closes or narrows a named gap with a PRD write target',
       '`domain-grill and decision-note adequacy`',
       '`deep requirements grill closure`',
-      'each reach a legal stop point in SKILL.md `Canonical: 四个合法停点`',
+      'each reach a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`',
       '`context/adr topology adapter boundary`',
       '`context/adr artifact mode boundary`',
       'P1 Conditional Pack',
@@ -2296,7 +2347,7 @@ describe('spec-prd workflow contracts', () => {
       'skills/spec-prd/references/grill-with-docs-integration.md',
       'skills/spec-prd/references/prd-readiness-lens.md',
       'runtime_paths_checked: []',
-      'Canonical: 四个合法停点',
+      'Canonical: Four Legal Stop Points',
       'owner-capped',
       'checkpoint-blocked',
       'STRUCTURAL-GATE-SKIPPABLE',
@@ -3748,7 +3799,7 @@ describe('spec-prd workflow contracts', () => {
 });
 
 // U8 (R21 / S4a):停点 SSOT 防漂移 lint。
-// SKILL.md `Canonical: 四个合法停点` 是四元组停点的唯一真相源,他处只能 by-reference。
+// SKILL.md `Canonical: Four Legal Stop Points` 是四元组停点的唯一真相源,他处只能 by-reference。
 // 这条 lint 只锁「四元组四词在同一行枚举式共现」这一字面形态——绝不锁 posture 措辞
 // (relentless / keep going by default 等对抗早停先验的 load-bearing 强化),绝不升级为语义复述检测,
 // 绝不进 artifact BLOCKING_REASON_CODES(那会违反 KTD14)。它是 source-lint,不是 checker reason_code。
@@ -3757,7 +3808,7 @@ describe('spec-prd canonical stop-point SSOT anti-drift lint (U8/R21)', () => {
   const STOP_TOKENS = [/\bleaf\b/, /\bsource-resolved\b/, /\bowner-capped\b/, /how-pushdown/];
 
   // 豁免落点:四元组的合法定义点与 fixture,允许全词共现。
-  // - SKILL.md `## Canonical: 四个合法停点` 小节内部(定义 + Light contract field mapping)
+  // - SKILL.md `## Canonical: Four Legal Stop Points` 小节内部(定义 + Light contract field mapping)
   // - evals/examples.json 的 fixture(eval 语料本就要复现 Canonical 措辞)
   function collectStopPointFourTupleLines() {
     const files = [];
@@ -3775,7 +3826,7 @@ describe('spec-prd canonical stop-point SSOT anti-drift lint (U8/R21)', () => {
       let inCanonical = false;
       lines.forEach((line, idx) => {
         if (file === SKILL_PATH) {
-          if (/^##\s+Canonical:\s*四个合法停点/.test(line)) {
+          if (/^##\s+Canonical:\s*Four Legal Stop Points/.test(line)) {
             inCanonical = true;
             return;
           }
@@ -3804,8 +3855,8 @@ describe('spec-prd canonical stop-point SSOT anti-drift lint (U8/R21)', () => {
   test('the canonical SSOT itself still defines the four stop points', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
     // 定义点必须仍在,否则 by-reference 指针会悬空。
-    expect(skill).toContain('## Canonical: 四个合法停点');
-    const canonicalSection = skill.slice(skill.indexOf('## Canonical: 四个合法停点'));
+    expect(skill).toContain('## Canonical: Four Legal Stop Points');
+    const canonicalSection = skill.slice(skill.indexOf('## Canonical: Four Legal Stop Points'));
     for (const re of STOP_TOKENS) {
       expect(re.test(canonicalSection)).toBe(true);
     }

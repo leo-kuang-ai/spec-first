@@ -12,7 +12,7 @@ This file is the single canonical source for product-expert judgment in `spec-pr
 - Re-read every load-bearing requirement from two non-product seats in addition to the product seat: the implementer seat ("which unnamed interface availability, permission boundary, state, source-of-truth, or fallback would force me to invent product behavior?") and the test-author seat ("which requirement has no observable signal to write a pass/fail assertion against?"). Each seat yields either one concrete gap bound to `PRD_write_target` or an explicit `none-found`. `none-found` is legal only after the seat's counterfactual question has actually been run against that requirement's source / current-state evidence; declaring `none-found` without running it — or because the product seat already "looks settled" — is the premature-none-found failure, not a legal outcome. A `none-found` names the specific source / current-state evidence the seat checked, and when current-state evidence explicitly flags an unnamed or unresolved dependency (an interface marked "to be provided", a source-of-truth not yet named, a referent with multiple repo implementations), that seat cannot declare `none-found` until the dependency is bound or carried as a gap. This raises a fake `none-found` from self-narration to a citable claim a reviewer can open; it does not, and cannot, prove the seat truly examined the evidence — that stays the deferred artifact-truth ceiling, not something this lens gates. This is the existing `downstream_confirmation_risk` engine re-run from another seat — not a new dimension list, per-requirement matrix, checklist, persona, or dispatch.
 - Challenge vague product terms before they reach PRD sections.
 - Rank gaps by downstream confirmation risk, not by checklist completeness.
-- Order owner questions by `downstream_confirmation_risk`; ranking sets which gap to grill first, not whether to keep grilling. Grilling continues by default until a branch reaches a legal stop point in SKILL.md `Canonical: 四个合法停点`.
+- Order owner questions by `downstream_confirmation_risk`; ranking sets which gap to grill first, not whether to keep grilling. Grilling continues by default until a branch reaches a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`.
 - Preserve accepted assumptions, owner decisions, blockers, and unresolved questions in PRD-local sections.
 - Close with which downstream confirmations have been eliminated and which remain explicit handoff boundaries.
 
@@ -50,7 +50,7 @@ Contract tests may lock the field anchors and consumption direction. They must n
 - Every gap that enters Requirements Grill must bind to `PRD_write_target`.
 - Risk -> PRD Write Target Map is a mandatory run-local interface before durable write-in: each load-bearing risk either names the PRD section it will update, becomes an owner question/accepted assumption/blocker, or routes out.
 - A load-bearing gap that cannot yet bind to a write target is not dropped or parked as a stop reason: keep grilling to bind it, or carry it visibly as `Outstanding Questions`, blocker, accepted assumption, or route-out. "Not yet bindable" never ends a branch.
-- `downstream_confirmation_risk` controls next-question ordering and handoff priority. It does not control whether to keep grilling — grilling continues by default until a branch reaches a legal stop point in SKILL.md `Canonical: 四个合法停点`. It is not a score, enum, schema, or deterministic readiness verdict.
+- `downstream_confirmation_risk` controls next-question ordering and handoff priority. It does not control whether to keep grilling — grilling continues by default until a branch reaches a legal stop point in SKILL.md `Canonical: Four Legal Stop Points`. It is not a score, enum, schema, or deterministic readiness verdict.
 - Requirements Grill consumes only `gap + owner_question_or_assumption + PRD_write_target`.
 - Standard PRD Write-In consumes only `PRD_write_target + closure_state`.
 - Readiness consumes `closure_state` plus remaining handoff residue that would make planning/work invent WHAT.
@@ -64,7 +64,7 @@ Use these dimensions to find gaps, then reduce them into the run-local interface
 - current-state and code alignment, including confirmed source, source-candidate limits, contradictions, and missing active surfaces; this confirms current WHAT and evidence pointers, not HOW to change implementation
 - requirement quality: atomic, necessary, prioritized, testable, implementation-free, and traceable to evidence
 - acceptance coverage: happy path, exception path, negative acceptance, permissions, empty/loading/error, and cross-surface effects when relevant
-- goals and metrics: measurable口径, baseline/window when available, and no invented target values
+- goals and metrics: a measurable definition, baseline/window when available, and no invented target values
 - industry/domain overlay: compliance, money movement, privacy, safety, audit, and operational questions only when triggered
 - scope and handoff entropy: non-goals, dependencies, rollout/ops boundaries, and remaining WHAT decisions
 
