@@ -127,6 +127,12 @@
       "skillPath": "skills/baoyu-youtube-transcript/SKILL.md",
       "computedHash": "27582028cbdd9c81232fba1aafbfa609e4dc1167bff4f2e89ca48a3ecd07049b"
     },
+    "darwin-skill": {
+      "source": "alchaincyf/darwin-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "3ce47693e3dcbfb334a0f9d3604faad2d144bb910a123c64b2e388f3019a8b56"
+    },
     "release-skills": {
       "source": "jimliu/baoyu-skills",
       "sourceType": "github",
