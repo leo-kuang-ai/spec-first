@@ -158,7 +158,7 @@ This table is the R&D main-chain entrypoint map, following the engineering loop 
 | Spec — brainstorm requirements | `/spec:brainstorm` | `$spec-brainstorm` | Requirements brief under `docs/brainstorms/` |
 | Spec — brownfield PRD requirements | `/spec:prd` | `$spec-prd` | PRD-grade requirements under `docs/brainstorms/` |
 | Plan — define HOW | `/spec:plan` | `$spec-plan` | Implementation plan under `docs/plans/` |
-| Tasks — optional, derived | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | Derived task pack under `docs/tasks/` |
+| Tasks — optional, derived | `/spec:write-tasks` | `$spec-write-tasks` | Derived task pack under `docs/tasks/` |
 | Code — execute | `/spec:work` | `$spec-work` | Scoped source changes, tests, and verification notes |
 | Review — code | `/spec:code-review` | `$spec-code-review` | Structured findings and residual risks |
 | Review — docs/plans | `/spec:doc-review` | `$spec-doc-review` | Document findings, gaps, and residual risks |

@@ -4,19 +4,20 @@
 ## 一、核心 Workflow 链路
 
 ```
-Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowledge
+Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
 ```
+
+Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：普通 workflow 通过 bounded source reads、`rg`、ast-grep、git diff、tests/logs、docs/solutions 和 runtime readiness facts 获取可验证上下文。
 
 | 链路节点 | 对应 Workflow | 说明 |
 |---------|-------------|------|
 | Codebase | 终端 `spec-first update`、`/spec:mcp-setup` | 建立运行时基线，修复 runtime drift |
-| Context | direct source reads / `rg` / ast-grep / git diff / tests/logs | 为需求、计划、执行和审查准备可验证的源码与测试证据 |
 | Spec | `/spec:brainstorm`、`/spec:prd`、`/spec:ideate` | 需求探索与 PRD 产出 |
 | Plan | `/spec:plan` | 将需求转化为结构化实施计划 |
 | Tasks | `/spec:write-tasks` | 将计划编译为可执行任务包（可选派生层） |
 | Code | `/spec:work` | 系统化执行开发任务 |
-| Review | `/spec:code-review`、`/spec:doc-review` | 多 persona 并行审查代码与文档 |
-| Knowledge | `/spec:compound`、`/spec:sessions` | 沉淀可复用工程知识到 docs/solutions/ |
+| Review | `/spec:code-review`、`/spec:doc-review` | 结构化审查代码与文档；dispatch 可用且授权时使用多 persona，否则走 report-only / inline fallback |
+| Knowledge | `/spec:compound`、`/spec:compound-refresh`、`/spec:sessions` | 沉淀可复用工程知识，刷新/合并/退役旧 learning，并检索历史会话作为 recall support |
 
 ---
 
@@ -30,8 +31,8 @@ Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowled
 | `/spec:plan` | spec-plan | 为多步骤任务创建结构化实施计划，或对现有计划做深化审查 | spec-repo-research-analyst、spec-learnings-researcher、spec-spec-flow-analyzer（条件）；spec-slack-researcher（opt-in）；spec-best-practices-researcher、spec-framework-docs-researcher（外部研究有价值时） |
 | `/spec:write-tasks` | spec-write-tasks | 将已定稿的 spec-plan 编译为派生任务包，或验证现有任务包完整性 | 无 |
 | `/spec:work` | spec-work | 接收任务包或计划，系统化执行开发工作，保证质量交付 | spec-figma-design-sync（UI 工作按需） |
-| `/spec:code-review` | spec-code-review | 多 persona 并行代码审查，置信度门控，合并去重，可选自动修复 | spec-correctness-reviewer、spec-testing-reviewer、spec-maintainability-reviewer、spec-project-standards-reviewer、spec-agent-native-reviewer、spec-learnings-researcher（默认核心）；spec-security-reviewer、spec-performance-reviewer、spec-api-contract-reviewer、spec-data-migrations-reviewer、spec-reliability-reviewer、spec-adversarial-reviewer、spec-cli-readiness-reviewer、spec-cli-agent-readiness-reviewer、spec-previous-comments-reviewer（条件 cross-cutting）；spec-dhh-rails-reviewer、spec-kieran-rails-reviewer、spec-kieran-python-reviewer、spec-kieran-typescript-reviewer、spec-julik-frontend-races-reviewer、spec-swift-ios-reviewer（stack-specific 条件）；spec-schema-drift-detector、spec-deployment-verification-agent（含迁移文件时） |
-| `/spec:doc-review` | spec-doc-review | 多 persona 并行文档审查，发现一致性、可行性、范围、安全等问题，可选自动修复 | spec-coherence-reviewer、spec-feasibility-reviewer（always-on）；spec-product-lens-reviewer、spec-design-lens-reviewer、spec-security-lens-reviewer、spec-scope-guardian-reviewer、spec-adversarial-document-reviewer（条件激活） |
+| `/spec:code-review` | spec-code-review | 结构化代码审查；dispatch 可用且授权时使用多 persona，缺失时走 report-only / inline fallback；置信度门控，合并去重，可选自动修复 | spec-correctness-reviewer、spec-testing-reviewer、spec-maintainability-reviewer、spec-project-standards-reviewer、spec-agent-native-reviewer、spec-learnings-researcher（默认核心）；spec-security-reviewer、spec-performance-reviewer、spec-api-contract-reviewer、spec-data-migrations-reviewer、spec-reliability-reviewer、spec-adversarial-reviewer、spec-cli-readiness-reviewer、spec-cli-agent-readiness-reviewer、spec-previous-comments-reviewer（条件 cross-cutting）；spec-dhh-rails-reviewer、spec-kieran-rails-reviewer、spec-kieran-python-reviewer、spec-kieran-typescript-reviewer、spec-julik-frontend-races-reviewer、spec-swift-ios-reviewer（stack-specific 条件）；spec-schema-drift-detector、spec-deployment-verification-agent（含迁移文件时） |
+| `/spec:doc-review` | spec-doc-review | 结构化文档审查；dispatch 可用且授权时使用多 persona，缺失时走 single-agent report-only fallback；发现一致性、可行性、范围、安全等问题，可选自动修复 | spec-coherence-reviewer、spec-feasibility-reviewer（always-on）；spec-product-lens-reviewer、spec-design-lens-reviewer、spec-security-lens-reviewer、spec-scope-guardian-reviewer、spec-adversarial-document-reviewer（条件激活） |
 | `/spec:debug` | spec-debug | 系统性排查 bug 根因，可选修复，适用于失败测试、运行时报错等场景 | 无（可派发匿名只读 sub-agent 并行调查） |
 | `/spec:optimize` | spec-optimize | 指标驱动的迭代优化循环，并行实验，按评分保留改进方案 | spec-learnings-researcher（Phase 0.3）；spec-repo-research-analyst（较大或陌生代码库时） |
 | `/spec:compound` | spec-compound | 问题刚解决时，通过并行子 agent 将解决方案沉淀到 docs/solutions/ | spec-performance-oracle（性能问题）；spec-security-sentinel（安全问题）；spec-data-integrity-guardian（数据库问题）；spec-code-simplicity-reviewer + 对应 kieran reviewer（代码密集型）；spec-pattern-recognition-specialist、spec-best-practices-researcher、spec-framework-docs-researcher（条件）；spec-session-historian（由 spec-sessions 间接调度） |
@@ -105,7 +106,7 @@ Codebase → Context → Spec → Plan → Tasks → Code → Review → Knowled
 
 ## 四、备注
 
-- **spec-write-tasks 是 standalone skill**，不绑定特定 workflow 命令，作为 spec-plan 到 spec-work 之间的可选派生步骤独立存在；plan 始终是 single source of truth，task pack 是派生产物，不得反向扩展 plan 范围。
+- **spec-write-tasks 是公开 workflow**，Claude 入口为 `/spec:write-tasks`，Codex 入口为 `$spec-write-tasks`；它仍是 spec-plan 到 spec-work 之间的可选派生层，plan 始终是 single source of truth，task pack 是派生产物，不得反向扩展 plan 范围。
 - **代码上下文默认走 direct evidence**：普通 workflow 使用 bounded source reads、`rg`、ast-grep、git diff、tests/logs 和用户提供证据，不依赖外部图谱 readiness 入口。
 - **Agent 激活分为三类**：always-on（如 spec-correctness-reviewer、spec-coherence-reviewer）；条件激活（按 diff 内容、文档信号或技术栈决定）；opt-in（如 spec-slack-researcher，需用户明确请求）。
 - **dispatch 不可用时的降级行为**：spec-code-review 和 spec-doc-review 均定义了 dispatch 不可用时退化为单 agent 报告模式，不执行文档编辑或自动修复。

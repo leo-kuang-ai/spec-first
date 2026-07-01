@@ -76,7 +76,7 @@ Choose it when the pack contains `review_gate: required` tasks, touches shared c
 For a high-risk pack that resolves to `review-task-pack`, do not dispatch by default. Continue directly into the current host's document review without a separate confirmation step only under all of these conditions:
 
 - the pack is executable (`deterministic_handoff: true`) and `review-task-pack` was selected by the high-risk criteria above,
-- the invoking parent workflow or user explicitly authorized this single bounded continuation for the current run; a standalone skill trigger alone is not dispatch authorization,
+- the invoking parent workflow or user explicitly authorized this single bounded continuation for the current run; invoking the public write-tasks workflow alone is not document-review dispatch authorization,
 - the current session is an interactive host that exposes the current host's document-review entrypoint,
 - the continuation targets exactly the doc-review of the just-written task pack; do not chain any further workflow, and do not invoke document review as an Agent/Task/subagent type.
 

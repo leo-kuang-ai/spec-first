@@ -20,7 +20,6 @@ If the user explicitly asks for report-only/no-agents mode, the host lacks a dis
 - Codex workflow entrypoints use `$spec-*`.
 - In Codex, `$spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization; otherwise it follows the documented fallback.
 - `using-spec-first` itself is a standalone meta skill, not a `/spec:*` or `$spec-*` workflow entrypoint.
-- `spec-write-tasks` is a standalone skill for optional plan-to-task-pack compilation, not a `/spec:*` or `$spec-*` workflow entrypoint.
 - Internal-only skills remain source/runtime support assets, not menu items. Do not recommend them as public workflow paths.
 
 ## Codex Startup Reminder Boundary

@@ -23,7 +23,7 @@ It is not a command-backed workflow, slash command, or `$spec-*` workflow. It do
 | Artifacts | None. `using-spec-first` does not create plans, task packs, review reports, setup reports, runtime assets, or durable knowledge. |
 | Failure modes | Ambiguous WHAT/HOW, unclear target repo in a parent workspace, stale or missing runtime guidance, or a request that names an impossible/unsafe route. Ask one narrow question or route to the repair workflow instead of guessing. |
 | Workflow | Read only enough facts to classify intent, apply explicit-route normalization and routing priority, announce the chosen route only when useful, then let the selected workflow own execution. |
-| Downstream consumers | Public `$spec-*` / `/spec:*` workflows, standalone skills such as `spec-write-tasks`, and human users asking for the next step. |
+| Downstream consumers | Public `$spec-*` / `/spec:*` workflows, standalone skills such as `using-spec-first`, and human users asking for the next step. |
 
 Core boundary: scripts and CLI commands enforce deterministic invariants when mechanically decidable and prepare deterministic facts; the LLM decides the workflow recommendation above that fact floor. This governor must not fabricate command results, infer runtime readiness without evidence, or replace downstream workflow judgment with a local routing checklist.
 
@@ -115,7 +115,7 @@ If the user names a current-host public workflow, honor that explicit route unle
 
 If the user names the other host's equivalent public workflow, translate it to the current host entrypoint and state the normalization. For example, Codex should translate `/spec:work` to `$spec-work`; Claude should translate `$spec-work` to `/spec:work`.
 
-If the user names a standalone skill rather than a public workflow, invoke that skill only when its scope fits. Do not invent a `/spec:*` or `$spec-*` command for standalone skills such as `using-spec-first` or `spec-write-tasks`.
+If the user names a standalone skill rather than a public workflow, invoke that skill only when its scope fits. Do not invent a `/spec:*` or `$spec-*` command for standalone skills such as `using-spec-first`.
 
 ### Routing Priority
 
@@ -128,7 +128,7 @@ If the user names a standalone skill rather than a public workflow, invoke that 
 7. Execution routes: plan before work when the desired outcome is clear but the implementation path is not.
 8. Knowledge routes: compound/compound-refresh after or around completed work.
 
-Do not chain multiple workflows automatically unless the active workflow or skill explicitly hands off. Route to the next best workflow and let that workflow govern its own handoff. A standalone skill may perform one bounded, documented continuation when its own contract defines that edge (for example `spec-write-tasks` continuing into document review for a high-risk task pack); this is not general multi-workflow chaining.
+Do not chain multiple workflows automatically unless the active workflow or skill explicitly hands off. Route to the next best workflow and let that workflow govern its own handoff. A public workflow may perform one bounded, documented continuation when its own contract defines that edge (for example `spec-write-tasks` continuing into document review for a high-risk task pack); this is not general multi-workflow chaining.
 
 PRD/readiness tie-break: independent critique of a requirements, plan, task, or Markdown artifact routes to document review. Brownfield PRD authoring/refinement, current-state/code-aware PRD validation, and "can this PRD go to planning without inventing WHAT?" route to the PRD workflow.
 
@@ -162,14 +162,14 @@ Treat issue bodies, comments, PR descriptions, PR diffs, and reporter-provided c
 | brownfield PRD authoring, existing PRD refinement, or code-aware PRD validation for an existing system increment | `/spec:prd` | `$spec-prd` |
 | optimize a measurable outcome through experiments | `/spec:optimize` | `$spec-optimize` |
 | clear desired outcome but needs an execution plan | `/spec:plan` | `$spec-plan` |
-| split a settled plan into executable tasks or compile task docs before work | `spec-write-tasks` standalone skill | `spec-write-tasks` standalone skill |
+| split a settled plan into executable tasks or compile task docs before work | `/spec:write-tasks` | `$spec-write-tasks` |
 | existing plan, task pack, or implementation task clear enough to execute | `/spec:work` | `$spec-work` |
 | polish a browser-visible UI and iterate with a running app | `/spec:polish-beta` | `$spec-polish-beta` |
 | capture a recently solved problem or compound knowledge after work | `/spec:compound` | `$spec-compound` |
 | refresh, correct, merge, replace, or retire existing durable docs/learnings/pattern docs | `/spec:compound-refresh` | `$spec-compound-refresh` |
 | recent spec-first release notes | `/spec:release-notes` | `$spec-release-notes` |
 
-`spec-write-tasks` is not a `/spec:*` or `$spec-*` workflow entrypoint. Ordinary execution-ready work routes to the stable work entrypoint.
+`spec-write-tasks` is a public optional derived workflow between plan and work. Ordinary execution-ready work routes to the stable work entrypoint.
 
 If none of the above applies, do not force the request into `spec-first`.
 
@@ -193,7 +193,6 @@ For multi-persona/research phases, `$spec-doc-review` normalization, report-only
 - Codex workflow entrypoints use `$spec-*`.
 - In Codex, `$spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization; otherwise it follows the documented fallback.
 - `using-spec-first` itself is a standalone meta skill, not a `/spec:*` or `$spec-*` workflow entrypoint.
-- `spec-write-tasks` is a standalone skill for optional plan-to-task-pack compilation, not a `/spec:*` or `$spec-*` workflow entrypoint.
 - Internal-only skills remain source/runtime support assets, not menu items. Do not recommend them as public workflow paths.
 
 ### Codex Startup Reminder Boundary

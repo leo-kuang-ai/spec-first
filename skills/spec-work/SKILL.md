@@ -177,8 +177,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
    - If the input is a bare prompt and the product WHAT is unclear, recommend the current host's brainstorm entrypoint before execution.
    - If the desired outcome is clear but no settled plan exists, return to the current host's plan entrypoint rather than forcing `spec-work` to plan while implementing.
-   - If the input is a settled plan and the plan is large enough that execution would require the executor to split dependencies, waves, or cross-module file ownership while implementing, offer the standalone `spec-write-tasks` diversion once.
-   - Do not describe task compilation as a command-backed workflow entrypoint; `spec-write-tasks` remains a standalone skill.
+   - If the input is a settled plan and the plan is large enough that execution would require the executor to split dependencies, waves, or cross-module file ownership while implementing, offer the current host's `spec-write-tasks` public workflow diversion once.
+   - Describe task compilation with the current host's write-tasks public workflow entrypoint; keep it optional and derived rather than mandatory execution state.
    - If execution discovers scope beyond the plan/task pack, stop and return to `spec-plan` or rerun `spec-write-tasks`. Do not expand scope in place.
    - Do not invent human-time phases, multi-day slices, or "this session only" subsets as an oversized-work workaround.
 

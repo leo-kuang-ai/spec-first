@@ -153,7 +153,7 @@ describe('workflow invocation boundary', () => {
     expect(violations).toEqual([]);
   });
 
-  test('large-requirements design doc keeps dual-host entrypoints and standalone task compilation boundaries', () => {
+  test('large-requirements design doc keeps dual-host entrypoints and public task compilation boundaries', () => {
     const text = read(path.join(REPO_ROOT, 'docs', '02-架构设计', '需求拆分', '大需求拆分.md'));
 
     expect(text).toContain('Claude Code:');
@@ -168,9 +168,9 @@ describe('workflow invocation boundary', () => {
     expect(text).toContain('$spec-work');
     expect(text).toContain('$spec-code-review');
     expect(text).toContain('$spec-compound');
-    expect(text).toContain('`spec-write-tasks` 是 standalone skill，不是 command-backed workflow');
-    expect(text).not.toContain('/spec:write-tasks');
-    expect(text).not.toContain('$spec-write-tasks');
+    expect(text).toContain('`spec-write-tasks` 已提升为公开 workflow');
+    expect(text).toContain('/spec:write-tasks');
+    expect(text).toContain('$spec-write-tasks');
     expect(text).toContain('当前不存在 `/spec:requirements` 或 `$spec-requirements` 入口');
     expect(text).not.toContain('/spec:requirements validate');
     expect(text).not.toContain('$spec-requirements validate');

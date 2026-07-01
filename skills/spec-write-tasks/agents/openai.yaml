@@ -1,7 +1,7 @@
 interface:
   display_name: "Write Tasks"
   short_description: "Compile or validate derived task packs"
-  default_prompt: "Use the spec-write-tasks standalone skill with a local plan path, existing task-pack path, or clear task-splitting request. First decide whether task compilation or validation is warranted, then compile a settled plan into a derived task pack for the appropriate spec-work workflow only when the plan is large, dependency-heavy, or benefits from explicit execution waves."
+  default_prompt: "Use the spec-write-tasks public workflow with a local plan path, existing task-pack path, or clear task-splitting request. First decide whether task compilation or validation is warranted, then compile a settled plan into a derived task pack for the appropriate spec-work workflow only when the plan is large, dependency-heavy, or benefits from explicit execution waves."
 
 policy:
   allow_implicit_invocation: false

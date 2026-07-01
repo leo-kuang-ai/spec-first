@@ -34,15 +34,15 @@
       }
     },
     {
-      "id": "standalone-write-tasks-is-not-public-workflow",
+      "id": "public-write-tasks-workflow-admission",
       "input": "用 $spec-write-tasks workflow 把这个 settled plan 拆任务。",
       "coverage_tags": ["routing", "boundary", "expected"],
-      "expected_outcome": "Explain that spec-write-tasks is a standalone skill, not a /spec:* or $spec-* workflow entrypoint.",
-      "boundary_note": "Standalone skill triggers are not public workflow admission.",
-      "forbidden_signals": ["Invents $spec-write-tasks", "Invents /spec:write-tasks"],
+      "expected_outcome": "Route to the current-host write-tasks public workflow when the input is a settled local plan that should be split into a derived task pack.",
+      "boundary_note": "The write-tasks public workflow is optional and derived; it does not execute code or replace the source plan.",
+      "forbidden_signals": ["Says spec-write-tasks is not a public workflow", "Routes directly to work without considering the explicit task-splitting request"],
       "extensions": {
-        "public_workflow_required": false,
-        "expected_entrypoint": "spec-write-tasks"
+        "public_workflow_required": true,
+        "expected_entrypoint": "$spec-write-tasks"
       }
     },
     {

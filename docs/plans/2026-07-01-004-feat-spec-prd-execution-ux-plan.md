@@ -1,7 +1,7 @@
 ---
 title: "feat: 为 spec-prd 增加执行 UX 协议"
 type: feat
-status: active
+status: completed
 date: 2026-07-01
 spec_id: 2026-07-01-002-spec-prd-execution-ux-protocol
 origin: docs/brainstorms/2026-07-01-002-spec-prd-execution-ux-protocol-requirements.md

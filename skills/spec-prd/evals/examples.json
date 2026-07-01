@@ -2355,6 +2355,37 @@
       ]
     },
     {
+      "id": "push-right-brief-batch-owner-close-rejected",
+      "intent": "create",
+      "case_type": "failure",
+      "quality_buckets": [
+        "failure",
+        "grill-quality",
+        "readiness-fail"
+      ],
+      "input_shape": "Model reads source materials, builds a Push-Right decision Brief with 4 owner decisions, sends the whole Brief as one blocking question or chat message, receives a broad owner reply like 'agree with recommendations', then marks every owner-* Outstanding Question owner-answered from that single global reply and proceeds toward final-prd.",
+      "expected": [
+        "the Brief is only a run-local ordering and preview surface",
+        "owner interaction still asks one highest-risk source-backed owner decision at a time and waits for feedback",
+        "each owner-* OQ must bind to its own Owner Decision Trace row for the specific question and answer",
+        "a global Brief reply cannot close multiple owner-* OQs at once",
+        "if the owner cannot answer the next load-bearing decision, the legal outcome is ask-owner-first or checkpoint-prd with next_owner_question"
+      ],
+      "must_not": [
+        "must not send multiple owner decisions as one batch question",
+        "must not use one global Brief reply to close multiple owner-* OQs",
+        "must not treat a batch agreement as clarification_evidence: asked-owner for unasked load-bearing OQs",
+        "must not claim ready-for-planning while owner decisions were batch-closed"
+      ],
+      "coverage_tags": [
+        "grill-quality",
+        "readiness",
+        "owner-answer-fidelity",
+        "one-question-at-a-time",
+        "push-right-brief"
+      ]
+    },
+    {
       "id": "checkpoint-after-full-grill-accepted",
       "intent": "create",
       "case_type": "positive",
@@ -2591,6 +2622,38 @@
         "p1-pack",
         "traceability",
         "readiness"
+      ]
+    },
+    {
+      "id": "execution-ux-protocol-skipped-rejected",
+      "intent": "create",
+      "case_type": "failure",
+      "quality_buckets": [
+        "failure",
+        "readiness-fail"
+      ],
+      "input_shape": "Model reads source materials, says '口径已明确' without source, owner, or checker evidence for that claim, skips the entry broadcast, visible task list, and short evidence-aware status updates, writes a checkpoint or final PRD without a pre-write Decision Card, then closes out without finalize/checker finding count, blocking reason_codes, receipt status, or readiness_outcome.",
+      "expected": [
+        "visible execution UX starts with a short broadcast and task-list-first before durable Phase 1+ actions",
+        "status updates remain short and evidence-aware, naming the active gap, source claim, owner question, PRD write target, or finalize fact",
+        "evidence wording labels source-candidate, assumption, external-research, degraded, and checker-owned facts instead of saying 口径已明确",
+        "compact Decision Card (write_mode, highest_risk_gap, next_action, why planning will not invent WHAT) must be emitted before durable PRD Write",
+        "checkpoint-prd is non-ready recovery with can_enter_spec-plan: no and next_owner_question, not a planning recommendation",
+        "closeout reports finalize/checker finding count, blocking reason_codes, receipt status, and readiness_outcome",
+        "script-owned facts stay separate from LLM-owned readiness judgment"
+      ],
+      "must_not": [
+        "must not say 口径已明确, confirmed, or ready without source, owner, or checker evidence",
+        "must not skip visible task list or status UX before durable PRD writes",
+        "must not write any PRD without a pre-write Decision Card",
+        "must not recommend planning from checkpoint-prd",
+        "must not close out without finalize/checker summary"
+      ],
+      "coverage_tags": [
+        "execution-ux",
+        "failure",
+        "readiness",
+        "decision-card-required"
       ]
     },
     {

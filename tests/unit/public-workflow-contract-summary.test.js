@@ -12,7 +12,7 @@ const GOVERNANCE_PATH = path.join(
   'dual-host-governance',
   'skills-governance.json',
 );
-const REQUIRED_STANDALONE_SUMMARIES = ['using-spec-first', 'spec-write-tasks'];
+const REQUIRED_STANDALONE_SUMMARIES = ['using-spec-first'];
 
 function publicWorkflowSkills() {
   const governance = JSON.parse(fs.readFileSync(GOVERNANCE_PATH, 'utf8'));

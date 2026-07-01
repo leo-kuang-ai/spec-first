@@ -158,7 +158,7 @@ docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
 | Spec — brainstorm 需求 | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` 下的 requirements brief |
 | Spec — brownfield PRD 需求 | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` 下的研发侧 clarified requirements / planning-readiness artifact |
 | Plan — 定 HOW | `/spec:plan` | `$spec-plan` | `docs/plans/` 下的 implementation plan |
-| Tasks — 可选派生 | use installed standalone `write-tasks` skill | use installed standalone `write-tasks` skill | `docs/tasks/` 下的 derived task pack |
+| Tasks — 可选派生 | `/spec:write-tasks` | `$spec-write-tasks` | `docs/tasks/` 下的 derived task pack |
 | Code — 执行 | `/spec:work` | `$spec-work` | Scoped source changes、tests 和 verification notes |
 | Review — 代码 | `/spec:code-review` | `$spec-code-review` | Structured findings 和 residual risks |
 | Review — 文档/计划 | `/spec:doc-review` | `$spec-doc-review` | Document findings、gaps 和 residual risks |

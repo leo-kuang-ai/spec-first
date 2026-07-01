@@ -87,7 +87,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 五、Tasks 节点
 
-**对应命令**：`spec-write-tasks`（standalone skill）
+**对应命令**：`/spec:write-tasks` / `$spec-write-tasks`
 
 **当前能力**：将计划编译为派生任务包。
 
@@ -124,7 +124,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 **对应命令**：`/spec:code-review`、`/spec:doc-review`
 
-**当前能力**：已相当完善，20+ reviewer agents，多 persona 并行。
+**当前能力**：已相当完善，20+ reviewer agents；dispatch 可用且授权时多 persona，缺失时有 report-only fallback。
 
 **缺口**：缺少 supply chain 安全审查；缺少 AI 生成代码质量专项检测；缺少跨 PR 累积债务追踪。
 

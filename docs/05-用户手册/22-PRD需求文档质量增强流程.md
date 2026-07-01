@@ -303,6 +303,18 @@ Codex 或当前 host 没有 blocking question tool，不等于 true headless。�
 
 source 已闭合的简单需求不需要反复问 owner，这属于 `source-proven-no-ask`，不是跳过流程。相反，如果问题会改变用户行为、范围、验收、数据权威、接口可用性、降级展示、埋点验收或 source-of-truth，它就是 owner-owned / product-owned 问题，必须在澄清产物输出过程中逐一确认、写成有证据的 accepted assumption，或阻塞 readiness；不能放进 `Planning Recheck` 后宣称 `ready-for-planning`。
 
+## 用户可见执行 UX
+
+进入 `$spec-prd` 后，用户应先看到一段短播报：本轮目标、输入姿态、预计输出的 PRD artifact 姿态，以及硬边界。硬边界包括不做 implementation work、不生成 implementation plan、不手改 `.claude/`、`.codex/` 或 `.agents/skills/` generated runtime mirrors。
+
+Phase 1 之后的 durable action 前，应有可见任务清单或轻量编号列表，覆盖 load-bearing OQ、source/evidence work、PRD write target、下一条 owner question 和 finalize/checker gap。推进中状态更新应该短，只说明正在处理哪个 gap、source claim、owner question、PRD write target 或 finalize fact；不应输出长 transcript，也不应伪造类似 `Ran command` 的工具日志。
+
+写入 PRD 前，应看到 compact Decision Card：`write_mode`、`highest_risk_gap`、`next_action`、`why planning will not invent WHAT`。如果 blocking question tool 不可用但 chat 可以等待用户，执行必须声明 `question_delivery=chat-fallback`，一次只问一个 source-backed owner question，并等待回复；这不是 `question_delivery=true-headless-unavailable`。
+
+证据措辞必须保守。`confirmed`、`ready` 或“口径已明确”只能用于有 source、owner 或 checker evidence 支撑的具体 claim。`source-candidate`、`external-research`、`assumption`、degraded facts 和 checker presence-only facts 必须保持标注，不能被说成 confirmed truth。
+
+`write_mode=checkpoint-prd` 是 non-ready recovery，不是 planning handoff。它必须说明 `can_enter_spec-plan: no`、`next_owner_question` 或下一条 source question，并保持 `readiness_outcome=revise-prd` 或 `readiness_outcome=ask-owner`。最终 closeout 应展示 finalize/checker summary：finding count、blocking `reason_codes`、receipt status 和 `readiness_outcome`，并区分 script-owned facts 与 LLM-owned readiness judgment。
+
 ## Progressive Detail Ladder
 
 流程按风险渐进展开，避免所有 PRD 都走最重路径。
@@ -414,7 +426,7 @@ user-repo/
 | --- | --- | --- |
 | `$spec-prd` | 写作或 refine PRD 时 | 校准术语、识别历史决策约束、发现需求 claim 与现有上下文冲突；输出仍先落在 PRD-local sections |
 | `$spec-plan` | 从 PRD 进入实施计划时 | 消费 PRD 中的 context/ADR source refs，避免重新发明术语、scope boundary、架构约束和 hard decision；`Planning Recheck` 项仍是 producer-side advisory handoff，只有被 planning 重新读取、重跑或 owner/source 确认后才可当作 confirmed truth |
-| standalone `write-tasks` | 从 plan 派生 task pack 时 | 保留计划中已经确认的术语、决策和非目标，避免任务拆分时丢掉上下文 |
+| `write-tasks` public workflow | 从 plan 派生 task pack 时 | 保留计划中已经确认的术语、决策和非目标，避免任务拆分时丢掉上下文 |
 | `$spec-work` | 实现阶段 | 在代码变更前读取相关 context/ADR，确认实现没有违背领域语言、source-of-truth、runtime/source 边界或既有决策 |
 | `$spec-doc-review` | review PRD、plan 或 task 文档时 | 检查文档是否与稳定术语、ADR、scope boundary 冲突，或是否遗漏必须传递给下游的决策后果 |
 | `$spec-code-review` | review 代码 diff 时 | 检查代码是否违反已确认的领域边界、命名、数据 ownership、runtime/source 决策或已记录 trade-off |
@@ -459,4 +471,4 @@ user-repo/
 
 “我判断它是规划期并行项”不是合法 disposition——这正是过去把未确认接口/权限问题自降级为非阻塞却从未问 owner 的失败形态。`blocks_planning=no` 必须由合法 disposition 派生,没有“随手判非阻塞”的自由。
 
-实操:先 source-first 把能查的查掉,把不可约的 owner 决策攒到最后一次性做成决策就绪 Brief(决策 | 推荐答案 | 影响的写入目标 | 不答会让规划发明什么)再问 owner;owner 不在场/headless 时只能停在 `checkpoint-prd`,不能自行标 ready。脚本只做确定性结构检查(token 与证据格是否在),不替你判断问题是否重要——语义仍由你和 owner 承担。
+实操:先 source-first 把能查的查掉,把不可约的 owner 决策整理成决策就绪 Brief(决策 | 推荐答案 | 影响的写入目标 | 不答会让规划发明什么),用于排序和预览;真正问 owner 时仍按最高风险项一次只问一个 source-backed question,等待回复,并把该回复绑定到对应 Owner Decision Trace 行。一个全局 Brief 或批量回复不能一次关闭多个 `owner-*` OQ。owner 不在场/headless 时只能停在 `checkpoint-prd`,不能自行标 ready。脚本只做确定性结构检查(token 与证据格是否在),不替你判断问题是否重要——语义仍由你和 owner 承担。

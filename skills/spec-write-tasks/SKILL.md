@@ -7,6 +7,8 @@ description: "Compile a settled spec-plan into an optional derived task pack for
 
 `spec-write-tasks` is an optional derived layer between `spec-plan` and `spec-work`. It does not execute code. It either compiles a settled source plan into a derived task pack, validates an existing task pack, or returns a no-task-pack decision.
 
+It is a public workflow: Claude entrypoint `/spec:write-tasks`, Codex entrypoint `$spec-write-tasks`.
+
 ## Purpose
 
 Decide whether a derived task pack is worthwhile, compile one when it reduces execution risk or context load, and validate existing task packs before they reach `spec-work`.

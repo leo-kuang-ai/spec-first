@@ -275,7 +275,7 @@ describe('spec-prd workflow contracts', () => {
   test('entrypoint exposes compact workflow contract summary and decision-tree intake', () => {
     const text = read(SKILL_PATH);
     // 入口锚点窗口:保留到 Phase 0 compact decision tree 结束。
-    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 170).join('\n');
+    const entrypointHeadLines = text.split(/\r?\n/).slice(0, 190).join('\n');
     const phaseOne = extractMarkdownSection(text, '### Phase 1: Current-State Analysis');
 
     expect(text).toContain('name: spec-prd');
@@ -541,6 +541,77 @@ describe('spec-prd workflow contracts', () => {
     expect(skill).not.toContain('grill_depth_state');
   });
 
+  test('user-visible execution UX protocol exposes progress without adding workflow state', () => {
+    const skill = read(SKILL_PATH);
+    const template = read(OUTPUT_TEMPLATE_PATH);
+    const readiness = read(READINESS_PATH);
+    const userManual = read(USER_MANUAL_PATH);
+
+    expectContainsAll(skill, [
+      '## User-Visible Execution UX Protocol',
+      'run-local presentation discipline for `$spec-prd`',
+      'reuses the Decision Card, task-list-first discipline, `write_mode`, `question_delivery`, `clarification_evidence`, `readiness_outcome`, finalize, and checker fields',
+      'It is not a progress ledger, run artifact, transcript schema, phase-status enum, central state machine, public workflow entrypoint, second PRD artifact topology, or permission to edit generated runtime mirrors.',
+      'begin with a short broadcast',
+      'the run goal, input posture, expected PRD artifact posture, and hard boundaries',
+      'no implementation work, no implementation plan, source-first edits only, and no hand edits to `.claude/`, `.codex/`, or `.agents/skills/` generated mirrors',
+      'Before any durable Phase 1+ action, show a visible task list',
+      'load-bearing OQ or source/evidence work',
+      'PRD write target/section work',
+      'the next owner question when one exists',
+      'finalize/checker gap before closeout',
+      'Keep status updates short and evidence-aware',
+      'Do not dump a transcript-like log',
+      'do not imitate fake tool output such as "Ran command"',
+      'Before the first durable PRD Write, show the compact Decision Card in conversation',
+      '`write_mode`, `highest_risk_gap`, `next_action`, and `why planning will not invent WHAT`',
+      'question_delivery=chat-fallback',
+      'ask one source-backed owner question, and wait',
+      'Do not call that path `question_delivery=true-headless-unavailable`',
+      'Distinguish `confirmed-source`, `user-stated`, `source-candidate`, `external-research`, `assumption`, degraded facts, and checker-owned facts',
+      'Do not use "confirmed", "ready", or "口径已明确" unless source, owner, or checker evidence supports the specific claim',
+      '`source-candidate`, `external-research`, `assumption`, and degraded facts stay labeled and must not be presented as confirmed truth',
+      'For `write_mode=checkpoint-prd`, present it as non-ready recovery',
+      'state `can_enter_spec-plan: no`, name `next_owner_question` or the next source question',
+      'do not recommend planning',
+      'finding count, blocking `reason_codes`, receipt status, and `readiness_outcome`',
+      'Keep script-owned facts separate from the LLM-owned readiness judgment',
+    ]);
+    expectContainsAll(template, [
+      'finalize/checker finding count',
+      'finalize/checker blocking reason_codes',
+      'producer receipt status',
+      'readiness_outcome',
+      'finding count, blocking reason_codes, and producer receipt status',
+      'For `write_mode=checkpoint-prd`, closeout wording must remain non-ready recovery',
+      'repeat `can_enter_spec-plan: no`, name `next_owner_question` or the next source question',
+      'A checkpoint may preserve recoverable context, but it is not a final PRD and not a planning handoff',
+    ]);
+    expectContainsAll(readiness, [
+      'Closeout must show the finalize/checker summary facts before any planning handoff',
+      'finding count, blocking `reason_codes`, producer receipt status, and the LLM-owned `readiness_outcome`',
+      'Treat finding count, reason_codes, and receipt status as script-owned facts',
+      'treat `readiness_outcome`, `Resolved before planning`, `Still carried`, and whether planning would invent WHAT as LLM-owned judgment above those facts',
+      'Do not call source-candidate, assumption, external-research, degraded, or checker-presence-only evidence "confirmed", "ready", or "口径已明确"',
+    ]);
+    expectContainsAll(userManual, [
+      '## 用户可见执行 UX',
+      '用户应先看到一段短播报',
+      '本轮目标、输入姿态、预计输出的 PRD artifact 姿态，以及硬边界',
+      'Phase 1 之后的 durable action 前，应有可见任务清单或轻量编号列表',
+      '写入 PRD 前，应看到 compact Decision Card',
+      '`question_delivery=chat-fallback`',
+      '一次只问一个 source-backed owner question',
+      '`write_mode=checkpoint-prd` 是 non-ready recovery，不是 planning handoff',
+      '最终 closeout 应展示 finalize/checker summary',
+      '区分 script-owned facts 与 LLM-owned readiness judgment',
+    ]);
+    expect(skill).not.toContain('must create a progress ledger');
+    expect(skill).not.toContain('must write a transcript schema');
+    expect(skill).not.toContain('must add a phase-status enum');
+    expect(skill).not.toContain('must create a central state machine');
+  });
+
   test('evidence and topology reference preserves source truth and system-shape boundaries', () => {
     const reference = read(EVIDENCE_TOPOLOGY_PATH);
 
@@ -605,6 +676,7 @@ describe('spec-prd workflow contracts', () => {
     const domainLanguage = read(DOMAIN_LANGUAGE_PATH);
     const grillIntegration = read(GRILL_WITH_DOCS_INTEGRATION_PATH);
     const skill = read(SKILL_PATH);
+    const template = read(OUTPUT_TEMPLATE_PATH);
 
     expectContainsAll(domainLanguage, [
       'Source-First Questioning',
@@ -670,6 +742,21 @@ describe('spec-prd workflow contracts', () => {
       'hard to reverse',
       'surprising without context',
       'reflects a real tradeoff',
+    ]);
+    expectContainsAll(skill, [
+      '**Push-Right owner checkpoint (Brief).**',
+      'as an ordering/preview Brief, not as permission to batch-close owner questions',
+      'submit only the current highest-risk source-backed owner decision',
+      'wait for the reply',
+      'bind that specific answer to its own Owner Decision Trace row',
+      'A single global Brief or batch answer cannot close multiple `owner-*` OQs at once',
+      'each `owner-*` OQ must point at its own bound row',
+    ]);
+    expectContainsAll(template, [
+      'as a decision ordering/preview Brief, not as a batch question',
+      'owner interaction still happens one source-backed decision at a time',
+      'ask the current highest-risk item, wait for the reply',
+      'Do not use one global Brief reply to close multiple `owner-*` OQs',
     ]);
     expectContainsAll(grillIntegration, [
       'Embedded Upstream Source Snapshot',
@@ -1275,6 +1362,8 @@ describe('spec-prd workflow contracts', () => {
       'direct-route-out',
       'no-fixed-cap',
       'requirement-analysis-gate',
+      'execution-ux',
+      'push-right-brief',
     ]);
     expectQualityBuckets(examples, [
       'brownfield-create',
@@ -1340,6 +1429,23 @@ describe('spec-prd workflow contracts', () => {
         'Requirement Interaction Analysis catches conflict',
         'checker must not gain semantic blockers',
       ],
+    });
+    expectEvalCase(examples, 'execution-ux-protocol-skipped-rejected', {
+      tags: ['execution-ux', 'readiness', 'failure'],
+      expected: [
+        'visible execution UX starts with a short broadcast and task-list-first',
+        'compact Decision Card (write_mode, highest_risk_gap, next_action, why planning will not invent WHAT)',
+        'closeout reports finalize/checker finding count, blocking reason_codes, receipt status, and readiness_outcome',
+        'script-owned facts stay separate from LLM-owned readiness judgment',
+      ],
+    });
+    expect(findEvalCase(examples, 'execution-ux-protocol-skipped-rejected')).toMatchObject({
+      case_type: 'failure',
+      quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
+      must_not: expect.arrayContaining([
+        'must not say 口径已明确, confirmed, or ready without source, owner, or checker evidence',
+        'must not close out without finalize/checker summary',
+      ]),
     });
     expect(examples.case_contract.sentinel_cases).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -1739,6 +1845,22 @@ describe('spec-prd workflow contracts', () => {
         'a branch stops only at a Canonical stop point (leaf, source-resolved, owner-capped, how-pushdown)',
         'not ready-for-planning until every load-bearing branch reaches a Canonical stop point',
       ],
+    });
+    expectEvalCase(examples, 'push-right-brief-batch-owner-close-rejected', {
+      tags: ['readiness', 'grill-quality', 'one-question-at-a-time'],
+      expected: [
+        'the Brief is only a run-local ordering and preview surface',
+        'owner interaction still asks one highest-risk source-backed owner decision at a time and waits for feedback',
+        'a global Brief reply cannot close multiple owner-* OQs at once',
+      ],
+    });
+    expect(findEvalCase(examples, 'push-right-brief-batch-owner-close-rejected')).toMatchObject({
+      case_type: 'failure',
+      quality_buckets: expect.arrayContaining(['failure', 'readiness-fail']),
+      must_not: expect.arrayContaining([
+        'must not send multiple owner decisions as one batch question',
+        'must not use one global Brief reply to close multiple owner-* OQs',
+      ]),
     });
     expectEvalCase(examples, 'requirements-grill-context-artifact-triggered', {
       tags: ['boundary', 'grill-with-docs'],

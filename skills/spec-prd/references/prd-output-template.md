@@ -353,7 +353,7 @@ Use brownfield increment examples, not 0-1 expansion examples:
 
 ### Push-Right Owner Checkpoint (Brief)
 
-Resolve every source-answerable gap first (relentless, one question at a time against repo/docs/API). Defer the irreducible owner decisions to the rightmost checkpoint and present them as one decision-ready Brief, not a stream of interruptions and not the full draft. Each Brief item: `decision | recommended answer | affected PRD write target | what planning would invent if unanswered`. The owner's replies become the `owner-answered` rows in Owner Decision Trace. The Brief is run-local (no new artifact); its only durable residue is the trace. Review speed matters — a fast, decision-ready Brief is genuine engagement, a wall of raw draft is not.
+Resolve every source-answerable gap first (relentless, one question at a time against repo/docs/API). Defer the irreducible owner decisions to the rightmost checkpoint as a decision ordering/preview Brief, not as a batch question. Each Brief item: `decision | recommended answer | affected PRD write target | what planning would invent if unanswered`. The Brief is run-local (no new artifact); its only durable residue is the trace. Review speed matters — a concise, decision-ready Brief is genuine engagement, a wall of raw draft is not. However, owner interaction still happens one source-backed decision at a time through the platform blocking question tool or `question_delivery=chat-fallback`: ask the current highest-risk item, wait for the reply, write the matching `owner-answered` row in Owner Decision Trace, then continue if another item remains. Do not use one global Brief reply to close multiple `owner-*` OQs.
 
 ## PRD Quality Diagnosis And Optimization
 
@@ -593,10 +593,16 @@ Every PRD handoff should report:
 - uncovered requirements
 - feature items without acceptance examples
 - current-state claims without confirmed evidence
+- finalize/checker finding count
+- finalize/checker blocking reason_codes
+- producer receipt status
+- readiness_outcome
 
 When a PRD artifact path exists, run `skills/spec-prd/scripts/finalize-prd-artifact.js <prd-path> --inputs <input-path>` before confirmed ready closeout; use `--inputs-from-frontmatter` only when `source_inputs:` / legacy `prd_input:` already lists the same locatable input files, and use `--check-only` for preview. The finalize path seeds deterministic counts and trace facts from `check-prd-artifact.js` before any LLM-owned readiness judgment such as `Resolved before planning`, `Still carried`, and whether planning would still have to invent WHAT. Use `preflight_sweep_closure` to state whether the Phase 1 Requirement Analysis Gate closed, degraded, blocked, or is missing; this is a lightweight compatibility declaration in the existing `Readiness Self-Check`, not a second PRD artifact topology.
 
-The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, and feature-to-R/AE trace gaps. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
+The script seeds only the deterministic lines: sections included, requirement count, acceptance example count, priority distribution, NFR count, assumption count, outstanding question count, uncovered requirements, feature-to-R/AE trace gaps, finding count, blocking reason_codes, and producer receipt status. The lines `Resolved before planning`, `Still carried`, `planning recheck item count`, `current-state claims without confirmed evidence`, `readiness_outcome`, and whether planning would still have to invent WHAT stay LLM-owned: the checker intentionally does not and must not compute them, because deciding which sentence is a load-bearing source-candidate recheck item or current-state claim and whether its evidence genuinely confirms is semantic (the script reports `evidence_tags_present` by presence only, not sufficiency).
+
+For `write_mode=checkpoint-prd`, closeout wording must remain non-ready recovery: repeat `can_enter_spec-plan: no`, name `next_owner_question` or the next source question, keep `readiness_outcome=revise-prd` or `readiness_outcome=ask-owner`, and do not recommend planning. A checkpoint may preserve recoverable context, but it is not a final PRD and not a planning handoff.
 
 When `## Feature Slices` is present, or when PRD complexity was explicitly evaluated for slice need, additionally report:
 

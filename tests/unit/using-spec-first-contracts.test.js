@@ -212,7 +212,7 @@ describe('using-spec-first contracts', () => {
       '/spec:plan',
       '$spec-plan',
       'spec-write-tasks',
-      'not a `/spec:*` or `$spec-*` workflow entrypoint',
+      'public optional derived workflow between plan and work',
       '/spec:work',
       '$spec-work',
       'Ordinary execution-ready work routes to the stable work entrypoint.',

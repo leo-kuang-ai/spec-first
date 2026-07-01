@@ -611,8 +611,8 @@ describe('spec-work host entrypoint contract', () => {
     expect(text).toContain('current host\'s brainstorm or plan entrypoint');
     expect(text).toContain('If the input is a bare prompt and the product WHAT is unclear, recommend the current host\'s brainstorm entrypoint');
     expect(text).toContain('If the desired outcome is clear but no settled plan exists, return to the current host\'s plan entrypoint');
-    expect(text).toContain('offer the standalone `spec-write-tasks` diversion once');
-    expect(text).toContain('Do not describe task compilation as a command-backed workflow entrypoint');
+    expect(text).toContain('offer the current host\'s `spec-write-tasks` public workflow diversion once');
+    expect(text).toContain('Describe task compilation with the current host\'s write-tasks public workflow entrypoint');
     expect(text).toContain('If execution discovers scope beyond the plan/task pack');
     expect(text).toContain('Do not expand scope in place.');
     expect(text).toContain('Do not invent human-time phases');
@@ -621,9 +621,9 @@ describe('spec-work host entrypoint contract', () => {
     expect(text).not.toContain('/spec:brainstorm` / `/spec:plan` on Claude Code');
     expect(text).not.toContain('$spec-brainstorm` / `$spec-plan` on Codex');
     expect(text).not.toContain('current host\'s plan entrypoint (`/spec:plan` on Claude Code, `$spec-plan` on Codex)');
-    expect(text).not.toContain('/spec:write-tasks');
     expect(text).not.toContain('/spec:spec-write-tasks');
-    expect(text).not.toContain('$spec-write-tasks');
+    expect(text).not.toContain('/spec:write-tasks` on Claude Code');
+    expect(text).not.toContain('$spec-write-tasks` on Codex');
   });
 
   test('gives users a compact handoff when execution cannot continue safely', () => {

@@ -133,7 +133,7 @@
         "The output sets dispatch_authorization: missing unless the parent workflow or user explicitly authorized the continuation."
       ],
       "objective_assertions": [
-        "No document-review continuation runs solely because this standalone skill was triggered.",
+        "No document-review continuation runs solely because the public write-tasks workflow was invoked.",
         "The returned envelope exposes dispatch_authorization and reason_code."
       ],
       "deterministic_assertions": [

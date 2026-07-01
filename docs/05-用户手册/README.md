@@ -72,7 +72,7 @@ mcp-setup
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
 ```
 
-这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由入口治理推荐一个公开 workflow。`write-tasks` 是 standalone skill，不是 `/spec:*` 或 `$spec-*` command-backed workflow。
+这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由入口治理推荐一个公开 workflow。`write-tasks` 是可选派生 workflow：Claude 使用 `/spec:write-tasks`，Codex 使用 `$spec-write-tasks`；它不替代 source plan，也不是强制阶段。
 
 当外部工具或 setup facts 缺失时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation；不要把缺失证据包装成成功证据，也不要把 setup 当成所有 workflow 的硬前置。
 

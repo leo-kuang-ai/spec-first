@@ -197,7 +197,7 @@ describe('spec-write-tasks contracts', () => {
     expect(handoff).toContain('validity_scope: identity-freshness-structure-only');
     expect(handoff).toContain('spec-first tasks validate <task-pack-path> --json');
     expect(handoff).toContain('spec-first tasks hash <plan-path>');
-    expect(handoff).toContain('a standalone skill trigger alone is not dispatch authorization');
+    expect(handoff).toContain('invoking the public write-tasks workflow alone is not document-review dispatch authorization');
     expect(handoff).toContain('This is bounded auto-continuation, not general workflow chaining');
     expect(handoff).toContain('copy-ready current-host document-review invocation');
     expect(handoff).toContain('This shared reference owns the handoff semantics, not the per-host entrypoint mapping.');

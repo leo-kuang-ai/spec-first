@@ -27,7 +27,7 @@ function testGovernance() {
       },
       {
         skill_name: 'spec-write-tasks',
-        entry_surface: 'standalone_skill',
+        entry_surface: 'workflow_command',
       },
       {
         skill_name: 'spec-work',
@@ -74,41 +74,23 @@ describe('lint skill entrypoints', () => {
     ]);
   });
 
-  test('blocks spec-write-tasks positive command entrypoint aliases', () => {
+  test('allows spec-write-tasks public workflow command aliases', () => {
     const config = testConfig();
     const governance = testGovernance();
     const rules = buildRules(config, governance);
     const slashCommand = '/spec:write-tasks';
-    const sourceSlashCommand = '/spec:spec-write-tasks';
     const codexCommand = '$spec-write-tasks';
 
     const findings = analyzeContent(
       [
         `Route users to \`${slashCommand}\`.`,
-        `Invoke \`${sourceSlashCommand}\`.`,
         `Use \`${codexCommand}\`.`,
       ].join('\n'),
       'fixture.md',
       { config, governance, rules },
     );
 
-    expect(findings).toEqual([
-      expect.objectContaining({
-        ruleId: 'standalone-command-entrypoint',
-        severity: 'error',
-        line: 1,
-      }),
-      expect.objectContaining({
-        ruleId: 'standalone-command-entrypoint',
-        severity: 'error',
-        line: 2,
-      }),
-      expect.objectContaining({
-        ruleId: 'standalone-command-entrypoint',
-        severity: 'error',
-        line: 3,
-      }),
-    ]);
+    expect(findings).toEqual([]);
   });
 
   test('allows public workflow command prose for workflow-command skills', () => {
