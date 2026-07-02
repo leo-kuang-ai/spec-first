@@ -33,10 +33,9 @@ describe('spec-first gitignore policy', () => {
     expect(patterns).toContain('.spec-first/config/*.json');
     expect(patterns).toContain('.spec-first/governance/');
     expect(patterns).toContain('.codegraph/');
-    expect(patterns).toContain('graphify-out/cost.json');
-    expect(patterns).toContain('graphify-out/.graphify_python');
-    expect(patterns).not.toContain('graphify-out/');
-    expect(patterns).not.toContain('graphify-out/cache/');
+    expect(patterns).toContain('graphify-out/');
+    expect(patterns).not.toContain('graphify-out/cost.json');
+    expect(patterns).not.toContain('graphify-out/.graphify_python');
     expect(patterns).not.toContain('.spec-first/standards/');
     expect(patterns).toContain('.spec-first/sessions/');
     expect(patterns).not.toContain('.claude/');
@@ -121,8 +120,8 @@ describe('spec-first gitignore policy', () => {
     const block = buildSpecFirstGitignoreBlock();
 
     expect(manual).toContain(`\`\`\`gitignore\n${block}\n\`\`\``);
-    expect(manual).toContain('Graphify 官方实践允许团队提交它以共享 map');
-    expect(manual).toContain('不忽略整个目录');
+    expect(manual).toContain('Graphify provider 的项目图谱运行时目录，默认不提交');
+    expect(manual).toContain('默认整体忽略，不提交');
     expect(block).not.toContain('.direct-source-evidence/');
     expect(block).not.toContain('.code-review-graph/');
     expect(block).not.toContain('.spec-first-graph/');
@@ -135,6 +134,7 @@ describe('spec-first gitignore policy', () => {
 
     expect(rootGitignore).toContain('.spec-first/ci/');
     expect(rootGitignore).toContain('.claude/settings.local.json');
+    expect(rootGitignore).not.toContain('\n.agents/\n');
     expect(block).not.toContain('.spec-first/ci/');
     expect(block).not.toContain('.claude/settings.local.json');
   });

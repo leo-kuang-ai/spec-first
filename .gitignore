@@ -25,8 +25,8 @@ yarn-error.log*
 .history/
 .serena/
 .worktrees/
-.claude/tasks/
 .claude/settings.local.json
+.claude/*.lock
 .playwright-mcp/
 /*-loop.md
 /*-userskuang*.txt
@@ -36,37 +36,12 @@ yarn-error.log*
 # 外部 CLI 工具运行日志（如 nb / hst-mcp），不属于 spec-first 仓库源码
 logs/
 
-# Generated runtime assets in this repo checkout
-.claude/commands/spec/
-.claude/skills/
-.claude/spec-first/
-.claude/agents/
-.claude/hooks/session-start
-.claude/hooks/spec-plan-guard
-.claude/hooks/prd-readiness-guard
-.claude/*.lock
-.codex/
-.agents/
-.context/spec-first/
-
-# Generated spec-first local config and workflow runtime artifacts
-# These files are runtime facts; verify presence/schema with setup scripts, not git status.
-.spec-first/config.local.yaml
+# spec-first repo-local runtime artifacts not covered by the init managed block
 .spec-first/verification-profile.local.json
-.spec-first/config/*.json
-.spec-first/audits/
-.spec-first/governance/
-.spec-first/app-audit/
-.spec-first/workflows/
-.spec-first/workspace/
-.spec-first/sessions/
 .spec-first/ci/
 .spec-first/cache/
 .spec-first/tools/
 .spec-first/tmp-review/
-
-# Provider runtime data (CodeGraph daemon db/log) — runtime facts, not source
-.codegraph/
 
 # Published/package artifacts
 *.tgz
@@ -105,10 +80,8 @@ __pycache__/
 
 # optional provider local artifacts
 .codegraph/
-graphify-out/cost.json
-graphify-out/.graphify_python
+graphify-out/
 # spec-first:end
 
 # local-only provider artifacts and session logs (not managed by spec-first init)
-graphify-out/
 *command-message*.txt

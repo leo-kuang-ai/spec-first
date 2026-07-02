@@ -349,7 +349,7 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
         review_required: Boolean(provider.safety && provider.safety.review_required),
         install_effect: provider.safety && provider.safety.install_effect,
         usage_display: '$graphify . / /graphify . after the provider project skill is installed; setup uses the resolved CLI path for extract/update/query/hook operations and reports when bare graphify is not on PATH.',
-        gitignore_policy: 'spec-first init managed block ignores .codegraph/, graphify-out/cost.json, and graphify-out/.graphify_python; setup does not auto-add, auto-commit, or auto-ignore the whole graphify-out/ directory.',
+        gitignore_policy: 'spec-first init managed block ignores .codegraph/ and the whole graphify-out/ provider artifact directory; setup does not auto-add, auto-commit, or promote Graphify output to source truth.',
         ...safety,
       };
     });
