@@ -31,7 +31,7 @@ The first thing to evaluate is not an agent count or a prompt library. It is whe
 
 The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
 
-<sub>Simulated demo path: install → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
+<sub>Simulated demo path: install → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; mcp-setup is the readiness/setup step to run when helper or MCP facts are missing, debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
 
 ## Quickstart
 
@@ -81,6 +81,8 @@ Select your host (Claude Code and/or Codex), confirm your developer name and lan
 
 Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, or `.agents/skills/`. Generated copies can be rebuilt any time with `spec-first init`.
 
+If the host reports missing helper or MCP readiness facts, run `/spec:mcp-setup` in Claude Code or `$spec-mcp-setup` in Codex before continuing.
+
 For all init options (flags, scripted mode, multi-repo), see the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md).
 
 **Step 3 — Restart the host**
@@ -119,7 +121,7 @@ For subsequent tasks, use this quick route to pick the right entrypoint:
 | A settled plan, task pack, or scoped implementation request | `/spec:work` or `$spec-work` |
 | A document, plan, task pack, diff, or implementation that needs review | `/spec:doc-review`, `$spec-doc-review`, `/spec:code-review`, or `$spec-code-review` |
 
-Detailed walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
+Detailed manuals are Chinese-first; this README is the English quick path. Walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
 
 ## What You Get
 
@@ -127,9 +129,11 @@ A typical workflow chain produces these repo-local artifacts:
 
 ```text
 docs/
+  ideation/      ranked ideas and exploration notes
   brainstorms/   requirements briefs and PRD-grade requirements
   plans/         implementation plans ready for review and execution
   tasks/         derived task packs for structured handoff
+  reviews/       document and code review findings
   solutions/     reusable learnings after solving problems
 .spec-first/
   workflows/     structured work closeout evidence (gitignored by default)
@@ -146,12 +150,13 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 | Requirements from a rough idea | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` |
 | Requirements from an existing PRD | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` |
 | Implementation plan | `/spec:plan` | `$spec-plan` | `docs/plans/` |
+| Split a plan into executable tasks | `/spec:write-tasks` | `$spec-write-tasks` | `docs/tasks/` |
 | Execute scoped work | `/spec:work` | `$spec-work` | source changes + evidence |
 | Review code | `/spec:code-review` | `$spec-code-review` | structured findings |
 | Review docs or plans | `/spec:doc-review` | `$spec-doc-review` | structured findings |
 | Capture reusable learning | `/spec:compound` | `$spec-compound` | `docs/solutions/` |
 
-Support entrypoints (on demand): `/spec:mcp-setup` (runtime environment plus required harness and MCP/helper readiness), `/spec:debug`, `/spec:optimize`, `/spec:ideate`, `/spec:write-tasks`, `/spec:compound-refresh`, `/spec:polish-beta`, `/spec:write-skill`.
+Support entrypoints (on demand): `/spec:mcp-setup` (runtime environment plus required harness and MCP/helper readiness), `/spec:debug`, `/spec:optimize`, `/spec:ideate`, `/spec:compound-refresh`, `/spec:polish-beta`, `/spec:write-skill`.
 
 [→ Full entrypoint reference with routing rules](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 

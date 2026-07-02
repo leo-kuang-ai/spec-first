@@ -31,7 +31,7 @@
 
 最小成功信号是具体可检查的：安装和 init 后，在宿主里运行一个 workflow，然后查看它写入仓库的 Markdown artifact，通常位于 `docs/brainstorms/` 或 `docs/plans/`。更深的治理内容可以稍后再读；第一次试用先确认工作是否变得可检查。
 
-<sub>模拟演示路径：安装 → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound；debug 作为测试失败或根因不明时的旁路循环，并在仓库中留下可检查的 Markdown artifacts。动画源文件：[spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)。</sub>
+<sub>模拟演示路径：安装 → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound；mcp-setup 是 helper 或 MCP readiness facts 缺失时运行的准备步骤，debug 作为测试失败或根因不明时的旁路循环，并在仓库中留下可检查的 Markdown artifacts。动画源文件：[spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)。</sub>
 
 ## 快速开始
 
@@ -81,6 +81,8 @@ spec-first init
 
 预期结果：init 列出 `.claude/`、`.codex/` 或 `.agents/skills/` 下的生成路径，并确认 setup 完成。生成的 runtime copies 随时可通过 `spec-first init` 重建。
 
+如果宿主提示缺少 helper 或 MCP readiness facts，继续前先在 Claude Code 运行 `/spec:mcp-setup`，或在 Codex 运行 `$spec-mcp-setup`。
+
 所有 init 选项（flags、脚本模式、多仓库）见 [完整快速开始指南](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)。
 
 **步骤 3 — 重启宿主**
@@ -127,9 +129,11 @@ docs/brainstorms/YYYY-MM-DD-NNN-<topic>-requirements.md
 
 ```text
 docs/
+  ideation/      ranked ideas 与探索记录
   brainstorms/   requirements briefs 与 PRD 级需求
   plans/         可评审、可执行的 implementation plans
   tasks/         结构化 handoff 用 derived task packs
+  reviews/       文档与代码审查 findings
   solutions/     解决问题后沉淀的可复用经验
 .spec-first/
   workflows/     structured work closeout evidence（默认 gitignore）
@@ -146,12 +150,13 @@ docs/
 | 从粗略想法提炼需求 | `/spec:brainstorm` | `$spec-brainstorm` | `docs/brainstorms/` |
 | 从已有 PRD 提炼需求 | `/spec:prd` | `$spec-prd` | `docs/brainstorms/` |
 | 制定实现计划 | `/spec:plan` | `$spec-plan` | `docs/plans/` |
+| 将计划拆成可执行任务 | `/spec:write-tasks` | `$spec-write-tasks` | `docs/tasks/` |
 | 执行有范围的工作 | `/spec:work` | `$spec-work` | 源码变更 + 证据 |
 | 代码审查 | `/spec:code-review` | `$spec-code-review` | 结构化 findings |
 | 文档/计划审查 | `/spec:doc-review` | `$spec-doc-review` | 结构化 findings |
 | 沉淀可复用经验 | `/spec:compound` | `$spec-compound` | `docs/solutions/` |
 
-支撑入口（按需触发）：`/spec:mcp-setup`（runtime 环境与必备 harness、MCP/helper readiness）、`/spec:debug`、`/spec:optimize`、`/spec:ideate`、`/spec:write-tasks`、`/spec:compound-refresh`、`/spec:polish-beta`、`/spec:write-skill`。
+支撑入口（按需触发）：`/spec:mcp-setup`（runtime 环境与必备 harness、MCP/helper readiness）、`/spec:debug`、`/spec:optimize`、`/spec:ideate`、`/spec:compound-refresh`、`/spec:polish-beta`、`/spec:write-skill`。
 
 [→ 完整入口与路由规则](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 
