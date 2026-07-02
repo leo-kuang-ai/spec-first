@@ -40,8 +40,7 @@ const SPEC_FIRST_GITIGNORE_SECTIONS = [
     title: 'optional provider local artifacts',
     patterns: [
       '.codegraph/',
-      'graphify-out/cost.json',
-      'graphify-out/.graphify_python',
+      'graphify-out/',
     ],
   },
 ];

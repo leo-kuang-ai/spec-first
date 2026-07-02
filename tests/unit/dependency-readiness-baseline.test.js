@@ -2836,8 +2836,8 @@ exit 0
       '.claude/skills/graphify/',
       'CLAUDE.md',
     ]));
-    expect(graphify.gitignore_policy).toContain('spec-first init managed block ignores .codegraph/, graphify-out/cost.json, and graphify-out/.graphify_python');
-    expect(graphify.gitignore_policy).toContain('does not auto-add, auto-commit, or auto-ignore the whole graphify-out/ directory');
+    expect(graphify.gitignore_policy).toContain('spec-first init managed block ignores .codegraph/ and the whole graphify-out/ provider artifact directory');
+    expect(graphify.gitignore_policy).toContain('does not auto-add, auto-commit, or promote Graphify output to source truth');
     expect(graphify.will_not_do).toEqual(expect.arrayContaining([
       'will not install Graphify MCP server',
       'will not start graphify watch',
