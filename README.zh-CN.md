@@ -25,13 +25,13 @@
 
 ## 90 秒看懂
 
-![spec-first engineering loop](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.png)
+![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
 首次评估时，重点不应该是 agent 数量或 prompt 库，而是一次 workflow 是否会留下可复用的东西。健康的第一圈会给你已有的 Claude Code 或 Codex 会话加上一条可治理路径：定义问题、规划方案、必要时拆 task、执行、评审，并把经验沉淀下来。
 
 最小成功信号是具体可检查的：安装和 init 后，在宿主里运行一个 workflow，然后查看它写入仓库的 Markdown artifact，通常位于 `docs/brainstorms/` 或 `docs/plans/`。更深的治理内容可以稍后再读；第一次试用先确认工作是否变得可检查。
 
-<sub>维护的演示素材位：配图由 source-controlled SVG（[spec-first-flow.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg)）生成并转为 PNG，使其在 GitHub 和 npm 包页面都能正常显示；未来可直接替换为终端录屏，不需要重排页面结构。</sub>
+<sub>模拟演示路径：安装 → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound；debug 作为测试失败或根因不明时的旁路循环，并在仓库中留下可检查的 Markdown artifacts。动画源文件：[spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)。</sub>
 
 ## 快速开始
 
