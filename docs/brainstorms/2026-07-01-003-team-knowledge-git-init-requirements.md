@@ -1,34 +1,51 @@
-# Team Knowledge Git Init 优化版需求
-
-```yaml
-date: 2026-07-01
-topic: team-knowledge-git-init
-spec_id: 2026-07-01-003-team-knowledge-git-init
-status: ready-for-planning
-version: v1-optimized
-```
-
 ---
+date: "2026-07-01"
+topic: team-ai-knowledge-repository
+spec_id: 2026-07-01-003-team-knowledge-git-init
+artifact_kind: prd-requirements
+status: draft
+version: v2-team-knowledge-focused
+write_mode: checkpoint-prd
+can_enter_spec_plan: no
+clarification_evidence: asked-owner
+preflight_sweep_closure: degraded
+next_owner_question: "先联动决策 CF1（adoptions.yaml 复用 team-standards enum 还是独立 surface）与 CF4（adoption 子系统是否整体 defer 到 v2），再决策 CF2（新 resolver 扩展还是替换既有 spec-learnings-researcher 召回路径）。"
+source_inputs:
+  - docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md
+  - docs/contracts/team-standards.md
+  - docs/contracts/knowledge/knowledge-harness.md
+  - docs/adr/0001-init-owns-limited-user-language-sync.md
+  - docs/brainstorms/2026-06-19-001-docs-solutions-recall-activation-layer-requirements.md
+---
+
+# Team AI Knowledge Repository 需求
 
 ## 1. Summary
 
-为 `spec-first init` 增加一个可选的团队公共知识 Git 源加载能力。
+本需求当前主焦点收敛为 **团队 AI 辅助研发知识库本身**，而不是 `spec-first init` 的安装流程。
 
-用户在首次初始化业务项目时，可以显式输入团队知识仓库 Git URL、ref 和要启用的知识包。`spec-first` 将团队知识仓库 clone 到用户级全局目录的一份共享 checkout，并在业务项目中写入可提交的 `docs/knowledge/sources.yaml`。后续 workflow 运行时，通过项目 `sources.yaml` 和用户级 `~/.spec-first/knowledge/registry.json` 找到本机知识 checkout，再通过统一 Knowledge Intake Resolver 按任务画像加载少量高相关 advisory cards。
+团队知识库不是普通 Wiki，而是给 AI 辅助研发使用的团队工程记忆库。它的首要目标是让 AI 在需求拆解、计划、开发、评审和排障这些关键节点，想起团队过去已经踩过的坑、已经确认过的开发规范、以及必须回到当前项目证据验证的检查点。
 
-v1 目标不是建设完整知识平台，也不是把团队知识强制注入所有项目，而是建立一个最小闭环：
+`spec-first init`、用户级 checkout、项目 `docs/knowledge/sources.yaml` 和 Knowledge Intake Resolver 都只是这套团队知识库的接入和消费机制。它们不拥有知识本身，也不应该让安装流程压过知识库的内容质量、治理质量和 AI 消费边界。
+
+团队知识仓库的 v1 canonical layout 固定为 `catalog.yaml` + `packs/` + `taxonomy/` + `schemas/`。历史 demo 或团队可读草稿中出现的 `standards/` + `experiences/` 顶层双目录，不作为 v1 runtime resolver 的主读取路径；如保留，只能作为 examples / authoring mirror，并必须通过 `packs/<pack-id>/manifest.yaml` 显式映射进 canonical layout。
+
+v1 目标不是建设完整知识平台，也不是让 AI 搜索一堆长文，而是建立一个最小团队知识闭环：
 
 ```text
-团队知识 Git 仓库
-  → spec-first init 显式接入
-  → 用户级共享 checkout
-  → 项目级 sources.yaml 引用
-  → 统一 resolver 少量召回 advisory cards
-  → Plan / Work / Code Review / Debug 消费
-  → 运行时记录 source snapshot
+历史 Bug / Review / Debug 经验
+  → 提炼成小颗粒经验卡
+  → 按 stage / surface / domain / trigger 分类
+  → 通过 owner review 和 lifecycle 治理
+  → 存入团队知识 Git 仓库
+  → resolver 按任务画像少量召回 advisory cards
+  → Plan / Work / Code Review / Debug 使用
+  → 新问题继续沉淀回团队知识库
 ```
 
 v1 明确不做自动 pull、不写项目级 `knowledge-lock.json`、不引入 RAG / MCP / 数据库、不执行知识仓库脚本、不自动晋升 shared standard、不把业务流程和项目画像作为默认共享知识加载对象。
+
+`spec-first init` 的价值是显式接入团队知识库；团队知识库的价值是把团队研发经验变成 AI 可安全消费的高信号上下文。
 
 ---
 
@@ -44,7 +61,7 @@ recall-as-advisory
 verified promotion
 ```
 
-但目前还缺一个稳定入口，让团队公共知识库能够被业务项目发现、引用、校验和按边界消费。
+但目前真正缺的不是一个“大知识目录”，而是一套团队知识库规范，让每条知识都能被 AI 安全、少量、按任务画像消费。
 
 真实团队知识不应该打进 `spec-first` npm 包，也不应该默认复制进每个业务项目。更合适的 v1 形态是：
 
@@ -64,14 +81,14 @@ workflow 通过统一 resolver 少量加载经验卡；
 
 v1 聚焦一个可落地的最小目标：
 
-> 建立团队知识 Git 源的可发现、可校验、可引用、可解析、可追溯闭环；首批只让 Bug / Review / Debug 经验以 advisory cards 形式进入 Plan、Work、Code Review、Debug 四个核心 workflow。
+> 建立团队 AI 知识库的内容模型、目录规范、经验卡格式、分类词表、治理生命周期和 AI 消费边界；首批只让 Bug / Review / Debug 经验以 advisory cards 形式进入 Plan、Work、Code Review、Debug 四个核心 workflow。
 
 v1 重点覆盖两类知识：
 
 | 知识类型                      | v1 处理方式                                                        |
 | ------------------------- | -------------------------------------------------------------- |
 | Bug / Review / Debug 经验   | 首批支持自动召回，默认 advisory                                           |
-| 代码开发规范 / Review 规范 / 测试规范 | 支持 Git 仓结构校验、项目显式采用记录和后续 hard context 预留；v1 默认不自动 hard enforce |
+| 代码开发规范 / Review 规范 / 测试规范 | 支持 Git 仓结构校验、项目显式采用记录和后续 hard context 预留；v1 不接 runtime hard enforce |
 
 v1 不默认加载：
 
@@ -84,6 +101,18 @@ v1 不默认加载：
 ```
 
 当 workflow 需要理解业务流程时，必须优先读取当前项目代码、接口、测试、PRD、日志或 owner 输入。团队共享知识只能作为历史风险提醒，不能替代当前项目事实。
+
+### 3.1 Team Knowledge First Principle
+
+v1 的优先级必须是：
+
+```text
+1. 先定义团队知识库本身的目录、格式、分类和治理。
+2. 再定义 AI 如何按任务画像少量加载。
+3. 最后定义 spec-first init 如何显式接入。
+```
+
+不得反过来先做加载机制，再让知识内容随意生长。否则会得到一个可安装但不可治理、可检索但低信号、可召回但容易误导 AI 的知识库。
 
 ---
 
@@ -105,6 +134,9 @@ v1 不做以下事情：
 11. 不迁移、复制或集中管理项目 docs/solutions/**。
 12. 不把 shared standards 自动注入所有项目。
 13. 不把业务流程、领域 wiki 或项目画像作为默认共享知识加载对象。
+14. 不把团队知识库做成长期大文档 Wiki。
+15. 不把知识卡写成无法按 stage / surface / domain / trigger 过滤的散文。
+16. 不接收没有 owner、source_refs、invalidation_condition 和 lifecycle 的 active 知识。
 ```
 
 ---
@@ -113,29 +145,37 @@ v1 不做以下事情：
 
 | Actor                         | 说明                                                                    |
 | ----------------------------- | --------------------------------------------------------------------- |
-| A1. 项目初始化用户                   | 在业务项目中运行 `spec-first init`，决定是否加载团队公共知识库                              |
-| A2. 业务项目仓库                    | 保存团队知识源引用，不保存知识正文和本机绝对路径                                              |
+| A1. 团队知识 owner                  | 维护分类、owner、review policy、lifecycle，决定哪些知识可以 active                         |
+| A2. 知识贡献者                       | 从 Bug、review、debug 和开发规范中提炼经验卡或标准草案                                      |
 | A3. 团队知识 Git 仓库               | 保存 `catalog.yaml`、taxonomy、packs、manifest、cards，是团队知识 source-of-truth |
-| A4. 用户级 spec-first 目录         | 保存共享知识 checkout 和本机 registry                                          |
-| A5. Knowledge Intake Resolver | 统一解析 sources、registry、catalog、manifest、cards，并输出少量 advisory cards     |
-| A6. 后续 spec-first workflow    | 通过 resolver 消费知识，把 cards 作为风险提醒、检查清单或根因假设                             |
+| A4. 项目初始化用户                   | 在业务项目中运行 `spec-first init`，决定是否加载团队公共知识库                              |
+| A5. 业务项目仓库                    | 保存团队知识源引用，不保存知识正文和本机绝对路径                                              |
+| A6. 用户级 spec-first 目录         | 保存共享知识 checkout 和本机 registry                                          |
+| A7. Knowledge Intake Resolver | 统一解析 sources、registry、catalog、manifest、cards，并输出少量 advisory cards     |
+| A8. 后续 spec-first workflow    | 通过 resolver 消费知识，把 cards 作为风险提醒、检查清单或根因假设                             |
 
 ---
 
 ## 6. Key Decisions
 
-1. 团队知识仓库是独立 Git 工程，是团队知识 source-of-truth。
-2. v1 只保留 `shared-latest` 模式：同一用户机器上一份共享 checkout，多个业务项目共同引用。
-3. 业务项目只提交 `docs/knowledge/sources.yaml`，不提交本机缓存路径，不默认复制知识正文。
-4. 本机 checkout 路径只记录在 `~/.spec-first/knowledge/registry.json`。
-5. `init` 只做首次加载和 ensure，不做自动更新。
-6. cards 默认 `advisory`，不得绕过 Knowledge Harness 的 recall trust boundary。
-7. workflow 消费知识前必须先构造任务画像，至少包含 stage。
-8. v1 首批接入 resolver 的 workflow 只包括 `$spec-plan`、`$spec-work`、`$spec-code-review`、`$spec-debug`。
-9. 每次 workflow 消费团队知识时，必须记录本次 source snapshot，包括 ref、resolved commit、pack、card id、card version 和 trust。
-10. shared standard 只有经过 owner review、lifecycle active、scope 命中，并被项目显式 adoption 后，才能作为 hard context。
-11. 项目内 `docs/standards/**` 和 `docs/solutions/**` 跟随项目走；团队公共知识仓库只承载跨项目 shared standards 与 shared experiences。
-12. 共享经验只能提醒；项目经验只在当前项目 recall；跨项目强约束必须通过 standards governance 和项目显式采用。
+1. 团队知识库是核心产品；`spec-first init` 只是显式接入机制。
+2. 团队知识仓库是独立 Git 工程，是团队知识 source-of-truth。
+3. v1 canonical layout 固定为 `catalog.yaml` + `packs/` + `taxonomy/` + `schemas/`；`standards/` + `experiences/` 只能是人读草稿、demo 或迁移前镜像，不能成为 resolver 主路径。
+4. 团队知识库首批只沉淀两类知识：团队开发规范、过往 Bug / Review / Debug 经验。
+5. 每张 active 知识卡都必须有 owner、trust、lifecycle、source_refs、invalidation_condition 和任务画像字段。
+6. 经验卡必须是小颗粒、高信号、可过滤的 AI 上下文，不是长文档。
+7. v1 只保留 `shared-latest` 模式：同一用户机器上一份共享 checkout，多个业务项目共同引用。
+8. 业务项目只提交 `docs/knowledge/sources.yaml`，不提交本机缓存路径，不默认复制知识正文。
+9. 本机 checkout 路径只记录在 `~/.spec-first/knowledge/registry.json`。
+10. `init` 只做首次加载和 ensure，不做自动更新。
+11. cards 默认 `advisory`，不得绕过 Knowledge Harness 的 recall trust boundary。
+12. workflow 消费知识前必须先构造任务画像，至少包含 stage。
+13. v1 首批接入 resolver 的 workflow 只包括 `$spec-plan`、`$spec-work`、`$spec-code-review`、`$spec-debug`。
+14. 每次 workflow 消费团队知识时，必须记录本次 source snapshot，包括 ref、本地 checkout 当前 HEAD 的 resolved commit、pack、card id、card version 和 trust。
+15. source snapshot 是单次执行证据，不是远端最新证明，也不是项目级 lock；checkout 缺失、ref 不匹配、dirty 或 commit 读取失败时必须降级并输出 reason_codes，不得回写 `sources.yaml`。
+16. shared standard adoption 在 v1 只作为 schema / 配置 / conflict 输出预留，不接入 runtime hard enforce；后续如要作为 hard context，必须经过 owner review、lifecycle active、scope 命中和项目显式 adoption。
+17. 项目内 `docs/standards/**` 和 `docs/solutions/**` 跟随项目走；团队公共知识仓库只承载跨项目 shared standards 与 shared experiences。
+18. 共享经验只能提醒；项目经验只在当前项目 recall；跨项目强约束必须通过 standards governance 和项目显式采用。
 
 ---
 
@@ -237,7 +277,7 @@ workflow 可以稳定找到团队公共知识本地路径，但不会把经验�
 2. 如果具备跨项目复用价值，提炼为团队知识仓库中的 shared experience card。
 3. 如果需要成为强约束，进入 team standards governance。
 4. owner review 通过后，成为 shared standard。
-5. 项目如需 hard enforce，需要在 docs/standards/adoptions.yaml 中显式采用。
+5. 项目如需在后续版本 hard enforce，需要在 docs/standards/adoptions.yaml 中显式采用；v1 只记录 adoption 预留，不启用 runtime hard enforce。
 ```
 
 **Outcome:**
@@ -250,10 +290,10 @@ workflow 可以稳定找到团队公共知识本地路径，但不会把经验�
 | Surface                  | Path                                           | Owned by | Should record                                                                                             | Must not record                                              |
 | ------------------------ | ---------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | 用户级共享 checkout           | `~/.spec-first/knowledge/repos/<source-hash>/` | 当前开发者机器  | 团队知识 Git 仓库的一份 checkout                                                                                   | 项目启用策略、业务项目绝对路径、项目 durable knowledge                         |
-| 用户级知识 registry           | `~/.spec-first/knowledge/registry.json`        | 当前开发者机器  | `schema_version`、source id、type、规范化 Git URL、ref、source_hash、checkout_path、last_checked_at、resolved_commit | token、项目 owner 决策、项目启用列表                                     |
+| 用户级知识 registry           | `~/.spec-first/knowledge/registry.json`        | 当前开发者机器  | `schema_version`、source id、type、规范化 Git URL、ref、source_hash、checkout_path、last_checked_at、last_resolved_commit（最近一次本地 HEAD 观察值，仅诊断） | token、项目 owner 决策、项目启用列表                                     |
 | 项目级知识源配置                 | `docs/knowledge/sources.yaml`                  | 业务项目仓库   | source id、type、Git URL、ref、`load_mode: shared-latest`、启用 packs、默认 trust                                   | checkout_path、`~/.spec-first/**`、本机绝对路径、resolved commit lock |
 | 项目级 shared standard 采用记录 | `docs/standards/adoptions.yaml`                | 业务项目仓库   | 项目显式采用的 shared standard、scope、version_range、owner、enforcement                                             | 团队知识正文、本机路径                                                  |
-| 运行时 source snapshot      | workflow 产物 / context bundle                   | 当前执行产物   | 本次实际使用的 source id、ref、resolved commit、pack、card id、card version、trust                                     | 不作为项目长期 lock，不改写 sources.yaml                                |
+| 运行时 source snapshot      | workflow 产物 / context bundle                   | 当前执行产物   | 本次实际使用的 source id、ref、resolved commit（本地 checkout 当前 HEAD）、pack、card id、card version、trust、status、reason_codes                                     | 不作为远端最新证明，不作为项目长期 lock，不改写 sources.yaml                                |
 | 开发者 profile              | `~/.spec-first/.developer`                     | 当前开发者机器  | 开发者姓名、语言、用户级偏好                                                                                            | 团队知识 Git 源、checkout 路径、项目启用列表                                |
 
 ---
@@ -265,7 +305,7 @@ workflow 可以稳定找到团队公共知识本地路径，但不会把经验�
 项目级 `sources.yaml` 是团队协作的可提交 contract。它说明项目从哪里加载团队知识，但不记录本机绝对路径，也不记录 resolved commit lock。
 
 ```yaml
-schema_version: 1
+schema_version: spec-first.knowledge-sources.v1
 
 sources:
   - id: team-ai-knowledge
@@ -302,7 +342,7 @@ sources:
 项目显式采用 shared standard 时，必须记录在 adoption manifest 中。
 
 ```yaml
-schema_version: 1
+schema_version: spec-first.knowledge-adoptions.v1
 
 adopted_shared_standards:
   - source_id: team-ai-knowledge
@@ -328,7 +368,8 @@ adopted_shared_standards:
 1. 没有 adoption 记录的 shared standard 不得作为 hard context。
 2. adoption 必须声明 scope。
 3. adoption 必须声明 enforcement。
-4. shared standard 与项目 standard 冲突时，workflow 不得自动裁决。
+4. v1 即使存在 adoption，也不得自动 hard enforce。
+5. shared standard 与项目 standard 冲突时，workflow 不得自动裁决。
 ```
 
 ---
@@ -336,6 +377,10 @@ adopted_shared_standards:
 ## 10. Team Knowledge Repo Structure
 
 团队知识仓库建议使用以下最小结构：
+
+这是 v1 runtime resolver 的唯一 canonical layout。选择 `packs/` 作为主入口，是因为 experience cards 与 shared standards 都可以通过同一套 catalog / manifest / taxonomy / schema 被发现、校验、过滤和记录 source snapshot；`taxonomy/` 负责统一 stage / surface / domain / trigger 词表，`schemas/` 负责机器可校验的最小合同。
+
+如果团队为了人读维护保留 `standards/`、`experiences/`、`playbooks/` 等顶层目录，它们只能是 authoring mirror 或 examples，不能和 `packs/` 形成双真相源。进入 workflow 消费前，必须由 pack manifest 显式引用到 canonical path。
 
 ```text
 team-ai-knowledge/
@@ -391,7 +436,7 @@ team-ai-knowledge/
 ### 11.1 `catalog.yaml`
 
 ```yaml
-schema_version: 1
+schema_version: spec-first.knowledge-catalog.v1
 source_id: team-ai-knowledge
 source_type: git
 title: 团队 AI Coding 知识仓库
@@ -422,7 +467,7 @@ packs:
 ### 11.2 `manifest.yaml`
 
 ```yaml
-schema_version: 1
+schema_version: spec-first.knowledge-pack-manifest.v1
 pack_id: bug-experience
 type: experience-cards
 title: Bug 经验卡
@@ -533,7 +578,7 @@ evidence_required:
 
 | Knowledge type      | Source                                        | Default trust              | Scope | Consumer rule                                                                 |
 | ------------------- | --------------------------------------------- | -------------------------- | ----- | ----------------------------------------------------------------------------- |
-| Shared standards    | `team-ai-knowledge/packs/shared-standards/**` | `confirmed_after_adoption` | 跨项目   | 只有 owner reviewed、lifecycle active、scope 命中、项目显式 adoption 后，才可作为 hard context |
+| Shared standards    | `team-ai-knowledge/packs/shared-standards/**` | `confirmed_after_adoption` | 跨项目   | v1 只做 discover / adoption schema / conflict 预留；后续进入 hard context 前必须 owner reviewed、lifecycle active、scope 命中、项目显式 adoption |
 | Project standards   | `docs/standards/**`                           | confirmed                  | 当前项目  | 优先于共享经验；按项目标准合同消费                                                             |
 | Shared experiences  | `team-ai-knowledge/packs/*/cards/*.md`        | advisory                   | 跨项目   | 只作为风险提醒、checklist 或 hypothesis；必须回源确认                                         |
 | Project experiences | `docs/solutions/**`                           | advisory                   | 当前项目  | 跟随项目仓库演进；可 recall，但不自动晋升为团队共享知识                                               |
@@ -543,7 +588,7 @@ evidence_required:
 ```text
 当前用户指令 / 当前需求 / 当前源码 / 当前测试 / 当前日志
   > 项目 confirmed standards
-  > 项目显式采用的共享 confirmed standards
+  > 项目显式采用且后续 runtime 明确启用的共享 confirmed standards
   > 项目 experiences
   > 共享 experiences
 ```
@@ -555,6 +600,8 @@ evidence_required:
 2. workflow 必须记录 conflict、source refs、affected scope 和 owner next action。
 3. 冲突解决前，不得 hard enforce 任一方。
 ```
+
+v1 对 shared standards 的落点是 schema、catalog discover、adoptions.yaml 配置和 conflict 输出预留。即使 shared standard 满足 owner reviewed / lifecycle active / scope 命中 / project adoption，v1 resolver 也不得自动把它注入为 hard context；真正 hard enforce 必须由后续计划显式扩展 runtime 消费合同。
 
 ---
 
@@ -597,10 +644,12 @@ evidence_required:
   "source_snapshots": [
     {
       "source_id": "team-ai-knowledge",
+      "status": "ok",
       "url": "git@git.example.com:arch/team-ai-knowledge.git",
       "ref": "main",
       "resolved_commit": "abc1234",
-      "load_mode": "shared-latest"
+      "load_mode": "shared-latest",
+      "reason_codes": []
     }
   ],
   "included_cards": [
@@ -631,6 +680,47 @@ evidence_required:
 3. 必须复用 excluded_context + reason_code 记录未加载候选。
 4. 如发现 shared standard 与 project standard 冲突，必须输出 conflicts。
 5. included card 必须保留 trust，不得被 workflow 静默升级为 confirmed。
+6. source_snapshot.resolved_commit 只能表示本地 checkout 当前 HEAD。
+7. checkout 缺失、ref 不匹配、dirty 或 commit 读取失败时，source_snapshot.status 必须为 degraded，并输出 reason_codes。
+8. source_snapshot 不得被写回项目 `docs/knowledge/sources.yaml`，也不得被描述为 remote freshness proof 或 project lock。
+```
+
+### 13.3 Source Snapshot Semantics
+
+`resolved_commit` 的语义必须严格限定为：
+
+```text
+当前 workflow 执行时，
+resolver 在本机共享 checkout 中读取到的 Git HEAD。
+```
+
+它不表达：
+
+```text
+1. 远端仓库是否最新。
+2. 团队知识仓库是否有新提交。
+3. 项目是否锁定在该 commit。
+4. 未来 workflow 是否还会读到同一 commit。
+```
+
+当 resolver 发现以下情况时，仍可在安全读取边界内输出可用的 advisory cards，但必须把 source snapshot 降级，并把限制传给 workflow：
+
+```text
+1. registry 存在但 checkout_path 缺失。
+2. checkout_path 存在但不是 Git checkout。
+3. checkout 当前 ref 与 sources.yaml 声明 ref 不匹配。
+4. checkout dirty。
+5. 无法读取当前 HEAD commit。
+```
+
+降级 reason_codes 建议预留：
+
+```text
+checkout_missing
+checkout_not_git_repo
+ref_mismatch
+checkout_dirty
+head_unreadable
 ```
 
 ---
@@ -692,6 +782,24 @@ v1 首批真正接入 resolver 的 workflow 只有四个：
 
 ## 16. Requirements
 
+### 团队知识库内容治理
+
+* K1. 团队知识库必须以 `catalog.yaml` + `packs/` + `taxonomy/` + `schemas/` 作为 canonical runtime layout。
+* K2. v1 默认只允许两类知识进入主路径：团队开发规范、过往 Bug / Review / Debug 经验。
+* K3. 业务流程、领域 wiki、项目画像、长期产品百科不得进入默认加载 pack。
+* K4. 每个 pack 必须有 `manifest.yaml`，并声明 `pack_id`、`type`、`title`、`lifecycle`、`trust_default`、`cards_path` 或 `standards_path`。
+* K5. active 知识卡必须声明 `id`、`title`、`type`、`trust`、`lifecycle`、`version`、`owner`、`updated_at`、`source_refs` 和 `invalidation_condition`。
+* K6. active 知识卡必须声明任务画像字段，至少包含 `applies_to`，建议包含 `surface`、`domain`、`trigger`。
+* K7. 经验卡正文必须小颗粒化，至少回答 7 个问题：这个问题是什么、什么时候容易发生、AI 在哪个阶段应该想起它、命中后应该提醒什么、应该如何验证、哪些情况下这条经验失效、来源证据是什么。
+* K8. 经验卡默认 `trust: advisory`，不得直接成为 confirmed 事实或 hard rule。
+* K9. 团队开发规范可以作为 shared standard 草案或 confirmed_after_adoption 候选，但 v1 不接 runtime hard enforce。
+* K10. lifecycle 必须支持 `draft`、`active`、`deprecated`、`archived`；没有 owner 或失效条件的卡不得进入 active。
+* K11. 分类词表必须少而稳定，优先复用既有 stage / surface / domain / trigger，避免每张卡发明新分类。
+* K12. evidence 目录只能作为 `source_refs` 回源材料，不应被 workflow 默认全量扫描。
+* K13. AI 命中经验卡后只能输出风险提醒、检查清单、验证建议或根因假设，不得只基于经验卡输出“规范要求如此”、确定性 finding 或 root cause。
+
+---
+
 ### Init 交互与输入
 
 * R1. `spec-first init` 在普通 host、语言、目标项目选择之后，必须提供可选问题“是否加载团队知识库”，默认 No。
@@ -747,7 +855,7 @@ v1 首批真正接入 resolver 的 workflow 只有四个：
 * R31. experience card 必须包含最小 frontmatter：`id`、`title`、`type`、`trust`、`lifecycle`、`version`、`applies_to`。
 * R32. shared standard 必须包含最小 frontmatter：`id`、`title`、`type`、`trust`、`lifecycle`、`version`、`owner`。
 * R33. v1 首批自动召回只支持 `type: experience-cards`。
-* R34. shared standards 在 v1 支持结构校验和 adoption 预留，但默认不自动 hard enforce。
+* R34. shared standards 在 v1 只支持结构校验、discover、adoption schema 和 conflict 输出预留，不接入 runtime hard enforce。
 
 ---
 
@@ -761,7 +869,7 @@ v1 首批真正接入 resolver 的 workflow 只有四个：
 * R40. 多张 cards 命中时，resolver 必须按 stage、surface、domain、trigger、paths 过滤排序。
 * R41. 单次 workflow 默认只加载最多 5 张高相关 cards。
 * R42. 未加载候选必须复用 `excluded_context` + `reason_code` 记录排除原因。
-* R43. workflow 每次消费团队知识时，必须在输出产物或 context bundle 中记录 source id、url、ref、resolved commit、pack id、card id、card version、trust 和 matched reason。
+* R43. workflow 每次消费团队知识时，必须在输出产物或 context bundle 中记录 source id、url、ref、resolved commit、snapshot status、reason_codes、pack id、card id、card version、trust 和 matched reason。
 * R44. v1 不写项目级 knowledge lock，但单次执行必须可追溯。
 
 ---
@@ -790,9 +898,9 @@ v1 首批真正接入 resolver 的 workflow 只有四个：
 * R59. 项目 `docs/solutions/**` 继续作为项目经验沉淀和 recall source，默认 advisory。
 * R60. 团队公共知识仓库可以提供 shared standards 与 shared experiences。
 * R61. shared experiences 默认 advisory，只作为风险提醒、checklist 或 hypothesis。
-* R62. shared standards 只有经过 owner review、lifecycle active、scope 命中并被项目显式采用后，才能作为项目 hard context。
+* R62. shared standards 进入项目 hard context 的必要条件是 owner review、lifecycle active、scope 命中并被项目显式采用；v1 只记录这个后续安全条件，不启用 runtime hard enforce。
 * R63. 项目采用 shared standard 必须写入 `docs/standards/adoptions.yaml`。
-* R64. 知识消费优先级必须保持：当前用户指令 / 需求 / 源码 / 测试 / 日志 > 项目 confirmed standards > 项目显式采用的共享 confirmed standards > 项目 experiences > 共享 experiences。
+* R64. 知识消费优先级必须保持：当前用户指令 / 需求 / 源码 / 测试 / 日志 > 项目 confirmed standards > 项目显式采用且后续 runtime 明确启用的共享 confirmed standards > 项目 experiences > 共享 experiences。
 * R65. 当项目规范与共享规范冲突时，workflow 必须记录 conflict、source refs、affected scope 和 owner next action。
 * R66. 冲突解决前，不得自动选择任一规则 hard enforce。
 * R67. 项目经验晋升链路必须是：`docs/solutions/**` 项目经验 → shared experience → shared standard proposal → owner-reviewed shared standard。
@@ -930,11 +1038,11 @@ Covers: R52
 
 ---
 
-### AE12. shared standard 需要项目显式采用
+### AE12. shared standard v1 不自动 hard enforce
 
 Given 团队知识仓库中存在 `coding-money-bigdecimal` shared standard，
-When 项目没有在 `docs/standards/adoptions.yaml` 中显式采用，
-Then workflow 不得把该 shared standard 作为 hard context。
+When 项目没有在 `docs/standards/adoptions.yaml` 中显式采用，或 v1 runtime 尚未显式启用 shared standard hard context，
+Then workflow 不得把该 shared standard 作为 hard context，只能把 adoption 状态作为后续治理信息记录。
 
 Covers: R62, R63
 
@@ -975,19 +1083,24 @@ Covers: R61, R64
 v1 成功标准如下：
 
 ```text
-1. 团队公共知识 Git 仓库可以在首次 init 时被显式加载到用户级全局目录。
-2. 业务项目可以提交 docs/knowledge/sources.yaml，团队成员共享同一知识源配置。
-3. 同一用户机器上的多个业务项目可以共用同一份团队知识 checkout。
-4. 本机绝对路径只保存在 ~/.spec-first/knowledge/registry.json，不进入业务项目 Git。
-5. v1 不自动 pull、不写 knowledge-lock.json、不引入 RAG/MCP/数据库。
-6. clone / 校验失败时不留下半成品项目配置。
-7. catalog / manifest / card schema 有最小校验。
-8. resolver 输入输出合同明确。
-9. $spec-plan、$spec-work、$spec-code-review、$spec-debug 可以通过统一 resolver 少量加载 advisory cards。
-10. workflow 输出 source snapshot，保证单次执行可追溯。
-11. shared standards 不会自动 hard enforce，必须项目显式 adoption。
-12. 项目 standards、项目 solutions、shared standards、shared experiences 的 source-of-truth、trust 和消费优先级清晰。
-13. v1 默认共享知识路径聚焦 Bug / Review / Debug 经验，业务流程仍从当前项目证据读取。
+1. 团队知识库 canonical layout 明确为 catalog.yaml + packs/ + taxonomy/ + schemas/。
+2. demo 和需求文档都不再把 standards/ + experiences/ 作为 runtime 主路径。
+3. v1 默认共享知识路径聚焦团队开发规范与 Bug / Review / Debug 经验。
+4. active 知识卡具备 owner、trust、lifecycle、source_refs、invalidation_condition 和任务画像字段。
+5. 经验卡是小颗粒 advisory cards，能被 stage / surface / domain / trigger 少量召回。
+6. 业务流程、领域 wiki、项目画像仍从当前项目证据读取，不作为默认共享知识加载对象。
+7. 团队公共知识 Git 仓库可以在首次 init 时被显式加载到用户级全局目录。
+8. 业务项目可以提交 docs/knowledge/sources.yaml，团队成员共享同一知识源配置。
+9. 同一用户机器上的多个业务项目可以共用同一份团队知识 checkout。
+10. 本机绝对路径只保存在 ~/.spec-first/knowledge/registry.json，不进入业务项目 Git。
+11. v1 不自动 pull、不写 knowledge-lock.json、不引入 RAG/MCP/数据库。
+12. clone / 校验失败时不留下半成品项目配置。
+13. catalog / manifest / card schema 有最小校验。
+14. resolver 输入输出合同明确。
+15. $spec-plan、$spec-work、$spec-code-review、$spec-debug 可以通过统一 resolver 少量加载 advisory cards。
+16. workflow 输出 source snapshot，保证单次执行可追溯。
+17. shared standards 在 v1 不接 runtime hard enforce；后续如要 hard enforce，必须先项目显式 adoption。
+18. 项目 standards、项目 solutions、shared standards、shared experiences 的 source-of-truth、trust 和消费优先级清晰。
 ```
 
 ---
@@ -1003,6 +1116,7 @@ v1 成功标准如下：
 6. 依赖项目 docs/solutions/** 继续作为项目 durable learning，不被团队知识 init 流程接管。
 7. 接受 shared-latest 语义：团队知识 ref 后续更新可能影响未来执行结果。
 8. v1 通过运行时 source snapshot 保证单次执行可追溯，不提供项目级完全可复现 knowledge lock。
+9. source snapshot 的 `resolved_commit` 是本地 checkout 当前 HEAD，不证明远端最新。
 ```
 
 ---
@@ -1024,14 +1138,44 @@ v1 成功标准如下：
 10. 多 host / workspace / multi-repo 模式是否 v1 降级为 single-repo。
 11. shared standard conflict JSON 字段形态。
 12. schema 校验深度：只校验必填字段，还是校验 taxonomy 枚举。
-13. 团队知识仓 demo 目录是否正式收敛为 packs + taxonomy + schemas。
+13. 旧 demo 中 `standards/` + `experiences/` 顶层目录是否迁移为 examples mirror 或生成到 canonical `packs/`；不影响 v1 runtime 主路径。
 ```
 
 ---
 
 ## 21. Recommended v1 Implementation Slices
 
-### Slice 1：Init 接入
+### Slice 1：团队知识库 canonical contract
+
+```text
+1. catalog.yaml
+2. packs/<pack-id>/manifest.yaml
+3. taxonomy/*.yaml
+4. schemas/*.schema.json
+5. README / CONTRIBUTING / owners
+```
+
+### Slice 2：经验卡与规范卡模板
+
+```text
+1. Bug 经验卡模板
+2. Review 经验卡模板
+3. Debug 排查卡模板
+4. Shared standard 草案模板
+5. source_refs / invalidation_condition / lifecycle 示例
+```
+
+### Slice 3：Knowledge Repo Schema
+
+```text
+1. catalog.yaml schema
+2. manifest.yaml schema
+3. card frontmatter schema
+4. shared standard frontmatter schema
+5. 安全读取校验
+```
+
+### Slice 4：Init 接入
 
 ```text
 1. init 交互问题
@@ -1042,17 +1186,7 @@ v1 成功标准如下：
 6. 失败原子回滚
 ```
 
-### Slice 2：Knowledge Repo Schema
-
-```text
-1. catalog.yaml schema
-2. manifest.yaml schema
-3. card frontmatter schema
-4. shared standard frontmatter schema
-5. 安全读取校验
-```
-
-### Slice 3：Resolver
+### Slice 5：Resolver
 
 ```text
 1. 读取 sources.yaml
@@ -1063,7 +1197,7 @@ v1 成功标准如下：
 6. 输出 included cards / excluded_context / conflicts
 ```
 
-### Slice 4：Workflow 接入
+### Slice 6：Workflow 接入
 
 ```text
 1. $spec-plan
@@ -1072,13 +1206,13 @@ v1 成功标准如下：
 4. $spec-debug
 ```
 
-### Slice 5：Adoption 预留
+### Slice 7：Adoption schema 预留
 
 ```text
 1. docs/standards/adoptions.yaml schema
-2. shared standard discover
-3. shared standard not hard enforce by default
-4. conflict 输出预留
+2. shared standard discover / schema validation
+3. v1 不把 shared standard 注入 runtime hard context
+4. conflict 输出 schema 预留
 ```
 
 ---
@@ -1099,3 +1233,38 @@ resolver 承载统一知识 intake，
 workflow 承载 advisory 使用，
 source snapshot 承载执行可追溯。
 ```
+
+---
+
+<!-- prd:section=outstanding_questions -->
+## Outstanding Questions
+
+以下 12 条来自 `spec-doc-review` 多角色深度审查（coherence / feasibility / product-lens / security-lens / scope-guardian / adversarial，2026-07-02），经综合去重与跨角色一致性提升后 defer 到 planning。它们**不新增 WHAT**，只把已识别的 planning-前决策项/缺口结构化记录；§1–§22 需求正文实质未改动。本 artifact 因此从不实的 `ready-for-planning` 降级为 `checkpoint-prd`（`can_enter_spec_plan: no`）：存在 2 个 P0 对账未闭合。`closure_disposition` 留空表示尚无合法闭合依据，须由 owner/planning 决策后回填。
+
+| id | question | prd_write_target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| OQ-CF1 | §9.2/§11.4/§12：`adoptions.yaml` 与 `docs/contracts/team-standards.md` 词表/surface 冲突（`trust: confirmed_after_adoption`、`enforcement: hard`、`severity: must` 均不在 canonical enum；`docs/standards/shared.md` 已是受该契约治理的承载面）。同目录两套真相源。 | §9.2 §11.4 §12 | yes | | yes | blocker | 映射到既有 enum（`hard`→`plan-gate`/`manual-owner-review`；`confirmed_after_adoption`→拆独立 adoption/lifecycle 字段；`severity: must`→`priority: P0-blocking`），或声明 adoptions.yaml 为不受该契约治理的独立 surface 并论证；与 OQ-CF4 联动。 |
+| OQ-CF2 | §13/F3/F4/Decision13/R55/Slice5：新 Knowledge Intake Resolver 未与既有 `agents/spec-learnings-researcher.agent.md`、`2026-06-19-001` defer 决策、`knowledge-harness.md` OQ-2 对账；R55「必须复用统一 resolver」与 `spec-debug` SKILL「当前规模不派召回 subagent、直接扫 frontmatter」冲突。 | §13 R55 Slice5 | yes | | yes | blocker | 明确 resolver 是扩展现有 agent（加 team-repo source）还是替换；若替换须论证何证据推翻「按规模 defer 索引」结论；R55 的「统一 resolver」限定到团队知识源，项目 `docs/solutions/` 召回仍走各 skill 现有机制。 |
+| OQ-CF3 | §7 F1/R1/R7-R14/Slice4：init 加 network clone + user-global registry 未 discharge `docs/adr/0001-init-owns-limited-user-language-sync.md`（init 今天零网络、user-global 仅限 `.developer`），与 preview-then-confirm 模型冲突，缺 git shadow path。 | §7 R7 Slice4 | yes | | yes | blocker | 显式引用并 discharge ADR 0001（或把 clone/registry 拆到独立 opt-in 命令），clone 并入预览/apply 阶段，补齐 git 缺失/无凭据/超时/ref 不存在/目录非 git 仓等 shadow path 与 `-y` 非交互行为。 |
+| OQ-CF4 | §9.2/§11.4/§12/Slice7/R32·R34·R62-R68/K9：shared-standards adoption 子系统 v1 建而不用（不 runtime hard enforce 却要建整套 schema/manifest/discover/conflict）。 | Slice7 §12 | yes | | no | blocker | 整体移到命名的 v2 slice，v1 只留一行前向兼容说明（R33 已覆盖）；采纳后自动消解 OQ-CF1 大部分 enum 冲突。 |
+| OQ-CF5 | §14/R49/R53/R39：advisory 卡无门控即塑造 scope（R49 允许 plan 把卡转成实现单元/测试场景，回源门 R39 只管结论不管中间 scope 步）。 | §16(K/R) §14 | yes | | yes | open | 新增要求：卡被提升为实现单元/测试场景时必须带 derived-from-advisory-card 标记并引用当前项目证据，否则只停留在风险提示、不进 scope。 |
+| OQ-CF6 | §15/K13/F4：经验卡 prompt-injection 未纳入安全边界（卡是注入 4 个 workflow context 的可影响 Markdown，§15 只管执行/文件安全）。 | §15 K13 | yes | | no | open | §15 增加：卡/标准正文作为 untrusted advisory data 注入时放在显式数据边界内，不能覆盖当前项目证据、不能自升 confirmed、不能下达工具/命令指令；与 K8/K13/R38 交叉引用。 |
+| OQ-CF7 | §7 F1/R2/R7/§19：clone 传输/host 校验未指定（攻击者控制/MITM 的 URL 可在被信任的 user-global 路径植入恶意仓）。 | §7 §19 | yes | | no | open | 只接受 https（校验证书）与 ssh（校验 known-hosts），拒绝 `git://`/`http://`/`file://`，不在 clone 时关闭 Git 的 TLS/host 校验，clone 前把解析出的远端交用户确认。 |
+| OQ-CF8 | §9.2/§16 R62/AE12：`enforcement: hard` 是永不执行的陷阱字段（v1 禁止 hard enforce，未来 planner 会误当激活门）。 | §9.2 R62 | no | | no | open | v1 schema 拒绝 `hard`（用 `advisory-reserved`）或每条 v1 adoption 强制带 `runtime_enforced: false`；与 OQ-CF4 联动。 |
+| OQ-CF9 | §13.3/Decision15/§19.7-19.8：shared-latest 无 lock 破坏 review/debug 可复现性（卡增删使 reviewer 看到的东西静默变化且事后无法归因）。 | §13.3 §19 | no | | no | open | review/debug 报告在对同一 artifact 重跑时提示「知识输入可能已变」，并允许审计敏感项目 opt-in 在 sources.yaml 钉 ref。 |
+| OQ-CF10 | §13.1/F4/R40-R47：任务画像仅 stage 必填、其余 best-effort 推断且无校验，错画像静默丢最相关卡（max-5 放大）。 | §13.1 R42 | no | | no | open | reason_code 区分「按显式字段排除」与「按推断字段排除」，并让 workflow 浮出仅按推断维度被排除的高严重度/高匹配卡。 |
+| OQ-CF11 | §3/§16 K5·K7/§5：v1 押在未验证的 authoring/governance 采纳前提（无 team repo 生产使用证据，仅 demo）。 | §3 §5 | yes | | no | open | 先从真实 `docs/solutions` 历史种 5-10 张卡、手动跑一个 workflow 确认改善输出，再 gate 后续 resolver/init/schema 建设。 |
+| OQ-CF12 | §1/§6 Decision1/§22：「核心产品」定位与 harness charter（不应成为 content/collection）张力，planning 会反复 re-litigate scope。 | §1 §22 | yes | | no | open | 重述为：机制（schema+resolver+consumer contract+trust boundary）是核心产品，团队知识库是被服务但不拥有的内容——§2/R70 已这么论证，让 §1/Decision1/§22 对齐。 |
+
+---
+
+<!-- prd:section=readiness_self_check -->
+## Readiness Self-Check
+
+- decision_card_highest_risk_gap: OQ-CF1（adoptions.yaml 与 team-standards 词表/surface 冲突，P0）+ OQ-CF2（新 resolver 未与既有召回路径/defer 决策对账，P0）——两条 P0 对账未闭合前不得进入 planning。
+- decision_card_next_action: checkpoint-prd —— 把 spec-doc-review 的 12 条 findings 落为 Outstanding Questions，交 owner/planning 逐条决策；不伪造 ready receipt。
+- decision_card_why_no_invention: 本次未改动 §1–§22 需求正文，只把已识别的 planning-前决策项结构化为 OQ（各带 prd_write_target + recommended_default），planning 消费决策而非发明 WHAT。
+- preflight_sweep_closure: degraded —— 本 artifact 由 doc-review 结论转录进入，未在本次运行完整重跑 Requirement Analysis Gate；current-state 证据（team-standards enum、init 无联网、ADR 0001、2026-06-19 recall 决策、knowledge-harness OQ-2）由 doc-review 阶段直接读取核实。
+- clarification_evidence: asked-owner —— 12 条 findings 的处置在 doc-review 交互中经 owner 逐条/批量确认为 Defer（走查 5 条逐条 + 7 条 Auto-resolve → Append to Open Questions）。
+- readiness_outcome: revise-prd —— 存在 2 个 P0 对账 + 多个 P1 安全/scope/定位缺口；须先闭合 OQ-CF1/CF2（建议先联动 OQ-CF4）再考虑 planning。
+- can_enter_spec_plan: no
