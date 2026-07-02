@@ -25,13 +25,13 @@ Official site: [spec-first.cn](http://spec-first.cn/)
 
 ## See It In 90 Seconds
 
-![spec-first engineering loop](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.png)
+![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
 The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code or Codex session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
 
 The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
 
-<sub>Maintained demo slot: the diagram is generated from a source-controlled SVG ([spec-first-flow.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg)) and rendered to PNG so it shows on both GitHub and the npm package page; a future terminal recording can replace this position without restructuring the page.</sub>
+<sub>Simulated demo path: install → init → mcp-setup → ideate → brainstorm → prd → doc-review → plan → write-tasks → work → code-review → compound; debug is shown as a side loop for test failures or unclear root causes, and inspectable Markdown artifacts remain in the repository. Animation source: [spec-first-cli-workflow-demo.svg](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg).</sub>
 
 ## Quickstart
 

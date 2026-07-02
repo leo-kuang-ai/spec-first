@@ -154,7 +154,7 @@ describe('package install contracts', () => {
     expect(pkg.files).not.toContain('README.zh-CN.md');
     expect(pkg.files).not.toContain('docs/assets/readme/');
     expect(pkg.files).not.toContain('docs/05-用户手册/');
-    expect(readme).toContain('https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-flow.svg');
+    expect(readme).toContain('https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg');
     expect(readme).toContain('https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md');
     expect(readme).toContain('https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/README.md');
     expect(readme).not.toMatch(/\]\(\.\/|\]\(\.\.\//);
