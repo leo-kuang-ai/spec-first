@@ -6,6 +6,18 @@
 
 当前阶段不引入尚未开发完成的团队知识 Git 仓库、Knowledge Resolver、advisory cards、source snapshot 等能力；这些只保留未来扩展占位，不作为当前审查硬约束。
 
+---
+
+> **核心审查原则（在开始任何分析前必须内化）**
+>
+> 1. **Source-First**：所有结论必须来自直接读取 `skills/*/SKILL.md` 等原始源码，而非依赖描述、记忆或推断替代事实核查。
+> 2. **Script 验证事实，LLM 判断语义**：行数、目录是否存在、文件内容等确定性事实，用 bash/grep 验证后再陈述；架构合理性、约束充分性由 LLM 判断。
+> 3. **Eval-First，后压缩**：eval cases 是压缩的前提，不是可选项。没有 eval 覆盖的 skill，禁止声明"可安全压缩"。
+> 4. **Advisory 不等于 Confirmed**：审查结论标注类型（Fact/Inference/Advisory），不得把推断当事实上报。
+> 5. **多角色对抗**：单一视角的审查不够，需要从架构师、Evidence工程师、安全工程师、产品工程师、双宿主一致性等多个角色做对抗性审查。
+
+---
+
 # 一、审查目标
 
 请完成以下目标：
@@ -165,26 +177,46 @@ NEVER 当前阶段强行引入未开发的团队知识 Resolver
 
 ## 7. Evaluation Harness：回归评测能力
 
+> **关键区分（实战经验）**：`examples.json`（examples-as-context）≠ 可自动化回归的 negative cases。目录存在不等于 eval 有效。审查时必须区分：
+> - **examples-as-context**：供人工或 LLM fresh-source eval 使用的结构化样本，不可直接作为 CI 回归 runner。
+> - **negative cases**：专门测试 skill 拒绝/降级的反例 JSON，是防回归退化的核心保护。
+> - **CI runner**：可在 CI 中自动执行的回归测试 hook。
+>
+> **真正的 eval 缺口** = 缺少 negative cases + CI runner，而非仅仅"目录不存在"。
+
 审查问题：
 
-1. Skill 是否有 eval cases？
+1. Skill 是否有 eval cases？（需区分 examples-as-context 和 negative cases）
 2. 是否有 golden cases？
-3. 是否能验证压缩前后质量不退化？
-4. 是否能覆盖正常路径、边界路径、失败路径？
-5. 是否能测试上下文加载是否过量？
-6. 是否能测试 Evidence 是否缺失？
-7. 是否能进入 CI 或本地检查流程？
+3. **是否有专用的 negative cases？**（拒绝/降级/边界场景的反例，这是最常缺失的）
+4. 是否能验证压缩前后质量不退化？
+5. 是否能覆盖正常路径、边界路径、失败路径？
+6. 是否能测试上下文加载是否过量？
+7. 是否能测试 Evidence 是否缺失？
+8. **是否有 CI runner 或本地可执行的自动化回归 hook？**
+9. **eval 规模是否合理？**（不同 skill 保护密度差异不应悬殊）
+10. **是否覆盖跨 skill handoff quality 场景和 degraded-mode 场景？**
 
 输出审查项：
 
 ```text
-MUST 有核心 eval cases
+MUST 有核心 eval cases（golden + negative）
+MUST negative cases 覆盖关键 anti-pattern 场景
 MUST 覆盖成功 / 失败 / 边界场景
 MUST 能检查压缩后质量退化
-CHECK 是否缺少回归样例
-CHECK 是否缺少负例
-CHECK 是否缺少 Evidence 类测试
+CHECK 是否缺少 negative cases（最常见缺口）
+CHECK 是否缺少 CI runner / 自动化执行机制
+CHECK 是否缺少 Evidence 类测试（无证据不得 confirmed）
+CHECK examples-as-context 与 negative cases 是否被混淆
+CHECK eval 规模是否足以保护该 skill 的风险等级
+CHECK 是否缺少 degraded-mode 和 handoff quality 场景
 ```
+
+**eval 优先级：**
+- P0：Skill 行数>500行或被频繁调用，无任何 negative cases
+- P1：Skill 有 examples 但缺关键反例（如 PRD checkpoint-as-escape、work scope-expansion）
+- P2：eval 规模偏小，高风险场景未覆盖
+- P3：eval 格式不统一，跨 skill 场景缺失
 
 ## 8. Governance Harness：治理能力
 
@@ -255,6 +287,37 @@ CHECK 是否存在无人维护的隐性规范
 8. 回归用例 → evals/
 9. 可自动检查规则 → scripts/
 ```
+
+## Progressive Disclosure 三层模型（压缩的操作标准）
+
+压缩不是"删内容"，而是按 **L1/L2/L3** 三层分级：
+
+| 层级 | 定义 | 操作 |
+|---|---|---|
+| **L1** | Always inline（主干 contract / gate / boundary）| 必须保留在 SKILL.md，模型每次都需要 |
+| **L2** | Triggered（满足特定条件时按需加载）| 用 `STOP. Read references/xxx.md` 精确触发，不默认加载 |
+| **L3** | Reference only（背景/解释/例子/bash 脚本）| 完全移出 SKILL.md，不得在主文件内联 |
+
+**L2 触发规则（必须是明确的 STOP 指令，而非 prose 条件）：**
+```text
+✅ 正确：STOP. Before Phase 1, read references/governance-boundaries.md
+❌ 错误：If the input is a large file, you may want to read references/large-input-checkpoint.md
+```
+
+**典型的 L3 内容（应全部外置）：**
+- 所有嵌入在 SKILL.md 中的 bash 脚本
+- Core Principles 段落（解释性，不是 gate）
+- 详细的示例/example blocks
+- 长篇技术背景说明
+
+**L1 保护红线（绝不外置）：**
+- hard gate 触发条件（如 `🔴 STOP — Pre-Write Closure Gate`）
+- Forbidden Actions 列表
+- Failure Mode 黑名单
+- Evidence 分类定义
+- Handoff contract 核心字段
+
+
 
 # 四、审查步骤
 
@@ -821,3 +884,233 @@ skill-system/
     * Evaluation
     * Governance
 14. 最终方案必须服务于团队级 AI Coding 规范治理，而不是个人 Prompt 优化。
+
+---
+
+# 七、多角色对抗审查方法（进阶）
+
+单一视角的 Harness 审查容易形成盲区。实战经验表明，对一个复杂 Skill 体系进行 **20轮多角色对抗审查**，能发现基础审查遗漏的深层问题。
+
+## 7.1 推荐审查角色矩阵
+
+| 轮次 | 审查角色 | 核心问题 |
+|---|---|---|
+| R01 | Skill 补漏审查 | 是否有被遗漏的 skill？（如 spec-mcp-setup 这类基础设施 skill）|
+| R02 | 架构师 | Source/Runtime 边界漏洞；CLAUDE.md dual-nature 问题 |
+| R03 | Context Engineering 专家 | Lost in Middle 风险；跨 Skill 上下文传递断点 |
+| R04 | Evidence 工程师 | 跨 Skill evidence 词汇不统一；上下游互操作断点 |
+| R05 | LLM 幻觉防控专家 | 哪些 gate 是真正防幻觉的（有 hook/CLI），哪些是伪 gate |
+| R06 | Evaluation 工程师 | eval 缺口定量分析（区分 examples vs negative cases）|
+| R07 | 产品工程师 | 用户侧摩擦点；入口混乱；Degraded Mode 体验 |
+| R08 | 安全工程师 | Prompt injection 风险；Provider 写入 AGENTS.md 漏洞 |
+| R09 | 并行协作工程师 | 多 Session 并发冲突；race condition 场景 |
+| R10 | 双宿主一致性审查 | Claude vs Codex 功能差异；降级声明完整性 |
+| R11 | Validation 深度 | 哪些 Gate 是"伪 Gate"（LLM 可绕过的文本指令）|
+| R12 | Knowledge 工程师 | 知识污染路径；source_refs 路径漂移；unverified 升级 |
+| R13 | Governance 治理专家 | 版本/Owner 缺失；规则冲突；无废弃机制 |
+| R14 | PD（Progressive Disclosure）专家 | L1/L2/L3 层级违规；STOP vs prose 触发问题 |
+| R15 | 压缩可行性评估 | 每个 skill 的压缩风险矩阵（结合 eval 状态）|
+| R16 | Handoff 质量审查 | 11 条 handoff 链路完整性；缺失 freshness indicator |
+| R17 | 反模式识别 | 识别当前体系中存在的工程反模式（见下节）|
+| R18 | 全局优先级矩阵 | 综合所有轮次，输出 P0/P1/P2/P3 排序清单 |
+| R19 | 最小修复路径 | 每个 P0/P1 的具体操作步骤和工作量估算 |
+| R20 | 综合收口 | 量化收益预期；三阶段演进路线图；一句话结论 |
+
+## 7.2 关键审查角色的核心问题清单
+
+### Evidence 工程师（R04）关键问题
+
+| 检查项 | 常见问题 |
+|---|---|
+| 跨 Skill evidence 词汇是否统一 | spec-prd(5级) vs debug(hypothesis ledger) vs code-review(0-100) 三套体系 |
+| Handoff 时 evidence class 是否传递 | brainstorm→prd 断点：brainstorm 产物无 evidence tag |
+| Advisory 是否被当作 Confirmed | docs/solutions/ recall 结果在 plan/work 中被当 fact |
+
+### LLM 幻觉防控专家（R05）关键问题
+
+**真正防幻觉的机制**（有 hook/CLI 强制，LLM 无法绕过）：
+- `spec-first tasks validate --json`（CLI 层阻断）
+- `prd-prewrite-guard` PreToolUse hook（工具层拦截）
+- `finalize-prd-artifact.js` + `check-prd-artifact.js`（checker blocking reason_codes）
+- `validate-frontmatter.py`（YAML parser-level 验证）
+
+**伪 Gate**（依赖 LLM 自觉，无强制）：
+- "STOP. Before Phase X, read references/xxx.md"（文本指令）
+- Anti-Rationalization Red Flags（注意力提醒，SKILL.md 本身承认"不是 gate"）
+- spec-debug Causal Chain Gate（"Do not proceed until..." 但无 hook）
+- spec-compound preconditions（`enforcement="advisory"` 明确声明不强制）
+
+
+---
+
+# 八、工程反模式清单（必须主动识别）
+
+审查时不只找"缺什么"，还要主动识别以下7类工程反模式：
+
+| 反模式 | 表现 | 根本原因 | 解决方向 |
+|---|---|---|---|
+| **Prompt Instruction Burial（指令埋葬）**| 关键约束在1000行 SKILL.md 的中段 | SKILL.md 随功能线性增长，无 PD 分层 | L3 内容外置，L1 首屏可见 |
+| **Advisory Evidence Drift（Advisory 变 Confirmed）**| docs/solutions/ recall 结果被当作当前事实 | recall 仅说"treat as advisory"，无 evidence class 标注在产物中 | recall 结果必须在 artifact 中标注 evidence class |
+| **Document-Driven Completion（文档假完成）**| 格式正确的文档 → 声明 phase 完成 | checker 只验格式，不验语义质量 | checker 增加语义充分性检查 |
+| **Fake Completeness（虚假完整性）**| checkpoint-prd 被标为"draft complete" | checkpoint-prd 和 final-prd 的 UI 区分不明显 | checkpoint 输出必须有显眼 NOT READY 标记 |
+| **Scope Implicit Expansion（隐式 scope 扩展）**| spec-work 执行时 LLM 自行扩大 scope | Anti-Rationalization 是提示不是 gate | diff 范围必须在 closeout 中与 plan declared files 对比 |
+| **Knowledge Accumulation Neglect（知识积累忽视）**| spec-work/debug 完成后无任何知识沉淀 | 知识捕获完全可选，无结构化触发 | closeout 增加强制 knowledge-capture-decision 字段 |
+| **Spec System as Overhead（spec 体系被视为负担）**| 用户跳过 brainstorm/prd/plan 直接用 bare prompt | workflow 链路太长，overhead 不值 | 小任务轻量化；大任务主动提示回到 plan |
+
+
+---
+
+# 九、审查质量保证原则
+
+## 9.1 Source-First 验证流程
+
+**审查之前，先确认事实：**
+
+```bash
+# 1. 确认 SKILL.md 行数（不依赖记忆）
+wc -l skills/*/SKILL.md | sort -n
+
+# 2. 确认 evals/ 目录实际内容（不依赖描述）
+for d in skills/*/; do
+  echo "=== $(basename $d) ==="
+  ls "${d}evals/" 2>/dev/null || echo "(no evals)"
+done
+
+# 3. 确认 evals 文件内容规模
+find skills -path "*/evals/*.json" | xargs wc -l 2>/dev/null | sort -rn | head -20
+
+# 4. 验证文件是否存在（不能仅凭记忆）
+ls skills/spec-prd/evals/ && head -5 skills/spec-prd/evals/examples.json
+```
+
+## 9.2 真 Gate vs 伪 Gate 分类框架
+
+在 Validation Harness 审查时，必须区分：
+
+| Gate 类型 | 定义 | 识别方式 |
+|---|---|---|
+| **真 Gate** | 有 hook/CLI/脚本强制，LLM 无法绕过 | 找到对应的 PreToolUse hook、CLI exit code 或 schema validator |
+| **伪 Gate** | 依赖 LLM 自觉的文本指令 | "Do not proceed until..."、"MUST check..."类语句，无对应机制 |
+| **降级 Gate** | runtime 无法硬强制，须"响亮声明"降级 | 明文声明 `codex_prd_guard: not_available` 类 |
+| **Advisory Gate** | 只影响风险/置信度，不阻断 | 如 graph/codegraph unavailable |
+
+**伪 Gate 的真实化路径：**
+1. 添加 CLI 前置验证命令（`spec-first plan validate --json`）
+2. 在 closeout 增加必填字段（如 `feedback_loop_not_possible` 强制填写）
+3. 利用 PreToolUse hook 拦截直接写入行为
+
+## 9.3 审查结论的可信度标注
+
+输出任何审查结论时，必须标注可信度：
+
+| 标签 | 含义 | 要求 |
+|---|---|---|
+| `[Fact]` | 来自直接 bash/grep/read 验证 | 必须附 source ref |
+| `[Inference]` | 基于 Fact 推断 | 必须说明推断链路 |
+| `[Advisory]` | LLM 语义判断 | 标注"未经 CLI 验证" |
+| `[Unverified]` | 未能验证 | 必须说明无法验证原因 |
+
+## 9.4 审查报告的事实核查清单
+
+报告完成后，必须执行以下验证：
+
+```bash
+# 检查 SKILL.md 行数引用是否准确
+wc -l skills/<skill>/SKILL.md
+
+# 检查 eval 状态描述是否准确
+ls skills/<skill>/evals/ && wc -l skills/<skill>/evals/*.json
+
+# 检查 spec-compound SKILL.md 行数
+wc -l skills/spec-compound/SKILL.md  # 确认是646而非614
+
+# 检查是否还有明显错误的"无 eval"声明
+grep -rn "无 eval\|无 evals\|无 eval cases" docs/validation/ | head -20
+```
+
+
+---
+
+# 十、实战经验与关键教训
+
+以下经验来自对 spec-first 37个 skill 体系的完整审查实战（2026-07-02），具体证据见 `docs/validation/2026-07-02-skill-system-harness-review.md`。
+
+## 10.1 最重要的发现
+
+**发现1：examples-as-context 不等于 eval 有效**
+
+审查时发现：所有核心 skill 都有 `evals/examples.json`，但初版审查错误地将它们标注为"无 eval"。真正的缺口是缺少 **negative cases** 和 **CI runner**，而非目录不存在。
+
+→ **教训：** 永远先用 bash 确认文件实际内容和行数，再下结论。
+
+**发现2：SKILL.md 行数是 Prompt Instruction Burial 的量化指标**
+
+| Skill | 行数 | 风险 |
+|---|---|---|
+| spec-code-review | 1241行 | 🔴 关键约束在行500，Lost in Middle 高风险 |
+| spec-work | 579行 | 🔴 task-pack validation 在行150-300 |
+| spec-compound | 646行 | 🟠 Phase 1 subagent 细节内联 |
+| spec-plan | 460行 | 🟡 deepening 逻辑可外置 |
+
+→ **教训：** 超过300行的 SKILL.md 几乎肯定存在 L3 内容内联问题。
+
+**发现3：体系中只有6个真正防幻觉的机制**
+
+spec-first 整个体系中，只有6个机制是"LLM 无法绕过"的：
+1. `prd-prewrite-guard` PreToolUse hook
+2. `spec-first tasks validate --json` CLI
+3. `finalize-prd-artifact.js` + `check-prd-artifact.js`
+4. `validate-frontmatter.py`
+5. `scripts/resolve-base.sh` error on failure
+6. task-pack `stop_if` 字段
+
+其余所有"MUST/NEVER/CHECK"规则都依赖 LLM 自觉，是"伪防线"。
+
+→ **教训：** Evaluation Harness 的核心价值就是为这些伪防线提供回归测试网。
+
+**发现4：Evidence 词汇的碎片化是跨 Skill 协作的隐形障碍**
+
+9个核心 skill 使用了5套不同的 evidence 词汇体系：
+- spec-prd：confirmed-source / user-stated / source-candidate / external-research / assumption
+- spec-debug：claims_validated_by / claims_remaining_advisory
+- spec-code-review：confidence 0/25/50/75/100
+- spec-plan：confirmed / advisory / session-local / stale / user
+- spec-brainstorm：（无）
+
+→ **教训：** 需要建立 `shared/evidence/evidence-class-v1.yaml` 统一映射，而非要求每个 skill 重写词汇。
+
+## 10.2 压缩操作的三个铁律
+
+```
+铁律1：eval 是压缩的前提，不是可选项。
+        没有 negative cases 覆盖的内容，不得声明"可安全压缩"。
+
+铁律2：只移动内容，不重写内容。
+        保持原始约束原文，防止语义漂移。
+
+铁律3：每个外置的 reference 必须有精确的 STOP 触发条件。
+        prose 条件不够，必须是显式的 STOP 指令。
+```
+
+## 10.3 Skill 体系总体成熟度基准（spec-first 为例）
+
+| Harness 维度 | 基准评分 | 主要缺口 |
+|---|---|---|
+| Context Harness | 7/10 | 无统一 Context Loading Policy，各自为政 |
+| Execution Harness | 9/10 | 已成熟，phase 化执行健全 |
+| Review Harness | 6/10 | code-review/doc-review 强，其余 skill 薄弱 |
+| Evidence Harness | 7/10 | prd/debug 强，brainstorm/compound 弱 |
+| Validation Harness | 6/10 | prd/write-tasks 有脚本，plan/brainstorm 无 |
+| Knowledge Harness | 3/10 | 仅 compound 健全，其余无闭环 |
+| Evaluation Harness | 4/10 | 有 examples，缺 negative + CI runner |
+| Governance Harness | 5/10 | source/runtime 边界清晰，版本/owner 缺失 |
+| **加权总分** | **5.8/10** | 执行强，知识与评测极弱 |
+
+## 10.4 最高优先级的单点行动（适用于任何类似 Skill 体系）
+
+1. **先找"真 Gate" vs "伪 Gate"**，为伪 Gate 补充 negative cases
+2. **用 wc -l 量化 SKILL.md 行数**，超过 300 行立即做 PD 分析
+3. **确认 evals/ 中有 negative cases**（不只有 examples）
+4. **确认 Evidence 词汇**在上下游 handoff 中是否统一
+5. **确认每个 Skill 的 Knowledge Harness Placeholder** 是否存在
+

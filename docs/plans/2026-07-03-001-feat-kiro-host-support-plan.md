@@ -51,7 +51,7 @@ implements_schemas:
 - R5. `skills-governance.json` 与 `agents-governance.json` 必须能表达 `host_delivery.kiro`，并由 schema/tests 防止漏登记、错误 delivery、错误 entry surface。
 - R6. Kiro MCP setup 必须写入/读取 JSON `mcpServers` 配置，并保持 credential boundary：只写 env var references 或 non-secret config，不提交凭据。
 - R7. Runtime context exclusion 必须覆盖 Kiro spec-first-managed runtime roots；Kiro native `.kiro/specs/**` 只能作为 named/advisory input，不成为 spec-first source-of-truth。
-- R8. Hook 支持如进入本计划实现范围，只能承载确定性边界提醒或阻断，不让 hook 做语义判断。
+- R8. *(实现约束，非 P0 需求)* 如 hook 被生成，只能承载确定性边界提醒或阻断（mutation/source-runtime guard），不得做语义判断或充当 plan/review 质量门控。此约束等价于 role contract 中的确定性门控原则；hooks 本身是 P1/deferred 交付，见 U5 与 Deferred to Follow-Up Work。
 - R9. README、README.zh-CN、用户手册、runtime capability/catalog、doctor/help 输出必须同步体现三宿主支持。
 - R10. 测试必须覆盖三宿主投影、CLI flags、MCP setup、context governance、release/package 内容；实现期还需 Kiro 实机 smoke 验证。
 
@@ -77,7 +77,7 @@ implements_schemas:
 
 ### Deferred to Follow-Up Work
 
-- Kiro-specific steering generation：若实机验证发现根 `AGENTS.md` 不足，再新增 `.kiro/steering/spec-first.md` 生成逻辑。
+- Kiro-specific steering generation：若实机验证发现根 `AGENTS.md` 不足，再新增 `.kiro/steering/spec-first.md` 生成逻辑。注意：Kiro 官方文档明确指出 codebase steering 文件存在安全隐患（untrusted content auto-inclusion）；后续 steering 计划必须显式选择 inclusion mode（优先 `manual` 或 `fileMatch` 而非 `always`），且不得将 generated steering 作为 spec-first 治理/语言 block 的第二 source-of-truth。
 - Kiro hook hardening：在 P0 Kiro skill/runtime delivery 通过后，再为 startup reminder、mutation/source-runtime gate 设计最小 blocking hook。
 - Kiro Specs import/export：未来可以把 `.kiro/specs/**` 转为 spec-first advisory input，但必须另起 plan，明确 artifact authority 和 freshness。
 
@@ -260,7 +260,7 @@ flowchart TB
   U3 --> U6["U6 docs/tests/release readiness"]
   U4 --> U6
   U2 --> U5["U5 optional hooks/steering boundary"]
-  U5 --> U6
+  U5 -.->|"if U5 P1 implemented"| U6
 ```
 
 ### U1. Multi-host governance contract
@@ -285,6 +285,7 @@ flowchart TB
 **Approach:**
 - Introduce a single supported host registry/list consumed by governance validation, filtering and runtime projection.
 - Add `host_delivery.kiro` for every public workflow, standalone skill and internal-only asset.
+- When updating the schema, explicitly extend `$defs.host` to `enum: ["claude", "codex", "kiro"]` and `owner_host` to `enum: ["claude", "codex", "kiro", null]` in both `skills-governance.schema.json` and `agents-governance.schema.json`. These sub-field enums are currently claude/codex-only and will reject Kiro-exclusive records if not updated.
 - Keep existing `dual_host` records valid during migration if changing them all at once creates unnecessary churn; document whether it means "all supported hosts" or is superseded.
 - Reject records that omit `kiro`, deliver a workflow to an unsupported surface, or expose internal-only assets to Kiro.
 
