@@ -5,19 +5,25 @@
 - 覆盖 skills：37 个（全部 SKILL.md）
 - 核心工作流分析深度：spec-plan / spec-code-review / spec-work / spec-prd / spec-optimize / spec-compound / spec-debug / spec-skill-audit / spec-write-skill / spec-team-standards-governance / using-spec-first
 
+> **执行者阅读路径（重要）**：本文件是追加式修订的研究方案，不是一次性定稿。若你要据此实施，只需读：**§一（方法论映射）+ §G / §H / §I / §J（当前有效结论）+ §H.14 / §H.15（执行清单与口径）**。
+> **§二~§六与附录 A-F 属于初版分析，其中「零风险删除」「整体减少 31%」「P0 立即落地」等措辞已被 §G / §H 系统性修正，仅供追溯脉络，不得作为实施依据。**
+> 质量审查与本文件的已知问题清单见 `docs/11-业界调研/spec-first-skills-优化方案-质量审查修复方案.md`。
+
 ---
 
 ## 执行摘要：结论先行
 
-基于对 16 个思维模型与当前 spec-first 全部 skills 的深度比对，识别出以下**5 个最高价值优化方向**：
+基于对 16 个思维模型与当前 spec-first 全部 skills 的深度比对，识别出以下 **5 个最高价值优化方向（候选，收益待 eval 验证）**：
 
-| 优化方向 | 对应模型 | 影响 skill | 预期收益 |
+> 本表为方向概览，「潜在方向」列只描述假设性收益，不代表已证明或可直接落地。每个方向的当前执行口径、降级结论与验证前置以 **§H.14 / §H.15** 为准；§一~§六与附录 A-F 为初版分析，不作为实施依据。
+
+| 优化方向 | 对应模型 | 影响 skill | 潜在方向（待验证） |
 |---|---|---|---|
-| **O1 · 需求歧义放大路径可视化** | 蝴蝶效应 | spec-prd / spec-plan | 减少因早期 OQ 未关闭导致的 plan 返工 |
-| **O2 · 置信度分级决策框架** | 概率思维 + 回归均值 | spec-code-review / spec-debug | 减少「大概成立」的低质量 finding |
-| **O3 · 知识复利追踪机制** | 复利效应 + 大数定律 | spec-compound / spec-compound-refresh | 把一次解决方案变成可度量的知识资产 |
-| **O4 · 二阶影响强制推演检查** | 二阶思维 | spec-plan / spec-work / spec-mcp-setup | 防止「一阶正确、二阶损害」决策 |
-| **O5 · 关键少数高杠杆聚焦** | 帕累托法则 | spec-code-review / spec-plan / spec-team-standards-governance | 把有限 review 资源投向最高风险 20% |
+| **O1 · 需求歧义放大路径可视化** | 蝴蝶效应 | spec-prd / spec-plan | 假设可降低早期 OQ 未关闭向 plan 放大的返工；需历史返工样本或 eval 证明 |
+| **O2 · 置信度分级决策框架** | 概率思维 + 回归均值 | spec-code-review / spec-debug | 假设可减少「大概成立」的低质量 finding；优先复用现有 confidence anchors 而非新增 schema |
+| **O3 · 知识复利追踪机制** | 复利效应 + 大数定律 | spec-compound / spec-compound-refresh | 假设可让一次解决方案变成可度量的知识资产；需先定义「引用影响决策」的计数规则 |
+| **O4 · 二阶影响强制推演检查** | 二阶思维 | spec-plan / spec-work / spec-mcp-setup | 假设可减少「一阶正确、二阶损害」决策；作为 attention prompt 而非必填字段 |
+| **O5 · 关键少数高杠杆聚焦** | 帕累托法则 | spec-code-review / spec-plan / spec-team-standards-governance | 假设可把有限 review 资源投向最高风险的少数变更；需跨 run 数据支撑 |
 
 ---
 
@@ -188,8 +194,8 @@ replacement_analysis:
 **核心洞察**：共享资源（context budget、CLAUDE.md/AGENTS.md、docs/solutions/ 知识库）如果缺少治理机制，会被过度消耗或污染。
 
 **当前 skill 现状**：
-- Context governance 合约（`docs/contracts/context-governance.md`）存在，但各 workflow 对上下文预算的使用缺少明确的「预算申报」机制
-- `docs/solutions/` 是共享知识库，但缺少「写入质量门控」防止低质量文档稀释信号密度
+- Context governance 合约（`docs/contracts/context-governance.md`）已定义上下文预算申报机制：`context_budget_exceeded` reason_code、`budget` / `budget_used` accounting，以及排除 context 时必须在输出或 coverage 中说明 `excluded_context` 和 reason_code（见该合约相关条目及 `docs/contracts/context-bundle.md` 的 `context-bundle.v1` envelope）。因此当前缺口不在「是否有机制」，而在「各 workflow 是否一致地在 coverage 中申报预算使用」——这属于执行遵守度问题，应通过 eval / fresh-source 复核观察，而非新增 schema。
+- `docs/solutions/` 是共享知识库，其写入质量已由 `spec-compound` 的 `Structured Promotion Gate` 门控；优化方向是把该 gate 的语义自检表达得更可扫描，而非新增第二套门控（见 OPT-4.1）。
 
 **具体优化建议**：
 
@@ -206,6 +212,8 @@ structured_promotion_gate_check:
 ```
 
 只有所有条件 `true` 才支持写入 `confirmed` 类型文档；否则沿用现有 Structured Promotion Gate 的降级路径，作为 `legacy_unstructured_advisory` / advisory candidate 或建议放弃。这防止「公地」（共享知识库）被低质量内容过度填充，同时避免制造第二个 promotion source-of-truth。
+
+> **字段性质澄清（重要）**：上述四项 `structured_promotion_gate_check` 是 promotion 时的 **reviewer / LLM 语义判断提示**，复用现有 `Structured Promotion Gate` 的判断语境，**不进入 `docs/solutions/` frontmatter 的 deterministic 校验、不新增字段、不新增 checker**。现有 frontmatter 契约以 `skills/spec-compound/references/schema.yaml`（`invalidation_condition` / `source_refs` 等）为准。若未来确需把某项变成 deterministic 校验，必须先证明现有 schema 无法满足明确 consumer，再按 consumer-proven 路径推进；否则它只是语义提示，不是 schema。
 
 ---
 
@@ -2153,25 +2161,9 @@ L24（Plan-Only Safety Contract）→ 压缩为 1 行引用：
 
 ### I.4 推荐下一步
 
-**推荐先做一个小型可验证切片：`Progressive Disclosure Reference Extraction Pilot`**
+推荐的首个实施切片 `Progressive Disclosure Reference Extraction Pilot`（试点范围、首选顺位、必须保留 inline 的内容、不包含项、验收标准）已在 **§七「推荐首个实施切片」** 完整给出，此处不重复。
 
-范围：
-
-1. 从以下候选中选一个，不跨 workflow 打包：
-   - `spec-code-review` headless output template 下沉
-   - `spec-plan` HTD 决策表下沉
-   - `using-spec-first` Artifact Boundaries 压缩
-2. 为选定 surface 增加 2-4 个案例：
-   - 正常触发 reference 的输入
-   - reference 未加载或触发条件不明时的保守 fallback
-   - must-stay-inline hard gate / activation gate 不丢
-   - 输出字段或 terminal signal 不退化
-3. 完成一次 source 改动后，用同一组案例做 regression check。
-
-验收：
-- 每个案例明确输入、预期行为、必须出现/不得出现的 output anchor。
-- 主干保留契约包含 `trigger`、`summary`、`must_stay_inline`、`fallback_when_unread`、`equivalence_eval`。
-- 精炼前先跑一遍作为 baseline，精炼后用相同 examples 做 regression check。
+§七与本节结论一致：从 code-review headless output template 下沉 / spec-plan HTD 决策表下沉 / using-spec-first Artifact Boundaries 压缩三者中**只选一个**，先补 2-4 个 targeted regression eval，再做单点 reference 下沉，用同一组 eval 做前后对比。
 
 ---
 

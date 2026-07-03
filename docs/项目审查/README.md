@@ -17,6 +17,9 @@
 
 | 日期 | 审查文档 | 主题 |
 | --- | --- | --- |
+| 2026-07-03 | [Windows PowerShell 修复计划](2026-07-03-windows-powershell-fix-plan.md) | Windows PowerShell 兼容性专项审查的修复计划与优先级 |
+| 2026-07-03 | [Windows PowerShell 兼容性审查](2026-07-03-windows-powershell-compat-review.md) | Windows 安装、shim、doctor、init、workflow helper 与 CI 覆盖的兼容性审查 |
+| 2026-07-03 | [Windows PowerShell 兼容性问题清单](2026-07-03-windows-powershell-compat-issues.md) | Windows PowerShell 兼容性待处理问题分级清单 |
 | 2026-07-02 | [项目整体严格审查报告](2026-07-02-项目整体严格审查报告.md) | 按项目整体审查逻辑覆盖 Harness、横向能力、纵向流程、37 个 skill、51 个 agent、产物、上下文、门禁、Evidence、Benchmark、Knowledge、工程效能与开源传播 |
 | 2026-07-02 | [AI 专家与工程效能综合审查](2026-07-02-ai-expert-engineering-effectiveness-review.md) | 任务建模、上下文治理、执行控制、评测反馈、知识进化与工程效能综合评估 |
 | 2026-06-28 | [spec-skill-健壮性稳定性优化审查](2026-06-28-spec-skill-健壮性稳定性优化审查.md) | skill 体系健壮性/稳定性/确定性 gate 加固（已转 PRD） |
