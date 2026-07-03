@@ -33,13 +33,13 @@ tags: [spec-plan, spec-work, architecture-fit, minimality, source-runtime, workf
 
 # plan 负责架构设计，work 负责架构适配检查
 
-## 背景
+## Context
 
 `spec-work` minimality 优化最初是一个 YAGNI 风格请求：执行阶段避免新增不必要的 dependency、file、helper、wrapper 和 abstraction。随后用户提出了真正承重的问题：优化后的 work skill 也必须思考架构层面的设计约束，并严格遵循现有项目规范、架构、分层、解耦和复用。
 
 这次计划沉淀的可复用经验是边界，而不是未来实现本身。`spec-plan` 仍然是负责架构设计和方案形态选择的阶段。`spec-work` 可以检查某个实现选择是否仍符合 plan、当前 source、confirmed standards、source/runtime ownership 和 nearby patterns。若执行中发现未授权的新架构决策，应停回 `spec-plan` 或 task-pack regeneration，而不是在实现阶段临场设计。
 
-## 指引
+## Guidance
 
 给执行 workflow 增加架构敏感行为时，使用这个职责拆分：
 
@@ -65,7 +65,7 @@ work 侧检查应保持轻量。它应是 durable surface 上的注意力提醒�
 
 Contract tests 和 examples 有价值，但边界有限。它们可以钉住计划中的 heading、loop order、禁止的 schema/CLI/runtime expansion 和 fixture tags；它们不能证明 agent 会拒绝 overbuild、保留 protected code、对小改动保持零 note，或在未授权架构决策前停回。
 
-## 为什么重要
+## Why This Matters
 
 缺少这个拆分时，很容易出现两个相反的失败模式：
 
@@ -74,14 +74,14 @@ Contract tests 和 examples 有价值，但边界有限。它们可以钉住计�
 
 这个边界能保持 workflow 链路一致：planning 负责 architecture design；work 负责 fit checking 和诚实 stop-back；review 负责 implemented-diff critique；compound 负责 verified learning。这符合 `Light contract + Explicit boundaries + Deterministic floor, LLM semantic judgment`。
 
-## 适用场景
+## When to Apply
 
 - 计划要求 execution skill 增加 preflight、minimality、YAGNI、reuse、layering 或 architecture-fit 行为。
 - work run 发现 plan 或 task pack 未授权的 durable surface。
 - review finding 指出计划让 review 变成了 architecture decision 授权来源。
 - source-only skill prompt 改动 closeout 时，有人想仅凭绿色 prose tests 声称 runtime behavior 已生效。
 
-## 示例
+## Examples
 
 更好的 source-contract 表述：
 
