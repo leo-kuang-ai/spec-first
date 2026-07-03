@@ -1,14 +1,16 @@
 const ClaudeAdapter = require('./claude');
 const CodexAdapter = require('./codex');
+const KiroAdapter = require('./kiro');
 
 const adapters = {
   claude: new ClaudeAdapter(),
   codex: new CodexAdapter(),
+  kiro: new KiroAdapter(),
 };
 
 /**
  * Get platform adapter by ID
- * @param {string} platformId - Platform identifier ('claude' or 'codex')
+ * @param {string} platformId - Platform identifier ('claude', 'codex', or 'kiro')
  * @returns {PlatformAdapter} Platform adapter instance
  * @throws {Error} If platform is unknown
  */

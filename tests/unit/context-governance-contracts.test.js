@@ -36,12 +36,17 @@ describe('context governance runtime exclusion contract', () => {
     expect(contract).toContain('`.claude/**`');
     expect(contract).toContain('`.codex/**`');
     expect(contract).toContain('`.agents/skills/**`');
+    expect(contract).toContain('`.kiro/skills/**`');
+    expect(contract).toContain('`.kiro/agents/**`');
+    expect(contract).toContain('`.kiro/spec-first/**`');
+    expect(contract).toContain('`.kiro/settings/**`');
+    expect(contract).toContain('`.kiro/specs/**` 是 Kiro-native advisory artifact');
     expect(contract).toContain('`runtime_audit_artifact_excluded`');
     expect(contract).toContain('`runtime_governance_artifact_excluded`');
     expect(contract).toContain('`generated_runtime_mirror_excluded`');
     expect(contract).toContain('`outside_repo_context_excluded`');
     expect(contract).toContain('普通 workflow 仍可读取 checked-in source truth');
-    expect(contract).toContain('禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**` 纳入默认');
+    expect(contract).toContain('禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**` 纳入默认');
     expect(contract).toContain('repo-relative canonical path');
     expect(contract).toContain('Changelog Consumption Policy');
     expect(contract).toContain('`CHANGELOG.md` remains mandatory for project source changes.');
@@ -72,6 +77,11 @@ describe('context governance runtime exclusion contract', () => {
       expect(block).toContain('.claude/**');
       expect(block).toContain('.codex/**');
       expect(block).toContain('.agents/skills/**');
+      expect(block).toContain('.kiro/skills/**');
+      expect(block).toContain('.kiro/agents/**');
+      expect(block).toContain('.kiro/spec-first/**');
+      expect(block).toContain('.kiro/settings/**');
+      expect(block).toContain('.kiro/specs/**');
     }
 
     // Checked-in instruction files surface the same runtime-exclusion invariants.
@@ -109,6 +119,10 @@ describe('context governance runtime exclusion contract', () => {
       expect(content).toContain('.claude/**');
       expect(content).toContain('.codex/**');
       expect(content).toContain('.agents/skills/**');
+      expect(content).toContain('.kiro/skills/**');
+      expect(content).toContain('.kiro/agents/**');
+      expect(content).toContain('.kiro/spec-first/**');
+      expect(content).toContain('.kiro/settings/**');
       if (relativePath === 'skills/using-spec-first/SKILL.md') {
         expect(content).toContain('latest relevant window / summary-first rules in `docs/contracts/context-governance.md`');
       }

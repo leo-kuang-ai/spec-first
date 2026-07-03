@@ -9,6 +9,14 @@ command -v jq >/dev/null 2>&1 || { echo '错误：jq 是必需依赖，请先安
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib-template.sh"
 
+KIRO_USER_SCOPE_ARG=false
+for arg in "$@"; do
+  if [ "$arg" = "--user-scope" ]; then
+    KIRO_USER_SCOPE_ARG=true
+    export KIRO_USER_SCOPE=1
+  fi
+done
+
 SKILL_DIR="$(dirname "$SCRIPT_DIR")"
 TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 PROVIDER_TOOLS_JSON="$SKILL_DIR/provider-tools.json"
@@ -253,6 +261,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     --plan)
       PLAN_MODE=true
+      shift
+      ;;
+    --user-scope)
+      KIRO_USER_SCOPE_ARG=true
+      export KIRO_USER_SCOPE=1
       shift
       ;;
     --requirement-workspace)
@@ -824,7 +837,11 @@ EOF
 
   if [ "$status" = "ready" ] && [ "$host_config_required" = "true" ]; then
     configure_output=""
-    if run_and_capture "configure:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/configure-host.sh" --tool "$tool_id"; then
+    configure_args=(--tool "$tool_id")
+    if [ "$KIRO_USER_SCOPE_ARG" = "true" ]; then
+      configure_args+=(--user-scope)
+    fi
+    if run_and_capture "configure:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/configure-host.sh" "${configure_args[@]}"; then
       configure_output="$RUN_STDOUT"
       configured_path="$(jq -r '.configured_path // empty' <<<"$configure_output")"
       selected_scope="$(jq -r '.selected_scope // empty' <<<"$configure_output")"
@@ -832,7 +849,7 @@ EOF
     else
       exit_code="$RUN_EXIT_CODE"
       diagnostic_summary="$RUN_DIAGNOSTIC"
-      if run_and_capture "repair:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/repair-install.sh" --tool "$tool_id"; then
+      if run_and_capture "repair:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/repair-install.sh" "${configure_args[@]}"; then
         repair_output="$RUN_STDOUT"
         last_action="repaired"
         configured_path="$(jq -r '.configured_path // empty' <<<"$repair_output")"

@@ -2,11 +2,11 @@
 
 这套手册对应当前 `spec-first` npm CLI 模型。
 
-`spec-first` 是面向 Claude Code 与 Codex 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。
+`spec-first` 是面向 Claude Code、Codex 与 Kiro 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。
 
-落到 CLI，它通过 `doctor / init [--claude] [--codex] [-y] / update / clean (--claude|--codex)` 把 Claude Code 的 `/spec:*` 命令、Codex 的 `$spec-*` skills、workflow skills、agents、agent support files、项目级 `.developer` 和受管状态安装到当前项目中。
+落到 CLI，它通过 `doctor / init [--claude] [--codex] [--kiro] [-y] / update / clean (--claude|--codex|--kiro)` 把 Claude Code 的 `/spec:*` 命令、Codex 的 `$spec-*` skills、Kiro Agent Skills、workflow skills、agents、agent support files、项目级 `.developer` 和受管状态安装到当前项目中。
 
-完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `/spec:*` 或 `$spec-*` workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
+完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `/spec:*`、`$spec-*` 或 Kiro Agent Skill workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
 
 当前推荐的事实准备、专项审查与知识沉淀入口：
 

@@ -37,6 +37,20 @@ const codex = buildFilteredAssetSet('codex');
 process.stdout.write(String(codex.skills.length + codex.workflowSkills.length + codex.internalSkills.length));
 NODE
 )"
+expected_kiro_total_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+const kiro = buildFilteredAssetSet('kiro');
+process.stdout.write(String(kiro.skills.length + kiro.workflowSkills.length + kiro.internalSkills.length));
+NODE
+)"
+expected_kiro_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+const kiro = buildFilteredAssetSet('kiro');
+process.stdout.write(String(kiro.skills.length + kiro.internalSkills.length));
+NODE
+)"
 
 run_programmatic_init() {
   local project_root="$1"
@@ -97,7 +111,7 @@ version_output="$(node "$REPO_ROOT/bin/spec-first.js" --version)"
 grep -q "doctor" <<<"$help_output"
 grep -q "init" <<<"$help_output"
 grep -q "Interactively install workflows" <<<"$help_output"
-grep -q "clean (--claude|--codex)" <<<"$help_output"
+grep -q "clean (--claude|--codex|--kiro)" <<<"$help_output"
 grep -q "repair-worktree" <<<"$help_output"
 grep -q "tasks <subcommand>" <<<"$help_output"
 if grep -q "stage0-context" <<<"$help_output"; then
@@ -105,7 +119,7 @@ if grep -q "stage0-context" <<<"$help_output"; then
   exit 1
 fi
 grep -q "Spec-First v${expected_version}" <<<"$version_output"
-grep -q "Claude Code & Codex" <<<"$version_output"
+grep -q "Claude Code, Codex, and Kiro" <<<"$version_output"
 unknown_output="$(node "$REPO_ROOT/bin/spec-first.js" unknown-command 2>&1 || true)"
 if ! grep -Eiq "unknown command|usage" <<<"$unknown_output"; then
   echo "unknown command should use normal usage path" >&2
@@ -117,7 +131,7 @@ echo "2. Check doctor output in a fresh project..."
 doctor_fresh_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor)"
 grep -q "No spec-first platform detected in this project." <<<"$doctor_fresh_output"
 grep -q 'spec-first init' <<<"$doctor_fresh_output"
-grep -q 'select Claude Code and/or Codex' <<<"$doctor_fresh_output"
+grep -q 'select Claude Code, Codex, and/or Kiro' <<<"$doctor_fresh_output"
 doctor_fresh_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --json)"
 node - "$doctor_fresh_json" <<'NODE'
 const payload = JSON.parse(process.argv[2]);
@@ -339,7 +353,70 @@ NODE
 grep -q '.agents/skills/' "$TMP_DIR/.gitignore"
 echo "✓ Codex init generated skills, agents, hooks, and AGENTS.md"
 
-echo "8. Verify clean dry-run and clean removal..."
+echo "8. Initialize Kiro runtime and verify assets..."
+kiro_output="$(run_programmatic_init "$TMP_DIR" kiro kuang en)"
+grep -q "Generated ${expected_agent_count} agent file(s) in .kiro/agents" <<<"$kiro_output"
+grep -q "Generated ${expected_kiro_total_skill_count} skill directory(ies) in .kiro/skills" <<<"$kiro_output"
+installed_kiro_skill_count="$(find "$TMP_DIR/.kiro/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
+test "$installed_kiro_skill_count" = "$expected_kiro_total_skill_count"
+for skill in spec-plan spec-work spec-code-review spec-doc-review spec-brainstorm spec-mcp-setup spec-compound-refresh; do
+  test -f "$TMP_DIR/.kiro/skills/$skill/SKILL.md"
+  grep -q "^name: $skill$" "$TMP_DIR/.kiro/skills/$skill/SKILL.md"
+done
+test ! -e "$TMP_DIR/.kiro/skills/spec-"standards"/SKILL.md"
+test ! -e "$TMP_DIR/.kiro/skills/spec-work-beta/SKILL.md"
+test -f "$TMP_DIR/.kiro/skills/using-spec-first/SKILL.md"
+grep -q '^name: using-spec-first$' "$TMP_DIR/.kiro/skills/using-spec-first/SKILL.md"
+test -f "$TMP_DIR/.kiro/skills/git-worktree/SKILL.md"
+grep -q '^name: git-worktree$' "$TMP_DIR/.kiro/skills/git-worktree/SKILL.md"
+for agent in spec-repo-research-analyst.agent.md spec-session-historian.agent.md spec-slack-researcher.agent.md; do
+  test -f "$TMP_DIR/.kiro/agents/$agent"
+  grep -q '^tools: \["read"\]$' "$TMP_DIR/.kiro/agents/$agent"
+done
+test -f "$TMP_DIR/.kiro/spec-first/state.json"
+test ! -e "$TMP_DIR/.kiro/commands/spec"
+test ! -e "$TMP_DIR/.kiro/hooks"
+test ! -e "$TMP_DIR/.kiro/steering"
+node - "$TMP_DIR/.kiro/spec-first/state.json" "$expected_kiro_skill_count" "$expected_workflow_skill_count" "$expected_agent_count" <<'NODE'
+const fs = require('node:fs');
+const [statePath, skillCount, workflowSkillCount, agentCount] = process.argv.slice(2);
+const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+if (state.commands.length !== 0) throw new Error('Kiro command count should be zero');
+if (state.skills.length !== Number(skillCount)) throw new Error('Kiro skill count mismatch');
+if (state.workflowSkills.length !== Number(workflowSkillCount)) throw new Error('Kiro workflow skill count mismatch');
+if (!state.workflowSkills.includes('spec-mcp-setup')) throw new Error('missing Kiro mcp-setup workflow skill');
+if (state.agents.length !== Number(agentCount)) throw new Error('Kiro agent count mismatch');
+NODE
+kiro_doctor_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --kiro)"
+grep -q ".kiro/spec-first/state.json" <<<"$kiro_doctor_output"
+grep -q ".kiro/skills" <<<"$kiro_doctor_output"
+grep -q ".kiro/agents" <<<"$kiro_doctor_output"
+if grep -q ".kiro/commands/spec" <<<"$kiro_doctor_output"; then
+  echo "Kiro doctor should not report .kiro/commands/spec as an installed surface" >&2
+  exit 1
+fi
+kiro_doctor_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --kiro --json)"
+node - "$kiro_doctor_json" <<'NODE'
+const payload = JSON.parse(process.argv[2]);
+if (!['simulated', 'verified', 'not_verified'].includes(payload.workflow_runnability)) {
+  throw new Error(`unexpected Kiro runnability ${payload.workflow_runnability}`);
+}
+if (!['pass', 'warn', 'error'].includes(payload.runtime_asset_health)) {
+  throw new Error(`unexpected Kiro asset health ${payload.runtime_asset_health}`);
+}
+if (!payload.platform_checks?.kiro?.length) throw new Error('missing Kiro checks');
+const skillCheck = payload.platform_checks.kiro.find((entry) =>
+  entry.name === '.kiro/skills/spec-work/SKILL.md' && entry.message.includes('Kiro skill frontmatter is valid')
+);
+if (!skillCheck || skillCheck.level !== 'PASS') throw new Error('missing passing Kiro skill check');
+const agentCheck = payload.platform_checks.kiro.find((entry) =>
+  entry.name === '.kiro/agents/spec-repo-research-analyst.agent.md' && entry.message.includes('read-only default tools')
+);
+if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing Kiro agent check');
+NODE
+echo "✓ Kiro init generated Agent Skills, agents, state, and doctor facts"
+
+echo "9. Verify clean dry-run and clean removal..."
 clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --claude --dry-run)"
 grep -q "Dry run: spec-first clean (claude)" <<<"$clean_dry"
 grep -q "No files were changed." <<<"$clean_dry"
@@ -348,5 +425,24 @@ test -d "$TMP_DIR/.claude/spec-first"
 test ! -d "$TMP_DIR/.claude/spec-first"
 test ! -d "$TMP_DIR/.claude/commands/spec"
 echo "✓ clean removes managed Claude runtime"
+
+mkdir -p "$TMP_DIR/.kiro/hooks" "$TMP_DIR/.kiro/settings" "$TMP_DIR/.kiro/specs/native"
+printf 'custom hook\n' > "$TMP_DIR/.kiro/hooks/custom"
+printf '{"custom":true}\n' > "$TMP_DIR/.kiro/settings/user.json"
+printf '# Native Kiro spec\n' > "$TMP_DIR/.kiro/specs/native/spec.md"
+kiro_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --kiro --dry-run)"
+grep -q "Dry run: spec-first clean (kiro)" <<<"$kiro_clean_dry"
+grep -q ".kiro/skills/spec-work" <<<"$kiro_clean_dry"
+grep -q ".kiro/agents/spec-repo-research-analyst.agent.md" <<<"$kiro_clean_dry"
+grep -q ".kiro/spec-first/state.json" <<<"$kiro_clean_dry"
+grep -q "No files were changed." <<<"$kiro_clean_dry"
+(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --kiro >/dev/null)
+test ! -d "$TMP_DIR/.kiro/skills"
+test ! -d "$TMP_DIR/.kiro/agents"
+test ! -d "$TMP_DIR/.kiro/spec-first"
+test -f "$TMP_DIR/.kiro/hooks/custom"
+test -f "$TMP_DIR/.kiro/settings/user.json"
+test -f "$TMP_DIR/.kiro/specs/native/spec.md"
+echo "✓ clean removes managed Kiro runtime without touching user-owned .kiro assets"
 
 echo "=== CLI smoke test passed ✓ ==="

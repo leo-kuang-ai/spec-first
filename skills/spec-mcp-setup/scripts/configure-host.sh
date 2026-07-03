@@ -12,12 +12,6 @@ TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 source "$SCRIPT_DIR/lib-toml.sh"
 source "$SCRIPT_DIR/lib-template.sh"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
-HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
-HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
-SELECTED_SCOPE="$(jq -r '.selected_scope // empty' <<<"$HOST_INFO_JSON")"
-CONFIG_PATH="$(jq -r '.config_path' <<<"$HOST_INFO_JSON")"
-LOCK_FILE="${CONFIG_PATH}.lock"
-CONFIG_DIR="$(dirname "$CONFIG_PATH")"
 
 TOOL_ID=""
 while [[ $# -gt 0 ]]; do
@@ -26,11 +20,23 @@ while [[ $# -gt 0 ]]; do
       TOOL_ID="${2:-}"
       shift 2
       ;;
+    --user-scope)
+      export KIRO_USER_SCOPE=1
+      shift
+      ;;
     *)
       shift
       ;;
   esac
 done
+
+HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
+HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
+SELECTED_SCOPE="$(jq -r '.selected_scope // empty' <<<"$HOST_INFO_JSON")"
+CONFIG_PATH="$(jq -r '.config_path' <<<"$HOST_INFO_JSON")"
+CONFIG_FORMAT="$(jq -r '.config_format // empty' <<<"$HOST_INFO_JSON")"
+LOCK_FILE="${CONFIG_PATH}.lock"
+CONFIG_DIR="$(dirname "$CONFIG_PATH")"
 
 [ -n "$TOOL_ID" ] || { echo '错误：缺少 --tool' >&2; exit 1; }
 [ -n "$SELECTED_SCOPE" ] || { echo '错误：未找到可用宿主配置目标' >&2; exit 1; }
@@ -49,6 +55,10 @@ FALLBACK_APPLIED=false
 if [ "$HOST" = "claude" ] && [ "$SELECTED_SCOPE" != "managed" ]; then
   FALLBACK_APPLIED=true
 fi
+
+host_uses_json_config() {
+  [ "$CONFIG_FORMAT" = "json" ]
+}
 
 codex_higher_precedence_status() {
   [ "$HOST" = "codex" ] || {
@@ -92,7 +102,7 @@ tool_is_configured() {
 
   case "$DETECT_KIND" in
     host_config_exact)
-      if [ "$HOST" = "claude" ]; then
+      if host_uses_json_config; then
         jq -e --arg key "$DETECT_KEY" --arg command "$EXPECTED_COMMAND" --argjson expected_args "$EXPECTED_ARGS" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1
         return
       fi
@@ -100,7 +110,7 @@ tool_is_configured() {
       return
       ;;
     host_config_key_only)
-      if [ "$HOST" = "claude" ]; then
+      if host_uses_json_config; then
         jq -e --arg key "$DETECT_KEY" '.mcpServers[$key] != null' "$CONFIG_PATH" >/dev/null 2>&1
       else
         [ -n "$(extract_toml_mcp_section "$CONFIG_PATH" "$DETECT_KEY")" ]
@@ -122,7 +132,7 @@ overwrite_approved() {
 selected_config_conflicts() {
   [ "$DETECT_KIND" = "host_config_exact" ] || return 1
   [ -f "$CONFIG_PATH" ] || return 1
-  if [ "$HOST" = "claude" ]; then
+  if host_uses_json_config; then
     jq -e --arg key "$DETECT_KEY" '.mcpServers[$key] != null' "$CONFIG_PATH" >/dev/null 2>&1 || return 1
     jq -e --arg key "$DETECT_KEY" --arg command "$EXPECTED_COMMAND" --argjson expected_args "$EXPECTED_ARGS" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1 && return 1
     return 0
@@ -161,7 +171,7 @@ release_lock() {
   fi
 }
 
-write_claude_config() {
+write_json_mcp_config() {
   local config_json="$1"
   local tmp
   tmp="$(mktemp "${CONFIG_PATH}.XXXXXX")"
@@ -172,6 +182,17 @@ write_claude_config() {
     jq -n --arg id "$TOOL_ID" --argjson cfg "$config_json" '{mcpServers: {($id): $cfg}}' > "$tmp"
   fi
   mv "$tmp" "$CONFIG_PATH"
+}
+
+assert_no_literal_secret_values() {
+  [ "$HOST" = "kiro" ] || return 0
+  jq -e '
+    [.. | objects | to_entries[]? |
+      select((.key | test("(?i)(token|secret|api[_-]?key|password)"))
+        and (.value | type == "string")
+        and ((.value | test("^\\$\\{[A-Za-z_][A-Za-z0-9_]*\\}$")) | not))]
+    | length == 0
+  ' "$CONFIG_PATH" >/dev/null
 }
 
 write_codex_config() {
@@ -233,17 +254,27 @@ else
 fi
 
 if [ "$HOST" = "claude" ]; then
-  if ! write_claude_config "$RESOLVED_TOOL_CONFIG_JSON"; then
+  if ! write_json_mcp_config "$RESOLVED_TOOL_CONFIG_JSON"; then
     restore_backup
     echo "错误：$TOOL_ID 写入宿主配置失败，已回滚" >&2
     exit 1
   fi
-else
+elif [ "$HOST" = "codex" ]; then
   if ! write_codex_config; then
     restore_backup
     echo "错误：$TOOL_ID 写入宿主配置失败，已回滚" >&2
     exit 1
   fi
+elif [ "$HOST" = "kiro" ]; then
+  if ! write_json_mcp_config "$RESOLVED_TOOL_CONFIG_JSON" || ! assert_no_literal_secret_values; then
+    restore_backup
+    echo "错误：$TOOL_ID 写入 Kiro 配置失败或包含非 env reference 形式的敏感字段，已回滚" >&2
+    exit 1
+  fi
+else
+  restore_backup
+  echo "错误：无法识别宿主：$HOST" >&2
+  exit 1
 fi
 
 CONFIGURED_EFFECTIVE_PATH="$CONFIG_PATH"

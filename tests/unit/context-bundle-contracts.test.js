@@ -151,6 +151,11 @@ describe('context bundle and summary contracts', () => {
         '.spec-first/workflows/spec-work/run.json',
         '.spec-first/sessions/session-a.json',
         '.agents/skills/spec-work/SKILL.md',
+        '.kiro/skills/spec-work/SKILL.md',
+        '.kiro/agents/spec-security-reviewer.agent.md',
+        '.kiro/spec-first/state.json',
+        '.kiro/settings/mcp.json',
+        '.kiro/specs/feature-a/requirements.md',
         'tests/unit/context-bundle-contracts.test.js',
       ],
       fullReadTriggers: ['summary_missing'],
@@ -165,6 +170,7 @@ describe('context bundle and summary contracts', () => {
     expect(bundle.related_paths.map((entry) => entry.path)).toContain('docs/contracts/context-bundle.md');
     expect(bundle.artifact_summaries.map((entry) => entry.path)).toContain('docs/contracts/artifact-summary.md');
     expect(bundle.evidence_paths.map((entry) => entry.path)).toContain('tests/unit/context-bundle-contracts.test.js');
+    expect(bundle.evidence_paths.map((entry) => entry.path)).toContain('.kiro/specs/feature-a/requirements.md');
     expect(bundle.excluded_context).toEqual(expect.arrayContaining([
       expect.objectContaining({
         path: '.spec-first/audits/old-run/summary.json',
@@ -196,6 +202,22 @@ describe('context bundle and summary contracts', () => {
       }),
       expect.objectContaining({
         path: '.agents/skills/spec-work/SKILL.md',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/skills/spec-work/SKILL.md',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/agents/spec-security-reviewer.agent.md',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/spec-first/state.json',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/settings/mcp.json',
         reason_code: 'generated_runtime_mirror_excluded',
       }),
     ]));

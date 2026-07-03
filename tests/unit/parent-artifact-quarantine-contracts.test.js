@@ -55,7 +55,7 @@ describe('parent artifact quarantine contract', () => {
     const cleanSource = read('src/cli/commands/clean.js');
 
     expect(cleanSource).toContain('runWorkspaceOrphansClean');
-    expect(cleanSource).toContain('--workspace-orphans cannot be combined with --claude or --codex');
+    expect(cleanSource).toContain('--workspace-orphans cannot be combined with host flags');
     expect(cleanSource).toContain('Run `spec-first clean --workspace-orphans --confirm` to delete listed paths.');
     expect(cleanSource).toContain('isAllowedWorkspaceOrphanPath');
     expect(cleanSource).toContain('schema_version must be parent-artifact-quarantine.v1');

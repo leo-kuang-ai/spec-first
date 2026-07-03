@@ -79,7 +79,7 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('target_repo');
     expect(twice).toContain('Runtime context 默认排除 `.spec-first/audits/**`');
     expect(twice).toContain('`.spec-first/governance/**`');
-    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`）');
+    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`）');
     expect(twice).toContain('docs/10-prompt/结构化项目角色契约.md');
     expect(twice).toContain('scripts/tools 只产 deterministic facts');
     expect(twice).toContain('优化→`/spec:optimize`');
@@ -132,7 +132,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('bounded subagents, leaf reviewers, and worker agents');
     expect(updated).toContain('Runtime context excludes `.spec-first/audits/**`');
     expect(updated).toContain('`.spec-first/governance/**`');
-    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`)');
+    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`)');
     expect(updated).toContain('Common entry anchors');
     expect(updated).toContain('External issue/PR inputs');
     expect(updated).toContain('issue/PR material is an input surface, not a separate workflow');

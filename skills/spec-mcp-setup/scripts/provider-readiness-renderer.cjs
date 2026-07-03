@@ -168,6 +168,7 @@ function setupWorkflowCommand(host, args = '') {
   const suffix = args ? ` ${args}` : '';
   if (host === 'claude') return `/spec:mcp-setup${suffix}`;
   if (host === 'codex') return `$spec-mcp-setup${suffix}`;
+  if (host === 'kiro') return `Kiro Agent Skill spec-mcp-setup${suffix}`;
   return `/spec:mcp-setup${suffix} or $spec-mcp-setup${suffix}`;
 }
 
@@ -192,7 +193,7 @@ function envFlag(name) {
 
 function currentProviderHost() {
   const value = String(process.env.SPEC_FIRST_PROVIDER_HOST || '').toLowerCase();
-  if (value === 'claude' || value === 'codex') return value;
+  if (value === 'claude' || value === 'codex' || value === 'kiro') return value;
   return 'codex';
 }
 
@@ -248,6 +249,11 @@ function projectSkillCandidates(repoDir, providerId, host = currentProviderHost(
   if (host === 'claude') {
     return [
       path.join(repoDir, '.claude', 'skills', providerId, 'SKILL.md'),
+    ];
+  }
+  if (host === 'kiro') {
+    return [
+      path.join(repoDir, '.kiro', 'skills', providerId, 'SKILL.md'),
     ];
   }
   return [

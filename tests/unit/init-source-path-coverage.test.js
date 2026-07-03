@@ -6,6 +6,7 @@ const path = require('node:path');
 
 const ClaudeAdapter = require('../../src/cli/adapters/claude');
 const CodexAdapter = require('../../src/cli/adapters/codex');
+const KiroAdapter = require('../../src/cli/adapters/kiro');
 const {
   buildFilteredAssetSet,
   listBundledCommands,
@@ -49,7 +50,8 @@ describe('init source path coverage', () => {
       .map((record) => record.skill_name);
     const claudeSkills = deliveredSkills(buildFilteredAssetSet('claude'));
     const codexSkills = deliveredSkills(buildFilteredAssetSet('codex'));
-    const delivered = new Set([...claudeSkills, ...codexSkills]);
+    const kiroSkills = deliveredSkills(buildFilteredAssetSet('kiro'));
+    const delivered = new Set([...claudeSkills, ...codexSkills, ...kiroSkills]);
 
     expect(bundledSkills.length).toBeGreaterThan(0);
     expect(bundledSkills.filter((skillName) => !governedSkills.has(skillName))).toEqual([]);
@@ -60,10 +62,12 @@ describe('init source path coverage', () => {
     const commands = listBundledCommands();
     const claudeAssets = buildFilteredAssetSet('claude');
     const codexAssets = buildFilteredAssetSet('codex');
+    const kiroAssets = buildFilteredAssetSet('kiro');
 
     expect(commands.length).toBeGreaterThan(0);
     expect(claudeAssets.commands.map((command) => command.name)).toEqual(commands.map((command) => command.name));
     expect(codexAssets.commands).toEqual([]);
+    expect(kiroAssets.commands).toEqual([]);
 
     for (const command of commands) {
       const hasTemplate = fs.existsSync(path.join(REPO_ROOT, 'templates/droid/commands/spec', command.filename));
@@ -71,6 +75,7 @@ describe('init source path coverage', () => {
       expect(hasTemplate || hasSkillSource).toBe(true);
       expect(claudeAssets.workflowSkills).toContain(command.skill);
       expect(codexAssets.workflowSkills).toContain(command.skill);
+      expect(kiroAssets.workflowSkills).toContain(command.skill);
     }
   });
 
@@ -80,17 +85,21 @@ describe('init source path coverage', () => {
     try {
       const claudePlan = planBundledAssetSync(projectRoot, new ClaudeAdapter()).plan;
       const codexPlan = planBundledAssetSync(projectRoot, new CodexAdapter()).plan;
+      const kiroPlan = planBundledAssetSync(projectRoot, new KiroAdapter()).plan;
       const claudePaths = operationPaths(claudePlan);
       const codexPaths = operationPaths(codexPlan);
+      const kiroPaths = operationPaths(kiroPlan);
 
       for (const skillName of GOVERNED_CRITICAL_SKILLS) {
         const claudeRuntimeRoot = skillName === 'using-spec-first'
           ? `.claude/skills/${skillName}/SKILL.md`
           : `.claude/spec-first/workflows/${skillName}/SKILL.md`;
         const codexRuntimeRoot = `.agents/skills/${skillName}/SKILL.md`;
+        const kiroRuntimeRoot = `.kiro/skills/${skillName}/SKILL.md`;
 
         expect(claudePaths).toContain(claudeRuntimeRoot);
         expect(codexPaths).toContain(codexRuntimeRoot);
+        expect(kiroPaths).toContain(kiroRuntimeRoot);
       }
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });

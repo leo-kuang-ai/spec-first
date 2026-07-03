@@ -95,7 +95,7 @@ Past learnings from `docs/solutions/` are recall advisory candidate evidence. Tr
 
 ## Runtime Context Exclusion
 
-Follow `docs/contracts/context-governance.md`: ordinary Debug context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`) by default. Runtime logs are task evidence only when they directly reproduce the symptom or the user points to them; do not scan audit snapshots, governance observations, or generated mirrors as source context unless debugging setup/update/runtime drift/audit/governance behavior.
+Follow `docs/contracts/context-governance.md`: ordinary Debug context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`) by default. Runtime logs are task evidence only when they directly reproduce the symptom or the user points to them; do not scan audit snapshots, governance observations, or generated mirrors as source context unless debugging setup/update/runtime drift/audit/governance behavior. Kiro-native `.kiro/specs/**` is advisory input only when explicitly named.
 
 Maintain a run-local context ledger for this workflow: paths read, reason, phase, and compact summary. Reuse loaded summaries within the same workflow run. Re-read only when exact wording is needed, the file changed, prior evidence is insufficient, or the user explicitly asks.
 

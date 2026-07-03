@@ -41,6 +41,68 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(source).toContain('Set-TextFileAtomic -Path $ConfigPath -Value ($config | ConvertTo-Json -Depth 8)');
     expect(source).toContain('function Test-SelectedConfigConflicts');
     expect(source).toContain('SPEC_FIRST_MCP_CONFIGURE_OVERWRITE');
+    expect(source).toContain("} elseif ($DetectedHost -eq 'kiro') {");
+    expect(source).toContain('Assert-NoLiteralSecretValues');
+    expect(source).toContain('$value -is [pscustomobject]');
+  });
+
+  test('kiro host config writes workspace json by default and user json only with opt-in when PowerShell is available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-kiro-'));
+    try {
+      const repo = path.join(tmp, 'repo');
+      const home = path.join(tmp, 'home');
+      fs.mkdirSync(repo, { recursive: true });
+      fs.mkdirSync(home, { recursive: true });
+      fs.writeFileSync(path.join(repo, 'package.json'), '{"name":"fixture"}\n');
+
+      const defaultResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'sequential-thinking'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      if (defaultResult === null) {
+        return;
+      }
+
+      expect(defaultResult.status).toBe(0);
+      const defaultPayload = JSON.parse(defaultResult.stdout);
+      const workspaceConfigPath = path.join(repo, '.kiro/settings/mcp.json');
+      const userConfigPath = path.join(home, '.kiro/settings/mcp.json');
+      expect(defaultPayload.selected_scope).toBe('workspace');
+      expect(fs.existsSync(workspaceConfigPath)).toBe(true);
+      expect(fs.existsSync(userConfigPath)).toBe(false);
+      expect(JSON.parse(read(workspaceConfigPath)).mcpServers['sequential-thinking']).toMatchObject({
+        command: 'npx',
+      });
+
+      const userResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(userResult.status).toBe(0);
+      const userPayload = JSON.parse(userResult.stdout);
+      expect(userPayload.selected_scope).toBe('user');
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('kiro literal secret guard walks PSCustomObject graphs', () => {
+    expect(read(configureHostPs1)).toContain('$current -is [pscustomobject]');
+    expect(read(configureHostPs1)).toContain('$property.Name');
+    expect(read(configureHostPs1)).toContain('Kiro config contains a literal secret-like value');
   });
 
   test('setup sources use direct setup facts only', () => {
@@ -112,6 +174,22 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
           command: 'codegraph',
           args: ['serve', '--mcp'],
         },
+        kiro: {
+          command: 'codegraph',
+          args: ['serve', '--mcp'],
+          targets: {
+            workspace: {
+              config_path: '.kiro/settings/mcp.json',
+              config_format: 'json',
+            },
+            user: {
+              config_path: '$HOME/.kiro/settings/mcp.json',
+              config_format: 'json',
+              requires_user_scope_opt_in: true,
+            },
+          },
+          fallback_order: ['workspace'],
+        },
       },
     });
     expect(toolsJson.tools.every((tool) => tool.category === 'mcp')).toBe(true);
@@ -124,6 +202,8 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(combined).toContain("reason_code = 'setup-facts-ready'");
     expect(combined).toContain('tool-facts.json');
     expect(combined).toContain('runtime-capabilities.json');
+    expect(read(detectToolsPs1)).toContain('$ConfigFormat = $HostInfo.config_format');
+    expect(read(detectToolsPs1)).toContain('function Test-JsonHostConfig');
     expect(read(installMcpPs1)).toContain('function Test-OptionalToolAllowed');
     expect(read(installMcpPs1)).toContain('[switch]$Plan');
     expect(read(installMcpPs1)).toContain('[string]$RequirementWorkspace');
@@ -165,6 +245,9 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).toContain("SPEC_FIRST_PROVIDER_GRAPHIFY_QUERY_VERIFIED'))) { return }");
     expect(read(installHelpersPs1)).toContain('if ([string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return }');
     expect(read(installHelpersPs1)).toContain('Ordinary workflows do not refresh project graphs after code changes');
+    expect(read(installHelpersPs1)).toContain("'.kiro/skills/graphify/SKILL.md'");
+    expect(read(installHelpersPs1)).toContain("@('claude', 'codex', 'kiro')");
+    expect(read(checkHealthPs1)).toContain("'.kiro', 'skills', $SkillName, 'SKILL.md'");
     for (const token of [
       'Use Graphify as exploration-tier orientation',
       'architecture relationships',

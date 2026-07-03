@@ -84,7 +84,7 @@ For docs-only and config-only changes, docs contract checks, schema/help/render 
 
 ## Runtime Context Exclusion
 
-遵循 `docs/contracts/context-governance.md`：普通 Code Review context 默认排除 `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`）。除非 diff 或用户请求明确指向 setup/update/runtime drift/audit/governance evidence，否则不要把这些路径放进 reviewer prompt、broad repo search 或 review context bundle；被排除时，在 Coverage 中报告 path 或 reason，而不是静默扫描。
+遵循 `docs/contracts/context-governance.md`：普通 Code Review context 默认排除 `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`）。除非 diff 或用户请求明确指向 setup/update/runtime drift/audit/governance evidence，否则不要把这些路径放进 reviewer prompt、broad repo search 或 review context bundle；被排除时，在 Coverage 中报告 path 或 reason，而不是静默扫描。Kiro-native `.kiro/specs/**` 只有显式点名时作为 advisory input。
 
 ## Cache-Friendly Context Layout
 

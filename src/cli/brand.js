@@ -18,7 +18,7 @@ const LOGO_LINES = [
   '███████║██║     ███████╗╚██████╗          ██║     ██║██║  ██║███████║   ██║   ',
   '╚══════╝╚═╝     ╚══════╝ ╚═════╝          ╚═╝     ╚═╝╚═╝  ╚═╝╚══════╝   ╚═╝   ',
 ];
-const TAGLINE = 'AI coding harness for Claude Code & Codex';
+const TAGLINE = 'AI coding harness for Claude Code, Codex, and Kiro';
 // art 与品牌行左侧缩进,保持与分隔线对齐的呼吸感。
 const INDENT = ' ';
 

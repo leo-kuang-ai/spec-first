@@ -423,6 +423,7 @@ describe('spec-prd workflow contracts', () => {
           host_delivery: {
             claude: 'command',
             codex: 'skill',
+            kiro: 'skill',
           },
         },
       ]),
@@ -442,6 +443,7 @@ describe('spec-prd workflow contracts', () => {
     expect(claudeAssets.commands.map((command) => command.name)).toContain('prd');
     expect(claudeAssets.workflowSkills).toContain('spec-prd');
     expect(codexAssets.workflowSkills).toContain('spec-prd');
+    expect(buildFilteredAssetSet('kiro').workflowSkills).toContain('spec-prd');
     expect(codexAssets.commands.map((command) => command.name)).not.toContain('prd');
   });
 

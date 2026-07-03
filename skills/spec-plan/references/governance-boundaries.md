@@ -18,7 +18,7 @@ For major planning decisions, carry a lightweight decision note in the plan or h
 
 ## Runtime Context Exclusion
 
-Follow `docs/contracts/context-governance.md`: ordinary Planning context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`) by default. Do not use those paths as planning source, broad repo context, or research input unless the plan explicitly targets setup/update/runtime drift/audit/governance evidence or the user names a precise runtime path; when excluded, carry the path or reason as a limitation instead of silently scanning it.
+Follow `docs/contracts/context-governance.md`: ordinary Planning context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`) by default. Do not use those paths as planning source, broad repo context, or research input unless the plan explicitly targets setup/update/runtime drift/audit/governance evidence or the user names a precise runtime path; when excluded, carry the path or reason as a limitation instead of silently scanning it. Kiro-native `.kiro/specs/**` is advisory input only when explicitly named.
 
 ## Cache-Friendly Context Layout
 

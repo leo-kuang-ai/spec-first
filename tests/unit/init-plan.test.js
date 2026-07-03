@@ -151,6 +151,42 @@ describe('init plan API', () => {
     }
   });
 
+  test('applyInitPlan writes Kiro skills, agents and state without command, hook or steering runtime', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      const plan = buildInitPlan({
+        projectRoot,
+        platform: 'kiro',
+        name: 'reviewer',
+        lang: 'zh',
+      });
+      const result = applyInitPlan(projectRoot, plan);
+
+      expect(result.exit_code).toBe(0);
+      expect(fs.existsSync(path.join(projectRoot, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'commands', 'spec'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'hooks'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'steering'))).toBe(false);
+
+      const skill = fs.readFileSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).toContain('name: spec-work');
+      expect(skill).not.toContain('.agents/skills/spec-work');
+
+      const agent = fs.readFileSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
+      expect(agent).toContain('name: spec-security-reviewer');
+      expect(agent).toContain('tools: ["read"]');
+      expect(agent).not.toMatch(/^model:/m);
+      expect(agent).not.toMatch(/^tools:.*\b(Read|Grep|Glob|Bash)\b/m);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('legacy managed state is represented as destructive plan diagnostics before apply', () => {
     const projectRoot = makeTempDir();
 

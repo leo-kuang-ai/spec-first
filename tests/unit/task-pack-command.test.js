@@ -488,16 +488,21 @@ describe('task pack hash and validation', () => {
           '.claude',
           '.codex',
           '.agents/skills',
+          '.kiro/skills',
+          '.kiro/agents/spec-security-reviewer.agent.md',
+          '.kiro/spec-first/state.json',
+          '.kiro/settings/mcp.json',
           '.claude/commands/spec/work.md',
           '.codex/skills/spec-work/SKILL.md',
           '.agents/skills/spec-work/SKILL.md',
+          '.kiro/skills/spec-work/SKILL.md',
         ];
       });
 
       const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
 
       expect(result.deterministic_handoff).toBe(false);
-      expect(result.errors.filter((error) => error.code === 'task-pack-task-file-generated-runtime')).toHaveLength(6);
+      expect(result.errors.filter((error) => error.code === 'task-pack-task-file-generated-runtime')).toHaveLength(11);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }

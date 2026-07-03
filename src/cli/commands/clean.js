@@ -40,18 +40,19 @@ function runClean(argv) {
     return 2;
   }
 
-  const platformSelected = parsed.claude || parsed.codex;
+  const selectedPlatforms = ['claude', 'codex', 'kiro'].filter((platform) => parsed[platform]);
+  const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--kiro) [--dry-run]');
     return 2;
   }
 
-  if (parsed.claude && parsed.codex) {
-    console.error('Error: Cannot specify both --claude and --codex');
+  if (selectedPlatforms.length > 1) {
+    console.error('Error: Cannot specify more than one host flag for clean');
     return 2;
   }
 
-  const platform = parsed.claude ? 'claude' : 'codex';
+  const platform = selectedPlatforms[0];
   const adapter = getAdapter(platform);
   const projectRoot = process.cwd();
   let state;
@@ -108,7 +109,7 @@ function runClean(argv) {
   applyOperationPlan(projectRoot, mergeOperationPlans(cleanPlan.managedPlan, cleanPlan.runtimeCleanup));
   applyOperationPlan(projectRoot, planEmptyManagedRootCleanup(projectRoot, adapter));
 
-  console.log(`Removed spec-first managed ${platform === 'claude' ? 'Claude Code' : 'Codex'} assets from the current project.`);
+  console.log(`Removed spec-first managed ${platformDisplayName(platform)} assets from the current project.`);
   console.log('Custom assets outside the spec-first managed set were left untouched.');
   return 0;
 }
@@ -126,6 +127,7 @@ function parseCleanArgs(argv) {
     help: false,
     claude: false,
     codex: false,
+    kiro: false,
     dryRun: false,
     workspaceOrphans: false,
     confirm: false,
@@ -139,6 +141,8 @@ function parseCleanArgs(argv) {
       parsed.claude = true;
     } else if (arg === '--codex') {
       parsed.codex = true;
+    } else if (arg === '--kiro') {
+      parsed.kiro = true;
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
@@ -159,8 +163,8 @@ function runWorkspaceOrphansClean(parsed) {
     return 2;
   }
 
-  if (parsed.claude || parsed.codex) {
-    console.error('Error: --workspace-orphans cannot be combined with --claude or --codex.');
+  if (parsed.claude || parsed.codex || parsed.kiro) {
+    console.error('Error: --workspace-orphans cannot be combined with host flags.');
     console.error('Workspace orphan cleanup is separate from runtime asset cleanup.');
     return 2;
   }
@@ -360,7 +364,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--kiro) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
     '',
     'Workspace orphan cleanup previews parent quarantine evidence by default; add --confirm to delete supported orphan paths.',
@@ -368,6 +372,13 @@ function printHelp() {
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
   ].join('\n'));
+}
+
+function platformDisplayName(platform) {
+  if (platform === 'claude') return 'Claude Code';
+  if (platform === 'codex') return 'Codex';
+  if (platform === 'kiro') return 'Kiro';
+  return platform;
 }
 
 function buildCleanPlan(projectRoot, state, adapter) {

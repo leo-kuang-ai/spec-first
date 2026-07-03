@@ -46,6 +46,7 @@ assert_eq "optional tools require explicit opt-in" "true" "$(jq -r 'all(.tools[]
 assert_eq "codegraph is explicit opt-in" "true" "$(jq -r '.tools[] | select(.id == "codegraph") | (.required == false and .opt_in.explicit_consent_required == true and .provider_readiness.kind == "code-structure")' "$TOOLS_JSON")"
 assert_eq "codegraph installs scoped package with codegraph CLI" "true" "$(jq -r '.tools[] | select(.id == "codegraph") | (.dependency_ref == "codegraph" and (.package // null) == null and (.version // null) == null and .installation.kind == "global-npm" and .installation.unix.command == "npm" and (.installation.unix.args | index("{{package}}@{{version}}") != null) and .installation.verify_command.command == "codegraph")' "$TOOLS_JSON")"
 assert_eq "codegraph host config uses mcp server command" "true" "$(jq -r '.tools[] | select(.id == "codegraph") | (.host_config.codex.command == "codegraph" and (.host_config.codex.args | join(" ") == "serve --mcp"))' "$TOOLS_JSON")"
+assert_eq "kiro host configs use workspace/user json targets" "true" "$(jq -r 'all(.tools[]; (.host_config.kiro.scope == "workspace") and (.host_config.kiro.targets.workspace.config_path == ".kiro/settings/mcp.json") and (.host_config.kiro.targets.workspace.config_format == "json") and (.host_config.kiro.targets.user.config_path == "$HOME/.kiro/settings/mcp.json") and (.host_config.kiro.targets.user.config_format == "json") and (.host_config.kiro.targets.user.requires_user_scope_opt_in == true) and (.host_config.kiro.fallback_order == ["workspace"]))' "$TOOLS_JSON")"
 assert_eq "codegraph project bootstrap runs init and status" "true" "$(jq -r '.tools[] | select(.id == "codegraph") | (.project_bootstrap.required == true and .project_bootstrap.unix.command == "codegraph" and (.project_bootstrap.unix.args | index("init") != null) and .project_bootstrap.status_probe.command == "codegraph" and (.project_bootstrap.status_probe.args | index("status") != null))' "$TOOLS_JSON")"
 assert_eq "summary includes project bootstrap column" "true" "$(jq -r '.summary_columns | index("project_bootstrap") != null' "$TOOLS_JSON")"
 
@@ -57,7 +58,14 @@ pass_count=$((pass_count + 1))
 assert "bash install-mcp gates optional tools" grep -q 'optional_tool_allowed' "$SCRIPTS_DIR/install-mcp.sh"
 assert "bash install-mcp keeps registry_not_required for ungated optional tools" grep -q 'registry_not_required' "$SCRIPTS_DIR/install-mcp.sh"
 assert "bash configure-host guards optional clobber" grep -q 'SPEC_FIRST_MCP_CONFIGURE_OVERWRITE' "$SCRIPTS_DIR/configure-host.sh"
+assert "bash detect-tools branches on config format" grep -q 'host_uses_json_config' "$SCRIPTS_DIR/detect-tools.sh"
+assert "bash configure-host rejects unknown host explicitly" grep -q '无法识别宿主' "$SCRIPTS_DIR/configure-host.sh"
+assert "bash uninstall-mcp pre-scans user scope before host detection" grep -q 'for arg in "$@"; do' "$SCRIPTS_DIR/uninstall-mcp.sh"
 assert "bash install-helpers accepts requirement workspace" grep -q -- '--requirement-workspace' "$SCRIPTS_DIR/install-helpers.sh"
+assert "bash install-helpers accepts Kiro provider host" grep -q -- 'claude|codex|kiro' "$SCRIPTS_DIR/install-helpers.sh"
+assert "bash install-helpers detects Kiro project Graphify skill" grep -q -- '.kiro/skills/graphify/SKILL.md' "$SCRIPTS_DIR/install-helpers.sh"
+assert "bash provider readiness detects Kiro project skills" grep -q -- ".kiro', 'skills', providerId" "$SCRIPTS_DIR/provider-readiness-renderer.cjs"
+assert "bash check-health detects Kiro global skills" grep -q -- '.kiro/skills/$skill_name/SKILL.md' "$SCRIPTS_DIR/check-health"
 assert "bash install-helpers gates mcp-tools schema before dependency reads" grep -q -- 'require_mcp_tools_schema_version 7 "$MCP_TOOLS_JSON"' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers reads Graphify version from mcp-tools" grep -q -- 'external_dependency_field graphify version' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers installs Graphify CLI with uv tool force pin" grep -q -- 'uv tool install --force "$GRAPHIFY_PACKAGE==$GRAPHIFY_VERSION_PIN"' "$SCRIPTS_DIR/install-helpers.sh"
@@ -121,6 +129,58 @@ fi
 
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-mcp-setup.XXXXXX")"
 trap 'rm -rf "$TMP_ROOT"' EXIT
+
+REPO_KIRO="$TMP_ROOT/repo-kiro"
+KIRO_HOME="$TMP_ROOT/home-kiro"
+mkdir -p "$REPO_KIRO" "$KIRO_HOME"
+printf '{"name":"repo-kiro"}\n' > "$REPO_KIRO/package.json"
+
+kiro_detect="$(cd "$REPO_KIRO" && MCP_SETUP_HOST=kiro HOME="$KIRO_HOME" bash "$SCRIPTS_DIR/detect-host.sh")"
+assert_eq "kiro detect host" "kiro" "$(jq -r '.host' <<<"$kiro_detect")"
+assert_eq "kiro detect default scope" "workspace" "$(jq -r '.selected_scope' <<<"$kiro_detect")"
+assert_eq "kiro detect default config format" "json" "$(jq -r '.config_format' <<<"$kiro_detect")"
+assert_eq "kiro detect default workspace path" ".kiro/settings/mcp.json" "$(jq -r '.config_path' <<<"$kiro_detect")"
+
+kiro_user_detect="$(cd "$REPO_KIRO" && MCP_SETUP_HOST=kiro KIRO_USER_SCOPE=1 HOME="$KIRO_HOME" bash "$SCRIPTS_DIR/detect-host.sh")"
+assert_eq "kiro detect user-scope opt-in selects user" "user" "$(jq -r '.selected_scope' <<<"$kiro_user_detect")"
+assert_eq "kiro detect user-scope path" "$KIRO_HOME/.kiro/settings/mcp.json" "$(jq -r '.config_path' <<<"$kiro_user_detect")"
+
+kiro_configure_output="$(cd "$REPO_KIRO" && MCP_SETUP_HOST=kiro HOME="$KIRO_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool sequential-thinking)"
+assert_eq "kiro configure default selected scope" "workspace" "$(jq -r '.selected_scope' <<<"$kiro_configure_output")"
+assert "kiro configure writes workspace mcp json" test -f "$REPO_KIRO/.kiro/settings/mcp.json"
+assert_eq "kiro configure writes top-level mcpServers" "true" "$(jq -r 'has("mcpServers") and (.mcpServers["sequential-thinking"].command == "npx")' "$REPO_KIRO/.kiro/settings/mcp.json")"
+assert "kiro configure default does not write user config" test ! -f "$KIRO_HOME/.kiro/settings/mcp.json"
+
+jq '.mcpServers.existing = {"command":"node","args":["server.js"]}' "$REPO_KIRO/.kiro/settings/mcp.json" > "$REPO_KIRO/.kiro/settings/mcp.json.next"
+mv "$REPO_KIRO/.kiro/settings/mcp.json.next" "$REPO_KIRO/.kiro/settings/mcp.json"
+(cd "$REPO_KIRO" && MCP_SETUP_HOST=kiro HOME="$KIRO_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool context7 >/dev/null)
+assert_eq "kiro configure preserves unrelated servers" "true" "$(jq -r '(.mcpServers.existing.command == "node") and (.mcpServers.context7.command == "npx") and (.mcpServers["sequential-thinking"].command == "npx")' "$REPO_KIRO/.kiro/settings/mcp.json")"
+
+kiro_detect_tools="$(cd "$REPO_KIRO" && MCP_SETUP_HOST=kiro HOME="$KIRO_HOME" bash "$SCRIPTS_DIR/detect-tools.sh" --folder "$REPO_KIRO")"
+assert_eq "kiro detect-tools reads json host config" "ready,ready" "$(jq -r '[.tools["sequential-thinking"].host_config_status, .tools.context7.host_config_status] | join(",")' <<<"$kiro_detect_tools")"
+
+REPO_KIRO_BAD="$TMP_ROOT/repo-kiro-bad"
+mkdir -p "$REPO_KIRO_BAD/.kiro/settings"
+printf '{"name":"repo-kiro-bad"}\n' > "$REPO_KIRO_BAD/package.json"
+printf '{not-json\n' > "$REPO_KIRO_BAD/.kiro/settings/mcp.json"
+set +e
+bad_output="$(cd "$REPO_KIRO_BAD" && MCP_SETUP_HOST=kiro HOME="$KIRO_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool sequential-thinking 2>&1)"
+bad_status=$?
+set -e
+assert_eq "kiro invalid json configure fails" "1" "$bad_status"
+assert_eq "kiro invalid json is not overwritten" "{not-json" "$(cat "$REPO_KIRO_BAD/.kiro/settings/mcp.json")"
+
+REPO_KIRO_USER="$TMP_ROOT/repo-kiro-user"
+KIRO_USER_HOME="$TMP_ROOT/home-kiro-user"
+mkdir -p "$REPO_KIRO_USER" "$KIRO_USER_HOME"
+printf '{"name":"repo-kiro-user"}\n' > "$REPO_KIRO_USER/package.json"
+(cd "$REPO_KIRO_USER" && MCP_SETUP_HOST=kiro HOME="$KIRO_USER_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool context7 --user-scope >/dev/null)
+assert "kiro user-scope writes user config" test -f "$KIRO_USER_HOME/.kiro/settings/mcp.json"
+assert "kiro user-scope does not write workspace config" test ! -f "$REPO_KIRO_USER/.kiro/settings/mcp.json"
+(cd "$REPO_KIRO_USER" && MCP_SETUP_HOST=kiro HOME="$KIRO_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 >/dev/null)
+assert_eq "kiro uninstall without user-scope preserves user config" "true" "$(jq -r '.mcpServers.context7 != null' "$KIRO_USER_HOME/.kiro/settings/mcp.json")"
+(cd "$REPO_KIRO_USER" && MCP_SETUP_HOST=kiro HOME="$KIRO_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 --user-scope >/dev/null)
+assert_eq "kiro uninstall user-scope removes user config entry" "false" "$(jq -r '.mcpServers.context7 != null' "$KIRO_USER_HOME/.kiro/settings/mcp.json")"
 
 REPO_A="$TMP_ROOT/repo-a"
 mkdir -p "$REPO_A"

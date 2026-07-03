@@ -503,7 +503,7 @@ write_agent_browser_install_marker() {
 
 global_skill_installed() {
   local skill_name="$1"
-  [ -f "$HOME/.agents/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.claude/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.codex/skills/$skill_name/SKILL.md" ]
+  [ -f "$HOME/.agents/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.claude/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.codex/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.kiro/skills/$skill_name/SKILL.md" ]
 }
 
 browser_helper_required() {
@@ -1205,7 +1205,7 @@ graphify_cli_version_matches_pin() {
 
 graphify_project_platform() {
   case "${SPEC_FIRST_PROVIDER_HOST:-}" in
-    claude|codex) printf '%s' "$SPEC_FIRST_PROVIDER_HOST" ;;
+    claude|codex|kiro) printf '%s' "$SPEC_FIRST_PROVIDER_HOST" ;;
     *) printf 'codex' ;;
   esac
 }
@@ -1298,6 +1298,9 @@ graphify_project_skill_configured() {
   case "$platform" in
     claude|windows)
       [ -f "$repo_root/.claude/skills/graphify/SKILL.md" ]
+      ;;
+    kiro)
+      [ -f "$repo_root/.kiro/skills/graphify/SKILL.md" ]
       ;;
     *)
       [ -f "$repo_root/.codex/skills/graphify/SKILL.md" ] || [ -f "$repo_root/.agents/skills/graphify/SKILL.md" ]

@@ -162,6 +162,7 @@ describe('spec-write-skill contract', () => {
       host_delivery: {
         claude: 'command',
         codex: 'skill',
+        kiro: 'skill',
       },
     });
   });

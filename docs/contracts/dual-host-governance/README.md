@@ -1,9 +1,11 @@
-# Claude/Codex 双宿主治理 Contract v1
+# Supported-host skill delivery governance Contract v1
 
 - 状态：`accepted`
 - 生效日期：`2026-04-16`
 - 作用范围：`T00 / T01 / T11 / T12 / T14`
-- 目标：为 Claude/Codex 双宿主产品面、治理枚举、filtered asset set 提供单一可引用 contract
+- 目标：为 Claude/Codex/Kiro supported-host 产品面、治理枚举、filtered asset set 提供单一可引用 contract
+
+> 兼容性说明：目录名仍为 `dual-host-governance`，这是历史 compatibility path。当前 machine-readable 语义已经泛化为 supported-host / 三宿主 skill delivery governance；不得把目录名解读为只支持 Claude/Codex。
 
 ## 1. 产品面最终决策
 
@@ -11,8 +13,9 @@
 
 1. Claude 用户可见 workflow 入口：`/spec:*`
 2. Codex 用户可见 workflow 入口：`$spec-*`
-3. standalone skill 只能按 skill 方式表述，不得写成已声明 slash command
-4. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
+3. Kiro 用户可见 workflow 入口：Kiro Agent Skill `spec-*`，由 `.kiro/skills/spec-*/SKILL.md` 投影；P0 不生成 Kiro `/spec:*` 命令，也不占用 Kiro native Specs namespace
+4. standalone skill 只能按 skill 方式表述，不得写成已声明 slash command
+5. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
 
 ### 1.2 Codex compatibility layer 决策
 
@@ -66,7 +69,7 @@
 定义：
 
 1. `dual_host`
-   - Claude 与 Codex 都需要交付对应能力
+   - 所有 supported hosts 都需要交付对应能力；当前 supported hosts 为 `claude`、`codex`、`kiro`
 2. `host_exclusive`
    - 只在单一宿主上交付给用户或运行时
 3. `target_host_maintenance`
@@ -76,17 +79,17 @@
 
 ### 2.3 必要补充字段
 
-仅靠 `entry_surface + host_scope` 仍不足以表达 command-backed workflow 在双宿主下的实际投递方式，因此必须补充以下字段：
+仅靠 `entry_surface + host_scope` 仍不足以表达 command-backed workflow 在 supported hosts 下的实际投递方式，因此必须补充以下字段：
 
 1. `command_name`
    - 类型：`string | null`
    - 当 `entry_surface = workflow_command` 时必填
 2. `owner_host`
-   - 类型：`claude | codex | null`
+   - 类型：`claude | codex | kiro | null`
    - 当 `host_scope = host_exclusive` 或 `target_host_maintenance` 时必填
 3. `host_delivery`
    - 类型：对象
-   - 字段：`claude`、`codex`
+   - 字段：`claude`、`codex`、`kiro`
    - 允许值：`command`、`skill`、`internal`、`none`
 
 说明：
@@ -107,11 +110,15 @@
    - `host_delivery.codex = skill`
    - 不再生成 `.codex/commands/spec/*`
    - workflow 通过 `.agents/skills/spec-*` 发现与调用
+3. Kiro
+   - `host_delivery.kiro = skill`
+   - 不生成 `.kiro/commands/spec/*` 或 Kiro `/spec:*` command layer
+   - workflow 通过 `.kiro/skills/spec-*` 发现与调用
 
 这意味着：
 
 1. `workflow_command` 是源层事实
-2. Codex 侧不再因为这个源层事实而额外生成 command 文件
+2. Codex 和 Kiro 侧不再因为这个源层事实而额外生成 command 文件
 
 ### 2.5 Agent 模型选择 Contract
 
@@ -155,7 +162,7 @@ filtered asset set 的最小输入固定为：
 
 1. 由 `skills-governance.json` 的 workflow records 与 command template frontmatter 生成的 manifest command set
 2. 宿主治理真源文件
-3. 目标平台：`claude | codex`
+3. 目标平台：`claude | codex | kiro`
 
 ### 3.2 输出
 
@@ -215,7 +222,7 @@ machine-readable 真源文件固定落位：
 其中：
 
 1. `skills-governance.json`
-   - 覆盖当前仓库 `42` 个 source skills
+   - 覆盖当前仓库 `37` 个 source skills
    - 是 `plugin.js` runtime filter、lint、审计脚本的共同真源
 2. `skills-governance.schema.json`
    - 固定 `schemaVersion=1`
@@ -232,10 +239,11 @@ machine-readable 真源文件固定落位：
 `T01 / T16` 必须直接遵守本 contract：
 
 1. CodexAdapter 不再安装 `.codex/commands/spec/*`
-2. `init` 对 Codex 改为 `$spec-*` 用户可见口径
-3. `doctor` 不再把 `.codex/commands/spec/*` 当成正式产品面检查项
-4. README、CLI banner、`spec-mcp-setup`、`setup` 全量收口到正确宿主入口
-5. smoke 断言同步切换到新契约
+2. KiroAdapter 不安装 `.kiro/commands/spec/*`，P0 只交付 `.kiro/skills`、`.kiro/agents`、`.kiro/spec-first` 和 Kiro MCP config 支撑面
+3. `init` 对 Codex 改为 `$spec-*` 用户可见口径，对 Kiro 改为 Kiro Agent Skill `spec-*` 用户可见口径
+4. `doctor` 不再把 `.codex/commands/spec/*` 或 `.kiro/commands/spec/*` 当成正式产品面检查项
+5. README、CLI banner、`spec-mcp-setup`、`setup` 全量收口到正确宿主入口
+6. smoke 断言同步切换到新契约
 
 ## 6. Contributor Maintenance Rules
 
@@ -245,7 +253,8 @@ machine-readable 真源文件固定落位：
 2. 不得只改 command template frontmatter 或生成后的 manifest command set，而不更新 `entry_surface=workflow_command` 记录
 3. 不得把 standalone skill 写成已声明 slash command
 4. 不得把 Codex 用户入口写成 `**Codex entry point:** /spec:*`
-5. `Skill(...)`、`skill:`、以及其他内部调用 DSL 明确不属于“用户可见入口治理”范围
-6. `docs/10-prompt/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/10-prompt/skills/` 重新变成双真相源
-7. 新增 lint / doctor / smoke 规则时，应优先引用 `skills-governance.json`，而不是重复手写 skill 名单
-8. 运行时 machine-readable contract 必须继续落在 `src/cli/contracts/dual-host-governance/`，不得重新回放到 `docs/`
+5. 不得把 Kiro 用户入口写成 `/spec:*` 或 `$spec-*`；P0 口径是 Kiro Agent Skill `spec-*`
+6. `Skill(...)`、`skill:`、以及其他内部调用 DSL 明确不属于“用户可见入口治理”范围
+7. `docs/10-prompt/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/10-prompt/skills/` 重新变成双真相源
+8. 新增 lint / doctor / smoke 规则时，应优先引用 `skills-governance.json`，而不是重复手写 skill 名单
+9. 运行时 machine-readable contract 必须继续落在 `src/cli/contracts/dual-host-governance/`，不得重新回放到 `docs/`

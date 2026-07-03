@@ -305,6 +305,7 @@ describe('using-spec-first contracts', () => {
           host_delivery: {
             claude: 'skill',
             codex: 'skill',
+            kiro: 'skill',
           },
         }),
       ]),

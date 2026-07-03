@@ -41,6 +41,7 @@ fi
 HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
 HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
 CONFIG_PATH="$(jq -r '.config_path' <<<"$HOST_INFO_JSON")"
+CONFIG_FORMAT="$(jq -r '.config_format // empty' <<<"$HOST_INFO_JSON")"
 PLATFORM="$(jq -r '.platform' <<<"$HOST_INFO_JSON")"
 SELECTED_SCOPE="$(jq -r '.selected_scope // empty' <<<"$HOST_INFO_JSON")"
 
@@ -109,6 +110,10 @@ host_config_required() {
   jq -r --arg id "$tool_id" '.tools[] | select(.id == $id) | if has("host_config_required") then .host_config_required else true end' "$TOOLS_JSON"
 }
 
+host_uses_json_config() {
+  [ "$CONFIG_FORMAT" = "json" ]
+}
+
 host_config_status() {
   local tool_id="$1"
   local detect_kind detect_key host_cfg expected_command expected_args
@@ -156,12 +161,12 @@ host_config_status() {
 
   case "$detect_kind" in
     host_config_exact)
-      if [ "$HOST" = "claude" ]; then
+      if host_uses_json_config; then
         if jq -e --arg key "$detect_key" --arg command "$expected_command" --argjson expected_args "$expected_args" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1; then
-          if [ "$SELECTED_SCOPE" = "managed" ]; then
-            echo ready
-          else
+          if [ "$HOST" = "claude" ] && [ "$SELECTED_SCOPE" != "managed" ]; then
             echo fallback-active
+          else
+            echo ready
           fi
         elif jq -e --arg key "$detect_key" --arg command "$expected_command" --argjson expected_args "$expected_args" '
           def normalize_npm_latest:
@@ -188,12 +193,12 @@ host_config_status() {
       fi
       ;;
     host_config_key_only)
-      if [ "$HOST" = "claude" ]; then
+      if host_uses_json_config; then
         if jq -e --arg key "$detect_key" '.mcpServers[$key] != null' "$CONFIG_PATH" >/dev/null 2>&1; then
-          if [ "$SELECTED_SCOPE" = "managed" ]; then
-            echo ready
-          else
+          if [ "$HOST" = "claude" ] && [ "$SELECTED_SCOPE" != "managed" ]; then
             echo fallback-active
+          else
+            echo ready
           fi
         else
           echo action-required

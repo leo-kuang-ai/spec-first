@@ -10,6 +10,7 @@ TMP_CACHE="$TMP_ROOT/cache"
 TARBALL_DIR="$TMP_ROOT/tarball"
 CODEX_PROJECT="$TMP_ROOT/codex-project"
 CLAUDE_PROJECT="$TMP_ROOT/claude-project"
+KIRO_PROJECT="$TMP_ROOT/kiro-project"
 PACKAGE_VERSION="$(node -p "require(process.argv[1]).version" "$REPO_ROOT/package.json")"
 
 cleanup() {
@@ -31,6 +32,7 @@ echo "   tarball: $TARBALL_PATH"
 echo "2. 校验 tarball 包含 runtime governance assets..."
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/contracts/dual-host-governance/skills-governance.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/contracts/dual-host-governance/skills-governance.schema.json$'
+tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/adapters/kiro.js$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/docs/contracts/verifiers/verification-evidence.schema.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/scripts/typecheck-js.js$'
 if tar -tf "$TARBALL_PATH" | grep -q '^package/docs/contracts/dual-host-governance/skills-governance.json$'; then
@@ -161,7 +163,51 @@ test ! -e "$CODEX_PROJECT/.codex/hooks/session-start.cmd"
 test ! -e "$CODEX_PROJECT/.codex/hooks.json"
 echo "   ✓ Codex 安装态闭环通过"
 
-echo "5. 验证 Claude 安装态 init / doctor..."
+echo "5. 验证 Kiro 安装态 init / doctor / clean..."
+mkdir -p "$KIRO_PROJECT"
+kiro_init_output="$(
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$KIRO_PROJECT" kiro test en 2>&1
+)"
+grep -q 'skill directory(ies) in .kiro/skills' <<<"$kiro_init_output"
+grep -q 'agent file(s) in .kiro/agents' <<<"$kiro_init_output"
+test -f "$KIRO_PROJECT/.kiro/skills/spec-work/SKILL.md"
+test -f "$KIRO_PROJECT/.kiro/skills/spec-mcp-setup/SKILL.md"
+test -f "$KIRO_PROJECT/.kiro/skills/using-spec-first/SKILL.md"
+test -f "$KIRO_PROJECT/.kiro/agents/spec-repo-research-analyst.agent.md"
+grep -q '^tools: \["read"\]$' "$KIRO_PROJECT/.kiro/agents/spec-repo-research-analyst.agent.md"
+test -f "$KIRO_PROJECT/.kiro/spec-first/state.json"
+test ! -e "$KIRO_PROJECT/.kiro/commands/spec"
+test ! -e "$KIRO_PROJECT/.kiro/hooks"
+test ! -e "$KIRO_PROJECT/.kiro/steering"
+
+kiro_doctor_output="$(
+  cd "$KIRO_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --kiro 2>&1
+)"
+grep -q '.kiro/skills' <<<"$kiro_doctor_output"
+grep -q '.kiro/agents' <<<"$kiro_doctor_output"
+grep -q '.kiro/spec-first/state.json' <<<"$kiro_doctor_output"
+if grep -q '.kiro/commands/spec' <<<"$kiro_doctor_output"; then
+  echo "✗ Kiro doctor 不应把 .kiro/commands/spec 当作正式产品面"
+  exit 1
+fi
+mkdir -p "$KIRO_PROJECT/.kiro/hooks" "$KIRO_PROJECT/.kiro/settings" "$KIRO_PROJECT/.kiro/specs/native"
+printf 'custom hook\n' > "$KIRO_PROJECT/.kiro/hooks/custom"
+printf '{"custom":true}\n' > "$KIRO_PROJECT/.kiro/settings/user.json"
+printf '# Native Kiro spec\n' > "$KIRO_PROJECT/.kiro/specs/native/spec.md"
+(
+  cd "$KIRO_PROJECT"
+  "$SHIM" clean --kiro >/dev/null
+)
+test ! -e "$KIRO_PROJECT/.kiro/skills"
+test ! -e "$KIRO_PROJECT/.kiro/agents"
+test ! -e "$KIRO_PROJECT/.kiro/spec-first"
+test -f "$KIRO_PROJECT/.kiro/hooks/custom"
+test -f "$KIRO_PROJECT/.kiro/settings/user.json"
+test -f "$KIRO_PROJECT/.kiro/specs/native/spec.md"
+echo "   ✓ Kiro 安装态闭环通过"
+
+echo "6. 验证 Claude 安装态 init / doctor..."
 mkdir -p "$CLAUDE_PROJECT"
 claude_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CLAUDE_PROJECT" claude test en 2>&1

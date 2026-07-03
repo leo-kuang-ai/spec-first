@@ -77,7 +77,7 @@ $ToolsJson = Read-McpToolsJson -Path (Join-Path $SkillDir 'mcp-tools.json') -AsH
 Assert-McpToolsSchemaVersion -ToolsJson $ToolsJson
 
 function Get-DetectedHost {
-  if ($env:MCP_SETUP_HOST -in @('claude', 'codex')) {
+  if ($env:MCP_SETUP_HOST -in @('claude', 'codex', 'kiro')) {
     return $env:MCP_SETUP_HOST
   }
 
@@ -102,7 +102,11 @@ function Get-DetectedHost {
     return 'claude'
   }
 
-  throw '错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude 或 MCP_SETUP_HOST=codex 后再运行。'
+  throw '错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex 或 MCP_SETUP_HOST=kiro 后再运行。'
+}
+
+function Test-KiroUserScopeRequested {
+  return @('1', 'true', 'TRUE', 'yes', 'YES', 'approved', 'APPROVED') -contains [string]$env:KIRO_USER_SCOPE
 }
 
 function Resolve-PathTemplate {
@@ -125,6 +129,12 @@ function Resolve-TargetPathOverride {
   }
   if ($HostName -eq 'codex' -and $TargetKey -eq 'system' -and -not [string]::IsNullOrWhiteSpace($env:MCP_SETUP_CODEX_SYSTEM_PATH_OVERRIDE)) {
     return $env:MCP_SETUP_CODEX_SYSTEM_PATH_OVERRIDE
+  }
+  if ($HostName -eq 'kiro' -and $TargetKey -eq 'workspace' -and -not [string]::IsNullOrWhiteSpace($env:MCP_SETUP_KIRO_WORKSPACE_PATH_OVERRIDE)) {
+    return $env:MCP_SETUP_KIRO_WORKSPACE_PATH_OVERRIDE
+  }
+  if ($HostName -eq 'kiro' -and $TargetKey -eq 'user' -and -not [string]::IsNullOrWhiteSpace($env:MCP_SETUP_KIRO_USER_PATH_OVERRIDE)) {
+    return $env:MCP_SETUP_KIRO_USER_PATH_OVERRIDE
   }
   return $ResolvedPath
 }
@@ -242,6 +252,12 @@ switch ($detectedHost) {
     $markerPath = [System.IO.Path]::Combine($HOME, '.codex', 'spec-first', 'host-setup.json')
     $configFormat = 'toml'
   }
+  'kiro' {
+    $cliCommand = 'kiro'
+    $displayName = 'Kiro'
+    $markerPath = [System.IO.Path]::Combine($HOME, '.kiro', 'spec-first', 'host-setup.json')
+    $configFormat = 'json'
+  }
   default {
     throw "错误：无法识别宿主：$detectedHost"
   }
@@ -251,6 +267,10 @@ $mcpHostContract = Get-HostContract $detectedHost
 $primaryScope = Get-MapValue -Object $mcpHostContract -Name 'scope'
 $fallbackOrder = @(Get-MapValue -Object $mcpHostContract -Name 'fallback_order')
 $uninstallTargets = @(Get-MapValue -Object $mcpHostContract -Name 'uninstall_targets')
+if ($detectedHost -eq 'kiro' -and (Test-KiroUserScopeRequested)) {
+  $primaryScope = 'user'
+  $fallbackOrder = @('user')
+}
 $targets = [ordered]@{}
 $contractTargets = Get-MapValue -Object $mcpHostContract -Name 'targets'
 if ($null -ne $contractTargets) {

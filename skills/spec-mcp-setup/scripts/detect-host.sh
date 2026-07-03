@@ -35,15 +35,28 @@ apply_target_override() {
     codex:system)
       printf '%s' "${MCP_SETUP_CODEX_SYSTEM_PATH_OVERRIDE:-$resolved_path}"
       ;;
+    kiro:workspace)
+      printf '%s' "${MCP_SETUP_KIRO_WORKSPACE_PATH_OVERRIDE:-$resolved_path}"
+      ;;
+    kiro:user)
+      printf '%s' "${MCP_SETUP_KIRO_USER_PATH_OVERRIDE:-$resolved_path}"
+      ;;
     *)
       printf '%s' "$resolved_path"
       ;;
   esac
 }
 
+kiro_user_scope_requested() {
+  case "${KIRO_USER_SCOPE:-}" in
+    1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 detect_host() {
   case "${MCP_SETUP_HOST:-}" in
-    claude|codex)
+    claude|codex|kiro)
       echo "$MCP_SETUP_HOST"
       return 0
       ;;
@@ -69,7 +82,7 @@ detect_host() {
     return 0
   fi
 
-  echo "错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude 或 MCP_SETUP_HOST=codex 后再运行。" >&2
+  echo "错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex 或 MCP_SETUP_HOST=kiro 后再运行。" >&2
   return 1
 }
 
@@ -198,6 +211,12 @@ case "$host" in
     marker_path="$HOME/.codex/spec-first/host-setup.json"
     config_format="toml"
     ;;
+  kiro)
+    cli_command="kiro"
+    display_name="Kiro"
+    marker_path="$HOME/.kiro/spec-first/host-setup.json"
+    config_format="json"
+    ;;
   *)
     echo "错误：无法识别宿主：$host" >&2
     exit 1
@@ -207,6 +226,10 @@ esac
 primary_scope="$(jq -r '.scope' <<<"$host_contract_json")"
 fallback_order_json="$(jq -c '.fallback_order // []' <<<"$host_contract_json")"
 uninstall_targets_json="$(jq -c '.uninstall_targets // []' <<<"$host_contract_json")"
+if [ "$host" = "kiro" ] && kiro_user_scope_requested; then
+  primary_scope="user"
+  fallback_order_json='["user"]'
+fi
 
 targets_json='{}'
 while IFS= read -r target_key; do

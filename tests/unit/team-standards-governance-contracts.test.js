@@ -371,6 +371,6 @@ describe('team standards governance source contract', () => {
     expect(read('docs/05-用户手册/12-gitignore参考.md')).toContain('旧 `.spec-first/standards/` 属于已退役 runtime/artifact 路径');
     expect(read('docs/README.md')).toContain('docs/contracts/team-standards.md');
     expect(read('README.zh-CN.md')).toContain('团队开发规范合同');
-    expect(read('README.md')).toContain('团队开发规范可以放在 `docs/contracts/team-standards.md` 与 `docs/standards/**`');
+    expect(read('README.md')).toContain('Team standards live as source docs under `docs/contracts/team-standards.md` and `docs/standards/**`');
   });
 });

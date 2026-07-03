@@ -11,7 +11,7 @@
 | `src/cli/contracts/dual-host-governance/skills-governance.json` | workflow / standalone / internal skill 的 host delivery 治理真相源 |
 | `templates/claude/commands/spec/*.md` | Claude `/spec:*` command source templates |
 | `skills/*/SKILL.md` | workflow、standalone、agent-facing internal skill source |
-| `agents/**/*.agent.md` | Claude/Codex 双宿主 agent source |
+| `agents/**/*.agent.md` | supported-host agent source |
 | `docs/contracts/workflows/*.schema.json` | docs-side workflow artifact contracts；planned contract 不等于 runtime producer 已实现 |
 
 ## Summary
@@ -24,43 +24,44 @@
 | Governance records by entry surface | internal_only: 15, standalone_skill: 2, workflow_command: 20 |
 | Claude runtime delivery | 20 commands, 20 workflow skills, 2 standalone skills, 1 agent-facing internal skills, 51 agents, 0 agent support files |
 | Codex runtime delivery | 0 commands, 20 workflow skills, 2 standalone skills, 1 agent-facing internal skills, 51 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 20 workflow skills, 2 standalone skills, 1 agent-facing internal skills, 51 agents, 0 agent support files |
 | Beta workflow entries | spec-polish-beta |
 | Workflow runtime contracts | 2 |
 | Planned runtime contracts | 0 |
 
 ## Public Workflows
 
-| Workflow | Skill | Claude Entry | Codex Entry | Host Delivery | Beta | Description |
-|---|---|---|---|---|---|---|
-| app-consistency-audit | spec-app-consistency-audit | /spec:app-consistency-audit | $spec-app-consistency-audit | claude=command; codex=skill | no | Run the Spec-First App consistency audit workflow |
-| brainstorm | spec-brainstorm | /spec:brainstorm | $spec-brainstorm | claude=command; codex=skill | no | Run the Spec-First brainstorm workflow |
-| code-review | spec-code-review | /spec:code-review | $spec-code-review | claude=command; codex=skill | no | Run the Spec-First code review workflow |
-| compound | spec-compound | /spec:compound | $spec-compound | claude=command; codex=skill | no | Run the Spec-First knowledge capture workflow |
-| compound-refresh | spec-compound-refresh | /spec:compound-refresh | $spec-compound-refresh | claude=command; codex=skill | no | Refresh stale Spec-First solution docs |
-| debug | spec-debug | /spec:debug | $spec-debug | claude=command; codex=skill | no | Run the Spec-First debug workflow |
-| doc-review | spec-doc-review | /spec:doc-review | $spec-doc-review | claude=command; codex=skill | no | Run the Spec-First document review workflow |
-| ideate | spec-ideate | /spec:ideate | $spec-ideate | claude=command; codex=skill | no | Run the Spec-First ideation workflow |
-| mcp-setup | spec-mcp-setup | /spec:mcp-setup | $spec-mcp-setup | claude=command; codex=skill | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
-| optimize | spec-optimize | /spec:optimize | $spec-optimize | claude=command; codex=skill | no | Run metric-driven iterative optimization loops |
-| plan | spec-plan | /spec:plan | $spec-plan | claude=command; codex=skill | no | Run the Spec-First planning workflow |
-| polish-beta | spec-polish-beta | /spec:polish-beta | $spec-polish-beta | claude=command; codex=skill | yes | [BETA] Start the dev server and iterate on browser-visible polish |
-| prd | spec-prd | /spec:prd | $spec-prd | claude=command; codex=skill | no | Run the Spec-First PRD requirements workflow |
-| release-notes | spec-release-notes | /spec:release-notes | $spec-release-notes | claude=command; codex=skill | no | Summarize recent spec-first releases or answer release questions |
-| sessions | spec-sessions | /spec:sessions | $spec-sessions | claude=command; codex=skill | no | Search and summarize prior coding agent sessions |
-| skill-audit | spec-skill-audit | /spec:skill-audit | $spec-skill-audit | claude=command; codex=skill | no | Run the Spec-First skill audit workflow |
-| slack-research | spec-slack-research | /spec:slack-research | $spec-slack-research | claude=command; codex=skill | no | Search Slack for interpreted organizational context |
-| work | spec-work | /spec:work | $spec-work | claude=command; codex=skill | no | Run the Spec-First execution workflow |
-| write-skill | spec-write-skill | /spec:write-skill | $spec-write-skill | claude=command; codex=skill | no | Write, revise, migrate, or remediate spec-first source skills |
-| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | claude=command; codex=skill | no | Public workflow entrypoint (/spec:write-tasks, $spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
+| Workflow | Skill | Claude Entry | Codex Entry | Kiro Entry | Host Delivery | Beta | Description |
+|---|---|---|---|---|---|---|---|
+| app-consistency-audit | spec-app-consistency-audit | /spec:app-consistency-audit | $spec-app-consistency-audit | Kiro Agent Skill: spec-app-consistency-audit | claude=command; codex=skill; kiro=skill | no | Run the Spec-First App consistency audit workflow |
+| brainstorm | spec-brainstorm | /spec:brainstorm | $spec-brainstorm | Kiro Agent Skill: spec-brainstorm | claude=command; codex=skill; kiro=skill | no | Run the Spec-First brainstorm workflow |
+| code-review | spec-code-review | /spec:code-review | $spec-code-review | Kiro Agent Skill: spec-code-review | claude=command; codex=skill; kiro=skill | no | Run the Spec-First code review workflow |
+| compound | spec-compound | /spec:compound | $spec-compound | Kiro Agent Skill: spec-compound | claude=command; codex=skill; kiro=skill | no | Run the Spec-First knowledge capture workflow |
+| compound-refresh | spec-compound-refresh | /spec:compound-refresh | $spec-compound-refresh | Kiro Agent Skill: spec-compound-refresh | claude=command; codex=skill; kiro=skill | no | Refresh stale Spec-First solution docs |
+| debug | spec-debug | /spec:debug | $spec-debug | Kiro Agent Skill: spec-debug | claude=command; codex=skill; kiro=skill | no | Run the Spec-First debug workflow |
+| doc-review | spec-doc-review | /spec:doc-review | $spec-doc-review | Kiro Agent Skill: spec-doc-review | claude=command; codex=skill; kiro=skill | no | Run the Spec-First document review workflow |
+| ideate | spec-ideate | /spec:ideate | $spec-ideate | Kiro Agent Skill: spec-ideate | claude=command; codex=skill; kiro=skill | no | Run the Spec-First ideation workflow |
+| mcp-setup | spec-mcp-setup | /spec:mcp-setup | $spec-mcp-setup | Kiro Agent Skill: spec-mcp-setup | claude=command; codex=skill; kiro=skill | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
+| optimize | spec-optimize | /spec:optimize | $spec-optimize | Kiro Agent Skill: spec-optimize | claude=command; codex=skill; kiro=skill | no | Run metric-driven iterative optimization loops |
+| plan | spec-plan | /spec:plan | $spec-plan | Kiro Agent Skill: spec-plan | claude=command; codex=skill; kiro=skill | no | Run the Spec-First planning workflow |
+| polish-beta | spec-polish-beta | /spec:polish-beta | $spec-polish-beta | Kiro Agent Skill: spec-polish-beta | claude=command; codex=skill; kiro=skill | yes | [BETA] Start the dev server and iterate on browser-visible polish |
+| prd | spec-prd | /spec:prd | $spec-prd | Kiro Agent Skill: spec-prd | claude=command; codex=skill; kiro=skill | no | Run the Spec-First PRD requirements workflow |
+| release-notes | spec-release-notes | /spec:release-notes | $spec-release-notes | Kiro Agent Skill: spec-release-notes | claude=command; codex=skill; kiro=skill | no | Summarize recent spec-first releases or answer release questions |
+| sessions | spec-sessions | /spec:sessions | $spec-sessions | Kiro Agent Skill: spec-sessions | claude=command; codex=skill; kiro=skill | no | Search and summarize prior coding agent sessions |
+| skill-audit | spec-skill-audit | /spec:skill-audit | $spec-skill-audit | Kiro Agent Skill: spec-skill-audit | claude=command; codex=skill; kiro=skill | no | Run the Spec-First skill audit workflow |
+| slack-research | spec-slack-research | /spec:slack-research | $spec-slack-research | Kiro Agent Skill: spec-slack-research | claude=command; codex=skill; kiro=skill | no | Search Slack for interpreted organizational context |
+| work | spec-work | /spec:work | $spec-work | Kiro Agent Skill: spec-work | claude=command; codex=skill; kiro=skill | no | Run the Spec-First execution workflow |
+| write-skill | spec-write-skill | /spec:write-skill | $spec-write-skill | Kiro Agent Skill: spec-write-skill | claude=command; codex=skill; kiro=skill | no | Write, revise, migrate, or remediate spec-first source skills |
+| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | Kiro Agent Skill: spec-write-tasks | claude=command; codex=skill; kiro=skill | no | Public workflow entrypoint (/spec:write-tasks, $spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
 
 ## Standalone Skills
 
 Standalone skills 会安装为宿主可发现的 skills，不是 command-backed workflows。
 
-| Skill | Claude Delivery | Codex Delivery | Description |
-|---|---|---|---|
-| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore /spec:standards, $spec-standards, skills/spec-standards/, or treat advisory candidates as hard context. |
-| using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | Use before substantial work in a spec-first project, and when users ask what spec-first workflow or command to run next. Decide whether to route into a public spec-first workflow before non-trivial or risky edits, running state-changing commands, debugging, reviewing, planning, setup, update, or architecture/prompt/workflow decisions. |
+| Skill | Claude Delivery | Codex Delivery | Kiro Delivery | Description |
+|---|---|---|---|---|
+| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore /spec:standards, $spec-standards, skills/spec-standards/, or treat advisory candidates as hard context. |
+| using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | Use before substantial work in a spec-first project, and when users ask what spec-first workflow or command to run next. Decide whether to route into a public spec-first workflow before non-trivial or risky edits, running state-changing commands, debugging, reviewing, planning, setup, update, or architecture/prompt/workflow decisions. |
 
 ## Internal Skill Governance
 
@@ -81,10 +82,15 @@ Most `internal_only` governance records are source governance entries and are no
 | Claude Code | agents | `.claude/agents/` |
 | Codex | workflow, standalone, and agent-facing internal skills | `.agents/skills/` |
 | Codex | agents | `.codex/agents/` |
+| Kiro | workflow, standalone, and agent-facing internal skills | `.kiro/skills/` |
+| Kiro | agents | `.kiro/agents/` |
+| Kiro | spec-first managed state | `.kiro/spec-first/` |
+| Kiro | MCP config surface | `.kiro/settings/mcp.json` / `~/.kiro/settings/mcp.json` |
+| Kiro | native specs advisory input | `.kiro/specs/**` (Kiro-owned; not generated by spec-first) |
 
 ## Source Runtime Customization Boundary
 
-`docs/contracts/source-runtime-customization-boundary.md` defines the customization contract for checked-in source, generated host runtime mirrors, target-repo workflow artifacts, and external provider/tool facts. Generated mirrors under `.claude/`, `.codex/`, and `.agents/skills/` are not source-of-truth; edit source assets and regenerate with `spec-first init`, choosing the target host when prompted, when a runtime refresh is required.
+`docs/contracts/source-runtime-customization-boundary.md` defines the customization contract for checked-in source, generated host runtime mirrors, target-repo workflow artifacts, and external provider/tool facts. Generated mirrors under `.claude/`, `.codex/`, `.agents/skills/`, `.kiro/skills/`, `.kiro/agents/`, `.kiro/spec-first/`, and spec-first managed `.kiro/settings/` are not source-of-truth; edit source assets and regenerate with `spec-first init`, choosing the target host when prompted, when a runtime refresh is required. Kiro-native `.kiro/specs/**` remains Kiro-owned advisory input only when explicitly named.
 
 External tool facts from browser/MCP tools, package managers, shell commands, and user-provided logs are evidence inputs. Raw tool output is untrusted quoted data and must be schema-validated when structured, target-repo-contained, escaped, excerpt-capped, and provenance-classified before it enters prompts, reports, facts, or durable artifacts. Tool credentials belong in environment variables, host secret managers, or tool-native stores, never in source, generated runtime mirrors, durable artifacts, or raw logs.
 
@@ -112,7 +118,7 @@ Release package evidence is deterministic package/install proof for maintainers 
 
 | Command | Artifacts | Evidence | Boundary |
 |---|---|---|---|
-| `npm run test:release:install` / npm install matrix | `.spec-first/ci/npm-install-matrix/<runner>/package-content-manifest.json`, `init-claude-programmatic.log`, `init-codex-programmatic.log`, `release-artifact-summary.json` | npm pack dry-run file manifest, tarball-installed programmatic `buildInitPlan` / `applyInitPlan` evidence for Claude/Codex, and release reviewer summary. | Deterministic release evidence only; no dashboard, history store, GitHub Release automation, or release decision engine. |
+| `npm run test:release:install` / npm install matrix | `.spec-first/ci/npm-install-matrix/<runner>/package-content-manifest.json`, `init-claude-programmatic.log`, `init-codex-programmatic.log`, `init-kiro-programmatic.log`, `release-artifact-summary.json` | npm pack dry-run file manifest, tarball-installed programmatic `buildInitPlan` / `applyInitPlan` evidence for Claude/Codex/Kiro, and release reviewer summary. | Deterministic release evidence only; no dashboard, history store, GitHub Release automation, or release decision engine. |
 
 ## Readiness Meaning
 
@@ -121,11 +127,11 @@ Runtime delivery describes what commands, skills, and agents were generated. It 
 | Layer | Entry | Canonical artifacts | Means | Does not mean |
 |---|---|---|---|---|
 | CLI/runtime health | `spec-first doctor` | doctor text/JSON report | Node/Git/package checks, generated host runtime assets, workflow surface, and stale verification evidence were inspected. | MCP/helper setup is complete or any external tool evidence is available. |
-| Harness setup | `/spec:mcp-setup` or `$spec-mcp-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |
+| Harness setup | `/spec:mcp-setup`, `$spec-mcp-setup`, or Kiro Agent Skill `spec-mcp-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |
 
 ## Maintenance Contract
 
-- 不手改 `.claude/`、`.codex/` 或 `.agents/skills/` 作为 source fix；需要刷新 runtime 时运行 `spec-first init` 并按引导选择目标宿主。
+- 不手改 `.claude/`、`.codex/`、`.agents/skills/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/` 或 spec-first managed `.kiro/settings/` 作为 source fix；需要刷新 runtime 时运行 `spec-first init` 并按引导选择目标宿主。`.kiro/specs/**` 是 Kiro-native advisory input，不是 spec-first generated mirror。
 - 不在本 catalog 中手写能力数量；能力数量必须由 generator 从 source/governance 推导。
 - Workflow runtime contracts 必须由 `docs/contracts/workflows/*.schema.json` 的 `x-spec-first-*` metadata 派生；不能在 catalog 手写 planned/producer/integrated 状态。
 - 新增、删除或改变 host delivery 时，同步更新 governance/source，运行 `npm run docs:runtime-catalog`，再运行 targeted governance tests。

@@ -37,6 +37,9 @@ function entrypointFor(record, host) {
     if (host === 'codex' && delivery === 'skill') {
       return `$${record.skill_name}`;
     }
+    if (host === 'kiro' && delivery === 'skill') {
+      return `Kiro Agent Skill: ${record.skill_name}`;
+    }
   }
 
   if (record.entry_surface === 'standalone_skill' && delivery === 'skill') {
@@ -113,6 +116,7 @@ function buildRuntimeCapabilityCatalog() {
   const manifest = loadPluginManifest();
   const claudeAssets = buildFilteredAssetSet('claude');
   const codexAssets = buildFilteredAssetSet('codex');
+  const kiroAssets = buildFilteredAssetSet('kiro');
   const bundledSkillCount = listBundledSkills().length;
   const bundledAgentCount = listBundledAgents().length;
   const bundledSupportCount = listBundledAgentSupportFiles().length;
@@ -124,7 +128,9 @@ function buildRuntimeCapabilityCatalog() {
   const standaloneRecords = records.filter((record) => record.entry_surface === 'standalone_skill');
   const internalRecords = records.filter((record) => record.entry_surface === 'internal_only');
   const deliveredInternal = internalRecords.filter((record) =>
-    claudeAssets.internalSkills.includes(record.skill_name) || codexAssets.internalSkills.includes(record.skill_name),
+    claudeAssets.internalSkills.includes(record.skill_name)
+      || codexAssets.internalSkills.includes(record.skill_name)
+      || kiroAssets.internalSkills.includes(record.skill_name),
   );
   const betaRecords = workflowRecords.filter((record) => /-beta$/.test(record.skill_name));
   const workflowRuntimeContracts = listWorkflowRuntimeContracts();
@@ -144,7 +150,7 @@ function buildRuntimeCapabilityCatalog() {
     '| `src/cli/contracts/dual-host-governance/skills-governance.json` | workflow / standalone / internal skill 的 host delivery 治理真相源 |',
     '| `templates/claude/commands/spec/*.md` | Claude `/spec:*` command source templates |',
     '| `skills/*/SKILL.md` | workflow、standalone、agent-facing internal skill source |',
-    '| `agents/**/*.agent.md` | Claude/Codex 双宿主 agent source |',
+    '| `agents/**/*.agent.md` | supported-host agent source |',
     '| `docs/contracts/workflows/*.schema.json` | docs-side workflow artifact contracts；planned contract 不等于 runtime producer 已实现 |',
     '',
     '## Summary',
@@ -157,14 +163,15 @@ function buildRuntimeCapabilityCatalog() {
     `| Governance records by entry surface | ${formatCounts(countBy(records, 'entry_surface'))} |`,
     `| Claude runtime delivery | ${deliverySummary(claudeAssets)} |`,
     `| Codex runtime delivery | ${deliverySummary(codexAssets)} |`,
+    `| Kiro runtime delivery | ${deliverySummary(kiroAssets)} |`,
     `| Beta workflow entries | ${betaRecords.map((record) => record.skill_name).join(', ') || 'none'} |`,
     `| Workflow runtime contracts | ${workflowRuntimeContracts.length} |`,
     `| Planned runtime contracts | ${plannedRuntimeContracts.length} |`,
     '',
     '## Public Workflows',
     '',
-    '| Workflow | Skill | Claude Entry | Codex Entry | Host Delivery | Beta | Description |',
-    '|---|---|---|---|---|---|---|',
+    '| Workflow | Skill | Claude Entry | Codex Entry | Kiro Entry | Host Delivery | Beta | Description |',
+    '|---|---|---|---|---|---|---|---|',
     ...workflowRecords
       .sort((a, b) => a.command_name.localeCompare(b.command_name))
       .map((record) => {
@@ -174,7 +181,8 @@ function buildRuntimeCapabilityCatalog() {
           record.skill_name,
           entrypointFor(record, 'claude'),
           entrypointFor(record, 'codex'),
-          `claude=${record.host_delivery.claude}; codex=${record.host_delivery.codex}`,
+          entrypointFor(record, 'kiro'),
+          `claude=${record.host_delivery.claude}; codex=${record.host_delivery.codex}; kiro=${record.host_delivery.kiro}`,
           /-beta$/.test(record.skill_name) ? 'yes' : 'no',
           command ? command.description : readSkillDescription(record.skill_name),
         ]);
@@ -184,12 +192,13 @@ function buildRuntimeCapabilityCatalog() {
     '',
     'Standalone skills 会安装为宿主可发现的 skills，不是 command-backed workflows。',
     '',
-    '| Skill | Claude Delivery | Codex Delivery | Description |',
-    '|---|---|---|---|',
+    '| Skill | Claude Delivery | Codex Delivery | Kiro Delivery | Description |',
+    '|---|---|---|---|---|',
     ...standaloneRecords.map((record) => tableRow([
       record.skill_name,
       entrypointFor(record, 'claude'),
       entrypointFor(record, 'codex'),
+      entrypointFor(record, 'kiro'),
       readSkillDescription(record.skill_name),
     ])),
     '',
@@ -212,10 +221,15 @@ function buildRuntimeCapabilityCatalog() {
     '| Claude Code | agents | `.claude/agents/` |',
     '| Codex | workflow, standalone, and agent-facing internal skills | `.agents/skills/` |',
     '| Codex | agents | `.codex/agents/` |',
+    '| Kiro | workflow, standalone, and agent-facing internal skills | `.kiro/skills/` |',
+    '| Kiro | agents | `.kiro/agents/` |',
+    '| Kiro | spec-first managed state | `.kiro/spec-first/` |',
+    '| Kiro | MCP config surface | `.kiro/settings/mcp.json` / `~/.kiro/settings/mcp.json` |',
+    '| Kiro | native specs advisory input | `.kiro/specs/**` (Kiro-owned; not generated by spec-first) |',
     '',
     '## Source Runtime Customization Boundary',
     '',
-    '`docs/contracts/source-runtime-customization-boundary.md` defines the customization contract for checked-in source, generated host runtime mirrors, target-repo workflow artifacts, and external provider/tool facts. Generated mirrors under `.claude/`, `.codex/`, and `.agents/skills/` are not source-of-truth; edit source assets and regenerate with `spec-first init`, choosing the target host when prompted, when a runtime refresh is required.',
+    '`docs/contracts/source-runtime-customization-boundary.md` defines the customization contract for checked-in source, generated host runtime mirrors, target-repo workflow artifacts, and external provider/tool facts. Generated mirrors under `.claude/`, `.codex/`, `.agents/skills/`, `.kiro/skills/`, `.kiro/agents/`, `.kiro/spec-first/`, and spec-first managed `.kiro/settings/` are not source-of-truth; edit source assets and regenerate with `spec-first init`, choosing the target host when prompted, when a runtime refresh is required. Kiro-native `.kiro/specs/**` remains Kiro-owned advisory input only when explicitly named.',
     '',
     'External tool facts from browser/MCP tools, package managers, shell commands, and user-provided logs are evidence inputs. Raw tool output is untrusted quoted data and must be schema-validated when structured, target-repo-contained, escaped, excerpt-capped, and provenance-classified before it enters prompts, reports, facts, or durable artifacts. Tool credentials belong in environment variables, host secret managers, or tool-native stores, never in source, generated runtime mirrors, durable artifacts, or raw logs.',
     '',
@@ -252,7 +266,7 @@ function buildRuntimeCapabilityCatalog() {
     '',
     '| Command | Artifacts | Evidence | Boundary |',
     '|---|---|---|---|',
-    '| `npm run test:release:install` / npm install matrix | `.spec-first/ci/npm-install-matrix/<runner>/package-content-manifest.json`, `init-claude-programmatic.log`, `init-codex-programmatic.log`, `release-artifact-summary.json` | npm pack dry-run file manifest, tarball-installed programmatic `buildInitPlan` / `applyInitPlan` evidence for Claude/Codex, and release reviewer summary. | Deterministic release evidence only; no dashboard, history store, GitHub Release automation, or release decision engine. |',
+    '| `npm run test:release:install` / npm install matrix | `.spec-first/ci/npm-install-matrix/<runner>/package-content-manifest.json`, `init-claude-programmatic.log`, `init-codex-programmatic.log`, `init-kiro-programmatic.log`, `release-artifact-summary.json` | npm pack dry-run file manifest, tarball-installed programmatic `buildInitPlan` / `applyInitPlan` evidence for Claude/Codex/Kiro, and release reviewer summary. | Deterministic release evidence only; no dashboard, history store, GitHub Release automation, or release decision engine. |',
     '',
     '## Readiness Meaning',
     '',
@@ -261,11 +275,11 @@ function buildRuntimeCapabilityCatalog() {
     '| Layer | Entry | Canonical artifacts | Means | Does not mean |',
     '|---|---|---|---|---|',
     '| CLI/runtime health | `spec-first doctor` | doctor text/JSON report | Node/Git/package checks, generated host runtime assets, workflow surface, and stale verification evidence were inspected. | MCP/helper setup is complete or any external tool evidence is available. |',
-    '| Harness setup | `/spec:mcp-setup` or `$spec-mcp-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |',
+    '| Harness setup | `/spec:mcp-setup`, `$spec-mcp-setup`, or Kiro Agent Skill `spec-mcp-setup` | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json` | Required MCP/helper runtime facts were prepared. | Any external tool result is semantically relevant; the LLM still decides how to use direct evidence. |',
     '',
     '## Maintenance Contract',
     '',
-    '- 不手改 `.claude/`、`.codex/` 或 `.agents/skills/` 作为 source fix；需要刷新 runtime 时运行 `spec-first init` 并按引导选择目标宿主。',
+    '- 不手改 `.claude/`、`.codex/`、`.agents/skills/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/` 或 spec-first managed `.kiro/settings/` 作为 source fix；需要刷新 runtime 时运行 `spec-first init` 并按引导选择目标宿主。`.kiro/specs/**` 是 Kiro-native advisory input，不是 spec-first generated mirror。',
     '- 不在本 catalog 中手写能力数量；能力数量必须由 generator 从 source/governance 推导。',
     '- Workflow runtime contracts 必须由 `docs/contracts/workflows/*.schema.json` 的 `x-spec-first-*` metadata 派生；不能在 catalog 手写 planned/producer/integrated 状态。',
     '- 新增、删除或改变 host delivery 时，同步更新 governance/source，运行 `npm run docs:runtime-catalog`，再运行 targeted governance tests。',

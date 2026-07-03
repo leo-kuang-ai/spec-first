@@ -30,6 +30,12 @@
 | `.claude/**` | `generated_runtime_mirror_excluded` | Claude generated runtime mirror / host-local state |
 | `.codex/**` | `generated_runtime_mirror_excluded` | Codex generated runtime mirror / host-local state |
 | `.agents/skills/**` | `generated_runtime_mirror_excluded` | Codex-facing generated skill mirror |
+| `.kiro/skills/**` | `generated_runtime_mirror_excluded` | Kiro generated Agent Skills runtime mirror |
+| `.kiro/agents/**` | `generated_runtime_mirror_excluded` | Kiro generated agent runtime mirror |
+| `.kiro/spec-first/**` | `generated_runtime_mirror_excluded` | Kiro spec-first managed state/runtime facts |
+| `.kiro/settings/**` | `generated_runtime_mirror_excluded` | Kiro spec-first managed MCP config surface; direct doctor/setup reads are allowed only in runtime tasks |
+
+`.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它；不得把 `.kiro/**` blanket 排除或 blanket 纳入 source context。
 
 普通 workflow 仍可读取 checked-in source truth，例如 `skills/`、`agents/`、`templates/`、`src/cli/`、`docs/contracts/`、`AGENTS.md`、`CLAUDE.md`、`README*` 和当前任务直接相关的源码、测试、计划或需求文档。
 
@@ -105,7 +111,7 @@ New changelog entries should be compact breadcrumbs: one concise summary naming 
 3. validated summaries, review facts, or deterministic setup facts.
 4. 精确路径的 full artifact 或 raw evidence，仅当用户要求、workflow 明确需要，或 summary 显示证据不足。
 
-禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**` 纳入默认 `rg --files` / file-search / agent prompt bundle 的普通候选集。
+禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**` 纳入默认 `rg --files` / file-search / agent prompt bundle 的普通候选集。`.kiro/specs/**` 不在 generated mirror denylist 内；它只在显式命名时作为 advisory input 消费。
 
 内部 context helper 在匹配排除规则前必须先把输入路径规范化为 repo-relative canonical path；解析后位于当前 repo 外的路径，或 repo 内 symlink 解析后指向 repo 外的路径，必须以 `outside_repo_context_excluded` 排除，除非上游 workflow 明确使用了自己的外部路径合同。
 

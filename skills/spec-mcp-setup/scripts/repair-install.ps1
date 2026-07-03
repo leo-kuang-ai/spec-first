@@ -1,5 +1,6 @@
 param(
-  [string]$Tool
+  [string]$Tool,
+  [switch]$UserScope
 )
 
 $ErrorActionPreference = 'Stop'
@@ -7,6 +8,9 @@ Set-StrictMode -Version Latest
 
 if ([string]::IsNullOrWhiteSpace($Tool)) {
   throw '缺少 -Tool 参数'
+}
+if ($UserScope) {
+  $env:KIRO_USER_SCOPE = '1'
 }
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -25,4 +29,4 @@ foreach ($dep in @($ToolDef.dependencies)) {
   }
 }
 
-& (Join-Path $ScriptDir 'configure-host.ps1') -Tool $Tool
+& (Join-Path $ScriptDir 'configure-host.ps1') -Tool $Tool -UserScope:$UserScope

@@ -53,6 +53,10 @@ describe('spec-mcp-setup config template contract', () => {
     const setupDoesNot = markdownSection(text, '## Boundaries').split('Setup does not:')[1];
 
     expect(text).toContain('Setup Posture And Project Conventions');
+    expect(text).toContain('Claude Code, Codex, or Kiro');
+    expect(text).toContain('Generated runtime mirrors under `.claude/`, `.codex/`, `.kiro/`, and `.agents/skills/` are not source');
+    expect(text).toContain('Kiro MCP config to workspace `.kiro/settings/mcp.json` by default');
+    expect(text).toContain('~/.kiro/settings/mcp.json` only after explicit user-scope opt-in');
     expect(text).toContain('Explore -> Present -> Decide -> Write');
     expect(text).toContain('local-only overrides');
     expect(text).toContain('verification_profile_path');

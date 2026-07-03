@@ -172,6 +172,7 @@ function Get-RuntimeStatePathForHost {
   switch ($HostName) {
     'codex' { return (Join-Path $TargetRoot '.codex/spec-first/state.json') }
     'claude' { return (Join-Path $TargetRoot '.claude/spec-first/state.json') }
+    'kiro' { return (Join-Path $TargetRoot '.kiro/spec-first/state.json') }
     default { return '' }
   }
 }

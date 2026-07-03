@@ -62,6 +62,30 @@ const EXCLUDED_PREFIXES = [
     reason_code: 'generated_runtime_mirror_excluded',
     reason: 'generated runtime mirrors are excluded from ordinary context',
   },
+  {
+    prefix: '.kiro/skills',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/agents',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/spec-first',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/settings',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
 ];
 
 const OUTSIDE_REPO_EXCLUSION = {

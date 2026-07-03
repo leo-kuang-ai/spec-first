@@ -5,6 +5,7 @@ param(
   [switch]$AllRepos,
   [switch]$Plan,
   [switch]$Refresh,
+  [switch]$UserScope,
   [string]$RequirementWorkspace = ''
 )
 
@@ -14,6 +15,9 @@ Set-StrictMode -Version Latest
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillDir = Split-Path -Parent $ScriptDir
 . (Join-Path $ScriptDir 'lib-template.ps1')
+if ($UserScope) {
+  $env:KIRO_USER_SCOPE = '1'
+}
 $ToolsJsonPath = Join-Path $SkillDir 'mcp-tools.json'
 $ProviderToolsJsonPath = Join-Path $SkillDir 'provider-tools.json'
 $ToolsJson = Read-McpToolsJson -Path $ToolsJsonPath
@@ -764,7 +768,9 @@ foreach ($tool in @($ToolsJson.tools)) {
   $hostConfigRequired = if ($null -ne $tool.PSObject.Properties['host_config_required']) { [bool]$tool.host_config_required } else { $true }
 
   if ($status -eq 'ready' -and $hostConfigRequired) {
-    $configureRun = Invoke-Captured { & (Join-Path $ScriptDir 'configure-host.ps1') -Tool $tool.id }
+    $configureParams = @{ Tool = $tool.id }
+    if ($UserScope) { $configureParams.UserScope = $true }
+    $configureRun = Invoke-Captured { & (Join-Path $ScriptDir 'configure-host.ps1') @configureParams }
     if ($configureRun.ok) {
       $configureResult = $configureRun.stdout | ConvertFrom-Json
       $configuredPath = $configureResult.configured_path
@@ -773,7 +779,7 @@ foreach ($tool in @($ToolsJson.tools)) {
     } else {
       $exitCode = $configureRun.exit_code
       $diagnosticSummary = $configureRun.diagnostic_summary
-      $repairRun = Invoke-Captured { & (Join-Path $ScriptDir 'repair-install.ps1') -Tool $tool.id }
+      $repairRun = Invoke-Captured { & (Join-Path $ScriptDir 'repair-install.ps1') @configureParams }
       if ($repairRun.ok) {
         $repairResult = $repairRun.stdout | ConvertFrom-Json
         $lastAction = 'repaired'

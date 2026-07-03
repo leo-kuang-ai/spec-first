@@ -125,6 +125,9 @@ runtime_state_path_for_host() {
     claude)
       printf '%s/.claude/spec-first/state.json' "$target_root"
       ;;
+    kiro)
+      printf '%s/.kiro/spec-first/state.json' "$target_root"
+      ;;
     *)
       printf ''
       ;;

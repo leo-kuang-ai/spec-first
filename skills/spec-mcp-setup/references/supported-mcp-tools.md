@@ -8,15 +8,21 @@ This reference summarizes the current `spec-mcp-setup` registry. The machine sou
 | --- | --- | --- | --- | --- |
 | Sequential Thinking | Yes | `mcp` | Yes | `npx -y @modelcontextprotocol/server-sequential-thinking@latest` |
 | Context7 | Yes | `mcp` | Yes | `npx -y @upstash/context7-mcp@latest` |
+| CodeGraph | No, explicit opt-in | `mcp` | Yes | `codegraph serve --mcp` |
 
 ## Setup Rules
 
-- All registry entries must have `required=true`.
-- Current registry categories are `mcp` only.
+- Baseline entries may have `required=true`; optional MCP entries must carry `opt_in.explicit_consent_required=true`.
+- Current registry categories are `mcp` only. Required helper/provider tools live in `helper-tools.json` and `provider-tools.json`, not in `mcp-tools.json`.
 - MCP tools must define deterministic install, host config, detection, summary, and uninstall metadata.
 - Package-backed setup paths normally request latest versions through `@latest`.
 - Warmup cache lives under `$HOME/.spec-first/cache/mcp-warmup/` unless `SPEC_FIRST_WARMUP_CACHE_DIR` overrides it.
 - `--verify-only` only reads facts and must not perform installs or host config writes.
+- Supported host MCP config targets:
+  - Claude Code: managed/user JSON `mcpServers`.
+  - Codex: user/system TOML `mcp_servers` sections.
+  - Kiro: workspace `.kiro/settings/mcp.json` by default; user `~/.kiro/settings/mcp.json` only with `--user-scope` or `KIRO_USER_SCOPE=1`.
+- Kiro config writes use JSON `mcpServers`, preserve unrelated entries, reject invalid JSON instead of overwriting, and must write secret-like values only as env var references.
 
 ## Required Helper Tools
 

@@ -161,7 +161,7 @@ describe('interactive init command', () => {
       expect(result.stdout).toContain('Select one or more host runtimes');
       expect(result.stdout).toContain('spec-first init --codex');
       expect(result.stdout).toContain('spec-first init -y');
-      expect(result.stdout).toContain('Explicit --claude/--codex flags override the default host set.');
+      expect(result.stdout).toContain('Explicit --claude/--codex/--kiro flags override the default host set.');
       expect(result.stdout).toContain('--dry-run');
       expect(result.stdout).toContain('--sync-user-language');
       expect(result.stdout).toContain('--no-sync-user-language');
@@ -256,7 +256,7 @@ describe('interactive init command', () => {
       const result = await captureInit(projectRoot, ['--lang', 'zh'], prompts);
 
       expect(result.exitCode).toBe(0);
-      expect(hostChoices).toHaveLength(2);
+      expect(hostChoices).toHaveLength(3);
       expect(hostChoices.every((choice) => choice.checked === false)).toBe(true);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -299,9 +299,10 @@ describe('interactive init command', () => {
       const result = await captureInit(projectRoot, [], prompts);
 
       expect(result.exitCode).toBe(0);
-      expect(hostChoices).toHaveLength(2);
+      expect(hostChoices).toHaveLength(3);
       const checkedById = Object.fromEntries(hostChoices.map((choice) => [choice.value, choice.checked]));
       expect(checkedById.claude).toBe(true);
+      expect(checkedById.kiro).toBe(false);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }

@@ -241,6 +241,62 @@ describe('clean --dry-run', () => {
     }
   });
 
+  test('Kiro clean removes only spec-first managed runtime and preserves user-owned Kiro assets', () => {
+    const projectRoot = makeTempDir();
+    const initLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'kiro' }))).toBe(0);
+
+      const userSkillPath = path.join(projectRoot, '.kiro', 'skills', 'custom-skill', 'SKILL.md');
+      const userAgentPath = path.join(projectRoot, '.kiro', 'agents', 'custom-agent.md');
+      const userHookPath = path.join(projectRoot, '.kiro', 'hooks', 'user-hook.json');
+      const userSettingsPath = path.join(projectRoot, '.kiro', 'settings', 'mcp.json');
+      const userSpecPath = path.join(projectRoot, '.kiro', 'specs', 'feature-a', 'requirements.md');
+      fs.mkdirSync(path.dirname(userSkillPath), { recursive: true });
+      fs.mkdirSync(path.dirname(userAgentPath), { recursive: true });
+      fs.mkdirSync(path.dirname(userHookPath), { recursive: true });
+      fs.mkdirSync(path.dirname(userSettingsPath), { recursive: true });
+      fs.mkdirSync(path.dirname(userSpecPath), { recursive: true });
+      fs.writeFileSync(userSkillPath, '---\nname: custom-skill\ndescription: custom\n---\n', 'utf8');
+      fs.writeFileSync(userAgentPath, '---\nname: custom-agent\ndescription: custom\n---\n', 'utf8');
+      fs.writeFileSync(userHookPath, '{}\n', 'utf8');
+      fs.writeFileSync(userSettingsPath, '{"mcpServers":{"user":{}}}\n', 'utf8');
+      fs.writeFileSync(userSpecPath, '# Requirements\n', 'utf8');
+
+      const dryRun = captureCommand(projectRoot, runClean, ['--kiro', '--dry-run']);
+      expect(dryRun.exitCode).toBe(0);
+      expect(dryRun.stderr).toBe('');
+      expect(dryRun.stdout).toContain('Dry run: spec-first clean (kiro)');
+      expect(dryRun.stdout).toContain('.kiro/skills/spec-work');
+      expect(dryRun.stdout).toContain('.kiro/agents/spec-security-reviewer.agent.md');
+      expect(dryRun.stdout).toContain('.kiro/spec-first/state.json');
+      expect(dryRun.stdout).toContain('AGENTS.md');
+      expect(dryRun.stdout).not.toContain('.kiro/hooks/user-hook.json');
+      expect(dryRun.stdout).not.toContain('.kiro/settings/mcp.json');
+      expect(dryRun.stdout).not.toContain('.kiro/specs/feature-a/requirements.md');
+
+      const cleanResult = captureCommand(projectRoot, runClean, ['--kiro']);
+      expect(cleanResult.exitCode).toBe(0);
+      expect(cleanResult.stdout).toContain('Removed spec-first managed Kiro assets');
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'))).toBe(false);
+      expect(fs.existsSync(userSkillPath)).toBe(true);
+      expect(fs.existsSync(userAgentPath)).toBe(true);
+      expect(fs.existsSync(userHookPath)).toBe(true);
+      expect(fs.existsSync(userSettingsPath)).toBe(true);
+      expect(fs.existsSync(userSpecPath)).toBe(true);
+
+      const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
+      expect(instructions).not.toContain('spec-first:bootstrap:start');
+      expect(instructions).not.toContain('spec-first:runtime-tools:start');
+    } finally {
+      initLogSpy.mockRestore();
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('clean rejects unsafe managed state paths before deleting assets', () => {
     const tempRoot = makeTempDir();
     const projectRoot = path.join(tempRoot, 'project');
@@ -402,7 +458,7 @@ describe('clean --workspace-orphans', () => {
     try {
       const mixed = captureCommand(projectRoot, runClean, ['--workspace-orphans', '--claude']);
       expect(mixed.exitCode).toBe(2);
-      expect(mixed.stderr).toContain('--workspace-orphans cannot be combined with --claude or --codex');
+      expect(mixed.stderr).toContain('--workspace-orphans cannot be combined with host flags');
 
       const invalidConfirm = captureCommand(projectRoot, runClean, ['--confirm']);
       expect(invalidConfirm.exitCode).toBe(2);

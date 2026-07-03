@@ -157,16 +157,16 @@ function parseStartupReminderArgs(args) {
 
 function printHelp(withErrorPrefix = false) {
   const lines = [
-    '🚀 spec-first — Manage spec-first workflow assets for Claude and Codex',
+    '🚀 spec-first — Manage spec-first workflow assets for Claude Code, Codex, and Kiro',
     '',
     '📘 Usage:',
     '  spec-first <command> [options]',
     '',
     '🧩 Commands:',
     '  doctor                 Check environment, runtime asset manifest, and managed runtime assets',
-    '  init [--claude] [--codex] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
+    '  init [--claude] [--codex] [--kiro] [-y] [--all-repos|--repo <path>] Interactively install workflows, skills, agents, and developer profile',
     '  update                 Upgrade the spec-first CLI package and refresh runtime assets with `spec-first init`',
-    '  clean (--claude|--codex) Remove spec-first managed assets from the current project',
+    '  clean (--claude|--codex|--kiro) Remove spec-first managed assets from the current project',
     '  repair-worktree        Preview broken worktree pointer repair guidance',
     '  tasks <subcommand>      Hash and validate derived task packs',
     '  session <subcommand>    Opt-in multi-actor session advisory (register|list|heartbeat|unregister)',
@@ -205,11 +205,11 @@ function printVersion() {
     3. 如需查看 package CLI 命令面
        $ spec-first --help
 
-    4. 重启宿主 CLI，使 Claude 的 /spec:* 或 Codex 的 $spec-* 入口生效
+    4. 重启宿主 CLI，使 Claude 的 /spec:*、Codex 的 $spec-* 或 Kiro Agent Skill 入口生效
 
     5. 在对话中使用当前宿主对应入口开始工作流
 
-       例如: /spec:plan 或 $spec-plan
+       例如: /spec:plan、$spec-plan 或 Kiro Agent Skill spec-plan
        注意: 这些是宿主 workflow 入口，不是 package CLI 子命令
 
   了解更多:

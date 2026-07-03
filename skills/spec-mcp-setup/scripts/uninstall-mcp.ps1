@@ -1,5 +1,6 @@
 param(
-  [string]$Tool
+  [string]$Tool,
+  [switch]$UserScope
 )
 
 $ErrorActionPreference = 'Stop'
@@ -9,6 +10,10 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SkillDir = Split-Path -Parent $ScriptDir
 . (Join-Path $ScriptDir 'lib-toml.ps1')
 . (Join-Path $ScriptDir 'lib-template.ps1')
+if ($UserScope) {
+  $env:KIRO_USER_SCOPE = '1'
+}
+$KiroUserScopeRequested = $UserScope -or (@('1', 'true', 'TRUE', 'yes', 'YES', 'approved', 'APPROVED') -contains [string]$env:KIRO_USER_SCOPE)
 
 function ConvertFrom-JsonCompat {
   param(
@@ -72,6 +77,11 @@ function Remove-CodexEntry {
   }
 }
 
+function Remove-JsonMcpEntry {
+  param([string]$ConfigPath, [string]$ToolId)
+  Remove-ClaudeEntry -ConfigPath $ConfigPath -ToolId $ToolId
+}
+
 $toolIds = if ([string]::IsNullOrWhiteSpace($Tool)) {
   @($ToolsJson.tools | ForEach-Object { $_.id })
 } else {
@@ -88,15 +98,25 @@ foreach ($toolId in $toolIds) {
   if ($null -eq $toolDef) { continue }
   $detectKey = $toolDef.detection.key
   foreach ($targetKey in @($toolDef.host_config[$DetectedHost].uninstall_targets)) {
+    if ($DetectedHost -eq 'kiro' -and $targetKey -eq 'user' -and -not $KiroUserScopeRequested) { continue }
     $target = $toolDef.host_config[$DetectedHost].targets[$targetKey]
     $configPathValue = Get-ToolField -Tool $target -Name 'config_path'
     $rawPath = if ($configPathValue -is [string]) { [string]$configPathValue } else { [string](Get-ToolField -Tool $configPathValue -Name $Platform) }
     if ([string]::IsNullOrWhiteSpace($rawPath)) { continue }
-    $configPath = Resolve-PathTemplate $rawPath
+    $hostTarget = $HostInfo.targets.PSObject.Properties[$targetKey]
+    $configPath = if ($null -ne $hostTarget -and -not [string]::IsNullOrWhiteSpace([string]$hostTarget.Value.config_path)) {
+      [string]$hostTarget.Value.config_path
+    } else {
+      Resolve-PathTemplate $rawPath
+    }
     if ($DetectedHost -eq 'claude') {
       Remove-ClaudeEntry -ConfigPath $configPath -ToolId $detectKey
-    } else {
+    } elseif ($DetectedHost -eq 'kiro') {
+      Remove-JsonMcpEntry -ConfigPath $configPath -ToolId $detectKey
+    } elseif ($DetectedHost -eq 'codex') {
       Remove-CodexEntry -ConfigPath $configPath -DetectKey $detectKey
+    } else {
+      throw "错误：无法识别宿主：$DetectedHost"
     }
   }
 }

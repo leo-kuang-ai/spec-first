@@ -12,6 +12,15 @@ TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 source "$SCRIPT_DIR/lib-toml.sh"
 source "$SCRIPT_DIR/lib-template.sh"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
+
+KIRO_USER_SCOPE_ARG=false
+for arg in "$@"; do
+  if [ "$arg" = "--user-scope" ]; then
+    KIRO_USER_SCOPE_ARG=true
+    export KIRO_USER_SCOPE=1
+  fi
+done
+
 HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
 HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
 PLATFORM="$(jq -r '.platform' <<<"$HOST_INFO_JSON")"
@@ -22,6 +31,11 @@ while [[ $# -gt 0 ]]; do
     --tool)
       TOOL_ID="${2:-}"
       shift 2
+      ;;
+    --user-scope)
+      KIRO_USER_SCOPE_ARG=true
+      export KIRO_USER_SCOPE=1
+      shift
       ;;
     *)
       shift
@@ -38,6 +52,14 @@ resolve_path_template() {
     *)
       printf '%s' "$template"
       ;;
+  esac
+}
+
+kiro_user_scope_requested() {
+  [ "$KIRO_USER_SCOPE_ARG" = "true" ] && return 0
+  case "${KIRO_USER_SCOPE:-}" in
+    1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+    *) return 1 ;;
   esac
 }
 
@@ -58,6 +80,10 @@ remove_claude_entry() {
     rm -f "$tmp" "$backup"
     return 1
   fi
+}
+
+remove_json_mcp_entry() {
+  remove_claude_entry "$@"
 }
 
 remove_codex_entry() {
@@ -96,11 +122,20 @@ for tool_id in "${TOOL_IDS[@]}"; do
     [ "$target_json" != "null" ] || continue
     raw_path="$(jq -r '.config_path | if type == "object" then .[$platform] // empty else . end' --arg platform "$PLATFORM" <<<"$target_json")"
     [ -n "$raw_path" ] || continue
-    config_path="$(resolve_path_template "$raw_path")"
+    if [ "$HOST" = "kiro" ] && [ "$target_key" = "user" ] && ! kiro_user_scope_requested; then
+      continue
+    fi
+    config_path="$(jq -r --arg key "$target_key" '.targets[$key].config_path // empty' <<<"$HOST_INFO_JSON")"
+    [ -n "$config_path" ] || config_path="$(resolve_path_template "$raw_path")"
     if [ "$HOST" = "claude" ]; then
       remove_claude_entry "$config_path" "$detect_key"
-    else
+    elif [ "$HOST" = "kiro" ]; then
+      remove_json_mcp_entry "$config_path" "$detect_key"
+    elif [ "$HOST" = "codex" ]; then
       remove_codex_entry "$config_path" "$detect_key"
+    else
+      echo "错误：无法识别宿主：$HOST" >&2
+      exit 1
     fi
   done < <(jq -r --arg id "$tool_id" --arg host "$HOST" '.tools[] | select(.id == $id) | .host_config[$host].uninstall_targets[]' "$TOOLS_JSON")
 done

@@ -10,7 +10,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -21,7 +22,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -32,7 +34,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -43,7 +46,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -54,7 +58,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -65,7 +70,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -76,7 +82,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -87,7 +94,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -98,7 +106,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -109,7 +118,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -120,7 +130,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -131,7 +142,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -142,7 +154,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -153,7 +166,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -164,7 +178,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -175,7 +190,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -186,7 +202,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -197,7 +214,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -208,7 +226,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -219,7 +238,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -230,7 +250,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -241,7 +262,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -252,7 +274,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -263,7 +286,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -274,7 +298,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -285,7 +310,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -296,7 +322,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -307,7 +334,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -318,7 +346,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -329,7 +358,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -340,7 +370,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -351,7 +382,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -362,7 +394,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -373,7 +406,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "skill",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     },
     {
@@ -384,7 +418,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -395,7 +430,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "kiro": "internal"
       }
     },
     {
@@ -406,7 +442,8 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "skill",
-        "codex": "skill"
+        "codex": "skill",
+        "kiro": "skill"
       }
     }
   ]

@@ -83,7 +83,8 @@ function Test-GlobalSkillInstalled {
   $paths = @(
     [System.IO.Path]::Combine($HOME, '.agents', 'skills', $SkillName, 'SKILL.md'),
     [System.IO.Path]::Combine($HOME, '.codex', 'skills', $SkillName, 'SKILL.md'),
-    [System.IO.Path]::Combine($HOME, '.claude', 'skills', $SkillName, 'SKILL.md')
+    [System.IO.Path]::Combine($HOME, '.claude', 'skills', $SkillName, 'SKILL.md'),
+    [System.IO.Path]::Combine($HOME, '.kiro', 'skills', $SkillName, 'SKILL.md')
   )
   foreach ($path in $paths) {
     if (Test-Path -LiteralPath $path -PathType Leaf) { return $true }
