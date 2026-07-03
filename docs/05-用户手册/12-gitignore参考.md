@@ -6,7 +6,9 @@
 
 核心原则：
 
-- `.claude/`、`.codex/` 和 `.agents/skills/` 下的 spec-first runtime mirror 可重建，不作为项目 source truth。
+- `.claude/`、`.codex/`、`.agents/skills/`、`.kiro/skills/`、`.kiro/agents/` 和 `.kiro/spec-first/` 下的 spec-first runtime mirror 可重建，不作为项目 source truth。
+- `.kiro/settings/` 是 Kiro workspace MCP 配置落点；`spec-first` 写入的 MCP 配置默认不提交。
+- `.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated runtime mirror；只有被显式点名时才作为输入读取。
 - `.spec-first/config/` 和 `.spec-first/workspace/` 是本地 setup/control-plane facts，默认不提交。
 - `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated runtime mirrors 也不应作为普通 LLM 上下文扫描源；只有 setup/update/runtime-drift/audit/governance evidence 任务或用户明确点名路径时才按需读取。
 - `.spec-first/sessions/` 是 multi-actor 治理协议的 opt-in advisory 记录目录，由 `spec-first session register` 等命令写入；属于 runtime state，默认不提交。
@@ -34,6 +36,10 @@
 .claude/worktrees/
 .codex/
 .agents/skills/
+.kiro/skills/
+.kiro/agents/
+.kiro/spec-first/
+.kiro/settings/
 .context/spec-first/
 
 # spec-first local setup and workflow runtime artifacts
@@ -92,6 +98,13 @@ graphify-out/
   .agents/
     skills/                         # Codex skill runtime mirror，忽略
 
+  .kiro/
+    skills/                         # Kiro Agent Skill runtime mirror，忽略
+    agents/                         # Kiro custom subagent runtime mirror，忽略
+    spec-first/                     # spec-first state/profile，忽略
+    settings/                       # spec-first MCP workspace config，忽略
+    specs/                          # Kiro-native specs，是否提交按团队策略
+
   .spec-first/
     config.local.example.yaml       # 本地配置模板，可提交
     config.local.yaml               # 本地配置，忽略
@@ -148,6 +161,7 @@ graphify-out/
 | `.claude/commands/spec/`、`.claude/skills/`、`.claude/spec-first/`、`.claude/agents/` | `spec-first init` 可重建的 runtime assets |
 | `.claude/tasks/`、`.claude/worktrees/` | Claude Code host-local scratch/worktree 产物 |
 | `.codex/`、`.agents/skills/` | Codex host/runtime assets 与 `spec-first init` 可重建的 runtime mirror |
+| `.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.kiro/settings/` | Kiro spec-first-managed runtime mirror、state 与 MCP workspace config，可由 `init` / `$spec-mcp-setup` 重建 |
 | `.spec-first/config.local.yaml`、`.spec-first/*.local.yaml` | 本地配置，可能包含个人路径或私有设置 |
 | `.spec-first/config/*.json` | `spec-mcp-setup` 生成的 setup-owned 本地投影，不是第二个版本源 |
 | `.spec-first/workspace/` | 父级多仓 advisory summaries，不是 child repo canonical truth |

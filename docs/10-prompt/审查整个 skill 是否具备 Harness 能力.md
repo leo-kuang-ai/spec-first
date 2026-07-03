@@ -1113,4 +1113,3 @@ spec-first 整个体系中，只有6个机制是"LLM 无法绕过"的：
 3. **确认 evals/ 中有 negative cases**（不只有 examples）
 4. **确认 Evidence 词汇**在上下游 handoff 中是否统一
 5. **确认每个 Skill 的 Knowledge Harness Placeholder** 是否存在
-

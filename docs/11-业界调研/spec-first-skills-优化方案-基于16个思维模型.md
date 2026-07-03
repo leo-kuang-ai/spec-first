@@ -2264,14 +2264,3 @@ L24（Plan-Only Safety Contract）→ 压缩为 1 行引用：
 | spec-debug | Feedback loop 细节 + issue tracker 移入 reference | L2 | `STOP. For feedback loop / issue tracker inputs, read references/investigation-techniques.md.` | ~60行 |
 | spec-code-review | Headless output template 移入 reference | L2 | `STOP. For headless output format, read references/headless-output-template.md.` | ~85行 |
 | spec-code-review | 新增 Reference Trigger Map 章节 | L1 | —（结构改善）| +0行，但提升 L2 可发现性 |
-
-
-
-
-
-
-
-
-
-
-

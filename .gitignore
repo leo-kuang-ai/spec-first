@@ -65,6 +65,10 @@ __pycache__/
 .claude/worktrees/
 .codex/
 .agents/skills/
+.kiro/skills/
+.kiro/agents/
+.kiro/spec-first/
+.kiro/settings/
 .context/spec-first/
 
 # spec-first local setup and workflow runtime artifacts

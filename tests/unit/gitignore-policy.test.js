@@ -29,6 +29,10 @@ describe('spec-first gitignore policy', () => {
     expect(patterns).toContain('.claude/hooks/prd-readiness-guard');
     expect(patterns).toContain('.codex/');
     expect(patterns).toContain('.agents/skills/');
+    expect(patterns).toContain('.kiro/skills/');
+    expect(patterns).toContain('.kiro/agents/');
+    expect(patterns).toContain('.kiro/spec-first/');
+    expect(patterns).toContain('.kiro/settings/');
     expect(getSpecFirstGitignorePatternMetadata()).toEqual({});
     expect(patterns).toContain('.spec-first/config/*.json');
     expect(patterns).toContain('.spec-first/governance/');
@@ -43,6 +47,8 @@ describe('spec-first gitignore policy', () => {
     expect(patterns).not.toContain('.codex/spec-first/');
     expect(patterns).not.toContain('.codex/agents/');
     expect(patterns).not.toContain('.agents/');
+    expect(patterns).not.toContain('.kiro/');
+    expect(patterns).not.toContain('.kiro/specs/');
     expect(patterns).not.toContain('.spec-first/');
     expect(patterns).not.toContain('*.tgz');
     expect(block).toContain([

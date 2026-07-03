@@ -998,8 +998,20 @@ function printHelp() {
 function detectPlatforms(projectRoot) {
   return getSupportedPlatforms().filter(platform => {
     const adapter = getAdapter(platform);
-    return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
+    return isPlatformRuntimeDetected(projectRoot, adapter);
   });
+}
+
+function isPlatformRuntimeDetected(projectRoot, adapter) {
+  if (adapter.id !== 'kiro') {
+    return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
+  }
+
+  return [
+    adapter.stateFile,
+    adapter.skillsRoot,
+    adapter.agentsRoot,
+  ].some((runtimePath) => fs.existsSync(path.join(projectRoot, runtimePath)));
 }
 
 function parseDoctorArgs(argv) {

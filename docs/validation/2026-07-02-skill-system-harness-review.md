@@ -1,8 +1,8 @@
 # Skill 体系 Harness 化审查与压缩治理报告
 
-> 审查日期：2026-07-02  
-> 审查方法：基于 `docs/10-prompt/审查整个 skill 是否具备 Harness 能力.md` 15步审查框架，5轮深度分析  
-> 审查范围：spec-first `skills/` 目录全量 Skill，重点覆盖 10 个核心 workflow skill  
+> 审查日期：2026-07-02
+> 审查方法：基于 `docs/10-prompt/审查整个 skill 是否具备 Harness 能力.md` 15步审查框架，5轮深度分析
+> 审查范围：spec-first `skills/` 目录全量 Skill，重点覆盖 10 个核心 workflow skill
 > 审查轮次：5轮（理解→关系图谱→逐Skill Harness→内容分类→不可丢失约束→Harness设计→治理）
 
 ---
@@ -1331,8 +1331,8 @@ argument-hint: "[optional args]"
 
 # 第二轮深化审查（20轮多维度分析）
 
-> 审查日期：2026-07-02（续）  
-> 审查方法：20轮多视角/多角色深度审查  
+> 审查日期：2026-07-02（续）
+> 审查方法：20轮多视角/多角色深度审查
 > 审查轮次：R01~R20（架构师/Evidence工程师/Eval工程师/安全/并发/双宿主/治理/PD/收口）
 
 ---
@@ -1588,22 +1588,22 @@ evidence_classes:
     alias: [confirmed-source, confirmed, verified]
     definition: "来自当前文件/代码/测试/日志/diff/用户明确输入"
     usage: "可直接支撑 confirmed 结论"
-  
+
   inference:
     alias: [advisory, session-local]
     definition: "基于 fact 推断，需标注推断路径"
     usage: "可用于 recommendation，不得用于 confirmed 声明"
-  
+
   hypothesis:
     alias: [source-candidate, stale]
     definition: "待验证，需独立验证后才能提升为 fact"
     usage: "只能作为 investigation target"
-  
+
   assumption:
     alias: [assumption, external-research]
     definition: "未验证前提，须显式标注"
     usage: "须在 outstanding questions 或 evidence gaps 中可见"
-  
+
   unknown:
     definition: "当前无法确认"
     usage: "须说明何种证据可关闭此 gap"

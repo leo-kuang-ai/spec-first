@@ -94,6 +94,58 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
       expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
         command: 'npx',
       });
+
+      const workspaceContext7Result = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(workspaceContext7Result.status).toBe(0);
+
+      const detectResult = spawnPwsh(['-NoProfile', '-File', detectToolsPs1, '-Repo', repo], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(detectResult.status).toBe(0);
+      const detectPayload = JSON.parse(detectResult.stdout);
+      expect(detectPayload.tools['sequential-thinking'].host_config_status).toBe('ready');
+      expect(detectPayload.tools.context7.host_config_status).toBe('ready');
+
+      const uninstallWorkspaceResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(uninstallWorkspaceResult.status).toBe(0);
+      expect(JSON.parse(read(workspaceConfigPath)).mcpServers.context7).toBeUndefined();
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const uninstallUserResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(uninstallUserResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toBeUndefined();
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
