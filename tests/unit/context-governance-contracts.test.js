@@ -90,26 +90,13 @@ describe('context governance runtime exclusion contract', () => {
       const block = buildBootstrapBlock(host, lang);
       expect(block).toContain('.spec-first/audits/**');
       expect(block).toContain('.spec-first/governance/**');
-      expect(block).toContain('.claude/**');
-      expect(block).toContain('.codex/**');
-      expect(block).toContain('.agents/skills/**');
-      expect(block).toContain('.cursor/skills/**');
-      expect(block).toContain('.cursor/spec-first/**');
-      expect(block).toContain('.cursor/mcp.json');
-      expect(block).toContain('.kiro/skills/**');
-      expect(block).toContain('.kiro/agents/**');
-      expect(block).toContain('.kiro/spec-first/**');
-      expect(block).toContain('.kiro/settings/**');
-      expect(block).toContain('.qoder/commands/spec-*.md');
-      expect(block).toContain('.qoder/commands/spec/**');
-      expect(block).toContain('.qoder/skills/**');
-      expect(block).toContain('.qoder/agents/**');
-      expect(block).toContain('.qoder/spec-first/**');
-      expect(block).toContain('.qoder/settings.local.json');
-      expect(block).toContain('.cursor/rules/**');
-      expect(block).toContain('.cursor/agents/**');
-      expect(block).toContain('.kiro/specs/**');
-      expect(block).toContain('.qoder/rules/**');
+      expect(block).toContain('generated mirrors');
+      expect(block).toContain('docs/contracts/context-governance.md');
+      expect(block).toContain('host-native advisory');
+      expect(block).not.toContain('.claude/**');
+      expect(block).not.toContain('.codex/**');
+      expect(block).not.toContain('.agents/skills/**');
+      expect(block).not.toContain('.qoder/settings.local.json');
     }
 
     // Checked-in instruction files surface the same runtime-exclusion invariants.
@@ -119,6 +106,7 @@ describe('context governance runtime exclusion contract', () => {
       const content = read(file);
       expect(content).toContain('`.spec-first/audits/**`');
       expect(content).toContain('`.spec-first/governance/**`');
+      expect(content).toContain('`docs/contracts/context-governance.md`');
       expect(content).toContain('`spec-first:lang` managed block');
     }
   });

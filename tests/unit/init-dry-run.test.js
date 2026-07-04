@@ -431,7 +431,8 @@ describe('init --dry-run', () => {
       expect(claudeInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
       expect(claudeInstruction).not.toContain('入口映射(意图→入口)');
       expect(claudeInstruction).toContain('target_repo');
-      expect(claudeInstruction).toContain('spec-optimize');
+      expect(claudeInstruction).toContain('完整 map 查 SKILL');
+      expect(claudeInstruction).not.toContain('spec-optimize');
       expect(claudeInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(claudeInstruction).not.toContain('group.status');
       expect(claudeInstruction).not.toContain('spec-standards` 无参数运行默认为每个 discovered child repo');
@@ -599,7 +600,8 @@ describe('init --dry-run', () => {
       expect(codexInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
       expect(codexInstruction).not.toContain('入口映射(意图→入口)');
       expect(codexInstruction).toContain('target_repo');
-      expect(codexInstruction).toContain('spec-optimize');
+      expect(codexInstruction).toContain('完整 map 查 SKILL');
+      expect(codexInstruction).not.toContain('spec-optimize');
       expect(codexInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(codexInstruction).not.toContain('group.status');
       expect(codexInstruction).toContain('spec-first startup-reminder --codex');

@@ -136,7 +136,7 @@ function commandFromPath(command, pathValue = process.env.PATH) {
     }
     return null;
   }
-  const result = spawnSync('/bin/sh', ['-lc', `command -v ${shellQuote(command)}`], {
+  const result = spawnSync('/bin/sh', ['-c', `command -v ${shellQuote(command)}`], {
     encoding: 'utf8',
     env: {
       ...process.env,

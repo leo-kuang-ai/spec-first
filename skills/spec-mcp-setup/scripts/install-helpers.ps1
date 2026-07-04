@@ -1001,6 +1001,51 @@ function Resolve-GraphifyCliMatchingPin {
   return ''
 }
 
+function Repair-GraphifyPathSymlinkIfSafe {
+  $repairSetting = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK')
+  if ($repairSetting -in @('false', 'FALSE', 'no', 'NO', '0')) { return }
+
+  $pathCommand = Resolve-GraphifyOnOriginalPath
+  if ([string]::IsNullOrWhiteSpace($pathCommand)) { return }
+  if (Test-GraphifyCommandVersionMatchesPin -Command $pathCommand) { return }
+
+  $pathItem = Get-Item -LiteralPath $pathCommand -Force -ErrorAction SilentlyContinue
+  if ($null -eq $pathItem) { return }
+  if ($pathItem.LinkType -notin @('SymbolicLink', 'Junction')) { return }
+
+  $pinnedCommand = Resolve-GraphifyCliMatchingPin
+  if ([string]::IsNullOrWhiteSpace($pinnedCommand)) { return }
+  if ($pinnedCommand -eq $pathCommand) { return }
+  if (-not (Test-Path -LiteralPath $pinnedCommand -PathType Leaf)) { return }
+
+  $backupPath = "$pathCommand.old"
+  $index = 1
+  while ((Test-Path -LiteralPath $backupPath) -or ((Get-Item -LiteralPath $backupPath -Force -ErrorAction SilentlyContinue) -ne $null)) {
+    $backupPath = "$pathCommand.old.$index"
+    $index += 1
+  }
+
+  try {
+    Move-Item -LiteralPath $pathCommand -Destination $backupPath -ErrorAction Stop
+    try {
+      New-Item -ItemType SymbolicLink -Path $pathCommand -Target $pinnedCommand -Force -ErrorAction Stop | Out-Null
+    } catch {
+      if (-not (Test-Path -LiteralPath $pathCommand)) {
+        Move-Item -LiteralPath $backupPath -Destination $pathCommand -ErrorAction SilentlyContinue
+      }
+      throw
+    }
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED -Value 'true'
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_FROM -Value $pathCommand
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_TO -Value $pinnedCommand
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_BACKUP -Value $backupPath
+    Write-StageLog 'provider:graphify' "repaired stale PATH symlink $pathCommand -> $pinnedCommand (backup: $backupPath)"
+    Reset-GraphifyResolver
+  } catch {
+    Write-StageLog 'provider:graphify' "stale PATH symlink repair skipped"
+  }
+}
+
 function Invoke-GraphifyCommand {
   param(
     [string[]]$Arguments,
@@ -1338,10 +1383,15 @@ function Test-GraphifyCliVersionMatchesPin {
 }
 
 function Install-GraphifyCli {
-  if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
+  if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) {
+    Repair-GraphifyPathSymlinkIfSafe
+    if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
+    return $true
+  }
   if (Test-CommandExists 'npm') {
     if (Invoke-NpmGlobalInstallWithOptionalSudo -Packages @("$graphifyPackage@$graphifyVersionPin")) {
       Reset-GraphifyResolver
+      Repair-GraphifyPathSymlinkIfSafe
       if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
     }
   }

@@ -586,6 +586,10 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).toContain('SPEC_FIRST_PROVIDER_ORIGINAL_PATH');
     expect(read(installHelpersPs1)).toContain('Resolve-GraphifyCli');
     expect(read(installHelpersPs1)).toContain('Resolve-GraphifyCliMatchingPin');
+    expect(read(installHelpersPs1)).toContain('Repair-GraphifyPathSymlinkIfSafe');
+    expect(read(installHelpersPs1)).toContain('SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK');
+    expect(read(installHelpersPs1)).toContain("LinkType -notin @('SymbolicLink', 'Junction')");
+    expect(read(installHelpersPs1)).toContain('New-Item -ItemType SymbolicLink');
     expect(read(installHelpersPs1)).toContain('Invoke-GraphifyCommand');
     expect(read(installHelpersPs1)).toContain('Invoke-GraphifyCommandWithTimeout');
     expect(read(installHelpersPs1)).toContain('Get-GraphifyVersionOutputWithTimeout');

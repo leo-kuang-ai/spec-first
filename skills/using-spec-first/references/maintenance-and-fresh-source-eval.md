@@ -49,3 +49,12 @@ Minimum source-change evidence:
 - Fresh-source eval status or a concrete `not_run` reason for prose/behavior changes.
 
 Use output eval evidence for larger changes. For routing skills, compare `with-skill` against a baseline that has only the public workflow menu, not a baseline that lacks all workflow names.
+
+## Prose And Context-Tax Review Prompt
+
+When changing this skill, another skill description, or host bootstrap prose, use these questions as an LLM-owned review prompt, not as a deterministic gate:
+
+- Does the frontmatter description only decide trigger and exclusion, instead of explaining the full workflow?
+- Does `SKILL.md` keep only high-frequency runtime invariants, with low-frequency edge detail in `references/`?
+- Does host bootstrap keep only rules that must be present when the skill is not loaded?
+- Do eval fixtures cover false positives, false negatives, and lightweight requests that should stay direct?

@@ -106,6 +106,18 @@
         "public_workflow_required": false,
         "artifact_expected": false
       }
+    },
+    {
+      "id": "current-context-summary-stays-direct",
+      "input": "总结一下当前对话里你已经读到的上下文，不要改文件。",
+      "coverage_tags": ["routing", "boundary", "lightweight", "expected"],
+      "expected_outcome": "Answer from current context directly and do not route to review, plan, work, Graphify, or setup.",
+      "boundary_note": "Current-conversation or already-loaded context summaries are lightweight unless the user asks for source edits, validation, or review artifacts.",
+      "forbidden_signals": ["Starts spec-doc-review", "Starts spec-work", "Creates a review artifact", "Runs setup solely because context is incomplete"],
+      "extensions": {
+        "public_workflow_required": false,
+        "artifact_expected": false
+      }
     }
   ]
 }

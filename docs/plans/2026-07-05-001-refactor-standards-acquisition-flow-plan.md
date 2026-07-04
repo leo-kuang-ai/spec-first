@@ -12,15 +12,15 @@ implements_schemas: []
 
 ## Summary
 
-本计划把 `spec-rule-miner` 最值得借鉴的三个思想落地到 `spec-team-standards-governance`：单一 extraction target、类别化抽取、大项目分批后跨批归并。目标不是把代码习惯挖掘器变成团队标准，也不是恢复 `$spec-standards`，而是让 standards acquisition 的输入、抽取、归并和验证更可复核。
+本计划把 `spec-rule-miner` 最值得借鉴的三个思想落地到 `spec-team-standards-governance`：单一 extraction target、lens-guided acquisition、大项目分批后按需跨批归并。目标不是把代码习惯挖掘器变成团队标准，也不是恢复 legacy `$spec-standards`/`/spec:standards`，而是让 standards acquisition 的输入、抽取、归并和验证更可复核。
 
 ---
 
 ## Decision Brief
 
-- **Recommended approach:** 扩展现有 standards governance source skill：在入口和 `initialization.md` 固化单一 extraction target intake，新增一个 standards 专属 `acquisition-categories.md`，并把大项目 slice-only acquisition 到 final reconciliation 的流程写进现有 acquisition references。
+- **Recommended approach:** 扩展现有 standards governance source skill：在入口和 `initialization.md` 固化单一 extraction target intake，新增或扩展一个 standards 专属 acquisition lens reference（推荐 `acquisition-lenses.md`），并把大项目 slice-only acquisition 到 conditional reconciliation 的流程写进现有 acquisition references。
 - **Key decisions:** `spec-rule-miner` 只作为方法来源；代码观察最多生成 `observed` candidate；derived AI rules 只能从 confirmed active standards 或 reviewable proposal 派生并引用 rule/proposal ID；不新增 public workflow。
-- **Validation focus:** `team-standards-governance-contracts.test.js` 锁住 SKILL 指针、reference 存在、eval 覆盖、no public workflow/no hard-context 回退；eval fixtures 覆盖 single-target、mixed-surface split、observed-not-confirmed、reconciliation-required。
+- **Validation focus:** `team-standards-governance-contracts.test.js` 锁住 SKILL 指针、reference 存在、eval 覆盖、no public workflow/no hard-context 回退；eval fixtures 复用并强化 single-target、mixed-surface split，并新增 observed-not-confirmed、derived-not-source-truth、reconciliation-required-before-broad-scope 缺口。
 - **Largest risks / boundaries:** 最大风险是把“项目代码里常见”误升为团队 confirmed standard。计划通过 source matrix、promotion boundary、owner/high-impact gate 和 reconciliation 阶段把这个风险卡在 promotion 出口，而不是把抽取流程做成自动确认器。
 
 ---
@@ -32,8 +32,8 @@ implements_schemas: []
 `spec-team-standards-governance` 处理的是另一类问题：团队级开发标准的 authority、trust、lifecycle、owner、promotion 和 downstream consumption。它已经有 V2 acquisition task pack、source matrix、evidence quality 和 replay 边界，但当前入口和 references 对三个执行思想表达得偏分散：
 
 - 单一目标存在，但没有在 SKILL 主流程和 eval/test 中形成足够显眼的 intake contract。
-- acquisition categories 只有零散质量字段，缺一个像 `pattern-categories.md` 那样指导 LLM 避免只抽表层风格的 standards 分类地图。
-- 大项目分批存在“mixed surface split”的局部要求，但缺少跨批 reconciliation 的清晰流程：每批只能产 candidate，最后才能判断 shared/team-level standard、局部例外、冲突和 promotion proposal。
+- acquisition lenses 只有零散质量字段，缺一个像 `pattern-categories.md` 那样指导 LLM 避免只抽表层风格的 standards prompt lens 地图；该地图不是 rule-card canonical `category` enum。
+- 大项目分批存在“mixed surface split”的局部要求，但缺少按需 reconciliation 的清晰流程：每批只能产 candidate，只有 multi-slice、冲突、覆盖不足或 broad-scope proposal 时才进入归并判断 shared/team-level standard、局部例外、冲突和 promotion proposal。
 
 本计划只写 source 优化方案，不执行实现。
 
@@ -42,8 +42,8 @@ implements_schemas: []
 ## Requirements
 
 - R1. `spec-team-standards-governance` 必须在 init/propose/eval acquisition 场景先锁定一个 extraction target：`target_repo`、surface、sub_domain、capability、include/exclude、evidence_sources、output.mode 和 privacy boundary；混合 surface/domain/capability 必须 split。
-- R2. 新增或完善 standards acquisition categories，覆盖团队标准真正关心的类别，而不是复制代码风格分类：source/runtime boundary、verification、review/release、security/privacy、architecture/layering、workflow handoff、testing、deprecation/forbidden patterns、derived artifacts。
-- R3. 大项目获取流程必须是 slice-first：每个 slice 只生成 candidate/facts/evidence quality，不产生 confirmed standard；跨批 reconciliation 后才允许形成 shared rule、scope-specific rule、local exception、conflict record 或 reject/defer decision。
+- R2. 新增或完善 standards acquisition lenses，覆盖团队标准真正关心的观察维度，而不是复制代码风格分类：source/runtime boundary、verification、review/release、security/privacy、architecture/layering、workflow handoff、testing、deprecation/forbidden patterns、derived artifacts。该 lens map 只指导 acquisition prompt，不扩展 `docs/contracts/team-standards.md` 的 canonical `category` enum。
+- R3. 大项目获取流程必须是 slice-first：每个 slice 只生成 candidate/facts/evidence quality，不产生 confirmed standard；只有 multi-slice、mixed split 后的 broad proposal、冲突或覆盖不足场景才进入 reconciliation。reconciliation 后才允许形成 shared rule proposal、scope-specific rule proposal、local exception、conflict record 或 reject/defer decision。
 - R4. 保留 standards governance 权威边界：`trust=confirmed,lifecycle_state=active` 且 scope 命中的规则才可成为 hard context；`observed`、`suggested`、`confirmed-draft`、replay pass 或高 confidence 都不能 hard enforce。
 - R5. 派生 AI rules、review checklist、query summary、workflow handoff snippets 必须引用 confirmed rule IDs 或 reviewable proposal IDs，不得成为独立 source truth，也不得从 `spec-rule-miner` 输出反向生成 standards source。
 - R6. 不新增 `/spec:standards`、`$spec-standards`、`skills/spec-standards/`、`.spec-first/standards/`，不手改 generated runtime mirrors。
@@ -69,7 +69,7 @@ implements_schemas: []
 - source_refs: `docs/10-prompt/结构化项目角色契约.md`, `skills/spec-plan/SKILL.md`, `skills/spec-plan/references/governance-boundaries.md`, `skills/spec-plan/references/reuse-analysis.md`, `skills/spec-plan/references/planning-flow.md`, `skills/spec-plan/references/plan-sections.md`, `skills/spec-plan/references/markdown-rendering.md`, `skills/spec-plan/references/plan-template.md`, `skills/spec-team-standards-governance/SKILL.md`, `skills/spec-team-standards-governance/references/initialization.md`, `skills/spec-team-standards-governance/references/acquisition-quality.md`, `skills/spec-team-standards-governance/references/source-matrix.md`, `skills/spec-team-standards-governance/references/loading-and-consumption.md`, `skills/spec-team-standards-governance/references/validation-and-replay.md`, `skills/spec-team-standards-governance/references/output-risk-profile.md`, `skills/spec-team-standards-governance/evals/trigger-cases.json`, `skills/spec-team-standards-governance/evals/output-cases.json`, `tests/unit/team-standards-governance-contracts.test.js`, `docs/contracts/team-standards.md`, `skills/spec-rule-miner/SKILL.md`, `skills/spec-rule-miner/references/pattern-categories.md`, `skills/spec-rule-miner/references/write-targets.md`。
 - current_revision: `940d0814`
 - worktree_status: dirty；存在大量与本计划无关的未提交修改，包括 Cursor/runtime setup 相关 source、`CHANGELOG.md`、`docs/catalog/runtime-capabilities.md`、`skills/spec-rule-miner/**` 等。本计划不得回滚或整理无关改动。
-- confidence: high for target skill boundaries and implementation surfaces；medium for exact wording of new categories until implementation reads current source again。
+- confidence: high for target skill boundaries and implementation surfaces；medium for exact wording of new acquisition lenses until implementation reads current source again。
 - limitations: 没有运行 runtime projection；没有读取 generated runtime mirrors；`task-governance-signals` 输出的 `generated_at` 与会话日期有偏差，作为 advisory 信号只用于 plan depth，不作为时间事实。
 
 ---
@@ -78,10 +78,10 @@ implements_schemas: []
 
 - repo_scope: `spec-first` 当前仓库，计划文件写入 `docs/plans/**`，后续实现目标为 source skill、eval、unit tests 和 changelog。
 - source_reads_completed: 读取了 plan workflow references、项目角色契约、目标 standards governance skill 与关键 references、现有 eval fixtures、contract tests、team standards contract、rule miner skill 与 pattern/write-target references。
-- source_reads_required: 实现期需重新打开所有拟修改文件，尤其是 `skills/spec-team-standards-governance/SKILL.md`、`references/initialization.md`、`references/acquisition-quality.md`、拟新增 `references/acquisition-categories.md`、eval fixtures、`tests/unit/team-standards-governance-contracts.test.js` 和 `CHANGELOG.md`。
+- source_reads_required: 实现期需重新打开所有拟修改文件，尤其是 `skills/spec-team-standards-governance/SKILL.md`、`references/initialization.md`、`references/acquisition-quality.md`、拟新增或扩展的 acquisition lens reference（推荐 `references/acquisition-lenses.md`）、eval fixtures、`tests/unit/team-standards-governance-contracts.test.js` 和 `CHANGELOG.md`。
 - commands_or_tools_used: `sed` bounded reads；`rg --files` / `rg -n` source scan；`git rev-parse --short HEAD`；`git status --short`；`find docs/plans -name '2026-07-05-*'`；`spec-first internal task-governance-signals --source plan-declared --json`。
 - impact_on_plan: helper returned `candidate_level=deep` with `cross-module`, `critical-path-hit`, `keyword-hit`, `candidate-deep`; final depth is Deep because this touches skill behavior semantics, new reference surface, eval fixtures, contract tests and changelog.
-- key_findings: `initialization.md` already states one extraction target and split policy, but it is only a short note; `acquisition-quality.md` already has V2 task pack fields and quality gates but no categories map; eval fixtures already cover mixed-surface split and retired workflow boundary but not the three borrowed ideas as explicit cases; tests already lock standalone skill, no public workflow, V2 references/evals and derived artifact boundary.
+- key_findings: `initialization.md` already states one extraction target and split policy, but it is only a short note; `acquisition-quality.md` already has V2 task pack fields and quality gates but no lens map; eval fixtures already cover single-target acquisition, mixed-surface split and retired workflow boundary but not all three borrowed ideas as explicit cases; tests already lock standalone skill, no public workflow, V2 references/evals and derived artifact boundary.
 - limitations: This plan does not prove the final wording is sufficient; implementation should still run quick validation, focused Jest and entrypoint lint.
 
 ---
@@ -95,9 +95,9 @@ implements_schemas: []
 - `skills/spec-team-standards-governance/references/acquisition-quality.md`: owns V2 task pack fields, evidence quality, source anchors and gates; best owner for candidate quality and reconciliation prerequisites.
 - `skills/spec-team-standards-governance/references/source-matrix.md`: already states code structure cannot produce `confirmed` trust by itself; use it to keep rule-miner-derived observations advisory.
 - `skills/spec-team-standards-governance/references/loading-and-consumption.md`: owns derived artifact boundary; use it to keep AI rules/checklists/query summaries as derived outputs with rule/proposal citations.
-- `skills/spec-team-standards-governance/evals/*.json`: existing fixture shape supports adding trigger/boundary and expected-output cases without inventing a new runner.
+- `skills/spec-team-standards-governance/evals/*.json`: existing fixture shape supports strengthening trigger/boundary and expected-output cases without inventing a new runner.
 - `tests/unit/team-standards-governance-contracts.test.js`: existing contract test already asserts no public workflow, no hard-context promotion, V2 references and eval structure; extend this test rather than adding a separate duplicate suite.
-- `skills/spec-rule-miner/references/pattern-categories.md`: provides the reusable method shape for categories, sampling disclosure, hidden associations and anti-patterns.
+- `skills/spec-rule-miner/references/pattern-categories.md`: provides the reusable method shape for lenses/categories, sampling disclosure, hidden associations and anti-patterns.
 - `skills/spec-rule-miner/references/write-targets.md`: useful as a contrast for write-boundary discipline, but standards governance should not copy its AGENTS/CLAUDE write target model.
 
 ### Institutional Learnings
@@ -115,19 +115,19 @@ implements_schemas: []
 ## Existing Capability / Reuse Analysis
 
 - **Inventory:** Existing standards governance already has `SKILL.md`, initialization/acquisition/source-matrix/loading/replay/output-risk references, trigger/output eval fixtures, contract tests, and `docs/contracts/team-standards.md`.
-- **Decision:** Extend existing owners for target intake, split policy, evidence quality and reconciliation. Create one new reference, `skills/spec-team-standards-governance/references/acquisition-categories.md`, because categories are neither source authority (`source-matrix.md`) nor quality scoring (`acquisition-quality.md`); putting them there would mix “what to look for” with “how to score/promo gate it”.
-- **Source-of-truth:** `acquisition-categories.md` becomes the source-owned category map for acquisition prompts; `initialization.md` owns target/slice intake; `acquisition-quality.md` owns candidate quality and reconciliation gates; `docs/contracts/team-standards.md` remains canonical for trust/lifecycle/enums/promotion boundary.
-- **Rejected owner:** Do not put standards categories into `spec-rule-miner/references/pattern-categories.md`; that file is scoped to project AI coding rules and would make rule miner look like standards authority.
-- **Work-phase recheck:** Before adding `acquisition-categories.md`, re-open current `acquisition-quality.md` and `source-matrix.md`. If implementation finds categories can be added cleanly to an existing reference without mixing concerns, prefer extend over new and explain the deviation in closeout.
+- **Decision:** Extend existing owners for target intake, split policy, evidence quality and reconciliation. Create one new reference, `skills/spec-team-standards-governance/references/acquisition-lenses.md`, unless implementation recheck proves an existing reference can own the same lens map without mixing concerns. The lens map is neither source authority (`source-matrix.md`) nor quality scoring (`acquisition-quality.md`); it answers “what classes of standards to look for.”
+- **Source-of-truth:** `acquisition-lenses.md` becomes the source-owned lens map for acquisition prompts, not a canonical rule-card taxonomy; `initialization.md` owns target/slice intake; `acquisition-quality.md` owns candidate quality and reconciliation triggers; `docs/contracts/team-standards.md` remains canonical for trust/lifecycle/enums/promotion boundary.
+- **Rejected owner:** Do not put standards acquisition lenses into `spec-rule-miner/references/pattern-categories.md`; that file is scoped to project AI coding rules and would make rule miner look like standards authority.
+- **Work-phase recheck:** Before adding `acquisition-lenses.md`, re-open current `acquisition-quality.md` and `source-matrix.md`. If implementation finds lenses can be added cleanly to an existing reference without mixing concerns, prefer extend over new and explain the deviation in closeout.
 
 ---
 
 ## Key Technical Decisions
 
-- KTD1. Treat `spec-rule-miner` as a method donor, not a source donor. The borrowed mechanisms are target locking, category-guided extraction and sampling/reconciliation discipline; its generated AI rules never become standards authority.
+- KTD1. Treat `spec-rule-miner` as a method donor, not a source donor. The borrowed mechanisms are target locking, lens-guided extraction and sampling/reconciliation discipline; its generated AI rules never become standards authority.
 - KTD2. Make extraction target a first-class intake object. This avoids vague prompts like “summarize all team standards” and lets large repos split by surface/capability before any candidate is written.
-- KTD3. Add standards-specific acquisition categories. The categories should bias the LLM toward durable team constraints such as source/runtime boundaries, verification, security/privacy and workflow handoff, not superficial naming or formatter rules.
-- KTD4. Separate slice acquisition from standard reconciliation. Slice outputs are candidate-only; reconciliation decides common core, local exception, conflict, reject/defer or promotion proposal.
+- KTD3. Add standards-specific acquisition lenses. The lenses should bias the LLM toward durable team constraints such as source/runtime boundaries, verification, security/privacy and workflow handoff, not superficial naming or formatter rules. They must not be treated as the canonical `category` enum.
+- KTD4. Separate slice acquisition from conditional standard reconciliation. Slice outputs are candidate-only; reconciliation is required only when multiple slices, conflicts, coverage gaps or broad-scope proposals require distinguishing common core, local exception, conflict, reject/defer or promotion proposal.
 - KTD5. Keep promotion semantic and owner-governed. Tests can lock required fields, references and anti-regression wording; they must not decide whether a candidate is “good enough” to become a team standard.
 - KTD6. Prefer extending current tests/evals. The implementation should add cases to existing fixtures and contract tests instead of creating a parallel evaluation system.
 
@@ -137,13 +137,13 @@ implements_schemas: []
 
 ### Resolved During Planning
 
-- Should this become a new public workflow? No. `spec-team-standards-governance` remains standalone source-maintenance skill; public execution continues through `$spec-work` or other established workflows when source edits are needed.
+- Should this become a new public workflow? No. `spec-team-standards-governance` remains standalone source-maintenance skill; public execution continues through `spec-work` or other established workflows when source edits are needed.
 - Should `spec-rule-miner` expose standards governance? No. It explicitly routes team standards governance away to `spec-team-standards-governance`.
-- Should standards categories reuse `pattern-categories.md` directly? No. That file is project-rule oriented; standards need a separate category map with different authority and promotion semantics.
+- Should standards lenses reuse `pattern-categories.md` directly? No. That file is project-rule oriented; standards need a separate lens map with different authority and promotion semantics.
 
 ### Deferred to Implementation
 
-- Exact wording and ordering of `acquisition-categories.md`: implementation should keep it concise and test-locked only on load-bearing concepts.
+- Exact wording and ordering of `acquisition-lenses.md` or the chosen existing-reference section: implementation should keep it concise and test-locked only on load-bearing concepts.
 - Whether to update `docs/contracts/team-standards.md`: defer unless implementation needs new canonical fields or enums. The current plan should work without contract schema changes.
 - Whether to run fresh-source eval after implementation: recommended for behavior-semantic skill changes if host dispatch or equivalent read-only reviewer is available; if unavailable, record the limitation.
 
@@ -158,10 +158,12 @@ flowchart TB
   UserInput[User asks for standards acquisition] --> Intake[Single extraction target intake]
   Intake --> Split{Mixed surface/domain/capability?}
   Split -->|yes| SlicePacks[Split into per-target acquisition slices]
-  Split -->|no| Categories[Apply acquisition categories]
-  SlicePacks --> Categories
-  Categories --> CandidateOnly[Produce candidate-only outputs]
-  CandidateOnly --> Reconcile[Cross-slice reconciliation]
+  Split -->|no| Lenses[Apply acquisition lenses]
+  SlicePacks --> Lenses
+  Lenses --> CandidateOnly[Produce candidate-only outputs]
+  CandidateOnly --> NeedReconcile{Multi-slice, conflict, coverage gap or broad-scope proposal?}
+  NeedReconcile -->|no| EvidenceQuality[Record evidence quality and proposal-only next action]
+  NeedReconcile -->|yes| Reconcile[Cross-slice reconciliation]
   Reconcile --> Outcomes{Outcome}
   Outcomes --> Shared[Shared/team standard proposal]
   Outcomes --> Scoped[Scope-specific standard proposal]
@@ -179,7 +181,7 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-  U1[U1 Intake contract] --> U2[U2 Category reference]
+  U1[U1 Intake contract] --> U2[U2 Acquisition lens reference]
   U1 --> U3[U3 Slice reconciliation]
   U2 --> U3
   U1 --> U4[U4 Eval fixtures]
@@ -203,7 +205,7 @@ flowchart TB
 - Test: `tests/unit/team-standards-governance-contracts.test.js`
 
 **Approach:**
-- Add a short SKILL-level pointer in acquisition-producing modes (`init` / `propose`) that candidate synthesis requires one `extraction_target`; `eval/replay` should validate and report the existing acquisition run's target/categories rather than re-mine broad scope.
+- Add a short SKILL-level pointer in acquisition-producing modes (`init` / `propose`) that candidate synthesis requires one `extraction_target`; `eval/replay` should validate and report the existing acquisition run's target/lens evidence rather than re-mine broad scope. If lens evidence becomes an output field, update `SKILL.md` Output Contract in the same change; otherwise keep it inside source refs, limitations or eval fixture expectations.
 - Expand `initialization.md` from a short note into a compact intake contract: `target_repo`, `surface`, `sub_domain`, `capability`, `scope.include`, `scope.exclude`, `time_window`, `evidence_sources`, `privacy_boundary`, `output.mode`, `non_goals`.
 - State that mixed input gets split before formal acquisition, and each slice gets its own target and candidate-only output.
 - Keep the detail in `initialization.md`; do not bloat `SKILL.md`.
@@ -222,22 +224,23 @@ flowchart TB
 
 ---
 
-### U2. Add standards acquisition categories
+### U2. Add standards acquisition lenses
 
-**Goal:** Add a standards-specific category map that helps LLMs extract durable team standards instead of shallow style observations.
+**Goal:** Add a standards-specific lens map that helps LLMs extract durable team standards instead of shallow style observations.
 
 **Requirements:** R2, R4, R5
 
 **Dependencies:** U1
 
 **Files:**
-- Create: `skills/spec-team-standards-governance/references/acquisition-categories.md`
+- Preferred create: `skills/spec-team-standards-governance/references/acquisition-lenses.md`
+- Alternative modify: an existing reference only if implementation recheck proves it can own the lens map without mixing source authority, scoring and prompt guidance
 - Modify: `skills/spec-team-standards-governance/SKILL.md`
 - Modify: `skills/spec-team-standards-governance/references/initialization.md`
 - Test: `tests/unit/team-standards-governance-contracts.test.js`
 
 **Approach:**
-- Create categories inspired by `spec-rule-miner/references/pattern-categories.md`, but standards-specific:
+- Create lenses inspired by `spec-rule-miner/references/pattern-categories.md`, but standards-specific and explicitly non-canonical:
   - source/runtime and source-of-truth boundaries
   - verification and completion evidence
   - review/release/change-management gates
@@ -249,26 +252,27 @@ flowchart TB
   - derived artifact boundaries such as AI rules/checklists/summaries
 - Include anti-pattern guidance: do not promote language defaults, formatter rules, personal preferences, temporary workarounds, stale remnants or unconfirmed review opinions.
 - Reference this file only for acquisition modes; query/promote/deprecate should not default-read it.
+- State that these lenses do not extend `docs/contracts/team-standards.md` canonical `category`; final rule cards still use the existing `architecture/design/coding/testing/security/review` enum unless a separate contract change is deliberately made.
 
-**Reuse decision:** New `acquisition-categories.md` is justified because no existing standards reference owns “what classes of standards to look for.” `source-matrix.md` owns authority by source type, and `acquisition-quality.md` owns scoring/gates.
+**Reuse decision:** New `acquisition-lenses.md` is justified because no existing standards reference owns “what classes of standards to look for.” `source-matrix.md` owns authority by source type, and `acquisition-quality.md` owns scoring/gates.
 
 **Patterns to follow:**
-- `skills/spec-rule-miner/references/pattern-categories.md` for concise category layout and anti-pattern emphasis.
-- `docs/contracts/team-standards.md` for category names and authority boundaries.
+- `skills/spec-rule-miner/references/pattern-categories.md` for concise lens/category layout and anti-pattern emphasis.
+- `docs/contracts/team-standards.md` for canonical enum and authority boundaries.
 
 **Test scenarios:**
 - Happy path: new reference exists and SKILL loading map points acquisition modes to it.
-- Edge case: categories include derived artifacts and privacy/security boundaries, not only coding style.
-- Error path: categories state observed code patterns cannot produce confirmed trust by themselves.
+- Edge case: lenses include derived artifacts and privacy/security boundaries, not only coding style.
+- Error path: lenses state observed code patterns cannot produce confirmed trust by themselves and do not redefine rule-card `category`.
 
 **Verification:**
-- Focused Jest locks the new reference path, required category tokens and no-confirmed-from-code boundary.
+- Focused Jest locks the new reference path, acquisition-only loading, no canonical enum expansion without contract change, and no-confirmed-from-code boundary. Avoid locking the full lens wording beyond load-bearing concepts.
 
 ---
 
-### U3. Document slice acquisition and reconciliation
+### U3. Document slice acquisition and conditional reconciliation
 
-**Goal:** Make large-project acquisition explicitly two-stage: per-slice candidate collection followed by cross-slice reconciliation.
+**Goal:** Make large-project acquisition explicitly slice-first while keeping reconciliation conditional and grounded in existing V2 ledgers.
 
 **Requirements:** R3, R4, R5
 
@@ -277,7 +281,7 @@ flowchart TB
 **Files:**
 - Modify: `skills/spec-team-standards-governance/references/initialization.md`
 - Modify: `skills/spec-team-standards-governance/references/acquisition-quality.md`
-- Modify: `skills/spec-team-standards-governance/references/validation-and-replay.md`
+- Optional modify: `skills/spec-team-standards-governance/references/validation-and-replay.md` only for a one-sentence boundary that replay consumes reconciliation evidence but does not promote rules
 - Test: `tests/unit/team-standards-governance-contracts.test.js`
 
 **Approach:**
@@ -285,28 +289,31 @@ flowchart TB
   - split by surface/capability/sub-domain
   - each slice emits candidate/fact/evidence-quality outputs only
   - suppress broad-scope standard wording until reconciliation
+  - single-target, non-conflicting runs can stop at evidence quality plus proposal-only next action
+  - reconciliation is triggered only by multi-slice acquisition, mixed split followed by broad proposal, conflicts, coverage gaps or broad shared-rule claims
   - reconciliation compares consistency, conflicts, scope coverage, owner trace, risk level and migration cost
   - outcomes are shared rule proposal, scoped rule proposal, local exception, conflict record, reject, or defer
 - Make final reconciliation responsible for distinguishing “common team rule” from “project/surface-local habit”.
 - Tie replay/retrieval/owner edit distance to reconciliation evidence, not promotion by itself.
+- Do not introduce an implicit `reconciliation_decision` source truth. Record reconciliation outcomes through existing V2 artifacts: `lineage-ledger.md`, `promotion-log.md`, `owner-decision-queue.md` and `output-risk-profile.md`. If implementation truly needs a new field or artifact, first expand `docs/contracts/team-standards.md` and `SKILL.md` Output Contract.
 
 **Patterns to follow:**
 - `skills/spec-rule-miner/references/pattern-categories.md` large-repo sampling disclosure.
 - `skills/spec-team-standards-governance/references/validation-and-replay.md` promotion boundary.
 
 **Test scenarios:**
-- Happy path: references describe slice-only candidate output and reconciliation outcomes.
+- Happy path: references describe slice-only candidate output, fast path for non-conflicting single-target runs, and reconciliation outcomes for broad/multi-slice cases.
 - Edge case: one slice shows a strong local pattern but no cross-slice consistency; output remains scoped/local or observed.
 - Boundary: replay pass and high confidence remain promotion evidence only.
 
 **Verification:**
-- Focused Jest asserts reconciliation vocabulary and candidate-only boundary exist in references.
+- Focused Jest asserts conditional reconciliation triggers, existing ledger owners and candidate-only boundary exist in references without requiring a new output artifact.
 
 ---
 
 ### U4. Expand eval fixtures for the borrowed ideas
 
-**Goal:** Add fixture coverage so future edits do not erase the three borrowed mechanisms or confuse rule-miner output with standards authority.
+**Goal:** Strengthen fixture coverage so future edits do not erase the three borrowed mechanisms or confuse rule-miner output with standards authority.
 
 **Requirements:** R1, R2, R3, R4, R5, R7
 
@@ -319,13 +326,11 @@ flowchart TB
 - Test: `tests/unit/team-standards-governance-contracts.test.js`
 
 **Approach:**
-- Add trigger/boundary cases:
-  - `single-target-required`
-  - `mixed-surface-requires-split`
-  - `rule-miner-output-is-derived-not-source-truth`
-  - `observed-code-pattern-not-confirmed-standard`
-  - `reconciliation-required-before-broad-scope`
-- Add output cases for `extraction_target`, `acquisition_categories`, `slice_candidate_only`, `reconciliation_decision`, and derived artifact citation.
+- Reuse and strengthen existing trigger/boundary cases before adding new IDs:
+  - strengthen `TRIGGER-ACQ-001` for single-target acquisition
+  - strengthen `TRIGGER-BOUNDARY-001` for mixed-surface split
+  - add only the missing cases: `rule-miner-output-is-derived-not-source-truth`, `observed-code-pattern-not-confirmed-standard`, `reconciliation-required-before-broad-scope`
+- Add or extend output cases only for fields represented in the active contracts: `extraction_target`, acquisition lens evidence, slice candidate-only posture, existing ledger-based reconciliation outcome, and derived artifact citation. Do not add `reconciliation_decision` as a new output field unless `SKILL.md` Output Contract and `docs/contracts/team-standards.md` are updated in the same implementation.
 - Keep `threshold_result` honest: fixture contract cases can stay `not-run`; do not claim replay coverage.
 
 **Patterns to follow:**
@@ -333,7 +338,7 @@ flowchart TB
 - Existing `output-derived-001` derived artifact citation case.
 
 **Test scenarios:**
-- Happy path: JSON parses and contains expected case IDs/reason codes.
+- Happy path: JSON parses and contains expected case IDs/reason codes without duplicating existing coverage.
 - Edge case: eval cases distinguish `expected_mode: init` from near-neighbor code review or rule-miner work.
 - Boundary: no fixture contains local absolute paths or `trust: confirmed` for candidate-only outputs.
 
@@ -357,16 +362,17 @@ flowchart TB
 **Approach:**
 - Extend existing `team-standards-governance-contracts.test.js` instead of adding a parallel suite.
 - Assert:
-  - SKILL loading map references `acquisition-categories.md` only for acquisition modes.
-  - Source references contain single extraction target, slice-only candidate output and reconciliation.
-  - Eval fixtures include the new IDs and required fields.
+  - SKILL loading map references `acquisition-lenses.md` only for acquisition modes when the new reference is created.
+  - Source references contain single extraction target, slice-only candidate output, fast path, conditional reconciliation and existing ledger owners.
+  - Eval fixtures include strengthened existing IDs plus only the new missing IDs and required fields.
   - No public workflow / retired surface wording remains locked.
   - Derived AI rules cannot become source truth.
+- Keep Jest focused on deterministic floor: reference path/loading map, eval IDs/reason codes, required fields, no public workflow, no confirmed-from-code, derived citations and no local absolute paths. Do not test semantic adequacy by locking every lens label or reconciliation phrase.
 - Only touch `eval-fixture-contracts.test.js` if global fixture rules need a generic no-absolute-path or required-field extension.
 
 **Test scenarios:**
 - Happy path: existing 8 governance tests continue passing with new assertions.
-- Error path: deleting `acquisition-categories.md` or removing reconciliation wording fails tests.
+- Error path: deleting `acquisition-lenses.md` when referenced, removing conditional reconciliation triggers or removing ledger owner wording fails tests.
 - Boundary: accidentally adding `$spec-standards` or making `observed` hard context fails tests.
 
 **Verification:**
@@ -395,7 +401,7 @@ flowchart TB
 - Test expectation: none -- changelog-only source bookkeeping plus validation command reporting.
 
 **Verification:**
-- `python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-team-standards-governance`
+- Optional if locally available: `python3 /Users/kuang/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/spec-team-standards-governance`; absence of this host-local helper must not fail required validation.
 - `npx jest tests/unit/team-standards-governance-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
 - `npm run lint:skill-entrypoints`
 - JSON parse check for modified eval fixtures
@@ -407,7 +413,7 @@ flowchart TB
 
 - **Skill behavior:** `spec-team-standards-governance` acquisition modes become more explicit and safer for large repos; query/promote/deprecate modes should remain progressively loaded and unaffected.
 - **Standards authority:** No change to `docs/contracts/team-standards.md` authority model unless implementation discovers a real canonical-field need.
-- **Downstream workflows:** `$spec-plan`, `$spec-work`, `$spec-code-review` and `$spec-doc-review` continue consuming confirmed active standards only; candidate acquisition remains proposal evidence.
+- **Downstream workflows:** `spec-plan`, `spec-work`, `spec-code-review` and `spec-doc-review` continue consuming confirmed active standards only; candidate acquisition remains proposal evidence.
 - **Runtime:** No generated runtime mirrors are edited by this plan. Any future runtime projection comes from source via `spec-first init` if needed.
 - **Testing:** Existing focused Jest suite remains the main deterministic guard; semantic adequacy of candidate promotion remains LLM/owner judgment.
 - **Unchanged invariants:** No public `spec-standards` workflow, no auto-confirmation, no provider output as confirmed truth, no broad `docs/standards/**` scan as index fallback.
@@ -418,8 +424,8 @@ flowchart TB
 
 | Risk | Mitigation |
 | --- | --- |
-| Categories become too broad and turn into generic best practices | Keep categories tied to team standards authority and add anti-pattern wording plus tests for no generic/source-less promotion |
-| `SKILL.md` becomes too large | Keep detailed intake/categories/reconciliation in references; SKILL only points to them in loading map and workflow |
+| Acquisition lenses become too broad and turn into generic best practices | Keep lenses tied to team standards authority and add anti-pattern wording plus tests for no generic/source-less promotion |
+| `SKILL.md` becomes too large | Keep detailed intake/lenses/reconciliation in references; SKILL only points to them in loading map and workflow |
 | Large-project reconciliation over-promotes local habits | Require slice-only candidates first, then reconciliation outcomes that include scoped/local exception/reject/defer |
 | Eval fixtures are mistaken for quality proof | Keep `threshold_result: not-run` or `not-enough-sample` when no real replay exists; tests only assert structure |
 | Existing dirty worktree causes accidental unrelated edits | Scope patches to plan/target source files only; do not regenerate runtime catalog or runtime mirrors unless explicitly needed |
