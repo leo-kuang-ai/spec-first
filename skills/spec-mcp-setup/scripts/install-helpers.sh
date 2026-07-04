@@ -995,6 +995,8 @@ PY
 
 install_graphify_cli() {
   if resolve_graphify_cli_matching_pin >/dev/null 2>&1; then
+    repair_graphify_path_symlink_if_safe || true
+    resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
     return 0
   fi
 
@@ -1002,6 +1004,7 @@ install_graphify_cli() {
     if run_npm_global_install_with_optional_sudo "$GRAPHIFY_PACKAGE@$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
       hash -r 2>/dev/null || true
       reset_graphify_resolver
+      repair_graphify_path_symlink_if_safe || true
       resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
     fi
   fi
@@ -1079,6 +1082,70 @@ graphify_command_version_matches_pin() {
   local output
   output="$(run_with_timeout 30 "$command_path" --version 2>/dev/null || true)"
   grep -Eq "(^|[^0-9A-Za-z.])${GRAPHIFY_VERSION_PIN//./\\.}([^0-9A-Za-z.]|$)" <<<"$output"
+}
+
+repair_graphify_path_symlink_if_safe() {
+  case "${SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK:-true}" in
+    false|FALSE|no|NO|0) return 0 ;;
+  esac
+
+  local path_command pinned_command
+  path_command="$(resolve_graphify_on_original_path || true)"
+  [ -n "$path_command" ] || return 0
+  [ -L "$path_command" ] || return 0
+  graphify_command_version_matches_pin "$path_command" && return 0
+
+  pinned_command="$(resolve_graphify_cli_matching_pin || true)"
+  [ -n "$pinned_command" ] || return 0
+  [ "$pinned_command" != "$path_command" ] || return 0
+  [ -f "$pinned_command" ] && [ -x "$pinned_command" ] || return 0
+
+  local backup_path
+  if backup_path="$(GRAPHIFY_PATH_COMMAND="$path_command" GRAPHIFY_PINNED_COMMAND="$pinned_command" python3 <<'PY'
+import os
+from pathlib import Path
+
+path_command = Path(os.environ["GRAPHIFY_PATH_COMMAND"])
+pinned_command = Path(os.environ["GRAPHIFY_PINNED_COMMAND"])
+
+if not path_command.is_symlink():
+    raise SystemExit(1)
+if not pinned_command.exists():
+    raise SystemExit(1)
+
+parent = path_command.parent
+if not os.access(parent, os.W_OK):
+    raise SystemExit(1)
+
+backup = parent / f"{path_command.name}.old"
+index = 1
+while backup.exists() or backup.is_symlink():
+    backup = parent / f"{path_command.name}.old.{index}"
+    index += 1
+
+path_command.rename(backup)
+try:
+    path_command.symlink_to(pinned_command)
+except Exception:
+    if not path_command.exists() and not path_command.is_symlink():
+        backup.rename(path_command)
+    raise
+
+print(str(backup))
+PY
+  )"; then
+    export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED=true
+    export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_FROM="$path_command"
+    export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_TO="$pinned_command"
+    if [ -n "$backup_path" ]; then
+      export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_BACKUP="$backup_path"
+      stage_log "provider:graphify" "repaired stale PATH symlink $path_command -> $pinned_command (backup: $backup_path)"
+    else
+      stage_log "provider:graphify" "repaired stale PATH symlink $path_command -> $pinned_command"
+    fi
+    hash -r 2>/dev/null || true
+    reset_graphify_resolver
+  fi
 }
 
 resolve_graphify_cli_matching_pin() {

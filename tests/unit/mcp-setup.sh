@@ -75,6 +75,7 @@ assert "bash install-helpers reads Graphify version from mcp-tools" grep -q -- '
 assert "bash install-helpers installs Graphify CLI with npm global pin" grep -q -- 'run_npm_global_install_with_optional_sudo "$GRAPHIFY_PACKAGE@$GRAPHIFY_VERSION_PIN"' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers resolves npm global Graphify bin fallback" grep -q -- 'graphify_known_cli_candidates' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers captures original PATH for Graphify visibility" grep -q -- 'SPEC_FIRST_PROVIDER_ORIGINAL_PATH' "$SCRIPTS_DIR/install-helpers.sh"
+assert "bash install-helpers repairs stale Graphify PATH symlink" grep -q -- 'repair_graphify_path_symlink_if_safe' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers resolves Graphify CLI before invocation" grep -q -- 'resolve_graphify_cli' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers normalizes provider-written Graphify instructions" grep -q -- 'normalize_graphify_instruction_section "$repo_root" "$platform"' "$SCRIPTS_DIR/install-helpers.sh"
 assert "bash install-helpers invokes resolved Graphify project skill install" grep -q -- 'run_graphify_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" install --project --platform "$platform"' "$SCRIPTS_DIR/install-helpers.sh"

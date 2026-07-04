@@ -339,7 +339,7 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
         auto_refresh_display: scope.ok
           ? 'resolved graphify CLI -> graphify hook install (git repo only; provider-owned post-commit/post-checkout refresh)'
           : `skipped: ${scope.first_generation_next_action}`,
-        command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard $HOME/.local/bin/graphify; off-PATH installs remain usable by setup but are reported as a manual PATH visibility action.',
+        command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard/npm global bin candidates; after npm install/upgrade, a stale PATH symlink may be backed up and repointed to the pinned CLI, while ordinary files stay report-only.',
         instruction_section_display: 'after provider project install, setup normalizes the AGENTS.md/CLAUDE.md ## graphify section to resolved CLI/manual-visibility/direct-source-fallback wording.',
         first_generation_next_action: scope.first_generation_next_action,
         package_spec: packageSpec,

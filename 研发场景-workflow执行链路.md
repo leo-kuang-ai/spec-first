@@ -14,32 +14,32 @@ Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
 
 | Skill | 角色 |
 | --- | --- |
-| `using-spec-first` | meta 路由 governor。判断当前请求是否进入某个公开 workflow,只选一个入口。本身不是 `/spec:*` 命令,不产 artifact。 |
+| `using-spec-first` | meta 路由 governor。判断当前请求是否进入某个公开 workflow,只选一个入口。本身不是命令入口,不产 artifact。 |
 
 ## 二、主链路 workflow(研发执行流程骨架)
 
 | 阶段 | Skill / 命令 | 说明 |
 | --- | --- | --- |
-| Spec(定义 WHAT) | `spec-ideate` `/spec:ideate` | 0-1 找点子、要选项 |
-| | `spec-brainstorm` `/spec:brainstorm` | WHAT 还不清、问题框架未定 |
-| | `spec-prd` `/spec:prd` | 已有系统形态的 brownfield PRD 编写/校验 |
-| Plan(定 HOW) | `spec-plan` `/spec:plan` | 目标清晰但实现路径未定 → 出计划 |
-| Tasks(可选派生) | `spec-write-tasks` | standalone skill,非 `/spec:*` 命令。把已定稿 plan 拆成可执行 task pack;plan 仍是唯一 source of truth,task 是派生且可选 |
-| Code(执行) | `spec-work` `/spec:work` | 已有 plan/task/明确任务 → 实施 |
-| Review(审查) | `spec-code-review` `/spec:code-review` | diff/PR/实现质量 |
-| | `spec-doc-review` `/spec:doc-review` | 需求/计划/markdown 文档评审 |
-| Knowledge(沉淀) | `spec-compound` `/spec:compound` | 沉淀刚解决的问题 |
-| | `spec-compound-refresh` `/spec:compound-refresh` | 修正/合并/退役已有 durable 知识 |
+| Spec(定义 WHAT) | `spec-ideate` | 0-1 找点子、要选项 |
+| | `spec-brainstorm` | WHAT 还不清、问题框架未定 |
+| | `spec-prd` | 已有系统形态的 brownfield PRD 编写/校验 |
+| Plan(定 HOW) | `spec-plan` | 目标清晰但实现路径未定 → 出计划 |
+| Tasks(可选派生) | `spec-write-tasks` | standalone skill,非公开 workflow 命令。把已定稿 plan 拆成可执行 task pack;plan 仍是唯一 source of truth,task 是派生且可选 |
+| Code(执行) | `spec-work` | 已有 plan/task/明确任务 → 实施 |
+| Review(审查) | `spec-code-review` | diff/PR/实现质量 |
+| | `spec-doc-review` | 需求/计划/markdown 文档评审 |
+| Knowledge(沉淀) | `spec-compound` | 沉淀刚解决的问题 |
+| | `spec-compound-refresh` | 修正/合并/退役已有 durable 知识 |
 
 ## 三、研发流程旁路 / 支撑 workflow
 
 | Skill / 命令 | 触发场景 |
 | --- | --- |
-| `spec-debug` `/spec:debug` | 失败、报错、测试挂、异常行为(诊断优先于 work) |
-| `spec-optimize` `/spec:optimize` | 指标驱动的实验式优化 |
-| `spec-mcp-setup` `/spec:mcp-setup` | 环境/host/MCP/工具就绪(执行前置) |
-| `spec-polish-beta` `/spec:polish-beta` | 跑起 app 迭代浏览器可见 UI |
-| `spec-write-skill` `/spec:write-skill` | 编写、改写、迁移或按 audit findings 修复 spec-first source skill |
+| `spec-debug` | 失败、报错、测试挂、异常行为(诊断优先于 work) |
+| `spec-optimize` | 指标驱动的实验式优化 |
+| `spec-mcp-setup` | 环境/host/MCP/工具就绪(执行前置) |
+| `spec-polish-beta` | 跑起 app 迭代浏览器可见 UI |
+| `spec-write-skill` | 编写、改写、迁移或按 audit findings 修复 spec-first source skill |
 
 ## 四、内部 helper(执行流程内部被调用,非用户入口)
 
@@ -49,7 +49,7 @@ Codebase → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 边界提示
 
-- 公开入口只有 `/spec:*` 命令(Codex 端是 `$spec-*`);`using-spec-first` 和 `spec-write-tasks` 是 standalone skill,不是命令;`git-worktree` 是隐藏 helper。
+- 公开 workflow 用户入口统一为 `spec-*`;`using-spec-first` 和 `spec-write-tasks` 是 standalone skill,不是命令;`git-worktree` 是隐藏 helper。
 - 不属于研发执行流程(可排除):团队治理类 `spec-team-standards-governance`;上下文检索类 `spec-sessions`、`spec-slack-research`、`spec-release-notes`;以及与研发流程无关的 `baoyu-*`、`lark-*`、图像/视频类 skill。
 - `spec-skill-audit`、`spec-app-consistency-audit` 和 `spec-write-skill` 现在是公开 workflow 入口,但属于治理/支撑链路,不是 Codebase → Spec → Plan → Tasks → Code → Review → Knowledge 主链路节点。
 - 路由原则:意图优先于关键词,只选一个入口、给一个理由,不自动串联多个 workflow——除非某 workflow 显式 handoff。
@@ -61,10 +61,10 @@ flowchart TD
     Start([研发请求]) --> Gov{using-spec-first<br/>入口路由}
 
     %% 旁路/支撑
-    Gov -->|环境/工具未就绪| Setup["/spec:mcp-setup"]
-    Gov -->|失败/报错/测试挂| Debug["/spec:debug"]
-    Gov -->|指标驱动优化| Opt["/spec:optimize"]
-    Gov -->|编写/修复 source skill| WriteSkill["/spec:write-skill"]
+    Gov -->|环境/工具未就绪| Setup["spec-mcp-setup"]
+    Gov -->|失败/报错/测试挂| Debug["spec-debug"]
+    Gov -->|指标驱动优化| Opt["spec-optimize"]
+    Gov -->|编写/修复 source skill| WriteSkill["spec-write-skill"]
     Setup -.就绪后.-> Gov
     Debug -.根因定位后.-> Gov
 
@@ -75,18 +75,18 @@ flowchart TD
 
     subgraph 主链路 [主链路 Spec → Plan → Tasks → Code → Review → Knowledge]
         direction TB
-        Spec["Spec 定义 WHAT<br/>/spec:ideate · /spec:brainstorm · /spec:prd"]
-        Plan["Plan 定 HOW<br/>/spec:plan"]
+        Spec["Spec 定义 WHAT<br/>spec-ideate · spec-brainstorm · spec-prd"]
+        Plan["Plan 定 HOW<br/>spec-plan"]
         Tasks["Tasks 可选派生<br/>spec-write-tasks (standalone)"]
-        Code["Code 执行<br/>/spec:work"]
-        Review["Review 审查<br/>/spec:code-review · /spec:doc-review"]
-        Know["Knowledge 沉淀<br/>/spec:compound · /spec:compound-refresh"]
+        Code["Code 执行<br/>spec-work"]
+        Review["Review 审查<br/>spec-code-review · spec-doc-review"]
+        Know["Knowledge 沉淀<br/>spec-compound · spec-compound-refresh"]
 
         Spec --> Plan --> Tasks --> Code --> Review --> Know
     end
 
     %% UI 打磨旁路
-    Code -.浏览器可见 UI.-> Polish["/spec:polish-beta"]
+    Code -.浏览器可见 UI.-> Polish["spec-polish-beta"]
     Polish -.-> Review
 
     %% 内部 helper

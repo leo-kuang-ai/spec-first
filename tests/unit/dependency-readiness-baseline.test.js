@@ -661,6 +661,95 @@ exit 0
     expect(graphify.next_actions.join('\n')).not.toContain('Graphify CLI version does not match pinned');
   });
 
+  test('install-helpers repairs stale Graphify symlink on PATH when pinned npm CLI is available', () => {
+    if (process.platform === 'win32') return;
+
+    const tempDir = makeTempDir();
+    const homeDir = path.join(tempDir, 'home');
+    const binDir = path.join(tempDir, 'bin');
+    const oldToolDir = path.join(tempDir, 'old-tool');
+    const npmPrefix = path.join(tempDir, 'npm-global');
+    const capturePath = path.join(tempDir, 'graphify-args.txt');
+    fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(oldToolDir, { recursive: true });
+    fs.mkdirSync(path.join(npmPrefix, 'bin'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
+
+    for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
+      const commandPath = path.join(binDir, command);
+      fs.writeFileSync(commandPath, '#!/bin/sh\nexit 0\n', 'utf8');
+      fs.chmodSync(commandPath, 0o755);
+    }
+
+    const npmPath = path.join(binDir, 'npm');
+    fs.writeFileSync(npmPath, `#!/bin/sh
+if [ "$1" = "prefix" ] && [ "$2" = "-g" ]; then
+  printf '%s\\n' "${npmPrefix}"
+  exit 0
+fi
+exit 0
+`, 'utf8');
+    fs.chmodSync(npmPath, 0o755);
+
+    const oldGraphifyTarget = path.join(oldToolDir, 'graphify');
+    fs.writeFileSync(oldGraphifyTarget, '#!/bin/sh\nprintf "graphify 0.8.39\\n"\n', 'utf8');
+    fs.chmodSync(oldGraphifyTarget, 0o755);
+    const pathGraphify = path.join(binDir, 'graphify');
+    fs.symlinkSync(oldGraphifyTarget, pathGraphify);
+
+    const pinnedGraphify = path.join(npmPrefix, 'bin', 'graphify');
+    fs.writeFileSync(pinnedGraphify, `#!/bin/sh
+printf '%s\\n' "$*" >> "$GRAPHIFY_CAPTURE"
+if [ "$1" = "--version" ]; then
+  printf 'graphify ${GRAPHIFY_VERSION}\\n'
+  exit 0
+fi
+if [ "$1" = "query" ]; then
+  exit 0
+fi
+if [ "$1" = "hook" ]; then
+  exit 0
+fi
+exit 0
+`, 'utf8');
+    fs.chmodSync(pinnedGraphify, 0o755);
+
+    const result = spawnSync('bash', [installHelpersPath, '--install'], {
+      cwd: tempDir,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        HOME: homeDir,
+        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        GRAPHIFY_CAPTURE: capturePath,
+        SPEC_FIRST_PROVIDER_REPO_ROOT: tempDir,
+        SPEC_FIRST_PROVIDER_GRAPHIFY_CONSENT: 'approved',
+        SPEC_FIRST_PROVIDER_HOST: 'codex',
+        SPEC_FIRST_STAGE_TIMEOUT_SECONDS: '5',
+      },
+    });
+
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout).provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
+      lifecycle: {
+        installed: true,
+        query_verified: true,
+      },
+    });
+    expect(fs.lstatSync(pathGraphify).isSymbolicLink()).toBe(true);
+    expect(fs.readlinkSync(pathGraphify)).toBe(pinnedGraphify);
+    expect(fs.lstatSync(path.join(binDir, 'graphify.old')).isSymbolicLink()).toBe(true);
+    expect(fs.readlinkSync(path.join(binDir, 'graphify.old'))).toBe(oldGraphifyTarget);
+    expect(fs.readFileSync(capturePath, 'utf8')).toContain('query spec-first setup readiness --graph');
+    expect(result.stderr).toContain('repaired stale PATH symlink');
+  });
+
   test('provider readiness renderer degrades Graphify when hook setup failed', () => {
     const tempDir = makeTempDir();
     const binDir = path.join(tempDir, 'bin');
@@ -2824,7 +2913,7 @@ exit 0
       artifact_root: path.join(tempDir, 'graphify-out'),
       first_generation_display: 'resolved graphify CLI -> verify/install current-host project skill; if graphify-out exists, verify install state and recommend incremental --refresh; otherwise graphify extract .; explicit --refresh runs graphify update . code-only/no-LLM (if provider refuses overwrite and suggests --force, one graphify update . --force repair)',
       auto_refresh_display: 'resolved graphify CLI -> graphify hook install (git repo only; provider-owned post-commit/post-checkout refresh)',
-      command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard $HOME/.local/bin/graphify; off-PATH installs remain usable by setup but are reported as a manual PATH visibility action.',
+      command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard/npm global bin candidates; after npm install/upgrade, a stale PATH symlink may be backed up and repointed to the pinned CLI, while ordinary files stay report-only.',
       instruction_section_display: 'after provider project install, setup normalizes the AGENTS.md/CLAUDE.md ## graphify section to resolved CLI/manual-visibility/direct-source-fallback wording.',
     });
     const codegraph = guidedPlan.provider_selection.find((entry) => entry.provider === 'codegraph');
