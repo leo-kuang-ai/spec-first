@@ -66,7 +66,9 @@ If setup later reports project convention facts, they must be deterministic exis
 
 The current public entrypoint is authoritative host evidence: `/spec:mcp-setup` or `/spec:runtime-setup` means Claude Code, `$spec-mcp-setup` or `$spec-runtime-setup` means Codex, the generated Kiro Agent Skill means Kiro, and the generated Qoder project command or Skill means Qoder. Generated host-specific runtime surfaces may additionally pin `MCP_SETUP_HOST=<host>` before invoking setup scripts. Do not override the entrypoint host by noticing another CLI on `PATH`, a generated runtime directory, a prior `.spec-first/config/*` host value, or a host config file from another platform.
 
-Before any host config write, the workflow must anchor the write target to a fresh `detect-host.*` JSON result or an entrypoint host pin. Previous setup facts are drift comparison evidence only: if they disagree with the current entrypoint host, report a host-marker drift and refresh setup-owned facts for the current host instead of treating the previous host as current. Never manually choose `.kiro/settings/mcp.json`, `.qoder/settings.local.json`, Codex TOML, or Claude managed/user config from prose alone.
+Before any host config write or setup-owned facts refresh, the workflow must anchor the write target to a fresh `detect-host.*` JSON result or an entrypoint host pin. Previous setup facts are drift comparison evidence only: if they disagree with the current entrypoint host, report a host-marker drift and refresh setup-owned facts for the current host instead of treating the previous host as current. Never manually choose `.kiro/settings/mcp.json`, `.qoder/settings.local.json`, Codex TOML, or Claude managed/user config from prose alone.
+
+Do not use host file-edit tools such as Write, Update, or Edit to modify `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, or host MCP config files. Setup-owned facts must be written only by `verify-tools.*` / `write-setup-facts.*`; host MCP config must be written only by `configure-host.*` / `install-mcp.*` after host detection.
 
 ## Workflow Modes
 

@@ -161,6 +161,7 @@ describe('init source path coverage', () => {
         expect(operation.contents).toContain('MCP_SETUP_HOST=claude');
         expect(operation.contents).toContain('Treat `/spec:mcp-setup` and `/spec:runtime-setup` command entry as authoritative Claude host evidence');
         expect(operation.contents).toContain('Never manually choose `.kiro/settings/mcp.json`');
+        expect(operation.contents).toContain('Do not use host file-edit tools such as Write, Update, or Edit');
       }
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
