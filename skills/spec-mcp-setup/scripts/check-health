@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/lib-helper-registry.sh"
 
 plugin_version=""
 json_output="no"
-BROWSER_HELPER_OPT_IN_ACTION='set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`$spec-mcp-setup` or `/spec:mcp-setup`)'
+BROWSER_HELPER_OPT_IN_ACTION='set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)'
 while [ $# -gt 0 ]; do
   case "$1" in
     --version)

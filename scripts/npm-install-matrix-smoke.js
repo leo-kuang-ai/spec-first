@@ -30,7 +30,7 @@ const EXPECTED_INIT_RUNTIME_PATHS = {
   claude: [
     'CLAUDE.md',
     '.claude/spec-first/state.json',
-    '.claude/commands/spec/work.md',
+    '.claude/commands/spec-work.md',
     '.claude/spec-first/workflows/spec-work/SKILL.md',
     '.claude/skills/using-spec-first/SKILL.md',
   ],
@@ -55,7 +55,7 @@ const EXPECTED_INIT_RUNTIME_PATHS = {
   qoder: [
     'AGENTS.md',
     '.qoder/spec-first/state.json',
-    '.qoder/commands/spec/work.md',
+    '.qoder/commands/spec-work.md',
     '.qoder/skills/spec-work/SKILL.md',
     '.qoder/skills/spec-mcp-setup/SKILL.md',
   ],

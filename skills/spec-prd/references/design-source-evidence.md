@@ -79,7 +79,7 @@ design_source:
   reconciliation_needed:
 ```
 
-This interface is run-local prose guidance, not a schema or artifact. It tells `$spec-prd` what to carry into Product Expert Lens and PRD sections.
+This interface is run-local prose guidance, not a schema or artifact. It tells `spec-prd` what to carry into Product Expert Lens and PRD sections.
 
 ## Internal Probe Trace
 

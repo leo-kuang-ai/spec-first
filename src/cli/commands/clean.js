@@ -179,7 +179,7 @@ function runWorkspaceOrphansClean(parsed) {
   const quarantinePath = path.join(projectRoot, '.spec-first', 'workspace', 'parent-artifact-quarantine.json');
   if (!fs.existsSync(quarantinePath)) {
     console.error('No parent artifact quarantine found.');
-    console.error('Run `$spec-mcp-setup` from the parent workspace to generate workspace orphan evidence first.');
+    console.error('Run `spec-mcp-setup` from the parent workspace to generate workspace orphan evidence first.');
     return 1;
   }
 
@@ -190,7 +190,7 @@ function runWorkspaceOrphansClean(parsed) {
     console.error(
       `Could not read parent artifact quarantine. ${error instanceof Error ? error.message : String(error)}`,
     );
-    console.error('Rerun `$spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 
@@ -199,7 +199,7 @@ function runWorkspaceOrphansClean(parsed) {
     entries = validateWorkspaceOrphanQuarantine(payload);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
-    console.error('Rerun `$spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 

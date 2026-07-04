@@ -195,7 +195,7 @@ Refer to the echoed absolute path as `<scratch-dir>` throughout the rest of this
 
 ## 5.3.6 Run Targeted Research
 
-Launch the selected agents in parallel using the execution mode chosen above only when host capability exists and dispatch authorization is present for this run. In Codex, a public `$spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`. If the user did not explicitly request subagents, delegation, parallel research, or research-agent dispatch, use the inline fallback and record `dispatch_authorization_missing`.
+Launch the selected agents in parallel using the execution mode chosen above only when host capability exists and dispatch authorization is present for this run. In Codex, a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`. If the user did not explicitly request subagents, delegation, parallel research, or research-agent dispatch, use the inline fallback and record `dispatch_authorization_missing`.
 
 If dispatch is authorized and the current platform supports dispatch but not parallel dispatch, run the same selected agents sequentially through the host dispatch primitive. If dispatch is unavailable, explicitly disabled, unauthorized, or unsafe, read the corresponding agent profiles and perform the selected research sequentially in the current agent, marking the deepening report with `dispatch_fallback: inline-current-agent`. Omit the `mode` parameter when dispatching so the user's configured permission settings apply.
 

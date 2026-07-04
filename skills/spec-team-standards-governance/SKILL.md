@@ -5,12 +5,12 @@ description: "Govern source-backed team development standards: query confirmed r
 
 # Spec Team Standards Governance
 
-Use this standalone skill when the user asks to query, initialize, audit, propose, promote, or deprecate source-backed team development standards. It is a source-maintenance method, not a public Claude `/spec:*` or Codex `$spec-*` workflow and not the retired `spec-standards` workflow.
+Use this standalone skill when the user asks to query, initialize, audit, propose, promote, or deprecate source-backed team development standards. It is a source-maintenance method, not a public `spec-*` workflow and not the retired `spec-standards` workflow.
 
 ## When To Use / When Not To Use
 
 - Use for standards governance work on `docs/contracts/team-standards.md`, `docs/standards/**`, candidate evidence, health audits, or promotion/deprecation proposals.
-- Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution; those route to their own public `$spec-*` workflow.
+- Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution; those route to their own public `spec-*` workflow.
 - Do not use to create, restore, or recommend `/spec:standards`, `$spec-standards`, `skills/spec-standards/`, or `.spec-first/standards/`.
 - Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.
 
@@ -18,7 +18,7 @@ Use this standalone skill when the user asks to query, initialize, audit, propos
 
 - Do not create Claude `/spec:standards`, Codex `$spec-standards`, `skills/spec-standards/` or `.spec-first/standards/`.
 - Do not edit generated runtime mirrors such as `.claude/`, `.codex/` or `.agents/skills/`.
-- Standalone direct use defaults to report/proposal-only. Durable source mutation requires an active Claude `/spec:work`, Codex `$spec-work`, or equivalent source-edit workflow, ordinary diff review, `CHANGELOG.md`, and focused tests.
+- Standalone direct use defaults to report/proposal-only. Durable source mutation requires an active `spec-work` or equivalent source-edit workflow, ordinary diff review, `CHANGELOG.md`, and focused tests.
 - Scripts or structured steps may collect deterministic/advisory facts; the LLM decides semantic applicability and promotion posture.
 - Only `trust=confirmed,lifecycle_state=active` and scope-matched standards can become hard context. `observed`, `suggested`, `imported`, `conflict` and `confirmed-draft` are not enforceable.
 - Confidence score is not authority. High-impact governance, conflicts and owner-unresolved rules require owner/ADR/design-note handling.

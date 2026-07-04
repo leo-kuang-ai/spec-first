@@ -186,11 +186,7 @@ function resolveCommand(command) {
 
 function setupWorkflowCommand(host, args = '') {
   const suffix = args ? ` ${args}` : '';
-  if (host === 'claude') return `/spec:mcp-setup${suffix}`;
-  if (host === 'codex') return `$spec-mcp-setup${suffix}`;
-  if (host === 'kiro') return `Kiro Agent Skill spec-mcp-setup${suffix}`;
-  if (host === 'qoder') return `Qoder project command /spec:mcp-setup or Skill spec-mcp-setup${suffix}`;
-  return `/spec:mcp-setup${suffix} or $spec-mcp-setup${suffix}`;
+  return `spec-mcp-setup${suffix}`;
 }
 
 function commandExists(command) {

@@ -994,23 +994,23 @@ baseline_ready="$(jq -r '.baseline_ready // false' "$MARKER_PATH")"
 case "$host_name" in
   claude)
     host_display="Claude Code"
-    setup_command="/spec:mcp-setup"
+    setup_command="spec-mcp-setup"
     ;;
   codex)
     host_display="Codex"
-    setup_command='$spec-mcp-setup'
+    setup_command="spec-mcp-setup"
     ;;
   kiro)
     host_display="Kiro"
-    setup_command='Kiro Agent Skill spec-mcp-setup'
+    setup_command="spec-mcp-setup"
     ;;
   qoder)
     host_display="Qoder"
-    setup_command='Qoder project command /spec:mcp-setup or Skill spec-mcp-setup'
+    setup_command="spec-mcp-setup"
     ;;
   *)
     host_display="Claude Code / Codex"
-    setup_command='/spec:mcp-setup or $spec-mcp-setup'
+    setup_command="spec-mcp-setup"
     ;;
 esac
 

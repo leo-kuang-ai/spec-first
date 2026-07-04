@@ -6,7 +6,7 @@
 
 Routing into a public workflow authorizes that workflow to run. It does not by itself override host-level subagent tool contracts. In Codex, call `spawn_agent` only when the current request explicitly asks for subagents, delegated work, parallel agents, persona reviewer dispatch, or when an upstream workflow delegates from an already authorized multi-agent context whose visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording.
 
-Some public workflows prefer multi-persona or research phases when host capability and authorization are both present, for example `$spec-doc-review` multi-persona document reviewers, `$spec-code-review` reviewer personas, `$spec-plan` research agents, and `$spec-ideate` grounding or ideation agents. If authorization is absent, use that workflow's documented single-agent/report-only or inline-checklist fallback and record the concrete fallback reason instead of treating the workflow itself as failed.
+Some public workflows prefer multi-persona or research phases when host capability and authorization are both present, for example `spec-doc-review` multi-persona document reviewers, `spec-code-review` reviewer personas, `$spec-plan` research agents, and `spec-ideate` grounding or ideation agents. If authorization is absent, use that workflow's documented single-agent/report-only or inline-checklist fallback and record the concrete fallback reason instead of treating the workflow itself as failed.
 
 When Codex fallback is caused by missing dispatch authorization, record `dispatch_authorization_missing` and make the opt-in path user-visible: for multi-persona or subagent review, ask for `subagents`, `personas`, delegated review, or parallel agents in the request.
 

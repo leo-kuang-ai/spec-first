@@ -146,7 +146,7 @@ category in {architecture, security} OR risk_domain is non-empty
 
 `confidence_score` 是 promotion 输入，不是 authority。Quality gate pass 或高 confidence 不等于 owner decision、diff review 或 confirmed hard context。
 
-Promotion decision 必须记录 `gate_results`、`confidence.signals`、`autonomy.mode`、`next_action`、`outcome`、`decision_trace` 和 `source_refs`。真正写入 `trust=confirmed,lifecycle_state=active` 必须发生在 active Claude `/spec:work`、Codex `$spec-work` 或等价 source-edit workflow 中，并经过普通 diff review、CHANGELOG 和聚焦验证。
+Promotion decision 必须记录 `gate_results`、`confidence.signals`、`autonomy.mode`、`next_action`、`outcome`、`decision_trace` 和 `source_refs`。真正写入 `trust=confirmed,lifecycle_state=active` 必须发生在 active `spec-work` 或等价 source-edit workflow 中，并经过普通 diff review、CHANGELOG 和聚焦验证。
 
 ## Rule Selection Contract
 

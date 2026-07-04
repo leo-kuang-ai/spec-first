@@ -6,7 +6,7 @@ argument-hint: "[bare auto setup] [--check|--verify-only|--plan] [--only codegra
 
 # Runtime Setup
 
-`spec-mcp-setup` is the current runnable entrypoint for the Runtime Setup workflow. The target user-facing name is `spec-runtime-setup` (`/spec:runtime-setup` on Claude Code, `$spec-runtime-setup` on Codex, a generated Kiro Agent Skill entry once Kiro aliases are verified, a Qoder project command/Skill once Qoder aliases are verified, and a generated Cursor Agent Skill while Cursor remains generated-runtime preview); `/spec:mcp-setup`, `$spec-mcp-setup`, Kiro generated Agent Skill `spec-mcp-setup`, Qoder generated `/spec:mcp-setup` command / Skill `spec-mcp-setup`, and Cursor generated Agent Skill `spec-mcp-setup` remain compatibility names until the host alias contract is implemented. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and helper tooling, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
+`spec-mcp-setup` is the current runnable entrypoint for the Runtime Setup workflow across supported hosts. The target user-facing alias remains `spec-runtime-setup` once the host alias contract is implemented; legacy host spellings such as `/spec:mcp-setup` or `$spec-mcp-setup` normalize to `spec-mcp-setup` and are not separate product surfaces. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and helper tooling, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
 
 ## Contract Summary
 
@@ -64,7 +64,7 @@ If setup later reports project convention facts, they must be deterministic exis
 
 ## Host Authority And Write Safety
 
-The current public entrypoint is authoritative host evidence: `/spec:mcp-setup` or `/spec:runtime-setup` means Claude Code, `$spec-mcp-setup` or `$spec-runtime-setup` means Codex, the generated Kiro Agent Skill means Kiro, the generated Qoder project command or Skill means Qoder, and the generated Cursor Agent Skill means Cursor. Generated host-specific runtime surfaces must pin `MCP_SETUP_HOST=<host>` before invoking setup mutation scripts. `install-mcp.*`, `configure-host.*`, and `uninstall-mcp.*` fail closed without an explicit canonical `MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor`; they must not infer mutation targets from `PATH`, generated runtime directories, old `.spec-first/config/*` facts, or host config files from another platform. Read-only detection/report paths may surface advisory host candidates, but those candidates are not write authority.
+The current public entrypoint is `spec-mcp-setup`; the host runtime surface that invoked it is authoritative host evidence. Generated host-specific runtime surfaces must pin `MCP_SETUP_HOST=<host>` before invoking setup mutation scripts. `install-mcp.*`, `configure-host.*`, and `uninstall-mcp.*` fail closed without an explicit canonical `MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor`; they must not infer mutation targets from `PATH`, generated runtime directories, old `.spec-first/config/*` facts, or host config files from another platform. Read-only detection/report paths may surface advisory host candidates, but those candidates are not write authority.
 
 Before any host config write or setup-owned facts refresh, the workflow must anchor the write target to a fresh `detect-host.*` JSON result driven by an explicit entrypoint host pin. Previous setup facts are drift comparison evidence only: if they disagree with the current entrypoint host, report a host-marker drift and refresh setup-owned facts for the current host instead of treating the previous host as current. Never manually choose `.kiro/settings/mcp.json`, `.qoder/settings.local.json`, `.cursor/mcp.json`, Codex TOML, or Claude managed/user config from prose alone.
 
@@ -75,7 +75,7 @@ Do not use host file-edit tools such as Write, Update, or Edit to modify `.spec-
 - `--check`: inspect current dependency/runtime status only; do not write setup facts, host config, or install tools.
 - `--verify-only` / `--refresh-facts`: verify readiness and refresh setup-owned facts; do not install tools or edit host config.
 - `--plan`: render install/config operations and safety results; do not write setup facts, host config, or install tools.
-- Bare invocation (`/spec:mcp-setup` on Claude, `$spec-mcp-setup` on Codex, the Kiro `spec-mcp-setup` Agent Skill, or the Qoder `/spec:mcp-setup` project command / Skill): primary automatic setup path. Show the current CodeGraph/Graphify provider pack, project/provider runtime writes, host config writes, first-generation commands, refresh hooks, and explicit non-actions, then run install-init and verification to completion without an extra confirmation prompt. Treat the bare workflow invocation as explicit opt-in for the default provider pack. Do not ask the user to run internal scripts directly.
+- Bare invocation (`spec-mcp-setup` in the current host): primary automatic setup path. Show the current CodeGraph/Graphify provider pack, project/provider runtime writes, host config writes, first-generation commands, refresh hooks, and explicit non-actions, then run install-init and verification to completion without an extra confirmation prompt. Treat the bare workflow invocation as explicit opt-in for the default provider pack. Do not ask the user to run internal scripts directly.
 - `--only <ids>`: headless/subset apply path. `--only codegraph`, `--only graphify`, or `--only codegraph,graphify` narrows provider selection and also does not require a confirmation prompt.
 - `--refresh`: Graphify explicit incremental refresh path. Use with `--only graphify` when `graphify-out/` already exists and the user wants setup to run provider-native `graphify update .` (code-only, no LLM) instead of only verifying/installing provider readiness. This is not full semantic extraction; missing artifacts still use first-generation `graphify extract .`.
 - `--requirement-workspace <repo-relative-path>`: optional Graphify input-scope override. Omit it for normal project-workspace setup; default input scope is the resolved project workspace.
@@ -87,7 +87,7 @@ CodeGraph setup uses the controlled MCP/provider route. When selected, setup ins
 
 ## Bare Setup Flow
 
-For bare `$spec-mcp-setup`, do this inside the skill:
+For bare `spec-mcp-setup`, do this inside the skill:
 
 1. Resolve the project target and render the provider plan with `setup-plan-renderer.cjs --mode guided-apply --repo-root <resolved-project-root>`.
 2. Present a compact install-init preview block naming:
@@ -103,7 +103,7 @@ For bare `$spec-mcp-setup`, do this inside the skill:
 
 ## Workflow
 
-1. Identify the current host: current runnable entrypoints are `/spec:mcp-setup` on Claude Code, `$spec-mcp-setup` on Codex, the `spec-mcp-setup` Kiro Agent Skill, Qoder project command `/spec:mcp-setup` / Skill `spec-mcp-setup`, and Cursor Agent Skill `spec-mcp-setup`. The target renamed entrypoints are `/spec:runtime-setup`, `$spec-runtime-setup`, and the Kiro/Qoder/Cursor runtime-setup aliases once the alias contract lands.
+1. Identify the current host from the generated host-specific runtime surface invoking the unified `spec-mcp-setup` entrypoint. The target renamed entrypoint is `spec-runtime-setup` once the alias contract lands.
 2. If invoked from a parent workspace, select an explicit child repo or intentionally run setup for all supported child repos. Writes must stay within the selected target.
 3. Read `mcp-tools.json`, validate schema version, and verify every required baseline tool plus explicit opt-in MCP entry has deterministic install, host-config, detection, and summary metadata.
 4. Run `detect-tools.*` or `install-mcp.*` as appropriate. Warm required package-backed MCP tools, admit optional MCP entries only through the documented default provider pack or explicit `--only` selection, write host config only through documented host targets, and record structured status.

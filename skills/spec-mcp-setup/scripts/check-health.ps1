@@ -5,7 +5,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$browserHelperOptInAction = 'set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`$spec-mcp-setup` or `/spec:mcp-setup`)'
+$browserHelperOptInAction = 'set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)'
 . (Join-Path $PSScriptRoot 'lib-helper-registry.ps1')
 $helperRegistry = Get-HelperRegistry
 

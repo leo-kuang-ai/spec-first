@@ -1156,23 +1156,23 @@ Write-StatusBlock -Sections $sections
 switch ($combined.host) {
   'claude' {
     $hostDisplay = 'Claude Code'
-    $setupCommand = '/spec:mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
   'codex' {
     $hostDisplay = 'Codex'
-    $setupCommand = '$spec-mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
   'kiro' {
     $hostDisplay = 'Kiro'
-    $setupCommand = 'Kiro Agent Skill spec-mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
   'qoder' {
     $hostDisplay = 'Qoder'
-    $setupCommand = 'Qoder project command /spec:mcp-setup or Skill spec-mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
   default {
     $hostDisplay = 'Claude Code / Codex'
-    $setupCommand = '/spec:mcp-setup or $spec-mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
 }
 

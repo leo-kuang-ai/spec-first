@@ -18,9 +18,9 @@
       "message": "Heading must use a descriptive title, not a slash entrypoint."
     },
     {
-      "id": "codex-entrypoint-spec",
-      "pattern": "\\*\\*Codex entry point:\\*\\*\\s*`?/spec:[^`\\s]*`?",
-      "message": "Codex user-visible workflow entrypoints must use $spec-*."
+      "id": "legacy-host-specific-entrypoint",
+      "pattern": "\\*\\*Codex entry point:\\*\\*\\s*`?(?:/spec:|\\$spec-)[^`\\s]*`?",
+      "message": "User-visible workflow entrypoints must use the unified spec-* form."
     },
     {
       "id": "legacy-free-command",

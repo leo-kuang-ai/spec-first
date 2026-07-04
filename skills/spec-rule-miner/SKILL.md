@@ -5,7 +5,7 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 
 # Spec Rule Miner
 
-`spec-rule-miner` 从目标仓库的真实代码中提炼项目级 AI 编码规则，并把规则写入 `AGENTS.md` 这类 agent 可读配置。它是 standalone skill，不是 `/spec:*` 或 `$spec-*` workflow。
+`spec-rule-miner` 从目标仓库的真实代码中提炼项目级 AI 编码规则，并把规则写入 `AGENTS.md` 这类 agent 可读配置。它是 standalone skill，不是 `spec-*` public workflow。
 
 核心产物是 <=1000 words 的项目规则块，规则必须来自当前目标仓库证据，而不是语言默认、个人偏好或通用最佳实践。
 
@@ -13,7 +13,7 @@ description: "Use this standalone skill when the user asks to mine a repo's exis
 
 - 使用本 skill：用户要“分析项目风格”“学习代码规范”“生成项目规则”“挖掘编码习惯”“让 AI 像团队一样写代码”，或明确要生成 `AGENTS.md`、`.cursorrules`、Copilot/Cursor/Kiro/Qoder/Claude 规则文件。
 - 不使用本 skill：用户要审查当前 diff、修复代码、重构、调试、写 lint/format 配置、生成通用语言规范，或治理 `docs/standards/**` confirmed team standards。
-- 近邻路由：团队标准的查询/提升/废弃走 `spec-team-standards-governance`；代码质量评审走 `$spec-code-review`；实际实现或修复走 `$spec-work`；创建或修改 spec-first source skill 走 `$spec-write-skill`。
+- 近邻路由：团队标准的查询/提升/废弃走 `spec-team-standards-governance`；代码质量评审走 `spec-code-review`；实际实现或修复走 `spec-work`；创建或修改 spec-first source skill 走 `spec-write-skill`。
 
 ## 硬边界
 

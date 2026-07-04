@@ -61,6 +61,7 @@ const GENERATED_RUNTIME_MIRROR_PREFIXES = [
   '.kiro/agents/',
   '.kiro/spec-first/',
   '.kiro/settings/',
+  '.qoder/commands/spec-',
   '.qoder/commands/spec/',
   '.qoder/skills/',
   '.qoder/agents/',

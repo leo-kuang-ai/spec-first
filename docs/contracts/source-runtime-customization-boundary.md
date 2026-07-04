@@ -36,7 +36,8 @@ Do not hand-edit these paths as source fixes:
 - `.kiro/agents/`
 - `.kiro/spec-first/`
 - spec-first managed `.kiro/settings/`
-- `.qoder/commands/spec/`
+- `.qoder/commands/spec-*.md`
+- `.qoder/commands/spec/` (retired legacy namespace)
 - `.qoder/skills/`
 - `.qoder/agents/`
 - `.qoder/spec-first/`

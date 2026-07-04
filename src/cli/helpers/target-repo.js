@@ -15,6 +15,7 @@ const GENERATED_RUNTIME_PREFIXES = Object.freeze([
   '.kiro/agents/',
   '.kiro/spec-first/',
   '.kiro/settings/',
+  '.qoder/commands/spec-',
   '.qoder/commands/spec/',
   '.qoder/skills/',
   '.qoder/agents/',
