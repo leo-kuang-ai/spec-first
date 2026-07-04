@@ -576,7 +576,9 @@ describe('instruction bootstrap', () => {
     for (const host of ['claude', 'codex', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
-        const blockIds = new Set([...block.matchAll(/`spec-([a-z-]+)`/g)].map((m) => m[1]));
+        const blockIds = new Set([...block.matchAll(/`spec-([a-z-]+)`/g)]
+          .map((m) => m[1])
+          .filter((id) => id !== '*'));
         // block ⊆ SKILL:不得含 SKILL Route Map 之外的入口(防自造入口/drift)
         for (const id of blockIds) {
           expect(skillIds.has(id)).toBe(true);

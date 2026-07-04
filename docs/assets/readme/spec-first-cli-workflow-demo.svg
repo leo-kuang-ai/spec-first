@@ -97,35 +97,35 @@
       <text x="0" y="34" class="mono cmd">$ spec-first init</text>
       <text x="430" y="34" class="mono-small ok">✓ runtime  ✓ .gitignore</text>
 
-      <text x="0" y="68" class="mono cmd">$spec-mcp-setup</text>
+      <text x="0" y="68" class="mono cmd">spec-mcp-setup</text>
       <text x="430" y="68" class="mono-small ok">✓ MCP/helper readiness</text>
 
-      <text x="0" y="102" class="mono cmd">$spec-ideate "新用户 onboarding"</text>
+      <text x="0" y="102" class="mono cmd">spec-ideate "新用户 onboarding"</text>
       <text x="430" y="102" class="mono-small ok">✓ ranked ideas</text>
 
-      <text x="0" y="136" class="mono cmd">$spec-brainstorm "改进 onboarding"</text>
+      <text x="0" y="136" class="mono cmd">spec-brainstorm "改进 onboarding"</text>
       <text x="430" y="136" class="mono-small ok">✓ docs/brainstorms/</text>
 
-      <text x="0" y="170" class="mono cmd">$spec-prd docs/brainstorms/...md</text>
+      <text x="0" y="170" class="mono cmd">spec-prd docs/brainstorms/...md</text>
       <text x="430" y="170" class="mono-small ok">✓ PRD-ready requirements</text>
 
-      <text x="0" y="204" class="mono cmd">$spec-doc-review docs/brainstorms/...md</text>
+      <text x="0" y="204" class="mono cmd">spec-doc-review docs/brainstorms/...md</text>
       <text x="430" y="204" class="mono-small ok">✓ gaps reviewed</text>
 
-      <text x="0" y="238" class="mono cmd">$spec-plan docs/brainstorms/...md</text>
+      <text x="0" y="238" class="mono cmd">spec-plan docs/brainstorms/...md</text>
       <text x="430" y="238" class="mono-small ok">✓ docs/plans/</text>
 
-      <text x="0" y="272" class="mono cmd">$spec-write-tasks docs/plans/...md</text>
+      <text x="0" y="272" class="mono cmd">spec-write-tasks docs/plans/...md</text>
       <text x="430" y="272" class="mono-small ok">✓ docs/tasks/</text>
 
-      <text x="0" y="306" class="mono cmd">$spec-work docs/tasks/...md</text>
+      <text x="0" y="306" class="mono cmd">spec-work docs/tasks/...md</text>
       <text x="430" y="306" class="mono-small ok">✓ source changes  ✓ checks</text>
 
-      <text x="0" y="340" class="mono cmd">$spec-code-review</text>
+      <text x="0" y="340" class="mono cmd">spec-code-review</text>
       <text x="430" y="340" class="mono-small ok">✓ findings resolved</text>
-      <text x="0" y="374" class="mono cmd">$spec-debug  # failure path</text>
+      <text x="0" y="374" class="mono cmd">spec-debug  # failure path</text>
       <text x="430" y="374" class="mono-small ok">↺ debug loop</text>
-      <text x="0" y="408" class="mono cmd">$spec-compound</text>
+      <text x="0" y="408" class="mono cmd">spec-compound</text>
       <text x="430" y="408" class="mono-small ok">✓ docs/solutions/<tspan class="cursor accent"> █</tspan></text>
     </g>
   </g>

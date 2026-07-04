@@ -110,7 +110,7 @@ describe('prompt examples baseline contracts', () => {
     expect(skillPrompt).toContain('skills/using-spec-first/evals/routing-cases.json');
     expect(skillPrompt).toContain('not a deterministic router');
     expect(skillPrompt).toContain('External issue or PR material is an input surface, not a separate public workflow.');
-    expect(skillPrompt).toContain('do not add an external issue/PR-specific public workflow entrypoint');
+    expect(skillPrompt).toContain('Do not invent an external issue/PR-specific `spec-*` entrypoint');
 
     const casesById = new Map(payload.cases.map((entry) => [entry.id, entry]));
     for (const id of [

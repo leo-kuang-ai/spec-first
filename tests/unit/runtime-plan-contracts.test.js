@@ -113,6 +113,11 @@ describe('runtime plan contracts', () => {
 
     expect(plan.operations).toEqual([
       {
+        kind: 'remove_dir',
+        path: '.claude/commands/spec',
+        reason: 'retired_runtime_command_namespace',
+      },
+      {
         kind: 'remove_file',
         path: '.claude/hooks/session-start',
         reason: 'managed_runtime_hook',

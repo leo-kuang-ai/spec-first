@@ -110,7 +110,7 @@ describe('CLI entry contract', () => {
     expect(result.stderr).toBe('');
     expect(result.stdout).toContain(`Spec-First v${PACKAGE_JSON.version}`);
     expect(result.stdout).toContain('Claude Code, Codex, Kiro, Qoder, and Cursor generated-runtime preview');
-    expect(result.stdout).toContain('Qoder spec-plan');
+    expect(result.stdout).toContain('例如: spec-plan、spec-work、spec-code-review、spec-mcp-setup');
   });
 
   test('doctor help names the current setup entrypoint and deferred runtime-setup alias', () => {

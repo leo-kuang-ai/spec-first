@@ -161,6 +161,7 @@ describe('spec-write-skill contract', () => {
       host_delivery: {
         claude: 'command',
         codex: 'skill',
+        cursor: 'skill',
         kiro: 'skill',
         qoder: 'command',
       },
@@ -175,7 +176,7 @@ describe('spec-write-skill contract', () => {
         [
           new ClaudeAdapter(),
           path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-write-skill'),
-          path.join(projectRoot, '.claude', 'commands', 'spec', 'write-skill.md'),
+          path.join(projectRoot, '.claude', 'commands', 'spec-write-skill.md'),
         ],
         [
           new CodexAdapter(),

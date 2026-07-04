@@ -424,6 +424,7 @@ describe('spec-prd workflow contracts', () => {
           host_delivery: {
             claude: 'command',
             codex: 'skill',
+            cursor: 'skill',
             kiro: 'skill',
             qoder: 'command',
           },

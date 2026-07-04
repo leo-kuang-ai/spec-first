@@ -1116,8 +1116,8 @@ describe('init --dry-run', () => {
   test('init generates current setup workflow command', () => {
     const projectRoot = makeTempDir();
     const initLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    const setupCommandFile = 'mcp-setup.md';
-    const setupCommandPath = path.join(projectRoot, '.claude', 'commands', 'spec', setupCommandFile);
+    const setupCommandFile = 'spec-mcp-setup.md';
+    const setupCommandPath = path.join(projectRoot, '.claude', 'commands', setupCommandFile);
 
     try {
       expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'claude' }))).toBe(0);

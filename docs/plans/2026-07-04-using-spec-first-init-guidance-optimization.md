@@ -1,4 +1,4 @@
-# using-spec-first Skill 与 spec-first init 引导内容优化方案（第五修订版 · doc-review 修正）
+# using-spec-first Skill 与 spec-first init 引导内容优化方案（第六修订版 · 统一 spec-* 与 Cursor 基线修正）
 
 > 生成时间：2026-07-04 22:22
 > 初次纠正：2026-07-04
@@ -6,24 +6,27 @@
 > 压缩复审：2026-07-04 23:58
 > 钢板复审：2026-07-04
 > 评审修正：2026-07-05（基于 `/spec:doc-review` 五 persona 评审，逐条落地）
+> 入口统一修正：2026-07-05（基于最新 source：公开入口统一为 `spec-*`，legacy `/spec:*` / `$spec-*` 仅作为归一化输入）
 > 主题：`using-spec-first` skill 的路由边界，以及 `spec-first init` 写入 `CLAUDE.md` / `AGENTS.md` 的常驻引导内容
 > 目标项目：`spec-first`
 > 外部参考：https://mp.weixin.qq.com/s/H8cggLR2TbQ_gkyJ2xSR7Q
 > 公开原文参考：https://research.perplexity.ai/articles/designing-refining-and-maintaining-agent-skills-at-perplexity
-> 真相源：`skills/using-spec-first/SKILL.md`、`skills/using-spec-first/references/*.md`、`src/cli/commands/init.js`、`src/cli/instruction-bootstrap.js`、`tests/unit/instruction-bootstrap.test.js`、`tests/unit/using-spec-first-contracts.test.js`
+> 真相源：`skills/using-spec-first/SKILL.md`、`skills/using-spec-first/references/*.md`、`src/cli/commands/init.js`、`src/cli/instruction-bootstrap.js`、`tests/unit/instruction-bootstrap.test.js`、`tests/unit/context-governance-contracts.test.js`、`tests/unit/using-spec-first-contracts.test.js`
 
 ---
 
-## 评审修正摘要（第五版做了什么）
+## 评审修正摘要（第六版做了什么）
 
-第四版（钢板复审）的方向成立，但一次 doc-review 发现它建立在**错误的当前状态基线**上，并因此系统性低估了改动破坏面。第五版逐条修正：
+第四版（钢板复审）的方向成立，但一次 doc-review 发现它建立在**错误的当前状态基线**上，并因此系统性低估了改动破坏面。第五版逐条修正基线、保留准则、测试迁移和度量前置。第六版继续按最新 source 修正三处新增漂移：
 
-- **P0 基线更正**：当前 bootstrap 不是「5 条」，`buildZhBootstrapBody` 实际产出 **14 条 bullet**（Codex 16 条、Qoder 14 条；均已用本节实测命令确认）。「压到 4 条」实为 **~14→4 删除**，而非修剪 1 条。全文以 14 条为基线。
+- **P0 入口表面更正**：当前公开 workflow 入口统一为 **`spec-*`**。`/spec:*` 与 `$spec-*` 只是 legacy host spelling / 兼容归一化输入，不再作为当前产品表面描述。
+- **P0 基线更正**：当前 bootstrap 不是「5 条」，`buildZhBootstrapBody` 实际产出 **14 条 bullet**（Claude 14、Codex 16、Cursor 14、Qoder 14；均已用本节实测命令确认）。「压到 4 条」实为 **~14→4 删除**，而非修剪 1 条。全文以 Claude/Cursor/Qoder 14 条、Codex 16 条为基线。
 - **P0 保留准则**：新增「不路由那一轮也要生效」判定，对 14 条逐条做 keep / sink / drop，得出候选 L0 keep 集约 **10–11 条**（待 Step 0 baseline 验证），而非硬定 4 条。
-- **P0 测试迁移**：完整枚举 `instruction-bootstrap.test.js` 断言（含行数下界、byte-exact 生成器耦合、codex 专测），不再只点名 `CURATED_CORE`。
+- **P0 变体基线更正**：最新 `instruction-bootstrap.js` 生成器覆盖 `zh/en × claude/codex/cursor/qoder` **8 个变体**；Kiro 不在本次 bootstrap 变体判定内，除非后续 generator 明确纳入。
+- **P0 测试迁移**：完整枚举 `instruction-bootstrap.test.js` 断言（含行数下界、byte-exact 生成器耦合、codex 专测），并补上 `context-governance-contracts.test.js` 对 runtime exclusion 长路径列表的联动断言；不再只点名 `CURATED_CORE`。
 - **P1 度量前置**：增加压缩前后 routing/governance baseline 作为 Step 0 硬验收 gate。
 - **P1 性质更正**：`CLAUDE.md` / `AGENTS.md` 是 checked-in host 入口文档 / 受生成规则管理的 source slice，**不是** `.claude/` 那类 runtime mirror；补「同提交必须重生成」硬 gate。
-- **P2 精度修正**：description 改写会破坏逐字契约测试；Codex `spawn_agent` 是「幻影删除」（本就不在 Claude block）；references/evals 已存在（应「扩展」而非「新增」）。
+- **P2 精度修正**：description 改写会破坏逐字契约测试；Codex `spawn_agent` 是「幻影删除」（本就不在 Claude block）；references/evals 已存在（应「扩展」而非「新增」）；入口 identifier 断言必须只统计正向 workflow entrypoint，不能把 `spec-using-spec-first` 这类否定示例误计为入口。
 
 ---
 
@@ -51,7 +54,7 @@
 
 | 角色 | 真实身份 | 职责 | 是否写文件 |
 |---|---|---|---|
-| `using-spec-first` | 独立 meta skill / 入口治理器 | 判断当前请求是否进入公开 `/spec:*` / `$spec-*` workflow，或给出 next-step 建议 | 否，不产 artifact |
+| `using-spec-first` | 独立 meta skill / 入口治理器 | 判断当前请求是否进入公开 `spec-*` workflow，或给出 next-step 建议；legacy `/spec:*` / `$spec-*` 只作为归一化输入 | 否，不产 artifact |
 | `spec-first init` | CLI 命令 | 从 source 生成 host runtime assets，并写入 / 更新 `CLAUDE.md` / `AGENTS.md` managed block | 是 |
 
 所以：
@@ -134,6 +137,7 @@ L3：evals / docs / solutions
 |---|---|---:|---:|
 | claude | zh | 14 | 19 |
 | codex | zh | 16 | 20 |
+| cursor | zh | 14 | 19 |
 | qoder | zh | 14 | 19 |
 
 en 变体同构。实测命令如下：
@@ -141,7 +145,7 @@ en 变体同构。实测命令如下：
 ```bash
 node - <<'NODE'
 const { buildBootstrapBlock } = require('./src/cli/instruction-bootstrap');
-for (const host of ['claude', 'codex', 'qoder']) {
+for (const host of ['claude', 'codex', 'cursor', 'qoder']) {
   for (const lang of ['zh', 'en']) {
     const block = buildBootstrapBlock(host, lang);
     const lines = block.split('\n');
@@ -152,7 +156,7 @@ for (const host of ['claude', 'codex', 'qoder']) {
 NODE
 ```
 
-Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 workflow ③何时直接做 ④何时不重新分流 ⑤如何路由 ⑥常见入口锚点（枚举 12 个 `/spec:` 入口）⑦外部 issue/PR 输入 ⑧语言策略指针 ⑨父级多仓 `target_repo` ⑩Runtime-context 排除（generated mirror 长路径列表）⑪角色契约读取指针 ⑫反合理化红旗 ⑬host 入口行 ⑭surface / internal-only 行。Codex 在此基础上多 2 条（startup-reminder、spawn_agent 授权）。
+Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 workflow ③何时直接做 ④何时不重新分流 ⑤如何路由 ⑥常见入口锚点（枚举 12 个 `spec-*` 入口）⑦外部 issue/PR 输入 ⑧语言策略指针 ⑨父级多仓 `target_repo` ⑩Runtime-context 排除（generated mirror 长路径列表）⑪角色契约读取指针 ⑫反合理化红旗 ⑬host 入口 / delivery 行 ⑭surface / internal-only 行。Codex 在此基础上多 2 条（startup-reminder、spawn_agent 授权）。Cursor 与 Qoder 当前均为 14 条，但 Cursor/Codex 因 `spec-using-spec-first` 否定示例会被粗糙正则误计出额外 identifier，测试迁移时必须只统计正向入口锚点。
 
 结论：当前既不是「短锚点」，也不是「5 条」。§4 的「压缩」必须以 14 条为基线，且要逐条决定去留。
 
@@ -188,7 +192,7 @@ Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 w
 | ⑩ | Runtime-context 排除 | **keep 读排除语义 / sink 长路径列表** | 「默认不读 generated mirror」必留（否则整轮扫 mirror，反增 per-session 上下文，违背压缩目标）；具体路径长列表可下沉到 context-governance |
 | ⑪ | 角色契约读取指针 | **sink（可选）** | 「架构判断前读角色契约」本身是按需触发，可下沉；保留与否列为作者裁决点 |
 | ⑫ | 反合理化红旗 | **keep（语义）** | 作用是在 SKILL 加载前阻止 agent 合理化掉路由；下沉即自毁（product-lens 强调） |
-| ⑬ | host 入口行 | **keep** | host-specific 语法（`/spec:*` vs `$spec-*`） |
+| ⑬ | host 入口 / delivery 行 | **keep** | 当前产品入口统一 `spec-*`，但不同 host 的 delivery surface 不同（Claude/Qoder project commands，Codex/Cursor generated Skills）；legacy `/spec:*` / `$spec-*` 仅在 SKILL 中做归一化说明 |
 | ⑭ | surface / internal-only 行 | **keep** | 防暴露 internal-only skill（如 `git-worktree`） |
 
 净结果：真正可安全 sink 的是 ⑥（入口枚举→指针）、⑩ 的长路径列表、⑪（可选）。**候选 L0 keep 集约 10–11 条，待 Step 0 baseline 验证**，不是 4 条。方案的核心洞察（把入口枚举与长路径列表移出常驻块）仍成立，只是「4 条」这个数字是错的。
@@ -202,9 +206,9 @@ Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 w
 | 角色契约读取指针（⑪，若下沉） | 架构 / prompt / contract 判断时按需读取 |
 | CLI 维护命令细节 | CLI help、setup/update 文档、`spec-mcp-setup` |
 
-**Codex `spawn_agent` 的准确处理（评审 P2-2）。** 原文称「这一版刻意不写 Codex spawn_agent 边界」，暗示从当前讨论的 Claude block 删除它。事实：`spawn_agent` 授权 prose 只在 `hostId==='codex'` 分支内联（`instruction-bootstrap.js:147-151`），**从未出现在 Claude block**。这不是「删除」，而是本就不在。正确表述应是：Codex 变体的 spawn_agent / startup-reminder 两条是 codex-only；若要将其移出 codex bootstrap，需同步改 codex 专测（见 §4.4），而不是把它当作 Claude block 的删除项。
+**Codex `spawn_agent` 的准确处理（评审 P2-2）。** 原文称「这一版刻意不写 Codex spawn_agent 边界」，暗示从当前讨论的 Claude block 删除它。事实：`spawn_agent` 授权 prose 只在 `hostId==='codex'` 分支内联（`instruction-bootstrap.js:147-151` 附近），**从未出现在 Claude block**。这不是「删除」，而是本就不在。正确表述应是：Codex 变体的 spawn_agent / startup-reminder 两条是 codex-only；若要将其移出 codex bootstrap，需同步改 codex 专测（见 §4.4），而不是把它当作 Claude block 的删除项。
 
-**多变体处理（评审 P1-4）。** 生成器实际产出 zh+en × claude/codex/qoder 共 6 变体。任何 L0 判定都必须对 6 变体给出一致决定，而不是只提供一个 zh-claude 草稿。dual-host alignment 测试（`instruction-bootstrap.test.js:604-619`）会强制三端核心语义对齐。
+**多变体处理（评审 P1-4，第六版更新）。** 生成器实际产出 zh+en × claude/codex/cursor/qoder 共 8 变体。任何 L0 判定都必须对 8 变体给出一致决定，而不是只提供一个 zh-claude 草稿。现有 dual-host alignment 测试（`instruction-bootstrap.test.js:604-619`）主要强制 claude/codex/qoder 三端核心语义对齐，压缩落地时应同步纳入 Cursor，避免 Cursor bootstrap 成为漏测分支。
 
 ### 4.2 P1：微调 `using-spec-first` description（含契约测试耦合，评审 P2-1）
 
@@ -260,28 +264,30 @@ Use before substantial work in a spec-first repo or when the user asks which spe
 
 | 断言 | 位置 | 压缩后处理 |
 |---|---|---|
-| `CURATED_CORE` 12 identifier 必须在 block | 559-561, 584-587 | ⑥ 下沉后需**删除/重写**：改为「入口枚举不常驻，identifier 集合可为 0」 |
+| `CURATED_CORE` 12 identifier 必须在 block | 559-561, 584-587 | ⑥ 下沉后需**删除/重写**：改为「完整入口枚举不常驻」；identifier 统计只看正向入口锚点，不能把 `spec-using-spec-first` 否定示例计为 workflow 入口 |
 | 四段核心语义在场 | 59-63, 482-505 | keep（②③⑤保留） |
 | 外部 issue/PR 段在场 | 64-67, 488, 611 | keep（⑦保留） |
 | 反合理化红旗在场 | 68, 489, 611 | keep（⑫保留语义） |
 | 语言策略行 | 75-76 | keep（⑧保留 precedence） |
 | Runtime-context 长路径列表**逐字** | 80-82, 133-135 | ⑩ 长路径下沉后需**改**为「读排除语义在场、路径列表不再逐字断言」 |
+| `context-governance-contracts.test.js` 的 bootstrap runtime exclusion 断言 | 79-118 附近 | ⑩ 长路径下沉后需**同步改**：contract 继续保存完整 denylist，bootstrap 只断言读排除语义和指向 contract |
 | 角色契约路径 | 83 | 若 ⑪ 下沉则**删**，否则 keep |
 | 行数上下界 `>8 且 <26`（codex `>10 且 <28`） | 56-57, 436-437, 448-449 | **必须重设下界**：纯 4-bullet 约 6–8 行会跌破下界；即使压到 10–11 条也需复核 |
-| dual-host alignment segmentProbes | 604-619 | keep（6 变体核心语义对齐） |
+| dual-host alignment segmentProbes | 604-619 | keep，并扩展到 Cursor（8 变体核心语义对齐） |
 | R-10 load-bearing red flags | 627-648 | keep（vague→brainstorm/plan、run-init→route first 语义必留） |
 | checked-in CLAUDE.md/AGENTS.md 与生成器**逐字节相等** | 401-415 | keep，且触发 §6 Step 0 的同提交重生成硬 gate |
-| codex 专测：codex 必须含 spawn_agent/startup-reminder，claude/qoder 必须不含 | 417-456 | 若移出 codex spawn_agent 则需**改** codex 专测 |
+| codex 专测：codex 必须含 spawn_agent/startup-reminder，claude/qoder 必须不含 | 417-456 | 若移出 codex spawn_agent 则需**改** codex 专测；同时断言 cursor 不含 codex-only guidance |
 
 **依赖倒置更正（评审 scope S4）。** 压缩（原 §4.1/Step 0）一旦落地，`CURATED_CORE` 与行数下界测试**立即变红**。因此原被标为 P2/Step 3 的「drift 分类重写」实际是 Step 0 变绿的**前置依赖**，不是可延后项。测试重写必须与生成器改动在同一步、同一提交完成。
 
 新守护目标（压缩后）：
 
-- bootstrap 不承载完整入口枚举（⑥ identifier 集合为 0 或仅剩指针）；
+- bootstrap 不承载完整入口枚举（⑥ 正向 entrypoint identifier 集合为 0 或仅剩指针）；若文本含 `spec-using-spec-first` 等 anti-pattern 示例，测试必须排除它们而非误计为入口；
 - 保留的 L0 语义（②③④⑤⑦⑧⑨⑩读排除⑫⑬⑭）逐条仍在；
 - 行数下界按新常驻集重设，仍有上界防再膨胀；
 - checked-in 文件与生成器逐字节一致仍守护；
-- Route Map / non-core workflow command 的 drift 守护保留在 SKILL / governance registry / routing eval 层。
+- Route Map / non-core workflow command 的 drift 守护保留在 SKILL / governance registry / routing eval 层；
+- `context-governance` 保留完整 runtime exclusion denylist，bootstrap 只保留「默认排除 generated mirrors + 明确 runtime 任务才读取 + advisory host-native surface」的短语义锚点。
 
 不建议新增独立 audit 子命令，这个风险仍由 contract/unit tests 处理。
 
@@ -360,8 +366,9 @@ Use before substantial work in a spec-first repo or when the user asks which spe
 
 范围：
 
-- `src/cli/instruction-bootstrap.js`（6 变体一致处理）；
-- `tests/unit/instruction-bootstrap.test.js`（完整重写，含行数下界、identifier、路径列表、codex 专测）；
+- `src/cli/instruction-bootstrap.js`（8 变体一致处理：claude/codex/cursor/qoder × zh/en）；
+- `tests/unit/instruction-bootstrap.test.js`（完整重写，含行数下界、正向 identifier、路径列表、codex 专测、Cursor 覆盖）；
+- `tests/unit/context-governance-contracts.test.js`（runtime exclusion 长路径从 bootstrap 逐字断言迁移为 contract-owned denylist + bootstrap 短语义断言）；
 - 通过 `spec-first init` 重生成 checked-in `CLAUDE.md` / `AGENTS.md`。
 
 **硬 gate（评审 P1-2）：** `CLAUDE.md` / `AGENTS.md` 是 checked-in host 入口文档 / 受生成规则管理的 source slice，**不是** `.claude/` 那类 runtime mirror。生成器改动后**必须在同一提交**用 `spec-first init` 重生成这两个文件，否则 `instruction-bootstrap.test.js:401-415` 的逐字节比对失败。
@@ -402,7 +409,7 @@ Use before substantial work in a spec-first repo or when the user asks which spe
 - 当前上下文解释 / 用户单文档摘要不触发 workflow；
 - "不知道下一步" 触发 guide mode；
 - 具体 review 仍路由到 code/doc review；
-- `$spec-doc-review` 在 Codex 中仍不自动授权 `spawn_agent`。
+- `spec-doc-review` 在 Codex 中仍不自动授权 `spawn_agent`。
 
 ---
 
@@ -420,7 +427,7 @@ spec-first init
   = 写入 / 更新 CLAUDE.md / AGENTS.md 的 managed block
 
 CLAUDE.md / AGENTS.md bootstrap
-  = L0 入口治理不变量（当前实测 14 条；候选 keep 集约 10–11 条，待 Step 0 baseline 验证，非 4 条）
+  = L0 入口治理不变量（当前实测 Claude/Cursor/Qoder 14 条、Codex 16 条；候选 keep 集约 10–11 条，待 Step 0 baseline 验证，非 4 条）
   = 只放「不路由那一轮也必须在场」的边界
   = 可下沉：完整入口枚举、generated mirror 全路径列表、dispatch/guide 细则
   = CLAUDE.md/AGENTS.md 是 checked-in source slice，改生成器须同提交重生成
@@ -437,18 +444,18 @@ evals/*.json
 
 最终建议（修正版）：
 
-> 这份优化不应变成「给入口治理器再造一个入口治理系统」，也不应以错误基线追求一个不可达的数字。最小可维护路径是：**先用 baseline 验证当前块的问题、收益和可删边界并锁定成功判据；再按「不路由那轮是否失效」逐条判定 14 条，把可安全下沉的（入口枚举、长路径列表）下沉；压缩与全套测试重写同提交完成，并同提交重生成 checked-in 文件；最后补强 description 与 guide/lightweight eval。** 保留的是治理，不是数字。
+> 这份优化不应变成「给入口治理器再造一个入口治理系统」，也不应以错误基线追求一个不可达的数字。最小可维护路径是：**先用 baseline 验证当前块的问题、收益和可删边界并锁定成功判据；再按「不路由那轮是否失效」逐条判定 Claude/Cursor/Qoder 14 条、Codex 16 条，把可安全下沉的（入口枚举、长路径列表）下沉；压缩与全套测试重写同提交完成，并同提交重生成 checked-in 文件；最后补强 description 与 guide/lightweight eval。** 保留的是治理，不是数字。
 
 ---
 
 ## 附录：评审 provenance（证据锚点）
 
-本第五版的修正来自会话内 `/spec:doc-review` 评审，**非独立持久化 review artifact**。诚实标注如下，供后续核验：
+本第五版的修正来自会话内 document-review workflow 评审（当时以 legacy `/spec:doc-review` spelling 触发），**非独立持久化 review artifact**。第六版追加统一 `spec-*`、Cursor 变体和 context-governance 测试影响面的 source-grounded 修正。诚实标注如下，供后续核验：
 
-- **评审方式**：`/spec:doc-review` 交互模式，Claude Code host，五 persona 有界并行 dispatch（会话内 subagent，无独立 artifact 文件）。
+- **评审方式**：document-review workflow 交互模式，Claude Code host，五 persona 有界并行 dispatch（会话内 subagent，无独立 artifact 文件）。
 - **persona 名单**：`spec-coherence-reviewer`、`spec-feasibility-reviewer`、`spec-scope-guardian-reviewer`、`spec-adversarial-document-reviewer`、`spec-product-lens-reviewer`。其中 feasibility 与 scope-guardian 首次因模型访问错误失败，经 `model: opus` 重试成功，5/5 覆盖完成。
 - **findings 计数**：合并去重后 P0×3、P1×4、P2×4、FYI×3；剔除 false positive×2（「缺 4-bullet 文本」实已提供、「description 已匹配」误读引用）。
-- **codebase 证据**：所有源码声明（14/16/14 条 bullet、测试断言范围、byte-exact 生成器耦合、`spawn_agent` codex-only、references/evals 已存在、`tests/unit/using-spec-first-contracts.test.js:74` 逐字断言 `what spec-first workflow or command to run next`）均直读 `spec-first` 源码确证（confirmed tier）。
+- **codebase 证据**：所有源码声明（Claude/Cursor/Qoder 14 条、Codex 16 条 bullet、8 变体范围、测试断言范围、byte-exact 生成器耦合、`spawn_agent` codex-only、references/evals 已存在、`tests/unit/context-governance-contracts.test.js` runtime exclusion 断言、`tests/unit/using-spec-first-contracts.test.js:74` 逐字断言 `what spec-first workflow or command to run next`）均直读 `spec-first` 源码确证（confirmed tier）。
 - **第二轮复审**：本附录、§4.6 baseline 契约、§4.1/§7 候选数字降级、根目录 `CHANGELOG.md` 同步，以及本目录与文件从 `use-spec-first-init*` 更名为 `using-spec-first-init-guidance-optimization`（修正被 §1 纠正过的错误名 use→using），来自对第五版初稿的再一次复审（2026-07-05）。
 - **限制**：评审为会话内产物，findings 的持久锚点是本文档的「评审修正摘要」与 §4 各节 `评审 Px` 标注；如需独立 artifact，应在实施时运行 `/spec:compound` 或将 findings 导出到 `docs/validation/`。
 
