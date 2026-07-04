@@ -284,8 +284,8 @@ const settingsPath = process.argv[2];
 const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
 const matchers = settings.hooks?.UserPromptExpansion;
 if (!Array.isArray(matchers)) throw new Error('missing UserPromptExpansion hook matchers');
-const matcher = matchers.find((entry) => entry.matcher === 'spec:plan');
-if (!matcher) throw new Error('missing spec:plan UserPromptExpansion matcher');
+const matcher = matchers.find((entry) => entry.matcher === 'spec-plan');
+if (!matcher) throw new Error('missing spec-plan UserPromptExpansion matcher');
 const command = matcher.hooks?.find((hook) => hook.type === 'command')?.command || '';
 if (!command.includes('.claude/hooks/spec-plan-guard')) {
   throw new Error('spec-plan guard matcher does not invoke managed hook');

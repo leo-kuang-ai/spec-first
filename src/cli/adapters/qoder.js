@@ -214,9 +214,9 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --qoder')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --qoder')
     .replace(/\$spec-\*/g, 'Qoder project commands or Skills')
-    .replace(/\$spec-mcp-setup/g, 'Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup`')
+    .replace(/\$spec-mcp-setup/g, 'Qoder `spec-mcp-setup` entrypoint')
     .replace(/Kiro Agent Skills/g, 'Qoder project commands or Skills')
-    .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup`');
+    .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Qoder `spec-mcp-setup` entrypoint');
 
   return rewritten;
 }

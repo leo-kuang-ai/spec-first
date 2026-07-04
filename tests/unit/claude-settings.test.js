@@ -675,7 +675,7 @@ describe('claude settings', () => {
         encoding: 'utf8',
         input: JSON.stringify({
           hook_event_name: 'UserPromptExpansion',
-          command_name: 'spec:plan',
+          command_name: 'spec-plan',
           permission_mode: 'plan',
         }),
       });
@@ -705,7 +705,7 @@ describe('claude settings', () => {
         encoding: 'utf8',
         input: JSON.stringify({
           hook_event_name: 'UserPromptExpansion',
-          command_name: 'spec:plan',
+          command_name: 'spec-plan',
           permission_mode: 'default',
           prompt: 'x'.repeat(1024 * 1024),
         }),

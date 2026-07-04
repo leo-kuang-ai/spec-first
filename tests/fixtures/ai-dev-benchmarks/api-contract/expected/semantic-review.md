@@ -7,7 +7,7 @@
 - status: `recorded`
 - workflow execution: not executed
 
-This evidence records a bounded LLM review of the expected successful output for the fixture. It does not claim that `$spec-work` ran against this fixture.
+This evidence records a bounded LLM review of the expected successful output for the fixture. It does not claim that `spec-work` ran against this fixture.
 
 ## Review Checklist
 

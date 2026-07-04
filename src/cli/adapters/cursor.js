@@ -223,7 +223,7 @@ function rewriteSharedPaths(content) {
     .replace(/Kiro Agent Skills/g, 'Cursor Agent Skills')
     .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Cursor Agent Skill `spec-mcp-setup`')
     .replace(/Qoder project commands or Skills/g, 'Cursor Agent Skills')
-    .replace(/Qoder project command `(?:\/spec:mcp-setup|spec-mcp-setup)` or Skill `spec-mcp-setup`/g, 'Cursor Agent Skill `spec-mcp-setup`');
+    .replace(/Qoder `(?:\/spec:mcp-setup|spec-mcp-setup)` entrypoint/g, 'Cursor Agent Skill `spec-mcp-setup`');
 }
 
 function normalizeCursorSkillFrontmatter(content, context = {}) {
