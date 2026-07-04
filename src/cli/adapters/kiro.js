@@ -59,10 +59,13 @@ class KiroAdapter extends PlatformAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    const transformed = rewriteSkillName(
+    let transformed = rewriteSkillName(
       rewriteSharedPaths(content),
       kiroRuntimeSkillName(context),
     );
+    if (isKiroRuntimeSetupSurface(context)) {
+      transformed = addKiroSetupHostPin(transformed);
+    }
     const runtimeSkillRoot = context.runtimeSkillRoot
       || (context.isWorkflowSkill ? `${this.workflowsRoot}/${context.skillName}` : '');
     return runtimeSkillRoot
@@ -169,6 +172,25 @@ function rewriteSkillName(content, skillName) {
 
 function kiroRuntimeSkillName(context = {}) {
   return normalizeKiroName(context.skillName);
+}
+
+function isKiroRuntimeSetupSurface(context = {}) {
+  return context.skillName === 'spec-mcp-setup';
+}
+
+function addKiroSetupHostPin(content) {
+  if (content.includes('## Kiro Host Pin')) {
+    return content;
+  }
+
+  return content.replace(/## Workflow Modes\n/, [
+    '## Kiro Host Pin',
+    '',
+    'When this generated Kiro Agent Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, and Qoder CLIs can coexist on the same machine.',
+    '',
+    '## Workflow Modes',
+    '',
+  ].join('\n'));
 }
 
 function splitMarkdownFrontmatter(content) {

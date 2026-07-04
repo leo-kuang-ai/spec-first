@@ -141,4 +141,47 @@ describe('init source path coverage', () => {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
   });
+
+  test('claude runtime setup projection pins Claude host before host config writes', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-claude-setup-projection-'));
+
+    try {
+      const claudePlan = planBundledAssetSync(projectRoot, new ClaudeAdapter()).plan;
+      const setupSkill = claudePlan.operations.find((operation) =>
+        operation.path === '.claude/spec-first/workflows/spec-mcp-setup/SKILL.md',
+      );
+      const setupCommand = claudePlan.operations.find((operation) =>
+        operation.path === '.claude/commands/spec/mcp-setup.md',
+      );
+
+      expect(setupSkill).toEqual(expect.objectContaining({ kind: 'write_file' }));
+      expect(setupCommand).toEqual(expect.objectContaining({ kind: 'write_file' }));
+      for (const operation of [setupSkill, setupCommand]) {
+        expect(operation.contents).toContain('## Claude Host Pin');
+        expect(operation.contents).toContain('MCP_SETUP_HOST=claude');
+        expect(operation.contents).toContain('Treat `/spec:mcp-setup` and `/spec:runtime-setup` command entry as authoritative Claude host evidence');
+        expect(operation.contents).toContain('Never manually choose `.kiro/settings/mcp.json`');
+      }
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('kiro runtime setup projection pins Kiro host detection', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-kiro-setup-projection-'));
+
+    try {
+      const kiroPlan = planBundledAssetSync(projectRoot, new KiroAdapter()).plan;
+      const setupSkill = kiroPlan.operations.find((operation) =>
+        operation.path === '.kiro/skills/spec-mcp-setup/SKILL.md',
+      );
+
+      expect(setupSkill).toEqual(expect.objectContaining({ kind: 'write_file' }));
+      expect(setupSkill.contents).toContain('## Kiro Host Pin');
+      expect(setupSkill.contents).toContain('MCP_SETUP_HOST=kiro');
+      expect(setupSkill.contents).toContain('Do not rely on automatic host detection from PATH');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
 });
