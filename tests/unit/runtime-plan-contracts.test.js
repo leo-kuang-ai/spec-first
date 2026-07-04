@@ -138,7 +138,7 @@ describe('runtime plan contracts', () => {
         reason: 'managed_runtime_hook',
       },
     ]);
-    expect(plan.summary).toEqual({ remove_file: 4 });
+    expect(plan.summary).toEqual({ remove_dir: 1, remove_file: 4 });
   });
 
   test('Codex runtime plans retain legacy cleanup while adding SessionStart hook assets', () => {

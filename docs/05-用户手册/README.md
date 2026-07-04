@@ -4,9 +4,9 @@
 
 `spec-first` 是面向 Claude Code、Codex、Kiro 与 Qoder 的 **AI Coding Harness**：它把一次性的 AI coding 对话，变成可治理、可验证、可复用的工程闭环。AI 写代码很快，真正会丢失的是塑造代码的判断——需求、计划、评审结论和经验常常随对话窗口一起消失。`spec-first` 把这些工作作为持久 artifact 留在你的仓库里：**脚本产出可信事实，LLM 做语义判断，证据留在仓库**，让下一次会话、reviewer 和同事直接继承上下文，而不是从零开始。Kiro 与 Qoder 当前都是 opt-in preview 宿主。
 
-落到 CLI，它通过 `doctor / init [--claude] [--codex] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--kiro|--qoder)` 把 Claude Code 的 `/spec:*` 命令、Codex 的 `$spec-*` skills、Kiro Agent Skills、Qoder project commands/skills、workflow skills、agents、agent support files、项目级 `.developer` 和受管状态安装到当前项目中。
+落到 CLI，它通过 `doctor / init [--claude] [--codex] [--kiro] [--qoder] [-y] / update / clean (--claude|--codex|--kiro|--qoder)` 把统一的 `spec-*` workflow 入口投射到 Claude Code commands、Codex skills、Kiro Agent Skills、Qoder project commands/skills，并同步 workflow skills、agents、agent support files、项目级 `.developer` 和受管状态。
 
-完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `/spec:*`、`$spec-*`、Kiro Agent Skill 或 Qoder `/spec:*` workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
+完成 `doctor`、`init` 和宿主重启后，轻量任务可以直接进入匹配的 `spec-*` workflow。`spec-mcp-setup` 是 required harness runtime 的 setup 路径；普通 plan/work/debug/review 使用 bounded direct source reads、`rg`、ast-grep、git diff、tests、logs 和用户提供证据。
 
 当前推荐的事实准备、专项审查与知识沉淀入口：
 
@@ -38,12 +38,11 @@
 
 ## 你会得到什么
 
-- 一个前置的 `/spec:ideate` 候选发散入口
-- Claude Code 的 `/spec:*` 命令入口
-- Codex 的 `$spec-*` skill 入口
+- 一个前置的 `spec-ideate` 候选发散入口
+- 跨宿主统一的 `spec-*` workflow 入口
 - 当前推荐的 App 一致性审查入口 `spec-app-consistency-audit`、source skill 审计入口 `spec-skill-audit`，以及知识沉淀入口 `spec-compound`
 - 一条 `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 的标准闭环
-- 项目级 `.claude/commands/spec`
+- 项目级 `.claude/commands/spec-*.md`
 - 项目级 `.claude/skills`、`.claude/spec-first/workflows` 与 `.claude/agents`
 - 项目级 `.agents/skills` 与 `.codex/agents`
 - 项目级 `.claude/spec-first/.developer` / `.codex/spec-first/.developer`
@@ -72,7 +71,7 @@ mcp-setup
   -> 反哺项目知识、文档、skills 和下一次 workflow 选择
 ```
 
-这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由入口治理推荐一个公开 workflow。`write-tasks` 是可选派生 workflow：Claude 使用 `/spec:write-tasks`，Codex 使用 `$spec-write-tasks`；它不替代 source plan，也不是强制阶段。
+这不是必须顺序执行的命令链。用户应从当前状态最匹配的节点进入；当下一步不清楚时，在宿主会话里询问即可由入口治理推荐一个公开 workflow。`write-tasks` 是可选派生 workflow，入口是 `spec-write-tasks`；它不替代 source plan，也不是强制阶段。
 
 当外部工具或 setup facts 缺失时，workflow 可以用 bounded direct repo reads 继续，但必须披露 limitation；不要把缺失证据包装成成功证据，也不要把 setup 当成所有 workflow 的硬前置。
 
@@ -91,8 +90,7 @@ mcp-setup
 移动 App 的产品、设计和代码在进入模拟器、真机或打包验证前，可以使用专项入口做静态一致性审查：
 
 ```text
-/spec:app-consistency-audit prd:<path> figma-context:<path> source:<path>
-$spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
+spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 ```
 
 它适合检查 PRD、materialized Figma context、本地源码、页面路由、KMP / Clean Architecture、组件复用、埋点、i18n 和行业规则之间是否一致。审查产物写入 `.spec-first/app-audit/runs/<run-id>/`，默认是 runtime/control-plane evidence，不作为长期手工维护文档提交。

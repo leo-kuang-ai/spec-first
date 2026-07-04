@@ -86,7 +86,7 @@
     <rect x="150" y="68" width="120" height="74" rx="14" fill="#EAF4FF" stroke="#B8D7F5"/>
   </g>
   <text x="210" y="88" class="stageTitle center">🧠 Brainstorm</text>
-  <text x="210" y="106" class="stageCmd center">/spec:brainstorm</text>
+  <text x="210" y="106" class="stageCmd center">spec-brainstorm</text>
   <text x="210" y="124" class="stageOutput center">需求文档</text>
 
   <!-- Arrow: Brainstorm → Plan -->
@@ -99,7 +99,7 @@
     <rect x="300" y="68" width="120" height="74" rx="14" fill="#EAF9F3" stroke="#B5DBC9"/>
   </g>
   <text x="360" y="88" class="stageTitle center">📋 Plan</text>
-  <text x="360" y="106" class="stageCmd center">/spec:plan</text>
+  <text x="360" y="106" class="stageCmd center">spec-plan</text>
   <text x="360" y="124" class="stageOutput center">实施计划</text>
 
   <!-- Arrow: Plan → Work -->
@@ -112,7 +112,7 @@
     <rect x="450" y="68" width="120" height="74" rx="14" fill="#FFF6E8" stroke="#E5D1B1"/>
   </g>
   <text x="510" y="88" class="stageTitle center">⚡ Work</text>
-  <text x="510" y="106" class="stageCmd center">/spec:work</text>
+  <text x="510" y="106" class="stageCmd center">spec-work</text>
   <text x="510" y="124" class="stageOutput center">代码 + 测试</text>
 
   <!-- Arrow: Work → Review -->
@@ -125,7 +125,7 @@
     <rect x="600" y="68" width="120" height="74" rx="14" fill="#F4EEFF" stroke="#D9CCF1"/>
   </g>
   <text x="660" y="88" class="stageTitle center">🔎 Review</text>
-  <text x="660" y="106" class="stageCmd center">/spec:code-review</text>
+  <text x="660" y="106" class="stageCmd center">spec-code-review</text>
   <text x="660" y="124" class="stageOutput center">审查报告</text>
 
   <!-- Arrow: Review → Compound -->
@@ -138,7 +138,7 @@
     <rect x="750" y="68" width="120" height="74" rx="14" fill="#FFF1EB" stroke="#E5CBBF"/>
   </g>
   <text x="810" y="88" class="stageTitle center">📚 Compound</text>
-  <text x="810" y="106" class="stageCmd center">/spec:compound</text>
+  <text x="810" y="106" class="stageCmd center">spec-compound</text>
   <text x="810" y="124" class="stageOutput center">知识文档</text>
 
   <!-- Arrow: Compound → End -->

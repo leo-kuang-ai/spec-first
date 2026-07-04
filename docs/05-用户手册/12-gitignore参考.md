@@ -24,7 +24,7 @@
 ```gitignore
 # spec-first:start
 # spec-first generated runtime assets
-.claude/commands/spec/
+.claude/commands/spec-*.md
 .claude/commands/spec-*.md
 .claude/skills/
 .claude/spec-first/
@@ -187,7 +187,7 @@ graphify-out/
 
 | 路径 | 原因 |
 | --- | --- |
-| `.claude/commands/spec-*.md`、`.claude/commands/spec/`、`.claude/skills/`、`.claude/spec-first/`、`.claude/agents/` | `spec-first init` 可重建的 runtime assets；`.claude/commands/spec/` 是旧版命名空间清理目标 |
+| `.claude/commands/spec-*.md`、`.claude/commands/spec-*.md`、`.claude/skills/`、`.claude/spec-first/`、`.claude/agents/` | `spec-first init` 可重建的 runtime assets；`.claude/commands/spec-*.md` 是旧版命名空间清理目标 |
 | `.claude/tasks/`、`.claude/worktrees/` | Claude Code host-local scratch/worktree 产物 |
 | `.codex/`、`.agents/skills/` | Codex host/runtime assets 与 `spec-first init` 可重建的 runtime mirror |
 | `.cursor/skills/`、`.cursor/spec-first/` | Cursor preview spec-first-managed runtime mirror 与 state，可由 `init --cursor` 重建 |

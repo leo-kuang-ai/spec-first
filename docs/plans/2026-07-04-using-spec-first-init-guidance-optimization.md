@@ -5,7 +5,7 @@
 > 二次修订：2026-07-04 23:44
 > 压缩复审：2026-07-04 23:58
 > 钢板复审：2026-07-04
-> 评审修正：2026-07-05（基于 `/spec:doc-review` 五 persona 评审，逐条落地）
+> 评审修正：2026-07-05（基于 document-review workflow 五 persona 评审，逐条落地；当时使用 legacy `/spec:doc-review` spelling）
 > 入口统一修正：2026-07-05（基于最新 source：公开入口统一为 `spec-*`，legacy `/spec:*` / `$spec-*` 仅作为归一化输入）
 > 主题：`using-spec-first` skill 的路由边界，以及 `spec-first init` 写入 `CLAUDE.md` / `AGENTS.md` 的常驻引导内容
 > 目标项目：`spec-first`
@@ -30,7 +30,7 @@
 
 ---
 
-## 0. 第五次结论
+## 0. 第六次结论
 
 这份优化方案的核心方向依然成立：区分 `using-spec-first` 的入口治理职责与 `spec-first init` 的 runtime 投射职责，并按 progressive disclosure 维护 L0/L1/L2/L3 分层、防止常驻块退化。
 
@@ -44,7 +44,7 @@
 
 一句话判断（修正版）：
 
-> 最值得做的仍是把已有分层压实，但顺序要倒过来：**先用 baseline 验证当前 bootstrap 的问题、收益和可删边界，再按「不路由那轮是否失效」准则逐条判定 14 条的去留，把可安全下沉的（入口枚举、长路径列表）下沉，同时同步重写全套测试守护**；不要以错误基线追求一个不可达的「4 条」数字。
+> 最值得做的仍是把已有分层压实，但顺序要倒过来：**先用 baseline 验证当前 bootstrap 的问题、收益和可删边界，再按「不路由那轮是否失效」准则逐条判定 Claude/Cursor/Qoder 14 条、Codex 16 条的去留，把可安全下沉的（入口枚举、长路径列表）下沉，同时同步重写全套测试守护**；不要以错误基线追求一个不可达的「4 条」数字。
 
 ---
 
@@ -129,7 +129,7 @@ L3：evals / docs / solutions
 
 `spec-first init` 通过 `src/cli/commands/init.js` 的 init plan 写入 instruction file，并由 `src/cli/instruction-bootstrap.js` 的 `buildBootstrapBlock` 生成 bootstrap block。常驻引导是 CLI init 的 runtime 投射职责，不是 `using-spec-first` skill 的职责。
 
-### 3.2 当前实际规模：14 条，不是「短锚点」也不是「5 条」（评审 P0-1 / P2-3）
+### 3.2 当前实际规模：14/16 条，不是「短锚点」也不是「5 条」（评审 P0-1 / P2-3）
 
 第四版称「已实现：短锚点」，与 §4「仍偏长需钢板压缩」自相矛盾。用源码实测消除这个矛盾——`buildBootstrapBlock` 当前实际产出：
 
@@ -158,7 +158,7 @@ NODE
 
 Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 workflow ③何时直接做 ④何时不重新分流 ⑤如何路由 ⑥常见入口锚点（枚举 12 个 `spec-*` 入口）⑦外部 issue/PR 输入 ⑧语言策略指针 ⑨父级多仓 `target_repo` ⑩Runtime-context 排除（generated mirror 长路径列表）⑪角色契约读取指针 ⑫反合理化红旗 ⑬host 入口 / delivery 行 ⑭surface / internal-only 行。Codex 在此基础上多 2 条（startup-reminder、spawn_agent 授权）。Cursor 与 Qoder 当前均为 14 条，但 Cursor/Codex 因 `spec-using-spec-first` 否定示例会被粗糙正则误计出额外 identifier，测试迁移时必须只统计正向入口锚点。
 
-结论：当前既不是「短锚点」，也不是「5 条」。§4 的「压缩」必须以 14 条为基线，且要逐条决定去留。
+结论：当前既不是「短锚点」，也不是「5 条」。§4 的「压缩」必须以 Claude/Cursor/Qoder 14 条、Codex 16 条为基线，且要逐条决定去留。
 
 ### 3.3 当前测试守护范围（远超「三类」，评审 P0-3 前置）
 
@@ -174,9 +174,9 @@ Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 w
 
 ## 4. 修订后的开放优化点
 
-### 4.1 P0：以 14 条为基线，按准入准则逐条判定（取代原「压到 4 条」）
+### 4.1 P0：以 14/16 条为基线，按准入准则逐条判定（取代原「压到 4 条」）
 
-原「从 5 条压到 4 条」作废。正确做法是对当前 14 条逐条应用 §2 的准入准则（「不路由那一轮是否失效」），得出 keep / sink / drop：
+原「从 5 条压到 4 条」作废。正确做法是对当前 Claude/Cursor/Qoder 14 条、Codex 16 条逐条应用 §2 的准入准则（「不路由那一轮是否失效」），得出 keep / sink / drop：
 
 | # | 当前条目 | 判定 | 依据 |
 |---|---|---|---|
@@ -457,6 +457,6 @@ evals/*.json
 - **findings 计数**：合并去重后 P0×3、P1×4、P2×4、FYI×3；剔除 false positive×2（「缺 4-bullet 文本」实已提供、「description 已匹配」误读引用）。
 - **codebase 证据**：所有源码声明（Claude/Cursor/Qoder 14 条、Codex 16 条 bullet、8 变体范围、测试断言范围、byte-exact 生成器耦合、`spawn_agent` codex-only、references/evals 已存在、`tests/unit/context-governance-contracts.test.js` runtime exclusion 断言、`tests/unit/using-spec-first-contracts.test.js:74` 逐字断言 `what spec-first workflow or command to run next`）均直读 `spec-first` 源码确证（confirmed tier）。
 - **第二轮复审**：本附录、§4.6 baseline 契约、§4.1/§7 候选数字降级、根目录 `CHANGELOG.md` 同步，以及本目录与文件从 `use-spec-first-init*` 更名为 `using-spec-first-init-guidance-optimization`（修正被 §1 纠正过的错误名 use→using），来自对第五版初稿的再一次复审（2026-07-05）。
-- **限制**：评审为会话内产物，findings 的持久锚点是本文档的「评审修正摘要」与 §4 各节 `评审 Px` 标注；如需独立 artifact，应在实施时运行 `/spec:compound` 或将 findings 导出到 `docs/validation/`。
+- **限制**：评审为会话内产物，findings 的持久锚点是本文档的「评审修正摘要」与 §4 各节 `评审 Px` 标注；如需独立 artifact，应在实施时运行 `spec-compound` 或将 findings 导出到 `docs/validation/`。
 
 > 说明：本节将「五 persona 评审」这一 provenance claim 落到可核验锚点（persona 名单、findings 计数、源码证据、限制），而非不可验证的权威背书。

@@ -17,6 +17,7 @@ const {
 } = require('../../src/cli/instruction-bootstrap');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
+const NON_WORKFLOW_SPEC_IDS = new Set(['*', 'using-spec-first']);
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-bootstrap-'));
@@ -578,7 +579,7 @@ describe('instruction bootstrap', () => {
         const block = buildBootstrapBlock(host, lang);
         const blockIds = new Set([...block.matchAll(/`spec-([a-z-]+)`/g)]
           .map((m) => m[1])
-          .filter((id) => id !== '*'));
+          .filter((id) => !NON_WORKFLOW_SPEC_IDS.has(id)));
         // block ⊆ SKILL:不得含 SKILL Route Map 之外的入口(防自造入口/drift)
         for (const id of blockIds) {
           expect(skillIds.has(id)).toBe(true);
