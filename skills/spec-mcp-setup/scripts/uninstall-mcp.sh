@@ -13,11 +13,12 @@ source "$SCRIPT_DIR/lib-toml.sh"
 source "$SCRIPT_DIR/lib-template.sh"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
 
-KIRO_USER_SCOPE_ARG=false
+USER_SCOPE_ARG=false
 for arg in "$@"; do
   if [ "$arg" = "--user-scope" ]; then
-    KIRO_USER_SCOPE_ARG=true
+    USER_SCOPE_ARG=true
     export KIRO_USER_SCOPE=1
+    export QODER_USER_SCOPE=1
   fi
 done
 
@@ -33,8 +34,9 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     --user-scope)
-      KIRO_USER_SCOPE_ARG=true
+      USER_SCOPE_ARG=true
       export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
       shift
       ;;
     *)
@@ -55,12 +57,21 @@ resolve_path_template() {
   esac
 }
 
-kiro_user_scope_requested() {
-  [ "$KIRO_USER_SCOPE_ARG" = "true" ] && return 0
-  case "${KIRO_USER_SCOPE:-}" in
-    1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
-    *) return 1 ;;
-  esac
+host_user_scope_requested() {
+  [ "$USER_SCOPE_ARG" = "true" ] && return 0
+  if [ "$HOST" = "kiro" ]; then
+    case "${KIRO_USER_SCOPE:-}" in
+      1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+  if [ "$HOST" = "qoder" ]; then
+    case "${QODER_USER_SCOPE:-}" in
+      1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+  return 1
 }
 
 remove_claude_entry() {
@@ -122,14 +133,14 @@ for tool_id in "${TOOL_IDS[@]}"; do
     [ "$target_json" != "null" ] || continue
     raw_path="$(jq -r '.config_path | if type == "object" then .[$platform] // empty else . end' --arg platform "$PLATFORM" <<<"$target_json")"
     [ -n "$raw_path" ] || continue
-    if [ "$HOST" = "kiro" ] && [ "$target_key" = "user" ] && ! kiro_user_scope_requested; then
+    if { [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ]; } && [ "$target_key" = "user" ] && ! host_user_scope_requested; then
       continue
     fi
     config_path="$(jq -r --arg key "$target_key" '.targets[$key].config_path // empty' <<<"$HOST_INFO_JSON")"
     [ -n "$config_path" ] || config_path="$(resolve_path_template "$raw_path")"
     if [ "$HOST" = "claude" ]; then
       remove_claude_entry "$config_path" "$detect_key"
-    elif [ "$HOST" = "kiro" ]; then
+    elif [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ]; then
       remove_json_mcp_entry "$config_path" "$detect_key"
     elif [ "$HOST" = "codex" ]; then
       remove_codex_entry "$config_path" "$detect_key"

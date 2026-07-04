@@ -33,6 +33,11 @@ describe('spec-first gitignore policy', () => {
     expect(patterns).toContain('.kiro/agents/');
     expect(patterns).toContain('.kiro/spec-first/');
     expect(patterns).toContain('.kiro/settings/');
+    expect(patterns).toContain('.qoder/commands/spec/');
+    expect(patterns).toContain('.qoder/skills/');
+    expect(patterns).toContain('.qoder/agents/');
+    expect(patterns).toContain('.qoder/spec-first/');
+    expect(patterns).toContain('.qoder/settings.local.json');
     expect(getSpecFirstGitignorePatternMetadata()).toEqual({});
     expect(patterns).toContain('.spec-first/config/*.json');
     expect(patterns).toContain('.spec-first/governance/');
@@ -49,6 +54,10 @@ describe('spec-first gitignore policy', () => {
     expect(patterns).not.toContain('.agents/');
     expect(patterns).not.toContain('.kiro/');
     expect(patterns).not.toContain('.kiro/specs/');
+    expect(patterns).not.toContain('.qoder/');
+    expect(patterns).not.toContain('.qoder/rules/');
+    expect(patterns).not.toContain('.qoder/settings.json');
+    expect(patterns).not.toContain('.qoder/hooks/');
     expect(patterns).not.toContain('.spec-first/');
     expect(patterns).not.toContain('*.tgz');
     expect(block).toContain([

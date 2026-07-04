@@ -59,6 +59,10 @@ const GENERATED_RUNTIME_MIRROR_PREFIXES = [
   '.kiro/agents/',
   '.kiro/spec-first/',
   '.kiro/settings/',
+  '.qoder/commands/spec/',
+  '.qoder/skills/',
+  '.qoder/agents/',
+  '.qoder/spec-first/',
 ];
 const GENERATED_RUNTIME_MIRROR_ROOTS = new Set([
   '.claude',
@@ -68,6 +72,11 @@ const GENERATED_RUNTIME_MIRROR_ROOTS = new Set([
   '.kiro/agents',
   '.kiro/spec-first',
   '.kiro/settings',
+  '.qoder/commands/spec',
+  '.qoder/skills',
+  '.qoder/agents',
+  '.qoder/spec-first',
+  '.qoder/settings.local.json',
 ]);
 
 function normalizeNewlines(text) {

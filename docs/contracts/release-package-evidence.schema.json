@@ -43,6 +43,8 @@
         "package_content_manifest",
         "init_claude_programmatic_log",
         "init_codex_programmatic_log",
+        "init_kiro_programmatic_log",
+        "init_qoder_programmatic_log",
         "release_artifact_summary"
       ],
       "properties": {
@@ -51,6 +53,8 @@
         "package_content_manifest": { "type": "string", "const": "package-content-manifest.json" },
         "init_claude_programmatic_log": { "type": "string", "const": "init-claude-programmatic.log" },
         "init_codex_programmatic_log": { "type": "string", "const": "init-codex-programmatic.log" },
+        "init_kiro_programmatic_log": { "type": "string", "const": "init-kiro-programmatic.log" },
+        "init_qoder_programmatic_log": { "type": "string", "const": "init-qoder-programmatic.log" },
         "release_artifact_summary": { "type": "string", "const": "release-artifact-summary.json" }
       },
       "additionalProperties": false

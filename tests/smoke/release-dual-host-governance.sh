@@ -11,6 +11,7 @@ TARBALL_DIR="$TMP_ROOT/tarball"
 CODEX_PROJECT="$TMP_ROOT/codex-project"
 CLAUDE_PROJECT="$TMP_ROOT/claude-project"
 KIRO_PROJECT="$TMP_ROOT/kiro-project"
+QODER_PROJECT="$TMP_ROOT/qoder-project"
 PACKAGE_VERSION="$(node -p "require(process.argv[1]).version" "$REPO_ROOT/package.json")"
 
 cleanup() {
@@ -33,6 +34,7 @@ echo "2. 校验 tarball 包含 runtime governance assets..."
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/contracts/dual-host-governance/skills-governance.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/contracts/dual-host-governance/skills-governance.schema.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/adapters/kiro.js$'
+tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/adapters/qoder.js$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/docs/contracts/verifiers/verification-evidence.schema.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/scripts/typecheck-js.js$'
 if tar -tf "$TARBALL_PATH" | grep -q '^package/docs/contracts/dual-host-governance/skills-governance.json$'; then
@@ -207,7 +209,58 @@ test -f "$KIRO_PROJECT/.kiro/settings/user.json"
 test -f "$KIRO_PROJECT/.kiro/specs/native/spec.md"
 echo "   ✓ Kiro 安装态闭环通过"
 
-echo "6. 验证 Claude 安装态 init / doctor..."
+echo "6. 验证 Qoder 安装态 init / doctor / clean..."
+mkdir -p "$QODER_PROJECT"
+qoder_init_output="$(
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$QODER_PROJECT" qoder test en 2>&1
+)"
+grep -q 'command file(s) in .qoder/commands/spec' <<<"$qoder_init_output"
+grep -q 'skill directory(ies) in .qoder/skills' <<<"$qoder_init_output"
+grep -q 'agent file(s) in .qoder/agents' <<<"$qoder_init_output"
+test -f "$QODER_PROJECT/.qoder/commands/spec/work.md"
+test -f "$QODER_PROJECT/.qoder/commands/spec/mcp-setup.md"
+test -f "$QODER_PROJECT/.qoder/skills/spec-work/SKILL.md"
+test -f "$QODER_PROJECT/.qoder/skills/spec-mcp-setup/SKILL.md"
+test -f "$QODER_PROJECT/.qoder/skills/using-spec-first/SKILL.md"
+test -f "$QODER_PROJECT/.qoder/agents/spec-repo-research-analyst.agent.md"
+grep -q '^tools: \[Read, Grep, Glob\]$' "$QODER_PROJECT/.qoder/agents/spec-repo-research-analyst.agent.md"
+test -f "$QODER_PROJECT/.qoder/spec-first/state.json"
+test ! -e "$QODER_PROJECT/.qoder/rules"
+test ! -e "$QODER_PROJECT/.qoder/hooks"
+
+qoder_doctor_output="$(
+  cd "$QODER_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --qoder 2>&1
+)"
+grep -q '.qoder/commands/spec' <<<"$qoder_doctor_output"
+grep -q '.qoder/skills' <<<"$qoder_doctor_output"
+grep -q '.qoder/agents' <<<"$qoder_doctor_output"
+grep -q '.qoder/spec-first/state.json' <<<"$qoder_doctor_output"
+if command -v qodercli >/dev/null 2>&1 || command -v qoder >/dev/null 2>&1; then
+  qoder_loader_command="$(command -v qodercli 2>/dev/null || command -v qoder 2>/dev/null)"
+  "$qoder_loader_command" --version >/dev/null 2>&1 || true
+  echo "   ! Qoder loader smoke degraded: Qoder CLI is present at $qoder_loader_command, but no non-interactive project loader probe is defined"
+else
+  echo "   ! Qoder loader smoke degraded: qodercli/qoder not found on PATH"
+fi
+mkdir -p "$QODER_PROJECT/.qoder/rules" "$QODER_PROJECT/.qoder/hooks"
+printf '# Native Qoder rule\n' > "$QODER_PROJECT/.qoder/rules/security.md"
+printf '{"custom":true}\n' > "$QODER_PROJECT/.qoder/settings.json"
+printf '{"hooks":[]}\n' > "$QODER_PROJECT/.qoder/hooks/custom.json"
+(
+  cd "$QODER_PROJECT"
+  "$SHIM" clean --qoder >/dev/null
+)
+test ! -e "$QODER_PROJECT/.qoder/commands/spec"
+test ! -e "$QODER_PROJECT/.qoder/skills"
+test ! -e "$QODER_PROJECT/.qoder/agents"
+test ! -e "$QODER_PROJECT/.qoder/spec-first"
+test -f "$QODER_PROJECT/.qoder/rules/security.md"
+test -f "$QODER_PROJECT/.qoder/settings.json"
+test -f "$QODER_PROJECT/.qoder/hooks/custom.json"
+echo "   ✓ Qoder 安装态闭环通过"
+
+echo "7. 验证 Claude 安装态 init / doctor..."
 mkdir -p "$CLAUDE_PROJECT"
 claude_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CLAUDE_PROJECT" claude test en 2>&1

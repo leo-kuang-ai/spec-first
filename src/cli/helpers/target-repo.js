@@ -15,6 +15,10 @@ const GENERATED_RUNTIME_PREFIXES = Object.freeze([
   '.kiro/agents/',
   '.kiro/spec-first/',
   '.kiro/settings/',
+  '.qoder/commands/spec/',
+  '.qoder/skills/',
+  '.qoder/agents/',
+  '.qoder/spec-first/',
 ]);
 const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.claude',
@@ -24,6 +28,11 @@ const GENERATED_RUNTIME_ROOTS = Object.freeze([
   '.kiro/agents',
   '.kiro/spec-first',
   '.kiro/settings',
+  '.qoder/commands/spec',
+  '.qoder/skills',
+  '.qoder/agents',
+  '.qoder/spec-first',
+  '.qoder/settings.local.json',
 ]);
 
 function resolveTargetRepoRoot(targetRepo) {

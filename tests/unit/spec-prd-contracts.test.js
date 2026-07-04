@@ -411,6 +411,7 @@ describe('spec-prd workflow contracts', () => {
     const manifest = loadPluginManifest();
     const claudeAssets = buildFilteredAssetSet('claude');
     const codexAssets = buildFilteredAssetSet('codex');
+    const qoderAssets = buildFilteredAssetSet('qoder');
 
     expect(governance.skills).toEqual(
       expect.arrayContaining([
@@ -424,6 +425,7 @@ describe('spec-prd workflow contracts', () => {
             claude: 'command',
             codex: 'skill',
             kiro: 'skill',
+            qoder: 'command',
           },
         },
       ]),
@@ -444,6 +446,8 @@ describe('spec-prd workflow contracts', () => {
     expect(claudeAssets.workflowSkills).toContain('spec-prd');
     expect(codexAssets.workflowSkills).toContain('spec-prd');
     expect(buildFilteredAssetSet('kiro').workflowSkills).toContain('spec-prd');
+    expect(qoderAssets.commands.map((command) => command.name)).toContain('prd');
+    expect(qoderAssets.workflowSkills).toContain('spec-prd');
     expect(codexAssets.commands.map((command) => command.name)).not.toContain('prd');
   });
 

@@ -14,6 +14,7 @@ for arg in "$@"; do
   if [ "$arg" = "--user-scope" ]; then
     KIRO_USER_SCOPE_ARG=true
     export KIRO_USER_SCOPE=1
+    export QODER_USER_SCOPE=1
   fi
 done
 
@@ -266,6 +267,7 @@ while [[ $# -gt 0 ]]; do
     --user-scope)
       KIRO_USER_SCOPE_ARG=true
       export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
       shift
       ;;
     --requirement-workspace)

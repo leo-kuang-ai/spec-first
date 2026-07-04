@@ -128,6 +128,9 @@ runtime_state_path_for_host() {
     kiro)
       printf '%s/.kiro/spec-first/state.json' "$target_root"
       ;;
+    qoder)
+      printf '%s/.qoder/spec-first/state.json' "$target_root"
+      ;;
     *)
       printf ''
       ;;
@@ -993,6 +996,14 @@ case "$host_name" in
   codex)
     host_display="Codex"
     setup_command='$spec-mcp-setup'
+    ;;
+  kiro)
+    host_display="Kiro"
+    setup_command='Kiro Agent Skill spec-mcp-setup'
+    ;;
+  qoder)
+    host_display="Qoder"
+    setup_command='Qoder project command /spec:mcp-setup or Skill spec-mcp-setup'
     ;;
   *)
     host_display="Claude Code / Codex"

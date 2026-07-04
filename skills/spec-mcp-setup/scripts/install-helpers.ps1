@@ -405,7 +405,8 @@ function Test-GlobalSkill {
     (Test-Path (Join-Path $HOME ".agents/skills/$Name/SKILL.md")) -or
     (Test-Path (Join-Path $HOME ".claude/skills/$Name/SKILL.md")) -or
     (Test-Path (Join-Path $HOME ".codex/skills/$Name/SKILL.md")) -or
-    (Test-Path (Join-Path $HOME ".kiro/skills/$Name/SKILL.md"))
+    (Test-Path (Join-Path $HOME ".kiro/skills/$Name/SKILL.md")) -or
+    (Test-Path (Join-Path $HOME ".qoder/skills/$Name/SKILL.md"))
   )
 }
 
@@ -1336,7 +1337,7 @@ function Install-GraphifyCli {
 
 function Get-GraphifyProjectPlatform {
   $hostValue = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_HOST')
-  if (@('claude', 'codex', 'kiro') -contains $hostValue) { return $hostValue }
+  if (@('claude', 'codex', 'kiro', 'qoder') -contains $hostValue) { return $hostValue }
   return 'codex'
 }
 
@@ -1424,6 +1425,9 @@ function Test-GraphifyProjectSkillConfigured {
   }
   if ($platformName -eq 'kiro') {
     return (Test-Path -LiteralPath (Join-Path $RepoRoot '.kiro/skills/graphify/SKILL.md') -PathType Leaf)
+  }
+  if ($platformName -eq 'qoder') {
+    return (Test-Path -LiteralPath (Join-Path $RepoRoot '.qoder/skills/graphify/SKILL.md') -PathType Leaf)
   }
   return (
     (Test-Path -LiteralPath (Join-Path $RepoRoot '.codex/skills/graphify/SKILL.md') -PathType Leaf) -or

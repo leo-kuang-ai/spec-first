@@ -130,6 +130,34 @@ fi
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-mcp-setup.XXXXXX")"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
+HOST_DETECT_BIN="$TMP_ROOT/host-detect-bin"
+REPO_QODER_PATH_ONLY="$TMP_ROOT/repo-qoder-path-only"
+QODER_PATH_HOME="$TMP_ROOT/home-qoder-path-only"
+mkdir -p "$HOST_DETECT_BIN" "$REPO_QODER_PATH_ONLY" "$QODER_PATH_HOME"
+ln -s "$(command -v jq)" "$HOST_DETECT_BIN/jq"
+printf '#!/bin/bash\nexit 0\n' > "$HOST_DETECT_BIN/qoder"
+chmod +x "$HOST_DETECT_BIN/qoder"
+printf '{"name":"repo-qoder-path-only"}\n' > "$REPO_QODER_PATH_ONLY/package.json"
+
+qoder_path_detect="$(cd "$REPO_QODER_PATH_ONLY" && CODEX_CI= CODEX_MANAGED_BY_NPM= CODEX_THREAD_ID= CODEX_SANDBOX= CLAUDE_CODE_SSE_PORT= CLAUDE_CODE_SESSION_ID= CLAUDE_PROJECT_DIR= PATH="$HOST_DETECT_BIN:/usr/bin:/bin:/usr/sbin:/sbin" HOME="$QODER_PATH_HOME" bash "$SCRIPTS_DIR/detect-host.sh")"
+assert_eq "qoder detect auto accepts qoder CLI alias" "qoder" "$(jq -r '.host' <<<"$qoder_path_detect")"
+assert_eq "qoder detect auto reports qoder CLI alias" "qoder" "$(jq -r '.cli_command' <<<"$qoder_path_detect")"
+
+printf '#!/bin/bash\nexit 0\n' > "$HOST_DETECT_BIN/codex"
+chmod +x "$HOST_DETECT_BIN/codex"
+set +e
+qoder_ambiguous_output="$(cd "$REPO_QODER_PATH_ONLY" && CODEX_CI= CODEX_MANAGED_BY_NPM= CODEX_THREAD_ID= CODEX_SANDBOX= CLAUDE_CODE_SSE_PORT= CLAUDE_CODE_SESSION_ID= CLAUDE_PROJECT_DIR= PATH="$HOST_DETECT_BIN:/usr/bin:/bin:/usr/sbin:/sbin" HOME="$QODER_PATH_HOME" bash "$SCRIPTS_DIR/detect-host.sh" 2>&1)"
+qoder_ambiguous_status=$?
+set -e
+assert_eq "qoder detect auto requires explicit host when codex also exists" "1" "$qoder_ambiguous_status"
+case "$qoder_ambiguous_output" in
+  *"无法自动识别宿主"*) pass_count=$((pass_count + 1)) ;;
+  *) fail "qoder ambiguous detect should ask for explicit MCP_SETUP_HOST" ;;
+esac
+
+qoder_pinned_detect="$(cd "$REPO_QODER_PATH_ONLY" && CODEX_CI= CODEX_MANAGED_BY_NPM= CODEX_THREAD_ID= CODEX_SANDBOX= CLAUDE_CODE_SSE_PORT= CLAUDE_CODE_SESSION_ID= CLAUDE_PROJECT_DIR= PATH="$HOST_DETECT_BIN:/usr/bin:/bin:/usr/sbin:/sbin" MCP_SETUP_HOST=qoder HOME="$QODER_PATH_HOME" bash "$SCRIPTS_DIR/detect-host.sh")"
+assert_eq "qoder explicit host works when codex also exists" "qoder" "$(jq -r '.host' <<<"$qoder_pinned_detect")"
+
 REPO_KIRO="$TMP_ROOT/repo-kiro"
 KIRO_HOME="$TMP_ROOT/home-kiro"
 mkdir -p "$REPO_KIRO" "$KIRO_HOME"
@@ -179,8 +207,78 @@ assert "kiro user-scope writes user config" test -f "$KIRO_USER_HOME/.kiro/setti
 assert "kiro user-scope does not write workspace config" test ! -f "$REPO_KIRO_USER/.kiro/settings/mcp.json"
 (cd "$REPO_KIRO_USER" && MCP_SETUP_HOST=kiro HOME="$KIRO_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 >/dev/null)
 assert_eq "kiro uninstall without user-scope preserves user config" "true" "$(jq -r '.mcpServers.context7 != null' "$KIRO_USER_HOME/.kiro/settings/mcp.json")"
+(cd "$REPO_KIRO_USER" && MCP_SETUP_HOST=kiro QODER_USER_SCOPE=1 HOME="$KIRO_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 >/dev/null)
+assert_eq "kiro uninstall ignores qoder user-scope env" "true" "$(jq -r '.mcpServers.context7 != null' "$KIRO_USER_HOME/.kiro/settings/mcp.json")"
 (cd "$REPO_KIRO_USER" && MCP_SETUP_HOST=kiro HOME="$KIRO_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 --user-scope >/dev/null)
 assert_eq "kiro uninstall user-scope removes user config entry" "false" "$(jq -r '.mcpServers.context7 != null' "$KIRO_USER_HOME/.kiro/settings/mcp.json")"
+
+REPO_QODER="$TMP_ROOT/repo-qoder"
+QODER_HOME="$TMP_ROOT/home-qoder"
+mkdir -p "$REPO_QODER" "$QODER_HOME"
+printf '{"name":"repo-qoder"}\n' > "$REPO_QODER/package.json"
+
+qoder_detect="$(cd "$REPO_QODER" && MCP_SETUP_HOST=qoder HOME="$QODER_HOME" bash "$SCRIPTS_DIR/detect-host.sh")"
+assert_eq "qoder detect host" "qoder" "$(jq -r '.host' <<<"$qoder_detect")"
+assert_eq "qoder detect default scope" "local" "$(jq -r '.selected_scope' <<<"$qoder_detect")"
+assert_eq "qoder detect default config format" "json" "$(jq -r '.config_format' <<<"$qoder_detect")"
+assert_eq "qoder detect default local path" ".qoder/settings.local.json" "$(jq -r '.config_path' <<<"$qoder_detect")"
+
+qoder_user_detect="$(cd "$REPO_QODER" && MCP_SETUP_HOST=qoder QODER_USER_SCOPE=1 HOME="$QODER_HOME" bash "$SCRIPTS_DIR/detect-host.sh")"
+assert_eq "qoder detect user-scope opt-in selects user" "user" "$(jq -r '.selected_scope' <<<"$qoder_user_detect")"
+assert_eq "qoder detect user-scope path" "$QODER_HOME/.qoder/settings.json" "$(jq -r '.config_path' <<<"$qoder_user_detect")"
+
+qoder_configure_output="$(cd "$REPO_QODER" && MCP_SETUP_HOST=qoder HOME="$QODER_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool sequential-thinking)"
+assert_eq "qoder configure default selected scope" "local" "$(jq -r '.selected_scope' <<<"$qoder_configure_output")"
+assert "qoder configure writes local mcp json" test -f "$REPO_QODER/.qoder/settings.local.json"
+assert_eq "qoder configure writes top-level mcpServers" "true" "$(jq -r 'has("mcpServers") and (.mcpServers["sequential-thinking"].command == "npx")' "$REPO_QODER/.qoder/settings.local.json")"
+assert "qoder configure default does not write user config" test ! -f "$QODER_HOME/.qoder/settings.json"
+
+jq '.mcpServers.existing = {"command":"node","args":["server.js"]}' "$REPO_QODER/.qoder/settings.local.json" > "$REPO_QODER/.qoder/settings.local.json.next"
+mv "$REPO_QODER/.qoder/settings.local.json.next" "$REPO_QODER/.qoder/settings.local.json"
+(cd "$REPO_QODER" && MCP_SETUP_HOST=qoder HOME="$QODER_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool context7 >/dev/null)
+assert_eq "qoder configure preserves unrelated local servers" "true" "$(jq -r '(.mcpServers.existing.command == "node") and (.mcpServers.context7.command == "npx") and (.mcpServers["sequential-thinking"].command == "npx")' "$REPO_QODER/.qoder/settings.local.json")"
+
+qoder_detect_tools="$(cd "$REPO_QODER" && MCP_SETUP_HOST=qoder HOME="$QODER_HOME" bash "$SCRIPTS_DIR/detect-tools.sh" --folder "$REPO_QODER")"
+assert_eq "qoder detect-tools reads local json host config" "ready,ready" "$(jq -r '[.tools["sequential-thinking"].host_config_status, .tools.context7.host_config_status] | join(",")' <<<"$qoder_detect_tools")"
+
+REPO_QODER_BAD="$TMP_ROOT/repo-qoder-bad"
+mkdir -p "$REPO_QODER_BAD/.qoder"
+printf '{"name":"repo-qoder-bad"}\n' > "$REPO_QODER_BAD/package.json"
+printf '{not-json\n' > "$REPO_QODER_BAD/.qoder/settings.local.json"
+set +e
+qoder_bad_output="$(cd "$REPO_QODER_BAD" && MCP_SETUP_HOST=qoder HOME="$QODER_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool sequential-thinking 2>&1)"
+qoder_bad_status=$?
+set -e
+assert_eq "qoder invalid json configure fails" "1" "$qoder_bad_status"
+assert_eq "qoder invalid json is not overwritten" "{not-json" "$(cat "$REPO_QODER_BAD/.qoder/settings.local.json")"
+
+REPO_QODER_SECRET="$TMP_ROOT/repo-qoder-secret"
+mkdir -p "$REPO_QODER_SECRET/.qoder"
+printf '{"name":"repo-qoder-secret"}\n' > "$REPO_QODER_SECRET/package.json"
+printf '{"mcpServers":{"existing":{"command":"node","apiKey":"literal-secret"}}}\n' > "$REPO_QODER_SECRET/.qoder/settings.local.json"
+set +e
+qoder_secret_output="$(cd "$REPO_QODER_SECRET" && MCP_SETUP_HOST=qoder HOME="$QODER_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool sequential-thinking 2>&1)"
+qoder_secret_status=$?
+set -e
+assert_eq "qoder literal secret guard fails" "1" "$qoder_secret_status"
+assert_eq "qoder literal secret guard preserves config" "literal-secret" "$(jq -r '.mcpServers.existing.apiKey' "$REPO_QODER_SECRET/.qoder/settings.local.json")"
+if jq -e '.mcpServers["sequential-thinking"] != null' "$REPO_QODER_SECRET/.qoder/settings.local.json" >/dev/null; then
+  fail "qoder literal secret guard must roll back attempted write"
+fi
+
+REPO_QODER_USER="$TMP_ROOT/repo-qoder-user"
+QODER_USER_HOME="$TMP_ROOT/home-qoder-user"
+mkdir -p "$REPO_QODER_USER" "$QODER_USER_HOME"
+printf '{"name":"repo-qoder-user"}\n' > "$REPO_QODER_USER/package.json"
+(cd "$REPO_QODER_USER" && MCP_SETUP_HOST=qoder HOME="$QODER_USER_HOME" bash "$SCRIPTS_DIR/configure-host.sh" --tool context7 --user-scope >/dev/null)
+assert "qoder user-scope writes user config" test -f "$QODER_USER_HOME/.qoder/settings.json"
+assert "qoder user-scope does not write local config" test ! -f "$REPO_QODER_USER/.qoder/settings.local.json"
+(cd "$REPO_QODER_USER" && MCP_SETUP_HOST=qoder HOME="$QODER_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 >/dev/null)
+assert_eq "qoder uninstall without user-scope preserves user config" "true" "$(jq -r '.mcpServers.context7 != null' "$QODER_USER_HOME/.qoder/settings.json")"
+(cd "$REPO_QODER_USER" && MCP_SETUP_HOST=qoder KIRO_USER_SCOPE=1 HOME="$QODER_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 >/dev/null)
+assert_eq "qoder uninstall ignores kiro user-scope env" "true" "$(jq -r '.mcpServers.context7 != null' "$QODER_USER_HOME/.qoder/settings.json")"
+(cd "$REPO_QODER_USER" && MCP_SETUP_HOST=qoder QODER_USER_SCOPE=1 HOME="$QODER_USER_HOME" bash "$SCRIPTS_DIR/uninstall-mcp.sh" --tool context7 >/dev/null)
+assert_eq "qoder uninstall qoder user-scope removes user config entry" "false" "$(jq -r '.mcpServers.context7 != null' "$QODER_USER_HOME/.qoder/settings.json")"
 
 REPO_A="$TMP_ROOT/repo-a"
 mkdir -p "$REPO_A"

@@ -13,9 +13,9 @@
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
-**AI Coding Harness for Claude Code, Codex, and Kiro.**
+**AI Coding Harness for Claude Code, Codex, Kiro, and Qoder.**
 
-`spec-first` makes Claude Code, Codex, and Kiro easier to trust on real projects: one-off AI coding chats become a repo-backed loop of requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor. Evidence stays in your repository. Kiro support is currently opt-in preview until Kiro IDE smoke and a real user-value signal are confirmed.
+`spec-first` makes Claude Code, Codex, Kiro, and Qoder easier to trust on real projects: one-off AI coding chats become a repo-backed loop of requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor. Evidence stays in your repository. Kiro and Qoder support are currently opt-in preview until real host smoke and user-value signals are confirmed.
 
 Official site: [spec-first.cn](http://spec-first.cn/)
 
@@ -27,7 +27,7 @@ Official site: [spec-first.cn](http://spec-first.cn/)
 
 ![spec-first CLI workflow demo](https://raw.githubusercontent.com/sunrain520/spec-first/main/docs/assets/readme/spec-first-cli-workflow-demo.svg)
 
-The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code, Codex, or Kiro session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
+The first thing to evaluate is not an agent count or a prompt library. It is whether a workflow leaves something durable behind. A healthy first loop gives your existing Claude Code, Codex, Kiro, or Qoder session a governed path: define the work, plan it, split it when useful, execute it, review it, and compound the learning.
 
 The smallest success is intentionally concrete: after install and init, run one host workflow and inspect the Markdown artifact it writes under your repo, usually in `docs/brainstorms/` or `docs/plans/`. Deeper governance is available later; the first test is whether the work becomes inspectable.
 
@@ -41,7 +41,7 @@ Prerequisites:
 
 - Node.js `>=20.0.0` and npm.
 - Git on `PATH`; `doctor`, setup, and workflow checks read repository facts from Git.
-- Claude Code, Codex, or Kiro installed, with one chosen as the current host.
+- Claude Code, Codex, Kiro, or Qoder installed, with one chosen as the current host.
 - A terminal opened at the root of the project repo where you want to enable `spec-first`. First-time users can try a throwaway/test repo before initializing a real project.
 
 **Step 1 — Install and check health**
@@ -77,17 +77,17 @@ Expected: `doctor` reports no blocking issues. If issues appear, follow the prin
 spec-first init
 ```
 
-Select your host (Claude Code, Codex, and/or Kiro), confirm your developer name and language, then confirm the writes. Scripted Kiro preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>`.
+Select your host (Claude Code, Codex, Kiro, and/or Qoder), confirm your developer name and language, then confirm the writes. Scripted preview setup uses `spec-first init --kiro -y -u <name> --lang <zh|en>` for Kiro or `spec-first init --qoder -y -u <name> --lang <zh|en>` for Qoder.
 
-Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, or `.kiro/`. Generated copies can be rebuilt any time with `spec-first init`.
+Expected: init lists the generated runtime paths under `.claude/`, `.codex/`, `.agents/skills/`, `.kiro/`, or `.qoder/`. Generated copies can be rebuilt any time with `spec-first init`.
 
-If the host reports missing helper or MCP readiness facts, run `/spec:mcp-setup` in Claude Code, `$spec-mcp-setup` in Codex, or Kiro Agent Skill `spec-mcp-setup` before continuing.
+If the host reports missing helper or MCP readiness facts, run `/spec:mcp-setup` in Claude Code, `$spec-mcp-setup` in Codex, Kiro Agent Skill `spec-mcp-setup`, or Qoder project command `/spec:mcp-setup` / Skill `spec-mcp-setup` before continuing.
 
 For all init options (flags, scripted mode, multi-repo), see the [full Quickstart guide](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/01-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md).
 
 **Step 3 — Restart the host**
 
-Restart the host or open a new session so it loads the generated runtime assets. Host-session workflow entries are not shell commands — they run inside the Claude Code, Codex, or Kiro session, not in your terminal.
+Restart the host or open a new session so it loads the generated runtime assets. Host-session workflow entries are not shell commands — they run inside the Claude Code, Codex, Kiro, or Qoder session, not in your terminal.
 
 **Step 4 — Run your first workflow**
 
@@ -102,6 +102,9 @@ $spec-brainstorm "describe your first task here"
 
 # In a Kiro session
 Kiro Agent Skill spec-brainstorm "describe your first task here"
+
+# In a Qoder session
+/spec:brainstorm "describe your first task here"
 ```
 
 **Step 5 — Verify success**
@@ -118,11 +121,11 @@ For subsequent tasks, use this quick route to pick the right entrypoint:
 
 | If your first task is... | Start with... |
 |---|---|
-| A rough idea, feature, or product change | `/spec:brainstorm`, `$spec-brainstorm`, or Kiro Agent Skill `spec-brainstorm` |
-| An existing PRD, requirement note, or brownfield change request | `/spec:prd`, `$spec-prd`, or Kiro Agent Skill `spec-prd` |
-| A bug, failing test, stack trace, or abnormal behavior | `/spec:debug`, `$spec-debug`, or Kiro Agent Skill `spec-debug` |
-| A settled plan, task pack, or scoped implementation request | `/spec:work`, `$spec-work`, or Kiro Agent Skill `spec-work` |
-| A document, plan, task pack, diff, or implementation that needs review | `/spec:doc-review`, `$spec-doc-review`, `/spec:code-review`, `$spec-code-review`, or matching Kiro Agent Skills |
+| A rough idea, feature, or product change | `/spec:brainstorm`, `$spec-brainstorm`, Kiro Agent Skill `spec-brainstorm`, or Qoder `/spec:brainstorm` |
+| An existing PRD, requirement note, or brownfield change request | `/spec:prd`, `$spec-prd`, Kiro Agent Skill `spec-prd`, or Qoder `/spec:prd` |
+| A bug, failing test, stack trace, or abnormal behavior | `/spec:debug`, `$spec-debug`, Kiro Agent Skill `spec-debug`, or Qoder `/spec:debug` |
+| A settled plan, task pack, or scoped implementation request | `/spec:work`, `$spec-work`, Kiro Agent Skill `spec-work`, or Qoder `/spec:work` |
+| A document, plan, task pack, diff, or implementation that needs review | `/spec:doc-review`, `$spec-doc-review`, `/spec:code-review`, `$spec-code-review`, matching Kiro Agent Skills, or Qoder `/spec:doc-review` / `/spec:code-review` |
 
 Detailed manuals are Chinese-first; this README is the English quick path. Walkthrough: [Chinese First Workflow Walkthrough](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/09-%E9%A6%96%E6%AC%A1%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%B5%B0%E6%9F%A5.md). Artifact ownership: [Chinese Artifact Catalog](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/10-%E4%BA%A7%E7%89%A9%E7%9B%AE%E5%BD%95.md).
 
@@ -148,18 +151,18 @@ Not every workflow writes every artifact. The first run writes one file under `d
 
 The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Review → Knowledge`.
 
-| Task | Claude Code | Codex | Kiro | Artifact |
-|---|---|---|---|---|
-| Requirements from a rough idea | `/spec:brainstorm` | `$spec-brainstorm` | Agent Skill `spec-brainstorm` | `docs/brainstorms/` |
-| Requirements from an existing PRD | `/spec:prd` | `$spec-prd` | Agent Skill `spec-prd` | `docs/brainstorms/` |
-| Implementation plan | `/spec:plan` | `$spec-plan` | Agent Skill `spec-plan` | `docs/plans/` |
-| Split a plan into executable tasks | `/spec:write-tasks` | `$spec-write-tasks` | Agent Skill `spec-write-tasks` | `docs/tasks/` |
-| Execute scoped work | `/spec:work` | `$spec-work` | Agent Skill `spec-work` | source changes + evidence |
-| Review code | `/spec:code-review` | `$spec-code-review` | Agent Skill `spec-code-review` | structured findings |
-| Review docs or plans | `/spec:doc-review` | `$spec-doc-review` | Agent Skill `spec-doc-review` | structured findings |
-| Capture reusable learning | `/spec:compound` | `$spec-compound` | Agent Skill `spec-compound` | `docs/solutions/` |
+| Task | Claude Code | Codex | Kiro | Qoder | Artifact |
+|---|---|---|---|---|---|
+| Requirements from a rough idea | `/spec:brainstorm` | `$spec-brainstorm` | Agent Skill `spec-brainstorm` | `/spec:brainstorm` | `docs/brainstorms/` |
+| Requirements from an existing PRD | `/spec:prd` | `$spec-prd` | Agent Skill `spec-prd` | `/spec:prd` | `docs/brainstorms/` |
+| Implementation plan | `/spec:plan` | `$spec-plan` | Agent Skill `spec-plan` | `/spec:plan` | `docs/plans/` |
+| Split a plan into executable tasks | `/spec:write-tasks` | `$spec-write-tasks` | Agent Skill `spec-write-tasks` | `/spec:write-tasks` | `docs/tasks/` |
+| Execute scoped work | `/spec:work` | `$spec-work` | Agent Skill `spec-work` | `/spec:work` | source changes + evidence |
+| Review code | `/spec:code-review` | `$spec-code-review` | Agent Skill `spec-code-review` | `/spec:code-review` | structured findings |
+| Review docs or plans | `/spec:doc-review` | `$spec-doc-review` | Agent Skill `spec-doc-review` | `/spec:doc-review` | structured findings |
+| Capture reusable learning | `/spec:compound` | `$spec-compound` | Agent Skill `spec-compound` | `/spec:compound` | `docs/solutions/` |
 
-Support entrypoints (on demand): `/spec:mcp-setup`, `$spec-mcp-setup`, or Kiro Agent Skill `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish-beta, and write-skill entries for the current host.
+Support entrypoints (on demand): `/spec:mcp-setup`, `$spec-mcp-setup`, Kiro Agent Skill `spec-mcp-setup`, or Qoder `/spec:mcp-setup` / Skill `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish-beta, and write-skill entries for the current host.
 
 [→ Full entrypoint reference with routing rules](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 
@@ -171,7 +174,7 @@ Without a repo-backed trail, that context disappears with the chat window. The n
 
 ## Why spec-first?
 
-`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, or Kiro; it gives those hosts a project-local harness. Kiro native Specs remain Kiro-owned artifacts; spec-first only treats `.kiro/specs/**` as advisory input when explicitly named.
+`spec-first` keeps the software lifecycle legible without pretending that prose alone is proof. It is not trying to replace Claude Code, Codex, Kiro, or Qoder; it gives those hosts a project-local harness. Kiro native Specs and Qoder native rules remain host-owned artifacts; spec-first only treats `.kiro/specs/**` and `.qoder/rules/**` as advisory input when explicitly named.
 
 | Adoption question | Prompt pack / agent orchestration | spec-first |
 |---|---|---|
@@ -179,7 +182,7 @@ Without a repo-backed trail, that context disappears with the chat window. The n
 | Where do decisions and evidence live? | Session state, message bus, runtime memory | Repo-local docs, generated runtime assets, and verifiable CLI facts |
 | What does the human review? | Often the final diff or agent output | Requirements, plans, task packs, diffs, review findings, bugs, and learnings |
 | Who enforces mechanical boundaries? | Mostly model discipline or custom glue | Scripts enforce deterministic invariants and prepare facts; LLMs make semantic decisions above that floor |
-| How do Claude Code, Codex, and Kiro stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates supported host runtime surfaces |
+| How do Claude Code, Codex, Kiro, and Qoder stay aligned? | Separate setup and prompt maintenance | One source asset set regenerates supported host runtime surfaces |
 
 Current mechanisms you can inspect today:
 
@@ -190,7 +193,7 @@ Current mechanisms you can inspect today:
 - Work, review, debug, optimize, and compound workflows preserve evidence and learning.
 - Knowledge handoffs stay summary-first, and recalled `docs/solutions/` learnings remain advisory until reconfirmed from source evidence.
 - Team standards live as source docs under `docs/contracts/team-standards.md` and `docs/standards/**`; workflows pick the confirmed rules in scope rather than adding a new entrypoint.
-- One source asset set supports Claude Code `/spec:*` entries, Codex `$spec-*` entries, and Kiro Agent Skills without hand-maintaining generated runtime copies.
+- One source asset set supports Claude Code `/spec:*` entries, Codex `$spec-*` entries, Kiro Agent Skills, and Qoder project commands/skills without hand-maintaining generated runtime copies.
 
 These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.
 
@@ -200,7 +203,7 @@ These are current repo mechanisms, not measured adoption-outcome claims. Trust t
 
 Source assets (`skills/`, `agents/`, `templates/`, `src/cli/`) are regenerated by `spec-first init` into host runtime assets — producing repo-local workflow artifacts: `ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`.
 
-Generated runtime copies under `.claude/`, `.codex/`, `.agents/skills/`, `.kiro/skills/`, `.kiro/agents/`, and `.kiro/spec-first/` are disposable and can be rebuilt with `spec-first init`. Spec-first managed `.kiro/settings/` is configuration output; Kiro native `.kiro/specs/**` is not spec-first source.
+Generated runtime copies under `.claude/`, `.codex/`, `.agents/skills/`, `.kiro/skills/`, `.kiro/agents/`, `.kiro/spec-first/`, `.qoder/commands/spec/`, `.qoder/skills/`, `.qoder/agents/`, and `.qoder/spec-first/` are disposable and can be rebuilt with `spec-first init`. Spec-first managed `.kiro/settings/` and Qoder local `.qoder/settings.local.json` are config outputs, not source; Qoder clean preserves the local settings file because it may contain user-owned MCP entries. Kiro native `.kiro/specs/**` and Qoder native `.qoder/rules/**` are not spec-first source.
 
 Detailed references:
 
@@ -214,7 +217,7 @@ Scripts enforce deterministic invariants; scripts prepare facts; the LLM decides
 
 - **What scripts do:** enforce mechanically decidable invariants, install, validate, generate, report machine facts.
 - **What the LLM decides:** requirements framing, scope boundaries, tradeoffs, implementation judgment, review evidence.
-- **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors such as `.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, and spec-first managed `.kiro/settings/**`.
+- **What is excluded from ordinary context:** `.spec-first/audits/**`, `.spec-first/governance/**`, generated mirrors such as `.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, spec-first managed `.kiro/settings/**`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, and host-local config such as `.qoder/settings.local.json`.
 
 [→ Full trust model and verification contracts](https://github.com/sunrain520/spec-first/blob/main/docs/contracts/workflows/honest-closeout.md)
 
@@ -222,7 +225,7 @@ Scripts enforce deterministic invariants; scripts prepare facts; the LLM decides
 
 Use `spec-first` when:
 
-- You already use Claude Code, Codex, or Kiro and want project-local workflows instead of one-off prompts.
+- You already use Claude Code, Codex, Kiro, or Qoder and want project-local workflows instead of one-off prompts.
 - You want AI coding work to leave durable requirements, plans, explicitly routed review summaries, and learnings.
 - You want scripts to handle deterministic setup and enforce machine-checkable boundaries while keeping semantic judgment with the LLM.
 - You want a lightweight workflow layer that can be regenerated from source assets.

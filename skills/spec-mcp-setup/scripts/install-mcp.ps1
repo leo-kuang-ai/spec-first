@@ -17,6 +17,7 @@ $SkillDir = Split-Path -Parent $ScriptDir
 . (Join-Path $ScriptDir 'lib-template.ps1')
 if ($UserScope) {
   $env:KIRO_USER_SCOPE = '1'
+  $env:QODER_USER_SCOPE = '1'
 }
 $ToolsJsonPath = Join-Path $SkillDir 'mcp-tools.json'
 $ProviderToolsJsonPath = Join-Path $SkillDir 'provider-tools.json'

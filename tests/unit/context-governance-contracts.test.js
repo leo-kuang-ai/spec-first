@@ -40,13 +40,20 @@ describe('context governance runtime exclusion contract', () => {
     expect(contract).toContain('`.kiro/agents/**`');
     expect(contract).toContain('`.kiro/spec-first/**`');
     expect(contract).toContain('`.kiro/settings/**`');
+    expect(contract).toContain('`.qoder/commands/spec/**`');
+    expect(contract).toContain('`.qoder/skills/**`');
+    expect(contract).toContain('`.qoder/agents/**`');
+    expect(contract).toContain('`.qoder/spec-first/**`');
+    expect(contract).toContain('`.qoder/settings.local.json`');
     expect(contract).toContain('`.kiro/specs/**` 是 Kiro-native advisory artifact');
+    expect(contract).toContain('`.qoder/rules/**`、`.qoder/settings.json` 和 `.qoder/hooks/**` 是 Qoder-native/user-owned surface');
     expect(contract).toContain('`runtime_audit_artifact_excluded`');
     expect(contract).toContain('`runtime_governance_artifact_excluded`');
     expect(contract).toContain('`generated_runtime_mirror_excluded`');
+    expect(contract).toContain('`host_local_config_excluded`');
     expect(contract).toContain('`outside_repo_context_excluded`');
     expect(contract).toContain('普通 workflow 仍可读取 checked-in source truth');
-    expect(contract).toContain('禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**` 纳入默认');
+    expect(contract).toContain('禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json` 纳入默认');
     expect(contract).toContain('repo-relative canonical path');
     expect(contract).toContain('Changelog Consumption Policy');
     expect(contract).toContain('`CHANGELOG.md` remains mandatory for project source changes.');
@@ -68,8 +75,10 @@ describe('context governance runtime exclusion contract', () => {
     for (const [host, lang] of [
       ['codex', 'zh'],
       ['claude', 'zh'],
+      ['qoder', 'zh'],
       ['codex', 'en'],
       ['claude', 'en'],
+      ['qoder', 'en'],
     ]) {
       const block = buildBootstrapBlock(host, lang);
       expect(block).toContain('.spec-first/audits/**');
@@ -81,7 +90,13 @@ describe('context governance runtime exclusion contract', () => {
       expect(block).toContain('.kiro/agents/**');
       expect(block).toContain('.kiro/spec-first/**');
       expect(block).toContain('.kiro/settings/**');
+      expect(block).toContain('.qoder/commands/spec/**');
+      expect(block).toContain('.qoder/skills/**');
+      expect(block).toContain('.qoder/agents/**');
+      expect(block).toContain('.qoder/spec-first/**');
+      expect(block).toContain('.qoder/settings.local.json');
       expect(block).toContain('.kiro/specs/**');
+      expect(block).toContain('.qoder/rules/**');
     }
 
     // Checked-in instruction files surface the same runtime-exclusion invariants.
@@ -123,6 +138,11 @@ describe('context governance runtime exclusion contract', () => {
       expect(content).toContain('.kiro/agents/**');
       expect(content).toContain('.kiro/spec-first/**');
       expect(content).toContain('.kiro/settings/**');
+      expect(content).toContain('.qoder/commands/spec/**');
+      expect(content).toContain('.qoder/skills/**');
+      expect(content).toContain('.qoder/agents/**');
+      expect(content).toContain('.qoder/spec-first/**');
+      expect(content).toContain('.qoder/settings.local.json');
       if (relativePath === 'skills/using-spec-first/SKILL.md') {
         expect(content).toContain('latest relevant window / summary-first rules in `docs/contracts/context-governance.md`');
       }

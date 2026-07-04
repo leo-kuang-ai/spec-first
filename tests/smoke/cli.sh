@@ -51,6 +51,32 @@ const kiro = buildFilteredAssetSet('kiro');
 process.stdout.write(String(kiro.skills.length + kiro.internalSkills.length));
 NODE
 )"
+expected_qoder_command_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+process.stdout.write(String(buildFilteredAssetSet('qoder').commands.length));
+NODE
+)"
+expected_qoder_total_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+const qoder = buildFilteredAssetSet('qoder');
+process.stdout.write(String(qoder.skills.length + qoder.workflowSkills.length + qoder.internalSkills.length));
+NODE
+)"
+expected_qoder_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+const qoder = buildFilteredAssetSet('qoder');
+process.stdout.write(String(qoder.skills.length + qoder.internalSkills.length));
+NODE
+)"
+expected_qoder_workflow_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+process.stdout.write(String(buildFilteredAssetSet('qoder').workflowSkills.length));
+NODE
+)"
 
 run_programmatic_init() {
   local project_root="$1"
@@ -111,7 +137,7 @@ version_output="$(node "$REPO_ROOT/bin/spec-first.js" --version)"
 grep -q "doctor" <<<"$help_output"
 grep -q "init" <<<"$help_output"
 grep -q "Interactively install workflows" <<<"$help_output"
-grep -q "clean (--claude|--codex|--kiro)" <<<"$help_output"
+grep -q "clean (--claude|--codex|--kiro|--qoder)" <<<"$help_output"
 grep -q "repair-worktree" <<<"$help_output"
 grep -q "tasks <subcommand>" <<<"$help_output"
 if grep -q "stage0-context" <<<"$help_output"; then
@@ -119,7 +145,7 @@ if grep -q "stage0-context" <<<"$help_output"; then
   exit 1
 fi
 grep -q "Spec-First v${expected_version}" <<<"$version_output"
-grep -q "Claude Code, Codex, and Kiro" <<<"$version_output"
+grep -q "Claude Code, Codex, Kiro, and Qoder" <<<"$version_output"
 unknown_output="$(node "$REPO_ROOT/bin/spec-first.js" unknown-command 2>&1 || true)"
 if ! grep -Eiq "unknown command|usage" <<<"$unknown_output"; then
   echo "unknown command should use normal usage path" >&2
@@ -131,7 +157,7 @@ echo "2. Check doctor output in a fresh project..."
 doctor_fresh_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor)"
 grep -q "No spec-first platform detected in this project." <<<"$doctor_fresh_output"
 grep -q 'spec-first init' <<<"$doctor_fresh_output"
-grep -q 'select Claude Code, Codex, and/or Kiro' <<<"$doctor_fresh_output"
+grep -q 'select Claude Code, Codex, Kiro, and/or Qoder' <<<"$doctor_fresh_output"
 doctor_fresh_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --json)"
 node - "$doctor_fresh_json" <<'NODE'
 const payload = JSON.parse(process.argv[2]);
@@ -416,7 +442,97 @@ if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing
 NODE
 echo "✓ Kiro init generated Agent Skills, agents, state, and doctor facts"
 
-echo "9. Verify clean dry-run and clean removal..."
+echo "9. Initialize Qoder runtime and verify assets..."
+qoder_output="$(run_programmatic_init "$TMP_DIR" qoder kuang en)"
+grep -q "Generated ${expected_qoder_command_count} command file(s) in .qoder/commands/spec" <<<"$qoder_output"
+grep -q "Generated ${expected_qoder_total_skill_count} skill directory(ies) in .qoder/skills" <<<"$qoder_output"
+grep -q "Generated ${expected_agent_count} agent file(s) in .qoder/agents" <<<"$qoder_output"
+installed_qoder_skill_count="$(find "$TMP_DIR/.qoder/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
+test "$installed_qoder_skill_count" = "$expected_qoder_total_skill_count"
+for command in plan work code-review doc-review brainstorm mcp-setup; do
+  test -f "$TMP_DIR/.qoder/commands/spec/$command.md"
+  grep -q "^name: $command$" "$TMP_DIR/.qoder/commands/spec/$command.md"
+done
+for skill in spec-plan spec-work spec-code-review spec-doc-review spec-brainstorm spec-mcp-setup spec-compound-refresh; do
+  test -f "$TMP_DIR/.qoder/skills/$skill/SKILL.md"
+  grep -q "^name: $skill$" "$TMP_DIR/.qoder/skills/$skill/SKILL.md"
+done
+test -f "$TMP_DIR/.qoder/skills/using-spec-first/SKILL.md"
+grep -q '^name: using-spec-first$' "$TMP_DIR/.qoder/skills/using-spec-first/SKILL.md"
+test -f "$TMP_DIR/.qoder/skills/git-worktree/SKILL.md"
+grep -q '^name: git-worktree$' "$TMP_DIR/.qoder/skills/git-worktree/SKILL.md"
+for agent in spec-repo-research-analyst.agent.md spec-session-historian.agent.md spec-slack-researcher.agent.md; do
+  test -f "$TMP_DIR/.qoder/agents/$agent"
+  node - "$TMP_DIR/.qoder/agents/$agent" <<'NODE'
+const fs = require('node:fs');
+const agentPath = process.argv[2];
+const content = fs.readFileSync(agentPath, 'utf8');
+const match = content.match(/^---\n([\s\S]*?)\n---/);
+if (!match) throw new Error(`missing frontmatter: ${agentPath}`);
+const frontmatter = match[1];
+const expectedTools = agentPath.endsWith('spec-slack-researcher.agent.md')
+  ? 'Read, Grep, Glob, mcp__slack__*'
+  : 'Read, Grep, Glob';
+if (!new RegExp(`^tools: \\[${expectedTools.replace('*', '\\*')}\\]$`, 'm').test(frontmatter)) {
+  throw new Error(`Qoder agent tools mismatch; expected [${expectedTools}]: ${agentPath}`);
+}
+if (/\b(Write|Edit|Bash|Agent)\b/.test(frontmatter)) {
+  throw new Error(`Qoder agent should not default to write/shell/dispatch tools: ${agentPath}`);
+}
+NODE
+done
+test -f "$TMP_DIR/.qoder/spec-first/state.json"
+test ! -e "$TMP_DIR/.qoder/rules"
+test ! -e "$TMP_DIR/.qoder/hooks"
+node - "$TMP_DIR/.qoder/spec-first/state.json" "$expected_qoder_command_count" "$expected_qoder_skill_count" "$expected_qoder_workflow_skill_count" "$expected_agent_count" <<'NODE'
+const fs = require('node:fs');
+const [statePath, commandCount, skillCount, workflowSkillCount, agentCount] = process.argv.slice(2);
+const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+if (state.commands.length !== Number(commandCount)) throw new Error('Qoder command count mismatch');
+if (state.skills.length !== Number(skillCount)) throw new Error('Qoder skill count mismatch');
+if (state.workflowSkills.length !== Number(workflowSkillCount)) throw new Error('Qoder workflow skill count mismatch');
+if (!state.commands.includes('work.md')) throw new Error('missing Qoder work command');
+if (!state.workflowSkills.includes('spec-mcp-setup')) throw new Error('missing Qoder mcp-setup workflow skill');
+if (state.agents.length !== Number(agentCount)) throw new Error('Qoder agent count mismatch');
+NODE
+qoder_doctor_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --qoder)"
+grep -q ".qoder/spec-first/state.json" <<<"$qoder_doctor_output"
+grep -q ".qoder/commands/spec" <<<"$qoder_doctor_output"
+grep -q ".qoder/skills" <<<"$qoder_doctor_output"
+grep -q ".qoder/agents" <<<"$qoder_doctor_output"
+qoder_doctor_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --qoder --json)"
+node - "$qoder_doctor_json" <<'NODE'
+const payload = JSON.parse(process.argv[2]);
+if (!['simulated', 'verified', 'not_verified'].includes(payload.workflow_runnability)) {
+  throw new Error(`unexpected Qoder runnability ${payload.workflow_runnability}`);
+}
+if (!['pass', 'warn', 'error'].includes(payload.runtime_asset_health)) {
+  throw new Error(`unexpected Qoder asset health ${payload.runtime_asset_health}`);
+}
+if (!payload.platform_checks?.qoder?.length) throw new Error('missing Qoder checks');
+const commandCheck = payload.platform_checks.qoder.find((entry) =>
+  entry.name === '.qoder/commands/spec/work.md' && entry.message.includes('Qoder command frontmatter is valid')
+);
+if (!commandCheck || commandCheck.level !== 'PASS') throw new Error('missing passing Qoder command check');
+const skillCheck = payload.platform_checks.qoder.find((entry) =>
+  entry.name === '.qoder/skills/spec-work/SKILL.md' && entry.message.includes('Qoder skill frontmatter is valid')
+);
+if (!skillCheck || skillCheck.level !== 'PASS') throw new Error('missing passing Qoder skill check');
+const agentCheck = payload.platform_checks.qoder.find((entry) =>
+  entry.name === '.qoder/agents/spec-repo-research-analyst.agent.md' && entry.message.includes('read/search default tools')
+);
+if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing Qoder agent check');
+NODE
+if command -v qodercli >/dev/null 2>&1 || command -v qoder >/dev/null 2>&1; then
+  qoder_loader_command="$(command -v qodercli 2>/dev/null || command -v qoder 2>/dev/null)"
+  "$qoder_loader_command" --version >/dev/null 2>&1 || true
+  echo "Qoder loader smoke degraded: Qoder CLI is present at $qoder_loader_command, but no non-interactive project loader probe is defined"
+else
+  echo "Qoder loader smoke degraded: qodercli/qoder not found on PATH"
+fi
+echo "✓ Qoder init generated project commands, skills, agents, state, and doctor facts"
+
+echo "10. Verify clean dry-run and clean removal..."
 clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --claude --dry-run)"
 grep -q "Dry run: spec-first clean (claude)" <<<"$clean_dry"
 grep -q "No files were changed." <<<"$clean_dry"
@@ -444,5 +560,26 @@ test -f "$TMP_DIR/.kiro/hooks/custom"
 test -f "$TMP_DIR/.kiro/settings/user.json"
 test -f "$TMP_DIR/.kiro/specs/native/spec.md"
 echo "✓ clean removes managed Kiro runtime without touching user-owned .kiro assets"
+
+mkdir -p "$TMP_DIR/.qoder/rules" "$TMP_DIR/.qoder/hooks"
+printf '# Native Qoder rule\n' > "$TMP_DIR/.qoder/rules/security.md"
+printf '{"custom":true}\n' > "$TMP_DIR/.qoder/settings.json"
+printf '{"hooks":[]}\n' > "$TMP_DIR/.qoder/hooks/custom.json"
+qoder_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --qoder --dry-run)"
+grep -q "Dry run: spec-first clean (qoder)" <<<"$qoder_clean_dry"
+grep -q ".qoder/commands/spec/work.md" <<<"$qoder_clean_dry"
+grep -q ".qoder/skills/spec-work" <<<"$qoder_clean_dry"
+grep -q ".qoder/agents/spec-repo-research-analyst.agent.md" <<<"$qoder_clean_dry"
+grep -q ".qoder/spec-first/state.json" <<<"$qoder_clean_dry"
+grep -q "No files were changed." <<<"$qoder_clean_dry"
+(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --qoder >/dev/null)
+test ! -d "$TMP_DIR/.qoder/commands/spec"
+test ! -d "$TMP_DIR/.qoder/skills"
+test ! -d "$TMP_DIR/.qoder/agents"
+test ! -d "$TMP_DIR/.qoder/spec-first"
+test -f "$TMP_DIR/.qoder/rules/security.md"
+test -f "$TMP_DIR/.qoder/settings.json"
+test -f "$TMP_DIR/.qoder/hooks/custom.json"
+echo "✓ clean removes managed Qoder runtime without touching user-owned .qoder assets"
 
 echo "=== CLI smoke test passed ✓ ==="

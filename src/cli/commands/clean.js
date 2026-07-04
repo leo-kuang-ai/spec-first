@@ -40,10 +40,10 @@ function runClean(argv) {
     return 2;
   }
 
-  const selectedPlatforms = ['claude', 'codex', 'kiro'].filter((platform) => parsed[platform]);
+  const selectedPlatforms = ['claude', 'codex', 'kiro', 'qoder'].filter((platform) => parsed[platform]);
   const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex|--kiro) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--kiro|--qoder) [--dry-run]');
     return 2;
   }
 
@@ -128,6 +128,7 @@ function parseCleanArgs(argv) {
     claude: false,
     codex: false,
     kiro: false,
+    qoder: false,
     dryRun: false,
     workspaceOrphans: false,
     confirm: false,
@@ -143,6 +144,8 @@ function parseCleanArgs(argv) {
       parsed.codex = true;
     } else if (arg === '--kiro') {
       parsed.kiro = true;
+    } else if (arg === '--qoder') {
+      parsed.qoder = true;
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
@@ -163,7 +166,7 @@ function runWorkspaceOrphansClean(parsed) {
     return 2;
   }
 
-  if (parsed.claude || parsed.codex || parsed.kiro) {
+  if (parsed.claude || parsed.codex || parsed.kiro || parsed.qoder) {
     console.error('Error: --workspace-orphans cannot be combined with host flags.');
     console.error('Workspace orphan cleanup is separate from runtime asset cleanup.');
     return 2;
@@ -364,7 +367,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex|--kiro) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--kiro|--qoder) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
     '',
     'Workspace orphan cleanup previews parent quarantine evidence by default; add --confirm to delete supported orphan paths.',
@@ -378,6 +381,7 @@ function platformDisplayName(platform) {
   if (platform === 'claude') return 'Claude Code';
   if (platform === 'codex') return 'Codex';
   if (platform === 'kiro') return 'Kiro';
+  if (platform === 'qoder') return 'Qoder';
   return platform;
 }
 

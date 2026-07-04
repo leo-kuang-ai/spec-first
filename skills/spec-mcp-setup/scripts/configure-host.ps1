@@ -11,6 +11,7 @@ if ([string]::IsNullOrWhiteSpace($Tool)) {
 }
 if ($UserScope) {
   $env:KIRO_USER_SCOPE = '1'
+  $env:QODER_USER_SCOPE = '1'
 }
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -168,7 +169,7 @@ function Write-JsonMcpConfig {
 }
 
 function Assert-NoLiteralSecretValues {
-  if ($DetectedHost -ne 'kiro') { return }
+  if ($DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder') { return }
   if (-not (Test-Path $ConfigPath)) { return }
   $raw = Get-Content -Raw $ConfigPath
   $parsed = ConvertFrom-JsonCompat -Json $raw -AsHashtable
@@ -180,7 +181,7 @@ function Assert-NoLiteralSecretValues {
       foreach ($key in $current.Keys) {
         $value = $current[$key]
         if ([string]$key -match '(?i)(token|secret|api[_-]?key|password)' -and $value -is [string] -and $value -notmatch '^\$\{[A-Za-z_][A-Za-z0-9_]*\}$') {
-          throw 'Kiro config contains a literal secret-like value; use an env var reference such as ${TOKEN_NAME}'
+          throw ('{0} config contains a literal secret-like value; use an env var reference such as ${TOKEN_NAME}' -f $DetectedHost)
         }
         if (($value -is [System.Collections.IDictionary]) -or ($value -is [pscustomobject]) -or ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string]))) {
           $stack.Push($value)
@@ -190,7 +191,7 @@ function Assert-NoLiteralSecretValues {
       foreach ($property in $current.PSObject.Properties) {
         $value = $property.Value
         if ([string]$property.Name -match '(?i)(token|secret|api[_-]?key|password)' -and $value -is [string] -and $value -notmatch '^\$\{[A-Za-z_][A-Za-z0-9_]*\}$') {
-          throw 'Kiro config contains a literal secret-like value; use an env var reference such as ${TOKEN_NAME}'
+          throw ('{0} config contains a literal secret-like value; use an env var reference such as ${TOKEN_NAME}' -f $DetectedHost)
         }
         if (($value -is [System.Collections.IDictionary]) -or ($value -is [pscustomobject]) -or ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string]))) {
           $stack.Push($value)
@@ -302,7 +303,7 @@ try {
       Write-JsonMcpConfig -FinalConfig $ResolvedConfig
     } elseif ($DetectedHost -eq 'codex') {
       Write-CodexConfig -FinalConfig $ResolvedConfig
-    } elseif ($DetectedHost -eq 'kiro') {
+    } elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder') {
       Write-JsonMcpConfig -FinalConfig $ResolvedConfig
       Assert-NoLiteralSecretValues
     } else {

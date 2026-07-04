@@ -27,7 +27,7 @@ const SOURCE_DIRECTORIES = {
   skills: 'skills',
   agents: 'agents',
 };
-const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'kiro'];
+const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'kiro', 'qoder'];
 const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
 const ENTRY_SURFACES = new Set(['workflow_command', 'standalone_skill', 'internal_only']);
 const HOST_SCOPES = new Set(['dual_host', 'host_exclusive', 'target_host_maintenance']);
@@ -269,6 +269,7 @@ function loadSkillsGovernance() {
           claude: record.host_delivery.claude,
           codex: record.host_delivery.codex,
           kiro: record.host_delivery.kiro,
+          qoder: record.host_delivery.qoder,
         },
       }))
       .sort((a, b) => a.skill_name.localeCompare(b.skill_name)),

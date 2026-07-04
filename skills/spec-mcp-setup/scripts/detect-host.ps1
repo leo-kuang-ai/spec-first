@@ -77,7 +77,7 @@ $ToolsJson = Read-McpToolsJson -Path (Join-Path $SkillDir 'mcp-tools.json') -AsH
 Assert-McpToolsSchemaVersion -ToolsJson $ToolsJson
 
 function Get-DetectedHost {
-  if ($env:MCP_SETUP_HOST -in @('claude', 'codex', 'kiro')) {
+  if ($env:MCP_SETUP_HOST -in @('claude', 'codex', 'kiro', 'qoder')) {
     return $env:MCP_SETUP_HOST
   }
 
@@ -94,19 +94,31 @@ function Get-DetectedHost {
     return 'claude'
   }
 
-  if ((Test-CommandExists 'codex') -and -not (Test-CommandExists 'claude')) {
+  $hasCodexCli = Test-CommandExists 'codex'
+  $hasClaudeCli = Test-CommandExists 'claude'
+  $hasQoderCli = (Test-CommandExists 'qodercli') -or (Test-CommandExists 'qoder')
+
+  if ($hasCodexCli -and -not $hasClaudeCli -and -not $hasQoderCli) {
     return 'codex'
   }
 
-  if ((Test-CommandExists 'claude') -and -not (Test-CommandExists 'codex')) {
+  if ($hasClaudeCli -and -not $hasCodexCli -and -not $hasQoderCli) {
     return 'claude'
   }
 
-  throw '错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex 或 MCP_SETUP_HOST=kiro 后再运行。'
+  if ($hasQoderCli -and -not $hasClaudeCli -and -not $hasCodexCli) {
+    return 'qoder'
+  }
+
+  throw '错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex、MCP_SETUP_HOST=kiro 或 MCP_SETUP_HOST=qoder 后再运行。'
 }
 
 function Test-KiroUserScopeRequested {
   return @('1', 'true', 'TRUE', 'yes', 'YES', 'approved', 'APPROVED') -contains [string]$env:KIRO_USER_SCOPE
+}
+
+function Test-QoderUserScopeRequested {
+  return @('1', 'true', 'TRUE', 'yes', 'YES', 'approved', 'APPROVED') -contains [string]$env:QODER_USER_SCOPE
 }
 
 function Resolve-PathTemplate {
@@ -135,6 +147,12 @@ function Resolve-TargetPathOverride {
   }
   if ($HostName -eq 'kiro' -and $TargetKey -eq 'user' -and -not [string]::IsNullOrWhiteSpace($env:MCP_SETUP_KIRO_USER_PATH_OVERRIDE)) {
     return $env:MCP_SETUP_KIRO_USER_PATH_OVERRIDE
+  }
+  if ($HostName -eq 'qoder' -and $TargetKey -eq 'local' -and -not [string]::IsNullOrWhiteSpace($env:MCP_SETUP_QODER_LOCAL_PATH_OVERRIDE)) {
+    return $env:MCP_SETUP_QODER_LOCAL_PATH_OVERRIDE
+  }
+  if ($HostName -eq 'qoder' -and $TargetKey -eq 'user' -and -not [string]::IsNullOrWhiteSpace($env:MCP_SETUP_QODER_USER_PATH_OVERRIDE)) {
+    return $env:MCP_SETUP_QODER_USER_PATH_OVERRIDE
   }
   return $ResolvedPath
 }
@@ -258,6 +276,18 @@ switch ($detectedHost) {
     $markerPath = [System.IO.Path]::Combine($HOME, '.kiro', 'spec-first', 'host-setup.json')
     $configFormat = 'json'
   }
+  'qoder' {
+    if (Test-CommandExists 'qodercli') {
+      $cliCommand = 'qodercli'
+    } elseif (Test-CommandExists 'qoder') {
+      $cliCommand = 'qoder'
+    } else {
+      $cliCommand = 'qodercli'
+    }
+    $displayName = 'Qoder'
+    $markerPath = [System.IO.Path]::Combine($HOME, '.qoder', 'spec-first', 'host-setup.json')
+    $configFormat = 'json'
+  }
   default {
     throw "错误：无法识别宿主：$detectedHost"
   }
@@ -268,6 +298,10 @@ $primaryScope = Get-MapValue -Object $mcpHostContract -Name 'scope'
 $fallbackOrder = @(Get-MapValue -Object $mcpHostContract -Name 'fallback_order')
 $uninstallTargets = @(Get-MapValue -Object $mcpHostContract -Name 'uninstall_targets')
 if ($detectedHost -eq 'kiro' -and (Test-KiroUserScopeRequested)) {
+  $primaryScope = 'user'
+  $fallbackOrder = @('user')
+}
+if ($detectedHost -eq 'qoder' -and (Test-QoderUserScopeRequested)) {
   $primaryScope = 'user'
   $fallbackOrder = @('user')
 }

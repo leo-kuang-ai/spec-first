@@ -6,9 +6,9 @@
 
 核心原则：
 
-- `.claude/`、`.codex/`、`.agents/skills/`、`.kiro/skills/`、`.kiro/agents/` 和 `.kiro/spec-first/` 下的 spec-first runtime mirror 可重建，不作为项目 source truth。
-- `.kiro/settings/` 是 Kiro workspace MCP 配置落点；`spec-first` 写入的 MCP 配置默认不提交。
-- `.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated runtime mirror；只有被显式点名时才作为输入读取。
+- `.claude/`、`.codex/`、`.agents/skills/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec/`、`.qoder/skills/`、`.qoder/agents/` 和 `.qoder/spec-first/` 下的 spec-first runtime mirror 可重建，不作为项目 source truth。
+- `.kiro/settings/` 是 Kiro workspace MCP 配置落点；`.qoder/settings.local.json` 是 Qoder local MCP 配置落点；二者不是 source，默认不提交。Qoder clean 保留 local settings 整文件，具体 MCP server entry 由 setup/uninstall 路径管理。
+- `.kiro/specs/**` 是 Kiro-native advisory artifact，`.qoder/rules/**` 是 Qoder-native optional rules；二者不属于 spec-first generated runtime mirror，只有被显式点名时才作为输入读取。
 - `.spec-first/config/` 和 `.spec-first/workspace/` 是本地 setup/control-plane facts，默认不提交。
 - `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated runtime mirrors 也不应作为普通 LLM 上下文扫描源；只有 setup/update/runtime-drift/audit/governance evidence 任务或用户明确点名路径时才按需读取。
 - `.spec-first/sessions/` 是 multi-actor 治理协议的 opt-in advisory 记录目录，由 `spec-first session register` 等命令写入；属于 runtime state，默认不提交。
@@ -40,6 +40,11 @@
 .kiro/agents/
 .kiro/spec-first/
 .kiro/settings/
+.qoder/commands/spec/
+.qoder/skills/
+.qoder/agents/
+.qoder/spec-first/
+.qoder/settings.local.json
 .context/spec-first/
 
 # spec-first local setup and workflow runtime artifacts
@@ -105,6 +110,14 @@ graphify-out/
     settings/                       # spec-first MCP workspace config，忽略
     specs/                          # Kiro-native specs，是否提交按团队策略
 
+  .qoder/
+    commands/spec/                  # Qoder project command runtime mirror，忽略
+    skills/                         # Qoder project skill runtime mirror，忽略
+    agents/                         # Qoder subagent runtime mirror，忽略
+    spec-first/                     # spec-first state/profile，忽略
+    settings.local.json             # Qoder local MCP config，忽略；clean 保留整文件
+    rules/                          # Qoder-native rules，是否提交按团队策略
+
   .spec-first/
     config.local.example.yaml       # 本地配置模板，可提交
     config.local.yaml               # 本地配置，忽略
@@ -150,6 +163,7 @@ graphify-out/
 | 路径 | 建议 |
 | --- | --- |
 | `.claude/settings.json` | Claude Code 项目配置；`init --claude` 会写入 spec-first 受管 hook matchers。团队希望共享 Claude hooks、permissions 或 MCP 配置时可提交；仅个人使用的配置应放到 `.claude/settings.local.json` 并在 managed block 外自行忽略。 |
+| `.qoder/rules/**`、`.qoder/settings.json`、`.qoder/hooks/**` | Qoder-native 团队规则、用户级配置或 hooks；是否提交按 Qoder/团队策略决定，spec-first 不把它们作为 P0 generated runtime。 |
 | `graphify-out/cache/`、`graphify-out/graph.html`、`graphify-out/.graphify_labels.json` | Graphify provider runtime/cache 输出，默认随整个 `graphify-out/` 忽略。 |
 
 ## 默认不提交的内容
@@ -162,6 +176,8 @@ graphify-out/
 | `.claude/tasks/`、`.claude/worktrees/` | Claude Code host-local scratch/worktree 产物 |
 | `.codex/`、`.agents/skills/` | Codex host/runtime assets 与 `spec-first init` 可重建的 runtime mirror |
 | `.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.kiro/settings/` | Kiro spec-first-managed runtime mirror、state 与 MCP workspace config，可由 `init` / `$spec-mcp-setup` 重建 |
+| `.qoder/commands/spec/`、`.qoder/skills/`、`.qoder/agents/`、`.qoder/spec-first/` | Qoder spec-first-managed runtime mirror 与 state，可由 `init` 重建 |
+| `.qoder/settings.local.json` | Qoder local MCP config output，默认忽略且不是 source；`spec-first clean --qoder` 保留整文件，server entry 由 `$spec-mcp-setup` setup/uninstall 管理 |
 | `.spec-first/config.local.yaml`、`.spec-first/*.local.yaml` | 本地配置，可能包含个人路径或私有设置 |
 | `.spec-first/config/*.json` | `spec-mcp-setup` 生成的 setup-owned 本地投影，不是第二个版本源 |
 | `.spec-first/workspace/` | 父级多仓 advisory summaries，不是 child repo canonical truth |
@@ -192,6 +208,7 @@ graphify-out/
 .claude/
 .agents/
 .spec-first/
+.qoder/
 ```
 
 原因：
@@ -199,5 +216,6 @@ graphify-out/
 - 整个 `.claude/` 可能会隐藏团队有意提交的项目设置、hook 或非 spec-first 配置；`.codex/` 是当前默认例外，Codex host/runtime config 与 spec-first Codex runtime mirror 都按本地可重建资产处理。
 - 整个 `.agents/` 可能会隐藏团队自定义 plugins 或 marketplace 配置。
 - 整个 `.spec-first/` 会隐藏 `.spec-first/config.local.example.yaml`、`.spec-first/specs/repo-profile.yaml` 和团队可能选择提交的其他 source 文件；当前 confirmed team standards 推荐放在 `docs/standards/**`，不放在 `.spec-first/standards/`。
+- 整个 `.qoder/` 可能会隐藏团队有意维护的 Qoder rules、settings 或 hooks；默认只忽略 spec-first managed Qoder runtime。
 
 默认推荐是忽略 spec-first 可重建 runtime、Codex host runtime root 和本地 facts，同时保留明确 source 路径的提交决策空间。

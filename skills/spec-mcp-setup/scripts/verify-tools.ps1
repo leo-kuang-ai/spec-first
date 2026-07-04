@@ -173,6 +173,7 @@ function Get-RuntimeStatePathForHost {
     'codex' { return (Join-Path $TargetRoot '.codex/spec-first/state.json') }
     'claude' { return (Join-Path $TargetRoot '.claude/spec-first/state.json') }
     'kiro' { return (Join-Path $TargetRoot '.kiro/spec-first/state.json') }
+    'qoder' { return (Join-Path $TargetRoot '.qoder/spec-first/state.json') }
     default { return '' }
   }
 }
@@ -1159,6 +1160,14 @@ switch ($combined.host) {
   'codex' {
     $hostDisplay = 'Codex'
     $setupCommand = '$spec-mcp-setup'
+  }
+  'kiro' {
+    $hostDisplay = 'Kiro'
+    $setupCommand = 'Kiro Agent Skill spec-mcp-setup'
+  }
+  'qoder' {
+    $hostDisplay = 'Qoder'
+    $setupCommand = 'Qoder project command /spec:mcp-setup or Skill spec-mcp-setup'
   }
   default {
     $hostDisplay = 'Claude Code / Codex'

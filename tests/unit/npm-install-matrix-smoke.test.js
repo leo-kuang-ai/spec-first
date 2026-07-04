@@ -152,6 +152,8 @@ describe('npm install matrix smoke script', () => {
     expect(normalizeArtifactFileName('release-artifact-summary.json')).toBe('release-artifact-summary.json');
     expect(normalizeArtifactFileName('init-claude-programmatic.log')).toBe('init-claude-programmatic.log');
     expect(normalizeArtifactFileName('init-codex-programmatic.log')).toBe('init-codex-programmatic.log');
+    expect(normalizeArtifactFileName('init-kiro-programmatic.log')).toBe('init-kiro-programmatic.log');
+    expect(normalizeArtifactFileName('init-qoder-programmatic.log')).toBe('init-qoder-programmatic.log');
 
     for (const unsafe of ['../summary.json', '..\\summary.json', '/tmp/summary.json', 'C:\\tmp\\summary.json', 'bad:name.log', '']) {
       expect(() => normalizeArtifactFileName(unsafe)).toThrow(/Unsafe smoke artifact file name/);
@@ -274,6 +276,8 @@ describe('npm install matrix smoke script', () => {
       package_content_manifest: 'package-content-manifest.json',
       init_claude_programmatic_log: 'init-claude-programmatic.log',
       init_codex_programmatic_log: 'init-codex-programmatic.log',
+      init_kiro_programmatic_log: 'init-kiro-programmatic.log',
+      init_qoder_programmatic_log: 'init-qoder-programmatic.log',
       release_artifact_summary: 'release-artifact-summary.json',
     });
 
@@ -344,6 +348,46 @@ describe('npm install matrix smoke script', () => {
       has_state: false,
       mutated: true,
     }));
+
+    const kiroPassed = buildInitProgrammaticEvidence({
+      host: 'kiro',
+      result: {
+        status: 0,
+        stdout: 'Generated skill directory(ies)',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.kiro/spec-first/state.json:content',
+      ],
+    });
+    expect(kiroPassed).toEqual(expect.objectContaining({
+      host: 'kiro',
+      passed: true,
+      expected_state_path: '.kiro/spec-first/state.json',
+      expected_instruction_path: 'AGENTS.md',
+    }));
+
+    const qoderPassed = buildInitProgrammaticEvidence({
+      host: 'qoder',
+      result: {
+        status: 0,
+        stdout: 'Generated command file(s)',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.qoder/spec-first/state.json:content',
+      ],
+    });
+    expect(qoderPassed).toEqual(expect.objectContaining({
+      host: 'qoder',
+      passed: true,
+      expected_state_path: '.qoder/spec-first/state.json',
+      expected_instruction_path: 'AGENTS.md',
+    }));
   });
 
   test('workflow uses reusable smoke script and avoids shell true fallback', () => {
@@ -395,7 +439,9 @@ describe('npm install matrix smoke script', () => {
     expect(script).toContain('release-artifact-summary.json');
     expect(script).toContain('init-claude-programmatic.log');
     expect(script).toContain('init-codex-programmatic.log');
-    expect(script).toContain("['claude', 'codex']");
+    expect(script).toContain('init-kiro-programmatic.log');
+    expect(script).toContain('init-qoder-programmatic.log');
+    expect(script).toContain("['claude', 'codex', 'kiro', 'qoder']");
     expect(script).not.toContain("['init', '--claude'");
     expect(script).not.toContain("['init', '--codex'");
     expect(script).toContain('cmd.exe');

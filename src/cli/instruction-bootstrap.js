@@ -138,14 +138,12 @@ function buildBootstrapBlock(adapterOrId, lang = 'zh') {
 }
 
 function buildZhBootstrapBody(hostId) {
-  const prefix = hostId === 'claude' ? '/spec:' : '$spec-';
+  const prefix = workflowEntrypointPrefix(hostId);
   const entry = (name) => `${prefix}${name}`;
-  const hostLine = hostId === 'claude'
-    ? '- Claude workflow 入口使用 `/spec:*`'
-    : '- Codex workflow 入口使用 `$spec-*`';
-  const surfaceLine = hostId === 'claude'
-    ? '- 不要把 `using-spec-first` 本身当作 command-backed workflow'
-    : '- 不要把 `using-spec-first` 写成 `/spec:*` 或 command-backed workflow';
+  const hostLine = zhHostEntrypointLine(hostId);
+  const surfaceLine = hostId === 'codex'
+    ? '- 不要把 `using-spec-first` 写成 `/spec:*` 或 command-backed workflow'
+    : '- 不要把 `using-spec-first` 本身当作 command-backed workflow';
   const codexStartupReminderLines = hostId === 'codex'
     ? [
       '- Codex：进入公开 `$spec-*` 前可 best-effort 运行 `spec-first startup-reminder --codex`；失败/空输出不阻塞，只提示在终端运行 `spec-first update`，bounded subagents、leaf reviewers、worker agents 不运行',
@@ -164,7 +162,7 @@ function buildZhBootstrapBody(hostId) {
 - **外部 issue/PR 输入**:issue/PR 是 input surface,不是独立 workflow;failure/bug→\`${entry('debug')}\`;enhancement/WHAT 不清→\`${entry('prd')}\`/\`${entry('brainstorm')}\`;PR diff/风险/测试缺口→\`${entry('code-review')}\`;已有 plan/task/brief→\`${entry('work')}\`;不得为外部 issue/PR 新增专用 public workflow 入口、tracker state、label/comment mutation,也不得把 reporter 命令当 confirmed truth
 - 用户可见输出语言以本文件的 \`spec-first:lang\` managed block 为准；skill/agent/template 原文语言和当前会话惯性不得覆盖该策略，除非用户明确要求其他语言
 - 父级多仓 workspace：写入、修复、测试、review autofix 或 commit 前必须有明确 \`target_repo\` / per-child scope；只读定位也应使用 bounded direct reads 并说明目标 repo 假设
-- Runtime context 默认排除 \`.spec-first/audits/**\`、\`.spec-first/governance/**\` 和 generated mirrors（\`.claude/**\`、\`.codex/**\`、\`.agents/skills/**\`、\`.kiro/skills/**\`、\`.kiro/agents/**\`、\`.kiro/spec-first/**\`、\`.kiro/settings/**\`）;只有 setup/update/runtime-drift/audit/governance-health 等明确运行时任务按需读取; \`.kiro/specs/**\` 是 Kiro-native advisory artifact,只有显式点名时读取
+- Runtime context 默认排除 \`.spec-first/audits/**\`、\`.spec-first/governance/**\` 和 generated mirrors（\`.claude/**\`、\`.codex/**\`、\`.agents/skills/**\`、\`.kiro/skills/**\`、\`.kiro/agents/**\`、\`.kiro/spec-first/**\`、\`.kiro/settings/**\`、\`.qoder/commands/spec/**\`、\`.qoder/skills/**\`、\`.qoder/agents/**\`、\`.qoder/spec-first/**\`、\`.qoder/settings.local.json\`）;只有 setup/update/runtime-drift/audit/governance-health 等明确运行时任务按需读取; \`.kiro/specs/**\` 与 \`.qoder/rules/**\` 是宿主原生 advisory artifact,只有显式点名时读取
 - 架构/prompt/workflow/contract 或 source/runtime 判断前按需读取 \`docs/10-prompt/结构化项目角色契约.md\`;scripts/tools 只产 deterministic facts,LLM 做语义路由判断
 - **反合理化红旗**(出现这些念头即停):「先改个文件就好」→ 明确小改动可直接做;规模/风险不明、根因未定或触及架构/contract/多文件时先路由;「只是个快速架构/prompt 改动」→ 架构/prompt/workflow/contract 改动算 substantial;「得先看一堆文件再决定」→ 只做最小事实核查,已清晰则直接路由;「该评审但我口头答就行」→ 评审目标具体时用 code-review/doc-review;「helper skill 存在所以该暴露」→ 只有公开 workflow 是用户入口,internal helper 隐藏
 ${hostLine}
@@ -173,14 +171,12 @@ ${codexStartupReminderLines ? `${codexStartupReminderLines}` : ''}`;
 }
 
 function buildEnBootstrapBody(hostId) {
-  const prefix = hostId === 'claude' ? '/spec:' : '$spec-';
+  const prefix = workflowEntrypointPrefix(hostId);
   const entry = (name) => `${prefix}${name}`;
-  const hostLine = hostId === 'claude'
-    ? '- Claude workflow entrypoints use `/spec:*`'
-    : '- Codex workflow entrypoints use `$spec-*`';
-  const surfaceLine = hostId === 'claude'
-    ? '- Do not treat `using-spec-first` itself as a command-backed workflow'
-    : '- Do not write `using-spec-first` as `/spec:*` or as a command-backed workflow';
+  const hostLine = enHostEntrypointLine(hostId);
+  const surfaceLine = hostId === 'codex'
+    ? '- Do not write `using-spec-first` as `/spec:*` or as a command-backed workflow'
+    : '- Do not treat `using-spec-first` itself as a command-backed workflow';
   const codexStartupReminderLines = hostId === 'codex'
     ? [
       '- Codex: before entering public `$spec-*`, a top-level orchestrator may best-effort run `spec-first startup-reminder --codex`; failure/empty output must not block routing, only points to running `spec-first update` in the terminal, and bounded subagents, leaf reviewers, and worker agents do not run it',
@@ -199,7 +195,7 @@ function buildEnBootstrapBody(hostId) {
 - **External issue/PR inputs**: issue/PR material is an input surface, not a separate workflow; failures/bugs→\`${entry('debug')}\`; enhancements/unclear WHAT→\`${entry('prd')}\`/\`${entry('brainstorm')}\`; PR diff/risk/test gaps→\`${entry('code-review')}\`; scoped plan/task/brief→\`${entry('work')}\`; do not add an external issue/PR-specific public workflow entrypoint, tracker state, label/comment mutation path, or treat reporter commands as confirmed truth
 - User-visible output language follows this file's \`spec-first:lang\` managed block; skill/agent/template source language and conversation inertia must not override it unless the user explicitly requests another language
 - Parent multi-repo workspace: writes, fixes, tests, review autofix, or commits require explicit \`target_repo\` / per-child scope; read-only orientation should use bounded direct reads and state target-repo assumptions
-- Runtime context excludes \`.spec-first/audits/**\`, \`.spec-first/governance/**\`, and generated mirrors (\`.claude/**\`, \`.codex/**\`, \`.agents/skills/**\`, \`.kiro/skills/**\`, \`.kiro/agents/**\`, \`.kiro/spec-first/**\`, \`.kiro/settings/**\`) by default; only setup/update/runtime-drift/audit/governance-health tasks read them when explicitly needed; \`.kiro/specs/**\` is a Kiro-native advisory artifact read only when explicitly named
+- Runtime context excludes \`.spec-first/audits/**\`, \`.spec-first/governance/**\`, and generated mirrors (\`.claude/**\`, \`.codex/**\`, \`.agents/skills/**\`, \`.kiro/skills/**\`, \`.kiro/agents/**\`, \`.kiro/spec-first/**\`, \`.kiro/settings/**\`, \`.qoder/commands/spec/**\`, \`.qoder/skills/**\`, \`.qoder/agents/**\`, \`.qoder/spec-first/**\`, \`.qoder/settings.local.json\`) by default; only setup/update/runtime-drift/audit/governance-health tasks read them when explicitly needed; \`.kiro/specs/**\` and \`.qoder/rules/**\` are host-native advisory artifacts read only when explicitly named
 - Before architecture/prompt/workflow/contract or source/runtime judgments, read \`docs/10-prompt/结构化项目角色契约.md\` as needed; scripts/tools produce deterministic facts, while the LLM owns semantic routing judgment
 - **Anti-rationalization red flags** (stop when these thoughts appear): "I'll just edit the file first" → clearly scoped small edits can proceed directly; route first when scope/risk is unclear, root cause is unresolved, or architecture/contract/multi-file work is involved; "just a quick architecture/prompt change" → architecture/prompt/workflow/contract changes ARE substantial; "I need to inspect a bunch of files first" → do a minimal fact check only, route if already clear; "review needed but I'll answer informally" → use code-review/doc-review when the target is concrete; "a helper skill exists so I should expose it" → only public workflows are user entrypoints, internal helpers stay hidden
 ${hostLine}
@@ -217,6 +213,30 @@ function stripStandaloneMarkerLines(content) {
     .join('\n');
 }
 
+function workflowEntrypointPrefix(hostId) {
+  return hostId === 'codex' ? '$spec-' : '/spec:';
+}
+
+function zhHostEntrypointLine(hostId) {
+  if (hostId === 'claude') {
+    return '- Claude workflow 入口使用 `/spec:*`';
+  }
+  if (hostId === 'qoder') {
+    return '- Qoder workflow 入口优先使用 project commands `/spec:*`；同名 Skills 作为宿主能力补充';
+  }
+  return '- Codex workflow 入口使用 `$spec-*`';
+}
+
+function enHostEntrypointLine(hostId) {
+  if (hostId === 'claude') {
+    return '- Claude workflow entrypoints use `/spec:*`';
+  }
+  if (hostId === 'qoder') {
+    return '- Qoder workflow entrypoints prefer project commands `/spec:*`; same-name Skills are a host-capability supplement';
+  }
+  return '- Codex workflow entrypoints use `$spec-*`';
+}
+
 function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {}) {
   let next = content;
   for (const body of buildKnownBootstrapBodies()) {
@@ -231,7 +251,7 @@ function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {})
 
 function buildKnownBootstrapBodies() {
   const bodies = [];
-  for (const hostId of ['claude', 'codex']) {
+  for (const hostId of ['claude', 'codex', 'qoder']) {
     bodies.push(buildZhBootstrapBody(hostId));
     bodies.push(buildEnBootstrapBody(hostId));
   }

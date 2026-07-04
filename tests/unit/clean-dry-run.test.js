@@ -297,6 +297,59 @@ describe('clean --dry-run', () => {
     }
   });
 
+  test('Qoder clean removes only spec-first managed runtime and preserves user-owned Qoder assets', () => {
+    const projectRoot = makeTempDir();
+    const initLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'qoder' }))).toBe(0);
+
+      const userRulePath = path.join(projectRoot, '.qoder', 'rules', 'security.md');
+      const userSettingsPath = path.join(projectRoot, '.qoder', 'settings.json');
+      const localMcpConfigPath = path.join(projectRoot, '.qoder', 'settings.local.json');
+      const userHookPath = path.join(projectRoot, '.qoder', 'hooks', 'custom.json');
+      fs.mkdirSync(path.dirname(userRulePath), { recursive: true });
+      fs.mkdirSync(path.dirname(userHookPath), { recursive: true });
+      fs.writeFileSync(userRulePath, '# native rule\n', 'utf8');
+      fs.writeFileSync(userSettingsPath, '{"mcpServers":{"user":{}}}\n', 'utf8');
+      fs.writeFileSync(localMcpConfigPath, '{"mcpServers":{"local":{}}}\n', 'utf8');
+      fs.writeFileSync(userHookPath, '{}\n', 'utf8');
+
+      const dryRun = captureCommand(projectRoot, runClean, ['--qoder', '--dry-run']);
+      expect(dryRun.exitCode).toBe(0);
+      expect(dryRun.stderr).toBe('');
+      expect(dryRun.stdout).toContain('Dry run: spec-first clean (qoder)');
+      expect(dryRun.stdout).toContain('.qoder/commands/spec/work.md');
+      expect(dryRun.stdout).toContain('.qoder/skills/spec-work');
+      expect(dryRun.stdout).toContain('.qoder/agents/spec-security-reviewer.agent.md');
+      expect(dryRun.stdout).toContain('.qoder/spec-first/state.json');
+      expect(dryRun.stdout).toContain('AGENTS.md');
+      expect(dryRun.stdout).not.toContain('.qoder/rules/security.md');
+      expect(dryRun.stdout).not.toContain('.qoder/settings.json');
+      expect(dryRun.stdout).not.toContain('.qoder/settings.local.json');
+      expect(dryRun.stdout).not.toContain('.qoder/hooks/custom.json');
+
+      const cleanResult = captureCommand(projectRoot, runClean, ['--qoder']);
+      expect(cleanResult.exitCode).toBe(0);
+      expect(cleanResult.stdout).toContain('Removed spec-first managed Qoder assets');
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec', 'work.md'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(false);
+      expect(fs.existsSync(userRulePath)).toBe(true);
+      expect(fs.existsSync(userSettingsPath)).toBe(true);
+      expect(fs.existsSync(localMcpConfigPath)).toBe(true);
+      expect(fs.existsSync(userHookPath)).toBe(true);
+
+      const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
+      expect(instructions).not.toContain('spec-first:bootstrap:start');
+      expect(instructions).not.toContain('spec-first:runtime-tools:start');
+    } finally {
+      initLogSpy.mockRestore();
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('clean rejects unsafe managed state paths before deleting assets', () => {
     const tempRoot = makeTempDir();
     const projectRoot = path.join(tempRoot, 'project');

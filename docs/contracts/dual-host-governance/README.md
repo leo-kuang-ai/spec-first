@@ -3,9 +3,9 @@
 - 状态：`accepted`
 - 生效日期：`2026-04-16`
 - 作用范围：`T00 / T01 / T11 / T12 / T14`
-- 目标：为 Claude/Codex/Kiro supported-host 产品面、治理枚举、filtered asset set 提供单一可引用 contract
+- 目标：为 Claude/Codex/Kiro/Qoder supported-host 产品面、治理枚举、filtered asset set 提供单一可引用 contract
 
-> 兼容性说明：目录名仍为 `dual-host-governance`，这是历史 compatibility path。当前 machine-readable 语义已经泛化为 supported-host / 三宿主 skill delivery governance；不得把目录名解读为只支持 Claude/Codex。
+> 兼容性说明：目录名仍为 `dual-host-governance`，这是历史 compatibility path。当前 machine-readable 语义已经泛化为 supported-host / 多宿主 skill delivery governance；不得把目录名解读为只支持 Claude/Codex。
 
 ## 1. 产品面最终决策
 
@@ -14,8 +14,9 @@
 1. Claude 用户可见 workflow 入口：`/spec:*`
 2. Codex 用户可见 workflow 入口：`$spec-*`
 3. Kiro 用户可见 workflow 入口：Kiro Agent Skill `spec-*`，由 `.kiro/skills/spec-*/SKILL.md` 投影；P0 不生成 Kiro `/spec:*` 命令，也不占用 Kiro native Specs namespace
-4. standalone skill 只能按 skill 方式表述，不得写成已声明 slash command
-5. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
+4. Qoder 用户可见 workflow 入口：Qoder project command `/spec:*`，由 `.qoder/commands/spec/*.md` 投影；同时生成 `.qoder/skills/spec-*` 作为 project skill mirror 供 Qoder skill surface 使用
+5. standalone skill 只能按 skill 方式表述，不得写成已声明 slash command
+6. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
 
 ### 1.2 Codex compatibility layer 决策
 
@@ -69,7 +70,7 @@
 定义：
 
 1. `dual_host`
-   - 所有 supported hosts 都需要交付对应能力；当前 supported hosts 为 `claude`、`codex`、`kiro`
+   - 所有 supported hosts 都需要交付对应能力；当前 supported hosts 为 `claude`、`codex`、`kiro`、`qoder`
 2. `host_exclusive`
    - 只在单一宿主上交付给用户或运行时
 3. `target_host_maintenance`
@@ -85,11 +86,11 @@
    - 类型：`string | null`
    - 当 `entry_surface = workflow_command` 时必填
 2. `owner_host`
-   - 类型：`claude | codex | kiro | null`
+   - 类型：`claude | codex | kiro | qoder | null`
    - 当 `host_scope = host_exclusive` 或 `target_host_maintenance` 时必填
 3. `host_delivery`
    - 类型：对象
-   - 字段：`claude`、`codex`、`kiro`
+   - 字段：`claude`、`codex`、`kiro`、`qoder`
    - 允许值：`command`、`skill`、`internal`、`none`
 
 说明：
@@ -114,11 +115,15 @@
    - `host_delivery.kiro = skill`
    - 不生成 `.kiro/commands/spec/*` 或 Kiro `/spec:*` command layer
    - workflow 通过 `.kiro/skills/spec-*` 发现与调用
+4. Qoder
+   - `host_delivery.qoder = command`
+   - 生成 `.qoder/commands/spec/*` project commands
+   - 同步 `.qoder/skills/spec-*` workflow skill mirrors
 
 这意味着：
 
 1. `workflow_command` 是源层事实
-2. Codex 和 Kiro 侧不再因为这个源层事实而额外生成 command 文件
+2. Codex 和 Kiro 侧不再因为这个源层事实而额外生成 command 文件；Qoder 因宿主原生支持 project commands 而生成 command layer
 
 ### 2.5 Agent 模型选择 Contract
 
@@ -162,7 +167,7 @@ filtered asset set 的最小输入固定为：
 
 1. 由 `skills-governance.json` 的 workflow records 与 command template frontmatter 生成的 manifest command set
 2. 宿主治理真源文件
-3. 目标平台：`claude | codex | kiro`
+3. 目标平台：`claude | codex | kiro | qoder`
 
 ### 3.2 输出
 

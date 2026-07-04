@@ -306,6 +306,7 @@ describe('using-spec-first contracts', () => {
             claude: 'skill',
             codex: 'skill',
             kiro: 'skill',
+            qoder: 'skill',
           },
         }),
       ]),

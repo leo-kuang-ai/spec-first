@@ -28,7 +28,8 @@
       "enum": [
         "claude",
         "codex",
-        "kiro"
+        "kiro",
+        "qoder"
       ]
     },
     "entrySurface": {
@@ -90,6 +91,7 @@
             "claude",
             "codex",
             "kiro",
+            "qoder",
             null
           ]
         },
@@ -99,7 +101,8 @@
           "required": [
             "claude",
             "codex",
-            "kiro"
+            "kiro",
+            "qoder"
           ],
           "properties": {
             "claude": {
@@ -109,6 +112,9 @@
               "$ref": "#/$defs/hostDelivery"
             },
             "kiro": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "qoder": {
               "$ref": "#/$defs/hostDelivery"
             }
           }

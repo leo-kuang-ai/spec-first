@@ -187,6 +187,77 @@ describe('init plan API', () => {
     }
   });
 
+  test('applyInitPlan writes Qoder commands, skills, agents and state without rules or hooks runtime', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      const plan = buildInitPlan({
+        projectRoot,
+        platform: 'qoder',
+        name: 'reviewer',
+        lang: 'zh',
+      });
+      const result = applyInitPlan(projectRoot, plan);
+
+      expect(result.exit_code).toBe(0);
+      expect(fs.existsSync(path.join(projectRoot, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec', 'work.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'rules'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'hooks'))).toBe(false);
+
+      const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
+      expect(instructions).toContain('Qoder workflow 入口优先使用 project commands `/spec:*`');
+      expect(instructions).toContain('setup/runtime→`/spec:mcp-setup`');
+      expect(instructions).not.toContain('Codex workflow 入口使用 `$spec-*`');
+      expect(instructions).not.toContain('$spec-mcp-setup');
+
+      const command = fs.readFileSync(path.join(projectRoot, '.qoder', 'commands', 'spec', 'work.md'), 'utf8');
+      expect(command).toContain('name: work');
+      expect(command).toContain('description:');
+      expect(command).not.toContain('.agents/skills/spec-work');
+
+      const skill = fs.readFileSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).toContain('name: spec-work');
+      expect(skill).not.toContain('.agents/skills/spec-work');
+
+      const agent = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
+      expect(agent).toContain('name: spec-security-reviewer');
+      expect(agent).toContain('tools: [Read, Grep, Glob]');
+      expect(agent).not.toMatch(/^model:/m);
+      expect(agent).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const webResearcher = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-web-researcher.agent.md'), 'utf8');
+      expect(webResearcher).toContain('name: spec-web-researcher');
+      expect(webResearcher).toContain('tools: [Read, Grep, Glob, WebFetch, WebSearch]');
+      expect(webResearcher).not.toMatch(/^model:/m);
+      expect(webResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const slackResearcher = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-slack-researcher.agent.md'), 'utf8');
+      expect(slackResearcher).toContain('name: spec-slack-researcher');
+      expect(slackResearcher).toContain('tools: [Read, Grep, Glob, mcp__slack__*]');
+      expect(slackResearcher).not.toMatch(/^model:/m);
+      expect(slackResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const issueIntelligence = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-issue-intelligence-analyst.agent.md'), 'utf8');
+      expect(issueIntelligence).toContain('name: spec-issue-intelligence-analyst');
+      expect(issueIntelligence).toContain('tools: [Read, Grep, Glob, mcp__github__*]');
+      expect(issueIntelligence).not.toMatch(/^model:/m);
+      expect(issueIntelligence).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const bestPractices = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-best-practices-researcher.agent.md'), 'utf8');
+      expect(bestPractices).toContain('name: spec-best-practices-researcher');
+      expect(bestPractices).toContain('tools: [Read, Grep, Glob, WebFetch, WebSearch, mcp__context7__*]');
+      expect(bestPractices).not.toMatch(/^model:/m);
+      expect(bestPractices).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('legacy managed state is represented as destructive plan diagnostics before apply', () => {
     const projectRoot = makeTempDir();
 

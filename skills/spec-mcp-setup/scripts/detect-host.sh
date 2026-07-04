@@ -41,6 +41,12 @@ apply_target_override() {
     kiro:user)
       printf '%s' "${MCP_SETUP_KIRO_USER_PATH_OVERRIDE:-$resolved_path}"
       ;;
+    qoder:local)
+      printf '%s' "${MCP_SETUP_QODER_LOCAL_PATH_OVERRIDE:-$resolved_path}"
+      ;;
+    qoder:user)
+      printf '%s' "${MCP_SETUP_QODER_USER_PATH_OVERRIDE:-$resolved_path}"
+      ;;
     *)
       printf '%s' "$resolved_path"
       ;;
@@ -54,9 +60,20 @@ kiro_user_scope_requested() {
   esac
 }
 
+qoder_user_scope_requested() {
+  case "${QODER_USER_SCOPE:-}" in
+    1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 detect_host() {
+  local has_codex_cli=false
+  local has_claude_cli=false
+  local has_qoder_cli=false
+
   case "${MCP_SETUP_HOST:-}" in
-    claude|codex|kiro)
+    claude|codex|kiro|qoder)
       echo "$MCP_SETUP_HOST"
       return 0
       ;;
@@ -72,17 +89,26 @@ detect_host() {
     return 0
   fi
 
-  if command -v codex >/dev/null 2>&1 && ! command -v claude >/dev/null 2>&1; then
+  command -v codex >/dev/null 2>&1 && has_codex_cli=true
+  command -v claude >/dev/null 2>&1 && has_claude_cli=true
+  { command -v qodercli >/dev/null 2>&1 || command -v qoder >/dev/null 2>&1; } && has_qoder_cli=true
+
+  if [ "$has_codex_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_qoder_cli" = "false" ]; then
     echo "codex"
     return 0
   fi
 
-  if command -v claude >/dev/null 2>&1 && ! command -v codex >/dev/null 2>&1; then
+  if [ "$has_claude_cli" = "true" ] && [ "$has_codex_cli" = "false" ] && [ "$has_qoder_cli" = "false" ]; then
     echo "claude"
     return 0
   fi
 
-  echo "错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex 或 MCP_SETUP_HOST=kiro 后再运行。" >&2
+  if [ "$has_qoder_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_codex_cli" = "false" ]; then
+    echo "qoder"
+    return 0
+  fi
+
+  echo "错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex、MCP_SETUP_HOST=kiro 或 MCP_SETUP_HOST=qoder 后再运行。" >&2
   return 1
 }
 
@@ -217,6 +243,18 @@ case "$host" in
     marker_path="$HOME/.kiro/spec-first/host-setup.json"
     config_format="json"
     ;;
+  qoder)
+    if command -v qodercli >/dev/null 2>&1; then
+      cli_command="qodercli"
+    elif command -v qoder >/dev/null 2>&1; then
+      cli_command="qoder"
+    else
+      cli_command="qodercli"
+    fi
+    display_name="Qoder"
+    marker_path="$HOME/.qoder/spec-first/host-setup.json"
+    config_format="json"
+    ;;
   *)
     echo "错误：无法识别宿主：$host" >&2
     exit 1
@@ -227,6 +265,10 @@ primary_scope="$(jq -r '.scope' <<<"$host_contract_json")"
 fallback_order_json="$(jq -c '.fallback_order // []' <<<"$host_contract_json")"
 uninstall_targets_json="$(jq -c '.uninstall_targets // []' <<<"$host_contract_json")"
 if [ "$host" = "kiro" ] && kiro_user_scope_requested; then
+  primary_scope="user"
+  fallback_order_json='["user"]'
+fi
+if [ "$host" = "qoder" ] && qoder_user_scope_requested; then
   primary_scope="user"
   fallback_order_json='["user"]'
 fi

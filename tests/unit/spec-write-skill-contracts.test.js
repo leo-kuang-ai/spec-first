@@ -163,6 +163,7 @@ describe('spec-write-skill contract', () => {
         claude: 'command',
         codex: 'skill',
         kiro: 'skill',
+        qoder: 'command',
       },
     });
   });

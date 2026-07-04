@@ -9,9 +9,18 @@ const { spawnSync } = require('node:child_process');
 const PACKAGE_CONTENT_MANIFEST_FILE = 'package-content-manifest.json';
 const INIT_CLAUDE_PROGRAMMATIC_LOG_FILE = 'init-claude-programmatic.log';
 const INIT_CODEX_PROGRAMMATIC_LOG_FILE = 'init-codex-programmatic.log';
+const INIT_KIRO_PROGRAMMATIC_LOG_FILE = 'init-kiro-programmatic.log';
+const INIT_QODER_PROGRAMMATIC_LOG_FILE = 'init-qoder-programmatic.log';
 const RELEASE_ARTIFACT_SUMMARY_FILE = 'release-artifact-summary.json';
 const SUMMARY_FILE = 'summary.json';
 const PACK_OUTPUT_FILE = 'pack-output.log';
+const INIT_PROGRAMMATIC_HOSTS = ['claude', 'codex', 'kiro', 'qoder'];
+const INIT_PROGRAMMATIC_LOG_FILES = {
+  claude: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
+  codex: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+  kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
+  qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
+};
 
 const REQUIRED_PACKAGE_PATHS = [
   'bin/spec-first.js',
@@ -312,9 +321,12 @@ function buildInitProgrammaticEvidence({ host, result, beforeSnapshot, afterSnap
   const stderr = result.stderr || '';
   const status = Number.isInteger(result.status) ? result.status : 1;
   const mutated = JSON.stringify(beforeSnapshot) !== JSON.stringify(afterSnapshot);
-  const expectedStatePath = host === 'claude'
-    ? '.claude/spec-first/state.json'
-    : '.codex/spec-first/state.json';
+  const expectedStatePath = {
+    claude: '.claude/spec-first/state.json',
+    codex: '.codex/spec-first/state.json',
+    kiro: '.kiro/spec-first/state.json',
+    qoder: '.qoder/spec-first/state.json',
+  }[host] || `.${host}/spec-first/state.json`;
   const expectedInstructionPath = host === 'claude' ? 'CLAUDE.md' : 'AGENTS.md';
   const hasState = afterSnapshot.some((entry) => entry.startsWith(`${expectedStatePath}:`));
   const hasInstruction = afterSnapshot.some((entry) => entry.startsWith(`${expectedInstructionPath}:`));
@@ -373,7 +385,7 @@ process.exit(result.exit_code);
 }
 
 function runInitProgrammaticEvidence({ packageRoot, cwd, host, artifacts }) {
-  const logName = host === 'claude' ? INIT_CLAUDE_PROGRAMMATIC_LOG_FILE : INIT_CODEX_PROGRAMMATIC_LOG_FILE;
+  const logName = INIT_PROGRAMMATIC_LOG_FILES[host] || `init-${host}-programmatic.log`;
   const beforeSnapshot = snapshotTree(cwd);
   const result = runInstalledProgrammaticInitResult({ packageRoot, cwd, host });
   const afterSnapshot = snapshotTree(cwd);
@@ -420,6 +432,8 @@ function defaultReleaseArtifacts() {
     package_content_manifest: PACKAGE_CONTENT_MANIFEST_FILE,
     init_claude_programmatic_log: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
     init_codex_programmatic_log: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+    init_kiro_programmatic_log: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
+    init_qoder_programmatic_log: INIT_QODER_PROGRAMMATIC_LOG_FILE,
     release_artifact_summary: RELEASE_ARTIFACT_SUMMARY_FILE,
   };
 }
@@ -590,7 +604,7 @@ function main() {
     runInstalledShim(shim, ['--help']);
     runInstalledShim(shim, ['-v']);
 
-    const initProgrammaticChecks = ['claude', 'codex'].map((host) => {
+    const initProgrammaticChecks = INIT_PROGRAMMATIC_HOSTS.map((host) => {
       const programmaticProject = path.join(tmp, `programmatic-${host} workspace [win64] 中文`);
       fs.mkdirSync(programmaticProject);
       const evidence = runInitProgrammaticEvidence({
@@ -653,6 +667,8 @@ function main() {
       init_programmatic_artifacts: {
         claude: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
         codex: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+        kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
+        qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
       },
       release_checks: releaseChecks,
       release_failures: releaseArtifactSummary.failures,
@@ -686,6 +702,8 @@ function main() {
       init_programmatic_artifacts: {
         claude: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
         codex: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+        kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
+        qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
       },
       release_checks: releaseChecks,
       release_failures: releaseArtifactSummary.failures,
@@ -714,6 +732,8 @@ module.exports = {
   getEnvValue,
   INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
   INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+  INIT_KIRO_PROGRAMMATIC_LOG_FILE,
+  INIT_QODER_PROGRAMMATIC_LOG_FILE,
   matchesForbiddenPattern,
   normalizePackagePath,
   normalizeArtifactFileName,

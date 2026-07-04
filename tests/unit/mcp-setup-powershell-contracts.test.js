@@ -5,6 +5,7 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const configureHostPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/configure-host.ps1');
+const detectHostPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/detect-host.ps1');
 const detectToolsPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/detect-tools.ps1');
 const installHelpersPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/install-helpers.ps1');
 const installMcpPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/install-mcp.ps1');
@@ -41,9 +42,19 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(source).toContain('Set-TextFileAtomic -Path $ConfigPath -Value ($config | ConvertTo-Json -Depth 8)');
     expect(source).toContain('function Test-SelectedConfigConflicts');
     expect(source).toContain('SPEC_FIRST_MCP_CONFIGURE_OVERWRITE');
-    expect(source).toContain("} elseif ($DetectedHost -eq 'kiro') {");
+    expect(source).toContain("} elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder') {");
     expect(source).toContain('Assert-NoLiteralSecretValues');
     expect(source).toContain('$value -is [pscustomobject]');
+  });
+
+  test('detect-host recognizes qoder and qodercli as Qoder CLI aliases without silent mixed-host selection', () => {
+    const source = read(detectHostPs1);
+
+    expect(source).toContain("$hasQoderCli = (Test-CommandExists 'qodercli') -or (Test-CommandExists 'qoder')");
+    expect(source).toContain('if ($hasQoderCli -and -not $hasClaudeCli -and -not $hasCodexCli)');
+    expect(source).toContain("if (Test-CommandExists 'qodercli')");
+    expect(source).toContain("} elseif (Test-CommandExists 'qoder') {");
+    expect(source).toContain("$cliCommand = 'qoder'");
   });
 
   test('kiro host config writes workspace json by default and user json only with opt-in when PowerShell is available', () => {
@@ -135,6 +146,21 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
         command: 'npx',
       });
 
+      const uninstallWrongEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          QODER_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallWrongEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
       const uninstallUserResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7', '-UserScope'], {
         cwd: repo,
         encoding: 'utf8',
@@ -154,7 +180,90 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
   test('kiro literal secret guard walks PSCustomObject graphs', () => {
     expect(read(configureHostPs1)).toContain('$current -is [pscustomobject]');
     expect(read(configureHostPs1)).toContain('$property.Name');
-    expect(read(configureHostPs1)).toContain('Kiro config contains a literal secret-like value');
+    expect(read(configureHostPs1)).toContain('config contains a literal secret-like value');
+    expect(read(configureHostPs1)).toContain("$DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder'");
+  });
+
+  test('qoder host config writes local json by default and user json only with opt-in when PowerShell is available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-qoder-'));
+    try {
+      const repo = path.join(tmp, 'repo');
+      const home = path.join(tmp, 'home');
+      fs.mkdirSync(repo, { recursive: true });
+      fs.mkdirSync(home, { recursive: true });
+      fs.writeFileSync(path.join(repo, 'package.json'), '{"name":"fixture"}\n');
+
+      const defaultResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'sequential-thinking'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          HOME: home,
+        },
+      });
+      if (defaultResult === null) {
+        return;
+      }
+
+      expect(defaultResult.status).toBe(0);
+      const defaultPayload = JSON.parse(defaultResult.stdout);
+      const localConfigPath = path.join(repo, '.qoder/settings.local.json');
+      const userConfigPath = path.join(home, '.qoder/settings.json');
+      expect(defaultPayload.selected_scope).toBe('local');
+      expect(fs.existsSync(localConfigPath)).toBe(true);
+      expect(fs.existsSync(userConfigPath)).toBe(false);
+      expect(JSON.parse(read(localConfigPath)).mcpServers['sequential-thinking']).toMatchObject({
+        command: 'npx',
+      });
+
+      const userResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          HOME: home,
+        },
+      });
+      expect(userResult.status).toBe(0);
+      const userPayload = JSON.parse(userResult.stdout);
+      expect(userPayload.selected_scope).toBe('user');
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+      expect(JSON.parse(read(localConfigPath)).mcpServers.context7).toBeUndefined();
+
+      const uninstallWrongEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          KIRO_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallWrongEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const uninstallUserEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          QODER_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallUserEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toBeUndefined();
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
   });
 
   test('setup sources use direct setup facts only', () => {
@@ -242,6 +351,22 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
           },
           fallback_order: ['workspace'],
         },
+        qoder: {
+          command: 'codegraph',
+          args: ['serve', '--mcp'],
+          targets: {
+            local: {
+              config_path: '.qoder/settings.local.json',
+              config_format: 'json',
+            },
+            user: {
+              config_path: '$HOME/.qoder/settings.json',
+              config_format: 'json',
+              requires_user_scope_opt_in: true,
+            },
+          },
+          fallback_order: ['local'],
+        },
       },
     });
     expect(toolsJson.tools.every((tool) => tool.category === 'mcp')).toBe(true);
@@ -298,8 +423,10 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).toContain('if ([string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return }');
     expect(read(installHelpersPs1)).toContain('Ordinary workflows do not refresh project graphs after code changes');
     expect(read(installHelpersPs1)).toContain("'.kiro/skills/graphify/SKILL.md'");
-    expect(read(installHelpersPs1)).toContain("@('claude', 'codex', 'kiro')");
+    expect(read(installHelpersPs1)).toContain("'.qoder/skills/graphify/SKILL.md'");
+    expect(read(installHelpersPs1)).toContain("@('claude', 'codex', 'kiro', 'qoder')");
     expect(read(checkHealthPs1)).toContain("'.kiro', 'skills', $SkillName, 'SKILL.md'");
+    expect(read(checkHealthPs1)).toContain("'.qoder', 'skills', $SkillName, 'SKILL.md'");
     for (const token of [
       'Use Graphify as exploration-tier orientation',
       'architecture relationships',

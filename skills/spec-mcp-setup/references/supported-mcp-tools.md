@@ -22,7 +22,8 @@ This reference summarizes the current `spec-mcp-setup` registry. The machine sou
   - Claude Code: managed/user JSON `mcpServers`.
   - Codex: user/system TOML `mcp_servers` sections.
   - Kiro: workspace `.kiro/settings/mcp.json` by default; user `~/.kiro/settings/mcp.json` only with `--user-scope` or `KIRO_USER_SCOPE=1`.
-- Kiro config writes use JSON `mcpServers`, preserve unrelated entries, reject invalid JSON instead of overwriting, and must write secret-like values only as env var references.
+  - Qoder: local `.qoder/settings.local.json` by default; user `~/.qoder/settings.json` only with `--user-scope` or `QODER_USER_SCOPE=1`.
+- Kiro and Qoder config writes use JSON `mcpServers`, preserve unrelated entries, reject invalid JSON instead of overwriting, and must write secret-like values only as env var references.
 
 ## Required Helper Tools
 

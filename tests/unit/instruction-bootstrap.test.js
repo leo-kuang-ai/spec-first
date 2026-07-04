@@ -79,7 +79,7 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('target_repo');
     expect(twice).toContain('Runtime context 默认排除 `.spec-first/audits/**`');
     expect(twice).toContain('`.spec-first/governance/**`');
-    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`）');
+    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）');
     expect(twice).toContain('docs/10-prompt/结构化项目角色契约.md');
     expect(twice).toContain('scripts/tools 只产 deterministic facts');
     expect(twice).toContain('优化→`/spec:optimize`');
@@ -132,7 +132,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('bounded subagents, leaf reviewers, and worker agents');
     expect(updated).toContain('Runtime context excludes `.spec-first/audits/**`');
     expect(updated).toContain('`.spec-first/governance/**`');
-    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`)');
+    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)');
     expect(updated).toContain('Common entry anchors');
     expect(updated).toContain('External issue/PR inputs');
     expect(updated).toContain('issue/PR material is an input surface, not a separate workflow');
@@ -418,6 +418,7 @@ describe('instruction bootstrap', () => {
     const codexZh = buildBootstrapBlock('codex', 'zh');
     const codexEn = buildBootstrapBlock('codex', 'en');
     const claudeZh = buildBootstrapBlock('claude', 'zh');
+    const qoderZh = buildBootstrapBlock('qoder', 'zh');
 
     expect(codexZh).toContain('Codex：进入公开 `$spec-*` 前');
     expect(codexZh).toContain('spec-first startup-reminder --codex');
@@ -450,11 +451,31 @@ describe('instruction bootstrap', () => {
     expect(claudeZh).not.toContain('$spec-update');
     expect(claudeZh).not.toContain('默认多 persona dispatch');
     expect(claudeZh).not.toContain('dispatch_authorization_missing');
+    expect(qoderZh).not.toContain('startup-reminder --codex');
+    expect(qoderZh).not.toContain('dispatch_authorization_missing');
+  });
+
+  test('Qoder bootstrap uses project command entrypoints instead of Codex entrypoint prose', () => {
+    const qoderZh = buildBootstrapBlock('qoder', 'zh');
+    const qoderEn = buildBootstrapBlock('qoder', 'en');
+
+    expect(qoderZh).toContain('Qoder workflow 入口优先使用 project commands `/spec:*`');
+    expect(qoderZh).toContain('setup/runtime→`/spec:mcp-setup`');
+    expect(qoderZh).toContain('计划/执行→`/spec:plan`/`/spec:work`');
+    expect(qoderZh).toContain('不要把 `using-spec-first` 本身当作 command-backed workflow');
+    expect(qoderZh).not.toContain('Codex workflow 入口使用 `$spec-*`');
+    expect(qoderZh).not.toContain('Codex：进入公开 `$spec-*` 前');
+    expect(qoderZh).not.toContain('$spec-mcp-setup');
+
+    expect(qoderEn).toContain('Qoder workflow entrypoints prefer project commands `/spec:*`');
+    expect(qoderEn).toContain('setup/runtime→`/spec:mcp-setup`');
+    expect(qoderEn).not.toContain('Codex workflow entrypoints use `$spec-*`');
+    expect(qoderEn).not.toContain('before entering public `$spec-*`');
   });
 
   // U3: 最小入口锚点 + R2 哲学守护(AE1/AE2)
   test('minimal entry anchor carries core segments without 1% coercion (AE1/AE2)', () => {
-    for (const host of ['claude', 'codex']) {
+    for (const host of ['claude', 'codex', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
         // 四段在场
@@ -550,10 +571,10 @@ describe('instruction bootstrap', () => {
       expect(skillIds.has(id)).toBe(true);
     }
 
-    for (const host of ['claude', 'codex']) {
+    for (const host of ['claude', 'codex', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
-        const prefix = host === 'claude' ? '/spec:' : '$spec-';
+      const prefix = host === 'codex' ? '$spec-' : '/spec:';
         const re = new RegExp(prefix.replace(/[$]/g, '\\$') + '([a-z-]+)', 'g');
         const blockIds = new Set([...block.matchAll(re)].map((m) => m[1]));
         // block ⊆ SKILL:不得含 SKILL Route Map 之外的入口(防自造入口/drift)
@@ -584,6 +605,7 @@ describe('instruction bootstrap', () => {
     for (const lang of ['zh', 'en']) {
       const claude = buildBootstrapBlock('claude', lang);
       const codex = buildBootstrapBlock('codex', lang);
+      const qoder = buildBootstrapBlock('qoder', lang);
       // 把入口语法差异归一化后,四段核心语义点应两端都在
       const segmentProbes = lang === 'zh'
         ? ['何时进入 workflow', '何时直接做', '如何路由', '反合理化红旗', '常见入口锚点', '外部 issue/PR 输入', 'bounded subagent']
@@ -591,6 +613,7 @@ describe('instruction bootstrap', () => {
       for (const probe of segmentProbes) {
         expect(claude).toContain(probe);
         expect(codex).toContain(probe);
+        expect(qoder).toContain(probe);
       }
     }
   });
@@ -602,7 +625,7 @@ describe('instruction bootstrap', () => {
   // 本测试守护这种 intentional deferral:这两条红旗的语义必须在 bootstrap 在场,
   // 即使不在红旗措辞行内;若被静默删除则失败。
   test('load-bearing red flags (vague-route, run-init-route-first) stay covered in bootstrap (R-10)', () => {
-    for (const host of ['claude', 'codex']) {
+    for (const host of ['claude', 'codex', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
         if (lang === 'en') {

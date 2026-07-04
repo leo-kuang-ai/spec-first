@@ -12,8 +12,21 @@ $SkillDir = Split-Path -Parent $ScriptDir
 . (Join-Path $ScriptDir 'lib-template.ps1')
 if ($UserScope) {
   $env:KIRO_USER_SCOPE = '1'
+  $env:QODER_USER_SCOPE = '1'
 }
-$KiroUserScopeRequested = $UserScope -or (@('1', 'true', 'TRUE', 'yes', 'YES', 'approved', 'APPROVED') -contains [string]$env:KIRO_USER_SCOPE)
+$UserScopeValues = @('1', 'true', 'TRUE', 'yes', 'YES', 'approved', 'APPROVED')
+
+function Test-HostUserScopeRequested {
+  param([string]$HostName)
+  if ($UserScope) { return $true }
+  if ($HostName -eq 'kiro') {
+    return $UserScopeValues -contains [string]$env:KIRO_USER_SCOPE
+  }
+  if ($HostName -eq 'qoder') {
+    return $UserScopeValues -contains [string]$env:QODER_USER_SCOPE
+  }
+  return $false
+}
 
 function ConvertFrom-JsonCompat {
   param(
@@ -31,6 +44,7 @@ Assert-McpToolsSchemaVersion -ToolsJson $ToolsJson
 $HostInfo = & (Join-Path $ScriptDir 'detect-host.ps1') | ConvertFrom-Json
 $DetectedHost = $HostInfo.host
 $Platform = $HostInfo.platform
+$HostUserScopeRequested = Test-HostUserScopeRequested -HostName $DetectedHost
 
 function Resolve-PathTemplate {
   param([string]$Template)
@@ -98,7 +112,7 @@ foreach ($toolId in $toolIds) {
   if ($null -eq $toolDef) { continue }
   $detectKey = $toolDef.detection.key
   foreach ($targetKey in @($toolDef.host_config[$DetectedHost].uninstall_targets)) {
-    if ($DetectedHost -eq 'kiro' -and $targetKey -eq 'user' -and -not $KiroUserScopeRequested) { continue }
+    if (($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder') -and $targetKey -eq 'user' -and -not $HostUserScopeRequested) { continue }
     $target = $toolDef.host_config[$DetectedHost].targets[$targetKey]
     $configPathValue = Get-ToolField -Tool $target -Name 'config_path'
     $rawPath = if ($configPathValue -is [string]) { [string]$configPathValue } else { [string](Get-ToolField -Tool $configPathValue -Name $Platform) }
@@ -111,7 +125,7 @@ foreach ($toolId in $toolIds) {
     }
     if ($DetectedHost -eq 'claude') {
       Remove-ClaudeEntry -ConfigPath $configPath -ToolId $detectKey
-    } elseif ($DetectedHost -eq 'kiro') {
+    } elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder') {
       Remove-JsonMcpEntry -ConfigPath $configPath -ToolId $detectKey
     } elseif ($DetectedHost -eq 'codex') {
       Remove-CodexEntry -ConfigPath $configPath -DetectKey $detectKey

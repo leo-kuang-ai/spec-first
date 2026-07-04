@@ -152,6 +152,36 @@
             "workspace",
             "user"
           ]
+        },
+        "qoder": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
+            "user"
+          ]
         }
       },
       "detection": {
@@ -286,6 +316,36 @@
           ],
           "uninstall_targets": [
             "workspace",
+            "user"
+          ]
+        },
+        "qoder": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
             "user"
           ]
         }
@@ -440,6 +500,36 @@
           ],
           "uninstall_targets": [
             "workspace",
+            "user"
+          ]
+        },
+        "qoder": {
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "local",
+          "targets": {
+            "local": {
+              "config_path": ".qoder/settings.local.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.qoder/settings.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "local"
+          ],
+          "uninstall_targets": [
+            "local",
             "user"
           ]
         }

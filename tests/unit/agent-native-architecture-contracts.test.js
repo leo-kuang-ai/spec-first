@@ -63,6 +63,8 @@ describe('agent-native-architecture contracts', () => {
       host_delivery: {
         claude: 'internal',
         codex: 'internal',
+        kiro: 'internal',
+        qoder: 'internal',
       },
     });
 

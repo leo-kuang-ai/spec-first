@@ -22,6 +22,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --user-scope)
       export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
       shift
       ;;
     *)
@@ -185,7 +186,7 @@ write_json_mcp_config() {
 }
 
 assert_no_literal_secret_values() {
-  [ "$HOST" = "kiro" ] || return 0
+  [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ] || return 0
   jq -e '
     [.. | objects | to_entries[]? |
       select((.key | test("(?i)(token|secret|api[_-]?key|password)"))
@@ -265,10 +266,10 @@ elif [ "$HOST" = "codex" ]; then
     echo "错误：$TOOL_ID 写入宿主配置失败，已回滚" >&2
     exit 1
   fi
-elif [ "$HOST" = "kiro" ]; then
+elif [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ]; then
   if ! write_json_mcp_config "$RESOLVED_TOOL_CONFIG_JSON" || ! assert_no_literal_secret_values; then
     restore_backup
-    echo "错误：$TOOL_ID 写入 Kiro 配置失败或包含非 env reference 形式的敏感字段，已回滚" >&2
+    echo "错误：$TOOL_ID 写入 $HOST 配置失败或包含非 env reference 形式的敏感字段，已回滚" >&2
     exit 1
   fi
 else
