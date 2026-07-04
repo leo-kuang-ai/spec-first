@@ -18,6 +18,10 @@ $SkillDir = Split-Path -Parent $ScriptDir
 if ($UserScope) {
   $env:KIRO_USER_SCOPE = '1'
   $env:QODER_USER_SCOPE = '1'
+  $env:CURSOR_USER_SCOPE = '1'
+}
+if ($env:MCP_SETUP_HOST -notin @('claude', 'codex', 'kiro', 'qoder', 'cursor')) {
+  throw '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。'
 }
 $ToolsJsonPath = Join-Path $SkillDir 'mcp-tools.json'
 $ProviderToolsJsonPath = Join-Path $SkillDir 'provider-tools.json'
@@ -479,6 +483,18 @@ function Write-WarmupCache {
   }
 }
 
+function Redact-Diagnostic {
+  param([string]$Value)
+  $text = [string]$Value
+  $text = $text -replace '(?i)(https?://[^:/\s?]+):[^@\s/?]+@', '$1:<redacted>@'
+  $text = $text -replace '(?i)([?&](?:token|access_token|api[_-]?key|key|secret|password)=)[^&\s]+', '$1<redacted>'
+  $text = $text -replace '(?i)(authorization\s*:\s*(?:Bearer|Basic)\s+)[^,;\s]+', '$1<redacted>'
+  $text = $text -replace '(?i)\b(Bearer|Basic)\s+[A-Za-z0-9._~+/\-]+=*', '$1 <redacted>'
+  $text = $text -replace '(?i)\b((?:authorization|api[_-]?key|access[_-]?token|token|secret|password)\s*[:=]\s*)[^,;\s]+', '$1<redacted>'
+  $text = $text -replace '(?i)(--?(?:token|api-key|api_key|secret|password|access-token|access_token)(?:=|\s+))\S+', '$1<redacted>'
+  return $text
+}
+
 function Invoke-Captured {
   param(
     [scriptblock]$Script,
@@ -505,12 +521,12 @@ function Invoke-Captured {
       $exitCode = if ($LASTEXITCODE -is [int] -and $LASTEXITCODE -ne 0) { $LASTEXITCODE } else { 1 }
     }
     $output.Add([string]$_.Exception.Message)
-    $summary = (($output -join ' ') -replace '\s+', ' ').Trim()
+    $summary = Redact-Diagnostic ((($output -join ' ') -replace '\s+', ' ').Trim())
     if ($summary.Length -gt $Limit) { $summary = $summary.Substring(0, $Limit) }
     return [pscustomobject]@{ ok = $false; exit_code = $exitCode; stdout = ($captured -join "`n"); diagnostic_summary = $summary }
   }
 
-  $summary = (($output -join ' ') -replace '\s+', ' ').Trim()
+  $summary = Redact-Diagnostic ((($output -join ' ') -replace '\s+', ' ').Trim())
   if ($summary.Length -gt $Limit) { $summary = $summary.Substring(0, $Limit) }
   [pscustomobject]@{ ok = $true; exit_code = 0; stdout = ($captured -join "`n"); diagnostic_summary = $summary }
 }
@@ -1016,7 +1032,7 @@ if ($OnlyArray.Count -gt 0 -and (Test-SelectionContains -Id 'graphify')) {
         status = 'action-required'
         exit_code = [int]$helperRun.exit_code
         reason_code = 'graphify-helper-output-invalid'
-        diagnostic_summary = [string]$helperRun.stdout
+        diagnostic_summary = Redact-Diagnostic ([string]$helperRun.stdout)
       }
     }
   } finally {

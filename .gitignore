@@ -54,6 +54,7 @@ __pycache__/
 # spec-first:start
 # spec-first generated runtime assets
 .claude/commands/spec/
+.claude/commands/spec-*.md
 .claude/skills/
 .claude/spec-first/
 .claude/agents/
@@ -65,11 +66,15 @@ __pycache__/
 .claude/worktrees/
 .codex/
 .agents/skills/
+.cursor/skills/
+.cursor/spec-first/
+.cursor/mcp.json
 .kiro/skills/
 .kiro/agents/
 .kiro/spec-first/
 .kiro/settings/
 .qoder/commands/spec/
+.qoder/commands/spec-*.md
 .qoder/skills/
 .qoder/agents/
 .qoder/spec-first/

@@ -38,6 +38,9 @@ const graphifyDependency = externalDependency('graphify');
 const codegraphDependency = externalDependency('codegraph');
 const GRAPHIFY_PACKAGE = graphifyDependency.package;
 const GRAPHIFY_VERSION = graphifyDependency.version;
+const GRAPHIFY_PACKAGE_SPEC = graphifyDependency.ecosystem === 'npm'
+  ? `${GRAPHIFY_PACKAGE}@${GRAPHIFY_VERSION}`
+  : `${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`;
 const CODEGRAPH_PACKAGE = codegraphDependency.package;
 const CODEGRAPH_VERSION = codegraphDependency.version;
 
@@ -277,7 +280,7 @@ describe('dependency readiness baseline contracts', () => {
         usage_owner: 'downstream-skill',
       },
       installation: {
-        strategy: 'uv-tool',
+        strategy: 'npm-global',
         dependency_ref: 'graphify',
       },
       readiness: {
@@ -286,7 +289,8 @@ describe('dependency readiness baseline contracts', () => {
       },
     });
     expect(providerTools.providers[0].safety.risk_flags).toEqual(expect.arrayContaining([
-      'name-bin-mismatch:graphifyy->graphify',
+      'global-npm-install',
+      'package-migration:graphifyy->@sentropic/graphify',
       'single-maintainer-bus-factor',
       'project-runtime-skill-write',
       'git-hook-write',
@@ -653,7 +657,7 @@ exit 0
     const graphify = JSON.parse(result.stdout)[0];
     expect(graphify.lifecycle.installed).toBe(true);
     expect(graphify.next_actions.join('\n')).toContain(`setup is using ${pinnedGraphify}`);
-    expect(graphify.next_actions.join('\n')).toContain(`Graphify CLI on PATH at ${staleGraphify} does not match pinned ${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`);
+    expect(graphify.next_actions.join('\n')).toContain(`Graphify CLI on PATH at ${staleGraphify} does not match pinned ${GRAPHIFY_PACKAGE_SPEC}`);
     expect(graphify.next_actions.join('\n')).not.toContain('Graphify CLI version does not match pinned');
   });
 
@@ -730,7 +734,7 @@ exit 0
         artifact_exists: true,
       },
     });
-    expect(graphify.next_actions.join('\n')).toContain(`${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`);
+    expect(graphify.next_actions.join('\n')).toContain(GRAPHIFY_PACKAGE_SPEC);
   });
 
   test('install-helpers runs native Graphify project skill, graph generation, hook, and query probe', () => {
@@ -920,7 +924,7 @@ exit 0
       },
     });
     expect(graphify.next_actions.join('\n')).toContain('Graphify query probe has not confirmed CLI/artifact usability');
-    expect(graphify.next_actions.join('\n')).toContain(`does not match pinned ${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`);
+    expect(graphify.next_actions.join('\n')).toContain(`does not match pinned ${GRAPHIFY_PACKAGE_SPEC}`);
   });
 
   test('install-helpers invokes provider-standard off-PATH Graphify while preserving manual visibility next action', () => {

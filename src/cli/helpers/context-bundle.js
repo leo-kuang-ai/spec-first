@@ -63,6 +63,24 @@ const EXCLUDED_PREFIXES = [
     reason: 'generated runtime mirrors are excluded from ordinary context',
   },
   {
+    prefix: '.cursor/skills',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.cursor/spec-first',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.cursor/mcp.json',
+    kind: 'host_local_config',
+    reason_code: 'host_local_config_excluded',
+    reason: 'host-local config is excluded from ordinary context',
+  },
+  {
     prefix: '.kiro/skills',
     kind: 'generated_runtime_mirror',
     reason_code: 'generated_runtime_mirror_excluded',

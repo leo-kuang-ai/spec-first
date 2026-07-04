@@ -35,7 +35,7 @@ function runDoctor(argv) {
   }
 
   if (parsed.unknown.length > 0) {
-    console.error('Usage: spec-first doctor [--claude|--codex|--kiro|--qoder] [--json]');
+    console.error('Usage: spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json]');
     return 2;
   }
 
@@ -45,6 +45,7 @@ function runDoctor(argv) {
   let platforms = [];
   if (parsed.claude) platforms.push('claude');
   if (parsed.codex) platforms.push('codex');
+  if (parsed.cursor) platforms.push('cursor');
   if (parsed.kiro) platforms.push('kiro');
   if (parsed.qoder) platforms.push('qoder');
 
@@ -60,7 +61,7 @@ function runDoctor(argv) {
     }
 
     console.log('No spec-first platform detected in this project.');
-    console.log('Run `spec-first init` and select Claude Code, Codex, Kiro, and/or Qoder when prompted to initialize.');
+    console.log('Run `spec-first init` and select Claude Code, Codex, Cursor, Kiro, and/or Qoder when prompted to initialize.');
     return 0;
   }
 
@@ -147,18 +148,22 @@ function checkGit() {
 function checkPlatformCli(platform) {
   const command = platform === 'codex'
     ? 'codex'
-    : platform === 'kiro'
-      ? 'kiro'
-      : platform === 'qoder'
-        ? 'qodercli'
-        : 'claude';
+    : platform === 'cursor'
+      ? 'agent'
+      : platform === 'kiro'
+        ? 'kiro'
+        : platform === 'qoder'
+          ? 'qodercli'
+          : 'claude';
   const displayName = platform === 'codex'
     ? 'Codex'
-    : platform === 'kiro'
-      ? 'Kiro'
-      : platform === 'qoder'
-        ? 'Qoder'
-        : 'Claude Code';
+    : platform === 'cursor'
+      ? 'Cursor CLI'
+      : platform === 'kiro'
+        ? 'Kiro'
+        : platform === 'qoder'
+          ? 'Qoder'
+          : 'Claude Code';
   // Note: Codex CLI may not be available yet - this is expected during MVP phase
   const result = spawnSyncWithTimeout(command, ['--version'], { encoding: 'utf8' });
   if (result.status === 0) {
@@ -455,8 +460,12 @@ function buildDoctorReport({ projectRoot, platforms }) {
     ];
     const inventoryChecks = [
       checkInstalledSkills(projectRoot, adapter),
-      checkInstalledAgents(projectRoot, adapter),
-      checkInstalledAgentSupportFiles(projectRoot, adapter),
+      ...(adapter.supportsAgents === false
+        ? []
+        : [
+          checkInstalledAgents(projectRoot, adapter),
+          checkInstalledAgentSupportFiles(projectRoot, adapter),
+        ]),
     ];
     const runtimeChecks = [
       ...coreRuntimeChecks,
@@ -585,8 +594,11 @@ function computeWorkflowRunnability({
     const requiredChecks = [
       adapter.stateFile,
       adapter.skillsRoot,
-      adapter.agentsRoot,
     ];
+
+    if (adapter.supportsAgents !== false) {
+      requiredChecks.push(adapter.agentsRoot);
+    }
 
     if (adapter.hasCommands) {
       requiredChecks.push(adapter.commandRoot);
@@ -940,6 +952,10 @@ function buildHostSpecificChecks(projectRoot, adapter) {
     return [checkQoderLocalMcpConfig(projectRoot)];
   }
 
+  if (adapter.id === 'cursor') {
+    return [checkCursorProjectMcpConfig(projectRoot)];
+  }
+
   if (adapter.id !== 'claude') {
     return [];
   }
@@ -957,6 +973,43 @@ function buildHostSpecificChecks(projectRoot, adapter) {
   });
 }
 
+function checkCursorProjectMcpConfig(projectRoot) {
+  const relativePath = '.cursor/mcp.json';
+  const configPath = path.join(projectRoot, relativePath);
+  if (!fs.existsSync(configPath)) {
+    return {
+      level: 'WARNING',
+      name: relativePath,
+      message: 'missing project MCP config',
+      fix: 'Run Cursor Agent Skill `spec-mcp-setup` when MCP setup is required.',
+    };
+  }
+
+  const document = readJsonDocument(configPath);
+  if (!document.parsed || typeof document.parsed !== 'object') {
+    return {
+      level: 'WARNING',
+      name: relativePath,
+      message: 'invalid JSON',
+      fix: 'Repair the project Cursor MCP config or rerun Cursor Runtime Setup.',
+    };
+  }
+
+  const servers = document.parsed.mcpServers;
+  const serverCount = servers && typeof servers === 'object' && !Array.isArray(servers)
+    ? Object.keys(servers).length
+    : 0;
+
+  return {
+    level: serverCount > 0 ? 'PASS' : 'WARNING',
+    name: relativePath,
+    message: serverCount > 0
+      ? `found ${serverCount} project MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
+      : 'found project MCP config with no mcpServers entries',
+    fix: serverCount > 0 ? undefined : 'Run Cursor Agent Skill `spec-mcp-setup` to configure required MCP servers.',
+  };
+}
+
 function checkQoderLocalMcpConfig(projectRoot) {
   const relativePath = '.qoder/settings.local.json';
   const configPath = path.join(projectRoot, relativePath);
@@ -965,7 +1018,7 @@ function checkQoderLocalMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing local MCP config',
-      fix: 'Run Qoder project command `/spec:mcp-setup` or Skill `spec-mcp-setup` when MCP setup is required.',
+      fix: 'Run Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup` when MCP setup is required.',
     };
   }
 
@@ -990,7 +1043,7 @@ function checkQoderLocalMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} local MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found local MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run Qoder project command `/spec:mcp-setup` or Skill `spec-mcp-setup` to configure required MCP servers.',
+    fix: serverCount > 0 ? undefined : 'Run Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup` to configure required MCP servers.',
   };
 }
 
@@ -1023,11 +1076,11 @@ function printHelp() {
     '🩺 spec-first doctor',
     '',
 	    '📘 Usage:',
-	    '  spec-first doctor [--claude|--codex|--kiro|--qoder] [--json]',
+	    '  spec-first doctor [--claude|--codex|--cursor|--kiro|--qoder] [--json]',
 	    '',
 	    '📊 JSON status fields:',
 	    '  install_health: Node/Git/package-level checks for running the CLI.',
-	    '  runtime_asset_health: managed Claude/Codex/Kiro/Qoder runtime assets generated by spec-first init.',
+	    '  runtime_asset_health: managed Claude/Codex/Cursor/Kiro/Qoder runtime assets generated by spec-first init.',
 	    '  host_readiness: host CLI and host-specific project wiring checks.',
 	    '  decision_input_health: pass | warn | error | stale | missing | not_checked.',
 	    '  workflow_runnability: verified | simulated | not_verified.',
@@ -1041,7 +1094,7 @@ function printHelp() {
 	    '🔎 Boundaries:',
 	    '  doctor checks CLI install, managed runtime assets, host readiness, and workflow verification evidence.',
 	    '  When setup facts exist, doctor reads .spec-first/config/tool-facts.json for decision_input_health.',
-	    '  MCP/helper setup is handled by $spec-mcp-setup, /spec:mcp-setup, the generated Kiro spec-mcp-setup Agent Skill, or the generated Qoder /spec:mcp-setup command/Skill.',
+	    '  MCP/helper setup is handled by the matching spec-mcp-setup workflow entrypoint: Claude/Qoder project command or Codex/Cursor/Kiro Skill.',
 	    '  target name: spec-runtime-setup, pending host alias contract.',
 	    '',
 	    '🔗 Repository:',
@@ -1057,11 +1110,15 @@ function detectPlatforms(projectRoot) {
 }
 
 function isPlatformRuntimeDetected(projectRoot, adapter) {
-  if (adapter.id !== 'kiro' && adapter.id !== 'qoder') {
+  if (adapter.id !== 'kiro' && adapter.id !== 'qoder' && adapter.id !== 'cursor') {
     return fs.existsSync(path.join(projectRoot, adapter.runtimeRoot));
   }
 
   if (adapter.id === 'qoder') {
+    return fs.existsSync(path.join(projectRoot, adapter.stateFile));
+  }
+
+  if (adapter.id === 'cursor') {
     return fs.existsSync(path.join(projectRoot, adapter.stateFile));
   }
 
@@ -1079,6 +1136,7 @@ function parseDoctorArgs(argv) {
     help: false,
     claude: false,
     codex: false,
+    cursor: false,
     kiro: false,
     qoder: false,
     json: false,
@@ -1092,6 +1150,8 @@ function parseDoctorArgs(argv) {
       parsed.claude = true;
     } else if (arg === '--codex') {
       parsed.codex = true;
+    } else if (arg === '--cursor') {
+      parsed.cursor = true;
     } else if (arg === '--kiro') {
       parsed.kiro = true;
     } else if (arg === '--qoder') {

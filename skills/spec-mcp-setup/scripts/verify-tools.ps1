@@ -174,6 +174,7 @@ function Get-RuntimeStatePathForHost {
     'claude' { return (Join-Path $TargetRoot '.claude/spec-first/state.json') }
     'kiro' { return (Join-Path $TargetRoot '.kiro/spec-first/state.json') }
     'qoder' { return (Join-Path $TargetRoot '.qoder/spec-first/state.json') }
+    'cursor' { return (Join-Path $TargetRoot '.cursor/spec-first/state.json') }
     default { return '' }
   }
 }

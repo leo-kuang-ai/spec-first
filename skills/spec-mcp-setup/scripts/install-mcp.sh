@@ -15,6 +15,7 @@ for arg in "$@"; do
     KIRO_USER_SCOPE_ARG=true
     export KIRO_USER_SCOPE=1
     export QODER_USER_SCOPE=1
+    export CURSOR_USER_SCOPE=1
   fi
 done
 
@@ -22,6 +23,19 @@ SKILL_DIR="$(dirname "$SCRIPT_DIR")"
 TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 PROVIDER_TOOLS_JSON="$SKILL_DIR/provider-tools.json"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
+
+require_explicit_mcp_setup_host() {
+  case "${MCP_SETUP_HOST:-}" in
+    claude|codex|kiro|qoder|cursor) return 0 ;;
+    *)
+      echo '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。' >&2
+      exit 1
+      ;;
+  esac
+}
+
+require_explicit_mcp_setup_host
+
 HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
 HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
 HOST_DISPLAY_NAME="$(jq -r '.display_name' <<<"$HOST_INFO_JSON")"
@@ -268,6 +282,7 @@ while [[ $# -gt 0 ]]; do
       KIRO_USER_SCOPE_ARG=true
       export KIRO_USER_SCOPE=1
       export QODER_USER_SCOPE=1
+      export CURSOR_USER_SCOPE=1
       shift
       ;;
     --requirement-workspace)
@@ -576,6 +591,17 @@ write_warmup_cache() {
   return 0
 }
 
+redact_diagnostic() {
+  local value="${1:-}"
+  printf '%s' "$value" | sed -E \
+    -e 's#(https?://[^:/?[:space:]]+):[^@/?[:space:]]+@#\1:<redacted>@#g' \
+    -e 's#([?&](token|access_token|api[_-]?key|key|secret|password)=)[^&[:space:]]+#\1<redacted>#Ig' \
+    -e 's#(authorization[[:space:]]*:[[:space:]]*(Bearer|Basic)[[:space:]]+)[^,;[:space:]]+#\1<redacted>#Ig' \
+    -e 's#\b(Bearer|Basic)[[:space:]]+[A-Za-z0-9._~+/-]+=*#\1 <redacted>#Ig' \
+    -e 's#((authorization|api[_-]?key|access[_-]?token|token|secret|password)[[:space:]]*[:=][[:space:]]*)[^,;[:space:]]+#\1<redacted>#Ig' \
+    -e 's#(--?(token|api-key|api_key|secret|password|access-token|access_token)(=|[[:space:]]+))[^[:space:]]+#\1<redacted>#Ig'
+}
+
 append_result() {
   local tool_id="$1"
   local status="$2"
@@ -589,6 +615,8 @@ append_result() {
   local exit_code="${10}"
   local diagnostic_summary="${11}"
   local repair_diagnostic_summary="${12}"
+  diagnostic_summary="$(redact_diagnostic "$diagnostic_summary")"
+  repair_diagnostic_summary="$(redact_diagnostic "$repair_diagnostic_summary")"
 
   jq --arg id "$tool_id" \
      --arg status "$status" \
@@ -701,6 +729,7 @@ PY
 
   RUN_STDOUT="$(cat "$stdout_file")"
   combined="$(cat "$stderr_file" "$stdout_file" | tr '\n' ' ' | cut -c 1-1000)"
+  combined="$(redact_diagnostic "$combined")"
   RUN_DIAGNOSTIC="$combined"
   rm -f "$stdout_file" "$stderr_file"
   if [ "$RUN_EXIT_CODE" -eq 124 ]; then
@@ -1031,7 +1060,7 @@ if [ -n "$ONLY_FILTER" ] && selection_contains "graphify"; then
     mv "$ledger_tmp.next" "$ledger_tmp"
   else
     jq \
-      --arg diagnostic "$helper_output" \
+      --arg diagnostic "$(redact_diagnostic "$helper_output")" \
       --argjson exit_code "$helper_status" \
       '.provider_apply = {
           selected:["graphify"],

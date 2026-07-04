@@ -998,16 +998,8 @@ install_graphify_cli() {
     return 0
   fi
 
-  if command -v uv >/dev/null 2>&1; then
-    if run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" uv tool install --force "$GRAPHIFY_PACKAGE==$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
-      hash -r 2>/dev/null || true
-      reset_graphify_resolver
-      resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
-    fi
-  fi
-
-  if command -v pipx >/dev/null 2>&1; then
-    if run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" pipx install --force "$GRAPHIFY_PACKAGE==$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
+  if command -v npm >/dev/null 2>&1; then
+    if run_npm_global_install_with_optional_sudo "$GRAPHIFY_PACKAGE@$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
       hash -r 2>/dev/null || true
       reset_graphify_resolver
       resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
@@ -1034,6 +1026,23 @@ resolve_graphify_on_original_path() {
   return 1
 }
 
+graphify_known_cli_candidates() {
+  printf '%s\n' \
+    "$HOME/.local/bin/graphify" \
+    "$HOME/.local/bin/graphify.exe" \
+    "$HOME/.local/bin/graphify.cmd"
+  if command -v npm >/dev/null 2>&1; then
+    local npm_prefix
+    npm_prefix="$(npm prefix -g 2>/dev/null || true)"
+    if [ -n "$npm_prefix" ]; then
+      printf '%s\n' \
+        "$npm_prefix/bin/graphify" \
+        "$npm_prefix/bin/graphify.exe" \
+        "$npm_prefix/bin/graphify.cmd"
+    fi
+  fi
+}
+
 resolve_graphify_cli() {
   if [ -n "$GRAPHIFY_RESOLVED_COMMAND" ]; then
     printf '%s' "$GRAPHIFY_RESOLVED_COMMAND"
@@ -1051,7 +1060,7 @@ resolve_graphify_cli() {
     return 0
   fi
 
-  for candidate in "$HOME/.local/bin/graphify" "$HOME/.local/bin/graphify.exe" "$HOME/.local/bin/graphify.cmd"; do
+  while IFS= read -r candidate; do
     if [ -f "$candidate" ] && [ -x "$candidate" ]; then
       GRAPHIFY_RESOLVED_COMMAND="$candidate"
       GRAPHIFY_RESOLVED_ON_PATH="false"
@@ -1060,7 +1069,7 @@ resolve_graphify_cli() {
       printf '%s' "$GRAPHIFY_RESOLVED_COMMAND"
       return 0
     fi
-  done
+  done < <(graphify_known_cli_candidates)
 
   return 1
 }
@@ -1086,7 +1095,7 @@ resolve_graphify_cli_matching_pin() {
     return 0
   fi
 
-  for candidate in "$HOME/.local/bin/graphify" "$HOME/.local/bin/graphify.exe" "$HOME/.local/bin/graphify.cmd"; do
+  while IFS= read -r candidate; do
     if [ -f "$candidate" ] && [ -x "$candidate" ] && graphify_command_version_matches_pin "$candidate"; then
       GRAPHIFY_RESOLVED_COMMAND="$candidate"
       GRAPHIFY_RESOLVED_ON_PATH="false"
@@ -1095,7 +1104,7 @@ resolve_graphify_cli_matching_pin() {
       printf '%s' "$GRAPHIFY_RESOLVED_COMMAND"
       return 0
     fi
-  done
+  done < <(graphify_known_cli_candidates)
 
   return 1
 }

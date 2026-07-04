@@ -131,6 +131,9 @@ runtime_state_path_for_host() {
     qoder)
       printf '%s/.qoder/spec-first/state.json' "$target_root"
       ;;
+    cursor)
+      printf '%s/.cursor/spec-first/state.json' "$target_root"
+      ;;
     *)
       printf ''
       ;;

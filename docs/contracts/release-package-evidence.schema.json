@@ -43,8 +43,12 @@
         "package_content_manifest",
         "init_claude_programmatic_log",
         "init_codex_programmatic_log",
+        "init_cursor_programmatic_log",
         "init_kiro_programmatic_log",
         "init_qoder_programmatic_log",
+        "cursor_doctor_programmatic_log",
+        "cursor_clean_programmatic_log",
+        "cursor_loader_evidence_log",
         "release_artifact_summary"
       ],
       "properties": {
@@ -53,8 +57,12 @@
         "package_content_manifest": { "type": "string", "const": "package-content-manifest.json" },
         "init_claude_programmatic_log": { "type": "string", "const": "init-claude-programmatic.log" },
         "init_codex_programmatic_log": { "type": "string", "const": "init-codex-programmatic.log" },
+        "init_cursor_programmatic_log": { "type": "string", "const": "init-cursor-programmatic.log" },
         "init_kiro_programmatic_log": { "type": "string", "const": "init-kiro-programmatic.log" },
         "init_qoder_programmatic_log": { "type": "string", "const": "init-qoder-programmatic.log" },
+        "cursor_doctor_programmatic_log": { "type": "string", "const": "cursor-doctor-programmatic.log" },
+        "cursor_clean_programmatic_log": { "type": "string", "const": "cursor-clean-programmatic.log" },
+        "cursor_loader_evidence_log": { "type": "string", "const": "cursor-loader-evidence.log" },
         "release_artifact_summary": { "type": "string", "const": "release-artifact-summary.json" }
       },
       "additionalProperties": false
@@ -88,6 +96,17 @@
       }
     }
   },
+  "allOf": [
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "package-content-manifest" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "init-claude-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "init-codex-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "init-cursor-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "init-kiro-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "init-qoder-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "cursor-doctor-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "cursor-clean-programmatic" } } } } } },
+    { "properties": { "checks": { "contains": { "type": "object", "required": ["check_id"], "properties": { "check_id": { "const": "cursor-loader-evidence" } } } } } }
+  ],
   "if": {
     "type": "object",
     "properties": {

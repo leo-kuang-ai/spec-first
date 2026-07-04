@@ -9,17 +9,56 @@ const { spawnSync } = require('node:child_process');
 const PACKAGE_CONTENT_MANIFEST_FILE = 'package-content-manifest.json';
 const INIT_CLAUDE_PROGRAMMATIC_LOG_FILE = 'init-claude-programmatic.log';
 const INIT_CODEX_PROGRAMMATIC_LOG_FILE = 'init-codex-programmatic.log';
+const INIT_CURSOR_PROGRAMMATIC_LOG_FILE = 'init-cursor-programmatic.log';
 const INIT_KIRO_PROGRAMMATIC_LOG_FILE = 'init-kiro-programmatic.log';
 const INIT_QODER_PROGRAMMATIC_LOG_FILE = 'init-qoder-programmatic.log';
+const CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE = 'cursor-doctor-programmatic.log';
+const CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE = 'cursor-clean-programmatic.log';
+const CURSOR_LOADER_EVIDENCE_LOG_FILE = 'cursor-loader-evidence.log';
 const RELEASE_ARTIFACT_SUMMARY_FILE = 'release-artifact-summary.json';
 const SUMMARY_FILE = 'summary.json';
 const PACK_OUTPUT_FILE = 'pack-output.log';
-const INIT_PROGRAMMATIC_HOSTS = ['claude', 'codex', 'kiro', 'qoder'];
+const INIT_PROGRAMMATIC_HOSTS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
 const INIT_PROGRAMMATIC_LOG_FILES = {
   claude: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
   codex: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+  cursor: INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
   kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
   qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
+};
+const EXPECTED_INIT_RUNTIME_PATHS = {
+  claude: [
+    'CLAUDE.md',
+    '.claude/spec-first/state.json',
+    '.claude/commands/spec/work.md',
+    '.claude/spec-first/workflows/spec-work/SKILL.md',
+    '.claude/skills/using-spec-first/SKILL.md',
+  ],
+  codex: [
+    'AGENTS.md',
+    '.codex/spec-first/state.json',
+    '.agents/skills/spec-work/SKILL.md',
+    '.agents/skills/spec-mcp-setup/SKILL.md',
+  ],
+  cursor: [
+    'AGENTS.md',
+    '.cursor/spec-first/state.json',
+    '.cursor/skills/spec-work/SKILL.md',
+    '.cursor/skills/spec-mcp-setup/SKILL.md',
+  ],
+  kiro: [
+    'AGENTS.md',
+    '.kiro/spec-first/state.json',
+    '.kiro/skills/spec-work/SKILL.md',
+    '.kiro/skills/spec-mcp-setup/SKILL.md',
+  ],
+  qoder: [
+    'AGENTS.md',
+    '.qoder/spec-first/state.json',
+    '.qoder/commands/spec/work.md',
+    '.qoder/skills/spec-work/SKILL.md',
+    '.qoder/skills/spec-mcp-setup/SKILL.md',
+  ],
 };
 
 const REQUIRED_PACKAGE_PATHS = [
@@ -324,13 +363,19 @@ function buildInitProgrammaticEvidence({ host, result, beforeSnapshot, afterSnap
   const expectedStatePath = {
     claude: '.claude/spec-first/state.json',
     codex: '.codex/spec-first/state.json',
+    cursor: '.cursor/spec-first/state.json',
     kiro: '.kiro/spec-first/state.json',
     qoder: '.qoder/spec-first/state.json',
   }[host] || `.${host}/spec-first/state.json`;
   const expectedInstructionPath = host === 'claude' ? 'CLAUDE.md' : 'AGENTS.md';
   const hasState = afterSnapshot.some((entry) => entry.startsWith(`${expectedStatePath}:`));
   const hasInstruction = afterSnapshot.some((entry) => entry.startsWith(`${expectedInstructionPath}:`));
-  const passed = status === 0 && mutated && hasState && hasInstruction;
+  const expectedRuntimePaths = EXPECTED_INIT_RUNTIME_PATHS[host] || [expectedInstructionPath, expectedStatePath];
+  const presentRuntimePaths = expectedRuntimePaths.filter((expectedPath) =>
+    afterSnapshot.some((entry) => entry.startsWith(`${expectedPath}:`) || entry === `${expectedPath}/`)
+  );
+  const missingRuntimePaths = expectedRuntimePaths.filter((expectedPath) => !presentRuntimePaths.includes(expectedPath));
+  const passed = status === 0 && mutated && missingRuntimePaths.length === 0;
 
   return {
     host,
@@ -342,6 +387,9 @@ function buildInitProgrammaticEvidence({ host, result, beforeSnapshot, afterSnap
     has_state: hasState,
     expected_instruction_path: expectedInstructionPath,
     has_instruction: hasInstruction,
+    expected_runtime_paths: expectedRuntimePaths,
+    present_runtime_paths: presentRuntimePaths,
+    missing_runtime_paths: missingRuntimePaths,
     stdout,
     stderr,
   };
@@ -405,6 +453,9 @@ function runInitProgrammaticEvidence({ packageRoot, cwd, host, artifacts }) {
     `has_state=${evidence.has_state}`,
     `expected_instruction_path=${evidence.expected_instruction_path}`,
     `has_instruction=${evidence.has_instruction}`,
+    `expected_runtime_paths=${evidence.expected_runtime_paths.join(',')}`,
+    `present_runtime_paths=${evidence.present_runtime_paths.join(',')}`,
+    `missing_runtime_paths=${evidence.missing_runtime_paths.join(',')}`,
     '',
     '--- stdout ---',
     evidence.stdout,
@@ -432,8 +483,12 @@ function defaultReleaseArtifacts() {
     package_content_manifest: PACKAGE_CONTENT_MANIFEST_FILE,
     init_claude_programmatic_log: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
     init_codex_programmatic_log: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+    init_cursor_programmatic_log: INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
     init_kiro_programmatic_log: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
     init_qoder_programmatic_log: INIT_QODER_PROGRAMMATIC_LOG_FILE,
+    cursor_doctor_programmatic_log: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+    cursor_clean_programmatic_log: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+    cursor_loader_evidence_log: CURSOR_LOADER_EVIDENCE_LOG_FILE,
     release_artifact_summary: RELEASE_ARTIFACT_SUMMARY_FILE,
   };
 }
@@ -459,6 +514,123 @@ function checkFromInitProgrammaticEvidence(evidence) {
       ? `Programmatic spec-first init plan/apply for ${evidence.host} passed and wrote expected runtime evidence.`
       : `Programmatic spec-first init plan/apply for ${evidence.host} failed evidence checks.`,
     artifact_path: evidence.artifact_path,
+  };
+}
+
+function buildCursorLoaderEvidence(options = {}) {
+  return {
+    schema_version: 'cursor-loader-evidence.v1',
+    generated_at: options.generatedAt || new Date().toISOString(),
+    status: 'skipped',
+    support_status: 'generated_runtime_preview',
+    reason_code: 'cursor_loader_validation_unavailable',
+    summary: 'Cursor programmatic init evidence proves generated-runtime preview assets only; local Cursor skill discovery/invocation was not validated by this smoke run, so generated skills may not load.',
+    artifact_path: CURSOR_LOADER_EVIDENCE_LOG_FILE,
+  };
+}
+
+function checkFromCursorLoaderEvidence(evidence) {
+  return {
+    check_id: 'cursor-loader-evidence',
+    status: evidence.status,
+    reason_code: evidence.reason_code,
+    summary: evidence.summary,
+    artifact_path: evidence.artifact_path,
+  };
+}
+
+function buildCursorDoctorProgrammaticEvidence({ packageRoot, cwd, result }) {
+  const commandResult = result || runInstalledBinResult(packageRoot, ['doctor', '--cursor', '--json'], { cwd });
+  let payload = null;
+  try {
+    payload = JSON.parse(commandResult.stdout || '{}');
+  } catch {
+    payload = null;
+  }
+  const checkNames = Array.isArray(payload?.platform_checks?.cursor)
+    ? payload.platform_checks.cursor.map((check) => check.name)
+    : [];
+  const hasCursorPlatform = Array.isArray(payload?.platforms) && payload.platforms.includes('cursor');
+  const hasPreviewCheck = checkNames.includes('Cursor generated-runtime preview');
+  const hasSkillRootCheck = checkNames.includes('.cursor/skills');
+  const passed = commandResult.status === 0 && hasCursorPlatform && hasPreviewCheck && hasSkillRootCheck;
+
+  return {
+    schema_version: 'cursor-doctor-programmatic.v1',
+    status: commandResult.status,
+    passed,
+    reason_code: passed ? 'cursor-doctor-programmatic-passed' : 'cursor-doctor-programmatic-failed',
+    has_cursor_platform: hasCursorPlatform,
+    has_preview_check: hasPreviewCheck,
+    has_skill_root_check: hasSkillRootCheck,
+    stdout: commandResult.stdout || '',
+    stderr: commandResult.stderr || '',
+  };
+}
+
+function buildCursorCleanProgrammaticEvidence({ packageRoot, cwd, result }) {
+  const commandResult = result || runInstalledBinResult(packageRoot, ['clean', '--cursor', '--dry-run'], { cwd });
+  const stdout = commandResult.stdout || '';
+  const expectedFragments = [
+    'Dry run: spec-first clean (cursor)',
+    '.cursor/skills/spec-work',
+    '.cursor/spec-first/state.json',
+    'No files were changed.',
+  ];
+  const forbiddenFragments = [
+    '.cursor/agents',
+    '.cursor/commands',
+    '.cursor/rules',
+    '.cursor/mcp.json',
+  ];
+  const missing_fragments = expectedFragments.filter((fragment) => !stdout.includes(fragment));
+  const forbidden_matches = forbiddenFragments.filter((fragment) => stdout.includes(fragment));
+  const passed = commandResult.status === 0 && missing_fragments.length === 0 && forbidden_matches.length === 0;
+
+  return {
+    schema_version: 'cursor-clean-programmatic.v1',
+    status: commandResult.status,
+    passed,
+    reason_code: passed ? 'cursor-clean-programmatic-passed' : 'cursor-clean-programmatic-failed',
+    expected_fragments: expectedFragments,
+    missing_fragments,
+    forbidden_matches,
+    stdout,
+    stderr: commandResult.stderr || '',
+  };
+}
+
+function writeCursorProgrammaticEvidence({ evidence, checkId, artifactPath, artifacts }) {
+  artifacts.write(artifactPath, [
+    `schema_version=${evidence.schema_version}`,
+    `check_id=${checkId}`,
+    `status=${evidence.status}`,
+    `passed=${evidence.passed}`,
+    `reason_code=${evidence.reason_code}`,
+    '',
+    '--- evidence ---',
+    JSON.stringify({
+      ...evidence,
+      stdout: undefined,
+      stderr: undefined,
+    }, null, 2),
+    '',
+    '--- stdout ---',
+    evidence.stdout,
+    '--- stderr ---',
+    evidence.stderr,
+  ].join('\n'));
+}
+
+function checkFromCursorProgrammaticEvidence({ evidence, checkId, artifactPath, label }) {
+  return {
+    check_id: checkId,
+    status: evidence.passed ? 'passed' : 'failed',
+    reason_code: evidence.reason_code,
+    summary: evidence.passed
+      ? `${label} passed against Cursor generated-runtime preview assets.`
+      : `${label} failed against Cursor generated-runtime preview assets.`,
+    artifact_path: artifactPath,
   };
 }
 
@@ -621,6 +793,67 @@ function main() {
       throw new Error(`${failedProgrammaticInits.length} programmatic init evidence check(s) failed.`);
     }
 
+    const cursorLoaderEvidence = buildCursorLoaderEvidence({
+      generatedAt: new Date().toISOString(),
+    });
+    artifacts.write(CURSOR_LOADER_EVIDENCE_LOG_FILE, [
+      `schema_version=${cursorLoaderEvidence.schema_version}`,
+      `status=${cursorLoaderEvidence.status}`,
+      `support_status=${cursorLoaderEvidence.support_status}`,
+      `reason_code=${cursorLoaderEvidence.reason_code}`,
+      `summary=${cursorLoaderEvidence.summary}`,
+      '',
+    ].join('\n'));
+    releaseChecks.push(checkFromCursorLoaderEvidence(cursorLoaderEvidence));
+
+    const cursorProject = path.join(tmp, 'cursor generated-runtime preview [win64] 中文');
+    fs.mkdirSync(cursorProject);
+    const cursorInit = runInstalledProgrammaticInitResult({ packageRoot, cwd: cursorProject, host: 'cursor' });
+    if (cursorInit.status !== 0) {
+      throw new Error(`Programmatic Cursor init for doctor/clean evidence failed with status ${cursorInit.status}`);
+    }
+    const cursorDoctorEvidence = buildCursorDoctorProgrammaticEvidence({
+      packageRoot,
+      cwd: cursorProject,
+    });
+    writeCursorProgrammaticEvidence({
+      evidence: cursorDoctorEvidence,
+      checkId: 'cursor-doctor-programmatic',
+      artifactPath: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+      artifacts,
+    });
+    const cursorCleanEvidence = buildCursorCleanProgrammaticEvidence({
+      packageRoot,
+      cwd: cursorProject,
+    });
+    writeCursorProgrammaticEvidence({
+      evidence: cursorCleanEvidence,
+      checkId: 'cursor-clean-programmatic',
+      artifactPath: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+      artifacts,
+    });
+    releaseChecks.push(
+      checkFromCursorProgrammaticEvidence({
+        evidence: cursorDoctorEvidence,
+        checkId: 'cursor-doctor-programmatic',
+        artifactPath: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+        label: 'Cursor doctor programmatic evidence',
+      }),
+      checkFromCursorProgrammaticEvidence({
+        evidence: cursorCleanEvidence,
+        checkId: 'cursor-clean-programmatic',
+        artifactPath: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+        label: 'Cursor clean dry-run programmatic evidence',
+      }),
+    );
+    const failedCursorRuntimeChecks = releaseChecks.filter((check) =>
+      ['cursor-doctor-programmatic', 'cursor-clean-programmatic'].includes(check.check_id)
+      && check.status === 'failed'
+    );
+    if (failedCursorRuntimeChecks.length > 0) {
+      throw new Error(`${failedCursorRuntimeChecks.length} Cursor runtime evidence check(s) failed.`);
+    }
+
     const fixtureProject = path.join(tmp, 'workspace [win64] 中文 (paren)');
     fs.mkdirSync(fixtureProject);
     runInstalledBin(packageRoot, ['doctor'], { cwd: fixtureProject });
@@ -667,9 +900,13 @@ function main() {
       init_programmatic_artifacts: {
         claude: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
         codex: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+        cursor: INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
         kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
         qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
       },
+      cursor_doctor_programmatic: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+      cursor_clean_programmatic: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+      cursor_loader_evidence: CURSOR_LOADER_EVIDENCE_LOG_FILE,
       release_checks: releaseChecks,
       release_failures: releaseArtifactSummary.failures,
     });
@@ -702,9 +939,13 @@ function main() {
       init_programmatic_artifacts: {
         claude: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
         codex: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+        cursor: INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
         kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
         qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
       },
+      cursor_doctor_programmatic: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+      cursor_clean_programmatic: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+      cursor_loader_evidence: CURSOR_LOADER_EVIDENCE_LOG_FILE,
       release_checks: releaseChecks,
       release_failures: releaseArtifactSummary.failures,
     });
@@ -722,7 +963,9 @@ module.exports = {
   buildInitProgrammaticEvidence,
   buildPackageContentManifest,
   buildCmdCommandLine,
+  buildCursorLoaderEvidence,
   buildReleaseArtifactSummary,
+  checkFromCursorLoaderEvidence,
   checkFromInitProgrammaticEvidence,
   checkFromPackageContentManifest,
   createArtifactWriter,
@@ -732,8 +975,16 @@ module.exports = {
   getEnvValue,
   INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
   INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+  INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
   INIT_KIRO_PROGRAMMATIC_LOG_FILE,
   INIT_QODER_PROGRAMMATIC_LOG_FILE,
+  CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+  CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+  CURSOR_LOADER_EVIDENCE_LOG_FILE,
+  EXPECTED_INIT_RUNTIME_PATHS,
+  buildCursorCleanProgrammaticEvidence,
+  buildCursorDoctorProgrammaticEvidence,
+  checkFromCursorProgrammaticEvidence,
   matchesForbiddenPattern,
   normalizePackagePath,
   normalizeArtifactFileName,

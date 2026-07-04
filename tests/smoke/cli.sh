@@ -77,6 +77,20 @@ const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
 process.stdout.write(String(buildFilteredAssetSet('qoder').workflowSkills.length));
 NODE
 )"
+expected_cursor_total_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+const cursor = buildFilteredAssetSet('cursor');
+process.stdout.write(String(cursor.skills.length + cursor.workflowSkills.length + cursor.internalSkills.length));
+NODE
+)"
+expected_cursor_skill_count="$(node - "$REPO_ROOT" <<'NODE'
+const repoRoot = process.argv[2];
+const { buildFilteredAssetSet } = require(`${repoRoot}/src/cli/plugin`);
+const cursor = buildFilteredAssetSet('cursor');
+process.stdout.write(String(cursor.skills.length + cursor.internalSkills.length));
+NODE
+)"
 
 run_programmatic_init() {
   local project_root="$1"
@@ -137,7 +151,7 @@ version_output="$(node "$REPO_ROOT/bin/spec-first.js" --version)"
 grep -q "doctor" <<<"$help_output"
 grep -q "init" <<<"$help_output"
 grep -q "Interactively install workflows" <<<"$help_output"
-grep -q "clean (--claude|--codex|--kiro|--qoder)" <<<"$help_output"
+grep -q "clean (--claude|--codex|--cursor|--kiro|--qoder)" <<<"$help_output"
 grep -q "repair-worktree" <<<"$help_output"
 grep -q "tasks <subcommand>" <<<"$help_output"
 if grep -q "stage0-context" <<<"$help_output"; then
@@ -145,7 +159,7 @@ if grep -q "stage0-context" <<<"$help_output"; then
   exit 1
 fi
 grep -q "Spec-First v${expected_version}" <<<"$version_output"
-grep -q "Claude Code, Codex, Kiro, and Qoder" <<<"$version_output"
+grep -q "Claude Code, Codex, Kiro, Qoder, and Cursor generated-runtime preview" <<<"$version_output"
 unknown_output="$(node "$REPO_ROOT/bin/spec-first.js" unknown-command 2>&1 || true)"
 if ! grep -Eiq "unknown command|usage" <<<"$unknown_output"; then
   echo "unknown command should use normal usage path" >&2
@@ -157,7 +171,7 @@ echo "2. Check doctor output in a fresh project..."
 doctor_fresh_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor)"
 grep -q "No spec-first platform detected in this project." <<<"$doctor_fresh_output"
 grep -q 'spec-first init' <<<"$doctor_fresh_output"
-grep -q 'select Claude Code, Codex, Kiro, and/or Qoder' <<<"$doctor_fresh_output"
+grep -q 'select Claude Code, Codex, Cursor, Kiro, and/or Qoder' <<<"$doctor_fresh_output"
 doctor_fresh_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --json)"
 node - "$doctor_fresh_json" <<'NODE'
 const payload = JSON.parse(process.argv[2]);
@@ -379,7 +393,64 @@ NODE
 grep -q '.agents/skills/' "$TMP_DIR/.gitignore"
 echo "✓ Codex init generated skills, agents, hooks, and AGENTS.md"
 
-echo "8. Initialize Kiro runtime and verify assets..."
+echo "8. Initialize Cursor runtime and verify generated-runtime preview assets..."
+cursor_output="$(run_programmatic_init "$TMP_DIR" cursor kuang en 2>&1)"
+grep -q "Generated ${expected_cursor_total_skill_count} skill directory(ies) in .cursor/skills" <<<"$cursor_output"
+grep -q "Cursor support is generated-runtime preview" <<<"$cursor_output"
+installed_cursor_skill_count="$(find "$TMP_DIR/.cursor/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
+test "$installed_cursor_skill_count" = "$expected_cursor_total_skill_count"
+for skill in spec-plan spec-work spec-code-review spec-doc-review spec-brainstorm spec-mcp-setup spec-compound-refresh; do
+  test -f "$TMP_DIR/.cursor/skills/$skill/SKILL.md"
+  grep -q "^name: $skill$" "$TMP_DIR/.cursor/skills/$skill/SKILL.md"
+done
+test ! -e "$TMP_DIR/.cursor/skills/spec-"standards"/SKILL.md"
+test ! -e "$TMP_DIR/.cursor/skills/spec-work-beta/SKILL.md"
+test -f "$TMP_DIR/.cursor/skills/using-spec-first/SKILL.md"
+grep -q '^name: using-spec-first$' "$TMP_DIR/.cursor/skills/using-spec-first/SKILL.md"
+test -f "$TMP_DIR/.cursor/skills/git-worktree/SKILL.md"
+grep -q '^name: git-worktree$' "$TMP_DIR/.cursor/skills/git-worktree/SKILL.md"
+test -f "$TMP_DIR/.cursor/spec-first/state.json"
+test ! -e "$TMP_DIR/.cursor/commands"
+test ! -e "$TMP_DIR/.cursor/agents"
+test ! -e "$TMP_DIR/.cursor/rules"
+node - "$TMP_DIR/.cursor/spec-first/state.json" "$expected_cursor_skill_count" "$expected_workflow_skill_count" <<'NODE'
+const fs = require('node:fs');
+const [statePath, skillCount, workflowSkillCount] = process.argv.slice(2);
+const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+if (state.commands.length !== 0) throw new Error('Cursor command count should be zero');
+if (state.skills.length !== Number(skillCount)) throw new Error('Cursor skill count mismatch');
+if (state.workflowSkills.length !== Number(workflowSkillCount)) throw new Error('Cursor workflow skill count mismatch');
+if (!state.workflowSkills.includes('spec-mcp-setup')) throw new Error('missing Cursor mcp-setup workflow skill');
+if (state.agents.length !== 0) throw new Error('Cursor agent count should be zero');
+NODE
+cursor_doctor_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --cursor)"
+grep -q ".cursor/spec-first/state.json" <<<"$cursor_doctor_output"
+grep -q ".cursor/skills" <<<"$cursor_doctor_output"
+grep -q "Cursor generated-runtime preview" <<<"$cursor_doctor_output"
+if grep -q ".cursor/commands" <<<"$cursor_doctor_output"; then
+  echo "Cursor doctor should not report .cursor/commands as an installed surface" >&2
+  exit 1
+fi
+cursor_doctor_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --cursor --json)"
+node - "$cursor_doctor_json" <<'NODE'
+const payload = JSON.parse(process.argv[2]);
+if (!['simulated', 'verified', 'not_verified'].includes(payload.workflow_runnability)) {
+  throw new Error(`unexpected Cursor runnability ${payload.workflow_runnability}`);
+}
+if (!['pass', 'warn', 'error'].includes(payload.runtime_asset_health)) {
+  throw new Error(`unexpected Cursor asset health ${payload.runtime_asset_health}`);
+}
+if (!payload.platform_checks?.cursor?.length) throw new Error('missing Cursor checks');
+const previewCheck = payload.platform_checks.cursor.find((entry) => entry.name === 'Cursor generated-runtime preview');
+if (!previewCheck || previewCheck.level !== 'WARNING') throw new Error('missing Cursor generated-runtime preview warning');
+const skillCheck = payload.platform_checks.cursor.find((entry) =>
+  entry.name === '.cursor/skills/spec-work/SKILL.md' && entry.message.includes('Cursor skill frontmatter is valid')
+);
+if (!skillCheck || skillCheck.level !== 'PASS') throw new Error('missing passing Cursor skill check');
+NODE
+echo "✓ Cursor init generated Agent Skills, state, and preview doctor facts"
+
+echo "9. Initialize Kiro runtime and verify assets..."
 kiro_output="$(run_programmatic_init "$TMP_DIR" kiro kuang en)"
 grep -q "Generated ${expected_agent_count} agent file(s) in .kiro/agents" <<<"$kiro_output"
 grep -q "Generated ${expected_kiro_total_skill_count} skill directory(ies) in .kiro/skills" <<<"$kiro_output"
@@ -442,7 +513,7 @@ if (!agentCheck || agentCheck.level !== 'PASS') throw new Error('missing passing
 NODE
 echo "✓ Kiro init generated Agent Skills, agents, state, and doctor facts"
 
-echo "9. Initialize Qoder runtime and verify assets..."
+echo "10. Initialize Qoder runtime and verify assets..."
 qoder_output="$(run_programmatic_init "$TMP_DIR" qoder kuang en)"
 grep -q "Generated ${expected_qoder_command_count} command file(s) in .qoder/commands/spec" <<<"$qoder_output"
 grep -q "Generated ${expected_qoder_total_skill_count} skill directory(ies) in .qoder/skills" <<<"$qoder_output"
@@ -532,7 +603,7 @@ else
 fi
 echo "✓ Qoder init generated project commands, skills, agents, state, and doctor facts"
 
-echo "10. Verify clean dry-run and clean removal..."
+echo "11. Verify clean dry-run and clean removal..."
 clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --claude --dry-run)"
 grep -q "Dry run: spec-first clean (claude)" <<<"$clean_dry"
 grep -q "No files were changed." <<<"$clean_dry"
@@ -541,6 +612,34 @@ test -d "$TMP_DIR/.claude/spec-first"
 test ! -d "$TMP_DIR/.claude/spec-first"
 test ! -d "$TMP_DIR/.claude/commands/spec"
 echo "✓ clean removes managed Claude runtime"
+
+mkdir -p "$TMP_DIR/.cursor/rules" "$TMP_DIR/.cursor/agents"
+printf '# Native Cursor rule\n' > "$TMP_DIR/.cursor/rules/product.mdc"
+printf '{"custom":true}\n' > "$TMP_DIR/.cursor/mcp.json"
+cursor_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --cursor --dry-run)"
+grep -q "Dry run: spec-first clean (cursor)" <<<"$cursor_clean_dry"
+grep -q ".cursor/skills/spec-work" <<<"$cursor_clean_dry"
+grep -q ".cursor/spec-first/state.json" <<<"$cursor_clean_dry"
+grep -q "No files were changed." <<<"$cursor_clean_dry"
+if grep -q ".cursor/agents" <<<"$cursor_clean_dry"; then
+  echo "Cursor clean dry-run should not remove user-owned .cursor/agents" >&2
+  exit 1
+fi
+if grep -q ".cursor/rules" <<<"$cursor_clean_dry"; then
+  echo "Cursor clean dry-run should not remove user-owned .cursor/rules" >&2
+  exit 1
+fi
+if grep -q ".cursor/mcp.json" <<<"$cursor_clean_dry"; then
+  echo "Cursor clean dry-run should not remove user-owned .cursor/mcp.json" >&2
+  exit 1
+fi
+(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --cursor >/dev/null)
+test ! -d "$TMP_DIR/.cursor/skills"
+test ! -d "$TMP_DIR/.cursor/spec-first"
+test -d "$TMP_DIR/.cursor/agents"
+test -f "$TMP_DIR/.cursor/rules/product.mdc"
+test -f "$TMP_DIR/.cursor/mcp.json"
+echo "✓ clean removes managed Cursor runtime without touching user-owned .cursor assets"
 
 mkdir -p "$TMP_DIR/.kiro/hooks" "$TMP_DIR/.kiro/settings" "$TMP_DIR/.kiro/specs/native"
 printf 'custom hook\n' > "$TMP_DIR/.kiro/hooks/custom"

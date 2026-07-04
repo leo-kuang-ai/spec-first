@@ -9,6 +9,7 @@ const QODER_AGENT_BASE_TOOLS = ['Read', 'Grep', 'Glob'];
 const QODER_AGENT_WEB_TOOLS = ['WebFetch', 'WebSearch'];
 const QODER_UNREWRITTEN_PATH_PATTERNS = [
   /\.claude\/commands\/spec\/[a-z-]+\.md/,
+  /\.claude\/commands\/spec-[a-z-]+\.md/,
   /\.claude\/spec-first\/workflows\//,
   /\.claude\/skills\//,
   /\.claude\/agents\//,
@@ -37,7 +38,11 @@ class QoderAdapter extends PlatformAdapter {
   }
 
   get commandRoot() {
-    return '.qoder/commands/spec';
+    return '.qoder/commands';
+  }
+
+  commandFilename(command) {
+    return `spec-${command.name}.md`;
   }
 
   get skillsRoot() {
@@ -159,6 +164,19 @@ class QoderAdapter extends PlatformAdapter {
         message: 'no Qoder-specific runtime drift detected',
       }];
   }
+
+  planRuntimeFilesRemoval() {
+    const operations = [{
+      kind: 'remove_dir',
+      path: '.qoder/commands/spec',
+      reason: 'retired_runtime_command_namespace',
+    }];
+
+    return {
+      operations,
+      summary: summarizeOperations(operations),
+    };
+  }
 }
 
 module.exports = QoderAdapter;
@@ -168,13 +186,16 @@ module.exports.normalizeQoderName = normalizeQoderName;
 function rewriteSharedPaths(content) {
   const rewritten = content
     .replace(/\.claude\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
-      return `.qoder/commands/spec/${commandName}.md`;
+      return `.qoder/commands/spec-${commandName}.md`;
+    })
+    .replace(/\.claude\/commands\/spec-([a-z-]+)\.md/g, (_match, commandName) => {
+      return `.qoder/commands/spec-${commandName}.md`;
     })
     .replace(/\.codex\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
-      return `.qoder/commands/spec/${commandName}.md`;
+      return `.qoder/commands/spec-${commandName}.md`;
     })
     .replace(/\.kiro\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
-      return `.qoder/commands/spec/${commandName}.md`;
+      return `.qoder/commands/spec-${commandName}.md`;
     })
     .replace(/\.claude\/spec-first\/workflows\//g, '.qoder/skills/')
     .replace(/\.claude\/skills\//g, '.qoder/skills/')
@@ -193,15 +214,17 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --qoder')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --qoder')
     .replace(/\$spec-\*/g, 'Qoder project commands or Skills')
-    .replace(/\$spec-mcp-setup/g, 'Qoder project command `/spec:mcp-setup` or Skill `spec-mcp-setup`')
+    .replace(/\$spec-mcp-setup/g, 'Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup`')
     .replace(/Kiro Agent Skills/g, 'Qoder project commands or Skills')
-    .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Qoder project command `/spec:mcp-setup` or Skill `spec-mcp-setup`');
+    .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup`');
 
   return rewritten;
 }
 
 function isQoderRuntimeSetupSurface(context = {}) {
-  return context.skillName === 'spec-mcp-setup' || context.runtimeName === 'mcp-setup';
+  return context.skillName === 'spec-mcp-setup'
+    || context.commandName === 'mcp-setup'
+    || context.runtimeName === 'spec-mcp-setup';
 }
 
 function addQoderSetupHostPin(content) {
@@ -279,6 +302,14 @@ function normalizeQoderName(value) {
     .replace(/^-+|-+$/g, '')
     .slice(0, 64);
   return normalized || 'spec-first';
+}
+
+function summarizeOperations(operations) {
+  const summary = {};
+  for (const operation of operations) {
+    summary[operation.kind] = (summary[operation.kind] || 0) + 1;
+  }
+  return summary;
 }
 
 function sanitizeFrontmatterScalar(value) {

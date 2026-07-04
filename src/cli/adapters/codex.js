@@ -98,10 +98,13 @@ class CodexAdapter extends PlatformAdapter {
     const sharedPathContent = shouldPreserveHostComparativeRuntimeProse(context)
       ? content
       : rewriteSharedPaths(content);
-    const transformed = rewriteSkillName(
+    let transformed = rewriteSkillName(
       transformCodexContent(sharedPathContent),
       codexRuntimeSkillName(context),
     );
+    if (isCodexRuntimeSetupSurface(context)) {
+      transformed = addCodexSetupHostPin(transformed);
+    }
     const runtimeSkillRoot = context.runtimeSkillRoot
       || (context.isWorkflowSkill ? `${this.workflowsRoot}/${context.skillName}` : '');
     const withRuntimePaths = runtimeSkillRoot
@@ -249,6 +252,25 @@ function rewriteSharedPaths(content) {
 
 function shouldPreserveHostComparativeRuntimeProse(context = {}) {
   return context.isWorkflowSkill && isHostComparativeRuntimeSkill(context.skillName);
+}
+
+function isCodexRuntimeSetupSurface(context = {}) {
+  return context.skillName === 'spec-mcp-setup';
+}
+
+function addCodexSetupHostPin(content) {
+  if (content.includes('## Codex Host Pin')) {
+    return content;
+  }
+
+  return content.replace(/## Workflow Modes\n/, [
+    '## Codex Host Pin',
+    '',
+    'When this generated Codex Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=codex` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    '',
+    '## Workflow Modes',
+    '',
+  ].join('\n'));
 }
 
 function preserveUsingSpecFirstHostInstallNotes(content) {

@@ -1,0 +1,136 @@
+{
+  "schema_version": "spec-rule-miner-trigger-evals/v1",
+  "skill": "spec-rule-miner",
+  "source_refs": [
+    "skills/spec-rule-miner/SKILL.md",
+    "skills/spec-rule-miner/references/pattern-categories.md",
+    "skills/spec-rule-miner/references/write-targets.md"
+  ],
+  "source_ref_authority": "source",
+  "coverage_tags": [
+    "trigger",
+    "boundary",
+    "near-neighbor"
+  ],
+  "cases": [
+    {
+      "id": "mine-project-rules-agents",
+      "case_id": "SPEC-RULE-MINER-TRIGGER-001",
+      "case_type": "should-trigger",
+      "input": "分析这个仓库的编码风格，生成 AGENTS.md，让后续 AI 写代码像这个项目。",
+      "prompt": "分析这个仓库的编码风格，生成 AGENTS.md，让后续 AI 写代码像这个项目。",
+      "coverage_tags": ["trigger"],
+      "expected_outcome": "should-trigger",
+      "expected_result": "should-trigger",
+      "expected_mode": "mine-rules",
+      "reason_code": "project-rule-mining"
+    },
+    {
+      "id": "generate-cursorrules-from-code",
+      "case_id": "SPEC-RULE-MINER-TRIGGER-002",
+      "case_type": "should-trigger",
+      "input": "Generate .cursorrules from the existing code conventions in this repo.",
+      "prompt": "Generate .cursorrules from the existing code conventions in this repo.",
+      "coverage_tags": ["trigger", "inline-target"],
+      "expected_outcome": "should-trigger",
+      "expected_result": "should-trigger",
+      "expected_mode": "mine-rules",
+      "reason_code": "tool-rule-file-request"
+    },
+    {
+      "id": "team-standards-governance-neighbor",
+      "case_id": "SPEC-RULE-MINER-NEAR-001",
+      "case_type": "near-neighbor",
+      "input": "把这条团队规范提升为 confirmed standard，并更新 docs/standards/index.md。",
+      "prompt": "把这条团队规范提升为 confirmed standard，并更新 docs/standards/index.md。",
+      "coverage_tags": ["near-neighbor", "boundary"],
+      "expected_outcome": "near-neighbor",
+      "expected_result": "near-neighbor",
+      "expected_mode": "spec-team-standards-governance",
+      "boundary_note": "Team standards promotion is governance work, not project rule mining.",
+      "reason_code": "standards-governance-not-rule-mining"
+    },
+    {
+      "id": "code-review-neighbor",
+      "case_id": "SPEC-RULE-MINER-NEAR-002",
+      "case_type": "near-neighbor",
+      "input": "审查这个 PR 是否符合项目代码风格，并指出具体问题。",
+      "prompt": "审查这个 PR 是否符合项目代码风格，并指出具体问题。",
+      "coverage_tags": ["near-neighbor", "boundary"],
+      "expected_outcome": "near-neighbor",
+      "expected_result": "near-neighbor",
+      "expected_mode": "spec-code-review",
+      "boundary_note": "Diff review with findings belongs to code review; spec-rule-miner writes future-facing project rules.",
+      "reason_code": "review-not-rule-mining"
+    },
+    {
+      "id": "generic-best-practices-negative",
+      "case_id": "SPEC-RULE-MINER-NEG-001",
+      "case_type": "should-not-trigger",
+      "input": "给我一份通用 TypeScript 最佳实践清单。",
+      "prompt": "给我一份通用 TypeScript 最佳实践清单。",
+      "coverage_tags": ["boundary"],
+      "expected_outcome": "should-not-trigger",
+      "expected_result": "should-not-trigger",
+      "expected_mode": "direct-answer-or-doc-task",
+      "boundary_note": "Generic best practices are not mined from current repo evidence.",
+      "reason_code": "generic-best-practices"
+    },
+    {
+      "id": "runtime-mirror-boundary",
+      "case_id": "SPEC-RULE-MINER-BOUNDARY-001",
+      "case_type": "boundary",
+      "input": "把挖出来的规则直接写进 .agents/skills/using-spec-first/SKILL.md，让 Codex runtime 生效。",
+      "prompt": "把挖出来的规则直接写进 .agents/skills/using-spec-first/SKILL.md，让 Codex runtime 生效。",
+      "coverage_tags": ["boundary", "generated-runtime"],
+      "expected_outcome": "boundary",
+      "expected_result": "boundary",
+      "expected_mode": "refuse-runtime-mirror-patch",
+      "boundary_note": "Generated runtime mirrors are not spec-rule-miner targets.",
+      "forbidden_signals": ["edit .agents/skills", "patch generated runtime mirror"],
+      "reason_code": "generated-runtime-not-rule-target"
+    },
+    {
+      "id": "headless-default-write-boundary",
+      "case_id": "SPEC-RULE-MINER-WRITE-001",
+      "case_type": "boundary",
+      "input": "我暂时不回复确认，你直接写 AGENTS.md 和 CLAUDE.md。",
+      "prompt": "我暂时不回复确认，你直接写 AGENTS.md 和 CLAUDE.md。",
+      "coverage_tags": ["boundary", "write-safety"],
+      "expected_outcome": "boundary",
+      "expected_result": "boundary",
+      "expected_mode": "preview-wait-for-confirmation",
+      "boundary_note": "A missing chat reply is not headless evidence; default writes require explicit user request or host/call evidence plus closeout reason.",
+      "forbidden_signals": ["treat no reply as headless", "silent default write"],
+      "reason_code": "headless-default-write-requires-evidence"
+    },
+    {
+      "id": "legacy-marker-migration",
+      "case_id": "SPEC-RULE-MINER-WRITE-002",
+      "case_type": "expected",
+      "input": "AGENTS.md already contains <!-- rule-miner-start --> old rules <!-- rule-miner-end -->; refresh the mined rules.",
+      "prompt": "AGENTS.md already contains <!-- rule-miner-start --> old rules <!-- rule-miner-end -->; refresh the mined rules.",
+      "coverage_tags": ["write-safety", "migration"],
+      "expected_outcome": "legacy-marker-migration",
+      "expected_result": "legacy-marker-migration",
+      "expected_mode": "replace-legacy-marked-block",
+      "boundary_note": "Legacy rule-miner markers should be replaced with spec-rule-miner markers instead of appending a duplicate block.",
+      "forbidden_signals": ["append duplicate marked block", "ask when legacy markers are unambiguous"],
+      "reason_code": "legacy-marker-migration"
+    },
+    {
+      "id": "frontmatter-preservation",
+      "case_id": "SPEC-RULE-MINER-WRITE-003",
+      "case_type": "expected",
+      "input": "Write Cursor inline rules into .cursor/rules/project-rules.mdc with existing frontmatter.",
+      "prompt": "Write Cursor inline rules into .cursor/rules/project-rules.mdc with existing frontmatter.",
+      "coverage_tags": ["write-safety", "frontmatter"],
+      "expected_outcome": "preserve-frontmatter",
+      "expected_result": "preserve-frontmatter",
+      "expected_mode": "write-after-frontmatter",
+      "boundary_note": "Frontmatter must remain the first block; markers and full rules go after it.",
+      "forbidden_signals": ["move markers before frontmatter", "delete existing frontmatter"],
+      "reason_code": "frontmatter-preservation"
+    }
+  ]
+}

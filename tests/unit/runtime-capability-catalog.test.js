@@ -18,6 +18,7 @@ describe('runtime capability catalog', () => {
     const catalog = buildRuntimeCapabilityCatalog();
     const claudeAssets = buildFilteredAssetSet('claude');
     const codexAssets = buildFilteredAssetSet('codex');
+    const cursorAssets = buildFilteredAssetSet('cursor');
     const kiroAssets = buildFilteredAssetSet('kiro');
     const qoderAssets = buildFilteredAssetSet('qoder');
 
@@ -32,6 +33,9 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain(`| Planned runtime contracts | ${listPlannedRuntimeContracts().length} |`);
     expect(catalog).toContain(`| Claude runtime delivery | ${claudeAssets.commands.length} commands, ${claudeAssets.workflowSkills.length} workflow skills, ${claudeAssets.skills.length} standalone skills, ${claudeAssets.internalSkills.length} agent-facing internal skills, ${claudeAssets.agents.length} agents, ${claudeAssets.agentSupportFiles.length} agent support files |`);
     expect(catalog).toContain(`| Codex runtime delivery | ${codexAssets.commands.length} commands, ${codexAssets.workflowSkills.length} workflow skills, ${codexAssets.skills.length} standalone skills, ${codexAssets.internalSkills.length} agent-facing internal skills, ${codexAssets.agents.length} agents, ${codexAssets.agentSupportFiles.length} agent support files |`);
+    expect(catalog).toContain(`| Cursor runtime delivery | ${cursorAssets.commands.length} commands, ${cursorAssets.workflowSkills.length} workflow skills, ${cursorAssets.skills.length} standalone skills, ${cursorAssets.internalSkills.length} agent-facing internal skills, ${cursorAssets.agents.length} agents, ${cursorAssets.agentSupportFiles.length} agent support files |`);
+    expect(catalog).toContain('| Cursor support status | generated_runtime_preview |');
+    expect(catalog).toContain('generated skills may not load');
     expect(catalog).toContain(`| Kiro runtime delivery | ${kiroAssets.commands.length} commands, ${kiroAssets.workflowSkills.length} workflow skills, ${kiroAssets.skills.length} standalone skills, ${kiroAssets.internalSkills.length} agent-facing internal skills, ${kiroAssets.agents.length} agents, ${kiroAssets.agentSupportFiles.length} agent support files |`);
     expect(catalog).toContain(`| Qoder runtime delivery | ${qoderAssets.commands.length} commands, ${qoderAssets.workflowSkills.length} workflow skills, ${qoderAssets.skills.length} standalone skills, ${qoderAssets.internalSkills.length} agent-facing internal skills, ${qoderAssets.agents.length} agents, ${qoderAssets.agentSupportFiles.length} agent support files |`);
   });
@@ -39,16 +43,20 @@ describe('runtime capability catalog', () => {
   test('catalog exposes public, standalone, internal, beta, and host delivery boundaries', () => {
     const catalog = buildRuntimeCapabilityCatalog();
 
-    expect(catalog).toContain('| work | spec-work | /spec:work | $spec-work | Kiro Agent Skill: spec-work | /spec:work | claude=command; codex=skill; kiro=skill; qoder=command | no |');
+    expect(catalog).toContain('## Cursor Preview Status');
+    expect(catalog).toContain('| `generated_runtime_preview` | Deterministic source-to-runtime projection and package evidence exist; loader/user journey evidence is degraded. | Current Cursor state. Do not include Cursor in `init -y` defaults or full host support wording. |');
+    expect(catalog).toContain('| `skill_first_loader_confirmed_preview` |');
+    expect(catalog).toContain('| `full_host_preview` |');
+    expect(catalog).toContain('| work | spec-work | /spec:work | $spec-work | Cursor Agent Skill: spec-work | Kiro Agent Skill: spec-work | /spec:work | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no |');
     expect(catalog).not.toContain('spec-work-beta');
     expect(catalog).not.toContain('/spec:work-beta');
-    expect(catalog).toContain('| polish-beta | spec-polish-beta | /spec:polish-beta | $spec-polish-beta | Kiro Agent Skill: spec-polish-beta | /spec:polish-beta | claude=command; codex=skill; kiro=skill; qoder=command | yes |');
+    expect(catalog).toContain('| polish-beta | spec-polish-beta | /spec:polish-beta | $spec-polish-beta | Cursor Agent Skill: spec-polish-beta | Kiro Agent Skill: spec-polish-beta | /spec:polish-beta | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | yes |');
     expect(catalog).not.toContain('| standards | spec-standards |');
     expect(catalog).not.toContain('| standards | spec-standards | /spec:standards | $spec-standards |');
-    expect(catalog).toContain('| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance |');
+    expect(catalog).toContain('| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance |');
     expect(catalog).toContain('Do not restore /spec:standards, $spec-standards, skills/spec-standards/');
-    expect(catalog).toContain('| write-skill | spec-write-skill | /spec:write-skill | $spec-write-skill | Kiro Agent Skill: spec-write-skill | /spec:write-skill | claude=command; codex=skill; kiro=skill; qoder=command | no |');
-    expect(catalog).toContain('| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | Kiro Agent Skill: spec-write-tasks | /spec:write-tasks | claude=command; codex=skill; kiro=skill; qoder=command | no |');
+    expect(catalog).toContain('| write-skill | spec-write-skill | /spec:write-skill | $spec-write-skill | Cursor Agent Skill: spec-write-skill | Kiro Agent Skill: spec-write-skill | /spec:write-skill | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no |');
+    expect(catalog).toContain('| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | Cursor Agent Skill: spec-write-tasks | Kiro Agent Skill: spec-write-tasks | /spec:write-tasks | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no |');
     expect(catalog).toContain('| Delivered agent-facing internal skills | git-worktree |');
     expect(catalog).not.toContain('spec-session-extract');
     expect(catalog).not.toContain('spec-session-inventory');
@@ -56,7 +64,7 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('setup readiness 由 `spec-mcp-setup` 产物表达');
     expect(catalog).toContain('## Readiness Meaning');
     expect(catalog).toContain('| CLI/runtime health | `spec-first doctor` |');
-    expect(catalog).toContain('| Harness setup | `/spec:mcp-setup`, `$spec-mcp-setup`, Kiro Agent Skill `spec-mcp-setup`, or Qoder project command `/spec:mcp-setup` / Skill `spec-mcp-setup` |');
+    expect(catalog).toContain('| Harness setup | `/spec:mcp-setup`, `$spec-mcp-setup`, Cursor Agent Skill `spec-mcp-setup`, Kiro Agent Skill `spec-mcp-setup`, or Qoder project command `/spec:mcp-setup` / Skill `spec-mcp-setup` |');
     expect(catalog).toContain('It does not mean MCP helpers or external tools are ready.');
     expect(catalog).toContain('## Quality Gate Evidence');
     expect(catalog).toContain('npm run test:ai-dev:benchmarks');
@@ -67,9 +75,14 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('package-content-manifest.json');
     expect(catalog).toContain('init-claude-programmatic.log');
     expect(catalog).toContain('init-codex-programmatic.log');
+    expect(catalog).toContain('init-cursor-programmatic.log');
     expect(catalog).toContain('init-kiro-programmatic.log');
     expect(catalog).toContain('init-qoder-programmatic.log');
+    expect(catalog).toContain('cursor-doctor-programmatic.log');
+    expect(catalog).toContain('cursor-clean-programmatic.log');
+    expect(catalog).toContain('cursor-loader-evidence.log');
     expect(catalog).toContain('release-artifact-summary.json');
+    expect(catalog).toContain('Cursor programmatic init/doctor/clean proves generated-runtime preview assets, not Cursor skill loader/user journey support');
     expect(catalog).toContain('no dashboard, history store, GitHub Release automation, or release decision engine');
   });
 

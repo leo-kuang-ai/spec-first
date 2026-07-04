@@ -11,6 +11,8 @@ if ([string]::IsNullOrWhiteSpace($Tool)) {
 }
 if ($UserScope) {
   $env:KIRO_USER_SCOPE = '1'
+  $env:QODER_USER_SCOPE = '1'
+  $env:CURSOR_USER_SCOPE = '1'
 }
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path

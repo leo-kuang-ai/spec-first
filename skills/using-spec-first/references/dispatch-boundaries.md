@@ -16,17 +16,18 @@ If the user explicitly asks for report-only/no-agents mode, the host lacks a dis
 
 ## Host Surface
 
-- Claude workflow entrypoints use `/spec:*`.
-- Codex workflow entrypoints use `$spec-*`.
-- In Codex, `$spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization; otherwise it follows the documented fallback.
-- `using-spec-first` itself is a standalone meta skill, not a `/spec:*` or `$spec-*` workflow entrypoint.
+- Public workflow identifiers use the unified `spec-*` form across hosts.
+- Claude and Qoder project commands are generated as `spec-*.md` command files.
+- Codex, Cursor, and Kiro expose the same names as generated Skills where supported by the host.
+- In Codex, `spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization; otherwise it follows the documented fallback.
+- `using-spec-first` itself is a standalone meta skill, not a `spec-*` workflow entrypoint.
 - Internal-only skills remain source/runtime support assets, not menu items. Do not recommend them as public workflow paths.
 
 ## Codex Startup Reminder Boundary
 
 Codex currently uses managed instruction guidance for startup reminders, not a verified deterministic SessionStart hook.
 
-When a top-level Codex orchestrator is about to route into a public `$spec-*` workflow and the `spec-first` CLI is available, it may run:
+When a top-level Codex orchestrator is about to route into a public `spec-*` workflow and the `spec-first` CLI is available, it may run:
 
 ```bash
 spec-first startup-reminder --codex

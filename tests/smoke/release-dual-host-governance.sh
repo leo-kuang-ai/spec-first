@@ -9,6 +9,7 @@ TMP_PREFIX="$TMP_ROOT/prefix"
 TMP_CACHE="$TMP_ROOT/cache"
 TARBALL_DIR="$TMP_ROOT/tarball"
 CODEX_PROJECT="$TMP_ROOT/codex-project"
+CURSOR_PROJECT="$TMP_ROOT/cursor-project"
 CLAUDE_PROJECT="$TMP_ROOT/claude-project"
 KIRO_PROJECT="$TMP_ROOT/kiro-project"
 QODER_PROJECT="$TMP_ROOT/qoder-project"
@@ -165,7 +166,77 @@ test ! -e "$CODEX_PROJECT/.codex/hooks/session-start.cmd"
 test ! -e "$CODEX_PROJECT/.codex/hooks.json"
 echo "   ✓ Codex 安装态闭环通过"
 
-echo "5. 验证 Kiro 安装态 init / doctor / clean..."
+echo "5. 验证 Cursor 安装态 init / doctor / clean..."
+mkdir -p "$CURSOR_PROJECT"
+cursor_init_output="$(
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CURSOR_PROJECT" cursor test en 2>&1
+)"
+grep -q 'skill directory(ies) in .cursor/skills' <<<"$cursor_init_output"
+grep -q 'Cursor support is generated-runtime preview' <<<"$cursor_init_output"
+test -f "$CURSOR_PROJECT/.cursor/skills/spec-work/SKILL.md"
+test -f "$CURSOR_PROJECT/.cursor/skills/spec-mcp-setup/SKILL.md"
+test -f "$CURSOR_PROJECT/.cursor/skills/using-spec-first/SKILL.md"
+test -f "$CURSOR_PROJECT/.cursor/spec-first/state.json"
+test ! -e "$CURSOR_PROJECT/.cursor/commands"
+test ! -e "$CURSOR_PROJECT/.cursor/agents"
+test ! -e "$CURSOR_PROJECT/.cursor/rules"
+
+cursor_doctor_output="$(
+  cd "$CURSOR_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --cursor 2>&1
+)"
+grep -q '.cursor/skills' <<<"$cursor_doctor_output"
+grep -q '.cursor/spec-first/state.json' <<<"$cursor_doctor_output"
+grep -q 'Cursor generated-runtime preview' <<<"$cursor_doctor_output"
+cursor_doctor_json="$(
+  cd "$CURSOR_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --cursor --json 2>&1
+)"
+node - "$cursor_doctor_json" <<'NODE'
+const payload = JSON.parse(process.argv[2]);
+if (!payload.platforms.includes('cursor')) throw new Error('missing cursor platform');
+const checks = payload.platform_checks?.cursor || [];
+if (!checks.some((entry) => entry.name === 'Cursor generated-runtime preview')) {
+  throw new Error('missing Cursor preview evidence');
+}
+if (!checks.some((entry) => entry.name === '.cursor/skills/spec-work/SKILL.md')) {
+  throw new Error('missing Cursor spec-work skill evidence');
+}
+NODE
+echo "   ! Cursor loader smoke degraded: cursor_loader_validation_unavailable"
+mkdir -p "$CURSOR_PROJECT/.cursor/rules" "$CURSOR_PROJECT/.cursor/agents"
+printf '# Native Cursor rule\n' > "$CURSOR_PROJECT/.cursor/rules/product.mdc"
+printf '{"custom":true}\n' > "$CURSOR_PROJECT/.cursor/mcp.json"
+cursor_clean_dry="$(
+  cd "$CURSOR_PROJECT"
+  "$SHIM" clean --cursor --dry-run 2>&1
+)"
+grep -q '.cursor/skills/spec-work' <<<"$cursor_clean_dry"
+grep -q '.cursor/spec-first/state.json' <<<"$cursor_clean_dry"
+if grep -q '.cursor/agents' <<<"$cursor_clean_dry"; then
+  echo "✗ Cursor clean dry-run 不应删除用户自有 .cursor/agents"
+  exit 1
+fi
+if grep -q '.cursor/rules' <<<"$cursor_clean_dry"; then
+  echo "✗ Cursor clean dry-run 不应删除用户自有 .cursor/rules"
+  exit 1
+fi
+if grep -q '.cursor/mcp.json' <<<"$cursor_clean_dry"; then
+  echo "✗ Cursor clean dry-run 不应删除用户自有 .cursor/mcp.json"
+  exit 1
+fi
+(
+  cd "$CURSOR_PROJECT"
+  "$SHIM" clean --cursor >/dev/null
+)
+test ! -e "$CURSOR_PROJECT/.cursor/skills"
+test ! -e "$CURSOR_PROJECT/.cursor/spec-first"
+test -f "$CURSOR_PROJECT/.cursor/rules/product.mdc"
+test -d "$CURSOR_PROJECT/.cursor/agents"
+test -f "$CURSOR_PROJECT/.cursor/mcp.json"
+echo "   ✓ Cursor 安装态 generated-runtime preview 闭环通过"
+
+echo "6. 验证 Kiro 安装态 init / doctor / clean..."
 mkdir -p "$KIRO_PROJECT"
 kiro_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$KIRO_PROJECT" kiro test en 2>&1
@@ -209,7 +280,7 @@ test -f "$KIRO_PROJECT/.kiro/settings/user.json"
 test -f "$KIRO_PROJECT/.kiro/specs/native/spec.md"
 echo "   ✓ Kiro 安装态闭环通过"
 
-echo "6. 验证 Qoder 安装态 init / doctor / clean..."
+echo "7. 验证 Qoder 安装态 init / doctor / clean..."
 mkdir -p "$QODER_PROJECT"
 qoder_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$QODER_PROJECT" qoder test en 2>&1
@@ -260,7 +331,7 @@ test -f "$QODER_PROJECT/.qoder/settings.json"
 test -f "$QODER_PROJECT/.qoder/hooks/custom.json"
 echo "   ✓ Qoder 安装态闭环通过"
 
-echo "7. 验证 Claude 安装态 init / doctor..."
+echo "8. 验证 Claude 安装态 init / doctor..."
 mkdir -p "$CLAUDE_PROJECT"
 claude_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CLAUDE_PROJECT" claude test en 2>&1

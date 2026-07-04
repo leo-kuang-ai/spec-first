@@ -1,7 +1,7 @@
 ---
 title: "feat: 支持 Cursor 宿主"
 type: feat
-status: active
+status: completed
 date: 2026-07-04
 spec_id: 2026-07-04-002-cursor-host-support
 origin_verification_status: not-applicable
@@ -782,3 +782,11 @@ The plan intentionally has a narrow runtime projection:
   - MCP docs confirm `.cursor/mcp.json`, `~/.cursor/mcp.json`, `mcpServers`, stdio/SSE/Streamable HTTP transports, `envFile` stdio-only, config interpolation, environment-variable secret guidance, tool approval and Run Modes.
   - CLI installation docs confirm the current Cursor CLI command is verified with `agent --version`; CLI MCP docs confirm `agent mcp list` and `agent mcp list-tools <identifier>` use the same configuration as the editor.
   - Subagents docs confirm `.cursor/agents/` and `~/.cursor/agents/`, built-in `explore`/`bash`/`browser`, inherited MCP tools, and custom subagent frontmatter including `readonly` and `is_background`.
+
+## Completion Evidence
+
+- Implementation scope: Cursor opt-in `generated_runtime_preview` landed across adapter registry, init/doctor/clean, governance schema/data, MCP setup scripts, context/source-runtime boundaries, runtime catalog, README surfaces, release package evidence, and focused tests. P0 does not generate `.cursor/commands/spec/**`, `.cursor/agents/**`, or `.cursor/rules/**`.
+- Shipping review fixes: resolved Cursor duplicate-skill warning suppression, doctor auto-detect, clean empty-agent-root behavior, release evidence required checks, MCP diagnostic redaction, Cursor generated-runtime context exclusions, programmatic init warning visibility, and Cursor skill path rewrite drift for `.qoder/commands/spec/**` / `.kiro/settings/**`.
+- Verification: focused Cursor/catalog/release/changelog/init tests, broader Cursor/init/doctor/clean/context/MCP Jest suites, `npm run typecheck`, `npm run test:mcp-setup`, `node scripts/npm-install-matrix-smoke.js`, `npm run test:smoke`, `bash tests/smoke/release-dual-host-governance.sh`, `bash tests/smoke/install-tarball.sh`, `npm run build`, `git diff --check`, and changelog/plan taxonomy tests passed during closeout.
+- Review status: shipping review used Codex manual multi-perspective fallback because no host-native review or authorized subagent/persona dispatch was available (`dispatch_authorization_missing`); blocking findings were fixed and revalidated, with no remaining blocking residual in the closeout scope.
+- Generated-runtime status: Cursor loader/user journey remains degraded with `cursor_loader_validation_unavailable`; this completes generated-runtime preview only, not full Cursor host support, `init -y` default inclusion, or typed reviewer/worker delegation parity.

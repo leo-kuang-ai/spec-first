@@ -28,6 +28,7 @@
       "enum": [
         "claude",
         "codex",
+        "cursor",
         "kiro",
         "qoder"
       ]
@@ -90,6 +91,7 @@
           "enum": [
             "claude",
             "codex",
+            "cursor",
             "kiro",
             "qoder",
             null
@@ -101,6 +103,7 @@
           "required": [
             "claude",
             "codex",
+            "cursor",
             "kiro",
             "qoder"
           ],
@@ -109,6 +112,9 @@
               "$ref": "#/$defs/hostDelivery"
             },
             "codex": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "cursor": {
               "$ref": "#/$defs/hostDelivery"
             },
             "kiro": {

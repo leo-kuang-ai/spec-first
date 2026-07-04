@@ -137,6 +137,7 @@ function Get-HostConfigStatus {
         $server = Get-ClaudeMcpServer -Config $config -Key $Tool.detection.key
         if ($null -eq $server) { return 'action-required' }
         if ($server.command -ne $hostConfig.command) { return 'action-required' }
+        if ($null -ne $hostConfig.PSObject.Properties['type'] -and $server.type -ne $hostConfig.type) { return 'action-required' }
         $serverArgs = @($server.args)
         $expectedArgs = @(Expand-ToolArgs -Tool $Tool -Args $hostConfig.args)
         if ($null -ne $server.PSObject.Properties['scope']) { return 'action-required' }

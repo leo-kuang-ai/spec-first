@@ -12,6 +12,11 @@ if ([string]::IsNullOrWhiteSpace($Tool)) {
 if ($UserScope) {
   $env:KIRO_USER_SCOPE = '1'
   $env:QODER_USER_SCOPE = '1'
+  $env:CURSOR_USER_SCOPE = '1'
+}
+
+if ($env:MCP_SETUP_HOST -notin @('claude', 'codex', 'kiro', 'qoder', 'cursor')) {
+  throw '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。'
 }
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -39,6 +44,15 @@ if ($null -eq $HostConfig) {
 
 $resolvedArgs = @(Expand-ToolArgs -Tool $ToolDef -Args $HostConfig.args)
 $ResolvedConfig = [ordered]@{ command = $HostConfig.command; args = $resolvedArgs }
+if ($null -ne $HostConfig.PSObject.Properties['type']) {
+  $ResolvedConfig['type'] = [string]$HostConfig.type
+}
+if ($null -ne $HostConfig.PSObject.Properties['env']) {
+  $ResolvedConfig['env'] = $HostConfig.env
+}
+if ($null -ne $HostConfig.PSObject.Properties['envFile']) {
+  $ResolvedConfig['envFile'] = $HostConfig.envFile
+}
 if ($null -ne $HostConfig.PSObject.Properties['startup_timeout_sec']) {
   $ResolvedConfig['startup_timeout_sec'] = [int]$HostConfig.startup_timeout_sec
 }
@@ -107,6 +121,7 @@ function Test-ToolConfigured {
         $server = Get-ClaudeMcpServer -Config $config -Key $ToolDef.detection.key
         if ($null -eq $server) { return $false }
         if ($server.command -ne $ResolvedConfig.command) { return $false }
+        if ($ResolvedConfig.Contains('type') -and $server.type -ne $ResolvedConfig.type) { return $false }
         $serverArgs = @($server.args)
         $expectedArgs = @($ResolvedConfig.args)
         if ($serverArgs.Count -ne $expectedArgs.Count) { return $false }
@@ -141,6 +156,7 @@ function Test-SelectedConfigConflicts {
     $server = Get-ClaudeMcpServer -Config $config -Key $ToolDef.detection.key
     if ($null -eq $server) { return $false }
     if ($server.command -ne $ResolvedConfig.command) { return $true }
+    if ($ResolvedConfig.Contains('type') -and $server.type -ne $ResolvedConfig.type) { return $true }
     $serverArgs = @($server.args)
     $expectedArgs = @($ResolvedConfig.args)
     if ($serverArgs.Count -ne $expectedArgs.Count) { return $true }
@@ -169,7 +185,7 @@ function Write-JsonMcpConfig {
 }
 
 function Assert-NoLiteralSecretValues {
-  if ($DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder') { return }
+  if ($DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder' -and $DetectedHost -ne 'cursor') { return }
   if (-not (Test-Path $ConfigPath)) { return }
   $raw = Get-Content -Raw $ConfigPath
   $parsed = ConvertFrom-JsonCompat -Json $raw -AsHashtable
@@ -286,7 +302,7 @@ try {
     return
   }
 
-  if (-not [bool]$ToolDef.required -and (Test-SelectedConfigConflicts) -and -not (Test-OverwriteApproved)) {
+  if ((Test-SelectedConfigConflicts) -and -not (Test-OverwriteApproved)) {
     throw "$Tool 已存在同名但不同 command/args 的宿主 MCP 配置；如需覆盖，请设置 SPEC_FIRST_MCP_CONFIGURE_OVERWRITE=approved 后重跑"
   }
 
@@ -303,7 +319,7 @@ try {
       Write-JsonMcpConfig -FinalConfig $ResolvedConfig
     } elseif ($DetectedHost -eq 'codex') {
       Write-CodexConfig -FinalConfig $ResolvedConfig
-    } elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder') {
+    } elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder' -or $DetectedHost -eq 'cursor') {
       Write-JsonMcpConfig -FinalConfig $ResolvedConfig
       Assert-NoLiteralSecretValues
     } else {

@@ -10,7 +10,7 @@ These reminders are advisory. They help prevent rationalizing around the entry-g
 | "The user asked for a review, but I can answer informally." | Use `code-review` or `doc-review` when the review target is concrete. |
 | "The task is vague, but I can probably implement something." | Use `brainstorm` or `plan` before work. |
 | "A helper skill exists, so I should expose it." | Only public workflows are user entrypoints; internal helpers stay hidden. |
-| "I should run init/update now." | Route to `spec-first update` (terminal) or `/spec:mcp-setup` first unless the user explicitly requested the command. |
+| "I should run init/update now." | Route to `spec-first update` (terminal) or `spec-mcp-setup` first unless the user explicitly requested the command. |
 
 ## Hard Rules
 
@@ -19,8 +19,8 @@ These reminders are advisory. They help prevent rationalizing around the entry-g
 3. Do **not** adopt the `using-superpowers` rule that "if there is a 1% chance a skill applies, you must invoke it."
 4. Do **not** turn ordinary lightweight requests into mandatory workflow traffic.
 5. Do **not** describe `using-spec-first` itself as a command-backed workflow.
-6. Do **not** write Codex entrypoints as `/spec:*`.
-7. Do **not** write Claude workflow entrypoints as `$spec-*`.
+6. Do **not** restore `/spec:*` or `$spec-*` as current product surfaces; normalize legacy spellings to `spec-*`.
+7. Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.
 8. Do **not** expose internal-only skills as user entrypoints. This includes delegated helpers such as `git-worktree`.
 9. Do **not** route to hidden helper skills such as git, browser, image, proof, xcode, or report-bug helpers unless a public workflow explicitly delegates to them.
 10. Do **not** run `spec-first init`, `clean`, update, or other state-changing commands just because this governor matched; first route to the appropriate workflow or ask a narrow confirmation when required.

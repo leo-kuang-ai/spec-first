@@ -39,11 +39,9 @@ function captureInit(cwd, args) {
       exitCode: 0,
       stdout: [
         'After successful init',
-        'For lightweight work, start the matching /spec:* workflow',
-        'For lightweight work, start the matching $spec-* workflow',
+        'For lightweight work, start the matching spec-* workflow',
         'init asks whether to initialize all child repos',
-        '/spec:mcp-setup',
-        '$spec-mcp-setup',
+        'spec-mcp-setup',
       ].join('\n'),
       stderr: '',
     };
@@ -323,12 +321,10 @@ describe('init --dry-run', () => {
       expect(result.exitCode).toBe(0);
       expect(result.stderr).toBe('');
       expect(result.stdout).toContain('After successful init');
-      expect(result.stdout).toContain('For lightweight work, start the matching /spec:* workflow');
-      expect(result.stdout).toContain('For lightweight work, start the matching $spec-* workflow');
+      expect(result.stdout).toContain('For lightweight work, start the matching spec-* workflow');
       expect(result.stdout).toContain('init asks whether to initialize all child repos');
-      expect(result.stdout).toContain('/spec:mcp-setup');
+      expect(result.stdout).toContain('spec-mcp-setup');
       expect(result.stdout).not.toContain('/spec:standards');
-      expect(result.stdout).toContain('$spec-mcp-setup');
       expect(result.stdout).not.toContain('$spec-standards');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -369,11 +365,12 @@ describe('init --dry-run', () => {
       expect(result.stderr).toBe('');
       expect(after).toEqual(before);
       expect(result.stdout).toContain('Dry run: spec-first init (claude)');
-      expect(result.stdout).toContain('Would prune 1 unmanaged command file(s)');
-      expect(result.stdout).toContain('.claude/commands/spec/custom.md');
+      expect(result.stdout).not.toContain('Would prune 1 unmanaged command file(s)');
+      expect(result.stdout).toContain('.claude/commands/spec');
+      expect(result.stdout).not.toContain('.claude/commands/spec/custom.md');
       expect(result.stdout).toContain('Would ensure');
       expect(result.stdout).toContain('Would write/update');
-      expect(result.stdout).toContain('.claude/commands/spec/work.md');
+      expect(result.stdout).toContain('.claude/commands/spec-work.md');
       expect(result.stdout).toContain('.claude/spec-first/workflows/spec-mcp-setup/scripts/check-health');
       expect(result.stdout).toContain('.claude/agents/spec-security-reviewer.agent.md');
       expect(result.stdout).toContain('CLAUDE.md');
@@ -401,7 +398,7 @@ describe('init --dry-run', () => {
       expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'claude' }))).toBe(0);
 
       for (const relativePath of [
-        '.claude/commands/spec/work.md',
+        '.claude/commands/spec-work.md',
         '.claude/agents/spec-security-reviewer.agent.md',
         '.claude/hooks/session-start',
         '.claude/hooks/spec-plan-guard',
@@ -424,6 +421,7 @@ describe('init --dry-run', () => {
       const gitignore = fs.readFileSync(path.join(projectRoot, '.gitignore'), 'utf8');
       expect(gitignore).toContain(buildSpecFirstGitignoreBlock());
       expect(gitignore).toContain('.claude/commands/spec/');
+      expect(gitignore).toContain('.claude/commands/spec-*.md');
       expect(gitignore).not.toContain('.spec-first/standards/');
 
       const claudeInstruction = fs.readFileSync(path.join(projectRoot, 'CLAUDE.md'), 'utf8');
@@ -433,7 +431,7 @@ describe('init --dry-run', () => {
       expect(claudeInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
       expect(claudeInstruction).not.toContain('入口映射(意图→入口)');
       expect(claudeInstruction).toContain('target_repo');
-      expect(claudeInstruction).toContain('/spec:optimize');
+      expect(claudeInstruction).toContain('spec-optimize');
       expect(claudeInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(claudeInstruction).not.toContain('group.status');
       expect(claudeInstruction).not.toContain('spec-standards` 无参数运行默认为每个 discovered child repo');
@@ -441,7 +439,7 @@ describe('init --dry-run', () => {
       expect(claudeInstruction).not.toContain('<!-- spec-first:runtime-tools:start -->');
 
       const claudeMcpSetupCommand = fs.readFileSync(
-        path.join(projectRoot, '.claude', 'commands', 'spec', 'mcp-setup.md'),
+        path.join(projectRoot, '.claude', 'commands', 'spec-mcp-setup.md'),
         'utf8',
       );
       expect(claudeMcpSetupCommand).toContain('bash .claude/spec-first/workflows/spec-mcp-setup/scripts/check-health');
@@ -1037,7 +1035,7 @@ describe('init --dry-run', () => {
       expect(claude.stdout).toContain('重启 Claude Code 或新开会话');
       expect(claude.stdout).toContain('docs、小修复、首次试用、plan、work、review 或 debug');
       expect(claude.stdout).toContain('需要更完整的 readiness 时');
-      expect(claude.stdout).toContain('/spec:mcp-setup');
+      expect(claude.stdout).toContain('spec-mcp-setup');
       expect(claude.stdout).not.toContain('/spec:standards');
       expect(claude.stdout).toContain('然后按用户意图选择 workflow');
       expect(claude.stdout).toContain('项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts');
@@ -1050,7 +1048,7 @@ describe('init --dry-run', () => {
       expect(codex.stdout).toContain('重启 Codex 或新开会话');
       expect(codex.stdout).toContain('docs、小修复、首次试用、plan、work、review 或 debug');
       expect(codex.stdout).toContain('需要更完整的 readiness 时');
-      expect(codex.stdout).toContain('$spec-mcp-setup');
+      expect(codex.stdout).toContain('spec-mcp-setup');
       expect(codex.stdout).not.toContain('$spec-standards');
       expect(codex.stdout).toContain('然后按用户意图选择 workflow');
       expect(codex.stdout).toContain('项目指导来自 AGENTS.md、CLAUDE.md、docs/contracts');
@@ -1063,7 +1061,7 @@ describe('init --dry-run', () => {
       expect(english.stdout).toContain('Restart Codex or open a new session');
       expect(english.stdout).toContain('lightweight docs, small fixes, first trials, plan, work, review, or debug');
       expect(english.stdout).toContain('For stronger readiness');
-      expect(english.stdout).toContain('$spec-mcp-setup');
+      expect(english.stdout).toContain('spec-mcp-setup');
       expect(english.stdout).not.toContain('$spec-standards');
       expect(english.stdout).toContain('Then choose the workflow by user intent');
       expect(english.stdout).toContain('Project guidance comes from AGENTS.md, CLAUDE.md, docs/contracts');
@@ -1091,7 +1089,7 @@ describe('init --dry-run', () => {
         'utf8',
       );
 
-      const commandPath = path.join(projectRoot, '.claude', 'commands', 'spec', 'work.md');
+      const commandPath = path.join(projectRoot, '.claude', 'commands', 'spec-work.md');
       const drifted = fs.readFileSync(commandPath, 'utf8')
         .replace(
           "Derive tasks from the plan's implementation units",
@@ -1105,9 +1103,8 @@ describe('init --dry-run', () => {
       expect(result.stderr).toBe('');
       expect(result.stdout).toContain('Would perform a managed hard reset before regenerating runtime assets');
       expect(result.stdout).toContain('current runtime drift detected');
-      expect(result.stdout).toContain('.claude/commands/spec/work.md');
-      expect(result.stdout).toContain('Would prune 1 unmanaged command file(s)');
-      expect(result.stdout).toContain('.claude/commands/spec/custom.md');
+      expect(result.stdout).toContain('.claude/commands/spec-work.md');
+      expect(result.stdout).toContain('.claude/commands/spec');
       expect(result.stdout).toContain('.claude/spec-first/workflows/spec-mcp-setup/scripts/check-health');
     } finally {
       warnSpy.mockRestore();

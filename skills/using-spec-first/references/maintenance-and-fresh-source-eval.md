@@ -30,7 +30,7 @@ Use `docs/contracts/workflows/fresh-source-eval-checklist.md` status values: `pa
 
 Re-review this skill when any of these change:
 
-- A public `/spec:*` or `$spec-*` workflow is added, renamed, retired, or changes entry semantics.
+- A public `spec-*` workflow is added, renamed, retired, or changes entry semantics.
 - A standalone skill becomes a public workflow, or a public workflow becomes internal/standalone.
 - Codex or Claude host dispatch authorization contracts change.
 - SessionStart/bootstrap behavior changes, especially if a host starts injecting different per-turn or post-compact context.

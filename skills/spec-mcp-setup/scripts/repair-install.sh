@@ -22,6 +22,8 @@ while [[ $# -gt 0 ]]; do
     --user-scope)
       USER_SCOPE_ARGS+=(--user-scope)
       export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
+      export CURSOR_USER_SCOPE=1
       shift
       ;;
     *)

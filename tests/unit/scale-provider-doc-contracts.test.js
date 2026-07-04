@@ -70,7 +70,7 @@ describe('SCALE provider documentation contracts', () => {
     expect(mcpTools).toContain('"id": "codegraph"');
     expect(mcpTools).toContain('"external_dependencies"');
     expect(mcpTools).toContain('"package": "@colbymchenry/codegraph"');
-    expect(mcpTools).toContain('"package": "graphifyy"');
+    expect(mcpTools).toContain('"package": "@sentropic/graphify"');
     expect(mcpTools).toContain('"dependency_ref": "codegraph"');
     expect(mcpTools).toContain('"kind": "code-structure"');
     expect(mcpTools).toContain('"command": "codegraph"');

@@ -860,6 +860,27 @@ function Resolve-GraphifyOnOriginalPath {
   return ''
 }
 
+function Get-GraphifyKnownCliCandidates {
+  $candidates = @()
+  foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
+    $candidates += (Join-Path $homeLocalBin $name)
+  }
+  if (Test-CommandExists 'npm') {
+    $npmPrefix = ''
+    try {
+      $npmPrefix = (& npm prefix -g 2>$null | Select-Object -First 1)
+    } catch {
+      $npmPrefix = ''
+    }
+    if (-not [string]::IsNullOrWhiteSpace($npmPrefix)) {
+      foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
+        $candidates += (Join-Path (Join-Path $npmPrefix 'bin') $name)
+      }
+    }
+  }
+  return $candidates
+}
+
 function Set-GraphifyResolvedCommand {
   param(
     [string]$Command,
@@ -882,8 +903,7 @@ function Resolve-GraphifyCli {
     return $script:GraphifyResolvedCommand
   }
 
-  foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
-    $candidate = Join-Path $homeLocalBin $name
+  foreach ($candidate in Get-GraphifyKnownCliCandidates) {
     $command = Get-Command -Name $candidate -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -ne $command -and -not [string]::IsNullOrWhiteSpace([string]$command.Source)) {
       Set-GraphifyResolvedCommand -Command ([string]$command.Source) -OnPath $false
@@ -967,8 +987,7 @@ function Resolve-GraphifyCliMatchingPin {
     return $script:GraphifyResolvedCommand
   }
 
-  foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
-    $candidate = Join-Path $homeLocalBin $name
+  foreach ($candidate in Get-GraphifyKnownCliCandidates) {
     $command = Get-Command -Name $candidate -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -ne $command -and -not [string]::IsNullOrWhiteSpace([string]$command.Source)) {
       $source = [string]$command.Source
@@ -1320,14 +1339,8 @@ function Test-GraphifyCliVersionMatchesPin {
 
 function Install-GraphifyCli {
   if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
-  if (Test-CommandExists 'uv') {
-    if (Invoke-HelperCommand { uv tool install --force "$graphifyPackage==$graphifyVersionPin" }) {
-      Reset-GraphifyResolver
-      if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
-    }
-  }
-  if (Test-CommandExists 'pipx') {
-    if (Invoke-HelperCommand { pipx install --force "$graphifyPackage==$graphifyVersionPin" }) {
+  if (Test-CommandExists 'npm') {
+    if (Invoke-NpmGlobalInstallWithOptionalSudo -Packages @("$graphifyPackage@$graphifyVersionPin")) {
       Reset-GraphifyResolver
       if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
     }

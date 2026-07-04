@@ -53,12 +53,15 @@ describe('spec-mcp-setup config template contract', () => {
     const setupDoesNot = markdownSection(text, '## Boundaries').split('Setup does not:')[1];
 
     expect(text).toContain('Setup Posture And Project Conventions');
-    expect(text).toContain('Claude Code, Codex, Kiro, or Qoder');
-    expect(text).toContain('Generated runtime mirrors under `.claude/`, `.codex/`, `.kiro/`, `.qoder/`, and `.agents/skills/` are not source');
+    expect(text).toContain('Claude Code, Codex, Kiro, Qoder, or Cursor');
+    expect(text).toContain('Generated runtime mirrors under `.claude/`, `.codex/`, `.cursor/skills/`, `.cursor/spec-first/`, `.kiro/`, `.qoder/`, and `.agents/skills/` are not source');
     expect(text).toContain('Kiro MCP config to workspace `.kiro/settings/mcp.json` by default');
     expect(text).toContain('~/.kiro/settings/mcp.json` only after explicit user-scope opt-in');
     expect(text).toContain('Qoder MCP config to local `.qoder/settings.local.json` by default');
     expect(text).toContain('~/.qoder/settings.json` only after explicit user-scope opt-in');
+    expect(text).toContain('Cursor MCP config to project `.cursor/mcp.json` by default');
+    expect(text).toContain('~/.cursor/mcp.json` only after explicit user-scope opt-in');
+    expect(text).toContain('fail closed without an explicit canonical `MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor`');
     expect(text).toContain('Explore -> Present -> Decide -> Write');
     expect(text).toContain('local-only overrides');
     expect(text).toContain('verification_profile_path');

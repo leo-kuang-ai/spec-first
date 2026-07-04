@@ -50,7 +50,7 @@ describe('instruction bootstrap', () => {
     expect(twice.match(/<!-- spec-first:bootstrap:start -->/g)).toHaveLength(1);
     expect(twice).toContain('## Workflow 入口治理');
     expect(twice).not.toContain('## Workflow 入口治理（由 spec-first 管理）');
-    expect(twice).toContain('Claude workflow 入口使用 `/spec:*`');
+    expect(twice).toContain('Claude workflow 入口使用 `spec-*` project commands');
     // 抗膨胀上界断言(替代旧的 toHaveLength(12) 精确行数断言):
     // body 是核心决策集,行数随内容增长,但需有上界防膨胀。
     expect(block.split('\n').length).toBeGreaterThan(8);
@@ -79,10 +79,11 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('target_repo');
     expect(twice).toContain('Runtime context 默认排除 `.spec-first/audits/**`');
     expect(twice).toContain('`.spec-first/governance/**`');
-    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）');
+    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）');
+    expect(twice).toContain('`.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 与 `.qoder/rules/**` 是宿主原生 advisory artifact');
     expect(twice).toContain('docs/10-prompt/结构化项目角色契约.md');
     expect(twice).toContain('scripts/tools 只产 deterministic facts');
-    expect(twice).toContain('优化→`/spec:optimize`');
+    expect(twice).toContain('优化→`spec-optimize`');
     expect(twice).toContain('不要直接暴露 internal-only skills');
     expect(twice).not.toContain('入口映射(意图→入口)');
     expect(twice).not.toContain('过往 session 检索');
@@ -119,7 +120,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('## Existing Notes');
     expect(updated).toContain('## Workflow Entry Governance');
     expect(updated).not.toContain('## Workflow Entry Governance (managed by spec-first)');
-    expect(updated).toContain('Codex workflow entrypoints use `$spec-*`');
+    expect(updated).toContain('Codex workflow entrypoints use same-name `spec-*` Skills');
     expect(updated).toContain('minimal entry anchor');
     expect(updated).toContain('the full route map lives in `skills/using-spec-first/SKILL.md`, with boundary details and exceptions in its registered `references/*.md`');
     expect(updated).toContain('skills/using-spec-first/SKILL.md');
@@ -132,12 +133,13 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('bounded subagents, leaf reviewers, and worker agents');
     expect(updated).toContain('Runtime context excludes `.spec-first/audits/**`');
     expect(updated).toContain('`.spec-first/governance/**`');
-    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)');
+    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.cursor/mcp.json`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)');
+    expect(updated).toContain('`.cursor/rules/**`, `.cursor/agents/**`, `.kiro/specs/**`, and `.qoder/rules/**` are host-native advisory artifacts');
     expect(updated).toContain('Common entry anchors');
     expect(updated).toContain('External issue/PR inputs');
     expect(updated).toContain('issue/PR material is an input surface, not a separate workflow');
     expect(updated).toContain('do not add an external issue/PR-specific public workflow entrypoint, tracker state, label/comment mutation path, or treat reporter commands as confirmed truth');
-    expect(updated).toContain('optimization→`$spec-optimize`');
+    expect(updated).toContain('optimization→`spec-optimize`');
     expect(updated).not.toContain('priority rules, and red flags');
     expect(updated).not.toContain('Entry map (intent→entrypoint)');
     expect(updated).not.toContain('spec-intake');
@@ -158,7 +160,7 @@ describe('instruction bootstrap', () => {
     const updated = applyManagedBootstrapBlock(corrupted, buildBootstrapBlock('codex', 'en'));
 
     expect(updated).toContain('## Existing Notes');
-    expect(updated).toContain('Codex workflow entrypoints use `$spec-*`');
+    expect(updated).toContain('Codex workflow entrypoints use same-name `spec-*` Skills');
     expect(updated).not.toContain('perform route checks');
     expect(updated).not.toContain('Claude workflow entrypoints use `/spec:*`');
     expect(updated.match(/<!-- spec-first:bootstrap:start -->/g)).toHaveLength(1);
@@ -220,7 +222,7 @@ describe('instruction bootstrap', () => {
       '## Workflow Entry Governance',
       '',
       '- This block is the spec-first workflow entry reminder; `using-spec-first` is a standalone meta skill, not a workflow command',
-      '- Common entry anchors: environment/MCP→`/spec:mcp-setup`; version/runtime check→run `spec-first update` in the terminal; execution→`/spec:work`',
+      '- Common entry anchors: environment/MCP→`spec-mcp-setup`; version/runtime check→run `spec-first update` in the terminal; execution→`spec-work`',
       '- Do not expose internal-only skills directly',
       '- CUSTOM DRIFT',
       '',
@@ -245,7 +247,7 @@ describe('instruction bootstrap', () => {
       '## Workflow Entry Governance (managed by spec-first)',
       '',
       '- This block is the spec-first workflow entry reminder; `using-spec-first` is a standalone meta skill, not a workflow command',
-      '- Common entry anchors: environment/MCP→`/spec:mcp-setup`; version/runtime check→run `spec-first update` in the terminal; execution→`/spec:work`',
+      '- Common entry anchors: environment/MCP→`spec-mcp-setup`; version/runtime check→run `spec-first update` in the terminal; execution→`spec-work`',
       '- Do not expose internal-only skills directly',
       '- CUSTOM DRIFT',
       '',
@@ -420,29 +422,29 @@ describe('instruction bootstrap', () => {
     const claudeZh = buildBootstrapBlock('claude', 'zh');
     const qoderZh = buildBootstrapBlock('qoder', 'zh');
 
-    expect(codexZh).toContain('Codex：进入公开 `$spec-*` 前');
+    expect(codexZh).toContain('Codex：进入公开 `spec-*` workflow 前');
     expect(codexZh).toContain('spec-first startup-reminder --codex');
     expect(codexZh).toContain('只提示在终端运行 `spec-first update`');
     expect(codexZh).toContain('失败/空输出不阻塞');
     expect(codexZh).toContain('bounded subagents、leaf reviewers、worker agents 不运行');
-    expect(codexZh).toContain('公开 `$spec-*` 调用只授权 workflow 本身');
+    expect(codexZh).toContain('公开 `spec-*` workflow 调用只授权 workflow 本身');
     expect(codexZh).toContain('不自动授权 `spawn_agent`');
-    expect(codexZh).toContain('`$spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback');
+    expect(codexZh).toContain('`spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback');
     expect(codexZh).toContain('`dispatch_authorization_missing`');
     expect(codexZh).toContain('需要多 persona/subagent review 时请在请求中明说 `subagents`/`personas`');
-    expect(codexZh).not.toContain('`$spec-doc-review` 默认多 persona dispatch');
+    expect(codexZh).not.toContain('`spec-doc-review` 默认多 persona dispatch');
     expect(codexZh).not.toContain('仅 report-only/no-agents、dispatch/runtime 缺失或安全边界不满足时降级');
-    expect(codexZh).not.toContain('公开 `$spec-*` 调用即授权该 workflow 文档化的只读 reviewer/researcher phase');
+    expect(codexZh).not.toContain('公开 `spec-*` workflow 调用即授权该 workflow 文档化的只读 reviewer/researcher phase');
     expect(codexZh.split('\n').length).toBeGreaterThan(10);
     expect(codexZh.split('\n').length).toBeLessThan(28);
     expect(codexEn).toContain('a top-level orchestrator');
     expect(codexEn).toContain('failure/empty output must not block routing');
     expect(codexEn).toContain('worker agents do not run it');
-    expect(codexEn).toContain('invoking public `$spec-*` authorizes the workflow itself, not `spawn_agent`');
-    expect(codexEn).toContain('`$spec-doc-review` without explicit subagents/personas/delegated/parallel wording uses the documented fallback');
+    expect(codexEn).toContain('invoking a public `spec-*` workflow authorizes the workflow itself, not `spawn_agent`');
+    expect(codexEn).toContain('`spec-doc-review` without explicit subagents/personas/delegated/parallel wording uses the documented fallback');
     expect(codexEn).toContain('`dispatch_authorization_missing`');
     expect(codexEn).toContain('for multi-persona/subagent review, ask for `subagents` or `personas` in the request');
-    expect(codexEn).not.toContain('`$spec-doc-review` defaults to multi-persona dispatch');
+    expect(codexEn).not.toContain('`spec-doc-review` defaults to multi-persona dispatch');
     expect(codexEn).not.toContain('falls back only for report-only/no-agents, missing dispatch/runtime, or unmet safety boundaries');
     expect(codexEn).not.toContain('that workflow\'s documented read-only reviewer/researcher phase');
     expect(codexEn.split('\n').length).toBeGreaterThan(10);
@@ -459,16 +461,16 @@ describe('instruction bootstrap', () => {
     const qoderZh = buildBootstrapBlock('qoder', 'zh');
     const qoderEn = buildBootstrapBlock('qoder', 'en');
 
-    expect(qoderZh).toContain('Qoder workflow 入口优先使用 project commands `/spec:*`');
-    expect(qoderZh).toContain('setup/runtime→`/spec:mcp-setup`');
-    expect(qoderZh).toContain('计划/执行→`/spec:plan`/`/spec:work`');
+    expect(qoderZh).toContain('Qoder workflow 入口优先使用 `spec-*` project commands');
+    expect(qoderZh).toContain('setup/runtime→`spec-mcp-setup`');
+    expect(qoderZh).toContain('计划/执行→`spec-plan`/`spec-work`');
     expect(qoderZh).toContain('不要把 `using-spec-first` 本身当作 command-backed workflow');
     expect(qoderZh).not.toContain('Codex workflow 入口使用 `$spec-*`');
     expect(qoderZh).not.toContain('Codex：进入公开 `$spec-*` 前');
     expect(qoderZh).not.toContain('$spec-mcp-setup');
 
-    expect(qoderEn).toContain('Qoder workflow entrypoints prefer project commands `/spec:*`');
-    expect(qoderEn).toContain('setup/runtime→`/spec:mcp-setup`');
+    expect(qoderEn).toContain('Qoder workflow entrypoints prefer `spec-*` project commands');
+    expect(qoderEn).toContain('setup/runtime→`spec-mcp-setup`');
     expect(qoderEn).not.toContain('Codex workflow entrypoints use `$spec-*`');
     expect(qoderEn).not.toContain('before entering public `$spec-*`');
   });
@@ -524,10 +526,10 @@ describe('instruction bootstrap', () => {
   test('drift invariant: bootstrap identifiers stay within SKILL without copying the full Route Map (AE4/R6)', () => {
     const skillPath = path.join(__dirname, '..', '..', 'skills', 'using-spec-first', 'SKILL.md');
     const skill = fs.readFileSync(skillPath, 'utf8');
-    // 从 SKILL 的 Route Map 区提取公开 workflow identifier(/spec:NAME 形式)
+    // 从 SKILL 的 Route Map 区提取公开 workflow identifier(`spec-NAME` 形式)
     const routeMapSection = skill.slice(skill.indexOf('### Route Map'));
     const skillIds = new Set(
-      [...routeMapSection.matchAll(/\/spec:([a-z-]+)/g)].map((m) => m[1]),
+      [...routeMapSection.matchAll(/`spec-([a-z-]+)`/g)].map((m) => m[1]),
     );
     expect(skillIds.size).toBeGreaterThan(10); // SKILL Route Map 应有充足条目(防提取失败)
 
@@ -574,9 +576,7 @@ describe('instruction bootstrap', () => {
     for (const host of ['claude', 'codex', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
-      const prefix = host === 'codex' ? '$spec-' : '/spec:';
-        const re = new RegExp(prefix.replace(/[$]/g, '\\$') + '([a-z-]+)', 'g');
-        const blockIds = new Set([...block.matchAll(re)].map((m) => m[1]));
+        const blockIds = new Set([...block.matchAll(/`spec-([a-z-]+)`/g)].map((m) => m[1]));
         // block ⊆ SKILL:不得含 SKILL Route Map 之外的入口(防自造入口/drift)
         for (const id of blockIds) {
           expect(skillIds.has(id)).toBe(true);

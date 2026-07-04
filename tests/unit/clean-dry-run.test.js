@@ -319,7 +319,8 @@ describe('clean --dry-run', () => {
       expect(dryRun.exitCode).toBe(0);
       expect(dryRun.stderr).toBe('');
       expect(dryRun.stdout).toContain('Dry run: spec-first clean (qoder)');
-      expect(dryRun.stdout).toContain('.qoder/commands/spec/work.md');
+      expect(dryRun.stdout).toContain('.qoder/commands/spec-work.md');
+      expect(dryRun.stdout).toContain('.qoder/commands/spec');
       expect(dryRun.stdout).toContain('.qoder/skills/spec-work');
       expect(dryRun.stdout).toContain('.qoder/agents/spec-security-reviewer.agent.md');
       expect(dryRun.stdout).toContain('.qoder/spec-first/state.json');
@@ -332,7 +333,8 @@ describe('clean --dry-run', () => {
       const cleanResult = captureCommand(projectRoot, runClean, ['--qoder']);
       expect(cleanResult.exitCode).toBe(0);
       expect(cleanResult.stdout).toContain('Removed spec-first managed Qoder assets');
-      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec', 'work.md'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec-work.md'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(false);
@@ -340,6 +342,55 @@ describe('clean --dry-run', () => {
       expect(fs.existsSync(userSettingsPath)).toBe(true);
       expect(fs.existsSync(localMcpConfigPath)).toBe(true);
       expect(fs.existsSync(userHookPath)).toBe(true);
+
+      const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
+      expect(instructions).not.toContain('spec-first:bootstrap:start');
+      expect(instructions).not.toContain('spec-first:runtime-tools:start');
+    } finally {
+      initLogSpy.mockRestore();
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('Cursor clean removes only spec-first managed runtime and preserves user-owned Cursor assets', () => {
+    const projectRoot = makeTempDir();
+    const initLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+
+    try {
+      expect(withCwd(projectRoot, () => runProgrammaticInit({ projectRoot, platform: 'cursor' }))).toBe(0);
+
+      const userSkillPath = path.join(projectRoot, '.cursor', 'skills', 'custom-skill', 'SKILL.md');
+      const userAgentRoot = path.join(projectRoot, '.cursor', 'agents');
+      const userRulePath = path.join(projectRoot, '.cursor', 'rules', 'product.mdc');
+      const userMcpConfigPath = path.join(projectRoot, '.cursor', 'mcp.json');
+      fs.mkdirSync(path.dirname(userSkillPath), { recursive: true });
+      fs.mkdirSync(userAgentRoot, { recursive: true });
+      fs.mkdirSync(path.dirname(userRulePath), { recursive: true });
+      fs.writeFileSync(userSkillPath, '---\nname: custom-skill\ndescription: custom\n---\n', 'utf8');
+      fs.writeFileSync(userRulePath, '# native rule\n', 'utf8');
+      fs.writeFileSync(userMcpConfigPath, '{"mcpServers":{"user":{}}}\n', 'utf8');
+
+      const dryRun = captureCommand(projectRoot, runClean, ['--cursor', '--dry-run']);
+      expect(dryRun.exitCode).toBe(0);
+      expect(dryRun.stderr).toBe('');
+      expect(dryRun.stdout).toContain('Dry run: spec-first clean (cursor)');
+      expect(dryRun.stdout).toContain('.cursor/skills/spec-work');
+      expect(dryRun.stdout).toContain('.cursor/spec-first/state.json');
+      expect(dryRun.stdout).toContain('AGENTS.md');
+      expect(dryRun.stdout).not.toContain('.cursor/agents');
+      expect(dryRun.stdout).not.toContain('.cursor/commands');
+      expect(dryRun.stdout).not.toContain('.cursor/rules/product.mdc');
+      expect(dryRun.stdout).not.toContain('.cursor/mcp.json');
+
+      const cleanResult = captureCommand(projectRoot, runClean, ['--cursor']);
+      expect(cleanResult.exitCode).toBe(0);
+      expect(cleanResult.stdout).toContain('Removed spec-first managed Cursor assets');
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'skills', 'spec-work'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'spec-first', 'state.json'))).toBe(false);
+      expect(fs.existsSync(userSkillPath)).toBe(true);
+      expect(fs.existsSync(userAgentRoot)).toBe(true);
+      expect(fs.existsSync(userRulePath)).toBe(true);
+      expect(fs.existsSync(userMcpConfigPath)).toBe(true);
 
       const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
       expect(instructions).not.toContain('spec-first:bootstrap:start');

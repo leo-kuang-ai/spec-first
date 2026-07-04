@@ -41,6 +41,7 @@ const RETIRED_COMMON_RUNTIME_ASSET_PATHS = [
 ];
 const RETIRED_RUNTIME_ASSET_PATHS = {
   claude: [
+    { kind: 'remove_dir', path: '.claude/commands/spec' },
     { kind: 'remove_file', path: '.claude/commands/spec/standards.md' },
     { kind: 'remove_dir', path: `.claude/spec-first/workflows/${RETIRED_STANDARDS_SKILL}` },
     { kind: 'remove_dir', path: `.claude/skills/${RETIRED_STANDARDS_SKILL}` },
@@ -48,6 +49,9 @@ const RETIRED_RUNTIME_ASSET_PATHS = {
   codex: [
     { kind: 'remove_dir', path: `.agents/skills/${RETIRED_STANDARDS_SKILL}` },
     { kind: 'remove_file', path: '.codex/commands/spec/standards.md' },
+  ],
+  qoder: [
+    { kind: 'remove_dir', path: '.qoder/commands/spec' },
   ],
 };
 
@@ -527,9 +531,12 @@ function pruneCommandNamespace(projectRoot, managedCommandFiles, adapter) {
 }
 
 function planEmptyManagedRootCleanup(projectRoot, adapter) {
-  const relativePaths = [adapter.skillsRoot, adapter.agentsRoot];
+  const relativePaths = [adapter.skillsRoot];
   if (adapter.hasCommands) {
     relativePaths.unshift(adapter.commandRoot);
+  }
+  if (adapter.supportsAgents !== false) {
+    relativePaths.push(adapter.agentsRoot);
   }
 
   const operations = [];

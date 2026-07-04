@@ -54,6 +54,7 @@ function hydrateProvider(mcpRegistry, provider) {
     ...provider,
     installation: {
       ...installation,
+      ecosystem: installation.ecosystem || dependency.ecosystem || '',
       package: installation.package || dependency.package || '',
       version_pin: installation.version_pin || dependency.version || '',
     },
@@ -84,6 +85,14 @@ function expandProviderTemplates(provider) {
       install_effect: expandDependencyTemplate(provider.safety && provider.safety.install_effect, installation),
     },
   };
+}
+
+function providerPackageSpec(installation = {}) {
+  if (!installation.package || !installation.version_pin) return '';
+  if (installation.ecosystem === 'npm') {
+    return `${installation.package}@${installation.version_pin}`;
+  }
+  return `${installation.package}==${installation.version_pin}`;
 }
 
 function loadHelperRegistry() {
@@ -292,9 +301,7 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
             first_generation_next_action: null,
           };
       const safety = providerSafetyResult(provider.safety || {});
-      const packageSpec = provider.installation && provider.installation.package && provider.installation.version_pin
-        ? `${provider.installation.package}==${provider.installation.version_pin}`
-        : provider.id;
+      const packageSpec = providerPackageSpec(provider.installation) || provider.id;
       return {
         provider: provider.id,
         name: provider.name || provider.id,

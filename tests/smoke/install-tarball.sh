@@ -74,6 +74,7 @@ grep -q "skills/spec-skill-audit/scripts/write-audit-artifacts.js" "$PACK_LIST"
 grep -q "templates/claude/commands/spec/skill-audit.md" "$PACK_LIST"
 grep -q "skills/spec-mcp-setup/SKILL.md" "$PACK_LIST"
 grep -q "templates/claude/commands/spec/mcp-setup.md" "$PACK_LIST"
+grep -q "src/cli/adapters/cursor.js" "$PACK_LIST"
 grep -q "src/cli/adapters/kiro.js" "$PACK_LIST"
 grep -q "src/cli/adapters/qoder.js" "$PACK_LIST"
 echo "   ✓ tarball 包含当前 workflow assets，且未包含 generated mirrors/native parser caches"
@@ -143,7 +144,7 @@ DOCTOR_OUTPUT=$(cd "$DOCTOR_TMP" && "$SHIM" doctor 2>&1)
 rm -rf "$DOCTOR_TMP"
 grep -q "init" <<<"$DOCTOR_OUTPUT"
 grep -q "spec-first init" <<<"$DOCTOR_OUTPUT"
-grep -q "select Claude Code, Codex, Kiro, and/or Qoder" <<<"$DOCTOR_OUTPUT"
+grep -q "select Claude Code, Codex, Cursor, Kiro, and/or Qoder" <<<"$DOCTOR_OUTPUT"
 echo "   ✓ doctor 在空目录输出交互式 init 指引"
 
 # -------------------------------------------------------------------------
@@ -186,6 +187,10 @@ if (!fs.existsSync(path.join(root, 'skills/spec-mcp-setup/SKILL.md'))) {
 }
 if (!fs.existsSync(path.join(root, 'templates/claude/commands/spec/mcp-setup.md'))) {
   console.error('mcp setup command missing from package');
+  process.exit(1);
+}
+if (!fs.existsSync(path.join(root, 'src/cli/adapters/cursor.js'))) {
+  console.error('Cursor adapter missing from package');
   process.exit(1);
 }
 if (!fs.existsSync(path.join(root, 'src/cli/adapters/kiro.js'))) {

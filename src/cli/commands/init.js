@@ -90,6 +90,13 @@ const INIT_PLATFORM_CHOICES = [
     defaultForYes: true,
   },
   {
+    id: 'cursor',
+    flag: 'cursor',
+    label: 'Cursor',
+    defaultChecked: false,
+    defaultForYes: false,
+  },
+  {
     id: 'kiro',
     flag: 'kiro',
     label: 'Kiro',
@@ -124,7 +131,7 @@ async function runInit(argv, promptOverrides = {}) {
 
   if (parsed.error) {
     console.error(parsed.error);
-    console.error('Usage: spec-first init [--claude] [--codex] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]');
+    console.error('Usage: spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]');
     return 2;
   }
 
@@ -132,7 +139,7 @@ async function runInit(argv, promptOverrides = {}) {
     const tty = promptApi.requireTty();
     if (!tty.ok) {
       console.error('spec-first init requires an interactive terminal unless `-y/--yes` is used with defaults or explicit host flags.');
-      console.error('spec-first init 需要交互式终端；如需跳过引导，请使用 `-y/--yes` 并按需指定 `--claude` / `--codex` / `--kiro` / `--qoder`。');
+      console.error('spec-first init 需要交互式终端；如需跳过引导，请使用 `-y/--yes` 并按需指定 `--claude` / `--codex` / `--cursor` / `--kiro` / `--qoder`。');
       return 2;
     }
   }
@@ -219,6 +226,7 @@ async function runInit(argv, promptOverrides = {}) {
         printWorkspaceInitApplySuccess(plan, result);
       } else {
         printInitApplySuccess(plan, result, {
+          showDiagnostics: false,
           showNextSteps: false,
           suppressChangelogCreated: plans.length > 1 && index > 0,
         });
@@ -736,6 +744,9 @@ function hasAnyManagedState(root) {
   return [
     path.join(root, '.claude', 'spec-first', 'state.json'),
     path.join(root, '.codex', 'spec-first', 'state.json'),
+    path.join(root, '.cursor', 'spec-first', 'state.json'),
+    path.join(root, '.kiro', 'spec-first', 'state.json'),
+    path.join(root, '.qoder', 'spec-first', 'state.json'),
   ].some((statePath) => fs.existsSync(statePath));
 }
 
@@ -854,7 +865,7 @@ function runInitForProject({
   }
 
   const result = applyInitPlan(projectRoot, plan);
-  printInitApplySuccess(plan, result);
+  printInitApplySuccess(plan, result, { showDiagnostics: false });
   return result;
 }
 
@@ -939,6 +950,13 @@ function buildProjectInitPlan({
         diagnostics,
       });
     }
+  }
+  if (platform === 'cursor') {
+    diagnostics.push({
+      level: 'warn',
+      code: 'cursor_generated_runtime_preview',
+      message: 'Warning: Cursor support is generated-runtime preview. Local Cursor skill discovery/invocation is not verified on this machine, so generated skills may not load.',
+    });
   }
 
   const commandDir = adapter.hasCommands ? path.join(normalizedRoot, adapter.commandRoot) : '';
@@ -1227,6 +1245,10 @@ function printInitApplySuccess(plan, result, options = {}) {
   printGlobalDeveloperWriteSummary(plan.globalDeveloperWrite, messages);
   if (plan.changelogCreated && !options.suppressChangelogCreated) {
     console.log(messages.applyBootstrappedChangelog);
+  }
+
+  if (options.showDiagnostics !== false) {
+    printInitDiagnostics(plan);
   }
 
   if (options.showNextSteps !== false) {
@@ -2031,18 +2053,18 @@ function hostDisplayName(platform) {
 }
 
 function hostEntrypointLabel(platform) {
-  if (platform === 'claude') return '/spec:* commands';
-  if (platform === 'codex') return '$spec-* skills';
+  if (platform === 'claude') return 'spec-* commands';
+  if (platform === 'codex') return 'spec-* skills';
   if (platform === 'kiro') return 'Kiro Agent Skills';
-  if (platform === 'qoder') return 'Qoder project commands or Skills';
+  if (platform === 'qoder') return 'Qoder spec-* project commands or Skills';
   return 'host workflow entrypoints';
 }
 
 function hostMcpSetupCommand(platform) {
-  if (platform === 'claude') return '/spec:mcp-setup';
-  if (platform === 'codex') return '$spec-mcp-setup';
+  if (platform === 'claude') return 'spec-mcp-setup';
+  if (platform === 'codex') return 'spec-mcp-setup';
   if (platform === 'kiro') return 'Kiro Agent Skill `spec-mcp-setup`';
-  if (platform === 'qoder') return 'Qoder project command `/spec:mcp-setup` or Skill `spec-mcp-setup`';
+  if (platform === 'qoder') return 'Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup`';
   return 'the host MCP setup workflow';
 }
 
@@ -2077,7 +2099,7 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
   if (lang === 'en') {
     console.log('Setup complete. Next steps:');
     console.log(`  1. Restart ${uniquePlatforms.map(hostDisplayName).join(', ')} or open new sessions so each host loads the generated entrypoints.`);
-    console.log('  2. Use the host-specific workflow entrypoints (/spec:* commands, $spec-* skills, Kiro Agent Skills, or Qoder project commands/Skills) for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
+    console.log('  2. Use the matching spec-* workflow entrypoint (Claude/Qoder commands or Codex/Cursor/Kiro Skills) for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
     console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
     console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
     return;
@@ -2085,7 +2107,7 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
 
   console.log('初始化完成。下一步:');
   console.log(`  1. 重启 ${uniquePlatforms.map(hostDisplayName).join('、')} 或分别新开会话，让宿主加载刚生成的入口。`);
-  console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动 /spec:* command、$spec-* skill、Kiro Agent Skill 或 Qoder project command/Skill。');
+  console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动同名 spec-* workflow 入口（Claude/Qoder command 或 Codex/Cursor/Kiro Skill）。');
   console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
   console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
 }
@@ -2095,19 +2117,21 @@ function printHelp() {
     '🚀 spec-first init',
     '',
     '📘 Usage:',
-    '  spec-first init [--claude] [--codex] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
+    '  spec-first init [--claude] [--codex] [--cursor] [--kiro] [--qoder] [-y] [--all-repos|--repo <path>] [-u <name>] [--lang <zh|en>] [--sync-user-language|--no-sync-user-language]',
     '',
     'Host selection:',
     '  spec-first init                         Select one or more host runtimes interactively',
     '  spec-first init --codex                 Initialize only Codex after the remaining prompts',
+    '  spec-first init --cursor                Initialize only Cursor preview runtime after the remaining prompts',
     '  spec-first init --kiro                  Initialize only Kiro after the remaining prompts',
     '  spec-first init --qoder                 Initialize only Qoder after the remaining prompts',
-    '  spec-first init --claude --codex --kiro --qoder Initialize all supported hosts',
-    '  spec-first init -y                      Skip prompts and initialize default hosts (Claude Code + Codex; Kiro/Qoder require explicit flags)',
+    '  spec-first init --claude --codex --cursor --kiro --qoder Initialize all supported hosts',
+    '  spec-first init -y                      Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder require explicit flags)',
+    '  spec-first init --cursor -y -u <name> --lang zh',
     '  spec-first init --qoder -y -u <name> --lang zh',
     '',
     'Interactive steps:',
-    '  1. Select Claude Code, Codex, Kiro, and/or Qoder',
+    '  1. Select Claude Code, Codex, Cursor, Kiro, and/or Qoder',
     '  2. Confirm developer name (reuse the existing global profile when present)',
     '  3. Choose response language',
     '  4. Choose workspace target when child Git repos are detected',
@@ -2122,15 +2146,16 @@ function printHelp() {
     '',
     'Non-interactive usage:',
     '  Use -y/--yes to skip prompts. Without -y, init requires an interactive terminal and exits 2 in CI/non-TTY environments.',
-    '  Explicit --claude/--codex/--kiro/--qoder flags override the default host set.',
+    '  Explicit --claude/--codex/--cursor/--kiro/--qoder flags override the default host set.',
     '  Use --dry-run to preview writes without changing runtime assets.',
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',
     '',
     '➡️ After successful init:',
-    '  Claude: restart Claude Code. For lightweight work, start the matching /spec:* workflow; for enhanced readiness, run /spec:mcp-setup, then route by user intent.',
+    '  Claude: restart Claude Code. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-mcp-setup, then route by user intent.',
     '  Codex: restart Codex. For lightweight work, start the matching $spec-* workflow; for enhanced readiness, run $spec-mcp-setup, then route by user intent.',
+    '  Cursor: restart Cursor. For lightweight work, explicitly invoke the generated Cursor Agent Skill; for enhanced readiness, run the generated spec-mcp-setup Agent Skill. Cursor remains generated-runtime preview until local loader evidence is recorded.',
     '  Kiro: restart Kiro. For lightweight work, invoke the generated Kiro Agent Skill; for enhanced readiness, run the generated spec-mcp-setup Agent Skill, then route by user intent.',
-    '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run the generated /spec:mcp-setup command or spec-mcp-setup Skill.',
+    '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run the generated spec-mcp-setup command or spec-mcp-setup Skill.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',

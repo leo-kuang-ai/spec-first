@@ -47,6 +47,12 @@ apply_target_override() {
     qoder:user)
       printf '%s' "${MCP_SETUP_QODER_USER_PATH_OVERRIDE:-$resolved_path}"
       ;;
+    cursor:project)
+      printf '%s' "${MCP_SETUP_CURSOR_PROJECT_PATH_OVERRIDE:-$resolved_path}"
+      ;;
+    cursor:user)
+      printf '%s' "${MCP_SETUP_CURSOR_USER_PATH_OVERRIDE:-$resolved_path}"
+      ;;
     *)
       printf '%s' "$resolved_path"
       ;;
@@ -67,13 +73,21 @@ qoder_user_scope_requested() {
   esac
 }
 
+cursor_user_scope_requested() {
+  case "${CURSOR_USER_SCOPE:-}" in
+    1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 detect_host() {
   local has_codex_cli=false
   local has_claude_cli=false
   local has_qoder_cli=false
+  local has_cursor_cli=false
 
   case "${MCP_SETUP_HOST:-}" in
-    claude|codex|kiro|qoder)
+    claude|codex|kiro|qoder|cursor)
       echo "$MCP_SETUP_HOST"
       return 0
       ;;
@@ -92,23 +106,29 @@ detect_host() {
   command -v codex >/dev/null 2>&1 && has_codex_cli=true
   command -v claude >/dev/null 2>&1 && has_claude_cli=true
   { command -v qodercli >/dev/null 2>&1 || command -v qoder >/dev/null 2>&1; } && has_qoder_cli=true
+  command -v agent >/dev/null 2>&1 && has_cursor_cli=true
 
-  if [ "$has_codex_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_qoder_cli" = "false" ]; then
+  if [ "$has_codex_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_qoder_cli" = "false" ] && [ "$has_cursor_cli" = "false" ]; then
     echo "codex"
     return 0
   fi
 
-  if [ "$has_claude_cli" = "true" ] && [ "$has_codex_cli" = "false" ] && [ "$has_qoder_cli" = "false" ]; then
+  if [ "$has_claude_cli" = "true" ] && [ "$has_codex_cli" = "false" ] && [ "$has_qoder_cli" = "false" ] && [ "$has_cursor_cli" = "false" ]; then
     echo "claude"
     return 0
   fi
 
-  if [ "$has_qoder_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_codex_cli" = "false" ]; then
+  if [ "$has_qoder_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_codex_cli" = "false" ] && [ "$has_cursor_cli" = "false" ]; then
     echo "qoder"
     return 0
   fi
 
-  echo "错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex、MCP_SETUP_HOST=kiro 或 MCP_SETUP_HOST=qoder 后再运行。" >&2
+  if [ "$has_cursor_cli" = "true" ] && [ "$has_claude_cli" = "false" ] && [ "$has_codex_cli" = "false" ] && [ "$has_qoder_cli" = "false" ]; then
+    echo "cursor"
+    return 0
+  fi
+
+  echo "错误：无法自动识别宿主。请显式设置 MCP_SETUP_HOST=claude、MCP_SETUP_HOST=codex、MCP_SETUP_HOST=kiro、MCP_SETUP_HOST=qoder 或 MCP_SETUP_HOST=cursor 后再运行。" >&2
   return 1
 }
 
@@ -255,6 +275,12 @@ case "$host" in
     marker_path="$HOME/.qoder/spec-first/host-setup.json"
     config_format="json"
     ;;
+  cursor)
+    cli_command="agent"
+    display_name="Cursor"
+    marker_path="$HOME/.cursor/spec-first/host-setup.json"
+    config_format="json"
+    ;;
   *)
     echo "错误：无法识别宿主：$host" >&2
     exit 1
@@ -269,6 +295,10 @@ if [ "$host" = "kiro" ] && kiro_user_scope_requested; then
   fallback_order_json='["user"]'
 fi
 if [ "$host" = "qoder" ] && qoder_user_scope_requested; then
+  primary_scope="user"
+  fallback_order_json='["user"]'
+fi
+if [ "$host" = "cursor" ] && cursor_user_scope_requested; then
   primary_scope="user"
   fallback_order_json='["user"]'
 fi

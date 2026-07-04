@@ -15,14 +15,14 @@
       "id": "codegraph",
       "ecosystem": "npm",
       "package": "@colbymchenry/codegraph",
-      "version": "1.0.1",
+      "version": "1.2.0",
       "command": "codegraph"
     },
     {
       "id": "graphify",
-      "ecosystem": "pypi",
-      "package": "graphifyy",
-      "version": "0.8.39",
+      "ecosystem": "npm",
+      "package": "@sentropic/graphify",
+      "version": "0.17.1",
       "command": "graphify"
     }
   ],
@@ -180,6 +180,37 @@
           ],
           "uninstall_targets": [
             "local",
+            "user"
+          ]
+        },
+        "cursor": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-sequential-thinking@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
             "user"
           ]
         }
@@ -346,6 +377,37 @@
           ],
           "uninstall_targets": [
             "local",
+            "user"
+          ]
+        },
+        "cursor": {
+          "type": "stdio",
+          "command": "npx",
+          "args": [
+            "-y",
+            "@upstash/context7-mcp@latest"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
             "user"
           ]
         }
@@ -530,6 +592,37 @@
           ],
           "uninstall_targets": [
             "local",
+            "user"
+          ]
+        },
+        "cursor": {
+          "type": "stdio",
+          "command": "codegraph",
+          "args": [
+            "serve",
+            "--mcp"
+          ],
+          "scope": "project",
+          "targets": {
+            "project": {
+              "config_path": ".cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 50,
+              "writable_check": "parent-or-file"
+            },
+            "user": {
+              "config_path": "$HOME/.cursor/mcp.json",
+              "config_format": "json",
+              "precedence": 100,
+              "writable_check": "parent-or-file",
+              "requires_user_scope_opt_in": true
+            }
+          },
+          "fallback_order": [
+            "project"
+          ],
+          "uninstall_targets": [
+            "project",
             "user"
           ]
         }

@@ -186,7 +186,7 @@ function addKiroSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Kiro Host Pin',
     '',
-    'When this generated Kiro Agent Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, and Qoder CLIs can coexist on the same machine.',
+    'When this generated Kiro Agent Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=kiro` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Cursor, Kiro, and Qoder CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
