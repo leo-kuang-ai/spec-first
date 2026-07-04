@@ -83,7 +83,7 @@ describe('agent-native-architecture contracts', () => {
     });
 
     expect(skill).toContain('internal architecture reference/helper');
-    expect(skill).toContain('not a public `$spec-*` or `/spec:*` workflow');
+    expect(skill).toContain('not a public `spec-*` workflow');
     expect(skill).toContain('Generated runtime mirrors are not source-of-truth');
     expectNoPublicAgentNativeCommandReference(skill);
   });

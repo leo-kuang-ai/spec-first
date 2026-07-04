@@ -97,7 +97,6 @@ The caller receives findings with their original classifications intact and deci
 Callers invoke headless mode by including `mode:headless` in the workflow arguments, e.g.:
 
 ```
-/spec:doc-review mode:headless docs/plans/my-plan.md
 spec-doc-review mode:headless docs/plans/my-plan.md
 ```
 

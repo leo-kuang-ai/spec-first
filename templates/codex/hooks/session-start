@@ -49,7 +49,7 @@ async function main() {
       // AGENTS.md already carries the managed bootstrap block; inject a short pointer.
       additionalContext = [
         '[spec-first] using-spec-first SessionStart injection',
-        "Workflow entry governance is active in this repo's AGENTS.md (using-spec-first managed block): route substantial work through a public $spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+        "Workflow entry governance is active in this repo's AGENTS.md (using-spec-first managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
         'Full routing policy: skills/using-spec-first/SKILL.md.',
       ].join('\n');
     }

@@ -193,7 +193,7 @@ describe('runtime plan contracts', () => {
 
     expect(renderedSkill).toContain('read `.agents/skills/spec-plan/references/planning-flow.md`');
     expect(combined).toContain('dispatch authorization is present for this run');
-    expect(combined).toContain('a public `$spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
+    expect(combined).toContain('a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
     expect(combined).toContain('record `dispatch_authorization_missing`');
     expect(combined).toContain('explicit fallback');
     expect(combined).toContain('Plan generation must still complete when research dispatch is unavailable');

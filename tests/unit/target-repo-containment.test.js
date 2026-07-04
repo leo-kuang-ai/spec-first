@@ -60,7 +60,7 @@ describe('target repo containment helpers', () => {
     validateRepoRelativeField('/tmp/log.txt', 'field.absolute', errors);
     validateRepoRelativeField('.git/config', 'field.git', errors);
     validateRepoRelativeField('.env', 'field.secret', errors);
-    validateRepoRelativeField('.claude/commands/spec/work.md', 'field.runtime', errors);
+    validateRepoRelativeField('.claude/commands/spec-work.md', 'field.runtime', errors);
     validateRepoRelativeField('.kiro/skills/spec-work/SKILL.md', 'field.kiro_runtime', errors);
     validateRepoRelativeField('.kiro/specs/feature-a/requirements.md', 'field.kiro_specs', errors);
     validateRepoRelativeField('.spec-first/config/tool-facts.json', 'field.specfirst', errors);

@@ -7,7 +7,7 @@ description: "Use before substantial work in a spec-first project, and when user
 
 `using-spec-first` is the standalone meta skill and entry governor for `spec-first` in this repository. It decides whether the current request should enter a public `spec-first` workflow before the agent changes state.
 
-It is not a command-backed workflow, slash command, or `$spec-*` workflow. It does **not** exist to force every task through brainstorming.
+It is not a command-backed workflow, slash command, or `spec-*` workflow. It does **not** exist to force every task through brainstorming.
 
 - Claude Code installs it as `.claude/skills/using-spec-first/SKILL.md` and also reads the managed block in `CLAUDE.md`; its SessionStart hook does not re-inject that block (CLAUDE.md already carries it) and instead emits a short pointer to the active governance plus any startup reminder.
 - Codex installs it as `.agents/skills/using-spec-first/SKILL.md` and also reads the managed block in `AGENTS.md`; its SessionStart hook does not re-inject that block (AGENTS.md already carries it) and instead emits a short pointer to the active governance plus any startup reminder.
@@ -40,7 +40,7 @@ Keep this `SKILL.md` focused on the routing map and runtime-safe stubs; detailed
 - `skills/using-spec-first/references/scenario-fingerprint-routing.md`: when `.spec-first/workspace/scenario-fingerprint*.json` already exists or setup/workspace state affects route trust.
 - `skills/using-spec-first/references/user-next-step-guide-mode.md`: when the user asks what to run next, which workflow applies, or asks for guide-only output.
 - `skills/using-spec-first/references/multi-session-awareness.md`: before substantial file-writing work when opt-in session records may affect coordination disclosure.
-- `skills/using-spec-first/references/codex-startup-reminder-boundary.md`: before a top-level Codex orchestrator enters a public `$spec-*` workflow and startup reminder evidence may be relevant.
+- `skills/using-spec-first/references/codex-startup-reminder-boundary.md`: before a top-level Codex orchestrator enters a public `spec-*` workflow and startup reminder evidence may be relevant.
 - `skills/using-spec-first/references/routing-red-flags.md`: when editing or reviewing routing posture, anti-rationalization reminders, or the Hard Rules.
 - `skills/using-spec-first/references/output-risk-profile.md`: when editing, reviewing, or evaluating this routing skill; it names likely output failures and matching checks.
 - `skills/using-spec-first/references/maintenance-and-fresh-source-eval.md`: when changing this skill, host bootstrap prose, dispatch boundaries, route map entries, or source/runtime guidance.
@@ -185,7 +185,7 @@ Routing into a public workflow authorizes that workflow to run. It does not by i
 
 When Codex fallback is caused by missing dispatch authorization, record `dispatch_authorization_missing` and make the opt-in path user-visible: for multi-persona or subagent review, ask for `subagents`, `personas`, delegated review, or parallel agents in the request.
 
-For multi-persona/research phases, `$spec-doc-review` normalization, report-only fallback, and the full dispatch-boundary detail, read `skills/using-spec-first/references/dispatch-boundaries.md`.
+For multi-persona/research phases, `spec-doc-review` normalization, report-only fallback, and the full dispatch-boundary detail, read `skills/using-spec-first/references/dispatch-boundaries.md`.
 
 ### Host Surface
 

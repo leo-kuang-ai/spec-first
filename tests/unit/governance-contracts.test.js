@@ -93,7 +93,7 @@ describe('governance contracts', () => {
           dimension: 'generated-output',
           severity: 'advisory',
           reason_code: 'generated-runtime-path',
-          subject_path: '.claude/commands/spec/work.md',
+          subject_path: '.claude/commands/spec-work.md',
           evidence_ref: 'git-status:porcelain',
         },
       ],

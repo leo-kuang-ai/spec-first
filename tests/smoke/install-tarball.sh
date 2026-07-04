@@ -127,16 +127,16 @@ echo "   ✓ spec-first -v 可执行"
 grep -q "Spec-First" <<<"$VERSION_OUTPUT"
 grep -q "doctor" <<<"$VERSION_OUTPUT"
 echo "   ✓ -v 输出包含 doctor"
-# 确定性断言：-v 不推荐 /spec:ideate 或 /spec:brainstorm 作为安装后第一建议
-if grep -q "/spec:ideate" <<<"$VERSION_OUTPUT"; then
-  echo "✗ -v 输出不应推荐 /spec:ideate 作为安装后第一建议"
+# 确定性断言：-v 不推荐 spec-ideate 或 spec-brainstorm 作为安装后第一建议
+if grep -q "spec-ideate" <<<"$VERSION_OUTPUT"; then
+  echo "✗ -v 输出不应推荐 spec-ideate 作为安装后第一建议"
   exit 1
 fi
-if grep -q "/spec:brainstorm" <<<"$VERSION_OUTPUT"; then
-  echo "✗ -v 输出不应推荐 /spec:brainstorm 作为安装后第一建议"
+if grep -q "spec-brainstorm" <<<"$VERSION_OUTPUT"; then
+  echo "✗ -v 输出不应推荐 spec-brainstorm 作为安装后第一建议"
   exit 1
 fi
-echo "   ✓ -v 输出未推荐 /spec:ideate 或 /spec:brainstorm"
+echo "   ✓ -v 输出未推荐 spec-ideate 或 spec-brainstorm"
 
 # 4b. spec-first doctor（在空目录）
 DOCTOR_TMP="$(mktemp -d)"

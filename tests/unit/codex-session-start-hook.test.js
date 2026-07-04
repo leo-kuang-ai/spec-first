@@ -660,7 +660,7 @@ describe('Codex SessionStart hook script', () => {
         '<!-- spec-first:bootstrap:start -->',
         '## Workflow entry governance',
         '',
-        '- Codex workflow entrypoints use `$spec-*`.',
+        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
         '- Keep writes bounded to target_repo.',
         '<!-- spec-first:bootstrap:end -->',
         '',
@@ -685,7 +685,7 @@ describe('Codex SessionStart hook script', () => {
       expect(ctx).toContain('skills/using-spec-first/SKILL.md');
       // AGENTS.md already carries the block; the hook must not duplicate its body.
       expect(ctx).not.toContain('## Workflow entry governance');
-      expect(ctx).not.toContain('- Codex workflow entrypoints use `$spec-*`.');
+      expect(ctx).not.toContain('- Codex workflow entrypoints use same-name `spec-*` Skills.');
       expect(ctx).not.toContain('before editing');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -778,7 +778,7 @@ describe('Codex SessionStart hook script', () => {
     try {
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use `$spec-*`.',
+        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
         '<!-- spec-first:bootstrap:end -->',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedCodexHook(projectRoot, (content) => (
@@ -809,7 +809,7 @@ describe('Codex SessionStart hook script', () => {
       }, null, 2), 'utf8');
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use `$spec-*`.',
+        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
@@ -845,7 +845,7 @@ describe('Codex SessionStart hook script', () => {
       ].join('\n'), 'utf8');
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use `$spec-*`.',
+        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
@@ -937,7 +937,7 @@ describe('Codex SessionStart hook script', () => {
     try {
       fs.writeFileSync(path.join(projectRoot, 'AGENTS.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Codex workflow entrypoints use `$spec-*`.',
+        '- Codex workflow entrypoints use same-name `spec-*` Skills.',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');

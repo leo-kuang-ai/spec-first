@@ -280,7 +280,7 @@ describe('spec-prd workflow contracts', () => {
     const phaseOne = extractMarkdownSection(text, '### Phase 1: Current-State Analysis');
 
     expect(text).toContain('name: spec-prd');
-    expect(frontmatter).toContain('Public workflow entrypoint (/spec:prd, $spec-prd)');
+    expect(frontmatter).toContain('Public workflow entrypoint (spec-prd)');
     expect(frontmatter).toContain('brownfield PRD-grade requirements for existing systems');
     expect(frontmatter).toContain('0-1 product exploration');
     expect(frontmatter).toContain('unresolved product shape');
@@ -583,7 +583,7 @@ describe('spec-prd workflow contracts', () => {
 
     expectContainsAll(skill, [
       '## Execution Compass',
-      'This table is the run-local quick reference for `$spec-prd`',
+      'This table is the run-local quick reference for `spec-prd`',
       'not a second state machine, persistent artifact, schema, or progress ledger',
       'First durable PRD Write',
       'Requirement Analysis Gate map',
@@ -627,7 +627,7 @@ describe('spec-prd workflow contracts', () => {
 
     expectContainsAll(skill, [
       '## User-Visible Execution UX Protocol',
-      'run-local presentation discipline for `$spec-prd`',
+      'run-local presentation discipline for `spec-prd`',
       'reuses the Decision Card, task-list-first discipline, `write_mode`, `question_delivery`, `clarification_evidence`, `readiness_outcome`, finalize, and checker fields',
       'It is not a progress ledger, run artifact, transcript schema, phase-status enum, central state machine, public workflow entrypoint, second PRD artifact topology, or permission to edit generated runtime mirrors.',
       'begin with a short broadcast',
@@ -1354,8 +1354,7 @@ describe('spec-prd workflow contracts', () => {
       'brownfield PRD authoring, existing PRD refinement, or code-aware PRD validation',
       'PRD/readiness tie-break',
       'can this PRD go to planning without inventing WHAT?',
-      '/spec:prd',
-      '$spec-prd',
+      'spec-prd',
       '0-1 product idea',
       'spec-app-consistency-audit',
     ]);

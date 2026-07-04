@@ -52,7 +52,7 @@ Figma is optional per run, per user, per host, and per OS:
 
 - do not assume Figma MCP/plugin, Figma Desktop, browser login, team access, local shell, Node package manager, or a specific host tool name exists
 - do not install MCP/plugins from `spec-prd`
-- do not claim `$spec-mcp-setup` or `/spec:mcp-setup` installs Figma unless setup contracts explicitly add that optional capability
+- do not claim `spec-mcp-setup` installs Figma unless setup contracts explicitly add that optional capability
 - do not write OS-specific installation commands into this reference or generated PRDs
 - do not store maintainer-local identity probe output, account names, team ids, auth state, or successful tool probes in long-lived contracts or eval fixtures
 

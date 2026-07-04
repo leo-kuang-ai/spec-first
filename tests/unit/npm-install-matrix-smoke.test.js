@@ -238,7 +238,7 @@ describe('npm install matrix smoke script', () => {
   test('package content manifest fails with reason codes for missing required and forbidden paths', () => {
     const files = [
       ...VALID_PACK_FILES.filter((file) => !['README.md', KNOWLEDGE_HARNESS_CONTRACT_PATH].includes(file.path)),
-      { path: '.claude/commands/spec/work.md', size: 12, mode: 420 },
+      { path: '.claude/commands/spec-work.md', size: 12, mode: 420 },
       { path: 'skills/spec-work/scripts/__pycache__/tool.pyc', size: 13, mode: 420 },
     ];
     const manifest = buildPackageContentManifest(packJson(files), {
@@ -257,7 +257,7 @@ describe('npm install matrix smoke script', () => {
       }),
       expect.objectContaining({
         reason_code: 'forbidden-package-path-present',
-        paths: ['.claude/commands/spec/work.md'],
+        paths: ['.claude/commands/spec-work.md'],
       }),
       expect.objectContaining({
         reason_code: 'forbidden-package-path-present',
@@ -360,7 +360,7 @@ describe('npm install matrix smoke script', () => {
       afterSnapshot: [
         'CLAUDE.md:content',
         '.claude/spec-first/state.json:content',
-        '.claude/commands/spec/work.md:content',
+        '.claude/commands/spec-work.md:content',
         '.claude/spec-first/workflows/spec-work/SKILL.md:content',
         '.claude/skills/using-spec-first/SKILL.md:content',
       ],
@@ -430,7 +430,7 @@ describe('npm install matrix smoke script', () => {
       afterSnapshot: [
         'AGENTS.md:content',
         '.qoder/spec-first/state.json:content',
-        '.qoder/commands/spec/work.md:content',
+        '.qoder/commands/spec-work.md:content',
         '.qoder/skills/spec-work/SKILL.md:content',
         '.qoder/skills/spec-mcp-setup/SKILL.md:content',
       ],

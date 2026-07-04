@@ -1,6 +1,6 @@
 ---
 name: spec-team-standards-governance
-description: "Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore /spec:standards, $spec-standards, skills/spec-standards/, or treat advisory candidates as hard context."
+description: "Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore legacy standards workflow entrypoints, skills/spec-standards/, or treat advisory candidates as hard context."
 ---
 
 # Spec Team Standards Governance
@@ -11,12 +11,12 @@ Use this standalone skill when the user asks to query, initialize, audit, propos
 
 - Use for standards governance work on `docs/contracts/team-standards.md`, `docs/standards/**`, candidate evidence, health audits, or promotion/deprecation proposals.
 - Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution; those route to their own public `spec-*` workflow.
-- Do not use to create, restore, or recommend `/spec:standards`, `$spec-standards`, `skills/spec-standards/`, or `.spec-first/standards/`.
+- Do not use to create, restore, or recommend legacy `/spec:standards`, `$spec-standards`, `spec-standards` workflow, `skills/spec-standards/`, or `.spec-first/standards/`.
 - Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.
 
 ## Hard Boundaries
 
-- Do not create Claude `/spec:standards`, Codex `$spec-standards`, `skills/spec-standards/` or `.spec-first/standards/`.
+- Do not create legacy standards workflow entrypoints, `skills/spec-standards/` or `.spec-first/standards/`.
 - Do not edit generated runtime mirrors such as `.claude/`, `.codex/` or `.agents/skills/`.
 - Standalone direct use defaults to report/proposal-only. Durable source mutation requires an active `spec-work` or equivalent source-edit workflow, ordinary diff review, `CHANGELOG.md`, and focused tests.
 - Scripts or structured steps may collect deterministic/advisory facts; the LLM decides semantic applicability and promotion posture.

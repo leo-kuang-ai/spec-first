@@ -405,7 +405,7 @@ describe('dependency readiness baseline contracts', () => {
     const unverifiedGraphify = JSON.parse(unverified.stdout)[0];
     expect(unverifiedGraphify.lifecycle.query_verified).toBe(false);
     expect(unverifiedGraphify.next_actions.join('\n')).toContain('Graphify query probe has not confirmed CLI/artifact usability');
-    expect(unverifiedGraphify.next_actions.join('\n')).toContain('$spec-mcp-setup --only graphify');
+    expect(unverifiedGraphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify');
     expect(unverifiedGraphify.next_actions.join('\n')).toContain('graphify explain');
     expect(unverifiedGraphify.next_actions.join('\n')).not.toContain('recall quality failed');
     expect(unverifiedGraphify.next_actions.join('\n')).not.toContain('is broken');
@@ -561,7 +561,7 @@ exit 0
         artifact_exists: true,
       },
     });
-    expect(codexGraphify.next_actions.join('\n')).toContain('$spec-mcp-setup --only graphify');
+    expect(codexGraphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify');
     expect(codexGraphify.next_actions.join('\n')).toContain('codex');
 
     const claudeResult = spawnSync(process.execPath, [providerRendererPath, '--source', 'helper', '--repo-root', tempDir], {
@@ -619,8 +619,8 @@ exit 0
         artifact_exists: true,
       },
     });
-    expect(graphify.next_actions.join('\n')).toContain('/spec:mcp-setup --only graphify');
-    expect(graphify.next_actions.join('\n')).not.toContain('$spec-mcp-setup --only graphify');
+    expect(graphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify');
+    expect(graphify.next_actions.join('\n')).not.toContain('spec-mcp-setup --only graphify');
   });
 
   test('provider readiness renderer prefers pinned provider-standard Graphify over stale PATH command', () => {
@@ -1058,7 +1058,7 @@ exit 0
     expect(agents).toContain('reading source first is always valid');
     expect(agents).toContain('Use `query` for broad orientation');
     expect(agents).toContain('scoped candidate subgraph');
-    expect(agents).toContain('$spec-mcp-setup --only graphify');
+    expect(agents).toContain('spec-mcp-setup --only graphify');
     expect(agents).toContain('docs/contracts/project-graph-consumption.md');
     expect(agents).toContain('Ordinary workflows do not refresh project graphs after code changes');
     expect(agents).not.toContain('Use Graphify first only');
@@ -1153,7 +1153,7 @@ exit 0
         hook_status: 'verified',
       },
     });
-    expect(graphify.next_actions.join('\n')).toContain('$spec-mcp-setup --only graphify --refresh');
+    expect(graphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify --refresh');
     expect(graphify.next_actions.join('\n')).toContain('incrementally refresh graphify-out');
     expect(graphify.next_actions.join('\n')).toContain('runs `graphify update .`, no full semantic extraction');
     const agents = fs.readFileSync(path.join(tempDir, 'AGENTS.md'), 'utf8');
@@ -1242,10 +1242,10 @@ exit 0
     expect(claude).toContain('reading source first is always valid');
     expect(claude).toContain('Use `query` for broad orientation');
     expect(claude).toContain('scoped candidate subgraph');
-    expect(claude).toContain('/spec:mcp-setup --only graphify');
+    expect(claude).toContain('spec-mcp-setup --only graphify');
     expect(claude).toContain('docs/contracts/project-graph-consumption.md');
     expect(claude).toContain('Ordinary workflows do not refresh project graphs after code changes');
-    expect(claude).not.toContain('$spec-mcp-setup --only graphify');
+    expect(claude).not.toContain('spec-mcp-setup --only graphify');
     expect(claude).not.toContain('Use Graphify first only');
     expect(claude).not.toContain('first run `graphify query "<question>"`');
     expect(claude).not.toContain('run `"<resolved-graphify>" update .`');
@@ -2237,7 +2237,7 @@ exit 0
           reason_code: 'setup-facts-host-mismatch',
           facts_host: 'claude',
           requested_platforms: ['codex'],
-          next_action: 'Run `$spec-mcp-setup` from codex to refresh host-aligned setup facts.',
+          next_action: 'Run `spec-mcp-setup` from codex to refresh host-aligned setup facts.',
         },
       });
       expect(computeDecisionInputHealth({ projectRoot: tmp, platforms: ['claude'], now })).toMatchObject({
@@ -2294,7 +2294,7 @@ exit 0
         status: 'warn',
         basis: {
           reason_code: 'optional-capability-degraded',
-          next_action: 'Rerun `$spec-mcp-setup` from codex to refresh degraded optional capability facts.',
+          next_action: 'Rerun `spec-mcp-setup` from codex to refresh degraded optional capability facts.',
         },
       });
 
@@ -2316,7 +2316,7 @@ exit 0
               query_verified: false,
               fallback_used: false,
             },
-            next_actions: ['Install the current-host Graphify project skill with `/spec:mcp-setup --only graphify` for claude.'],
+            next_actions: ['Install the current-host Graphify project skill with `spec-mcp-setup --only graphify` for claude.'],
           }),
         ],
       }));
@@ -2324,7 +2324,7 @@ exit 0
         status: 'warn',
         basis: {
           reason_code: 'optional-capability-degraded',
-          next_action: 'Rerun `/spec:mcp-setup` from claude to refresh degraded optional capability facts.',
+          next_action: 'Rerun `spec-mcp-setup` from claude to refresh degraded optional capability facts.',
         },
       });
 

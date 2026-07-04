@@ -429,7 +429,7 @@ describe('spec-compound host entrypoint contract', () => {
   });
 
   test('Claude command projection points compound-refresh action flow reference at the workflow runtime copy', () => {
-    const command = plannedRuntimeContent(new ClaudeAdapter(), '.claude/commands/spec/compound-refresh.md');
+    const command = plannedRuntimeContent(new ClaudeAdapter(), '.claude/commands/spec-compound-refresh.md');
 
     expect(command).toContain('Load `.claude/spec-first/workflows/spec-compound-refresh/references/per-action-flows.md`');
     expect(command).not.toContain('Load `references/per-action-flows.md`');

@@ -211,16 +211,16 @@ echo "✓ init rejects non-TTY without -y, rejects unsupported flags, and suppor
 
 echo "4. Check programmatic init preview changes without writing files..."
 dry_dir="$TMP_DIR/dry-init"
-mkdir -p "$dry_dir/.claude/commands/spec"
+mkdir -p "$dry_dir/.claude/commands"
 git -C "$dry_dir" init -q >/dev/null
-printf 'custom command\n' > "$dry_dir/.claude/commands/spec/custom.md"
+printf 'custom command\n' > "$dry_dir/.claude/commands/spec-custom.md"
 dry_output="$(run_programmatic_init "$dry_dir" claude kuang en dry-run)"
 grep -q "Dry run: spec-first init (claude)" <<<"$dry_output"
 grep -q "Would prune 1 unmanaged command file(s)" <<<"$dry_output"
 grep -q "No managed runtime paths require untracking." <<<"$dry_output"
 grep -q ".gitignore" <<<"$dry_output"
 grep -q "No files were changed." <<<"$dry_output"
-test -e "$dry_dir/.claude/commands/spec/custom.md"
+test -e "$dry_dir/.claude/commands/spec-custom.md"
 test ! -e "$dry_dir/.claude/spec-first/state.json"
 test ! -e "$dry_dir/.gitignore"
 echo "✓ programmatic init preview changes without writing files"
@@ -231,12 +231,12 @@ grep -q "Generated ${expected_command_count} command file(s)" <<<"$claude_output
 grep -q "Generated ${expected_claude_skill_count} skill directory(ies)" <<<"$claude_output"
 grep -q "Generated ${expected_agent_count} agent file(s)" <<<"$claude_output"
 for file in brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish-beta.md release-notes.md sessions.md slack-research.md work.md write-tasks.md; do
-  test -f "$TMP_DIR/.claude/commands/spec/$file"
+  test -f "$TMP_DIR/.claude/commands/spec-$file"
 done
-test ! -e "$TMP_DIR/.claude/commands/spec/"standards".md"
+test ! -e "$TMP_DIR/.claude/commands/spec-standards.md"
 test -f "$TMP_DIR/.claude/spec-first/workflows/spec-mcp-setup/scripts/check-health"
-grep -q 'bash .claude/spec-first/workflows/spec-mcp-setup/scripts/check-health' "$TMP_DIR/.claude/commands/spec/mcp-setup.md"
-if grep -q 'bash skills/spec-mcp-setup/scripts/check-health' "$TMP_DIR/.claude/commands/spec/mcp-setup.md"; then
+grep -q 'bash .claude/spec-first/workflows/spec-mcp-setup/scripts/check-health' "$TMP_DIR/.claude/commands/spec-mcp-setup.md"
+if grep -q 'bash skills/spec-mcp-setup/scripts/check-health' "$TMP_DIR/.claude/commands/spec-mcp-setup.md"; then
   echo "Claude mcp-setup command should not reference source-only skill script paths" >&2
   exit 1
 fi
@@ -293,7 +293,7 @@ if (!command.includes('.claude/hooks/spec-plan-guard')) {
 NODE
 test -f "$TMP_DIR/.gitignore"
 grep -q '# spec-first:start' "$TMP_DIR/.gitignore"
-grep -q '.claude/commands/spec/' "$TMP_DIR/.gitignore"
+grep -q '.claude/commands/spec-\*.md' "$TMP_DIR/.gitignore"
 grep -q '.codex/' "$TMP_DIR/.gitignore"
 if grep -q ".spec-first/"standards"/" "$TMP_DIR/.gitignore"; then
   echo "init gitignore should not preserve retired standards artifact root" >&2
@@ -515,14 +515,14 @@ echo "✓ Kiro init generated Agent Skills, agents, state, and doctor facts"
 
 echo "10. Initialize Qoder runtime and verify assets..."
 qoder_output="$(run_programmatic_init "$TMP_DIR" qoder kuang en)"
-grep -q "Generated ${expected_qoder_command_count} command file(s) in .qoder/commands/spec" <<<"$qoder_output"
+grep -q "Generated ${expected_qoder_command_count} command file(s) in .qoder/commands" <<<"$qoder_output"
 grep -q "Generated ${expected_qoder_total_skill_count} skill directory(ies) in .qoder/skills" <<<"$qoder_output"
 grep -q "Generated ${expected_agent_count} agent file(s) in .qoder/agents" <<<"$qoder_output"
 installed_qoder_skill_count="$(find "$TMP_DIR/.qoder/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
 test "$installed_qoder_skill_count" = "$expected_qoder_total_skill_count"
 for command in plan work code-review doc-review brainstorm mcp-setup; do
-  test -f "$TMP_DIR/.qoder/commands/spec/$command.md"
-  grep -q "^name: $command$" "$TMP_DIR/.qoder/commands/spec/$command.md"
+  test -f "$TMP_DIR/.qoder/commands/spec-$command.md"
+  grep -q "^name: spec-$command$" "$TMP_DIR/.qoder/commands/spec-$command.md"
 done
 for skill in spec-plan spec-work spec-code-review spec-doc-review spec-brainstorm spec-mcp-setup spec-compound-refresh; do
   test -f "$TMP_DIR/.qoder/skills/$skill/SKILL.md"
@@ -582,7 +582,7 @@ if (!['pass', 'warn', 'error'].includes(payload.runtime_asset_health)) {
 }
 if (!payload.platform_checks?.qoder?.length) throw new Error('missing Qoder checks');
 const commandCheck = payload.platform_checks.qoder.find((entry) =>
-  entry.name === '.qoder/commands/spec/work.md' && entry.message.includes('Qoder command frontmatter is valid')
+  entry.name === '.qoder/commands/spec-work.md' && entry.message.includes('Qoder command frontmatter is valid')
 );
 if (!commandCheck || commandCheck.level !== 'PASS') throw new Error('missing passing Qoder command check');
 const skillCheck = payload.platform_checks.qoder.find((entry) =>
@@ -666,7 +666,7 @@ printf '{"custom":true}\n' > "$TMP_DIR/.qoder/settings.json"
 printf '{"hooks":[]}\n' > "$TMP_DIR/.qoder/hooks/custom.json"
 qoder_clean_dry="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" clean --qoder --dry-run)"
 grep -q "Dry run: spec-first clean (qoder)" <<<"$qoder_clean_dry"
-grep -q ".qoder/commands/spec/work.md" <<<"$qoder_clean_dry"
+grep -q ".qoder/commands/spec-work.md" <<<"$qoder_clean_dry"
 grep -q ".qoder/skills/spec-work" <<<"$qoder_clean_dry"
 grep -q ".qoder/agents/spec-repo-research-analyst.agent.md" <<<"$qoder_clean_dry"
 grep -q ".qoder/spec-first/state.json" <<<"$qoder_clean_dry"

@@ -110,7 +110,7 @@ describe('CLI entry contract', () => {
     expect(result.stderr).toBe('');
     expect(result.stdout).toContain(`Spec-First v${PACKAGE_JSON.version}`);
     expect(result.stdout).toContain('Claude Code, Codex, Kiro, Qoder, and Cursor generated-runtime preview');
-    expect(result.stdout).toContain('Qoder /spec:plan');
+    expect(result.stdout).toContain('Qoder spec-plan');
   });
 
   test('doctor help names the current setup entrypoint and deferred runtime-setup alias', () => {
@@ -118,7 +118,7 @@ describe('CLI entry contract', () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
-    expect(result.stdout).toContain('MCP/helper setup is handled by $spec-mcp-setup, /spec:mcp-setup, the generated Cursor/Kiro spec-mcp-setup Agent Skill, or the generated Qoder /spec:mcp-setup command/Skill');
+    expect(result.stdout).toContain('MCP/helper setup is handled by the matching spec-mcp-setup workflow entrypoint: Claude/Qoder project command or Codex/Cursor/Kiro Skill.');
     expect(result.stdout).toContain('target name: spec-runtime-setup, pending host alias contract');
     expect(result.stdout).not.toContain('legacy alias: spec-mcp-setup');
     expect(result.stdout).not.toContain('$spec-runtime-setup or /spec:runtime-setup');

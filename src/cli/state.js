@@ -55,6 +55,10 @@ const RETIRED_RUNTIME_ASSET_PATHS = {
   ],
 };
 
+function isSpecFirstManagedCommandFile(fileName) {
+  return /^spec-[A-Za-z0-9-]+\.md$/.test(fileName);
+}
+
 function getStateFilePath(projectRoot, adapter) {
   return path.join(projectRoot, adapter.stateFile);
 }
@@ -505,6 +509,10 @@ function planCommandNamespacePrune(projectRoot, managedCommandFiles, adapter) {
   const allowed = new Set(normalizeStringArray(managedCommandFiles));
   for (const entry of fs.readdirSync(commandDir, { withFileTypes: true })) {
     if (!entry.isFile()) {
+      continue;
+    }
+
+    if (!isSpecFirstManagedCommandFile(entry.name)) {
       continue;
     }
 

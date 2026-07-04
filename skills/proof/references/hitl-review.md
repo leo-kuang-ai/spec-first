@@ -14,7 +14,7 @@ Inputs:
 
 - **Source file path** (required): absolute or repo-relative path to the local markdown file. When an upstream caller invokes this mode, it passes the path explicitly. When the user invokes directly ("share that doc to proof and let's iterate"), derive the path from conversation context — the file the user just referenced, created, or edited. If ambiguous, ask the user which file.
 - **Doc title** (required): display title for the Proof doc. Upstream callers pass this explicitly; on direct-user invocation, default to the file's H1 heading, falling back to the filename (minus extension) if no H1 exists.
-- **Recommended next step** (optional, caller-specific): short string the caller wants echoed in the final terminal output (e.g., "Recommended next: `/spec:plan`"). Not used on direct-user invocation — the terminal report simply summarizes the iteration and asks what's next.
+- **Recommended next step** (optional, caller-specific): short string the caller wants echoed in the final terminal output (e.g., "Recommended next: `spec-plan`"). Not used on direct-user invocation — the terminal report simply summarizes the iteration and asks what's next.
 
 Agent identity is fixed, not a parameter: every API call uses agent ID `ai:spec-first` and display name `Spec-First`. Callers do not override this.
 

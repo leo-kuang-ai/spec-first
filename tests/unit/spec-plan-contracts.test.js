@@ -392,7 +392,7 @@ describe('spec-plan context orientation contract', () => {
 
     expect(text).toContain('Planning research agents are read-only.');
     expect(text).toContain('dispatch authorization is present for this run');
-    expect(text).toContain('a public `$spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
+    expect(text).toContain('a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
     expect(text).toContain('If the user did not explicitly request subagents, delegation, parallel research, or research-agent dispatch');
     expect(text).toContain('record `dispatch_authorization_missing`');
     expect(text).toContain('unauthorized, or fails for a non-capacity reason');
@@ -419,7 +419,7 @@ describe('spec-plan context orientation contract', () => {
     const text = fs.readFileSync(DEEPENING_PATH, 'utf8');
 
     expect(text).toContain('dispatch authorization is present for this run');
-    expect(text).toContain('a public `$spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
+    expect(text).toContain('a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
     expect(text).toContain('If the user did not explicitly request subagents, delegation, parallel research, or research-agent dispatch');
     expect(text).toContain('record `dispatch_authorization_missing`');
     expect(text).toContain('Use fully-qualified agent names inside dispatch prompts or agent invocations.');
@@ -780,7 +780,7 @@ describe('spec_id planning contract', () => {
   });
 
   test('Claude command projection points plan template reference at the workflow runtime copy', () => {
-    const command = plannedRuntimeContent(new ClaudeAdapter(), '.claude/commands/spec/plan.md');
+    const command = plannedRuntimeContent(new ClaudeAdapter(), '.claude/commands/spec-plan.md');
     const claudePlanningFlow = plannedRuntimeContent(new ClaudeAdapter(), '.claude/spec-first/workflows/spec-plan/references/planning-flow.md');
     const codexPlanningFlow = plannedRuntimeContent(new CodexAdapter(), '.agents/skills/spec-plan/references/planning-flow.md');
 

@@ -79,7 +79,7 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('target_repo');
     expect(twice).toContain('Runtime context 默认排除 `.spec-first/audits/**`');
     expect(twice).toContain('`.spec-first/governance/**`');
-    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）');
+    expect(twice).toContain('generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）');
     expect(twice).toContain('`.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 与 `.qoder/rules/**` 是宿主原生 advisory artifact');
     expect(twice).toContain('docs/10-prompt/结构化项目角色契约.md');
     expect(twice).toContain('scripts/tools 只产 deterministic facts');
@@ -133,7 +133,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('bounded subagents, leaf reviewers, and worker agents');
     expect(updated).toContain('Runtime context excludes `.spec-first/audits/**`');
     expect(updated).toContain('`.spec-first/governance/**`');
-    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.cursor/mcp.json`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)');
+    expect(updated).toContain('generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.cursor/mcp.json`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`, `.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)');
     expect(updated).toContain('`.cursor/rules/**`, `.cursor/agents/**`, `.kiro/specs/**`, and `.qoder/rules/**` are host-native advisory artifacts');
     expect(updated).toContain('Common entry anchors');
     expect(updated).toContain('External issue/PR inputs');

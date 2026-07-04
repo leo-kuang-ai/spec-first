@@ -599,7 +599,7 @@ describe('init --dry-run', () => {
       expect(codexInstruction).toContain('完整路由表仍在 `skills/using-spec-first/SKILL.md`,边界细节和例外见其 registered `references/*.md`');
       expect(codexInstruction).not.toContain('入口映射(意图→入口)');
       expect(codexInstruction).toContain('target_repo');
-      expect(codexInstruction).toContain('$spec-optimize');
+      expect(codexInstruction).toContain('spec-optimize');
       expect(codexInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(codexInstruction).not.toContain('group.status');
       expect(codexInstruction).toContain('spec-first startup-reminder --codex');

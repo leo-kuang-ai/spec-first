@@ -430,7 +430,7 @@ describe('claude settings', () => {
         '',
         '- 本 block 是 using-spec-first 的核心决策集；完整路由策略在 `skills/using-spec-first/SKILL.md`',
         '- substantial work 前先判断是否进入公开 spec-first workflow；轻量问答和窄事实查询可直接回答；已在 workflow 或 bounded subagent 中时不重新分流',
-        '- Claude workflow 入口使用 `/spec:*`',
+        '- Claude workflow 入口使用 `spec-*` project commands',
         '- 不要把 `using-spec-first` 本身当作 command-backed workflow',
         '<!-- spec-first:bootstrap:end -->',
         '',
@@ -482,7 +482,7 @@ describe('claude settings', () => {
         '<!-- spec-first:bootstrap:start -->',
         '## Workflow 入口治理',
         '',
-        '- Claude workflow 入口使用 `/spec:*`',
+        '- Claude workflow 入口使用 `spec-*` project commands',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
@@ -639,7 +639,7 @@ describe('claude settings', () => {
     try {
       fs.writeFileSync(path.join(projectRoot, 'CLAUDE.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Claude workflow entrypoints use `/spec:*`.',
+        '- Claude workflow entrypoints use `spec-*` project commands.',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
@@ -684,7 +684,7 @@ describe('claude settings', () => {
       expect(result.stderr).toBe('');
       const payload = JSON.parse(result.stdout);
       expect(payload.hookSpecificOutput.hookEventName).toBe('UserPromptExpansion');
-      expect(payload.hookSpecificOutput.additionalContext).toContain('/spec:plan planning-only attention guard');
+      expect(payload.hookSpecificOutput.additionalContext).toContain('spec-plan planning-only attention guard');
       expect(payload.hookSpecificOutput.additionalContext).toContain('planning-only');
       expect(payload.hookSpecificOutput.additionalContext).toContain('wait for the user handoff choice');
       expect(payload.hookSpecificOutput.additionalContext).toContain('Claude native Plan Mode write protection is active');
@@ -730,7 +730,7 @@ describe('claude settings', () => {
         const hookPath = writeRenderedSpecPlanGuardHook(projectRoot);
         const input = {
           hook_event_name: 'UserPromptExpansion',
-          command_name: '/spec:plan',
+          command_name: 'spec-plan',
         };
         if (permissionMode !== undefined) {
           input.permission_mode = permissionMode;

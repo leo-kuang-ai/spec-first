@@ -76,7 +76,7 @@ describe('spec-write-tasks contracts', () => {
 
     expect(estimatedTokens(SKILL_PATH)).toBeLessThanOrEqual(3000);
     expect(frontmatterKeys).toEqual(expect.arrayContaining(['name', 'description']));
-    expect(frontmatter).toContain('Public workflow entrypoint (/spec:write-tasks, $spec-write-tasks)');
+    expect(frontmatter).toContain('Public workflow entrypoint (spec-write-tasks)');
     expect(frontmatter).toContain('settled local spec-plan');
     expect(frontmatter).toContain('existing local task pack');
     expect(frontmatter).toContain('explicit plan-splitting/task-doc requests');

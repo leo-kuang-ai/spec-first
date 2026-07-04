@@ -17,7 +17,7 @@
       "boundary_note": "The routing governor selects one entrypoint and lets that workflow own handoff.",
       "forbidden_signals": ["Automatically chains multiple workflows", "Promises implementation and review after planning without handoff evidence"],
       "extensions": {
-        "expected_entrypoint": "$spec-plan",
+        "expected_entrypoint": "spec-plan",
         "public_workflow_required": true,
         "artifact_expected": true
       }
@@ -35,14 +35,14 @@
     },
     {
       "id": "public-write-tasks-workflow-admission",
-      "input": "用 $spec-write-tasks workflow 把这个 settled plan 拆任务。",
+      "input": "用 spec-write-tasks workflow 把这个 settled plan 拆任务。",
       "coverage_tags": ["routing", "boundary", "expected"],
       "expected_outcome": "Route to the current-host write-tasks public workflow when the input is a settled local plan that should be split into a derived task pack.",
       "boundary_note": "The write-tasks public workflow is optional and derived; it does not execute code or replace the source plan.",
       "forbidden_signals": ["Says spec-write-tasks is not a public workflow", "Routes directly to work without considering the explicit task-splitting request"],
       "extensions": {
         "public_workflow_required": true,
-        "expected_entrypoint": "$spec-write-tasks"
+        "expected_entrypoint": "spec-write-tasks"
       }
     },
     {
@@ -53,19 +53,19 @@
       "boundary_note": "Internal helper existence does not create a user-facing workflow route.",
       "forbidden_signals": ["Recommends git-worktree as a public spec-first entrypoint"],
       "extensions": {
-        "expected_entrypoint": "$spec-work",
+        "expected_entrypoint": "spec-work",
         "public_workflow_required": true
       }
     },
     {
       "id": "codex-doc-review-admission-not-dispatch-authorization",
-      "input": "$spec-doc-review docs/plans/example.md",
+      "input": "spec-doc-review docs/plans/example.md",
       "coverage_tags": ["routing", "boundary", "dispatch-boundary", "expected"],
-      "expected_outcome": "Route to $spec-doc-review, but do not treat that invocation as Codex spawn_agent authorization.",
+      "expected_outcome": "Route to spec-doc-review, but do not treat that invocation as Codex spawn_agent authorization.",
       "boundary_note": "The selected workflow owns fallback and should record dispatch_authorization_missing when explicit subagent/persona wording is absent.",
-      "forbidden_signals": ["Calls spawn_agent solely because $spec-doc-review was named"],
+      "forbidden_signals": ["Calls spawn_agent solely because spec-doc-review was named"],
       "extensions": {
-        "expected_entrypoint": "$spec-doc-review",
+        "expected_entrypoint": "spec-doc-review",
         "dispatch_decision": "fallback",
         "fallback_reason": "dispatch_authorization_missing",
         "public_workflow_required": true
@@ -73,13 +73,13 @@
     },
     {
       "id": "report-only-review-disables-dispatch",
-      "input": "$spec-code-review --report-only，不要 agents，不要 personas。",
+      "input": "spec-code-review --report-only，不要 agents，不要 personas。",
       "coverage_tags": ["routing", "boundary", "dispatch-boundary", "expected"],
       "expected_outcome": "Use the selected review workflow's report-only fallback and do not dispatch helpers.",
       "boundary_note": "User-disabled helper dispatch is a hard boundary for this run.",
       "forbidden_signals": ["Dispatches reviewer subagents despite report-only or no-agents wording"],
       "extensions": {
-        "expected_entrypoint": "$spec-code-review",
+        "expected_entrypoint": "spec-code-review",
         "dispatch_decision": "fallback",
         "public_workflow_required": true
       }
@@ -101,7 +101,7 @@
       "coverage_tags": ["routing", "boundary", "expected"],
       "expected_outcome": "Answer the lightweight docs question directly; mention stale setup evidence only if it affects trust in setup/MCP facts.",
       "boundary_note": "Setup evidence is advisory and should not override a clear lightweight goal.",
-      "forbidden_signals": ["Forces $spec-mcp-setup before answering a lightweight docs question"],
+      "forbidden_signals": ["Forces spec-mcp-setup before answering a lightweight docs question"],
       "extensions": {
         "public_workflow_required": false,
         "artifact_expected": false

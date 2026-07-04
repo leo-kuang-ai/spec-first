@@ -495,7 +495,7 @@ describe('task pack hash and validation', () => {
           '.kiro/agents/spec-security-reviewer.agent.md',
           '.kiro/spec-first/state.json',
           '.kiro/settings/mcp.json',
-          '.claude/commands/spec/work.md',
+          '.claude/commands/spec-work.md',
           '.codex/skills/spec-work/SKILL.md',
           '.agents/skills/spec-work/SKILL.md',
           '.cursor/skills/spec-work/SKILL.md',

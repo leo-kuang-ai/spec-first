@@ -178,7 +178,7 @@ describe('doctor Qoder auto-detection', () => {
     expect(checks).toEqual(expect.arrayContaining([
       expect.objectContaining({
         level: 'WARNING',
-        name: '.qoder/commands/spec/work.md',
+        name: '.qoder/commands/spec-work.md',
         message: expect.stringContaining('missing description'),
       }),
       expect.objectContaining({
@@ -192,7 +192,7 @@ describe('doctor Qoder auto-detection', () => {
         message: expect.stringContaining('must not default to Bash'),
       }),
     ]));
-    expect(checks.find((check) => check.name === '.qoder/commands/spec/work.md').message)
+    expect(checks.find((check) => check.name === '.qoder/commands/spec-work.md').message)
       .toContain('contains non-Qoder runtime path references');
     expect(checks.find((check) => check.name === '.qoder/skills/bad-skill/SKILL.md').message)
       .toContain('contains non-Qoder runtime path references');

@@ -23,7 +23,7 @@ For software and plan-seeking tasks, this workflow produces a durable implementa
 - **Handoff is blocking.** After the plan is written and reviewed, present the handoff menu and wait for the user's explicit selection. Do not continue into `spec-work`, task compilation, issue creation, or code edits without that selection.
 - **Question tools are mandatory when available.** In Claude Code interactive planning, preload `AskUserQuestion` at the start of the interactive flow by calling `ToolSearch` with query `select:AskUserQuestion` before any question fires. On Codex, use `request_user_input` when available.
 - **Fallback must be loud.** A numbered-list text fallback is allowed only when the harness genuinely lacks a blocking question tool, `ToolSearch` returns no match, the tool call explicitly fails, or the runtime mode does not expose the tool. A pending schema load, tool inconvenience, report-formatting mode, or this instruction being buried in a long skill is not a fallback trigger. In fallback, present numbered options and wait for the user's reply.
-- **Safety posture is explicit.** This workflow-level discipline and any `/spec:plan` attention guard are best-effort attention hardening. Hard write protection outside the model's cooperation comes from Claude native Plan Mode; do not claim non-Plan Mode has hard write protection.
+- **Safety posture is explicit.** This workflow-level discipline and any `spec-plan` attention guard are best-effort attention hardening. Hard write protection outside the model's cooperation comes from Claude native Plan Mode; do not claim non-Plan Mode has hard write protection.
 
 ## Workflow Contract Summary
 

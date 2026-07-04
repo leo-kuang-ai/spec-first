@@ -267,7 +267,7 @@ describe('doctor Cursor detection', () => {
       'argument-hint: [bad]',
       '---',
       '',
-      'Runtime reference: .qoder/commands/spec/work.md',
+      'Runtime reference: .qoder/commands/spec-work.md',
       '',
     ].join('\n'), 'utf8');
 
