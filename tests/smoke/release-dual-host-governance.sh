@@ -110,7 +110,7 @@ mkdir -p "$CODEX_PROJECT"
 codex_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CODEX_PROJECT" codex test en 2>&1
 )"
-grep -Fq 'spec-* skills' <<<"$codex_init_output"
+grep -q 'skill directory(ies) in .agents/skills' <<<"$codex_init_output"
 test ! -e "$CODEX_PROJECT/.codex/commands/spec"
 test -f "$CODEX_PROJECT/.agents/skills/spec-work/SKILL.md"
 test ! -e "$CODEX_PROJECT/.agents/skills/spec-"standards"/SKILL.md"
