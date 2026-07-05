@@ -1,3 +1,13 @@
+---
+title: "using-spec-first Skill 与 spec-first init 引导内容优化方案（第七修订版 · L0 baseline 与收益门槛修正）"
+type: refactor
+status: completed
+date: 2026-07-04
+spec_id: 2026-07-04-using-spec-first-init-guidance-optimization
+origin_verification_status: not-applicable
+implements_schemas: []
+---
+
 # using-spec-first Skill 与 spec-first init 引导内容优化方案（第七修订版 · L0 baseline 与收益门槛修正）
 
 > 状态：completed
