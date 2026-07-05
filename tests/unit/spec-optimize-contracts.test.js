@@ -86,11 +86,3 @@ describe('spec-optimize host entrypoint contract', () => {
     expect(schema).not.toContain('--yolo');
   });
 });
-
-describe('spec-optimize Windows degraded mode contract', () => {
-  test('SKILL documents Windows degraded mode for bash-only helpers and POSIX temp paths', () => {
-    const text = fs.readFileSync(SKILL_PATH, 'utf8');
-    expect(text).toContain('**Windows degraded mode:**');
-    expect(text).toMatch(/Git Bash.*WSL|WSL.*Git Bash/);
-  });
-});

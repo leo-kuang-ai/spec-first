@@ -424,8 +424,6 @@ git checkout <branch>
 
 Then detect the review base branch and compute the merge-base. Run the trusted `skills/spec-code-review/scripts/resolve-base.sh` helper, which handles fork-safe remote resolution with multi-fallback detection (PR metadata -> `origin/HEAD` -> `gh repo view` -> common branch names). Runtime adapters rewrite this source path to the loaded workflow skill directory during `spec-first init`; never run a repo-root `scripts/resolve-base.sh` from the project under review.
 
-**Windows degraded mode:** `resolve-base.sh` requires a bash-capable environment (the host harness bash tool, Git Bash, or WSL); it uses `awk`/`sed`/POSIX shell and will not run under native PowerShell without bash. When bash is unavailable, ask the user to supply the diff base explicitly and use the "explicit base" path above (`git merge-base HEAD "$BASE_ARG"`), or run this review from Git Bash/WSL. Do not silently fall back to `git diff HEAD` — that would miss all committed work on the branch. State that automatic base detection is degraded and request an explicit base instead.
-
 ```
 RESOLVE_OUT=$(bash skills/spec-code-review/scripts/resolve-base.sh) || { echo "ERROR: resolve-base.sh failed"; exit 1; }
 if [ -z "$RESOLVE_OUT" ] || echo "$RESOLVE_OUT" | grep -q '^ERROR:'; then echo "${RESOLVE_OUT:-ERROR: resolve-base.sh produced no output}"; exit 1; fi

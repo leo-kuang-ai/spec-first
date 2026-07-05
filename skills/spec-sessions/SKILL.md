@@ -118,8 +118,6 @@ bash skills/spec-sessions/scripts/discover-sessions.sh <repo> <days> | tr '\n' '
 
 Each output line is a JSON object describing a session: platform, file, size, ts, session, plus platform-specific fields. The final `_meta` line carries `files_processed` and `parse_errors`.
 
-**Windows degraded mode:** the discovery pipeline (`discover-sessions.sh` plus `find`/`xargs`/`tr` and `mktemp` in Step 4) requires a bash-capable environment (the host harness bash tool, Git Bash, or WSL); it will not run under native PowerShell without bash. When bash is unavailable, run this workflow from Git Bash/WSL, or list session files directly from the platform history directory (`~/.claude` / Codex session store resolved via `%USERPROFILE%`) and pass them to `extract-metadata.py` manually. State that session discovery is degraded rather than returning an empty result as if no sessions existed.
-
 If the inventory's `_meta` line shows `files_processed: 0`, return `no relevant prior sessions` and stop.
 
 If `parse_errors > 0`, note that some sessions could not be parsed and proceed with what was returned.

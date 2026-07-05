@@ -13,9 +13,9 @@
 
 [English](https://github.com/sunrain520/spec-first/blob/main/README.md) | [简体中文](https://github.com/sunrain520/spec-first/blob/main/README.zh-CN.md)
 
-**面向 Claude Code、Codex、Kiro、Qoder 与 Cursor 的 AI Coding Harness。**
+**An AI Coding Harness for Claude Code, Codex, Kiro, Qoder, and Cursor.**
 
-`spec-first` 让 Claude Code、Codex、Kiro、Qoder 和 Cursor 在真实项目中更容易被信任：一次性的 AI coding 对话会变成仓库承载的 requirements、plans、scoped work、review 和 reusable learning 闭环。脚本强制确定性不变量并准备事实，LLM 判断这层地板之上的语义充分性，证据留在你的仓库里。Kiro 与 Qoder 仍是 opt-in preview；Cursor 当前更保守，是 opt-in `generated_runtime_preview`，只证明可生成 `.cursor/skills/**`、`.cursor/spec-first/**` 与 `.cursor/mcp.json` 相关证据，本机尚未验证 Cursor skill discovery/invocation，generated skills 可能不会被 Cursor 加载。
+`spec-first` helps Claude Code, Codex, Kiro, Qoder, and Cursor become easier to trust in real projects: one-off AI coding conversations become repo-backed requirements, plans, scoped work, review, and reusable learning. Scripts enforce deterministic invariants and prepare facts; LLMs judge semantic adequacy above that floor; evidence stays in your repository. Kiro and Qoder remain opt-in previews. Cursor is more conservative: it is an opt-in `generated_runtime_preview` that currently proves generation of `.cursor/skills/**`, `.cursor/spec-first/**`, and `.cursor/mcp.json` evidence only. Local Cursor skill discovery/invocation has not been verified, and generated skills may not be loaded by Cursor.
 
 Official site: [spec-first.cn](http://spec-first.cn/)
 
@@ -41,7 +41,7 @@ Prerequisites:
 
 - Node.js `>=20.0.0` and npm.
 - Git on `PATH`; `doctor`, setup, and workflow checks read repository facts from Git.
-- Claude Code、Codex、Kiro、Qoder，或 Cursor installed, with one chosen as the current host. Cursor 需要显式 `--cursor` opt-in，且当前只处于 generated-runtime preview。
+- Claude Code, Codex, Kiro, Qoder, or Cursor installed, with one chosen as the current host. Cursor requires explicit `--cursor` opt-in and is currently generated-runtime preview only.
 - A terminal opened at the root of the project repo where you want to enable `spec-first`. First-time users can try a throwaway/test repo before initializing a real project.
 
 **Step 1 — Install and check health**

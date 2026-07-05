@@ -58,8 +58,6 @@ Overrides: none
 
 Resolve all `scripts/<name>.sh` paths relative to this skill's loaded directory. The target app stays in the user's project checkout; only these helper scripts live beside the skill.
 
-**Windows degraded mode:** these `scripts/*.sh` helpers require a bash-capable environment (the host harness bash tool, Git Bash, or WSL). On native PowerShell without bash, they cannot run. When bash is unavailable: skip auto-detection and ask the user for the start command, package manager, and port directly, or ask them to run this workflow from Git Bash/WSL. Do not silently fail the launch — state that helper auto-detection is degraded and continue via the manual path.
-
 ### 1.1 Check for `.claude/launch.json`
 
 Run `bash scripts/read-launch-json.sh`. If it finds a configuration, use it — the user already told us how to start the project.
