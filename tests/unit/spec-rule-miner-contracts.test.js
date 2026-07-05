@@ -26,11 +26,19 @@ describe('spec-rule-miner skill contract', () => {
     expect(skill).toContain('name: spec-rule-miner');
     expect(skill).toContain('standalone skill');
     expect(skill).toContain('`AGENTS.md`');
+    expect(skill).toContain('`docs/ai/project-rules.md` 是默认 canonical full rules');
     expect(skill).toContain('<=1000 words');
+    expect(skill).toContain('## Purpose');
+    expect(skill).toContain('## When To Use');
+    expect(skill).toContain('## When Not To Use');
+    expect(skill).toContain('## Inputs');
+    expect(skill).toContain('## Outputs');
+    expect(skill).toContain('## Workflow');
+    expect(skill).toContain('## Failure Modes');
     expect(skill).toContain('近邻路由');
     expect(skill).toContain('`spec-team-standards-governance`');
     expect(skill).toContain('不要修改业务源码');
-    expect(skill).toContain('不手改 generated runtime mirrors');
+    expect(skill).toContain("Host-projected copies are outside this skill's rule targets");
     expect(skill).toContain('[Pattern Categories](references/pattern-categories.md)');
     expect(skill).toContain('[Write Targets](references/write-targets.md)');
     expect(skill).toContain('spec-rule-miner-start');
@@ -43,16 +51,38 @@ describe('spec-rule-miner skill contract', () => {
     expect(patternCategories).toContain('函数与代码体风格');
     expect(patternCategories).toContain('大仓库');
     expect(patternCategories).toContain('混合语言');
+    expect(patternCategories).toContain('多包/monorepo/workspace');
+    expect(patternCategories).toContain('先识别包级边界');
+    expect(patternCategories).toContain('改具体子项目先跟随本包现有结构');
+    expect(patternCategories).toContain('不要把主模式写成全仓库事实或绝对禁令');
+    expect(patternCategories).toContain('除非证据在目标适用范围内压倒性一致');
+
+    expect(skill).toContain('大仓库或多包仓库使用分层抽样');
+    expect(skill).toContain('多包规则必须区分跨包通用模式、包级专属模式和历史例外');
+    expect(skill).toContain('规则正文可以包含适用范围和例外边界');
+    expect(skill).toContain('改具体子项目先跟随本包现有结构');
+    expect(skill).toContain('不要写成“全仓库统一/只/永远/不得”的绝对事实');
 
     expect(writeTargets).toContain('canonical full rules');
+    expect(writeTargets).toContain('`docs/ai/project-rules.md`：写完整规则块');
+    expect(writeTargets).toContain('`AGENTS.md`：默认写 pointer 到 `docs/ai/project-rules.md`');
+    expect(writeTargets).toContain('`CLAUDE.md`：默认写 pointer 到 `docs/ai/project-rules.md`');
+    expect(writeTargets).toContain('不把完整规则写进入口文件');
     expect(writeTargets).toContain('CLAUDE.md');
     expect(writeTargets).toContain('.cursor/rules/project-rules.mdc');
-    expect(writeTargets).toContain('.cursorrules');
     expect(writeTargets).toContain('markers');
     expect(writeTargets).toContain('legacy `rule-miner-start` / `rule-miner-end` markers');
     expect(writeTargets).toContain('legacy marker migration');
     expect(writeTargets).toContain('frontmatter 必须保持文件第一段');
     expect(writeTargets).toContain('禁止目标');
+    expect(writeTargets).toContain('非当前 spec-first 支持的编程工具或 legacy 规则文件不作为写入目标');
+    expect(writeTargets).toContain('Kiro 当前通过根目录 `AGENTS.md` 和 skill delivery 消费规则');
+    expect(writeTargets).not.toContain('GitHub Copilot |');
+    expect(writeTargets).not.toContain('Trae |');
+    expect(writeTargets).not.toContain('Copilot inline');
+    expect(writeTargets).not.toContain('| Kiro | `.kiro/steering/project-rules.md`');
+    expect(writeTargets).not.toContain('Legacy Cursor');
+    expect(writeTargets).not.toContain('`.cursorrules` 为纯文本');
   });
 
   test('declares trigger, near-neighbor, and runtime-boundary eval coverage', () => {
@@ -79,6 +109,14 @@ describe('spec-rule-miner skill contract', () => {
     expect(JSON.stringify(cases)).toContain('generated-runtime-not-rule-target');
     expect(JSON.stringify(cases)).toContain('headless-default-write-requires-evidence');
     expect(JSON.stringify(cases)).toContain('legacy-marker-migration');
+    expect(JSON.stringify(cases)).toContain('leave full rules in AGENTS.md');
+    expect(JSON.stringify(cases)).toContain('unsupported-tool-rule-file');
+    expect(JSON.stringify(cases)).toContain('unsupported-legacy-cursorrules');
+    expect(JSON.stringify(cases)).toContain('unsupported-kiro-steering');
+    expect(JSON.stringify(cases)).toContain('multi-package-scope-boundary');
+    expect(JSON.stringify(cases)).toContain('scoped-rules-with-limitations');
+    expect(JSON.stringify(cases)).toContain('write workspace-wide absolute rule');
+    expect(JSON.stringify(cases)).toContain('omit package-level scope');
     expect(JSON.stringify(cases)).toContain('frontmatter-preservation');
   });
 
