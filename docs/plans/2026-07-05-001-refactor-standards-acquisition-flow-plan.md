@@ -1,9 +1,11 @@
 ---
 title: "refactor: 优化团队规范获取流程"
 type: refactor
-status: active
+status: superseded
 date: 2026-07-05
 spec_id: 2026-07-05-001-standards-acquisition-flow
+superseded_at: 2026-07-05
+superseded_by: docs/plans/2026-07-05-002-refactor-confirmed-code-standards-extraction-plan.md
 origin_verification_status: not-applicable
 implements_schemas: []
 ---
@@ -11,6 +13,8 @@ implements_schemas: []
 # refactor: 优化团队规范获取流程
 
 ## Summary
+
+**状态：** 2026-07-05 已被 `docs/plans/2026-07-05-002-refactor-confirmed-code-standards-extraction-plan.md` supersede。本计划仅保留为 target locking、acquisition lenses 与 split/reconciliation 边界的历史 rationale；confirmed-first plan 拥有当前默认输出姿态。
 
 本计划把 `spec-rule-miner` 最值得借鉴的两个方法思想落地到 `spec-team-standards-governance`：单一 extraction target 与 lens-guided acquisition；第三条是复用 rule-miner 的大项目分层采样/披露纪律，并把结果收敛到 team-standards **自有**的 conflict/promotion 边界(reconciliation 本身不是从 rule-miner 借来的机制)。目标不是把代码习惯挖掘器变成团队标准，也不是恢复 legacy standards command spellings 或 retired `spec-standards` workflow，而是让 standards acquisition 的输入、抽取、归并和验证更可复核。
 

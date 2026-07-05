@@ -4,6 +4,7 @@ type: refactor
 status: active
 date: 2026-07-05
 spec_id: 2026-07-05-001-standards-acquisition-flow
+supersedes: docs/plans/2026-07-05-001-refactor-standards-acquisition-flow-plan.md
 origin_verification_status: not-applicable
 implements_schemas: []
 ---
@@ -12,16 +13,16 @@ implements_schemas: []
 
 ## Summary
 
-本计划将 `spec-team-standards-governance` 的代码规范提炼路径从 candidate-first acquisition 调整为 confirmed-first extraction：默认目标产物是可被下游 workflow 消费的 `docs/standards/**` confirmed rule cards，而不是 `docs/standards/candidates/**` 候选账本。
+本计划将 `spec-team-standards-governance` 的代码规范提炼路径从 candidate-first acquisition 调整为 confirmed-first extraction：默认目标产物是可被下游 workflow 消费的 `docs/standards/**` confirmed rule patch preview，而不是 `docs/standards/candidates/**` 候选账本。
 
-核心边界不变：从代码中总结出的重复模式只能作为 signal；只有同时命中 explicit authority、machine-enforced policy、owner-confirmed decision 或 existing-confirmed refactor 这类 confirmation basis，才允许写入 `trust=confirmed,lifecycle_state=active`。code-only 模式不足时默认 suppressed/report-only，不自动落候选、不自动 confirmed。
+核心边界不变：从代码中总结出的重复模式只能作为 signal；只有同时命中 explicit authority、machine-enforced policy、owner-confirmed decision 或 existing-confirmed refactor 这类 confirmation basis，才允许在 active source-edit workflow 中写入 `trust=confirmed,lifecycle_state=active`。standalone 直接使用只准备 confirmed patch preview / suppressed finding；code-only 模式不足时默认 suppressed/report-only，不自动落候选、不自动 confirmed。
 
 ---
 
 ## Decision Brief
 
-- **Recommended approach:** 扩展现有 `spec-team-standards-governance` source skill 和 `docs/contracts/team-standards.md`，新增 confirmed-first extraction 语义、confirmation gate、suppressed finding 输出边界和 confirmed rule 写入要求；不要创建新 public workflow。
-- **Key decisions:** 默认产物从 candidate cards 改为 confirmed rule cards；code-only repeated pattern 继续不能 confirmed；候选区改为显式 opt-in fallback；implementation 必须同步 user-facing docs、eval fixtures、contract tests 和 changelog。
+- **Recommended approach:** 扩展现有 `spec-team-standards-governance` source skill 和 `docs/contracts/team-standards.md`，新增 confirmed-first extraction 语义、confirmation gate、suppressed finding 输出边界和 confirmed rule patch preview / source-edit 写入要求；不要创建新 public workflow。
+- **Key decisions:** 默认产物从 candidate cards 改为 confirmed rule patch previews；真实 confirmed source 写入只发生在 `spec-work` 或等价 source-edit workflow 中；code-only repeated pattern 继续不能 confirmed；候选区改为显式 opt-in fallback；implementation 必须同步 user-facing docs、eval fixtures、contract tests 和 changelog。
 - **Validation focus:** 聚焦 `team-standards-governance-contracts.test.js`、`eval-fixture-contracts.test.js`、`changelog-format.test.js`、entrypoint lint、JSON parse 和 diff check；如果 schema/contract 字段扩展，追加相应 downstream consumer tests。
 - **Largest risks / boundaries:** 最大风险是把“代码现状”伪装成“团队规范”。本计划把风险前移到 confirmation gate：证据不足时阻断 confirmed 写入，而不是先生成 candidate 再期望后续流程修正。
 
@@ -50,13 +51,13 @@ implements_schemas: []
 
 ## Requirements
 
-- R1. `spec-team-standards-governance` 的代码提炼路径必须默认以 confirmed usable standards 为目标产物，写入面为 `docs/standards/index.md` 与 `docs/standards/*.md`，不是默认写入 `docs/standards/candidates/**`。
+- R1. `spec-team-standards-governance` 的代码提炼路径必须默认以 confirmed usable standards 为目标产物；standalone/default 输出是 confirmed rule patch preview 加 suppressed findings，实际 confirmed 写入面为 active source-edit workflow 中的 `docs/standards/index.md` 与 `docs/standards/*.md`，不是默认写入 `docs/standards/candidates/**`。
 - R2. 每次 extraction 必须先锁定一个 `extraction_target`：`target_repo`、surface、sub_domain、capability、include/exclude、evidence_sources、privacy boundary 和 output mode；mixed surface/domain/capability 必须 split。
 - R3. 从代码、测试、目录结构、graph/code provider 或 `docs/solutions/**` 得到的观察只能作为 code signal；code-only signal 不能自动产生 `trust=confirmed`。
 - R4. confirmed 写入必须命中至少一个 confirmation basis：`explicit-authority`、`machine-enforced-policy`、`owner-confirmed` 或 `existing-confirmed-refactor`。
 - R5. 证据不足的 rule signal 默认输出为 suppressed finding / `needs-owner` / `insufficient-authority`，不得 silent promote，也不得默认写入 candidate 文件。
 - R6. `docs/standards/candidates/**` 保留为显式 opt-in fallback：仅当用户要求保存候选、owner 暂不可用但需要保留 evidence，或 source-edit workflow 明确选择 proposal flow 时写入。
-- R7. confirmed rule card 必须携带 confirmation basis、source refs、scope、owner、invalidation condition 和 counterexample/locality review 结果；若不扩展 YAML schema，至少在 rule card 正文中表达。
+- R7. confirmed rule card 必须携带 confirmation basis、source refs、scope、owner、invalidation condition 和 counterexample/locality review 结果；若不扩展 YAML schema，必须在 rule card 正文中使用固定 `Confirmation basis:` 小节表达。
 - R8. 派生 AI rules、review checklist、query summary、handoff snippets 只能从 confirmed rule IDs 或 reviewable proposal IDs 派生，不得成为独立 source truth。
 - R9. 不恢复 legacy standards command spellings、retired `spec-standards` workflow、`skills/spec-standards/`、`.spec-first/standards/`，不手改 generated runtime mirrors。
 - R10. 实现必须同步 focused eval、Jest contract tests、用户文档和 `CHANGELOG.md`；测试要同时证明 confirmed path 可用与 code-only path 被阻断。
@@ -76,7 +77,7 @@ implements_schemas: []
 
 - 真实 code extraction pilot：等 confirmed-first source contract 落地后，另起一次 source-edit workflow，在一个明确 target repo/surface/capability 上跑真实提炼。
 - 自动 rule-card 校验器扩展：如果 `confirmation_basis` 进入 YAML metadata 并需要机械校验，再扩展 `scripts/check-team-standards.js`。
-- 旧 plan status 清理：实现时可将 `docs/plans/2026-07-05-001-refactor-standards-acquisition-flow-plan.md` 标为 `superseded`，但本计划创建阶段不额外修改旧 artifact。
+- 旧 plan status 已在本次 plan 修复中清理：`docs/plans/2026-07-05-001-refactor-standards-acquisition-flow-plan.md` 标为 `superseded`，本计划通过 frontmatter `supersedes` 成为当前执行来源。
 
 ---
 
@@ -122,7 +123,7 @@ implements_schemas: []
 - `docs/contracts/team-standards.md` owns the semantic contract for trust, lifecycle, promotion, candidate boundary, V2 acquisition output and downstream consumption. It is the correct owner for confirmation basis and default output semantics.
 - `docs/standards/index.md` owns registries and confirmed rule index. Any new confirmed rule output must update this file and keep rows consistent with rule cards.
 - `skills/spec-team-standards-governance/SKILL.md` owns mode routing, reference loading map, output contract and hard boundaries. It should gain a confirmed-first mode description without absorbing the whole extraction algorithm.
-- `references/source-matrix.md` already separates code structure from explicit docs and machine-enforced config. It should be extended, not replaced, so code-only remains blocked while explicit/machine/owner confirmation can lead to confirmed output.
+- `references/source-matrix.md` 已经分离 code structure、explicit docs 与 machine-enforced config。应扩展它而不是替换它，让 code-only 保持阻断，同时允许 explicit/machine/owner confirmation 进入 confirmed patch preview 或 source-edit write 路径。
 - `references/acquisition-quality.md` owns task pack, evidence quality, anchors and gates. It can keep source quality fields, but should not become the sole owner of confirmation semantics.
 - `docs/standards/candidates/README.md` currently says code scanning cannot auto-confirm team policy. This boundary remains correct, but the document should explain candidates are opt-in fallback rather than default output.
 - `tests/unit/team-standards-governance-contracts.test.js` already locks source authority, standalone skill name, runtime sync, V2 pilot artifacts, eval fixtures and user-facing docs. Extend it instead of creating a parallel suite.
@@ -153,7 +154,7 @@ implements_schemas: []
 
 ## Key Technical Decisions
 
-- KTD1. Default output becomes confirmed standards, but confirmed is gated. The skill should aim to write `docs/standards/**` rule cards, yet any rule lacking confirmation basis is suppressed/report-only or explicitly routed to owner confirmation.
+- KTD1. 默认产物转向 confirmed standards，但 confirmed 仍被 gate。skill 应默认准备 `docs/standards/**` confirmed rule patch preview；实际 `trust=confirmed,lifecycle_state=active` 写入只发生在 active source-edit workflow 内。缺少 confirmation basis 的 rule 必须 suppressed/report-only，或显式路由到 owner confirmation。
 - KTD2. Code is signal, not authority. Repeated source patterns, directory structures and test layouts can justify inspection and examples, but cannot by themselves produce `trust=confirmed`.
 - KTD3. Confirmation basis is explicit and enumerable. The accepted confirmation paths are `explicit-authority`, `machine-enforced-policy`, `owner-confirmed` and `existing-confirmed-refactor`.
 - KTD4. Candidate files are fallback, not hot path. `docs/standards/candidates/**` remains useful for evidence preservation, conflict records and proposal flows, but the default requested outcome is either confirmed rule or suppressed finding.
@@ -171,12 +172,12 @@ implements_schemas: []
 - Should pure code repetition be sufficient for confirmed? No. It is a signal only; confirmation basis remains required.
 - Should this become a new public workflow? No. Keep `spec-team-standards-governance` standalone and source-maintenance oriented.
 - Should candidates disappear? No. They become opt-in fallback or evidence-preservation path, not default output.
+- 前一版 candidate-first plan 是否应继续 active？不应。它已被本 confirmed-first plan supersede，只作为历史 rationale 保留。
 
 ### Deferred to Implementation
 
-- Whether `confirmation_basis` should become YAML metadata in every new code-extracted rule card or a required prose subsection. Prefer prose first unless tests or downstream consumers need structured metadata.
+- `confirmation_basis` 是否要进入每张 code-extracted rule card 的 YAML metadata。默认先使用固定正文小节 `Confirmation basis:`；只有测试或下游消费者确实需要 structured metadata 时再扩展。
 - Whether to create `references/confirmed-extraction.md` or extend existing references. Decide after re-reading all current references in implementation.
-- Whether to mark the previous active plan as `superseded`. Recommended when implementing this plan, but not required to create this plan artifact.
 - Whether fresh-source eval is available for skill prose behavior changes. If not, record `dispatch_authorization_missing` or equivalent limitation.
 
 ---
@@ -193,16 +194,16 @@ flowchart TB
   Split -->|no| Signals[Extract code/test/config/doc signals]
   Signals --> Counter[Check locality, counterexamples, stale debt]
   Counter --> Basis{Confirmation basis exists?}
-  Basis -->|explicit authority| Confirmed[Write confirmed rule card]
+  Basis -->|explicit authority| Confirmed[生成 confirmed rule patch preview]
   Basis -->|machine enforced| Confirmed
   Basis -->|owner confirmed| Confirmed
   Basis -->|existing confirmed refactor| Confirmed
   Basis -->|none| Suppress[Suppress with reason]
-  Confirmed --> Index[Update docs/standards/index.md]
+  Confirmed --> Index[生成 docs/standards/index.md patch preview]
   Index --> Downstream[Scope-matched workflow consumption]
   Suppress --> Owner[Owner question or report-only finding]
   Owner --> CandidateOptIn{User/source-edit opts in?}
-  CandidateOptIn -->|yes| Candidate[Write candidates evidence]
+  CandidateOptIn -->|yes| Candidate[按 opt-in 生成或写入候选 evidence]
   CandidateOptIn -->|no| Report[Close with limitation]
 ```
 
@@ -223,7 +224,7 @@ flowchart TB
 
 ### U1. Update team-standards contract semantics
 
-**Goal:** Make `docs/contracts/team-standards.md` say that code-to-standards extraction defaults to confirmed outputs when confirmation basis exists, while preserving the no-code-only-confirmed boundary.
+**Goal:** 让 `docs/contracts/team-standards.md` 明确：code-to-standards extraction 在存在 confirmation basis 时默认生成 confirmed rule patch preview，真实写入仍由 source-edit workflow 承担，同时保留 no-code-only-confirmed 边界。
 
 **Requirements:** R1, R3, R4, R5, R6, R7, R8
 
@@ -240,7 +241,7 @@ flowchart TB
 - Reframe candidates as explicit fallback, not default.
 - Specify suppressed finding reasons such as `insufficient-authority`, `needs-owner`, `scope-too-local`, `counterexample-conflict`, `privacy-blocked`.
 - State that code-extracted confirmed rules must record confirmation basis, source refs, scope, owner and counterexample/locality review.
-- Avoid adding a new canonical enum unless implementation confirms a structured field is necessary. If a new enum is needed, update tests and downstream docs in the same unit.
+- 避免新增 canonical enum，除非 implementation 确认 structured field 必要。若不新增 structured field，必须要求固定 `Confirmation basis:` 正文小节；若需要新 enum，同一 unit 内同步更新 tests 和 downstream docs。
 
 **Patterns to follow:**
 - `docs/contracts/team-standards.md` Canonical Enums and Rule Card Contract.
@@ -248,7 +249,7 @@ flowchart TB
 - `docs/standards/candidates/README.md` pre-write and proposal-only boundary.
 
 **Test scenarios:**
-- Happy path: contract contains confirmed-first extraction, confirmation basis, and confirmed output path.
+- Happy path: contract contains confirmed-first extraction, confirmation basis, and confirmed patch preview / source-edit write boundary.
 - Error path: contract still rejects code-only auto-confirm and LLM self-evaluation.
 - Boundary: candidates remain proposal-only and not hard context.
 
@@ -274,9 +275,9 @@ flowchart TB
 - Test: `tests/unit/team-standards-governance-contracts.test.js`
 
 **Approach:**
-- Rename or clarify `init` / `propose` outputs so the default is confirmed rule patch preview plus suppressed findings, not candidate cards.
+- Rename or clarify `init` / `propose` outputs，使默认产物为 confirmed rule patch preview 加 suppressed findings，而不是 candidate cards。
 - Add `confirmed-extraction.md` only if recheck shows no existing reference can own the flow without mixing source matrix and quality scoring.
-- In `source-matrix.md`, allow explicit docs, machine-enforced config and owner decisions to feed confirmed output when the source-edit workflow and review gates are satisfied. Keep code-structure max default as signal only.
+- In `source-matrix.md`, allow explicit docs, machine-enforced config and owner decisions to feed confirmed patch preview / source-edit writes when source-edit workflow and review gates are satisfied. Keep code-structure max default as signal only.
 - In `initialization.md`, preserve one extraction target and mixed-split policy.
 - In `acquisition-quality.md`, keep evidence quality fields as confirmation inputs, not authority replacement.
 - Update the SKILL loading map so confirmed extraction reads the new reference only for relevant modes.
@@ -290,7 +291,7 @@ flowchart TB
 **Test scenarios:**
 - Happy path: SKILL output contract names confirmed rule patch preview and suppressed findings for extraction modes.
 - Edge case: code-only extraction says `insufficient-authority`, not `trust=confirmed`.
-- Boundary: standalone direct use still cannot mutate source without `spec-work` or equivalent source-edit authorization.
+- Boundary: standalone 直接使用在没有 `spec-work` 或等价 source-edit 授权时仍不能 mutate source。
 
 **Verification:**
 - Focused Jest asserts loading map, confirmation basis, suppressed output and no public workflow.
@@ -352,8 +353,8 @@ flowchart TB
 - Preserve existing schema versions: `team-standards-trigger-evals/v1` and `team-standards-output-evals/v1`.
 - Strengthen `TRIGGER-ACQ-001` or add a new trigger for confirmed-first code extraction with single target.
 - Add output cases for:
-  - explicit authority plus code examples -> confirmed rule card output;
-  - machine-enforced config plus code examples -> confirmed rule card output;
+  - explicit authority plus code examples -> confirmed rule patch preview；
+  - machine-enforced config plus code examples -> confirmed rule patch preview；
   - code-only repeated pattern -> suppressed finding with `insufficient-authority`;
   - mixed-surface code summary -> split boundary;
   - derived artifact -> citations to confirmed rule IDs or reviewable proposal IDs.
@@ -365,8 +366,8 @@ flowchart TB
 - Shared fixture normalizer expectations in `tests/unit/eval-fixture-contracts.test.js`.
 
 **Test scenarios:**
-- Happy path: new confirmed output cases parse and normalize.
-- Error path: fixture with code-only confirmed output would fail governance assertions.
+- Happy path: new confirmed patch preview cases 可以 parse 并 normalize。
+- Error path: code-only confirmed patch/write output fixture 会触发 governance assertion 失败。
 - Boundary: no eval fixture uses local absolute paths or generated runtime mirrors as source refs.
 
 **Verification:**
@@ -391,13 +392,13 @@ flowchart TB
 **Approach:**
 - Update contract snippets currently tied to candidate-only V2 semantics.
 - Add assertions for:
-  - confirmation basis exists;
-  - code-only cannot confirmed;
-  - default extraction can produce confirmed rule patch previews;
-  - candidates are opt-in fallback;
-  - suppressed findings are represented;
-  - index and rule-card consistency remains required;
-  - no public workflow or runtime mirror path appears.
+  - confirmation basis 以 structured metadata 或固定 `Confirmation basis:` 正文小节存在；
+  - code-only cannot confirmed；
+  - default extraction can produce confirmed rule patch previews；
+  - candidates are opt-in fallback；
+  - suppressed findings are represented；
+  - index and rule-card consistency remains required；
+  - no public workflow or runtime mirror path appears。
 - Do not assert exact full wording of every lens or rule. Lock load-bearing concepts and file paths.
 - Extend hygiene checks only if the implementation adds structured `confirmation_basis` metadata or new candidate output fields.
 
@@ -421,14 +422,14 @@ flowchart TB
 
 **Files:**
 - Modify: `CHANGELOG.md`
-- Optional modify: `docs/plans/2026-07-05-001-refactor-standards-acquisition-flow-plan.md`
+- Modify: `docs/plans/2026-07-05-001-refactor-standards-acquisition-flow-plan.md`
 
 **Approach:**
 - Add a compact changelog entry naming standards contract, skill references, eval fixtures, user docs and tests.
-- If implementation fully supersedes the previous candidate-first plan, update that plan frontmatter to `status: superseded` and add a short supersession note pointing to this plan.
-- Do not regenerate runtime mirrors unless implementation explicitly needs runtime projection. If not run, state that in closeout.
-- Run focused validation. Broaden to README/docs tests only if those surfaces change.
-- If skill prose changes substantially, run fresh-source eval when dispatch/equivalent reviewer is available; otherwise record limitation.
+- 保持前一版 candidate-first plan frontmatter 为 `status: superseded`，并保留指向本计划的短 supersession note。
+- 不 regenerate runtime mirrors，除非 implementation 明确需要 runtime projection；若未运行，在 closeout 中说明。
+- 运行 focused validation；只有 README/docs surfaces 发生变化时才扩大验证。
+- 如果 skill prose 大幅改变，在 dispatch/equivalent reviewer 可用时运行 fresh-source eval；否则记录 limitation。
 
 **Test scenarios:**
 - Test expectation: none -- release bookkeeping and validation closeout.
@@ -438,7 +439,7 @@ flowchart TB
 - Required: `npm run lint:skill-entrypoints`.
 - Required: JSON parse for modified eval fixtures.
 - Required: `git diff --check -- CHANGELOG.md docs/contracts/team-standards.md docs/standards skills/spec-team-standards-governance tests/unit/team-standards-governance-contracts.test.js docs/05-用户手册/23-团队开发规范治理.md`.
-- Conditional: `npx jest tests/unit/plan-status-taxonomy.test.js --runInBand` if the previous plan status is changed.
+- 本次 plan-fix artifact 必跑：`npx jest tests/unit/plan-status-taxonomy.test.js --runInBand`。
 
 ---
 
@@ -447,7 +448,7 @@ flowchart TB
 - **Workflow consumers:** `spec-plan`, `spec-work`, `spec-code-review`, `spec-doc-review` and `spec-debug` continue to consume only confirmed active scope-matched standards. The extraction default changes upstream of consumption, not the consumer selection rule.
 - **Standards authority:** `docs/contracts/team-standards.md` becomes stricter about confirmed-first confirmation basis. It does not allow scripts or LLM self-evaluation to promote code-only patterns.
 - **Skill behavior:** `spec-team-standards-governance` extraction modes become more assertive: either prepare confirmed rule patches with confirmation basis, or suppress/report insufficient signals.
-- **Docs:** User-facing docs must explain why code extraction can produce confirmed output only when authority evidence exists.
+- **Docs:** User-facing docs must explain why code extraction can produce confirmed patch preview / source-edit writes only when authority evidence exists.
 - **Runtime:** No generated mirrors are edited by this plan. Runtime projection remains source-generated only.
 - **Testing:** Focused Jest remains deterministic floor. Semantic adequacy of a rule remains LLM/owner/diff review judgment.
 - **Unchanged invariants:** No public `spec-standards` workflow, no automatic code-only confirmation, no provider output as confirmed truth, no full `docs/standards/**` scan as index fallback.
@@ -462,7 +463,7 @@ flowchart TB
 | New reference creates reference sprawl | Prefer extending existing references unless ownership would mix source authority and prompt flow |
 | Existing V2 candidate fixtures conflict with new default | Reclassify them as opt-in fallback or historical pilot cases, not default output |
 | `confirmation_basis` schema expands downstream burden | Start with prose section unless structured consumers need YAML metadata |
-| User docs become misleading by implying automation | Say confirmed output requires source-edit workflow, diff review and focused tests |
+| User docs become misleading by implying automation | Say confirmed patch preview / source-edit writes require confirmation basis, diff review and focused tests |
 | Dirty worktree causes unrelated churn | Scope implementation patches to listed files; do not regenerate runtime catalog or runtime mirrors |
 
 ---
@@ -478,8 +479,8 @@ flowchart TB
 
 ## Documentation / Operational Notes
 
-- Implementation closeout should explicitly state whether `docs/contracts/team-standards.md` gained new canonical enum tokens or only prose semantics.
-- If `confirmation_basis` becomes structured metadata, update rule-card examples and any hygiene/parser assumptions in the same change.
+- Implementation closeout 必须明确 `docs/contracts/team-standards.md` 是新增 canonical enum tokens，还是只新增固定 prose semantics。
+- 如果 `confirmation_basis` 成为 structured metadata，同一变更中更新 rule-card examples 和 hygiene/parser assumptions；否则保持固定 `Confirmation basis:` 小节在 prose 中可测试。
 - Runtime mirrors should remain untouched unless a source-to-runtime projection check is intentionally run through `spec-first init`.
 - The prior plan remains useful as historical rationale for target locking and lenses, but this plan controls the default output posture.
 
