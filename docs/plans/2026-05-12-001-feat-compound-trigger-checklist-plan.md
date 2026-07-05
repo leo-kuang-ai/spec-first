@@ -82,7 +82,7 @@ origin_issue: P2-008
 - `tests/unit/spec-work-beta-contracts.test.js` already asserts the beta shipping completion response contract and must be updated with the same learning-worthy and negative-boundary checks.
 - `skills/spec-code-review/SKILL.md` owns final review output sections, After Review routing, completion reports, and headless/autofix boundaries. This is the right place to add review-side learning-worthy guidance without changing reviewer findings schema.
 - `tests/unit/spec-code-review-contracts.test.js` is the right contract test surface for Review.
-- `skills/spec-compound/SKILL.md` already defines `current host's compound entrypoint` / `current host's compound entrypoint with brief context`, and tests forbid hardcoding only `spec-compound` or `spec-compound` in source prose.
+- `skills/spec-compound/SKILL.md` already defines `current host's compound entrypoint` / `current host's compound entrypoint with brief context`, and tests forbid hardcoding only `spec-compound` in source prose.
 
 ### Institutional Learnings
 
@@ -217,7 +217,7 @@ origin_issue: P2-008
 
 **Approach:**
 - Add positive assertions for the three-tier trigger language and current-host compound entrypoint wording across stable Work, beta Work, and Code Review.
-- Add negative assertions that source prose does not introduce `spec-compound-auto`, `spec-compound-auto`, `spec-first compound-auto`, auto-write `docs/solutions/`, or compound as a mandatory completion gate.
+- Add negative assertions that source prose does not introduce `spec-compound-auto`, `spec-first compound-auto`, auto-write `docs/solutions/`, or compound as a mandatory completion gate.
 - Add a beta parity assertion through `tests/unit/spec-work-beta-contracts.test.js` so beta cannot keep an older shipping contract while stable Work evolves.
 - Prefer focused tests in existing skill contract files over a new test file unless assertions become hard to read.
 

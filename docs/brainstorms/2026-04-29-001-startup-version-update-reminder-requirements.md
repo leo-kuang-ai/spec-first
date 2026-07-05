@@ -18,7 +18,7 @@ spec_id: 2026-04-29-001-startup-version-update-reminder
 
 - A1. 使用者：打开 Claude Code 或 Codex 并使用 spec-first workflow 的人。
 - A2. 宿主启动面：Claude Code 的 SessionStart 或 Codex 的会话指令加载面，负责展示提醒。
-- A3. spec-first update workflow：`spec-update` 或 `spec-update`，负责解释当前宿主的升级路径。
+- A3. spec-first update workflow：`spec-update`，负责解释当前宿主的升级路径。
 
 ---
 

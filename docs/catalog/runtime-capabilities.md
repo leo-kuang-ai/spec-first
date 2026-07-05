@@ -9,7 +9,7 @@
 |---|---|
 | `src/cli/plugin.js` | 构建 plugin manifest、filtered asset set、runtime sync 与 drift 检查的实现真相源 |
 | `src/cli/contracts/dual-host-governance/skills-governance.json` | workflow / standalone / internal skill 的 host delivery 治理真相源 |
-| `templates/claude/commands/spec/*.md` | Unified `spec-*` command source templates |
+| `templates/claude/commands/spec/*.md` | Unified `spec-*` workflow runtime source templates |
 | `skills/*/SKILL.md` | workflow、standalone、agent-facing internal skill source |
 | `agents/**/*.agent.md` | supported-host agent source |
 | `docs/contracts/workflows/*.schema.json` | docs-side workflow artifact contracts；planned contract 不等于 runtime producer 已实现 |
@@ -45,28 +45,30 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 
 ## Public Workflows
 
-| Workflow | Skill | Claude Entry | Codex Entry | Cursor Entry | Kiro Entry | Qoder Entry | Host Delivery | Beta | Description |
-|---|---|---|---|---|---|---|---|---|---|
-| app-consistency-audit | spec-app-consistency-audit | spec-app-consistency-audit | spec-app-consistency-audit | spec-app-consistency-audit | spec-app-consistency-audit | spec-app-consistency-audit | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First App consistency audit workflow |
-| brainstorm | spec-brainstorm | spec-brainstorm | spec-brainstorm | spec-brainstorm | spec-brainstorm | spec-brainstorm | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First brainstorm workflow |
-| code-review | spec-code-review | spec-code-review | spec-code-review | spec-code-review | spec-code-review | spec-code-review | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First code review workflow |
-| compound | spec-compound | spec-compound | spec-compound | spec-compound | spec-compound | spec-compound | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First knowledge capture workflow |
-| compound-refresh | spec-compound-refresh | spec-compound-refresh | spec-compound-refresh | spec-compound-refresh | spec-compound-refresh | spec-compound-refresh | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Refresh stale Spec-First solution docs |
-| debug | spec-debug | spec-debug | spec-debug | spec-debug | spec-debug | spec-debug | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First debug workflow |
-| doc-review | spec-doc-review | spec-doc-review | spec-doc-review | spec-doc-review | spec-doc-review | spec-doc-review | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First document review workflow |
-| ideate | spec-ideate | spec-ideate | spec-ideate | spec-ideate | spec-ideate | spec-ideate | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First ideation workflow |
-| mcp-setup | spec-mcp-setup | spec-mcp-setup | spec-mcp-setup | spec-mcp-setup | spec-mcp-setup | spec-mcp-setup | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
-| optimize | spec-optimize | spec-optimize | spec-optimize | spec-optimize | spec-optimize | spec-optimize | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run metric-driven iterative optimization loops |
-| plan | spec-plan | spec-plan | spec-plan | spec-plan | spec-plan | spec-plan | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First planning workflow |
-| polish-beta | spec-polish-beta | spec-polish-beta | spec-polish-beta | spec-polish-beta | spec-polish-beta | spec-polish-beta | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | yes | [BETA] Start the dev server and iterate on browser-visible polish |
-| prd | spec-prd | spec-prd | spec-prd | spec-prd | spec-prd | spec-prd | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First PRD requirements workflow |
-| release-notes | spec-release-notes | spec-release-notes | spec-release-notes | spec-release-notes | spec-release-notes | spec-release-notes | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Summarize recent spec-first releases or answer release questions |
-| sessions | spec-sessions | spec-sessions | spec-sessions | spec-sessions | spec-sessions | spec-sessions | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Search and summarize prior coding agent sessions |
-| skill-audit | spec-skill-audit | spec-skill-audit | spec-skill-audit | spec-skill-audit | spec-skill-audit | spec-skill-audit | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First skill audit workflow |
-| slack-research | spec-slack-research | spec-slack-research | spec-slack-research | spec-slack-research | spec-slack-research | spec-slack-research | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Search Slack for interpreted organizational context |
-| work | spec-work | spec-work | spec-work | spec-work | spec-work | spec-work | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Run the Spec-First execution workflow |
-| write-skill | spec-write-skill | spec-write-skill | spec-write-skill | spec-write-skill | spec-write-skill | spec-write-skill | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Write, revise, migrate, or remediate spec-first source skills |
-| write-tasks | spec-write-tasks | spec-write-tasks | spec-write-tasks | spec-write-tasks | spec-write-tasks | spec-write-tasks | claude=command; codex=skill; cursor=skill; kiro=skill; qoder=command | no | Public workflow entrypoint (spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
+所有支持宿主的用户可见 workflow 入口都统一写作 `spec-*`。宿主 runtime delivery 只影响生成文件位置，不改变用户启动口径。
+
+| Workflow | Skill | Unified Entry | Beta | Description |
+|---|---|---|---|---|
+| app-consistency-audit | spec-app-consistency-audit | spec-app-consistency-audit | no | Run the Spec-First App consistency audit workflow |
+| brainstorm | spec-brainstorm | spec-brainstorm | no | Run the Spec-First brainstorm workflow |
+| code-review | spec-code-review | spec-code-review | no | Run the Spec-First code review workflow |
+| compound | spec-compound | spec-compound | no | Run the Spec-First knowledge capture workflow |
+| compound-refresh | spec-compound-refresh | spec-compound-refresh | no | Refresh stale Spec-First solution docs |
+| debug | spec-debug | spec-debug | no | Run the Spec-First debug workflow |
+| doc-review | spec-doc-review | spec-doc-review | no | Run the Spec-First document review workflow |
+| ideate | spec-ideate | spec-ideate | no | Run the Spec-First ideation workflow |
+| mcp-setup | spec-mcp-setup | spec-mcp-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
+| optimize | spec-optimize | spec-optimize | no | Run metric-driven iterative optimization loops |
+| plan | spec-plan | spec-plan | no | Run the Spec-First planning workflow |
+| polish-beta | spec-polish-beta | spec-polish-beta | yes | [BETA] Start the dev server and iterate on browser-visible polish |
+| prd | spec-prd | spec-prd | no | Run the Spec-First PRD requirements workflow |
+| release-notes | spec-release-notes | spec-release-notes | no | Summarize recent spec-first releases or answer release questions |
+| sessions | spec-sessions | spec-sessions | no | Search and summarize prior coding agent sessions |
+| skill-audit | spec-skill-audit | spec-skill-audit | no | Run the Spec-First skill audit workflow |
+| slack-research | spec-slack-research | spec-slack-research | no | Search Slack for interpreted organizational context |
+| work | spec-work | spec-work | no | Run the Spec-First execution workflow |
+| write-skill | spec-write-skill | spec-write-skill | no | Write, revise, migrate, or remediate spec-first source skills |
+| write-tasks | spec-write-tasks | spec-write-tasks | no | Public workflow entrypoint (spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
 
 ## Standalone Skills
 
@@ -76,7 +78,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 |---|---|---|---|---|---|---|
 | spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | Use this standalone skill when the user asks to mine a repo's existing coding conventions for future AI coding, generate or refresh project rules in AGENTS.md, create .cursorrules or Copilot/Cursor/Kiro/Qoder/Claude pointer rules from actual code evidence, or make AI-generated code follow a specific project's habits. Do not use for team standards governance, normal code review/debug/refactor work, linter/formatter configuration, generic best practices, or generated runtime mirror edits. |
 | spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | Govern source-backed team development standards: query confirmed rules, audit health, initialize or draft evidence-based candidates, and prepare promotion/deprecation proposals. Do not restore legacy standards workflow entrypoints, skills/spec-standards/, or treat advisory candidates as hard context. |
-| using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | Use before substantial work in a spec-first project, and when users ask what spec-first workflow or command to run next. Decide whether to route into a public spec-first workflow before non-trivial or risky edits, running state-changing commands, debugging, reviewing, planning, setup, update, or architecture/prompt/workflow decisions. |
+| using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | Use before substantial work in a spec-first repo, and when users ask what spec-first workflow or command to run next. Route non-trivial edits, state-changing commands, debugging, review, planning, setup/update, optimization, and architecture/prompt/workflow/contract decisions. Do not use for lightweight factual answers, current-context explanations, narrow lookups, user-supplied single-document summaries, or clearly scoped low-risk small edits. |
 
 ## Internal Skill Governance
 
@@ -91,7 +93,7 @@ Most `internal_only` governance records are source governance entries and are no
 
 | Host | Runtime surface | Generated path |
 |---|---|---|
-| Claude Code | `spec-*` project commands | `.claude/commands/spec-*.md` |
+| Claude Code | `spec-*` workflow runtime files | `.claude/commands/spec-*.md` |
 | Claude Code | standalone and agent-facing internal skills | `.claude/skills/` |
 | Claude Code | workflow skill mirrors for command-backed workflows | `.claude/spec-first/workflows/` |
 | Claude Code | agents | `.claude/agents/` |
@@ -108,7 +110,7 @@ Most `internal_only` governance records are source governance entries and are no
 | Kiro | spec-first managed state | `.kiro/spec-first/` |
 | Kiro | MCP config surface | `.kiro/settings/mcp.json` / `~/.kiro/settings/mcp.json` |
 | Kiro | native specs advisory input | `.kiro/specs/**` (Kiro-owned; not generated by spec-first) |
-| Qoder | `spec-*` project commands | `.qoder/commands/spec-*.md` |
+| Qoder | `spec-*` workflow runtime files | `.qoder/commands/spec-*.md` |
 | Qoder | workflow, standalone, and agent-facing internal skills | `.qoder/skills/` |
 | Qoder | agents | `.qoder/agents/` |
 | Qoder | spec-first managed state | `.qoder/spec-first/` |

@@ -158,7 +158,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 本方案不包含以下目标：
 
 1. 不在本轮为 Codex 设计未经验证的 session-start hook 兼容层。
-2. 不把 `using-spec-first` 做成新的 `spec-using` 或 `spec-using` workflow command。
+2. 不把 `using-spec-first` 做成新的 `spec-using` workflow command。
 3. 不在本轮重构现有 13 个 workflow skill 的正文，只做路由层与激活层设计。
 4. 不把 `lang-policy.js` 直接塞满所有 bootstrap 逻辑，避免语言治理与流程路由耦合。
 5. 不引入第二套 skill 分类矩阵，继续以现有 `skills-governance.json` 为 skill 真源。

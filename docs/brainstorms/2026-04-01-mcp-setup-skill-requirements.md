@@ -15,7 +15,7 @@ topic: mcp-setup-skill
 
 ## Actors
 
-- A1. 使用者：运行 `spec-mcp-setup` 或 `spec-mcp-setup` 配置当前宿主的 MCP 工具链。
+- A1. 使用者：运行 `spec-mcp-setup` 配置当前宿主的 MCP 工具链。
 - A2. `spec-mcp-setup` workflow：读取脚本输出，向使用者解释安装状态、失败原因和下一步。
 - A3. 安装脚本链路：执行确定性检测、host config 写入、Serena bootstrap、验证与 ledger 写入。
 - A4. 下游 workflow：例如 `spec-graph-bootstrap`，消费 readiness ledger 判断 Serena / CRG 等能力是否可用。
@@ -96,7 +96,7 @@ topic: mcp-setup-skill
 
 ## Success Criteria
 
-- 用户重复运行 `spec-mcp-setup` 或 `spec-mcp-setup` 时，要么得到明确 ready，要么得到可以执行的下一步，而不是模糊的失败或误导性成功。
+- 用户重复运行 `spec-mcp-setup` 时，要么得到明确 ready，要么得到可以执行的下一步，而不是模糊的失败或误导性成功。
 - 下游 workflow 能只依赖 readiness ledger 判断 Serena / MCP baseline / CRG 状态，不需要重新猜测宿主配置文件语义。
 - 安装失败不会破坏已有 host config；修复路径可以从结构化结果看出发生了 install、repair、fallback 还是 rollback。
 - 当前需求文档、skill 文案与 reference 不再把 GitNexus、ABCoder、Feishu 或 `install-coordinator.*` 描述为现行 MCP setup 能力。

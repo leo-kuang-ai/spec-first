@@ -981,7 +981,7 @@ function checkCursorProjectMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing project MCP config',
-      fix: 'Run Cursor Agent Skill `spec-mcp-setup` when MCP setup is required.',
+      fix: 'Run `spec-mcp-setup` when MCP setup is required.',
     };
   }
 
@@ -1006,7 +1006,7 @@ function checkCursorProjectMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} project MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found project MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run Cursor Agent Skill `spec-mcp-setup` to configure required MCP servers.',
+    fix: serverCount > 0 ? undefined : 'Run `spec-mcp-setup` to configure required MCP servers.',
   };
 }
 
@@ -1018,7 +1018,7 @@ function checkQoderLocalMcpConfig(projectRoot) {
       level: 'WARNING',
       name: relativePath,
       message: 'missing local MCP config',
-      fix: 'Run Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup` when MCP setup is required.',
+      fix: 'Run `spec-mcp-setup` when MCP setup is required.',
     };
   }
 
@@ -1043,7 +1043,7 @@ function checkQoderLocalMcpConfig(projectRoot) {
     message: serverCount > 0
       ? `found ${serverCount} local MCP server entr${serverCount === 1 ? 'y' : 'ies'}`
       : 'found local MCP config with no mcpServers entries',
-    fix: serverCount > 0 ? undefined : 'Run Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup` to configure required MCP servers.',
+    fix: serverCount > 0 ? undefined : 'Run `spec-mcp-setup` to configure required MCP servers.',
   };
 }
 
@@ -1094,7 +1094,7 @@ function printHelp() {
 	    '🔎 Boundaries:',
 	    '  doctor checks CLI install, managed runtime assets, host readiness, and workflow verification evidence.',
 	    '  When setup facts exist, doctor reads .spec-first/config/tool-facts.json for decision_input_health.',
-	    '  MCP/helper setup is handled by the matching spec-mcp-setup workflow entrypoint: Claude/Qoder project command or Codex/Cursor/Kiro Skill.',
+    '  MCP/helper setup is handled by the matching `spec-mcp-setup` workflow entrypoint.',
 	    '  target name: spec-runtime-setup, pending host alias contract.',
 	    '',
 	    '🔗 Repository:',

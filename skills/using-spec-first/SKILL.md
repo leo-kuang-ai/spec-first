@@ -61,7 +61,7 @@ Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-
 
 Detailed scope-guards rules — If You Are Already In A Workflow, If You Are A Subagent, What Counts as Substantial Work, Lightweight Direct Outcomes, Spec-First Self-Work, Skill Trigger vs Workflow Admission, and Parent Workspace Direct Reads — live in `skills/using-spec-first/references/scope-guards.md`. The runtime-safe anchors below stay in this SKILL so the runtime transform preserves them.
 
-A skill trigger is source/methodology loading; it is not automatically public workflow admission. Public workflow admission happens only when the current intent actually matches a public `spec-*` workflow, or the user explicitly invokes one and the route is safe. Legacy host spellings such as `/spec:work` or `$spec-work` are normalized to the same `spec-work` workflow instead of becoming separate products. Admission authorizes that workflow to run under its own contract; it does not create a plan/task/review artifact inside this governor and does not grant host-level subagent dispatch beyond the dispatch rules below.
+A skill trigger is source/methodology loading; it is not automatically public workflow admission. Public workflow admission happens only when the current intent actually matches a public `spec-*` workflow, or the user explicitly invokes one and the route is safe. Legacy host-specific spellings are accepted as compatibility aliases and normalized to the same unified workflow id instead of becoming separate products. Admission authorizes that workflow to run under its own contract; it does not create a plan/task/review artifact inside this governor and does not grant host-level subagent dispatch beyond the dispatch rules below.
 
 ## Multi-Session Awareness
 
@@ -81,7 +81,7 @@ When routing is needed, state the chosen entrypoint and one concrete reason, the
 
 When no workflow meaningfully applies, say so briefly only if useful, then answer directly or execute normally.
 
-If the user explicitly invokes a workflow (`spec-*`, or a legacy host spelling such as `/spec:*` / `$spec-*`), honor that route unless it is clearly impossible or unsafe. If the user names a standalone skill, use that skill only when its own scope fits; do not convert it into public workflow admission.
+If the user explicitly invokes a workflow with the current `spec-*` form or a legacy host-specific compatibility spelling, honor that route unless it is clearly impossible or unsafe. If the user names a standalone skill, use that skill only when its own scope fits; do not convert it into public workflow admission.
 
 If the user asks only for guidance about the next step, use User Next-Step Guide Mode instead of starting the workflow. If the user directly describes clear work, normal entry routing may announce the chosen workflow and continue under this contract.
 
@@ -113,7 +113,7 @@ Use a decision tree, not a blanket "brainstorm first" rule. Pick the first stron
 
 If the user names a current public workflow, honor that explicit route unless it is clearly impossible or unsafe.
 
-If the user names a legacy host-specific spelling, translate it to the unified `spec-*` entrypoint and state the normalization when useful. For example, `/spec:work`, `$spec-work`, and `spec-work` all refer to `spec-work`.
+If the user names a legacy host-specific spelling, translate it to the unified `spec-*` entrypoint and state the normalization only when useful. Current user-facing guidance should present the unified `spec-*` entrypoint.
 
 If the user names a standalone skill rather than a public workflow, invoke that skill only when its scope fits. Do not invent a `spec-*` command for standalone skills such as `using-spec-first`.
 
@@ -190,8 +190,7 @@ For multi-persona/research phases, `spec-doc-review` normalization, report-only 
 ### Host Surface
 
 - Public workflow identifiers use the unified `spec-*` form across hosts.
-- Claude and Qoder project commands are generated as `spec-*.md` command files.
-- Codex, Cursor, and Kiro expose the same names as generated Skills where supported by the host.
+- Host runtime delivery is an internal projection detail; the user-facing workflow name remains the same `spec-*` entrypoint.
 - In Codex, `spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization; otherwise it follows the documented fallback.
 - `using-spec-first` itself is a standalone meta skill, not a `spec-*` workflow entrypoint.
 - Internal-only skills remain source/runtime support assets, not menu items. Do not recommend them as public workflow paths.
@@ -217,7 +216,7 @@ If this guidance has already been injected through `CLAUDE.md`, `AGENTS.md`, or 
 
 ## Hard Rules
 
-The Hard Rules (workflow-first ≠ brainstorming-first; no default `spec-brainstorm`; no `using-superpowers` 1% rule; no turning lightweight requests into workflow traffic; no describing `using-spec-first` as a command-backed workflow; no restoring legacy `/spec:*` or `$spec-*` as product surfaces; no exposing internal-only skills such as `git-worktree`; no routing to hidden helper skills; no state-changing commands just because this governor matched) live in `skills/using-spec-first/references/routing-red-flags.md`.
+The Hard Rules (workflow-first ≠ brainstorming-first; no default `spec-brainstorm`; no `using-superpowers` 1% rule; no turning lightweight requests into workflow traffic; no describing `using-spec-first` as a command-backed workflow; no restoring legacy host-specific spellings as product surfaces; no exposing internal-only skills such as `git-worktree`; no routing to hidden helper skills; no state-changing commands just because this governor matched) live in `skills/using-spec-first/references/routing-red-flags.md`.
 
 ## Routing Red Flags
 

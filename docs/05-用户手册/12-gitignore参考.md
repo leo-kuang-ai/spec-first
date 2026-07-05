@@ -90,7 +90,7 @@ graphify-out/
   .gitignore                        # 建议提交
 
   .claude/
-    commands/spec-*.md              # spec-* project command runtime，忽略
+    commands/spec-*.md              # spec-* workflow runtime mirror，忽略
     commands/spec/                  # legacy command namespace，init/clean 会清理
     skills/                         # generated runtime，忽略
     spec-first/                     # runtime state/profile，忽略
@@ -110,21 +110,21 @@ graphify-out/
     skills/                         # Codex skill runtime mirror，忽略
 
   .cursor/
-    skills/                         # Cursor Agent Skill runtime mirror，忽略
+    skills/                         # Cursor workflow runtime mirror，忽略
     spec-first/                     # spec-first state/profile，忽略
     mcp.json                        # Cursor project MCP config，忽略；clean 保留整文件
     rules/                          # Cursor-native rules，是否提交按团队策略
     agents/                         # Cursor-native/user agents，是否提交按团队策略
 
   .kiro/
-    skills/                         # Kiro Agent Skill runtime mirror，忽略
+    skills/                         # Kiro workflow runtime mirror，忽略
     agents/                         # Kiro custom subagent runtime mirror，忽略
     spec-first/                     # spec-first state/profile，忽略
     settings/                       # spec-first MCP workspace config，忽略
     specs/                          # Kiro-native specs，是否提交按团队策略
 
   .qoder/
-    commands/spec-*.md              # Qoder spec-* project command runtime mirror，忽略
+    commands/spec-*.md              # Qoder spec-* workflow runtime file mirror，忽略
     commands/spec/                  # legacy command namespace，init/clean 会清理
     skills/                         # Qoder project skill runtime mirror，忽略
     agents/                         # Qoder subagent runtime mirror，忽略

@@ -13,8 +13,8 @@
 
 核心边界：**scripts prepare facts, LLM decides**——脚本只产确定性 readiness facts，不做代码语义理解；setup 不得在 ordinary work 前强制要求任何外部分析服务。
 
-- 入口 canonical 名：`spec-runtime-setup`（`spec-runtime-setup` / `spec-runtime-setup`）
-- 当前运行名（迁移期 alias）：`spec-mcp-setup`（`spec-mcp-setup` / `spec-mcp-setup`）
+- 入口 canonical 名：`spec-runtime-setup`
+- 当前运行名（迁移期 alias）：`spec-mcp-setup`
 - source 目录：`skills/spec-mcp-setup/`（重命名是后续独立 work 任务）
 
 ---

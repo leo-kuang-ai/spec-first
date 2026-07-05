@@ -74,7 +74,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 
 **Source and runtime boundary**
 - R9. `skills/using-spec-first/SKILL.md` 必须继续作为唯一 routing policy source of truth；不得新增第二套完整路由表。
-- R10. 本阶段不新增 `spec-next`、`spec-next`、`spec-guide` 或 `spec-guide` 公开入口；如未来新增，只能作为读取/引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
+- R10. 本阶段不新增 `spec-next`、`spec-guide` 公开入口；如未来新增，只能作为读取/引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
 - R11. 不得手改 `.claude/`、`.codex/` 或 `.agents/skills/` runtime mirrors；需要 runtime 刷新时由 `spec-first init --claude|--codex` 生成。
 
 **Managed instruction block interaction**
@@ -114,7 +114,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 
 ## Scope Boundaries
 
-- 不新增公开 `spec-next`、`spec-next`、`spec-guide` 或 `spec-guide`。
+- 不新增公开 `spec-next`、`spec-guide`。
 - 不实现新的 CLI 命令、状态机、router script 或 machine-readable routing engine。
 - 不让脚本替 LLM 做语义路由判断；脚本只可在未来提供 deterministic facts。
 - 不复制 `using-superpowers` 的 1% 必用规则。

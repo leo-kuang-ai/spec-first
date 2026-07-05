@@ -56,7 +56,7 @@ Host Readiness Gate
 
 ```mermaid
 flowchart TD
-  A["入口触发<br/>spec-graph-bootstrap 或 spec-graph-bootstrap"] --> B["Step 1<br/>识别 target repo / slug"]
+  A["入口触发<br/>spec-graph-bootstrap"] --> B["Step 1<br/>识别 target repo / slug"]
   B --> C["Step 2<br/>Host Readiness Gate"]
   C -->|未通过| X["阻断并提示用户先完成宿主准备"]
   C -->|通过| D["Step 3<br/>建立控制面与 backup"]

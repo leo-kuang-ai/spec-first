@@ -430,7 +430,7 @@ describe('claude settings', () => {
         '',
         '- 本 block 是 using-spec-first 的核心决策集；完整路由策略在 `skills/using-spec-first/SKILL.md`',
         '- substantial work 前先判断是否进入公开 spec-first workflow；轻量问答和窄事实查询可直接回答；已在 workflow 或 bounded subagent 中时不重新分流',
-        '- Claude workflow 入口使用 `spec-*` project commands',
+        '- Workflow 入口统一使用同名 `spec-*`',
         '- 不要把 `using-spec-first` 本身当作 command-backed workflow',
         '<!-- spec-first:bootstrap:end -->',
         '',
@@ -482,7 +482,7 @@ describe('claude settings', () => {
         '<!-- spec-first:bootstrap:start -->',
         '## Workflow 入口治理',
         '',
-        '- Claude workflow 入口使用 `spec-*` project commands',
+        '- Workflow 入口统一使用同名 `spec-*`',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
@@ -639,7 +639,7 @@ describe('claude settings', () => {
     try {
       fs.writeFileSync(path.join(projectRoot, 'CLAUDE.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Claude workflow entrypoints use `spec-*` project commands.',
+        '- Workflow entrypoints use the same `spec-*` names.',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');

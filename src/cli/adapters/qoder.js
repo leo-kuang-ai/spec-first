@@ -10,14 +10,21 @@ const QODER_AGENT_WEB_TOOLS = ['WebFetch', 'WebSearch'];
 const QODER_UNREWRITTEN_PATH_PATTERNS = [
   /\.claude\/commands\/spec\/[a-z-]+\.md/,
   /\.claude\/commands\/spec-[a-z-]+\.md/,
+  /\.claude\/commands\/spec-\*\.md/,
   /\.claude\/spec-first\/workflows\//,
   /\.claude\/skills\//,
   /\.claude\/agents\//,
   /\.codex\/commands\/spec\/[a-z-]+\.md/,
+  /\.codex\/commands\/spec-\*\.md/,
   /\.codex\/skills\//,
   /\.codex\/agents\//,
   /\.agents\/skills\//,
+  /\.cursor\/skills\//,
+  /\.cursor\/spec-first\//,
+  /\.cursor\/mcp\.json/,
+  /\.cursor\/agents\//,
   /\.kiro\/commands\/spec\/[a-z-]+\.md/,
+  /\.kiro\/commands\/spec-\*\.md/,
   /\.kiro\/skills\//,
   /\.kiro\/agents\//,
   /\.kiro\/spec-first\//,
@@ -191,12 +198,23 @@ function rewriteSharedPaths(content) {
     .replace(/\.claude\/commands\/spec-([a-z-]+)\.md/g, (_match, commandName) => {
       return `.qoder/commands/spec-${commandName}.md`;
     })
+    .replace(/\.claude\/commands\/spec-\*\.md/g, '.qoder/commands/spec-*.md')
     .replace(/\.codex\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
       return `.qoder/commands/spec-${commandName}.md`;
     })
+    .replace(/\.codex\/commands\/spec-\*\.md/g, '.qoder/commands/spec-*.md')
+    .replace(/\.cursor\/skills\/spec-([a-z-]+)\/SKILL\.md/g, (_match, commandName) => {
+      return `.qoder/commands/spec-${commandName}.md`;
+    })
+    .replace(/\.cursor\/skills\/\*\*/g, '.qoder/commands/spec-*.md')
+    .replace(/\.cursor\/skills\//g, '.qoder/skills/')
+    .replace(/\.cursor\/spec-first\//g, '.qoder/spec-first/')
+    .replace(/\.cursor\/mcp\.json/g, '.qoder/settings.local.json')
     .replace(/\.kiro\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
       return `.qoder/commands/spec-${commandName}.md`;
     })
+    .replace(/\.kiro\/commands\/spec-\*\.md/g, '.qoder/commands/spec-*.md')
+    .replace(/\.kiro\/commands\/spec\/\*\*/g, '.qoder/commands/spec-*.md')
     .replace(/\.claude\/spec-first\/workflows\//g, '.qoder/skills/')
     .replace(/\.claude\/skills\//g, '.qoder/skills/')
     .replace(/\.codex\/skills\//g, '.qoder/skills/')
@@ -204,6 +222,7 @@ function rewriteSharedPaths(content) {
     .replace(/\.kiro\/skills\//g, '.qoder/skills/')
     .replace(/\.claude\/agents\//g, '.qoder/agents/')
     .replace(/\.codex\/agents\//g, '.qoder/agents/')
+    .replace(/\.cursor\/agents\//g, '.qoder/agents/')
     .replace(/\.kiro\/agents\//g, '.qoder/agents/')
     .replace(/\.kiro\/spec-first\//g, '.qoder/spec-first/')
     .replace(/\$HOME\/\.kiro\/settings\/mcp\.json/g, '$HOME/.qoder/settings.json')
@@ -213,12 +232,48 @@ function rewriteSharedPaths(content) {
     .replace(/spec-first managed \.kiro\/settings\//g, 'Qoder local .qoder/settings.local.json')
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --qoder')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --qoder')
-    .replace(/\$spec-\*/g, 'Qoder project commands or Skills')
-    .replace(/\$spec-mcp-setup/g, 'Qoder `spec-mcp-setup` entrypoint')
-    .replace(/Kiro Agent Skills/g, 'Qoder project commands or Skills')
-    .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Qoder `spec-mcp-setup` entrypoint');
+    .replace(/\$spec-\*/g, '`spec-*`')
+    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/Kiro Agent\s+Skills/g, '`spec-*`')
+    .replace(/Kiro Agent\s+Skill `spec-mcp-setup`/g, '`spec-mcp-setup`');
 
-  return rewritten;
+  return rewriteQoderRuntimeContextSections(rewriteUsingSpecFirstQoderSections(rewritten));
+}
+
+function rewriteUsingSpecFirstQoderSections(content) {
+  return content
+    .replace(
+      /- Claude Code installs it as `\.qoder\/skills\/using-spec-first\/SKILL\.md`[\s\S]*?\n- Codex installs it as `\.qoder\/skills\/using-spec-first\/SKILL\.md`.*?\n/,
+      '- Qoder installs it as `.qoder/skills/using-spec-first/SKILL.md` and also reads the managed block in `AGENTS.md`; its generated runtime exposes the same `spec-*` workflow names as the user entrypoint surface.\n',
+    )
+    .replace(
+      /Runtime copies under .*? are generated mirrors\. Repair stale or missing runtime guidance with `spec-first init` after choosing the target host; do not hand-edit generated mirrors as the source of truth\. Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` remain advisory input only when explicitly named\./,
+      'Runtime copies under `.qoder/commands/spec-*.md`, `.qoder/commands/spec/` (retired legacy namespace), `.qoder/skills/`, `.qoder/agents/`, `.qoder/spec-first/`, and `.qoder/settings.local.json` are generated runtime or host-local config outputs for this host. Repair stale or missing runtime guidance with `spec-first init --qoder`, and do not hand-edit generated mirrors as the source of truth. Qoder-native `.qoder/rules/**` remain advisory input only when explicitly named.',
+    )
+    .replace(
+      /Ordinary context routing follows `docs\/contracts\/context-governance\.md`: `\.spec-first\/audits\/\*\*`, `\.spec-first\/governance\/\*\*`, and generated mirrors \(.*?\) are excluded from default workflow context\. Route to setup\/update\/runtime-drift\/audit\/governance-health workflows, or require a precise user-named path, before treating those directories as evidence\. Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` remain advisory input only when explicitly named\./,
+      'Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`) are excluded from default workflow context. Route to setup/update/runtime-drift/audit/governance-health workflows, or require a precise user-named path, before treating those directories as evidence. Qoder-native `.qoder/rules/**` remain advisory input only when explicitly named.',
+    );
+}
+
+function rewriteQoderRuntimeContextSections(content) {
+  return content
+    .replace(
+      /generated mirrors \([^)\n]*\)/g,
+      'generated mirrors (`.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`)',
+    )
+    .replace(
+      /generated mirrors（[^）\n]*）/g,
+      'generated mirrors（`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json`）',
+    )
+    .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` (?:remain|are) advisory input only when explicitly named\./g,
+      'Qoder-native `.qoder/rules/**` remains advisory input only when explicitly named.',
+    )
+    .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`、Kiro-native `\.kiro\/specs\/\*\*` 与 Qoder-native `\.qoder\/rules\/\*\*` 只有显式点名时作为 advisory input。/g,
+      'Qoder-native `.qoder/rules/**` 只有显式点名时作为 advisory input。',
+    );
 }
 
 function isQoderRuntimeSetupSurface(context = {}) {
@@ -235,7 +290,7 @@ function addQoderSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Qoder Host Pin',
     '',
-    'When this generated Qoder command or Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=qoder` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, and Qoder CLIs can coexist on the same machine.',
+    'When this generated Qoder `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=qoder` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, and Qoder CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',
@@ -362,7 +417,7 @@ function inspectQoderCommandFiles(projectRoot, commandRoot) {
           level: 'WARNING',
           name: relativePath,
           message: issues.join('; '),
-          fix: formatInitGuidance('qoder', 'in this project to regenerate Qoder command runtime assets'),
+          fix: formatInitGuidance('qoder', 'in this project to regenerate Qoder spec-* runtime assets'),
         }];
     });
 }

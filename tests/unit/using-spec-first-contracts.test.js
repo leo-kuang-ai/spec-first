@@ -155,7 +155,7 @@ describe('using-spec-first contracts', () => {
       'explicit `target_repo` / per-child scope',
       'Explicit Route Normalization',
       'If the user names a legacy host-specific spelling, translate it to the unified `spec-*` entrypoint',
-      '/spec:work`, `$spec-work`, and `spec-work` all refer to `spec-work`',
+      'Current user-facing guidance should present the unified `spec-*` entrypoint',
       'Do not invent a `spec-*` command for standalone skills',
       'Workflow Dispatch Admission',
       'Routing into a public workflow authorizes that workflow to run.',
@@ -181,11 +181,10 @@ describe('using-spec-first contracts', () => {
       'It does **not** exist to force every task through brainstorming.',
       'Do **not** make `spec-brainstorm` the universal default front door.',
       'Do **not** adopt the `using-superpowers` rule',
-      'Do **not** restore `/spec:*` or `$spec-*` as current product surfaces',
+      'Do **not** restore legacy host-specific spellings as current product surfaces',
       'Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.',
       'Public workflow identifiers use the unified `spec-*` form across hosts.',
-      'Claude and Qoder project commands are generated as `spec-*.md` command files.',
-      'Codex, Cursor, and Kiro expose the same names as generated Skills where supported by the host.',
+      'Host runtime delivery is an internal projection detail; the user-facing workflow name remains the same `spec-*` entrypoint.',
       'spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization',
       'Codex Startup Reminder Boundary',
       'not a verified deterministic SessionStart hook',
@@ -437,7 +436,7 @@ describe('using-spec-first contracts', () => {
     // Hard Rules 完整断言串必须在 routing-red-flags.md(SKILL 主面仅留概述指针)
     expect(routingRedFlags).toContain('Do **not** make `spec-brainstorm` the universal default front door.');
     expect(routingRedFlags).toContain('Do **not** adopt the `using-superpowers` rule');
-    expect(routingRedFlags).toContain('Do **not** restore `/spec:*` or `$spec-*` as current product surfaces');
+    expect(routingRedFlags).toContain('Do **not** restore legacy host-specific spellings as current product surfaces');
     expect(routingRedFlags).toContain('Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.');
     expect(routingRedFlags).toContain('Do **not** expose internal-only skills as user entrypoints.');
     expect(routingRedFlags).toContain('`git-worktree`');

@@ -41,7 +41,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 
 **Source and runtime boundary**
 - R9. `skills/using-spec-first/SKILL.md` 继续作为唯一 routing policy source of truth。
-- R10. 本阶段不新增 `spec-next`、`spec-next`、`spec-guide` 或 `spec-guide`。
+- R10. 本阶段不新增 `spec-next`、`spec-guide`。
 - R11. 不修改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors。
 
 **User experience**
@@ -85,7 +85,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 
 ### Deferred to Follow-Up Work
 
-- 未来如果新增 `spec-next` 或 `spec-next`，只能作为读取或引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
+- 未来如果新增 `spec-next`，只能作为读取或引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
 - 未来如果要做确定性 routing script 或 telemetry recommender，需要单独设计；本阶段仍由 LLM 做语义路由判断。
 
 ---

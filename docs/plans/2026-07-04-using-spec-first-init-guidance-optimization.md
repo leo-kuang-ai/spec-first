@@ -203,7 +203,7 @@ Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 w
 | ⑩ | Runtime-context 排除 | **keep 读排除语义 / sink 长路径列表** | 「默认不读 generated mirror」必留（否则整轮扫 mirror，反增 per-session 上下文，违背压缩目标）；具体路径长列表可下沉到 context-governance |
 | ⑪ | 角色契约读取指针 | **keep（短指针）** | 架构/prompt/workflow/contract/source-runtime 判断前读取角色契约是仓库强制基线；若下沉到 SKILL，未触发 skill 的轻量误判轮会绕过它 |
 | ⑫ | 反合理化红旗 | **keep（语义）** | 作用是在 SKILL 加载前阻止 agent 合理化掉路由；下沉即自毁（product-lens 强调） |
-| ⑬ | host 入口 / delivery 行 | **keep** | 当前产品入口统一 `spec-*`，但不同 host 的 delivery surface 不同（Claude/Qoder project commands，Codex/Cursor generated Skills）；legacy `spec-*` / `spec-*` 仅在 SKILL 中做归一化说明 |
+| ⑬ | host 入口 / delivery 行 | **keep** | 当前产品入口统一 `spec-*`；不同 host 的 runtime delivery surface 是内部投射细节，不再作为用户入口差异呈现；legacy spellings 仅在 SKILL 中做兼容归一化说明 |
 | ⑭ | surface / internal-only 行 | **keep** | 防暴露 internal-only skill（如 `git-worktree`） |
 
 净结果：真正可安全 sink 的是 ⑥（入口枚举→指针）和 ⑩ 的长路径列表；⑪ 默认保留短指针，除非 Step 0 L0-only no-route case 证明下沉不会绕过角色契约。**候选 L0 keep 集约 11 条，待 Step 0 baseline 验证**，不是 4 条。方案的核心洞察（把入口枚举与长路径列表移出常驻块）仍成立，只是「4 条」这个数字是错的。

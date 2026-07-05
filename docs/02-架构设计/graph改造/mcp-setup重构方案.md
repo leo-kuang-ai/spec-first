@@ -256,7 +256,7 @@ Graph providers are configured but not query-ready yet.
 
 Next:
 1. Restart Claude Code / Codex if needed.
-2. Run spec-graph-bootstrap or spec-graph-bootstrap.
+2. Run spec-graph-bootstrap.
 ```
 
 注意这句必须保留：
@@ -2484,7 +2484,7 @@ spec-mcp-setup
 21. graph_bootstrap_required=true
 22. git repo 内生成 .spec-first/config/graph-providers.json
 23. 非 git repo 不写 provider config，但 host setup 可成功
-24. 最后提示用户运行 spec-graph-bootstrap 或 spec-graph-bootstrap
+24. 最后提示用户运行 spec-graph-bootstrap
 ```
 
 ---

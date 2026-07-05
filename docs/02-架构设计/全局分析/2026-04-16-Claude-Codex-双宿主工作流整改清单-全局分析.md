@@ -421,7 +421,7 @@ README 也仍然在传播这个错误产品面：
 
 1. Codex 到底应该用 `spec-*` 还是 `spec-*`
 2. standalone skill 到底是显式命令还是宿主内 skill 调用
-3. `spec-graph-bootstrap` 与 `spec-graph-bootstrap` 的边界是什么
+3. `spec-graph-bootstrap` 的边界是什么
 4. Stage-0 是“自动注入”还是“按降级策略预载”
 5. 哪些能力是宿主维护能力，哪些是通用 skill
 

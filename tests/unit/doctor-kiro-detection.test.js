@@ -137,4 +137,27 @@ describe('doctor Kiro auto-detection', () => {
     expect(checks.find((check) => check.name === '.kiro/agents/bad.agent.md').message)
       .toContain('leaks Claude/Codex tool names');
   });
+
+  test('reports literal wildcard command mirrors that were not rewritten for Kiro runtime', () => {
+    fs.mkdirSync(path.join(tmp, '.kiro', 'skills', 'spec-work'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, '.kiro', 'skills', 'spec-work', 'SKILL.md'), [
+      '---',
+      'name: spec-work',
+      'description: Work fixture',
+      '---',
+      '',
+      'Runtime denylist: .claude/commands/spec-*.md',
+      'Runtime denylist: .qoder/commands/spec-*.md',
+      '',
+    ].join('\n'));
+
+    const result = captureDoctor(tmp, ['--kiro', '--json']);
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    const check = payload.platform_checks.kiro.find((entry) =>
+      entry.name === '.kiro/skills/spec-work/SKILL.md'
+    );
+    expect(check.message).toContain('contains non-Kiro runtime path references');
+  });
 });

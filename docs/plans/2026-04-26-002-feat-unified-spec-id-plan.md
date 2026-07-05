@@ -60,7 +60,7 @@ origin: 当前对话，围绕“需求文档、技术方案 plan、开发任务 
 
 ## Scope Boundaries
 
-- 不新增 `spec-write-tasks` 或 `spec-write-tasks`；`spec-write-tasks` 继续是 standalone skill。
+- 不新增 `spec-write-tasks`；`spec-write-tasks` 继续是 standalone skill。
 - 不让 `spec-plan` 自动决定或自动调用 `spec-write-tasks`；plan 结束后仍通过 handoff menu 暴露选择。
 - 不让 `spec-work` 自动生成 task pack；它只消费 plan 或已验证 task pack。
 - 不引入 `.spec-first/specs/registry.json`、数据库表、全局 sequence allocator 或 artifact 状态机。
@@ -407,7 +407,7 @@ source_sections:
 **Test scenarios:**
 - Happy path: generated Codex runtime skill preserves task pack `spec_id` validation wording.
 - Happy path: governance tests still identify `spec-write-tasks` as standalone, not command-backed.
-- Edge case: no new `spec-write-tasks` or `spec-write-tasks` command appears in runtime manifests.
+- Edge case: no new `spec-write-tasks` command appears in runtime manifests.
 - Edge case: `src/cli/plugin.js` high-value anchors and smoke tests remain unchanged when unit runtime sync already proves the contract reaches generated assets.
 
 **Verification:**

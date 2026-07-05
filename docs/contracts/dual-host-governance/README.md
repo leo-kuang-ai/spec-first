@@ -12,12 +12,13 @@
 ### 1.1 用户可见入口
 
 1. 所有 supported hosts 的用户可见 workflow 标识统一为 `spec-*`
-2. Claude 用户通过 project command `spec-*` 入口使用 workflow，由 `.claude/commands/spec-*.md` 投影
-3. Codex 用户通过 `.agents/skills/spec-*` 下的 Skill 入口使用同名 workflow
-4. Kiro 用户通过 Kiro Agent Skill `spec-*` 入口使用 workflow，由 `.kiro/skills/spec-*/SKILL.md` 投影；P0 不生成 Kiro command layer，也不占用 Kiro native Specs namespace
-5. Qoder 用户通过 project command `spec-*` 入口使用 workflow，由 `.qoder/commands/spec-*.md` 投影；同时生成 `.qoder/skills/spec-*` 作为 project skill mirror 供 Qoder skill surface 使用
-6. standalone skill 只能按 skill 方式表述，不得写成已声明 workflow command
-7. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
+2. 宿主 runtime delivery 是内部投射细节，不改变用户侧 `spec-*` workflow 名称
+3. Claude 内部投射 `.claude/commands/spec-*.md` 和 `.claude/spec-first/workflows/`
+4. Codex 内部投射 `.agents/skills/spec-*`
+5. Kiro 内部投射 `.kiro/skills/spec-*/SKILL.md`；P0 不生成 Kiro command layer，也不占用 Kiro native Specs namespace
+6. Qoder 内部投射 `.qoder/commands/spec-*.md`，并同步 `.qoder/skills/spec-*` workflow skill mirror
+7. standalone skill 只能按 skill 方式表述，不得写成已声明 workflow command
+8. `Skill(...)`、`skill:`、其他内部调用 DSL 明确排除在“用户可见入口治理”之外
 
 ### 1.2 Codex compatibility layer 决策
 
@@ -118,13 +119,13 @@
    - workflow 通过 `.kiro/skills/spec-*` 发现与调用
 4. Qoder
    - `host_delivery.qoder = command`
-   - 生成 `.qoder/commands/spec-*.md` project commands
+   - 生成 `.qoder/commands/spec-*.md` workflow runtime files
    - 同步 `.qoder/skills/spec-*` workflow skill mirrors
 
 这意味着：
 
 1. `workflow_command` 是源层事实
-2. Codex 和 Kiro 侧不再因为这个源层事实而额外生成 command 文件；Qoder 因宿主原生支持 project commands 而生成 command layer
+2. Codex 和 Kiro 侧不再因为这个源层事实而额外生成 command 文件；Qoder 因宿主原生支持命令文件 runtime 而生成 command layer
 
 ### 2.5 Agent 模型选择 Contract
 
@@ -258,8 +259,8 @@ machine-readable 真源文件固定落位：
 1. 不得只改 `SKILL.md` 文案而不更新 `skills-governance.json`
 2. 不得只改 command template frontmatter 或生成后的 manifest command set，而不更新 `entry_surface=workflow_command` 记录
 3. 不得把 standalone skill 写成已声明 slash command
-4. 不得把 Codex 用户入口写成 `**Codex entry point:** /spec:*` 或 `$spec-*`
-5. 不得把 Kiro 用户入口写成 `/spec:*` 或 `$spec-*`；P0 口径是 Kiro Agent Skill `spec-*`
+4. 不得把 Codex 用户入口写成 host-specific legacy spelling；用户口径统一为同名 `spec-*` workflow
+5. 不得把 Kiro 用户入口写成 host-specific legacy spelling；用户口径是同名 `spec-*` workflow，Kiro 内部投射到 `.kiro/skills/spec-*`
 6. `Skill(...)`、`skill:`、以及其他内部调用 DSL 明确不属于“用户可见入口治理”范围
 7. `docs/10-prompt/skills/` 不再是 active contract surface、runtime mirror 或 skill source；新增或修改 skill 不得要求随 `skills/` source 改动同步更新或重新创建该目录，避免把 `skills/` 与 `docs/10-prompt/skills/` 重新变成双真相源
 8. 新增 lint / doctor / smoke 规则时，应优先引用 `skills-governance.json`，而不是重复手写 skill 名单

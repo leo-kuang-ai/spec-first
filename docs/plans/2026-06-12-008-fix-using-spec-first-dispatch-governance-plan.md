@@ -43,7 +43,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 - R1. Establish one current dispatch authorization contract for `using-spec-first`, bootstrap blocks, and dispatch-bearing review workflows.
 - R2. Remove bootstrap wording that implies direct public `spec-*` invocation alone authorizes Codex `spawn_agent`.
 - R3. Preserve the distinction between workflow admission and host-level dispatch authorization for the confirmed drift surfaces: `spec-doc-review`, `spec-code-review`, and the `using-spec-first` prose that mentions dispatch-bearing workflows such as `spec-plan`/`spec-ideate`. This plan should not claim broad cross-skill routing-eval coverage beyond the fixtures it actually adds.
-- R4. Route skill/agent asset audit requests to `spec-skill-audit` or `spec-skill-audit`, not only to code/doc review.
+- R4. Route skill/agent asset audit requests to `spec-skill-audit`, not only to code/doc review.
 - R5. Add machine-judgable routing/dispatch eval fixtures so tests can catch future drift, while keeping examples usable as context for prompt evaluation.
 - R6. Keep the source/runtime boundary intact: update source files and generator-managed checked-in blocks; do not hand-edit generated mirrors under `.claude/`, `.codex/`, or `.agents/skills/`.
 - R7. Update `CHANGELOG.md` and any stale durable learning or docs that would otherwise teach the old dispatch contract.
@@ -79,7 +79,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 ## Completion Criteria
 
 - `skills/using-spec-first/SKILL.md`, `src/cli/instruction-bootstrap.js`, `AGENTS.md`, and `CLAUDE.md` no longer conflict on Codex dispatch authorization.
-- `using-spec-first` self-work routing names `spec-skill-audit` / `spec-skill-audit` for skill and agent asset audits.
+- `using-spec-first` self-work routing names `spec-skill-audit` for skill and agent asset audits.
 - Focused tests fail on the old bootstrap dispatch wording and pass on the new contract.
 - Routing fixtures can express expected entrypoint, dispatch decision, and fallback reason for the Codex-surface dispatch cases this plan owns. `host` and `mode` stay deferred as schema fields, so Codex scope must be explicit in case ids, names, and boundary notes rather than implied by host-neutral metadata.
 - The no-authorization fallback path includes user-facing opt-in guidance for multi-persona/subagent review, not only `dispatch_authorization_missing`.
@@ -142,7 +142,7 @@ This is a workflow governance fix, not a review workflow redesign. The implement
 - KTD1. **Canonical dispatch contract:** Public workflow entry authorizes the workflow. It does not automatically authorize host-level `spawn_agent` in Codex.
 - KTD2. **Bootstrap is a projection, not an override:** `src/cli/instruction-bootstrap.js` and checked-in managed blocks should summarize the full skill; they must not create a separate Codex dispatch policy.
 - KTD3. **Fallback is part of normal workflow behavior:** When dispatch authorization is absent, dispatch-bearing workflows should use documented report-only or inline fallback, record concrete reason codes such as `dispatch_authorization_missing`, and tell Codex users the shortest opt-in wording needed when they do want multi-persona/subagent review.
-- KTD4. **Skill/agent asset audits route to skill-audit:** Review-only self-work over skill or agent assets should route to `spec-skill-audit` / `spec-skill-audit`, while diffs/PRs still route to code review and markdown plans/requirements still route to doc review.
+- KTD4. **Skill/agent asset audits route to skill-audit:** Review-only self-work over skill or agent assets should route to `spec-skill-audit`, while diffs/PRs still route to code review and markdown plans/requirements still route to doc review.
 - KTD5. **Examples become fixtures:** Keep examples readable for prompt context, but add enough structured fields for unit tests to assert expected entrypoints, dispatch decisions, and fallback reasons. `host` and `mode` are intentionally out of scope for this fixture slice; Codex scope for dispatch cases is carried by case id/name/boundary note, not by a new schema axis.
 - KTD6. **Stale learning must be neutralized in place:** Update the old dispatch-boundary learning with an explicit supersession section (citing commit `fc3d43c1` / 2026-05-24) and rewrite or retire any normative stale guidance outside that section. Do not rely on a separate replacement doc while leaving the old file readable as current advice.
 - KTD7. **Parent-context remains a prose exception until hardened:** This plan keeps the current "already authorized parent context" exception, but only as a visible-provenance rule: if the parent cannot point to explicit user dispatch wording or an equivalent documented handoff signal, fallback applies. Machine-readable parent/headless authorization is deferred.

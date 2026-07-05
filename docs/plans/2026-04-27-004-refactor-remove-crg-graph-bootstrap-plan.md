@@ -35,7 +35,7 @@ LLM = 语义判断、范围选择、review finding 与取舍决策
 当前 CRG 已经从一个内部 graph helper 扩散成跨仓库核心基础设施：
 
 - `bin/spec-first.js` 对 `crg` 做特殊分支并延迟加载 `src/crg/cli/router`。
-- `src/cli/index.js` help 与 version onboarding 仍公开 `spec-first crg`、`spec-graph-bootstrap`、`spec-graph-bootstrap`。
+- `src/cli/index.js` help 与 version onboarding 仍公开 `spec-first crg`、`spec-graph-bootstrap`。
 - `src/cli/commands/doctor.js` 通过 CRG 检查 CLI、`better-sqlite3`、`tree-sitter` 和 graph contract。
 - `scripts/run-ai-dev-quality-gate.js` 与 `.github/workflows/ai-dev-quality-gate.yml` 把 CRG runtime contracts 当作 AI Dev Gate 的核心。
 - `skills/spec-plan`、`spec-work`、`spec-work-beta`、`spec-code-review`、`spec-write-tasks` 把 CRG hook 当作上下文入口。
@@ -379,7 +379,7 @@ Implementation notes:
 Test scenarios:
 
 - `spec-first --help` does not contain `crg <subcommand>`.
-- `spec-first --version` does not suggest `spec-graph-bootstrap` or `spec-graph-bootstrap`.
+- `spec-first --version` does not suggest `spec-graph-bootstrap`.
 - `spec-first crg --help` exits non-zero through normal CLI path; the test should not bind to exact wording.
 - Unknown command output matches `/unknown command|unknown|unsupported|invalid/i`.
 - Unknown command output does not contain `src/crg` or `crg <subcommand>`.
@@ -389,7 +389,7 @@ Test scenarios:
 
 ### U3. Remove graph-bootstrap Workflow From Source Runtime Governance
 
-Goal: source-of-truth no longer installs `spec-graph-bootstrap` or `spec-graph-bootstrap`.
+Goal: source-of-truth no longer installs `spec-graph-bootstrap`.
 
 Files:
 
@@ -481,7 +481,7 @@ External tools may prioritize inspection, but they do not define scope authority
 Test scenarios:
 
 - Contract tests assert no skill source contains `spec-first crg hook`.
-- Contract tests assert no skill source contains `spec-graph-bootstrap` or `spec-graph-bootstrap`.
+- Contract tests assert no skill source contains `spec-graph-bootstrap`.
 - `spec-plan` contract asserts direct repo reads fallback is primary, not CRG fallback.
 - `spec-work` contract asserts scope expansion is judged from plan/task-pack and diff, not CRG after-work.
 - `spec-code-review` contract asserts reviewer owns findings and starts from diff.
@@ -706,7 +706,7 @@ The internal CRG runtime has been removed. For current workflows:
 Test scenarios:
 
 - README current sections contain no `spec-first crg`.
-- README current sections contain no `spec-graph-bootstrap` or `spec-graph-bootstrap`.
+- README current sections contain no `spec-graph-bootstrap`.
 - Runtime install smoke confirms generated command/skill counts after deletion.
 - Obsolete managed graph-bootstrap runtime is cleaned by managed asset removal flow.
 - README contains the replacement path section and does not mention GitNexus or `code-review-graph` as a promised replacement.

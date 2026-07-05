@@ -142,6 +142,10 @@ describe('init plan API', () => {
 
       expect(result.exit_code).toBe(0);
       expect(fs.readFileSync(path.join(projectRoot, '.codex', 'skills', 'graphify', 'SKILL.md'), 'utf8')).toBe('# graphify\n');
+      const skill = fs.readFileSync(path.join(projectRoot, '.agents', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).not.toContain('.qoder/commands/spec-*.md');
+      expect(skill).not.toContain('.kiro/settings/');
+      expect(skill).not.toContain('.cursor/mcp.json');
       expect(hooksJson.hooks.PreToolUse).toEqual([graphifyHook]);
       expect(hooksJson.hooks.SessionStart[0].hooks[0]).toEqual({
         type: 'command',
@@ -178,6 +182,8 @@ describe('init plan API', () => {
       const skill = fs.readFileSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
       expect(skill).toContain('name: spec-work');
       expect(skill).not.toContain('.agents/skills/spec-work');
+      expect(skill).not.toContain('.qoder/commands/spec-*.md');
+      expect(skill).not.toContain('.cursor/mcp.json');
 
       const agent = fs.readFileSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
       expect(agent).toContain('name: spec-security-reviewer');
@@ -213,9 +219,9 @@ describe('init plan API', () => {
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'hooks'))).toBe(false);
 
       const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
-      expect(instructions).toContain('Qoder workflow 入口优先使用 `spec-*` project commands');
+      expect(instructions).toContain('Workflow 入口统一使用同名 `spec-*`');
       expect(instructions).toContain('setup/runtime→`spec-mcp-setup`');
-      expect(instructions).not.toContain('Codex workflow 入口使用同名 `spec-*` Skills');
+      expect(instructions).not.toContain('project ' + 'commands');
       expect(instructions).not.toContain('$spec-mcp-setup');
 
       const command = fs.readFileSync(path.join(projectRoot, '.qoder', 'commands', 'spec-work.md'), 'utf8');
@@ -226,6 +232,8 @@ describe('init plan API', () => {
       const skill = fs.readFileSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
       expect(skill).toContain('name: spec-work');
       expect(skill).not.toContain('.agents/skills/spec-work');
+      expect(skill).not.toContain('.kiro/settings/');
+      expect(skill).not.toContain('.cursor/mcp.json');
 
       const agent = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
       expect(agent).toContain('name: spec-security-reviewer');
@@ -301,7 +309,7 @@ describe('init plan API', () => {
       expect(skill).toContain('disable-model-invocation: true');
       expect(skill).not.toContain('argument-hint:');
       expect(skill).not.toContain('.agents/skills/spec-work');
-      expect(skill).toContain('.qoder/commands/spec-*.md');
+      expect(skill).not.toContain('.qoder/commands/spec-*.md');
       expect(skill).not.toContain('.kiro/settings/');
       expect(skill).not.toContain('`agents/**`');
       expect(skill).toContain('`.cursor/agents/**`');

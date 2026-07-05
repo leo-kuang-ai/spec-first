@@ -127,7 +127,13 @@ describe('workflow invocation boundary', () => {
     expect(skill).toContain('current host\'s document-review entrypoint');
     expect(skill).not.toContain('/spec:doc-review <path>` on Claude Code');
     expect(skill).not.toContain('$spec-doc-review <path>` on Codex');
-    expect(skill).not.toContain('Claude users call `/spec:doc-review <path>`; Codex users call `$spec-doc-review <path>`');
+    const legacyHostSpecificSentence = [
+      'Claude' + ' users',
+      'call `/spec:doc-review <path>`;',
+      'Codex' + ' users',
+      'call `$spec-doc-review <path>`',
+    ].join(' ');
+    expect(skill).not.toContain(legacyHostSpecificSentence);
     expect(skill).toContain('Phase 2');
     expect(skill).toContain('persona agents');
   });

@@ -29,15 +29,15 @@
 | `.spec-first/governance/**` | `runtime_governance_artifact_excluded` | 本机 workflow 治理观测证据，如 rule-maturity shadow hits；普通 source context 不扫描，周期审计或显式治理复查按路径读取 |
 | `.claude/**` | `generated_runtime_mirror_excluded` | Claude generated runtime mirror / host-local state |
 | `.codex/**` | `generated_runtime_mirror_excluded` | Codex generated runtime mirror / host-local state |
-| `.agents/skills/**` | `generated_runtime_mirror_excluded` | Codex-facing generated skill mirror |
-| `.cursor/skills/**` | `generated_runtime_mirror_excluded` | Cursor generated Agent Skills runtime mirror |
+| `.agents/skills/**` | `generated_runtime_mirror_excluded` | Codex-facing generated workflow runtime mirror |
+| `.cursor/skills/**` | `generated_runtime_mirror_excluded` | Cursor generated workflow runtime mirror |
 | `.cursor/spec-first/**` | `generated_runtime_mirror_excluded` | Cursor spec-first managed state/runtime facts |
 | `.cursor/mcp.json` | `host_local_config_excluded` | Cursor project MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --cursor` 保留整文件，server entry 由 setup/uninstall 路径管理 |
-| `.kiro/skills/**` | `generated_runtime_mirror_excluded` | Kiro generated Agent Skills runtime mirror |
+| `.kiro/skills/**` | `generated_runtime_mirror_excluded` | Kiro generated workflow runtime mirror |
 | `.kiro/agents/**` | `generated_runtime_mirror_excluded` | Kiro generated agent runtime mirror |
 | `.kiro/spec-first/**` | `generated_runtime_mirror_excluded` | Kiro spec-first managed state/runtime facts |
 | `.kiro/settings/**` | `generated_runtime_mirror_excluded` | Kiro spec-first managed MCP config surface; direct doctor/setup reads are allowed only in runtime tasks |
-| `.qoder/commands/spec-*.md` | `generated_runtime_mirror_excluded` | Qoder generated project command runtime mirror |
+| `.qoder/commands/spec-*.md` | `generated_runtime_mirror_excluded` | Qoder generated workflow runtime file mirror |
 | `.qoder/commands/spec/**` | `generated_runtime_mirror_excluded` | Qoder retired legacy command namespace；仅 runtime cleanup / drift repair 读取 |
 | `.qoder/skills/**` | `generated_runtime_mirror_excluded` | Qoder generated project skill runtime mirror |
 | `.qoder/agents/**` | `generated_runtime_mirror_excluded` | Qoder generated subagent runtime mirror |

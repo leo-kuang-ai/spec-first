@@ -2053,19 +2053,11 @@ function hostDisplayName(platform) {
 }
 
 function hostEntrypointLabel(platform) {
-  if (platform === 'claude') return 'spec-* commands';
-  if (platform === 'codex') return 'spec-* skills';
-  if (platform === 'kiro') return 'Kiro Agent Skills';
-  if (platform === 'qoder') return 'Qoder spec-* project commands or Skills';
-  return 'host workflow entrypoints';
+  return 'spec-* workflow entrypoints';
 }
 
 function hostMcpSetupCommand(platform) {
-  if (platform === 'claude') return 'spec-mcp-setup';
-  if (platform === 'codex') return 'spec-mcp-setup';
-  if (platform === 'kiro') return 'Kiro Agent Skill `spec-mcp-setup`';
-  if (platform === 'qoder') return 'Qoder project command `spec-mcp-setup` or Skill `spec-mcp-setup`';
-  return 'the host MCP setup workflow';
+  return '`spec-mcp-setup`';
 }
 
 function printInitNextSteps(platform, lang = 'zh') {
@@ -2099,7 +2091,7 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
   if (lang === 'en') {
     console.log('Setup complete. Next steps:');
     console.log(`  1. Restart ${uniquePlatforms.map(hostDisplayName).join(', ')} or open new sessions so each host loads the generated entrypoints.`);
-    console.log('  2. Use the matching spec-* workflow entrypoint (Claude/Qoder commands or Codex/Cursor/Kiro Skills) for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
+    console.log('  2. Use the matching spec-* workflow entrypoint for lightweight docs, small fixes, first trials, plan, work, review, or debug.');
     console.log('  3. For stronger readiness, run the matching MCP setup workflow in the host you plan to use.');
     console.log('  4. Then choose the workflow by user intent: brainstorm/plan/work/review/debug.');
     return;
@@ -2107,7 +2099,7 @@ function printInitNextStepsForPlatforms(platforms, lang = 'zh') {
 
   console.log('初始化完成。下一步:');
   console.log(`  1. 重启 ${uniquePlatforms.map(hostDisplayName).join('、')} 或分别新开会话，让宿主加载刚生成的入口。`);
-  console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动同名 spec-* workflow 入口（Claude/Qoder command 或 Codex/Cursor/Kiro Skill）。');
+  console.log('  2. docs、小修复、首次试用、plan、work、review 或 debug，可在对应宿主启动同名 spec-* workflow 入口。');
   console.log('  3. 需要更完整的 readiness 时，在计划使用的宿主里运行匹配的 MCP setup workflow。');
   console.log('  4. 然后按用户意图进入 brainstorm/plan/work/review/debug 等 workflow。');
 }
@@ -2153,9 +2145,9 @@ function printHelp() {
     '➡️ After successful init:',
     '  Claude: restart Claude Code. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-mcp-setup, then route by user intent.',
     '  Codex: restart Codex. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-mcp-setup, then route by user intent.',
-    '  Cursor: restart Cursor. For lightweight work, explicitly invoke the generated spec-* Agent Skill; for enhanced readiness, run the generated spec-mcp-setup Agent Skill. Cursor remains generated-runtime preview until local loader evidence is recorded.',
-    '  Kiro: restart Kiro. For lightweight work, invoke the generated spec-* Agent Skill; for enhanced readiness, run the generated spec-mcp-setup Agent Skill, then route by user intent.',
-    '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run the generated spec-mcp-setup command or spec-mcp-setup Skill.',
+    '  Cursor: restart Cursor. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-mcp-setup. Cursor remains generated-runtime preview until local loader evidence is recorded.',
+    '  Kiro: restart Kiro. For lightweight work, start the matching spec-* workflow; for enhanced readiness, run spec-mcp-setup, then route by user intent.',
+    '  Qoder: restart Qoder or run /commands reload, /skills reload, and /agents reload. For enhanced readiness, run spec-mcp-setup.',
     '',
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',

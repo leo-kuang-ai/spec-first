@@ -218,23 +218,11 @@ function usesSharedAgentsInstructionFile(hostId) {
 }
 
 function zhHostEntrypointLine(hostId) {
-  if (hostId === 'claude') {
-    return '- Claude workflow 入口使用 `spec-*` project commands';
-  }
-  if (usesSharedAgentsInstructionFile(hostId)) {
-    return '- Codex/Cursor/Kiro workflow 入口使用同名 `spec-*` Skills；Qoder workflow 入口优先使用 `spec-*` project commands，同名 Skills 作为宿主能力补充';
-  }
-  return '- Workflow 入口使用统一 `spec-*` 名称';
+  return '- Workflow 入口统一使用同名 `spec-*`';
 }
 
 function enHostEntrypointLine(hostId) {
-  if (hostId === 'claude') {
-    return '- Claude workflow entrypoints use `spec-*` project commands';
-  }
-  if (usesSharedAgentsInstructionFile(hostId)) {
-    return '- Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands, with same-name Skills as a host-capability supplement';
-  }
-  return '- Workflow entrypoints use unified `spec-*` names';
+  return '- Workflow entrypoints use the same `spec-*` names';
 }
 
 function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {}) {

@@ -220,7 +220,7 @@ module.exports = CodexAdapter;
 module.exports.detectGlobalCodexHookPollution = detectGlobalCodexHookPollution;
 
 function rewriteSharedPaths(content) {
-  return content
+  const rewritten = content
     .replace(/\.claude\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
       return `.agents/skills/spec-${commandName}/SKILL.md`;
     })
@@ -247,6 +247,27 @@ function rewriteSharedPaths(content) {
     .replace(
       /^(spec-first\s+(?:init|clean)\s+--codex\s+#\s*Codex runtime)\n(?:spec-first\s+(?:init|clean)\s+--codex\s+#\s*Codex runtime)$/gm,
       '$1',
+    );
+  return rewriteCodexRuntimeContextSections(rewritten);
+}
+
+function rewriteCodexRuntimeContextSections(content) {
+  return content
+    .replace(
+      /generated mirrors \([^)\n]*\)/g,
+      'generated mirrors (`.codex/**`, `.agents/skills/**`)',
+    )
+    .replace(
+      /generated mirrors（[^）\n]*）/g,
+      'generated mirrors（`.codex/**`、`.agents/skills/**`）',
+    )
+    .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` (?:remain|are) advisory input only when explicitly named\./g,
+      'Host-native advisory paths from other runtimes are not default context unless explicitly named.',
+    )
+    .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`、Kiro-native `\.kiro\/specs\/\*\*` 与 Qoder-native `\.qoder\/rules\/\*\*` 只有显式点名时作为 advisory input。/g,
+      '其他宿主原生 advisory artifact 只有显式点名时作为 advisory input。',
     );
 }
 

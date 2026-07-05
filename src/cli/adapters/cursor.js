@@ -17,20 +17,24 @@ const CURSOR_ALLOWED_FRONTMATTER_FIELDS = new Set([
 const CURSOR_UNREWRITTEN_PATH_PATTERNS = [
   /\.claude\/commands\/spec\/[a-z-]+\.md/,
   /\.claude\/commands\/spec-[a-z-]+\.md/,
+  /\.claude\/commands\/spec-\*\.md/,
   /\.claude\/spec-first\/workflows\//,
   /\.claude\/skills\//,
   /\.claude\/agents\//,
   /\.codex\/commands\/spec\/[a-z-]+\.md/,
+  /\.codex\/commands\/spec-\*\.md/,
   /\.codex\/skills\//,
   /\.codex\/agents\//,
   /\.agents\/skills\//,
   /\.kiro\/commands\/spec\/[a-z-]+\.md/,
+  /\.kiro\/commands\/spec-\*\.md/,
   /\.kiro\/skills\//,
   /\.kiro\/agents\//,
   /\.kiro\/spec-first\//,
   /\.kiro\/settings\//,
   /\.qoder\/commands\/spec\/[a-z-]+\.md/,
   /\.qoder\/commands\/spec-[a-z-]+\.md/,
+  /\.qoder\/commands\/spec-\*\.md/,
   /\.qoder\/skills\//,
   /\.qoder\/agents\//,
   /\.qoder\/spec-first\//,
@@ -136,15 +140,15 @@ class CursorAdapter extends PlatformAdapter {
       level: 'WARNING',
       name: 'Cursor generated-runtime preview',
       message: 'Cursor skill discovery/invocation is not verified on this machine; generated skills may not load.',
-      fix: 'Open Cursor Skills UI or run a current Cursor CLI/user journey to record loader evidence before promoting beyond generated-runtime preview.',
+      fix: 'Open Cursor runtime UI or run a current Cursor CLI/user journey to record loader evidence before promoting beyond generated-runtime preview.',
     });
 
     if (fs.existsSync(commandRoot)) {
       checks.push({
         level: 'WARNING',
         name: this.commandRoot,
-        message: 'unexpected Cursor command runtime directory present; Cursor P0 uses Agent Skills, not generated commands',
-        fix: formatInitGuidance('cursor', 'in this project to refresh Cursor Agent Skill runtime assets'),
+        message: 'unexpected Cursor command runtime directory present; Cursor P0 uses generated spec-* workflow runtime assets, not generated command files',
+        fix: formatInitGuidance('cursor', 'in this project to refresh Cursor spec-* runtime assets'),
       });
     }
     if (fs.existsSync(agentsRoot)) {
@@ -175,7 +179,7 @@ module.exports.normalizeCursorName = normalizeCursorName;
 module.exports.inspectCursorDuplicateSkillRoots = inspectCursorDuplicateSkillRoots;
 
 function rewriteSharedPaths(content) {
-  return content
+  const rewritten = content
     .replace(/\.claude\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
       return `.cursor/skills/spec-${commandName}/SKILL.md`;
     })
@@ -189,12 +193,14 @@ function rewriteSharedPaths(content) {
       return `.cursor/skills/spec-${commandName}/SKILL.md`;
     })
     .replace(/\.kiro\/commands\/spec\/\*\*/g, '.cursor/skills/**')
+    .replace(/\.kiro\/commands\/spec-\*\.md/g, '.cursor/skills/**')
     .replace(/\.qoder\/commands\/spec\/([a-z-]+)\.md/g, (_match, commandName) => {
       return `.cursor/skills/spec-${commandName}/SKILL.md`;
     })
     .replace(/\.qoder\/commands\/spec-([a-z-]+)\.md/g, (_match, commandName) => {
       return `.cursor/skills/spec-${commandName}/SKILL.md`;
     })
+    .replace(/\.qoder\/commands\/spec-\*\.md/g, '.cursor/skills/**')
     .replace(/\.qoder\/commands\/spec\/\*\*/g, '.cursor/skills/**')
     .replace(/\.claude\/spec-first\/workflows\//g, '.cursor/skills/')
     .replace(/\.claude\/skills\//g, '.cursor/skills/')
@@ -216,14 +222,51 @@ function rewriteSharedPaths(content) {
     .replace(/~\/\.qoder\/settings\.json/g, '~/.cursor/mcp.json')
     .replace(/spec-first\s+init\s+--codex/g, 'spec-first init --cursor')
     .replace(/spec-first\s+clean\s+--codex/g, 'spec-first clean --cursor')
-    .replace(/\$spec-\*/g, 'Cursor Agent Skills')
-    .replace(/\/spec:\*/g, 'Cursor Agent Skills')
-    .replace(/\$spec-mcp-setup/g, 'Cursor Agent Skill `spec-mcp-setup`')
-    .replace(/\/spec:mcp-setup/g, 'Cursor Agent Skill `spec-mcp-setup`')
-    .replace(/Kiro Agent Skills/g, 'Cursor Agent Skills')
-    .replace(/Kiro Agent Skill `spec-mcp-setup`/g, 'Cursor Agent Skill `spec-mcp-setup`')
-    .replace(/Qoder project commands or Skills/g, 'Cursor Agent Skills')
-    .replace(/Qoder `(?:\/spec:mcp-setup|spec-mcp-setup)` entrypoint/g, 'Cursor Agent Skill `spec-mcp-setup`');
+    .replace(/\$spec-\*/g, '`spec-*`')
+    .replace(/\/spec:\*/g, '`spec-*`')
+    .replace(/\$spec-mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/\/spec:mcp-setup/g, '`spec-mcp-setup`')
+    .replace(/Kiro Agent\s+Skills/g, '`spec-*`')
+    .replace(/Kiro Agent\s+Skill `spec-mcp-setup`/g, '`spec-mcp-setup`')
+    .replace(/Qoder project (?:commands|entrypoints)\s+or\s+Skills/g, '`spec-*`')
+    .replace(/Qoder `(?:\/spec:mcp-setup|spec-mcp-setup)` entrypoint/g, '`spec-mcp-setup`');
+  return rewriteCursorRuntimeContextSections(rewriteUsingSpecFirstCursorSections(rewritten));
+}
+
+function rewriteUsingSpecFirstCursorSections(content) {
+  return content
+    .replace(
+      /- Claude Code installs it as `\.cursor\/skills\/using-spec-first\/SKILL\.md`[\s\S]*?\n- Codex installs it as `\.cursor\/skills\/using-spec-first\/SKILL\.md`.*?\n/,
+      '- Cursor installs it as `.cursor/skills/using-spec-first/SKILL.md` and also reads the managed block in `AGENTS.md`; its generated runtime remains a preview until loader evidence is recorded.\n',
+    )
+    .replace(
+      /Runtime copies under .*? are generated mirrors\. Repair stale or missing runtime guidance with `spec-first init` after choosing the target host; do not hand-edit generated mirrors as the source of truth\. Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` remain advisory input only when explicitly named\./,
+      'Runtime copies under `.cursor/skills/`, `.cursor/spec-first/`, and `.cursor/mcp.json` are generated runtime or host-local config outputs for this host. Repair stale or missing runtime guidance with `spec-first init --cursor`, and do not hand-edit generated mirrors as the source of truth. Cursor-native `.cursor/rules/**` / `.cursor/agents/**` remain advisory input only when explicitly named.',
+    )
+    .replace(
+      /Ordinary context routing follows `docs\/contracts\/context-governance\.md`: `\.spec-first\/audits\/\*\*`, `\.spec-first\/governance\/\*\*`, and generated mirrors \(.*?\) are excluded from default workflow context\. Route to setup\/update\/runtime-drift\/audit\/governance-health workflows, or require a precise user-named path, before treating those directories as evidence\. Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` remain advisory input only when explicitly named\./,
+      'Ordinary context routing follows `docs/contracts/context-governance.md`: `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.cursor/skills/**`, `.cursor/spec-first/**`, `.cursor/mcp.json`) are excluded from default workflow context. Route to setup/update/runtime-drift/audit/governance-health workflows, or require a precise user-named path, before treating those directories as evidence. Cursor-native `.cursor/rules/**` / `.cursor/agents/**` remain advisory input only when explicitly named.',
+    );
+}
+
+function rewriteCursorRuntimeContextSections(content) {
+  return content
+    .replace(
+      /generated mirrors \([^)\n]*\)/g,
+      'generated mirrors (`.cursor/skills/**`, `.cursor/spec-first/**`, `.cursor/mcp.json`)',
+    )
+    .replace(
+      /generated mirrors（[^）\n]*）/g,
+      'generated mirrors（`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`）',
+    )
+    .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` (?:remain|are) advisory input only when explicitly named\./g,
+      'Cursor-native `.cursor/rules/**` / `.cursor/agents/**` remain advisory input only when explicitly named.',
+    )
+    .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`、Kiro-native `\.kiro\/specs\/\*\*` 与 Qoder-native `\.qoder\/rules\/\*\*` 只有显式点名时作为 advisory input。/g,
+      'Cursor-native `.cursor/rules/**` / `.cursor/agents/**` 只有显式点名时作为 advisory input。',
+    );
 }
 
 function normalizeCursorSkillFrontmatter(content, context = {}) {
@@ -270,7 +313,7 @@ function addCursorSetupHostPin(content) {
   return content.replace(/## Workflow Modes\n/, [
     '## Cursor Host Pin',
     '',
-    'When this generated Cursor Agent Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=cursor` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
+    'When this generated Cursor `spec-mcp-setup` runtime surface invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=cursor` in the script environment. Do not rely on automatic host detection from PATH, because Claude Code, Codex, Kiro, Qoder, and Cursor CLIs can coexist on the same machine.',
     '',
     '## Workflow Modes',
     '',

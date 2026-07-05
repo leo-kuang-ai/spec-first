@@ -51,7 +51,7 @@ describe('instruction bootstrap', () => {
     expect(twice.match(/<!-- spec-first:bootstrap:start -->/g)).toHaveLength(1);
     expect(twice).toContain('## Workflow 入口治理');
     expect(twice).not.toContain('## Workflow 入口治理（由 spec-first 管理）');
-    expect(twice).toContain('Claude workflow 入口使用 `spec-*` project commands');
+    expect(twice).toContain('Workflow 入口统一使用同名 `spec-*`');
     // 抗膨胀上界断言(替代旧的 toHaveLength(12) 精确行数断言):
     // body 是核心决策集,行数随内容增长,但需有上界防膨胀。
     expect(block.split('\n').length).toBeGreaterThan(8);
@@ -123,7 +123,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('## Existing Notes');
     expect(updated).toContain('## Workflow Entry Governance');
     expect(updated).not.toContain('## Workflow Entry Governance (managed by spec-first)');
-    expect(updated).toContain('Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands');
+    expect(updated).toContain('Workflow entrypoints use the same `spec-*` names');
     expect(updated).toContain('minimal entry anchor');
     expect(updated).toContain('the full route map lives in `skills/using-spec-first/SKILL.md`, with boundary details and exceptions in its registered `references/*.md`');
     expect(updated).toContain('skills/using-spec-first/SKILL.md');
@@ -163,7 +163,7 @@ describe('instruction bootstrap', () => {
     const updated = applyManagedBootstrapBlock(corrupted, buildBootstrapBlock('codex', 'en'));
 
     expect(updated).toContain('## Existing Notes');
-    expect(updated).toContain('Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands');
+    expect(updated).toContain('Workflow entrypoints use the same `spec-*` names');
     expect(updated).not.toContain('perform route checks');
     expect(updated).not.toContain('Claude workflow entrypoints use `/spec:*`');
     expect(updated.match(/<!-- spec-first:bootstrap:start -->/g)).toHaveLength(1);
@@ -474,11 +474,11 @@ describe('instruction bootstrap', () => {
     }
   });
 
-  test('Qoder bootstrap uses project command entrypoints while preserving shared AGENTS guidance', () => {
+  test('Qoder bootstrap uses unified workflow entrypoints while preserving shared AGENTS guidance', () => {
     const qoderZh = buildBootstrapBlock('qoder', 'zh');
     const qoderEn = buildBootstrapBlock('qoder', 'en');
 
-    expect(qoderZh).toContain('Codex/Cursor/Kiro workflow 入口使用同名 `spec-*` Skills；Qoder workflow 入口优先使用 `spec-*` project commands');
+    expect(qoderZh).toContain('Workflow 入口统一使用同名 `spec-*`');
     expect(qoderZh).toContain('setup/runtime→`spec-mcp-setup`');
     expect(qoderZh).toContain('计划/执行→`spec-plan`/`spec-work`');
     expect(qoderZh).toContain('不要把 `using-spec-first` 本身当作 command-backed workflow');
@@ -486,7 +486,7 @@ describe('instruction bootstrap', () => {
     expect(qoderZh).not.toContain('Codex：进入公开 `$spec-*` 前');
     expect(qoderZh).not.toContain('$spec-mcp-setup');
 
-    expect(qoderEn).toContain('Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands');
+    expect(qoderEn).toContain('Workflow entrypoints use the same `spec-*` names');
     expect(qoderEn).toContain('setup/runtime→`spec-mcp-setup`');
     expect(qoderEn).not.toContain('Codex workflow entrypoints use `$spec-*`');
     expect(qoderEn).not.toContain('before entering public `$spec-*`');

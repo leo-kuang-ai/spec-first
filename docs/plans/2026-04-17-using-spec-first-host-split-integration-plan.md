@@ -110,10 +110,10 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 本方案明确不做以下事情：
 
 1. 不为 `Codex` 设计未经验证的 hook / session-start 兼容层。
-2. 不把 `using-spec-first` 改造成 `spec-using` 或 `spec-using`。
+2. 不把 `using-spec-first` 改造成 `spec-using`。
 3. 不在 hook 脚本里复制第二套路由规则摘要。
 4. 不用 `AGENTS.md` 模拟 `using-superpowers` 旧时代的 bootstrap 命令块。
-5. 不改变现有 `spec-*` 与 `spec-*` 的产品面。
+5. 不改变现有统一 `spec-*` 产品面。
 
 ## 4. 推荐方案总览
 

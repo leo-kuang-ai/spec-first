@@ -39,7 +39,7 @@ spec_id: 2026-07-02-001-readme-quick-start-optimization
 - R3. Quickstart 章节必须出现在"The Problem"和"Why spec-first"等背景章节**之前**，紧接首屏内容
 - R4. Quickstart 步骤必须是线性无歧义的完整路径：安装 → `spec-first doctor` → `spec-first init` → 重启 host → 运行推荐 workflow → 验证产物
 - R5. 每个关键 Quickstart 步骤必须跟随"期望看到什么"的成功标志描述
-- R6. Quickstart 必须推荐一个具体的"第一个 workflow"（不让用户自选），推荐 `spec-brainstorm` 或 `spec-brainstorm`
+- R6. Quickstart 必须推荐一个具体的"第一个 workflow"（不让用户自选），推荐 `spec-brainstorm`
 - R7. Quickstart 结尾必须明确说明第一次成功的验证方式（在 repo 下检查具体产物路径）
 
 **深度内容后置**

@@ -205,7 +205,7 @@ function printVersion() {
     3. 如需查看 package CLI 命令面
        $ spec-first --help
 
-    4. 重启宿主 CLI，使同名 spec-* workflow 入口生效（Claude/Qoder project commands，Codex/Cursor/Kiro Skills）
+    4. 重启宿主 CLI，使同名 spec-* workflow 入口生效
 
     5. 在对话中使用当前宿主对应入口开始工作流
 

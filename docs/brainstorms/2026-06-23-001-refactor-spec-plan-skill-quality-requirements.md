@@ -13,7 +13,7 @@ origin: docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报�
 
 ## Summary
 
-`spec-plan` 需要在不改变其公开 planning workflow 身份的前提下，降低入口初载负载和输出漂移风险。目标是让 `spec-plan` / `spec-plan` 继续稳定承担 HOW planning：直接调用时必须进入 planning workflow，计划阶段不实现、不生成执行态 task pack、不改 generated runtime mirrors；同时通过 source-owned eval fixtures、contract tests、runtime projection checks、集中治理说明和 fresh-source eval 证据，证明入口瘦身没有破坏 plan-only safety、handoff、near-neighbor routing、PRD handoff entropy 和双宿主投影边界。
+`spec-plan` 需要在不改变其公开 planning workflow 身份的前提下，降低入口初载负载和输出漂移风险。目标是让 `spec-plan` 继续稳定承担 HOW planning：直接调用时必须进入 planning workflow，计划阶段不实现、不生成执行态 task pack、不改 generated runtime mirrors；同时通过 source-owned eval fixtures、contract tests、runtime projection checks、集中治理说明和 fresh-source eval 证据，证明入口瘦身没有破坏 plan-only safety、handoff、near-neighbor routing、PRD handoff entropy 和双宿主投影边界。
 
 ## Problem Frame
 
@@ -62,7 +62,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 
 | surface | current behavior | owner/source | artifact/contract | consumer | delta | evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| public workflow entry | `spec-plan` 与 `spec-plan` 暴露 planning workflow。 | `src/cli/contracts/dual-host-governance/skills-governance.json`, `docs/catalog/runtime-capabilities.md` | workflow_command delivery | Claude/Codex users | keep | confirmed-source |
+| public workflow entry | `spec-plan` 暴露 planning workflow。 | `src/cli/contracts/dual-host-governance/skills-governance.json`, `docs/catalog/runtime-capabilities.md` | workflow_command delivery | Claude/Codex users | keep | confirmed-source |
 | skill source hot path | `SKILL.md` 含 description、safety、contract summary、routing 和长流程。 | `skills/spec-plan/SKILL.md` | source skill | host runtime render, tests, users | replace / compact | confirmed-source |
 | references | 10 个 markdown reference 承载 deepening、template、handoff、rendering 等细节。 | `skills/spec-plan/references/` | source support files | `spec-plan`, runtime copies, tests | extend ownership clarity | confirmed-source |
 | eval fixtures | `examples.json` 含 5 个 examples-as-context cases。 | `skills/spec-plan/evals/examples.json` | source eval fixture | tests, fresh-source eval context | extend | confirmed-source |
@@ -98,7 +98,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 | actor | role in this increment | requirement relevance |
 | --- | --- | --- |
 | Workflow maintainer | Edits `spec-plan` source, references, tests and validation docs. | Needs clear source/runtime and advisory/confirmed evidence boundaries. |
-| Planning user | Invokes `spec-plan` or `spec-plan`. | Should experience stable routing, plan-only behavior and explicit handoff. |
+| Planning user | Invokes `spec-plan`. | Should experience stable routing, plan-only behavior and explicit handoff. |
 | Downstream implementer | Uses the plan artifact through `spec-work`, optional `spec-write-tasks`, review or issue handoff. | Should not inherit WHAT gaps or task-pack state invented by planning. |
 | Reviewer / future maintainer | Reviews prompt/source changes and evidence. | Needs focused tests, fresh-source eval status and changelog trail. |
 | Runtime generator / doctor | Renders and inspects generated runtime assets. | Needs anchors and paths that remain valid across Claude/Codex. |
@@ -108,7 +108,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 | id | priority | requirement | rationale/source |
 | --- | --- | --- | --- |
 | R-01 | P0 | `spec-plan` must continue to present itself as the workflow that defines HOW after WHAT is clear; it must not absorb `spec-brainstorm`, `spec-prd`, `spec-debug`, `spec-work`, `spec-doc-review`, or `spec-write-tasks` ownership. | confirmed-source: `skills/spec-plan/SKILL.md`; confirmed-source: `docs/catalog/runtime-capabilities.md` |
-| R-02 | P0 | Direct `spec-plan` or `spec-plan` invocation must remain a planning workflow entry. If the input is unclear, the workflow must clarify or bootstrap scope instead of exiting as "not a planning task". | confirmed-source: `skills/spec-plan/SKILL.md` |
+| R-02 | P0 | Direct `spec-plan` invocation must remain a planning workflow entry. If the input is unclear, the workflow must clarify or bootstrap scope instead of exiting as "not a planning task". | confirmed-source: `skills/spec-plan/SKILL.md` |
 | R-03 | P0 | Plan-only safety must remain hot-path visible: before explicit handoff selection, `spec-plan` may research, decide, and write/update the plan artifact only; it must not edit implementation source/config, run implementation verification, dispatch implementation workers, create execution task packs, or patch generated runtime mirrors. | confirmed-source: `skills/spec-plan/SKILL.md`; confirmed-source: `tests/unit/spec-plan-contracts.test.js` |
 | R-04 | P0 | The handoff gate must remain blocking and host-neutral: after plan write/review, the workflow presents `Start work`, `Compile task pack`, or `Create Issue` style options and waits for explicit user selection. | confirmed-source: `skills/spec-plan/SKILL.md`; confirmed-source: `skills/spec-plan/references/plan-handoff.md`; confirmed-source: `tests/unit/spec-plan-contracts.test.js` |
 | R-05 | P0 | Entrypoint compaction must preserve the public workflow contract summary, direct invocation rule, plan-only safety contract, question-tool fallback rules, examples-as-context anchor, governance-boundaries mandatory load, core principles, and plan quality bar. | source-candidate: `docs/plans/2026-06-22-004-refactor-spec-plan-skill-quality-plan.md`; confirmed-source for current anchors: `skills/spec-plan/SKILL.md` |

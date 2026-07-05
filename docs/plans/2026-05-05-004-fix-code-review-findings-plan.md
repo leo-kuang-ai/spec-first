@@ -515,14 +515,14 @@ Files:
 Implementation:
 
 - Replace the main chain example with:
-  - `spec-brainstorm` / `spec-brainstorm`
-  - `spec-plan` / `spec-plan`
+  - `spec-brainstorm`
+  - `spec-plan`
   - optional standalone `spec-write-tasks`
-  - `spec-work` / `spec-work`
-  - `spec-code-review` / `spec-code-review`
-  - `spec-compound` / `spec-compound`
+  - `spec-work`
+  - `spec-code-review`
+  - `spec-compound`
 - Rewrite `spec-requirements` command semantics section as proposed capability API, not current public command.
-- Add wording that no `spec-requirements` or `spec-requirements` entrypoint exists today.
+- Add wording that no `spec-requirements` entrypoint exists today.
 
 Verification:
 

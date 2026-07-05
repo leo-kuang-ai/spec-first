@@ -19,7 +19,7 @@ These reminders are advisory. They help prevent rationalizing around the entry-g
 3. Do **not** adopt the `using-superpowers` rule that "if there is a 1% chance a skill applies, you must invoke it."
 4. Do **not** turn ordinary lightweight requests into mandatory workflow traffic.
 5. Do **not** describe `using-spec-first` itself as a command-backed workflow.
-6. Do **not** restore `/spec:*` or `$spec-*` as current product surfaces; normalize legacy spellings to `spec-*`.
+6. Do **not** restore legacy host-specific spellings as current product surfaces; normalize compatibility aliases to `spec-*`.
 7. Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.
 8. Do **not** expose internal-only skills as user entrypoints. This includes delegated helpers such as `git-worktree`.
 9. Do **not** route to hidden helper skills such as git, browser, image, proof, xcode, or report-bug helpers unless a public workflow explicitly delegates to them.

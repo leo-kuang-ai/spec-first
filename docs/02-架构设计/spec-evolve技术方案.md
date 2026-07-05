@@ -297,7 +297,7 @@ evidence -> decision -> plan handoff -> plan -> tasks -> work -> review -> compo
 | 不输出 implementation plan        | implementation plan 属于 `spec-plan` |
 | 不默认新增 agent profiles           | 优先复用现有 reviewer / lens             |
 | 不默认新增 scripts                  | P0/P1 先 source-only / dogfood      |
-| 不承诺 P0 可运行 `spec-evolve` / `spec-evolve` | P0 是 source-only MVP               |
+| 不承诺 P0 可运行 `spec-evolve` | P0 是 source-only MVP               |
 | 不做后台 daemon                    | 当前由 maintainer 手动触发                |
 | 不成为所有小改默认 gate                 | 只覆盖系统级变更                           |
 | 不自动写 `repo-profile.yaml`       | repo-profile 只存确认过的稳定标准            |

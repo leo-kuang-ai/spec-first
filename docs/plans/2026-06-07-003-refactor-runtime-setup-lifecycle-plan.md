@@ -51,7 +51,7 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 
 > 2026-06-08 目标修正（用户确认）：Runtime Setup 的目标进一步收敛为“裸 `spec-mcp-setup` 先引导确认，然后安装初始化到后续节点可用，并尽最大努力保持可用”。这修正本计划早先“Graphify hook 默认不启用/未来另接”的表述：Graphify SKILL/MCP 仍不默认安装，但项目级 `graphify hook install` 属于确认后的 provider pack auto-refresh setup 目标；`hook_default=false` 若保留在机械字段中，只表示不做 silent/baseline hook install，不表示用户确认后仍不装 hook。落地实现若尚未能安装或验证 hook，必须输出 action-required facts，并允许 LLM 在 `spec-mcp-setup` 流程内做有界修复或给明确 next action。
 
-本计划同时处理命名迁移：`spec-runtime-setup` / `spec-runtime-setup` 是目标规范入口，`spec-mcp-setup` / `spec-mcp-setup` 是兼容入口。第一阶段先建立公共兼容入口和文档口径，不在同一切片强行物理重命名 `skills/spec-mcp-setup/**`，避免 source/runtime/test 大搬迁遮蔽生命周期边界调整。
+本计划同时处理命名迁移：`spec-runtime-setup` 是目标规范入口，`spec-mcp-setup` 是兼容入口。第一阶段先建立公共兼容入口和文档口径，不在同一切片强行物理重命名 `skills/spec-mcp-setup/**`，避免 source/runtime/test 大搬迁遮蔽生命周期边界调整。
 
 > 注:按上方 B5/B6 收敛,命名迁移(U8/U9)已从本批移出为独立 defer 切片;本段描述的迁移意图保留为方向记录,实际 alias delivery 不在本批执行。
 
@@ -59,8 +59,8 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 
 当前 source 已经出现三种状态并存：
 
-- `skills/spec-mcp-setup/SKILL.md` 标题是 `Runtime Setup`，并说明目标用户入口是 `spec-runtime-setup` / `spec-runtime-setup`。
-- README、runtime catalog 和命令模板仍使用 `spec-mcp-setup` / `spec-mcp-setup`。
+- `skills/spec-mcp-setup/SKILL.md` 标题是 `Runtime Setup`，并说明目标用户入口是 `spec-runtime-setup`。
+- README、runtime catalog 和命令模板仍使用 `spec-mcp-setup`。
 - v1.16 引入 CodeGraph / Graphify 后，setup 的 provider 生命周期边界仍未统一成“first generation 属 setup，steady-state 属 provider”的模型。
 
 需要修正的核心误区：
@@ -75,7 +75,7 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 - `docs/01-需求分析/13.scale-integration/Runtime-Setup目标.md`：本计划的指导方向。
 - `skills/spec-mcp-setup/SKILL.md`：当前 runnable entrypoint 是 `spec-mcp-setup`，目标名是 `spec-runtime-setup`。
 - `templates/claude/commands/spec/mcp-setup.md`：Claude command template 仍是 legacy `spec-mcp-setup` 兼容入口。
-- `README.md` / `README.zh-CN.md`：公共入口表仍列 `spec-mcp-setup` / `spec-mcp-setup`。
+- `README.md` / `README.zh-CN.md`：公共入口表仍列 `spec-mcp-setup`。
 - `docs/catalog/runtime-capabilities.md`：catalog 仍登记 `mcp-setup`。
 - `docs/01-需求分析/13.scale-integration/CodeGraph技术方案.md`：CodeGraph / Graphify 是 capability tools，消费侧 capability-aware，输出 advisory 且必须回源。
 - `docs/contracts/provider-readiness.md`：`readiness_status` 是进入 setup 决策健康判断的 provider readiness 字段，lifecycle 只是展示/解释位。
@@ -83,7 +83,7 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 ## 目标
 
 - 把 `spec-mcp-setup` 的语义升级为 Runtime Setup：安装、配置、provider-native 首次初始化/首次生成、readiness probe、工具说明输出。
-- 提供 `spec-runtime-setup` / `spec-runtime-setup` 规范公共入口，并保留旧 `spec-mcp-setup` / `spec-mcp-setup` 兼容入口。
+- 提供 `spec-runtime-setup` 规范公共入口，并保留旧 `spec-mcp-setup` 兼容入口。
 - 明确三类生命周期：
   - setup-owned：安装、配置、provider bootstrap / first generation、readiness facts、runtime tooling manifest / summary。
   - provider-owned：watcher、hook、refresh、MCP/CLI query surface、内部 cache/index/artifact。
@@ -115,8 +115,8 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 用户
   |
   v
-spec-runtime-setup or spec-runtime-setup
-兼容入口: spec-mcp-setup or spec-mcp-setup
+spec-runtime-setup
+兼容入口: spec-mcp-setup
   |
   v
 解析 host + target repo + workspace scope

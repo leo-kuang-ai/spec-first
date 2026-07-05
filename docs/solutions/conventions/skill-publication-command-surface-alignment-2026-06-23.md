@@ -98,7 +98,7 @@ or equivalent source-edit workflow.
 不应表达为：
 
 ```markdown
-Run `spec-team-standards-governance` or `spec-team-standards-governance`.
+Run `spec-team-standards-governance`.
 ```
 
 Runtime projection 回归测试应覆盖两个宿主，而不是只检查 source：

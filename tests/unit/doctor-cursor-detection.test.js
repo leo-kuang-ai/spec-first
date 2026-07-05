@@ -190,6 +190,22 @@ describe('doctor Cursor detection', () => {
     }));
   });
 
+  test('reports literal wildcard command mirrors that were not rewritten for Cursor runtime', () => {
+    writeSkill(path.join(tmp, '.cursor', 'skills'), 'spec-work', [
+      'Runtime denylist: .claude/commands/spec-*.md',
+      'Runtime denylist: .qoder/commands/spec-*.md',
+    ].join('\n'));
+
+    const result = captureDoctor(tmp, ['--cursor', '--json']);
+
+    expect(result.exitCode).toBe(0);
+    const payload = JSON.parse(result.stdout);
+    const check = payload.platform_checks.cursor.find((entry) =>
+      entry.name === '.cursor/skills/spec-work/SKILL.md'
+    );
+    expect(check.message).toContain('contains non-Cursor runtime path references');
+  });
+
   test('reports unmanaged duplicate Cursor-compatible skill roots', () => {
     writeSkill(path.join(tmp, '.cursor', 'skills'), 'spec-plan', 'project skill');
     writeSkill(path.join(tmp, '.agents', 'skills'), 'spec-plan', 'compat skill');

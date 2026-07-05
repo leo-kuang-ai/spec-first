@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | `over-routing` | Lightweight explanations, current-context questions, or narrow where-used lookups are forced into public workflows. | Keep direct-answer and bounded-read cases in `evals/routing-cases.json`. |
 | `under-routing` | Prompt, workflow, contract, governance, or runtime-delivery changes proceed as casual edits. | Keep substantial-work and self-work boundaries visible in `SKILL.md`. |
-| `legacy-entry-syntax` | Current product guidance restores `/spec:*` or `$spec-*` as primary workflow surfaces instead of normalizing to `spec-*`. | Preserve unified-entry rules and runtime transform tests. |
+| `legacy-entry-syntax` | Current product guidance restores legacy host-specific spellings as primary workflow surfaces instead of normalizing to `spec-*`. | Preserve unified-entry rules and runtime transform tests. |
 | `dispatch-overreach` | Public workflow admission is treated as Codex `spawn_agent` authorization. | Keep dispatch-boundary cases and `dispatch_authorization_missing` fallback wording. |
 | `internal-helper-exposure` | Internal helpers such as `git-worktree` are recommended as public entrypoints. | Keep skill-entrypoint lint and routing cases for standalone/internal boundaries. |
 | `source-runtime-violation` | Generated runtime mirrors are edited or treated as source truth. | Keep source/runtime boundary wording and regenerate with `spec-first init` only after source validation. |

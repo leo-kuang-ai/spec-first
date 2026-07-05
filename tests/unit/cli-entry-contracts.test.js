@@ -118,7 +118,7 @@ describe('CLI entry contract', () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe('');
-    expect(result.stdout).toContain('MCP/helper setup is handled by the matching spec-mcp-setup workflow entrypoint: Claude/Qoder project command or Codex/Cursor/Kiro Skill.');
+    expect(result.stdout).toContain('MCP/helper setup is handled by the matching `spec-mcp-setup` workflow entrypoint.');
     expect(result.stdout).toContain('target name: spec-runtime-setup, pending host alias contract');
     expect(result.stdout).not.toContain('legacy alias: spec-mcp-setup');
     expect(result.stdout).not.toContain('$spec-runtime-setup or /spec:runtime-setup');
