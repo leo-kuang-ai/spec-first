@@ -184,6 +184,8 @@ describe('init plan API', () => {
       expect(skill).not.toContain('.agents/skills/spec-work');
       expect(skill).not.toContain('.qoder/commands/spec-*.md');
       expect(skill).not.toContain('.cursor/mcp.json');
+      expect(skill).toContain('Kiro-native `.kiro/specs/**` remains advisory input only when explicitly named.');
+      expect(skill).not.toContain('Cursor-native `.cursor/rules/**` / `.kiro/agents/**`');
 
       const agent = fs.readFileSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
       expect(agent).toContain('name: spec-security-reviewer');
@@ -234,6 +236,8 @@ describe('init plan API', () => {
       expect(skill).not.toContain('.agents/skills/spec-work');
       expect(skill).not.toContain('.kiro/settings/');
       expect(skill).not.toContain('.cursor/mcp.json');
+      expect(skill).toContain('Qoder-native `.qoder/rules/**` remains advisory input only when explicitly named.');
+      expect(skill).not.toContain('Cursor-native `.cursor/rules/**` / `.qoder/agents/**`');
 
       const agent = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
       expect(agent).toContain('name: spec-security-reviewer');

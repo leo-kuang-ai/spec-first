@@ -88,7 +88,7 @@ flowchart LR
 
 同一 CLI smoke 还验证 fresh project 下的 `doctor` 输出：普通输出需要提示没有检测到 spec-first platform、建议 `spec-first init` 并提示选择 Claude Code、Codex、Cursor、Kiro、Qoder；JSON 输出则断言 `workflow_runnability` 为 `not_verified`、`runtime_asset_health` 为 `not_applicable`。Sources: [cli.sh](tests/smoke/cli.sh#L170-L181)
 
-`tests/smoke/install-local.sh` 验证本地安装脚本的输出仍指向 npm CLI 模型：输出必须包含 `npm install -g spec-first`、`spec-first init`、按引导选择目标宿主，以及 `spec-compound` 的说明；同时它禁止继续输出旧的 `.claude/plugins/cache/spec-first-repo` 路径。Sources: [install-local.sh](tests/smoke/install-local.sh#L15-L36)
+`tests/smoke/install-local.sh` 验证本地安装脚本的输出仍指向 npm CLI 模型：输出必须包含全局安装命令、init 引导、按引导选择目标宿主，以及 `spec-compound` 的说明；同时它禁止继续输出旧的 `.claude/plugins/cache/spec-first-repo` 路径。Sources: [install-local.sh](tests/smoke/install-local.sh#L15-L36)
 
 ## 发布烟测：从 tarball 内容到安装态闭环
 

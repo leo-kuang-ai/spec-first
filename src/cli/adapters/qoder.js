@@ -271,6 +271,10 @@ function rewriteQoderRuntimeContextSections(content) {
       'Qoder-native `.qoder/rules/**` remains advisory input only when explicitly named.',
     )
     .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.qoder\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` (?:remain|are) advisory input only when explicitly named\./g,
+      'Qoder-native `.qoder/rules/**` remains advisory input only when explicitly named.',
+    )
+    .replace(
       /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`、Kiro-native `\.kiro\/specs\/\*\*` 与 Qoder-native `\.qoder\/rules\/\*\*` 只有显式点名时作为 advisory input。/g,
       'Qoder-native `.qoder/rules/**` 只有显式点名时作为 advisory input。',
     );

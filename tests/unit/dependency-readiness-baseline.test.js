@@ -2905,6 +2905,19 @@ exit 0
     }
   });
 
+  it('verify-tools provider table separates readiness scope from probe verification', () => {
+    const verifyTools = fs.readFileSync(
+      path.join(repoRoot, 'skills/spec-mcp-setup/scripts/verify-tools.sh'),
+      'utf8',
+    );
+    expect(verifyTools).toContain('"readiness_scope"');
+    expect(verifyTools).toContain('"probe_status"');
+    expect(verifyTools).toContain('def provider_readiness_scope:');
+    expect(verifyTools).toContain('def provider_probe_status:');
+    expect(verifyTools).toContain('"index-ready"');
+    expect(verifyTools).toContain('"not-verified"');
+  });
+
   // 回归:install-helpers.sh 的 global-skill 循环必须真实迭代 registry 中的
   // skill 条目。曾因循环漏写 `done < <(helper_registry_skill_ids)` 而从空 stdin
   // 读取、零次执行,导致缺失的 baseline skill(ast-grep-skill)被兜底成 ready,

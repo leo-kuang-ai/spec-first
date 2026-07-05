@@ -38,7 +38,7 @@ flowchart TD
   A[进入源码目录] --> B[执行 npm pack]
   B --> C[得到 spec-first-version.tgz]
   C --> D[npm install -g ./spec-first-version.tgz]
-  D --> E[which spec-first / spec-first --version]
+  D --> E[which spec-first 后运行 spec-first --version]
   E --> F[进入目标项目]
   F --> G[spec-first doctor]
   G --> H[spec-first init]
@@ -150,11 +150,11 @@ codex
 | 项目运行时已生成 | `spec-first init` 后检查 `.claude/`、`.agents/` 或 `.codex/` | 目标宿主目录出现受管资产 |
 | 宿主入口可见 | 重启宿主后尝试 `spec-mcp-setup`、`spec-skill-audit` 等 | 宿主能识别对应入口 |
 
-`install-local.sh` 的 smoke test 也把这些预期固化为回归检查：脚本输出必须包含 `npm install -g spec-first`、`spec-first init`、按引导选择目标宿主，并且不得再输出旧插件缓存路径。Sources: [tests/smoke/install-local.sh](tests/smoke/install-local.sh#L15-L37)
+`install-local.sh` 的 smoke test 也把这些预期固化为回归检查：脚本输出必须包含全局安装命令、init 引导、按引导选择目标宿主，并且不得再输出旧插件缓存路径。Sources: [tests/smoke/install-local.sh](tests/smoke/install-local.sh#L15-L37)
 
 ## 常见问题与处理方式
 
-如果 `which spec-first` 或 `spec-first doctor` 仍然指向旧路径，先执行 `hash -r`，再重新检查；如果仍不正确，关闭当前终端并重新打开，因为旧 pnpm shim 或 shell 缓存可能仍在影响命令解析。Sources: [docs/05-用户手册/06-本地源码安装.md](docs/05-用户手册/06-本地源码安装.md#L65-L73), [docs/05-用户手册/06-本地源码安装.md](docs/05-用户手册/06-本地源码安装.md#L342-L352)
+如果 `which spec-first` 或 doctor 检查仍然指向旧路径，先执行 `hash -r`，再重新检查；如果仍不正确，关闭当前终端并重新打开，因为旧 pnpm shim 或 shell 缓存可能仍在影响命令解析。Sources: [docs/05-用户手册/06-本地源码安装.md](docs/05-用户手册/06-本地源码安装.md#L65-L73), [docs/05-用户手册/06-本地源码安装.md](docs/05-用户手册/06-本地源码安装.md#L342-L352)
 
 如果宿主找不到 skills 或 commands，先检查目标项目内 `.claude/commands`、`.claude/skills`、`.claude/spec-first/workflows` 或 `.agents/skills`，然后重新运行 `spec-first init` 与 `spec-first doctor`；必要时重新 `npm pack` 并重新安装本地 tarball。Sources: [docs/05-用户手册/06-本地源码安装.md](docs/05-用户手册/06-本地源码安装.md#L289-L315)
 

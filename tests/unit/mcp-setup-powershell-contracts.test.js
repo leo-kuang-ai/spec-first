@@ -668,6 +668,12 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     ]) {
       expect(read(verifyToolsPs1)).toContain(`title = '${section}'`);
     }
+    expect(read(verifyToolsPs1)).toContain("'readiness_scope'");
+    expect(read(verifyToolsPs1)).toContain("'probe_status'");
+    expect(read(verifyToolsPs1)).toContain('function Get-ProviderReadinessScope');
+    expect(read(verifyToolsPs1)).toContain('function Get-ProviderProbeStatus');
+    expect(read(verifyToolsPs1)).toContain("'index-ready'");
+    expect(read(verifyToolsPs1)).toContain("'not-verified'");
   });
 
   test('check-health project URLs come from helper registry source_repo', () => {

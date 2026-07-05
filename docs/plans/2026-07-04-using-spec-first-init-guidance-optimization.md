@@ -1,5 +1,7 @@
 # using-spec-first Skill 与 spec-first init 引导内容优化方案（第七修订版 · L0 baseline 与收益门槛修正）
 
+> 状态：completed
+> 完成时间：2026-07-05
 > 生成时间：2026-07-04 22:22
 > 初次纠正：2026-07-04
 > 二次修订：2026-07-04 23:44
@@ -542,3 +544,16 @@ evals/*.json
 - **限制**：评审为会话内产物，findings 的持久锚点是本文档的「评审修正摘要」与 §4 各节 `评审 Px` 标注；如需独立 artifact，应在实施时运行 `spec-compound` 或将 findings 导出到 `docs/validation/`。
 
 > 说明：本节将「五 persona 评审」这一 provenance claim 落到可核验锚点（persona 名单、findings 计数、源码证据、限制），而非不可验证的权威背书。
+
+## Completion Evidence
+
+本计划已完成并标记 `status: completed`。实现范围覆盖 Step 0 baseline、bootstrap L0 收敛、`using-spec-first` description 排除信号补强、guide/direct eval fixture 扩展、context-governance 测试迁移、checked-in host instruction source slice 同步和 changelog 记录。
+
+完成证据：
+
+- Step 0 baseline artifact：`docs/validation/2026-07-05-using-spec-first-bootstrap-baseline.md`。
+- 落地 changelog：`CHANGELOG.md` 2026-07-05 07:00:24 `feat(using-spec-first)` 条目。
+- 当前源码确认：`src/cli/instruction-bootstrap.js` 仅保留 L0 allowlist 入口锚点和 runtime/context-governance owner 指针；完整 Route Map 留在 `skills/using-spec-first/SKILL.md`。
+- 当前验证：`npx jest tests/unit/instruction-bootstrap.test.js tests/unit/context-governance-contracts.test.js tests/unit/using-spec-first-contracts.test.js tests/unit/changelog-format.test.js --runInBand`，4 个 test suite / 41 个 tests 通过。
+
+限制：fresh-source eval 仍按 baseline artifact 标注为 `degraded semantic review gate`，不是 deterministic runner hard gate；本次状态更新未手改 generated runtime mirrors。

@@ -224,6 +224,10 @@ function rewriteKiroRuntimeContextSections(content) {
       'Kiro-native `.kiro/specs/**` remains advisory input only when explicitly named.',
     )
     .replace(
+      /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.kiro\/agents\/\*\*`, Kiro-native `\.kiro\/specs\/\*\*`, and Qoder-native `\.qoder\/rules\/\*\*` (?:remain|are) advisory input only when explicitly named\./g,
+      'Kiro-native `.kiro/specs/**` remains advisory input only when explicitly named.',
+    )
+    .replace(
       /Cursor-native `\.cursor\/rules\/\*\*` \/ `\.cursor\/agents\/\*\*`、Kiro-native `\.kiro\/specs\/\*\*` 与 Qoder-native `\.qoder\/rules\/\*\*` 只有显式点名时作为 advisory input。/g,
       'Kiro-native `.kiro/specs/**` 只有显式点名时作为 advisory input。',
     );
