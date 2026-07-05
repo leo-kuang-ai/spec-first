@@ -100,6 +100,15 @@ describe('spec-polish-beta project detection contracts', () => {
     }
   });
 
+  test('SKILL documents Windows degraded mode for bash-only helpers', () => {
+    const skill = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-polish-beta', 'SKILL.md'),
+      'utf8',
+    );
+    expect(skill).toContain('**Windows degraded mode:**');
+    expect(skill).toMatch(/Git Bash.*WSL|WSL.*Git Bash/);
+  });
+
   test('dev-server port detection does not scan instruction files by default', () => {
     const detection = fs.readFileSync(DEV_SERVER_DETECTION_PATH, 'utf8');
     const rails = fs.readFileSync(DEV_SERVER_RAILS_PATH, 'utf8');

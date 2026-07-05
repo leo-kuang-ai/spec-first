@@ -118,6 +118,8 @@ Optimization dispatch is an optional capability selected by the approved optimiz
 
 Parallel experiments require explicit `execution.mode`, bounded `execution.max_concurrent`, clean mutable/immutable scope, and the worktree readiness probes below. Worktree-backed mutation happens in experiment worktrees; Codex delegation must fall back after repeated failures when the serial/local path can continue. The orchestrator owns final integration: selecting kept experiments, merging or cherry-picking winners, reverting non-winners, cleaning worktrees, updating experiment logs, and presenting post-completion actions.
 
+**Windows degraded mode:** the `scripts/*.sh` helpers (`measure.sh`, `parallel-probe.sh`, `experiment-worktree.sh`) and POSIX examples in this skill (`mkdir -p`, `cat /tmp/... | codex exec -`) require a bash-capable environment (the host harness bash tool, Git Bash, or WSL). On native PowerShell without bash they will not run. When bash is unavailable: use OS-temp paths (`%TEMP%` / `os.tmpdir()`) instead of `/tmp`, drive measurement/probe/worktree steps manually or from Git Bash/WSL, and for Codex backend dispatch pipe the prompt with `Get-Content -Raw $tempFile | codex exec --skip-git-repo-check -`. State that helper automation is degraded rather than silently failing the loop.
+
 ---
 
 ## Persistence Discipline

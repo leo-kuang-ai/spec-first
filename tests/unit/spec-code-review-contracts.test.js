@@ -1101,3 +1101,13 @@ describe('spec-code-review CE sync contracts', () => {
     expect(text).not.toContain('explicit user authorization');
   });
 });
+
+describe('spec-code-review Windows degraded mode contract', () => {
+  test('SKILL documents Windows degraded mode for the bash resolve-base helper', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+    expect(text).toContain('**Windows degraded mode:**');
+    expect(text).toMatch(/Git Bash.*WSL|WSL.*Git Bash/);
+    // Must not silently fall back to `git diff HEAD` when base detection is degraded.
+    expect(text).toContain('Do not silently fall back to `git diff HEAD`');
+  });
+});

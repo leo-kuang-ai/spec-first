@@ -164,3 +164,11 @@ describe('spec session history contracts', () => {
     }
   });
 });
+
+describe('spec-sessions Windows degraded mode contract', () => {
+  test('SKILL documents Windows degraded mode for the bash discovery pipeline', () => {
+    const text = fs.readFileSync(SESSIONS_SKILL, 'utf8');
+    expect(text).toContain('**Windows degraded mode:**');
+    expect(text).toMatch(/Git Bash.*WSL|WSL.*Git Bash/);
+  });
+});

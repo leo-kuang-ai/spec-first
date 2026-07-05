@@ -1,0 +1,46 @@
+# spec-first 文本/换行/编码治理
+#
+# 目标:强制跨平台一致的 LF 换行,防止 Windows 贡献者提交 CRLF shell 脚本或
+# 编码漂移。有意不使用 `* text=auto`,避免对既有历史文件触发大规模 renormalize
+# churn(见 docs/项目审查/2026-07-05-windows-powershell-fix-plan.md 回归风险表)。
+# 仅对明确的文本扩展名声明 LF,对二进制资产显式标注 binary。
+
+# Shell 脚本必须保持 LF,否则 bash 会因 \r 解析失败
+*.sh    text eol=lf
+
+# PowerShell:统一 LF,PowerShell 5.1/7+ 均可读 LF,避免双份脚本换行漂移
+*.ps1   text eol=lf
+*.psm1  text eol=lf
+*.psd1  text eol=lf
+
+# 代码与配置:统一 LF
+*.js    text eol=lf
+*.cjs   text eol=lf
+*.mjs   text eol=lf
+*.ts    text eol=lf
+*.py    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.toml  text eol=lf
+
+# Windows 批处理若将来引入,保持 CRLF(cmd 对 LF 容忍度低)
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# 二进制资产:禁止任何换行/编码转换
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.mp4   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.gz    binary
+*.tgz   binary

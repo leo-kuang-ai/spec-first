@@ -1028,6 +1028,35 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     }
   });
 
+  // WIN-P1-01 回归:agent-browser 是既有 parity 测试(上方 helpers 数组)显式排除的特例,
+  // 因其 install vs opt-in 语义在各脚本自有分支处理。故其 Windows 展示命令没有被上面的
+  // 共享 display 生成器 parity 覆盖。此处补一条专项守护:
+  //  1) registry 静态 windows 串(经 setup-plan-renderer.cjs 外露为 install_commands_display)
+  //     必须是 PowerShell 5.1 安全写法,不得含 POSIX `CI=true ` 前缀或裸 `&&` 链;
+  //  2) 且必须与 install-helpers.ps1 执行真相源 Get-AgentBrowserInstallCommand 的
+  //     非 --with-deps(macOS/Windows)分支逐字一致,防止 registry↔executor 再次漂移。
+  test('agent-browser windows registry command is PowerShell 5.1 safe and matches the ps1 executor (no drift)', () => {
+    const registry = JSON.parse(read(helperToolsJsonPath));
+    const agentBrowser = registry.helpers.find((h) => h.id === 'agent-browser');
+    expect(agentBrowser).toBeTruthy();
+    const winCmd = agentBrowser.installation.commands.windows;
+
+    // PowerShell 5.1 安全性:无 POSIX env-prefix,无裸 `&&`,须用 $env: 与 $LASTEXITCODE 控制流。
+    expect(winCmd).not.toMatch(/(^|\s)CI=true\s/);
+    expect(winCmd).not.toMatch(/\s&&\s/);
+    expect(winCmd).toContain("$env:CI='true'");
+    expect(winCmd).toContain('if ($LASTEXITCODE -eq 0)');
+
+    // 反漂移:从 install-helpers.ps1 重建 Get-AgentBrowserInstallCommand 的非 with-deps 结果,
+    // 与 registry windows 串比较。ps1 用单引号字符串拼接,'' 转义为单个 '。
+    const ps1 = read(installHelpersPs1);
+    const tmpl = ps1.match(/return '((?:[^']|'')*)' \+ \$browserInstall \+ '((?:[^']|'')*)'/);
+    expect(tmpl).toBeTruthy();
+    const unescape = (s) => s.replace(/''/g, "'");
+    const ps1WindowsCmd = `${unescape(tmpl[1])}agent-browser install${unescape(tmpl[2])}`;
+    expect(winCmd).toBe(ps1WindowsCmd);
+  });
+
   // 回归(M1 parity 盲区补充):同时校验「工具缺失」分支的双宿主一致性。
   // 已知 pre-existing 平台差异(非本次 M1 引入,M1 只忠实搬运):vhs/silicon 在 windows
   // 缺 go/cargo 时,bash 给官网 URL(诚实,因命令会失败),PowerShell 无条件给 go/cargo
