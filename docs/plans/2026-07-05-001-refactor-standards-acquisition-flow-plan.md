@@ -43,7 +43,7 @@ implements_schemas: []
 
 - R1. `spec-team-standards-governance` 必须在 init/propose/eval acquisition 场景先锁定一个 extraction target：`target_repo`、surface、sub_domain、capability、include/exclude、evidence_sources、output.mode 和 privacy boundary；混合 surface/domain/capability 必须 split。
 - R2. 新增或完善 standards acquisition lenses，覆盖团队标准真正关心的观察维度，而不是复制代码风格分类：source/runtime boundary、verification、review/release、security/privacy、architecture/layering、workflow handoff、testing、deprecation/forbidden patterns、derived artifacts。该 lens map 只指导 acquisition prompt，不扩展 `docs/contracts/team-standards.md` 的 canonical `category` enum。
-- R3. 大项目获取流程必须是 slice-first：每个 slice 只生成 candidate/facts/evidence quality，不产生 confirmed standard；只有 multi-slice、mixed split 后的 broad proposal、冲突或覆盖不足场景才进入 reconciliation。reconciliation 后才允许形成 shared rule proposal、scope-specific rule proposal、local exception、conflict record 或 reject/defer decision。
+- R3. 大项目获取流程必须是 slice-first：每个 slice 只生成 candidate/facts/evidence quality，不产生 confirmed standard；只有 multi-slice、mixed split 后的 broad proposal、冲突或覆盖不足场景才进入 reconciliation。reconciliation 后才允许形成 shared rule proposal、scope-specific rule proposal、local exception、conflict record 或 reject/defer decision。这些是概念性产物类别，落账时映射到既有 canonical 词表(通用结局用 `docs/contracts/team-standards.md` 的 `outcome` enum，冲突分支用 `promotion-and-conflicts.md` 的 `Allowed exits`)，不新造 token。
 - R4. 保留 standards governance 权威边界：`trust=confirmed,lifecycle_state=active` 且 scope 命中的规则才可成为 hard context；`observed`、`suggested`、`confirmed-draft`、replay pass 或高 confidence 都不能 hard enforce。
 - R5. 派生 AI rules、review checklist、query summary、workflow handoff snippets 必须引用 confirmed rule IDs 或 reviewable proposal IDs，不得成为独立 source truth，也不得从 `spec-rule-miner` 输出反向生成 standards source。
 - R6. 不新增 legacy standards command spellings、retired `spec-standards` workflow、`skills/spec-standards/`、`.spec-first/standards/`，不手改 generated runtime mirrors。
@@ -92,7 +92,7 @@ implements_schemas: []
 
 - `skills/spec-team-standards-governance/SKILL.md`: owns mode routing, reference loading map, hard boundaries and output contract; should gain only lightweight intake pointers, not absorb all acquisition details.
 - `skills/spec-team-standards-governance/references/initialization.md`: currently owns V1 initialization only and already mentions single extraction target; the full V2 task pack field list lives in `acquisition-quality.md`. Best owner for the single-target + mixed-split process entry, not for a duplicated field list.
-- `skills/spec-team-standards-governance/references/acquisition-quality.md`: owns V2 task pack fields, evidence quality, source anchors and gates; best owner for candidate quality and reconciliation prerequisites.
+- `skills/spec-team-standards-governance/references/acquisition-quality.md`: owns V2 task pack fields, evidence quality, source anchors and gates; best owner for candidate quality and reconciliation triggers.
 - `skills/spec-team-standards-governance/references/source-matrix.md`: already states code structure cannot produce `confirmed` trust by itself; use it to keep rule-miner-derived observations advisory.
 - `skills/spec-team-standards-governance/references/loading-and-consumption.md`: owns derived artifact boundary; use it to keep AI rules/checklists/query summaries as derived outputs with rule/proposal citations.
 - `skills/spec-team-standards-governance/evals/*.json`: existing fixture shape supports strengthening trigger/boundary and expected-output cases without inventing a new runner.
@@ -216,7 +216,7 @@ flowchart TB
 - `skills/spec-team-standards-governance/references/acquisition-quality.md` V2 task pack field list.
 
 **Test scenarios:**
-- Happy path: SKILL/references contain single-target intake terms and `target_repo` / `extraction_target` fields.
+- Happy path: `initialization.md` contains single-target intake and mixed-split terms and points to the field list; the `target_repo` / `extraction_target` field assertions target `acquisition-quality.md`'s V2 task pack, not a duplicated list in `initialization.md`.
 - Edge case: mixed-surface prompt remains split/reject, not best-effort broad acquisition.
 - Boundary: wording still says candidate-only/proposal-only until source-edit workflow and promotion boundary.
 
@@ -337,8 +337,8 @@ flowchart TB
 - Keep `threshold_result` honest, but only where it applies: `output-cases.json` cases carry `threshold_result` (existing ones are all `not-run`); `trigger-cases.json` cases do not use this field at all. New output cases can stay `not-run`; do not claim replay coverage.
 
 **Patterns to follow:**
-- Existing `trigger-boundary-001` mixed-surface case.
-- Existing `output-derived-001` derived artifact citation case.
+- Existing `TRIGGER-BOUNDARY-001` mixed-surface case.
+- Existing `OUTPUT-DERIVED-001` derived artifact citation case.
 
 **Test scenarios:**
 - Happy path: JSON parses and contains expected case IDs/reason codes without duplicating existing coverage.
