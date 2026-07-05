@@ -120,11 +120,11 @@ updated_at: 2026-03-29T11:10:00+08:00
 
 | Skill | 职责 | 主要输入 | 主要输出 |
 |-------|------|---------|---------|
-| `/spec:brainstorm` | 思路发散、方案探索 | 问题定义、背景、目标 | 候选方案、取舍分析 |
-| `/spec:plan` | 任务拆解、路径设计 | brainstorm 结论、约束 | 任务清单、验收标准 |
-| `/spec:work` | 执行落地、产出生成 | plan 结果、模板 | 文档草稿、分析结论、执行记录或阶段性交付物 |
-| `/spec:code-review` | 质量校验、问题识别 | work 产物、评审维度 | 评分、问题清单、修订建议 |
-| `/spec:compound` | 资产沉淀、知识提炼 | 已通过产物 | 模板、SOP、案例 |
+| `spec-brainstorm` | 思路发散、方案探索 | 问题定义、背景、目标 | 候选方案、取舍分析 |
+| `spec-plan` | 任务拆解、路径设计 | brainstorm 结论、约束 | 任务清单、验收标准 |
+| `spec-work` | 执行落地、产出生成 | plan 结果、模板 | 文档草稿、分析结论、执行记录或阶段性交付物 |
+| `spec-code-review` | 质量校验、问题识别 | work 产物、评审维度 | 评分、问题清单、修订建议 |
+| `spec-compound` | 资产沉淀、知识提炼 | 已通过产物 | 模板、SOP、案例 |
 
 ### 3.2 参数设计
 
@@ -575,11 +575,11 @@ review 是否通过采用双重判定机制，而非单纯依赖总分：
 ### 11.1 一期必须实现
 
 **核心 Skills**：
-- `/spec:brainstorm`
-- `/spec:plan`
-- `/spec:work`
-- `/spec:code-review`
-- `/spec:compound`
+- `spec-brainstorm`
+- `spec-plan`
+- `spec-work`
+- `spec-code-review`
+- `spec-compound`
 
 **参数支持**：
 - `--role <product|dev|fullstack|test>`
@@ -602,7 +602,7 @@ review 是否通过采用双重判定机制，而非单纯依赖总分：
 ### 11.2 一期暂不实现
 
 - 完整任务引擎或工作流编排器
-- 独立的 `/spec:task` 管理 skill
+- 独立的 `spec-task` 管理 skill
 - 并行任务依赖管理
 - 可视化看板
 - 复杂的自动化编排状态机
@@ -652,7 +652,7 @@ review 是否通过采用双重判定机制，而非单纯依赖总分：
 - 补强资产检索能力
 - 增强模板治理机制
 - 补充角色专属 skills（如 PRD 专用、测试执行专用）
-- 引入 `/spec:task` 任务管理 skill
+- 引入 `spec-task` 任务管理 skill
 
 ### 13.2 三期扩展
 

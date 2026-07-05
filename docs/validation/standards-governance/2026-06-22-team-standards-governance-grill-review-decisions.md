@@ -7,7 +7,7 @@
 - 日期: 2026-06-22
 - 审查时仓 HEAD: `61c29f10`（stale snapshot；任何实现/修订前必须重新捕获 `git rev-parse --short HEAD` 与 `git status --short`）
 - 状态: **决策已记录；plan 正文未改**。plan 修订是独立后续工作（用户选择"先存档、plan 修订另起"）。
-- 性质: 本文件是 review 决策存档，供后续 plan 修订或 `/spec:work` 直接消费；不是 plan 本身，不改变 source/runtime 行为。
+- 性质: 本文件是 review 决策存档，供后续 plan 修订或 `spec-work` 直接消费；不是 plan 本身，不改变 source/runtime 行为。
 
 ## 范围说明
 

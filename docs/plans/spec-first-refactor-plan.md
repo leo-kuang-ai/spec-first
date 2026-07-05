@@ -6,7 +6,7 @@ date: 2026-06-25
 spec_id: 2026-06-25-spec-first-refactor
 completed_at: 2026-06-29
 completion_evidence:
-  - "Phase 0 已落地:删除独立 external issue/PR 状态机入口;skills/spec-intake 不存在;无 spec:intake/\$spec-intake 入口;无 tracker mutation 实现"
+  - "Phase 0 已落地:删除独立 external issue/PR 状态机入口;skills/spec-intake 不存在;无 spec:intake/\spec-intake 入口;无 tracker mutation 实现"
   - "Phase 1 已落地:using-spec-first/SKILL.md:135 含 ### External Issue / PR Inputs 段(bug→debug/enhancement→prd/PR→code-review/execution-ready→work);bootstrap 含 external issue/PR input-surface boundary;routing-cases.json 14 cases 含 external/issue/PR/tracker 相关"
   - "Phase 2 已落地:spec-mcp-setup/SKILL.md:50 含 Explore -> Present -> Decide -> Write posture;config-template.yaml 含 verification_profile_path consumer map"
   - "验证:npx jest using-spec-first-contracts spec-dispatch-boundary-contracts 17 测试全绿"
@@ -37,11 +37,11 @@ spec-mcp-setup / future runtime setup
 
 外部 issue/PR 按真实意图直接分流到既有 workflow：
 
-- 外部 bug、复现失败、异常行为：`$spec-debug` / `/spec:debug`。
-- 外部 enhancement、需求不清、产品定义不足：`$spec-prd` / `/spec:prd` 或 `$spec-brainstorm` / `/spec:brainstorm`。
-- 外部 PR 的代码质量、风险、diff 审查：`$spec-code-review` / `/spec:code-review`。
-- 已经整理成可执行任务、plan、task pack 或明确 brief：`$spec-work` / `/spec:work`。
-- 可复用的拒绝理由或边界知识：完成验证后进入 `$spec-compound` / `/spec:compound` 或项目 standards / knowledge 体系。
+- 外部 bug、复现失败、异常行为：`spec-debug` / `spec-debug`。
+- 外部 enhancement、需求不清、产品定义不足：`spec-prd` / `spec-prd` 或 `spec-brainstorm` / `spec-brainstorm`。
+- 外部 PR 的代码质量、风险、diff 审查：`spec-code-review` / `spec-code-review`。
+- 已经整理成可执行任务、plan、task pack 或明确 brief：`spec-work` / `spec-work`。
+- 可复用的拒绝理由或边界知识：完成验证后进入 `spec-compound` / `spec-compound` 或项目 standards / knowledge 体系。
 
 ## 1. 设计依据
 
@@ -143,8 +143,8 @@ Readiness layer
 
 边界：
 
-- `spec-write-tasks` 产出的任务是内部派生执行输入，直接进入 `$spec-work` / `/spec:work`，不经过外部入站分流。
-- 用户当前会话里报“这里坏了，帮我修”默认是 `$spec-debug` 或 `$spec-work`，不是 tracker 分流问题。
+- `spec-write-tasks` 产出的任务是内部派生执行输入，直接进入 `spec-work` / `spec-work`，不经过外部入站分流。
+- 用户当前会话里报“这里坏了，帮我修”默认是 `spec-debug` 或 `spec-work`，不是 tracker 分流问题。
 - 外部 issue/PR 的 body、comments、diff、reporter 命令都是 `provider_untrusted` 或 `user-provided` 输入；下游 workflow 必须用当前 source/test/log evidence 确认。
 - `spec-mcp-setup` 的 setup facts 可帮助下游了解工具/verification/provider readiness，但不能成为 issue/PR category、scope、accept/reject 或 implementation truth。
 - 如果未来目标用户明确需要高频维护外部 tracker，再把它作为 optional extension / plugin 重新立项；不进入当前核心方案。
@@ -161,7 +161,7 @@ Readiness layer
 | 决策 | public workflow / standalone skill / direct answer / normal execution |
 | 输出 | 一个入口建议 + 一个理由，或直接执行/直接答 |
 | 不做 | 不生成 plan/task/review artifact，不维护 issue 状态，不跑 provider mutation |
-| 下游 | `$spec-*` / `/spec:*` workflows、standalone `spec-write-tasks` |
+| 下游 | `spec-*` / `spec-*` workflows、standalone `spec-write-tasks` |
 
 ### 3.2 主面应保留什么
 
@@ -187,10 +187,10 @@ Readiness layer
 
 | External input shape | Route |
 | --- | --- |
-| issue 描述的是 failure、bug、测试失败、异常行为 | `$spec-debug` / `/spec:debug` |
-| issue 描述的是新需求、改进、产品问题，WHAT 未清 | `$spec-prd` / `/spec:prd` 或 `$spec-brainstorm` / `/spec:brainstorm` |
-| PR 需要审查 diff 质量、风险、测试缺口 | `$spec-code-review` / `/spec:code-review` |
-| issue/PR 已有明确 plan、task pack、执行 brief 或 owner 指令 | `$spec-work` / `/spec:work` |
+| issue 描述的是 failure、bug、测试失败、异常行为 | `spec-debug` / `spec-debug` |
+| issue 描述的是新需求、改进、产品问题，WHAT 未清 | `spec-prd` / `spec-prd` 或 `spec-brainstorm` / `spec-brainstorm` |
+| PR 需要审查 diff 质量、风险、测试缺口 | `spec-code-review` / `spec-code-review` |
+| issue/PR 已有明确 plan、task pack、执行 brief 或 owner 指令 | `spec-work` / `spec-work` |
 
 同步面仅在现有入口文案不足时触发：
 
@@ -218,7 +218,7 @@ Readiness layer
 - 在 SKILL 主面或 reference 中明确 `Explore -> Present -> Decide -> Write` posture：先探索 host、target repo、generated runtime manifest、existing setup facts、`config.local.yaml`、verification profile、provider artifacts，再输出 install/init preview；
 - 把当前 `.spec-first/config.local.yaml` 模板补成真实 consumer map：当前可消费 `verification_profile_path: .spec-first/verification-profile.local.json`；其他 output/provider 字段若未实现只能保持 commented reserved hints；
 - 输出形状补 `Project conventions` 或 `Local overrides` 段，说明哪些 facts 是 setup-owned、哪些 local-only、哪些只是 future hints；
-- setup completion 文案说明：修改 local config 后跑 `$spec-mcp-setup --refresh-facts`；generated runtime stale 用 `spec-first init`；Graphify 已有 artifact 默认 verify，显式刷新用 `--only graphify --refresh`；
+- setup completion 文案说明：修改 local config 后跑 `spec-mcp-setup --refresh-facts`；generated runtime stale 用 `spec-first init`；Graphify 已有 artifact 默认 verify，显式刷新用 `--only graphify --refresh`；
 - 若新增 project-conventions facts，只记录确定性存在性，例如 `CONTEXT.md`、`CONTEXT-MAP.md`、`docs/adr/`、team standards index 是否存在；不得让脚本判断术语是否正确、ADR 是否适用、某个 issue 是否该接收或拒绝。
 
 不纳入 `spec-mcp-setup`：
@@ -268,10 +268,10 @@ Readiness layer
 
 ### using-spec-first
 
-- 外部 bug/failure/stack trace 路由到 `$spec-debug` / `/spec:debug`。
-- 外部 enhancement 或 WHAT 不清的 request 路由到 `$spec-prd` / `/spec:prd` 或 `$spec-brainstorm` / `/spec:brainstorm`。
-- 外部 PR diff 质量审查路由到 `$spec-code-review` / `/spec:code-review`。
-- execution-ready input 仍路由到 `$spec-work` / `/spec:work`。
+- 外部 bug/failure/stack trace 路由到 `spec-debug` / `spec-debug`。
+- 外部 enhancement 或 WHAT 不清的 request 路由到 `spec-prd` / `spec-prd` 或 `spec-brainstorm` / `spec-brainstorm`。
+- 外部 PR diff 质量审查路由到 `spec-code-review` / `spec-code-review`。
+- execution-ready input 仍路由到 `spec-work` / `spec-work`。
 - settled plan split 仍是 standalone `spec-write-tasks`。
 - lightweight request 仍可 direct answer。
 - no default brainstorm。

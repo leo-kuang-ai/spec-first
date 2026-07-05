@@ -66,7 +66,7 @@
 
 ### A1 · code-review always-on（高频痛点，建议优先降）
 
-每次 `/spec:code-review` 都会触发，是降档收益最大的部分。
+每次 `spec-code-review` 都会触发，是降档收益最大的部分。
 
 | Agent | 当前 | 建议 | 详细职责 |
 |---|---|---|---|
@@ -191,7 +191,7 @@ UI 视觉对比与文档写作。模型深度需求低，但跑得密集（desig
 
 ## 落地顺序建议
 
-1. **第一步（小范围验证）**：先改 A1 + A2 共 10 个 code-review 高频 reviewer，跑一次 `/spec:code-review` 验证体感与命中率。
+1. **第一步（小范围验证）**：先改 A1 + A2 共 10 个 code-review 高频 reviewer，跑一次 `spec-code-review` 验证体感与命中率。
 2. **第二步（语言专精）**：A3 共 6 个。这些只在对应语言 diff 时触发，验证窗口窄但风险低。
 3. **第三步（研究/审计/设计）**：A4 + A5 + A6 共 13 个，统一收尾。
 4. **每步在 `CHANGELOG.md` 加 `perf(agents)` 条目（user-visible）**，列出本次降档的 agent 名单，便于回滚定位。
@@ -200,4 +200,4 @@ UI 视觉对比与文档写作。模型深度需求低，但跑得密集（desig
 
 - 改动后用 `git diff agents/` 检查只有 `model:` 字段变化。
 - 必要时跑 `npm run test:unit`：本次改动仅 frontmatter 单字段，应该不影响测试。
-- 真正的回归在跑实际 `/spec:code-review` 和 `/spec:doc-review` 时观察 reviewer 是否仍能捕获已知 finding —— 不要把"测试通过"等同于"reviewer 质量不降"。
+- 真正的回归在跑实际 `spec-code-review` 和 `spec-doc-review` 时观察 reviewer 是否仍能捕获已知 finding —— 不要把"测试通过"等同于"reviewer 质量不降"。

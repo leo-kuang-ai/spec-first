@@ -8,7 +8,7 @@ spec_id: 2026-04-29-001-startup-version-update-reminder
 
 ## Problem Frame
 
-`spec-first` 已有 CLI 级版本提醒：用户运行 `spec-first doctor/init/clean` 时可以发现 npm 上存在新版本。但用户打开 Claude Code 或 Codex 后，可能直接使用 `/spec:*` 或 `$spec-*` workflow，而不会先运行 CLI 命令，因此旧版本 runtime 可能继续工作很久，用户不知道已有修复或能力更新。
+`spec-first` 已有 CLI 级版本提醒：用户运行 `spec-first doctor/init/clean` 时可以发现 npm 上存在新版本。但用户打开 Claude Code 或 Codex 后，可能直接使用 `spec-*` 或 `spec-*` workflow，而不会先运行 CLI 命令，因此旧版本 runtime 可能继续工作很久，用户不知道已有修复或能力更新。
 
 这个需求要解决的是：用户进入 Claude/Codex 会话时，能低噪音地知道 `spec-first` 是否有新版本，并被引导到正确的升级流程。它不应该在启动时自动修改环境，也不应该让版本检查成为会话启动的可靠性风险。
 
@@ -18,7 +18,7 @@ spec_id: 2026-04-29-001-startup-version-update-reminder
 
 - A1. 使用者：打开 Claude Code 或 Codex 并使用 spec-first workflow 的人。
 - A2. 宿主启动面：Claude Code 的 SessionStart 或 Codex 的会话指令加载面，负责展示提醒。
-- A3. spec-first update workflow：`/spec:update` 或 `$spec-update`，负责解释当前宿主的升级路径。
+- A3. spec-first update workflow：`spec-update` 或 `spec-update`，负责解释当前宿主的升级路径。
 
 ---
 
@@ -53,7 +53,7 @@ spec_id: 2026-04-29-001-startup-version-update-reminder
 - R4. 发现新版本时，提示必须包含当前版本、最新版本、当前宿主对应的 update workflow 入口，以及一句明确的“由用户决定是否升级”的引导。
 - R5. 检查失败、网络不可用、权限不足或 registry/API 异常时，不应向用户展示错误堆栈，不应要求用户立即处理。
 - R6. 提醒应默认低噪音：同一工作区或同一安装上下文中，最多每 24 小时展示一次同类更新提醒，除非用户主动运行 update workflow。
-- R7. Claude 与 Codex 的提示必须使用各自宿主语言：Claude 引导 `/spec:update`，Codex 引导 `$spec-update`。
+- R7. Claude 与 Codex 的提示必须使用各自宿主语言：Claude 引导 `spec-update`，Codex 引导 `spec-update`。
 
 **升级决策边界**
 
@@ -65,8 +65,8 @@ spec_id: 2026-04-29-001-startup-version-update-reminder
 
 ## Acceptance Examples
 
-- AE1. **Covers R1, R4, R7.** Given 用户打开 Codex，且本地 spec-first CLI/runtime 版本落后于 npm 最新版本，when 启动检测成功，then 用户看到一条短提示，包含当前版本、最新版本和 `$spec-update`。
-- AE2. **Covers R1, R4, R7.** Given 用户打开 Claude Code，且 marketplace 缓存版本落后于上游版本，when 启动检测成功，then 用户看到一条短提示，包含当前版本、最新版本和 `/spec:update`。
+- AE1. **Covers R1, R4, R7.** Given 用户打开 Codex，且本地 spec-first CLI/runtime 版本落后于 npm 最新版本，when 启动检测成功，then 用户看到一条短提示，包含当前版本、最新版本和 `spec-update`。
+- AE2. **Covers R1, R4, R7.** Given 用户打开 Claude Code，且 marketplace 缓存版本落后于上游版本，when 启动检测成功，then 用户看到一条短提示，包含当前版本、最新版本和 `spec-update`。
 - AE3. **Covers R2, R5.** Given 用户离线打开宿主，when 版本查询失败，then 会话正常启动，且不会显示 npm/gh/API 错误堆栈。
 - AE4. **Covers R3, R8.** Given 检测发现新版本，when 用户没有显式运行 update workflow，then 系统不会自动安装、更新 plugin、刷新 runtime assets 或重启宿主。
 
@@ -75,7 +75,7 @@ spec_id: 2026-04-29-001-startup-version-update-reminder
 ## Success Criteria
 
 - 旧版本用户在打开 Claude/Codex 后能自然发现有新版本，而不必先运行 `spec-first doctor`。
-- 用户清楚知道下一步该运行 `/spec:update` 还是 `$spec-update`。
+- 用户清楚知道下一步该运行 `spec-update` 还是 `spec-update`。
 - 启动提醒不会自动改变本机环境、项目 runtime assets 或宿主 plugin 状态。
 - 网络失败和版本查询失败不会降低 Claude/Codex 启动可靠性。
 - 规划和实现不需要再发明“自动升级还是用户决策”的产品边界。

@@ -15,7 +15,7 @@ supersede_reason: brainstorm-pressure-test-concluded-do-nothing
 
 > **status: superseded(2026-06-01)。本文档不再作为待执行 PRD;转为 decision record,保留完整推理链,供以后避免重复提案。** 下方原 PRD 正文(Summary 起)是被推翻方案的历史记录,不代表当前结论。
 
-经一次 `/spec:brainstorm` 产品层压测,**结论是不推进本方案,也不新建替代方案**。本次 spec-first 不产出任何代码或 prose 改动。
+经一次 `spec-brainstorm` 产品层压测,**结论是不推进本方案,也不新建替代方案**。本次 spec-first 不产出任何代码或 prose 改动。
 
 ### 1. 为何推翻(两个被证伪的方案)
 

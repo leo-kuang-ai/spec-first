@@ -297,7 +297,7 @@ evidence -> decision -> plan handoff -> plan -> tasks -> work -> review -> compo
 | 不输出 implementation plan        | implementation plan 属于 `spec-plan` |
 | 不默认新增 agent profiles           | 优先复用现有 reviewer / lens             |
 | 不默认新增 scripts                  | P0/P1 先 source-only / dogfood      |
-| 不承诺 P0 可运行 `/spec:evolve` / `$spec-evolve` | P0 是 source-only MVP               |
+| 不承诺 P0 可运行 `spec-evolve` / `spec-evolve` | P0 是 source-only MVP               |
 | 不做后台 daemon                    | 当前由 maintainer 手动触发                |
 | 不成为所有小改默认 gate                 | 只覆盖系统级变更                           |
 | 不自动写 `repo-profile.yaml`       | repo-profile 只存确认过的稳定标准            |
@@ -610,7 +610,7 @@ docs/YYYY-MM-DD-spec-evolve-baseline/
 不绑定 command template。
 不新增 scripts。
 不新增 agent profiles。
-不承诺 Claude `/spec:evolve` 或 Codex `$spec-evolve` 可运行。
+不承诺 Claude `spec-evolve` 或 Codex `spec-evolve` 可运行。
 ```
 
 ### P0 输出文档
@@ -789,8 +789,8 @@ src/cli/contracts/**
 这时才允许承诺：
 
 ```text
-Claude: /spec:evolve
-Codex: $spec-evolve
+Claude: spec-evolve
+Codex: spec-evolve
 ```
 
 ### Command Wiring 验收
@@ -800,8 +800,8 @@ Codex: $spec-evolve
 2. command 模板只路由到 source skill
 3. runtime copies 仍由 init/sync 生成
 4. skills-governance.json 中有触发说明
-5. Claude 入口写作 /spec:evolve
-6. Codex 入口写作 $spec-evolve
+5. Claude 入口写作 spec-evolve
+6. Codex 入口写作 spec-evolve
 7. npm run lint:skill-entrypoints 通过
 8. CHANGELOG.md 更新
 ```
@@ -1885,7 +1885,7 @@ P0 完成条件：
 2. 已证明现有 skill 组合存在 named gaps，或明确决定不新增 spec-evolve。
 3. 若新增，spec-evolve 是 source-only MVP。
 4. 若新增，已写入 skills-governance.json 记录，entry_surface=standalone_skill，command_name=null。
-5. 不承诺 Claude /spec:evolve 或 Codex $spec-evolve 可运行。
+5. 不承诺 Claude spec-evolve 或 Codex spec-evolve 可运行。
 6. 不新增 scripts。
 7. 不新增 agent profiles。
 8. 不修改 runtime generated copies。
@@ -1999,7 +1999,7 @@ collect-doc-code-surface-signals.js
 目标：
 
 ```text
-让 Claude /spec:evolve 和 Codex $spec-evolve 成为稳定入口。
+让 Claude spec-evolve 和 Codex spec-evolve 成为稳定入口。
 ```
 
 包含：
@@ -2119,7 +2119,7 @@ Implement source-only MVP for spec-evolve only if the composition baseline found
 Scope:
 - Add source skill definition.
 - Add a skills-governance.json record with entry_surface=standalone_skill and command_name=null.
-- Do not wire Claude /spec:evolve or Codex $spec-evolve command entry yet.
+- Do not wire Claude spec-evolve or Codex spec-evolve command entry yet.
 - Do not edit generated runtime copies.
 - Do not add scripts.
 - Do not add new agent profiles.

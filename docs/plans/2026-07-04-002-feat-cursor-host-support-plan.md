@@ -64,7 +64,7 @@ implements_schemas:
 - A1. Cursor 当前官方 docs 在 planning time（2026-07-05）暴露 Agent Skills、`.cursor/skills/`、`.agents/skills/`、nested `.cursor/skills/` / `.agents/skills/`、`~/.cursor/skills/`、`~/.agents/skills/`、`.claude/skills/`、`.codex/skills/`、`~/.claude/skills/`、`~/.codex/skills/`、`SKILL.md`、Viewing skills 与 `/migrate-to-skills` 路径；这是 planning-confirmed evidence，不是跳过实现期复核的许可证。实现前仍必须复核官方 docs 与本地 Cursor 版本，并用 U0 记录 exact evidence。
 - A2. `.agents/skills`、`.claude/skills`、`.codex/skills` 已是官方 confirmed Cursor-compatible skill roots；P0 duplicate warning contract 必须覆盖它们。Cursor 是否会发现 `.kiro/skills`、`.qoder/skills` 等非官方兼容 roots 尚未确认，只能作为 advisory hypothesis。
 - A3. Cursor project-level MCP config 使用 `.cursor/mcp.json`，user-level config 使用 `~/.cursor/mcp.json`；实现前必须再次复核官方 docs。
-- A4. Cursor 没有必须使用的 spec-first command source；P0 以 Cursor Agent Skills 作为用户可见入口。`$spec-*`/`/spec:*` 只能作为跨宿主概念映射出现在说明文档中，不进入 Cursor bootstrap wording，也不暗示 Cursor 支持同名 slash command。
+- A4. Cursor 没有必须使用的 spec-first command source；P0 以 Cursor Agent Skills 作为用户可见入口。`spec-*`/`spec-*` 只能作为跨宿主概念映射出现在说明文档中，不进入 Cursor bootstrap wording，也不暗示 Cursor 支持同名 slash command。
 - A5. 当前实现环境可能没有 Cursor CLI/IDE 或无法从 CLI 自动证明 loader 行为；这种情况只能得到 degraded validation，不影响 deterministic generated-asset tests。
 - A6. Cursor CLI 当前官方安装文档用 `agent --version` 验证，并在 CLI MCP 文档中使用 `agent mcp list` / `agent mcp list-tools <identifier>`；U0/U5 不得猜测 `cursor` 或 `cursor-agent`。实现期必须重新打开官方 CLI docs，记录 resolved binary path、version 和命令是否非交互可用。
 
@@ -84,7 +84,7 @@ implements_schemas:
 
 **P1 candidates after U0 passes and preview use is validated:**
 - Cursor subagents projection：需要确认 Cursor subagent frontmatter、tool model、dispatch 行为和安全默认值；只有在 skill-first preview 确认可用后才进入。P0 的已知降级是 typed reviewer/worker agent 派发不能投射为 Cursor subagents，多 agent review/workflow 只能经 skill prose 和宿主原生能力执行。
-- Cursor command-like entrypoint：只有在官方/本地证据证明稳定 surface 后再决定是否生成；若 Agent Skills 已足够，不必强行生成。P0 不提供 command surface，因此用户必须通过 Cursor skill invocation，而不是 `/spec:*` 或 `$spec-*`。
+- Cursor command-like entrypoint：只有在官方/本地证据证明稳定 surface 后再决定是否生成；若 Agent Skills 已足够，不必强行生成。P0 不提供 command surface，因此用户必须通过 Cursor skill invocation，而不是 `spec-*` 或 `spec-*`。
 - Cursor remote MCP writer：当前 `skills/spec-mcp-setup/mcp-tools.json` 中 spec-first required MCP servers 都是 stdio/command shape；remote `url`/`headers`/`auth` writer、remote secret redaction matrix 和 remote CLI validation 移入 P1，待真正引入 remote MCP server 时再补。
 
 **Later / adoption-dependent:**
@@ -142,7 +142,7 @@ implements_schemas:
 - `src/cli/plugin.js`: current source of supported host ids and governance validation loops; adding Cursor affects manifest, filtered assets, delivery semantics and strict host-delivery validation。
 - `src/cli/commands/init.js`: `INIT_PLATFORM_CHOICES` owns interactive/default host selection; Cursor should be selectable but `defaultForYes:false`。
 - `src/cli/commands/doctor.js` and `src/cli/commands/clean.js`: current command flags and auto-detection hard-code known hosts; Cursor must add explicit flags and avoid false positives from host-native `.cursor/**` files。
-- `src/cli/instruction-bootstrap.js`: host entrypoint wording and runtime exclusion prose; Cursor should use Cursor-specific entrypoint text, not Codex `$spec-*` or Qoder project commands wording。
+- `src/cli/instruction-bootstrap.js`: host entrypoint wording and runtime exclusion prose; Cursor should use Cursor-specific entrypoint text, not Codex `spec-*` or Qoder project commands wording。
 - `skills/spec-mcp-setup/scripts/*`: deterministic host detection/config writer; Cursor must be script-owned facts and config writes, not LLM-authored JSON edits。
 
 ### Institutional Learnings
@@ -457,7 +457,7 @@ The plan intentionally has a narrow runtime projection:
 - Test: `tests/unit/task-pack-command.test.js`
 
 **Approach:**
-- Add Cursor-specific bootstrap wording: Cursor workflow entrypoints use Cursor Agent Skills, not Codex `$spec-*` or Qoder project commands. `$spec-*` and `/spec:*` may be mentioned only as cross-host conceptual aliases in docs, not as Cursor invocation syntax.
+- Add Cursor-specific bootstrap wording: Cursor workflow entrypoints use Cursor Agent Skills, not Codex `spec-*` or Qoder project commands. `spec-*` and `spec-*` may be mentioned only as cross-host conceptual aliases in docs, not as Cursor invocation syntax.
 - Extend default runtime exclusions with `.cursor/skills/**`, `.cursor/spec-first/**` and `.cursor/mcp.json` as generated/runtime or host-local config output.
 - Define `.cursor/rules/**` as Cursor-native advisory input only when explicitly named; do not blanket exclude or consume all `.cursor/**`.
 - Add `.cursor/skills/`, `.cursor/spec-first/` and `.cursor/mcp.json` to managed gitignore patterns, but avoid ignoring `.cursor/rules/` and future user-owned Cursor files.

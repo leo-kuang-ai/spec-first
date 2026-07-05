@@ -740,7 +740,7 @@ skills/<skill>/evals/
 
 - **Given**: 用户输入"修复这个 failing test"+ stack trace
 - **When**: using-spec-first 路由判断
-- **Then**: 推荐 `/spec:debug`；不得推荐 work/brainstorm
+- **Then**: 推荐 `spec-debug`；不得推荐 work/brainstorm
 - **Covers**: Routing priority: debug before work
 
 #### Case EVAL-BRAINSTORM-EVIDENCE-001
@@ -1341,7 +1341,7 @@ argument-hint: "[optional args]"
 
 ### R01.1 Skill 基本情况
 
-`spec-mcp-setup` 是 spec-first 运行时就绪的"入口守门员"。其正式名称为 `spec-runtime-setup`（`/spec:runtime-setup`），当前因 alias contract 尚未落地，保持 `spec-mcp-setup` 兼容名。
+`spec-mcp-setup` 是 spec-first 运行时就绪的"入口守门员"。其正式名称为 `spec-runtime-setup`（`spec-runtime-setup`），当前因 alias contract 尚未落地，保持 `spec-mcp-setup` 兼容名。
 
 **核心职责：**
 - 安装/验证 MCP 服务器（sequential-thinking、context7）
@@ -1933,11 +1933,11 @@ CLAUDE.md 要求："缺 runtime 强制能力时，verification / handoff / knowl
 
 **问题2：using-spec-first Route Map 的 Claude/Codex 分列存在维护问题**
 
-每次新增/修改 workflow，Route Map 的两列（Claude `/spec:*` 和 Codex `$spec-*`）都需要同步修改。当前无自动化验证两列一致性的机制。
+每次新增/修改 workflow，Route Map 的两列（Claude `spec-*` 和 Codex `spec-*`）都需要同步修改。当前无自动化验证两列一致性的机制。
 
 **问题3：spec-mcp-setup 的 entrypoint 重命名未完成**
 
-计划中的 `/spec:runtime-setup` (`$spec-runtime-setup`) → `/spec:mcp-setup` (`$spec-mcp-setup`) 的 alias contract 尚未落地，导致两个宿主的 using-spec-first 路由表中仍用旧名称。
+计划中的 `spec-runtime-setup` (`spec-runtime-setup`) → `spec-mcp-setup` (`spec-mcp-setup`) 的 alias contract 尚未落地，导致两个宿主的 using-spec-first 路由表中仍用旧名称。
 
 ### R10.4 双宿主一致性改进建议
 

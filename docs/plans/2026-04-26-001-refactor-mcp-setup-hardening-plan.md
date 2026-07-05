@@ -87,7 +87,7 @@ origin: docs/brainstorms/2026-04-01-mcp-setup-skill-requirements.md
 - `skills/spec-mcp-setup/scripts/verify-tools.sh` / `verify-tools.ps1`：ledger writer，写入 host-specific `spec-first/host-setup.json`。
 - `skills/spec-graph-bootstrap/SKILL.md`：下游 readiness ledger v1 消费方，要求不再读取旧字段 `setup_success`、`tools.*.configured`、`crg.cli_available`、`crg.native_modules`。
 - `tests/unit/mcp-setup.sh`：当前主测试面，覆盖 registry、host facts、readiness facts、installer、uninstall、ledger、skill/reference 文案。
-- `tests/unit/dual-host-governance-contracts.test.js` 与 `tests/smoke/cli.sh`：守住 `$spec-mcp-setup` / `/spec:mcp-setup` runtime exposure。
+- `tests/unit/dual-host-governance-contracts.test.js` 与 `tests/smoke/cli.sh`：守住 `spec-mcp-setup` / `spec-mcp-setup` runtime exposure。
 
 ### Institutional Learnings
 
@@ -430,7 +430,7 @@ flowchart TD
 
 **Test scenarios:**
 - Happy path: active `spec-mcp-setup` source docs list exactly current supported tools and statuses.
-- Happy path: smoke tests still confirm `/spec:mcp-setup` and `$spec-mcp-setup` exposure.
+- Happy path: smoke tests still confirm `spec-mcp-setup` and `spec-mcp-setup` exposure.
 - Edge case: retired `install-coordinator.*` appears only as retired/negative guidance, not as an executable path.
 - Edge case: GitNexus / ABCoder / Feishu mentions in active setup surfaces are absent or explicitly historical.
 - Integration: generated runtime assets are not hand-edited; init/smoke paths remain the verification surface.
@@ -442,7 +442,7 @@ flowchart TD
 
 ## System-Wide Impact
 
-- **Interaction graph:** `$spec-mcp-setup` / `/spec:mcp-setup` invokes `check-health`, `check-deps`, `detect-host`, `detect-tools`, `install-mcp`, `configure-host`, `repair-install`, `activate-serena`, and `verify-tools`; `spec-graph-bootstrap` consumes the resulting host ledger.
+- **Interaction graph:** `spec-mcp-setup` / `spec-mcp-setup` invokes `check-health`, `check-deps`, `detect-host`, `detect-tools`, `install-mcp`, `configure-host`, `repair-install`, `activate-serena`, and `verify-tools`; `spec-graph-bootstrap` consumes the resulting host ledger.
 - **Error propagation:** Script failures should propagate as structured facts with reason code, diagnostic summary, and next action. The workflow explains these facts; scripts do not perform open-ended semantic recovery.
 - **State lifecycle risks:** Host config writes can partially modify user files unless lock / backup / verify / rollback are correct. Serena ready markers can become stale unless removed before bootstrap and only recreated after success. Ledger writes can mislead users unless `baseline_ready` and `overall_status` are clearly separated.
 - **API surface parity:** Unix `.sh` and Windows `.ps1` entrypoints must expose equivalent observable JSON fields and readiness semantics.

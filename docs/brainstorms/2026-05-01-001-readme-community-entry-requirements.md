@@ -60,9 +60,9 @@ spec_id: 2026-05-01-001-readme-community-entry
 **上手路径**
 
 - R6. Quickstart 命令块前必须列出最小 prerequisites：可用的 Node/npm 环境，用户已选择 Claude Code 或 Codex 作为当前宿主，并且当前 shell 位于想启用 spec-first 的项目仓库根目录；首次试用者可以先在 throwaway/test repo 中体验。没有对应宿主的读者应先完成宿主安装或转到相关文档。
-- R7. Quickstart 必须前置到 README 主体前半段，并呈现最短闭环：在 terminal 安装 CLI、运行 `doctor`、按当前宿主 init；重启宿主；在宿主会话运行第一个 workflow。命令示例必须明确区分 terminal commands 与 host-session workflow entries：CLI 命令使用 shell/terminal 命令块，`$spec-*` 明确标注为 Codex 会话内入口，`/spec:*` 明确标注为 Claude Code 会话内入口，不得放在同一个未标注的 `bash` 命令块中。
+- R7. Quickstart 必须前置到 README 主体前半段，并呈现最短闭环：在 terminal 安装 CLI、运行 `doctor`、按当前宿主 init；重启宿主；在宿主会话运行第一个 workflow。命令示例必须明确区分 terminal commands 与 host-session workflow entries：CLI 命令使用 shell/terminal 命令块，`spec-*` 明确标注为 Codex 会话内入口，`spec-*` 明确标注为 Claude Code 会话内入口，不得放在同一个未标注的 `bash` 命令块中。
 - R8. Quickstart 必须明确用户按实际宿主选择 `--claude` 或 `--codex`，不能暗示所有用户都必须同时初始化两个宿主。
-- R9. README 必须给出 "First workflow" 指引，把常见起点映射到公开入口：有想法用 brainstorm，有计划用 plan，要执行用 work，要评审用 code-review，要调试用 debug；同时必须用 brainstorm 作为默认 first-run 示例，说明 `$spec-brainstorm` / `/spec:brainstorm` 是宿主会话内入口，会形成 requirements brief，并可继续进入 plan。
+- R9. README 必须给出 "First workflow" 指引，把常见起点映射到公开入口：有想法用 brainstorm，有计划用 plan，要执行用 work，要评审用 code-review，要调试用 debug；同时必须用 brainstorm 作为默认 first-run 示例，说明 `spec-brainstorm` / `spec-brainstorm` 是宿主会话内入口，会形成 requirements brief，并可继续进入 plan。
 
 **渐进披露与信息架构**
 
@@ -90,7 +90,7 @@ spec_id: 2026-05-01-001-readme-community-entry
 ## Acceptance Examples
 
 - AE1. **Covers R1, R2, R4, R5, R16.** Given 一名首次用户打开 README，when 他阅读首屏、"Why spec-first?"、适用性判断、轻量 trust summary 和后续 Trust Model，then 他能说出 spec-first 不是单个 prompt，而是一套适合 Claude Code / Codex 用户沉淀 AI 研发流程的 workflow，并能复述 `scripts prepare, LLM decides` 以及 Why 只做价值提示、详细 Trust Model 位于 Core Concepts 之后。
-- AE2. **Covers R6, R7, R8, R9.** Given 一名 Codex 用户只使用 Codex，when 他在项目仓库根目录阅读 Quickstart，then 他会在 terminal 运行 `spec-first init --codex`，重启后在 Codex 会话中尝试 `$spec-brainstorm` 或其他 `$spec-*` 入口，而不是误以为还必须运行 Claude init，或把 `$spec-*` 当作 shell 命令运行。
+- AE2. **Covers R6, R7, R8, R9.** Given 一名 Codex 用户只使用 Codex，when 他在项目仓库根目录阅读 Quickstart，then 他会在 terminal 运行 `spec-first init --codex`，重启后在 Codex 会话中尝试 `spec-brainstorm` 或其他 `spec-*` 入口，而不是误以为还必须运行 Claude init，或把 `spec-*` 当作 shell 命令运行。
 - AE3. **Covers R10, R11, R12.** Given 一名首访用户还没决定是否安装，when 他阅读 README 前半段，then 他看到 README 按“是什么 → 为什么/适用性/trust summary → 快速上手 → 第一个 workflow → 核心概念”推进，不会先被 runtime asset 数量、完整 graph provider 细节或完整生成路径打断，并能从 Core Concepts 看到 source assets vs generated runtime assets、current host、scripts prepare / LLM decides、task-pack handoff 四项少数必要概念。
 - AE4. **Covers R14, R15.** Given 维护者更新英文 README 结构，when 同步中文 README，then 两份文档的章节顺序和关键约束保持一致，只做语言本地化差异。
 - AE5. **Covers R9.** Given 一名用户运行第一个 brainstorm workflow，when README 展示 first-run result，then 用户能看到它会形成 `docs/brainstorms/...-requirements.md` 这类 requirements brief，并理解下一步可进入 plan。
@@ -111,7 +111,7 @@ spec_id: 2026-05-01-001-readme-community-entry
 ## Implementation Verification
 
 - 2026-05-01 17:28 30 秒首访阅读检查：`README.md` 与 `README.zh-CN.md` 首屏先回答“是什么”（面向 Claude Code 与 Codex 的 spec-driven AI engineering workflows）、“为什么值得试”（可复用 workflow loop、清晰脚本/LLM 信任边界、双宿主一致性）和“下一步怎么开始”（进入 Quickstart，按当前宿主 init 后运行第一个 brainstorm workflow）。
-- 2026-05-01 17:28 单宿主 Quickstart trace（Codex）：从项目 repo 根目录阅读 prerequisites，terminal 中执行 `npm install -g spec-first`、`spec-first doctor`、`spec-first init --codex -u <name> --lang en|zh`；重启 Codex 或新开会话；在 Codex 会话内运行 `$spec-brainstorm "Improve onboarding"` / `$spec-brainstorm "改进 onboarding"`；文档明确预期产物为 `docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md`，随后进入当前宿主 plan 入口。
+- 2026-05-01 17:28 单宿主 Quickstart trace（Codex）：从项目 repo 根目录阅读 prerequisites，terminal 中执行 `npm install -g spec-first`、`spec-first doctor`、`spec-first init --codex -u <name> --lang en|zh`；重启 Codex 或新开会话；在 Codex 会话内运行 `spec-brainstorm "Improve onboarding"` / `spec-brainstorm "改进 onboarding"`；文档明确预期产物为 `docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md`，随后进入当前宿主 plan 入口。
 - 2026-05-01 18:31 开源信任入口二阶段验证：`README.md` 与 `README.zh-CN.md` 已增加 trust badges、90 秒文本 demo、Quickstart 完成标志、`docs/brainstorms/` / `docs/plans/` / `docs/tasks/` 产物说明、source assets -> runtime assets -> workflow artifacts 工作方式说明，以及 `CONTRIBUTING.md` / `SECURITY.md` / `LICENSE` 社区入口；`tests/unit/readme-open-source-entry.test.js` 覆盖 proof/trust 结构、local links 和保守安全政策边界。
 
 ---
@@ -157,4 +157,4 @@ spec_id: 2026-05-01-001-readme-community-entry
 
 ## Next Steps
 
--> `$spec-plan` 进行结构化实施规划
+-> `spec-plan` 进行结构化实施规划

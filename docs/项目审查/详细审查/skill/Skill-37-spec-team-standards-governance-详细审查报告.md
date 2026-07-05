@@ -8,11 +8,11 @@
 | 文件路径 | `skills/spec-team-standards-governance/SKILL.md` |
 | 当前行数 | 90 行 |
 | entry surface | standalone skill |
-| 当前 source 证据 | `docs/catalog/runtime-capabilities.md` 将其列为 standalone skill；`skills/spec-team-standards-governance/SKILL.md` 声明不可恢复 `/spec:standards` / `$spec-standards` |
+| 当前 source 证据 | `docs/catalog/runtime-capabilities.md` 将其列为 standalone skill；`skills/spec-team-standards-governance/SKILL.md` 声明不可恢复 `spec-standards` / `spec-standards` |
 
 ## 2. 职责定位
 
-该 skill 负责 source-backed team standards governance：查询 confirmed standards、初始化/提议候选、准备 promotion/deprecation、做健康审计和 eval/replay。它不是 public workflow，不生成 `/spec:standards` 或 `$spec-standards`，也不把 advisory candidates 当 hard context。
+该 skill 负责 source-backed team standards governance：查询 confirmed standards、初始化/提议候选、准备 promotion/deprecation、做健康审计和 eval/replay。它不是 public workflow，不生成 `spec-standards` 或 `spec-standards`，也不把 advisory candidates 当 hard context。
 
 ## 3. 适用与不适用场景
 
@@ -58,7 +58,7 @@ Output Contract 是本 skill 的单一输出字段真相源，所有 mode 都必
 
 ## 9. 核心优点
 
-- Retired workflow 边界强：明确不得恢复 `/spec:standards`、`$spec-standards`、`skills/spec-standards/`。
+- Retired workflow 边界强：明确不得恢复 `spec-standards`、`spec-standards`、`skills/spec-standards/`。
 - 不把 confidence、observed、suggested、replay result 当 authority。
 - Reference Loading Map 做到了 progressive disclosure。
 - Output Contract 集中，避免字段散落。

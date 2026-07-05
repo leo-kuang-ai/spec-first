@@ -300,19 +300,19 @@ sequenceDiagram
 **Approach:**
 - **老用户宽限规则(新增,优先级最低):**
   - fingerprint 不存在 **且** 已有 graph artifacts → advisory 提示"建议重跑 mcp-setup 升级场景指纹",不阻断后续 workflow
-  - fingerprint 不存在 **且** 无任何旧 artifacts → 推荐先跑 `/spec:mcp-setup`
+  - fingerprint 不存在 **且** 无任何旧 artifacts → 推荐先跑 `spec-mcp-setup`
 - **6 优先级路由(维度独立,不合成评分):**
   1. `state_class=foreign-residual` 或 `foreign_residual_indicators.length>0` → `spec-first clean --workspace-orphans` + `spec-first init`
-  2. `state_class=first-time-on-new-machine` → `/spec:mcp-setup`
+  2. `state_class=first-time-on-new-machine` → `spec-mcp-setup`
   3. `complexity_dimensions.git_alignment_broken=true` **且** 任务涉及 impact/review/refactor → 告知覆盖盲区
-  4. `providers_status_refs.gitnexus` 引用 status 为 unavailable/query-unverified → `/spec:graph-bootstrap` 或 fallback
+  4. `providers_status_refs.gitnexus` 引用 status 为 unavailable/query-unverified → `spec-graph-bootstrap` 或 fallback
   5. `complexity_dimensions.worktree_dirty_graph_affecting=true` **且** 任务涉及 commit/PR → 提示 dirty 列表
   6. 上述都不命中 → 按用户意图正常路由
 - 每次推荐"一个入口 · 一个理由 · 一个动作";所有推荐均为 advisory,LLM 可越级
 - `freshness.stale_setup_layer=true` → 主动提示重跑 setup(advisory)
 
 **Test scenarios:**
-- Integration: `state_class=clean` + 用户意图 review → 正常路由 `/spec:code-review`
+- Integration: `state_class=clean` + 用户意图 review → 正常路由 `spec-code-review`
 - Integration: `state_class=foreign-residual` → 优先级 1 触发,输出 clean + init 建议
 - Integration: fingerprint 不存在 + 旧 graph artifacts 存在 → advisory 提示,不阻断
 - Integration: fingerprint 不存在 + 无旧 artifacts → 推荐先跑 mcp-setup

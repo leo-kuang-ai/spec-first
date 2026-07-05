@@ -48,9 +48,9 @@ spec_id: 2026-06-21-002-refactor-spec-brainstorm-ce-patterns
 
 - 不复制 CE 的宽触发 frontmatter、`output:html` exclusive artifact、Proof/browser handoff、Path A 同轮 auto-write、scout dossier scratch path、模型 tier 指令或 mandatory claim verifier phase。
 - 不新增 `spec-brainstorm-v2`、新 public workflow、per-skill `manifest.json`、trust report 或 output quality scorecard。
-- 不改变 current-host entrypoint wording，不新增 `/spec:*` 或 `$spec-*` 硬编码到 `spec-brainstorm` source。
+- 不改变 current-host entrypoint wording，不新增 `spec-*` 或 `spec-*` 硬编码到 `spec-brainstorm` source。
 - 不调整 routing fixture 的 route matrix，除非实现发现新增规则确实改变 routing contract；本计划预期不改变 routing。
-- 不运行实现、测试修复或 runtime regeneration；这些属于后续 `$spec-work`。
+- 不运行实现、测试修复或 runtime regeneration；这些属于后续 `spec-work`。
 
 ### Deferred to Follow-Up Work
 
@@ -173,7 +173,7 @@ spec_id: 2026-06-21-002-refactor-spec-brainstorm-ce-patterns
 ## Assumptions
 
 - A1. The existing dirty `spec-brainstorm` source split is intentional and should be treated as the current baseline.
-- A2. The goal is to plan the next source evolution only; implementation should wait for explicit handoff into `$spec-work`.
+- A2. The goal is to plan the next source evolution only; implementation should wait for explicit handoff into `spec-work`.
 - A3. CE files remain available in the sibling checkout during implementation if exact wording needs another look.
 
 ---

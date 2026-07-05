@@ -23,7 +23,7 @@ date: 2026-04-12
 与此同时，安装成功后的三类提示缺少产品分层：
 
 - `bin/postinstall.js` 在安装阶段包含 warning 兜底文案（"属于预期行为"）+ 4 条 workflow 入口列表，与 Unit 1 完成后的目标状态（无需 warning 兜底 + 只指向 doctor/-v）不一致。
-- `src/cli/index.js` 的 `printVersion()` 完全没有提到 `doctor`，直接跳到 `init` → `/spec:ideate`/`/spec:brainstorm`，与 `doctor` 的 canonical onboarding 路径（doctor → init → 重启 → workflow）方向冲突。
+- `src/cli/index.js` 的 `printVersion()` 完全没有提到 `doctor`，直接跳到 `init` → `spec-ideate`/`spec-brainstorm`，与 `doctor` 的 canonical onboarding 路径（doctor → init → 重启 → workflow）方向冲突。
 - `src/cli/commands/doctor.js` 已具备很好的“安装后第一动作”能力，但当前没有被提升为最稳定、最权威的后续入口。
 
 结果是：用户经历了大量 warning，却没有得到单一且稳定的成功路径；文档也把噪音当作“预期行为”长期接受，降低了整体产品质量门槛。
@@ -73,7 +73,7 @@ date: 2026-04-12
 - `npm view tree-sitter-swift@0.6.0`：即使把 Swift 版本降到 `0.6.0`，其依赖里仍包含 `tree-sitter-cli@^0.23`，说明“仅降级 Swift 版本”不能消除安装期 GitHub 下载链
 - `node_modules/tree-sitter-cli/install.js`：下载地址固定指向 GitHub release，且未提供镜像、重试、离线缓存等产品级兜底能力，因此不应继续作为默认安装链路的一部分
 - `bin/postinstall.js`：在安装阶段包含 warning 兜底文案（”属于预期行为”）+ 4 条 workflow 入口列表，与 Unit 1 完成后的目标状态（无需 warning 兜底 + 只指向 doctor/-v）不一致
-- `src/cli/index.js`：`printVersion()` 完全没有提到 `doctor`，直接跳到 `init` → `/spec:ideate`/`/spec:brainstorm`，与 canonical onboarding 路径（doctor → init → 重启 → workflow）方向冲突
+- `src/cli/index.js`：`printVersion()` 完全没有提到 `doctor`，直接跳到 `init` → `spec-ideate`/`spec-brainstorm`，与 canonical onboarding 路径（doctor → init → 重启 → workflow）方向冲突
 - `src/cli/commands/doctor.js`：在未初始化项目时已能输出简洁的 `init --claude` / `init --codex` 指引，适合成为 canonical next step
 - `src/crg/lang-config.js`：Swift 当前被硬编码到上游包名 `tree-sitter-swift`，因此若采用受控 Swift parser 包，必须同步调整包名映射或加一层最小适配
 - `src/crg/parser.js`：当某个 parser 包 `require()` 失败时，`parseFile()` 会返回 `reason: 'no_parser'` 的 graceful degradation；这仍可作为安全兜底，但在新约束下**不能**作为 Swift 的默认安装路径
@@ -104,7 +104,7 @@ date: 2026-04-12
 - **KD1: 先治理依赖图，再治理文案。** 当前最刺眼的问题是 `tree-sitter` peer mismatch 触发的安装噪音；如果不先解决，任何欢迎文案优化都会被 warning 冲掉。
 - **KD2: `postinstall` 只保留最短 next step。** 安装阶段输出不可作为稳定承诺，因此这里只做“安装成功 + 运行 `spec-first doctor` + 如需详情执行 `spec-first -v`”。
 - **KD3: `spec-first -v` 作为稳定欢迎页，`doctor` 作为稳定第一动作。** `-v` 负责解释“这个 CLI 是什么 + 你现在该干什么”；`doctor` 负责在当前项目里给出精确状态与下一步。
-- **KD4: 统一 onboarding 的 canonical 顺序。** 推荐顺序收敛为：安装 CLI → `spec-first doctor` → `spec-first init --claude|--codex` → 重启宿主 → 使用 `/spec:*` 或 `$spec-*`。
+- **KD4: 统一 onboarding 的 canonical 顺序。** 推荐顺序收敛为：安装 CLI → `spec-first doctor` → `spec-first init --claude|--codex` → 重启宿主 → 使用 `spec-*` 或 `spec-*`。
 - **KD5: `tree-sitter-swift` 的问题不是单纯 peer conflict，而是 install-time network dependency。** 仅把 `tree-sitter-swift` 从 `0.7.1` 降到 `0.6.0` 不能解决安装失败，因为 `0.6.0` 依然依赖 `tree-sitter-cli@^0.23`。
 - **KD6: Swift 保持必装，但默认安装面只接受“无安装期网络依赖”的 Swift parser 路线。** 这意味着不能继续直接依赖当前上游 `tree-sitter-swift`；推荐维护受控的 Swift parser 包（例如 scoped fork、vendor 包或内部包），把生成产物随包分发，切断 `tree-sitter-cli` 安装链。
 - **KD7: 以“受控 Swift parser 包 + 其余 grammar 版本收敛”为主策略，`overrides` 为辅助兜底。** npm 的 `overrides` 在全局安装场景下不保证生效（`overrides` 需要 npm v8.3+，而 `engines.node >= 20` 默认 bundled npm 9+，版本满足），因此核心策略必须是：Swift 改用受控包、c/python/rust 等 grammar 用兼容版本收敛 peer range。`overrides` 只作为额外保障层。
@@ -118,7 +118,7 @@ date: 2026-04-12
 
 - **Q: 这次优化的主问题是不是 `postinstall` 文案不够友好？** 不是。真正的首屏失败体验首先来自依赖 warning 噪音，文案只是第二层问题。
 - **Q: `doctor` 是否适合作为安装后第一动作？** 适合。当前实现已经能在未初始化项目中给出简洁、正确的下一步。
-- **Q: 是否应继续在 `postinstall` 中直接展示 `/spec:graph-bootstrap`、`/spec:plan` 等 workflow 列表？** 不应。那是初始化和重启宿主之后的事情，安装阶段提前暴露会增加信息噪音。
+- **Q: 是否应继续在 `postinstall` 中直接展示 `spec-graph-bootstrap`、`spec-plan` 等 workflow 列表？** 不应。那是初始化和重启宿主之后的事情，安装阶段提前暴露会增加信息噪音。
 - **Q: 是否可以通过包内 `overrides` 快速遮掉 warning？** 不应作为消除 warning 的主手段，但作为辅助兜底层仍有价值。npm 的 `overrides` 在全局安装场景下不保证生效，核心策略必须是 grammar 包版本降级。
 - **Q: 把 `tree-sitter-swift` 从 `0.7.1` 降到 `0.6.0`，能否同时解决 warning 和安装失败？** 不能。`0.6.0` 仍然依赖 `tree-sitter-cli@^0.23`，安装期 GitHub 下载链依然存在。
 - **Q: 是否可以靠并发安装、多线程或多 subagent 解决当前用户安装失败？** 不能。失败根因是 `tree-sitter-cli` 下载 GitHub release 的单点阻塞；并发只会让其他依赖更早完成，无法移除这个硬阻塞步骤。
@@ -290,7 +290,7 @@ flowchart TD
 **Test scenarios:**
 - Happy path: `postinstall` 输出包含安装完成与 `spec-first doctor`
 - Happy path: `postinstall` 输出包含 `spec-first -v` 作为详情入口
-- Edge case: `postinstall` 不再列出 `/spec:graph-bootstrap`、`/spec:graph-bootstrap`、`/spec:plan` 等后续 workflow 入口
+- Edge case: `postinstall` 不再列出 `spec-graph-bootstrap`、`spec-graph-bootstrap`、`spec-plan` 等后续 workflow 入口
 - Edge case: 输出总行数受控，不再形成长篇说明块
 
 **Verification:**
@@ -324,9 +324,9 @@ flowchart TD
 **Test scenarios:**
 - Happy path: `spec-first -v` 输出版本号、产品定位和 `spec-first doctor`
 - Happy path: `spec-first -v` 输出 `init --claude` / `init --codex` 的后续动作
-- Edge case: `spec-first -v` 不再把 `/spec:ideate`、`/spec:brainstorm` 当作安装后的第一建议
+- Edge case: `spec-first -v` 不再把 `spec-ideate`、`spec-brainstorm` 当作安装后的第一建议
 - Edge case: `-v` 与 `doctor` 的指引顺序一致，不存在互相打架的下一步
-- **Regression guard**: `spec-first -v` 的输出必须包含 `doctor` 字符串（`spec-first -v | grep -q “doctor”`），且不能把 `/spec:ideate` 或 `/spec:brainstorm` 作为安装后第一建议；此断言写入 smoke 测试防止未来回退
+- **Regression guard**: `spec-first -v` 的输出必须包含 `doctor` 字符串（`spec-first -v | grep -q “doctor”`），且不能把 `spec-ideate` 或 `spec-brainstorm` 作为安装后第一建议；此断言写入 smoke 测试防止未来回退
 - Integration: fresh project 中先看 `-v` 再执行 `doctor`，两者共同形成一条连续路径
 
 **Verification:**
@@ -354,7 +354,7 @@ flowchart TD
 - 统一所有入口文档中的推荐顺序：安装 → `doctor` → `init` → 重启 → workflow
 - 重写”peer dependency 警告”相关段落：从”预期行为，可忽略”改为”这是已知兼容性噪音，本版本目标是消除；若仍出现则作为故障排查说明”
 - **修正现有文档中的版本方向描述错误**：`06-本地源码安装.md` 第 53 行和 `04-常见问题.md` 第 314-325 行错误地将版本关系描述为”tree-sitter@~0.22.0 主包 vs grammar 要 ^0.21.x”，实际方向相反（tree-sitter@0.21.0 主包，grammar 要 ^0.22.1）。Unit 4 必须同时修正这一事实错误
-- 在 FAQ 中明确区分”安装成功确认”与”宿主内 workflow 可见”是两个阶段，避免把 `/spec:*` 可见性归咎于安装本身
+- 在 FAQ 中明确区分”安装成功确认”与”宿主内 workflow 可见”是两个阶段，避免把 `spec-*` 可见性归咎于安装本身
 - 更新版本更新文档，记录安装体验治理属于用户可见改进
 - 注意：README 已在 Quick Start 中包含 `spec-first doctor`（第 82-84 行），Unit 4 的 README 改动范围主要是修正 warning 相关文案，不需要从零写 doctor 引导
 

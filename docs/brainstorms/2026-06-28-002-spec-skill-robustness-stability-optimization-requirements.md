@@ -31,7 +31,7 @@ readiness_inputs_hash: sha256:e40974a4adbed2d0fa27f057a2a33cd406ffc0220e4599e711
 
 ## Summary（概要）
 
-本 PRD 把 `docs/项目审查/2026-06-28-spec-skill-健壮性稳定性优化审查.md` 经 fresh-source 元审查确认成立的优化项，整理为可被 `/spec:plan` 消费的需求集合。actor 为 Spec-First Evolution Architect 与后续接手的 plan/work workflow；increment 是 skill 体系的健壮性/稳定性/确定性 gate 加固；intended outcome 是让核心链路 `Codebase→Spec→Plan→Tasks→Work→Review→Knowledge` 的确定性 gate 真正负载、可复用知识真正沉淀、入口路由不可被合理化绕过、audit 信号不再被误报淹没。当前系统锚点是已具备 37 skill governance registry、source/runtime 边界、eval fixture contract 的工程化骨架，本 PRD 不新增 workflow，只闭合四类质量债。形态为 final-prd：WHAT 已定义，两条 blocking owner 决策已闭环（OQ-01/OQ-03，见 Owner Decision Trace），ready receipt 已写入。
+本 PRD 把 `docs/项目审查/2026-06-28-spec-skill-健壮性稳定性优化审查.md` 经 fresh-source 元审查确认成立的优化项，整理为可被 `spec-plan` 消费的需求集合。actor 为 Spec-First Evolution Architect 与后续接手的 plan/work workflow；increment 是 skill 体系的健壮性/稳定性/确定性 gate 加固；intended outcome 是让核心链路 `Codebase→Spec→Plan→Tasks→Work→Review→Knowledge` 的确定性 gate 真正负载、可复用知识真正沉淀、入口路由不可被合理化绕过、audit 信号不再被误报淹没。当前系统锚点是已具备 37 skill governance registry、source/runtime 边界、eval fixture contract 的工程化骨架，本 PRD 不新增 workflow，只闭合四类质量债。形态为 final-prd：WHAT 已定义，两条 blocking owner 决策已闭环（OQ-01/OQ-03，见 Owner Decision Trace），ready receipt 已写入。
 
 ## Problem Frame（问题框架）
 
@@ -57,7 +57,7 @@ readiness_inputs_hash: sha256:e40974a4adbed2d0fa27f057a2a33cd406ffc0220e4599e711
 | R-04 | P0 | spec-doc-review 必须具备可追踪的 learning-capture 路径，headless 模式与 safe_auto 应用路径至少留一条包含候选证据、建议动作和用户选择记录方式的 advisory 行 | `spec-doc-review/SKILL.md:43` Downstream Consumers 未列 compound，全文无 capture（grep 返回空）；`spec-doc-review/SKILL.md:85-93` 只有 headless 模式与 safe_auto 机制；code-review `:853-857` 三段式可移植 |
 | R-05 | P1 | routing-red-flags.md 不得含反转 skill 名 | `:25` 写 bug-report，真实为 report-bug |
 | R-06 | P1 | sensitive surfaces 必须在 scope-guards.md 或红旗中有定义与举例 | `routing-red-flags.md:7` 唯一出现且无定义，是最大合理化漏洞 |
-| R-07 | P1 | 红旗 route target 不得用裸名 update/setup 引发 /spec:* 命名混淆 | `routing-red-flags.md:13` 裸名，应写 spec-first update/`/spec:mcp-setup` |
+| R-07 | P1 | 红旗 route target 不得用裸名 update/setup 引发 spec-* 命名混淆 | `routing-red-flags.md:13` 裸名，应写 spec-first update/`spec-mcp-setup` |
 | R-08 | P1 | bootstrap 显式缺席集必须覆盖 slack-research/skill-audit/app-consistency-audit/polish-beta | `instruction-bootstrap.test.js:539-540` 仅断言 sessions/release-notes 缺席 |
 | R-09 | P1 | CURATED_CORE 必须从 skills-governance.json 派生，不得硬编码 | `instruction-bootstrap.test.js:514-517` 数组字面量，无 registry 引用 |
 | R-10 | P1 | 两条 load-bearing 红旗（vague→brainstorm/plan、run-init-now→route first）必须在 bootstrap 内联或有 intentional deferral 测试 | routing-red-flags.md 有 7 条，bootstrap 仅内联 5 条；无测试守护 |
@@ -198,7 +198,7 @@ Then placeholder 和代码块链接不产生 broken_local_link，真实本地 br
 
 | 原审查项 | 真实状态 | 处置 |
 | --- | --- | --- |
-| P0-1 map `/spec:update` stale | 盘面已无（grep exit 1） | 降为 R-28 防回归（P2） |
+| P0-1 map `spec-update` stale | 盘面已无（grep exit 1） | 降为 R-28 防回归（P2） |
 | P0-2 byte-faithful repo-state test 缺失 | 已存在（`instruction-bootstrap.test.js:401-415` + `instruction-bootstrap.js:38-82`） | 移除主体；细分点为 R-08/R-09/R-10 |
 | P0-3「scanner 误报已处理」 | 附录 B 初稿纠错本身错误，三行 P0 仍为 live 误报 | 恢复 P0，即 R-01 |
 | 附录 A-D「code-review headless 完全抑制」 | 源码 `:857` 允许至多一行 advisory | 措辞修正，R-04 目标是 doc-review 达同等基线 |

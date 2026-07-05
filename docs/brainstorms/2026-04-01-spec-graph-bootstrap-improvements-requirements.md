@@ -75,4 +75,4 @@ topic: spec-graph-bootstrap-improvements
 
 ## Next Steps
 
-→ `/spec:plan` 进行结构化实施规划
+→ `spec-plan` 进行结构化实施规划

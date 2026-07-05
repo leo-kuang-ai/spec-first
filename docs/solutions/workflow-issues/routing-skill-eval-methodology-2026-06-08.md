@@ -17,7 +17,7 @@ tags: [skill-evaluation, routing-skill, using-spec-first, baseline-isolation, fr
 
 ## Context
 
-`using-spec-first` 这类 skill 不产出文件,产出的是**路由决策**(把用户意图导向某个 `/spec:*` workflow,或直接回答,或 guide-mode 给下一步)。skill-creator 的默认评测假设"skill 产出可检验的 artifact",对这类 skill 不直接适用,需要改造。
+`using-spec-first` 这类 skill 不产出文件,产出的是**路由决策**(把用户意图导向某个 `spec-*` workflow,或直接回答,或 guide-mode 给下一步)。skill-creator 的默认评测假设"skill 产出可检验的 artifact",对这类 skill 不直接适用,需要改造。
 
 本次评测要回答的真问题是:**这个引导 skill 到底高不高质量?它相比"没有它的裸 Claude"多带来了什么?**
 
@@ -47,7 +47,7 @@ iteration-2 专门造 baseline 会翻车的用例:多意图混杂(修 bug+加功
 
 ### 4. 路由 skill 的真实价值是"固化纪律",不是"选对入口"
 
-最强证据(iteration-2 eval-1,用户说"一步到位、你看着办"):baseline 路由对了 `/spec:plan`,但结尾擅自预告串联"进 plan→接 work 一次性实现+验证",违反"不自动串联多个 workflow"纪律;with-skill 两 run 都守住单一入口。
+最强证据(iteration-2 eval-1,用户说"一步到位、你看着办"):baseline 路由对了 `spec-plan`,但结尾擅自预告串联"进 plan→接 work 一次性实现+验证",违反"不自动串联多个 workflow"纪律;with-skill 两 run 都守住单一入口。
 
 裸强模型**偶尔能想到守纪律,但不稳定**(±25% 方差);with-skill 全 run 稳定 100%、0 方差。**把"偶发的好习惯"固化成"每次必然遵守的纪律"——这才是引导 skill 不可替代的价值**,而非"教模型选哪个入口"(那对强模型增量极薄)。评测用例与 skill 优化都应向这个维度倾斜:不自动串联、scope-guard 不重路由、不暴露 internal-helper、guide-mode 单一下一步、双宿主入口前缀正确。
 
@@ -89,7 +89,7 @@ Bundled skills governance truth source is missing skills: using-spec-first-works
 **反例 vs 正例(baseline 设计):**
 
 ```text
-反例:baseline = 完全不给 skill → 它连有哪些 /spec:* 都不知道 → 测的是"菜单认知"
+反例:baseline = 完全不给 skill → 它连有哪些 spec-* 都不知道 → 测的是"菜单认知"
 正例:baseline = 只给入口清单(名+用途),不给路由策略 → 测的是"路由策略增量"
 ```
 

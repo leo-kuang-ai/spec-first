@@ -110,10 +110,10 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 本方案明确不做以下事情：
 
 1. 不为 `Codex` 设计未经验证的 hook / session-start 兼容层。
-2. 不把 `using-spec-first` 改造成 `/spec:using` 或 `$spec-using`。
+2. 不把 `using-spec-first` 改造成 `spec-using` 或 `spec-using`。
 3. 不在 hook 脚本里复制第二套路由规则摘要。
 4. 不用 `AGENTS.md` 模拟 `using-superpowers` 旧时代的 bootstrap 命令块。
-5. 不改变现有 `/spec:*` 与 `$spec-*` 的产品面。
+5. 不改变现有 `spec-*` 与 `spec-*` 的产品面。
 
 ## 4. 推荐方案总览
 
@@ -125,7 +125,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 
 1. 定义 substantial work
 2. 定义 workflow 决策树
-3. 定义 Claude `/spec:*` 与 Codex `$spec-*` 入口
+3. 定义 Claude `spec-*` 与 Codex `spec-*` 入口
 4. 定义负向约束：
    - 不是 brainstorming-first
    - 不采用 `using-superpowers` 的 1% 强制 skill 纪律
@@ -142,8 +142,8 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 
 1. 当前项目安装了 `using-spec-first`
 2. substantial work 前先做 workflow 判定
-3. `Claude` 主入口是 `/spec:*`
-4. `Codex` 主入口是 `$spec-*`
+3. `Claude` 主入口是 `spec-*`
+4. `Codex` 主入口是 `spec-*`
 
 ### 4.3 Claude 会话启动注入层
 
@@ -276,15 +276,15 @@ block 内容建议保持轻量：
 
 1. 当前项目已安装 `using-spec-first`
 2. 在 substantial work 前，先按 `using-spec-first` 做 workflow 判定
-3. Claude workflow 入口使用 `/spec:*`
+3. Claude workflow 入口使用 `spec-*`
 4. 不要把 `using-spec-first` 本身当作 command
 
 #### Codex block
 
 1. 当前项目已安装 `using-spec-first`
 2. 在 substantial work 前，先按 `using-spec-first` 做 workflow 判定
-3. Codex workflow 入口使用 `$spec-*`
-4. 不要把 `using-spec-first` 本身写成 `/spec:*`
+3. Codex workflow 入口使用 `spec-*`
+4. 不要把 `using-spec-first` 本身写成 `spec-*`
 
 ### 6.4 Claude settings merge
 
@@ -353,7 +353,7 @@ block 内容建议保持轻量：
 1. `.agents/skills/using-spec-first/SKILL.md` 已安装
 2. `AGENTS.md` bootstrap block 存在
 3. 不存在伪造的 `.codex/hooks`
-4. 不存在误写的 `/spec:*` 主入口
+4. 不存在误写的 `spec-*` 主入口
 
 也就是说，`Codex` 没有 hook 不是缺陷；在当前阶段，这就是它的目标健康态。
 
@@ -413,7 +413,7 @@ block 内容建议保持轻量：
 
 1. `.agents/skills/using-spec-first/SKILL.md` 存在性 + 与源 skill 经 codex adapter transform 后的字节对比
 2. `AGENTS.md` 受管 bootstrap block marker 成对性 + 区块文本与 `buildBlock('codex')` 一致性
-3. 否定性断言：不存在 `.codex/hooks`、不存在误写成 `/spec:*` 的 Codex 主入口
+3. 否定性断言：不存在 `.codex/hooks`、不存在误写成 `spec-*` 的 Codex 主入口
 
 ### 8.3 clean
 
@@ -607,7 +607,7 @@ block 内容建议保持轻量：
    - `using-spec-first` 已安装为 runtime skill
    - `AGENTS.md` bootstrap block 存在
    - 不存在伪造 hook 资产
-   - 入口文案仍是 `$spec-*`
+   - 入口文案仍是 `spec-*`
 3. `doctor` 至少能区分 `NotInstalled / BootstrapInstalled / SessionStartInstalled / Partial / Drifted`
 4. `clean` 不误删用户自定义 hooks 或 skills
 5. 所有路由语义变更都能回溯到 `skills/using-spec-first/SKILL.md`

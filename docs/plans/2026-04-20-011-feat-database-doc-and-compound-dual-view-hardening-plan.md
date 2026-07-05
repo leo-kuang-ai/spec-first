@@ -107,7 +107,7 @@ origin: docs/plans/2026-04-19-005-feat-sdd-riper-light-contract-integration-plan
 
 ## Scope Boundaries
 
-- 本计划不引入新的 `/spec:*` 或 `$spec-*` workflow 入口。
+- 本计划不引入新的 `spec-*` 或 `spec-*` workflow 入口。
 - 本计划不新增第二套 `docs/solutions/` durable 根目录。
 - 本计划不批量重写现有 `docs/solutions/` 全量历史文档。
 - 本计划不把数据库 secret 写入任何落盘文档、schema sample、fixture 或 runtime artifact 明文字段。

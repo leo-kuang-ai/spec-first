@@ -79,7 +79,7 @@
 | Skills | 182 | `skills/*/SKILL.md` | 大量工程、语言、测试、安全、前端、媒体、业务运营技能 |
 | Agents | 48 | `agents/*.md` | review / build / planning / docs / e2e / performance 等子代理 |
 | Commands | 68 | `commands/*.md` | 插件模式下是 `/everything-claude-code:*` 命令 |
-| Commands 导出 | 68 | `.claude-plugin/plugin.json` 的 `commands: ["./commands/"]` | ECC commands 是用户入口，不适合混入 `/spec:*` |
+| Commands 导出 | 68 | `.claude-plugin/plugin.json` 的 `commands: ["./commands/"]` | ECC commands 是用户入口，不适合混入 `spec-*` |
 | Skills 导出 | 182 | `.claude-plugin/plugin.json` 的 `skills: ["./skills/"]` | ECC skills 可作为能力来源 |
 | Agents 发现 | 48 | `.claude-plugin/PLUGIN_SCHEMA_NOTES.md` | agents 不在 manifest 中声明，按目录约定发现 |
 
@@ -459,7 +459,7 @@ agent:
 原因：
 
 - ECC commands 是 `/everything-claude-code:*` 用户入口。
-- spec-first 用户入口必须保持 `/spec:*` / `$spec-*`。
+- spec-first 用户入口必须保持 `spec-*` / `spec-*`。
 - ECC command 内部流程可作为设计参考，但不能直接下发。
 
 | ECC Command | 决策 | 集成形态 | 备注 |
@@ -743,7 +743,7 @@ provider manifest schema
 
 | 类型 | 不集成内容 | 理由 |
 |---|---|---|
-| Commands | `commands/*.md` 全部不进入 runtime | 第二套用户入口，与 `/spec:*` 冲突 |
+| Commands | `commands/*.md` 全部不进入 runtime | 第二套用户入口，与 `spec-*` 冲突 |
 | Hooks | `hooks/*` 默认不集成 | 会改变全局工具行为和 managed runtime |
 | Agents | 大多数 ECC agents 不进 MVP | 当前 spec-first 已有丰富 reviewer/persona，且 agent governance 未完成 |
 | Full ECC plugin | 不整包安装 | 资产过大、边界不清、上下文膨胀 |

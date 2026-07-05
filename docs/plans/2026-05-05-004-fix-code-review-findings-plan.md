@@ -5,7 +5,7 @@ status: completed
 type: fix
 spec_id: 2026-05-05-004-code-review-findings
 target_repo: spec-first
-origin: $spec-code-review finding set on branch leo-2026-05-05-update-self
+origin: spec-code-review finding set on branch leo-2026-05-05-update-self
 priority: P1
 scope: review-findings-remediation
 ---
@@ -14,9 +14,9 @@ scope: review-findings-remediation
 
 ## Overview
 
-本计划承接当前分支 `$spec-code-review` 复核出的 11 个问题，目标是在不手改 generated runtime、不新增无必要 agent、不引入 auto-rewrite system 的前提下，逐项修复 source truth、脚本建议、安全扫描、Codex runtime projection、self-reflection contract 覆盖和用户入口文档漂移。
+本计划承接当前分支 `spec-code-review` 复核出的 11 个问题，目标是在不手改 generated runtime、不新增无必要 agent、不引入 auto-rewrite system 的前提下，逐项修复 source truth、脚本建议、安全扫描、Codex runtime projection、self-reflection contract 覆盖和用户入口文档漂移。
 
-本计划只定义修复方案和验证门禁；真正修改代码、文档、测试和 staging 由后续 `$spec-work` 或等价执行阶段完成。
+本计划只定义修复方案和验证门禁；真正修改代码、文档、测试和 staging 由后续 `spec-work` 或等价执行阶段完成。
 
 ## Success Criteria
 
@@ -25,8 +25,8 @@ scope: review-findings-remediation
 - 每个 source-changing patch 同步 `CHANGELOG.md`，不把 changelog 当成逐项修复日志。
 - 不直接修改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors。
 - 脚本只做 deterministic detection / suggestion / validation，不做语义决策。
-- Codex 与 Claude 两端入口文案保持各自 host 语义，不再出现 `/spec:*`、`$spec-*` 或 `--claude|--codex` 错误投影。
-- 修复后重新运行 targeted tests、`npm run typecheck`、`git diff --check`，并用 `$spec-code-review` 或等价 report-only review 复核残留风险。
+- Codex 与 Claude 两端入口文案保持各自 host 语义，不再出现 `spec-*`、`spec-*` 或 `--claude|--codex` 错误投影。
+- 修复后重新运行 targeted tests、`npm run typecheck`、`git diff --check`，并用 `spec-code-review` 或等价 report-only review 复核残留风险。
 
 ## Non-Goals
 
@@ -493,15 +493,15 @@ Completion evidence:
 
 Problem:
 
-- `docs/02-架构设计/需求拆分/大需求拆分.md` shows a Claude-only `/spec:*` main chain inside a dual-host project.
-- It lists `/spec:write-tasks`, but `spec-write-tasks` is standalone skill, not a command-backed workflow.
-- It lists future `/spec:requirements ...` commands that are not implemented.
+- `docs/02-架构设计/需求拆分/大需求拆分.md` shows a Claude-only `spec-*` main chain inside a dual-host project.
+- It lists `spec-write-tasks`, but `spec-write-tasks` is standalone skill, not a command-backed workflow.
+- It lists future `spec-requirements ...` commands that are not implemented.
 
 Decision:
 
 - Convert examples to dual-host-aware language:
-  - Claude workflow entrypoints use `/spec:*`.
-  - Codex workflow entrypoints use `$spec-*`.
+  - Claude workflow entrypoints use `spec-*`.
+  - Codex workflow entrypoints use `spec-*`.
   - `spec-write-tasks` remains standalone.
 - Mark `spec-requirements` as future proposal / maintenance skill concept, not available slash command.
 
@@ -515,18 +515,18 @@ Files:
 Implementation:
 
 - Replace the main chain example with:
-  - `/spec:brainstorm` / `$spec-brainstorm`
-  - `/spec:plan` / `$spec-plan`
+  - `spec-brainstorm` / `spec-brainstorm`
+  - `spec-plan` / `spec-plan`
   - optional standalone `spec-write-tasks`
-  - `/spec:work` / `$spec-work`
-  - `/spec:code-review` / `$spec-code-review`
-  - `/spec:compound` / `$spec-compound`
+  - `spec-work` / `spec-work`
+  - `spec-code-review` / `spec-code-review`
+  - `spec-compound` / `spec-compound`
 - Rewrite `spec-requirements` command semantics section as proposed capability API, not current public command.
-- Add wording that no `/spec:requirements` or `$spec-requirements` entrypoint exists today.
+- Add wording that no `spec-requirements` or `spec-requirements` entrypoint exists today.
 
 Verification:
 
-- `rg -n "/spec:write-tasks|\\$spec-write-tasks|/spec:requirements|\\$spec-requirements" docs/02-架构设计/需求拆分/大需求拆分.md`
+- `rg -n "spec-write-tasks|\\spec-write-tasks|spec-requirements|\\spec-requirements" docs/02-架构设计/需求拆分/大需求拆分.md`
 - `npm run lint:skill-entrypoints`
 - `npx jest tests/unit/spec-work-contracts.test.js tests/unit/spec-work-beta-contracts.test.js tests/unit/using-spec-first-contracts.test.js --runInBand`
 
@@ -607,7 +607,7 @@ Rationale: This is user-facing documentation and should be checked against publi
   - `npm run lint:skill-entrypoints`
   - `git diff --check`
 - If runtime projection changed, optionally run `spec-first init --codex` in a temp fixture or use existing init tests; do not commit generated mirrors unless project policy explicitly says they are checked-in source slices.
-- Run `$spec-code-review mode:report-only` or an equivalent final review pass.
+- Run `spec-code-review mode:report-only` or an equivalent final review pass.
 
 ## Test Matrix
 

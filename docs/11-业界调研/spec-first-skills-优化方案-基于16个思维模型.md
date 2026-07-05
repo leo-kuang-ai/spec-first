@@ -106,7 +106,7 @@ affected_plan_units_estimate: 0 | 1-3 | 3+
 路由时增加一个轻量「路由影响评估」：
 
 ```
-route: /spec:work
+route: spec-work
 reason: plan exists, scope clear
 second_order_cost_if_wrong: 如果实际上 WHAT 还不清楚，进 work 后发现会触发 back-to-plan 返工
 ```

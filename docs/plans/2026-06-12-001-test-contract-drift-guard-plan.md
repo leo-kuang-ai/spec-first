@@ -21,7 +21,7 @@ origin: docs/01-需求分析/15.contract-drift-guard/技术方案.md
 
 角色契约是 spec-first 演化判断基线，但当前只有人工审计能发现“契约声称能力存在，source 没有承载”这类 honesty drift。技术方案已经确认最高杠杆修复不是再扩审计流程，而是把最低限度的声明-承载核对固化到 unit tests 中。
 
-该 guard 要防的是 contract drift，不是能力质量评估。它应当在 `npm run test:unit` 这种常规验证链路里尽早暴露以下问题：角色契约 §2 新增能力词但没有 probe、probe registry 残留 stale term、未实现能力没有逐词 `(aspirational)` 标记、Claude command template 与 `skills-governance.json` 的 workflow registry 漂移，以及 runtime 维护动作被误写成 `/spec:*` 入口。
+该 guard 要防的是 contract drift，不是能力质量评估。它应当在 `npm run test:unit` 这种常规验证链路里尽早暴露以下问题：角色契约 §2 新增能力词但没有 probe、probe registry 残留 stale term、未实现能力没有逐词 `(aspirational)` 标记、Claude command template 与 `skills-governance.json` 的 workflow registry 漂移，以及 runtime 维护动作被误写成 `spec-*` 入口。
 
 本计划使用 plan-local `spec_id`，因为 origin 技术方案没有 frontmatter `spec_id` 可继承。
 
@@ -35,7 +35,7 @@ origin: docs/01-需求分析/15.contract-drift-guard/技术方案.md
 - R4. `content` probe 必须用 Node `fs` 扫描 source 文本，不依赖外部 `grep` / `rg` 命令，且默认排除 generated runtime、audit output、`node_modules` 与 `graphify-out`。
 - R5. workflow command expected set 必须从 `src/cli/contracts/dual-host-governance/skills-governance.json` 中 `entry_surface === "workflow_command"` 的 `command_name` 派生，不能从角色契约 §5 示例句反推。
 - R6. Claude command template 必须与 workflow registry 双向一致；Codex v1 不做 command parity，因为 `src/cli/adapters/codex.js` 明确 `hasCommands = false`，Codex workflow delivery 是 skill projection。
-- R7. 角色契约 §5 只做 lightweight honesty check：不得出现 `/spec:update`，runtime 维护动作必须表述为 terminal CLI `spec-first update/init/clean/doctor`，不要求 §5 枚举全量 workflow commands。
+- R7. 角色契约 §5 只做 lightweight honesty check：不得出现 `spec-update`，runtime 维护动作必须表述为 terminal CLI `spec-first update/init/clean/doctor`，不要求 §5 枚举全量 workflow commands。
 - R8. 新增测试和文档变更必须同步 `CHANGELOG.md`，不手改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors。
 
 ---
@@ -106,7 +106,7 @@ origin: docs/01-需求分析/15.contract-drift-guard/技术方案.md
 - source_reads_completed:
   - Origin 技术方案完整读取并 preserved its Goals, Non-goals, T1/T2/T3 design, validation plan, artifact table, dual-host boundary, risks, and acceptance standard.
   - 角色契约 §2 currently lists Harness coverage terms such as `bounded direct source reads`, `` `rg` ``, `ast-grep`, `context bundle`, `docs/solutions`, `debug 命中率`, `review 漏判率`, `workflow 质量反馈`, `hook budget`, and related source/governance terms.
-  - 角色契约 §5 currently treats `/spec:*` entries as examples and states runtime maintenance actions are terminal CLI commands.
+  - 角色契约 §5 currently treats `spec-*` entries as examples and states runtime maintenance actions are terminal CLI commands.
   - `src/cli/plugin.js` builds command manifest from `skills-governance.json` plus `templates/claude/commands/spec/*.md`, and validates governance/manifest consistency.
   - `src/cli/adapters/claude.js` has command delivery under `.claude/commands/spec`; `src/cli/adapters/codex.js` has `hasCommands = false` and uses `.agents/skills`.
   - Current workflow registry has 18 `workflow_command` records; current Claude command templates have 18 files; Node comparison found no missing or stale templates.
@@ -306,7 +306,7 @@ flowchart TB
 - Compare sorted `command_name` values with basenames under `templates/claude/commands/spec/*.md`.
 - Require each workflow record to use `host_delivery.claude === "command"`.
 - For dual-host workflows, require Codex delivery to be the registry-allowed skill delivery; do not check `.codex/commands`.
-- Parse role contract §5 only for honesty anti-patterns: no `/spec:update`, and terminal maintenance actions remain `spec-first update/init/clean/doctor`.
+- Parse role contract §5 only for honesty anti-patterns: no `spec-update`, and terminal maintenance actions remain `spec-first update/init/clean/doctor`.
 
 **Patterns to follow:**
 - `src/cli/plugin.js` `buildPluginManifestFromSources()`
@@ -320,7 +320,7 @@ flowchart TB
 - Error path: a template basename not present in workflow registry fails `stale_claude_command_template`.
 - Error path: workflow record with `host_delivery.claude` not equal to `command` fails `invalid_claude_delivery`.
 - Edge case: Codex command directory absence is not a failure when `CodexAdapter.hasCommands = false`.
-- Error path: role contract §5 containing `/spec:update` fails `runtime_cli_misclassified_as_workflow`.
+- Error path: role contract §5 containing `spec-update` fails `runtime_cli_misclassified_as_workflow`.
 
 **Verification:**
 - T3 derives truth from `skills-governance.json` and templates, not from role contract examples.
@@ -387,7 +387,7 @@ flowchart TB
 - Error path: synthetic registry term absent from §2 fails `stale_probe`.
 - Error path: synthetic aspirational term without marker fails `aspirational_marker_missing`.
 - Error path: synthetic extra template basename fails `stale_claude_command_template`.
-- Error path: synthetic §5 prose with `/spec:update` fails the lightweight honesty check.
+- Error path: synthetic §5 prose with `spec-update` fails the lightweight honesty check.
 
 **Verification:**
 - Focused guard test passes when source is honest and fails for the intended negative cases.

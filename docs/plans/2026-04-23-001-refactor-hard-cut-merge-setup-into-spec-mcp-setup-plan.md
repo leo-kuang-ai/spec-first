@@ -25,7 +25,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 这两个 workflow 已经形成三个问题：
 
 1. **用户入口重叠**：用户难以判断“环境 setup”到底该走 `setup` 还是 `spec-mcp-setup`。
-2. **对外口径漂移**：当前 source/docs/README 对 Codex 入口存在 `$setup` / `$spec-setup` / `$spec-mcp-setup` 的混杂。
+2. **对外口径漂移**：当前 source/docs/README 对 Codex 入口存在 `$setup` / `spec-setup` / `spec-mcp-setup` 的混杂。
 3. **真相源分裂**：setup 语义分布在两个 workflow 中，增加长期维护与双宿主治理成本。
 
 用户已明确要求走**方案 1 的一次性彻底迁移**：不保留兼容壳，直接把 `setup` 的职责并入 `spec-mcp-setup`，并删除独立 `setup` surface。
@@ -38,9 +38,9 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 
 1. `spec-mcp-setup` 成为唯一 setup 入口。
 2. 删除独立 `setup` workflow command / skill / template / docs mirror / tests surface。
-3. 所有原先指向 `/spec:setup`、`$setup`、`$spec-setup` 的入口与提示，统一改为：
-   - Claude：`/spec:mcp-setup`
-   - Codex：`$spec-mcp-setup`
+3. 所有原先指向 `spec-setup`、`$setup`、`spec-setup` 的入口与提示，统一改为：
+   - Claude：`spec-mcp-setup`
+   - Codex：`spec-mcp-setup`
 4. 保持当前 `spec-mcp-setup` 的 machine truth、readiness ledger、Serena bootstrap 与 graph-bootstrap 消费语义不被污染。
 5. 保证 repo-local preflight 的确定性资产在 hard-cut 后仍有稳定落点，不出现“文案已并入、脚本已丢失”的半迁移状态。
 6. 保证当前产品面 / runtime 面 / test 断言面中不再暴露旧 setup 入口；唯一允许保留旧入口的位置仅限历史文档或“已移除说明”语境。
@@ -276,8 +276,8 @@ hard-cut 后，`spec-mcp-setup` 变为**唯一 setup workflow**，但内部必�
 在删除 `setup` surface 之前，先把所有旧入口指向替换为 `spec-mcp-setup`，避免 hard-cut 后残留死链接。
 
 ### 统一后的唯一入口
-- Claude：`/spec:mcp-setup`
-- Codex：`$spec-mcp-setup`
+- Claude：`spec-mcp-setup`
+- Codex：`spec-mcp-setup`
 
 ### 必改文件
 - `skills/using-spec-first/SKILL.md`
@@ -287,15 +287,15 @@ hard-cut 后，`spec-mcp-setup` 变为**唯一 setup workflow**，但内部必�
 - `README.md`
 - `README.zh-CN.md`
 - `docs/项目介绍/README.md`
-- 其他 grep 到的 `/spec:setup`、`$setup`、`$spec-setup`、`setup skill` 引用
+- 其他 grep 到的 `spec-setup`、`$setup`、`spec-setup`、`setup skill` 引用
 
 ### 具体要求
 1. `using-spec-first` 中关于 setup 请求的路由规则必须改到：
-   - Claude：`/spec:mcp-setup`
-   - Codex：`$spec-mcp-setup`
+   - Claude：`spec-mcp-setup`
+   - Codex：`spec-mcp-setup`
 2. 所有原 `setup_hint` 改为 `spec:mcp-setup`
-3. 清理 `$setup` / `$spec-setup` 漂移
-4. README / README.zh-CN` 中原有独立 `Setup | /spec:setup | $spec-setup` 行应删除，而不是仅做字符串替换；唯一保留的 setup 类入口应是 `mcp-setup`
+3. 清理 `$setup` / `spec-setup` 漂移
+4. README / README.zh-CN` 中原有独立 `Setup | spec-setup | spec-setup` 行应删除，而不是仅做字符串替换；唯一保留的 setup 类入口应是 `mcp-setup`
 5. `feature-video`、`test-browser` 等下游 guidance 文案必须同步迁移，不能只改测试不改 source
 
 ### 历史文档处理边界
@@ -323,7 +323,7 @@ hard-cut 后，`spec-mcp-setup` 变为**唯一 setup workflow**，但内部必�
 - “已移除说明”语境
 
 不允许出现的情况：
-- 当前产品面仍提示 `/spec:setup`
+- 当前产品面仍提示 `spec-setup`
 - runtime 产物仍暴露 `setup` command / skill
 - 当前测试断言仍把旧入口当作现行 contract
 
@@ -362,7 +362,7 @@ hard-cut 后，`spec-mcp-setup` 变为**唯一 setup workflow**，但内部必�
 - Serena pending / failed / ready 三态不变
 - graph-bootstrap 仍按 readiness ledger 消费，不回退到旧 `setup_success`
 - `verification_gate_state` blocker 中的 `setup_hint` 已切到 `spec:mcp-setup`
-- `feature-video` / `test-browser` 的 source 与 test 都不再引用 `/spec:setup`
+- `feature-video` / `test-browser` 的 source 与 test 都不再引用 `spec-setup`
 
 ### smoke 特别要求
 `tests/smoke/cli.sh` 不只是删除 `setup.md` 文件存在性断言，还必须同步处理：
@@ -458,7 +458,7 @@ hard-cut 后，`spec-mcp-setup` 变为**唯一 setup workflow**，但内部必�
 - 不保留空壳 command
 - 不保留“请改用”的中间态
 
-这意味着迁移一旦合入，`/spec:setup` 立即失效，唯一入口是 `/spec:mcp-setup`。
+这意味着迁移一旦合入，`spec-setup` 立即失效，唯一入口是 `spec-mcp-setup`。
 
 ---
 
@@ -571,12 +571,12 @@ graph-bootstrap 会把 repo-local config / helper tools 的状态误当作 MCP b
 ## 风险 3：双宿主入口继续漂移
 
 ### 表现
-部分 source/docs/tests 仍保留 `$setup` / `$spec-setup` / `/spec:setup`。
+部分 source/docs/tests 仍保留 `$setup` / `spec-setup` / `spec-setup`。
 
 ### 控制
 - 全仓 grep 清零旧入口
 - `using-spec-first`、`verifier-registry`、`feature-video`、`test-browser` 必须纳入 hard-cut 同批修改
-- 统一改为 `$spec-mcp-setup`
+- 统一改为 `spec-mcp-setup`
 
 ---
 
@@ -598,8 +598,8 @@ graph-bootstrap 会把 repo-local config / helper tools 的状态误当作 MCP b
 因为用户明确要求“一次性彻底迁移”，本方案**不保留兼容壳**。
 
 因此必须在 PR / CHANGELOG / README 中明确说明：
-- `/spec:setup` 已移除
-- 请改用 `/spec:mcp-setup`
+- `spec-setup` 已移除
+- 请改用 `spec-mcp-setup`
 
 ---
 
@@ -641,9 +641,9 @@ graph-bootstrap 会把 repo-local config / helper tools 的状态误当作 MCP b
 
 ### 全仓 grep
 确认以下入口已被彻底替换：
-- `/spec:setup`
+- `spec-setup`
 - `$setup`
-- `$spec-setup`
+- `spec-setup`
 
 允许保留的唯一情况：
 - 历史版本记录 / 历史文档说明中以“已移除/历史背景”形式出现
@@ -712,8 +712,8 @@ spec-first doctor --codex
 被消除的历史负担：
 
 - 独立 `setup` workflow
-- `/spec:setup` 入口
-- `$setup` / `$spec-setup` 文案漂移
+- `spec-setup` 入口
+- `$setup` / `spec-setup` 文案漂移
 - setup 与 mcp-setup 双入口认知负担
 
 ---
@@ -748,7 +748,7 @@ spec-first doctor --codex
 
 本次若进入实施，必须在根目录 `CHANGELOG.md` 追加记录，摘要建议类似：
 
-- `refactor(setup): 硬切移除独立 setup workflow，将 repo-local preflight 全量并入 spec-mcp-setup，统一唯一 setup 入口为 /spec:mcp-setup 与 $spec-mcp-setup，并同步收口双宿主治理、runtime assets、README 与 contract tests (user-visible)`
+- `refactor(setup): 硬切移除独立 setup workflow，将 repo-local preflight 全量并入 spec-mcp-setup，统一唯一 setup 入口为 spec-mcp-setup 与 spec-mcp-setup，并同步收口双宿主治理、runtime assets、README 与 contract tests (user-visible)`
 
 ---
 

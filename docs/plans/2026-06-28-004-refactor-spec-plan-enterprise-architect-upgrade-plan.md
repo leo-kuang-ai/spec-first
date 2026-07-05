@@ -535,7 +535,7 @@ flowchart TB
 - **Interaction graph:** 影响集中在 `spec-plan` skill source、references、eval fixture、unit contract test 和 runtime projection；下游 `spec-work`、`spec-write-tasks`、`spec-doc-review` 继续消费 markdown plan，不需要 schema 变化。
 - **Error propagation:** 高风险缺口通过 existing deepening、Open Questions 或 handoff blocker 暴露，不引入新失败通道。
 - **State lifecycle risks:** 无持久业务状态；主要 lifecycle 是 source reference 更新后必须投影到 Claude/Codex runtime，并保持旧 generated mirror 非 source。
-- **API surface parity:** Claude `/spec:plan` 和 Codex `$spec-plan` 均需要新 reference、eval fixture 和 SKILL 指针投影。
+- **API surface parity:** Claude `spec-plan` 和 Codex `spec-plan` 均需要新 reference、eval fixture 和 SKILL 指针投影。
 - **Surface coverage:** `skills/spec-plan/**` in-scope；`tests/unit/spec-plan-contracts.test.js` in-scope；`agents/*.agent.md` read-only existence evidence；`.claude/**`、`.codex/**`、`.agents/skills/**` generated projection in-scope but not source；`spec-prd`、`spec-work`、`spec-doc-review` out-of-scope。
 - **Integration coverage:** Unit/contract test 能证明文件、锚点、runtime projection 和 eval fixture contract；真实模型是否在高风险 plan 中触发企业附录仍需后续 fresh-source eval 或 human adjudication。
 - **Unchanged invariants:** plan-only safety、handoff 菜单、U-ID 稳定规则、markdown canonical artifact、source/runtime 边界、Scripts prepare and LLM decides。
@@ -583,7 +583,7 @@ flowchart TB
 
 ## Documentation / Operational Notes
 
-- 实施本 plan 后，`$spec-plan` 在高风险场景的用户可见输出会更严格，CHANGELOG 必须标注 `(user-visible)`。
+- 实施本 plan 后，`spec-plan` 在高风险场景的用户可见输出会更严格，CHANGELOG 必须标注 `(user-visible)`。
 - README/用户手册是否更新取决于现有文档是否已经说明 `spec-plan` 的 high-risk/deepening 行为；实现期不要默认扩写。
 - 本 plan 自身已经合并旧 001/002，并删除旧 active plan 文件。后续实现只应引用本 plan。
 - 任何 runtime drift 修复都先改 source，再运行 `spec-first init`；不得把 `.agents/skills/spec-plan/**` 当 source。
@@ -596,7 +596,7 @@ flowchart TB
 
 验证已执行：JSON parse、`npx jest tests/unit/changelog-format.test.js tests/unit/spec-plan-contracts.test.js tests/unit/using-spec-first-contracts.test.js tests/unit/public-workflow-contract-summary.test.js tests/unit/scenario-capability-matrix-contracts.test.js tests/unit/ai-coding-harness-contracts.test.js --runInBand`、`npm run typecheck`、`npm run lint:skill-entrypoints`、`npm run test:unit`、`npm run test:smoke`、`npm run test:integration`、`git diff --check`、行尾空白扫描、`node bin/spec-first.js init --claude --codex -y` runtime 投影抽检。
 
-Review：按 `$spec-code-review` single-agent report-only fallback 完成，原因是当前 Codex dispatch 未获显式 subagent/persona 授权且 required MCP host config 存在 version drift；审查未发现 residual actionable findings。Generated runtime mirrors 仅通过 `spec-first init` 投影，未作为 source 手改或 tracked diff。
+Review：按 `spec-code-review` single-agent report-only fallback 完成，原因是当前 Codex dispatch 未获显式 subagent/persona 授权且 required MCP host config 存在 version drift；审查未发现 residual actionable findings。Generated runtime mirrors 仅通过 `spec-first init` 投影，未作为 source 手改或 tracked diff。
 
 ---
 

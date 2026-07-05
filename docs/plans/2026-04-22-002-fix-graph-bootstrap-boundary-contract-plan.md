@@ -22,7 +22,7 @@ deepened: 2026-04-22
 - `README.md` 仍把 `graph-bootstrap` 描述为 `Code-hard gate`，而 package CLI 本身并没有对外暴露 `graph-bootstrap` 子命令。
 - 现有 contract / compiler / e2e 测试主要证明“编译器主链能跑通”，没有证明“安装后的 runtime workflow 在外部 repo 中不会误导模型”。
 
-这使得 LLM 在外部仓库执行 `/spec:graph-bootstrap` 或 `$spec-graph-bootstrap` 时，很容易把 source repo truth、runtime assets、target repo artifacts 和 package CLI surface 混成一个层面，进而得出“当前仓库没有真正 compiler / contract，只能手工生成产物”的错误结论。
+这使得 LLM 在外部仓库执行 `spec-graph-bootstrap` 或 `spec-graph-bootstrap` 时，很容易把 source repo truth、runtime assets、target repo artifacts 和 package CLI surface 混成一个层面，进而得出“当前仓库没有真正 compiler / contract，只能手工生成产物”的错误结论。
 
 ## Requirements Trace
 
@@ -49,7 +49,7 @@ deepened: 2026-04-22
 本计划完成的判定标准：
 
 - `skills/spec-graph-bootstrap/SKILL.md` 与 `docs/10-prompt/skills/spec-graph-bootstrap/SKILL.md` 明确给出四层 surface map，并写明“不要在 target repo 中查找 source repo 内部路径来判断 workflow 能力”。
-- `README.md`、`README.zh-CN.md` 和 CLI help 对 package commands 与 host workflow entrypoints 的表述一致，不再让用户或 LLM把 `/spec:graph-bootstrap` 误读为 `spec-first graph-bootstrap`。
+- `README.md`、`README.zh-CN.md` 和 CLI help 对 package commands 与 host workflow entrypoints 的表述一致，不再让用户或 LLM把 `spec-graph-bootstrap` 误读为 `spec-first graph-bootstrap`。
 - contract / runtime integrity tests 能在 source contract 缺失边界标签或把内部路径写成 target repo 前提时失败。
 - 至少一条外部 repo 安装后回归测试证明：生成的 runtime `graph-bootstrap` 文本会给出清晰边界，且不会再引导模型在目标仓库中寻找 source repo 内部真源。
 - 既有 `spec-graph-bootstrap` compiler / mainline tests 继续通过，说明本次修复没有破坏 bootstrap 主价值链。
@@ -204,7 +204,7 @@ flowchart TD
 - Test: `tests/smoke/cli.sh`
 
 **Approach:**
-- 把 package CLI surface 与 host workflow surface 分开描述，明确 `/spec:graph-bootstrap` / `$spec-graph-bootstrap` 是 `init` 安装后的宿主入口，而不是 `spec-first graph-bootstrap`。
+- 把 package CLI surface 与 host workflow surface 分开描述，明确 `spec-graph-bootstrap` / `spec-graph-bootstrap` 是 `init` 安装后的宿主入口，而不是 `spec-first graph-bootstrap`。
 - 评估 CLI help 是否需要更清楚地区分 package commands 与宿主 workflow surfaces；若涉及 `stage0-context` 的呈现，只能作为次级文案决策，不能把“公开更多命令”当作本次问题的主修复路径。
 - 收紧 README 中关于 `Code-hard gate` 的措辞，使其与真实 enforce 面一致：哪些是包级代码硬约束，哪些是 runtime skill contract，哪些是宿主加载后的行为。
 
@@ -217,7 +217,7 @@ flowchart TD
 - `README.md`
 
 **Test scenarios:**
-- Happy path: `spec-first --help` 与 README 双语文案同时明确区分 package commands（如 `init` / `doctor` / `stage0-context`）和 host workflow entrypoints（如 `/spec:graph-bootstrap` / `$spec-graph-bootstrap`）。
+- Happy path: `spec-first --help` 与 README 双语文案同时明确区分 package commands（如 `init` / `doctor` / `stage0-context`）和 host workflow entrypoints（如 `spec-graph-bootstrap` / `spec-graph-bootstrap`）。
 - Edge case: 仅查看 CLI help、未安装任何 runtime asset 的用户，不会被引导去假设存在 `spec-first graph-bootstrap` 子命令。
 - Error path: 若 README 仍把 `graph-bootstrap` 表述成 `Code-hard gate` 或 package CLI surface，而 help 没有对应子命令，smoke 断言失败。
 - Integration: 生成后的 Claude command metadata 仍只承载 command wrapper 角色，不重新承诺不存在的 package CLI surface。

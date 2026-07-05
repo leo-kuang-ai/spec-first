@@ -15,7 +15,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 > **Relationship:** 本文档与 host-split-integration-plan 在 §1/§2/§5 大量重叠。重叠部分的**字面 contract（资产路径、marker 名、state 字段、验收项）以 host-split-integration-plan 为准**；本文档聚焦"为什么选这个形态而不是那个"。若二者出现硬冲突，以 host-split-integration-plan 为准并回填修正本文档。
 > **Scope:** 本文档描述的"Phase 1 新建"大多在 host-split-integration-plan 层面已完成（skill 本体、governance、runtime 安装、contract tests）。本文档内出现的"Create"措辞应读作"设计意图"，对应实现状态见 §1.4 仓库现状审计。
 
-**Goal:** 为 `spec-first` 设计一个基于 `using-superpowers` 思路、但适配当前双宿主产品面与项目级安装模型的 `using-spec-first` 能力，使 `spec-first` 成为 Claude Code / Codex 会话进入 substantial work 前的默认治理层与统一流量入口：用户不再需要记忆 `/spec:*` 或 `$spec-*` 矩阵，而是先由 `using-spec-first` 接管入口、完成 workflow 分诊，再把请求路由到正确能力。
+**Goal:** 为 `spec-first` 设计一个基于 `using-superpowers` 思路、但适配当前双宿主产品面与项目级安装模型的 `using-spec-first` 能力，使 `spec-first` 成为 Claude Code / Codex 会话进入 substantial work 前的默认治理层与统一流量入口：用户不再需要记忆 `spec-*` 或 `spec-*` 矩阵，而是先由 `using-spec-first` 接管入口、完成 workflow 分诊，再把请求路由到正确能力。
 
 **Architecture:** 推荐采用“统一 skill 核心 + 双宿主 instruction bootstrap + Claude 专属 SessionStart 增强”的混合方案。`using-spec-first` 本体作为 `standalone_skill` 同时投递到 Claude 与 Codex；先用 repo-root 指令文件注入实现双宿主稳定生效，再在 Claude 上按官方 project hooks 契约增加会话启动自动注入；Codex 在缺乏已验证 session hook 契约前，不做自动 hook，对外仍以 skill 发现与 `AGENTS.md` bootstrap 为主。
 
@@ -73,8 +73,8 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 当前仓库已经有以下代码事实：
 
 1. 用户可见 workflow 产品面已经固定：
-   - Claude Code: `/spec:*`
-   - Codex: `$spec-*`
+   - Claude Code: `spec-*`
+   - Codex: `spec-*`
 2. workflow skill 与 standalone skill 由 `src/cli/contracts/dual-host-governance/skills-governance.json` 治理。
 3. `spec-first init` 当前只会同步三类核心运行时资产：
    - commands
@@ -144,10 +144,10 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 2. 让 `spec-first` 从“用户主动调用的 workflow 集合”升级为“会话默认治理层与统一入口”。
 3. 保持双宿主一致的逻辑核心，但承认宿主自动化能力不完全对称。
 4. 不破坏现有双宿主治理：
-   - 不能给 Codex 发明 `/spec:*`
+   - 不能给 Codex 发明 `spec-*`
    - 不能把 standalone skill 写成 command
 5. 优先复用现有 `init / doctor / clean / state / instruction file` 主链，而不是引入一套旁路安装系统。
-6. 让用户无需记忆整个 workflow 矩阵，也无需自行判断首个 `/spec:*` 或 `$spec-*` 入口；入口接管由 `using-spec-first` 完成。
+6. 让用户无需记忆整个 workflow 矩阵，也无需自行判断首个 `spec-*` 或 `spec-*` 入口；入口接管由 `using-spec-first` 完成。
 7. 保持可回滚、可审计、可测试，不把行为绑死在不可见的魔法配置里。
 8. 形成机械可执行的闭环：任何运行时状态都能被 `init / doctor / clean` 解释、修复或清理。
 9. 把“文件存在”与“行为正确”分开建模，确保验收既覆盖物理资产，也覆盖路由语义与宿主行为。
@@ -158,7 +158,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 本方案不包含以下目标：
 
 1. 不在本轮为 Codex 设计未经验证的 session-start hook 兼容层。
-2. 不把 `using-spec-first` 做成新的 `/spec:using` 或 `$spec-using` workflow command。
+2. 不把 `using-spec-first` 做成新的 `spec-using` 或 `spec-using` workflow command。
 3. 不在本轮重构现有 13 个 workflow skill 的正文，只做路由层与激活层设计。
 4. 不把 `lang-policy.js` 直接塞满所有 bootstrap 逻辑，避免语言治理与流程路由耦合。
 5. 不引入第二套 skill 分类矩阵，继续以现有 `skills-governance.json` 为 skill 真源。
@@ -276,7 +276,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 
 #### 5.1.0.1 目标态用户体验
 
-从产品体验看，目标态不是“用户知道该用哪个 `/spec:*`”，而是：
+从产品体验看，目标态不是“用户知道该用哪个 `spec-*`”，而是：
 
 1. 用户只需表达目标、问题或上下文。
 2. 系统先经过 `using-spec-first` 进行统一分诊。
@@ -332,11 +332,11 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
    - 再判断进入哪个 workflow
    - 不把 `spec-brainstorm` 设为统一默认前置
 4. **宿主入口说明**
-   - Claude: `/spec:*`
-   - Codex: `$spec-*`
+   - Claude: `spec-*`
+   - Codex: `spec-*`
    - standalone skills 按 skill 表述，不写成 slash command
 5. **负向约束**
-   - 不得把 Codex 入口写成 `/spec:*`
+   - 不得把 Codex 入口写成 `spec-*`
    - 不得把 `using-spec-first` 自己写成 command-backed workflow
    - 不得因为“只是简单问题”就跳过 workflow 判定
    - 不得把“有 1% 可能适用”改写成强制进入 `spec-first` workflow
@@ -659,8 +659,8 @@ block 内容不需要复制完整 skill，但需要明确：
 
 1. 当前项目安装了 `using-spec-first`
 2. 进入 substantial task 前优先使用该 skill 做 workflow 路由
-3. Claude workflow 入口是 `/spec:*`
-4. Codex workflow 入口是 `$spec-*`
+3. Claude workflow 入口是 `spec-*`
+4. Codex workflow 入口是 `spec-*`
 5. standalone skills 仍按 skill 方式表述
 
 ### 5.8 Claude Hook 设计
@@ -808,8 +808,8 @@ block 内容不需要复制完整 skill，但需要明确：
    - `.claude/settings.json` 中是否存在命中受管 command 路径的 `SessionStart` matcher
 4. state 中 `hooks` 记录是否与实际安装资产一致
 5. 宿主入口文案是否未串宿主：
-   - Claude 不出现 `$spec-*` 作为主入口
-   - Codex 不出现 `/spec:*` 作为主入口
+   - Claude 不出现 `spec-*` 作为主入口
+   - Codex 不出现 `spec-*` 作为主入口
 
 `doctor` 输出建议按以下分类：
 
@@ -825,11 +825,11 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
 1. 安装 `using-spec-first` 到 `.agents/skills/using-spec-first/`
 2. 在 `AGENTS.md` 写 bootstrap block
 3. 保持现有 workflow 产品面：
-   - `$spec-plan`
-   - `$spec-work`
-   - `$spec-debug`
-   - `$spec-code-review`
-   - 其他 `$spec-*`
+   - `spec-plan`
+   - `spec-work`
+   - `spec-debug`
+   - `spec-code-review`
+   - 其他 `spec-*`
 
 这样做的好处是：
 
@@ -840,7 +840,7 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
 另外补充一条边界：Codex 当前健康态只有 Phase 1，不存在“因为没有 hook 所以不完整”的错误判断。也就是说：
 
 1. Codex 安装 skill + bootstrap 即可被判定为健康。
-2. 只有在错误出现 `/spec:*`、缺少 runtime skill、缺少 bootstrap block、镜像内容漂移时，才算 partial/drift。
+2. 只有在错误出现 `spec-*`、缺少 runtime skill、缺少 bootstrap block、镜像内容漂移时，才算 partial/drift。
 3. 若未来引入官方 hook 能力，应作为新 phase 单独建模，而不是反向修改当前 Phase 1 健康定义。
 
 ### 5.10 代码改动面
@@ -899,7 +899,7 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
 新增 `tests/unit/using-spec-first-contracts.test.js`，至少覆盖：
 
 1. frontmatter 名称与描述存在
-2. 正确区分 Claude `/spec:*` 与 Codex `$spec-*`
+2. 正确区分 Claude `spec-*` 与 Codex `spec-*`
 3. 不把 standalone skill 写成 command
 4. 路由优先级明确是 workflow-first，而不是 brainstorming-first
 5. Claude / Codex runtime transform 后名称与内容保持正确
@@ -947,7 +947,7 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
    - 安装 `.agents/skills/using-spec-first/`
    - 写入 `AGENTS.md` bootstrap block
    - 不生成 `.codex/hooks`
-   - 不写 Codex `/spec:*`
+   - 不写 Codex `spec-*`
 3. `spec-first doctor --claude`
    - 能发现 hook 缺失/漂移
 4. `spec-first clean --claude`
@@ -975,7 +975,7 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
 
 **Phase 1 命中率度量（建议作为后续评估 harness 或手工 benchmark 采集，而不是当前 smoke gate 的阻塞条件）：**
 
-1. 定义命中率：在一组固定的 substantial work fixture 请求下（建议 ≥20 条，覆盖决策树所有分叉），统计 Claude / Codex 首轮回复中是否引用了正确 workflow 入口（`/spec:*` / `$spec-*`）或显式触发对应 skill。
+1. 定义命中率：在一组固定的 substantial work fixture 请求下（建议 ≥20 条，覆盖决策树所有分叉），统计 Claude / Codex 首轮回复中是否引用了正确 workflow 入口（`spec-*` / `spec-*`）或显式触发对应 skill。
 2. 采集方法：需要单独的会话级评估 harness，或作为人工验证 / benchmark 流程执行；当前仓库的 shell smoke tests 只适合验证安装与文件落盘，不适合直接充当 assistant-response 采集器。
 3. 判定阈值：Phase 1 目标命中率 ≥60%（不依赖 hook 注入）；若低于 40%，说明 bootstrap block 表达不足，应回到 §5.7.3 修订，而不是把问题推给 Phase 2。
 4. 这项度量同时作为 Phase 2 ROI 的基线：Phase 2 命中率若相对 Phase 1 无显著提升，说明 hook 注入并未带来实际价值，应回头检查 skill 正文或 matcher 覆盖。
@@ -1025,7 +1025,7 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
 4. 单测覆盖 merge / update / remove
 5. 不使用“整段覆盖 hooks 数组”这类粗暴写法
 
-#### 风险 3：Codex 产品面被错误写成 `/spec:*`
+#### 风险 3：Codex 产品面被错误写成 `spec-*`
 
 **缓解：**
 
@@ -1068,7 +1068,7 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
    - `.agents/skills/using-spec-first/SKILL.md` 存在，且内容与 Codex adapter transform 结果一致
    - `AGENTS.md` 存在 bootstrap marker 对，块内内容与 `buildBootstrapBlock("codex")` 一致
    - 不出现 `.codex/hooks`
-   - 不出现 Codex `/spec:*` 错误文案（入口命名错写 → drift）
+   - 不出现 Codex `spec-*` 错误文案（入口命名错写 → drift）
 
 ### 6.2 语义正确性验收
 
@@ -1076,8 +1076,8 @@ Codex 侧当前不做 hook 自动注入，推荐策略是：
 2. bootstrap block 只承担"先判定 workflow"的提示职责，不复制完整路由规则。
 3. hook 注入内容以运行时 `SKILL.md` 为真源，不在 hook 脚本中另写一套路由摘要。
 4. Claude 与 Codex 的入口文案不串宿主：
-   - Claude 主入口为 `/spec:*`
-   - Codex 主入口为 `$spec-*`
+   - Claude 主入口为 `spec-*`
+   - Codex 主入口为 `spec-*`
 5. **语言策略一致性（与项目 `CLAUDE.md` `lang=zh` 对齐规则）：**
    - `using-spec-first/SKILL.md` 的自然语言正文**允许英文**，理由记录在本验收条的注释里：skill 的主要消费者是模型（SessionStart 注入上下文）而非终端用户，英文能显著降低指令跨语言歧义。这是对 lang policy 的**显式豁免**，不是遗漏。
    - 但 **bootstrap block 的用户可见文字必须中文**，因为该块直接出现在 `CLAUDE.md` / `AGENTS.md` 里供人阅读与审计。

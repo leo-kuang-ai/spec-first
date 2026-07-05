@@ -37,7 +37,7 @@ That mismatch creates three practical problems:
 
 ## Requirements
 
-- R1. Align `agent-native-architecture` and `agent-native-audit` with the dual-host governance truth source: no implied public slash or `$spec-*` command unless governance explicitly exposes one.
+- R1. Align `agent-native-architecture` and `agent-native-audit` with the dual-host governance truth source: no implied public slash or `spec-*` command unless governance explicitly exposes one.
 - R2. Add standard lightweight skill contract sections: Purpose, Invocation Boundary, When To Use, When Not To Use, Inputs, Outputs, Workflow, Failure Modes, and Runtime/Source Boundary.
 - R3. Preserve the current agent-native principles while making production guardrails first-class: sandbox/workspace boundaries, approvals, secrets, audit logs/tracing, rollback/checkpoints, eval gates, and human-in-the-loop escalation.
 - R4. Establish a canonical taxonomy consumed by `agent-native-audit`, `spec-agent-native-reviewer`, and `spec-best-practices-researcher` without duplicating divergent principle lists.
@@ -162,7 +162,7 @@ flowchart TB
 - Inspect: `src/cli/contracts/dual-host-governance/skills-governance.json`
 
 **Approach:**
-- Add clear language that `agent-native-architecture` is currently an internal architecture reference/helper, not a public `$spec-*` or `/spec:*` workflow.
+- Add clear language that `agent-native-architecture` is currently an internal architecture reference/helper, not a public `spec-*` or `spec-*` workflow.
 - Replace `/agent-native-architecture` in `agent-native-audit` with an instruction to read `skills/agent-native-architecture/SKILL.md` and the relevant references as source context.
 - Fix the audit helper's option mismatch: action parity is option 8 in the current architecture skill, not option 1.
 - Add tests that assert both skills remain `internal_only`, do not mention nonexistent public commands, and keep the audit option mapping accurate.

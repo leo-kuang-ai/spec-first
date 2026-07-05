@@ -226,7 +226,7 @@ The implementation should make the `S` path sharper without moving the whole `B`
   - `spec-prd`: brownfield PRD authoring/refinement/validation
   - `spec-plan`: clear implementation planning
   - `spec-work`/`spec-debug`/`spec-doc-review`/setup/direct: execution, failure investigation, review, setup, narrow factual/direct cleanup
-- Do not introduce host-specific `/spec:*` or `$spec-*` wording into frontmatter.
+- Do not introduce host-specific `spec-*` or `spec-*` wording into frontmatter.
 
 **Execution note:** Treat this as a route-surface change; keep patch small and run focused contract tests before broad suites.
 
@@ -600,4 +600,4 @@ Fresh-source eval is a required closeout decision, not optional: after source ed
 
 本计划已完成。实现范围包括：收窄 `skills/spec-brainstorm/SKILL.md` frontmatter/入口合同，新增 near-neighbor exit cues、route-out shape、Examples As Context 指针，新增 canonical `skills/spec-brainstorm/evals/routing-cases.json` 与 `tests/unit/spec-brainstorm-routing-contracts.test.js`，并补充现有 `spec-brainstorm-contracts` 断言。执行中 `npm run test:unit` 还暴露了既有 `agent-native-architecture` source-truth 句式漂移，已用一行 source 文案修复。
 
-验证已通过：focused brainstorm/project-graph/public-workflow/routing/changelog/skill-path Jest、`npm run test:eval-fixtures`、`npm run lint:skill-entrypoints`、`npm run test:unit`、`git diff --check`。Review 采用 `$spec-code-review` single-agent report-only fallback，未发现 actionable finding。`$yao-meta-skill` 复审后修复了新增 `evals/` 未被入口引用的问题；其通用 Production 1000-token resource budget 与当前 spec-first public workflow 入口合同不兼容，记录为限制而非本轮继续压缩。未手改 generated runtime mirrors，未运行 `spec-first init`。
+验证已通过：focused brainstorm/project-graph/public-workflow/routing/changelog/skill-path Jest、`npm run test:eval-fixtures`、`npm run lint:skill-entrypoints`、`npm run test:unit`、`git diff --check`。Review 采用 `spec-code-review` single-agent report-only fallback，未发现 actionable finding。`$yao-meta-skill` 复审后修复了新增 `evals/` 未被入口引用的问题；其通用 Production 1000-token resource budget 与当前 spec-first public workflow 入口合同不兼容，记录为限制而非本轮继续压缩。未手改 generated runtime mirrors，未运行 `spec-first init`。

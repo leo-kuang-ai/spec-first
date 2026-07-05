@@ -103,7 +103,7 @@
 
 ## 9. Planning Handoff
 
-范围中等、边界清晰,可直接进 `/spec:plan`。plan 需覆盖:
+范围中等、边界清晰,可直接进 `spec-plan`。plan 需覆盖:
 
 - **主线(两 skill):** 对当前实际会派发的 code-review/doc-review reviewer agent prose 增补结构化 "What Not to Flag" 守卫 + 可选出处引用指引;两 skill 的 `subagent-template.md` 增补 advisory 出处说明;可考虑共享一份 `decay-risk-field-guide.md` 速查表(两 skill 引用,避免各写一份)。**该速查表仅作 advisory 出处参考用途,不得作为维度分类结构或 schema 枚举**(与 §7 否决"维度框架"一致)。`spec-architecture-strategist` 若要纳入,先做 catalog 接入决策,不要在本 requirements 中把 standalone agent 当作既有 code-review 覆盖面。
 - **doc-review 专属:** `agents/spec-scope-guardian-reviewer.agent.md` 增文档债子镜头 + Pain×Spread 如何映射现有 severity/confidence。

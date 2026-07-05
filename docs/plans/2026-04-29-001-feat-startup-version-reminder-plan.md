@@ -13,13 +13,13 @@ origin: docs/brainstorms/2026-04-29-001-startup-version-update-reminder-requirem
 
 Add a low-noise reminder path that checks whether the loaded spec-first runtime is behind the latest available version when a Claude Code session starts, and when a top-level Codex agent is about to enter a public spec-first workflow. The reminder must be read-only from an upgrade perspective: it may fetch version facts and update its own cooldown marker, but it must not install packages, update Claude plugins, regenerate runtime assets, or restart hosts.
 
-The implementation should reuse the existing version comparison and update-entrypoint concepts instead of creating a second upgrade workflow. The reminder surfaces a short message and points users to the current host's update workflow; `/spec:update` and `$spec-update` remain the single upgrade decision surface.
+The implementation should reuse the existing version comparison and update-entrypoint concepts instead of creating a second upgrade workflow. The reminder surfaces a short message and points users to the current host's update workflow; `spec-update` and `spec-update` remain the single upgrade decision surface.
 
 ---
 
 ## Problem Frame
 
-The origin requirements document explains that CLI-level reminders already exist for `spec-first doctor/init/clean`, but users often open Claude Code or Codex and go directly to `/spec:*` or `$spec-*` workflows. In that path, stale runtime assets can continue to be used without the user seeing that a newer spec-first version exists (see origin: docs/brainstorms/2026-04-29-001-startup-version-update-reminder-requirements.md). Claude has a deterministic SessionStart hook surface; Codex currently does not, so the Codex side must be framed as best-effort top-level workflow-entry guidance until a real Codex startup hook exists.
+The origin requirements document explains that CLI-level reminders already exist for `spec-first doctor/init/clean`, but users often open Claude Code or Codex and go directly to `spec-*` or `spec-*` workflows. In that path, stale runtime assets can continue to be used without the user seeing that a newer spec-first version exists (see origin: docs/brainstorms/2026-04-29-001-startup-version-update-reminder-requirements.md). Claude has a deterministic SessionStart hook surface; Codex currently does not, so the Codex side must be framed as best-effort top-level workflow-entry guidance until a real Codex startup hook exists.
 
 This plan implements the automatic-detect/manual-upgrade decision from the origin document. It preserves spec-first's boundary: scripts gather deterministic version facts and format the reminder; users and the update workflow decide whether to mutate the environment.
 
@@ -35,7 +35,7 @@ This plan implements the automatic-detect/manual-upgrade decision from the origi
 - R4. Include current version, latest version, host-specific update workflow, and explicit user-decision wording when a reminder is shown. If local runtime metadata is missing or malformed but managed runtime files exist, state that the current runtime version is unknown rather than suppressing the reminder.
 - R5. Hide network, permission, registry, or API failures from normal startup output.
 - R6. Limit repeated prompts to at most once every 24 hours per host/current-version/latest-version context, with a shared host-level suppression so users do not see the same stale-version reminder in every repository. The update workflow should clear or refresh the cooldown marker when the user explicitly invokes it.
-- R7. Use `/spec:update` for Claude and `$spec-update` for Codex.
+- R7. Use `spec-update` for Claude and `spec-update` for Codex.
 - R8. Require explicit user action before upgrade.
 
 ### Update Workflow Boundary
@@ -50,7 +50,7 @@ This plan implements the automatic-detect/manual-upgrade decision from the origi
 **Origin actors:** A1 使用者, A2 宿主启动面, A3 spec-first update workflow
 **Origin flows:** F1 启动时发现新版本, F2 检查失败或网络不可用
 **Origin acceptance examples:** AE1 covers the Codex best-effort workflow-entry update prompt, AE2 covers the Claude SessionStart update prompt, AE3 covers offline startup, AE4 covers no automatic upgrade
-**Plan-added acceptance example:** AE5 covers generated `spec-update` runtime parity before the startup reminder points users to `/spec:update` or `$spec-update`.
+**Plan-added acceptance example:** AE5 covers generated `spec-update` runtime parity before the startup reminder points users to `spec-update` or `spec-update`.
 
 ---
 
@@ -94,15 +94,15 @@ This plan implements the automatic-detect/manual-upgrade decision from the origi
 - `src/cli/adapters/codex.js` has no hook equivalent. Codex runtime entrypoints are `.agents/skills/`, and the managed instruction surface is `AGENTS.md`.
 - `src/cli/instruction-bootstrap.js` builds host-specific bootstrap blocks for both `CLAUDE.md` and `AGENTS.md`.
 - `skills/spec-update/SKILL.md` already distinguishes Claude plugin state from Codex npm CLI/runtime asset state and should remain the upgrade truth source.
-- `src/cli/contracts/dual-host-governance/skills-governance.json` exposes `spec-update` as `dual_host`, delivered as a Claude command and a Codex skill. README tables also list `/spec:update` and `$spec-update`, so the public entrypoint model is already dual-host.
-- `src/cli/adapters/claude.js` renders `/spec:update` by merging `templates/claude/commands/spec/update.md` frontmatter with the body of `skills/spec-update/SKILL.md`. This proves the Claude command is source-backed, but the runtime render currently rewrites the Codex fallback path inside `.agents/skills/spec-update/SKILL.md` into `.agents/.claude/spec-first/workflows/spec-update/SKILL.md`.
-- `src/cli/adapters/codex.js` renders `$spec-update` by copying the workflow skill into `.agents/skills/spec-update/SKILL.md`, but its blanket `rewriteSharedPaths()` transform rewrites `.claude/commands/spec/update.md` and every `--claude` token. For this host-comparative workflow, that produces incorrect runtime prose such as `.agents/.agents/skills/spec-update/SKILL.md` and changes the Claude branch's post-update command from `spec-first init --claude` to `spec-first init --codex`.
+- `src/cli/contracts/dual-host-governance/skills-governance.json` exposes `spec-update` as `dual_host`, delivered as a Claude command and a Codex skill. README tables also list `spec-update` and `spec-update`, so the public entrypoint model is already dual-host.
+- `src/cli/adapters/claude.js` renders `spec-update` by merging `templates/claude/commands/spec/update.md` frontmatter with the body of `skills/spec-update/SKILL.md`. This proves the Claude command is source-backed, but the runtime render currently rewrites the Codex fallback path inside `.agents/skills/spec-update/SKILL.md` into `.agents/.claude/spec-first/workflows/spec-update/SKILL.md`.
+- `src/cli/adapters/codex.js` renders `spec-update` by copying the workflow skill into `.agents/skills/spec-update/SKILL.md`, but its blanket `rewriteSharedPaths()` transform rewrites `.claude/commands/spec/update.md` and every `--claude` token. For this host-comparative workflow, that produces incorrect runtime prose such as `.agents/.agents/skills/spec-update/SKILL.md` and changes the Claude branch's post-update command from `spec-first init --claude` to `spec-first init --codex`.
 - Current `doctor --claude|--codex --json` can report runtime drift against the adapter's expected output, but it cannot catch semantic bugs that are already baked into the expected adapter transform. `spec-update` therefore needs rendered-runtime semantic contract tests, not only source-skill assertions.
 - `tests/unit/version-reminder.sh`, `tests/unit/claude-settings.test.js`, `tests/unit/runtime-hook-permissions.test.js`, `tests/unit/instruction-bootstrap.test.js`, and `tests/unit/init-dry-run.test.js` are the narrowest tests for this change.
 
 ### Institutional Learnings
 
-- `docs/solutions/workflow-issues/host-entrypoint-mapping-source-boundary-2026-04-29.md` says host-specific entrypoint mapping belongs in init/governance layers, not scattered through ordinary workflow prose. Startup reminders are an entry-governance concern, so explicit `/spec:update` vs `$spec-update` mapping is acceptable in the hook/bootstrap surfaces and corresponding contract tests.
+- `docs/solutions/workflow-issues/host-entrypoint-mapping-source-boundary-2026-04-29.md` says host-specific entrypoint mapping belongs in init/governance layers, not scattered through ordinary workflow prose. Startup reminders are an entry-governance concern, so explicit `spec-update` vs `spec-update` mapping is acceptable in the hook/bootstrap surfaces and corresponding contract tests.
 
 ### External References
 
@@ -113,12 +113,12 @@ This plan implements the automatic-detect/manual-upgrade decision from the origi
 ## Key Technical Decisions
 
 - Add a shared startup reminder command path instead of embedding network/version logic directly in each host surface: this keeps deterministic checks in CLI code and keeps host templates thin.
-- Treat `spec-update` rendered-runtime parity as a prerequisite for startup reminders. The reminder can only point users to `/spec:update` or `$spec-update` after the existing update workflow is verified as semantically correct for both hosts.
+- Treat `spec-update` rendered-runtime parity as a prerequisite for startup reminders. The reminder can only point users to `spec-update` or `spec-update` after the existing update workflow is verified as semantically correct for both hosts.
 - Use managed runtime state as the primary "current version" fact, with a local fallback when state is missing or malformed: if managed runtime files exist but `.claude/spec-first/state.json` or `.codex/spec-first/state.json` cannot provide a version, return a cooldown-limited "current runtime version unknown" reminder instead of silently suppressing the warning.
-- Align reminder fact sources with the workflow they route to. Claude reminders may be driven by project runtime state only if `spec-update`'s Claude branch also checks project runtime health through `spec-first doctor --claude --json`; otherwise the reminder should compare the same loaded Claude plugin/cache version that `/spec:update` compares.
+- Align reminder fact sources with the workflow they route to. Claude reminders may be driven by project runtime state only if `spec-update`'s Claude branch also checks project runtime health through `spec-first doctor --claude --json`; otherwise the reminder should compare the same loaded Claude plugin/cache version that `spec-update` compares.
 - Store reminder cooldown outside the project working tree, under host-scoped user state such as `$HOME/.claude/spec-first/startup-version-reminder.json` and `$HOME/.codex/spec-first/startup-version-reminder.json`. The primary cooldown key is host + current runtime version (or unknown-state sentinel) + latest version, not project root, so one stale install does not produce the same reminder in every repository.
-- Keep the startup command hidden from public help unless the implementation team decides a documented diagnostic command is useful. The user-facing path remains `/spec:update` or `$spec-update`. Its output contract should be explicit: reminder text on stdout only, no output on no-op/failure, no ordinary CLI reminder stderr, and exit 0 for expected no-op/failure cases so hooks and bootstrap surfaces can consume it safely.
-- Implement Codex as managed workflow-entry guidance rather than a shell hook: the current local Codex CLI surface does not show a hook mechanism, while `AGENTS.md` is already the managed session instruction surface. The instruction should apply only to top-level orchestrators before entering public `$spec-*` workflows, not to bounded subagents, leaf reviewers, or worker agents.
+- Keep the startup command hidden from public help unless the implementation team decides a documented diagnostic command is useful. The user-facing path remains `spec-update` or `spec-update`. Its output contract should be explicit: reminder text on stdout only, no output on no-op/failure, no ordinary CLI reminder stderr, and exit 0 for expected no-op/failure cases so hooks and bootstrap surfaces can consume it safely.
+- Implement Codex as managed workflow-entry guidance rather than a shell hook: the current local Codex CLI surface does not show a hook mechanism, while `AGENTS.md` is already the managed session instruction surface. The instruction should apply only to top-level orchestrators before entering public `spec-*` workflows, not to bounded subagents, leaf reviewers, or worker agents.
 - Keep deterministic path/host rewriting narrow. Adapter transforms may rewrite source asset paths for the current host, but they must not rewrite prose that intentionally compares Claude and Codex branches, host-specific commands, or other-host runtime detection paths.
 
 ---
@@ -127,7 +127,7 @@ This plan implements the automatic-detect/manual-upgrade decision from the origi
 
 ### Resolved During Planning
 
-- Codex trigger: use managed `AGENTS.md` bootstrap instructions as best-effort workflow-entry guidance for top-level `$spec-*` routing; do not plan against an unverified Codex hook API or claim deterministic Codex session-start execution.
+- Codex trigger: use managed `AGENTS.md` bootstrap instructions as best-effort workflow-entry guidance for top-level `spec-*` routing; do not plan against an unverified Codex hook API or claim deterministic Codex session-start execution.
 - Cooldown storage: use user-level host-specific state, not project runtime directories, so startup reminders do not create Git working-tree noise. Use host/version-level suppression by default to avoid multi-repo over-prompting.
 - Claude implementation shape: extend the existing SessionStart template and call shared CLI/helper logic rather than duplicating version lookup logic inside the shell template.
 - Existing update workflow support: source-of-truth `skills/spec-update/SKILL.md`, governance metadata, and public README entry tables already support both Claude and Codex. The gap is not conceptual support; it is rendered-runtime correctness caused by overly broad adapter rewrites.
@@ -159,7 +159,7 @@ sequenceDiagram
   CLI->>CLI: resolve current runtime version
   CLI->>CLI: lookup latest version with timeout
   alt latest is newer and cooldown allows
-    CLI-->>Surface: short reminder with /spec:update or $spec-update
+    CLI-->>Surface: short reminder with spec-update or spec-update
     Surface->>Cache: record marker after accepting reminder output
     Surface-->>Host: show reminder in startup context
     Host-->>Update: user may explicitly run update workflow
@@ -174,7 +174,7 @@ sequenceDiagram
 
 - U0. **`spec-update` rendered runtime parity repair**
 
-**Goal:** Fix the existing `/spec:update` and `$spec-update` generated-runtime defects before adding startup reminders that route users to those entries.
+**Goal:** Fix the existing `spec-update` and `spec-update` generated-runtime defects before adding startup reminders that route users to those entries.
 
 **Requirements:** R7, R9, R10, R11; supports AE1, AE2, AE5
 
@@ -203,9 +203,9 @@ sequenceDiagram
 
 **Test scenarios:**
 - Happy path: source `skills/spec-update/SKILL.md` still declares Claude Code and Codex branches and contains both `spec-first init --claude` and `spec-first init --codex` in the correct branch contexts.
-- Happy path: rendered Claude `/spec:update` contains `.agents/skills/spec-update/SKILL.md` for Codex runtime fallback and `.claude/commands/spec/update.md` for Claude runtime fallback.
-- Happy path: rendered Codex `$spec-update` contains `.agents/skills/spec-update/SKILL.md` for Codex runtime fallback and `.claude/commands/spec/update.md` for Claude runtime fallback.
-- Happy path: rendered Codex `$spec-update` keeps the Claude plugin-update follow-up as `spec-first init --claude`, while the Codex branch keeps `spec-first init --codex`.
+- Happy path: rendered Claude `spec-update` contains `.agents/skills/spec-update/SKILL.md` for Codex runtime fallback and `.claude/commands/spec/update.md` for Claude runtime fallback.
+- Happy path: rendered Codex `spec-update` contains `.agents/skills/spec-update/SKILL.md` for Codex runtime fallback and `.claude/commands/spec/update.md` for Claude runtime fallback.
+- Happy path: rendered Codex `spec-update` keeps the Claude plugin-update follow-up as `spec-first init --claude`, while the Codex branch keeps `spec-first init --codex`.
 - Edge case: rendered runtime content for both hosts does not contain `.agents/.agents`, `.agents/.claude`, `.claude/.claude`, or a rewritten Claude command path that points to Codex skill output.
 - Integration: `spec-first init --claude` and `spec-first init --codex` generated output satisfies the same semantic assertions without hand-editing generated mirrors.
 
@@ -236,7 +236,7 @@ sequenceDiagram
   - compare the recorded runtime version to the host-appropriate latest source, matching `spec-update`'s split: Claude checks upstream project version and project runtime health, Codex checks npm package version
   - apply 24-hour cooldown using user-level host state keyed by host + current/unknown runtime version + latest version, with optional project information stored only as diagnostic metadata
   - expose a reset/clear mode that `spec-update` can call when the user explicitly runs the update workflow
-  - format a short host-specific reminder that names `/spec:update` or `$spec-update`
+  - format a short host-specific reminder that names `spec-update` or `spec-update`
 - Define a strict output contract for startup surfaces: reminder text on stdout only when a reminder should be shown; no output on no-op/failure; no stderr for expected lookup/state failures; exit 0 for no-op/failure cases. Failure paths should return "no reminder" rather than throwing through startup surfaces.
 
 **Patterns to follow:**
@@ -245,8 +245,8 @@ sequenceDiagram
 - `tests/unit/version-reminder.sh` for shell-driven unit coverage with environment overrides.
 
 **Test scenarios:**
-- Happy path: given current runtime `1.6.1`, latest `1.6.2`, host `codex`, and no cooldown marker, the helper returns a reminder containing `1.6.1`, `1.6.2`, `$spec-update`, and no install command.
-- Happy path: given current runtime `1.6.1`, latest `1.6.2`, host `claude`, the helper returns `/spec:update`.
+- Happy path: given current runtime `1.6.1`, latest `1.6.2`, host `codex`, and no cooldown marker, the helper returns a reminder containing `1.6.1`, `1.6.2`, `spec-update`, and no install command.
+- Happy path: given current runtime `1.6.1`, latest `1.6.2`, host `claude`, the helper returns `spec-update`.
 - Happy path: given managed runtime files exist but state metadata is missing or malformed, the helper returns a cooldown-limited reminder that names the current runtime version as unknown and routes to the host update workflow.
 - Edge case: given equal versions, the helper returns no reminder.
 - Edge case: given a cooldown marker inside 24 hours for the same host/current/latest tuple, the helper returns no reminder even in a different project.
@@ -287,7 +287,7 @@ sequenceDiagram
 - `tests/unit/runtime-hook-permissions.test.js` for generated hook permissions.
 
 **Test scenarios:**
-- Happy path: with an overridden latest version and fake project state, running the hook returns `additionalContext` containing `/spec:update`, current version, and latest version.
+- Happy path: with an overridden latest version and fake project state, running the hook returns `additionalContext` containing `spec-update`, current version, and latest version.
 - Edge case: with no update available, the hook output matches the existing bootstrap behavior aside from intentionally stable formatting.
 - Error path: when `spec-first` is absent from PATH or the startup reminder exits non-zero, the hook still exits 0 and emits the normal bootstrap context.
 - Integration: `spec-first init --claude` still writes `.claude/hooks/session-start` with executable bits and installs exactly one managed SessionStart matcher.
@@ -314,12 +314,12 @@ sequenceDiagram
 - Test: `tests/unit/init-dry-run.test.js`
 
 **Approach:**
-- Add a concise Codex bootstrap instruction that a top-level orchestrator should run the read-only reminder check only when it is about to route into a public `$spec-*` workflow and `spec-first` is available.
+- Add a concise Codex bootstrap instruction that a top-level orchestrator should run the read-only reminder check only when it is about to route into a public `spec-*` workflow and `spec-first` is available.
 - State that failure or missing CLI must be ignored and must not block user work.
 - Keep this instruction in the managed startup/bootstrap layer, not inside ordinary workflow prose.
 - Explicitly state that bounded subagents, leaf reviewer agents, and worker agents should not run the reminder check; they inherit the parent task scope and should not write cooldown state.
 - State that this is best-effort managed instruction behavior, not a deterministic Codex startup hook. If a real Codex hook is later verified, a follow-up can move this behavior into that hook.
-- Avoid listing full upgrade commands in `AGENTS.md`; point to `$spec-update`.
+- Avoid listing full upgrade commands in `AGENTS.md`; point to `spec-update`.
 
 **Patterns to follow:**
 - `src/cli/instruction-bootstrap.js` host-specific bootstrap rendering.
@@ -327,8 +327,8 @@ sequenceDiagram
 - `docs/solutions/workflow-issues/host-entrypoint-mapping-source-boundary-2026-04-29.md` for where host-specific entrypoint mapping is allowed.
 
 **Test scenarios:**
-- Happy path: generated Codex `AGENTS.md` bootstrap includes a read-only best-effort workflow-entry reminder instruction and `$spec-update`.
-- Edge case: generated Claude `CLAUDE.md` bootstrap does not accidentally include the Codex `$spec-update` reminder instruction when the Claude hook owns that surface.
+- Happy path: generated Codex `AGENTS.md` bootstrap includes a read-only best-effort workflow-entry reminder instruction and `spec-update`.
+- Edge case: generated Claude `CLAUDE.md` bootstrap does not accidentally include the Codex `spec-update` reminder instruction when the Claude hook owns that surface.
 - Edge case: generated Codex bootstrap states the check is for top-level workflow routing only and must not run inside bounded subagents or leaf reviewers.
 - Error path: the instruction explicitly says missing/failed reminder checks do not block routing.
 - Integration: `spec-first init --codex` still generates `.agents/skills/` runtime assets and does not reintroduce `.codex/commands/spec` as an active command surface.
@@ -336,7 +336,7 @@ sequenceDiagram
 
 **Verification:**
 - Codex workflow-entry reminder guidance is present in the generated source-of-truth bootstrap and remains host-specific.
-- Codex still uses `$spec-*` workflow entries and no command-backed compatibility layer returns.
+- Codex still uses `spec-*` workflow entries and no command-backed compatibility layer returns.
 
 ---
 
@@ -359,9 +359,9 @@ sequenceDiagram
 - Add a short note to `spec-update` that startup reminders may route users here and that this workflow remains responsible for host-specific upgrade decisions.
 - Preserve the existing host model while closing the fact-source gap:
   - Claude plugin cache facts and `claude plugin update` belong to the Claude branch.
-  - Claude project runtime asset health must also be checked with `spec-first doctor --claude --json`, so `/spec:update` can recommend `spec-first init --claude` when runtime assets are stale even if the plugin cache is current.
+  - Claude project runtime asset health must also be checked with `spec-first doctor --claude --json`, so `spec-update` can recommend `spec-first init --claude` when runtime assets are stale even if the plugin cache is current.
   - Codex npm CLI facts, npm latest lookup, and `spec-first doctor --codex --json` belong to the Codex branch.
-- Have the update workflow call the startup reminder helper's cooldown reset/clear mode, or document an equivalent deterministic reset path, when the user explicitly invokes `/spec:update` or `$spec-update`.
+- Have the update workflow call the startup reminder helper's cooldown reset/clear mode, or document an equivalent deterministic reset path, when the user explicitly invokes `spec-update` or `spec-update`.
 - Keep README changes minimal: if needed, mention that startup reminders point to the existing update workflow; do not duplicate install commands outside the central workflow entry table.
 - Assert that docs do not imply automatic upgrades.
 
@@ -371,11 +371,11 @@ sequenceDiagram
 
 **Test scenarios:**
 - Happy path: `spec-update` still contains both Claude and Codex update branches and now states that startup reminders are advisory.
-- Happy path: Claude `/spec:update` covers both plugin cache freshness and project runtime asset freshness, including a `spec-first init --claude` recommendation when `doctor --claude --json` reports stale runtime assets.
+- Happy path: Claude `spec-update` covers both plugin cache freshness and project runtime asset freshness, including a `spec-first init --claude` recommendation when `doctor --claude --json` reports stale runtime assets.
 - Happy path: invoking the update workflow path clears or refreshes the startup reminder cooldown marker through the helper reset mode.
 - Happy path: rendered update runtime for both hosts still satisfies U0 semantic contracts after any prose changes.
 - Edge case: docs do not claim startup performs installation or runtime refresh automatically.
-- Integration: dual-host governance tests continue to enforce host-appropriate `/spec:update` and `$spec-update` references only in approved surfaces.
+- Integration: dual-host governance tests continue to enforce host-appropriate `spec-update` and `spec-update` references only in approved surfaces.
 
 **Verification:**
 - Users who follow a startup reminder land in a workflow that explains the correct host-specific next command.
@@ -431,13 +431,13 @@ sequenceDiagram
 | Risk | Mitigation |
 |------|------------|
 | Startup check slows or breaks host startup | Keep lookup timeout short, catch all helper failures, and preserve current hook output on failure |
-| Startup reminder routes users to a flawed update workflow | Complete U0 before U1-U5 and add rendered-runtime semantic contracts for both `/spec:update` and `$spec-update` |
+| Startup reminder routes users to a flawed update workflow | Complete U0 before U1-U5 and add rendered-runtime semantic contracts for both `spec-update` and `spec-update` |
 | Codex reminder is less deterministic than Claude hook | Frame Codex as best-effort top-level workflow-entry guidance, not deterministic session-start behavior; add tests for bootstrap wording and a fresh-source/fresh-session verification where feasible |
 | Missing runtime state hides stale legacy installs | Probe managed runtime files when state is missing or malformed, and emit a cooldown-limited unknown-version reminder if runtime files exist |
 | Reminder logic becomes a second upgrade workflow | Only output current/latest versions and the host update workflow entrypoint; leave install commands in `spec-update` |
 | Cooldown over-prompts multi-repo users | Key suppression primarily by host/current/latest tuple instead of project root, and let explicit update workflow invocation clear or refresh the marker |
 | Cooldown state dirties user projects | Store cooldown in user-level host state, not `.claude/` or `.codex/` project runtime directories |
-| Host-specific entrypoint mapping leaks into ordinary prose | Limit explicit `/spec:update` and `$spec-update` mapping to startup/governance/update surfaces and contract tests |
+| Host-specific entrypoint mapping leaks into ordinary prose | Limit explicit `spec-update` and `spec-update` mapping to startup/governance/update surfaces and contract tests |
 | Adapter transform fix becomes an over-broad runtime migration | Prefer a narrow, context-aware repair for `spec-update` host-comparative prose first; broaden only with contract coverage for other generated workflow skills |
 
 ---

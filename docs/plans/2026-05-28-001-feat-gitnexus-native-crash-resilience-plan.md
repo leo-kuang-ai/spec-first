@@ -50,7 +50,7 @@ origin: /tmp/spec-first-incident-2026-05-28-gitnexus-native-crash-resilience.md
 
 ## Problem Frame
 
-`/spec:graph-bootstrap --all-repos` 在 GitNexus 1.6.5（PR #1833 修复，1.6.6-rc.76 已含；origin document 中以 1.6.6-rc.75 做的对照实验同样适用）下对中等规模 child repo 高概率触发 worker idle timeout terminate native parser frames 导致的 process-fatal abort。该事件链在 spec-first 一侧暴露 4 个 Harness 空洞：
+`spec-graph-bootstrap --all-repos` 在 GitNexus 1.6.5（PR #1833 修复，1.6.6-rc.76 已含；origin document 中以 1.6.6-rc.75 做的对照实验同样适用）下对中等规模 child repo 高概率触发 worker idle timeout terminate native parser frames 导致的 process-fatal abort。该事件链在 spec-first 一侧暴露 4 个 Harness 空洞：
 
 1. **Evidence Harness** — `bootstrap-providers` 把 stdout+stderr 合并到 raw log，native abort 时 stderr 仅 91 字节就 std::terminate；落到 `status.json` 的 raw log 没有可推理信息。
 2. **Governance Harness** — `classify_provider_failure` 仅识别 exit_code=139 (SIGSEGV)；SIGABRT (134) 和 Python wrapper 转的 250 都退化为 `provider-command-failed`，next_action 不可执行。
@@ -63,7 +63,7 @@ origin: /tmp/spec-first-incident-2026-05-28-gitnexus-native-crash-resilience.md
 
 ## Requirements
 
-- R1. 用户跑 `/spec:graph-bootstrap` 触发 GitNexus native crash 时，证据始终可见、不被 retry 静默吞掉：
+- R1. 用户跑 `spec-graph-bootstrap` 触发 GitNexus native crash 时，证据始终可见、不被 retry 静默吞掉：
   - 若 retry 全部失败：顶层 `failure_class=provider-crash`、`reason_code=gitnexus-analyze-sigabrt`、`recommended_action` 明确指向已知 race 与升级 pin 路径
   - 若 retry 后成功：顶层 `failure_class=provider-crash-recovered`、`reason_code=gitnexus-analyze-sigabrt-recovered`、`recommended_action` 仍提示"已自动 retry，建议升级 pin 减少未来 race"（参照现有 `incremental-fallback-recovered` 模式）
   - 每次 attempt 的分类结果同步写入 `command_results[].attempt_failure`，无论成功或失败，retry 历史完整可追
@@ -100,7 +100,7 @@ origin: /tmp/spec-first-incident-2026-05-28-gitnexus-native-crash-resilience.md
 - fallback_capabilities: bounded direct repo reads + 已读源文件
 - runtime_mcp_evidence: not-evaluated（本 plan 阶段未调用 live MCP）
 - confidence: high — 核心证据来自直接读源文件（`bootstrap-providers.sh`、`compile-workspace-gitnexus-readiness.js`、`provider-status.v1` 实例、`tests/unit/spec-graph-bootstrap.sh`）和 origin document 中 6/6 vs 4/6 实测对照
-- limitations: graph-facts.json 的 graph-affecting 列表已包含本 plan 即将修改的 `bootstrap-providers.{sh,ps1}`；执行前建议 `/spec:graph-bootstrap` 重新刷新一遍，但本 plan 的设计不依赖图证据 — 所有断言均可由 LLM 直接读源验证
+- limitations: graph-facts.json 的 graph-affecting 列表已包含本 plan 即将修改的 `bootstrap-providers.{sh,ps1}`；执行前建议 `spec-graph-bootstrap` 重新刷新一遍，但本 plan 的设计不依赖图证据 — 所有断言均可由 LLM 直接读源验证
 
 ---
 

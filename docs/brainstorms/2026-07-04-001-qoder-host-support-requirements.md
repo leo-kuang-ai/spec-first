@@ -45,7 +45,7 @@ readiness_inputs_hash: sha256:9b378eb72f0f842a5ba6a9c716a3c3fe3078f1db15ee9adc23
 
 `spec-first` 当前已支持 Claude Code、Codex 与 Kiro。Kiro 支持刚完成 opt-in preview，但它的 P0 投影受 Kiro 能力边界约束：不生成 commands，agent 默认工具只有 `read`，且真实 IDE smoke 仍为 degraded/open item。Qoder 官方 CLI 文档显示它同时支持 project commands、project skills、project subagents、MCP scopes、hooks，以及以 `AGENTS.md` 为默认静态记忆入口；这意味着 Qoder 不应机械复用 Kiro 的最小投影策略，而应把 project commands/skills/agents 一并纳入 P0。
 
-本需求的产品对象是 spec-first CLI/runtime generation 与治理文档，不是 Qoder 的原生产品体验。成功结果是后续 `$spec-plan` 能在不重新发明宿主边界的情况下规划实现：新增 Qoder host adapter、接入 init/doctor/clean/plugin registry、补齐 MCP setup、本地文档与测试矩阵，并清楚标注真实 Qoder CLI/IDE smoke 的验证上限。
+本需求的产品对象是 spec-first CLI/runtime generation 与治理文档，不是 Qoder 的原生产品体验。成功结果是后续 `spec-plan` 能在不重新发明宿主边界的情况下规划实现：新增 Qoder host adapter、接入 init/doctor/clean/plugin registry、补齐 MCP setup、本地文档与测试矩阵，并清楚标注真实 Qoder CLI/IDE smoke 的验证上限。
 
 ---
 
@@ -116,7 +116,7 @@ Primary topology: runtime-host-extension
 
 | producer | artifact/path | artifact type | consumer | target behavior |
 | --- | --- | --- | --- | --- |
-| `spec-first init --qoder` | `.qoder/commands/spec/*.md` | generated | Qoder slash command loader | 提供 `/spec:prd`、`/spec:plan` 等 project commands。 |
+| `spec-first init --qoder` | `.qoder/commands/spec/*.md` | generated | Qoder slash command loader | 提供 `spec-prd`、`spec-plan` 等 project commands。 |
 | `spec-first init --qoder` | `.qoder/skills/*/SKILL.md` | generated | Qoder skill loader | 提供自动/手动触发的 project skills。 |
 | `spec-first init --qoder` | `.qoder/agents/*.md` | generated | Qoder subagent loader | 提供 least-privilege project subagents。 |
 | `spec-first init --qoder` | `.qoder/spec-first/state.json` | generated | doctor/clean/drift checks | 记录 managed asset manifest，作为 spec-first-owned state。 |
@@ -237,7 +237,7 @@ NA4. 不允许 MCP setup 在无 `--user-scope` / `QODER_USER_SCOPE=1` 时写 `~/
 
 NA5. 不允许用 Qoder 官方文档本身替代 generated asset inspection、doctor facts、tests 或真实 CLI/IDE smoke。
 
-NA6. 不允许普通 workflow prose 散落 `/spec:*` / `$spec-*` / Qoder command mapping；宿主入口对照集中在 README/runtime catalog/init guidance。
+NA6. 不允许普通 workflow prose 散落 `spec-*` / `spec-*` / Qoder command mapping；宿主入口对照集中在 README/runtime catalog/init guidance。
 
 ---
 
@@ -279,7 +279,7 @@ NA6. 不允许普通 workflow prose 散落 `/spec:*` / `$spec-*` / Qoder command
 
 | question | owner_answer | chosen_answer | prd_write_target | consequence | closure_state |
 | --- | --- | --- | --- | --- | --- |
-| 用户要求“接下来，要支持 qoder，请思考需求、方案；写入需求文档后，再进入 $spec-plan 生成正式计划文档”。 | 用户明确要求先需求后计划。 | 产出 Qoder host support PRD requirements，并继续生成正式计划。 | Summary / Requirements / Planning Recheck | 不进入 implementation；计划可消费本文档。 | closed |
+| 用户要求“接下来，要支持 qoder，请思考需求、方案；写入需求文档后，再进入 spec-plan 生成正式计划文档”。 | 用户明确要求先需求后计划。 | 产出 Qoder host support PRD requirements，并继续生成正式计划。 | Summary / Requirements / Planning Recheck | 不进入 implementation；计划可消费本文档。 | closed |
 
 ---
 

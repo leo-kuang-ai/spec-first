@@ -176,7 +176,7 @@ spec-brainstorm
 - 正常路径：`spec-first init --codex` 生成的 `AGENTS.md` 不包含 `spec-first:runtime-tools` marker。
 - 正常路径：`spec-first init --claude` 生成的 `CLAUDE.md` 不包含 `spec-first:runtime-tools` marker。
 - 回归：`AGENTS.md` / `CLAUDE.md` 仍包含 language、bootstrap、coding-guidelines managed blocks。
-- 回归：host-specific `/spec:*` / `$spec-*` workflow entry guidance 仍存在。
+- 回归：host-specific `spec-*` / `spec-*` workflow entry guidance 仍存在。
 
 **验证：**
 - `npx jest tests/unit/init-dry-run.test.js --runInBand`

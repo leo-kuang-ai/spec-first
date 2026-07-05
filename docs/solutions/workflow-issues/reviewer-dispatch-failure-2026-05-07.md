@@ -19,7 +19,7 @@ tracker_entry: dispatch-failure-1
 
 ## Symptom
 
-2026-05-07 在 Claude Code (Opus 4.7 1M context) 宿主下执行 `/spec:doc-review` 评审 `docs/plans/2026-05-07-001-feat-skill-agent-quality-governance-plan.md`。一次性并行 dispatch 6 个 reviewer agent（spec-coherence-reviewer / spec-feasibility-reviewer / spec-scope-guardian-reviewer / spec-adversarial-document-reviewer / spec-product-lens-reviewer / spec-security-lens-reviewer），全部失败：
+2026-05-07 在 Claude Code (Opus 4.7 1M context) 宿主下执行 `spec-doc-review` 评审 `docs/plans/2026-05-07-001-feat-skill-agent-quality-governance-plan.md`。一次性并行 dispatch 6 个 reviewer agent（spec-coherence-reviewer / spec-feasibility-reviewer / spec-scope-guardian-reviewer / spec-adversarial-document-reviewer / spec-product-lens-reviewer / spec-security-lens-reviewer），全部失败：
 
 - 3 个返回 `API Error: 400 {"error":"1m 上下文已经全量可用，请启用 1m 上下文后重试","type":"error"}`
 - 3 个返回 `API Error: 500 Panic detected, error: runtime error: invalid memory address or nil pointer dereference`（来自 `Calcium-Ion/new-api` 网关）

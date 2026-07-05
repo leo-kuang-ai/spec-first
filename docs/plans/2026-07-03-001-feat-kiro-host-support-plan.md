@@ -135,7 +135,7 @@ implements_schemas:
 - worktree_status: dirty; this plan file is being revised during document-review fix application, with no code/runtime edits in this pass.
 - confidence: medium-high for repo change surface; medium for exact Kiro runtime invocation until Kiro session smoke confirms.
 - limitations:
-  - `dispatch_authorization_missing`: Codex `$spec-plan` did not authorize subagent/research-agent dispatch, so research ran inline.
+  - `dispatch_authorization_missing`: Codex `spec-plan` did not authorize subagent/research-agent dispatch, so research ran inline.
   - Kiro docs were fetched from official web pages, but no Kiro IDE runtime was launched in this planning run.
   - Codegraph output is advisory navigation; load-bearing conclusions are grounded in direct source paths and docs listed above.
 
@@ -160,7 +160,7 @@ implements_schemas:
 - impact_on_plan:
   - Confirmed this must be a multi-host architecture change, not a single flag patch.
   - Confirmed Kiro support must touch CLI, adapter registry, governance schema/data, runtime projection, MCP setup, docs, context governance, and tests.
-  - Confirmed `/spec` should remain Kiro-native; spec-first should not create a Kiro `/spec:*` command family by assumption.
+  - Confirmed `/spec` should remain Kiro-native; spec-first should not create a Kiro `spec-*` command family by assumption.
 - key_findings:
   - `PlatformAdapter` already provides the extension point for runtime roots, commands, skills, workflows, agents, state, instruction file and platform-specific runtime hooks.
   - `src/cli/plugin.js` still hard-codes `SUPPORTED_PLATFORM_IDS = ['claude', 'codex']` and only returns `host_delivery.claude/codex`.
@@ -256,7 +256,7 @@ flowchart TB
 
 | Surface | Claude | Codex | Kiro |
 | --- | --- | --- | --- |
-| Public workflow delivery | `/spec:*` command | `$spec-*` skill invocation | Kiro Agent Skill invocation from `.kiro/skills` |
+| Public workflow delivery | `spec-*` command | `spec-*` skill invocation | Kiro Agent Skill invocation from `.kiro/skills` |
 | Workflow runtime asset | `.claude/commands/spec/*.md` + `.claude/spec-first/workflows` | `.agents/skills/spec-*` | `.kiro/skills/spec-*` |
 | Standalone skills | `.claude/skills` | `.agents/skills` | `.kiro/skills` |
 | Agents | `.claude/agents` | `.codex/agents` | `.kiro/agents` |
@@ -424,7 +424,7 @@ flowchart TB
 **Approach:**
 - Add `--kiro` everywhere host selection is parsed, displayed or remembered.
 - **`-y` 默认宿主选择策略（已决定）：** 首版 require explicit `--kiro`，`-y` 不自动选中 Kiro。原因：Success Metrics 说"opt into Kiro during init"（暗示显式选择）；首版应保守，避免现有 Claude/Codex 用户的 `-y` 自动化流程受影响。后续如有需求，另起 plan 评估纳入默认集。
-- Update bootstrap language to describe "current host entrypoint" and central host tables, not scattered `/spec:*` / `$spec-*` / Kiro aliases.
+- Update bootstrap language to describe "current host entrypoint" and central host tables, not scattered `spec-*` / `spec-*` / Kiro aliases.
 - Extend user language sync to include Kiro runtime if Kiro consumes `AGENTS.md` or generated steering.
 - **Runtime exclusion 语义必须分两类明确处理（避免混淆两种不同的排除规则）：**
   - *generated mirror roots exclusion（写入规则）：* spec-first 拥有并管理的路径，不得被用户手改当作 source 修复：P0 覆盖 `.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`（仅 spec-first 管理的 config）；若 P1 生成 hooks/steering，再条件覆盖 spec-first managed `.kiro/hooks/**` 与 `.kiro/steering/**`。

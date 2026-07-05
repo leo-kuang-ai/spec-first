@@ -31,7 +31,7 @@ referenced_reviews:
 1. **当前 spec-first 投射不对称(confirmed):** `templates/codex/hooks/hooks.json` 只声明 `SessionStart`,但 Codex 宿主本身已支持 `UserPromptSubmit`。这不是宿主缺能力,而是 spec-first 当前未接入 Codex per-turn handler;若未来要做,需另行验证 Codex `UserPromptSubmit` 输入/输出语义、trust flow、runtime 投射和 contract tests。
 2. **与 no-state-machine 哲学冲突(confirmed):** Trellis 的每轮面包屑能工作,是因为它有 `task.json` 状态机存「当前 phase」。spec-first **刻意不存 per-unit 进度**(spec-plan skill 自述「Plans do not carry per-unit progress state — progress is derived from git by spec-work」;角色契约 §3「不画死状态图、进度由 git 派生」)。要每轮注入「当前 phase」,要么逼 spec-first 引入它拒绝的状态机,要么每轮从 git 模糊推断。
 
-**关键正面发现:** spec-first **已有此机制的右尺寸 native 版本**,且不止一处——(a)`templates/claude/hooks/spec-plan-guard` 用 Claude `UserPromptExpansion` 事件,在 `/spec:plan` 展开时注入 best-effort 注意力提醒,**显式声明无硬保护、无状态**(`spec-plan-guard:21` 原文 "best-effort attention reminder only; this hook provides no hard write protection.");(b)`templates/{claude,codex}/hooks/session-start` 均已有 `startup-reminder --claude|--codex` CLI 注入路径,每会话喂 workflow-entry 注意力上下文。这说明 spec-first-native 的「抗漂移注入」形态是:**按命令展开 / 按会话启动注入、无状态、best-effort、诚实降级**——而不是 Trellis 的有状态每轮注入。
+**关键正面发现:** spec-first **已有此机制的右尺寸 native 版本**,且不止一处——(a)`templates/claude/hooks/spec-plan-guard` 用 Claude `UserPromptExpansion` 事件,在 `spec-plan` 展开时注入 best-effort 注意力提醒,**显式声明无硬保护、无状态**(`spec-plan-guard:21` 原文 "best-effort attention reminder only; this hook provides no hard write protection.");(b)`templates/{claude,codex}/hooks/session-start` 均已有 `startup-reminder --claude|--codex` CLI 注入路径,每会话喂 workflow-entry 注意力上下文。这说明 spec-first-native 的「抗漂移注入」形态是:**按命令展开 / 按会话启动注入、无状态、best-effort、诚实降级**——而不是 Trellis 的有状态每轮注入。
 
 **最终推荐:** 不采纳 Trellis 式有状态 per-turn 注入。**鉴于规划期检索证实痛点证据为空(详见 Direct Evidence / U2)**,按 U2 门与 §10,结局是 **带重启条件的 reasoned defer**——而非"倾向采纳变体"。仅当 U2 翻出 confirmed 痛点证据,才触发轻量 native 变体重新评估;届时必须区分 Claude `UserPromptExpansion` 命令展开提醒与 Codex `UserPromptSubmit` 每轮提醒的不同宿主语义。让排序服从证据门控,不让变体的优雅压过门控——优雅恰是 §10 警惕的 rationalization。
 
@@ -60,7 +60,7 @@ referenced_reviews:
 **三者共性:** 每轮/每工具注入都**依赖一个显式的「当前状态」真相源**(task.json / session 文件 / 单一 active plan)。这正是 spec-first 没有、且刻意不要的东西。
 
 **spec-first 现状(confirmed):**
-- hook 基建已有:Claude `session-start`(注入 using-spec-first bootstrap + `startup-reminder --claude` 每会话注意力上下文,见 `session-start:50-57`)+ `spec-plan-guard`(`UserPromptExpansion`,/spec:plan 展开时 best-effort 注意力提醒);Codex `session-start`(当前 spec-first `hooks.json` 仅投射 SessionStart)。Codex 宿主支持 `UserPromptSubmit`,但 spec-first 当前没有 managed per-turn hook handler。
+- hook 基建已有:Claude `session-start`(注入 using-spec-first bootstrap + `startup-reminder --claude` 每会话注意力上下文,见 `session-start:50-57`)+ `spec-plan-guard`(`UserPromptExpansion`,spec-plan 展开时 best-effort 注意力提醒);Codex `session-start`(当前 spec-first `hooks.json` 仅投射 SessionStart)。Codex 宿主支持 `UserPromptSubmit`,但 spec-first 当前没有 managed per-turn hook handler。
 - 无「当前 active workflow/phase」持久状态;进度由 git 派生。
 - `spec-plan-guard` + `session-start` 的 `startup-reminder` 是 native 右尺寸先例:无状态、按命令展开 / 按会话启动、显式 best-effort、no hard protection。
 
@@ -91,7 +91,7 @@ referenced_reviews:
 
 **Goal:** 钉死「per-turn 注入在双宿主上各能做到什么」。
 **Files(只读):** `templates/codex/hooks/hooks.json`、`templates/claude/hooks/*`、`src/cli/claude-settings.js`、`src/cli/adapters/codex.js`
-**Approach:** 区分宿主能力与 spec-first 当前投射:Claude 当前 source 已有 `UserPromptExpansion` `/spec:plan` guard;Codex 宿主支持 `UserPromptSubmit`,但 spec-first 当前 Codex runtime 只投射 `SessionStart`。产出:能力矩阵 + 若做轻量变体时 Codex parity/降级声明文案(响亮约定,不静默)。
+**Approach:** 区分宿主能力与 spec-first 当前投射:Claude 当前 source 已有 `UserPromptExpansion` `spec-plan` guard;Codex 宿主支持 `UserPromptSubmit`,但 spec-first 当前 Codex runtime 只投射 `SessionStart`。产出:能力矩阵 + 若做轻量变体时 Codex parity/降级声明文案(响亮约定,不静默)。
 **Verification:** 能力矩阵有 source 依据;降级形态明确。
 
 ### U2. 判定「抗漂移」痛点是否被证据支持
@@ -122,7 +122,7 @@ referenced_reviews:
 
 **Goal:** 汇总 U1-U3,给出 采纳轻量变体 / defer 的最终决策 + 理由,并据此更新本 plan status 与 origin 闭环(addresses_findings 或转 deferred_findings)。
 **Approach:** 决策矩阵:痛点证据 × 双宿主代价 × 边界契合度。若 defer,在 review-closure 中把 finding 标 deferred_findings + 重估条件(≥3 条 context-drift 失败记录时重启)。
-**§10 推进义务(防 defer 退化为永久免责声明):** defer 不是终点。U4 闭环必须显式回答「痛点证据如何从空变 confirmed」——给出**数据采集路径**:context-drift / workflow-phase 漂移的失败一旦发生,由 `/spec:debug` 或 `/spec:compound` 落盘到 `docs/12-bug分析/` 或 `docs/solutions/`(标注 context-drift 关键词);累计 ≥3 条即触发本评估重启。无此路径,defer 即 §10 警告的「机制就位永久搁置」,不合法。
+**§10 推进义务(防 defer 退化为永久免责声明):** defer 不是终点。U4 闭环必须显式回答「痛点证据如何从空变 confirmed」——给出**数据采集路径**:context-drift / workflow-phase 漂移的失败一旦发生,由 `spec-debug` 或 `spec-compound` 落盘到 `docs/12-bug分析/` 或 `docs/solutions/`(标注 context-drift 关键词);累计 ≥3 条即触发本评估重启。无此路径,defer 即 §10 警告的「机制就位永久搁置」,不合法。
 **Verification:** 决策落盘,P1 闭环状态明确,且 defer 分支带可执行的数据采集路径 + 重启阈值。
 
 **最终决策(2026-06-15):DEFERRED — reasoned defer。**
@@ -135,13 +135,13 @@ referenced_reviews:
 | 轻量 native 变体(U3) | **暂缓(非否决)** | 设计方向成立(静态 reminder,无状态),但 U2 痛点无证据,按 §10「无证据则 defer」不进开发;若重启需重新评估 Claude `UserPromptExpansion` 与 Codex `UserPromptSubmit` 的不同语义 |
 | origin 闭环 | **转 deferred_findings** | `referenced_reviews` 两 origin entry `scope: deferred` + `deferred_findings`,plan `status: completed` |
 
-**重启条件:** spec-first 侧累计出现 **≥3 条** confirmed context-drift / workflow-phase 漂移失败记录(经 `/spec:debug` 或 `/spec:compound` 落 `docs/solutions/` 或 `docs/12-bug分析/`,标 context-drift 关键词)时,重启本评估并重跑 U2→U4。届时若证据成立,U3 设计可直接承接 spec-work 实现。
+**重启条件:** spec-first 侧累计出现 **≥3 条** confirmed context-drift / workflow-phase 漂移失败记录(经 `spec-debug` 或 `spec-compound` 落 `docs/solutions/` 或 `docs/12-bug分析/`,标 context-drift 关键词)时,重启本评估并重跑 U2→U4。届时若证据成立,U3 设计可直接承接 spec-work 实现。
 
 **为何 `status: completed` 而非 `active`:** 本 plan 是评估 plan,其交付物是 U4 决策本身——决策已产出(defer),评估即完成。实现是条件性后续,由重启条件门控,不挂在本 plan 的 active 状态上。
 
 ## System-Wide Impact
 
-- **双宿主:** 当前 spec-first runtime 投射不对称(Codex 仅 SessionStart;Claude 另有 `/spec:plan` UserPromptExpansion guard)。Codex 宿主已支持 `UserPromptSubmit`,但采用前必须补 source/runtime/trust/output contract 验证,不把"可用"伪装成"已交付"。
+- **双宿主:** 当前 spec-first runtime 投射不对称(Codex 仅 SessionStart;Claude 另有 `spec-plan` UserPromptExpansion guard)。Codex 宿主已支持 `UserPromptSubmit`,但采用前必须补 source/runtime/trust/output contract 验证,不把"可用"伪装成"已交付"。
 - **runtime 边界:** 若实现,改 `templates/` + CLI 注册 source,经 `spec-first init` 生成,不手改 mirror。
 - **角色契约:** 本 plan 是 §7 借鉴边界判断 + §10 aspirational 推进义务的实地应用,结论须可回链。
 - **CHANGELOG:** 决策落盘时需条目(治理决策,docs 层)。

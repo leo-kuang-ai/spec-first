@@ -75,7 +75,7 @@ origin:
 
 ### Owner 推荐
 
-推荐**候选 2**：把 brownfield current-state grounding 与多端 lens 作为 `spec-brainstorm` 的两个可选 reference 落地，**不新增 skill、不新增 `/spec:*` 入口、不新增 schema**。依据角色契约优先级——"清晰边界 > 功能完整""可信证据 > 自动化便利""更小可维护方案 > 更完整设计"，§18 刚完成的 schema budget 纪律，以及本轮取证的成本不对称(≥8 登记点 vs 2 reference)与 `spec-plan` 已消费该 artifact 路径的事实。
+推荐**候选 2**：把 brownfield current-state grounding 与多端 lens 作为 `spec-brainstorm` 的两个可选 reference 落地，**不新增 skill、不新增 `spec-*` 入口、不新增 schema**。依据角色契约优先级——"清晰边界 > 功能完整""可信证据 > 自动化便利""更小可维护方案 > 更完整设计"，§18 刚完成的 schema budget 纪律，以及本轮取证的成本不对称(≥8 登记点 vs 2 reference)与 `spec-plan` 已消费该 artifact 路径的事实。
 
 **唯一硬风险（两个方向共有）**：brownfield 现状重建不得反向驱动 HOW（schema/endpoint/类名/文件布局仍归 `spec-plan`）。须**复用** `skills/spec-plan/references/graph-evidence-posture.md` 的四轴 evidence 词表(`capability_status`/`evidence_grade`/`evidence_posture`/`freshness_state`)与非法组合矩阵、Scope Authority 子句，**不另造第二套证据词表**(本文 §Current-State Analysis Contract 的五级标签应映射到该四轴，而非平行发明)；并由 fresh-source eval 专门断言"greenfield 不触发该 reference、Requirements 段无实现细节泄漏"。
 
@@ -507,7 +507,7 @@ PRD ready 的判断不是“章节都填了”，而是“下游不需要发明 
   - **greenfield 新建**：断言**不触发** brownfield grounding（候选 2 下不加载该 reference）。
   - **admin lens**：断言加载 admin 关注点（RBAC/批量/审计/部分成功），未误用 app lens。
 - Source/runtime 边界检查：确认未手改 `.claude/`、`.codex/`、`.agents/skills/`。
-- 双宿主：brainstorm 是核心 workflow，Claude `/spec:brainstorm` 与 Codex `$spec-brainstorm` 共享同一 SKILL.md body（render-merge），改 source 即双宿主同步，但需各跑一次 fresh-source eval。
+- 双宿主：brainstorm 是核心 workflow，Claude `spec-brainstorm` 与 Codex `spec-brainstorm` 共享同一 SKILL.md body（render-merge），改 source 即双宿主同步，但需各跑一次 fresh-source eval。
 - `CHANGELOG.md`：source/doc/test 变更追加记录，作者读 `~/.spec-first/.developer`。
 
 ---

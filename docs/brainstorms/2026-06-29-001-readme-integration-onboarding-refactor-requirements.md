@@ -17,7 +17,7 @@ spec_id: 2026-06-29-001-readme-integration-onboarding-refactor
 当前 `README.md`（339 行）经过几轮整理后内容准确，但从开源运营漏斗视角仍有可定位的"集成上手"摩擦（以下行号/占比为本需求成文时点的快照,落地时以节名为准、行号会随编辑漂移）：
 
 - **安装入口埋得太深。** 真正的 `npm install -g spec-first` 在 `Quickstart` 节（成文时约全文 27% 处）。运营常识是"安装 + 首次成功"应落在前 1/5,落地用户却要先翻过 `See It In 90 Seconds` → `Try The First Loop` → `What Stays Repo-Local` → `Why spec-first?` 四个小节。
-- **顺序自相矛盾。** `Try The First Loop` 节让用户运行 `$spec-brainstorm`,但此处尚未介绍安装——"试第一个循环"出现在"怎么装"之前。
+- **顺序自相矛盾。** `Try The First Loop` 节让用户运行 `spec-brainstorm`,但此处尚未介绍安装——"试第一个循环"出现在"怎么装"之前。
 - **首屏内容重复。** `Try The First Loop` 与 `Quickstart` 都演示同一条首次成功示例,首屏宝贵空间被重复占用。
 - **价值铺陈偏长。** 安装前有 4 个叙事/价值小节,对"已决定试"的用户是延迟,对"还在评估"的用户又偏冗长。
 
@@ -60,7 +60,7 @@ spec_id: 2026-06-29-001-readme-integration-onboarding-refactor
 - R1. 两份 README 首屏（安装之前）按此渐进披露顺序组织：Title + 一句话定位 + badges + 中英切换 → Hero 图 → 紧凑"问题场景"小节 → "spec-first 怎么解"（价值 + 对比表）→ Quickstart。
 - R2. "问题场景"小节紧凑（建议不超过一屏内的一节）,只陈述 AI coding 决策/证据/评审随对话消失的痛点,不展开实现细节。现标题块中那段痛点叙事（成文时 `README.md` 标题段的 "AI can write code quickly; the risky part is..." 一段）应收敛为标题处的一句话定位,其余痛点表述移入本"问题场景"小节,**不得在标题块与问题场景小节重复出现同一痛点叙事**（否则即为本次要消除的"首屏重复"的变体）。
 - R3. Quickstart 上移至对比表之后、其余参考内容之前,使安装入口落在全文前 1/4,且首次成功路径连续可读。
-- R4. 合并现有 `Try The First Loop` 与 `Quickstart`,首屏只保留一条首次成功示例(`$spec-brainstorm` / `/spec:brainstorm` 之一为主,另一宿主形态可并列展示),消除重复演示与"试循环在安装前"的顺序矛盾。
+- R4. 合并现有 `Try The First Loop` 与 `Quickstart`,首屏只保留一条首次成功示例(`spec-brainstorm` / `spec-brainstorm` 之一为主,另一宿主形态可并列展示),消除重复演示与"试循环在安装前"的顺序矛盾。
 - R5. 后半段保留并按渐进披露排序：Workflow Entry Points → Operating Model → Trust Model → Use spec-first when → Documentation → Runtime And CLI Reference → Development & Contributing；不删除其承载的事实内容。
 - R5a. 现有 `What Stays Repo-Local` 小节（含 `spec-first-artifact-trail.png` 及其 SVG 源链接）不进首屏：其"产物随仓库留存"的内容与 artifact-trail 配图并入后段 `Operating Model` 小节（该节本就承载 artifact roots 与 runtime-model 图）,作为一次去重。并入后 artifact-trail 与 runtime-model 两张图均保留、承载事实不删除。三张受测试约束的 PNG 落点由此明确：Hero 图在首屏,artifact-trail 与 runtime-model 图在后段 `Operating Model`。
 

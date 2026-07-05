@@ -8,7 +8,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 
 ## Problem Frame
 
-`spec-first` 的公开 workflow 数量已经足够多，新手用户经常不会先说 `$spec-plan`、`$spec-work` 或 `$spec-debug`，而是直接描述一个任务，或者在关键节点问“下一步该执行哪个命令”。现有 `using-spec-first` 已经是 workflow routing policy 的 source of truth，但正文主要服务 agent 在 substantial work 前做入口治理，缺少一个明确的用户可见 next-step 引导模式。
+`spec-first` 的公开 workflow 数量已经足够多，新手用户经常不会先说 `spec-plan`、`spec-work` 或 `spec-debug`，而是直接描述一个任务，或者在关键节点问“下一步该执行哪个命令”。现有 `using-spec-first` 已经是 workflow routing policy 的 source of truth，但正文主要服务 agent 在 substantial work 前做入口治理，缺少一个明确的用户可见 next-step 引导模式。
 
 同时，`spec-first init --claude|--codex` 已经会向 `CLAUDE.md` 或 `AGENTS.md` 注入三类 managed blocks：language/changelog governance、`using-spec-first` bootstrap，以及 `spec-first:coding-guidelines`。其中 bootstrap 只是入口提醒，`using-spec-first` 是路由真源，`coding-guidelines` 明确只约束进入工作后的 execution posture，不替代 workflow entry governance。本需求必须保留这条分层模型，避免把“下一步该用哪个 workflow”的判断塞进 coding guidelines。
 
@@ -63,7 +63,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 **Guide mode trigger**
 - R1. `using-spec-first` 必须显式定义 user next-step guide mode，覆盖用户询问“下一步”“该用哪个命令”“不知道用哪个 workflow”的场景。
 - R2. guide mode 必须支持 workflow 后续场景，例如刚 init 完不知道先跑什么、做完 brainstorm 后不知道该 plan 还是 work、已有 diff 不知道是否 review。
-- R3. `using-spec-first` 必须继续支持用户直接描述任务时的自动入口分流，不要求用户先显式调用某个 `$spec-*` 或 `/spec:*`。
+- R3. `using-spec-first` 必须继续支持用户直接描述任务时的自动入口分流，不要求用户先显式调用某个 `spec-*` 或 `spec-*`。
 
 **Routing behavior**
 - R4. 每次路由只能推荐一个最合适的公开入口；如果确实存在两个相互排斥的解释，先问一个窄确认问题，而不是列出完整菜单。
@@ -74,7 +74,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 
 **Source and runtime boundary**
 - R9. `skills/using-spec-first/SKILL.md` 必须继续作为唯一 routing policy source of truth；不得新增第二套完整路由表。
-- R10. 本阶段不新增 `/spec:next`、`$spec-next`、`/spec:guide` 或 `$spec-guide` 公开入口；如未来新增，只能作为读取/引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
+- R10. 本阶段不新增 `spec-next`、`spec-next`、`spec-guide` 或 `spec-guide` 公开入口；如未来新增，只能作为读取/引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
 - R11. 不得手改 `.claude/`、`.codex/` 或 `.agents/skills/` runtime mirrors；需要 runtime 刷新时由 `spec-first init --claude|--codex` 生成。
 
 **Managed instruction block interaction**
@@ -93,9 +93,9 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 ## Acceptance Examples
 
 - AE1. **Covers R1, R4, R5, R12.** Given 用户说“我现在不知道该用哪个 spec 命令”，when agent 响应，then agent 推荐一个当前最合适入口并给出一句原因，而不是打印完整 workflow 表。
-- AE2. **Covers R3, R7.** Given 用户说“这个测试失败了，帮我看看为什么”，when agent 判断入口，then agent 可说明“我会按 `$spec-debug` 处理”并进入 debug workflow，不需要先问是否使用 brainstorm。
+- AE2. **Covers R3, R7.** Given 用户说“这个测试失败了，帮我看看为什么”，when agent 判断入口，then agent 可说明“我会按 `spec-debug` 处理”并进入 debug workflow，不需要先问是否使用 brainstorm。
 - AE3. **Covers R7, R14.** Given 用户说“我想改一下登录逻辑”，when bug 修复和需求变更都可能成立，then agent 先确认这是现有行为错误还是策略变更，再决定 debug/work/brainstorm/plan 路径。
-- AE4. **Covers R2, R9.** Given 用户刚完成 brainstorm requirements doc 后问“下一步呢”，when agent 响应，then agent 根据 active workflow handoff 或 `using-spec-first` policy 推荐 `$spec-plan`，不新增第二套 handoff 规则。
+- AE4. **Covers R2, R9.** Given 用户刚完成 brainstorm requirements doc 后问“下一步呢”，when agent 响应，then agent 根据 active workflow handoff 或 `using-spec-first` policy 推荐 `spec-plan`，不新增第二套 handoff 规则。
 - AE5. **Covers R10, R11.** Given 维护者实现本阶段能力，when 检查变更，then 只修改 source 真相源和必要文档/测试，不新增公开 `spec-next` governance entry，也不手改 generated runtime assets。
 - AE6. **Covers R15, R16, R17.** Given 用户项目已经通过 init 注入 `bootstrap` 和 `coding-guidelines` blocks，when 用户直接描述任务，then agent 先基于 `using-spec-first` 做 workflow 入口判断，再在进入 work/debug 等执行阶段遵守 coding-guidelines；coding-guidelines 本身不承担入口路由。
 - AE7. **Covers R18.** Given 实施阶段调整 bootstrap 文案以增强“下一步引导”可见性，when 运行 contract tests，then 测试仍能证明 bootstrap 是薄提醒、完整策略在 `using-spec-first`，且 coding-guidelines 仍声明不替代 workflow entry governance。
@@ -114,7 +114,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 
 ## Scope Boundaries
 
-- 不新增公开 `/spec:next`、`$spec-next`、`/spec:guide` 或 `$spec-guide`。
+- 不新增公开 `spec-next`、`spec-next`、`spec-guide` 或 `spec-guide`。
 - 不实现新的 CLI 命令、状态机、router script 或 machine-readable routing engine。
 - 不让脚本替 LLM 做语义路由判断；脚本只可在未来提供 deterministic facts。
 - 不复制 `using-superpowers` 的 1% 必用规则。
@@ -145,7 +145,7 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 ## Dependencies / Assumptions
 
 - `using-spec-first` 已在 dual-host governance 中作为 standalone skill 投递到 Claude 和 Codex runtime。
-- 当前宿主入口语法保持不变：Claude 使用 `/spec:*`，Codex 使用 `$spec-*`。
+- 当前宿主入口语法保持不变：Claude 使用 `spec-*`，Codex 使用 `spec-*`。
 - 当前 init/bootstrap block 已明确 `using-spec-first` 是 standalone meta skill，不是 command-backed workflow；本改动不改变该身份。
 - 当前 `spec-first:coding-guidelines` block 已由 `src/cli/coding-guidelines.js` 独立生成、inspect、remove，并通过独立 tests 覆盖 installed/drifted/idempotent 行为。
 - 当前 `CLAUDE.md` / `AGENTS.md` 中 coding-guidelines block 已明确“这些准则只约束进入工作后的执行姿势，不替代 `using-spec-first` 的 workflow 入口治理”。
@@ -171,4 +171,4 @@ spec_id: 2026-05-01-002-using-spec-first-next-step-guidance
 
 ## Next Steps
 
--> `$spec-plan docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requirements.md` for structured implementation planning.
+-> `spec-plan docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requirements.md` for structured implementation planning.

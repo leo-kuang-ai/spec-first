@@ -40,7 +40,7 @@
 
 ```text
 ┌────────────────────────────────────────────────────┐
-│  /spec:graph-bootstrap 或 $spec-graph-bootstrap                │
+│  spec-graph-bootstrap 或 spec-graph-bootstrap                │
 └──────────────────────────────┬─────────────────────┘
                                │
                                v
@@ -99,7 +99,7 @@
 
 | 状态 | 判定条件 | 行为 |
 |------|----------|------|
-| `NOT_SETUP` | `~/.claude/spec-first/host-setup.json` 不存在，或 `setup_success != true` | 直接停止，提示先跑 `/spec:mcp-setup` |
+| `NOT_SETUP` | `~/.claude/spec-first/host-setup.json` 不存在，或 `setup_success != true` | 直接停止，提示先跑 `spec-mcp-setup` |
 | `SETUP_DONE_NOT_RESTARTED` | 配置文件存在，但 MCP 工具探针失败 | 直接停止，提示重启 Claude Code |
 | `READY` | 文件存在且 MCP 探针成功 | 进入 Phase 1 |
 
@@ -329,7 +329,7 @@ docs/contexts/<slug>/
 
 ### 7.1 宿主依赖风险
 
-如果用户忘了执行 `/spec:mcp-setup` 或没重启 Claude Code，bootstrap 会在门禁阶段直接停掉。
+如果用户忘了执行 `spec-mcp-setup` 或没重启 Claude Code，bootstrap 会在门禁阶段直接停掉。
 
 ### 7.2 目标项目污染风险
 

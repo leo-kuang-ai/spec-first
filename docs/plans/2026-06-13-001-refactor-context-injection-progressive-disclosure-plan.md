@@ -40,7 +40,7 @@ plan_depth: deep
 - R3. `skills/using-spec-first/SKILL.md` 继续作为完整 routing policy source-of-truth；bootstrap 只能是 faithful core subset，不成为第二套完整路由真相源。
 - R4. substantial work、prompt/workflow/contract 设计或 source/runtime 判断仍必须按需读取 `docs/10-prompt/结构化项目角色契约.md` 和相关 source skill。
 - R5. 不新增中心化强状态机；scripts/tools 只产 deterministic facts、reason_code、paths 和 validation outcome，LLM 继续做语义路由。
-- R6. 明确 skill trigger 与 workflow admission 是两层判断；读取 skill 方法论不自动等于进入 public `$spec-*` workflow。
+- R6. 明确 skill trigger 与 workflow admission 是两层判断；读取 skill 方法论不自动等于进入 public `spec-*` workflow。
 - R7. `using-spec-first` 合法输出包括 direct answer / normal execution；轻量事实问答、当前上下文解释、窄定位查询、当前材料整理不得强制升级为 brainstorm、plan 或 work。
 - R8. Graphify 默认只用于架构关系、跨文件关系、影响面和代码库导航；单文档整理、当前对话总结、简单事实问答和用户明确给定材料不默认触发 Graphify。
 - R9. Graphify、code-graph 和 capability-class provider 输出必须记录为 advisory / `provider_untrusted`，不得作为 confirmed source truth。
@@ -63,7 +63,7 @@ plan_depth: deep
 
 ## Assumptions
 
-- A1. 用户已明确调用 `$spec-plan deep` 并给出 successor requirements 路径，本计划按 headless-like plan-write 处理 scoping checkpoint；未另行中断询问，关键可替代选择记录在本节、Scope Boundaries 和 Open Questions。
+- A1. 用户已明确调用 `spec-plan deep` 并给出 successor requirements 路径，本计划按 headless-like plan-write 处理 scoping checkpoint；未另行中断询问，关键可替代选择记录在本节、Scope Boundaries 和 Open Questions。
 - A2. 当前计划只规划本仓 `target_repo: .` 的 source 改动；不跨仓写入。
 - A3. 旧 2026-06-08 扩注入计划已完成并影响当前 source/test 形态；本计划不是 revert，而是在 successor 需求下做二次校准。
 - A4. Graphify 触发收窄需要同时改仓库根 instruction source section 和 `spec-mcp-setup` 的 Graphify instruction renderer，否则 provider install/normalization 会把旧触发规则写回。
@@ -74,7 +74,7 @@ plan_depth: deep
 
 ## Scope Boundaries
 
-- 不删除 `using-spec-first`，不取消 public `$spec-*` workflow routing。
+- 不删除 `using-spec-first`，不取消 public `spec-*` workflow routing。
 - 不删除 `CHANGELOG.md` gate，不弱化 source/runtime gate、verification honesty 或 degraded-mode reason_code。
 - 不把 Graphify、code-graph、browser、git-worktree 等 helper 暴露成新的 public workflow 入口。
 - 不新增中心化 context router、强状态机、全消息拦截器或“每条请求必须 workflow route”的机制。
@@ -286,7 +286,7 @@ flowchart TB
   - "where is X used" narrow lookup;
   - current conversation or user-provided document summarization.
 - Keep examples-as-context compact. If existing `examples.json` would exceed its 4-6 item budget, add a separate routing-case fixture with structured expected outcomes and update tests accordingly.
-- Preserve explicit-route precedence: `$spec-plan`, `$spec-work`, `$spec-doc-review` still route when the user explicitly invokes them.
+- Preserve explicit-route precedence: `spec-plan`, `spec-work`, `spec-doc-review` still route when the user explicitly invokes them.
 - Preserve dispatch governance from the adjacent 2026-06-12 dispatch plan: public workflow admission does not automatically authorize Codex `spawn_agent`.
 
 **Execution note:** Treat routing fixtures as behavior guardrails, not as a hardcoded router state machine.
@@ -297,17 +297,17 @@ flowchart TB
 - `tests/unit/spec-dispatch-boundary-contracts.test.js` dispatch admission boundary.
 
 **Test scenarios:**
-- Happy path: explicit `$spec-plan` remains honored for plan requests.
+- Happy path: explicit `spec-plan` remains honored for plan requests.
 - Happy path: clear docs/source edit request routes to work/plan as appropriate.
 - Edge case: greeting returns direct answer and expects no public workflow artifact.
-- Edge case: current context injection explanation returns direct answer or bounded source read, not `$spec-plan` / `$spec-work`.
+- Edge case: current context injection explanation returns direct answer or bounded source read, not `spec-plan` / `spec-work`.
 - Edge case: narrow "where is X used" lookup may use `rg`/bounded reads and does not require workflow admission.
 - Edge case: summarizing a user-provided current document does not trigger Graphify or public workflow by default.
 - Error path: fixture expecting a lightweight direct answer fails if mapped to brainstorm/plan/work.
 
 **Verification:**
 - Routing fixture tests and `using-spec-first` contract tests pass.
-- No new hidden helper skill is presented as a public `$spec-*` entrypoint.
+- No new hidden helper skill is presented as a public `spec-*` entrypoint.
 
 ---
 
@@ -334,7 +334,7 @@ flowchart TB
 - Change Graphify instruction text from broad "For codebase questions, first use Graphify" to narrower trigger language: architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, and "how does X connect to Y".
 - Add explicit non-trigger examples: simple factual Q&A, current conversation summarization, user-provided single document summarization/editing, and already-scoped file reads.
 - Preserve explicit `/graphify` handling where present.
-- Keep setup repair path host-specific (`/spec:mcp-setup --only graphify` or `$spec-mcp-setup --only graphify`).
+- Keep setup repair path host-specific (`spec-mcp-setup --only graphify` or `spec-mcp-setup --only graphify`).
 - Reuse `docs/contracts/project-graph-consumption.md` for trust tiers and `provider_untrusted`; do not add provider-specific commands to the contract body beyond the existing appendix.
 - Update both Bash and PowerShell renderers so provider install/normalization writes the same narrowed instruction section.
 

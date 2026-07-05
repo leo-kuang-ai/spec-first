@@ -18,7 +18,7 @@
 ## WIN-P2-07：`spec-polish-beta` helper 是 bash-only
 
 - 严重程度：P2
-- 影响范围：`$spec-polish-beta` / `/spec:polish-beta`
+- 影响范围：`spec-polish-beta` / `spec-polish-beta`
 - 涉及文件：
   - `skills/spec-polish-beta/SKILL.md:63`
   - `skills/spec-polish-beta/SKILL.md:67`
@@ -45,7 +45,7 @@ node skills/spec-polish-beta/scripts/resolve-port.cjs --type vite
 ## WIN-P2-08：`spec-optimize` 优化闭环依赖 POSIX shell 与 `/tmp`
 
 - 严重程度：P2
-- 影响范围：`$spec-optimize` / `/spec:optimize`
+- 影响范围：`spec-optimize` / `spec-optimize`
 - 涉及文件：
   - `skills/spec-optimize/SKILL.md:321`
   - `skills/spec-optimize/SKILL.md:350`
@@ -74,7 +74,7 @@ node skills/spec-optimize/scripts/optimize-runner.cjs probe --project . --measur
 ## WIN-P2-09：`spec-code-review` base resolver 依赖 bash/awk/sed
 
 - 严重程度：P2
-- 影响范围：`$spec-code-review` / `/spec:code-review`
+- 影响范围：`spec-code-review` / `spec-code-review`
 - 涉及文件：
   - `skills/spec-code-review/scripts/resolve-base.sh:1-103`
   - `skills/spec-code-review/SKILL.md:335`
@@ -98,7 +98,7 @@ node skills/spec-code-review/scripts/resolve-base.cjs
 ## WIN-P1-04：`helper-tools.json` Windows command 使用 PowerShell 5.1 不兼容语法
 
 - 严重程度：P1
-- 影响范围：`$spec-mcp-setup` helper repair path 的用户复制命令与 registry 展示。
+- 影响范围：`spec-mcp-setup` helper repair path 的用户复制命令与 registry 展示。
 - 涉及文件：
   - `skills/spec-mcp-setup/helper-tools.json:21-25`
   - `skills/spec-mcp-setup/scripts/install-helpers.ps1:212-249`
@@ -119,7 +119,7 @@ $env:CI='true'; npm --version; if ($LASTEXITCODE -eq 0) { npx --version }
 ## WIN-P1-05：frontmatter validators 未显式 UTF-8
 
 - 严重程度：P1
-- 影响范围：`$spec-compound`、`$spec-compound-refresh`
+- 影响范围：`spec-compound`、`spec-compound-refresh`
 - 涉及文件：
   - `skills/spec-compound/scripts/validate-frontmatter.py:43`
   - `skills/spec-compound-refresh/scripts/validate-frontmatter.py:43`
@@ -140,7 +140,7 @@ python skills/spec-compound-refresh/scripts/validate-frontmatter.py .\tests\fixt
 ## WIN-P2-01：`spec-sessions` session discovery 依赖 bash/find/xargs
 
 - 严重程度：P2
-- 影响范围：`$spec-sessions`
+- 影响范围：`spec-sessions`
 - 涉及文件：
   - `skills/spec-sessions/scripts/discover-sessions.sh:1-66`
   - `skills/spec-sessions/SKILL.md:208-210`

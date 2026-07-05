@@ -145,7 +145,7 @@
 但如果从“产品完成度”看，体系仍不完整，主要缺在三处：
 
 1. **用户可见入口未完全收口**
-   - Codex 仍被代码和文档双重暴露为 `/spec:*`
+   - Codex 仍被代码和文档双重暴露为 `spec-*`
 2. **宿主专有能力没有被显式建模**
    - 例如 `claude-permissions-optimizer`
 3. **静态治理闸门缺失**
@@ -239,7 +239,7 @@
 
 > 当前存在 `init / doctor / clean` 围绕 `state.json` 的执行闭环，而不是存在一个对外的 `state` 命令。
 
-### 4.3 Codex 产品面是否仍然错误暴露 `/spec:*`
+### 4.3 Codex 产品面是否仍然错误暴露 `spec-*`
 
 是，且这是当前系统最大的产品面偏差之一。
 
@@ -248,7 +248,7 @@
 1. `CodexAdapter.hasCommands` 返回 `true`
 2. `CodexAdapter.commandRoot` 是 `.codex/commands/spec`
 3. `init` 在 `adapter.hasCommands` 为真时会生成 command files
-4. `init` 对这一路径的提示文案仍然是“pick up the new /spec:* commands”
+4. `init` 对这一路径的提示文案仍然是“pick up the new spec-* commands”
 5. `doctor` 会把 `adapter.commandRoot` 当成正式产品面检查
 6. `clean` 会按 commandRoot 清理这批 commands
 7. `state` 会记录 `commands`
@@ -343,13 +343,13 @@ README 也仍然在传播这个错误产品面：
 但这份清单还不够完整，至少漏了三类内容：
 
 1. `skills/setup/SKILL.md`
-   - 仍显式写 `**Codex entry point:** /spec:setup`
+   - 仍显式写 `**Codex entry point:** spec-setup`
    - 证据：`skills/setup/SKILL.md:12`
 2. `skills/spec-graph-bootstrap/SKILL.md`
-   - 仍显式写 `**Codex entry point:** /spec:graph-bootstrap`
+   - 仍显式写 `**Codex entry point:** spec-graph-bootstrap`
    - 证据：`skills/spec-graph-bootstrap/SKILL.md:11`
 3. `src/cli/index.js`
-   - `printVersion()` 仍传播 `/spec:*`
+   - `printVersion()` 仍传播 `spec-*`
    - 证据：`src/cli/index.js:89-91`
 
 结论：
@@ -419,7 +419,7 @@ README 也仍然在传播这个错误产品面：
 
 不清晰的地方不在“程序怎么跑”，而在“用户怎么理解”：
 
-1. Codex 到底应该用 `/spec:*` 还是 `$spec-*`
+1. Codex 到底应该用 `spec-*` 还是 `spec-*`
 2. standalone skill 到底是显式命令还是宿主内 skill 调用
 3. `spec-graph-bootstrap` 与 `spec-graph-bootstrap` 的边界是什么
 4. Stage-0 是“自动注入”还是“按降级策略预载”
@@ -438,13 +438,13 @@ README 也仍然在传播这个错误产品面：
 ### 7.1 补入第一阶段必修项
 
 1. `src/cli/index.js`
-   - `printVersion()` 仍写 `/spec:*`
+   - `printVersion()` 仍写 `spec-*`
 2. `skills/setup/SKILL.md`
-   - 显式传播 `Codex entry point: /spec:setup`
+   - 显式传播 `Codex entry point: spec-setup`
 3. `skills/spec-graph-bootstrap/SKILL.md`
-   - 显式传播 `Codex entry point: /spec:graph-bootstrap`
+   - 显式传播 `Codex entry point: spec-graph-bootstrap`
 4. `skills/spec-mcp-setup/SKILL.md`
-   - 除路径漂移外，还显式传播 `Codex entry point: /spec:mcp-setup`
+   - 除路径漂移外，还显式传播 `Codex entry point: spec-mcp-setup`
 
 ### 7.2 为每类修复补 DoD
 

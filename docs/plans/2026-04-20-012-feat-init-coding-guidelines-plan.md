@@ -106,7 +106,7 @@ scope: 为 init 默认注入独立 managed coding-guidelines block，并接入 c
 
 ### Out of Scope
 
-- 不新增 `/spec:*` 或 `$spec-*` workflow 入口
+- 不新增 `spec-*` 或 `spec-*` workflow 入口
 - 不修改 `skills/using-spec-first/SKILL.md` 的路由 contract
 - 不把 coding guidelines 变成 standalone skill
 - 不新增新的 state machine、registry 或 host delivery 维度
@@ -552,7 +552,7 @@ PASS  AGENTS.md coding guidelines    managed coding-guidelines block present
 ## 12. Non-Goals
 
 - 不把 coding guidelines 做成独立 skill
-- 不把 coding guidelines 接成 `/spec:*` 或 `$spec-*`
+- 不把 coding guidelines 接成 `spec-*` 或 `spec-*`
 - 不修改 `using-spec-first` 的路由 contract
 - 不新增用户开关参数，如 `--with-guidelines`
 - 不为这次改动设计新的 managed state 字段

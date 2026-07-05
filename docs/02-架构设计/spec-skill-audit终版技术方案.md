@@ -5,7 +5,7 @@
 > 定位：在 `spec-first` 中新增一个 **workflow skill**，用于审查 skill 质量、边界、治理、运行时投递与安全风险。
 > 重要边界：**不是 CLI、不是 npm 包、不是外部平台**。
 > 新增位置：`skills/spec-skill-audit/`。
-> 运行入口：Claude `/spec:skill-audit`，Codex `$spec-skill-audit`。
+> 运行入口：Claude `spec-skill-audit`，Codex `spec-skill-audit`。
 > 默认审查对象：`spec-first` 自身 `skills/` source-of-truth。
 > 扩展能力：可用同一套审查方法论审查任意包含 `SKILL.md` 的本地 skill 目录。
 
@@ -255,7 +255,7 @@ spec-skill-mining：学方法论
 用户：
 
 ```text
-/spec:skill-audit
+spec-skill-audit
 ```
 
 行为：
@@ -286,7 +286,7 @@ spec-skill-mining：学方法论
 用户：
 
 ```text
-/spec:skill-audit 审查 skills/spec-plan
+spec-skill-audit 审查 skills/spec-plan
 ```
 
 行为：
@@ -316,7 +316,7 @@ spec-skill-mining：学方法论
 用户：
 
 ```text
-/spec:skill-audit 审查 /path/to/other/skills
+spec-skill-audit 审查 /path/to/other/skills
 ```
 
 行为：
@@ -415,10 +415,10 @@ src/cli/contracts/dual-host-governance/skills-governance.json
 
 ```text
 Claude:
-  /spec:skill-audit
+  spec-skill-audit
 
 Codex:
-  $spec-skill-audit
+  spec-skill-audit
 ```
 
 注意：
@@ -1541,7 +1541,7 @@ security_posture 和 boundary_discipline 权重最高。
 用户明确要求后才生成：
 
 ```text
-/spec:skill-audit 给出修复预览
+spec-skill-audit 给出修复预览
 ```
 
 产物：
@@ -1779,7 +1779,7 @@ Phase 0 是入口接入补齐，不是单独产品 MVP。
 目标：
 
 ```text
-/spec:skill-audit 能审查 spec-first 自身 skills/
+spec-skill-audit 能审查 spec-first 自身 skills/
 ```
 
 范围：
@@ -2068,8 +2068,8 @@ Codex runtime 预期生成 .agents/skills/spec-skill-audit/
 `spec-skill-audit` 完成后，应满足：
 
 ```text
-1. /spec:skill-audit 可以作为 Claude workflow 入口使用
-2. $spec-skill-audit 可以作为 Codex skill 入口使用
+1. spec-skill-audit 可以作为 Claude workflow 入口使用
+2. spec-skill-audit 可以作为 Codex skill 入口使用
 3. 新 skill 位于 skills/spec-skill-audit/
 4. 不新增 spec-first CLI 子命令
 5. 默认审查 skills/ source-of-truth

@@ -36,7 +36,7 @@ Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 原审查发现主链路公开表达存在一个 P1 级治理漂移：`spec-write-tasks` 到底是 standalone skill 还是 public workflow command，source 之间互相冲突。这个冲突会直接影响用户如何从 Plan 进入 Tasks，并影响 runtime catalog、Claude command 投射、README 和 entry governor 的一致性。
 
-2026-07-01 owner 决策：反向提升 `spec-write-tasks` 为 public workflow。当前 source surface 已按该决策修复：`using-spec-first`、README/用户手册、`spec-work` handoff、task-pack handoff contract、workflow map、metadata 和测试已收敛到 `/spec:write-tasks` / `$spec-write-tasks`。剩余不是 source 口径问题，而是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新。
+2026-07-01 owner 决策：反向提升 `spec-write-tasks` 为 public workflow。当前 source surface 已按该决策修复：`using-spec-first`、README/用户手册、`spec-work` handoff、task-pack handoff contract、workflow map、metadata 和测试已收敛到 `spec-write-tasks` / `spec-write-tasks`。剩余不是 source 口径问题，而是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新。
 
 当前 F2-F5 的后续优化已在 source 层修复：`docs/workflow-skill-agent-map.md` 已把 `Context` 从顺序链路节点调整为横切 Harness layer，Knowledge 行已覆盖 `spec-compound-refresh`，Review 描述已补 dispatch 授权与 fallback 边界；核心链路 9 个 skill 的 frontmatter description 也已补齐最容易误触发的 positive/negative trigger boundary。剩余不是 source 口径问题，而是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新。
 
@@ -83,7 +83,7 @@ LLM 语义判断：
 | Spec / Brainstorm | `spec-brainstorm` 明确只做 WHAT discovery，错误入口会 route out；不接 PRD、plan、work、debug。 | 正确 |
 | Spec / PRD | `spec-prd` 面向 brownfield PRD-grade requirements，强调 current-state evidence、owner question、readiness/finalize；禁止写 implementation plan。 | 正确，复杂但边界强 |
 | Plan | `spec-plan` 明确 HOW plan，planning-only until handoff，post-plan 可进入 work 或 task compilation。 | 正确 |
-| Tasks | `spec-write-tasks` 本体作为 Plan 和 Work 之间的 optional derived layer，task pack 不改变 scope；owner 已决定将入口收敛为 `/spec:write-tasks` / `$spec-write-tasks` public workflow。 | 本体正确，F1 已按 public workflow 方向修复 source surface |
+| Tasks | `spec-write-tasks` 本体作为 Plan 和 Work 之间的 optional derived layer，task pack 不改变 scope；owner 已决定将入口收敛为 `spec-write-tasks` / `spec-write-tasks` public workflow。 | 本体正确，F1 已按 public workflow 方向修复 source surface |
 | Code | `spec-work` 对 plan/task-pack 输入、hash/spec_id、scope expansion、repo scope、verification 和 review gate 有强边界。 | 正确 |
 | Review | `spec-code-review` / `spec-doc-review` 分别审代码 diff 和 requirements/plan/task-pack 文档，并定义 dispatch fallback。 | 正确，公开文档需避免过度承诺并行 |
 | Knowledge | `spec-compound` 只沉淀刚解决且 source-confirmed 的问题；`spec-compound-refresh` 维护旧 learning/pattern doc。 | 正确 |
@@ -102,20 +102,20 @@ LLM 语义判断：
 
 以下证据记录的是本报告初始审查时的 source/runtime 漂移；owner 选择 promote-to-public-workflow 后，当前 source 已按下方 remediation validation 收敛。
 
-- `skills/using-spec-first/SKILL.md:118` 明确说不要为 standalone skill invent `/spec:*` 或 `$spec-*`，并举例 `spec-write-tasks`。
+- `skills/using-spec-first/SKILL.md:118` 明确说不要为 standalone skill invent `spec-*` 或 `spec-*`，并举例 `spec-write-tasks`。
 - `skills/using-spec-first/SKILL.md:165` Route Map 把 task compilation 映射为 `spec-write-tasks` standalone skill。
-- `skills/using-spec-first/SKILL.md:172` 明确说 `spec-write-tasks` 不是 `/spec:*` 或 `$spec-*` workflow entrypoint。
+- `skills/using-spec-first/SKILL.md:172` 明确说 `spec-write-tasks` 不是 `spec-*` 或 `spec-*` workflow entrypoint。
 - `skills/using-spec-first/SKILL.md:196` Host Surface 再次说它不是 public workflow entrypoint。
 - `README.md:161` 和 `README.zh-CN.md:161` 均写 `use installed standalone write-tasks skill`。
-- `skills/spec-work/SKILL.md:237-240` 说执行大 plan 时可提供一次 standalone `spec-write-tasks` diversion；`tests/unit/spec-work-contracts.test.js:614-626` 明确断言不得出现 `/spec:write-tasks` 或 `$spec-write-tasks`。
+- `skills/spec-work/SKILL.md:237-240` 说执行大 plan 时可提供一次 standalone `spec-write-tasks` diversion；`tests/unit/spec-work-contracts.test.js:614-626` 明确断言不得出现 `spec-write-tasks` 或 `spec-write-tasks`。
 - 反向证据：`src/cli/contracts/dual-host-governance/skills-governance.json:347-354` 把 `spec-write-tasks` 登记为 `entry_surface: workflow_command`，`command_name: write-tasks`。
-- 反向证据：`tests/unit/runtime-capability-catalog.test.js:47` 断言 runtime catalog 暴露 `| write-tasks | spec-write-tasks | /spec:write-tasks | $spec-write-tasks | ... |`。
-- 反向证据：`docs/workflow-skill-agent-map.md:16` 和 `docs/workflow-skill-agent-map.md:31` 写 `/spec:write-tasks`，但 `docs/workflow-skill-agent-map.md:108` 又说它是 standalone skill。
+- 反向证据：`tests/unit/runtime-capability-catalog.test.js:47` 断言 runtime catalog 暴露 `| write-tasks | spec-write-tasks | spec-write-tasks | spec-write-tasks | ... |`。
+- 反向证据：`docs/workflow-skill-agent-map.md:16` 和 `docs/workflow-skill-agent-map.md:31` 写 `spec-write-tasks`，但 `docs/workflow-skill-agent-map.md:108` 又说它是 standalone skill。
 - 反向证据：当前 generated runtime 存在 `.claude/commands/spec/write-tasks.md`，说明 runtime 投射受治理记录影响；这只能作为 runtime evidence，不是 source truth。
 
 **为什么重要**
 
-Tasks 是 `Plan -> Code` 之间的派生层。修复前，如果用户看 README 得到 standalone 口径，看 runtime catalog 或 generated Claude command 得到 `/spec:write-tasks` 口径，entry governor、文档、测试、runtime 投射会把同一行为导向不同路径。高风险 task pack 还带有 bounded doc-review continuation，这个入口不清会放大 dispatch 授权误判。
+Tasks 是 `Plan -> Code` 之间的派生层。修复前，如果用户看 README 得到 standalone 口径，看 runtime catalog 或 generated Claude command 得到 `spec-write-tasks` 口径，entry governor、文档、测试、runtime 投射会把同一行为导向不同路径。高风险 task pack 还带有 bounded doc-review continuation，这个入口不清会放大 dispatch 授权误判。
 
 **反证检查**
 
@@ -125,8 +125,8 @@ Tasks 是 `Plan -> Code` 之间的派生层。修复前，如果用户看 README
 
 已按 owner 决策将 `spec-write-tasks` 提升为 public workflow，而不是降级治理表：
 
-1. 已保留 `skills-governance.json` 中 `spec-write-tasks` 的 `entry_surface: workflow_command`、`command_name: write-tasks`、Claude `/spec:write-tasks` 和 Codex `$spec-write-tasks` runtime catalog 口径。
-2. 已更新 `using-spec-first` Route Map、Host Surface、dispatch reference 和 routing eval，明确 task compilation 入口是 `/spec:write-tasks` / `$spec-write-tasks`。
+1. 已保留 `skills-governance.json` 中 `spec-write-tasks` 的 `entry_surface: workflow_command`、`command_name: write-tasks`、Claude `spec-write-tasks` 和 Codex `spec-write-tasks` runtime catalog 口径。
+2. 已更新 `using-spec-first` Route Map、Host Surface、dispatch reference 和 routing eval，明确 task compilation 入口是 `spec-write-tasks` / `spec-write-tasks`。
 3. 已更新 README / README.zh-CN / 用户手册 / `docs/workflow-skill-agent-map.md` / `docs/workflow-enhancement-proposals.md` / 大需求拆分文档，让用户入口表与 runtime catalog 一致。
 4. 已更新 `spec-work` 的 oversized plan diversion 文案和 tests，让它推荐当前宿主 write-tasks public workflow，而不是 standalone skill。
 5. 已更新 `spec-write-tasks` 本体、OpenAI metadata、high-risk doc-review handoff contract 和 eval wording，保留“可选派生层、不执行代码、不替代 source plan”的职责边界。
@@ -157,8 +157,8 @@ Context 是横切能力，不是用户顺序 workflow 节点。把它写进顺�
 
 **证据**
 
-- `docs/workflow-skill-agent-map.md:19` Knowledge 行只列 `/spec:compound`、`/spec:sessions`。
-- 同文件 `docs/workflow-skill-agent-map.md:38` 又列 `/spec:compound-refresh`。
+- `docs/workflow-skill-agent-map.md:19` Knowledge 行只列 `spec-compound`、`spec-sessions`。
+- 同文件 `docs/workflow-skill-agent-map.md:38` 又列 `spec-compound-refresh`。
 - README 主链路 `README.md:165-166` 和 `README.zh-CN.md:165-166` 均把 `compound` 和 `compound-refresh` 分成 capture / refresh 两个知识阶段。
 - `skills/using-spec-first/SKILL.md:168-169` Route Map 同时提供 compound 和 compound-refresh。
 
@@ -168,7 +168,7 @@ Knowledge 不只是“写入新 learning”，还包括让旧 learning 与当前
 
 **修复记录**
 
-已把 Knowledge 行补为 `/spec:compound`、`/spec:compound-refresh` 和 `/spec:sessions`：前者负责 capture，中者负责 refresh/merge/retire 旧 learning，sessions 作为历史会话 recall support，不等同于 durable knowledge promotion。
+已把 Knowledge 行补为 `spec-compound`、`spec-compound-refresh` 和 `spec-sessions`：前者负责 capture，中者负责 refresh/merge/retire 旧 learning，sessions 作为历史会话 recall support，不等同于 durable knowledge promotion。
 
 ### F4 P2：用户文档对 review 的“多 persona 并行”表达过强（source fixed）
 
@@ -183,7 +183,7 @@ Knowledge 不只是“写入新 learning”，还包括让旧 learning 与当前
 
 **为什么重要**
 
-在 Codex 侧，直接 `$spec-doc-review` 不等于授权 `spawn_agent`。如果用户文档过度承诺“多 persona 并行”，会导致实际 fallback 被误认为质量下降或 workflow 失败。
+在 Codex 侧，直接 `spec-doc-review` 不等于授权 `spawn_agent`。如果用户文档过度承诺“多 persona 并行”，会导致实际 fallback 被误认为质量下降或 workflow 失败。
 
 **修复记录**
 
@@ -216,10 +216,10 @@ skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 re
 5. `skills/spec-compound/SKILL.md`：限定为 just-solved、source-confirmed、reusable team knowledge；排除 active debugging、unresolved hypotheses、one-off summaries/transcript archiving、mandatory completion gates，并把 stale knowledge 路由到 `spec-compound-refresh`。
 6. `skills/spec-brainstorm/SKILL.md`：把入口明确为 selected feature/problem 的 WHAT discovery before PRD/planning；排除 open-ended ideation、brownfield PRD、HOW planning/task compilation、implementation/debug/review/setup、runtime mirror fix、factual answer 和 cleanup。
 7. `skills/spec-prd/SKILL.md`：把入口明确为 brownfield PRD-grade requirements planning-readiness；排除 0-1 product exploration、unresolved product shape、HOW planning/task compilation、implementation/debug/review、lightweight direct fixes、runtime mirror edits 和 design/source consistency audit，并补 near-neighbor route hints。
-8. `skills/spec-write-tasks/SKILL.md`：把入口明确为 `/spec:write-tasks` / `$spec-write-tasks` public workflow、settled local plan 和 existing local task pack；排除 plan authoring、implementation、unresolved scope、small low-risk plans、progress/approval state、remote/generic task lists 和 runtime mirror edits。
+8. `skills/spec-write-tasks/SKILL.md`：把入口明确为 `spec-write-tasks` / `spec-write-tasks` public workflow、settled local plan 和 existing local task pack；排除 plan authoring、implementation、unresolved scope、small low-risk plans、progress/approval state、remote/generic task lists 和 runtime mirror edits。
 9. `skills/spec-compound-refresh/SKILL.md`：把入口明确为现有 `docs/solutions/` learning/pattern docs 的 stale/drift/overlap/inaccuracy refresh；排除 new learning capture、active debugging、general refactor/migration/code-review、非 `docs/solutions/` doc sweep、transcript archive、mandatory completion gate 和 runtime mirror edits。
 
-对应新增或调整 focused contract tests，锁住上述 frontmatter trigger contract，避免后续退回宽泛摘要式 description。`docs/catalog/runtime-capabilities.md` 已通过 `npm run docs:runtime-catalog` 从 source 重新生成，保持 `/spec:write-tasks` catalog 描述一致。
+对应新增或调整 focused contract tests，锁住上述 frontmatter trigger contract，避免后续退回宽泛摘要式 description。`docs/catalog/runtime-capabilities.md` 已通过 `npm run docs:runtime-catalog` 从 source 重新生成，保持 `spec-write-tasks` catalog 描述一致。
 
 ## 非 Findings：当前流程做得好的地方
 
@@ -259,7 +259,7 @@ skill-audit 确定性报告显示核心链路 skill 的 eval readiness 均为 re
 
 ## 建议落地顺序
 
-1. **P1 已按 owner 决策修复 source surface：** `spec-write-tasks` 入口已收敛为 `/spec:write-tasks` / `$spec-write-tasks` public workflow；后续需要用非 dry-run `spec-first init` 刷新 generated runtime mirrors。
+1. **P1 已按 owner 决策修复 source surface：** `spec-write-tasks` 入口已收敛为 `spec-write-tasks` / `spec-write-tasks` public workflow；后续需要用非 dry-run `spec-first init` 刷新 generated runtime mirrors。
 2. **全景文档已修复：** canonical 7 节点主链路、Context 横切层、Knowledge capture/refresh/recall 和 Review fallback 表达已对齐。
 3. **保持 runtime catalog 与 tests 锁步：** 让 `runtime-capability-catalog`、`workflow-skill-agent-map`、`spec-work`、`using-spec-first` 对同一 public surface 有一致断言。
 4. **trigger polish 已 source-fixed：** 5 个核心 skill 的 frontmatter description 已补近邻负向边界，并以 focused contract tests 锁定。
@@ -336,4 +336,4 @@ Review challenges code/docs
 Knowledge captures and refreshes verified learnings
 ```
 
-原始审查需要优先修的是 public surface、导航文档和 discovery 触发边界，而不是重写这些核心 skill。Remediation 后，当前 source surface 已按 owner 决策收敛到 `/spec:write-tasks` / `$spec-write-tasks` public workflow，F2-F4 的全景文档 polish 已完成，F5 的 trigger discovery polish 也已覆盖核心链路 9 个 skill。剩余风险主要是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新，以及 fresh-source eval 未执行。
+原始审查需要优先修的是 public surface、导航文档和 discovery 触发边界，而不是重写这些核心 skill。Remediation 后，当前 source surface 已按 owner 决策收敛到 `spec-write-tasks` / `spec-write-tasks` public workflow，F2-F4 的全景文档 polish 已完成，F5 的 trigger discovery polish 也已覆盖核心链路 9 个 skill。剩余风险主要是 generated runtime mirrors 尚未执行非 dry-run `spec-first init` 刷新，以及 fresh-source eval 未执行。

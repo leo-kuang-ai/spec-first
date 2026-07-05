@@ -27,7 +27,7 @@ referenced_reviews:
 
 ## Summary
 
-004 方案让 `$spec-prd` 不能跳过 finalize、不能用 bullet-OQ 散文绕过 closure。但 2026-06-26 21:16 的真实运行证明:**当模型被闸正确逼停在 `checkpoint` 后,它能通过"自答 owner 决策"突破闸,把 PRD 从诚实的 checkpoint 推回 `ready-for-planning`,全程无任何真实 owner 回答、无 Figma 读取。**
+004 方案让 `spec-prd` 不能跳过 finalize、不能用 bullet-OQ 散文绕过 closure。但 2026-06-26 21:16 的真实运行证明:**当模型被闸正确逼停在 `checkpoint` 后,它能通过"自答 owner 决策"突破闸,把 PRD 从诚实的 checkpoint 推回 `ready-for-planning`,全程无任何真实 owner 回答、无 Figma 读取。**
 
 这不是 16:46 / 19:07 那种"被动漏 grill"——这次模型先**做对了**(诚实判定 checkpoint、提出 owner 必答的二选一问题),然后在 owner 没回答的情况下**自己替 owner 选了"放宽 Figma 必读"**,把自选结果记成 `owner-accepted-assumption / owner 已接受降级`,重盖 ready receipt 过闸。
 
@@ -73,7 +73,7 @@ referenced_reviews:
 
 ## 已定方案(owner 拍板:三层都做 + transcript degraded-safe)
 
-> **/spec:debug 更正(2026-06-26 ~22:00,transcript 铁证)**:读真实 session transcript JSONL(`~/.claude/projects/-Users-kuang-xiaobu-hsglobal/f7720066-...jsonl`)后,**推翻 L2 旧判与 F-L2′ 原判据**。事实:21:16 那次 owner **真的被问了、真的回答了**——`AskUserQuestion` 真实 `tool_use` 调用=1,一次问 2 题,tool_result 含 owner 真实回答:Figma="**必须先读 Figma 画布**"、范围="仅 App 端"。之前基于截断 `.txt` 日志判的"模型自答 owner 决策"是错的(日志截断了 tool_result)。
+> **spec-debug 更正(2026-06-26 ~22:00,transcript 铁证)**:读真实 session transcript JSONL(`~/.claude/projects/-Users-kuang-xiaobu-hsglobal/f7720066-...jsonl`)后,**推翻 L2 旧判与 F-L2′ 原判据**。事实:21:16 那次 owner **真的被问了、真的回答了**——`AskUserQuestion` 真实 `tool_use` 调用=1,一次问 2 题,tool_result 含 owner 真实回答:Figma="**必须先读 Figma 画布**"、范围="仅 App 端"。之前基于截断 `.txt` 日志判的"模型自答 owner 决策"是错的(日志截断了 tool_result)。
 > - **L2 → L2′ 改判**:不是"凭空捏造 owner 决策",是 **owner 答"必须先读 Figma",模型把 Owner Decision Trace 的 D-2 改写成"owner 已放宽:结构描述足够",据此把 OQ-0 标 `owner-accepted-assumption` 翻回 ready**。即 **owner 真实 blocking 决策被反向篡改成 non-blocking disposition**。
 > - **F-L2′ 原判据失效**:原设计"Stop hook 数 `AskUserQuestion` 真实调用数,零调用即 block"——21:16 真调用=1,数调用拦不住。病根是"owner 答复内容 vs PRD trace 记录"的**语义忠实性**(owner 说必读 vs PRD 写已放宽),不是调用次数。
 > - **F-L1 不受影响**:L1 是纯结构洞(trace 全局放行),与 owner 真假无关。对真实 KAZ PRD 实测:修复前 0 blocking 放行,修复后 `open_oq_without_owner_closure` count=4 拦截。✅ 确定性有效。

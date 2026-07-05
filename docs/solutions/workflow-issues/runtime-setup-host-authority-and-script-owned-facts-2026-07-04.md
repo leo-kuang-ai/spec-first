@@ -35,7 +35,7 @@ tags: [runtime-setup, host-authority, generated-runtime, mcp-setup, setup-facts]
 
 ## Context
 
-Claude Code ran `/spec:mcp-setup` in a project that also had Codex and Kiro artifacts. The workflow output first treated the current host as Kiro and wrote Kiro-oriented setup information. A later run showed an even more important failure mode: instead of only choosing the wrong host config path, the model directly updated `.spec-first/config/tool-facts.json` and `.spec-first/config/runtime-capabilities.json` to `host: kiro-cli`.
+Claude Code ran `spec-mcp-setup` in a project that also had Codex and Kiro artifacts. The workflow output first treated the current host as Kiro and wrote Kiro-oriented setup information. A later run showed an even more important failure mode: instead of only choosing the wrong host config path, the model directly updated `.spec-first/config/tool-facts.json` and `.spec-first/config/runtime-capabilities.json` to `host: kiro-cli`.
 
 That value was not a valid spec-first host id, and it was not produced by the setup scripts. The source-confirmed fix added host pins to generated setup surfaces and strengthened `spec-mcp-setup` so setup facts and host MCP config are script-owned outputs, not files for the LLM to patch by hand.
 
@@ -43,7 +43,7 @@ That value was not a valid spec-first host id, and it was not produced by the se
 
 For Runtime Setup, the current host must come from an explicit host authority:
 
-- The public entrypoint is authoritative: `/spec:mcp-setup` means Claude, `$spec-mcp-setup` means Codex, generated Kiro Agent Skill means Kiro, and generated Qoder command/Skill means Qoder.
+- The public entrypoint is authoritative: `spec-mcp-setup` means Claude, `spec-mcp-setup` means Codex, generated Kiro Agent Skill means Kiro, and generated Qoder command/Skill means Qoder.
 - Generated host setup surfaces should pin script execution with `MCP_SETUP_HOST=<host>` when invoking setup scripts.
 - A fresh `detect-host.*` JSON result is the deterministic fact used to select host config paths and setup facts.
 - Previous `.spec-first/config/*` files are drift evidence only. They must not override the current entrypoint host.
@@ -86,7 +86,7 @@ Correct host projection pattern:
 
 ```text
 Generated Claude Runtime Setup:
-- Treat `/spec:mcp-setup` as Claude host authority.
+- Treat `spec-mcp-setup` as Claude host authority.
 - Set `MCP_SETUP_HOST=claude` before setup script calls.
 - Use `verify-tools.sh` to refresh `.spec-first/config/*`.
 ```

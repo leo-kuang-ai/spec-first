@@ -61,7 +61,7 @@ origin 文档已经裁决：`spec-brainstorm` 继续负责 0-1 WHAT shaping，`s
 ## Scope Boundaries
 
 - 不把 `spec-prd` 做成 `spec-brainstorm` 的换名版，也不把 0-1 产品探索拉进 PRD 模板生成。
-- 不新增多个公开 PRD workflow，不公开 readiness reviewer，不把 internal helper 写成 `$spec-*` 或 `/spec:*` 入口。
+- 不新增多个公开 PRD workflow，不公开 readiness reviewer，不把 internal helper 写成 `spec-*` 或 `spec-*` 入口。
 - 不新增 `docs/prds/`，不改变 `docs/brainstorms/*-requirements.md` 作为需求 artifact 的现有链路。
 - 不抽取 shared readiness gate 到 `docs/contracts/workflows/requirements-readiness-gate.md`；这是 v2 重构项。
 - 不把证券行业常识写成合规事实，不替代法务/合规/牌照主体确认。
@@ -423,7 +423,7 @@ flowchart TD
 
 ### U5. 注册 public workflow command 与 dual-host delivery
 
-**Goal:** 让 Claude 通过 `/spec:prd`、Codex 通过 `$spec-prd` 暴露同一个 source workflow，同时保持 command manifest、governance 和 runtime adapter 边界一致。
+**Goal:** 让 Claude 通过 `spec-prd`、Codex 通过 `spec-prd` 暴露同一个 source workflow，同时保持 command manifest、governance 和 runtime adapter 边界一致。
 
 **Requirements:** R1, R8, R9; Covers AE8
 
@@ -481,7 +481,7 @@ flowchart TD
 - `spec-plan` intake 增加 `artifact_kind: prd-requirements`，并说明它等价于 requirements origin，继承 `spec_id`、R/F/AE、Scope Boundaries 与 Evidence And Assumptions。
 - `spec-plan` intake 应继承 PRD trace 自检摘要和稳定 ID（包括 project-local `US-*` / `FEAT-*` / `NFR-*` 辅助 trace 时的映射），并在 plan Context / Sources 中保留 trace 缺口，不让 planner 重建或忽略。
 - 对 split summary，`spec-plan` 应把它当导航/边界 artifact，不默认直接规划；实施计划默认从具体 child PRD 进入，并保留 parent/source/summary trace。
-- 普通 prose 使用 current-host wording；具体 `/spec:prd` / `$spec-prd` 映射只在 routing table 或 README 集中表中出现。
+- 普通 prose 使用 current-host wording；具体 `spec-prd` / `spec-prd` 映射只在 routing table 或 README 集中表中出现。
 
 **Patterns to follow:**
 - `skills/using-spec-first/SKILL.md` Route Map 和 explicit route normalization 风格。
@@ -558,7 +558,7 @@ flowchart TD
 - Test: `tests/unit/workflow-artifact-paths.test.js` if artifact path contract is updated
 
 **Approach:**
-- README 集中 workflow entry table 可列 `/spec:prd` / `$spec-prd`，普通 workflow prose 继续用 current-host wording。
+- README 集中 workflow entry table 可列 `spec-prd` / `spec-prd`，普通 workflow prose 继续用 current-host wording。
 - **更新 README.md 与 README.zh-CN.md 中内嵌的 bundled-asset 计数**：`tests/unit/dual-host-governance-contracts.test.js`（约 L370「README runtime counts stay aligned」）按 `listBundledSkills().length`、`claudeAssets.commands.length`、`codexAssets.workflowSkills.length` 等动态值断言 README 字面数字。新增 `spec-prd` 会令 bundled skill 数、Claude command 数（含「Generated N command file(s)」行）、Codex workflow skill 数各 +1（若 U7 实体化 reviewer agent 则 agent 数另 +1）。两个 README 的对应数字必须同步更新，否则该测试失败。
 - 用户文档说明 `spec-prd` 输出仍在 `docs/brainstorms/*-requirements.md`，不是 `docs/prds/`。
 - Artifact map 标明 `artifact_kind: prd-requirements` 是 PRD-grade requirements，可进入 `spec-plan`，也可先走 `spec-doc-review`。
@@ -597,7 +597,7 @@ flowchart TD
 - **Interaction graph:** 新增 public workflow entrypoint；`using-spec-first` routing、README entry table、dual-host governance、plugin manifest generation、Codex/Claude runtime sync 都会感知该 workflow。
 - **Error propagation:** PRD readiness fail 应回到最小补齐问题或 doc-review/plan handoff，不直接进入 implementation。
 - **State lifecycle risks:** 不写 runtime mirrors；若 `spec-first init` 后 runtime 未刷新，属于 generated asset drift，不是 source 修复点。
-- **API surface parity:** Claude `/spec:prd` 与 Codex `$spec-prd` 必须由同一 `skills/spec-prd/SKILL.md` source 生成，不能形成宿主分叉。
+- **API surface parity:** Claude `spec-prd` 与 Codex `spec-prd` 必须由同一 `skills/spec-prd/SKILL.md` source 生成，不能形成宿主分叉。
 - **Integration coverage:** Unit tests 需覆盖 workflow registration、routing tie-break、spec-plan intake、template drift、readiness gate drift；fresh-source eval 补语义置信。
 - **Unchanged invariants:** `spec-brainstorm` 仍是 0-1 WHAT shaping；`spec-plan` 仍是 HOW owner；`spec-app-consistency-audit` 仍是 App PRD/Figma/source 一致性审计 owner；`docs/brainstorms/*-requirements.md` 仍是 requirements artifact 路径。
 
@@ -634,7 +634,7 @@ flowchart TD
 
 - 实施完成后如果需要刷新本机宿主 runtime，使用 `spec-first init`；这不是 source validation proof，也不应替代 tests/fresh-source eval。
 - PRD 模板中出现证券市场、交易时段、交收周期、客户分类等示例时，必须标为示例或待确认，不写成通用事实。
-- 新增 `spec-prd` 后，后续 `$spec-plan` 可直接消费 `artifact_kind: prd-requirements` 的 origin 文档，不需要新目录或新 artifact kind pipeline。
+- 新增 `spec-prd` 后，后续 `spec-plan` 可直接消费 `artifact_kind: prd-requirements` 的 origin 文档，不需要新目录或新 artifact kind pipeline。
 
 ---
 

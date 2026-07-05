@@ -66,14 +66,14 @@ README 是开源项目最高频的首访入口,直接决定"用户是否在几�
 
 **接入路径(更快跑通)**
 
-- R4. Quickstart 必须保持在主体前半段,并保留最短可验证闭环:terminal 安装 CLI → `doctor` → 按当前宿主 `init` → 重启宿主 → 宿主会话运行第一个 workflow;必须明确区分 terminal 命令块与 host-session 入口(`/spec:*` 标注为 Claude Code 会话内、`$spec-*` 标注为 Codex 会话内),不得混入同一未标注 `bash` 块。
+- R4. Quickstart 必须保持在主体前半段,并保留最短可验证闭环:terminal 安装 CLI → `doctor` → 按当前宿主 `init` → 重启宿主 → 宿主会话运行第一个 workflow;必须明确区分 terminal 命令块与 host-session 入口(`spec-*` 标注为 Claude Code 会话内、`spec-*` 标注为 Codex 会话内),不得混入同一未标注 `bash` 块。
 - R5. Quickstart 必须保留"按实际宿主选择 `--claude` 或 `--codex`",不得暗示所有用户必须同时初始化双宿主;必须保留最小 prerequisites(Node `>=20` + npm、Git on PATH、已选择并安装 Claude Code 或 Codex、shell 位于目标仓库根目录、首次可用 throwaway repo)。
 - R6. README 必须保留"第一个 workflow 怎么选"的指引,把常见起点映射到公开入口,并以 brainstorm 作为默认 first-run 示例,说明其产出 `docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md` 并可继续进入 plan。
 
 **冗余收敛(提升信息密度)**
 
 - R7. 重复的 workflow 链路表达必须收敛:全文保留**一处**规范的端到端 workflow 可视化作为权威呈现,外加**最多一个**极简示例;其余位置如需提及链路,只能引用该权威呈现或仅列出与当前语境相关的子集,不得再次重复完整链路。
-- R8. 重复的 workflow 入口表必须收敛为**一张**规范入口表(覆盖 intent → Claude Code `/spec:*` → Codex `$spec-*` → 预期产物);`Choose Your Path`、`Core Workflows`、`Full Workflow Reference`、`Main flows` 等并存的入口映射必须合并去重,保留的入口信息总量不少于现状(不得丢失任何公开 workflow 入口)。
+- R8. 重复的 workflow 入口表必须收敛为**一张**规范入口表(覆盖 intent → Claude Code `spec-*` → Codex `spec-*` → 预期产物);`Choose Your Path`、`Core Workflows`、`Full Workflow Reference`、`Main flows` 等并存的入口映射必须合并去重,保留的入口信息总量不少于现状(不得丢失任何公开 workflow 入口)。
 - R9. `What You Get` 与 `How It Works` 中对 durable entities、artifact roots、runtime shape 的重叠描述必须合并为单一表达,去除重复说明同一组产物目录的段落。
 
 **内部细节下沉(降低接入阅读负担)**
@@ -99,7 +99,7 @@ README 是开源项目最高频的首访入口,直接决定"用户是否在几�
 ## Acceptance Examples
 
 - AE1. **Covers R1, R2, R3.** Given 一名首次用户打开 README 首屏,when 他阅读定位句、差异化对照与适用性判断,then 他能用一句话向同事转述 spec-first 是什么、和 agent 编排工具有何不同,并据此判断是否值得接入,且首屏未被内部 capability 计数或 runtime mirror 术语干扰。
-- AE2. **Covers R4, R5, R6.** Given 一名只使用 Codex 的用户,when 他在目标仓库根目录阅读 Quickstart,then 他在 terminal 运行 `spec-first init --codex`、重启后在 Codex 会话尝试 `$spec-brainstorm`,而不会误以为必须同时 init Claude,也不会把 `$spec-*` 当作 shell 命令;随后他知道首个 brainstorm 产出 `docs/brainstorms/...-requirements.md` 并可进入 plan。
+- AE2. **Covers R4, R5, R6.** Given 一名只使用 Codex 的用户,when 他在目标仓库根目录阅读 Quickstart,then 他在 terminal 运行 `spec-first init --codex`、重启后在 Codex 会话尝试 `spec-brainstorm`,而不会误以为必须同时 init Claude,也不会把 `spec-*` 当作 shell 命令;随后他知道首个 brainstorm 产出 `docs/brainstorms/...-requirements.md` 并可进入 plan。
 - AE3. **Covers R7, R8, R9.** Given 一名读者从头读到尾,when 他经过 README 主体,then 他只看到**一处**权威 workflow 链路可视化与**一张**规范入口表,不再遇到四次重复链路或多张重复入口表,且所有公开 workflow 入口仍可在那张表中找到。
 - AE4. **Covers R10, R11, R12, R13.** Given 一名首次接入用户,when 他阅读 README 主体前半段,then 他不会被仓库拓扑全集、scenario fingerprint、workspace 子仓、provider readiness、init 完整输出或内部计数打断;当他确实需要这些细节时,能通过 README 后半段的压缩摘要或 docs 链接到达,且没有必要参考被无承载地删除。
 - AE5. **Covers R14, R15.** Given 维护者收敛英文 README 结构,when 同步中文 README,then 两份文档的 H2 节顺序、数量与关键约束保持一致,仅存在语言本地化差异,不出现一方仍冗余、另一方已收敛的结构漂移。
@@ -110,7 +110,7 @@ README 是开源项目最高频的首访入口,直接决定"用户是否在几�
 
 - 本次优先服务"首次接入的开源用户"与"项目推广";已安装用户与贡献者仍被支持,但不是首屏与前半段的主导读者。
 - **仅内容层重构**(owner-confirmed):本次不录制 GIF/asciinema、不新增截图或营销素材;复用现有徽章与唯一 SVG。收敛后按 R17 预留首屏素材位,但只预留接口、不生产素材。
-- **推广素材作为独立 follow-up**(owner-confirmed):终端演示素材分两类,均不在本 PRD 交付——(1) **CLI setup 动画**:`npm i -g spec-first` → `doctor` → `init` 的确定性段,适合用工具链中已具备的 `vhs`(checked-in `.tape` → 生成 GIF)可重生成,符合 source/runtime 边界,建议作为首个 polish follow-up;(2) **workflow 实跑录制**:`/spec:brainstorm` 等会话产出非确定性,只能录真实会话(asciinema/录屏),维护成本更高、易随版本过期,作为第二阶段可选项。两者都不得用 VHS 伪造 workflow 输出。
+- **推广素材作为独立 follow-up**(owner-confirmed):终端演示素材分两类,均不在本 PRD 交付——(1) **CLI setup 动画**:`npm i -g spec-first` → `doctor` → `init` 的确定性段,适合用工具链中已具备的 `vhs`(checked-in `.tape` → 生成 GIF)可重生成,符合 source/runtime 边界,建议作为首个 polish follow-up;(2) **workflow 实跑录制**:`spec-brainstorm` 等会话产出非确定性,只能录真实会话(asciinema/录屏),维护成本更高、易随版本过期,作为第二阶段可选项。两者都不得用 VHS 伪造 workflow 输出。
 - 不删除任何公开 workflow 入口;只收敛展示方式并下沉深层参考。
 - 不改变 CLI 行为、workflow 行为、runtime 生成契约、graph readiness 机制或测试运行契约(除按需更新 README 回归测试断言)。
 - 不修改 `CLAUDE.md`、`AGENTS.md` 或其他治理文件;不手改 `.claude/`、`.codex/`、`.agents/skills/` 下的 generated runtime assets。
@@ -140,9 +140,9 @@ README 是开源项目最高频的首访入口,直接决定"用户是否在几�
 ## Implementation Verification
 
 - 收敛度量: 以 `git show HEAD:README*` 作为实施前基线测量,`README.md` 从 663 行 / 17 个 H2 收敛到 319 行 / 11 个 H2;`README.zh-CN.md` 从 664 行 / 17 个 H2 收敛到 319 行 / 11 个 H2。
-- 公开入口完整性: `tests/unit/readme-open-source-entry.test.js` 的 `PUBLIC_WORKFLOW_ENTRIES` 覆盖 21 个公开入口,并断言英文与中文 README 均保留 Claude Code `/spec:*`、Codex `$spec-*` 或 standalone `write-tasks` 映射;验证通过,无公开 workflow 入口丢失。
+- 公开入口完整性: `tests/unit/readme-open-source-entry.test.js` 的 `PUBLIC_WORKFLOW_ENTRIES` 覆盖 21 个公开入口,并断言英文与中文 README 均保留 Claude Code `spec-*`、Codex `spec-*` 或 standalone `write-tasks` 映射;验证通过,无公开 workflow 入口丢失。
 - 30 秒首访阅读检查: 首屏定位句回答"这是面向 Claude Code 与 Codex 的 spec-driven AI engineering workflow";`Why spec-first?` 回答"为什么不同于 prompt snippet / agent team";`Quickstart` 在前半段给出 terminal 安装、`doctor`、按当前宿主 `init`、重启宿主和首个 workflow 入口。
-- 单宿主 Quickstart trace: Codex-only 读者可在 terminal 执行 `npm install -g spec-first` -> `spec-first doctor` -> `spec-first init --codex`,重启 Codex 后在 Codex 会话运行 `$spec-brainstorm "Improve onboarding"`,并预期得到 `docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md`;README 明确 host-session workflow entries 不是 shell commands,且不要求同时初始化 Claude Code。
+- 单宿主 Quickstart trace: Codex-only 读者可在 terminal 执行 `npm install -g spec-first` -> `spec-first doctor` -> `spec-first init --codex`,重启 Codex 后在 Codex 会话运行 `spec-brainstorm "Improve onboarding"`,并预期得到 `docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md`;README 明确 host-session workflow entries 不是 shell commands,且不要求同时初始化 Claude Code。
 - 验证命令: `npx jest tests/unit/readme-open-source-entry.test.js tests/unit/readme-language-split.test.js tests/unit/runtime-contract-boundary.test.js tests/unit/gitnexus-capability-catalog-contracts.test.js tests/unit/package-install-contracts.test.js --runInBand` -> 5 suites passed,38 tests passed。
 - 边界确认: 本次未新增 GIF/截图/录屏,继续复用 `docs/assets/readme/spec-first-flow.svg`;未修改 CLI 行为、workflow 行为、runtime generation、graph readiness 机制或 generated runtime mirrors。
 

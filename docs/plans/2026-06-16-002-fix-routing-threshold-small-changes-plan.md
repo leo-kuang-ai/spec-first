@@ -12,7 +12,7 @@ target_repo: spec-first (current repo)
 
 ## Summary
 
-用户反馈两点：(1) 一个"加两行代码"的明确小改动会被路由进 `/spec:work`，跑一大堆东西；(2) 整体侵入性比以前高，简单修改也烧大量 token，1M 上下文很快被压缩。
+用户反馈两点：(1) 一个"加两行代码"的明确小改动会被路由进 `spec-work`，跑一大堆东西；(2) 整体侵入性比以前高，简单修改也烧大量 token，1M 上下文很快被压缩。
 
 经源码核对，真因是**入口治理的 substantial 阈值无规模下限**：多处治理措辞把"modifying code, docs, config"无条件列为 substantial，而对应的"非 substantial"清单全是"回答/解释/查询"类——**"明确的、低风险的小代码改动"在分类里无家可归，只能被归入 substantial → 触发公开 workflow（`/work` 等）→ token 暴涨**。
 
@@ -188,7 +188,7 @@ These are not substantial work:
 - 修改 §60 substantial 清单：把"modifying code, docs, config"限定为"需要工程闭环的改动（多文件/架构/契约/治理/状态变更/根因不明/敏感面）"，而非任何文件改动。
 - 在 §68 "These are not substantial work" 或新增小节加入一类：**明确的、单点的、低风险的小代码/文案改动**（如加两行、改常量、修 typo、单文件局部修复），默认直接执行，保留 CHANGELOG/最窄验证/source-runtime 边界纪律。
 - 明确引用既有 §81 reclassify 安全阀（小改动中途升级则重新路由），作为放松的对冲。
-- **（②修正）同步改 §320 Routing Red Flags 表 §324 行**：`"I'll just edit the file first."` 不能再无差别归为红旗——否则 full skill 与上面放宽的判据自相矛盾，仍把模型推回 `$spec-work`。改为承认"明确小改动直接编辑是对的；要警惕的是规模/风险不明、跨架构/契约/多文件、或根因未定的编辑"。其余红旗行（quick architecture change、inspect a bunch of files、review informally 等）保留。
+- **（②修正）同步改 §320 Routing Red Flags 表 §324 行**：`"I'll just edit the file first."` 不能再无差别归为红旗——否则 full skill 与上面放宽的判据自相矛盾，仍把模型推回 `spec-work`。改为承认"明确小改动直接编辑是对的；要警惕的是规模/风险不明、跨架构/契约/多文件、或根因未定的编辑"。其余红旗行（quick architecture change、inspect a bunch of files、review informally 等）保留。
 - **（④修正）同步改 §83-96 Self-Work**：现 §89 把 spec-first 自身"concrete implementation or prose changes"一律路由到 work，会把本仓一个 2 行 `src/cli` 局部修复也升级。改为分层：**prompt/workflow/contract/governance/runtime delivery/skill/agent prose 变更仍 substantial**（这是 spec-first 的高风险面，不放宽）；**明确单点低风险的普通代码/文案修正（如 src/cli 局部 bug 修、注释、typo）可直接执行**，保留 CHANGELOG/最窄验证纪律。这正面回应"本仓小改动也被过度路由"——因为用户反馈很可能就发生在本仓。
 
 **Patterns to follow**：镜像现有 §75 "Lightweight Direct Outcomes" 的写法（已有"valid non-workflow outcomes"框架），把"涉及小编辑"纳入该框架的自然延伸。
@@ -229,7 +229,7 @@ These are not substantial work:
 - **（①修正，关键）改「何时进入 workflow / When to enter a workflow」触发句本身**（`:159` zh / `:193` en）：现写"改 code/docs/config/runtime asset … 前判断进入 workflow"，这是把"编辑文件"无差别等同 substantial 的源头。改为"**需要工程闭环的编辑、或非平凡/有风险的改动**（多文件/架构/contract/治理/状态变更/根因不明/敏感面）前判断进入 workflow"。**只在"何时直接做"补一句而不改这句，会造成同一 bootstrap block 内部自相矛盾**——这是 doc-review 漏掉、外部审查抓出的 P1。
 - 配套在「何时直接做 / When to just answer」锚点行补一句：明确的、单点的、低风险小改动可直接执行（保留 CHANGELOG/最窄验证纪律），不必开公开 workflow；放大/不确定时再路由。
 - 软化「反合理化红旗 / Anti-rationalization red flags」首条：`「先改个文件就好」`→ 改为"明确小改动直接做是对的；要停下的是规模/风险不明或跨架构/契约/多文件时"。保留其余红旗。
-- 保持四 body 措辞对称（claude 用 `/spec:`、codex 用 `$spec-`；zh/en 语义一致）。
+- 保持四 body 措辞对称（claude 用 `spec-*`、codex 用 `spec-*`；zh/en 语义一致）。
 - 严守 bootstrap 忠实子集约束：只改/加锚点行，不展开成完整判据表。
 
 **Patterns to follow**：现有四 body 的对称结构与 `entry()`/`hostLine`/`surfaceLine` 模板拼接方式。
@@ -396,7 +396,7 @@ U1 先定措辞基线，U2/U5/U6 各取与之一致的措辞落到不同注入�
 
 ## Out of Scope（独立计划）
 
-- command 渲染策略改造：让 `/spec:*` 只内联"路由 + 默认路径"，低频分支（headless/autofix、parallel dispatch、worktree）外置 references，实现真正的渐进披露。这是影响 18 个 workflow 的结构性改动，应单独 `/spec:plan`。
+- command 渲染策略改造：让 `spec-*` 只内联"路由 + 默认路径"，低频分支（headless/autofix、parallel dispatch、worktree）外置 references，实现真正的渐进披露。这是影响 18 个 workflow 的结构性改动，应单独 `spec-plan`。
 
 ## Completion Evidence
 

@@ -47,8 +47,8 @@ origin: docs/01-需求分析/spec-graph-bootstrap需求/阶段1-skill安装集�
 
 - 不包含 `skills/spec-graph-bootstrap/` 的事实抽取、路由生成、refresh 或消费逻辑
 - 不包含阶段 2、3、4 的任何产物 contract 落地
-- 不包含入口切换，不会让 `/spec:graph-bootstrap` 覆盖 `/spec:graph-bootstrap`
-- 不包含把 Codex 正式入口从 `$spec-*`/skill discovery 改造为原生命令模型
+- 不包含入口切换，不会让 `spec-graph-bootstrap` 覆盖 `spec-graph-bootstrap`
+- 不包含把 Codex 正式入口从 `spec-*`/skill discovery 改造为原生命令模型
 - 允许在 `spec-graph-bootstrap` 的初版 `SKILL.md` 中使用明确的阶段 1 stub 行为，只要不伪装成已完成的 Stage-0 实现
 
 ## Context & Research
@@ -262,8 +262,8 @@ flowchart LR
   - Unit 3 负责 README、用户手册、版本更新文档中的双入口并行期对外叙述收口
   - `CHANGELOG.md` 的最终文案收口以 Unit 3 为准；Unit 2 若产生中间实现记录，应在提交前合并去重
 - 在 README 的 Stage-0 入口说明中加入双入口并行期说明：
-  - `/spec:graph-bootstrap` 仍是默认稳定入口
-  - `/spec:graph-bootstrap` 是并行验证入口
+  - `spec-graph-bootstrap` 仍是默认稳定入口
+  - `spec-graph-bootstrap` 是并行验证入口
   - Codex 正式能力仍以 skill discovery 为准，`.codex/commands/spec/graph-bootstrap.md` 是兼容层
 - 在用户手册范围内同步最小文案 contract，至少覆盖：
   - `docs/05-用户手册/README.md`
@@ -285,7 +285,7 @@ flowchart LR
 **Test scenarios:**
 - Happy path: README 明确写出旧入口稳定、新入口验证的双入口并行语义
 - Happy path: 用户手册关键入口页同步写出旧入口稳定、新入口验证的双入口并行语义
-- Edge case: 不再出现“已迁移到 `/spec:graph-bootstrap`”或“新入口已成默认入口”的表述
+- Edge case: 不再出现“已迁移到 `spec-graph-bootstrap`”或“新入口已成默认入口”的表述
 - Integration: README、用户手册与版本更新文档对 Codex 的表述不与阶段 1 需求文档冲突
 
 **Verification:**

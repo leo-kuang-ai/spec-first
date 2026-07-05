@@ -8,7 +8,7 @@ problem_type: architecture_pattern
 component: tooling
 severity: medium
 applies_when:
-  - 新增 `/spec:xxx` 和 `$spec-xxx` 这种 workflow 入口
+  - 新增 `spec-xxx` 和 `spec-xxx` 这种 workflow 入口
   - 判断一个 skill 应该作为 workflow command 还是 standalone skill 暴露
   - 修改 `spec-first init --claude` 或 `spec-first init --codex` 的运行时资产同步行为
 tags: [workflow-entrypoint, dual-host-governance, init-runtime, skill-command, claude-codex]
@@ -20,15 +20,15 @@ tags: [workflow-entrypoint, dual-host-governance, init-runtime, skill-command, c
 
 `spec-first init` 同时服务 Claude 和 Codex，但两边的用户入口不是同一种运行时资产：
 
-- Claude workflow 入口是 `/spec:xxx`，由 `.claude/commands/spec/*.md` 暴露。
-- Codex workflow 入口是 `$spec-xxx`，由 `.agents/skills/spec-xxx/SKILL.md` 暴露。
+- Claude workflow 入口是 `spec-xxx`，由 `.claude/commands/spec/*.md` 暴露。
+- Codex workflow 入口是 `spec-xxx`，由 `.agents/skills/spec-xxx/SKILL.md` 暴露。
 - 同一份 source skill 仍放在 `skills/spec-xxx/SKILL.md`。
 
 因此，“新增一个 workflow 入口”不是只新增一个 `SKILL.md`，也不是只改 Claude command template。它需要同时维护三层事实：动态 command manifest 投影、dual-host governance、host adapter 同步边界。
 
 ## Guidance
 
-新增 `/spec:xxx` / `$spec-xxx` workflow 入口时，按这四步做：
+新增 `spec-xxx` / `spec-xxx` workflow 入口时，按这四步做：
 
 1. 新增 source skill：
 
@@ -69,7 +69,7 @@ tags: [workflow-entrypoint, dual-host-governance, init-runtime, skill-command, c
 
 普通 standalone skill 不走这条路径。它只需要 `skills/<name>/SKILL.md` 和 governance 中的 `entry_surface: "standalone_skill"`，不应出现在 workflow command governance 或 Claude command templates 中。
 
-当前治理下，standalone skill 也不应被写成 `/spec:*` 或 `$spec-*` 这种 public workflow command。`entry_surface: "standalone_skill"` 表示它按宿主 skill 发现机制交付；source `name:` 应保持 skill identity，运行时命名细节由 host adapter 处理。例如 Codex adapter 会把 runtime skill `name:` 改写为目录名，Claude adapter 会把部分 `spec-*` standalone skill 的 runtime name 去掉 `spec-` 前缀；这些 adapter 转换不是 source frontmatter 规范，也不应回写成新的 `/spec:*` 入口规则。
+当前治理下，standalone skill 也不应被写成 `spec-*` 或 `spec-*` 这种 public workflow command。`entry_surface: "standalone_skill"` 表示它按宿主 skill 发现机制交付；source `name:` 应保持 skill identity，运行时命名细节由 host adapter 处理。例如 Codex adapter 会把 runtime skill `name:` 改写为目录名，Claude adapter 会把部分 `spec-*` standalone skill 的 runtime name 去掉 `spec-` 前缀；这些 adapter 转换不是 source frontmatter 规范，也不应回写成新的 `spec-*` 入口规则。
 
 ## Why This Matters
 
@@ -88,10 +88,10 @@ tags: [workflow-entrypoint, dual-host-governance, init-runtime, skill-command, c
 
 ## When to Apply
 
-- 新增正式 workflow，例如规划、执行、审查、调试、知识沉淀等 `/spec:*` 入口。
+- 新增正式 workflow，例如规划、执行、审查、调试、知识沉淀等 `spec-*` 入口。
 - 把已有 standalone skill 提升为 workflow command。
 - 调整某个 skill 是否在 Claude 或 Codex 中对用户可见。
-- 排查 `init --claude` 后有 `/spec:xxx`，但 `init --codex` 后没有 `$spec-xxx`，或反过来的暴露不一致。
+- 排查 `init --claude` 后有 `spec-xxx`，但 `init --codex` 后没有 `spec-xxx`，或反过来的暴露不一致。
 
 ## Examples
 
@@ -99,9 +99,9 @@ tags: [workflow-entrypoint, dual-host-governance, init-runtime, skill-command, c
 
 | Host | 用户入口 | 运行时资产 |
 |------|----------|------------|
-| Claude | `/spec:xxx` | `.claude/commands/spec/xxx.md` |
+| Claude | `spec-xxx` | `.claude/commands/spec/xxx.md` |
 | Claude | command backing skill | `.claude/spec-first/workflows/spec-xxx/SKILL.md` |
-| Codex | `$spec-xxx` | `.agents/skills/spec-xxx/SKILL.md` |
+| Codex | `spec-xxx` | `.agents/skills/spec-xxx/SKILL.md` |
 
 **standalone skill 的目标形态**：
 
@@ -135,7 +135,7 @@ tags: [workflow-entrypoint, dual-host-governance, init-runtime, skill-command, c
 }
 ```
 
-表示普通 skill，不生成 `/spec:*` command。
+表示普通 skill，不生成 `spec-*` command。
 
 ## Related
 

@@ -18,7 +18,7 @@ origin: "微信文章：Code Review Graph 完整安装与最佳实践指南；�
 
 当前项目已经把 `code-review-graph` 建模为 `impact_context` provider，默认通过 `spec-graph-bootstrap` 编译 `.spec-first/graph/*` 与 `.spec-first/impact/*` readiness artifacts。缺口在于 `spec-code-review` 只在 Context Orientation 里提到 `code-review-graph`，尚未把变更影响、最小上下文、风险信号和相关测试建议变成 reviewer context 的稳定输入。
 
-本计划同时补充一套无侵入刷新机制：刷新判断发生在 skill / workflow 节点流转边界，用户每次 Edit / Write / Bash 后不自动刷新。默认动作是 `check-only` freshness preflight；只有用户显式运行 `$spec-graph-bootstrap`，或未来显式 opt-in `graph:refresh`，才写 durable graph artifacts。
+本计划同时补充一套无侵入刷新机制：刷新判断发生在 skill / workflow 节点流转边界，用户每次 Edit / Write / Bash 后不自动刷新。默认动作是 `check-only` freshness preflight；只有用户显式运行 `spec-graph-bootstrap`，或未来显式 opt-in `graph:refresh`，才写 durable graph artifacts。
 
 ## 目标
 
@@ -31,13 +31,13 @@ origin: "微信文章：Code Review Graph 完整安装与最佳实践指南；�
 - 保持 `report-only` 只读、`headless` 可控、`autofix` 不越权。
 - 定义 workflow-level graph freshness preflight，默认不侵入用户操作流。
 - 适配单仓单项目、单仓多模块、多仓 workspace 三种研发拓扑。
-- 明确 durable refresh 仍由 `$spec-graph-bootstrap` 负责，live probe 只作为 session-local evidence。
+- 明确 durable refresh 仍由 `spec-graph-bootstrap` 负责，live probe 只作为 session-local evidence。
 
 ## 非目标
 
 - 不把 `code-review-graph` 包装成 reviewer agent。
 - 不把 `spec-graph-impact-reviewer` 做成 provider adapter、graph builder 或 CRG prompt wrapper。
-- 不新增 `/review-delta`、`/review-pr` 或与 `$spec-code-review` 并行的 review 入口。
+- 不新增 `/review-delta`、`/review-pr` 或与 `spec-code-review` 并行的 review 入口。
 - 不默认安装或启用 `code-review-graph serve` host MCP。
 - 不在 `spec-code-review` 默认运行 `code-review-graph build`、`update` 或 `build_or_update_graph`。
 - 不做用户操作级 `PostToolUse` 自动刷新，不在每次 Edit / Write / Bash 后刷新 GitNexus 或 code-review-graph。
@@ -58,7 +58,7 @@ origin: "微信文章：Code Review Graph 完整安装与最佳实践指南；�
 - fallback_capabilities: `serena`, `ast-grep`, bounded direct repo reads
 - runtime_mcp_evidence: 本次 docs-only planning change 未使用 live MCP 证据
 - confidence: medium
-- limitations: compiled graph facts 显示 `impact_context=true`，但当前 dirty worktree hash 与 compiled `worktree_status_hash` 不一致；实施时必须把 compiled graph artifacts 视为 stale，直到 `$spec-graph-bootstrap` 刷新，或当前会话收集到 session-local live evidence。
+- limitations: compiled graph facts 显示 `impact_context=true`，但当前 dirty worktree hash 与 compiled `worktree_status_hash` 不一致；实施时必须把 compiled graph artifacts 视为 stale，直到 `spec-graph-bootstrap` 刷新，或当前会话收集到 session-local live evidence。
 
 ## 文章解读
 
@@ -80,26 +80,26 @@ origin: "微信文章：Code Review Graph 完整安装与最佳实践指南；�
 | `prompts.py` | minimal-first、最多少量 tool calls、只对 high-risk items 升级 | mode-sensitive bounded live probe 与 reviewer 触发条件 |
 | `pre_merge_check` prompt | risk score + affected flows + tests_for + dead code 检查 | 作为 pre-merge evidence recipe，不作为独立 merge gate |
 
-这些能力不直接形成 `$spec-code-review` 的入口，也不直接输出最终 review 结论。它们用于准备 evidence，并由 `spec-graph-impact-reviewer` 解释影响面，由 synthesis 合并、校准和裁决。
+这些能力不直接形成 `spec-code-review` 的入口，也不直接输出最终 review 结论。它们用于准备 evidence，并由 `spec-graph-impact-reviewer` 解释影响面，由 synthesis 合并、校准和裁决。
 
 不应直接照搬到 spec-first 的部分：
 
 - Claude-only 的 `/build-graph`、`/review-delta`、`/review-pr` 入口；
 - 每次 write 后自动修改 graph state 的默认 `PostToolUse` hooks；
 - 把 always-on live MCP server 当作 baseline requirement；
-- 与 `$spec-code-review` 竞争入口的 CRG prompts。
+- 与 `spec-code-review` 竞争入口的 CRG prompts。
 
 ## 关键决策
 
 - D1. 增加 preflight stage，并允许新增条件触发的 graph-impact reviewer。`code-review-graph` 仍然是 provider/tool；orchestrator 收集它的 evidence；`spec-graph-impact-reviewer` 只消费 evidence 并做语义审查。
 - D2. 默认先读取 compiled artifacts。`spec-code-review` 在可选 live MCP probe 前读取 canonical graph readiness 和 impact capability artifacts。
 - D3. Live MCP evidence 是 session-local。成功的 live CRG 调用不会更新 `.spec-first/graph/*`、`.spec-first/impact/*` 或 `query_ready`。
-- D4. Review 阶段默认不修改 graph state。Review 可以报告 stale graph facts 并建议 `$spec-graph-bootstrap`，但不在 `report-only` 或普通 review preflight 中运行 build/update。
+- D4. Review 阶段默认不修改 graph state。Review 可以报告 stale graph facts 并建议 `spec-graph-bootstrap`，但不在 `report-only` 或普通 review preflight 中运行 build/update。
 - D5. 使用 evidence ladder：先 minimal context，必要时才升级 impact/radius。
 - D6. 把 evidence 作为独立 block 传给 reviewers。Reviewer personas 可以使用、质疑或用 direct reads 补证据。
 - D7. Synthesis 负责 severity 和 routing。CRG risk score 是输入，不是最终 finding。
 - D8. Refresh hook 位于 workflow 节点边界，不位于用户操作边界。它是 preflight，不是后台 daemon。
-- D9. 默认 refresh policy 是 `check-only`。Full durable refresh 仍然通过 `$spec-graph-bootstrap` 显式执行。
+- D9. 默认 refresh policy 是 `check-only`。Full durable refresh 仍然通过 `spec-graph-bootstrap` 显式执行。
 - D10. Refresh granularity 跟随 selected Git repo root。Monorepo modules 是 evidence focus，不是独立 artifact owner；parent workspace summaries 只作 advisory。
 - D11. 未来如果引入自动 refresh，必须 opt-in、mode-sensitive，并且在 `report-only` 中禁用。
 - D12. `spec-graph-impact-reviewer` 是默认评估、条件派发，不是 always-on。`spec-code-review` 默认运行 graph evidence preflight，并默认判断是否需要该 reviewer；只有 graph evidence 显示 medium/high risk、多 callers、多 affected flows、related tests gaps、public/shared symbol change、inheritance/implementation 影响或 rename/move 风险时才进入 reviewer team。
@@ -134,7 +134,7 @@ GraphRefreshPreflight
   -> fresh 时消费 artifacts
   -> 有用且可用时执行 live probe
   -> stale/degraded/unavailable 时 fallback
-  -> durable readiness 重要时建议 $spec-graph-bootstrap
+  -> durable readiness 重要时建议 spec-graph-bootstrap
 ```
 
 ### 刷新层级
@@ -144,7 +144,7 @@ GraphRefreshPreflight
 | L0 | Freshness Check | 是 | 否 | graph-aware workflows |
 | L1 | Session-local Live Probe | 有用且可用时 | 否 | 当前 LLM session |
 | L2 | Review Evidence Preflight | `spec-code-review` 默认执行 | 默认否 | `spec-code-review` orchestrator |
-| L3 | Full Graph Bootstrap Refresh | 显式执行 | 是 | `$spec-graph-bootstrap` |
+| L3 | Full Graph Bootstrap Refresh | 显式执行 | 是 | `spec-graph-bootstrap` |
 
 L0/L1/L2 是 evidence collection。L3 是 canonical graph readiness refresh。
 
@@ -169,10 +169,10 @@ Downstream workflows 应把这些状态当作 evidence context，而不是自动
 | 状态 | `spec-plan` / `spec-work` / `spec-debug` | `spec-code-review` interactive | `spec-code-review` report-only/headless |
 | --- | --- | --- | --- |
 | `fresh` | 使用 compiled artifacts | 使用 compiled artifacts + CRG preflight | 只读使用 compiled artifacts |
-| `stale` | 披露 limitation，使用 live probe 或 direct reads | 收集 read-only CRG evidence；需要高置信时建议 `$spec-graph-bootstrap` | 不刷新；携带 limitation |
+| `stale` | 披露 limitation，使用 live probe 或 direct reads | 收集 read-only CRG evidence；需要高置信时建议 `spec-graph-bootstrap` | 不刷新；携带 limitation |
 | `dirty-uncertain` | 只作 advisory，用 direct reads 验证 | CRG 聚焦当前 diff；GitNexus 只作历史指针 | 不刷新；携带 limitation |
 | `degraded-fallback` | 使用 Serena / ast-grep / direct reads | 在 reviewer context 中标记 degraded | 在 Coverage 中标记 degraded |
-| `setup-ready-bootstrap-required` | 建议 `$spec-graph-bootstrap` | 建议 `$spec-graph-bootstrap`；review 可继续则继续 | 不刷新；报告 limitation |
+| `setup-ready-bootstrap-required` | 建议 `spec-graph-bootstrap` | 建议 `spec-graph-bootstrap`；review 可继续则继续 | 不刷新；报告 limitation |
 | `unavailable` | 继续 direct reads | 无 graph evidence 时继续 review | 无 graph evidence 时继续 report-only |
 | `blocked` | 报告 `reason_code` 并 fallback | 报告 `reason_code` 并 fallback | 报告 `reason_code` 并 fallback |
 
@@ -193,7 +193,7 @@ repo-a/
 规则：
 
 - `.spec-first/config/*`、`.spec-first/graph/*`、`.spec-first/impact/*` 和 `.spec-first/providers/*` 属于 repo root。
-- `$spec-graph-bootstrap` 刷新该 repo 的 durable graph readiness。
+- `spec-graph-bootstrap` 刷新该 repo 的 durable graph readiness。
 - Downstream workflows 读取该 repo 的 graph facts 并分类 freshness。
 
 ### 单仓多模块
@@ -235,7 +235,7 @@ workspace/
 - 只读 orientation 可以使用 workspace graph target summaries 查找 candidate child repos。
 - 任何 write、test、changelog、autofix 或 commit 路径都必须有 explicit `target_repo` 或 per-child scope。
 - `spec-code-review` 按 child repo 分组 changed files，并为每个 child repo 创建一个 graph-review-context。
-- 默认不刷新所有 child repos；只有显式 maintenance 请求才使用 `$spec-graph-bootstrap --all-repos`。
+- 默认不刷新所有 child repos；只有显式 maintenance 请求才使用 `spec-graph-bootstrap --all-repos`。
 
 统一原则：
 
@@ -306,7 +306,7 @@ source_artifacts:
 
 | Mode | CRG artifact read | Live CRG read-only probe | CRG build/update | 说明 |
 | --- | ---: | ---: | ---: | --- |
-| interactive | 是 | 可用且有用时 | 默认否 | stale 时可建议 `$spec-graph-bootstrap`。 |
+| interactive | 是 | 可用且有用时 | 默认否 | stale 时可建议 `spec-graph-bootstrap`。 |
 | report-only | 是 | 仅 read-only | 否 | 不得写 run artifacts 或 graph state。 |
 | headless | 是 | 仅 bounded read-only | 否 | 在 structured output 中返回 limitations。 |
 | autofix | 是 | 仅 bounded read-only | 否 | CRG evidence 可辅助 safe_auto routing，但不能授权 risky fixes。 |
@@ -382,7 +382,7 @@ Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 - Contract test 断言 stale graph facts 不阻断 review。
 - Contract test 断言 `spec-code-review` 引用 `docs/contracts/graph-evidence-policy.md` 的 `Graph Evidence Preflight Appendix`，且不把 `fresh | stale | degraded | unavailable` 写成第二套 canonical enum。
 - Contract test 断言 live MCP evidence 是 session-local，不能更新 compiled readiness。
-- Contract test 同步迁移当前负向断言：允许 `spec-code-review` 在 Coverage/Limitations 中建议 `$spec-graph-bootstrap` 作为显式 durable refresh next action；仍禁止 `report-only` / ordinary preflight silent refresh，且禁止把 graph-bootstrap 当作 review 前自动执行步骤。
+- Contract test 同步迁移当前负向断言：允许 `spec-code-review` 在 Coverage/Limitations 中建议 `spec-graph-bootstrap` 作为显式 durable refresh next action；仍禁止 `report-only` / ordinary preflight silent refresh，且禁止把 graph-bootstrap 当作 review 前自动执行步骤。
 
 ### U2. 定义 CRG 证据升级阶梯
 
@@ -486,7 +486,7 @@ Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 - Contract test 断言 coverage 说明 graph evidence limitations。
 - Contract test 断言 CRG risk score 不会被单独当成 finding。
-- Contract test 删除或重写现有“不出现 `$spec-graph-bootstrap` / `/spec:graph-bootstrap`”断言，改为断言该入口只出现在 explicit recommendation / next-action 语境中，不能出现在 automatic refresh 或 hard gate 语境中。
+- Contract test 删除或重写现有“不出现 `spec-graph-bootstrap` / `spec-graph-bootstrap`”断言，改为断言该入口只出现在 explicit recommendation / next-action 语境中，不能出现在 automatic refresh 或 hard gate 语境中。
 
 ### U5. 保持 provider setup 与 bootstrap 边界稳定
 
@@ -523,7 +523,7 @@ Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 变更：
 
-- 说明 `$spec-code-review` 消费 graph readiness 和 impact capability artifacts。
+- 说明 `spec-code-review` 消费 graph readiness 和 impact capability artifacts。
 - 明确 stale/degraded graph evidence 不阻断 review；它降低 confidence 并触发 fallback。
 - 说明 CRG live MCP 是 optional enhancement，不是默认 install requirement。
 - 在 preflight source 尚未落地前，用户手册必须使用 planned/recommended wording；不得把 `Graph / Impact Evidence Preflight` 或 `spec-graph-impact-reviewer` 写成当前默认行为。
@@ -548,7 +548,7 @@ Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 - 定义默认 policy：`check-only`。
 - 定义 interactive、report-only、headless、autofix 的 mode-sensitive constraints。
 - 定义 single repo、monorepo、multi-repo parent workspace 的 topology behavior。
-- 声明 durable refresh 仍由 `$spec-graph-bootstrap` 负责。
+- 声明 durable refresh 仍由 `spec-graph-bootstrap` 负责。
 
 测试：
 
@@ -599,13 +599,13 @@ Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 - 不让 preflight 扩大 scope。
 - 保留 stale/degraded/unavailable facts 的现有 fallback 行为。
 - 在 `spec-code-review` 中，用 preflight output 作为 `<graph-review-context>` 的基础。
-- `spec-code-review` 可以建议 `$spec-graph-bootstrap` 作为 explicit next action，但不得在 ordinary review、report-only 或 headless preflight 中自动运行 durable refresh。
+- `spec-code-review` 可以建议 `spec-graph-bootstrap` 作为 explicit next action，但不得在 ordinary review、report-only 或 headless preflight 中自动运行 durable refresh。
 
 测试：
 
 - Contract tests 断言 `check-only` default 和 no silent refresh。
 - Contract tests 断言 `report-only` remains read-only。
-- Contract tests 断言 `$spec-graph-bootstrap` / `/spec:graph-bootstrap` 只允许出现在 recommendation 语境，不允许出现在 automatic execution 语境。
+- Contract tests 断言 `spec-graph-bootstrap` / `spec-graph-bootstrap` 只允许出现在 recommendation 语境，不允许出现在 automatic execution 语境。
 
 ### U10. 支持三种拓扑且不新增 runtime roots
 
@@ -703,7 +703,7 @@ Codebase -> Graph -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge
 
 推荐下一步 workflow：
 
-- `$spec-work`：按本计划实施 `spec-code-review` source 和 contract-test changes。
+- `spec-work`：按本计划实施 `spec-code-review` source 和 contract-test changes。
 
 实施者应先完成 002 U1 policy gap closure；随后执行本计划 U7，建立 shared policy appendix；再执行 U1 和 U2，把 preflight stage 与 CRG evidence ladder 作为 policy consumer 落到 `spec-code-review`；再通过 U3 把 evidence 串入 reviewer context，通过 U3b 新增 `spec-graph-impact-reviewer` 作为条件消费者，最后通过 U4 把 reporting 和 Coverage 收口。U5 默认应保持 no-op，除非实施时发现当前 setup/bootstrap docs 会误导新的 downstream behavior。
 

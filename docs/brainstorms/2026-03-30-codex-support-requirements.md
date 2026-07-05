@@ -132,4 +132,4 @@ canonical assets → platform adapter → platform-specific runtime
 
 ## 10. 下一步
 
-进入 `/spec:plan` 阶段，设计详细实现方案。
+进入 `spec-plan` 阶段，设计详细实现方案。

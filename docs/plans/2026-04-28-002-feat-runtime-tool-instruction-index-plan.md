@@ -72,7 +72,7 @@ spec_id: 2026-04-28-002-runtime-tool-instruction-index
 ### Relevant Code and Patterns
 
 - `src/cli/lang-policy.js`：已有 `spec-first:lang` managed block 模式，包含 build/apply/inspect 的轻量 contract。
-- `src/cli/instruction-bootstrap.js`：已有 `spec-first:bootstrap` managed block，按 adapter 生成 Claude `/spec:*` 与 Codex `$spec-*` 入口文案。
+- `src/cli/instruction-bootstrap.js`：已有 `spec-first:bootstrap` managed block，按 adapter 生成 Claude `spec-*` 与 Codex `spec-*` 入口文案。
 - `src/cli/coding-guidelines.js`：已有 `spec-first:coding-guidelines` managed block，`doctor` 会检测 drift。
 - `src/cli/commands/init.js`：`buildInitMetadataPlan()` 当前按 lang -> bootstrap -> coding-guidelines 顺序写入 instruction file。
 - `src/cli/commands/doctor.js`：当前检查 bootstrap 与 coding-guidelines，可扩展 runtime tool instruction 检查。
@@ -120,7 +120,7 @@ spec_id: 2026-04-28-002-runtime-tool-instruction-index
 
 ### 使用边界
 - `GitNexus`：用于全局代码知识图谱、架构理解、影响分析和提交前变更检测。若本文件存在 `<!-- gitnexus:start -->` 管理块，优先遵守该块的强制规则。
-- `code-review-graph`：用于最小上下文、impact radius、review context、相关测试和 graph stats。只有 graph provider 已 query-ready 时使用；未 ready 时先运行 `$spec-graph-bootstrap`，或退回 bounded direct repo reads。
+- `code-review-graph`：用于最小上下文、impact radius、review context、相关测试和 graph stats。只有 graph provider 已 query-ready 时使用；未 ready 时先运行 `spec-graph-bootstrap`，或退回 bounded direct repo reads。
 - `Serena MCP`：用于 symbol overview、symbol lookup、references、LSP 辅助定位和精确编辑。它是上下文/编辑辅助，不替代源码真相源、测试或 graph-level 影响分析。
 - `ast-grep`：用于结构化代码搜索和安全 rewrite。简单文本/文件搜索仍优先 `rg` / `rg --files`；需要 AST 语义匹配时再使用 `ast-grep`。
 
@@ -131,7 +131,7 @@ spec_id: 2026-04-28-002-runtime-tool-instruction-index
 <!-- spec-first:runtime-tools:end -->
 ```
 
-Claude 版本将同一段中的 reference path 和 graph-bootstrap entrypoint 改为 `.claude/skills/spec-mcp-setup/references/supported-mcp-tools.md` 与 `/spec:graph-bootstrap`。
+Claude 版本将同一段中的 reference path 和 graph-bootstrap entrypoint 改为 `.claude/skills/spec-mcp-setup/references/supported-mcp-tools.md` 与 `spec-graph-bootstrap`。
 
 ### 英文版本
 
@@ -163,8 +163,8 @@ Claude 版本将同一段中的 reference path 和 graph-bootstrap entrypoint �
 **Test Scenarios**
 
 - `tests/unit/runtime-tools-index.test.js` 覆盖空文件、无 marker 文件、已有 marker 文件、partial marker、drifted content。
-- Codex 中文 block 包含 `.agents/skills/spec-mcp-setup/references/supported-mcp-tools.md` 和 `$spec-graph-bootstrap`。
-- Claude 中文 block 包含 `.claude/skills/spec-mcp-setup/references/supported-mcp-tools.md` 和 `/spec:graph-bootstrap`。
+- Codex 中文 block 包含 `.agents/skills/spec-mcp-setup/references/supported-mcp-tools.md` 和 `spec-graph-bootstrap`。
+- Claude 中文 block 包含 `.claude/skills/spec-mcp-setup/references/supported-mcp-tools.md` 和 `spec-graph-bootstrap`。
 - 英文 block 使用 English natural language，但保留 `GitNexus`、`code-review-graph`、`Serena MCP`、`ast-grep`、paths、commands。
 - block 不包含 `npx -y gitnexus@latest analyze`、`uvx code-review-graph build`、`brew install`、`cargo install`、symbol count、relationship count、`query_ready=true` 等动态/安装事实。
 - 文件中存在 `<!-- gitnexus:start -->` 时，新 block 插入到 GitNexus block 前，GitNexus block 内容 byte-for-byte 保留。

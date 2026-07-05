@@ -5,7 +5,7 @@
 - **审查形态**:全量战略体检式质量审计(非 diff review)。覆盖 `skills/`、`agents/`、`src/cli/`、`src/cli/contracts/`、`templates/`、生成骨架。维度化抽样,6 维度并行 reviewer。
 - **审查基线**:`docs/10-prompt/结构化项目角色契约.md` v2.0 + `CLAUDE.md` + `AGENTS.md`
 - **取证策略**:GitNexus 当前为 definitions-only(`query_global_graph: true`、`impact_context: false`),仅用作 orientation pointer;所有 finding 均经 Bash/Read direct source 复核。2026-05-31 复核时 canonical graph artifacts 已 stale,下文不声称 graph-fresh evidence。
-- **资产规模(已复核)**:38 skill(19 command-backed / 19 no-command)、51 agent、19 个公开 `/spec:*` command 模板。
+- **资产规模(已复核)**:38 skill(19 command-backed / 19 no-command)、51 agent、19 个公开 `spec-*` command 模板。
 
 ---
 
@@ -215,7 +215,7 @@ security 三件套整体是刻意分层(reviewer=diff 级 persona / lens=plan �
 2. **修 #2 schema-validator** — 它守护整个 harness 的"确定性事实"承诺,放行 bug 影响面最广。窄修复,可直接用当前 host 的 work workflow。
 3. **加 source→runtime helper 可解析性 verifier(#3)** — 把一类反复出现(2026-05-07 已记录)的断裂从人工审查变成持续可验证约束;同时为宿主外部 skill 依赖建立显式声明口径。
 4. **#4 补 read-only agent 的 tools 约束** — session-historian 是窄修复;slack-researcher 需先确认 Slack MCP tool allowlist 表达方式,避免误剪能力。
-5. **单独规划 #5 agent governance/allowlist** — 这是 source/runtime delivery contract 变更,需要 `/spec:plan`/`$spec-plan` 正式拆解。最小第一步是 metadata + lint/report,不是直接按 0-dispatch 跳过部署。
+5. **单独规划 #5 agent governance/allowlist** — 这是 source/runtime delivery contract 变更,需要 `spec-plan`/`spec-plan` 正式拆解。最小第一步是 metadata + lint/report,不是直接按 0-dispatch 跳过部署。
 
 ---
 

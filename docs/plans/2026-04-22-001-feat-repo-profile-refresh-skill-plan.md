@@ -76,7 +76,7 @@ scope: 新增 standalone skill `spec-repo-profile-refresh`，显式读取仓库�
 
 1. 新增 standalone skill：`spec-repo-profile-refresh`
 2. 它是 `standalone_skill`，不是 `workflow_command`
-3. 它是 `dual_host` 能力，Claude / Codex 都通过 skill 交付，不生成 `/spec:*` command
+3. 它是 `dual_host` 能力，Claude / Codex 都通过 skill 交付，不生成 `spec-*` command
 4. 默认交互模式为 preview-first：
    - 先生成建议
    - 用户确认后再写回
@@ -162,7 +162,7 @@ scope: 新增 standalone skill `spec-repo-profile-refresh`，显式读取仓库�
 这意味着：
 
 - 它不进入 `.claude-plugin/plugin.json` commands
-- 不生成 Claude `/spec:*` command 文件
+- 不生成 Claude `spec-*` command 文件
 - 不生成 Codex workflow command surface
 - 只作为用户可发现的 skill 交付
 
@@ -287,7 +287,7 @@ scope: 新增 standalone skill `spec-repo-profile-refresh`，显式读取仓库�
 1. skill frontmatter 合法
 2. source 与 prompt mirror 关键合同锚点一致
 3. 文案明确“preview 默认、apply 可选”
-4. 文案明确不属于 `/spec:*` command
+4. 文案明确不属于 `spec-*` command
 
 ## Unit 2: 双宿主治理与交付接线
 
@@ -450,7 +450,7 @@ scope: 新增 standalone skill `spec-repo-profile-refresh`，显式读取仓库�
 3. dual-host governance 真源已补齐对应记录
 4. skill 合同明确 preview / apply 两种模式
 5. skill 合同明确默认可补全字段与默认不主动改动字段
-6. skill 合同明确不属于 `/spec:*` workflow command
+6. skill 合同明确不属于 `spec-*` workflow command
 7. contract tests 能防止 host delivery 或写回边界回归
 
 以下任一情况仍算未完成：

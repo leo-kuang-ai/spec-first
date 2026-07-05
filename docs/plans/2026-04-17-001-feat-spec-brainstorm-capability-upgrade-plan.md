@@ -85,7 +85,7 @@ origin: docs/01-需求分析/brainstorm优化/spec-brainstorm-能力升级方案
   当前 requirements doc contract 已定义基础模板，但尚未包含分节确认、design-for-isolation、targeted improvements、preflight self-check 相关规则。
 
 - `skills/spec-brainstorm/references/handoff.md`
-  当前已支持 `/spec:plan`、`/spec:work`、`Share to Proof` 等 handoff，但尚未内建三层 `Terminal State Lock` 和 unlisted skill 分类规则。
+  当前已支持 `spec-plan`、`spec-work`、`Share to Proof` 等 handoff，但尚未内建三层 `Terminal State Lock` 和 unlisted skill 分类规则。
 
 - `skills/spec-plan/SKILL.md`
   当前 planning workflow 已支持 origin document carry-forward，但没有 `epic` frontmatter -> decomposition doc 的补充消费逻辑。
@@ -465,7 +465,7 @@ flowchart TB
 - **Interaction graph:** `skills/spec-brainstorm/SKILL.md` -> `references/requirements-capture.md` / `references/decomposition-capture.md` / `references/handoff.md` -> `skills/spec-plan/SKILL.md` -> `tests/unit/*contracts.test.js` -> `tests/smoke/cli.sh` + `tests/integration/e2e.sh`
 - **Error propagation:** 如果 `spec-plan` 的 epic consumer 写错，风险应退化为 warning + continue，而不是把 planning 卡死
 - **State lifecycle risks:** `skip future gates` 必须继续只存在于当前运行期内存；`Context Pulse` 不得引入持久化 state；`Terminal State Lock` escape hatch 不得被 session flag 绕过
-- **API surface parity:** Claude runtime 的 workflow source naming、Codex runtime 的 `name: spec-brainstorm`、`Share to Proof`、`/spec:plan` 与 direct-to-work gate 都要保持双宿主语义一致
+- **API surface parity:** Claude runtime 的 workflow source naming、Codex runtime 的 `name: spec-brainstorm`、`Share to Proof`、`spec-plan` 与 direct-to-work gate 都要保持双宿主语义一致
 - **Integration coverage:** 新增 integration 只算完成了一半；接入 `e2e.sh` 才算默认测试入口覆盖
 - **Unchanged invariants:** 不新增 public command；不新增 `spec-brainstorm-visual`；不改 dual-host governance JSON；不让 `spec-work` 开始消费 epic metadata
 

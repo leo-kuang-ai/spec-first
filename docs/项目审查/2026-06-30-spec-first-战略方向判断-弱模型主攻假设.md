@@ -57,7 +57,7 @@
 
 **错配 1 — 宿主错配(结构性,最难解)**:spec-first 绑定 Claude Code / Codex,二者在国内官方不可用。国内使用只能走"CLI + 中转 API/代理"的灰色路径,不稳定、有成本、有合规风险。地基本身国内进不来。
 
-**错配 2 — 非原生模型/工具遵循错配(体验层,已有单例实证)**:为绕开错配 1,国内真实用法可能是"Claude Code CLI 壳 + Kimi/GLM/DeepSeek 等模型"。但 spec-first 的精密 workflow/gate 依赖 Claude 原生工具调用、阻塞式提问与长 workflow 指令遵循。**issue #20 即此场景的实证**:Kimi 2.6 未可靠调用 `EnterPlanMode`/`AskUserQuestion`,直接改代码,绕过 `/spec:plan` 的"等用户确认"。
+**错配 2 — 非原生模型/工具遵循错配(体验层,已有单例实证)**:为绕开错配 1,国内真实用法可能是"Claude Code CLI 壳 + Kimi/GLM/DeepSeek 等模型"。但 spec-first 的精密 workflow/gate 依赖 Claude 原生工具调用、阻塞式提问与长 workflow 指令遵循。**issue #20 即此场景的实证**:Kimi 2.6 未可靠调用 `EnterPlanMode`/`AskUserQuestion`,直接改代码,绕过 `spec-plan` 的"等用户确认"。
 
 **重要校准**:"弱模型"不应泛化为"国产模型整体 coding 能力弱"。联网 benchmark 可见部分国产/中国系模型在代码编辑任务上并不弱(见 §10);本报告真正关心的是**当前宿主壳中的工具调用、阻塞交互、长指令遵循和 workflow boundary 可靠性**。这比泛称"国产模型弱"更准确,也更可验证。
 
@@ -90,7 +90,7 @@
 
 **spec-first 该不该把「非原生/弱工具遵循模型也能可靠走完工程闭环」立为下一阶段高优先级验证型战略假设?**
 
-- **若是** → 不是立即大规模重构,而是先做一个低摩擦 P1 切片验证:复现 #20,选择 Kimi/DeepSeek/GLM 等 2-3 类非原生模型,检查 `$spec-plan` 是否能做到"计划写入后必须阻塞确认、无 silent write、失败时 loud fallback";成功后再决定是否升格为主攻方向。
+- **若是** → 不是立即大规模重构,而是先做一个低摩擦 P1 切片验证:复现 #20,选择 Kimi/DeepSeek/GLM 等 2-3 类非原生模型,检查 `spec-plan` 是否能做到"计划写入后必须阻塞确认、无 silent write、失败时 loud fallback";成功后再决定是否升格为主攻方向。
 - **若否** → 继续把 Claude/Codex 原生强模型用户作为主路径,但必须诚实声明非原生模型/国产模型场景是 degraded support,不要把国内推广叙事建立在未验证的可靠性上。
 
 **这个判断依赖两个只有一线 owner/真实用户能校准的事实**:
@@ -122,7 +122,7 @@
 - 本报告**不**新增 workflow/CLI/runtime/source-of-truth 表面,是判断沉淀。
 - 它与既有审查一致:角色契约 v2.0 一等目标(可采纳性/外部可验证性/表达可信度)、业界调研 README "三个急需增强点"、`docs/06-待办事项` P-friction 优先级。
 - 它**修正**了过程中一个候选方向的优先级:多会话并发安全(`docs/brainstorms/2026-06-30-003-multi-session-concurrency-safety-requirements.md`)无真实摩擦证据,应 gated 在采纳证据/P-friction 之后,不应先于本报告的根因优先做。
-- 下一步若 owner 拍板"验证非原生/弱工具遵循模型可靠性假设",再进 `/spec:plan` 或 `/spec:brainstorm` 转成有边界的实验方案;本报告止于方向判断。
+- 下一步若 owner 拍板"验证非原生/弱工具遵循模型可靠性假设",再进 `spec-plan` 或 `spec-brainstorm` 转成有边界的实验方案;本报告止于方向判断。
 
 ---
 
@@ -211,7 +211,7 @@
 
 - **npm 公开下载**:2026-06-30 复核 `https://api.npmjs.org/downloads/point/last-month/spec-first` = 2238;`last-week` = 461。与 §3 主体一致。
 - **GitHub 公开信号**:2026-06-30 复核 `https://api.github.com/repos/sunrain520/spec-first` = 50 stars、7 forks、0 open issues;PR #1-#19 均为 owner;非维护者 issue 仍只有 #20。
-- **#20 具体问题**:issue 标题为"国产模型走spec work flow失效";报告者使用 Kimi 2.6 跑 `/spec:plan` 时未完整进入 workflow,直接修改代码,并明确怀疑 `EnterPlanMode`、`AskUserQuestion`、长 SKILL 注意力和工具调用能力差异。
+- **#20 具体问题**:issue 标题为"国产模型走spec work flow失效";报告者使用 Kimi 2.6 跑 `spec-plan` 时未完整进入 workflow,直接修改代码,并明确怀疑 `EnterPlanMode`、`AskUserQuestion`、长 SKILL 注意力和工具调用能力差异。
 - **官方可用性**:Anthropic / OpenAI supported countries 文档均未把中国大陆列为支持地区;OpenAI unsupported countries 文档说明从不支持地区访问可能导致账号被封或访问受限。故"国内官方可用性受限"判断成立,但具体合规/网络可达性不能由本报告替代法律或商务判断。
 - **模型能力反向校准**:Aider leaderboard 等公开 coding benchmark 显示 DeepSeek、Kimi 等模型在代码编辑任务有竞争力。因此本报告不再把"国产模型整体弱"作为前提,只讨论非原生宿主壳中的工具调用、阻塞交互、长 workflow 遵循可靠性。
 - **本地源码复核**:`spec-plan-guard` 在非 Claude native Plan Mode 下明确只是 best-effort attention reminder,无 hard write protection;`skills/spec-plan/SKILL.md` 也声明非 Plan Mode 的保护依赖模型合作。
@@ -221,7 +221,7 @@
 
 若 owner 接受 §6 的验证型假设,下一步不要先做大方案,而应先定义一个可证伪切片:
 
-- **对象**:`$spec-plan` / `/spec:plan` 的"计划写入后必须阻塞确认"路径。
+- **对象**:`spec-plan` / `spec-plan` 的"计划写入后必须阻塞确认"路径。
 - **模型样本**:Kimi 2.6 或后继版本 + DeepSeek/GLM 中至少一个;Claude 原生模型作为对照。
 - **成功条件**:每个模型重复 3-5 次,不得 silent write 非计划 source;若阻塞提问工具不可用或未被调用,必须 loud fallback 并停止在用户确认前。
 - **摩擦条件**:新增 gate 不得把本来能完成的 Claude/Codex 原生路径显著变慢;非原生模型失败时给出可理解、可恢复的 next action。
@@ -238,8 +238,8 @@
 
 映射到 spec-first,最贴近业界且符合角色契约的做法是:
 
-1. **把 `/spec:plan` 视为 planning state,不是 prompt 建议**。进入该状态后,默认只允许研究、提问、写/更新计划 artifact。
-2. **用写入前 barrier 兜底**。在用户明确 handoff 到 `$spec-work` / `/spec:work` 前,阻断 `Write`/`Edit`/`MultiEdit` 对非计划 source 的修改;允许范围先收窄到 `docs/plans/**` 及当前 plan artifact,不要一开始泛化到所有 workflow。
+1. **把 `spec-plan` 视为 planning state,不是 prompt 建议**。进入该状态后,默认只允许研究、提问、写/更新计划 artifact。
+2. **用写入前 barrier 兜底**。在用户明确 handoff 到 `spec-work` / `spec-work` 前,阻断 `Write`/`Edit`/`MultiEdit` 对非计划 source 的修改;允许范围先收窄到 `docs/plans/**` 及当前 plan artifact,不要一开始泛化到所有 workflow。
 3. **复用 native Plan Mode,但不依赖它唯一成立**。Claude native Plan Mode 存在时优先使用;非 native / Codex / 第三方模型场景下,必须显式标注 hard/soft protection 边界。
 4. **阻塞确认必须 fail closed**。`AskUserQuestion` / `request_user_input` / `ExitPlanMode` 若失败、返回空答案、状态模糊或工具不可用,合法出口是 loud fallback + 停止等待用户,不是继续实现。
 5. **测试要覆盖失败路径**。最小切片的测试重点不是"模型是否听话",而是"未确认前写源码会不会被确定性拦住";模型工具调用可靠性只作为复现实验和 degraded-mode 证据。

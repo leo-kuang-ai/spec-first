@@ -62,4 +62,4 @@ spec_id: 2026-04-28-002-readme-structural-reorganization
 
 ## Next Steps
 
--> `/spec:plan` 进行结构化实现规划
+-> `spec-plan` 进行结构化实现规划

@@ -103,7 +103,7 @@ plan_depth: lightweight
 - **Dependencies:** 无（可与 U1 并行）
 - **Files:**
   - `docs/solutions/tooling-decisions/graphify-query-explain-reliability-2026-06-12.md`（新增）
-- **Approach:** 按 `docs/solutions/` 现行格式写：问题（query/explain 实测分化）、根因（无语义 BFS 种子劫持 + `.cjs` extractor 盲区，确定性证据）、判断（graphify=代码导航工具，`explain`/`path` 可靠、`query` 弱定向、docs 散文导航放弃）、mcp-setup 份内边界（不修 provider，只诚实暴露）、对 project-graph 消费协议的含义（前提存疑→挂起）、上游归位（`.cjs` extractor）。可经 `/spec:compound` 规范化产出。
+- **Approach:** 按 `docs/solutions/` 现行格式写：问题（query/explain 实测分化）、根因（无语义 BFS 种子劫持 + `.cjs` extractor 盲区，确定性证据）、判断（graphify=代码导航工具，`explain`/`path` 可靠、`query` 弱定向、docs 散文导航放弃）、mcp-setup 份内边界（不修 provider，只诚实暴露）、对 project-graph 消费协议的含义（前提存疑→挂起）、上游归位（`.cjs` extractor）。可经 `spec-compound` 规范化产出。
 - **Test scenarios:** Test expectation: none — 知识沉淀文档，无行为变更。
 - **Verification:** 人工复核 doc 含上述要素 + `source_refs` 指向本计划 Direct Evidence。
 

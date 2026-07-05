@@ -5,8 +5,8 @@
 > 二次修订：2026-07-04 23:44
 > 压缩复审：2026-07-04 23:58
 > 钢板复审：2026-07-04
-> 评审修正：2026-07-05（基于 document-review workflow 五 persona 评审，逐条落地；当时使用 legacy `/spec:doc-review` spelling）
-> 入口统一修正：2026-07-05（基于最新 source：公开入口统一为 `spec-*`，legacy `/spec:*` / `$spec-*` 仅作为归一化输入）
+> 评审修正：2026-07-05（基于 document-review workflow 五 persona 评审，逐条落地；当时使用 legacy `spec-doc-review` spelling）
+> 入口统一修正：2026-07-05（基于最新 source：公开入口统一为 `spec-*`，legacy `spec-*` / `spec-*` 仅作为归一化输入）
 > 多 agent 复审修正：2026-07-05（修复 Step 0 baseline、go/no-go、角色契约指针、Cursor 测试覆盖和落地范围）
 > 主题：`using-spec-first` skill 的路由边界，以及 `spec-first init` 写入 `CLAUDE.md` / `AGENTS.md` 的常驻引导内容
 > 目标项目：`spec-first`
@@ -20,7 +20,7 @@
 
 第四版（钢板复审）的方向成立，但一次 doc-review 发现它建立在**错误的当前状态基线**上，并因此系统性低估了改动破坏面。第五版逐条修正基线、保留准则、测试迁移和度量前置。第六版继续按最新 source 修正若干新增漂移与联动影响：
 
-- **P0 入口表面更正**：当前公开 workflow 入口统一为 **`spec-*`**。`/spec:*` 与 `$spec-*` 只是 legacy host spelling / 兼容归一化输入，不再作为当前产品表面描述。
+- **P0 入口表面更正**：当前公开 workflow 入口统一为 **`spec-*`**。`spec-*` 与 `spec-*` 只是 legacy host spelling / 兼容归一化输入，不再作为当前产品表面描述。
 - **P0 基线更正**：当前 bootstrap 不是「5 条」，`buildZhBootstrapBody` 实际产出 **14 条 bullet**（Claude 14、Codex 16、Cursor 14、Qoder 14；均已用本节实测命令确认）。「压到 4 条」实为 **~14→4 删除**，而非修剪 1 条。全文以 Claude/Cursor/Qoder 14 条、Codex 16 条为基线。
 - **P0 保留准则**：新增「不路由那一轮也要生效」判定，对 14 条逐条做 keep / sink / drop，得出候选 L0 keep 集约 **11 条**（待 Step 0 baseline 验证），而非硬定 4 条。
 - **P0 变体基线更正**：最新 `instruction-bootstrap.js` 生成器覆盖 `zh/en × claude/codex/cursor/qoder` **8 个变体**；Kiro 不在本次 bootstrap 变体判定内，除非后续 generator 明确纳入。
@@ -63,7 +63,7 @@
 
 | 角色 | 真实身份 | 职责 | 是否写文件 |
 |---|---|---|---|
-| `using-spec-first` | 独立 meta skill / 入口治理器 | 判断当前请求是否进入公开 `spec-*` workflow，或给出 next-step 建议；legacy `/spec:*` / `$spec-*` 只作为归一化输入 | 否，不产 artifact |
+| `using-spec-first` | 独立 meta skill / 入口治理器 | 判断当前请求是否进入公开 `spec-*` workflow，或给出 next-step 建议；legacy `spec-*` / `spec-*` 只作为归一化输入 | 否，不产 artifact |
 | `spec-first init` | CLI 命令 | 从 source 生成 host runtime assets，并写入 / 更新 `CLAUDE.md` / `AGENTS.md` managed block | 是 |
 
 所以：
@@ -203,7 +203,7 @@ Claude zh 的 14 条依次是：①最小锚点 / 指向 SKILL ②何时进入 w
 | ⑩ | Runtime-context 排除 | **keep 读排除语义 / sink 长路径列表** | 「默认不读 generated mirror」必留（否则整轮扫 mirror，反增 per-session 上下文，违背压缩目标）；具体路径长列表可下沉到 context-governance |
 | ⑪ | 角色契约读取指针 | **keep（短指针）** | 架构/prompt/workflow/contract/source-runtime 判断前读取角色契约是仓库强制基线；若下沉到 SKILL，未触发 skill 的轻量误判轮会绕过它 |
 | ⑫ | 反合理化红旗 | **keep（语义）** | 作用是在 SKILL 加载前阻止 agent 合理化掉路由；下沉即自毁（product-lens 强调） |
-| ⑬ | host 入口 / delivery 行 | **keep** | 当前产品入口统一 `spec-*`，但不同 host 的 delivery surface 不同（Claude/Qoder project commands，Codex/Cursor generated Skills）；legacy `/spec:*` / `$spec-*` 仅在 SKILL 中做归一化说明 |
+| ⑬ | host 入口 / delivery 行 | **keep** | 当前产品入口统一 `spec-*`，但不同 host 的 delivery surface 不同（Claude/Qoder project commands，Codex/Cursor generated Skills）；legacy `spec-*` / `spec-*` 仅在 SKILL 中做归一化说明 |
 | ⑭ | surface / internal-only 行 | **keep** | 防暴露 internal-only skill（如 `git-worktree`） |
 
 净结果：真正可安全 sink 的是 ⑥（入口枚举→指针）和 ⑩ 的长路径列表；⑪ 默认保留短指针，除非 Step 0 L0-only no-route case 证明下沉不会绕过角色契约。**候选 L0 keep 集约 11 条，待 Step 0 baseline 验证**，不是 4 条。方案的核心洞察（把入口枚举与长路径列表移出常驻块）仍成立，只是「4 条」这个数字是错的。
@@ -531,7 +531,7 @@ evals/*.json
 
 ## 附录：评审 provenance（证据锚点）
 
-第五版阶段的修正来自会话内 document-review workflow 评审（当时以 legacy `/spec:doc-review` spelling 触发），**非独立持久化 review artifact**。第六版追加统一 `spec-*`、Cursor 变体和 context-governance 测试影响面的 source-grounded 修正。第七版追加 Codex 多 agent report-only 复审后的 Step 0 baseline、go/no-go、角色契约指针、Cursor 测试覆盖和落地范围修正。诚实标注如下，供后续核验：
+第五版阶段的修正来自会话内 document-review workflow 评审（当时以 legacy `spec-doc-review` spelling 触发），**非独立持久化 review artifact**。第六版追加统一 `spec-*`、Cursor 变体和 context-governance 测试影响面的 source-grounded 修正。第七版追加 Codex 多 agent report-only 复审后的 Step 0 baseline、go/no-go、角色契约指针、Cursor 测试覆盖和落地范围修正。诚实标注如下，供后续核验：
 
 - **评审方式**：document-review workflow 交互模式，Claude Code host，五 persona 有界并行 dispatch（会话内 subagent，无独立 artifact 文件）。
 - **persona 名单**：`spec-coherence-reviewer`、`spec-feasibility-reviewer`、`spec-scope-guardian-reviewer`、`spec-adversarial-document-reviewer`、`spec-product-lens-reviewer`。其中 feasibility 与 scope-guardian 首次因模型访问错误失败，经 `model: opus` 重试成功，5/5 覆盖完成。

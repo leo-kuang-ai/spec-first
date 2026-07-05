@@ -162,7 +162,7 @@ spec_id: 2026-06-07-001-brownfield-harness-onboarding
 
 ### Deferred to Planning
 
-- [Affects R1][形态/Technical] ~~onboarding 实现为新 public workflow(如 `/spec:onboard`)、`using-spec-first` 路由分支,还是扩现有 workflow 的 brownfield 模式?~~ **已收敛(2026-06-07,见 Key Decisions"入口分流落点")**:入口分流复用 `using-spec-first` 既有 governor,不新建 workflow / 不新建独立路由分支;形态已达成约 70%,仅剩两个有条件小缺口(rg/ast 底座姿态待 drift、R7 规模分档随 signal)。onboarding 其余产出(R7/R9/R3 deliverable)仍走各自 workflow,不改本结论。
+- [Affects R1][形态/Technical] ~~onboarding 实现为新 public workflow(如 `spec-onboard`)、`using-spec-first` 路由分支,还是扩现有 workflow 的 brownfield 模式?~~ **已收敛(2026-06-07,见 Key Decisions"入口分流落点")**:入口分流复用 `using-spec-first` 既有 governor,不新建 workflow / 不新建独立路由分支;形态已达成约 70%,仅剩两个有条件小缺口(rg/ast 底座姿态待 drift、R7 规模分档随 signal)。onboarding 其余产出(R7/R9/R3 deliverable)仍走各自 workflow,不改本结论。
 - [Affects R7][Technical] `codebase-scale` signal 的确定性字段与分档阈值(LOC/文件数/语言数/多仓)。
 - [Affects R3][Technical] agent 原生探索与 onboarding 嫌疑点治理的职责切分点(哪些定位让给 agent、哪些必须显式治理)。
 - [Affects R8][Needs research] 从 git history/PR 抽候选约束的可行抽取信号与误报控制。

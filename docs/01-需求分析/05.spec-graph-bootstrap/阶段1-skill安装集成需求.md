@@ -50,8 +50,8 @@
 
 Claude 宿主上的显式入口：
 
-* Claude：`/spec:graph-bootstrap`
-* Claude：`/spec:graph-bootstrap`
+* Claude：`spec-graph-bootstrap`
+* Claude：`spec-graph-bootstrap`
 
 Codex 宿主上的实现边界：
 
@@ -148,7 +148,7 @@ Codex 宿主上的实现边界：
   * 旧：`spec-graph-bootstrap`
   * 新：`spec-graph-bootstrap`
 * Claude 对外显式入口：
-  * `/spec:graph-bootstrap`
+  * `spec-graph-bootstrap`
 
 Codex 侧约束：
 
@@ -188,10 +188,10 @@ Codex 侧约束：
 
 README / 用户手册的最小文案 contract：
 
-* 必须明确：旧入口 `/spec:graph-bootstrap` 仍是默认稳定入口
-* 必须明确：新入口 `/spec:graph-bootstrap` 仅用于并行验证
+* 必须明确：旧入口 `spec-graph-bootstrap` 仍是默认稳定入口
+* 必须明确：新入口 `spec-graph-bootstrap` 仅用于并行验证
 * 必须明确：阶段 1 不发生默认入口切换
-* 不得写成“已完成迁移到 `/spec:graph-bootstrap`”
+* 不得写成“已完成迁移到 `spec-graph-bootstrap`”
 
 ## 8. 验收标准
 
@@ -228,8 +228,8 @@ README / 用户手册的最小文案 contract：
 * README 中明确说明双入口并行期
 * 阶段边界说明清晰，不把新入口误写成默认正式入口
 * README / 用户手册同时满足以下最小文案 contract：
-  * 旧入口 `/spec:graph-bootstrap` 仍是默认稳定入口
-  * 新入口 `/spec:graph-bootstrap` 仅用于并行验证
+  * 旧入口 `spec-graph-bootstrap` 仍是默认稳定入口
+  * 新入口 `spec-graph-bootstrap` 仅用于并行验证
   * 阶段 1 不发生默认入口切换
 
 ### 8.4 失败判定

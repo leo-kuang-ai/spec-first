@@ -70,7 +70,7 @@ spec-first 的整体架构是清晰的、符合项目哲学的。治理结构（
 | 资产 | 状态 | 问题 |
 |------|------|------|
 | `SKILL.md` | ✅ 内容完整，两路径（Native Video / Tiered）边界清晰 | 无 |
-| `references/tier-browser-reel.md` | ✅ 已对齐 `/spec:mcp-setup` 入口 | 无 |
+| `references/tier-browser-reel.md` | ✅ 已对齐 `spec-mcp-setup` 入口 | 无 |
 | `references/tier-static-screenshots.md` | ✅ | 无 |
 | `scripts/capture-demo.py` | ✅ 内容正确 | 无 |
 | `scripts/__pycache__/` | ❌ **`.pyc` 文件被 git 追踪** | P0-1 |
@@ -232,9 +232,9 @@ spec-first 的整体架构是清晰的、符合项目哲学的。治理结构（
 
 #### 流程：`lfg` → `spec-plan` → `spec-work` → `spec-code-review`
 
-- `lfg` 第 2 步：`/spec:plan $ARGUMENTS` — 正确
-- `lfg` 第 3 步：`/spec:work <plan-path>` — **问题**：`spec-work` 稳定版无 frontend-design 引导，但 `lfg` 链路指向 `spec-work` 而非 `spec-work-beta`；如果用户做 UI 任务走 lfg 链路，将不会获得 frontend-design 提示
-- `lfg` 第 4 步：`/spec:code-review mode:autofix plan:<path>` — 正确
+- `lfg` 第 2 步：`spec-plan $ARGUMENTS` — 正确
+- `lfg` 第 3 步：`spec-work <plan-path>` — **问题**：`spec-work` 稳定版无 frontend-design 引导，但 `lfg` 链路指向 `spec-work` 而非 `spec-work-beta`；如果用户做 UI 任务走 lfg 链路，将不会获得 frontend-design 提示
+- `lfg` 第 4 步：`spec-code-review mode:autofix plan:<path>` — 正确
 - `lfg` 第 1 步：ralph-loop 悬挂引用，不存在本 repo，静默降级
 
 #### 流程：`spec-compound` → `spec-compound-refresh`
@@ -271,7 +271,7 @@ spec-first 的整体架构是清晰的、符合项目哲学的。治理结构（
 | 维度 | 评分 | 说明 |
 |------|------|------|
 | plugin.json 与 skills-governance.json 一致性 | ✅ 完全对齐 | 所有 skill 在两个文件中均有对应条目 |
-| 宿主入口规范 | ✅ Claude `/spec:*`，Codex `$spec-*`，standalone skill 均正确 | dual-host-governance-contracts 测试覆盖 |
+| 宿主入口规范 | ✅ Claude `spec-*`，Codex `spec-*`，standalone skill 均正确 | dual-host-governance-contracts 测试覆盖 |
 | contract test 覆盖率 | ⚠️ 每个 skill 都有专属 test，但个别 test 对具体内容覆盖不足 | P1-2、P2-4、P2-5 |
 | 源码 vs 生成产物边界 | ✅ skills/ 是真源，`.claude/` 等是生成产物 | 指南明确 |
 | docs 镜像同步 | ❌ `docs/10-prompt/skills/setup/` 是已退休 skill 的死镜像 | P0-3 |

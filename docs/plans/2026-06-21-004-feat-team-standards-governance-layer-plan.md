@@ -23,7 +23,7 @@ deepened: 2026-06-21
 ## 决策摘要
 
 - **推荐方案:** 先建立 `docs/standards/**` 作为团队开发规范的 confirmed source surface，并新增 `docs/contracts/team-standards.md` 定义 trust level、scope、lifecycle、注入边界和提升流程；再以 `skills/spec-team-standards-governance/SKILL.md` 作为规范治理元提示词层，规定动态加载、候选生成、提升、废弃和审计方式；随后让 `spec-plan`、`spec-work`、`spec-write-tasks`、`spec-code-review`、`spec-doc-review`、`spec-debug` 按同一合同消费 confirmed standards。
-- **关键决策:** 不恢复 `$spec-standards` / `/spec:standards` public workflow，不复用 `.spec-first/standards/` 作为当前 source，不把代码扫描结果本身自动确认为团队规范，不全量注入大文档；多端适配靠 surface/layer/capability/workflow 标签过滤，架构规范单列为最高优先级规则；LLM 自主能力按 authority tier 放大，而不是用单一“必须人工确认”压平所有场景；规范获取必须先过 acquisition quality layer，避免把历史债、个人偏好或低质量证据包装成团队规则。
+- **关键决策:** 不恢复 `spec-standards` / `spec-standards` public workflow，不复用 `.spec-first/standards/` 作为当前 source，不把代码扫描结果本身自动确认为团队规范，不全量注入大文档；多端适配靠 surface/layer/capability/workflow 标签过滤，架构规范单列为最高优先级规则；LLM 自主能力按 authority tier 放大，而不是用单一“必须人工确认”压平所有场景；规范获取必须先过 acquisition quality layer，避免把历史债、个人偏好或低质量证据包装成团队规则。
 - **验证重点:** V1 重点验证 public workflow catalog 仍不暴露 `spec-standards`，下游 workflow 只把 `confirmed` 且 scope 命中的规范当硬上下文，review persona findings 必须引用具体标准条款，索引加载不会要求全量读取 `docs/standards/**`，候选落盘前通过 privacy/secret/path/prompt-injection pre-write gate。PR replay / retrieval eval 属于 V2 价值验证，用真实 pilot 证明“获取到的规范能否减少误判和正确命中”。
 - **最大风险 / 边界:** 最大风险是把“规范治理”做成第二套流程引擎、大上下文注入器，或把模型置信度误当组织授权。本计划把第一版限定为轻合同、Markdown source、手工索引、focused contract tests 和分级自治的提升流程。
 
@@ -76,7 +76,7 @@ OpenSpec 的本地源码显示，`openspec/config.yaml` 通过 `context` 和 `ru
 - R18. 规范 skill 必须遵守 `Scripts prepare, LLM decides`：脚本或结构化步骤只能准备 deterministic/advisory facts；LLM 可做语义判断、置信评分、多轮复核和候选合并，但 authority boundary 由 `docs/contracts/team-standards.md` 定义。
 - R19. 定义规范治理元提示词层：明确 AI 如何理解规范、选择规范、解释冲突、提出候选、触发生命周期动作、生成 handoff，并把这些行为与 confirmed 规范内容分离。
 - R20. 支持受治理的自适应扩展动态：workflow 可根据重复问题、review finding、incident、实现偏差和跨端冲突提出候选或审计项，但不得在未满足 authority tier 时自动把候选提升为 confirmed。
-- R21. 定义分级自治规则：显式权威来源可被 LLM 自动整理并生成 `confirmed-draft` 或面向 `confirmed` 的可审查 patch proposal；真正写入 `confirmed` 必须处在 active `$spec-work` 或等价 source-edit workflow 中，并通过普通 diff review、CHANGELOG 与聚焦验证；代码推断、review 重复模式和高置信候选可自动生成 promotion proposal；高影响治理规则、冲突规则和 owner 不明规则必须保留 owner gate。
+- R21. 定义分级自治规则：显式权威来源可被 LLM 自动整理并生成 `confirmed-draft` 或面向 `confirmed` 的可审查 patch proposal；真正写入 `confirmed` 必须处在 active `spec-work` 或等价 source-edit workflow 中，并通过普通 diff review、CHANGELOG 与聚焦验证；代码推断、review 重复模式和高置信候选可自动生成 promotion proposal；高影响治理规则、冲突规则和 owner 不明规则必须保留 owner gate。
 - R22. 定义规范获取任务包：每次初始化或提取规范前必须声明目标仓库、业务能力、surface、时间窗口、证据来源、排除范围、隐私边界和预期产物。
 - R23. 定义证据质量评分：每个候选规则必须记录 `source_strength`、`recency`、`consistency`、`coverage`、`conflict_density`、`enforcement_feasibility`、`owner_trace`、`migration_cost`、`risk_level` 和 `retrieval_value`。
 - R24. 定义来源矩阵：显式文档、机械配置、PR review、incident/postmortem、代码结构、测试、onboarding 问题、团队访谈分别能产生哪些 trust level 和 candidate type。
@@ -110,14 +110,14 @@ OpenSpec 的本地源码显示，`openspec/config.yaml` 通过 `context` 和 `ru
 
 ## 范围边界
 
-- 不恢复 `$spec-standards`、`/spec:standards`、`skills/spec-standards/` 或 `.spec-first/standards/`。
+- 不恢复 `spec-standards`、`spec-standards`、`skills/spec-standards/` 或 `.spec-first/standards/`。
 - 不把 `docs/specs/<capability>/spec.md` 改造成团队开发规范；能力 spec 记录产品/系统能力真相，团队开发规范记录工程约束和协作规则。
 - 不把 `docs/contracts/**` 的 workflow/schema contract 与团队规范混为一谈；contract 约束 harness/artifact，standards 约束团队在项目中的开发实践。
 - 不把 `docs/solutions/**` 的经验文档直接提升为规范；经验文档提供可复用学习，只有经过确认和 scope 定义后才进入 standards。
 - 不要求所有项目都一次性补齐完整规范库；第一版应支持薄规范、渐进补充和局部 scope。
 - 不把 App、H5、PC、Admin、Backend 各自拆成孤立规范体系；共享规则和跨端契约优先，端特有规则只承载差异。
 - 不把 architecture/design standards 写成“高内聚低耦合”这类不可执行口号；每条高层规范必须能判断违反条件、source of truth、owner 和例外。
-- 不把规范 skill 做成 public `$spec-*` workflow、中心化状态机或自动批准器；它只能是 source skill / helper 方法论，服务既有 plan/work/review/debug workflow。
+- 不把规范 skill 做成 public `spec-*` workflow、中心化状态机或自动批准器；它只能是 source skill / helper 方法论，服务既有 plan/work/review/debug workflow。
 - 不让元提示词层自我修改角色契约、public workflow route map、runtime delivery 或绕过 authority tier 修改 confirmed standards；它只能解释当前规范、产生候选、提出冲突和组织 promotion review。
 - 不设计复杂评分、状态机、规范 marketplace、远程同步或跨组织规范中心。
 
@@ -143,7 +143,7 @@ OpenSpec 的本地源码显示，`openspec/config.yaml` 通过 `context` 和 `ru
 - C9. 首批标准文件包含 architecture/design/cross-surface 规则模板，能表达业务状态 ownership、依赖方向、跨端契约和设计决策门槛。
 - C10. brownfield 初始化文档区分 explicit rules、observed patterns、suggested candidates、conflicts、`confirmed-draft` promotion proposals 和面向 confirmed 的 patch proposals，并给出 authority tier / owner review / source-edit workflow 退出条件。
 - C11. 生命周期规则覆盖新增、修改、例外、冲突、deprecated、archive，不允许没有 owner/invalidation condition 的 confirmed 规则合入。
-- C12. 规范治理 skill 架构文档明确入口、模式、输入、输出、文件边界、执行流程、失败模式、handoff 和与现有 workflow 的调用关系；测试继续证明没有 `$spec-standards` / `/spec:standards` 回归。
+- C12. 规范治理 skill 架构文档明确入口、模式、输入、输出、文件边界、执行流程、失败模式、handoff 和与现有 workflow 的调用关系；测试继续证明没有 `spec-standards` / `spec-standards` 回归。
 - C13. 规范治理元提示词层文档明确 meta-prompt responsibilities、动态加载算法、自适应候选生成边界、handoff 输出格式和分级自治边界。
 - C14. 自适应扩展流程能从 workflow feedback 生成 `suggested` / `observed` candidates、conflict records 或 audit report，并明确哪些 authority tier 可自动生成 `confirmed-draft` patch、哪些必须 owner confirmation；`confirmed-draft` 不可被下游 workflow 当 hard context 消费。
 - C15. `docs/contracts/team-standards.md` 定义 authority-tier table、promotion decision rules 和 absence guards：模型 confidence 是 promotion 输入，不是独立 authority；high-impact governance 与 conflict-present 一律不可自动 enforce。
@@ -211,7 +211,7 @@ OpenSpec 的本地源码显示，`openspec/config.yaml` 通过 `context` 和 `ru
   - `git status --short`, `git rev-parse --short HEAD`
 - impact_on_plan:
   - `task-governance-signals` 返回 `candidate_level: deep`，命中 `cross-module`、`critical-path-hit` 以及 governance/contract/workflow 关键词。
-  - 当前 tests 明确要求 active contracts 中没有 `$spec-standards`、`/spec:standards`、`.spec-first/standards/`、`docs/examples/standards-glue-consumption-examples.md` 或 `<standards-baseline-paths>`。
+  - 当前 tests 明确要求 active contracts 中没有 `spec-standards`、`spec-standards`、`.spec-first/standards/`、`docs/examples/standards-glue-consumption-examples.md` 或 `<standards-baseline-paths>`。
   - `spec-project-standards-reviewer` 已提供 review enforcement 形态：引用明写规则、抑制 generic best practices、按 changed file types 匹配 section。
 - key_findings:
   - spec-first 已有 standards consumption 概念，但分散在多个 workflow，且主要绑定 host instructions。
@@ -304,7 +304,7 @@ OpenSpec 的本地源码显示，`openspec/config.yaml` 通过 `context` 和 `ru
 - spec-first 是否应该学习 OpenSpec 的 `context` / `rules`？是，但只学习显式配置和 artifact-scoped selection 思想；不复制 all-context injection，也不把 config text 自动确认为所有 workflow 的 confirmed 规范。
 - 代码扫描是否能初始化历史规范？可以，但只能生成候选。它可以基于 source refs 提出 `observed` / `suggested` 条目，不能创建 `confirmed`。
 - `docs/specs/<capability>/spec.md` 是否应该存团队开发规范？不应该。capability specs 记录当前产品/系统能力真相；团队开发规范记录工程规则和 workflow 约束。
-- 旧 `$spec-standards` 是否应该回来？不应该。当前 source 和 tests 已有意退役它。
+- 旧 `spec-standards` 是否应该回来？不应该。当前 source 和 tests 已有意退役它。
 
 ### 延后到实现
 
@@ -382,7 +382,7 @@ skills/
         README.md                    # V2 optional replay fixture notes
 ```
 
-`index.md` 是加载地图；`shared.md`、`architecture.md`、`review.md`、`security.md` 承载 V1 最小规则面；端侧文件只在项目确有对应 surface 且存在 confirmed 规则时创建；`candidates/README.md` 把 proposal-only、pre-write privacy gate、source anchor 和 no-absolute-path 边界先讲清楚。完整获取任务包、fact/evidence/lineage ledger、owner queue、output risk profile、role interview 和 replay eval 都是 V2 真实运行产物，不作为 V1 空模板批量创建。`skills/spec-team-standards-governance/` 是辅助规范工作的 standalone source skill，不能暴露成 `$spec-standards` 或 `/spec:standards`。
+`index.md` 是加载地图；`shared.md`、`architecture.md`、`review.md`、`security.md` 承载 V1 最小规则面；端侧文件只在项目确有对应 surface 且存在 confirmed 规则时创建；`candidates/README.md` 把 proposal-only、pre-write privacy gate、source anchor 和 no-absolute-path 边界先讲清楚。完整获取任务包、fact/evidence/lineage ledger、owner queue、output risk profile、role interview 和 replay eval 都是 V2 真实运行产物，不作为 V1 空模板批量创建。`skills/spec-team-standards-governance/` 是辅助规范工作的 standalone source skill，不能暴露成 `spec-standards` 或 `spec-standards`。
 
 ---
 
@@ -493,7 +493,7 @@ V2 candidate card 再追加 `acquisition_id`、`evidence_quality`、`source_anch
 
 `promotion-proposal` 不是 init/propose 阶段的初始分类结果，而是 promote 阶段从候选生成的 proposal 产物类型。初始 classify 只产出 `explicit-rule`、`observed-pattern`、`suggested-rule`、`imported` 或 `conflict-record`；`promotion-proposal` 必须带 gate results、decision trace 和 diff-review handoff。
 
-`confirmed-draft` 是 promotion state，不是 trust level 的 hard-context 等价物。它表示 agent 已基于 explicit authority、mechanical enforcement 或多源高置信证据生成可审查 patch/proposal；只有该 patch 在 active `$spec-work` 或等价 source-edit workflow 中经普通 diff review 合入、更新 CHANGELOG/测试并标为 `trust=confirmed,lifecycle_state=active` 后，下游 workflow 才能 enforce。
+`confirmed-draft` 是 promotion state，不是 trust level 的 hard-context 等价物。它表示 agent 已基于 explicit authority、mechanical enforcement 或多源高置信证据生成可审查 patch/proposal；只有该 patch 在 active `spec-work` 或等价 source-edit workflow 中经普通 diff review 合入、更新 CHANGELOG/测试并标为 `trust=confirmed,lifecycle_state=active` 后，下游 workflow 才能 enforce。
 
 ### 字段分类与校验来源
 
@@ -1044,7 +1044,7 @@ flowchart TD
 
 ## 规范治理 Skill 架构
 
-可选规范 skill 应是 guided source-maintenance skill，而不是 command-backed public workflow。可用工作名是 `spec-team-standards-governance`；具体目录可在实现时最终确认，但不能命名为 `spec-standards`，也不能创建 `$spec-standards` / `/spec:standards`。当用户直接调用该 standalone skill 时，默认输出 proposal/report/patch preview；任何 durable source mutation（写入 confirmed standards、`index.md`、archive、promotion log、lineage ledger、owner queue，或把 candidate 状态真正推进）都必须由 active `$spec-work` 或等价 source-edit workflow 承担，并遵守 preview-first、普通 diff review、CHANGELOG 和 focused tests。
+可选规范 skill 应是 guided source-maintenance skill，而不是 command-backed public workflow。可用工作名是 `spec-team-standards-governance`；具体目录可在实现时最终确认，但不能命名为 `spec-standards`，也不能创建 `spec-standards` / `spec-standards`。当用户直接调用该 standalone skill 时，默认输出 proposal/report/patch preview；任何 durable source mutation（写入 confirmed standards、`index.md`、archive、promotion log、lineage ledger、owner queue，或把 candidate 状态真正推进）都必须由 active `spec-work` 或等价 source-edit workflow 承担，并遵守 preview-first、普通 diff review、CHANGELOG 和 focused tests。
 
 ### Skill 角色与模式
 
@@ -1205,7 +1205,7 @@ docs/standards/index.md
 ### Skill 安全规则
 
 - standalone 直接调用默认是 report/proposal-only：可以生成 acquisition report、candidate cards、decision trace 和 patch preview，但不直接改 durable source。
-- 只有 active `$spec-work` 或等价 source-edit workflow 明确接管 source mutation 时，skill 才能辅助写 `docs/standards/candidates/**`、confirmed standards files、index updates、archive records 或 promotion/deprecation records；V2 才允许写 ledger/owner queue/run-level output risk profile。该外层 workflow 负责 preview-first、diff review、CHANGELOG 和 focused tests。
+- 只有 active `spec-work` 或等价 source-edit workflow 明确接管 source mutation 时，skill 才能辅助写 `docs/standards/candidates/**`、confirmed standards files、index updates、archive records 或 promotion/deprecation records；V2 才允许写 ledger/owner queue/run-level output risk profile。该外层 workflow 负责 preview-first、diff review、CHANGELOG 和 focused tests。
 - confirmed standards files、`docs/standards/index.md`、archive records、promotion log、lineage ledger 和 owner decision queue 都属于 durable source mutation；V1 不批量创建 lineage/owner queue，不能由一次 standalone skill 调用静默写入或合入。
 - skill 不得编辑 generated runtime mirrors、route maps、public workflow catalogs 或 `.spec-first/standards/`。
 - `query` mode 只读。
@@ -1344,7 +1344,7 @@ flowchart TB
 
 **测试场景:**
 - 合同测试：context governance 只能通过新的 team standards contract 提及 `docs/standards/**`，不能把它写成 raw mandatory read。
-- 负向：active contract text 不得重新引入 `.spec-first/standards/`、`glue-map.json`、`<standards-baseline-paths>`、`/spec:standards` 或 `$spec-standards`。
+- 负向：active contract text 不得重新引入 `.spec-first/standards/`、`glue-map.json`、`<standards-baseline-paths>`、`spec-standards` 或 `spec-standards`。
 - 正向：contract text 明确只有 scope 匹配的 `confirmed` standards 是 hard context。
 - 正向：contract text 明确 observed/imported/suggested candidates 在 owner confirmation 前保持 advisory。
 - 正向：contract text 明确 source authority hierarchy、peer conflict 处理和 duplicate host-rule source_refs 策略。
@@ -1613,9 +1613,9 @@ flowchart TB
 - 测试: `tests/unit/using-spec-first-contracts.test.js`
 
 **方案:**
-- 增加简短说明：team standards 是 source docs，不是 `$spec-*` workflow。
+- 增加简短说明：team standards 是 source docs，不是 `spec-*` workflow。
 - 链接 `docs/contracts/team-standards.md` 和 `docs/standards/index.md`。
-- route maps 继续不出现 `$spec-standards` 和 `/spec:standards`。
+- route maps 继续不出现 `spec-standards` 和 `spec-standards`。
 - 更新 gitignore guidance：`docs/standards/**` 是 confirmed standards source 示例，而 `.spec-first/standards/` 仍是 retired/generated cleanup 范围。
 - 解释与 OpenSpec 的关系：
   - OpenSpec-style explicit constraints 有价值。
@@ -1679,13 +1679,13 @@ flowchart TB
 - `output-risk-profile.md` 在 V1 只定义 missing evidence、输出失败模式、pre-write gate 失败 reason_code 和 no-absolute-path guard；完整 replay 输出风险由 V2/U12 填充。
 - `adaptive-expansion.md` 定义从 workflow feedback 生成 `suggested` / `observed` candidates、conflict records 和 audit reports 的闭环。
 - 明确定义六个 mode：`init`、`query`、`propose`、`promote`、`deprecate`、`audit`。
-- standalone 直接调用默认 report/proposal-only；只有 active `$spec-work` 或等价 source-edit workflow 接管后，skill 才能辅助写 source。
+- standalone 直接调用默认 report/proposal-only；只有 active `spec-work` 或等价 source-edit workflow 接管后，skill 才能辅助写 source。
 - `init` / `propose` 在允许 source 写入时也只写 `docs/standards/candidates/**`、ledger 和 promotion proposals，不得写 confirmed rules。
 - `query` 只读，输出 filtered standards summary 和 precise refs。
 - `promote` 必须先检查 authority tier，再检查 owner confirmation 或 explicit source refs、required fields、scope、exceptions、effective_from、migration_impact、invalidation_condition 和 index patch preview；真正写 confirmed/index/lineage/owner queue 必须在 active source-edit workflow 中完成。
 - `deprecate` 必须记录 invalidation evidence、replacement/migration note 和 archive patch preview；真正写 lifecycle/archive/promotion log 必须在 active source-edit workflow 中完成。
 - `audit` 只输出 advisory health report，不能成为 blocking gate。
-- skill 文档要显式说明它不是 `$spec-*` public workflow，不进入 using-spec-first route map，不创建 `.spec-first/standards/`。
+- skill 文档要显式说明它不是 `spec-*` public workflow，不进入 using-spec-first route map，不创建 `.spec-first/standards/`。
 
 **遵循模式:**
 - `skills/using-spec-first/SKILL.md` 的 standalone/public workflow 边界。
@@ -1701,7 +1701,7 @@ flowchart TB
 - 正向：skill 文档把 V1 轻量 rule quality / pre-write gate 作为候选写入前置条件，且不把 evidence score 当 authority。
 - 正向：skill 文档包含 V1 single target notes、pre-write gate、warning routing 和 decision trace；V2 再覆盖完整 acquisition/source anchors。
 - 正向：skill 文档声明 AI rules/review checklist 是 derived artifacts，必须引用 standard rule IDs。
-- 负向：route map、runtime capability catalog、README 命令列表不出现 `$spec-standards` / `/spec:standards`。
+- 负向：route map、runtime capability catalog、README 命令列表不出现 `spec-standards` / `spec-standards`。
 - 负向：skill 文档不得声明代码推断或高影响治理规则可自动 promote confirmed rules。
 - 负向：owner queue 不得接收普通 evidence warning 或 abstraction warning。
 - 负向：skill 文档不得允许 meta-prompt 自行修改 confirmed standards、public workflow 或 runtime mirrors。
@@ -1978,7 +1978,7 @@ flowchart TB
 | 过度设计成 CLI/状态机 | 中 | 中 | 第一版 docs-first，不做评分、自动 promote 或新 workflow。 |
 | Review 噪音增加 | 中 | 中 | project-standards reviewer 必须引用规则和 diff/source 线，generic best practice 继续 suppress。 |
 | 历史开发规范过期 | 高 | 中 | 迁移时逐条标记 source、last_reviewed、invalidation condition，不整篇提升。 |
-| 规范 skill 被误认为 public workflow | 中 | 高 | skill 命名避开 `spec-standards`，route map/catalog 测试明确禁止 `$spec-standards` / `/spec:standards`。 |
+| 规范 skill 被误认为 public workflow | 中 | 高 | skill 命名避开 `spec-standards`，route map/catalog 测试明确禁止 `spec-standards` / `spec-standards`。 |
 | 高层架构规范退化为口号 | 中 | 高 | `architecture.md` / `design.md` 规则必须有 violation condition、owner、exceptions 和 enforcement。 |
 | Scope tags 漂移或过宽 | 中 | 中 | `index.md` 维护 surface/layer/capability/workflow 索引，audit mode 定期报告 stale/overbroad rules。 |
 | Owner 缺失导致僵尸规范 | 中 | 中 | confirmed rule 必须包含 owner、last_reviewed、invalidation_condition；无 owner 的规则进入 conflict/deprecated。 |
@@ -2014,7 +2014,7 @@ flowchart TB
 - **从代码自动扫描生成 confirmed standards。** 拒绝作为通用规则。代码事实可生成 observed/suggested candidate；只有与显式权威来源或机械 enforcement 对齐，且无冲突、低影响、scope 清楚时，才能进入 confirmed-draft 或 fast review proposal，真正 confirmed 仍需 source-edit workflow + diff review。
 - **把规范放进 `docs/specs/<capability>/spec.md`。** 拒绝。capability spec 维护当前能力真相，团队规范维护开发实践约束，二者消费者和更新时机不同。
 - **先做 machine-readable schema 和 CLI。** 延后。没有语义 authority contract 的 schema 只会制造伪确定性。
-- **直接把规范 skill 做成 `$spec-standards`。** 拒绝。用户需要的是规范治理能力，不是恢复已退役 public workflow；standalone source skill 更符合 light contract 和 source/runtime 边界。
+- **直接把规范 skill 做成 `spec-standards`。** 拒绝。用户需要的是规范治理能力，不是恢复已退役 public workflow；standalone source skill 更符合 light contract 和 source/runtime 边界。
 - **让元提示词层不分层地自动维护 confirmed standards。** 拒绝。meta-prompt 是解释与编排层，不是 authority layer；自动维护必须受 authority tier 约束，否则会把 advisory feedback 伪装成团队政策。
 
 ---
@@ -2165,7 +2165,7 @@ flowchart TB
 - Updated consumers: `spec-code-review` project-standards discovery and `spec-project-standards-reviewer` now route team standards through the contract/index and only hard-enforce `trust=confirmed,lifecycle_state=active` scope-matched rules.
 - Kept V2 acquisition, PR replay, retrieval eval, role interviews, fact/lineage ledgers, and owner queues out of V1. V2 now adds a real single-target pilot (`team-standards-v2-pilot-20260623`) for `spec-first/shared/team-standards`: `docs/standards/candidates/acquisition-task-pack.md`, `source-matrix.md`, `fact-ledger.md`, `evidence-quality-ledger.md`, `lineage-ledger.md`, `owner-decision-queue.md`, `promotion-log.md`, `output-risk-profile.md`, `role-interview-notes.md`, `skills/spec-team-standards-governance/references/source-matrix.md`, `role-interview-playbook.md`, `validation-and-replay.md`, `skills/spec-team-standards-governance/evals/**`, and `docs/validation/standards-governance/2026-06-23-acquisition-quality-validation.md`.
 - V2 evidence remains honest/degraded where inputs are unavailable: PR replay and owner edit distance are recorded as `not-enough-sample` / `not-run`; `CAND-STANDARDS-ACQ-001` remains `keep-advisory` and no confirmed standards/index/archive writes were made.
-- No `spec-standards` public workflow, `/spec:standards`, `skills/spec-standards/`, or `.spec-first/standards/` source/artifact path was restored.
+- No `spec-standards` public workflow, `spec-standards`, `skills/spec-standards/`, or `.spec-first/standards/` source/artifact path was restored.
 - Multi-agent review completed with four read-only reviewers. Findings fixed: P1 local absolute path hygiene gap in `check-team-standards.js`; P2 `meta-prompt-governance.md` reference reachability; P2 index/rule metadata reverse-consistency coverage; P2 missing concrete cross-surface template. No residual blocking findings remain.
 - Verification passed: `node --check scripts/check-team-standards.js`; `node scripts/check-team-standards.js --all`; `npx jest --runTestsByPath tests/unit/changelog-format.test.js tests/unit/team-standards-governance-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/runtime-capability-catalog.test.js tests/unit/package-install-contracts.test.js tests/unit/spec-write-tasks-output-evals.test.js tests/unit/spec-write-tasks-runtime-governance.test.js --runInBand`; `npx jest --runTestsByPath tests/unit/init-dry-run.test.js tests/unit/runtime-plan-contracts.test.js --runInBand`; `npm run lint:skill-entrypoints`; `npm run typecheck`; `git diff --check`; `npm test` (159 unit suites / 1364 tests, smoke, 2 integration suites passed); `npm run build`.
 - V2 focused verification passed: `node --check scripts/check-team-standards.js`; `node scripts/check-team-standards.js --all`; `npx jest --runTestsByPath tests/unit/team-standards-governance-contracts.test.js --runInBand`; `npx jest --runTestsByPath tests/unit/changelog-format.test.js tests/unit/team-standards-governance-contracts.test.js tests/unit/spec-code-review-contracts.test.js tests/unit/runtime-capability-catalog.test.js tests/unit/package-install-contracts.test.js --runInBand`; `npm run lint:skill-entrypoints`; `npm run typecheck`; `npm run build`; `git diff --check`.

@@ -44,7 +44,7 @@ target_repo: spec-first
 
 - NG1. **不**让 `spec-write-tasks` 自动 invoke `spec-doc-review`(违反 Core Rule 5 + 自动串联禁令)。
 - NG2. **不**新建 requirements↔plan↔tasks 三向 diff 引擎或跨文档审查状态机。
-- NG3. **不**新增 `/spec:*` / `$spec-*` 入口;`spec-write-tasks` 仍是 standalone skill。
+- NG3. **不**新增 `spec-*` / `spec-*` 入口;`spec-write-tasks` 仍是 standalone skill。
 - NG4. **不**新增复杂度评分脚本或 schema;复用 `task-governance-signals.v1`,judgment 留给 LLM。
 - NG5. **不**把 `candidate_level` 当 confirmed truth 硬门禁;它是 advisory,`collection_status` 非 `ok` 时降级。
 - NG6. **不**让 `spec-doc-review` 变成"必须三文档并排重审";覆盖盘点是 task-pack 审查内的一个 bounded 追加 lens。
@@ -104,7 +104,7 @@ target_repo: spec-first
 - **KTD2 — 决断式推荐而非自动执行。** 三处 handoff 都输出"一个推荐 + 一个理由 + 一个动作",由用户确认。理由:遵守 Core Rule 5 / 自动串联禁令 / Gate 非状态机;业界亦人在环中。
 - **KTD3 — P1 复用既有 `next_action: review-task-pack`,只补决断标准 prose,并加固 NG1。** 不新增字段、不新增枚举。高风险触发条件:含 `review_gate: required` 任务、触及共享 contract/公开 workflow prose/source-runtime 边界、或**任务数显著偏多**(无固定硬阈值,由 LLM 依直接证据判断;可锚定 `task-governance-signals` 的 `deep` 阈值或 INVEST 6–10/sprint 作为参考量级,不写死数字)。**NG1 加固**:`next_action: review-task-pack` + copy-ready 调用是**需人类决策的 handoff 建议**,不是自动执行指令;交互式宿主应停下等待用户确认,**自治宿主(无人类暂停)必须 surface 该建议而非自行 dispatch doc-review**。no-auto-chain 保证写进 prose,不依赖宿主恰好会暂停。
 - **KTD4 — P2 强化 hash 闭环 + 轻量 ID 覆盖盘点(方案 b)。** 不做三文档并排重审。doc-review 在 task-pack 路径解析 task-pack→source_plan→plan.origin(requirements),核对每条**影响实现**的 R/F/AE 是否经 `requirement_refs`/`source_unit` 在 task 端**被引用**(ID 级可追踪性);freshness 交给 `source_plan_hash`;**未被引用**的 R/F/AE(整条丢弃/不可追踪)作为覆盖 gap finding。**范围边界**:这是 ID 级覆盖检查,**不**检测"R-ID 仍被引用但语义已变窄"的语义漂移(那属 reviewer 人工判断,见 NG2)。理由:regeneration over drift-detection,最小可维护。
-- **KTD5 — 双宿主对齐。** `skills/` 是 Claude/Codex 共享 source。改动 prose 须保留 host-agnostic 措辞(`/spec:*` 与 `$spec-*` 并列或由 host 占位),runtime mirror 经 `spec-first init` 重生成,不手改。
+- **KTD5 — 双宿主对齐。** `skills/` 是 Claude/Codex 共享 source。改动 prose 须保留 host-agnostic 措辞(`spec-*` 与 `spec-*` 并列或由 host 占位),runtime mirror 经 `spec-first init` 重生成,不手改。
 
 ---
 
@@ -112,7 +112,7 @@ target_repo: spec-first
 
 - **Workflow 链路:** 强化 `Plan -> Tasks -> Review` 节点间 handoff 质量与证据留存,不改链路形状。
 - **Downstream consumers:** `spec-work` 消费 task-pack 时新增"可能带 review 推荐"的 handoff;`spec-doc-review` task-pack finding 集新增覆盖类 finding。
-- **双宿主:** Claude(`/spec:*`)与 Codex(`$spec-*`)共享 skill 源,需同步验证生成镜像与命令模板措辞。
+- **双宿主:** Claude(`spec-*`)与 Codex(`spec-*`)共享 skill 源,需同步验证生成镜像与命令模板措辞。
 - **Contracts:** `task-governance-signals.md` 新增 `spec-write-tasks` consumer 说明;`spec-doc-review` findings 若需新 finding 类别需评估 schema 影响(执行期核实,优先复用现有 `review-finding.v1`)。
 
 ---
@@ -159,7 +159,7 @@ target_repo: spec-first
 - **Files:**
   - `skills/spec-write-tasks/SKILL.md`(Final Decision Envelope / Handoff 段)
   - `skills/spec-write-tasks/evals/boundary-cases.json`(补"高风险包推荐 review"用例)
-- **Approach:** 在 Handoff 段补决断标准:当 task-pack 含 `review_gate: required` 任务、触及共享 contract/公开 workflow prose/source-runtime 边界/security-release-CI、或任务数显著偏多(无硬阈值,LLM 依直接证据判断,可锚定 `task-governance-signals` deep 阈值或 INVEST 6–10 作参考量级)时,`next_action` 选 `review-task-pack`,并输出 `/spec:doc-review <task-pack-path>`(Codex:`$spec-doc-review`)的 copy-ready 调用与一句理由。**NG1 加固措辞**:这是需人类决策的 handoff 建议,不得由 spec-write-tasks 自动调用 doc-review;自治宿主必须 surface 该建议而非自行 dispatch。
+- **Approach:** 在 Handoff 段补决断标准:当 task-pack 含 `review_gate: required` 任务、触及共享 contract/公开 workflow prose/source-runtime 边界/security-release-CI、或任务数显著偏多(无硬阈值,LLM 依直接证据判断,可锚定 `task-governance-signals` deep 阈值或 INVEST 6–10 作参考量级)时,`next_action` 选 `review-task-pack`,并输出 `spec-doc-review <task-pack-path>`(Codex:`spec-doc-review`)的 copy-ready 调用与一句理由。**NG1 加固措辞**:这是需人类决策的 handoff 建议,不得由 spec-write-tasks 自动调用 doc-review;自治宿主必须 surface 该建议而非自行 dispatch。
 - **Patterns to follow:** 既有 `next_action` 枚举语义(SKILL.md:292)与 evals 结构。
 - **Test scenarios:**
   - fresh-source eval:含 `review_gate: required` 的 pack → `next_action: review-task-pack` + copy-ready 调用 + 一句理由。
@@ -192,7 +192,7 @@ target_repo: spec-first
 - **Files:**
   - `docs/contracts/governance/task-governance-signals.md`(**当前无 consumers 段,需新增**:consumer 名称、消费姿态、collection_status 降级规则;并记录 spec-write-tasks 把 plan-declared 作可选交叉校验、非主判据)
   - `templates/claude/commands/spec/{plan,work,doc-review}.md`(已确认存在;**仅当其 inline 了被改 handoff prose 才改**——经核多为 thin launcher,实际改动概率低,执行期确认即可,无 `write-tasks.md`,符合 standalone skill 定位)
-- **Approach:** 在 contract **新增 consumers 段**标注新 consumer 与消费姿态(advisory、collection_status 降级规则、tasks-time 为可选交叉校验)。审查所有改动 prose 的 host 入口措辞,确保 `/spec:*` 与 `$spec-*` 并列或占位化,无单宿主硬编码;确认命令模板是否 inline handoff prose。runtime mirror 不手改,经 `spec-first init` 重生成验证。
+- **Approach:** 在 contract **新增 consumers 段**标注新 consumer 与消费姿态(advisory、collection_status 降级规则、tasks-time 为可选交叉校验)。审查所有改动 prose 的 host 入口措辞,确保 `spec-*` 与 `spec-*` 并列或占位化,无单宿主硬编码;确认命令模板是否 inline handoff prose。runtime mirror 不手改,经 `spec-first init` 重生成验证。
 - **Patterns to follow:** `task-governance-signals.md` 现有结构;`using-spec-first` 双宿主入口写法。
 - **Test scenarios:**
   - 文档契约:contract consumer 段包含 spec-write-tasks。

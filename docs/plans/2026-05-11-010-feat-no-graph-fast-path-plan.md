@@ -14,7 +14,7 @@ origin_issue: P2-006
 
 本计划交付 `P2-006 lightweight/no-graph fast path` 的轻量版：把现有 `doctor -> init -> restart -> workflow` 的最小可用路径讲清楚，让新用户在 MCP / graph / standards 尚未 ready 时也能先完成轻量 `ideate/brainstorm -> plan -> work -> review` 闭环。
 
-实现方式以文档、入口治理 prose 和 contract tests 为主；不新增 `$spec-quick`、不新增独立 CLI mode、不降低 graph-heavy workflow 的 setup/readiness 提示，也不让脚本替 LLM 判断某个任务是否“简单”。
+实现方式以文档、入口治理 prose 和 contract tests 为主；不新增 `spec-quick`、不新增独立 CLI mode、不降低 graph-heavy workflow 的 setup/readiness 提示，也不让脚本替 LLM 判断某个任务是否“简单”。
 
 ---
 
@@ -34,7 +34,7 @@ origin_issue: P2-006
 - R4. `using-spec-first` guide mode 必须在用户有清晰目标时按目标路由，而不是因为 MCP/graph readiness 未完成就一律推荐 setup；只有用户询问 setup/readiness、graph-heavy 能力、provider 缺失或 workflow 明确阻塞时才优先 setup/update/bootstrap。
 - R5. `init` post-init guidance 可以增加 fast path 提示，但不能删除现有 setup/bootstrap/standards guidance，也不能把 host workflow entrypoints 表述成 shell commands。
 - R6. 必须增加 contract tests，防止 README、用户手册、using-spec-first 和 init guidance 再次把 graph readiness 表述成所有 workflow 的必需前置。
-- R7. 不新增 `$spec-quick` / `/spec:quick`、不新增 CLI flag/mode、不新增 runtime state、dashboard 或自动模式选择器。
+- R7. 不新增 `spec-quick` / `spec-quick`、不新增 CLI flag/mode、不新增 runtime state、dashboard 或自动模式选择器。
 - R8. 不修改 generated runtime mirrors；如后续实现修改 source skills，runtime regeneration 必须由实现阶段按 source-first 规则另行处理。
 
 ---
@@ -98,7 +98,7 @@ origin_issue: P2-006
 - Use docs + source skill prose + tests, not a new CLI mode. Rationale: the problem is entry friction and graph-readiness interpretation, not missing executor capability.
 - Keep setup/bootstrap as the enhanced path. Rationale: graph-heavy tasks still benefit from MCP and graph providers; the fast path should not train users to ignore readiness when it matters.
 - Narrow `using-spec-first` guidance instead of adding a separate router. Rationale: the route governor already owns “what should I run next”; adding another mode would fragment entry governance.
-- Add tests that forbid `$spec-quick` / `/spec:quick` recommendations. Rationale: this is the overdesign failure mode most likely to reappear.
+- Add tests that forbid `spec-quick` / `spec-quick` recommendations. Rationale: this is the overdesign failure mode most likely to reappear.
 
 ---
 
@@ -106,7 +106,7 @@ origin_issue: P2-006
 
 ### Resolved During Planning
 
-- Should this add a new `$spec-quick` entrypoint? Resolved: no. The fast path is a documented route through existing workflows.
+- Should this add a new `spec-quick` entrypoint? Resolved: no. The fast path is a documented route through existing workflows.
 - Should `mcp-setup` and `graph-bootstrap` be removed from Quickstart? Resolved: no. They remain recommended enhanced readiness steps, but not mandatory for every lightweight workflow.
 - Should implementation modify generated runtime mirrors? Resolved: no. Source files only; runtime regeneration, if needed, belongs to implementation/shipping.
 
@@ -149,7 +149,7 @@ origin_issue: P2-006
 **Test scenarios:**
 - Happy path: README and zh README both mention the lightweight path can start after init/restart without graph readiness.
 - Boundary: README and user manual still mention `mcp-setup`, `graph-bootstrap`, and `spec-standards` as enhanced readiness steps.
-- Overdesign guard: docs do not mention `/spec:quick`, `$spec-quick`, or a new CLI quick mode.
+- Overdesign guard: docs do not mention `spec-quick`, `spec-quick`, or a new CLI quick mode.
 
 **Verification:**
 - Public docs distinguish fast path from enhanced readiness path and preserve dual-host command spelling.
@@ -201,7 +201,7 @@ origin_issue: P2-006
 
 **Approach:**
 - Add one concise post-init line or next-step note that says lightweight tasks can start in the host after restart.
-- Preserve existing next steps for `$spec-mcp-setup`, `$spec-graph-bootstrap`, and `$spec-standards`.
+- Preserve existing next steps for `spec-mcp-setup`, `spec-graph-bootstrap`, and `spec-standards`.
 - Avoid adding CLI flags, shell aliases, or new commands.
 
 **Patterns to follow:**
@@ -210,7 +210,7 @@ origin_issue: P2-006
 
 **Test scenarios:**
 - Happy path: Claude and Codex init output include the fast-path note and still include setup/bootstrap/standards next steps.
-- Boundary: init help/output does not mention `$spec-quick`, `/spec:quick`, `spec-first quick`, or `--no-graph`.
+- Boundary: init help/output does not mention `spec-quick`, `spec-quick`, `spec-first quick`, or `--no-graph`.
 
 **Verification:**
 - Init output reduces onboarding friction without changing command surface.
@@ -235,7 +235,7 @@ origin_issue: P2-006
 **Approach:**
 - Prefer one focused contract test file if assertions would otherwise scatter too much.
 - Assert positive language: no-graph/lightweight path, bounded direct reads or degraded evidence, enhanced readiness path.
-- Assert negative language: no `/spec:quick`, no `$spec-quick`, no `spec-first quick`, no “graph required before any workflow” wording.
+- Assert negative language: no `spec-quick`, no `spec-quick`, no `spec-first quick`, no “graph required before any workflow” wording.
 - If adding smoke coverage, keep it package-CLI only: `doctor` / `init --dry-run` in a fresh temp repo with no `.spec-first/graph` artifacts should succeed and should not run graph bootstrap.
 
 **Patterns to follow:**

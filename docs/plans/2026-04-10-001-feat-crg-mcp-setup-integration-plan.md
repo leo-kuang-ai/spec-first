@@ -10,7 +10,7 @@ origin: docs/01-需求分析/spec-graph-bootstrap需求/阶段0-CRG安装接入m
 
 ## Overview
 
-将 `code-review-graph`（CRG）作为 `optional` 工具纳入 `mcp-setup` 的标准安装链，使其可通过 `/spec:mcp-setup` 安装和检测。同时将 `verify-tools.sh` / `verify-tools.ps1` 从硬编码重构为数据驱动，并将 host marker schema 从 v4 升级到 v5（加法兼容：保留 `tools` 字段，新增 `optional_tools` 字段）。
+将 `code-review-graph`（CRG）作为 `optional` 工具纳入 `mcp-setup` 的标准安装链，使其可通过 `spec-mcp-setup` 安装和检测。同时将 `verify-tools.sh` / `verify-tools.ps1` 从硬编码重构为数据驱动，并将 host marker schema 从 v4 升级到 v5（加法兼容：保留 `tools` 字段，新增 `optional_tools` 字段）。
 
 ## Problem Frame
 
@@ -351,7 +351,7 @@ output JSON:
 
 - **向后兼容性（spec-graph-bootstrap）**：`spec-graph-bootstrap/SKILL.md` 第 241 行错误提示明确引用 `serena.configured=true`，消费路径是 `.tools.serena.configured`。v5 marker 保留 `tools` 字段，spec-graph-bootstrap 对新旧 marker 透明，无需修改。
 
-- **磁盘上已有的 v4 marker 文件**：用户在升级前已有的 `~/.claude/spec-first/host-setup.json`（v4 格式）在本次变更后仍可被 spec-graph-bootstrap 正常读取（`setup_success` 和 `tools` 字段保持不变）。spec-graph-bootstrap 读取这些 v4 文件时，因 `optional_tools` 字段缺失，应降级到 Enhanced/Basic mode（该降级逻辑在阶段 2 实施，超出本计划范围，记录为约定）。用户下次运行 `/spec:mcp-setup` 后 marker 将自动升级为 v5。
+- **磁盘上已有的 v4 marker 文件**：用户在升级前已有的 `~/.claude/spec-first/host-setup.json`（v4 格式）在本次变更后仍可被 spec-graph-bootstrap 正常读取（`setup_success` 和 `tools` 字段保持不变）。spec-graph-bootstrap 读取这些 v4 文件时，因 `optional_tools` 字段缺失，应降级到 Enhanced/Basic mode（该降级逻辑在阶段 2 实施，超出本计划范围，记录为约定）。用户下次运行 `spec-mcp-setup` 后 marker 将自动升级为 v5。
 
 - **前向兼容约束**：后续 marker 只允许做加法扩展；消费者必须忽略未知字段。`tools` 与 `setup_success` 继续作为 baseline 契约锚点，避免每次 schema 演进触发跨技能联动重构。
 

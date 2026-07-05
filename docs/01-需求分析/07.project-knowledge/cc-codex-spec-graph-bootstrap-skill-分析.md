@@ -2,7 +2,7 @@
 
 > 来源: 当前仓库 `skills/spec-graph-bootstrap/SKILL.md` 与 `references/*.md`
 > 基准版本: spec-first v1.4.x（截至 2026-04-03）
-> 入口: Claude Code `/spec:graph-bootstrap [target-repo-path-or-slug]` | Codex `$spec-graph-bootstrap [target-repo-path-or-slug]`
+> 入口: Claude Code `spec-graph-bootstrap [target-repo-path-or-slug]` | Codex `spec-graph-bootstrap [target-repo-path-or-slug]`
 
 ---
 
@@ -56,7 +56,7 @@ Host Readiness Gate
 
 ```mermaid
 flowchart TD
-  A["入口触发<br/>/spec:graph-bootstrap 或 $spec-graph-bootstrap"] --> B["Step 1<br/>识别 target repo / slug"]
+  A["入口触发<br/>spec-graph-bootstrap 或 spec-graph-bootstrap"] --> B["Step 1<br/>识别 target repo / slug"]
   B --> C["Step 2<br/>Host Readiness Gate"]
   C -->|未通过| X["阻断并提示用户先完成宿主准备"]
   C -->|通过| D["Step 3<br/>建立控制面与 backup"]
@@ -80,7 +80,7 @@ flowchart TD
 
 ```text
 +---------------------------------------------------------------+
-| 入口触发: /spec:graph-bootstrap [target] / $spec-graph-bootstrap [target] |
+| 入口触发: spec-graph-bootstrap [target] / spec-graph-bootstrap [target] |
 +-------------------------------+-------------------------------+
                                 |
                                 v
@@ -200,8 +200,8 @@ flowchart TD
 入口形式：
 
 ```bash
-/spec:graph-bootstrap [target-repo-path-or-slug]
-$spec-graph-bootstrap [target-repo-path-or-slug]
+spec-graph-bootstrap [target-repo-path-or-slug]
+spec-graph-bootstrap [target-repo-path-or-slug]
 ```
 
 编排器首先要判定两件事：
@@ -676,9 +676,9 @@ completion_report: produced files + any missing evidence or blocked assumptions
 推荐链路是：
 
 ```bash
-/spec:mcp-setup quick
+spec-mcp-setup quick
 # 重启 Claude Code
-/spec:graph-bootstrap [target]
+spec-graph-bootstrap [target]
 ```
 
 ### 分析能力依赖

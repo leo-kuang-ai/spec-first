@@ -236,7 +236,7 @@ owner 决策:**不回滚扩展内容**(代码已 working,测试 1116 全绿,zero
   - 与 `spec-first clean --claude|--codex` 的 runtime removal mode 分离;`--workspace-orphans` 不要求 host 参数
   - 与 `--claude` / `--codex` 同时出现时 fail closed,避免把 read-only workspace orphan 列举混入 runtime clean apply 路径
   - 无 `parent-artifact-quarantine.json` 时提示 "先跑 mcp-setup"
-  - quarantine JSON 不可读或 schema_version 不匹配时退出 non-zero,提示重跑 `$spec-mcp-setup`
+  - quarantine JSON 不可读或 schema_version 不匹配时退出 non-zero,提示重跑 `spec-mcp-setup`
   - 有 quarantine 文件时打印路径列表 + 每条 reason_code,固定输出 "Deletion is not implemented in this release"
   - 不实际删除(本期 read-only)
 - 双宿主对称:Bash 用 jq + stat;PowerShell 用 ConvertFrom-Json + Test-Path;path 字段 PowerShell 侧调 `$_.Replace('\','/')` 转 POSIX;JSON 写文件 PowerShell 侧 `Out-File -Encoding utf8NoBOM`
@@ -267,8 +267,8 @@ owner 决策:**不回滚扩展内容**(代码已 working,测试 1116 全绿,zero
 
 **Verification:**
 - `npm run test:unit` 通过 `parent-artifact-quarantine-contracts.test.js`
-- 在 spec-first 本仓跑 `spec-first init && /spec:mcp-setup` → 不产生 quarantine 文件(single-repo)
-- 在 kaz-mvp 跑 `spec-first init && /spec:mcp-setup` → `.spec-first/workspace/parent-artifact-quarantine.json` 包含 graph-facts.json + .gitnexus/ + (如存在)code-review-graph 残留
+- 在 spec-first 本仓跑 `spec-first init && spec-mcp-setup` → 不产生 quarantine 文件(single-repo)
+- 在 kaz-mvp 跑 `spec-first init && spec-mcp-setup` → `.spec-first/workspace/parent-artifact-quarantine.json` 包含 graph-facts.json + .gitnexus/ + (如存在)code-review-graph 残留
 - `spec-first clean --workspace-orphans` 在 kaz-mvp 输出污染路径列表
 
 ---
