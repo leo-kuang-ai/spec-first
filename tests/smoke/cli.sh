@@ -308,7 +308,7 @@ echo "✓ Claude init generated commands, skills, agents, hooks, and state"
 echo "6. Run doctor after Claude initialization..."
 doctor_output="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --claude)"
 grep -q ".claude/spec-first/state.json" <<<"$doctor_output"
-grep -q ".claude/commands/spec" <<<"$doctor_output"
+grep -q ".claude/commands" <<<"$doctor_output"
 grep -q ".claude/skills" <<<"$doctor_output"
 grep -q ".claude/agents" <<<"$doctor_output"
 doctor_json="$(cd "$TMP_DIR" && node "$REPO_ROOT/bin/spec-first.js" doctor --claude --json)"
@@ -562,7 +562,7 @@ const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
 if (state.commands.length !== Number(commandCount)) throw new Error('Qoder command count mismatch');
 if (state.skills.length !== Number(skillCount)) throw new Error('Qoder skill count mismatch');
 if (state.workflowSkills.length !== Number(workflowSkillCount)) throw new Error('Qoder workflow skill count mismatch');
-if (!state.commands.includes('work.md')) throw new Error('missing Qoder work command');
+if (!state.commands.includes('spec-work.md')) throw new Error('missing Qoder work command');
 if (!state.workflowSkills.includes('spec-mcp-setup')) throw new Error('missing Qoder mcp-setup workflow skill');
 if (state.agents.length !== Number(agentCount)) throw new Error('Qoder agent count mismatch');
 NODE

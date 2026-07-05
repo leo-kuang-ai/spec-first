@@ -432,7 +432,7 @@ describe('init --dry-run', () => {
       expect(claudeInstruction).not.toContain('入口映射(意图→入口)');
       expect(claudeInstruction).toContain('target_repo');
       expect(claudeInstruction).toContain('完整 map 查 SKILL');
-      expect(claudeInstruction).not.toContain('spec-optimize');
+      expect(claudeInstruction).toContain('spec-optimize');
       expect(claudeInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(claudeInstruction).not.toContain('group.status');
       expect(claudeInstruction).not.toContain('spec-standards` 无参数运行默认为每个 discovered child repo');
@@ -601,7 +601,7 @@ describe('init --dry-run', () => {
       expect(codexInstruction).not.toContain('入口映射(意图→入口)');
       expect(codexInstruction).toContain('target_repo');
       expect(codexInstruction).toContain('完整 map 查 SKILL');
-      expect(codexInstruction).not.toContain('spec-optimize');
+      expect(codexInstruction).toContain('spec-optimize');
       expect(codexInstruction).not.toContain('not-evaluated-no-mcp-input');
       expect(codexInstruction).not.toContain('group.status');
       expect(codexInstruction).toContain('spec-first startup-reminder --codex');

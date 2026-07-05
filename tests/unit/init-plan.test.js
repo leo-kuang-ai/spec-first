@@ -301,8 +301,7 @@ describe('init plan API', () => {
       expect(skill).toContain('disable-model-invocation: true');
       expect(skill).not.toContain('argument-hint:');
       expect(skill).not.toContain('.agents/skills/spec-work');
-      expect(skill).not.toContain('.qoder/commands/spec/');
-      expect(skill).not.toContain('.qoder/commands/spec-');
+      expect(skill).toContain('.qoder/commands/spec-*.md');
       expect(skill).not.toContain('.kiro/settings/');
       expect(skill).not.toContain('`agents/**`');
       expect(skill).toContain('`.cursor/agents/**`');

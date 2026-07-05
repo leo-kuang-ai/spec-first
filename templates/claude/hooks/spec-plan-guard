@@ -9,7 +9,7 @@ const input = parseJsonObject(rawInput);
 const eventName = String(input.hook_event_name || input.hookEventName || '');
 const commandName = normalizeCommandName(input.command_name || input.commandName || '');
 
-if (eventName !== 'UserPromptExpansion' || !['spec-plan', 'spec:plan'].includes(commandName)) {
+if (eventName !== 'UserPromptExpansion' || commandName !== 'spec-plan') {
   process.exit(0);
 }
 

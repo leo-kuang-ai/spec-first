@@ -116,7 +116,7 @@ class KiroAdapter extends PlatformAdapter {
       checks.push({
         level: 'WARNING',
         name: this.commandRoot,
-        message: 'unexpected Kiro command runtime directory present; Kiro P0 uses Agent Skills, not /spec commands',
+        message: 'unexpected Kiro command runtime directory present; Kiro P0 uses Agent Skills, not generated command files',
         fix: formatInitGuidance('kiro', 'in this project to refresh Kiro Agent Skill runtime assets'),
       });
     }

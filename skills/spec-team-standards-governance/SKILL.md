@@ -11,7 +11,7 @@ Use this standalone skill when the user asks to query, initialize, audit, propos
 
 - Use for standards governance work on `docs/contracts/team-standards.md`, `docs/standards/**`, candidate evidence, health audits, or promotion/deprecation proposals.
 - Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution; those route to their own public `spec-*` workflow.
-- Do not use to create, restore, or recommend legacy `/spec:standards`, `$spec-standards`, `spec-standards` workflow, `skills/spec-standards/`, or `.spec-first/standards/`.
+- Do not use to create, restore, or recommend legacy standards command spellings, the retired `spec-standards` workflow, `skills/spec-standards/`, or `.spec-first/standards/`.
 - Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.
 
 ## Hard Boundaries

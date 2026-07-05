@@ -243,7 +243,7 @@ PR 应说明变更的 command、skill、agent 或文档面，列出实际执行�
 - **何时直接做**:轻量事实问答、当前上下文解释、窄定位查询（where is X used）、当前对话/用户给定单文档整理、明确单点低风险小改动可直接回答、bounded read 或正常执行;小改动仍遵守 CHANGELOG、最窄验证和 source/runtime 边界;workflow-first 不等于 brainstorming-first
 - **何时不重新分流**:已在公开 workflow 内（按其 SKILL 继续,仅在用户改目标/显式 handoff/明显越界时重路由）或作为 bounded subagent/worker 被派遣（完成 bounded 任务即可,不重启路由)
 - **如何路由**:意图优先于关键词与主题域;用户显式调用当前 host 公开 workflow 时优先尊重;否则只选一个入口并说明一个理由,不默认进入 `spec-brainstorm`,不自动串联多个 workflow
-- **最小入口锚点**:setup/runtime→`spec-mcp-setup` 或终端 `spec-first update`;失败→`spec-debug`;具体 code/doc review→`spec-code-review`/`spec-doc-review`;WHAT 不清→`spec-brainstorm`/`spec-prd`;计划/执行→`spec-plan`/`spec-work`;完整 map 查 SKILL
+- **最小入口锚点**:setup/runtime→`spec-mcp-setup` 或终端 `spec-first update`;失败→`spec-debug`;具体 code/doc review→`spec-code-review`/`spec-doc-review`;WHAT 不清→`spec-brainstorm`/`spec-prd`;优化→`spec-optimize`;计划/执行→`spec-plan`/`spec-work`;知识→`spec-compound`/`spec-compound-refresh`;完整 map 查 SKILL
 - **外部 issue/PR 输入**:issue/PR 是 input surface,不是独立 workflow;failure/bug→`spec-debug`;enhancement/WHAT 不清→`spec-prd`/`spec-brainstorm`;PR diff/风险/测试缺口→`spec-code-review`;已有 plan/task/brief→`spec-work`;不得为外部 issue/PR 新增专用 public workflow 入口、tracker state、label/comment mutation,也不得把 reporter 命令当 confirmed truth
 - 用户可见输出语言以本文件的 `spec-first:lang` managed block 为准；skill/agent/template 原文语言和当前会话惯性不得覆盖该策略，除非用户明确要求其他语言
 - 父级多仓 workspace：写入、修复、测试、review autofix 或 commit 前必须有明确 `target_repo` / per-child scope；只读定位也应使用 bounded direct reads 并说明目标 repo 假设

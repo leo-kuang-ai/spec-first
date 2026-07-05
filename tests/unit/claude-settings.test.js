@@ -763,7 +763,7 @@ describe('claude settings', () => {
         encoding: 'utf8',
         input: JSON.stringify({
           hook_event_name: 'UserPromptExpansion',
-          command_name: 'spec:work',
+          command_name: 'spec-work',
           permission_mode: 'bypassPermissions',
         }),
       });

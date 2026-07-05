@@ -661,6 +661,14 @@ exit 0
     expect(graphify.next_actions.join('\n')).not.toContain('Graphify CLI version does not match pinned');
   });
 
+  test('provider readiness renderer resolves Unix PATH without login shell mutation', () => {
+    if (process.platform === 'win32') return;
+
+    const source = fs.readFileSync(providerRendererPath, 'utf8');
+    expect(source).toContain("spawnSync('/bin/sh', ['-c',");
+    expect(source).not.toContain("spawnSync('/bin/sh', ['-lc',");
+  });
+
   test('install-helpers repairs stale Graphify symlink on PATH when pinned npm CLI is available', () => {
     if (process.platform === 'win32') return;
 

@@ -127,6 +127,9 @@ describe('doctor Kiro auto-detection', () => {
         message: expect.stringContaining('tools must default to ["read"]'),
       }),
     ]));
+    const commandRuntimeWarning = checks.find((check) => check.name === '.kiro/commands/spec');
+    expect(commandRuntimeWarning.message).toContain('not generated command files');
+    expect(commandRuntimeWarning.message).not.toContain('/spec commands');
     expect(checks.find((check) => check.name === '.kiro/skills/bad-skill/SKILL.md').message)
       .toContain('contains non-Kiro runtime path references');
     expect(checks.find((check) => check.name === '.kiro/agents/bad.agent.md').message)

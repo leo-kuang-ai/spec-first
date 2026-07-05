@@ -6,7 +6,7 @@ argument-hint: "[bare auto setup] [--check|--verify-only|--plan] [--only codegra
 
 # Runtime Setup
 
-`spec-mcp-setup` is the current runnable entrypoint for the Runtime Setup workflow across supported hosts. The target user-facing alias remains `spec-runtime-setup` once the host alias contract is implemented; legacy host spellings such as `/spec:mcp-setup` or `$spec-mcp-setup` normalize to `spec-mcp-setup` and are not separate product surfaces. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and helper tooling, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
+`spec-mcp-setup` is the current runnable entrypoint for the Runtime Setup workflow across supported hosts. The target user-facing alias remains `spec-runtime-setup` once the host alias contract is implemented; legacy host-specific setup spellings normalize to `spec-mcp-setup` and are not separate product surfaces. Runtime Setup prepares deterministic host/runtime facts for spec-first workflows. It installs or verifies required MCP servers and helper tooling, writes setup-owned project facts, and reports concrete next actions. It does not provide code-understanding authority; downstream workflows use bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user-provided evidence.
 
 ## Contract Summary
 

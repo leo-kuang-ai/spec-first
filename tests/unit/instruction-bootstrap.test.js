@@ -85,8 +85,8 @@ describe('instruction bootstrap', () => {
     expect(twice).toContain('host-native advisory artifact 只有显式点名时读取');
     expect(twice).toContain('docs/10-prompt/结构化项目角色契约.md');
     expect(twice).toContain('scripts/tools 只产 deterministic facts');
-    expect(twice).not.toContain('优化→`spec-optimize`');
-    expect(twice).not.toContain('知识→`spec-compound`');
+    expect(twice).toContain('优化→`spec-optimize`');
+    expect(twice).toContain('知识→`spec-compound`/`spec-compound-refresh`');
     expect(twice).toContain('不要直接暴露 internal-only skills');
     expect(twice).not.toContain('入口映射(意图→入口)');
     expect(twice).not.toContain('过往 session 检索');
@@ -123,7 +123,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('## Existing Notes');
     expect(updated).toContain('## Workflow Entry Governance');
     expect(updated).not.toContain('## Workflow Entry Governance (managed by spec-first)');
-    expect(updated).toContain('Codex workflow entrypoints use same-name `spec-*` Skills');
+    expect(updated).toContain('Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands');
     expect(updated).toContain('minimal entry anchor');
     expect(updated).toContain('the full route map lives in `skills/using-spec-first/SKILL.md`, with boundary details and exceptions in its registered `references/*.md`');
     expect(updated).toContain('skills/using-spec-first/SKILL.md');
@@ -142,7 +142,7 @@ describe('instruction bootstrap', () => {
     expect(updated).toContain('External issue/PR inputs');
     expect(updated).toContain('issue/PR material is an input surface, not a separate workflow');
     expect(updated).toContain('do not add an external issue/PR-specific public workflow entrypoint, tracker state, label/comment mutation path, or treat reporter commands as confirmed truth');
-    expect(updated).not.toContain('optimization→`spec-optimize`');
+    expect(updated).toContain('optimization→`spec-optimize`');
     expect(updated).not.toContain('priority rules, and red flags');
     expect(updated).not.toContain('Entry map (intent→entrypoint)');
     expect(updated).not.toContain('spec-intake');
@@ -163,7 +163,7 @@ describe('instruction bootstrap', () => {
     const updated = applyManagedBootstrapBlock(corrupted, buildBootstrapBlock('codex', 'en'));
 
     expect(updated).toContain('## Existing Notes');
-    expect(updated).toContain('Codex workflow entrypoints use same-name `spec-*` Skills');
+    expect(updated).toContain('Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands');
     expect(updated).not.toContain('perform route checks');
     expect(updated).not.toContain('Claude workflow entrypoints use `/spec:*`');
     expect(updated.match(/<!-- spec-first:bootstrap:start -->/g)).toHaveLength(1);
@@ -419,11 +419,21 @@ describe('instruction bootstrap', () => {
       .toBe(buildBootstrapBlock('codex', 'zh'));
   });
 
+  test('shared AGENTS hosts render the same bootstrap block', () => {
+    for (const lang of ['zh', 'en']) {
+      const codex = buildBootstrapBlock('codex', lang);
+      for (const host of ['cursor', 'kiro', 'qoder']) {
+        expect(buildBootstrapBlock(host, lang)).toBe(codex);
+      }
+    }
+  });
+
   test('Codex bootstrap includes best-effort top-level startup version reminder guidance', () => {
     const codexZh = buildBootstrapBlock('codex', 'zh');
     const codexEn = buildBootstrapBlock('codex', 'en');
     const claudeZh = buildBootstrapBlock('claude', 'zh');
     const cursorZh = buildBootstrapBlock('cursor', 'zh');
+    const kiroZh = buildBootstrapBlock('kiro', 'zh');
     const qoderZh = buildBootstrapBlock('qoder', 'zh');
 
     expect(codexZh).toContain('Codex：进入公开 `spec-*` workflow 前');
@@ -457,17 +467,18 @@ describe('instruction bootstrap', () => {
     expect(claudeZh).not.toContain('$spec-update');
     expect(claudeZh).not.toContain('默认多 persona dispatch');
     expect(claudeZh).not.toContain('dispatch_authorization_missing');
-    expect(cursorZh).not.toContain('startup-reminder --codex');
-    expect(cursorZh).not.toContain('dispatch_authorization_missing');
-    expect(qoderZh).not.toContain('startup-reminder --codex');
-    expect(qoderZh).not.toContain('dispatch_authorization_missing');
+    for (const sharedAgentsBlock of [cursorZh, kiroZh, qoderZh]) {
+      expect(sharedAgentsBlock).toContain('Codex：进入公开 `spec-*` workflow 前');
+      expect(sharedAgentsBlock).toContain('startup-reminder --codex');
+      expect(sharedAgentsBlock).toContain('dispatch_authorization_missing');
+    }
   });
 
-  test('Qoder bootstrap uses project command entrypoints instead of Codex entrypoint prose', () => {
+  test('Qoder bootstrap uses project command entrypoints while preserving shared AGENTS guidance', () => {
     const qoderZh = buildBootstrapBlock('qoder', 'zh');
     const qoderEn = buildBootstrapBlock('qoder', 'en');
 
-    expect(qoderZh).toContain('Qoder workflow 入口优先使用 `spec-*` project commands');
+    expect(qoderZh).toContain('Codex/Cursor/Kiro workflow 入口使用同名 `spec-*` Skills；Qoder workflow 入口优先使用 `spec-*` project commands');
     expect(qoderZh).toContain('setup/runtime→`spec-mcp-setup`');
     expect(qoderZh).toContain('计划/执行→`spec-plan`/`spec-work`');
     expect(qoderZh).toContain('不要把 `using-spec-first` 本身当作 command-backed workflow');
@@ -475,7 +486,7 @@ describe('instruction bootstrap', () => {
     expect(qoderZh).not.toContain('Codex：进入公开 `$spec-*` 前');
     expect(qoderZh).not.toContain('$spec-mcp-setup');
 
-    expect(qoderEn).toContain('Qoder workflow entrypoints prefer `spec-*` project commands');
+    expect(qoderEn).toContain('Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands');
     expect(qoderEn).toContain('setup/runtime→`spec-mcp-setup`');
     expect(qoderEn).not.toContain('Codex workflow entrypoints use `$spec-*`');
     expect(qoderEn).not.toContain('before entering public `$spec-*`');
@@ -483,7 +494,7 @@ describe('instruction bootstrap', () => {
 
   // U3: 最小入口锚点 + R2 哲学守护(AE1/AE2)
   test('minimal entry anchor carries core segments without 1% coercion (AE1/AE2)', () => {
-    for (const host of ['claude', 'codex', 'cursor', 'qoder']) {
+    for (const host of ['claude', 'codex', 'cursor', 'kiro', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
         // 四段在场
@@ -542,7 +553,7 @@ describe('instruction bootstrap', () => {
     // block 必须覆盖的 L0 allowlist 锚点。完整 Route Map 留在 SKILL。
     const REQUIRED_L0_IDS = [
       'mcp-setup', 'debug', 'code-review', 'doc-review', 'brainstorm', 'prd',
-      'plan', 'work',
+      'optimize', 'plan', 'work', 'compound', 'compound-refresh',
     ];
     const OPTIONAL_L0_IDS = [];
     const ALLOWED_L0_IDS = new Set([...REQUIRED_L0_IDS, ...OPTIONAL_L0_IDS]);
@@ -560,9 +571,8 @@ describe('instruction bootstrap', () => {
     );
     // 显式非 L0 workflow_command:有 workflow_command 入口但不进 bootstrap 锚点集
     const NON_CORE_WORKFLOW_COMMANDS = [
-      'app-consistency-audit', 'compound', 'compound-refresh', 'ideate', 'optimize',
-      'polish-beta', 'release-notes', 'sessions', 'skill-audit', 'slack-research',
-      'write-skill', 'write-tasks',
+      'app-consistency-audit', 'ideate', 'polish-beta', 'release-notes', 'sessions',
+      'skill-audit', 'slack-research', 'write-skill', 'write-tasks',
     ];
     // 每个 REQUIRED_L0_IDS 必须是真实 registry workflow_command(抓幽灵/拼写漂移)
     for (const id of REQUIRED_L0_IDS) {
@@ -580,7 +590,7 @@ describe('instruction bootstrap', () => {
       expect(skillIds.has(id)).toBe(true);
     }
 
-    for (const host of ['claude', 'codex', 'cursor', 'qoder']) {
+    for (const host of ['claude', 'codex', 'cursor', 'kiro', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
         const blockIds = new Set([...block.matchAll(/`spec-([a-z-]+)`/g)]
@@ -609,9 +619,9 @@ describe('instruction bootstrap', () => {
         expect(blockIds.has('app-consistency-audit')).toBe(false);
         expect(blockIds.has('polish-beta')).toBe(false);
         expect(blockIds.has('ideate')).toBe(false);
-        expect(blockIds.has('optimize')).toBe(false);
-        expect(blockIds.has('compound')).toBe(false);
-        expect(blockIds.has('compound-refresh')).toBe(false);
+        expect(blockIds.has('optimize')).toBe(true);
+        expect(blockIds.has('compound')).toBe(true);
+        expect(blockIds.has('compound-refresh')).toBe(true);
         expect(block).not.toContain(lang === 'zh' ? '入口映射(意图→入口)' : 'Entry map (intent→entrypoint)');
       }
     }
@@ -623,6 +633,7 @@ describe('instruction bootstrap', () => {
       const claude = buildBootstrapBlock('claude', lang);
       const codex = buildBootstrapBlock('codex', lang);
       const cursor = buildBootstrapBlock('cursor', lang);
+      const kiro = buildBootstrapBlock('kiro', lang);
       const qoder = buildBootstrapBlock('qoder', lang);
       // 把入口语法差异归一化后,四段核心语义点应两端都在
       const segmentProbes = lang === 'zh'
@@ -632,6 +643,7 @@ describe('instruction bootstrap', () => {
         expect(claude).toContain(probe);
         expect(codex).toContain(probe);
         expect(cursor).toContain(probe);
+        expect(kiro).toContain(probe);
         expect(qoder).toContain(probe);
       }
     }
@@ -644,7 +656,7 @@ describe('instruction bootstrap', () => {
   // 本测试守护这种 intentional deferral:这两条红旗的语义必须在 bootstrap 在场,
   // 即使不在红旗措辞行内;若被静默删除则失败。
   test('load-bearing red flags (vague-route, run-init-route-first) stay covered in bootstrap (R-10)', () => {
-    for (const host of ['claude', 'codex', 'cursor', 'qoder']) {
+    for (const host of ['claude', 'codex', 'cursor', 'kiro', 'qoder']) {
       for (const lang of ['zh', 'en']) {
         const block = buildBootstrapBlock(host, lang);
         if (lang === 'en') {

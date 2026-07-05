@@ -80,10 +80,12 @@ describe('context governance runtime exclusion contract', () => {
     for (const [host, lang] of [
       ['codex', 'zh'],
       ['cursor', 'zh'],
+      ['kiro', 'zh'],
       ['claude', 'zh'],
       ['qoder', 'zh'],
       ['codex', 'en'],
       ['cursor', 'en'],
+      ['kiro', 'en'],
       ['claude', 'en'],
       ['qoder', 'en'],
     ]) {

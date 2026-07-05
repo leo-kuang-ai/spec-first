@@ -72,8 +72,8 @@ describe('spec session history contracts', () => {
     expect(text).toContain('Dispatch the `spec-session-historian` subagent');
     expect(text).toContain('scratch_dir');
     expect(text).toContain('sessions');
-    expect(text).not.toContain('cursor');
-    expect(text).not.toContain('Cursor');
+    expect(text).toContain('`.cursor/skills/**`');
+    expect(text).toContain('`.cursor/agents/**`');
   });
 
   test('spec-sessions returns distilled replay refs instead of full history', () => {

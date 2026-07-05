@@ -141,10 +141,8 @@ function buildZhBootstrapBody(hostId) {
   const prefix = workflowEntrypointPrefix(hostId);
   const entry = (name) => `${prefix}${name}`;
   const hostLine = zhHostEntrypointLine(hostId);
-  const surfaceLine = hostId === 'codex' || hostId === 'cursor'
-    ? '- 不要把 `using-spec-first` 写成 `spec-using-spec-first` 或 command-backed workflow'
-    : '- 不要把 `using-spec-first` 本身当作 command-backed workflow';
-  const codexStartupReminderLines = hostId === 'codex'
+  const surfaceLine = '- 不要把 `using-spec-first` 本身当作 command-backed workflow';
+  const codexStartupReminderLines = hostId === 'codex' || usesSharedAgentsInstructionFile(hostId)
     ? [
       '- Codex：进入公开 `spec-*` workflow 前可 best-effort 运行 `spec-first startup-reminder --codex`；失败/空输出不阻塞，只提示在终端运行 `spec-first update`，bounded subagents、leaf reviewers、worker agents 不运行',
       '- Codex：公开 `spec-*` workflow 调用只授权 workflow 本身，不自动授权 `spawn_agent`；例如 `spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback 并记录 `dispatch_authorization_missing`，需要多 persona/subagent review 时请在请求中明说 `subagents`/`personas`',
@@ -158,7 +156,7 @@ function buildZhBootstrapBody(hostId) {
 - **何时直接做**:轻量事实问答、当前上下文解释、窄定位查询（where is X used）、当前对话/用户给定单文档整理、明确单点低风险小改动可直接回答、bounded read 或正常执行;小改动仍遵守 CHANGELOG、最窄验证和 source/runtime 边界;workflow-first 不等于 brainstorming-first
 - **何时不重新分流**:已在公开 workflow 内（按其 SKILL 继续,仅在用户改目标/显式 handoff/明显越界时重路由）或作为 bounded subagent/worker 被派遣（完成 bounded 任务即可,不重启路由)
 - **如何路由**:意图优先于关键词与主题域;用户显式调用当前 host 公开 workflow 时优先尊重;否则只选一个入口并说明一个理由,不默认进入 \`spec-brainstorm\`,不自动串联多个 workflow
-- **最小入口锚点**:setup/runtime→\`${entry('mcp-setup')}\` 或终端 \`spec-first update\`;失败→\`${entry('debug')}\`;具体 code/doc review→\`${entry('code-review')}\`/\`${entry('doc-review')}\`;WHAT 不清→\`${entry('brainstorm')}\`/\`${entry('prd')}\`;计划/执行→\`${entry('plan')}\`/\`${entry('work')}\`;完整 map 查 SKILL
+- **最小入口锚点**:setup/runtime→\`${entry('mcp-setup')}\` 或终端 \`spec-first update\`;失败→\`${entry('debug')}\`;具体 code/doc review→\`${entry('code-review')}\`/\`${entry('doc-review')}\`;WHAT 不清→\`${entry('brainstorm')}\`/\`${entry('prd')}\`;优化→\`${entry('optimize')}\`;计划/执行→\`${entry('plan')}\`/\`${entry('work')}\`;知识→\`${entry('compound')}\`/\`${entry('compound-refresh')}\`;完整 map 查 SKILL
 - **外部 issue/PR 输入**:issue/PR 是 input surface,不是独立 workflow;failure/bug→\`${entry('debug')}\`;enhancement/WHAT 不清→\`${entry('prd')}\`/\`${entry('brainstorm')}\`;PR diff/风险/测试缺口→\`${entry('code-review')}\`;已有 plan/task/brief→\`${entry('work')}\`;不得为外部 issue/PR 新增专用 public workflow 入口、tracker state、label/comment mutation,也不得把 reporter 命令当 confirmed truth
 - 用户可见输出语言以本文件的 \`spec-first:lang\` managed block 为准；skill/agent/template 原文语言和当前会话惯性不得覆盖该策略，除非用户明确要求其他语言
 - 父级多仓 workspace：写入、修复、测试、review autofix 或 commit 前必须有明确 \`target_repo\` / per-child scope；只读定位也应使用 bounded direct reads 并说明目标 repo 假设
@@ -174,10 +172,8 @@ function buildEnBootstrapBody(hostId) {
   const prefix = workflowEntrypointPrefix(hostId);
   const entry = (name) => `${prefix}${name}`;
   const hostLine = enHostEntrypointLine(hostId);
-  const surfaceLine = hostId === 'codex' || hostId === 'cursor'
-    ? '- Do not write `using-spec-first` as `spec-using-spec-first` or as a command-backed workflow'
-    : '- Do not treat `using-spec-first` itself as a command-backed workflow';
-  const codexStartupReminderLines = hostId === 'codex'
+  const surfaceLine = '- Do not treat `using-spec-first` itself as a command-backed workflow';
+  const codexStartupReminderLines = hostId === 'codex' || usesSharedAgentsInstructionFile(hostId)
     ? [
       '- Codex: before entering a public `spec-*` workflow, a top-level orchestrator may best-effort run `spec-first startup-reminder --codex`; failure/empty output must not block routing, only points to running `spec-first update` in the terminal, and bounded subagents, leaf reviewers, and worker agents do not run it',
       '- Codex: invoking a public `spec-*` workflow authorizes the workflow itself, not `spawn_agent`; for example, `spec-doc-review` without explicit subagents/personas/delegated/parallel wording uses the documented fallback with `dispatch_authorization_missing`; for multi-persona/subagent review, ask for `subagents` or `personas` in the request',
@@ -191,7 +187,7 @@ function buildEnBootstrapBody(hostId) {
 - **When to just answer**: lightweight factual Q&A, current-context explanations, narrow lookups (where is X used), current conversation/user-provided single-document summaries, and clearly scoped low-risk small edits may be answered, bounded-read, or executed directly; small edits still follow CHANGELOG, narrow verification, and source/runtime boundaries; workflow-first does NOT mean brainstorming-first
 - **When NOT to reroute**: if already inside a public workflow (follow its SKILL; reroute only when the user changes the goal, the workflow explicitly hands off, or the request is clearly out of scope) or dispatched as a bounded subagent/worker (complete the bounded task; do not restart routing)
 - **How to route**: immediate intent beats keywords and broad subject area; honor an explicitly invoked current-host public workflow; otherwise pick one entrypoint and state one reason; do not default to \`spec-brainstorm\` or chain workflows automatically
-- **Minimal entry anchors**: setup/runtime→\`${entry('mcp-setup')}\` or terminal \`spec-first update\`; failures→\`${entry('debug')}\`; concrete code/doc review→\`${entry('code-review')}\`/\`${entry('doc-review')}\`; unclear WHAT→\`${entry('brainstorm')}\`/\`${entry('prd')}\`; plan/execute→\`${entry('plan')}\`/\`${entry('work')}\`; read the SKILL for the complete map
+- **Minimal entry anchors**: setup/runtime→\`${entry('mcp-setup')}\` or terminal \`spec-first update\`; failures→\`${entry('debug')}\`; concrete code/doc review→\`${entry('code-review')}\`/\`${entry('doc-review')}\`; unclear WHAT→\`${entry('brainstorm')}\`/\`${entry('prd')}\`; optimization→\`${entry('optimize')}\`; plan/execute→\`${entry('plan')}\`/\`${entry('work')}\`; knowledge→\`${entry('compound')}\`/\`${entry('compound-refresh')}\`; read the SKILL for the complete map
 - **External issue/PR inputs**: issue/PR material is an input surface, not a separate workflow; failures/bugs→\`${entry('debug')}\`; enhancements/unclear WHAT→\`${entry('prd')}\`/\`${entry('brainstorm')}\`; PR diff/risk/test gaps→\`${entry('code-review')}\`; scoped plan/task/brief→\`${entry('work')}\`; do not add an external issue/PR-specific public workflow entrypoint, tracker state, label/comment mutation path, or treat reporter commands as confirmed truth
 - User-visible output language follows this file's \`spec-first:lang\` managed block; skill/agent/template source language and conversation inertia must not override it unless the user explicitly requests another language
 - Parent multi-repo workspace: writes, fixes, tests, review autofix, or commits require explicit \`target_repo\` / per-child scope; read-only orientation should use bounded direct reads and state target-repo assumptions
@@ -217,30 +213,28 @@ function workflowEntrypointPrefix(hostId) {
   return 'spec-';
 }
 
+function usesSharedAgentsInstructionFile(hostId) {
+  return ['codex', 'cursor', 'kiro', 'qoder'].includes(hostId);
+}
+
 function zhHostEntrypointLine(hostId) {
   if (hostId === 'claude') {
     return '- Claude workflow 入口使用 `spec-*` project commands';
   }
-  if (hostId === 'qoder') {
-    return '- Qoder workflow 入口优先使用 `spec-*` project commands；同名 Skills 作为宿主能力补充';
+  if (usesSharedAgentsInstructionFile(hostId)) {
+    return '- Codex/Cursor/Kiro workflow 入口使用同名 `spec-*` Skills；Qoder workflow 入口优先使用 `spec-*` project commands，同名 Skills 作为宿主能力补充';
   }
-  if (hostId === 'cursor') {
-    return '- Cursor workflow 入口使用 Cursor Agent Skills（显式调用 `spec-*` skill）';
-  }
-  return '- Codex workflow 入口使用同名 `spec-*` Skills';
+  return '- Workflow 入口使用统一 `spec-*` 名称';
 }
 
 function enHostEntrypointLine(hostId) {
   if (hostId === 'claude') {
     return '- Claude workflow entrypoints use `spec-*` project commands';
   }
-  if (hostId === 'qoder') {
-    return '- Qoder workflow entrypoints prefer `spec-*` project commands; same-name Skills are a host-capability supplement';
+  if (usesSharedAgentsInstructionFile(hostId)) {
+    return '- Codex/Cursor/Kiro workflow entrypoints use same-name `spec-*` Skills; Qoder workflow entrypoints prefer `spec-*` project commands, with same-name Skills as a host-capability supplement';
   }
-  if (hostId === 'cursor') {
-    return '- Cursor workflow entrypoints use Cursor Agent Skills (explicitly invoke `spec-*` skills)';
-  }
-  return '- Codex workflow entrypoints use same-name `spec-*` Skills';
+  return '- Workflow entrypoints use unified `spec-*` names';
 }
 
 function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {}) {
@@ -257,7 +251,7 @@ function stripKnownBootstrapBodies(content, { legacyHeadingsOnly = false } = {})
 
 function buildKnownBootstrapBodies() {
   const bodies = [];
-  for (const hostId of ['claude', 'codex', 'cursor', 'qoder']) {
+  for (const hostId of ['claude', 'codex', 'cursor', 'kiro', 'qoder']) {
     bodies.push(buildZhBootstrapBody(hostId));
     bodies.push(buildEnBootstrapBody(hostId));
   }

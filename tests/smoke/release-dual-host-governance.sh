@@ -110,7 +110,7 @@ mkdir -p "$CODEX_PROJECT"
 codex_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CODEX_PROJECT" codex test en 2>&1
 )"
-grep -q 'spec-* skills' <<<"$codex_init_output"
+grep -Fq 'spec-* skills' <<<"$codex_init_output"
 test ! -e "$CODEX_PROJECT/.codex/commands/spec"
 test -f "$CODEX_PROJECT/.agents/skills/spec-work/SKILL.md"
 test ! -e "$CODEX_PROJECT/.agents/skills/spec-"standards"/SKILL.md"
@@ -352,7 +352,7 @@ claude_doctor_output="$(
   cd "$CLAUDE_PROJECT"
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --claude 2>&1
 )"
-grep -q '.claude/commands/spec' <<<"$claude_doctor_output"
+grep -q '.claude/commands' <<<"$claude_doctor_output"
 grep -q '.claude/skills' <<<"$claude_doctor_output"
 grep -q 'workflow skills' <<<"$claude_doctor_output"
 echo "   ✓ Claude 安装态闭环通过"

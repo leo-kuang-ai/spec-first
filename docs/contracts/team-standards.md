@@ -11,7 +11,7 @@
 
 ## Non-Goals
 
-- 不恢复 legacy `/spec:standards`、`$spec-standards`、`spec-standards` workflow、`skills/spec-standards/` 或 `.spec-first/standards/`。
+- 不恢复 legacy standards command spellings、`spec-standards` workflow、`skills/spec-standards/` 或 `.spec-first/standards/`。
 - 不把 `docs/specs/<capability>/spec.md` 变成团队开发规范库。
 - 不把 graphify/codegraph、LLM 总结、历史 plans 或 `docs/solutions/**` 直接提升为 confirmed policy。
 - 不用脚本替代架构判断、owner 授权或 promotion 语义判断。

@@ -190,8 +190,7 @@ describe('spec-app-consistency-audit entry contract', () => {
         claudeProject,
         '.claude',
         'commands',
-        'spec',
-        'app-consistency-audit.md',
+        'spec-app-consistency-audit.md',
       );
       const claudeWorkflowSkillPath = path.join(
         claudeProject,
@@ -219,8 +218,7 @@ describe('spec-app-consistency-audit entry contract', () => {
         codexProject,
         '.codex',
         'commands',
-        'spec',
-        'app-consistency-audit.md',
+        'spec-app-consistency-audit.md',
       );
 
       expect(fs.existsSync(claudeCommandPath)).toBe(true);

@@ -72,9 +72,9 @@ describe('doctor Qoder auto-detection', () => {
   });
 
   test('does not auto-detect Qoder from user-owned command or skill directories without managed state', () => {
-    fs.mkdirSync(path.join(tmp, '.qoder', 'commands', 'spec'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, '.qoder', 'commands'), { recursive: true });
     fs.mkdirSync(path.join(tmp, '.qoder', 'skills', 'custom-skill'), { recursive: true });
-    fs.writeFileSync(path.join(tmp, '.qoder', 'commands', 'spec', 'custom.md'), [
+    fs.writeFileSync(path.join(tmp, '.qoder', 'commands', 'spec-custom.md'), [
       '---',
       'name: custom',
       'description: User command',
@@ -140,7 +140,7 @@ describe('doctor Qoder auto-detection', () => {
     fs.mkdirSync(path.join(tmp, '.qoder', 'commands', 'spec'), { recursive: true });
     fs.mkdirSync(path.join(tmp, '.qoder', 'skills', 'bad-skill'), { recursive: true });
     fs.mkdirSync(path.join(tmp, '.qoder', 'agents'), { recursive: true });
-    fs.writeFileSync(path.join(tmp, '.qoder', 'commands', 'spec', 'work.md'), [
+    fs.writeFileSync(path.join(tmp, '.qoder', 'commands', 'spec-work.md'), [
       '---',
       'name: spec-work',
       '---',

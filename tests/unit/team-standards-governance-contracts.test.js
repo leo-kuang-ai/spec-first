@@ -103,7 +103,7 @@ describe('team standards governance source contract', () => {
       expect(contract).toContain(snippet);
     }
 
-    expect(contract).toContain('不恢复 legacy `/spec:standards`、`$spec-standards`、`spec-standards` workflow、`skills/spec-standards/` 或 `.spec-first/standards/`');
+    expect(contract).toContain('不恢复 legacy standards command spellings、`spec-standards` workflow、`skills/spec-standards/` 或 `.spec-first/standards/`');
     expect(contract).not.toContain('confirmed standards can be inferred from code scanning');
   });
 
@@ -175,7 +175,7 @@ describe('team standards governance source contract', () => {
     expect(skill).toContain('not a public `spec-*` workflow');
     expect(skill).toContain('not the retired `spec-standards` workflow');
     expect(skill).toContain('Do not create legacy standards workflow entrypoints');
-    expect(skill).toContain('Do not use to create, restore, or recommend legacy `/spec:standards`, `$spec-standards`, `spec-standards` workflow, `skills/spec-standards/`, or `.spec-first/standards/`.');
+    expect(skill).toContain('Do not use to create, restore, or recommend legacy standards command spellings, the retired `spec-standards` workflow, `skills/spec-standards/`, or `.spec-first/standards/`.');
     expect(skill).toContain('Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.');
     expect(skill).toContain('requires an active `spec-work`');
     expect(skill).toContain('Never load every reference by default');
