@@ -10,7 +10,7 @@
 
 ### 1.1 skill 定位
 
-`spec-debug` 是 spec-first 体系的**公开 debug workflow 入口**（`/spec:debug`），定位是"系统性找根因并修复"。它不只是诊断纪律，而是一条**端到端的工作流**，覆盖 bug 的完整闭环：
+`spec-debug` 是 spec-first 体系的**公开 debug workflow 入口**（`spec-debug`），定位是"系统性找根因并修复"。它不只是诊断纪律，而是一条**端到端的工作流**，覆盖 bug 的完整闭环：
 
 ```
 输入解析 → 复现 → 根因 → 修复 → 移交/开 PR → 可选知识沉淀

@@ -4,12 +4,51 @@ const { writeFileAtomic } = require('./atomic-write');
 
 const SETTINGS_RELATIVE_PATH = '.claude/settings.json';
 const SESSION_START_MATCHER = 'startup|resume|clear|compact';
-const SPEC_PLAN_COMMAND_NAME = 'spec:plan';
-const SESSION_START_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/session-start';
-const SPEC_PLAN_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/spec-plan-guard';
-const PRD_PREWRITE_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-prewrite-guard';
-const PRD_READINESS_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-readiness-guard';
+const SPEC_PLAN_COMMAND_NAME = 'spec-plan';
+
+// Managed Claude hooks use exec form (command + args) instead of a bash shell command
+// string. Claude Code runs shell form through Git Bash on Windows and falls back to
+// PowerShell when Git Bash is absent — a bash-only string like
+// `"$CLAUDE_PROJECT_DIR"/.claude/hooks/session-start` then fails (PowerShell reads
+// `$CLAUDE_PROJECT_DIR` as an undefined variable and cannot execute an extensionless
+// bash script). Exec form spawns `node` directly with no shell on any platform, and
+// `$CLAUDE_PROJECT_DIR` is substituted into each args element as a plain string, so the
+// same managed hooks work on macOS, Linux, and Windows with or without Git Bash. The hook
+// files themselves are Node scripts (see templates/claude/hooks/*).
+const HOOK_INTERPRETER = 'node';
+const SESSION_START_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/session-start';
+const SPEC_PLAN_GUARD_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/spec-plan-guard';
+const PRD_PREWRITE_GUARD_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/prd-prewrite-guard';
+const PRD_READINESS_GUARD_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/prd-readiness-guard';
+const PROJECT_DIR_ARG = '$CLAUDE_PROJECT_DIR';
+
+// Legacy bash shell-form commands from before the exec-form migration. Kept only so that
+// detection/removal still recognizes and cleans a pre-migration managed hook on refresh.
+const LEGACY_SESSION_START_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/session-start';
+const LEGACY_SPEC_PLAN_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/spec-plan-guard';
+const LEGACY_PRD_PREWRITE_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-prewrite-guard';
+const LEGACY_PRD_READINESS_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-readiness-guard';
+const LEGACY_MANAGED_COMMANDS = [
+  LEGACY_SESSION_START_COMMAND,
+  LEGACY_SPEC_PLAN_GUARD_COMMAND,
+  LEGACY_PRD_PREWRITE_GUARD_COMMAND,
+  LEGACY_PRD_READINESS_GUARD_COMMAND,
+];
+
+// Preserved export name for backward compatibility with consumers/tests that referenced the
+// session-start command constant. Now points at the exec-form hook path token.
+const SESSION_START_COMMAND = SESSION_START_HOOK_PATH;
+const SPEC_PLAN_GUARD_COMMAND = SPEC_PLAN_GUARD_HOOK_PATH;
+const PRD_PREWRITE_GUARD_COMMAND = PRD_PREWRITE_GUARD_HOOK_PATH;
+const PRD_READINESS_GUARD_COMMAND = PRD_READINESS_GUARD_HOOK_PATH;
+
 const MANAGED_HOOK_PATH_PATTERN = /(^|[^A-Za-z0-9_])\.claude\/hooks\/(?:session-start|spec-plan-guard|prd-prewrite-guard|prd-readiness-guard)(\s|"|$)/;
+const MANAGED_HOOK_ARG_PATHS = [
+  SESSION_START_HOOK_PATH,
+  SPEC_PLAN_GUARD_HOOK_PATH,
+  PRD_PREWRITE_GUARD_HOOK_PATH,
+  PRD_READINESS_GUARD_HOOK_PATH,
+];
 
 const MANAGED_HOOK_DEFINITIONS = [
   {
@@ -34,78 +73,93 @@ const MANAGED_HOOK_DEFINITIONS = [
   },
 ];
 
+// Exec-form managed hook: `node <hook-path> $CLAUDE_PROJECT_DIR`. Each args element is a
+// plain string (Claude substitutes $CLAUDE_PROJECT_DIR without shell tokenization), and no
+// shell runs, so this is Windows-safe with or without Git Bash. The trailing project-dir
+// arg is read by the hook (argv[2]); hooks that only need stdin ignore it harmlessly.
+function buildExecFormHook(hookPath) {
+  return {
+    type: 'command',
+    command: HOOK_INTERPRETER,
+    args: [hookPath, PROJECT_DIR_ARG],
+  };
+}
+
 function buildManagedSessionStartMatcher() {
   return {
     matcher: SESSION_START_MATCHER,
-    hooks: [
-      {
-        type: 'command',
-        command: SESSION_START_COMMAND,
-      },
-    ],
+    hooks: [buildExecFormHook(SESSION_START_HOOK_PATH)],
   };
 }
 
 function buildManagedSpecPlanGuardMatcher() {
   return {
     matcher: SPEC_PLAN_COMMAND_NAME,
-    hooks: [
-      {
-        type: 'command',
-        command: SPEC_PLAN_GUARD_COMMAND,
-      },
-    ],
+    hooks: [buildExecFormHook(SPEC_PLAN_GUARD_HOOK_PATH)],
   };
 }
 
 function buildManagedPrdPrewriteGuardMatcher() {
   return {
     matcher: 'Write|Edit|MultiEdit',
-    hooks: [
-      {
-        type: 'command',
-        command: PRD_PREWRITE_GUARD_COMMAND,
-      },
-    ],
+    hooks: [buildExecFormHook(PRD_PREWRITE_GUARD_HOOK_PATH)],
   };
 }
 
 function buildManagedPrdReadinessGuardMatcher() {
   return {
     matcher: '.*',
-    hooks: [
-      {
-        type: 'command',
-        command: PRD_READINESS_GUARD_COMMAND,
-      },
-    ],
+    hooks: [buildExecFormHook(PRD_READINESS_GUARD_HOOK_PATH)],
   };
 }
 
-// Loose substring match: used for drift DETECTION/inspection so a lightly-edited managed
-// command is still recognized as ours and reported as drifted.
-function isSpecFirstManagedHook(hook) {
-  return !!hook &&
-    typeof hook === 'object' &&
-    hook.type === 'command' &&
-    typeof hook.command === 'string' &&
-    MANAGED_HOOK_PATH_PATTERN.test(hook.command);
+// True when any exec-form args element references a managed hook path. Exec form stores the
+// hook path as a plain args string (not the command, which is the `node` interpreter), so
+// detection/removal must scan args in addition to the legacy command string.
+function execFormArgsReferenceManagedHook(hook) {
+  return !!hook
+    && Array.isArray(hook.args)
+    && hook.args.some((arg) => typeof arg === 'string' && MANAGED_HOOK_PATH_PATTERN.test(arg));
 }
 
-// Tight match: used for REMOVAL only. The Claude managed commands are project-relative
-// and stable, so exact-equality (or the command followed by extra args, e.g. spec-first's
-// own "...session-start --debug" drift) is safe to remove and re-add. A user wrapper that
-// merely references the managed path mid-command (e.g. "my-wrapper ...session-start && x")
-// does not start with the managed command, so it is preserved instead of silently deleted.
-function isManagedHookForRemoval(hook) {
-  if (!hook || typeof hook !== 'object' || hook.type !== 'command' || typeof hook.command !== 'string') {
+// Loose substring match: used for drift DETECTION/inspection so a lightly-edited managed
+// command is still recognized as ours and reported as drifted. Recognizes both the current
+// exec form (node + args hook path) and the legacy bash shell-form command string.
+function isSpecFirstManagedHook(hook) {
+  if (!hook || typeof hook !== 'object' || hook.type !== 'command') {
     return false;
   }
-  return [SESSION_START_COMMAND, SPEC_PLAN_GUARD_COMMAND, PRD_PREWRITE_GUARD_COMMAND].some((command) => (
-    hook.command === command || hook.command.startsWith(`${command} `)
-  )) || [PRD_READINESS_GUARD_COMMAND].some((command) => (
-    hook.command === command || hook.command.startsWith(`${command} `)
-  ));
+  if (typeof hook.command === 'string' && MANAGED_HOOK_PATH_PATTERN.test(hook.command)) {
+    return true;
+  }
+  return execFormArgsReferenceManagedHook(hook);
+}
+
+// Tight match: used for REMOVAL only. Removes both the current exec-form managed hooks
+// (command === 'node' and an args element is exactly a managed hook path) and legacy
+// shell-form managed commands (exact-equality or the command followed by extra args). A
+// user wrapper that merely references the managed path mid-command does not match, so it is
+// preserved instead of silently deleted.
+function isManagedHookForRemoval(hook) {
+  if (!hook || typeof hook !== 'object' || hook.type !== 'command') {
+    return false;
+  }
+
+  // Current exec form: node + args whose first element is exactly a managed hook path.
+  if (hook.command === HOOK_INTERPRETER && Array.isArray(hook.args)) {
+    if (hook.args.some((arg) => MANAGED_HOOK_ARG_PATHS.includes(arg))) {
+      return true;
+    }
+  }
+
+  // Legacy shell form: the managed command string, optionally followed by extra args.
+  if (typeof hook.command === 'string') {
+    return LEGACY_MANAGED_COMMANDS.some((command) => (
+      hook.command === command || hook.command.startsWith(`${command} `)
+    ));
+  }
+
+  return false;
 }
 
 function upsertManagedClaudeHooks(projectRoot) {
@@ -383,8 +437,16 @@ function isManagedMatcherEqual(actual, expected) {
     !Array.isArray(actual.hooks[0]) &&
     actual.hooks[0].type === expected.hooks[0].type &&
     actual.hooks[0].command === expected.hooks[0].command &&
+    stringArraysEqual(actual.hooks[0].args, expected.hooks[0].args) &&
     Object.keys(actual).length === Object.keys(expected).length &&
     Object.keys(actual.hooks[0]).length === Object.keys(expected.hooks[0]).length;
+}
+
+function stringArraysEqual(actual, expected) {
+  const actualArr = Array.isArray(actual) ? actual : [];
+  const expectedArr = Array.isArray(expected) ? expected : [];
+  return actualArr.length === expectedArr.length
+    && actualArr.every((value, index) => value === expectedArr[index]);
 }
 
 function cloneJson(value) {

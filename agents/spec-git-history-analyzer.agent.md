@@ -44,4 +44,4 @@ When analyzing, consider:
 
 Your insights should help developers understand not just what the code does, but why it evolved to its current state, informing better decisions for future changes.
 
-Note that files in `docs/plans/` and `docs/solutions/` are spec-first workflow artifacts created by `/spec:plan`. They are intentional, permanent living documents — do not recommend their removal or characterize them as unnecessary.
+Note that files in `docs/plans/` and `docs/solutions/` are spec-first workflow artifacts created by `spec-plan`. They are intentional, permanent living documents — do not recommend their removal or characterize them as unnecessary.

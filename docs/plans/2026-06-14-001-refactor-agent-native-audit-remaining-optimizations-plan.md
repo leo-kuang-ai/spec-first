@@ -67,7 +67,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 - `schema-validator` 结构化 `details[].{keyword,instanceLocation}`：仅当 CLI/helper/review consumer 需要机器可读错误定位时启动。
 - `doctor --json` 投影 `runtime_catalog_freshness`：现有 `checkManagedState` 已比较 `manifestVersion`，但 source/tests/skills 中无任何 consumer 读取该字段。遵循 R6，仅当 closeout、doctor automation 或 runtime repair guidance 确有机器可读 manifest freshness 需求时启动，不为 schema 完整性提前扩展。
-- 完整 `/spec:runtime-setup` / `$spec-runtime-setup` alias 迁移：遵循 `docs/plans/2026-06-07-003-refactor-runtime-setup-lifecycle-plan.md` 的 U8，不作为 P0 顺手改。
+- 完整 `spec-runtime-setup` / `spec-runtime-setup` alias 迁移：遵循 `docs/plans/2026-06-07-003-refactor-runtime-setup-lifecycle-plan.md` 的 U8，不作为 P0 顺手改。
 
 ---
 
@@ -423,7 +423,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 
 ### U8. 核对 Runtime Setup alias 迁移文案（多为已满足）
 
-**Goal:** 确认当前 source prose 未把“未来入口 `/spec:runtime-setup`”呈现为可运行命令；如已正确收口则关闭为 already-satisfied，否则做最小一句修正。
+**Goal:** 确认当前 source prose 未把“未来入口 `spec-runtime-setup`”呈现为可运行命令；如已正确收口则关闭为 already-satisfied，否则做最小一句修正。
 
 **Requirements:** R4, R6, R7
 
@@ -439,7 +439,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 - Conditional Modify: `CHANGELOG.md` only when this slice changes source; already-satisfied closeout alone does not require a changelog entry.
 
 **Approach:**
-- 先核对 source 现状：`skills/spec-mcp-setup/SKILL.md`（L9 已写明 `/spec:mcp-setup` / `$spec-mcp-setup` 为 compatibility names，直至 alias contract 落地）与 `templates/claude/commands/spec/mcp-setup.md`（L8/L10 已标注 legacy compatibility entrypoint、future `/spec:runtime-setup`）均已带 deferred-alias 语义。若核对通过，本切片关闭为 already-satisfied，仅留 closeout 说明，不为“未改 source”的核对结果单独写 changelog。
+- 先核对 source 现状：`skills/spec-mcp-setup/SKILL.md`（L9 已写明 `spec-mcp-setup` / `spec-mcp-setup` 为 compatibility names，直至 alias contract 落地）与 `templates/claude/commands/spec/mcp-setup.md`（L8/L10 已标注 legacy compatibility entrypoint、future `spec-runtime-setup`）均已带 deferred-alias 语义。若核对通过，本切片关闭为 already-satisfied，仅留 closeout 说明，不为“未改 source”的核对结果单独写 changelog。
 - 仅当发现某处 prose 仍把 future alias 当作当前可运行命令时，做最小一句修正，指向既有 2026-06-07-003 U8 计划。
 - 不新增 host command，不改 runtime generation，不刷新 generated runtime mirrors；如最终触及 template 文案改动，需显式记录 runtime drift 并由实现 workflow 运行 `spec-first init`。
 
@@ -524,7 +524,7 @@ origin: docs/项目审查/2026-06-12-agent-native-architecture-audit-report.md
 - Implementation scope: U1-U7 completed; U8 required one additional current-entrypoint `doctor --help` prose correction. `doctor --json` freshness and `schema-validator details[]` remain deferred until a confirmed consumer exists.
 - Legacy classification: `task-manager.sh` task.yaml lifecycle is obsolete-by-replacement through source plan/task-pack artifacts and spec-work run artifacts; `stage-gate.sh` phase gating is replaced by verification profile/run-summary/honest-closeout helpers plus Jest integration coverage; `review-judge.sh` shell scoring is replaced by `spec-code-review` confidence-gated findings, reviewer synthesis, and review contracts.
 - Verification: focused Jest suites, `npm run test:mcp-setup`, `npm run test:integration`, `npm run typecheck`, `npm run test:ai-dev:gate`, `npm run test:unit`, `npm run test:smoke`, `npm run build`, `npm run sync:instructions`, and `git diff --check` passed.
-- Review: `$spec-code-review` ran as single-agent report-only fallback because Codex reviewer dispatch/subagents were not explicitly authorized; one P3 test cleanup guard was fixed and re-verified with focused Jest.
+- Review: `spec-code-review` ran as single-agent report-only fallback because Codex reviewer dispatch/subagents were not explicitly authorized; one P3 test cleanup guard was fixed and re-verified with focused Jest.
 - Runtime impact: source-only changes; generated runtime mirrors were not edited and `spec-first init` was not run.
 
 ---

@@ -54,7 +54,11 @@ class ClaudeAdapter extends PlatformAdapter {
   }
 
   get commandRoot() {
-    return '.claude/commands/spec';
+    return '.claude/commands';
+  }
+
+  commandFilename(command) {
+    return `spec-${command.name}.md`;
   }
 
   get skillsRoot() {
@@ -92,7 +96,10 @@ class ClaudeAdapter extends PlatformAdapter {
   }
 
   transformSkillContent(content, context = {}) {
-    const transformed = rewriteCanonicalAgentNamesForSkills(content);
+    let transformed = rewriteCanonicalAgentNamesForSkills(content);
+    if (isClaudeRuntimeSetupSurface(context)) {
+      transformed = addClaudeSetupHostPin(transformed);
+    }
 
     const runtimeSkillRoot = context.runtimeSkillRoot
       || (context.isWorkflowSkill ? `${this.workflowsRoot}/${context.skillName}` : '');
@@ -193,11 +200,18 @@ class ClaudeAdapter extends PlatformAdapter {
   }
 
   planRuntimeFilesRemoval() {
-    const operations = MANAGED_HOOK_FILES.map((hook) => ({
-      kind: 'remove_file',
-      path: hook.relativePath.replace(/\\/g, '/'),
-      reason: 'managed_runtime_hook',
-    }));
+    const operations = [
+      {
+        kind: 'remove_dir',
+        path: '.claude/commands/spec',
+        reason: 'retired_runtime_command_namespace',
+      },
+      ...MANAGED_HOOK_FILES.map((hook) => ({
+        kind: 'remove_file',
+        path: hook.relativePath.replace(/\\/g, '/'),
+        reason: 'managed_runtime_hook',
+      })),
+    ];
 
     return {
       operations,
@@ -223,6 +237,25 @@ function rewriteCanonicalAgentNamesForSkills(content) {
 
 function rewriteCanonicalAgentNamesForExecution(content) {
   return content;
+}
+
+function isClaudeRuntimeSetupSurface(context = {}) {
+  return context.skillName === 'spec-mcp-setup' || context.commandName === 'mcp-setup';
+}
+
+function addClaudeSetupHostPin(content) {
+  if (content.includes('## Claude Host Pin')) {
+    return content;
+  }
+
+  return content.replace(/## Workflow Modes\n/, [
+    '## Claude Host Pin',
+    '',
+    'When this generated Claude command or workflow Skill invokes `skills/spec-mcp-setup/scripts/*`, set `MCP_SETUP_HOST=claude` in the script environment. Treat `spec-mcp-setup` and `spec-runtime-setup` command entry as authoritative Claude host evidence; do not infer Kiro, Qoder, or Codex from PATH, existing runtime directories, or stale setup facts.',
+    '',
+    '## Workflow Modes',
+    '',
+  ].join('\n'));
 }
 
 function listMarkdownFiles(rootPath) {

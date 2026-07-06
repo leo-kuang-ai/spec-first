@@ -27,7 +27,7 @@ Treat as P2 when evidence shows maintainability or variance risk:
 ## Not Findings By Themselves
 
 - A lightweight read-only skill does not need heavyweight checkpoints.
-- A standalone skill is allowed to be user-facing without a slash command or `$spec-*` alias.
+- A standalone skill is allowed to be user-facing without a `spec-*` workflow alias.
 - A scorecard or keyword hit is only a signal; confirm source evidence and counter-evidence before surfacing.
 - Progressive disclosure drift is an optimization/risk signal unless it causes wrong routing, unsafe writes, or unusable instructions.
 

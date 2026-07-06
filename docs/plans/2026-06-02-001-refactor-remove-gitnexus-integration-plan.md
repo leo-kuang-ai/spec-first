@@ -69,7 +69,7 @@ origin PRD 明确要求“彻底删除 GitNexus，从安装流程、使用流程
 - 不把 ast-grep、browser tooling、Context7、sequential-thinking、shell commands 等非 GitNexus 工具一起删除。
 - 不重写历史事实：历史 PRD/plan/analysis/validation/run artifacts 可保留为 archive，但 active docs/tests/package/workflow 不得把它们当 current contract。
 - 不强删用户全局自管 GitNexus MCP 配置；只删除 spec-first source/runtime/setup 管理的入口，并对本地 retired residue 使用 preview-first cleanup。
-- 不在计划阶段实施代码删除或运行 npm 测试；执行验证属于后续 `$spec-work`。
+- 不在计划阶段实施代码删除或运行 npm 测试；执行验证属于后续 `spec-work`。
 
 ---
 
@@ -78,7 +78,7 @@ origin PRD 明确要求“彻底删除 GitNexus，从安装流程、使用流程
 - `skills/spec-graph-bootstrap/` and `templates/claude/commands/spec/graph-bootstrap.md` do not exist in source, package contents, or regenerated runtime mirrors.
 - `spec-first --help`, `spec-first init`, `spec-first doctor`, `spec-first clean`, startup reminder, and host bootstrap prose do not mention GitNexus, graph-bootstrap, review-pre-facts, or graph readiness as current behavior.
 - `skills/spec-mcp-setup` no longer installs, warms, configures, verifies, projects, or hands off to GitNexus.
-- All active workflow skills named in R-16 have no active dependency on `.spec-first/graph/provider-status.json`, `.spec-first/graph/graph-facts.json`, `.spec-first/impact/bootstrap-impact-capabilities.json`, `.spec-first/workspace/gitnexus-readiness.json`, `Graph / GitNexus Evidence`, `review-pre-facts`, `$spec-graph-bootstrap`, or `/spec:graph-bootstrap`.
+- All active workflow skills named in R-16 have no active dependency on `.spec-first/graph/provider-status.json`, `.spec-first/graph/graph-facts.json`, `.spec-first/impact/bootstrap-impact-capabilities.json`, `.spec-first/workspace/gitnexus-readiness.json`, `Graph / GitNexus Evidence`, `review-pre-facts`, `spec-graph-bootstrap`, or `spec-graph-bootstrap`.
 - Active docs/tests/package/CI/source roots pass the residual allowlist scan.
 - `CHANGELOG.md` contains the user-visible breaking change entry.
 
@@ -204,7 +204,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 **Test scenarios:**
 
 - Happy path: active roots with no GitNexus terms pass.
-- Error path: a synthetic active file containing `$spec-graph-bootstrap` fails the residual guard.
+- Error path: a synthetic active file containing `spec-graph-bootstrap` fails the residual guard.
 - Edge case: origin PRD and this plan are allowed while active docs are not.
 - Edge case: an explicitly archived historical doc passes only when it carries the chosen archive signal and is not linked as current guidance.
 - Error path: a non-archived doc outside the narrow active roots fails if it contains current GitNexus guidance.
@@ -218,7 +218,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 
 ### U2. Remove GitNexus From MCP Setup Registry, Scripts, And Setup Prose
 
-**Goal:** `$spec-mcp-setup` no longer installs, warms, configures, verifies, projects, or hands off to GitNexus.
+**Goal:** `spec-mcp-setup` no longer installs, warms, configures, verifies, projects, or hands off to GitNexus.
 
 **Requirements:** R-01, R-02, R-05, R-09, R-16
 
@@ -244,7 +244,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 - Remove GitNexus package pin, host config entries, native capabilities, mutation boundary, `global_knowledge` role, and license advisory.
 - Stop writing GitNexus-derived setup facts: `graph-providers.json.providers.gitnexus`, `runtime-capabilities.json.gitnexus_capability_discovery`, GitNexus command arrays, GitNexus raw/normalized artifact refs, and graph-bootstrap next actions.
 - Update setup scripts so old `.gitnexus/` or `.spec-first/providers/gitnexus/` paths are classified only as retired residue or cleanup candidates, not current readiness.
-- Remove prose that says setup hands off to `$spec-graph-bootstrap` or Plan-stage live GitNexus probing.
+- Remove prose that says setup hands off to `spec-graph-bootstrap` or Plan-stage live GitNexus probing.
 
 **Execution note:** Characterization-first. Capture current setup output shape from focused tests before editing, then update tests to assert absence rather than preserving old table columns that only existed for graph providers.
 
@@ -288,7 +288,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 **Approach:**
 
 - Remove the entire source directory, including `SKILL.md`, `evals/`, and `scripts/`.
-- Remove the Claude command template so `/spec:graph-bootstrap` is not generated.
+- Remove the Claude command template so `spec-graph-bootstrap` is not generated.
 - Remove generated runtime governance entries that list `spec-graph-bootstrap` as a deliverable source skill.
 - Remove package/test suite entries such as `test:graph-bootstrap` and graph-bootstrap runners.
 - Do not create a replacement `spec-graph` skill, empty command, or provider-neutral bootstrap contract in this increment.
@@ -298,7 +298,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 - Happy path: skill governance no longer expects `spec-graph-bootstrap`.
 - Happy path: command generation source has no `graph-bootstrap.md`.
 - Happy path: package dry-run excludes `skills/spec-graph-bootstrap/` and `templates/claude/commands/spec/graph-bootstrap.md`.
-- Error path: any active workflow or test that references `$spec-graph-bootstrap` fails residual guard.
+- Error path: any active workflow or test that references `spec-graph-bootstrap` fails residual guard.
 
 **Verification:**
 
@@ -429,7 +429,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 **Approach:**
 
 - Replace “GitNexus-first, fallback to direct reads” with “bounded direct source reads, `rg`, ast-grep, git diff, tests/logs, and user evidence”.
-- Delete graph freshness / graph refresh trigger sections that recommend `$spec-graph-bootstrap` or read `.spec-first/graph/*`.
+- Delete graph freshness / graph refresh trigger sections that recommend `spec-graph-bootstrap` or read `.spec-first/graph/*`.
 - Delete `## Graph / GitNexus Evidence` block production/consumption from plan/work/debug/review paths.
 - Remove workspace-gitnexus routing and group-ready hints from `using-spec-first`; parent workspace still requires explicit target repo before writes.
 - Keep source/runtime governance, target repo discipline, reviewer dispatch boundaries, and direct evidence disclosure.
@@ -439,10 +439,10 @@ The replacement context path is not a new provider contract. It is a workflow po
 
 **Test scenarios:**
 
-- Happy path: `$spec-plan` from a PRD with no graph facts records direct-read limitations, not GitNexus evidence.
-- Happy path: `$spec-work` consumes source/test evidence and does not expect a graph evidence block.
-- Happy path: `$spec-debug` hypothesis ledger has no GitNexus-specific root-cause gate.
-- Happy path: `$spec-code-review` and `$spec-doc-review` do not instruct users to run graph-bootstrap before high-risk review.
+- Happy path: `spec-plan` from a PRD with no graph facts records direct-read limitations, not GitNexus evidence.
+- Happy path: `spec-work` consumes source/test evidence and does not expect a graph evidence block.
+- Happy path: `spec-debug` hypothesis ledger has no GitNexus-specific root-cause gate.
+- Happy path: `spec-code-review` and `spec-doc-review` do not instruct users to run graph-bootstrap before high-risk review.
 - Edge case: parent workspace routing still requires explicit write target and does not infer from graph artifacts.
 
 **Verification:**
@@ -539,7 +539,7 @@ The replacement context path is not a new provider contract. It is a workflow po
 **Test scenarios:**
 
 - Happy path: `npm run build` tarball has no GitNexus-only skills/templates/contracts/fixtures.
-- Happy path: unit tests fail if active source reintroduces `$spec-graph-bootstrap`.
+- Happy path: unit tests fail if active source reintroduces `spec-graph-bootstrap`.
 - Happy path: `npm test` no longer tries to run graph-provider e2e.
 - Edge case: `CHANGELOG.md`, origin PRD, and this plan are not rejected by residual tests.
 - Happy path: package manifest and runtime catalog checks include `bin/` and `docs/catalog/runtime-capabilities.md`.

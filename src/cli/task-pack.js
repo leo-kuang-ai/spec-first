@@ -55,8 +55,35 @@ const GENERATED_RUNTIME_MIRROR_PREFIXES = [
   '.claude/',
   '.codex/',
   '.agents/skills/',
+  '.cursor/skills/',
+  '.cursor/spec-first/',
+  '.kiro/skills/',
+  '.kiro/agents/',
+  '.kiro/spec-first/',
+  '.kiro/settings/',
+  '.qoder/commands/spec-',
+  '.qoder/commands/spec/',
+  '.qoder/skills/',
+  '.qoder/agents/',
+  '.qoder/spec-first/',
 ];
-const GENERATED_RUNTIME_MIRROR_ROOTS = new Set(['.claude', '.codex', '.agents/skills']);
+const GENERATED_RUNTIME_MIRROR_ROOTS = new Set([
+  '.claude',
+  '.codex',
+  '.agents/skills',
+  '.cursor/skills',
+  '.cursor/spec-first',
+  '.cursor/mcp.json',
+  '.kiro/skills',
+  '.kiro/agents',
+  '.kiro/spec-first',
+  '.kiro/settings',
+  '.qoder/commands/spec',
+  '.qoder/skills',
+  '.qoder/agents',
+  '.qoder/spec-first',
+  '.qoder/settings.local.json',
+]);
 
 function normalizeNewlines(text) {
   return String(text).replace(/\r\n?/g, '\n');

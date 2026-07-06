@@ -24,7 +24,7 @@ related_plans:
 
 - 用真实产物 `~/xiaobu/hsglobal/docs/brainstorms/20260625-kaz-market-page-requirements.md` 实跑**现有** `check-prd-artifact.js`:报 **28 条 finding**(6× `core_section_missing` 因产物用纯中文标题、18× `requirement_without_acceptance_ref`、`write_mode_undeclared`/`clarification_evidence_undeclared`/`can_enter_spec_plan_undeclared`)。**checker 从不"全绿"**。
 - 该产物 `artifact_kind: prd-requirements` 已声明 → `needsReadinessDeclarations=true`,现有 readiness finding 本就该触发。
-- 真实故障转录:模型写完 PRD + CHANGELOG 后直接自证"标准 PRD 已产出"、提议进 `/spec:plan`,**从未进入 Phase 4、从未运行 checker**。`SKILL.md:209` 当时已要求"PRD 路径存在时先跑 checker",模型跳过了整个 Phase 4。
+- 真实故障转录:模型写完 PRD + CHANGELOG 后直接自证"标准 PRD 已产出"、提议进 `spec-plan`,**从未进入 Phase 4、从未运行 checker**。`SKILL.md:209` 当时已要求"PRD 路径存在时先跑 checker",模型跳过了整个 Phase 4。
 
 ## Completion Evidence (2026-06-25)
 
@@ -49,11 +49,11 @@ Generated runtime mirrors 未手改;source 变更后如需刷新运行时,继续
 **已确认方向(owner 决策:生产端加固为主,只动 spec-prd,不碰 spec-plan)。** 已实现并验证(见 CHANGELOG `2026-06-25 17:06:54`):
 
 1. **checker 本地化 core-section 锚定**(`check-prd-artifact.js`):标题去前导序号后含 canonical 英文 token 即识别(`## Summary(文档概要)` / `## 一、Change Delta 变更` 命中),不误伤 `Non-Functional Requirements`,纯中文无锚点仍报 `core_section_missing`。消除对中文 PRD 的假报噪声,避免闸因噪声被忽略——这是"闸不可信→被跳过"的一半根因。
-2. **Phase 4 调用硬化**(`SKILL.md`):Phase 4 是强制闸;未运行 readiness lens + checker、未在 handoff/closeout 报出 findings 与 readiness outcome 前,禁止声称 PRD 完成或提议 `/spec:plan`;自证 ready = Phase 4 违约。
+2. **Phase 4 调用硬化**(`SKILL.md`):Phase 4 是强制闸;未运行 readiness lens + checker、未在 handoff/closeout 报出 findings 与 readiness outcome 前,禁止声称 PRD 完成或提议 `spec-plan`;自证 ready = Phase 4 违约。
 3. **readiness 收紧 + 模板锚点**(`prd-readiness-lens.md` / `prd-output-template.md`):artifact 存在却无 executed checker result 即非 ready;core section 必须保留英文锚点 token。
 4. 契约测试 + KAZ 形态复现 fixture(`tests/unit/spec-prd-contracts.test.js`)。
 
-**诚实边界**:生产端加固无法确定性杜绝"模型跳过 Phase 4"——唯一不可绕过的强制点是消费端(`/spec:plan` 入口自跑 checker),owner 已知并暂不采纳。
+**诚实边界**:生产端加固无法确定性杜绝"模型跳过 Phase 4"——唯一不可绕过的强制点是消费端(`spec-plan` 入口自跑 checker),owner 已知并暂不采纳。
 
 **Deferred(defense-in-depth,非本轮实现)**:下方原始 U1 的 6 个新 finding(`clarification_trace_absent` 等)、`--inputs` 输入侧探测、Phase 1 Preflight Sweep。它们对"闸已运行"的场景仍有价值,但不解决"闸未运行"的真实根因,故降级待定。下方原始内容保留为历史上下文。
 

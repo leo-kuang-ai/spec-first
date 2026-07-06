@@ -16,8 +16,8 @@
     {
       "name": "document review routes to doc-review",
       "user_intent": "用户给出一个 requirements 或 plan 文档路径，要求审查内容质量。",
-      "expected_posture": "推荐 `$spec-doc-review`，让 doc-review workflow 拥有 persona selection、findings synthesis、授权时的 bounded dispatch 和未授权时的 report-only fallback。",
-      "boundary_note": "不要把文档审查误当成 `$spec-work` 执行，也不要把路由到 `$spec-doc-review` 当作 Codex `spawn_agent` 显式授权。",
+      "expected_posture": "推荐 `spec-doc-review`，让 doc-review workflow 拥有 persona selection、findings synthesis、授权时的 bounded dispatch 和未授权时的 report-only fallback。",
+      "boundary_note": "不要把文档审查误当成 `spec-work` 执行，也不要把路由到 `spec-doc-review` 当作 Codex `spawn_agent` 显式授权。",
       "negative_signal": "直接编辑代码、执行计划，或在未显式授权 subagents / parallel reviewers 时启动 Codex `spawn_agent`。",
       "context_snippets": ["requirements, plan, spec, or markdown document review", "doc-review before implementation"],
       "source_note": "existing prompt clause: Route Map maps requirements/plan markdown review to doc-review",
@@ -26,10 +26,10 @@
     },
     {
       "name": "direct doc-review route is not subagent authorization",
-      "user_intent": "用户输入 `$spec-doc-review` 或 `spec-doc-review` 要求审查文档，但没有要求 subagents、delegated review、parallel agents 或 persona reviewer dispatch。",
+      "user_intent": "用户输入 `spec-doc-review` 要求审查文档，但没有要求 subagents、delegated review、parallel agents 或 persona reviewer dispatch。",
       "expected_posture": "路由到当前 host 的 document-review workflow；在 Codex 中不要调用 `spawn_agent`，让 doc-review 记录 `dispatch_authorization_missing` 并走 single-agent report-only fallback。",
       "boundary_note": "public workflow admission authorizes workflow execution, not host-level subagent tools whose contract requires explicit wording.",
-      "negative_signal": "把 `$spec-doc-review` 入口本身解释成 explicit `spawn_agent` authorization。",
+      "negative_signal": "把 `spec-doc-review` 入口本身解释成 explicit `spawn_agent` authorization。",
       "context_snippets": ["It does not by itself override host-level subagent tool contracts", "explicit dispatch authorization is absent"],
       "source_note": "current Codex tool contract: direct workflow invocation alone is not subagent authorization",
       "id": "direct-doc-review-route-is-not-subagent-authorization",

@@ -43,7 +43,7 @@ spec_id: 2026-06-30-001-readme-adoption-first-redesign
 - F2. 首次试用路径
   - **Trigger:** A2 决定尝试 spec-first。
   - **Actors:** A2
-  - **Steps:** 确认 prerequisites → 复制安装与 doctor 命令 → 运行 `spec-first init` → 重启当前 host → 运行第一个 `$spec-*` 或 `/spec:*` workflow → 看到 repo-local artifact。
+  - **Steps:** 确认 prerequisites → 复制安装与 doctor 命令 → 运行 `spec-first init` → 重启当前 host → 运行第一个 `spec-*` 或 `spec-*` workflow → 看到 repo-local artifact。
   - **Outcome:** A2 从 README 获得一次可复制的 first success path。
   - **Covered by:** R5, R6, R7, R10
 
@@ -105,7 +105,7 @@ spec_id: 2026-06-30-001-readme-adoption-first-redesign
 
 ## Scope Boundaries
 
-- 不在本次需求中直接改 README；本文件只定义 WHAT，实施交给后续 `$spec-plan` / `$spec-work`。
+- 不在本次需求中直接改 README；本文件只定义 WHAT，实施交给后续 `spec-plan` / `spec-work`。
 - 不新增 Roadmap、赞助、社区群、营销落地页或官网改版。
 - 不新增 product capability、workflow entrypoint、CLI 命令或 runtime surface。
 - 不把 generated runtime mirrors 当作 source 修改。

@@ -74,18 +74,14 @@ describe('lint skill entrypoints', () => {
     ]);
   });
 
-  test('allows spec-write-tasks public workflow command aliases', () => {
+  test('allows spec-write-tasks public workflow entrypoint', () => {
     const config = testConfig();
     const governance = testGovernance();
     const rules = buildRules(config, governance);
-    const slashCommand = '/spec:write-tasks';
-    const codexCommand = '$spec-write-tasks';
+    const command = 'spec-write-tasks';
 
     const findings = analyzeContent(
-      [
-        `Route users to \`${slashCommand}\`.`,
-        `Use \`${codexCommand}\`.`,
-      ].join('\n'),
+      `Route users to \`${command}\`.`,
       'fixture.md',
       { config, governance, rules },
     );
@@ -99,7 +95,7 @@ describe('lint skill entrypoints', () => {
     const rules = buildRules(config, governance);
 
     const findings = analyzeContent(
-      'Route implementation work to `/spec:work` on Claude or `$spec-work` on Codex.',
+      'Route implementation work to `spec-work`.',
       'fixture.md',
       { config, governance, rules },
     );

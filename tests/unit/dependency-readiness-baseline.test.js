@@ -38,6 +38,9 @@ const graphifyDependency = externalDependency('graphify');
 const codegraphDependency = externalDependency('codegraph');
 const GRAPHIFY_PACKAGE = graphifyDependency.package;
 const GRAPHIFY_VERSION = graphifyDependency.version;
+const GRAPHIFY_PACKAGE_SPEC = graphifyDependency.ecosystem === 'npm'
+  ? `${GRAPHIFY_PACKAGE}@${GRAPHIFY_VERSION}`
+  : `${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`;
 const CODEGRAPH_PACKAGE = codegraphDependency.package;
 const CODEGRAPH_VERSION = codegraphDependency.version;
 
@@ -277,7 +280,7 @@ describe('dependency readiness baseline contracts', () => {
         usage_owner: 'downstream-skill',
       },
       installation: {
-        strategy: 'uv-tool',
+        strategy: 'npm-global',
         dependency_ref: 'graphify',
       },
       readiness: {
@@ -286,7 +289,8 @@ describe('dependency readiness baseline contracts', () => {
       },
     });
     expect(providerTools.providers[0].safety.risk_flags).toEqual(expect.arrayContaining([
-      'name-bin-mismatch:graphifyy->graphify',
+      'global-npm-install',
+      'package-migration:graphifyy->@sentropic/graphify',
       'single-maintainer-bus-factor',
       'project-runtime-skill-write',
       'git-hook-write',
@@ -401,7 +405,7 @@ describe('dependency readiness baseline contracts', () => {
     const unverifiedGraphify = JSON.parse(unverified.stdout)[0];
     expect(unverifiedGraphify.lifecycle.query_verified).toBe(false);
     expect(unverifiedGraphify.next_actions.join('\n')).toContain('Graphify query probe has not confirmed CLI/artifact usability');
-    expect(unverifiedGraphify.next_actions.join('\n')).toContain('$spec-mcp-setup --only graphify');
+    expect(unverifiedGraphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify');
     expect(unverifiedGraphify.next_actions.join('\n')).toContain('graphify explain');
     expect(unverifiedGraphify.next_actions.join('\n')).not.toContain('recall quality failed');
     expect(unverifiedGraphify.next_actions.join('\n')).not.toContain('is broken');
@@ -557,7 +561,7 @@ exit 0
         artifact_exists: true,
       },
     });
-    expect(codexGraphify.next_actions.join('\n')).toContain('$spec-mcp-setup --only graphify');
+    expect(codexGraphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify');
     expect(codexGraphify.next_actions.join('\n')).toContain('codex');
 
     const claudeResult = spawnSync(process.execPath, [providerRendererPath, '--source', 'helper', '--repo-root', tempDir], {
@@ -565,7 +569,8 @@ exit 0
       encoding: 'utf8',
       env: {
         ...process.env,
-        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        HOME: path.join(tempDir, 'home'),
+        PATH: binDir,
         SPEC_FIRST_PROVIDER_HOST: 'claude',
       },
     });
@@ -615,8 +620,7 @@ exit 0
         artifact_exists: true,
       },
     });
-    expect(graphify.next_actions.join('\n')).toContain('/spec:mcp-setup --only graphify');
-    expect(graphify.next_actions.join('\n')).not.toContain('$spec-mcp-setup --only graphify');
+    expect(graphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify');
   });
 
   test('provider readiness renderer prefers pinned provider-standard Graphify over stale PATH command', () => {
@@ -643,8 +647,8 @@ exit 0
       env: {
         ...process.env,
         HOME: homeDir,
-        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
-        SPEC_FIRST_PROVIDER_ORIGINAL_PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        PATH: binDir,
+        SPEC_FIRST_PROVIDER_ORIGINAL_PATH: binDir,
         SPEC_FIRST_PROVIDER_HOST: 'codex',
       },
     });
@@ -653,8 +657,190 @@ exit 0
     const graphify = JSON.parse(result.stdout)[0];
     expect(graphify.lifecycle.installed).toBe(true);
     expect(graphify.next_actions.join('\n')).toContain(`setup is using ${pinnedGraphify}`);
-    expect(graphify.next_actions.join('\n')).toContain(`Graphify CLI on PATH at ${staleGraphify} does not match pinned ${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`);
+    expect(graphify.next_actions.join('\n')).toContain(`Graphify CLI on PATH at ${staleGraphify} does not match pinned ${GRAPHIFY_PACKAGE_SPEC}`);
     expect(graphify.next_actions.join('\n')).not.toContain('Graphify CLI version does not match pinned');
+  });
+
+  test('provider readiness renderer resolves Unix PATH without login shell mutation', () => {
+    if (process.platform === 'win32') return;
+
+    const source = fs.readFileSync(providerRendererPath, 'utf8');
+    expect(source).toContain("spawnSync('/bin/sh', ['-c',");
+    expect(source).not.toContain("spawnSync('/bin/sh', ['-lc',");
+  });
+
+  test('install-helpers repairs stale Graphify symlink on PATH when pinned npm CLI is available', () => {
+    if (process.platform === 'win32') return;
+
+    const tempDir = makeTempDir();
+    const homeDir = path.join(tempDir, 'home');
+    const binDir = path.join(tempDir, 'bin');
+    const oldToolDir = path.join(tempDir, 'old-tool');
+    const npmPrefix = path.join(tempDir, 'npm-global');
+    const capturePath = path.join(tempDir, 'graphify-args.txt');
+    fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(oldToolDir, { recursive: true });
+    fs.mkdirSync(path.join(npmPrefix, 'bin'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
+
+    for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
+      const commandPath = path.join(binDir, command);
+      fs.writeFileSync(commandPath, '#!/bin/sh\nexit 0\n', 'utf8');
+      fs.chmodSync(commandPath, 0o755);
+    }
+
+    const npmPath = path.join(binDir, 'npm');
+    fs.writeFileSync(npmPath, `#!/bin/sh
+if [ "$1" = "prefix" ] && [ "$2" = "-g" ]; then
+  printf '%s\\n' "${npmPrefix}"
+  exit 0
+fi
+exit 0
+`, 'utf8');
+    fs.chmodSync(npmPath, 0o755);
+
+    const oldGraphifyTarget = path.join(oldToolDir, 'graphify');
+    fs.writeFileSync(oldGraphifyTarget, '#!/bin/sh\nprintf "graphify 0.8.39\\n"\n', 'utf8');
+    fs.chmodSync(oldGraphifyTarget, 0o755);
+    const pathGraphify = path.join(binDir, 'graphify');
+    fs.symlinkSync(oldGraphifyTarget, pathGraphify);
+
+    const pinnedGraphify = path.join(npmPrefix, 'bin', 'graphify');
+    fs.writeFileSync(pinnedGraphify, `#!/bin/sh
+printf '%s\\n' "$*" >> "$GRAPHIFY_CAPTURE"
+if [ "$1" = "--version" ]; then
+  printf 'graphify ${GRAPHIFY_VERSION}\\n'
+  exit 0
+fi
+if [ "$1" = "query" ]; then
+  exit 0
+fi
+if [ "$1" = "hook" ]; then
+  exit 0
+fi
+exit 0
+`, 'utf8');
+    fs.chmodSync(pinnedGraphify, 0o755);
+
+    const result = spawnSync('bash', [installHelpersPath, '--install'], {
+      cwd: tempDir,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        HOME: homeDir,
+        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        GRAPHIFY_CAPTURE: capturePath,
+        SPEC_FIRST_PROVIDER_REPO_ROOT: tempDir,
+        SPEC_FIRST_PROVIDER_GRAPHIFY_CONSENT: 'approved',
+        SPEC_FIRST_PROVIDER_HOST: 'codex',
+        SPEC_FIRST_STAGE_TIMEOUT_SECONDS: '5',
+      },
+    });
+
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout).provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
+      lifecycle: {
+        installed: true,
+        query_verified: true,
+      },
+    });
+    expect(fs.lstatSync(pathGraphify).isSymbolicLink()).toBe(true);
+    expect(fs.readlinkSync(pathGraphify)).toBe(pinnedGraphify);
+    expect(fs.lstatSync(path.join(binDir, 'graphify.old')).isSymbolicLink()).toBe(true);
+    expect(fs.readlinkSync(path.join(binDir, 'graphify.old'))).toBe(oldGraphifyTarget);
+    expect(fs.readFileSync(capturePath, 'utf8')).toContain('query spec-first setup readiness --graph');
+    expect(result.stderr).toContain('repaired stale PATH symlink');
+  });
+
+  test('install-helpers does not overwrite stale non-symlink Graphify command on PATH', () => {
+    if (process.platform === 'win32') return;
+
+    const tempDir = makeTempDir();
+    const homeDir = path.join(tempDir, 'home');
+    const binDir = path.join(tempDir, 'bin');
+    const npmPrefix = path.join(tempDir, 'npm-global');
+    const capturePath = path.join(tempDir, 'graphify-args.txt');
+    fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(path.join(npmPrefix, 'bin'), { recursive: true });
+    fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
+
+    for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
+      const commandPath = path.join(binDir, command);
+      fs.writeFileSync(commandPath, '#!/bin/sh\nexit 0\n', 'utf8');
+      fs.chmodSync(commandPath, 0o755);
+    }
+
+    const npmPath = path.join(binDir, 'npm');
+    fs.writeFileSync(npmPath, `#!/bin/sh
+if [ "$1" = "prefix" ] && [ "$2" = "-g" ]; then
+  printf '%s\\n' "${npmPrefix}"
+  exit 0
+fi
+exit 0
+`, 'utf8');
+    fs.chmodSync(npmPath, 0o755);
+
+    const pathGraphify = path.join(binDir, 'graphify');
+    const staleGraphifyBody = '#!/bin/sh\nprintf "graphify 0.8.39\\n"\n';
+    fs.writeFileSync(pathGraphify, staleGraphifyBody, 'utf8');
+    fs.chmodSync(pathGraphify, 0o755);
+
+    const pinnedGraphify = path.join(npmPrefix, 'bin', 'graphify');
+    fs.writeFileSync(pinnedGraphify, `#!/bin/sh
+printf '%s\\n' "$*" >> "$GRAPHIFY_CAPTURE"
+if [ "$1" = "--version" ]; then
+  printf 'graphify ${GRAPHIFY_VERSION}\\n'
+  exit 0
+fi
+if [ "$1" = "query" ]; then
+  exit 0
+fi
+if [ "$1" = "hook" ]; then
+  exit 0
+fi
+exit 0
+`, 'utf8');
+    fs.chmodSync(pinnedGraphify, 0o755);
+
+    const result = spawnSync('bash', [installHelpersPath, '--install'], {
+      cwd: tempDir,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        HOME: homeDir,
+        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        GRAPHIFY_CAPTURE: capturePath,
+        SPEC_FIRST_PROVIDER_REPO_ROOT: tempDir,
+        SPEC_FIRST_PROVIDER_GRAPHIFY_CONSENT: 'approved',
+        SPEC_FIRST_PROVIDER_HOST: 'codex',
+        SPEC_FIRST_STAGE_TIMEOUT_SECONDS: '5',
+      },
+    });
+
+    expect(result.status).toBe(0);
+    expect(JSON.parse(result.stdout).provider_readiness.find((entry) => entry.provider === 'graphify')).toMatchObject({
+      lifecycle: {
+        installed: true,
+        query_verified: true,
+      },
+    });
+    expect(fs.lstatSync(pathGraphify).isFile()).toBe(true);
+    expect(fs.readFileSync(pathGraphify, 'utf8')).toBe(staleGraphifyBody);
+    expect(fs.existsSync(path.join(binDir, 'graphify.old'))).toBe(false);
+    expect(fs.readFileSync(capturePath, 'utf8')).toContain('query spec-first setup readiness --graph');
+    expect(result.stderr).not.toContain('repaired stale PATH symlink');
   });
 
   test('provider readiness renderer degrades Graphify when hook setup failed', () => {
@@ -716,7 +902,8 @@ exit 0
       encoding: 'utf8',
       env: {
         ...process.env,
-        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        HOME: path.join(tempDir, 'home'),
+        PATH: binDir,
       },
     });
 
@@ -730,7 +917,7 @@ exit 0
         artifact_exists: true,
       },
     });
-    expect(graphify.next_actions.join('\n')).toContain(`${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`);
+    expect(graphify.next_actions.join('\n')).toContain(GRAPHIFY_PACKAGE_SPEC);
   });
 
   test('install-helpers runs native Graphify project skill, graph generation, hook, and query probe', () => {
@@ -920,7 +1107,7 @@ exit 0
       },
     });
     expect(graphify.next_actions.join('\n')).toContain('Graphify query probe has not confirmed CLI/artifact usability');
-    expect(graphify.next_actions.join('\n')).toContain(`does not match pinned ${GRAPHIFY_PACKAGE}==${GRAPHIFY_VERSION}`);
+    expect(graphify.next_actions.join('\n')).toContain(`does not match pinned ${GRAPHIFY_PACKAGE_SPEC}`);
   });
 
   test('install-helpers invokes provider-standard off-PATH Graphify while preserving manual visibility next action', () => {
@@ -1054,7 +1241,7 @@ exit 0
     expect(agents).toContain('reading source first is always valid');
     expect(agents).toContain('Use `query` for broad orientation');
     expect(agents).toContain('scoped candidate subgraph');
-    expect(agents).toContain('$spec-mcp-setup --only graphify');
+    expect(agents).toContain('spec-mcp-setup --only graphify');
     expect(agents).toContain('docs/contracts/project-graph-consumption.md');
     expect(agents).toContain('Ordinary workflows do not refresh project graphs after code changes');
     expect(agents).not.toContain('Use Graphify first only');
@@ -1149,7 +1336,7 @@ exit 0
         hook_status: 'verified',
       },
     });
-    expect(graphify.next_actions.join('\n')).toContain('$spec-mcp-setup --only graphify --refresh');
+    expect(graphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify --refresh');
     expect(graphify.next_actions.join('\n')).toContain('incrementally refresh graphify-out');
     expect(graphify.next_actions.join('\n')).toContain('runs `graphify update .`, no full semantic extraction');
     const agents = fs.readFileSync(path.join(tempDir, 'AGENTS.md'), 'utf8');
@@ -1238,10 +1425,9 @@ exit 0
     expect(claude).toContain('reading source first is always valid');
     expect(claude).toContain('Use `query` for broad orientation');
     expect(claude).toContain('scoped candidate subgraph');
-    expect(claude).toContain('/spec:mcp-setup --only graphify');
+    expect(claude).toContain('spec-mcp-setup --only graphify');
     expect(claude).toContain('docs/contracts/project-graph-consumption.md');
     expect(claude).toContain('Ordinary workflows do not refresh project graphs after code changes');
-    expect(claude).not.toContain('$spec-mcp-setup --only graphify');
     expect(claude).not.toContain('Use Graphify first only');
     expect(claude).not.toContain('first run `graphify query "<question>"`');
     expect(claude).not.toContain('run `"<resolved-graphify>" update .`');
@@ -2233,7 +2419,7 @@ exit 0
           reason_code: 'setup-facts-host-mismatch',
           facts_host: 'claude',
           requested_platforms: ['codex'],
-          next_action: 'Run `$spec-mcp-setup` from codex to refresh host-aligned setup facts.',
+          next_action: 'Run `spec-mcp-setup` from codex to refresh host-aligned setup facts.',
         },
       });
       expect(computeDecisionInputHealth({ projectRoot: tmp, platforms: ['claude'], now })).toMatchObject({
@@ -2290,7 +2476,7 @@ exit 0
         status: 'warn',
         basis: {
           reason_code: 'optional-capability-degraded',
-          next_action: 'Rerun `$spec-mcp-setup` from codex to refresh degraded optional capability facts.',
+          next_action: 'Rerun `spec-mcp-setup` from codex to refresh degraded optional capability facts.',
         },
       });
 
@@ -2312,7 +2498,7 @@ exit 0
               query_verified: false,
               fallback_used: false,
             },
-            next_actions: ['Install the current-host Graphify project skill with `/spec:mcp-setup --only graphify` for claude.'],
+            next_actions: ['Install the current-host Graphify project skill with `spec-mcp-setup --only graphify` for claude.'],
           }),
         ],
       }));
@@ -2320,7 +2506,7 @@ exit 0
         status: 'warn',
         basis: {
           reason_code: 'optional-capability-degraded',
-          next_action: 'Rerun `/spec:mcp-setup` from claude to refresh degraded optional capability facts.',
+          next_action: 'Rerun `spec-mcp-setup` from claude to refresh degraded optional capability facts.',
         },
       });
 
@@ -2719,6 +2905,19 @@ exit 0
     }
   });
 
+  it('verify-tools provider table separates readiness scope from probe verification', () => {
+    const verifyTools = fs.readFileSync(
+      path.join(repoRoot, 'skills/spec-mcp-setup/scripts/verify-tools.sh'),
+      'utf8',
+    );
+    expect(verifyTools).toContain('"readiness_scope"');
+    expect(verifyTools).toContain('"probe_status"');
+    expect(verifyTools).toContain('def provider_readiness_scope:');
+    expect(verifyTools).toContain('def provider_probe_status:');
+    expect(verifyTools).toContain('"index-ready"');
+    expect(verifyTools).toContain('"not-verified"');
+  });
+
   // 回归:install-helpers.sh 的 global-skill 循环必须真实迭代 registry 中的
   // skill 条目。曾因循环漏写 `done < <(helper_registry_skill_ids)` 而从空 stdin
   // 读取、零次执行,导致缺失的 baseline skill(ast-grep-skill)被兜底成 ready,
@@ -2820,7 +3019,7 @@ exit 0
       artifact_root: path.join(tempDir, 'graphify-out'),
       first_generation_display: 'resolved graphify CLI -> verify/install current-host project skill; if graphify-out exists, verify install state and recommend incremental --refresh; otherwise graphify extract .; explicit --refresh runs graphify update . code-only/no-LLM (if provider refuses overwrite and suggests --force, one graphify update . --force repair)',
       auto_refresh_display: 'resolved graphify CLI -> graphify hook install (git repo only; provider-owned post-commit/post-checkout refresh)',
-      command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard $HOME/.local/bin/graphify; off-PATH installs remain usable by setup but are reported as a manual PATH visibility action.',
+      command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard/npm global bin candidates; after npm install/upgrade, a stale PATH symlink may be backed up and repointed to the pinned CLI, while ordinary files stay report-only.',
       instruction_section_display: 'after provider project install, setup normalizes the AGENTS.md/CLAUDE.md ## graphify section to resolved CLI/manual-visibility/direct-source-fallback wording.',
     });
     const codegraph = guidedPlan.provider_selection.find((entry) => entry.provider === 'codegraph');

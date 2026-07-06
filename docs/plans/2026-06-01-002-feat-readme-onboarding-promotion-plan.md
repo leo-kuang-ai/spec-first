@@ -32,7 +32,7 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 - R5. Quickstart 明确按实际宿主选择 `--claude` 或 `--codex`，并保留 Node `>=20`、npm、Git、已安装宿主、shell 位于目标仓库根目录、可用 throwaway repo 等 prerequisites。
 - R6. 保留“第一个 workflow 怎么选”，以 brainstorm 作为默认 first-run 示例，并说明产出 `docs/brainstorms/YYYY-MM-DD-NNN-topic-requirements.md` 后可进入 plan。
 - R7. 全文只保留一处权威端到端 workflow 可视化，外加最多一个极简示例；其他位置引用或局部提及，不再重复完整链路。
-- R8. 多张 workflow 入口表收敛为一张规范表，覆盖 intent、Claude Code `/spec:*`、Codex `$spec-*`、预期产物，且不丢失任何公开 workflow 入口。
+- R8. 多张 workflow 入口表收敛为一张规范表，覆盖 intent、Claude Code `spec-*`、Codex `spec-*`、预期产物，且不丢失任何公开 workflow 入口。
 - R9. 合并 `What You Get` 与 `How It Works` 中对 durable entities、artifact roots 和 runtime shape 的重复描述。
 - R10. `Supported Development Modes` 的完整仓库拓扑从主体前半段下沉；主体只保留 `.spec-first` facts 以所选 Git repo root 为权威的最小约束。
 - R11. `Runtime Reference` 的 graph readiness、provider config、scenario fingerprint、workspace 子仓、init 输出预期和 capability 计数等深层细节下沉；README 只保留首次接入必需的 runtime 摘要和 CLI reference。
@@ -112,7 +112,7 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 
 ### Institutional Learnings
 
-- `docs/solutions/workflow-issues/host-entrypoint-mapping-source-boundary-2026-04-29.md`: host-specific `/spec:*` / `$spec-*` mappings should be centralized in init output, governance contracts, and README's central entry table; ordinary prose should prefer “current host”.
+- `docs/solutions/workflow-issues/host-entrypoint-mapping-source-boundary-2026-04-29.md`: host-specific `spec-*` / `spec-*` mappings should be centralized in init output, governance contracts, and README's central entry table; ordinary prose should prefer “current host”.
 - `docs/solutions/workflow-issues/modify-source-not-artifacts-2026-04-13.md`: generated runtime assets are disposable mirrors; README must preserve source-first and `spec-first init` regeneration boundaries.
 - `docs/solutions/architecture-patterns/workflow-entrypoint-exposure-contract-2026-04-26.md`: workflow entry exposure spans manifest, governance and host adapter boundaries. For this plan, the README must list existing public entries without implying new runtime exposure.
 - `docs/solutions/workflow-issues/workflow-host-instruction-reuse-policy-2026-05-25.md`: host/project instructions are loaded governance context, not ordinary README content. This supports downshifting internal governance details instead of front-loading them.
@@ -236,7 +236,7 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 
 **Approach:**
 - Keep prerequisites explicit and near Quickstart.
-- Separate terminal commands (`npm install -g spec-first`, `spec-first doctor`, `spec-first init --claude|--codex`) from host-session entries (`/spec:brainstorm`, `$spec-brainstorm`).
+- Separate terminal commands (`npm install -g spec-first`, `spec-first doctor`, `spec-first init --claude|--codex`) from host-session entries (`spec-brainstorm`, `spec-brainstorm`).
 - Keep the host choice explicit: users initialize the host they actually use, not both by default.
 - Make the first-run brainstorm output and next step to plan visible without repeating the full workflow chain elsewhere.
 
@@ -245,9 +245,9 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 - `docs/05-用户手册/09-首次工作流走查.md` for first workflow expectations.
 
 **Test scenarios:**
-- Covers AE2. Happy path: Codex-only path shows `spec-first init --codex` as terminal command and `$spec-brainstorm` as host-session entry.
-- Covers AE2. Happy path: Claude-only path shows `spec-first init --claude` as terminal command and `/spec:brainstorm` as host-session entry.
-- Covers AE2. Error path: tests fail if `$spec-*` or `/spec:*` is placed in an unlabelled `bash` block that looks like a shell command.
+- Covers AE2. Happy path: Codex-only path shows `spec-first init --codex` as terminal command and `spec-brainstorm` as host-session entry.
+- Covers AE2. Happy path: Claude-only path shows `spec-first init --claude` as terminal command and `spec-brainstorm` as host-session entry.
+- Covers AE2. Error path: tests fail if `spec-*` or `spec-*` is placed in an unlabelled `bash` block that looks like a shell command.
 - Edge case: tests fail if README implies all users must initialize both hosts.
 
 **Verification:**
@@ -315,7 +315,7 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 **Test scenarios:**
 - Happy path: English and Chinese README section-order assertions pass with mirrored information architecture.
 - Happy path: canonical entry table includes mcp-setup, graph-bootstrap, update, sessions, slack-research, skill-audit, ideate, brainstorm, prd, doc-review, plan, write-tasks, app-consistency-audit, debug, work, optimize, polish-beta, code-review, compound, compound-refresh, and release-notes.
-- Edge case: tests fail if `/spec:*` and `$spec-*` mappings are scattered into multiple full entry tables.
+- Edge case: tests fail if `spec-*` and `spec-*` mappings are scattered into multiple full entry tables.
 - Error path: tests fail if local docs links introduced by downshifting do not exist.
 
 **Verification:**
@@ -355,7 +355,7 @@ origin requirements 指出，当前两份 README 已经具备价值优先、渐�
 ## System-Wide Impact
 
 - **Interaction graph:** README is a public documentation surface consumed by GitHub, npm users, current host users, contributors, and future workflow readers. No runtime code path changes.
-- **Error propagation:** The main risk is documentation-induced user error, especially treating `$spec-*` / `/spec:*` as shell commands or thinking both hosts must be initialized.
+- **Error propagation:** The main risk is documentation-induced user error, especially treating `spec-*` / `spec-*` as shell commands or thinking both hosts must be initialized.
 - **State lifecycle risks:** No persistent data changes. Generated runtime mirrors remain out of scope and should not be edited.
 - **API surface parity:** The canonical workflow table must preserve all current public Claude and Codex entrypoints.
 - **Integration coverage:** README local links, SVG reference, community files, first workflow artifact paths, and bilingual section parity need regression coverage.

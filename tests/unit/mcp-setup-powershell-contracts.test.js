@@ -5,6 +5,7 @@ const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '../..');
 const configureHostPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/configure-host.ps1');
+const detectHostPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/detect-host.ps1');
 const detectToolsPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/detect-tools.ps1');
 const installHelpersPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/install-helpers.ps1');
 const installMcpPs1 = path.join(repoRoot, 'skills/spec-mcp-setup/scripts/install-mcp.ps1');
@@ -41,6 +42,402 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(source).toContain('Set-TextFileAtomic -Path $ConfigPath -Value ($config | ConvertTo-Json -Depth 8)');
     expect(source).toContain('function Test-SelectedConfigConflicts');
     expect(source).toContain('SPEC_FIRST_MCP_CONFIGURE_OVERWRITE');
+    expect(source).toContain("} elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder' -or $DetectedHost -eq 'cursor') {");
+    expect(source).toContain('Assert-NoLiteralSecretValues');
+    expect(source).toContain('$value -is [pscustomobject]');
+    expect(source).toContain("MCP_SETUP_HOST -notin @('claude', 'codex', 'kiro', 'qoder', 'cursor')");
+  });
+
+  test('detect-host recognizes qoder/cursor CLI aliases without silent mixed-host selection', () => {
+    const source = read(detectHostPs1);
+
+    expect(source).toContain("$hasQoderCli = (Test-CommandExists 'qodercli') -or (Test-CommandExists 'qoder')");
+    expect(source).toContain("$hasCursorCli = Test-CommandExists 'agent'");
+    expect(source).toContain('if ($hasQoderCli -and -not $hasClaudeCli -and -not $hasCodexCli -and -not $hasCursorCli)');
+    expect(source).toContain("return 'cursor'");
+    expect(source).toContain("if (Test-CommandExists 'qodercli')");
+    expect(source).toContain("} elseif (Test-CommandExists 'qoder') {");
+    expect(source).toContain("$cliCommand = 'qoder'");
+    expect(source).toContain("$cliCommand = 'agent'");
+  });
+
+  test('kiro host config writes workspace json by default and user json only with opt-in when PowerShell is available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-kiro-'));
+    try {
+      const repo = path.join(tmp, 'repo');
+      const home = path.join(tmp, 'home');
+      fs.mkdirSync(repo, { recursive: true });
+      fs.mkdirSync(home, { recursive: true });
+      fs.writeFileSync(path.join(repo, 'package.json'), '{"name":"fixture"}\n');
+
+      const defaultResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'sequential-thinking'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      if (defaultResult === null) {
+        return;
+      }
+
+      expect(defaultResult.status).toBe(0);
+      const defaultPayload = JSON.parse(defaultResult.stdout);
+      const workspaceConfigPath = path.join(repo, '.kiro/settings/mcp.json');
+      const userConfigPath = path.join(home, '.kiro/settings/mcp.json');
+      expect(defaultPayload.selected_scope).toBe('workspace');
+      expect(fs.existsSync(workspaceConfigPath)).toBe(true);
+      expect(fs.existsSync(userConfigPath)).toBe(false);
+      expect(JSON.parse(read(workspaceConfigPath)).mcpServers['sequential-thinking']).toMatchObject({
+        command: 'npx',
+      });
+
+      const userResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(userResult.status).toBe(0);
+      const userPayload = JSON.parse(userResult.stdout);
+      expect(userPayload.selected_scope).toBe('user');
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const workspaceContext7Result = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(workspaceContext7Result.status).toBe(0);
+
+      const detectResult = spawnPwsh(['-NoProfile', '-File', detectToolsPs1, '-Repo', repo], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(detectResult.status).toBe(0);
+      const detectPayload = JSON.parse(detectResult.stdout);
+      expect(detectPayload.tools['sequential-thinking'].host_config_status).toBe('ready');
+      expect(detectPayload.tools.context7.host_config_status).toBe('ready');
+
+      const uninstallWorkspaceResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(uninstallWorkspaceResult.status).toBe(0);
+      expect(JSON.parse(read(workspaceConfigPath)).mcpServers.context7).toBeUndefined();
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const uninstallWrongEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          QODER_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallWrongEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const uninstallUserResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          HOME: home,
+        },
+      });
+      expect(uninstallUserResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toBeUndefined();
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('kiro literal secret guard walks PSCustomObject graphs', () => {
+    expect(read(configureHostPs1)).toContain('$current -is [pscustomobject]');
+    expect(read(configureHostPs1)).toContain('$property.Name');
+    expect(read(configureHostPs1)).toContain('config contains a literal secret-like value');
+    expect(read(configureHostPs1)).toContain("$DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder' -and $DetectedHost -ne 'cursor'");
+  });
+
+  test('qoder host config writes local json by default and user json only with opt-in when PowerShell is available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-qoder-'));
+    try {
+      const repo = path.join(tmp, 'repo');
+      const home = path.join(tmp, 'home');
+      fs.mkdirSync(repo, { recursive: true });
+      fs.mkdirSync(home, { recursive: true });
+      fs.writeFileSync(path.join(repo, 'package.json'), '{"name":"fixture"}\n');
+
+      const defaultResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'sequential-thinking'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          HOME: home,
+        },
+      });
+      if (defaultResult === null) {
+        return;
+      }
+
+      expect(defaultResult.status).toBe(0);
+      const defaultPayload = JSON.parse(defaultResult.stdout);
+      const localConfigPath = path.join(repo, '.qoder/settings.local.json');
+      const userConfigPath = path.join(home, '.qoder/settings.json');
+      expect(defaultPayload.selected_scope).toBe('local');
+      expect(fs.existsSync(localConfigPath)).toBe(true);
+      expect(fs.existsSync(userConfigPath)).toBe(false);
+      expect(JSON.parse(read(localConfigPath)).mcpServers['sequential-thinking']).toMatchObject({
+        command: 'npx',
+      });
+
+      const userResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          HOME: home,
+        },
+      });
+      expect(userResult.status).toBe(0);
+      const userPayload = JSON.parse(userResult.stdout);
+      expect(userPayload.selected_scope).toBe('user');
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+      expect(JSON.parse(read(localConfigPath)).mcpServers.context7).toBeUndefined();
+
+      const uninstallWrongEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          KIRO_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallWrongEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const uninstallUserEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'qoder',
+          QODER_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallUserEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toBeUndefined();
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('cursor host config writes project json by default and user json only with opt-in when PowerShell is available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-cursor-'));
+    try {
+      const repo = path.join(tmp, 'repo');
+      const home = path.join(tmp, 'home');
+      fs.mkdirSync(repo, { recursive: true });
+      fs.mkdirSync(home, { recursive: true });
+      fs.writeFileSync(path.join(repo, 'package.json'), '{"name":"fixture"}\n');
+
+      const defaultResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'sequential-thinking'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'cursor',
+          HOME: home,
+        },
+      });
+      if (defaultResult === null) {
+        return;
+      }
+
+      expect(defaultResult.status).toBe(0);
+      const defaultPayload = JSON.parse(defaultResult.stdout);
+      const projectConfigPath = path.join(repo, '.cursor/mcp.json');
+      const userConfigPath = path.join(home, '.cursor/mcp.json');
+      expect(defaultPayload.selected_scope).toBe('project');
+      expect(fs.existsSync(projectConfigPath)).toBe(true);
+      expect(fs.existsSync(userConfigPath)).toBe(false);
+      expect(JSON.parse(read(projectConfigPath)).mcpServers['sequential-thinking']).toMatchObject({
+        type: 'stdio',
+        command: 'npx',
+      });
+
+      const userResult = spawnPwsh(['-NoProfile', '-File', configureHostPs1, '-Tool', 'context7', '-UserScope'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'cursor',
+          HOME: home,
+        },
+      });
+      expect(userResult.status).toBe(0);
+      const userPayload = JSON.parse(userResult.stdout);
+      expect(userPayload.selected_scope).toBe('user');
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        type: 'stdio',
+        command: 'npx',
+      });
+      expect(JSON.parse(read(projectConfigPath)).mcpServers.context7).toBeUndefined();
+
+      const uninstallWrongEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'cursor',
+          QODER_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallWrongEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'npx',
+      });
+
+      const uninstallUserEnvResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'cursor',
+          CURSOR_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(uninstallUserEnvResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toBeUndefined();
+
+      fs.writeFileSync(userConfigPath, '{"mcpServers":{"context7":{"type":"stdio","command":"node","args":["user-context7.js"]}}}\n');
+      const preserveUserOwnedResult = spawnPwsh(['-NoProfile', '-File', path.join(repoRoot, 'skills/spec-mcp-setup/scripts/uninstall-mcp.ps1'), '-Tool', 'context7'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'cursor',
+          CURSOR_USER_SCOPE: '1',
+          HOME: home,
+        },
+      });
+      expect(preserveUserOwnedResult.status).toBe(0);
+      expect(JSON.parse(read(userConfigPath)).mcpServers.context7).toMatchObject({
+        command: 'node',
+      });
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('install-mcp redacts secret-like command diagnostics when PowerShell is available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-redaction-'));
+    try {
+      const repo = path.join(tmp, 'repo');
+      const home = path.join(tmp, 'home');
+      const bin = path.join(tmp, 'bin');
+      fs.mkdirSync(repo, { recursive: true });
+      fs.mkdirSync(home, { recursive: true });
+      fs.mkdirSync(bin, { recursive: true });
+      fs.writeFileSync(path.join(repo, 'package.json'), '{"name":"fixture"}\n');
+
+      const fakeNpx = process.platform === 'win32'
+        ? path.join(bin, 'npx.cmd')
+        : path.join(bin, 'npx');
+      const fakeNpxBody = process.platform === 'win32'
+        ? [
+          '@echo off',
+          'echo Authorization: Bearer literal-secret-token 1>&2',
+          'echo API_KEY=literal-api-key PASSWORD=literal-password --token literal-arg-token 1>&2',
+          'echo https://user:literal-url-password@example.com/path?token=literal-query-token 1>&2',
+          'exit /b 42',
+          '',
+        ].join('\r\n')
+        : [
+          '#!/bin/bash',
+          "echo 'Authorization: Bearer literal-secret-token' >&2",
+          "echo 'API_KEY=literal-api-key PASSWORD=literal-password --token literal-arg-token' >&2",
+          "echo 'https://user:literal-url-password@example.com/path?token=literal-query-token' >&2",
+          'exit 42',
+          '',
+        ].join('\n');
+      fs.writeFileSync(fakeNpx, fakeNpxBody);
+      if (process.platform !== 'win32') {
+        fs.chmodSync(fakeNpx, 0o755);
+      }
+
+      const result = spawnPwsh(['-NoProfile', '-File', installMcpPs1, '-Only', 'sequential-thinking'], {
+        cwd: repo,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'cursor',
+          HOME: home,
+          PATH: `${bin}${path.delimiter}${process.env.PATH || ''}`,
+          SPEC_FIRST_STAGE_TIMEOUT_SECONDS: '5',
+        },
+      });
+      if (result === null) {
+        return;
+      }
+
+      expect(result.status).toBe(0);
+      const payload = JSON.parse(result.stdout);
+      const diagnostic = payload.results.find((entry) => entry.tool_id === 'sequential-thinking').diagnostic_summary;
+      expect(diagnostic).toContain('<redacted>');
+      for (const literal of [
+        'literal-secret-token',
+        'literal-api-key',
+        'literal-password',
+        'literal-arg-token',
+        'literal-url-password',
+        'literal-query-token',
+      ]) {
+        expect(diagnostic).not.toContain(literal);
+      }
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
   });
 
   test('setup sources use direct setup facts only', () => {
@@ -61,7 +458,7 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
       }),
       expect.objectContaining({
         id: 'graphify',
-        package: 'graphifyy',
+        package: '@sentropic/graphify',
         version: expect.any(String),
       }),
     ]));
@@ -112,6 +509,55 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
           command: 'codegraph',
           args: ['serve', '--mcp'],
         },
+        kiro: {
+          command: 'codegraph',
+          args: ['serve', '--mcp'],
+          targets: {
+            workspace: {
+              config_path: '.kiro/settings/mcp.json',
+              config_format: 'json',
+            },
+            user: {
+              config_path: '$HOME/.kiro/settings/mcp.json',
+              config_format: 'json',
+              requires_user_scope_opt_in: true,
+            },
+          },
+          fallback_order: ['workspace'],
+        },
+        qoder: {
+          command: 'codegraph',
+          args: ['serve', '--mcp'],
+          targets: {
+            local: {
+              config_path: '.qoder/settings.local.json',
+              config_format: 'json',
+            },
+            user: {
+              config_path: '$HOME/.qoder/settings.json',
+              config_format: 'json',
+              requires_user_scope_opt_in: true,
+            },
+          },
+          fallback_order: ['local'],
+        },
+        cursor: {
+          type: 'stdio',
+          command: 'codegraph',
+          args: ['serve', '--mcp'],
+          targets: {
+            project: {
+              config_path: '.cursor/mcp.json',
+              config_format: 'json',
+            },
+            user: {
+              config_path: '$HOME/.cursor/mcp.json',
+              config_format: 'json',
+              requires_user_scope_opt_in: true,
+            },
+          },
+          fallback_order: ['project'],
+        },
       },
     });
     expect(toolsJson.tools.every((tool) => tool.category === 'mcp')).toBe(true);
@@ -124,6 +570,8 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(combined).toContain("reason_code = 'setup-facts-ready'");
     expect(combined).toContain('tool-facts.json');
     expect(combined).toContain('runtime-capabilities.json');
+    expect(read(detectToolsPs1)).toContain('$ConfigFormat = $HostInfo.config_format');
+    expect(read(detectToolsPs1)).toContain('function Test-JsonHostConfig');
     expect(read(installMcpPs1)).toContain('function Test-OptionalToolAllowed');
     expect(read(installMcpPs1)).toContain('[switch]$Plan');
     expect(read(installMcpPs1)).toContain('[string]$RequirementWorkspace');
@@ -131,11 +579,17 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installMcpPs1)).toContain('setup-plan-renderer.cjs');
     expect(read(installMcpPs1)).toContain("reason_code = 'registry_not_required'");
     expect(read(installMcpPs1)).toContain('optional MCP tools require explicit opt-in metadata');
+    expect(read(installMcpPs1)).toContain('function Redact-Diagnostic');
+    expect(read(installMcpPs1)).toContain('diagnostic_summary = Redact-Diagnostic');
     expect(read(installHelpersPs1)).toContain('[string]$RequirementWorkspace');
     expect(read(installHelpersPs1)).toContain('Resolve-RequirementWorkspace');
     expect(read(installHelpersPs1)).toContain('SPEC_FIRST_PROVIDER_ORIGINAL_PATH');
     expect(read(installHelpersPs1)).toContain('Resolve-GraphifyCli');
     expect(read(installHelpersPs1)).toContain('Resolve-GraphifyCliMatchingPin');
+    expect(read(installHelpersPs1)).toContain('Repair-GraphifyPathSymlinkIfSafe');
+    expect(read(installHelpersPs1)).toContain('SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK');
+    expect(read(installHelpersPs1)).toContain("LinkType -notin @('SymbolicLink', 'Junction')");
+    expect(read(installHelpersPs1)).toContain('New-Item -ItemType SymbolicLink');
     expect(read(installHelpersPs1)).toContain('Invoke-GraphifyCommand');
     expect(read(installHelpersPs1)).toContain('Invoke-GraphifyCommandWithTimeout');
     expect(read(installHelpersPs1)).toContain('Get-GraphifyVersionOutputWithTimeout');
@@ -149,8 +603,8 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).toContain('$mcpToolsJson = Read-McpToolsJson -Path $mcpToolsPath');
     expect(read(installHelpersPs1)).toContain('Assert-McpToolsSchemaVersion -ToolsJson $mcpToolsJson');
     expect(read(installHelpersPs1)).toContain("Get-ExternalDependencyField -DependencyId 'graphify' -Field 'version'");
-    expect(read(installHelpersPs1)).toContain('uv tool install --force "$graphifyPackage==$graphifyVersionPin"');
-    expect(read(installHelpersPs1)).toContain('pipx install --force "$graphifyPackage==$graphifyVersionPin"');
+    expect(read(installHelpersPs1)).toContain('Invoke-NpmGlobalInstallWithOptionalSudo -Packages @("$graphifyPackage@$graphifyVersionPin")');
+    expect(read(installHelpersPs1)).toContain('Get-GraphifyKnownCliCandidates');
     expect(read(installHelpersPs1)).toContain("Invoke-GraphifyCommand @('install', '--project', '--platform', $platformName)");
     expect(read(installHelpersPs1)).toContain("Invoke-GraphifyCommand @('hook', 'install')");
     expect(read(installHelpersPs1)).toContain('Repair-GraphifyHookPathVisibility -RepoRoot $RepoRoot');
@@ -165,6 +619,11 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).toContain("SPEC_FIRST_PROVIDER_GRAPHIFY_QUERY_VERIFIED'))) { return }");
     expect(read(installHelpersPs1)).toContain('if ([string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return }');
     expect(read(installHelpersPs1)).toContain('Ordinary workflows do not refresh project graphs after code changes');
+    expect(read(installHelpersPs1)).toContain("'.kiro/skills/graphify/SKILL.md'");
+    expect(read(installHelpersPs1)).toContain("'.qoder/skills/graphify/SKILL.md'");
+    expect(read(installHelpersPs1)).toContain("@('claude', 'codex', 'kiro', 'qoder')");
+    expect(read(checkHealthPs1)).toContain("'.kiro', 'skills', $SkillName, 'SKILL.md'");
+    expect(read(checkHealthPs1)).toContain("'.qoder', 'skills', $SkillName, 'SKILL.md'");
     for (const token of [
       'Use Graphify as exploration-tier orientation',
       'architecture relationships',
@@ -188,6 +647,8 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).not.toContain('After modifying code, run `"<resolved-graphify>" update .`');
     expect(read(installHelpersPs1)).not.toContain('--no-cluster');
     expect(read(installHelpersPs1)).not.toContain('.spec-first/workspace/providers/graphify/graphify-out');
+    expect(read(installHelpersPs1)).not.toContain('uv tool install --force "$graphifyPackage==$graphifyVersionPin"');
+    expect(read(installHelpersPs1)).not.toContain('pipx install --force "$graphifyPackage==$graphifyVersionPin"');
     expect(read(installHelpersPs1)).not.toContain('uvx --from graphifyy==');
     expect(read(installHelpersPs1)).not.toContain('graphify .');
     expect(read(installMcpPs1)).toContain('codegraph sync');
@@ -207,6 +668,12 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     ]) {
       expect(read(verifyToolsPs1)).toContain(`title = '${section}'`);
     }
+    expect(read(verifyToolsPs1)).toContain("'readiness_scope'");
+    expect(read(verifyToolsPs1)).toContain("'probe_status'");
+    expect(read(verifyToolsPs1)).toContain('function Get-ProviderReadinessScope');
+    expect(read(verifyToolsPs1)).toContain('function Get-ProviderProbeStatus');
+    expect(read(verifyToolsPs1)).toContain("'index-ready'");
+    expect(read(verifyToolsPs1)).toContain("'not-verified'");
   });
 
   test('check-health project URLs come from helper registry source_repo', () => {
@@ -559,6 +1026,35 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
         expect(`${h}|${p}=>${psByKey[`${h}|${p}`]}`).toBe(`${h}|${p}=>${bashCmd}`);
       }
     }
+  });
+
+  // WIN-P1-01 回归:agent-browser 是既有 parity 测试(上方 helpers 数组)显式排除的特例,
+  // 因其 install vs opt-in 语义在各脚本自有分支处理。故其 Windows 展示命令没有被上面的
+  // 共享 display 生成器 parity 覆盖。此处补一条专项守护:
+  //  1) registry 静态 windows 串(经 setup-plan-renderer.cjs 外露为 install_commands_display)
+  //     必须是 PowerShell 5.1 安全写法,不得含 POSIX `CI=true ` 前缀或裸 `&&` 链;
+  //  2) 且必须与 install-helpers.ps1 执行真相源 Get-AgentBrowserInstallCommand 的
+  //     非 --with-deps(macOS/Windows)分支逐字一致,防止 registry↔executor 再次漂移。
+  test('agent-browser windows registry command is PowerShell 5.1 safe and matches the ps1 executor (no drift)', () => {
+    const registry = JSON.parse(read(helperToolsJsonPath));
+    const agentBrowser = registry.helpers.find((h) => h.id === 'agent-browser');
+    expect(agentBrowser).toBeTruthy();
+    const winCmd = agentBrowser.installation.commands.windows;
+
+    // PowerShell 5.1 安全性:无 POSIX env-prefix,无裸 `&&`,须用 $env: 与 $LASTEXITCODE 控制流。
+    expect(winCmd).not.toMatch(/(^|\s)CI=true\s/);
+    expect(winCmd).not.toMatch(/\s&&\s/);
+    expect(winCmd).toContain("$env:CI='true'");
+    expect(winCmd).toContain('if ($LASTEXITCODE -eq 0)');
+
+    // 反漂移:从 install-helpers.ps1 重建 Get-AgentBrowserInstallCommand 的非 with-deps 结果,
+    // 与 registry windows 串比较。ps1 用单引号字符串拼接,'' 转义为单个 '。
+    const ps1 = read(installHelpersPs1);
+    const tmpl = ps1.match(/return '((?:[^']|'')*)' \+ \$browserInstall \+ '((?:[^']|'')*)'/);
+    expect(tmpl).toBeTruthy();
+    const unescape = (s) => s.replace(/''/g, "'");
+    const ps1WindowsCmd = `${unescape(tmpl[1])}agent-browser install${unescape(tmpl[2])}`;
+    expect(winCmd).toBe(ps1WindowsCmd);
   });
 
   // 回归(M1 parity 盲区补充):同时校验「工具缺失」分支的双宿主一致性。

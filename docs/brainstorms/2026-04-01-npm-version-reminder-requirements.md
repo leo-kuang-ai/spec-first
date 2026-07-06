@@ -64,4 +64,4 @@ topic: npm-version-reminder
 
 ## Next Steps
 
-→ `/spec:plan` for structured implementation planning
+→ `spec-plan` for structured implementation planning

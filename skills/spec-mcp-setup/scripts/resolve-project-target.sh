@@ -101,7 +101,7 @@ path_is_within() {
   esac
 }
 
-IGNORE_DIR_NAMES=(.git node_modules vendor .claude .codex .agents .spec-first build .cache .direnv .venv)
+IGNORE_DIR_NAMES=(.git node_modules vendor .claude .codex .kiro .agents .spec-first build .cache .direnv .venv)
 
 is_ignored_dir_name() {
   local name="$1"

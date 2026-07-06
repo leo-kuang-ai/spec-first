@@ -37,9 +37,9 @@
     <rect x="422" y="208" width="160" height="28" rx="14" fill="#e9f2f8"/>
     <text class="chip-text" x="454" y="227">spec-first clean</text>
     <rect x="596" y="208" width="126" height="28" rx="14" fill="#e9f2f8"/>
-    <text class="chip-text" x="629" y="227">/spec:*</text>
+    <text class="chip-text" x="629" y="227">spec-*</text>
     <rect x="736" y="208" width="140" height="28" rx="14" fill="#e9f2f8"/>
-    <text class="chip-text" x="766" y="227">$spec-*</text>
+    <text class="chip-text" x="766" y="227">spec-*</text>
   </g>
 
   <path class="arrow" d="M480 264 L480 300"/>

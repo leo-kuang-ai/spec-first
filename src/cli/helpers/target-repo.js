@@ -7,7 +7,34 @@ const { isExactRepoRelativePath, isSecretDeniedPath } = require('./secret-deny-p
 
 // 冻结:该数组同时作为路径安全校验(validateRepoRelativeField)的 denylist 被多处按引用复用,
 // 冻结可防止下游消费者就地修改而悄悄削弱安全校验。
-const GENERATED_RUNTIME_PREFIXES = Object.freeze(['.claude/', '.codex/', '.agents/skills/']);
+const GENERATED_RUNTIME_PREFIXES = Object.freeze([
+  '.claude/',
+  '.codex/',
+  '.agents/skills/',
+  '.kiro/skills/',
+  '.kiro/agents/',
+  '.kiro/spec-first/',
+  '.kiro/settings/',
+  '.qoder/commands/spec-',
+  '.qoder/commands/spec/',
+  '.qoder/skills/',
+  '.qoder/agents/',
+  '.qoder/spec-first/',
+]);
+const GENERATED_RUNTIME_ROOTS = Object.freeze([
+  '.claude',
+  '.codex',
+  '.agents/skills',
+  '.kiro/skills',
+  '.kiro/agents',
+  '.kiro/spec-first',
+  '.kiro/settings',
+  '.qoder/commands/spec',
+  '.qoder/skills',
+  '.qoder/agents',
+  '.qoder/spec-first',
+  '.qoder/settings.local.json',
+]);
 
 function resolveTargetRepoRoot(targetRepo) {
   if (typeof targetRepo !== 'string' || targetRepo.trim() === '') {
@@ -82,7 +109,10 @@ function validateRepoRelativeField(value, field, errors, options = {}) {
   if (isSecretDeniedPath(normalized)) {
     errors.push(`${field} must not point at secret-denied paths`);
   }
-  if (GENERATED_RUNTIME_PREFIXES.some((prefix) => normalized.startsWith(prefix))) {
+  if (
+    GENERATED_RUNTIME_ROOTS.includes(normalized)
+    || GENERATED_RUNTIME_PREFIXES.some((prefix) => normalized.startsWith(prefix))
+  ) {
     errors.push(`${field} must not point at generated runtime mirrors`);
   }
   if (normalized.startsWith('.spec-first/') && !(options.allowSpecFirstWorkflows && normalized.startsWith('.spec-first/workflows/'))) {

@@ -14,7 +14,7 @@
 
 | | spec-graph-bootstrap | spec-graph-bootstrap |
 |---|---|---|
-| 入口 | `/spec:graph-bootstrap [target]` | `/spec:graph-bootstrap [target]` |
+| 入口 | `spec-graph-bootstrap [target]` | `spec-graph-bootstrap [target]` |
 | 核心工具层 | Serena MCP / Read+Grep+Glob | CRG CLI（Tier 1）→ Serena → Read+Grep+Glob |
 | 分析模式数 | 2（Enhanced / Basic） | 3（Full / Enhanced / Basic） |
 | 产物层 | 人类可读 markdown 文档 | 机器可读 JSON 控制面 + 人类可读文档 |
@@ -37,7 +37,7 @@ spec-graph-bootstrap 是一个 **单层编排器模式**：编排器自身完成
 ### 2.2 ASCII 全链路流程图
 
 ```
-/spec:graph-bootstrap [target-repo-path-or-slug]
+spec-graph-bootstrap [target-repo-path-or-slug]
         │
         ▼
 ┌──────────────────────────────────────────────────────────────────┐
@@ -187,7 +187,7 @@ spec-graph-bootstrap 是 **双层架构**：
 ### 3.2 ASCII 全链路流程图
 
 ```
-/spec:graph-bootstrap [target-repo-path]
+spec-graph-bootstrap [target-repo-path]
         │
         ▼
 ┌──────────────────────────────────────────────────────────────────┐

@@ -19,7 +19,7 @@ note: 本文是对 spec-first 当前仓库的 agent-native architecture audit �
 | Taxonomy 概念 | spec-first 对应物 |
 | --- | --- |
 | Users | 开发者（驱动 Claude/Codex 的人） |
-| Agents | 执行 `/spec:*` / `$spec-*` workflow 的 Claude/Codex（在 loop 中运行） |
+| Agents | 执行 `spec-*` / `spec-*` workflow 的 Claude/Codex（在 loop 中运行） |
 | Primitive tools | CLI（init/doctor/clean/update/tasks/session）+ skill scripts + MCP provider |
 | Prompt-native features | SKILL.md / agent profile / template prose |
 | Shared workspace | git repo + `.spec-first/**` artifacts |
@@ -50,7 +50,7 @@ note: 本文是对 spec-first 当前仓库的 agent-native architecture audit �
 
 | Agent-native 术语 | 本仓库审计映射 |
 | --- | --- |
-| UI/user action | 用户可见 CLI、公开 `$spec-*` / `/spec:*` workflow、README/doctor/help 引导、source docs 中的操作路径 |
+| UI/user action | 用户可见 CLI、公开 `spec-*` / `spec-*` workflow、README/doctor/help 引导、source docs 中的操作路径 |
 | Agent tool | skills、agents、workflow prompts、CLI/scripts、host runtime adapters、MCP/provider readiness |
 | UI integration | source 变更到 host runtime mirror、preview-first 写入、doctor/init/update 提示、workflow 输出反馈 |
 | Shared workspace | 用户与 agent 共同操作的 git worktree、source-of-truth 文件、generated runtime mirror 边界、`.spec-first/**` artifacts |
@@ -182,10 +182,10 @@ note: 本文是对 spec-first 当前仓库的 agent-native architecture audit �
 - **修正后建议（XS）：** **整组删除 4 个文件**（3 脚本 + `tests/integration/e2e.sh`，e2e.sh 唯一用途就是驱动这三个、不测任何当前产品行为）+ 删 `run-test-suite.cjs:100` 那行 + 跑 `npm test` 确认绿 + CHANGELOG 记录（非 user-visible）。删除前需确认当前 integration 覆盖仍由 `verification-gate.integration.test.js` 与 `spec-work-closeout-producer.test.js` 承载；不为 legacy shell path 重造替代 e2e。CLAUDE.md "不删预存死代码除非被要求" 的豁免条件已满足（审查 P3 + 2026-06-10 P1-10 均已点名退役）。
 - **反过度工程：** 不写 "primitive validator 替代品"（无 live workflow 需要这些 primitive）、不建 legacy 归档目录、不加 deprecation header——未发布的内部化石，git history 即恢复网。
 
-### L2 · `/spec:runtime-setup` alias 口径漂移（出现在 3 处）⚠️
+### L2 · `spec-runtime-setup` alias 口径漂移（出现在 3 处）⚠️
 **验证:** Warning（XS，conf 0.95）；**比原报告更严重——是 3 处不是 1 处**
 
-- **深挖回源：** `/spec:runtime-setup` 作为"未来入口"出现在 **3 个 source**：`templates/claude/commands/spec/mcp-setup.md:10`、`skills/spec-mcp-setup/SKILL.md:9`、及其 generated mirror。无 `runtime-setup.md` 命令文件、governance 无 `command_aliases` 实现；`using-spec-first/SKILL.md:230` 路由表只认 `/spec:mcp-setup`。违反项目自有的 "不广告不存在的命令" 规则。alias 实现已在 `2026-06-08-004` 单独 tracked/deferred。
+- **深挖回源：** `spec-runtime-setup` 作为"未来入口"出现在 **3 个 source**：`templates/claude/commands/spec/mcp-setup.md:10`、`skills/spec-mcp-setup/SKILL.md:9`、及其 generated mirror。无 `runtime-setup.md` 命令文件、governance 无 `command_aliases` 实现；`using-spec-first/SKILL.md:230` 路由表只认 `spec-mcp-setup`。违反项目自有的 "不广告不存在的命令" 规则。alias 实现已在 `2026-06-08-004` 单独 tracked/deferred。
 - **修正后建议（XS）：** 把 2 个 source 的 prose 从"recommended future entrypoint"改为明确当前入口 + deferral 注记（指向 tracked plan）；generated mirror 由 `init` 重生，不手改。可选：加 skill-audit 断言扫描"广告未实现命令"的 prose 模式。
 
 ### L3 · ~~update 是 check-only~~ → 修正：前提已 STALE，update 现在真执行升级；真实 drift 只剩 1 行 help text
@@ -259,7 +259,7 @@ Effort 口径：XS≈单文件几行；S≈一个聚焦改动+窄测试；M≈�
 | --- | --- | --- |
 | `index.js:161` help text 改掉过期的 "check-only; never auto-upgrades"（update 现真升级） | L3 | XS |
 | `check-health` build_project_url 改读 registry（bash + ps1 两侧），删 ~12 行硬编码 URL | W5 | XS |
-| L2 两处 source prose 去掉 "未来入口 `/spec:runtime-setup`"，改当前入口 + deferral 注记 | L2 | XS |
+| L2 两处 source prose 去掉 "未来入口 `spec-runtime-setup`"，改当前入口 + deferral 注记 | L2 | XS |
 | 把既有 `plan-status-taxonomy.test.js` 接入 GitHub CI 触发路径（不新增 schema/archive） | W2 | XS |
 | 整组删除 4 个 legacy 文件（review-judge/stage-gate/task-manager.sh + e2e.sh）+ 删 run-test-suite:100 那行；确认当前 Jest integration tests 仍承载现有覆盖 | L1 | XS |
 | `plugin.js` 完整性/copy 遍历加集中 ignore set（`__pycache__`/`.pyc`/`.DS_Store`…），修 `.pyc` 虚假 drift；加 1 单测 | L4(a) | S |
@@ -288,7 +288,7 @@ Effort 口径：XS≈单文件几行；S≈一个聚焦改动+窄测试；M≈�
 | 外部调研 | W1 记录 Anthropic/Hamel 等一手来源与抓取限制 | 部分 provider docs 抓取受限；外部结论只作为 design pressure，不写入 spec-first contract 字段 |
 | 运行验证 | 未运行 state-changing runtime 修复命令；未运行 fresh-source eval | 无完整可重跑审计 run id、token trace、agent transcript；不能据本文声称“43 agents 输出可复验” |
 
-后续 `$spec-plan` / `$spec-work` 消费本文时，应把本 ledger 当作 handoff boundary：先回源确认当前 source，再按第 7 节拆小切片执行，不能把分数或旧 agent 输出当作 confirmed truth。
+后续 `spec-plan` / `spec-work` 消费本文时，应把本 ledger 当作 handoff boundary：先回源确认当前 source，再按第 7 节拆小切片执行，不能把分数或旧 agent 输出当作 confirmed truth。
 
 ### 8.2 直接证据路径
 
@@ -317,4 +317,4 @@ Effort 口径：XS≈单文件几行；S≈一个聚焦改动+窄测试；M≈�
 
 ### 8.4 建议消费方式
 
-本报告可作为后续 `/spec:plan` 或 `/spec:work` 的输入证据，但不应被直接当作实施计划。落地整改建议按第 7 节拆成小切片，每个切片重新回源确认：目标/非目标、source-of-truth 与 generated runtime 边界、script-owned facts 与 LLM-owned judgment 分工、README/docs/CHANGELOG 是否同步、Claude/Codex runtime impact、focused tests 或 doc-contract checks。
+本报告可作为后续 `spec-plan` 或 `spec-work` 的输入证据，但不应被直接当作实施计划。落地整改建议按第 7 节拆成小切片，每个切片重新回源确认：目标/非目标、source-of-truth 与 generated runtime 边界、script-owned facts 与 LLM-owned judgment 分工、README/docs/CHANGELOG 是否同步、Claude/Codex runtime impact、focused tests 或 doc-contract checks。

@@ -214,15 +214,15 @@ playwright
 删除：
 
 ```text
-/spec:mcp-setup [quick|custom]
-$spec-mcp-setup [quick|custom]
+spec-mcp-setup [quick|custom]
+spec-mcp-setup [quick|custom]
 ```
 
 改为固定入口：
 
 ```text
-/spec:mcp-setup
-$spec-mcp-setup
+spec-mcp-setup
+spec-mcp-setup
 ```
 
 不再暴露 quick/custom。
@@ -256,7 +256,7 @@ Graph providers are configured but not query-ready yet.
 
 Next:
 1. Restart Claude Code / Codex if needed.
-2. Run /spec:graph-bootstrap or $spec-graph-bootstrap.
+2. Run spec-graph-bootstrap.
 ```
 
 注意这句必须保留：
@@ -1913,8 +1913,8 @@ argument-hint: ""
 ## 16.3 Entry points
 
 ```md
-**Claude entry point:** `/spec:mcp-setup`  
-**Codex entry point:** `$spec-mcp-setup`
+**Claude entry point:** `spec-mcp-setup`
+**Codex entry point:** `spec-mcp-setup`
 ```
 
 ---
@@ -2312,7 +2312,7 @@ package.json
 
 ```text
 npm run test:unit 不再引用已删除的 tests/unit/mcp-setup.sh
-删除或重写锁定 $spec-mcp-setup [quick|custom] 的 Jest contract
+删除或重写锁定 spec-mcp-setup [quick|custom] 的 Jest contract
 保留新 runtime smoke test
 ```
 
@@ -2449,13 +2449,13 @@ bootstrap 成功后更新 query_ready=true
 执行：
 
 ```text
-/spec:mcp-setup
+spec-mcp-setup
 ```
 
 或：
 
 ```text
-$spec-mcp-setup
+spec-mcp-setup
 ```
 
 必须满足：
@@ -2484,7 +2484,7 @@ $spec-mcp-setup
 21. graph_bootstrap_required=true
 22. git repo 内生成 .spec-first/config/graph-providers.json
 23. 非 git repo 不写 provider config，但 host setup 可成功
-24. 最后提示用户运行 /spec:graph-bootstrap 或 $spec-graph-bootstrap
+24. 最后提示用户运行 spec-graph-bootstrap
 ```
 
 ---

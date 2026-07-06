@@ -65,7 +65,7 @@ origin: 对照 awesome-agent-harness 中 Superpowers(obra/superpowers)注入机�
 **一致性与边界**
 - R6. 扩大后的 block 与 `using-spec-first/SKILL.md` 核心段是**同源派生**关系;必须有机制防止两者 drift(block 内容 = SKILL 核心段的受管派生,而非各自维护的两份副本)。具体 drift 防护机制(同源生成 / 引用 / 测试断言)留待 plan。
 - R7. 扩大后的 block 与 `CLAUDE.md`/`AGENTS.md` 其余既有内容**不得制造多真相源**;主题重叠处需去重,遵循角色契约「不导致多真相源」原则。
-- R8. 双宿主一致:Claude 与 Codex 两端注入的核心决策集内容对齐(各自宿主入口语法 `/spec:*` vs `$spec-*` 差异除外),`spec-first init`/`doctor` 对两宿主同步处理。
+- R8. 双宿主一致:Claude 与 Codex 两端注入的核心决策集内容对齐(各自宿主入口语法 `spec-*` vs `spec-*` 差异除外),`spec-first init`/`doctor` 对两宿主同步处理。
 
 ---
 

@@ -29,7 +29,7 @@ origin_issue: P2-002
 - G3. 让 deterministic validator 接受并校验 `review_gate` 的结构，不判断哪些 task 语义上必须 review。
 - G4. 让 `spec-work` 在消费 validated task-pack 时保留 `review_gate` 和 `review_focus`，并对 `required` gate 给出明确 report-only review 或 handoff 行为。
 - G5. 保持最终 shipping review 机制不退化：task-level gate 是早反馈与 review 聚焦信号，不替代 Phase 3 的 required code review。
-- G6. 保持 `spec-write-tasks` 是 standalone skill，不新增 `$spec-write-tasks` 或 `/spec:write-tasks` 入口。
+- G6. 保持 `spec-write-tasks` 是 standalone skill，不新增 `spec-write-tasks` 入口。
 
 ## 非目标
 
@@ -194,7 +194,7 @@ origin_issue: P2-002
   - `optional`: 非平凡行为改动、中等风险、存在局部 review 价值但可并入最终 shipping review 的 task。
   - absent: docs-only、config-only、trivial copy edit、低风险单文件修正。
 - 明确 `review_focus` 必须具体描述 review 应看的风险；`review_gate` 只表达是否需要 gate。
-- 保留 standalone skill 入口边界，不新增 `$spec-write-tasks` 或 `/spec:write-tasks` 文案。
+- 保留 standalone skill 入口边界，不新增 `spec-write-tasks` 文案。
 
 **Execution note:** 这是 skill prose 语义变更；实现后需要 contract tests，并在可用时按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 做 fresh-source eval。
 
@@ -206,7 +206,7 @@ origin_issue: P2-002
 - Contract: source skill mentions `review_gate` as optional review intent metadata, not lifecycle state。
 - Contract: guide distinguishes `review_gate` from `review_focus`、`test_focus`、`done_signal`、`stop_if`。
 - Contract: guide says validator checks structure only and does not decide which tasks semantically require review。
-- Contract: no new `$spec-write-tasks` / `/spec:write-tasks` command-backed entrypoint wording appears。
+- Contract: no new `spec-write-tasks` command-backed entrypoint wording appears。
 
 **Verification:**
 - `npx jest tests/unit/spec-write-tasks-contracts.test.js --runInBand`
@@ -380,7 +380,7 @@ origin_issue: P2-002
 本计划已完成一轮 `spec-doc-review` 修订。下一步进入：
 
 ```text
-$spec-work docs/plans/2026-05-11-006-feat-task-pack-review-gate-plan.md
+spec-work docs/plans/2026-05-11-006-feat-task-pack-review-gate-plan.md
 ```
 
 ## Sources & References

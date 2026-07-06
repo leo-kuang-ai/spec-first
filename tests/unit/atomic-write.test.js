@@ -43,6 +43,67 @@ describe('atomic file write helper', () => {
     }
   });
 
+  function withPlatform(value, fn) {
+    const descriptor = Object.getOwnPropertyDescriptor(process, 'platform');
+    Object.defineProperty(process, 'platform', { value, configurable: true });
+    try {
+      fn();
+    } finally {
+      Object.defineProperty(process, 'platform', descriptor);
+    }
+  }
+
+  test('retries a transient Windows rename contention before succeeding', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-atomic-retry-'));
+    const filePath = path.join(root, 'CLAUDE.md');
+    const realRename = fs.renameSync;
+    let calls = 0;
+    const renameSpy = jest.spyOn(fs, 'renameSync').mockImplementation((from, to) => {
+      calls += 1;
+      if (calls < 3) {
+        const error = new Error('EPERM: operation not permitted, rename');
+        error.code = 'EPERM';
+        throw error;
+      }
+      return realRename(from, to);
+    });
+
+    try {
+      withPlatform('win32', () => {
+        writeFileAtomic(filePath, 'retried\n');
+      });
+      expect(calls).toBe(3);
+      expect(fs.readFileSync(filePath, 'utf8')).toBe('retried\n');
+      expect(fs.readdirSync(root).filter((name) => name.endsWith('.tmp'))).toEqual([]);
+    } finally {
+      renameSpy.mockRestore();
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  test('does not retry a non-contention rename error and cleans up the temp file', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-atomic-nonretry-'));
+    const filePath = path.join(root, 'CLAUDE.md');
+    let calls = 0;
+    const renameSpy = jest.spyOn(fs, 'renameSync').mockImplementation(() => {
+      calls += 1;
+      const error = new Error('ENOSPC: no space left on device, rename');
+      error.code = 'ENOSPC';
+      throw error;
+    });
+
+    try {
+      withPlatform('win32', () => {
+        expect(() => writeFileAtomic(filePath, 'nope\n')).toThrow(/ENOSPC/);
+      });
+      expect(calls).toBe(1);
+      expect(fs.readdirSync(root).filter((name) => name.endsWith('.tmp'))).toEqual([]);
+    } finally {
+      renameSpy.mockRestore();
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   test('writes once without replacing an existing file', () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-atomic-write-'));
     const filePath = path.join(root, 'nested', 'run.json');

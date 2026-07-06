@@ -57,4 +57,4 @@ LLM workflows may use the artifact as degraded-evidence context when deciding wh
 
 ## Failure Mode
 
-If the artifact is missing, unreadable, or has an unknown `schema_version`, cleanup consumers should ask the user to rerun `$spec-mcp-setup` from the parent workspace. Setup must warn-and-continue if quarantine writing fails, except when the shared workspace summary path itself is rejected as a symlink escape.
+If the artifact is missing, unreadable, or has an unknown `schema_version`, cleanup consumers should ask the user to rerun `spec-mcp-setup` from the parent workspace. Setup must warn-and-continue if quarantine writing fails, except when the shared workspace summary path itself is rejected as a symlink escape.

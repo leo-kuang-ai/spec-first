@@ -106,4 +106,4 @@ v2 的目标是重写 `SKILL.md`，在不向下兼容 v1 的前提下，将 Stag
 
 ## Next Steps
 
-→ `/spec:plan` 进行结构化实施规划
+→ `spec-plan` 进行结构化实施规划

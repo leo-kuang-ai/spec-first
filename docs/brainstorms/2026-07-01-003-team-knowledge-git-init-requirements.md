@@ -3,19 +3,28 @@ date: "2026-07-01"
 topic: team-ai-knowledge-repository
 spec_id: 2026-07-01-003-team-knowledge-git-init
 artifact_kind: prd-requirements
-status: draft
-version: v3-oq-resolved
-write_mode: checkpoint-prd
-can_enter_spec_plan: no
+status: ready-for-planning
+version: v5-progressive-disclosure-handoff
+write_mode: final-prd
+can_enter_spec_plan: yes
 clarification_evidence: asked-owner
-preflight_sweep_closure: degraded
-next_owner_question: "全部 12 条 OQ（CF1–CF12）已在 2026-07-02 逐条修复闭合。无残余 blocker。请运行 producer-local finalize path 签发 ready-for-planning receipt。"
+preflight_sweep_closure: closed
+next_owner_question: "none - 全部 12 条历史 OQ 已闭合，50 轮审查与 Progressive Disclosure 消费合同已落入本文档；可运行 producer-local finalize path 刷新 ready receipt。"
 source_inputs:
-  - docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md
   - docs/contracts/team-standards.md
   - docs/contracts/knowledge/knowledge-harness.md
   - docs/adr/0001-init-owns-limited-user-language-sync.md
+  - docs/adr/0002-init-team-knowledge-network-access.md
   - docs/brainstorms/2026-06-19-001-docs-solutions-recall-activation-layer-requirements.md
+  - docs/brainstorms/2026-06-12-002-context-injection-progressive-disclosure-requirements.md
+  - docs/plans/2026-06-13-001-refactor-context-injection-progressive-disclosure-plan.md
+readiness_verified_by: check-prd-artifact.js
+readiness_verified_at: 2026-07-02T15:35:14.063Z
+readiness_checker_schema: spec-prd-artifact-check.v1
+readiness_finding_count: 12
+readiness_blocking_count: 0
+readiness_prd_hash: sha256:2eb1f3eb4c8ebf4d43d15cba690e3e4649dedd36eb5a5d7df41ec9cbcfe76444
+readiness_inputs_hash: sha256:5ed022532da2da69f6ecf5fd8403defc370322ac7c38a7696fadfcceec423c84
 ---
 
 # Team AI Knowledge Repository 需求
@@ -46,6 +55,18 @@ v1 目标不是建设完整知识平台，也不是让 AI 搜索一堆长文，�
 v1 明确不做自动 pull、不写项目级 `knowledge-lock.json`、不引入 RAG / MCP / 数据库、不执行知识仓库脚本、不自动晋升 shared standard、不把业务流程和项目画像作为默认共享知识加载对象。
 
 `spec-first init` 的价值是显式接入团队知识库；团队知识库的价值是把团队研发经验变成 AI 可安全消费的高信号上下文。
+
+---
+
+<!-- prd:section=change_delta -->
+## Change Delta
+
+| item | current | target | delta | evidence |
+| --- | --- | --- | --- | --- |
+| 团队知识 source-of-truth | 团队经验散落在项目 `docs/solutions/**`、review 结论、debug 记录和个人上下文中 | 团队知识以独立 Git 仓库承载，使用 `catalog.yaml` + `packs/` + `taxonomy/` + `schemas/` canonical layout | 新增团队知识 Git 仓目录规范、pack manifest、experience card schema 和治理生命周期 | 本文 §10–§13；`docs/contracts/knowledge/knowledge-harness.md` |
+| 项目接入方式 | 业务项目没有标准方式显式引用团队共享知识 | 项目只提交 `docs/knowledge/sources.yaml`，本机 checkout 路径只进入用户级 registry | 新增 opt-in init 接入、shared-latest registry、atomic sources write、source snapshot | 本文 §7–§9、§13；`docs/adr/0002-init-team-knowledge-network-access.md` |
+| AI 消费边界 | 历史经验容易被误当 confirmed rule 或被漏召回 | resolver 只返回少量 advisory cards，workflow 必须回源到当前 source/test/log/doc 才能升级结论 | 新增 task profile、included/excluded cards、source snapshot、prompt-injection 防御和 advisory-to-confirmed 门槛 | 本文 §13–§16；`docs/contracts/team-standards.md` |
+| shared standards 范围 | 草稿曾把 adoption / hard enforce 放进 v1，制造 enum 和执行边界张力 | v1 只处理 experience-cards 自动召回；shared standard runtime adoption 整体 defer 到 v2 | 收窄 v1 范围，避免未成熟 hard context 进入 runtime | 本文 §9.2、§11.4、§12、§20、§21 |
 
 ---
 
@@ -116,6 +137,7 @@ v1 的优先级必须是：
 
 ---
 
+<!-- prd:section=scope_boundaries -->
 ## 4. Non-goals
 
 v1 不做以下事情：
@@ -1122,6 +1144,7 @@ v1 成功标准如下：
 
 ---
 
+<!-- prd:section=evidence_assumptions -->
 ## 19. Dependencies / Assumptions
 
 ```text
@@ -1422,25 +1445,104 @@ flowchart TD
 
 ---
 
+## 24. Progressive Disclosure / Planning Consumption Contract
+
+本节是给下游 `$spec-plan` 的消费合同，不是第二份 PRD。本文档仍是团队知识 Git 接入需求的单一 source-of-truth；本节只说明 planner 应如何按风险与实现 slice 展开上下文，避免把 1490+ 行需求一次性当作等权信息广播。
+
+### 24.1 Minimum Handoff Slice
+
+首次进入 planning 时，必须先读取以下最小上下文：
+
+```text
+1. Frontmatter：status / can_enter_spec_plan / source_inputs / readiness hashes。
+2. §1 Summary：确认 v1 是团队知识接入机制，不拥有团队知识内容。
+3. Change Delta：确认本次增量与 source-of-truth / project config / advisory consumption 边界。
+4. §4 Non-goals：防止把 v1 扩成 knowledge platform、RAG、自动 hard context 或项目级 lock。
+5. §6 Key Decisions：确认接入机制、shared-latest、advisory-first、v2 defer 等核心取舍。
+6. §18 Success Criteria：确认规划完成后应证明什么。
+7. §21 Recommended v1 Implementation Slices：确认 Slice 0 是 Slice 1-6 前置 gate。
+8. §24 本节：确认后续分层展开规则。
+```
+
+如果只读上述最小切片仍无法形成 plan skeleton，planner 应记录 coverage limitation，再按 §24.2 展开对应 slice；不得靠记忆或示例 YAML / Mermaid 补齐实现决策。
+
+### 24.2 Triggered Expansion Map
+
+| planning focus | must read | why |
+| --- | --- | --- |
+| Slice 0 验证前提 | §3.1、§21 Slice 0、§18、K5-K13 | 防止在未验证卡片有效性前建设 resolver/init/schema |
+| Slice 1 canonical contract | §10、§11.1、§11.2、K1-K4、R27-R34 | 定义团队知识仓 layout、catalog、manifest 和最小校验 |
+| Slice 2 card templates | §11.3、§11.4、K5-K13、R31-R33 | 定义 experience card / shared standard 草案字段与 v2 边界 |
+| Slice 3 schema / validation | §10、§11、§15、R27-R34、R71-R81 | 把 schema 校验与安全读取边界绑定，不执行知识仓内容 |
+| Slice 4 init 接入 | §7 F1/F2、§8、§9、§15 第16-19条、R1-R26、AE1-AE5 | 处理 opt-in clone、registry、sources.yaml、原子写入和已有配置 |
+| Slice 5 resolver | §13、§15、R35-R44、R71-R81、AE6-AE8、§23.3-23.5 | 定义 resolver 输入输出、source snapshot、降级 reason_code 和安全边界 |
+| Slice 6 workflow 接入 | §14、R45-R55、AE6-AE11、§23.4-23.5 | 定义 `$spec-plan` / `$spec-work` / `$spec-code-review` / `$spec-debug` 如何消费 advisory cards |
+| v2 adoption / shared standards | §9.2、§11.4、§12、§20、§21 Slice 7、AE12-AE14 | 确认 v1 只预留，不实现 adoption 或 runtime hard enforce |
+| 审计 / 可复现性 | §13.3、§19、R43-R44、AE7 | 确认 source snapshot 只证明本地 checkout HEAD，不证明远端最新 |
+| 安全与 prompt-injection | §15、R71-R81、K13、AE8 | 确认卡片正文是 untrusted advisory data，不能覆盖 host / project evidence |
+
+### 24.3 Do Not Treat Examples As Implementation Source
+
+本文中的 JSON、YAML 和 Mermaid 块只承担三类作用：
+
+```text
+1. contract shape example：帮助 planner 识别字段族和产物方向。
+2. navigation aid：帮助 reviewer / planner 理解 flow。
+3. acceptance illustration：帮助测试用例覆盖用户可观察行为。
+```
+
+它们不是完整实现规格。任何 implementation unit、schema 字段、CLI 参数或测试断言，都必须回链到对应 K/R/AE 条目、Key Decision、Security Boundary 或 Deferred to Planning 条目；不能只引用示例块。
+
+### 24.4 Non-Deferrable Mainline Constraints
+
+Progressive Disclosure 不允许下沉或跳过以下主线约束：
+
+```text
+1. source-of-truth：团队知识正文在团队 Git 仓，项目只提交 sources.yaml。
+2. generated runtime：不得手改 .claude/、.codex/、.agents/skills/ 作为实现方式。
+3. advisory-first：cards 只能作为风险提醒、checklist、hypothesis 或验证建议。
+4. confirmed gate：plan/work/review/debug 的 confirmed 结论必须回当前项目 source/test/log/doc 或人工确认。
+5. scope shaping gate：advisory card 提升为 implementation unit 或测试场景时，必须标注 derived-from-advisory-card 并引用当前项目证据。
+6. security boundary：不执行知识仓脚本、hook、二进制；卡片正文作为 untrusted advisory data 注入。
+7. source snapshot：resolved_commit 只表示本机 checkout 当前 HEAD，不是 remote freshness proof 或 project lock。
+8. Slice 0：先验证卡片对 workflow 输出有可观察改善，再推进 Slice 1-6。
+```
+
+### 24.5 Coverage Reporting Requirement
+
+下游 plan 应在 Direct Evidence 或 Coverage 中记录：
+
+```text
+1. 已读取的 minimum handoff slice。
+2. 按 §24.2 展开的 slice-specific sections。
+3. 明确未读取的 sections 及原因。
+4. 是否把任何示例块转成实现输入；如果有，必须记录对应 K/R/AE anchor。
+5. 是否存在 source snapshot、advisory trust、security boundary 或 v2 defer 的 residual risk。
+```
+
+如果 planning 因上下文预算只消费局部章节，必须把未读部分标为 limitation；不得声称已完成 full PRD coverage。
+
+---
+
 <!-- prd:section=outstanding_questions -->
 ## Outstanding Questions
 
-以下 12 条来自 `spec-doc-review` 多角色深度审查（coherence / feasibility / product-lens / security-lens / scope-guardian / adversarial，2026-07-02），经综合去重与跨角色一致性提升后 defer 到 planning。它们**不新增 WHAT**，只把已识别的 planning-前决策项/缺口结构化记录；§1–§22 需求正文实质未改动。本 artifact 因此从不实的 `ready-for-planning` 降级为 `checkpoint-prd`（`can_enter_spec_plan: no`）：存在 2 个 P0 对账未闭合。`closure_disposition` 留空表示尚无合法闭合依据，须由 owner/planning 决策后回填。
+以下 12 条来自 `spec-doc-review` 多角色深度审查（coherence / feasibility / product-lens / security-lens / scope-guardian / adversarial，2026-07-02）。它们已作为历史审查闭合记录保留在本节，便于 planning 与后续 review 追踪为什么 v1 收窄为 team Git experience cards + advisory resolver，而不是 knowledge platform、RAG、自动标准注入或项目级 lock。所有条目当前均已闭合，`blocks_planning=no` 表示 planning 可消费本文档而不需要发明 WHAT；后续 implementation 仍需按 §21 Slice 0 先验证卡片对 workflow 输出的实际改善。
 
 | id | question | prd_write_target | blocks_planning | closure_disposition | planning_would_invent_what | closure_state | recommended_default |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| OQ-CF1 | §9.2/§11.4/§12：`adoptions.yaml` 与 `docs/contracts/team-standards.md` 词表/surface 冲突（`trust: confirmed_after_adoption`、`enforcement: hard`、`severity: must` 均不在 canonical enum）。 | §9.2 §11.4 §12 | yes | CF4 联动消解：§9.2 整节 defer 到 v2；§11.4 改为 v2 design preview（`trust: confirmed`，`priority: P0-blocking`）；§12 shared standards 行标注 v2 预留；R32/R34/R62-R68/K9 移到 Deferred。 | yes | **closed** | 映射到既有 enum 或 defer adoption 子系统——已选择 defer。 |
-| OQ-CF2 | §13/R55/Slice5：新 Knowledge Intake Resolver 未与既有 `spec-learnings-researcher`、`2026-06-19-001` defer 决策对账；R55「统一 resolver」与 spec-debug 直接扫 frontmatter 冲突。 | §13 R55 Slice5 | yes | §13 开头增加范围限定：resolver 只处理 team knowledge Git 仓库（`type: git`），不替代 spec-learnings-researcher；R55 限定为「团队知识 Git 仓库」；§14 补充两路并行召回说明。 | yes | **closed** | resolver 限定到 team Git 仓，项目 docs/solutions/ 召回走现有机制。 |
-| OQ-CF3 | §7 F1/R7-R14/Slice4：init 联网 clone + user-global registry 未 discharge ADR 0001（init 今天零网络）。 | §7 R7 Slice4 | yes | 新建 `docs/adr/0002-init-team-knowledge-network-access.md`，显式扩展 ADR 0001 授权 opt-in 联网 clone 和 registry 写入；§7F1 引用 ADR 0002；§19 Dependencies 补充第10条。 | yes | **closed** | 方案A（discharge ADR）——已执行。 |
-| OQ-CF4 | §9.2/§11.4/§12/Slice7/R32·R34·R62-R68/K9：adoption 子系统 v1 建而不用。 | Slice7 §12 | yes | §9.2 整节替换为 v2 defer 说明；§11.4 标注为 v2 design preview；§12 表格 shared standards 行改为 v2 预留；R32/R34/R62-R68/K9 移到 §20 Deferred to v2；AE12 简化；Slice7 改为 v2 defer 说明。CF1 enum 冲突大部分随之消解。 | no | **closed** | 整体移 v2——已执行。 |
-| OQ-CF5 | §14/R49/R39：advisory 卡无门控即塑造 scope（R49 允许 plan 把卡转成实现单元/测试场景，回源门 R39 只管结论不管中间 scope 步）。 | §16(K/R) §14 | yes | R49 补充：被提升为 implementation unit/测试场景时必须标注 `derived-from-advisory-card: <card-id>` 并引用当前项目证据；K13 补充：不得仅凭 advisory card 扩展 scope。 | yes | **closed** | 新增 derived-from 标记要求——已执行。 |
-| OQ-CF6 | §15/K13/F4：经验卡 prompt-injection 未纳入安全边界。 | §15 K13 | yes | §15 Security Boundary 新增第12–15条 prompt-injection 防御边界：untrusted data fenced 注入、不覆盖项目证据优先级、不自动晋升 confirmed、含指令式文本时 resolver 降级并标注 injection-risk。 | no | **closed** | §15 增加 prompt-injection data boundary——已执行。 |
-| OQ-CF7 | §7 F1/R2/R7/§19：clone 传输/host 校验未指定。 | §7 §19 | yes | §15 新增第16–19条：只接受 https/ssh，拒绝 git://、http://、file://，保持 TLS/known-hosts 校验，clone 前展示远端 host 供用户确认；§7F1 步骤2–3拆出协议校验和用户确认步骤。 | no | **closed** | 只接受 https/ssh，clone 前用户确认——已执行。 |
-| OQ-CF8 | §9.2/§16 R62/AE12：`enforcement: hard` 是永不执行的陷阱字段。 | §9.2 R62 | no | CF4 联动消解：§9.2 整节 defer 到 v2，`enforcement: hard` 字段随 adoption 子系统一并移除。 | no | **closed** | CF4 联动消解——已执行。 |
-| OQ-CF9 | §13.3/Decision15：shared-latest 无 lock 破坏 review/debug 可复现性。 | §13.3 §19 | no | §13.3 新增「可复现性提示」段落：workflow 输出报告时注明知识输入版本，审计敏感场景建议在 sources.yaml 中用 ref 钉到具体 tag/commit。 | no | **closed** | review/debug 输出提示知识输入可能已变——已执行。 |
-| OQ-CF10 | §13.1/R42：任务画像推断字段无透明度，错画像静默丢最相关卡。 | §13.1 R42 | no | §13.1 field 说明补充「推断时需记录推断来源」提示；R42 扩展：excluded_context reason_code 区分 `excluded_by_explicit_field` 与 `excluded_by_inferred_field`，高 severity/高匹配卡仅因推断字段被排除时必须浮出。 | no | **closed** | 区分显式/推断排除 reason_code——已执行。 |
-| OQ-CF11 | §3/§5：v1 押在未验证的 authoring/governance 采纳前提。 | §3 §5 | yes | §21 新增 Slice 0「验证前提」：先从真实 docs/solutions/ 历史提炼 5–10 张样本卡、手动跑一个 workflow 验证输出改善，作为 Slice 1–7 的前置 gate；§18 Success Criteria 隐含此前置。 | no | **closed** | 转化为 Slice 0 验证前提——已执行。 |
-| OQ-CF12 | §1/§6 Decision1/§22：「核心产品」定位与 harness charter 张力。 | §1 §22 | yes | §6 Decision1 改为「团队知识接入机制是核心产品，团队知识库是被服务但不拥有的内容」；§22 Final Positioning 末句补充「spec-first 只交付接入机制，不拥有内容」。 | no | **closed** | 重述为「机制是核心产品」——已执行。 |
+| OQ-CF1 | §9.2/§11.4/§12：`adoptions.yaml` 与 `docs/contracts/team-standards.md` 词表/surface 冲突（`trust: confirmed_after_adoption`、`enforcement: hard`、`severity: must` 均不在 canonical enum）。 | §9.2 §11.4 §12 | no | source-resolved | no | closed | docs/contracts/team-standards.md canonical enum + docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §9.2/§11.4/§12/§20：adoption 子系统整体 defer 到 v2。 |
+| OQ-CF2 | §13/R55/Slice5：新 Knowledge Intake Resolver 未与既有 `spec-learnings-researcher`、`2026-06-19-001` defer 决策对账；R55「统一 resolver」与 spec-debug 直接扫 frontmatter 冲突。 | §13 R55 Slice5 | no | source-resolved | no | closed | docs/brainstorms/2026-06-19-001-docs-solutions-recall-activation-layer-requirements.md + docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §13/§14/R55：resolver 只处理 team knowledge Git 仓库。 |
+| OQ-CF3 | §7 F1/R7-R14/Slice4：init 联网 clone + user-global registry 未 discharge ADR 0001（init 今天零网络）。 | §7 R7 Slice4 | no | source-resolved | no | closed | docs/adr/0002-init-team-knowledge-network-access.md + docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §7/§19：opt-in clone 和 registry 写入已有 ADR 授权。 |
+| OQ-CF4 | §9.2/§11.4/§12/Slice7/R32·R34·R62-R68/K9：adoption 子系统 v1 建而不用。 | Slice7 §12 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §9.2/§11.4/§12/§20/§21：adoption 子系统整体 defer 到 v2，v1 不实现。 |
+| OQ-CF5 | §14/R49/R39：advisory 卡无门控即塑造 scope（R49 允许 plan 把卡转成实现单元/测试场景，回源门 R39 只管结论不管中间 scope 步）。 | §16(K13/R49) §14 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md K13/R49：advisory card 提升为 implementation unit 或测试场景时必须标注 `derived-from-advisory-card` 并引用当前项目证据。 |
+| OQ-CF6 | §15/K13/F4：经验卡 prompt-injection 未纳入安全边界。 | §15 K13 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §15 第12–15条：经验卡/标准正文作为 untrusted advisory data 隔离注入，含越权指令时降级为 injection-risk。 |
+| OQ-CF7 | §7 F1/R2/R7/§19：clone 传输/host 校验未指定。 | §7 §15 §19 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §7 F1 与 §15 第16–19条：只接受 https/ssh，拒绝 git://、http://、file://，clone 前展示远端 host 并要求确认。 |
+| OQ-CF8 | §9.2/§16 R62/AE12：`enforcement: hard` 是永不执行的陷阱字段。 | §9.2 R62 AE12 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §9.2/§20/AE12：`enforcement: hard` 随 adoption 子系统移出 v1。 |
+| OQ-CF9 | §13.3/Decision15：shared-latest 无 lock 破坏 review/debug 可复现性。 | §13.3 §19 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §13.3：source snapshot 只证明本地 HEAD；审计敏感场景可用 tag/commit ref，报告需注明知识输入可能变化。 |
+| OQ-CF10 | §13.1/R42：任务画像推断字段无透明度，错画像静默丢最相关卡。 | §13.1 R42 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §13.1/R42：推断字段需记录来源，excluded_context 区分 `excluded_by_explicit_field` 与 `excluded_by_inferred_field`。 |
+| OQ-CF11 | §3/§5：v1 押在未验证的 authoring/governance 采纳前提。 | §21 Slice 0 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §21 Slice 0：先从真实 docs/solutions 历史提炼 5–10 张样本卡并验证至少 3 张产生可观察改善，再推进 Slice 1–7。 |
+| OQ-CF12 | §1/§6 Decision1/§22：「核心产品」定位与 harness charter 张力。 | §1 §6 §22 | no | source-resolved | no | closed | docs/brainstorms/2026-07-01-003-team-knowledge-git-init-requirements.md §6 Decision1 与 §22：spec-first 交付团队知识接入机制，不拥有团队知识内容。 |
 
 ---
 
@@ -1465,9 +1567,9 @@ flowchart TD
 ## Readiness Self-Check
 
 - decision_card_highest_risk_gap: 全部 12 条 OQ（CF1–CF12）已在 2026-07-02 逐条修复闭合。原 P0 对账（CF1 enum 冲突、CF2 resolver 未对账）通过 CF4 defer + CF2 范围限定消解；CF3 通过新建 ADR 0002 discharge；CF5–CF7 通过需求文本补充；CF9–CF12 通过文本对齐。无残余 blocker。
-- decision_card_next_action: 已完成所有 OQ 修复，建议通过 `spec-first` producer-local finalize path 验证 Readiness Gate，由机器签发 `ready-for-planning` receipt 后进入 planning。
+- decision_card_next_action: final-prd
 - decision_card_why_no_invention: 本轮修复仅调整需求文本措辞、defer 子系统、补充边界条款和增加 ADR；未新增产品 WHAT、未发明需求、未修改核心 flow 或 actor 职责。planning 阶段消费本文档决策而不会被迫发明 WHAT。
-- preflight_sweep_closure: degraded —— 本轮修复基于直接读取 team-standards.md / ADR 0001 / knowledge-harness.md / 2026-06-19-001 进行核实；未重跑完整 Requirement Analysis Gate。evidence 仍按 doc-review 阶段读取的 source 证据对账。
+- preflight_sweep_closure: closed
 - clarification_evidence: asked-owner —— 12 条 OQ 的修复方案在当前 session 中经 owner 指令（「按推荐逐个修复」）逐条授权执行；Owner Decision Trace 见下节。
-- readiness_outcome: oq-resolved —— 全部 OQ 闭合，prd 文本已按决策修改；须由 producer-local finalize path 签发 ready receipt，`can_enter_spec_plan` 字段由机器写入。
-- can_enter_spec_plan: no
+- readiness_outcome: ready-for-planning
+- can_enter_spec_plan: yes

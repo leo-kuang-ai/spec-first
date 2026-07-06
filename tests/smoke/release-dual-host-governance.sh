@@ -9,7 +9,10 @@ TMP_PREFIX="$TMP_ROOT/prefix"
 TMP_CACHE="$TMP_ROOT/cache"
 TARBALL_DIR="$TMP_ROOT/tarball"
 CODEX_PROJECT="$TMP_ROOT/codex-project"
+CURSOR_PROJECT="$TMP_ROOT/cursor-project"
 CLAUDE_PROJECT="$TMP_ROOT/claude-project"
+KIRO_PROJECT="$TMP_ROOT/kiro-project"
+QODER_PROJECT="$TMP_ROOT/qoder-project"
 PACKAGE_VERSION="$(node -p "require(process.argv[1]).version" "$REPO_ROOT/package.json")"
 
 cleanup() {
@@ -31,6 +34,8 @@ echo "   tarball: $TARBALL_PATH"
 echo "2. 校验 tarball 包含 runtime governance assets..."
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/contracts/dual-host-governance/skills-governance.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/contracts/dual-host-governance/skills-governance.schema.json$'
+tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/adapters/kiro.js$'
+tar -tf "$TARBALL_PATH" | grep -q '^package/src/cli/adapters/qoder.js$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/docs/contracts/verifiers/verification-evidence.schema.json$'
 tar -tf "$TARBALL_PATH" | grep -q '^package/scripts/typecheck-js.js$'
 if tar -tf "$TARBALL_PATH" | grep -q '^package/docs/contracts/dual-host-governance/skills-governance.json$'; then
@@ -105,7 +110,7 @@ mkdir -p "$CODEX_PROJECT"
 codex_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CODEX_PROJECT" codex test en 2>&1
 )"
-grep -q '\$spec-\* skills' <<<"$codex_init_output"
+grep -q 'skill directory(ies) in .agents/skills' <<<"$codex_init_output"
 test ! -e "$CODEX_PROJECT/.codex/commands/spec"
 test -f "$CODEX_PROJECT/.agents/skills/spec-work/SKILL.md"
 test ! -e "$CODEX_PROJECT/.agents/skills/spec-"standards"/SKILL.md"
@@ -161,14 +166,179 @@ test ! -e "$CODEX_PROJECT/.codex/hooks/session-start.cmd"
 test ! -e "$CODEX_PROJECT/.codex/hooks.json"
 echo "   ✓ Codex 安装态闭环通过"
 
-echo "5. 验证 Claude 安装态 init / doctor..."
+echo "5. 验证 Cursor 安装态 init / doctor / clean..."
+mkdir -p "$CURSOR_PROJECT"
+cursor_init_output="$(
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CURSOR_PROJECT" cursor test en 2>&1
+)"
+grep -q 'skill directory(ies) in .cursor/skills' <<<"$cursor_init_output"
+grep -q 'Cursor support is generated-runtime preview' <<<"$cursor_init_output"
+test -f "$CURSOR_PROJECT/.cursor/skills/spec-work/SKILL.md"
+test -f "$CURSOR_PROJECT/.cursor/skills/spec-mcp-setup/SKILL.md"
+test -f "$CURSOR_PROJECT/.cursor/skills/using-spec-first/SKILL.md"
+test -f "$CURSOR_PROJECT/.cursor/spec-first/state.json"
+test ! -e "$CURSOR_PROJECT/.cursor/commands"
+test ! -e "$CURSOR_PROJECT/.cursor/agents"
+test ! -e "$CURSOR_PROJECT/.cursor/rules"
+
+cursor_doctor_output="$(
+  cd "$CURSOR_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --cursor 2>&1
+)"
+grep -q '.cursor/skills' <<<"$cursor_doctor_output"
+grep -q '.cursor/spec-first/state.json' <<<"$cursor_doctor_output"
+grep -q 'Cursor generated-runtime preview' <<<"$cursor_doctor_output"
+cursor_doctor_json="$(
+  cd "$CURSOR_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --cursor --json 2>&1
+)"
+node - "$cursor_doctor_json" <<'NODE'
+const payload = JSON.parse(process.argv[2]);
+if (!payload.platforms.includes('cursor')) throw new Error('missing cursor platform');
+const checks = payload.platform_checks?.cursor || [];
+if (!checks.some((entry) => entry.name === 'Cursor generated-runtime preview')) {
+  throw new Error('missing Cursor preview evidence');
+}
+if (!checks.some((entry) => entry.name === '.cursor/skills/spec-work/SKILL.md')) {
+  throw new Error('missing Cursor spec-work skill evidence');
+}
+NODE
+echo "   ! Cursor loader smoke degraded: cursor_loader_validation_unavailable"
+mkdir -p "$CURSOR_PROJECT/.cursor/rules" "$CURSOR_PROJECT/.cursor/agents"
+printf '# Native Cursor rule\n' > "$CURSOR_PROJECT/.cursor/rules/product.mdc"
+printf '{"custom":true}\n' > "$CURSOR_PROJECT/.cursor/mcp.json"
+cursor_clean_dry="$(
+  cd "$CURSOR_PROJECT"
+  "$SHIM" clean --cursor --dry-run 2>&1
+)"
+grep -q '.cursor/skills/spec-work' <<<"$cursor_clean_dry"
+grep -q '.cursor/spec-first/state.json' <<<"$cursor_clean_dry"
+if grep -q '.cursor/agents' <<<"$cursor_clean_dry"; then
+  echo "✗ Cursor clean dry-run 不应删除用户自有 .cursor/agents"
+  exit 1
+fi
+if grep -q '.cursor/rules' <<<"$cursor_clean_dry"; then
+  echo "✗ Cursor clean dry-run 不应删除用户自有 .cursor/rules"
+  exit 1
+fi
+if grep -q '.cursor/mcp.json' <<<"$cursor_clean_dry"; then
+  echo "✗ Cursor clean dry-run 不应删除用户自有 .cursor/mcp.json"
+  exit 1
+fi
+(
+  cd "$CURSOR_PROJECT"
+  "$SHIM" clean --cursor >/dev/null
+)
+test ! -e "$CURSOR_PROJECT/.cursor/skills"
+test ! -e "$CURSOR_PROJECT/.cursor/spec-first"
+test -f "$CURSOR_PROJECT/.cursor/rules/product.mdc"
+test -d "$CURSOR_PROJECT/.cursor/agents"
+test -f "$CURSOR_PROJECT/.cursor/mcp.json"
+echo "   ✓ Cursor 安装态 generated-runtime preview 闭环通过"
+
+echo "6. 验证 Kiro 安装态 init / doctor / clean..."
+mkdir -p "$KIRO_PROJECT"
+kiro_init_output="$(
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$KIRO_PROJECT" kiro test en 2>&1
+)"
+grep -q 'skill directory(ies) in .kiro/skills' <<<"$kiro_init_output"
+grep -q 'agent file(s) in .kiro/agents' <<<"$kiro_init_output"
+test -f "$KIRO_PROJECT/.kiro/skills/spec-work/SKILL.md"
+test -f "$KIRO_PROJECT/.kiro/skills/spec-mcp-setup/SKILL.md"
+test -f "$KIRO_PROJECT/.kiro/skills/using-spec-first/SKILL.md"
+test -f "$KIRO_PROJECT/.kiro/agents/spec-repo-research-analyst.agent.md"
+grep -q '^tools: \["read"\]$' "$KIRO_PROJECT/.kiro/agents/spec-repo-research-analyst.agent.md"
+test -f "$KIRO_PROJECT/.kiro/spec-first/state.json"
+test ! -e "$KIRO_PROJECT/.kiro/commands/spec"
+test ! -e "$KIRO_PROJECT/.kiro/hooks"
+test ! -e "$KIRO_PROJECT/.kiro/steering"
+
+kiro_doctor_output="$(
+  cd "$KIRO_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --kiro 2>&1
+)"
+grep -q '.kiro/skills' <<<"$kiro_doctor_output"
+grep -q '.kiro/agents' <<<"$kiro_doctor_output"
+grep -q '.kiro/spec-first/state.json' <<<"$kiro_doctor_output"
+if grep -q '.kiro/commands/spec' <<<"$kiro_doctor_output"; then
+  echo "✗ Kiro doctor 不应把 .kiro/commands/spec 当作正式产品面"
+  exit 1
+fi
+mkdir -p "$KIRO_PROJECT/.kiro/hooks" "$KIRO_PROJECT/.kiro/settings" "$KIRO_PROJECT/.kiro/specs/native"
+printf 'custom hook\n' > "$KIRO_PROJECT/.kiro/hooks/custom"
+printf '{"custom":true}\n' > "$KIRO_PROJECT/.kiro/settings/user.json"
+printf '# Native Kiro spec\n' > "$KIRO_PROJECT/.kiro/specs/native/spec.md"
+(
+  cd "$KIRO_PROJECT"
+  "$SHIM" clean --kiro >/dev/null
+)
+test ! -e "$KIRO_PROJECT/.kiro/skills"
+test ! -e "$KIRO_PROJECT/.kiro/agents"
+test ! -e "$KIRO_PROJECT/.kiro/spec-first"
+test -f "$KIRO_PROJECT/.kiro/hooks/custom"
+test -f "$KIRO_PROJECT/.kiro/settings/user.json"
+test -f "$KIRO_PROJECT/.kiro/specs/native/spec.md"
+echo "   ✓ Kiro 安装态闭环通过"
+
+echo "7. 验证 Qoder 安装态 init / doctor / clean..."
+mkdir -p "$QODER_PROJECT"
+qoder_init_output="$(
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$QODER_PROJECT" qoder test en 2>&1
+)"
+grep -q 'command file(s) in .qoder/commands' <<<"$qoder_init_output"
+grep -q 'skill directory(ies) in .qoder/skills' <<<"$qoder_init_output"
+grep -q 'agent file(s) in .qoder/agents' <<<"$qoder_init_output"
+test -f "$QODER_PROJECT/.qoder/commands/spec-work.md"
+test -f "$QODER_PROJECT/.qoder/commands/spec-mcp-setup.md"
+test -f "$QODER_PROJECT/.qoder/skills/spec-work/SKILL.md"
+test -f "$QODER_PROJECT/.qoder/skills/spec-mcp-setup/SKILL.md"
+test -f "$QODER_PROJECT/.qoder/skills/using-spec-first/SKILL.md"
+test -f "$QODER_PROJECT/.qoder/agents/spec-repo-research-analyst.agent.md"
+grep -q '^tools: \[Read, Grep, Glob\]$' "$QODER_PROJECT/.qoder/agents/spec-repo-research-analyst.agent.md"
+test -f "$QODER_PROJECT/.qoder/spec-first/state.json"
+test ! -e "$QODER_PROJECT/.qoder/rules"
+test ! -e "$QODER_PROJECT/.qoder/hooks"
+
+qoder_doctor_output="$(
+  cd "$QODER_PROJECT"
+  SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --qoder 2>&1
+)"
+grep -q '.qoder/commands/spec' <<<"$qoder_doctor_output"
+grep -q '.qoder/skills' <<<"$qoder_doctor_output"
+grep -q '.qoder/agents' <<<"$qoder_doctor_output"
+grep -q '.qoder/spec-first/state.json' <<<"$qoder_doctor_output"
+if command -v qodercli >/dev/null 2>&1 || command -v qoder >/dev/null 2>&1; then
+  qoder_loader_command="$(command -v qodercli 2>/dev/null || command -v qoder 2>/dev/null)"
+  "$qoder_loader_command" --version >/dev/null 2>&1 || true
+  echo "   ! Qoder loader smoke degraded: Qoder CLI is present at $qoder_loader_command, but no non-interactive project loader probe is defined"
+else
+  echo "   ! Qoder loader smoke degraded: qodercli/qoder not found on PATH"
+fi
+mkdir -p "$QODER_PROJECT/.qoder/rules" "$QODER_PROJECT/.qoder/hooks"
+printf '# Native Qoder rule\n' > "$QODER_PROJECT/.qoder/rules/security.md"
+printf '{"custom":true}\n' > "$QODER_PROJECT/.qoder/settings.json"
+printf '{"hooks":[]}\n' > "$QODER_PROJECT/.qoder/hooks/custom.json"
+(
+  cd "$QODER_PROJECT"
+  "$SHIM" clean --qoder >/dev/null
+)
+test ! -e "$QODER_PROJECT/.qoder/commands/spec"
+test ! -e "$QODER_PROJECT/.qoder/skills"
+test ! -e "$QODER_PROJECT/.qoder/agents"
+test ! -e "$QODER_PROJECT/.qoder/spec-first"
+test -f "$QODER_PROJECT/.qoder/rules/security.md"
+test -f "$QODER_PROJECT/.qoder/settings.json"
+test -f "$QODER_PROJECT/.qoder/hooks/custom.json"
+echo "   ✓ Qoder 安装态闭环通过"
+
+echo "8. 验证 Claude 安装态 init / doctor..."
 mkdir -p "$CLAUDE_PROJECT"
 claude_init_output="$(
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" run_installed_programmatic_init "$CLAUDE_PROJECT" claude test en 2>&1
 )"
-grep -q '.claude/commands/spec' <<<"$claude_init_output"
-test -f "$CLAUDE_PROJECT/.claude/commands/spec/brainstorm.md"
-test ! -e "$CLAUDE_PROJECT/.claude/commands/spec/standards.md"
+grep -q '.claude/commands' <<<"$claude_init_output"
+test -f "$CLAUDE_PROJECT/.claude/commands/spec-brainstorm.md"
+test ! -e "$CLAUDE_PROJECT/.claude/commands/spec-standards.md"
 test -f "$CLAUDE_PROJECT/.claude/skills/using-spec-first/SKILL.md"
 test -f "$CLAUDE_PROJECT/.claude/hooks/session-start"
 grep -q 'startup-reminder' "$CLAUDE_PROJECT/.claude/hooks/session-start"
@@ -182,7 +352,7 @@ claude_doctor_output="$(
   cd "$CLAUDE_PROJECT"
   SPEC_FIRST_VERSION_REMINDER_LATEST="$PACKAGE_VERSION" "$SHIM" doctor --claude 2>&1
 )"
-grep -q '.claude/commands/spec' <<<"$claude_doctor_output"
+grep -q '.claude/commands' <<<"$claude_doctor_output"
 grep -q '.claude/skills' <<<"$claude_doctor_output"
 grep -q 'workflow skills' <<<"$claude_doctor_output"
 echo "   ✓ Claude 安装态闭环通过"

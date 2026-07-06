@@ -34,7 +34,7 @@ spec_id: 2026-05-13-001-init-instruction-router
 - R2. `skills/using-spec-first/SKILL.md` 继续作为 workflow routing policy source-of-truth。
 - R3. bootstrap 必须保留 substantial work 前入口判断提醒，包括文件修改、state-changing command、架构 / prompt / workflow 决策。
 - R4. bootstrap 必须保留“已在 workflow 或 bounded subagent 中时不重新分流”的边界。
-- R5. bootstrap 必须保留当前 host 入口边界：Claude 使用 `/spec:*`，Codex 使用 `$spec-*`。
+- R5. bootstrap 必须保留当前 host 入口边界：Claude 使用 `spec-*`，Codex 使用 `spec-*`。
 - R6. bootstrap 必须保留“不默认进入 `spec-brainstorm`，不自动串联多个 workflow”的高频防错信号。
 - R7. bootstrap 必须保留父 workspace 的最小安全边界：只读候选 repo 可用 advisory facts，写入 / 修复 / 测试 / review autofix / commit 前必须有明确 `target_repo` 或 per-child scope。
 - R8. Codex bootstrap 必须保留 startup reminder 的 best-effort / non-blocking / top-level-only 边界，以及 public workflow 调用授权其文档化 read-only reviewer/researcher phase 的规则。
@@ -57,7 +57,7 @@ spec_id: 2026-05-13-001-init-instruction-router
 
 ## 范围边界
 
-- 不新增 `$spec-next`、`/spec:guide`、CLI router、routing script、状态机或新 public workflow。
+- 不新增 `spec-next`、`spec-guide`、CLI router、routing script、状态机或新 public workflow。
 - 不把 `CLAUDE.md` / `AGENTS.md` 变成完整 workflow 手册。
 - 不把 GitNexus / code-review-graph readiness、provider status 或动态 facts 写进 bootstrap。
 - 不修改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors 作为 source fix。
@@ -190,7 +190,7 @@ Workflow 入口治理
 
 **做法：**
 - 用保留 guardrails 的语义断言替换脆弱的长 prose 断言。
-- 保留 Claude `/spec:*` 与 Codex `$spec-*` 的 host-specific 检查。
+- 保留 Claude `spec-*` 与 Codex `spec-*` 的 host-specific 检查。
 - 增加反向断言，确保 bootstrap 不膨胀成完整 routing tree 或 guide-mode menu。
 - 保留对 `workspace-graph-targets.v1`、`target_repo`、`startup-reminder --codex`、non-blocking startup reminder，以及 Codex workflow-owned read-only reviewer/researcher dispatch authorization 的断言。
 
@@ -202,7 +202,7 @@ Workflow 入口治理
 
 **测试场景：**
 - 正常路径：生成的 Claude zh/en bootstrap 包含指向 `using-spec-first` 的短指针、当前 host 入口语法和常用锚点。
-- 正常路径：生成的 Codex zh/en bootstrap 包含 `$spec-*`、`spec-first startup-reminder --codex`、non-blocking 行为和 workflow-owned read-only dispatch authorization。
+- 正常路径：生成的 Codex zh/en bootstrap 包含 `spec-*`、`spec-first startup-reminder --codex`、non-blocking 行为和 workflow-owned read-only dispatch authorization。
 - 边界情况：corrupted marker repair 仍会移除 stale generated-like bodies，并保留 clean-heading user sections。
 - 错误路径：builder 变化后，drifted bootstrap 仍可被 `inspectInstructionBootstrap()` 检测到。
 - 集成：`init --claude` 与 `init --codex` 只生成一个 bootstrap marker，并保留周围用户内容。

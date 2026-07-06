@@ -12,11 +12,19 @@ TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 source "$SCRIPT_DIR/lib-template.sh"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
 TOOL_ID=""
+USER_SCOPE_ARGS=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tool)
       TOOL_ID="${2:-}"
       shift 2
+      ;;
+    --user-scope)
+      USER_SCOPE_ARGS+=(--user-scope)
+      export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
+      export CURSOR_USER_SCOPE=1
+      shift
       ;;
     *)
       shift
@@ -39,4 +47,4 @@ if [ -n "$missing_dep" ]; then
   exit 1
 fi
 
-bash "$SCRIPT_DIR/configure-host.sh" --tool "$TOOL_ID"
+bash "$SCRIPT_DIR/configure-host.sh" --tool "$TOOL_ID" "${USER_SCOPE_ARGS[@]}"

@@ -12,7 +12,7 @@
 
 spec-first 先选择 entry surface，再写触发描述：
 
-- `workflow_command`：公开 workflow，Claude 是 `/spec:*` command，Codex 是 `$spec-*` skill；必须有完整 I/O、artifacts、failure modes、downstream consumers。
+- `workflow_command`：公开 workflow，用户可见标识统一为 `spec-*`；host delivery 是内部投射细节，不应要求用户按宿主区分入口载体，但必须有完整 I/O、artifacts、failure modes、downstream consumers。
 - `standalone_skill`：用户或 agent 可直接加载的方法能力，不是 command-backed workflow；适合 authoring、task pack、standards governance 等横向方法。
 - `internal_only`：只能由公开 workflow 或 agent 内部消费，不作为用户入口。
 
@@ -130,6 +130,6 @@ relevance 判断一句话是否仍服务当前 recurring job、branch、boundary
 
 - 新 skill 名称使用 kebab-case，并与 `name:`、目录名、治理记录一致。
 - 新增 user-visible skill 更新 `skills-governance.json`，并重新生成 runtime catalog。
-- 不为 standalone skill 发明 `/spec:*` 或 `$spec-*` 命令入口。
+- 不为 standalone skill 发明 `spec-*` workflow 命令入口，也不恢复 legacy host-specific spellings 作为产品面。
 - `SKILL.md` 指向所有 runtime 必读 references；维护者-only 资产明确标注。
 - 变更包含 `CHANGELOG.md`、聚焦 contract tests、最窄验证命令和 generated runtime mirror 状态。

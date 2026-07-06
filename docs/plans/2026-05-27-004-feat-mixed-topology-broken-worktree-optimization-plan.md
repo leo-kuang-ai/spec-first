@@ -46,7 +46,7 @@ Verification run:
 
 ## Problem Frame
 
-工作区 `kaz-mvp` 拓扑：父级 `.git` 是指向已失效路径的 worktree pointer（82 字节文件），根目录下同时存在 6 个独立 child git repo 和 30+ 个非独立 git 业务模块。用户跑完 `/spec:mcp-setup` + `/spec:graph-bootstrap --all-repos` 后只看到"跑了 6 个"，不知道 30+ 个业务模块被完全跳过。
+工作区 `kaz-mvp` 拓扑：父级 `.git` 是指向已失效路径的 worktree pointer（82 字节文件），根目录下同时存在 6 个独立 child git repo 和 30+ 个非独立 git 业务模块。用户跑完 `spec-mcp-setup` + `spec-graph-bootstrap --all-repos` 后只看到"跑了 6 个"，不知道 30+ 个业务模块被完全跳过。
 
 根本原因：`resolve-project-target.sh:114` 用 `2>/dev/null || true` 静默吞掉所有 git 失败，broken worktree、损坏 gitdir、真正非 git 三类情况无法区分；`discover_candidates` 的忽略列表与 `coverage_gap` 字段缺失；schema `project-target.v1` 没有 `git_health`、`coverage_gap`、`candidates_diagnostics` 诊断字段。`--folder` 路径存在但用户无从得知。
 
@@ -831,7 +831,7 @@ dry-run: detect_git_health() → print preview → exit 0
 
 ### Phase P0（诊断诚实性）
 
-**目标：** 用户运行 `/spec:mcp-setup` 时，setup 报告中能看到 broken worktree 状态、coverage gap 计数、扩展的 next_action 文案。`baseline_ready` 语义不变。
+**目标：** 用户运行 `spec-mcp-setup` 时，setup 报告中能看到 broken worktree 状态、coverage gap 计数、扩展的 next_action 文案。`baseline_ready` 语义不变。
 
 **单元：** U1 → U2 → U3 → U4 → U5 → U6 → U7（P0 tests + docs）
 
@@ -883,7 +883,7 @@ dry-run: detect_git_health() → print preview → exit 0
 ## Operational / Rollout Notes
 
 - **无 breaking change：** P0 schema v2 是 v1 超集；P1 是新增 dry-run 子命令；P2 不在本计划引入 runtime behavior。
-- **P0 deploy 后验证：** 在 kaz-mvp 工作区跑一次 `/spec:mcp-setup`，确认 setup 报告含 git_health + coverage_gap 字段。
+- **P0 deploy 后验证：** 在 kaz-mvp 工作区跑一次 `spec-mcp-setup`，确认 setup 报告含 git_health + coverage_gap 字段。
 - **P1 deploy 后验证：** `spec-first repair-worktree --dry-run` 在 kaz-mvp 输出正确 preview 文案；`--apply` / `--unlink` 输出 deferred reason 且不删除 `.git`。
 - **Spike 结论必须记录到独立 spike 文档：** U12 完成后将 parent config authority、artifact boundary、mode decision、consumer list、provider exclude/label/fingerprint、耗时数据写入 spike 文档，作为是否另开 P2 follow-up 的依据。
 - **P2 deploy 后验证：** 不适用于本计划。P2 若另开 follow-up，必须先有 contract gate pass。

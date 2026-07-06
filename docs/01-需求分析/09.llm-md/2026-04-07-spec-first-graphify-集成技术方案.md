@@ -11,7 +11,7 @@
 
 本方案的核心结论只有一条：
 
-**`spec-first` 应正式打包 graphify 运行时入口（Claude: `/spec:graphify`；Codex: `graphify` skill），并由后续 `spec-graph-bootstrap` / `spec-docs` 直接消费其 `graphify-out/` 产物；不将 `graphify` Python 代码并入 `spec-first`。**
+**`spec-first` 应正式打包 graphify 运行时入口（Claude: `spec-graphify`；Codex: `graphify` skill），并由后续 `spec-graph-bootstrap` / `spec-docs` 直接消费其 `graphify-out/` 产物；不将 `graphify` Python 代码并入 `spec-first`。**
 
 当前推荐新增并保留的能力只有一个：
 
@@ -219,7 +219,7 @@ skills/
 6. 建议后续进入 spec-graph-bootstrap
 ```
 
-> **当前状态（2026-04-08）**：`spec-first` 曾短暂收敛为单一 `graphify` 入口。Claude 使用 `/spec:graphify`，Codex 使用 `graphify` skill。
+> **当前状态（2026-04-08）**：`spec-first` 曾短暂收敛为单一 `graphify` 入口。Claude 使用 `spec-graphify`，Codex 使用 `graphify` skill。
 
 ### 7.2 命令行为
 
@@ -278,7 +278,7 @@ spec-graph-bootstrap
 
 这意味着：
 
-- 用户可以显式先运行 `/spec:graphify`（Claude）或 `graphify` skill（Codex）
+- 用户可以显式先运行 `spec-graphify`（Claude）或 `graphify` skill（Codex）
 - 再运行 `spec-graph-bootstrap`
 - `spec-graph-bootstrap` 直接读取 `graphify-out/GRAPH_REPORT.md` 与可选 `wiki/` 获取结构先验
 

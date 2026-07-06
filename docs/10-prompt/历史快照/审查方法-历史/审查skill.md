@@ -153,7 +153,7 @@ reviewer 在判定豁免前必须把 (a)(b)(c)(d) 四项证据写入对应 findi
 | 8 | 与已有 skill 职责高度重叠但未声明边界差异(详见 §3.5) | |
 | 9 | 列出**高风险脚本/工具**(写入/删除/部署类)但完全没有 risk policy 或 preview-first 声明 | 仅缺 dedicated vs shell 偏好走 §2 #5 P1 |
 | 12 | 边界违反:scripts 里写语义判断 / LLM 步骤要求执行确定性校验 | 项目核心哲学违反,但因常见可修复,降级为 soft-block |
-| 13 | 入口治理违规:internal-only skill 暴露为公开 `/spec:*` / `$spec-*` 入口,或 public skill 未在 `using-spec-first` 路由表登记 | 与 `skills/using-spec-first/SKILL.md` 路由策略冲突 |
+| 13 | 入口治理违规:internal-only skill 暴露为公开 `spec-*` / `spec-*` 入口,或 public skill 未在 `using-spec-first` 路由表登记 | 与 `skills/using-spec-first/SKILL.md` 路由策略冲突 |
 
 ### 3.5 #8 适用范围与 skill profile 段提取规则
 
@@ -463,7 +463,7 @@ Step 4 — 应用 hard-block cap 并记录成因(不互斥,允许同时记录):
 - **工具/脚本裸奔**:列工具但不写 tool budget、risk policy、parallel/sequential 偏好
 - **Scripts/LLM 边界违反**:scripts 里写语义判断 / LLM 步骤要求执行确定性校验
 - **Runtime 直改**:skill 让 LLM 编辑 `.claude/`、`.codex/`、`.agents/skills/` 而非 source
-- **入口治理违规**:internal-only skill 暴露为 `/spec:*` 或 `$spec-*` 公开入口;public skill 不在 `using-spec-first` 路由
+- **入口治理违规**:internal-only skill 暴露为 `spec-*` 或 `spec-*` 公开入口;public skill 不在 `using-spec-first` 路由
 - **单宿主假设未声明**:skill 只能在 Claude 或 Codex 一侧运行但未在 versioning 段声明
 - **Bundled resources 角色混乱**:scripts/ 里塞文档、references/ 里塞可执行脚本、assets/ 里放需要执行的内容
 

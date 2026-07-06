@@ -55,7 +55,7 @@ deepened: 2026-04-21
 
 ## Scope Boundaries
 
-- 不新增 `/spec:*` 或 `$spec-*` workflow 入口。
+- 不新增 `spec-*` 或 `spec-*` workflow 入口。
 - 不把 `database-routing.json` 扩成同时承载 schema 来源、静态解析结果、worker readiness 与 live route 的重对象。
 - 不在本轮为 PostgreSQL / MongoDB / Redis / Elasticsearch 等全部类型引入完整 live worker；本轮重点是 detection / schema synthesis / routing boundary。
 - 不要求 `src/bootstrap-compiler/` 引入 runtime LLM 调用器；继续保持 deterministic compiler posture。

@@ -9,10 +9,33 @@ command -v jq >/dev/null 2>&1 || { echo '错误：jq 是必需依赖，请先安
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib-template.sh"
 
+KIRO_USER_SCOPE_ARG=false
+for arg in "$@"; do
+  if [ "$arg" = "--user-scope" ]; then
+    KIRO_USER_SCOPE_ARG=true
+    export KIRO_USER_SCOPE=1
+    export QODER_USER_SCOPE=1
+    export CURSOR_USER_SCOPE=1
+  fi
+done
+
 SKILL_DIR="$(dirname "$SCRIPT_DIR")"
 TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 PROVIDER_TOOLS_JSON="$SKILL_DIR/provider-tools.json"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
+
+require_explicit_mcp_setup_host() {
+  case "${MCP_SETUP_HOST:-}" in
+    claude|codex|kiro|qoder|cursor) return 0 ;;
+    *)
+      echo '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。' >&2
+      exit 1
+      ;;
+  esac
+}
+
+require_explicit_mcp_setup_host
+
 HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
 HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
 HOST_DISPLAY_NAME="$(jq -r '.display_name' <<<"$HOST_INFO_JSON")"
@@ -253,6 +276,13 @@ while [[ $# -gt 0 ]]; do
       ;;
     --plan)
       PLAN_MODE=true
+      shift
+      ;;
+    --user-scope)
+      KIRO_USER_SCOPE_ARG=true
+      export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
+      export CURSOR_USER_SCOPE=1
       shift
       ;;
     --requirement-workspace)
@@ -561,6 +591,17 @@ write_warmup_cache() {
   return 0
 }
 
+redact_diagnostic() {
+  local value="${1:-}"
+  printf '%s' "$value" | sed -E \
+    -e 's#(https?://[^:/?[:space:]]+):[^@/?[:space:]]+@#\1:<redacted>@#g' \
+    -e 's#([?&](token|access_token|api[_-]?key|key|secret|password)=)[^&[:space:]]+#\1<redacted>#Ig' \
+    -e 's#(authorization[[:space:]]*:[[:space:]]*(Bearer|Basic)[[:space:]]+)[^,;[:space:]]+#\1<redacted>#Ig' \
+    -e 's#\b(Bearer|Basic)[[:space:]]+[A-Za-z0-9._~+/-]+=*#\1 <redacted>#Ig' \
+    -e 's#((authorization|api[_-]?key|access[_-]?token|token|secret|password)[[:space:]]*[:=][[:space:]]*)[^,;[:space:]]+#\1<redacted>#Ig' \
+    -e 's#(--?(token|api-key|api_key|secret|password|access-token|access_token)(=|[[:space:]]+))[^[:space:]]+#\1<redacted>#Ig'
+}
+
 append_result() {
   local tool_id="$1"
   local status="$2"
@@ -574,6 +615,8 @@ append_result() {
   local exit_code="${10}"
   local diagnostic_summary="${11}"
   local repair_diagnostic_summary="${12}"
+  diagnostic_summary="$(redact_diagnostic "$diagnostic_summary")"
+  repair_diagnostic_summary="$(redact_diagnostic "$repair_diagnostic_summary")"
 
   jq --arg id "$tool_id" \
      --arg status "$status" \
@@ -686,6 +729,7 @@ PY
 
   RUN_STDOUT="$(cat "$stdout_file")"
   combined="$(cat "$stderr_file" "$stdout_file" | tr '\n' ' ' | cut -c 1-1000)"
+  combined="$(redact_diagnostic "$combined")"
   RUN_DIAGNOSTIC="$combined"
   rm -f "$stdout_file" "$stderr_file"
   if [ "$RUN_EXIT_CODE" -eq 124 ]; then
@@ -824,7 +868,11 @@ EOF
 
   if [ "$status" = "ready" ] && [ "$host_config_required" = "true" ]; then
     configure_output=""
-    if run_and_capture "configure:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/configure-host.sh" --tool "$tool_id"; then
+    configure_args=(--tool "$tool_id")
+    if [ "$KIRO_USER_SCOPE_ARG" = "true" ]; then
+      configure_args+=(--user-scope)
+    fi
+    if run_and_capture "configure:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/configure-host.sh" "${configure_args[@]}"; then
       configure_output="$RUN_STDOUT"
       configured_path="$(jq -r '.configured_path // empty' <<<"$configure_output")"
       selected_scope="$(jq -r '.selected_scope // empty' <<<"$configure_output")"
@@ -832,7 +880,7 @@ EOF
     else
       exit_code="$RUN_EXIT_CODE"
       diagnostic_summary="$RUN_DIAGNOSTIC"
-      if run_and_capture "repair:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/repair-install.sh" --tool "$tool_id"; then
+      if run_and_capture "repair:$tool_id" "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash "$SCRIPT_DIR/repair-install.sh" "${configure_args[@]}"; then
         repair_output="$RUN_STDOUT"
         last_action="repaired"
         configured_path="$(jq -r '.configured_path // empty' <<<"$repair_output")"
@@ -1012,7 +1060,7 @@ if [ -n "$ONLY_FILTER" ] && selection_contains "graphify"; then
     mv "$ledger_tmp.next" "$ledger_tmp"
   else
     jq \
-      --arg diagnostic "$helper_output" \
+      --arg diagnostic "$(redact_diagnostic "$helper_output")" \
       --argjson exit_code "$helper_status" \
       '.provider_apply = {
           selected:["graphify"],

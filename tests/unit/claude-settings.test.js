@@ -107,7 +107,8 @@ describe('claude settings', () => {
     expect(matcher.hooks).toEqual([
       {
         type: 'command',
-        command: PRD_PREWRITE_GUARD_COMMAND,
+        command: 'node',
+        args: [PRD_PREWRITE_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR'],
       },
     ]);
   });
@@ -175,14 +176,20 @@ describe('claude settings', () => {
       upsertManagedSessionStartHook(projectRoot);
 
       const settings = readJson(getClaudeSettingsPath(projectRoot));
+      // Exec form: command is the node interpreter, and the managed hook path plus the
+      // $CLAUDE_PROJECT_DIR arg live in args.
       expect(settings.hooks.SessionStart).toHaveLength(1);
-      expect(settings.hooks.SessionStart[0].hooks[0].command).toBe(SESSION_START_COMMAND);
+      expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('node');
+      expect(settings.hooks.SessionStart[0].hooks[0].args).toEqual([SESSION_START_COMMAND, '$CLAUDE_PROJECT_DIR']);
       expect(settings.hooks.UserPromptExpansion).toHaveLength(1);
-      expect(settings.hooks.UserPromptExpansion[0].hooks[0].command).toBe(SPEC_PLAN_GUARD_COMMAND);
+      expect(settings.hooks.UserPromptExpansion[0].hooks[0].command).toBe('node');
+      expect(settings.hooks.UserPromptExpansion[0].hooks[0].args).toEqual([SPEC_PLAN_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
       expect(settings.hooks.PreToolUse).toHaveLength(1);
-      expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe(PRD_PREWRITE_GUARD_COMMAND);
+      expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('node');
+      expect(settings.hooks.PreToolUse[0].hooks[0].args).toEqual([PRD_PREWRITE_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
       expect(settings.hooks.Stop).toHaveLength(1);
-      expect(settings.hooks.Stop[0].hooks[0].command).toBe(PRD_READINESS_GUARD_COMMAND);
+      expect(settings.hooks.Stop[0].hooks[0].command).toBe('node');
+      expect(settings.hooks.Stop[0].hooks[0].args).toEqual([PRD_READINESS_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -212,7 +219,10 @@ describe('claude settings', () => {
       const allHooks = settings.hooks.SessionStart.flatMap((matcher) => matcher.hooks);
       // Substring-based removal would have deleted this wrapper; exact/prefix removal keeps it.
       expect(allHooks).toContainEqual(userWrapper);
-      expect(allHooks.filter((hook) => hook.command === SESSION_START_COMMAND)).toHaveLength(1);
+      // The managed hook is exec form (command 'node', hook path in args).
+      expect(allHooks.filter((hook) => (
+        hook.command === 'node' && Array.isArray(hook.args) && hook.args[0] === SESSION_START_COMMAND
+      ))).toHaveLength(1);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -430,14 +440,14 @@ describe('claude settings', () => {
         '',
         '- 本 block 是 using-spec-first 的核心决策集；完整路由策略在 `skills/using-spec-first/SKILL.md`',
         '- substantial work 前先判断是否进入公开 spec-first workflow；轻量问答和窄事实查询可直接回答；已在 workflow 或 bounded subagent 中时不重新分流',
-        '- Claude workflow 入口使用 `/spec:*`',
+        '- Workflow 入口统一使用同名 `spec-*`',
         '- 不要把 `using-spec-first` 本身当作 command-backed workflow',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedSessionStartHook(projectRoot);
 
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -482,7 +492,7 @@ describe('claude settings', () => {
         '<!-- spec-first:bootstrap:start -->',
         '## Workflow 入口治理',
         '',
-        '- Claude workflow 入口使用 `/spec:*`',
+        '- Workflow 入口统一使用同名 `spec-*`',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
@@ -490,7 +500,7 @@ describe('claude settings', () => {
         content.replace(JSON.stringify(path.join(REPO_ROOT, 'bin', 'spec-first.js')), JSON.stringify(fakeCliPath))
       ));
 
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -525,7 +535,7 @@ describe('claude settings', () => {
       fs.chmodSync(path.join(fakeBin, 'spec-first'), 0o755);
       const hookPath = writeRenderedSessionStartHook(projectRoot);
 
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -556,7 +566,7 @@ describe('claude settings', () => {
         content.replace(JSON.stringify(path.join(REPO_ROOT, 'bin', 'spec-first.js')), JSON.stringify(fakeCliPath))
       ));
 
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -582,7 +592,7 @@ describe('claude settings', () => {
 
     try {
       const hookPath = writeRenderedSessionStartHook(projectRoot);
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -611,7 +621,7 @@ describe('claude settings', () => {
       // the runner's uid (unlike chmod 0o000, which root bypasses) -> exercises the guard.
       fs.mkdirSync(path.join(projectRoot, 'CLAUDE.md'));
 
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -639,13 +649,13 @@ describe('claude settings', () => {
     try {
       fs.writeFileSync(path.join(projectRoot, 'CLAUDE.md'), [
         '<!-- spec-first:bootstrap:start -->',
-        '- Claude workflow entrypoints use `/spec:*`.',
+        '- Workflow entrypoints use the same `spec-*` names.',
         '<!-- spec-first:bootstrap:end -->',
         '',
       ].join('\n'), 'utf8');
       const hookPath = writeRenderedSessionStartHook(projectRoot);
 
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: { ...process.env, CLAUDE_PROJECT_DIR: projectRoot },
@@ -670,12 +680,12 @@ describe('claude settings', () => {
 
     try {
       const hookPath = writeRenderedSpecPlanGuardHook(projectRoot);
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         input: JSON.stringify({
           hook_event_name: 'UserPromptExpansion',
-          command_name: 'spec:plan',
+          command_name: 'spec-plan',
           permission_mode: 'plan',
         }),
       });
@@ -684,7 +694,7 @@ describe('claude settings', () => {
       expect(result.stderr).toBe('');
       const payload = JSON.parse(result.stdout);
       expect(payload.hookSpecificOutput.hookEventName).toBe('UserPromptExpansion');
-      expect(payload.hookSpecificOutput.additionalContext).toContain('/spec:plan planning-only attention guard');
+      expect(payload.hookSpecificOutput.additionalContext).toContain('spec-plan planning-only attention guard');
       expect(payload.hookSpecificOutput.additionalContext).toContain('planning-only');
       expect(payload.hookSpecificOutput.additionalContext).toContain('wait for the user handoff choice');
       expect(payload.hookSpecificOutput.additionalContext).toContain('Claude native Plan Mode write protection is active');
@@ -700,12 +710,12 @@ describe('claude settings', () => {
 
     try {
       const hookPath = writeRenderedSpecPlanGuardHook(projectRoot);
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         input: JSON.stringify({
           hook_event_name: 'UserPromptExpansion',
-          command_name: 'spec:plan',
+          command_name: 'spec-plan',
           permission_mode: 'default',
           prompt: 'x'.repeat(1024 * 1024),
         }),
@@ -730,13 +740,13 @@ describe('claude settings', () => {
         const hookPath = writeRenderedSpecPlanGuardHook(projectRoot);
         const input = {
           hook_event_name: 'UserPromptExpansion',
-          command_name: '/spec:plan',
+          command_name: 'spec-plan',
         };
         if (permissionMode !== undefined) {
           input.permission_mode = permissionMode;
         }
 
-        const result = spawnSync('bash', [hookPath], {
+        const result = spawnSync(process.execPath, [hookPath, projectRoot], {
           cwd: projectRoot,
           encoding: 'utf8',
           input: JSON.stringify(input),
@@ -758,12 +768,12 @@ describe('claude settings', () => {
 
     try {
       const hookPath = writeRenderedSpecPlanGuardHook(projectRoot);
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         input: JSON.stringify({
           hook_event_name: 'UserPromptExpansion',
-          command_name: 'spec:work',
+          command_name: 'spec-work',
           permission_mode: 'bypassPermissions',
         }),
       });
@@ -782,7 +792,7 @@ describe('claude settings', () => {
     try {
       installPrdCheckerRuntime(projectRoot);
       const hookPath = writeRenderedPrdPrewriteGuardHook(projectRoot);
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {
@@ -828,7 +838,7 @@ describe('claude settings', () => {
     try {
       installPrdCheckerRuntime(projectRoot);
       const hookPath = writeRenderedPrdPrewriteGuardHook(projectRoot);
-      const result = spawnSync('bash', [hookPath], {
+      const result = spawnSync(process.execPath, [hookPath, projectRoot], {
         cwd: projectRoot,
         encoding: 'utf8',
         env: {

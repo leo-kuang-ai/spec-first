@@ -67,10 +67,7 @@ Before self-work that changes architecture, prompt, workflow, contract, source/r
 
 Clearly scoped, single-point, low-risk ordinary code/prose corrections in `spec-first` itself may proceed directly when they do not touch prompt/workflow/contract/governance/runtime delivery semantics and do not expand beyond the known target. Keep the same local discipline: source-of-truth edits, `CHANGELOG.md` when required, narrow verification, and reclassification if the change becomes substantial.
 
-Route substantial concrete implementation or prose changes to:
-
-- Claude: `/spec:work`
-- Codex: `$spec-work`
+Route substantial concrete implementation or prose changes to `spec-work`. The workflow identifier stays the same across hosts; host-specific loading is only the runtime carrier.
 
 Route unresolved policy, architecture, or scope questions to `spec-brainstorm` or `spec-plan` based on whether the WHAT or HOW is unclear. Route review-only requests by artifact type: code/diff/PR quality review to `spec-code-review`, requirements/plan/Markdown review to `spec-doc-review`, and skill/agent asset governance audits to `spec-skill-audit`. If the request asks for review plus concrete revisions, route to work and keep a review posture during execution.
 
@@ -80,7 +77,7 @@ For source changes, update source-of-truth files, the narrowest contract tests, 
 
 A skill trigger is source/methodology loading; it is not automatically public workflow admission. Reading this SKILL, loading an examples file, or matching a skill description can help classify the request while still producing a direct answer, bounded read, or normal execution when no public workflow adds value.
 
-Public workflow admission happens only when the current intent actually matches a public `/spec:*` or `$spec-*` workflow, or the user explicitly invokes one and the route is safe. Admission to a workflow authorizes that workflow to run under its own contract; it does not create a plan/task/review artifact inside this governor and does not grant host-level subagent dispatch beyond the dispatch rules below.
+Public workflow admission happens only when the current intent actually matches a public `spec-*` workflow, or the user explicitly invokes one and the route is safe. Legacy host-specific spellings normalize to the same unified workflow id; they are not separate products and should not be presented as current user-facing entrypoints. Admission to a workflow authorizes that workflow to run under its own contract; it does not create a plan/task/review artifact inside this governor and does not grant host-level subagent dispatch beyond the dispatch rules below.
 
 ## Parent Workspace Direct Reads
 

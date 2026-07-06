@@ -32,7 +32,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 **A. 红旗/边界 prose 的 stale 与漏洞**
 - `references/routing-red-flags.md` 红旗 helper 列表存在 stale/反转 skill 名（如 `bug-report` vs 真实 `report-bug`；`git-worktree` 标注 "internal-only" 但其 `skills/git-worktree/SKILL.md` 存在且 harness 列为可用 skill——内部/公开边界自相矛盾，留待 Round 9 复核）。
 - "sensitive surfaces" 在红旗中未定义，是最大的合理化漏洞——LLM 可把任意改动判为"非 sensitive"绕过路由。
-- `update`/`setup` 在红旗中被当作 route target，但 `update` 是终端命令 `spec-first update`，非 `/spec:*` 入口；命名混淆会让 LLM 误造入口。
+- `update`/`setup` 在红旗中被当作 route target，但 `update` 是终端命令 `spec-first update`，非 `spec-*` 入口；命名混淆会让 LLM 误造入口。
 - `SKILL.md` 内联抄写了 dispatch-admission 与 parent-workspace 文本，而对应 `references/*.md` 声称是唯一细节落点——false indirection，任一处改文另一处漂移且无测试守护。
 - `SKILL.md:219` 的 Hard Rules 摘要无任何 contract test 守护。
 
@@ -50,7 +50,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
   2. `CURATED_CORE` 在测试中硬编码，未从 `skills-governance.json` 派生；SKILL 新增高频入口时无人提示 bootstrap 漏纳。
   3. **无 repo-state faithfulness 测试**：`inspectInstructionBootstrap` helper 已存在，但仅对 temp dir 执行，从未对仓库自身 `CLAUDE.md`/`AGENTS.md` 断言 `status==='installed'`——checked-in block 的静默 prose drift 不会被 CI 捕获。这是单点最高杠杆修复。
 - 两条 load-bearing 红旗被 bootstrap 内联丢弃且无测试守护：「task is vague → brainstorm/plan」与「run init/update now → route first」——前者恰是路由最该生效的 vague-WHAT 场景，后者对应 Hard Rule #10（no state-changing commands just because governor matched）。
-- `scripts/lint-skill-entrypoints.config.json` `scanRoots:["skills"]` 不含 `CLAUDE.md`/`AGENTS.md`——bootstrap 内的 `/spec:using-spec-first` 别名泄漏绕过 standalone-command-entrypoint lint。
+- `scripts/lint-skill-entrypoints.config.json` `scanRoots:["skills"]` 不含 `CLAUDE.md`/`AGENTS.md`——bootstrap 内的 `spec-using-spec-first` 别名泄漏绕过 standalone-command-entrypoint lint。
 
 ### 风险
 - 「sensitive surfaces」未定义 + 红旗 skill 名反转 + `update` 当入口——三处叠加使入口路由在 LLM 语义层可被合理化绕过，而 eval 又恰好不覆盖这些分支，形成"漏洞无守"。
@@ -78,9 +78,9 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ### 证据与发现
 
 **A. 主链路总体完整，但 public map 出现 stale 入口**
-- 角色契约明确核心链路为 `Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge`，且明确 `spec-first update/init/clean/doctor` 是终端 CLI，不是 `/spec:*` workflow。
+- 角色契约明确核心链路为 `Codebase -> Spec -> Plan -> Tasks -> Code -> Review -> Knowledge`，且明确 `spec-first update/init/clean/doctor` 是终端 CLI，不是 `spec-*` workflow。
 - `skills-governance.json` 当前登记 37 个 skill：18 个 `workflow_command`、4 个 `standalone_skill`、15 个 `internal_only`；`governance-drift-report.json` 显示 source skill count 与 governance record count 均为 37，finding 0。
-- `docs/workflow-skill-agent-map.md` 仍把 `/spec:update` / `spec-update` 列为 workflow，且 Codebase 行写 `/spec:update`；这与角色契约、README、`using-spec-first` Route Map 当前口径冲突。
+- `docs/workflow-skill-agent-map.md` 仍把 `spec-update` / `spec-update` 列为 workflow，且 Codebase 行写 `spec-update`；这与角色契约、README、`using-spec-first` Route Map 当前口径冲突。
 
 **B. 节点 handoff 的 source-of-truth 边界基本清晰**
 - `using-spec-first` 只做入口路由，不生成 plan/task/review artifact。
@@ -88,17 +88,17 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - review 类 workflow 输出 findings，执行类 workflow 消费 plan/task/source/test 证据，knowledge 类 workflow 写 `docs/solutions/`。
 
 **C. Handoff 风险主要来自 stale 辅助文档，而非 skill 主面**
-- `docs/workflow-skill-agent-map.md` 既列出现有 public workflow，也混入已退役的 `/spec:update`，说明“人工维护全景表”缺少与治理 registry 的机械对齐。
-- `docs/workflow-skill-agent-map.md` 的 “Codebase -> /spec:update” 会误导用户把 update 当 host workflow 调用，尤其与 Round 1 发现的 red-flag `update` 命名混淆叠加。
+- `docs/workflow-skill-agent-map.md` 既列出现有 public workflow，也混入已退役的 `spec-update`，说明“人工维护全景表”缺少与治理 registry 的机械对齐。
+- `docs/workflow-skill-agent-map.md` 的 “Codebase -> spec-update” 会误导用户把 update 当 host workflow 调用，尤其与 Round 1 发现的 red-flag `update` 命名混淆叠加。
 
 ### 风险
-- 入口面 stale 文档会绕过最核心的 source/runtime 边界：用户或 agent 可能寻找不存在的 `$spec-update` / `/spec:update`，或把 runtime refresh 当作 workflow artifact 产出。
+- 入口面 stale 文档会绕过最核心的 source/runtime 边界：用户或 agent 可能寻找不存在的 `spec-update` / `spec-update`，或把 runtime refresh 当作 workflow artifact 产出。
 - 当手写 workflow map 与 `skills-governance.json` 分离时，新增/删除 public workflow 后文档可能长期漂移。
 
 ### 优化点
-1. **P0** 修正 `docs/workflow-skill-agent-map.md`：删除 `/spec:update` workflow 行；改为 “Runtime maintenance: terminal `spec-first update/init/doctor/clean`”。
+1. **P0** 修正 `docs/workflow-skill-agent-map.md`：删除 `spec-update` workflow 行；改为 “Runtime maintenance: terminal `spec-first update/init/doctor/clean`”。
 2. **P1** 为 `docs/workflow-skill-agent-map.md` 增加生成或校验脚本：public workflow 列表从 `skills-governance.json` 派生，人工说明只保留用途/agent 调度。
-3. **P1** 在 `using-spec-first` routing eval 中增加 “用户显式说 `$spec-update` / `/spec:update`” 的反例，期望输出终端 `spec-first update`，不造 workflow。
+3. **P1** 在 `using-spec-first` routing eval 中增加 “用户显式说 `spec-update` / `spec-update`” 的反例，期望输出终端 `spec-first update`，不造 workflow。
 4. **P2** 给 plan/task/review/knowledge handoff 增加一份 compact contract index，列每个节点的 canonical artifact、producer、consumer、failure mode，避免信息散在多个 SKILL。
 
 ---
@@ -367,8 +367,8 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 - 审查报告若没有 owner/next slice，会变成长期 backlog 噪声。
 
 ### 优化点
-1. **P1** 本报告只作为 review artifact；待 P0/P1 修复落地并通过验证后，再用 `$spec-compound` 提炼 1-3 篇 `docs/solutions/`。
-2. **P1** 每条优化建议标注 source evidence、consumer、验证命令，便于后续 `$spec-work` 接手。
+1. **P1** 本报告只作为 review artifact；待 P0/P1 修复落地并通过验证后，再用 `spec-compound` 提炼 1-3 篇 `docs/solutions/`。
+2. **P1** 每条优化建议标注 source evidence、consumer、验证命令，便于后续 `spec-work` 接手。
 3. **P2** `spec-compound-refresh` 增加“审查报告候选是否可晋升 durable knowledge”的判定 eval。
 4. **P2** 为 `docs/项目审查/README.md` 增加最新审查索引与 active recommendations 指针，减少历史报告检索成本。
 
@@ -378,11 +378,11 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 ### 总体结论
 
-> Closeout 状态：本汇总保留原始取证发现，同时标注本次 staged closeout 已处理的项。`docs/workflow-skill-agent-map.md` 中 `/spec:update` / `spec-update` stale **盘面已无**（核对确认，Codebase 行已写 `终端 spec-first update`；归因不确定——可能本次 closeout 修正或并发会话修正，详见附录 B P0-1 归因澄清）；checked-in `CLAUDE.md` / `AGENTS.md` bootstrap 与 generator 的中文 repo-state faithfulness 测试已补强（核对确认 `instruction-bootstrap.test.js:401-415` 已 byte-faithful 守护）。
+> Closeout 状态：本汇总保留原始取证发现，同时标注本次 staged closeout 已处理的项。`docs/workflow-skill-agent-map.md` 中 `spec-update` / `spec-update` stale **盘面已无**（核对确认，Codebase 行已写 `终端 spec-first update`；归因不确定——可能本次 closeout 修正或并发会话修正，详见附录 B P0-1 归因澄清）；checked-in `CLAUDE.md` / `AGENTS.md` bootstrap 与 generator 的中文 repo-state faithfulness 测试已补强（核对确认 `instruction-bootstrap.test.js:401-415` 已 byte-faithful 守护）。
 
 `spec-first` 的 skill 体系已经具备较强的工程化骨架：37 个 source skill 均纳入 governance registry，public workflow / standalone / internal-only 有基本分层；source/runtime 边界、context exclusion、scenario capability、eval fixture contract、reviewer guard coverage 等关键治理面都已存在。当前主要问题不是“缺 workflow”，而是四类质量债：
 
-1. **入口与公共文档漂移曾存在，盘面已无**：原始取证发现 `docs/workflow-skill-agent-map.md` 暴露 `/spec:update`，与当前 CLI-only update 口径冲突；当前盘面已无该 stale（核对确认，归因见附录 B P0-1），剩余工作是长期保持治理 registry / map 防漂移（防回归 test 见 P2）。
+1. **入口与公共文档漂移曾存在，盘面已无**：原始取证发现 `docs/workflow-skill-agent-map.md` 暴露 `spec-update`，与当前 CLI-only update 口径冲突；当前盘面已无该 stale（核对确认，归因见附录 B P0-1），剩余工作是长期保持治理 registry / map 防漂移（防回归 test 见 P2）。
 2. **确定性 audit 信号误报率高**：P0/P1 候选里存在明显反证，scanner 需要把 guardrail/prohibition/template placeholder 与真实风险分开。
 3. **eval 覆盖不均衡**：15/37 ready，22/37 missing；高风险 public workflow 中 `spec-mcp-setup`、`spec-optimize`、`spec-compound-refresh` 等优先级高。
 4. **bootstrap/runtime drift 防线已补强一层**：已有 generator tests，本次 closeout 已补 checked-in host docs 与 generator 的中文 repo-state faithfulness 断言；runtime `using-spec-first` drift 仍按 source-first 规则刷新，不手改 generated mirrors。
@@ -390,10 +390,10 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 ### 优先级路线图
 
 #### P0：先消除会误导入口或误导严重性的缺口
-1. **已闭环**：修正 `docs/workflow-skill-agent-map.md` 的 `/spec:update` / `spec-update` stale workflow 表述。
+1. **已闭环**：修正 `docs/workflow-skill-agent-map.md` 的 `spec-update` / `spec-update` stale workflow 表述。
    - Evidence：角色契约 §5、README update 段、`using-spec-first` Route Map 均说明 update 是终端 CLI。
    - Consumer：用户、workflow 路由、release docs。
-   - 验证：`rg -n "/spec:update|\\$spec-update|spec-update" docs/workflow-skill-agent-map.md skills/using-spec-first/SKILL.md README.md README.zh-CN.md` 只允许历史/明确 CLI 语境。
+   - 验证：`rg -n "spec-update|\\spec-update|spec-update" docs/workflow-skill-agent-map.md skills/using-spec-first/SKILL.md README.md README.zh-CN.md` 只允许历史/明确 CLI 语境。
 2. **已闭环**：新增 checked-in `CLAUDE.md` / `AGENTS.md` bootstrap 中文 faithfulness test。
    - Evidence：Round 1 已确认 generator 守得住，repo-state 原先未守。
    - Consumer：host entry docs、SessionStart injection。
@@ -435,17 +435,17 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 4. **Slice D：主面瘦身与知识沉淀**
    - 在 eval 保护下瘦身 `spec-code-review`。
-   - 完成 P0/P1 修复后，用 `$spec-compound` 将“bootstrap faithfulness pattern”和“audit false-positive triage pattern”晋升到 `docs/solutions/`。
+   - 完成 P0/P1 修复后，用 `spec-compound` 将“bootstrap faithfulness pattern”和“audit false-positive triage pattern”晋升到 `docs/solutions/`。
 
 ### 本轮验证证据
 
 - 已读取角色契约：`docs/10-prompt/结构化项目角色契约.md`。
-- 已按 `$spec-skill-audit` workflow 运行确定性采集：
+- 已按 `spec-skill-audit` workflow 运行确定性采集：
   - `node skills/spec-skill-audit/scripts/write-audit-artifacts.js --repo . --runtime --run-id 2026-06-28-deep-research-loop10`
   - 产物：`.spec-first/audits/skill-audit/2026-06-28-deep-research-loop10/`
 - 已检查多会话：`spec-first session list --json`，active_count 0。
 - 已使用 Graphify 作为 advisory navigation：`graphify query "spec-first skills workflow handoff runtime governance eval readiness source runtime boundaries" --budget 2200`。
-- 已用 source/test evidence 复核关键结论：`skills-governance.json` 37 条记录、`runtime-drift-report.json` 2 条 drift、`eval-readiness-report.json` 15 ready / 22 missing、`security-risk-report.json` P0/P1 误报反证、`docs/workflow-skill-agent-map.md` `/spec:update` stale。
+- 已用 source/test evidence 复核关键结论：`skills-governance.json` 37 条记录、`runtime-drift-report.json` 2 条 drift、`eval-readiness-report.json` 15 ready / 22 missing、`security-risk-report.json` P0/P1 误报反证、`docs/workflow-skill-agent-map.md` `spec-update` stale。
 
 ### 明确未执行
 
@@ -516,10 +516,10 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 > 本附录对上文「最高杠杆 P0（合并执行）」4 项逐个深度核实真实源码状态、诊断根因、给出优化设计。**核实结论（2026-06-28 元审查校正后）：P0-1 盘面已无 stale（Round 2 取证过时）、P0-2 主体已 byte-faithful 满足（Round 1/8 漏读）、P0-3 主体成立（初稿曾误判失实，已据全仓实扫反转，恢复 P0）、P0-4 三子项成立（4b/4c 有措辞修正）。** Spec-First Evolution Architect 必须以可验证事实优先于模型猜测——不在错误前提上"优化"不存在的问题，对真缺口给方案，对误报给纠正；但"核实"本身也必须落到对具体 case 的实测，而非对机制结构的转述（P0-3 即为反例）。证据均带 `file:line`，可在仓库复验。
 
-### P0-1 修正 `docs/workflow-skill-agent-map.md` 残留 `/spec:update` stale 入口
+### P0-1 修正 `docs/workflow-skill-agent-map.md` 残留 `spec-update` stale 入口
 
 **真实状态：该问题不存在。**
-- `grep -n "spec:update|spec-update|\$spec-update" docs/workflow-skill-agent-map.md` 返回空——当前盘面已无该 stale 入口。文件 mtime `Jun 28 06:25`，与并发审查会话同时段，推测 stale 已在该会话中被修正，或审查报告 Round 2 基于更早的瞬态状态。
+- `grep -n "spec:update|spec-update|\spec-update" docs/workflow-skill-agent-map.md` 返回空——当前盘面已无该 stale 入口。文件 mtime `Jun 28 06:25`，与并发审查会话同时段，推测 stale 已在该会话中被修正，或审查报告 Round 2 基于更早的瞬态状态。
 - 上文汇总报告 P0-1、附录 A 未触及此项——此项**无需执行**。
 
 **根因（为何会进入 P0 清单）**：审查报告把"曾观察到的 stale"当成"当前缺口"，未在写汇总前对盘面复验。这正是角色契约强调的"Advisory facts 不是 confirmed truth"——audit 产物是快照，汇总前必须对 source 复核。
@@ -527,7 +527,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 **优化设计**：无需改 `docs/workflow-skill-agent-map.md`。真正值得做的是**防回归**（避免 stale 复发）：
 - **Goals**：让 `docs/workflow-skill-agent-map.md` 的 public workflow 列表与 `skills-governance.json` 机械对齐，新增/退役 workflow 后文档不漂移。
 - **Non-goals**：不把该文档改成全自动生成（人工用途/agent 调度说明需保留）。
-- **方案**：新增一个轻量 contract test——解析 `docs/workflow-skill-agent-map.md` 中出现的 `/spec:<name>` / `$spec-<name>` token 集，断言其 ⊆ `skills-governance.json` 中 `kind=workflow_command` 的 entrypoint 集，且 `spec-first update/init/doctor/clean` 不被当作 `/spec:*`。失败即报 `workflow_map_stale_entrypoint`。
+- **方案**：新增一个轻量 contract test——解析 `docs/workflow-skill-agent-map.md` 中出现的 `spec-*` / `spec-*` token 集，断言其 ⊆ `skills-governance.json` 中 `kind=workflow_command` 的 entrypoint 集，且 `spec-first update/init/doctor/clean` 不被当作 `spec-*`。失败即报 `workflow_map_stale_entrypoint`。
 - **风险**：低。test 仅读两份 source，无副作用。
 - **落地**：`tests/unit/workflow-skill-agent-map-contracts.test.js`，验证 `npm run test:unit`。
 - **结论**：从 P0 清单**移除**（源已无 stale）；防回归 test 降为 **P2**。
@@ -642,7 +642,7 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 | 原 P0 项 | 真实状态 | 处置 |
 | --- | --- | --- |
-| P0-1 map `/spec:update` stale | **盘面已无**（grep 返回空；Round 2 取证过时） | 移除；防回归 test 降 P2。归因澄清见下 |
+| P0-1 map `spec-update` stale | **盘面已无**（grep 返回空；Round 2 取证过时） | 移除；防回归 test 降 P2。归因澄清见下 |
 | P0-2 bootstrap faithfulness test | **已存在且 byte-faithful**（`instruction-bootstrap.test.js:401-415` + `instruction-bootstrap.js:38-82`） | 移除主体；3 条细分点降 P1 |
 | P0-3 audit scanner runtime 误报 | **三层 negation 存在但对三行失效，P0 仍为 live 误报**（全仓实扫确认） | **保留 P0**；`{url}` placeholder 误报为 P2 |
 | P0-4 handoff 确定性（a/b/c） | **三子项成立，4b/4c 有措辞修正** | 保留 P0，按 4a→4c→4b 执行 |
@@ -653,4 +653,4 @@ note: 本文是当前 review artifact；Round 原文保留取证时点，汇总�
 
 **真正待执行的 P0**：**P0-3（scanner 误报治理）+ P0-4（a/b/c）**。其余降为 P1/P2 细分点见上文汇总报告与附录 A。初稿所写"仅 P0-4"**不准确**，已校正。
 
-**P0-1 归因澄清**：汇总报告称"本次 closeout 已修正"该 map stale，附录 B 初稿称"推测被并发会话修正或 Round 2 基于更早瞬态"——两者归因不一致。经核对，当前盘面确无 stale（Codebase 行 `:12` 写 `终端 spec-first update、/spec:mcp-setup`，文件 mtime `Jun 28 06:25:17`），但无法从盘面判定是哪一方修正；建议两处统一为"盘面已无 stale，Round 2 取证基于更早瞬态"，避免虚报修正动作。
+**P0-1 归因澄清**：汇总报告称"本次 closeout 已修正"该 map stale，附录 B 初稿称"推测被并发会话修正或 Round 2 基于更早瞬态"——两者归因不一致。经核对，当前盘面确无 stale（Codebase 行 `:12` 写 `终端 spec-first update、spec-mcp-setup`，文件 mtime `Jun 28 06:25:17`），但无法从盘面判定是哪一方修正；建议两处统一为"盘面已无 stale，Round 2 取证基于更早瞬态"，避免虚报修正动作。

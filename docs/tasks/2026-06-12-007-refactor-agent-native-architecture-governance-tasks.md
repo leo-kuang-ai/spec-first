@@ -120,7 +120,7 @@ The pack is intentionally serial because the main skill and contract test file a
       "risk_note": "Accidentally promoting this helper to a public entrypoint would expand scope beyond the source plan.",
       "review_gate": "required",
       "review_focus": "Check dual-host entry-surface governance, no public command implication, and no edits to generated runtime mirrors.",
-      "stop_if": "A public `$spec-*` or `/spec:*` entrypoint, command template, or host-delivery change is needed to make the prose coherent.",
+      "stop_if": "A public `spec-*` or `spec-*` entrypoint, command template, or host-delivery change is needed to make the prose coherent.",
       "wave": 1
     },
     {
@@ -294,7 +294,7 @@ The pack is intentionally serial because the main skill and contract test file a
   risk_note: Accidentally promoting this helper to a public entrypoint would expand scope beyond the source plan.
   review_gate: required
   review_focus: Check dual-host entry-surface governance, no public command implication, and no edits to generated runtime mirrors.
-  stop_if: A public `$spec-*` or `/spec:*` entrypoint, command template, or host-delivery change is needed to make the prose coherent.
+  stop_if: A public `spec-*` or `spec-*` entrypoint, command template, or host-delivery change is needed to make the prose coherent.
   wave: 1
 
 - T002

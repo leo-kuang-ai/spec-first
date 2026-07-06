@@ -315,7 +315,7 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 
 本会话 agent 已缓存改前 spec-debug 定义，无法 fresh-load；运行时分发命中率只能由用户在新会话观察。执行步骤：
 1. 开一个**全新会话**（确保加载改后 spec-debug runtime mirror——已核实 `.claude/spec-first/workflows/spec-debug/SKILL.md` description 含 `why is this slow` / `performance regression`）。
-2. 依次发以下 4 条用户消息，观察宿主实际把哪个 skill 加载进上下文（看 `/spec:*` 触发建议或 skill 被注入的信号）：
+2. 依次发以下 4 条用户消息，观察宿主实际把哪个 skill 加载进上下文（看 `spec-*` 触发建议或 skill 被注入的信号）：
    - `why is the build slow after the last deploy` → 期望触发 **spec-debug**（诊断动词 "why"）
    - `improve build performance — want it faster` → 期望触发 **spec-optimize**（优化动词 "improve"）
    - `performance regression in the API: p95 doubled this week` → 期望触发 **spec-debug**（`performance regression` 字面命中）
@@ -369,8 +369,8 @@ spec-debug Phase 3 已有「Verify it fails for the right reason — the root ca
 
 `status: completed` — Step 1-8 源码落地完成 + fresh-source eval 三轮通过 + Step 2-A/B 运行时触发观察的本会话可做部分完成。已完成四轮修订 + Step 2 部分推进：
 1. 首轮设计审查修订（P1-1 perf 统计时计 / P1-2 correct seam 锁住能锁的 / P1-3 假设重排折叠进 smart-escalation / P2-1 tighten 三轴改 framing 句 / P2-2 description 触发面验证 / P2-3 checklist 分工措辞 / P3 措辞与 shell 风格）。
-2. `/spec:doc-review` 对抗审查（coherence / feasibility / scope-guardian / adversarial 四视角）：应用 1 个 safe_auto + 7 个 manual 修正——perf 环境隔离平台条件化、militant 与 LLM-decides 真兼容（强制度落产物约束）、fresh-source eval 代理强度边界声明、lint 触发面虚假保证纠正 + spec-optimize 路由消歧、bisect 阈值噪声带边界纪律、浅测试假信心 blocking-advisory 防护、perf 独立成文件理由声明。
-3. `/spec:code-review`（correctness / testing / maintainability / project-standards / agent-native + learnings-researcher）Auto-resolve 落地 10 个 finding：HITL 模板诚实标注为 human-operated（非 agent-runnable）、no-loop+no-evidence 分支补 AFK fallback、perf 命令名纠正（cpupower/cpufreq-set）+ 权限前置 + 降级模式、bisect 噪声带补 exit 125 skip wrapper、三轴去重改交叉引用、9 项新行为 + description 触发面 + dead-link 补 spec-debug-contracts 断言（11→17）、契约测试去掉冻结的过期 flat-list 改锁菜单 cue、plan status 改 partially-shipped 并勾选已满足项。
+2. `spec-doc-review` 对抗审查（coherence / feasibility / scope-guardian / adversarial 四视角）：应用 1 个 safe_auto + 7 个 manual 修正——perf 环境隔离平台条件化、militant 与 LLM-decides 真兼容（强制度落产物约束）、fresh-source eval 代理强度边界声明、lint 触发面虚假保证纠正 + spec-optimize 路由消歧、bisect 阈值噪声带边界纪律、浅测试假信心 blocking-advisory 防护、perf 独立成文件理由声明。
+3. `spec-code-review`（correctness / testing / maintainability / project-standards / agent-native + learnings-researcher）Auto-resolve 落地 10 个 finding：HITL 模板诚实标注为 human-operated（非 agent-runnable）、no-loop+no-evidence 分支补 AFK fallback、perf 命令名纠正（cpupower/cpufreq-set）+ 权限前置 + 降级模式、bisect 噪声带补 exit 125 skip wrapper、三轴去重改交叉引用、9 项新行为 + description 触发面 + dead-link 补 spec-debug-contracts 断言（11→17）、契约测试去掉冻结的过期 flat-list 改锁菜单 cue、plan status 改 partially-shipped 并勾选已满足项。
 4. fresh-source eval 三轮（neutral sonnet / adversarial sonnet / deciding-vote opus）：13 个独立判定点全 `passed`、零 findings、零分歧；2-hypothesis gap 经 opus deciding vote 判定为由 Phase 2 显式 default 覆盖、无源码修复。`fresh_source_eval: passed`。
 5. Step 2 运行时触发观察：**2-A 静态路由消歧分析**完成（触发短语零完全重叠、`performance` 共享 token、动词区分诊断/优化、Phase 1.1 入口消歧兜底）；**2-B fresh-subagent 路由模拟（opus，10 条消息）**完成——9 条干净路由 + 1 条真实撞车（message 8「the build got slow, make it fast again」跨 spec-debug/spec-optimize，P2 finding），处理决策为不改 description、靠 Phase 1.1 兜底（B 明确「no source fix strictly required if Phase 1.1 reliably present」）；**2-C 真实新会话触发观察**仍 `not_run: requires new-session observation by user`——本会话 agent 无法开新会话，已写成用户可复现观察清单（治理验证段「Step 2-C」4 步骤）。
 

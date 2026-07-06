@@ -106,7 +106,7 @@ source: docs/ideation/2026-04-03-spec-first-blog-series-outline.md
 **要点**
 
 - `doctor / init / clean` 管运行时资产
-- `/spec:*` 和 `$spec-*` 提供稳定入口
+- `spec-*` 和 `spec-*` 提供稳定入口
 - `Stage-0` 先建上下文
 - `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 形成闭环
 - `docs/solutions`、`docs/plans`、`docs/brainstorms` 形成知识复利

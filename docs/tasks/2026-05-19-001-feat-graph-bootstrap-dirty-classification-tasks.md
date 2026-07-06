@@ -204,7 +204,7 @@ source_sections:
         "CHANGELOG.md",
         "skills/spec-graph-bootstrap/SKILL.md"
       ],
-      "entry_hint": "CHANGELOG 按当前 host developer profile 解析作者,新增 (user-visible) 行;SKILL.md 在 ## Refresh Modes 段更新 dirty 行,新增 ## Dirty Classification 小节链接 setup-owned-dirty-ignore.v1;README 段在 /spec:graph-bootstrap 与 $spec-graph-bootstrap 描述处补一句。",
+      "entry_hint": "CHANGELOG 按当前 host developer profile 解析作者,新增 (user-visible) 行;SKILL.md 在 ## Refresh Modes 段更新 dirty 行,新增 ## Dirty Classification 小节链接 setup-owned-dirty-ignore.v1;README 段在 spec-graph-bootstrap 与 spec-graph-bootstrap 描述处补一句。",
       "test_focus": "CHANGELOG 行格式符合仓库现行格式且 (user-visible);SKILL.md / README 文案与契约保持一致;版本规划新增 changelog 引用。",
       "done_signal": "CHANGELOG.md 顶部新增 (user-visible) 行;SKILL.md 与 README/README.zh-CN 更新落地;版本规划补 changelog 引用;`npm run lint:skill-entrypoints`(若适用)通过。",
       "wave": 4,
@@ -246,7 +246,7 @@ source_sections:
 
 ### T005 — IU-5 文档/CHANGELOG/SKILL/README
 
-- 锚点：`CHANGELOG.md` 顶部、`skills/spec-graph-bootstrap/SKILL.md` line 268（`## Refresh Modes`）、`docs/00-版本路线/版本规划.md`、`README.md` / `README.zh-CN.md` 中 `$spec-graph-bootstrap` / `/spec:graph-bootstrap` 段
+- 锚点：`CHANGELOG.md` 顶部、`skills/spec-graph-bootstrap/SKILL.md` line 268（`## Refresh Modes`）、`docs/00-版本路线/版本规划.md`、`README.md` / `README.zh-CN.md` 中 `spec-graph-bootstrap` / `spec-graph-bootstrap` 段
 - 内容：CHANGELOG 新增 `(user-visible)` 行（作者按 `.codex/spec-first/.developer` 或 `.claude/spec-first/.developer`）；SKILL.md 更新 dirty 描述并新增 `## Dirty Classification` 小节；README 在 graph-bootstrap 段补一句；版本规划补 changelog 引用。
 - 边界：不在 README 新增独立大节；不暗示 `--allow-dirty` 已支持。
 

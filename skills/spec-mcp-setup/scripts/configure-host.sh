@@ -12,12 +12,6 @@ TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 source "$SCRIPT_DIR/lib-toml.sh"
 source "$SCRIPT_DIR/lib-template.sh"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
-HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
-HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
-SELECTED_SCOPE="$(jq -r '.selected_scope // empty' <<<"$HOST_INFO_JSON")"
-CONFIG_PATH="$(jq -r '.config_path' <<<"$HOST_INFO_JSON")"
-LOCK_FILE="${CONFIG_PATH}.lock"
-CONFIG_DIR="$(dirname "$CONFIG_PATH")"
 
 TOOL_ID=""
 while [[ $# -gt 0 ]]; do
@@ -26,11 +20,37 @@ while [[ $# -gt 0 ]]; do
       TOOL_ID="${2:-}"
       shift 2
       ;;
+    --user-scope)
+      export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
+      export CURSOR_USER_SCOPE=1
+      shift
+      ;;
     *)
       shift
       ;;
   esac
 done
+
+require_explicit_mcp_setup_host() {
+  case "${MCP_SETUP_HOST:-}" in
+    claude|codex|kiro|qoder|cursor) return 0 ;;
+    *)
+      echo '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。' >&2
+      exit 1
+      ;;
+  esac
+}
+
+require_explicit_mcp_setup_host
+
+HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
+HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
+SELECTED_SCOPE="$(jq -r '.selected_scope // empty' <<<"$HOST_INFO_JSON")"
+CONFIG_PATH="$(jq -r '.config_path' <<<"$HOST_INFO_JSON")"
+CONFIG_FORMAT="$(jq -r '.config_format // empty' <<<"$HOST_INFO_JSON")"
+LOCK_FILE="${CONFIG_PATH}.lock"
+CONFIG_DIR="$(dirname "$CONFIG_PATH")"
 
 [ -n "$TOOL_ID" ] || { echo '错误：缺少 --tool' >&2; exit 1; }
 [ -n "$SELECTED_SCOPE" ] || { echo '错误：未找到可用宿主配置目标' >&2; exit 1; }
@@ -39,16 +59,20 @@ mkdir -p "$CONFIG_DIR"
 HOST_CONFIG_JSON=$(jq -c --arg id "$TOOL_ID" --arg host "$HOST" "$SPEC_FIRST_JQ_TEMPLATE_PRELUDE"'tool_by_id($id) as $t | $t.host_config[$host] | .args = (.args | map(expand_tpl($t)))' "$TOOLS_JSON")
 [ -n "$HOST_CONFIG_JSON" ] && [ "$HOST_CONFIG_JSON" != "null" ] || { echo "错误：未找到 $TOOL_ID 的 host_config" >&2; exit 1; }
 
-RESOLVED_TOOL_CONFIG_JSON="$(jq -c '{command, args} + (if has("startup_timeout_sec") then {startup_timeout_sec} else {} end)' <<<"$HOST_CONFIG_JSON")"
+RESOLVED_TOOL_CONFIG_JSON="$(jq -c '{command, args} + (if has("type") then {type} else {} end) + (if has("env") then {env} else {} end) + (if has("envFile") then {envFile} else {} end) + (if has("startup_timeout_sec") then {startup_timeout_sec} else {} end)' <<<"$HOST_CONFIG_JSON")"
 EXPECTED_COMMAND="$(jq -r '.command' <<<"$RESOLVED_TOOL_CONFIG_JSON")"
 EXPECTED_ARGS="$(jq -c '.args' <<<"$RESOLVED_TOOL_CONFIG_JSON")"
+EXPECTED_TYPE="$(jq -r '.type // empty' <<<"$RESOLVED_TOOL_CONFIG_JSON")"
 DETECT_KIND="$(jq -r --arg id "$TOOL_ID" '.tools[] | select(.id == $id) | .detection.kind' "$TOOLS_JSON")"
 DETECT_KEY="$(jq -r --arg id "$TOOL_ID" '.tools[] | select(.id == $id) | .detection.key' "$TOOLS_JSON")"
-TOOL_REQUIRED="$(jq -r --arg id "$TOOL_ID" '.tools[] | select(.id == $id) | .required // true' "$TOOLS_JSON")"
 FALLBACK_APPLIED=false
 if [ "$HOST" = "claude" ] && [ "$SELECTED_SCOPE" != "managed" ]; then
   FALLBACK_APPLIED=true
 fi
+
+host_uses_json_config() {
+  [ "$CONFIG_FORMAT" = "json" ]
+}
 
 codex_higher_precedence_status() {
   [ "$HOST" = "codex" ] || {
@@ -92,15 +116,15 @@ tool_is_configured() {
 
   case "$DETECT_KIND" in
     host_config_exact)
-      if [ "$HOST" = "claude" ]; then
-        jq -e --arg key "$DETECT_KEY" --arg command "$EXPECTED_COMMAND" --argjson expected_args "$EXPECTED_ARGS" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1
+      if host_uses_json_config; then
+        jq -e --arg key "$DETECT_KEY" --arg command "$EXPECTED_COMMAND" --argjson expected_args "$EXPECTED_ARGS" --arg expected_type "$EXPECTED_TYPE" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and (if $expected_type == "" then true else .mcpServers[$key].type == $expected_type end) and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1
         return
       fi
       toml_mcp_section_matches_exact "$CONFIG_PATH" "$DETECT_KEY" "$EXPECTED_COMMAND" "$EXPECTED_ARGS"
       return
       ;;
     host_config_key_only)
-      if [ "$HOST" = "claude" ]; then
+      if host_uses_json_config; then
         jq -e --arg key "$DETECT_KEY" '.mcpServers[$key] != null' "$CONFIG_PATH" >/dev/null 2>&1
       else
         [ -n "$(extract_toml_mcp_section "$CONFIG_PATH" "$DETECT_KEY")" ]
@@ -122,9 +146,9 @@ overwrite_approved() {
 selected_config_conflicts() {
   [ "$DETECT_KIND" = "host_config_exact" ] || return 1
   [ -f "$CONFIG_PATH" ] || return 1
-  if [ "$HOST" = "claude" ]; then
+  if host_uses_json_config; then
     jq -e --arg key "$DETECT_KEY" '.mcpServers[$key] != null' "$CONFIG_PATH" >/dev/null 2>&1 || return 1
-    jq -e --arg key "$DETECT_KEY" --arg command "$EXPECTED_COMMAND" --argjson expected_args "$EXPECTED_ARGS" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1 && return 1
+    jq -e --arg key "$DETECT_KEY" --arg command "$EXPECTED_COMMAND" --argjson expected_args "$EXPECTED_ARGS" --arg expected_type "$EXPECTED_TYPE" '.mcpServers[$key].command == $command and (.mcpServers[$key].args // []) == $expected_args and (if $expected_type == "" then true else .mcpServers[$key].type == $expected_type end) and ((.mcpServers[$key] | has("scope")) | not)' "$CONFIG_PATH" >/dev/null 2>&1 && return 1
     return 0
   fi
   [ -n "$(extract_toml_mcp_section "$CONFIG_PATH" "$DETECT_KEY")" ] || return 1
@@ -161,7 +185,7 @@ release_lock() {
   fi
 }
 
-write_claude_config() {
+write_json_mcp_config() {
   local config_json="$1"
   local tmp
   tmp="$(mktemp "${CONFIG_PATH}.XXXXXX")"
@@ -172,6 +196,17 @@ write_claude_config() {
     jq -n --arg id "$TOOL_ID" --argjson cfg "$config_json" '{mcpServers: {($id): $cfg}}' > "$tmp"
   fi
   mv "$tmp" "$CONFIG_PATH"
+}
+
+assert_no_literal_secret_values() {
+  [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ] || [ "$HOST" = "cursor" ] || return 0
+  jq -e '
+    [.. | objects | to_entries[]? |
+      select((.key | test("(?i)(token|secret|api[_-]?key|password)"))
+        and (.value | type == "string")
+        and ((.value | test("^\\$\\{[A-Za-z_][A-Za-z0-9_]*\\}$")) | not))]
+    | length == 0
+  ' "$CONFIG_PATH" >/dev/null
 }
 
 write_codex_config() {
@@ -218,7 +253,7 @@ elif [ "$configured_status" -eq 2 ]; then
   exit 1
 fi
 
-if [ "$TOOL_REQUIRED" != "true" ] && selected_config_conflicts && ! overwrite_approved; then
+if selected_config_conflicts && ! overwrite_approved; then
   echo "错误：$TOOL_ID 已存在同名但不同 command/args 的宿主 MCP 配置；如需覆盖，请设置 SPEC_FIRST_MCP_CONFIGURE_OVERWRITE=approved 后重跑" >&2
   exit 1
 fi
@@ -233,17 +268,27 @@ else
 fi
 
 if [ "$HOST" = "claude" ]; then
-  if ! write_claude_config "$RESOLVED_TOOL_CONFIG_JSON"; then
+  if ! write_json_mcp_config "$RESOLVED_TOOL_CONFIG_JSON"; then
     restore_backup
     echo "错误：$TOOL_ID 写入宿主配置失败，已回滚" >&2
     exit 1
   fi
-else
+elif [ "$HOST" = "codex" ]; then
   if ! write_codex_config; then
     restore_backup
     echo "错误：$TOOL_ID 写入宿主配置失败，已回滚" >&2
     exit 1
   fi
+elif [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ] || [ "$HOST" = "cursor" ]; then
+  if ! write_json_mcp_config "$RESOLVED_TOOL_CONFIG_JSON" || ! assert_no_literal_secret_values; then
+    restore_backup
+    echo "错误：$TOOL_ID 写入 $HOST 配置失败或包含非 env reference 形式的敏感字段，已回滚" >&2
+    exit 1
+  fi
+else
+  restore_backup
+  echo "错误：无法识别宿主：$HOST" >&2
+  exit 1
 fi
 
 CONFIGURED_EFFECTIVE_PATH="$CONFIG_PATH"

@@ -316,7 +316,7 @@ Agent 对比结论：
 - **D2: 在审计完成前保留 spec-first `spec-cli-*readiness*` reviewers。** CE 删除了两个 CLI readiness reviewers，但 spec-first 本身就是 CLI/workflow harness 且当前仍引用它们。删除是产品和 review 覆盖面决策，不是路径同步决策。
 - **D3: 主动同步 shell safety 修复。** 删除被拒绝的 `!` 预解析语法、避免 Bash parameter expansion、把脚本调用移入 runtime scripts，都直接服务当前 host 稳定性。
 - **D4: 不复制 CE release metadata。** CE `3.4.2`、plugin manifests、release-please state、lockfile metadata 和 CE changelog 都不是 spec-first 真相源。
-- **D5: 使用 spec-first 当前宿主语言。** 任何复制的 CE `/ce-*` 文案必须改为当前宿主表述，Claude 使用 `/spec:*`，Codex 使用 `$spec-*`；共享 source skill 中可使用中性的“当前宿主入口”表述。
+- **D5: 使用 spec-first 当前宿主语言。** 任何复制的 CE `/ce-*` 文案必须改为当前宿主表述，Claude 使用 `spec-*`，Codex 使用 `spec-*`；共享 source skill 中可使用中性的“当前宿主入口”表述。
 - **D6: 测试遵循 spec-first 布局。** CE 的 Bun/TS tests 是上游断言，不是目标文件。断言应移植到现有 `tests/unit/*.test.js` 或 shell tests。
 - **D7: 本计划本身仅是文档变更。** 本计划不实施 patch，不重新生成 runtime，也不运行 CE sync tests。
 - **D8: Agent 权限是证据驱动的最小适配，不是整文件同步。** CE agent 正文没有变化，`Write` 只是为了让 JSON-pipeline leaf reviewers 写 run artifact。spec-first 只能在确认当前 code-review template、host frontmatter 语义和 runtime generation 都需要且支持该权限后，追加 `Write`；不得借此复制 CE agent 正文或删除 spec-first 特有 CLI reviewers。

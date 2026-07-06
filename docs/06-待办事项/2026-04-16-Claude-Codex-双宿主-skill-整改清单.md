@@ -5,8 +5,8 @@
 - 审查口径：以仓库代码与打包/同步实现为事实依据，不以测试文件为主依据
 - 宿主范围：`Claude Code` + `Codex`
 - 本轮已确认的产品契约：
-  - Claude 用户可见 workflow 入口：`/spec:*`
-  - Codex 用户可见 workflow 入口：`$spec-*`
+  - Claude 用户可见 workflow 入口：`spec-*`
+  - Codex 用户可见 workflow 入口：`spec-*`
   - `Skill(...)`、`skill:` 属于内部调用 DSL，不纳入“用户可见入口治理”
 - 对标基准：`/Users/kuang/xiaobu/compound-engineering-plugin`
 - 关联审计：
@@ -23,7 +23,7 @@
 
 当前已落地的关键结果：
 
-1. Codex 已停止生成 `.codex/commands/spec/*`，用户可见 workflow 入口统一为 `$spec-*`
+1. Codex 已停止生成 `.codex/commands/spec/*`，用户可见 workflow 入口统一为 `spec-*`
 2. `src/cli/contracts/dual-host-governance/skills-governance.json` + `skills-governance.schema.json` 已形成 `47` 个 skill 的 machine-readable 真源
 3. `src/cli/plugin.js` 已改为由 `plugin manifest + src/cli/contracts/dual-host-governance/skills-governance.json` 共同驱动 filtered asset set；`init / sync / doctor / state` 共用同一治理模型
 4. `orchestrating-swarms` 已被 runtime 正式收口为 `host_exclusive(owner_host=claude)`；Codex 不再安装该 skill
@@ -92,7 +92,7 @@
 3. Codex runtime 当前代码仍然：
    - 生成 `.codex/commands/spec/`
    - 把 `skillsRoot` 与 `workflowsRoot` 都指向 `.agents/skills/`
-   - 在 `init` / `doctor` 中按“Codex 也有 `/spec:*` commands”处理
+   - 在 `init` / `doctor` 中按“Codex 也有 `spec-*` commands”处理
 4. 当前代码只逻辑区分：
    - `command-backed workflow`
    - `standalone skill`
@@ -114,8 +114,8 @@
 
 本轮按下面的边界执行整改：
 
-1. Claude 用户可见 workflow 入口统一为 `/spec:*`
-2. Codex 用户可见 workflow 入口统一为 `$spec-*`
+1. Claude 用户可见 workflow 入口统一为 `spec-*`
+2. Codex 用户可见 workflow 入口统一为 `spec-*`
 3. standalone skill 不得写成已暴露的用户命令，除非产品明确声明
 4. `Skill(...)`、`skill:`、其他内部路由 token 不纳入用户可见入口治理
 5. 因此，本轮“入口错位”只审：
@@ -141,8 +141,8 @@
 1. 先让代码和文档收敛到**已确认的产品契约**，不要继续混写“当前现状”和“未来待定策略”
 2. 保留当前 `13` 个 workflow source set，不要为了补文档把大量 standalone skill 升格成用户命令
 3. 用户可见入口只治理两层：
-   - Claude：`/spec:*`
-   - Codex：`$spec-*`
+   - Claude：`spec-*`
+   - Codex：`spec-*`
 4. 宿主治理不能再用单一 `Claude-only / Codex-only / dual-host` 轴，至少要拆成：
    - `entry_surface`：workflow command / standalone skill / internal-only
    - `host_scope`：dual-host / host-exclusive / target-host-maintenance
@@ -194,7 +194,7 @@
 5. 合并前闸门：
    - 必须对 `skills/*/SKILL.md` 做一次全量入口静态扫描
    - 扫描至少覆盖：`^# /`、`/todo-`、`/test-`、`/feature-video`、`/proof`、`/agent-native-architecture`、`/research`、`/simplify`、`/ralph-loop`
-   - 建议追加标签感知规则：拦截 `**Codex entry point:** /spec:*` 这类错误宿主入口写法；不要用过宽的 `/spec:` 全局匹配误伤合法 Claude 文案
+   - 建议追加标签感知规则：拦截 `**Codex entry point:** spec-*` 这类错误宿主入口写法；不要用过宽的 `spec-*` 全局匹配误伤合法 Claude 文案
 6. 代码与脚本类：
    - 必须补对应验证
    - `T01` 至少补 unit / smoke
@@ -220,8 +220,8 @@
    - 禁止：`/model to Haiku`
    - 标准：`切换到快速/低成本模型（宿主相关）`
 3. 用户可见 workflow 入口
-   - Claude：`/spec:*`
-   - Codex：`$spec-*`
+   - Claude：`spec-*`
+   - Codex：`spec-*`
    - 除这两类外，不把其他文案写成已声明命令
 4. 下一步引导
    - 禁止：`Run /proof`
@@ -231,7 +231,7 @@
 
 ## P0：必须先修
 
-### 4.1 Codex 仍在暴露错误的 `/spec:*` 产品面，且口径未在 CLI 与关键 skill 文案中全量收口
+### 4.1 Codex 仍在暴露错误的 `spec-*` 产品面，且口径未在 CLI 与关键 skill 文案中全量收口
 
 - 类型：`代码+文档`
 - 文件：
@@ -245,20 +245,20 @@
   - `skills/setup/SKILL.md`
 - 问题：
   - 当前代码仍为 Codex 生成 `.codex/commands/spec/*`
-  - `init` 仍提示 Codex 重启后获取新的 `/spec:* commands`
-  - 当前 `init.js` 的错误不是“完全没有 `$spec-*` 分支”，而是 `adapter.hasCommands === true` 时 Codex 永远走进 `/spec:* commands` 分支
+  - `init` 仍提示 Codex 重启后获取新的 `spec-* commands`
+  - 当前 `init.js` 的错误不是“完全没有 `spec-*` 分支”，而是 `adapter.hasCommands === true` 时 Codex 永远走进 `spec-* commands` 分支
   - `doctor` 仍把 Codex command 目录当成正式产品面检查
-  - `printVersion()` 仍提示“使 `/spec:*` 命令生效”
-  - README 仍在传播 Codex `/spec:*` 入口
-  - `spec-mcp-setup`、`spec-graph-bootstrap`、`setup` 仍显式写 `**Codex entry point:** /spec:*`
+  - `printVersion()` 仍提示“使 `spec-*` 命令生效”
+  - README 仍在传播 Codex `spec-*` 入口
+  - `spec-mcp-setup`、`spec-graph-bootstrap`、`setup` 仍显式写 `**Codex entry point:** spec-*`
 - 影响：
-  - 当前代码和公开文档都偏离已确认契约：`Codex = $spec-*`
+  - 当前代码和公开文档都偏离已确认契约：`Codex = spec-*`
 - 建议动作：
   - 先锁定 `.codex/commands/spec/*` 的最终策略：删除，或保留为兼容层但明确排除在用户可见入口之外
   - 停止把 `.codex/commands/spec/*` 作为 Codex 用户可见入口
   - `init.js` / `doctor.js` / `printVersion()` 的修法必须直接参照 compatibility layer 决策，不能让执行者自行猜测
-  - `init` / `doctor` / `printVersion()` / README 全量改成 `$spec-*`
-  - 同批修 `spec-mcp-setup`、`spec-graph-bootstrap`、`setup` 中显式写死的 Codex `/spec:* entry point`
+  - `init` / `doctor` / `printVersion()` / README 全量改成 `spec-*`
+  - 同批修 `spec-mcp-setup`、`spec-graph-bootstrap`、`setup` 中显式写死的 Codex `spec-* entry point`
   - 先收口产品面，再做后续文档批修
 
 ### 4.2 `spec-mcp-setup` 旧路径漂移
@@ -282,7 +282,7 @@
 - 问题：
   - 第 1 步仍写 `/ralph-loop:ralph-loop`
   - 第 5、6、7 步直接写成 `/todo-resolve`、`/test-browser`、`/feature-video`
-  - 第 3 步裸调用 `/spec:work`，没有把第 2 步产出的 plan path 传下去
+  - 第 3 步裸调用 `spec-work`，没有把第 2 步产出的 plan path 传下去
 - 影响：
   - 当前流水线编排不能按文档闭环
   - 即使只修第 5/6/7 步，主数据流仍然是断的
@@ -508,7 +508,7 @@
   - `README.md`
 - 问题：
   - `.claude-plugin/plugin.json` 的产品描述仍是 Claude Code 口径
-  - README 仍混写 Codex `/spec:*` 与 `$spec-*`
+  - README 仍混写 Codex `spec-*` 与 `spec-*`
 - 影响：
   - 即使 skill 文案修完，外层产品定位仍会继续误导
 - 建议动作：
@@ -578,7 +578,7 @@
   - 增加对 `skills/*/SKILL.md` 的全量静态扫描
   - 默认阻断：`^# /`、`/todo-`、`/test-`、`/feature-video`、`/proof`、`/agent-native-architecture`、`/research`、`/simplify`、`/ralph-loop`
   - 明确豁免：`Skill(...)`、`skill:`
-  - 增强项：追加 `Codex entry point.*\\/spec:` 这类标签感知规则，专门拦截错误宿主入口，不把所有 `/spec:` 写法一刀切判错
+  - 增强项：追加 `Codex entry point.*\\spec-*` 这类标签感知规则，专门拦截错误宿主入口，不把所有 `spec-*` 写法一刀切判错
   - 第一阶段先提供 `npm run lint:skill-entrypoints`
   - 第二阶段接入 CI gate
   - `pre-commit` 作为增强项，等规则稳定后再决定是否默认启用
@@ -633,9 +633,9 @@
 ### 第一阶段：先切到最终产品契约
 
 1. 先完成 `T00`，锁定 Codex compatibility layer、治理枚举与 filtered asset set contract
-2. 再停止 Codex 对外产品面继续传播 `/spec:*`
-3. 把 Codex 的 `init` / `doctor` / `printVersion()` / README 统一改成 `$spec-*`
-4. 同批修 `spec-mcp-setup` / `spec-graph-bootstrap` / `setup` 中显式写死的 Codex `/spec:* entry point`
+2. 再停止 Codex 对外产品面继续传播 `spec-*`
+3. 把 Codex 的 `init` / `doctor` / `printVersion()` / README 统一改成 `spec-*`
+4. 同批修 `spec-mcp-setup` / `spec-graph-bootstrap` / `setup` 中显式写死的 Codex `spec-* entry point`
 5. 同步修 `.claude-plugin/plugin.json` 与外层产品 copy
 
 ### 第二阶段：清硬断点
@@ -689,4 +689,4 @@
 3. 少量路径和宿主变量已经失效
 4. 宿主兼容边界还没有在分发层以正确模型落地
 
-只要按本清单完成整改，当前 skill 资产本身的能力密度仍然足够支撑双宿主产品成立；但前提是先把“Codex = `$spec-*`、Claude = `/spec:*`、内部 DSL 不纳入用户入口治理”这三个边界彻底钉死。
+只要按本清单完成整改，当前 skill 资产本身的能力密度仍然足够支撑双宿主产品成立；但前提是先把“Codex = `spec-*`、Claude = `spec-*`、内部 DSL 不纳入用户入口治理”这三个边界彻底钉死。

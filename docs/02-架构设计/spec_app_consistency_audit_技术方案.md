@@ -169,7 +169,7 @@ LLM / Agent 职责：
 ## 4. 总体架构
 
 ```text
-/spec:app-consistency-audit
+spec-app-consistency-audit
         ↓
 Preflight 项目预检
         ↓

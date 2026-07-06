@@ -8,7 +8,7 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 
 ## Summary
 
-本需求将 GitNexus 从“graph readiness 产物来源”升级为 spec-first 的一等代码智能增强插件：保留 GitNexus 原生能力面，同时用轻量能力协议优先接入 `$spec-plan`。首阶段让技术方案阶段默认获得代码图谱证据、影响面提示、复用候选和证据限制说明；`$spec-work`、`$spec-code-review`、`$spec-debug` 后续可复用同一 evidence posture，但不作为 v1 硬验收面。
+本需求将 GitNexus 从“graph readiness 产物来源”升级为 spec-first 的一等代码智能增强插件：保留 GitNexus 原生能力面，同时用轻量能力协议优先接入 `spec-plan`。首阶段让技术方案阶段默认获得代码图谱证据、影响面提示、复用候选和证据限制说明；`spec-work`、`spec-code-review`、`spec-debug` 后续可复用同一 evidence posture，但不作为 v1 硬验收面。
 
 ---
 
@@ -25,19 +25,19 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 ## Actors
 
 - A1. Developer: 在单仓或多仓 workspace 中使用 spec-first，希望技术方案基于真实代码结构、执行流和影响面，而不是靠猜测。
-- A2. `$spec-plan`: 技术方案生成者，是首个一等消费 GitNexus capability 的 workflow。
+- A2. `spec-plan`: 技术方案生成者，是首个一等消费 GitNexus capability 的 workflow。
 - A3. GitNexus capability plugin: 暴露 GitNexus 原生代码智能能力，并提供 freshness / availability / limitation evidence。
 - A4. Generic Code Intelligence Plugin protocol: spec-first 内部的轻量能力协议，允许未来接入其他代码智能 provider，但不得压平 GitNexus 原生能力。
-- A5. `$spec-graph-bootstrap`: durable graph readiness compiler，负责 provider refresh、canonical facts 和 workspace advisory facts。
-- A6. Downstream workflows: 后续 `$spec-work`、`$spec-code-review`、`$spec-debug` 等消费者，可逐步复用同一能力协议。
-- A7. `$spec-mcp-setup`: required harness runtime setup，负责安装/配置 MCP、helper、provider projection 和 setup-owned capability facts。
+- A5. `spec-graph-bootstrap`: durable graph readiness compiler，负责 provider refresh、canonical facts 和 workspace advisory facts。
+- A6. Downstream workflows: 后续 `spec-work`、`spec-code-review`、`spec-debug` 等消费者，可逐步复用同一能力协议。
+- A7. `spec-mcp-setup`: required harness runtime setup，负责安装/配置 MCP、helper、provider projection 和 setup-owned capability facts。
 
 ---
 
 ## Key Flows
 
 - F1. Plan lightweight intelligence probe
-  - **Trigger:** Developer 进入 `$spec-plan`，任务涉及代码、架构、API、跨模块、测试或多仓判断。
+  - **Trigger:** Developer 进入 `spec-plan`，任务涉及代码、架构、API、跨模块、测试或多仓判断。
   - **Actors:** A1, A2, A3, A4
   - **Steps:** Plan 读取已有 readiness / freshness facts；探测 GitNexus capability 是否 query-ready 或可作为 session-local evidence；判断是否需要 deep dive；记录可用能力、capability status、evidence grade、freshness state、限制和候选目标。
   - **Outcome:** 每个有代码影响的技术方案都有最低成本的 GitNexus evidence posture，不再默认跳过图谱能力。
@@ -58,14 +58,14 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
   - **Covered by:** R10, R11, R12, R13
 
 - F4. Durable refresh remains explicit
-  - **Trigger:** Developer 运行 `$spec-graph-bootstrap` 或 workflow 明确进入 graph readiness refresh。
+  - **Trigger:** Developer 运行 `spec-graph-bootstrap` 或 workflow 明确进入 graph readiness refresh。
   - **Actors:** A1, A3, A5
   - **Steps:** Bootstrap 继续负责编译 durable readiness、provider status、canonical artifacts 和 workspace advisory facts；普通 Plan 不静默刷新 provider，也不静默执行 group sync。
   - **Outcome:** GitNexus 能力增强不破坏现有 source/runtime/provider 边界，dirty-source-blocked 只表示 durable refresh 受限，不等同于 GitNexus query 完全不可用。
   - **Covered by:** R11, R13, R14, R15
 
 - F5. Setup-owned capability projection
-  - **Trigger:** Developer 运行 `$spec-mcp-setup` 或 setup 在 repo / parent workspace 中刷新 required harness runtime。
+  - **Trigger:** Developer 运行 `spec-mcp-setup` 或 setup 在 repo / parent workspace 中刷新 required harness runtime。
   - **Actors:** A1, A3, A7
   - **Steps:** Setup 配置 GitNexus host MCP、warm provider package、写入 setup-owned provider/capability facts 和 handoff guidance；它不运行 GitNexus query/analyze/status，也不生成 Plan evidence。
   - **Outcome:** 下游 Plan 能知道 GitNexus 作为 live capability 可用或需要新会话/graph bootstrap，但 setup 不越界成为代码智能查询执行器。
@@ -84,43 +84,43 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 
 **Plugin Boundary**
 
-- R1. GitNexus 必须作为 spec-first 的一等 capability enhancement plugin 集成，而不是只作为 `$spec-graph-bootstrap` 的 readiness 输入或 artifact 生产者。
+- R1. GitNexus 必须作为 spec-first 的一等 capability enhancement plugin 集成，而不是只作为 `spec-graph-bootstrap` 的 readiness 输入或 artifact 生产者。
 - R2. 集成必须保留 GitNexus 原生能力面，包括 execution-flow query、symbol context、impact analysis、route map、API impact、shape check、Cypher、tool map、repo registry 和 workspace group 能力；spec-first 可以路由和标注证据等级，但不得把这些能力压平成单一 ready / not-ready 字段。
 - R3. spec-first 可以定义 Generic Code Intelligence Plugin protocol，但该 protocol 必须是轻量能力枚举和证据 envelope；它不得成为隐藏 GitNexus 原生命令、限制高级查询或把所有 provider 取最小公分母的抽象层。
 - R4. GitNexus evidence 不拥有 semantic authority：它提供可追溯证据、候选关系和影响面信号；源码、测试、canonical facts 与 LLM 判断仍是最终方案依据。
 
 **Plan-First Consumption**
 
-- R5. `$spec-plan` 必须成为第一阶段首个一等消费者：凡计划涉及代码实现、架构、API、跨模块、跨仓、数据流、执行流、测试或 review 风险，都应先做 lightweight GitNexus capability/readiness/context probe。
+- R5. `spec-plan` 必须成为第一阶段首个一等消费者：凡计划涉及代码实现、架构、API、跨模块、跨仓、数据流、执行流、测试或 review 风险，都应先做 lightweight GitNexus capability/readiness/context probe。
 - R6. Lightweight probe 必须产出 plan 可消费的 evidence posture，至少表达：是否建议 deep dive、触发原因、可用 GitNexus capabilities、capability status、evidence grade、freshness state、candidate refs、limitations、fallback posture，以及这些字段来自哪些 existing contract/source fields。
 - R7. 当出现 graph-heavy 信号时，Plan 必须执行 conditional deep dive；信号包括跨模块/跨仓风险、现有执行流可能存在、API surface 变更、共享符号或公共契约变更、复用候选不明、测试选择不明、影响面不确定或用户显式要求 GitNexus。
 - R8. Deep dive 必须优先选择与任务匹配的 GitNexus 原生能力，而不是只读取 canonical readiness artifacts；例如 API 变更优先 route/API impact，符号重构优先 context/impact，复用探索优先 query/context，复杂结构问题可使用 Cypher。
-- R9. Plan 输出必须保留现有 `$spec-plan` 的 `## Graph Readiness` block 字段语义，并在其后增加 `Graph / GitNexus Evidence` 或等价相邻章节；不得把 readiness 字段改造成影响分析字段。GitNexus evidence 章节至少包含：`provider`、`native_tool_or_resource`、`repo_scope`、`capability_status`、`evidence_grade`、`freshness_state`、`source_contract_fields`、`source_reads_required`、`impact_on_plan`；说明 capabilities_used、关键发现、限制，以及这些证据如何影响方案信心。
+- R9. Plan 输出必须保留现有 `spec-plan` 的 `## Graph Readiness` block 字段语义，并在其后增加 `Graph / GitNexus Evidence` 或等价相邻章节；不得把 readiness 字段改造成影响分析字段。GitNexus evidence 章节至少包含：`provider`、`native_tool_or_resource`、`repo_scope`、`capability_status`、`evidence_grade`、`freshness_state`、`source_contract_fields`、`source_reads_required`、`impact_on_plan`；说明 capabilities_used、关键发现、限制，以及这些证据如何影响方案信心。
 - R10. Plan 的 implementation units 必须能引用图谱证据对工作拆分产生的影响：impacted surfaces、reuse references、risk hotspots、test candidates、unknowns 和 fallback reads。
 
 **Freshness And Degraded Mode**
 
 - R11. GitNexus unavailable、query-unverified、stale 或 dirty-advisory 时，Plan 默认继续，但必须强制披露 limitations；对于 graph-heavy 任务，必须提示方案信心下降并扩大 direct source reads / ast-grep / code-review-graph fallback。
 - R12. dirty worktree 不应被解释为“必须全部提交后才能计划”。它只影响 durable provider refresh 和 source_revision 精确保证；已有 query-ready index 仍可作为 prior evidence 使用，但必须标注 stale 或 dirty-advisory，并用当前源码读取验证关键点。
-- R13. 普通 workflow 不得静默运行 provider refresh、GitNexus group sync 或其他可能改变 durable provider state 的命令；这些动作必须通过 `$spec-graph-bootstrap`、明确 user intent 或后续专门 workflow 执行。
+- R13. 普通 workflow 不得静默运行 provider refresh、GitNexus group sync 或其他可能改变 durable provider state 的命令；这些动作必须通过 `spec-graph-bootstrap`、明确 user intent 或后续专门 workflow 执行。
 - R14. Evidence envelope 必须区分三轴：`capability_status`（available/partial/unavailable/mutation-gated）、`evidence_grade`（primary/session-local/advisory/fallback）、`freshness_state`（fresh/stale/dirty-advisory/query-unverified）；避免把 provider 可用性、证据可信度、refresh eligibility、query usability 和 index 新鲜度混为一谈（见附录 A）。这些字段是 Plan 输出 envelope，不是新的 canonical readiness truth，必须从 `docs/contracts/graph-evidence-policy.md`、`docs/contracts/workspace-gitnexus-consumption.md`、setup projection、provider status 或 session-local live MCP evidence 派生。
 
 **Evidence Contract Compatibility**
 
-- R14a. `capability_status` 只表达当前 capability 是否可被本轮 workflow 使用；它不得替代 `workspace-gitnexus-consumption.md` 中的 `refresh_eligibility`、`index_snapshot`、`query_usability`，也不得覆盖 `$spec-plan` 现有 `Graph Readiness.status`。
+- R14a. `capability_status` 只表达当前 capability 是否可被本轮 workflow 使用；它不得替代 `workspace-gitnexus-consumption.md` 中的 `refresh_eligibility`、`index_snapshot`、`query_usability`，也不得覆盖 `spec-plan` 现有 `Graph Readiness.status`。
 - R14b. `evidence_grade` 必须映射到 `graph-evidence-policy.md` 的证据等级（含 Plan 层别名）：`primary` 是 `confirmed` 的 Plan 别名，对应已验证 fresh compiled/provider evidence；`session-local` 对应当前会话 live MCP/CLI 结果；`advisory` 对应 stale/partial/definitions-only/pointer；`fallback` 是 Plan 专用 posture 标签，表示切换为 direct source reads、ast-grep、git diff 或 code-review-graph，对应 `advisory`/`stale` 降级后的行为结果，不是独立证据等级——当 fallback 来自直接源码或测试时，源码/测试事实本身仍可作为 `confirmed`/`primary` evidence。别名定义见 `docs/contracts/graph-evidence-policy.md`。
 - R14c. `freshness_state` 必须从 `source_revision`、`worktree_dirty`、`worktree_status_hash`、provider fingerprint、`query_ready`、`last_indexed_commit`、workspace `index_snapshot` / `query_usability` 等既有字段推导。Plan 不得把这些推导结果写回 `.spec-first/graph/*`、`.spec-first/providers/*`、`.spec-first/impact/*` 或 `.spec-first/workspace/*`。
 
 **Graph Bootstrap Relationship**
 
-- R15. `$spec-mcp-setup` 继续只负责 required harness runtime、MCP/helper/config/ledger readiness，不运行 provider analyze，不替 Plan 做语义判断。
-- R16. `$spec-graph-bootstrap` 继续只负责编译 durable provider readiness、canonical graph facts、raw/normalized provider pointers 和 workspace advisory facts；它不决定某个技术方案应该如何用 GitNexus 证据。
+- R15. `spec-mcp-setup` 继续只负责 required harness runtime、MCP/helper/config/ledger readiness，不运行 provider analyze，不替 Plan 做语义判断。
+- R16. `spec-graph-bootstrap` 继续只负责编译 durable provider readiness、canonical graph facts、raw/normalized provider pointers 和 workspace advisory facts；它不决定某个技术方案应该如何用 GitNexus 证据。
 - R17. GitNexus plugin 必须能同时消费 durable bootstrap facts 和 session-local MCP evidence；durable facts 用于 freshness / readiness / provenance，session-local evidence 用于本轮 Plan 的具体代码智能查询。
 - R18. canonical artifacts 仍然是下游 workflow 的标准入口，但不能成为唯一入口；当 GitNexus 原生能力可用时，Plan 应能越过 summary artifact 使用更精确的 native query，并在输出中说明证据来源。
 
 **Downstream Adoption**
 
-- R19. 第一阶段只要求 `$spec-plan` 深度接入；`$spec-work`、`$spec-code-review`、`$spec-debug` 后续逐步接入同一能力协议，不要求一次性全 workflow 改造。
+- R19. 第一阶段只要求 `spec-plan` 深度接入；`spec-work`、`spec-code-review`、`spec-debug` 后续逐步接入同一能力协议，不要求一次性全 workflow 改造。
 - R20. Downstream workflows 消费 GitNexus evidence 时必须保持 source-first：图谱发现用于缩小读码范围、发现影响面和提升计划质量，不能替代直接读取目标源码、运行测试或人工确认高风险决策。
 
 **Mutation Capability Boundary**
@@ -136,12 +136,12 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 
 **MCP Setup Integration**
 
-- R21. `$spec-mcp-setup` 需要配合本方案补强 setup-owned GitNexus capability metadata，表达 GitNexus 作为 required host MCP / graph-provider 可向下游提供哪些原生能力；这些 metadata 只描述 capability availability，不包含任务级查询结果或语义结论。
+- R21. `spec-mcp-setup` 需要配合本方案补强 setup-owned GitNexus capability metadata，表达 GitNexus 作为 required host MCP / graph-provider 可向下游提供哪些原生能力；这些 metadata 只描述 capability availability，不包含任务级查询结果或语义结论。
 - R22. GitNexus capability projection 至少应能表达 query、context、impact、route/API evidence、shape check、Cypher、tool map、repo registry 和 workspace group 等能力是否可由当前 host/runtime 暴露；具体字段、命名、schema 和 provider pin / live tool surface 校验方式由 planning 决定。
-- R23. `$spec-mcp-setup` 的 handoff 必须区分三件事：需要 durable readiness refresh 时运行 `$spec-graph-bootstrap`；只需要 Plan 阶段 live GitNexus evidence 时新开会话后由 `$spec-plan` 做 lightweight probe；dirty worktree 阻断 durable refresh 不等于 Plan 不能使用 prior/session-local evidence。
-- R24. `$spec-mcp-setup` 不得因为新增 capability metadata 而运行 `gitnexus analyze`、`gitnexus status`、`gitnexus query`、GitNexus group sync、provider repair 或任何任务级 deep dive；这些仍属于 `$spec-graph-bootstrap`、用户显式意图或 downstream LLM workflow。
+- R23. `spec-mcp-setup` 的 handoff 必须区分三件事：需要 durable readiness refresh 时运行 `spec-graph-bootstrap`；只需要 Plan 阶段 live GitNexus evidence 时新开会话后由 `spec-plan` 做 lightweight probe；dirty worktree 阻断 durable refresh 不等于 Plan 不能使用 prior/session-local evidence。
+- R24. `spec-mcp-setup` 不得因为新增 capability metadata 而运行 `gitnexus analyze`、`gitnexus status`、`gitnexus query`、GitNexus group sync、provider repair 或任何任务级 deep dive；这些仍属于 `spec-graph-bootstrap`、用户显式意图或 downstream LLM workflow。
 - R25. setup-owned fallback / degraded 文案不得恢复 Serena 语义；GitNexus 不可用时的默认降级证据应表述为 direct source reads、ast-grep、code-review-graph、prior GitNexus evidence 或 bounded per-repo fallback。
-- R26. `$spec-mcp-setup` 的调整应优先落在 `mcp-tools.json` registry、provider projection writer、runtime capability facts、setup skill prose 和 contract tests；不应把 setup 执行流改造成 provider capability router。
+- R26. `spec-mcp-setup` 的调整应优先落在 `mcp-tools.json` registry、provider projection writer、runtime capability facts、setup skill prose 和 contract tests；不应把 setup 执行流改造成 provider capability router。
 
 **Multi Repo Workspace Model**
 
@@ -156,19 +156,19 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 
 - R33. Capability catalog 必须带 source tag 和 verification posture：checked-in 文档可以记录基线能力，但最终实现必须根据当前 GitNexus provider pin、setup projection 和当前 host 暴露的 MCP tool / resource surface 复核；不得把一次 session-local 工具清单当成永久事实。最低 source tags 包括 `checked-in-baseline`、`setup-projection`、`provider-pin`、`live-mcp-tool`、`live-mcp-resource`、`session-local-inference`、`user-decision`。
 - R34. GitNexus plugin 的 capability surface 不限于 MCP tools，也应允许读取 GitNexus 暴露的 read-only MCP resources（如 repo context、schema、processes）作为 lightweight probe 或 deep dive 的证据来源；resources 与 tools 一样必须标注 provenance 和 freshness。
-- R35. Capability catalog 的 checked-in baseline 只定义 capability 语义、候选 native tools/resources 和降级 posture；`$spec-mcp-setup` 只能写 observed availability / projection facts，`$spec-plan` 再执行 session-local probe 并决定是否使用某个 native capability。setup projection 不得成为第二个永久 capability registry。
+- R35. Capability catalog 的 checked-in baseline 只定义 capability 语义、候选 native tools/resources 和降级 posture；`spec-mcp-setup` 只能写 observed availability / projection facts，`spec-plan` 再执行 session-local probe 并决定是否使用某个 native capability。setup projection 不得成为第二个永久 capability registry。
 
 ---
 
 ## Acceptance Examples
 
-- AE1. **Covers R5, R6, R9.** Given GitNexus query-ready and a developer asks for a technical plan, when `$spec-plan` starts, then the plan includes a lightweight GitNexus evidence posture and states whether deep dive was triggered.
+- AE1. **Covers R5, R6, R9.** Given GitNexus query-ready and a developer asks for a technical plan, when `spec-plan` starts, then the plan includes a lightweight GitNexus evidence posture and states whether deep dive was triggered.
 - AE2. **Covers R7, R8, R10.** Given a task changes a public API route, when Plan detects API surface risk, then it uses route/API impact capability where available and annotates implementation units with impacted consumers, source reads still required, and test candidates.
 - AE3. **Covers R11, R12, R14.** Given a dirty worktree with prior GitNexus query-ready evidence, when Plan runs, then it does not require all changes to be committed; it labels GitNexus evidence as dirty-advisory or stale, validates critical claims with current source reads, and discloses lower confidence.
 - AE4. **Covers R11, R20.** Given GitNexus is unavailable, when a graph-heavy Plan is requested, then planning continues with an explicit limitation section and fallback evidence from direct reads, ast-grep or code-review-graph rather than silently omitting impact analysis.
 - AE5. **Covers R13, R17, R18.** Given a parent multi-repo workspace, when Plan needs read-only cross-repo context, then it may use existing workspace/group readiness and session-local GitNexus queries; it must not silently run group sync or refresh durable provider state.
 - AE6. **Covers R1, R2, R3.** Given the integration is complete, when a user asks whether GitNexus capabilities were preserved, then spec-first documentation and Plan behavior show native GitNexus capabilities available as task-matched tools, not hidden behind a generic ready flag.
-- AE7. **Covers R21, R22, R23.** Given `$spec-mcp-setup` completes successfully, when a later Plan starts in a fresh session, then it can discover GitNexus native capability availability from setup-owned facts while still relying on Plan to decide which capability to use.
+- AE7. **Covers R21, R22, R23.** Given `spec-mcp-setup` completes successfully, when a later Plan starts in a fresh session, then it can discover GitNexus native capability availability from setup-owned facts while still relying on Plan to decide which capability to use.
 - AE8. **Covers R24, R25, R26.** Given setup is rerun in a dirty repo, when file changes are inspected, then setup has not run GitNexus query/analyze/status or group sync, has not restored Serena fallback wording, and has only updated setup-owned projection/readiness/capability facts.
 - AE9. **Covers R27, R28, R29.** Given a parent workspace has multiple indexed child repos and GitNexus group is ready, when Plan needs cross-repo orientation, then it may use the group selector to find candidates but still records per-repo freshness and validates final conclusions against child source files.
 - AE10. **Covers R30, R31, R32.** Given `group_list` returns no configured group but `list_repos` shows matching child repos, when Plan runs from the parent workspace, then it uses bounded registry / per-repo fan-out, does not treat group-missing as provider failure, and requires target_repo before any write-oriented work.
@@ -186,23 +186,23 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 - dirty worktree 不再被用户理解为“必须全部提交才能继续”；系统能区分 durable refresh blocked 与 query evidence usable-but-limited。
 - GitNexus 不可用时 Plan 仍可继续，但必须显式降低信心并扩大 fallback evidence，而不是静默降级。
 - 脚本与 LLM 边界保持清楚：setup/bootstrap 编译事实，Plan 做语义判断和方案取舍。
-- `$spec-mcp-setup` 能清楚表达 GitNexus live capability 是否已配置、是否需要新会话、是否建议 graph-bootstrap，但不会执行任务级 GitNexus 查询。
+- `spec-mcp-setup` 能清楚表达 GitNexus live capability 是否已配置、是否需要新会话、是否建议 graph-bootstrap，但不会执行任务级 GitNexus 查询。
 - 多仓计划能在 group-ready 和 group-missing 两种情况下都产出可执行方案：group-ready 作为增强，group-missing 走 registry / per-repo fallback，不把 group 当成硬依赖。
 - Plan 输出能区分 capability status、evidence grade 和 freshness state，并能说明 GitNexus 证据是否来自 tool、resource、compiled readiness 还是 direct read fallback，同时映射回现有 graph/workspace evidence contracts。
-- v1 只要求 `$spec-plan` 与 setup capability metadata 达到硬验收；后续 `$spec-work` 和 `$spec-code-review` 能复用同一 capability evidence posture 属于 compatibility goal，不作为 v1 行为完成条件。
+- v1 只要求 `spec-plan` 与 setup capability metadata 达到硬验收；后续 `spec-work` 和 `spec-code-review` 能复用同一 capability evidence posture 属于 compatibility goal，不作为 v1 行为完成条件。
 
 ---
 
 ## Scope Boundaries
 
 - 不把 GitNexus 变成 spec-first 内置 provider，也不 fork、代理或重实现 GitNexus。
-- 不要求第一阶段实现所有 downstream workflows；首阶段以 `$spec-plan` 为硬验收面。
+- 不要求第一阶段实现所有 downstream workflows；首阶段以 `spec-plan` 为硬验收面。
 - 不让普通 Plan 静默执行 provider analyze、group sync、install、host config 修改或 durable artifact refresh。
 - 不删除现有 canonical graph artifacts；本需求是在其上增加一等 capability consumption，不替换 readiness compiler。
 - 不把 Code Intelligence Plugin protocol 设计成复杂 provider 平台、状态机或规则引擎。
 - 不让 GitNexus evidence 替代源码、测试、review 或 LLM 架构判断。
 - 不要求用户为了生成计划而提交所有未提交变更；只有需要 durable refresh 精确对齐时才提示 clean/commit/stash 等操作。
-- 不让 `$spec-mcp-setup` 承担 Plan intelligence pass、GitNexus deep dive、group sync 或 provider query 证明。
+- 不让 `spec-mcp-setup` 承担 Plan intelligence pass、GitNexus deep dive、group sync 或 provider query 证明。
 - 不恢复 Serena MCP 或 Serena fallback 文案。
 - 不把 GitNexus group mode 设为 Multi Repo Workspace 的必要前提；group mode 只是可用时的增强层。
 - 不允许 parent workspace 写入或合成 child repo 的 canonical graph readiness truth。
@@ -214,12 +214,12 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 ## Key Decisions
 
 - **Hybrid model:** 采用 `GitNexus first-class plugin + Generic Code Intelligence Plugin protocol`，既避免 GitNexus-only wrapper 锁死，也避免泛化抽象压平 GitNexus 能力。
-- **Plan-first rollout:** 优先增强 `$spec-plan`，因为技术方案错误会级联污染后续 task、work 和 review。
+- **Plan-first rollout:** 优先增强 `spec-plan`，因为技术方案错误会级联污染后续 task、work 和 review。
 - **Light probe + conditional deep dive:** 每个相关 Plan 都做低成本探测；只有 graph-heavy 或高风险信号才进入更深的 GitNexus 查询。
 - **Degrade, do not hard block:** GitNexus 不可用时 Plan 继续，但必须强制披露 limitations、fallback evidence 和信心影响。
 - **Refresh eligibility separated from query usability:** dirty-source-blocked 影响 durable refresh，不自动等于 GitNexus query 完全不可用。
 - **Native capability preservation:** GitNexus 原生能力面是需求核心，不允许被 readiness artifact 或 generic protocol 吞掉。
-- **Setup stays metadata-only:** `$spec-mcp-setup` 只补 capability projection 与 handoff guidance，不执行 GitNexus 智能查询。
+- **Setup stays metadata-only:** `spec-mcp-setup` 只补 capability projection 与 handoff guidance，不执行 GitNexus 智能查询。
 - **Registry/per-repo first:** Multi Repo Workspace 的 GitNexus 最佳实践以 global registry、显式 repo scope 和 per-repo freshness 为底座，group mode 是增强层。
 - **Three-axis evidence envelope:** capability 可用性、证据等级和 freshness 分开表达，避免一个状态枚举承载过多含义。
 - **Scope authority remains outside graph:** GitNexus evidence 影响风险和验证策略，不自动改变需求、计划或任务范围。
@@ -230,7 +230,7 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 
 - 现有 `.spec-first/graph/*`、`.spec-first/providers/gitnexus/*` 和 `.spec-first/workspace/*` facts 继续作为 durable readiness / freshness / provenance 证据来源。
 - 当前 GitNexus MCP 能力集可通过 host runtime 暴露给 agent；具体可用性仍以 setup/bootstrap facts 与 session-local probe 为准。
-- `$spec-mcp-setup` 已经负责 GitNexus host MCP 配置和 setup-owned `.spec-first/config/*` facts；本需求只要求补强 capability metadata 和 handoff 语义。
+- `spec-mcp-setup` 已经负责 GitNexus host MCP 配置和 setup-owned `.spec-first/config/*` facts；本需求只要求补强 capability metadata 和 handoff 语义。
 - code-review-graph、ast-grep 和 direct source reads 是 GitNexus 不可用时的主要 fallback evidence，但它们不应伪装成等价替代。
 - 多仓 workspace 写入仍需要明确 target repo / per-child scope；GitNexus registry / group query 只支持 read-only planning evidence，不能替代写入边界判断。
 - GitNexus 多仓模型（source_tag: session-local live MCP surface + existing spec-first workspace contract + user decision）按 per-repo index、registry discovery、显式 repo scope、per-repo staleness 检查理解；planning 需要用当前 provider pin / docs / live MCP surface 复核后再把它升级为 confirmed implementation premise。spec-first 的 group mode 使用必须建立在这条主路径之上。
@@ -243,30 +243,30 @@ spec_id: 2026-05-22-001-gitnexus-first-class-capability-plugin
 ### Deferred to Planning
 
 - [Affects R3, R6, R14, R14a, R14b, R14c][Technical] 定义最小 Code Intelligence Plugin capability envelope，要求足够表达 GitNexus 原生能力、capability status、evidence grade、freshness state、limitations 和 source contract mapping，但不引入复杂 provider 平台。
-- [Affects R5, R9][Technical] 决定 `$spec-plan` 的最小 source 改动面和输出格式，确保每个技术方案在保留现有 `## Graph Readiness` block 的同时稳定呈现相邻 Graph / GitNexus Evidence。
+- [Affects R5, R9][Technical] 决定 `spec-plan` 的最小 source 改动面和输出格式，确保每个技术方案在保留现有 `## Graph Readiness` block 的同时稳定呈现相邻 Graph / GitNexus Evidence。
 - [Affects R7, R8][Technical] 设计 trigger matrix：哪些任务信号触发 GitNexus deep dive，哪些只需要 lightweight probe，以及 API/route/shape/tool 场景的 native capability 选择顺序。
 - [Affects R11, R14][Technical] 统一 freshness / degraded vocabulary，并与已有 graph evidence policy、workspace readiness contract 和 bootstrap artifacts 对齐。
-- [Affects R19][Technical] 决定 `$spec-work`、`$spec-code-review`、`$spec-debug` 的后续接入顺序与最小消费规则。
-- [Affects R21, R22, R23][Technical] 决定 `$spec-mcp-setup` capability metadata 落点和最小 schema，避免与 graph readiness canonical artifacts 形成第二真相源。
+- [Affects R19][Technical] 决定 `spec-work`、`spec-code-review`、`spec-debug` 的后续接入顺序与最小消费规则。
+- [Affects R21, R22, R23][Technical] 决定 `spec-mcp-setup` capability metadata 落点和最小 schema，避免与 graph readiness canonical artifacts 形成第二真相源。
 - [Affects R24, R26][Technical] 为 setup 增加 contract tests，确保新增 metadata 不会触发 GitNexus query/analyze/status、group sync 或 downstream deep dive。
-- [Affects R27, R32][Technical] 在 `$spec-plan` 输出中定义 Multi Repo Workspace 的 evidence posture，区分 registry evidence、group evidence、per-repo query usability 和 target_repo scope。
+- [Affects R27, R32][Technical] 在 `spec-plan` 输出中定义 Multi Repo Workspace 的 evidence posture，区分 registry evidence、group evidence、per-repo query usability 和 target_repo scope。
 - [Affects R1, R2, R33, R34, R35][Deferred to Planning] 复核当前 GitNexus MCP tool/resource surface 和 CLI/provider behavior：附录 A 包含一次 session-local probe 的快照，但 planning 必须以当前 provider pin、setup projection、live host MCP tool/resource surface 重新验证，不得把快照当作长期 contract。
 
 ---
 
 ## Next Steps
 
--> `$spec-plan docs/brainstorms/2026-05-22-001-gitnexus-first-class-capability-plugin-requirements.md` 进行结构化实施规划。
+-> `spec-plan docs/brainstorms/2026-05-22-001-gitnexus-first-class-capability-plugin-requirements.md` 进行结构化实施规划。
 
 **v1 实现优先级（planning 参考）：**
 
 - **v1 P0 — Plan 核心接入**：R1-R14、R14a、R14b、R14c、R-MUT1、R-MUT2、R-MUT3、R-SCP1、R-SCP2
-  `$spec-plan` 深度接入 GitNexus capability，evidence 三轴模型，mutation/scope 防护栏
+  `spec-plan` 深度接入 GitNexus capability，evidence 三轴模型，mutation/scope 防护栏
 - **v1 P0 — Setup capability metadata**：R21-R26、R33-R35
-  `$spec-mcp-setup` 补强 capability projection，与 Plan 核心接入同优先级并行推进
+  `spec-mcp-setup` 补强 capability projection，与 Plan 核心接入同优先级并行推进
 - **v1 P1 — Multi Repo Workspace**：R27-R32
   多仓 evidence posture，group-ready / group-missing 两路径
-- **v2+ — Downstream workflows**：R19 涉及的 `$spec-work`、`$spec-code-review`、`$spec-debug`
+- **v2+ — Downstream workflows**：R19 涉及的 `spec-work`、`spec-code-review`、`spec-debug`
 
 ---
 
@@ -407,10 +407,10 @@ evidence 模型拆为三个独立轴，避免把 provider 可用性、证据可�
 **多仓工作区推荐流程：**
 
 ```
-1. /spec:mcp-setup / $spec-mcp-setup
+1. spec-mcp-setup / spec-mcp-setup
    → 各 child 写 .spec-first/config/*
 
-2. /spec:graph-bootstrap / $spec-graph-bootstrap
+2. spec-graph-bootstrap / spec-graph-bootstrap
    → 各 child 独立 analyze，写 .spec-first/graph/*
 
 3. 可选：group_sync（显式 maintenance action，非任何 workflow 的隐式步骤）
@@ -419,16 +419,16 @@ evidence 模型拆为三个独立轴，避免把 provider 可用性、证据可�
    → execute：用户确认后才允许由后续 spec-first maintenance workflow 或明确授权路径调用真实 group_sync
    → 验证：group_list → group.status="group-ready"
 
-4. 只读查询（或 /spec:plan / $spec-plan）
+4. 只读查询（或 spec-plan / spec-plan）
    → group-ready：query(repo="@<group>") 跨仓搜索（对应 R29）
    → group-missing：降级到逐 repo fan-out（对应 R30）
 
-5. /spec:plan / $spec-plan
+5. spec-plan / spec-plan
    → 每个 unit 带 target_repo（对应 R31）
 
-6. /spec:work / $spec-work
+6. spec-work / spec-work
    → 按 target_repo 隔离写入，验证 git status 变更属于 target_repo
 
-7. /spec:code-review / $spec-code-review
+7. spec-code-review / spec-code-review
    → 按 child repo 分组 diff + impact evidence
 ```

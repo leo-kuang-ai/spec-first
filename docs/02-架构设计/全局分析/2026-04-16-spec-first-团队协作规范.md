@@ -6,7 +6,7 @@
 适用范围：
 
 1. `spec-first` 框架仓库自身
-2. 使用 `spec-first` / `spec-graph-bootstrap` / `spec-graph-bootstrap` 的目标代码仓库
+2. 使用 `spec-first` / `spec-graph-bootstrap` 的目标代码仓库
 
 文档目标：
 

@@ -29,7 +29,26 @@
 | `.spec-first/governance/**` | `runtime_governance_artifact_excluded` | 本机 workflow 治理观测证据，如 rule-maturity shadow hits；普通 source context 不扫描，周期审计或显式治理复查按路径读取 |
 | `.claude/**` | `generated_runtime_mirror_excluded` | Claude generated runtime mirror / host-local state |
 | `.codex/**` | `generated_runtime_mirror_excluded` | Codex generated runtime mirror / host-local state |
-| `.agents/skills/**` | `generated_runtime_mirror_excluded` | Codex-facing generated skill mirror |
+| `.agents/skills/**` | `generated_runtime_mirror_excluded` | Codex-facing generated workflow runtime mirror |
+| `.cursor/skills/**` | `generated_runtime_mirror_excluded` | Cursor generated workflow runtime mirror |
+| `.cursor/spec-first/**` | `generated_runtime_mirror_excluded` | Cursor spec-first managed state/runtime facts |
+| `.cursor/mcp.json` | `host_local_config_excluded` | Cursor project MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --cursor` 保留整文件，server entry 由 setup/uninstall 路径管理 |
+| `.kiro/skills/**` | `generated_runtime_mirror_excluded` | Kiro generated workflow runtime mirror |
+| `.kiro/agents/**` | `generated_runtime_mirror_excluded` | Kiro generated agent runtime mirror |
+| `.kiro/spec-first/**` | `generated_runtime_mirror_excluded` | Kiro spec-first managed state/runtime facts |
+| `.kiro/settings/**` | `generated_runtime_mirror_excluded` | Kiro spec-first managed MCP config surface; direct doctor/setup reads are allowed only in runtime tasks |
+| `.qoder/commands/spec-*.md` | `generated_runtime_mirror_excluded` | Qoder generated workflow runtime file mirror |
+| `.qoder/commands/spec/**` | `generated_runtime_mirror_excluded` | Qoder retired legacy command namespace；仅 runtime cleanup / drift repair 读取 |
+| `.qoder/skills/**` | `generated_runtime_mirror_excluded` | Qoder generated project skill runtime mirror |
+| `.qoder/agents/**` | `generated_runtime_mirror_excluded` | Qoder generated subagent runtime mirror |
+| `.qoder/spec-first/**` | `generated_runtime_mirror_excluded` | Qoder spec-first managed state/runtime facts |
+| `.qoder/settings.local.json` | `host_local_config_excluded` | Qoder local MCP config output；不是 source truth，普通 context 默认排除；`spec-first clean --qoder` 保留整文件，server entry 由 setup/uninstall 路径管理 |
+
+`.kiro/specs/**` 是 Kiro-native advisory artifact，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它；不得把 `.kiro/**` blanket 排除或 blanket 纳入 source context。
+
+`.cursor/rules/**`、`.cursor/agents/**` 和未知 `.cursor/**` host-native/user-owned surface 不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.cursor/**` blanket 排除或 blanket 纳入 source context。
+
+`.qoder/rules/**`、`.qoder/settings.json` 和 `.qoder/hooks/**` 是 Qoder-native/user-owned surface，不属于 spec-first generated mirror。普通 workflow 只有在用户或上游 artifact 显式命名时才读取它们；不得把 `.qoder/**` blanket 排除或 blanket 纳入 source context。
 
 普通 workflow 仍可读取 checked-in source truth，例如 `skills/`、`agents/`、`templates/`、`src/cli/`、`docs/contracts/`、`AGENTS.md`、`CLAUDE.md`、`README*` 和当前任务直接相关的源码、测试、计划或需求文档。
 
@@ -105,7 +124,7 @@ New changelog entries should be compact breadcrumbs: one concise summary naming 
 3. validated summaries, review facts, or deterministic setup facts.
 4. 精确路径的 full artifact 或 raw evidence，仅当用户要求、workflow 明确需要，或 summary 显示证据不足。
 
-禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**` 纳入默认 `rg --files` / file-search / agent prompt bundle 的普通候选集。
+禁止把 `.spec-first/audits/**`、`.spec-first/governance/**`、`.claude/**`、`.codex/**`、`.agents/skills/**`、`.cursor/skills/**`、`.cursor/spec-first/**`、`.cursor/mcp.json`、`.kiro/skills/**`、`.kiro/agents/**`、`.kiro/spec-first/**`、`.kiro/settings/**`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/**`、`.qoder/skills/**`、`.qoder/agents/**`、`.qoder/spec-first/**`、`.qoder/settings.local.json` 纳入默认 `rg --files` / file-search / agent prompt bundle 的普通候选集。`.cursor/rules/**`、`.cursor/agents/**`、`.kiro/specs/**` 与 `.qoder/rules/**` 不在 generated mirror denylist 内；它们只在显式命名时作为 advisory input 消费。
 
 内部 context helper 在匹配排除规则前必须先把输入路径规范化为 repo-relative canonical path；解析后位于当前 repo 外的路径，或 repo 内 symlink 解析后指向 repo 外的路径，必须以 `outside_repo_context_excluded` 排除，除非上游 workflow 明确使用了自己的外部路径合同。
 
@@ -115,6 +134,7 @@ New changelog entries should be compact breadcrumbs: one concise summary naming 
 | --- | --- |
 | `runtime_audit_artifact_excluded` | 返回 path/summary 指针，说明 audit artifact 不是普通 source context |
 | `generated_runtime_mirror_excluded` | 指向 source-of-truth 或 update/init workflow |
+| `host_local_config_excluded` | 由 setup/uninstall/doctor 等 runtime 任务按宿主配置合同读取或管理，普通 context 只保留 path/reason |
 | `outside_repo_context_excluded` | 不纳入普通 repo context bundle；需要外部路径时由上游 workflow 使用显式合同 |
 | `runtime_context_requested_by_non_runtime_workflow` | 只读取用户明确路径；否则排除并说明边界 |
 | `summary_missing` | 读取最小可用 status/manifest，或要求用户确认是否展开 full artifact |

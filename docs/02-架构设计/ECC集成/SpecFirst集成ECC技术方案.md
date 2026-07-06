@@ -11,7 +11,7 @@
 ```text
 spec-first 管流程
 ECC 补能力
-/spec:* 入口不变
+spec-* 入口不变
 ECC commands 不导入
 ECC hooks 不导入
 MVP 只导入 6 个 internal reference/lens skills
@@ -78,7 +78,7 @@ ECC agents 不进入 MVP
 Claude runtime 生成路径：
 
 ```text
-.claude/commands/spec/        # 用户可见 /spec:* commands
+.claude/commands/spec/        # 用户可见 spec-* commands
 .claude/skills/               # standalone + internal skills
 .claude/spec-first/workflows/  # workflow skill runtime copy
 .claude/agents/               # agents
@@ -103,7 +103,7 @@ Skill   = workflow 主体
 Agent   = workflow 内部调度的专项角色
 ```
 
-例如 `/spec:plan`：
+例如 `spec-plan`：
 
 ```text
 templates/claude/commands/spec/plan.md 只定义 command metadata
@@ -175,7 +175,7 @@ ECC 中有价值的是大量检查清单、工程实践和专项 reviewer 思路
 
 1. 增强 spec-first workflow 的决策输入质量。
 2. 为 `spec-plan`、`spec-debug`、`spec-code-review`、`spec-polish-beta`、`spec-mcp-setup` 补充少量高价值工程 lens。
-3. 保持 `/spec:*` 和 `$spec-*` 用户入口不变。
+3. 保持 `spec-*` 和 `spec-*` 用户入口不变。
 4. 保持 spec-first source assets -> runtime assets 的生成边界。
 5. 让 ECC-derived assets 可审计、可版本锁定、可禁用、可清理、可逐步扩展。
 
@@ -184,7 +184,7 @@ ECC 中有价值的是大量检查清单、工程实践和专项 reviewer 思路
 | 非目标 | 原因 |
 |---|---|
 | 不全量导入 ECC | ECC 资产规模大，会增加上下文和维护负担 |
-| 不导入 ECC commands | 避免 `/spec:*` 与 `/everything-claude-code:*` 两套入口并存 |
+| 不导入 ECC commands | 避免 `spec-*` 与 `/everything-claude-code:*` 两套入口并存 |
 | 不导入 ECC hooks | hooks 会改变宿主全局行为，风险高 |
 | MVP 不导入 ECC agents | 当前 agent filtering / schema / 权限边界尚未补齐 |
 | 不让脚本语义路由 ECC 能力 | 语义判断属于 LLM |
@@ -203,29 +203,29 @@ ECC 中有价值的是大量检查清单、工程实践和专项 reviewer 思路
 Claude Code：
 
 ```text
-/spec:brainstorm
-/spec:plan
-/spec:work
-/spec:debug
-/spec:code-review
-/spec:doc-review
-/spec:polish-beta
-/spec:optimize
-/spec:mcp-setup
+spec-brainstorm
+spec-plan
+spec-work
+spec-debug
+spec-code-review
+spec-doc-review
+spec-polish-beta
+spec-optimize
+spec-mcp-setup
 ```
 
 Codex：
 
 ```text
-$spec-brainstorm
-$spec-plan
-$spec-work
-$spec-debug
-$spec-code-review
-$spec-doc-review
-$spec-polish-beta
-$spec-optimize
-$spec-mcp-setup
+spec-brainstorm
+spec-plan
+spec-work
+spec-debug
+spec-code-review
+spec-doc-review
+spec-polish-beta
+spec-optimize
+spec-mcp-setup
 ```
 
 不新增：

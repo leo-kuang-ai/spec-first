@@ -11,7 +11,7 @@ plan_depth: medium
 
 ## Summary
 
-把 `spec-plan` 的“只计划、不实现”从长 prompt 里的自然语言纪律，升级为 Claude Code 宿主层的**注意力增强**：用 `UserPromptExpansion` hook 识别 `/spec:plan` 命令，在它展开成 prompt 之前注入一段短而高显著性的 plan-only / handoff 提醒。该机制对所有 permission mode、所有模型生效，但**只注入上下文、不硬阻断**。
+把 `spec-plan` 的“只计划、不实现”从长 prompt 里的自然语言纪律，升级为 Claude Code 宿主层的**注意力增强**：用 `UserPromptExpansion` hook 识别 `spec-plan` 命令，在它展开成 prompt 之前注入一段短而高显著性的 plan-only / handoff 提醒。该机制对所有 permission mode、所有模型生效，但**只注入上下文、不硬阻断**。
 
 v1 明确定位为 **best-effort attention hardening，不是硬防写保证**。需要硬防写的用户使用 Claude 原生 Plan Mode——那是宿主自带能力，零额外代码。v1 不实现 `PreToolUse` mutation guard、不引入文件 marker / Stop hook / TTL cleanup / 新 writer。同步把 `spec-plan` 的 plan-only 安全契约和 question-tool 规则上移到 skill 热路径。保留 source/runtime 边界，不手改 generated mirrors。
 
@@ -19,20 +19,20 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 
 ## Problem Frame
 
-用户报告：Kimi 2.6 等第三方/非原生模型通过 Claude Code CLI 跑 `/spec:plan` 时，可能不可靠地调用 Plan Mode 或 `AskUserQuestion`，从而跳过“写计划后等待用户选择”，直接改代码。Claude 原生模型较少出现，因为其 Plan Mode / `ExitPlanMode` / `AskUserQuestion` 工具调用路径更可靠。
+用户报告：Kimi 2.6 等第三方/非原生模型通过 Claude Code CLI 跑 `spec-plan` 时，可能不可靠地调用 Plan Mode 或 `AskUserQuestion`，从而跳过“写计划后等待用户选择”，直接改代码。Claude 原生模型较少出现，因为其 Plan Mode / `ExitPlanMode` / `AskUserQuestion` 工具调用路径更可靠。
 
 当前 `skills/spec-plan/SKILL.md` 已写了 `NEVER CODE during this skill`、blocking question、post-plan handoff menu，但关键边界主要埋在约 68KB skill 后半段。对工具调用弱、长上下文注意力不稳的模型，这些规则不足以成为可靠提醒。
 
 **诚实的边界**：注意力增强最弱的地方，恰恰是目标人群最弱的地方——弱 tool-call 模型的问题正是“不听指令”，而注意力增强靠它听指令。能给“非 Plan Mode 目标人群”兜底的硬手段（跨事件防写）需要 marker lifecycle，那正是本项目要避免的复杂度；而一个只在 Plan Mode 触发的 `PreToolUse` guard 只保护“已经在 Plan Mode、本就被宿主保护”的用户，对目标人群零贡献——属于把复杂度花在边际收益最低处。
 
-因此 v1 选择相称的最小机制：用 harness 在 `/spec:plan` 展开前注入高显著性提醒（覆盖所有模式、所有模型），并把“要硬防写就用 native Plan Mode”作为零成本逃生口。硬兜底留作带触发条件的后续工作。
+因此 v1 选择相称的最小机制：用 harness 在 `spec-plan` 展开前注入高显著性提醒（覆盖所有模式、所有模型），并把“要硬防写就用 native Plan Mode”作为零成本逃生口。硬兜底留作带触发条件的后续工作。
 
 ---
 
 ## Requirements
 
-- R1. Claude Code 端直接输入 `/spec:plan` 时，`UserPromptExpansion` attention guard 必须通过 `command_name` 识别命令，并注入短而显眼的 `additionalContext`：本次是 planning-only、只能研究/决策/写计划 artifact、完成后必须等待用户 handoff 选择。`permission_mode` 只作为上下文事实：在 `plan` 模式下可附注“native Plan Mode 防写生效”，在非 Plan Mode（`default` / `acceptEdits` / `bypassPermissions` / `auto` / `dontAsk` 等）下必须注明“这是 best-effort 提醒，无硬防写保证”。遇到缺失或无法识别的 `permission_mode` 仍注入提醒，并标注无硬保证。
-- R2. attention guard 只约束 `spec-plan` 对应命令（matcher 匹配 `command_name`），不改变其他 `/spec:*` workflow，不影响计划批准后的 `/spec:work` 或实现流程。
+- R1. Claude Code 端直接输入 `spec-plan` 时，`UserPromptExpansion` attention guard 必须通过 `command_name` 识别命令，并注入短而显眼的 `additionalContext`：本次是 planning-only、只能研究/决策/写计划 artifact、完成后必须等待用户 handoff 选择。`permission_mode` 只作为上下文事实：在 `plan` 模式下可附注“native Plan Mode 防写生效”，在非 Plan Mode（`default` / `acceptEdits` / `bypassPermissions` / `auto` / `dontAsk` 等）下必须注明“这是 best-effort 提醒，无硬防写保证”。遇到缺失或无法识别的 `permission_mode` 仍注入提醒，并标注无硬保证。
+- R2. attention guard 只约束 `spec-plan` 对应命令（matcher 匹配 `command_name`），不改变其他 `spec-*` workflow，不影响计划批准后的 `spec-work` 或实现流程。
 - R3. Hook 输出必须使用 Claude Code 官方 `UserPromptExpansion` 形态：`hookSpecificOutput.hookEventName = "UserPromptExpansion"` + `additionalContext`，非阻断。不得尝试 deny / block 该命令的展开。
 - R4. 新增或修改 hook 必须通过 source-of-truth 路径完成：`templates/`、`src/cli/`、tests；不得手改 `.claude/`、`.codex/`、`.agents/skills/` runtime mirrors。
 - R5. Claude `.claude/settings.json` managed hook 的写入、检查、清理需支持多个 spec-first managed matcher（`SessionStart` + `UserPromptExpansion`），不得破坏现有 `SessionStart` bootstrap。
@@ -40,7 +40,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 - R7. `spec-plan` SKILL 顶部新增短热路径 safety contract：计划阶段只能研究、决策、写计划文件；不得调用 implementation tools；完成计划后必须用 blocking question tool 或 loud fallback 等待用户选择。
 - R8. `spec-plan` 的 question-tool 规则对齐 `spec-doc-review`：Claude Code 交互模式开始时预加载 `AskUserQuestion`；“schema 尚未加载”“工具不方便”“指令埋得深”都不是文本 fallback 的理由；文本编号 fallback 只在工具缺失或调用失败时可用，并且必须等待用户回复。
 - R9. 不让脚本判断“计划语义是否完成”、不解析 plan 文档质量、不自动决定 handoff；这些仍由 `spec-plan` / `spec-doc-review` 的 LLM 判断承担。hook 只做确定性事实处理：事件名、`command_name`、`permission_mode`、上下文注入。
-- R10. Codex 端不伪造 Claude Plan Mode parity，也不在本轮强行引入 Codex 端等价 attention hook。`$spec-plan` 仍按 Codex workflow contract 写计划文件；本轮只做规则文案和测试中的双宿主边界说明，除非实现时确认 Codex 有可靠的 slash-command 展开 hook 可注入同等 plan-only 上下文。
+- R10. Codex 端不伪造 Claude Plan Mode parity，也不在本轮强行引入 Codex 端等价 attention hook。`spec-plan` 仍按 Codex workflow contract 写计划文件；本轮只做规则文案和测试中的双宿主边界说明，除非实现时确认 Codex 有可靠的 slash-command 展开 hook 可注入同等 plan-only 上下文。
 - R11. 用户可见 workflow 行为变化必须更新 `CHANGELOG.md`，README / docs 仅在新增用户操作或 troubleshooting 说明需要公开时同步。
 - R12. v1 明确不实现硬防写保证：不实现 `PreToolUse` mutation guard、不引入文件 marker、Stop hook、TTL cleanup 或新的 artifact writer。文档与提醒措辞不得声称非 Plan Mode 存在硬防写。
 - R13. Skill prose 变更需要 fresh-source eval 或明确记录未执行原因；hook/CLI 变更需要 focused unit/smoke 验证。
@@ -53,20 +53,20 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 - 不实现通用 workflow 状态机、文件 marker、跨会话 cleanup。
 - 不让 hook 或脚本审查计划内容质量。
 - 不改变 `spec-work`、`spec-debug`、`spec-code-review` 的入口语义。
-- 不在 Codex 端引入会阻止 `$spec-plan` 写 plan 文件的 gate。
+- 不在 Codex 端引入会阻止 `spec-plan` 写 plan 文件的 gate。
 - 不依赖第三方模型必须正确调用 `AskUserQuestion`；blocking question 规则保留，但 v1 不为其提供硬兜底。
 - 不把 generated runtime mirrors 当 source 修复点；runtime drift 通过 `spec-first init` 刷新。
 
 ### Deferred to Follow-Up Work
 
 - **非 Plan Mode 硬兜底**：若注意力增强后仍积累到可观测的“非 Plan Mode 误改代码”事件，再单独规划基于 marker lifecycle 的硬防写（含 `UserPromptExpansion` 写 session 级 marker、`PreToolUse` 读 marker deny、handoff 清除）。本计划不引入。
-- **Codex attention parity**：若 Codex 暴露与 Claude `UserPromptExpansion` 等价、可在 slash-command 展开前注入上下文的 hook，再规划 `$spec-plan` 的 Codex 端注意力增强。
+- **Codex attention parity**：若 Codex 暴露与 Claude `UserPromptExpansion` 等价、可在 slash-command 展开前注入上下文的 hook，再规划 `spec-plan` 的 Codex 端注意力增强。
 
 ---
 
 ## Completion Criteria
 
-- `/spec:plan` 在 Claude Code 任意 permission mode 下都进入 planning workflow；`UserPromptExpansion` 注入高显著性 plan-only / handoff 提醒，且不阻断命令展开、不强制切 Plan Mode。
+- `spec-plan` 在 Claude Code 任意 permission mode 下都进入 planning workflow；`UserPromptExpansion` 注入高显著性 plan-only / handoff 提醒，且不阻断命令展开、不强制切 Plan Mode。
 - 注入文案对 permission mode 自适应：Plan Mode 注明“native 防写生效”，非 Plan Mode 注明“best-effort 提醒、无硬保证”。
 - 文档与提醒不声称非 Plan Mode 有硬防写；native Plan Mode 作为零成本硬保护逃生口被明确记录。
 - 计划完成后的 handoff question 规则在 `spec-plan` 热路径中可见、可测试，并明确 loud fallback 条件。
@@ -102,7 +102,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 - **UserPromptExpansion hook 契约（Claude Code 2.1.173 二进制实证，决定性）**：
   - 该事件真实存在、可在 settings 注册（出现在 hook 事件枚举与可注册 hooks 集合中）。
   - 输入 schema：`{ session_id, transcript_path, cwd, permission_mode?, agent..., hook_event_name:"UserPromptExpansion", expansion_type: "slash_command"|"mcp_prompt", command_name, command_args, command_source?, prompt }`。
-  - 触发时机：slash command / mcp prompt **展开时**，正好覆盖 `/spec:plan` 直接输入路径。
+  - 触发时机：slash command / mcp prompt **展开时**，正好覆盖 `spec-plan` 直接输入路径。
   - matcher：对 `UserPromptExpansion`，settings matcher 匹配的是 `command_name`。
   - 输出 schema：`{ hookEventName:"UserPromptExpansion", additionalContext? }` —— **只能注入上下文、无 decision/deny 字段**，与 v1“非阻断注意力”定位完全一致。
 - source_reads_completed:
@@ -112,7 +112,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
   - `src/cli/adapters/claude.js`：当前只写 `.claude/hooks/session-start` 作为 managed runtime hook；`planRuntimeFilesRemoval` / `removeRuntimeFiles` 硬编码单一 `SESSION_START_RELATIVE_PATH`，需扩展枚举全部 managed hook 脚本。
   - `tests/unit/claude-settings.test.js`：覆盖现有 SessionStart 行为，是自然扩展点。
 - source_reads_required:
-  - `/spec:plan` 渲染后的确切 `command_name` 取值（很可能是 `spec:plan`）应用一次真实 hook 输入或 fixture 固化。这是一个 fixture 级小问题，不是 go/no-go。
+  - `spec-plan` 渲染后的确切 `command_name` 取值（很可能是 `spec:plan`）应用一次真实 hook 输入或 fixture 固化。这是一个 fixture 级小问题，不是 go/no-go。
 - commands_or_tools_used:
   - `spec-first internal task-governance-signals` 在含 mutation-guard 的旧范围下返回 `candidate_level: deep`；reshape 砍掉 mutation guard 后实际范围降至 medium。
   - `rg` 搜索 hook / question-tool / runtime / test 面。
@@ -160,7 +160,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 - KTD1. 用 harness 注意力增强替代 prompt-only 强化。
   - Rationale：prompt 措辞仍有用但最弱；`UserPromptExpansion` 是在 workflow body 加载前提升显著性的确定性位置，且模型无关。
 
-- KTD2. 用 `UserPromptExpansion` 作为 `/spec:plan` 的 attention guard。
+- KTD2. 用 `UserPromptExpansion` 作为 `spec-plan` 的 attention guard。
   - Rationale：二进制实证它在 slash command 展开时触发、暴露 `command_name`、输出 `additionalContext`、非阻断——原生契合本机制。直接 slash command 展开是 `PreToolUse`(Skill) 覆盖不到的路径，而 `UserPromptExpansion` 正好覆盖。
 
 - KTD3. native Plan Mode 是硬防写逃生口；v1 不另建 mutation guard。
@@ -173,7 +173,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
   - Rationale：长文档正是弱模型丢约束的地方；safety contract 需出现在 workflow 细节之前。
 
 - KTD6. Codex 端显式非 parity。
-  - Rationale：Codex 有本地 hook，但 `$spec-plan` 必须能写计划文件；本轮不引入 Codex attention hook，除非确认有等价展开 hook。
+  - Rationale：Codex 有本地 hook，但 `spec-plan` 必须能写计划文件；本轮不引入 Codex attention hook，除非确认有等价展开 hook。
 
 ---
 
@@ -198,7 +198,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 
 ### Deferred to Implementation
 
-- `/spec:plan` 的确切 `command_name` matcher 值。
+- `spec-plan` 的确切 `command_name` matcher 值。
   - Reason：用一次真实 hook 输入或 fixture 固化（很可能是 `spec:plan`）。fixture 级，非阻断。
 
 - README 是否需要面向用户的说明。
@@ -212,7 +212,7 @@ v1 明确定位为 **best-effort attention hardening，不是硬防写保证**�
 
 ```mermaid
 flowchart TB
-  A[User invokes /spec:plan] --> B[UserPromptExpansion hook]
+  A[User invokes spec-plan] --> B[UserPromptExpansion hook]
   B --> C{permission_mode}
   C -->|plan| D1[Inject plan-only context + note native Plan Mode 防写生效]
   C -->|non-plan / unknown| D2[Inject plan-only context + note best-effort 无硬保证]
@@ -223,7 +223,7 @@ flowchart TB
   G -->|Start work selected| H[spec-work / implementation workflow]
 ```
 
-单层设计：在 `/spec:plan` 展开前注入与模式自适应的高显著性提醒。硬防写不在本机制内——由用户自行选择 native Plan Mode 提供。
+单层设计：在 `spec-plan` 展开前注入与模式自适应的高显著性提醒。硬防写不在本机制内——由用户自行选择 native Plan Mode 提供。
 
 ---
 
@@ -231,7 +231,7 @@ flowchart TB
 
 ### U1. Claude spec-plan UserPromptExpansion attention guard
 
-**Goal:** 识别 `/spec:plan` 展开并注入模式自适应的 plan-only / handoff 提醒；泛化 managed settings 以支持多 matcher。
+**Goal:** 识别 `spec-plan` 展开并注入模式自适应的 plan-only / handoff 提醒；泛化 managed settings 以支持多 matcher。
 
 **Requirements:** R1, R2, R3, R4, R5, R9, R12
 
@@ -245,7 +245,7 @@ flowchart TB
 - Test: `tests/unit/runtime-plan-contracts.test.js`
 
 **Approach:**
-- 注册一个 managed `UserPromptExpansion` matcher，matcher 值匹配 `/spec:plan` 的 `command_name`。
+- 注册一个 managed `UserPromptExpansion` matcher，matcher 值匹配 `spec-plan` 的 `command_name`。
 - hook 读取 JSON 事件输入，按 `permission_mode` 选择文案：`plan` → 注明 native 防写生效；非 Plan Mode / 缺失 / 未知 → 注明 best-effort、无硬保证。
 - 始终通过 `hookSpecificOutput.additionalContext` 注入；绝不尝试 deny。
 - 泛化 managed hook settings 支持 `SessionStart` 与 `UserPromptExpansion` 共存、去重、inspect、干净移除。具体改动点：`src/cli/claude-settings.js` 的 `MANAGED_HOOK_PATH_PATTERN`（仅匹配 `session-start`）、`removeManagedHookEntries`（仅遍历 `SessionStart`）、inspect（仅检查 `SessionStart`）三处必须泛化以覆盖新 hook 脚本路径与新事件键（`UserPromptExpansion`）；`src/cli/adapters/claude.js` 的 `planRuntimeFilesRemoval` / `removeRuntimeFiles` 硬编码的单一 `SESSION_START_RELATIVE_PATH` 需扩展枚举全部 managed hook 脚本。
@@ -329,7 +329,7 @@ flowchart TB
 - 扩展 doctor 独立报告每个 managed hook 脚本/settings matcher，保留可执行修复信息。
 - 扩展 clean 移除全部 managed hook 文件与 managed settings 条目，保留无关 hook。
 - **实现前先确认 init/doctor/clean 是否已完全委托给 adapter 做 hook 操作。** 若是，则改动收敛到 adapter 与 settings helper，不要把 hook 注册知识散落到命令文件；若命令文件确需直接改，在实现说明里记录原因。结论回填本单元。
-- Keep Codex docs/prose honest：Codex 有本地 hook parity，但本轮 attention 加固针对 Claude。不加 Codex guard，除非有等价展开 hook 且不破坏 `$spec-plan`。
+- Keep Codex docs/prose honest：Codex 有本地 hook parity，但本轮 attention 加固针对 Claude。不加 Codex guard，除非有等价展开 hook 且不破坏 `spec-plan`。
 
 **Patterns to follow:**
 - `src/cli/adapters/codex.js` 的多 hook 文件写/查模式。
@@ -365,7 +365,7 @@ flowchart TB
 - Generated by command only: `.claude/**`、`.codex/**`、`.agents/skills/**`
 
 **Approach:**
-- 新增 `(user-visible)` `CHANGELOG.md` 条目，因为 `/spec:plan` 调用行为变化（注入注意力提醒）。
+- 新增 `(user-visible)` `CHANGELOG.md` 条目，因为 `spec-plan` 调用行为变化（注入注意力提醒）。
 - 仅当实现新增超出注入文案的用户可见指引时更新 README。
 - source 与 tests 通过后运行 `spec-first init` 刷新受影响 host runtime；不手改 generated mirrors。
 - 在 closeout 记录 fresh-source eval 状态。
@@ -382,7 +382,7 @@ flowchart TB
 
 ## System-Wide Impact
 
-- **Workflow entry:** `/spec:plan` 获得 Claude 端识别/注意力要求。任意 permission mode 进入 planning，带模式自适应的短提醒。
+- **Workflow entry:** `spec-plan` 获得 Claude 端识别/注意力要求。任意 permission mode 进入 planning，带模式自适应的短提醒。
 - **安全姿态:** 全模式注意力增强（best-effort）；硬防写仍是 native Plan Mode 的既有能力，未被本计划改变或扩展。
 - **Runtime 生成:** Claude managed hook 资产从一个 SessionStart 脚本扩展为两个脚本/settings 条目。
 - **Doctor/clean:** 需区分多个 managed hook。
@@ -414,7 +414,7 @@ flowchart TB
 - **`PreToolUse` mutation guard（defense-in-depth 硬闸门）。**
   - **Rejected for v1。** 它只在 `permission_mode=plan` 触发，而 native Plan Mode 本身已防写——guard 对“已被保护的 Plan Mode 用户”是冗余，对“目标的非 Plan Mode 人群”零贡献。其复杂度（settings/lifecycle 泛化、Bash 分类器、characterization）与边际收益不成比例。需要硬防写的用户使用 native Plan Mode。
 
-- Hard-denying 非 Plan Mode `/spec:plan`。
+- Hard-denying 非 Plan Mode `spec-plan`。
   - Rejected：期望的 UX 不是强推 Plan Mode；且 `UserPromptExpansion` 输出不支持 deny。
 
 - 中心 workflow 状态文件 / 文件 marker（标记“planning active”）。
@@ -426,7 +426,7 @@ flowchart TB
 - 手改 `.claude/` runtime mirrors 快速止血。
   - Rejected by source/runtime 治理。
 
-- 对所有 `/spec:*` 的全局 mutation guard。
+- 对所有 `spec-*` 的全局 mutation guard。
   - Rejected as overbroad：`spec-work` 等实现流必须能在用户意图后写入。
 
 ---
@@ -436,7 +436,7 @@ flowchart TB
 ### Phase 1: Claude attention guard + runtime lifecycle
 
 - Land U1（UserPromptExpansion guard + settings 泛化）。
-- 用 characterization fixture 固化 `/spec:plan` 的 `command_name` 与注入文案。
+- 用 characterization fixture 固化 `spec-plan` 的 `command_name` 与注入文案。
 - Land U3（runtime projection / doctor / clean / smoke），随 U1 的新增 hook 数量同步更新断言。
 - 范围窄到 Claude runtime projection 与确定性 guard 逻辑。
 
@@ -454,7 +454,7 @@ flowchart TB
 
 ## Documentation / Operational Notes
 
-- 注入文案避免点名特定模型。建议短提醒：“`/spec:plan` 是 planning-only：研究、写/预览计划，然后等用户的 handoff 选择再实现。需要硬防写请使用 Plan Mode。”
+- 注入文案避免点名特定模型。建议短提醒：“`spec-plan` 是 planning-only：研究、写/预览计划，然后等用户的 handoff 选择再实现。需要硬防写请使用 Plan Mode。”
 - README 更新应短，仅在新行为需要 hook 文案之外的可发现性时添加。
 - 实现 closeout 应说明 Kimi/K2.6 是否被手动测试；未测试则不声称 provider-specific 验证。
 
@@ -478,7 +478,7 @@ flowchart TB
 
 Implemented U1-U4: Claude `UserPromptExpansion` spec-plan attention guard, managed settings/runtime lifecycle for both Claude hooks, `spec-plan` hot-path safety/question-tool contract, changelog/docs/gitignore updates, and source-driven runtime refresh via `spec-first init`.
 
-Post-review closeout: `$spec-code-review` multi-agent review found 3 actionable issues and they were fixed: the Claude `spec-plan-guard` hook now reads the full `UserPromptExpansion` payload from stdin instead of passing large prompts through an environment variable; Claude runtime inspection now warns on managed hook executable-bit drift; smoke coverage now asserts the `UserPromptExpansion` settings matcher and doctor entries.
+Post-review closeout: `spec-code-review` multi-agent review found 3 actionable issues and they were fixed: the Claude `spec-plan-guard` hook now reads the full `UserPromptExpansion` payload from stdin instead of passing large prompts through an environment variable; Claude runtime inspection now warns on managed hook executable-bit drift; smoke coverage now asserts the `UserPromptExpansion` settings matcher and doctor entries.
 
 Verification completed for this closeout: `npm run test:unit -- --runTestsByPath tests/unit/runtime-plan-contracts.test.js tests/unit/claude-settings.test.js tests/unit/runtime-hook-permissions.test.js` (runner executed the full unit suite: 140 suites / 1091 tests passed), `npm run typecheck`, `npm run test:smoke`, `./bin/spec-first.js doctor --claude --json`, `git diff --check`, and `/Users/kuang/.local/bin/graphify update .`. The earlier broad `npm test`, Codex doctor, and fresh-source eval claims were not rerun in this follow-up closeout and are not used as the post-review evidence.
 

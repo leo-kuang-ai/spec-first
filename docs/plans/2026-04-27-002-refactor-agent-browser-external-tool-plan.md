@@ -31,7 +31,7 @@ spec-first 目前同时存在两种 `agent-browser` 所有权表达：`spec-mcp-
 - R1. `agent-browser` 在 spec-first 中定位为外部/upstream helper tool，而不是本地 source skill 或 `spec-*` workflow。
 - R2. `spec-mcp-setup` 成为检测和安装 `agent-browser` 的唯一项目内入口，并保持 Phase 0 helper tool 边界；`spec-setup` 不再保留第二套安装入口，只能指向 `spec-mcp-setup` 或明确不交付该能力。
 - R3. 不把 `agent-browser` 加入 `skills/spec-mcp-setup/mcp-tools.json`，避免污染 MCP baseline registry。
-- R4. 所有 downstream browser workflow 继续使用 `agent-browser` CLI，并在缺失时指向 `/spec:mcp-setup` / `$spec-mcp-setup`。
+- R4. 所有 downstream browser workflow 继续使用 `agent-browser` CLI，并在缺失时指向 `spec-mcp-setup` / `spec-mcp-setup`。
 - R5. 删除本地 `skills/agent-browser/**` 后，同步清理 `.claude-plugin/plugin.json` 和 `src/cli/contracts/dual-host-governance/skills-governance.json` 中的本地交付记录。
 - R6. 用新的 contract tests 守护外部 helper tool 安装契约、downstream 缺失提示和“不进入 MCP registry / runtime governance”的边界。
 - R7. README runtime asset count、相关 validation 文档和 changelog 与删除后的 source asset set 对齐。
@@ -153,7 +153,7 @@ flowchart TD
 - Keep `spec-mcp-setup/scripts/check-health` as the deterministic source for helper tool detection and install suggestions.
 - Ensure the install suggestion still covers CLI installation, browser/runtime initialization via `agent-browser install`, and upstream/global skill installation.
 - In `supported-mcp-tools.md`, do not add `agent-browser` to the MCP Tool Index; if mentioned, keep it under a separate helper-tool boundary note.
-- Remove or rewrite `spec-setup` `agent-browser` install guidance so it delegates users to `/spec:mcp-setup` in Claude or `$spec-mcp-setup` in Codex. `spec-setup` must not remain a second command source for installing `agent-browser`.
+- Remove or rewrite `spec-setup` `agent-browser` install guidance so it delegates users to `spec-mcp-setup` in Claude or `spec-mcp-setup` in Codex. `spec-setup` must not remain a second command source for installing `agent-browser`.
 
 **Patterns to follow:**
 - `skills/spec-mcp-setup/SKILL.md` Phase 0.2 currently says helper tools are not written into readiness ledger and not added to `mcp-tools.json`.
@@ -198,7 +198,7 @@ flowchart TD
   - spec-first must not grant broad host permissions as a hidden replacement for local `allowed-tools`.
   - required execution should stay limited to documented `agent-browser` / install commands or upstream/global skill permissions.
   - if upstream/global skill or host config cannot provide an acceptable permission path, stop and keep local `skills/agent-browser/**` until a separate permission design exists.
-- Verify whether `spec-first init --claude` / `spec-first init --codex` remove obsolete generated skills from an existing runtime. If not, require either a runtime cleanup code change or explicit `$spec-update` / release-note / setup-output guidance before deletion proceeds.
+- Verify whether `spec-first init --claude` / `spec-first init --codex` remove obsolete generated skills from an existing runtime. If not, require either a runtime cleanup code change or explicit `spec-update` / release-note / setup-output guidance before deletion proceeds.
 
 **Patterns to follow:**
 - Repository guidance treats generated `.claude/`, `.codex/`, `.agents/` assets as runtime outputs, not source of truth.
@@ -241,8 +241,8 @@ flowchart TD
 **Approach:**
 - Preserve existing `agent-browser` CLI snippets where they describe actual usage.
 - Keep missing-tool guidance host-specific:
-  - Claude-facing surfaces should mention `/spec:mcp-setup`.
-  - Codex-facing surfaces should mention `$spec-mcp-setup`.
+  - Claude-facing surfaces should mention `spec-mcp-setup`.
+  - Codex-facing surfaces should mention `spec-mcp-setup`.
   - Source prose that may render into both hosts should use a dual-host or host-neutral wording, not slash-only guidance.
 - If any prompt says “load/use the `agent-browser` skill,” revise it to “use the `agent-browser` CLI” or “install via `spec-mcp-setup`.”
 - Do not introduce alternative browser automation in `test-browser`; it should still require `agent-browser` exclusively.
@@ -259,7 +259,7 @@ flowchart TD
 **Test scenarios:**
 - Happy path: browser workflow prompts still contain `agent-browser open`, `agent-browser snapshot -i`, and relevant wait/screenshot readiness guidance.
 - Edge case: no current source prompt tells users to open, load, or rely on local `skills/agent-browser`.
-- Edge case: host-specific guidance does not regress to only `/spec:mcp-setup` in Codex-facing output or only `$spec-mcp-setup` in Claude-facing output.
+- Edge case: host-specific guidance does not regress to only `spec-mcp-setup` in Codex-facing output or only `spec-mcp-setup` in Claude-facing output.
 - Integration: `feature-video` and `spec-debug` tests continue to guard browser-bug reproduction behavior without implying local skill ownership.
 
 **Verification:**
@@ -350,7 +350,7 @@ flowchart TD
 - Update README runtime asset counts after bundled skill count changes.
 - Add user-facing migration wording with four facts:
   - `agent-browser` browser automation remains supported.
-  - It is now installed as an external/upstream helper via `/spec:mcp-setup` in Claude or `$spec-mcp-setup` in Codex.
+  - It is now installed as an external/upstream helper via `spec-mcp-setup` in Claude or `spec-mcp-setup` in Codex.
   - Existing `agent-browser` CLI commands remain unchanged.
   - Users with old runtime copies should refresh through init/update guidance and remove stale local runtime copies if prompted.
 - In current-vs-CE reconciliation docs, change `agent-browser` from “spec-first 独有保留项” to “外部/upstream helper tool，由 `spec-mcp-setup` 安装，不作为本地 source skill 交付.”
@@ -440,7 +440,7 @@ flowchart TD
 | `spec-setup` keeps a second install command | Remove or delegate its `agent-browser` install guidance to `spec-mcp-setup` and add contract coverage |
 | `agent-browser` accidentally enters `mcp-tools.json` | Add contract test that forbids it in MCP registry |
 | Downstream prompt still references deleted local skill | Add repo-wide reference audit plus browser helper contract scan across browser consumers |
-| Host-specific guidance drifts to the wrong command style | Test Claude-facing `/spec:mcp-setup` and Codex-facing `$spec-mcp-setup` separately instead of checking only the `spec-mcp-setup` substring |
+| Host-specific guidance drifts to the wrong command style | Test Claude-facing `spec-mcp-setup` and Codex-facing `spec-mcp-setup` separately instead of checking only the `spec-mcp-setup` substring |
 | README count drift after deleting one bundled skill | Use existing dynamic README count test in `dual-host-governance-contracts.test.js` |
 | Old runtime copies remain on user machines | Verify init/update/clean behavior; if obsolete copies are not auto-removed, document an explicit user action path |
 | Security guidance disappears with deleted references | Preserve a minimal local warning or point authenticated/session browser workflows to upstream security guidance |
@@ -451,7 +451,7 @@ flowchart TD
 ## Documentation / Operational Notes
 
 - This change is user-visible because `agent-browser` will no longer be bundled as a local spec-first skill.
-- The user-facing path for missing browser automation becomes: run `/spec:mcp-setup` in Claude or `$spec-mcp-setup` in Codex, then refresh/restart host as normal for setup changes.
+- The user-facing path for missing browser automation becomes: run `spec-mcp-setup` in Claude or `spec-mcp-setup` in Codex, then refresh/restart host as normal for setup changes.
 - Release notes should phrase this as an ownership migration, not a capability removal, and should explicitly state that existing `agent-browser` CLI commands remain unchanged.
 - User-facing docs should include where to find or confirm the upstream/global `agent-browser` skill documentation after setup installs it.
 - If old generated runtime copies are detected, docs or setup output must tell users whether init/update/clean removes them or whether manual cleanup is required.

@@ -22,7 +22,7 @@ UV_MIRROR_ENDPOINT="https://mirrors.tuna.tsinghua.edu.cn/pypi/simple"
 CHROME_MIRROR_ENDPOINT="https://npmmirror.com/mirrors/chrome-for-testing"
 LAST_INSTALL_SOURCE="official"
 LAST_INSTALL_MIRROR_USED="false"
-BROWSER_HELPER_OPT_IN_ACTION='set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`$spec-mcp-setup` or `/spec:mcp-setup`)'
+BROWSER_HELPER_OPT_IN_ACTION='set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)'
 export NPM_MIRROR_ENDPOINT UV_MIRROR_ENDPOINT CHROME_MIRROR_ENDPOINT
 
 reset_install_provenance() {
@@ -503,7 +503,7 @@ write_agent_browser_install_marker() {
 
 global_skill_installed() {
   local skill_name="$1"
-  [ -f "$HOME/.agents/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.claude/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.codex/skills/$skill_name/SKILL.md" ]
+  [ -f "$HOME/.agents/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.claude/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.codex/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.kiro/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.qoder/skills/$skill_name/SKILL.md" ]
 }
 
 browser_helper_required() {
@@ -995,21 +995,16 @@ PY
 
 install_graphify_cli() {
   if resolve_graphify_cli_matching_pin >/dev/null 2>&1; then
+    repair_graphify_path_symlink_if_safe || true
+    resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
     return 0
   fi
 
-  if command -v uv >/dev/null 2>&1; then
-    if run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" uv tool install --force "$GRAPHIFY_PACKAGE==$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
+  if command -v npm >/dev/null 2>&1; then
+    if run_npm_global_install_with_optional_sudo "$GRAPHIFY_PACKAGE@$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
       hash -r 2>/dev/null || true
       reset_graphify_resolver
-      resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
-    fi
-  fi
-
-  if command -v pipx >/dev/null 2>&1; then
-    if run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" pipx install --force "$GRAPHIFY_PACKAGE==$GRAPHIFY_VERSION_PIN" >/dev/null 2>&1; then
-      hash -r 2>/dev/null || true
-      reset_graphify_resolver
+      repair_graphify_path_symlink_if_safe || true
       resolve_graphify_cli_matching_pin >/dev/null 2>&1 && return 0
     fi
   fi
@@ -1034,6 +1029,23 @@ resolve_graphify_on_original_path() {
   return 1
 }
 
+graphify_known_cli_candidates() {
+  printf '%s\n' \
+    "$HOME/.local/bin/graphify" \
+    "$HOME/.local/bin/graphify.exe" \
+    "$HOME/.local/bin/graphify.cmd"
+  if command -v npm >/dev/null 2>&1; then
+    local npm_prefix
+    npm_prefix="$(npm prefix -g 2>/dev/null || true)"
+    if [ -n "$npm_prefix" ]; then
+      printf '%s\n' \
+        "$npm_prefix/bin/graphify" \
+        "$npm_prefix/bin/graphify.exe" \
+        "$npm_prefix/bin/graphify.cmd"
+    fi
+  fi
+}
+
 resolve_graphify_cli() {
   if [ -n "$GRAPHIFY_RESOLVED_COMMAND" ]; then
     printf '%s' "$GRAPHIFY_RESOLVED_COMMAND"
@@ -1051,7 +1063,7 @@ resolve_graphify_cli() {
     return 0
   fi
 
-  for candidate in "$HOME/.local/bin/graphify" "$HOME/.local/bin/graphify.exe" "$HOME/.local/bin/graphify.cmd"; do
+  while IFS= read -r candidate; do
     if [ -f "$candidate" ] && [ -x "$candidate" ]; then
       GRAPHIFY_RESOLVED_COMMAND="$candidate"
       GRAPHIFY_RESOLVED_ON_PATH="false"
@@ -1060,7 +1072,7 @@ resolve_graphify_cli() {
       printf '%s' "$GRAPHIFY_RESOLVED_COMMAND"
       return 0
     fi
-  done
+  done < <(graphify_known_cli_candidates)
 
   return 1
 }
@@ -1070,6 +1082,70 @@ graphify_command_version_matches_pin() {
   local output
   output="$(run_with_timeout 30 "$command_path" --version 2>/dev/null || true)"
   grep -Eq "(^|[^0-9A-Za-z.])${GRAPHIFY_VERSION_PIN//./\\.}([^0-9A-Za-z.]|$)" <<<"$output"
+}
+
+repair_graphify_path_symlink_if_safe() {
+  case "${SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK:-true}" in
+    false|FALSE|no|NO|0) return 0 ;;
+  esac
+
+  local path_command pinned_command
+  path_command="$(resolve_graphify_on_original_path || true)"
+  [ -n "$path_command" ] || return 0
+  [ -L "$path_command" ] || return 0
+  graphify_command_version_matches_pin "$path_command" && return 0
+
+  pinned_command="$(resolve_graphify_cli_matching_pin || true)"
+  [ -n "$pinned_command" ] || return 0
+  [ "$pinned_command" != "$path_command" ] || return 0
+  [ -f "$pinned_command" ] && [ -x "$pinned_command" ] || return 0
+
+  local backup_path
+  if backup_path="$(GRAPHIFY_PATH_COMMAND="$path_command" GRAPHIFY_PINNED_COMMAND="$pinned_command" python3 <<'PY'
+import os
+from pathlib import Path
+
+path_command = Path(os.environ["GRAPHIFY_PATH_COMMAND"])
+pinned_command = Path(os.environ["GRAPHIFY_PINNED_COMMAND"])
+
+if not path_command.is_symlink():
+    raise SystemExit(1)
+if not pinned_command.exists():
+    raise SystemExit(1)
+
+parent = path_command.parent
+if not os.access(parent, os.W_OK):
+    raise SystemExit(1)
+
+backup = parent / f"{path_command.name}.old"
+index = 1
+while backup.exists() or backup.is_symlink():
+    backup = parent / f"{path_command.name}.old.{index}"
+    index += 1
+
+path_command.rename(backup)
+try:
+    path_command.symlink_to(pinned_command)
+except Exception:
+    if not path_command.exists() and not path_command.is_symlink():
+        backup.rename(path_command)
+    raise
+
+print(str(backup))
+PY
+  )"; then
+    export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED=true
+    export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_FROM="$path_command"
+    export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_TO="$pinned_command"
+    if [ -n "$backup_path" ]; then
+      export SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_BACKUP="$backup_path"
+      stage_log "provider:graphify" "repaired stale PATH symlink $path_command -> $pinned_command (backup: $backup_path)"
+    else
+      stage_log "provider:graphify" "repaired stale PATH symlink $path_command -> $pinned_command"
+    fi
+    hash -r 2>/dev/null || true
+    reset_graphify_resolver
+  fi
 }
 
 resolve_graphify_cli_matching_pin() {
@@ -1086,7 +1162,7 @@ resolve_graphify_cli_matching_pin() {
     return 0
   fi
 
-  for candidate in "$HOME/.local/bin/graphify" "$HOME/.local/bin/graphify.exe" "$HOME/.local/bin/graphify.cmd"; do
+  while IFS= read -r candidate; do
     if [ -f "$candidate" ] && [ -x "$candidate" ] && graphify_command_version_matches_pin "$candidate"; then
       GRAPHIFY_RESOLVED_COMMAND="$candidate"
       GRAPHIFY_RESOLVED_ON_PATH="false"
@@ -1095,7 +1171,7 @@ resolve_graphify_cli_matching_pin() {
       printf '%s' "$GRAPHIFY_RESOLVED_COMMAND"
       return 0
     fi
-  done
+  done < <(graphify_known_cli_candidates)
 
   return 1
 }
@@ -1205,7 +1281,7 @@ graphify_cli_version_matches_pin() {
 
 graphify_project_platform() {
   case "${SPEC_FIRST_PROVIDER_HOST:-}" in
-    claude|codex) printf '%s' "$SPEC_FIRST_PROVIDER_HOST" ;;
+    claude|codex|kiro|qoder) printf '%s' "$SPEC_FIRST_PROVIDER_HOST" ;;
     *) printf 'codex' ;;
   esac
 }
@@ -1228,12 +1304,12 @@ This project has a knowledge graph at graphify-out/ with god nodes, community st
 Rules:
 - Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `/spec:mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
 - Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `/spec:mcp-setup --only graphify` when setup repair would help.
+- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 EOF
       ;;
     *)
@@ -1247,12 +1323,12 @@ When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"
 Rules:
 - Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `$spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
 - Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `$spec-mcp-setup --only graphify` when setup repair would help.
+- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 EOF
       ;;
   esac
@@ -1298,6 +1374,12 @@ graphify_project_skill_configured() {
   case "$platform" in
     claude|windows)
       [ -f "$repo_root/.claude/skills/graphify/SKILL.md" ]
+      ;;
+    kiro)
+      [ -f "$repo_root/.kiro/skills/graphify/SKILL.md" ]
+      ;;
+    qoder)
+      [ -f "$repo_root/.qoder/skills/graphify/SKILL.md" ]
       ;;
     *)
       [ -f "$repo_root/.codex/skills/graphify/SKILL.md" ] || [ -f "$repo_root/.agents/skills/graphify/SKILL.md" ]

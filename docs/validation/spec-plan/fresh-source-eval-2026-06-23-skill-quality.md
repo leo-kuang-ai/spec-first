@@ -11,7 +11,7 @@ runtime_mirrors_modified: false
 
 ## Summary
 
-本记录验证 `spec-plan` skill 质量与边界优化的 source 变更。结论：当前 source 保留 `$spec-plan` / `/spec:plan` 的 HOW planning 身份、direct invocation、plan-only safety、blocking handoff、question-tool fallback、source/runtime boundary 和双宿主 runtime projection；eval fixtures 覆盖 trigger / boundary / failure / expected 四类结构性样例；fresh-source reviewer 最终复核为 `passed`，无 P0/P1/P2 findings。
+本记录验证 `spec-plan` skill 质量与边界优化的 source 变更。结论：当前 source 保留 `spec-plan` / `spec-plan` 的 HOW planning 身份、direct invocation、plan-only safety、blocking handoff、question-tool fallback、source/runtime boundary 和双宿主 runtime projection；eval fixtures 覆盖 trigger / boundary / failure / expected 四类结构性样例；fresh-source reviewer 最终复核为 `passed`，无 P0/P1/P2 findings。
 
 `$yao-meta-skill` 的 `context_budget_limit: 1000` 是外部 advisory production budget，不是本仓当前 public workflow 的硬 gate。本轮不为了追预算牺牲 plan-only safety、handoff、direct evidence 或双宿主交付 contract。
 
@@ -117,7 +117,7 @@ Follow-up read-only reviewers checked the current closeout:
 Final closeout reviewers checked the latest code and artifacts:
 
 - runtime-test-closeout reviewer found that the older structured closeout still recorded broad eval fixtures as degraded; fixed by rerunning `npm run test:eval-fixtures -- --silent --no-cache` successfully and writing superseding `spec-plan-skill-quality-20260623-closeout-final` artifacts.
-- requirement-semantics reviewer found that `spec-plan` could still be read as treating a public `$spec-plan` invocation as Codex `spawn_agent` authorization; fixed by requiring both host capability and per-run dispatch authorization, and by recording `dispatch_authorization_missing` when the user did not explicitly authorize subagents/delegation/parallel research/research-agent dispatch.
+- requirement-semantics reviewer found that `spec-plan` could still be read as treating a public `spec-plan` invocation as Codex `spawn_agent` authorization; fixed by requiring both host capability and per-run dispatch authorization, and by recording `dispatch_authorization_missing` when the user did not explicitly authorize subagents/delegation/parallel research/research-agent dispatch.
 - requirement-semantics reviewer also found Direct Evidence wording drift between `planning-flow.md` and `plan-template.md`; fixed by aligning planning-flow guidance to the canonical `Direct Evidence Readiness` / `Direct Evidence` fields and removing legacy `worktree_dirty`, `discovery_methods`, and `tests_or_logs` anchors from the planning-flow contract tests.
 
 ### Fresh-Source Eval

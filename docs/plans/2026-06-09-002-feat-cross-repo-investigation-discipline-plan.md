@@ -9,7 +9,7 @@ created: 2026-06-09
 
 # feat: Cross-repo 需求影响分析的 agent 调查纪律
 
-> **CLOSEOUT(2026-06-09,/spec:work):未执行 U1/U2/U3,回退档1。** plan 的 Assumption A1 经 fresh-source eval **证伪**。
+> **CLOSEOUT(2026-06-09,spec-work):未执行 U1/U2/U3,回退档1。** plan 的 Assumption A1 经 fresh-source eval **证伪**。
 >
 > **eval:** 在 `/tmp` 建真实多仓 fixture(3 个独立 git 仓,含一个 grep 命中不了的事件订阅型隐藏下游 `notification-service`),用两个**零纪律**的 fresh subagent 跑跨仓需求影响分析(优惠券结构改造 / 金额元→分)。两个样本**稳定一致**地:① 找到隐藏下游;② 区分 confirmed vs inferred;③ 显式声明盲区(其他订阅者、无 schema、stub 外字段);④ 自评完整性把握。
 >
@@ -17,7 +17,7 @@ created: 2026-06-09
 >
 > **本仓无任何源码/prose 改动。** eval fixture 已清理。
 
-> **Origin:** 本计划来自 2026-06-09 在 `/spec:brainstorm` 内的对话式收敛(无独立 requirements 文档)。origin identity 未继承,使用 plan-local `spec_id`。WHAT 决策已沉淀于 memory `project_cross_repo_what_decision`。
+> **Origin:** 本计划来自 2026-06-09 在 `spec-brainstorm` 内的对话式收敛(无独立 requirements 文档)。origin identity 未继承,使用 plan-local `spec_id`。WHAT 决策已沉淀于 memory `project_cross_repo_what_decision`。
 
 ---
 

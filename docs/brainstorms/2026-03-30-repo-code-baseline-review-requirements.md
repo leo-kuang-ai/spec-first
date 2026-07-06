@@ -66,4 +66,4 @@ topic: repo-code-baseline-review
 - [Affects R10][Needs research] 是否需要为全仓基线体检增加专门的输出模板或复用现有 review report 结构。
 
 ## Next Steps
-→ /spec:plan for structured implementation planning
+→ spec-plan for structured implementation planning

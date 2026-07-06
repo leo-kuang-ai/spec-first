@@ -12,14 +12,14 @@ created: 2026-06-06
 
 ## Summary
 
-把 spec-first 的「检查版本是否过期 + runtime 资产是否需刷新」能力，从 `spec-update` skill（`/spec:update`、`$spec-update` 宿主入口）**彻底删除**，收敛为单一 `spec-first update` package CLI 命令。
+把 spec-first 的「检查版本是否过期 + runtime 资产是否需刷新」能力，从 `spec-update` skill（`spec-update`、`spec-update` 宿主入口）**彻底删除**，收敛为单一 `spec-first update` package CLI 命令。
 
 用户已在决策中**明确接受 Claude 宿主能力回退**：独立 npm CLI 运行时拿不到自己作为 Claude plugin 被缓存的路径与 marketplace 名，因此 Claude 端不再能生成精确的 `claude plugin update spec-first@<marketplace>`，只给通用升级提示。Codex 端能力不回退（本就走 npm CLI），可端到端实现。
 
 兑现的可观察行为变化（user-visible）：
-- **移除**：`/spec:update` 与 `$spec-update` 两个 workflow 入口消失。
+- **移除**：`spec-update` 与 `spec-update` 两个 workflow 入口消失。
 - **新增**：`spec-first update [--claude|--codex] [--json]` package CLI 命令，输出版本比较 + runtime drift + 下一步建议。
-- **路由变化**：startup version reminder 不再指向 `/spec:update`/`$spec-update`，改为指向 `spec-first update`。
+- **路由变化**：startup version reminder 不再指向 `spec-update`/`spec-update`，改为指向 `spec-first update`。
 
 核心边界一句话：**确定性逻辑（版本探测/比较/drift）下沉 CLI；Claude marketplace 反推能力随 skill 一起删除、不强行用新机制补齐（non-goal）。**
 
@@ -36,7 +36,7 @@ created: 2026-06-06
 - 3 个脚本性质不同（`skills/spec-update/scripts/`）：
   - `upstream-version.sh`：纯 `gh api repos/sunrain520/spec-first/contents/package.json` 取 main 的 version → **可完整移植 CLI**。
   - `currently-loaded-version.sh` / `marketplace-name.sh`：靠解析 `${BASH_SOURCE[0]}` 自身在 `~/.claude/plugins/cache/<marketplace>/spec-first/<version>/skills/spec-update/` 的路径反推 → **独立 CLI 本质无法复现**（这是 Claude 端必然降级的技术根因）。
-- update 已有非脚本入口：`src/cli/version-reminder.js` 已用 `fetch raw.githubusercontent.com/.../main/package.json`（Claude）与 npm registry（Codex）做 latest 探测，并在 `formatStartupVersionReminder`（L154-156）把用户指向 `/spec:update`/`$spec-update`。
+- update 已有非脚本入口：`src/cli/version-reminder.js` 已用 `fetch raw.githubusercontent.com/.../main/package.json`（Claude）与 npm registry（Codex）做 latest 探测，并在 `formatStartupVersionReminder`（L154-156）把用户指向 `spec-update`/`spec-update`。
 - `doctor --json`（`src/cli/commands/doctor.js`）已产出各宿主 command/skill/agent 的 missing/drifted 事实 → **update 的 runtime drift 检查可直接复用 doctor 内核**。
 
 ### 为什么是 Deep
@@ -72,9 +72,9 @@ CLI 重构（新增命令）+ 删除/迁移（删 skill + template + governance 
 ### 双宿主下游清理（downstream consumer checks）
 
 - **R8. 清理所有 source 引用,使 `spec-first init` 重新生成后无悬挂 update 入口。** 逐处处理：
-  - `src/cli/version-reminder.js`：`formatStartupVersionReminder`（L154-156）`updateEntry` 从 `/spec:update`/`$spec-update` 改为 `spec-first update`；`managedRuntimeExists`（L254/259）移除对 `commandRoot/update.md` 与 `workflowsRoot/spec-update/SKILL.md` 的存在性扫描（改用其它 sentinel 资产，如 using-spec-first，避免删除后误判 runtime 不存在）。
+  - `src/cli/version-reminder.js`：`formatStartupVersionReminder`（L154-156）`updateEntry` 从 `spec-update`/`spec-update` 改为 `spec-first update`；`managedRuntimeExists`（L254/259）移除对 `commandRoot/update.md` 与 `workflowsRoot/spec-update/SKILL.md` 的存在性扫描（改用其它 sentinel 资产，如 using-spec-first，避免删除后误判 runtime 不存在）。
   - `src/cli/host-comparative-workflows.js`：L5/L12-13 把 `spec-update` 从 host-comparative runtime skill 集合与路径映射中移除。
-  - `src/cli/instruction-bootstrap.js`：L142/L156/L170 生成的 CLAUDE.md/AGENTS.md managed block 里 `$spec-update`、`entry('update')`、`更新/runtime 修复→update` 锚点改为指向 `spec-first update`（CLI 命令，非宿主入口）。
+  - `src/cli/instruction-bootstrap.js`：L142/L156/L170 生成的 CLAUDE.md/AGENTS.md managed block 里 `spec-update`、`entry('update')`、`更新/runtime 修复→update` 锚点改为指向 `spec-first update`（CLI 命令，非宿主入口）。
   - `skills/using-spec-first/SKILL.md`、`skills/spec-release-notes/SKILL.md`：清除 spec-update 入口引用 / 改指 CLI。
   - `docs/catalog/runtime-capabilities.md`：更新 runtime capability 清单（移除 update workflow，记 CLI 命令）。
 
@@ -84,12 +84,12 @@ CLI 重构（新增命令）+ 删除/迁移（删 skill + template + governance 
 
 ### 测试同步（审查发现的完整性缺口，必做）
 
-- **R10. 同步所有断言 `spec-update`/`/spec:update`/`$spec-update` 的测试与文档。** 全仓扫描确认受影响面远超 R7 单个文件。删除 skill + 改路由后，以下 **7 个测试会因硬断言变红 / 文件不存在而崩**，必须在删除前同步改写它们的期望（断言改为 `spec-first update` 或移除 update 入口期望）：
-  - `tests/unit/using-spec-first-contracts.test.js`（L123/135/136：`toContain('$spec-update')`、`'/spec:update'`）
-  - `tests/unit/instruction-bootstrap.test.js`（L59/177/283/298：`toContain('$spec-update')`、entry anchors）
-  - `tests/unit/init-dry-run.test.js`（L573：`codexInstruction.toContain('$spec-update')`）
-  - `tests/unit/claude-settings.test.js`（L248/279：`additionalContext.toContain('/spec:update')`）
-  - `tests/unit/version-reminder.sh`（L260/304/346/484/626：6 处 `assert_contains '$spec-update'`/`'/spec:update'`）
+- **R10. 同步所有断言 `spec-update`/`spec-update`/`spec-update` 的测试与文档。** 全仓扫描确认受影响面远超 R7 单个文件。删除 skill + 改路由后，以下 **7 个测试会因硬断言变红 / 文件不存在而崩**，必须在删除前同步改写它们的期望（断言改为 `spec-first update` 或移除 update 入口期望）：
+  - `tests/unit/using-spec-first-contracts.test.js`（L123/135/136：`toContain('spec-update')`、`'spec-update'`）
+  - `tests/unit/instruction-bootstrap.test.js`（L59/177/283/298：`toContain('spec-update')`、entry anchors）
+  - `tests/unit/init-dry-run.test.js`（L573：`codexInstruction.toContain('spec-update')`）
+  - `tests/unit/claude-settings.test.js`（L248/279：`additionalContext.toContain('spec-update')`）
+  - `tests/unit/version-reminder.sh`（L260/304/346/484/626：6 处 `assert_contains 'spec-update'`/`'spec-update'`）
   - `tests/unit/public-workflow-contract-summary.test.js`（L66：`readFileSync(skills/spec-update/SKILL.md)` → 文件删除后直接抛错）
   - `tests/unit/context-governance-contracts.test.js`（L35：`toContain('\`spec-update\` / \`spec-mcp-setup\`')`）
 
@@ -142,10 +142,10 @@ CLI 重构（新增命令）+ 删除/迁移（删 skill + template + governance 
 - `npm run typecheck`
 - `npm run test:unit`（含改写后的 update CLI contract test + governance 测试 + R10 的 7 个断言测试 + `version-reminder.sh`）
 - `npm run test:smoke`（CLI help/init/doctor；release-dual-host-governance.sh）
-- **R10 点名回归**：删除后 `npm run test:unit` 必须覆盖 using-spec-first-contracts、instruction-bootstrap、init-dry-run、claude-settings、context-governance-contracts、public-workflow-contract-summary 这 6 个 jest 测试 + `version-reminder.sh`，确认无残留 `$spec-update`/`/spec:update` 期望。
+- **R10 点名回归**：删除后 `npm run test:unit` 必须覆盖 using-spec-first-contracts、instruction-bootstrap、init-dry-run、claude-settings、context-governance-contracts、public-workflow-contract-summary 这 6 个 jest 测试 + `version-reminder.sh`，确认无残留 `spec-update`/`spec-update` 期望。
 - 双宿主手测：
-  - Claude：`spec-first init --claude` 后 `.claude/commands/spec/` 无 `update.md`；`spec-first update --claude` 给「版本差+drift+marketplace 降级提示」；CLAUDE.md managed block 无 `/spec:update`。
-  - Codex：`spec-first init --codex` 后 `.agents/skills/` 无 `spec-update`；`spec-first update --codex` 端到端给版本+drift；AGENTS.md 无 `$spec-update`。
+  - Claude：`spec-first init --claude` 后 `.claude/commands/spec/` 无 `update.md`；`spec-first update --claude` 给「版本差+drift+marketplace 降级提示」；CLAUDE.md managed block 无 `spec-update`。
+  - Codex：`spec-first init --codex` 后 `.agents/skills/` 无 `spec-update`；`spec-first update --codex` 端到端给版本+drift；AGENTS.md 无 `spec-update`。
 - `spec-first --help` 输出含 `update` 行（R11）。
 - 残留扫描：`grep -rn "spec-update\|spec:update" skills/ agents/ templates/ src/ tests/ docs/contracts/ docs/catalog/` 仅剩有意保留项（无）。
 - `spec-first init` 重新生成后 `grep` runtime mirror 无悬挂 update 入口。
@@ -159,7 +159,7 @@ CLI 重构（新增命令）+ 删除/迁移（删 skill + template + governance 
 - **F3**：`version-reminder.js:managedRuntimeExists` 删除 update sentinel 后,若无替代 sentinel 会误判 runtime 不存在 → R8 指定改用 using-spec-first 等稳定 sentinel。
 - **F4**：删除顺序错误（先删 skill 后清下游）会让中间态 `init` 生成悬挂引用 → 严格按批 1→2→3,删除放最后。
 - **F5**：`instruction-bootstrap` 改动影响 CLAUDE.md/AGENTS.md 受管 block → 双宿主都需 init 验证。
-- **F6（审查发现，最高危）**：初版 Test Plan 仅列 1 个测试，实际 7 个测试硬断言 `$spec-update`/`/spec:update`，删除后 `test:unit` 会大片变红 → R10 已补全清单，且其改写排进**批 2（删除前）**，不是批 3 收尾。若不前置，批 3 一删即全红，看似「删除引入大量回归」实为顺序错误。
+- **F6（审查发现，最高危）**：初版 Test Plan 仅列 1 个测试，实际 7 个测试硬断言 `spec-update`/`spec-update`，删除后 `test:unit` 会大片变红 → R10 已补全清单，且其改写排进**批 2（删除前）**，不是批 3 收尾。若不前置，批 3 一删即全红，看似「删除引入大量回归」实为顺序错误。
 
 ---
 

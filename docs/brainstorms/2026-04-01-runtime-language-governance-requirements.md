@@ -113,4 +113,4 @@ documentation, and code comments. Code identifiers and technical terms remain in
 
 ## Next Steps
 
-→ `/spec:plan` for structured implementation planning
+→ `spec-plan` for structured implementation planning

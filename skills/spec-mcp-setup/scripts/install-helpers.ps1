@@ -74,7 +74,7 @@ $script:MirrorEndpoints = [ordered]@{
 }
 
 $script:LastInstallProvenance = $null
-$browserHelperOptInAction = 'set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`$spec-mcp-setup` or `/spec:mcp-setup`)'
+$browserHelperOptInAction = 'set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)'
 $helperRegistry = Get-HelperRegistry
 
 function Get-NonNegativeIntEnv {
@@ -404,7 +404,9 @@ function Test-GlobalSkill {
   return (
     (Test-Path (Join-Path $HOME ".agents/skills/$Name/SKILL.md")) -or
     (Test-Path (Join-Path $HOME ".claude/skills/$Name/SKILL.md")) -or
-    (Test-Path (Join-Path $HOME ".codex/skills/$Name/SKILL.md"))
+    (Test-Path (Join-Path $HOME ".codex/skills/$Name/SKILL.md")) -or
+    (Test-Path (Join-Path $HOME ".kiro/skills/$Name/SKILL.md")) -or
+    (Test-Path (Join-Path $HOME ".qoder/skills/$Name/SKILL.md"))
   )
 }
 
@@ -858,6 +860,27 @@ function Resolve-GraphifyOnOriginalPath {
   return ''
 }
 
+function Get-GraphifyKnownCliCandidates {
+  $candidates = @()
+  foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
+    $candidates += (Join-Path $homeLocalBin $name)
+  }
+  if (Test-CommandExists 'npm') {
+    $npmPrefix = ''
+    try {
+      $npmPrefix = (& npm prefix -g 2>$null | Select-Object -First 1)
+    } catch {
+      $npmPrefix = ''
+    }
+    if (-not [string]::IsNullOrWhiteSpace($npmPrefix)) {
+      foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
+        $candidates += (Join-Path (Join-Path $npmPrefix 'bin') $name)
+      }
+    }
+  }
+  return $candidates
+}
+
 function Set-GraphifyResolvedCommand {
   param(
     [string]$Command,
@@ -880,8 +903,7 @@ function Resolve-GraphifyCli {
     return $script:GraphifyResolvedCommand
   }
 
-  foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
-    $candidate = Join-Path $homeLocalBin $name
+  foreach ($candidate in Get-GraphifyKnownCliCandidates) {
     $command = Get-Command -Name $candidate -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -ne $command -and -not [string]::IsNullOrWhiteSpace([string]$command.Source)) {
       Set-GraphifyResolvedCommand -Command ([string]$command.Source) -OnPath $false
@@ -965,8 +987,7 @@ function Resolve-GraphifyCliMatchingPin {
     return $script:GraphifyResolvedCommand
   }
 
-  foreach ($name in @('graphify', 'graphify.exe', 'graphify.cmd')) {
-    $candidate = Join-Path $homeLocalBin $name
+  foreach ($candidate in Get-GraphifyKnownCliCandidates) {
     $command = Get-Command -Name $candidate -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($null -ne $command -and -not [string]::IsNullOrWhiteSpace([string]$command.Source)) {
       $source = [string]$command.Source
@@ -978,6 +999,51 @@ function Resolve-GraphifyCliMatchingPin {
   }
 
   return ''
+}
+
+function Repair-GraphifyPathSymlinkIfSafe {
+  $repairSetting = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_REPAIR_PATH_SYMLINK')
+  if ($repairSetting -in @('false', 'FALSE', 'no', 'NO', '0')) { return }
+
+  $pathCommand = Resolve-GraphifyOnOriginalPath
+  if ([string]::IsNullOrWhiteSpace($pathCommand)) { return }
+  if (Test-GraphifyCommandVersionMatchesPin -Command $pathCommand) { return }
+
+  $pathItem = Get-Item -LiteralPath $pathCommand -Force -ErrorAction SilentlyContinue
+  if ($null -eq $pathItem) { return }
+  if ($pathItem.LinkType -notin @('SymbolicLink', 'Junction')) { return }
+
+  $pinnedCommand = Resolve-GraphifyCliMatchingPin
+  if ([string]::IsNullOrWhiteSpace($pinnedCommand)) { return }
+  if ($pinnedCommand -eq $pathCommand) { return }
+  if (-not (Test-Path -LiteralPath $pinnedCommand -PathType Leaf)) { return }
+
+  $backupPath = "$pathCommand.old"
+  $index = 1
+  while ((Test-Path -LiteralPath $backupPath) -or ((Get-Item -LiteralPath $backupPath -Force -ErrorAction SilentlyContinue) -ne $null)) {
+    $backupPath = "$pathCommand.old.$index"
+    $index += 1
+  }
+
+  try {
+    Move-Item -LiteralPath $pathCommand -Destination $backupPath -ErrorAction Stop
+    try {
+      New-Item -ItemType SymbolicLink -Path $pathCommand -Target $pinnedCommand -Force -ErrorAction Stop | Out-Null
+    } catch {
+      if (-not (Test-Path -LiteralPath $pathCommand)) {
+        Move-Item -LiteralPath $backupPath -Destination $pathCommand -ErrorAction SilentlyContinue
+      }
+      throw
+    }
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED -Value 'true'
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_FROM -Value $pathCommand
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_REPAIRED_TO -Value $pinnedCommand
+    Set-Item -Path env:SPEC_FIRST_PROVIDER_GRAPHIFY_PATH_SYMLINK_BACKUP -Value $backupPath
+    Write-StageLog 'provider:graphify' "repaired stale PATH symlink $pathCommand -> $pinnedCommand (backup: $backupPath)"
+    Reset-GraphifyResolver
+  } catch {
+    Write-StageLog 'provider:graphify' "stale PATH symlink repair skipped"
+  }
 }
 
 function Invoke-GraphifyCommand {
@@ -1317,16 +1383,15 @@ function Test-GraphifyCliVersionMatchesPin {
 }
 
 function Install-GraphifyCli {
-  if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
-  if (Test-CommandExists 'uv') {
-    if (Invoke-HelperCommand { uv tool install --force "$graphifyPackage==$graphifyVersionPin" }) {
-      Reset-GraphifyResolver
-      if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
-    }
+  if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) {
+    Repair-GraphifyPathSymlinkIfSafe
+    if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
+    return $true
   }
-  if (Test-CommandExists 'pipx') {
-    if (Invoke-HelperCommand { pipx install --force "$graphifyPackage==$graphifyVersionPin" }) {
+  if (Test-CommandExists 'npm') {
+    if (Invoke-NpmGlobalInstallWithOptionalSudo -Packages @("$graphifyPackage@$graphifyVersionPin")) {
       Reset-GraphifyResolver
+      Repair-GraphifyPathSymlinkIfSafe
       if (-not [string]::IsNullOrWhiteSpace((Resolve-GraphifyCliMatchingPin))) { return $true }
     }
   }
@@ -1335,7 +1400,7 @@ function Install-GraphifyCli {
 
 function Get-GraphifyProjectPlatform {
   $hostValue = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_HOST')
-  if (@('claude', 'codex') -contains $hostValue) { return $hostValue }
+  if (@('claude', 'codex', 'kiro', 'qoder') -contains $hostValue) { return $hostValue }
   return 'codex'
 }
 
@@ -1356,12 +1421,12 @@ This project has a knowledge graph at graphify-out/ with god nodes, community st
 Rules:
 - Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `/spec:mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
 - Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `/spec:mcp-setup --only graphify` when setup repair would help.
+- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 '@
   }
   return @'
@@ -1374,12 +1439,12 @@ When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"
 Rules:
 - Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `$spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
 - Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `$spec-mcp-setup --only graphify` when setup repair would help.
+- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 '@
 }
 
@@ -1420,6 +1485,12 @@ function Test-GraphifyProjectSkillConfigured {
   $platformName = Get-GraphifyProjectPlatform
   if ($platformName -eq 'claude' -or $platformName -eq 'windows') {
     return (Test-Path -LiteralPath (Join-Path $RepoRoot '.claude/skills/graphify/SKILL.md') -PathType Leaf)
+  }
+  if ($platformName -eq 'kiro') {
+    return (Test-Path -LiteralPath (Join-Path $RepoRoot '.kiro/skills/graphify/SKILL.md') -PathType Leaf)
+  }
+  if ($platformName -eq 'qoder') {
+    return (Test-Path -LiteralPath (Join-Path $RepoRoot '.qoder/skills/graphify/SKILL.md') -PathType Leaf)
   }
   return (
     (Test-Path -LiteralPath (Join-Path $RepoRoot '.codex/skills/graphify/SKILL.md') -PathType Leaf) -or

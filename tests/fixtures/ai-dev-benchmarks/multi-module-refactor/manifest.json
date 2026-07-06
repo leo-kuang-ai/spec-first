@@ -5,9 +5,9 @@
   "prompt_path": "prompt.md",
   "repo_path": "repo",
   "expected_workflows": [
-    "$spec-plan",
-    "$spec-work",
-    "$spec-code-review"
+    "spec-plan",
+    "spec-work",
+    "spec-code-review"
   ],
   "expected_changed_paths": [
     "packages/cli/src/render.js",

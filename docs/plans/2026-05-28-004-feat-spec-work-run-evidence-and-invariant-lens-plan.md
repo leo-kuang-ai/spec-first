@@ -275,7 +275,7 @@ Lens test 逻辑：
 - `npm run test:integration`
 - `npm run test:unit`
 - `npm test`
-- 手动 fresh-source eval（实施期具体化）：fresh-source eval 不是 CLI 命令；本方案 Stage 4 验证应在 fresh chat 中以宿主 workflow 触发（Claude `/spec:work <task-pack-path>` 或 Codex 等价入口）跑一次 spec-work，验证 closeout 写出 run.json 并被 final response 引用；或退化为直接 `spec-first internal spec-work-run-artifact write --input <fixture>` 验证 schema 通过（不构成端到端实证，只验证 producer 行为）。两种验证路径选择见 ## Open Questions C2。
+- 手动 fresh-source eval（实施期具体化）：fresh-source eval 不是 CLI 命令；本方案 Stage 4 验证应在 fresh chat 中以宿主 workflow 触发（Claude `spec-work <task-pack-path>` 或 Codex 等价入口）跑一次 spec-work，验证 closeout 写出 run.json 并被 final response 引用；或退化为直接 `spec-first internal spec-work-run-artifact write --input <fixture>` 验证 schema 通过（不构成端到端实证，只验证 producer 行为）。两种验证路径选择见 ## Open Questions C2。
 
 ---
 
@@ -438,7 +438,7 @@ Lens test 逻辑：
 - `npm test`
 - `npm run build`
 - 端到端验证（实施期按 Open Questions C2 选择具体路径）：
-  - **首选 host-driven**：fresh chat 中以宿主 workflow 入口（Claude `/spec:work <task-pack-path>` 或 Codex 等价）跑一次 spec-work，验证 `.spec-first/workflows/spec-work/<workspace>/<run>/run.json` 实际生成并通过 schema validate；final response `Artifacts:` 行包含该路径；`producer.workflow_integrated=true`；`producer.reason_code` 在新 enum 内。
+  - **首选 host-driven**：fresh chat 中以宿主 workflow 入口（Claude `spec-work <task-pack-path>` 或 Codex 等价）跑一次 spec-work，验证 `.spec-first/workflows/spec-work/<workspace>/<run>/run.json` 实际生成并通过 schema validate；final response `Artifacts:` 行包含该路径；`producer.workflow_integrated=true`；`producer.reason_code` 在新 enum 内。
   - **退化 producer-level**：构造命中 `trigger-task-pack` 的 closeout payload fixture，直接 `spec-first internal spec-work-run-artifact write --input <fixture>` 验证 producer 行为。该方式**不构成端到端实证**，仅作为宿主 workflow 验证不可行时的降级。
 - `spec-first doctor --claude --codex`：双宿主 runtime 状态绿
 - 反向验证：手动临时删除 `spec-work` SKILL.md 中 `## Run Artifact Boundary` 段任一 invariant phrase → `npm run test:unit` 必须 fail 并报具体 invariant id（验证 lens 真守护，不是装饰）
@@ -545,7 +545,7 @@ Lens test 逻辑：
 - fallback: 直接源码读取（已对照 `src/cli/helpers/spec-work-run-artifact.js`、`docs/contracts/workflows/spec-work-run-artifact.schema.json`、`skills/spec-work/`、`skills/spec-plan/references/plan-template.md`、既有测试文件），grep 与 Read 验证关键字段位置。
 - runtime_mcp_evidence: 无（本 plan 撰写期间未调用 GitNexus live query）
 - confidence: 高（源码与契约直接读取确认所有断言）；中（Stage 6 generated runtime 重生成的双宿主 diff 影响面需在执行期再确认）
-- 后续：如 U-A Stage 4 需要 impact 分析（例如 evaluate spec-work 调用方），可考虑在 implementation 阶段执行 `/spec:graph-bootstrap` 刷新；本 plan 撰写阶段直接读源即可。
+- 后续：如 U-A Stage 4 需要 impact 分析（例如 evaluate spec-work 调用方），可考虑在 implementation 阶段执行 `spec-graph-bootstrap` 刷新；本 plan 撰写阶段直接读源即可。
 
 ---
 

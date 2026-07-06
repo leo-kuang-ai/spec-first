@@ -40,7 +40,9 @@ def main(argv: list[str]) -> int:
     if not os.path.isfile(doc_path):
         usage_fail(f"file not found: {doc_path}")
 
-    with open(doc_path) as f:
+    # 显式 UTF-8:Windows 非 UTF-8 locale 下默认编码可能误读或抛 UnicodeDecodeError,
+    # 而 docs/solutions frontmatter 常含中文。newline='' 保留原始换行,交由下方逻辑处理。
+    with open(doc_path, encoding="utf-8", newline="") as f:
         text = f.read()
 
     lines = text.split("\n")

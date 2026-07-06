@@ -35,7 +35,7 @@ LLM = 语义判断、范围选择、review finding 与取舍决策
 当前 CRG 已经从一个内部 graph helper 扩散成跨仓库核心基础设施：
 
 - `bin/spec-first.js` 对 `crg` 做特殊分支并延迟加载 `src/crg/cli/router`。
-- `src/cli/index.js` help 与 version onboarding 仍公开 `spec-first crg`、`/spec:graph-bootstrap`、`$spec-graph-bootstrap`。
+- `src/cli/index.js` help 与 version onboarding 仍公开 `spec-first crg`、`spec-graph-bootstrap`。
 - `src/cli/commands/doctor.js` 通过 CRG 检查 CLI、`better-sqlite3`、`tree-sitter` 和 graph contract。
 - `scripts/run-ai-dev-quality-gate.js` 与 `.github/workflows/ai-dev-quality-gate.yml` 把 CRG runtime contracts 当作 AI Dev Gate 的核心。
 - `skills/spec-plan`、`spec-work`、`spec-work-beta`、`spec-code-review`、`spec-write-tasks` 把 CRG hook 当作上下文入口。
@@ -76,7 +76,7 @@ LLM = 语义判断、范围选择、review finding 与取舍决策
 
 - 删除 `src/crg/**` 内部实现。
 - 删除 `skills/spec-graph-bootstrap/SKILL.md` source skill。
-- 删除 Claude `/spec:graph-bootstrap` 与 Codex `$spec-graph-bootstrap` 的 source manifest/template 暴露。
+- 删除 Claude `spec-graph-bootstrap` 与 Codex `spec-graph-bootstrap` 的 source manifest/template 暴露。
 - 删除 `spec-first crg` package CLI 入口与 help onboarding。
 - 删除 CRG native dependency、postinstall repair、tree-sitter prune、vendored grammars。
 - 删除 MCP readiness ledger 中的顶层 `crg` 字段和 native module 检测。
@@ -234,10 +234,10 @@ Serena、LSP、external `code-review-graph`、GitNexus 等工具只能作为可�
 
 `graph-bootstrap` 不是改名，也不是隐藏 internal skill，而是从 source runtime governance 中删除。`using-spec-first` 不再把“repository fact preparation / query-first context quality”路由到 graph-bootstrap。此类请求按真实意图进入：
 
-- planning：`$spec-plan`
-- execution：`$spec-work`
-- setup/readiness：`$spec-mcp-setup`
-- review：`$spec-code-review` 或 `$spec-doc-review`
+- planning：`spec-plan`
+- execution：`spec-work`
+- setup/readiness：`spec-mcp-setup`
+- review：`spec-code-review` 或 `spec-doc-review`
 
 ### D5. MCP readiness 不再报告 CRG native module
 
@@ -379,7 +379,7 @@ Implementation notes:
 Test scenarios:
 
 - `spec-first --help` does not contain `crg <subcommand>`.
-- `spec-first --version` does not suggest `/spec:graph-bootstrap` or `$spec-graph-bootstrap`.
+- `spec-first --version` does not suggest `spec-graph-bootstrap`.
 - `spec-first crg --help` exits non-zero through normal CLI path; the test should not bind to exact wording.
 - Unknown command output matches `/unknown command|unknown|unsupported|invalid/i`.
 - Unknown command output does not contain `src/crg` or `crg <subcommand>`.
@@ -389,7 +389,7 @@ Test scenarios:
 
 ### U3. Remove graph-bootstrap Workflow From Source Runtime Governance
 
-Goal: source-of-truth no longer installs `/spec:graph-bootstrap` or `$spec-graph-bootstrap`.
+Goal: source-of-truth no longer installs `spec-graph-bootstrap`.
 
 Files:
 
@@ -481,7 +481,7 @@ External tools may prioritize inspection, but they do not define scope authority
 Test scenarios:
 
 - Contract tests assert no skill source contains `spec-first crg hook`.
-- Contract tests assert no skill source contains `$spec-graph-bootstrap` or `/spec:graph-bootstrap`.
+- Contract tests assert no skill source contains `spec-graph-bootstrap`.
 - `spec-plan` contract asserts direct repo reads fallback is primary, not CRG fallback.
 - `spec-work` contract asserts scope expansion is judged from plan/task-pack and diff, not CRG after-work.
 - `spec-code-review` contract asserts reviewer owns findings and starts from diff.
@@ -696,17 +696,17 @@ Recommended README section:
 
 The internal CRG runtime has been removed. For current workflows:
 
-- Use `$spec-plan` for design and implementation planning.
-- Use `$spec-write-tasks` to compile executable task packs.
-- Use `$spec-work` with direct repo reads, nearby files, task packs, diffs, and tests.
-- Use `$spec-code-review` for review from diff, plan/task evidence, targeted file reads, and test results.
-- Use `$spec-mcp-setup` only for MCP/helper readiness, not graph readiness.
+- Use `spec-plan` for design and implementation planning.
+- Use `spec-write-tasks` to compile executable task packs.
+- Use `spec-work` with direct repo reads, nearby files, task packs, diffs, and tests.
+- Use `spec-code-review` for review from diff, plan/task evidence, targeted file reads, and test results.
+- Use `spec-mcp-setup` only for MCP/helper readiness, not graph readiness.
 ```
 
 Test scenarios:
 
 - README current sections contain no `spec-first crg`.
-- README current sections contain no `/spec:graph-bootstrap` or `$spec-graph-bootstrap`.
+- README current sections contain no `spec-graph-bootstrap`.
 - Runtime install smoke confirms generated command/skill counts after deletion.
 - Obsolete managed graph-bootstrap runtime is cleaned by managed asset removal flow.
 - README contains the replacement path section and does not mention GitNexus or `code-review-graph` as a promised replacement.
@@ -796,7 +796,7 @@ doc_targets=(README.md README.zh-CN.md)
 [ -d docs/user-manual ] && doc_targets+=(docs/user-manual)
 [ -f docs/README.md ] && doc_targets+=(docs/README.md)
 ! rg -n \
-  "spec-first crg|/spec:graph-bootstrap|\\$spec-graph-bootstrap|graph\\.db|test:e2e:crg" \
+  "spec-first crg|spec-graph-bootstrap|\\spec-graph-bootstrap|graph\\.db|test:e2e:crg" \
   "${doc_targets[@]}"
 ```
 
@@ -872,7 +872,7 @@ Do not run the strict no-CRG scan over all `docs/**`. Historical plans, archives
 | Existing workflow prose loses context guidance | Plan/work/review quality drops | U4 direct repo reads replacement with explicit orientation rules |
 | Historical docs confuse future agents | Agents follow retired CRG route | Update current README and mark graph改造 docs as exploratory if needed |
 | Quality gate name remains CRG | CI preserves stale mental model | U7 neutral rename and tests |
-| Old generated runtime files linger in local repos | `/spec:graph-bootstrap` still appears until re-init | Do not hand edit runtime; document and test managed obsolete removal through init |
+| Old generated runtime files linger in local repos | `spec-graph-bootstrap` still appears until re-init | Do not hand edit runtime; document and test managed obsolete removal through init |
 
 ## Done Signals
 

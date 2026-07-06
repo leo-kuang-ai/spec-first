@@ -64,7 +64,7 @@ description: ...
 
 - Claude Code 对这个问题容忍度更高
 - Codex 的 skill 发现对 `name:` 更敏感
-- 目录名与 `name:` 脱节时，Codex runtime 的 `$spec-*` 很容易不命中
+- 目录名与 `name:` 脱节时，Codex runtime 的 `spec-*` 很容易不命中
 
 注意区分两层：
 
@@ -128,8 +128,8 @@ Task spec-first:review:correctness-reviewer(Review the current diff for correctn
 
 核心 workflow skill：
 
-- 既要能作为 Claude 的 `/spec:*` 命令被调用
-- 又要能作为 Codex 的 `$spec-*` skill 被发现
+- 既要能作为 Claude 的 `spec-*` 命令被调用
+- 又要能作为 Codex 的 `spec-*` skill 被发现
 - 不再生成 `.codex/commands/spec/<name>.md`；Codex 正式 discovery 以 `.agents/skills/spec-<name>/` 为准
 
 如果是新增核心 workflow，还必须继续执行下面的“新增核心 workflow”步骤。
@@ -186,8 +186,8 @@ agent 文件本身只描述：
 
 如果你新增的是新的主链路入口，例如想增加：
 
-- Claude: `/spec:triage`
-- Codex: `$spec-triage`
+- Claude: `spec-triage`
+- Codex: `spec-triage`
 
 那除了新增 skill，还要同步以下资产。
 
@@ -225,7 +225,7 @@ agent 文件本身只描述：
 templates/claude/commands/spec/triage.md
 ```
 
-这一步是为了让 Claude Code 继续通过 `/spec:triage` 进入 workflow。
+这一步是为了让 Claude Code 继续通过 `spec-triage` 进入 workflow。
 
 ### 3. 新增对应 skill
 
@@ -238,7 +238,7 @@ skills/spec-triage/SKILL.md
 这样 Codex 在生成 runtime 后，才会出现：
 
 ```text
-$spec-triage
+spec-triage
 ```
 
 ## 同时兼容 Claude 和 Codex 的检查点
@@ -321,13 +321,13 @@ spec-first doctor --codex
 Claude Code：
 
 ```text
-/spec:<name>
+spec-*
 ```
 
 Codex：
 
 ```text
-$spec-<name>
+spec-*
 ```
 
 至少确认目标平台可以看到该入口。
@@ -350,8 +350,8 @@ $spec-<name>
 
 结果：
 
-- Codex 可能能用 `$spec-xxx`
-- Claude 里却没有 `/spec:xxx`
+- Codex 可能能用 `spec-xxx`
+- Claude 里却没有 `spec-xxx`
 
 ### 错误 2：skill 目录名和 `name:` 不一致
 

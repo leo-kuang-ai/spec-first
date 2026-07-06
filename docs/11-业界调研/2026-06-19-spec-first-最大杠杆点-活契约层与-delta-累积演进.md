@@ -205,7 +205,7 @@ spec-first contracts show <domain>     # 查看某领域当前契约
 **新增 skill 入口**：
 
 ```
-/spec:sync   # 或扩展 compound：合并契约 + 沉淀 learnings 的统一收尾
+spec-sync   # 或扩展 compound：合并契约 + 沉淀 learnings 的统一收尾
 ```
 
 ### 3.2 Phase 2：打通乘数效应（让现有治理对照活契约）
@@ -226,7 +226,7 @@ Phase 1 建好载体后，Phase 2 让现有能力对照活契约，激活乘数�
 
 **compound 升级**：
 
-- compound 收尾时执行契约合并（/spec:sync）
+- compound 收尾时执行契约合并（spec-sync）
 - 合并冲突走 honest closeout 降级（degraded/unsupported），不强行合并
 - 知识闭环补齐契约层
 

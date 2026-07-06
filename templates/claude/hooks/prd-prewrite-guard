@@ -1,9 +1,10 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env node
+'use strict';
 
-project_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-
-node /dev/fd/3 "$project_dir" 3<<'EOF'
+// Cross-platform PreToolUse PRD prewrite guard. Claude Code invokes this in exec form
+// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
+// Windows without a POSIX shell. The project dir arrives as argv[2]; fall back to
+// CLAUDE_PROJECT_DIR then cwd. The tool event payload arrives as JSON on stdin.
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -17,7 +18,11 @@ const WHAT_TOUCHING_KEYWORDS = [
   'analytics', '埋点', '指标',
 ];
 
-const projectDir = process.argv[2];
+const projectDir = (process.argv[2] && process.argv[2].trim())
+  ? process.argv[2]
+  : (process.env.CLAUDE_PROJECT_DIR && process.env.CLAUDE_PROJECT_DIR.trim()
+    ? process.env.CLAUDE_PROJECT_DIR
+    : process.cwd());
 const rawInput = readStdin();
 const input = parseJsonObject(rawInput);
 const toolName = String(input.tool_name || input.toolName || '');
@@ -134,7 +139,7 @@ if (readyStatus || machineReceipt || readyIntent || missingWriteModeOnFirstWrite
   reasonLines.push(
     '',
     'Do not repair this by only changing enum values, deleting rich requirements, or rewriting the PRD into a checker-friendly skeleton.',
-    'Run the `$spec-prd` pre-write Requirements Grill first, then choose the correct path: `ask-owner-first` to ask the next load-bearing owner question; `write_mode: checkpoint-prd` to preserve recoverable context with `can_enter_spec_plan: no` and `next_owner_question`; `route-out` when PRD authoring adds no durable WHAT value; or `final-prd` only after every load-bearing branch is closed.',
+      'Run the `spec-prd` pre-write Requirements Grill first, then choose the correct path: `ask-owner-first` to ask the next load-bearing owner question; `write_mode: checkpoint-prd` to preserve recoverable context with `can_enter_spec_plan: no` and `next_owner_question`; `route-out` when PRD authoring adds no durable WHAT value; or `final-prd` only after every load-bearing branch is closed.',
     'Legal enum values: write_mode = checkpoint-prd | final-prd | ask-owner-first | route-out; can_enter_spec_plan = yes | no; clarification_evidence = asked-owner | source-proven-no-ask | headless-degraded-logged; preflight_sweep_closure = closed | degraded | blocked.',
     'Phase 1 restore point: (1) emit a run-local Decision Card in the conversation with write_mode / highest_risk_gap / next_action / why planning will not invent WHAT; (2) emit the Requirement Analysis Gate map; (3) begin Requirements Grill before any durable Write — do not satisfy this gate by writing a ready/final PRD first and relying on Phase 4 to catch it.',
     'After all load-bearing branches are closed, update the existing artifact and run the producer-local finalize path. `status: ready-for-planning` and `readiness_verified_*` are machine-owned receipt fields.',
@@ -466,4 +471,3 @@ function block(reason) {
   process.stderr.write(`${reason}\n`);
   process.exit(2);
 }
-EOF

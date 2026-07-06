@@ -197,11 +197,11 @@ spec-first:spec-doc-review:coherence-reviewer -> spec-doc-review:coherence-revie
 
 1. `init --claude` 后，关键运行态 skill 中不再残留 `spec-first:research:` 等形式
 2. 关键 slash command 仍保持不变：
-   - `/spec:brainstorm`
-   - `/spec:plan`
-   - `/spec:work`
-   - `/spec:code-review`
-   - `/spec:compound`
+   - `spec-brainstorm`
+   - `spec-plan`
+   - `spec-work`
+   - `spec-code-review`
+   - `spec-compound`
 3. 重新执行 `init --claude` 时，转换结果稳定、幂等
 
 建议重点覆盖：
@@ -268,7 +268,7 @@ spec-first:spec-doc-review:coherence-reviewer -> spec-doc-review:coherence-revie
 
 1. `npm pack` 产物不变，仍包含 `skills/`、`agents/`、`templates/`、`.claude-plugin/plugin.json`
 2. `spec-first init --claude` 后，目标项目的 `.claude/skills/` 中关键运行态引用已被转换到 Claude adapter 的目标格式
-3. `/spec:plan`、`/spec:code-review`、`/resolve-pr-feedback` 不再因 agent 名称失配出现 `0 tool uses`
+3. `spec-plan`、`spec-code-review`、`/resolve-pr-feedback` 不再因 agent 名称失配出现 `0 tool uses`
 4. `spec-first doctor` 能识别运行态命名空间残留问题
 5. 文档不再建议用户手工删除源码中的 `spec-first:` 前缀
 
@@ -276,7 +276,7 @@ spec-first:spec-doc-review:coherence-reviewer -> spec-doc-review:coherence-revie
 
 **测试 1：Agent 调用成功**
 ```
-执行：/spec:plan
+执行：spec-plan
 预期：research:repo-research-analyst 显示 >0 tool uses
 实际：调用成功，执行 Glob/Read 等工具
 ```
@@ -289,9 +289,9 @@ grep -r "spec-first:research:" .claude/skills/
 ```
 
 **测试 3：关键 skill 可用**
-- `/spec:brainstorm` - 正常执行
-- `/spec:plan` - 调用 research/review agents 成功
-- `/spec:code-review` - 调用 review agents 成功
+- `spec-brainstorm` - 正常执行
+- `spec-plan` - 调用 research/review agents 成功
+- `spec-code-review` - 调用 review agents 成功
 - `/resolve-pr-feedback` - 调用 workflow agents 成功
 
 ## 风险与控制

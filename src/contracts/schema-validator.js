@@ -8,6 +8,7 @@ const SUPPORTED_SCHEMA_KEYWORDS = [
   'required',
   'properties',
   'items',
+  'contains',
   'additionalProperties',
   'anyOf',
   'oneOf',
@@ -153,13 +154,21 @@ function validateAgainstSchema(schema, value, pointer = 'root', errors = [], roo
     }
   }
 
-  if (schemaAllowsType(schema, 'array') && Array.isArray(value) && schema.items) {
+  if (Array.isArray(value) && schema.items) {
     value.forEach((item, index) => {
       validateAgainstSchema(schema.items, item, `${pointer}[${index}]`, errors, rootSchema, refStack);
     });
   }
 
-  if (schemaAllowsType(schema, 'array') && Array.isArray(value)) {
+  if (Array.isArray(value)) {
+    if (schema.contains && typeof schema.contains === 'object') {
+      const hasMatch = value.some((item, index) =>
+        validateAgainstSchema(schema.contains, item, `${pointer}[${index}]`, [], rootSchema, refStack).valid
+      );
+      if (!hasMatch) {
+        errors.push(`${pointer}: expected array to contain matching item`);
+      }
+    }
     if (Number.isInteger(schema.minItems) && value.length < schema.minItems) {
       errors.push(`${pointer}: expected at least ${schema.minItems} item(s), received ${value.length}`);
     }

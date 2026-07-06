@@ -1,15 +1,17 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env node
+'use strict';
 
-node /dev/fd/3 3<<'EOF'
+// Cross-platform UserPromptExpansion spec-plan guard. Claude Code invokes this in exec form
+// (`node <this file>`), so it runs identically on macOS, Linux, and Windows without a POSIX
+// shell. The hook event payload arrives as JSON on stdin (fd 0), unchanged across platforms.
 const fs = require('node:fs');
 
-const rawInput = fs.readFileSync(0, 'utf8');
+const rawInput = readStdin();
 const input = parseJsonObject(rawInput);
 const eventName = String(input.hook_event_name || input.hookEventName || '');
 const commandName = normalizeCommandName(input.command_name || input.commandName || '');
 
-if (eventName !== 'UserPromptExpansion' || commandName !== 'spec:plan') {
+if (eventName !== 'UserPromptExpansion' || commandName !== 'spec-plan') {
   process.exit(0);
 }
 
@@ -21,8 +23,8 @@ const permissionLine = permissionMode === 'plan'
   : `permission_mode=${permissionMode}: best-effort attention reminder only; this hook provides no hard write protection.`;
 
 const additionalContext = [
-  '[spec-first] /spec:plan planning-only attention guard',
-  'This slash-command expansion is planning-only.',
+  '[spec-first] spec-plan planning-only attention guard',
+  'This command expansion is planning-only.',
   'Allowed before handoff: research, decisions, and writing or updating the plan artifact.',
   'Do not implement code, edit non-plan source files, run implementation workflows, or claim implementation has started.',
   'After the plan is written and reviewed, stop and wait for the user handoff choice before implementation.',
@@ -36,6 +38,14 @@ process.stdout.write(JSON.stringify({
   },
 }));
 
+function readStdin() {
+  try {
+    return fs.readFileSync(0, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
 function parseJsonObject(raw) {
   try {
     const parsed = JSON.parse(raw || '{}');
@@ -48,4 +58,3 @@ function parseJsonObject(raw) {
 function normalizeCommandName(value) {
   return String(value || '').trim().replace(/^\//, '');
 }
-EOF

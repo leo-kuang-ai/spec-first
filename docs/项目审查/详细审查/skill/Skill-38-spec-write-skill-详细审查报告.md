@@ -8,7 +8,7 @@
 | 文件路径 | `skills/spec-write-skill/SKILL.md` |
 | 当前行数 | 75 行 |
 | entry surface | public workflow command |
-| 当前 source 证据 | `docs/catalog/runtime-capabilities.md` 将其列为 `/spec:write-skill` / `$spec-write-skill` public workflow |
+| 当前 source 证据 | `docs/catalog/runtime-capabilities.md` 将其列为 `spec-write-skill` / `spec-write-skill` public workflow |
 
 ## 2. 职责定位
 

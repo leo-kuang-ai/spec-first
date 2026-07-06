@@ -103,7 +103,7 @@ describe('team standards governance source contract', () => {
       expect(contract).toContain(snippet);
     }
 
-    expect(contract).toContain('不恢复 Claude `/spec:standards`、Codex `$spec-standards`、`skills/spec-standards/` 或 `.spec-first/standards/`');
+    expect(contract).toContain('不恢复 legacy standards command spellings、`spec-standards` workflow、`skills/spec-standards/` 或 `.spec-first/standards/`');
     expect(contract).not.toContain('confirmed standards can be inferred from code scanning');
   });
 
@@ -172,12 +172,12 @@ describe('team standards governance source contract', () => {
     expect(skill).not.toContain('name: team-standards-governance');
     expect(skill).toContain('## When To Use / When Not To Use');
     expect(skill).toContain('Do not use for ordinary code/doc review, implementation, PRD/plan authoring, or workflow execution');
-    expect(skill).toContain('not a public Claude `/spec:*` or Codex `$spec-*` workflow');
+    expect(skill).toContain('not a public `spec-*` workflow');
     expect(skill).toContain('not the retired `spec-standards` workflow');
-    expect(skill).toContain('Do not create Claude `/spec:standards`, Codex `$spec-standards`');
-    expect(skill).toContain('Do not use to create, restore, or recommend `/spec:standards`, `$spec-standards`, `skills/spec-standards/`, or `.spec-first/standards/`.');
+    expect(skill).toContain('Do not create legacy standards workflow entrypoints');
+    expect(skill).toContain('Do not use to create, restore, or recommend legacy standards command spellings, the retired `spec-standards` workflow, `skills/spec-standards/`, or `.spec-first/standards/`.');
     expect(skill).toContain('Do not turn `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, replay results, or high confidence into enforceable hard context.');
-    expect(skill).toContain('requires an active Claude `/spec:work`, Codex `$spec-work`');
+    expect(skill).toContain('requires an active `spec-work`');
     expect(skill).toContain('Never load every reference by default');
     expect(skill).toContain('references/meta-prompt-governance.md');
     expect(skill).toContain('references/source-matrix.md');
@@ -211,9 +211,9 @@ describe('team standards governance source contract', () => {
         const runtimeSkill = readAbsolute(runtimeSkillPath);
         expect(runtimeSkill).toContain('name: spec-team-standards-governance');
         expect(runtimeSkill).not.toContain('name: team-standards-governance');
-        expect(runtimeSkill).toContain('not a public Claude `/spec:*` or Codex `$spec-*` workflow');
-        expect(runtimeSkill).toContain('Do not create Claude `/spec:standards`, Codex `$spec-standards`');
-        expect(runtimeSkill).toContain('requires an active Claude `/spec:work`, Codex `$spec-work`');
+        expect(runtimeSkill).toContain('not a public `spec-*` workflow');
+        expect(runtimeSkill).toContain('Do not create legacy standards workflow entrypoints');
+        expect(runtimeSkill).toContain('requires an active `spec-work`');
       }
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
@@ -371,6 +371,6 @@ describe('team standards governance source contract', () => {
     expect(read('docs/05-用户手册/12-gitignore参考.md')).toContain('旧 `.spec-first/standards/` 属于已退役 runtime/artifact 路径');
     expect(read('docs/README.md')).toContain('docs/contracts/team-standards.md');
     expect(read('README.zh-CN.md')).toContain('团队开发规范合同');
-    expect(read('README.md')).toContain('团队开发规范可以放在 `docs/contracts/team-standards.md` 与 `docs/standards/**`');
+    expect(read('README.md')).toContain('Team standards live as source docs under `docs/contracts/team-standards.md` and `docs/standards/**`');
   });
 });

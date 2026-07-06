@@ -488,16 +488,45 @@ describe('task pack hash and validation', () => {
           '.claude',
           '.codex',
           '.agents/skills',
-          '.claude/commands/spec/work.md',
+          '.cursor/skills',
+          '.cursor/spec-first',
+          '.cursor/mcp.json',
+          '.kiro/skills',
+          '.kiro/agents/spec-security-reviewer.agent.md',
+          '.kiro/spec-first/state.json',
+          '.kiro/settings/mcp.json',
+          '.claude/commands/spec-work.md',
           '.codex/skills/spec-work/SKILL.md',
           '.agents/skills/spec-work/SKILL.md',
+          '.cursor/skills/spec-work/SKILL.md',
+          '.cursor/spec-first/state.json',
+          '.kiro/skills/spec-work/SKILL.md',
         ];
       });
 
       const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
 
       expect(result.deterministic_handoff).toBe(false);
-      expect(result.errors.filter((error) => error.code === 'task-pack-task-file-generated-runtime')).toHaveLength(6);
+      expect(result.errors.filter((error) => error.code === 'task-pack-task-file-generated-runtime')).toHaveLength(16);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('task files allow Cursor native advisory paths when explicitly named', () => {
+    const tmp = copyFixtureProject();
+    try {
+      const taskPackPath = path.join(tmp, 'tests/fixtures/spec-write-tasks/valid/task-pack.md');
+      replaceTaskPackContract(taskPackPath, (contract) => {
+        contract.tasks[0].files = [
+          '.cursor/rules/product.mdc',
+          '.cursor/agents/custom-agent.md',
+        ];
+      });
+
+      const result = validateTaskPack(taskPackPath, { repoRoot: tmp });
+
+      expect(result.errors.filter((error) => error.code === 'task-pack-task-file-generated-runtime')).toHaveLength(0);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }

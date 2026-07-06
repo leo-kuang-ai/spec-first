@@ -97,7 +97,7 @@ deepened: 2026-04-28
 - `tests/unit/mcp-setup.sh`：已有 fake repo、fake PATH、fake provider command pattern，可以扩展或拆出 `tests/unit/spec-graph-bootstrap.sh` 来验证 bootstrap compiler 行为。
 - `tests/unit/mcp-setup-powershell-contracts.test.js`：现有 PowerShell contract tests 可扩展为 parity guard，避免 `.sh` 与 `.ps1` 行为漂移。
 - `src/cli/runtime-tools-index.js` 与 `tests/unit/runtime-tools-index.test.js`：已有 root instruction managed block 和 graph-bootstrap entrypoint 文案；`spec-plan` downstream adoption 需要同步 contract tests，避免旧文案继续暗示只靠 direct repo reads。
-- `README.md`、`README.zh-CN.md`：当前只说 `$spec-graph-bootstrap` “build indexes and flip query_ready”，需要更新为 canonical artifacts / graph facts / impact capability readiness。
+- `README.md`、`README.zh-CN.md`：当前只说 `spec-graph-bootstrap` “build indexes and flip query_ready”，需要更新为 canonical artifacts / graph facts / impact capability readiness。
 
 ### Institutional Learnings
 
@@ -577,7 +577,7 @@ flowchart TD
 **Approach:**
 - Replace “build indexes and flip `query_ready=true`” wording with “compile provider readiness, canonical graph facts, impact capabilities, and report”.
 - Keep the source/runtime boundary explicit: change source assets under `skills/`, `templates/`, `agents/`, `src/cli/`; do not hand-edit `.claude/`, `.codex/`, `.agents/skills/`.
-- Update graph-bootstrap command metadata and init/bootstrap instruction wording so `/spec:graph-bootstrap` / `$spec-graph-bootstrap` are described as Graph Readiness Compiler entrypoints, not just index builders.
+- Update graph-bootstrap command metadata and init/bootstrap instruction wording so `spec-graph-bootstrap` / `spec-graph-bootstrap` are described as Graph Readiness Compiler entrypoints, not just index builders.
 - Update runtime tools index copy so `code-review-graph` is described as usable when canonical graph facts/provider readiness are query-ready, with fallback to bounded direct repo reads when blocked/stale.
 - Add `CHANGELOG.md` record for user-visible setup/bootstrap/spec-plan behavior change using the project developer profile.
 

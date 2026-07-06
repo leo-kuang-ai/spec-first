@@ -37,7 +37,7 @@ kaz-mvp/
 └── submodules/biz-common, hscomponents, userinfo, web        ← 4 个独立 child Git repo
 ```
 
-`/spec:mcp-setup` + `/spec:graph-bootstrap --all-repos` 跑完后，用户问："当前项目下那么多文件夹，为何只跑了 6 个？"
+`spec-mcp-setup` + `spec-graph-bootstrap --all-repos` 跑完后，用户问："当前项目下那么多文件夹，为何只跑了 6 个？"
 
 ### 当前 spec-first 行为分析
 
@@ -64,8 +64,8 @@ kaz-mvp/
 ## Actors
 
 - A1. Developer：在混合拓扑 / broken worktree / 团队间分发 worktree 等场景下使用 spec-first，希望快速理解"为什么我的 30 个核心模块没被建图"并选择修复路径。
-- A2. `$spec-mcp-setup`：preflight 阶段需要诚实暴露 git_health 与 coverage_gap，不再静默把 broken worktree 当作 not-git。
-- A3. `$spec-graph-bootstrap`：消费 setup 产出的 git_health / coverage_gap / additional_folder_targets 配置，决定是否对父级 folder target 也跑一次 GitNexus。
+- A2. `spec-mcp-setup`：preflight 阶段需要诚实暴露 git_health 与 coverage_gap，不再静默把 broken worktree 当作 not-git。
+- A3. `spec-graph-bootstrap`：消费 setup 产出的 git_health / coverage_gap / additional_folder_targets 配置，决定是否对父级 folder target 也跑一次 GitNexus。
 - A4. `using-spec-first`：guide mode 在 broken-worktree 状态下推荐第一步使用 `spec-first repair-worktree`，而不是直接跳 plan/work。
 - A5. spec-first 维护者：愿意以最小改动暴露诊断信息，不愿意立即引入混合拓扑 first-class（P3）。
 
@@ -75,7 +75,7 @@ kaz-mvp/
 
 ### F1. broken worktree 诊断暴露
 
-- **Trigger:** `/spec:mcp-setup` 在父级或 child 子目录存在 broken worktree 的工作区运行
+- **Trigger:** `spec-mcp-setup` 在父级或 child 子目录存在 broken worktree 的工作区运行
 - **Actors:** A1, A2
 - **Steps:** `resolve-project-target` 调用 `git rev-parse` 失败时，捕获 stderr，读取 `.git` 文件内容判断是 worktree pointer 还是 gitdir 文件，验证目标路径存在性，输出 `git_health.status="broken-worktree"` + `worktree_pointer.exists=false` + 诊断摘要。同一逻辑也在 `discover_candidates` 内部对每个有 `.git` 但 `git rev-parse` 失败的 child 子目录执行——broken child 不进 `candidate_roots`，但其诊断信息记入 `candidates_diagnostics[]` 附属输出，避免静默跳过。`check-health` 把这些字段冒泡到 preflight JSON，`verify-tools` 写入 readiness ledger v2 的 `parent_workspace_advisory.git_health`。
 - **Outcome:** 用户在 setup 报告中第一时间看到"父级 .git 是失效 worktree pointer，指向 X，X 不存在"；如有 child broken worktree，也能看到"子目录 Y 有 .git 但 worktree pointer 失效，未纳入候选"。
@@ -488,14 +488,14 @@ rg -n 'schema_version.*project-target' --type-add 'sh:*.{sh,bash}' -t sh -t js -
 
 ## Definition of Done
 
-- P0 落地后，运行 `/spec:mcp-setup` 在 kaz-mvp 这种 broken-worktree workspace 时，setup 报告里能看到：
+- P0 落地后，运行 `spec-mcp-setup` 在 kaz-mvp 这种 broken-worktree workspace 时，setup 报告里能看到：
   - `git_health.status="broken-worktree"` 与失效路径
   - 如有 child broken worktree，`candidates_diagnostics[]` 列出受影响的子目录
   - `coverage_gap.uncovered_top_level_dirs=35` 与 sample
   - `next_action` 明确说"运行 spec-first repair-worktree 或加 --folder ."
   - `discover_candidates` 和 `coverage_gap` 的忽略列表来自同一共享变量（含 `build`）
 - P1 落地后，`spec-first repair-worktree --dry-run` 对 kaz-mvp `.git` 文件能给出 unlink preview + 两条手动 git 修复建议文案。`--apply` 只执行 unlink（删除 broken `.git` 文件）。
-- P2 落地后（需 GitNexus multi-target spike 通过），用户在 `.spec-first/config.local.yaml` 写 `workspace.additional_folder_targets`，然后 `/spec:graph-bootstrap` 一次性覆盖 6 child git repo + 1 parent folder target，`computed_exclude` 自动包含 child git roots，无需手动 `--folder` 或手动列出 exclude。
+- P2 落地后（需 GitNexus multi-target spike 通过），用户在 `.spec-first/config.local.yaml` 写 `workspace.additional_folder_targets`，然后 `spec-graph-bootstrap` 一次性覆盖 6 child git repo + 1 parent folder target，`computed_exclude` 自动包含 child git roots，无需手动 `--folder` 或手动列出 exclude。
 - 所有改动遵守 spec-first source-only 原则（不动 generated runtime mirror）。
 - CHANGELOG / `docs/05-用户手册/` / `docs/02-架构设计/` 同步更新；anti-regression 测试加入 `tests/integration/` 与 contract 测试矩阵。
 

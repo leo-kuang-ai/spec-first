@@ -59,8 +59,8 @@
 | 2026-04-16 | fix | `agent-parity` | 完成 `product-lens-reviewer`、`best-practices-researcher`、`pr-comment-resolver` 三项 P1 agent 对齐修复：恢复产品上下文/战略后果审查、补回 `dhh-rails-style` Ruby/Rails 映射与显式 skill attribution 模板、放宽 review feedback 的 untrusted input 安全边界，并补 3 组内容级 contract tests |
 | 2026-04-16 | fix | `spec-only-skill-boundaries` | 完成 `agent-browser`、`orchestrating-swarms`、`rclone`、`reproduce-bug` 的职责边界深审，明确 browser substrate / Claude-host orchestration / transport substrate / issue-grounded investigation 分层，并补 3 个专项 contract tests 与审计完成态 |
 | 2026-04-16 | test | `exact-same-skill-parity` | 对 `agent-native-architecture`、`andrew-kane-gem-writer`、`dspy-ruby`、`gemini-imagegen`、`git-clean-gone-branches` 完成上游目录级核对与 contract freeze，把“已追平但未证据化”的 skill 收口为可回归完成态 |
-| 2026-04-16 | fix | `spec-update` | `/spec:update` 的 CLI 探测改为“PATH 优先 + repo-local source checkout fallback”，修复在 `spec-first` 源码仓库内源码直跑时误报“当前 CLI 无法检查、建议全局重装”的问题 |
-| 2026-04-16 | feat | `source-only-skill-parity` | 完成 `ce-debug`、`ce-update`、`ce-optimize`、`ce-sessions`、`ce-slack-research`、`ce-demo-reel` 六项上游 source-only 能力追平：新增 `/spec:debug`、`/spec:update`、`spec-optimize`、`spec-slack-research`，补齐 `feature-video` 分层证据采集、`session-historian` 脚本同步与 Claude/Codex runtime 打包守卫 |
+| 2026-04-16 | fix | `spec-update` | `spec-update` 的 CLI 探测改为“PATH 优先 + repo-local source checkout fallback”，修复在 `spec-first` 源码仓库内源码直跑时误报“当前 CLI 无法检查、建议全局重装”的问题 |
+| 2026-04-16 | feat | `source-only-skill-parity` | 完成 `ce-debug`、`ce-update`、`ce-optimize`、`ce-sessions`、`ce-slack-research`、`ce-demo-reel` 六项上游 source-only 能力追平：新增 `spec-debug`、`spec-update`、`spec-optimize`、`spec-slack-research`，补齐 `feature-video` 分层证据采集、`session-historian` 脚本同步与 Claude/Codex runtime 打包守卫 |
 | 2026-04-15 | feat | `spec-graph-bootstrap+crg` | 完成 Stage-0 后续 P1-P3 最小闭环：补齐 `plan/work minimal-context`、hybrid retrieval、AST-aware chunking、freshness/lint/contradictions、compiler 模块化、repo QA/context efficiency/regression benchmark、workflow telemetry、optional semantic rerank、workspace context 与知识治理能力 |
 | 2026-04-15 | fix | `managed-state-upgrade` | 统一 legacy managed state 升级语义：`doctor` 会明确标记 legacy state 并指向 `init`，`init` 成为唯一支持的 hard-cut 升级入口，执行 managed hard reset 后全量重建运行时，`clean` 仅清理当前受管集合并保留用户自定义资产 |
 | 2026-04-15 | feat | `spec-brainstorm` | `spec-brainstorm` 同步 `ce-brainstorm` 非 Slack 核心能力，并新增 source-driven supplemental context 路由：支持 Local Docs、Feishu Chat、Feishu Doc、GitHub URL、Docs URL、Web URL；同时补齐 `universal-brainstorming` / `visual-communication` references 与 contract/smoke 守卫 |
@@ -71,8 +71,8 @@
 | 2026-04-12 | feat | `spec-graph-bootstrap` | `graph-bootstrap` 的 manifest、安装提示、README、用户手册与 smoke 断言统一升级为 graph-informed Phase 0-4 / 阶段2最小闭环语义，对外描述与 `SKILL.md`、阶段2文档收敛一致 |
 | 2026-04-09 | feat | `spec-graph-bootstrap` | 新增阶段 1 安装集成入口，`bootstrap` 保持稳定默认入口，`graph-bootstrap` 以并行验证入口接入 Claude / Codex runtime、smoke 与文档链路 |
 | 2026-04-08 | fix | `mcp-setup` | 收紧双宿主健壮性，Serena MCP 配置按宿主上下文校验，宿主歧义时不再默认 Claude |
-| 2026-04-08 | docs | `mcp-setup` | 将技能命名统一为 `spec-mcp-setup`，Codex 直接调用格式改为 `$spec-mcp-setup`，与其他 spec-* 技能保持一致 |
-| 2026-04-08 | feat | `codex` | Codex init 曾短暂生成 `/spec:*` compatibility command files；该产品面后续已撤回，当前 Codex 正式入口以 `$spec-*` skills 为准 |
+| 2026-04-08 | docs | `mcp-setup` | 将技能命名统一为 `spec-mcp-setup`，Codex 直接调用格式改为 `spec-mcp-setup`，与其他 spec-* 技能保持一致 |
+| 2026-04-08 | feat | `codex` | Codex init 曾短暂生成 `spec-*` compatibility command files；该产品面后续已撤回，当前 Codex 正式入口以 `spec-*` skills 为准 |
 | 2026-04-08 | docs | `mcp-setup` | 增加更友好的执行进度提示，安装与验证脚本会显示当前宿主检查、逐项配置、标记写入和完成状态 |
 | 2026-04-08 | feat | `mcp-setup` | 增加 Windows PowerShell 7+ 支持，补齐 detect/check/install/verify 的 .ps1 入口，并把技能合同改成按平台选择脚本 |
 | 2026-04-08 | fix | `mcp-setup/spec-graph-bootstrap` | 让 MCP 安装与引导流程按当前宿主自适应，自动区分 Claude Code / Codex 的配置文件与 host-setup 标记路径，并补齐双宿主 unit 测试与文档同步 |
@@ -1737,8 +1737,8 @@
   - 把 `skills/rclone/scripts/check_setup.sh` 提升为主 setup check 入口，并补 `sync` 删除远端文件的显式风险提示
   - 新增 `tests/unit/rclone-contracts.test.js`
 - `reproduce-bug`
-  - 在 `skills/reproduce-bug/SKILL.md` 补 issue-grounded entrypoint 边界，明确新建 issue 用 `/report-bug`，进入完整 debug/fix 用 `/spec:debug`
-  - 调整 close-out 选项，把“继续修复”改成显式 handoff 到 `/spec:debug`
+  - 在 `skills/reproduce-bug/SKILL.md` 补 issue-grounded entrypoint 边界，明确新建 issue 用 `/report-bug`，进入完整 debug/fix 用 `spec-debug`
+  - 调整 close-out 选项，把“继续修复”改成显式 handoff 到 `spec-debug`
   - 新增 `tests/unit/reproduce-bug-contracts.test.js`
 - 审计治理
   - `docs/业界分析/9.spec-first-vs-compound-engineering-plugin-全量同步审计-2026-04-14.md`
@@ -2027,12 +2027,12 @@
 
 ### 更新内容
 
-`mcp-setup` 技能命名现在统一为 `spec-mcp-setup`，Codex 侧直接调用格式改为 `$spec-mcp-setup`，与其他 `spec-*` 技能保持一致。
+`mcp-setup` 技能命名现在统一为 `spec-mcp-setup`，Codex 侧直接调用格式改为 `spec-mcp-setup`，与其他 `spec-*` 技能保持一致。
 
 ### 主要变化
 
 - 技能 frontmatter `name` 改为 `spec-mcp-setup`
-- Codex 直接调用文案改成 `$spec-mcp-setup`
+- Codex 直接调用文案改成 `spec-mcp-setup`
 - 相关测试断言同步更新，避免命名再回退到旧格式
 
 ### 版本意义
@@ -2045,20 +2045,20 @@
 
 ### 更新内容
 
-Codex 侧的 `spec-first init` 曾短暂生成 `/spec:*` compatibility command files，尝试和 Claude 侧保持一致的命令可见性与诊断体验。
+Codex 侧的 `spec-first init` 曾短暂生成 `spec-*` compatibility command files，尝试和 Claude 侧保持一致的命令可见性与诊断体验。
 
-> 当前状态：该产品面后续已撤回。当前 Codex 正式入口以 `$spec-*` skills 和 `.agents/skills/` discovery 为准；`.codex/commands/spec/` 只作为旧版本遗留清理目标。
+> 当前状态：该产品面后续已撤回。当前 Codex 正式入口以 `spec-*` skills 和 `.agents/skills/` discovery 为准；`.codex/commands/spec/` 只作为旧版本遗留清理目标。
 
 ### 主要变化
 
 - `CodexAdapter` 当时从不生成命令，改为生成 `.codex/commands/spec/`
 - `doctor` 当时会在 Codex 平台检查命令目录是否存在
 - smoke 测试同步验证 Codex init、doctor、clean 的命令链路
-- 用户文档当时更新为 Codex 也会出现 `/spec:*` 命令入口
+- 用户文档当时更新为 Codex 也会出现 `spec-*` 命令入口
 
 ### 版本意义
 
-这次改动把 Codex 的工作流入口从“仅 skills”扩展为“commands + skills”，降低了跨平台认知差异；后续治理结论认为这会制造第二产品面，因此已回到“Codex 使用 `$spec-*` skills，Claude 使用 `/spec:*` commands”的边界。
+这次改动把 Codex 的工作流入口从“仅 skills”扩展为“commands + skills”，降低了跨平台认知差异；后续治理结论认为这会制造第二产品面，因此已回到“Codex 使用 `spec-*` skills，Claude 使用 `spec-*` commands”的边界。
 
 ---
 

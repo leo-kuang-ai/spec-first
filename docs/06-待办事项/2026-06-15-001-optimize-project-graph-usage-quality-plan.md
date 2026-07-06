@@ -45,7 +45,7 @@
 
 ### 修正
 
-- `CLAUDE.md` / `AGENTS.md` 不是 generated runtime mirror;它们是 checked-in host entry docs / source slices。P0 不能写成"改完跑 `spec-first init` 重生即可"——核查 `src/cli/` 后确认 `init` 链路不处理 `## graphify` 段,该段由 `install-helpers.{sh,ps1}` normalize 路径(经 `spec-first update` / `/spec:mcp-setup`)维护。
+- `CLAUDE.md` / `AGENTS.md` 不是 generated runtime mirror;它们是 checked-in host entry docs / source slices。P0 不能写成"改完跑 `spec-first init` 重生即可"——核查 `src/cli/` 后确认 `init` 链路不处理 `## graphify` 段,该段由 `install-helpers.{sh,ps1}` normalize 路径(经 `spec-first update` / `spec-mcp-setup`)维护。
 - `docs/solutions/**` 的 `source_refs` / `invalidation_condition` 归 `docs/contracts/knowledge/knowledge-harness.md` 和 `skills/spec-compound/references/schema.yaml`,不归 `spec-id-traceability.md`。
 - `docs/solutions/` 不是 graph/relay 沉淀为零。已有 `docs/solutions/tooling-decisions/graphify-query-explain-reliability-2026-06-12.md`;P1 只有发现新的可复用模式时才新增或更新 solution。
 
@@ -58,7 +58,7 @@
 3. **setup 侧已有机械事实。** Graphify readiness 已包含 `query_verified`、`readiness_status`、lifecycle bits 和 renderer next action。本方案不新增 readiness lifecycle。
 4. **`query` 的局限已被 runtime 文案承认。** `provider-readiness-renderer.cjs` 已提示 `query` 是 unscored BFS / weak orientation,code navigation 优先 `explain` / `path`。
 5. **本次核查也暴露召回偏弱。** 对本题运行 Graphify query 主要召回了 `AGENTS.md` / `CLAUDE.md` / boundary 节点,没有直接召回目标待办文档和相关合同。这只能作为 `provider_untrusted` 偏航样例,最终结论仍来自 direct source reads。此结论与既有 `docs/solutions/tooling-decisions/graphify-query-explain-reliability-2026-06-12.md` 一致,P1 预期确认既有 solution 而非推翻它。
-6. **`## graphify` 段不经 `spec-first init` 刷新。** 核查 `src/cli/`,`init` 链路无任何 `normalize_graphify` / `## graphify` 处理;该段只由 `skills/spec-mcp-setup/scripts/install-helpers.{sh,ps1}` 的 normalize 路径维护,经 `spec-first update` / `/spec:mcp-setup` 触发。这把 P0 的 refresh path 从悬念变为定论(实施时仍建议 grep 复核一次)。
+6. **`## graphify` 段不经 `spec-first init` 刷新。** 核查 `src/cli/`,`init` 链路无任何 `normalize_graphify` / `## graphify` 处理;该段只由 `skills/spec-mcp-setup/scripts/install-helpers.{sh,ps1}` 的 normalize 路径维护,经 `spec-first update` / `spec-mcp-setup` 触发。这把 P0 的 refresh path 从悬念变为定论(实施时仍建议 grep 复核一次)。
 
 ---
 
@@ -134,7 +134,7 @@ Use Graphify as exploration-tier orientation for architecture relationships, cro
 - `tests/unit/mcp-setup-powershell-contracts.test.js`:pin PowerShell rendered section 不再含旧句。
 - 如现有断言读取 checked-in host docs,同步改为断言 absence of `Use Graphify first only` 与 presence of `exploration-tier` / `reading source first is always valid`。
 
-注意:`spec-first init` 不刷新 `## graphify` 段(已核查 `src/cli/`,见事实基线第 6 条)。该段由 `install-helpers.{sh,ps1}` 的 normalize 路径维护,经 `spec-first update` / `/spec:mcp-setup` 触发。实施者应改 `.sh` / `.ps1` 模板,用 setup helper / normalize path 的 focused 测试证明输出正确,再按 source/runtime 边界同步 checked-in dogfood docs;落地前 grep 复核 init 链路确无 graphify 处理。
+注意:`spec-first init` 不刷新 `## graphify` 段(已核查 `src/cli/`,见事实基线第 6 条)。该段由 `install-helpers.{sh,ps1}` 的 normalize 路径维护,经 `spec-first update` / `spec-mcp-setup` 触发。实施者应改 `.sh` / `.ps1` 模板,用 setup helper / normalize path 的 focused 测试证明输出正确,再按 source/runtime 边界同步 checked-in dogfood docs;落地前 grep 复核 init 链路确无 graphify 处理。
 
 ### P1 - 一次性 relay diagnostic artifact
 
@@ -244,7 +244,7 @@ P1 完成后只写一条结论注记:
 ## 风险与反模式
 
 - **重复造协议**:任何新建 `project-graph-*` 消费合同的动作都应停止,先改现有合同。
-- **误用 `spec-first init`**:`init` 不刷新 Graphify 段(已核查 `src/cli/`);修复落点是 `install-helpers.{sh,ps1}` 的 normalize 路径,经 `spec-first update` / `/spec:mcp-setup` 生效。
+- **误用 `spec-first init`**:`init` 不刷新 Graphify 段(已核查 `src/cli/`);修复落点是 `install-helpers.{sh,ps1}` 的 normalize 路径,经 `spec-first update` / `spec-mcp-setup` 生效。
 - **手改 runtime mirror**:`.claude/`、`.codex/`、`.agents/skills/` 不作为修复落点。
 - **常驻诊断腐烂**:一次性诊断脚手架不得进入 CI。
 - **provider 输出升格**:Graphify / CodeGraph 候选不得直接进入 finding/root-cause/merge-ready 结论。
@@ -281,5 +281,5 @@ P1 完成后只写一条结论注记:
 - **完成时间**: 2026-06-15 01:42:15
 - **实现范围**: P0 已修正 `CLAUDE.md` / `AGENTS.md` 与 `skills/spec-mcp-setup/scripts/install-helpers.{sh,ps1}` 的 Graphify host 指令措辞；P1 已新增 `docs/validation/project-graph/2026-06-15-relay-diagnostic.md`；P2 已按诊断结果回填既有 Graphify solution 的 structured recall anchor；P3 明确不做常驻 benchmark suite。
 - **验证**: `npm run typecheck`、`npm run test:mcp-setup`、focused Jest、`npm run test:smoke`、`npm run test:integration`、`git diff --check` 均通过；`npm run test:unit` 已尝试，剩余失败集中在 init 输出本地化断言，属当前分支既有非本计划触达面；结构化 closeout 已写入 `.spec-first/workflows/spec-work/spec-first/2026-06-15-project-graph-usage-quality/run.json`。
-- **Review**: `$spec-code-review` 因 Codex 未显式授权 reviewer subagents/personas，按 single-agent report-only fallback 做只读 diff/source review；发现并修正 P1 诊断文档中的本机绝对路径固化问题，修后无本计划阻断 findings。
+- **Review**: `spec-code-review` 因 Codex 未显式授权 reviewer subagents/personas，按 single-agent report-only fallback 做只读 diff/source review；发现并修正 P1 诊断文档中的本机绝对路径固化问题，修后无本计划阻断 findings。
 - **Generated runtime**: 未手改 `.claude/`、`.codex/` 或 `.agents/skills/` runtime mirrors；Graphify 段刷新路径仍是 `install-helpers.{sh,ps1}` normalize。

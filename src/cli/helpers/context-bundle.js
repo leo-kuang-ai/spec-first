@@ -62,6 +62,78 @@ const EXCLUDED_PREFIXES = [
     reason_code: 'generated_runtime_mirror_excluded',
     reason: 'generated runtime mirrors are excluded from ordinary context',
   },
+  {
+    prefix: '.cursor/skills',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.cursor/spec-first',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.cursor/mcp.json',
+    kind: 'host_local_config',
+    reason_code: 'host_local_config_excluded',
+    reason: 'host-local config is excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/skills',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/agents',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/spec-first',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.kiro/settings',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/commands/spec',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/skills',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/agents',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/spec-first',
+    kind: 'generated_runtime_mirror',
+    reason_code: 'generated_runtime_mirror_excluded',
+    reason: 'generated runtime mirrors are excluded from ordinary context',
+  },
+  {
+    prefix: '.qoder/settings.local.json',
+    kind: 'host_local_config',
+    reason_code: 'host_local_config_excluded',
+    reason: 'host-local config is excluded from ordinary context',
+  },
 ];
 
 const OUTSIDE_REPO_EXCLUSION = {

@@ -1,16 +1,16 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env node
+'use strict';
 
-project_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-instruction_path="$project_dir/CLAUDE.md"
-
-node - "$instruction_path" "$project_dir" <<'EOF'
+// Cross-platform SessionStart hook. Claude Code invokes this in exec form
+// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
+// Windows (with or without Git Bash) without relying on a POSIX shell, bash-only heredocs,
+// or shell variable expansion. The project dir arrives as argv[2]; fall back to cwd.
 const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const instructionPath = process.argv[2];
-const projectDir = process.argv[3];
+const projectDir = process.argv[2] && process.argv[2].trim() ? process.argv[2] : process.cwd();
+const instructionPath = path.join(projectDir, 'CLAUDE.md');
 const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
 const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
 const BOOTSTRAP_END = '<!-- spec-first:bootstrap:end -->';
@@ -35,7 +35,7 @@ if (instructionBody !== null) {
     // multi-repo target_repo boundary salient without paying the duplication cost.
     additionalContext = [
       '[spec-first] using-spec-first SessionStart injection',
-      "Workflow entry governance is active in this repo's CLAUDE.md (using-spec-first managed block): route substantial work through a public /spec:* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
+      "Workflow entry governance is active in this repo's CLAUDE.md (using-spec-first managed block): route substantial work through a public spec-* workflow before non-trivial or risky edits, and in a parent multi-repo workspace keep writes within an explicit target_repo.",
       'Full routing policy: skills/using-spec-first/SKILL.md.',
     ].join('\n');
   }
@@ -116,4 +116,3 @@ function isTrustedSpecFirstCliPath(cliPath) {
     return false;
   }
 }
-EOF

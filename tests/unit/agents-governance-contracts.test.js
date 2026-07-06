@@ -96,4 +96,12 @@ describe('agents governance (orphan detection)', () => {
       expect(corpus.includes(record.agent_name)).toBe(false);
     }
   });
+
+  test('bundled agent instructions use unified spec-* workflow entrypoints', () => {
+    for (const entry of fs.readdirSync(AGENTS_DIR, { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith('.agent.md')) continue;
+      const content = fs.readFileSync(path.join(AGENTS_DIR, entry.name), 'utf8');
+      expect(content).not.toMatch(/\/spec:[a-z-]+|\$spec-[a-z-]+/);
+    }
+  });
 });

@@ -65,7 +65,7 @@ origin: docs/brainstorms/2026-05-29-002-spec-first-init-ux-brand-requirements.md
 - fallback_capabilities: bounded direct repo reads（已直接读取 brand.js / index.js / postinstall.js / commands/init.js / brand.test.js / cli.sh 全部相关源）
 - runtime_mcp_evidence: not-used（lightweight 单模块展示改动，直接源码证据已足够）
 - confidence: high（消费面已枚举确认仅 3 处，签名稳定）
-- limitations: graph-facts.json stale；本计划为 docs-only-level 视觉改动，未刷新 graph；如后续需要 graph-backed 影响分析应先运行 `/spec:graph-bootstrap`。
+- limitations: graph-facts.json stale；本计划为 docs-only-level 视觉改动，未刷新 graph；如后续需要 graph-backed 影响分析应先运行 `spec-graph-bootstrap`。
 
 ---
 

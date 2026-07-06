@@ -88,7 +88,7 @@ Researcher
 Reference
 ```
 
-不能变成新的 `/spec:*` 主流程入口。
+不能变成新的 `spec-*` 主流程入口。
 
 ---
 
@@ -191,7 +191,7 @@ finding
 | 目标                | 说明                                            |
 | ----------------- | --------------------------------------------- |
 | 吸收 ECC 专家能力       | 复用 ECC 成熟的工程 lens / reviewer 思路               |
-| 保持 spec-first 主架构 | `/spec:*` 入口、Skill 主流程、Artifacts 闭环不变         |
+| 保持 spec-first 主架构 | `spec-*` 入口、Skill 主流程、Artifacts 闭环不变         |
 | 提升专家团队能力          | 让 brainstorm / plan / review / audit 不再是单视角判断 |
 | 动态路由              | 按 workflow、文件、风险、技术栈、证据状态选择专家                 |
 | 控制 token 成本       | 两阶段路由，先选专家，再构造最小上下文                           |
@@ -206,7 +206,7 @@ finding
 
 | 非目标                             | 原因                                                       |
 | ------------------------------- | -------------------------------------------------------- |
-| 不导入 ECC commands                | 会形成第二套用户入口，与 `/spec:*` 冲突                                |
+| 不导入 ECC commands                | 会形成第二套用户入口，与 `spec-*` 冲突                                |
 | 不导入 ECC hooks                   | hooks 会改变宿主全局行为，风险太高                                     |
 | MVP 不导入 ECC agents              | 当前 agent filtering/governance 未完成，容易泄漏                   |
 | 不全量导入 ECC skills                | token 膨胀、资产污染、治理复杂                                       |
@@ -321,7 +321,7 @@ Agent/Lens = workflow 内部专业能力
 例如：
 
 ```text
-/spec:plan
+spec-plan
   → skills/spec-plan/SKILL.md
   → 读取 capability registry
   → 选择 architecture / feasibility / simplicity lens
@@ -432,8 +432,8 @@ spec-first init --claude
 当用户未启用 ECC：
 
 ```text
-/spec:plan 不引用 ecc-*
-/spec:code-review 不引用 ecc-*
+spec-plan 不引用 ecc-*
+spec-code-review 不引用 ecc-*
 doctor 不报告 ECC 缺失
 clean 不碰用户自定义 ecc-* 文件
 ```

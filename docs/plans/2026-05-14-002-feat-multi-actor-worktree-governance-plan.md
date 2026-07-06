@@ -26,13 +26,13 @@ spec_id: 2026-05-14-002-multi-actor-worktree-governance
 
 ### 触发事件
 
-2026-05-14 一次 `$spec-graph-bootstrap` 阻塞调试中暴露的链式异常：
+2026-05-14 一次 `spec-graph-bootstrap` 阻塞调试中暴露的链式异常：
 
 | 表面现象 | 直接机制 | 真正信号 |
 |---|---|---|
 | `git stash` 拒绝合并 (`Entry not uptodate`) | index 里 8 个文件是空 blob，磁盘有内容 | 有外部工具用 `git add` 占位再异步写内容 |
 | stash 之后 worktree 又出现 dirty | CHANGELOG / plan 文件被另一份较旧内容覆盖 | 另一个 actor 持有不同的 file content snapshot 并在 stash 之后写入 |
-| `$spec-graph-bootstrap` 二次阻塞为 `readiness-conflict` | runtime-capabilities 说 `baseline_ready=true / host=codex`，host ledger 实际是 `baseline_ready=false / generated_at=null` | host pointer 漂移；上一次 setup 在 codex 跑过，会话切到 claude 后没人重写 pointer |
+| `spec-graph-bootstrap` 二次阻塞为 `readiness-conflict` | runtime-capabilities 说 `baseline_ready=true / host=codex`，host ledger 实际是 `baseline_ready=false / generated_at=null` | host pointer 漂移；上一次 setup 在 codex 跑过，会话切到 claude 后没人重写 pointer |
 | `git stash pop` 之后 staged 集合多出 4 个不在 stash 里的文件 | 另一个会话 14:17 时刻在写 `secret-deny-patterns` 系列 + `bootstrap-providers.sh safe_string` 加固 | pop 把"另一个 actor 的 added 文件"吸收进 staged |
 | `git status` 显示的 dirty 集合在跑 setup 期间持续变化 | mcp-setup 期间另一个 actor 正在持续编辑同一个 plan 文件 | 没有 lock，没有 advisory，两个 session 共用同一个 worktree |
 
@@ -72,7 +72,7 @@ spec_id: 2026-05-14-002-multi-actor-worktree-governance
 
 1. multi-session 用户开多窗口同时干活时，`spec-first` skill 必须 fail-fast 给出可解释的 reason_code，禁止 silent corruption
 2. 单 actor 用户感知不到任何新约束、不需要新命令
-3. host pointer 漂移（单宿主或跨宿主）由 mcp-setup 自动 reconcile，不再让 `$spec-graph-bootstrap` 走 `readiness-conflict` 替 setup 报错
+3. host pointer 漂移（单宿主或跨宿主）由 mcp-setup 自动 reconcile，不再让 `spec-graph-bootstrap` 走 `readiness-conflict` 替 setup 报错
 4. session 之间提供 cheap 的 advisory 感知：第二个 session 启动 spec-first skill 时能看到 "已有 session A 在工作"，但**是否避让由 LLM 判断**
 5. 任何根治行为都必须 backward-compatible：旧版 consumer / 旧 artifact / 旧 ledger 不能因新 schema 失效
 
@@ -313,7 +313,7 @@ node bin/spec-first.js session unregister
   - 在 substantial work 前调用 `spec-first session list`（read-only）
   - active session > 1 时，输出一句 advisory：推荐 `git-worktree` 隔离或继续但 disclose 给用户
   - **不**强制阻塞；LLM 决定是否 disclose
-- `templates/claude/commands/spec/session.md`（新）：暴露 `/spec:session` 命令？暂不，避免变成中心化 dispatch
+- `templates/claude/commands/spec/session.md`（新）：暴露 `spec-session` 命令？暂不，避免变成中心化 dispatch
 - `tests/integration/using-spec-first-multi-session.sh`（新）：fixture 模拟多 session 状态；断言 guide 输出包含 advisory 关键词
 
 **验证**：
@@ -373,8 +373,8 @@ npm run test:integration
 ## 验收标准
 
 - 单 actor 用户运行 `spec-first` 任意现有 workflow，不感知任何新约束、不需要新命令、不需要新配置
-- 多 session 用户开两个 Claude Code / Codex 窗口跑 `$spec-graph-bootstrap`，第二个 session 看到第一个 session 输出的 `concurrent-write-detected` reason_code，不再产生 partial commit
-- codex→claude 宿主切换后第一次跑 `$spec-graph-bootstrap` 不再报 `readiness-conflict`；setup 自愈痕迹可在 ledger 中追溯
+- 多 session 用户开两个 Claude Code / Codex 窗口跑 `spec-graph-bootstrap`，第二个 session 看到第一个 session 输出的 `concurrent-write-detected` reason_code，不再产生 partial commit
+- codex→claude 宿主切换后第一次跑 `spec-graph-bootstrap` 不再报 `readiness-conflict`；setup 自愈痕迹可在 ledger 中追溯
 - `.spec-first/sessions/` opt-in 启用时，`using-spec-first` guide mode 输出 advisory；未启用时完全静默
 - 全链路 e2e 测试覆盖以上四条
 

@@ -89,7 +89,7 @@ Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound
 
 - 不改 `src/cli/commands/doctor.js`
 - 不改 `src/context-routing/evaluator.js` 的 Top 3 范围之外逻辑
-- 不新增 `/spec:riper` 或 `$spec-riper` 入口
+- 不新增 `spec-riper` 入口
 - 不复制 `archive_builder.py`
 - 不新增 `mydocs/` 或其它并行 artifact 根目录
 - 不引入精确短语 `Plan Approved` 作为全局硬规则

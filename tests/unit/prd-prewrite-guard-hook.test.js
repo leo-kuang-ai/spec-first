@@ -27,7 +27,7 @@ function installRuntimeChecker(projectRoot) {
 }
 
 function runHook(projectRoot, filePath, content, toolName = 'Write', toolInputOverrides = {}) {
-  return spawnSync('bash', [HOOK_TEMPLATE], {
+  return spawnSync(process.execPath, [HOOK_TEMPLATE, projectRoot], {
     cwd: projectRoot,
     encoding: 'utf8',
     input: JSON.stringify({

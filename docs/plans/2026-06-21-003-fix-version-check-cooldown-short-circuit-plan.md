@@ -27,7 +27,7 @@ implements_schemas: []
 
 ## 问题框定
 
-`spec-first` runtime 会在 Claude/Codex 会话内被消费，因此陈旧 runtime 会在用户实际工作的位置悄悄降低 workflow 定义、治理规则和路由质量。startup version reminder（origin: `docs/brainstorms/2026-04-29-001-startup-version-update-reminder-requirements.md`）的产品意图，是向那些只调用 `/spec:*` workflows、几乎不在终端运行 CLI 的用户提示 “有新的 spec-first 可用”。对这类用户来说，会话启动是唯一可靠的升级触点。这个产品意图是成立的，本方案保留它。
+`spec-first` runtime 会在 Claude/Codex 会话内被消费，因此陈旧 runtime 会在用户实际工作的位置悄悄降低 workflow 定义、治理规则和路由质量。startup version reminder（origin: `docs/brainstorms/2026-04-29-001-startup-version-update-reminder-requirements.md`）的产品意图，是向那些只调用 `spec-*` workflows、几乎不在终端运行 CLI 的用户提示 “有新的 spec-first 可用”。对这类用户来说，会话启动是唯一可靠的升级触点。这个产品意图是成立的，本方案保留它。
 
 缺陷不在于是否需要 reminder，而在于 throttle 的实现位置。`buildStartupVersionReminder` 用 `host|currentVersion|latestVersion` 计算 cooldown key（`src/cli/version-reminder.js`，`buildStartupReminderKey`），所以它必须先知道 `latestVersion` 才能判断 cooldown；而知道 `latestVersion` 需要网络 fetch。结果是：按 `src/cli/version-reminder.js:117` fetch → `:131` cooldown check 的执行顺序确认，在 24h 窗口内，每次 session-start 仍会 spawn `startup-reminder` 并执行网络 lookup，然后把答案丢掉。session-start hook 注释（`templates/claude/hooks/session-start` 与 `templates/codex/hooks/session-start`，两者 `timeout: 1200`）也明确承认这一点：“on a dead/slow network it re-spawns every session”。本方案不把 hook 的 child-process spawn 移出路径，而是让已启动的 helper 在网络边界前快速退出；因此它保护的是网络 lookup 成本和慢网延迟，不声称完全消除 spawn 开销。
 
@@ -42,7 +42,7 @@ implements_schemas: []
 - R1. 在 active cooldown window 内，session-start 版本检查不得执行网络 lookup；短路必须发生在调用 `lookupLatestVersion` 之前。（推进 origin R6 “low-noise 24h”，但这里保护的是网络成本和慢网延迟，不承诺 hook 级 no-spawn）
 - R2. 任意先前 attempt 结果都必须触发同 scope 短路，包括 update-shown、on-latest、network-failed；attempt timestamp 必须在进入 `lookupLatestVersion` 前同步持久化，以避免外层 1200ms hook timeout 在慢网下杀掉进程后无法记录失败 attempt。
 - R3. CLI reminder 路径（`doctor`/`init`/`clean`/`update`）必须遵守独立的 package-level `cli.package` 24h attempt window，避免每次调用都访问网络；startup scope 与 CLI scope 互不抑制，所以一次后台 startup/offline attempt 不会屏蔽用户显式运行的 `doctor` / `update` 检查。
-- R4. 必须保留所有 origin invariants：非阻塞（不抛错、不改变 exit code、失败静默，origin R2/R5）、只读（不 auto-install/refresh/restart，origin R3/R8）、host-correct entrypoint wording（`/spec:update` vs `$spec-update`，origin R7），以及 reminder body 中现有的只读边界句。
+- R4. 必须保留所有 origin invariants：非阻塞（不抛错、不改变 exit code、失败静默，origin R2/R5）、只读（不 auto-install/refresh/restart，origin R3/R8）、host-correct entrypoint wording（`spec-update` vs `spec-update`，origin R7），以及 reminder body 中现有的只读边界句。
 - R5. 必须有意记录 24h staleness trade-off：全新 release 最多可能延迟一个窗口才提示；一次临时离线也会让检查暂停一个窗口。（origin Key Decision “失败静默” + 本会话 “any outcome” 决策）
 - R6. 现有 reset 行为（`clearStartupVersionReminderCooldown` / `startup-reminder --reset`）必须继续清除对应 host 的 startup throttle；成功的 `spec-first update` 必须清除 package-level `cli.package` throttle，使升级 remedy 后后续 CLI 检查不被旧 attempt 静默。
 
@@ -299,7 +299,7 @@ implements_schemas: []
 - **Origin document（feature origin）：** `docs/brainstorms/2026-04-29-001-startup-version-update-reminder-requirements.md`
 - **已落地 timeout fix 的 prior art：** `docs/brainstorms/2026-06-01-001-spec-first-install-version-visibility-requirements.md`, `docs/plans/2026-06-01-001-feat-install-version-visibility-plan.md`
 - 相关代码：`src/cli/version-reminder.js`, `src/cli/index.js`, `templates/claude/hooks/session-start`, `templates/codex/hooks/session-start`, `tests/unit/version-reminder.sh`
-- Plan origin（范围决策）：本会话的 `/spec:brainstorm` 对话
+- Plan origin（范围决策）：本会话的 `spec-brainstorm` 对话
 
 ---
 

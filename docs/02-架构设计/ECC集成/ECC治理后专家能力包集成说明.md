@@ -376,11 +376,11 @@ spec-first 已有 public workflow 入口；
 
 | ECC command | spec-first 消费方式 |
 | --- | --- |
-| `/code-review`, `/review-pr`, `/quality-gate`, `/test-coverage` | 参考到 `$spec-code-review` 的 reviewer routing、finding、coverage gate |
-| `/plan`, `/multi-plan`, `/feature-dev`, `/prp-plan`, `/prp-implement` | 参考到 `$spec-brainstorm`, `$spec-plan`, `spec-write-tasks`, `$spec-work` |
-| `/build-fix`, `/go-build`, `/rust-build`, `/kotlin-build`, `/flutter-build`, `/gradle-build` | 参考到 `$spec-debug` 和 `$spec-work` 的 build failure handling |
-| `/harness-audit`, `/skill-health`, `/learn-eval` | 参考到 `$spec-skill-audit` 与 `$spec-optimize` |
-| `/update-docs`, `/update-codemaps`, `/learn` | 参考到 `$spec-compound`、`$spec-skill-audit` 与现有 docs/contracts/source 维护流程 |
+| `/code-review`, `/review-pr`, `/quality-gate`, `/test-coverage` | 参考到 `spec-code-review` 的 reviewer routing、finding、coverage gate |
+| `/plan`, `/multi-plan`, `/feature-dev`, `/prp-plan`, `/prp-implement` | 参考到 `spec-brainstorm`, `spec-plan`, `spec-write-tasks`, `spec-work` |
+| `/build-fix`, `/go-build`, `/rust-build`, `/kotlin-build`, `/flutter-build`, `/gradle-build` | 参考到 `spec-debug` 和 `spec-work` 的 build failure handling |
+| `/harness-audit`, `/skill-health`, `/learn-eval` | 参考到 `spec-skill-audit` 与 `spec-optimize` |
+| `/update-docs`, `/update-codemaps`, `/learn` | 参考到 `spec-compound`、`spec-skill-audit` 与现有 docs/contracts/source 维护流程 |
 | `/hookify*`, `/jira`, `/pm2`, `/model-route`, `/setup-pm` | 不进入核心，未来最多作为 optional tooling provider 参考 |
 
 后续可生成 `ecc-command-idea-matrix`，但它只能用于 reference：
@@ -443,7 +443,7 @@ P3 style / experimental packs:
 借鉴 ECC 的 Codex 使用逻辑，并同步适配 Claude / Codex 双宿主，重要工作必须优先使用显式 workflow 或显式能力启用：
 
 ```text
-显式 spec-first workflow（Claude: /spec:*；Codex: $spec-*） > 显式 capability pack enablement > router implicit candidate
+显式 spec-first workflow（Claude: spec-*；Codex: spec-*） > 显式 capability pack enablement > router implicit candidate
 ```
 
 隐式触发只能产生候选事实：

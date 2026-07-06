@@ -174,4 +174,4 @@ platformChecks.splice(3 + runtimeChecks.length, 0, checkGeneratedCommands(...));
 
 ## Next Steps
 
-→ `/spec:plan` 将审计发现转化为具体的修复计划
+→ `spec-plan` 将审计发现转化为具体的修复计划

@@ -1,5 +1,6 @@
 param(
-  [string]$Tool
+  [string]$Tool,
+  [switch]$UserScope
 )
 
 $ErrorActionPreference = 'Stop'
@@ -7,6 +8,15 @@ Set-StrictMode -Version Latest
 
 if ([string]::IsNullOrWhiteSpace($Tool)) {
   throw '缺少 -Tool 参数'
+}
+if ($UserScope) {
+  $env:KIRO_USER_SCOPE = '1'
+  $env:QODER_USER_SCOPE = '1'
+  $env:CURSOR_USER_SCOPE = '1'
+}
+
+if ($env:MCP_SETUP_HOST -notin @('claude', 'codex', 'kiro', 'qoder', 'cursor')) {
+  throw '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。'
 }
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -19,6 +29,7 @@ $HostInfo = & (Join-Path $ScriptDir 'detect-host.ps1') | ConvertFrom-Json
 $DetectedHost = $HostInfo.host
 $SelectedScope = $HostInfo.selected_scope
 $ConfigPath = $HostInfo.config_path
+$ConfigFormat = $HostInfo.config_format
 $ToolDef = @($ToolsJson.tools | Where-Object { $_.id -eq $Tool })[0]
 if ($null -eq $ToolDef) {
   throw "未知工具: $Tool"
@@ -33,10 +44,23 @@ if ($null -eq $HostConfig) {
 
 $resolvedArgs = @(Expand-ToolArgs -Tool $ToolDef -Args $HostConfig.args)
 $ResolvedConfig = [ordered]@{ command = $HostConfig.command; args = $resolvedArgs }
+if ($null -ne $HostConfig.PSObject.Properties['type']) {
+  $ResolvedConfig['type'] = [string]$HostConfig.type
+}
+if ($null -ne $HostConfig.PSObject.Properties['env']) {
+  $ResolvedConfig['env'] = $HostConfig.env
+}
+if ($null -ne $HostConfig.PSObject.Properties['envFile']) {
+  $ResolvedConfig['envFile'] = $HostConfig.envFile
+}
 if ($null -ne $HostConfig.PSObject.Properties['startup_timeout_sec']) {
   $ResolvedConfig['startup_timeout_sec'] = [int]$HostConfig.startup_timeout_sec
 }
 $FallbackApplied = ($DetectedHost -eq 'claude' -and $SelectedScope -ne 'managed')
+
+function Test-JsonHostConfig {
+  return $ConfigFormat -eq 'json'
+}
 
 function Get-CodexHigherPrecedenceStatus {
   if ($DetectedHost -ne 'codex') {
@@ -92,11 +116,12 @@ function Test-ToolConfigured {
   if (-not (Test-Path $ConfigPath)) { return $false }
   switch ($ToolDef.detection.kind) {
     'host_config_exact' {
-      if ($DetectedHost -eq 'claude') {
+      if (Test-JsonHostConfig) {
         $config = Get-Content -Raw $ConfigPath | ConvertFrom-Json
         $server = Get-ClaudeMcpServer -Config $config -Key $ToolDef.detection.key
         if ($null -eq $server) { return $false }
         if ($server.command -ne $ResolvedConfig.command) { return $false }
+        if ($ResolvedConfig.Contains('type') -and $server.type -ne $ResolvedConfig.type) { return $false }
         $serverArgs = @($server.args)
         $expectedArgs = @($ResolvedConfig.args)
         if ($serverArgs.Count -ne $expectedArgs.Count) { return $false }
@@ -109,7 +134,7 @@ function Test-ToolConfigured {
       return (Test-TomlMcpSectionExact -Path $ConfigPath -Key $ToolDef.detection.key -Command $ResolvedConfig.command -Args @($ResolvedConfig.args))
     }
     'host_config_key_only' {
-      if ($DetectedHost -eq 'claude') {
+      if (Test-JsonHostConfig) {
         $config = Get-Content -Raw $ConfigPath | ConvertFrom-Json
         return $null -ne (Get-ClaudeMcpServer -Config $config -Key $ToolDef.detection.key)
       }
@@ -126,11 +151,12 @@ function Test-OverwriteApproved {
 function Test-SelectedConfigConflicts {
   if ($ToolDef.detection.kind -ne 'host_config_exact') { return $false }
   if (-not (Test-Path $ConfigPath)) { return $false }
-  if ($DetectedHost -eq 'claude') {
+  if (Test-JsonHostConfig) {
     $config = Get-Content -Raw $ConfigPath | ConvertFrom-Json
     $server = Get-ClaudeMcpServer -Config $config -Key $ToolDef.detection.key
     if ($null -eq $server) { return $false }
     if ($server.command -ne $ResolvedConfig.command) { return $true }
+    if ($ResolvedConfig.Contains('type') -and $server.type -ne $ResolvedConfig.type) { return $true }
     $serverArgs = @($server.args)
     $expectedArgs = @($ResolvedConfig.args)
     if ($serverArgs.Count -ne $expectedArgs.Count) { return $true }
@@ -144,7 +170,7 @@ function Test-SelectedConfigConflicts {
   return -not (Test-TomlMcpSectionExact -Path $ConfigPath -Key $ToolDef.detection.key -Command $ResolvedConfig.command -Args @($ResolvedConfig.args))
 }
 
-function Write-ClaudeConfig {
+function Write-JsonMcpConfig {
   param([System.Collections.IDictionary]$FinalConfig)
 
   $config = if (Test-Path $ConfigPath) {
@@ -156,6 +182,45 @@ function Write-ClaudeConfig {
   if (-not $config.Contains('mcpServers')) { $config['mcpServers'] = @{} }
   $config['mcpServers'][$ToolDef.detection.key] = $FinalConfig
   Set-TextFileAtomic -Path $ConfigPath -Value ($config | ConvertTo-Json -Depth 8)
+}
+
+function Assert-NoLiteralSecretValues {
+  if ($DetectedHost -ne 'kiro' -and $DetectedHost -ne 'qoder' -and $DetectedHost -ne 'cursor') { return }
+  if (-not (Test-Path $ConfigPath)) { return }
+  $raw = Get-Content -Raw $ConfigPath
+  $parsed = ConvertFrom-JsonCompat -Json $raw -AsHashtable
+  $stack = New-Object System.Collections.Stack
+  $stack.Push($parsed)
+  while ($stack.Count -gt 0) {
+    $current = $stack.Pop()
+    if ($current -is [System.Collections.IDictionary]) {
+      foreach ($key in $current.Keys) {
+        $value = $current[$key]
+        if ([string]$key -match '(?i)(token|secret|api[_-]?key|password)' -and $value -is [string] -and $value -notmatch '^\$\{[A-Za-z_][A-Za-z0-9_]*\}$') {
+          throw ('{0} config contains a literal secret-like value; use an env var reference such as ${TOKEN_NAME}' -f $DetectedHost)
+        }
+        if (($value -is [System.Collections.IDictionary]) -or ($value -is [pscustomobject]) -or ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string]))) {
+          $stack.Push($value)
+        }
+      }
+    } elseif ($current -is [pscustomobject]) {
+      foreach ($property in $current.PSObject.Properties) {
+        $value = $property.Value
+        if ([string]$property.Name -match '(?i)(token|secret|api[_-]?key|password)' -and $value -is [string] -and $value -notmatch '^\$\{[A-Za-z_][A-Za-z0-9_]*\}$') {
+          throw ('{0} config contains a literal secret-like value; use an env var reference such as ${TOKEN_NAME}' -f $DetectedHost)
+        }
+        if (($value -is [System.Collections.IDictionary]) -or ($value -is [pscustomobject]) -or ($value -is [System.Collections.IEnumerable] -and -not ($value -is [string]))) {
+          $stack.Push($value)
+        }
+      }
+    } elseif ($current -is [System.Collections.IEnumerable] -and -not ($current -is [string])) {
+      foreach ($item in $current) {
+        if (($item -is [System.Collections.IDictionary]) -or ($item -is [pscustomobject]) -or ($item -is [System.Collections.IEnumerable] -and -not ($item -is [string]))) {
+          $stack.Push($item)
+        }
+      }
+    }
+  }
 }
 
 function Write-CodexConfig {
@@ -237,7 +302,7 @@ try {
     return
   }
 
-  if (-not [bool]$ToolDef.required -and (Test-SelectedConfigConflicts) -and -not (Test-OverwriteApproved)) {
+  if ((Test-SelectedConfigConflicts) -and -not (Test-OverwriteApproved)) {
     throw "$Tool 已存在同名但不同 command/args 的宿主 MCP 配置；如需覆盖，请设置 SPEC_FIRST_MCP_CONFIGURE_OVERWRITE=approved 后重跑"
   }
 
@@ -251,9 +316,14 @@ try {
 
   try {
     if ($DetectedHost -eq 'claude') {
-      Write-ClaudeConfig -FinalConfig $ResolvedConfig
-    } else {
+      Write-JsonMcpConfig -FinalConfig $ResolvedConfig
+    } elseif ($DetectedHost -eq 'codex') {
       Write-CodexConfig -FinalConfig $ResolvedConfig
+    } elseif ($DetectedHost -eq 'kiro' -or $DetectedHost -eq 'qoder' -or $DetectedHost -eq 'cursor') {
+      Write-JsonMcpConfig -FinalConfig $ResolvedConfig
+      Assert-NoLiteralSecretValues
+    } else {
+      throw "无法识别宿主：$DetectedHost"
     }
 
     if (-not (Test-ToolConfigured)) {

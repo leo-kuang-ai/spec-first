@@ -96,6 +96,7 @@ describe('context bundle and summary contracts', () => {
     expect(governance).toContain('compact facts, source-read requirements, limitations, and precise artifact paths');
     expect(governance).toContain('docs/contracts/context-bundle.md');
     expect(governance).toContain('docs/contracts/artifact-summary.md');
+    expect(governance).toContain('`host_local_config_excluded`');
   });
 
   test('high-frequency workflows consume compact context contracts instead of full broadcast by default', () => {
@@ -151,6 +152,17 @@ describe('context bundle and summary contracts', () => {
         '.spec-first/workflows/spec-work/run.json',
         '.spec-first/sessions/session-a.json',
         '.agents/skills/spec-work/SKILL.md',
+        '.cursor/skills/spec-work/SKILL.md',
+        '.cursor/spec-first/state.json',
+        '.cursor/mcp.json',
+        '.cursor/rules/product.mdc',
+        '.cursor/agents/custom-agent.md',
+        '.kiro/skills/spec-work/SKILL.md',
+        '.kiro/agents/spec-security-reviewer.agent.md',
+        '.kiro/spec-first/state.json',
+        '.kiro/settings/mcp.json',
+        '.qoder/settings.local.json',
+        '.kiro/specs/feature-a/requirements.md',
         'tests/unit/context-bundle-contracts.test.js',
       ],
       fullReadTriggers: ['summary_missing'],
@@ -165,6 +177,9 @@ describe('context bundle and summary contracts', () => {
     expect(bundle.related_paths.map((entry) => entry.path)).toContain('docs/contracts/context-bundle.md');
     expect(bundle.artifact_summaries.map((entry) => entry.path)).toContain('docs/contracts/artifact-summary.md');
     expect(bundle.evidence_paths.map((entry) => entry.path)).toContain('tests/unit/context-bundle-contracts.test.js');
+    expect(bundle.evidence_paths.map((entry) => entry.path)).toContain('.kiro/specs/feature-a/requirements.md');
+    expect(bundle.evidence_paths.map((entry) => entry.path)).toContain('.cursor/rules/product.mdc');
+    expect(bundle.evidence_paths.map((entry) => entry.path)).toContain('.cursor/agents/custom-agent.md');
     expect(bundle.excluded_context).toEqual(expect.arrayContaining([
       expect.objectContaining({
         path: '.spec-first/audits/old-run/summary.json',
@@ -197,6 +212,40 @@ describe('context bundle and summary contracts', () => {
       expect.objectContaining({
         path: '.agents/skills/spec-work/SKILL.md',
         reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.cursor/skills/spec-work/SKILL.md',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.cursor/spec-first/state.json',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        kind: 'host_local_config',
+        path: '.cursor/mcp.json',
+        reason_code: 'host_local_config_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/skills/spec-work/SKILL.md',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/agents/spec-security-reviewer.agent.md',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/spec-first/state.json',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.kiro/settings/mcp.json',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        kind: 'host_local_config',
+        path: '.qoder/settings.local.json',
+        reason_code: 'host_local_config_excluded',
       }),
     ]));
     expect(bundle.full_read_triggers).toEqual(['summary_missing']);

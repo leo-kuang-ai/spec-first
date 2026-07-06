@@ -46,7 +46,8 @@
       "minItems": 1,
       "items": {
         "type": "string",
-        "minLength": 1
+        "minLength": 1,
+        "pattern": "^spec-"
       }
     },
     "expected_changed_paths": {

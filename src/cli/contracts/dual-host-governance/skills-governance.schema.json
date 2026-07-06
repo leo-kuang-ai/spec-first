@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://spec-first.dev/contracts/dual-host-governance/skills-governance.schema.json",
-  "title": "spec-first dual-host skills governance",
+  "title": "spec-first supported-host skills governance",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -27,7 +27,10 @@
     "host": {
       "enum": [
         "claude",
-        "codex"
+        "codex",
+        "cursor",
+        "kiro",
+        "qoder"
       ]
     },
     "entrySurface": {
@@ -88,6 +91,9 @@
           "enum": [
             "claude",
             "codex",
+            "cursor",
+            "kiro",
+            "qoder",
             null
           ]
         },
@@ -96,13 +102,25 @@
           "additionalProperties": false,
           "required": [
             "claude",
-            "codex"
+            "codex",
+            "cursor",
+            "kiro",
+            "qoder"
           ],
           "properties": {
             "claude": {
               "$ref": "#/$defs/hostDelivery"
             },
             "codex": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "cursor": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "kiro": {
+              "$ref": "#/$defs/hostDelivery"
+            },
+            "qoder": {
               "$ref": "#/$defs/hostDelivery"
             }
           }

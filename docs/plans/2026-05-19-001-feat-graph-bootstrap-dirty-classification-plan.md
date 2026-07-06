@@ -10,11 +10,11 @@ spec_id: 2026-05-19-001-graph-bootstrap-dirty-classification
 
 ## Summary
 
-把 `spec-graph-bootstrap` 当前"任何 `git status --porcelain` 非空就 `dirty-refresh-non-canonical` 阻断"的一刀切 dirty gate，升级为按路径来源分类的 dirty gate：脚本只在**graph-affecting dirty**（用户源码、构建配置、provider setup 输入、host instruction 非 managed block 修改）时阻断；当 dirty 仅命中**setup-owned 治理路径**（spec-first 自己 own 或受角色契约要求频繁更新的路径，如 `.spec-first/`、`.gitnexus/`、`.code-review-graph/`、`CHANGELOG.md`、`.gitignore` 的 spec-first managed block、`AGENTS.md` / `CLAUDE.md` 的 spec-first managed blocks 等）时，bootstrap 继续运行 provider 命令并写出 canonical artifacts，仅把 dirty 状态如实写进 `worktree_dirty` / `worktree_status_hash` / 新增 `dirty_classification`，由下游 consumer 自行用 hash 判 freshness。真源码 dirty 仍 fail-closed；本轮不提供 `--allow-dirty` / `-AllowDirty` escape hatch。预期效果：用户在 `spec-mcp-setup` 之后第一时间跑 `$spec-graph-bootstrap`，不再因为 setup 自己刚写的 governance 文件被阻断；KAZ workspace 8 child 全部命中 `dirty-refresh-non-canonical` 的现场被根治。
+把 `spec-graph-bootstrap` 当前"任何 `git status --porcelain` 非空就 `dirty-refresh-non-canonical` 阻断"的一刀切 dirty gate，升级为按路径来源分类的 dirty gate：脚本只在**graph-affecting dirty**（用户源码、构建配置、provider setup 输入、host instruction 非 managed block 修改）时阻断；当 dirty 仅命中**setup-owned 治理路径**（spec-first 自己 own 或受角色契约要求频繁更新的路径，如 `.spec-first/`、`.gitnexus/`、`.code-review-graph/`、`CHANGELOG.md`、`.gitignore` 的 spec-first managed block、`AGENTS.md` / `CLAUDE.md` 的 spec-first managed blocks 等）时，bootstrap 继续运行 provider 命令并写出 canonical artifacts，仅把 dirty 状态如实写进 `worktree_dirty` / `worktree_status_hash` / 新增 `dirty_classification`，由下游 consumer 自行用 hash 判 freshness。真源码 dirty 仍 fail-closed；本轮不提供 `--allow-dirty` / `-AllowDirty` escape hatch。预期效果：用户在 `spec-mcp-setup` 之后第一时间跑 `spec-graph-bootstrap`，不再因为 setup 自己刚写的 governance 文件被阻断；KAZ workspace 8 child 全部命中 `dirty-refresh-non-canonical` 的现场被根治。
 
 ## Origin
 
-无独立 brainstorm 文档；本 plan 由当前会话产生，源于用户在 `/Users/kuang/ops/code/9627_KAZ展业项目-MVP版本-CRM需求_中台开发` workspace 跑 `$spec-graph-bootstrap` 时 8 个 child repo 全部以 `reason_code=dirty-refresh-non-canonical` 阻断的现场观察。现场 dirty 内容集中在 `.gitignore` managed block、`AGENTS.md` managed block、`CHANGELOG.md`、`.codex/spec-first/.developer` 删除等 setup-owned 路径，无源码改动；若 host entry 文档在 managed block 外也有 dirty，仍按 graph-affecting 处理。本 plan 与 `2026-05-18-003-init-untrack-managed-runtime` 正交但互补：003 解决"历史索引被跟踪"，本 plan 解决"setup 后立即 bootstrap 被自己刚写的 governance 文件拦住"。
+无独立 brainstorm 文档；本 plan 由当前会话产生，源于用户在 `/Users/kuang/ops/code/9627_KAZ展业项目-MVP版本-CRM需求_中台开发` workspace 跑 `spec-graph-bootstrap` 时 8 个 child repo 全部以 `reason_code=dirty-refresh-non-canonical` 阻断的现场观察。现场 dirty 内容集中在 `.gitignore` managed block、`AGENTS.md` managed block、`CHANGELOG.md`、`.codex/spec-first/.developer` 删除等 setup-owned 路径，无源码改动；若 host entry 文档在 managed block 外也有 dirty，仍按 graph-affecting 处理。本 plan 与 `2026-05-18-003-init-untrack-managed-runtime` 正交但互补：003 解决"历史索引被跟踪"，本 plan 解决"setup 后立即 bootstrap 被自己刚写的 governance 文件拦住"。
 
 ## Graph Readiness
 
@@ -28,7 +28,7 @@ spec_id: 2026-05-19-001-graph-bootstrap-dirty-classification
 - fallback_capabilities: bounded direct repo reads
 - runtime_mcp_evidence: not-attempted（plan 阶段不需要语义图证据，只读 bootstrap script 与 contract source）
 - confidence: medium-high
-- limitations: 改动面集中在 `skills/spec-graph-bootstrap/scripts/*` + `docs/contracts/graph-provider-consumption.md` + `tests/unit/spec-graph-bootstrap.sh` + `tests/unit/spec-graph-bootstrap-contracts.test.js` 几条已完整阅读过的链路；不依赖 graph evidence 做 impact 判断。spec-work 阶段如需做大范围影响分析，需要先 commit 本 plan 后重跑 `$spec-graph-bootstrap`。
+- limitations: 改动面集中在 `skills/spec-graph-bootstrap/scripts/*` + `docs/contracts/graph-provider-consumption.md` + `tests/unit/spec-graph-bootstrap.sh` + `tests/unit/spec-graph-bootstrap-contracts.test.js` 几条已完整阅读过的链路；不依赖 graph evidence 做 impact 判断。spec-work 阶段如需做大范围影响分析，需要先 commit 本 plan 后重跑 `spec-graph-bootstrap`。
 
 ## Goals
 
@@ -158,7 +158,7 @@ spec_id: 2026-05-19-001-graph-bootstrap-dirty-classification
 ### IU-5：文档与 CHANGELOG
 
 - `CHANGELOG.md`：新增一行 `(user-visible)`，作者按当前 host developer profile 解析。
-- `README.md` / `README.zh-CN.md`：在 `$spec-graph-bootstrap` / `/spec:graph-bootstrap` 段落补一句"setup-owned dirty 不再阻断 bootstrap；真源码 dirty 仍 fail-closed"。
+- `README.md` / `README.zh-CN.md`：在 `spec-graph-bootstrap` / `spec-graph-bootstrap` 段落补一句"setup-owned dirty 不再阻断 bootstrap；真源码 dirty 仍 fail-closed"。
 - `docs/00-版本路线/版本规划.md`：补一行 changelog 引用。
 - `skills/spec-graph-bootstrap/SKILL.md`：把 `## Refresh Modes` 段第 268 行 "dirty worktree" 那条更新为分类描述；新增 `## Dirty Classification` 小节链接到契约 `setup-owned-dirty-ignore.v1`；说明真源码 dirty 保持 fail-closed，override 留待 Future Work。
 
@@ -213,15 +213,15 @@ spec_id: 2026-05-19-001-graph-bootstrap-dirty-classification
 - 必跑（spec-work 完成后）：`npm run typecheck`、`npm run test:unit`、`npm run test:graph-bootstrap`、`npm run test:smoke`。
 - 选跑：`npm run test:integration`（若 workspace fan-out 改动较大）。
 - 手验：在 spec-first 自身仓库（当前已是 dirty setup-owned-only 状态）跑 `node bin/spec-first.js ...` 等价路径或直接 `bash skills/spec-graph-bootstrap/scripts/bootstrap-providers.sh`，断言不再阻断；`graph-facts.json` 顶层有 `dirty_classification=setup-owned-only`。
-- 现场验证（用户授权后）：在 `/Users/kuang/ops/code/9627_KAZ展业项目-MVP版本-CRM需求_中台开发` 跑 `$spec-graph-bootstrap`，断言 8 个 child 中 dirty 全部为 setup-owned 路径的 child 不再被阻断；含真源码 dirty 的 child 仍 `dirty-source-blocked`。
+- 现场验证（用户授权后）：在 `/Users/kuang/ops/code/9627_KAZ展业项目-MVP版本-CRM需求_中台开发` 跑 `spec-graph-bootstrap`，断言 8 个 child 中 dirty 全部为 setup-owned 路径的 child 不再被阻断；含真源码 dirty 的 child 仍 `dirty-source-blocked`。
 - 回归：跑既有 `spec-graph-bootstrap.sh` 全套用例，确认 `concurrent-write-detected`、`incremental-and-full-failed`、`provider-projection-stale` 等路径不受影响。
 
 ## Handoff
 
 下一步建议（按优先级）：
 
-1. **首选**：本 plan 已完成本轮 `$spec-doc-review` auto-resolve 收口：MVP 收窄为 setup-owned dirty 分类 gate，移除首版 `--allow-dirty`，补 canonical blocked/result 边界与 parent summary 数据流。直接 `spec-write-tasks` 拆 ≤6 个原子任务（IU-1～IU-5），便于 spec-work 控制 commit 粒度。
-2. **次选**：直接 `$spec-work --plan docs/plans/2026-05-19-001-feat-graph-bootstrap-dirty-classification-plan.md`。
+1. **首选**：本 plan 已完成本轮 `spec-doc-review` auto-resolve 收口：MVP 收窄为 setup-owned dirty 分类 gate，移除首版 `--allow-dirty`，补 canonical blocked/result 边界与 parent summary 数据流。直接 `spec-write-tasks` 拆 ≤6 个原子任务（IU-1～IU-5），便于 spec-work 控制 commit 粒度。
+2. **次选**：直接 `spec-work --plan docs/plans/2026-05-19-001-feat-graph-bootstrap-dirty-classification-plan.md`。
 3. **不推荐**：合并到任意 in-flight plan，本能力是独立 source 行为。
 
 ## Deferred / Open Questions

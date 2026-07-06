@@ -38,7 +38,7 @@ spec_id: 2026-06-19-001-docs-solutions-recall-activation-layer
 ## Key Flows
 
 - F1. work/debug 入口召回（核心交付）
-  - **Trigger:** 用户进入 `/spec:work` 或 `/spec:debug` 的实质工作，orchestrator 进入 context-orientation 阶段。
+  - **Trigger:** 用户进入 `spec-work` 或 `spec-debug` 的实质工作，orchestrator 进入 context-orientation 阶段。
   - **Actors:** A1, A2, A3
   - **Steps:** orchestrator 在 context-orientation 调度 `spec-learnings-researcher`（或在其不可用时直接对 `docs/solutions/` 扫 frontmatter）→ 拿到候选 → 仅对命中候选回源读取对应 solution 与其 `source_refs`/`source_reads_required` → 形成结论时保持 advisory 并完成回源确认。
   - **Outcome:** work/debug 不再依赖「orchestrator 临场记得去召回」；召回入口与 plan/review 对齐。是否采纳由 LLM + 回源决定。
@@ -76,8 +76,8 @@ spec_id: 2026-06-19-001-docs-solutions-recall-activation-layer
 
 ## Acceptance Examples
 
-- AE1. **Covers R1, R3.** Given 用户进入 `/spec:work` 实质工作，when orchestrator 进入 context-orientation，then 它在该既有阶段调度 `spec-learnings-researcher`（或回退直接扫 `docs/solutions/`），而不触发 SessionStart 加厚或新中心化拦截器。
-- AE2. **Covers R1.** Given `/spec:debug` 进入诊断，when context-orientation，then `docs/solutions/` 召回被调度，行为与 `spec-plan`/`spec-code-review` 现有召回调度对齐。
+- AE1. **Covers R1, R3.** Given 用户进入 `spec-work` 实质工作，when orchestrator 进入 context-orientation，then 它在该既有阶段调度 `spec-learnings-researcher`（或回退直接扫 `docs/solutions/`），而不触发 SessionStart 加厚或新中心化拦截器。
+- AE2. **Covers R1.** Given `spec-debug` 进入诊断，when context-orientation，then `docs/solutions/` 召回被调度，行为与 `spec-plan`/`spec-code-review` 现有召回调度对齐。
 - AE3. **Covers R2, R8.** Given 召回返回一个候选 solution，when 结论写入 work/debug 产物，then 结论要么附回源确认（读了对应 solution + `source_refs`），要么明确标注 advisory 未确认；召回逻辑未被重写、脚本未对「是否适用」下结论。
 - AE4. **Covers R4, R5.** Given 一篇 legacy solution 只有 `applies_when`/`title`/`problem_type` 而无 `domain`/`pattern`，when 召回，then 它仍被匹配到（基于普遍字段），且无需任何生成索引或检索基建即可完成。
 - AE5. **Covers R6, R7.** Given reviewer 检查 Success Criteria，when 对照实现，then 验收点是「入口步骤存在且被调度」而非「跨会话稳定必触发」；文档未把 best-effort 表述为 guaranteed。
@@ -143,7 +143,7 @@ spec_id: 2026-06-19-001-docs-solutions-recall-activation-layer
 
 ### Resolve Before Planning
 
-- [Affects 全文][证据] 前置证据采集：产出 2-3 个真实 `/spec:work` 或 `/spec:debug` trace，其中相关 `docs/solutions` 文档存在却未被召回，用以确认「work/debug 缺召回入口」确为真实缺口（而非臆测）。评审 P0 指出原premise未被行为证据支撑；wiring 改动很轻，此证据门是「轻确认」而非阻断，但应在 planning 前补一次最小确认。
+- [Affects 全文][证据] 前置证据采集：产出 2-3 个真实 `spec-work` 或 `spec-debug` trace，其中相关 `docs/solutions` 文档存在却未被召回，用以确认「work/debug 缺召回入口」确为真实缺口（而非臆测）。评审 P0 指出原premise未被行为证据支撑；wiring 改动很轻，此证据门是「轻确认」而非阻断，但应在 planning 前补一次最小确认。
 
 ### Deferred to Planning
 

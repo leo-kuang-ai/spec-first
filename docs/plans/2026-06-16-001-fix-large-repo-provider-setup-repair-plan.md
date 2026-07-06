@@ -18,7 +18,7 @@ spec_id: 2026-06-16-001-large-repo-provider-setup-repair
 
 This plan makes Runtime Setup complete more reliably on large repositories by adding bounded install-init repair for two provider-native failure modes: Graphify refusing to overwrite an older larger graph without `--force`, and CodeGraph reporting an old engine index that needs a full `codegraph index -f` rebuild after `sync` cannot clear the advisory.
 
-The work stays inside explicit setup paths (`$spec-mcp-setup` / `/spec:mcp-setup`, including `--only graphify`, `--only codegraph`, and confirmed guided setup). It does not make ordinary workflows, git hooks, or downstream code navigation automatically rebuild large provider indexes.
+The work stays inside explicit setup paths (`spec-mcp-setup` / `spec-mcp-setup`, including `--only graphify`, `--only codegraph`, and confirmed guided setup). It does not make ordinary workflows, git hooks, or downstream code navigation automatically rebuild large provider indexes.
 
 ---
 

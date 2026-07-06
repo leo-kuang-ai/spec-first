@@ -1,6 +1,6 @@
 # Product Expert Lens
 
-Load this reference on the normal `$spec-prd` authoring hot path before owner questions, Requirements Grill, PRD write-in, or readiness judgment.
+Load this reference on the normal `spec-prd` authoring hot path before owner questions, Requirements Grill, PRD write-in, or readiness judgment.
 
 This file is the single canonical source for product-expert judgment in `spec-prd`. Other references may consume its run-local interface, but they must not copy the full dimension list or create a second canonical lens.
 
@@ -119,4 +119,4 @@ Use independent product-reviewer critique only for high downstream-risk triggers
 
 Dispatch requires both host capability and explicit user/parent-workflow authorization for subagents, delegated review, parallel agents, or personas. If either is absent, stay inline and record the reason code: `dispatch_unavailable` or `dispatch_authorization_missing`.
 
-Inline escalation is not self-congratulation. It must switch to an adversarial product-review posture and name at least one product risk plus the affected PRD write target, or explicitly record that no such risk was found from current evidence. Final judgment remains with the `$spec-prd` orchestrator.
+Inline escalation is not self-congratulation. It must switch to an adversarial product-review posture and name at least one product risk plus the affected PRD write target, or explicitly record that no such risk was found from current evidence. Final judgment remains with the `spec-prd` orchestrator.
