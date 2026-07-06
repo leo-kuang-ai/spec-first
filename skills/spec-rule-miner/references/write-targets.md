@@ -39,8 +39,10 @@ completion/inline 功能通常不会读取 `AGENTS.md` 或 pointer。用户明�
 ## 合并规则
 
 - 文件不存在：创建父目录和文件，只写目标块或 pointer。
+- 非首次 refresh：先读取 `docs/ai/project-rules.md` 的当前 marked block、入口文件 pointer 和用户指定目标，再生成 candidate rules block；candidate 与当前 canonical block 无实质变化且 pointer 已正确时，不写任何文件，closeout 记录 `refresh_noop`、采样范围和限制。
 - 独立规则文件中 `spec-rule-miner-start` / `spec-rule-miner-end` markers 存在：只替换 markers 中间内容，保留文件其他部分。
 - pointer 文件中 `spec-rule-miner-start` / `spec-rule-miner-end` markers 存在：只替换 markers 中间内容为 pointer，不把完整规则写进入口文件。
+- candidate rules block 有变化时：preview 展示规则差异和受影响目标；确认后只替换 marker 中间内容，不因排序、更新时间、同义措辞或 pointer 已正确而重写无变化文件。
 - legacy `rule-miner-start` / `rule-miner-end` markers 存在：如果在独立规则文件内，替换旧 markers 与其中内容为新的 `spec-rule-miner` marked block；如果在 `AGENTS.md` / `CLAUDE.md` 内，先把完整规则写入独立规则文件，再把入口文件中的旧块替换为 pointer，并在 summary 说明完成 legacy marker migration。
 - markers 不存在且已有内容明显无关：追加 marked block，不删除用户内容。
 - markers 不存在但内容像旧版规则挖掘输出：停止并询问“迁移到独立规则文件还是追加 pointer”，避免重复堆叠。

@@ -20,7 +20,7 @@ argument-hint: "[bare auto setup] [--check|--verify-only|--plan] [--only codegra
 | Failure modes | Missing dependencies, host config write failure, ambiguous parent workspace target, symlink escape, invalid registry schema, helper install failure, or unsupported host. |
 | Downstream consumers | `using-spec-first`, plan/work/review/debug workflows, doctor/update guidance, and humans repairing setup. |
 
-Core boundary: scripts prepare deterministic readiness facts; LLM workflows decide how to use those facts. Setup must not make semantic code-understanding judgments or require any external analysis service before ordinary work can continue.
+Core boundary: scripts prepare deterministic readiness facts; LLM workflows decide how to use those facts. Setup must not make semantic code-understanding judgments or require any external analysis service before ordinary work can continue. After CodeGraph/Graphify readiness is prepared, setup may recommend `spec-rule-miner` as a next step for evidence-backed project AI coding rules; it must not invoke rule mining, synthesize rules, or write `docs/ai/project-rules.md`.
 
 ## Scenario Capability
 
@@ -97,9 +97,9 @@ For bare `spec-mcp-setup`, do this inside the skill:
    - provider/project writes: `.codegraph/`, `graphify-out/`, `.git/hooks/`, `.codex/skills/graphify/`, `.kiro/skills/graphify/`, `.qoder/skills/graphify/`, `.codex/hooks.json`, `AGENTS.md`, `.claude/skills/graphify/`, `CLAUDE.md`, and `.graphify_version` when the selected host/provider writes them;
   - host-owned writes: Claude/Codex/Kiro/Qoder/Cursor MCP config for CodeGraph when selected; Kiro user-level config requires explicit `--user-scope`/`KIRO_USER_SCOPE=1`, otherwise workspace `.kiro/settings/mcp.json` is the only Kiro write target; Qoder user-level config requires explicit `--user-scope`/`QODER_USER_SCOPE=1`, otherwise `.qoder/settings.local.json` is the only Qoder write target; Cursor user-level config requires explicit `--user-scope`/`CURSOR_USER_SCOPE=1`, otherwise `.cursor/mcp.json` is the only Cursor write target;
    - `.gitignore` policy: `spec-first init`'s managed block ignores `.codegraph/` and the whole `graphify-out/` provider artifact directory; setup does not auto-add, auto-commit, or promote Graphify output to source truth;
-   - non-actions: no `graphify watch`/long-running daemon, no optional Graphify MCP server install, no generated artifact promotion to `docs/` or source truth.
+   - non-actions: no `graphify watch`/long-running daemon, no optional Graphify MCP server install, no generated artifact promotion to `docs/` or source truth, no automatic `spec-rule-miner` invocation, and no project-rule file writes.
 3. If the plan reports an unknown provider selection or unresolved target, stop with the blocked reason and next action instead of installing.
-4. Otherwise, run the internal apply path with `--only codegraph,graphify` plus any `--repo`/`--folder`/`--requirement-workspace` args already supplied, then run verification/fact refresh and render the final grouped status block.
+4. Otherwise, run the internal apply path with `--only codegraph,graphify` plus any `--repo`/`--folder`/`--requirement-workspace` args already supplied, then run verification/fact refresh and render the final grouped status block. If CodeGraph/Graphify readiness is ready or degraded-but-usable and no setup blocker remains, the final next step should suggest running `spec-rule-miner` separately to mine project rules from source evidence.
 
 ## Workflow
 
@@ -123,7 +123,7 @@ The final setup output should contain:
 - `Install safety`: helper install source, risk, review, and mirror provenance.
 - `Project setup facts`: status for `tool-facts.json` and `runtime-capabilities.json`.
 - `Verification profile`: current verification profile visibility placeholder; full profile execution is v1.13 scope.
-- `Next steps`: either fix action-required rows, choose an explicit child repo, or continue to the user-intent workflow.
+- `Next steps`: either fix action-required rows, choose an explicit child repo, continue to the user-intent workflow, or suggest `spec-rule-miner` as a separate follow-up after CodeGraph/Graphify readiness is prepared. This suggestion is advisory; setup must not treat rule-miner output as setup readiness and must not call `spec-rule-miner` automatically.
 
 `tool-facts.json` records setup-owned tool and helper readiness:
 
@@ -184,6 +184,7 @@ Setup does not:
 - run provider first generation from `--check`, `--plan`, `--verify-only`, or invalid explicit workspace override paths;
 - treat provider indexes or query probes as semantic code evidence;
 - treat setup facts as semantic code evidence;
+- invoke `spec-rule-miner`, synthesize project rules, or write `docs/ai/project-rules.md`;
 - treat `.spec-first/config.local.yaml` as team-shared workflow policy;
 - decide issue/PR category, state, scope, accept/reject status, or implementation truth;
 - hand-edit generated runtime mirrors as source;

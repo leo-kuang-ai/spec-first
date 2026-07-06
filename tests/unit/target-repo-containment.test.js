@@ -61,6 +61,9 @@ describe('target repo containment helpers', () => {
     validateRepoRelativeField('.git/config', 'field.git', errors);
     validateRepoRelativeField('.env', 'field.secret', errors);
     validateRepoRelativeField('.claude/commands/spec-work.md', 'field.runtime', errors);
+    validateRepoRelativeField('.cursor/skills/spec-work/SKILL.md', 'field.cursor_runtime', errors);
+    validateRepoRelativeField('.cursor/spec-first/state.json', 'field.cursor_state', errors);
+    validateRepoRelativeField('.cursor/mcp.json', 'field.cursor_config', errors);
     validateRepoRelativeField('.kiro/skills/spec-work/SKILL.md', 'field.kiro_runtime', errors);
     validateRepoRelativeField('.kiro/specs/feature-a/requirements.md', 'field.kiro_specs', errors);
     validateRepoRelativeField('.spec-first/config/tool-facts.json', 'field.specfirst', errors);
@@ -73,6 +76,9 @@ describe('target repo containment helpers', () => {
       'field.git must not point at Git internals',
       'field.secret must not point at secret-denied paths',
       'field.runtime must not point at generated runtime mirrors',
+      'field.cursor_runtime must not point at generated runtime mirrors',
+      'field.cursor_state must not point at generated runtime mirrors',
+      'field.cursor_config must not point at generated runtime mirrors',
       'field.kiro_runtime must not point at generated runtime mirrors',
       'field.specfirst uses unsupported .spec-first artifact path',
     ]);

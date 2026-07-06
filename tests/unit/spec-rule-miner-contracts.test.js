@@ -45,6 +45,9 @@ describe('spec-rule-miner skill contract', () => {
     expect(skill).toContain('headless_default_write');
     expect(skill).toContain('普通聊天里用户暂未回复不能算 headless');
     expect(skill).toContain('evidence_summary');
+    expect(skill).toContain('refresh_noop');
+    expect(skill).toContain('先重新取证并生成 candidate rules block');
+    expect(skill).toContain('大仓库可按其中 capability-class 边界使用 `code-graph` / `project-graph` 候选');
 
     expect(patternCategories).toContain('Hidden Associations');
     expect(patternCategories).toContain('Anti-Patterns');
@@ -56,6 +59,12 @@ describe('spec-rule-miner skill contract', () => {
     expect(patternCategories).toContain('改具体子项目先跟随本包现有结构');
     expect(patternCategories).toContain('不要把主模式写成全仓库事实或绝对禁令');
     expect(patternCategories).toContain('除非证据在目标适用范围内压倒性一致');
+    expect(patternCategories).toContain('## 大仓候选导航');
+    expect(patternCategories).toContain('`code-graph` / `project-graph` capability-class 输出作为 `provider_untrusted` 候选导航');
+    expect(patternCategories).toContain('候选只回答“先看哪里”');
+    expect(patternCategories).toContain('不能证明规则、频率、80% 一致性');
+    expect(patternCategories).toContain('不要读取完整 raw graph artifact，例如 `graph.json`');
+    expect(patternCategories).toContain('不要阻塞规则挖掘');
 
     expect(skill).toContain('大仓库或多包仓库使用分层抽样');
     expect(skill).toContain('多包规则必须区分跨包通用模式、包级专属模式和历史例外');
@@ -73,6 +82,10 @@ describe('spec-rule-miner skill contract', () => {
     expect(writeTargets).toContain('markers');
     expect(writeTargets).toContain('legacy `rule-miner-start` / `rule-miner-end` markers');
     expect(writeTargets).toContain('legacy marker migration');
+    expect(writeTargets).toContain('非首次 refresh');
+    expect(writeTargets).toContain('candidate 与当前 canonical block 无实质变化且 pointer 已正确时，不写任何文件');
+    expect(writeTargets).toContain('preview 展示规则差异和受影响目标');
+    expect(writeTargets).toContain('不因排序、更新时间、同义措辞或 pointer 已正确而重写无变化文件');
     expect(writeTargets).toContain('frontmatter 必须保持文件第一段');
     expect(writeTargets).toContain('禁止目标');
     expect(writeTargets).toContain('非当前 spec-first 支持的编程工具或 legacy 规则文件不作为写入目标');
@@ -102,7 +115,85 @@ describe('spec-rule-miner skill contract', () => {
       'near-neighbor',
       'should-not-trigger',
       'boundary',
+      'refresh-noop',
+      'use-provider-candidates-as-navigation-only',
+      'do-not-generate-empty-rules',
     ]));
+    const casesById = new Map(cases.cases.map((entry) => [entry.id, entry]));
+    const refreshNoop = casesById.get('refresh-noop-idempotence');
+    expect(refreshNoop).toMatchObject({
+      case_type: 'expected',
+      expected_result: 'refresh-noop',
+      expected_mode: 'compare-candidate-to-canonical-block-and-write-nothing',
+      reason_code: 'refresh-noop-idempotence',
+    });
+    expect(refreshNoop.coverage_tags).toEqual(expect.arrayContaining([
+      'write-safety',
+      'refresh',
+      'idempotence',
+    ]));
+    expect(refreshNoop.required_signals).toEqual(expect.arrayContaining([
+      'generate candidate rules before deciding',
+      'compare with canonical marked block',
+      'record refresh_noop',
+      'preserve existing pointers',
+    ]));
+    expect(refreshNoop.forbidden_signals).toEqual(expect.arrayContaining([
+      'exit only because project-rules.md exists',
+      'rewrite timestamp-only changes',
+      'rewrite AGENTS.md when pointer is already correct',
+      'skip evidence summary',
+    ]));
+
+    const largeRepoGraph = casesById.get('large-repo-graph-candidate-boundary');
+    expect(largeRepoGraph).toMatchObject({
+      case_type: 'expected',
+      expected_result: 'use-provider-candidates-as-navigation-only',
+      expected_mode: 'provider-untrusted-candidates-then-source-confirmation',
+      reason_code: 'large-repo-provider-candidate-boundary',
+    });
+    expect(largeRepoGraph.coverage_tags).toEqual(expect.arrayContaining([
+      'expected',
+      'scope',
+      'large-repo',
+      'capability-class',
+      'provider-boundary',
+    ]));
+    expect(largeRepoGraph.required_signals).toEqual(expect.arrayContaining([
+      'provider_untrusted',
+      'source confirmation before rule text',
+      'fallback to bounded source reads',
+      'record accepted and rejected candidates',
+    ]));
+    expect(largeRepoGraph.forbidden_signals).toEqual(expect.arrayContaining([
+      'cite graph edge as rule evidence',
+      'treat provider candidate as confirmed frequency',
+      'refresh or rebuild the graph from this skill',
+      'cat graph.json',
+    ]));
+
+    const noAnalyzableSource = casesById.get('no-analyzable-source-failure');
+    expect(noAnalyzableSource).toMatchObject({
+      case_type: 'failure',
+      expected_result: 'do-not-generate-empty-rules',
+      expected_mode: 'stop-with-limitations',
+      reason_code: 'no-analyzable-source',
+    });
+    expect(noAnalyzableSource.coverage_tags).toEqual(expect.arrayContaining([
+      'failure',
+      'source-evidence',
+    ]));
+    expect(noAnalyzableSource.required_signals).toEqual(expect.arrayContaining([
+      'no analyzable source',
+      'do not generate empty rules',
+      'limitations',
+    ]));
+    expect(noAnalyzableSource.forbidden_signals).toEqual(expect.arrayContaining([
+      'write generic best practices',
+      'infer rules from generated code',
+      'create empty project-rules.md',
+    ]));
+
     expect(JSON.stringify(cases)).toContain('project-rule-mining');
     expect(JSON.stringify(cases)).toContain('standards-governance-not-rule-mining');
     expect(JSON.stringify(cases)).toContain('review-not-rule-mining');

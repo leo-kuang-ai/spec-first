@@ -161,6 +161,7 @@ describe('context bundle and summary contracts', () => {
         '.kiro/agents/spec-security-reviewer.agent.md',
         '.kiro/spec-first/state.json',
         '.kiro/settings/mcp.json',
+        '.qoder/commands/spec-work.md',
         '.qoder/settings.local.json',
         '.kiro/specs/feature-a/requirements.md',
         'tests/unit/context-bundle-contracts.test.js',
@@ -240,6 +241,10 @@ describe('context bundle and summary contracts', () => {
       }),
       expect.objectContaining({
         path: '.kiro/settings/mcp.json',
+        reason_code: 'generated_runtime_mirror_excluded',
+      }),
+      expect.objectContaining({
+        path: '.qoder/commands/spec-work.md',
         reason_code: 'generated_runtime_mirror_excluded',
       }),
       expect.objectContaining({

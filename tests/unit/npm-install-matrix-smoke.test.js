@@ -31,6 +31,7 @@ const {
   getEnvValue,
   normalizeArtifactFileName,
   resolveNpmCliPath,
+  runInitCliEvidence,
   runWindowsCmdShim,
   runWindowsCmdShimResult,
 } = require('../../scripts/npm-install-matrix-smoke');
@@ -579,6 +580,76 @@ describe('npm install matrix smoke script', () => {
       summary: 'CLI spec-first init -y for codex passed and wrote expected runtime evidence.',
       artifact_path: 'init-codex-cli.log',
     });
+  });
+
+  test('CLI init evidence invokes the packaged CLI path and snapshots its writes', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-cli-evidence-'));
+    const packageRoot = path.join(tempDir, 'package');
+    const projectRoot = path.join(tempDir, 'project');
+    const argsPath = path.join(tempDir, 'captured-args.json');
+    const previousCaptureArgs = process.env.SPEC_FIRST_CAPTURE_ARGS;
+    const artifactWrites = {};
+
+    try {
+      process.env.SPEC_FIRST_CAPTURE_ARGS = argsPath;
+      fs.mkdirSync(path.join(packageRoot, 'bin'), { recursive: true });
+      fs.mkdirSync(projectRoot, { recursive: true });
+      fs.writeFileSync(path.join(packageRoot, 'bin', 'spec-first.js'), [
+        'const fs = require("node:fs");',
+        'const path = require("node:path");',
+        'const args = process.argv.slice(2);',
+        'fs.writeFileSync(process.env.SPEC_FIRST_CAPTURE_ARGS, JSON.stringify(args));',
+        'if (JSON.stringify(args) !== JSON.stringify(["init","--codex","-y","-u","matrix","--lang","en"])) process.exit(7);',
+        'function write(relativePath, contents) {',
+        '  const filePath = path.join(process.cwd(), relativePath);',
+        '  fs.mkdirSync(path.dirname(filePath), { recursive: true });',
+        '  fs.writeFileSync(filePath, contents);',
+        '}',
+        'write("AGENTS.md", "content");',
+        'write(".codex/spec-first/state.json", "{}");',
+        'write(".agents/skills/spec-work/SKILL.md", "content");',
+        'write(".agents/skills/spec-mcp-setup/SKILL.md", "content");',
+        'console.log("fake cli init ok");',
+      ].join('\n'));
+
+      const evidence = runInitCliEvidence({
+        packageRoot,
+        cwd: projectRoot,
+        host: 'codex',
+        artifacts: {
+          write(name, content) {
+            artifactWrites[name] = String(content);
+          },
+        },
+      });
+
+      expect(JSON.parse(fs.readFileSync(argsPath, 'utf8'))).toEqual([
+        'init',
+        '--codex',
+        '-y',
+        '-u',
+        'matrix',
+        '--lang',
+        'en',
+      ]);
+      expect(evidence).toEqual(expect.objectContaining({
+        host: 'codex',
+        status: 0,
+        passed: true,
+        reason_code: 'init-cli-passed',
+        artifact_path: INIT_CODEX_CLI_LOG_FILE,
+        missing_runtime_paths: [],
+      }));
+      expect(artifactWrites[INIT_CODEX_CLI_LOG_FILE]).toContain('command=spec-first init --codex -y -u <name> --lang <lang>');
+      expect(artifactWrites[INIT_CODEX_CLI_LOG_FILE]).toContain('passed=true');
+    } finally {
+      if (previousCaptureArgs === undefined) {
+        delete process.env.SPEC_FIRST_CAPTURE_ARGS;
+      } else {
+        process.env.SPEC_FIRST_CAPTURE_ARGS = previousCaptureArgs;
+      }
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   test('Cursor doctor and clean programmatic evidence validates generated runtime assets', () => {

@@ -14,6 +14,16 @@
 - 历史例外：如果存在高频主模式和少量旧项目/旧页面/迁移期反例，规则可以写“新增代码优先沿用主模式”或“不要扩大历史例外”；不要把主模式写成全仓库事实或绝对禁令。
 - 绝对化措辞：除非证据在目标适用范围内压倒性一致，不要使用“统一”“只”“永远”“不得”“禁止”等全称表达；需要强约束时必须同时给出 scope 或例外边界。
 
+## 大仓候选导航
+
+大仓库、monorepo 或 hidden association 难以直接定位时，可以把 `code-graph` / `project-graph` capability-class 输出作为 `provider_untrusted` 候选导航，用来决定下一批 source refs。遵守当前仓库 `docs/contracts/project-graph-consumption.md` 的 candidate-only 口径；若该合同在运行目标不可见，按本小节最小边界执行。
+
+- 候选只回答“先看哪里”，不能证明规则、频率、80% 一致性、包级适用范围、hidden association 或 anti-pattern。
+- 每条进入规则正文的模式仍必须由当前目标仓库源码、测试、配置或已有人写规则文件确认；记录代表性 source refs。
+- 候选不可用、stale、unknown、unverified、失败或不安全时，直接回退到 bounded source reads、`rg`、ast-grep 和分层抽样；不要阻塞规则挖掘。
+- 不从本 skill 运行图谱刷新、索引生成、repair 或 mutation；不要读取完整 raw graph artifact，例如 `graph.json`。
+- 如果候选影响了阅读顺序，在 preview/closeout 的 `limitations` 或 `evidence_summary` 里说明查询摘要、采纳/拒绝的候选和回源确认结果。
+
 ## 必查类别
 
 ### 1. 函数与代码体风格

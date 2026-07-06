@@ -1111,6 +1111,7 @@ module.exports = {
   runChild,
   runChildResult,
   runGit,
+  runInitCliEvidence,
   runInstalledBin,
   runInstalledBinResult,
   runInstalledCliInitResult,

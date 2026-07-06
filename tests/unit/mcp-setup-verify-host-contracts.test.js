@@ -119,8 +119,8 @@ describe('spec-mcp-setup verify host propagation contract', () => {
           target_kind: 'parent-workspace',
           workspace_root: workspace,
           candidates: [
-            { repo_label: 'repo-a', workspace_relative_path: repoA },
-            { repo_label: 'repo-b', workspace_relative_path: repoB },
+            { repo_label: 'repo-a', git_root: repoA, workspace_relative_path: 'repo-a' },
+            { repo_label: 'repo-b', git_root: repoB, workspace_relative_path: 'repo-b' },
           ],
           git_health: { status: 'ok', reason_code: 'git-ok' },
         }),
@@ -194,7 +194,12 @@ describe('spec-mcp-setup verify host propagation contract', () => {
         reason_code: 'generated-runtime-manifest-refresh-required',
       });
       expect(repoAResult.result.generated_runtime_manifest.status).toBe('stale');
+      expect(repoAResult.result.generated_runtime_manifest.next_action).toBe('spec-first init --repo repo-a -y -u <name>');
+      expect(repoAResult.result.next_actions).toContain('spec-first init --repo repo-a -y -u <name>');
+      expect(repoAResult.result.next_actions).not.toContain('spec-first init -y');
       expect(repoBResult.overall_status).toBe('ready');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --repo <child> -y -u <name>');
       expect(summary.next_action).toContain('spec-first init -y -u <name>');
       expect(summary.next_action).toContain('spec-first init --repo <child> -y -u <name>');
     } finally {

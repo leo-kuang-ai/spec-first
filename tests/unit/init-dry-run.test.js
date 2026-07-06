@@ -87,10 +87,14 @@ function parseProgrammaticInitArgs(cwd, args) {
     if (fs.existsSync(path.join(cwd, '.git'))) {
       return { error: 'Error: --all-repos must be run from a parent workspace, not inside a Git repo.' };
     }
+    const candidates = discoverTestChildRepos(cwd);
+    if (candidates.length === 0) {
+      return { error: 'Error: --all-repos requires a parent workspace containing child Git repos.' };
+    }
     options.target = {
       mode: 'all-repos',
       workspaceRoot: cwd,
-      candidates: discoverTestChildRepos(cwd),
+      candidates,
       selectionSource: 'explicit-all-repos',
     };
     return options;
@@ -106,10 +110,14 @@ function parseProgrammaticInitArgs(cwd, args) {
     if (!realProject.startsWith(`${realCwd}${path.sep}`) && realProject !== realCwd) {
       return { error: 'Error: --repo target must be inside the current workspace.' };
     }
-    options.projectRoot = realProject;
+    const gitRoot = findTestGitRoot(realProject);
+    if (!gitRoot || (!gitRoot.startsWith(`${realCwd}${path.sep}`) && gitRoot !== realCwd)) {
+      return { error: 'Error: --repo target must resolve to a Git repo inside the current workspace.' };
+    }
+    options.projectRoot = gitRoot;
     options.target = {
       mode: 'single-repo',
-      projectRoot: realProject,
+      projectRoot: gitRoot,
       selectionSource: 'explicit-repo',
     };
     return options;
@@ -141,6 +149,20 @@ function discoverTestChildRepos(workspaceRoot) {
       };
     })
     .sort((left, right) => left.workspace_relative_path.localeCompare(right.workspace_relative_path));
+}
+
+function findTestGitRoot(startPath) {
+  let current = fs.statSync(startPath).isDirectory() ? startPath : path.dirname(startPath);
+  while (true) {
+    if (fs.existsSync(path.join(current, '.git'))) {
+      return fs.realpathSync.native(current);
+    }
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return '';
+    }
+    current = parent;
+  }
 }
 
 function snapshotTree(rootDir) {
@@ -980,21 +1002,33 @@ describe('init --dry-run', () => {
   test('init rejects invalid workspace target flag combinations', () => {
     const projectRoot = makeTempDir();
     const workspaceRoot = makeTempDir();
+    const emptyWorkspaceRoot = makeTempDir();
 
     try {
       fs.mkdirSync(path.join(projectRoot, '.git'), { recursive: true });
       fs.mkdirSync(path.join(workspaceRoot, 'project-a', '.git'), { recursive: true });
+      fs.mkdirSync(path.join(workspaceRoot, 'not-git'), { recursive: true });
 
       const allReposInsideGit = captureInit(projectRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']);
       expect(allReposInsideGit.exitCode).toBe(2);
       expect(allReposInsideGit.stderr).toContain('--all-repos must be run from a parent workspace');
       expect(fs.existsSync(path.join(projectRoot, '.gitignore'))).toBe(false);
 
+      const allReposWithoutChildren = captureInit(emptyWorkspaceRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']);
+      expect(allReposWithoutChildren.exitCode).toBe(2);
+      expect(allReposWithoutChildren.stderr).toContain('--all-repos requires a parent workspace containing child Git repos');
+      expect(fs.existsSync(path.join(emptyWorkspaceRoot, '.gitignore'))).toBe(false);
+
       const conflicting = captureInit(workspaceRoot, ['--codex', '--all-repos', '--repo', 'project-a', '-u', 'reviewer', '--lang', 'zh']);
       expect(conflicting.exitCode).toBe(2);
       expect(conflicting.stderr).toContain('Cannot combine --repo and --all-repos');
       expect(fs.existsSync(path.join(workspaceRoot, '.gitignore'))).toBe(false);
       expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(false);
+
+      const nonGitRepo = captureInit(workspaceRoot, ['--codex', '--repo', 'not-git', '-u', 'reviewer', '--lang', 'zh']);
+      expect(nonGitRepo.exitCode).toBe(2);
+      expect(nonGitRepo.stderr).toContain('--repo target must resolve to a Git repo inside the current workspace');
+      expect(fs.existsSync(path.join(workspaceRoot, 'not-git', '.gitignore'))).toBe(false);
 
       const emptyRepoEquals = captureInit(workspaceRoot, ['--codex', '--repo=', '-u', 'reviewer', '--lang', 'zh']);
       expect(emptyRepoEquals.exitCode).toBe(2);
@@ -1003,6 +1037,7 @@ describe('init --dry-run', () => {
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
       fs.rmSync(workspaceRoot, { recursive: true, force: true });
+      fs.rmSync(emptyWorkspaceRoot, { recursive: true, force: true });
     }
   });
 
