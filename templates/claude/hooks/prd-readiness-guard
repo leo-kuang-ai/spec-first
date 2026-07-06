@@ -2,18 +2,14 @@
 'use strict';
 
 // Cross-platform Stop PRD readiness guard. Claude Code invokes this in exec form
-// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
-// Windows without a POSIX shell. The project dir arrives as argv[2]; fall back to
-// CLAUDE_PROJECT_DIR then cwd. The hook event payload arrives as JSON on stdin (unused here).
+// (`node .claude/hooks/prd-readiness-guard`), so it runs identically on macOS, Linux, and
+// Windows without a POSIX shell. Project dir comes from CLAUDE_PROJECT_DIR env / argv[2] /
+// cwd (see resolveProjectDir). The hook event payload arrives as JSON on stdin (unused here).
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const projectDir = (process.argv[2] && process.argv[2].trim())
-  ? process.argv[2]
-  : (process.env.CLAUDE_PROJECT_DIR && process.env.CLAUDE_PROJECT_DIR.trim()
-    ? process.env.CLAUDE_PROJECT_DIR
-    : process.cwd());
+const projectDir = resolveProjectDir();
 const finalizeScript = path.join(
   projectDir,
   '.claude',
@@ -219,6 +215,21 @@ function extractSourceInputs(prdPath) {
     }
   }
   return inputs;
+}
+
+// Exec form does not expand $CLAUDE_PROJECT_DIR, so prefer the env var Claude exports, then
+// a real argv[2] (reject the literal placeholder from a stale settings.json), then cwd
+// (Claude runs the hook with cwd = project root).
+function resolveProjectDir() {
+  const fromEnv = process.env.CLAUDE_PROJECT_DIR;
+  if (typeof fromEnv === 'string' && fromEnv.trim()) {
+    return fromEnv;
+  }
+  const fromArg = process.argv[2];
+  if (typeof fromArg === 'string' && fromArg.trim() && fromArg !== '$CLAUDE_PROJECT_DIR') {
+    return fromArg;
+  }
+  return process.cwd();
 }
 
 function block(reason) {

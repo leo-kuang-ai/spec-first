@@ -11,16 +11,24 @@ const SPEC_PLAN_COMMAND_NAME = 'spec-plan';
 // PowerShell when Git Bash is absent — a bash-only string like
 // `"$CLAUDE_PROJECT_DIR"/.claude/hooks/session-start` then fails (PowerShell reads
 // `$CLAUDE_PROJECT_DIR` as an undefined variable and cannot execute an extensionless
-// bash script). Exec form spawns `node` directly with no shell on any platform, and
-// `$CLAUDE_PROJECT_DIR` is substituted into each args element as a plain string, so the
-// same managed hooks work on macOS, Linux, and Windows with or without Git Bash. The hook
-// files themselves are Node scripts (see templates/claude/hooks/*).
+// bash script). Exec form spawns `node` directly with no shell on any platform, so the
+// managed hooks work on macOS, Linux, and Windows with or without Git Bash. The hook files
+// are Node scripts (see templates/claude/hooks/*).
+//
+// The hook path in args is PROJECT-ROOT-RELATIVE (`.claude/hooks/xxx`), NOT
+// `$CLAUDE_PROJECT_DIR/.claude/hooks/xxx`. In exec form there is no shell, and Claude Code
+// does NOT variable-expand `$CLAUDE_PROJECT_DIR` inside args — only dedicated path
+// placeholders like `$CLAUDE_PLUGIN_ROOT` are substituted. A literal `$CLAUDE_PROJECT_DIR`
+// would be passed to node verbatim and resolved against cwd, producing
+// `<cwd>/$CLAUDE_PROJECT_DIR/.claude/hooks/xxx` -> MODULE_NOT_FOUND. Claude Code runs the
+// hook with cwd set to the project root, so a relative `.claude/hooks/xxx` resolves
+// correctly on every platform, and each hook reads its project dir from
+// `CLAUDE_PROJECT_DIR` env / stdin `cwd` / `process.cwd()`.
 const HOOK_INTERPRETER = 'node';
-const SESSION_START_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/session-start';
-const SPEC_PLAN_GUARD_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/spec-plan-guard';
-const PRD_PREWRITE_GUARD_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/prd-prewrite-guard';
-const PRD_READINESS_GUARD_HOOK_PATH = '$CLAUDE_PROJECT_DIR/.claude/hooks/prd-readiness-guard';
-const PROJECT_DIR_ARG = '$CLAUDE_PROJECT_DIR';
+const SESSION_START_HOOK_PATH = '.claude/hooks/session-start';
+const SPEC_PLAN_GUARD_HOOK_PATH = '.claude/hooks/spec-plan-guard';
+const PRD_PREWRITE_GUARD_HOOK_PATH = '.claude/hooks/prd-prewrite-guard';
+const PRD_READINESS_GUARD_HOOK_PATH = '.claude/hooks/prd-readiness-guard';
 
 // Legacy bash shell-form commands from before the exec-form migration. Kept only so that
 // detection/removal still recognizes and cleans a pre-migration managed hook on refresh.
@@ -73,15 +81,16 @@ const MANAGED_HOOK_DEFINITIONS = [
   },
 ];
 
-// Exec-form managed hook: `node <hook-path> $CLAUDE_PROJECT_DIR`. Each args element is a
-// plain string (Claude substitutes $CLAUDE_PROJECT_DIR without shell tokenization), and no
-// shell runs, so this is Windows-safe with or without Git Bash. The trailing project-dir
-// arg is read by the hook (argv[2]); hooks that only need stdin ignore it harmlessly.
+// Exec-form managed hook: `node .claude/hooks/<name>`. No shell runs, so this is Windows-
+// safe with or without Git Bash. The single args element is the project-root-relative hook
+// path, which resolves against Claude Code's hook cwd (the project root). The hook derives
+// its own project dir from CLAUDE_PROJECT_DIR env / stdin `cwd` / process.cwd() rather than
+// a literal $CLAUDE_PROJECT_DIR arg (exec form does not expand it).
 function buildExecFormHook(hookPath) {
   return {
     type: 'command',
     command: HOOK_INTERPRETER,
-    args: [hookPath, PROJECT_DIR_ARG],
+    args: [hookPath],
   };
 }
 

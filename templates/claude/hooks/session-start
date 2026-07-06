@@ -2,14 +2,16 @@
 'use strict';
 
 // Cross-platform SessionStart hook. Claude Code invokes this in exec form
-// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
-// Windows (with or without Git Bash) without relying on a POSIX shell, bash-only heredocs,
-// or shell variable expansion. The project dir arrives as argv[2]; fall back to cwd.
+// (`node .claude/hooks/session-start`), so it runs identically on macOS, Linux, and Windows
+// (with or without Git Bash) without relying on a POSIX shell, bash-only heredocs, or shell
+// variable expansion. Exec form does not expand $CLAUDE_PROJECT_DIR, so the project dir is
+// taken from the CLAUDE_PROJECT_DIR env var Claude exports, then argv[2] (legacy), then cwd
+// (Claude runs the hook with cwd = project root).
 const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const projectDir = process.argv[2] && process.argv[2].trim() ? process.argv[2] : process.cwd();
+const projectDir = resolveProjectDir();
 const instructionPath = path.join(projectDir, 'CLAUDE.md');
 const SPEC_FIRST_CLI_PATH = "__SPEC_FIRST_CLI_PATH__";
 const BOOTSTRAP_START = '<!-- spec-first:bootstrap:start -->';
@@ -64,6 +66,18 @@ process.stdout.write(JSON.stringify({
     additionalContext,
   },
 }));
+
+function resolveProjectDir() {
+  const fromEnv = process.env.CLAUDE_PROJECT_DIR;
+  if (typeof fromEnv === 'string' && fromEnv.trim()) {
+    return fromEnv;
+  }
+  const fromArg = process.argv[2];
+  if (typeof fromArg === 'string' && fromArg.trim() && fromArg !== '$CLAUDE_PROJECT_DIR') {
+    return fromArg;
+  }
+  return process.cwd();
+}
 
 function readInstructionBody(filePath) {
   try {

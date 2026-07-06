@@ -108,7 +108,7 @@ describe('claude settings', () => {
       {
         type: 'command',
         command: 'node',
-        args: [PRD_PREWRITE_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR'],
+        args: [PRD_PREWRITE_GUARD_COMMAND],
       },
     ]);
   });
@@ -177,19 +177,20 @@ describe('claude settings', () => {
 
       const settings = readJson(getClaudeSettingsPath(projectRoot));
       // Exec form: command is the node interpreter, and the managed hook path plus the
-      // $CLAUDE_PROJECT_DIR arg live in args.
+      // project-root-relative hook path live in args (single element, no
+      // $CLAUDE_PROJECT_DIR literal — exec form does not expand it).
       expect(settings.hooks.SessionStart).toHaveLength(1);
       expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.SessionStart[0].hooks[0].args).toEqual([SESSION_START_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.SessionStart[0].hooks[0].args).toEqual([SESSION_START_COMMAND]);
       expect(settings.hooks.UserPromptExpansion).toHaveLength(1);
       expect(settings.hooks.UserPromptExpansion[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.UserPromptExpansion[0].hooks[0].args).toEqual([SPEC_PLAN_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.UserPromptExpansion[0].hooks[0].args).toEqual([SPEC_PLAN_GUARD_COMMAND]);
       expect(settings.hooks.PreToolUse).toHaveLength(1);
       expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.PreToolUse[0].hooks[0].args).toEqual([PRD_PREWRITE_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.PreToolUse[0].hooks[0].args).toEqual([PRD_PREWRITE_GUARD_COMMAND]);
       expect(settings.hooks.Stop).toHaveLength(1);
       expect(settings.hooks.Stop[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.Stop[0].hooks[0].args).toEqual([PRD_READINESS_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.Stop[0].hooks[0].args).toEqual([PRD_READINESS_GUARD_COMMAND]);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
