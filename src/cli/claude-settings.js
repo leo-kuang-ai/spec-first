@@ -51,12 +51,22 @@ const PRD_PREWRITE_GUARD_COMMAND = PRD_PREWRITE_GUARD_HOOK_PATH;
 const PRD_READINESS_GUARD_COMMAND = PRD_READINESS_GUARD_HOOK_PATH;
 
 const MANAGED_HOOK_PATH_PATTERN = /(^|[^A-Za-z0-9_])\.claude\/hooks\/(?:session-start|spec-plan-guard|prd-prewrite-guard|prd-readiness-guard)(\s|"|$)/;
+// Current (relative) exec-form arg paths.
 const MANAGED_HOOK_ARG_PATHS = [
   SESSION_START_HOOK_PATH,
   SPEC_PLAN_GUARD_HOOK_PATH,
   PRD_PREWRITE_GUARD_HOOK_PATH,
   PRD_READINESS_GUARD_HOOK_PATH,
 ];
+// Legacy exec-form arg paths from the first exec-form migration, which incorrectly prefixed
+// a literal `$CLAUDE_PROJECT_DIR/` (that Claude never expands). Removal must still recognize
+// these so a refresh replaces the broken hook instead of leaving a duplicate alongside the
+// corrected one.
+const LEGACY_EXEC_FORM_ARG_PATHS = MANAGED_HOOK_ARG_PATHS.map((p) => `$CLAUDE_PROJECT_DIR/${p}`);
+const REMOVABLE_EXEC_FORM_ARG_PATHS = new Set([
+  ...MANAGED_HOOK_ARG_PATHS,
+  ...LEGACY_EXEC_FORM_ARG_PATHS,
+]);
 
 const MANAGED_HOOK_DEFINITIONS = [
   {
@@ -154,9 +164,11 @@ function isManagedHookForRemoval(hook) {
     return false;
   }
 
-  // Current exec form: node + args whose first element is exactly a managed hook path.
+  // Exec form: node + args containing a managed hook path. Matches both the current
+  // relative paths and the legacy `$CLAUDE_PROJECT_DIR/`-prefixed paths so a refresh
+  // replaces a broken legacy exec-form hook instead of leaving a duplicate.
   if (hook.command === HOOK_INTERPRETER && Array.isArray(hook.args)) {
-    if (hook.args.some((arg) => MANAGED_HOOK_ARG_PATHS.includes(arg))) {
+    if (hook.args.some((arg) => REMOVABLE_EXEC_FORM_ARG_PATHS.has(arg))) {
       return true;
     }
   }
