@@ -64,18 +64,18 @@ describe('spec-first update command', () => {
     expect(stdout).toContain('Runtime refresh completed.');
   });
 
-  test('successful npm install: parent workspace refresh uses init --all-repos', async () => {
+  test('successful npm install: parent workspace refresh uses parent-only init', async () => {
     const { runInstall } = makeInstaller({ status: 0, errorCode: null });
     const refresh = makeRuntimeRefresh({ status: 0, errorCode: null });
     const { exitCode, stdout } = await captureUpdate([], {
       runInstall,
       runRuntimeRefresh: refresh.runRuntimeRefresh,
-      resolveRuntimeRefreshCommand: () => ({ args: ['init', '--all-repos', '-y'], cwd: '/workspace' }),
+      resolveRuntimeRefreshCommand: () => ({ args: ['init', '-y'], cwd: '/workspace' }),
     });
 
     expect(exitCode).toBe(0);
-    expect(refresh.calls).toEqual([{ args: ['init', '--all-repos', '-y'], options: { cwd: '/workspace' } }]);
-    expect(stdout).toContain('spec-first init --all-repos -y');
+    expect(refresh.calls).toEqual([{ args: ['init', '-y'], options: { cwd: '/workspace' } }]);
+    expect(stdout).toContain('spec-first init -y');
   });
 
   test('default runtime refresh resolver detects a real parent workspace', () => {
@@ -85,7 +85,7 @@ describe('spec-first update command', () => {
       fs.mkdirSync(path.join(workspaceRoot, 'project-b', '.git'), { recursive: true });
 
       expect(resolveRuntimeRefreshCommand(workspaceRoot)).toEqual({
-        args: ['init', '--all-repos', '-y'],
+        args: ['init', '-y'],
         cwd: path.resolve(workspaceRoot),
         reason_code: 'parent-workspace',
         child_repo_count: 2,
@@ -120,8 +120,9 @@ describe('spec-first update command', () => {
 
     expect(exitCode).toBe(1);
     expect(stderr).toContain('Runtime refresh: degraded');
-    expect(stderr).toContain('Single repo: spec-first init -y');
-    expect(stderr).toContain('Parent workspace: spec-first init --all-repos -y');
+    expect(stderr).toContain('Single repo: spec-first init -y -u <name>');
+    expect(stderr).toContain('Parent workspace: spec-first init -y -u <name>');
+    expect(stderr).toContain('Child repo: spec-first init --repo <path> -y -u <name>');
   });
 
   test('unknown refresh scope prints fallback commands without spawning init', async () => {
@@ -139,8 +140,9 @@ describe('spec-first update command', () => {
     expect(refresh.calls).toHaveLength(0);
     expect(clearVersionReminderCooldown).toHaveBeenCalledTimes(1);
     expect(stdout).toContain('Runtime refresh: skipped');
-    expect(stderr).toContain('Single repo: spec-first init -y');
-    expect(stderr).toContain('Parent workspace: spec-first init --all-repos -y');
+    expect(stderr).toContain('Single repo: spec-first init -y -u <name>');
+    expect(stderr).toContain('Parent workspace: spec-first init -y -u <name>');
+    expect(stderr).toContain('Child repo: spec-first init --repo <path> -y -u <name>');
   });
 
   test('successful update remains successful when version reminder cleanup fails', async () => {

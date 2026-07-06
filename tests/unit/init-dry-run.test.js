@@ -40,7 +40,7 @@ function captureInit(cwd, args) {
       stdout: [
         'After successful init',
         'For lightweight work, start the matching spec-* workflow',
-        'init asks whether to initialize all child repos',
+        'parent workspace defaults to workspace-only init',
         'spec-mcp-setup',
       ].join('\n'),
       stderr: '',
@@ -87,10 +87,14 @@ function parseProgrammaticInitArgs(cwd, args) {
     if (fs.existsSync(path.join(cwd, '.git'))) {
       return { error: 'Error: --all-repos must be run from a parent workspace, not inside a Git repo.' };
     }
+    const candidates = discoverTestChildRepos(cwd);
+    if (candidates.length === 0) {
+      return { error: 'Error: --all-repos requires a parent workspace containing child Git repos.' };
+    }
     options.target = {
       mode: 'all-repos',
       workspaceRoot: cwd,
-      candidates: discoverTestChildRepos(cwd),
+      candidates,
       selectionSource: 'explicit-all-repos',
     };
     return options;
@@ -106,21 +110,27 @@ function parseProgrammaticInitArgs(cwd, args) {
     if (!realProject.startsWith(`${realCwd}${path.sep}`) && realProject !== realCwd) {
       return { error: 'Error: --repo target must be inside the current workspace.' };
     }
-    options.projectRoot = realProject;
+    const gitRoot = findTestGitRoot(realProject);
+    if (!gitRoot || (!gitRoot.startsWith(`${realCwd}${path.sep}`) && gitRoot !== realCwd)) {
+      return { error: 'Error: --repo target must resolve to a Git repo inside the current workspace.' };
+    }
+    options.projectRoot = gitRoot;
     options.target = {
       mode: 'single-repo',
-      projectRoot: realProject,
+      projectRoot: gitRoot,
       selectionSource: 'explicit-repo',
     };
     return options;
   }
   const candidates = discoverTestChildRepos(cwd);
   if (!fs.existsSync(path.join(cwd, '.git')) && candidates.length > 0) {
+    options.gitRootTopology = 'multi-repo-workspace';
     options.target = {
-      mode: 'all-repos',
+      mode: 'single-repo',
+      projectRoot: cwd,
       workspaceRoot: cwd,
-      candidates,
-      selectionSource: 'workspace-default-all-repos',
+      gitRootTopology: 'multi-repo-workspace',
+      selectionSource: 'parent-workspace-default',
     };
   }
   return options;
@@ -139,6 +149,20 @@ function discoverTestChildRepos(workspaceRoot) {
       };
     })
     .sort((left, right) => left.workspace_relative_path.localeCompare(right.workspace_relative_path));
+}
+
+function findTestGitRoot(startPath) {
+  let current = fs.statSync(startPath).isDirectory() ? startPath : path.dirname(startPath);
+  while (true) {
+    if (fs.existsSync(path.join(current, '.git'))) {
+      return fs.realpathSync.native(current);
+    }
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return '';
+    }
+    current = parent;
+  }
 }
 
 function snapshotTree(rootDir) {
@@ -322,7 +346,7 @@ describe('init --dry-run', () => {
       expect(result.stderr).toBe('');
       expect(result.stdout).toContain('After successful init');
       expect(result.stdout).toContain('For lightweight work, start the matching spec-* workflow');
-      expect(result.stdout).toContain('init asks whether to initialize all child repos');
+      expect(result.stdout).toContain('parent workspace defaults to workspace-only init');
       expect(result.stdout).toContain('spec-mcp-setup');
       expect(result.stdout).not.toContain('/spec:standards');
       expect(result.stdout).not.toContain('$spec-standards');
@@ -839,7 +863,7 @@ describe('init --dry-run', () => {
     }
   });
 
-  test('init preserves single repo behavior and auto-batches parent workspaces into child repos', () => {
+  test('init preserves single repo behavior and keeps parent workspaces parent-only by default', () => {
     const monorepoRoot = makeTempDir();
     const workspaceRoot = makeTempDir();
 
@@ -860,22 +884,27 @@ describe('init --dry-run', () => {
       expect(fs.existsSync(path.join(workspaceRoot, 'AGENTS.md'))).toBe(true);
       expect(fs.existsSync(path.join(workspaceRoot, '.agents', 'skills', 'spec-mcp-setup', 'mcp-tools.json'))).toBe(true);
       expect(fs.existsSync(path.join(workspaceRoot, '.codex'))).toBe(true);
-      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(false);
       expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'config'))).toBe(false);
-      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(true);
-      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(false);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(false);
       const parentAgents = fs.readFileSync(path.join(workspaceRoot, 'AGENTS.md'), 'utf8');
-      const childAgents = fs.readFileSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'), 'utf8');
       expect(parentAgents).toContain('target_repo');
       expect(parentAgents).toContain('父级多仓 workspace');
       expect(parentAgents).toContain('per-child scope');
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'))).toBe(false);
+
+      expect(captureInit(workspaceRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']).exitCode).toBe(0);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(true);
+      const childAgents = fs.readFileSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'), 'utf8');
       expect(childAgents).toContain('target_repo');
       expect(fs.readFileSync(path.join(workspaceRoot, 'project-a', '.gitignore'), 'utf8')).toContain(buildSpecFirstGitignoreBlock());
       expect(fs.readFileSync(path.join(workspaceRoot, 'project-b', '.gitignore'), 'utf8')).toContain(buildSpecFirstGitignoreBlock());
 
       const summary = JSON.parse(fs.readFileSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'), 'utf8'));
       expect(summary.schema_version).toBe('workspace-init-summary.v1');
-      expect(summary.selection_source).toBe('workspace-default-all-repos');
+      expect(summary.selection_source).toBe('explicit-all-repos');
       expect(summary.parent_writes_repo_local_artifacts).toBe(false);
       expect(summary.parent_writes_host_runtime_assets).toBe(true);
       expect(summary.parent_host_runtime.overall_status).toBe('ready');
@@ -973,21 +1002,33 @@ describe('init --dry-run', () => {
   test('init rejects invalid workspace target flag combinations', () => {
     const projectRoot = makeTempDir();
     const workspaceRoot = makeTempDir();
+    const emptyWorkspaceRoot = makeTempDir();
 
     try {
       fs.mkdirSync(path.join(projectRoot, '.git'), { recursive: true });
       fs.mkdirSync(path.join(workspaceRoot, 'project-a', '.git'), { recursive: true });
+      fs.mkdirSync(path.join(workspaceRoot, 'not-git'), { recursive: true });
 
       const allReposInsideGit = captureInit(projectRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']);
       expect(allReposInsideGit.exitCode).toBe(2);
       expect(allReposInsideGit.stderr).toContain('--all-repos must be run from a parent workspace');
       expect(fs.existsSync(path.join(projectRoot, '.gitignore'))).toBe(false);
 
+      const allReposWithoutChildren = captureInit(emptyWorkspaceRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']);
+      expect(allReposWithoutChildren.exitCode).toBe(2);
+      expect(allReposWithoutChildren.stderr).toContain('--all-repos requires a parent workspace containing child Git repos');
+      expect(fs.existsSync(path.join(emptyWorkspaceRoot, '.gitignore'))).toBe(false);
+
       const conflicting = captureInit(workspaceRoot, ['--codex', '--all-repos', '--repo', 'project-a', '-u', 'reviewer', '--lang', 'zh']);
       expect(conflicting.exitCode).toBe(2);
       expect(conflicting.stderr).toContain('Cannot combine --repo and --all-repos');
       expect(fs.existsSync(path.join(workspaceRoot, '.gitignore'))).toBe(false);
       expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(false);
+
+      const nonGitRepo = captureInit(workspaceRoot, ['--codex', '--repo', 'not-git', '-u', 'reviewer', '--lang', 'zh']);
+      expect(nonGitRepo.exitCode).toBe(2);
+      expect(nonGitRepo.stderr).toContain('--repo target must resolve to a Git repo inside the current workspace');
+      expect(fs.existsSync(path.join(workspaceRoot, 'not-git', '.gitignore'))).toBe(false);
 
       const emptyRepoEquals = captureInit(workspaceRoot, ['--codex', '--repo=', '-u', 'reviewer', '--lang', 'zh']);
       expect(emptyRepoEquals.exitCode).toBe(2);
@@ -996,6 +1037,7 @@ describe('init --dry-run', () => {
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
       fs.rmSync(workspaceRoot, { recursive: true, force: true });
+      fs.rmSync(emptyWorkspaceRoot, { recursive: true, force: true });
     }
   });
 

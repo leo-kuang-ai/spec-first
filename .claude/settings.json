@@ -6,7 +6,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session-start"
+            "command": "node",
+            "args": [
+              ".claude/hooks/session-start"
+            ]
           }
         ]
       }
@@ -17,7 +20,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/spec-plan-guard"
+            "command": "node",
+            "args": [
+              ".claude/hooks/spec-plan-guard"
+            ]
           }
         ]
       }
@@ -28,7 +34,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/prd-prewrite-guard"
+            "command": "node",
+            "args": [
+              ".claude/hooks/prd-prewrite-guard"
+            ]
           }
         ]
       }
@@ -39,7 +48,10 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/prd-readiness-guard"
+            "command": "node",
+            "args": [
+              ".claude/hooks/prd-readiness-guard"
+            ]
           }
         ]
       }

@@ -140,7 +140,7 @@ function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
   const childRepos = discoverChildGitRepos(root);
   if (childRepos.length > 0) {
     return {
-      args: ['init', '--all-repos', '-y'],
+      args: ['init', '-y'],
       cwd: root,
       reason_code: 'parent-workspace',
       child_repo_count: childRepos.length,
@@ -156,8 +156,9 @@ function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
 
 function printRuntimeRefreshFallback() {
   console.error('Fallback commands:');
-  console.error('  Single repo: spec-first init -y');
-  console.error('  Parent workspace: spec-first init --all-repos -y');
+  console.error('  Single repo: spec-first init -y -u <name>');
+  console.error('  Parent workspace: spec-first init -y -u <name>');
+  console.error('  Child repo: spec-first init --repo <path> -y -u <name>');
 }
 
 function formatSpecFirstCommand(args) {

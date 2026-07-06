@@ -13,6 +13,7 @@ const RELEASE_EVIDENCE_SCHEMA_PATH = path.join(REPO_ROOT, 'docs', 'contracts', '
 const KNOWLEDGE_HARNESS_CONTRACT_PATH = 'docs/contracts/knowledge/knowledge-harness.md';
 
 const {
+  buildInitCliEvidence,
   buildInitProgrammaticEvidence,
   buildPackageContentManifest,
   buildCmdCommandLine,
@@ -22,13 +23,17 @@ const {
   buildReleaseArtifactSummary,
   checkFromCursorProgrammaticEvidence,
   checkFromCursorLoaderEvidence,
+  checkFromInitCliEvidence,
   createArtifactWriter,
   CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
   CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+  INIT_CODEX_CLI_LOG_FILE,
   getEnvValue,
   normalizeArtifactFileName,
   resolveNpmCliPath,
+  runInitCliEvidence,
   runWindowsCmdShim,
+  runWindowsCmdShimResult,
 } = require('../../scripts/npm-install-matrix-smoke');
 
 const VALID_PACK_FILES = [
@@ -61,6 +66,7 @@ const REQUIRED_RELEASE_CHECK_IDS = [
   'package-content-manifest',
   'init-claude-programmatic',
   'init-codex-programmatic',
+  'init-codex-cli',
   'init-cursor-programmatic',
   'init-kiro-programmatic',
   'init-qoder-programmatic',
@@ -145,6 +151,49 @@ describe('npm install matrix smoke script', () => {
         '/d',
         '/c',
         'call "C:\\Temp\\prefix with spaces\\spec-first.cmd" "--help"',
+      ]);
+    } finally {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  test('runs Windows cmd shim result wrapper through the same quoted call path', () => {
+    if (process.platform === 'win32') return;
+
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-cmd-shim-result-'));
+    const fakeComspec = path.join(tempDir, 'fake-cmd.js');
+    const argsPath = path.join(tempDir, 'args.json');
+
+    try {
+      fs.writeFileSync(fakeComspec, [
+        '#!/usr/bin/env node',
+        'const fs = require("node:fs");',
+        'fs.writeFileSync(process.env.SPEC_FIRST_CAPTURE_ARGS, JSON.stringify(process.argv.slice(2)));',
+        'console.log("shim-result-ok");',
+        '',
+      ].join('\n'));
+      fs.chmodSync(fakeComspec, 0o755);
+
+      const result = runWindowsCmdShimResult('C:\\Temp\\prefix with spaces\\spec-first.cmd', [
+        'init',
+        '--codex',
+        '-y',
+        '-u',
+        'matrix',
+      ], {
+        env: {
+          ...process.env,
+          ComSpec: fakeComspec,
+          SPEC_FIRST_CAPTURE_ARGS: argsPath,
+        },
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.stdout).toContain('shim-result-ok');
+      expect(JSON.parse(fs.readFileSync(argsPath, 'utf8'))).toEqual([
+        '/d',
+        '/c',
+        'call "C:\\Temp\\prefix with spaces\\spec-first.cmd" "init" "--codex" "-y" "-u" "matrix"',
       ]);
     } finally {
       fs.rmSync(tempDir, { recursive: true, force: true });
@@ -301,6 +350,7 @@ describe('npm install matrix smoke script', () => {
       package_content_manifest: 'package-content-manifest.json',
       init_claude_programmatic_log: 'init-claude-programmatic.log',
       init_codex_programmatic_log: 'init-codex-programmatic.log',
+      init_codex_cli_log: 'init-codex-cli.log',
       init_cursor_programmatic_log: 'init-cursor-programmatic.log',
       init_kiro_programmatic_log: 'init-kiro-programmatic.log',
       init_qoder_programmatic_log: 'init-qoder-programmatic.log',
@@ -322,12 +372,14 @@ describe('npm install matrix smoke script', () => {
     expect(Object.values(summary.artifacts).some((artifactPath) => path.isAbsolute(artifactPath))).toBe(false);
   });
 
-  test('release artifact summary schema requires every release evidence check id', () => {
+  test('release artifact summary schema requires the CLI Codex evidence check id', () => {
     const schema = JSON.parse(fs.readFileSync(RELEASE_EVIDENCE_SCHEMA_PATH, 'utf8'));
     const invalid = buildReleaseArtifactSummary({
       generatedAt: '2026-05-11T12:00:00.000Z',
       status: 'passed',
-      checks: [releaseCheck('package-content-manifest')],
+      checks: REQUIRED_RELEASE_CHECK_IDS
+        .filter((checkId) => checkId !== 'init-codex-cli')
+        .map((checkId) => releaseCheck(checkId, checkId === 'cursor-loader-evidence' ? 'skipped' : 'passed')),
       failures: [],
     });
 
@@ -489,6 +541,117 @@ describe('npm install matrix smoke script', () => {
     }));
   });
 
+  test('CLI init evidence covers the real non-interactive init command', () => {
+    const passed = buildInitCliEvidence({
+      host: 'codex',
+      result: {
+        status: 0,
+        stdout: '已安装 Codex SessionStart hook',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.codex/spec-first/state.json:content',
+        '.agents/skills/spec-work/SKILL.md:content',
+        '.agents/skills/spec-mcp-setup/SKILL.md:content',
+      ],
+    });
+
+    expect(passed).toEqual(expect.objectContaining({
+      host: 'codex',
+      status: 0,
+      passed: true,
+      reason_code: 'init-cli-passed',
+      has_state: true,
+      has_instruction: true,
+      mutated: true,
+      missing_runtime_paths: [],
+    }));
+
+    const check = checkFromInitCliEvidence({
+      ...passed,
+      artifact_path: INIT_CODEX_CLI_LOG_FILE,
+    });
+    expect(check).toEqual({
+      check_id: 'init-codex-cli',
+      status: 'passed',
+      reason_code: 'init-cli-passed',
+      summary: 'CLI spec-first init -y for codex passed and wrote expected runtime evidence.',
+      artifact_path: 'init-codex-cli.log',
+    });
+  });
+
+  test('CLI init evidence invokes the packaged CLI path and snapshots its writes', () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-cli-evidence-'));
+    const packageRoot = path.join(tempDir, 'package');
+    const projectRoot = path.join(tempDir, 'project');
+    const argsPath = path.join(tempDir, 'captured-args.json');
+    const previousCaptureArgs = process.env.SPEC_FIRST_CAPTURE_ARGS;
+    const artifactWrites = {};
+
+    try {
+      process.env.SPEC_FIRST_CAPTURE_ARGS = argsPath;
+      fs.mkdirSync(path.join(packageRoot, 'bin'), { recursive: true });
+      fs.mkdirSync(projectRoot, { recursive: true });
+      fs.writeFileSync(path.join(packageRoot, 'bin', 'spec-first.js'), [
+        'const fs = require("node:fs");',
+        'const path = require("node:path");',
+        'const args = process.argv.slice(2);',
+        'fs.writeFileSync(process.env.SPEC_FIRST_CAPTURE_ARGS, JSON.stringify(args));',
+        'if (JSON.stringify(args) !== JSON.stringify(["init","--codex","-y","-u","matrix","--lang","en"])) process.exit(7);',
+        'function write(relativePath, contents) {',
+        '  const filePath = path.join(process.cwd(), relativePath);',
+        '  fs.mkdirSync(path.dirname(filePath), { recursive: true });',
+        '  fs.writeFileSync(filePath, contents);',
+        '}',
+        'write("AGENTS.md", "content");',
+        'write(".codex/spec-first/state.json", "{}");',
+        'write(".agents/skills/spec-work/SKILL.md", "content");',
+        'write(".agents/skills/spec-mcp-setup/SKILL.md", "content");',
+        'console.log("fake cli init ok");',
+      ].join('\n'));
+
+      const evidence = runInitCliEvidence({
+        packageRoot,
+        cwd: projectRoot,
+        host: 'codex',
+        artifacts: {
+          write(name, content) {
+            artifactWrites[name] = String(content);
+          },
+        },
+      });
+
+      expect(JSON.parse(fs.readFileSync(argsPath, 'utf8'))).toEqual([
+        'init',
+        '--codex',
+        '-y',
+        '-u',
+        'matrix',
+        '--lang',
+        'en',
+      ]);
+      expect(evidence).toEqual(expect.objectContaining({
+        host: 'codex',
+        status: 0,
+        passed: true,
+        reason_code: 'init-cli-passed',
+        artifact_path: INIT_CODEX_CLI_LOG_FILE,
+        missing_runtime_paths: [],
+      }));
+      expect(artifactWrites[INIT_CODEX_CLI_LOG_FILE]).toContain('command=spec-first init --codex -y -u <name> --lang <lang>');
+      expect(artifactWrites[INIT_CODEX_CLI_LOG_FILE]).toContain('passed=true');
+    } finally {
+      if (previousCaptureArgs === undefined) {
+        delete process.env.SPEC_FIRST_CAPTURE_ARGS;
+      } else {
+        process.env.SPEC_FIRST_CAPTURE_ARGS = previousCaptureArgs;
+      }
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
   test('Cursor doctor and clean programmatic evidence validates generated runtime assets', () => {
     const doctorEvidence = buildCursorDoctorProgrammaticEvidence({
       packageRoot: REPO_ROOT,
@@ -644,13 +807,14 @@ describe('npm install matrix smoke script', () => {
     expect(script).toContain('release-artifact-summary.json');
     expect(script).toContain('init-claude-programmatic.log');
     expect(script).toContain('init-codex-programmatic.log');
+    expect(script).toContain('init-codex-cli.log');
     expect(script).toContain('init-cursor-programmatic.log');
     expect(script).toContain('init-kiro-programmatic.log');
     expect(script).toContain('init-qoder-programmatic.log');
     expect(script).toContain('cursor-loader-evidence.log');
     expect(script).toContain("['claude', 'codex', 'cursor', 'kiro', 'qoder']");
-    expect(script).not.toContain("['init', '--claude'");
-    expect(script).not.toContain("['init', '--codex'");
+    expect(script).toContain('runInstalledCliInitResult');
+    expect(script).toContain("['init', `--${host}`, '-y', '-u', name, '--lang', lang]");
     expect(script).toContain('cmd.exe');
   });
 });

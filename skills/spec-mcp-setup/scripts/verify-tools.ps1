@@ -182,7 +182,8 @@ function Get-RuntimeStatePathForHost {
 function Get-GeneratedRuntimeManifestHealth {
   param(
     [string]$HostName,
-    [string]$TargetRoot
+    [string]$TargetRoot,
+    [string]$NextAction = 'spec-first init -y -u <name>'
   )
 
   $bundledVersion = Get-BundledManifestVersion
@@ -190,7 +191,7 @@ function Get-GeneratedRuntimeManifestHealth {
   $recordedVersion = ''
   $status = 'unknown'
   $reasonCode = 'unknown-runtime-manifest-health'
-  $nextAction = 'spec-first init -y'
+  $nextAction = $NextAction
 
   if ([string]::IsNullOrWhiteSpace($HostName) -or [string]::IsNullOrWhiteSpace($TargetRoot) -or [string]::IsNullOrWhiteSpace($statePath)) {
     $reasonCode = 'missing-host-or-target-root'
@@ -231,6 +232,17 @@ function Get-GeneratedRuntimeManifestHealth {
     evidence_basis = 'state.manifestVersion vs bundled manifest.version'
     next_action = $nextAction
   }
+}
+
+function Get-GeneratedRuntimeRefreshActionForFacts {
+  param([object]$Facts)
+
+  $selectionSource = [string](Get-NestedValue -InputObject $Facts -PathParts @('target', 'selection_source'))
+  $repoLabel = [string](Get-NestedValue -InputObject $Facts -PathParts @('target', 'repo_label'))
+  if ($selectionSource -eq 'explicit-repo' -and -not [string]::IsNullOrWhiteSpace($repoLabel) -and $repoLabel -ne '.') {
+    return "spec-first init --repo $repoLabel -y -u <name>"
+  }
+  return 'spec-first init -y -u <name>'
 }
 
 function Test-PathIsSymlink {
@@ -529,14 +541,32 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
           $childOverall = 'action-required'
         }
         $childReason = if ($childManifestRefreshRequired) { 'generated-runtime-manifest-refresh-required' } elseif ($childStatus -ne 0 -and [string]::IsNullOrWhiteSpace([string]$childLedger.reason_code)) { 'child-verify-failed' } else { [string]$childLedger.reason_code }
+        $childGeneratedRuntimeManifest = if ($childLedger.PSObject.Properties.Name -contains 'generated_runtime_manifest') { $childLedger.generated_runtime_manifest } else { [pscustomobject]@{ status = 'unknown'; reason_code = 'not-reported' } }
+        $childNextActions = @($childLedger.next_actions)
+        if ($childManifestRefreshRequired) {
+          $childManifestAction = "spec-first init --repo $($child.workspace_relative_path) -y -u <name>"
+          if ($childGeneratedRuntimeManifest -is [System.Collections.IDictionary]) {
+            $childGeneratedRuntimeManifest['next_action'] = $childManifestAction
+          } elseif ($childGeneratedRuntimeManifest.PSObject.Properties.Name -contains 'next_action') {
+            $childGeneratedRuntimeManifest.next_action = $childManifestAction
+          } else {
+            $childGeneratedRuntimeManifest | Add-Member -NotePropertyName 'next_action' -NotePropertyValue $childManifestAction
+          }
+          $childNextActions = @($childNextActions | ForEach-Object {
+            if ($_ -eq 'spec-first init -y' -or $_ -eq 'spec-first init -y -u <name>') { $childManifestAction } else { $_ }
+          })
+          if (-not ($childNextActions -contains $childManifestAction)) {
+            $childNextActions += $childManifestAction
+          }
+        }
         $childResult = [pscustomobject]@{
           schema_version = 'mcp-verify-child-result.v1'
           baseline_ready = [bool]$childLedger.baseline_ready
-          generated_runtime_manifest = if ($childLedger.PSObject.Properties.Name -contains 'generated_runtime_manifest') { $childLedger.generated_runtime_manifest } else { [pscustomobject]@{ status = 'unknown'; reason_code = 'not-reported' } }
+          generated_runtime_manifest = $childGeneratedRuntimeManifest
           tool_facts_status = $childLedger.tool_facts_status
           runtime_capabilities_status = $childLedger.runtime_capabilities_status
           reason_code = [string]$childLedger.reason_code
-          next_actions = @($childLedger.next_actions)
+          next_actions = @($childNextActions)
         }
       } catch {
         $childOverall = 'action-required'
@@ -571,7 +601,7 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
 
   $parentGeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName ([string]$HostInfo.host) -TargetRoot $workspaceRoot
   if (@('stale', 'missing') -contains [string]$parentGeneratedRuntimeManifest.status) {
-    $parentGeneratedRuntimeManifest['next_action'] = 'spec-first init --all-repos -y'
+    $parentGeneratedRuntimeManifest['next_action'] = 'spec-first init -y -u <name>'
   }
   $readyCount = @($results | Where-Object { $_.overall_status -eq 'ready' }).Count
   $actionRequiredCount = @($results | Where-Object { $_.overall_status -ne 'ready' }).Count
@@ -627,10 +657,10 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
         ('- Workspace pollution detected: wrote .spec-first/workspace/parent-artifact-quarantine.json ({0} paths quarantined). Run `spec-first clean --workspace-orphans` for read-only inspection.' -f $parentWorkspacePollutionCount)
       }
       if ($manifestRefreshRequiredCount -gt 0) {
-        '- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init --all-repos -y` from the parent workspace.'
+        '- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init -y -u <name>` for the parent workspace runtime; use `spec-first init --repo <child> -y -u <name>` for a stale child repo, or explicit `spec-first init --all-repos -y -u <name>` for intentional batch child-root refresh.'
       }
     )
-    next_action = if ($manifestRefreshRequiredCount -gt 0) { 'Run spec-first init --all-repos -y from the parent workspace, then rerun verify.' } elseif ($actionRequiredCount -eq 0) { 'All child repos verified required MCP/helper dependency readiness.' } else { 'Inspect per-child reason_code and rerun setup/verify for action-required repos.' }
+    next_action = if ($manifestRefreshRequiredCount -gt 0) { 'Run spec-first init -y -u <name> from the parent workspace for parent runtime, or spec-first init --repo <child> -y -u <name> for stale child repos, then rerun verify.' } elseif ($actionRequiredCount -eq 0) { 'All child repos verified required MCP/helper dependency readiness.' } else { 'Inspect per-child reason_code and rerun setup/verify for action-required repos.' }
   }
 
   try {
@@ -699,7 +729,8 @@ try {
 }
 
 $HostPointerReconciliation = Get-HostPointerReconciliation -CurrentHost $reconciliationHost -RepoRoot $reconciliationRepoRoot -MarkerPathArg $MarkerPath
-$GeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName $reconciliationHost -TargetRoot $reconciliationRepoRoot
+$generatedRuntimeRefreshAction = Get-GeneratedRuntimeRefreshActionForFacts -Facts $Facts
+$GeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName $reconciliationHost -TargetRoot $reconciliationRepoRoot -NextAction $generatedRuntimeRefreshAction
 
 function Test-ToolReady {
   param([object]$Tool)

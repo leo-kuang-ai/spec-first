@@ -65,7 +65,7 @@ function resolveDeveloperIdentity(projectRoot, options = {}) {
 
   if (!name) {
     throw new Error(
-      'Unable to determine developer name. Run `spec-first init` in an interactive terminal and choose a developer name when prompted.',
+      'Unable to determine developer name. Run `spec-first init` in an interactive terminal and choose a developer name, or pass `-u <name>` for non-interactive setup.',
     );
   }
 

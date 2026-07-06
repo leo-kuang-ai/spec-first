@@ -77,7 +77,7 @@ spec-first doctor
 spec-first init
 ```
 
-选择宿主（Claude Code、Codex、Cursor、Kiro 和/或 Qoder）、确认开发者姓名与语言，然后确认写入。脚本化 preview 初始化可使用 `spec-first init --kiro -y -u <name> --lang <zh|en>` 初始化 Kiro，使用 `spec-first init --qoder -y -u <name> --lang <zh|en>` 初始化 Qoder，或使用 `spec-first init --cursor -y -u <name> --lang <zh|en>` 初始化 Cursor generated-runtime preview。Cursor 不属于 `init -y` 默认宿主集合。
+选择宿主（Claude Code、Codex、Cursor、Kiro 和/或 Qoder）、确认开发者姓名与语言，然后确认写入。在包含大量 child Git repos 的父级 workspace 中，`init` 默认只写父级 workspace runtime；只有某个 child repo 需要作为独立 agent root 时才使用 `--repo <child>`，`--all-repos` 仅保留给显式批量维护。全新机器上的脚本化 `init -y` 必须传入 `-u <name>`，因为非交互模式不会再提示输入开发者姓名，例如 `spec-first init --codex -y -u <name> --lang <zh|en>`。脚本化 preview 初始化可使用 `spec-first init --kiro -y -u <name> --lang <zh|en>` 初始化 Kiro，使用 `spec-first init --qoder -y -u <name> --lang <zh|en>` 初始化 Qoder，或使用 `spec-first init --cursor -y -u <name> --lang <zh|en>` 初始化 Cursor generated-runtime preview。Cursor 不属于 `init -y` 默认宿主集合。
 
 预期结果：init 列出 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/`、`.kiro/` 或 `.qoder/` 下的生成路径，并确认 setup 完成。生成的 runtime copies 随时可通过 `spec-first init` 重建。
 

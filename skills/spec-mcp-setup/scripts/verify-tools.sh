@@ -143,6 +143,7 @@ runtime_state_path_for_host() {
 compute_generated_runtime_manifest_health() {
   local host="$1"
   local target_root="$2"
+  local refresh_action="${3:-spec-first init -y -u <name>}"
   local bundled_version state_path recorded_version status reason next_action
 
   bundled_version="$(resolve_bundled_manifest_version)"
@@ -150,7 +151,7 @@ compute_generated_runtime_manifest_health() {
   recorded_version=""
   status="unknown"
   reason="unknown-runtime-manifest-health"
-  next_action="spec-first init -y"
+  next_action="$refresh_action"
 
   if [ -z "$host" ] || [ -z "$target_root" ] || [ -z "$state_path" ]; then
     reason="missing-host-or-target-root"
@@ -196,6 +197,19 @@ compute_generated_runtime_manifest_health() {
       evidence_basis:"state.manifestVersion vs bundled manifest.version",
       next_action:(if $next_action == "" then null else $next_action end)
     }'
+}
+
+generated_runtime_refresh_action_for_facts() {
+  local facts_json="$1"
+  jq -r '
+    (.target.selection_source // "") as $selection_source
+    | (.target.repo_label // "") as $repo_label
+    | if ($selection_source == "explicit-repo" and $repo_label != "" and $repo_label != ".") then
+        "spec-first init --repo \($repo_label) -y -u <name>"
+      else
+        "spec-first init -y -u <name>"
+      end
+  ' <<<"$facts_json"
 }
 
 write_workspace_summary_atomic() {
@@ -498,14 +512,25 @@ write_all_repos_verify_summary_and_exit() {
             (.reason_code // empty)
           end
       ' <<<"$child_ledger")"
-      child_result="$(jq -n --argjson ledger "$child_ledger" '{
+      child_manifest_action="spec-first init --repo $child_path -y -u <name>"
+      child_result="$(jq -n --argjson ledger "$child_ledger" --arg child_manifest_action "$child_manifest_action" '
+        ($ledger.generated_runtime_manifest // {status:"unknown", reason_code:"not-reported"}) as $manifest
+        | ((($manifest.status // "unknown") == "stale") or (($manifest.status // "unknown") == "missing")) as $manifest_refresh_required
+        | ($ledger.next_actions // []) as $actions
+        | {
         schema_version:"mcp-verify-child-result.v1",
         baseline_ready:($ledger.baseline_ready // false),
-        generated_runtime_manifest:($ledger.generated_runtime_manifest // {status:"unknown", reason_code:"not-reported"}),
+        generated_runtime_manifest:(if $manifest_refresh_required then ($manifest | .next_action = $child_manifest_action) else $manifest end),
         tool_facts_status:($ledger.tool_facts_status // "unknown"),
         runtime_capabilities_status:($ledger.runtime_capabilities_status // "unknown"),
         reason_code:($ledger.reason_code // ""),
-        next_actions:($ledger.next_actions // [])
+        next_actions:(
+          if $manifest_refresh_required then
+            (($actions | map(if . == "spec-first init -y" or . == "spec-first init -y -u <name>" then $child_manifest_action else . end)) + [$child_manifest_action] | unique)
+          else
+            $actions
+          end
+        )
       }')"
     else
       child_overall="action-required"
@@ -542,13 +567,13 @@ write_all_repos_verify_summary_and_exit() {
   fi
 
   parent_host="$(jq -r '.host // empty' <<<"$HOST_INFO_JSON")"
-  parent_generated_runtime_manifest="$(compute_generated_runtime_manifest_health "$parent_host" "$workspace_root" | jq '
-    if ((.status // "unknown") == "stale") or ((.status // "unknown") == "missing") then
-      .next_action = "spec-first init --all-repos -y"
-    else
-      .
-    end
-  ')"
+	  parent_generated_runtime_manifest="$(compute_generated_runtime_manifest_health "$parent_host" "$workspace_root" | jq '
+	    if ((.status // "unknown") == "stale") or ((.status // "unknown") == "missing") then
+	      .next_action = "spec-first init -y -u <name>"
+	    else
+	      .
+	    end
+	  ')"
 
   summary_json="$(jq -n \
     --arg generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -612,14 +637,14 @@ write_all_repos_verify_summary_and_exit() {
           (if $parent_workspace_pollution_count > 0 then
             ["- Workspace pollution detected: wrote .spec-first/workspace/parent-artifact-quarantine.json (\($parent_workspace_pollution_count) paths quarantined). Run `spec-first clean --workspace-orphans` for read-only inspection."]
           else [] end)
-          + (if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
-            ["- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init --all-repos -y` from the parent workspace."]
-          else [] end)
-        ),
-        next_action:(
-          if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
-            "Run spec-first init --all-repos -y from the parent workspace, then rerun verify."
-          elif ([$results[] | select(.overall_status != "ready")] | length) == 0 then
+	          + (if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
+	            ["- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init -y -u <name>` for the parent workspace runtime; use `spec-first init --repo <child> -y -u <name>` for a stale child repo, or explicit `spec-first init --all-repos -y -u <name>` for intentional batch child-root refresh."]
+	          else [] end)
+	        ),
+	        next_action:(
+	          if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
+	            "Run spec-first init -y -u <name> from the parent workspace for parent runtime, or spec-first init --repo <child> -y -u <name> for stale child repos, then rerun verify."
+	          elif ([$results[] | select(.overall_status != "ready")] | length) == 0 then
             "All child repos verified required MCP/helper dependency readiness."
           else
             "Inspect per-child reason_code and rerun setup/verify for action-required repos."
@@ -692,7 +717,8 @@ FACTS_JSON="$(bash "$SCRIPT_DIR/detect-tools.sh" ${DETECT_ARGS[@]+"${DETECT_ARGS
 RECONCILIATION_HOST="$(jq -r '.host // empty' <<<"$FACTS_JSON")"
 RECONCILIATION_REPO_ROOT="$(jq -r '.selected_repo_root // .selected_folder_root // .target.target_root // .repo_root // empty' <<<"$FACTS_JSON")"
 HOST_POINTER_RECONCILIATION="$(compute_host_pointer_reconciliation "$RECONCILIATION_HOST" "$RECONCILIATION_REPO_ROOT" "$MARKER_PATH")"
-GENERATED_RUNTIME_MANIFEST="$(compute_generated_runtime_manifest_health "$RECONCILIATION_HOST" "$RECONCILIATION_REPO_ROOT")"
+GENERATED_RUNTIME_REFRESH_ACTION="$(generated_runtime_refresh_action_for_facts "$FACTS_JSON")"
+GENERATED_RUNTIME_MANIFEST="$(compute_generated_runtime_manifest_health "$RECONCILIATION_HOST" "$RECONCILIATION_REPO_ROOT" "$GENERATED_RUNTIME_REFRESH_ACTION")"
 HELPER_JSON="$(
   SPEC_FIRST_PROVIDER_HOST="$RECONCILIATION_HOST" \
   SPEC_FIRST_PROVIDER_REPO_ROOT="$RECONCILIATION_REPO_ROOT" \

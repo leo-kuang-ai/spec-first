@@ -6,7 +6,8 @@ const MESSAGES = {
     developerName: '开发者名称:',
     languageSelect: '默认回复语言:',
     workspaceTarget: '选择 workspace 初始化目标:',
-    workspaceAllRepos: (count) => `所有子仓库 (${count})`,
+    workspaceRootOnly: (count) => `仅父级 workspace（推荐，检测到 ${count} 个子仓库）`,
+    workspaceAllRepos: (count) => `所有子仓库（高级批量维护，${count} 个）`,
     workspaceCancel: '取消',
     reuseGlobalProfile: (name, lang) => (
       `检测到全局开发者: ${name} (${lang})。沿用?`
@@ -63,7 +64,8 @@ const MESSAGES = {
     developerName: 'Developer name:',
     languageSelect: 'Default response language:',
     workspaceTarget: 'Select workspace target:',
-    workspaceAllRepos: (count) => `All child repos (${count})`,
+    workspaceRootOnly: (count) => `Parent workspace only (recommended, ${count} child repos detected)`,
+    workspaceAllRepos: (count) => `All child repos (advanced batch maintenance, ${count})`,
     workspaceCancel: 'Cancel',
     reuseGlobalProfile: (name, lang) => (
       `Detected global developer: ${name} (${lang}). Reuse it?`

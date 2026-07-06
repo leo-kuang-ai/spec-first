@@ -3,6 +3,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 
 const { printInitDryRun, runInit } = require('../../src/cli/commands/init');
 const { BrandColors } = require('../../src/cli/brand');
@@ -10,6 +11,14 @@ const { buildUserLanguageBlock } = require('../../src/cli/lang-policy');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-init-interactive-'));
+}
+
+function runGit(cwd, args) {
+  const result = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  if (result.status !== 0) {
+    throw new Error(`git ${args.join(' ')} failed: ${result.stderr || result.stdout}`);
+  }
+  return result;
 }
 
 // 现有用例隐式依赖真实 ~/.spec-first/.developer,会让 init 走"沿用确认"分支并污染机器全局 profile。
@@ -56,6 +65,28 @@ function writeGlobalDeveloperProfile({
 function readGlobalDeveloperProfile() {
   const filePath = path.join(isolatedHome, '.spec-first', '.developer');
   return fs.existsSync(filePath) ? fs.readFileSync(filePath, 'utf8') : '';
+}
+
+async function withIsolatedGitConfig(fn) {
+  const previous = {
+    GIT_CONFIG_GLOBAL: process.env.GIT_CONFIG_GLOBAL,
+    GIT_CONFIG_NOSYSTEM: process.env.GIT_CONFIG_NOSYSTEM,
+    XDG_CONFIG_HOME: process.env.XDG_CONFIG_HOME,
+  };
+  process.env.GIT_CONFIG_GLOBAL = path.join(isolatedHome, 'empty.gitconfig');
+  process.env.GIT_CONFIG_NOSYSTEM = '1';
+  process.env.XDG_CONFIG_HOME = path.join(isolatedHome, '.config');
+  try {
+    return await fn();
+  } finally {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
 }
 
 async function withCwd(cwd, fn) {
@@ -113,7 +144,8 @@ function interactivePrompts({
     select: jest.fn((question, options) => {
       if (options.some((option) => option.value === 'zh' || option.value === 'en')) return Promise.resolve(lang);
       if (options.some((option) => option.value === null || (option.value && option.value.mode))) {
-        if (workspaceTarget === 'single') return Promise.resolve(options[1].value);
+        if (workspaceTarget === 'all') return Promise.resolve(options[1].value);
+        if (workspaceTarget === 'single') return Promise.resolve(options[2].value);
         if (workspaceTarget === 'cancel') return Promise.resolve(null);
         return Promise.resolve(options[0].value);
       }
@@ -161,7 +193,10 @@ describe('interactive init command', () => {
       expect(result.stdout).toContain('Select one or more host runtimes');
       expect(result.stdout).toContain('spec-first init --codex');
       expect(result.stdout).toContain('spec-first init --cursor');
-      expect(result.stdout).toContain('spec-first init -y');
+      expect(result.stdout).toContain('spec-first init -y -u <name> --lang zh');
+      expect(result.stdout).toContain('parent workspace with child Git repos');
+      expect(result.stdout).toContain('defaults to the parent workspace only');
+      expect(result.stdout).toContain('must pass -u <name>');
       expect(result.stdout).toContain('Explicit --claude/--codex/--cursor/--kiro/--qoder flags override the default host set.');
       expect(result.stdout).toContain('--dry-run');
       expect(result.stdout).toContain('--sync-user-language');
@@ -221,6 +256,117 @@ describe('interactive init command', () => {
       expect(snapshotTree(projectRoot)).toEqual([]);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('non-interactive init without a developer identity exits 2 with -u guidance', async () => {
+    const projectRoot = makeTempDir();
+    const prompts = {
+      ...interactivePrompts(),
+      requireTty: jest.fn(() => ({ ok: false, reason: 'no-stdin-tty' })),
+    };
+
+    try {
+      const result = await withIsolatedGitConfig(() => (
+        captureInit(projectRoot, ['--codex', '-y', '--lang', 'zh'], prompts)
+      ));
+
+      expect(result.exitCode).toBe(2);
+      expect(result.stderr).toContain('无法确定 developer name');
+      expect(result.stderr).toContain('-u <name>');
+      expect(result.stderr).toContain('spec-first init --codex -y -u <name> --lang zh');
+      expect(prompts.requireTty).not.toHaveBeenCalled();
+      expect(prompts.checkbox).not.toHaveBeenCalled();
+      expect(prompts.textInput).not.toHaveBeenCalled();
+      expect(snapshotTree(projectRoot)).toEqual([]);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('non-interactive developer identity guidance preserves workspace target flags', async () => {
+    const projectRoot = makeTempDir();
+    const childRepo = path.join(projectRoot, 'child');
+    const prompts = interactivePrompts();
+
+    try {
+      fs.mkdirSync(childRepo);
+      runGit(childRepo, ['init', '-q']);
+
+      const result = await withIsolatedGitConfig(() => (
+        captureInit(projectRoot, ['--codex', '--all-repos', '-y', '--lang', 'zh'], prompts)
+      ));
+
+      expect(result.exitCode).toBe(2);
+      expect(result.stderr).toContain('spec-first init --codex --all-repos -y -u <name> --lang zh');
+      expect(prompts.checkbox).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('non-interactive developer identity guidance quotes repo target flags', async () => {
+    const projectRoot = makeTempDir();
+    const childRepo = path.join(projectRoot, 'child repo');
+    const prompts = interactivePrompts();
+
+    try {
+      fs.mkdirSync(childRepo);
+      runGit(childRepo, ['init', '-q']);
+
+      const result = await withIsolatedGitConfig(() => (
+        captureInit(projectRoot, ['--codex', '--repo', 'child repo', '-y', '--lang', 'zh'], prompts)
+      ));
+
+      expect(result.exitCode).toBe(2);
+      expect(result.stderr).toContain('spec-first init --codex --repo "child repo" -y -u <name> --lang zh');
+      expect(prompts.checkbox).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('non-interactive repo target errors take precedence over developer identity guidance', async () => {
+    const projectRoot = makeTempDir();
+    const prompts = interactivePrompts();
+
+    try {
+      const result = await withIsolatedGitConfig(() => (
+        captureInit(projectRoot, ['--codex', '--repo', 'missing repo', '-y', '--lang', 'zh'], prompts)
+      ));
+
+      expect(result.exitCode).toBe(2);
+      expect(result.stderr).toContain('--repo target does not exist: missing repo');
+      expect(result.stderr).not.toContain('developer name');
+      expect(result.stderr).not.toContain('-u <name>');
+      expect(prompts.checkbox).not.toHaveBeenCalled();
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('non-interactive repo target can use the child git user name', async () => {
+    const workspaceRoot = makeTempDir();
+    const childRepo = path.join(workspaceRoot, 'child repo');
+    const prompts = interactivePrompts();
+
+    try {
+      fs.mkdirSync(childRepo);
+      runGit(childRepo, ['init', '-q']);
+      runGit(childRepo, ['config', 'user.name', 'child-git-user']);
+
+      const result = await withIsolatedGitConfig(() => (
+        captureInit(workspaceRoot, ['--codex', '--repo', 'child repo', '-y', '--lang', 'zh'], prompts)
+      ));
+
+      expect(result.exitCode).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(prompts.checkbox).not.toHaveBeenCalled();
+      expect(prompts.textInput).not.toHaveBeenCalled();
+      expect(fs.existsSync(path.join(childRepo, 'AGENTS.md'))).toBe(true);
+      expect(readGlobalDeveloperProfile()).toContain('name=child-git-user');
+    } finally {
+      fs.rmSync(workspaceRoot, { recursive: true, force: true });
     }
   });
 
@@ -775,7 +921,7 @@ describe('interactive init command', () => {
     expect(output).not.toMatch(/\x1B\[[0-?]*[ -/]*[@-~]/);
   });
 
-  test('parent workspace can initialize all discovered child repos', async () => {
+  test('parent workspace initializes only the workspace root by default', async () => {
     const workspaceRoot = makeTempDir();
     const childA = path.join(workspaceRoot, 'child-a');
     const childB = path.join(workspaceRoot, 'child-b');
@@ -787,16 +933,17 @@ describe('interactive init command', () => {
       const result = await captureInit(workspaceRoot, [], interactivePrompts({ platforms: ['claude'] }));
 
       expect(result.exitCode).toBe(0);
-      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(true);
       expect(fs.existsSync(path.join(workspaceRoot, 'CLAUDE.md'))).toBe(true);
-      expect(fs.existsSync(path.join(childA, 'CLAUDE.md'))).toBe(true);
-      expect(fs.existsSync(path.join(childB, 'CLAUDE.md'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, '.claude'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(false);
+      expect(fs.existsSync(path.join(childA, 'CLAUDE.md'))).toBe(false);
+      expect(fs.existsSync(path.join(childB, 'CLAUDE.md'))).toBe(false);
     } finally {
       fs.rmSync(workspaceRoot, { recursive: true, force: true });
     }
   });
 
-  test('all-repos workspace init persists the selected hosts to the global profile', async () => {
+  test('parent workspace init persists the selected hosts to the global profile', async () => {
     const workspaceRoot = makeTempDir();
     const childA = path.join(workspaceRoot, 'child-a');
     const childB = path.join(workspaceRoot, 'child-b');

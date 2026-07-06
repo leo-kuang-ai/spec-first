@@ -140,7 +140,7 @@ If a workflow needs to preserve a log reference, store a redacted repo-relative 
 3. Run the narrow validation command first.
 4. For skill/agent prose changes, run fresh-source eval or record a valid not-run reason.
    Use `Fresh-source eval: passed | concerns | not_run | N/A` in PR/closeout surfaces; `N/A` is the normal value for changes that do not touch skill/agent/workflow prose, templates, host entry blocks, or generated-runtime behavior.
-   Record `Runtime impact: none | init claude | init codex | init kiro | init qoder | multiple | N/A` beside it so generated mirror refresh decisions stay explicit.
+   Record `Runtime impact: none | init claude | init codex | init cursor | init kiro | init qoder | multiple | N/A` beside it so generated mirror refresh decisions stay explicit.
 5. Regenerate runtime mirrors with `spec-first init` only when runtime refresh is part of the task or release, choosing the target host when prompted.
 6. Record runtime impact and validation in `CHANGELOG.md` and any phase validation artifact.
 

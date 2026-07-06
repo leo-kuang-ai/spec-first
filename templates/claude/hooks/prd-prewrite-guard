@@ -2,9 +2,9 @@
 'use strict';
 
 // Cross-platform PreToolUse PRD prewrite guard. Claude Code invokes this in exec form
-// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
-// Windows without a POSIX shell. The project dir arrives as argv[2]; fall back to
-// CLAUDE_PROJECT_DIR then cwd. The tool event payload arrives as JSON on stdin.
+// (`node .claude/hooks/prd-prewrite-guard`), so it runs identically on macOS, Linux, and
+// Windows without a POSIX shell. Project dir comes from CLAUDE_PROJECT_DIR env / argv[2] /
+// cwd (see resolveProjectDir). The tool event payload arrives as JSON on stdin.
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -18,11 +18,7 @@ const WHAT_TOUCHING_KEYWORDS = [
   'analytics', '埋点', '指标',
 ];
 
-const projectDir = (process.argv[2] && process.argv[2].trim())
-  ? process.argv[2]
-  : (process.env.CLAUDE_PROJECT_DIR && process.env.CLAUDE_PROJECT_DIR.trim()
-    ? process.env.CLAUDE_PROJECT_DIR
-    : process.cwd());
+const projectDir = resolveProjectDir();
 const rawInput = readStdin();
 const input = parseJsonObject(rawInput);
 const toolName = String(input.tool_name || input.toolName || '');
@@ -197,6 +193,21 @@ if (readyStatus || machineReceipt || readyIntent || missingWriteModeOnFirstWrite
 }
 
 process.exit(0);
+
+// Exec form does not expand $CLAUDE_PROJECT_DIR, so prefer the env var Claude exports, then
+// a real argv[2] (reject the literal placeholder from a stale settings.json), then cwd
+// (Claude runs the hook with cwd = project root).
+function resolveProjectDir() {
+  const fromEnv = process.env.CLAUDE_PROJECT_DIR;
+  if (typeof fromEnv === 'string' && fromEnv.trim()) {
+    return fromEnv;
+  }
+  const fromArg = process.argv[2];
+  if (typeof fromArg === 'string' && fromArg.trim() && fromArg !== '$CLAUDE_PROJECT_DIR') {
+    return fromArg;
+  }
+  return process.cwd();
+}
 
 function readStdin() {
   try {

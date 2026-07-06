@@ -108,7 +108,7 @@ describe('claude settings', () => {
       {
         type: 'command',
         command: 'node',
-        args: [PRD_PREWRITE_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR'],
+        args: [PRD_PREWRITE_GUARD_COMMAND],
       },
     ]);
   });
@@ -177,19 +177,20 @@ describe('claude settings', () => {
 
       const settings = readJson(getClaudeSettingsPath(projectRoot));
       // Exec form: command is the node interpreter, and the managed hook path plus the
-      // $CLAUDE_PROJECT_DIR arg live in args.
+      // project-root-relative hook path live in args (single element, no
+      // $CLAUDE_PROJECT_DIR literal — exec form does not expand it).
       expect(settings.hooks.SessionStart).toHaveLength(1);
       expect(settings.hooks.SessionStart[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.SessionStart[0].hooks[0].args).toEqual([SESSION_START_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.SessionStart[0].hooks[0].args).toEqual([SESSION_START_COMMAND]);
       expect(settings.hooks.UserPromptExpansion).toHaveLength(1);
       expect(settings.hooks.UserPromptExpansion[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.UserPromptExpansion[0].hooks[0].args).toEqual([SPEC_PLAN_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.UserPromptExpansion[0].hooks[0].args).toEqual([SPEC_PLAN_GUARD_COMMAND]);
       expect(settings.hooks.PreToolUse).toHaveLength(1);
       expect(settings.hooks.PreToolUse[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.PreToolUse[0].hooks[0].args).toEqual([PRD_PREWRITE_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.PreToolUse[0].hooks[0].args).toEqual([PRD_PREWRITE_GUARD_COMMAND]);
       expect(settings.hooks.Stop).toHaveLength(1);
       expect(settings.hooks.Stop[0].hooks[0].command).toBe('node');
-      expect(settings.hooks.Stop[0].hooks[0].args).toEqual([PRD_READINESS_GUARD_COMMAND, '$CLAUDE_PROJECT_DIR']);
+      expect(settings.hooks.Stop[0].hooks[0].args).toEqual([PRD_READINESS_GUARD_COMMAND]);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -223,6 +224,47 @@ describe('claude settings', () => {
       expect(allHooks.filter((hook) => (
         hook.command === 'node' && Array.isArray(hook.args) && hook.args[0] === SESSION_START_COMMAND
       ))).toHaveLength(1);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('upsert replaces a legacy $CLAUDE_PROJECT_DIR exec-form hook instead of duplicating it', () => {
+    const projectRoot = makeTempDir();
+    const settingsPath = getClaudeSettingsPath(projectRoot);
+
+    try {
+      // Simulate settings written by the first (broken) exec-form migration: args prefixed
+      // with the literal $CLAUDE_PROJECT_DIR that Claude never expands.
+      fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+      fs.writeFileSync(settingsPath, `${JSON.stringify({
+        hooks: {
+          Stop: [
+            {
+              matcher: '.*',
+              hooks: [
+                {
+                  type: 'command',
+                  command: 'node',
+                  args: ['$CLAUDE_PROJECT_DIR/.claude/hooks/prd-readiness-guard', '$CLAUDE_PROJECT_DIR'],
+                },
+              ],
+            },
+          ],
+        },
+      }, null, 2)}\n`, 'utf8');
+
+      upsertManagedSessionStartHook(projectRoot);
+
+      const settings = readJson(settingsPath);
+      // The legacy broken hook must be removed, leaving exactly one corrected relative-path
+      // managed hook — not two.
+      expect(settings.hooks.Stop).toHaveLength(1);
+      expect(settings.hooks.Stop[0].hooks).toHaveLength(1);
+      expect(settings.hooks.Stop[0].hooks[0].args).toEqual([PRD_READINESS_GUARD_COMMAND]);
+      const stopArgs = settings.hooks.Stop.flatMap((m) => m.hooks).flatMap((h) => h.args || []);
+      expect(stopArgs).not.toContain('$CLAUDE_PROJECT_DIR');
+      expect(stopArgs).not.toContain('$CLAUDE_PROJECT_DIR/.claude/hooks/prd-readiness-guard');
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
