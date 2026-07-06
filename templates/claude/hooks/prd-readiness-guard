@@ -1,14 +1,19 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env node
+'use strict';
 
-project_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-
-node /dev/fd/3 "$project_dir" 3<<'EOF'
+// Cross-platform Stop PRD readiness guard. Claude Code invokes this in exec form
+// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
+// Windows without a POSIX shell. The project dir arrives as argv[2]; fall back to
+// CLAUDE_PROJECT_DIR then cwd. The hook event payload arrives as JSON on stdin (unused here).
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const projectDir = process.argv[2];
+const projectDir = (process.argv[2] && process.argv[2].trim())
+  ? process.argv[2]
+  : (process.env.CLAUDE_PROJECT_DIR && process.env.CLAUDE_PROJECT_DIR.trim()
+    ? process.env.CLAUDE_PROJECT_DIR
+    : process.cwd());
 const finalizeScript = path.join(
   projectDir,
   '.claude',
@@ -232,4 +237,3 @@ function parseJsonObject(raw) {
     return {};
   }
 }
-EOF

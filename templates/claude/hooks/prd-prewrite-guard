@@ -1,9 +1,10 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env node
+'use strict';
 
-project_dir="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-
-node /dev/fd/3 "$project_dir" 3<<'EOF'
+// Cross-platform PreToolUse PRD prewrite guard. Claude Code invokes this in exec form
+// (`node <this file> "$CLAUDE_PROJECT_DIR"`), so it runs identically on macOS, Linux, and
+// Windows without a POSIX shell. The project dir arrives as argv[2]; fall back to
+// CLAUDE_PROJECT_DIR then cwd. The tool event payload arrives as JSON on stdin.
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -17,7 +18,11 @@ const WHAT_TOUCHING_KEYWORDS = [
   'analytics', '埋点', '指标',
 ];
 
-const projectDir = process.argv[2];
+const projectDir = (process.argv[2] && process.argv[2].trim())
+  ? process.argv[2]
+  : (process.env.CLAUDE_PROJECT_DIR && process.env.CLAUDE_PROJECT_DIR.trim()
+    ? process.env.CLAUDE_PROJECT_DIR
+    : process.cwd());
 const rawInput = readStdin();
 const input = parseJsonObject(rawInput);
 const toolName = String(input.tool_name || input.toolName || '');
@@ -466,4 +471,3 @@ function block(reason) {
   process.stderr.write(`${reason}\n`);
   process.exit(2);
 }
-EOF

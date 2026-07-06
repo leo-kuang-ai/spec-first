@@ -286,8 +286,12 @@ const matchers = settings.hooks?.UserPromptExpansion;
 if (!Array.isArray(matchers)) throw new Error('missing UserPromptExpansion hook matchers');
 const matcher = matchers.find((entry) => entry.matcher === 'spec-plan');
 if (!matcher) throw new Error('missing spec-plan UserPromptExpansion matcher');
-const command = matcher.hooks?.find((hook) => hook.type === 'command')?.command || '';
-if (!command.includes('.claude/hooks/spec-plan-guard')) {
+// Exec form: command is the node interpreter; the managed hook path lives in args so the
+// hook runs cross-platform (Windows without Git Bash included) with no shell.
+const hook = matcher.hooks?.find((entry) => entry.type === 'command');
+const command = hook?.command || '';
+const args = Array.isArray(hook?.args) ? hook.args : [];
+if (command !== 'node' || !args.some((arg) => typeof arg === 'string' && arg.includes('.claude/hooks/spec-plan-guard'))) {
   throw new Error('spec-plan guard matcher does not invoke managed hook');
 }
 NODE
