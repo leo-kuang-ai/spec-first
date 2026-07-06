@@ -571,7 +571,7 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
 
   $parentGeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName ([string]$HostInfo.host) -TargetRoot $workspaceRoot
   if (@('stale', 'missing') -contains [string]$parentGeneratedRuntimeManifest.status) {
-    $parentGeneratedRuntimeManifest['next_action'] = 'spec-first init --all-repos -y'
+    $parentGeneratedRuntimeManifest['next_action'] = 'spec-first init -y -u <name>'
   }
   $readyCount = @($results | Where-Object { $_.overall_status -eq 'ready' }).Count
   $actionRequiredCount = @($results | Where-Object { $_.overall_status -ne 'ready' }).Count
@@ -627,10 +627,10 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
         ('- Workspace pollution detected: wrote .spec-first/workspace/parent-artifact-quarantine.json ({0} paths quarantined). Run `spec-first clean --workspace-orphans` for read-only inspection.' -f $parentWorkspacePollutionCount)
       }
       if ($manifestRefreshRequiredCount -gt 0) {
-        '- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init --all-repos -y` from the parent workspace.'
+        '- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init -y -u <name>` for the parent workspace runtime; use `spec-first init --repo <child> -y -u <name>` for a stale child repo, or explicit `spec-first init --all-repos -y -u <name>` for intentional batch child-root refresh.'
       }
     )
-    next_action = if ($manifestRefreshRequiredCount -gt 0) { 'Run spec-first init --all-repos -y from the parent workspace, then rerun verify.' } elseif ($actionRequiredCount -eq 0) { 'All child repos verified required MCP/helper dependency readiness.' } else { 'Inspect per-child reason_code and rerun setup/verify for action-required repos.' }
+    next_action = if ($manifestRefreshRequiredCount -gt 0) { 'Run spec-first init -y -u <name> from the parent workspace for parent runtime, or spec-first init --repo <child> -y -u <name> for stale child repos, then rerun verify.' } elseif ($actionRequiredCount -eq 0) { 'All child repos verified required MCP/helper dependency readiness.' } else { 'Inspect per-child reason_code and rerun setup/verify for action-required repos.' }
   }
 
   try {

@@ -542,13 +542,13 @@ write_all_repos_verify_summary_and_exit() {
   fi
 
   parent_host="$(jq -r '.host // empty' <<<"$HOST_INFO_JSON")"
-  parent_generated_runtime_manifest="$(compute_generated_runtime_manifest_health "$parent_host" "$workspace_root" | jq '
-    if ((.status // "unknown") == "stale") or ((.status // "unknown") == "missing") then
-      .next_action = "spec-first init --all-repos -y"
-    else
-      .
-    end
-  ')"
+	  parent_generated_runtime_manifest="$(compute_generated_runtime_manifest_health "$parent_host" "$workspace_root" | jq '
+	    if ((.status // "unknown") == "stale") or ((.status // "unknown") == "missing") then
+	      .next_action = "spec-first init -y -u <name>"
+	    else
+	      .
+	    end
+	  ')"
 
   summary_json="$(jq -n \
     --arg generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -612,14 +612,14 @@ write_all_repos_verify_summary_and_exit() {
           (if $parent_workspace_pollution_count > 0 then
             ["- Workspace pollution detected: wrote .spec-first/workspace/parent-artifact-quarantine.json (\($parent_workspace_pollution_count) paths quarantined). Run `spec-first clean --workspace-orphans` for read-only inspection."]
           else [] end)
-          + (if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
-            ["- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init --all-repos -y` from the parent workspace."]
-          else [] end)
-        ),
-        next_action:(
-          if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
-            "Run spec-first init --all-repos -y from the parent workspace, then rerun verify."
-          elif ([$results[] | select(.overall_status != "ready")] | length) == 0 then
+	          + (if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
+	            ["- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init -y -u <name>` for the parent workspace runtime; use `spec-first init --repo <child> -y -u <name>` for a stale child repo, or explicit `spec-first init --all-repos -y -u <name>` for intentional batch child-root refresh."]
+	          else [] end)
+	        ),
+	        next_action:(
+	          if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
+	            "Run spec-first init -y -u <name> from the parent workspace for parent runtime, or spec-first init --repo <child> -y -u <name> for stale child repos, then rerun verify."
+	          elif ([$results[] | select(.overall_status != "ready")] | length) == 0 then
             "All child repos verified required MCP/helper dependency readiness."
           else
             "Inspect per-child reason_code and rerun setup/verify for action-required repos."

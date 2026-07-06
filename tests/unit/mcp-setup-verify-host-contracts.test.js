@@ -78,7 +78,9 @@ describe('spec-mcp-setup verify host propagation contract', () => {
     const powerShellSource = read(verifyToolsPs1);
 
     for (const source of [bashSource, powerShellSource]) {
-      expect(source).toContain('spec-first init --all-repos -y');
+      expect(source).toContain('spec-first init -y -u <name>');
+      expect(source).toContain('spec-first init --repo <child> -y -u <name>');
+      expect(source).toContain('explicit `spec-first init --all-repos -y -u <name>`');
       expect(source).toContain('Generated runtime manifest stale or missing in the parent workspace or one or more child repos');
       expect(source).toContain('current');
       expect(source).toContain('stale');
@@ -193,7 +195,8 @@ describe('spec-mcp-setup verify host propagation contract', () => {
       });
       expect(repoAResult.result.generated_runtime_manifest.status).toBe('stale');
       expect(repoBResult.overall_status).toBe('ready');
-      expect(summary.next_action).toContain('spec-first init --all-repos -y');
+      expect(summary.next_action).toContain('spec-first init -y -u <name>');
+      expect(summary.next_action).toContain('spec-first init --repo <child> -y -u <name>');
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }

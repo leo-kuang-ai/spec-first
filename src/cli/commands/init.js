@@ -150,8 +150,19 @@ async function runInit(argv, promptOverrides = {}) {
   }
 
   const workspaceRoot = process.cwd();
-  const defaults = resolveDeveloperDefaults(workspaceRoot);
+  const explicitTarget = collectNonInteractiveExplicitTarget(workspaceRoot, parsed);
+  if (explicitTarget && explicitTarget.error) {
+    console.error(explicitTarget.error);
+    return 2;
+  }
+  const defaultsRoot = resolveNonInteractiveDeveloperDefaultsRoot(workspaceRoot, parsed, explicitTarget);
+  const defaults = resolveDeveloperDefaults(defaultsRoot);
   const defaultLang = parsed.lang || defaults.lang;
+  const nonInteractiveIdentityError = buildNonInteractiveDeveloperIdentityError(parsed, defaults, defaultLang);
+  if (nonInteractiveIdentityError) {
+    console.error(nonInteractiveIdentityError);
+    return 2;
+  }
   const messages = getInitMessages(defaultLang);
   let activeLang = defaultLang;
   const useColor = detectColorSupport();
@@ -172,6 +183,7 @@ async function runInit(argv, promptOverrides = {}) {
       defaults,
       defaultLang,
       messages,
+      explicitTarget,
       onLangSelected: (lang) => {
         activeLang = lang;
       },
@@ -383,6 +395,7 @@ async function collectInitInput({
   defaults = null,
   defaultLang = '',
   messages = null,
+  explicitTarget = null,
   onLangSelected = null,
 }) {
   const root = canonicalizeExistingPath(workspaceRoot);
@@ -477,11 +490,11 @@ async function collectInitInput({
     messages: activeMessages,
     existingGlobal,
   });
-  const target = parsed.allRepos || parsed.repo
+  const target = explicitTarget || (parsed.allRepos || parsed.repo
     ? collectExplicitInitTarget(root, parsed)
     : parsed.yes
       ? collectDefaultInitTarget(root)
-      : await collectInteractiveInitTarget(root, promptApi, activeMessages);
+      : await collectInteractiveInitTarget(root, promptApi, activeMessages));
   if (!target) {
     return { cancelled: true, lang };
   }
@@ -616,6 +629,11 @@ function collectDefaultInitTarget(workspaceRoot) {
     };
   }
 
+  const candidates = discoverChildGitRepos(workspaceRoot);
+  if (candidates.length > 0) {
+    return buildWorkspaceOnlyInitTarget(workspaceRoot, 'parent-workspace-default');
+  }
+
   return {
     mode: 'single-repo',
     projectRoot: workspaceRoot,
@@ -685,6 +703,10 @@ async function collectInteractiveInitTarget(workspaceRoot, promptApi, messages =
 
   return promptApi.select(messages.workspaceTarget, [
     {
+      label: messages.workspaceRootOnly(candidates.length),
+      value: buildWorkspaceOnlyInitTarget(workspaceRoot, 'workspace-interactive-parent-only'),
+    },
+    {
       label: messages.workspaceAllRepos(candidates.length),
       value: {
         mode: 'all-repos',
@@ -708,6 +730,16 @@ async function collectInteractiveInitTarget(workspaceRoot, promptApi, messages =
   ], { requireExplicit: true, hint: messages.selectHint });
 }
 
+function buildWorkspaceOnlyInitTarget(workspaceRoot, selectionSource) {
+  return {
+    mode: 'single-repo',
+    projectRoot: workspaceRoot,
+    workspaceRoot,
+    gitRootTopology: 'multi-repo-workspace',
+    selectionSource,
+  };
+}
+
 function resolveDeveloperDefaults(projectRoot) {
   const globalDeveloper = readDeveloperFile(getGlobalDeveloperPath());
   const gitUserName = readGitUserName(projectRoot);
@@ -723,6 +755,76 @@ function resolveDeveloperDefaults(projectRoot) {
     name,
     lang,
   };
+}
+
+function collectNonInteractiveExplicitTarget(workspaceRoot, parsed) {
+  if (!parsed.yes || (!parsed.allRepos && !parsed.repo)) {
+    return null;
+  }
+  return collectExplicitInitTarget(workspaceRoot, parsed);
+}
+
+function resolveNonInteractiveDeveloperDefaultsRoot(workspaceRoot, parsed, explicitTarget = null) {
+  if (!parsed.yes || parsed.name || !parsed.repo) {
+    return workspaceRoot;
+  }
+
+  if (explicitTarget && !explicitTarget.error && explicitTarget.mode === 'single-repo' && explicitTarget.projectRoot) {
+    return explicitTarget.projectRoot;
+  }
+  return workspaceRoot;
+}
+
+function buildNonInteractiveDeveloperIdentityError(parsed, defaults, lang = 'zh') {
+  if (!parsed.yes || parsed.name || (defaults && defaults.name)) {
+    return '';
+  }
+
+  const hostFlags = formatInitHostFlagsForExample(parsed.platforms);
+  const targetFlags = formatInitTargetFlagsForExample(parsed);
+  const normalizedLang = lang === 'en' ? 'en' : 'zh';
+  const example = `spec-first init ${hostFlags}${targetFlags} -y -u <name> --lang ${normalizedLang}`;
+  const interactive = `spec-first init ${hostFlags}${targetFlags}`;
+
+  if (normalizedLang === 'en') {
+    return [
+      'Unable to determine developer name. Non-interactive `spec-first init -y` cannot prompt for one.',
+      'Pass it explicitly with `-u <name>`, for example:',
+      `  ${example}`,
+      'Or remove `-y` and run interactive init:',
+      `  ${interactive}`,
+    ].join('\n');
+  }
+
+  return [
+    '无法确定 developer name。非交互 `spec-first init -y` 无法提示输入姓名。',
+    '请显式传入 `-u <name>`，例如：',
+    `  ${example}`,
+    '或去掉 `-y` 运行交互式初始化：',
+    `  ${interactive}`,
+  ].join('\n');
+}
+
+function formatInitHostFlagsForExample(platforms = []) {
+  const selectedPlatforms = Array.isArray(platforms) && platforms.length > 0
+    ? platforms
+    : defaultInitPlatforms();
+  return selectedPlatforms.map((platform) => `--${platform}`).join(' ') || '--codex';
+}
+
+function formatInitTargetFlagsForExample(parsed) {
+  if (parsed.allRepos) {
+    return ' --all-repos';
+  }
+  if (parsed.repo) {
+    return ` --repo ${quoteInitExampleArg(parsed.repo)}`;
+  }
+  return '';
+}
+
+function quoteInitExampleArg(value) {
+  const raw = String(value || '');
+  return /^[A-Za-z0-9_./:\\-]+$/.test(raw) ? raw : JSON.stringify(raw);
 }
 
 function normalizeSupportedLang(value) {
@@ -2118,7 +2220,7 @@ function printHelp() {
     '  spec-first init --kiro                  Initialize only Kiro after the remaining prompts',
     '  spec-first init --qoder                 Initialize only Qoder after the remaining prompts',
     '  spec-first init --claude --codex --cursor --kiro --qoder Initialize all supported hosts',
-    '  spec-first init -y                      Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder require explicit flags)',
+    '  spec-first init -y -u <name> --lang zh  Skip prompts and initialize default hosts (Claude Code + Codex; Cursor/Kiro/Qoder require explicit flags)',
     '  spec-first init --cursor -y -u <name> --lang zh',
     '  spec-first init --qoder -y -u <name> --lang zh',
     '',
@@ -2131,13 +2233,15 @@ function printHelp() {
     '  6. Confirm or cancel',
     '',
     'Workspace targeting:',
-    '  In a parent workspace with child Git repos, init asks whether to initialize all child repos or one selected child.',
-    '  spec-first init --all-repos -y     Initialize every child Git repo from a parent workspace.',
-    '  spec-first init --repo <path> -y   Initialize one child repo from a parent workspace.',
-    '  Parent workspace runs write only parent advisory summary assets; child repo truth stays in each child repo.',
+    '  In a parent workspace with child Git repos, init defaults to the parent workspace only.',
+    '  spec-first init -y -u <name> --lang zh                 Initialize parent workspace runtime only.',
+    '  spec-first init --repo <path> -y -u <name> --lang zh   Initialize one child repo from a parent workspace.',
+    '  spec-first init --all-repos -y -u <name> --lang zh     Advanced: initialize every child Git repo.',
+    '  Child repo truth stays in each child repo; use --repo or --all-repos only when those repos are independent agent roots.',
     '',
     'Non-interactive usage:',
     '  Use -y/--yes to skip prompts. Without -y, init requires an interactive terminal and exits 2 in CI/non-TTY environments.',
+    '  Fresh machines without a global developer profile or git user.name must pass -u <name>.',
     '  Explicit --claude/--codex/--cursor/--kiro/--qoder flags override the default host set.',
     '  Use --dry-run to preview writes without changing runtime assets.',
     '  Use --sync-user-language to opt in to user-level language sync; use --no-sync-user-language to disable it and remove spec-first user-language blocks from supported hosts.',

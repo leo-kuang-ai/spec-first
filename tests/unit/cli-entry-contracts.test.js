@@ -197,6 +197,40 @@ describe('CLI entry contract', () => {
     }
   });
 
+  test('init -y uses parent-only runtime from a parent workspace by default', () => {
+    const workspaceRoot = makeTempDir();
+    const home = makeTempDir();
+
+    try {
+      fs.mkdirSync(path.join(workspaceRoot, 'project-a', '.git'), { recursive: true });
+      fs.mkdirSync(path.join(workspaceRoot, 'project-b', '.git'), { recursive: true });
+
+      const result = runCli([
+        'init',
+        '--codex',
+        '-y',
+        '-u',
+        'reviewer',
+        '--lang',
+        'en',
+      ], {
+        cwd: workspaceRoot,
+        env: { HOME: home },
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).toBe('');
+      expect(fs.existsSync(path.join(workspaceRoot, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, '.codex'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(false);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'))).toBe(false);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', 'AGENTS.md'))).toBe(false);
+    } finally {
+      fs.rmSync(workspaceRoot, { recursive: true, force: true });
+      fs.rmSync(home, { recursive: true, force: true });
+    }
+  });
+
   test('init --all-repos -y preserves per-host workspace summaries for default hosts', () => {
     const workspaceRoot = makeTempDir();
     const home = makeTempDir();

@@ -40,7 +40,7 @@ function captureInit(cwd, args) {
       stdout: [
         'After successful init',
         'For lightweight work, start the matching spec-* workflow',
-        'init asks whether to initialize all child repos',
+        'parent workspace defaults to workspace-only init',
         'spec-mcp-setup',
       ].join('\n'),
       stderr: '',
@@ -116,11 +116,13 @@ function parseProgrammaticInitArgs(cwd, args) {
   }
   const candidates = discoverTestChildRepos(cwd);
   if (!fs.existsSync(path.join(cwd, '.git')) && candidates.length > 0) {
+    options.gitRootTopology = 'multi-repo-workspace';
     options.target = {
-      mode: 'all-repos',
+      mode: 'single-repo',
+      projectRoot: cwd,
       workspaceRoot: cwd,
-      candidates,
-      selectionSource: 'workspace-default-all-repos',
+      gitRootTopology: 'multi-repo-workspace',
+      selectionSource: 'parent-workspace-default',
     };
   }
   return options;
@@ -322,7 +324,7 @@ describe('init --dry-run', () => {
       expect(result.stderr).toBe('');
       expect(result.stdout).toContain('After successful init');
       expect(result.stdout).toContain('For lightweight work, start the matching spec-* workflow');
-      expect(result.stdout).toContain('init asks whether to initialize all child repos');
+      expect(result.stdout).toContain('parent workspace defaults to workspace-only init');
       expect(result.stdout).toContain('spec-mcp-setup');
       expect(result.stdout).not.toContain('/spec:standards');
       expect(result.stdout).not.toContain('$spec-standards');
@@ -839,7 +841,7 @@ describe('init --dry-run', () => {
     }
   });
 
-  test('init preserves single repo behavior and auto-batches parent workspaces into child repos', () => {
+  test('init preserves single repo behavior and keeps parent workspaces parent-only by default', () => {
     const monorepoRoot = makeTempDir();
     const workspaceRoot = makeTempDir();
 
@@ -860,22 +862,27 @@ describe('init --dry-run', () => {
       expect(fs.existsSync(path.join(workspaceRoot, 'AGENTS.md'))).toBe(true);
       expect(fs.existsSync(path.join(workspaceRoot, '.agents', 'skills', 'spec-mcp-setup', 'mcp-tools.json'))).toBe(true);
       expect(fs.existsSync(path.join(workspaceRoot, '.codex'))).toBe(true);
-      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'))).toBe(false);
       expect(fs.existsSync(path.join(workspaceRoot, '.spec-first', 'config'))).toBe(false);
-      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(true);
-      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(false);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(false);
       const parentAgents = fs.readFileSync(path.join(workspaceRoot, 'AGENTS.md'), 'utf8');
-      const childAgents = fs.readFileSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'), 'utf8');
       expect(parentAgents).toContain('target_repo');
       expect(parentAgents).toContain('父级多仓 workspace');
       expect(parentAgents).toContain('per-child scope');
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'))).toBe(false);
+
+      expect(captureInit(workspaceRoot, ['--codex', '--all-repos', '-u', 'reviewer', '--lang', 'zh']).exitCode).toBe(0);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-a', '.gitignore'))).toBe(true);
+      expect(fs.existsSync(path.join(workspaceRoot, 'project-b', '.gitignore'))).toBe(true);
+      const childAgents = fs.readFileSync(path.join(workspaceRoot, 'project-a', 'AGENTS.md'), 'utf8');
       expect(childAgents).toContain('target_repo');
       expect(fs.readFileSync(path.join(workspaceRoot, 'project-a', '.gitignore'), 'utf8')).toContain(buildSpecFirstGitignoreBlock());
       expect(fs.readFileSync(path.join(workspaceRoot, 'project-b', '.gitignore'), 'utf8')).toContain(buildSpecFirstGitignoreBlock());
 
       const summary = JSON.parse(fs.readFileSync(path.join(workspaceRoot, '.spec-first', 'workspace', 'init-summary.json'), 'utf8'));
       expect(summary.schema_version).toBe('workspace-init-summary.v1');
-      expect(summary.selection_source).toBe('workspace-default-all-repos');
+      expect(summary.selection_source).toBe('explicit-all-repos');
       expect(summary.parent_writes_repo_local_artifacts).toBe(false);
       expect(summary.parent_writes_host_runtime_assets).toBe(true);
       expect(summary.parent_host_runtime.overall_status).toBe('ready');

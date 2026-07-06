@@ -9,6 +9,7 @@ const { spawnSync } = require('node:child_process');
 const PACKAGE_CONTENT_MANIFEST_FILE = 'package-content-manifest.json';
 const INIT_CLAUDE_PROGRAMMATIC_LOG_FILE = 'init-claude-programmatic.log';
 const INIT_CODEX_PROGRAMMATIC_LOG_FILE = 'init-codex-programmatic.log';
+const INIT_CODEX_CLI_LOG_FILE = 'init-codex-cli.log';
 const INIT_CURSOR_PROGRAMMATIC_LOG_FILE = 'init-cursor-programmatic.log';
 const INIT_KIRO_PROGRAMMATIC_LOG_FILE = 'init-kiro-programmatic.log';
 const INIT_QODER_PROGRAMMATIC_LOG_FILE = 'init-qoder-programmatic.log';
@@ -179,6 +180,15 @@ function runWindowsCmdShim(shim, args, options = {}) {
   });
 }
 
+function runWindowsCmdShimResult(shim, args, options = {}) {
+  const comspec = getEnvValue(options.env || process.env, 'ComSpec') || 'cmd.exe';
+  return runChildResult(comspec, ['/d', '/c', buildCmdCommandLine(shim, args)], {
+    ...options,
+    stdio: options.stdio || 'pipe',
+    windowsVerbatimArguments: true,
+  });
+}
+
 function runInstalledShim(shim, args, options = {}) {
   if (process.platform === 'win32') {
     return runWindowsCmdShim(shim, args, options);
@@ -187,6 +197,13 @@ function runInstalledShim(shim, args, options = {}) {
     ...options,
     stdio: options.stdio || 'inherit',
   });
+}
+
+function runInstalledShimResult(shim, args, options = {}) {
+  if (process.platform === 'win32') {
+    return runWindowsCmdShimResult(shim, args, options);
+  }
+  return runChildResult(shim, args, options);
 }
 
 function runInstalledBin(packageRoot, args, options = {}) {
@@ -397,6 +414,19 @@ function buildInitProgrammaticEvidence({ host, result, beforeSnapshot, afterSnap
   };
 }
 
+function buildInitCliEvidence({ host, result, beforeSnapshot, afterSnapshot }) {
+  const evidence = buildInitProgrammaticEvidence({
+    host,
+    result,
+    beforeSnapshot,
+    afterSnapshot,
+  });
+  return {
+    ...evidence,
+    reason_code: evidence.passed ? 'init-cli-passed' : 'init-cli-failed',
+  };
+}
+
 function runInstalledProgrammaticInitResult({ packageRoot, cwd, host, name = 'matrix', lang = 'en' }) {
   const source = `
 const packageRoot = process.argv[2];
@@ -432,6 +462,14 @@ process.exit(result.exit_code);
     cwd,
     input: source,
   });
+}
+
+function runInstalledCliInitResult({ packageRoot, shim = '', cwd, host, name = 'matrix', lang = 'en' }) {
+  const args = ['init', `--${host}`, '-y', '-u', name, '--lang', lang];
+  if (shim) {
+    return runInstalledShimResult(shim, args, { cwd });
+  }
+  return runInstalledBinResult(packageRoot, args, { cwd });
 }
 
 function runInitProgrammaticEvidence({ packageRoot, cwd, host, artifacts }) {
@@ -470,6 +508,43 @@ function runInitProgrammaticEvidence({ packageRoot, cwd, host, artifacts }) {
   };
 }
 
+function runInitCliEvidence({ packageRoot, shim = '', cwd, host, artifacts }) {
+  const logName = host === 'codex' ? INIT_CODEX_CLI_LOG_FILE : `init-${host}-cli.log`;
+  const beforeSnapshot = snapshotTree(cwd);
+  const result = runInstalledCliInitResult({ packageRoot, shim, cwd, host });
+  const afterSnapshot = snapshotTree(cwd);
+  const evidence = buildInitCliEvidence({
+    host,
+    result,
+    beforeSnapshot,
+    afterSnapshot,
+  });
+  artifacts.write(logName, [
+    `host=${host}`,
+    `command=spec-first init --${host} -y -u <name> --lang <lang>`,
+    `status=${evidence.status}`,
+    `passed=${evidence.passed}`,
+    `reason_code=${evidence.reason_code}`,
+    `mutated=${evidence.mutated}`,
+    `expected_state_path=${evidence.expected_state_path}`,
+    `has_state=${evidence.has_state}`,
+    `expected_instruction_path=${evidence.expected_instruction_path}`,
+    `has_instruction=${evidence.has_instruction}`,
+    `expected_runtime_paths=${evidence.expected_runtime_paths.join(',')}`,
+    `present_runtime_paths=${evidence.present_runtime_paths.join(',')}`,
+    `missing_runtime_paths=${evidence.missing_runtime_paths.join(',')}`,
+    '',
+    '--- stdout ---',
+    evidence.stdout,
+    '--- stderr ---',
+    evidence.stderr,
+  ].join('\n'));
+  return {
+    ...evidence,
+    artifact_path: logName,
+  };
+}
+
 function readPackageInfo(cwd) {
   const pkg = JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
   return {
@@ -485,6 +560,7 @@ function defaultReleaseArtifacts() {
     package_content_manifest: PACKAGE_CONTENT_MANIFEST_FILE,
     init_claude_programmatic_log: INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
     init_codex_programmatic_log: INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+    init_codex_cli_log: INIT_CODEX_CLI_LOG_FILE,
     init_cursor_programmatic_log: INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
     init_kiro_programmatic_log: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
     init_qoder_programmatic_log: INIT_QODER_PROGRAMMATIC_LOG_FILE,
@@ -515,6 +591,18 @@ function checkFromInitProgrammaticEvidence(evidence) {
     summary: evidence.passed
       ? `Programmatic spec-first init plan/apply for ${evidence.host} passed and wrote expected runtime evidence.`
       : `Programmatic spec-first init plan/apply for ${evidence.host} failed evidence checks.`,
+    artifact_path: evidence.artifact_path,
+  };
+}
+
+function checkFromInitCliEvidence(evidence) {
+  return {
+    check_id: `init-${evidence.host}-cli`,
+    status: evidence.passed ? 'passed' : 'failed',
+    reason_code: evidence.reason_code,
+    summary: evidence.passed
+      ? `CLI spec-first init -y for ${evidence.host} passed and wrote expected runtime evidence.`
+      : `CLI spec-first init -y for ${evidence.host} failed evidence checks.`,
     artifact_path: evidence.artifact_path,
   };
 }
@@ -795,6 +883,21 @@ function main() {
       throw new Error(`${failedProgrammaticInits.length} programmatic init evidence check(s) failed.`);
     }
 
+    const cliCodexProject = path.join(tmp, 'cli-codex workspace [win64] 中文');
+    fs.mkdirSync(cliCodexProject);
+    const cliCodexEvidence = runInitCliEvidence({
+      packageRoot,
+      shim,
+      cwd: cliCodexProject,
+      host: 'codex',
+      artifacts,
+    });
+    const cliCodexCheck = checkFromInitCliEvidence(cliCodexEvidence);
+    releaseChecks.push(cliCodexCheck);
+    if (cliCodexCheck.status === 'failed') {
+      throw new Error('CLI Codex init evidence check failed.');
+    }
+
     const cursorLoaderEvidence = buildCursorLoaderEvidence({
       generatedAt: new Date().toISOString(),
     });
@@ -906,6 +1009,9 @@ function main() {
         kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
         qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
       },
+      init_cli_artifacts: {
+        codex: INIT_CODEX_CLI_LOG_FILE,
+      },
       cursor_doctor_programmatic: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
       cursor_clean_programmatic: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
       cursor_loader_evidence: CURSOR_LOADER_EVIDENCE_LOG_FILE,
@@ -945,6 +1051,9 @@ function main() {
         kiro: INIT_KIRO_PROGRAMMATIC_LOG_FILE,
         qoder: INIT_QODER_PROGRAMMATIC_LOG_FILE,
       },
+      init_cli_artifacts: {
+        codex: INIT_CODEX_CLI_LOG_FILE,
+      },
       cursor_doctor_programmatic: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
       cursor_clean_programmatic: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
       cursor_loader_evidence: CURSOR_LOADER_EVIDENCE_LOG_FILE,
@@ -962,12 +1071,14 @@ if (require.main === module) {
 }
 
 module.exports = {
+  buildInitCliEvidence,
   buildInitProgrammaticEvidence,
   buildPackageContentManifest,
   buildCmdCommandLine,
   buildCursorLoaderEvidence,
   buildReleaseArtifactSummary,
   checkFromCursorLoaderEvidence,
+  checkFromInitCliEvidence,
   checkFromInitProgrammaticEvidence,
   checkFromPackageContentManifest,
   createArtifactWriter,
@@ -977,6 +1088,7 @@ module.exports = {
   getEnvValue,
   INIT_CLAUDE_PROGRAMMATIC_LOG_FILE,
   INIT_CODEX_PROGRAMMATIC_LOG_FILE,
+  INIT_CODEX_CLI_LOG_FILE,
   INIT_CURSOR_PROGRAMMATIC_LOG_FILE,
   INIT_KIRO_PROGRAMMATIC_LOG_FILE,
   INIT_QODER_PROGRAMMATIC_LOG_FILE,
@@ -1001,8 +1113,11 @@ module.exports = {
   runGit,
   runInstalledBin,
   runInstalledBinResult,
+  runInstalledCliInitResult,
   runInstalledShim,
+  runInstalledShimResult,
   runNpm,
   runWindowsCmdShim,
+  runWindowsCmdShimResult,
   SUMMARY_FILE,
 };
