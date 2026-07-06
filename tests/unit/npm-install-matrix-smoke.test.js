@@ -629,6 +629,7 @@ describe('npm install matrix smoke script', () => {
     expect(script).not.toContain('shell: process.platform ===');
     expect(script).toContain('shell: false');
     expect(script).toContain("['/d', '/c', buildCmdCommandLine(shim, args)]");
+    expect(script).toContain('windowsVerbatimArguments: true');
     expect(script).toContain("return ['call', command, ...args]");
     expect(script).toContain('prefix with spaces');
     expect(script).toContain('workspace [win64] 中文 (paren)');

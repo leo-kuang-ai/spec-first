@@ -141,6 +141,7 @@ function runChildResult(command, args, options = {}) {
     shell: false,
     stdio: options.stdio || 'pipe',
     windowsHide: true,
+    windowsVerbatimArguments: options.windowsVerbatimArguments,
   });
 }
 
@@ -174,6 +175,7 @@ function runWindowsCmdShim(shim, args, options = {}) {
   return runChild(comspec, ['/d', '/c', buildCmdCommandLine(shim, args)], {
     ...options,
     stdio: options.stdio || 'inherit',
+    windowsVerbatimArguments: true,
   });
 }
 
