@@ -110,7 +110,7 @@ describe('prompt examples baseline contracts', () => {
     expect(skillPrompt).toContain('skills/using-spec-first/evals/routing-cases.json');
     expect(skillPrompt).toContain('not a deterministic router');
     expect(skillPrompt).toContain('External issue or PR material is an input surface, not a separate public workflow.');
-    expect(skillPrompt).toContain('Do not invent an external issue/PR-specific `/spec:*` or `$spec-*` entrypoint');
+    expect(skillPrompt).toContain('Do not invent an external issue/PR-specific `spec-*` entrypoint');
 
     const casesById = new Map(payload.cases.map((entry) => [entry.id, entry]));
     for (const id of [
@@ -142,7 +142,7 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('cross-file-contract-change-routes-work')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-work',
+      expected_entrypoint: 'spec-work',
       artifact_expected: true,
     });
     expect(casesById.get('cross-file-contract-change-routes-work').boundary_note).toContain('contract/runtime delivery changes');
@@ -150,7 +150,7 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('external-bug-issue-routes-debug')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-debug',
+      expected_entrypoint: 'spec-debug',
       artifact_expected: true,
     });
     expect(casesById.get('external-bug-issue-routes-debug').boundary_note).toContain('current source, tests, logs, or owner evidence');
@@ -158,7 +158,7 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('external-enhancement-issue-routes-prd')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-prd',
+      expected_entrypoint: 'spec-prd',
       artifact_expected: true,
     });
     expect(casesById.get('external-enhancement-issue-routes-prd').boundary_note).toContain('not directly to implementation');
@@ -166,7 +166,7 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('external-pr-diff-routes-code-review')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-code-review',
+      expected_entrypoint: 'spec-code-review',
       artifact_expected: true,
     });
     expect(casesById.get('external-pr-diff-routes-code-review').boundary_note).toContain('untrusted inputs');
@@ -174,7 +174,7 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('external-ready-brief-routes-work')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-work',
+      expected_entrypoint: 'spec-work',
       artifact_expected: true,
     });
     expect(casesById.get('external-ready-brief-routes-work').boundary_note).toContain('ordinary execution input');
@@ -182,14 +182,14 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('explicit-spec-plan-honored')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-plan',
+      expected_entrypoint: 'spec-plan',
       artifact_expected: true,
     });
 
     expect(casesById.get('codex-doc-review-no-subagents-fallback')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-doc-review',
+      expected_entrypoint: 'spec-doc-review',
       dispatch_decision: 'fallback',
       fallback_reason: 'dispatch_authorization_missing',
     });
@@ -198,13 +198,13 @@ describe('prompt examples baseline contracts', () => {
     expect(casesById.get('skill-agent-asset-audit-routes-skill-audit')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-skill-audit',
+      expected_entrypoint: 'spec-skill-audit',
     });
 
     expect(casesById.get('codex-spec-plan-explicit-research-personas-dispatch')).toMatchObject({
       expected_outcome: 'public_workflow',
       public_workflow_required: true,
-      expected_entrypoint: '$spec-plan',
+      expected_entrypoint: 'spec-plan',
       dispatch_decision: 'dispatch',
     });
     expect(casesById.get('codex-spec-plan-explicit-research-personas-dispatch').boundary_note).toContain('Codex');
@@ -263,6 +263,6 @@ describe('prompt examples baseline contracts', () => {
         fallback_reason: 'dispatch_authorization_missing',
       });
     expect(casesById.get('stale-setup-does-not-hijack-lightweight-docs-work').forbidden_signals)
-      .toEqual(expect.arrayContaining(['Forces $spec-mcp-setup before answering a lightweight docs question']));
+      .toEqual(expect.arrayContaining(['Forces spec-mcp-setup before answering a lightweight docs question']));
   });
 });

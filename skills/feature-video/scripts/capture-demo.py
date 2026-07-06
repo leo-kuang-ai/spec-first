@@ -759,7 +759,8 @@ Commands:
     p_save = sub.add_parser("save-local", help="Save artifact locally instead of uploading")
     p_save.add_argument("--file", required=True, help="Artifact file to save")
     p_save.add_argument("--branch", default="", help="Branch name for filename")
-    default_dir = "/tmp/spec-first/feature-video"
+    # 用 OS 临时目录:Windows 无 /tmp,硬编码会落到语义错误的路径。
+    default_dir = os.path.join(tempfile.gettempdir(), "spec-first", "feature-video")
     p_save.add_argument("--output-dir", default=default_dir, help="Target directory")
 
     args = parser.parse_args()

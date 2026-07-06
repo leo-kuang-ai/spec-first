@@ -58,7 +58,7 @@ spec-first 必须从 active product surface 中彻底移除 GitNexus：不再安
 
 | 变化类型 | 内容 | 涉及现有能力 | 风险/权限/数据影响 | 证据 tag |
 | --- | --- | --- | --- | --- |
-| remove | 从 setup registry、host config、warmup、projection 和 verification output 中移除 GitNexus | `$spec-mcp-setup`、`mcp-tools.json`、provider config scripts | 用户不再获得 GitNexus MCP config；这是 owner-requested breaking change | user-stated + confirmed-source |
+| remove | 从 setup registry、host config、warmup、projection 和 verification output 中移除 GitNexus | `spec-mcp-setup`、`mcp-tools.json`、provider config scripts | 用户不再获得 GitNexus MCP config；这是 owner-requested breaking change | user-stated + confirmed-source |
 | remove | 移除 GitNexus host instruction block、`gitnexus-instruction` CLI 和 init 自动注入 | `spec-first init`、`AGENTS.md`、`CLAUDE.md`、generated runtime mirrors | 若已有 runtime mirror 含旧 block，需通过 source-first regeneration / cleanup 收口 | confirmed-source |
 | remove | 整目录删除当前 GitNexus-only `spec-graph-bootstrap` source skill，并删除 Claude command template | `skills/spec-graph-bootstrap/`、`templates/claude/commands/spec/graph-bootstrap.md` | graph-heavy workflow 不再有 GitNexus readiness path；保留空壳 skill 会误导 routing 和 runtime generation | confirmed-source |
 | remove | 移除 GitNexus-only readiness artifacts 与 workspace advisory artifacts 的生产和消费 | `.spec-first/graph/*`、`.spec-first/providers/gitnexus/*`、`.spec-first/workspace/gitnexus-readiness.json` | 旧 artifacts 不能继续作为 current evidence；clean/doctor/setup 输出需避免误导 | confirmed-source |
@@ -72,11 +72,11 @@ spec-first 必须从 active product surface 中彻底移除 GitNexus：不再安
 
 | 编号 | 触发条件 | 角色 | 系统行为 | 用户可见结果 | 对应关注点 |
 | --- | --- | --- | --- | --- | --- |
-| R-01 | 当用户运行 `$spec-mcp-setup` 或安装后验证 MCP 工具时 | spec-first setup workflow | 系统不得把 GitNexus 列为 required tool、graph-provider、host MCP server、warmup dependency、provider pin 或 next action | setup 输出不再要求安装、重启或探测 GitNexus | install removal |
+| R-01 | 当用户运行 `spec-mcp-setup` 或安装后验证 MCP 工具时 | spec-first setup workflow | 系统不得把 GitNexus 列为 required tool、graph-provider、host MCP server、warmup dependency、provider pin 或 next action | setup 输出不再要求安装、重启或探测 GitNexus | install removal |
 | R-02 | 当 setup 生成 `.spec-first/config/*` 事实时 | setup scripts | 系统不得写入 `graph-providers.json.providers.gitnexus`、`runtime-capabilities.json.gitnexus_capability_discovery` 或 GitNexus command arrays / artifact path projections | downstream workflows 不再看到 setup-inferred GitNexus availability | setup artifacts |
 | R-03 | 当用户运行 `spec-first init` 或 init plan/apply 生成 host entry docs 时 | CLI / host runtime generator | 系统不得创建或更新 `<!-- gitnexus:start -->` managed block；若 source-owned checked-in entry docs 含该 block，本期应移除 source block | 新生成的 Claude/Codex runtime 不再包含 GitNexus 指令 | runtime generation |
 | R-04 | 当用户查看 CLI help 或调用 internal command | CLI | 系统不得暴露 `gitnexus-instruction`、`workspace-gitnexus-readiness` 或 GitNexus-only `review-pre-facts` active command | 用户无法通过 spec-first CLI 进入 GitNexus 指令或 readiness helper | CLI surface |
-| R-05 | 当用户通过 workflow entry router 选择下一步时 | `using-spec-first` / host bootstrap | 系统不得推荐 `$spec-graph-bootstrap`、`/spec:graph-bootstrap`、workspace-gitnexus readiness 或 GitNexus refresh；graph readiness 不再是公共入口锚点 | next-step guidance 只指向仍存在的 workflows | workflow routing |
+| R-05 | 当用户通过 workflow entry router 选择下一步时 | `using-spec-first` / host bootstrap | 系统不得推荐 `spec-graph-bootstrap`、workspace-gitnexus readiness 或 GitNexus refresh；graph readiness 不再是公共入口锚点 | next-step guidance 只指向仍存在的 workflows | workflow routing |
 | R-06 | 当用户查找 public workflows、source skills 或 runtime command files 时 | Claude/Codex host runtime | 当前 `spec-graph-bootstrap` public workflow 必须整目录删除 source skill；除非另有独立 PRD 定义 provider-free graph capability，否则不得保留同名入口、空壳 skill、scripts、evals 或 command template | `skills/spec-graph-bootstrap/`、`.claude/commands/spec/graph-bootstrap.md` 和 `.agents/skills/spec-graph-bootstrap/` 不再由 source 生成 | public workflow removal |
 | R-07 | 当 plan/work/review/debug/doc-review/brainstorm/write-tasks 需要代码上下文时 | LLM workflow | workflow prose 必须把 bounded direct source reads、`rg`、ast-grep、tests/logs、用户 evidence 作为上下文来源；不得写 GitNexus-first、Graph / GitNexus Evidence、workspace-gitnexus、graph-bootstrap artifact 或 review-pre-facts 依赖 | agent 不会等待 GitNexus readiness 才继续普通工作 | usage removal |
 | R-08 | 当 workflow closeout、Coverage、debug ledger 或 task pack 记录 evidence 时 | LLM workflow | 输出不得包含 GitNexus-specific evidence envelope、capability tags、workspace group status 或 provider limitation schema；如无外部 graph provider，应写 direct-read evidence 或 graph not applicable | 用户看到的证据口径不再引用 GitNexus | evidence semantics |
@@ -115,7 +115,7 @@ spec-first 必须从 active product surface 中彻底移除 GitNexus：不再安
 ```text
 AE-01（对应 R-01, R-02）
 Given 一个新 checkout
-When 用户运行 `$spec-mcp-setup`
+When 用户运行 `spec-mcp-setup`
 Then setup registry、host config preview、warmup 和最终 summary 均不出现 GitNexus
 And `.spec-first/config/graph-providers.json` 与 `runtime-capabilities.json` 不含 `gitnexus` key
 ```
@@ -145,7 +145,7 @@ And 不要求先运行 GitNexus、graph-bootstrap 或读取 workspace-gitnexus r
 
 ```text
 AE-05（对应 R-08）
-Given `$spec-plan` 产出实施计划
+Given `spec-plan` 产出实施计划
 When 计划需要说明代码证据
 Then 它不输出 `## Graph / GitNexus Evidence`
 And 如果没有外部 graph provider，它只记录 direct-read evidence、limitations 和 source refs
@@ -219,7 +219,7 @@ And 不存在 `.spec-first/graph/provider-status.json`、`.spec-first/graph/grap
 - 删除 GitNexus 在 install/setup/host config/warmup/detection/projection 中的 active provider 身份。
 - 删除 GitNexus host instruction block 的 source 与 generation path，包括 checked-in `AGENTS.md` / `CLAUDE.md` 中的 managed block。
 - 整目录删除当前 GitNexus-only `skills/spec-graph-bootstrap/` source skill，包括 `SKILL.md`、scripts、evals 和测试引用。
-- 删除 `templates/claude/commands/spec/graph-bootstrap.md`，确保 source 不再生成 `/spec:graph-bootstrap` 或 `$spec-graph-bootstrap` runtime entry。
+- 删除 `templates/claude/commands/spec/graph-bootstrap.md`，确保 source 不再生成 `spec-graph-bootstrap` runtime entry。
 - 更新所有消费 graph-bootstrap 产物或 handoff 的 active skills，至少覆盖 `spec-mcp-setup`、`using-spec-first`、`spec-plan`、`spec-code-review`、`spec-doc-review`、`spec-work`、`spec-debug`、`spec-brainstorm`、`spec-write-tasks`。
 - 删除或断开 GitNexus-only review-pre-facts helper 及其 active workflow consumption。
 - 清理 active contracts、README、用户手册、workflow prose、tests、fixtures、benchmarks、package allowlist 中的 GitNexus current-state 叙述。
@@ -236,7 +236,7 @@ And 不存在 `.spec-first/graph/provider-status.json`、`.spec-first/graph/grap
 
 ### 与其它模块/需求的关系
 
-- `docs/plans/2026-06-02-001-refactor-remove-gitnexus-integration-plan.md` 已存在，但它是 implementation plan。若该计划与本文冲突，后续执行应先修订计划再进入 `$spec-work`。
+- `docs/plans/2026-06-02-001-refactor-remove-gitnexus-integration-plan.md` 已存在，但它是 implementation plan。若该计划与本文冲突，后续执行应先修订计划再进入 `spec-work`。
 - 既有 GitNexus capability / intent routing PRD 和计划属于历史背景；本 PRD 的 remove delta supersedes 它们在 active implementation 上的 GitNexus 增强方向。
 - 后续若要重建图谱能力，应从新的 brownfield PRD 开始，不复用本期删除任务夹带实现。
 

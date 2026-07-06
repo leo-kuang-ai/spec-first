@@ -92,7 +92,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - rule_id 注册表 / canonical rule 词表：等真实 rule_id 出现重复与歧义后再评估（phase 1 用 lens-family 前缀约定缓解）。
 - 专用 rule-maturity handoff agent：第一版不用；若 `Rule Maturity Candidates` 误报多、需要跨 finding 模式识别、或需要和已有 rule_id 做冲突/重叠分析，再新增只读 classifier agent。该 agent 仍不得新增 finding、`adjudicate`、`promote` 或 `demote`。
 - spec-work closeout 接入 shadow 记录：phase 1 先验证 plan/code-review 两个接入点，work closeout 已有 honest-closeout 链路，叠加点位在 phase 2 启动时按零记录复查结果裁定。
-- harness 衰减审计（定期关组件对比质量）：「构建是为了删除」已通过 R14 退役路径承载最小语义；组件级 A/B 衰减审计是独立的 optimize 实验课题，走 `/spec:optimize`。
+- harness 衰减审计（定期关组件对比质量）：「构建是为了删除」已通过 R14 退役路径承载最小语义；组件级 A/B 衰减审计是独立的 optimize 实验课题，走 `spec-optimize`。
 - 评测平台 / 上下文预算管理等 harness 文档其余建议：与 v1.17 无强依赖，另行走 ideate/brainstorm 裁定。
 
 ---
@@ -616,7 +616,7 @@ SCALE 集成路线（`docs/01-需求分析/13.scale-integration/README.md`）中
 - Modify: `skills/spec-compound/SKILL.md`（沉淀治理类 solution 时，提示「该 learning 是否对应某条 rule 的候选/毕业候选」，把知识轮与规则轮在 compound 处接通；≤3 行 prose）
 
 **Approach:**
-- 毕业流程为既有机制的组合而非新机制：人审决定毕业 → 走 `/spec:work` 写毕业 contract test（如同 `governance-contracts.test.js` 既有断言）→ `promote --to blocking` 时 approval-ref 记录毕业 test 路径 → `report` 此后校验该 ref。
+- 毕业流程为既有机制的组合而非新机制：人审决定毕业 → 走 `spec-work` 写毕业 contract test（如同 `governance-contracts.test.js` 既有断言）→ `promote --to blocking` 时 approval-ref 记录毕业 test 路径 → `report` 此后校验该 ref。
 - 合同明确反向守卫：任何把 blocking 实现为 runtime hook、pre-commit 拦截、SessionStart 注入的尝试都违反本合同（OPT-D 与父方案 non-goal 双重背书），由 governance-contracts 测试守源码层。
 - compound 接通是单向提示：知识轮的 verified learning 可成为规则轮的 rule 候选（事故墓志铭→规则），输出建议 `rule_id`、`evidence_ref`（新 learning 文档）、`reason_code` 与 `human_review_kind`；不反向自动创建、不调用 `record/adjudicate/promote`，第一版不新增 agent。
 

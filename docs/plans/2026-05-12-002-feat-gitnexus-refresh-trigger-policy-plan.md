@@ -10,7 +10,7 @@ spec_id: 2026-05-12-002-gitnexus-refresh-trigger-policy
 
 ## Summary
 
-本计划把 GitNexus 图谱刷新机制收敛为一套可执行的节点策略：所有 graph consumer 自动做 freshness check，只有 `$spec-graph-bootstrap` 拥有 canonical readiness refresh / provider rebuild，graph-heavy workflow 在 stale 时做显式 handoff 而不是静默重建。
+本计划把 GitNexus 图谱刷新机制收敛为一套可执行的节点策略：所有 graph consumer 自动做 freshness check，只有 `spec-graph-bootstrap` 拥有 canonical readiness refresh / provider rebuild，graph-heavy workflow 在 stale 时做显式 handoff 而不是静默重建。
 
 结合代码索引、静态分析、构建缓存和搜索索引系统的常见做法，当前最佳默认不是“切分支自动重建”，而是“便宜事实自动校验、昂贵刷新显式进入”。本计划的实施范围只覆盖默认本地治理：freshness contract、consumer handoff、graph-bootstrap ownership、deterministic tests 和用户文档。advisory hook 与 CI / policy-based refresh 只作为后续独立计划的边界说明，不进入本轮 U1-U6。
 
@@ -30,15 +30,15 @@ spec_id: 2026-05-12-002-gitnexus-refresh-trigger-policy
 ## Requirements
 
 - R1. 明确定义四类操作：`freshness-check`、`refresh-handoff`、`bootstrap-refresh`、`repair-preview`，并说明各自的 artifact 写入边界。
-- R2. `$spec-graph-bootstrap` 是唯一可以写 `.spec-first/graph/*`、`.spec-first/providers/*`、`.spec-first/impact/*` canonical graph readiness artifacts 的默认刷新入口。
+- R2. `spec-graph-bootstrap` 是唯一可以写 `.spec-first/graph/*`、`.spec-first/providers/*`、`.spec-first/impact/*` canonical graph readiness artifacts 的默认刷新入口。
 - R3. 切换分支、pull、rebase、merge、dirty worktree 变化和 provider fingerprint 变化只应让下游判定 stale / bootstrap required；不得默认自动运行 GitNexus analyze。
-- R4. `$spec-mcp-setup` 只刷新 setup-owned provider projection 和 runtime capability facts；当 projection stale 或 setup 成功后，只提示或 handoff 到 `$spec-graph-bootstrap`。
-- R5. `$spec-plan`、`$spec-work`、`$spec-work-beta`、`$spec-debug`、`$spec-code-review`、`$spec-doc-review` 等 consumer 自动 freshness check；轻量任务可 bounded direct reads fallback，graph-heavy / shared contract / cross-module 任务 stale 时应明确建议先运行 `$spec-graph-bootstrap`。
+- R4. `spec-mcp-setup` 只刷新 setup-owned provider projection 和 runtime capability facts；当 projection stale 或 setup 成功后，只提示或 handoff 到 `spec-graph-bootstrap`。
+- R5. `spec-plan`、`spec-work`、`spec-work-beta`、`spec-debug`、`spec-code-review`、`spec-doc-review` 等 consumer 自动 freshness check；轻量任务可 bounded direct reads fallback，graph-heavy / shared contract / cross-module 任务 stale 时应明确建议先运行 `spec-graph-bootstrap`。
 - R6. review / commit / PR 前可以在 fresh graph 下运行 GitNexus impact / detect changes 作为 evidence；detect changes 是 review evidence，不是自动重建索引的触发器。
-- R7. Parent workspace 下批量 refresh 只能发生在 `$spec-graph-bootstrap --all-repos` / parent maintenance path；普通只读问题使用 `workspace-graph-targets.v1` advisory facts 选候选 child repo，不写 parent-local graph artifacts。
+- R7. Parent workspace 下批量 refresh 只能发生在 `spec-graph-bootstrap --all-repos` / parent maintenance path；普通只读问题使用 `workspace-graph-targets.v1` advisory facts 选候选 child repo，不写 parent-local graph artifacts。
 - R8. GitNexus repair、删除 `.gitnexus` 或 provider raw/status artifacts 必须保持 preview-first / confirm boundary，不得由普通 workflow 自动执行。
 - R9. 用户文档、README、contract docs、workflow source、tests 和 `CHANGELOG.md` 必须同步，防止“graph readiness 是所有 workflow hard gate”或“graph stale 自动重建”的误导。
-- R10. 不新增默认 git hook、daemon、watcher、`$spec-quick`、后台刷新服务或隐式 state machine。
+- R10. 不新增默认 git hook、daemon、watcher、`spec-quick`、后台刷新服务或隐式 state machine。
 
 ---
 
@@ -67,7 +67,7 @@ spec_id: 2026-05-12-002-gitnexus-refresh-trigger-policy
 - contract docs 定义 refresh trigger policy、evidence levels 和 canonical artifact ownership。
 - consumer workflows 对齐 freshness-check、graph-heavy handoff、lightweight fallback 和 no-hidden-rebuild 语义。
 - deterministic tests 覆盖 branch / pull / rebase 等价 stale、dirty hash mismatch、provider fingerprint mismatch 和 consumer contract parity。
-- README / user manual 说明 `$spec-graph-bootstrap` 是显式 graph readiness refresh 入口，同时保留 no-graph fast path。
+- README / user manual 说明 `spec-graph-bootstrap` 是显式 graph readiness refresh 入口，同时保留 no-graph fast path。
 
 本计划当前不实现：
 
@@ -79,7 +79,7 @@ spec_id: 2026-05-12-002-gitnexus-refresh-trigger-policy
 ### Deferred to Follow-Up Work
 
 - Optional advisory git hook：未来可独立规划只写 “graph may be stale” marker 或 terminal hint 的 opt-in hook；不属于本计划 U1-U6，且默认不安装、不运行 provider。
-- CI / policy-based refresh：未来可独立规划针对 default branch、protected branch、PR head 或 nightly schedule 的 `$spec-graph-bootstrap` 执行策略；不属于本计划 U1-U6，且必须保持显式配置、可审计 artifacts 和 provider fingerprint 校验。
+- CI / policy-based refresh：未来可独立规划针对 default branch、protected branch、PR head 或 nightly schedule 的 `spec-graph-bootstrap` 执行策略；不属于本计划 U1-U6，且必须保持显式配置、可审计 artifacts 和 provider fingerprint 校验。
 - Provider fast reuse cold-run skip：沿用 `docs/plans/2026-05-09-003-feat-graph-bootstrap-fast-reuse-plan.md`，不在本计划重复实现。
 - Full Windows behavioral parity runner：当前继续使用 shell behavior tests + PowerShell source contract parity；真实 Windows runner 可在后续 CI 计划补充。
 
@@ -146,7 +146,7 @@ External systems are non-authoritative context. They help validate the shape of 
 ## Key Technical Decisions
 
 - Use “automatic check, explicit refresh” as the default model. Rationale: freshness comparison is cheap and deterministic; GitNexus analyze is stateful, slower, and provider-owned.
-- Keep refresh ownership in `$spec-graph-bootstrap`. Rationale: it already owns canonical `.spec-first/graph/*`, `.spec-first/providers/*`, and `.spec-first/impact/*` artifacts.
+- Keep refresh ownership in `spec-graph-bootstrap`. Rationale: it already owns canonical `.spec-first/graph/*`, `.spec-first/providers/*`, and `.spec-first/impact/*` artifacts.
 - Treat branch switch / pull / rebase as staleness events, not refresh events. Rationale: users often inspect or hop branches temporarily; auto-rebuild would add noisy writes and latency.
 - Consumer workflows should hand off, not rebuild. Rationale: planning, work, debug, and review own semantic decisions; graph-bootstrap owns provider execution.
 - Preserve no-graph fast path. Rationale: docs-only, small bug fixes, and lightweight plans should not be blocked by stale or missing graph facts.
@@ -159,7 +159,7 @@ External systems are non-authoritative context. They help validate the shape of 
 
 | Industry pattern | Useful lesson | spec-first application | Boundary |
 | --- | --- | --- | --- |
-| Code intelligence policy indexing | Indexing coverage is chosen by branch / age / policy and resource cost | Keep `$spec-graph-bootstrap` as the canonical refresh node and add future CI policy refresh only when explicitly configured | Do not attach provider rebuild to every local branch switch |
+| Code intelligence policy indexing | Indexing coverage is chosen by branch / age / policy and resource cost | Keep `spec-graph-bootstrap` as the canonical refresh node and add future CI policy refresh only when explicitly configured | Do not attach provider rebuild to every local branch switch |
 | Static analysis workflow triggers | Analysis runs on explicit checkout events such as PR, push, schedule, or path filters | Future CI refresh can target PR head / default branch / nightly windows | Do not make local consumer workflows run provider analyze silently |
 | Build cache fingerprints | Reuse is valid only when inputs and environment match | Normalize a shared freshness helper around `source_revision`, `worktree_status_hash`, `worktree_dirty`, provider projection, and fingerprint | Do not let each workflow invent a different freshness rule |
 | Search refresh economics | Explicit refresh trades correctness latency for indexing cost | Use fresh graph evidence when needed, otherwise disclose limitations and fallback | Do not turn graph freshness into a universal hard gate |
@@ -167,9 +167,9 @@ External systems are non-authoritative context. They help validate the shape of 
 
 Long-term optional layering, not current implementation scope:
 
-1. **Current scope - default local workflow:** automatic freshness check, explicit `$spec-graph-bootstrap` refresh, no hidden provider writes.
+1. **Current scope - default local workflow:** automatic freshness check, explicit `spec-graph-bootstrap` refresh, no hidden provider writes.
 2. **Deferred - optional local ergonomics:** advisory branch / merge hooks may write a stale hint or marker, but must not run GitNexus analyze.
-3. **Deferred - optional team policy:** CI or scheduled refresh may run `$spec-graph-bootstrap` for agreed refs and publish artifacts, guarded by the same fingerprint and query-proof contracts.
+3. **Deferred - optional team policy:** CI or scheduled refresh may run `spec-graph-bootstrap` for agreed refs and publish artifacts, guarded by the same fingerprint and query-proof contracts.
 
 ---
 
@@ -177,8 +177,8 @@ Long-term optional layering, not current implementation scope:
 
 ### Resolved During Planning
 
-- Should switching branches auto-refresh GitNexus? No. It should invalidate or mark stale on the next consumer check; graph-heavy work can then hand off to `$spec-graph-bootstrap`.
-- Should `$spec-mcp-setup` run GitNexus analyze after refreshing provider projection? No. It should refresh projection facts and point to graph-bootstrap.
+- Should switching branches auto-refresh GitNexus? No. It should invalidate or mark stale on the next consumer check; graph-heavy work can then hand off to `spec-graph-bootstrap`.
+- Should `spec-mcp-setup` run GitNexus analyze after refreshing provider projection? No. It should refresh projection facts and point to graph-bootstrap.
 - Should review/commit always refresh before `detect_changes`? No. Use detect/impact only when graph is fresh; stale high-risk review should recommend graph-bootstrap first.
 - Should parent workspace read-only questions refresh all children? No. Use `workspace-graph-targets.v1` and bounded GitNexus-first evidence for primary children.
 
@@ -204,7 +204,7 @@ flowchart TD
   Fresh -->|no| Risk{graph-heavy task?}
   Risk -->|no| Fallback[Bounded direct reads / live MCP as session-local]
   Risk -->|yes| Handoff[Recommend explicit graph-bootstrap handoff]
-  Handoff --> Bootstrap[$spec-graph-bootstrap]
+  Handoff --> Bootstrap[spec-graph-bootstrap]
   Bootstrap --> Reuse{fingerprint reusable?}
   Reuse -->|yes| Reused[reuse fresh prior proof]
   Reuse -->|no| ColdRun[provider analyze/status/query proof]
@@ -217,8 +217,8 @@ flowchart TD
 | --- | --- | --- |
 | startup reminder | read-only version / runtime reminder | no |
 | `doctor` / `init` | runtime / instruction readiness guidance | no |
-| `$spec-mcp-setup` | refresh setup-owned projection and mark bootstrap required when stale | no |
-| `$spec-graph-bootstrap` | reuse or rebuild provider readiness | yes |
+| `spec-mcp-setup` | refresh setup-owned projection and mark bootstrap required when stale | no |
+| `spec-graph-bootstrap` | reuse or rebuild provider readiness | yes |
 | branch switch / pull / rebase | next consumer detects `source_revision` mismatch | no |
 | dirty worktree change | next consumer detects `worktree_status_hash` mismatch | no |
 | lightweight plan/work/review | disclose stale/unavailable graph and fallback | no |
@@ -246,7 +246,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 
 | Category | Examples | Stale graph behavior |
 | --- | --- | --- |
-| Shared contracts | shared helper/API/route/provider contract/core workflow changes | recommend `$spec-graph-bootstrap` before claiming graph-backed impact evidence |
+| Shared contracts | shared helper/API/route/provider contract/core workflow changes | recommend `spec-graph-bootstrap` before claiming graph-backed impact evidence |
 | Cross-module or cross-repo work | refactors, renames, moved symbols, parent workspace routing, multi-module plans | hand off when execution flows or blast radius materially shape the plan/review |
 | Review evidence surfaces | review-pre-facts, code-review graph context, impact/detect changes use | do not run provider rebuild; refresh explicitly first if primary graph evidence is needed |
 | High-risk review | public/shared symbol changes, provider/runtime governance, reviewer dispatch boundary changes | disclose stale graph limitations and recommend explicit bootstrap before high-confidence graph claims |
@@ -280,7 +280,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 - `docs/contracts/graph-provider-consumption.md` canonical artifact and forbidden-read tables.
 
 **Test scenarios:**
-- Happy path: contract docs explicitly say `$spec-graph-bootstrap` owns canonical graph refresh.
+- Happy path: contract docs explicitly say `spec-graph-bootstrap` owns canonical graph refresh.
 - Edge case: docs mention branch switch / pull / rebase as stale detection events, not auto-rebuild events.
 - Error path: docs forbid live MCP success from updating compiled `query_ready`.
 - Integration: graph-provider consumption contract still requires `source_revision`, `worktree_dirty`, and `worktree_status_hash` checks.
@@ -310,7 +310,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 **Approach:**
 - In `spec-graph-bootstrap`, add a “refresh ownership” subsection: it is the only default workflow that writes canonical graph readiness artifacts.
 - In `spec-mcp-setup`, clarify that setup can invalidate derived readiness and refresh provider projection, but provider analyze/build remains graph-bootstrap work.
-- In `using-spec-first`, ensure explicit user requests to “refresh graph/GitNexus/index” route to `$spec-graph-bootstrap`, while setup/runtime repair still routes to `$spec-mcp-setup` or `$spec-update`.
+- In `using-spec-first`, ensure explicit user requests to “refresh graph/GitNexus/index” route to `spec-graph-bootstrap`, while setup/runtime repair still routes to `spec-mcp-setup` or `spec-update`.
 - Preserve existing projection-stale behavior: stale package/version or provider command projection recommends setup refresh before bootstrap continues.
 
 **Patterns to follow:**
@@ -321,7 +321,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 - Happy path: setup text says graph providers are configured but not query-ready until graph-bootstrap runs.
 - Edge case: stale provider fingerprint still marks bootstrap required without running provider commands from setup.
 - Error path: provider projection stale recommends rerunning setup and does not proceed with stale provider command arrays.
-- Boundary: using-spec-first routes graph refresh/index rebuild requests to `$spec-graph-bootstrap`, not `$spec-mcp-setup`.
+- Boundary: using-spec-first routes graph refresh/index rebuild requests to `spec-graph-bootstrap`, not `spec-mcp-setup`.
 
 **Verification:**
 - Setup, update, startup, and bootstrap entrypoints have non-overlapping refresh responsibilities.
@@ -355,7 +355,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 - Define the minimum graph-heavy trigger set from this plan in prose and tests: shared helper/API/route/provider contract/core workflow/cross-module changes, review-pre-facts changes, high-risk review, or planning/review that depends on execution flows and blast radius.
 - Add a minimum freshness-check execution contract: before using compiled graph facts as primary evidence, consumers must inspect the same canonical artifact fields and snapshot values (`source_revision`, `worktree_dirty`, `worktree_status_hash`, provider `query_ready`, and provider projection/fingerprint freshness). Prefer a shared helper or shared test fixture now; a per-workflow implementation is only acceptable if the tests prove field parity and reason-code parity.
 - For stale graph + lightweight work, require limitation disclosure and bounded direct reads fallback.
-- For stale graph + graph-heavy work, require a clear handoff recommendation to `$spec-graph-bootstrap` before claiming graph-backed evidence.
+- For stale graph + graph-heavy work, require a clear handoff recommendation to `spec-graph-bootstrap` before claiming graph-backed evidence.
 - Apply the same semantics to `spec-work-beta` delegation prompts so beta worker execution does not drift from stable Work.
 - For review/commit, clarify that `detect_changes` / impact analysis only runs as evidence when the graph is fresh or explicitly session-local; it does not trigger rebuild.
 
@@ -450,11 +450,11 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 - User manual quickstart no-graph fast path language.
 
 **Test scenarios:**
-- Happy path: README and zh README identify `$spec-graph-bootstrap` as graph readiness refresh entrypoint.
+- Happy path: README and zh README identify `spec-graph-bootstrap` as graph readiness refresh entrypoint.
 - Boundary: README and user manual still say lightweight workflows can proceed before graph readiness is compiled.
 - Edge case: docs mention branch switching as stale detection, not an automatic rebuild.
 - Integration: user-manual contract coverage scans graph/GitNexus/readiness references broadly enough to catch stale guidance outside quickstart/index.
-- Overdesign guard: docs do not introduce `$spec-quick`, `spec-first graph watch`, or default git hooks.
+- Overdesign guard: docs do not introduce `spec-quick`, `spec-first graph watch`, or default git hooks.
 
 **Verification:**
 - Users can distinguish “I need current graph evidence” from “I can continue with bounded reads”.
@@ -499,7 +499,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 - **Interaction graph:** Setup produces provider projection; graph-bootstrap compiles canonical readiness; consumers check and interpret; repair remains explicit. This plan tightens prose and tests around that chain without adding a new runtime node.
 - **Error propagation:** Stale graph facts propagate as limitations and bootstrap-required guidance, not as hidden failures or automatic provider execution.
 - **State lifecycle risks:** `.spec-first/graph/*` and `.spec-first/providers/*` remain generated runtime artifacts owned by graph-bootstrap. Plans/docs/tests are source truth.
-- **API surface parity:** Claude and Codex workflow guidance must stay equivalent; public entrypoints remain `$spec-graph-bootstrap` / `/spec:graph-bootstrap`.
+- **API surface parity:** Claude and Codex workflow guidance must stay equivalent; public entrypoints remain `spec-graph-bootstrap` / `spec-graph-bootstrap`.
 - **Integration coverage:** Contract tests cover prose semantics; shell tests cover deterministic artifact state; PowerShell tests cover source parity.
 - **Unchanged invariants:** `query_ready=true` still requires analyze/build + status + query-surface proof; live MCP remains session-local; graph unavailable does not block lightweight workflows.
 
@@ -522,7 +522,7 @@ The minimum graph-heavy set is deliberately small and must be consistent across 
 
 ## Documentation / Operational Notes
 
-- Public docs should use “refresh graph readiness” for `$spec-graph-bootstrap`; avoid saying ordinary workflows “refresh GitNexus” unless they actually enter graph-bootstrap.
+- Public docs should use “refresh graph readiness” for `spec-graph-bootstrap`; avoid saying ordinary workflows “refresh GitNexus” unless they actually enter graph-bootstrap.
 - Branch switching guidance should be explicit: `HEAD` changes make compiled graph facts stale; the next graph consumer detects this and graph-heavy work should refresh explicitly.
 - If future docs mention hooks or CI refresh, they must say `opt-in`, name the artifact owner, and clarify whether the path writes only advisory markers or canonical graph readiness artifacts.
 - Repair guidance should tie user actions to structured reason codes such as provider projection stale, provider storage write failure, or query-unverified evidence.

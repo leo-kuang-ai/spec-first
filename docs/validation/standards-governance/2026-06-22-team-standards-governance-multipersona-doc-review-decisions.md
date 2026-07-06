@@ -7,7 +7,7 @@
 - 日期: 2026-06-22
 - 审查时仓 HEAD: `61c29f10`（stale snapshot；任何实现/修订前必须重新捕获 `git rev-parse --short HEAD` 与 `git status --short`）
 - 状态: **决策已记录；plan 正文未改**（用户选择"决策先存档、plan 修订另起"，与上一轮 grill register 同一处理方式）。
-- 性质: 本文件是 review 决策存档，供后续 plan 修订或 `/spec:work` 直接消费；不是 plan 本身，不改变 source/runtime 行为。
+- 性质: 本文件是 review 决策存档，供后续 plan 修订或 `spec-work` 直接消费；不是 plan 本身，不改变 source/runtime 行为。
 - 直接证据: bounded 读源 + `rg` 确认 FACT-1~7（见 Coverage）；两个最强 P1（A owner-gate、F 冲突复用）经双 persona 直接读源确认，置信 100。**未做** fresh-source eval / 未做实现变更。
 
 ## 范围说明与定位
@@ -23,7 +23,7 @@
 - plan 在完整性、R→U 正向 / C→证据反向可追溯、trust/source-runtime 纪律上**扎实**。
 - 但 **6 个 persona 高度收敛地指向同一根问题**：v1 的范围与机制重量，与 plan 自身反复声明的"轻合同 / docs-first / 薄规范 / 渐进 / 不做复杂状态机"**严重不一致**。
 - 另有 **3 个具体、可验证的硬缺陷**（非主观）：owner-gate 在本仓 fail-open 且字段自相矛盾（A）、冲突解决"复用"了不具备该能力的上游（F）、隐私脱敏纯 prose（H）。
-- 总建议: **进入 `/spec:work` 前先做一次 scope 收敛 + 三个硬缺陷修订**，否则会实现一套"无消费者、无法 dogfood、部分机制空转"的治理层。
+- 总建议: **进入 `spec-work` 前先做一次 scope 收敛 + 三个硬缺陷修订**，否则会实现一套"无消费者、无法 dogfood、部分机制空转"的治理层。
 
 ---
 

@@ -137,7 +137,7 @@ source: docs/ideation/2026-04-03-spec-first-blog-series-ideation.md
 
 **讲什么**
 
-- `/spec:*` 和 `$spec-*` 的双平台差异
+- `spec-*` 和 `spec-*` 的双平台差异
 - 为什么要做双宿主
 - 同一套流程、同一套治理、同一套知识沉淀
 - 为什么这代表一套可迁移的方法

@@ -127,7 +127,13 @@ describe('workflow invocation boundary', () => {
     expect(skill).toContain('current host\'s document-review entrypoint');
     expect(skill).not.toContain('/spec:doc-review <path>` on Claude Code');
     expect(skill).not.toContain('$spec-doc-review <path>` on Codex');
-    expect(skill).not.toContain('Claude users call `/spec:doc-review <path>`; Codex users call `$spec-doc-review <path>`');
+    const legacyHostSpecificSentence = [
+      'Claude' + ' users',
+      'call `/spec:doc-review <path>`;',
+      'Codex' + ' users',
+      'call `$spec-doc-review <path>`',
+    ].join(' ');
+    expect(skill).not.toContain(legacyHostSpecificSentence);
     expect(skill).toContain('Phase 2');
     expect(skill).toContain('persona agents');
   });
@@ -153,27 +159,20 @@ describe('workflow invocation boundary', () => {
     expect(violations).toEqual([]);
   });
 
-  test('large-requirements design doc keeps dual-host entrypoints and public task compilation boundaries', () => {
+  test('large-requirements design doc keeps unified entrypoints and public task compilation boundaries', () => {
     const text = read(path.join(REPO_ROOT, 'docs', '02-架构设计', '需求拆分', '大需求拆分.md'));
 
-    expect(text).toContain('Claude Code:');
-    expect(text).toContain('/spec:brainstorm');
-    expect(text).toContain('/spec:plan');
-    expect(text).toContain('/spec:work');
-    expect(text).toContain('/spec:code-review');
-    expect(text).toContain('/spec:compound');
-    expect(text).toContain('Codex:');
-    expect(text).toContain('$spec-brainstorm');
-    expect(text).toContain('$spec-plan');
-    expect(text).toContain('$spec-work');
-    expect(text).toContain('$spec-code-review');
-    expect(text).toContain('$spec-compound');
+    expect(text).toContain('supported hosts 的用户可见 workflow 入口统一为 `spec-*`');
+    expect(text).toContain('spec-brainstorm');
+    expect(text).toContain('spec-plan');
+    expect(text).toContain('spec-work');
+    expect(text).toContain('spec-code-review');
+    expect(text).toContain('spec-compound');
     expect(text).toContain('`spec-write-tasks` 已提升为公开 workflow');
-    expect(text).toContain('/spec:write-tasks');
-    expect(text).toContain('$spec-write-tasks');
-    expect(text).toContain('当前不存在 `/spec:requirements` 或 `$spec-requirements` 入口');
-    expect(text).not.toContain('/spec:requirements validate');
-    expect(text).not.toContain('$spec-requirements validate');
+    expect(text).toContain('spec-write-tasks');
+    expect(text).toContain('当前不存在 `spec-requirements` workflow 入口');
+    expect(text).not.toContain('/spec:');
+    expect(text).not.toContain('$spec-');
     expect(text).toContain('spec-requirements validate <packet-dir>');
   });
 });

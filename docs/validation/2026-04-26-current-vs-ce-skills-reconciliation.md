@@ -195,18 +195,18 @@
 | `ce-adversarial-document-reviewer.agent.md` | `spec-adversarial-document-reviewer.agent.md` | 当前项目将 spec-doc-review shared rubric 引用明确为 `skills/spec-doc-review/references/subagent-template.md`，并把 peer persona signal 改为 `spec-*` agent identity。 |
 | `ce-adversarial-reviewer.agent.md` | `spec-adversarial-reviewer.agent.md` | 当前项目修正旧简称 `security-reviewer` / `performance-reviewer` 为真实 `spec-security-reviewer` / `spec-performance-reviewer`。 |
 | `ce-best-practices-researcher.agent.md` | `spec-best-practices-researcher.agent.md` | 当前项目按实际 skill 名称修正引用：`frontend-design`、`gemini-imagegen`、`git-worktree`；属于命名适配。 |
-| `ce-code-simplicity-reviewer.agent.md` | `spec-code-simplicity-reviewer.agent.md` | 当前项目将受保护文档说明从 CE artifact 改为 spec-first workflow artifact，并使用 Claude workflow 入口 `/spec:plan`、`/spec:work`。 |
+| `ce-code-simplicity-reviewer.agent.md` | `spec-code-simplicity-reviewer.agent.md` | 当前项目将受保护文档说明从 CE artifact 改为 spec-first workflow artifact，并使用 Claude workflow 入口 `spec-plan`、`spec-work`。 |
 | `ce-coherence-reviewer.agent.md` | `spec-coherence-reviewer.agent.md` | 当前项目将 shared rubric 引用明确为 `skills/spec-doc-review/references/subagent-template.md`。 |
 | `ce-design-lens-reviewer.agent.md` | `spec-design-lens-reviewer.agent.md` | 当前项目将 shared rubric 引用明确为 `skills/spec-doc-review/references/subagent-template.md`。 |
 | `ce-feasibility-reviewer.agent.md` | `spec-feasibility-reviewer.agent.md` | 当前项目将 shared rubric / false-positive catalog 引用明确为 `skills/spec-doc-review/references/subagent-template.md`。 |
-| `ce-git-history-analyzer.agent.md` | `spec-git-history-analyzer.agent.md` | 当前项目将受保护文档说明从 CE artifact 改为 spec-first workflow artifact，并使用 Claude workflow 入口 `/spec:plan`。 |
-| `ce-learnings-researcher.agent.md` | `spec-learnings-researcher.agent.md` | 当前项目补充 `docs/solutions` 双视图复用说明，将 CE module 查询适配为 `spec-first`，并将调用方引用改为中性 workflow 名称，避免混淆 Claude `/spec:*` 与 Codex `$spec-*` 入口。 |
+| `ce-git-history-analyzer.agent.md` | `spec-git-history-analyzer.agent.md` | 当前项目将受保护文档说明从 CE artifact 改为 spec-first workflow artifact，并使用 Claude workflow 入口 `spec-plan`。 |
+| `ce-learnings-researcher.agent.md` | `spec-learnings-researcher.agent.md` | 当前项目补充 `docs/solutions` 双视图复用说明，将 CE module 查询适配为 `spec-first`，并将调用方引用改为中性 workflow 名称，避免混淆 Claude `spec-*` 与 Codex `spec-*` 入口。 |
 | `ce-product-lens-reviewer.agent.md` | `spec-product-lens-reviewer.agent.md` | 当前项目将 shared rubric / false-positive catalog 引用明确为 `skills/spec-doc-review/references/subagent-template.md`，并把 peer persona 引用改为 `spec-*` identity。 |
 | `ce-project-standards-reviewer.agent.md` | `spec-project-standards-reviewer.agent.md` | 当前项目将 cross-reference 检查口径改为扁平 `spec-*.agent.md` identity，属于 agent 目录结构适配。 |
 | `ce-scope-guardian-reviewer.agent.md` | `spec-scope-guardian-reviewer.agent.md` | 当前项目将 shared rubric 引用明确为 `skills/spec-doc-review/references/subagent-template.md`，并把 peer persona 引用改为 `spec-*` identity。 |
 | `ce-security-lens-reviewer.agent.md` | `spec-security-lens-reviewer.agent.md` | 当前项目将 shared rubric / false-positive catalog 引用明确为 `skills/spec-doc-review/references/subagent-template.md`。 |
 | `ce-session-historian.agent.md` | `spec-session-historian.agent.md` | 当前项目按仅支持 Claude Code / Codex 的 host 边界移除 Cursor 会话源说明，并要求 `spec-session-inventory` 显式传入 `claude` / `codex` 平台参数。 |
-| `ce-slack-researcher.agent.md` | `spec-slack-researcher.agent.md` | 当前项目将示例中的旧 `/spec-ideate` 写法修正为 Claude workflow 入口 `/spec:ideate`。 |
+| `ce-slack-researcher.agent.md` | `spec-slack-researcher.agent.md` | 当前项目将示例中的旧 `/spec-ideate` 写法修正为 Claude workflow 入口 `spec-ideate`。 |
 
 ### Agents 结论
 
@@ -234,7 +234,7 @@
 | 7 | `spec-best-practices-researcher.agent.md` | 通过 | 通过：`agent-native-architecture`、`frontend-design`、`gemini-imagegen`、`git-worktree` 均存在 | 无 | 通过：`.claude/.codex/.agents` runtime 与 home skill 目录为搜索范围 | 已在前序迁移中修正为当前 skill 名。 |
 | 8 | `spec-cli-agent-readiness-reviewer.agent.md` | 通过 | 无 | 无 | 通过：`src/cli/` 存在；其他入口为跨项目候选 | 候选入口目录用于被审项目扫描，不要求当前仓库全部存在。 |
 | 9 | `spec-cli-readiness-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
-| 10 | `spec-code-simplicity-reviewer.agent.md` | 通过 | 通过：`/spec:plan`、`/spec:work` 为 Claude workflow 入口 | 无 | 通过：`docs/plans/*.md`、`docs/solutions/*.md` 为保护通配 | 已修正 CE artifact 残留为 spec-first workflow artifact。 |
+| 10 | `spec-code-simplicity-reviewer.agent.md` | 通过 | 通过：`spec-plan`、`spec-work` 为 Claude workflow 入口 | 无 | 通过：`docs/plans/*.md`、`docs/solutions/*.md` 为保护通配 | 已修正 CE artifact 残留为 spec-first workflow artifact。 |
 | 11 | `spec-coherence-reviewer.agent.md` | 通过 | 无 | 无 | 通过：`skills/spec-doc-review/references/subagent-template.md` 存在 | 已修正 shared rubric 路径。 |
 | 12 | `spec-correctness-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 13 | `spec-data-integrity-guardian.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
@@ -248,7 +248,7 @@
 | 21 | `spec-feasibility-reviewer.agent.md` | 通过 | 无 | 无 | 通过：`skills/spec-doc-review/references/subagent-template.md` 存在 | 已修正 shared rubric / false-positive catalog 路径。 |
 | 22 | `spec-figma-design-sync.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 23 | `spec-framework-docs-researcher.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
-| 24 | `spec-git-history-analyzer.agent.md` | 通过 | 通过：`/spec:plan` 为 Claude workflow 入口 | 无 | 通过：`docs/plans/`、`docs/solutions/` 存在 | 已修正 CE artifact 残留为 spec-first workflow artifact。 |
+| 24 | `spec-git-history-analyzer.agent.md` | 通过 | 通过：`spec-plan` 为 Claude workflow 入口 | 无 | 通过：`docs/plans/`、`docs/solutions/` 存在 | 已修正 CE artifact 残留为 spec-first workflow artifact。 |
 | 25 | `spec-issue-intelligence-analyst.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 26 | `spec-julik-frontend-races-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 27 | `spec-kieran-python-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
@@ -271,7 +271,7 @@
 | 44 | `spec-security-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 45 | `spec-security-sentinel.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 46 | `spec-session-historian.agent.md` | 通过 | 通过：仅调用 `spec-session-inventory` / `spec-session-extract`，并显式限制 `claude`、`codex` 平台 | 无 | 通过：`~/.claude`、`~/.codex`、`~/.agents` 为受支持宿主会话目录 | 已移除 Cursor 会话源正文，保留对 unsupported platforms 的拒绝说明。 |
-| 47 | `spec-slack-researcher.agent.md` | 通过 | 通过：Claude 示例使用 `/spec:ideate` | 通过：自引用 `spec-slack-researcher` 存在 | 无 | 示例文案已使用 `spec-slack-researcher`，并修正旧 `/spec-ideate` 写法。 |
+| 47 | `spec-slack-researcher.agent.md` | 通过 | 通过：Claude 示例使用 `spec-ideate` | 通过：自引用 `spec-slack-researcher` 存在 | 无 | 示例文案已使用 `spec-slack-researcher`，并修正旧 `/spec-ideate` 写法。 |
 | 48 | `spec-spec-flow-analyzer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 49 | `spec-swift-ios-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
 | 50 | `spec-testing-reviewer.agent.md` | 通过 | 无 | 无 | 无 | 未发现 skill、脚本、目录或命令引用问题。 |
@@ -281,15 +281,15 @@
 
 | 类型 | 文件 | 修正 |
 |---|---|---|
-| CE 残留 | `agents/spec-code-simplicity-reviewer.agent.md` | `compound-engineering pipeline artifacts` 改为 `spec-first workflow artifacts`，并将 workflow 入口改为 `/spec:plan`、`/spec:work`。 |
-| CE 残留 | `agents/spec-git-history-analyzer.agent.md` | `compound-engineering pipeline artifacts` 改为 `spec-first workflow artifacts`，并将 workflow 入口改为 `/spec:plan`。 |
+| CE 残留 | `agents/spec-code-simplicity-reviewer.agent.md` | `compound-engineering pipeline artifacts` 改为 `spec-first workflow artifacts`，并将 workflow 入口改为 `spec-plan`、`spec-work`。 |
+| CE 残留 | `agents/spec-git-history-analyzer.agent.md` | `compound-engineering pipeline artifacts` 改为 `spec-first workflow artifacts`，并将 workflow 入口改为 `spec-plan`。 |
 | CE 残留 | `agents/spec-learnings-researcher.agent.md` | `module:.*(compound-engineering|skill-design)` 改为 `module:.*(spec-first|skill-design)`。 |
 | CE 路径示例 | `agents/spec-project-standards-reviewer.agent.md` | `plugins/compound-engineering/AGENTS.md` 示例改为 `packages/example/AGENTS.md`。 |
 | Agent 互指 | `agents/spec-adversarial-reviewer.agent.md` | `security-reviewer`、`performance-reviewer` 改为 `spec-security-reviewer`、`spec-performance-reviewer`。 |
 | Agent 互指 | `agents/spec-adversarial-document-reviewer.agent.md`、`agents/spec-product-lens-reviewer.agent.md`、`agents/spec-scope-guardian-reviewer.agent.md` | `product-lens`、`scope-guardian`、`security-lens`、`design-lens` 等 peer shorthand 改为真实 `spec-*` agent identity。 |
 | Reference 路径 | `agents/spec-adversarial-document-reviewer.agent.md`、`agents/spec-coherence-reviewer.agent.md`、`agents/spec-design-lens-reviewer.agent.md`、`agents/spec-feasibility-reviewer.agent.md`、`agents/spec-product-lens-reviewer.agent.md`、`agents/spec-scope-guardian-reviewer.agent.md`、`agents/spec-security-lens-reviewer.agent.md` | `subagent-template.md` 改为存在的 `skills/spec-doc-review/references/subagent-template.md`。 |
 | Host 边界 | `agents/spec-session-historian.agent.md` | 搜索范围从 Claude Code / Codex / Cursor 收敛为仅 Claude Code / Codex，并要求 inventory 调用显式传 `claude` / `codex`，避免默认扫入 unsupported platform。 |
-| Workflow 入口 | `agents/spec-learnings-researcher.agent.md`、`agents/spec-slack-researcher.agent.md`、`agents/spec-session-historian.agent.md` | 清理旧 `/spec-*` 写法；Claude 示例使用 `/spec:*`，跨宿主语境使用中性 workflow 名称。 |
+| Workflow 入口 | `agents/spec-learnings-researcher.agent.md`、`agents/spec-slack-researcher.agent.md`、`agents/spec-session-historian.agent.md` | 清理旧 `/spec-*` 写法；Claude 示例使用 `spec-*`，跨宿主语境使用中性 workflow 名称。 |
 
 ### 逐 Agent 审查例外说明
 
@@ -328,16 +328,16 @@
 | 14 | `proof` | 通过 | 修正 HITL review blocking question 与 subagent 说明，仅保留 Claude Code / Codex。 |
 | 15 | `report-bug` | 通过 | 修正 blocking question 说明，并将 Agent Platform 字段限制为 Claude Code 或 Codex。 |
 | 16 | `resolve-pr-feedback` | 通过 | 修正 blocking question 说明，仅保留 Claude Code / Codex；保留 Gemini Code Assist 作为 review bot 文本识别，不作为宿主支持。 |
-| 17 | `spec-brainstorm` | 通过 | 修正 blocking question 说明与 workflow 入口语法；Claude command 使用 `/spec:*`。 |
+| 17 | `spec-brainstorm` | 通过 | 修正 blocking question 说明与 workflow 入口语法；Claude command 使用 `spec-*`。 |
 | 18 | `spec-compound` | 通过 | 修正 blocking question、session history host 范围与 workflow 入口语法；session history 仅 Claude Code / Codex。 |
 | 19 | `spec-compound-refresh` | 通过 | 修正 blocking question 说明，仅保留 Claude Code / Codex。 |
-| 20 | `spec-debug` | 通过 | 修正 blocking question 说明与 workflow 入口语法；Claude command 使用 `/spec:*`。 |
+| 20 | `spec-debug` | 通过 | 修正 blocking question 说明与 workflow 入口语法；Claude command 使用 `spec-*`。 |
 | 21 | `spec-dhh-rails-style` | 通过 | 未发现 unsupported host、旧 question tool 或旧 `/spec-*` 入口问题。 |
 | 22 | `spec-graph-bootstrap` | 通过 | 未发现 unsupported host、旧 question tool 或旧 `/spec-*` 入口问题。 |
-| 23 | `spec-ideate` | 通过 | 修正 blocking question 说明与 post-ideation workflow 入口语法；Claude command 使用 `/spec:*`。 |
+| 23 | `spec-ideate` | 通过 | 修正 blocking question 说明与 post-ideation workflow 入口语法；Claude command 使用 `spec-*`。 |
 | 24 | `spec-mcp-setup` | 通过 | 未发现 unsupported host、旧 question tool 或旧 `/spec-*` 入口问题。 |
 | 25 | `spec-optimize` | 通过 | 修正 blocking question 说明，并将旧 `/spec-optimize` 口径改为 standalone skill 名称。 |
-| 26 | `spec-plan` | 通过 | 修正 blocking question 说明与 handoff 入口语法；Claude command 使用 `/spec:*`。 |
+| 26 | `spec-plan` | 通过 | 修正 blocking question 说明与 handoff 入口语法；Claude command 使用 `spec-*`。 |
 | 27 | `spec-polish-beta` | 通过 | 移除 Cursor / VS Code IDE handoff 口径，保留 Claude Code browser hint 与 Codex/terminal URL 输出。 |
 | 28 | `spec-pr-description` | 通过 | 修正 harness badge lookup，仅保留 Claude Code / Codex。 |
 | 29 | `spec-release-notes` | 通过 | 未发现 unsupported host、旧 question tool 或旧 `/spec-*` 入口问题。 |
@@ -347,8 +347,8 @@
 | 33 | `spec-sessions` | 通过 | 修正 blocking question 说明与 Claude command 入口语法。 |
 | 34 | `spec-setup` | 通过 | 修正 blocking question 说明，仅保留 Claude Code / Codex。 |
 | 35 | `spec-slack-research` | 通过 | 修正 blocking question 说明，并将旧 `/spec-slack-research` 改为 standalone skill 名称。 |
-| 36 | `spec-update` | 通过 | 修正旧 `/spec-update` 用户提示为 Claude command `/spec:update`，保留真实 skill 路径 `spec-update`。 |
-| 37 | `spec-work` | 通过 | 修正 workflow 入口语法；Claude command 使用 `/spec:*`。 |
+| 36 | `spec-update` | 通过 | 修正旧 `/spec-update` 用户提示为 Claude command `spec-update`，保留真实 skill 路径 `spec-update`。 |
+| 37 | `spec-work` | 通过 | 修正 workflow 入口语法；Claude command 使用 `spec-*`。 |
 | 38 | `spec-work-beta` | 通过 | 修正 blocking question、delegation gate 与 workflow 入口语法，仅保留 Claude Code / Codex。 |
 | 39 | `test-browser` | 通过 | 修正 blocking question 说明，仅保留 Claude Code / Codex。 |
 | 40 | `test-xcode` | 通过 | 未发现 unsupported host、旧 question tool 或旧 `/spec-*` 入口问题。 |
@@ -362,7 +362,7 @@
 | Subagent primitive | `skills/agent-native-audit/SKILL.md`、`skills/spec-doc-review/SKILL.md`、`skills/proof/references/hitl-review.md` | 删除 Pi subagent 说明，仅保留 Claude Code Agent/Task 与 Codex `spawn_agent`。 |
 | Session history | `skills/spec-session-inventory/**`、`skills/spec-session-extract/**`、`skills/spec-compound/SKILL.md` | 移除 Cursor discovery / metadata / skeleton / errors 支持；session history 收敛为 Claude Code + Codex。 |
 | Polish beta | `skills/spec-polish-beta/**` | 移除 Cursor / VS Code browser handoff 与 launch schema 泛 IDE 叙事；保留 Claude Code browser hint 与 Codex/terminal URL 输出。 |
-| Workflow entrypoints | 多个 workflow skills 与 references | 命令型 Claude 入口统一为 `/spec:*`；非 command-backed standalone skill 使用 skill 名称，不写成 slash command。 |
+| Workflow entrypoints | 多个 workflow skills 与 references | 命令型 Claude 入口统一为 `spec-*`；非 command-backed standalone skill 使用 skill 名称，不写成 slash command。 |
 | PR/report metadata | `skills/spec-pr-description/SKILL.md`、`skills/report-bug/SKILL.md` | harness/platform 示例收敛为 Claude Code 与 Codex。 |
 
 ### 逐 Skill Host 边界例外说明

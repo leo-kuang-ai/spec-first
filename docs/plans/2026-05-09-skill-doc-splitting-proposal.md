@@ -26,7 +26,7 @@ Created: 2026-05-09
 
 全部 40 个 skill 合计 12,053 行，平均约 301 行/skill。超长 SKILL.md 带来三个问题：
 
-1. **单次执行 prompt 过长**：Claude Code 和 Codex 在用户调用 skill 时（`/spec:xxx` 或 `$spec-xxx`）加载完整 SKILL.md 作为执行 prompt。大量边界条件和子阶段描述占用 context window，核心意图被稀释。注意：skill 是按需加载而非会话启动时全部加载，所以收益体现在"每次调用时 LLM 需要处理的 prompt 长度减少"，而非"启动时 token 节省"
+1. **单次执行 prompt 过长**：Claude Code 和 Codex 在用户调用 skill 时（`spec-xxx`）加载完整 SKILL.md 作为执行 prompt。大量边界条件和子阶段描述占用 context window，核心意图被稀释。注意：skill 是按需加载而非会话启动时全部加载，所以收益体现在"每次调用时 LLM 需要处理的 prompt 长度减少"，而非"启动时 token 节省"
 2. **执行精度下降**：关键判断点淹没在细节中，LLM 更容易遗漏核心流程步骤
 3. **维护成本高**：单文件 960 行的 prose 难以 review、难以定位变更影响面
 

@@ -1,11 +1,11 @@
 ---
 name: spec-write-skill
-description: 公开 workflow：编写、改写、迁移或按 audit findings 修复 spec-first source skill 时使用；先判断是否值得做成 skill，再更新 skills/NAME/SKILL.md 的触发、边界、I/O、渐进披露、resources/evals、治理和验证。不要用于一次性回答、解释/总结/翻译、只审计、文档导出、第三方安装、普通代码评审、普通 /spec:* workflow 执行，或手改 generated runtime mirrors。
+description: 公开 workflow：编写、改写、迁移或按 audit findings 修复 spec-first source skill 时使用；先判断是否值得做成 skill，再更新 skills/NAME/SKILL.md 的触发、边界、I/O、渐进披露、resources/evals、治理和验证。不要用于一次性回答、解释/总结/翻译、只审计、文档导出、第三方安装、普通 spec-* workflow 执行，或手改 generated runtime mirrors。
 ---
 
 # Spec Write Skill
 
-`spec-write-skill` 是写 skill 的公开 workflow。Claude 入口是 `/spec:write-skill`，Codex 入口是 `$spec-write-skill`。它不是 `spec-skill-audit` 的替代品：本 workflow 只把明确目标转成 source patch。
+`spec-write-skill` 是写 skill 的公开 workflow，统一入口是 `spec-write-skill`。它不是 `spec-skill-audit` 的替代品：本 workflow 只把明确目标转成 source patch。
 
 ## Purpose
 

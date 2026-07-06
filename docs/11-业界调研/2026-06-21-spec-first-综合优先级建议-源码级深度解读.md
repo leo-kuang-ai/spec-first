@@ -371,7 +371,7 @@ P2 behavior contract + Delta ──> 阻塞于 P0-C + P0-D 证据；后置首因
 
 **两处研究建议改写的证据独立性差异已在 §0 第 2 点如实标注**：config-protection 有一条与作者无关的机械证据（全仓 grep），且本质是继承 ECH 自己的 caveat 而非纠错；scorecard out-of-scope 是同作者同批次单方治理决策，无独立对抗评审 artifact，已保留"带新证据可重开"的口子，未武断终局化。
 
-**本文档经一轮 `/spec:doc-review` 多 persona 审查**（coherence / feasibility / product-lens / scope-guardian / adversarial），feasibility reviewer 独立回源逐条复核 7 条 source 声明为真（置信 100）；产品/对抗/范围 reviewer 的高一致发现（replay corpus 应独立为 P0、执行序应按杠杆而非确定性、证据门对称化、净增成本聚合、P0-C 样本来源限定、依赖阻塞可见化、P0-A 拆分）已在本轮修订采纳。
+**本文档经一轮 `spec-doc-review` 多 persona 审查**（coherence / feasibility / product-lens / scope-guardian / adversarial），feasibility reviewer 独立回源逐条复核 7 条 source 声明为真（置信 100）；产品/对抗/范围 reviewer 的高一致发现（replay corpus 应独立为 P0、执行序应按杠杆而非确定性、证据门对称化、净增成本聚合、P0-C 样本来源限定、依赖阻塞可见化、P0-A 拆分）已在本轮修订采纳。
 
 **两处对研究文档的纠正**（config-protection 不存在、自动 PRD scorecard 已 settled out-of-scope）均有 source / CHANGELOG / 治理 reference 三重依据。
 

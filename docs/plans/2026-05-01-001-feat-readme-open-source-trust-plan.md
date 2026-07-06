@@ -283,9 +283,9 @@ README back half
 - Existing `dual-host-governance-contracts.test.js` assertions for current-host setup/graph/bootstrap wording.
 
 **Test scenarios:**
-- Covers AE2. Happy path: Codex-only reader sees `spec-first init --codex -u <name> --lang en` and `$spec-brainstorm` without being told to run Claude init.
-- Covers AE2. Happy path: Claude-only reader sees `spec-first init --claude -u <name> --lang en` and `/spec:brainstorm` without being told to run Codex init.
-- Edge case: `$spec-*` entries do not appear in unlabelled shell command blocks.
+- Covers AE2. Happy path: Codex-only reader sees `spec-first init --codex -u <name> --lang en` and `spec-brainstorm` without being told to run Claude init.
+- Covers AE2. Happy path: Claude-only reader sees `spec-first init --claude -u <name> --lang en` and `spec-brainstorm` without being told to run Codex init.
+- Edge case: `spec-*` entries do not appear in unlabelled shell command blocks.
 - Integration: dual-host governance tests still confirm shared prose uses current-host wording.
 
 **Verification:**

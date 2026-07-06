@@ -22,7 +22,7 @@ spec-graph-bootstrap 从 Trellis 移植时简化了 MCP 工具使用指引。当
 
 **Prerequisites 节补充（R1-R3）**
 
-- R1. 在 Prerequisites 节第 4 条后新增"MCP Tools Setup"小节，引导用户使用 `/spec:mcp-setup quick` 一键安装所需工具，并说明安装后需重启 Claude Code
+- R1. 在 Prerequisites 节第 4 条后新增"MCP Tools Setup"小节，引导用户使用 `spec-mcp-setup quick` 一键安装所需工具，并说明安装后需重启 Claude Code
 - R2. 在"MCP Tools Setup"小节后新增"Tool Usage Guide"小节，补充 GitNexus、ABCoder、Serena 三类工具的使用示例，包括：常用工具调用格式、典型使用场景、推荐工作流
 - R3. 工具使用示例应与 `references/prd-template.md` 中的"Tools Available"节保持一致（如果 prd-template 已补充工具示例的话）
 
@@ -36,7 +36,7 @@ spec-graph-bootstrap 从 Trellis 移植时简化了 MCP 工具使用指引。当
 
 ## Success Criteria
 
-- 外部开发者阅读 Prerequisites 节后，知道如何安装 MCP 工具（通过 `/spec:mcp-setup`）
+- 外部开发者阅读 Prerequisites 节后，知道如何安装 MCP 工具（通过 `spec-mcp-setup`）
 - 外部开发者阅读 Tool Usage Guide 后，知道如何手动调用这些工具进行代码分析
 - spec-graph-bootstrap 的工具使用指引与 prd-template 中的工具说明保持一致
 
@@ -54,7 +54,7 @@ spec-graph-bootstrap 从 Trellis 移植时简化了 MCP 工具使用指引。当
 ## Key Decisions
 
 - **方案选择**：采用方案A（在 SKILL.md 中补充 + 引用 mcp-setup），而非方案B（创建独立 references 文件）
-  - 理由：维护成本低，用户路径清晰（`/spec:mcp-setup` → 重启 → `/spec:graph-bootstrap`）
+  - 理由：维护成本低，用户路径清晰（`spec-mcp-setup` → 重启 → `spec-graph-bootstrap`）
 - **内容深度**：提供调用示例和典型场景，不展开完整教程
   - 理由：SKILL.md 是执行指引，不是工具手册；详细文档由各工具官方提供
 
@@ -62,4 +62,4 @@ spec-graph-bootstrap 从 Trellis 移植时简化了 MCP 工具使用指引。当
 
 ## Next Steps
 
-→ `/spec:plan` for structured implementation planning
+→ `spec-plan` for structured implementation planning

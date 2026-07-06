@@ -86,6 +86,46 @@ problem_type: not_a_real_enum
   });
 });
 
+// WIN-P1-02 回归:验证器必须显式以 UTF-8 读取。Windows 非 UTF-8 系统 locale 下,Python
+// 默认编码会误读或对含中文 frontmatter 抛 UnicodeDecodeError。这里通过强制 C locale 并关闭
+// Python 的 UTF-8 mode 强制(PYTHONUTF8=0 / PYTHONCOERCECLOCALE=0)来复现该 locale 条件;
+// 若脚本退回默认编码,读取会失败,本 test 即报警。
+describe.each(SCRIPT_PATHS)('frontmatter validator reads UTF-8 explicitly %s', (scriptPath) => {
+  let dir;
+
+  beforeEach(() => {
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-frontmatter-utf8-'));
+  });
+
+  afterEach(() => {
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  test('validates Chinese frontmatter under a non-UTF-8 locale', () => {
+    const chineseDoc = writeDoc(dir, `---
+title: "修复中文标题：parser-safe"
+problem_type: workflow_issue
+---
+
+# 示例中文文档
+`);
+
+    const result = spawnSync('python3', [scriptPath, chineseDoc], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        LC_ALL: 'C',
+        LANG: 'C',
+        PYTHONUTF8: '0',
+        PYTHONCOERCECLOCALE: '0',
+      },
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain('OK:');
+  });
+});
+
 // 防拷贝漂移:validate-frontmatter.py 在 spec-compound 与 spec-compound-refresh 各有一份
 // 有意副本(skill 投影机制只带各自目录的 scripts/,无法跨 skill 引用)。两份必须逐字一致;
 // 改一处时此 test 强制同步另一处,把隐性漂移风险转为显式守护。彻底去重需改投影机制,

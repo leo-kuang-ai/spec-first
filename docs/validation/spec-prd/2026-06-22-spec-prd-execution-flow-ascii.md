@@ -28,8 +28,8 @@ skills/spec-prd/
 |   |
 |   |-- workflow orchestrator
 |   |-- public route surface:
-|   |      Claude: /spec:prd
-|   |      Codex: $spec-prd
+|   |      Claude: spec-prd
+|   |      Codex: spec-prd
 |   |-- owns:
 |   |      intent classification
 |   |      current-state analysis

@@ -1,6 +1,6 @@
 ---
 name: spec-prd
-description: "Public workflow entrypoint (/spec:prd, $spec-prd): create, write, refine, or validate planning-readiness of brownfield PRD-grade requirements for existing systems before implementation planning. Do not use for 0-1 product exploration, unresolved product shape, HOW planning/task compilation, implementation/debug/review, lightweight direct fixes, generated runtime mirror edits, or PRD/design-source/source consistency audits; route to spec-brainstorm, spec-plan/spec-write-tasks, spec-work, review workflows, or spec-app-consistency-audit as appropriate."
+description: "Public workflow entrypoint (spec-prd): create, write, refine, or validate planning-readiness of brownfield PRD-grade requirements for existing systems before implementation planning. Do not use for 0-1 product exploration, unresolved product shape, HOW planning/task compilation, implementation/debug/review, lightweight direct fixes, generated runtime mirror edits, or PRD/design-source/source consistency audits; route to spec-brainstorm, spec-plan/spec-write-tasks, spec-work, review workflows, or spec-app-consistency-audit as appropriate."
 ---
 
 # Brownfield PRD Requirements
@@ -9,7 +9,7 @@ description: "Public workflow entrypoint (/spec:prd, $spec-prd): create, write, 
 
 Turn an existing-system increment, rough product note, or low-quality PRD into a standard durable PRD artifact by first thoroughly clarifying requirements with source-first `grill-with-docs` discipline, then writing WHAT/WHY, current-state evidence, acceptance, scope boundaries, assumptions, and unresolved blockers into the PRD template so `spec-plan` can plan without inventing product behavior. For existing PRDs, diagnose quality gaps, grill unresolved requirements until they are resolved or explicitly blocked, then rewrite the final PRD-grade artifact.
 
-Mental map: `$spec-prd` is analysis-first: materials become a run-local Requirement Analysis Gate map, the map identifies uncertainty and contradiction points, Product Expert Lens ranks which product/design/technical decisions must be grilled, Requirements Grill closes or carries the load-bearing WHAT gaps, Standard PRD write-in records the decisions, and Readiness Lens asks whether planning or work would still have to invent product behavior. Treat this as the workflow spine, not a direct external skill chain or persistent artifact topology.
+Mental map: `spec-prd` is analysis-first: materials become a run-local Requirement Analysis Gate map, the map identifies uncertainty and contradiction points, Product Expert Lens ranks which product/design/technical decisions must be grilled, Requirements Grill closes or carries the load-bearing WHAT gaps, Standard PRD write-in records the decisions, and Readiness Lens asks whether planning or work would still have to invent product behavior. Treat this as the workflow spine, not a direct external skill chain or persistent artifact topology.
 
 Main workflow spine: `Input -> Classify / Route Decision -> Input Inventory & Sanitization -> Current-State Evidence -> Requirement Analysis Gate -> Product Expert Lens -> Requirements Grill -> Pre-Write Closure Decision -> PRD Write / Refine -> Readiness Lens + Finalize -> Handoff`. Treat `ready-for-planning`, `ask-owner`, `revise-prd`, `doc-review`, and `route-out` as readiness/handoff outcomes, not the main workflow chain. Treat `checkpoint-prd` as a `write_mode` recovery shape under Pre-Write Closure Decision, never as a readiness outcome or planning handoff.
 
@@ -88,7 +88,7 @@ Follows `docs/contracts/project-graph-consumption.md`: `capability-class` candid
 
 ## Execution Compass
 
-This table is the run-local quick reference for `$spec-prd`; it is not a second state machine, persistent artifact, schema, or progress ledger. The authoritative rules stay in each Phase, `Canonical: Four Legal Stop Points`, the references, and the checker/finalize scripts.
+This table is the run-local quick reference for `spec-prd`; it is not a second state machine, persistent artifact, schema, or progress ledger. The authoritative rules stay in each Phase, `Canonical: Four Legal Stop Points`, the references, and the checker/finalize scripts.
 
 | Gate | Must complete before the next step | Legal next step |
 | --- | --- | --- |
@@ -100,7 +100,7 @@ This table is the run-local quick reference for `$spec-prd`; it is not a second 
 
 ## User-Visible Execution UX Protocol
 
-This protocol is run-local presentation discipline for `$spec-prd`; it reuses the Decision Card, task-list-first discipline, `write_mode`, `question_delivery`, `clarification_evidence`, `readiness_outcome`, finalize, and checker fields already defined here. It is not a progress ledger, run artifact, transcript schema, phase-status enum, central state machine, public workflow entrypoint, second PRD artifact topology, or permission to edit generated runtime mirrors.
+This protocol is run-local presentation discipline for `spec-prd`; it reuses the Decision Card, task-list-first discipline, `write_mode`, `question_delivery`, `clarification_evidence`, `readiness_outcome`, finalize, and checker fields already defined here. It is not a progress ledger, run artifact, transcript schema, phase-status enum, central state machine, public workflow entrypoint, second PRD artifact topology, or permission to edit generated runtime mirrors.
 
 After Phase 0 routes into PRD authoring/refinement/validation, begin with a short broadcast that names: the run goal, input posture, expected PRD artifact posture, and hard boundaries. Hard boundaries include no implementation work, no implementation plan, source-first edits only, and no hand edits to `.claude/`, `.codex/`, or `.agents/skills/` generated mirrors. Lightweight route-out, bypass, and source-proven branches may use a single concise reason instead of full ceremony.
 
@@ -176,7 +176,7 @@ Field mapping (Light contract): leaf -> `owner_question_progress=closed`; source
 
 ## Failure-Mode Blacklist
 
-The shortcuts below are observed `$spec-prd` failure modes. When one is hit, stop the current output path and run the recovery action; do not paper over an evidence gap with nicer PRD prose.
+The shortcuts below are observed `spec-prd` failure modes. When one is hit, stop the current output path and run the recovery action; do not paper over an evidence gap with nicer PRD prose.
 
 | Blacklisted shortcut | Observable trigger | Required recovery |
 | --- | --- | --- |
@@ -277,7 +277,7 @@ For oversized initial PRDs, produce a split-decision recommendation first. Write
 
 ### Phase 4: Readiness And Handoff
 
-🔴 **STOP — Phase 4 Mandatory Gate**: Phase 4 is a mandatory producer-local gate, not an optional closeout. Do not declare the PRD done, call it a "standard PRD", write confirmed ready fields, or offer a planning handoff (including `/spec:plan`) before you have actually run the readiness lens and, when a PRD artifact path exists, executed the producer-local finalize path. Producing the artifact and updating the changelog is not the end of the run; entering Phase 4 is. Self-declaring readiness or recommending planning without an executed checker/finalize receipt and a stated readiness outcome is a Phase 4 violation, even when the draft looks complete.
+🔴 **STOP — Phase 4 Mandatory Gate**: Phase 4 is a mandatory producer-local gate, not an optional closeout. Do not declare the PRD done, call it a "standard PRD", write confirmed ready fields, or offer a planning handoff (including `spec-plan`) before you have actually run the readiness lens and, when a PRD artifact path exists, executed the producer-local finalize path. Producing the artifact and updating the changelog is not the end of the run; entering Phase 4 is. Self-declaring readiness or recommending planning without an executed checker/finalize receipt and a stated readiness outcome is a Phase 4 violation, even when the draft looks complete.
 
 Run the readiness lens before recommending planning:
 

@@ -263,7 +263,7 @@ checkpoint_next_owner_question_present: true | false
 
 最新日志 `/Users/kuang/xiaobu/hsglobal/2026-06-27-113802-command-messagespecprdcommand-message.txt` 暴露出比 232726 更清晰的失败链：
 
-1. 用户运行 `/spec:prd`，输入是一个 KAZ 市场页素材目录，并要求“梳理需求，输出 app 端需求 prd”。
+1. 用户运行 `spec-prd`，输入是一个 KAZ 市场页素材目录，并要求“梳理需求，输出 app 端需求 prd”。
 2. 模型读取 7 个文件后，直接 `Write(docs/brainstorms/kaz-market-page-requirements.md)`，没有 owner question、没有 `AskUserQuestion`、没有 `question_delivery`、没有 Requirements Grill。
 3. 首次 closeout 被 Stop hook 拦截，reason codes 指向 readiness declaration、core section、design source 与 finalize 缺口。
 4. 模型把问题理解成“字段格式不对”，先写入无效枚举和值：`write_mode: create`、`can_enter_spec_plan: true`、YAML 对象形式的 `clarification_evidence`、自造 `producer_local_finalize: passed`。
@@ -319,7 +319,7 @@ checkpoint_next_owner_question_present: true | false
 -> 交付出口
 ```
 
-核心目标只有一个：让后续 `$spec-plan` 不需要发明 WHAT。
+核心目标只有一个：让后续 `spec-plan` 不需要发明 WHAT。
 
 ### 14.1 输入
 
@@ -623,7 +623,7 @@ route-out          -> 转到正确 workflow
 
 实然：
 
-- 最终 closeout 只说“PRD 已通过所有检查，status: finalizable，blocking 为空，可进入 /spec:plan”。
+- 最终 closeout 只说“PRD 已通过所有检查，status: finalizable，blocking 为空，可进入 spec-plan”。
 
 问题：
 

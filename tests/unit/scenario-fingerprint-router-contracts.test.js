@@ -48,10 +48,10 @@ describe('scenario fingerprint router contract', () => {
 
     expectContainsAll(routingReference, [
       'If the fingerprint is missing and setup artifacts exist',
-      'rerunning `$spec-mcp-setup` / `/spec:mcp-setup` will refresh the workspace scenario fingerprint',
+      'rerunning `spec-mcp-setup` will refresh the workspace scenario fingerprint',
       'then continue normal routing by user intent',
       'If the fingerprint is missing and no setup artifacts exist',
-      'recommend `$spec-mcp-setup` / `/spec:mcp-setup`',
+      'recommend `spec-mcp-setup`',
       'For clearly lightweight work, route by intent',
     ]);
   });
@@ -78,7 +78,7 @@ describe('scenario fingerprint router contract', () => {
       'Recommend `spec-first clean --workspace-orphans` as the preview-first inspection step',
       'spec-first clean --workspace-orphans --confirm',
       'only when the user explicitly wants to delete the quarantined parent artifacts',
-      'pair cleanup with `spec-first init` or `$spec-mcp-setup` / `/spec:mcp-setup`',
+      'pair cleanup with `spec-first init` or `spec-mcp-setup`',
     ]);
   });
 });

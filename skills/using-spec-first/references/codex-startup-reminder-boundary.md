@@ -2,7 +2,7 @@
 
 Codex currently uses managed instruction guidance for startup reminders, not a verified deterministic SessionStart hook.
 
-When a top-level Codex orchestrator is about to route into a public `$spec-*` workflow and the `spec-first` CLI is available, it may run:
+When a top-level Codex orchestrator is about to route into a public `spec-*` workflow and the `spec-first` CLI is available, it may run:
 
 ```bash
 spec-first startup-reminder --codex

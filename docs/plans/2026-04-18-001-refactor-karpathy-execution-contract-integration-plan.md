@@ -21,7 +21,7 @@ supersedes: prior 6-unit version committed at a49fb7c3 (kept in git history)
 1. **`spec-plan` 源 skill 已包含** Execution Readiness / Starting point / Execution note / explicit assumptions / require assumptions before proceeding（见 `skills/spec-plan/SKILL.md` Line 40/54/200/213/433/434/606/608）。原 Unit 1 的 spec-plan 部分属于重复结构。
 2. **`spec-brainstorm` 源 skill 已包含** challenge assumptions / YAGNI / speculative complexity warning / unverified assumption labeling / simplification-as-leverage（Line 26/30/183/270/310）。原 Unit 1 的 spec-brainstorm 部分属于重复结构。
 3. **`subagent-template.md:43`** 现有"too speculative → 不报告"合同与原 Unit 3 的"显式报告 speculative complexity"**语义冲突**，原 plan 未识别。
-4. **原 Unit 4** 对 `lfg` 添加继承说明是纯装饰：lfg 只是调用 `/spec:plan` / `/spec:work` / `/spec:code-review`，下游 skill 已各自携带合同，lfg 层文本不被执行期消费。
+4. **原 Unit 4** 对 `lfg` 添加继承说明是纯装饰：lfg 只是调用 `spec-plan` / `spec-work` / `spec-code-review`，下游 skill 已各自携带合同，lfg 层文本不被执行期消费。
 5. **原 Unit 5 byte-equal mirror test** 只覆盖 5 个 skill，但 `docs/10-prompt/skills/` 下有 48 个 mirror。这是 governance inconsistency，不是 minimal viable guard。
 6. **`spec-work-beta` 是 spec-work 的同源 fork**（`description: "Same as spec:work but with Codex delegation"`）。把它从 scope 排除但保留 spec-work 改造，制造平行执行路径的治理缝隙。
 7. **原方案的验收只是 keyword-present 断言**，外加 Observational Goals 声明"非 gating 且不承担测量基础设施"——等于**改了 prompt 但 6 个月后无法回答有没有用**。
@@ -271,7 +271,7 @@ Karpathy 方法论核心的四类失误里，**只有一类在 spec-first 当前
 - **Interaction graph:** 影响面仅限 `spec-code-review` source + docs mirror + contract test。
 - **Error propagation:** 若 reviewer 新段落导致 finding 过噪，只影响 review 输出可读性；不影响 correctness / security 等核心维度，无状态/持久化副作用。
 - **State lifecycle risks:** 无；只是 prompt + 可选 schema 字段。
-- **API surface parity:** 不改 `/spec:*`、`$spec-*`、双宿主治理 contract；findings-schema 向后兼容。
+- **API surface parity:** 不改 `spec-*`、`spec-*`、双宿主治理 contract；findings-schema 向后兼容。
 - **Integration coverage:** Unit 1 只改 reviewer qualitative contract；Unit 2 把 `dimension_tag` 贯通到 compact return / merge / synthesize / output template。adapter 对 schema 是透明的，但 runtime 安装后的 reference files 仍需做 host-level sanity check。
 - **Unchanged invariants:** `using-spec-first` routing 不变；`spec-optimize` 不卷入；`spec-work-beta` 与 `spec-work` 自动保持一致（都不改）；17 reviewer catalog 不变。
 

@@ -18,7 +18,7 @@ depth: medium
 ## Requirements Trace
 
 - R1. 仓库中不再存在旧 bootstrap workflow 的 skill、命令模板、runtime 目录、测试断言或用户入口说明。
-- R2. Claude 与 Codex 的 Stage-0 graph bootstrap 入口统一为 `/spec:graph-bootstrap` 与 `$spec-graph-bootstrap`。
+- R2. Claude 与 Codex 的 Stage-0 graph bootstrap 入口统一为 `spec-graph-bootstrap` 与 `spec-graph-bootstrap`。
 - R3. `using-spec-first` 只把 graph/context bootstrap 请求路由到 `spec-graph-bootstrap` 或 `spec-compound`。
 - R4. dual-host governance、plugin manifest、runtime 安装与 smoke tests 对保留入口的事实保持一致。
 - R5. active README、用户手册、setup/mcp-setup 文档不再宣传旧入口。
@@ -53,10 +53,10 @@ depth: medium
 
 Stage-0 graph-informed 上下文生成统一使用：
 
-- Claude: `/spec:graph-bootstrap`
-- Codex: `$spec-graph-bootstrap`
+- Claude: `spec-graph-bootstrap`
+- Codex: `spec-graph-bootstrap`
 
-知识捕获和复合上下文整理仍由 `/spec:compound` / `$spec-compound` 承接。
+知识捕获和复合上下文整理仍由 `spec-compound` / `spec-compound` 承接。
 
 ### D3. 历史文档也清旧名
 

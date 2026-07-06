@@ -492,7 +492,7 @@ PRD evidence tags 是文档层便捷标签，不是新的 graph evidence contrac
 | Template drift | 人用模板新增行业横切自检但 skill reference 未覆盖 | focused drift check / reviewer checklist 提醒更新 `prd-output-template.md` 或 `domain-lenses.md` |
 | Stale GitNexus pointer | GitNexus 与源码不一致 | 降级 GitNexus pointer，以源码为准 |
 | Readiness reviewer eval gate | 用户问是否要新增 agent | 回答 v1 仅纳入 1 个内部 readiness reviewer(非公开入口),且实体化须 fresh-source eval 证明 orchestrator 自审失效；现状采集复用 `spec-repo-research-analyst`，不新增 researcher agent |
-| Public agent entry boundary | 实现把 readiness reviewer 暴露为 `/spec:` 公开入口 | eval / contract test 失败，要求回到内部 helper 形态 |
+| Public agent entry boundary | 实现把 readiness reviewer 暴露为 `spec-*` 公开入口 | eval / contract test 失败，要求回到内部 helper 形态 |
 | PRD readiness fail | PRD 缺异常和验收 | 输出最小补齐问题或修订建议，不进入 `spec-work` |
 | Claude-risk regression | 实现新增 `docs/prds/` 或独立 evidence enum | eval / contract test 失败，要求回到 shared artifact 与 existing evidence policy |
 | App audit boundary | “App PRD + Figma + source 一致性审计” | 推荐 `spec-app-consistency-audit`，不把 `spec-prd` 当审计 workflow |
@@ -576,7 +576,7 @@ PRD evidence tags 是文档层便捷标签，不是新的 graph evidence contrac
 
 ## 变更记录（2026-05-30 brainstorm：新增 readiness reviewer agent）
 
-owner 在 `/spec:brainstorm` 复审中决定调整一条原已收敛决策：从「v1 不新增 agent」改为「v1 纳入 1 个 eval-gated 内部 readiness reviewer」。
+owner 在 `spec-brainstorm` 复审中决定调整一条原已收敛决策：从「v1 不新增 agent」改为「v1 纳入 1 个 eval-gated 内部 readiness reviewer」。
 
 - **决策实质**：新增内部 reviewer helper（暂名 `spec-requirements-readiness-reviewer`），own PRD-grade readiness 判断，主要服务 `spec-prd` 自检、设计上保持可被 `spec-doc-review` 复用（实体化 + 更新 doc-review persona 契约后启用），**非用户公开入口**；实体化受 fresh-source eval 校准——v1 先 orchestrator-owned 执行 `prd-readiness-lens.md`，仅当 eval 证明单 orchestrator 自审稳定失效时才落地为独立 agent。
 - **未改动的边界**：单入口 `spec-prd`、PRD artifact 路径、graph evidence policy、domain lens、与 `spec-brainstorm`/`spec-app-consistency-audit` 的 tie-break 均不变；现状采集**不**新增 researcher agent，复用 `spec-repo-research-analyst`。
@@ -587,7 +587,7 @@ owner 在 `/spec:brainstorm` 复审中决定调整一条原已收敛决策：从
 
 ## 变更记录（2026-05-30 brainstorm：PRD 模板刚性收口）
 
-owner 在 `/spec:brainstorm` 复审中收口 R16「必须包含 13 section」与 Risks「right-sized」的字面冲突。
+owner 在 `spec-brainstorm` 复审中收口 R16「必须包含 13 section」与 Risks「right-sized」的字面冲突。
 
 - **决策实质**：PRD 模板改为 **core + conditional 两层**——core sections（Summary、Change Delta、Requirements、Acceptance Examples、Scope Boundaries、Evidence And Assumptions）始终必填，作为 `spec-plan` 消费的最小骨架；conditional sections（Problem Frame、Current System Snapshot、Goals / Success Metrics / Non-Goals、Glossary、Actors、Use Cases、Interaction Requirements、Exception Handling、Outstanding Questions）按 target surface 与需求规模决定是否展开。
 - **裁剪不丢证据**：conditional section 展开时仍须满足 R17-R21；被省略项若有未决点，必须落入 Outstanding Questions，不得静默丢弃。

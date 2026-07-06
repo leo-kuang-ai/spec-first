@@ -12,6 +12,29 @@ TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 source "$SCRIPT_DIR/lib-toml.sh"
 source "$SCRIPT_DIR/lib-template.sh"
 require_mcp_tools_schema_version 7 "$TOOLS_JSON"
+
+USER_SCOPE_ARG=false
+for arg in "$@"; do
+  if [ "$arg" = "--user-scope" ]; then
+    USER_SCOPE_ARG=true
+    export KIRO_USER_SCOPE=1
+    export QODER_USER_SCOPE=1
+    export CURSOR_USER_SCOPE=1
+  fi
+done
+
+require_explicit_mcp_setup_host() {
+  case "${MCP_SETUP_HOST:-}" in
+    claude|codex|kiro|qoder|cursor) return 0 ;;
+    *)
+      echo '错误：install/configure/uninstall 写入宿主 MCP 配置必须显式设置 MCP_SETUP_HOST=claude|codex|kiro|qoder|cursor；不会根据 PATH、环境变量或历史 facts 推断 mutation target。' >&2
+      exit 1
+      ;;
+  esac
+}
+
+require_explicit_mcp_setup_host
+
 HOST_INFO_JSON="$(bash "$SCRIPT_DIR/detect-host.sh")"
 HOST="$(jq -r '.host' <<<"$HOST_INFO_JSON")"
 PLATFORM="$(jq -r '.platform' <<<"$HOST_INFO_JSON")"
@@ -22,6 +45,13 @@ while [[ $# -gt 0 ]]; do
     --tool)
       TOOL_ID="${2:-}"
       shift 2
+      ;;
+    --user-scope)
+      USER_SCOPE_ARG=true
+      export KIRO_USER_SCOPE=1
+      export QODER_USER_SCOPE=1
+      export CURSOR_USER_SCOPE=1
+      shift
       ;;
     *)
       shift
@@ -41,10 +71,47 @@ resolve_path_template() {
   esac
 }
 
+host_user_scope_requested() {
+  [ "$USER_SCOPE_ARG" = "true" ] && return 0
+  if [ "$HOST" = "kiro" ]; then
+    case "${KIRO_USER_SCOPE:-}" in
+      1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+  if [ "$HOST" = "qoder" ]; then
+    case "${QODER_USER_SCOPE:-}" in
+      1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+  if [ "$HOST" = "cursor" ]; then
+    case "${CURSOR_USER_SCOPE:-}" in
+      1|true|TRUE|yes|YES|approved|APPROVED) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+  return 1
+}
+
+json_mcp_entry_matches_expected() {
+  local config_path="$1"
+  local tool_id="$2"
+  local expected_command="$3"
+  local expected_args="$4"
+  local expected_type="$5"
+  [ -f "$config_path" ] || return 1
+  jq -e --arg id "$tool_id" --arg command "$expected_command" --argjson expected_args "$expected_args" --arg expected_type "$expected_type" '.mcpServers[$id].command == $command and (.mcpServers[$id].args // []) == $expected_args and (if $expected_type == "" then true else .mcpServers[$id].type == $expected_type end) and ((.mcpServers[$id] | has("scope")) | not)' "$config_path" >/dev/null 2>&1
+}
+
 remove_claude_entry() {
   local config_path="$1"
   local tool_id="$2"
+  local expected_command="$3"
+  local expected_args="$4"
+  local expected_type="$5"
   [ -f "$config_path" ] || return 0
+  json_mcp_entry_matches_expected "$config_path" "$tool_id" "$expected_command" "$expected_args" "$expected_type" || return 0
   local tmp backup
   tmp="$(mktemp "${config_path}.XXXXXX")"
   backup="$(mktemp "${config_path}.backup.XXXXXX")"
@@ -60,10 +127,17 @@ remove_claude_entry() {
   fi
 }
 
+remove_json_mcp_entry() {
+  remove_claude_entry "$@"
+}
+
 remove_codex_entry() {
   local config_path="$1"
   local detect_key="$2"
+  local expected_command="$3"
+  local expected_args="$4"
   [ -f "$config_path" ] || return 0
+  toml_mcp_section_matches_exact "$config_path" "$detect_key" "$expected_command" "$expected_args" || return 0
   local tmp backup
   tmp="$(mktemp "${config_path}.XXXXXX")"
   backup="$(mktemp "${config_path}.backup.XXXXXX")"
@@ -91,16 +165,29 @@ fi
 
 for tool_id in "${TOOL_IDS[@]}"; do
   detect_key="$(jq -r --arg id "$tool_id" '.tools[] | select(.id == $id) | .detection.key' "$TOOLS_JSON")"
+  host_config_json="$(jq -c --arg id "$tool_id" --arg host "$HOST" "$SPEC_FIRST_JQ_TEMPLATE_PRELUDE"'tool_by_id($id) as $t | $t.host_config[$host] | .args = (.args | map(expand_tpl($t)))' "$TOOLS_JSON")"
+  expected_command="$(jq -r '.command' <<<"$host_config_json")"
+  expected_args="$(jq -c '.args' <<<"$host_config_json")"
+  expected_type="$(jq -r '.type // empty' <<<"$host_config_json")"
   while IFS= read -r target_key; do
     target_json="$(jq -c --arg id "$tool_id" --arg host "$HOST" --arg key "$target_key" '.tools[] | select(.id == $id) | .host_config[$host].targets[$key]' "$TOOLS_JSON")"
     [ "$target_json" != "null" ] || continue
     raw_path="$(jq -r '.config_path | if type == "object" then .[$platform] // empty else . end' --arg platform "$PLATFORM" <<<"$target_json")"
     [ -n "$raw_path" ] || continue
-    config_path="$(resolve_path_template "$raw_path")"
+    if { [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ] || [ "$HOST" = "cursor" ]; } && [ "$target_key" = "user" ] && ! host_user_scope_requested; then
+      continue
+    fi
+    config_path="$(jq -r --arg key "$target_key" '.targets[$key].config_path // empty' <<<"$HOST_INFO_JSON")"
+    [ -n "$config_path" ] || config_path="$(resolve_path_template "$raw_path")"
     if [ "$HOST" = "claude" ]; then
-      remove_claude_entry "$config_path" "$detect_key"
+      remove_claude_entry "$config_path" "$detect_key" "$expected_command" "$expected_args" "$expected_type"
+    elif [ "$HOST" = "kiro" ] || [ "$HOST" = "qoder" ] || [ "$HOST" = "cursor" ]; then
+      remove_json_mcp_entry "$config_path" "$detect_key" "$expected_command" "$expected_args" "$expected_type"
+    elif [ "$HOST" = "codex" ]; then
+      remove_codex_entry "$config_path" "$detect_key" "$expected_command" "$expected_args"
     else
-      remove_codex_entry "$config_path" "$detect_key"
+      echo "错误：无法识别宿主：$HOST" >&2
+      exit 1
     fi
   done < <(jq -r --arg id "$tool_id" --arg host "$HOST" '.tools[] | select(.id == $id) | .host_config[$host].uninstall_targets[]' "$TOOLS_JSON")
 done

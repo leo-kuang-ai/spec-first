@@ -36,6 +36,7 @@ function hydrateProvider(mcpRegistry, provider) {
     ...provider,
     installation: {
       ...installation,
+      ecosystem: installation.ecosystem || dependency.ecosystem || '',
       package: installation.package || dependency.package || '',
       version_pin: installation.version_pin || dependency.version || '',
     },
@@ -62,6 +63,14 @@ function expandProviderTemplates(provider) {
     },
     usage_note: expandDependencyTemplate(provider.usage_note, installation),
   };
+}
+
+function providerPackageSpec(installation = {}) {
+  if (!installation.package || !installation.version_pin) return '';
+  if (installation.ecosystem === 'npm') {
+    return `${installation.package}@${installation.version_pin}`;
+  }
+  return `${installation.package}==${installation.version_pin}`;
 }
 
 function hydrateProviderRegistry(providerRegistry, mcpRegistry) {
@@ -127,7 +136,7 @@ function commandFromPath(command, pathValue = process.env.PATH) {
     }
     return null;
   }
-  const result = spawnSync('/bin/sh', ['-lc', `command -v ${shellQuote(command)}`], {
+  const result = spawnSync('/bin/sh', ['-c', `command -v ${shellQuote(command)}`], {
     encoding: 'utf8',
     env: {
       ...process.env,
@@ -146,6 +155,17 @@ function knownCommandCandidates(command) {
     candidates.push(path.join(home, '.local', 'bin', command));
     candidates.push(path.join(home, '.local', 'bin', `${command}.exe`));
     candidates.push(path.join(home, '.local', 'bin', `${command}.cmd`));
+  }
+  const npmPrefix = commandFromPath('npm')
+    ? spawnSync('npm', ['prefix', '-g'], { encoding: 'utf8' })
+    : null;
+  if (npmPrefix && npmPrefix.status === 0) {
+    const prefix = String(npmPrefix.stdout || '').trim().split(/\r?\n/).find(Boolean);
+    if (prefix) {
+      candidates.push(path.join(prefix, 'bin', command));
+      candidates.push(path.join(prefix, 'bin', `${command}.exe`));
+      candidates.push(path.join(prefix, 'bin', `${command}.cmd`));
+    }
   }
   return candidates;
 }
@@ -166,9 +186,7 @@ function resolveCommand(command) {
 
 function setupWorkflowCommand(host, args = '') {
   const suffix = args ? ` ${args}` : '';
-  if (host === 'claude') return `/spec:mcp-setup${suffix}`;
-  if (host === 'codex') return `$spec-mcp-setup${suffix}`;
-  return `/spec:mcp-setup${suffix} or $spec-mcp-setup${suffix}`;
+  return `spec-mcp-setup${suffix}`;
 }
 
 function commandExists(command) {
@@ -192,7 +210,7 @@ function envFlag(name) {
 
 function currentProviderHost() {
   const value = String(process.env.SPEC_FIRST_PROVIDER_HOST || '').toLowerCase();
-  if (value === 'claude' || value === 'codex') return value;
+  if (value === 'claude' || value === 'codex' || value === 'kiro' || value === 'qoder') return value;
   return 'codex';
 }
 
@@ -248,6 +266,16 @@ function projectSkillCandidates(repoDir, providerId, host = currentProviderHost(
   if (host === 'claude') {
     return [
       path.join(repoDir, '.claude', 'skills', providerId, 'SKILL.md'),
+    ];
+  }
+  if (host === 'kiro') {
+    return [
+      path.join(repoDir, '.kiro', 'skills', providerId, 'SKILL.md'),
+    ];
+  }
+  if (host === 'qoder') {
+    return [
+      path.join(repoDir, '.qoder', 'skills', providerId, 'SKILL.md'),
     ];
   }
   return [
@@ -442,6 +470,7 @@ function helperProviderEntries(registry, repoDir) {
       const command = provider.detection && provider.detection.command;
       const expectedVersion = provider.installation && provider.installation.version_pin;
       const expectedPackage = provider.installation && provider.installation.package ? provider.installation.package : provider.id;
+      const expectedPackageSpec = providerPackageSpec(provider.installation) || `${expectedPackage}==${expectedVersion}`;
       const versionArgs = provider.detection && Array.isArray(provider.detection.version_args)
         ? provider.detection.version_args
         : [];
@@ -489,7 +518,7 @@ function helperProviderEntries(registry, repoDir) {
         nextActions.push(`Graphify CLI is installed at ${commandInfo.command} but not on PATH; add ${path.dirname(commandInfo.command)} to PATH or use the absolute command path for manual graphify CLI calls.`);
       }
       if (stalePathCommand && provider.id === 'graphify') {
-        nextActions.push(`Graphify CLI on PATH at ${stalePathCommand} does not match pinned ${expectedPackage}==${expectedVersion}; setup is using ${commandInfo.command}. Update PATH when convenient.`);
+        nextActions.push(`Graphify CLI on PATH at ${stalePathCommand} does not match pinned ${expectedPackageSpec}; setup is using ${commandInfo.command}. Update PATH when convenient.`);
       }
       if (installed && !configured && provider.id === 'graphify') {
         if (readinessStatus === 'unknown' || readinessStatus === 'fresh') {
@@ -499,7 +528,7 @@ function helperProviderEntries(registry, repoDir) {
       }
       if (installed && !versionMatches && expectedVersion && provider.id === 'graphify') {
         readinessStatus = 'degraded';
-        nextActions.push(`Graphify CLI version does not match pinned ${expectedPackage}==${expectedVersion}; rerun \`${setupWorkflowCommand(currentHost, '--only graphify')}\` to reinstall the pinned provider version.`);
+        nextActions.push(`Graphify CLI version does not match pinned ${expectedPackageSpec}; rerun \`${setupWorkflowCommand(currentHost, '--only graphify')}\` to reinstall the pinned provider version.`);
       }
       if (installed && !artifact) {
         nextActions.push('Generate project-root graphify-out/ with graphify extract or graphify update . before using this provider as architecture navigation.');

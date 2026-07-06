@@ -50,7 +50,7 @@ function createFixture(root, fixtureId, overrides = {}) {
     scenario_type: 'docs-only',
     prompt_path: 'prompt.md',
     repo_path: 'repo',
-    expected_workflows: ['$spec-work'],
+    expected_workflows: ['spec-work'],
     expected_changed_paths: ['README.md'],
     expected_artifacts: [
       {

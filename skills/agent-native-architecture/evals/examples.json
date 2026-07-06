@@ -6,8 +6,8 @@
       "id": "internal-only-invocation",
       "user_intent": "Run /agent-native-architecture and design an agent-native workflow.",
       "coverage_tags": ["trigger-boundary", "internal-only", "public-route-refusal", "trigger", "boundary"],
-      "expected_posture": "State that agent-native-architecture is an internal source reference/helper, not a public slash or $spec-* workflow, then route the actual design work through the appropriate public workflow or read the source reference as bounded context.",
-      "forbidden_signals": ["Claims /agent-native-architecture is a valid public command", "Invents a $spec-agent-native-architecture workflow", "Edits generated runtime mirrors to expose the helper"],
+      "expected_posture": "State that agent-native-architecture is an internal source reference/helper, not a public spec-* workflow, then route the actual design work through the appropriate public workflow or read the source reference as bounded context.",
+      "forbidden_signals": ["Claims /agent-native-architecture is a valid public command", "Invents a public workflow for this internal helper", "Edits generated runtime mirrors to expose the helper"],
       "source_refs": ["skills/agent-native-architecture/SKILL.md#Invocation-Boundary", "src/cli/contracts/dual-host-governance/skills-governance.json"]
     },
     {
@@ -47,7 +47,7 @@
       "user_intent": "Run agent-native-audit on this project.",
       "coverage_tags": ["merged-helper-boundary", "internal-only", "audit-playbook-routing", "expected"],
       "expected_posture": "State that agent-native-audit is no longer a standalone skill surface; for a bounded full-codebase agent-native audit, read agent-native-architecture and references/audit-playbook.md, otherwise hand off to the appropriate public workflow.",
-      "forbidden_signals": ["Claims skills/agent-native-audit/SKILL.md is the current source of truth", "Invents a $spec-agent-native-audit workflow", "Edits generated runtime mirrors to restore the removed helper"],
+      "forbidden_signals": ["Claims skills/agent-native-audit/SKILL.md is the current source of truth", "Invents a public workflow for the removed audit helper", "Edits generated runtime mirrors to restore the removed helper"],
       "source_refs": ["skills/agent-native-architecture/SKILL.md", "skills/agent-native-architecture/references/audit-playbook.md", "src/cli/contracts/dual-host-governance/skills-governance.json"]
     },
     {

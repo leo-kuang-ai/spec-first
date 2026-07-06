@@ -51,8 +51,8 @@
 - 目标：
   - 把三项前置决策正式落文
   - 锁定 Codex compatibility layer 策略
-  - 停止 Codex 对外产品面继续传播 `/spec:*`
-  - 把外层产品 copy 与 CLI 可见口径统一收口到 `$spec-*`
+  - 停止 Codex 对外产品面继续传播 `spec-*`
+  - 把外层产品 copy 与 CLI 可见口径统一收口到 `spec-*`
 - 主要文件：
   - `src/cli/adapters/codex.js`
   - `src/cli/commands/init.js`
@@ -70,7 +70,7 @@
 - 验收：
   - `T00` 产物存在，且可被 `T01 / T11 / T12 / T14` 直接引用
   - 已明确记录 `.codex/commands/spec/*` 的最终策略：移除，或保留为兼容层但不再视为用户可见入口
-  - Codex 不再被代码与对外文案双重描述为 `/spec:*`
+  - Codex 不再被代码与对外文案双重描述为 `spec-*`
   - `.claude-plugin/plugin.json`、README、CLI 输出与最终契约一致
   - 若涉及源码变更，已同步追加 `CHANGELOG.md`
   - 至少完成对应 unit / smoke 验证；具体 smoke 断言以 compatibility layer 决策为准，不预设必须删除 `.codex/commands/spec/*`
@@ -283,7 +283,7 @@
 - 验收：
   - 后续新增 skill 可直接按规则校验
 - 执行回写：
-  - `T20`：已在 `AGENTS.md` 新增 `Dual-Host Skill Governance` 段，固化 `entry_surface / host_scope / host_delivery`、用户可见入口边界、`Skill(...)` / `skill:` 豁免、Codex `/spec:*` 禁止规则与镜像刷新义务
+  - `T20`：已在 `AGENTS.md` 新增 `Dual-Host Skill Governance` 段，固化 `entry_surface / host_scope / host_delivery`、用户可见入口边界、`Skill(...)` / `skill:` 豁免、Codex `spec-*` 禁止规则与镜像刷新义务
   - `docs/contracts/dual-host-governance/README.md` 已补 machine-readable 真源落位与 contributor maintenance rules，形成仓库级治理文本闭环
 
 ### 包 L：静态扫描闸门
@@ -300,13 +300,13 @@
 - 验收：
   - 能自动阻断旧入口回流
   - 明确豁免 `Skill(...)` 与 `skill:`
-  - 增强项优先采用标签感知扫描，拦截 `**Codex entry point:** /spec:*` 这类错误宿主入口，而不是用过宽 `/spec:` 模式误伤合法 Claude 文案
+  - 增强项优先采用标签感知扫描，拦截 `**Codex entry point:** spec-*` 这类错误宿主入口，而不是用过宽 `spec-*` 模式误伤合法 Claude 文案
   - 第一阶段先提供 `npm run lint:skill-entrypoints`
   - 第二阶段接入 CI gate
   - `pre-commit` 作为增强项，不在规则尚未稳定前先行强推
 - 执行回写：
   - `T21`：已新增 `scripts/lint-skill-entrypoints.js` 与 `scripts/lint-skill-entrypoints.config.json`，采用“显式 blocked patterns + 从 `skills-governance.json` 推导 standalone skill 名单”的标签感知扫描
-  - 规则已明确豁免 `Skill(...)` 与 `skill:`，并拦截 `# /...`、`**Codex entry point:** /spec:*`、`/research`、`/simplify`、standalone skill 假 slash command
+  - 规则已明确豁免 `Skill(...)` 与 `skill:`，并拦截 `# /...`、`**Codex entry point:** spec-*`、`/research`、`/simplify`、standalone skill 假 slash command
   - 已新增 `package.json` 脚本 `npm run lint:skill-entrypoints`
   - 已新增 `.github/workflows/skill-entrypoint-gate.yml`，将 lint 接入 pull request gate
   - 验证：`npx jest tests/unit/lint-skill-entrypoints.test.js --runInBand` 通过（`3/3`）；`npm run lint:skill-entrypoints` 通过
@@ -369,8 +369,8 @@
 - 优先级：`P0`
 - 阶段：`第一阶段`
 - 目标：
-  - 停止 Codex 暴露 `/spec:*`
-  - 把所有对外口径统一改成 `$spec-*`
+  - 停止 Codex 暴露 `spec-*`
+  - 把所有对外口径统一改成 `spec-*`
 - 依赖：T00
 - 输出：
   - Codex compatibility layer 策略已明确落文：移除，或保留为兼容层但不属于用户可见入口
@@ -614,7 +614,7 @@
 - 输出：
   - `npm run lint:skill-entrypoints`
   - 扫描脚本
-  - `Codex entry point.*\\/spec:` 这类标签感知规则（增强项）
+  - `Codex entry point.*\\spec-*` 这类标签感知规则（增强项）
   - CI / 合并前检查规则
 
 ## 4. 并行建议

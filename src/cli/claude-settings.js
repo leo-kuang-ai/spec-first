@@ -4,7 +4,7 @@ const { writeFileAtomic } = require('./atomic-write');
 
 const SETTINGS_RELATIVE_PATH = '.claude/settings.json';
 const SESSION_START_MATCHER = 'startup|resume|clear|compact';
-const SPEC_PLAN_COMMAND_NAME = 'spec:plan';
+const SPEC_PLAN_COMMAND_NAME = 'spec-plan';
 const SESSION_START_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/session-start';
 const SPEC_PLAN_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/spec-plan-guard';
 const PRD_PREWRITE_GUARD_COMMAND = '"$CLAUDE_PROJECT_DIR"/.claude/hooks/prd-prewrite-guard';

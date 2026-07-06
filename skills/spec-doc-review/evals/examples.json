@@ -15,7 +15,7 @@
     },
     {
       "name": "dispatch unavailable or unauthorized falls back honestly",
-      "user_intent": "运行环境没有 reviewer dispatch primitive、用户明确要求 no-agents/report-only，或 direct `$spec-doc-review` 调用没有显式授权 Codex subagents / parallel reviewer work。",
+      "user_intent": "运行环境没有 reviewer dispatch primitive、用户明确要求 no-agents/report-only，或 direct `spec-doc-review` 调用没有显式授权 Codex subagents / parallel reviewer work。",
       "expected_posture": "执行 single-agent report-only fallback，并清楚说明多 persona dispatch 未运行。",
       "boundary_note": "缺少 dispatch 不是跳过审查的理由，但不能声称 helper agents 已完成。",
       "negative_signal": "编造 persona agent 输出或把 unavailable dispatch 当成 review pass。",

@@ -87,11 +87,11 @@
     <text x="478" y="70" class="tier">Generated runtime mirror · 不手改</text>
     <g transform="translate(78 84)">
       <rect class="purple" x="0" y="0" width="240" height="42" rx="21"/>
-      <text x="120" y="26" class="mono">Claude Code /spec:*</text>
+      <text x="120" y="26" class="mono">Claude Code spec-*</text>
     </g>
     <g transform="translate(358 84)">
       <rect class="purple" x="0" y="0" width="240" height="42" rx="21"/>
-      <text x="120" y="26" class="mono">Codex $spec-*</text>
+      <text x="120" y="26" class="mono">Codex spec-*</text>
     </g>
     <g transform="translate(638 84)">
       <rect class="purple" x="0" y="0" width="240" height="42" rx="21"/>

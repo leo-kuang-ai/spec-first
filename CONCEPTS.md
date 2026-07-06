@@ -44,15 +44,15 @@ A fixture, test, or fresh-source evaluation that proves a prompt or workflow ref
 
 ### Skill
 
-A reusable workflow or method with an entry contract, execution steps, references, artifacts, and failure handling. Public `$spec-*` skills are user entrypoints; internal helper skills are invoked only from documented workflow phases.
+A reusable workflow or method with an entry contract, execution steps, references, artifacts, and failure handling. Public `spec-*` workflow skills are user entrypoints; internal helper skills are invoked only from documented workflow phases.
 
 ### Workflow Command
 
-A public spec-first workflow entry that is command-backed in source governance: Claude exposes it as `/spec:*`, while Codex exposes the same workflow through `$spec-*` skill delivery. It is distinct from a standalone skill even when both are implemented as `SKILL.md` source files.
+A public spec-first workflow entry exposed consistently as `spec-*` across supported hosts. It is distinct from a standalone skill even when both are implemented as `SKILL.md` source files.
 
 ### Standalone Skill
 
-A reusable skill delivered through host skill discovery rather than the public workflow command surface. It should not be documented as a `/spec:*` or `$spec-*` workflow entry unless `skills-governance.json` classifies it as `workflow_command`.
+A reusable skill delivered through host skill discovery rather than the public workflow command surface. It should not be documented as a public `spec-*` workflow entry unless `skills-governance.json` classifies it as `workflow_command`.
 
 When projected into host runtime, a standalone skill keeps the governed source skill name, including a `spec-` prefix when present; shortening the runtime `name` makes discovery inconsistent with source governance.
 

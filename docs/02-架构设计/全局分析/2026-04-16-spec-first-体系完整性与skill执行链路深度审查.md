@@ -114,7 +114,7 @@
 - `bin/spec-first.js:7-15` 只分流到两类入口：
   - `crg` -> `src/crg/cli/router.js`
   - 普通 CLI -> `doctor/init/clean`
-- 也就是说，`/spec:*` 或 `$spec-*` 的 workflow 执行，主要依赖 **运行时已安装的 command wrapper + workflow skill**，不是普通 CLI 进程自己直接跑完整业务逻辑。
+- 也就是说，`spec-*` 或 `spec-*` 的 workflow 执行，主要依赖 **运行时已安装的 command wrapper + workflow skill**，不是普通 CLI 进程自己直接跑完整业务逻辑。
 
 这不是缺陷，而是当前架构的真实边界。
 
@@ -183,7 +183,7 @@ Claude/Codex runtime assets      .spec-first/graph/*
        +---------------+--------------+
                        |
                        v
-         /spec:* command wrapper or $spec-* skill
+         spec-* command wrapper or spec-* skill
                        |
                        v
               workflow SKILL contract
@@ -213,7 +213,7 @@ Claude/Codex runtime assets      .spec-first/graph/*
 
 | 类型 | 真源位置 | 运行时落点 | 用途 |
 |---|---|---|---|
-| command-backing workflow skill | `skills/spec-*/SKILL.md` + `.claude-plugin/plugin.json` | Claude: `.claude/spec-first/workflows/<skill>/`；Codex: `.agents/skills/<skill>/` | 支撑 `/spec:*` 或 `$spec-*` 主 workflow |
+| command-backing workflow skill | `skills/spec-*/SKILL.md` + `.claude-plugin/plugin.json` | Claude: `.claude/spec-first/workflows/<skill>/`；Codex: `.agents/skills/<skill>/` | 支撑 `spec-*` 或 `spec-*` 主 workflow |
 | standalone skill | `skills/<name>/SKILL.md` | Claude: `.claude/skills/<name>/`；Codex: `.agents/skills/<name>/` | 被直接调用，或被 workflow 间接调度 |
 | agent profile | `agents/**/*.md` | Claude: `.claude/agents/**`；Codex: `.codex/agents/**` | reviewer / researcher / specialist 子代理 |
 
@@ -379,7 +379,7 @@ Codex 的额外特征：
 
 ### 7.2 Stage-0 compiler mainline 的真实代码链
 
-这里说的“真实代码链”，特指 **Stage-0 compiler 内部主链**，不是宿主里的 `/spec:graph-bootstrap -> command wrapper -> workflow skill` 全链路。
+这里说的“真实代码链”，特指 **Stage-0 compiler 内部主链**，不是宿主里的 `spec-graph-bootstrap -> command wrapper -> workflow skill` 全链路。
 
 这条内部主链在代码层和 E2E 测试里都能找到：
 
@@ -596,7 +596,7 @@ spec-first init
 ### 9.2 第二层：workflow 执行链，主要通过宿主 runtime 内 skill contract 落地
 
 ```text
-/spec:plan
+spec-plan
    -> read runtime workflow SKILL.md
    -> optional Stage-0 preload
    -> repo research / requirements grounding
@@ -604,7 +604,7 @@ spec-first init
 ```
 
 ```text
-/spec:work
+spec-work
    -> read plan
    -> optional Stage-0 preload
    -> setup branch/worktree
@@ -613,7 +613,7 @@ spec-first init
 ```
 
 ```text
-/spec:code-review
+spec-code-review
    -> optional Stage-0 preload
    -> spawn persona reviewers
    -> merge/dedup findings
@@ -839,7 +839,7 @@ spec-first init
 
 - `spec-first` 普通 CLI 主要负责**运行时安装、治理、诊断、清理**
 - `crg` 负责**图理解引擎**
-- 真正的 `/spec:*` workflow 执行主要发生在**宿主 runtime 安装后的 command wrapper + workflow skill contract**
+- 真正的 `spec-*` workflow 执行主要发生在**宿主 runtime 安装后的 command wrapper + workflow skill contract**
 
 如果按这个模型理解，整条链路是连贯的。
 

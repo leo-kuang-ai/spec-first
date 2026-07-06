@@ -53,7 +53,7 @@ When editing or reviewing this workflow prompt, or when running fresh-source eva
 
 ## Runtime Context Exclusion
 
-Follow `docs/contracts/context-governance.md`: ordinary Document Review context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`) by default. Do not include those paths in reviewer prompts, pre-facts targets, broad repo search, or section bundles unless the document or user request explicitly targets setup/update/runtime drift/audit/governance evidence; when excluded, surface the path or reason in Coverage instead of silently scanning it.
+Follow `docs/contracts/context-governance.md`: ordinary Document Review context excludes `.spec-first/audits/**`, `.spec-first/governance/**`, and generated mirrors (`.claude/**`, `.codex/**`, `.agents/skills/**`, `.cursor/skills/**`, `.cursor/spec-first/**`, `.cursor/mcp.json`, `.kiro/skills/**`, `.kiro/agents/**`, `.kiro/spec-first/**`, `.kiro/settings/**`, `.qoder/commands/spec-*.md`, `.qoder/commands/spec/**`, `.qoder/skills/**`, `.qoder/agents/**`, `.qoder/spec-first/**`, `.qoder/settings.local.json`) by default. Do not include those paths in reviewer prompts, pre-facts targets, broad repo search, or section bundles unless the document or user request explicitly targets setup/update/runtime drift/audit/governance evidence; when excluded, surface the path or reason in Coverage instead of silently scanning it. Cursor-native `.cursor/rules/**` / `.cursor/agents/**`, Kiro-native `.kiro/specs/**`, and Qoder-native `.qoder/rules/**` are advisory input only when explicitly named.
 
 ## Summary-First Section Bundles
 
@@ -97,8 +97,7 @@ The caller receives findings with their original classifications intact and deci
 Callers invoke headless mode by including `mode:headless` in the workflow arguments, e.g.:
 
 ```
-/spec:doc-review mode:headless docs/plans/my-plan.md
-$spec-doc-review mode:headless docs/plans/my-plan.md
+spec-doc-review mode:headless docs/plans/my-plan.md
 ```
 
 If `mode:headless` is not present, the workflow runs in its default interactive mode with the routing question, walk-through, and bulk-preview behaviors documented in `references/walkthrough.md` and `references/bulk-preview.md`.
@@ -233,13 +232,13 @@ Before dispatching any reviewer, confirm the current host exposes a dispatch pri
 Reviewers are analysis agents, not implementation workers. Dispatch is bounded to document-review personas with the current document scope, selected sections, pre-facts, and output contract. Do not create hidden implement/check agents from document review. Autofix is limited to this workflow's documented `safe_auto` document edits; report-only fallback, user-requested no-agents mode, unsafe runtime, or missing dispatch capability must not edit documents or generated runtime mirrors.
 
 - A direct invocation of the current host's document-review workflow entrypoint authorizes the doc-review workflow itself; it does not automatically authorize host-level subagent tools whose contract requires explicit subagent, delegation, or parallel-agent wording.
-- For Codex, a direct `$spec-doc-review` invocation alone is not an explicit `spawn_agent` authorization. Call `spawn_agent` only when the user explicitly requests subagents, parallel agents, delegated review, or persona reviewer dispatch, or when an upstream workflow delegates doc-review from an already authorized multi-agent context whose visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording.
+- For Codex, a direct `spec-doc-review` invocation alone is not an explicit `spawn_agent` authorization. Call `spawn_agent` only when the user explicitly requests subagents, parallel agents, delegated review, or persona reviewer dispatch, or when an upstream workflow delegates doc-review from an already authorized multi-agent context whose visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording.
 - Default doc-review posture is multi-persona analysis when host capability and dispatch authorization are both present. A plain invocation on a gated host uses the single-agent report-only fallback without treating the review itself as failed.
 - `mode:headless` is not a dispatch-disabling flag. It changes interaction/output behavior only; use normal bounded multi-persona dispatch when dispatch is otherwise safe and authorized.
 - If the user explicitly requested subagents, parallel agents, delegated review, or persona reviewer dispatch and the host exposes a dispatch primitive, continue with normal bounded multi-persona dispatch.
 - If an active workflow or parent orchestrator explicitly delegated this doc-review workflow from an authorized multi-agent context, continue with normal bounded multi-persona dispatch only when the visible parent request or handoff evidence carries explicit subagent/delegation/parallel/persona authorization.
 - If the user explicitly requests report-only/no-agents mode, the host lacks a dispatch primitive, or the current runtime cannot call it, do not call `Agent`, `Task`, `spawn_agent`, or equivalent dispatch tools.
-- Codex supports reviewer dispatch through `spawn_agent` only when the current request satisfies the runtime tool authorization contract. Do not call `spawn_agent` solely because a persona profile exists or because `$spec-doc-review` was invoked.
+- Codex supports reviewer dispatch through `spawn_agent` only when the current request satisfies the runtime tool authorization contract. Do not call `spawn_agent` solely because a persona profile exists or because `spec-doc-review` was invoked.
 - If dispatch capability exists but explicit authorization is absent, record `dispatch_authorization_missing` and run the single-agent report-only fallback. This is a host boundary, not a reviewer failure; for multi-persona or subagent review in Codex, ask for `subagents`, `personas`, delegated review, or parallel agents in the request.
 
 When dispatch is unavailable, explicitly disabled, or unsafe, set `single_agent_report_only_fallback: true` and run a read-only review in the current orchestrator:

@@ -27,8 +27,9 @@ const SOURCE_DIRECTORIES = {
   skills: 'skills',
   agents: 'agents',
 };
-const SUPPORTED_PLATFORM_IDS = ['claude', 'codex'];
+const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
 const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
+const AGENTLESS_PLATFORM_IDS = new Set(['cursor']);
 const ENTRY_SURFACES = new Set(['workflow_command', 'standalone_skill', 'internal_only']);
 const HOST_SCOPES = new Set(['dual_host', 'host_exclusive', 'target_host_maintenance']);
 const HOST_DELIVERIES = new Set(['command', 'skill', 'internal', 'none']);
@@ -268,6 +269,9 @@ function loadSkillsGovernance() {
         host_delivery: {
           claude: record.host_delivery.claude,
           codex: record.host_delivery.codex,
+          cursor: record.host_delivery.cursor,
+          kiro: record.host_delivery.kiro,
+          qoder: record.host_delivery.qoder,
         },
       }))
       .sort((a, b) => a.skill_name.localeCompare(b.skill_name)),
@@ -645,8 +649,8 @@ function buildFilteredAssetSet(platformOrAdapter) {
     workflowSkills: workflowSkills.sort((a, b) => a.localeCompare(b)),
     skills: skills.sort((a, b) => a.localeCompare(b)),
     internalSkills: internalSkills.sort((a, b) => a.localeCompare(b)),
-    agents: listBundledAgents(),
-    agentSupportFiles: listBundledAgentSupportFiles(),
+    agents: platformSupportsAgents(platformOrAdapter) ? listBundledAgents() : [],
+    agentSupportFiles: platformSupportsAgents(platformOrAdapter) ? listBundledAgentSupportFiles() : [],
     skipped: skipped.sort((a, b) => a.skillName.localeCompare(b.skillName)),
   };
 }
@@ -665,21 +669,32 @@ function resolvePlatformId(platformOrAdapter) {
   return platform;
 }
 
+function platformSupportsAgents(platformOrAdapter) {
+  if (platformOrAdapter && typeof platformOrAdapter === 'object') {
+    return platformOrAdapter.supportsAgents !== false;
+  }
+  return !AGENTLESS_PLATFORM_IDS.has(resolvePlatformId(platformOrAdapter));
+}
+
 function syncBundledAssets(projectRoot, adapter) {
-  const filteredAssetSet = buildFilteredAssetSet(adapter.id);
+  const filteredAssetSet = buildFilteredAssetSet(adapter);
   const commands = adapter.hasCommands ? syncCommands(projectRoot, adapter, filteredAssetSet.commands) : [];
   const { skills, workflowSkills, internalSkills } = syncSkills(projectRoot, adapter, filteredAssetSet);
-  const { agents, agentSupportFiles } = syncAgents(projectRoot, adapter);
+  const { agents, agentSupportFiles } = adapter.supportsAgents === false
+    ? { agents: [], agentSupportFiles: [] }
+    : syncAgents(projectRoot, adapter);
 
   return { commands, skills, workflowSkills, internalSkills, agents, agentSupportFiles, skipped: filteredAssetSet.skipped };
 }
 
-function planBundledAssetSync(projectRoot, adapter, filteredAssetSet = buildFilteredAssetSet(adapter.id)) {
+function planBundledAssetSync(projectRoot, adapter, filteredAssetSet = buildFilteredAssetSet(adapter)) {
   const commandPlan = adapter.hasCommands
     ? planCommandsSync(projectRoot, adapter, filteredAssetSet.commands)
     : { plan: emptyPlan(), runtimeCommands: [] };
   const skillsPlan = planSkillsSync(projectRoot, adapter, filteredAssetSet);
-  const agentsPlan = planAgentsSync(projectRoot, adapter);
+  const agentsPlan = adapter.supportsAgents === false
+    ? { plan: emptyPlan(), agents: [], agentSupportFiles: [] }
+    : planAgentsSync(projectRoot, adapter);
 
   return {
     plan: mergeOperationPlans(commandPlan.plan, skillsPlan.plan, agentsPlan.plan),
@@ -909,9 +924,9 @@ function planAgentsSync(projectRoot, adapter) {
 }
 
 function inspectInstalledAssets(projectRoot, adapter) {
-  const filteredAssetSet = buildFilteredAssetSet(adapter.id);
-  const agents = listBundledAgents();
-  const agentSupportFiles = listBundledAgentSupportFiles();
+  const filteredAssetSet = buildFilteredAssetSet(adapter);
+  const agents = adapter.supportsAgents === false ? [] : listBundledAgents();
+  const agentSupportFiles = adapter.supportsAgents === false ? [] : listBundledAgentSupportFiles();
 
   return {
     commands: adapter.hasCommands

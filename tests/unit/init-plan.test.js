@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { applyInitPlan, buildInitPlan } = require('../../src/cli/init-plan');
+const { printInitApplySuccess } = require('../../src/cli/commands/init');
 const { useIsolatedDeveloperHome } = require('./helpers/init-plan');
 
 // applyInitPlan 会写全局 developer profile(~/.spec-first/.developer);隔离 HOME 避免污染运行机器。
@@ -97,7 +98,8 @@ describe('init plan API', () => {
 
       expect(result.exit_code).toBe(0);
       expect(fs.existsSync(path.join(projectRoot, 'CLAUDE.md'))).toBe(true);
-      expect(fs.existsSync(path.join(projectRoot, '.claude', 'commands', 'spec', 'work.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.claude', 'commands', 'spec-work.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.claude', 'commands', 'spec', 'work.md'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.claude', 'hooks', 'session-start'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.claude', 'hooks', 'spec-plan-guard'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.claude', 'spec-first', 'state.json'))).toBe(true);
@@ -140,6 +142,10 @@ describe('init plan API', () => {
 
       expect(result.exit_code).toBe(0);
       expect(fs.readFileSync(path.join(projectRoot, '.codex', 'skills', 'graphify', 'SKILL.md'), 'utf8')).toBe('# graphify\n');
+      const skill = fs.readFileSync(path.join(projectRoot, '.agents', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).not.toContain('.qoder/commands/spec-*.md');
+      expect(skill).not.toContain('.kiro/settings/');
+      expect(skill).not.toContain('.cursor/mcp.json');
       expect(hooksJson.hooks.PreToolUse).toEqual([graphifyHook]);
       expect(hooksJson.hooks.SessionStart[0].hooks[0]).toEqual({
         type: 'command',
@@ -147,6 +153,209 @@ describe('init plan API', () => {
         commandWindows: `"${path.join(fs.realpathSync.native(projectRoot), '.codex/hooks/session-start.cmd').replace(/"/g, '\\"')}"`,
       });
     } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('applyInitPlan writes Kiro skills, agents and state without command, hook or steering runtime', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      const plan = buildInitPlan({
+        projectRoot,
+        platform: 'kiro',
+        name: 'reviewer',
+        lang: 'zh',
+      });
+      const result = applyInitPlan(projectRoot, plan);
+
+      expect(result.exit_code).toBe(0);
+      expect(fs.existsSync(path.join(projectRoot, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'commands', 'spec'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'hooks'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'steering'))).toBe(false);
+
+      const skill = fs.readFileSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).toContain('name: spec-work');
+      expect(skill).not.toContain('.agents/skills/spec-work');
+      expect(skill).not.toContain('.qoder/commands/spec-*.md');
+      expect(skill).not.toContain('.cursor/mcp.json');
+      expect(skill).toContain('Kiro-native `.kiro/specs/**` remains advisory input only when explicitly named.');
+      expect(skill).not.toContain('Cursor-native `.cursor/rules/**` / `.kiro/agents/**`');
+
+      const agent = fs.readFileSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
+      expect(agent).toContain('name: spec-security-reviewer');
+      expect(agent).toContain('tools: ["read"]');
+      expect(agent).not.toMatch(/^model:/m);
+      expect(agent).not.toMatch(/^tools:.*\b(Read|Grep|Glob|Bash)\b/m);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('applyInitPlan writes Qoder commands, skills, agents and state without rules or hooks runtime', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      const plan = buildInitPlan({
+        projectRoot,
+        platform: 'qoder',
+        name: 'reviewer',
+        lang: 'zh',
+      });
+      const result = applyInitPlan(projectRoot, plan);
+
+      expect(result.exit_code).toBe(0);
+      expect(fs.existsSync(path.join(projectRoot, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec-work.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec', 'work.md'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'rules'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'hooks'))).toBe(false);
+
+      const instructions = fs.readFileSync(path.join(projectRoot, 'AGENTS.md'), 'utf8');
+      expect(instructions).toContain('Workflow 入口统一使用同名 `spec-*`');
+      expect(instructions).toContain('setup/runtime→`spec-mcp-setup`');
+      expect(instructions).not.toContain('project ' + 'commands');
+      expect(instructions).not.toContain('$spec-mcp-setup');
+
+      const command = fs.readFileSync(path.join(projectRoot, '.qoder', 'commands', 'spec-work.md'), 'utf8');
+      expect(command).toContain('name: spec-work');
+      expect(command).toContain('description:');
+      expect(command).not.toContain('.agents/skills/spec-work');
+
+      const skill = fs.readFileSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).toContain('name: spec-work');
+      expect(skill).not.toContain('.agents/skills/spec-work');
+      expect(skill).not.toContain('.kiro/settings/');
+      expect(skill).not.toContain('.cursor/mcp.json');
+      expect(skill).toContain('Qoder-native `.qoder/rules/**` remains advisory input only when explicitly named.');
+      expect(skill).not.toContain('Cursor-native `.cursor/rules/**` / `.qoder/agents/**`');
+
+      const agent = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
+      expect(agent).toContain('name: spec-security-reviewer');
+      expect(agent).toContain('tools: [Read, Grep, Glob]');
+      expect(agent).not.toMatch(/^model:/m);
+      expect(agent).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const webResearcher = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-web-researcher.agent.md'), 'utf8');
+      expect(webResearcher).toContain('name: spec-web-researcher');
+      expect(webResearcher).toContain('tools: [Read, Grep, Glob, WebFetch, WebSearch]');
+      expect(webResearcher).not.toMatch(/^model:/m);
+      expect(webResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const slackResearcher = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-slack-researcher.agent.md'), 'utf8');
+      expect(slackResearcher).toContain('name: spec-slack-researcher');
+      expect(slackResearcher).toContain('tools: [Read, Grep, Glob, mcp__slack__*]');
+      expect(slackResearcher).not.toMatch(/^model:/m);
+      expect(slackResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const issueIntelligence = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-issue-intelligence-analyst.agent.md'), 'utf8');
+      expect(issueIntelligence).toContain('name: spec-issue-intelligence-analyst');
+      expect(issueIntelligence).toContain('tools: [Read, Grep, Glob, mcp__github__*]');
+      expect(issueIntelligence).not.toMatch(/^model:/m);
+      expect(issueIntelligence).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+
+      const bestPractices = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-best-practices-researcher.agent.md'), 'utf8');
+      expect(bestPractices).toContain('name: spec-best-practices-researcher');
+      expect(bestPractices).toContain('tools: [Read, Grep, Glob, WebFetch, WebSearch, mcp__context7__*]');
+      expect(bestPractices).not.toMatch(/^model:/m);
+      expect(bestPractices).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('applyInitPlan writes Cursor skills and state without commands, agents, or rules runtime', () => {
+    const projectRoot = makeTempDir();
+
+    try {
+      const plan = buildInitPlan({
+        projectRoot,
+        platform: 'cursor',
+        name: 'reviewer',
+        lang: 'zh',
+      });
+      const result = applyInitPlan(projectRoot, plan);
+
+      expect(result.exit_code).toBe(0);
+      expect(plan.diagnostics).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          code: 'cursor_generated_runtime_preview',
+          level: 'warn',
+        }),
+      ]));
+      expect(fs.existsSync(path.join(projectRoot, 'AGENTS.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'spec-first', 'state.json'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'commands', 'spec'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'agents'))).toBe(false);
+      expect(fs.existsSync(path.join(projectRoot, '.cursor', 'rules'))).toBe(false);
+
+      const state = JSON.parse(fs.readFileSync(path.join(projectRoot, '.cursor', 'spec-first', 'state.json'), 'utf8'));
+      expect(state.platform).toBe('cursor');
+      expect(state.commands).toEqual([]);
+      expect(state.agents).toEqual([]);
+      expect(state.agentSupportFiles).toEqual([]);
+      expect(state.workflowSkills).toContain('spec-work');
+
+      const skill = fs.readFileSync(path.join(projectRoot, '.cursor', 'skills', 'spec-work', 'SKILL.md'), 'utf8');
+      expect(skill).toContain('name: spec-work');
+      expect(skill).toContain('description:');
+      expect(skill).toContain('disable-model-invocation: true');
+      expect(skill).not.toContain('argument-hint:');
+      expect(skill).not.toContain('.agents/skills/spec-work');
+      expect(skill).not.toContain('.qoder/commands/spec-*.md');
+      expect(skill).not.toContain('.kiro/settings/');
+      expect(skill).not.toContain('`agents/**`');
+      expect(skill).toContain('`.cursor/agents/**`');
+      expect(skill).not.toContain('$spec-*');
+      expect(skill).not.toContain('/spec:*');
+
+      const setupSkill = fs.readFileSync(path.join(projectRoot, '.cursor', 'skills', 'spec-mcp-setup', 'SKILL.md'), 'utf8');
+      expect(setupSkill).toContain('## Cursor Host Pin');
+      expect(setupSkill).toContain('MCP_SETUP_HOST=cursor');
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('programmatic init success output surfaces Cursor generated-runtime preview warning', () => {
+    const projectRoot = makeTempDir();
+    const logs = [];
+    const warns = [];
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+
+    try {
+      const plan = buildInitPlan({
+        projectRoot,
+        platform: 'cursor',
+        name: 'reviewer',
+        lang: 'zh',
+      });
+      const result = applyInitPlan(projectRoot, plan);
+
+      console.log = (...args) => logs.push(args.join(' '));
+      console.warn = (...args) => warns.push(args.join(' '));
+      printInitApplySuccess(plan, result, { showNextSteps: false });
+
+      expect(warns.join('\n')).toContain('Cursor support is generated-runtime preview');
+
+      warns.length = 0;
+      printInitApplySuccess(plan, result, { showDiagnostics: false, showNextSteps: false });
+      expect(warns.join('\n')).not.toContain('Cursor support is generated-runtime preview');
+    } finally {
+      console.log = originalLog;
+      console.warn = originalWarn;
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
   });
@@ -172,7 +381,8 @@ describe('init plan API', () => {
       const result = applyInitPlan(projectRoot, plan);
       expect(result.exit_code).toBe(0);
       expect(fs.existsSync(path.join(projectRoot, '.claude', 'skills', 'old-skill'))).toBe(false);
-      expect(fs.existsSync(path.join(projectRoot, '.claude', 'commands', 'spec', 'work.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.claude', 'commands', 'spec-work.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.claude', 'commands', 'spec', 'work.md'))).toBe(false);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }

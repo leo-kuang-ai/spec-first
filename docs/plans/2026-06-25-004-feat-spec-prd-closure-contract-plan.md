@@ -33,9 +33,9 @@ referenced_reviews:
 
 ## Summary
 
-003 方案已经让 `$spec-prd` 不能跳过 producer-local finalize,但最新 19:07 real-run 证明它仍不能强制 pressure grill:模型被 Stop hook 拦住后只补机器字段、跑 finalize,没有回到 owner 继续澄清,最终把带 6 个 OQ 和 partial/unread Figma coverage 的 PRD 标成 `ready-for-planning`。
+003 方案已经让 `spec-prd` 不能跳过 producer-local finalize,但最新 19:07 real-run 证明它仍不能强制 pressure grill:模型被 Stop hook 拦住后只补机器字段、跑 finalize,没有回到 owner 继续澄清,最终把带 6 个 OQ 和 partial/unread Figma coverage 的 PRD 标成 `ready-for-planning`。
 
-本方案把 `$spec-prd` 修正为双层机制:第一层是**前置分块 pressure grill**，在获取资料后先做 input inventory、authority classification、module/chunk map、risk-to-write-target map,再按风险队列一块一块追问 owner,逐步细化到 PRD 写入目标;第二层才是 Closure Contract v1 和 finalize/checker,负责阻止未闭合 residue 伪装成 ready。
+本方案把 `spec-prd` 修正为双层机制:第一层是**前置分块 pressure grill**，在获取资料后先做 input inventory、authority classification、module/chunk map、risk-to-write-target map,再按风险队列一块一块追问 owner,逐步细化到 PRD 写入目标;第二层才是 Closure Contract v1 和 finalize/checker,负责阻止未闭合 residue 伪装成 ready。
 
 关键变化:PRD 草稿不是先写完再检查,而是每个资料块先被梳理、归类、提问、闭合或 checkpoint。readiness 的顶层语义是一把**剃刀**(借鉴 loop-me 的 "nothing is done while a question remains"):任一 PRD-owned open question 默认 not-ready,**只有携带一个合法 closure disposition + 对应证据**才非阻塞——模型没有“我判它非阻塞”这个自由旋钮。合法 disposition 即 Canonical 四个停点的具体化:source-resolved、owner-answered、owner-capped、owner-accepted assumption、source-backed non-WHAT assumption,或不改 WHAT/scope/acceptance/source-of-truth 的 implementation-only how-pushdown。只有所有 load-bearing chunk 经此闭合,才允许写 `final-prd` 并进入 finalize。finalize/checker 只是出口保险,不是 pressure grill 的发生点。
 
@@ -52,7 +52,7 @@ referenced_reviews:
 
 ## Problem Frame
 
-`$spec-prd` 的目标是让 `spec-plan` 消费 PRD 时不需要发明产品行为。过去几轮修复已经逐步把 prose gate 推向 producer-local finalize:
+`spec-prd` 的目标是让 `spec-plan` 消费 PRD 时不需要发明产品行为。过去几轮修复已经逐步把 prose gate 推向 producer-local finalize:
 
 - 001/002 让 skill prose 明确 relentless grill、Figma/design-source accounting 和 Phase 4 checker。
 - 003 新增 `finalize-prd-artifact.js` 与 Claude Stop hook,解决“写完 PRD 后不跑 checker、自盖 ready”的根因。
@@ -62,16 +62,16 @@ referenced_reviews:
 
 现有 artifact 只有 `clarification_evidence: asked-owner`、`preflight_sweep_closure: closed`、`can_enter_spec_plan: yes` 这类粗字段,没有把每个资料块是否已 source-resolved、owner-answered、owner-capped、owner-accepted assumption、source-backed non-WHAT assumption、implementation-only how-pushdown 或 checkpoint 写成可检查结构。于是浅问 3 个 scoping 问题也能被包装成 `final-prd`。
 
-正确修复不是规定“必须问 N 轮”,也不是把 `spec-plan` 改成 PRD consumer gate,而是在 `$spec-prd` 内建立写前分块 grill pipeline,并在出口补一个轻量 closure contract:LLM 仍判断哪些问题 load-bearing,但必须在写 PRD 前把判断推进到每个 chunk 的 closure state;脚本只检查这些声明是否存在且与 ready 状态矛盾。
+正确修复不是规定“必须问 N 轮”,也不是把 `spec-plan` 改成 PRD consumer gate,而是在 `spec-prd` 内建立写前分块 grill pipeline,并在出口补一个轻量 closure contract:LLM 仍判断哪些问题 load-bearing,但必须在写 PRD 前把判断推进到每个 chunk 的 closure state;脚本只检查这些声明是否存在且与 ready 状态矛盾。
 
 ---
 
 ## Requirements
 
 - R1. `spec-plan` 保持独立,不新增 PRD-specific consumer gate、plan guard、PRD reason_code 解析或跨 skill 强依赖。
-- R2. `$spec-prd` 必须在 durable PRD 写入前运行前置分块 grill pipeline:input inventory -> authority classification -> chunk/module map -> risk-to-write-target map -> grill queue -> chunk closure。
+- R2. `spec-prd` 必须在 durable PRD 写入前运行前置分块 grill pipeline:input inventory -> authority classification -> chunk/module map -> risk-to-write-target map -> grill queue -> chunk closure。
 - R3. 每个 load-bearing chunk 必须绑定 PRD write target,并记录 closure_state;未闭合 chunk 不得被延后到 final PRD 后处理。
-- R4. `$spec-prd` producer 必须阻止可见未闭合 PRD-owned OQ 进入 `ready-for-planning`。
+- R4. `spec-prd` producer 必须阻止可见未闭合 PRD-owned OQ 进入 `ready-for-planning`。
 - R5. `final-prd` 中所有 Outstanding Questions 必须有 closure 字段:owner/status、PRD write target、blocks_planning、closure_disposition(及其证据)、planning_would_invent_what、closure_state、recommended_default 或 deferred reason。
 - R6. 对声明 final/ready 或 `can_enter_spec_plan: yes` 的 artifact,任一 OQ 或 chunk 声明 `blocks_planning: yes`、`planning_would_invent_what: yes`、`closure_state: unclosed|blocker|unknown|headless-degraded` 时,finalize 必须 block;合法 `checkpoint-prd + can_enter_spec_plan: no` 可携带这些 residue 并以 non-ready closeout 退出。
 - R7. `clarification_evidence: asked-owner` 必须有独立 `## Owner Decision Trace` 条件 section 中可检查的 owner answer row,并关联 PRD write target;只写 `asked-owner` 或把答案混在自由体 Decision Notes 中不足以证明 pressure grill closure。
@@ -80,7 +80,7 @@ referenced_reviews:
 - R10. `checkpoint-prd` 必须能保留上下文、chunk map 和下一问,但不能写 `status: ready-for-planning`、`write_mode: final-prd` 或 `can_enter_spec_plan: yes`。
 - R11. checker/finalize 只产 deterministic facts/reason_codes,不决定某个业务问题是否本质上 blocking;该语义判断仍由 LLM/owner 承担,但必须显式声明。
 - R12. 验收必须覆盖 19:07 real-run 的 artifact 残留形态,防止测试只锁当前字段名;真正证明 pre-write grill 曾发生、owner answer 未伪造,需要 host question receipt / transcript-bound provenance,本方案只记录为 deferred capability。
-- R13. `$spec-prd` 必须在写 PRD 前区分 PRD、Figma、API docs、code workspace、historical knowledge 的 source type 和 authority;不同 source type 只能贡献对应的 evidence/extraction target,不得直接混成 confirmed target requirement。
+- R13. `spec-prd` 必须在写 PRD 前区分 PRD、Figma、API docs、code workspace、historical knowledge 的 source type 和 authority;不同 source type 只能贡献对应的 evidence/extraction target,不得直接混成 confirmed target requirement。
 - R14. API/contract docs 和 code workspace 必须先进入 requirement questions 或 current-state evidence:API docs 关注 consumer-visible behavior、availability、error semantics、compatibility 和 data authority;code workspace 只证明当前行为/约束,不能替 owner 决定目标行为。
 - R15. 核心 requirement chunk 应映射到 acceptance example、显式 trace gap、owner cap 或 Outstanding Question;缺少 AE 映射本身保持 advisory,不得回退 003 的 trace-gap carve-out,但 readiness lens 必须解释为什么 planning 不会发明 WHAT。
 - R16. **Closure-disposition 剃刀(readiness 脊柱)。** 任一 PRD-owned open question 默认 not-ready;它非阻塞当且仅当携带一个合法 closure disposition 且带该 disposition 要求的证据。合法 disposition 是 Canonical 四停点的具体化:`source-resolved`(source/docs/repo 引用)、`owner-answered`(Owner Decision Trace 非空 row,含 chosen_answer+write target)、`owner-capped`(owner cap 证据)、`owner-accepted-assumption`(owner 确认痕迹)、`source-backed-non-WHAT-assumption`(source 引用)、`implementation-only-how-pushdown`(声明 `planning_would_invent_what=no` 且不改 WHAT/scope/acceptance/source-of-truth/release/contract)。模型**没有**“我判它非阻塞”这条路——`blocks_planning=no` 不是自由断言,而是上述 disposition 的派生结果。这直接打掉 19:07 根因:模型把 OQ-2/OQ-4 自判为“planning 期并行项”却从未问 owner,在剃刀下属于“无合法 disposition 的 open question”=not-ready,只能继续 grill 或 `checkpoint-prd`。owner 缺席/headless 时唯一合法出口是 `checkpoint-prd`。checker 只做结构检查(open OQ 是否带合法 disposition token + 证据 cell),不裁决业务语义(KTD2);蓄意伪造 owner ratification 仍属 [R12] 的 deferred host-provenance 上界。剃刀使旧的“自标 load-bearing 再抓矛盾”路径不再需要,因此**退役** R17 的自标循环机制(见下)。
@@ -91,7 +91,7 @@ referenced_reviews:
 
 > 这三条是 U0–U5 落地后、经 `docs/项目审查/详细审查/2026-06-26-spec-prd-10轮SE深度审查.md` 终轮收口筛出的**对已建 closure 机制的加固/纠偏**,不扩 closure scope、不新增 BLOCKING、不改既有 ready 判定。承载于 follow-up units U6–U8。审查从 9 条候选收敛到这 3.5 条 KEEP 的依据见该文档「终轮收口结论」。
 
-- R19. **(O7,eval 取向纠偏)** `$spec-prd` 的 eval fixture 取向当前结构性偏防御(anti-over-blocking 方向的硬 `must_not` 为 0),奖励梯度单向助推 closure 偏置——能抓 19:07 的“放水”,却对“过度阻塞 / 把 source-resolvable 问题升级成 owner 打扰 / 把合法 disposition 误判为 blocker”零惩罚。必须在 `examples.json` 的 `cases[]` 净增 3 条恢复梯度对称的自然语言 case:(a) how-pushdown 后门失败、(b) 合法非阻塞正向锚(合并 declare-default,展示 `closure_disposition` 合法非阻塞 ready 长什么样)、(c) anti-over-blocking 失败(source-resolvable gap 被升级成 owner 打扰)。约束:全进 `cases[]` 不进 `sentinel_cases`,零 `reason_code` token(reason_code 精确断言归 R20 的确定性测试层,不进 examples.json),复用现有 `quality_buckets` 不新增 bucket,守 examples-as-context 定位与反 scorecard 封板。
+- R19. **(O7,eval 取向纠偏)** `spec-prd` 的 eval fixture 取向当前结构性偏防御(anti-over-blocking 方向的硬 `must_not` 为 0),奖励梯度单向助推 closure 偏置——能抓 19:07 的“放水”,却对“过度阻塞 / 把 source-resolvable 问题升级成 owner 打扰 / 把合法 disposition 误判为 blocker”零惩罚。必须在 `examples.json` 的 `cases[]` 净增 3 条恢复梯度对称的自然语言 case:(a) how-pushdown 后门失败、(b) 合法非阻塞正向锚(合并 declare-default,展示 `closure_disposition` 合法非阻塞 ready 长什么样)、(c) anti-over-blocking 失败(source-resolvable gap 被升级成 owner 打扰)。约束:全进 `cases[]` 不进 `sentinel_cases`,零 `reason_code` token(reason_code 精确断言归 R20 的确定性测试层,不进 examples.json),复用现有 `quality_buckets` 不新增 bucket,守 examples-as-context 定位与反 scorecard 封板。
 - R20. **(S5,确定性回归 freeze)** `check-prd-artifact.js` 是 1064 行高熵脚本,当前测试全是 `arrayContaining`/`toMatchObject` 部分匹配,无一处锁 `BLOCKING_REASON_CODES` 完整集合,任何 advisory finding 的 reason_code 拼写或 facts 字段名静默漂移(下游 doc-review 消费这些)都抓不到。必须补:(1) `BLOCKING_REASON_CODES` 数组相等断言(真 freeze,不可变),守 KTD14 审计不变量(无 presence/ceremony 进 BLOCKING);(2) 3–5 个代表性 characterization fixture(baseline 语义,随 intended change 同步并 diff review,头部注释写明 carve-out)。**不做** 18 个逐字节 fixture(维护熵过高)与 parity 矩阵(已被 `runtime-*-contracts.test.js` 覆盖)。`preflight_closure_contradicted` 当前在两个测试文件命中双零(11 个 blocking code 里唯一 golden 无直接断言的),必须在本轮补一条直接断言。
 - R21. **(S4a,SSOT 净减 + lint 降级)** `SKILL.md`「Canonical 四个合法停点」已声明 "Other references point here by reference and must not restate this four-tuple",但 6+ reference 文件内联复述整段四元组措辞且无防漂移 lint。必须删冗余四元组 gloss(只删括号四元组枚举,**保留 posture 句 + by-reference 指针**;posture 是对抗早停先验的 load-bearing 强化,绝不压);SSOT 唯一性 lint **只能落到 advisory/test 层,绝不进 artifact `BLOCKING_REASON_CODES`**(否则违反 KTD14),且只锁四元组字面、绝不升级为语义复述检测、绝不锁 posture 词。
 
@@ -105,7 +105,7 @@ referenced_reviews:
 - 不新增第二套 PRD artifact topology,不创建 transcript、progress file、context map 或 approval artifact。
 - 不把 checker 做成产品语义裁判,不让它判断 OQ-2 是否真的 blocking;它只判断 PRD 自己声明的 closure 与 ready 是否矛盾。
 - 不依赖 Figma provider 一定可用。provider 不可用时允许 `checkpoint-prd` 或 owner-accepted degraded path,但不允许静默 ready。
-- 不在 Codex 中虚构 Claude Stop hook 等价能力。Codex 仍依赖 `$spec-prd` closeout/finalize 路径和 tests,直到宿主有可 block closeout 的 primitive。
+- 不在 Codex 中虚构 Claude Stop hook 等价能力。Codex 仍依赖 `spec-prd` closeout/finalize 路径和 tests,直到宿主有可 block closeout 的 primitive。
 - 不把 discovery 侧增强(主动多义嗅探、dev/test forcing-function、隐含假设挖掘)并入本 closure plan。10 轮审查的 S4b/B1 存活项属 discovery scope,塞进 closure plan 会膨胀边界、违反 80/20;它们作为头号遗留 handoff 交独立 discovery-side plan(见 Alternative Approaches 与 Open Questions),R1 红线照旧。
 - 不因 R19–R21 加固而新增任何 BLOCKING reason_code、改既有 ready 判定、或把 advisory finding 升 blocking。R19 只动 eval fixture,R20 只加测试与 freeze 断言,R21 只删冗余 prose + advisory/test 层 lint;三者均 behavior-preserving over 已部署 checker 行为。
 
@@ -161,7 +161,7 @@ referenced_reviews:
 
 ## Direct Evidence
 
-- repo_scope: `spec-first` source repo,目标 surface 为 `$spec-prd` skill、PRD output template、readiness lens、checker/finalize、Claude Stop hook、focused tests/docs
+- repo_scope: `spec-first` source repo,目标 surface 为 `spec-prd` skill、PRD output template、readiness lens、checker/finalize、Claude Stop hook、focused tests/docs
 - source_reads_completed:
   - `check-prd-artifact.js` 当前 blocking set 包含 core section、write_mode、clarification_evidence、design accounting、receipt,但没有 OQ closure contradiction 或 design unread owner acceptance 检查。
   - `finalize-prd-artifact.js` 只消费 checker 的 `blocking_reason_codes`,因此新增 blocker 应优先落到 checker。
@@ -210,7 +210,7 @@ referenced_reviews:
 - Consumer-driven contracts / API contract review:接口文档在需求阶段应被转成 consumer-visible behavior、availability、error semantics、compatibility questions,而不是提前落 HOW。参考: https://docs.pact.io/
 - Figma Dev Mode / design handoff:设计源应提取布局、状态、文案、tokens、交互和 inspect 信息,但 provider/tool output 仍是 source-candidate。参考: https://help.figma.com/hc/en-us/articles/15023124644247-Guide-to-Dev-Mode
 
-These references support the workflow shape, not a third-party dependency. `$spec-prd` should borrow the patterns of discovery-before-delivery, example-based ambiguity finding, design/API evidence extraction, and traceable closure, while keeping spec-first's local boundaries: scripts prepare deterministic facts, LLM decides semantic requirement closure, and owner decisions remain the highest authority for product WHAT.
+These references support the workflow shape, not a third-party dependency. `spec-prd` should borrow the patterns of discovery-before-delivery, example-based ambiguity finding, design/API evidence extraction, and traceable closure, while keeping spec-first's local boundaries: scripts prepare deterministic facts, LLM decides semantic requirement closure, and owner decisions remain the highest authority for product WHAT.
 
 ### Best-Mode Process Synthesis
 
@@ -227,11 +227,11 @@ These references support the workflow shape, not a third-party dependency. `$spe
 9. **PRD Write-In / 需求写入。** 只有闭合后的 chunk 才进入 durable PRD。未闭合 chunk 进入 `checkpoint-prd` 的 `Outstanding Questions`/`Readiness Self-Check`,明确 `planning_would_invent_what` 和下一问。
 10. **Finalize Backstop / 出口防逃逸。** finalize/checker 不负责发现全部语义问题,只阻止 artifact 自相矛盾:未闭合 chunk、blocking OQ、未接受 design unread、缺 owner trace、自证 ready。
 
-这套流程与业界实践的对应关系是:dual-track 的 discovery 在 `$spec-prd` 内完成;Three Amigos 的多视角 ambiguity finding 被 Product Expert Lens + example mapping 吸收;consumer-driven contract review 被 API Coverage Gate 吸收;Figma handoff 被 design-source inventory 和 design-WHAT extraction 吸收;requirements traceability 被 PRD write target、acceptance examples 和 closure state 吸收。
+这套流程与业界实践的对应关系是:dual-track 的 discovery 在 `spec-prd` 内完成;Three Amigos 的多视角 ambiguity finding 被 Product Expert Lens + example mapping 吸收;consumer-driven contract review 被 API Coverage Gate 吸收;Figma handoff 被 design-source inventory 和 design-WHAT extraction 吸收;requirements traceability 被 PRD write target、acceptance examples 和 closure state 吸收。
 
 ### Current Sufficiency Assessment
 
-Current `$spec-prd` direction is correct but not yet sufficient for the user's target.
+Current `spec-prd` direction is correct but not yet sufficient for the user's target.
 
 - Sufficient parts: brownfield-first、WHAT-not-HOW、Requirement Analysis Gate、Product Expert Lens、Figma/design accounting、producer-local finalize、Claude Stop hook、防 `spec-plan` 背锅的边界,方向都对。
 - Main insufficiency: pressure grill 仍主要靠 prose self-discipline。真实日志证明模型会把“问过 1 轮 scoping 问题”误当 closure,之后用字段补齐来通过出口。
@@ -243,7 +243,7 @@ Current `$spec-prd` direction is correct but not yet sufficient for the user's t
 
 ## Key Technical Decisions
 
-- KTD0. **Pressure grill 必须前置到 PRD 写入前。** `$spec-prd` 的主路径应是资料摄取 -> 分块梳理 -> risk-to-write-target map -> grill queue -> chunk closure -> PRD write-in。finalize/checker 不是让模型在最后补字段的地方,只验证 artifact 中可检查的 closure 声明与 ready 声明是否自洽。
+- KTD0. **Pressure grill 必须前置到 PRD 写入前。** `spec-prd` 的主路径应是资料摄取 -> 分块梳理 -> risk-to-write-target map -> grill queue -> chunk closure -> PRD write-in。finalize/checker 不是让模型在最后补字段的地方,只验证 artifact 中可检查的 closure 声明与 ready 声明是否自洽。
 - KTD1. **Closure Contract v1 是 PRD section contract,不是新 artifact。** 新字段落在 `Outstanding Questions`、独立条件 section `Owner Decision Trace`、`Design Source Coverage`、`Readiness Self-Check` 和最小 `Pre-Write Grill Map` 摘要;不创建 transcript、approval 文件或第二 artifact topology。普通 `Decision Notes` 可继续记录背景决策,但不能替代可解析的 owner answer trace。
 - KTD2. **最终 ready 只检查矛盾,不裁决业务。** checker 不判断 OQ-2 是否 blocking;它只检查 PRD 是否声明了 `blocks_planning`、`planning_would_invent_what`、`closure_state`,以及这些声明是否与 `final-prd` 自相矛盾。
 - KTD3. **`final-prd` 不能携带未闭合 PRD-owned residue。** 如果 owner 未回答且未明确 cap,或者 design unread 仍可能改变 UI structure/state/interaction/acceptance/scope,唯一合法路径是 `checkpoint-prd` 或 `ask-owner`。
@@ -299,7 +299,7 @@ Closure Contract v1 fields:
 
 ### U0. Requirement Intelligence Intake And Source-Type Extraction
 
-**Goal:** Make the first visible act of `$spec-prd` a requirement-intelligence intake instead of a PRD draft: enumerate inputs, classify authority, extract source-type-specific facts, and produce the chunk/grill material that U1 consumes.
+**Goal:** Make the first visible act of `spec-prd` a requirement-intelligence intake instead of a PRD draft: enumerate inputs, classify authority, extract source-type-specific facts, and produce the chunk/grill material that U1 consumes.
 
 **Requirements:** R2, R3, R7, R8, R11, R13, R14
 
@@ -345,7 +345,7 @@ Closure Contract v1 fields:
 
 ### U1. Pre-Write Chunked Grill Pipeline And Closure Prose
 
-**Goal:** Move pressure grill to the front of `$spec-prd`: after资料摄取, the workflow must chunk, map, rank, ask, close, or checkpoint before durable final PRD write-in.
+**Goal:** Move pressure grill to the front of `spec-prd`: after资料摄取, the workflow must chunk, map, rank, ask, close, or checkpoint before durable final PRD write-in.
 
 **Requirements:** R2, R3, R4, R5, R7, R8, R10, R11, R15, R16, R17, R18
 
@@ -549,10 +549,10 @@ Closure Contract v1 fields:
 **Approach:**
 - Keep finalize logic unchanged for ordinary robust blockers when U2 reason_codes enter checker `blocking_reason_codes`, but implement the valid checkpoint closeout exception below.
 - Update finalize closeout JSON only if needed to surface closure blocker names clearly.
-- Update Stop hook block message copy to mention pressure grill/closure blockers, but keep it producer-local and route back to `$spec-prd`.
+- Update Stop hook block message copy to mention pressure grill/closure blockers, but keep it producer-local and route back to `spec-prd`.
 - Add a valid checkpoint closeout path: `checkpoint-prd` with `can_enter_spec_plan: no`, no `status: ready-for-planning`, and no ready receipt is a legal non-ready outcome. Finalize/check-only must split readiness receipt semantics from closeout permission: checkpoint closeout returns a non-blocking status such as `checkpoint-closeout`, `can_closeout: true`, `should_block_closeout: false`, and `can_finalize: false`; non-`--check-only` checkpoint closeout must not write `ready-for-planning` or `readiness_verified_*` receipt fields. Only `checkpoint-prd` that also claims ready or `can_enter_spec_plan: yes` triggers `checkpoint_claims_ready`.
 - Wire CLI exit status to closeout blocking, not ready finalization: `finalize-prd-artifact.js --check-only` should exit `0` when `should_block_closeout=false` even if `can_finalize=false`, so a valid checkpoint cleanly closes. The Stop hook must continue to use only the finalize exit code for allow/block and must not parse `can_closeout`, `can_finalize`, or checkpoint semantic fields.
-- Keep `source_inputs` / `prd_input` handoff deterministic: hook and finalize may pass absolute paths, but checker must use the same resolved input identity as direct `$spec-prd` finalize calls so receipt freshness does not churn between relative and absolute invocation styles.
+- Keep `source_inputs` / `prd_input` handoff deterministic: hook and finalize may pass absolute paths, but checker must use the same resolved input identity as direct `spec-prd` finalize calls so receipt freshness does not churn between relative and absolute invocation styles.
 - Do not filter input paths in the Stop hook before invoking finalize. Resolve each input with `path.isAbsolute(inputPath) ? inputPath : path.resolve(projectDir, inputPath)`, pass missing paths through, and let checker own `input_refs_unavailable` / `input_scan_degraded` facts instead of hiding missing inputs at hook level.
 - Ensure Stop hook/finalize copy tells the model to return to the pre-write grill queue, not merely to fill missing fields.
 
@@ -650,9 +650,9 @@ Closure Contract v1 fields:
 - Modify: `CHANGELOG.md`
 
 **Approach:**
-- Document the practical rule: after source/design/API materials are gathered, `$spec-prd` first chunks and grills; unresolved PRD-owned OQ, unclosed chunk, or unread design source means keep grilling or checkpoint, not ready.
+- Document the practical rule: after source/design/API materials are gathered, `spec-prd` first chunks and grills; unresolved PRD-owned OQ, unclosed chunk, or unread design source means keep grilling or checkpoint, not ready.
 - Ensure runtime projection tests cover the updated hook/script assets for Claude and source skill assets for Codex.
-- Changelog entry must state user-visible behavior: `$spec-prd` will now block final ready when closure declarations contradict unresolved OQ/design residue.
+- Changelog entry must state user-visible behavior: `spec-prd` will now block final ready when closure declarations contradict unresolved OQ/design residue.
 
 **Test scenarios:**
 - Documentation mentions frontloaded chunked grill as the normal path and `checkpoint-prd` as legitimate non-ready output.
@@ -672,7 +672,7 @@ Closure Contract v1 fields:
 
 ### U6. Eval Orientation Symmetry(承接 R19 / O7)
 
-**Goal:** 把 `$spec-prd` 的 eval 取向从单向"防放水"补成双向"既防放水也防过度阻塞",恢复奖励梯度对称,正面回应"充分发挥 LLM 能力 vs closure 偏置"。
+**Goal:** 把 `spec-prd` 的 eval 取向从单向"防放水"补成双向"既防放水也防过度阻塞",恢复奖励梯度对称,正面回应"充分发挥 LLM 能力 vs closure 偏置"。
 
 **Requirements:** R19
 
@@ -773,7 +773,7 @@ Closure Contract v1 fields:
 
 
 
-- **Interaction graph:** `$spec-prd` SKILL/readiness/output template first create a run-local chunk map and grill queue, then persist only the minimal body-resident `Pre-Write Grill Map` summary and closure declarations. `check-prd-artifact.js` validates the persisted closure summary; finalize and Claude Stop hook consume checker blockers. `spec-plan` consumes only ready PRD artifact and remains unchanged.
+- **Interaction graph:** `spec-prd` SKILL/readiness/output template first create a run-local chunk map and grill queue, then persist only the minimal body-resident `Pre-Write Grill Map` summary and closure declarations. `check-prd-artifact.js` validates the persisted closure summary; finalize and Claude Stop hook consume checker blockers. `spec-plan` consumes only ready PRD artifact and remains unchanged.
 - **Error propagation:** pre-write grill and closure blockers surface as reason_codes in finalize JSON and Stop hook block message. LLM next action is return to the grill queue, ask owner, read design, downgrade checkpoint, or fix false declaration.
 - **State lifecycle risks:** a stale ready receipt remains blocked by existing receipt hash logic. Closure declarations should stay body-resident in PRD sections, where `normalizeForReceipt` already includes them in `readiness_prd_hash`; do not move closure fields into frontmatter or add them to `MACHINE_READY_FIELDS`, or post-finalize OQ/design edits could stop invalidating the receipt.
 - **Surface coverage:** Claude hard block in scope through Stop hook; Codex source skill/finalize path in scope but host-level hard block remains degraded; README/docs communicate the difference.
@@ -836,7 +836,7 @@ Closure Contract v1 fields:
 - Should all new checker reason_codes start as blockers? No. 19:07 proved the model can game checker contracts, so presence/self-incrimination checks are advisory-first; only robust ready contradictions enter `BLOCKING_REASON_CODES`.
 - Should missing acceptance example mapping be a blocker? No. It stays advisory to preserve the 003/readiness-lens trace-gap carve-out; only a separate, narrowly detected contradiction may block when the artifact has no AE, no trace gap/OQ/owner cap, and still claims planning will not invent WHAT.
 - Should localized OQ/Decision Trace aliases be deferred? No. The implementation starts with the explicit minimal Chinese/English alias table in U2; adding more aliases later requires fixtures.
-- Is the fix an independent LLM verifier or owner ratification? Owner ratification, expressed as the R16 closure-disposition razor (R16/KTD13). The disease is producer==checker==same model; the structurally independent party in interactive `/spec:prd` is the human owner, already wired via the blocking question tool, with no same-base self-preference blind spot and no host-dispatch dependency. A second LLM critic shares the artifact-truth ceiling and the base-model blind spot, so it stays optional defense-in-depth, not the primary fix. The razor closes the sincere-misjudgment layer without a self-labeling loophole: there is no "mark it non-load-bearing to escape" path, because every open OQ needs a legal `closure_disposition`+evidence regardless. Deliberate forgery of an owner answer remains the deferred host-provenance ceiling (R12).
+- Is the fix an independent LLM verifier or owner ratification? Owner ratification, expressed as the R16 closure-disposition razor (R16/KTD13). The disease is producer==checker==same model; the structurally independent party in interactive `spec-prd` is the human owner, already wired via the blocking question tool, with no same-base self-preference blind spot and no host-dispatch dependency. A second LLM critic shares the artifact-truth ceiling and the base-model blind spot, so it stays optional defense-in-depth, not the primary fix. The razor closes the sincere-misjudgment layer without a self-labeling loophole: there is no "mark it non-load-bearing to escape" path, because every open OQ needs a legal `closure_disposition`+evidence regardless. Deliberate forgery of an owner answer remains the deferred host-provenance ceiling (R12).
 - Why a closure-disposition razor instead of a self-labeled `load_bearing` flag? An earlier revision used `load_bearing=yes` self-labeling plus contradiction detection, but that created a second-order self-labeling loophole (the model could simply not mark a load-bearing OQ). Borrowing loop-me's "nothing is done while a question remains", the razor removes the downgrade knob entirely: open OQ defaults to not-ready, the only exit is a legal disposition. This retires the `load_bearing_oq_self_downgraded` blocker and its broad advisory, collapsing them into the single `open_oq_without_owner_closure` blocker; the only residual self-asserted disposition (`implementation-only-how-pushdown`) is backstopped by `how_pushdown_touches_what`, which blocks on the three-fact conjunction (how-pushdown + keyword hit + claims-ready) and degrades to the advisory `possible_misclassified_how_pushdown` only when the artifact is not claiming ready.
 - What exact compact shape should persisted pre-write grill closure use? A minimal body-resident `Pre-Write Grill Map` summary with `chunk_id`, `source_refs/types`, `risk_or_conflict`, `PRD write target`, `next_owner_brief_id`, `closure_state`, and `first_unclosed_chunk`. Full transcripts and raw chunk reasoning remain run-local.
 - Should `Owner Decision Trace` be a new section or stricter `Decision Notes` table? New conditional `## Owner Decision Trace` section. Free-form `Decision Notes` can explain decisions but cannot satisfy checker-visible owner answer trace.
@@ -860,7 +860,7 @@ Closure Contract v1 fields:
 
 ## Documentation / Operational Notes
 
-- Update user docs to state the new operational rule plainly: `$spec-prd` starts pressure grill after material intake, not after final PRD drafting; if owner questions remain load-bearing, it should stop as `checkpoint-prd` and ask the next owner question, not finalize.
+- Update user docs to state the new operational rule plainly: `spec-prd` starts pressure grill after material intake, not after final PRD drafting; if owner questions remain load-bearing, it should stop as `checkpoint-prd` and ask the next owner question, not finalize.
 - Document the recommended R&D operating mode: collect PRD/Figma/API/source/history into an input packet, classify authority and conflicts, extract source-type-specific evidence, then run chunked grill before any technical solution.
 - Fresh-source eval should be run after implementation if host dispatch is available; if not available, record `not_run` with reason rather than claiming behavioral proof.
 - After source implementation, run `spec-first init` only when runtime projection verification is needed; do not hand-edit generated mirrors.

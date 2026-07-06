@@ -18,7 +18,7 @@ spec-first 的 README 是项目的首要入口，同时服务两类读者：**�
 
 **演示内容**
 - R1. 在"概述"后、"为什么需要它"前，新增"实际效果 / See It In Action"区块
-- R2. 该区块展示真实 terminal 输出，至少覆盖 `spec-first init --claude` + 第一个工作流命令（如 `/spec:brainstorm`）的执行过程
+- R2. 该区块展示真实 terminal 输出，至少覆盖 `spec-first init --claude` + 第一个工作流命令（如 `spec-brainstorm`）的执行过程
 - R3. 演示内容采用 GIF 动图或高质量 terminal 截图；若尚未制作，可先以代码块格式的示例输出占位，后续替换
 
 **章节顺序（价值优先重排）**
@@ -64,9 +64,9 @@ spec-first 的 README 是项目的首要入口，同时服务两类读者：**�
 
 ### Deferred to Planning
 
-- [Affects R2][Needs research] 演示输出最能体现价值的场景是哪一段？建议在实施时先梳理 `spec-first init` + `/spec:brainstorm` 的典型输出，再决定截取哪段作为演示内容
+- [Affects R2][Needs research] 演示输出最能体现价值的场景是哪一段？建议在实施时先梳理 `spec-first init` + `spec-brainstorm` 的典型输出，再决定截取哪段作为演示内容
 - [Affects R3][Technical] GIF 制作工具选择（asciinema、VHS、录屏等）留到素材制作阶段决定
 
 ## Next Steps
 
-→ `/spec:plan` 进行结构化实施规划
+→ `spec-plan` 进行结构化实施规划

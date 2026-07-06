@@ -8,7 +8,7 @@ focus: 输出连载博客
 
 ## Codebase Context
 
-`spec-first` 不是单点 CLI，而是一套面向 Claude Code 和 Codex 的中文优先 AI 工程工作流系统。仓库的核心叙事已经很明确：用 `doctor / init / clean` 管理运行时资产，用 `/spec:*` 与 `$spec-*` 提供稳定入口，用 `Stage-0`、`Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 把 AI 编程从一次性对话升级为可安装、可治理、可复用的工程系统。
+`spec-first` 不是单点 CLI，而是一套面向 Claude Code 和 Codex 的中文优先 AI 工程工作流系统。仓库的核心叙事已经很明确：用 `doctor / init / clean` 管理运行时资产，用 `spec-*` 与 `spec-*` 提供稳定入口，用 `Stage-0`、`Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 把 AI 编程从一次性对话升级为可安装、可治理、可复用的工程系统。
 
 当前文档结构也支持“连续内容”而不是零散说明：`docs/05-用户手册/` 适合讲使用路径，`docs/08-版本更新/` 适合讲迭代故事，`docs/09-业界借鉴/` 已经形成外部知识输入索引，`docs/brainstorms/`、`docs/plans/`、`docs/solutions/` 则能把“想法 - 方案 - 修复 - 复盘”串成一条内容链。
 
@@ -57,7 +57,7 @@ focus: 输出连载博客
 **Status:** Unexplored
 
 ### 6. Claude Code 和 Codex 的双宿主实践：同一套工作流如何跨平台落地
-**Description:** 以 `/spec:*` 和 `$spec-*` 为切面，讲同一套工程工作流如何适配不同宿主、不同命令入口和不同 runtime 资产模型。
+**Description:** 以 `spec-*` 和 `spec-*` 为切面，讲同一套工程工作流如何适配不同宿主、不同命令入口和不同 runtime 资产模型。
 **Rationale:** 这是 `spec-first` 很独特的卖点，容易形成对外传播的辨识度。
 **Downsides:** 平台差异写不好会显得分散，且需要同时照顾两个生态的读者。
 **Confidence:** 84%

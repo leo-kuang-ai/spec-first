@@ -1076,7 +1076,7 @@ Matrix 必须包含 `spec-doc-review` 作为 fixed reference pattern，并说明
 
 ```text
 当 host capability 和 session policy 允许时，
-直接调用 $spec-code-review 可以授权 documented reviewer phase。
+直接调用 spec-code-review 可以授权 documented reviewer phase。
 
 当 dispatch 不可用或未授权时，
 fallback 到 single-agent report-only path。
@@ -1135,7 +1135,7 @@ single-agent report-only fallback
 Add / update assertions:
 
 ```text
-- direct $spec-code-review invocation may authorize documented reviewer phase when session allows
+- direct spec-code-review invocation may authorize documented reviewer phase when session allows
 - Codex is not treated as naturally incapable of dispatch
 - unauthorized dispatch falls back to single-agent report-only
 - stale anti-spawn_agent wording is absent
@@ -1662,7 +1662,7 @@ no public workflow invocation authorization wording unless entrypoint is public
 ##### Acceptance Criteria
 
 ```text
-- agent-native-audit 不被误解为 /spec:* 公开入口
+- agent-native-audit 不被误解为 spec-* 公开入口
 - dispatch 是 optional helper capability
 ```
 
@@ -1888,7 +1888,7 @@ docs/solutions/workflow-issues/*
 如果包含用户可见行为，追加：
 
 ```markdown
-  - (user-visible) `$spec-code-review` now documents Codex reviewer dispatch support when the workflow's documented reviewer phase and host capability select it.
+  - (user-visible) `spec-code-review` now documents Codex reviewer dispatch support when the workflow's documented reviewer phase and host capability select it.
 ```
 
 ---

@@ -7,7 +7,7 @@
 
 - 以 CE 当前本地 skill 内容为上游基线。
 - 不再对比 git 历史或远程内容。
-- 覆盖后仅做当前项目必需适配：`spec-first` 命名、扁平 `spec-*` agent identity、`.spec-first` 路径、`/spec:*` 与 `$spec-*` 入口、prompt mirror 同步。
+- 覆盖后仅做当前项目必需适配：`spec-first` 命名、扁平 `spec-*` agent identity、`.spec-first` 路径、`spec-*` 与 `spec-*` 入口、prompt mirror 同步。
 - 旧本地增强 contract tests 不再作为迁移约束；本次已删除覆盖后失败的旧测试文件。
 
 ## 逐 Skill 验收结论

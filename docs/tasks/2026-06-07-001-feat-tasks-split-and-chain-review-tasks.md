@@ -168,7 +168,7 @@ source_sections:
         "skills/using-spec-first/SKILL.md"
       ],
       "entry_hint": "task-governance-signals.md 当前无 consumers 段需新增;执行者须 grep templates/claude/commands/spec/{plan,work,doc-review}.md 确认是否 inline 了被改 handoff prose——确认无则跳过,有则纳入本任务文件边界(多为 thin launcher)。",
-      "test_focus": "consumer 段含 spec-write-tasks 与降级规则;改动 prose 的 /spec:* 与 $spec-* 措辞并列/占位化(可 grep 验证);template 是否 inline handoff prose 已确认。",
+      "test_focus": "consumer 段含 spec-write-tasks 与降级规则;改动 prose 的 spec-* 与 spec-* 措辞并列/占位化(可 grep 验证);template 是否 inline handoff prose 已确认。",
       "done_signal": "contract consumers 段落地且内容准确(spec-write-tasks 列为可选交叉校验非主判据 + collection_status 降级规则);改动 prose 双宿主措辞审查通过;template inline 情况已 grep 确认。双宿主 init+doctor 验证由 T005 在全部 source 改动落地后统一执行。",
       "parallelizable": false,
       "risk_note": "手改 runtime mirror 而非经 spec-first init 重生成会破坏 source/runtime 边界;在 T001-T003 未落地时跑 init+doctor 会验证到旧 skill 状态,故移至 T005。",

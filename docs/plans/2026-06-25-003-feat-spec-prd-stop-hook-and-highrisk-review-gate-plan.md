@@ -20,7 +20,7 @@ related_plans:
 
 ## Summary
 
-002 已把 `$spec-prd` 的质量闸内容做对了:checker 能检测 grill 痕迹、design 漏读、Requirement Analysis Gate closure、core section 锚点和 readiness 声明缺失;SKILL/readiness prose 也明确 Phase 4 必跑 checker。但三次 KAZ real-run 实证显示:prose 强制无效。模型读完输入后直接写 PRD、自盖 `status: ready-for-planning`、推荐进入 `/spec:plan`,从未实际运行 checker;第三次即使带强 system-reminder("停手前必须自检是否满足 skill 要求")仍跳过 Figma 分析、requirements grill 和 Phase 4 checker。
+002 已把 `spec-prd` 的质量闸内容做对了:checker 能检测 grill 痕迹、design 漏读、Requirement Analysis Gate closure、core section 锚点和 readiness 声明缺失;SKILL/readiness prose 也明确 Phase 4 必跑 checker。但三次 KAZ real-run 实证显示:prose 强制无效。模型读完输入后直接写 PRD、自盖 `status: ready-for-planning`、推荐进入 `spec-plan`,从未实际运行 checker;第三次即使带强 system-reminder("停手前必须自检是否满足 skill 要求")仍跳过 Figma 分析、requirements grill 和 Phase 4 checker。
 
 根因是结构性的:被约束者和解释约束者是同一个模型。只要 "ready" 仍可由 LLM 直接写入并由 LLM 自己宣布完成,它就会把未执行的 gate 合理化为已满足。
 
@@ -28,10 +28,10 @@ related_plans:
 
 核心机制:
 
-1. **producer-local finalize 脚本**:新增 `finalize-prd-artifact.js`,作为 `$spec-prd` 唯一合法 ready 出口。LLM 可以写 draft/checkpoint PRD,但 `ready-for-planning`、`final-prd`、`can_enter_spec_plan: yes` 只能由 finalize 在 checker 通过后写入或确认。
+1. **producer-local finalize 脚本**:新增 `finalize-prd-artifact.js`,作为 `spec-prd` 唯一合法 ready 出口。LLM 可以写 draft/checkpoint PRD,但 `ready-for-planning`、`final-prd`、`can_enter_spec_plan: yes` 只能由 finalize 在 checker 通过后写入或确认。
 2. **checker must-not-ready 子集硬化**:扩展 `check-prd-artifact.js` 的 deterministic facts/reason_codes,把 design-source、grill closure、Requirement Analysis Gate closure、write_mode、clarification_evidence、can_enter_spec_plan 和 readiness evasion 作为 producer-local blocking facts。
 3. **Claude Stop hook 防绕过**:新增 `prd-readiness-guard` Stop hook,停手时扫描本会话改动的 PRD artifact。只要检测到自证 ready 或 must-not-ready finding,就 block 收尾并回灌 findings,要求回到 `spec-prd` 本地 finalize/修复路径。
-4. **Codex 诚实降级**:Codex 当前没有已确认等价 Stop block primitive。本方案不把强制转嫁给 `spec-plan`,也不假装双宿主对等;Codex 侧通过 `$spec-prd` closeout contract、finalize 脚本和 focused tests 提供 producer-local 可验证路径,并明确 `stop_hook_blocking=not_available` 的限制。
+4. **Codex 诚实降级**:Codex 当前没有已确认等价 Stop block primitive。本方案不把强制转嫁给 `spec-plan`,也不假装双宿主对等;Codex 侧通过 `spec-prd` closeout contract、finalize 脚本和 focused tests 提供 producer-local 可验证路径,并明确 `stop_hook_blocking=not_available` 的限制。
 
 脚本只产 deterministic facts 和 producer-local readiness receipt;LLM 仍负责语义判断、如何补 Figma、如何继续 grill、是否降级为 checkpoint。强制的是出口,不是思考路径。
 
@@ -42,8 +42,8 @@ related_plans:
 已落地:
 
 - `skills/spec-prd/scripts/check-prd-artifact.js`:新增 ready receipt hash/freshness facts、`blocking_reason_codes`、`ready_receipt_absent` / `ready_receipt_stale` 检测,继续输出 input-side design-source facts。
-- `skills/spec-prd/scripts/finalize-prd-artifact.js`:作为 `$spec-prd` 唯一合法 ready receipt 写入路径;只有 `write_mode=final-prd`、`can_enter_spec_plan: yes` 且 producer blocking reasons 清空时才写 `status: ready-for-planning` 与 `readiness_verified_*`;frontmatter 自证 ready 但无有效 receipt 时 `--check-only` 必须 block。
-- `templates/claude/hooks/prd-readiness-guard`:Claude Stop hook 扫描 changed/untracked `docs/brainstorms/*-requirements.md`,调用 runtime finalize `--check-only`,并把 block message 路由回 `$spec-prd` producer-local repair/finalize。
+- `skills/spec-prd/scripts/finalize-prd-artifact.js`:作为 `spec-prd` 唯一合法 ready receipt 写入路径;只有 `write_mode=final-prd`、`can_enter_spec_plan: yes` 且 producer blocking reasons 清空时才写 `status: ready-for-planning` 与 `readiness_verified_*`;frontmatter 自证 ready 但无有效 receipt 时 `--check-only` 必须 block。
+- `templates/claude/hooks/prd-readiness-guard`:Claude Stop hook 扫描 changed/untracked `docs/brainstorms/*-requirements.md`,调用 runtime finalize `--check-only`,并把 block message 路由回 `spec-prd` producer-local repair/finalize。
 - Stop hook 输入侧断链已修复:PRD artifact 必须持久化 `source_inputs:`;hook 兼容 `prd_input:` 别名,读取原始输入文件后传给 finalize/checker,确保 Figma/design source 只存在于输入文件、PRD 正文无设计字面时仍触发 `design_source_unaccounted`。
 - `skills/spec-prd/SKILL.md`、`prd-readiness-lens.md`、`prd-output-template.md`、用户手册、README 中英文、`.gitignore`/gitignore policy 和 runtime projection tests 已同步。
 - Codex 侧保持诚实降级:当前无确认等价 Stop block primitive,不借用 `spec-plan` 或 plan consumer gate 兜底。
@@ -66,7 +66,7 @@ related_plans:
 
 ## Goals
 
-- 让 `$spec-prd` 无法在未跑 checker、未记录 design-source inventory、未闭合 grill、未声明 Requirement Analysis Gate closure 时产出 `ready-for-planning`。
+- 让 `spec-prd` 无法在未跑 checker、未记录 design-source inventory、未闭合 grill、未声明 Requirement Analysis Gate closure 时产出 `ready-for-planning`。
 - 把强制点放在 `spec-prd` producer 内部:checker/finalize/Stop hook 都属于 PRD producer 出口,不让 `spec-plan` 或其他 consumer skill 内置 PRD 专用逻辑。
 - 保持 Light contract:不引入 phase 状态机、不新增第二套 PRD artifact topology、不把语义 readiness 脚本化。
 - 保持 source/runtime 边界:修改 source templates/skills/scripts/tests;runtime mirror 由 `spec-first init` 投影,不手改 `.claude/`、`.codex/`、`.agents/skills/`。
@@ -87,10 +87,10 @@ related_plans:
   - `~/xiaobu/hsglobal/2026-06-25-172944-*.txt`
   - `~/xiaobu/hsglobal/2026-06-25-175926-*.txt`
 - 第三次日志事实:
-  - 进入 `/spec:prd` 后读 7 个输入文件,只问 3 个 scoping 问题。
+  - 进入 `spec-prd` 后读 7 个输入文件,只问 3 个 scoping 问题。
   - 第 50-61 行直接从"三个决策已确认"进入 `Write(docs/brainstorms/kaz-market-page-mvp-requirements.md)`。
   - 第 69 行 PRD frontmatter 直接写 `status: ready-for-planning`。
-  - 第 106-117 行自称 readiness ready 并推荐 `/spec:plan`。
+  - 第 106-117 行自称 readiness ready 并推荐 `spec-plan`。
   - 全日志无 `check-prd-artifact.js`、无 checker finding count、无 `design_source_inventory`。
 - 对第三次产物补跑 checker 的 deterministic 结果:
   - 35 个 findings。
@@ -211,16 +211,16 @@ Claude Stop hook 的职责:
 1. 找出当前 worktree 中被修改/新增的 `docs/brainstorms/*-requirements.md`。
 2. 对每个 PRD 运行 runtime-projected `finalize --check-only` 或 `check-prd-artifact.js`。
 3. 若 PRD 自称 ready/final 但 receipt 缺失/陈旧,或存在 blocking reason_code,返回 hook block。
-4. block reason 只指向 `$spec-prd` 本地修复路径:补 design inventory、继续 grill、降级 checkpoint、或运行 finalize。
+4. block reason 只指向 `spec-prd` 本地修复路径:补 design inventory、继续 grill、降级 checkpoint、或运行 finalize。
 
-Stop hook 不推荐 `/spec:plan`,不调用 `spec-doc-review`,不判断 PRD 语义质量。
+Stop hook 不推荐 `spec-plan`,不调用 `spec-doc-review`,不判断 PRD 语义质量。
 
 ### KTD-6:Codex 降级不借用 `spec-plan`
 
 Codex 当前不设计 `spec-plan-guard` 兜底,因为这会破坏 skill 独立性。Codex 侧只做:
 
 - 投影 `finalize-prd-artifact.js` 与 checker 到 `.agents/skills/spec-prd/`。
-- 在 `$spec-prd` source prose 中要求 closeout 必须包含 finalize receipt。
+- 在 `spec-prd` source prose 中要求 closeout 必须包含 finalize receipt。
 - 在 tests/evals 中覆盖 "Codex 无 Stop block 时必须显式 `stop_hook_blocking=not_available`"。
 
 如果未来 Codex 提供 Stop-equivalent hook,再在 Codex runtime adapter 内对齐 producer-local Stop guard;仍不修改 `spec-plan`。
@@ -281,7 +281,7 @@ Codex 当前不设计 `spec-plan-guard` 兜底,因为这会破坏 skill 独立�
   - PRD path
   - finding count
   - reason_codes
-  - next action:回到 `$spec-prd` producer-local finalize path
+  - next action:回到 `spec-prd` producer-local finalize path
 - 更新 `claude-settings.js` managed hook definitions,注入 `Stop` matcher。
 - 更新 clean/init/doctor/runtime plan tests,确保 source 投影和 executable bits 正确。
 
@@ -337,7 +337,7 @@ Codex 当前不设计 `spec-plan-guard` 兜底,因为这会破坏 skill 独立�
   - Figma/source input 不能只抄 node id 后 ready。
   - 一轮 scoping 后仍有 load-bearing OQ 时只能 checkpoint。
   - 未跑 finalize receipt 不能 ready。
-  - Stop hook block message 是否把 agent 拉回 `$spec-prd` 本地修复,而不是推荐 plan。
+  - Stop hook block message 是否把 agent 拉回 `spec-prd` 本地修复,而不是推荐 plan。
 
 **Verification**:
 
@@ -353,7 +353,7 @@ Codex 当前不设计 `spec-plan-guard` 兜底,因为这会破坏 skill 独立�
 - A PRD with design refs but no `design_source_inventory`/coverage/read/unread is blocked before ready closeout.
 - A PRD with unresolved load-bearing owner-owned WHAT/acceptance/scope OQ cannot be finalized as `final-prd`.
 - Claude Stop hook blocks PRD ready closeout even if the model never voluntarily runs checker.
-- Stop hook block message routes back to `$spec-prd` local repair/finalize, not to `spec-plan`.
+- Stop hook block message routes back to `spec-prd` local repair/finalize, not to `spec-plan`.
 - `spec-plan` source remains untouched by this feature.
 - Codex limitation is explicit; no false claim of hard Stop blocking unless the runtime actually supports it.
 

@@ -79,7 +79,7 @@ AI 写代码已经不是问题。真正的问题是，它写出来的东西，�
 在这个仓库里，这套系统的骨架已经很清楚：
 
 - `doctor / init / clean` 负责运行时资产的检查、注入和回收
-- `/spec:*` 和 `$spec-*` 提供跨宿主的稳定入口
+- `spec-*` 和 `spec-*` 提供跨宿主的稳定入口
 - `Stage-0` 通过 `spec-graph-bootstrap` 先生产项目上下文，再进入后续执行
 - `Ideate -> Brainstorm -> Plan -> Work -> Review -> Compound` 把交付过程拆成可治理的阶段
 - `docs/brainstorms`、`docs/plans`、`docs/solutions` 把一次性讨论和修复沉淀成可复用资产

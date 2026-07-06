@@ -549,7 +549,7 @@ V1 只吸收这个执行模型，并同步映射到当前已支持的 Claude / C
 | 优化点 | ECC 观察 | spec-first 落地 |
 | --- | --- | --- |
 | Capability Execution Plane | `AGENTS.md`、skills、config、agents、commands 各有执行职责 | 在 capability pack 中显式区分 governance、workflow、tool、role、command/prompt、runtime state 六层 |
-| Explicit invocation first | `$skill-name` 显式调用比隐式触发稳定 | 显式 spec-first workflow（Claude: `/spec:*`；Codex: `$spec-*`）和显式能力启用优先；隐式 router 只能输出 advisory candidate |
+| Explicit invocation first | `$skill-name` 显式调用比隐式触发稳定 | 显式 spec-first workflow（Claude: `spec-*`；Codex: `spec-*`）和显式能力启用优先；隐式 router 只能输出 advisory candidate |
 | Host Compatibility Matrix | Codex target 会过滤不支持的模块，Claude / Codex dispatch primitive 不同 | 每个 pack 声明 Claude / Codex 支持度、fallback 与 unsupported reason |
 | Runtime Merge Policy | Codex 全局同步采用 marker merge / add-only merge 保护用户配置；Claude 也有 managed blocks / generated runtime 边界 | 未来双宿主 runtime delivery 必须 managed marker merge、add-only config merge、preview-first |
 | Source Freshness 与 Command Idea Matrix | commands 在 Codex 中不是 slash command parity，skills 来源可能是本地、全局或插件 | rubric extraction 记录 source freshness；ECC commands 只进入 idea matrix，不进入 command registry |
@@ -2287,8 +2287,8 @@ low-risk typo 场景不得选择重专家
 | 59 | 当前开发基准是否遗漏 G6.5 host/runtime merge preview | 已补入 G6.5，并保持 preview-only |
 | 60 | Staged rollout 是否仍引用旧 G0-G6 | 已统一为 G0-G6.5 gate + pilot |
 | 61 | Runtime delivery 前置条件是否误写 R8 | 已收敛为 R9 之后才能进入 runtime capability |
-| 62 | 显式 workflow 入口是否只写 Codex `$spec-*` | 已改为 Claude `/spec:*` 与 Codex `$spec-*` 双宿主口径 |
-| 63 | 包集成说明是否同步双宿主显式入口 | 已同步为 `显式 spec-first workflow（Claude: /spec:*；Codex: $spec-*）` |
+| 62 | 显式 workflow 入口是否只写 Codex `spec-*` | 已改为 Claude `spec-*` 与 Codex `spec-*` 双宿主口径 |
+| 63 | 包集成说明是否同步双宿主显式入口 | 已同步为 `显式 spec-first workflow（Claude: spec-*；Codex: spec-*）` |
 | 64 | source freshness schema 是否缺少 `freshness` 字段 | 已在 capability pack preview 示例中补齐 |
 | 65 | source freshness 验证规则是否与 schema 示例一致 | 已统一 `source_file/source_revision/loaded_from/runtime_cached/freshness` 字段 |
 | 66 | command idea matrix 是否可能被理解为 command registry | 已明确 adoption_action 只能是 enhance_existing_workflow / reference_only / rejected |
@@ -2327,7 +2327,7 @@ low-risk typo 场景不得选择重专家
 | graph 假证据 | graph 不可用还输出架构影响 | graph readiness + degraded mode |
 | 规则硬编码 | Router 变复杂 rule engine | Scripts prepare, LLM decides |
 | 终态过大 | 一次性做 Agent Platform | G0-G3 先做治理，不急 runtime |
-| 破坏现有 workflow | 引入新入口或新命令 | 不新增 `/ecc:*`，保留 `/spec:*` 和 `$spec-*` |
+| 破坏现有 workflow | 引入新入口或新命令 | 不新增 `/ecc:*`，保留 `spec-*` 和 `spec-*` |
 | runtime 污染 | 未启用 capability 却生成 runtime asset | pack-gated delivery + doctor/clean |
 | 插件整包污染 | 把 ECC 原始 plugin 当成 spec-first capability plugin 安装 | provider source 只进 inventory/rubric，runtime delivery 必须 pack-gated |
 | 插拔不可逆 | 启用 optional pack 后无法清理 runtime residual | Future runtime delivery 必须 state-aware、doctor-able、clean-able |

@@ -13,7 +13,7 @@ origin: docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报�
 
 ## Summary
 
-`spec-plan` 需要在不改变其公开 planning workflow 身份的前提下，降低入口初载负载和输出漂移风险。目标是让 `$spec-plan` / `/spec:plan` 继续稳定承担 HOW planning：直接调用时必须进入 planning workflow，计划阶段不实现、不生成执行态 task pack、不改 generated runtime mirrors；同时通过 source-owned eval fixtures、contract tests、runtime projection checks、集中治理说明和 fresh-source eval 证据，证明入口瘦身没有破坏 plan-only safety、handoff、near-neighbor routing、PRD handoff entropy 和双宿主投影边界。
+`spec-plan` 需要在不改变其公开 planning workflow 身份的前提下，降低入口初载负载和输出漂移风险。目标是让 `spec-plan` 继续稳定承担 HOW planning：直接调用时必须进入 planning workflow，计划阶段不实现、不生成执行态 task pack、不改 generated runtime mirrors；同时通过 source-owned eval fixtures、contract tests、runtime projection checks、集中治理说明和 fresh-source eval 证据，证明入口瘦身没有破坏 plan-only safety、handoff、near-neighbor routing、PRD handoff entropy 和双宿主投影边界。
 
 ## Problem Frame
 
@@ -23,7 +23,7 @@ origin: docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报�
 
 | claim | tag | source / owner | note |
 | --- | --- | --- | --- |
-| `spec-plan` 当前是公开 planning workflow，Claude 入口为 `/spec:plan`，Codex 入口为 `$spec-plan`。 | confirmed-source | `docs/catalog/runtime-capabilities.md`, `src/cli/contracts/dual-host-governance/skills-governance.json` | Catalog 与 governance 记录均指向 dual-host delivery。 |
+| `spec-plan` 当前是公开 planning workflow，Claude 入口为 `spec-plan`，Codex 入口为 `spec-plan`。 | confirmed-source | `docs/catalog/runtime-capabilities.md`, `src/cli/contracts/dual-host-governance/skills-governance.json` | Catalog 与 governance 记录均指向 dual-host delivery。 |
 | Claude command 模板只定义 metadata，实际 workflow 行为由 `skills/spec-plan/SKILL.md` 渲染。 | confirmed-source | `templates/claude/commands/spec/plan.md` | 变更 workflow 行为应修改 skill source，不手改 runtime command。 |
 | `skills/spec-plan/SKILL.md` 当前 756 行，`references/` 下有 10 个 markdown reference，`evals/examples.json` 有 5 个 case。 | confirmed-source | `wc -l skills/spec-plan/SKILL.md skills/spec-plan/references/*.md skills/spec-plan/evals/examples.json` | 当前直接命令输出确认；origin review 的 757 行是历史事实。 |
 | `SKILL.md` 已在热路径声明 `spec-brainstorm` 定义 WHAT、`spec-plan` 定义 HOW、`spec-work` 执行，并要求直接调用时始终 stay in planning。 | confirmed-source | `skills/spec-plan/SKILL.md` | 这些是必须保留的行为身份。 |
@@ -62,7 +62,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 
 | surface | current behavior | owner/source | artifact/contract | consumer | delta | evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| public workflow entry | `/spec:plan` 与 `$spec-plan` 暴露 planning workflow。 | `src/cli/contracts/dual-host-governance/skills-governance.json`, `docs/catalog/runtime-capabilities.md` | workflow_command delivery | Claude/Codex users | keep | confirmed-source |
+| public workflow entry | `spec-plan` 暴露 planning workflow。 | `src/cli/contracts/dual-host-governance/skills-governance.json`, `docs/catalog/runtime-capabilities.md` | workflow_command delivery | Claude/Codex users | keep | confirmed-source |
 | skill source hot path | `SKILL.md` 含 description、safety、contract summary、routing 和长流程。 | `skills/spec-plan/SKILL.md` | source skill | host runtime render, tests, users | replace / compact | confirmed-source |
 | references | 10 个 markdown reference 承载 deepening、template、handoff、rendering 等细节。 | `skills/spec-plan/references/` | source support files | `spec-plan`, runtime copies, tests | extend ownership clarity | confirmed-source |
 | eval fixtures | `examples.json` 含 5 个 examples-as-context cases。 | `skills/spec-plan/evals/examples.json` | source eval fixture | tests, fresh-source eval context | extend | confirmed-source |
@@ -98,7 +98,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 | actor | role in this increment | requirement relevance |
 | --- | --- | --- |
 | Workflow maintainer | Edits `spec-plan` source, references, tests and validation docs. | Needs clear source/runtime and advisory/confirmed evidence boundaries. |
-| Planning user | Invokes `/spec:plan` or `$spec-plan`. | Should experience stable routing, plan-only behavior and explicit handoff. |
+| Planning user | Invokes `spec-plan`. | Should experience stable routing, plan-only behavior and explicit handoff. |
 | Downstream implementer | Uses the plan artifact through `spec-work`, optional `spec-write-tasks`, review or issue handoff. | Should not inherit WHAT gaps or task-pack state invented by planning. |
 | Reviewer / future maintainer | Reviews prompt/source changes and evidence. | Needs focused tests, fresh-source eval status and changelog trail. |
 | Runtime generator / doctor | Renders and inspects generated runtime assets. | Needs anchors and paths that remain valid across Claude/Codex. |
@@ -108,7 +108,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 | id | priority | requirement | rationale/source |
 | --- | --- | --- | --- |
 | R-01 | P0 | `spec-plan` must continue to present itself as the workflow that defines HOW after WHAT is clear; it must not absorb `spec-brainstorm`, `spec-prd`, `spec-debug`, `spec-work`, `spec-doc-review`, or `spec-write-tasks` ownership. | confirmed-source: `skills/spec-plan/SKILL.md`; confirmed-source: `docs/catalog/runtime-capabilities.md` |
-| R-02 | P0 | Direct `/spec:plan` or `$spec-plan` invocation must remain a planning workflow entry. If the input is unclear, the workflow must clarify or bootstrap scope instead of exiting as "not a planning task". | confirmed-source: `skills/spec-plan/SKILL.md` |
+| R-02 | P0 | Direct `spec-plan` invocation must remain a planning workflow entry. If the input is unclear, the workflow must clarify or bootstrap scope instead of exiting as "not a planning task". | confirmed-source: `skills/spec-plan/SKILL.md` |
 | R-03 | P0 | Plan-only safety must remain hot-path visible: before explicit handoff selection, `spec-plan` may research, decide, and write/update the plan artifact only; it must not edit implementation source/config, run implementation verification, dispatch implementation workers, create execution task packs, or patch generated runtime mirrors. | confirmed-source: `skills/spec-plan/SKILL.md`; confirmed-source: `tests/unit/spec-plan-contracts.test.js` |
 | R-04 | P0 | The handoff gate must remain blocking and host-neutral: after plan write/review, the workflow presents `Start work`, `Compile task pack`, or `Create Issue` style options and waits for explicit user selection. | confirmed-source: `skills/spec-plan/SKILL.md`; confirmed-source: `skills/spec-plan/references/plan-handoff.md`; confirmed-source: `tests/unit/spec-plan-contracts.test.js` |
 | R-05 | P0 | Entrypoint compaction must preserve the public workflow contract summary, direct invocation rule, plan-only safety contract, question-tool fallback rules, examples-as-context anchor, governance-boundaries mandatory load, core principles, and plan quality bar. | source-candidate: `docs/plans/2026-06-22-004-refactor-spec-plan-skill-quality-plan.md`; confirmed-source for current anchors: `skills/spec-plan/SKILL.md` |
@@ -128,7 +128,7 @@ Why this topology matters: 本次需求会改变 `spec-plan` prompt/source 的�
 ## Acceptance Examples
 
 AE-01（对应 R-01, R-02）
-Given a user directly invokes `$spec-plan` with a vague but plan-seeking prompt
+Given a user directly invokes `spec-plan` with a vague but plan-seeking prompt
 When the prompt lacks enough scope for a durable plan
 Then `spec-plan` asks a blocking clarification question or uses its planning bootstrap, and does not exit as "not a planning task".
 
@@ -266,7 +266,7 @@ Then planning must not treat those units as mandatory task boundaries; it should
 
 | claim | tag | source / owner | note |
 | --- | --- | --- | --- |
-| 本 PRD 从 wrong-stage plan 中抽取需求，不把实施单元当任务合同。 | assumption | `$spec-prd` workflow contract + input posture | 输入是 `docs/plans/**`，不是 `artifact_kind: prd-requirements`。 |
+| 本 PRD 从 wrong-stage plan 中抽取需求，不把实施单元当任务合同。 | assumption | `spec-prd` workflow contract + input posture | 输入是 `docs/plans/**`，不是 `artifact_kind: prd-requirements`。 |
 | 当前工作区 dirty，且存在与本 PRD无关的 `tests/unit/spec-prd-contracts.test.js` 修改。 | confirmed-source | `git status --short` | 本 PRD 不回滚或覆盖该改动。 |
 | `2026-06-23-001` 是当前日期下新的 requirements 路径编号。 | confirmed-source | `date +%F`; `find docs/brainstorms -name '2026-06-23-*'` | Frontmatter `spec_id` 沿用已有 plan chain。 |
 | Current source revision at PRD authoring is `f2b4553e`。 | confirmed-source | `git rev-parse --short HEAD` | 仅作 authoring freshness 标记，不代表未来实施时 source 未变。 |
@@ -278,7 +278,7 @@ Then planning must not treat those units as mandatory task boundaries; it should
 
 | question | blocks planning? | recommended default | owner |
 | --- | --- | --- | --- |
-| 后续是否要先更新现有 plan，使其显式以本 PRD 为 origin，再进入 implementation？ | no | 是。下一次 `$spec-plan` / plan refine 应把本 PRD作为 WHAT origin，并保留原 plan 的 review evidence。 | product owner / workflow maintainer |
+| 后续是否要先更新现有 plan，使其显式以本 PRD 为 origin，再进入 implementation？ | no | 是。下一次 `spec-plan` / plan refine 应把本 PRD作为 WHAT origin，并保留原 plan 的 review evidence。 | product owner / workflow maintainer |
 
 ## Readiness Self-Check
 

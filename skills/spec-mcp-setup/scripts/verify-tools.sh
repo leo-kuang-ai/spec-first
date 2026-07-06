@@ -125,6 +125,15 @@ runtime_state_path_for_host() {
     claude)
       printf '%s/.claude/spec-first/state.json' "$target_root"
       ;;
+    kiro)
+      printf '%s/.kiro/spec-first/state.json' "$target_root"
+      ;;
+    qoder)
+      printf '%s/.qoder/spec-first/state.json' "$target_root"
+      ;;
+    cursor)
+      printf '%s/.cursor/spec-first/state.json' "$target_root"
+      ;;
     *)
       printf ''
       ;;
@@ -911,6 +920,18 @@ jq -c '
     [(.tools // {} | to_entries[] | select((.value.type // "") == "mcp") | row13(.key; .value; "mcp"))];
   def helper_rows:
     [(.helper_tools // {} | to_entries[] | row13(.key; .value; (.value.kind // .value.type // "helper")))];
+  def provider_probe_status:
+    if .lifecycle.query_verified == true and .lifecycle.server_reachable == true then "verified"
+    elif .lifecycle.query_verified == true or .lifecycle.server_reachable == true then "partial"
+    elif .lifecycle.installed == true or .lifecycle.configured == true or .lifecycle.indexed == true then "not-verified"
+    else "not-run" end;
+  def provider_readiness_scope:
+    if .lifecycle.query_verified == true then "query-verified"
+    elif .lifecycle.server_reachable == true then "server-verified"
+    elif .lifecycle.indexed == true then "index-ready"
+    elif .lifecycle.configured == true then "configured"
+    elif .lifecycle.installed == true then "installed"
+    else "not-run" end;
   def provider_rows:
     [(.provider_readiness // [])[] |
       [
@@ -918,6 +939,8 @@ jq -c '
         display(.kind),
         display(.profile),
         display(.readiness_status),
+        display(provider_readiness_scope),
+        display(provider_probe_status),
         display(.lifecycle.installed),
         display(.lifecycle.configured),
         display(.lifecycle.indexed),
@@ -970,7 +993,7 @@ jq -c '
       {title: "Execution result", headers: ["Area", "Status", "Evidence", "Next"], rows: summary_rows},
       {title: "MCP servers", headers: ["id", "kind", "profile", "required", "baseline_blocking", "dependency", "configured", "allowed", "install", "safety", "result", "reason_code", "next_action"], rows: mcp_rows},
       {title: "Helper tools", headers: ["id", "kind", "profile", "required", "baseline_blocking", "dependency", "configured", "allowed", "install", "safety", "result", "reason_code", "next_action"], rows: helper_rows},
-      {title: "Provider tools", headers: ["provider", "kind", "profile", "readiness", "installed", "configured", "indexed", "server_reachable", "query_verified", "repo_aligned", "fallback_reason", "next_actions"], rows: provider_rows},
+      {title: "Provider tools", headers: ["provider", "kind", "profile", "readiness", "readiness_scope", "probe_status", "installed", "configured", "indexed", "server_reachable", "query_verified", "repo_aligned", "fallback_reason", "next_actions"], rows: provider_rows},
       {title: "Host configured dependencies", headers: ["id", "kind", "source_path", "command", "args_shape", "declared_tool_id", "declared_status", "dependency", "configured", "result", "reason_code"], rows: configured_dependency_rows},
       {title: "Install safety", headers: ["id", "safety", "install_source", "mirror_used", "next_action"], rows: install_safety_rows},
       {title: "Project setup facts", headers: ["Artifact", "Project", "Next"], rows: project_rows},
@@ -985,15 +1008,23 @@ baseline_ready="$(jq -r '.baseline_ready // false' "$MARKER_PATH")"
 case "$host_name" in
   claude)
     host_display="Claude Code"
-    setup_command="/spec:mcp-setup"
+    setup_command="spec-mcp-setup"
     ;;
   codex)
     host_display="Codex"
-    setup_command='$spec-mcp-setup'
+    setup_command="spec-mcp-setup"
+    ;;
+  kiro)
+    host_display="Kiro"
+    setup_command="spec-mcp-setup"
+    ;;
+  qoder)
+    host_display="Qoder"
+    setup_command="spec-mcp-setup"
     ;;
   *)
     host_display="Claude Code / Codex"
-    setup_command='/spec:mcp-setup or $spec-mcp-setup'
+    setup_command="spec-mcp-setup"
     ;;
 esac
 

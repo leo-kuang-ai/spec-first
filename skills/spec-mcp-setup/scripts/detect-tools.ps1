@@ -15,6 +15,7 @@ Assert-McpToolsSchemaVersion -ToolsJson $ToolsJson
 $HostInfo = & (Join-Path $ScriptDir 'detect-host.ps1') | ConvertFrom-Json
 $DetectedHost = $HostInfo.host
 $ConfigPath = $HostInfo.config_path
+$ConfigFormat = $HostInfo.config_format
 $Platform = $HostInfo.platform
 $SelectedScope = $HostInfo.selected_scope
 
@@ -48,6 +49,10 @@ function Test-HostConfigRequired {
     return [bool]$Tool.host_config_required
   }
   return $true
+}
+
+function Test-JsonHostConfig {
+  return $ConfigFormat -eq 'json'
 }
 
 function Get-ClaudeMcpServer {
@@ -127,11 +132,12 @@ function Get-HostConfigStatus {
 
   switch ($Tool.detection.kind) {
     'host_config_exact' {
-      if ($DetectedHost -eq 'claude') {
+      if (Test-JsonHostConfig) {
         $config = Get-Content -Raw $ConfigPath | ConvertFrom-Json
         $server = Get-ClaudeMcpServer -Config $config -Key $Tool.detection.key
         if ($null -eq $server) { return 'action-required' }
         if ($server.command -ne $hostConfig.command) { return 'action-required' }
+        if ($null -ne $hostConfig.PSObject.Properties['type'] -and $server.type -ne $hostConfig.type) { return 'action-required' }
         $serverArgs = @($server.args)
         $expectedArgs = @(Expand-ToolArgs -Tool $Tool -Args $hostConfig.args)
         if ($null -ne $server.PSObject.Properties['scope']) { return 'action-required' }
@@ -139,8 +145,8 @@ function Get-HostConfigStatus {
           if (Test-RegistryArgsDrift -Actual $serverArgs -Expected $expectedArgs) { return 'registry-args-drift' }
           return 'action-required'
         }
-        if ($SelectedScope -eq 'managed') { return 'ready' }
-        return 'fallback-active'
+        if ($DetectedHost -eq 'claude' -and $SelectedScope -ne 'managed') { return 'fallback-active' }
+        return 'ready'
       }
 
       if (-not (Test-TomlMcpSectionExact -Path $ConfigPath -Key $Tool.detection.key -Command $hostConfig.command -Args @(Expand-ToolArgs -Tool $Tool -Args $hostConfig.args))) {
@@ -152,11 +158,11 @@ function Get-HostConfigStatus {
       return 'ready'
     }
     'host_config_key_only' {
-      if ($DetectedHost -eq 'claude') {
+      if (Test-JsonHostConfig) {
         $config = Get-Content -Raw $ConfigPath | ConvertFrom-Json
         if ($null -eq (Get-ClaudeMcpServer -Config $config -Key $Tool.detection.key)) { return 'action-required' }
-        if ($SelectedScope -eq 'managed') { return 'ready' }
-        return 'fallback-active'
+        if ($DetectedHost -eq 'claude' -and $SelectedScope -ne 'managed') { return 'fallback-active' }
+        return 'ready'
       }
       if (-not [string]::IsNullOrWhiteSpace((Get-TomlMcpSection -Path $ConfigPath -Key $Tool.detection.key))) { return 'ready' }
       return 'action-required'

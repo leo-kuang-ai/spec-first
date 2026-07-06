@@ -333,16 +333,16 @@ Scenario class 取值新增/修改走 RFC,由 `using-spec-first` SKILL.md 的 ro
 
 `using-spec-first` 当前是 prose-based guide mode。升级后:
 
-- **优先读** `.spec-first/workspace/scenario-fingerprint.json`(bootstrap 层),否则读 `scenario-fingerprint-setup.json`(setup 层);两者都不存在时建议先跑 `/spec:mcp-setup`
+- **优先读** `.spec-first/workspace/scenario-fingerprint.json`(bootstrap 层),否则读 `scenario-fingerprint-setup.json`(setup 层);两者都不存在时建议先跑 `spec-mcp-setup`
 - 当 `freshness.stale_setup_layer: true` 或 `child_revisions_at_bootstrap` 与当前 git revision 不一致时,提示用户考虑重新跑 setup
 - 路由判断**按维度独立判断**(不合成单一评分),按从高到低优先级:
 
 | 优先级 | 触发条件 | 推荐入口 | 一句话理由 |
 |---|---|---|---|
 | 1 | `worktree.state_class == "foreign-residual"` 或 `foreign_residual_indicators.length > 0` | `spec-first clean --workspace-orphans` + `spec-first init` | 顶层产物来自外部机器,继续工作会读到错误事实 |
-| 2 | `worktree.state_class == "first-time-on-new-machine"` | `/spec:mcp-setup` | 新机器首次工作,需要重新生成 host_ledger_pointer 与 setup-owned 产物 |
+| 2 | `worktree.state_class == "first-time-on-new-machine"` | `spec-mcp-setup` | 新机器首次工作,需要重新生成 host_ledger_pointer 与 setup-owned 产物 |
 | 3 | `complexity_dimensions.git_alignment_broken == true` **且**任务涉及 impact/review/refactor | 告知覆盖盲区,询问是否继续或先做 git-align repair | 17 个 build module 不在图谱内,impact 半径不可信 |
-| 4 | `providers_status_refs.gitnexus` 引用的 status 为 `unavailable` 或 `query-unverified` | `/spec:graph-bootstrap` 或显式 fallback | graph 不可用,需要重建或降级 |
+| 4 | `providers_status_refs.gitnexus` 引用的 status 为 `unavailable` 或 `query-unverified` | `spec-graph-bootstrap` 或显式 fallback | graph 不可用,需要重建或降级 |
 | 5 | `complexity_dimensions.worktree_dirty_graph_affecting == true` **且**任务涉及 commit/PR | 提示 dirty 列表,询问是否先 commit/stash | dirty 状态下 graph 与代码可能不一致 |
 | 6 | 上述都不命中 | 按用户意图正常路由(plan/work/review/debug) | 场景常规 |
 

@@ -246,12 +246,12 @@ When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"
 Rules:
 - Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `$spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
 - Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
-- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `$spec-mcp-setup --only graphify` when setup repair would help.
+- Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 
 <!-- spec-first:bootstrap:start -->
 ## Workflow 入口治理
@@ -261,15 +261,15 @@ Rules:
 - **何时直接做**:轻量事实问答、当前上下文解释、窄定位查询（where is X used）、当前对话/用户给定单文档整理、明确单点低风险小改动可直接回答、bounded read 或正常执行;小改动仍遵守 CHANGELOG、最窄验证和 source/runtime 边界;workflow-first 不等于 brainstorming-first
 - **何时不重新分流**:已在公开 workflow 内（按其 SKILL 继续,仅在用户改目标/显式 handoff/明显越界时重路由）或作为 bounded subagent/worker 被派遣（完成 bounded 任务即可,不重启路由)
 - **如何路由**:意图优先于关键词与主题域;用户显式调用当前 host 公开 workflow 时优先尊重;否则只选一个入口并说明一个理由,不默认进入 `spec-brainstorm`,不自动串联多个 workflow
-- **常见入口锚点**:setup/runtime→`$spec-mcp-setup` 或终端 `spec-first update`;失败→`$spec-debug`;评审→`$spec-code-review`/`$spec-doc-review`;定义→`$spec-ideate`/`$spec-brainstorm`/`$spec-prd`;优化→`$spec-optimize`;计划/执行→`$spec-plan`/`$spec-work`;知识→`$spec-compound`/`$spec-compound-refresh`;完整 map 查 SKILL
-- **外部 issue/PR 输入**:issue/PR 是 input surface,不是独立 workflow;failure/bug→`$spec-debug`;enhancement/WHAT 不清→`$spec-prd`/`$spec-brainstorm`;PR diff/风险/测试缺口→`$spec-code-review`;已有 plan/task/brief→`$spec-work`;不得为外部 issue/PR 新增专用 public workflow 入口、tracker state、label/comment mutation,也不得把 reporter 命令当 confirmed truth
+- **最小入口锚点**:setup/runtime→`spec-mcp-setup` 或终端 `spec-first update`;失败→`spec-debug`;具体 code/doc review→`spec-code-review`/`spec-doc-review`;WHAT 不清→`spec-brainstorm`/`spec-prd`;优化→`spec-optimize`;计划/执行→`spec-plan`/`spec-work`;知识→`spec-compound`/`spec-compound-refresh`;完整 map 查 SKILL
+- **外部 issue/PR 输入**:issue/PR 是 input surface,不是独立 workflow;failure/bug→`spec-debug`;enhancement/WHAT 不清→`spec-prd`/`spec-brainstorm`;PR diff/风险/测试缺口→`spec-code-review`;已有 plan/task/brief→`spec-work`;不得为外部 issue/PR 新增专用 public workflow 入口、tracker state、label/comment mutation,也不得把 reporter 命令当 confirmed truth
 - 用户可见输出语言以本文件的 `spec-first:lang` managed block 为准；skill/agent/template 原文语言和当前会话惯性不得覆盖该策略，除非用户明确要求其他语言
 - 父级多仓 workspace：写入、修复、测试、review autofix 或 commit 前必须有明确 `target_repo` / per-child scope；只读定位也应使用 bounded direct reads 并说明目标 repo 假设
-- Runtime context 默认排除 `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated mirrors（`.claude/**`、`.codex/**`、`.agents/skills/**`）;只有 setup/update/runtime-drift/audit/governance-health 等明确运行时任务按需读取
+- Runtime context 默认排除 `.spec-first/audits/**`、`.spec-first/governance/**` 和 generated mirrors;完整 denylist 归 `docs/contracts/context-governance.md`;只有 setup/update/runtime-drift/audit/governance-health 等明确运行时任务按需读取;Cursor/Kiro/Qoder host-native advisory artifact 只有显式点名时读取
 - 架构/prompt/workflow/contract 或 source/runtime 判断前按需读取 `docs/10-prompt/结构化项目角色契约.md`;scripts/tools 只产 deterministic facts,LLM 做语义路由判断
 - **反合理化红旗**(出现这些念头即停):「先改个文件就好」→ 明确小改动可直接做;规模/风险不明、根因未定或触及架构/contract/多文件时先路由;「只是个快速架构/prompt 改动」→ 架构/prompt/workflow/contract 改动算 substantial;「得先看一堆文件再决定」→ 只做最小事实核查,已清晰则直接路由;「该评审但我口头答就行」→ 评审目标具体时用 code-review/doc-review;「helper skill 存在所以该暴露」→ 只有公开 workflow 是用户入口,internal helper 隐藏
-- Codex workflow 入口使用 `$spec-*`
-- 不要把 `using-spec-first` 写成 `/spec:*` 或 command-backed workflow；不要直接暴露 internal-only skills,例如 `git-worktree`
-- Codex：进入公开 `$spec-*` 前可 best-effort 运行 `spec-first startup-reminder --codex`；失败/空输出不阻塞，只提示在终端运行 `spec-first update`，bounded subagents、leaf reviewers、worker agents 不运行
-- Codex：公开 `$spec-*` 调用只授权 workflow 本身，不自动授权 `spawn_agent`；例如 `$spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback 并记录 `dispatch_authorization_missing`，需要多 persona/subagent review 时请在请求中明说 `subagents`/`personas`
+- Workflow 入口统一使用同名 `spec-*`
+- 不要把 `using-spec-first` 本身当作 command-backed workflow；不要直接暴露 internal-only skills,例如 `git-worktree`
+- Codex：进入公开 `spec-*` workflow 前可 best-effort 运行 `spec-first startup-reminder --codex`；失败/空输出不阻塞，只提示在终端运行 `spec-first update`，bounded subagents、leaf reviewers、worker agents 不运行
+- Codex：公开 `spec-*` workflow 调用只授权 workflow 本身，不自动授权 `spawn_agent`；例如 `spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback 并记录 `dispatch_authorization_missing`，需要多 persona/subagent review 时请在请求中明说 `subagents`/`personas`
 <!-- spec-first:bootstrap:end -->

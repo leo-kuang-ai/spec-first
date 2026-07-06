@@ -40,6 +40,14 @@ class PlatformAdapter {
   }
 
   /**
+   * Whether this platform installs bundled agent profiles.
+   * Preview hosts can opt out until their native agent/subagent surface is proven.
+   */
+  get supportsAgents() {
+    return true;
+  }
+
+  /**
    * Skills directory path (user-visible standalone skills only)
    */
   get skillsRoot() {

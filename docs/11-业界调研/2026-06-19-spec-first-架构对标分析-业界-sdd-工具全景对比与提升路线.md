@@ -151,7 +151,7 @@ specs-apply.ts 的 delta 合并引擎：RENAMED→REMOVED→MODIFIED→ADDED + �
 - 新增 docs/contracts/<domain>/spec.md（活契约，累积权威）
 - brainstorm/prd 产出契约 Delta（ADDED/MODIFIED/REMOVED），参考 OpenSpec schema.yaml instruction
 - 移植 specs-apply.ts 合并逻辑到 spec-first JS CLI：**合并归脚本（scripts prepare）、语义分类归 LLM（LLM decides）、冲突走 honest-closeout 降级**
-- 新增 /spec:sync：合并契约 + 沉淀 learnings 的统一收尾
+- 新增 spec-sync：合并契约 + 沉淀 learnings 的统一收尾
 - **乘数效应**：code-review 对照活契约（填回归盲区）、verification 从契约派生回归 check、compound 闭环契约演进
 
 **优先级**：P0，最高。这是"根"，其他 4 个缺口都建在其上。
@@ -196,7 +196,7 @@ spec-first 的 bounded direct reads 是"按需读源码"策略，但**没有运�
 **③ spec-first 落地设计**（契合双宿主 + trust model）
 
 - **Context Monitor Hook**（移植 gsd 机制到 spec-first hooks 体系）：spec-first 已有 session-start/spec-plan-guard hooks，新增 context-monitor hook。阈值化收尾与 honest closeout 联动——CRITICAL 时触发 spec:sync 保存契约+进度
-- **STATE.md 活记忆**（借鉴 gsd <100 行 digest）：记录当前 spec_id、phase、last activity、blockers。每个 /spec:* 入口第一步读 STATE.md，收尾时写。**与活契约（缺口 1）分工**：STATE.md 是"工作进度短期记忆"，活契约是"系统行为长期真相"
+- **STATE.md 活记忆**（借鉴 gsd <100 行 digest）：记录当前 spec_id、phase、last activity、blockers。每个 spec-* 入口第一步读 STATE.md，收尾时写。**与活契约（缺口 1）分工**：STATE.md 是"工作进度短期记忆"，活契约是"系统行为长期真相"
 - **Durable Progress Ledger**（借鉴 superpowers）：.spec-first/progress.md append-only，一行 per task，防 compaction。与 verification-run-summary 联动——进度条目带 check status
 - **File Handoff 协议**（借鉴 superpowers）：spec-first 的 51 agent 已有 subagent dispatch，但缺统一的 file handoff 协议。新增 task-brief/review-package 标准化文件 handoff，避免 controller context 爆炸
 
@@ -248,7 +248,7 @@ spec-first 的工作流固定在 source skills 中，团队无法声明自定义
 - 与现有 skills-governance.json（分发治理）分工：schema.yaml 定义工作流，governance.json 定义分发
 - **量化门控**（借鉴 gsd）：spec-phase 增加 ambiguity scoring（4 维度≤阈值放行）；plan-phase 增加 principles check 量化评分
 - **渐进严格度**：spec-first init --profile lite|full，高风险触发条件（API 契约变更/跨 repo/安全）自动升级
-- **slash command handoff**（借鉴 spec-kit）：每个 /spec:* 的 frontmatter 声明 handoffs，命令链声明式编排
+- **slash command handoff**（借鉴 spec-kit）：每个 spec-* 的 frontmatter 声明 handoffs，命令链声明式编排
 
 **优先级**：P2。在缺口 1/2 建好后，工作流可声明化让 spec-first 适应不同团队文化。
 
@@ -318,7 +318,7 @@ spec-first 的工作流固定在 source skills 中，团队无法声明自定义
 引入 docs/contracts/<domain>/spec.md 活契约
   + Delta 语法（ADDED/MODIFIED/REMOVED/RENAMED）
   + 移植 specs-apply.ts 合并引擎到 spec-first CLI
-  + /spec:sync 统一收尾（合并契约 + 沉淀 learnings）
+  + spec-sync 统一收尾（合并契约 + 沉淀 learnings）
   + honest-closeout 扩展 contract_coverage claim
 ```
 

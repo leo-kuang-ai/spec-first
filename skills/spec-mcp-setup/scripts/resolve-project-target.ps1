@@ -142,7 +142,7 @@ function Find-ChildGitRepos {
     [string]$Root,
     [int]$MaxDepth
   )
-  $excluded = @('.git', 'node_modules', 'vendor', '.claude', '.codex', '.agents', '.spec-first', 'build', '.cache', '.direnv', '.venv')
+  $excluded = @('.git', 'node_modules', 'vendor', '.claude', '.codex', '.kiro', '.agents', '.spec-first', 'build', '.cache', '.direnv', '.venv')
   $queue = New-Object System.Collections.Generic.Queue[object]
   $candidates = New-Object System.Collections.Generic.List[string]
   $queue.Enqueue([pscustomobject]@{ depth = 0; path = $Root })
@@ -179,7 +179,7 @@ function Get-CoverageGap {
     [string]$Root,
     [object[]]$CandidateRoots
   )
-  $ignored = @('.git', 'node_modules', 'vendor', '.claude', '.codex', '.agents', '.spec-first', 'build', '.cache', '.direnv', '.venv')
+  $ignored = @('.git', 'node_modules', 'vendor', '.claude', '.codex', '.kiro', '.agents', '.spec-first', 'build', '.cache', '.direnv', '.venv')
   $uncovered = New-Object System.Collections.Generic.List[string]
   foreach ($child in @(Get-ChildItem -LiteralPath $Root -Directory -Force -ErrorAction SilentlyContinue | Sort-Object Name)) {
     if ($ignored -contains $child.Name) { continue }

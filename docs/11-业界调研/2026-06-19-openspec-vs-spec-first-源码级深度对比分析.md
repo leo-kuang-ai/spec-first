@@ -253,11 +253,11 @@ export const claudeAdapter: ToolCommandAdapter = {
 
 | 阶段 | Claude 入口 | Codex 入口 | 产出位置 |
 | --- | --- | --- | --- |
-| 前置 | /spec:mcp-setup /spec:ideate /spec:brainstorm /spec:prd /spec:doc-review | $spec-* | docs/ideation/ docs/brainstorms/ |
-| 计划 | /spec:plan + write-tasks skill | $spec-plan | docs/plans/ docs/tasks/ |
-| 执行 | /spec:work /spec:debug /spec:optimize /spec:polish-beta | $spec-* | 代码 + .spec-first/workflows/spec-work/ |
-| 评审 | /spec:code-review /spec:app-consistency-audit | $spec-* | review artifacts |
-| 沉淀 | /spec:compound /spec:compound-refresh /spec:sessions /spec:skill-audit | $spec-* | docs/solutions/ |
+| 前置 | spec-mcp-setup spec-ideate spec-brainstorm spec-prd spec-doc-review | spec-* | docs/ideation/ docs/brainstorms/ |
+| 计划 | spec-plan + write-tasks skill | spec-plan | docs/plans/ docs/tasks/ |
+| 执行 | spec-work spec-debug spec-optimize spec-polish-beta | spec-* | 代码 + .spec-first/workflows/spec-work/ |
+| 评审 | spec-code-review spec-app-consistency-audit | spec-* | review artifacts |
+| 沉淀 | spec-compound spec-compound-refresh spec-sessions spec-skill-audit | spec-* | docs/solutions/ |
 
 > **关键**：这些入口**不是刚性状态机**，脚本准备 deterministic facts，LLM 根据目标/证据/scope/风险决定下一步。
 
@@ -500,7 +500,7 @@ OpenSpec 的 specs-apply.ts 提供了成熟的合并引擎：RENAMED→REMOVED�
 
 - 在 docs/ 下新增 contracts/<domain>/spec.md（主行为契约，累积），类比 OpenSpec 的 openspec/specs/
 - spec-brainstorm/spec-prd 产出改为**契约 delta**：## ADDED/MODIFIED/REMOVED Requirements，参考 schemas/spec-driven/schema.yaml 的 specs instruction
-- 新增 /spec:sync（或扩展 compound）：CLI 执行确定性合并（移植 specs-apply.ts 的 buildUpdatedSpec 逻辑到 JS），LLM 判断冲突，产出 contract-sync-summary（类比 verification-run-summary，记录 merged/conflict/degraded）
+- 新增 spec-sync（或扩展 compound）：CLI 执行确定性合并（移植 specs-apply.ts 的 buildUpdatedSpec 逻辑到 JS），LLM 判断冲突，产出 contract-sync-summary（类比 verification-run-summary，记录 merged/conflict/degraded）
 - 移植 OpenSpec 的**跨段冲突检测**到 honest-closeout.js：MODIFIED ∩ REMOVED 等冲突标记 unsupported
 - 多仓模式下，每个 child repo 一套 contracts/，父 workspace 仅 advisory
 
@@ -704,7 +704,7 @@ Phase 3（治理深化）—— 融入 spec-first 现有 honest-closeout + 51 ag
 
 - 定位明确：**不是通用 agent marketplace，不是 standalone app**，而是给已有 Claude Code/Codex 会话加可治理工程闭环
 - 核心论点：*"AI coding is not a prompt problem — it is a workflow problem."*
-- 双宿主统一 source 是核心卖点：一套 source assets 同时生成 Claude /spec:* 和 Codex $spec-*
+- 双宿主统一 source 是核心卖点：一套 source assets 同时生成 Claude spec-* 和 Codex spec-*
 - 社区讨论聚焦于其"重"——harness setup 成本高，但治理深度是其价值锚点
 
 ### 8.3 生态碎片化警告

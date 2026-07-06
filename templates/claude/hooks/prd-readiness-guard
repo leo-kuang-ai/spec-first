@@ -28,7 +28,7 @@ if (!fs.existsSync(finalizeScript)) {
   block([
     '[spec-first] PRD readiness guard blocked closeout.',
     `Missing managed spec-prd finalize script: ${path.relative(projectDir, finalizeScript)}`,
-    'Run `spec-first init` to refresh Claude runtime assets, then rerun `$spec-prd` finalize.',
+    'Run `spec-first init` to refresh Claude runtime assets, then rerun `spec-prd` finalize.',
   ].join('\n'));
 }
 
@@ -77,7 +77,7 @@ for (const relativePrdPath of prdPaths) {
 if (blocked.length > 0) {
   const lines = [
     '[spec-first] PRD readiness guard blocked closeout.',
-    'Changed PRD artifacts that claim ready/final cannot close out until `$spec-prd` producer-local finalize passes.',
+    'Changed PRD artifacts that claim ready/final cannot close out until `spec-prd` producer-local finalize passes.',
     'Do not repair this by only changing enum values to `final-prd`, deleting detailed requirements, or treating checker reason_codes as the workflow.',
     'Choose the correct path: ask the next load-bearing owner question, preserve a non-ready checkpoint with `next_owner_question`, revise the PRD while keeping source/design gaps visible, or finalize only after all load-bearing gaps are closed and original inputs were scanned.',
     '',
@@ -87,7 +87,7 @@ if (blocked.length > 0) {
       entry.stderr ? `  stderr: ${entry.stderr}` : '',
     ].filter(Boolean)),
     '',
-    'Next action: return to `$spec-prd`, fix the listed readiness/design/grill/finalize gaps, then run the producer-local finalize path again.',
+    'Next action: return to `spec-prd`, fix the listed readiness/design/grill/finalize gaps, then run the producer-local finalize path again.',
     'Phase 1 restore point if grill was skipped: (1) emit a run-local Decision Card (write_mode / highest_risk_gap / next_action / why planning will not invent WHAT); (2) emit the Requirement Analysis Gate map; (3) begin Requirements Grill on each load-bearing branch before re-finalizing.',
     'Legal enum values: write_mode = checkpoint-prd | final-prd | ask-owner-first | route-out; can_enter_spec_plan = yes | no; clarification_evidence = asked-owner | source-proven-no-ask | headless-degraded-logged; preflight_sweep_closure = closed | degraded | blocked.',
   ];
@@ -122,8 +122,8 @@ function changedPrdArtifacts(cwd) {
   return [...new Set(paths)].sort();
 }
 
-// docs/brainstorms/*-requirements.md 同时承载 $spec-brainstorm 的需求 brief 与
-// $spec-prd 的 PRD-grade 需求,仅凭路径无法区分。Stop hook 只守 ready/final 出口:
+// docs/brainstorms/*-requirements.md 同时承载 spec-brainstorm 的需求 brief 与
+// spec-prd 的 PRD-grade 需求,仅凭路径无法区分。Stop hook 只守 ready/final 出口:
 // 普通 draft/checkpoint PRD 不应在多会话共享 checkout 时阻断其他会话 closeout。
 function isReadyClaimPrdArtifact(absolutePath) {
   let content;

@@ -414,7 +414,7 @@ database worker Step 1（现有的 schema 探测）可优先消费这些 `doc_sc
 
 ## 6. 验证 as Done
 
-- [ ] `spec-first` 仓库自举运行 `/spec:graph-bootstrap`，产出 `project-knowledge-registry.json`，`doc_facts_coverage: rich`（因为 `docs/` 目录丰富）
+- [ ] `spec-first` 仓库自举运行 `spec-graph-bootstrap`，产出 `project-knowledge-registry.json`，`doc_facts_coverage: rich`（因为 `docs/` 目录丰富）
 - [ ] `artifact-manifest.json` 的 `data_quality` 字段结构为双轴格式，`effective_quality` 正确计算
 - [ ] `fact-inventory.json` 的已有条目带 `source_layer: "code"`
 - [ ] `injection-index.yaml` 包含文档来源 selection_rules（若 Phase 0.5 发现了对应文件）

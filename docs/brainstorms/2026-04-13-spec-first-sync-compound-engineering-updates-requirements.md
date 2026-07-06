@@ -146,4 +146,4 @@ topic: spec-first-sync-compound-engineering-updates
 
 ## Next Steps
 
-→ `/spec:plan` 基于本需求文档，产出“批次 A 到批次 D 的实施计划”，至少先细化批次 A 的文件级迁移顺序与验证要求。
+→ `spec-plan` 基于本需求文档，产出“批次 A 到批次 D 的实施计划”，至少先细化批次 A 的文件级迁移顺序与验证要求。

@@ -54,7 +54,7 @@ Fallback path:
 The reviewer checks:
 
 - Does the changed source still preserve `Light contract + Explicit boundaries + scripts enforce deterministic invariants; scripts prepare facts; LLM decides semantic adequacy above that floor`?
-- Is the entrypoint surface correct for Claude (`/spec:*`), Codex (`$spec-*`), standalone skills, and internal-only skills?
+- Is the entrypoint surface using the unified `spec-*` workflow id correctly across hosts, standalone skills, and internal-only skills?
 - Does the text avoid exposing generated runtime assets as source-of-truth?
 - Does the change avoid turning helper prose into a hidden workflow command?
 - Are trigger rules precise enough to avoid routing unrelated lightweight requests?

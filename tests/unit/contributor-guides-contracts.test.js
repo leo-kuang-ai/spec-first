@@ -36,7 +36,7 @@ describe('contributor guide contracts', () => {
     const codexPackaging = read(GUIDE_PATHS[2]);
 
     expect(codexPackaging).toContain('旧命令层清理目标：`.codex/commands/spec/`');
-    expect(codexPackaging).toContain('正式 discovery / skill 入口：`$spec-*`');
+    expect(codexPackaging).toContain('正式 discovery / skill 入口：`spec-*`');
     expect(codexPackaging).toContain('不再生成到 `.codex/commands/spec/`');
     expect(codexPackaging).toContain('清理目标');
   });

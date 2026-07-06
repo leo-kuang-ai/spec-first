@@ -16,8 +16,15 @@ const {
   buildInitProgrammaticEvidence,
   buildPackageContentManifest,
   buildCmdCommandLine,
+  buildCursorCleanProgrammaticEvidence,
+  buildCursorDoctorProgrammaticEvidence,
+  buildCursorLoaderEvidence,
   buildReleaseArtifactSummary,
+  checkFromCursorProgrammaticEvidence,
+  checkFromCursorLoaderEvidence,
   createArtifactWriter,
+  CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+  CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
   getEnvValue,
   normalizeArtifactFileName,
   resolveNpmCliPath,
@@ -48,6 +55,28 @@ function packJson(files = VALID_PACK_FILES) {
       files,
     },
   ]);
+}
+
+const REQUIRED_RELEASE_CHECK_IDS = [
+  'package-content-manifest',
+  'init-claude-programmatic',
+  'init-codex-programmatic',
+  'init-cursor-programmatic',
+  'init-kiro-programmatic',
+  'init-qoder-programmatic',
+  'cursor-doctor-programmatic',
+  'cursor-clean-programmatic',
+  'cursor-loader-evidence',
+];
+
+function releaseCheck(checkId, status = 'passed') {
+  return {
+    check_id: checkId,
+    status,
+    reason_code: `${checkId}-${status}`,
+    summary: `${checkId} ${status}`,
+    artifact_path: `${checkId}.log`,
+  };
 }
 
 describe('npm install matrix smoke script', () => {
@@ -152,6 +181,12 @@ describe('npm install matrix smoke script', () => {
     expect(normalizeArtifactFileName('release-artifact-summary.json')).toBe('release-artifact-summary.json');
     expect(normalizeArtifactFileName('init-claude-programmatic.log')).toBe('init-claude-programmatic.log');
     expect(normalizeArtifactFileName('init-codex-programmatic.log')).toBe('init-codex-programmatic.log');
+    expect(normalizeArtifactFileName('init-cursor-programmatic.log')).toBe('init-cursor-programmatic.log');
+    expect(normalizeArtifactFileName('init-kiro-programmatic.log')).toBe('init-kiro-programmatic.log');
+    expect(normalizeArtifactFileName('init-qoder-programmatic.log')).toBe('init-qoder-programmatic.log');
+    expect(normalizeArtifactFileName('cursor-doctor-programmatic.log')).toBe('cursor-doctor-programmatic.log');
+    expect(normalizeArtifactFileName('cursor-clean-programmatic.log')).toBe('cursor-clean-programmatic.log');
+    expect(normalizeArtifactFileName('cursor-loader-evidence.log')).toBe('cursor-loader-evidence.log');
 
     for (const unsafe of ['../summary.json', '..\\summary.json', '/tmp/summary.json', 'C:\\tmp\\summary.json', 'bad:name.log', '']) {
       expect(() => normalizeArtifactFileName(unsafe)).toThrow(/Unsafe smoke artifact file name/);
@@ -203,7 +238,7 @@ describe('npm install matrix smoke script', () => {
   test('package content manifest fails with reason codes for missing required and forbidden paths', () => {
     const files = [
       ...VALID_PACK_FILES.filter((file) => !['README.md', KNOWLEDGE_HARNESS_CONTRACT_PATH].includes(file.path)),
-      { path: '.claude/commands/spec/work.md', size: 12, mode: 420 },
+      { path: '.claude/commands/spec-work.md', size: 12, mode: 420 },
       { path: 'skills/spec-work/scripts/__pycache__/tool.pyc', size: 13, mode: 420 },
     ];
     const manifest = buildPackageContentManifest(packJson(files), {
@@ -222,7 +257,7 @@ describe('npm install matrix smoke script', () => {
       }),
       expect.objectContaining({
         reason_code: 'forbidden-package-path-present',
-        paths: ['.claude/commands/spec/work.md'],
+        paths: ['.claude/commands/spec-work.md'],
       }),
       expect.objectContaining({
         reason_code: 'forbidden-package-path-present',
@@ -255,15 +290,7 @@ describe('npm install matrix smoke script', () => {
       tarballName: 'spec-first-1.8.1.tgz',
       platform: 'darwin',
       node: 'v24.0.0',
-      checks: [
-        {
-          check_id: 'package-content-manifest',
-          status: 'passed',
-          reason_code: 'package-content-manifest-passed',
-          summary: 'ok',
-          artifact_path: 'package-content-manifest.json',
-        },
-      ],
+      checks: REQUIRED_RELEASE_CHECK_IDS.map((checkId) => releaseCheck(checkId, checkId === 'cursor-loader-evidence' ? 'skipped' : 'passed')),
       failures: [],
     });
 
@@ -274,6 +301,12 @@ describe('npm install matrix smoke script', () => {
       package_content_manifest: 'package-content-manifest.json',
       init_claude_programmatic_log: 'init-claude-programmatic.log',
       init_codex_programmatic_log: 'init-codex-programmatic.log',
+      init_cursor_programmatic_log: 'init-cursor-programmatic.log',
+      init_kiro_programmatic_log: 'init-kiro-programmatic.log',
+      init_qoder_programmatic_log: 'init-qoder-programmatic.log',
+      cursor_doctor_programmatic_log: 'cursor-doctor-programmatic.log',
+      cursor_clean_programmatic_log: 'cursor-clean-programmatic.log',
+      cursor_loader_evidence_log: 'cursor-loader-evidence.log',
       release_artifact_summary: 'release-artifact-summary.json',
     });
 
@@ -287,6 +320,21 @@ describe('npm install matrix smoke script', () => {
     expect(validateAgainstSchema(schema, invalid).errors).toContain('root.artifacts.package_content_manifest: value "/tmp/package-content-manifest.json" does not equal const "package-content-manifest.json"');
     expect(Object.values(invalid.artifacts).some((artifactPath) => path.isAbsolute(artifactPath))).toBe(true);
     expect(Object.values(summary.artifacts).some((artifactPath) => path.isAbsolute(artifactPath))).toBe(false);
+  });
+
+  test('release artifact summary schema requires every release evidence check id', () => {
+    const schema = JSON.parse(fs.readFileSync(RELEASE_EVIDENCE_SCHEMA_PATH, 'utf8'));
+    const invalid = buildReleaseArtifactSummary({
+      generatedAt: '2026-05-11T12:00:00.000Z',
+      status: 'passed',
+      checks: [releaseCheck('package-content-manifest')],
+      failures: [],
+    });
+
+    const errors = validateAgainstSchema(schema, invalid).errors;
+    expect(errors).toEqual(expect.arrayContaining([
+      'root.checks: expected array to contain matching item',
+    ]));
   });
 
   test('failed release artifact summary requires a failure entry', () => {
@@ -312,6 +360,9 @@ describe('npm install matrix smoke script', () => {
       afterSnapshot: [
         'CLAUDE.md:content',
         '.claude/spec-first/state.json:content',
+        '.claude/commands/spec-work.md:content',
+        '.claude/spec-first/workflows/spec-work/SKILL.md:content',
+        '.claude/skills/using-spec-first/SKILL.md:content',
       ],
     });
 
@@ -323,6 +374,7 @@ describe('npm install matrix smoke script', () => {
       has_state: true,
       has_instruction: true,
       mutated: true,
+      missing_runtime_paths: [],
     }));
 
     const failed = buildInitProgrammaticEvidence({
@@ -344,6 +396,202 @@ describe('npm install matrix smoke script', () => {
       has_state: false,
       mutated: true,
     }));
+
+    const kiroPassed = buildInitProgrammaticEvidence({
+      host: 'kiro',
+      result: {
+        status: 0,
+        stdout: 'Generated skill directory(ies)',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.kiro/spec-first/state.json:content',
+        '.kiro/skills/spec-work/SKILL.md:content',
+        '.kiro/skills/spec-mcp-setup/SKILL.md:content',
+      ],
+    });
+    expect(kiroPassed).toEqual(expect.objectContaining({
+      host: 'kiro',
+      passed: true,
+      expected_state_path: '.kiro/spec-first/state.json',
+      expected_instruction_path: 'AGENTS.md',
+    }));
+
+    const qoderPassed = buildInitProgrammaticEvidence({
+      host: 'qoder',
+      result: {
+        status: 0,
+        stdout: 'Generated command file(s)',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.qoder/spec-first/state.json:content',
+        '.qoder/commands/spec-work.md:content',
+        '.qoder/skills/spec-work/SKILL.md:content',
+        '.qoder/skills/spec-mcp-setup/SKILL.md:content',
+      ],
+    });
+    expect(qoderPassed).toEqual(expect.objectContaining({
+      host: 'qoder',
+      passed: true,
+      expected_state_path: '.qoder/spec-first/state.json',
+      expected_instruction_path: 'AGENTS.md',
+    }));
+
+    const cursorPassed = buildInitProgrammaticEvidence({
+      host: 'cursor',
+      result: {
+        status: 0,
+        stdout: 'Generated skill directory(ies)',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.cursor/spec-first/state.json:content',
+        '.cursor/skills/spec-work/SKILL.md:content',
+        '.cursor/skills/spec-mcp-setup/SKILL.md:content',
+      ],
+    });
+    expect(cursorPassed).toEqual(expect.objectContaining({
+      host: 'cursor',
+      passed: true,
+      expected_state_path: '.cursor/spec-first/state.json',
+      expected_instruction_path: 'AGENTS.md',
+      missing_runtime_paths: [],
+    }));
+
+    const cursorMissingSkills = buildInitProgrammaticEvidence({
+      host: 'cursor',
+      result: {
+        status: 0,
+        stdout: 'Generated skill directory(ies)',
+        stderr: '',
+      },
+      beforeSnapshot: [],
+      afterSnapshot: [
+        'AGENTS.md:content',
+        '.cursor/spec-first/state.json:content',
+      ],
+    });
+    expect(cursorMissingSkills).toEqual(expect.objectContaining({
+      host: 'cursor',
+      passed: false,
+      reason_code: 'init-programmatic-failed',
+      missing_runtime_paths: [
+        '.cursor/skills/spec-work/SKILL.md',
+        '.cursor/skills/spec-mcp-setup/SKILL.md',
+      ],
+    }));
+  });
+
+  test('Cursor doctor and clean programmatic evidence validates generated runtime assets', () => {
+    const doctorEvidence = buildCursorDoctorProgrammaticEvidence({
+      packageRoot: REPO_ROOT,
+      cwd: REPO_ROOT,
+      result: {
+        status: 0,
+        stdout: JSON.stringify({
+          platforms: ['cursor'],
+          platform_checks: {
+            cursor: [
+              { name: 'Cursor generated-runtime preview' },
+              { name: '.cursor/skills' },
+            ],
+          },
+        }),
+        stderr: '',
+      },
+    });
+    expect(doctorEvidence).toEqual(expect.objectContaining({
+      schema_version: 'cursor-doctor-programmatic.v1',
+      passed: true,
+      reason_code: 'cursor-doctor-programmatic-passed',
+      has_cursor_platform: true,
+      has_preview_check: true,
+      has_skill_root_check: true,
+    }));
+
+    const cleanEvidence = buildCursorCleanProgrammaticEvidence({
+      packageRoot: REPO_ROOT,
+      cwd: REPO_ROOT,
+      result: {
+        status: 0,
+        stdout: [
+          'Dry run: spec-first clean (cursor)',
+          '.cursor/skills/spec-work',
+          '.cursor/spec-first/state.json',
+          'No files were changed.',
+        ].join('\n'),
+        stderr: '',
+      },
+    });
+    expect(cleanEvidence).toEqual(expect.objectContaining({
+      schema_version: 'cursor-clean-programmatic.v1',
+      passed: true,
+      reason_code: 'cursor-clean-programmatic-passed',
+      missing_fragments: [],
+      forbidden_matches: [],
+    }));
+
+    const doctorCheck = checkFromCursorProgrammaticEvidence({
+      evidence: {
+        passed: true,
+        reason_code: 'cursor-doctor-programmatic-passed',
+      },
+      checkId: 'cursor-doctor-programmatic',
+      artifactPath: CURSOR_DOCTOR_PROGRAMMATIC_LOG_FILE,
+      label: 'Cursor doctor programmatic evidence',
+    });
+    expect(doctorCheck).toEqual({
+      check_id: 'cursor-doctor-programmatic',
+      status: 'passed',
+      reason_code: 'cursor-doctor-programmatic-passed',
+      summary: 'Cursor doctor programmatic evidence passed against Cursor generated-runtime preview assets.',
+      artifact_path: 'cursor-doctor-programmatic.log',
+    });
+
+    const cleanCheck = checkFromCursorProgrammaticEvidence({
+      evidence: {
+        passed: false,
+        reason_code: 'cursor-clean-programmatic-failed',
+      },
+      checkId: 'cursor-clean-programmatic',
+      artifactPath: CURSOR_CLEAN_PROGRAMMATIC_LOG_FILE,
+      label: 'Cursor clean dry-run programmatic evidence',
+    });
+    expect(cleanCheck).toEqual(expect.objectContaining({
+      check_id: 'cursor-clean-programmatic',
+      status: 'failed',
+      artifact_path: 'cursor-clean-programmatic.log',
+    }));
+    expect(typeof buildCursorCleanProgrammaticEvidence).toBe('function');
+  });
+
+  test('Cursor loader evidence stays degraded until a real Cursor user journey is recorded', () => {
+    const evidence = buildCursorLoaderEvidence({
+      generatedAt: '2026-07-05T12:00:00.000Z',
+    });
+    expect(evidence).toEqual({
+      schema_version: 'cursor-loader-evidence.v1',
+      generated_at: '2026-07-05T12:00:00.000Z',
+      status: 'skipped',
+      support_status: 'generated_runtime_preview',
+      reason_code: 'cursor_loader_validation_unavailable',
+      summary: expect.stringContaining('generated-runtime preview assets only'),
+      artifact_path: 'cursor-loader-evidence.log',
+    });
+    expect(checkFromCursorLoaderEvidence(evidence)).toEqual({
+      check_id: 'cursor-loader-evidence',
+      status: 'skipped',
+      reason_code: 'cursor_loader_validation_unavailable',
+      summary: evidence.summary,
+      artifact_path: 'cursor-loader-evidence.log',
+    });
   });
 
   test('workflow uses reusable smoke script and avoids shell true fallback', () => {
@@ -395,7 +643,11 @@ describe('npm install matrix smoke script', () => {
     expect(script).toContain('release-artifact-summary.json');
     expect(script).toContain('init-claude-programmatic.log');
     expect(script).toContain('init-codex-programmatic.log');
-    expect(script).toContain("['claude', 'codex']");
+    expect(script).toContain('init-cursor-programmatic.log');
+    expect(script).toContain('init-kiro-programmatic.log');
+    expect(script).toContain('init-qoder-programmatic.log');
+    expect(script).toContain('cursor-loader-evidence.log');
+    expect(script).toContain("['claude', 'codex', 'cursor', 'kiro', 'qoder']");
     expect(script).not.toContain("['init', '--claude'");
     expect(script).not.toContain("['init', '--codex'");
     expect(script).toContain('cmd.exe');

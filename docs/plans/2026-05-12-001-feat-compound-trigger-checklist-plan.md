@@ -39,7 +39,7 @@ origin_issue: P2-008
 
 ## Scope Boundaries
 
-- 不新增 `$spec-compound-auto`、`$spec-knowledge-capture`、CLI flag、runtime state、dashboard 或 hidden background writer。
+- 不新增 `spec-compound-auto`、`spec-knowledge-capture`、CLI flag、runtime state、dashboard 或 hidden background writer。
 - 不自动运行 `spec-compound`，不自动创建或修改 `docs/solutions/`。
 - 不把 compound 建议作为 code review verdict、merge gate、release gate 或 task completion gate。
 - 不要求所有 work/review 输出都出现 `Next action`；没有 learning-worthy signal 时应省略建议。
@@ -73,7 +73,7 @@ origin_issue: P2-008
 
 ### Relevant Code and Patterns
 
-- `docs/2026-05-10/spec-first-full-code-review-and-competitor-benchmark.md` identifies `P2-008` as the only remaining worth-doing but non-required P2 item: add a “learning-worthy signal” checklist to final summary contracts, suggest `$spec-compound`, and do not auto-write docs.
+- `docs/2026-05-10/spec-first-full-code-review-and-competitor-benchmark.md` identifies `P2-008` as the only remaining worth-doing but non-required P2 item: add a “learning-worthy signal” checklist to final summary contracts, suggest `spec-compound`, and do not auto-write docs.
 - `skills/spec-debug/SKILL.md` already has the desired lightweight pattern after PR creation: skip silently for mechanical fixes, offer neutrally when the lesson can be stated in one sentence, and lean into the offer when the pattern appears in 3+ locations or reveals a wrong assumption about shared dependency, framework, or convention.
 - `tests/unit/spec-debug-contracts.test.js` already locks that debug behavior with strings such as `Skip silently`, `Offer neutrally`, `Lean into the offer`, `pattern appears in 3+ locations`, and `run \`spec-compound\``.
 - `skills/spec-work/references/shipping-workflow.md` owns the stable Work `Completion Response Contract` for final output: Completed, Verification, Review, Artifacts, and optional Next action. This is the narrowest place to add work-side learning-worthy guidance.
@@ -82,7 +82,7 @@ origin_issue: P2-008
 - `tests/unit/spec-work-beta-contracts.test.js` already asserts the beta shipping completion response contract and must be updated with the same learning-worthy and negative-boundary checks.
 - `skills/spec-code-review/SKILL.md` owns final review output sections, After Review routing, completion reports, and headless/autofix boundaries. This is the right place to add review-side learning-worthy guidance without changing reviewer findings schema.
 - `tests/unit/spec-code-review-contracts.test.js` is the right contract test surface for Review.
-- `skills/spec-compound/SKILL.md` already defines `current host's compound entrypoint` / `current host's compound entrypoint with brief context`, and tests forbid hardcoding only `/spec:compound` or `$spec-compound` in source prose.
+- `skills/spec-compound/SKILL.md` already defines `current host's compound entrypoint` / `current host's compound entrypoint with brief context`, and tests forbid hardcoding only `spec-compound` in source prose.
 
 ### Institutional Learnings
 
@@ -217,7 +217,7 @@ origin_issue: P2-008
 
 **Approach:**
 - Add positive assertions for the three-tier trigger language and current-host compound entrypoint wording across stable Work, beta Work, and Code Review.
-- Add negative assertions that source prose does not introduce `$spec-compound-auto`, `/spec:compound-auto`, `spec-first compound-auto`, auto-write `docs/solutions/`, or compound as a mandatory completion gate.
+- Add negative assertions that source prose does not introduce `spec-compound-auto`, `spec-first compound-auto`, auto-write `docs/solutions/`, or compound as a mandatory completion gate.
 - Add a beta parity assertion through `tests/unit/spec-work-beta-contracts.test.js` so beta cannot keep an older shipping contract while stable Work evolves.
 - Prefer focused tests in existing skill contract files over a new test file unless assertions become hard to read.
 

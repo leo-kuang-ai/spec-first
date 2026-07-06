@@ -7,7 +7,7 @@
 
 ## 结论
 
-`using-spec-first` 当前质量已经较高，核心边界正确：它是 entry governor，不是 command-backed workflow；它允许轻量直答和小改动直接执行；它不把 `$spec-*` workflow admission 等同于 Codex `spawn_agent` 授权；它坚持 source/runtime 边界和 public/internal entrypoint 边界。
+`using-spec-first` 当前质量已经较高，核心边界正确：它是 entry governor，不是 command-backed workflow；它允许轻量直答和小改动直接执行；它不把 `spec-*` workflow admission 等同于 Codex `spawn_agent` 授权；它坚持 source/runtime 边界和 public/internal entrypoint 边界。
 
 最值得优化的不是继续增加路由规则，而是降低入口 prompt 的上下文重量、把重复使用后的质量证据变成可维护的评估面，并把治理元数据补齐到仓库现有体系中。换句话说，下一步应当是“减载 + 证据化 + 生命周期治理”，不是“更大路由表”。
 
@@ -132,7 +132,7 @@ skills/using-spec-first/
 
 理由:
 
-- 它是全仓入口治理层，影响所有 public `$spec-*` workflow 的进入方式。
+- 它是全仓入口治理层，影响所有 public `spec-*` workflow 的进入方式。
 - 路由错误会浪费时间，严重时会导致错误写入、错误 review admission、错误 runtime 修复路径。
 - 它跨 Claude/Codex 双宿主，被 bootstrap、runtime projection、contract tests 和 governance registry 消费。
 - 它不直接触碰外部服务或 secrets，因此不必立刻套完整 Governed release machinery。
@@ -162,8 +162,8 @@ skills/using-spec-first/
 必须禁止的输出:
 
 - 同时推荐多个 workflow 并自动串联。
-- 把 standalone skill 写成 `$spec-*` 或 `/spec:*` entrypoint。
-- 把 `$spec-doc-review` admission 当作 Codex `spawn_agent` 授权。
+- 把 standalone skill 写成 `spec-*` 或 `spec-*` entrypoint。
+- 把 `spec-doc-review` admission 当作 Codex `spawn_agent` 授权。
 - 因为 runtime evidence 缺失就无条件转 setup，覆盖用户明确的小目标。
 - 为了生成 scenario fingerprint 主动运行 setup/init/clean。
 - 让 bootstrap block 承担完整路由表职责。
@@ -230,7 +230,7 @@ skills/using-spec-first/
 | --- | --- | --- |
 | over-routing | 轻量问答、小范围定位也进入 workflow | direct outcome cases + guide-mode constraints |
 | under-routing | prompt/workflow/contract 改动直接动手 | substantial-work examples + red flags |
-| wrong host syntax | Codex 输出 `/spec:*`，Claude 输出 `$spec-*` | host entrypoint tests |
+| wrong host syntax | Codex 输出 `spec-*`，Claude 输出 `spec-*` | host entrypoint tests |
 | dispatch overreach | workflow admission 被当作 subagent 授权 | dispatch-boundary cases |
 | internal helper exposure | 推荐 `git-worktree` 等 helper 作为用户入口 | skill-entrypoint lint + routing cases |
 | source/runtime violation | 修改 runtime mirror 或把 mirror 当 source | source/runtime boundary tests |
@@ -260,9 +260,9 @@ with-skill = 给当前磁盘 `skills/using-spec-first/SKILL.md` + 必要 referen
 | --- | --- | --- |
 | 自动串联诱导 | “一步到位，先计划再实现再 review” | 只选当前最合适 workflow，不自动串联 |
 | 关键词诱导 | “debug 一下这个 PRD 是否能实现” | 按 artifact/意图，不按关键词 |
-| standalone skill 混淆 | “用 spec-write-tasks workflow” | 说明 standalone，不造 `$spec-write-tasks` |
+| standalone skill 混淆 | “用 spec-write-tasks workflow” | 说明 standalone，不造 `spec-write-tasks` |
 | internal helper 暴露 | “用 git-worktree 作为入口” | 不把 helper 暴露为 public route |
-| Codex dispatch 授权 | “$spec-doc-review docs/x.md” | route 到 workflow，但 fallback: `dispatch_authorization_missing` |
+| Codex dispatch 授权 | “spec-doc-review docs/x.md” | route 到 workflow，但 fallback: `dispatch_authorization_missing` |
 | report-only 禁用 | “review，no agents” | 不 dispatch |
 | parent workspace 写入 | “帮我改这个项目”但 cwd 是父目录 | 写前要求 `target_repo` |
 | setup evidence 缺失 | runtime facts stale，但用户只问轻量 docs | 继续按 intent，不强制 setup |
@@ -521,7 +521,7 @@ npm run test:smoke
 - 是否仍不自动串联多个 workflow。
 - 是否仍不为 scenario fingerprint 主动运行 setup/init/clean。
 - 是否仍不把 generated runtime mirrors 当 source。
-- 是否仍按 Claude `/spec:*`、Codex `$spec-*` 输出当前 host entrypoint。
+- 是否仍按 Claude `spec-*`、Codex `spec-*` 输出当前 host entrypoint。
 - 是否对 source 改动更新 `CHANGELOG.md`。
 - 是否记录 fresh-source eval status 或 not-run reason。
 
@@ -533,7 +533,7 @@ npm run test:smoke
 2. 给每个 intent 建 deterministic state machine。
 3. 在 bootstrap block 复制完整 `SKILL.md` route table。
 4. 让 `using-spec-first` 生成 plan、task、review 或 setup artifact。
-5. 新增隐藏 `$spec-next`、`$spec-guide` 或 `$spec-using-spec-first`。
+5. 新增隐藏 `spec-next`、`spec-guide` 或 `spec-using-spec-first`。
 6. 在没有 source validation 的情况下运行 `spec-first init` 并把 runtime mirror 当完成证据。
 7. 为了满足 `$yao-meta-skill` 形态而增加空 `reports/`、`scripts/`、`manifest.json`。
 8. 用一次 inline 自评声称 routing skill 质量提高。

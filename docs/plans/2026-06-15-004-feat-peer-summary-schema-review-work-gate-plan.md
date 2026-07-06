@@ -8,7 +8,7 @@ spec_id: 2026-06-15-004-peer-summary-schema-review-work-gate
 
 # feat: peer-session-summary 结构化输出 schema + review→work handoff gate
 
-> **本 plan 已完成为「决策/评估 plan」，不是直接 build plan。** 经 `/spec:doc-review`（5 reviewer 多视角 + 对抗）与痛点证据门检索后，结论已收口为当前不开发，对齐同日 plan 002 立的证据纪律。下方 Implementation Units 保留为「若重启会怎么建」的设计存档，**当前不进入开发，也不作为 active backlog**。
+> **本 plan 已完成为「决策/评估 plan」，不是直接 build plan。** 经 `spec-doc-review`（5 reviewer 多视角 + 对抗）与痛点证据门检索后，结论已收口为当前不开发，对齐同日 plan 002 立的证据纪律。下方 Implementation Units 保留为「若重启会怎么建」的设计存档，**当前不进入开发，也不作为 active backlog**。
 
 > **完成结论：COMPLETED DECISION（not planned，2026-06-30 收口；原评估 2026-06-15）。** 痛点证据门未达标：`docs/solutions/` + `docs/12-bug分析/` 对「review findings 跨轮/跨会话丢失」与「peer 历史不可结构化消费」两类痛点 **0 条 confirmed 失败记录**（≥3 阈值未达）；唯一邻近记录 `reviewer-dispatch-failure-2026-05-07.md` 反向证明「findings 没丢，只降级了交叉验证」；且 `docs/solutions/architecture-patterns/ai-reviewer-capability-borrowing-gates-2026-06-09.md` **已显式拒绝**为本地单会话 CLI 借鉴「增量复审/carry findings forward」，判定该痛点未被证实。按角色契约 §10（能力↔采纳平衡、证据门优先）与 plan 002 先例，**P1-3、P0-2 均不开发 / 不进入当前 backlog**，非永久否决。**重启条件：** 累计 ≥3 条 confirmed 失败记录落 `docs/solutions/` 或 `docs/12-bug分析/`（标 `review-finding-lost` / `peer-context-drift` 关键词），证明跨会话 finding 丢失或 peer 历史重读是真实高频痛点；届时重启评估，并先修下方 doc-review 暴露的 5 处设计硬伤。
 
@@ -78,7 +78,7 @@ spec_id: 2026-06-15-004-peer-summary-schema-review-work-gate
 本计划的 `status: completed` 表示「评估/决策已完成」，不是实现交付完成。完成依据：
 
 - 痛点证据门已完成检索：`docs/solutions/` + `docs/12-bug分析/` 对 `review-finding-lost` / `peer-context-drift` 相关 confirmed 失败记录为 0，未达到 ≥3 条重启阈值。
-- `/spec:doc-review` 已暴露重启前必须先修的 5 处设计硬伤，并在本文顶部存档。
+- `spec-doc-review` 已暴露重启前必须先修的 5 处设计硬伤，并在本文顶部存档。
 - 最终结论已明确：`peer-session-summary.v1` 与 `review→work handoff gate` 当前不开发、不进入 active backlog；Implementation Units 仅保留为 future restart design archive。
 - 重启条件已明确：未来累计 ≥3 条 confirmed 失败记录后重新评估，并先修本文记录的设计硬伤。
 - `CHANGELOG.md` 已记录本次决策收口。

@@ -184,7 +184,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 调用入口：
 
 ```text
-/spec:graph-bootstrap [target-repo-path]
+spec-graph-bootstrap [target-repo-path]
 ```
 
 若不传 `target-repo-path`，则默认取当前工作目录。
@@ -202,7 +202,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 当前 skill 的真实执行顺序可以概括为：
 
 ```text
-用户调用 /spec:graph-bootstrap
+用户调用 spec-graph-bootstrap
   -> 计算 slug 与产物路径
   -> Phase 0 就绪探测与模式判定
   -> 首次写 artifact-manifest.json (in_progress)
@@ -221,7 +221,7 @@ archive_reason: "legacy plan-status backfill; retained as historical evidence on
 
 ```text
 +---------------------------------------------------------------+
-| /spec:graph-bootstrap [target]                                |
+| spec-graph-bootstrap [target]                                |
 | 产物: 无                                                      |
 | 说明: 用户触发 Stage-0 bootstrap 工作流                       |
 +---------------------------------------------------------------+

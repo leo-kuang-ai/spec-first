@@ -568,15 +568,7 @@ function decisionInputNextAction(reasonCode, requestedPlatforms = []) {
 }
 
 function setupWorkflowCommandForPlatforms(requestedPlatforms = []) {
-  const platforms = Array.isArray(requestedPlatforms)
-    ? [...new Set(requestedPlatforms.map((platform) => String(platform).toLowerCase()).filter(Boolean))]
-    : [];
-  if (platforms.length === 1 && platforms[0] === 'claude') return '/spec:mcp-setup';
-  if (platforms.length === 1 && platforms[0] === 'codex') return '$spec-mcp-setup';
-  if (platforms.includes('claude') && platforms.includes('codex')) {
-    return '/spec:mcp-setup or $spec-mcp-setup';
-  }
-  return '$spec-mcp-setup';
+  return 'spec-mcp-setup';
 }
 
 function toBoolean(value, fallback) {

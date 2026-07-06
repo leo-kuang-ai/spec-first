@@ -72,12 +72,15 @@ describe('using-spec-first contracts', () => {
     expectContainsAll(skill, [
       'name: using-spec-first',
       'what spec-first workflow or command to run next',
+      'Do not use for lightweight factual answers, current-context explanations, narrow lookups, user-supplied single-document summaries, or clearly scoped low-risk small edits.',
       'standalone meta skill and entry governor',
       'not a command-backed workflow',
       'Contract Summary',
       '| When to use |',
       '| When not to use |',
       'clearly scoped low-risk small edits',
+      'current-context explanations',
+      'user-supplied single-document summaries',
       '| Inputs |',
       '| Outputs |',
       '| Artifacts |',
@@ -92,7 +95,8 @@ describe('using-spec-first contracts', () => {
       'substantial-work workflow check',
       'direct-answer allowance',
       'external issue/PR input-surface boundary',
-      'small set of common entry anchors',
+      'small set of minimal entry anchors',
+      'the full denylist owned by `docs/contracts/context-governance.md`',
       'prevent it from becoming a second complete route table',
       'Repair stale or missing runtime guidance with `spec-first init` after choosing the target host',
       'If You Are Already In A Workflow',
@@ -112,7 +116,7 @@ describe('using-spec-first contracts', () => {
       'do not convert it into public workflow admission',
       'Skill Trigger vs Workflow Admission',
       'A skill trigger is source/methodology loading; it is not automatically public workflow admission',
-      'Public workflow admission happens only when the current intent actually matches a public `/spec:*` or `$spec-*` workflow',
+      'Public workflow admission happens only when the current intent actually matches a public `spec-*` workflow',
       'does not grant host-level subagent dispatch beyond the dispatch rules below',
       'User Next-Step Guide Mode',
       'when the user explicitly asks what to run next',
@@ -140,7 +144,7 @@ describe('using-spec-first contracts', () => {
       'docs/10-prompt/结构化项目角色契约.md',
       'host instruction blocks',
       'Clearly scoped, single-point, low-risk ordinary code/prose corrections in `spec-first` itself may proceed directly',
-      'Route substantial concrete implementation or prose changes to:',
+      'Route unresolved policy, architecture, or scope questions to `spec-brainstorm` or `spec-plan`',
       'Route review-only requests by artifact type: code/diff/PR quality review to `spec-code-review`, requirements/plan/Markdown review to `spec-doc-review`, and skill/agent asset governance audits to `spec-skill-audit`.',
       'If the request asks for review plus concrete revisions, route to work and keep a review posture during execution.',
       'For source changes, update source-of-truth files, the narrowest contract tests, and `CHANGELOG.md`',
@@ -150,20 +154,20 @@ describe('using-spec-first contracts', () => {
       'Use bounded direct reads in the likely child repo candidates and state the target-repo assumption.',
       'explicit `target_repo` / per-child scope',
       'Explicit Route Normalization',
-      "If the user names the other host's equivalent public workflow, translate it to the current host entrypoint",
-      'Codex should translate `/spec:work` to `$spec-work`',
-      'Do not invent a `/spec:*` or `$spec-*` command for standalone skills',
+      'If the user names a legacy host-specific spelling, translate it to the unified `spec-*` entrypoint',
+      'Current user-facing guidance should present the unified `spec-*` entrypoint',
+      'Do not invent a `spec-*` command for standalone skills',
       'Workflow Dispatch Admission',
       'Routing into a public workflow authorizes that workflow to run.',
       'It does not by itself override host-level subagent tool contracts.',
       'call `spawn_agent` only when the current request explicitly asks for subagents, delegated work, parallel agents, persona reviewer dispatch',
       'or when an upstream workflow delegates from an already authorized multi-agent context whose visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording',
       'Some public workflows prefer multi-persona or research phases when host capability and authorization are both present',
-      '$spec-doc-review` multi-persona document reviewers',
+      'spec-doc-review` multi-persona document reviewers',
       'record `dispatch_authorization_missing` and make the opt-in path user-visible',
       'for multi-persona or subagent review, ask for `subagents`, `personas`, delegated review, or parallel agents in the request',
-      'If the user names `spec-doc-review` in a document-review request without the `$` prefix',
-      'normalize it to the current host\'s public document-review entrypoint',
+      'If the user names `spec-doc-review` or a legacy host spelling in a document-review request',
+      'normalize it to the unified `spec-doc-review` workflow',
       'Do not invent extra dispatch authorization from normalization',
       'explicit dispatch authorization is absent',
       'follow that workflow\'s documented fallback instead of dispatching',
@@ -177,11 +181,11 @@ describe('using-spec-first contracts', () => {
       'It does **not** exist to force every task through brainstorming.',
       'Do **not** make `spec-brainstorm` the universal default front door.',
       'Do **not** adopt the `using-superpowers` rule',
-      'Do **not** write Codex entrypoints as `/spec:*`.',
-      'Do **not** write Claude workflow entrypoints as `$spec-*`.',
-      'Claude workflow entrypoints use `/spec:*`',
-      'Codex workflow entrypoints use `$spec-*`',
-      '$spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization',
+      'Do **not** restore legacy host-specific spellings as current product surfaces',
+      'Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.',
+      'Public workflow identifiers use the unified `spec-*` form across hosts.',
+      'Host runtime delivery is an internal projection detail; the user-facing workflow name remains the same `spec-*` entrypoint.',
+      'spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization',
       'Codex Startup Reminder Boundary',
       'not a verified deterministic SessionStart hook',
       'top-level Codex orchestrator',
@@ -198,23 +202,16 @@ describe('using-spec-first contracts', () => {
       'Do **not** expose internal-only skills as user entrypoints.',
       '`git-worktree`',
       'using-spec-first` itself is a standalone meta skill',
-      '/spec:doc-review',
-      '$spec-doc-review',
-      '/spec:skill-audit',
-      '$spec-skill-audit',
-      '/spec:app-consistency-audit',
-      '$spec-app-consistency-audit',
-      '/spec:prd',
-      '$spec-prd',
+      'spec-doc-review',
+      'spec-skill-audit',
+      'spec-app-consistency-audit',
+      'spec-prd',
       'brownfield PRD authoring',
-      '/spec:optimize',
-      '$spec-optimize',
-      '/spec:plan',
-      '$spec-plan',
+      'spec-optimize',
+      'spec-plan',
       'spec-write-tasks',
       'public optional derived workflow between plan and work',
-      '/spec:work',
-      '$spec-work',
+      'spec-work',
       'Ordinary execution-ready work routes to the stable work entrypoint.',
       'skills/using-spec-first/evals/routing-cases.json',
       'skills/using-spec-first/evals/routing-discipline-cases.json',
@@ -232,8 +229,7 @@ describe('using-spec-first contracts', () => {
     expect(skill).not.toContain('$spec-standards');
     expect(skill).not.toContain('/spec:setup');
     expect(skill).not.toContain('$spec-setup');
-    expect(skill).not.toContain('generated by `spec-first init --codex` or `spec-first init --codex`');
-    expect(skill).not.toContain('with `spec-first init --codex` or `spec-first init --codex`');
+    expect(skill).not.toMatch(/spec-first init --codex.*spec-first init --codex/);
     expect(skill).not.toContain('spec-session-inventory');
     expect(skill).not.toContain('spec-session-extract');
     expect(skill).not.toContain('/spec:pr-description');
@@ -305,6 +301,9 @@ describe('using-spec-first contracts', () => {
           host_delivery: {
             claude: 'skill',
             codex: 'skill',
+            cursor: 'skill',
+            kiro: 'skill',
+            qoder: 'skill',
           },
         }),
       ]),
@@ -321,8 +320,8 @@ describe('using-spec-first contracts', () => {
 
     expect(claudeRuntime).toContain('name: using-spec-first');
     expect(codexRuntime).toContain('name: using-spec-first');
-    expect(claudeRuntime).toContain('Claude workflow entrypoints use `/spec:*`');
-    expect(codexRuntime).toContain('Codex workflow entrypoints use `$spec-*`');
+    expect(claudeRuntime).toContain('Public workflow identifiers use the unified `spec-*` form across hosts.');
+    expect(codexRuntime).toContain('Public workflow identifiers use the unified `spec-*` form across hosts.');
     expect(codexRuntime).toContain('spec-first startup-reminder --codex');
     expect(codexRuntime).not.toContain('query proof after setup');
     expect(codexRuntime).toContain('Workflow Dispatch Admission');
@@ -331,14 +330,13 @@ describe('using-spec-first contracts', () => {
     expect(codexRuntime).toContain('visible parent request or handoff evidence includes explicit subagent/delegation/parallel/persona wording');
     expect(codexRuntime).toContain('record `dispatch_authorization_missing` and make the opt-in path user-visible');
     expect(codexRuntime).toContain('for multi-persona or subagent review, ask for `subagents`, `personas`, delegated review, or parallel agents in the request');
-    expect(codexRuntime).toContain('$spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization');
+    expect(codexRuntime).toContain('spec-doc-review` means the document-review workflow. It uses bounded reviewer dispatch only when the current request also satisfies Codex `spawn_agent` authorization');
     expect(codexRuntime).toContain('generated by `spec-first init` after choosing the target host');
     expect(codexRuntime).toContain('Repair stale or missing runtime guidance with `spec-first init` after choosing the target host');
     expect(codexRuntime).toContain('minimal entry anchors');
     expect(codexRuntime).toContain('Skill Trigger vs Workflow Admission');
     expect(codexRuntime).toContain('A skill trigger is source/methodology loading; it is not automatically public workflow admission');
-    expect(codexRuntime).not.toContain('generated by `spec-first init --codex` or `spec-first init --codex`');
-    expect(codexRuntime).not.toContain('with `spec-first init --codex` or `spec-first init --codex`');
+    expect(codexRuntime).not.toMatch(/spec-first init --codex.*spec-first init --codex/);
     expect(codexRuntime).toContain('Bounded subagents, leaf reviewers, and worker agents must not run the startup reminder');
     expect(codexRuntime).toContain('using-spec-first` itself is a standalone meta skill');
     expect(claudeRuntime).toContain('User Next-Step Guide Mode');
@@ -386,7 +384,7 @@ describe('using-spec-first contracts', () => {
     const rendered = codex.transformSkillContent(
       [
         'Repair with spec-first init and choose the target host.',
-        'See `.claude/commands/spec/work.md` for the legacy command path.',
+        'See `.claude/commands/spec/work.md` for the command path.',
       ].join('\n'),
       {
         skillName: 'using-spec-first',
@@ -395,7 +393,7 @@ describe('using-spec-first contracts', () => {
     );
 
     expect(rendered).toContain('spec-first init and choose the target host');
-    expect(rendered).not.toContain('spec-first init --codex or spec-first init --codex');
+    expect(rendered).not.toMatch(/spec-first init --codex.*spec-first init --codex/);
     expect(rendered).toContain('`.agents/skills/spec-work/SKILL.md`');
   });
 
@@ -438,8 +436,8 @@ describe('using-spec-first contracts', () => {
     // Hard Rules 完整断言串必须在 routing-red-flags.md(SKILL 主面仅留概述指针)
     expect(routingRedFlags).toContain('Do **not** make `spec-brainstorm` the universal default front door.');
     expect(routingRedFlags).toContain('Do **not** adopt the `using-superpowers` rule');
-    expect(routingRedFlags).toContain('Do **not** write Codex entrypoints as `/spec:*`.');
-    expect(routingRedFlags).toContain('Do **not** write Claude workflow entrypoints as `$spec-*`.');
+    expect(routingRedFlags).toContain('Do **not** restore legacy host-specific spellings as current product surfaces');
+    expect(routingRedFlags).toContain('Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.');
     expect(routingRedFlags).toContain('Do **not** expose internal-only skills as user entrypoints.');
     expect(routingRedFlags).toContain('`git-worktree`');
 
@@ -452,7 +450,7 @@ describe('using-spec-first contracts', () => {
 
     // Dispatch 详细 elaboration 必须在 dispatch-boundaries.md
     expect(dispatchBoundaries).toContain('record `dispatch_authorization_missing` and make the opt-in path user-visible');
-    expect(dispatchBoundaries).toContain('$spec-doc-review` means the document-review workflow');
+    expect(dispatchBoundaries).toContain('spec-doc-review` means the document-review workflow');
   });
 
   // R-05: 红旗不得含反转 skill 名 bug-report，真实名是 report-bug
@@ -472,7 +470,7 @@ describe('using-spec-first contracts', () => {
     ));
 
     expect(routingRedFlags).toContain('`spec-first update`');
-    expect(routingRedFlags).toContain('`/spec:mcp-setup`');
+    expect(routingRedFlags).toContain('`spec-mcp-setup`');
     expect(routingRedFlags).not.toContain('Route to `update` or `setup` first');
   });
 

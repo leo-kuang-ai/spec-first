@@ -35,8 +35,7 @@ describe('spec-write-skill contract', () => {
 
     expect(skill).toContain('name: spec-write-skill');
     expect(skill).toContain('写 skill 的公开 workflow');
-    expect(skill).toContain('Claude 入口是 `/spec:write-skill`');
-    expect(skill).toContain('Codex 入口是 `$spec-write-skill`');
+    expect(skill).toContain('统一入口是 `spec-write-skill`');
     expect(skill).toContain('先判断是否值得做成 skill');
     expect(skill).toContain('不是 `spec-skill-audit` 的替代品');
     expect(skill).toContain('Source of truth 是 `skills/`');
@@ -162,6 +161,9 @@ describe('spec-write-skill contract', () => {
       host_delivery: {
         claude: 'command',
         codex: 'skill',
+        cursor: 'skill',
+        kiro: 'skill',
+        qoder: 'command',
       },
     });
   });
@@ -174,7 +176,7 @@ describe('spec-write-skill contract', () => {
         [
           new ClaudeAdapter(),
           path.join(projectRoot, '.claude', 'spec-first', 'workflows', 'spec-write-skill'),
-          path.join(projectRoot, '.claude', 'commands', 'spec', 'write-skill.md'),
+          path.join(projectRoot, '.claude', 'commands', 'spec-write-skill.md'),
         ],
         [
           new CodexAdapter(),

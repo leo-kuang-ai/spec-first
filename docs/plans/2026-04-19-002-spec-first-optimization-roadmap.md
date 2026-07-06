@@ -153,7 +153,7 @@ LLM 应该拿到更好的事实、风险、验证建议和 fallback 信号，然
 
 - Claude / Codex 宿主真的会加载 runtime asset
 - MCP server 能连接
-- `/spec:*` 或 `$spec-*` workflow 真能完成执行
+- `spec-*` 或 `spec-*` workflow 真能完成执行
 - Stage-0 context 能被 skill 正确消费
 
 ### P1-3：workflow gate 多为 prompt soft contract

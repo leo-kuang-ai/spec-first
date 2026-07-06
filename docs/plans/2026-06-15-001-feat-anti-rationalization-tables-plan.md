@@ -186,7 +186,7 @@ spec-first 已有此模式的雏形——`CLAUDE.md` 的 workflow 入口治理�
 
 ## System-Wide Impact
 
-- **双宿主:** SKILL.md 是同源投射到 Claude(`/spec:*`)与 Codex(`$spec-*`),无 per-host 分支,改 source 后 `spec-first init` 重生成即双宿主一致。无需 per-host 验证差异(R5 自动满足),但 closeout 时应跑一次 init 确认投射正常。
+- **双宿主:** SKILL.md 是同源投射到 Claude(`spec-*`)与 Codex(`spec-*`),无 per-host 分支,改 source 后 `spec-first init` 重生成即双宿主一致。无需 per-host 验证差异(R5 自动满足),但 closeout 时应跑一次 init 确认投射正常。
 - **runtime 边界:** 只改 source(skills/、docs/contracts/),不手改 `.claude/`、`.codex/`、`.agents/skills/`。
 - **CHANGELOG:** 需新增条目(skill prose 变更,用户可见 workflow 行为)。
 - **文档:** 不需改 README(内部 workflow prose,非用户入口变化)。

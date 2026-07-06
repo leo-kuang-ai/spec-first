@@ -120,6 +120,6 @@
 
   <g transform="translate(262 552)">
     <rect x="0" y="0" width="676" height="50" rx="25" fill="#FFFFFF" opacity="0.86" stroke="#E4E7EC"/>
-    <text x="338" y="31" class="mono">/spec:* for Claude Code · $spec-* for Codex · artifacts stay repo-local</text>
+    <text x="338" y="31" class="mono">spec-* across supported hosts · artifacts stay repo-local</text>
   </g>
 </svg>

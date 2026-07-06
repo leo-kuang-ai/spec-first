@@ -19,7 +19,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 一、Codebase 节点
 
-**对应命令**：`/spec:mcp-setup`、`/spec:update`
+**对应命令**：`spec-mcp-setup`；runtime CLI 维护动作走 `spec-first update`
 
 **当前能力**：环境就绪检查、runtime 资产同步。
 
@@ -36,7 +36,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 二、Graph 节点
 
-**对应命令**：`/spec:graph-bootstrap`（计划移除 GitNexus 后待替换）
+**对应命令**：`spec-graph-bootstrap`（计划移除 GitNexus 后待替换）
 
 **移除 GitNexus 后的增强方向**（provider-agnostic）：
 
@@ -51,7 +51,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 三、Spec 节点
 
-**对应命令**：`/spec:brainstorm`、`/spec:prd`、`/spec:ideate`
+**对应命令**：`spec-brainstorm`、`spec-prd`、`spec-ideate`
 
 **当前能力**：需求探索 + PRD 产出。
 
@@ -69,7 +69,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 四、Plan 节点
 
-**对应命令**：`/spec:plan`
+**对应命令**：`spec-plan`
 
 **当前能力**：多 agent 研究 + 结构化计划产出，已有 confidence-first deepening。
 
@@ -87,7 +87,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 五、Tasks 节点
 
-**对应命令**：`/spec:write-tasks` / `$spec-write-tasks`
+**对应命令**：`spec-write-tasks`
 
 **当前能力**：将计划编译为派生任务包。
 
@@ -104,7 +104,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 六、Code 节点
 
-**对应命令**：`/spec:work`
+**对应命令**：`spec-work`
 
 **当前能力**：系统化执行开发任务。
 
@@ -122,7 +122,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 七、Review 节点
 
-**对应命令**：`/spec:code-review`、`/spec:doc-review`
+**对应命令**：`spec-code-review`、`spec-doc-review`
 
 **当前能力**：已相当完善，20+ reviewer agents；dispatch 可用且授权时多 persona，缺失时有 report-only fallback。
 
@@ -140,7 +140,7 @@ Codebase → Graph → Spec → Plan → Tasks → Code → Review → Knowledge
 
 ## 八、Knowledge 节点
 
-**对应命令**：`/spec:compound`、`/spec:compound-refresh`、`/spec:sessions`
+**对应命令**：`spec-compound`、`spec-compound-refresh`、`spec-sessions`
 
 **当前能力**：解决方案沉淀到 `docs/solutions/`，历史会话查询。
 

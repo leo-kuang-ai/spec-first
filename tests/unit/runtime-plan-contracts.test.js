@@ -113,6 +113,11 @@ describe('runtime plan contracts', () => {
 
     expect(plan.operations).toEqual([
       {
+        kind: 'remove_dir',
+        path: '.claude/commands/spec',
+        reason: 'retired_runtime_command_namespace',
+      },
+      {
         kind: 'remove_file',
         path: '.claude/hooks/session-start',
         reason: 'managed_runtime_hook',
@@ -133,7 +138,7 @@ describe('runtime plan contracts', () => {
         reason: 'managed_runtime_hook',
       },
     ]);
-    expect(plan.summary).toEqual({ remove_file: 4 });
+    expect(plan.summary).toEqual({ remove_dir: 1, remove_file: 4 });
   });
 
   test('Codex runtime plans retain legacy cleanup while adding SessionStart hook assets', () => {
@@ -193,7 +198,7 @@ describe('runtime plan contracts', () => {
 
     expect(renderedSkill).toContain('read `.agents/skills/spec-plan/references/planning-flow.md`');
     expect(combined).toContain('dispatch authorization is present for this run');
-    expect(combined).toContain('a public `$spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
+    expect(combined).toContain('a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`');
     expect(combined).toContain('record `dispatch_authorization_missing`');
     expect(combined).toContain('explicit fallback');
     expect(combined).toContain('Plan generation must still complete when research dispatch is unavailable');

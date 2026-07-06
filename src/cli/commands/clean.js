@@ -40,18 +40,19 @@ function runClean(argv) {
     return 2;
   }
 
-  const platformSelected = parsed.claude || parsed.codex;
+  const selectedPlatforms = ['claude', 'codex', 'cursor', 'kiro', 'qoder'].filter((platform) => parsed[platform]);
+  const platformSelected = selectedPlatforms.length > 0;
   if (!platformSelected || parsed.unknown.length > 0) {
-    console.error('Usage: spec-first clean (--claude|--codex) [--dry-run]');
+    console.error('Usage: spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]');
     return 2;
   }
 
-  if (parsed.claude && parsed.codex) {
-    console.error('Error: Cannot specify both --claude and --codex');
+  if (selectedPlatforms.length > 1) {
+    console.error('Error: Cannot specify more than one host flag for clean');
     return 2;
   }
 
-  const platform = parsed.claude ? 'claude' : 'codex';
+  const platform = selectedPlatforms[0];
   const adapter = getAdapter(platform);
   const projectRoot = process.cwd();
   let state;
@@ -108,7 +109,7 @@ function runClean(argv) {
   applyOperationPlan(projectRoot, mergeOperationPlans(cleanPlan.managedPlan, cleanPlan.runtimeCleanup));
   applyOperationPlan(projectRoot, planEmptyManagedRootCleanup(projectRoot, adapter));
 
-  console.log(`Removed spec-first managed ${platform === 'claude' ? 'Claude Code' : 'Codex'} assets from the current project.`);
+  console.log(`Removed spec-first managed ${platformDisplayName(platform)} assets from the current project.`);
   console.log('Custom assets outside the spec-first managed set were left untouched.');
   return 0;
 }
@@ -126,6 +127,9 @@ function parseCleanArgs(argv) {
     help: false,
     claude: false,
     codex: false,
+    cursor: false,
+    kiro: false,
+    qoder: false,
     dryRun: false,
     workspaceOrphans: false,
     confirm: false,
@@ -139,6 +143,12 @@ function parseCleanArgs(argv) {
       parsed.claude = true;
     } else if (arg === '--codex') {
       parsed.codex = true;
+    } else if (arg === '--cursor') {
+      parsed.cursor = true;
+    } else if (arg === '--kiro') {
+      parsed.kiro = true;
+    } else if (arg === '--qoder') {
+      parsed.qoder = true;
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
     } else if (arg === '--workspace-orphans') {
@@ -159,8 +169,8 @@ function runWorkspaceOrphansClean(parsed) {
     return 2;
   }
 
-  if (parsed.claude || parsed.codex) {
-    console.error('Error: --workspace-orphans cannot be combined with --claude or --codex.');
+  if (parsed.claude || parsed.codex || parsed.cursor || parsed.kiro || parsed.qoder) {
+    console.error('Error: --workspace-orphans cannot be combined with host flags.');
     console.error('Workspace orphan cleanup is separate from runtime asset cleanup.');
     return 2;
   }
@@ -169,7 +179,7 @@ function runWorkspaceOrphansClean(parsed) {
   const quarantinePath = path.join(projectRoot, '.spec-first', 'workspace', 'parent-artifact-quarantine.json');
   if (!fs.existsSync(quarantinePath)) {
     console.error('No parent artifact quarantine found.');
-    console.error('Run `$spec-mcp-setup` from the parent workspace to generate workspace orphan evidence first.');
+    console.error('Run `spec-mcp-setup` from the parent workspace to generate workspace orphan evidence first.');
     return 1;
   }
 
@@ -180,7 +190,7 @@ function runWorkspaceOrphansClean(parsed) {
     console.error(
       `Could not read parent artifact quarantine. ${error instanceof Error ? error.message : String(error)}`,
     );
-    console.error('Rerun `$spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 
@@ -189,7 +199,7 @@ function runWorkspaceOrphansClean(parsed) {
     entries = validateWorkspaceOrphanQuarantine(payload);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
-    console.error('Rerun `$spec-mcp-setup` from the parent workspace to regenerate the artifact.');
+    console.error('Rerun `spec-mcp-setup` from the parent workspace to regenerate the artifact.');
     return 1;
   }
 
@@ -360,7 +370,7 @@ function printHelp() {
     '🧹 spec-first clean',
     '',
     '📘 Usage:',
-    '  spec-first clean (--claude|--codex) [--dry-run]',
+    '  spec-first clean (--claude|--codex|--cursor|--kiro|--qoder) [--dry-run]',
     '  spec-first clean --workspace-orphans [--confirm]',
     '',
     'Workspace orphan cleanup previews parent quarantine evidence by default; add --confirm to delete supported orphan paths.',
@@ -368,6 +378,15 @@ function printHelp() {
     '🔗 Repository:',
     '  https://github.com/sunrain520/spec-first',
   ].join('\n'));
+}
+
+function platformDisplayName(platform) {
+  if (platform === 'claude') return 'Claude Code';
+  if (platform === 'codex') return 'Codex';
+  if (platform === 'cursor') return 'Cursor';
+  if (platform === 'kiro') return 'Kiro';
+  if (platform === 'qoder') return 'Qoder';
+  return platform;
 }
 
 function buildCleanPlan(projectRoot, state, adapter) {

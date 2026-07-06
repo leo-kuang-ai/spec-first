@@ -5,7 +5,7 @@ updated: 2026-05-29
 status: done
 resolution: superseded-by-render-merge
 owner: engineering
-origin: 用户观察到 /spec:graph-bootstrap 在文件存在的情况下仍报"SKILL.md 不存在"，根因定位为 command shim 两跳架构的 path resolution 不稳定
+origin: 用户观察到 spec-graph-bootstrap 在文件存在的情况下仍报"SKILL.md 不存在"，根因定位为 command shim 两跳架构的 path resolution 不稳定
 scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .claude/spec-first/workflows/ 二跳架构，迁移为 .claude/skills/spec-*/SKILL.md native project skill 直调
 ---
 
@@ -39,9 +39,9 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 
 ### 0.3 未采纳的部分
 
-计划 §2.2 的「调用名从 `/spec:*`（colon namespace）统一为 `/spec-*`（hyphen）」**未执行**，且不再作为本计划的一部分推进：
+计划 §2.2 的「调用名从 `spec-*`（colon namespace）统一为 `/spec-*`（hyphen）」**未执行**，且不再作为本计划的一部分推进：
 
-- 当前 runtime 命令名仍为 `/spec:plan` 等 colon namespace 形式，自洽可用，不是 bug。
+- 当前 runtime 命令名仍为 `spec-plan` 等 colon namespace 形式，自洽可用，不是 bug。
 - 这是命名偏好 + breaking change（见 §7），与已解决的 P0 入口可靠性无关。
 - 如需推进命名统一，应作为独立小计划重新立项，不复用本文档基于「两跳架构」错误前提的 Step 3-14。
 
@@ -55,7 +55,7 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 
 ### 1.1 表现症状
 
-用户在正确执行 `spec-first init --claude` 之后，`.claude/spec-first/workflows/spec-graph-bootstrap/SKILL.md` 确实存在，但执行 `/spec:graph-bootstrap` 仍然被提示：
+用户在正确执行 `spec-first init --claude` 之后，`.claude/spec-first/workflows/spec-graph-bootstrap/SKILL.md` 确实存在，但执行 `spec-graph-bootstrap` 仍然被提示：
 
 > `.claude/spec-first/workflows/spec-graph-bootstrap/SKILL.md 文件不存在，请先执行 spec-first init --claude`
 
@@ -66,7 +66,7 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 当前 Claude 侧 workflow 入口是两跳架构：
 
 ```
-用户执行 /spec:graph-bootstrap
+用户执行 spec-graph-bootstrap
   → Claude 读 .claude/commands/spec/graph-bootstrap.md   ← 命令存在 ✓
   → 命令内容是 prose instruction：
     "read .claude/spec-first/workflows/spec-graph-bootstrap/SKILL.md"
@@ -92,7 +92,7 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 ## 2. 目标
 
 1. **消除两跳**：workflow skills 直接以 native project skill 形式安装，由 Claude Code runtime 确定性加载。
-2. **统一命名**：Claude 侧入口从 `/spec:*`（colon namespace）统一为 `/spec-*`（hyphen，native skill 调用形式）。
+2. **统一命名**：Claude 侧入口从 `spec-*`（colon namespace）统一为 `/spec-*`（hyphen，native skill 调用形式）。
 3. **清理遗留**：`clean --claude` 自动清理旧 `.claude/commands/spec/` 和 `.claude/spec-first/workflows/` 目录。
 4. **不破坏 Codex 侧**：Codex adapter 已是 `workflowsRoot === skillsRoot`，本次改动对 Codex 零影响。
 
@@ -102,7 +102,7 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 
 - 不修改 workflow skill 的内容和行为逻辑
 - 不修改 bootstrap 产物的生成逻辑
-- 不追改 `docs/plans/`、`docs/brainstorms/` 等历史文档中的 `/spec:*` 引用
+- 不追改 `docs/plans/`、`docs/brainstorms/` 等历史文档中的 `spec-*` 引用
 - 不改变 Codex 侧任何入口
 
 ---
@@ -112,7 +112,7 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 | 类别 | 数量 |
 |---|---|
 | SKILL.md `name` 字段更新 | 11 个 |
-| skills/ 内 `/spec:*` 引用替换 | 75 处 |
+| skills/ 内 `spec-*` 引用替换 | 75 处 |
 | 源码文件修改 | 7 个 |
 | 命令模板文件删除 | 12 个 |
 | 测试断言更新 | 35+ 处，23+ 个文件 |
@@ -149,50 +149,50 @@ scope: 把 Claude 侧 12 个 workflow 入口从 .claude/commands/spec/*.md + .cl
 
 ---
 
-### Step 2：skills/ 内 `/spec:*` 引用全局替换
+### Step 2：skills/ 内 `spec-*` 引用全局替换
 
 范围限定为 `skills/` 目录，不改 `docs/` 历史文档。
 
 **替换映射**：
 
 ```
-/spec:brainstorm      →  /spec-brainstorm
-/spec:ideate          →  /spec-ideate
-/spec:plan            →  /spec-plan
-/spec:work\b          →  /spec-work
-/spec:work-beta       →  /spec-work-beta
-/spec:debug           →  /spec-debug
-/spec:code-review          →  /spec-code-review
-/spec:compound\b      →  /spec-compound
-/spec:sessions        →  /spec-sessions
-/spec:update          →  /spec-update
-/spec:setup           →  /spec-setup  ← 仅在 Step 1 决定将 setup 改名为 spec-setup 时执行；若保留 /setup 则跳过此行
-/spec:mcp-setup       →  /spec-mcp-setup
-/spec:graph-bootstrap    →  /spec-graph-bootstrap
-/spec:compound-refresh  →  /spec-compound-refresh
+spec-brainstorm      →  /spec-brainstorm
+spec-ideate          →  /spec-ideate
+spec-plan            →  /spec-plan
+spec-work\b          →  /spec-work
+spec-work-beta       →  /spec-work-beta
+spec-debug           →  /spec-debug
+spec-code-review          →  /spec-code-review
+spec-compound\b      →  /spec-compound
+spec-sessions        →  /spec-sessions
+spec-update          →  /spec-update
+spec-setup           →  /spec-setup  ← 仅在 Step 1 决定将 setup 改名为 spec-setup 时执行；若保留 /setup 则跳过此行
+spec-mcp-setup       →  /spec-mcp-setup
+spec-graph-bootstrap    →  /spec-graph-bootstrap
+spec-compound-refresh  →  /spec-compound-refresh
 ```
 
 **重点文件**（引用最集中）：
 
 - `skills/using-spec-first/SKILL.md`（13 处，治理合同，必须改正确）
-- `skills/lfg/SKILL.md`（pipeline 串联 `/spec:plan` → `/spec:work` → `/spec:code-review`）
+- `skills/lfg/SKILL.md`（pipeline 串联 `spec-plan` → `spec-work` → `spec-code-review`）
 - `skills/spec-brainstorm/references/`（多处 handoff 引用）
-- `skills/git-worktree/SKILL.md`（引用 `/spec:code-review`、`/spec:work`）
-- `skills/spec-debug/SKILL.md`（引用 `/spec:brainstorm`、`/spec:compound`）
+- `skills/git-worktree/SKILL.md`（引用 `spec-code-review`、`spec-work`）
+- `skills/spec-debug/SKILL.md`（引用 `spec-brainstorm`、`spec-compound`）
 
 `using-spec-first` 还有两条治理语义需同步更新：
 
 ```markdown
 # 旧
-- Claude workflow entrypoints use `/spec:*`
-- Do **not** write Claude workflow entrypoints as `$spec-*`.
+- Claude workflow entrypoints use `spec-*`
+- Do **not** write Claude workflow entrypoints as `spec-*`.
 
 # 新
 - Claude workflow entrypoints use `/spec-*`（native project skill）
-- Do **not** write Claude workflow entrypoints as `$spec-*`.
+- Do **not** write Claude workflow entrypoints as `spec-*`.
 ```
 
-**验证**：`grep -r "/spec:" skills/` 输出为空。
+**验证**：`grep -r "spec-*" skills/` 输出为空。
 
 ---
 
@@ -338,7 +338,7 @@ Codex adapter 已有 `workflowsRoot === skillsRoot`，改动量极小：
 - 删除 `planCommandNamespacePrune()` 调用
 - 删除 dry-run preview 中 commands 部分的输出
 - 删除 managed state 写入中的 `commands` 字段
-- 更新 restart 提示中的命令名：`/spec:*` → `/spec-*`
+- 更新 restart 提示中的命令名：`spec-*` → `/spec-*`
 
 **验证**：`node bin/spec-first.js init --claude --dry-run` 输出无 commands 相关行；state.json 无 `commands` 字段。
 
@@ -458,7 +458,7 @@ templates/claude/commands/spec/work.md
 | `tests/unit/runtime-asset-integrity.test.js` | 移除 commands 目录存在性断言 |
 | `tests/unit/runtime-plan-contracts.test.js` | 移除 commandPlan 相关断言 |
 | `tests/unit/clean-dry-run.test.js` | 新增对遗留 commands/workflows dir 清理的断言 |
-| `tests/unit/skills-governance-contracts.test.js` | 更新命令名 `/spec:*` → `/spec-*` |
+| `tests/unit/skills-governance-contracts.test.js` | 更新命令名 `spec-*` → `/spec-*` |
 | `tests/unit/using-spec-first-runtime-contracts.test.js` | 更新所有命令名引用 |
 | `tests/unit/dual-host-governance-contracts.test.js` | 同上 |
 | `tests/unit/spec-sessions-contracts.test.js` | 更新命令名引用 |
@@ -470,33 +470,33 @@ templates/claude/commands/spec/work.md
 | `tests/smoke/cli.sh` | 移除 commands 目录生成验证，改为 skills 目录验证 |
 | `tests/smoke/release-dual-host-governance.sh` | 更新命令名引用 |
 
-> **执行前先获取完整列表**：`grep -rln '/spec:[a-z]' tests/` 获取实际受影响文件（至少 23 个，比原列表多 7+）。同时检查 `docs/10-prompt/` 目录——该目录存放 skills/ 的 prompt mirror 文件，与 skills/ 源文件要求 byte-equal 同步；Step 2 改动 skills/ 后，`docs/10-prompt/` 中对应的 mirror 文件也需同步替换 `/spec:*` 引用（`grep -rln '/spec:[a-z]' docs/10-prompt/` 可获取列表）。已知遗漏的文件包括：`feature-video-contracts.test.js`、`test-browser-contracts.test.js`、`lfg-contracts.test.js`、`lint-skill-entrypoints.test.js`、`spec-brainstorm-contracts.test.js`、`spec-compound-contracts.test.js`、`git-worktree-contracts.test.js`。
+> **执行前先获取完整列表**：`grep -rln 'spec-*[a-z]' tests/` 获取实际受影响文件（至少 23 个，比原列表多 7+）。同时检查 `docs/10-prompt/` 目录——该目录存放 skills/ 的 prompt mirror 文件，与 skills/ 源文件要求 byte-equal 同步；Step 2 改动 skills/ 后，`docs/10-prompt/` 中对应的 mirror 文件也需同步替换 `spec-*` 引用（`grep -rln 'spec-*[a-z]' docs/10-prompt/` 可获取列表）。已知遗漏的文件包括：`feature-video-contracts.test.js`、`test-browser-contracts.test.js`、`lfg-contracts.test.js`、`lint-skill-entrypoints.test.js`、`spec-brainstorm-contracts.test.js`、`spec-compound-contracts.test.js`、`git-worktree-contracts.test.js`。
 
 > **skills-governance-contracts.test.js 需完整重写**（不只是改名）：现有测试从 `manifest.commands.map(c => c.skill)` 推导 `workflowSkills`，Step 3b 后 `manifest.commands` 消失，测试需要改为验证 governance 记录的 `host_delivery.claude === 'skill'`。
 
-| `tests/unit/native-skill-entry-contracts.test.js` | **新增**：验证 11 个 SKILL.md `name` 字段符合 `spec-*` 格式；验证 `skills/` 内无残留 `/spec:*` 引用；验证 plugin.json 无 `commands` 字段 |
+| `tests/unit/native-skill-entry-contracts.test.js` | **新增**：验证 11 个 SKILL.md `name` 字段符合 `spec-*` 格式；验证 `skills/` 内无残留 `spec-*` 引用；验证 plugin.json 无 `commands` 字段 |
 
 ---
 
 ### Step 14：更新 CLAUDE.md
 
-更新范围：**不只是一行治理规则**，需审查全文所有 `/spec:*` 引用和命令模板路径引用。
+更新范围：**不只是一行治理规则**，需审查全文所有 `spec-*` 引用和命令模板路径引用。
 
 已知需更新的位置：
-1. 治理规则行：`Claude workflow 入口使用 /spec:*` → `/spec-*`
-2. 第 62 行资产结构说明：`入口命令 /spec:sessions` → `/spec-sessions`；`templates/claude/commands/spec/sessions.md` → 删除（文件已不存在）
-3. 全文搜索 `/spec:` 并逐一确认替换
+1. 治理规则行：`Claude workflow 入口使用 spec-*` → `/spec-*`
+2. 第 62 行资产结构说明：`入口命令 spec-sessions` → `/spec-sessions`；`templates/claude/commands/spec/sessions.md` → 删除（文件已不存在）
+3. 全文搜索 `spec-*` 并逐一确认替换
 
 ```markdown
 # 旧（治理规则）
-- Claude workflow 入口使用 `/spec:*`
+- Claude workflow 入口使用 `spec-*`
 
 # 新
 - Claude workflow 入口使用 `/spec-*`（native project skill 直调）
 - `.claude/commands/spec/` 已废弃，`spec-first clean --claude` 可清理旧残留
 ```
 
-**验证**：`grep "/spec:" CLAUDE.md` 无输出。
+**验证**：`grep "spec-*" CLAUDE.md` 无输出。
 
 ---
 
@@ -530,7 +530,7 @@ Step 1-2 可先合入验证命名行为，Step 3-14 建议单 PR 一次性完成
 
 | 变更 | 影响 | 缓解 |
 |---|---|---|
-| 调用名 `/spec:plan` → `/spec-plan` | 所有已使用命令的用户 | release notes 明确列出，CLAUDE.md 同步更新 |
+| 调用名 `spec-plan` → `/spec-plan` | 所有已使用命令的用户 | release notes 明确列出，CLAUDE.md 同步更新 |
 | state.json 移除 `commands` 字段 | 旧安装静默兼容 | readManagedState 忽略旧字段，不报错 |
 | `.claude/commands/spec/` 消失 | 旧安装在 clean 后清理 | clean 的 dry-run 预览会提前告知用户 |
 | `.claude/spec-first/workflows/` 消失 | 同上 | 同上 |
@@ -543,7 +543,7 @@ Step 1-2 可先合入验证命名行为，Step 3-14 建议单 PR 一次性完成
 2. `ls .claude/commands/` 目录不存在（或不含 `spec/` 子目录）。
 3. `ls .claude/spec-first/workflows/` 目录不存在。
 4. `ls .claude/skills/` 包含全部 15 个 `spec-*` skill 目录。
-5. `grep -r "/spec:" .claude/skills/` 无输出。
+5. `grep -r "spec-*" .claude/skills/` 无输出。
 6. `npm test` 全部通过。
 7. 旧安装（含 `commands` 字段的 state.json）执行 `spec-first doctor` 不报错，执行 `spec-first clean --claude` 正常清理遗留目录。
 

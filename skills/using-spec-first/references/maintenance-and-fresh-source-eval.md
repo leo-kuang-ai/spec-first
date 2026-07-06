@@ -30,7 +30,7 @@ Use `docs/contracts/workflows/fresh-source-eval-checklist.md` status values: `pa
 
 Re-review this skill when any of these change:
 
-- A public `/spec:*` or `$spec-*` workflow is added, renamed, retired, or changes entry semantics.
+- A public `spec-*` workflow is added, renamed, retired, or changes entry semantics.
 - A standalone skill becomes a public workflow, or a public workflow becomes internal/standalone.
 - Codex or Claude host dispatch authorization contracts change.
 - SessionStart/bootstrap behavior changes, especially if a host starts injecting different per-turn or post-compact context.
@@ -49,3 +49,12 @@ Minimum source-change evidence:
 - Fresh-source eval status or a concrete `not_run` reason for prose/behavior changes.
 
 Use output eval evidence for larger changes. For routing skills, compare `with-skill` against a baseline that has only the public workflow menu, not a baseline that lacks all workflow names.
+
+## Prose And Context-Tax Review Prompt
+
+When changing this skill, another skill description, or host bootstrap prose, use these questions as an LLM-owned review prompt, not as a deterministic gate:
+
+- Does the frontmatter description only decide trigger and exclusion, instead of explaining the full workflow?
+- Does `SKILL.md` keep only high-frequency runtime invariants, with low-frequency edge detail in `references/`?
+- Does host bootstrap keep only rules that must be present when the skill is not loaded?
+- Do eval fixtures cover false positives, false negatives, and lightweight requests that should stay direct?

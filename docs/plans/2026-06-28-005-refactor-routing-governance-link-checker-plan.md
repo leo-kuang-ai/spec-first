@@ -37,7 +37,7 @@ origin_grade: prd
 
 - R1. routing-red-flags.md 不得含反转 skill 名 `bug-report`，应为真实名 `report-bug`。Origin trace: R-05。
 - R2. sensitive surfaces 必须在 scope-guards.md 或红旗中有定义与举例，LLM 不得把架构/contract/governance/runtime-delivery/multi-file 改动判为"非 sensitive"绕过路由。Origin trace: R-06, AE-05。
-- R3. 红旗 route target 不得用裸名 `update`/`setup` 引发 `/spec:*` 命名混淆，应写 `spec-first update`/`/spec:mcp-setup`。Origin trace: R-07。
+- R3. 红旗 route target 不得用裸名 `update`/`setup` 引发 `spec-*` 命名混淆，应写 `spec-first update`/`spec-mcp-setup`。Origin trace: R-07。
 - R4. bootstrap 显式缺席集必须覆盖 `slack-research`/`skill-audit`/`app-consistency-audit`/`polish-beta`（当前仅断言 `sessions`/`release-notes`）。Origin trace: R-08。
 - R5. CURATED_CORE 必须从 `skills-governance.json` 派生，不得硬编码数组字面量。Origin trace: R-09。
 - R6. 两条 load-bearing 红旗（vague→brainstorm/plan、run-init-now→route first）必须在 bootstrap 内联或有 intentional deferral 测试。Origin trace: R-10。
@@ -80,7 +80,7 @@ origin_grade: prd
 
 - routing-red-flags.md 用 `report-bug`，contract test 守护无反转名回归。
 - sensitive surfaces 在 scope-guards.md 有定义与举例，fresh-source eval 确认 LLM 不会把架构改动判为非 sensitive。
-- 红旗 route target 用 `spec-first update`/`/spec:mcp-setup` 而非裸名。
+- 红旗 route target 用 `spec-first update`/`spec-mcp-setup` 而非裸名。
 - bootstrap 缺席集断言覆盖 6 项（sessions/release-notes + slack-research/skill-audit/app-consistency-audit/polish-beta）。
 - CURATED_CORE 从 skills-governance.json 派生，test 守护其不硬编码。
 - 两条 load-bearing 红旗在 bootstrap 内联或有 intentional deferral 测试。
@@ -252,7 +252,7 @@ flowchart TB
 
 ### U3. R-07 修正裸名 route target
 
-**Goal:** 红旗表 route target 用 `spec-first update`/`/spec:mcp-setup` 而非裸名 `update`/`setup`。
+**Goal:** 红旗表 route target 用 `spec-first update`/`spec-mcp-setup` 而非裸名 `update`/`setup`。
 
 **Requirements:** R3
 
@@ -263,12 +263,12 @@ flowchart TB
 - Modify/Test: `tests/unit/using-spec-first-contracts.test.js`
 
 **Approach:**
-- L13 "Route to `update` or `setup` first" 改为明确入口：`spec-first update`（终端）/`/spec:mcp-setup`（Claude workflow）。
+- L13 "Route to `update` or `setup` first" 改为明确入口：`spec-first update`（终端）/`spec-mcp-setup`（Claude workflow）。
 
-**Patterns to follow:** CLAUDE.md 入口锚点措辞（`setup/runtime→/spec:mcp-setup 或终端 spec-first update`）。
+**Patterns to follow:** CLAUDE.md 入口锚点措辞（`setup/runtime→spec-mcp-setup 或终端 spec-first update`）。
 
 **Test scenarios:**
-- Happy: 红旗含 `spec-first update` 和 `/spec:mcp-setup`，不含裸名 route target。
+- Happy: 红旗含 `spec-first update` 和 `spec-mcp-setup`，不含裸名 route target。
 - Error path: 裸 `update`/`setup` route target 回归被断言捕获。
 
 **Verification:** contract test 通过。
@@ -404,7 +404,7 @@ flowchart TB
 
 **Test scenarios:**
 - Happy: scanRoots 含 CLAUDE.md/AGENTS.md。
-- Edge: host 文档里的 `/spec:*`（Codex 侧）或 `$spec-*`（Claude 侧）错误语法被 lint 捕获。
+- Edge: host 文档里的 `spec-*`（Codex 侧）或 `spec-*`（Claude 侧）错误语法被 lint 捕获。
 - Integration: 现有 skills 扫描不回归。
 
 **Verification:** `npm run lint:skill-entrypoints`；`npx jest tests/unit/lint-skill-entrypoints.test.js` 通过。

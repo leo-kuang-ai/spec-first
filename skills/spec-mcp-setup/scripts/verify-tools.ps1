@@ -172,6 +172,9 @@ function Get-RuntimeStatePathForHost {
   switch ($HostName) {
     'codex' { return (Join-Path $TargetRoot '.codex/spec-first/state.json') }
     'claude' { return (Join-Path $TargetRoot '.claude/spec-first/state.json') }
+    'kiro' { return (Join-Path $TargetRoot '.kiro/spec-first/state.json') }
+    'qoder' { return (Join-Path $TargetRoot '.qoder/spec-first/state.json') }
+    'cursor' { return (Join-Path $TargetRoot '.cursor/spec-first/state.json') }
     default { return '' }
   }
 }
@@ -978,6 +981,29 @@ function Format-Remark {
   }
 }
 
+function Get-ProviderProbeStatus {
+  param([object]$Provider)
+  $serverReachable = [bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'server_reachable'))
+  $queryVerified = [bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'query_verified'))
+  $installed = [bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'installed'))
+  $configured = [bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'configured'))
+  $indexed = [bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'indexed'))
+  if ($serverReachable -and $queryVerified) { return 'verified' }
+  if ($serverReachable -or $queryVerified) { return 'partial' }
+  if ($installed -or $configured -or $indexed) { return 'not-verified' }
+  return 'not-run'
+}
+
+function Get-ProviderReadinessScope {
+  param([object]$Provider)
+  if ([bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'query_verified'))) { return 'query-verified' }
+  if ([bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'server_reachable'))) { return 'server-verified' }
+  if ([bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'indexed'))) { return 'index-ready' }
+  if ([bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'configured'))) { return 'configured' }
+  if ([bool](Get-NestedValue -InputObject $Provider -PathParts @('lifecycle', 'installed'))) { return 'installed' }
+  return 'not-run'
+}
+
 function Write-StatusBlock {
   param([object[]]$Sections)
 
@@ -1046,6 +1072,8 @@ $providerRows = @(
       (Format-Cell (Get-Field -InputObject $provider -Name 'kind' -Default 'generic')),
       (Format-Cell (Get-Field -InputObject $provider -Name 'profile' -Default 'minimal')),
       (Format-Cell (Get-Field -InputObject $provider -Name 'readiness_status' -Default 'unknown')),
+      (Format-Cell (Get-ProviderReadinessScope -Provider $provider)),
+      (Format-Cell (Get-ProviderProbeStatus -Provider $provider)),
       (Format-Cell (Get-NestedValue -InputObject $provider -PathParts @('lifecycle', 'installed'))),
       (Format-Cell (Get-NestedValue -InputObject $provider -PathParts @('lifecycle', 'configured'))),
       (Format-Cell (Get-NestedValue -InputObject $provider -PathParts @('lifecycle', 'indexed'))),
@@ -1111,7 +1139,7 @@ $sections = @(
   }
   [ordered]@{
     title = 'Provider tools'
-    headers = @('provider', 'kind', 'profile', 'readiness', 'installed', 'configured', 'indexed', 'server_reachable', 'query_verified', 'repo_aligned', 'fallback_reason', 'next_actions')
+    headers = @('provider', 'kind', 'profile', 'readiness', 'readiness_scope', 'probe_status', 'installed', 'configured', 'indexed', 'server_reachable', 'query_verified', 'repo_aligned', 'fallback_reason', 'next_actions')
     rows = $providerRows
   }
   [ordered]@{
@@ -1153,15 +1181,23 @@ Write-StatusBlock -Sections $sections
 switch ($combined.host) {
   'claude' {
     $hostDisplay = 'Claude Code'
-    $setupCommand = '/spec:mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
   'codex' {
     $hostDisplay = 'Codex'
-    $setupCommand = '$spec-mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
+  }
+  'kiro' {
+    $hostDisplay = 'Kiro'
+    $setupCommand = 'spec-mcp-setup'
+  }
+  'qoder' {
+    $hostDisplay = 'Qoder'
+    $setupCommand = 'spec-mcp-setup'
   }
   default {
     $hostDisplay = 'Claude Code / Codex'
-    $setupCommand = '/spec:mcp-setup or $spec-mcp-setup'
+    $setupCommand = 'spec-mcp-setup'
   }
 }
 

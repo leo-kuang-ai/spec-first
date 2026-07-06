@@ -22,7 +22,7 @@ superseded_by: docs/plans/2026-06-08-004-refactor-provider-native-runtime-setup-
 
 - `docs/plans/2026-06-08-004-refactor-provider-native-runtime-setup-plan.md` 已标记 `status: completed`。
 - `docs/01-需求分析/13.scale-integration/README.md` 已将 v1.16 Capability-aware 协同标记为已完成,并区分本方案为历史 lifecycle plan、`2026-06-08-004` 为当前 provider-native Runtime Setup 开发主方案。
-- `$spec-mcp-setup` 实测完成:baseline ready;CodeGraph first generation completed;Graphify first generation completed,并通过 code-only fallback 产出 project-root `graphify-out/graph.json`;Graphify hook verified。
+- `spec-mcp-setup` 实测完成:baseline ready;CodeGraph first generation completed;Graphify first generation completed,并通过 code-only fallback 产出 project-root `graphify-out/graph.json`;Graphify hook verified。
 - Focused verification 已通过:`npm run test:mcp-setup` 与 Runtime Setup/provider 相关 Jest contract tests。
 
 本方案中的 U7 provider uninstall 对称性、U8 alias migration、U9 physical source rename 均按原 B5/B6 决策保留为独立后续切片,不作为本方案未完成开发项继续挂 active。
@@ -46,12 +46,12 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 > - **B2 Graphify first-generation 可行性(已源码核实,2026-06-08)**:核实本地源码 `/Users/kuang/xiaobu/graphify`(`graphifyy` v0.8.35)结论——Graphify **有**可被 setup 非交互定向调用的生成命令:headless `graphify extract <path> --out <workspace>`(为 CI/scripts 设计;代码 AST 确定性、**no LLM**;语义聚类需 backend API key,可 `--no-cluster` 跳过),输出目录经 `--out` 或 `GRAPHIFY_OUT` env(支持绝对路径)定向。增量刷新 `graphify update <path>` 同样 no-LLM。`/graphify .` 是 AI-assistant skill 形态(LLM/vision 驱动,富媒体)。因此 U4 **不退化为纯 install-only**:setup 可在 opt-in gate 后用 `graphify extract --out <requirement-workspace>` 代跑确定性代码图谱首次生成(workspace resolver 解析目标,无法解析即 skip 不退回 repo-root);富媒体/语义层留用户在 AI assistant `/graphify .`。仍须保守的两点:(a) 语义聚类依赖 backend API key,setup 环境可能无,故默认 `--no-cluster` 或纯 `update` 路径;(b) provider-tools.json `version_pin` 保持 pinned 策略,已用 `pip index versions graphifyy` 实测 PyPI 当前发布版本为 `0.8.35`。
 > - **B3 §5.1 准入门槛回溯决策(已收敛)**:CodeGraph(新 first-gen `codegraph init`+global-npx+pre-1.0)与 Graphify(新 first-gen+name-bin-mismatch+single-maintainer+global-uv)按 §5.1「边际成本陡升不进 recommended」规则不进 baseline；source 已降为 `profile: optional` 并保留 explicit opt-in gate(CodeGraph `opt_in.explicit_consent_required`,Graphify consent/install gate)。`optional` 是 provider profile 姿态,不是 team/user overlay。
 > - **B4 砍 team/user overlay**:source 中 `team`/`user`/`overlay` 零消费者；本批只保留 registry 实用 profile `minimal` / `optional` / `recommended` / `platform`。**本批砍 team/user overlay**,team/user 降为目标文档一句「未来 policy 输入方向」备注,不进 U3 schema/loader/test。
-> - **B5 命名迁移 defer**:U8(alias,13 文件+governance schema 改 `command_aliases`)/U9(physical rename)是纯改名、0 功能收益、自引 split-brain 风险,核心价值(lifecycle 边界)不依赖它。**U8/U9 整体 defer 为独立 cosmetic 切片**;本批文档统一用「Runtime Setup(入口仍 `/spec:mcp-setup`)」口径,不动 governance schema。
+> - **B5 命名迁移 defer**:U8(alias,13 文件+governance schema 改 `command_aliases`)/U9(physical rename)是纯改名、0 功能收益、自引 split-brain 风险,核心价值(lifecycle 边界)不依赖它。**U8/U9 整体 defer 为独立 cosmetic 切片**;本批文档统一用「Runtime Setup(入口仍 `spec-mcp-setup`)」口径,不动 governance schema。
 > - **B6 切片重排**:depth 已改 large。本批最小可交付 = U0(文档自洽,含 B3 决策/B4 砍 overlay)+ U1(skill contract 文案)+ U4(first-generation execution + workspace resolver,唯一真有写盘安全风险)+ provider_readiness 字段扩展(替代 U5 双产物)。U2 降到「`--only` 安装前确认摘要 + workspace resolver」(`--plan`/`--verify-only` 当前不存在,完整三态 UX/TTY checkbox/`--profile team` 全 defer);U3 砍 overlay 保留 additive 字段;U6 下游文案微调可搭车;U7 uninstall 对称性 defer;U8/U9 defer。
 
-> 2026-06-08 目标修正（用户确认）：Runtime Setup 的目标进一步收敛为“裸 `$spec-mcp-setup` 先引导确认，然后安装初始化到后续节点可用，并尽最大努力保持可用”。这修正本计划早先“Graphify hook 默认不启用/未来另接”的表述：Graphify SKILL/MCP 仍不默认安装，但项目级 `graphify hook install` 属于确认后的 provider pack auto-refresh setup 目标；`hook_default=false` 若保留在机械字段中，只表示不做 silent/baseline hook install，不表示用户确认后仍不装 hook。落地实现若尚未能安装或验证 hook，必须输出 action-required facts，并允许 LLM 在 `$spec-mcp-setup` 流程内做有界修复或给明确 next action。
+> 2026-06-08 目标修正（用户确认）：Runtime Setup 的目标进一步收敛为“裸 `spec-mcp-setup` 先引导确认，然后安装初始化到后续节点可用，并尽最大努力保持可用”。这修正本计划早先“Graphify hook 默认不启用/未来另接”的表述：Graphify SKILL/MCP 仍不默认安装，但项目级 `graphify hook install` 属于确认后的 provider pack auto-refresh setup 目标；`hook_default=false` 若保留在机械字段中，只表示不做 silent/baseline hook install，不表示用户确认后仍不装 hook。落地实现若尚未能安装或验证 hook，必须输出 action-required facts，并允许 LLM 在 `spec-mcp-setup` 流程内做有界修复或给明确 next action。
 
-本计划同时处理命名迁移：`/spec:runtime-setup` / `$spec-runtime-setup` 是目标规范入口，`/spec:mcp-setup` / `$spec-mcp-setup` 是兼容入口。第一阶段先建立公共兼容入口和文档口径，不在同一切片强行物理重命名 `skills/spec-mcp-setup/**`，避免 source/runtime/test 大搬迁遮蔽生命周期边界调整。
+本计划同时处理命名迁移：`spec-runtime-setup` 是目标规范入口，`spec-mcp-setup` 是兼容入口。第一阶段先建立公共兼容入口和文档口径，不在同一切片强行物理重命名 `skills/spec-mcp-setup/**`，避免 source/runtime/test 大搬迁遮蔽生命周期边界调整。
 
 > 注:按上方 B5/B6 收敛,命名迁移(U8/U9)已从本批移出为独立 defer 切片;本段描述的迁移意图保留为方向记录,实际 alias delivery 不在本批执行。
 
@@ -59,8 +59,8 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 
 当前 source 已经出现三种状态并存：
 
-- `skills/spec-mcp-setup/SKILL.md` 标题是 `Runtime Setup`，并说明目标用户入口是 `/spec:runtime-setup` / `$spec-runtime-setup`。
-- README、runtime catalog 和命令模板仍使用 `/spec:mcp-setup` / `$spec-mcp-setup`。
+- `skills/spec-mcp-setup/SKILL.md` 标题是 `Runtime Setup`，并说明目标用户入口是 `spec-runtime-setup`。
+- README、runtime catalog 和命令模板仍使用 `spec-mcp-setup`。
 - v1.16 引入 CodeGraph / Graphify 后，setup 的 provider 生命周期边界仍未统一成“first generation 属 setup，steady-state 属 provider”的模型。
 
 需要修正的核心误区：
@@ -74,8 +74,8 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 
 - `docs/01-需求分析/13.scale-integration/Runtime-Setup目标.md`：本计划的指导方向。
 - `skills/spec-mcp-setup/SKILL.md`：当前 runnable entrypoint 是 `spec-mcp-setup`，目标名是 `spec-runtime-setup`。
-- `templates/claude/commands/spec/mcp-setup.md`：Claude command template 仍是 legacy `/spec:mcp-setup` 兼容入口。
-- `README.md` / `README.zh-CN.md`：公共入口表仍列 `/spec:mcp-setup` / `$spec-mcp-setup`。
+- `templates/claude/commands/spec/mcp-setup.md`：Claude command template 仍是 legacy `spec-mcp-setup` 兼容入口。
+- `README.md` / `README.zh-CN.md`：公共入口表仍列 `spec-mcp-setup`。
 - `docs/catalog/runtime-capabilities.md`：catalog 仍登记 `mcp-setup`。
 - `docs/01-需求分析/13.scale-integration/CodeGraph技术方案.md`：CodeGraph / Graphify 是 capability tools，消费侧 capability-aware，输出 advisory 且必须回源。
 - `docs/contracts/provider-readiness.md`：`readiness_status` 是进入 setup 决策健康判断的 provider readiness 字段，lifecycle 只是展示/解释位。
@@ -83,7 +83,7 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 ## 目标
 
 - 把 `spec-mcp-setup` 的语义升级为 Runtime Setup：安装、配置、provider-native 首次初始化/首次生成、readiness probe、工具说明输出。
-- 提供 `/spec:runtime-setup` / `$spec-runtime-setup` 规范公共入口，并保留旧 `/spec:mcp-setup` / `$spec-mcp-setup` 兼容入口。
+- 提供 `spec-runtime-setup` 规范公共入口，并保留旧 `spec-mcp-setup` 兼容入口。
 - 明确三类生命周期：
   - setup-owned：安装、配置、provider bootstrap / first generation、readiness facts、runtime tooling manifest / summary。
   - provider-owned：watcher、hook、refresh、MCP/CLI query surface、内部 cache/index/artifact。
@@ -99,7 +99,7 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 - 不 silent 运行 first generation；optional provider 必须显式 opt-in / gate。
 - 不让 LLM 根据当前任务静默安装 optional provider。
 - 不在 `Plan / Preview` 阶段安装、配置或执行 first generation。
-- 不 silent/baseline 安装 Graphify post-commit hook；项目级 `graphify hook install` 已纳入裸 `$spec-mcp-setup` guided confirmation 后的 provider pack 目标。
+- 不 silent/baseline 安装 Graphify post-commit hook；项目级 `graphify hook install` 已纳入裸 `spec-mcp-setup` guided confirmation 后的 provider pack 目标。
 - 不把 Graphify 产物自动写入 `docs/` 或 promotion 为长期 source truth。
 - 不建立 CodeGraph -> Graphify pipeline。
 - 不新增 provider adapter / fusion summary。
@@ -115,8 +115,8 @@ Provider 原生能力 = 后续刷新 + 查询 + 使用接口 + 内部缓存/产�
 用户
   |
   v
-/spec:runtime-setup or $spec-runtime-setup
-兼容入口: /spec:mcp-setup or $spec-mcp-setup
+spec-runtime-setup
+兼容入口: spec-mcp-setup
   |
   v
 解析 host + target repo + workspace scope
@@ -412,7 +412,7 @@ Graphify 自己负责：
 - `graphify-out/` contents;
 - MCP/CLI query/path/explain surface;
 - `GRAPH_REPORT.md` / `graph.json` internal format;
-- post-commit/post-checkout hook behavior after `$spec-mcp-setup` installs the project hook;
+- post-commit/post-checkout hook behavior after `spec-mcp-setup` installs the project hook;
 - CLI/MCP/hook refresh/use surface；hook 在 guided confirmation 后作为 project-level auto-refresh setup 启用，refresh 是 provider-native hook/on-demand 语义。
 
 Runtime Setup 不得在下游 workflow 运行期自动运行 `graphify .`、自动阅读全文、自动 check-in artifact，或自动把 project graph promotion 到长期文档。Runtime Setup 可以在显式 setup/init 阶段运行 Graphify 原生 first generation；这不是 steady-state refresh，也不是 workflow-owned generation。
@@ -449,14 +449,14 @@ fresh|stale|degraded|not-run|unknown
 
 ### 9. 命名迁移
 
-> **本批 defer（按 B5）**：命名迁移（U8 alias + U9 physical rename）已整体移出本批，作为独立 cosmetic 切片——纯改名、0 功能收益、自引 split-brain 风险，核心 lifecycle 价值不依赖它。本批文档统一用「Runtime Setup（入口仍 `/spec:mcp-setup`）」口径，不动 governance schema。以下两阶段描述保留为该未来切片的方向参考，不在本批执行。
+> **本批 defer（按 B5）**：命名迁移（U8 alias + U9 physical rename）已整体移出本批，作为独立 cosmetic 切片——纯改名、0 功能收益、自引 split-brain 风险，核心 lifecycle 价值不依赖它。本批文档统一用「Runtime Setup（入口仍 `spec-mcp-setup`）」口径，不动 governance schema。以下两阶段描述保留为该未来切片的方向参考，不在本批执行。
 
 采用两阶段迁移。
 
 阶段 A：公共规范入口与兼容入口。
 
-- 增加 `/spec:runtime-setup` 和 `$spec-runtime-setup` 作为公共规范入口。
-- 保留 `/spec:mcp-setup` 和 `$spec-mcp-setup` 作为 deprecated 兼容入口。
+- 增加 `spec-runtime-setup` 和 `spec-runtime-setup` 作为公共规范入口。
+- 保留 `spec-mcp-setup` 和 `spec-mcp-setup` 作为 deprecated 兼容入口。
 - 当前 governance/manifest 是一个 `skill_name` 对一个 `command_name` 的精确匹配模型，不能仅在 README 中写新入口。阶段 A 必须先选择并实现一种 alias delivery 机制：
   - 首选：扩展 governance/manifest/source generator 支持 `command_aliases:["runtime-setup"]`，由同一 `skills/spec-mcp-setup/SKILL.md` 渲染两个公共入口；
   - 备选：新增受控 alias stub，只做入口转发/说明，不复制 runtime setup 逻辑。
@@ -702,7 +702,7 @@ fresh|stale|degraded|not-run|unknown
 
 - 增加规范 Runtime Setup 入口口径，同时保留 legacy aliases。
 - 在现有一 skill 对一 command 限制下，先实现 alias delivery 机制：优先 `command_aliases` schema/generator/manifest 支持；若选择 alias stub，必须写明 stub source、projection 和去重测试。
-- 增加或登记 `/spec:runtime-setup` 和 `$spec-runtime-setup` delivery，不在同一步删除 legacy `mcp-setup`。
+- 增加或登记 `spec-runtime-setup` 和 `spec-runtime-setup` delivery，不在同一步删除 legacy `mcp-setup`。
 - 更新 routing guidance，优先推荐 Runtime Setup，并把 legacy aliases 标为兼容入口。
 
 验证：

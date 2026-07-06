@@ -14,7 +14,7 @@
 
 但当前 skill 的主要问题是：它已经定义了 task pack 的结构，却还没有充分定义**什么是高质量 task**。
 
-因此，本次优化不应重写工作流，也不应新增 `/spec:write-tasks` 这样的 command-backed workflow，而应聚焦三件事：
+因此，本次优化不应重写工作流，也不应新增 `spec-write-tasks` 这样的 command-backed workflow，而应聚焦三件事：
 
 1. 在 `SKILL.md` 中补强 task 生成流程：先判断 plan 是否 task-ready，再按稳定算法编译 task，最后做质量自检。
 2. 在 schema 参考中补强 task card 字段质量标准，而不是只列字段名。
@@ -78,11 +78,11 @@
 - 让每个 task 都能追踪回 plan 中的 requirement、implementation unit、acceptance ref 或来源章节。
 - 让每个 task 都有明确的文件边界、测试焦点、完成信号和停止信号。
 - 让 task pack 保持派生性，不新增 plan 未声明的范围、验收标准或技术决策。
-- 保留小任务直接进入 `/spec:work` 的轻路径。
+- 保留小任务直接进入 `spec-work` 的轻路径。
 
 ### 3.2 明确不做
 
-- 不新增 `/spec:write-tasks` command-backed workflow。
+- 不新增 `spec-write-tasks` command-backed workflow。
 - 不把 `spec-write-tasks` 变成 mandatory stage。
 - 不把 task pack 变成进度数据库。
 - 不让脚本判断 task 拆得是否合理。
@@ -460,7 +460,7 @@ A task is high quality when an executor can:
   done_signal: `spec-work` 文档明确 task pack 优先消费规则，并保留 plan fallback
   parallelizable: false
   risk_note: 如果把 task pack 写成唯一入口，会破坏小任务直达路径
-  stop_if: 需要新增 `/spec:write-tasks` 命令或移除 plan direct-to-work 路径
+  stop_if: 需要新增 `spec-write-tasks` 命令或移除 plan direct-to-work 路径
   wave: 2
 ```
 
@@ -503,7 +503,7 @@ A task is high quality when an executor can:
 当前默认 prompt：
 
 ```yaml
-default_prompt: "Use the spec-write-tasks standalone skill to split a settled plan into a derived task pack for $spec-work."
+default_prompt: "Use the spec-write-tasks standalone skill to split a settled plan into a derived task pack for spec-work."
 ```
 
 建议改为：
@@ -512,7 +512,7 @@ default_prompt: "Use the spec-write-tasks standalone skill to split a settled pl
 interface:
   display_name: "Write Tasks"
   short_description: "Compile settled plans into optional derived task packs for spec-work."
-  default_prompt: "Use the spec-write-tasks standalone skill to split a settled plan into a derived task pack for /spec:work when the plan is large, dependency-heavy, or benefits from explicit execution waves."
+  default_prompt: "Use the spec-write-tasks standalone skill to split a settled plan into a derived task pack for spec-work when the plan is large, dependency-heavy, or benefits from explicit execution waves."
 
 policy:
   allow_implicit_invocation: true
@@ -520,8 +520,8 @@ policy:
 
 理由：
 
-- `$spec-work` 容易被误解为变量或旧式入口。
-- Claude workflow 入口应是 `/spec:work`。
+- `spec-work` 容易被误解为变量或旧式入口。
+- Claude workflow 入口应是 `spec-work`。
 - `spec-write-tasks` 是 standalone skill，不是 command-backed workflow。
 - 默认 prompt 应强调 optional、large plan、dependency-heavy、execution waves，而不是暗示所有 plan 都要拆 tasks。
 
@@ -578,7 +578,7 @@ policy:
 - 明确 compilation algorithm。
 - 明确 quality pass。
 - 明确字段质量标准。
-- 修正 `$spec-work` 口径。
+- 修正 `spec-work` 口径。
 
 ### P2：生成质量验证
 
@@ -650,7 +650,7 @@ npm run test:unit
 1. 在 `SKILL.md` 增加 `Task-ready Check`、`Compilation Algorithm`、`Quality Pass Before Output`。
 2. 在 `task-pack-schema.md` 增加 `Traceability Matrix`、字段质量标准和粒度指南入口。
 3. 新增 `task-quality-guide.md`，承载详细质量规则、坏味道和好坏示例。
-4. 修改 `agents/openai.yaml`，把 `$spec-work` 改成 `/spec:work`，并强调 large / dependency-heavy / execution waves 触发条件。
+4. 修改 `agents/openai.yaml`，把 `spec-work` 改成 `spec-work`，并强调 large / dependency-heavy / execution waves 触发条件。
 5. 用一个真实大 plan 试生成 task pack，人工 review task pack 是否降低上下文、保持派生性、覆盖 requirements、具备可验证 done signals。
 
 这条路线能在不改变主链路、不新增强状态、不扩展执行器职责的前提下，显著提升 `spec-write-tasks` 创建 task 的质量。

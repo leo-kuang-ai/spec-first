@@ -13,7 +13,7 @@ Canonical taxonomy for adjacent audit/review/research assets: **Action parity**,
 
 ## Invocation Boundary
 
-`agent-native-architecture` is an internal architecture reference/helper, not a public `$spec-*` or `/spec:*` workflow. Upstream workflows may read it as bounded context; do not imply a standalone public command.
+`agent-native-architecture` is an internal architecture reference/helper, not a public `spec-*` workflow. Upstream workflows may read it as bounded context; do not imply a standalone public command.
 
 ## When To Use
 

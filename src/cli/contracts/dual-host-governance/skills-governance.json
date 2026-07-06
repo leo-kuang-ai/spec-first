@@ -10,7 +10,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -21,7 +24,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -32,7 +38,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -43,7 +52,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -54,7 +66,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -65,7 +80,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -76,7 +94,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -87,7 +108,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -98,7 +122,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -109,7 +136,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -120,7 +150,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -131,7 +164,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -142,7 +178,24 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
+      }
+    },
+    {
+      "skill_name": "spec-rule-miner",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     },
     {
@@ -153,7 +206,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -164,7 +220,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -175,7 +234,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -186,7 +248,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -197,7 +262,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -208,7 +276,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -219,7 +290,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -230,7 +304,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -241,7 +318,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -252,7 +332,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -263,7 +346,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -274,7 +360,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -285,7 +374,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -296,7 +388,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -307,7 +402,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -318,7 +416,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -329,7 +430,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -340,7 +444,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -351,7 +458,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -362,7 +472,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "command",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {
@@ -373,7 +486,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "skill",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     },
     {
@@ -384,7 +500,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -395,7 +514,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "internal",
-        "codex": "internal"
+        "codex": "internal",
+        "cursor": "internal",
+        "kiro": "internal",
+        "qoder": "internal"
       }
     },
     {
@@ -406,7 +528,10 @@
       "owner_host": null,
       "host_delivery": {
         "claude": "skill",
-        "codex": "skill"
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     }
   ]

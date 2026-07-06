@@ -12,7 +12,7 @@ supersedes:
 
 ## 方案审查结论
 
-当前方案方向正确：应把 `spec-setup` 剩余职责合入 `spec-mcp-setup`，并 hard-cut 删除 `/spec:setup` / `$spec-setup`。继续保留两个 setup 入口会制造用户入口分裂、治理真相源分裂和运行时资产维护成本。
+当前方案方向正确：应把 `spec-setup` 剩余职责合入 `spec-mcp-setup`，并 hard-cut 删除 `spec-setup` / `spec-setup`。继续保留两个 setup 入口会制造用户入口分裂、治理真相源分裂和运行时资产维护成本。
 
 但合并必须坚持分层 contract，不能把 project-local setup 与 required harness runtime 混成一个 readiness 语义：
 
@@ -54,7 +54,7 @@ spec-mcp-setup
 - `templates/claude/commands/spec/setup.md`
 - `.claude-plugin/plugin.json` 中的 `setup` command 和 `spec-setup` skill
 - `src/cli/contracts/dual-host-governance/skills-governance.json` 中的 `spec-setup`
-- `skills/using-spec-first/SKILL.md` 中的 `/spec:setup` / `$spec-setup` 路由
+- `skills/using-spec-first/SKILL.md` 中的 `spec-setup` / `spec-setup` 路由
 
 CE 源头 `ce-setup` 只有三个资产：`SKILL.md`、`scripts/check-health`、`references/config-template.yaml`。当前 `spec-setup` 基本是 CE setup 改名后剥离 `agent-browser` 的结果；剩余价值集中在 project-local bootstrap、recommended tools/skills 和 legacy cleanup。
 
@@ -64,12 +64,12 @@ CE 源头 `ce-setup` 只有三个资产：`SKILL.md`、`scripts/check-health`、
 2. 删除独立 `spec-setup` skill、Claude command template、manifest entry 和 governance entry。
 3. 将 `spec-setup` 剩余能力合入 `spec-mcp-setup` 的 Project Preflight 层。
 4. 保持 Required Harness Runtime 层的 `baseline_ready` 语义不被污染。
-5. 所有活跃用户文档和 runtime-facing 文本不再暴露 `/spec:setup` / `$spec-setup`。
+5. 所有活跃用户文档和 runtime-facing 文本不再暴露 `spec-setup` / `spec-setup`。
 6. tests 覆盖推荐工具、project config bootstrap、旧入口删除和 readiness 边界。
 
 ## 非目标
 
-- 不保留 `/spec:setup` / `$spec-setup` 兼容壳。
+- 不保留 `spec-setup` / `spec-setup` 兼容壳。
 - 不把 recommended tools 放进 `skills/spec-mcp-setup/mcp-tools.json`。
 - 不让 recommended tools、recommended skills 或 local config 缺失影响 `baseline_ready`。
 - 不自动读取 `.compound-engineering/config.local.yaml` 作为 spec-first 配置。
@@ -80,7 +80,7 @@ CE 源头 `ce-setup` 只有三个资产：`SKILL.md`、`scripts/check-health`、
 
 | ID | 需求 | 来源 |
 |---|---|---|
-| R1 | 单一 setup 入口为 `/spec:mcp-setup` / `$spec-mcp-setup` | 用户要求和既有 hard-cut plan |
+| R1 | 单一 setup 入口为 `spec-mcp-setup` / `spec-mcp-setup` | 用户要求和既有 hard-cut plan |
 | R2 | CE setup 的 project config bootstrap 不丢失 | CE `ce-setup` 与当前 `spec-setup` |
 | R3 | legacy CE residue 有迁移/清理提示 | CE `ce-setup` 与当前 `check-health` |
 | R4 | recommended developer tools 保留检测与安装建议 | CE `ce-setup` / `spec-setup` |
@@ -108,7 +108,7 @@ CE 源头 `ce-setup` 只有三个资产：`SKILL.md`、`scripts/check-health`、
 - `.spec-first/config.local.example.yaml` refresh 说明
 - `.spec-first/config.local.yaml` create-once 说明
 - `.spec-first/*.local.yaml` `.gitignore` 说明
-- `/spec:setup` / `$spec-setup` runtime surface
+- `spec-setup` / `spec-setup` runtime surface
 
 ### 当前 spec-mcp-setup 已检测但缺少完整执行闭环
 
@@ -322,7 +322,7 @@ write-provider-config.*
 - `spec-setup` skill 从 bundled skill list 删除。
 - governance 不再声明 `spec-setup`。
 - routing 中“installed spec-first environment diagnosis” 改指向 `mcp-setup`。
-- active docs 不再推荐 `/spec:setup` / `$spec-setup`。
+- active docs 不再推荐 `spec-setup` / `spec-setup`。
 
 测试：
 
@@ -366,8 +366,8 @@ write-provider-config.*
 
 记录 user-visible breaking change：
 
-- `/spec:setup` / `$spec-setup` 已移除。
-- setup 能力合并到 `/spec:mcp-setup` / `$spec-mcp-setup`。
+- `spec-setup` / `spec-setup` 已移除。
+- setup 能力合并到 `spec-mcp-setup` / `spec-mcp-setup`。
 - project-local config bootstrap、legacy cleanup 和 recommended helper 检查由 `spec-mcp-setup` 承接。
 
 ## 文件清单
@@ -459,7 +459,7 @@ npm test
 实施完成后运行：
 
 ```bash
-rg -n "/spec:setup|\\$spec-setup|skills/spec-setup|templates/claude/commands/spec/setup|spec-setup" \
+rg -n "spec-setup|\\spec-setup|skills/spec-setup|templates/claude/commands/spec/setup|spec-setup" \
   README.md README.zh-CN.md AGENTS.md CLAUDE.md skills src templates tests .claude-plugin
 ```
 
@@ -506,7 +506,7 @@ rg -n "/spec:setup|\\$spec-setup|skills/spec-setup|templates/claude/commands/spe
 - `templates/claude/commands/spec/setup.md` 不存在。
 - `.claude-plugin/plugin.json` 不含 `setup` command 或 `spec-setup` skill。
 - `skills-governance.json` 不含 `spec-setup`。
-- `using-spec-first` 不再路由到 `/spec:setup` / `$spec-setup`。
+- `using-spec-first` 不再路由到 `spec-setup` / `spec-setup`。
 - `spec-mcp-setup` 明确拥有 project preflight，但 `baseline_ready` 仍只代表 required harness runtime。
 - `ast-grep` 只作为 recommended helper/skill 出现在 preflight，不进入 MCP registry。
 - `mcp-tools.json` 只包含 MCP servers 和 graph-provider MCP servers。

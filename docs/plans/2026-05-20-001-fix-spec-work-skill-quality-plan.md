@@ -567,7 +567,7 @@ Phase B 预期 risk；本 plan 不执行 U3。
   - U2 + U7 合并为 U8
   - U1 → U1-revised（保留 + 改 source_note）
 
-**Doc-review iteration**（本 plan 经 `/spec:doc-review` 一次收敛 + 两轮 deepening 修订）：
+**Doc-review iteration**（本 plan 经 `spec-doc-review` 一次收敛 + 两轮 deepening 修订）：
 
 - 第一轮（2026-05-22 doc-review）：spec-feasibility / spec-adversarial-document / spec-product-lens 三 reviewer 收敛到 Phase A/B
 - 第二轮（2026-05-24 自我 deepening 深读最新 source）：基于 4 个新发现修订 scope，从 Phase A 4 unit 改为 fix-1 / fix-2 两段结构；本次重写吸收第二轮全部结论
@@ -598,7 +598,7 @@ Phase B 预期 risk；本 plan 不执行 U3。
 
 ### fix-1 ship-now handoff
 
-1. **work**：使用当前 host 的 work entrypoint 执行 fix-1 单 unit（U4）；Codex 入口是 `$spec-work`；Claude 兼容入口是 `/spec:work`
+1. **work**：使用当前 host 的 work entrypoint 执行 fix-1 单 unit（U4）；Codex 入口是 `spec-work`；Claude 兼容入口是 `spec-work`
 2. **commit**：独立 commit `fix(spec-work): renumber Phase 2 Track Progress step from 6 to 7` 并入当前 leo-2026-05-21-gitnexus 分支
 3. **CHANGELOG**：同步追加 fix-1 条目（按 developer profile `leokuang` + zh）
 4. **双宿主 runtime regenerate**：`spec-first init --claude` + `spec-first init --codex` + `spec-first doctor --claude` + `spec-first doctor --codex`
@@ -607,7 +607,7 @@ Phase B 预期 risk；本 plan 不执行 U3。
 
 1. **trigger**：当前 leo-2026-05-21-gitnexus 分支合并到 master 后启动；若被推迟 > 2 周，重新评估是否打破 deferral
 2. **work**：使用当前 host 的 work entrypoint 执行 fix-2 两 unit（U8 + U1-revised）
-3. **review (advisory)**：fix-2 完成后用当前 host 的 code-review entrypoint 做修复 diff review（可选；Codex 为 `$spec-code-review`，Claude 为 `/spec:code-review`）
+3. **review (advisory)**：fix-2 完成后用当前 host 的 code-review entrypoint 做修复 diff review（可选；Codex 为 `spec-code-review`，Claude 为 `spec-code-review`）
 4. **fresh review (advisory follow-up)**：跑新版 `审查skill.md`（含 Step 1.5）对修复后 spec-work 做 fresh review；**评分作为修复方向诊断信号，不作为 merge 条件**
 5. **batch review 启动决策**：fix-2 完成 closeout 阶段评估是否启动 batch review（spec-plan / spec-debug / spec-code-review / spec-write-tasks / spec-compound）
 

@@ -43,7 +43,7 @@ origin: docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报�
 ## 需求
 
 - R1. `spec-plan` 必须继续表达 `spec-brainstorm` 定义 WHAT、`spec-plan` 定义 HOW、`spec-work` 执行的主链路边界。
-- R2. 直接调用 `$spec-plan` 时仍必须进入 planning workflow；输入不清时用 clarification/bootstrap，而不是退出或自动改走其他 workflow。
+- R2. 直接调用 `spec-plan` 时仍必须进入 planning workflow；输入不清时用 clarification/bootstrap，而不是退出或自动改走其他 workflow。
 - R3. 计划阶段不得实现代码、运行实现验证、改生成态 runtime mirror、生成 task pack 或进入 `spec-work`；handoff 前只能写计划 artifact 和必要 docs/changelog。
 - R4. `SKILL.md` 热路径必须保留 trigger、non-trigger、inputs、outputs、artifacts、failure modes、workflow skeleton、downstream consumers、plan-only safety、reference routing 和 handoff 边界。
 - R5. 长细节应下沉到现有 references，或在确有 ownership 分离时新增最多 1 个清晰 reference；不得为了瘦身制造 reference sprawl。
@@ -150,7 +150,7 @@ origin: docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报�
   - `src/cli/contracts/dual-host-governance/skills-governance.json` 将 `spec-plan` 标为 `entry_surface: workflow_command`、`command_name: plan`、`host_scope: dual_host`、`host_delivery.claude: command`、`host_delivery.codex: skill`。
   - `src/cli/contracts/dual-host-governance/skills-governance.schema.json` 使用 `additionalProperties: false`，且只允许 delivery/topology metadata，不允许 owner/cadence/maturity 字段。
   - `templates/claude/commands/spec/plan.md` 说明 Claude command 行为由 `skills/spec-plan/SKILL.md` 渲染产生。
-  - `docs/catalog/runtime-capabilities.md` 将 `/spec:plan` 和 `$spec-plan` 列为公开 planning workflow 入口。
+  - `docs/catalog/runtime-capabilities.md` 将 `spec-plan` 和 `spec-plan` 列为公开 planning workflow 入口。
   - `spec-first internal task-governance-signals` 返回 `candidate_level: deep`、`risk_domains: contract, runtime, workflow`，以及 `cross-module`、`critical-path-hit`、`candidate-deep` reason codes。
 - source_reads_required:
   - 实现前立即重读所有 `skills/spec-plan/**` 文件，因为 prompt prose 可能在本计划之后已经变化。
@@ -172,7 +172,7 @@ origin: docs/项目审查/详细审查/skill/Skill-25-spec-plan-详细审查报�
   - 当前 eval 覆盖偏结构性，对输出质量和 handoff 降级的覆盖仍薄。
   - 当前 runtime delivery chain 依赖 source 路径改写和 high-value anchors，因此 reference 移动必须配套 projection tests。
 - limitations:
-  - 写入本计划前没有对这份新计划运行 `$spec-doc-review`。
+  - 写入本计划前没有对这份新计划运行 `spec-doc-review`。
   - 本次规划没有在当前会话 live 运行 `$yao-meta-skill` scripts；使用的是此前收集的 advisory outputs 与当前 source reads。
 
 ---
@@ -283,7 +283,7 @@ flowchart TB
 - 正常路径：清晰 implementation-plan prompt 的 expected outcome 仍是 durable plan artifact，且不修改实现代码。
 - 边界：`fix failing test now` 的 expected outcome 是路由到 `spec-debug` 或 `spec-work`，而不是生成计划。
 - 边界：`review this plan only` 的 expected outcome 是路由到 `spec-doc-review`，除非用户要求 revise/deepen plan。
-- 边界情况：直接 `$spec-plan` 但输入模糊时，expected outcome 是澄清或 bootstrap scope，而不是判为 `not a planning task`。
+- 边界情况：直接 `spec-plan` 但输入模糊时，expected outcome 是澄清或 bootstrap scope，而不是判为 `not a planning task`。
 - 集成：canonical fixture normalizer 接受每个新增 case，并拒绝把生成态 mirrors 或历史 plans 当 source authority。
 
 **验证：**
@@ -392,7 +392,7 @@ flowchart TB
 - 修改：`tests/unit/workflow-eval-readiness-contracts.test.js`
 
 **方案：**
-- 保持 description 足够支持直接 `$spec-plan` 和通用 planning，同时用紧凑排除语句覆盖 implementation、debugging、standalone review、task-pack compilation 和 product discovery 不清晰的场景。
+- 保持 description 足够支持直接 `spec-plan` 和通用 planning，同时用紧凑排除语句覆盖 implementation、debugging、standalone review、task-pack compilation 和 product discovery 不清晰的场景。
 - 避免把 description 过拟合成很长的 router table。详细 routing 继续留在 `using-spec-first` 和 `spec-plan` Phase 0 bootstrap。
 - 明确非软件问答型 planning 边界，但不削弱软件计划 artifact 生成。
 - U1、U2、U4 都会编辑同一文件 `skills/spec-plan/evals/examples.json`。该文件的编辑必须串行：先 U1 落地 trigger/boundary cases，再 U2 落地 output-quality cases（若复用 canonical envelope），最后 U4 调整 near-neighbor 措辞与对应 cases，避免同文件并发覆盖。实现若按 wave 编排，把 `examples.json` 归入单一 wave 串行处理。
@@ -507,7 +507,7 @@ flowchart TB
 
 **方案：**
 - 按 `docs/contracts/workflows/fresh-source-eval-checklist.md` 或等价 fresh read-only reviewer，注入当前磁盘 source，而不是调用当前会话缓存的 skill。
-- 运行或记录 `$spec-doc-review` 对修改后的 `spec-plan` source/plan output 的 review；如果当前 host 没有 dispatch 授权，记录 `dispatch_authorization_missing` 和 fallback review。
+- 运行或记录 `spec-doc-review` 对修改后的 `spec-plan` source/plan output 的 review；如果当前 host 没有 dispatch 授权，记录 `dispatch_authorization_missing` 和 fallback review。
 - 记录 resource-boundary before/after：实现前 baseline 包括当前 `SKILL.md` 756 行与 `$yao-meta-skill resource_boundary_check.py skills/spec-plan` estimated initial-load tokens `16633`；实现后重跑同一命令并在 validation artifact/changelog 中记录降幅、remaining warning/failure 和 waiver。
 - 若用户可见行为只有质量和边界收敛，README 通常不需要改；若 description、handoff menu 或 public entry semantics 发生明显变化，再更新 README EN/ZH。
 
@@ -532,7 +532,7 @@ flowchart TB
 
 ## 系统级影响
 
-- **交互图：** Claude 公开入口仍是 `/spec:plan`，Codex 公开入口仍是 `$spec-plan`。下游 consumers 仍是 `spec-write-tasks`、`spec-work`、`spec-doc-review`、issue creation、Proof/HITL review paths 和 human reviewers。
+- **交互图：** Claude 公开入口仍是 `spec-plan`，Codex 公开入口仍是 `spec-plan`。下游 consumers 仍是 `spec-write-tasks`、`spec-work`、`spec-doc-review`、issue creation、Proof/HITL review paths 和 human reviewers。
 - **错误传播：** 缺失 source documents、缺失 dispatch、question tools 不可用、optional providers degraded 和 dirty worktree evidence 都必须保持为 loud limitations 或 handoff choices，而不是 silent assumptions。
 - **状态生命周期风险：** Plan files 仍是带 `status: active` 的 decision artifacts；它们不记录实现进度。Task packs 仍是 derived 且 optional。
 - **API surface 对齐：** Claude command 与 Codex skill 的 runtime projection 在行为关键 anchors 上必须保持等价，即使 delivery shape 不同。

@@ -30,7 +30,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 **Guide mode trigger**
 - R1. 在 `using-spec-first` 中显式定义 user next-step guide mode，覆盖“下一步是什么 / 该用哪个命令 / 不知道用哪个 workflow”。
 - R2. 覆盖刚 init、刚 brainstorm、已有 plan、已有 work diff、review 后等 handoff 场景。
-- R3. 保留用户直接描述任务时的自动入口分流，不要求用户先点名 `$spec-*` 或 `/spec:*`。
+- R3. 保留用户直接描述任务时的自动入口分流，不要求用户先点名 `spec-*` 或 `spec-*`。
 
 **Routing behavior**
 - R4. 每次只推荐一个最匹配公开入口；如果两个解释会实质改变路线，先问一个窄确认问题。
@@ -41,7 +41,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 
 **Source and runtime boundary**
 - R9. `skills/using-spec-first/SKILL.md` 继续作为唯一 routing policy source of truth。
-- R10. 本阶段不新增 `/spec:next`、`$spec-next`、`/spec:guide` 或 `$spec-guide`。
+- R10. 本阶段不新增 `spec-next`、`spec-guide`。
 - R11. 不修改 `.claude/`、`.codex/`、`.agents/skills/` generated runtime mirrors。
 
 **User experience**
@@ -85,7 +85,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 
 ### Deferred to Follow-Up Work
 
-- 未来如果新增 `$spec-next` 或 `/spec:next`，只能作为读取或引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
+- 未来如果新增 `spec-next`，只能作为读取或引用 `using-spec-first` guide mode 的薄壳，不拥有独立路由逻辑。
 - 未来如果要做确定性 routing script 或 telemetry recommender，需要单独设计；本阶段仍由 LLM 做语义路由判断。
 
 ---
@@ -193,7 +193,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 - 在 `Decision Output Contract` 附近新增短章节，例如 `User Next-Step Guide Mode`，说明触发条件、允许行为和输出形态。
 - 将 guide mode 定义为 read-only route recommendation behavior，而不是 workflow 本身。
 - 加入显式下一步求助、直接高置信任务、低置信含糊任务的简短规则。
-- 保留 host entrypoint 拼写边界：Claude 用 `/spec:*`，Codex 用 `$spec-*`。
+- 保留 host entrypoint 拼写边界：Claude 用 `spec-*`，Codex 用 `spec-*`。
 - 保留负向约束：不新增 `spec-next/spec-guide`，不采用 1% rule，不把 brainstorm 设为万能默认，不过度路由轻量请求。
 
 **Execution note:** 先或同步更新 contract test expectations，让 source policy drift 能被确定性捕捉。
@@ -325,7 +325,7 @@ origin: docs/brainstorms/2026-05-01-002-using-spec-first-next-step-guidance-requ
 - **Interaction graph:** 影响 agent entry routing prose、init-injected instruction reminders，以及保护 source/runtime delivery 的 contract tests；不应影响 CLI 命令执行、graph providers 或下游 workflow 内部逻辑。
 - **Error propagation:** 主要失败模式是语义误路由；缓解方式是短输出契约加低置信窄确认，而不是确定性 route script。
 - **State lifecycle risks:** guide mode 是 read-only，不应在选定 workflow 前写 artifacts 或改变项目状态。
-- **API surface parity:** Claude 和 Codex 入口必须保持差异：Claude `/spec:*`，Codex `$spec-*`，`using-spec-first` 本身仍是 standalone meta skill。
+- **API surface parity:** Claude 和 Codex 入口必须保持差异：Claude `spec-*`，Codex `spec-*`，`using-spec-first` 本身仍是 standalone meta skill。
 - **Integration coverage:** `using-spec-first` runtime transform 覆盖、bootstrap builder tests、coding-guidelines block tests 是核心集成安全网。
 - **Unchanged invariants:** 不新增 command-backed workflow，不编辑 generated runtime mirrors，不让脚本做语义路由，不改变下游 workflow handoff contracts。
 

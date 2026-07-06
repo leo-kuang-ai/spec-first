@@ -62,7 +62,7 @@
 
 ## 边界与非目标
 
-- 本 ADR **不**改任何代码，仅锁定架构方向；第一层的 write_mode 写前闸实现走独立 `/spec:plan` → `/spec:work`。
+- 本 ADR **不**改任何代码，仅锁定架构方向；第一层的 write_mode 写前闸实现走独立 `spec-plan` → `spec-work`。
 - **不**否定 spec-prd 现有的 agent dispatch（Product Reviewer / doc-review）；它们是该保留的正确 agent 化。
 - **不**主张 spec-prd 永不增加 agent；主张的是「以流程步骤为单位批量 agent 化」撞红线，「以独立判断需求为单位选择性 agent 化」才合理。
 - 写前闸只能保证「路径被声明」，**不能**保证「grill 真实发生」或「owner 真实回答」——后者撞 host-provenance 天花板（R12），仍靠 prose forcing + doc-review + fresh-source eval 防御纵深，本 ADR 不假装突破该上界。

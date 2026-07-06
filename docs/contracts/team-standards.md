@@ -11,7 +11,7 @@
 
 ## Non-Goals
 
-- 不恢复 Claude `/spec:standards`、Codex `$spec-standards`、`skills/spec-standards/` 或 `.spec-first/standards/`。
+- 不恢复 legacy standards command spellings、`spec-standards` workflow、`skills/spec-standards/` 或 `.spec-first/standards/`。
 - 不把 `docs/specs/<capability>/spec.md` 变成团队开发规范库。
 - 不把 graphify/codegraph、LLM 总结、历史 plans 或 `docs/solutions/**` 直接提升为 confirmed policy。
 - 不用脚本替代架构判断、owner 授权或 promotion 语义判断。
@@ -146,7 +146,7 @@ category in {architecture, security} OR risk_domain is non-empty
 
 `confidence_score` 是 promotion 输入，不是 authority。Quality gate pass 或高 confidence 不等于 owner decision、diff review 或 confirmed hard context。
 
-Promotion decision 必须记录 `gate_results`、`confidence.signals`、`autonomy.mode`、`next_action`、`outcome`、`decision_trace` 和 `source_refs`。真正写入 `trust=confirmed,lifecycle_state=active` 必须发生在 active Claude `/spec:work`、Codex `$spec-work` 或等价 source-edit workflow 中，并经过普通 diff review、CHANGELOG 和聚焦验证。
+Promotion decision 必须记录 `gate_results`、`confidence.signals`、`autonomy.mode`、`next_action`、`outcome`、`decision_trace` 和 `source_refs`。真正写入 `trust=confirmed,lifecycle_state=active` 必须发生在 active `spec-work` 或等价 source-edit workflow 中，并经过普通 diff review、CHANGELOG 和聚焦验证。
 
 ## Rule Selection Contract
 

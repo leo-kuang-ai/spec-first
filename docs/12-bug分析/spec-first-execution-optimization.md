@@ -2,7 +2,7 @@
 
 ## 0. 文档目标
 
-本文档复盘本轮从 `/spec:mcp-setup` 到 `/spec:graph-bootstrap` 再到 `/spec:standards` 的完整执行过程，识别过程中暴露的系统性问题，并转化为可直接落地的优化项。
+本文档复盘本轮从 `spec-mcp-setup` 到 `spec-graph-bootstrap` 再到 `spec-standards` 的完整执行过程，识别过程中暴露的系统性问题，并转化为可直接落地的优化项。
 
 目标不是追责单个错误，而是把反复出现的执行风险固化成：
 
@@ -33,7 +33,7 @@
 
 #### 问题
 
-`/spec:mcp-setup` 修复 Serena 后，`/spec:graph-bootstrap` 仍然读取到旧的 `.spec-first/config/runtime-capabilities.json` 和 host readiness ledger，导致 graph bootstrap 首次失败。
+`spec-mcp-setup` 修复 Serena 后，`spec-graph-bootstrap` 仍然读取到旧的 `.spec-first/config/runtime-capabilities.json` 和 host readiness ledger，导致 graph bootstrap 首次失败。
 
 典型失败状态：
 
@@ -54,7 +54,7 @@ setup 的实际修复状态和 setup-owned projection artifact 没有绑定成�
 
 #### 优化动作
 
-在 `/spec:mcp-setup` 的最终阶段强制执行：
+在 `spec-mcp-setup` 的最终阶段强制执行：
 
 ```bash
 bash .claude/spec-first/workflows/spec-mcp-setup/scripts/verify-tools.sh
@@ -705,7 +705,7 @@ cSpell 应配 allowlist，否则会把真实标识符当作噪音。
 ### TASK-002：setup 完成后强制刷新 projection
 
 - 优先级：P0
-- 修改区域：`/spec:mcp-setup` workflow 文档、setup orchestrator / script
+- 修改区域：`spec-mcp-setup` workflow 文档、setup orchestrator / script
 - 动作：Serena 修复成功后必须 rerun `verify-tools.sh`，verify 成功后再允许报告 setup complete
 - 验收：`runtime-capabilities.json` 与 host ledger 一致，`baseline_ready=true`
 

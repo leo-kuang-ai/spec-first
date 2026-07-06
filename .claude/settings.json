@@ -13,7 +13,7 @@
     ],
     "UserPromptExpansion": [
       {
-        "matcher": "spec:plan",
+        "matcher": "spec-plan",
         "hooks": [
           {
             "type": "command",

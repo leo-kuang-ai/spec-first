@@ -18,25 +18,25 @@
     },
     {
       "id": "direct-invocation-always-plans",
-      "input": "$spec-plan plan the implementation approach for this rough feature idea.",
+      "input": "spec-plan plan the implementation approach for this rough feature idea.",
       "coverage_tags": ["trigger", "planning", "direct-invocation"],
       "expected_outcome": "Stay in the planning workflow; if the scope is thin, ask a blocking clarification question or bootstrap the plan instead of declaring the request is not a planning task."
     },
     {
       "id": "unclear-input-bootstrap",
-      "input": "$spec-plan improve onboarding",
+      "input": "spec-plan improve onboarding",
       "coverage_tags": ["trigger", "planning", "fallback"],
       "expected_outcome": "Use a concise planning bootstrap or blocking clarification to establish problem frame, intended behavior, scope boundaries, success criteria, and assumptions before planning."
     },
     {
       "id": "missing-source-document-failure",
-      "input": "$spec-plan create an implementation plan from docs/brainstorms/missing-requirements.md",
+      "input": "spec-plan create an implementation plan from docs/brainstorms/missing-requirements.md",
       "coverage_tags": ["failure", "boundary", "planning"],
       "expected_outcome": "Report the named source document as missing or unreadable and ask for a valid source, corrected path, or inline scope before planning; do not invent requirements from the filename."
     },
     {
       "id": "question-tool-unavailable-fallback",
-      "input": "$spec-plan create a plan, but the harness question tool is unavailable when scope clarification is required.",
+      "input": "spec-plan create a plan, but the harness question tool is unavailable when scope clarification is required.",
       "coverage_tags": ["failure", "fallback", "planning"],
       "expected_outcome": "Fall back loudly to numbered options in chat, state that the blocking question tool is unavailable, and wait for the user's reply before writing the plan."
     },

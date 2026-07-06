@@ -40,7 +40,7 @@ Use the project developer profile for the author. In Codex, that profile is read
 - README/docs changes: update `README.md`, `README.zh-CN.md`, relevant docs, and README contract tests when the public surface changes.
 - CLI changes: update `src/cli/` and the narrowest unit/smoke tests that prove the behavior.
 - Skill or agent changes: update source assets, not generated runtime copies, and add contract tests when behavior changes.
-- Runtime governance changes: verify dual-host behavior and keep Claude `/spec:*` and Codex `$spec-*` mappings centralized.
+- Runtime governance changes: verify supported-host behavior and keep unified `spec-*` entrypoint mappings centralized.
 
 ## Pull Request Checklist
 

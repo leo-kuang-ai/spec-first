@@ -38,7 +38,7 @@ fresh_source_eval:
       severity: P2
       kind: out-of-scope-followup
       summary: "本次 relentless 改造收紧了'走到 readiness 时不许放水'，但 spec-prd 的全部质量闸门(relentless grill、design readiness、clarification closure)都位于 readiness lens 内，而 readiness lens 本身是 LLM 自愿执行的。一个倾向抄近路的 LLM 可用'证据充分，无阻塞'一句话跳过整个 readiness 阶段，使所有闸门失效。real-run 日志(2026-06-25 KAZ 市场页 PRD)证实了这一点：figma 链接被当文本'读完'从未真 fetch、OQ 被事后补记而非 grill、最后反问'要确认还是直接进规划'而非用阻塞工具。relentless 改动无法解决'根本不走到 readiness'这条故障线。"
-      recommended_route: "下一轮 /spec:plan 议题：用 deterministic 脚本(check-prd-artifact.js)兜住'LLM 是否真的 decide 过'——检测 PRD 引用 figma/design source 但缺 design_source_inventory 时硬报 finding，以及'读完输入直接写 PRD 而无 grill 痕迹'在脚本层留可检测缺失。这是 'Scripts prepare, LLM decides' 向 '脚本兜住 LLM 是否真 decide' 的延伸，ROI 高于继续加 relentless 措辞。"
+      recommended_route: "下一轮 spec-plan 议题：用 deterministic 脚本(check-prd-artifact.js)兜住'LLM 是否真的 decide 过'——检测 PRD 引用 figma/design source 但缺 design_source_inventory 时硬报 finding，以及'读完输入直接写 PRD 而无 grill 痕迹'在脚本层留可检测缺失。这是 'Scripts prepare, LLM decides' 向 '脚本兜住 LLM 是否真 decide' 的延伸，ROI 高于继续加 relentless 措辞。"
       status_2026-06-25: "根因经真实产物实跑纠正——真实故障是 Phase 4 / checker 根本没运行(producer 自证 ready 直接 handoff)，不是'闸跑了却全绿'(现有 checker 实跑该产物即报 28 条 finding)。已落地生产端加固(Phase 4 强制闸 + checker 本地化锚定)，并在 002 后续开发补完 defense-in-depth：`--inputs` 输入侧 design-source 扫描、grill/design/input/preflight findings、`preflight_sweep_closure` 与 Claude/Codex runtime projection contract。见 docs/validation/spec-prd/fresh-source-eval-2026-06-25-enforce-grill-design-gate.md。消费端 /spec-plan 入口自跑 checker 仍为独立 open follow-up。"
   not_run_reason: "dispatch_authorization_missing：本会话未授权 subagent dispatch，语义行为验证降级为 deterministic 脚本 + 契约测试 characterization-first 验证。"
 ```

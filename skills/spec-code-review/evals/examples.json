@@ -13,7 +13,7 @@
     },
     {
       "id": "report-only-review-with-plan",
-      "input": "$spec-code-review mode:report-only base:main plan:docs/plans/example-plan.md",
+      "input": "spec-code-review mode:report-only base:main plan:docs/plans/example-plan.md",
       "coverage_tags": ["trigger", "report-only"],
       "expected_outcome": "Run report-only review scoped to the requested base and plan context."
     },
@@ -26,7 +26,7 @@
     },
     {
       "id": "codex-subagent-authorization-boundary",
-      "input": "$spec-code-review this diff with no mention of subagents or parallel personas.",
+      "input": "spec-code-review this diff with no mention of subagents or parallel personas.",
       "coverage_tags": ["boundary", "dispatch-boundary"],
       "expected_outcome": "Use the documented single-agent/report-only fallback when Codex dispatch authorization is absent.",
       "boundary_note": "Public workflow admission does not itself authorize Codex spawn_agent."
@@ -40,8 +40,8 @@
     },
     {
       "id": "phase-a-scope-violation-with-explicit-touch-set",
-      "input": "$spec-code-review mode:report-only base:main plan:docs/plans/example-plan.md with declared files skills/foo/SKILL.md only, diff also edits src/cli/plugin.js, and graph provider readiness is unknown.",
-      "diff_or_input": "$spec-code-review mode:report-only base:main plan:docs/plans/example-plan.md with declared files skills/foo/SKILL.md only, diff also edits src/cli/plugin.js, and graph provider readiness is unknown.",
+      "input": "spec-code-review mode:report-only base:main plan:docs/plans/example-plan.md with declared files skills/foo/SKILL.md only, diff also edits src/cli/plugin.js, and graph provider readiness is unknown.",
+      "diff_or_input": "spec-code-review mode:report-only base:main plan:docs/plans/example-plan.md with declared files skills/foo/SKILL.md only, diff also edits src/cli/plugin.js, and graph provider readiness is unknown.",
       "provider_readiness": "unknown",
       "coverage_tags": ["boundary", "scope-creep", "phase-a-floor"],
       "expected_scope_boundary": "violation",
@@ -60,8 +60,8 @@
     },
     {
       "id": "phase-a-graph-candidate-rejected-with-test-gap",
-      "input": "$spec-code-review mode:report-only base:main for a shared helper change where code-graph returns caller candidates but source confirmation finds only one real caller and no targeted test.",
-      "diff_or_input": "$spec-code-review mode:report-only base:main for a shared helper change where code-graph returns caller candidates but source confirmation finds only one real caller and no targeted test.",
+      "input": "spec-code-review mode:report-only base:main for a shared helper change where code-graph returns caller candidates but source confirmation finds only one real caller and no targeted test.",
+      "diff_or_input": "spec-code-review mode:report-only base:main for a shared helper change where code-graph returns caller candidates but source confirmation finds only one real caller and no targeted test.",
       "coverage_tags": ["graph-assisted-impact", "test-gap", "phase-a-floor"],
       "expected_scope_boundary": "unknown",
       "authorized_scope_source": "diff-only",
@@ -78,8 +78,8 @@
     },
     {
       "id": "phase-a-graph-provider-fallback-with-degraded-symbol-mapping",
-      "input": "$spec-code-review mode:report-only base:main for an impact-sensitive source-runtime instruction-prose change where graph provider readiness is unknown.",
-      "diff_or_input": "$spec-code-review mode:report-only base:main for an impact-sensitive source-runtime instruction-prose change where graph provider readiness is unknown.",
+      "input": "spec-code-review mode:report-only base:main for an impact-sensitive source-runtime instruction-prose change where graph provider readiness is unknown.",
+      "diff_or_input": "spec-code-review mode:report-only base:main for an impact-sensitive source-runtime instruction-prose change where graph provider readiness is unknown.",
       "provider_readiness": "unknown",
       "coverage_tags": ["graph-fallback", "symbol-mapping", "phase-a-floor"],
       "expected_scope_boundary": "unknown",
@@ -97,8 +97,8 @@
     },
     {
       "id": "phase-a-clean-diff-noise-floor",
-      "input": "$spec-code-review mode:report-only base:main for a docs-only diff fully matching declared files.",
-      "diff_or_input": "$spec-code-review mode:report-only base:main for a docs-only diff fully matching declared files.",
+      "input": "spec-code-review mode:report-only base:main for a docs-only diff fully matching declared files.",
+      "diff_or_input": "spec-code-review mode:report-only base:main for a docs-only diff fully matching declared files.",
       "coverage_tags": ["clean-diff-noise", "fallback", "phase-a-floor"],
       "expected_scope_boundary": "clean",
       "authorized_scope_source": "declared-files-only",
