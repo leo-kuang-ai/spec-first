@@ -5,8 +5,13 @@ const os = require('node:os');
 const path = require('node:path');
 
 const {
+  buildRuntimeRefreshArgs,
+  detectInstalledRuntimePlatforms,
+  insertInitTargetArgs,
   resolveRuntimeRefreshCommand,
   runUpdate,
+  stripInitTargetArgs,
+  withDeveloperPlaceholder,
 } = require('../../src/cli/commands/update');
 
 // 注入假 runInstall,避免单测触发真实 `npm install -g` 或联网。
@@ -95,6 +100,68 @@ describe('spec-first update command', () => {
     }
   });
 
+  test('parent workspace runtime refresh uses child installed host flags when parent has no state', () => {
+    const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-update-workspace-child-host-'));
+    try {
+      const childRoot = path.join(workspaceRoot, 'project-a');
+      fs.mkdirSync(path.join(childRoot, '.git'), { recursive: true });
+      fs.mkdirSync(path.join(childRoot, '.kiro', 'spec-first'), { recursive: true });
+      fs.writeFileSync(path.join(childRoot, '.kiro', 'spec-first', 'state.json'), '{}\n');
+
+      expect(resolveRuntimeRefreshCommand(workspaceRoot)).toEqual({
+        args: ['init', '--kiro', '--all-repos', '-y'],
+        cwd: path.resolve(workspaceRoot),
+        reason_code: 'parent-workspace',
+        child_repo_count: 1,
+      });
+    } finally {
+      fs.rmSync(workspaceRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('runtime refresh resolver uses explicit flags for installed preview host runtimes', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-update-kiro-'));
+    try {
+      fs.mkdirSync(path.join(projectRoot, '.git'), { recursive: true });
+      fs.mkdirSync(path.join(projectRoot, '.kiro', 'spec-first'), { recursive: true });
+      fs.writeFileSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'), '{}\n');
+
+      expect(detectInstalledRuntimePlatforms(projectRoot)).toEqual(['kiro']);
+      expect(buildRuntimeRefreshArgs(projectRoot)).toEqual(['init', '--kiro', '-y']);
+      expect(resolveRuntimeRefreshCommand(projectRoot)).toMatchObject({
+        args: ['init', '--kiro', '-y'],
+        cwd: path.resolve(projectRoot),
+        reason_code: 'single-git-repo',
+      });
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
+  test('runtime refresh resolver preserves all installed host runtimes with explicit flags', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-update-hosts-'));
+    try {
+      fs.mkdirSync(path.join(projectRoot, '.git'), { recursive: true });
+      for (const host of ['claude', 'codex', 'cursor', 'kiro', 'qoder']) {
+        fs.mkdirSync(path.join(projectRoot, `.${host}`, 'spec-first'), { recursive: true });
+        fs.writeFileSync(path.join(projectRoot, `.${host}`, 'spec-first', 'state.json'), '{}\n');
+      }
+
+      expect(detectInstalledRuntimePlatforms(projectRoot)).toEqual(['claude', 'codex', 'cursor', 'kiro', 'qoder']);
+      expect(buildRuntimeRefreshArgs(projectRoot)).toEqual([
+        'init',
+        '--claude',
+        '--codex',
+        '--cursor',
+        '--kiro',
+        '--qoder',
+        '-y',
+      ]);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   test('failed npm install (non-zero): surfaces manual command, no init refresh, exit non-zero', async () => {
     const { runInstall } = makeInstaller({ status: 1, errorCode: null });
     const refresh = makeRuntimeRefresh({ status: 0, errorCode: null });
@@ -125,6 +192,23 @@ describe('spec-first update command', () => {
     expect(stderr).toContain('Child repo: spec-first init --repo <path> -y -u <name>');
   });
 
+  test('automatic runtime refresh failure keeps fallback commands host-aware', async () => {
+    const { runInstall } = makeInstaller({ status: 0, errorCode: null });
+    const refresh = makeRuntimeRefresh({ status: 3, errorCode: null });
+    const { exitCode, stderr } = await captureUpdate([], {
+      runInstall,
+      runRuntimeRefresh: refresh.runRuntimeRefresh,
+      resolveRuntimeRefreshCommand: () => ({ args: ['init', '--kiro', '-y'], cwd: '/repo' }),
+    });
+
+    expect(exitCode).toBe(1);
+    expect(stderr).toContain('Runtime refresh: degraded');
+    expect(stderr).toContain('Single repo: spec-first init --kiro -y -u <name>');
+    expect(stderr).toContain('Parent workspace: spec-first init --kiro -y -u <name>');
+    expect(stderr).toContain('Child repo: spec-first init --kiro --repo <path> -y -u <name>');
+    expect(stderr).not.toContain('Single repo: spec-first init -y -u <name>');
+  });
+
   test('unknown refresh scope prints fallback commands without spawning init', async () => {
     const { runInstall } = makeInstaller({ status: 0, errorCode: null });
     const refresh = makeRuntimeRefresh({ status: 0, errorCode: null });
@@ -143,6 +227,34 @@ describe('spec-first update command', () => {
     expect(stderr).toContain('Single repo: spec-first init -y -u <name>');
     expect(stderr).toContain('Parent workspace: spec-first init -y -u <name>');
     expect(stderr).toContain('Child repo: spec-first init --repo <path> -y -u <name>');
+  });
+
+  test('runtime refresh fallback helpers preserve host flags and insert target before -y', () => {
+    expect(withDeveloperPlaceholder(['init', '--qoder', '-y'])).toEqual(['init', '--qoder', '-y', '-u', '<name>']);
+    expect(insertInitTargetArgs(['init', '--qoder', '-y'], ['--repo', '<path>'])).toEqual([
+      'init',
+      '--qoder',
+      '--repo',
+      '<path>',
+      '-y',
+    ]);
+  });
+
+  test('all-repos refresh fallback prints valid single and child commands', async () => {
+    const { runInstall } = makeInstaller({ status: 0, errorCode: null });
+    const refresh = makeRuntimeRefresh({ status: 3, errorCode: null });
+    const { exitCode, stderr } = await captureUpdate([], {
+      runInstall,
+      runRuntimeRefresh: refresh.runRuntimeRefresh,
+      resolveRuntimeRefreshCommand: () => ({ args: ['init', '--kiro', '--all-repos', '-y'], cwd: '/workspace' }),
+    });
+
+    expect(exitCode).toBe(1);
+    expect(stderr).toContain('Single repo: spec-first init --kiro -y -u <name>');
+    expect(stderr).toContain('Parent workspace: spec-first init --kiro --all-repos -y -u <name>');
+    expect(stderr).toContain('Child repo: spec-first init --kiro --repo <path> -y -u <name>');
+    expect(stderr).not.toContain('--all-repos --repo');
+    expect(stripInitTargetArgs(['init', '--kiro', '--all-repos', '--repo', 'repo-a', '-y'])).toEqual(['init', '--kiro', '-y']);
   });
 
   test('successful update remains successful when version reminder cleanup fails', async () => {

@@ -199,17 +199,40 @@ compute_generated_runtime_manifest_health() {
     }'
 }
 
+generated_runtime_host_flag() {
+  case "$1" in
+    claude|codex|cursor|kiro|qoder)
+      printf -- '--%s ' "$1"
+      ;;
+    *)
+      printf ''
+      ;;
+  esac
+}
+
+quote_init_example_arg() {
+  jq -rn --arg value "$1" '
+    if ($value | test("^[A-Za-z0-9_./:\\\\-]+$")) then
+      $value
+    else
+      ($value | @json)
+    end
+  '
+}
+
 generated_runtime_refresh_action_for_facts() {
   local facts_json="$1"
-  jq -r '
-    (.target.selection_source // "") as $selection_source
-    | (.target.repo_label // "") as $repo_label
-    | if ($selection_source == "explicit-repo" and $repo_label != "" and $repo_label != ".") then
-        "spec-first init --repo \($repo_label) -y -u <name>"
-      else
-        "spec-first init -y -u <name>"
-      end
-  ' <<<"$facts_json"
+  local host host_flag selection_source repo_label quoted_repo_label
+  host="$(jq -r '.host // ""' <<<"$facts_json")"
+  host_flag="$(generated_runtime_host_flag "$host")"
+  selection_source="$(jq -r '.target.selection_source // ""' <<<"$facts_json")"
+  repo_label="$(jq -r '.target.repo_label // ""' <<<"$facts_json")"
+  if [ "$selection_source" = "explicit-repo" ] && [ -n "$repo_label" ] && [ "$repo_label" != "." ]; then
+    quoted_repo_label="$(quote_init_example_arg "$repo_label")"
+    printf 'spec-first init %s--repo %s -y -u <name>\n' "$host_flag" "$quoted_repo_label"
+  else
+    printf 'spec-first init %s-y -u <name>\n' "$host_flag"
+  fi
 }
 
 write_workspace_summary_atomic() {
@@ -484,6 +507,8 @@ write_all_repos_verify_summary_and_exit() {
   mkdir -p "$MARKER_DIR"
   summary_items="$(mktemp "${TMPDIR:-/tmp}/mcp-verify-all-repos.XXXXXX")"
   jq -n '[]' > "$summary_items"
+  parent_host="$(jq -r '.host // empty' <<<"$HOST_INFO_JSON")"
+  parent_host_flag="$(generated_runtime_host_flag "$parent_host")"
   while IFS=$'\t' read -r child_label child_path; do
     [ -n "$child_path" ] || continue
     set +e
@@ -512,7 +537,7 @@ write_all_repos_verify_summary_and_exit() {
             (.reason_code // empty)
           end
       ' <<<"$child_ledger")"
-      child_manifest_action="spec-first init --repo $child_path -y -u <name>"
+      child_manifest_action="spec-first init ${parent_host_flag}--repo $(quote_init_example_arg "$child_path") -y -u <name>"
       child_result="$(jq -n --argjson ledger "$child_ledger" --arg child_manifest_action "$child_manifest_action" '
         ($ledger.generated_runtime_manifest // {status:"unknown", reason_code:"not-reported"}) as $manifest
         | ((($manifest.status // "unknown") == "stale") or (($manifest.status // "unknown") == "missing")) as $manifest_refresh_required
@@ -566,14 +591,16 @@ write_all_repos_verify_summary_and_exit() {
     parent_workspace_pollution_count=0
   fi
 
-  parent_host="$(jq -r '.host // empty' <<<"$HOST_INFO_JSON")"
-	  parent_generated_runtime_manifest="$(compute_generated_runtime_manifest_health "$parent_host" "$workspace_root" | jq '
-	    if ((.status // "unknown") == "stale") or ((.status // "unknown") == "missing") then
-	      .next_action = "spec-first init -y -u <name>"
-	    else
-	      .
-	    end
-	  ')"
+  parent_runtime_action="spec-first init ${parent_host_flag}-y -u <name>"
+  child_runtime_action="spec-first init ${parent_host_flag}--repo <child> -y -u <name>"
+  all_repos_runtime_action="spec-first init ${parent_host_flag}--all-repos -y -u <name>"
+  parent_generated_runtime_manifest="$(compute_generated_runtime_manifest_health "$parent_host" "$workspace_root" "$parent_runtime_action" | jq --arg parent_runtime_action "$parent_runtime_action" '
+    if ((.status // "unknown") == "stale") or ((.status // "unknown") == "missing") then
+      .next_action = $parent_runtime_action
+    else
+      .
+    end
+  ')"
 
   summary_json="$(jq -n \
     --arg generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
@@ -581,6 +608,9 @@ write_all_repos_verify_summary_and_exit() {
     --argjson target "$target_json" \
     --argjson parent_generated_runtime_manifest "$parent_generated_runtime_manifest" \
     --argjson parent_workspace_pollution_count "$parent_workspace_pollution_count" \
+    --arg parent_runtime_action "$parent_runtime_action" \
+    --arg child_runtime_action "$child_runtime_action" \
+    --arg all_repos_runtime_action "$all_repos_runtime_action" \
     --slurpfile items "$summary_items" \
     '($items[0] // []) as $results
     | (((($parent_generated_runtime_manifest.status // "unknown") == "stale") or (($parent_generated_runtime_manifest.status // "unknown") == "missing"))) as $parent_manifest_refresh_required
@@ -637,14 +667,14 @@ write_all_repos_verify_summary_and_exit() {
           (if $parent_workspace_pollution_count > 0 then
             ["- Workspace pollution detected: wrote .spec-first/workspace/parent-artifact-quarantine.json (\($parent_workspace_pollution_count) paths quarantined). Run `spec-first clean --workspace-orphans` for read-only inspection."]
           else [] end)
-	          + (if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
-	            ["- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init -y -u <name>` for the parent workspace runtime; use `spec-first init --repo <child> -y -u <name>` for a stale child repo, or explicit `spec-first init --all-repos -y -u <name>` for intentional batch child-root refresh."]
-	          else [] end)
-	        ),
-	        next_action:(
-	          if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
-	            "Run spec-first init -y -u <name> from the parent workspace for parent runtime, or spec-first init --repo <child> -y -u <name> for stale child repos, then rerun verify."
-	          elif ([$results[] | select(.overall_status != "ready")] | length) == 0 then
+          + (if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
+            ["- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `\($parent_runtime_action)` for the parent workspace runtime; use `\($child_runtime_action)` for a stale child repo, or explicit `\($all_repos_runtime_action)` for intentional batch child-root refresh."]
+          else [] end)
+        ),
+        next_action:(
+          if ($parent_manifest_refresh_required or ($child_manifest_refresh_required_count > 0)) then
+            "Run \($parent_runtime_action) from the parent workspace for parent runtime, or \($child_runtime_action) for stale child repos, then rerun verify."
+          elif ([$results[] | select(.overall_status != "ready")] | length) == 0 then
             "All child repos verified required MCP/helper dependency readiness."
           else
             "Inspect per-child reason_code and rerun setup/verify for action-required repos."
@@ -940,6 +970,22 @@ jq -c '
         display(.generated_runtime_manifest.status // "unknown"),
         "state.manifestVersion=\((.generated_runtime_manifest.recorded_manifest_version // "missing") | tostring), bundled=\((.generated_runtime_manifest.bundled_manifest_version // "unknown") | tostring)",
         display(.generated_runtime_manifest.next_action)
+      ],
+      [
+        "Host setup facts pointer",
+        (if .host_pointer_reconciliation == null then "current" else "reconciled" end),
+        (if .host_pointer_reconciliation == null then
+          "host=\((.host // "unknown") | tostring)"
+        else
+          "from=\((.host_pointer_reconciliation.from_host // "unknown") | tostring), to=\((.host_pointer_reconciliation.to_host // "unknown") | tostring)"
+        end),
+        (if .host_pointer_reconciliation == null then "" else "setup facts refreshed for current host" end)
+      ],
+      [
+        "Host runtime readiness",
+        (if .host_runtime_ready == true then "ready" else "action-required" end),
+        "host_runtime_ready=\((.host_runtime_ready // false) | tostring)",
+        (if .host_runtime_ready == true then "" else display(.generated_runtime_manifest.next_action) end)
       ]
     ];
   def mcp_rows:
@@ -1001,6 +1047,8 @@ jq -c '
         display(.value.next_action)
       ])];
   def project_rows:
+    . as $root
+    |
     [
       {
         name: "tool-facts.json",
@@ -1013,7 +1061,7 @@ jq -c '
         next: (if (.runtime_capabilities_status == "ready" or .runtime_capabilities_status == "written") then "" elif ((.target.next_action // "") != "") then .target.next_action else "write runtime capabilities" end)
       }
     ]
-    | map([display(.name), display(.status), display(.next)]);
+    | map([display(.name), display("\(.status) (host=\($root.host // "unknown"))"), display(.next)]);
   {
     sections: [
       {title: "Execution result", headers: ["Area", "Status", "Evidence", "Next"], rows: summary_rows},

@@ -1141,4 +1141,102 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
       expect(psHelpers[id].safety).toBe('safe');
     }
   });
+
+  test('PowerShell all-repos verify suggests explicit Kiro init flags when available', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-verify-ps-kiro-'));
+    try {
+      const scriptsDir = path.join(tmp, 'scripts');
+      const workspace = path.join(tmp, 'workspace');
+      const repoA = path.join(workspace, 'repo a');
+      const repoB = path.join(workspace, 'repo-b');
+      const markerPath = path.join(tmp, 'marker', 'readiness-ledger.json');
+      fs.mkdirSync(path.join(repoA, '.git'), { recursive: true });
+      fs.mkdirSync(path.join(repoB, '.git'), { recursive: true });
+      fs.mkdirSync(path.join(scriptsDir), { recursive: true });
+      fs.mkdirSync(path.join(workspace, '.kiro/spec-first'), { recursive: true });
+      fs.mkdirSync(path.join(repoA, '.kiro/spec-first'), { recursive: true });
+      fs.mkdirSync(path.join(repoB, '.kiro/spec-first'), { recursive: true });
+      fs.writeFileSync(path.join(workspace, '.kiro/spec-first/state.json'), JSON.stringify({ manifestVersion: '1.0.0' }));
+      fs.writeFileSync(path.join(repoA, '.kiro/spec-first/state.json'), JSON.stringify({ manifestVersion: '1.0.0' }));
+      fs.writeFileSync(path.join(repoB, '.kiro/spec-first/state.json'), JSON.stringify({ manifestVersion: '2.0.0' }));
+      fs.copyFileSync(verifyToolsPs1, path.join(scriptsDir, 'verify-tools.ps1'));
+      fs.writeFileSync(path.join(scriptsDir, 'detect-host.ps1'), [
+        `$payload = @{ host = 'kiro'; marker_path = '${markerPath.replace(/'/g, "''")}' }`,
+        '$payload | ConvertTo-Json -Compress',
+      ].join('\n'));
+      fs.writeFileSync(path.join(scriptsDir, 'resolve-project-target.ps1'), [
+        '$payload = [ordered]@{',
+        "  mode = 'parent-workspace'",
+        "  repo_status = 'parent-workspace'",
+        "  target_kind = 'parent-workspace'",
+        `  workspace_root = '${workspace.replace(/'/g, "''")}'`,
+        "  candidates = @(",
+        `    [ordered]@{ repo_label = 'repo a'; git_root = '${repoA.replace(/'/g, "''")}'; workspace_relative_path = 'repo a' },`,
+        `    [ordered]@{ repo_label = 'repo-b'; git_root = '${repoB.replace(/'/g, "''")}'; workspace_relative_path = 'repo-b' }`,
+        '  )',
+        "  git_health = [ordered]@{ status = 'ok'; reason_code = 'git-ok' }",
+        '}',
+        '$payload | ConvertTo-Json -Depth 8 -Compress',
+      ].join('\n'));
+      fs.writeFileSync(path.join(scriptsDir, 'detect-tools.ps1'), [
+        'param([string]$Repo)',
+        `$workspaceRoot = '${workspace.replace(/'/g, "''")}'`,
+        '$repoRoot = if ([IO.Path]::IsPathRooted($Repo)) { $Repo } else { Join-Path $workspaceRoot $Repo }',
+        '$payload = [ordered]@{',
+        "  host = 'kiro'",
+        "  platform = 'macos'",
+        '  repo_root = $repoRoot',
+        "  repo_status = 'git-repo'",
+        "  target_mode = 'git-repo'",
+        "  target_kind = 'child_git_repo'",
+        '  workspace_root = $repoRoot',
+        '  selected_repo_root = $repoRoot',
+        '  target = [ordered]@{ target_root = $repoRoot; state_write_allowed = $true; git_health = [ordered]@{ status = "ok" } }',
+        '  tools = [ordered]@{',
+        '    context7 = [ordered]@{ required = $true; dependency_status = "ready"; host_config_required = $true; host_config_status = "ready"; project_status = "ready" }',
+        '    "sequential-thinking" = [ordered]@{ required = $true; dependency_status = "ready"; host_config_required = $true; host_config_status = "ready"; project_status = "ready" }',
+        '  }',
+        '  next_actions = @()',
+        '}',
+        '$payload | ConvertTo-Json -Depth 10 -Compress',
+      ].join('\n'));
+      fs.writeFileSync(path.join(scriptsDir, 'install-helpers.ps1'), '@{ helper_tools = @{}; provider_readiness = @() } | ConvertTo-Json -Compress');
+      fs.writeFileSync(path.join(scriptsDir, 'write-setup-facts.ps1'), [
+        'param([string]$FactsFile)',
+        '$facts = Get-Content -Raw -LiteralPath $FactsFile | ConvertFrom-Json',
+        '$repoRoot = [string]$facts.selected_repo_root',
+        '$configDir = Join-Path $repoRoot ".spec-first/config"',
+        'New-Item -ItemType Directory -Force -Path $configDir | Out-Null',
+        '$toolFactsPath = Join-Path $configDir "tool-facts.json"',
+        '$runtimePath = Join-Path $configDir "runtime-capabilities.json"',
+        '@{ provider_readiness = @(); configured_dependencies = @() } | ConvertTo-Json -Depth 8 | Set-Content -Encoding utf8 $toolFactsPath',
+        '@{ baseline_ready = $true } | ConvertTo-Json -Depth 8 | Set-Content -Encoding utf8 $runtimePath',
+        '@{ tool_facts_status = "ready"; tool_facts_path = $toolFactsPath; runtime_capabilities_status = "ready"; runtime_capabilities_path = $runtimePath } | ConvertTo-Json -Compress',
+      ].join('\n'));
+      fs.writeFileSync(path.join(scriptsDir, 'provider-readiness-renderer.cjs'), 'process.stdout.write("[]");\n');
+      fs.writeFileSync(path.join(scriptsDir, 'render-status-block.cjs'), 'process.stdin.resume();\n');
+
+      const result = spawnPwsh(['-NoProfile', '-File', path.join(scriptsDir, 'verify-tools.ps1'), '-AllRepos'], {
+        cwd: workspace,
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          SPEC_FIRST_BUNDLED_VERSION: '2.0.0',
+          HOME: path.join(tmp, 'home'),
+        },
+      });
+      if (result === null) {
+        return;
+      }
+      expect(result.status).toBe(1);
+      const summary = JSON.parse(result.stdout);
+      const repoAResult = summary.results.find((entry) => entry.repo_label === 'repo a');
+      expect(summary.parent_generated_runtime_manifest.next_action).toBe('spec-first init --kiro -y -u <name>');
+      expect(repoAResult.result.generated_runtime_manifest.next_action).toBe('spec-first init --kiro --repo "repo a" -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --kiro --all-repos -y -u <name>');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
 });

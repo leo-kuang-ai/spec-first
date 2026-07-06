@@ -234,15 +234,41 @@ function Get-GeneratedRuntimeManifestHealth {
   }
 }
 
+function Get-GeneratedRuntimeHostFlag {
+  param([string]$HostName)
+
+  switch ($HostName) {
+    'claude' { return '--claude ' }
+    'codex' { return '--codex ' }
+    'cursor' { return '--cursor ' }
+    'kiro' { return '--kiro ' }
+    'qoder' { return '--qoder ' }
+    default { return '' }
+  }
+}
+
+function Format-InitExampleArg {
+  param([string]$Value)
+
+  $raw = [string]$Value
+  if ($raw -match '^[A-Za-z0-9_./:\\-]+$') {
+    return $raw
+  }
+  return ($raw | ConvertTo-Json -Compress)
+}
+
 function Get-GeneratedRuntimeRefreshActionForFacts {
   param([object]$Facts)
 
+  $hostName = if ($null -ne $Facts -and $Facts.PSObject.Properties.Name -contains 'host') { [string]$Facts.host } else { '' }
+  $hostFlag = Get-GeneratedRuntimeHostFlag -HostName $hostName
   $selectionSource = [string](Get-NestedValue -InputObject $Facts -PathParts @('target', 'selection_source'))
   $repoLabel = [string](Get-NestedValue -InputObject $Facts -PathParts @('target', 'repo_label'))
   if ($selectionSource -eq 'explicit-repo' -and -not [string]::IsNullOrWhiteSpace($repoLabel) -and $repoLabel -ne '.') {
-    return "spec-first init --repo $repoLabel -y -u <name>"
+    $quotedRepoLabel = Format-InitExampleArg -Value $repoLabel
+    return "spec-first init $hostFlag--repo $quotedRepoLabel -y -u <name>"
   }
-  return 'spec-first init -y -u <name>'
+  return "spec-first init $hostFlag-y -u <name>"
 }
 
 function Test-PathIsSymlink {
@@ -519,6 +545,8 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
 
   New-Item -ItemType Directory -Force -Path $MarkerDir | Out-Null
   $results = @()
+  $parentHostName = [string]$HostInfo.host
+  $parentHostFlag = Get-GeneratedRuntimeHostFlag -HostName $parentHostName
   foreach ($child in $children) {
     $childRun = Invoke-ChildScriptCaptured -ScriptPath $PSCommandPath -Arguments @{ Repo = [string]$child.workspace_relative_path }
     $childStatus = [int]$childRun.exit_code
@@ -544,7 +572,8 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
         $childGeneratedRuntimeManifest = if ($childLedger.PSObject.Properties.Name -contains 'generated_runtime_manifest') { $childLedger.generated_runtime_manifest } else { [pscustomobject]@{ status = 'unknown'; reason_code = 'not-reported' } }
         $childNextActions = @($childLedger.next_actions)
         if ($childManifestRefreshRequired) {
-          $childManifestAction = "spec-first init --repo $($child.workspace_relative_path) -y -u <name>"
+          $quotedChildPath = Format-InitExampleArg -Value ([string]$child.workspace_relative_path)
+          $childManifestAction = "spec-first init $parentHostFlag--repo $quotedChildPath -y -u <name>"
           if ($childGeneratedRuntimeManifest -is [System.Collections.IDictionary]) {
             $childGeneratedRuntimeManifest['next_action'] = $childManifestAction
           } elseif ($childGeneratedRuntimeManifest.PSObject.Properties.Name -contains 'next_action') {
@@ -599,9 +628,12 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
     }
   }
 
-  $parentGeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName ([string]$HostInfo.host) -TargetRoot $workspaceRoot
+  $parentRuntimeAction = "spec-first init $parentHostFlag-y -u <name>"
+  $childRuntimeAction = "spec-first init $parentHostFlag--repo <child> -y -u <name>"
+  $allReposRuntimeAction = "spec-first init $parentHostFlag--all-repos -y -u <name>"
+  $parentGeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName $parentHostName -TargetRoot $workspaceRoot -NextAction $parentRuntimeAction
   if (@('stale', 'missing') -contains [string]$parentGeneratedRuntimeManifest.status) {
-    $parentGeneratedRuntimeManifest['next_action'] = 'spec-first init -y -u <name>'
+    $parentGeneratedRuntimeManifest['next_action'] = $parentRuntimeAction
   }
   $readyCount = @($results | Where-Object { $_.overall_status -eq 'ready' }).Count
   $actionRequiredCount = @($results | Where-Object { $_.overall_status -ne 'ready' }).Count
@@ -657,10 +689,10 @@ function Write-WorkspaceMcpVerifySummaryAndExit {
         ('- Workspace pollution detected: wrote .spec-first/workspace/parent-artifact-quarantine.json ({0} paths quarantined). Run `spec-first clean --workspace-orphans` for read-only inspection.' -f $parentWorkspacePollutionCount)
       }
       if ($manifestRefreshRequiredCount -gt 0) {
-        '- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run `spec-first init -y -u <name>` for the parent workspace runtime; use `spec-first init --repo <child> -y -u <name>` for a stale child repo, or explicit `spec-first init --all-repos -y -u <name>` for intentional batch child-root refresh.'
+        "- Generated runtime manifest stale or missing in the parent workspace or one or more child repos. Run ``$parentRuntimeAction`` for the parent workspace runtime; use ``$childRuntimeAction`` for a stale child repo, or explicit ``$allReposRuntimeAction`` for intentional batch child-root refresh."
       }
     )
-    next_action = if ($manifestRefreshRequiredCount -gt 0) { 'Run spec-first init -y -u <name> from the parent workspace for parent runtime, or spec-first init --repo <child> -y -u <name> for stale child repos, then rerun verify.' } elseif ($actionRequiredCount -eq 0) { 'All child repos verified required MCP/helper dependency readiness.' } else { 'Inspect per-child reason_code and rerun setup/verify for action-required repos.' }
+    next_action = if ($manifestRefreshRequiredCount -gt 0) { "Run $parentRuntimeAction from the parent workspace for parent runtime, or $childRuntimeAction for stale child repos, then rerun verify." } elseif ($actionRequiredCount -eq 0) { 'All child repos verified required MCP/helper dependency readiness.' } else { 'Inspect per-child reason_code and rerun setup/verify for action-required repos.' }
   }
 
   try {
@@ -845,12 +877,12 @@ $combined = [ordered]@{
   target_kind = $factsTargetKind
   workspace_root = $Facts.workspace_root
   selected_repo_root = $Facts.selected_repo_root
-  selected_folder_root = if ($null -ne $Facts.PSObject.Properties['target']) { $Facts.target.selected_folder_root } else { $null }
-  target_root = if ($null -ne $Facts.PSObject.Properties['target']) { $Facts.target.target_root } else { $Facts.repo_root }
+  selected_folder_root = if ($null -ne $Facts.PSObject.Properties['target'] -and $Facts.target.PSObject.Properties.Name -contains 'selected_folder_root') { $Facts.target.selected_folder_root } else { $null }
+  target_root = if ($null -ne $Facts.PSObject.Properties['target'] -and $Facts.target.PSObject.Properties.Name -contains 'target_root') { $Facts.target.target_root } else { $Facts.repo_root }
   parent_workspace_advisory = $parentWorkspaceAdvisory
-  target_candidate_count = $Facts.target_candidate_count
-  target_candidates = @($Facts.target_candidates)
-  reason_code = $Facts.reason_code
+  target_candidate_count = if ($Facts.PSObject.Properties.Name -contains 'target_candidate_count') { $Facts.target_candidate_count } else { $null }
+  target_candidates = if ($Facts.PSObject.Properties.Name -contains 'target_candidates') { @($Facts.target_candidates) } else { @() }
+  reason_code = if ($Facts.PSObject.Properties.Name -contains 'reason_code') { $Facts.reason_code } else { $null }
   host_ledger_pointer = [ordered]@{
     host = $Facts.host
     path = $MarkerPath
@@ -1073,6 +1105,22 @@ $summaryRows = @(
     (Format-Cell (Get-Field -InputObject $manifest -Name 'status' -Default 'unknown')),
     $manifestEvidence,
     (Format-Cell (Get-Field -InputObject $manifest -Name 'next_action' -Default ''))
+  ),
+  ,@(
+    'Host setup facts pointer',
+    $(if ($null -eq $combined.host_pointer_reconciliation) { 'current' } else { 'reconciled' }),
+    $(if ($null -eq $combined.host_pointer_reconciliation) {
+      "host=$([string]$combined.host)"
+    } else {
+      "from=$([string]$combined.host_pointer_reconciliation.from_host), to=$([string]$combined.host_pointer_reconciliation.to_host)"
+    }),
+    $(if ($null -eq $combined.host_pointer_reconciliation) { '' } else { 'setup facts refreshed for current host' })
+  ),
+  ,@(
+    'Host runtime readiness',
+    $(if ($combined.host_runtime_ready) { 'ready' } else { 'action-required' }),
+    "host_runtime_ready=$($combined.host_runtime_ready.ToString().ToLowerInvariant())",
+    $(if ($combined.host_runtime_ready) { '' } else { (Format-Cell (Get-Field -InputObject $manifest -Name 'next_action' -Default '')) })
   )
 )
 
@@ -1187,8 +1235,8 @@ $sections = @(
     title = 'Project setup facts'
     headers = @('Artifact', 'Project', 'Next')
     rows = @(
-      @('tool-facts.json', (Format-Cell $combined.tool_facts_status), (Format-Cell $toolFactsNext)),
-      @('runtime-capabilities.json', (Format-Cell $combined.runtime_capabilities_status), (Format-Cell $runtimeNext))
+      @('tool-facts.json', (Format-Cell "$($combined.tool_facts_status) (host=$($combined.host))"), (Format-Cell $toolFactsNext)),
+      @('runtime-capabilities.json', (Format-Cell "$($combined.runtime_capabilities_status) (host=$($combined.host))"), (Format-Cell $runtimeNext))
     )
   }
   [ordered]@{

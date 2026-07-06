@@ -1,7 +1,9 @@
 const path = require('node:path');
+const fs = require('node:fs');
 const { spawnSync } = require('node:child_process');
 
 const pkg = require('../../../package.json');
+const { getAdapter, getSupportedPlatforms } = require('../adapters');
 const {
   discoverChildGitRepos,
   findGitRoot,
@@ -70,21 +72,21 @@ async function runUpdate(argv, deps = {}) {
   const refresh = resolveRuntimeRefresh(cwd);
   if (!refresh || !Array.isArray(refresh.args)) {
     console.log('Runtime refresh: skipped (scope could not be determined safely).');
-    printRuntimeRefreshFallback();
+    printRuntimeRefreshFallback(refresh);
   } else {
     console.log(`Refreshing runtime assets via: ${formatSpecFirstCommand(refresh.args)}`);
     const refreshResult = runRuntimeRefresh(refresh.args, { cwd: refresh.cwd || cwd });
     if (refreshResult && refreshResult.errorCode === 'ENOENT') {
       console.error('');
       console.error('Runtime refresh: degraded (`spec-first` was not found on PATH after upgrade).');
-      printRuntimeRefreshFallback();
+      printRuntimeRefreshFallback(refresh);
       return 1;
     }
     if (!refreshResult || refreshResult.status !== 0) {
       const status = refreshResult && Number.isInteger(refreshResult.status) ? refreshResult.status : 1;
       console.error('');
       console.error(`Runtime refresh: degraded (spec-first init exited with code ${status}).`);
-      printRuntimeRefreshFallback();
+      printRuntimeRefreshFallback(refresh);
       return 1;
     }
     console.log('Runtime refresh completed.');
@@ -131,7 +133,7 @@ function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
   const root = path.resolve(cwd);
   if (findGitRoot(root)) {
     return {
-      args: ['init', '-y'],
+      args: buildRuntimeRefreshArgs(root),
       cwd: root,
       reason_code: 'single-git-repo',
     };
@@ -139,8 +141,12 @@ function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
 
   const childRepos = discoverChildGitRepos(root);
   if (childRepos.length > 0) {
+    const parentArgs = buildRuntimeRefreshArgs(root);
+    const childPlatforms = detectInstalledRuntimePlatformsInRoots(childRepos.map((repo) => repo.git_root));
     return {
-      args: ['init', '-y'],
+      args: parentArgs.length > 2 || childPlatforms.length === 0
+        ? parentArgs
+        : buildRuntimeRefreshArgsForPlatforms(childPlatforms, ['--all-repos']),
       cwd: root,
       reason_code: 'parent-workspace',
       child_repo_count: childRepos.length,
@@ -154,11 +160,84 @@ function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
   };
 }
 
-function printRuntimeRefreshFallback() {
+function buildRuntimeRefreshArgs(root) {
+  const platforms = detectInstalledRuntimePlatforms(root);
+  return buildRuntimeRefreshArgsForPlatforms(platforms);
+}
+
+function buildRuntimeRefreshArgsForPlatforms(platforms, targetArgs = []) {
+  if (platforms.length === 0) {
+    return ['init', ...targetArgs, '-y'];
+  }
+  return ['init', ...platforms.map((platform) => `--${platform}`), ...targetArgs, '-y'];
+}
+
+function detectInstalledRuntimePlatforms(root) {
+  return detectInstalledRuntimePlatformsInRoots([root]);
+}
+
+function detectInstalledRuntimePlatformsInRoots(roots) {
+  const installed = new Set();
+  for (const root of roots) {
+    for (const platform of getSupportedPlatforms()) {
+      const adapter = getAdapter(platform);
+      if (fs.existsSync(path.join(root, adapter.stateFile))) {
+        installed.add(platform);
+      }
+    }
+  }
+  return getSupportedPlatforms()
+    .filter((platform) => installed.has(platform));
+}
+
+function printRuntimeRefreshFallback(refresh = {}) {
+  const args = Array.isArray(refresh.args) ? refresh.args : null;
+  const singleArgs = args && args.length > 0 ? stripInitTargetArgs(args) : ['init', '-y'];
+  const parentArgs = args && args.length > 0 ? args : ['init', '-y'];
+  const childArgs = args && args.length > 0
+    ? insertInitTargetArgs(stripInitTargetArgs(args), ['--repo', '<path>'])
+    : ['init', '--repo', '<path>', '-y'];
   console.error('Fallback commands:');
-  console.error('  Single repo: spec-first init -y -u <name>');
-  console.error('  Parent workspace: spec-first init -y -u <name>');
-  console.error('  Child repo: spec-first init --repo <path> -y -u <name>');
+  console.error(`  Single repo: ${formatSpecFirstCommand(withDeveloperPlaceholder(singleArgs))}`);
+  console.error(`  Parent workspace: ${formatSpecFirstCommand(withDeveloperPlaceholder(parentArgs))}`);
+  console.error(`  Child repo: ${formatSpecFirstCommand(withDeveloperPlaceholder(childArgs))}`);
+}
+
+function stripInitTargetArgs(args) {
+  const output = [];
+  for (let index = 0; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === '--all-repos') {
+      continue;
+    }
+    if (arg === '--repo') {
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith('--repo=')) {
+      continue;
+    }
+    output.push(arg);
+  }
+  return output;
+}
+
+function insertInitTargetArgs(args, targetArgs) {
+  const output = [...args];
+  const yesIndex = output.findIndex((arg) => arg === '-y' || arg === '--yes');
+  const insertAt = yesIndex >= 0 ? yesIndex : output.length;
+  output.splice(insertAt, 0, ...targetArgs);
+  return output;
+}
+
+function withDeveloperPlaceholder(args) {
+  if (!Array.isArray(args)) return ['init', '-y', '-u', '<name>'];
+  if (args.includes('-u') || args.includes('--user')) return args;
+  const output = [...args];
+  const yesIndex = output.findIndex((arg) => arg === '-y' || arg === '--yes');
+  const insertAt = yesIndex >= 0 ? yesIndex + 1 : output.length;
+  output.splice(insertAt, 0, '-u', '<name>');
+  return output;
 }
 
 function formatSpecFirstCommand(args) {
@@ -194,6 +273,11 @@ function printHelp() {
 }
 
 module.exports = {
+  buildRuntimeRefreshArgs,
+  detectInstalledRuntimePlatforms,
+  insertInitTargetArgs,
   resolveRuntimeRefreshCommand,
   runUpdate,
+  stripInitTargetArgs,
+  withDeveloperPlaceholder,
 };

@@ -68,8 +68,94 @@ describe('spec-mcp-setup verify host propagation contract', () => {
       expect(source).toContain('state.manifestVersion vs bundled manifest.version');
       expect(source).toContain('Required MCP/helper dependencies');
       expect(source).toContain('Generated runtime manifest');
+      expect(source).toContain('Host setup facts pointer');
+      expect(source).toContain('Host runtime readiness');
       expect(source).not.toContain('"Harness runtime"');
       expect(source).not.toContain("'Harness runtime'");
+    }
+  });
+
+  test('verify suggests explicit host init flags for Kiro stale runtime manifests', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-verify-kiro-runtime-'));
+    try {
+      const scriptsDir = path.join(tmp, 'scripts');
+      const repo = path.join(tmp, 'repo');
+      const markerPath = path.join(tmp, 'marker', 'readiness-ledger.json');
+      fs.mkdirSync(path.join(repo, '.git'), { recursive: true });
+      writeJson(path.join(repo, '.kiro/spec-first/state.json'), { manifestVersion: '1.0.0' });
+
+      copyExecutable(verifyToolsSh, path.join(scriptsDir, 'verify-tools.sh'));
+      writeFile(path.join(scriptsDir, 'detect-host.sh'), [
+        '#!/bin/bash',
+        'cat <<JSON',
+        JSON.stringify({ host: 'kiro', marker_path: markerPath }),
+        'JSON',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'detect-tools.sh'), [
+        '#!/bin/bash',
+        'set -euo pipefail',
+        'repo=""',
+        'while [ "$#" -gt 0 ]; do',
+        '  case "$1" in',
+        '    --repo) repo="$2"; shift 2 ;;',
+        '    *) shift ;;',
+        '  esac',
+        'done',
+        'jq -n --arg repo "$repo" \'{',
+        '  host:"kiro",',
+        '  platform:"macos",',
+        '  repo_root:$repo,',
+        '  repo_status:"git-repo",',
+        '  target_mode:"git-repo",',
+        '  target_kind:"child_git_repo",',
+        '  workspace_root:$repo,',
+        '  selected_repo_root:$repo,',
+        '  target:{target_root:$repo,state_write_allowed:true,selection_source:"explicit-repo",repo_label:"repo"},',
+        '  tools:{',
+        '    context7:{required:true,dependency_status:"ready",host_config_required:true,host_config_status:"ready",project_status:"ready"},',
+        '    "sequential-thinking":{required:true,dependency_status:"ready",host_config_required:true,host_config_status:"ready",project_status:"ready"}',
+        '  },',
+        '  next_actions:[]',
+        '}\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'install-helpers.sh'), [
+        '#!/bin/bash',
+        'printf \'{"helper_tools":{},"provider_readiness":[]}\\n\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'scan-configured-deps.sh'), [
+        '#!/bin/bash',
+        'printf \'{"configured_dependencies":[]}\\n\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'write-setup-facts.sh'), [
+        '#!/bin/bash',
+        'printf \'{"tool_facts_status":"ready","runtime_capabilities_status":"ready"}\\n\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'provider-readiness-renderer.cjs'), 'process.stdout.write("[]");\n');
+      writeFile(path.join(scriptsDir, 'render-status-block.cjs'), 'process.stdin.resume();\n');
+
+      const result = spawnSync('bash', [path.join(scriptsDir, 'verify-tools.sh'), '--repo', repo], {
+        cwd: repo,
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          SPEC_FIRST_BUNDLED_VERSION: '2.0.0',
+          HOME: path.join(tmp, 'home'),
+          PATH: process.env.PATH,
+        },
+        encoding: 'utf8',
+      });
+
+      expect(result.status).toBe(0);
+      expect(result.stderr).not.toContain('syntax error');
+      const ledger = JSON.parse(read(markerPath));
+      expect(ledger.overall_status).toBe('action-required');
+      expect(ledger.reason_code).toBe('generated-runtime-manifest-refresh-required');
+      expect(ledger.generated_runtime_manifest.status).toBe('stale');
+      expect(ledger.generated_runtime_manifest.next_action).toBe('spec-first init --kiro --repo repo -y -u <name>');
+      expect(ledger.next_actions).toContain('spec-first init --kiro --repo repo -y -u <name>');
+      expect(ledger.host_runtime_ready).toBe(false);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
 
@@ -79,8 +165,8 @@ describe('spec-mcp-setup verify host propagation contract', () => {
 
     for (const source of [bashSource, powerShellSource]) {
       expect(source).toContain('spec-first init -y -u <name>');
-      expect(source).toContain('spec-first init --repo <child> -y -u <name>');
-      expect(source).toContain('explicit `spec-first init --all-repos -y -u <name>`');
+      expect(source).toContain('--repo <child> -y -u <name>');
+      expect(source).toContain('--all-repos -y -u <name>');
       expect(source).toContain('Generated runtime manifest stale or missing in the parent workspace or one or more child repos');
       expect(source).toContain('current');
       expect(source).toContain('stale');
@@ -194,14 +280,124 @@ describe('spec-mcp-setup verify host propagation contract', () => {
         reason_code: 'generated-runtime-manifest-refresh-required',
       });
       expect(repoAResult.result.generated_runtime_manifest.status).toBe('stale');
-      expect(repoAResult.result.generated_runtime_manifest.next_action).toBe('spec-first init --repo repo-a -y -u <name>');
-      expect(repoAResult.result.next_actions).toContain('spec-first init --repo repo-a -y -u <name>');
+      expect(repoAResult.result.generated_runtime_manifest.next_action).toBe('spec-first init --codex --repo repo-a -y -u <name>');
+      expect(repoAResult.result.next_actions).toContain('spec-first init --codex --repo repo-a -y -u <name>');
       expect(repoAResult.result.next_actions).not.toContain('spec-first init -y');
       expect(repoBResult.overall_status).toBe('ready');
-      expect(summary.runtime_hints.join('\n')).toContain('spec-first init -y -u <name>');
-      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --repo <child> -y -u <name>');
-      expect(summary.next_action).toContain('spec-first init -y -u <name>');
-      expect(summary.next_action).toContain('spec-first init --repo <child> -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --codex -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --codex --repo <child> -y -u <name>');
+      expect(summary.next_action).toContain('spec-first init --codex -y -u <name>');
+      expect(summary.next_action).toContain('spec-first init --codex --repo <child> -y -u <name>');
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  test('bash all-repos verify suggests explicit Kiro init flags for parent and child runtime manifests', () => {
+      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-verify-all-repos-kiro-'));
+      try {
+        const scriptsDir = path.join(tmp, 'scripts');
+        const workspace = path.join(tmp, 'workspace');
+        const repoA = path.join(workspace, 'repo a');
+        const repoB = path.join(workspace, 'repo-b');
+      const markerPath = path.join(tmp, 'marker', 'readiness-ledger.json');
+      fs.mkdirSync(path.join(repoA, '.git'), { recursive: true });
+      fs.mkdirSync(path.join(repoB, '.git'), { recursive: true });
+      writeJson(path.join(workspace, '.kiro/spec-first/state.json'), { manifestVersion: '1.0.0' });
+      writeJson(path.join(repoA, '.kiro/spec-first/state.json'), { manifestVersion: '1.0.0' });
+      writeJson(path.join(repoB, '.kiro/spec-first/state.json'), { manifestVersion: '2.0.0' });
+
+      copyExecutable(verifyToolsSh, path.join(scriptsDir, 'verify-tools.sh'));
+      writeFile(path.join(scriptsDir, 'detect-host.sh'), [
+        '#!/bin/bash',
+        'cat <<JSON',
+        JSON.stringify({ host: 'kiro', marker_path: markerPath }),
+        'JSON',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'resolve-project-target.sh'), [
+        '#!/bin/bash',
+        'cat <<JSON',
+        JSON.stringify({
+          mode: 'parent-workspace',
+          repo_status: 'parent-workspace',
+          target_kind: 'parent-workspace',
+          workspace_root: workspace,
+          candidates: [
+            { repo_label: 'repo a', git_root: repoA, workspace_relative_path: 'repo a' },
+            { repo_label: 'repo-b', git_root: repoB, workspace_relative_path: 'repo-b' },
+          ],
+          git_health: { status: 'ok', reason_code: 'git-ok' },
+        }),
+        'JSON',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'detect-tools.sh'), [
+        '#!/bin/bash',
+        'set -euo pipefail',
+        'repo=""',
+        'while [ "$#" -gt 0 ]; do',
+        '  case "$1" in',
+        '    --repo) repo="$2"; shift 2 ;;',
+        '    *) shift ;;',
+        '  esac',
+        'done',
+        'jq -n --arg repo "$repo" \'{',
+        '  host:"kiro",',
+        '  platform:"macos",',
+        '  repo_root:$repo,',
+        '  repo_status:"git-repo",',
+        '  target_mode:"git-repo",',
+        '  target_kind:"child_git_repo",',
+        '  workspace_root:$repo,',
+        '  selected_repo_root:$repo,',
+        '  target:{target_root:$repo,state_write_allowed:true,git_health:{status:"ok"}},',
+        '  tools:{',
+        '    context7:{required:true,dependency_status:"ready",host_config_required:true,host_config_status:"ready",project_status:"ready"},',
+        '    "sequential-thinking":{required:true,dependency_status:"ready",host_config_required:true,host_config_status:"ready",project_status:"ready"}',
+        '  },',
+        '  next_actions:[]',
+        '}\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'install-helpers.sh'), [
+        '#!/bin/bash',
+        'printf \'{"helper_tools":{},"provider_readiness":[]}\\n\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'scan-configured-deps.sh'), [
+        '#!/bin/bash',
+        'printf \'{"configured_dependencies":[]}\\n\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'write-setup-facts.sh'), [
+        '#!/bin/bash',
+        'printf \'{"tool_facts_status":"ready","runtime_capabilities_status":"ready"}\\n\'',
+      ].join('\n'), 0o755);
+      writeFile(path.join(scriptsDir, 'provider-readiness-renderer.cjs'), 'process.stdout.write("[]");\n');
+      writeFile(path.join(scriptsDir, 'render-status-block.cjs'), 'process.stdin.resume();\n');
+
+      const result = spawnSync('bash', [path.join(scriptsDir, 'verify-tools.sh'), '--all-repos'], {
+        cwd: workspace,
+        env: {
+          ...process.env,
+          MCP_SETUP_HOST: 'kiro',
+          SPEC_FIRST_BUNDLED_VERSION: '2.0.0',
+          HOME: path.join(tmp, 'home'),
+          PATH: process.env.PATH,
+        },
+        encoding: 'utf8',
+      });
+
+      expect(result.status).toBe(1);
+      expect(result.stderr).not.toContain('syntax error');
+      const summary = JSON.parse(result.stdout);
+      const repoAResult = summary.results.find((entry) => entry.repo_label === 'repo a');
+      expect(summary.parent_generated_runtime_manifest.status).toBe('stale');
+      expect(summary.parent_generated_runtime_manifest.next_action).toBe('spec-first init --kiro -y -u <name>');
+      expect(repoAResult.result.generated_runtime_manifest.next_action).toBe('spec-first init --kiro --repo "repo a" -y -u <name>');
+      expect(repoAResult.result.next_actions).toContain('spec-first init --kiro --repo "repo a" -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --kiro -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --kiro --repo <child> -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).toContain('spec-first init --kiro --all-repos -y -u <name>');
+      expect(summary.next_action).toContain('spec-first init --kiro -y -u <name>');
+      expect(summary.next_action).toContain('spec-first init --kiro --repo <child> -y -u <name>');
+      expect(summary.runtime_hints.join('\n')).not.toContain('Run `spec-first init -y -u <name>`');
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
