@@ -141,11 +141,13 @@ function resolveRuntimeRefreshCommand(cwd = process.cwd()) {
 
   const childRepos = discoverChildGitRepos(root);
   if (childRepos.length > 0) {
-    const parentArgs = buildRuntimeRefreshArgs(root);
+    // 父 workspace 自身装了 host runtime 时按父范围刷新;否则回落到 child host 驱动的 --all-repos。
+    const parentPlatforms = detectInstalledRuntimePlatforms(root);
+    const parentHasOwnHostState = parentPlatforms.length > 0;
     const childPlatforms = detectInstalledRuntimePlatformsInRoots(childRepos.map((repo) => repo.git_root));
     return {
-      args: parentArgs.length > 2 || childPlatforms.length === 0
-        ? parentArgs
+      args: parentHasOwnHostState || childPlatforms.length === 0
+        ? buildRuntimeRefreshArgsForPlatforms(parentPlatforms)
         : buildRuntimeRefreshArgsForPlatforms(childPlatforms, ['--all-repos']),
       cwd: root,
       reason_code: 'parent-workspace',

@@ -119,6 +119,28 @@ describe('spec-first update command', () => {
     }
   });
 
+  test('parent workspace with its own host state refreshes parent scope, not child-driven --all-repos', () => {
+    const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-update-workspace-parent-host-'));
+    try {
+      // 父 workspace 自身装了 claude runtime,子仓装了 kiro:应按父范围刷新,不塌陷成 child host 的 --all-repos。
+      fs.mkdirSync(path.join(workspaceRoot, '.claude', 'spec-first'), { recursive: true });
+      fs.writeFileSync(path.join(workspaceRoot, '.claude', 'spec-first', 'state.json'), '{}\n');
+      const childRoot = path.join(workspaceRoot, 'project-a');
+      fs.mkdirSync(path.join(childRoot, '.git'), { recursive: true });
+      fs.mkdirSync(path.join(childRoot, '.kiro', 'spec-first'), { recursive: true });
+      fs.writeFileSync(path.join(childRoot, '.kiro', 'spec-first', 'state.json'), '{}\n');
+
+      expect(resolveRuntimeRefreshCommand(workspaceRoot)).toEqual({
+        args: ['init', '--claude', '-y'],
+        cwd: path.resolve(workspaceRoot),
+        reason_code: 'parent-workspace',
+        child_repo_count: 1,
+      });
+    } finally {
+      fs.rmSync(workspaceRoot, { recursive: true, force: true });
+    }
+  });
+
   test('runtime refresh resolver uses explicit flags for installed preview host runtimes', () => {
     const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-update-kiro-'));
     try {
@@ -238,6 +260,11 @@ describe('spec-first update command', () => {
       '<path>',
       '-y',
     ]);
+    // withDeveloperPlaceholder 不能在已带 -u/--user 时重复插入。
+    expect(withDeveloperPlaceholder(['init', '-y', '-u', 'alice'])).toEqual(['init', '-y', '-u', 'alice']);
+    expect(withDeveloperPlaceholder(['init', '--kiro', '--user', 'bob', '-y'])).toEqual(['init', '--kiro', '--user', 'bob', '-y']);
+    // stripInitTargetArgs 需同时处理 `--repo <x>` 与 `--repo=<x>` 两种形态。
+    expect(stripInitTargetArgs(['init', '--kiro', '--repo=repo-a', '-y'])).toEqual(['init', '--kiro', '-y']);
   });
 
   test('all-repos refresh fallback prints valid single and child commands', async () => {
