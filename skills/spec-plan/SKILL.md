@@ -1,6 +1,6 @@
 ---
 name: spec-plan
-description: "Create a structured HOW plan when the user has a clear goal, requirements document, brainstorm/PRD handoff, feature, bug, or project; also deepen an existing plan when asked to strengthen the plan as a whole. Prefer spec-brainstorm for unresolved WHAT/product exploration, spec-work for implementation or tests, spec-doc-review for independent plan review, and spec-write-tasks for task-pack compilation. Do not use for generated runtime mirror fixes."
+description: "Create a structured HOW plan when the user has a clear goal, requirements document, brainstorm/PRD handoff, feature, bug, or project; also deepen an existing plan when asked to strengthen the plan as a whole. Prefer spec-brainstorm for unresolved WHAT/product exploration, spec-debug for failing tests, stack traces, reproducible regressions, or root-cause investigation, spec-work for implementation or tests, spec-doc-review for independent plan review, and spec-write-tasks for task-pack compilation. Do not use for generated runtime mirror fixes."
 ---
 
 # Create Technical Plan
@@ -33,7 +33,7 @@ Use when the desired outcome is clear enough to plan, when a requirements docume
 
 ### When Not To Use
 
-Do not use to implement code, run tests as proof, review a finished document without planning changes, resolve unclear product framing that belongs in `spec-brainstorm`, generate task-pack state, or rewrite generated runtime assets.
+Do not use to implement code, run tests as proof, investigate failing tests, stack traces, reproducible regressions, or root causes that belong in `spec-debug`, review a finished document without planning changes, resolve unclear product framing that belongs in `spec-brainstorm`, generate task-pack state, or rewrite generated runtime assets.
 
 ### Inputs
 
