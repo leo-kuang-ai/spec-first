@@ -300,6 +300,9 @@ split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-p
 - KTD9. 把 Activation-L1 routing quality 拆分为独立 follow-up plan，而不是本计划 body pilot 的一部分。
   - 理由：description tokens 是 always-loaded 的正交维度，touching 面超出 pilot 两个 skill；独立成 `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md` 让本计划 closeout 单维度、blast radius 可控。route semantics 仍归 host/LLM 拥有。
 
+- KTD10. 把 `@./references` 宿主 loader 探针（U3B）前置到 U4 之前，而不是只在末尾 U6 验证。
+  - 理由：`@./` eager-inline 是宿主特定行为（Claude import 语义，CLI 无展开逻辑）；只有先知道每个宿主是否 eager-inline，U4 才能在首轮就转换真正省 token 的 entry，而不是把 activation-token 收益全 gate 到 pilot 末尾。探针 read-only、可与其它单元并行，不增加 mutation 风险；U6 保留为最终投射确认。
+
 ---
 
 ## 待决问题
@@ -346,7 +349,7 @@ flowchart TB
 
 Activation path 总是支付 G 的成本，但 H 仍归宿主拥有。触发后，热路径默认只读 A；只有 A 的 STOP trigger 触发时才读取 B。它把 C 作为 confirmed deterministic facts 消费，并且永远不把 F 当作 source。
 
-**收益边界（P2-1）：** 本计划做的是 B（A→B 的 body 下沉）。B 的**确定收益**是热路径可读性、维护性和减少长上下文漏读；而「activation-time context-room 下降」只在宿主激活 skill 后**惰性加载** B 时才成立——若某宿主把 `@./references` 当 eager-inline，则 body 下沉不省 activation token。因此 context-room 收益是 `contingent-on-loader-behavior`，由 U6 五宿主 projection + runtime smoke 验证，未验证时不写成 confirmed。G/H（Activation-L1 description 索引层）本身归 follow-up plan 002；此图仅作为分层理解上下文。
+**收益边界（P2-1）：** 本计划做的是 B（A→B 的 body 下沉）。B 的**确定收益**是热路径可读性、维护性和减少长上下文漏读；而「activation-time context-room 下降」只在宿主激活 skill 后**惰性加载** B 时才成立——若某宿主把 `@./references` 当 eager-inline，则 body 下沉不省 activation token。因此 context-room 收益是 `contingent-on-loader-behavior`，**按宿主**判定：U3B loader 探针前置产出 per-host 事实（eager-inline / lazy / literal-text / not-projected），U4 据此在首轮转换可安全 lazy 的 entry，U6 做最终投射确认；未证明的宿主不写成 confirmed。G/H（Activation-L1 description 索引层）本身归 follow-up plan 002；此图仅作为分层理解上下文。
 
 ---
 
@@ -357,16 +360,17 @@ flowchart TB
   U0["U0 premise baseline snapshot"] --> U8["U8 final review + closeout"]
   U1["U1 spec-work task-pack CLI 下沉"] --> U2["U2 spec-work spine"]
   U3["U3 code-review governance 下沉"] --> U4["U4 code-review mode/stage spine"]
+  U3B["U3B @./references loader 探针"] --> U4
   U1 --> U5["U5 trigger/eval 守护"]
   U2 --> U5
   U3 --> U5
   U4 --> U5
-  U5 --> U6["U6 runtime + loader 验证"]
+  U5 --> U6["U6 runtime + loader 最终确认"]
   U6 --> U7["U7 pilot audit lens"]
   U7 --> U8
 ```
 
-> 注 1：`U1→U2` 与 `U3→U4` 是两条**独立链**，可并行；`spec-work → spec-code-review` 是推荐排程（先跑 work 复用经验），**非硬依赖**。U0 是零改动的只读 baseline，可在任意时点先做。
+> 注 1：`U1→U2` 与 `U3(+U3B)→U4` 是两条**独立链**，可并行；`spec-work → spec-code-review` 是推荐排程（先跑 work 复用经验），**非硬依赖**。U0（premise baseline）与 U3B（loader 探针）都是零改动的只读单元，可在任意时点先做；U3B 前置的目的是让 U4 首轮就能依 per-host loader 事实转换可安全 lazy 的 `@./` include，而不是把 token 收益全 gate 到 U6。
 > 注 2：U8 是本计划终局 closeout，按依赖在 U0–U7 之后执行；单元编号与执行顺序一致。Activation-L1 索引维度（原 U9–U11）已拆分到 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`。
 
 ### U0. Premise baseline snapshot（thin，只读，零 source 改动）
@@ -767,7 +771,7 @@ flowchart TB
 
 **需求：** R8, R9, R10
 
-**依赖：** U0-U7
+**依赖：** U0-U7（含 U3B）
 
 **文件：**
 - 修改：`CHANGELOG.md`
@@ -788,7 +792,7 @@ flowchart TB
 - 记录 pilot outcome bundle：
   - exact line-count delta（确定可测的经济性指标）；
   - **按宿主分别记录** approximate context-room delta：Claude 惰性加载 references 时才有 activation-time 节省，其它宿主（Codex/Cursor/Kiro/Qoder）若把 `@./references` 当字面文本则无 activation 节省；标注为 `contingent-on-loader-behavior`，与 line-count delta 分开报告，不合并成单一数字；
-  - `spec-code-review` 首轮明确声明：如 5 条 `@./` eager include 在 U6 loader 验证前保留，则首轮多半只兑现主 spine 可读性，activation-token 收益记为「gated-pending-U6」而非已实现；
+  - `spec-code-review` 依 U3B loader 事实分宿主报告：对 eager-inline 宿主，U4 首轮转换的 `@./` include 记为已兑现 token 收益；对 `loader_behavior_degraded` 或未证明宿主，对应 entry 保持显式、收益记为 `gated-pending-loader-facts`，不把 line-count delta 误报为 token 收益；
   - trigger/eval/static-test results；
   - fresh-source/runtime smoke result 或 degraded reason；
   - created references 清单，以及有意保留的 load-bearing text；
@@ -841,7 +845,7 @@ flowchart TB
 | 移除 prose 后 CLI 缺失使 task-pack 执行完全罢工（P3-3） | 显式声明 CLI 可用性前提；CLI 缺失以 `task_pack_cli_unavailable` 停止并交还 handoff，bare-prompt work 不受影响；实现前可提示 `spec-first doctor` 前置检查，但仍不 fallback 到 prose 重写校验。 |
 | 既有 dirty worktree changes 与本实现冲突 | 保持 edits scoped；绝不 revert unrelated changes；编辑前重新读取 touched files。 |
 | 外部 references 变成新的 truth source | 仅把 external docs 当作 advisory；repo source 和角色契约治理决策。 |
-| 收益依赖未验证的宿主 lazy-load 行为（P2-1） | body 下沉的确定收益是热路径可读性/维护性/减少长上下文漏读；activation-time context-room 下降是 contingent-on-loader-behavior，由 U6 五宿主 projection + runtime smoke 验证，未验证时标 `runtime_reference_smoke_degraded` 并保留 load-bearing text。 |
+| 收益依赖未验证的宿主 lazy-load 行为（P2-1） | body 下沉的确定收益是热路径可读性/维护性/减少长上下文漏读；activation-time context-room 下降是 contingent-on-loader-behavior，由 U3B loader 探针**前置**产出 per-host 事实、U4 据此转换、U6 最终确认；未证明的宿主标 `loader_behavior_degraded:<host>` / `runtime_reference_smoke_degraded` 并保留 load-bearing text。 |
 
 ---
 
@@ -859,7 +863,7 @@ flowchart TB
 - `spec-work/SKILL.md`：第一轮 workflow-prompt refactor 移除重复的 task-pack deterministic validation prose，并记录 line-count delta；`spec-work` 首轮现实预算 ~200 行，150 行为后续收敛方向；均为 advisory budget，不是 completion gate。
 - `spec-code-review/SKILL.md`：第一轮 governance pass 移除重复的 cross-skill governance prose，并记录 line-count delta；300-400 行是 advisory first-pass budget，220/150 只作为后续 convergence targets。
 - context-room delta 作为经济性指标**按宿主分别记录**，标注为 `contingent-on-loader-behavior`：仅在宿主激活后惰性加载 references 时成立（Claude `@./` inline 场景需转 lazy 才有节省；其它宿主若按字面文本处理则无 activation 节省）；与 line-count delta 分开，不作为 hard gate。
-- `spec-code-review` 首轮预期：若 `@./` eager include 在 U6 loader 验证前保留，首轮可能只兑现主 spine 可读性/维护性，activation-token 收益标为「gated-pending-U6」，不得把 line-count delta 误报为 token 收益。
+- `spec-code-review` 首轮预期：U3B loader 探针前置后，对 U3B 判定为 eager-inline 的宿主，U4 首轮即可转换对应 `@./` include 并兑现 activation-token 收益；U3B 记 `loader_behavior_degraded:<host>` 或行为未证明的宿主对应 entry 保持显式，其收益标为 `gated-pending-loader-facts`。不得把 line-count delta 误报为 token 收益。
 - 每个 new reference 都有对应 STOP trigger，且至少有一个 trigger/no-trigger test 或 eval case。
 - `spec-first tasks validate --json` 是 `spec-work` prompt text 中唯一的 task-pack hash/structure validation authority。
 - Focused test suite 通过，且不手改 generated runtime mirrors。

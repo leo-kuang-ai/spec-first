@@ -55,6 +55,45 @@ describe('prompt primitives', () => {
     expect(readOutput()).toContain('\x1b[4A\r\x1b[J');
   });
 
+  test('select supports Windows and alternate arrow key sequences', async () => {
+    const first = createPromptStreams();
+    const explicitResult = select('Workspace?', ['Parent', 'All repos'], {
+      input: first.input,
+      output: first.output,
+      requireExplicit: true,
+    });
+
+    first.input.write('\x1b[0B');
+    first.input.write('\r');
+
+    await expect(explicitResult).resolves.toBe('Parent');
+
+    const second = createPromptStreams();
+    const alternateResult = select('Workspace?', ['Parent', 'All repos'], {
+      input: second.input,
+      output: second.output,
+      requireExplicit: true,
+    });
+
+    second.input.write('\x1bOB');
+    second.input.write('\x1bOA');
+    second.input.write('\r');
+
+    await expect(alternateResult).resolves.toBe('All repos');
+
+    const third = createPromptStreams();
+    const legacyResult = select('Workspace?', ['Parent', 'All repos'], {
+      input: third.input,
+      output: third.output,
+      requireExplicit: true,
+    });
+
+    third.input.write('\x00P');
+    third.input.write('\r');
+
+    await expect(legacyResult).resolves.toBe('Parent');
+  });
+
   test('select clamps an invalid default index', async () => {
     const { input, output } = createPromptStreams();
     const result = select('Platform?', ['A', 'B'], { input, output, defaultIndex: 99 });

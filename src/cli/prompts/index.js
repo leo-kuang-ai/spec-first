@@ -351,14 +351,50 @@ function containsCancel(text) {
 function tokenizeInput(text) {
   const tokens = [];
   for (let index = 0; index < text.length; index += 1) {
-    if (text.startsWith('\x1b[A', index) || text.startsWith('\x1b[B', index)) {
-      tokens.push(text.slice(index, index + 3));
-      index += 2;
+    const arrowToken = readArrowToken(text, index);
+    if (arrowToken) {
+      tokens.push(arrowToken.token);
+      index += arrowToken.length - 1;
       continue;
     }
     tokens.push(text[index]);
   }
   return tokens;
+}
+
+function readArrowToken(text, index) {
+  const char = text[index];
+  if (char === '\x00' || char === '\xe0') {
+    const legacyDirection = text[index + 1];
+    if (legacyDirection === 'H') return { token: '\x1b[A', length: 2 };
+    if (legacyDirection === 'P') return { token: '\x1b[B', length: 2 };
+    return null;
+  }
+
+  if (char !== '\x1b') {
+    return null;
+  }
+
+  const ss3Direction = text[index + 2];
+  if (text[index + 1] === 'O' && (ss3Direction === 'A' || ss3Direction === 'B')) {
+    return { token: `\x1b[${ss3Direction}`, length: 3 };
+  }
+
+  if (text[index + 1] !== '[') {
+    return null;
+  }
+
+  for (let cursor = index + 2; cursor < text.length; cursor += 1) {
+    const cursorChar = text[cursor];
+    if (cursorChar === 'A' || cursorChar === 'B') {
+      return { token: `\x1b[${cursorChar}`, length: cursor - index + 1 };
+    }
+    if (!/^[0-9;?]$/.test(cursorChar)) {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 function write(output, contents) {
