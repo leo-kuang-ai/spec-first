@@ -155,7 +155,7 @@ The main engineering loop: `Codebase → Spec → Plan → Tasks → Code → Re
 | Review docs or plans | `spec-doc-review` | structured findings |
 | Capture reusable learning | `spec-compound` | `docs/solutions/` |
 
-Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish-beta, and write-skill entries for the current host.
+Support entrypoints (on demand): `spec-mcp-setup` for runtime environment plus required harness and MCP/helper readiness; plus the matching debug, optimize, ideate, compound-refresh, polish, and write-skill entries for the current host.
 
 [→ Full entrypoint reference with routing rules](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 

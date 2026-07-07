@@ -76,7 +76,7 @@ describe('public workflow contract summary', () => {
     const compoundRefresh = fs.readFileSync(path.join(ROOT, 'skills', 'spec-compound-refresh', 'SKILL.md'), 'utf8');
     const ideate = fs.readFileSync(path.join(ROOT, 'skills', 'spec-ideate', 'SKILL.md'), 'utf8');
     const optimize = fs.readFileSync(path.join(ROOT, 'skills', 'spec-optimize', 'SKILL.md'), 'utf8');
-    const polish = fs.readFileSync(path.join(ROOT, 'skills', 'spec-polish-beta', 'SKILL.md'), 'utf8');
+    const polish = fs.readFileSync(path.join(ROOT, 'skills', 'spec-polish', 'SKILL.md'), 'utf8');
     const releaseNotes = fs.readFileSync(path.join(ROOT, 'skills', 'spec-release-notes', 'SKILL.md'), 'utf8');
     const sessions = fs.readFileSync(path.join(ROOT, 'skills', 'spec-sessions', 'SKILL.md'), 'utf8');
     const skillAudit = fs.readFileSync(path.join(ROOT, 'skills', 'spec-skill-audit', 'SKILL.md'), 'utf8');
@@ -87,7 +87,7 @@ describe('public workflow contract summary', () => {
     expect(compoundRefresh).toContain('refresh report plus scoped edits under `docs/solutions/`');
     expect(ideate).toContain('ranked ideation artifact in `docs/ideation/`');
     expect(optimize).toContain('measurement scaffold and experiment log');
-    expect(polish).toContain('interactive polish loop');
+    expect(polish).toContain('inspect the feature in browser');
     expect(releaseNotes).toContain('version-cited release summary');
     expect(sessions).toContain('distilled replay references');
     expect(skillAudit).toContain('deterministic release/governance guard results');

@@ -1153,7 +1153,7 @@ After presenting findings and verdict (Stage 6), route the next steps by mode. R
   - residual actionable work
   - advisory-only outputs
   Per-agent full-detail JSON files (`{reviewer_name}.json`) are already present in this directory from Stage 4 dispatch.
-- Also write `metadata.json` alongside the findings so downstream skills (e.g., `spec-polish-beta`) can verify the artifact matches the current branch and HEAD. Minimum fields:
+- Also write `metadata.json` alongside the findings so downstream skills (e.g., `spec-polish`) can verify the artifact matches the current branch and HEAD. Minimum fields:
   ```json
   {
     "run_id": "<run-id>",

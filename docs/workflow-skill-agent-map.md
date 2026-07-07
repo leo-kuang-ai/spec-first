@@ -44,7 +44,7 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 | `spec-write-skill` | spec-write-skill | 编写、改写、迁移或按 audit findings 修复 spec-first source skill | 无 |
 | `spec-app-consistency-audit` | spec-app-consistency-audit | 对移动 App 的 PRD、Figma、源码、路由、架构边界等做静态一致性审查 | 无（专家判断由 skill-local prompts 承载） |
 | `spec-release-notes` | spec-release-notes | 总结最近的 spec-first 发布，或带版本引用回答关于某次历史发布的具体问题 | 无（`disable-model-invocation`，纯检索，不自动触发） |
-| `spec-polish-beta` | spec-polish-beta | [BETA] 启动 dev server、在浏览器打开功能并协作迭代改进 | 无（`disable-model-invocation`，浏览器迭代，不自动触发） |
+| `spec-polish` | spec-polish | 启动 dev server、在浏览器打开功能并协作迭代改进 | 无（`disable-model-invocation`，浏览器迭代，不自动触发） |
 
 ---
 

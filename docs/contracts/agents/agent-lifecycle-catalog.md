@@ -8,7 +8,7 @@
 |---|---|
 | Source refs | `agents/*.agent.md` frontmatter、`docs/workflow-skill-agent-map.md`、`docs/contracts/workflows/review-finding.md` |
 | Authority | advisory catalog；agent 文件和 workflow prompt 仍是具体执行 source |
-| Primary consumers include | `spec-code-review`、`spec-doc-review`、`spec-plan`、`spec-ideate`、`spec-compound`、`spec-sessions`、`spec-work` UI/Figma flows、`spec-polish-beta`、`spec-slack-research`、release/migration handoff、standalone/manual callers、agent 维护者 |
+| Primary consumers include | `spec-code-review`、`spec-doc-review`、`spec-plan`、`spec-ideate`、`spec-compound`、`spec-sessions`、`spec-work` UI/Figma flows、`spec-polish`、`spec-slack-research`、release/migration handoff、standalone/manual callers、agent 维护者 |
 | Non-goals | 不做调度器、不删 agent、不强制 schema migration、不把 deep-dive agent 变 always-on、不新增 runtime state |
 
 维护规则：
@@ -81,7 +81,7 @@ Lifecycle 是 per-consumer classification，不是 agent 的全局唯一属性�
 | `spec-data-migration-expert` | `deep-dive` | 专项 migration review | 高风险 backfill、ID mapping、enum conversion、production data transformation | 简单 migration diff 默认审查 | migration risk findings | 与 `spec-data-migrations-reviewer` 分层：expert 是专项深审 |
 | `spec-data-migrations-reviewer` | `conditional` | `spec-code-review` | migration files、schema changes、data transformations、backfill scripts | 无数据结构或生产数据影响 | code-review reviewer schema | 普通 migration 条件 persona |
 | `spec-deployment-verification-agent` | `deep-dive` | release / migration handoff | 需要 Go/No-Go checklist、rollback、monitoring、SQL verification queries | 普通本地代码 review | deployment checklist | 应保持 read-only verification posture |
-| `spec-design-implementation-reviewer` | `conditional` | UI review、`spec-polish-beta` 类流程 | 有 live UI、screenshots 或 Figma facts，可比较实现和设计 | 无视觉 evidence 时只能输出 insufficient evidence | visual review prose | 与 design-lens 分工：它审实现还原 |
+| `spec-design-implementation-reviewer` | `conditional` | UI review、`spec-polish` 类流程 | 有 live UI、screenshots 或 Figma facts，可比较实现和设计 | 无视觉 evidence 时只能输出 insufficient evidence | visual review prose | 与 design-lens 分工：它审实现还原 |
 | `spec-design-iterator` | `deep-dive` | UI polish / design iteration | 用户要求迭代优化，或 1-2 次设计尝试后仍不理想 | 默认文档/代码 review | iteration summary | 不应作为默认 reviewer；需要明确 stop criteria |
 | `spec-design-lens-reviewer` | `conditional` | `spec-doc-review` | 文档涉及 IA、交互状态、用户流、响应式或 accessibility | 后端-only 或无用户体验决策 | doc-review finding，映射 `review-finding.v1` | 与 implementation reviewer 分工：它看计划层设计缺口 |
 | `spec-dhh-rails-reviewer` | `conditional` | `spec-code-review` | Rails diff 引入架构选择、抽象或可能违背框架路线 | 非 Rails 项目或已确认本地标准冲突 | code-review reviewer schema | style lens 不能覆盖 confirmed project standards |

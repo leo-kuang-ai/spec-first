@@ -66,8 +66,8 @@
       "id": "boundary-ui-polish",
       "input": "Open the implemented App screen and iterate on visual polish, layout, and interaction details.",
       "coverage_tags": ["boundary"],
-      "source_refs": ["skills/spec-polish-beta/SKILL.md"],
-      "expected_outcome": "Route to spec-polish-beta after an inspectable runtime target exists.",
+      "source_refs": ["skills/spec-polish/SKILL.md"],
+      "expected_outcome": "Route to spec-polish after an inspectable runtime target exists.",
       "boundary_note": "Post-implementation UI polish is an interactive runtime loop, not static consistency audit."
     },
     {

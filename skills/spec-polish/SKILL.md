@@ -1,6 +1,6 @@
 ---
-name: spec-polish-beta
-description: "[BETA] Start the dev server, open the feature in a browser, and iterate on improvements together."
+name: spec-polish
+description: "Start the dev server, inspect the feature in browser, and iterate on polish."
 disable-model-invocation: true
 argument-hint: "[PR number, branch name, or blank for current branch]"
 ---
@@ -8,45 +8,6 @@ argument-hint: "[PR number, branch name, or blank for current branch]"
 # Polish
 
 Start the dev server, open the feature in a browser, and iterate. You use the feature, say what feels off, and fixes happen.
-
-## Workflow Contract Summary
-
-### When To Use
-
-Use when a browser-visible UI exists and the user explicitly wants an interactive polish loop on the current branch or a named PR/branch.
-
-### When Not To Use
-
-Do not use for non-UI code, backend-only work, headless code review, production deployment, or when the current branch is main/master.
-
-### Inputs
-
-Current branch or PR/branch argument, launch config or detected project type, package manager/port facts, dev-server command, browser URL, and user polish feedback.
-
-### Outputs
-
-Applied UI polish changes, dev-server URL/status, browser observations when requested, and a final commit when the user says the polish pass is done.
-
-### Artifacts
-
-Temporary dev-server log files and source changes in the target app; no durable spec-first audit artifact is promised.
-
-### Failure Modes
-
-Unsafe branch, missing launch/start command, dependency/server startup failure, port conflict, unavailable browser helper, or user stops the loop.
-
-### Workflow
-
-Resolve the branch, start the dev server, open or print the browser URL, iterate on user-visible feedback, verify hot reload or browser state, and commit when done.
-
-### Downstream Consumers
-
-Human UI reviewers, `spec-code-review`, PR preparation, and product/design stakeholders checking the polished experience.
-
-## Scenario Capability
-
-Follows `docs/contracts/workflows/scenario-capability-matrix.md` (default).
-Overrides: none
 
 ## Phase 0: Get on the right branch
 
@@ -56,15 +17,25 @@ Overrides: none
 
 ## Phase 1: Start the dev server
 
-Resolve all `scripts/<name>.sh` paths relative to this skill's loaded directory. The target app stays in the user's project checkout; only these helper scripts live beside the skill.
+The scripts below ship in this skill's `scripts/` directory. The Bash tool's working directory is the user's project, not the skill directory, so a bare `scripts/<name>` path will not resolve — invoke each by the skill's own absolute path. Every runnable block below sets `SKILL_DIR` inline (shell state does not persist between Bash tool calls, so each command must carry it); replace the `<absolute path …>` placeholder with the directory you loaded this `spec-polish` SKILL.md from before running.
 
 ### 1.1 Check for `.claude/launch.json`
 
-Run `bash scripts/read-launch-json.sh`. If it finds a configuration, use it — the user already told us how to start the project.
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/read-launch-json.sh"
+```
+
+If it finds a configuration, use it — the user already told us how to start the project.
 
 ### 1.2 Auto-detect (when no launch.json)
 
-Run `bash scripts/detect-project-type.sh` to identify the framework.
+Identify the framework:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/detect-project-type.sh"
+```
 
 Route by type to the matching recipe reference for start command and port defaults:
 
@@ -80,9 +51,19 @@ Route by type to the matching recipe reference for start command and port defaul
 | `procfile` | `references/dev-server-procfile.md` |
 | `unknown` | Ask the user how to start the project |
 
-For framework types that need a package manager, run `bash scripts/resolve-package-manager.sh` and substitute the result into the start command.
+For framework types that need a package manager, run the resolver and substitute the result into the start command:
 
-Resolve the port with `bash scripts/resolve-port.sh --type <type>`.
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/resolve-package-manager.sh"
+```
+
+Resolve the port:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/resolve-port.sh" --type <type>
+```
 
 ### 1.3 Start the server
 
@@ -90,7 +71,7 @@ Start the dev server in the background, log output to a temp file. Probe `http:/
 
 ### 1.4 Open in browser
 
-Load `references/ide-detection.md` for the env-var probe table. Open the browser using the supported host mechanism (Claude Code browser hint; Codex and terminal contexts print the URL).
+Load `references/ide-detection.md` for the env-var probe table. Open the browser using the IDE's mechanism (Claude Code → `open`, Cursor → Cursor browser, VS Code → Simple Browser).
 
 Tell the user:
 ```
@@ -103,7 +84,7 @@ Browse the feature and tell me what could be better.
 This is the core loop. The user browses the feature and tells you what to improve. You fix it. Repeat until they're happy.
 
 - When the user describes something to fix → make the change, the dev server hot-reloads
-- When the user asks to check something → use `agent-browser` to screenshot or inspect the page; if it is missing, tell them: "Browser automation helper unavailable. To install/repair, set `SPEC_FIRST_BROWSER_HELPER_REQUIRED=1` and rerun `spec-mcp-setup` (or this host's MCP setup entrypoint). This does not block spec-first baseline." Continue the human browser loop when automated screenshots are unavailable.
+- When the user asks to check something → use a browser-automation capability to screenshot or inspect the page; prefer `agent-browser` if it's installed. If it is missing, tell them: "Browser automation helper unavailable. To install/repair, set `SPEC_FIRST_BROWSER_HELPER_REQUIRED=1` and rerun `spec-mcp-setup` (or this host's MCP setup entrypoint). This does not block spec-first baseline." Continue the human browser loop when automated screenshots are unavailable.
 - When the user says they're done → commit the fixes and stop
 
 No checklist. No envelope. Just conversation.
@@ -123,7 +104,7 @@ Reference files (loaded on demand):
 - `references/dev-server-sveltekit.md` — SvelteKit dev-server defaults
 - `references/dev-server-procfile.md` — Procfile-based dev-server defaults
 
-Scripts (invoked via `bash scripts/<name>`):
+Scripts (invoked via `bash "$SKILL_DIR/scripts/<name>"` — see Phase 1 for `SKILL_DIR`):
 - `scripts/read-launch-json.sh` — launch.json reader
 - `scripts/detect-project-type.sh` — project-type classifier
 - `scripts/resolve-package-manager.sh` — lockfile-based package-manager resolver

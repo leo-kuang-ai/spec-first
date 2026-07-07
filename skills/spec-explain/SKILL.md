@@ -90,7 +90,7 @@ Detect destinations by capability — probe the agent's own toolset and session 
 
 - **New-capability ideas** — offer first; on acceptance invoke the `spec-ideate` skill via the platform's skill-invocation primitive, passing the observations as seed context. Do not merely tell the user to run it.
 - **Code-clarity findings** — offer first; on acceptance invoke the `spec-simplify-code` skill via the platform's skill-invocation primitive, passing the observations and the files they concern. Do not merely tell the user to run it.
-- **UI/UX polish opportunities** — present the observations in chat and tell the user to run `spec-polish-beta` themselves; spec-polish-beta is user-invoked only ; do not invoke it automatically — the in-session observations carry into their run.
+- **UI/UX polish opportunities** — present the observations in chat and tell the user to run `spec-polish` themselves; spec-polish is user-invoked only ; do not invoke it automatically — the in-session observations carry into their run.
 
 ## Boundaries
 

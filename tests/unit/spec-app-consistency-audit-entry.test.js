@@ -81,7 +81,7 @@ describe('spec-app-consistency-audit entry contract', () => {
     expect(skill).toContain('Near-neighbor routing:');
     expect(skill).toContain('ordinary code review (`spec-code-review`)');
     expect(skill).toContain('PRD authoring or refinement (`spec-prd`)');
-    expect(skill).toContain('UI polish (`spec-polish-beta`)');
+    expect(skill).toContain('UI polish (`spec-polish`)');
     expect(skill).toContain('skills/spec-app-consistency-audit/evals/examples.json');
     expect(skill).toContain('evals/recorded-output-fixtures.json');
     expect(skill).toContain('references/evaluation-governance.md');

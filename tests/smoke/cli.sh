@@ -230,7 +230,7 @@ claude_output="$(run_programmatic_init "$TMP_DIR" claude kuang en)"
 grep -q "Generated ${expected_command_count} command file(s)" <<<"$claude_output"
 grep -q "Generated ${expected_claude_skill_count} skill directory(ies)" <<<"$claude_output"
 grep -q "Generated ${expected_agent_count} agent file(s)" <<<"$claude_output"
-for file in brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish-beta.md release-notes.md sessions.md slack-research.md work.md write-tasks.md; do
+for file in brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish.md release-notes.md sessions.md slack-research.md work.md write-tasks.md; do
   test -f "$TMP_DIR/.claude/commands/spec-$file"
 done
 test ! -e "$TMP_DIR/.claude/commands/spec-standards.md"
@@ -349,7 +349,7 @@ test ! -e "$TMP_DIR/.agents/skills/spec-"standards"/SKILL.md"
 test ! -e "$TMP_DIR/.agents/skills/spec-work-beta/SKILL.md"
 test -f "$TMP_DIR/.agents/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.agents/skills/using-spec-first/SKILL.md"
-grep -q '^name: spec-polish-beta$' "$TMP_DIR/.agents/skills/spec-polish-beta/SKILL.md"
+grep -q '^name: spec-polish$' "$TMP_DIR/.agents/skills/spec-polish/SKILL.md"
 test -f "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"
 test -f "$TMP_DIR/.agents/skills/git-worktree/scripts/worktree-manager.sh"
 grep -q '^name: git-worktree$' "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"

@@ -120,7 +120,11 @@ esac
 # Exclusion list: directories that ship framework configs as fixtures or build
 # output, not as real project roots.
 
-EXCLUDE_DIRS=(node_modules .git vendor dist build coverage .next .nuxt .svelte-kit .turbo tmp fixtures)
+EXCLUDE_DIRS="node_modules .git vendor dist build coverage .next .nuxt .svelte-kit .turbo tmp fixtures"
+EXCLUDE_ARGS=""
+for d in $EXCLUDE_DIRS; do
+  EXCLUDE_ARGS="$EXCLUDE_ARGS -path './$d' -prune -o -path '*/$d' -prune -o"
+done
 
 # Signature file patterns to look for
 SIGNATURE_PATTERNS=(
@@ -132,21 +136,30 @@ SIGNATURE_PATTERNS=(
   "svelte.config.js" "svelte.config.mjs" "svelte.config.ts"
 )
 
-FIND_BASE_ARGS=(. -maxdepth 4)
-for d in "${EXCLUDE_DIRS[@]}"; do
-  FIND_BASE_ARGS+=(-path "./$d" -prune -o -path "*/$d" -prune -o)
-done
-
-SIGNATURE_FIND_ARGS=("${FIND_BASE_ARGS[@]}" "(")
+# Build the find -name arguments
+NAME_ARGS=""
 for i in "${!SIGNATURE_PATTERNS[@]}"; do
   if [ "$i" -gt 0 ]; then
-    SIGNATURE_FIND_ARGS+=(-o)
+    NAME_ARGS="$NAME_ARGS -o"
   fi
-  SIGNATURE_FIND_ARGS+=(-name "${SIGNATURE_PATTERNS[$i]}")
+  NAME_ARGS="$NAME_ARGS -name '${SIGNATURE_PATTERNS[$i]}'"
 done
-SIGNATURE_FIND_ARGS+=(")" -print0)
 
-RAILS_FIND_ARGS=("${FIND_BASE_ARGS[@]}" -name "Gemfile" -print0)
+# Run find. Use eval because the dynamically built arguments contain quoted
+# strings that must be expanded by the shell.
+FOUND_FILES=$(eval "find . -maxdepth 4 $EXCLUDE_ARGS \\( $NAME_ARGS \\) -print" 2>/dev/null | sort)
+
+# Also check for Rails signature (bin/dev + Gemfile in the same subdir)
+RAILS_HITS=""
+# Find all Gemfiles at depth <= 3, check each dir for bin/dev
+while IFS= read -r gemfile; do
+  [ -z "$gemfile" ] && continue
+  gdir=$(dirname "$gemfile")
+  if [ -f "$gdir/bin/dev" ]; then
+    RAILS_HITS="$RAILS_HITS
+$gdir"
+  fi
+done < <(eval "find . -maxdepth 4 $EXCLUDE_ARGS -name 'Gemfile' -print" 2>/dev/null)
 
 # Parse found files into (type, relative-dir) pairs. Use a newline-delimited
 # string instead of an associative array so the script works on macOS's default
@@ -162,54 +175,54 @@ add_mono_hit() {
 ${hit}"
 }
 
-while IFS= read -r -d '' f; do
-  [ -z "$f" ] && continue
-  fname=$(basename "$f")
-  fdir=$(dirname "$f")
-  # Normalize dir: strip leading ./
-  fdir="${fdir#./}"
+if [ -n "$FOUND_FILES" ]; then
+  for f in $FOUND_FILES; do
+    [ -z "$f" ] && continue
+    fname=$(basename "$f")
+    fdir=$(dirname "$f")
+    # Normalize dir: strip leading ./
+    fdir="${fdir#./}"
 
-  # Enforce depth cap of 3: count slashes in the relative path of the file.
-  # A file at apps/web/next.config.js has dir apps/web (1 slash = depth 2).
-  # A file at a/b/c/d/next.config.js has dir a/b/c/d (3 slashes = depth 4 = too deep).
-  # We want maxdepth 3 for the directory, meaning at most 2 slashes in fdir.
-  slash_count=$(echo "$fdir" | tr -cd '/' | wc -c | tr -d ' ')
-  if [ "$slash_count" -gt 2 ]; then
-    continue
-  fi
-
-  case "$fname" in
-    next.config.*) ftype="next" ;;
-    vite.config.*) ftype="vite" ;;
-    nuxt.config.*) ftype="nuxt" ;;
-    astro.config.*) ftype="astro" ;;
-    remix.config.*) ftype="remix" ;;
-    svelte.config.*) ftype="sveltekit" ;;
-    *) continue ;;
-  esac
-
-  # Skip root hits (those would have been caught by root detection)
-  if [ "$fdir" = "." ]; then continue; fi
-
-  add_mono_hit "${ftype}@${fdir}"
-done < <(find "${SIGNATURE_FIND_ARGS[@]}" 2>/dev/null)
-
-# Also check for Rails signature (bin/dev + Gemfile in the same subdir)
-while IFS= read -r -d '' gemfile; do
-  [ -z "$gemfile" ] && continue
-  gdir=$(dirname "$gemfile")
-  if [ ! -f "$gdir/bin/dev" ]; then
-    continue
-  fi
-  rdir="${gdir#./}"
-  if [ "$rdir" != "." ] && [ -n "$rdir" ]; then
-    # Enforce depth cap for Rails hits too
-    slash_count=$(echo "$rdir" | tr -cd '/' | wc -c | tr -d ' ')
-    if [ "$slash_count" -le 2 ]; then
-      add_mono_hit "rails@${rdir}"
+    # Enforce depth cap of 3: count slashes in the relative path of the file.
+    # A file at apps/web/next.config.js has dir apps/web (1 slash = depth 2).
+    # A file at a/b/c/d/next.config.js has dir a/b/c/d (3 slashes = depth 4 = too deep).
+    # We want maxdepth 3 for the directory, meaning at most 2 slashes in fdir.
+    slash_count=$(echo "$fdir" | tr -cd '/' | wc -c | tr -d ' ')
+    if [ "$slash_count" -gt 2 ]; then
+      continue
     fi
-  fi
-done < <(find "${RAILS_FIND_ARGS[@]}" 2>/dev/null)
+
+    case "$fname" in
+      next.config.*) ftype="next" ;;
+      vite.config.*) ftype="vite" ;;
+      nuxt.config.*) ftype="nuxt" ;;
+      astro.config.*) ftype="astro" ;;
+      remix.config.*) ftype="remix" ;;
+      svelte.config.*) ftype="sveltekit" ;;
+      *) continue ;;
+    esac
+
+    # Skip root hits (those would have been caught by root detection)
+    if [ "$fdir" = "." ]; then continue; fi
+
+    add_mono_hit "${ftype}@${fdir}"
+  done
+fi
+
+# Add Rails monorepo hits
+if [ -n "$RAILS_HITS" ]; then
+  for rdir in $RAILS_HITS; do
+    [ -z "$rdir" ] && continue
+    rdir="${rdir#./}"
+    if [ "$rdir" != "." ] && [ -n "$rdir" ]; then
+      # Enforce depth cap for Rails hits too
+      slash_count=$(echo "$rdir" | tr -cd '/' | wc -c | tr -d ' ')
+      if [ "$slash_count" -le 2 ]; then
+        add_mono_hit "rails@${rdir}"
+      fi
+    fi
+  done
+fi
 
 MONO_HITS=$(printf '%s\n' "$MONO_HITS" | sed '/^$/d' | sort)
 MONO_COUNT=$(printf '%s\n' "$MONO_HITS" | sed '/^$/d' | wc -l | tr -d ' ')

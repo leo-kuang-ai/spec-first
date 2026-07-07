@@ -47,7 +47,7 @@ const DOWNSTREAM_PROMPTS = [
   path.join(REPO_ROOT, 'skills', 'feature-video', 'references', 'tier-browser-reel.md'),
   path.join(REPO_ROOT, 'skills', 'feature-video', 'references', 'tier-static-screenshots.md'),
   path.join(REPO_ROOT, 'skills', 'frontend-design', 'SKILL.md'),
-  path.join(REPO_ROOT, 'skills', 'spec-polish-beta', 'SKILL.md'),
+  path.join(REPO_ROOT, 'skills', 'spec-polish', 'SKILL.md'),
 ];
 
 function read(filePath) {

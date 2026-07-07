@@ -16,7 +16,7 @@ Use when mobile App PRD, Figma context, local source, routes, architecture, anal
 
 ### When Not To Use
 
-Do not use for ordinary code review (`spec-code-review`), PRD authoring or refinement (`spec-prd`), pure test/lint/build/runtime execution, UI polish (`spec-polish-beta`), formatting-only changes, or product-source edits.
+Do not use for ordinary code review (`spec-code-review`), PRD authoring or refinement (`spec-prd`), pure test/lint/build/runtime execution, UI polish (`spec-polish`), formatting-only changes, or product-source edits.
 
 ### Inputs
 
@@ -77,7 +77,7 @@ Near-neighbor routing:
 - Ordinary bug, regression, security, or test-coverage review of a diff belongs to `spec-code-review`.
 - PRD creation, refinement, or planning-readiness validation belongs to `spec-prd` unless the explicit job is PRD/Figma/source consistency.
 - Runtime validation, build, simulator, real-device, Maestro, Appium, or cloud-device execution belongs to the requested command or a later runtime workflow.
-- Post-implementation visual/UI polishing belongs to `spec-polish-beta`.
+- Post-implementation visual/UI polishing belongs to `spec-polish`.
 - Skill or agent quality review belongs to `spec-skill-audit`, not this App product audit workflow.
 
 ## Default Mode
@@ -278,7 +278,7 @@ Read these on demand; they are not required for routing:
 
 ## Workflow Handoff Boundary
 
-This workflow may recommend follow-ups to `spec-plan`, `spec-code-review`, `spec-skill-audit`, `spec-polish-beta`, or `spec-compound`. It does not automatically run those workflows.
+This workflow may recommend follow-ups to `spec-plan`, `spec-code-review`, `spec-skill-audit`, `spec-polish`, or `spec-compound`. It does not automatically run those workflows.
 
 In v0.1, follow-ups appear only in `app-consistency-audit.summary.md` and the headless envelope. A standalone `workflow-handoff-suggestions.json` artifact is deferred.
 

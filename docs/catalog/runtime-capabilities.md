@@ -29,7 +29,7 @@
 | Qoder runtime delivery | 20 commands, 20 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 49 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
-| Beta workflow entries | spec-polish-beta |
+| Beta workflow entries | none |
 | Workflow runtime contracts | 2 |
 | Planned runtime contracts | 0 |
 
@@ -60,7 +60,7 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 | mcp-setup | spec-mcp-setup | spec-mcp-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
 | optimize | spec-optimize | spec-optimize | no | Run metric-driven iterative optimization loops |
 | plan | spec-plan | spec-plan | no | Run the Spec-First planning workflow |
-| polish-beta | spec-polish-beta | spec-polish-beta | yes | [BETA] Start the dev server and iterate on browser-visible polish |
+| polish | spec-polish | spec-polish | no | Start the dev server, inspect the feature in browser, and iterate on polish. |
 | prd | spec-prd | spec-prd | no | Run the Spec-First PRD requirements workflow |
 | release-notes | spec-release-notes | spec-release-notes | no | Summarize recent spec-first releases or answer release questions |
 | sessions | spec-sessions | spec-sessions | no | Search and summarize prior coding agent sessions |

@@ -10,7 +10,7 @@ const SCRIPT_PATH = path.join(
   '..',
   '..',
   'skills',
-  'spec-polish-beta',
+  'spec-polish',
   'scripts',
   'detect-project-type.sh',
 );
@@ -19,7 +19,7 @@ const DEV_SERVER_DETECTION_PATH = path.join(
   '..',
   '..',
   'skills',
-  'spec-polish-beta',
+  'spec-polish',
   'references',
   'dev-server-detection.md',
 );
@@ -28,7 +28,7 @@ const DEV_SERVER_RAILS_PATH = path.join(
   '..',
   '..',
   'skills',
-  'spec-polish-beta',
+  'spec-polish',
   'references',
   'dev-server-rails.md',
 );
@@ -37,12 +37,12 @@ const RESOLVE_PORT_PATH = path.join(
   '..',
   '..',
   'skills',
-  'spec-polish-beta',
+  'spec-polish',
   'scripts',
   'resolve-port.sh',
 );
 
-describe('spec-polish-beta project detection contracts', () => {
+describe('spec-polish project detection contracts', () => {
   test('detect-project-type avoids Bash 4 associative arrays', () => {
     const text = fs.readFileSync(SCRIPT_PATH, 'utf8');
 

@@ -17,7 +17,7 @@
 - 普通 diff code review，走 `spec-code-review`。
 - PRD 创建、改写或 planning-readiness validation，走 `spec-prd`。
 - lint / test / build / simulator / real-device / Maestro / Appium / cloud-device 执行。
-- 已实现页面的交互式 UI polish，走 `spec-polish-beta`。
+- 已实现页面的交互式 UI polish，走 `spec-polish`。
 - skill / agent 质量审查，走 `spec-skill-audit`。
 
 ## 快速入口

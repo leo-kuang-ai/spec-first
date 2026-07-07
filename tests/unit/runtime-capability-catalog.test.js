@@ -50,7 +50,7 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('| work | spec-work | spec-work | no |');
     expect(catalog).not.toContain('spec-work-beta');
     expect(catalog).not.toContain('/spec:work-beta');
-    expect(catalog).toContain('| polish-beta | spec-polish-beta | spec-polish-beta | yes |');
+    expect(catalog).toContain('| polish | spec-polish | spec-polish | no |');
     expect(catalog).not.toContain('| standards | spec-standards |');
     expect(catalog).not.toContain('| standards | spec-standards | /spec:standards | $spec-standards |');
     expect(catalog).not.toContain(`| ${['spec-team', 'standards-governance'].join('-')} |`);

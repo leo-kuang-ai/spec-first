@@ -353,9 +353,9 @@
       }
     },
     {
-      "skill_name": "spec-polish-beta",
+      "skill_name": "spec-polish",
       "entry_surface": "workflow_command",
-      "command_name": "polish-beta",
+      "command_name": "polish",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {

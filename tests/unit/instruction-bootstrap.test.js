@@ -571,7 +571,7 @@ describe('instruction bootstrap', () => {
     );
     // 显式非 L0 workflow_command:有 workflow_command 入口但不进 bootstrap 锚点集
     const NON_CORE_WORKFLOW_COMMANDS = [
-      'app-consistency-audit', 'ideate', 'polish-beta', 'release-notes', 'sessions',
+      'app-consistency-audit', 'ideate', 'polish', 'release-notes', 'sessions',
       'skill-audit', 'slack-research', 'write-skill', 'write-tasks',
     ];
     // 每个 REQUIRED_L0_IDS 必须是真实 registry workflow_command(抓幽灵/拼写漂移)
@@ -617,7 +617,7 @@ describe('instruction bootstrap', () => {
         expect(blockIds.has('slack-research')).toBe(false);
         expect(blockIds.has('skill-audit')).toBe(false);
         expect(blockIds.has('app-consistency-audit')).toBe(false);
-        expect(blockIds.has('polish-beta')).toBe(false);
+        expect(blockIds.has('polish')).toBe(false);
         expect(blockIds.has('ideate')).toBe(false);
         expect(blockIds.has('optimize')).toBe(true);
         expect(blockIds.has('compound')).toBe(true);

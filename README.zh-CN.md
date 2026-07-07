@@ -155,7 +155,7 @@ docs/
 | 文档/计划审查 | `spec-doc-review` | 结构化 findings |
 | 沉淀可复用经验 | `spec-compound` | `docs/solutions/` |
 
-支撑入口（按需触发）：`spec-mcp-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish-beta、write-skill 使用当前宿主对应入口。
+支撑入口（按需触发）：`spec-mcp-setup` 用于 runtime 环境与必备 harness、MCP/helper readiness；debug、optimize、ideate、compound-refresh、polish、write-skill 使用当前宿主对应入口。
 
 [→ 完整入口与路由规则](https://github.com/sunrain520/spec-first/blob/main/docs/05-%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C/04-workflows-artifacts-map.md)
 
