@@ -248,6 +248,23 @@ describe('prompt primitives', () => {
     await expect(yesResult).resolves.toBe(true);
   });
 
+  test('confirm treats Windows and VT enter key sequences as enter', async () => {
+    const first = createPromptStreams();
+    const csiTildeResult = confirm('Apply?', { input: first.input, output: first.output, default: true });
+    first.input.write('\x1b[13~');
+    await expect(csiTildeResult).resolves.toBe(true);
+
+    const second = createPromptStreams();
+    const csiUResult = confirm('Apply?', { input: second.input, output: second.output, default: true });
+    second.input.write('\x1b[13;0u');
+    await expect(csiUResult).resolves.toBe(true);
+
+    const third = createPromptStreams();
+    const ss3Result = confirm('Apply?', { input: third.input, output: third.output, default: true });
+    third.input.write('\x1bOM');
+    await expect(ss3Result).resolves.toBe(true);
+  });
+
   test('Ctrl+C cancels and restores raw mode', async () => {
     const { input, output } = createPromptStreams();
     const result = select('Platform?', ['A', 'B'], { input, output });

@@ -351,10 +351,10 @@ function containsCancel(text) {
 function tokenizeInput(text) {
   const tokens = [];
   for (let index = 0; index < text.length; index += 1) {
-    const arrowToken = readArrowToken(text, index);
-    if (arrowToken) {
-      tokens.push(arrowToken.token);
-      index += arrowToken.length - 1;
+    const specialToken = readSpecialKeyToken(text, index);
+    if (specialToken) {
+      tokens.push(specialToken.token);
+      index += specialToken.length - 1;
       continue;
     }
     tokens.push(text[index]);
@@ -362,7 +362,7 @@ function tokenizeInput(text) {
   return tokens;
 }
 
-function readArrowToken(text, index) {
+function readSpecialKeyToken(text, index) {
   const char = text[index];
   if (char === '\x00' || char === '\xe0') {
     const legacyDirection = text[index + 1];
@@ -376,18 +376,32 @@ function readArrowToken(text, index) {
   }
 
   const ss3Direction = text[index + 2];
-  if (text[index + 1] === 'O' && (ss3Direction === 'A' || ss3Direction === 'B')) {
-    return { token: `\x1b[${ss3Direction}`, length: 3 };
+  if (text[index + 1] === 'O') {
+    if (ss3Direction === 'A' || ss3Direction === 'B') {
+      return { token: `\x1b[${ss3Direction}`, length: 3 };
+    }
+    if (ss3Direction === 'M') {
+      return { token: '\r', length: 3 };
+    }
+    return text.length > index + 2 ? { token: text.slice(index, index + 3), length: 3 } : null;
   }
 
   if (text[index + 1] !== '[') {
-    return null;
+    return text.length > index + 1 ? { token: text.slice(index, index + 2), length: 2 } : null;
   }
 
   for (let cursor = index + 2; cursor < text.length; cursor += 1) {
     const cursorChar = text[cursor];
     if (cursorChar === 'A' || cursorChar === 'B') {
       return { token: `\x1b[${cursorChar}`, length: cursor - index + 1 };
+    }
+    if (cursorChar === '~' || cursorChar === 'u') {
+      const params = text.slice(index + 2, cursor).split(';');
+      const token = params[0] === '13' ? '\r' : text.slice(index, cursor + 1);
+      return { token, length: cursor - index + 1 };
+    }
+    if (/^[A-Za-z]$/.test(cursorChar)) {
+      return { token: text.slice(index, cursor + 1), length: cursor - index + 1 };
     }
     if (!/^[0-9;?]$/.test(cursorChar)) {
       return null;
