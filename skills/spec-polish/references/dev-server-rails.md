@@ -23,6 +23,8 @@ Default: `3000`. Overrides follow the cascade in `references/dev-server-detectio
 3. `.env` / `.env.development` `PORT=<n>`
 4. a dev-server port explicitly stated in the project's active instructions in context (not grepped from instruction files)
 
+Do not scan `AGENTS.md` / `CLAUDE.md` for Rails ports by default.
+
 ## Stub generation for `.claude/launch.json`
 
 When the user accepts "Save this as `.claude/launch.json`?", emit the Rails stub from `launch-json-schema.md`:

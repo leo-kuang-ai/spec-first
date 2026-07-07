@@ -9,6 +9,32 @@ argument-hint: "[PR number, branch name, or blank for current branch]"
 
 Start the dev server, open the feature in a browser, and iterate. You use the feature, say what feels off, and fixes happen.
 
+## Workflow Contract Summary
+
+### When To Use
+Use when a feature or branch is ready for hands-on browser polish: start its dev server, inspect the feature in browser, and make iterative UI/UX fixes from direct feedback.
+
+### When Not To Use
+Do not use for initial requirements, implementation planning, non-browser backend work, static code review, broad visual audits, or MCP setup/repair beyond the browser helper handoff.
+
+### Inputs
+A PR number, branch name, or current branch; project dev-server conventions; feature URL/route when known; user feedback from browser inspection.
+
+### Outputs
+Running local dev server URL, browser handoff, scoped polish edits, verification notes, and a commit when the user says the polish loop is done.
+
+### Artifacts
+Source edits in the user's project, dev-server log in temp space, optional browser screenshots/inspection notes, and the final commit if requested by the loop.
+
+### Failure Modes
+Wrong branch, main/master branch, missing dev-server command, unresolved port, server startup failure, browser helper unavailable, or user feedback requiring upstream product/design decisions.
+
+### Workflow
+Select the branch, start the dev server, resolve the browser handoff, iterate on user-reported polish issues, and stop when the user says the loop is complete.
+
+### Downstream Consumers
+The user reviewing the browser result, `spec-work` for deeper implementation follow-up, and release/review workflows that consume the final branch changes.
+
 ## Phase 0: Get on the right branch
 
 1. If a PR number or branch name was provided, check it out (probe for existing worktrees first).

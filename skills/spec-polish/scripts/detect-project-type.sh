@@ -176,7 +176,7 @@ ${hit}"
 }
 
 if [ -n "$FOUND_FILES" ]; then
-  for f in $FOUND_FILES; do
+  while IFS= read -r f; do
     [ -z "$f" ] && continue
     fname=$(basename "$f")
     fdir=$(dirname "$f")
@@ -206,12 +206,14 @@ if [ -n "$FOUND_FILES" ]; then
     if [ "$fdir" = "." ]; then continue; fi
 
     add_mono_hit "${ftype}@${fdir}"
-  done
+  done <<EOF
+$FOUND_FILES
+EOF
 fi
 
 # Add Rails monorepo hits
 if [ -n "$RAILS_HITS" ]; then
-  for rdir in $RAILS_HITS; do
+  while IFS= read -r rdir; do
     [ -z "$rdir" ] && continue
     rdir="${rdir#./}"
     if [ "$rdir" != "." ] && [ -n "$rdir" ]; then
@@ -221,7 +223,9 @@ if [ -n "$RAILS_HITS" ]; then
         add_mono_hit "rails@${rdir}"
       fi
     fi
-  done
+  done <<EOF
+$RAILS_HITS
+EOF
 fi
 
 MONO_HITS=$(printf '%s\n' "$MONO_HITS" | sed '/^$/d' | sort)
