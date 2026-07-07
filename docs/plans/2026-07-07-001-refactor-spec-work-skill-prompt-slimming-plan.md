@@ -31,6 +31,38 @@ target_skill: skills/spec-work/SKILL.md
 
 `spec-work` 是 Codebase -> Spec -> Plan -> Tasks -> **Code** -> Review -> Knowledge 链路中的高频执行节点；它经常在已经加载计划、任务、源码、测试和验证输出后继续占用 active context。当前 579 行主 prompt 中包含大量条件路径，最直接的成本不是“文件看起来长”，而是执行者在热路径里同时承受 task-pack、subagent、test strategy、shipping closeout 等互斥或低频细节。先优化 `spec-work` 的信息架构，是因为它能减少高频执行节点的认知和上下文税；更大的采纳问题（如真实运行质量趋势、review 漏判率、跨宿主 loader 差异）本轮只建立观测触发，不承诺已兑现。
 
+## 与 2026-07-06 总方案的合并决策
+
+`docs/plans/2026-07-06-001-refactor-skill-prompt-slimming-plan.md` 是跨 skill 的总路线，当前文档是 `spec-work` 专项落地方案。两者合并后的执行判断如下：
+
+- 07-06 总方案拥有**实施顺序优先级**：第一刀先做 `spec-work` task-pack deterministic floor downshift，而不是先完整拆分 execution / feedback / quality / shipping references。
+- 当前 07-07 方案拥有**专项安全网**：registration/projection 检查、contract-test migration table、per-reference eval matrix、fresh-source eval runbook、rollback gate、host-loader probe 和 adoption follow-up。
+- 真正执行时以“07-06 的第一刀 + 07-07 的验收 gate”为准：先把 task-pack hash / `spec_id` / Task Pack Contract 结构等确定性规则从 prompt prose 降到 `spec-first tasks validate --json` handoff；其余 reference 分层只有在 pilot closeout 可信后进入 wave-2。
+
+因此，本方案的执行策略从“一次性建完整 reference 架构”收敛为“两阶段”：
+
+```text
+Pilot A（必须先做）:
+  task-pack deterministic downshift
+  + work-intake-and-task-pack.md
+  + contract/eval/projection/fresh-source 守护
+
+Wave B（outcome-gated）:
+  execution-strategy.md
+  + feedback-and-tests.md
+  + implementation-quality.md
+  + shipping TOC / anchor 收敛
+```
+
+Pilot A 未产出可信 Outcome Bundle 前，Wave B 只能保留为计划，不进入正文迁移。
+
+**07-06 总方案在本专项中的适用边界**
+
+- 采用：deterministic floor downshift、STOP trigger 四件套、source/runtime 同源、fresh-source eval、runtime projection、outcome bundle、收益分级。
+- 收窄：`spec-code-review` pilot、全局 Activation-L1 description 治理、stats/run evidence 消费层不进入本专项实施；它们仍归 07-06 总方案或 follow-up plan。
+- 改名：07-06 的 `task-pack-intake.md` 在本专项中统一命名为 `work-intake-and-task-pack.md`，避免把 work intake 误收窄成只处理 task-pack。
+- 决策优先级：若 07-06 的广义 rollout 叙述与本文 Pilot A / Wave B 顺序冲突，`spec-work` 实施按本文执行；若本文缺少方法论级原则，回到 07-06 总方案与 `docs/10-prompt/skill-prompt-设计与优化方法论-v2.md`。
+
 ## Goals / Non-Goals
 
 **Goals**
@@ -172,7 +204,7 @@ Key Principles + Common Pitfalls             536-579，约 44 行
 
 未读降级：不得执行 task-pack；只能返回 handoff 或要求重新运行 `spec-write-tasks` / `spec-plan`。
 
-### `references/execution-strategy.md`
+### `references/execution-strategy.md`（Wave B）
 
 触发：进入环境设置、任务列表、分支/commit/subagent/parallel strategy、worktree/fork workspace、incremental commit 判断。
 
@@ -188,7 +220,7 @@ Key Principles + Common Pitfalls             536-579，约 44 行
 
 未读降级：默认 inline execution；不得 dispatch parallel subagents，不得直接 commit 到 default branch。
 
-### `references/feedback-and-tests.md`
+### `references/feedback-and-tests.md`（Wave B）
 
 触发：修改 behavior-bearing code、写/改测试、执行 test-first/characterization-first、涉及 callback/middleware/state/interface parity。
 
@@ -203,7 +235,7 @@ Key Principles + Common Pitfalls             536-579，约 44 行
 
 未读降级：只能运行最窄已知验证，不得声称 coverage 或 system-wide interaction 已确认。
 
-### `references/implementation-quality.md`
+### `references/implementation-quality.md`（Wave B）
 
 触发：新增/修改 durable surface，复用/扩展/新增选择，架构 fit，simplify-as-you-go，domain decision ledger。
 
@@ -217,7 +249,7 @@ Key Principles + Common Pitfalls             536-579，约 44 行
 
 未读降级：不得新增 public contract、schema/runtime/config surface、provider boundary 或 generated runtime delivery；改为 handoff 到 `spec-plan`。
 
-### `references/shipping-workflow.md`
+### `references/shipping-workflow.md`（Wave B）
 
 保留现有 Phase 3-4 owner，并补：
 
@@ -270,70 +302,93 @@ Overlap check：每个 reference 开头写 `Owned here` / `Not owned here` 两�
 
 ## Implementation Units
 
-### U1. 建立 trigger map 与 reference 骨架
+### U1. Pilot A：task-pack deterministic downshift
 
 **Files**
 
 - Modify: `skills/spec-work/SKILL.md`
 - Create: `skills/spec-work/references/work-intake-and-task-pack.md`
-- Create: `skills/spec-work/references/execution-strategy.md`
-- Create: `skills/spec-work/references/feedback-and-tests.md`
-- Create: `skills/spec-work/references/implementation-quality.md`
-- Modify: `skills/spec-work/references/shipping-workflow.md`
+- Modify: `tests/unit/spec-work-contracts.test.js`
+- Modify: `skills/spec-work/evals/examples.json`
+- Check/Modify: `src/cli/plugin.js` or equivalent projection/manifest source if the new reference must be registered or high-value anchors updated.
+- Modify: `CHANGELOG.md`
 
 **Approach**
 
-先只新增 reference 文件与主 spine STOP triggers；不要删除承重正文。每个新 reference 文件先放 Contents、Scope、STOP fallback、trigger/non-trigger eval notes。
+这是 07-06 总方案指定的第一刀。只处理 task-pack intake 的 deterministic floor：把 hash、`spec_id`、source plan hash、Task Pack Contract 结构、路径格式等脚本已判定的散文复述压缩为 CLI handoff contract。
+
+Spine 只保留：
+
+- 何时运行 `spec-first tasks validate <task-pack-path> --json`。
+- 只有 validator 返回可执行 deterministic handoff 后才继续创建 execution tasks。
+- validator 失败按 `reason_code` 停止并输出 user-facing handoff。
+- `semantic_posture`、scope adequacy、review gate 仍是 LLM-owned semantic judgment，不由脚本裁决。
+
+`work-intake-and-task-pack.md` 承接 task-pack intake 的条件细节，但不得复制完整 validator 字段清单；能由 CLI 输出解释的内容只写消费姿态、fallback 和 handoff envelope。
 
 **Verification**
 
-- `git diff --check -- skills/spec-work/SKILL.md skills/spec-work/references`
-- focused read 确认所有 reference 都从 `SKILL.md` 直链一层可达。
+- `npx jest --runTestsByPath tests/unit/task-pack-command.test.js tests/unit/spec-work-contracts.test.js tests/unit/changelog-format.test.js --runInBand`
+- `npm run lint:skill-entrypoints`
+- `git diff --check -- skills/spec-work/SKILL.md skills/spec-work/references/work-intake-and-task-pack.md skills/spec-work/evals/examples.json tests/unit/spec-work-contracts.test.js src/cli/plugin.js CHANGELOG.md`
+- fresh-source eval 至少覆盖 stale task-pack、spec-id mismatch、hash mismatch、valid task-pack handoff、bare prompt non-trigger。
+- 如果 fresh-source eval 不可用，本单元只能新增 reference + STOP trigger；不得删除 spine 承重正文。
 
-### U2. 下沉 ready 候选：environment / duplicate anchors / shipping TOC
+### U2. Pilot A closeout gate
+
+**Files**
+
+- Modify: `docs/plans/2026-07-07-001-refactor-spec-work-skill-prompt-slimming-plan.md` only if closeout reveals plan drift.
+- Runtime observation only after source changes: generated mirrors from `spec-first init`.
+
+**Approach**
+
+在继续 Wave B 前，产出 Pilot A Outcome Bundle。必须回答：
+
+- `SKILL.md` task-pack prose 是否减少，减少了多少。
+- `work-intake-and-task-pack.md` 是否有 STOP trigger、fallback、trigger/non-trigger eval。
+- `spec-first tasks validate --json` 的 deterministic facts 与 LLM semantic judgment 是否分层清楚。
+- runtime projection 是否可达新增 reference。
+- 是否有 failed / not-run / degraded reason。
+
+**Verification**
+
+- `spec-first init`
+- `spec-first doctor --claude`
+- `spec-first doctor --codex`
+- host-loader probe for the new reference, recorded as confirmed / contingent / hypothesis.
+- If any hard gate fails, stop here and fix or roll back Pilot A; do not enter Wave B.
+
+### U3. Wave B：execution strategy / tests / quality references
 
 **Files**
 
 - Modify: `skills/spec-work/SKILL.md`
-- Modify: `skills/spec-work/references/execution-strategy.md`
+- Create/Modify: `skills/spec-work/references/execution-strategy.md`
+- Create/Modify: `skills/spec-work/references/feedback-and-tests.md`
+- Create/Modify: `skills/spec-work/references/implementation-quality.md`
 - Modify: `skills/spec-work/references/shipping-workflow.md`
+- Modify: `tests/unit/spec-work-contracts.test.js`
+- Modify: `tests/fixtures/workflow-invariants/spec-work.json` when anchors move.
 
 **Approach**
 
-迁移 branch/worktree/environment setup 到 `execution-strategy.md`；把 `Key Principles` 与 `Common Pitfalls` 压缩为短 behavioral anchors；给 `shipping-workflow.md` 加 TOC。
-
-**Verification**
-
-- `wc -l skills/spec-work/SKILL.md skills/spec-work/references/*.md`
-- `git diff --check -- skills/spec-work/SKILL.md skills/spec-work/references/shipping-workflow.md skills/spec-work/references/execution-strategy.md`
-- U2 只能在对应 U4 evidence 已补齐后标为完成：branch/env 迁移需要 contract assertion + trigger/non-trigger eval；duplicate anchors 合并需要 fresh-source protected-behavior eval；shipping TOC 需要 workflow-invariant 或 reference-shape assertion。若 U4 尚未补齐，U2 closeout 必须标 `migration_structural_only`，不得声明质量稳定。
-
-### U3. 下沉 candidate 候选：task-pack / execution strategy / tests / quality
-
-**Files**
-
-- Modify: `skills/spec-work/SKILL.md`
-- Modify: `skills/spec-work/references/work-intake-and-task-pack.md`
-- Modify: `skills/spec-work/references/execution-strategy.md`
-- Modify: `skills/spec-work/references/feedback-and-tests.md`
-- Modify: `skills/spec-work/references/implementation-quality.md`
-
-**Approach**
-
-逐块迁移，迁移后 spine 只保留保护性摘要与 STOP trigger。task-pack validator 细节可压为“运行 CLI 并按 reason_code stop/handoff”，不要在 spine 复述所有结构字段。
+只有 Pilot A closeout 可信后才进入。逐块迁移 execution / feedback / implementation-quality / shipping 细节，迁移后 spine 只保留保护性摘要与 STOP trigger。每块都必须遵守 Reference Ownership And Size Guards。
 
 **Stop if**
 
 - 无法形成未读 fallback。
 - 迁移后必须靠记忆才能知道何时读 reference。
 - `Run Artifact Boundary`、`Workspace Repo Scope`、`source/runtime` 等 hard gate 在 spine 消失。
+- contract-test migration table 尚未更新。
+- per-reference eval matrix 尚未覆盖目标 reference。
 
 **Verification**
 
 - focused contract tests 更新前后对照。
-- fresh-source eval 必须覆盖 stale task-pack、target_repo 缺失、generated mirror、scope expansion。
+- fresh-source eval 必须覆盖 target_repo 缺失、generated mirror、scope expansion、feedback loop、durable surface、shipping closeout。
 
-### U4. 更新 eval 与 contract tests
+### U4. 更新 eval 与 contract tests（Pilot A 和 Wave B 均适用）
 
 **Files**
 
@@ -475,22 +530,22 @@ static contract tests passed
 ### 三维采样矩阵
 
 - **维度 1 · 重复采样（抗随机性）**：同 case 同模型跑 N 次（N≥5），记 pass-rate 与方差，不记单次结果。
-- **维度 2 · 跨模型（§20，抗模型差）**：至少一个强模型 + 一个快/弱模型。这是本方案最薄的一维——`Key Principles` 的重复对强模型是冗余，对弱模型可能是有效强化，U2 合并可能只在弱模型上掉质量，必须在弱模型上单独验。
+- **维度 2 · 跨模型（§20，抗模型差）**：至少一个强模型 + 一个快/弱模型。这是本方案最薄的一维——`Key Principles` 的重复对强模型是冗余，对弱模型可能是有效强化，Wave B 压缩 behavioral anchors 时可能只在弱模型上掉质量，必须在弱模型上单独验。
 - **维度 3 · 前后对照（L3，抗“改坏没发现”）**：同 case 分别注入改前 / 改后 source 到全新实例对比，判据是“改后 ≥ 改前”，不是“改后能过”。
 
 ### 保护行为清单（稳定性断言目标）
 
 **硬 gate（零容忍，N 次 × 每模型必须 100%）**
 
-- U2：`execution-strategy.md` 未读时仍绝不在 default 分支未确认就 commit（fallback 生效）。
-- U3：stale/hash/spec_id/structure 不通过的 task-pack 一律 stop；parent workspace 缺 `target_repo` 阻断写入/测试/commit；generated runtime mirror 只读、不作 source fix；`Run Artifact Boundary` / verification-before-complete 不退化。
+- Pilot A：stale/hash/spec_id/structure 不通过的 task-pack 一律 stop；valid deterministic handoff 仍不等于 semantic readiness；validator 失败必须给 user-facing handoff。
+- Wave B：`execution-strategy.md` 未读时仍绝不在 default 分支未确认就 commit（fallback 生效）；parent workspace 缺 `target_repo` 阻断写入/测试/commit；generated runtime mirror 只读、不作 source fix；`Run Artifact Boundary` / verification-before-complete 不退化。
 
 **trigger 精度（正反各一）**
 
 - 该触发：validated task-pack → 必须读 `work-intake-and-task-pack.md`；default 分支执行 plan → 必须读 `execution-strategy.md`。
 - 不该触发：1-2 文件 trivial bare prompt → 不读 subagent/parallel reference、直接实现。
 
-**behavioral anchor（U2 合并后仍须成立）**
+**behavioral anchor（Wave B 合并后仍须成立）**
 
 - 不切 human-time phases；不留 80% done；unrelated cleanup → follow-up 不进本次 diff；reproduce/evidence-first；scope adherence。
 
@@ -512,7 +567,7 @@ static contract tests passed
 
 - LLM eval 非确定性，稳定性是统计结论非二值：报 pass-rate + N + 模型清单 + 方差，不报单个 ✓。
 - N=5 为指示性非统计证明（大数定律），标 `eval_adequacy: L3` 与样本上限。
-- dispatch 不可用跑不了 eval → 记 `fresh_source_eval_not_run:<reason>`，此时不得声称稳定，U2/U3 删除降级为只压缩保留（原则 6）。
+- dispatch 不可用跑不了 eval → 记 `fresh_source_eval_not_run:<reason>`，此时不得声称稳定；Pilot A / Wave B 中涉及删除或迁移 spine 承重文本的动作必须降级为只新增 reference + STOP trigger 或压缩保留（原则 6）。
 
 ## Risks And Mitigations
 

@@ -185,7 +185,6 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 - task-pack handoff 会基于 source plan 结构推荐是否拆分，并对高风险 task pack 推荐文档审查，同时保持工程师在环确认。
 - work、review、debug、optimize 和 compound workflows 会沉淀证据与经验。
 - knowledge handoff 默认 summary-first，召回的 `docs/solutions/` learning 在回源确认前保持 advisory。
-- 团队开发规范合同以 source 文档形式放在 `docs/contracts/team-standards.md` 与 `docs/standards/**`，由 workflow 按 scope 选择 confirmed 规则，而不是新增入口。
 - 一套 source assets 以统一 `spec-*` workflow 入口支持 Claude Code、Codex、Cursor、Kiro 和 Qoder，不需要手工维护生成副本。
 
 这些是当前 repo 机制，不是"已经被外部采纳数据证明"的效果宣称。先相信 artifacts、tests 和 source/runtime boundaries，再相信任何营销句子。

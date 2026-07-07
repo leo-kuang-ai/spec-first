@@ -6,6 +6,8 @@
 
 本次审查只写 source 文档，不修改 `skills/`、`agents/`、CLI 或 generated runtime mirrors。
 
+> 2026-07-08 freshness note：本目录是 2026-07-02 之前 skill/agent inventory 的历史审查证据。2026-07-07 完整退役 standards governance 后，涉及 standards governance skill 与 standards reviewer 的单项报告不再代表当前 source。
+
 ## 2. 报告清单
 
 | 序号 | 类型 | 名称 | 报告文件 | 最终建议 | 优先级 |

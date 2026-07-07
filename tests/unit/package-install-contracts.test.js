@@ -89,13 +89,10 @@ describe('package install contracts', () => {
     expect(pkg.files).toContain('docs/contracts/knowledge/');
     expect(pkg.files).toContain('docs/contracts/quality-gates/');
     expect(pkg.files).toContain('docs/contracts/release-package-evidence.schema.json');
-    expect(pkg.files).toContain('docs/contracts/team-standards.md');
     expect(pkg.files).toContain('docs/contracts/verifiers/');
     expect(pkg.files).toContain('docs/contracts/website-sync-contract.md');
     expect(pkg.files).toContain('docs/contracts/workflows/');
-    expect(pkg.files).toContain('docs/standards/');
     expect(pkg.files).toContain('scripts/check-release-continuity.cjs');
-    expect(pkg.files).toContain('scripts/check-team-standards.js');
     expect(pkg.files).toContain('scripts/check-website-sync.cjs');
     expect(pkg.files).toContain('scripts/generate-runtime-capability-catalog.js');
     expect(pkg.files).toContain('scripts/lint-skill-entrypoints.config.json');
@@ -193,11 +190,15 @@ describe('package install contracts', () => {
       expect(packedPaths).toContain('docs/contracts/provider-tools-registry.schema.json');
       expect(packedPaths).toContain('docs/contracts/workflows/review-finding.md');
       expect(packedPaths).toContain('docs/contracts/context-governance.md');
-      expect(packedPaths).toContain('docs/contracts/team-standards.md');
-      expect(packedPaths).toContain('docs/standards/index.md');
-      expect(packedPaths).toContain('docs/standards/shared.md');
-      expect(packedPaths).toContain('docs/standards/candidates/README.md');
-      expect(packedPaths).toContain('scripts/check-team-standards.js');
+      const retiredContractPath = ['docs/contracts', 'team-standards.md'].join('/');
+      const retiredStandardsRoot = ['docs', 'standards'].join('/');
+      const retiredChecker = ['scripts', ['check-team', 'standards.js'].join('-')].join('/');
+
+      expect(packedPaths).not.toContain(retiredContractPath);
+      expect(packedPaths).not.toContain(`${retiredStandardsRoot}/index.md`);
+      expect(packedPaths).not.toContain(`${retiredStandardsRoot}/shared.md`);
+      expect(packedPaths).not.toContain(`${retiredStandardsRoot}/candidates/README.md`);
+      expect(packedPaths).not.toContain(retiredChecker);
       expect(packedPaths).toContain('skills/spec-prd/references/evidence-and-topology.md');
       expect(packedPaths).toContain('skills/spec-prd/references/prd-output-template.md');
       expect(packedPaths).toContain('skills/spec-prd/references/prd-readiness-lens.md');

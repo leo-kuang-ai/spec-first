@@ -60,7 +60,7 @@ Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture:
 
 `.spec-first/config.local.yaml` is a local-only override file, not team-shared source of truth. The current supported consumer key is `verification_profile_path`, read by the verification profile loader as a local execution preference. Document output/provider keys in the template are reserved future hints unless an implemented consumer and focused tests exist. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
 
-If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a team standards index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
+If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a project guidance index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
 
 ## Host Authority And Write Safety
 

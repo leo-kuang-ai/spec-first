@@ -75,7 +75,6 @@ Lifecycle 是 per-consumer classification，不是 agent 的全局唯一属性�
 | `spec-best-practices-researcher` | `deep-dive` | `spec-plan`、`spec-compound`、research phase | 需要外部最佳实践、社区惯例或实现 guidance | 当前 source 足以判断，或用户不需要外部资料 | research digest | 与 framework-docs 分工：它看 broader patterns，不只官方版本文档 |
 | `spec-cli-agent-readiness-reviewer` | `deep-dive` | CLI 专项审查、`spec-code-review` 条件深审 | CLI source/plan/spec 需要完整 agent-readiness rubric | 普通 CLI diff 默认审查 | specialized readiness findings | 与 `spec-cli-readiness-reviewer` 重叠；它是深审版 |
 | `spec-cli-readiness-reviewer` | `conditional` | `spec-code-review` | CLI command definitions、argument parsing、handler implementation 变化 | 非 CLI 改动 | code-review reviewer schema | 普通 code-review 条件 persona |
-| `spec-code-simplicity-reviewer` | `conditional` | `spec-code-review`、`spec-compound` | 实现完成后怀疑 YAGNI、过度抽象或可删除复杂度 | 需求本身要求完整框架或设计已被确认 | review/simplification findings | 可作为 final pass；不应替代 maintainability |
 | `spec-coherence-reviewer` | `always-on` | `spec-doc-review` | requirements、plan、task-pack、review 报告内部一致性审查 | 代码 diff review | doc-review finding，映射 `review-finding.v1` | doc-review 基础 persona |
 | `spec-correctness-reviewer` | `always-on` | `spec-code-review` | 行为、状态、边界条件、错误传播和 intent-vs-implementation 检查 | 纯文档改动或无行为变化 | code-review reviewer schema | code-review 基础 persona |
 | `spec-data-integrity-guardian` | `deep-dive` | `spec-compound`、专项数据审查 | 资金、订单、隐私、持久化状态一致性或生产数据安全 | 普通 UI/文档改动 | prose / data risk findings | 与 data migration reviewers 重叠；偏数据完整性专项 |
@@ -103,7 +102,6 @@ Lifecycle 是 per-consumer classification，不是 agent 的全局唯一属性�
 | `spec-pr-comment-resolver` | `conditional` | `resolve-pr-feedback` | 处理一个 PR review feedback item 并准备 reply text | 无 PR feedback 上下文 | structured reply summary | 不是通用 code reviewer |
 | `spec-previous-comments-reviewer` | `conditional` | `spec-code-review` | PR 有既有 review comments 或 threads，需要检查是否复发/已处理 | 无历史 comments | code-review reviewer schema | 依赖 PR/comment facts |
 | `spec-product-lens-reviewer` | `conditional` | `spec-doc-review` | 文档包含可挑战的产品前提、战略取舍、用户影响 | 已确认的纯执行任务 | doc-review finding，映射 `review-finding.v1` | 不用产品偏好覆盖 owner decision |
-| `spec-project-standards-reviewer` | `always-on` | `spec-code-review` | 对照 AGENTS/CLAUDE、directory rules、confirmed `docs/standards` | 无 confirmed active standards 时只可说明未适用 | code-review reviewer schema | code-review 基础 persona，但 standards 必须 confirmed/scope matched |
 | `spec-reliability-reviewer` | `conditional` | `spec-code-review` | error handling、retries、timeouts、health checks、background jobs、async handlers | 无运行时 failure mode 变化 | code-review reviewer schema | 专注生产可靠性 |
 | `spec-repo-research-analyst` | `deep-dive` | `spec-plan`、research phase | 新代码库上手、结构/约定/影响面研究 | 已定位文件的小改 | repo research digest | 不应代替 bounded direct reads 的最终证据 |
 | `spec-schema-drift-detector` | `conditional` | `spec-code-review` | PR 含 database schema changes，需要核对 schema drift | 非 DB schema/migration 改动 | drift finding | 与 API contract 分工：它看 schema.rb 与 migrations 对齐 |

@@ -36,7 +36,6 @@ describe('spec-code-review context orientation contract', () => {
     expect(text).toContain('plan/task/work artifacts when present');
     expect(text).toContain('already-loaded host/project instructions');
     expect(text).toContain('not automatic re-read targets for every review run');
-    expect(text).toContain('Stage 3b is the narrow project-standards persona exception');
     expect(text).toContain('nearby implementation files');
     expect(text).toContain('nearby tests');
     expect(text).toContain('Use direct diff reads, source reads, `rg`, ast-grep, package/test facts, logs, and user-provided artifacts');
@@ -50,12 +49,8 @@ describe('spec-code-review context orientation contract', () => {
     expect(text).toContain('not external-tool output alone');
     expect(text).toContain('Autofix review must not edit a child repo unless that repo is explicit');
     expect(text).toContain('risk assessments scoped to the repo that owns the file');
-    expect(text).toContain('Discover project standards paths');
-    expect(text).toContain('find all `**/CLAUDE.md` and `**/AGENTS.md` in the repo');
-    expect(text).toContain('If `docs/contracts/team-standards.md` exists, include that contract and `docs/standards/index.md` in the path list');
-    expect(text).toContain('select only `trust=confirmed,lifecycle_state=active`, scope-matched rule files from `docs/standards/**`');
-    expect(text).toContain('must not receive or read the full standards corpus by default');
-    expect(text).toContain('Pass the resulting path list to the `project-standards` persona inside a `<standards-paths>` block');
+    expect(text).not.toContain('Discover project standards paths');
+    expect(text).not.toContain('<standards-paths>');
     expect(text).not.toContain('docs/examples/standards-glue-consumption-examples.md');
     expect(text).not.toContain('.spec-first/standards/');
     expect(text).not.toContain('<standards-baseline-paths>');
@@ -68,8 +63,8 @@ describe('spec-code-review context orientation contract', () => {
 
     expect(text).toContain('Domain Language And Decision Ledger');
     expect(text).toContain('consume existing context before asking questions or raising gaps that repo/docs can answer');
-    expect(text).toContain('already-loaded project standards and host instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
-    expect(text).toContain('Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy or the Stage 3b project-standards persona exception');
+    expect(text).toContain('already-loaded host/project instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
+    expect(text).toContain('Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy');
     expect(text).toContain('repo-local glossary or ADR-like artifacts that actually exist');
     expect(text).toContain('Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory.');
     expect(text).toContain('record the limitation in Coverage as advisory context rather than blocking the review');
@@ -381,28 +376,6 @@ describe('spec-code-review CE sync contracts', () => {
     expect(skill).toContain('Select when diff includes migration artifacts');
     expect(catalog).toContain('`spec-schema-drift-detector` | Cross-references schema.rb changes against included migrations to catch unrelated drift');
     expect(skill).toContain('For spec-schema-drift-detector specifically, pass the resolved review base branch explicitly so it never assumes `main`');
-  });
-
-  test('project-standards reviewer enforces only confirmed team standards with source evidence', () => {
-    const reviewer = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-project-standards-reviewer.agent.md'),
-      'utf8',
-    );
-    const catalog = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
-      'utf8',
-    );
-
-    expect(reviewer).toContain('docs/contracts/team-standards.md');
-    expect(reviewer).toContain('docs/standards/index.md');
-    expect(reviewer).toContain('trust=confirmed');
-    expect(reviewer).toContain('lifecycle_state=active');
-    expect(reviewer).toContain('matching scope');
-    expect(reviewer).toContain('Suppress `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`');
-    expect(reviewer).toContain('Do not scan the full `docs/standards/**` tree');
-    expect(reviewer).toContain('Every finding must include');
-    expect(reviewer).toContain('specific line(s) in the diff');
-    expect(catalog).toContain('confirmed `docs/standards/**` rule cards');
   });
 
   test('tracker defer references keep the tracker confidence tuple consistent', () => {
@@ -783,7 +756,7 @@ describe('spec-code-review CE sync contracts', () => {
     for (const content of [text, codexRuntime]) {
       expect(content).toContain('Codex `spawn_agent` parameter hygiene');
       expect(content).toContain('Codex reviewer prompts are self-contained');
-      expect(content).toContain('pass the persona, diff-scope rules, output schema, PR metadata, intent, file list, diff, and standards paths');
+      expect(content).toContain('pass the persona, diff-scope rules, output schema, PR metadata, intent, file list, diff, and boundary context');
       expect(content).toContain('Dispatch one reviewer per `spawn_agent` call');
       expect(content).toContain('do not bundle multiple reviewer personas into one sub-agent prompt');
       expect(content).toContain('prefer the default sub-agent type and omit `agent_type`');
@@ -892,8 +865,8 @@ describe('spec-code-review CE sync contracts', () => {
     expect(skill).toContain('Progressive disclosure boundary: low-risk docs-only, simple config, and tiny executable diffs may use a minimum reviewer set');
     expect(skill).toContain('high-risk workflow, contract, release, source/runtime boundary, external-tool evidence, security, or cross-module changes must use the full default core plus applicable conditional reviewers');
     expect(skill).toContain('avoid unbounded fan-out on small diffs without hiding risk');
-    expect(skill).toContain('| `docs_only` | `spec-project-standards-reviewer`, `spec-maintainability-reviewer` |');
-    expect(skill).toContain('| `simple_config_only` | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-project-standards-reviewer` |');
+    expect(skill).toContain('| `docs_only` | `spec-maintainability-reviewer`, `spec-agent-native-reviewer` |');
+    expect(skill).toContain('| `simple_config_only` | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer` |');
     expect(skill).toContain('| tiny executable diff | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer` |');
     expect(skill).toContain('`mode:headless` and `mode:report-only` keep their structured output contracts');
     expect(skill).toContain('`mode:autofix` may use the minimum set only for `docs_only` or `simple_config_only`');
@@ -1026,7 +999,6 @@ describe('spec-code-review CE sync contracts', () => {
       'spec-maintainability-reviewer',
       'spec-performance-reviewer',
       'spec-previous-comments-reviewer',
-      'spec-project-standards-reviewer',
       'spec-reliability-reviewer',
       'spec-security-reviewer',
       'spec-swift-ios-reviewer',

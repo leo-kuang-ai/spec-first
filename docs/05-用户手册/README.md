@@ -119,18 +119,17 @@ spec-app-consistency-audit prd:<path> figma-context:<path> source:<path>
 8. [研发场景与降级路径](./20-研发场景与降级路径.md)
 9. [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 10. [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)
-11. [团队开发规范治理](./23-团队开发规范治理.md)
-12. [常见问题](./04-常见问题.md)
-13. [最佳实践](./05-最佳实践.md)
-14. [三种开发模式](./08-三种开发模式.md)
-15. [本地源码安装](./06-本地源码安装.md)
-16. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
+11. [常见问题](./04-常见问题.md)
+12. [最佳实践](./05-最佳实践.md)
+13. [三种开发模式](./08-三种开发模式.md)
+14. [本地源码安装](./06-本地源码安装.md)
+15. [内部培训使用讲稿](./07-内部培训使用讲稿.md)
 
 ## 建议阅读路径
 
 - 如果你第一次使用，先看 [快速开始](./01-快速开始.md)，再看 [首次工作流走查](./09-首次工作流走查.md)
 - 如果你要理解运行模型、工程闭环和 evidence 边界，先看 [核心概念](./02-核心概念.md)
-- 如果你要共享 confirmed project standards，先看 [团队开发规范治理](./23-团队开发规范治理.md)，再看 [Gitignore 参考](./12-gitignore参考.md) 的提交边界
+- 如果你要共享 project guidance，优先放在 `AGENTS.md`、`CLAUDE.md`、目录级 instruction 文件或明确的 `docs/contracts/**`，再看 [Gitignore 参考](./12-gitignore参考.md) 的提交边界
 - 如果你要判断单仓、多模块或多仓 workspace 怎么使用，先看 [三种开发模式](./08-三种开发模式.md)
 - 如果你要判断 OpenSpec 和 spec-first 在不同项目阶段怎么取舍，先看 [OpenSpec 与 spec-first 项目阶段适用性对比](./21-OpenSpec与spec-first阶段适用性对比.md)
 - 如果产品或 owner 已经给出 PRD、需求材料、会议纪要、设计说明或系统增量说明，你要在进入研发 planning 前澄清 WHAT/WHY、owner 决策和计划准入条件，先看 [研发侧需求澄清与计划准入流程](./22-PRD需求文档质量增强流程.md)

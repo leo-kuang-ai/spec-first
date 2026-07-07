@@ -31,11 +31,11 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 | `spec-plan` | spec-plan | 为多步骤任务创建结构化实施计划，或对现有计划做深化审查 | spec-repo-research-analyst、spec-learnings-researcher、spec-spec-flow-analyzer（条件）；spec-slack-researcher（opt-in）；spec-best-practices-researcher、spec-framework-docs-researcher（外部研究有价值时） |
 | `spec-write-tasks` | spec-write-tasks | 将已定稿的 spec-plan 编译为派生任务包，或验证现有任务包完整性 | 无 |
 | `spec-work` | spec-work | 接收任务包或计划，系统化执行开发工作，保证质量交付 | spec-figma-design-sync（UI 工作按需） |
-| `spec-code-review` | spec-code-review | 结构化代码审查；dispatch 可用且授权时使用多 persona，缺失时走 report-only / inline fallback；置信度门控，合并去重，可选自动修复 | spec-correctness-reviewer、spec-testing-reviewer、spec-maintainability-reviewer、spec-project-standards-reviewer、spec-agent-native-reviewer、spec-learnings-researcher（默认核心）；spec-security-reviewer、spec-performance-reviewer、spec-api-contract-reviewer、spec-data-migrations-reviewer、spec-reliability-reviewer、spec-adversarial-reviewer、spec-cli-readiness-reviewer、spec-cli-agent-readiness-reviewer、spec-previous-comments-reviewer（条件 cross-cutting）；spec-dhh-rails-reviewer、spec-kieran-rails-reviewer、spec-kieran-python-reviewer、spec-kieran-typescript-reviewer、spec-julik-frontend-races-reviewer、spec-swift-ios-reviewer（stack-specific 条件）；spec-schema-drift-detector、spec-deployment-verification-agent（含迁移文件时） |
+| `spec-code-review` | spec-code-review | 结构化代码审查；dispatch 可用且授权时使用多 persona，缺失时走 report-only / inline fallback；置信度门控，合并去重，可选自动修复 | spec-correctness-reviewer、spec-testing-reviewer、spec-maintainability-reviewer、spec-agent-native-reviewer、spec-learnings-researcher（默认核心）；spec-security-reviewer、spec-performance-reviewer、spec-api-contract-reviewer、spec-data-migrations-reviewer、spec-reliability-reviewer、spec-adversarial-reviewer、spec-cli-readiness-reviewer、spec-cli-agent-readiness-reviewer、spec-previous-comments-reviewer（条件 cross-cutting）；spec-dhh-rails-reviewer、spec-kieran-rails-reviewer、spec-kieran-python-reviewer、spec-kieran-typescript-reviewer、spec-julik-frontend-races-reviewer、spec-swift-ios-reviewer（stack-specific 条件）；spec-schema-drift-detector、spec-deployment-verification-agent（含迁移文件时） |
 | `spec-doc-review` | spec-doc-review | 结构化文档审查；dispatch 可用且授权时使用多 persona，缺失时走 single-agent report-only fallback；发现一致性、可行性、范围、安全等问题，可选自动修复 | spec-coherence-reviewer、spec-feasibility-reviewer（always-on）；spec-product-lens-reviewer、spec-design-lens-reviewer、spec-security-lens-reviewer、spec-scope-guardian-reviewer、spec-adversarial-document-reviewer（条件激活） |
 | `spec-debug` | spec-debug | 系统性排查 bug 根因，可选修复，适用于失败测试、运行时报错等场景 | 无（可派发匿名只读 sub-agent 并行调查） |
 | `spec-optimize` | spec-optimize | 指标驱动的迭代优化循环，并行实验，按评分保留改进方案 | spec-learnings-researcher（Phase 0.3）；spec-repo-research-analyst（较大或陌生代码库时） |
-| `spec-compound` | spec-compound | 问题刚解决时，通过并行子 agent 将解决方案沉淀到 docs/solutions/ | spec-performance-oracle（性能问题）；spec-security-sentinel（安全问题）；spec-data-integrity-guardian（数据库问题）；spec-code-simplicity-reviewer + 对应 kieran reviewer（代码密集型）；spec-pattern-recognition-specialist、spec-best-practices-researcher、spec-framework-docs-researcher（条件）；spec-session-historian（由 spec-sessions 间接调度） |
+| `spec-compound` | spec-compound | 问题刚解决时，通过并行子 agent 将解决方案沉淀到 docs/solutions/ | spec-performance-oracle（性能问题）；spec-security-sentinel（安全问题）；spec-data-integrity-guardian（数据库问题）；代码密集型按栈选择 kieran reviewer；spec-pattern-recognition-specialist、spec-best-practices-researcher、spec-framework-docs-researcher（条件）；spec-session-historian（由 spec-sessions 间接调度） |
 | `spec-compound-refresh` | spec-compound-refresh | 审查并刷新 docs/solutions/ 下已漂移的 learning 与 pattern 文档，更新/合并/替换/删除，维持知识库新鲜度 | 无具名 agent（用匿名 subagent 做调查与 replacement 的上下文隔离） |
 | `spec-sessions` | spec-sessions | 搜索并综合历史 coding agent 会话，回答关于过去工作的问题 | spec-session-historian |
 | `spec-slack-research` | spec-slack-research | 搜索 Slack 组织上下文，返回经解读的 research digest | spec-slack-researcher |
@@ -59,7 +59,6 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 - **spec-best-practices-researcher** — 研究并综合任何技术或框架的外部最佳实践、文档与示例，获取行业标准和社区规范
 - **spec-cli-agent-readiness-reviewer** — 使用基于严重度的评估标准审查 CLI 源码/计划/规范的 AI agent 就绪度
 - **spec-cli-readiness-reviewer** — 条件性代码审查 persona，diff 涉及 CLI 命令定义/参数解析时激活，审查 CLI 对自主 agent 的可用性
-- **spec-code-simplicity-reviewer** — 实现完成后的最终审查，识别 YAGNI 违规和简化机会，确保代码尽可能简单最小
 - **spec-coherence-reviewer** — 审查规划文档的内部一致性——章节间矛盾、术语漂移、结构问题和歧义
 - **spec-correctness-reviewer** — 始终开启的代码审查 persona，检查逻辑错误、边界条件、状态管理 bug、错误传播失败和意图与实现不符
 - **spec-data-integrity-guardian** — 审查数据库迁移、数据模型和持久化数据代码的安全性，检查迁移安全、数据约束、事务边界和隐私合规
@@ -87,7 +86,6 @@ Context 不是顺序 workflow 节点，而是横切 evidence / harness layer：�
 - **spec-pr-comment-resolver** — 评估并解决一个或多个相关 PR 审查线程，返回含回复文本的结构化摘要
 - **spec-previous-comments-reviewer** — 条件性代码审查 persona，PR 已有审查评论时激活，检查当前 diff 是否已解决先前反馈
 - **spec-product-lens-reviewer** — 以高级产品负责人视角审查规划文档，挑战前提声明并评估战略影响
-- **spec-project-standards-reviewer** — 始终开启的代码审查 persona，对照项目自身 CLAUDE.md 和 AGENTS.md 标准审查变更
 - **spec-reliability-reviewer** — 条件性代码审查 persona，diff 涉及错误处理/重试/熔断/超时/后台任务时激活，审查生产可靠性
 - **spec-repo-research-analyst** — 对仓库结构、文档、规范和实现模式进行全面研究，适用于新代码库上手或理解项目规范
 - **spec-schema-drift-detector** — 通过对比包含的迁移文件，检测 PR 中不相关的 schema.rb 变更

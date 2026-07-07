@@ -31,7 +31,6 @@ describe('context governance runtime exclusion contract', () => {
     expect(contract).toContain('Host Instruction Reuse Policy');
     expect(contract).toContain('已加载的 host/project instructions');
     expect(contract).toContain('禁止把根 `AGENTS.md` / `CLAUDE.md` 当作每次 plan/work/debug/review 的普通必读上下文');
-    expect(contract).toContain('project-standards persona');
     expect(contract).toContain('`.spec-first/audits/**`');
     expect(contract).toContain('`.claude/**`');
     expect(contract).toContain('`.codex/**`');

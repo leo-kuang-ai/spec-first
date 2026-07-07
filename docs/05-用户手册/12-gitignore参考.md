@@ -217,11 +217,9 @@ graphify-out/
 *.tgz
 ```
 
-## 共享 project standards
+## 共享 project guidance
 
-如果团队希望跨人复用 project standards，应把已确认内容写入明确 source-of-truth，例如 `AGENTS.md`、`CLAUDE.md`、目录级 `AGENTS.md` / `CLAUDE.md`，或当前推荐的 `docs/contracts/team-standards.md` + `docs/standards/index.md` + `docs/standards/**`。
-
-`docs/standards/**` 是 checked-in source surface，不是 runtime artifact。只有 `trust=confirmed,lifecycle_state=active` 且 scope 命中的规则才可作为 workflow hard context；`docs/standards/candidates/**` 只放 proposal/advisory 内容，不应被 downstream workflow enforce。`docs/specs/**` 记录能力行为真相，不能替代团队开发规范。旧 `.spec-first/standards/` 属于已退役 runtime/artifact 路径，不应作为新的 confirmed standards source。
+如果团队希望跨人复用 project guidance，应把已确认内容写入明确 source-of-truth，例如 `AGENTS.md`、`CLAUDE.md`、目录级 `AGENTS.md` / `CLAUDE.md`，或精确的 `docs/contracts/**` 合同。`docs/specs/**` 记录能力行为真相，不能替代团队协作约束。
 
 ## 不建议加入的规则
 
@@ -239,7 +237,7 @@ graphify-out/
 
 - 整个 `.claude/` 可能会隐藏团队有意提交的项目设置、hook 或非 spec-first 配置；`.codex/` 是当前默认例外，Codex host/runtime config 与 spec-first Codex runtime mirror 都按本地可重建资产处理。
 - 整个 `.agents/` 可能会隐藏团队自定义 plugins 或 marketplace 配置。
-- 整个 `.spec-first/` 会隐藏 `.spec-first/config.local.example.yaml`、`.spec-first/specs/repo-profile.yaml` 和团队可能选择提交的其他 source 文件；当前 confirmed team standards 推荐放在 `docs/standards/**`，不放在 `.spec-first/standards/`。
+- 整个 `.spec-first/` 会隐藏 `.spec-first/config.local.example.yaml`、`.spec-first/specs/repo-profile.yaml` 和团队可能选择提交的其他 source 文件。
 - 整个 `.cursor/` 可能会隐藏团队有意维护的 Cursor rules、agents 或其它 host-native 文件；默认只忽略 spec-first managed Cursor preview runtime 和 project MCP config。
 - 整个 `.qoder/` 可能会隐藏团队有意维护的 Qoder rules、settings 或 hooks；默认只忽略 spec-first managed Qoder runtime。
 

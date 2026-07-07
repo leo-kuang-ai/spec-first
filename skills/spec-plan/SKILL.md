@@ -37,7 +37,7 @@ Do not use to implement code, run tests as proof, investigate failing tests, sta
 
 ### Inputs
 
-A feature/request description, requirements document path, existing plan path to deepen, bug report, rough task description, or non-software planning prompt; optional project standards, package/test context, setup/runtime facts, and nearby source evidence as planning context.
+A feature/request description, requirements document path, existing plan path to deepen, bug report, rough task description, or non-software planning prompt; optional host/project instructions, package/test context, setup/runtime facts, and nearby source evidence as planning context.
 
 ### Outputs
 

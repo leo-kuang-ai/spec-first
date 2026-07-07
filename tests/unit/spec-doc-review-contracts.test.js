@@ -167,7 +167,7 @@ describe('spec-doc-review best-judgment wording contract', () => {
 
     expect(skill).toContain('Domain Language And Decision Ledger');
     expect(skill).toContain('consume existing context before asking questions or raising gaps that repo/docs can answer');
-    expect(skill).toContain('already-loaded project standards and host instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
+    expect(skill).toContain('already-loaded host/project instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
     expect(skill).toContain('Read `AGENTS.md` / `CLAUDE.md` source only under `docs/contracts/context-governance.md`\'s Host Instruction Reuse Policy');
     expect(skill).toContain('repo-local glossary or ADR-like artifacts that actually exist');
     expect(skill).toContain('Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory.');

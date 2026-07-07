@@ -185,7 +185,6 @@ Current mechanisms you can inspect today:
 - Task-pack handoffs now recommend splitting from source-plan structure and recommend document review for high-risk packs while keeping the engineer in the loop.
 - Work, review, debug, optimize, and compound workflows preserve evidence and learning.
 - Knowledge handoffs stay summary-first, and recalled `docs/solutions/` learnings remain advisory until reconfirmed from source evidence.
-- Team standards live as source docs under `docs/contracts/team-standards.md` and `docs/standards/**`; workflows pick the confirmed rules in scope rather than adding a new entrypoint.
 - One source asset set supports unified `spec-*` workflow entries across Claude Code, Codex, Cursor, Kiro, and Qoder without hand-maintaining generated runtime copies.
 
 These are current repo mechanisms, not measured adoption-outcome claims. Trust the artifacts, tests, and source/runtime boundaries before trusting any marketing sentence.

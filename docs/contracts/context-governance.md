@@ -52,8 +52,6 @@
 
 普通 workflow 仍可读取 checked-in source truth，例如 `skills/`、`agents/`、`templates/`、`src/cli/`、`docs/contracts/`、`AGENTS.md`、`CLAUDE.md`、`README*` 和当前任务直接相关的源码、测试、计划或需求文档。
 
-`docs/standards/**` 是 checked-in team standards source surface，而不是 runtime artifact。普通 workflow 只能通过 `docs/contracts/team-standards.md` 的 summary-first、scope-filtered rule selection contract 消费它：先读 contract 和 `docs/standards/index.md`，再按 matched rule files 精确读取。只有 `trust=confirmed,lifecycle_state=active` 且 scope 命中的规则可成为 hard project context；`observed`、`suggested`、`imported`、`conflict`、`confirmed-draft` 和 `docs/standards/candidates/**` 保持 advisory 或 blocked。
-
 ## Host Instruction Reuse Policy
 
 `AGENTS.md`、`CLAUDE.md` 和项目角色文档是 host / project instruction layer。Claude 或 Codex 进入仓库时通常已经把适用的入口指令注入到当前会话；普通 workflow 的 context orientation 应优先使用这些已加载的 host/project instructions，而不是因为 prompt 提到 instruction files 就重新读取根 `AGENTS.md` / `CLAUDE.md`。
@@ -64,8 +62,6 @@
 2. 当前任务正在修改、审查、生成或诊断 instruction / runtime / setup / update / audit / source-runtime drift 行为。
 3. 已加载指令缺失、明显 stale、与当前 source 冲突，或 workflow 需要核对 source-of-truth 以避免漂移。
 4. 需要检查目录级 `AGENTS.md` / `CLAUDE.md` 是否管辖当前 changed files，而该目录级指令未出现在已加载 host context 中。
-5. `spec-code-review` 的 project-standards persona 需要自包含 standards path list；父级 orchestrator 只发现并传递路径，leaf reviewer 只读取与 changed files 相关的 sections。
-
 禁止把根 `AGENTS.md` / `CLAUDE.md` 当作每次 plan/work/debug/review 的普通必读上下文。若只是为了执行方向校准，使用已加载 instruction summary；若因上述例外读取 source 文件，在输出、Coverage 或 closeout 中说明读取原因即可。
 
 ## Runtime Artifact Policy

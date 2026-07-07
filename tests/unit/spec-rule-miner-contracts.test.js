@@ -36,7 +36,8 @@ describe('spec-rule-miner skill contract', () => {
     expect(skill).toContain('## Workflow');
     expect(skill).toContain('## Failure Modes');
     expect(skill).toContain('近邻路由');
-    expect(skill).toContain('`spec-team-standards-governance`');
+    expect(skill).toContain('confirmed team policy governance 已退役');
+    expect(skill).toContain('不再提供专用入口');
     expect(skill).toContain('不要修改业务源码');
     expect(skill).toContain("Host-projected copies are outside this skill's rule targets");
     expect(skill).toContain('[Pattern Categories](references/pattern-categories.md)');

@@ -13,7 +13,6 @@ Spawned for medium, broad, sensitive, or unclear reviews. The Stage 3 scale-awar
 | `correctness` | `spec-correctness-reviewer` | Logic errors, edge cases, state bugs, error propagation, intent compliance |
 | `testing` | `spec-testing-reviewer` | Coverage gaps, weak assertions, brittle tests, missing edge case tests |
 | `maintainability` | `spec-maintainability-reviewer` | Coupling, complexity, naming, dead code, premature abstraction |
-| `project-standards` | `spec-project-standards-reviewer` | Written project standards from CLAUDE.md, AGENTS.md, directory rules, and confirmed `docs/standards/**` rule cards |
 
 **Spec-First agents (unstructured output, synthesized separately):**
 

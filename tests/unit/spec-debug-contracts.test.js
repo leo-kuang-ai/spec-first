@@ -11,7 +11,7 @@ describe('spec-debug branch-aware handoff contract', () => {
 
     expect(text).toContain('Domain Language And Decision Ledger');
     expect(text).toContain('consume existing context before asking questions that repo/docs can answer');
-    expect(text).toContain('already-loaded project standards and host instructions, `docs/contracts/`, existing plans/solutions');
+    expect(text).toContain('already-loaded host/project instructions, `docs/contracts/`, existing plans/solutions');
     expect(text).toContain('Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy');
     expect(text).toContain('repo-local glossary or ADR-like artifacts that actually exist');
     expect(text).toContain('Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory.');

@@ -12,6 +12,7 @@ applies_when:
   - "A workflow must distinguish loaded instruction context from precise source-of-truth reads"
 tags: ["workflow-prompts", "context-governance", "host-instructions", "agents-md", "claude-md", "token-efficiency", "source-runtime-boundary", "prompt-economy"]
 related_components: ["spec-plan", "spec-work", "spec-debug", "spec-code-review", "spec-brainstorm", "spec-doc-review"]
+retirement_note: "2026-07-08: the old code-review project-standards persona and confirmed team-standards source surface were retired. This learning now applies to host/project instruction reuse only; do not restore the old standards-path handoff exception from this document."
 ---
 
 # Workflow prompts should reuse loaded host instructions
@@ -45,7 +46,7 @@ Use already-loaded host/project instructions first.
 2. 当前任务正在修改、审查、生成或诊断 instruction / runtime / setup / update / audit / source-runtime drift 行为。
 3. 已加载指令缺失、明显 stale、与当前 source 冲突，或 workflow 需要核对 source-of-truth 以避免漂移。
 4. 需要检查目录级 `AGENTS.md` / `CLAUDE.md` 是否管辖当前 changed files，而该目录级指令未出现在已加载 host context 中。
-5. `spec-code-review` 的 `project-standards` persona 需要自包含 standards path list；父级 orchestrator 只发现并传递路径，leaf reviewer 只读取与 changed files 相关的 sections。
+5. `spec-code-review` 若需要核对 written project guidance，应只在 Host Instruction Reuse Policy 允许时精确读取相关 host/project instruction、目录级 instruction 或 `docs/contracts/**` section；不要恢复已退役的 standards path list/persona 例外。
 
 普通 workflow 的 context orientation 应该写成：
 
@@ -101,23 +102,23 @@ Orient from AGENTS.md / CLAUDE.md / project role docs...
 Domain context 的正确 wording：
 
 ```diff
-- Consume existing context: project standards, `AGENTS.md` / `CLAUDE.md`
+- Consume existing context: host instructions, `AGENTS.md` / `CLAUDE.md`
 - source, `docs/contracts/`, existing plans...
-+ Consume existing context: already-loaded project standards and host
-+ instructions, `docs/contracts/`, existing plans...
++ Consume existing context: already-loaded host/project instructions,
++ `docs/contracts/`, existing plans...
 + Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction
 + Reuse Policy.
 ```
 
-`spec-code-review` 保留一个窄例外：
+`spec-code-review` 的当前例外是精确 source 读取，而不是旧 standards persona handoff：
 
 ```text
-Stage 3b discovers standards paths before leaf reviewers read relevant sections.
-The parent orchestrator discovers paths; the project-standards reviewer reads
-only sections relevant to changed files.
+Read instruction source only when the Host Instruction Reuse Policy allows it,
+such as directory-scoped instructions that may govern changed files or
+source/runtime governance work.
 ```
 
-这个例外服务 review 自包含性，不代表普通 review orientation 可以默认重读根入口文件。
+这个例外服务 source-of-truth 校验，不代表普通 review orientation 可以默认重读根入口文件。
 
 ## Related
 

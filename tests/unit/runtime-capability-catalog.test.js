@@ -53,8 +53,8 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('| polish-beta | spec-polish-beta | spec-polish-beta | yes |');
     expect(catalog).not.toContain('| standards | spec-standards |');
     expect(catalog).not.toContain('| standards | spec-standards | /spec:standards | $spec-standards |');
-    expect(catalog).toContain('| spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance | standalone skill: spec-team-standards-governance |');
-    expect(catalog).toContain('Do not restore legacy standards workflow entrypoints, skills/spec-standards/');
+    expect(catalog).not.toContain(`| ${['spec-team', 'standards-governance'].join('-')} |`);
+    expect(catalog).not.toContain('Do not restore legacy standards workflow entrypoints, skills/spec-standards/');
     expect(catalog).toContain('| write-skill | spec-write-skill | spec-write-skill | no |');
     expect(catalog).toContain('| write-tasks | spec-write-tasks | spec-write-tasks | no |');
     expect(catalog).toContain('| Delivered agent-facing internal skills | git-worktree |');

@@ -31,20 +31,6 @@
       }
     },
     {
-      "skill_name": "spec-doc-review",
-      "entry_surface": "workflow_command",
-      "command_name": "doc-review",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
       "skill_name": "feature-video",
       "entry_surface": "internal_only",
       "command_name": null,
@@ -185,20 +171,6 @@
       }
     },
     {
-      "skill_name": "spec-rule-miner",
-      "entry_surface": "standalone_skill",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "skill",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "skill"
-      }
-    },
-    {
       "skill_name": "spec-app-consistency-audit",
       "entry_surface": "workflow_command",
       "command_name": "app-consistency-audit",
@@ -227,9 +199,9 @@
       }
     },
     {
-      "skill_name": "spec-prd",
+      "skill_name": "spec-code-review",
       "entry_surface": "workflow_command",
-      "command_name": "prd",
+      "command_name": "code-review",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -294,6 +266,34 @@
         "cursor": "internal",
         "kiro": "internal",
         "qoder": "internal"
+      }
+    },
+    {
+      "skill_name": "spec-doc-review",
+      "entry_surface": "workflow_command",
+      "command_name": "doc-review",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
+      }
+    },
+    {
+      "skill_name": "spec-explain",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     },
     {
@@ -367,6 +367,62 @@
       }
     },
     {
+      "skill_name": "spec-pov",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-prd",
+      "entry_surface": "workflow_command",
+      "command_name": "prd",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
+      }
+    },
+    {
+      "skill_name": "spec-product-pulse",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-promote",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
+      }
+    },
+    {
       "skill_name": "spec-release-notes",
       "entry_surface": "workflow_command",
       "command_name": "release-notes",
@@ -381,17 +437,31 @@
       }
     },
     {
-      "skill_name": "spec-code-review",
-      "entry_surface": "workflow_command",
-      "command_name": "code-review",
+      "skill_name": "spec-riffrec-feedback-analysis",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "command",
+        "claude": "skill",
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-rule-miner",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
       }
     },
     {
@@ -409,17 +479,17 @@
       }
     },
     {
-      "skill_name": "spec-write-skill",
-      "entry_surface": "workflow_command",
-      "command_name": "write-skill",
+      "skill_name": "spec-simplify-code",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "command",
+        "claude": "skill",
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "skill"
       }
     },
     {
@@ -451,17 +521,17 @@
       }
     },
     {
-      "skill_name": "spec-write-tasks",
-      "entry_surface": "workflow_command",
-      "command_name": "write-tasks",
+      "skill_name": "spec-strategy",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "command",
+        "claude": "skill",
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "command"
+        "qoder": "skill"
       }
     },
     {
@@ -479,17 +549,31 @@
       }
     },
     {
-      "skill_name": "spec-team-standards-governance",
-      "entry_surface": "standalone_skill",
-      "command_name": null,
+      "skill_name": "spec-write-skill",
+      "entry_surface": "workflow_command",
+      "command_name": "write-skill",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
-        "claude": "skill",
+        "claude": "command",
         "codex": "skill",
         "cursor": "skill",
         "kiro": "skill",
-        "qoder": "skill"
+        "qoder": "command"
+      }
+    },
+    {
+      "skill_name": "spec-write-tasks",
+      "entry_surface": "workflow_command",
+      "command_name": "write-tasks",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
       }
     },
     {

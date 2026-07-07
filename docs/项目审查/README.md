@@ -9,7 +9,7 @@
 最新审查及其衍生的 active recommendations 由下游 PRD / plan 承接，避免在历史报告里反复检索：
 
 - **系统性项目审查与优化方案**（最新）：审查见 [2026-07-05-系统性项目审查与优化方案.md](2026-07-05-系统性项目审查与优化方案.md)；按 `docs/10-prompt/系统性项目审查方法.md` 重新裁决 06-15/07-02/07-03 历史 finding，确认 README/adoption-first 与五宿主 preview 已明显推进，但 P0 outcome evidence、P1 Windows workflow portability、P1 OSS governance、P1 enterprise adoption proof 与 P1 preview host honesty 仍需闭环或显式 deferred。已起三个 origin trace plan 承接或延期对应 finding：`docs/plans/2026-07-05-001-review-closure-outcome-ledger-plan.md`、`docs/plans/2026-07-05-002-windows-workflow-portability-plan.md`、`docs/plans/2026-07-05-003-oss-adoption-governance-plan.md`。
-- **项目整体严格审查**：审查见 [2026-07-02-项目整体严格审查报告.md](2026-07-02-项目整体严格审查报告.md)；按 `docs/10-prompt/项目整体审查.md` 的 18 章逻辑重新核对当前 source inventory，覆盖 37 个 current skill、51 个 agent，并补齐旧详细审查缺失的 `spec-team-standards-governance` 与 `spec-write-skill` 单项报告。核心建议是优先建立 dogfood outcome ledger、把 Benchmark/Evidence 从 shape-only 推进到 semantic/outcome advisory scoring，并加固旧 helper skill 的 preview/failure/output contract。
+- **项目整体严格审查（历史快照）**：审查见 [2026-07-02-项目整体严格审查报告.md](2026-07-02-项目整体严格审查报告.md)；该报告按当时 source inventory 建立覆盖。2026-07-07 完整退役 standards governance 后，其 skill/agent/standards inventory 不再代表当前状态；当前 active recommendations 以 2026-07-05 系统性项目审查和后续 plan 为准。
 - **AI 专家与工程效能综合审查**：审查见 [2026-07-02-ai-expert-engineering-effectiveness-review.md](2026-07-02-ai-expert-engineering-effectiveness-review.md)；核心建议是把下一阶段从继续堆机制转向证明真实工程效能，优先接通 workflow outcome 评测、采集真实用户摩擦数据、收敛 closeout/knowledge 证据闭环，并补齐 OSS/组织治理低成本信号。
 - **spec-skill 体系健壮性/稳定性优化**：审查见 [2026-06-28-spec-skill-健壮性稳定性优化审查.md](2026-06-28-spec-skill-健壮性稳定性优化审查.md)；需求化为 PRD `docs/brainstorms/2026-06-28-002-spec-skill-robustness-stability-optimization-requirements.md`（40 条 requirement，R-01~R-40）。落地进度：Slice A'（R-01~R-04）、Slice B（R-40）、Slice C（R-05~R-12）、Slice D（R-24/R-25/R-26/R-37/R-38）已完成；Slice E（R-13~R-23、R-27~R-36/R-39）为 backlog。
 - 其余历史报告的建议若仍 active，应在对应 PRD/plan 的 frontmatter `referenced_reviews` 中追溯，不在本 README 重复展开。
@@ -25,7 +25,7 @@
 | 2026-07-03 | [Windows PowerShell 修复计划](2026-07-03-windows-powershell-fix-plan.md) | Windows PowerShell 兼容性专项审查的修复计划与优先级 |
 | 2026-07-03 | [Windows PowerShell 兼容性审查](2026-07-03-windows-powershell-compat-review.md) | Windows 安装、shim、doctor、init、workflow helper 与 CI 覆盖的兼容性审查 |
 | 2026-07-03 | [Windows PowerShell 兼容性问题清单](2026-07-03-windows-powershell-compat-issues.md) | Windows PowerShell 兼容性待处理问题分级清单 |
-| 2026-07-02 | [项目整体严格审查报告](2026-07-02-项目整体严格审查报告.md) | 按项目整体审查逻辑覆盖 Harness、横向能力、纵向流程、37 个 skill、51 个 agent、产物、上下文、门禁、Evidence、Benchmark、Knowledge、工程效能与开源传播 |
+| 2026-07-02 | [项目整体严格审查报告](2026-07-02-项目整体严格审查报告.md) | 历史快照；按当时项目整体审查逻辑覆盖 Harness、横向能力、纵向流程、skill/agent、产物、上下文、门禁、Evidence、Benchmark、Knowledge、工程效能与开源传播 |
 | 2026-07-02 | [AI 专家与工程效能综合审查](2026-07-02-ai-expert-engineering-effectiveness-review.md) | 任务建模、上下文治理、执行控制、评测反馈、知识进化与工程效能综合评估 |
 | 2026-06-28 | [spec-skill-健壮性稳定性优化审查](2026-06-28-spec-skill-健壮性稳定性优化审查.md) | skill 体系健壮性/稳定性/确定性 gate 加固（已转 PRD） |
 | 2026-06-20 | [using-spec-first-skill-optimization-suggestions](2026-06-20-using-spec-first-skill-optimization-suggestions.md) | using-spec-first 入口路由优化建议 |

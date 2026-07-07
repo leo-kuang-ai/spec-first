@@ -409,7 +409,7 @@ Based on problem type, optionally invoke specialized agents to review the docume
 - **performance_issue** → `spec-performance-oracle`
 - **security_issue** → `spec-security-sentinel`
 - **database_issue** → `spec-data-integrity-guardian`
-- Any code-heavy issue → always run `spec-code-simplicity-reviewer`, and additionally run the kieran reviewer that matches the repo's primary stack:
+- Any code-heavy issue → run the kieran reviewer that matches the repo's primary stack:
   - Ruby/Rails → also run `spec-kieran-rails-reviewer`
   - Python → also run `spec-kieran-python-reviewer`
   - TypeScript/JavaScript → also run `spec-kieran-typescript-reviewer`
@@ -548,7 +548,6 @@ Subagent Results:
 Specialized Agent Reviews (Auto-Triggered):
   ✓ spec-performance-oracle: Validated query optimization approach
   ✓ spec-kieran-rails-reviewer: Code examples meet Rails conventions
-  ✓ spec-code-simplicity-reviewer: Solution is appropriately minimal
 
 File created:
 - docs/solutions/performance-issues/n-plus-one-brief-generation.md
@@ -624,7 +623,6 @@ Based on problem type, these agents can enhance documentation:
 - **spec-kieran-rails-reviewer**: Reviews code examples for Rails best practices
 - **spec-kieran-python-reviewer**: Reviews code examples for Python best practices
 - **spec-kieran-typescript-reviewer**: Reviews code examples for TypeScript best practices
-- **spec-code-simplicity-reviewer**: Ensures solution code is minimal and clear
 - **spec-pattern-recognition-specialist**: Identifies anti-patterns or repeating issues
 
 ### Specific Domain Experts

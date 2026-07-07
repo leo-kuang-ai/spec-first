@@ -115,7 +115,7 @@ describe('spec-work context orientation contract', () => {
 
     expect(text).toContain('Domain Language And Decision Ledger');
     expect(text).toContain('consume existing context before asking questions that repo/docs can answer');
-    expect(text).toContain('already-loaded project standards and host instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
+    expect(text).toContain('already-loaded host/project instructions, `docs/contracts/`, existing brainstorms/plans/solutions');
     expect(text).toContain('Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy');
     expect(text).toContain('repo-local glossary or ADR-like artifacts that actually exist');
     expect(text).toContain('Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory.');
@@ -261,7 +261,7 @@ describe('spec-work minimality and architecture-fit preflight contract', () => {
     expect(section).toContain('imagined future consumers');
     for (const evidence of [
       'source path',
-      'matched confirmed standard rule ID',
+      'active project instruction or contract',
       'explicit plan/task decision',
       'owner/source module boundary',
       'nearby pattern',
@@ -269,7 +269,7 @@ describe('spec-work minimality and architecture-fit preflight contract', () => {
     ]) {
       expect(section).toContain(evidence);
     }
-    expect(section).toContain('confirmed active standard or source-of-truth first');
+    expect(section).toContain('active source-of-truth instruction or contract first');
     expect(section).toContain('explicit plan/task decision second');
     expect(section).toContain('owner/source module boundary third');
     expect(section).toContain('nearby pattern last');

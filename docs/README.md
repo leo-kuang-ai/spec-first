@@ -20,8 +20,6 @@
 | `docs/contracts/` | current | schema、quality gate、workflow contract 与 verifier contract |
 | `docs/contracts/workflows/self-reflection-capability-upgrade.md` | current | 自我审视、CUD、最佳实践 intake、plan/review/compound handoff 和 30-cycle loop 的轻量 contract |
 | `docs/contracts/workflows/skill-agent-quality-governance.md` | current | skill / agent 质量治理的薄契约、执行边界语言和例外说明 |
-| `docs/contracts/team-standards.md` | current | 团队开发规范 source、trust、lifecycle、promotion、selection 和 downstream consumption 合同 |
-| `docs/standards/` | current | checked-in confirmed team standards source surface、索引、候选边界和首批规则卡；不等同于旧 `.spec-first/standards/` runtime artifact |
 | `docs/10-prompt/结构化项目角色契约.md` | current | spec-first 演化判断和 source/runtime 边界基线 |
 | `docs/2026-05-04/project-audit/` | active-artifact | 当前系统级审查报告与修复阶段证据 |
 | `docs/ideation/` | active-artifact | ideation artifact；进入 brainstorm 前需要确认 freshness 和所选方向 |

@@ -58,11 +58,11 @@ When editing or reviewing this workflow prompt, or when running fresh-source eva
 
 ## Context Orientation Anchor
 
-Orient review from the diff scope, current user request, plan/task/work artifacts when present, already-loaded host/project instructions, package manifests and command registries, nearby implementation files, nearby tests, and test results. Treat `AGENTS.md`, `CLAUDE.md`, and project role docs as host instruction sources that are normally already loaded by the current session, not automatic re-read targets for every review run. Read those source instruction files only when `docs/contracts/context-governance.md`'s Host Instruction Reuse Policy allows it; Stage 3b is the narrow project-standards persona exception and discovers paths before leaf reviewers read relevant sections. Use bounded direct diff/source reads, `rg`, ast-grep when useful, package/test facts, logs, and user-provided artifacts as review evidence. External tools may prioritize inspection, but they do not define scope authority or replace reviewer judgment. Findings still need direct source, diff, test, contract, log, or artifact confirmation.
+Orient review from the diff scope, current user request, plan/task/work artifacts when present, already-loaded host/project instructions, package manifests and command registries, nearby implementation files, nearby tests, and test results. Treat `AGENTS.md`, `CLAUDE.md`, and project role docs as host instruction sources that are normally already loaded by the current session, not automatic re-read targets for every review run. Read those source instruction files only when `docs/contracts/context-governance.md`'s Host Instruction Reuse Policy allows it. Use bounded direct diff/source reads, `rg`, ast-grep when useful, package/test facts, logs, and user-provided artifacts as review evidence. External tools may prioritize inspection, but they do not define scope authority or replace reviewer judgment. Findings still need direct source, diff, test, contract, log, or artifact confirmation.
 
 ## Domain Language And Decision Ledger
 
-When review findings depend on domain terminology, project-specific concepts, or ADR-like decisions, consume existing context before asking questions or raising gaps that repo/docs can answer: already-loaded project standards and host instructions, `docs/contracts/`, existing brainstorms/plans/solutions, and any repo-local glossary or ADR-like artifacts that actually exist. Team standards under `docs/standards/**` are governed by `docs/contracts/team-standards.md`; project-standards findings may enforce only `trust=confirmed,lifecycle_state=active`, scope-matched rules and must cite both the standard rule ID/section and the diff/source violation. `observed`, `suggested`, `imported`, `conflict`, `confirmed-draft`, and `docs/standards/candidates/**` are not hard findings. Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy or the Stage 3b project-standards persona exception, not as a default domain-context step. Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory. If those artifacts are absent, record the limitation in Coverage as advisory context rather than blocking the review.
+When review findings depend on domain terminology, project-specific concepts, or ADR-like decisions, consume existing context before asking questions or raising gaps that repo/docs can answer: already-loaded host/project instructions, `docs/contracts/`, existing brainstorms/plans/solutions, and any repo-local glossary or ADR-like artifacts that actually exist. Written project guidance can constrain review only when it comes from active host/project instructions, directory-scoped instruction files, explicit contracts, or direct source evidence relevant to the diff. Read `AGENTS.md` / `CLAUDE.md` source only under the Host Instruction Reuse Policy, not as a default domain-context step. Do not require a fixed `CONTEXT.md`, `docs/adr/`, or glossary directory. If those artifacts are absent, record the limitation in Coverage as advisory context rather than blocking the review.
 
 For major review decisions or residuals, carry a lightweight decision note: `question`, `recommended_answer`, `source_tag`, `chosen_answer`, `consequence`, and `deferred_reason` when unresolved. Use source tags such as `confirmed`, `advisory`, `session-local`, `stale`, or `user`. Recommend an ADR-like artifact only when the decision is hard to reverse, would be surprising without context, and reflects a real tradeoff; do not create the artifact from review unless an explicit workflow route chooses that work.
 
@@ -263,7 +263,6 @@ The scale-aware reviewer preflight in Stage 3 may replace this default core with
 | `spec-correctness-reviewer` | Logic errors, edge cases, state bugs, error propagation |
 | `spec-testing-reviewer` | Coverage gaps, weak assertions, brittle tests |
 | `spec-maintainability-reviewer` | Coupling, complexity, naming, dead code, abstraction debt |
-| `spec-project-standards-reviewer` | CLAUDE.md and AGENTS.md compliance -- frontmatter, references, naming, portability |
 | `spec-agent-native-reviewer` | Verify new features are agent-accessible |
 | `spec-learnings-researcher` | Search docs/solutions/ for past issues related to this PR |
 
@@ -570,11 +569,11 @@ Minimum sets:
 
 | Diff class | Reviewers |
 |------------|-----------|
-| `docs_only` | `spec-project-standards-reviewer`, `spec-maintainability-reviewer` |
-| `simple_config_only` | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-project-standards-reviewer` |
+| `docs_only` | `spec-maintainability-reviewer`, `spec-agent-native-reviewer` |
+| `simple_config_only` | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer` |
 | tiny executable diff | `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer` |
 
-If any minimum-set condition is false, use the full default core: `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer`, `spec-project-standards-reviewer`, `spec-agent-native-reviewer`, and `spec-learnings-researcher`. Always add applicable conditional reviewers after core selection. `mode:headless` and `mode:report-only` keep their structured output contracts while using the same scale-aware reviewer selection. `mode:autofix` may use the minimum set only for `docs_only` or `simple_config_only`; otherwise use the full default core because mutating review needs stronger coverage.
+If any minimum-set condition is false, use the full default core: `spec-correctness-reviewer`, `spec-testing-reviewer`, `spec-maintainability-reviewer`, `spec-agent-native-reviewer`, and `spec-learnings-researcher`. Always add applicable conditional reviewers after core selection. `mode:headless` and `mode:report-only` keep their structured output contracts while using the same scale-aware reviewer selection. `mode:autofix` may use the minimum set only for `docs_only` or `simple_config_only`; otherwise use the full default core because mutating review needs stronger coverage.
 
 Record the preflight facts, selected core tier (`minimum` or `full`), and reason in Coverage. Also include resource lens advisory status when available. If the facts are missing, ambiguous, or contradicted by the diff, choose the full default core.
 
@@ -599,7 +598,6 @@ Review team:
 - correctness (core)
 - testing (core)
 - maintainability (core)
-- project-standards (core)
 - spec-agent-native-reviewer (core)
 - spec-learnings-researcher (core)
 - security -- new endpoint in routes.rb accepts user-provided redirect URL
@@ -637,16 +635,6 @@ When a capability-class provider is ready and relevant, gather a minimal candida
 - `limitations` explaining unsupported file types, stale/unknown readiness, no candidates, or bounded sampling.
 
 Every graph-derived candidate is `provider_untrusted` until confirmed by bounded source/test/log/contract evidence. A reviewer may use candidates to choose which files to inspect next, but a finding that cites graph impact must cite the confirming source, diff, test, log, or contract evidence as the finding evidence.
-
-### Stage 3b: Discover project standards paths
-
-Before spawning sub-agents, find the file paths (not contents) of all relevant standards files for the `project-standards` persona. This is the explicit leaf-reviewer exception to the Host Instruction Reuse Policy: the parent orchestrator discovers paths, and the `project-standards` reviewer reads only the relevant sections. Use the native file-search/glob tool to locate:
-
-1. Use the native file-search tool (e.g., Glob in Claude Code) to find all `**/CLAUDE.md` and `**/AGENTS.md` in the repo.
-2. Filter to those whose directory is an ancestor of at least one changed file. A standards file governs all files below it (e.g., `plugins/spec-first/AGENTS.md` applies to everything under `plugins/spec-first/`).
-3. If `docs/contracts/team-standards.md` exists, include that contract and `docs/standards/index.md` in the path list. The leaf reviewer uses the contract/index to select only `trust=confirmed,lifecycle_state=active`, scope-matched rule files from `docs/standards/**`; it must not receive or read the full standards corpus by default.
-
-Pass the resulting path list to the `project-standards` persona inside a `<standards-paths>` block in its review context (see Stage 4). The persona reads the files itself, targeting only the sections and standards rule cards relevant to the changed file types. This keeps the orchestrator's work cheap (path discovery only), avoids bloating the subagent prompt with content the reviewer may not fully need, and prevents ordinary review orientation from re-reading root host instruction files or dumping `docs/standards/**`.
 
 ### Stage 4: Spawn sub-agents
 
@@ -741,7 +729,7 @@ Pass `{run_id}` and `{review_artifact_dir}` to every persona sub-agent as correl
 
 Omit the `mode` parameter when dispatching sub-agents so the user's configured permission settings apply. Do not pass `mode: "auto"`.
 
-**Codex `spawn_agent` parameter hygiene.** Codex reviewer prompts are self-contained: pass the persona, diff-scope rules, output schema, PR metadata, intent, file list, diff, and standards paths in the `message` or `items` payload instead of relying on inherited thread context. Dispatch one reviewer per `spawn_agent` call; do not bundle multiple reviewer personas into one sub-agent prompt. For Codex reviewer personas, prefer the default sub-agent type and omit `agent_type`; these reviewers are specialized by the prompt, not by a generic explorer/worker role. If a specific runtime genuinely needs an `agent_type`, omit `fork_context` (or leave it false); do not combine `fork_context: true` with `agent_type`. If a Codex dispatch fails before the reviewer starts because of parameter incompatibility, correct the parameters once and retry through the bounded scheduler; record it as an orchestrator dispatch correction, not a reviewer failure. If a runtime requires `fork_context: true` for a particular dispatch, omit `agent_type` and still include the full self-contained review context.
+**Codex `spawn_agent` parameter hygiene.** Codex reviewer prompts are self-contained: pass the persona, diff-scope rules, output schema, PR metadata, intent, file list, diff, and boundary context in the `message` or `items` payload instead of relying on inherited thread context. Dispatch one reviewer per `spawn_agent` call; do not bundle multiple reviewer personas into one sub-agent prompt. For Codex reviewer personas, prefer the default sub-agent type and omit `agent_type`; these reviewers are specialized by the prompt, not by a generic explorer/worker role. If a specific runtime genuinely needs an `agent_type`, omit `fork_context` (or leave it false); do not combine `fork_context: true` with `agent_type`. If a Codex dispatch fails before the reviewer starts because of parameter incompatibility, correct the parameters once and retry through the bounded scheduler; record it as an orchestrator dispatch correction, not a reviewer failure. If a runtime requires `fork_context: true` for a particular dispatch, omit `agent_type` and still include the full self-contained review context.
 
 **Model override at dispatch time.** Pass the platform's mid-tier model on every dispatch except `spec-correctness-reviewer`, `spec-security-reviewer`, and `spec-adversarial-reviewer`, which inherit the session model. In Claude Code, add `model: "sonnet"` to the Agent tool call. On other platforms, use only a host-provided stable alias or omit the override. Check this on every Agent / `spawn_agent` / equivalent call in the dispatch loop.
 
@@ -765,7 +753,6 @@ Spawn each selected persona reviewer using the subagent template included below.
 6. Run ID and review artifact directory for modes that create run artifacts, plus reviewer name for correlation and parent-owned artifact filenames
 7. Boundary context from Stage 2c, wrapped in `<boundary-context>`: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, declared files/touch set when known, plan requirement or implementation-unit refs, and limitations.
 8. Graph impact context from Stage 3, wrapped in `<graph-impact-context>`: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, candidate fields, rejected candidates, test candidates, `test_gaps`, and limitations. This context is advisory/provider_untrusted unless confirmed by direct evidence.
-9. **For `project-standards` only:** the standards file path list from Stage 3b, wrapped in a `<standards-paths>` block appended to the review context
 
 Persona sub-agents are **read-only** with respect to the project and the filesystem: they review and return structured JSON. They do not edit project files or write temp artifacts. They must not propose unrelated or speculative refactors, but may propose the smallest finding-scoped structural fix when it is grounded in the diff and surrounding code (for example a mechanical helper extraction that the schema's `suggested_fix` rules allow). Artifact persistence is parent/orchestrator-owned so reviewer capability frontmatter does not need broad `Write`.
 
