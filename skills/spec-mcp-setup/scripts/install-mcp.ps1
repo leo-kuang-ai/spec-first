@@ -1010,7 +1010,7 @@ if ($OnlyArray.Count -gt 0 -and (Test-SelectionContains -Id 'graphify')) {
     $env:SPEC_FIRST_PROVIDER_GRAPHIFY_CONSENT = 'approved'
     $env:SPEC_FIRST_PROVIDER_HOST = $DetectedHost
     $env:SPEC_FIRST_PROVIDER_REPO_ROOT = $ResolvedRepoRoot
-    $env:SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_ROOT = 'graphify-out'
+    $env:SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_ROOT = '.graphify'
     $helperParams = @{ Install = $true }
     if ($Refresh) { $helperParams.Refresh = $true }
     if (-not [string]::IsNullOrWhiteSpace($RequirementWorkspace)) { $helperParams.RequirementWorkspace = $RequirementWorkspace }

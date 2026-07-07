@@ -47,6 +47,7 @@ describe('spec-first gitignore policy', () => {
     expect(patterns).toContain('.spec-first/config/*.json');
     expect(patterns).toContain('.spec-first/governance/');
     expect(patterns).toContain('.codegraph/');
+    expect(patterns).toContain('.graphify/');
     expect(patterns).toContain('graphify-out/');
     expect(patterns).not.toContain('graphify-out/cost.json');
     expect(patterns).not.toContain('graphify-out/.graphify_python');
@@ -143,7 +144,8 @@ describe('spec-first gitignore policy', () => {
     const block = buildSpecFirstGitignoreBlock();
 
     expect(manual).toContain(`\`\`\`gitignore\n${block}\n\`\`\``);
-    expect(manual).toContain('Graphify provider 的项目图谱运行时目录，默认不提交');
+    expect(manual).toContain('Graphify provider-native 项目图谱运行时目录，默认不提交');
+    expect(manual).toContain('`graphify-out/` 是旧版 Graphify artifact 目录，默认继续忽略');
     expect(manual).toContain('默认整体忽略，不提交');
     expect(block).not.toContain('.direct-source-evidence/');
     expect(block).not.toContain('.code-review-graph/');

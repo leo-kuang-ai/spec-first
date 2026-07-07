@@ -646,7 +646,7 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(read(installHelpersPs1)).not.toContain('For codebase questions, first use Graphify');
     expect(read(installHelpersPs1)).not.toContain('After modifying code, run `"<resolved-graphify>" update .`');
     expect(read(installHelpersPs1)).not.toContain('--no-cluster');
-    expect(read(installHelpersPs1)).not.toContain('.spec-first/workspace/providers/graphify/graphify-out');
+    expect(read(installHelpersPs1)).not.toContain('.spec-first/workspace/providers/graphify/.graphify');
     expect(read(installHelpersPs1)).not.toContain('uv tool install --force "$graphifyPackage==$graphifyVersionPin"');
     expect(read(installHelpersPs1)).not.toContain('pipx install --force "$graphifyPackage==$graphifyVersionPin"');
     expect(read(installHelpersPs1)).not.toContain('uvx --from graphifyy==');
@@ -793,8 +793,8 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
               scope: 'project',
               requires_explicit_gate: true,
               requirement_workspace_path: '.spec-first/workspace/requirements/demo',
-              artifact_root: 'graphify-out',
-              artifact_refs: ['graphify-out/graph.json'],
+              artifact_root: '.graphify',
+              artifact_refs: ['.graphify/graph.json'],
               next_action: null,
             },
             steady_state: {

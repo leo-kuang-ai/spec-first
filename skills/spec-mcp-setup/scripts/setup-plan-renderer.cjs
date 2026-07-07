@@ -181,7 +181,7 @@ function toPosix(value) {
 
 function resolveGraphifyScope(repoRoot, requirementWorkspace) {
   const raw = toPosix(requirementWorkspace).trim();
-  const artifactRoot = 'graphify-out';
+  const artifactRoot = '.graphify';
   if (!raw) {
     return {
       ok: true,
@@ -334,7 +334,7 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
         artifact_root: scope.artifact_root ? path.join(repoRoot, scope.artifact_root) : null,
         requirement_workspace_path: scope.requirement_workspace_path,
         first_generation_display: scope.ok
-          ? 'resolved graphify CLI -> verify/install current-host project skill; if graphify-out exists, verify install state and recommend incremental --refresh; otherwise graphify extract .; explicit --refresh runs graphify update . code-only/no-LLM (if provider refuses overwrite and suggests --force, one graphify update . --force repair)'
+          ? 'resolved graphify CLI -> verify/install current-host project skill; if .graphify exists, verify install state and recommend incremental --refresh; legacy graphify-out is compatibility-only refresh-needed evidence; otherwise graphify extract .; explicit --refresh runs graphify update . code-only/no-LLM (if provider refuses overwrite and suggests --force, one graphify update . --force repair)'
           : `skipped: ${scope.first_generation_next_action}`,
         auto_refresh_display: scope.ok
           ? 'resolved graphify CLI -> graphify hook install (git repo only; provider-owned post-commit/post-checkout refresh)'
@@ -347,7 +347,7 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
           'will not install Graphify MCP server',
           'will not start graphify watch',
           'setup uses scriptable graphify extract for first generation instead of assistant command syntax',
-          'will not auto-add or auto-commit graphify-out',
+          'will not auto-add or auto-commit .graphify',
           'will not promote generated artifacts to docs or source truth',
         ],
         risk_flags: (provider.safety && provider.safety.risk_flags) || [],
@@ -356,7 +356,7 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
         review_required: Boolean(provider.safety && provider.safety.review_required),
         install_effect: provider.safety && provider.safety.install_effect,
         usage_display: '$graphify . / /graphify . after the provider project skill is installed; setup uses the resolved CLI path for extract/update/query/hook operations and reports when bare graphify is not on PATH.',
-        gitignore_policy: 'spec-first init managed block ignores .codegraph/ and the whole graphify-out/ provider artifact directory; setup does not auto-add, auto-commit, or promote Graphify output to source truth.',
+        gitignore_policy: 'spec-first init managed block ignores .codegraph/, the provider-native .graphify/ artifact directory, and legacy graphify-out/ artifacts; setup does not auto-add, auto-commit, or promote Graphify output to source truth.',
         ...safety,
       };
     });

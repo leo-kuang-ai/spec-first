@@ -47,7 +47,7 @@ if ([string]::IsNullOrWhiteSpace($providerToolRoot)) { $providerToolRoot = Join-
 $providerCacheRoot = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_CACHE_ROOT')
 if ([string]::IsNullOrWhiteSpace($providerCacheRoot)) { $providerCacheRoot = Join-Path $providerRepoRoot '.spec-first/cache' }
 $graphifyArtifactRootDefault = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_ROOT')
-if ([string]::IsNullOrWhiteSpace($graphifyArtifactRootDefault)) { $graphifyArtifactRootDefault = 'graphify-out' }
+if ([string]::IsNullOrWhiteSpace($graphifyArtifactRootDefault)) { $graphifyArtifactRootDefault = '.graphify' }
 $graphifyPackage = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_PACKAGE')
 if ([string]::IsNullOrWhiteSpace($graphifyPackage)) { $graphifyPackage = Get-ExternalDependencyField -DependencyId 'graphify' -Field 'package' }
 $graphifyVersionPin = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_VERSION_PIN')
@@ -1224,7 +1224,7 @@ function Resolve-RequirementWorkspace {
   }
 
   if ([string]::IsNullOrWhiteSpace($ArtifactRoot)) {
-    $ArtifactRoot = 'graphify-out'
+    $ArtifactRoot = '.graphify'
   }
   if ([System.IO.Path]::IsPathRooted($ArtifactRoot)) {
     return [ordered]@{ ok = $false; reason_code = 'graphify-artifact-root-absolute' }
@@ -1416,15 +1416,16 @@ function Get-GraphifyInstructionSection {
     return @'
 ## graphify
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+This project has a knowledge graph at .graphify/ with god nodes, community structure, and cross-file relationships.
 
 Rules:
-- Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `.graphify/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
-- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- If `.graphify/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- Dirty `.graphify/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If `.graphify/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
+- Read `.graphify/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
+- Treat legacy `graphify-out/` as compatibility-only evidence; prefer `spec-mcp-setup --only graphify --refresh` to regenerate provider-native `.graphify/`.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
 - Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 '@
@@ -1432,17 +1433,18 @@ Rules:
   return @'
 ## graphify
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+This project has a knowledge graph at .graphify/ with god nodes, community structure, and cross-file relationships.
 
 When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
 
 Rules:
-- Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `graphify-out/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Use Graphify as exploration-tier orientation for architecture relationships, cross-file relationships, impact analysis, broad codebase navigation, or questions about how one project area connects to another, when `.graphify/graph.json` exists and a Graphify CLI is runtime-visible. A useful Graphify candidate may decide where to inspect next; reading source first is always valid. Resolve the command as `graphify` from `PATH`, or `$HOME/.local/bin/graphify` (`.exe`/`.cmd` on Windows) when that executable exists. Use `query` for broad orientation; use `path "<A>" "<B>"` for relationships and `explain "<concept>"` for focused concepts. These return a scoped candidate subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
 - Do not use Graphify by default for simple factual Q&A, current conversation or context summaries, user-provided single-document summarization/editing, or already-scoped file reads; answer directly, use `rg`, or perform bounded source reads.
-- If `graphify-out/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
-- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- If `.graphify/graph.json` exists but no Graphify CLI is visible, do not treat the artifact as runtime readiness. Use bounded direct source reads and mention `spec-mcp-setup --only graphify` as the setup repair path when Graphify would help.
+- Dirty `.graphify/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If `.graphify/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
+- Read `.graphify/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
+- Treat legacy `graphify-out/` as compatibility-only evidence; prefer `spec-mcp-setup --only graphify --refresh` to regenerate provider-native `.graphify/`.
 - Treat Graphify/code-graph output as `provider_untrusted` advisory navigation; confirm important conclusions from source/test/log/doc evidence and record limitations when confirmation is unavailable.
 - Ordinary workflows do not refresh project graphs after code changes. Treat graph freshness as a setup/readiness advisory from `docs/contracts/project-graph-consumption.md`; confirm conclusions from source/test/log evidence and use `spec-mcp-setup --only graphify` when setup repair would help.
 '@
@@ -1601,7 +1603,7 @@ function Test-GraphifyFirstGenerationReadyForHook {
     return $false
   }
   $artifactRoot = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_ROOT')
-  if ([string]::IsNullOrWhiteSpace($artifactRoot)) { $artifactRoot = 'graphify-out' }
+  if ([string]::IsNullOrWhiteSpace($artifactRoot)) { $artifactRoot = '.graphify' }
   $artifactRef = [Environment]::GetEnvironmentVariable('SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_REF')
   if (-not [string]::IsNullOrWhiteSpace($artifactRef) -and (Test-Path -LiteralPath (Join-Path $providerRepoRoot $artifactRef) -PathType Leaf)) {
     return $true

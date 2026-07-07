@@ -12,23 +12,15 @@ referenced_reviews:
   - path: docs/项目审查/2026-07-06-真实状态与提升优先级.md
     role: origin
     scope: in
-    addresses_findings:
-      - skill-prompt-bloat
-      - deterministic-floor-not-downshifted
-    deferred_findings:
-      - run-evidence-not-consumed
+    addresses_findings: ["skill-prompt-bloat", "deterministic-floor-not-downshifted"]
+    deferred_findings: ["run-evidence-not-consumed"]
   - path: docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md
     role: refinement
     scope: in
-    addresses_findings:
-      - reuse-spec-plan-progressive-disclosure-pattern
-      - downshift-task-pack-validation-prose-to-cli
-      - avoid-duplicating-context-governance-path-lists
-      - l1-description-routing-tax
-      - new-skill-system-level-governance
-      - route-collision-eval-coverage
-    deferred_findings:
-      - host-owned-semantic-routing-out-of-scope
+    addresses_findings: ["reuse-spec-plan-progressive-disclosure-pattern", "downshift-task-pack-validation-prose-to-cli", "avoid-duplicating-context-governance-path-lists"]
+    deferred_findings: ["host-owned-semantic-routing-out-of-scope", "l1-description-routing-tax", "new-skill-system-level-governance", "route-collision-eval-coverage"]
+# Activation-L1 索引维度（l1-description-routing-tax / new-skill-system-level-governance / route-collision-eval-coverage）已拆分到 follow-up plan：
+split_to: docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md
 ---
 
 # refactor: 通过渐进披露精简 skill prompt
@@ -50,7 +42,12 @@ referenced_reviews:
 
 ## 问题框架
 
-`docs/项目审查/2026-07-06-真实状态与提升优先级.md` 指出当前最高优先级问题不是代码质量，而是 skill prompt 膨胀：38 个 skill 合计 10,628 行，`spec-code-review/SKILL.md` 1,241 行，`spec-work/SKILL.md` 579 行。主 prompt 过重会挤压用户代码、plan/source/test context，并让后置规则更容易在长上下文中被漏读。
+`docs/项目审查/2026-07-06-真实状态与提升优先级.md` 指出当前最高优先级问题不是代码质量，而是 skill prompt 膨胀：38 个 skill 合计 10,628 行，`spec-code-review/SKILL.md` 1,241 行，`spec-work/SKILL.md` 579 行。
+
+需要区分两层 premise，避免把假设当既定事实：
+
+- **已证实的维护性 premise（confirmed）：** 1,241 行单体、跨 6 个 skill 逐字重复的治理段落、超出 Anthropic 建议的 500 行上限——这些是 `wc -l` 与直接读源可复核的事实，是本计划的主要依据。
+- **待验证的用户影响 premise（hypothesis）：** 「主 prompt 过重 → 挤压用户代码/plan/source/test context → 后置规则在长上下文中被漏读 → not-run 升高」是 origin（`origin_grade: legacy`、`origin_verification_status: not-applicable`）的推测性因果链，尚无 run-evidence 证实。本计划**不把它当既定事实**：pilot 只赌「维护性提升 + 行为无回归」，not-run 率与 review 质量改善的验证归后续 stats 计划（见 U0 baseline 与后续工作）。
 
 这不是单纯压缩文字的问题。按 `docs/10-prompt/结构化项目角色契约.md`，正确方向是：
 
@@ -75,27 +72,29 @@ referenced_reviews:
 - 不能只凭“reference 文件存在”判断成功；每个迁移都要有 `trigger_condition`、`must_read`、`fallback_if_unread` 和至少一个 eval/test 锚点。
 - 行数预算是 advisory budget，不是 completion gate。`spec-code-review` 第一阶段可参考 300-400 行作为现实预算，220/150 行只作为后续收敛方向；`spec-work` 可先完成 task-pack intake 与治理边界下沉，再观察实际 delta。真正的 completion gate 是边界保留、STOP trigger 覆盖、deterministic floor handoff、focused tests、fresh-source/runtime 验证和 honest closeout。
 
-## Activation-L1 Description 补充（2026-07-06 借鉴报告）
+## Activation-L1 Description 维度：已拆分到 follow-up plan
 
-`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md` §10 引入了与 Body-L1/Body-L2 正文瘦身正交的维度：**Activation-L1 description 索引税**。前述 U1-U8 主要处理 Active body（触发后才付的条件税）；本 addendum 补上 Activation index（每次对话无条件付的常驻税）。
+`docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md` §10-11 引入了与本计划 Body 正文瘦身**正交**的维度：**Activation-L1 description 索引税**（每次对话无条件付的常驻税，实测常驻 metadata 约 6,200 tokens）。
 
-实测常驻 metadata 约 6,200 tokens（89 skills ~4,369 + 51 agents ~1,856），当前约占 200K 窗口 3%，随体系扩张只增不减。
+该维度触及 pilot 两个 skill 之外的多个 skill（description offender 压缩、`lint-skill-entrypoints` 系统级治理、相邻 workflow route collision fixtures），blast radius 与问题性质都不同于 Active body 瘦身。为让本计划回归「最小可验证第一刀」的单维度定位、closeout 只报 body 收益，**Activation-L1 维度（原 R11-R13 / U9-U11）已拆分到独立 follow-up plan**：
 
-三条约束区分 spec-first 能做与不能做：
+- `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`
 
-- **spec-first 拥有 Activation-L1 description 文本**：可压缩超长 offender（`proof` 149 词、`git-commit-push-pr` 119 词、`spec-slack-research` 84 词），但必须保留 exclude intent（38 skill 中已有 27 个）。压缩单位是“trigger + exclude + 定位三段各自最短”，不是裸 30 词——因为 `spec-plan/spec-work/spec-code-review/spec-doc-review/spec-compound` 边界相邻，误触发比漏触发更伤。
-- **宿主拥有 L0/语义路由**：skill 由宿主加载（`src/cli/plugin.js` 只做投射），是否懒加载/向量路由由宿主决定。**本计划明确拒绝**自建 L0 域索引引擎、语义 registry 或 skill 联邦——重建宿主 primitive 违反角色契约商品化原则。
-- **新增 skill 是体系变更**：新增/改 skill 有全局税与路由碰撞成本，扩展现有 `lint-skill-entrypoints` / `spec-skill-audit` 做 description 预算与重叠检查，而非新增 contract。
+本计划（001）与 follow-up plan（002）的关系：
 
-对应新增需求 R11-R13 与实现单元 U9-U11（见下文）。U9/U11 可与 Body-L2 单元并行并进入 U8 closeout；U10 只有在 U9/U11 证明 offender 集合小、route baseline 足够且改动不扩大 pilot scope 时才执行，否则作为 outcome-gated follow-up。
+- 002 依赖 001 的 pilot 经验但**不阻塞** 001；001 的 body 瘦身可独立完成。
+- 002 的 description token audit 可与 001 的 body 单元并行，作为索引层 before baseline。
+- 002 不改 001 拥有的 `spec-work` / `spec-code-review` body spine 与 references。
+
+本计划保留的核心边界与 002 一致：spec-first 只拥有 description 文本与 runtime 投射；L0/语义路由/skill 联邦归宿主拥有，明确拒绝自建。
 
 ---
 
 ## 需求
 
-- R1. `spec-work/SKILL.md` 第一阶段先完成 task-pack deterministic floor downshift 与 reference trigger 化；完整 spine 重排以 150 行级别作为 advisory budget。未达到预算时记录 line-count delta、未达原因和保留的承重文本，不阻断完成。
+- R1. `spec-work/SKILL.md` 第一阶段先完成 task-pack deterministic floor downshift 与 reference trigger 化；完整 spine 重排以 ~200 行作为首轮现实 advisory budget，150 行为后续收敛方向。未达到预算时记录 line-count delta、未达原因和保留的承重文本，不阻断完成。
 - R2. `spec-code-review/SKILL.md` 第一阶段优先下沉共享治理段落、mode/output 冷路径和 dispatch 细节；300-400 行是 advisory budget，220/150 行只作为后续收敛方向。未达到预算时记录 line-count delta、未达原因和保留的承重文本，不阻断完成。
-- R3. 每个移入 `references/` 的 Body-L2 细节必须在主 spine 有确定性 STOP 触发，触发语句包含具体条件、目标 reference、继续执行前置性。
+- R3. 每个移入 `references/` 的 Body-L2 细节必须在主 spine 有确定性 STOP 触发，触发语句包含具体条件、目标 reference、继续执行前置性。注意：静态测试只能证明 STOP 触发语句**存在**于 spine；模型是否真的按触发读取 reference 属行为保证，依赖 fresh-source eval（见 P2-D 与测试/eval 验收），静态断言不替代行为验证。
 - R4. Body-L3 背景叙事、通用建议、重复原则不得迁移到 references；删除后不应造成 phase 步骤、artifact contract 或 safety boundary 缺失。
 - R5. task-pack identity、freshness、hash、Task Pack Contract 结构校验以 `spec-first tasks validate <path> --json` 为确定性入口；prompt 不再手写 hash 比对规则。
 - R6. 语义判断仍留在 LLM：task quality、scope adequacy、review finding 成立性、implementation readiness 不下沉为脚本裁决。
@@ -103,9 +102,8 @@ referenced_reviews:
 - R8. 变更必须补或更新聚焦 tests/evals，证明主 spine 预算、reference trigger、deterministic floor handoff 和 source/runtime boundary 没有漂移。
 - R9. 方案必须兼容 Claude/Codex/Cursor/Kiro/Qoder 的 runtime projection，不引入 host-specific prompt truth source。
 - R10. 变更必须同步 `CHANGELOG.md`；用户可见的 prompt 行为变化标注 `(user-visible)`。
-- R11. Activation-L1 description 审计：测量所有 spec-first skill/agent 的 frontmatter description token 占用，识别把功能说明写进 description 的超长 offender；任何压缩都必须保留 trigger + exclude + 定位三段，不得为凑长度砍掉边界相邻 workflow 的 exclude intent。
-- R12. 新增/修改 skill 的系统级治理：扩展 `lint-skill-entrypoints` 或 `spec-skill-audit`，检查 description 长度预算、是否声明 exclude intent、是否与现有 skill 高重叠；不新增独立 contract/schema。
-- R13. route collision 覆盖：为边界相邻 workflow（plan/work/code-review/doc-review/compound）建 eval fixture，用典型请求记录 expected / excluded workflow；脚本/Jest 只校验 fixture 结构、覆盖和可解析性，语义命中是否合理由 fresh-source/read-only eval 判断。不得自建宿主级 L0 域索引、语义向量 registry 或 skill 联邦（宿主 primitive，重建即反模式）。
+
+> Activation-L1 索引维度需求（原 R11-R13：description 审计、新 skill 系统级治理、route collision 覆盖）已拆分到 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`（对应其 R-IDX-1 ~ R-IDX-3），不在本计划范围内。
 
 ---
 
@@ -118,10 +116,12 @@ referenced_reviews:
 - 不让脚本判断语义充分性；脚本只输出 deterministic facts、reason_code、artifact path、exit code。
 - 不把 stats/run evidence 消费层塞进本轮 prompt 瘦身实现；它是相邻高优先级计划，可在 prompt 样板稳定后单独推进。
 - 不自建宿主级 L0 域索引路由引擎、语义向量 skill registry 或 skill 联邦；skill discovery/routing 是宿主 primitive，spec-first 只拥有 description 文本与投射，不重建宿主能力。
+- 不做 Activation-L1 description 审计、压缩与 route collision fixtures；该正交维度已拆分到 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`。本计划只处理 Active body（触发后的正文）瘦身。
 
 ### 后续工作
 
-- `spec-first stats` / run evidence 消费层：单独计划，实现 `.spec-first/workflows/**/run.json` 趋势与 reason_code 汇总。
+- Activation-L1 description 索引治理：follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`，承接 description token audit、新 skill 系统级治理与 route collision fixtures；可与本计划 body 单元并行，不阻塞本计划完成。
+- `spec-first stats` / run evidence 消费层：单独计划，实现 `.spec-first/workflows/**/run.json` 趋势与 reason_code 汇总。**Committed trigger（防止无限 defer）：** U0 premise baseline 与 U8 closeout 一旦记录 before 分布，即创建该 stats 计划以采集 after，兑现 not-run/质量维度的验证——这是把 P1-A 假设从 hypothesis 推向 confirmed 的明确激活路径，不作为长期搁置的免责声明。
 - Windows helper 迁移：单独计划，优先 `spec-code-review` base resolver Node 化。
 - 首次体验 5 分钟闭环：单独计划，聚焦 init guidance、try/demo path 和 quick mode。
 - Wave-2 rollout：只有 pilot closeout 产出最小 outcome bundle 后才创建或更新后续推广计划；不作为本轮 implementation unit。
@@ -134,12 +134,48 @@ referenced_reviews:
 - `spec-code-review/SKILL.md` 第一阶段记录 line-count delta 和未达预算原因，并保留 mode、安全、审查输出和 fallback 合同。
 - 新增或更新的 references 均有主 spine STOP trigger，且 tests/evals 覆盖至少一个触发场景和一个不触发场景。
 - task-pack intake 中 prompt 不再重复描述可由 `spec-first tasks validate --json` 判定的 hash/structure 细节。
-- Activation-L1 description audit 产出 before baseline（或记录未执行 reason_code），并在 closeout 中与 Active body 瘦身收益分开报告。
-- route collision fixtures 覆盖相邻 workflow 的 expected / excluded 意图；Jest/脚本只证明 fixture 结构和覆盖，fresh-source/read-only eval 或 closeout limitations 负责说明语义路由判断结果。
-- 若执行 U10，必须先有 U9 baseline 与 U11 route fixture；若 U10 未执行，closeout 记录 `description_compression_deferred` 与触发条件，不阻断 Body-L1/Body-L2 pilot 完成。
 - `npm run lint:skill-entrypoints`、相关 unit tests、`npm run typecheck` 通过。
 - fresh-source eval 或等价 read-only reviewer 对两个样板确认：未丢失 source/runtime boundary、mutation gate、verification handoff、review handoff。
 - 若运行 `spec-first init` 验证 runtime projection，必须确认只由 source 生成 runtime，未手改 generated mirrors。
+
+## 质量不降级验收标准
+
+这些验收标准用于判断 skill prompt 精简是否保持或提升 workflow 质量。行数下降、token 下降和 context-room delta 只作为经济性指标；不得作为 hard gate 替代边界保留、语义路由、执行纪律和可验证证据。
+
+### Baseline 必须先建立
+
+- 每个待改 skill 在修改前必须记录 Active body baseline：`SKILL.md` 行数、主 prompt 中 references 清单、每个 reference 的 STOP trigger。该 baseline 捕获由 U1（`spec-work`）和 U3（`spec-code-review`）在改动前作为首步执行，并在 U8 closeout 引用。
+- 若 baseline 无法完整建立，closeout 必须记录 `baseline_degraded` 或更具体 reason_code。
+- Activation-L1 description token baseline 与 route quality 不属于本计划；见 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`。
+
+### Prompt 变更验收
+
+- 只允许按 Body-L1 / Body-L2 / Body-L3 分类移动或删除内容：Body-L1 hard boundary、mutation/verification/handoff/source-runtime 纪律必须保留在主 spine；Body-L2 可移动到 reference，但必须有清晰 STOP trigger；Body-L3 重复解释、冗余例子或过期实现细节才可删除。
+- 每个新增或移动后的 reference 必须在主 spine 有 STOP trigger，并至少覆盖一个触发场景和一个不触发场景；没有 STOP trigger 的 reference 视为不可验收。
+- task-pack hash、结构、路径格式等 deterministic checks 可以下沉到 CLI/Jest；task quality、scope adequacy、route semantic adequacy、review finding 是否成立等语义判断仍归 LLM / fresh-source eval，不得由脚本裁决。
+- `spec-first tasks validate --json` 只能成为 task-pack identity / freshness / structure 的 deterministic floor；不得把其输出解释为计划语义充分、任务拆分合理或可以跳过 reviewer judgment。
+
+### 测试与 eval 验收
+
+- Focused tests 必须覆盖两类形状：source prompt shape、runtime projection/path rewrite。Jest 或脚本只证明结构和覆盖。
+- Fresh-source/read-only eval 必须覆盖 source/runtime boundary、mutation gate、verification handoff、handoff limitations、trigger precision；若未执行，closeout 必须写明 `fresh_source_eval_not_run` 及原因。
+- Runtime projection 验证只能通过 source 生成结果观察；不得手改 `.claude/**`、`.codex/**` 或 `.agents/skills/**` 来制造通过。
+
+### Rollout 与 closeout 验收
+
+- Pilot 顺序保持 `spec-work` → `spec-code-review`；Wave-2 rollout 只有在 pilot closeout 产出 outcome bundle 后才允许进入后续计划。
+- Closeout 必须报告 exact line-count delta、retained load-bearing text、moved references、测试/eval 命令、not-run/degraded limitation、generated runtime impact。
+- 禁止把未运行的测试、未执行的 fresh-source eval、advisory evidence 或 transcript 声明写成 confirmed truth。
+
+### 阻断条件
+
+- 缺 baseline，且未记录 degraded reason。
+- reference 没有主 spine STOP trigger。
+- Body-L1 hard boundary 被删除或只藏入 reference。
+- Jest/脚本试图裁决自然语言路由语义、任务质量或 review finding 是否成立。
+- 手改 generated runtime mirror 作为修复或验证手段。
+- fresh-source/read-only eval 未执行且 closeout 未记录 reason_code。
+- **迁移/删除 main-spine load-bearing 文本（不可逆动作）而缺少 fresh-source eval 或等价 read-only 复核确认。** 未跑 eval 时本轮只允许**可逆动作**（新增 reference + STOP trigger），不得删除或迁移 spine 承重文本——把高 reversal-cost 动作 gate 在证据上，未验证则降级为可逆新增，而非放行。
 
 ---
 
@@ -240,8 +276,8 @@ referenced_reviews:
 - KTD1. 使用三层 Active body 模型：Body-L1 spine、Body-L2 on-demand references、Body-L3 deletion。
   - 理由：这与已有本地审查结论一致，并避免把 `references/` 变成堆放场。
 
-- KTD2. 给长 workflow spine 增加 `Reference Trigger Map`。
-  - 理由：集中 trigger map 让 references 可发现、可测试；“if applicable” 这类分散 prose 已被识别为脆弱模式。
+- KTD2. 给长 workflow spine 增加 `Reference Trigger Map`（借鉴 + 新增，非纯复用）。
+  - 理由：`spec-plan` 已验证的是**分散内联 STOP 触发**（`STOP. Before X, read Y`），并非集中式 trigger map；本计划借鉴其 STOP 触发语气与可测试性，并**新增**一个集中的 `Reference Trigger Map` 结构，让 references 更可发现、可测试；“if applicable” 这类分散 prose 已被识别为脆弱模式。集中 map 是新结构约定，需自带 contract test，不能声称是 spec-plan 现成模式的直接复用。
 
 - KTD3. 把 STOP triggers 当作承重 contract text。
   - 理由：只有模型可靠知道何时必须读取 reference，reference 才能安全减少 context。Trigger wording 必须具体到可测试。
@@ -261,8 +297,8 @@ referenced_reviews:
 - KTD8. 广泛 rollout 前先扩展 tests/evals。
   - 理由：没有 guardrails 时，prompt slimming 可能静默移除 safety boundaries。前两个 pilots 应定义可复用 test pattern。
 
-- KTD9. 把 Activation-L1 routing quality 作为并行 measurement lane，而不是 Body-L1/Body-L2 pilot 的 blocker。
-  - 理由：description tokens 是 always-loaded，值得 audit coverage；但 route semantics 仍归 host/LLM 拥有。U9/U11 应建立 baseline 和 fixtures；只有证据显示改动足够小，U10 才压缩 descriptions。
+- KTD9. 把 Activation-L1 routing quality 拆分为独立 follow-up plan，而不是本计划 body pilot 的一部分。
+  - 理由：description tokens 是 always-loaded 的正交维度，touching 面超出 pilot 两个 skill；独立成 `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md` 让本计划 closeout 单维度、blast radius 可控。route semantics 仍归 host/LLM 拥有。
 
 ---
 
@@ -310,12 +346,15 @@ flowchart TB
 
 Activation path 总是支付 G 的成本，但 H 仍归宿主拥有。触发后，热路径默认只读 A；只有 A 的 STOP trigger 触发时才读取 B。它把 C 作为 confirmed deterministic facts 消费，并且永远不把 F 当作 source。
 
+**收益边界（P2-1）：** 本计划做的是 B（A→B 的 body 下沉）。B 的**确定收益**是热路径可读性、维护性和减少长上下文漏读；而「activation-time context-room 下降」只在宿主激活 skill 后**惰性加载** B 时才成立——若某宿主把 `@./references` 当 eager-inline，则 body 下沉不省 activation token。因此 context-room 收益是 `contingent-on-loader-behavior`，由 U6 五宿主 projection + runtime smoke 验证，未验证时不写成 confirmed。G/H（Activation-L1 description 索引层）本身归 follow-up plan 002；此图仅作为分层理解上下文。
+
 ---
 
 ## 实施单元
 
 ```mermaid
 flowchart TB
+  U0["U0 premise baseline snapshot"] --> U8["U8 final review + closeout"]
   U1["U1 spec-work task-pack CLI 下沉"] --> U2["U2 spec-work spine"]
   U3["U3 code-review governance 下沉"] --> U4["U4 code-review mode/stage spine"]
   U1 --> U5["U5 trigger/eval 守护"]
@@ -324,13 +363,40 @@ flowchart TB
   U4 --> U5
   U5 --> U6["U6 runtime + loader 验证"]
   U6 --> U7["U7 pilot audit lens"]
-  U9["U9 Activation-L1 description audit"] --> U11["U11 governance + route fixtures"]
-  U11 -. "仅在范围小且覆盖充分时" .-> U10["U10 可选 description compression"]
-  U7 --> U8["U8 final review + closeout"]
-  U9 --> U8
-  U11 --> U8
-  U10 -. "若执行" .-> U8
+  U7 --> U8
 ```
+
+> 注 1：`U1→U2` 与 `U3→U4` 是两条**独立链**，可并行；`spec-work → spec-code-review` 是推荐排程（先跑 work 复用经验），**非硬依赖**。U0 是零改动的只读 baseline，可在任意时点先做。
+> 注 2：U8 是本计划终局 closeout，按依赖在 U0–U7 之后执行；单元编号与执行顺序一致。Activation-L1 索引维度（原 U9–U11）已拆分到 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`。
+
+### U0. Premise baseline snapshot（thin，只读，零 source 改动）
+
+**目标：** 在 pilot 前用**已存在**的 run evidence 建立一次性 before baseline，破解「pilot 无法自证痛点」的 self-sealing 问题。它不是 `spec-first stats` 消费层（那是独立后续计划），只做一次只读快照。
+
+**需求：** R8（证据留存），支撑 P1-A premise 诚实化
+
+**依赖：** 无（可最先做，或与任意单元并行）
+
+**文件：**
+- 新建：`docs/validation/2026-07-06-skill-prompt-slimming-premise-baseline.md`（advisory baseline artifact）
+- 修改：`CHANGELOG.md`
+
+**做法：**
+- 只读扫描现有 `.spec-first/workflows/**/run.json`，记录当前 passed/not-run/failed/degraded 分布（origin 报告称约 26/18/5/3、not-run ~35%），作为 pilot 前的 advisory before 数字。
+- 明确标注：这是 advisory snapshot，样本未按 workflow 分层、不构成因果证明；它的作用是让 pilot 后能有一个可对照的 before 值，而不是证明 prompt 瘦身能降 not-run。
+- 不新建 CLI、不改 skill、不建消费层；若 run.json 不可读或样本过小，记录 `premise_baseline_degraded` 并继续，不阻断 pilot。
+
+**遵循模式：**
+- `docs/项目审查/2026-07-06-真实状态与提升优先级.md` §3.2 的 run evidence 分布统计口径。
+
+**测试场景：**
+- 正常路径：baseline artifact 产出可复算的 before 分布。
+- 边界：样本不足或不可读时记 `premise_baseline_degraded`，不阻断。
+
+**验证：**
+- baseline artifact 存在且数据可复算；`npx jest tests/unit/changelog-format.test.js --runInBand`。
+
+---
 
 ### U1. 将 deterministic task-pack checks 下沉到 CLI output
 
@@ -348,6 +414,7 @@ flowchart TB
 - 修改：`CHANGELOG.md`
 
 **做法：**
+- 首步（body baseline）：改动前记录 `spec-work/SKILL.md` 行数、主 prompt references 清单、每个 reference 的 STOP trigger，供 U8 closeout 引用 delta。
 - 让 `spec-work` 消费现有 validator shape：
   - exit `0` 且 `deterministic_handoff: true` 是 deterministic task-pack execution 的必要条件。
   - exit non-zero 或 `deterministic_handoff: false` 时，带 handoff envelope 停止。
@@ -362,7 +429,8 @@ flowchart TB
   - task `stop_if`;
   - review gate intent；
   - source plan scope 和 non-goals。
-- 将 CLI unavailable 作为 deterministic task-pack execution 的停止条件。不要 fallback 到 prompt prose 手动重写 hash/structure checks。
+- 显式前提：假设目标宿主运行时 `spec-first` CLI 可用。CLI 缺失是 task-pack 执行的停止条件，以独立 reason_code（如 `task_pack_cli_unavailable`）停止并交还 handoff envelope，与 JSON 不可读的 `task_pack_validation_unreadable` 区分开。不要 fallback 到 prompt prose 手动重写 hash/structure checks。
+- 边界：CLI 缺失只硬停 task-pack 执行路径；direct bare-prompt work 不依赖 task-pack validation，仍可继续（见 U2 边界测试），因此用户不会被完全阻塞。
 - 除非当前 JSON 缺少 executor 真正需要的字段，否则不新增 CLI。
 
 **遵循模式：**
@@ -443,6 +511,7 @@ flowchart TB
 - 修改：`CHANGELOG.md`
 
 **做法：**
+- 首步（body baseline）：改动前记录 `spec-code-review/SKILL.md` 行数、主 prompt references 清单、每个 reference 的 STOP trigger，供 U8 closeout 引用 delta。
 - 仅在 Runtime Context Exclusion、Capability-Class Evidence Boundary、Summary-First Handoff、Cache-Friendly Context Layout、Direct Evidence Boundary、Anti-Rationalization Red Flags 等 repeated governance blocks 属于 cold-path 或 cross-skill repeated 时移动它们。
 - 在 spine 中保留紧凑 STOP trigger：
   - when broad context, external capability evidence, runtime mirror exclusion, or summary-first handoff is relevant, read `references/governance-boundaries.md` before continuing.
@@ -465,13 +534,47 @@ flowchart TB
 
 ---
 
+### U3B. `@./references` 宿主 loader 行为前置探针（read-only）
+
+**目标：** 在 U4 把任何 `@./references` eager include 转成 lazy STOP-trigger **之前**，先建立 per-host loader 事实：每个目标宿主是在激活时 eager-inline `@./references`，还是 lazy 解析 / 按字面文本处理 / 根本不投射该 surface。这决定哪些转换真正节省 activation token、哪些安全，让 code-review 首轮就能在已证明 eager-inline 的宿主上兑现 token 收益，而不是把全部收益 gate 到末尾的 U6。
+
+**需求：** R7, R9（宿主兼容/runtime 投射），支撑 P1-B 收益前置
+
+**依赖：** 无（read-only，可与 U1/U3 并行先做）
+
+**文件：**
+- 读取（不改）：`src/cli/plugin.js`、`src/cli/skill-path-rewrite-markers.js`、各 host adapter（`src/cli/adapters/*`）
+- 新建：`docs/validation/2026-07-06-at-references-loader-probe.md`（per-host loader 事实表）
+- 仅当需要固化探针断言时新增：`tests/unit/`（projection/inline 行为的只读断言）
+- 修改：`CHANGELOG.md`
+
+**做法：**
+- 通过直接读源 + `spec-first init` dry-run / plan tests（不写 runtime）确定每个宿主对 `@./references` 的处理，产出事实表：`{host: eager-inline | lazy-resolve | literal-text | not-projected}`。
+- 解读收益含义：eager-inline 的宿主上「转 lazy STOP-trigger」才省 activation token（转换候选）；literal-text / lazy / not-projected 的宿主上该 reference 本就不占 activation 预算，转换不省 token（但仍可为可读性做）。
+- 若某宿主行为无法 read-only 证明，记 `loader_behavior_degraded:<host>`，该宿主对应的 `@./` entries 在 U4 保持显式、不转换。
+- 只产事实，不改 skill 文本；结论交给 U4 分类与 U6 最终确认。
+
+**遵循模式：**
+- `src/cli/plugin.js`、`src/cli/skill-path-rewrite-markers.js`
+- `tests/unit/init-source-path-coverage.test.js` 只读投射断言风格
+
+**测试场景：**
+- 正常路径：事实表覆盖 Claude/Codex/Cursor/Kiro/Qoder 五宿主的 `@./references` 处理判定。
+- 边界：无法证明的宿主记 `loader_behavior_degraded:<host>`，不阻断。
+- 错误路径：探针只读；任何需要写 runtime 才能判定的项标 degraded，不手改 generated mirror 制造结论。
+
+**验证：**
+- loader 事实表存在且可复算；`npx jest tests/unit/init-source-path-coverage.test.js --runInBand`（若新增只读断言）。
+
+---
+
 ### U4. 围绕 mode 与 stage triggers 精简 `spec-code-review`
 
-**目标：** 在 shared governance 安全迁移且 `@./references` semantics 完成分类后，把最大 prompt 转为带 mode-specific references 的显式 review spine。
+**目标：** 在 shared governance 安全迁移、且 U3B 已产出 per-host `@./references` loader 事实后，把最大 prompt 转为带 mode-specific references 的显式 review spine，并**依据 loader 事实在首轮就转换已证明可安全 lazy 的 eager include**。
 
 **需求：** R2, R3, R4, R8, R9
 
-**依赖：** U3
+**依赖：** U3, U3B
 
 **文件：**
 - 修改：`skills/spec-code-review/SKILL.md`
@@ -503,7 +606,8 @@ flowchart TB
 - 将 scope/base detection 与 PR/branch/base handling 移到 `scope-resolution.md`。
 - 将 Stage 4 dispatch、runtime readiness preflight、model tiering、run-id、merge/dedupe、validation pass 移到 `dispatch-and-synthesis.md`。
 - 将大型 headless output envelope 移到 `headless-output-format.md`。
-- 只替换已证明可安全 lazy trigger 的 `@./references/...` entries。Required loader/schema/template entries 在 U6 验证所有目标 host runtime behavior 前仍保持显式。
+- 依据 U3B 的 per-host loader 事实转换 `@./references/...` entries：对 U3B 判定为 eager-inline 且转 lazy 安全的 entry，本轮即可转成 STOP-trigger（首轮兑现 token 收益）；U3B 记为 `loader_behavior_degraded:<host>` 或行为未证明的 entry 保持显式，留待 U6 最终确认。Required schema/template entries（`findings-schema.json`、`subagent-template.md`、persona catalog、output template）在证据不足时仍保持显式。
+- **可逆/不可逆分级（P2-D）：** 从 main spine **删除或迁移 load-bearing 文本**属不可逆动作，必须有 fresh-source eval 或等价 read-only 复核确认后才执行；eval 未跑时本单元只做**可逆的 reference 新增 + STOP trigger**，spine 承重文本原地保留，delta 记为「gated-pending-eval」。
 
 **遵循模式：**
 - 现有 `skills/spec-code-review/references/persona-catalog.md`
@@ -535,8 +639,9 @@ flowchart TB
 - 修改：`tests/unit/spec-work-contracts.test.js`
 - 修改：`tests/unit/spec-code-review-contracts.test.js`
 - 如果 eval fixture coverage 在其中跟踪，修改：`tests/unit/workflow-eval-readiness-contracts.test.js`
-- 新增或修改：`skills/spec-work/evals/*.json`
-- 新增或修改：`skills/spec-code-review/evals/*.json`
+- 新增或修改（body trigger/no-trigger fixtures，沿用现有 `examples.json` 家族）：`skills/spec-work/evals/examples*.json`、`skills/spec-code-review/evals/examples*.json`
+
+> **与 follow-up plan 002 的共享目录协调（P2-C）：** 本单元的 body trigger/no-trigger fixtures 使用 `examples*.json` 命名；002 U-IDX-3 的 route-collision fixtures 使用独立前缀 `route-collision-*.json`。两者同目录不同命名家族，避免同 glob 覆盖或归属混淆。
 
 **做法：**
 - 增加 static assertions 覆盖：
@@ -570,17 +675,18 @@ flowchart TB
 
 ### U6. 验证 runtime projection、loader behavior 和 source/runtime boundary
 
-**目标：** 确保 source prompt restructuring 正确投射到所有 generated runtime surfaces，并确保 moved references 在目标 host runtime 触发时可用。
+**目标：** 在 U3B loader 探针的 per-host 事实基础上做**最终确认**：source prompt restructuring 正确投射到所有 generated runtime surfaces，moved references 在目标 host runtime 触发时可用，且 U4 依 U3B 做的 eager→lazy 转换在实际投射中站得住。
 
 **需求：** R7, R9, R10
 
-**依赖：** U1, U2, U3, U4, U5
+**依赖：** U1, U2, U3, U3B, U4, U5
 
 **文件：**
 - 如果 new reference assertions 属于这里，修改：`tests/unit/init-source-path-coverage.test.js`
 - 仅当 path rewriting assertions 需要更新时修改：`tests/unit/skill-path-rewrite-guard.test.js`
 - 仅当 runtime plan expectations 变化时修改：`tests/unit/runtime-plan-contracts.test.js`
 - 仅当 `@./references` handling 或 path rewriting 变化时，修改 host adapter tests
+- 修改：`CHANGELOG.md`
 - 不编辑 generated runtime mirrors
 
 **做法：**
@@ -593,7 +699,7 @@ flowchart TB
   - non-triggering input 证明在 host 支持 lazy loading 时，长 reference content 不会 default-loaded；
   - 如果无法运行，记录 `runtime_reference_smoke_degraded`，且不移除对应 load-bearing main-spine text。
 - 如果实际需要 runtime regeneration，用显式 host flags 运行 `spec-first init`，并记录为 generated output，不记录为 source。
-- 如果任一 host 的 `@./references` loader behavior 仍未被证明，记录 `loader_behavior_degraded`，并在 main spine 保留对应 schema/template/reference pointer。
+- 复核 U3B loader 事实表与本单元投射结果一致；若某 host 的 `@./references` loader behavior 在 U3B 或此处仍未被证明，记录 `loader_behavior_degraded:<host>`，并在 main spine 保留对应 schema/template/reference pointer（U4 已按此保持显式，此处做最终确认）。
 
 **遵循模式：**
 - `src/cli/plugin.js`
@@ -628,6 +734,8 @@ flowchart TB
 - 如果当前 assertions 位于其中，修改：`tests/unit/skill-agent-quality-governance-contracts.test.js`
 - 修改：`CHANGELOG.md`
 
+> **与 follow-up plan 002 的共享文件协调（P2-C）：** `skill-authoring-quality.md` 由本单元 U7 **拥有并建立** prompt-slimming（body）lens 的 section 结构；002 U-IDX-3 的 route-index lens 只以**追加子节**方式加入、不重写本单元建立的结构。若两计划同期活跃，U7 先落地建立 rubric 骨架，002 随后 append，避免同文件 + 同 contract test 的并发编辑冲突。
+
 **做法：**
 - 基于 U1-U6 outcomes 增加一个简洁 prompt-slimming quality lens：
   - Body-L1 spine：contract、triggers、hot-path phase skeleton、hard boundaries。
@@ -653,116 +761,13 @@ flowchart TB
 
 ---
 
-### U9. Activation-L1 description token audit
-
-**目标：** 测量并输出所有 spec-first skill/agent 的 frontmatter description 常驻 token 占用，作为 Activation-L1 优化的 before baseline。这是索引层工作的第一步，先测量再判断是否改。
-
-**需求：** R11
-
-**依赖：** 无（与 Body-L2 单元并行）
-
-**文件：**
-- 新建：`docs/validation/2026-07-06-skill-description-token-audit.md`（audit baseline artifact）
-- 修改：`CHANGELOG.md`
-
-**做法：**
-- 脚本化统计每个 `skills/*/SKILL.md` 与投射 agent 的 description 词数/估算 token。
-- 标注三类：高频核心（plan/work/code-review）、边界相邻（doc-review/compound）、其他。
-- 标注 offender：把功能说明/案例写进 description 的（如 `proof`、`git-commit-push-pr`、`spec-slack-research`）。
-- 标注每个 skill 是否已有 exclude intent。
-- 输出为 advisory audit artifact，不改 skill 文本本身。是否进入 U10 取决于 offender 集合规模、route fixture 覆盖和 pilot scope。
-
-**遵循模式：**
-- `docs/项目审查/2026-07-06-skill-prompt-精简优化方案.md` §10 的测量方法。
-
-**测试场景：**
-- 正常路径：audit 产出每个 skill 的 description token 与 offender 标注。
-- 边界：audit 是 advisory 事实，不作为硬 gate。
-
-**验证：**
-- audit artifact 存在且数据可复算；`npx jest tests/unit/changelog-format.test.js --runInBand`。
-
----
-
-### U10. 条件性压缩 Activation-L1 description offenders
-
-**目标：** 在 U9 baseline 与 U11 route fixture 已就绪后，条件性压缩 U9 标注的少量超长 description offender，收敛为 trigger + exclude + 定位三段，保留边界相邻 workflow 的 exclude intent。
-
-**需求：** R11
-
-**依赖：** U9, U11
-
-**文件：**
-- 可选修改：被 U9 标注为 offender 且满足执行 gate 的 `skills/*/SKILL.md` frontmatter（如 `skills/proof/SKILL.md`、`skills/git-commit-push-pr/SKILL.md`、`skills/spec-slack-research/SKILL.md`）
-- 可选修改：`tests/unit/`（相关 skill contract / description 断言）
-- 修改：`CHANGELOG.md`
-
-**做法：**
-- 先做 execution gate：只有当 U9 证明 offender 集合小、U11 route fixture 能覆盖被改 description 的 expected/excluded 意图、且不牵引全量 skill 瘦身时，才在本计划内执行；否则记录 `description_compression_deferred` 并转 follow-up。
-- 只压把功能说明/案例写进 description 的部分；保留触发场景、exclude、一句话定位。
-- 边界相邻 workflow（plan/work/code-review/doc-review/compound）的 exclude intent **不得为凑长度删除**。
-- 改完 source 后如需验证 runtime，用 `spec-first init`，不手改 generated mirror。
-
-**遵循模式：**
-- 现有已有 exclude intent 的 skill description（27/38）。
-- 报告原则 #10「误触发比漏触发更伤」。
-
-**测试场景：**
-- 正常路径：offender description 压缩后仍含 trigger + exclude。
-- 错误路径：删除边界相邻 workflow 的 exclude intent 应被 contract test 拦截。
-- 边界：U9/U11 证据不足时，本单元 deferred，不阻断 `spec-work` / `spec-code-review` Body pilot closeout。
-- 边界：高频核心 skill description 保持可路由，不因压缩丢触发词。
-
-**验证：**
-- 若执行：相关 skill contract tests、`npm run lint:skill-entrypoints`、description token 复测显示下降，fresh-source/read-only eval 报告 route semantic judgment。
-- 若不执行：closeout 记录 deferred reason、U9 baseline 和 U11 fixture coverage，不声称 description token 已下降。
-
----
-
-### U11. 新 skill governance + route collision fixtures
-
-**目标：** 把「新增 skill 是体系变更」落成可执行守护，并为边界相邻 workflow 建 route collision fixture，防止 Activation-L1 压缩破坏路由。
-
-**需求：** R12, R13
-
-**依赖：** U9
-
-**文件：**
-- 修改：`scripts/lint-skill-entrypoints.js` 或 `skills/spec-skill-audit/references/skill-authoring-quality.md`（description 预算 + exclude 声明 + 重叠检查）
-- 若需新增检查项，修改：`scripts/lint-skill-entrypoints.config.json`
-- 新增或修改：`skills/spec-code-review/evals/*.json`、`skills/spec-doc-review/evals/*.json`、`skills/spec-plan/evals/*.json`、`skills/spec-work/evals/*.json`、`skills/spec-compound/evals/*.json`（route collision fixtures）
-- 修改：`tests/unit/`（fixture schema/coverage/parse 断言，不做语义裁决）
-- 修改：`CHANGELOG.md`
-
-**做法：**
-- 扩展现有 lint / audit：新增或修改 skill 时检查 description 长度预算、是否声明 exclude intent、是否与现有 skill description 高重叠；**不新增独立 contract/schema**。
-- 建 route collision fixture：用典型请求（如「review 这份计划」「按刚才计划改代码」「把这次修复沉淀」）记录 `expected_workflow` 与 `excluded_workflows`。
-- Jest/脚本只校验 fixture 结构、覆盖范围、JSON/Markdown 可解析性和必填字段；不得把自然语言意图匹配写成确定性脚本结论。
-- 语义路由判断由 fresh-source/read-only eval 或人工 reviewer 执行：读取当前 description 与 fixture，判断 expected/excluded 是否合理，并记录 limitations。
-- **明确不做**：不建 L0 域索引引擎、语义向量 registry、skill 联邦——宿主 primitive。
-
-**遵循模式：**
-- `scripts/lint-skill-entrypoints.js` 现有 blockedPatterns 结构。
-- `skills/using-spec-first/evals/*`、`skills/spec-write-tasks/evals/*` 的 eval fixture 风格。
-
-**测试场景：**
-- 正常路径：20 条典型请求 fixture 覆盖 expected workflow 与 excluded workflow，且结构检查通过。
-- 错误路径：新增无 exclude intent 或超预算的 skill description 被 lint/audit 标记。
-- 边界：route semantic adequacy 由 fresh-source/read-only eval 判断；Jest 不断言宿主实际加载机制或自然语言命中正确性（宿主拥有）。
-
-**验证：**
-- `npm run lint:skill-entrypoints`、route fixture 结构/覆盖相关 jest 套件、eval fixture JSON parse 通过。
-- fresh-source/read-only eval 运行并报告 route semantic judgment；如不可运行，记录 `route_semantic_eval_not_run` 和 reason_code。
-
----
-
 ### U8. 最终审查、fresh-source eval 与 outcome-gated closeout
 
 **目标：** 用可信证据、显式 adoption handoff 和清晰 outcome gate 收束 prompt slimming sample，并决定是否允许任何 wave-2 work。
 
 **需求：** R8, R9, R10
 
-**依赖：** U1-U7, U9, U11；U10 仅在 execution gate 通过时纳入
+**依赖：** U0-U7
 
 **文件：**
 - 修改：`CHANGELOG.md`
@@ -772,7 +777,7 @@ flowchart TB
 - 运行 focused checks：
   - `npm run typecheck`
   - `npm run lint:skill-entrypoints`
-  - U1-U7 与 U9/U11 的 targeted jest suites（若执行 U10，也包含 U10）
+  - U1-U7 的 targeted jest suites
   - `git diff --check`
 - 对 changed skill behavior 运行 fresh-source eval 或等价 read-only reviewer：
   - 确认 trigger precision；
@@ -781,13 +786,16 @@ flowchart TB
   - 确认没有 generated runtime hand edit。
 - 如果 fresh-source eval 不可用，记录 `fresh_source_eval_not_run` 和具体原因。不要声称它已通过。
 - 记录 pilot outcome bundle：
-  - line-count 和 approximate context-room delta；
-  - Activation-L1 description token baseline/delta，或 `description_compression_deferred` reason；
+  - exact line-count delta（确定可测的经济性指标）；
+  - **按宿主分别记录** approximate context-room delta：Claude 惰性加载 references 时才有 activation-time 节省，其它宿主（Codex/Cursor/Kiro/Qoder）若把 `@./references` 当字面文本则无 activation 节省；标注为 `contingent-on-loader-behavior`，与 line-count delta 分开报告，不合并成单一数字；
+  - `spec-code-review` 首轮明确声明：如 5 条 `@./` eager include 在 U6 loader 验证前保留，则首轮多半只兑现主 spine 可读性，activation-token 收益记为「gated-pending-U6」而非已实现；
   - trigger/eval/static-test results；
-  - route fixture coverage 和 route semantic eval result 或 degraded reason；
   - fresh-source/runtime smoke result 或 degraded reason；
   - created references 清单，以及有意保留的 load-bearing text；
-  - 明确说明 run-evidence consumption 仍 deferred，并链接或记录 follow-up stats plan。
+  - 引用 U0 premise baseline 的 before 分布；若有 pilot 后可比数据则并列 after，否则显式声明「not-run/质量 after 仍需 stats 计划采集」；
+  - 明确 pilot 成功判据 = 边界保留 + 行为无回归 + 行数/结构 delta 记录；not-run 率下降、review 质量改善等收益需后续 stats plan 验证，**不是本计划的验收项**；
+  - 明确说明 run-evidence consumption 仍 deferred，并链接或记录 follow-up stats plan；
+  - Activation-L1 description/route 收益不在本 bundle，见 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md` 的 closeout。
 - 除非 pilot outcome bundle 表明该模式足够安全、可推广，否则不要创建 wave-2 rollout checklist。如果证据不足，以 `wave2_blocked_pending_pilot_evidence` 收尾。
 - 增加 adoption handoff：明确说明本计划不解决 5 分钟 first-experience loop；若 owner approval 存在，则链接或创建 follow-up plan。
 
@@ -816,7 +824,7 @@ flowchart TB
   - `src/cli/plugin.js`: read/verify in-scope; modify only if runtime projection tests prove required
   - `.claude/**`, `.codex/**`, `.agents/skills/**`: out-of-scope as generated runtime mirrors
   - README/user docs: deferred unless prompt behavior changes require user-facing docs
-- **集成覆盖：** Static tests 必须覆盖 source prompt shape、route fixture structure 和 runtime projection。Fresh-source/read-only eval 必须覆盖 semantic behavior，包括 descriptions 变更处的 route adequacy。
+- **集成覆盖：** Static tests 必须覆盖 source prompt shape 和 runtime projection。Fresh-source/read-only eval 必须覆盖 semantic behavior。Activation-L1 route fixture 覆盖归 follow-up plan 002。
 - **不变不变量：** Scripts 产出 deterministic facts；LLM 拥有 semantic adequacy。Source/runtime boundary 保持不变。
 
 ---
@@ -830,9 +838,10 @@ flowchart TB
 | `spec-code-review` headless/autofix consumers 被破坏 | 删除 main-spine text 前，先用 mode-specific tests 把 output/mode details 移入 references。 |
 | 新 references 导致 runtime path rewrites 漂移 | 运行 path rewrite 与 runtime plan tests；避免使用 `skill-path-rewrite-markers.js` 未覆盖的 source path formats。 |
 | Deterministic floor downshift 过度侵入 semantic decisions | 保持 `validity_scope: identity-freshness-structure-only` 可见；保留 semantic posture 和 review gate prose。 |
+| 移除 prose 后 CLI 缺失使 task-pack 执行完全罢工（P3-3） | 显式声明 CLI 可用性前提；CLI 缺失以 `task_pack_cli_unavailable` 停止并交还 handoff，bare-prompt work 不受影响；实现前可提示 `spec-first doctor` 前置检查，但仍不 fallback 到 prose 重写校验。 |
 | 既有 dirty worktree changes 与本实现冲突 | 保持 edits scoped；绝不 revert unrelated changes；编辑前重新读取 touched files。 |
 | 外部 references 变成新的 truth source | 仅把 external docs 当作 advisory；repo source 和角色契约治理决策。 |
-| Route fixture tests 意外变成 semantic routing authority | 保持 Jest/script checks 只检查 fixture structure 与 coverage；route adequacy 仍由 fresh-source/read-only eval 或显式 degraded limitation 处理。 |
+| 收益依赖未验证的宿主 lazy-load 行为（P2-1） | body 下沉的确定收益是热路径可读性/维护性/减少长上下文漏读；activation-time context-room 下降是 contingent-on-loader-behavior，由 U6 五宿主 projection + runtime smoke 验证，未验证时标 `runtime_reference_smoke_degraded` 并保留 load-bearing text。 |
 
 ---
 
@@ -847,14 +856,16 @@ flowchart TB
 
 ## 成功指标
 
-- `spec-work/SKILL.md`：第一轮 workflow-prompt refactor 移除重复的 task-pack deterministic validation prose，并记录 line-count/context-room delta；150-line spine 仍是 advisory budget，不是 completion gate。
-- `spec-code-review/SKILL.md`：第一轮 governance pass 移除重复的 cross-skill governance prose，并记录 line-count/context-room delta；300-400 行是 advisory first-pass budget，220/150 只作为后续 convergence targets。
+- `spec-work/SKILL.md`：第一轮 workflow-prompt refactor 移除重复的 task-pack deterministic validation prose，并记录 line-count delta；`spec-work` 首轮现实预算 ~200 行，150 行为后续收敛方向；均为 advisory budget，不是 completion gate。
+- `spec-code-review/SKILL.md`：第一轮 governance pass 移除重复的 cross-skill governance prose，并记录 line-count delta；300-400 行是 advisory first-pass budget，220/150 只作为后续 convergence targets。
+- context-room delta 作为经济性指标**按宿主分别记录**，标注为 `contingent-on-loader-behavior`：仅在宿主激活后惰性加载 references 时成立（Claude `@./` inline 场景需转 lazy 才有节省；其它宿主若按字面文本处理则无 activation 节省）；与 line-count delta 分开，不作为 hard gate。
+- `spec-code-review` 首轮预期：若 `@./` eager include 在 U6 loader 验证前保留，首轮可能只兑现主 spine 可读性/维护性，activation-token 收益标为「gated-pending-U6」，不得把 line-count delta 误报为 token 收益。
 - 每个 new reference 都有对应 STOP trigger，且至少有一个 trigger/no-trigger test 或 eval case。
 - `spec-first tasks validate --json` 是 `spec-work` prompt text 中唯一的 task-pack hash/structure validation authority。
-- Activation-L1 audit 在任何 description compression 前报告 description chars/words/estimated tokens、offender list 和 exclude-intent presence。
-- Route collision fixture coverage 报告 plan/work/code-review/doc-review/compound 边界的 expected/excluded workflow coverage；route precision/recall 语言仅限 fixture-based semantic eval，不声称 statistical proof 或 host-loader guarantee。
 - Focused test suite 通过，且不手改 generated runtime mirrors。
-- Post-implementation closeout 诚实报告 exact line-count deltas、description token baseline/delta 或 deferred reason、retained load-bearing text、outcome bundle，以及 not-run/failed verification。
+- pilot 成功判据是**边界保留 + 行为无回归 + 行数/结构 delta 记录**；not-run 率下降与 review 质量改善需后续 stats plan 验证，不在本计划验收范围。
+- Post-implementation closeout 诚实报告 exact line-count deltas、retained load-bearing text、outcome bundle，以及 not-run/failed verification。
+- Activation-L1 description token 与 route collision 指标不在本计划，见 follow-up plan `docs/plans/2026-07-06-002-refactor-skill-activation-index-governance-plan.md`。
 
 ---
 

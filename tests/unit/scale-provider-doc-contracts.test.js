@@ -86,6 +86,7 @@ describe('SCALE provider documentation contracts', () => {
     expect(providerTools).toContain('graphify extract .');
     expect(providerTools).toContain('graphify update .');
     expect(providerTools).toContain('graphify hook install');
-    expect(providerTools).toContain('"artifact_root": "graphify-out"');
+    expect(providerTools).toContain('"artifact_root": ".graphify"');
+    expect(providerTools).toContain('graphify-out/graph.json');
   });
 });

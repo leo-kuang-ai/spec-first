@@ -296,7 +296,7 @@ describe('dependency readiness baseline contracts', () => {
       'git-hook-write',
     ]));
     expect(providerTools.providers[0].usage_note).toContain('current-host project skill');
-    expect(providerTools.providers[0].usage_note).toContain('project-root `graphify-out/`');
+    expect(providerTools.providers[0].usage_note).toContain('project-root `.graphify/`');
     expect(providerTools.providers[0].usage_note).toContain('Explicit refresh runs `graphify update .` (code-only, no LLM semantic extraction)');
     expect(providerTools.providers[0].safety.install_effect).toContain('graphify install --project --platform codex');
     expect(providerTools.providers[0].safety.install_effect).toContain('graphify update .');
@@ -360,7 +360,7 @@ describe('dependency readiness baseline contracts', () => {
       },
     });
     expect(freshProvider.next_actions).toContain(
-      'Generate project-root graphify-out/ with graphify extract or graphify update . before using this provider as architecture navigation.',
+      'Generate provider-native project-root .graphify/ with graphify extract or graphify update . before using this provider as architecture navigation.',
     );
     expect(freshProvider.next_actions.join('\n')).not.toContain('check in project-graph artifacts');
 
@@ -379,13 +379,54 @@ describe('dependency readiness baseline contracts', () => {
     });
   });
 
-  test('provider readiness renderer reports Graphify query probe advisory only when unverified', () => {
+  test('provider readiness renderer treats graphify-out as legacy refresh-needed evidence', () => {
     const tempDir = makeTempDir();
     const binDir = path.join(tempDir, 'bin');
     fs.mkdirSync(binDir, { recursive: true });
     fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.agents/skills/graphify'), { recursive: true });
     fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.agents/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
+    const graphifyBin = path.join(binDir, 'graphify');
+    fs.writeFileSync(graphifyBin, `#!/bin/sh\nif [ "$1" = "--version" ]; then printf "graphify ${GRAPHIFY_VERSION}\\n"; fi\nexit 0\n`, 'utf8');
+    fs.chmodSync(graphifyBin, 0o755);
+
+    const result = spawnSync(process.execPath, [providerRendererPath, '--source', 'helper', '--repo-root', tempDir], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+        SPEC_FIRST_PROVIDER_HOST: 'codex',
+      },
+    });
+
+    expect(result.status).toBe(0);
+    const graphify = JSON.parse(result.stdout)[0];
+    expect(graphify.lifecycle).toMatchObject({
+      installed: true,
+      configured: true,
+      initialized: false,
+      indexed: false,
+      artifact_exists: false,
+    });
+    expect(graphify.first_generation).toMatchObject({
+      status: 'not-run',
+      artifact_root: '.graphify',
+      artifact_refs: [],
+      next_action: 'graphify-first-generation-required',
+    });
+    expect(graphify.next_actions.join('\n')).toContain('Legacy Graphify artifact detected at graphify-out/graph.json');
+    expect(graphify.next_actions.join('\n')).toContain('regenerate provider-native .graphify/');
+  });
+
+  test('provider readiness renderer reports Graphify query probe advisory only when unverified', () => {
+    const tempDir = makeTempDir();
+    const binDir = path.join(tempDir, 'bin');
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.agents/skills/graphify'), { recursive: true });
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.agents/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
     const graphifyBin = path.join(binDir, 'graphify');
     fs.writeFileSync(graphifyBin, `#!/bin/sh\nif [ "$1" = "--version" ]; then printf "graphify ${GRAPHIFY_VERSION}\\n"; fi\nexit 0\n`, 'utf8');
@@ -471,9 +512,9 @@ describe('dependency readiness baseline contracts', () => {
     fs.mkdirSync(graphifyBinDir, { recursive: true });
     fs.mkdirSync(emptyBinDir, { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.claude/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.writeFileSync(path.join(tempDir, '.claude/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     const graphifyBin = path.join(graphifyBinDir, 'graphify');
     fs.writeFileSync(graphifyBin, `#!/bin/sh
 if [ "$1" = "--version" ]; then
@@ -512,7 +553,7 @@ exit 0
       },
       first_generation: {
         status: 'completed',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_refs: ['.graphify/graph.json'],
       },
       steady_state: {
         hook_installed: true,
@@ -526,10 +567,10 @@ exit 0
   test('provider readiness renderer does not treat env-only or wrong-host Graphify runtime as configured', () => {
     const tempDir = makeTempDir();
     const binDir = path.join(tempDir, 'bin');
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.claude/skills/graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.claude/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
     const graphifyBin = path.join(binDir, 'graphify');
     fs.writeFileSync(graphifyBin, `#!/bin/sh
@@ -586,9 +627,9 @@ exit 0
   test('provider readiness renderer gives Claude-specific Graphify repair actions', () => {
     const tempDir = makeTempDir();
     const binDir = path.join(tempDir, 'bin');
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     const graphifyBin = path.join(binDir, 'graphify');
     fs.writeFileSync(graphifyBin, `#!/bin/sh
 if [ "$1" = "--version" ]; then
@@ -628,11 +669,11 @@ exit 0
     const homeDir = path.join(tempDir, 'home');
     const binDir = path.join(tempDir, 'bin');
     const graphifyBinDir = path.join(homeDir, '.local/bin');
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.mkdirSync(graphifyBinDir, { recursive: true });
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
     const staleGraphify = path.join(binDir, 'graphify');
     fs.writeFileSync(staleGraphify, '#!/bin/sh\nprintf "graphify 0.1.0\\n"\n', 'utf8');
@@ -680,13 +721,13 @@ exit 0
     const capturePath = path.join(tempDir, 'graphify-args.txt');
     fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.mkdirSync(oldToolDir, { recursive: true });
     fs.mkdirSync(path.join(npmPrefix, 'bin'), { recursive: true });
     fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
 
     for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
@@ -768,12 +809,12 @@ exit 0
     const capturePath = path.join(tempDir, 'graphify-args.txt');
     fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.mkdirSync(path.join(npmPrefix, 'bin'), { recursive: true });
     fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
 
     for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
@@ -846,9 +887,9 @@ exit 0
   test('provider readiness renderer degrades Graphify when hook setup failed', () => {
     const tempDir = makeTempDir();
     const binDir = path.join(tempDir, 'bin');
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     const graphifyBin = path.join(binDir, process.platform === 'win32' ? 'graphify.cmd' : 'graphify');
     fs.writeFileSync(graphifyBin, process.platform === 'win32'
       ? `@echo off\r\nif "%1"=="--version" echo graphify ${GRAPHIFY_VERSION}& exit /b 0\r\nexit /b 0\r\n`
@@ -884,9 +925,9 @@ exit 0
   test('provider readiness renderer degrades Graphify when CLI version does not match the pin', () => {
     const tempDir = makeTempDir();
     const binDir = path.join(tempDir, 'bin');
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     const graphifyBin = path.join(binDir, 'graphify');
     fs.writeFileSync(graphifyBin, `#!/bin/sh
 if [ "$1" = "--version" ]; then
@@ -951,7 +992,7 @@ if [ "$1" = "install" ]; then
 ## graphify
 
 Rules:
-- For codebase questions, first run \`graphify query "<question>"\` when graphify-out/graph.json exists.
+- For codebase questions, first run \`graphify query "<question>"\` when .graphify/graph.json exists.
 - After modifying code, run \`graphify update .\` to keep the graph current (AST-only, no API cost).
 GRAPHIFY
   exit 0
@@ -965,14 +1006,14 @@ fi
 out=''
 while [ "$#" -gt 0 ]; do
   if [ "$1" = "--out" ]; then
-    out="$2/graphify-out"
+    out="$2/.graphify"
     shift 2
     continue
   fi
   shift
 done
 if [ -z "$out" ]; then
-  out="graphify-out"
+  out=".graphify"
 fi
 mkdir -p "$out"
 printf '{}\\n' > "$out/graph.json"
@@ -1018,8 +1059,8 @@ exit 0
       first_generation: {
         status: 'completed',
         requirement_workspace_path: '.spec-first/workspace/requirements/demo',
-        artifact_root: 'graphify-out',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_root: '.graphify',
+        artifact_refs: ['.graphify/graph.json'],
       },
       steady_state: {
         hook_installed: true,
@@ -1037,12 +1078,12 @@ exit 0
     const capturePath = path.join(tempDir, 'graphify-args.txt');
     fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.agents/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.mkdirSync(graphifyBinDir, { recursive: true });
     fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.agents/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
 
     for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
       const commandPath = path.join(binDir, command);
@@ -1151,7 +1192,7 @@ if [ "$1" = "install" ]; then
 ## graphify
 
 Rules:
-- For codebase questions, first run \`graphify query "<question>"\` when graphify-out/graph.json exists.
+- For codebase questions, first run \`graphify query "<question>"\` when .graphify/graph.json exists.
 - After modifying code, run \`graphify update .\` to keep the graph current (AST-only, no API cost).
 GRAPHIFY
   exit 0
@@ -1185,8 +1226,8 @@ HOOK
   exit 0
 fi
 if [ "$1" = "extract" ]; then
-  mkdir -p graphify-out
-  printf '{}\\n' > graphify-out/graph.json
+  mkdir -p .graphify
+  printf '{}\\n' > .graphify/graph.json
   exit 0
 fi
 exit 0
@@ -1259,12 +1300,12 @@ exit 0
     const capturePath = path.join(tempDir, 'graphify-args.txt');
     fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, 'AGENTS.md'), '## graphify\n\nold provider text\n\n<!-- spec-first:bootstrap:start -->\n## Workflow 入口治理\n\nkeep\n', 'utf8');
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
 
     for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
@@ -1328,7 +1369,7 @@ exit 0
       first_generation: {
         status: 'skipped',
         next_action: 'graphify-refresh-recommended',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_refs: ['.graphify/graph.json'],
       },
       steady_state: {
         hook_installed: true,
@@ -1337,7 +1378,7 @@ exit 0
       },
     });
     expect(graphify.next_actions.join('\n')).toContain('spec-mcp-setup --only graphify --refresh');
-    expect(graphify.next_actions.join('\n')).toContain('incrementally refresh graphify-out');
+    expect(graphify.next_actions.join('\n')).toContain('incrementally refresh .graphify');
     expect(graphify.next_actions.join('\n')).toContain('runs `graphify update .`, no full semantic extraction');
     const agents = fs.readFileSync(path.join(tempDir, 'AGENTS.md'), 'utf8');
     expect(agents).toContain('Use Graphify as exploration-tier orientation');
@@ -1377,7 +1418,7 @@ if [ "$1" = "install" ]; then
 ## graphify
 
 Rules:
-- For codebase questions, first run \`graphify query "<question>"\` when graphify-out/graph.json exists.
+- For codebase questions, first run \`graphify query "<question>"\` when .graphify/graph.json exists.
 - After modifying code, run \`graphify update .\` to keep the graph current (AST-only, no API cost).
 GRAPHIFY
   exit 0
@@ -1389,8 +1430,8 @@ if [ "$1" = "hook" ]; then
   exit 0
 fi
 if [ "$1" = "extract" ]; then
-  mkdir -p graphify-out
-  printf '{}\\n' > graphify-out/graph.json
+  mkdir -p .graphify
+  printf '{}\\n' > .graphify/graph.json
   exit 0
 fi
 exit 0
@@ -1524,8 +1565,8 @@ if [ "$1" = "extract" ]; then
   exit 2
 fi
 if [ "$1" = "update" ]; then
-  mkdir -p graphify-out
-  printf '{}\\n' > graphify-out/graph.json
+  mkdir -p .graphify
+  printf '{}\\n' > .graphify/graph.json
   exit 0
 fi
 if [ "$1" = "query" ]; then
@@ -1565,7 +1606,7 @@ exit 0
       first_generation: {
         status: 'completed',
         next_action: 'graphify-code-only-fallback-used',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_refs: ['.graphify/graph.json'],
       },
       steady_state: {
         hook_installed: true,
@@ -1709,8 +1750,8 @@ if [ "$1" = "extract" ]; then
   exit 2
 fi
 if [ "$1" = "update" ] && [ "$2" = "." ] && [ "$3" = "--force" ]; then
-  mkdir -p graphify-out
-  printf '{}\\n' > graphify-out/graph.json
+  mkdir -p .graphify
+  printf '{}\\n' > .graphify/graph.json
   exit 0
 fi
 if [ "$1" = "update" ]; then
@@ -1754,7 +1795,7 @@ exit 0
       first_generation: {
         status: 'completed',
         next_action: 'graphify-force-overwrite-used',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_refs: ['.graphify/graph.json'],
       },
       steady_state: {
         hook_installed: true,
@@ -1801,14 +1842,14 @@ fi
 out=''
 while [ "$#" -gt 0 ]; do
   if [ "$1" = "--out" ]; then
-    out="$2/graphify-out"
+    out="$2/.graphify"
     shift 2
     continue
   fi
   shift
 done
 if [ -z "$out" ]; then
-  out="graphify-out"
+  out=".graphify"
 fi
 mkdir -p "$out"
 printf '{}\\n' > "$out/graph.json"
@@ -1837,7 +1878,7 @@ exit 0
     expect(capturedGraphifyArgs).toContain('hook install');
     expect(capturedGraphifyArgs).toContain('hook status');
     expect(capturedGraphifyArgs).toContain('query spec-first setup readiness --graph');
-    expect(capturedGraphifyArgs).not.toContain('.spec-first/workspace/providers/graphify/graphify-out');
+    expect(capturedGraphifyArgs).not.toContain('.spec-first/workspace/providers/graphify/.graphify');
     const payload = JSON.parse(result.stdout);
     expect(payload.results).toEqual([]);
     expect(payload.provider_apply).toMatchObject({
@@ -1850,8 +1891,8 @@ exit 0
       first_generation: {
         status: 'completed',
         requirement_workspace_path: '.',
-        artifact_root: 'graphify-out',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_root: '.graphify',
+        artifact_refs: ['.graphify/graph.json'],
       },
       steady_state: {
         hook_installed: true,
@@ -1868,12 +1909,12 @@ exit 0
     const capturePath = path.join(tempDir, 'graphify-args.txt');
     fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, '.codex/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(tempDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(tempDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.writeFileSync(path.join(tempDir, 'package.json'), '{"name":"fixture"}\n', 'utf8');
     fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
     fs.writeFileSync(path.join(tempDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
-    fs.writeFileSync(path.join(tempDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(tempDir, '.graphify/graph.json'), '{}\n', 'utf8');
     spawnSync('git', ['init'], { cwd: tempDir, encoding: 'utf8' });
 
     for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
@@ -1895,8 +1936,8 @@ if [ "$1" = "hook" ]; then
   exit 0
 fi
 if [ "$1" = "update" ]; then
-  mkdir -p graphify-out
-  printf '{"refreshed":true}\\n' > graphify-out/graph.json
+  mkdir -p .graphify
+  printf '{"refreshed":true}\\n' > .graphify/graph.json
   exit 0
 fi
 if [ "$1" = "extract" ] || [ "$1" = "install" ]; then
@@ -1934,8 +1975,8 @@ exit 0
         status: 'completed',
         next_action: 'graphify-refresh-used',
         requirement_workspace_path: '.',
-        artifact_root: 'graphify-out',
-        artifact_refs: ['graphify-out/graph.json'],
+        artifact_root: '.graphify',
+        artifact_refs: ['.graphify/graph.json'],
       },
     });
   });
@@ -1948,12 +1989,12 @@ exit 0
     const capturePath = path.join(tempDir, 'graphify-args.txt');
     fs.mkdirSync(path.join(homeDir, '.agents/skills/ast-grep'), { recursive: true });
     fs.mkdirSync(path.join(childDir, '.codex/skills/graphify'), { recursive: true });
-    fs.mkdirSync(path.join(childDir, 'graphify-out'), { recursive: true });
+    fs.mkdirSync(path.join(childDir, '.graphify'), { recursive: true });
     fs.mkdirSync(binDir, { recursive: true });
     fs.writeFileSync(path.join(childDir, 'package.json'), '{"name":"child-app"}\n', 'utf8');
     fs.writeFileSync(path.join(homeDir, '.agents/skills/ast-grep/SKILL.md'), '# ast-grep\n', 'utf8');
     fs.writeFileSync(path.join(childDir, '.codex/skills/graphify/SKILL.md'), '# graphify\n', 'utf8');
-    fs.writeFileSync(path.join(childDir, 'graphify-out/graph.json'), '{}\n', 'utf8');
+    fs.writeFileSync(path.join(childDir, '.graphify/graph.json'), '{}\n', 'utf8');
     spawnSync('git', ['init'], { cwd: childDir, encoding: 'utf8' });
 
     for (const command of ['gh', 'vhs', 'silicon', 'ffmpeg', 'ast-grep']) {
@@ -1975,8 +2016,8 @@ if [ "$1" = "hook" ]; then
   exit 0
 fi
 if [ "$1" = "update" ]; then
-  mkdir -p graphify-out
-  printf '{"refreshed":true}\\n' > graphify-out/graph.json
+  mkdir -p .graphify
+  printf '{"refreshed":true}\\n' > .graphify/graph.json
   exit 0
 fi
 if [ "$1" = "extract" ] || [ "$1" = "install" ]; then
@@ -2018,7 +2059,7 @@ exit 0
     expect(childGraphify.first_generation).toMatchObject({
       status: 'completed',
       next_action: 'graphify-refresh-used',
-      artifact_refs: ['graphify-out/graph.json'],
+      artifact_refs: ['.graphify/graph.json'],
     });
   });
 
@@ -3016,8 +3057,8 @@ exit 0
       selected: true,
       requires_confirmation: false,
       tool_install_root: null,
-      artifact_root: path.join(tempDir, 'graphify-out'),
-      first_generation_display: 'resolved graphify CLI -> verify/install current-host project skill; if graphify-out exists, verify install state and recommend incremental --refresh; otherwise graphify extract .; explicit --refresh runs graphify update . code-only/no-LLM (if provider refuses overwrite and suggests --force, one graphify update . --force repair)',
+      artifact_root: path.join(tempDir, '.graphify'),
+      first_generation_display: 'resolved graphify CLI -> verify/install current-host project skill; if .graphify exists, verify install state and recommend incremental --refresh; legacy graphify-out is compatibility-only refresh-needed evidence; otherwise graphify extract .; explicit --refresh runs graphify update . code-only/no-LLM (if provider refuses overwrite and suggests --force, one graphify update . --force repair)',
       auto_refresh_display: 'resolved graphify CLI -> graphify hook install (git repo only; provider-owned post-commit/post-checkout refresh)',
       command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard/npm global bin candidates; after npm install/upgrade, a stale PATH symlink may be backed up and repointed to the pinned CLI, while ordinary files stay report-only.',
       instruction_section_display: 'after provider project install, setup normalizes the AGENTS.md/CLAUDE.md ## graphify section to resolved CLI/manual-visibility/direct-source-fallback wording.',
@@ -3035,12 +3076,12 @@ exit 0
       '.claude/skills/graphify/',
       'CLAUDE.md',
     ]));
-    expect(graphify.gitignore_policy).toContain('spec-first init managed block ignores .codegraph/ and the whole graphify-out/ provider artifact directory');
+    expect(graphify.gitignore_policy).toContain('spec-first init managed block ignores .codegraph/, the provider-native .graphify/ artifact directory, and legacy graphify-out/ artifacts');
     expect(graphify.gitignore_policy).toContain('does not auto-add, auto-commit, or promote Graphify output to source truth');
     expect(graphify.will_not_do).toEqual(expect.arrayContaining([
       'will not install Graphify MCP server',
       'will not start graphify watch',
-      'will not auto-add or auto-commit graphify-out',
+      'will not auto-add or auto-commit .graphify',
     ]));
 
     const unknown = spawnSync('node', [setupPlanRendererPath, '--mode', 'plan', '--repo-root', tempDir, '--only', 'unknown'], {
