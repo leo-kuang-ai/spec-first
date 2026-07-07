@@ -30,7 +30,7 @@
 | **确定性下沉** | 把可确定性判定的校验（hash/结构/路径）交给工具（脚本/CLI/linter），prompt 只消费其结构化输出（如 `--json` + `reason_code`），不用 prose 复述规则。见 §2 原则 3。 |
 | **loader 探针** | 只读查明「本宿主如何加载 references（eager-inline / lazy / 字面文本）」的前置调查，决定哪些下沉真省 token。见 §8/§2 原则 8。 |
 | **premise baseline** | 优化前用**已有**证据（历史运行日志/指标）建的一次性只读 before 快照，用于破解「无法自证价值」。见 §2 原则 7。 |
-| **reason_code 注册表** | 项目内所有降级/阻断码的集中枚举，见 §7.1；新增码先登记再引用。 |
+| **reason_code 注册表** | 本文提供示例码；落项目时由项目适配层指定最终 registry owner。证据等级（confirmed/contingent/hypothesis）与 outcome 状态不要混成 reason_code。见 §7.1/§8。 |
 
 ---
 
@@ -60,7 +60,7 @@
 
 对正文每一段先分类再决定去留：
 
-- **L1 contract/gate（spine，保留）：** workflow contract 摘要、热路径步骤骨架、Reference Trigger Map、**hard boundaries**（写删/验证/交接/不可逆动作纪律）。每次触发都必须在场。
+- **L1 contract/gate（spine，保留）：** workflow contract 摘要、热路径步骤骨架、Reference Trigger Map、**hard boundaries**（写删/验证/交接/不可逆动作纪律、脚本安全/信任边界）。每次触发都必须在场。
 - **L1 behavioral anchor（压短不删）：** 抽象但影响行为走向的原则句/反模式提醒（reproduce-first、scope adherence、evidence-first…）。非 gate，但删了会增加跳步、扩大 scope、过早执行、伪造验证的概率。
 - **L2（移 reference）：** 只在特定 phase/mode/条件才需要的详细步骤、mode 矩阵、大输出模板。移动时**必须**配 STOP trigger 四件套。
 - **L3（删）：** 背景叙事、通用建议、重复原则、过期细节、冗余例子。删后不得造成步骤/契约/边界缺失。
@@ -173,6 +173,35 @@ skill 发现、域索引、语义路由、懒加载、skill 联邦——都是**
 ### Step 6 — 诚实 closeout
 报告：exact line-count delta（confirmed）·按宿主的 context-room delta（contingent）·trigger/eval/static-test 结果·fresh eval / 投射 smoke 结果或 degraded reason·created references 清单 + 有意保留的 load-bearing text·before baseline 引用·成功判据（边界保留 + 无回归 + delta 记录）·deferred 项及 committed trigger·全部 reason_code。
 
+可复制模板如下。它是 Markdown outcome bundle，不是新 schema；若项目已有 closeout/validation owner，复用那个 owner：
+
+```markdown
+## Outcome Bundle
+
+- baseline_ref: <source read / existing run evidence / premise baseline path>
+- evidence_matrix:
+  - scenario: <scenario>
+    skill: <skill>
+    candidate: <body/index/reference/script change>
+    implementation_permission: ready|candidate|blocked
+    existing_eval_refs: <paths or none>
+    missing_negative_cases: <cases or none>
+- changed_surfaces: <SKILL.md / references / scripts / eval fixtures / tests>
+- line_count_delta: <before -> after> [confirmed]
+- context_room_delta_by_host:
+  - <host>: <delta or none> [confirmed|contingent|hypothesis, reason]
+- verification:
+  - static_tests: <command + result>
+  - fresh_eval: <result or eval_not_run:<reason>>
+  - negative_eval_cases: <false trigger / missed trigger / unread reference / degraded closeout / script safety>
+  - eval_adequacy: L0|L1|L2|L3|L4
+- boundary_result: <write/delete, verification, handoff, irreversible action, script safety preserved?>
+- references_created_or_kept: <paths + STOP trigger summary>
+- scripts_changed: <paths + safety posture, or none>
+- success_gate: pass|failed|degraded, <reason_code>
+- deferred_follow_up: <owner / trigger / re-evaluation condition>
+```
+
 ---
 
 ## 4. Pilot 与 rollout 纪律
@@ -212,6 +241,7 @@ skill 发现、域索引、语义路由、懒加载、skill 联邦——都是**
 - behavioral anchor 被当 L3 删且未用 eval/reviewer 证明不增加错误路径。
 - 脚本试图裁决自然语言语义（路由/质量/finding 成立性）。
 - 迁移/删除 spine 承重文本却缺 fresh eval（未跑时只允许可逆新增）。
+- 脚本会写删、联网、处理 secret/PII 或调用外部命令，但无最小权限、preview/confirm、dry-run/validate 或失败降级说明。
 - 手改 generated mirror 作为修复/验证。
 - fresh/read-only eval 未执行且 closeout 未记 reason_code。
 
@@ -229,7 +259,7 @@ skill 发现、域索引、语义路由、懒加载、skill 联邦——都是**
 
 ### 7.1 reason_code / status 注册表（示例，按项目补全）
 
-集中枚举，各处引用即指此处；新增码先登记再引用。以下为通用示例，落项目时替换为你的实际码：
+本节只给本文示例 reason_code 与 status tag；落项目时，§8 必须指定最终 registry owner，并说明项目内其他 workflow / CLI / checker 的码是否归同一 owner。证据等级（`confirmed` / `contingent` / `hypothesis`）和 outcome 状态（`not-run` / `failed` / `degraded`）不属于本表，除非项目 owner 明确把它们注册为状态枚举。
 
 | code / tag | 类型 | 触发条件 | 处置 |
 |---|---|---|---|
@@ -246,6 +276,9 @@ skill 发现、域索引、语义路由、懒加载、skill 联邦——都是**
 本方法论的通用内核（§0–§7、第二/三部分）项目中立。以下几点**依赖你项目**，需替换填充：
 
 - **确定性工具（原则 3）：** 你的校验 CLI/脚本/linter 及其 `--json` 输出契约（对应「`<validator> --json` + `reason_code`」）。
+- **host 约束来源：** 目标宿主的 skill `name` / `description` / reference / scripts 约束、官方文档链接与 `last_verified`；与本文示例冲突时，以目标宿主当前文档为准。
+- **reason_code owner：** 项目内降级/阻断码的最终 registry 文档，及它与 evidence status、workflow outcome status 的边界。
+- **脚本安全边界：** scripts 是否允许写删、联网、读 secret/PII、安装依赖或调用外部命令；需要的 preview、confirm、sandbox、dry-run、日志脱敏与失败降级规则。
 - **runtime 投射（原则 9）：** 你的 skill 是否 source→runtime 投射；若是，填你的再生成命令与 mirror 路径纪律；若否，忽略 mirror 相关条目。
 - **fresh eval 手段：** 你如何把当前 source 注入全新实例复核（subagent / 独立会话 / 人工 read-only）。
 - **质量/审查对齐：** 你项目已有的 skill 质量 rubric、审查方法、价值/风格基线（若有），本方法论是其「怎么改」的补充。
@@ -260,7 +293,7 @@ skill 发现、域索引、语义路由、懒加载、skill 联邦——都是**
 主依据：Anthropic 官方 [Skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)、[Equipping agents with Agent Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)、OpenAI Codex [Agent Skills](https://developers.openai.com/codex/skills) 与 [AGENTS.md 指南](https://developers.openai.com/codex/guides/agents-md)。仅作 advisory：
 
 - 三级渐进披露（metadata 常驻预加载 / SKILL.md 触发时读 / resources 按需读；不用 L 编号以免与本文 Body-L1/L2/L3 混淆）是 Agent Skills 基础架构；正文建议 <500 行、references 一层深、>100 行 reference 带 TOC。
-- description 是发现元数据：第三人称、含 what+when+触发词、≤1024 字符；name 建议动名词、≤64 字符、禁保留字。
+- description 是发现元数据：第三人称、含 what+when+触发词、主流宿主常见上限为 1024 字符；name 常见建议为动名词、≤64 字符、禁保留字。具体限制以目标宿主最新文档为准。
 - 设计纪律：先建 eval 再写正文；自由度匹配任务脆弱性；只加模型不知道的、术语一致、避免时效信息与过多选项；脚本 solve-don't-punt、无 voodoo constants、plan-validate-execute。
 - 单体化（全塞进一个长 `SKILL.md`）是最常见失败；用 Author/User 双实例迭代、跨模型测试，而非主观「读起来更好」。
 
@@ -283,6 +316,7 @@ skill 发现、域索引、语义路由、懒加载、skill 联邦——都是**
 - [ ] 静态 + 行为 eval 都覆盖（含 negative cases），标注 adequacy L0–L4
 - [ ] 收益按 confirmed/contingent/hypothesis 分级、按宿主报告
 - [ ] closeout 诚实：delta + degraded reason_code + deferred 项的 committed trigger
+- [ ] 项目适配层已声明 host 约束来源、reason_code owner 与脚本安全边界
 - [ ] 未自建宿主 primitive；（若有投射）未手改 mirror；已记录变更
 
 ---
@@ -308,7 +342,9 @@ eval 是 skill 有效性的**真相源**；设计期就把 eval fixtures 建起�
 ## 13. Frontmatter 设计：name 与 description
 frontmatter 是**唯一常驻**的部分（Activation index），每次对话都注入，是路由发现的全部依据。
 
-| 字段 | 官方约束 | 写法要点 |
+下表是 Claude/Codex 兼容 skill 生态中的主流约束摘要，**不是跨所有宿主的永久硬规范**。落项目时按 §8 填 `host_constraints_ref` 与 `last_verified`；若目标宿主最新文档不同，以目标宿主为准。
+
+| 字段 | 主流宿主约束 | 写法要点 |
 |---|---|---|
 | `name` | ≤64 字符，仅小写字母/数字/连字符，禁保留字，禁 XML | 建议**动名词**（`processing-pdfs`）；避免 `helper`/`utils`/`tools` 空词 |
 | `description` | ≤1024 字符，非空，禁 XML，**第三人称** | 必含 **what + when + 具体触发词**；第三人称（被注入 system prompt，「I can…」「You can…」破坏发现） |
@@ -356,6 +392,15 @@ frontmatter 是**唯一常驻**的部分（Activation index），每次对话都
 - **优先 utility 脚本**供**执行**（省 token、可靠、一致），明确标「执行」还是「参考阅读」。
 - **plan-validate-execute：** 高风险/批量操作先产结构化 plan → 校验 → 执行 → 验证（可验证中间产物）。
 
+### 19.1 脚本安全边界（scripts 是能力也是信任边界）
+只要 skill 带 scripts，就把脚本安全当 L1 gate，而不是实现细节：
+
+- **来源与依赖：** 脚本应随 skill/source 版本控制；外部依赖要固定来源和版本，避免运行时随意安装或下载。
+- **权限与副作用：** 写删文件、联网、执行外部命令、读取 secret/PII、修改宿主 runtime 都必须显式声明触发条件、preview/dry-run、确认点与失败降级。
+- **输入与输出：** 校验输入路径/格式，拒绝越界路径；输出结构化事实与 reason_code，不把语义判断硬编码进脚本。
+- **日志与脱敏：** 错误信息要可诊断，但默认不打印 token、密钥、个人信息或完整敏感路径。
+- **可恢复性：** 高风险脚本优先 plan → validate → execute；失败时返回可恢复状态，不让模型靠猜测继续。
+
 ## 20. 迭代与观察（Author / User 双实例）
 - **Author 实例**帮写/精修；**User 实例**（全新、加载该 skill）真实使用；观察行为带回作者侧。
 - **观察四个信号**：意外探索路径（结构不直觉）、错过链接（指针不显眼）、过度依赖某文件（该内容也许该进正文）、从不访问某文件（多余或信号太弱）。
@@ -363,7 +408,7 @@ frontmatter 是**唯一常驻**的部分（Activation index），每次对话都
 - 观察须用 **fresh eval**（注入当前 source），不依赖同会话缓存定义。
 
 ## 21. 项目适配层锚点（指针）
-设计期还需满足你项目的治理约束——这些**依赖项目**，见 **§8 项目适配层**：确定性工具契约、runtime 投射纪律（若有）、fresh eval 手段、质量/审查对齐、入口/命名治理。通用内核（§1–§7、§11–§20）不依赖它们。
+设计期还需满足你项目的治理约束——这些**依赖项目**，见 **§8 项目适配层**：host 约束来源、reason_code owner、确定性工具契约、脚本安全边界、runtime 投射纪律（若有）、fresh eval 手段、质量/审查对齐、入口/命名治理。通用内核（§1–§7、§11–§20）不依赖它们。
 
 ## 22. 设计 checklist
 
@@ -372,6 +417,7 @@ frontmatter 是**唯一常驻**的部分（Activation index），每次对话都
 **发现与边界**
 - [ ] name 动名词、≤64、无保留字
 - [ ] description 第三人称、≤1024、含 what+when+触发词、含相邻 skill 的 exclude intent
+- [ ] 上述 name/description 限制已按目标宿主最新文档复核（`host_constraints_ref` / `last_verified`）
 - [ ] 单一职责，should-trigger / should-not-trigger 清晰
 
 **信息架构**
@@ -387,6 +433,7 @@ frontmatter 是**唯一常驻**的部分（Activation index），每次对话都
 
 **脚本（如有）**
 - [ ] solve don't punt；无 voodoo constants；utility 脚本标明执行/参考；plan-validate-execute
+- [ ] 脚本安全边界明确：依赖固定、输入校验、最小权限、preview/dry-run、日志脱敏、失败可恢复
 
 **验证与治理**
 - [ ] ≥3 个 eval + baseline；覆盖 negative cases 并标 L0–L4 等级
@@ -457,11 +504,20 @@ body: 600 行；references/ 已存在 1 个，但正文仍全量承载
 index: description 128 词 / ~190 token；无 exclude intent；与相邻 skill 有 3 个重叠触发词
 ```
 
+Evidence Matrix（示例，真实执行必须读当前 source/eval 后重建）：
+
+| scenario | skill surface | candidate | existing_eval_refs | missing_negative_cases | implementation_permission |
+|---|---|---|---|---|---|
+| intake validation | Active body | 校验 prose → `<your-validator> --json` handoff + reference | `evals/intake-happy-path.json`、`tests/validator-contract.test.*` | validator 失败、reason_code 透传、未读 reference 的 conservative fallback | ready |
+| reviewer dispatch | Active body | mode 矩阵 → `references/mode-rules.md` | `evals/dispatch-happy-path.json` | 普通解释请求不应触发 dispatch；reference 未读时不得产生副作用 | candidate |
+| route discovery | Activation index | description 128 词 → trigger/exclude/定位 | none | 与相邻 skill 误触发；规划/审查意图不应触发执行 skill | blocked |
+
 ## 27.3 Step 1 分类（节选）
 | 段落 | 分类 | 依据 |
 |---|---|---|
 | 校验规则 40 行 prose | 确定性下沉候选 | 工具已确定性执行（原则 3） |
 | 写删/验证/交接边界 | L1 gate | 承重墙 |
+| "Stay inside the validated input boundary; finish only from observed verification." | L1 behavioral anchor | 非 hard gate，但删除后更容易扩大 scope 或伪造完成；压短保留 |
 | mode 矩阵、大输出模板 | L2 | 只在特定 mode 需要 |
 | 「CI/CD 是什么」等 2 段 | L3 | 删了无行为损失 |
 
@@ -480,6 +536,18 @@ Do not re-narrate the hash/structure rules here.
 | ❌ bad | `更多细节见 references/mode-rules.md` | 无触发时机、软措辞 → trigger failure |
 | ✅ good | `STOP. Before dispatching any reviewer, read references/mode-rules.md.`（+ fallback：未读按最保守模式；+ eval：dispatch 触发 / 解释代码不触发） | 四件套齐全、可测试 |
 
+**Body-L1 behavioral anchor 压短但不删除：**
+
+```markdown
+Before:
+"When executing from a validated input, avoid drifting into adjacent work. Do not
+declare completion until the relevant verification evidence has actually been
+observed."
+
+After:
+"Stay inside the validated input boundary; finish only from observed verification."
+```
+
 **description good vs bad：**
 ```
 ❌ bad（功能说明）: "This skill helps you ship widgets. It can validate, detect modes,
@@ -497,9 +565,12 @@ line-count: 600 → 190 行 spine + 3 references            [confirmed]
 context-room: 宿主 A -~2.1k token/激活                   [contingent-on-loader-behavior，探针已证]
               宿主 B 无 activation 节省，仅可读性         [contingent]
 质量/成功率改善                                          [hypothesis，待运行证据]
+Evidence Matrix: 只实施 implementation_permission=ready 的 validation candidate；dispatch candidate 延后补 negative eval；description blocked 不动
 边界: 写删/验证/交接全部保留在 spine                      [gate ✓]
 STOP trigger: 3 个 moved reference 各配四件套             [gate ✓]
 fresh eval: 已跑，trigger precision/边界无回归            [gate ✓]
+negative eval: validator failure、false dispatch、missed reference trigger、degraded closeout 均覆盖
+eval_adequacy: L3 before/after（同一 case 改前/改后对比，覆盖 protected behavior）
 成功判据: 边界保留 + 无回归 + delta 记录 → 达成
 ```
 

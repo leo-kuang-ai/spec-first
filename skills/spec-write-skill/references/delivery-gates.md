@@ -1,12 +1,12 @@
 # Delivery Gates
 
-本文件定义 `spec-write-skill` 的轻量交付 gate。原则是 risk-based：更多 gate 不自动更好；更高 rigor 应主要增加 references/evals/tests，不扩大 `SKILL.md` 初始加载。
+本 reference 定义 `spec-write-skill` 的 risk-based 交付 gate：按质量层级和改动风险选择最窄验证。提高 rigor 优先增加必要 references/evals/tests，不扩大 `SKILL.md` 初始加载，也不把更多 gate 当作默认更好。
 
 ## Quality Tiers
 
 | Tier | 使用场景 | 默认交付物 | 最小验证 |
 | --- | --- | --- | --- |
-| `scaffold` | 探索性、个人、短期、低误触发风险 | `SKILL.md`，必要时 1 个 small reference | `quick_validate.py`、`npm run lint:skill-entrypoints`、`git diff --check` |
+| `scaffold` | 探索性、个人、短期、低误触发风险 | `SKILL.md`，必要时 1 个 small reference | `npm run lint:skill-entrypoints`、`git diff --check`；目标 package 提供 `quick_validate.py` 时加跑 |
 | `production` | 团队复用、route confusion 真实存在、输出质量重要 | lean `SKILL.md`、必要 references、trigger/boundary eval | scaffold 验证 + 聚焦 Jest contract + `spec-skill-audit` target run |
 | `library` | 共享基础能力，或会影响其他 skill 写作/治理 | trigger positive/negative/near-neighbor eval、packaging readiness、维护说明 | production 验证 + package smoke 或 runtime sync test |
 | `governed` | 安全、合规、发布、事故、组织规范、高权限脚本 | owner、review cadence、rollback boundary、trust/security notes | library 验证 + owner/review evidence 或 proposal-only 限制 |
@@ -14,6 +14,8 @@
 默认从 `scaffold` 起步；只有复用、误触发、治理或分发风险真实存在时才升级。
 
 ## Resource Boundary
+
+资源放置映射的概念 owner 见 [Skill Quality Vocabulary](skill-quality-vocabulary.md) 的 Information Hierarchy；本节只定义交付 gate 专属的准入规则（baseline 排除、非空目录必须被指向）。
 
 资源只在当前需求需要时添加：
 
@@ -35,9 +37,9 @@
 | branch / context pointer / information hierarchy | branch list or reviewer note，`SKILL.md` pointer 说明读取条件，failure/expected eval 覆盖弱 pointer 或 sprawl 风险 |
 | source/runtime 边界 | contract test 或 runtime sync test，禁止手改 generated mirrors |
 | 新增 standalone skill | `skills-governance.json`、runtime catalog、public workflow summary test |
-| 新增 reference | `SKILL.md` 有清晰读取条件；quick validate 通过 |
+| 新增 reference | `SKILL.md` 有清晰读取条件；入口 lint / 可用 quick validate 通过 |
 | 新增 eval | normalized cases valid；覆盖 positive、negative/near-neighbor 或 boundary |
-| 可分发 package | 官方 `quick_validate.py`；可行时 package smoke，确认不依赖 maintainer-only evidence |
+| 可分发 package | 目标 package 提供时运行官方 `quick_validate.py`；可行时 package smoke，确认不依赖 maintainer-only evidence |
 | 写入脚本或 shell 行为 | 脚本语法/单测、安全边界、失败 reason_code |
 | 复杂或高风险语义行为 | fresh-source eval、forward-testing 或人工 reviewer note；若未执行，记录 `not_checked_with_reason` |
 
@@ -82,7 +84,7 @@
 - 只在复杂、团队复用、迁移、分发或高风险语义行为时要求；普通 scaffold 可标记 `not_checked_with_reason`。
 - 使用新上下文或 subagent 时，传入 skill 路径、真实请求形态和 raw artifact；不要传入预期答案、已知 bug、intended fix 或上轮结论。
 - 如果 forward-testing 会耗时很长、需要额外授权或会修改生产系统，先把拟运行 prompt 和风险交给用户确认。
-- 结果只作为语义证据；仍需结合 source patch、contract tests、quick validate 和 audit smoke 判断是否可交付。
+- 结果只作为语义证据；仍需结合 source patch、contract tests、可用 validator 和 audit smoke 判断是否可交付。
 
 fresh-source eval 与 forward-testing 一样只提供语义证据。修改 skill/agent prose 后，如果宿主调度能力、时间或授权不足，记录 `not_checked_with_reason`；不要用当前会话已加载的旧 skill 行为冒充 fresh-source 验证。
 

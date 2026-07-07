@@ -117,6 +117,10 @@ function textInput(question, promptOptions = {}) {
       reject(new PromptCancelled());
       return;
     }
+    if (isEscapeSequenceToken(text)) {
+      redraw();
+      return;
+    }
     for (const char of text) {
       if (char === '\r' || char === '\n') {
         const finalValue = value.length > 0 ? value : defaultValue;
@@ -346,6 +350,10 @@ function clampIndex(index, length) {
 
 function containsCancel(text) {
   return text.includes('\x03') || text === '\x1b';
+}
+
+function isEscapeSequenceToken(text) {
+  return typeof text === 'string' && text.length > 1 && text.startsWith('\x1b');
 }
 
 function tokenizeInput(text) {

@@ -1,6 +1,6 @@
 # Authoring Method
 
-本文件把 `yao-meta-skill` 中最适合 spec-first 的部分收敛为轻量 authoring method：资格判断、意图澄清、短参考扫描和反模式防线。它不是完整 SkillOps 平台，不引入全量 IR、registry、reports 或 cross-packager。
+本 reference 是 `spec-write-skill` 的资格判断与写作方法边界：先确认是否值得写成 skill，再收敛意图、扫描可复用 pattern、识别反模式。`yao-meta-skill` 只作为来源背景；不要引入完整 SkillOps 平台、全量 IR、registry、reports 或 cross-packager。
 
 ## 1. Qualification
 
@@ -116,7 +116,7 @@
 
 ## 5. Anti-Pattern Families
 
-维护 eval 时优先覆盖这些失败族：
+本表是 eval 覆盖族清单：资格/边界类（`one-off-vs-reusable`、`explain-not-package`、`document-export-vs-agent-skill`、`future-outline-vs-build`、`audit-not-authoring`、`runtime-mirror-patch`）语义见 §1 Qualification 与 `evals/trigger-cases.json` 的 `reason_code`；写作质量类（弱 pointer、模糊 completion criterion、over-split、no-op）语义框架见 [Skill Quality Vocabulary](skill-quality-vocabulary.md)。维护 eval 时优先覆盖这些失败族：
 
 - `one-off-vs-reusable`：把一次性回答误做成 skill package。
 - `explain-not-package`：把解释/总结请求误当成 skill 创建。

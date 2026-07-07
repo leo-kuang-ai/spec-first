@@ -34,10 +34,11 @@ describe('spec-write-skill contract', () => {
     const deliveryGates = read('skills/spec-write-skill/references/delivery-gates.md');
 
     expect(skill).toContain('name: spec-write-skill');
-    expect(skill).toContain('写 skill 的公开 workflow');
-    expect(skill).toContain('统一入口是 `spec-write-skill`');
-    expect(skill).toContain('先判断是否值得做成 skill');
-    expect(skill).toContain('不是 `spec-skill-audit` 的替代品');
+    expect(skill).toContain('公开 workflow：编写、改写、迁移或按 audit findings 修复 spec-first source skill');
+    expect(skill).toContain('明确、值得复用的 skill authoring 目标');
+    expect(skill).toContain('落到 `skills/<name>/` source patch');
+    expect(skill).toContain('普通实现、调试、评审或文档导出走对应 `spec-*` workflow 或直接回答');
+    expect(skill).toContain('资格判断');
     expect(skill).toContain('Source of truth 是 `skills/`');
     expect(skill).toContain('src/cli/contracts/dual-host-governance/skills-governance.json');
     expect(skill).toContain('[Authoring Method](references/authoring-method.md)');
@@ -45,7 +46,7 @@ describe('spec-write-skill contract', () => {
     expect(skill).toContain('[Delivery Gates](references/delivery-gates.md)');
     expect(skill).toContain('描述是 trigger contract');
     expect(skill).toContain('先列真实 branch');
-    expect(skill).toContain('context pointer 何时读取');
+    expect(skill).toContain('context pointer 的读取条件');
     expect(skill).toContain('completion criterion');
     expect(skill).toContain('clarity(done/not done) 与 demand');
     expect(skill).toContain('sentence-level no-op pruning');
@@ -192,14 +193,14 @@ describe('spec-write-skill contract', () => {
         const runtimeVocabulary = readAbsolute(path.join(runtimeSkillRoot, 'references', 'skill-quality-vocabulary.md'));
 
         expect(runtimeSkill).toContain('name: spec-write-skill');
-        expect(runtimeSkill).toContain('写 skill 的公开 workflow');
+        expect(runtimeSkill).toContain('明确、值得复用的 skill authoring 目标');
         expect(runtimeAuthoring).toContain('Skill Creator Compatibility');
         expect(runtimeDelivery).toContain('Forward Testing Boundary');
         expect(runtimeVocabulary).toContain('Description As Trigger Contract');
         if (runtimeCommandPath) {
           const runtimeCommand = readAbsolute(runtimeCommandPath);
           expect(runtimeCommand).toContain('Write, revise, migrate, or remediate spec-first source skills');
-          expect(runtimeCommand).toContain('写 skill 的公开 workflow');
+          expect(runtimeCommand).toContain('明确、值得复用的 skill authoring 目标');
         }
       }
     } finally {

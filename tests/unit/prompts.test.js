@@ -231,6 +231,15 @@ describe('prompt primitives', () => {
     await expect(typedResult).resolves.toBe('leo');
   });
 
+  test('textInput ignores non-text escape sequence tokens', async () => {
+    const { input, output } = createPromptStreams();
+    const result = textInput('Name?', { input, output });
+
+    input.write('\x1b[A\x1b[Hleo\r');
+
+    await expect(result).resolves.toBe('leo');
+  });
+
   test('confirm handles default, yes, and no values', async () => {
     const first = createPromptStreams();
     const defaultResult = confirm('Apply?', { input: first.input, output: first.output, default: true });
