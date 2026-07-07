@@ -2,6 +2,15 @@
 
 本 reference 是 `spec-write-skill` 与 `spec-skill-audit` 共享的 skill 质量词表，用于判断触发、信息层级、执行牵引和剪枝。`writing-great-skills` 只作为来源背景；不要复刻其原文、平台假设或 invocation 机制。
 
+## Contents
+
+- Predictability
+- Invocation
+- Information Hierarchy
+- Steering
+- Pruning
+- Spec-First Closeout Checklist
+
 ## Predictability
 
 **Predictability** 指 agent 每次都走相同类型的过程，而不是产出完全相同的文字。好 skill 会把随机推理约束到稳定流程：何时触发、读什么、写什么、何时完成、何时交给别的 workflow。

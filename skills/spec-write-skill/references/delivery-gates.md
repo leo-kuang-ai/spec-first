@@ -92,8 +92,10 @@ fresh-source eval 与 forward-testing 一样只提供语义证据。修改 skill
 
 交付时说明：
 
-- mode 和 quality tier
-- changed source files
-- deterministic checks actually run
-- semantic limits / residual risks
-- generated runtime mirrors 是否未刷新，以及是否需要用户后续运行 `spec-first init`
+- `mode` 和 `quality_tier`
+- `changed_surfaces`：source files、references、evals、tests、docs/catalog/governance
+- `deterministic_checks`：实际运行的命令，不写未运行命令
+- `eval_adequacy`：`L0 none`、`L1 structural`、`L2 semantic sample`、`L3 before/after` 或 `L4 production evidence`
+- `boundary_result`：source/runtime、mutation、handoff、verification 和 generated mirror 状态
+- `not_checked_with_reason`：未跑 validator、fresh-source eval、package smoke 或 runtime sync 时逐项说明
+- `residual_risks` 和必要下一步

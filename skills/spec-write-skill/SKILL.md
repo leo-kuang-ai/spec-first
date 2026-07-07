@@ -70,6 +70,8 @@ Overrides: none
 
 ## References
 
-- [Authoring Method](references/authoring-method.md) — 资格判断、意图澄清、reference 扫描、authoring discipline 与反模式族；进入步 1-4、8 前读取。
-- [Skill Quality Vocabulary](references/skill-quality-vocabulary.md) — 信息层级、触发/边界/steering/pruning 词表与失败模式定义；新建/改写和设计信息层级（步 4-8）时读取，是资源放置映射的概念 SSOT。
-- [Delivery Gates](references/delivery-gates.md) — quality tier、资源边界准入、gate selection 与验证证据；定 tier 和跑验证（步 6、10）时读取。
+STOP Reference Trigger Map:
+
+- Before steps 1-4 or sentence-level pruning in step 8, read [Authoring Method](references/authoring-method.md) to decide qualification, intent dialogue, reference scan, authoring discipline, Evidence Matrix readiness, and anti-pattern coverage; if unread, do not create or rewrite source yet.
+- Before new/rewrite work, trigger description changes, information hierarchy design, or branch/resource placement in steps 4-8, read [Skill Quality Vocabulary](references/skill-quality-vocabulary.md); it is the conceptual SSOT for resource placement, trigger/boundary wording, steering, and pruning. If unread, keep must-have rules in `SKILL.md` instead of hiding them in references.
+- Before selecting quality tier, adding resources/evals/scripts, running validation, or closing out in steps 6 and 10-11, read [Delivery Gates](references/delivery-gates.md); if unread, use scaffold-level checks only and record `not_checked_with_reason`.

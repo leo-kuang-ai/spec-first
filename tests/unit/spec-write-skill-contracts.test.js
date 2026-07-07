@@ -44,6 +44,10 @@ describe('spec-write-skill contract', () => {
     expect(skill).toContain('[Authoring Method](references/authoring-method.md)');
     expect(skill).toContain('[Skill Quality Vocabulary](references/skill-quality-vocabulary.md)');
     expect(skill).toContain('[Delivery Gates](references/delivery-gates.md)');
+    expect(skill).toContain('STOP Reference Trigger Map');
+    expect(skill).toContain('if unread, do not create or rewrite source yet');
+    expect(skill).toContain('conceptual SSOT for resource placement');
+    expect(skill).toContain('record `not_checked_with_reason`');
     expect(skill).toContain('描述是 trigger contract');
     expect(skill).toContain('先列真实 branch');
     expect(skill).toContain('context pointer 的读取条件');
@@ -78,6 +82,8 @@ describe('spec-write-skill contract', () => {
 
     for (const snippet of [
       'Qualification',
+      'Evidence Matrix Readiness',
+      '`implementation_permission: ready`',
       'do-not-create-skill',
       'Intent Dialogue',
       'Reference Scan',
@@ -110,9 +116,13 @@ describe('spec-write-skill contract', () => {
       'Output Eval Boundary',
       'Forward Testing Boundary',
       'not_checked_with_reason',
+      'eval_adequacy',
+      'boundary_result',
     ]) {
       expect(deliveryGates).toContain(snippet);
     }
+    expect(authoringMethod).toContain('## Contents');
+    expect(vocabulary).toContain('## Contents');
   });
 
   test('declares trigger and boundary eval coverage for maintainer validation', () => {
