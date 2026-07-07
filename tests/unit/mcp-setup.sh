@@ -130,6 +130,9 @@ assert "setup plan renderer discloses CodeGraph full reindex repair" grep -q -- 
 if grep -q '.spec-first/workspace/providers/graphify/graphify-out' "$SCRIPTS_DIR/install-helpers.sh"; then
   fail "install-helpers must not use old .spec-first Graphify artifact root"
 fi
+if grep -q '.spec-first/workspace/providers/graphify/.graphify' "$SCRIPTS_DIR/install-helpers.sh"; then
+  fail "install-helpers must not place provider-native Graphify state under .spec-first workspace"
+fi
 if grep -q 'uvx --from graphifyy==' "$SCRIPTS_DIR/install-helpers.sh"; then
   fail "install-helpers must not create workspace-local uvx wrapper for Graphify"
 fi

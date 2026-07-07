@@ -1040,7 +1040,7 @@ if [ -n "$ONLY_FILTER" ] && selection_contains "graphify"; then
     SPEC_FIRST_PROVIDER_GRAPHIFY_CONSENT=approved \
     SPEC_FIRST_PROVIDER_HOST="$HOST" \
     SPEC_FIRST_PROVIDER_REPO_ROOT="$REPO_ROOT" \
-    SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_ROOT="graphify-out" \
+    SPEC_FIRST_PROVIDER_GRAPHIFY_ARTIFACT_ROOT=".graphify" \
     bash "$SCRIPT_DIR/install-helpers.sh" "${helper_args[@]}"
   )"
   helper_status=$?

@@ -1,7 +1,7 @@
 # spec-mcp-setup 执行逻辑与产物分析
 
 > 日期：2026-06-04
-> 状态：snapshot（v1.11/v1.12 Dependency Readiness Baseline 实现后）
+> 状态：snapshot（v1.13.1 复核补充）
 > 范围：`skills/spec-mcp-setup/**` + `src/cli/helpers/setup-facts.js` + `src/cli/commands/doctor.js` 消费侧
 > 证据：基于实测脚本调用链与产物写入点，非凭文档推断；命令名以当前 source 为准（入口 canonical=`spec-runtime-setup`，运行名仍 `spec-mcp-setup`，目录未重命名）
 
@@ -213,3 +213,186 @@ degraded/skipped/provider missing/stale   → warn         (optional-capability-
 setup **做**：验证 Node/npm/npx 与 required helper；warmup package-backed MCP；写 host MCP config（managed/user target）；写 project-local setup facts；把父 workspace target 歧义与 foreign residual 标为 advisory facts。
 
 setup **不做**：跑代码索引/watcher/默认 hook/长驻 daemon；把 setup facts 当语义代码证据；手改 generated runtime mirror；在 direct source evidence 足够时阻塞 ordinary plan/work/review/debug。
+
+---
+
+## 9. 2026-07-07 复核补充
+
+这次复核主要补三件事：
+
+1. `graphify` 的专用路径是受控 provider 路由，不是主安装循环里的普通 MCP 工具。
+2. `codegraph` 的修复链路是 bounded 的 `init -> status -> sync -> index -f`，并且只在状态指示需要时触发。
+3. `verify-tools -> write-setup-facts` 是事实落盘链路，不承担安装或语义判断。
+
+### 9.1 Graphify 专用路径图
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│                           入口分流                                 │
+│  bare spec-mcp-setup / --only graphify / --refresh / 有 graphify  │
+└──────────────────────────────┬─────────────────────────────────────┘
+                               │
+                               ▼
+                    ┌────────────────────────┐
+                    │ install-mcp.sh/ps1     │
+                    │ 识别 selection          │
+                    └───────────┬────────────┘
+                                │
+                 ┌──────────────┴──────────────┐
+                 │                             │
+                 ▼                             ▼
+       ┌───────────────────┐        ┌──────────────────────┐
+       │ 默认 MCP/Helper    │        │ graphify 专用路由    │
+       │ 主循环             │        │ （only graphify）    │
+       └───────────────────┘        └───────────┬──────────┘
+                                                  │
+                                                  ▼
+                                   ┌──────────────────────────────┐
+                                   │ install-helpers.*            │
+                                   │ SPEC_FIRST_PROVIDER_GRAPHIFY │
+                                   │ CONSENT=approved             │
+                                   └───────────┬──────────────────┘
+                                               │
+                         ┌─────────────────────┼─────────────────────┐
+                         │                     │                     │
+                         ▼                     ▼                     ▼
+             ┌───────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+             │ first generation  │  │ refresh / update │  │ hook install     │
+             │ graphify extract . │  │ graphify update . │  │ graphify hook... │
+             └─────────┬─────────┘  └─────────┬────────┘  └─────────┬────────┘
+                       │                      │                     │
+                       └──────────────┬───────┴──────────────┬──────┘
+                                      ▼                      ▼
+                        ┌────────────────────────┐  ┌────────────────────────┐
+                        │ graphify-out/graph.json│  │ .git/hooks / 项目镜像   │
+                        │ + GRAPH_REPORT.md      │  │ + 说明性 next action   │
+                        └────────────────────────┘  └────────────────────────┘
+```
+
+### 9.2 CodeGraph 修复图
+
+```text
+┌──────────────────────────────┐
+│ install-mcp 主循环选择 codegraph │
+└──────────────┬───────────────┘
+               │
+               ▼
+     ┌──────────────────────────┐
+     │ npm global install/verify │
+     │ pinned @colbymchenry/...  │
+     └────────────┬─────────────┘
+                  │
+                  ▼
+         ┌───────────────────┐
+         │ configure-host.*  │
+         │ host MCP write    │
+         └─────────┬─────────┘
+                   │
+                   ▼
+          ┌──────────────────┐
+          │ codegraph init   │
+          │ .codegraph/db    │
+          └─────────┬────────┘
+                    │
+                    ▼
+          ┌──────────────────┐
+          │ codegraph status │
+          └─────────┬────────┘
+                    │
+          ┌─────────┴────────────────────────────┐
+          │                                      │
+          ▼                                      ▼
+  ┌─────────────────────┐              ┌────────────────────────┐
+  │ clean / ready       │              │ Pending Changes        │
+  │ 直接记 ready        │              │ or index -f advisory   │
+  └─────────────────────┘              └──────────┬─────────────┘
+                                                 │
+                                                 ▼
+                                        ┌─────────────────────┐
+                                        │ codegraph sync      │
+                                        └──────────┬──────────┘
+                                                   │
+                                                   ▼
+                                          ┌──────────────────┐
+                                          │ status re-check  │
+                                          └──────────┬───────┘
+                                                     │
+                      ┌──────────────────────────────┴──────────────────────────────┐
+                      │                                                             │
+                      ▼                                                             ▼
+           ┌─────────────────────┐                                      ┌──────────────────────┐
+           │ ready / synced      │                                      │ 仍要求 index -f      │
+           │ 结束并写 ready      │                                      │ 仅一次 bounded repair│
+           └─────────────────────┘                                      └──────────┬───────────┘
+                                                                                │
+                                                                                ▼
+                                                                      ┌──────────────────────┐
+                                                                      │ codegraph index -f   │
+                                                                      └──────────┬───────────┘
+                                                                                 │
+                                                                                 ▼
+                                                                       ┌─────────────────────┐
+                                                                       │ status 再检查      │
+                                                                       │ 失败则 degraded     │
+                                                                       └─────────────────────┘
+```
+
+### 9.3 verify-tools -> write-setup-facts 事实落盘图
+
+```text
+┌──────────────────────────────────────────────┐
+│ verify-tools.sh / verify-tools.ps1          │
+│ 总编排器：只负责验证与事实聚合               │
+└──────────────┬───────────────────────────────┘
+               │
+               ▼
+    ┌──────────────────────────────┐
+    │ detect-host / target resolve  │
+    │ install-helpers --verify-only │
+    │ scan-configured-deps          │
+    └──────────────┬───────────────┘
+                   │
+                   ▼
+       ┌──────────────────────────┐
+       │ 组装 readiness ledger    │
+       │ tool / helper / provider │
+       └──────────────┬───────────┘
+                      │
+                      ▼
+         ┌─────────────────────────────┐
+         │ write-setup-facts.sh/.ps1    │
+         │ 读取当前 facts 输入          │
+         └──────────────┬──────────────┘
+                        │
+         ┌──────────────┼──────────────────────────┐
+         │              │                          │
+         ▼              ▼                          ▼
+ ┌────────────────┐ ┌────────────────────┐ ┌──────────────────────┐
+ │ tool-facts.json │ │ runtime-capabilities│ │ workspace summary    │
+ │ tools/helper/   │ │ direct_evidence +   │ │ (可选，多仓汇总)     │
+ │ items/provider  │ │ generated_runtime   │ └──────────────────────┘
+ └────────────────┘ │ manifest health     │
+                    └────────────────────┘
+```
+
+### 9.4 复核结论
+
+- `graphify` 是 setup 内的受控 provider 路径，只在显式选择或 bare provider pack 场景中进入，不应被误读为通用 MCP 安装项。
+- `codegraph` 的修复策略是“先试状态，再做一次同步，再做一次 full reindex”，每一步都保留失败即 action-required / degraded 的退路。
+- `verify-tools` 和 `write-setup-facts` 共同构成事实闭环：前者负责检查与汇总，后者负责把 facts 落到 repo-local 的 gitignored 产物中。
+
+### 9.5 Step1 Host 写入目标表
+
+| Host | Step1 识别方式 | 默认写入目标 | 备选写入目标 | 配置格式 | `--user-scope` 作用 |
+| --- | --- | --- | --- | --- | --- |
+| `claude` | `MCP_SETUP_HOST=claude`、Claude env、单独 `claude` CLI | managed | user | JSON | 无额外切换开关，脚本层仍会尊重显式 path override |
+| `codex` | `MCP_SETUP_HOST=codex`、Codex env、单独 `codex` CLI | user | system | TOML | 不适用，Codex 走用户/系统两层目标，不走 `--user-scope` |
+| `kiro` | `MCP_SETUP_HOST=kiro`、显式 host pin | workspace | user | JSON | 将 Kiro user-level MCP config 从“不可默认写”提升为显式 opt-in |
+| `qoder` | `MCP_SETUP_HOST=qoder`、显式 host pin | local | user | JSON | 同上，只有显式 opt-in 才允许写 user-level |
+| `cursor` | `MCP_SETUP_HOST=cursor`、Cursor env、`agent` CLI | project | user | JSON | 同上，只有显式 opt-in 才允许写 user-level |
+
+说明：
+
+- Step1 的“识别 host”不等于“最终写入目标”，后者还会经过 `detect-host.*` 和 `host_config` 目标选择。
+- `claude` / `codex` 的目标优先级与 `kiro` / `qoder` / `cursor` 不同，但都满足“显式 host pin 优先，自动识别只做辅助”的原则。
+- `kiro` / `qoder` / `cursor` 的 user-level 写入都必须有显式 `--user-scope` 或对应环境变量授权。

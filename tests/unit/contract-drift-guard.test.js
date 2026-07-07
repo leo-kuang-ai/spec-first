@@ -34,6 +34,7 @@ const EXCLUDED_PREFIXES = [
   '.agents/skills/',
   '.spec-first/audits/',
   'node_modules/',
+  '.graphify/',
   'graphify-out/',
 ];
 const TEXT_EXTENSIONS = new Set([
@@ -539,9 +540,11 @@ describe('contract-drift-guard harness declaration probes', () => {
     const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'contract-drift-guard-'));
     fs.mkdirSync(path.join(tempRoot, 'source'), { recursive: true });
     fs.mkdirSync(path.join(tempRoot, '.agents', 'skills', 'fake'), { recursive: true });
+    fs.mkdirSync(path.join(tempRoot, '.graphify'), { recursive: true });
     fs.mkdirSync(path.join(tempRoot, 'graphify-out'), { recursive: true });
     fs.writeFileSync(path.join(tempRoot, 'source', 'contract.md'), 'real-source-anchor');
     fs.writeFileSync(path.join(tempRoot, '.agents', 'skills', 'fake', 'SKILL.md'), 'mirror-only-anchor');
+    fs.writeFileSync(path.join(tempRoot, '.graphify', 'graph.md'), 'mirror-only-anchor');
     fs.writeFileSync(path.join(tempRoot, 'graphify-out', 'graph.md'), 'mirror-only-anchor');
 
     expect(executeProbe({
@@ -552,7 +555,7 @@ describe('contract-drift-guard harness declaration probes', () => {
     expect(executeProbe({
       layer: 'Context Harness',
       term: 'excluded',
-      probe: { type: 'content', paths: ['.agents/skills', 'graphify-out'], pattern: 'mirror-only-anchor' },
+      probe: { type: 'content', paths: ['.agents/skills', '.graphify', 'graphify-out'], pattern: 'mirror-only-anchor' },
     }, { root: tempRoot }).errors).toEqual(expect.arrayContaining([
       expect.objectContaining({ reason: 'content_probe_missed' }),
     ]));

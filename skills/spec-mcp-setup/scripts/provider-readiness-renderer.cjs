@@ -354,6 +354,20 @@ function existingArtifactRefs(repoDir, artifactPaths = []) {
   ));
 }
 
+function graphifyCurrentArtifactPaths(provider) {
+  const artifactRoot = provider
+    && provider.first_generation
+    && typeof provider.first_generation.artifact_root === 'string'
+    && provider.first_generation.artifact_root.length > 0
+    ? provider.first_generation.artifact_root
+    : '.graphify';
+  return [`${artifactRoot}/graph.json`, `${artifactRoot}/GRAPH_REPORT.md`];
+}
+
+function graphifyLegacyArtifactPaths() {
+  return ['graphify-out/graph.json', 'graphify-out/GRAPH_REPORT.md'];
+}
+
 function stringList(value) {
   return Array.isArray(value) ? value.filter((item) => typeof item === 'string' && item.length > 0) : [];
 }
@@ -499,8 +513,12 @@ function helperProviderEntries(registry, repoDir) {
         }
       }
       const artifactPaths = provider.detection && provider.detection.artifact_paths;
-      const artifact = artifactExists(repoDir, artifactPaths);
-      const artifactRefs = existingArtifactRefs(repoDir, artifactPaths);
+      const currentArtifactPaths = provider.id === 'graphify' ? graphifyCurrentArtifactPaths(provider) : artifactPaths;
+      const legacyArtifactPaths = provider.id === 'graphify' ? graphifyLegacyArtifactPaths() : [];
+      const artifact = artifactExists(repoDir, currentArtifactPaths);
+      const legacyArtifact = !artifact && artifactExists(repoDir, legacyArtifactPaths);
+      const artifactRefs = existingArtifactRefs(repoDir, currentArtifactPaths);
+      const legacyArtifactRefs = existingArtifactRefs(repoDir, legacyArtifactPaths);
       const currentHost = currentProviderHost();
       const configured = projectSkillConfigured(repoDir, provider.id, currentHost);
       const queryVerified = envFlag(`SPEC_FIRST_PROVIDER_${provider.id.toUpperCase().replace(/[^A-Z0-9]/g, '_')}_QUERY_VERIFIED`);
@@ -531,7 +549,10 @@ function helperProviderEntries(registry, repoDir) {
         nextActions.push(`Graphify CLI version does not match pinned ${expectedPackageSpec}; rerun \`${setupWorkflowCommand(currentHost, '--only graphify')}\` to reinstall the pinned provider version.`);
       }
       if (installed && !artifact) {
-        nextActions.push('Generate project-root graphify-out/ with graphify extract or graphify update . before using this provider as architecture navigation.');
+        nextActions.push('Generate provider-native project-root .graphify/ with graphify extract or graphify update . before using this provider as architecture navigation.');
+      }
+      if (installed && legacyArtifact && provider.id === 'graphify') {
+        nextActions.push(`Legacy Graphify artifact detected at ${legacyArtifactRefs.join(', ')}; rerun ${setupWorkflowCommand(currentHost, '--only graphify --refresh')} to regenerate provider-native .graphify/.`);
       }
       if (installed && artifact && provider.id === 'graphify' && !queryVerified) {
         nextActions.push(`Graphify query probe has not confirmed CLI/artifact usability; rerun ${setupWorkflowCommand(currentHost, '--only graphify')} when project-graph navigation would help. For code navigation prefer \`graphify explain\`/\`path\`; \`query\` is unscored BFS and weak orientation only. Otherwise continue with bounded direct evidence.`);
@@ -548,7 +569,7 @@ function helperProviderEntries(registry, repoDir) {
         readinessStatus = 'degraded';
       }
       if (provider.id === 'graphify' && firstGenerationOverrides.firstGenerationNextAction === 'graphify-refresh-recommended') {
-        nextActions.push(`Graphify install state is verified for the existing artifact; incrementally refresh graphify-out with \`${setupWorkflowCommand(currentHost, '--only graphify --refresh')}\` when you want to update the graph (runs \`graphify update .\`, no full semantic extraction).`);
+        nextActions.push(`Graphify install state is verified for the existing artifact; incrementally refresh .graphify with \`${setupWorkflowCommand(currentHost, '--only graphify --refresh')}\` when you want to update the graph (runs \`graphify update .\`, no full semantic extraction).`);
       }
       return providerEntry(provider, {
         installed,

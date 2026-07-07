@@ -55,6 +55,45 @@ describe('prompt primitives', () => {
     expect(readOutput()).toContain('\x1b[4A\r\x1b[J');
   });
 
+  test('select supports Windows and alternate arrow key sequences', async () => {
+    const first = createPromptStreams();
+    const explicitResult = select('Workspace?', ['Parent', 'All repos'], {
+      input: first.input,
+      output: first.output,
+      requireExplicit: true,
+    });
+
+    first.input.write('\x1b[0B');
+    first.input.write('\r');
+
+    await expect(explicitResult).resolves.toBe('Parent');
+
+    const second = createPromptStreams();
+    const alternateResult = select('Workspace?', ['Parent', 'All repos'], {
+      input: second.input,
+      output: second.output,
+      requireExplicit: true,
+    });
+
+    second.input.write('\x1bOB');
+    second.input.write('\x1bOA');
+    second.input.write('\r');
+
+    await expect(alternateResult).resolves.toBe('All repos');
+
+    const third = createPromptStreams();
+    const legacyResult = select('Workspace?', ['Parent', 'All repos'], {
+      input: third.input,
+      output: third.output,
+      requireExplicit: true,
+    });
+
+    third.input.write('\x00P');
+    third.input.write('\r');
+
+    await expect(legacyResult).resolves.toBe('Parent');
+  });
+
   test('select clamps an invalid default index', async () => {
     const { input, output } = createPromptStreams();
     const result = select('Platform?', ['A', 'B'], { input, output, defaultIndex: 99 });
@@ -192,6 +231,15 @@ describe('prompt primitives', () => {
     await expect(typedResult).resolves.toBe('leo');
   });
 
+  test('textInput ignores non-text escape sequence tokens', async () => {
+    const { input, output } = createPromptStreams();
+    const result = textInput('Name?', { input, output });
+
+    input.write('\x1b[A\x1b[Hleo\r');
+
+    await expect(result).resolves.toBe('leo');
+  });
+
   test('confirm handles default, yes, and no values', async () => {
     const first = createPromptStreams();
     const defaultResult = confirm('Apply?', { input: first.input, output: first.output, default: true });
@@ -207,6 +255,23 @@ describe('prompt primitives', () => {
     const yesResult = confirm('Apply?', { input: third.input, output: third.output, default: false });
     third.input.write('y');
     await expect(yesResult).resolves.toBe(true);
+  });
+
+  test('confirm treats Windows and VT enter key sequences as enter', async () => {
+    const first = createPromptStreams();
+    const csiTildeResult = confirm('Apply?', { input: first.input, output: first.output, default: true });
+    first.input.write('\x1b[13~');
+    await expect(csiTildeResult).resolves.toBe(true);
+
+    const second = createPromptStreams();
+    const csiUResult = confirm('Apply?', { input: second.input, output: second.output, default: true });
+    second.input.write('\x1b[13;0u');
+    await expect(csiUResult).resolves.toBe(true);
+
+    const third = createPromptStreams();
+    const ss3Result = confirm('Apply?', { input: third.input, output: third.output, default: true });
+    third.input.write('\x1bOM');
+    await expect(ss3Result).resolves.toBe(true);
   });
 
   test('Ctrl+C cancels and restores raw mode', async () => {

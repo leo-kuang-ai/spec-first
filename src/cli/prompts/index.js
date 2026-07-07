@@ -117,6 +117,10 @@ function textInput(question, promptOptions = {}) {
       reject(new PromptCancelled());
       return;
     }
+    if (isEscapeSequenceToken(text)) {
+      redraw();
+      return;
+    }
     for (const char of text) {
       if (char === '\r' || char === '\n') {
         const finalValue = value.length > 0 ? value : defaultValue;
@@ -348,17 +352,71 @@ function containsCancel(text) {
   return text.includes('\x03') || text === '\x1b';
 }
 
+function isEscapeSequenceToken(text) {
+  return typeof text === 'string' && text.length > 1 && text.startsWith('\x1b');
+}
+
 function tokenizeInput(text) {
   const tokens = [];
   for (let index = 0; index < text.length; index += 1) {
-    if (text.startsWith('\x1b[A', index) || text.startsWith('\x1b[B', index)) {
-      tokens.push(text.slice(index, index + 3));
-      index += 2;
+    const specialToken = readSpecialKeyToken(text, index);
+    if (specialToken) {
+      tokens.push(specialToken.token);
+      index += specialToken.length - 1;
       continue;
     }
     tokens.push(text[index]);
   }
   return tokens;
+}
+
+function readSpecialKeyToken(text, index) {
+  const char = text[index];
+  if (char === '\x00' || char === '\xe0') {
+    const legacyDirection = text[index + 1];
+    if (legacyDirection === 'H') return { token: '\x1b[A', length: 2 };
+    if (legacyDirection === 'P') return { token: '\x1b[B', length: 2 };
+    return null;
+  }
+
+  if (char !== '\x1b') {
+    return null;
+  }
+
+  const ss3Direction = text[index + 2];
+  if (text[index + 1] === 'O') {
+    if (ss3Direction === 'A' || ss3Direction === 'B') {
+      return { token: `\x1b[${ss3Direction}`, length: 3 };
+    }
+    if (ss3Direction === 'M') {
+      return { token: '\r', length: 3 };
+    }
+    return text.length > index + 2 ? { token: text.slice(index, index + 3), length: 3 } : null;
+  }
+
+  if (text[index + 1] !== '[') {
+    return text.length > index + 1 ? { token: text.slice(index, index + 2), length: 2 } : null;
+  }
+
+  for (let cursor = index + 2; cursor < text.length; cursor += 1) {
+    const cursorChar = text[cursor];
+    if (cursorChar === 'A' || cursorChar === 'B') {
+      return { token: `\x1b[${cursorChar}`, length: cursor - index + 1 };
+    }
+    if (cursorChar === '~' || cursorChar === 'u') {
+      const params = text.slice(index + 2, cursor).split(';');
+      const token = params[0] === '13' ? '\r' : text.slice(index, cursor + 1);
+      return { token, length: cursor - index + 1 };
+    }
+    if (/^[A-Za-z]$/.test(cursorChar)) {
+      return { token: text.slice(index, cursor + 1), length: cursor - index + 1 };
+    }
+    if (!/^[0-9;?]$/.test(cursorChar)) {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 function write(output, contents) {

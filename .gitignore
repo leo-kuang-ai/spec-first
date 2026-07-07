@@ -94,6 +94,7 @@ __pycache__/
 
 # optional provider local artifacts
 .codegraph/
+.graphify/
 graphify-out/
 # spec-first:end
 

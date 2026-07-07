@@ -1,6 +1,15 @@
 # Skill Quality Vocabulary
 
-本文件把 `writing-great-skills` 的思想改写成 spec-first 可执行的 skill 写作词表，供 `spec-write-skill` 和 `spec-skill-audit` 共享语义。目标不是复刻原文，也不是引入完整 SkillOps 平台，而是提升 skill 在不同 agent run 中的过程可预测性。
+本 reference 是 `spec-write-skill` 与 `spec-skill-audit` 共享的 skill 质量词表，用于判断触发、信息层级、执行牵引和剪枝。`writing-great-skills` 只作为来源背景；不要复刻其原文、平台假设或 invocation 机制。
+
+## Contents
+
+- Predictability
+- Invocation
+- Information Hierarchy
+- Steering
+- Pruning
+- Spec-First Closeout Checklist
 
 ## Predictability
 
@@ -38,6 +47,8 @@ frontmatter `description` 是触发合同，不是简介。它应该说明：
 `boundary takeover` 是 skill 接管上游需求、下游实现、公开 workflow 或别的 owner 边界。修复方式是把 entry surface、near-neighbor route、handoff 条件写进 trigger 和 workflow，而不是在正文里泛泛提醒“不要越界”。
 
 ## Information Hierarchy
+
+本节是 spec-first 资源放置映射的概念 SSOT；`spec-write-skill` 的 SKILL.md 步骤和 delivery-gates 的 Resource Boundary 指向这里，不重复完整映射。
 
 把内容按 agent 需要的即时性放置：
 
