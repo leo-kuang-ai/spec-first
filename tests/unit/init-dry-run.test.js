@@ -319,7 +319,7 @@ describe('init --dry-run', () => {
             { kind: 'ensure_dir', path: '.agents/skills' },
             { kind: 'ensure_dir', path: '.agents/skills/spec-work' },
             { kind: 'write_file', path: '.agents/skills/spec-work/SKILL.md' },
-            { kind: 'write_file', path: '.codex/agents/spec-reviewer.agent.md' },
+            { kind: 'write_file', path: '.agents/skills/spec-work/references/agents/reviewer.md' },
           ],
         },
         showPathSamples: false,
@@ -396,7 +396,8 @@ describe('init --dry-run', () => {
       expect(result.stdout).toContain('Would write/update');
       expect(result.stdout).toContain('.claude/commands/spec-work.md');
       expect(result.stdout).toContain('.claude/spec-first/workflows/spec-mcp-setup/scripts/check-health');
-      expect(result.stdout).toContain('.claude/agents/spec-security-reviewer.agent.md');
+      expect(result.stdout).not.toContain('.claude/agents/spec-security-reviewer.agent.md');
+      expect(result.stdout).toContain('.claude/spec-first/workflows/spec-code-review/references/personas/security-reviewer.md');
       expect(result.stdout).toContain('CLAUDE.md');
       expect(result.stdout).toContain('.gitignore');
       expect(result.stdout).toContain('.claude/hooks/session-start');
@@ -423,7 +424,7 @@ describe('init --dry-run', () => {
 
       for (const relativePath of [
         '.claude/commands/spec-work.md',
-        '.claude/agents/spec-security-reviewer.agent.md',
+        '.claude/spec-first/workflows/spec-code-review/references/personas/security-reviewer.md',
         '.claude/hooks/session-start',
         '.claude/hooks/spec-plan-guard',
         '.claude/hooks/prd-prewrite-guard',
@@ -666,7 +667,8 @@ describe('init --dry-run', () => {
       expect(codexPlanSkill).toContain('.agents/skills/spec-plan/references/planning-flow.md');
       expect(codexPlanSkill).toContain('does not by itself authorize `spawn_agent`');
       expect(codexPlanSkill).toContain('applying it inline as an explicit fallback');
-      expect(codexPlanningFlow).toContain('`.codex/agents/spec-repo-research-analyst.agent.md`');
+      expect(codexPlanningFlow).toContain('references/agents/repo-research-analyst.md');
+      expect(codexPlanningFlow).not.toContain('`.codex/agents/spec-repo-research-analyst.agent.md`');
       expect(codexPlanningFlow).not.toContain('Read `.codex/agents/spec-repo-research-analyst.agent.md` and apply that agent profile to');
       expect(codexEvalExamples.source_refs).toContain('skills/spec-plan/references/planning-flow.md');
       expect(codexEvalExamples.source_refs.join('\n')).not.toContain('.agents/skills/spec-plan/');

@@ -17,16 +17,16 @@ describe('best-practices-researcher contracts', () => {
   test('source agent keeps curated skill discovery aligned with current skills and source attribution explicit', () => {
     const agent = read(AGENT_PATH);
 
-    expect(agent).toContain('Documentation → `spec-compound`');
-    expect(agent).toContain('File operations → `spec-worktree`');
-    expect(agent).toContain('current project/workspace skill directories');
-    expect(agent).toContain('Treat `.codex/skills/` and `~/.codex/skills/` as legacy cleanup signals only');
-    expect(agent).not.toContain('project/workspace skill directories in `.claude/skills/**/SKILL.md`, `.codex/skills/**/SKILL.md`');
-    expect(agent).not.toContain('user/home skill directories in `~/.claude/skills/**/SKILL.md`, `~/.codex/skills/**/SKILL.md`');
+    expect(agent).toContain('Before going online, check if curated knowledge already exists in skills');
+    expect(agent).toContain('If the current environment provides an `AGENTS.md` skill inventory');
+    expect(agent).toContain('Documentation → available durable-learning, documentation, or writing guidance');
+    expect(agent).toContain('File operations → available file-operation or worktree guidance');
+    expect(agent).toContain('Context7 MCP');
+    expect(agent).toContain('`ctx7` CLI');
     expect(agent).not.toContain('andrew-kane-gem-writer');
     expect(agent).not.toContain('dspy-ruby');
     expect(agent).not.toContain('every-style-editor');
     expect(agent).not.toContain('rclone');
-    expect(agent).not.toContain('The relevant skill recommends...');
+    expect(agent).not.toContain('ce-best-practices-researcher');
   });
 });

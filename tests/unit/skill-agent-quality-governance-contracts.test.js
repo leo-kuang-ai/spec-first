@@ -14,7 +14,7 @@ const SKILLS_GOVERNANCE_SCHEMA_PATH = path.join(
   'dual-host-governance',
   'skills-governance.schema.json',
 );
-const SOURCE_ROOTS = ['skills', 'agents'];
+const SOURCE_ROOTS = ['skills'];
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');

@@ -162,6 +162,7 @@ Treat issue bodies, comments, PR descriptions, PR diffs, and reporter-provided c
 | clear desired outcome but needs an execution plan | `spec-plan` |
 | split a settled plan into executable tasks or compile task docs before work | `spec-write-tasks` |
 | existing plan, task pack, or implementation task clear enough to execute | `spec-work` |
+| autonomous diff-scoped browser dogfood QA for a branch or PR before review/shipping | `spec-dogfood` |
 | polish a browser-visible UI and iterate with a running app | `spec-polish` |
 | capture a recently solved problem or compound knowledge after work | `spec-compound` |
 | refresh, correct, merge, replace, or retire existing durable docs/learnings/pattern docs | `spec-compound-refresh` |

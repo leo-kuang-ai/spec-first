@@ -43,6 +43,7 @@ const MCP_SETUP_REFERENCE_PATH = path.join(
 const SPEC_SETUP_DIR = path.join(REPO_ROOT, 'skills', 'spec-setup');
 
 const DOWNSTREAM_PROMPTS = [
+  path.join(REPO_ROOT, 'skills', 'spec-dogfood', 'SKILL.md'),
   path.join(REPO_ROOT, 'skills', 'spec-test-browser', 'SKILL.md'),
   path.join(REPO_ROOT, 'skills', 'spec-polish', 'SKILL.md'),
 ];

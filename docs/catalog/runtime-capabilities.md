@@ -1,6 +1,6 @@
 # Runtime Capability Catalog
 
-> 本文件由 `scripts/generate-runtime-capability-catalog.js` 从 `src/cli/plugin.js`、`src/cli/contracts/dual-host-governance/skills-governance.json`、`docs/contracts/workflows/*.schema.json` 和当前 `skills/` / `agents/` source 资产派生生成。
+> 本文件由 `scripts/generate-runtime-capability-catalog.js` 从 `src/cli/plugin.js`、`src/cli/contracts/dual-host-governance/skills-governance.json`、`docs/contracts/workflows/*.schema.json` 和当前 `skills/` source 资产派生生成。
 > 它是只读 catalog，不是第二套 source of truth；修改 runtime 能力时应先改 source/governance，再重新生成本文件。
 
 ## Source Truth
@@ -11,22 +11,22 @@
 | `src/cli/contracts/dual-host-governance/skills-governance.json` | workflow / standalone / internal skill 的 host delivery 治理真相源 |
 | `templates/claude/commands/spec/*.md` | Unified `spec-*` workflow runtime source templates |
 | `skills/*/SKILL.md` | workflow、standalone、agent-facing internal skill source |
-| `agents/**/*.agent.md` | supported-host agent source |
+| `skills/**/references/agents/`, `skills/**/references/personas/` | skill-local prompt assets；不再通过顶层 `agents/` 作为 runtime source |
 | `docs/contracts/workflows/*.schema.json` | docs-side workflow artifact contracts；planned contract 不等于 runtime producer 已实现 |
 
 ## Summary
 
 | 范围 | 当前值 |
 |---|---|
-| Bundled source skills | 33 |
-| Bundled source agents | 47 |
+| Bundled source skills | 34 |
+| Bundled source agents | 0 |
 | Bundled agent support files | 0 |
-| Governance records by entry surface | internal_only: 7, standalone_skill: 9, workflow_command: 17 |
-| Claude runtime delivery | 17 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
-| Qoder runtime delivery | 17 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
+| Governance records by entry surface | internal_only: 7, standalone_skill: 9, workflow_command: 18 |
+| Claude runtime delivery | 18 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 18 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | Beta workflow entries | none |
@@ -56,6 +56,7 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 | compound-refresh | spec-compound-refresh | spec-compound-refresh | no | Refresh stale Spec-First solution docs |
 | debug | spec-debug | spec-debug | no | Run the Spec-First debug workflow |
 | doc-review | spec-doc-review | spec-doc-review | no | Run the Spec-First document review workflow |
+| dogfood | spec-dogfood | spec-dogfood | no | Run autonomous diff-scoped browser dogfood QA for a branch or PR |
 | ideate | spec-ideate | spec-ideate | no | Run the Spec-First ideation workflow |
 | mcp-setup | spec-mcp-setup | spec-mcp-setup | no | Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows |
 | optimize | spec-optimize | spec-optimize | no | Run metric-driven iterative optimization loops |

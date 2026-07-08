@@ -166,7 +166,6 @@ This fails because: no pipe-delimited tables, no severity-grouped `###` headers,
 - **Learnings & Past Solutions section** -- results from spec-learnings-researcher, with links to docs/solutions/ files
 - **Learning Capture Recommendation section** -- include only when the current review produced a new reusable lesson; omit for mechanical, one-off, or formatting-only results
 - **Agent-Native Gaps section** -- results from spec-agent-native-reviewer. Omit if no gaps found.
-- **Schema Drift Check section** -- results from spec-schema-drift-detector. Omit if the agent did not run.
 - **Deployment Notes section** -- key checklist items from spec-deployment-verification-agent. Omit if the agent did not run.
 - **Coverage section** -- direct evidence posture, suppressed count, residual risks, first-class `test_gaps`, failed reviewers, boundary fields, graph fallback/candidate fields, and limitations
 - **Rule Maturity Candidates section** -- optional; include only when confirmed findings or resource advisory meet the noise filter and have durable evidence refs

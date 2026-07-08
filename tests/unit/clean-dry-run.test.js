@@ -269,7 +269,6 @@ describe('clean --dry-run', () => {
       expect(dryRun.stderr).toBe('');
       expect(dryRun.stdout).toContain('Dry run: spec-first clean (kiro)');
       expect(dryRun.stdout).toContain('.kiro/skills/spec-work');
-      expect(dryRun.stdout).toContain('.kiro/agents/spec-security-reviewer.agent.md');
       expect(dryRun.stdout).toContain('.kiro/spec-first/state.json');
       expect(dryRun.stdout).toContain('AGENTS.md');
       expect(dryRun.stdout).not.toContain('.kiro/hooks/user-hook.json');
@@ -322,7 +321,6 @@ describe('clean --dry-run', () => {
       expect(dryRun.stdout).toContain('.qoder/commands/spec-work.md');
       expect(dryRun.stdout).toContain('.qoder/commands/spec');
       expect(dryRun.stdout).toContain('.qoder/skills/spec-work');
-      expect(dryRun.stdout).toContain('.qoder/agents/spec-security-reviewer.agent.md');
       expect(dryRun.stdout).toContain('.qoder/spec-first/state.json');
       expect(dryRun.stdout).toContain('AGENTS.md');
       expect(dryRun.stdout).not.toContain('.qoder/rules/security.md');

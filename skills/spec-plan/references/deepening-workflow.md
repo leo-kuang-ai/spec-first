@@ -136,23 +136,23 @@ Use fully-qualified agent names inside dispatch prompts or agent invocations. Tr
 
 **System-Wide Impact**
 - `spec-architecture-strategist` (`references/agents/architecture-strategist.md`) for cross-boundary effects, interface surfaces, and architectural knock-on impact
-- Add `spec-api-contract-reviewer` (host-provided reviewer) when the plan changes API routes, request/response schemas, exported type signatures, event contracts, or versioning expectations; this is an existing specialist for contract depth, not a new surface-enumeration agent.
+- Add an inline API contract checklist when the plan changes API routes, request/response schemas, exported type signatures, event contracts, or versioning expectations; do not depend on a top-level agent.
 - Add `spec-design-lens-reviewer` (host-provided reviewer) only when the plan includes user-facing client surfaces and needs plan-time coverage of information architecture, interaction states, user flows, responsive/accessibility concerns, or AI-slop risk. It is a design-decision lens for materially user-facing plans, not a default reviewer for every multi-surface plan.
 - Add the specific specialist that matches the risk:
-  - `spec-performance-oracle` (`references/agents/performance-oracle.md`) for scalability, latency, throughput, and resource-risk analysis
-  - `spec-security-sentinel` (`references/agents/security-sentinel.md`) for auth, validation, exploit surfaces, and security boundary review
-  - `spec-data-integrity-guardian` (`references/agents/data-integrity-guardian.md`) for migrations, persistent state safety, consistency, and data lifecycle risks
+  - `references/agents/performance-oracle.md` for scalability, latency, throughput, and resource-risk analysis
+  - `references/agents/security-sentinel.md` for auth, validation, exploit surfaces, and security boundary review
+  - `references/agents/data-integrity-guardian.md` for migrations, persistent state safety, consistency, and data lifecycle risks
 
 **Enterprise trigger-to-specialist mapping**
 - For enterprise high-risk triggers, reuse the trigger-to-specialist mapping in `skills/spec-plan/references/enterprise-plan-review.md` (Specialist Reuse); the canonical mapping lives there, not duplicated here. The pre-existing per-section specialist guidance below still applies to ordinary deepening.
 
 **Risks & Dependencies / Operational Notes**
 - Use the specialist that matches the actual risk:
-  - `spec-security-sentinel` (`references/agents/security-sentinel.md`) for security, auth, privacy, and exploit risk
-  - `spec-data-integrity-guardian` (`references/agents/data-integrity-guardian.md`) for persistent data safety, constraints, and transaction boundaries
-  - `spec-data-migration-expert` (`references/agents/data-migration-reviewer.md`) for migration realism, backfills, and production data transformation risk
-  - `spec-deployment-verification-agent` (`references/agents/deployment-verification-agent.md`) for rollout checklists, rollback planning, and launch verification
-  - `spec-performance-oracle` (`references/agents/performance-oracle.md`) for capacity, latency, and scaling concerns
+  - `references/agents/security-sentinel.md` for security, auth, privacy, and exploit risk
+  - `references/agents/data-integrity-guardian.md` for persistent data safety, constraints, and transaction boundaries
+  - `references/agents/data-migration-reviewer.md` for migration realism, backfills, and production data transformation risk
+  - `references/agents/deployment-verification-agent.md` for rollout checklists, rollback planning, and launch verification
+  - `references/agents/performance-oracle.md` for capacity, latency, and scaling concerns
 
 **Agent Prompt Shape:**
 

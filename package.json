@@ -37,7 +37,6 @@
   "files": [
     "bin/",
     "src/",
-    "agents/",
     "docs/catalog/runtime-capabilities.md",
     "docs/contracts/ai-coding-harness.md",
     "docs/contracts/artifact-summary.md",

@@ -23,6 +23,7 @@ function escapeRegExp(value) {
 
 function collectMarkdownFiles(rootPath) {
   const files = [];
+  if (!fs.existsSync(rootPath)) return files;
 
   function walk(currentPath) {
     for (const entry of fs.readdirSync(currentPath, { withFileTypes: true })) {
@@ -56,9 +57,12 @@ function workflowSkillNames() {
 describe('workflow invocation boundary', () => {
   test('public workflows are not installed agent types', () => {
     const workflows = workflowSkillNames();
-    const agentNames = fs.readdirSync(path.join(REPO_ROOT, 'agents'))
-      .filter((fileName) => fileName.endsWith('.agent.md'))
-      .map((fileName) => fileName.replace(/\.agent\.md$/, ''));
+    const agentRoot = path.join(REPO_ROOT, 'agents');
+    const agentNames = fs.existsSync(agentRoot)
+      ? fs.readdirSync(agentRoot)
+        .filter((fileName) => fileName.endsWith('.agent.md'))
+        .map((fileName) => fileName.replace(/\.agent\.md$/, ''))
+      : [];
 
     for (const workflow of workflows) {
       expect(agentNames).not.toContain(workflow);

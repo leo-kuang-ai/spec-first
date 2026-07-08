@@ -56,7 +56,7 @@ describe('workflow-skill-agent-map coverage', () => {
 
   test('回归锚点:此前漏掉的 workflow 现已收录', () => {
     const mapContent = fs.readFileSync(MAP_PATH, 'utf8');
-    for (const command of ['spec-compound-refresh', 'spec-polish']) {
+    for (const command of ['spec-compound-refresh', 'spec-dogfood', 'spec-polish']) {
       expect(mapContent).toContain(`\`${command}\``);
     }
   });

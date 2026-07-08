@@ -88,7 +88,6 @@ Source-of-truth 路径包括：
 - `CLAUDE.md`
 - `AGENTS.md`
 - `skills/`
-- `agents/`
 - `templates/`
 - `templates/claude/commands/spec/*.md`
 - `src/cli/`
@@ -117,8 +116,7 @@ Generated runtime assets 包括：
 
 - `bin/spec-first.js`：可执行入口
 - `src/cli/`：CLI implementation、commands、adapters、contracts、state、bootstrap logic
-- `skills/`：workflow 与 standalone skill 源码资产
-- `agents/`：agent profile 源码资产
+- `skills/`：workflow、standalone skill 与 skill-local prompt asset 源码资产（例如 `skills/**/references/agents/`、`skills/**/references/personas/`）
 - `templates/`：host runtime templates
 - `docs/`：需求、计划、架构说明、验证报告、角色契约
 - `docs/solutions/`：解决问题后沉淀的可复用工程知识，供后续 plan/work/debug/review/compound 检索
@@ -169,7 +167,7 @@ Generated runtime assets 包括：
 
 Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启动时缓存定义。
 
-- 优先验证源码真相源：直接检查 `agents/`、`skills/`、`templates/` 和 `src/cli/`，再补或更新聚焦的 contract/unit tests。
+- 优先验证源码真相源：直接检查 `skills/`、`templates/` 和 `src/cli/`，再补或更新聚焦的 contract/unit tests。
 - 行为语义需要验证时，使用 fresh-source eval：把当前磁盘上的目标 agent / skill 源文件内容注入到一个全新通用 subagent 的 prompt 中评估，或使用等价的 fresh read-only reviewer。
 - fresh-source eval 的可复用 checklist 见 `docs/contracts/workflows/fresh-source-eval-checklist.md`；如果宿主缺少 dispatch primitive、runtime 无法调用，或用户显式禁用 helper agents，必须记录未执行原因，不能声称通过。
 - 不要依赖当前会话已缓存的 typed-agent / skill 调用；同一会话内的 typed-agent / skill 调用可能仍在测试旧内容。
@@ -185,7 +183,8 @@ Agent / skill prose 变更不同于普通代码，因为宿主可能在会话启
 - `README.zh-CN.md`
 - `docs/`
 - `skills/**/SKILL.md`
-- `agents/**`
+- `skills/**/references/agents/**`
+- `skills/**/references/personas/**`
 - `src/cli/contracts/**`
 - tests
 - generated runtime expectations

@@ -143,17 +143,15 @@ describe('knowledge harness workflow consumers', () => {
     expect(contract).toContain('不得把 summary 当 confirmed source fact');
   });
 
-  test('learnings researcher returns structured recall status and source-confirmation fields', () => {
+  test('learnings researcher returns source-confirmed advisory recall guidance', () => {
     const agent = read('skills/spec-plan/references/agents/learnings-researcher.md');
 
-    expect(agent).toContain('source_refs');
-    expect(agent).toContain('invalidation_condition');
-    expect(agent).toContain('structured recall candidate');
-    expect(agent).toContain('legacy_unstructured_advisory');
-    expect(agent).toContain('- **Recall Status**: [structured recall candidate | legacy_unstructured_advisory]');
-    expect(agent).toContain('- **Invalidation Condition**: [frontmatter `invalidation_condition`, if present]');
-    expect(agent).toContain('- **Source Refs**: [frontmatter `source_refs`, if present; otherwise note "missing — source confirmation required from current task evidence"]');
-    expect(agent).toContain('source confirmation required from current task evidence');
+    expect(agent).toContain('When a learning\'s claim conflicts with what you can observe in the current code or docs');
+    expect(agent).toContain('Research agents can be confidently wrong');
+    expect(agent).toContain('never let a past learning silently override present evidence');
+    expect(agent).toContain('Problem Type');
+    expect(agent).toContain('Relevance');
+    expect(agent).toContain('Key Insight');
   });
 });
 

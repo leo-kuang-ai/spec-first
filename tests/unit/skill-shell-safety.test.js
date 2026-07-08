@@ -5,7 +5,6 @@ const path = require('node:path');
 
 const SOURCE_ROOTS = [
   path.join(__dirname, '..', '..', 'skills'),
-  path.join(__dirname, '..', '..', 'agents'),
 ];
 
 function walkMarkdownFiles(dir) {

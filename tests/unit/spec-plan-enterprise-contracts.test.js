@@ -131,12 +131,10 @@ describe('spec-plan enterprise and reuse contracts', () => {
     const planningFlow = fs.readFileSync(PLANNING_FLOW_PATH, 'utf8');
     const deepening = fs.readFileSync(DEEPENING_PATH, 'utf8');
     const enterprise = fs.readFileSync(ENTERPRISE_PLAN_REVIEW_PATH, 'utf8');
-    const agentDir = path.join(REPO_ROOT, 'agents');
-    const agentNames = new Set(fs.readdirSync(agentDir)
-      .filter((file) => file.endsWith('.agent.md'))
-      .map((file) => fs.readFileSync(path.join(agentDir, file), 'utf8').match(/^name:\s*(.+)$/m))
-      .filter(Boolean)
-      .map((match) => match[1].trim()));
+    const localAgentDir = path.join(REPO_ROOT, 'skills', 'spec-plan', 'references', 'agents');
+    const localAgentFiles = new Set(fs.readdirSync(localAgentDir)
+      .filter((file) => file.endsWith('.md'))
+      .map((file) => `references/agents/${file}`));
 
     expect(skill).toContain('Enterprise / High-Risk Readiness');
     expect(skill).toContain('read `skills/spec-plan/references/enterprise-plan-review.md`');
@@ -179,17 +177,19 @@ describe('spec-plan enterprise and reuse contracts', () => {
       expect(enterprise).toContain(token);
     }
 
+    expect(deepening).toContain('inline API contract checklist');
+    expect(enterprise).toContain('inline API contract checklist');
+
     for (const specialist of [
-      'spec-api-contract-reviewer',
-      'spec-security-sentinel',
-      'spec-data-integrity-guardian',
-      'spec-data-migration-expert',
-      'spec-deployment-verification-agent',
-      'spec-performance-oracle',
+      'references/agents/security-sentinel.md',
+      'references/agents/data-integrity-guardian.md',
+      'references/agents/data-migration-reviewer.md',
+      'references/agents/deployment-verification-agent.md',
+      'references/agents/performance-oracle.md',
     ]) {
       expect(deepening).toContain(`\`${specialist}\``);
       expect(enterprise).toContain(`\`${specialist}\``);
-      expect(agentNames.has(specialist)).toBe(true);
+      expect(localAgentFiles.has(specialist)).toBe(true);
     }
   });
 

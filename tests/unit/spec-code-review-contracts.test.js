@@ -309,11 +309,19 @@ describe('spec-code-review CE sync contracts', () => {
 
   test('maintainability reviewer targets structural simplification without gaining write access', () => {
     const reviewer = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-maintainability-reviewer.agent.md'),
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        'skills',
+        'spec-code-review',
+        'references',
+        'personas',
+        'maintainability-reviewer.md',
+      ),
       'utf8',
     );
 
-    expect(reviewer).toContain('structural quality, complexity deletion');
     expect(reviewer).toContain('catch changes that make the codebase harder to change, delete, or reason about');
     expect(reviewer).toContain('delete complexity');
     expect(reviewer).toContain('Structural simplification (highest priority)');
@@ -335,14 +343,21 @@ describe('spec-code-review CE sync contracts', () => {
     expect(reviewer).toContain('suppress unless severity is P1');
     expect(reviewer).toContain('Philosophy without a concrete structural fix');
     expect(reviewer).toContain('"reviewer": "maintainability"');
-    expect(reviewer).toContain('tools: Read, Grep, Glob, Bash');
-    expect(reviewer).not.toContain('tools: Read, Grep, Glob, Bash, Write');
     expect(reviewer).not.toContain('ce-maintainability');
   });
 
   test('data-migrations reviewer adds verification rubric without absorbing schema drift', () => {
     const reviewer = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-data-migrations-reviewer.agent.md'),
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        'skills',
+        'spec-code-review',
+        'references',
+        'personas',
+        'data-migration-reviewer.md',
+      ),
       'utf8',
     );
     const catalog = fs.readFileSync(
@@ -351,22 +366,19 @@ describe('spec-code-review CE sync contracts', () => {
     );
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
 
-    expect(reviewer).toContain('deploy-window safety, rollback risk, and verification plans');
-    expect(reviewer).toContain('Never trust fixtures as proof of production shape');
+    expect(reviewer).toContain('Schema drift (when `schema.rb` / `structure.sql` is in the diff)');
+    expect(reviewer).toContain('Migration correctness');
+    expect(reviewer).toContain('Verification & rollback');
+    expect(reviewer).toContain('Never trust fixtures');
     expect(reviewer).toContain('Migration safety');
-    expect(reviewer).toContain('Verification and observability');
-    expect(reviewer).toContain('Read-only SQL to prove correctness after deploy');
+    expect(reviewer).toContain('Verification & observability');
+    expect(reviewer).toContain('Read-only SQL to prove correctness post-deploy');
     expect(reviewer).toContain('Rollback or feature-flag guardrails for risky paths');
     expect(reviewer).toContain('Flag missing verification for risky transforms as **P2** `manual`');
-    expect(reviewer).toContain('concrete verification shape in `suggested_fix`');
     expect(reviewer).toContain('verifiable swapped mapping');
     expect(reviewer).toContain('concrete orphaned reference');
-    expect(reviewer).toContain('Schema drift is still owned by `spec-schema-drift-detector`');
-    expect(reviewer).toContain('Do not replace it');
-    expect(reviewer).toContain('"reviewer": "data-migrations"');
-    expect(reviewer).toContain('tools: Read, Grep, Glob, Bash');
-    expect(reviewer).not.toContain('tools: Read, Grep, Glob, Bash, Write');
-    expect(reviewer).not.toContain('"reviewer": "data-migration"');
+    expect(reviewer).toContain('Schema drift concerns when neither `db/schema.rb` nor `db/structure.sql` is in the diff');
+    expect(reviewer).toContain('"reviewer": "data-migration"');
     expect(reviewer).not.toContain('ce-data-migration');
     expect(catalog).toContain('Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, or data transformations -- not model/query-only changes without migration artifacts');
     expect(catalog).toContain('Do not trigger migration-only agents for model/query-only changes without migration artifacts');
@@ -374,8 +386,8 @@ describe('spec-code-review CE sync contracts', () => {
     expect(skill).toContain('Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, or data transformations -- not model/query-only changes without migration artifacts');
     expect(skill).toContain('Do not trigger migration-only agents for model/query-only changes without migration artifacts');
     expect(skill).toContain('Select when diff includes migration artifacts');
-    expect(catalog).toContain('`spec-schema-drift-detector` | host-provided prompt surface | Cross-references schema.rb changes against included migrations to catch unrelated drift');
-    expect(skill).toContain('For spec-schema-drift-detector specifically, pass the resolved review base branch explicitly so it never assumes `main`');
+    expect(catalog).not.toContain('spec-schema-drift-detector');
+    expect(skill).not.toContain('spec-schema-drift-detector');
   });
 
   test('tracker defer references keep the tracker confidence tuple consistent', () => {
@@ -879,37 +891,18 @@ describe('spec-code-review CE sync contracts', () => {
     expect(catalog).toContain('selected core tier');
   });
 
-  test('retains CLI readiness reviewers as a spec-first product boundary', () => {
+  test('does not retain dangling top-level CLI readiness reviewers after agent migration', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
     const catalog = fs.readFileSync(
       path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
       'utf8',
     );
-    const cliAgentReadiness = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-cli-agent-readiness-reviewer.agent.md'),
-      'utf8',
-    );
-    const cliReadiness = fs.readFileSync(
-      path.join(__dirname, '..', '..', 'agents', 'spec-cli-readiness-reviewer.agent.md'),
-      'utf8',
-    );
 
-    expect(skill).toContain('CLI readiness boundary');
-    expect(skill).toContain('Keep `spec-cli-readiness-reviewer` as the conditional reviewer for CLI-facing diffs');
-    expect(skill).toContain('This project is itself a CLI/workflow harness');
-    expect(skill).toContain('not a replacement for the structured JSON persona');
-    expect(skill).not.toContain('U9 divergence note');
-    expect(skill).not.toContain('CE `06a7cee0` removed its CLI readiness reviewers');
-    expect(catalog).toContain('CLI readiness boundary');
-    expect(catalog).toContain('this repository ships a CLI/workflow harness');
-    expect(catalog).not.toContain('CE removed its CLI readiness reviewers');
-    expect(catalog).toContain('These Spec-First conditional agents provide specialized analysis');
-    expect(catalog).not.toContain('CE-native agents');
-    expect(catalog).toContain('| `cli-readiness` | `spec-cli-readiness-reviewer` |');
-    expect(cliReadiness).toContain('"reviewer": "cli-readiness"');
-    expect(cliReadiness).toContain('Return your findings as JSON matching the findings schema');
-    expect(cliAgentReadiness).toContain('source code**, **plans**, and **specs**');
-    expect(cliAgentReadiness).toContain('CLI Agent-Readiness Review');
+    expect(skill).not.toContain('spec-cli-readiness-reviewer');
+    expect(skill).not.toContain('spec-cli-agent-readiness-reviewer');
+    expect(catalog).not.toContain('spec-cli-readiness-reviewer');
+    expect(catalog).not.toContain('spec-cli-agent-readiness-reviewer');
+    expect(catalog).not.toContain('host-provided prompt surface');
   });
 
   test('finding numbers are stable across severity and residual sections', () => {
@@ -991,11 +984,7 @@ describe('spec-code-review CE sync contracts', () => {
       'spec-api-contract-reviewer',
       'spec-correctness-reviewer',
       'spec-data-migrations-reviewer',
-      'spec-dhh-rails-reviewer',
       'spec-julik-frontend-races-reviewer',
-      'spec-kieran-python-reviewer',
-      'spec-kieran-rails-reviewer',
-      'spec-kieran-typescript-reviewer',
       'spec-maintainability-reviewer',
       'spec-performance-reviewer',
       'spec-previous-comments-reviewer',
@@ -1004,22 +993,35 @@ describe('spec-code-review CE sync contracts', () => {
       'spec-swift-ios-reviewer',
       'spec-testing-reviewer',
     ];
+    const personaFiles = new Map([
+      ['spec-adversarial-reviewer', 'adversarial-reviewer.md'],
+      ['spec-api-contract-reviewer', 'api-contract-reviewer.md'],
+      ['spec-correctness-reviewer', 'correctness-reviewer.md'],
+      ['spec-data-migrations-reviewer', 'data-migration-reviewer.md'],
+      ['spec-julik-frontend-races-reviewer', 'julik-frontend-races-reviewer.md'],
+      ['spec-maintainability-reviewer', 'maintainability-reviewer.md'],
+      ['spec-performance-reviewer', 'performance-reviewer.md'],
+      ['spec-previous-comments-reviewer', 'previous-comments-reviewer.md'],
+      ['spec-reliability-reviewer', 'reliability-reviewer.md'],
+      ['spec-security-reviewer', 'security-reviewer.md'],
+      ['spec-swift-ios-reviewer', 'swift-ios-reviewer.md'],
+      ['spec-testing-reviewer', 'testing-reviewer.md'],
+    ]);
 
     for (const reviewer of reviewers) {
       const text = fs.readFileSync(
-        path.join(__dirname, '..', '..', 'agents', `${reviewer}.agent.md`),
+        path.join(
+          __dirname,
+          '..',
+          '..',
+          'skills',
+          'spec-code-review',
+          'references',
+          'personas',
+          personaFiles.get(reviewer),
+        ),
         'utf8',
       );
-      expect(text).toContain('tools: Read, Grep, Glob, Bash');
-      expect(text).not.toContain('tools: Read, Grep, Glob, Bash, Write');
-    }
-
-    for (const reviewer of ['spec-cli-agent-readiness-reviewer', 'spec-cli-readiness-reviewer']) {
-      const text = fs.readFileSync(
-        path.join(__dirname, '..', '..', 'agents', `${reviewer}.agent.md`),
-        'utf8',
-      );
-      expect(text).toContain('tools: Read, Grep, Glob, Bash');
       expect(text).not.toContain('tools: Read, Grep, Glob, Bash, Write');
     }
 
@@ -1084,10 +1086,11 @@ describe('spec-code-review CE sync contracts', () => {
       'testing-reviewer.md',
     ];
 
-    expect(skill).toContain('the prompt body is now skill-local');
-    expect(skill).toContain('Do not dispatch a top-level typed agent when a local prompt asset exists');
-    expect(skill).toContain('For every selected reviewer listed below, read the skill-local prompt asset before dispatch');
-    expect(skill).toContain('If a selected reviewer is not in this table, run it through the existing host-provided reviewer prompt surface');
+    expect(skill).toContain('Reviewer prompt bodies are skill-local');
+    expect(skill).toContain('Do not dispatch a top-level typed agent');
+    expect(skill).not.toContain('host-provided reviewer prompt surface');
+    expect(skill).toContain('reviewer_prompt_missing');
+    expect(catalog).not.toContain('host-provided prompt surface');
     expect(skill).toContain('read `references/cross-model-review.md`');
     expect(skill).toContain('read `references/repo-profile-cache.md`');
     expect(catalog).toContain('Reviewer ids are stable report/artifact labels.');

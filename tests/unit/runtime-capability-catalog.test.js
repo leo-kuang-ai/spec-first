@@ -27,6 +27,8 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('src/cli/plugin.js');
     expect(catalog).toContain('src/cli/contracts/dual-host-governance/skills-governance.json');
     expect(catalog).toContain('docs/contracts/workflows/*.schema.json');
+    expect(catalog).toContain('skill-local prompt assets');
+    expect(catalog).not.toContain('`agents/**/*.agent.md`');
     expect(catalog).toContain(`| Bundled source skills | ${listBundledSkills().length} |`);
     expect(catalog).toContain(`| Bundled source agents | ${listBundledAgents().length} |`);
     expect(catalog).toContain(`| Workflow runtime contracts | ${listWorkflowRuntimeContracts().length} |`);
@@ -48,6 +50,7 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('| `skill_first_loader_confirmed_preview` |');
     expect(catalog).toContain('| `full_host_preview` |');
     expect(catalog).toContain('| work | spec-work | spec-work | no |');
+    expect(catalog).toContain('| dogfood | spec-dogfood | spec-dogfood | no |');
     expect(catalog).not.toContain('spec-work-beta');
     expect(catalog).not.toContain('/spec:work-beta');
     expect(catalog).toContain('| polish | spec-polish | spec-polish | no |');

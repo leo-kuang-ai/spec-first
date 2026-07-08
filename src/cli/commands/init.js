@@ -1122,7 +1122,7 @@ function buildProjectInitPlan({
       code: 'codex_home_hook_write_skipped',
       message: 'This directory\'s .codex is the Codex global hook location (CODEX_HOME). '
         + 'Skipping SessionStart hook install here to avoid double-injecting into every project. '
-        + 'skills/agents/AGENTS.md were still installed. Run init inside an actual project to install the project hook.',
+        + 'skills/AGENTS.md were still installed. Run init inside an actual project to install the project hook.',
     });
   } else if (platform === 'codex') {
     // High-touch existing-pollution bridge (U2b): a normal project init is a frequent action,

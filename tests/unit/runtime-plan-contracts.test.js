@@ -202,8 +202,10 @@ describe('runtime plan contracts', () => {
     expect(combined).toContain('record `dispatch_authorization_missing`');
     expect(combined).toContain('explicit fallback');
     expect(combined).toContain('Plan generation must still complete when research dispatch is unavailable');
-    expect(combined).toContain('`.codex/agents/spec-repo-research-analyst.agent.md`');
-    expect(combined).toContain('`.codex/agents/spec-learnings-researcher.agent.md`');
+    expect(combined).toContain('references/agents/repo-research-analyst.md');
+    expect(combined).toContain('references/agents/learnings-researcher.md');
+    expect(combined).not.toContain('`.codex/agents/spec-repo-research-analyst.agent.md`');
+    expect(combined).not.toContain('`.codex/agents/spec-learnings-researcher.agent.md`');
     expect(combined).not.toContain('including `spawn_agent` where provided');
     expect(combined).not.toContain('Do not downgrade solely because the host is Codex.');
     expect(combined).not.toContain('Read `.codex/agents/spec-repo-research-analyst.agent.md` and apply that agent profile to');

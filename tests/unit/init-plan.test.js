@@ -157,7 +157,7 @@ describe('init plan API', () => {
     }
   });
 
-  test('applyInitPlan writes Kiro skills, agents and state without command, hook or steering runtime', () => {
+  test('applyInitPlan writes Kiro skills and state without command, agent, hook or steering runtime', () => {
     const projectRoot = makeTempDir();
 
     try {
@@ -173,7 +173,16 @@ describe('init plan API', () => {
       expect(fs.existsSync(path.join(projectRoot, 'AGENTS.md'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
-      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.kiro', 'agents'))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.kiro',
+        'skills',
+        'spec-code-review',
+        'references',
+        'personas',
+        'security-reviewer.md',
+      ))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'spec-first', 'state.json'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'commands', 'spec'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.kiro', 'hooks'))).toBe(false);
@@ -186,18 +195,12 @@ describe('init plan API', () => {
       expect(skill).not.toContain('.cursor/mcp.json');
       expect(skill).toContain('Kiro-native `.kiro/specs/**` remains advisory input only when explicitly named.');
       expect(skill).not.toContain('Cursor-native `.cursor/rules/**` / `.kiro/agents/**`');
-
-      const agent = fs.readFileSync(path.join(projectRoot, '.kiro', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
-      expect(agent).toContain('name: spec-security-reviewer');
-      expect(agent).toContain('tools: ["read"]');
-      expect(agent).not.toMatch(/^model:/m);
-      expect(agent).not.toMatch(/^tools:.*\b(Read|Grep|Glob|Bash)\b/m);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
   });
 
-  test('applyInitPlan writes Qoder commands, skills, agents and state without rules or hooks runtime', () => {
+  test('applyInitPlan writes Qoder commands, skills and state without agents, rules or hooks runtime', () => {
     const projectRoot = makeTempDir();
 
     try {
@@ -215,7 +218,16 @@ describe('init plan API', () => {
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'commands', 'spec', 'work.md'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-work', 'SKILL.md'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'skills', 'spec-mcp-setup', 'SKILL.md'))).toBe(true);
-      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'))).toBe(true);
+      expect(fs.existsSync(path.join(projectRoot, '.qoder', 'agents'))).toBe(false);
+      expect(fs.existsSync(path.join(
+        projectRoot,
+        '.qoder',
+        'skills',
+        'spec-ideate',
+        'references',
+        'agents',
+        'web-researcher.md',
+      ))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'spec-first', 'state.json'))).toBe(true);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'rules'))).toBe(false);
       expect(fs.existsSync(path.join(projectRoot, '.qoder', 'hooks'))).toBe(false);
@@ -238,30 +250,6 @@ describe('init plan API', () => {
       expect(skill).not.toContain('.cursor/mcp.json');
       expect(skill).toContain('Qoder-native `.qoder/rules/**` remains advisory input only when explicitly named.');
       expect(skill).not.toContain('Cursor-native `.cursor/rules/**` / `.qoder/agents/**`');
-
-      const agent = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-security-reviewer.agent.md'), 'utf8');
-      expect(agent).toContain('name: spec-security-reviewer');
-      expect(agent).toContain('tools: [Read, Grep, Glob]');
-      expect(agent).not.toMatch(/^model:/m);
-      expect(agent).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
-
-      const webResearcher = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-web-researcher.agent.md'), 'utf8');
-      expect(webResearcher).toContain('name: spec-web-researcher');
-      expect(webResearcher).toContain('tools: [Read, Grep, Glob, WebFetch, WebSearch]');
-      expect(webResearcher).not.toMatch(/^model:/m);
-      expect(webResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
-
-      const issueIntelligence = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-issue-intelligence-analyst.agent.md'), 'utf8');
-      expect(issueIntelligence).toContain('name: spec-issue-intelligence-analyst');
-      expect(issueIntelligence).toContain('tools: [Read, Grep, Glob, mcp__github__*]');
-      expect(issueIntelligence).not.toMatch(/^model:/m);
-      expect(issueIntelligence).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
-
-      const bestPractices = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-best-practices-researcher.agent.md'), 'utf8');
-      expect(bestPractices).toContain('name: spec-best-practices-researcher');
-      expect(bestPractices).toContain('tools: [Read, Grep, Glob, WebFetch, WebSearch, mcp__context7__*]');
-      expect(bestPractices).not.toMatch(/^model:/m);
-      expect(bestPractices).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
@@ -391,7 +379,7 @@ describe('init plan API', () => {
       const plan = buildInitPlan({ projectRoot, platform: 'codex', name: 'reviewer', lang: 'zh' });
       const codes = plan.diagnostics.map((diagnostic) => diagnostic.code);
       expect(codes).toContain('codex_home_hook_write_skipped');
-      // No SessionStart hook write planned, but skills/agents/AGENTS.md still install.
+      // No SessionStart hook write planned, but skills/AGENTS.md still install.
       const opPaths = plan.operationPlan.operations.map((operation) => operation.path);
       expect(opPaths).not.toContain('.codex/hooks.json');
       expect(opPaths).not.toContain('.codex/hooks/session-start');

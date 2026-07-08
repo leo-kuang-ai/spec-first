@@ -193,7 +193,7 @@ AI 写代码很快；真正昂贵的是保存代码背后的判断：为什么�
 
 `spec-first` 有两类 durable surface：仓库内 workflow artifacts 和 generated host runtime assets。
 
-Source assets（`skills/`、`agents/`、`templates/`、`src/cli/`）经 `spec-first init` 重新生成为 host runtime assets——产出仓库内 workflow artifacts：`ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`。
+Source assets（`skills/`、`skills/**/references/{agents,personas}/` 下的 skill-local prompt assets、`templates/`、`src/cli/`）经 `spec-first init` 重新生成为 host runtime assets——产出仓库内 workflow artifacts：`ideation -> brainstorms -> plans -> tasks -> work/review/debug -> learnings`。
 
 `.claude/`、`.codex/`、`.agents/skills/`、`.cursor/skills/`、`.cursor/spec-first/`、`.kiro/skills/`、`.kiro/agents/`、`.kiro/spec-first/`、`.qoder/commands/spec-*.md`、`.qoder/commands/spec/`（已退役的旧 namespace）、`.qoder/skills/`、`.qoder/agents/` 和 `.qoder/spec-first/` 下的 generated runtime copies 是可丢弃镜像，可通过 `spec-first init` 重建。Cursor project `.cursor/mcp.json`、spec-first managed `.kiro/settings/` 与 Qoder local `.qoder/settings.local.json` 是配置输出，不是 source；Cursor 与 Qoder clean 会保留用户维护的 MCP entry。Cursor native `.cursor/rules/**`、Kiro native `.kiro/specs/**` 和 Qoder native `.qoder/rules/**` 不是 spec-first source。
 
@@ -274,6 +274,6 @@ npm test
 
 `npm run build` 会执行 `npm pack --dry-run` 并通过 npm 验证 package payload 形态。
 
-修改 source assets 时，编辑 `skills/`、`agents/`、`templates/` 或 `src/cli/`，再通过 `spec-first init` 重新生成 runtime copies，并在 fresh host session 中选择目标宿主。
+修改 source assets 时，编辑 `skills/`、`skills/**/references/{agents,personas}/` 下的 skill-local prompt assets、`templates/` 或 `src/cli/`，再通过 `spec-first init` 重新生成 runtime copies，并在 fresh host session 中选择目标宿主。
 
 贡献与支持见 [CONTRIBUTING.md](https://github.com/sunrain520/spec-first/blob/main/CONTRIBUTING.md)、[SECURITY.md](https://github.com/sunrain520/spec-first/blob/main/SECURITY.md)、[LICENSE](https://github.com/sunrain520/spec-first/blob/main/LICENSE) 和 [GitHub Issues](https://github.com/sunrain520/spec-first/issues)。

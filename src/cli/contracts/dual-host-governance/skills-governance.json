@@ -157,6 +157,20 @@
       }
     },
     {
+      "skill_name": "spec-dogfood",
+      "entry_surface": "workflow_command",
+      "command_name": "dogfood",
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "command",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "command"
+      }
+    },
+    {
       "skill_name": "spec-doc-review",
       "entry_surface": "workflow_command",
       "command_name": "doc-review",

@@ -250,11 +250,9 @@ Routing rules:
 
 ## Reviewers
 
-Reviewer ids are stable public labels used in reports, artifacts, dedup keys, and tests. For CE-migrated reviewers, the prompt body is now skill-local: load the mapped file under `references/personas/` and inject that content into the generic reviewer subagent via `references/subagent-template.md`. Do not dispatch a top-level typed agent when a local prompt asset exists for the selected reviewer. Spec-First-only reviewers that do not yet have a local prompt asset keep their existing reviewer id and host-provided prompt surface until they are migrated in a later batch.
+Reviewer ids are stable public labels used in reports, artifacts, dedup keys, and tests. Reviewer prompt bodies are skill-local: load the mapped file under `references/personas/` and inject that content into the generic reviewer subagent via `references/subagent-template.md`. Do not dispatch a top-level typed agent.
 
 See the persona catalog included below for the full catalog and prompt asset mapping.
-
-**CLI readiness boundary:** Keep `spec-cli-readiness-reviewer` as the conditional reviewer for CLI-facing diffs. This project is itself a CLI/workflow harness, so changes to `src/cli/`, command definitions, argument parsing, runtime generation, or command handler behavior need autonomous-agent usability review. `spec-cli-agent-readiness-reviewer` is a separate manual/deep-dive agent for CLI source, plans, or specs; it is not a replacement for the structured JSON persona.
 
 **Default core reviewers (full or sensitive reviews):**
 
@@ -278,17 +276,12 @@ The scale-aware reviewer preflight in Stage 3 may replace this default core with
 | `spec-data-migrations-reviewer` | Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, or data transformations -- not model/query-only changes without migration artifacts |
 | `spec-reliability-reviewer` | Error handling, retries, timeouts, background jobs |
 | `spec-adversarial-reviewer` | Diff >=50 changed non-test/non-generated/non-lockfile lines, or auth, payments, data mutations, external APIs |
-| `spec-cli-readiness-reviewer` | CLI command definitions, argument parsing, CLI framework usage, command handler implementations |
 | `spec-previous-comments-reviewer` | Reviewing a PR that has existing review comments or threads |
 
 **Stack-specific conditional (selected per diff):**
 
 | Agent | Select when diff touches... |
 |-------|---------------------------|
-| `spec-dhh-rails-reviewer` | Rails architecture, service objects, session/auth choices, or Hotwire-vs-SPA boundaries |
-| `spec-kieran-rails-reviewer` | Rails application code where conventions, naming, and maintainability are in play |
-| `spec-kieran-python-reviewer` | Python modules, endpoints, scripts, or services |
-| `spec-kieran-typescript-reviewer` | TypeScript components, services, hooks, utilities, or shared types |
 | `spec-julik-frontend-races-reviewer` | Stimulus/Turbo controllers, DOM events, timers, animations, or async UI flows |
 | `spec-swift-ios-reviewer` | Swift files, SwiftUI views, UIKit controllers, entitlements, privacy manifests, Core Data models, SPM manifests, storyboards/XIBs, or semantic build-setting/target/signing changes in .pbxproj |
 
@@ -296,7 +289,6 @@ The scale-aware reviewer preflight in Stage 3 may replace this default core with
 
 | Agent | Select when diff includes migration artifacts |
 |-------|------------------------------------------|
-| `spec-schema-drift-detector` | Cross-references schema.rb against included migrations |
 | `spec-deployment-verification-agent` | Produces deployment checklist with SQL verification queries for risky migration artifacts |
 
 **Local prompt asset resolution:**
@@ -321,7 +313,7 @@ For every selected reviewer listed below, read the skill-local prompt asset befo
 | `spec-swift-ios-reviewer` | `references/personas/swift-ios-reviewer.md` |
 | `spec-testing-reviewer` | `references/personas/testing-reviewer.md` |
 
-If a selected reviewer is not in this table, run it through the existing host-provided reviewer prompt surface and record that it is not yet skill-local in Coverage.
+If a selected reviewer has no skill-local prompt asset, skip that reviewer and record `reviewer_prompt_missing` in Coverage instead of dispatching a top-level typed agent.
 
 ## Review Scope
 
@@ -630,7 +622,6 @@ Review team:
 - kieran-rails -- controller and Turbo flow changed in app/controllers and app/views
 - dhh-rails -- diff adds service objects around ordinary Rails CRUD
 - data-migrations -- adds migration 20260303_add_index_to_orders
-- spec-schema-drift-detector -- migration files present
 ```
 
 This is progress reporting, not a blocking confirmation.
@@ -820,7 +811,7 @@ Detail-tier fields (`why_it_matters`, `evidence`) come from the reviewer return 
 
 **Spec-First always-on agents** (spec-agent-native-reviewer, spec-learnings-researcher) are dispatched as standard Agent calls through the same bounded scheduler as the persona agents. Give them the same review context bundle the personas receive: entry mode, any PR metadata gathered in Stage 1, intent summary, review base branch name when known, `BASE:` marker, file list, diff, and `UNTRACKED:` scope notes. Do not invoke them with a generic "review this" prompt. Their output is unstructured and synthesized separately in Stage 6.
 
-**Spec-First conditional agents** (spec-schema-drift-detector, spec-deployment-verification-agent) are also dispatched as standard Agent calls through the same bounded scheduler when applicable. Pass the same review context bundle plus the applicability reason (for example, which migration files triggered the agent). For spec-schema-drift-detector specifically, pass the resolved review base branch explicitly so it never assumes `main`. Their output is unstructured and must be preserved for Stage 6 synthesis just like the Spec-First always-on agents.
+**Spec-First conditional agents** (spec-deployment-verification-agent) are also dispatched as standard Agent calls through the same bounded scheduler when applicable. Pass the same review context bundle plus the applicability reason (for example, which risky migration artifacts triggered the agent). Their output is unstructured and must be preserved for Stage 6 synthesis just like the Spec-First always-on agents. Schema drift belongs to the selected data-migrations persona, which receives the resolved review base branch through the standard review context bundle and must never assume `main`.
 
 ### Stage 5: Merge findings
 
@@ -949,15 +940,14 @@ Assemble the final report using **pipe-delimited markdown tables for findings** 
    - **Lean into the offer** when the pattern appears in 3+ places or reveals a wrong assumption about a shared dependency, framework, workflow, source/runtime boundary, or external-evidence convention.
    When offering, phrase it as the user's choice to run the current host's compound entrypoint with brief context. In report-only, autofix, and headless modes, ask no questions; include at most one advisory line when learning-worthy evidence exists. Do not automatically run `spec-compound`, do not write `docs/solutions/`, do not file tickets, and do not add extra prompts because of this checklist. If an older learning appears stale, recommend `spec-compound-refresh` only with a narrow scope hint and only after the new learning-capture path is clear.
 9. **Agent-Native Gaps.** Surface spec-agent-native-reviewer results. Omit section if no gaps found.
-10. **Schema Drift Check.** If spec-schema-drift-detector ran, summarize whether drift was found. If drift exists, list the unrelated schema objects and the required cleanup command. If clean, say so briefly.
-11. **Deployment Notes.** If spec-deployment-verification-agent ran, surface the key Go/No-Go items: blocking pre-deploy checks, the most important verification queries, rollback caveats, and monitoring focus areas. Keep the checklist actionable rather than dropping it into Coverage.
-12. **Resource Advisory.** If `resource-governance-lens` returned `status=advisory`, list the advisory dimensions and reason codes using `subject_path` for the file under discussion and `evidence_ref` for the proof source. Do not convert resource advisories into blocking findings unless a reviewer independently confirms a concrete code-review issue. A `status=unavailable` result (for example a non-git target) is a non-blocking degraded posture, not a fast-fail signal: note it in Coverage and continue; the helper exit code stays `0` for `ok`, `advisory`, and `unavailable`.
-13. **Rule Maturity Candidates.** Include only when the confirmed findings or resource advisory meet the rule-maturity noise filter: P1/P2 repeated governance gap, same low-level issue appears at least twice, or a registered contract / plan non-goal is clearly violated. For each candidate list `rule_id`, `evidence_ref`, `reason_code`, `human_review_kind`, and `similar_existing_rule_ids`; use durable repo-readable evidence refs, never session-only summaries, raw lens stdout, `/tmp` files, or "see above". This section is an advisory queue for humans, not a finding, not a verdict input, and not an automatic `adjudicate`, `promote`, or `demote` action.
-14. **Coverage.** Suppressed count by anchor (e.g., "N findings suppressed at anchor 50, M at anchor 25"), mode-aware demotion count (interactive/report-only) or suppression count (headless/autofix), validator drop count and reasons (when Stage 5b ran), validator over-budget validation skips (when the 15-cap fired), residual risks, first-class `test_gaps`, failed/timed-out reviewers, resource lens status/reason codes, direct evidence posture, Diff Boundary Review fields, Graph-Assisted Impact Review fields, and any intent uncertainty carried by non-interactive modes. Include `Direct evidence: <source refs/checks/logs used> | limitations: <reason>` when coverage depends on bounded direct evidence; for multi-repo review, report evidence per child repo. External-tool evidence is advisory whenever it is degraded or unconfirmed by source.
+10. **Deployment Notes.** If spec-deployment-verification-agent ran, surface the key Go/No-Go items: blocking pre-deploy checks, the most important verification queries, rollback caveats, and monitoring focus areas. Keep the checklist actionable rather than dropping it into Coverage.
+11. **Resource Advisory.** If `resource-governance-lens` returned `status=advisory`, list the advisory dimensions and reason codes using `subject_path` for the file under discussion and `evidence_ref` for the proof source. Do not convert resource advisories into blocking findings unless a reviewer independently confirms a concrete code-review issue. A `status=unavailable` result (for example a non-git target) is a non-blocking degraded posture, not a fast-fail signal: note it in Coverage and continue; the helper exit code stays `0` for `ok`, `advisory`, and `unavailable`.
+12. **Rule Maturity Candidates.** Include only when the confirmed findings or resource advisory meet the rule-maturity noise filter: P1/P2 repeated governance gap, same low-level issue appears at least twice, or a registered contract / plan non-goal is clearly violated. For each candidate list `rule_id`, `evidence_ref`, `reason_code`, `human_review_kind`, and `similar_existing_rule_ids`; use durable repo-readable evidence refs, never session-only summaries, raw lens stdout, `/tmp` files, or "see above". This section is an advisory queue for humans, not a finding, not a verdict input, and not an automatic `adjudicate`, `promote`, or `demote` action.
+13. **Coverage.** Suppressed count by anchor (e.g., "N findings suppressed at anchor 50, M at anchor 25"), mode-aware demotion count (interactive/report-only) or suppression count (headless/autofix), validator drop count and reasons (when Stage 5b ran), validator over-budget validation skips (when the 15-cap fired), residual risks, first-class `test_gaps`, failed/timed-out reviewers, resource lens status/reason codes, direct evidence posture, Diff Boundary Review fields, Graph-Assisted Impact Review fields, and any intent uncertainty carried by non-interactive modes. Include `Direct evidence: <source refs/checks/logs used> | limitations: <reason>` when coverage depends on bounded direct evidence; for multi-repo review, report evidence per child repo. External-tool evidence is advisory whenever it is degraded or unconfirmed by source.
    - Stable boundary fields: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, and run-level `finding_type` summaries for derived boundary/verification labels.
    - Stable graph fields: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, and any populated candidate fields from `changed_symbols`, `changed_entrypoints`, `changed_contracts`, `symbol_mapping_status`, `impact_chain_candidates`, `blast_radius_candidates`, `caller_callee_paths`, `affected_test_candidates`, `tests_for_query_result`, `missing_test_confirmation`, `review_priority_candidates`, `test_gaps`, and `limitations`.
    - Do not let downstream-consumption gates depend on human-only prose. If a value is meant for automation or headless callers, render it with the stable field name above.
-15. **Verdict.** Ready to merge / Ready with fixes / Not ready. Fix order if applicable. When an `explicit` plan has unaddressed requirements, the verdict must reflect it — a PR that's code-clean but missing planned requirements is "Not ready" unless the omission is intentional. When an `inferred` plan has unaddressed requirements, note it in the verdict reasoning but do not block on it alone.
+14. **Verdict.** Ready to merge / Ready with fixes / Not ready. Fix order if applicable. When an `explicit` plan has unaddressed requirements, the verdict must reflect it — a PR that's code-clean but missing planned requirements is "Not ready" unless the omission is intentional. When an `inferred` plan has unaddressed requirements, note it in the verdict reasoning but do not block on it alone.
 
 When the review established targeted validation, surface that as a structured `verification-run-summary.v1` ref in Coverage or artifact handoff instead of a freeform "tests passed" claim. If the review closeout is based on structured claims, use `honest-closeout.v1`; when structured claim or evidence objects are missing, mark the closeout `degraded` rather than quietly implying verification.
 

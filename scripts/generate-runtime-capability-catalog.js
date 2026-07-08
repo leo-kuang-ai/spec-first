@@ -137,7 +137,7 @@ function buildRuntimeCapabilityCatalog() {
   const lines = [
     '# Runtime Capability Catalog',
     '',
-    '> 本文件由 `scripts/generate-runtime-capability-catalog.js` 从 `src/cli/plugin.js`、`src/cli/contracts/dual-host-governance/skills-governance.json`、`docs/contracts/workflows/*.schema.json` 和当前 `skills/` / `agents/` source 资产派生生成。',
+    '> 本文件由 `scripts/generate-runtime-capability-catalog.js` 从 `src/cli/plugin.js`、`src/cli/contracts/dual-host-governance/skills-governance.json`、`docs/contracts/workflows/*.schema.json` 和当前 `skills/` source 资产派生生成。',
     '> 它是只读 catalog，不是第二套 source of truth；修改 runtime 能力时应先改 source/governance，再重新生成本文件。',
     '',
     '## Source Truth',
@@ -148,7 +148,7 @@ function buildRuntimeCapabilityCatalog() {
     '| `src/cli/contracts/dual-host-governance/skills-governance.json` | workflow / standalone / internal skill 的 host delivery 治理真相源 |',
     '| `templates/claude/commands/spec/*.md` | Unified `spec-*` workflow runtime source templates |',
     '| `skills/*/SKILL.md` | workflow、standalone、agent-facing internal skill source |',
-    '| `agents/**/*.agent.md` | supported-host agent source |',
+    '| `skills/**/references/agents/`, `skills/**/references/personas/` | skill-local prompt assets；不再通过顶层 `agents/` 作为 runtime source |',
     '| `docs/contracts/workflows/*.schema.json` | docs-side workflow artifact contracts；planned contract 不等于 runtime producer 已实现 |',
     '',
     '## Summary',
