@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
-const AGENT_PATH = path.join(REPO_ROOT, 'agents/spec-web-researcher.agent.md');
+const AGENT_PATH = path.join(REPO_ROOT, 'skills/spec-ideate/references/agents/web-researcher.md');
 
 function read(filePath) {
   return fs.readFileSync(filePath, 'utf8');

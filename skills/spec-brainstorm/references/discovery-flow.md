@@ -33,6 +33,8 @@ Assess scope from the feature description plus a light repo scan:
 
 For Deep scope, classify feature-tier vs product-tier. Deep-feature inherits product shape. Deep-product must establish product shape: primary actors, core outcome, positioning, or end-to-end flows are materially unresolved.
 
+If the feature is inherently visual or spatial -- drawing/canvas tools, annotation behavior, visual editors, UI layout or navigation, interaction states, charts, diagrams, animation, maps, timelines, or spatial flows -- read `references/visual-probes.md` before the first shape, behavior, state, layout, flow, or diagram decision. The reference owns the text-vs-visual offer, helper invocation, and display-only feedback contract.
+
 ## Phase 1.2 Product Pressure Test
 
 Before generating approaches, scan the user's opening for rigor gaps. This is agent-internal analysis, not a user-facing checklist. Raise only gaps that actually exist during Phase 1.3, folded into normal dialogue.

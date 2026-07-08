@@ -105,9 +105,9 @@ describe('spec-polish project detection contracts', () => {
     const rails = fs.readFileSync(DEV_SERVER_RAILS_PATH, 'utf8');
     const resolvePort = fs.readFileSync(RESOLVE_PORT_PATH, 'utf8');
 
-    expect(detection).toContain('Neither `resolve-port.sh` nor the `test-browser` inline cascade scans `AGENTS.md` / `CLAUDE.md` for port references by default');
+    expect(detection).toContain('Neither `resolve-port.sh` nor the `spec-test-browser` inline cascade scans `AGENTS.md` / `CLAUDE.md` for port references by default');
     expect(detection).toContain('already-loaded project guidance only when it explicitly declares the active dev-server port');
-    expect(detection).not.toContain('The `test-browser` inline cascade does. Instruction files');
+    expect(detection).not.toContain('The `spec-test-browser` inline cascade does. Instruction files');
     expect(detection).not.toContain('Removal of the `AGENTS.md`/`CLAUDE.md` grep');
     expect(rails).toContain('Do not scan `AGENTS.md` / `CLAUDE.md` for Rails ports by default');
     expect(resolvePort).toContain('Prose files (AGENTS.md, CLAUDE.md) are deliberately NOT');

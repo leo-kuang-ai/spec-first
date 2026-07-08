@@ -37,7 +37,7 @@ describe('spec-ideate host entrypoint contract', () => {
     const text = fs.readFileSync(POST_IDEATION_PATH, 'utf8');
 
     expect(text).toContain('user annotates in Proof, agent ingests feedback, applies agreed edits, and replies/resolves in-thread');
-    expect(text).toContain('use the proof skill\'s fixed HITL identity, `ai:spec-first` / `Spec-First`');
+    expect(text).toContain('use the spec-proof skill\'s fixed HITL identity, `ai:spec-first` / `Spec-First`');
     expect(text).not.toContain('**identity:**');
     expect(text).toContain('current host\'s brainstorm entrypoint');
     expect(text).not.toContain('**recommended next step:** `/spec:brainstorm`');
@@ -72,15 +72,21 @@ describe('spec-ideate host entrypoint contract', () => {
     expect(text).toContain('The orchestrator owns scratch checkpoints, merged candidates, critique, and final artifact writes.');
   });
 
-  test('web research dispatch targets spec-web-researcher and degrades with warning', () => {
+  test('web research dispatch uses the skill-local prompt asset and degrades with warning', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');
 
     expect(text).toContain('Always-on for both modes');
-    expect(text).toContain('When dispatching `spec-web-researcher`');
-    expect(text).toContain('If `spec-web-researcher` fails (network, tool unavailable)');
+    expect(text).toContain('When dispatching web research, read `references/agents/web-researcher.md`');
+    expect(text).toContain('If the web-researcher local prompt fails (network, tool unavailable)');
     expect(text).toContain('External research unavailable: {reason}. Proceeding with internal grounding only.');
     expect(text).toContain('Grounding agent failures follow "warn and proceed"');
+    expect(text).toContain('references/agents/learnings-researcher.md');
+    expect(text).toContain('references/agents/issue-intelligence-analyst.md');
+    expect(text).toContain('references/agents/slack-researcher.md');
+    expect(text).toContain('references/agents/repo-profiler.md');
     expect(text).not.toContain('When dispatching `ce-web-researcher`');
+    expect(text).not.toContain('dispatch `spec-learnings-researcher`');
+    expect(text).not.toContain('dispatch `spec-issue-intelligence-analyst`');
   });
 
   test('per-idea artifact contract uses basis instead of the retired field name', () => {

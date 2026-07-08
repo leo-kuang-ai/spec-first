@@ -121,7 +121,6 @@ describe('context governance runtime exclusion contract', () => {
       'skills/spec-doc-review/SKILL.md',
       'skills/spec-debug/SKILL.md',
       'skills/spec-compound/SKILL.md',
-      'skills/spec-sessions/SKILL.md',
       'skills/spec-optimize/SKILL.md',
     ];
 

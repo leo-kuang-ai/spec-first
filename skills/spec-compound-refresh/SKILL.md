@@ -39,7 +39,7 @@ Select scope, inspect supporting learnings before derived patterns, classify eac
 
 ### Downstream Consumers
 
-`spec-compound`, future planning/work/review sessions, `spec-sessions`, repo-local advisory vocabulary when present, and humans relying on `docs/solutions/` as reusable knowledge.
+`spec-compound`, future planning/work/review sessions, optional local session-history enrichment, repo-local advisory vocabulary when present, and humans relying on `docs/solutions/` as reusable knowledge.
 
 ## Scenario Capability
 

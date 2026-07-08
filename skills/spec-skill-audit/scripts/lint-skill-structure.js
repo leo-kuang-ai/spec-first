@@ -27,10 +27,7 @@ function downgradeSeverity(severity) {
 }
 
 // 目录名与 frontmatter name 故意不一致的已治理别名。
-// spec-dhh-rails-style 目录承载 name: dhh-rails-style:改 name 会破坏既有 runtime 引用契约
-// (best-practices-researcher 等按 dhh-rails-style 引用),故保留别名而非强制同名。
 const ALLOWED_FRONTMATTER_NAME_ALIASES = new Map([
-  ['spec-dhh-rails-style', 'dhh-rails-style'],
 ]);
 
 function lintSkillStructure(inventory, options = {}) {

@@ -67,7 +67,7 @@ Follows `docs/contracts/project-graph-consumption.md`: `capability-class` candid
 
 ## Reference Routing
 
-Refs: `references/interaction-rules.md`; `references/context-and-evidence.md`; `references/discovery-flow.md`; `references/approach-exploration.md`; `references/synthesis-summary.md`; `references/brainstorm-sections.md`, `references/requirements-capture.md`, and `references/markdown-rendering.md` for Phase 3 canonical markdown requirements capture. HTML is an optional sidecar only; do not replace markdown without focused downstream consumer tests. Phase 4: `references/handoff.md`; governance: `references/evaluation-governance.md`.
+Refs: `references/interaction-rules.md`; `references/context-and-evidence.md` for repo grounding, source claims, repo-profile cache, and opt-in Slack context; `references/discovery-flow.md`; `references/approach-exploration.md`; `references/synthesis-summary.md`; `references/visual-probes.md` when an inherently visual decision is faster to judge by seeing a rough artifact; `references/brainstorm-sections.md`, `references/requirements-capture.md`, and `references/markdown-rendering.md` for Phase 3 canonical markdown requirements capture. HTML is an optional sidecar only; do not replace markdown without focused downstream consumer tests. Phase 4: `references/handoff.md`; governance: `references/evaluation-governance.md`.
 
 ## Feature Description
 

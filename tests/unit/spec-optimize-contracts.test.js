@@ -27,6 +27,24 @@ describe('spec-optimize host entrypoint contract', () => {
     expect(text).toContain('mkdir -p .spec-first/workflows/spec-optimize/<spec-name>/');
     expect(text).not.toContain('.spec-first/workflowsspec-optimize');
     expect(text).toContain('Resolve `scripts/measure.sh`, `scripts/parallel-probe.sh`, and `scripts/experiment-worktree.sh` relative to this skill');
+    expect(text).toContain('SKILL_DIR="<absolute path of the directory containing this SKILL.md>"');
+    expect(text).toContain('bash "$SKILL_DIR/scripts/measure.sh"');
+    expect(text).toContain('bash "$SKILL_DIR/scripts/parallel-probe.sh"');
+    expect(text).toContain('bash "$SKILL_DIR/scripts/experiment-worktree.sh"');
+    expect(text).not.toContain('bash scripts/measure.sh');
+    expect(text).not.toContain('bash scripts/parallel-probe.sh');
+    expect(text).not.toContain('bash scripts/experiment-worktree.sh');
+  });
+
+  test('uses skill-local optimization prompt assets instead of standalone agent names', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('references/agents/learnings-researcher.md');
+    expect(text).toContain('references/agents/repo-research-analyst.md');
+    expect(text).toContain('references/agents/repo-profiler.md');
+    expect(text).toContain('python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get');
+    expect(text).not.toContain('Dispatch `spec-learnings-researcher`');
+    expect(text).not.toContain('dispatch `spec-repo-research-analyst`');
   });
 
   test('requires measurable goals and bounded first-run optimization budgets', () => {

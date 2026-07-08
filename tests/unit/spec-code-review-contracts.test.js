@@ -374,7 +374,7 @@ describe('spec-code-review CE sync contracts', () => {
     expect(skill).toContain('Migration files, schema dumps (`db/schema.rb`, `structure.sql`), backfill scripts, or data transformations -- not model/query-only changes without migration artifacts');
     expect(skill).toContain('Do not trigger migration-only agents for model/query-only changes without migration artifacts');
     expect(skill).toContain('Select when diff includes migration artifacts');
-    expect(catalog).toContain('`spec-schema-drift-detector` | Cross-references schema.rb changes against included migrations to catch unrelated drift');
+    expect(catalog).toContain('`spec-schema-drift-detector` | host-provided prompt surface | Cross-references schema.rb changes against included migrations to catch unrelated drift');
     expect(skill).toContain('For spec-schema-drift-detector specifically, pass the resolved review base branch explicitly so it never assumes `main`');
   });
 
@@ -1046,6 +1046,72 @@ describe('spec-code-review CE sync contracts', () => {
     expect(skill).toContain('const reviewArtifactDir = path.join(os.tmpdir(), \'spec-first\', \'spec-code-review\', runId);');
     expect(skill).toContain('the orchestrator may write that JSON to `<review-artifact-dir>/{reviewer_name}.json`');
     expect(skill).toContain('Artifact persistence is parent/orchestrator-owned');
+  });
+
+  test('CE-migrated reviewers use skill-local persona prompt assets', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    const catalog = fs.readFileSync(
+      path.join(__dirname, '..', '..', 'skills', 'spec-code-review', 'references', 'persona-catalog.md'),
+      'utf8',
+    );
+    const template = fs.readFileSync(
+      path.join(
+        __dirname,
+        '..',
+        '..',
+        'skills',
+        'spec-code-review',
+        'references',
+        'subagent-template.md',
+      ),
+      'utf8',
+    );
+    const localPersonaFiles = [
+      'adversarial-reviewer.md',
+      'agent-native-reviewer.md',
+      'api-contract-reviewer.md',
+      'correctness-reviewer.md',
+      'data-migration-reviewer.md',
+      'deployment-verification-agent.md',
+      'julik-frontend-races-reviewer.md',
+      'learnings-researcher.md',
+      'maintainability-reviewer.md',
+      'performance-reviewer.md',
+      'previous-comments-reviewer.md',
+      'reliability-reviewer.md',
+      'security-reviewer.md',
+      'swift-ios-reviewer.md',
+      'testing-reviewer.md',
+    ];
+
+    expect(skill).toContain('the prompt body is now skill-local');
+    expect(skill).toContain('Do not dispatch a top-level typed agent when a local prompt asset exists');
+    expect(skill).toContain('For every selected reviewer listed below, read the skill-local prompt asset before dispatch');
+    expect(skill).toContain('If a selected reviewer is not in this table, run it through the existing host-provided reviewer prompt surface');
+    expect(skill).toContain('read `references/cross-model-review.md`');
+    expect(skill).toContain('read `references/repo-profile-cache.md`');
+    expect(catalog).toContain('Reviewer ids are stable report/artifact labels.');
+    expect(catalog).toContain('Prompt asset');
+    expect(template).toContain('Skill-local `references/personas/*.md` content when mapped');
+
+    for (const file of localPersonaFiles) {
+      const relativePath = `references/personas/${file}`;
+      const fullPath = path.join(
+        __dirname,
+        '..',
+        '..',
+        'skills',
+        'spec-code-review',
+        relativePath,
+      );
+      const text = fs.readFileSync(fullPath, 'utf8');
+
+      expect(fs.existsSync(fullPath)).toBe(true);
+      expect(skill).toContain(relativePath);
+      expect(catalog).toContain(relativePath);
+      expect(text).not.toMatch(/^---\n/);
+      expect(text).not.toContain('tools: Read, Grep, Glob, Bash, Write');
+    }
   });
 
   test('supports single-agent report-only fallback when reviewer dispatch is unavailable or unsafe', () => {

@@ -440,12 +440,75 @@ describe('spec-compound host entrypoint contract', () => {
     const skill = fs.readFileSync(SKILL_PATH, 'utf8');
     const reference = fs.readFileSync(COMPOUND_REFRESH_PER_ACTION_FLOWS_PATH, 'utf8');
 
+    expect(skill).toContain('SKILL_DIR="<absolute path of the directory containing the spec-compound SKILL.md you read>"');
+    expect(skill).toContain('python3 "$SKILL_DIR/scripts/validate-frontmatter.py" <output-path>');
+    expect(skill).not.toContain('Run `python3 scripts/validate-frontmatter.py <output-path>`');
+
     for (const text of [skill, reference]) {
       expect(text).toContain('validator unavailable: <reason>');
       expect(text).toContain('do not silently skip');
       expect(text).toContain('manually verify the same scope the script covers');
       // The manual fallback must stay scoped to the script's exact three checks.
       expect(text).toContain('Keep the manual check to exactly these three');
+    }
+  });
+
+  test('compound uses migrated skill-local agents and scripts', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    const localAgents = [
+      'best-practices-researcher.md',
+      'data-integrity-guardian.md',
+      'framework-docs-researcher.md',
+      'pattern-recognition-specialist.md',
+      'performance-oracle.md',
+      'repo-profiler.md',
+      'security-sentinel.md',
+      'session-historian.md',
+    ];
+    const sessionScripts = [
+      'discover-sessions.sh',
+      'extract-errors.py',
+      'extract-metadata.py',
+      'extract-skeleton.py',
+    ];
+
+    expect(skill).toContain('references/repo-profile-cache.md');
+    expect(skill).toContain('python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get');
+    expect(skill).toContain('references/agents/repo-profiler.md');
+    expect(skill).toContain('The `docs/solutions/` enumeration is never cached');
+    expect(skill).toContain('Run session discovery, branch/keyword filtering, scan-window selection, extraction, and synthesis directly inside this skill using `scripts/session-history/`.');
+    expect(skill).toContain('Do not dispatch a retired workflow or standalone agent by type/name from this workflow.');
+    expect(skill).toContain('bash "$SKILL_DIR/scripts/session-history/discover-sessions.sh"');
+    expect(skill).toContain('xargs -0 python3 "$SKILL_DIR/scripts/session-history/extract-metadata.py"');
+    expect(skill).toContain('SCRATCH=$(mktemp -d -t spec-compound-sessions-XXXXXX)');
+    expect(skill).toContain('extract-skeleton.py');
+    expect(skill).toContain('extract-errors.py');
+    expect(skill).toContain('generic subagents seeded with local prompt assets from `references/agents/`');
+    expect(skill).toContain('Do not dispatch standalone agents by type/name when a local prompt asset exists.');
+    expect(skill).not.toContain('${CLAUDE_SKILL_DIR}');
+
+    for (const file of localAgents) {
+      const relativePath = `references/agents/${file}`;
+      const fullPath = path.join(__dirname, '..', '..', 'skills', 'spec-compound', relativePath);
+      const text = fs.readFileSync(fullPath, 'utf8');
+
+      expect(fs.existsSync(fullPath)).toBe(true);
+      expect(skill).toContain(relativePath);
+      expect(text).not.toMatch(/^---\n/);
+    }
+
+    for (const file of sessionScripts) {
+      const fullPath = path.join(
+        __dirname,
+        '..',
+        '..',
+        'skills',
+        'spec-compound',
+        'scripts',
+        'session-history',
+        file,
+      );
+      expect(fs.existsSync(fullPath)).toBe(true);
     }
   });
 

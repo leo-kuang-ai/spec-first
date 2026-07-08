@@ -27,6 +27,7 @@ const SOURCE_DIRECTORIES = {
   skills: 'skills',
   agents: 'agents',
 };
+const BUNDLED_AGENT_SOURCE_DIRECTORY = 'agents';
 const SUPPORTED_PLATFORM_IDS = ['claude', 'codex', 'cursor', 'kiro', 'qoder'];
 const SUPPORTED_PLATFORMS = new Set(SUPPORTED_PLATFORM_IDS);
 const AGENTLESS_PLATFORM_IDS = new Set(['cursor']);
@@ -34,7 +35,7 @@ const ENTRY_SURFACES = new Set(['workflow_command', 'standalone_skill', 'interna
 const HOST_SCOPES = new Set(['dual_host', 'host_exclusive', 'target_host_maintenance']);
 const HOST_DELIVERIES = new Set(['command', 'skill', 'internal', 'none']);
 const DELIVERED_INTERNAL_SKILLS = new Set([
-  'git-worktree',
+  'spec-worktree',
 ]);
 const TEXT_FILE_EXTENSIONS = new Set([
   '.md',
@@ -233,7 +234,7 @@ function validateManifest(manifest) {
     throw new Error('Bundled plugin manifest is missing directories metadata.');
   }
 
-  for (const field of ['commands', 'skills', 'agents']) {
+  for (const field of ['commands', 'skills']) {
     if (typeof manifest.directories[field] !== 'string' || manifest.directories[field].length === 0) {
       throw new Error(`Bundled plugin manifest is missing directories.${field}.`);
     }
@@ -245,6 +246,10 @@ function getSkillsGovernancePath() {
 }
 
 function getBundledPath(kind) {
+  if (kind === 'agents') {
+    return path.join(REPO_ROOT, BUNDLED_AGENT_SOURCE_DIRECTORY);
+  }
+
   const manifest = loadPluginManifest();
   return path.join(REPO_ROOT, manifest.directories[kind]);
 }
@@ -470,7 +475,7 @@ function listBundledSkills() {
 function listBundledAgents() {
   const sourceDir = getBundledPath('agents');
   if (!fs.existsSync(sourceDir)) {
-    throw new Error(`Bundled agents directory not found: ${sourceDir}`);
+    return [];
   }
 
   return listAgentMarkdownEntries(sourceDir);
@@ -486,7 +491,7 @@ function listBundledAgentNames() {
 function listBundledAgentSupportFiles() {
   const sourceDir = getBundledPath('agents');
   if (!fs.existsSync(sourceDir)) {
-    throw new Error(`Bundled agents directory not found: ${sourceDir}`);
+    return [];
   }
 
   return fs
@@ -858,12 +863,15 @@ function planSkillsSync(projectRoot, adapter, filteredAssetSet = buildFilteredAs
 }
 
 function syncAgents(projectRoot, adapter) {
-  const targetRoot = path.join(projectRoot, adapter.agentsRoot);
-  fs.mkdirSync(targetRoot, { recursive: true });
-
   const sourceRoot = getBundledPath('agents');
   const agentPaths = listBundledAgents();
   const agentSupportFiles = listBundledAgentSupportFiles();
+  if (agentPaths.length === 0 && agentSupportFiles.length === 0) {
+    return { agents: [], agentSupportFiles: [] };
+  }
+
+  const targetRoot = path.join(projectRoot, adapter.agentsRoot);
+  fs.mkdirSync(targetRoot, { recursive: true });
 
   for (const agentPath of agentPaths) {
     const sourcePath = path.join(sourceRoot, agentPath);
@@ -885,10 +893,18 @@ function syncAgents(projectRoot, adapter) {
 }
 
 function planAgentsSync(projectRoot, adapter) {
-  const targetRoot = path.join(projectRoot, adapter.agentsRoot);
   const sourceRoot = getBundledPath('agents');
   const agentPaths = listBundledAgents();
   const agentSupportFiles = listBundledAgentSupportFiles();
+  if (agentPaths.length === 0 && agentSupportFiles.length === 0) {
+    return {
+      plan: emptyPlan(),
+      agents: [],
+      agentSupportFiles: [],
+    };
+  }
+
+  const targetRoot = path.join(projectRoot, adapter.agentsRoot);
   const operations = [
     buildPlanOperation('ensure_dir', adapter.agentsRoot, 'managed_agents_root'),
   ];

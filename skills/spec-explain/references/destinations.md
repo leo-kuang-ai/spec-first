@@ -23,7 +23,7 @@ The run-dir file remains the complete standalone document; the fragment is a re-
 
 ## Publish to Proof (markdown output only)
 
-Proof ingests markdown, so this option renders only when the run resolved `output:md`. Invoke the `proof` skill via the platform's skill-invocation primitive when it is installed, passing the artifact path, a title (`Explainer: <subject>`), and identity `ai:spec-first` / `Spec-First`; surface the returned share URL. When the skill is not installed but the Proof web API is reachable, POST the markdown per that API. On failure: retry once after a short wait, then report plainly that the upload didn't succeed and why, and fall back to the local-file path. One-way publish; the run-dir file stays canonical.
+Proof ingests markdown, so this option renders only when the run resolved `output:md`. Invoke the `spec-proof` skill via the platform's skill-invocation primitive when it is installed, passing the artifact path, a title (`Explainer: <subject>`), and identity `ai:spec-first` / `Spec-First`; surface the returned share URL. When the skill is not installed but the Proof web API is reachable, POST the markdown per that API. On failure: retry once after a short wait, then report plainly that the upload didn't succeed and why, and fall back to the local-file path. One-way publish; the run-dir file stays canonical.
 
 ## Send to Thinkroom
 

@@ -57,12 +57,12 @@ High-risk plans must answer these review checks in the relevant plan sections:
 
 Reuse existing specialists during deepening; do not create enterprise-specific agents by default:
 
-- API contracts -> `spec-api-contract-reviewer`
-- Security, authorization, privacy, exploit surfaces -> `spec-security-sentinel`
-- Persistent data safety and lifecycle -> `spec-data-integrity-guardian`
-- Migration, backfill, production data transformation -> `spec-data-migration-expert`
-- Capacity, latency, throughput -> `spec-performance-oracle`
-- Rollout, rollback, launch verification -> `spec-deployment-verification-agent`
+- API contracts -> `spec-api-contract-reviewer` (host-provided reviewer)
+- Security, authorization, privacy, exploit surfaces -> `spec-security-sentinel` (`references/agents/security-sentinel.md`)
+- Persistent data safety and lifecycle -> `spec-data-integrity-guardian` (`references/agents/data-integrity-guardian.md`)
+- Migration, backfill, production data transformation -> `spec-data-migration-expert` (`references/agents/data-migration-reviewer.md`)
+- Capacity, latency, throughput -> `spec-performance-oracle` (`references/agents/performance-oracle.md`)
+- Rollout, rollback, launch verification -> `spec-deployment-verification-agent` (`references/agents/deployment-verification-agent.md`)
 
 ## Non-Goals / Policy Boundary
 

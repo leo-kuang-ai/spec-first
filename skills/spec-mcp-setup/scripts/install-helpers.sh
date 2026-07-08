@@ -642,7 +642,7 @@ process_cli_helper() {
       else
         if [ "$baseline_blocking" = "false" ]; then
           status="degraded"
-          next_action="optional helper for feature-video skill; install via: ${install_command:-install $name manually}"
+          next_action="optional helper; install via: ${install_command:-install $name manually}"
         else
           status="action-required"
           next_action="${install_command:-install $name manually}"
@@ -651,7 +651,7 @@ process_cli_helper() {
     else
       if [ "$baseline_blocking" = "false" ]; then
         status="degraded"
-        next_action="optional helper for feature-video skill; install via: ${install_command:-install $name manually}"
+        next_action="optional helper; install via: ${install_command:-install $name manually}"
       else
         status="action-required"
         next_action="${install_command:-install $name manually}"

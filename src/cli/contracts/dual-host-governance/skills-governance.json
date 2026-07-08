@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "skills": [
     {
-      "skill_name": "agent-native-architecture",
+      "skill_name": "spec-commit",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -17,7 +17,7 @@
       }
     },
     {
-      "skill_name": "changelog",
+      "skill_name": "spec-commit-push-pr",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -31,7 +31,7 @@
       }
     },
     {
-      "skill_name": "feature-video",
+      "skill_name": "spec-worktree",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -45,7 +45,7 @@
       }
     },
     {
-      "skill_name": "frontend-design",
+      "skill_name": "spec-proof",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -59,105 +59,7 @@
       }
     },
     {
-      "skill_name": "gemini-imagegen",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-clean-gone-branches",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-commit",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-commit-push-pr",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "git-worktree",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "proof",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "report-bug",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
-      }
-    },
-    {
-      "skill_name": "resolve-pr-feedback",
+      "skill_name": "spec-resolve-pr-feedback",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -252,20 +154,6 @@
         "cursor": "skill",
         "kiro": "skill",
         "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-dhh-rails-style",
-      "entry_surface": "internal_only",
-      "command_name": null,
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "internal",
-        "codex": "internal",
-        "cursor": "internal",
-        "kiro": "internal",
-        "qoder": "internal"
       }
     },
     {
@@ -423,20 +311,6 @@
       }
     },
     {
-      "skill_name": "spec-release-notes",
-      "entry_surface": "workflow_command",
-      "command_name": "release-notes",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
       "skill_name": "spec-riffrec-feedback-analysis",
       "entry_surface": "standalone_skill",
       "command_name": null,
@@ -465,20 +339,6 @@
       }
     },
     {
-      "skill_name": "spec-sessions",
-      "entry_surface": "workflow_command",
-      "command_name": "sessions",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
       "skill_name": "spec-simplify-code",
       "entry_surface": "standalone_skill",
       "command_name": null,
@@ -496,20 +356,6 @@
       "skill_name": "spec-skill-audit",
       "entry_surface": "workflow_command",
       "command_name": "skill-audit",
-      "host_scope": "dual_host",
-      "owner_host": null,
-      "host_delivery": {
-        "claude": "command",
-        "codex": "skill",
-        "cursor": "skill",
-        "kiro": "skill",
-        "qoder": "command"
-      }
-    },
-    {
-      "skill_name": "spec-slack-research",
-      "entry_surface": "workflow_command",
-      "command_name": "slack-research",
       "host_scope": "dual_host",
       "owner_host": null,
       "host_delivery": {
@@ -577,7 +423,7 @@
       }
     },
     {
-      "skill_name": "test-browser",
+      "skill_name": "spec-test-browser",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",
@@ -591,7 +437,7 @@
       }
     },
     {
-      "skill_name": "test-xcode",
+      "skill_name": "spec-test-xcode",
       "entry_surface": "internal_only",
       "command_name": null,
       "host_scope": "dual_host",

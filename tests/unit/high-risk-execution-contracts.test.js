@@ -55,9 +55,9 @@ function walkFiles(relativeDir, predicate) {
 
 describe('high-risk execution safety contracts', () => {
   test('worktree helpers do not propagate env files by default', () => {
-    const worktreeManager = read('skills/git-worktree/scripts/worktree-manager.sh');
+    const worktreeManager = read('skills/spec-worktree/scripts/worktree-manager.sh');
     const optimizeWorktree = read('skills/spec-optimize/scripts/experiment-worktree.sh');
-    const gitWorktreeSkill = read('skills/git-worktree/SKILL.md');
+    const gitWorktreeSkill = read('skills/spec-worktree/SKILL.md');
 
     expect(worktreeManager).toContain('local copy_env="false"');
     expect(worktreeManager).toContain('if [[ "$copy_env" == "true" ]]');

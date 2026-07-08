@@ -8,7 +8,7 @@
 |---|---|
 | Source refs | `agents/*.agent.md` frontmatter、`docs/workflow-skill-agent-map.md`、`docs/contracts/workflows/review-finding.md` |
 | Authority | advisory catalog；agent 文件和 workflow prompt 仍是具体执行 source |
-| Primary consumers include | `spec-code-review`、`spec-doc-review`、`spec-plan`、`spec-ideate`、`spec-compound`、`spec-sessions`、`spec-work` UI/Figma flows、`spec-polish`、`spec-slack-research`、release/migration handoff、standalone/manual callers、agent 维护者 |
+| Primary consumers include | `spec-code-review`、`spec-doc-review`、`spec-plan`、`spec-ideate`、`spec-compound`、`spec-work` UI/Figma flows、`spec-polish`、release/migration handoff、standalone/manual callers、agent 维护者 |
 | Non-goals | 不做调度器、不删 agent、不强制 schema migration、不把 deep-dive agent 变 always-on、不新增 runtime state |
 
 维护规则：
@@ -99,7 +99,7 @@ Lifecycle 是 per-consumer classification，不是 agent 的全局唯一属性�
 | `spec-pattern-recognition-specialist` | `deprecated candidate` | `spec-compound`、专项 pattern review | 多处重复模式、抽象候选、命名一致性研究 | 单点修复或已有 maintainability finding 足够 | prose / pattern findings | 与 learnings/architecture/maintainability 重叠，需确认消费者 |
 | `spec-performance-oracle` | `deep-dive` | `spec-compound`、专项性能审查 | 明确性能瓶颈、算法复杂度、数据库/内存/扩展性专项 | 普通 code review 默认触发 | performance analysis | 与 performance reviewer 分层：oracle 是深审 |
 | `spec-performance-reviewer` | `conditional` | `spec-code-review` | database queries、loop-heavy transforms、cache、I/O-intensive paths | 非性能相关改动 | code-review reviewer schema | 普通性能条件 persona |
-| `spec-pr-comment-resolver` | `conditional` | `resolve-pr-feedback` | 处理一个 PR review feedback item 并准备 reply text | 无 PR feedback 上下文 | structured reply summary | 不是通用 code reviewer |
+| `spec-pr-comment-resolver` | `conditional` | `spec-resolve-pr-feedback` | 处理一个 PR review feedback item 并准备 reply text | 无 PR feedback 上下文 | structured reply summary | 不是通用 code reviewer |
 | `spec-previous-comments-reviewer` | `conditional` | `spec-code-review` | PR 有既有 review comments 或 threads，需要检查是否复发/已处理 | 无历史 comments | code-review reviewer schema | 依赖 PR/comment facts |
 | `spec-product-lens-reviewer` | `conditional` | `spec-doc-review` | 文档包含可挑战的产品前提、战略取舍、用户影响 | 已确认的纯执行任务 | doc-review finding，映射 `review-finding.v1` | 不用产品偏好覆盖 owner decision |
 | `spec-reliability-reviewer` | `conditional` | `spec-code-review` | error handling、retries、timeouts、health checks、background jobs、async handlers | 无运行时 failure mode 变化 | code-review reviewer schema | 专注生产可靠性 |
@@ -109,8 +109,6 @@ Lifecycle 是 per-consumer classification，不是 agent 的全局唯一属性�
 | `spec-security-lens-reviewer` | `conditional` | `spec-doc-review` | plan/requirements 涉及 auth/authz、data exposure、API attack surface | 普通实现细节或无安全面 | doc-review finding，映射 `review-finding.v1` | 计划层安全，不是代码漏洞审计 |
 | `spec-security-reviewer` | `conditional` | `spec-code-review` | auth middleware、public endpoints、user input、permission checks、secrets | 无安全边界变化 | code-review reviewer schema | 普通安全条件 persona |
 | `spec-security-sentinel` | `deprecated candidate` | `spec-compound`、安全专项审计 | 明确安全专项审计或 knowledge capture | 默认 code review | prose / security audit findings | 与 `spec-security-reviewer`、`spec-security-lens-reviewer` 重叠，需确认是否合并为 deep-dive |
-| `spec-session-historian` | `conditional` | `spec-sessions` | `spec-sessions` 已提取 session skeleton/error files，需要综合历史会话 | 直接无输入 dispatch，或当前 source 可证明事实时优先 source | session synthesis prose | 不直接作为普通 reviewer |
-| `spec-slack-researcher` | `deep-dive` | `spec-slack-research`、opt-in research | 用户明确要求 Slack/组织上下文，或 workflow opt-in | 无组织上下文授权或无需外部组织事实 | Slack research digest | 需 workspace identity / privacy boundary |
 | `spec-spec-flow-analyzer` | `deep-dive` | `spec-plan`、flow analysis | spec/plan/feature description 需要用户流完整性、edge case discovery | 普通 code review | flow analysis findings | 可作为 plan research，不是 implementation reviewer |
 | `spec-swift-ios-reviewer` | `conditional` | `spec-code-review` | Swift、SwiftUI、UIKit、iOS entitlements、privacy manifests、Core Data、SPM、pbxproj semantic changes | 非 iOS/Swift 改动 | code-review reviewer schema | stack-specific lens |
 | `spec-testing-reviewer` | `always-on` | `spec-code-review` | 测试覆盖、弱断言、脆弱测试、缺失 error/edge path | 纯文档改动 | code-review reviewer schema | code-review 基础 persona |
@@ -125,5 +123,5 @@ Lifecycle 是 per-consumer classification，不是 agent 的全局唯一属性�
 | CLI readiness | `spec-cli-readiness-reviewer`, `spec-cli-agent-readiness-reviewer` | 普通 diff 用 reviewer，专项 CLI agent-readiness audit 用 deep-dive |
 | Data migration | `spec-data-migrations-reviewer`, `spec-data-migration-expert`, `spec-data-integrity-guardian`, `spec-deployment-verification-agent` | 按普通 migration review、生产数据深审、数据完整性、部署验证四层分工 |
 | Design/Figma | `spec-design-lens-reviewer`, `spec-design-implementation-reviewer`, `spec-design-iterator`, `spec-figma-design-sync` | plan lens、implementation visual check、iteration loop、Figma sync 分开，缺视觉 evidence 时降级 |
-| Research | `spec-best-practices-researcher`, `spec-framework-docs-researcher`, `spec-web-researcher`, `spec-slack-researcher`, `spec-issue-intelligence-analyst`, `spec-repo-research-analyst`, `spec-git-history-analyzer`, `spec-session-historian`, `spec-learnings-researcher` | 明确事实来源和 authority；外部/历史/组织/learning 都是 advisory，当前 source/test/log 仍是最终确认依据 |
+| Research | `spec-best-practices-researcher`, `spec-framework-docs-researcher`, `spec-web-researcher`, `spec-issue-intelligence-analyst`, `spec-repo-research-analyst`, `spec-git-history-analyzer`, `spec-learnings-researcher` | 明确事实来源和 authority；外部/历史/组织/learning 都是 advisory，当前 source/test/log 仍是最终确认依据 |
 | Style / stack lens | `spec-dhh-rails-reviewer`, `spec-kieran-rails-reviewer`, `spec-kieran-python-reviewer`, `spec-kieran-typescript-reviewer`, `spec-swift-ios-reviewer`, `spec-julik-frontend-races-reviewer` | 按技术栈触发；本地 confirmed standards 优先于个人风格 lens |

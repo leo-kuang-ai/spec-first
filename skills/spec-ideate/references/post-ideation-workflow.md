@@ -113,14 +113,14 @@ If resuming:
 
 ### 5.2 Proof Save (default for elsewhere mode; on request for repo mode)
 
-Hand off the ideation content to the `proof` skill in HITL review mode. This uploads the doc, runs an iterative review loop (user annotates in Proof, agent ingests feedback, applies agreed edits, and replies/resolves in-thread), and (in repo mode) syncs the reviewed markdown back to `docs/ideation/`.
+Hand off the ideation content to the `spec-proof` skill in HITL review mode. This uploads the doc, runs an iterative review loop (user annotates in Proof, agent ingests feedback, applies agreed edits, and replies/resolves in-thread), and (in repo mode) syncs the reviewed markdown back to `docs/ideation/`.
 
-Load the `proof` skill (host-provided; if the host does not expose it, tell the user this review surface is unavailable) in HITL-review mode with:
+Load the `spec-proof` skill (host-provided; if the host does not expose it, tell the user this review surface is unavailable) in HITL-review mode with:
 
 - **source content:** the survivors and rejection summary from Phase 4 (in repo mode, this is the file written in 5.1; in elsewhere mode, render to a temp file as the source for upload)
 - **doc title:** `Ideation: <topic>` or the H1 of the ideation doc
-- **attribution:** use the proof skill's fixed HITL identity, `ai:spec-first` / `Spec-First`
-- **recommended next step:** current host's brainstorm entrypoint (shown in the proof skill's final terminal output)
+- **attribution:** use the spec-proof skill's fixed HITL identity, `ai:spec-first` / `Spec-First`
+- **recommended next step:** current host's brainstorm entrypoint (shown in the spec-proof skill's final terminal output)
 
 The Proof failure ladder in Phase 6.5 governs what happens when this hand-off fails.
 
@@ -132,10 +132,10 @@ The Proof failure ladder in Phase 6.5 governs what happens when this hand-off fa
 - **§6.3 Brainstorm a selected idea.** On a successful Proof return (`proceeded` or `done_for_now`), do **not** stop at the Phase 6 menu — after applying the per-status handling below (including any stale-local pull offer), continue into §6.3's remaining bullets (mark the chosen idea as `Explored`, then load `spec-brainstorm`). Only the `aborted` branch returns to the Phase 6 menu, since no durable record was written.
 - **§6.4 Save and end.** On a successful Proof return (`proceeded` or `done_for_now`), exit cleanly: narrate that the ideation was saved, surface the `docUrl` (and the local-path note if applicable), and stop. Do **not** re-ask the Phase 6 question — the user already chose to end. Only the `aborted` branch returns to the Phase 6 menu so the user can retry or pick a different path.
 
-When the proof skill returns control:
+When the spec-proof skill returns control:
 
 - `status: proceeded` with `localSynced: true` → the ideation doc on disk now reflects the review. Apply the caller-aware return rule above for the invoking branch.
-- `status: proceeded` with `localSynced: false` → the reviewed version lives in Proof at `docUrl` but the local copy is stale. Offer to pull the Proof doc to `localPath` using the proof skill's Pull workflow. Apply the caller-aware return rule above; if the pull was declined, include a one-line note that `<localPath>` is stale vs. Proof so the next handoff (or final exit narration) doesn't read the old content silently. Placement: above the Phase 6 menu when the caller-aware rule returns to it, in the handoff preamble to `spec-brainstorm` for §6.3, or alongside the final save/exit narration for §6.2 elsewhere / §6.4.
+- `status: proceeded` with `localSynced: false` → the reviewed version lives in Proof at `docUrl` but the local copy is stale. Offer to pull the Proof doc to `localPath` using the spec-proof skill's Pull workflow. Apply the caller-aware return rule above; if the pull was declined, include a one-line note that `<localPath>` is stale vs. Proof so the next handoff (or final exit narration) doesn't read the old content silently. Placement: above the Phase 6 menu when the caller-aware rule returns to it, in the handoff preamble to `spec-brainstorm` for §6.3, or alongside the final save/exit narration for §6.2 elsewhere / §6.4.
 - `status: done_for_now` → the doc on disk may be stale if the user edited in Proof before leaving. Offer to pull the Proof doc to `localPath` so the local ideation artifact stays in sync, then apply the caller-aware return rule above. `done_for_now` means the user stopped the HITL loop — it does not mean they ended the whole ideation session unless the caller-aware rule exits (§6.2 elsewhere mode or §6.4). If the pull was declined, include the stale-local note at the placement described in the previous bullet.
 - `status: aborted` → fall back to the Phase 6 menu without changes, regardless of caller. No durable record was written, so §6.3 must not proceed with the brainstorm handoff and §6.4 must not end — the menu lets the user retry or pick another path.
 
@@ -148,7 +148,7 @@ Ask what should happen next using the platform's blocking question tool: `AskUse
 Offer these four options (labels are self-contained with the distinguishing word front-loaded so options stay distinct when truncated):
 
 1. **Refine the ideation in conversation (or stop here — no save)** — add ideas, re-evaluate, or deepen analysis. No file or network side effects; ending the conversation at any point after this pick is a valid no-save exit.
-2. **Open and iterate in Proof** — save the ideation to Proof and enter the proof skill's HITL review loop: iterate via comments in the Proof editor; reviewed edits sync back to `docs/ideation/` in repo mode.
+2. **Open and iterate in Proof** — save the ideation to Proof and enter the spec-proof skill's HITL review loop: iterate via comments in the Proof editor; reviewed edits sync back to `docs/ideation/` in repo mode.
 3. **Brainstorm a selected idea** — load `spec-brainstorm` with the chosen idea as the seed. The orchestrator first writes a durable record using the mode default in Phase 5.
 4. **Save and end** — persist the ideation using the mode default (file in repo mode, Proof in elsewhere mode), then end.
 
@@ -201,11 +201,11 @@ After the file save (and optional commit), end the session — do not return to 
 
 ### 6.5 Proof Failure Ladder
 
-The `proof` skill performs single-retry-once internally on transient failures (`STALE_BASE`, `BASE_TOKEN_REQUIRED`) before surfacing failure. The proof skill's return contract does not expose typed error classes to callers — the orchestrator cannot distinguish retryable vs terminal failures from outside.
+The `spec-proof` skill performs single-retry-once internally on transient failures (`STALE_BASE`, `BASE_TOKEN_REQUIRED`) before surfacing failure. The spec-proof skill's return contract does not expose typed error classes to callers — the orchestrator cannot distinguish retryable vs terminal failures from outside.
 
-**Orchestrator-side retry harness (intentionally minimal):** wrap the proof skill invocation in **one** additional best-effort retry with a short pause (~2 seconds). The proof skill already retried internally, so this catches transient races at the orchestrator boundary without compounding latency. Do not classify error types from outside the skill — no detection mechanism exists.
+**Orchestrator-side retry harness (intentionally minimal):** wrap the spec-proof skill invocation in **one** additional best-effort retry with a short pause (~2 seconds). The spec-proof skill already retried internally, so this catches transient races at the orchestrator boundary without compounding latency. Do not classify error types from outside the skill — no detection mechanism exists.
 
-Distinguish create-failure from ops-failure by inspecting whether the proof skill returned a `docUrl` before failing:
+Distinguish create-failure from ops-failure by inspecting whether the spec-proof skill returned a `docUrl` before failing:
 
 - **Create-failure** (no `docUrl` returned): retry the create.
 - **Ops-failure** (a `docUrl` was returned, but a later operation failed): retry only the failing operation. **Do not recreate** the document.
@@ -218,7 +218,7 @@ Distinguish create-failure from ops-failure by inspecting whether the proof skil
 - "Save to a custom path the user provides" (validate writable; create parent dirs)
 - "Skip save and keep the ideation in conversation" (no persistence)
 
-If proof returned a partial `docUrl` before failing, surface that URL alongside the fallback options so the user can recover or share the partial record.
+If spec-proof returned a partial `docUrl` before failing, surface that URL alongside the fallback options so the user can recover or share the partial record.
 
 After the fallback completes (any path), continue back to the Phase 6 menu so the user can still refine, iterate in Proof, brainstorm, or save and end.
 

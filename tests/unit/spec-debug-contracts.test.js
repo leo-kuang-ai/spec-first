@@ -58,7 +58,7 @@ describe('spec-debug branch-aware handoff contract', () => {
     expect(text).toContain('Check contextual overrides first');
     expect(text).toContain('already-loaded repo instructions');
     expect(text).toContain('Read `AGENTS.md` / `CLAUDE.md` source only if the loaded instruction context is missing');
-    expect(text).toContain('Run `git-commit-push-pr`');
+    expect(text).toContain('Run `spec-commit-push-pr`');
     expect(text).toContain('Pre-existing branch: ask the user');
   });
 
@@ -165,6 +165,16 @@ describe('spec-debug branch-aware handoff contract', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');
     expect(text).toContain('references/perf-regression.md');
     expect(text).toContain('scripts/hitl-loop.template.sh');
+  });
+
+  test('test-first convention lookup uses the skill-local repo profile cache assets', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('references/repo-profile-cache.md');
+    expect(text).toContain('python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get');
+    expect(text).toContain('references/agents/repo-profiler.md');
+    expect(text).toContain('conventions.testing');
+    expect(text).not.toContain('/tmp/compound-engineering');
   });
 
   test('description frontmatter declares the slow/performance-regression trigger surface', () => {

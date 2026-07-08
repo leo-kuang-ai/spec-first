@@ -10,7 +10,7 @@
 | `under-routing` | Prompt, workflow, contract, governance, or runtime-delivery changes proceed as casual edits. | Keep substantial-work and self-work boundaries visible in `SKILL.md`. |
 | `legacy-entry-syntax` | Current product guidance restores legacy host-specific spellings as primary workflow surfaces instead of normalizing to `spec-*`. | Preserve unified-entry rules and runtime transform tests. |
 | `dispatch-overreach` | Public workflow admission is treated as Codex `spawn_agent` authorization. | Keep dispatch-boundary cases and `dispatch_authorization_missing` fallback wording. |
-| `internal-helper-exposure` | Internal helpers such as `git-worktree` are recommended as public entrypoints. | Keep skill-entrypoint lint and routing cases for standalone/internal boundaries. |
+| `internal-helper-exposure` | Internal helpers such as `spec-worktree` are recommended as public entrypoints. | Keep skill-entrypoint lint and routing cases for standalone/internal boundaries. |
 | `source-runtime-violation` | Generated runtime mirrors are edited or treated as source truth. | Keep source/runtime boundary wording and regenerate with `spec-first init` only after source validation. |
 | `setup-hijack` | Missing or stale setup evidence overrides a clear lightweight or downstream user goal. | Keep scenario fingerprint facts advisory and intent-first. |
 | `automatic-chaining` | The answer promises plan -> work -> review as one automatic chain. | Keep one-entrypoint guide mode and routing-discipline evals. |

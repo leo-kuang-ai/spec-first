@@ -144,7 +144,7 @@ describe('knowledge harness workflow consumers', () => {
   });
 
   test('learnings researcher returns structured recall status and source-confirmation fields', () => {
-    const agent = read('agents/spec-learnings-researcher.agent.md');
+    const agent = read('skills/spec-plan/references/agents/learnings-researcher.md');
 
     expect(agent).toContain('source_refs');
     expect(agent).toContain('invalidation_condition');

@@ -294,7 +294,7 @@ Check whether the input is:
 
 ### 0.3 Search Prior Learnings
 
-Dispatch `spec-learnings-researcher` to search for prior optimization work on similar topics. If relevant learnings exist, incorporate them into the approach.
+Read `references/agents/learnings-researcher.md` and dispatch a generic subagent seeded with that local prompt to search for prior optimization work on similar topics. Do not dispatch a standalone agent by type/name. If relevant learnings exist, incorporate them into the approach.
 
 ### 0.4 Run Identity Detection
 
@@ -327,6 +327,13 @@ mkdir -p .spec-first/workflows/spec-optimize/<spec-name>/
 
 **This phase is a HARD GATE. The user must approve baseline and parallel readiness before Phase 2.**
 
+**Bundled scripts.** Phases 1 and 3 call helper scripts that ship in this skill's `scripts/` directory (`measure.sh`, `parallel-probe.sh`, `experiment-worktree.sh`). The Bash tool's working directory is the user's project, not the skill directory, so a bare `scripts/<name>` path will not resolve — invoke each by the skill's own absolute path. Every runnable block below already sets `SKILL_DIR` inline (shell state does not persist between Bash tool calls, so each block must carry it); replace the `<absolute path ...>` placeholder with the directory you loaded this `spec-optimize` SKILL.md from before running. The shape:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/<name>"
+```
+
 ### 1.1 Clean-Tree Gate
 
 Verify no uncommitted changes to files within `scope.mutable` or `scope.immutable`:
@@ -347,7 +354,8 @@ Resolve `scripts/measure.sh`, `scripts/parallel-probe.sh`, and `scripts/experime
 **If user provides a measurement harness** (the `measurement.command` already exists):
 1. Run it once via the measurement script:
    ```bash
-   bash scripts/measure.sh "<measurement.command>" <timeout_seconds> "<measurement.working_directory or .>"
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   bash "$SKILL_DIR/scripts/measure.sh" "<measurement.command>" <timeout_seconds> "<measurement.working_directory or .>"
    ```
 2. Validate the JSON output:
    - Contains keys for all degenerate gate metric names
@@ -390,7 +398,8 @@ If primary type is `judge`, also run the judge evaluation on baseline output to 
 
 Run the parallelism probe script:
 ```bash
-bash scripts/parallel-probe.sh "<project_directory>" "<measurement.command>" "<measurement.working_directory>" <shared_files...>
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/parallel-probe.sh" "<project_directory>" "<measurement.command>" "<measurement.working_directory>" <shared_files...>
 ```
 
 Read the JSON output. Present any blockers to the user with suggested mitigations. Treat the probe as intentionally narrow: it should inspect the measurement command, the measurement working directory, and explicitly declared shared files, not the entire repository.
@@ -399,7 +408,8 @@ Read the JSON output. Present any blockers to the user with suggested mitigation
 
 Count existing worktrees:
 ```bash
-bash scripts/experiment-worktree.sh count
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/experiment-worktree.sh" count
 ```
 
 If count + `execution.max_concurrent` would exceed 12:
@@ -451,7 +461,14 @@ Read the code within `scope.mutable` to understand:
 - Obvious improvement opportunities
 - Constraints and dependencies between components
 
-Optionally dispatch `spec-repo-research-analyst` for deeper codebase analysis if the scope is large or unfamiliar.
+Optionally read `references/agents/repo-research-analyst.md` and dispatch a generic subagent seeded with that local prompt for deeper codebase analysis if the scope is large or unfamiliar. Do not dispatch a standalone agent by type/name. When you do, resolve the question-agnostic project profile from the shared cache first (set `SKILL_DIR` to this skill's directory; protocol in `references/repo-profile-cache.md`):
+
+```bash
+SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
+python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
+```
+
+On `HIT` load the profile JSON; on `MISS` derive it via `references/agents/repo-profiler.md` and `put` the result; on `NO-CACHE` derive inline. Pass the profile to `repo-research-analyst` and request only the question-specific scopes (e.g. `patterns`) so it skips re-deriving the agnostic stack/architecture/conventions.
 
 ### 2.2 Generate Hypothesis List
 
@@ -513,12 +530,17 @@ If the backlog is non-empty but no runnable hypotheses remain because everything
 
 ### 3.2 Dispatch Experiments
 
-For each hypothesis in the batch, dispatch according to `execution.mode`. In `serial` mode, run exactly one experiment to completion before selecting the next hypothesis. In `parallel` mode, dispatch the full batch concurrently.
+For each hypothesis in the batch, dispatch according to `execution.mode`. In `serial` mode, run exactly one experiment to completion before selecting the next hypothesis. In `parallel` mode, dispatch the batch concurrently.
+
+**Bounded dispatch.** Do not assume the host will accept all concurrent subagents at once; the active-subagent cap varies by host and profile and is independent of `execution.max_concurrent` (which caps worktrees, a separate budget). Queue the selected experiments, dispatch only as many as the host accepts, and when a capacity or active-agent-limit error appears, treat it as backpressure — retry the queued experiment after a slot frees rather than marking it failed. Mark an experiment failed only when dispatch fails for a non-capacity reason or a successfully dispatched experiment errors/times out.
+
+The Phase 3 blocks below each set `SKILL_DIR` inline as well (the loaded `spec-optimize` skill directory; see the Bundled scripts note in Phase 1) — shell state does not persist from Phase 1, so each block carries its own assignment.
 
 **Worktree backend:**
 1. Create experiment worktree:
    ```bash
-   WORKTREE_PATH=$(bash scripts/experiment-worktree.sh create "<spec_name>" <exp_index> "optimize/<spec_name>" <shared_files...>)  # creates optimize-exp/<spec_name>/exp-<NNN>
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   WORKTREE_PATH=$(bash "$SKILL_DIR/scripts/experiment-worktree.sh" create "<spec_name>" <exp_index> "optimize/<spec_name>" <shared_files...>)  # creates optimize-exp/<spec_name>/exp-<NNN>
    ```
 2. Apply port parameterization if configured (set env vars for the measurement script)
 3. Fill the experiment prompt template (`references/experiment-prompt-template.md`) with:
@@ -552,7 +574,8 @@ For each completed experiment, **immediately**:
 
 1. **Run measurement** in the experiment's worktree:
    ```bash
-   bash scripts/measure.sh "<measurement.command>" <timeout_seconds> "<worktree_path>/<measurement.working_directory or .>" <env_vars...>
+   SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+   bash "$SKILL_DIR/scripts/measure.sh" "<measurement.command>" <timeout_seconds> "<worktree_path>/<measurement.working_directory or .>" <env_vars...>
    ```
    - If stability mode is `repeat`, run the measurement harness `repeat_count` times in that working directory and aggregate the results exactly as in Phase 1 before evaluating gates or ranking the experiment.
    - Use the aggregated metrics as the experiment's score; if variance exceeds `noise_threshold`, record that in learnings so the operator knows the result is noisy.

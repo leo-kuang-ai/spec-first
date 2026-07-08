@@ -38,12 +38,11 @@ describe('CE-lineage dispatch boundary contracts', () => {
       'spec-ideate',
       'spec-debug',
       'spec-optimize',
-      'resolve-pr-feedback',
+      'spec-resolve-pr-feedback',
       'spec-work',
       'spec-compound',
       'spec-compound-refresh',
       'spec-brainstorm',
-      'spec-slack-research',
     ];
 
     expect(matrix).toContain('CE Dispatch Boundary Audit Matrix');
@@ -63,10 +62,9 @@ describe('CE-lineage dispatch boundary contracts', () => {
       'skills/spec-code-review/SKILL.md',
       'skills/spec-plan/SKILL.md',
       'skills/spec-ideate/SKILL.md',
-      'skills/resolve-pr-feedback/SKILL.md',
+      'skills/spec-resolve-pr-feedback/SKILL.md',
       'skills/spec-work/SKILL.md',
       'skills/spec-optimize/SKILL.md',
-      'skills/agent-native-architecture/references/audit-playbook.md',
     ].map(read).join('\n');
 
     expect(combined).not.toMatch(/Codex cannot dispatch/i);
@@ -144,7 +142,7 @@ describe('CE-lineage dispatch boundary contracts', () => {
   });
 
   test('mutating dispatch skills state isolation, serialization, and orchestrator ownership', () => {
-    const resolveFeedback = read('skills/resolve-pr-feedback/SKILL.md');
+    const resolveFeedback = read('skills/spec-resolve-pr-feedback/SKILL.md');
     const work = read('skills/spec-work/SKILL.md');
     const optimize = read('skills/spec-optimize/SKILL.md');
 
@@ -160,21 +158,6 @@ describe('CE-lineage dispatch boundary contracts', () => {
     expect(optimize).toContain('Dispatch And Backend Boundary');
     expect(optimize).toContain('Serial local/worktree execution remains the safe fallback');
     expect(optimize).toContain('The orchestrator owns final integration');
-  });
-
-  test('agent-native audit playbook is capability-gated with sequential fallback', () => {
-    const text = read('skills/agent-native-architecture/references/audit-playbook.md');
-
-    expect(text).toContain('full-codebase audit adapter');
-    expect(text).toContain('not a standalone public workflow or skill entrypoint');
-    expect(text).toContain('Launch 8 parallel read-only subagents when the host exposes a dispatch primitive');
-    expect(text).toContain('If dispatch is unavailable, explicitly disabled, or unsafe');
-    expect(text).not.toContain('If dispatch is unavailable or explicitly disabled, run');
-    expect(text).toContain('run the eight principle audits sequentially in the current agent');
-    expect(text).toContain('Subagents are read-only explorers.');
-    expect(text).toContain('Keep parallelism bounded to these eight principles');
-    expect(text).toContain('All 8 principle audits complete, whether via parallel subagents or sequential current-agent fallback');
-    expect(text).not.toContain('All 8 sub-agents complete their audits');
   });
 
   test('phase 2 dispatch-bearing workflows reject hidden implement-check lifecycles', () => {

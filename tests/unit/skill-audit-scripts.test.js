@@ -647,22 +647,22 @@ describe('spec-skill-audit scripts', () => {
     expect(whenToUse.severity).toBe('P1');
   });
 
-  test('allows governed internal skill frontmatter runtime aliases', () => {
-    write(path.join(repoRoot, 'skills', 'spec-dhh-rails-style', 'SKILL.md'), [
+  test('reports frontmatter name mismatches without retired runtime aliases', () => {
+    write(path.join(repoRoot, 'skills', 'spec-example-style', 'SKILL.md'), [
       '---',
-      'name: dhh-rails-style',
-      'description: Apply curated DHH Rails conventions when Rails specialist agents request them.',
+      'name: example-style',
+      'description: Apply example conventions when specialist agents request them.',
       '---',
       '',
-      '# DHH Rails Style',
+      '# Example Style',
     ].join('\n'));
 
     const inventory = collectSkillFacts({ repoRoot });
     const findings = lintSkillStructure(inventory);
     const mismatchFindings = findings.filter((finding) => finding.title === 'Frontmatter name does not match directory name');
 
-    expect(mismatchFindings.map((finding) => finding.skill_id)).not.toEqual(expect.arrayContaining([
-      'spec-dhh-rails-style',
+    expect(mismatchFindings.map((finding) => finding.skill_id)).toEqual(expect.arrayContaining([
+      'spec-example-style',
     ]));
   });
 

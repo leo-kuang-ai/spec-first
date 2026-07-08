@@ -100,18 +100,6 @@ describe('skill source path rewrite guard', () => {
         runtimeSkillRoot: '.agents/skills/using-spec-first',
         expected: '`skills/using-spec-first/SKILL.md` is the source-of-truth routing policy.',
       },
-      {
-        adapter: new ClaudeAdapter(),
-        skillName: 'agent-native-architecture',
-        runtimeSkillRoot: '.claude/skills/agent-native-architecture',
-        expected: 'The source of truth is `skills/agent-native-architecture/SKILL.md`',
-      },
-      {
-        adapter: new CodexAdapter(),
-        skillName: 'agent-native-architecture',
-        runtimeSkillRoot: '.agents/skills/agent-native-architecture',
-        expected: 'The source of truth is `skills/agent-native-architecture/SKILL.md`',
-      },
     ];
 
     for (const { adapter, skillName, runtimeSkillRoot, expected } of cases) {

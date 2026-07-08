@@ -706,7 +706,7 @@ foreach ($helperEntry in @($helperRegistry.helpers | Where-Object { ($_.kind -eq
       } else {
         if (-not $baselineBlocking) {
           $status = 'degraded'
-          $nextAction = "optional helper for feature-video skill; install via: $installCommand"
+          $nextAction = "optional helper; install via: $installCommand"
         } else {
           $status = 'action-required'
           $nextAction = $installCommand
@@ -715,7 +715,7 @@ foreach ($helperEntry in @($helperRegistry.helpers | Where-Object { ($_.kind -eq
     } else {
       if (-not $baselineBlocking) {
         $status = 'degraded'
-        $nextAction = "optional helper for feature-video skill; install via: $installCommand"
+        $nextAction = "optional helper; install via: $installCommand"
       } else {
         $status = 'action-required'
         $nextAction = $installCommand

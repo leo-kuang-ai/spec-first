@@ -159,7 +159,7 @@ describe('package install contracts', () => {
   });
 
   test('npm pack dry-run includes referenced workflow contracts and excludes generated Python bytecode caches', () => {
-    const cacheDir = path.join(REPO_ROOT, 'skills/spec-release-notes/scripts/__pycache__');
+    const cacheDir = path.join(REPO_ROOT, 'skills/spec-compound/scripts/__pycache__');
     const bytecodePath = path.join(cacheDir, `pack-contract-${process.pid}-${Date.now()}.cpython-311.pyc`);
     const npmCacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-npm-pack-'));
 

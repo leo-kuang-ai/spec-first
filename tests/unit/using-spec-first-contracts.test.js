@@ -200,7 +200,7 @@ describe('using-spec-first contracts', () => {
       'This skill should not ask the agent to fabricate command results',
       'Do not use this governor to create pseudo-plan, pseudo-task, or pseudo-review artifacts.',
       'Do **not** expose internal-only skills as user entrypoints.',
-      '`git-worktree`',
+      '`spec-worktree`',
       'using-spec-first` itself is a standalone meta skill',
       'spec-doc-review',
       'spec-skill-audit',
@@ -439,7 +439,7 @@ describe('using-spec-first contracts', () => {
     expect(routingRedFlags).toContain('Do **not** restore legacy host-specific spellings as current product surfaces');
     expect(routingRedFlags).toContain('Do **not** create host-specific public workflow names when the unified `spec-*` id already exists.');
     expect(routingRedFlags).toContain('Do **not** expose internal-only skills as user entrypoints.');
-    expect(routingRedFlags).toContain('`git-worktree`');
+    expect(routingRedFlags).toContain('`spec-worktree`');
 
     // Scope Guards 详细规则必须在 scope-guards.md(SKILL 主面仅留指针)
     expect(scopeGuards).toContain('If You Are Already In A Workflow');
@@ -453,14 +453,16 @@ describe('using-spec-first contracts', () => {
     expect(dispatchBoundaries).toContain('spec-doc-review` means the document-review workflow');
   });
 
-  // R-05: 红旗不得含反转 skill 名 bug-report，真实名是 report-bug
-  test('routing red flags use the real report-bug skill name, not the reversed bug-report', () => {
+  // R-05: 红旗不得保留已退役 helper 名或其反转名
+  test('routing red flags do not reference retired bug-report helper names', () => {
     const routingRedFlags = read(path.join(
       REPO_ROOT, 'skills', 'using-spec-first', 'references', 'routing-red-flags.md',
     ));
+    const retiredName = ['report', 'bug'].join('-');
+    const reversedName = ['bug', 'report'].join('-');
 
-    expect(routingRedFlags).toContain('report-bug helpers');
-    expect(routingRedFlags).not.toContain('bug-report');
+    expect(routingRedFlags).not.toContain(retiredName);
+    expect(routingRedFlags).not.toContain(reversedName);
   });
 
   // R-07: 红旗 route target 不得用裸名 update/setup，应指向明确入口

@@ -10,15 +10,14 @@ const GOVERNANCE_PATH = path.join(
   'src/cli/contracts/dual-host-governance/skills-governance.json',
 );
 // DELIVERED_INTERNAL_SKILLS 镜像(src/cli/plugin.js)。internal_only 默认 skip,只有列入此集才会交付到 runtime。
-const DELIVERED_INTERNAL_SKILLS = new Set(['git-worktree']);
+const DELIVERED_INTERNAL_SKILLS = new Set(['spec-worktree']);
 // Host-provided skills:由宿主/插件生态提供,spec-first 不负责交付到 runtime。
 // 公开 workflow 可委托它们,但 prose 必须声明"宿主提供,缺失则降级"。
 // 这是 Light-contract 形式的 source→runtime helper 可解析性治理(report 批次 C #3)。
 const HOST_PROVIDED_SKILLS = new Set([
-  'git-commit',
-  'git-commit-push-pr',
-  'proof',
-  'feature-video',
+  'spec-commit',
+  'spec-commit-push-pr',
+  'spec-proof',
 ]);
 
 function walkSkillDocs(dir) {

@@ -7,9 +7,6 @@ const SOURCE_ROOTS = [
   path.join(__dirname, '..', '..', 'skills'),
   path.join(__dirname, '..', '..', 'agents'),
 ];
-const REPO_ROOT = path.join(__dirname, '..', '..');
-const GEMINI_SKILL_PATH = path.join(REPO_ROOT, 'skills', 'gemini-imagegen', 'SKILL.md');
-const GEMINI_SCRIPT_DIR = path.join(REPO_ROOT, 'skills', 'gemini-imagegen', 'scripts');
 
 function walkMarkdownFiles(dir) {
   const out = [];
@@ -331,35 +328,4 @@ describe('skill and agent `!` pre-resolution commands avoid Claude Code shell de
       }
     });
   }
-});
-
-describe('gemini-imagegen deterministic prompt/script drift contracts', () => {
-  test('skill prose and helper scripts agree on default model and jpg output posture', () => {
-    const skill = fs.readFileSync(GEMINI_SKILL_PATH, 'utf8');
-    const generate = fs.readFileSync(path.join(GEMINI_SCRIPT_DIR, 'generate_image.py'), 'utf8');
-    const edit = fs.readFileSync(path.join(GEMINI_SCRIPT_DIR, 'edit_image.py'), 'utf8');
-    const multiTurn = fs.readFileSync(path.join(GEMINI_SCRIPT_DIR, 'multi_turn_chat.py'), 'utf8');
-    const library = fs.readFileSync(path.join(GEMINI_SCRIPT_DIR, 'gemini_images.py'), 'utf8');
-
-    expect(skill).toContain('`gemini-3-pro-image-preview` | 1K-4K | All image generation (default)');
-    expect(skill).toContain('The helper scripts default to this model as well.');
-    expect(skill).toContain('do not silently change the default');
-    expect(skill).toContain('image.save("output.jpg")');
-
-    for (const script of [generate, edit, multiTurn]) {
-      expect(script).toContain('DEFAULT_MODEL = "gemini-3-pro-image-preview"');
-      expect(script).toContain('default=DEFAULT_MODEL');
-      expect(script).not.toMatch(/default="gemini-2\.5-flash-image"/);
-      expect(script).not.toMatch(/default: gemini-2\.5-flash-image/);
-    }
-
-    expect(generate).toContain('python generate_image.py "prompt" output.jpg');
-    expect(generate).toContain('Output file path (e.g., output.jpg)');
-    expect(edit).toContain('python edit_image.py input.png "edit instruction" output.jpg');
-    expect(multiTurn).toContain('filename = f"image_{timestamp}_{self.image_count}.jpg"');
-    expect(multiTurn).toContain('if filepath.suffix.lower() in {".jpg", ".jpeg"}:');
-    expect(multiTurn).toContain('image = image.convert("RGB")');
-    expect(multiTurn).toContain('save_kwargs["format"] = "JPEG"');
-    expect(library).toContain('def __init__(self, api_key: str | None = None, model: Model = PRO):');
-  });
 });

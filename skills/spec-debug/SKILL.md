@@ -315,7 +315,12 @@ If the user chose "Diagnosis only" at the end of Phase 2, skip this phase and go
 - If the current branch is the default branch, ask whether to create a feature branch first using the platform's blocking question tool (see Phase 2 for the per-platform names). To detect the default branch, compare against `main`, `master`, or the value of `git rev-parse --abbrev-ref origin/HEAD` with its `origin/` prefix stripped (the raw output is `origin/<name>`, so an unstripped comparison will never match the local branch name). Default to creating one; derive a name from the bug and run `git checkout -b <name>`. On any other branch, proceed.
 
 **Test-first:**
-1. Read the nearby or project-level testing convention before adding a reproduction test; match the existing test style, fixture pattern, and command shape
+1. Read the nearby or project-level testing convention before adding a reproduction test; match the existing test style, fixture pattern, and command shape. Resolve testing conventions from the shared repo-grounding cache first — set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
+   ```bash
+   SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
+   python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
+   ```
+   On `HIT`, read `conventions.testing` from the profile. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive the profile, write its JSON output to a file, then persist it with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call). On `NO-CACHE` or helper failure, derive testing conventions from direct source reads. The cache is advisory only; current nearby tests and source still win.
 2. **Judge the correct seam before writing the failing test** — does the seam exercise the bug's real call pattern at the real call site? Apply "lock what you can, flag what you can't":
    - **Correct seam exists** → write the failing test there, proceed normally.
    - **Only a shallow seam exists** (single-caller test, but the bug needs a multi-caller chain) → **still write** the failing test, but annotate in the test comment / PR that "this test does not cover the full call chain; it locks only this layer," and flag the architecture gap to Phase 4 as a `blocking advisory` (not ordinary advisory). The PR body must state "this PR locks only the shallow layer; architecture gap X remains, tracked at [issue link]" so the shallow test's apparent-coverage signal cannot swallow the architecture flag. Do not skip the test because the seam is shallow.
@@ -379,7 +384,7 @@ When Phase 3 created the branch, default to finishing the bugfix by committing a
 
 1. **Check contextual overrides first.** Look at the user's original prompt, loaded memories, and already-loaded repo instructions for explicit preferences that conflict with automatic commit-and-PR, such as "always review before pushing", "open PRs as drafts", or "do not open PRs from skills". Read `AGENTS.md` / `CLAUDE.md` source only if the loaded instruction context is missing, stale, or the override itself is being verified. If any apply, honor them by switching to the pre-existing-branch menu below or skipping the PR step, whichever matches the instruction.
 2. **Briefly preview what will happen**: what will be committed, on which branch, and that a PR will be opened. This preview lets the user interrupt; it is not a blocking question.
-3. **Run `git-commit-push-pr`.** When the entry came from an issue tracker, include the appropriate close syntax in the place that tracker parses, such as `Fixes #N` in GitHub PR descriptions or the relevant Jira/Linear close syntax. Surface the resulting PR URL.
+3. **Run `spec-commit-push-pr`.** When the entry came from an issue tracker, include the appropriate close syntax in the place that tracker parses, such as `Fixes #N` in GitHub PR descriptions or the relevant Jira/Linear close syntax. Surface the resulting PR URL.
 
 #### Pre-existing branch: ask the user
 
@@ -387,7 +392,7 @@ If this skill did not create the branch, prompt the user for the next action via
 
 Options:
 
-1. **Commit and open a PR (`git-commit-push-pr`)** — default for most cases
+1. **Commit and open a PR (`spec-commit-push-pr`)** — default for most cases
 2. **Commit the fix** — local commit only
 3. **Stop here** — user takes it from there
 

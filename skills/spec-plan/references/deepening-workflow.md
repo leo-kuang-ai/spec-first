@@ -106,53 +106,53 @@ Strengthening [section names] — [brief reason for each, e.g., "decision ration
 
 For each selected section, choose the smallest useful agent set. Do **not** run every agent. Use at most **1-3 agents per section** and usually no more than **8 agents total**.
 
-Use fully-qualified agent names inside dispatch prompts or agent invocations.
+Use fully-qualified agent names inside dispatch prompts or agent invocations. Treat those names as stable output labels. For every selected agent with a local prompt asset, read the mapped file under `references/agents/` and seed a generic read-only subagent with that content; do not dispatch a standalone typed agent by name when a local prompt asset exists. Agents marked host-provided keep their existing reviewer surface until migrated.
 
 **Deterministic Section-to-Agent Mapping:**
 
 **Requirements / Open Questions classification**
-- `spec-spec-flow-analyzer` for missing user flows, edge cases, and handoff gaps
-- `spec-repo-research-analyst` (Scope: `architecture, patterns`) for repo-grounded patterns, conventions, and implementation reality checks
+- `spec-spec-flow-analyzer` (`references/agents/spec-flow-analyzer.md`) for missing user flows, edge cases, and handoff gaps
+- `spec-repo-research-analyst` (`references/agents/repo-research-analyst.md`, Scope: `architecture, patterns`) for repo-grounded patterns, conventions, and implementation reality checks
 
 **Context & Research / Sources & References gaps**
-- `spec-learnings-researcher` for institutional knowledge and past solved problems
-- `spec-framework-docs-researcher` for official framework or library behavior
-- `spec-best-practices-researcher` for current external patterns and industry guidance
-- Add `spec-git-history-analyzer` only when historical rationale or prior art is materially missing
+- `spec-learnings-researcher` (`references/agents/learnings-researcher.md`) for institutional knowledge and past solved problems
+- `spec-framework-docs-researcher` (`references/agents/framework-docs-researcher.md`) for official framework or library behavior
+- `spec-best-practices-researcher` (`references/agents/best-practices-researcher.md`) for current external patterns and industry guidance
+- Add `spec-git-history-analyzer` (`references/agents/git-history-analyzer.md`) only when historical rationale or prior art is materially missing
 
 **Key Technical Decisions**
-- `spec-architecture-strategist` for design integrity, boundaries, and architectural tradeoffs
-- Add `spec-framework-docs-researcher` or `spec-best-practices-researcher` when the decision needs external grounding beyond repo evidence
+- `spec-architecture-strategist` (`references/agents/architecture-strategist.md`) for design integrity, boundaries, and architectural tradeoffs
+- Add `spec-framework-docs-researcher` (`references/agents/framework-docs-researcher.md`) or `spec-best-practices-researcher` (`references/agents/best-practices-researcher.md`) when the decision needs external grounding beyond repo evidence
 
 **High-Level Technical Design**
-- `spec-architecture-strategist` for validating that the technical design accurately represents the intended approach and identifying gaps
-- `spec-repo-research-analyst` (Scope: `architecture, patterns`) for grounding the technical design in existing repo patterns and conventions
-- Add `spec-best-practices-researcher` when the technical design involves a DSL, API surface, or pattern that benefits from external validation
+- `spec-architecture-strategist` (`references/agents/architecture-strategist.md`) for validating that the technical design accurately represents the intended approach and identifying gaps
+- `spec-repo-research-analyst` (`references/agents/repo-research-analyst.md`, Scope: `architecture, patterns`) for grounding the technical design in existing repo patterns and conventions
+- Add `spec-best-practices-researcher` (`references/agents/best-practices-researcher.md`) when the technical design involves a DSL, API surface, or pattern that benefits from external validation
 
 **Implementation Units / Verification**
-- `spec-repo-research-analyst` (Scope: `patterns`) for concrete file targets, patterns to follow, and repo-specific sequencing clues
-- `spec-pattern-recognition-specialist` for consistency, duplication risks, and alignment with existing patterns
-- Add `spec-spec-flow-analyzer` when sequencing depends on user flow or handoff completeness
+- `spec-repo-research-analyst` (`references/agents/repo-research-analyst.md`, Scope: `patterns`) for concrete file targets, patterns to follow, and repo-specific sequencing clues
+- `spec-pattern-recognition-specialist` (`references/agents/pattern-recognition-specialist.md`) for consistency, duplication risks, and alignment with existing patterns
+- Add `spec-spec-flow-analyzer` (`references/agents/spec-flow-analyzer.md`) when sequencing depends on user flow or handoff completeness
 
 **System-Wide Impact**
-- `spec-architecture-strategist` for cross-boundary effects, interface surfaces, and architectural knock-on impact
-- Add `spec-api-contract-reviewer` when the plan changes API routes, request/response schemas, exported type signatures, event contracts, or versioning expectations; this is an existing specialist for contract depth, not a new surface-enumeration agent.
-- Add `spec-design-lens-reviewer` only when the plan includes user-facing client surfaces and needs plan-time coverage of information architecture, interaction states, user flows, responsive/accessibility concerns, or AI-slop risk. It is a design-decision lens for materially user-facing plans, not a default reviewer for every multi-surface plan.
+- `spec-architecture-strategist` (`references/agents/architecture-strategist.md`) for cross-boundary effects, interface surfaces, and architectural knock-on impact
+- Add `spec-api-contract-reviewer` (host-provided reviewer) when the plan changes API routes, request/response schemas, exported type signatures, event contracts, or versioning expectations; this is an existing specialist for contract depth, not a new surface-enumeration agent.
+- Add `spec-design-lens-reviewer` (host-provided reviewer) only when the plan includes user-facing client surfaces and needs plan-time coverage of information architecture, interaction states, user flows, responsive/accessibility concerns, or AI-slop risk. It is a design-decision lens for materially user-facing plans, not a default reviewer for every multi-surface plan.
 - Add the specific specialist that matches the risk:
-  - `spec-performance-oracle` for scalability, latency, throughput, and resource-risk analysis
-  - `spec-security-sentinel` for auth, validation, exploit surfaces, and security boundary review
-  - `spec-data-integrity-guardian` for migrations, persistent state safety, consistency, and data lifecycle risks
+  - `spec-performance-oracle` (`references/agents/performance-oracle.md`) for scalability, latency, throughput, and resource-risk analysis
+  - `spec-security-sentinel` (`references/agents/security-sentinel.md`) for auth, validation, exploit surfaces, and security boundary review
+  - `spec-data-integrity-guardian` (`references/agents/data-integrity-guardian.md`) for migrations, persistent state safety, consistency, and data lifecycle risks
 
 **Enterprise trigger-to-specialist mapping**
 - For enterprise high-risk triggers, reuse the trigger-to-specialist mapping in `skills/spec-plan/references/enterprise-plan-review.md` (Specialist Reuse); the canonical mapping lives there, not duplicated here. The pre-existing per-section specialist guidance below still applies to ordinary deepening.
 
 **Risks & Dependencies / Operational Notes**
 - Use the specialist that matches the actual risk:
-  - `spec-security-sentinel` for security, auth, privacy, and exploit risk
-  - `spec-data-integrity-guardian` for persistent data safety, constraints, and transaction boundaries
-  - `spec-data-migration-expert` for migration realism, backfills, and production data transformation risk
-  - `spec-deployment-verification-agent` for rollout checklists, rollback planning, and launch verification
-  - `spec-performance-oracle` for capacity, latency, and scaling concerns
+  - `spec-security-sentinel` (`references/agents/security-sentinel.md`) for security, auth, privacy, and exploit risk
+  - `spec-data-integrity-guardian` (`references/agents/data-integrity-guardian.md`) for persistent data safety, constraints, and transaction boundaries
+  - `spec-data-migration-expert` (`references/agents/data-migration-reviewer.md`) for migration realism, backfills, and production data transformation risk
+  - `spec-deployment-verification-agent` (`references/agents/deployment-verification-agent.md`) for rollout checklists, rollback planning, and launch verification
+  - `spec-performance-oracle` (`references/agents/performance-oracle.md`) for capacity, latency, and scaling concerns
 
 **Agent Prompt Shape:**
 

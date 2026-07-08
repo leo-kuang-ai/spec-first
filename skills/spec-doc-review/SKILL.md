@@ -225,6 +225,8 @@ Add activated conditional personas:
 - `spec-scope-guardian-reviewer`
 - `spec-adversarial-document-reviewer`
 
+Selected reviewer prompt assets live under `references/personas/`. Read only the prompt files selected for the current review and pass their full content as `{persona_file}` in the subagent template; reviewer ids remain stable labels for announcements and findings, not standalone agent types to dispatch by name.
+
 ### Dispatch Capability Gate
 
 Before dispatching any reviewer, confirm the current host exposes a dispatch primitive, the current user request or parent workflow explicitly authorizes subagents / parallel reviewer work / delegated review for this phase, and the selected reviewers are part of this documented document-review phase. Dispatch capability and dispatch authorization are runtime boundaries, not reviewer-selection preferences.

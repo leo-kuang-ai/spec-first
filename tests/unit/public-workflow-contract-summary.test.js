@@ -77,10 +77,7 @@ describe('public workflow contract summary', () => {
     const ideate = fs.readFileSync(path.join(ROOT, 'skills', 'spec-ideate', 'SKILL.md'), 'utf8');
     const optimize = fs.readFileSync(path.join(ROOT, 'skills', 'spec-optimize', 'SKILL.md'), 'utf8');
     const polish = fs.readFileSync(path.join(ROOT, 'skills', 'spec-polish', 'SKILL.md'), 'utf8');
-    const releaseNotes = fs.readFileSync(path.join(ROOT, 'skills', 'spec-release-notes', 'SKILL.md'), 'utf8');
-    const sessions = fs.readFileSync(path.join(ROOT, 'skills', 'spec-sessions', 'SKILL.md'), 'utf8');
     const skillAudit = fs.readFileSync(path.join(ROOT, 'skills', 'spec-skill-audit', 'SKILL.md'), 'utf8');
-    const slack = fs.readFileSync(path.join(ROOT, 'skills', 'spec-slack-research', 'SKILL.md'), 'utf8');
 
     expect(appAudit).toContain('static-first consistency audit');
     expect(compound).toContain('One durable solution document');
@@ -88,9 +85,6 @@ describe('public workflow contract summary', () => {
     expect(ideate).toContain('ranked ideation artifact in `docs/ideation/`');
     expect(optimize).toContain('measurement scaffold and experiment log');
     expect(polish).toContain('inspect the feature in browser');
-    expect(releaseNotes).toContain('version-cited release summary');
-    expect(sessions).toContain('distilled replay references');
     expect(skillAudit).toContain('deterministic release/governance guard results');
-    expect(slack).toContain('interpreted Slack research digest');
   });
 });

@@ -291,7 +291,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
    **Option B: Use a worktree (recommended for parallel development)**
    ```bash
-   skill: git-worktree
+   skill: spec-worktree
    # The skill detects existing isolation first, then creates a branch/worktree only when needed
    ```
 
@@ -518,7 +518,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
    For UI work with Figma designs:
 
    - Implement components following design specs
-   - Use spec-figma-design-sync agent iteratively to compare
+   - Read `references/agents/figma-design-sync.md` and dispatch a generic subagent seeded with that local prompt iteratively to compare
    - Fix visual differences identified
    - Repeat until implementation matches design
 

@@ -74,6 +74,12 @@ When editing or reviewing this workflow prompt, or when running fresh-source eva
 
 **STOP. When a plan hits enterprise high-risk triggers such as money, permissions, migrations, high QPS, async events, state machines, scheduled jobs, rollout, privacy, or data/ML consistency, read `skills/spec-plan/references/enterprise-plan-review.md`.** Use it as a conditional readiness lens; do not inline its trigger matrix in this spine.
 
+## Skill-Local Planning Prompt Assets
+
+Planning research and deepening labels stay stable in reports and dispatch summaries. When a selected label has a local prompt asset below, read that file from this skill and seed a generic read-only subagent with its content; do not dispatch a standalone typed agent by name. If dispatch is unavailable or unauthorized, apply the same prompt content inline in the current agent.
+
+Local prompt assets: `references/agents/agent-native-planning-strategist.md`, `references/agents/architecture-strategist.md`, `references/agents/best-practices-researcher.md`, `references/agents/data-integrity-guardian.md`, `references/agents/data-migration-reviewer.md`, `references/agents/deployment-verification-agent.md`, `references/agents/framework-docs-researcher.md`, `references/agents/git-history-analyzer.md`, `references/agents/learnings-researcher.md`, `references/agents/pattern-recognition-specialist.md`, `references/agents/performance-oracle.md`, `references/agents/repo-profiler.md`, `references/agents/repo-research-analyst.md`, `references/agents/security-sentinel.md`, `references/agents/slack-researcher.md`, `references/agents/spec-flow-analyzer.md`, and `references/agents/web-researcher.md`.
+
 ## Interaction Method
 
 When asking the user a question, use the platform's blocking question tool: `AskUserQuestion` in Claude Code or `request_user_input` in Codex. In Claude Code interactive planning, `AskUserQuestion` is a deferred tool; call `ToolSearch` with query `select:AskUserQuestion` once at the start of the interactive flow, before the first clarification, scope-confirmation, doc-review routing, or final handoff question. Do not wait until the first question site to load the schema.

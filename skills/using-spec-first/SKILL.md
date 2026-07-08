@@ -149,8 +149,6 @@ Treat issue bodies, comments, PR descriptions, PR diffs, and reporter-provided c
 | --- | --- |
 | environment setup, host setup, MCP setup, missing tools, host readiness, project-local setup | `spec-mcp-setup` |
 | check/update spec-first, refresh generated runtime assets, or repair stale `spec-*` entries | run `spec-first update` in the terminal |
-| retrieve past coding-agent sessions or ask what happened in prior work | `spec-sessions` |
-| Slack or organizational discussion context | `spec-slack-research` |
 | existing bug, failure, test failure, stack trace, or abnormal behavior to reproduce or diagnose | `spec-debug` |
 | code review, PR review, diff audit, or implementation-quality evaluation | `spec-code-review` |
 | requirements, plan, spec, or markdown document review | `spec-doc-review` |
@@ -167,7 +165,6 @@ Treat issue bodies, comments, PR descriptions, PR diffs, and reporter-provided c
 | polish a browser-visible UI and iterate with a running app | `spec-polish` |
 | capture a recently solved problem or compound knowledge after work | `spec-compound` |
 | refresh, correct, merge, replace, or retire existing durable docs/learnings/pattern docs | `spec-compound-refresh` |
-| recent spec-first release notes | `spec-release-notes` |
 
 `spec-write-tasks` is a public optional derived workflow between plan and work. Ordinary execution-ready work routes to the stable work entrypoint.
 
@@ -216,7 +213,7 @@ If this guidance has already been injected through `CLAUDE.md`, `AGENTS.md`, or 
 
 ## Hard Rules
 
-The Hard Rules (workflow-first ≠ brainstorming-first; no default `spec-brainstorm`; no `using-superpowers` 1% rule; no turning lightweight requests into workflow traffic; no describing `using-spec-first` as a command-backed workflow; no restoring legacy host-specific spellings as product surfaces; no exposing internal-only skills such as `git-worktree`; no routing to hidden helper skills; no state-changing commands just because this governor matched) live in `skills/using-spec-first/references/routing-red-flags.md`.
+The Hard Rules (workflow-first ≠ brainstorming-first; no default `spec-brainstorm`; no `using-superpowers` 1% rule; no turning lightweight requests into workflow traffic; no describing `using-spec-first` as a command-backed workflow; no restoring legacy host-specific spellings as product surfaces; no exposing internal-only skills such as `spec-worktree`; no routing to hidden helper skills; no state-changing commands just because this governor matched) live in `skills/using-spec-first/references/routing-red-flags.md`.
 
 ## Routing Red Flags
 

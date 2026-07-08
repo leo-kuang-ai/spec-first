@@ -164,7 +164,7 @@ function buildZhBootstrapBody(hostId) {
 - 架构/prompt/workflow/contract 或 source/runtime 判断前按需读取 \`docs/10-prompt/结构化项目角色契约.md\`;scripts/tools 只产 deterministic facts,LLM 做语义路由判断
 - **反合理化红旗**(出现这些念头即停):「先改个文件就好」→ 明确小改动可直接做;规模/风险不明、根因未定或触及架构/contract/多文件时先路由;「只是个快速架构/prompt 改动」→ 架构/prompt/workflow/contract 改动算 substantial;「得先看一堆文件再决定」→ 只做最小事实核查,已清晰则直接路由;「该评审但我口头答就行」→ 评审目标具体时用 code-review/doc-review;「helper skill 存在所以该暴露」→ 只有公开 workflow 是用户入口,internal helper 隐藏
 ${hostLine}
-${surfaceLine}；不要直接暴露 internal-only skills,例如 \`git-worktree\`
+${surfaceLine}；不要直接暴露 internal-only skills,例如 \`spec-worktree\`
 ${codexStartupReminderLines ? `${codexStartupReminderLines}` : ''}`;
 }
 
@@ -195,7 +195,7 @@ function buildEnBootstrapBody(hostId) {
 - Before architecture/prompt/workflow/contract or source/runtime judgments, read \`docs/10-prompt/结构化项目角色契约.md\` as needed; scripts/tools produce deterministic facts, while the LLM owns semantic routing judgment
 - **Anti-rationalization red flags** (stop when these thoughts appear): "I'll just edit the file first" → clearly scoped small edits can proceed directly; route first when scope/risk is unclear, root cause is unresolved, or architecture/contract/multi-file work is involved; "just a quick architecture/prompt change" → architecture/prompt/workflow/contract changes ARE substantial; "I need to inspect a bunch of files first" → do a minimal fact check only, route if already clear; "review needed but I'll answer informally" → use code-review/doc-review when the target is concrete; "a helper skill exists so I should expose it" → only public workflows are user entrypoints, internal helpers stay hidden
 ${hostLine}
-${surfaceLine}; do not expose internal-only skills directly, for example \`git-worktree\`
+${surfaceLine}; do not expose internal-only skills directly, for example \`spec-worktree\`
 ${codexStartupReminderLines ? `${codexStartupReminderLines}` : ''}`;
 }
 

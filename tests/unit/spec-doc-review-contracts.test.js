@@ -33,8 +33,11 @@ const COHERENCE_REVIEWER_PATH = path.join(
   __dirname,
   '..',
   '..',
-  'agents',
-  'spec-coherence-reviewer.agent.md',
+  'skills',
+  'spec-doc-review',
+  'references',
+  'personas',
+  'coherence-reviewer.md',
 );
 
 describe('spec-doc-review frontmatter trigger contract', () => {
@@ -135,15 +138,26 @@ describe('spec-doc-review best-judgment wording contract', () => {
     expect(reviewer).toContain('context_refs');
     expect(reviewer).toContain('stop_if');
     expect(reviewer).toContain('declared source plan instead of inventing a second scope');
-    expect(reviewer).toContain('Summary/detail mismatch where the body is authoritative');
+    expect(reviewer).toContain('Summary/detail mismatch where body is authoritative');
     expect(reviewer).toContain('Prose-vs-prose contradiction where one passage is more detailed');
     expect(reviewer).toContain('Missing list entry derivable from elsewhere in the document');
     expect(reviewer).toContain('When you find one of the six patterns above');
     expect(reviewer).toContain('maybe the summary is intentionally lossy');
     expect(reviewer).toContain('maybe both readings are acceptable');
     expect(reviewer).toContain('maybe the omission is intentional');
-    expect(reviewer).toContain('tools: Read, Grep, Glob, Bash');
     expect(reviewer).not.toContain('ce-coherence-reviewer');
+    expect(reviewer).not.toContain('tools:');
+    expect(reviewer).not.toContain('---');
+  });
+
+  test('reviewer personas are loaded from skill-local prompt assets', () => {
+    const skill = fs.readFileSync(DOC_REVIEW_FILES[0], 'utf8');
+
+    expect(skill).toContain('Selected reviewer prompt assets live under `references/personas/`');
+    expect(skill).toContain('pass their full content as `{persona_file}`');
+    expect(skill).toContain('not standalone agent types to dispatch by name');
+    expect(fs.existsSync(COHERENCE_REVIEWER_PATH)).toBe(true);
+    expect(COHERENCE_REVIEWER_PATH).toContain(path.join('skills', 'spec-doc-review', 'references', 'personas'));
   });
 
   test('doc review preserves visual aids and escapes table pipes', () => {

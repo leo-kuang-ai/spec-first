@@ -18,15 +18,15 @@
 
 | 范围 | 当前值 |
 |---|---|
-| Bundled source skills | 44 |
-| Bundled source agents | 49 |
+| Bundled source skills | 33 |
+| Bundled source agents | 47 |
 | Bundled agent support files | 0 |
-| Governance records by entry surface | internal_only: 15, standalone_skill: 9, workflow_command: 20 |
-| Claude runtime delivery | 20 commands, 20 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 49 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 20 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 49 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 20 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 20 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 49 agents, 0 agent support files |
-| Qoder runtime delivery | 20 commands, 20 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 49 agents, 0 agent support files |
+| Governance records by entry surface | internal_only: 7, standalone_skill: 9, workflow_command: 17 |
+| Claude runtime delivery | 17 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
+| Qoder runtime delivery | 17 commands, 17 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 47 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | Beta workflow entries | none |
@@ -62,10 +62,7 @@ Cursor is opt-in generated-runtime preview. `spec-first init --cursor` can gener
 | plan | spec-plan | spec-plan | no | Run the Spec-First planning workflow |
 | polish | spec-polish | spec-polish | no | Start the dev server and iterate on browser-visible polish |
 | prd | spec-prd | spec-prd | no | Run the Spec-First PRD requirements workflow |
-| release-notes | spec-release-notes | spec-release-notes | no | Summarize recent spec-first releases or answer release questions |
-| sessions | spec-sessions | spec-sessions | no | Search and summarize prior coding agent sessions |
 | skill-audit | spec-skill-audit | spec-skill-audit | no | Run the Spec-First skill audit workflow |
-| slack-research | spec-slack-research | spec-slack-research | no | Search Slack for interpreted organizational context |
 | work | spec-work | spec-work | no | Run the Spec-First execution workflow |
 | write-skill | spec-write-skill | spec-write-skill | no | Write, revise, migrate, or remediate spec-first source skills |
 | write-tasks | spec-write-tasks | spec-write-tasks | no | Public workflow entrypoint (spec-write-tasks): compile a settled local spec-plan into an optional derived task pack for spec-work, or validate an existing local task pack before execution. Use for explicit plan-splitting/task-doc requests or high-complexity work suitability; do not use for plan authoring, implementation execution, unresolved scope, small low-risk plans, progress/approval state, remote/generic task lists, or generated runtime mirror edits. Keep the plan as single source of truth; tasks are derived and optional. |
@@ -92,8 +89,8 @@ Most `internal_only` governance records are source governance entries and are no
 
 | Category | Skills |
 |---|---|
-| Delivered agent-facing internal skills | git-worktree |
-| Governance-only internal records | agent-native-architecture, changelog, feature-video, frontend-design, gemini-imagegen, git-clean-gone-branches, git-commit, git-commit-push-pr, proof, report-bug, resolve-pr-feedback, spec-dhh-rails-style, test-browser, test-xcode |
+| Delivered agent-facing internal skills | spec-worktree |
+| Governance-only internal records | spec-commit, spec-commit-push-pr, spec-proof, spec-resolve-pr-feedback, spec-test-browser, spec-test-xcode |
 
 ## Runtime Paths
 

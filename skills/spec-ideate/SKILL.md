@@ -48,7 +48,7 @@ Resolve subject and mode, gather grounded context, generate many candidate ideas
 
 ### Downstream Consumers
 
-`spec-brainstorm`, `spec-plan`, human product decisions, future ideation refreshes, and `spec-sessions` context lookups.
+`spec-brainstorm`, `spec-plan`, human product decisions, future ideation refreshes, and optional local context lookups.
 
 ## Scenario Capability
 
@@ -275,6 +275,15 @@ node -e "const fs=require('node:fs'); const os=require('node:os'); const path=re
 
 Use the echoed absolute path as `<scratch-dir>` for every subsequent checkpoint write and cache read in this run. Treat the parent directory of `<scratch-dir>` as `<scratch-root>` for V15 cache lookup. The run directory is not deleted on Phase 6 completion — the V15 cache is session-scoped and reused across run-ids, and the checkpoints follow the cross-invocation-reusable convention of leaving session-scoped artifacts for later invocations to find. If the host sandbox makes the OS temp root ephemeral or hidden, surface that limitation and continue without cache reuse rather than falling back to a platform-specific hardcoded path.
 
+**Resolve the project profile from the shared cache first.** The question-agnostic profile (stack, top-level layout, conventions, root instruction files) is identical for every run at this commit, so reuse it instead of re-deriving it in the codebase scan. Set `SKILL_DIR` to this skill's directory and run the helper (full protocol in `references/repo-profile-cache.md`):
+
+```bash
+SKILL_DIR="<absolute path of the directory containing the SKILL.md you just read>"
+python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
+```
+
+On `HIT`, load the profile JSON — that is your agnostic project shape (stack, top-level layout, conventions); do not re-derive it in the scan. On `MISS`, dispatch a generic subagent with `references/agents/repo-profiler.md` to derive the profile, write its JSON output to a file under `<scratch-dir>`, then persist with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <file>` (re-set `SKILL_DIR` in that call — shell vars don't persist between Bash invocations). On `NO-CACHE`, derive the agnostic shape inline (the codebase scan below covers it) and skip the `put`. The cache is an optimization, never a hard dependency — on any failure or unreadable output, degrade to the full scan. With the profile in hand, the codebase scan runs **only the question-specific slice** on top of it.
+
 **Root Markdown handling.** If the user explicitly names a repo-root `.md` file in the focus hint or intake (for example `README.md`, `AGENTS.md`, or another concrete root Markdown path), read that file completely as a constraint for grounding and ideation. Other repo-root Markdown files are background only: skim or sample them when useful, but do not upgrade every root Markdown file into a required constraint. Do not reintroduce `STRATEGY.md` as a mandatory anchor; it is only read when the user names it or the current repo's documented conventions already make it relevant.
 
 Run grounding agents in parallel in the **foreground** (do not background — results are needed before Phase 2):
@@ -293,11 +302,11 @@ Run grounding agents in parallel in the **foreground** (do not background — re
    >
    > Focus hint: {focus_hint}
 
-2. **Learnings search** — dispatch `spec-learnings-researcher` with a brief summary of the ideation focus.
+2. **Learnings search** — read `references/agents/learnings-researcher.md` and dispatch a generic subagent seeded with that local prompt plus a brief summary of the ideation focus.
 
 3. **Web research** (always-on; see "Web research" subsection below for skip-phrase and V15 cache handling).
 
-4. **Issue intelligence** (conditional) — if issue-tracker intent was detected in Phase 0.3, dispatch `spec-issue-intelligence-analyst` with the focus hint. Run in parallel with the other agents.
+4. **Issue intelligence** (conditional) — if issue-tracker intent was detected in Phase 0.3, read `references/agents/issue-intelligence-analyst.md` and dispatch a generic subagent seeded with that local prompt plus the focus hint. Run in parallel with the other subagents.
 
    If the agent returns an error (gh not installed, no remote, auth failure), log a warning to the user ("Issue analysis unavailable: {reason}. Proceeding with standard ideation.") and continue with the remaining grounding.
 
@@ -307,7 +316,7 @@ Run grounding agents in parallel in the **foreground** (do not background — re
 
 1. **User-context synthesis** — dispatch a general-purpose sub-agent (cheapest capable model) to read the user-supplied context from Phase 0.4 intake plus any rich-prompt material, and return a structured grounding summary that mirrors the codebase-context shape (project shape → topic shape; notable patterns → stated constraints; pain points → user-named pain points; leverage points → opportunity hooks the context implies). This keeps Phase 2 sub-agents agnostic to grounding source.
 
-2. **Learnings search** *(elsewhere-software only; skipped by default in elsewhere-non-software)* — dispatch `spec-learnings-researcher` with the topic summary in case relevant institutional knowledge exists (skill-design patterns, prior solutions in similar shape). Skip for elsewhere-non-software: the CWD's `docs/solutions/` is unlikely to be topically relevant for non-digital topics, and running it risks polluting generation with unrelated engineering patterns.
+2. **Learnings search** *(elsewhere-software only; skipped by default in elsewhere-non-software)* — read `references/agents/learnings-researcher.md` and dispatch a generic subagent seeded with that local prompt plus the topic summary in case relevant institutional knowledge exists (skill-design patterns, prior solutions in similar shape). Skip for elsewhere-non-software: the CWD's `docs/solutions/` is unlikely to be topically relevant for non-digital topics, and running it risks polluting generation with unrelated engineering patterns.
 
 3. **Web research** — same as repo mode (see subsection below).
 
@@ -315,11 +324,11 @@ Issue intelligence does not apply in elsewhere mode. Slack research is opt-in fo
 
 #### Web Research (V5, V15)
 
-Always-on for both modes. Skip when the user said "no external research", "skip web research", or equivalent in their prompt or earlier answers; in that case, omit `spec-web-researcher` from dispatch and note the skip in the consolidated grounding summary.
+Always-on for both modes. Skip when the user said "no external research", "skip web research", or equivalent in their prompt or earlier answers; in that case, omit the `web-researcher` local prompt from dispatch and note the skip in the consolidated grounding summary.
 
-Reuse prior web research within a session via a sidecar cache — see `references/web-research-cache.md` for the cache file shape, reuse check, append behavior, and platform-degradation rules. Read it the first time `spec-web-researcher` would be dispatched in this run (and on every subsequent dispatch where the cache might apply).
+Reuse prior web research within a session via a sidecar cache — see `references/web-research-cache.md` for the cache file shape, reuse check, append behavior, and platform-degradation rules. Read it the first time the `web-researcher` local prompt would be dispatched in this run (and on every subsequent dispatch where the cache might apply).
 
-When dispatching `spec-web-researcher`, pass: the focus hint, a brief planning context summary (one or two sentences), and the mode. Do not pass codebase content — the agent operates externally.
+When dispatching web research, read `references/agents/web-researcher.md` and seed a generic subagent with that prompt. Pass the focus hint, a brief planning context summary (one or two sentences), and the mode. Do not pass codebase content — the prompt operates externally. Use the platform's mid-tier model when a known override exists; otherwise omit the override and inherit.
 
 #### Consolidated Grounding Summary
 
@@ -331,9 +340,9 @@ Consolidate all dispatched results into a short grounding summary using these se
 - **External context** *(when web research ran)* — prior art, adjacent solutions, market signals, cross-domain analogies. Note "(reused from earlier dispatch)" when V15 reuse fired
 - **Slack context** *(when present)* — organizational context
 
-**Failure handling.** Grounding agent failures follow "warn and proceed" — never block on grounding failure. If `spec-web-researcher` fails (network, tool unavailable), log a warning ("External research unavailable: {reason}. Proceeding with internal grounding only.") and continue. If elsewhere-mode intake produced no usable context, note in the grounding summary that context is thin so Phase 2 sub-agents can compensate with broader generation.
+**Failure handling.** Grounding agent failures follow "warn and proceed" — never block on grounding failure. If the web-researcher local prompt fails (network, tool unavailable), log a warning ("External research unavailable: {reason}. Proceeding with internal grounding only.") and continue. If elsewhere-mode intake produced no usable context, note in the grounding summary that context is thin so Phase 2 sub-agents can compensate with broader generation.
 
-**Slack context** (opt-in, both modes) — never auto-dispatch. When the user asks for Slack context and Slack tools are available (look for any `slack-researcher` agent or `slack` MCP tools in the current environment), dispatch `spec-slack-researcher` with the focus hint in parallel with other Phase 1 agents. When tools are present but the user did not ask, mention availability in the grounding summary so they can opt in. When the user asked but no Slack tools are reachable, surface the install hint instead.
+**Slack context** (opt-in, both modes) — never auto-dispatch. When the user asks for Slack context and Slack tools are available, read `references/agents/slack-researcher.md` and dispatch a generic subagent seeded with that local prompt plus the focus hint in parallel with other Phase 1 subagents. When tools are present but the user did not ask, mention availability in the grounding summary so they can opt in. When the user asked but no Slack tools are reachable, surface the install hint instead.
 
 ### Phase 1.5: Topic Axes
 

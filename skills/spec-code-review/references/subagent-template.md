@@ -188,7 +188,7 @@ Diff:
 
 | Variable | Source | Description |
 |----------|--------|-------------|
-| `{persona_file}` | Agent markdown file content | The full persona definition (identity, failure modes, calibration, suppress conditions) |
+| `{persona_file}` | Skill-local `references/personas/*.md` content when mapped; otherwise the selected host-provided reviewer prompt content | The full persona definition (identity, failure modes, calibration, suppress conditions) |
 | `{diff_scope_rules}` | `references/diff-scope.md` content | Primary/secondary/pre-existing tier rules |
 | `{schema}` | `references/findings-schema.json` content | The JSON schema reviewers must conform to |
 | `{intent_summary}` | Stage 2 output | 2-3 line description of what the change is trying to accomplish |

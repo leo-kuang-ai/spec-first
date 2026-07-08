@@ -36,8 +36,8 @@ describe('using-spec-first multi-session disclosure prose contract', () => {
     expect(body).toMatch(/docs\/contracts\/sessions\/spec-first-session\.md/);
   });
 
-  test('mentions git-worktree as a stronger isolation alternative', () => {
-    expect(body).toMatch(/git-worktree/);
+  test('mentions spec-worktree as a stronger isolation alternative', () => {
+    expect(body).toMatch(/spec-worktree/);
   });
 
   test('treats missing protocol or empty list as single-actor mode', () => {

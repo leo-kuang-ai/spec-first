@@ -8,6 +8,8 @@ Use visual aids during dialogue only when seeing the shape is clearer than readi
 
 Ask the user before switching into a visual artifact. Default to lightweight Markdown tables, Mermaid, or ASCII that can live in chat and later be summarized in the canonical markdown requirements doc. Use browser prototypes, Proof, or HTML sidecars only when the user explicitly opts in.
 
+When the decision is faster to judge by seeing a rough browser artifact than by reading prose, read `references/visual-probes.md` and follow its text-vs-visual gate and display-only helper contract. Do not add browser click tracking or treat the artifact as canonical requirements.
+
 Dialogue-time visuals are thinking aids, not canonical requirements. Do not let a diagram replace the markdown requirements document, introduce implementation architecture, or smuggle code/module/data-schema decisions into WHAT discovery.
 
 ## In Requirements Documents

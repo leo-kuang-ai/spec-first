@@ -230,7 +230,7 @@ claude_output="$(run_programmatic_init "$TMP_DIR" claude kuang en)"
 grep -q "Generated ${expected_command_count} command file(s)" <<<"$claude_output"
 grep -q "Generated ${expected_claude_skill_count} skill directory(ies)" <<<"$claude_output"
 grep -q "Generated ${expected_agent_count} agent file(s)" <<<"$claude_output"
-for file in brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish.md release-notes.md sessions.md slack-research.md work.md write-tasks.md; do
+for file in app-consistency-audit.md brainstorm.md code-review.md compound.md compound-refresh.md debug.md doc-review.md ideate.md mcp-setup.md optimize.md plan.md polish.md prd.md skill-audit.md work.md write-skill.md write-tasks.md; do
   test -f "$TMP_DIR/.claude/commands/spec-$file"
 done
 test ! -e "$TMP_DIR/.claude/commands/spec-standards.md"
@@ -244,15 +244,15 @@ installed_claude_skill_count="$(find "$TMP_DIR/.claude/skills" -mindepth 1 -maxd
 test "$installed_claude_skill_count" = "$expected_claude_skill_count"
 test -f "$TMP_DIR/.claude/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.claude/skills/using-spec-first/SKILL.md"
-test -f "$TMP_DIR/.claude/skills/git-worktree/SKILL.md"
-test -f "$TMP_DIR/.claude/skills/git-worktree/scripts/worktree-manager.sh"
-grep -q '^name: git-worktree$' "$TMP_DIR/.claude/skills/git-worktree/SKILL.md"
-grep -q '^user-invocable: false$' "$TMP_DIR/.claude/skills/git-worktree/SKILL.md"
-grep -q 'allowed-tools: Bash(bash \*worktree-manager.sh\*)' "$TMP_DIR/.claude/skills/git-worktree/SKILL.md"
-grep -q '.claude/skills/git-worktree/scripts/worktree-manager.sh' "$TMP_DIR/.claude/skills/git-worktree/SKILL.md"
+test -f "$TMP_DIR/.claude/skills/spec-worktree/SKILL.md"
+test -f "$TMP_DIR/.claude/skills/spec-worktree/scripts/worktree-manager.sh"
+grep -q '^name: spec-worktree$' "$TMP_DIR/.claude/skills/spec-worktree/SKILL.md"
+grep -q '^user-invocable: false$' "$TMP_DIR/.claude/skills/spec-worktree/SKILL.md"
+grep -q 'allowed-tools: Bash(bash \*worktree-manager.sh\*)' "$TMP_DIR/.claude/skills/spec-worktree/SKILL.md"
+grep -q '.claude/skills/spec-worktree/scripts/worktree-manager.sh' "$TMP_DIR/.claude/skills/spec-worktree/SKILL.md"
 test ! -e "$TMP_DIR/.claude/skills/spec-session-inventory"
 test ! -e "$TMP_DIR/.claude/skills/spec-session-extract"
-for agent in spec-repo-research-analyst.agent.md spec-session-historian.agent.md spec-slack-researcher.agent.md spec-spec-flow-analyzer.agent.md; do
+for agent in spec-repo-research-analyst.agent.md spec-spec-flow-analyzer.agent.md; do
   test -f "$TMP_DIR/.claude/agents/$agent"
 done
 node - "$TMP_DIR/.claude/spec-first/state.json" "$expected_command_count" "$expected_claude_skill_count" "$expected_workflow_skill_count" "$expected_agent_count" <<'NODE'
@@ -350,15 +350,15 @@ test ! -e "$TMP_DIR/.agents/skills/spec-work-beta/SKILL.md"
 test -f "$TMP_DIR/.agents/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.agents/skills/using-spec-first/SKILL.md"
 grep -q '^name: spec-polish$' "$TMP_DIR/.agents/skills/spec-polish/SKILL.md"
-test -f "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"
-test -f "$TMP_DIR/.agents/skills/git-worktree/scripts/worktree-manager.sh"
-grep -q '^name: git-worktree$' "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"
-grep -q '^user-invocable: false$' "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"
-grep -q 'allowed-tools: Bash(bash \*worktree-manager.sh\*)' "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"
-grep -q '.agents/skills/git-worktree/scripts/worktree-manager.sh' "$TMP_DIR/.agents/skills/git-worktree/SKILL.md"
+test -f "$TMP_DIR/.agents/skills/spec-worktree/SKILL.md"
+test -f "$TMP_DIR/.agents/skills/spec-worktree/scripts/worktree-manager.sh"
+grep -q '^name: spec-worktree$' "$TMP_DIR/.agents/skills/spec-worktree/SKILL.md"
+grep -q '^user-invocable: false$' "$TMP_DIR/.agents/skills/spec-worktree/SKILL.md"
+grep -q 'allowed-tools: Bash(bash \*worktree-manager.sh\*)' "$TMP_DIR/.agents/skills/spec-worktree/SKILL.md"
+grep -q '.agents/skills/spec-worktree/scripts/worktree-manager.sh' "$TMP_DIR/.agents/skills/spec-worktree/SKILL.md"
 test ! -e "$TMP_DIR/.agents/skills/spec-session-inventory"
 test ! -e "$TMP_DIR/.agents/skills/spec-session-extract"
-for agent in spec-repo-research-analyst.agent.md spec-session-historian.agent.md spec-slack-researcher.agent.md; do
+for agent in spec-repo-research-analyst.agent.md; do
   test -f "$TMP_DIR/.codex/agents/$agent"
 done
 grep -q '<!-- spec-first:lang:start -->' "$TMP_DIR/AGENTS.md"
@@ -411,8 +411,8 @@ test ! -e "$TMP_DIR/.cursor/skills/spec-"standards"/SKILL.md"
 test ! -e "$TMP_DIR/.cursor/skills/spec-work-beta/SKILL.md"
 test -f "$TMP_DIR/.cursor/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.cursor/skills/using-spec-first/SKILL.md"
-test -f "$TMP_DIR/.cursor/skills/git-worktree/SKILL.md"
-grep -q '^name: git-worktree$' "$TMP_DIR/.cursor/skills/git-worktree/SKILL.md"
+test -f "$TMP_DIR/.cursor/skills/spec-worktree/SKILL.md"
+grep -q '^name: spec-worktree$' "$TMP_DIR/.cursor/skills/spec-worktree/SKILL.md"
 test -f "$TMP_DIR/.cursor/spec-first/state.json"
 test ! -e "$TMP_DIR/.cursor/commands"
 test ! -e "$TMP_DIR/.cursor/agents"
@@ -468,9 +468,9 @@ test ! -e "$TMP_DIR/.kiro/skills/spec-"standards"/SKILL.md"
 test ! -e "$TMP_DIR/.kiro/skills/spec-work-beta/SKILL.md"
 test -f "$TMP_DIR/.kiro/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.kiro/skills/using-spec-first/SKILL.md"
-test -f "$TMP_DIR/.kiro/skills/git-worktree/SKILL.md"
-grep -q '^name: git-worktree$' "$TMP_DIR/.kiro/skills/git-worktree/SKILL.md"
-for agent in spec-repo-research-analyst.agent.md spec-session-historian.agent.md spec-slack-researcher.agent.md; do
+test -f "$TMP_DIR/.kiro/skills/spec-worktree/SKILL.md"
+grep -q '^name: spec-worktree$' "$TMP_DIR/.kiro/skills/spec-worktree/SKILL.md"
+for agent in spec-repo-research-analyst.agent.md; do
   test -f "$TMP_DIR/.kiro/agents/$agent"
   grep -q '^tools: \["read"\]$' "$TMP_DIR/.kiro/agents/$agent"
 done
@@ -534,9 +534,9 @@ for skill in spec-plan spec-work spec-code-review spec-doc-review spec-brainstor
 done
 test -f "$TMP_DIR/.qoder/skills/using-spec-first/SKILL.md"
 grep -q '^name: using-spec-first$' "$TMP_DIR/.qoder/skills/using-spec-first/SKILL.md"
-test -f "$TMP_DIR/.qoder/skills/git-worktree/SKILL.md"
-grep -q '^name: git-worktree$' "$TMP_DIR/.qoder/skills/git-worktree/SKILL.md"
-for agent in spec-repo-research-analyst.agent.md spec-session-historian.agent.md spec-slack-researcher.agent.md; do
+test -f "$TMP_DIR/.qoder/skills/spec-worktree/SKILL.md"
+grep -q '^name: spec-worktree$' "$TMP_DIR/.qoder/skills/spec-worktree/SKILL.md"
+for agent in spec-repo-research-analyst.agent.md; do
   test -f "$TMP_DIR/.qoder/agents/$agent"
   node - "$TMP_DIR/.qoder/agents/$agent" <<'NODE'
 const fs = require('node:fs');
@@ -545,9 +545,7 @@ const content = fs.readFileSync(agentPath, 'utf8');
 const match = content.match(/^---\n([\s\S]*?)\n---/);
 if (!match) throw new Error(`missing frontmatter: ${agentPath}`);
 const frontmatter = match[1];
-const expectedTools = agentPath.endsWith('spec-slack-researcher.agent.md')
-  ? 'Read, Grep, Glob, mcp__slack__*'
-  : 'Read, Grep, Glob';
+const expectedTools = 'Read, Grep, Glob';
 if (!new RegExp(`^tools: \\[${expectedTools.replace('*', '\\*')}\\]$`, 'm').test(frontmatter)) {
   throw new Error(`Qoder agent tools mismatch; expected [${expectedTools}]: ${agentPath}`);
 }

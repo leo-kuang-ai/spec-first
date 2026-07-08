@@ -45,7 +45,7 @@ Choose full or lightweight mode, gather bounded evidence, check existing learnin
 
 ### Downstream Consumers
 
-`spec-plan`, `spec-work`, `spec-code-review`, `spec-sessions`, future compound-refresh runs, repo-local advisory vocabulary when present, and humans searching `docs/solutions/`.
+`spec-plan`, `spec-work`, `spec-code-review`, future compound-refresh runs, repo-local advisory vocabulary when present, optional local session-history enrichment, and humans searching `docs/solutions/`.
 
 ## Scenario Capability
 
@@ -77,7 +77,13 @@ These files are the durable contract for the workflow. Read them on-demand at th
 - `references/yaml-schema.md` — category mapping from problem_type to directory (read when classifying)
 - `references/domain-model-capture.md` — domain signal scan, boundary scenarios, code cross-reference, and context/ADR preview-only rules (read in Phase 2.4 when the solved lesson exposes qualifying domain-model signals)
 - `references/concepts-vocabulary.md` — advisory `CONCEPTS.md` inclusion and update-only rules (read in Phase 2.4 when `CONCEPTS.md` exists)
+- `references/repo-profile-cache.md` — optional question-agnostic repo orientation cache protocol (read before Phase 1 full-mode subagent dispatch when broad repo orientation would otherwise be re-derived)
+- `references/agents/session-historian.md` — skill-local synthesis prompt for optional session-history compounding context (read only when the user opts into session history)
+- `references/agents/*.md` — skill-local prompt assets for optional Phase 3 documentation enhancement subagents
 - `assets/resolution-template.md` — section structure for new docs (read when assembling)
+- `scripts/session-history/` — session discovery and extraction scripts copied into this skill so session-history support does not depend on a separate public workflow
+- `scripts/repo-profile-cache.py` — deterministic cache get/put helper for `references/repo-profile-cache.md`
+- `scripts/validate-frontmatter.py` — parser-safety validator for written solution frontmatter
 
 When spawning subagents, pass the relevant file contents into the task prompt so they have the contract without needing cross-skill paths.
 
@@ -128,7 +134,7 @@ for relevant knowledge to help the Compound process? This adds
 time and token usage.
 ```
 
-If the user says yes, invoke `spec-sessions` in Phase 1 with the narrow problem topic and output schema below. If no, skip it. Do not ask this in lightweight mode.
+If the user says yes, run the skill-local session-history flow in Phase 1 with the narrow problem topic and output schema below. If no, skip it. Do not ask this in lightweight mode.
 
 ---
 
@@ -165,9 +171,22 @@ If no relevant entries are found, proceed to Phase 1 without passing memory cont
 
 Launch research subagents. Each returns text data to the orchestrator.
 
+**Resolve optional agnostic repo orientation from the shared cache before dispatching subagents.** Read `references/repo-profile-cache.md` and use `scripts/repo-profile-cache.py` only for question-agnostic stack, vocabulary, and convention facts that Context Analyzer or Related Docs Finder would otherwise re-derive. Set `SKILL_DIR` inline in each Bash call:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing the spec-compound SKILL.md you read>"
+python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
+```
+
+- `HIT`: load the profile JSON and use its `vocabulary` and `conventions` as agnostic orientation.
+- `MISS`: dispatch a generic subagent seeded with `references/agents/repo-profiler.md` to derive the profile, write its JSON to a file, then persist it with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <profile-json-file>` in a separate Bash call with `SKILL_DIR` reset inline.
+- `NO-CACHE`, helper error, or unusable output: derive only the orientation needed for this run and continue without caching.
+
+The cache is an optimization, never a correctness dependency. The `docs/solutions/` enumeration is never cached; Related Docs Finder must glob and search it fresh every run because `spec-compound` writes new learnings.
+
 **Dispatch order:**
 - Launch `Context Analyzer`, `Solution Extractor`, and `Related Docs Finder` in parallel (background)
-- If the user opted into session history, invoke `spec-sessions` in foreground; it owns session discovery, scratch extraction, and `spec-session-historian` synthesis
+- If the user opted into session history, run the local `scripts/session-history/` helpers in foreground and synthesize with the local `references/agents/session-historian.md` prompt asset
 - The foreground session enrichment runs while the background agents work, adding no wall-clock time when relevant
 
 <parallel_tasks>
@@ -241,11 +260,12 @@ Launch research subagents. Each returns text data to the orchestrator.
 
 #### 4. **Session History Enrichment** (foreground, after launching the above — only if the user opted in)
    - **Skip entirely** if the user declined session history in the follow-up question
-   - Invoke `spec-sessions`; it owns discovery, filtering, scratch extraction, and `spec-session-historian` synthesis dispatch
-   - Run in **foreground** because it reads session files outside the working directory (`~/.claude/projects/`, `~/.codex/sessions/`, `~/.agents/sessions/`) which background agents may not have access to
-   - Searches prior Claude Code and Codex sessions for the same project to find related investigation context
-   - Correlates sessions by repo name across supported platforms (matches sessions from main checkouts, worktrees, and Conductor workspaces)
-   - **Invocation prompt — keep tight.** Long, keyword-rich prompts encourage unnecessary widening. Use this shape:
+   - Run session discovery, branch/keyword filtering, scan-window selection, extraction, and synthesis directly inside this skill using `scripts/session-history/`.
+   - Read `references/agents/session-historian.md`, then dispatch a generic subagent seeded with that prompt content. Do not dispatch a retired workflow or standalone agent by type/name from this workflow.
+   - Run in **foreground** because it reads session files outside the working directory (`~/.claude/projects/`, `~/.codex/sessions/`, `.agents/sessions/`, `~/.pi/agent/sessions/`) which background agents may not have access to.
+   - Searches prior Claude Code, Codex, Cursor, and Pi sessions for the same project to find related investigation context.
+   - Correlates sessions by repo name across supported platforms (matches sessions from main checkouts, worktrees, and Conductor workspaces).
+   - **Session-history payload — keep tight.** Long, keyword-rich payloads encourage unnecessary widening. Use this shape:
      - **Pre-resolved context**: repo name and current git branch, only if the values resolved cleanly above; otherwise omit and let the agent derive them.
      - **Time window**: explicit `7 days` unless the documented problem clearly spans a longer arc.
      - **Problem topic**: one sentence naming the concrete issue: error message, module name, what broke and how it was fixed. Not a paragraph; not a bullet list of adjacent topics.
@@ -259,15 +279,28 @@ Launch research subagents. Each returns text data to the orchestrator.
        - Key decisions
        - Related context
        ```
-   - Do not append additional context blocks, exclusion lists, or topic-keyword bullets. If `spec-sessions` needs keyword search, it owns that decision via the `--keyword` mode on its metadata script.
-   - Let `spec-sessions` omit subagent `mode` so the user's configured permission settings apply
-   - Returns: structured digest of findings from prior sessions, or `no relevant prior sessions` if none found
+   - Do not append additional context blocks, exclusion lists, or topic-keyword bullets. If keyword search is needed, the internal flow owns that decision based on the topic.
+   - **Script resolution.** Run bundled scripts through the model-filled skill-dir anchor. Set `SKILL_DIR` inline in every Bash call because shell state does not persist:
+
+     ```bash
+     SKILL_DIR="<absolute path of the directory containing the spec-compound SKILL.md you read>"
+     REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+     REPO_NAME=$(basename "$REPO_ROOT")
+     SCAN_DAYS="7"
+     bash "$SKILL_DIR/scripts/session-history/discover-sessions.sh" "$REPO_NAME" "$SCAN_DAYS" --cwd "$REPO_ROOT" | tr '\n' '\0' | xargs -0 python3 "$SKILL_DIR/scripts/session-history/extract-metadata.py" --cwd-filter "$REPO_ROOT"
+     ```
+
+     If either script is missing or cannot run, skip session history visibly with: `Session history was requested, but the bundled session-history scripts were unavailable: <reason>`. Continue Phase 2 without session context.
+   - If `_meta.files_processed` is `0`, return `no relevant prior sessions`. If the first pass finds no relevant branch matches, or if processing Codex or Pi sessions, derive 2-4 keywords from the topic and re-run metadata extraction with `--keyword K1,K2,...`. Keep at most 5 sessions across Claude Code, Codex, Cursor, and Pi, ranked by branch match, keyword match count, file size over 30KB, and recency. Exclude the current session.
+   - Create `SCRATCH=$(mktemp -d -t spec-compound-sessions-XXXXXX)`. For each selected session, write extracted content to scratch files with `extract-skeleton.py`; use `extract-errors.py` selectively when dead ends or recurring errors are likely useful. Pass only the scratch file paths and metadata to the synthesis subagent.
+   - The synthesis subagent receives the full content of `references/agents/session-historian.md`, `problem_topic`, `scratch_dir`, a `sessions` array with extracted file paths and metadata, the output schema above, and the filter rule above. It returns a structured digest of findings from prior sessions, or `no relevant prior sessions` if none found.
+   - **Session history is the final Phase 1 input, not a workflow stop.** When it returns, proceed directly to Phase 2 with its output as the last input. Do not emit a summary and do not pause for the user. A `no relevant prior sessions` return is still a valid input; the documentation gets written without session context.
 
 ### Phase 2: Assembly & Write
 
 <sequential_tasks>
 
-**WAIT for all Phase 1 subagents to complete before proceeding.**
+**WAIT for all Phase 1 inputs to complete before proceeding** — the three parallel research subagents and, when the user opted in, the skill-local session-history flow.
 
 The orchestrating agent (main conversation) performs these steps:
 
@@ -293,7 +326,14 @@ The orchestrating agent (main conversation) performs these steps:
 5. Validate YAML frontmatter against `references/schema.yaml`, including new promote required fields (`invalidation_condition`, `source_refs`) for newly promoted solution docs and the YAML-safety quoting rule for array items (see `references/yaml-schema.md` > YAML Safety Rules)
 6. Create directory if needed: `mkdir -p docs/solutions/[category]/`
 7. Write the file: either the updated existing doc or the new `docs/solutions/[category]/[filename].md`
-8. **Run `python3 scripts/validate-frontmatter.py <output-path>`** from the `skills/spec-compound/` directory to catch parser-safety issues the prose rules can miss: malformed `---` delimiter lines, unquoted ` #` in scalar values, and unquoted `: ` in scalar values. Exit 0 means the doc is parser-safe; exit 1 means stderr names the field(s) to quote or fix. Re-write the doc and re-run until exit 0. Do not declare success while validation fails. The script is pure Python 3 stdlib and does not enforce schema required fields or enum values. If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify the same scope the script covers — the frontmatter opens and closes with exact `---` lines, and no unquoted top-level scalar value contains ` #` (YAML drops it as a comment) or `: ` (parsers may read it as a nested mapping). Quote offending values. Keep the manual check to exactly these three; do not expand into schema, enum, or style edits.
+8. **Run the bundled frontmatter validator through the skill-dir anchor** to catch parser-safety issues the prose rules can miss: malformed `---` delimiter lines, unquoted ` #` in scalar values, and unquoted `: ` in scalar values.
+
+   ```bash
+   SKILL_DIR="<absolute path of the directory containing the spec-compound SKILL.md you read>"
+   python3 "$SKILL_DIR/scripts/validate-frontmatter.py" <output-path>
+   ```
+
+   Exit 0 means the doc is parser-safe; exit 1 means stderr names the field(s) to quote or fix. Re-write the doc and re-run until exit 0. Do not declare success while validation fails. The script is pure Python 3 stdlib and does not enforce schema required fields or enum values. If `python3` is unavailable or the script cannot be located from the skill runtime directory, do not silently skip: state `validator unavailable: <reason>` and manually verify the same scope the script covers — the frontmatter opens and closes with exact `---` lines, and no unquoted top-level scalar value contains ` #` (YAML drops it as a comment) or `: ` (parsers may read it as a nested mapping). Quote offending values. Keep the manual check to exactly these three; do not expand into schema, enum, or style edits.
 
 When creating a new doc, preserve the section order from `assets/resolution-template.md` unless the user explicitly asks for a different structure.
 
@@ -404,11 +444,11 @@ After the learning is written and the refresh decision is made, check whether th
 
 <parallel_tasks>
 
-Based on problem type, optionally invoke specialized agents to review the documentation:
+Based on problem type, optionally dispatch generic subagents seeded with local prompt assets from `references/agents/` to review the documentation. Do not dispatch standalone agents by type/name when a local prompt asset exists.
 
-- **performance_issue** → `spec-performance-oracle`
-- **security_issue** → `spec-security-sentinel`
-- **database_issue** → `spec-data-integrity-guardian`
+- **performance_issue** → read `references/agents/performance-oracle.md`
+- **security_issue** → read `references/agents/security-sentinel.md`
+- **database_issue** → read `references/agents/data-integrity-guardian.md`
 - Any code-heavy issue → run the kieran reviewer that matches the repo's primary stack:
   - Ruby/Rails → also run `spec-kieran-rails-reviewer`
   - Python → also run `spec-kieran-python-reviewer`
@@ -617,22 +657,22 @@ Writes the final learning directly into `docs/solutions/`.
 
 ## Applicable Specialized Agents
 
-Based on problem type, these agents can enhance documentation:
+Based on problem type, these skill-local prompt assets can enhance documentation. The names below are stable review labels in the output; prompt content comes from `references/agents/*.md` unless the row explicitly names an external host-provided reviewer.
 
 ### Code Quality & Review
-- **spec-kieran-rails-reviewer**: Reviews code examples for Rails best practices
-- **spec-kieran-python-reviewer**: Reviews code examples for Python best practices
-- **spec-kieran-typescript-reviewer**: Reviews code examples for TypeScript best practices
-- **spec-pattern-recognition-specialist**: Identifies anti-patterns or repeating issues
+- **spec-kieran-rails-reviewer**: host-provided reviewer for Rails code examples when available
+- **spec-kieran-python-reviewer**: host-provided reviewer for Python code examples when available
+- **spec-kieran-typescript-reviewer**: host-provided reviewer for TypeScript code examples when available
+- **spec-pattern-recognition-specialist**: `references/agents/pattern-recognition-specialist.md` identifies anti-patterns or repeating issues
 
 ### Specific Domain Experts
-- **spec-performance-oracle**: Analyzes performance_issue category solutions
-- **spec-security-sentinel**: Reviews security_issue solutions for vulnerabilities
-- **spec-data-integrity-guardian**: Reviews database_issue migrations and queries
+- **spec-performance-oracle**: `references/agents/performance-oracle.md` analyzes performance_issue category solutions
+- **spec-security-sentinel**: `references/agents/security-sentinel.md` reviews security_issue solutions for vulnerabilities
+- **spec-data-integrity-guardian**: `references/agents/data-integrity-guardian.md` reviews database_issue migrations and queries
 
 ### Enhancement & Research
-- **spec-best-practices-researcher**: Enriches solution with industry best practices
-- **spec-framework-docs-researcher**: Links to framework/library documentation references
+- **spec-best-practices-researcher**: `references/agents/best-practices-researcher.md` enriches solution with industry best practices
+- **spec-framework-docs-researcher**: `references/agents/framework-docs-researcher.md` links to framework/library documentation references
 
 ### When to Invoke
 - **Auto-triggered** (optional): Agents can run post-documentation for enhancement

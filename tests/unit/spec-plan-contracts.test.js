@@ -415,6 +415,53 @@ describe('spec-plan context orientation contract', () => {
     expect(text).not.toContain('`Task` / `Agent` on Claude Code, or `spawn_agent` on Codex');
   });
 
+  test('planning research uses migrated skill-local agents and repo-profile cache', () => {
+    const skill = fs.readFileSync(SKILL_PATH, 'utf8');
+    const planningFlow = fs.readFileSync(PLANNING_FLOW_PATH, 'utf8');
+    const deepening = fs.readFileSync(DEEPENING_PATH, 'utf8');
+    const localAgents = [
+      'agent-native-planning-strategist.md',
+      'architecture-strategist.md',
+      'best-practices-researcher.md',
+      'data-integrity-guardian.md',
+      'data-migration-reviewer.md',
+      'deployment-verification-agent.md',
+      'framework-docs-researcher.md',
+      'git-history-analyzer.md',
+      'learnings-researcher.md',
+      'pattern-recognition-specialist.md',
+      'performance-oracle.md',
+      'repo-profiler.md',
+      'repo-research-analyst.md',
+      'security-sentinel.md',
+      'slack-researcher.md',
+      'spec-flow-analyzer.md',
+      'web-researcher.md',
+    ];
+
+    expect(skill).toContain('read `skills/spec-plan/references/governance-boundaries.md`');
+    expect(planningFlow).toContain('Research-agent names are stable labels');
+    expect(planningFlow).toContain('do not dispatch a standalone typed agent by name when a local prompt asset exists');
+    expect(planningFlow).toContain('read `references/repo-profile-cache.md`');
+    expect(planningFlow).toContain('python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get');
+    expect(planningFlow).toContain('references/agents/repo-profiler.md');
+    expect(planningFlow).toContain('docs/solutions/` and subdirectory-scoped instruction files are always searched fresh');
+    expect(deepening).toContain('Agents marked host-provided keep their existing reviewer surface until migrated.');
+    expect(deepening).toContain('`spec-api-contract-reviewer` (host-provided reviewer)');
+    expect(deepening).toContain('`spec-design-lens-reviewer` (host-provided reviewer)');
+    expect(deepening).toContain('`spec-data-migration-expert` (`references/agents/data-migration-reviewer.md`)');
+
+    for (const file of localAgents) {
+      const relativePath = `references/agents/${file}`;
+      const fullPath = path.join(__dirname, '..', '..', 'skills', 'spec-plan', relativePath);
+      const text = fs.readFileSync(fullPath, 'utf8');
+
+      expect(fs.existsSync(fullPath)).toBe(true);
+      expect(`${skill}\n${planningFlow}\n${deepening}`).toContain(relativePath);
+      expect(text).not.toMatch(/^---\n/);
+    }
+  });
+
   test('deepening research fallback distinguishes sequential dispatch from inline current-agent fallback', () => {
     const text = fs.readFileSync(DEEPENING_PATH, 'utf8');
 

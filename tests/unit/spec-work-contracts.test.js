@@ -182,6 +182,15 @@ describe('spec-work context orientation contract', () => {
   });
 });
 
+describe('spec-work skill-local prompt asset contract', () => {
+  test('Figma design sync uses a skill-local prompt asset instead of a standalone agent name', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('Read `references/agents/figma-design-sync.md` and dispatch a generic subagent seeded with that local prompt');
+    expect(text).not.toContain('Use spec-figma-design-sync agent');
+  });
+});
+
 describe('spec-work minimality and architecture-fit preflight contract', () => {
   test('defines a single preflight section and invokes it before implementation in the task loop', () => {
     const text = fs.readFileSync(SKILL_PATH, 'utf8');

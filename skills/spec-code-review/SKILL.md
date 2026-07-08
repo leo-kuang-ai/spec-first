@@ -250,7 +250,9 @@ Routing rules:
 
 ## Reviewers
 
-18 reviewer personas in layered conditionals, plus Spec-First-specific agents. See the persona catalog included below for the full catalog.
+Reviewer ids are stable public labels used in reports, artifacts, dedup keys, and tests. For CE-migrated reviewers, the prompt body is now skill-local: load the mapped file under `references/personas/` and inject that content into the generic reviewer subagent via `references/subagent-template.md`. Do not dispatch a top-level typed agent when a local prompt asset exists for the selected reviewer. Spec-First-only reviewers that do not yet have a local prompt asset keep their existing reviewer id and host-provided prompt surface until they are migrated in a later batch.
+
+See the persona catalog included below for the full catalog and prompt asset mapping.
 
 **CLI readiness boundary:** Keep `spec-cli-readiness-reviewer` as the conditional reviewer for CLI-facing diffs. This project is itself a CLI/workflow harness, so changes to `src/cli/`, command definitions, argument parsing, runtime generation, or command handler behavior need autonomous-agent usability review. `spec-cli-agent-readiness-reviewer` is a separate manual/deep-dive agent for CLI source, plans, or specs; it is not a replacement for the structured JSON persona.
 
@@ -296,6 +298,30 @@ The scale-aware reviewer preflight in Stage 3 may replace this default core with
 |-------|------------------------------------------|
 | `spec-schema-drift-detector` | Cross-references schema.rb against included migrations |
 | `spec-deployment-verification-agent` | Produces deployment checklist with SQL verification queries for risky migration artifacts |
+
+**Local prompt asset resolution:**
+
+For every selected reviewer listed below, read the skill-local prompt asset before dispatch and pass its full content as `{persona_file}` in the subagent template:
+
+| Reviewer id | Skill-local prompt asset |
+| --- | --- |
+| `spec-adversarial-reviewer` | `references/personas/adversarial-reviewer.md` |
+| `spec-agent-native-reviewer` | `references/personas/agent-native-reviewer.md` |
+| `spec-api-contract-reviewer` | `references/personas/api-contract-reviewer.md` |
+| `spec-correctness-reviewer` | `references/personas/correctness-reviewer.md` |
+| `spec-data-migrations-reviewer` | `references/personas/data-migration-reviewer.md` |
+| `spec-deployment-verification-agent` | `references/personas/deployment-verification-agent.md` |
+| `spec-julik-frontend-races-reviewer` | `references/personas/julik-frontend-races-reviewer.md` |
+| `spec-learnings-researcher` | `references/personas/learnings-researcher.md` |
+| `spec-maintainability-reviewer` | `references/personas/maintainability-reviewer.md` |
+| `spec-performance-reviewer` | `references/personas/performance-reviewer.md` |
+| `spec-previous-comments-reviewer` | `references/personas/previous-comments-reviewer.md` |
+| `spec-reliability-reviewer` | `references/personas/reliability-reviewer.md` |
+| `spec-security-reviewer` | `references/personas/security-reviewer.md` |
+| `spec-swift-ios-reviewer` | `references/personas/swift-ios-reviewer.md` |
+| `spec-testing-reviewer` | `references/personas/testing-reviewer.md` |
+
+If a selected reviewer is not in this table, run it through the existing host-provided reviewer prompt surface and record that it is not yet skill-local in Coverage.
 
 ## Review Scope
 
@@ -745,7 +771,7 @@ Codex scheduling rules:
 
 Spawn each selected persona reviewer using the subagent template included below. Each persona sub-agent receives:
 
-1. Their persona file content (identity, failure modes, calibration, suppress conditions)
+1. Their persona file content from the skill-local prompt asset mapping above when available (identity, failure modes, calibration, suppress conditions)
 2. Shared diff-scope rules from the diff-scope reference included below
 3. The JSON output contract from the findings schema included below
 4. PR metadata: title, body, and URL when reviewing a PR (empty string otherwise). Passed in a `<pr-context>` block so reviewers can verify code against stated intent
@@ -753,6 +779,10 @@ Spawn each selected persona reviewer using the subagent template included below.
 6. Run ID and review artifact directory for modes that create run artifacts, plus reviewer name for correlation and parent-owned artifact filenames
 7. Boundary context from Stage 2c, wrapped in `<boundary-context>`: `scope_boundary`, `authorized_scope_source`, `scope_boundary_evidence`, declared files/touch set when known, plan requirement or implementation-unit refs, and limitations.
 8. Graph impact context from Stage 3, wrapped in `<graph-impact-context>`: `graph_assist`, `graph_reason_code`, `expansion_budget`, `provider_untrusted.summaries[]`, candidate fields, rejected candidates, test candidates, `test_gaps`, and limitations. This context is advisory/provider_untrusted unless confirmed by direct evidence.
+
+For adversarial reviews, also read `references/cross-model-review.md` and launch the bundled cross-model pass when its gates hold. The script uses the same `references/personas/adversarial-reviewer.md` local prompt asset and writes only to the run-local temp artifact directory.
+
+When the repo-grounding cache assets are present, read `references/repo-profile-cache.md` before repeated broad repo orientation. Use it only for question-agnostic stack/convention facts; always re-ground code-review findings in the current diff/source/test/log/contract evidence.
 
 Persona sub-agents are **read-only** with respect to the project and the filesystem: they review and return structured JSON. They do not edit project files or write temp artifacts. They must not propose unrelated or speculative refactors, but may propose the smallest finding-scoped structural fix when it is grounded in the diff and surrounding code (for example a mechanical helper extraction that the schema's `suggested_fix` rules allow). Artifact persistence is parent/orchestrator-owned so reviewer capability frontmatter does not need broad `Write`.
 

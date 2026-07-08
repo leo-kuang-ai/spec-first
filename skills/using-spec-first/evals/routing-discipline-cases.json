@@ -47,11 +47,11 @@
     },
     {
       "id": "internal-helper-not-public-entrypoint",
-      "input": "直接用 git-worktree 作为入口来做这个 feature。",
+      "input": "直接用 spec-worktree 作为入口来做这个 feature。",
       "coverage_tags": ["routing", "boundary", "expected"],
       "expected_outcome": "Do not expose internal helpers as public entrypoints; route to the public workflow that may delegate internally when appropriate.",
       "boundary_note": "Internal helper existence does not create a user-facing workflow route.",
-      "forbidden_signals": ["Recommends git-worktree as a public spec-first entrypoint"],
+      "forbidden_signals": ["Recommends spec-worktree as a public spec-first entrypoint"],
       "extensions": {
         "expected_entrypoint": "spec-work",
         "public_workflow_required": true

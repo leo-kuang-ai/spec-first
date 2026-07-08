@@ -251,12 +251,6 @@ describe('init plan API', () => {
       expect(webResearcher).not.toMatch(/^model:/m);
       expect(webResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
 
-      const slackResearcher = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-slack-researcher.agent.md'), 'utf8');
-      expect(slackResearcher).toContain('name: spec-slack-researcher');
-      expect(slackResearcher).toContain('tools: [Read, Grep, Glob, mcp__slack__*]');
-      expect(slackResearcher).not.toMatch(/^model:/m);
-      expect(slackResearcher).not.toMatch(/^tools:.*\b(Write|Edit|Bash|Agent)\b/m);
-
       const issueIntelligence = fs.readFileSync(path.join(projectRoot, '.qoder', 'agents', 'spec-issue-intelligence-analyst.agent.md'), 'utf8');
       expect(issueIntelligence).toContain('name: spec-issue-intelligence-analyst');
       expect(issueIntelligence).toContain('tools: [Read, Grep, Glob, mcp__github__*]');

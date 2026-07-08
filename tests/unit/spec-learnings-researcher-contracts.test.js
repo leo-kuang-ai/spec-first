@@ -4,7 +4,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const REPO_ROOT = path.join(__dirname, '..', '..');
-const LEARNINGS_AGENT = path.join(REPO_ROOT, 'agents', 'spec-learnings-researcher.agent.md');
+const LEARNINGS_AGENT = path.join(
+  REPO_ROOT,
+  'skills/spec-plan/references/agents/learnings-researcher.md',
+);
 
 describe('spec learnings researcher contracts', () => {
   test('uses CONCEPTS.md as optional advisory vocabulary for learning search', () => {

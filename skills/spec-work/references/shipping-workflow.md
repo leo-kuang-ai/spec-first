@@ -46,7 +46,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    Options (four or fewer, self-contained labels):
    - `Apply/fix now` — loop back into review with focused fixes; the agent investigates each finding, applies changes where safe, and re-runs review.
    - `File tickets via project tracker` — load `references/tracker-defer.md` in Interactive mode; the agent files tickets in the project's detected tracker (or `gh` fallback, or leaves them in the report if no sink exists) and proceeds to Final Validation.
-   - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before shipping. If a PR will be created or updated in Phase 4, include them in the PR description's "Known Residuals" section (the agent owns this when calling `git-commit-push-pr`). If the user later chooses the no-PR `git-commit` path, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, stage it with the implementation commit, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
+   - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before shipping. If a PR will be created or updated in Phase 4, include them in the PR description's "Known Residuals" section (the agent owns this when calling `spec-commit-push-pr`). If the user later chooses the no-PR `spec-commit` path, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, stage it with the implementation commit, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
    - `Stop — do not ship` — abort the shipping workflow. The user will handle findings manually before re-invoking.
 
    Skip this gate entirely when the review reported `Residual actionable work: none.` or when only Tier 1 was used. Do not proceed past this gate on an `Accept and proceed` decision until the agent has recorded whether the durable sink is `PR Known Residuals` or `docs/residual-review-findings/<branch-or-head-sha>.md`.
@@ -76,9 +76,9 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
 1. **Prepare Evidence Context**
 
-   Do not invoke `feature-video` directly in this step. Evidence capture belongs to the PR creation or PR description update flow, where the final PR diff and description context are available.
+   Do not capture demo evidence directly in this step. Evidence belongs to the PR creation or PR description update flow, where the final PR diff and description context are available.
 
-   Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output). The `git-commit-push-pr` skill will ask whether to capture evidence only when evidence is possible.
+   Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output). The `spec-commit-push-pr` skill will ask whether to capture evidence only when evidence is possible.
 
 1.5. **Check Changelog And Release Path References**
 
@@ -180,17 +180,17 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
 3. **Commit and Create Pull Request**
 
-   Load the `git-commit-push-pr` skill to handle committing, pushing, and PR creation. The skill handles convention detection, branch safety, logical commit splitting, adaptive PR descriptions, and attribution badges. `git-commit-push-pr` is a host-provided skill, not a spec-first runtime asset; if the current host does not expose it, degrade gracefully — perform the commit/push/PR steps directly with `git` / `gh` and note that the helper was unavailable.
+   Load the `spec-commit-push-pr` skill to handle committing, pushing, and PR creation. The skill handles convention detection, branch safety, logical commit splitting, adaptive PR descriptions, and attribution badges. `spec-commit-push-pr` is a host-provided skill, not a spec-first runtime asset; if the current host does not expose it, degrade gracefully — perform the commit/push/PR steps directly with `git` / `gh` and note that the helper was unavailable.
 
    When providing context for the PR description, include:
    - The plan's summary and key decisions
    - Testing notes (tests added/modified, manual testing performed)
-   - Evidence context from step 1, so `git-commit-push-pr` can decide whether to ask about capturing evidence
+   - Evidence context from step 1, so `spec-commit-push-pr` can decide whether to ask about capturing evidence
    - Figma design link (if applicable)
    - The Post-Deploy Monitoring & Validation section (see Phase 3 Step 5)
    - Any "Known Residuals" accepted in the Phase 3 Residual Work Gate, rendered as a dedicated section in the PR body with severity, file:line, and title per finding
 
-   If the user prefers to commit without creating a PR, load the `git-commit` skill instead (also host-provided; if absent, commit directly with `git` and note the helper was unavailable).
+   If the user prefers to commit without creating a PR, load the `spec-commit` skill instead (also host-provided; if absent, commit directly with `git` and note the helper was unavailable).
 
 4. **Notify User**
    - Summarize what was completed
@@ -246,7 +246,7 @@ Before creating PR, verify:
 - [ ] Linting passes (use linting-agent)
 - [ ] Code follows existing patterns
 - [ ] Figma designs match implementation (if applicable)
-- [ ] Evidence decision handled by `git-commit-push-pr` when the change has observable behavior
+- [ ] Evidence decision handled by `spec-commit-push-pr` when the change has observable behavior
 - [ ] Commit messages follow conventional format
 - [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale)
 - [ ] Code review completed (Tier 1 host-native or Tier 2 `spec-code-review`)

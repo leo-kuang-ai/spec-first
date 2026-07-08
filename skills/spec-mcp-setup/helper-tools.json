@@ -4,13 +4,27 @@
     {
       "id": "agent-browser",
       "kind": "browser-helper",
-      "profiles": ["recommended", "platform"],
-      "surface_overlays": ["surface-ui"],
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
+      "surface_overlays": [
+        "surface-ui"
+      ],
       "required": true,
       "baseline_blocking": false,
-      "required_for": ["surface-ui"],
-      "recommended_for": ["browser automation", "frontend polish", "e2e validation"],
-      "demand_signals": ["SPEC_FIRST_BROWSER_HELPER_REQUIRED=1", "surface-ui"],
+      "required_for": [
+        "surface-ui"
+      ],
+      "recommended_for": [
+        "browser automation",
+        "frontend polish",
+        "e2e validation"
+      ],
+      "demand_signals": [
+        "SPEC_FIRST_BROWSER_HELPER_REQUIRED=1",
+        "surface-ui"
+      ],
       "detection": {
         "kind": "agent-browser",
         "command": "agent-browser",
@@ -26,30 +40,56 @@
         "next_action": "set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)"
       },
       "safety": {
-        "risk_flags": ["global-npm-install", "browser-runtime-install", "unpinned-latest"],
+        "risk_flags": [
+          "global-npm-install",
+          "browser-runtime-install",
+          "unpinned-latest"
+        ],
         "source": "npm",
         "source_repo": "https://github.com/vercel-labs/agent-browser",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": true,
         "install_effect": "global CLI, browser runtime, global skill"
       },
       "platform_required_tools": {
-        "shell": ["node", "npm", "npx"],
-        "powershell": ["node", "npm", "npx"]
+        "shell": [
+          "node",
+          "npm",
+          "npx"
+        ],
+        "powershell": [
+          "node",
+          "npm",
+          "npx"
+        ]
       },
       "runner_kind": "cross-platform"
     },
     {
       "id": "gh",
       "kind": "cli",
-      "profiles": ["minimal", "recommended", "platform"],
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": true,
-      "required_for": ["github issue and pull request workflows"],
-      "recommended_for": ["spec-code-review", "spec-work"],
+      "required_for": [
+        "github issue and pull request workflows"
+      ],
+      "recommended_for": [
+        "spec-code-review",
+        "spec-work"
+      ],
       "demand_signals": [],
-      "detection": { "kind": "command", "command": "gh" },
+      "detection": {
+        "kind": "command",
+        "command": "gh"
+      },
       "installation": {
         "strategy": "package-manager",
         "commands": {
@@ -60,27 +100,45 @@
         "next_action": "install gh"
       },
       "safety": {
-        "risk_flags": ["package-manager-install"],
+        "risk_flags": [
+          "package-manager-install"
+        ],
         "source": "package-manager",
         "source_repo": "https://cli.github.com",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": false,
         "install_effect": "system CLI"
       },
-      "platform_required_tools": { "shell": [], "powershell": [] },
+      "platform_required_tools": {
+        "shell": [],
+        "powershell": []
+      },
       "runner_kind": "cross-platform"
     },
     {
       "id": "jq",
       "kind": "cli",
-      "profiles": ["minimal", "recommended", "platform"],
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": true,
-      "required_for": ["bash setup scripts"],
-      "recommended_for": ["JSON parsing"],
+      "required_for": [
+        "bash setup scripts"
+      ],
+      "recommended_for": [
+        "JSON parsing"
+      ],
       "demand_signals": [],
-      "detection": { "kind": "command", "command": "jq" },
+      "detection": {
+        "kind": "command",
+        "command": "jq"
+      },
       "installation": {
         "strategy": "package-manager",
         "commands": {
@@ -91,27 +149,44 @@
         "next_action": "install jq"
       },
       "safety": {
-        "risk_flags": ["package-manager-install"],
+        "risk_flags": [
+          "package-manager-install"
+        ],
         "source": "package-manager",
         "source_repo": "https://jqlang.github.io/jq/",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": false,
         "install_effect": "system CLI"
       },
-      "platform_required_tools": { "shell": ["jq"], "powershell": [] },
+      "platform_required_tools": {
+        "shell": [
+          "jq"
+        ],
+        "powershell": []
+      },
       "runner_kind": "shell"
     },
     {
       "id": "vhs",
       "kind": "cli",
-      "profiles": ["recommended", "platform"],
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": false,
-      "required_for": ["feature-video"],
-      "recommended_for": ["terminal demos"],
+      "required_for": [],
+      "recommended_for": [
+        "terminal demos"
+      ],
       "demand_signals": [],
-      "detection": { "kind": "command", "command": "vhs" },
+      "detection": {
+        "kind": "command",
+        "command": "vhs"
+      },
       "installation": {
         "strategy": "package-manager",
         "commands": {
@@ -122,27 +197,43 @@
         "next_action": "install vhs"
       },
       "safety": {
-        "risk_flags": ["optional-helper", "unpinned-latest"],
+        "risk_flags": [
+          "optional-helper",
+          "unpinned-latest"
+        ],
         "source": "package-manager",
         "source_repo": "https://github.com/charmbracelet/vhs",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": true,
         "install_effect": "system CLI"
       },
-      "platform_required_tools": { "shell": [], "powershell": [] },
+      "platform_required_tools": {
+        "shell": [],
+        "powershell": []
+      },
       "runner_kind": "cross-platform"
     },
     {
       "id": "silicon",
       "kind": "cli",
-      "profiles": ["recommended", "platform"],
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": false,
-      "required_for": ["feature-video"],
-      "recommended_for": ["code screenshots"],
+      "required_for": [],
+      "recommended_for": [
+        "code screenshots"
+      ],
       "demand_signals": [],
-      "detection": { "kind": "command", "command": "silicon" },
+      "detection": {
+        "kind": "command",
+        "command": "silicon"
+      },
       "installation": {
         "strategy": "package-manager",
         "commands": {
@@ -153,27 +244,43 @@
         "next_action": "install silicon"
       },
       "safety": {
-        "risk_flags": ["optional-helper", "global-cargo-install"],
+        "risk_flags": [
+          "optional-helper",
+          "global-cargo-install"
+        ],
         "source": "package-manager",
         "source_repo": "https://github.com/Aloxaf/silicon",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": true,
         "install_effect": "system CLI"
       },
-      "platform_required_tools": { "shell": [], "powershell": [] },
+      "platform_required_tools": {
+        "shell": [],
+        "powershell": []
+      },
       "runner_kind": "cross-platform"
     },
     {
       "id": "ffmpeg",
       "kind": "cli",
-      "profiles": ["recommended", "platform"],
+      "profiles": [
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": false,
-      "required_for": ["feature-video"],
-      "recommended_for": ["video composition"],
+      "required_for": [],
+      "recommended_for": [
+        "video composition"
+      ],
       "demand_signals": [],
-      "detection": { "kind": "command", "command": "ffmpeg" },
+      "detection": {
+        "kind": "command",
+        "command": "ffmpeg"
+      },
       "installation": {
         "strategy": "package-manager",
         "commands": {
@@ -184,25 +291,43 @@
         "next_action": "install ffmpeg"
       },
       "safety": {
-        "risk_flags": ["optional-helper", "package-manager-install"],
+        "risk_flags": [
+          "optional-helper",
+          "package-manager-install"
+        ],
         "source": "package-manager",
         "source_repo": "https://ffmpeg.org/download.html",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": false,
         "install_effect": "system CLI"
       },
-      "platform_required_tools": { "shell": [], "powershell": [] },
+      "platform_required_tools": {
+        "shell": [],
+        "powershell": []
+      },
       "runner_kind": "cross-platform"
     },
     {
       "id": "ast-grep",
       "kind": "cli",
-      "profiles": ["minimal", "recommended", "platform"],
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": false,
-      "required_for": ["structural code search"],
-      "recommended_for": ["spec-code-review", "spec-debug", "spec-work"],
+      "required_for": [
+        "structural code search"
+      ],
+      "recommended_for": [
+        "spec-code-review",
+        "spec-debug",
+        "spec-work"
+      ],
       "demand_signals": [],
       "detection": {
         "kind": "command",
@@ -219,25 +344,41 @@
         "next_action": "install ast-grep"
       },
       "safety": {
-        "risk_flags": ["optional-helper", "global-install"],
+        "risk_flags": [
+          "optional-helper",
+          "global-install"
+        ],
         "source": "package-manager",
         "source_repo": "https://ast-grep.github.io",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": true,
         "install_effect": "system CLI"
       },
-      "platform_required_tools": { "shell": [], "powershell": [] },
+      "platform_required_tools": {
+        "shell": [],
+        "powershell": []
+      },
       "runner_kind": "cross-platform"
     },
     {
       "id": "ast-grep-skill",
       "kind": "global-skill",
-      "profiles": ["minimal", "recommended", "platform"],
+      "profiles": [
+        "minimal",
+        "recommended",
+        "platform"
+      ],
       "surface_overlays": [],
       "required": true,
       "baseline_blocking": true,
-      "required_for": ["ast-grep usage guidance"],
-      "recommended_for": ["structural search guidance"],
+      "required_for": [
+        "ast-grep usage guidance"
+      ],
+      "recommended_for": [
+        "structural search guidance"
+      ],
       "demand_signals": [],
       "detection": {
         "kind": "global-skill",
@@ -253,14 +394,28 @@
         "next_action": "install global ast-grep skill"
       },
       "safety": {
-        "risk_flags": ["global-skill-install", "unpinned-npx"],
+        "risk_flags": [
+          "global-skill-install",
+          "unpinned-npx"
+        ],
         "source": "npx",
         "source_repo": "https://ast-grep.github.io",
-        "version_policy": { "pin_status": "latest" },
+        "version_policy": {
+          "pin_status": "latest"
+        },
         "review_required": true,
         "install_effect": "global skill"
       },
-      "platform_required_tools": { "shell": ["node", "npx"], "powershell": ["node", "npx"] },
+      "platform_required_tools": {
+        "shell": [
+          "node",
+          "npx"
+        ],
+        "powershell": [
+          "node",
+          "npx"
+        ]
+      },
       "runner_kind": "cross-platform"
     }
   ]

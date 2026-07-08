@@ -57,7 +57,7 @@ describe('runtime capability catalog', () => {
     expect(catalog).not.toContain('Do not restore legacy standards workflow entrypoints, skills/spec-standards/');
     expect(catalog).toContain('| write-skill | spec-write-skill | spec-write-skill | no |');
     expect(catalog).toContain('| write-tasks | spec-write-tasks | spec-write-tasks | no |');
-    expect(catalog).toContain('| Delivered agent-facing internal skills | git-worktree |');
+    expect(catalog).toContain('| Delivered agent-facing internal skills | spec-worktree |');
     expect(catalog).not.toContain('spec-session-extract');
     expect(catalog).not.toContain('spec-session-inventory');
     expect(catalog).toContain('| Governance-only internal records |');

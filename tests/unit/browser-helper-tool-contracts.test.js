@@ -43,10 +43,7 @@ const MCP_SETUP_REFERENCE_PATH = path.join(
 const SPEC_SETUP_DIR = path.join(REPO_ROOT, 'skills', 'spec-setup');
 
 const DOWNSTREAM_PROMPTS = [
-  path.join(REPO_ROOT, 'skills', 'test-browser', 'SKILL.md'),
-  path.join(REPO_ROOT, 'skills', 'feature-video', 'references', 'tier-browser-reel.md'),
-  path.join(REPO_ROOT, 'skills', 'feature-video', 'references', 'tier-static-screenshots.md'),
-  path.join(REPO_ROOT, 'skills', 'frontend-design', 'SKILL.md'),
+  path.join(REPO_ROOT, 'skills', 'spec-test-browser', 'SKILL.md'),
   path.join(REPO_ROOT, 'skills', 'spec-polish', 'SKILL.md'),
 ];
 
@@ -253,7 +250,7 @@ describe('browser helper tool contracts', () => {
       expect(prompt).not.toContain('$spec-mcp-setup` on Codex');
     }
 
-    const testBrowser = read(path.join(REPO_ROOT, 'skills', 'test-browser', 'SKILL.md'));
+    const testBrowser = read(path.join(REPO_ROOT, 'skills', 'spec-test-browser', 'SKILL.md'));
     expect(testBrowser).toContain('Use `agent-browser` Only For Browser Automation');
     expect(testBrowser).toContain('agent-browser open');
     expect(testBrowser).toContain('agent-browser snapshot -i');

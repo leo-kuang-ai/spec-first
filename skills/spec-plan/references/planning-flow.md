@@ -211,7 +211,16 @@ Prepare a concise planning context summary (a paragraph or two) to pass as input
 
 Planning research agents are read-only. Use the active host's agent-dispatch primitive only when host capability exists and dispatch authorization is present for this run. In Codex, a public `spec-plan` invocation authorizes the workflow itself; it does not by itself authorize `spawn_agent`. If the user did not explicitly request subagents, delegation, parallel research, or research-agent dispatch, use the inline fallback and record `dispatch_authorization_missing`. When dispatch is authorized, omit permission-mode overrides and keep dispatch bounded to the named research agents below.
 
-If dispatch is unavailable, explicitly disabled, unauthorized, or fails for a non-capacity reason, run the same research sequentially in the current agent by reading the corresponding agent profile and applying it inline as an explicit fallback. Plan generation must still complete when research dispatch is unavailable; dispatch improves latency and context separation, not correctness.
+Research-agent names are stable labels for planning reports and dispatch summaries. For every selected agent with a local prompt asset, read the mapped file under `references/agents/` and seed a generic read-only subagent with that content; do not dispatch a standalone typed agent by name when a local prompt asset exists. If dispatch is unavailable, explicitly disabled, unauthorized, or fails for a non-capacity reason, run the same research sequentially in the current agent by reading the corresponding local prompt asset or host-provided profile and applying it inline as an explicit fallback. Plan generation must still complete when research dispatch is unavailable; dispatch improves latency and context separation, not correctness.
+
+Before broad repo orientation, read `references/repo-profile-cache.md` and run the co-located cache helper with the skill-dir anchor when available:
+
+```bash
+SKILL_DIR="<absolute path of the directory containing the spec-plan SKILL.md you read>"
+python3 "$SKILL_DIR/scripts/repo-profile-cache.py" get
+```
+
+On `HIT`, pass the profile's stack, topology, vocabulary, and conventions into `spec-repo-research-analyst` so it skips question-agnostic baseline discovery and focuses only on the plan-specific scopes. On `MISS`, dispatch a generic subagent seeded with `references/agents/repo-profiler.md`, write its JSON to a file, then persist it with `python3 "$SKILL_DIR/scripts/repo-profile-cache.py" put <profile-json-file>` in a separate Bash call with `SKILL_DIR` reset inline. On `NO-CACHE`, helper failure, or unusable output, derive only the orientation needed for this run and continue without caching. The cache is an optimization, never a correctness dependency; `docs/solutions/` and subdirectory-scoped instruction files are always searched fresh.
 
 ### Implementation Worker Suitability Gate
 
@@ -219,8 +228,8 @@ Planning may recommend later worker delegation, but it must not dispatch impleme
 
 Dispatch these read-only research agents in parallel when available, or run the explicit sequential/inline fallback:
 
-- `spec-repo-research-analyst` — Scope: technology, architecture, patterns. Input: `{planning context summary}`.
-- `spec-learnings-researcher` — Input: `{planning context summary}`.
+- `spec-repo-research-analyst` — prompt asset `references/agents/repo-research-analyst.md`; Scope: technology, architecture, patterns. Input: `{planning context summary}`.
+- `spec-learnings-researcher` — prompt asset `references/agents/learnings-researcher.md`; Input: `{planning context summary}`.
 
 Collect:
 
@@ -232,7 +241,7 @@ Collect:
 
 **Slack context** (opt-in) — never auto-dispatch. Route by condition:
 
-- **Tools available + user asked**: Dispatch `spec-slack-researcher` with the planning context summary in parallel with other Phase 1.1 agents. If the origin document has a Slack context section, pass it verbatim so the researcher focuses on gaps. Include findings in consolidation.
+- **Tools available + user asked**: Dispatch a generic subagent seeded with prompt asset `references/agents/slack-researcher.md` and the planning context summary in parallel with other Phase 1.1 agents. If the origin document has a Slack context section, pass it verbatim so the researcher focuses on gaps. Include findings in consolidation.
 - **Tools available + user didn't ask**: Note in output: "Slack tools detected. Ask me to search Slack for organizational context at any point, or include it in your next prompt."
 - **No tools + user asked**: Note in output: "Slack context was requested but no Slack tools are available. Install and authenticate the Slack plugin to enable organizational context search."
 
@@ -342,8 +351,8 @@ Announce the decision briefly before continuing.
 
 If Step 1.2 indicates external research is useful, dispatch these read-only agents in parallel when available, or run them sequentially/inline in the current agent as the explicit fallback:
 
-- `spec-best-practices-researcher` — Input: `{planning context summary}`.
-- `spec-framework-docs-researcher` — Input: `{planning context summary}`.
+- `spec-best-practices-researcher` — prompt asset `references/agents/best-practices-researcher.md`; Input: `{planning context summary}`.
+- `spec-framework-docs-researcher` — prompt asset `references/agents/framework-docs-researcher.md`; Input: `{planning context summary}`.
 
 ### 1.4 Consolidate Research
 
@@ -372,7 +381,7 @@ This ensures flow analysis (Phase 1.5) runs and the confidence-first check (Phas
 
 For **Standard** or **Deep** plans, or when user flow completeness is still unclear, dispatch the read-only flow analyzer when available, or run the same analysis sequentially/inline in the current agent as the explicit fallback:
 
-- `spec-spec-flow-analyzer` — Input: `{planning context summary, research findings}`.
+- `spec-spec-flow-analyzer` — prompt asset `references/agents/spec-flow-analyzer.md`; Input: `{planning context summary, research findings}`.
 
 Use the output to:
 
