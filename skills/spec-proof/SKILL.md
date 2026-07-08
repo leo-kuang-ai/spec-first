@@ -22,7 +22,16 @@ Every write to a Proof doc must be attributed. Two fields carry the agent's iden
 - **Machine ID (`by` on every op, `X-Agent-Id` header):** `ai:spec-first` — stable, lowercase-hyphenated, machine-parseable. Appears in marks, events, and the API response.
 - **Display name (`name` on `POST /presence`):** `Spec-First` — human-readable, shown in Proof's presence chips and comment-author badges.
 
-Set the display name once per doc session by posting to presence with the `X-Agent-Id` header; Proof binds the name to that agent ID for the session. These values are fixed for HITL review (`references/hitl-review.md`): callers pass source path, title, and recommended next step, but they do not override identity. Do not use legacy or ad-hoc identity variants.
+Set the display name once per doc session by posting to presence with the `X-Agent-Id` header; Proof binds the name to that agent ID for the session. These values are the defaults for ordinary publish/read/comment/edit flows; a caller may pass a different `identity` pair if a distinct sub-agent should own the doc. HITL review (`references/hitl-review.md`) keeps this identity fixed: callers pass source path, title, and recommended next step, but they do not override identity. Do not use legacy or ad-hoc identity variants.
+
+## Publish Mode
+
+The primary use is one-way publishing: take an existing local markdown file (a brainstorm, a unified plan, a learning, a draft), read its full contents and post them as the new doc's body (see "Workflow: Create and Share a New Document" for the source-file recipe - never publish placeholder content), and hand the user a shareable URL. The local file stays canonical - publishing does not sync anything back to disk. The user can open the link to read, comment, and share with others; the agent can also participate via the edit APIs below when given the URL. Two entry points, identical mechanics (see "Workflow: Create and Share a New Document"):
+
+- **Direct user request** - a bare user phrase naming a local markdown file and asking to share it via Proof: "share this to proof", "publish this to proof", "open this in proof editor so I can review", "get me a proof link for this doc". The file is whichever markdown the user just created, edited, or referenced; if ambiguous, ask which file. This is a first-class entry point - do not require an upstream caller.
+- **Upstream skill handoff** - `spec-brainstorm`, `spec-ideate`, or `spec-plan` finishes a draft and hands it off to publish for human review, passing the file path and title explicitly.
+
+Only publish markdown. If the source is an HTML unified plan, do not upload it to Proof; return the local browser/open path instead. When publishing a unified plan, label the title by readiness when available, e.g. `Plan: <title> (requirements-only)` or `Plan: <title> (implementation-ready)`.
 
 ## Human-in-the-Loop Review Mode
 
@@ -321,10 +330,15 @@ curl -X POST "https://www.proofeditor.ai/api/agent/abc123/edit/v2?return=minimal
 ## Workflow: Create and Share a New Document
 
 ```bash
-# 1. Create
-RESPONSE=$(curl -s -X POST https://www.proofeditor.ai/share/markdown \
-  -H "Content-Type: application/json" \
-  -d '{"title":"My Doc","markdown":"# Title\n\nContent here."}')
+SRC="docs/plans/2026-05-04-001-feat-foo-plan.md"   # source file from the caller
+TITLE="Plan: Foo"                                   # caller-provided title
+
+# 1. Create - from a local source file:
+RESPONSE=$(jq -n --arg title "$TITLE" --rawfile md "$SRC" '{title:$title, markdown:$md}' \
+  | curl -s -X POST https://www.proofeditor.ai/share/markdown \
+    -H "Content-Type: application/json" -d @-)
+# (Ad-hoc inline content instead of a file:
+#  -d '{"title":"My Doc","markdown":"# Title\n\nContent here."}')
 
 # 2. Extract URL and token
 URL=$(echo "$RESPONSE" | jq -r '.tokenUrl')

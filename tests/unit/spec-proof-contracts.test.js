@@ -65,11 +65,11 @@ describe('Proof skill API resilience contract', () => {
     expect(combined).toContain('IDEMPOTENCY_KEY_REUSED');
     expect(combined).toContain('X-Agent-Id: ai:spec-first');
     expect(combined).toContain('by: "ai:spec-first"');
-    expect(combined).toContain('These values are fixed for HITL review');
+    expect(combined).toContain('HITL review (`references/hitl-review.md`) keeps this identity fixed');
     expect(combined).toContain('callers pass source path, title, and recommended next step, but they do not override identity');
     expect(combined).toContain('Agent identity is fixed, not a parameter');
     expect(combined).toContain('Callers do not override this');
-    expect(combined).not.toContain('may pass a different `identity` pair');
+    expect(combined).toContain('These values are the defaults for ordinary publish/read/comment/edit flows; a caller may pass a different `identity` pair');
     expect(combined).not.toContain('identity stays uniform unless a caller explicitly overrides it');
     expect(combined).not.toContain('ai:compound-engineering');
     expect(combined).not.toContain('Compound Engineering');

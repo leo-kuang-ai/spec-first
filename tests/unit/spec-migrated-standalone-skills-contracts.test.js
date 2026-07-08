@@ -32,6 +32,22 @@ const EXPECTED_ARGUMENT_HINTS = {
   'spec-strategy': "[optional: section to revisit, e.g. 'metrics' or 'approach']",
 };
 
+const EXPECTED_FRONTMATTER_FIELDS = {
+  'spec-product-pulse': [
+    'disable-model-invocation: true',
+    'allowed-tools:',
+    '  - Read',
+    '  - Write',
+    '  - Glob',
+    '  - Grep',
+    '  - Bash',
+    '  - AskUserQuestion',
+  ],
+  'spec-promote': [
+    'disable-model-invocation: true',
+  ],
+};
+
 function read(relativePath) {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
 }
@@ -71,8 +87,17 @@ describe('migrated CE standalone skills', () => {
       } else {
         expect(frontmatter).not.toMatch(/^argument-hint:/m);
       }
-      expect(frontmatter).not.toMatch(/^allowed-tools:/m);
-      expect(frontmatter).not.toMatch(/^disable-model-invocation:/m);
+      for (const expectedField of EXPECTED_FRONTMATTER_FIELDS[skillName] || []) {
+        expect(frontmatter).toContain(expectedField);
+      }
+      if (!EXPECTED_FRONTMATTER_FIELDS[skillName]?.some((field) =>
+        field.startsWith('allowed-tools:'))) {
+        expect(frontmatter).not.toMatch(/^allowed-tools:/m);
+      }
+      if (!EXPECTED_FRONTMATTER_FIELDS[skillName]?.some((field) =>
+        field.startsWith('disable-model-invocation:'))) {
+        expect(frontmatter).not.toMatch(/^disable-model-invocation:/m);
+      }
       expect(skill).not.toMatch(/[\u4E00-\u9FFF]/);
     }
   });
@@ -98,6 +123,17 @@ describe('migrated CE standalone skills', () => {
       'references',
       'spec-first-feedback-format.md',
     ))).toBe(true);
+  });
+
+  test('keeps product pulse schedule config under the pulse key namespace', () => {
+    const skill = read('skills/spec-product-pulse/SKILL.md');
+    const interview = read('skills/spec-product-pulse/references/interview.md');
+
+    expect(skill).toContain('`pulse_schedule`');
+    expect(interview).toContain('pulse_schedule: {{daily | weekly | manual | ask-again-after-3-runs}}');
+    expect(interview).toContain('only add or update `pulse_*` keys');
+    expect(interview).not.toMatch(/^schedule:/m);
+    expect(interview).not.toContain('capture `schedule:');
   });
 
   test('registers every migrated skill as a dual-host standalone skill', () => {
