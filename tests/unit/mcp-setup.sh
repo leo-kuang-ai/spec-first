@@ -6,6 +6,7 @@ SKILL_DIR="$REPO_ROOT/skills/spec-mcp-setup"
 SCRIPTS_DIR="$SKILL_DIR/scripts"
 TOOLS_JSON="$SKILL_DIR/mcp-tools.json"
 WRITE_SETUP_FACTS="$SCRIPTS_DIR/write-setup-facts.sh"
+BOOTSTRAP_PROJECT_CONFIG="$SCRIPTS_DIR/bootstrap-project-config.sh"
 SPEC_FIRST_CLI="$REPO_ROOT/bin/spec-first.js"
 
 pass_count=0
@@ -138,7 +139,43 @@ if grep -q 'uvx --from graphifyy==' "$SCRIPTS_DIR/install-helpers.sh"; then
 fi
 
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/spec-first-mcp-setup.XXXXXX")"
-trap 'rm -rf "$TMP_ROOT"' EXIT
+mkdir -p "$REPO_ROOT/tmp"
+WORKSPACE_TMP="$(mktemp -d "$REPO_ROOT/tmp/spec-first-mcp-setup.XXXXXX")"
+trap 'rm -rf "$TMP_ROOT" "$WORKSPACE_TMP"' EXIT
+
+REPO_PROJECT_CONFIG="$WORKSPACE_TMP/repo-project-config"
+mkdir -p "$REPO_PROJECT_CONFIG/.compound-engineering"
+printf '{"name":"repo-project-config"}\n' > "$REPO_PROJECT_CONFIG/package.json"
+printf 'legacy markdown\n' > "$REPO_PROJECT_CONFIG/compound-engineering.local.md"
+printf 'legacy: true\n' > "$REPO_PROJECT_CONFIG/.compound-engineering/config.local.yaml"
+git -C "$REPO_PROJECT_CONFIG" init >/dev/null
+project_config_output="$(cd "$REPO_PROJECT_CONFIG" && bash "$BOOTSTRAP_PROJECT_CONFIG" --refresh-example --create-local --ensure-gitignore --json)"
+assert_eq "project config bootstrap ready" "ready" "$(jq -r '.overall_status' <<<"$project_config_output")"
+assert_eq "project config example refreshed" "refreshed" "$(jq -r '.project.example_config_status' <<<"$project_config_output")"
+assert_eq "project config local created" "created" "$(jq -r '.project.local_config_status' <<<"$project_config_output")"
+assert_eq "project config gitignore added" "added" "$(jq -r '.project.local_config_gitignore_status' <<<"$project_config_output")"
+assert_eq "project config reports legacy markdown" "present" "$(jq -r '.legacy.compound_engineering_markdown_status' <<<"$project_config_output")"
+assert_eq "project config reports legacy local config" "present" "$(jq -r '.legacy.compound_engineering_config_status' <<<"$project_config_output")"
+assert "project config example mirrors template" cmp -s "$SKILL_DIR/references/config-template.yaml" "$REPO_PROJECT_CONFIG/.spec-first/config.local.example.yaml"
+assert "project config local mirrors template" cmp -s "$SKILL_DIR/references/config-template.yaml" "$REPO_PROJECT_CONFIG/.spec-first/config.local.yaml"
+assert "project config gitignore preserves local yaml rule" grep -Fxq '.spec-first/*.local.yaml' "$REPO_PROJECT_CONFIG/.gitignore"
+project_config_delete_output="$(cd "$REPO_PROJECT_CONFIG" && bash "$BOOTSTRAP_PROJECT_CONFIG" --delete-legacy-markdown --json)"
+assert_eq "project config deletes legacy markdown only when explicit" "deleted" "$(jq -r '.legacy.compound_engineering_markdown_status' <<<"$project_config_delete_output")"
+assert "project config does not migrate or delete legacy local config" test -f "$REPO_PROJECT_CONFIG/.compound-engineering/config.local.yaml"
+
+REPO_PROJECT_CONFIG_SYMLINK="$WORKSPACE_TMP/repo-project-config-symlink"
+OUTSIDE_PROJECT_CONFIG="$WORKSPACE_TMP/outside-project-config"
+mkdir -p "$REPO_PROJECT_CONFIG_SYMLINK" "$OUTSIDE_PROJECT_CONFIG"
+printf '{"name":"repo-project-config-symlink"}\n' > "$REPO_PROJECT_CONFIG_SYMLINK/package.json"
+git -C "$REPO_PROJECT_CONFIG_SYMLINK" init >/dev/null
+ln -s "$OUTSIDE_PROJECT_CONFIG" "$REPO_PROJECT_CONFIG_SYMLINK/.spec-first"
+set +e
+project_config_symlink_output="$(cd "$REPO_PROJECT_CONFIG_SYMLINK" && bash "$BOOTSTRAP_PROJECT_CONFIG" --refresh-example --json)"
+project_config_symlink_status=$?
+set -e
+assert_eq "project config symlink escape exits nonzero" "1" "$project_config_symlink_status"
+assert_eq "project config symlink escape reason" "project-config-symlink-escape" "$(jq -r '.reason' <<<"$project_config_symlink_output")"
+assert "project config symlink target remains empty" test ! -f "$OUTSIDE_PROJECT_CONFIG/config.local.example.yaml"
 
 HOST_DETECT_BIN="$TMP_ROOT/host-detect-bin"
 REPO_QODER_PATH_ONLY="$TMP_ROOT/repo-qoder-path-only"

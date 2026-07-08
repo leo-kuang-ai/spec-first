@@ -28,6 +28,24 @@ const CHECK_HEALTH_PATH = path.join(
   'scripts',
   'check-health',
 );
+const VERIFY_TOOLS_SH_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  'skills',
+  'spec-mcp-setup',
+  'scripts',
+  'verify-tools.sh',
+);
+const VERIFY_TOOLS_PS1_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  'skills',
+  'spec-mcp-setup',
+  'scripts',
+  'verify-tools.ps1',
+);
 const SKILL_PATH = path.join(
   __dirname,
   '..',
@@ -65,12 +83,30 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).toContain('Explore -> Present -> Decide -> Write');
     expect(text).toContain('local-only overrides');
     expect(text).toContain('verification_profile_path');
-    expect(text).toContain('Document output/provider keys in the template are reserved future hints');
+    expect(text).toContain('feedback_sources` and `sweep_*`, read and written by `spec-sweep`');
+    expect(text).toContain('pulse_*`, read and written by `spec-product-pulse`');
+    expect(text).toContain('spec_promote_spiral_optout`, read and written by `spec-promote`');
+    expect(text).toContain('work_delegate_*`, exposed for downstream execution workflows');
+    expect(text).toContain('plan_skip_scoping_confirm`, exposed for downstream planning workflows');
+    expect(text).toContain('Document rendering keys (`plan_output`, `brainstorm_output`, `ideate_output`) are reserved future hints');
+    expect(text).toContain('it must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists');
     expect(text).toContain('Missing local config is not a blocker');
     expect(text).toContain('deterministic existence facts only');
     expect(text).toContain('Setup must not judge whether terminology is correct');
     expect(setupDoesNot).toContain('treat `.spec-first/config.local.yaml` as team-shared workflow policy');
     expect(setupDoesNot).toContain('decide issue/PR category, state, scope, accept/reject status, or implementation truth');
+  });
+
+  test('runtime setup documents a spec-first three-stage setup flow', () => {
+    const text = fs.readFileSync(SKILL_PATH, 'utf8');
+
+    expect(text).toContain('## Three-Stage Setup Flow');
+    expect(text).toContain('### Stage 1: Diagnose Target And Readiness');
+    expect(text).toContain('### Stage 2: Apply Authorized Setup Actions');
+    expect(text).toContain('### Stage 3: Summarize Facts And Next Action');
+    expect(text).toContain('Project-local config actions never install providers or edit host config');
+    expect(text).toContain('Host/provider actions never migrate local config keys');
+    expect(text).toContain('Do not collapse these boundaries into a single "setup complete" statement');
   });
 
   test('local execution override documents the current verification profile consumer', () => {
@@ -81,6 +117,41 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).toContain('Current supported consumer: src/verification/profile-loader.js reads this');
     expect(text).toContain('# verification_profile_path: .spec-first/verification-profile.local.json');
     expect(text).not.toMatch(/^verification_profile_path:/m);
+  });
+
+  test('active local config consumers are discoverable but remain commented by default', () => {
+    const text = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+
+    expect(text).toContain('# --- Feedback sweep ---');
+    expect(text).toContain('Active consumer: spec-sweep reads these keys');
+    expect(text).toContain('# feedback_sources:');
+    expect(text).toContain('# sweep_state_path: docs/feedback-sweep/state.yml');
+    expect(text).toContain('# sweep_ack_cap: 25');
+    expect(text).toContain('# sweep_lease_ttl_minutes: 60');
+    expect(text).toContain('# sweep_shared_branch: false');
+    expect(text).toContain('# --- Product pulse ---');
+    expect(text).toContain('Active consumer: spec-product-pulse reads these keys');
+    expect(text).toContain('# pulse_product_name: "Product name"');
+    expect(text).toContain('# pulse_lookback_default: 24h');
+    expect(text).toContain('# pulse_metric_sources: "retention_d7=posthog,nps=delighted"');
+    expect(text).toContain('# --- Promotion helpers ---');
+    expect(text).toContain('Active consumer: spec-promote reads an uncommented top-level');
+    expect(text).toContain('# spec_promote_spiral_optout: true');
+
+    for (const key of [
+      'feedback_sources',
+      'sweep_state_path',
+      'sweep_ack_cap',
+      'sweep_lease_ttl_minutes',
+      'sweep_shared_branch',
+      'pulse_product_name',
+      'pulse_lookback_default',
+      'pulse_primary_event',
+      'pulse_metric_sources',
+      'spec_promote_spiral_optout',
+    ]) {
+      expect(text).not.toMatch(new RegExp(`^${key}:`, 'm'));
+    }
   });
 
   test('document rendering hints stay inactive and spec-first scoped', () => {
@@ -94,8 +165,23 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).toContain('focused HTML consumer tests');
     expect(text).toContain('# plan_output: html');
     expect(text).toContain('# brainstorm_output: html');
+    expect(text).toContain('# ideate_output: html');
+    expect(text).toContain('# --- Work delegation ---');
+    expect(text).toContain('Integrated local config surface for downstream execution workflows');
+    expect(text).toContain('# work_delegate: codex');
+    expect(text).toContain('# work_delegate_consent: true');
+    expect(text).toContain('# work_delegate_sandbox: yolo');
+    expect(text).toContain('# work_delegate_decision: auto');
+    expect(text).toContain('# work_delegate_model: gpt-5.4');
+    expect(text).toContain('# work_delegate_effort: high');
+    expect(text).toContain('# --- Planning confirmation ---');
+    expect(text).toContain('Integrated local config surface for downstream planning workflows');
+    expect(text).toContain('# plan_skip_scoping_confirm: true');
     expect(text).not.toMatch(/^plan_output:/m);
     expect(text).not.toMatch(/^brainstorm_output:/m);
+    expect(text).not.toMatch(/^ideate_output:/m);
+    expect(text).not.toMatch(/^work_delegate_/m);
+    expect(text).not.toMatch(/^plan_skip_scoping_confirm:/m);
     expect(text).not.toContain('.compound-engineering');
     expect(text).not.toMatch(/\bce-[a-z]/);
     expect(text).not.toContain('exclusive format');
@@ -130,5 +216,20 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).not.toContain('warn "Local config missing (.spec-first/config.local.yaml)"');
     expect(text).toContain('Example config outdated (.spec-first/config.local.example.yaml)');
     expect(text).toContain('bootstrap-project-config.sh\\" --repo \\"$repo_root\\" --refresh-example');
+  });
+
+  test('verify status block reports project local config facts on bash and PowerShell paths', () => {
+    const bash = fs.readFileSync(VERIFY_TOOLS_SH_PATH, 'utf8');
+    const ps1 = fs.readFileSync(VERIFY_TOOLS_PS1_PATH, 'utf8');
+
+    for (const text of [bash, ps1]) {
+      expect(text).toContain('project-local-config-status.v1');
+      expect(text).toContain('Project local config');
+      expect(text).toContain('example config');
+      expect(text).toContain('local config gitignore');
+      expect(text).toContain('legacy markdown config');
+      expect(text).toContain('legacy local config');
+      expect(text).toContain('do not migrate old path automatically');
+    }
   });
 });

@@ -108,10 +108,19 @@ function Get-NestedValue {
   )
   $current = $InputObject
   foreach ($part in $PathParts) {
-    if ($null -eq $current -or $null -eq $current.PSObject.Properties[$part]) {
+    if ($null -eq $current) {
       return ''
     }
-    $current = $current.PSObject.Properties[$part].Value
+    if ($current -is [System.Collections.IDictionary]) {
+      if (-not $current.Contains($part)) {
+        return ''
+      }
+      $current = $current[$part]
+    } elseif ($current.PSObject.Properties.Name -contains $part) {
+      $current = $current.PSObject.Properties[$part].Value
+    } else {
+      return ''
+    }
   }
   if ($null -eq $current) { return '' }
   return [string]$current
@@ -231,6 +240,90 @@ function Get-GeneratedRuntimeManifestHealth {
     bundled_manifest_version = if ([string]::IsNullOrWhiteSpace($bundledVersion)) { $null } else { $bundledVersion }
     evidence_basis = 'state.manifestVersion vs bundled manifest.version'
     next_action = $nextAction
+  }
+}
+
+function Get-ProjectLocalConfigStatus {
+  param([string]$RepoRoot)
+
+  if ([string]::IsNullOrWhiteSpace($RepoRoot) -or -not (Test-Path -LiteralPath $RepoRoot -PathType Container)) {
+    return [ordered]@{
+      schema_version = 'project-local-config-status.v1'
+      status = 'not-applicable'
+      reason_code = 'target-root-unavailable'
+      example_config = [ordered]@{ status = 'not-applicable'; next_action = $null }
+      local_config = [ordered]@{ status = 'not-applicable'; next_action = $null }
+      local_config_gitignore = [ordered]@{ status = 'not-applicable'; next_action = $null }
+      legacy_markdown_config = [ordered]@{ status = 'not-applicable'; next_action = $null }
+      legacy_local_config = [ordered]@{ status = 'not-applicable'; next_action = $null }
+    }
+  }
+
+  $template = Join-Path (Split-Path -Parent $ScriptDir) 'references/config-template.yaml'
+  $specDir = Join-Path $RepoRoot '.spec-first'
+  $exampleConfig = Join-Path $specDir 'config.local.example.yaml'
+  $localConfig = Join-Path $specDir 'config.local.yaml'
+  $gitignore = Join-Path $RepoRoot '.gitignore'
+  $legacyMarkdown = Join-Path $RepoRoot 'compound-engineering.local.md'
+  $legacyConfig = Join-Path $RepoRoot '.compound-engineering/config.local.yaml'
+
+  $exampleStatus = 'missing'
+  $exampleNext = "pwsh `"$ScriptDir/bootstrap-project-config.ps1`" -Repo `"$RepoRoot`" -RefreshExample"
+  if (Test-Path -LiteralPath $exampleConfig -PathType Leaf) {
+    if ((Test-Path -LiteralPath $template -PathType Leaf) -and ((Get-FileHash -Algorithm SHA256 -LiteralPath $template).Hash -eq (Get-FileHash -Algorithm SHA256 -LiteralPath $exampleConfig).Hash)) {
+      $exampleStatus = 'current'
+      $exampleNext = $null
+    } else {
+      $exampleStatus = 'outdated'
+    }
+  }
+
+  $localStatus = 'missing'
+  $localNext = 'optional: bootstrap project config with -CreateLocal'
+  if (Test-Path -LiteralPath $localConfig -PathType Leaf) {
+    $localStatus = 'present'
+    $localNext = $null
+  }
+
+  $gitignoreStatus = 'not-applicable'
+  $gitignoreNext = $null
+  if (Test-Path -LiteralPath $localConfig -PathType Leaf) {
+    $ignored = $false
+    try {
+      & git -C $RepoRoot check-ignore -q $localConfig 2>$null
+      $ignored = ($LASTEXITCODE -eq 0)
+    } catch {
+      $ignored = $false
+    }
+    if ($ignored) {
+      $gitignoreStatus = 'ignored'
+    } else {
+      $gitignoreStatus = 'missing'
+      $gitignoreNext = "pwsh `"$ScriptDir/bootstrap-project-config.ps1`" -Repo `"$RepoRoot`" -EnsureGitignore"
+    }
+  } elseif ((Test-Path -LiteralPath $gitignore -PathType Leaf) -and ((Get-Content -LiteralPath $gitignore -ErrorAction SilentlyContinue) -contains '.spec-first/*.local.yaml')) {
+    $gitignoreStatus = 'ready-for-local-config'
+  }
+
+  $legacyMarkdownStatus = if (Test-Path -LiteralPath $legacyMarkdown -PathType Leaf) { 'present' } else { 'missing' }
+  $legacyConfigStatus = if (Test-Path -LiteralPath $legacyConfig -PathType Leaf) { 'present' } else { 'missing' }
+  $status = if ($exampleStatus -eq 'current' -and @('ignored', 'ready-for-local-config', 'not-applicable') -contains $gitignoreStatus) {
+    'ready'
+  } elseif (@('missing', 'outdated') -contains $exampleStatus -or $gitignoreStatus -eq 'missing') {
+    'action-required'
+  } else {
+    'partial'
+  }
+
+  return [ordered]@{
+    schema_version = 'project-local-config-status.v1'
+    status = $status
+    repo_root = $RepoRoot
+    example_config = [ordered]@{ path = $exampleConfig; status = $exampleStatus; next_action = $exampleNext }
+    local_config = [ordered]@{ path = $localConfig; status = $localStatus; next_action = $localNext }
+    local_config_gitignore = [ordered]@{ path = $gitignore; status = $gitignoreStatus; next_action = $gitignoreNext }
+    legacy_markdown_config = [ordered]@{ path = $legacyMarkdown; status = $legacyMarkdownStatus; next_action = $(if ($legacyMarkdownStatus -eq 'present') { 'manual review; delete only after explicit approval' } else { $null }) }
+    legacy_local_config = [ordered]@{ path = $legacyConfig; status = $legacyConfigStatus; next_action = $(if ($legacyConfigStatus -eq 'present') { 'manual review; do not migrate old path automatically' } else { $null }) }
   }
 }
 
@@ -763,6 +856,7 @@ try {
 $HostPointerReconciliation = Get-HostPointerReconciliation -CurrentHost $reconciliationHost -RepoRoot $reconciliationRepoRoot -MarkerPathArg $MarkerPath
 $generatedRuntimeRefreshAction = Get-GeneratedRuntimeRefreshActionForFacts -Facts $Facts
 $GeneratedRuntimeManifest = Get-GeneratedRuntimeManifestHealth -HostName $reconciliationHost -TargetRoot $reconciliationRepoRoot -NextAction $generatedRuntimeRefreshAction
+$ProjectLocalConfig = Get-ProjectLocalConfigStatus -RepoRoot $reconciliationRepoRoot
 
 function Test-ToolReady {
   param([object]$Tool)
@@ -890,6 +984,7 @@ $combined = [ordered]@{
   }
   host_pointer_reconciliation = $HostPointerReconciliation
   generated_runtime_manifest = $GeneratedRuntimeManifest
+  project_local_config = $ProjectLocalConfig
   tool_facts_status = 'pending'
   tool_facts_path = $null
   runtime_capabilities_status = 'pending'
@@ -1196,6 +1291,15 @@ $installSafetyRows = @(
   }
 )
 
+$projectLocalConfig = $combined.project_local_config
+$projectLocalConfigRows = @(
+  ,@('example config', (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('example_config', 'status'))), (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('example_config', 'next_action')))),
+  ,@('local config', (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('local_config', 'status'))), (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('local_config', 'next_action')))),
+  ,@('local config gitignore', (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('local_config_gitignore', 'status'))), (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('local_config_gitignore', 'next_action')))),
+  ,@('legacy markdown config', (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('legacy_markdown_config', 'status'))), (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('legacy_markdown_config', 'next_action')))),
+  ,@('legacy local config', (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('legacy_local_config', 'status'))), (Format-Cell (Get-NestedValue -InputObject $projectLocalConfig -PathParts @('legacy_local_config', 'next_action'))))
+)
+
 $targetNext = if ($null -ne $combined.target -and -not [string]::IsNullOrWhiteSpace([string]$combined.target.next_action)) { [string]$combined.target.next_action } else { '' }
 $toolFactsNext = if ($combined.tool_facts_status -eq 'ready' -or $combined.tool_facts_status -eq 'written') { '' } elseif (-not [string]::IsNullOrWhiteSpace($targetNext)) { $targetNext } else { 'write setup facts' }
 $runtimeNext = if ($combined.runtime_capabilities_status -eq 'ready' -or $combined.runtime_capabilities_status -eq 'written') { '' } elseif (-not [string]::IsNullOrWhiteSpace($targetNext)) { $targetNext } else { 'write runtime capabilities' }
@@ -1230,6 +1334,11 @@ $sections = @(
     title = 'Install safety'
     headers = @('id', 'safety', 'install_source', 'mirror_used', 'next_action')
     rows = $installSafetyRows
+  }
+  [ordered]@{
+    title = 'Project local config'
+    headers = @('Item', 'Status', 'Next')
+    rows = $projectLocalConfigRows
   }
   [ordered]@{
     title = 'Project setup facts'

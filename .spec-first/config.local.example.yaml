@@ -66,25 +66,13 @@
 # brainstorm_output: html # reserved: md | html (default remains md)
 # ideate_output: html     # reserved: md | html (default remains md)
 
-# --- Work delegation ---
-# Integrated local config surface for downstream execution workflows that
-# choose to support delegated work. These keys are inert during setup: setup
-# exposes and protects them, but never auto-delegates or changes host runtime
-# behavior by itself.
-
-# work_delegate: codex
-# work_delegate_consent: true
-# work_delegate_sandbox: yolo
-# work_delegate_decision: auto
-# work_delegate_model: gpt-5.4
-# work_delegate_effort: high
-
-# --- Planning confirmation ---
-# Integrated local config surface for downstream planning workflows that choose
-# to support a persisted scoping-confirmation preference. Setup never uses this
-# key to skip questions by itself.
-
-# plan_skip_scoping_confirm: true
+# --- Retired / host-owned preferences ---
+# work delegation model, effort, sandbox, and consent preferences are retired
+# from the active local config contract; stable spec-work is the only execution
+# entrypoint. Host model defaults belong in the host/user config, not here.
+# plan_skip_scoping_confirm is not an active local config key; plan scoping
+# confirmation remains a per-run workflow judgment, not a persisted setup
+# preference.
 
 # --- Project workflow conventions ---
 # Do not store team-shared tracker policy, label vocabulary, external PR

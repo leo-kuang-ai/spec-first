@@ -1,7 +1,7 @@
 ---
 name: spec-mcp-setup
 description: Install, configure, verify, and refresh required harness runtime readiness facts for spec-first workflows on Claude Code, Codex, Kiro, Qoder, or Cursor.
-argument-hint: "[bare auto setup] [--check|--verify-only|--plan] [--only codegraph,graphify] [--refresh] [--repo <path>] [--requirement-workspace <repo-relative-path>]"
+argument-hint: "[bare auto setup] [--check|--verify-only|--plan|--project-config] [--only codegraph,graphify] [--refresh] [--repo <path>] [--requirement-workspace <repo-relative-path>]"
 ---
 
 # Runtime Setup
@@ -15,8 +15,8 @@ argument-hint: "[bare auto setup] [--check|--verify-only|--plan] [--only codegra
 | When to use | Host runtime setup, MCP setup, helper-tool readiness, missing runtime assets, or project-local setup fact refresh. |
 | When not to use | Ordinary planning, implementation, review, debugging, or code impact questions that can proceed from direct source evidence. |
 | Inputs | Current host, repo target, `skills/spec-mcp-setup/mcp-tools.json`, helper installer facts, host config state, git/workspace target facts, and project instructions. |
-| Outputs | Readiness ledger v2, provider readiness v2 facts, generated runtime manifest freshness, setup scenario fingerprint, optional project setup facts under `.spec-first/config/`, and a grouped status block. |
-| Artifacts | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, and `.spec-first/workspace/scenario-fingerprint-setup.json` when applicable. |
+| Outputs | Readiness ledger v2, provider readiness v2 facts, generated runtime manifest freshness, setup scenario fingerprint, project-local config bootstrap status, optional project setup facts under `.spec-first/config/`, and a grouped status block. |
+| Artifacts | `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, `.spec-first/config.local.example.yaml`, `.spec-first/config.local.yaml` when explicitly created, `.gitignore` local-config safety rule when explicitly ensured, and `.spec-first/workspace/scenario-fingerprint-setup.json` when applicable. |
 | Failure modes | Missing dependencies, host config write failure, ambiguous parent workspace target, symlink escape, invalid registry schema, helper install failure, or unsupported host. |
 | Downstream consumers | `using-spec-first`, plan/work/review/debug workflows, doctor/update guidance, and humans repairing setup. |
 
@@ -47,7 +47,55 @@ Optional provider readiness is reported through `provider_readiness[]` (`provide
 
 ## Project Preflight / Local Setup
 
-Project-local setup writes `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, and when applicable `.spec-first/workspace/scenario-fingerprint-setup.json`. The readiness ledger and runtime capabilities include `generated_runtime_manifest.status` (`current`, `stale`, `missing`, or `unknown`) based only on `state.manifestVersion` versus the bundled manifest version; this is a deterministic freshness fact, not proof that generated prose is semantically correct. Scenario fingerprint wrapper failures are warn-and-continue: report `scenario_fingerprint_setup` status and keep the rest of setup actionable instead of blocking ordinary direct-evidence workflows.
+Project-local setup has two separate surfaces:
+
+1. Setup-owned facts: `.spec-first/config/tool-facts.json`, `.spec-first/config/runtime-capabilities.json`, and when applicable `.spec-first/workspace/scenario-fingerprint-setup.json`.
+2. Local config bootstrap: `.spec-first/config.local.example.yaml`, optional `.spec-first/config.local.yaml`, and `.gitignore` coverage for `.spec-first/*.local.yaml`.
+
+The readiness ledger and runtime capabilities include `generated_runtime_manifest.status` (`current`, `stale`, `missing`, or `unknown`) based only on `state.manifestVersion` versus the bundled manifest version; this is a deterministic freshness fact, not proof that generated prose is semantically correct. Scenario fingerprint wrapper failures are warn-and-continue: report `scenario_fingerprint_setup` status and keep the rest of setup actionable instead of blocking ordinary direct-evidence workflows.
+
+Local config bootstrap is a first-class Runtime Setup capability, but it remains project-local and local-only. It checks and can explicitly refresh `.spec-first/config.local.example.yaml`, explicitly create `.spec-first/config.local.yaml`, and explicitly ensure `.spec-first/*.local.yaml` is ignored. It reports legacy project config signals for manual review, but it does not copy legacy files, translate old key names, or treat old defaults as spec-first truth.
+
+## Three-Stage Setup Flow
+
+Runtime Setup should keep the user-facing flow split into three stages even when the internal scripts perform multiple checks:
+
+### Stage 1: Diagnose Target And Readiness
+
+Resolve the project target first. In a parent workspace, stop before repo-local writes unless the user selected a child repo or intentionally chose all supported child repos. Then inspect:
+
+- host runtime identity and write authority;
+- required MCP/helper dependency readiness;
+- generated runtime manifest freshness;
+- project-local config status for `.spec-first/config.local.example.yaml`, `.spec-first/config.local.yaml`, and `.gitignore` coverage;
+- legacy project config signals;
+- optional provider readiness for selected providers.
+
+This stage is read-only except for diagnostic facts written by verify-only paths that are already setup-owned. Missing optional provider/helper capabilities are not ordinary workflow blockers unless their registry entry marks them baseline-blocking or the user selected a workflow that needs them.
+
+### Stage 2: Apply Authorized Setup Actions
+
+Apply only actions authorized by the selected mode:
+
+- project-local config actions: refresh example config, create local override, ensure ignore coverage, and optionally delete obsolete legacy markdown only after explicit approval;
+- host config actions: write MCP/runtime config only through host-specific setup scripts and explicit host authority;
+- helper/provider actions: install or verify only selected baseline/default provider pack entries, run bounded first-generation or refresh commands, and record degraded next actions when a provider cannot be fully verified.
+
+Project-local config actions never install providers or edit host config. Host/provider actions never migrate local config keys. Legacy project config is a manual-review signal unless the user chooses a documented cleanup action.
+
+### Stage 3: Summarize Facts And Next Action
+
+Render a grouped final status that separates:
+
+- dependency/runtime readiness;
+- generated runtime freshness;
+- project-local config status;
+- project setup facts;
+- host configured dependencies;
+- helper/provider readiness and install safety;
+- next actions.
+
+The summary must make skipped, declined, optional, degraded, and action-required rows visible. Do not collapse these boundaries into a single "setup complete" statement.
 
 ## Setup Posture And Project Conventions
 
@@ -58,7 +106,16 @@ Runtime Setup follows an `Explore -> Present -> Decide -> Write` posture:
 3. **Decide** only where the runtime setup workflow has authority: install/verify helper tools, configure host MCP/runtime wiring, refresh setup-owned facts, or choose a documented degraded path. Team workflow conventions and semantic project decisions remain LLM/owner judgment in downstream workflows.
 4. **Write** only setup-owned facts, supported local config examples, host runtime config through documented targets, and generated runtime refreshes through `spec-first init`. Do not write team-shared tracker policy, label vocabulary, external PR request-surface policy, issue acceptance decisions, or durable rejected-scope decisions from setup.
 
-`.spec-first/config.local.yaml` is a local-only override file, not team-shared source of truth. The current supported consumer key is `verification_profile_path`, read by the verification profile loader as a local execution preference. Document output/provider keys in the template are reserved future hints unless an implemented consumer and focused tests exist. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
+`.spec-first/config.local.yaml` is a local-only override file, not team-shared source of truth. Current active local config consumers are:
+
+- `verification_profile_path`, read by the verification profile loader as a local execution preference;
+- `feedback_sources` and `sweep_*`, read and written by `spec-sweep`;
+- `pulse_*`, read and written by `spec-product-pulse`;
+- `spec_promote_spiral_optout`, read and written by `spec-promote`;
+- `work_delegate_*`, exposed for downstream execution workflows that support delegated work;
+- `plan_skip_scoping_confirm`, exposed for downstream planning workflows that support persisted scoping-confirmation preference.
+
+Document rendering keys (`plan_output`, `brainstorm_output`, `ideate_output`) are reserved future hints unless an implemented consumer and focused tests exist. Setup only exposes local config keys and keeps them protected; it must not auto-delegate, skip scoping confirmation, or change host model/runtime behavior merely because a key exists. Missing local config is not a blocker; defaults remain advisory and must not be reported as repo truth.
 
 If setup later reports project convention facts, they must be deterministic existence facts only, such as whether `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`, or a project guidance index exists. Setup must not judge whether terminology is correct, an ADR applies, a proposed issue/PR should be accepted or rejected, an out-of-scope concept matches, or implementation satisfies a request.
 
@@ -75,6 +132,7 @@ Do not use host file-edit tools such as Write, Update, or Edit to modify `.spec-
 - `--check`: inspect current dependency/runtime status only; do not write setup facts, host config, or install tools.
 - `--verify-only` / `--refresh-facts`: verify readiness and refresh setup-owned facts; do not install tools or edit host config.
 - `--plan`: render install/config operations and safety results; do not write setup facts, host config, or install tools.
+- `--project-config`: project-local config bootstrap only. Refresh the example when requested, create the local override only after explicit action, ensure `.spec-first/*.local.yaml` ignore coverage when requested, and report legacy project config signals without migrating them. This mode does not install MCP servers, configure host runtime, or run helper/provider first generation. If the current host has no public flag wired yet, run `bootstrap-project-config.*` through the documented setup path rather than asking users to edit files by hand.
 - Bare invocation (`spec-mcp-setup` in the current host): primary automatic setup path. Show the current CodeGraph/Graphify provider pack, project/provider runtime writes, host config writes, first-generation commands, refresh hooks, and explicit non-actions, then run install-init and verification to completion without an extra confirmation prompt. Treat the bare workflow invocation as explicit opt-in for the default provider pack. Do not ask the user to run internal scripts directly.
 - `--only <ids>`: headless/subset apply path. `--only codegraph`, `--only graphify`, or `--only codegraph,graphify` narrows provider selection and also does not require a confirmation prompt.
 - `--refresh`: Graphify explicit incremental refresh path. Use with `--only graphify` when `.graphify/` already exists, or when a legacy `graphify-out/` artifact should be regenerated into provider-native `.graphify/`, and the user wants setup to run provider-native `graphify update .` (code-only, no LLM) instead of only verifying/installing provider readiness. This is not full semantic extraction; missing artifacts still use first-generation `graphify extract .` with `graphify update .` fallback.
@@ -108,8 +166,9 @@ For bare `spec-mcp-setup`, do this inside the skill:
 3. Read `mcp-tools.json`, validate schema version, and verify every required baseline tool plus explicit opt-in MCP entry has deterministic install, host-config, detection, and summary metadata.
 4. Run `detect-tools.*` or `install-mcp.*` as appropriate. Warm required package-backed MCP tools, admit optional MCP entries only through the documented default provider pack or explicit `--only` selection, write host config only through documented host targets, and record structured status.
 5. Run `install-helpers.*` for required helper tooling and explicitly approved non-MCP provider helpers. Bare setup or `--only graphify` is enough public consent for Graphify; the script layer may translate that to helper env consent internally. Approved provider first generation and project-local auto-refresh setup may run only through controlled script cases or provider-native bounded CLI commands invoked through the resolved CLI path, then helper/provider readiness facts are collected. If `graphify extract .` fails in the default project-root scope, the script should try code-only `graphify update .` before returning failed readiness. If Graphify is installed but not visible on the user's original `PATH`, report the manual visibility action instead of editing shell profiles; for provider-owned git hooks, setup may repair only the project-local Graphify hook PATH block so hook verification can succeed without global profile edits. If Graphify hook install still fails after bounded repair, report `readiness_status=degraded` with `next_actions` instead of marking hook refresh verified.
-6. Run `verify-tools.*` to write the readiness ledger, reconcile host pointer facts, write project setup facts, and render the grouped status block. Read `generated_runtime_manifest.status` separately from `baseline_ready`; `baseline_ready=true` must not hide stale generated runtime. If the status is `stale` or `missing`, refresh runtime with the topology-appropriate command (`spec-first init -y` for the current repo or parent workspace runtime, `spec-first init --repo <child> -y` for one child repo, or explicit `spec-first init --all-repos -y` only for intentional batch child-root refresh), then rerun verification. If `spec-first update` just ran and the status is still stale, treat that as degraded refresh evidence and surface the same fallback command instead of reporting runtime freshness as ready.
-7. Report the status exactly enough for the user to act: ready rows need no action; action-required rows name the missing dependency/config/target step; generated runtime manifest rows name the init refresh command when stale or missing.
+6. Run project-local config bootstrap where the selected mode authorizes it. Bare setup should at least report current example/local/gitignore/legacy status; explicit project-config actions may refresh the example, create the local override, and ensure ignore coverage. Do not auto-delete legacy project config or migrate legacy keys.
+7. Run `verify-tools.*` to write the readiness ledger, reconcile host pointer facts, write project setup facts, and render the grouped status block. Read `generated_runtime_manifest.status` separately from `baseline_ready`; `baseline_ready=true` must not hide stale generated runtime. If the status is `stale` or `missing`, refresh runtime with the topology-appropriate command (`spec-first init -y` for the current repo or parent workspace runtime, `spec-first init --repo <child> -y` for one child repo, or explicit `spec-first init --all-repos -y` only for intentional batch child-root refresh), then rerun verification. If `spec-first update` just ran and the status is still stale, treat that as degraded refresh evidence and surface the same fallback command instead of reporting runtime freshness as ready.
+8. Report the status exactly enough for the user to act: ready rows need no action; action-required rows name the missing dependency/config/target step; generated runtime manifest rows name the init refresh command when stale or missing.
 
 ## Output Shape
 
@@ -121,6 +180,7 @@ The final setup output should contain:
 - `Provider tools`: provider readiness status, derived `readiness_scope` / `probe_status`, and lifecycle display bits when present. Summaries must distinguish install/index readiness from server/query verification.
 - `Host configured dependencies`: configured MCP/hooks/allowlist/setup/verification command facts.
 - `Install safety`: helper install source, risk, review, and mirror provenance.
+- `Project local config`: example config, local override, gitignore safety rule, legacy markdown config signal, and legacy local config signal. Human labels should be de-branded as legacy project config; compatibility field names in scripts may keep old identifiers only as internal fact keys.
 - `Project setup facts`: status for `tool-facts.json` and `runtime-capabilities.json`.
 - `Verification profile`: current verification profile visibility placeholder; full profile execution is v1.13 scope.
 - `Next steps`: either fix action-required rows, choose an explicit child repo, continue to the user-intent workflow, or suggest `spec-rule-miner` as a separate follow-up after CodeGraph/Graphify readiness is prepared. This suggestion is advisory; setup must not treat rule-miner output as setup readiness and must not call `spec-rule-miner` automatically.
@@ -172,6 +232,8 @@ Setup does:
 - write Qoder MCP config to local `.qoder/settings.local.json` by default, and to `~/.qoder/settings.json` only after explicit user-scope opt-in;
 - write Cursor MCP config to project `.cursor/mcp.json` by default, and to `~/.cursor/mcp.json` only after explicit user-scope opt-in;
 - write project-local setup facts;
+- refresh `.spec-first/config.local.example.yaml`, create `.spec-first/config.local.yaml`, and ensure `.spec-first/*.local.yaml` ignore coverage only through explicit project-local config bootstrap actions;
+- report legacy project markdown/local config signals for manual review without migrating them;
 - perform explicit provider-native first generation for approved providers when the target workspace is resolved, or verify Graphify install readiness without regenerating the graph when a project-root Graphify artifact already exists and no explicit `--refresh` was requested;
 - perform bounded provider-native setup repair where deterministic and documented, such as incremental/code-only `graphify update .` after default project-root `graphify extract .` failure or explicit `--refresh`, one `graphify update . --force` after Graphify overwrite refusal plus force hint, one `codegraph sync` after pending/full-rebuild status, or one `codegraph index -f` after sync cannot clear the full-rebuild advisory;
 - perform provider-native project-local auto-refresh setup for approved providers when available, such as Graphify `graphify hook install`, including bounded project-local PATH repair for Graphify-installed hook files when the resolved CLI is off the user's original `PATH`;
@@ -186,6 +248,7 @@ Setup does not:
 - treat setup facts as semantic code evidence;
 - invoke `spec-rule-miner`, synthesize project rules, or write `docs/ai/project-rules.md`;
 - treat `.spec-first/config.local.yaml` as team-shared workflow policy;
+- silently copy or translate legacy project config into `.spec-first/config.local.yaml`;
 - decide issue/PR category, state, scope, accept/reject status, or implementation truth;
 - hand-edit generated runtime mirrors as source;
 - block ordinary plan/work/review/debug when direct source evidence is sufficient.

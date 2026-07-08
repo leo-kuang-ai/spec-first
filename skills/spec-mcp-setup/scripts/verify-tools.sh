@@ -446,6 +446,112 @@ write_setup_scenario_fingerprint() {
   fi
 }
 
+compute_project_local_config_status() {
+  local repo_root template spec_dir example_config local_config gitignore legacy_markdown legacy_config
+  local example_status example_next local_status local_next gitignore_status gitignore_next legacy_markdown_status legacy_markdown_next legacy_config_status legacy_config_next
+
+  repo_root="$(jq -r '.target_root // .selected_repo_root // .selected_folder_root // .repo_root // empty' "$MARKER_PATH" 2>/dev/null || true)"
+  if [ -z "$repo_root" ] || [ ! -d "$repo_root" ]; then
+    jq -n '{
+      schema_version:"project-local-config-status.v1",
+      status:"not-applicable",
+      reason_code:"target-root-unavailable",
+      example_config:{status:"not-applicable", next_action:null},
+      local_config:{status:"not-applicable", next_action:null},
+      local_config_gitignore:{status:"not-applicable", next_action:null},
+      legacy_markdown_config:{status:"not-applicable", next_action:null},
+      legacy_local_config:{status:"not-applicable", next_action:null}
+    }'
+    return 0
+  fi
+
+  template="$SCRIPT_DIR/../references/config-template.yaml"
+  spec_dir="$repo_root/.spec-first"
+  example_config="$spec_dir/config.local.example.yaml"
+  local_config="$spec_dir/config.local.yaml"
+  gitignore="$repo_root/.gitignore"
+  legacy_markdown="$repo_root/compound-engineering.local.md"
+  legacy_config="$repo_root/.compound-engineering/config.local.yaml"
+
+  example_status="missing"
+  example_next="bash \"$SCRIPT_DIR/bootstrap-project-config.sh\" --repo \"$repo_root\" --refresh-example"
+  if [ -f "$example_config" ]; then
+    if [ -f "$template" ] && diff -q "$template" "$example_config" >/dev/null 2>&1; then
+      example_status="current"
+      example_next=""
+    else
+      example_status="outdated"
+    fi
+  fi
+
+  local_status="missing"
+  local_next="optional: bootstrap project config with --create-local"
+  if [ -f "$local_config" ]; then
+    local_status="present"
+    local_next=""
+  fi
+
+  gitignore_status="not-applicable"
+  gitignore_next=""
+  if [ -f "$local_config" ]; then
+    if git -C "$repo_root" check-ignore -q "$local_config" 2>/dev/null; then
+      gitignore_status="ignored"
+    else
+      gitignore_status="missing"
+      gitignore_next="bash \"$SCRIPT_DIR/bootstrap-project-config.sh\" --repo \"$repo_root\" --ensure-gitignore"
+    fi
+  elif [ -f "$gitignore" ] && grep -Fxq '.spec-first/*.local.yaml' "$gitignore"; then
+    gitignore_status="ready-for-local-config"
+  fi
+
+  legacy_markdown_status="missing"
+  legacy_markdown_next=""
+  if [ -f "$legacy_markdown" ]; then
+    legacy_markdown_status="present"
+    legacy_markdown_next="manual review; delete only after explicit approval"
+  fi
+
+  legacy_config_status="missing"
+  legacy_config_next=""
+  if [ -f "$legacy_config" ]; then
+    legacy_config_status="present"
+    legacy_config_next="manual review; do not migrate old path automatically"
+  fi
+
+  jq -n \
+    --arg repo_root "$repo_root" \
+    --arg example_path "$example_config" \
+    --arg example_status "$example_status" \
+    --arg example_next "$example_next" \
+    --arg local_path "$local_config" \
+    --arg local_status "$local_status" \
+    --arg local_next "$local_next" \
+    --arg gitignore_path "$gitignore" \
+    --arg gitignore_status "$gitignore_status" \
+    --arg gitignore_next "$gitignore_next" \
+    --arg legacy_markdown_path "$legacy_markdown" \
+    --arg legacy_markdown_status "$legacy_markdown_status" \
+    --arg legacy_markdown_next "$legacy_markdown_next" \
+    --arg legacy_config_path "$legacy_config" \
+    --arg legacy_config_status "$legacy_config_status" \
+    --arg legacy_config_next "$legacy_config_next" \
+    '{
+      schema_version:"project-local-config-status.v1",
+      status:(
+        if ($example_status == "current" and ($gitignore_status == "ignored" or $gitignore_status == "ready-for-local-config" or $gitignore_status == "not-applicable")) then "ready"
+        elif ($example_status == "missing" or $example_status == "outdated" or $gitignore_status == "missing") then "action-required"
+        else "partial"
+        end
+      ),
+      repo_root:$repo_root,
+      example_config:{path:$example_path,status:$example_status,next_action:(if $example_next == "" then null else $example_next end)},
+      local_config:{path:$local_path,status:$local_status,next_action:(if $local_next == "" then null else $local_next end)},
+      local_config_gitignore:{path:$gitignore_path,status:$gitignore_status,next_action:(if $gitignore_next == "" then null else $gitignore_next end)},
+      legacy_markdown_config:{path:$legacy_markdown_path,status:$legacy_markdown_status,next_action:(if $legacy_markdown_next == "" then null else $legacy_markdown_next end)},
+      legacy_local_config:{path:$legacy_config_path,status:$legacy_config_status,next_action:(if $legacy_config_next == "" then null else $legacy_config_next end)}
+    }'
+}
+
 write_all_repos_verify_summary_and_exit() {
   local target_json="$1"
   local selection_source="${2:-explicit-all-repos}"
@@ -907,6 +1013,12 @@ jq --argjson setup "$SETUP_FACTS_RESULT" \
      )' "$combined_tmp" > "$final_tmp"
 
 mv "$final_tmp" "$MARKER_PATH"
+project_local_config_json="$(compute_project_local_config_status)"
+project_local_config_tmp="$(mktemp "${MARKER_PATH}.project-local-config.XXXXXX")"
+jq --argjson project_local_config "$project_local_config_json" '
+  .project_local_config = $project_local_config
+' "$MARKER_PATH" > "$project_local_config_tmp"
+mv "$project_local_config_tmp" "$MARKER_PATH"
 write_setup_scenario_fingerprint
 
 echo "📝 宿主就绪标记已更新: $MARKER_PATH"
@@ -1062,6 +1174,15 @@ jq -c '
       }
     ]
     | map([display(.name), display("\(.status) (host=\($root.host // "unknown"))"), display(.next)]);
+  def project_local_config_rows:
+    (.project_local_config // {}) as $cfg
+    | [
+      ["example config", display($cfg.example_config.status // "unknown"), display($cfg.example_config.next_action)],
+      ["local config", display($cfg.local_config.status // "unknown"), display($cfg.local_config.next_action)],
+      ["local config gitignore", display($cfg.local_config_gitignore.status // "unknown"), display($cfg.local_config_gitignore.next_action)],
+      ["legacy markdown config", display($cfg.legacy_markdown_config.status // "unknown"), display($cfg.legacy_markdown_config.next_action)],
+      ["legacy local config", display($cfg.legacy_local_config.status // "unknown"), display($cfg.legacy_local_config.next_action)]
+    ];
   {
     sections: [
       {title: "Execution result", headers: ["Area", "Status", "Evidence", "Next"], rows: summary_rows},
@@ -1070,6 +1191,7 @@ jq -c '
       {title: "Provider tools", headers: ["provider", "kind", "profile", "readiness", "readiness_scope", "probe_status", "installed", "configured", "indexed", "server_reachable", "query_verified", "repo_aligned", "fallback_reason", "next_actions"], rows: provider_rows},
       {title: "Host configured dependencies", headers: ["id", "kind", "source_path", "command", "args_shape", "declared_tool_id", "declared_status", "dependency", "configured", "result", "reason_code"], rows: configured_dependency_rows},
       {title: "Install safety", headers: ["id", "safety", "install_source", "mirror_used", "next_action"], rows: install_safety_rows},
+      {title: "Project local config", headers: ["Item", "Status", "Next"], rows: project_local_config_rows},
       {title: "Project setup facts", headers: ["Artifact", "Project", "Next"], rows: project_rows},
       {title: "Verification profile", headers: ["Artifact", "Status", "Next"], rows: [["spec-first.verification.json", (if (.target_root // .repo_root) as $root | ($root + "/spec-first.verification.json") then "not-checked" else "not-checked" end), "v1.13 scope"]]},
       {title: "Next steps", headers: ["#", "Action"], rows: [(.next_actions // []) | to_entries[] | [((.key + 1) | tostring), display(.value)]]}
