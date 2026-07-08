@@ -1,6 +1,6 @@
 ---
 name: spec-sweep
-description: "Sweep configured feedback sources (Slack, GitHub Issues; email experimental) for new items: acknowledge at source, analyze recordings, verify fixes merged to main, and emit an spec-spec-lfg-ready plan. First run sets up sources; supports mode:headless for scheduled runs."
+description: "Sweep configured feedback sources (Slack, GitHub Issues; email experimental) for new items: acknowledge at source, analyze recordings, verify fixes merged to main, and emit a spec-lfg-ready plan. First run sets up sources; supports mode:headless for scheduled runs."
 disable-model-invocation: true
 argument-hint: "[setup|reconfigure] [mode:headless]"
 allowed-tools:

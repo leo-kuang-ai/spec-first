@@ -1,8 +1,8 @@
 # Sweep First-Run Interview
 
-Loaded by `SKILL.md` when `/spec-sweep` runs with no `feedback_sources` configured. Captures the setup that will be merged into `<repo-root>/.spec-first/config.local.yaml` (the unified CE local config, gitignored, machine-local) and re-read on every subsequent run.
+Loaded by `SKILL.md` when `spec-sweep` runs with no `feedback_sources` configured. Captures the setup that will be merged into `<repo-root>/.spec-first/config.local.yaml` (the unified spec-first local config, gitignored, machine-local) and re-read on every subsequent run.
 
-This interview is **interactive only**. The caller refuses first-run setup in headless mode — a scheduled or piped run with no config aborts and tells the user to run `/spec-sweep` interactively once. Do not attempt to infer sources, actions, or approvals without asking.
+This interview is **interactive only**. The caller refuses first-run setup in headless mode — a scheduled or piped run with no config aborts and tells the user to run `spec-sweep` interactively once. Do not attempt to infer sources, actions, or approvals without asking.
 
 ## Interaction Method
 
@@ -138,7 +138,7 @@ Offer to seed state from an existing legacy feedback-tracking file so prior work
 
 Merge the captured settings into `<repo-root>/.spec-first/config.local.yaml`. Resolve the repo root with `git rev-parse --show-toplevel`.
 
-- If the directory or file does not exist, create `.compound-engineering/` and write the file.
+- If the directory or file does not exist, create `.spec-first/` and write the file.
 - If the file exists, merge the sweep keys into the existing YAML, **preserving every unrelated key untouched** (e.g. `work_delegate_*`, `pulse_*`, `plan_*`). Only add or update the sweep keys.
 - If `.spec-first/config.local.yaml` is not already covered by the repo's `.gitignore`, offer to add the entry before writing.
 
@@ -157,12 +157,12 @@ Then surface the resulting Sweep section to the user in chat and offer **one rou
 
 **Ask:** "Want the sweep to run on a recurring schedule so feedback gets triaged automatically, or run it on demand? On-demand works fully without a schedule."
 
-- **On demand** -> nothing to register. Note that `/spec-sweep` is ready to run any time.
-- **Recurring** -> hand off to whichever scheduling primitive the harness exposes — the in-plugin `schedule` skill if it is installed, otherwise name the platform-native mechanism (cron, GitHub Actions, the host's own automation) and emit a brief hint of what would need to run. **The registered invocation must include `mode:headless`** — e.g. `/spec-sweep mode:headless` — so the scheduled run knows it is unattended and defers instead of prompting. Never schedule inline; always hand off to the scheduling primitive.
+- **On demand** -> nothing to register. Note that `spec-sweep` is ready to run any time.
+- **Recurring** -> hand off to whichever scheduling primitive the harness exposes — the in-plugin `schedule` skill if it is installed, otherwise name the platform-native mechanism (cron, GitHub Actions, the host's own automation) and emit a brief hint of what would need to run. **The registered invocation must include `mode:headless`** — e.g. `spec-sweep mode:headless` — so the scheduled run knows it is unattended and defers instead of prompting. Never schedule inline; always hand off to the scheduling primitive.
 
 Declining a schedule leaves on-demand use fully working.
 
-**End the interview:** tell the user setup is complete and the first sweep can run now with `/spec-sweep`.
+**End the interview:** tell the user setup is complete and the first sweep can run now with `spec-sweep`.
 
 ---
 

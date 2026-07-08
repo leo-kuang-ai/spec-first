@@ -18,15 +18,15 @@
 
 | 范围 | 当前值 |
 |---|---|
-| Bundled source skills | 34 |
+| Bundled source skills | 36 |
 | Bundled source agents | 0 |
 | Bundled agent support files | 0 |
-| Governance records by entry surface | internal_only: 7, standalone_skill: 9, workflow_command: 18 |
-| Claude runtime delivery | 18 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Codex runtime delivery | 0 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Cursor runtime delivery | 0 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Kiro runtime delivery | 0 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
-| Qoder runtime delivery | 18 commands, 18 workflow skills, 9 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Governance records by entry surface | internal_only: 7, standalone_skill: 11, workflow_command: 18 |
+| Claude runtime delivery | 18 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Codex runtime delivery | 0 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Cursor runtime delivery | 0 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Kiro runtime delivery | 0 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
+| Qoder runtime delivery | 18 commands, 18 workflow skills, 11 standalone skills, 1 agent-facing internal skills, 0 agents, 0 agent support files |
 | Cursor support status | generated_runtime_preview |
 | Cursor loader evidence | degraded: local Cursor skill discovery/invocation is not verified on this machine; generated skills may not load |
 | Beta workflow entries | none |
@@ -75,6 +75,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 | Skill | Claude Delivery | Codex Delivery | Cursor Delivery | Kiro Delivery | Qoder Delivery | Description |
 |---|---|---|---|---|---|---|
 | spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | standalone skill: spec-explain | Turn a concept, a diff, an idea, or a window of your own recent work into a dense, visual explainer written for you personally — with an optional check-in (predict-then-reveal for diffs, corrected exercises) that makes the material stick. For learning, not repo docs or verdicts. |
+| spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | standalone skill: spec-lfg | Run the full hands-off engineering pipeline from planning through a green PR. |
 | spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | standalone skill: spec-pov | Give a decisive, project-grounded verdict on an external input — judged against the current project, not in the abstract. Use to decide whether to adopt, switch to, or revisit a technology, library, pattern, platform, or architecture; to compare a candidate against what the project already uses; to judge whether an external change (a CVE, a deprecation, an ecosystem shift) actually affects this project; or for a mid-session second opinion. Always returns a project-specific verdict, so it is not for neutral explainers or generating options. |
 | spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | standalone skill: spec-product-pulse | Generate time-windowed product pulse reports from configured signals. |
 | spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | standalone skill: spec-promote | Draft launch or promotion copy for a shipped feature. |
@@ -82,6 +83,7 @@ Standalone skills 会安装为宿主可发现的 skills，不是 command-backed 
 | spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | standalone skill: spec-rule-miner | Use this standalone skill when the user asks to mine a repo's existing coding conventions for future AI coding, generate or refresh project rules with AGENTS.md/CLAUDE.md pointers, create Cursor or Qoder rule files from actual code evidence, or make AI-generated code follow a specific project's habits. Do not use for confirmed team policy governance, normal code review/debug/refactor work, linter/formatter configuration, generic best practices, unsupported tool rule files such as .cursorrules or .kiro/steering rules, or generated runtime mirror edits. |
 | spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | standalone skill: spec-simplify-code | Simplify recently changed code for clarity, reuse, quality, and efficiency while preserving behavior. Use for tidy/refactor passes; use spec-debug for bugs. |
 | spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | standalone skill: spec-strategy | Create or update STRATEGY.md. Use when starting a product, changing direction or roadmap, or when spec-ideate, spec-brainstorm, or spec-plan need upstream product grounding. |
+| spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | standalone skill: spec-sweep | Sweep configured feedback sources (Slack, GitHub Issues; email experimental) for new items: acknowledge at source, analyze recordings, verify fixes merged to main, and emit a spec-lfg-ready plan. First run sets up sources; supports mode:headless for scheduled runs. |
 | using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | standalone skill: using-spec-first | Use before substantial work in a spec-first repo, and when users ask what spec-first workflow or command to run next. Route non-trivial edits, state-changing commands, debugging, review, planning, setup/update, optimization, and architecture/prompt/workflow/contract decisions. Do not use for lightweight factual answers, current-context explanations, narrow lookups, user-supplied single-document summaries, or clearly scoped low-risk small edits. |
 
 ## Internal Skill Governance

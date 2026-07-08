@@ -199,6 +199,20 @@
       }
     },
     {
+      "skill_name": "spec-lfg",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
+      }
+    },
+    {
       "skill_name": "spec-ideate",
       "entry_surface": "workflow_command",
       "command_name": "ideate",
@@ -354,6 +368,20 @@
     },
     {
       "skill_name": "spec-simplify-code",
+      "entry_surface": "standalone_skill",
+      "command_name": null,
+      "host_scope": "dual_host",
+      "owner_host": null,
+      "host_delivery": {
+        "claude": "skill",
+        "codex": "skill",
+        "cursor": "skill",
+        "kiro": "skill",
+        "qoder": "skill"
+      }
+    },
+    {
+      "skill_name": "spec-sweep",
       "entry_surface": "standalone_skill",
       "command_name": null,
       "host_scope": "dual_host",
