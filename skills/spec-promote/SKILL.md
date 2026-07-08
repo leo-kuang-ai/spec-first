@@ -1,6 +1,7 @@
 ---
 name: spec-promote
 description: "Draft launch or promotion copy for a shipped feature."
+argument-hint: "[optional: what shipped and/or channels, e.g. 'a tweet thread and a LinkedIn post']"
 ---
 
 # spec-promote

@@ -229,6 +229,14 @@ docs-only 修复仍需要：
 - **最终执行口径：** 本文档成为本轮 CE 到 spec-first skill 迁移路径审查的持续纠偏 ledger；后续相关工作遇到用户纠正时，先判断是否属于本迁移/路径/边界审查范围，属于则追加本节，并在有 source 改动时同步 `CHANGELOG.md`。
 - **影响范围：** `docs/validation/2026-07-08-completed-skill-path-audit-summary.md`，以及后续迁移审查涉及的 skill 文档、reference、script path、runtime/source 边界判断。
 
+### 2026-07-08 22:51:39 — `argument-hint` 不是 legacy-only 字段
+
+- **触发场景：** `ce-compound` -> `spec-compound` 迁移中，先前把 CE 的 `argument-hint` 当作不进入 spec-first 的 frontmatter 字段；用户要求加回，并进一步要求检查文档中已完成审查的 skill。
+- **原先偏差：** 误把早期 standalone migrated skill contract test 中的 `not.toMatch(/^argument-hint:/m)` 当作当前治理规则，忽略了 `src/cli/plugin.js` 已支持 `metadata['argument-hint']`，且多个 active `spec-*` skill 已在使用该字段。
+- **用户纠正：** CE 有的入口提示能力都要集成进来；已完成审查的 skill 要逐个检查，不能只补 `spec-compound`。
+- **最终执行口径：** `argument-hint` 是用户入口参数提示，不参与 workflow 语义判断，但属于 CE 可见能力。已完成审查的迁移 skill 中，CE 有 `argument-hint` 的应在 spec-first 中保留并做必要命名/路径归一；CE 没有的不要为了统一而新增。
+- **影响范围：** `skills/spec-compound/SKILL.md`、`skills/spec-explain/SKILL.md`、`skills/spec-pov/SKILL.md`、`skills/spec-simplify-code/SKILL.md`、`skills/spec-strategy/SKILL.md`、`skills/spec-product-pulse/SKILL.md`、`skills/spec-promote/SKILL.md`、`skills/spec-commit-push-pr/SKILL.md`、`tests/unit/spec-migrated-standalone-skills-contracts.test.js`、`docs/validation/2026-07-08-ce-to-spec-first-skill-audit-plan.md`。
+
 ## 本轮验证
 
 已执行：

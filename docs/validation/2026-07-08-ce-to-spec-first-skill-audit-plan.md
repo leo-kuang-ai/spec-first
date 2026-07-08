@@ -36,7 +36,7 @@ CE 是迁移能力的语义基准：
 | `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 |  |  |
 | `ce-commit` | `spec-commit` | 生成并执行受控提交，维护 commit message 与验证摘要 | 直接映射，低复杂度 | 已完成 | 已审查 |
 | `ce-commit-push-pr` | `spec-commit-push-pr` | 提交、推送并创建或更新 PR 的交付 helper | 直接映射，低复杂度 | 已完成 | 已审查 |
-| `ce-compound` | `spec-compound` | 将已验证的问题解决经验沉淀为可复用知识 | 直接映射，knowledge/source evidence 关键 |  |  |
+| `ce-compound` | `spec-compound` | 将已验证的问题解决经验沉淀为可复用知识 | 直接映射，knowledge/source evidence 关键 | 已完成 | 已审查 |
 | `ce-compound-refresh` | `spec-compound-refresh` | 刷新、合并或淘汰过期的 durable knowledge | 直接映射，learning lifecycle 关键 |  |  |
 | `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
 | `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
@@ -47,11 +47,11 @@ CE 是迁移能力的语义基准：
 | `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 |  |  |
 | `ce-polish` | `spec-polish` | 启动应用、浏览器检查并迭代 UI / UX polish | 直接映射，browser/dev-server 行为关键 | 已完成 | 已审查 |
 | `ce-pov` | `spec-pov` | 基于项目上下文对外部输入给出明确 verdict | 直接映射，verdict routing 关键 | 已完成 | 已审查 |
-| `ce-product-pulse` | `spec-product-pulse` | 从配置的信号源生成产品脉搏报告 | 直接映射，signal/config 行为关键 |  |  |
+| `ce-product-pulse` | `spec-product-pulse` | 从配置的信号源生成产品脉搏报告 | 直接映射，signal/config 行为关键 | 已完成 | 已审查 |
 | `ce-promote` | `spec-promote` | 为已交付功能起草发布或推广文案 | 直接映射，低复杂度 | 已完成 | 已审查 |
 | `ce-proof` | `spec-proof` | 人工证明 / HITL 证据收集与验证辅助 | 直接映射，host-provided/HITL surface 关键 | 已完成 | 已审查 |
 | `ce-resolve-pr-feedback` | `spec-resolve-pr-feedback` | 处理 PR review feedback 并维护变更边界 | 直接映射，PR feedback mutation 边界关键 | 已完成 | 已审查 |
-| `ce-riffrec-feedback-analysis` | `spec-riffrec-feedback-analysis` | 分析 Riffrec 反馈录制包、会话和事件 | 直接映射，media bundle 处理关键 |  |  |
+| `ce-riffrec-feedback-analysis` | `spec-riffrec-feedback-analysis` | 分析 Riffrec 反馈录制包、会话和事件 | 直接映射，media bundle 处理关键 | 已完成 | 已审查 |
 | `ce-setup` | `spec-mcp-setup` | 诊断并修复 spec-first 运行时、MCP 与 helper readiness | 近似映射，必须记录 divergence | 已完成 | 已审查 |
 | `ce-simplify-code` | `spec-simplify-code` | 在保持行为不变的前提下简化近期改动代码 | 直接映射，behavior-preserving 边界关键 | 已完成 | 已审查 |
 | `ce-strategy` | `spec-strategy` | 创建或更新项目战略文档与方向判断 | 直接映射，product grounding 关键 | 已完成 | 已审查 |
@@ -322,6 +322,198 @@ done
 
 - 本 batch 未开启多 agent。理由：7 个 pair 都是 bounded source diff + artifact/path mapping，可由当前 orchestrator 直接确认；唯一中风险修复点已经有 focused contract tests 锁住。
 - 提升条件：后续若把 `spec-resolve-pr-feedback` resolver dispatch 改成真实多 agent并发 mutation，或让 `spec-test-browser` pipeline 被 `spec-lfg` 自动调用，需要补 fresh-source eval 或端到端 smoke。
+
+## Batch 3 支撑链路快审记录
+
+### `ce-compound` -> `spec-compound`
+
+#### Verdict
+
+- status: replaced
+- risk: high
+- decision: 按用户最新裁决，`spec-compound` 先以 CE `ce-compound` source 文件为真相源完成完整文件替换，再做 spec-first 必需归一化：入口名、下游 workflow 名、scratch/cache 路径、loaded skill directory anchor 和 frontmatter contract。CE 的 subagent scratch artifact、`CONCEPTS.md` create/seed、session-history、headless automation、grounding validation 与本地 prompt/script 产物均恢复；不保留上一轮“update-only CONCEPTS.md / 不恢复 scratch artifact”的 divergence 裁决。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/assets/resolution-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/schema.yaml`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/yaml-schema.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/concepts-vocabulary.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/repo-profile-cache.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/grounding-validation.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/references/agents/*.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/scripts/repo-profile-cache.py`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/scripts/validate-frontmatter.py`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/scripts/validate-doc-claims.py`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-compound/scripts/session-history/*`
+- spec-first: `skills/spec-compound/SKILL.md`
+- spec-first: `skills/spec-compound/assets/resolution-template.md`
+- spec-first: `skills/spec-compound/references/schema.yaml`
+- spec-first: `skills/spec-compound/references/yaml-schema.md`
+- spec-first: `skills/spec-compound/references/concepts-vocabulary.md`
+- spec-first: `skills/spec-compound/references/repo-profile-cache.md`
+- spec-first: `skills/spec-compound/references/grounding-validation.md`
+- spec-first: `skills/spec-compound/references/agents/*.md`
+- spec-first: `skills/spec-compound/scripts/repo-profile-cache.py`
+- spec-first: `skills/spec-compound/scripts/validate-frontmatter.py`
+- spec-first: `skills/spec-compound/scripts/validate-doc-claims.py`
+- spec-first: `skills/spec-compound/scripts/session-history/*`
+
+#### Preserved Capabilities
+
+- 保留 `docs/solutions/<category>/<filename>.md` 作为 durable learning 主产物，并保留 YAML frontmatter、bug/knowledge track、category mapping、duplicate/overlap 检查、related docs search、GitHub issue optional search、session-history enrichment、discoverability check 和 specialized doc enhancement prompt assets。
+- 保留 CE 的“一个 run 只沉淀一个 learning”约束，避免多个 learning 在同一草稿中交叉引用后把 `Learning 3` 等 drafting scaffold 写入 durable docs。
+- 保留 headless automation 模式：`mode:headless` 不问阻塞问题，按 Full mode 无 session history 执行，跳过 optional Phase 3 reviewer，并输出结构化 terminal report。
+- 保留 CE 的 grounding validation 思路：写入后先跑机械 claims validator，再在 Full/headless 中用 read-only semantic validator 校验 code-behavior、merge-state 和 countable completeness claims；lightweight 至少跑机械 claims check。
+- 保留 session-history 脚本对 Claude Code、Codex、Cursor、Pi 的支持；spec-first 版本继续通过 `SKILL_DIR` anchor 调用 bundled scripts，不依赖公共 sessions workflow。
+- 恢复 CE 的 Phase 1 scratch artifact 模式：Context Analyzer、Solution Extractor、Related Docs Finder 与可选 Session History 写入 `/tmp/spec-first/spec-compound/<run-id>/context.json|solution.md|related.json|session-history.md`，orchestrator 在 Phase 2 读取 artifact，inline return 只作写入失败 fallback。
+- 恢复 CE 的 `CONCEPTS.md` create/seed 行为：Full/headless 在 Phase 2.4 可按 learning area 创建并 seed glossary；Lightweight 仍只做 existing `CONCEPTS.md` update-only。
+
+#### Intentional Spec-First Divergences
+
+- CE 的 `/ce-compound`、`/ce-compound-refresh`、`/research`、`/ce-plan` 等用户入口映射为当前 `spec-*` 或 generic current-host entrypoint 表达。
+- CE scratch/cache 路径从 `/tmp/compound-engineering/ce-compound/...`、`/tmp/compound-engineering/repo-profile/...` 映射为 `/tmp/spec-first/spec-compound/...`、`/tmp/spec-first/repo-profile/...`。
+- `CLAUDE_SKILL_DIR` 归一为 runtime loaded skill directory anchor `SKILL_DIR`，shell guard 使用 `${SKILL_DIR:-}` 适配 `set -u`。
+- CE frontmatter 中的 `argument-hint` 是用户入口参数提示，不是 legacy-only 字段；spec-first runtime 和 entrypoint lint 已支持该字段。已完成审查的 skill 中，CE 有 `argument-hint` 的按 CE 真相源保留并做必要 spec-first 化，CE 没有的则不新增。
+
+#### Legacy CE Residuals
+
+- 拷贝后已扫描 `skills/spec-compound`，未发现 active `/ce-*`、`ce-*` workflow route、`compound-engineering`、`.compound-engineering`、`/tmp/compound-engineering` 或 `CLAUDE_SKILL_DIR` 残留。
+- CE 中没有的 spec-only `evals/examples.json` 与 `references/domain-model-capture.md` 已删除，避免形成第二套 `spec-compound` 行为真相源。
+- `skills/spec-compound/scripts/__pycache__/` 与 `scripts/session-history/__pycache__/` 属编译产物，已清理，不作为 source 迁移面处理。
+
+#### Recommended Changes
+
+- [done] 用 CE `ce-compound` source 文件替换 `skills/spec-compound` 对应文件，并删除 CE 中不存在的 spec-only 文件。
+- [done] 将 CE 命名、路径和下游入口归一为 spec-first：`spec-compound`、`spec-compound-refresh`、`spec-plan`、`spec-code-review`、`spec-simplify-code`、`/tmp/spec-first/spec-compound`、`/tmp/spec-first/repo-profile`。
+- [done] 保留 CE Phase 2.45 `references/grounding-validation.md` 与 `scripts/validate-doc-claims.py`，输出 flags 供 LLM adjudication，不让脚本裁决语义充分性。
+- [done] 修正 `$SKILL_DIR` shell 示例为 `${SKILL_DIR:-}` guard，避免 strict shell 环境下未设置变量直接失败。
+
+#### Downstream Consumers
+
+- `spec-plan` / `spec-work`: 消费 `docs/solutions/` learning 时可依赖已运行的 grounding validation 结果，并按 source refs / 当前源码回源确认关键事实。
+- `spec-code-review`: 可把 durable learning 当 advisory recall，并通过 cited paths、PR/link 与当前源码回源确认。
+- `spec-compound-refresh`: 后续刷新时区分 `legacy_unstructured_advisory` 与 structured promoted docs，并可用 `validate-doc-claims.py` 类机械 check 识别 path/link/scaffold 漂移。
+- `using-spec-first` / host instruction files: discoverability check 仍只在明确 gap 时做小编辑或提示，不让 `docs/solutions/` 搜索变成强制 completion gate。
+
+#### Verification Needed
+
+- 本轮改动触及 skill prose、reference、Python validator、validation docs 和 changelog；执行 Python 语法检查、validator smoke、focused CE residual scan、`git diff --check`、`npm run lint:skill-entrypoints` 和 changelog 格式测试。
+- 未执行 fresh-source eval：本轮为 source-level migration repair，且 Codex 当前请求未显式授权 subagent/persona dispatch；语义充分性来自逐文件 source read、CE 对照和 focused deterministic checks。
+
+### `ce-riffrec-feedback-analysis` -> `spec-riffrec-feedback-analysis`
+
+#### Verdict
+
+- status: repaired
+- risk: medium
+- decision: 保留 CE 的 Riffrec 消费能力和 analyzer 产物集，但把下游 handoff、requirements kickoff 和用户可见入口完全收敛到 spec-first 当前 `spec-*` 口径。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/references/compound-engineering-feedback-format.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/references/install-riffrec.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/references/quick-bug-report.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/references/extensive-analysis.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py`
+- spec-first: `skills/spec-riffrec-feedback-analysis/SKILL.md`
+- spec-first: `skills/spec-riffrec-feedback-analysis/references/spec-first-feedback-format.md`
+- spec-first: `skills/spec-riffrec-feedback-analysis/references/install-riffrec.md`
+- spec-first: `skills/spec-riffrec-feedback-analysis/references/quick-bug-report.md`
+- spec-first: `skills/spec-riffrec-feedback-analysis/references/extensive-analysis.md`
+- spec-first: `skills/spec-riffrec-feedback-analysis/scripts/analyze_riffrec_zip.py`
+
+#### Preserved Capabilities
+
+- 保留 Riffrec zip、standalone video/audio、meeting notes 输入；继续支持 `analysis.md`、`problem-analysis.md`、`review-prompt.md`、`source-materials.md`、`requirements-kickoff.md`、`analysis.json`、`frames/` 和 `raw/` 产物。
+- 保留三路径分流：setup 只指导安装/录制；quick bug report 写入 temp 输出且默认只回 inline bug report；extensive analysis 生成完整 evidence/kickoff artifact 并继续进入 brainstorm。
+- 保留 raw media、frames、audio chunks、zip contents local-only 默认策略；Markdown/JSON/manifest 在无敏感数据且需要 traceability 时可提交。
+- 保留 source mapping 作为 suspected implementation surfaces，而不是 root cause 证明；要求区分 observed facts、inferences 和 requirements。
+
+#### Intentional Spec-First Divergences
+
+- CE 的 `compound-engineering-feedback-format.md` 映射为 `spec-first-feedback-format.md`，Next Steps 从 `/ce-brainstorm` 改为 `spec-brainstorm`。
+- Extensive handoff 从 `ce-brainstorm` 改为 `spec-brainstorm`，durable requirements document 路径以 `docs/brainstorms/` 为当前 spec-first brainstorm contract；`docs/brainstorms/riffrec-feedback/` 只作为 analyzer evidence/kickoff artifact exception，不等同于 durable brainstorm output。
+- Analyzer help、generated requirements kickoff 和 human review checklist 已使用 spec-first 命名与 `spec-brainstorm` 消费者。
+
+#### Legacy CE Residuals
+
+- 逐文件审查发现 active spec-first source 中没有 `.compound-engineering`、`/tmp/compound-engineering`、`ce-brainstorm`、`ce-debug` 或 CE feedback format 文件名残留。
+- 修复前脚本命令行输出仍显示 `$spec-first:spec-brainstorm`，属于旧 host-specific / plugin-style 入口残留，已改为当前统一入口 `spec-brainstorm`。
+- `__pycache__/` 编译产物未被 git 跟踪，并被 `.gitignore` 覆盖；不作为 source 迁移差异处理。
+
+#### Recommended Changes
+
+- [fix] 将 analyzer 结尾 `Brainstorm handoff` 输出从 `$spec-first:spec-brainstorm <requirements-kickoff>` 改为 `spec-brainstorm <requirements-kickoff>`。
+- [document_divergence] 在本审查表记录 Riffrec analyzer artifact 到 `spec-brainstorm` 的产物映射和 `docs/brainstorms/riffrec-feedback/` 的 exception 语义。
+
+#### Downstream Consumers
+
+- `spec-brainstorm`: 消费 `requirements-kickoff.md`、`source-materials.md`、`analysis.md` 和截图引用，先确认、纠正、重组需求，再产出 durable requirements document。
+- `spec-plan` / `spec-work`: 只消费 brainstorm 确认后的 requirements artifact；Riffrec analyzer 产物是 evidence/kickoff 输入，不应跳过 brainstorm 确认直接进入实现。
+- `spec-debug`: quick path 可建议打开 `spec-debug`，但 quick bug report 本身不自动 handoff。
+
+#### Verification Needed
+
+- 本轮改动触及 Python script 输出文案和 docs validation，执行 Python 语法检查、`git diff --check` 与 changelog 格式检查。
+- 未运行 Riffrec analyzer 端到端样例，因为本轮没有本地录制 fixture；语义验证来自逐文件 source read 与 focused residual scan。
+
+### `ce-product-pulse` -> `spec-product-pulse`
+
+#### Verdict
+
+- status: repaired
+- risk: medium
+- decision: 保留 CE 的 product pulse 信号采集、first-run interview、read-only query discipline 和单页报告产物；把 machine-local config、strategy seed、调度提示和本地配置示例收敛到 spec-first source/runtime 边界。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-product-pulse/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-product-pulse/references/interview.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-product-pulse/references/report-template.md`
+- spec-first: `skills/spec-product-pulse/SKILL.md`
+- spec-first: `skills/spec-product-pulse/references/interview.md`
+- spec-first: `skills/spec-product-pulse/references/report-template.md`
+- supporting source: `skills/spec-mcp-setup/references/config-template.yaml`
+
+#### Preserved Capabilities
+
+- 保留 time-windowed pulse report：usage、performance、errors、followups 四类信号，默认 `24h`，支持 `1h`、`7d`、`30d` 等 lookback，并保留 15 分钟 trailing ingestion buffer。
+- 保留 first-run interview：从 `STRATEGY.md` seed product name 和 key metrics，按 SMART bar 对 engagement、value realization、completion/conversion、quality scoring、data sources、system performance、default lookback 做一次性配置。
+- 保留 data-source safety：analytics/tracing/payments 可并行读取，database 只允许 read-only 且串行查询；不收集 credentials，不写外部系统，不把 PII 写入 report。
+- 保留 durable report artifact：`docs/pulse-reports/YYYY-MM-DD_HH-MM.md` 是团队工作记忆；chat 只回 Headlines、top followup 和文件路径，不贴完整报告。
+- 保留 `pulse_metric_sources`、`pulse_pending_metrics`、`pulse_excluded_metrics` 语义，避免 strategy metrics 在多源或未 instrumentation 场景中静默丢失。
+
+#### Intentional Spec-First Divergences
+
+- CE local config 从 `.compound-engineering/config.local.yaml` 映射为 `.spec-first/config.local.yaml`，并由 `spec-mcp-setup` 的 config template 承接 `pulse_*` commented example keys。
+- `ce-strategy` seed route 映射为 `spec-strategy`；`STRATEGY.md` 作为 product grounding source 保留。
+- Scheduling 不再假设 CE plugin 内 `schedule` skill 是 single source of truth；spec-first 只 handoff 到当前 host 可用的 scheduling primitive，缺 primitive 时说明 cron、GitHub Actions 或 host automation 等平台方案。
+
+#### Legacy CE Residuals
+
+- 修复前 active spec-first source 已无 `.compound-engineering`、`ce-strategy` 或 CE local config 文案残留。
+- 修复前仍用 `work_delegate_*` 作为 non-pulse key 示例和 flat-key precedent。由于该类 key 已被 setup 审查裁决为下游 consumer-gated / setup inert，不应在 product pulse 中继续作为 active local config 示例；已改为 generic non-pulse keys 和 flat top-level spec-first local config wording。
+- `report-template.md` 与 CE 能力一致，无 CE-specific path 或 invocation residual。
+
+#### Recommended Changes
+
+- [fix] 去掉 `work_delegate_*` 示例，避免 product pulse 文档把已裁决 inert 的 execution delegation config 暗示为 active local config precedent。
+- [fix] 去掉 CE plugin `schedule` skill 假设，改为 host/platform scheduling primitive handoff，不自动安排 recurring job。
+- [document_divergence] 在本审查表记录 `.spec-first/config.local.yaml`、`docs/pulse-reports/` 和 scheduling handoff 的 spec-first 映射。
+
+#### Downstream Consumers
+
+- `spec-mcp-setup`: 提供 `.spec-first/config.local.example.yaml` 中的 `pulse_*` commented keys，保护 local config 不入库。
+- `spec-strategy`: 可提前生成或维护 `STRATEGY.md`，供 pulse interview seed product name 和 key metrics。
+- `spec-product-pulse`: 运行时消费 `.spec-first/config.local.yaml` 的 `pulse_*` keys，并写入 `docs/pulse-reports/`。
+
+#### Verification Needed
+
+- 本轮改动为 skill prose/reference/docs validation，执行 focused CE residual scan、`git diff --check`、`npx jest tests/unit/changelog-format.test.js --runInBand`。
+- 若未来把 `pulse_*` config 解析写成 deterministic script，补 config parser / template contract tests；本轮未新增脚本。
 
 ## 待确认的首轮发现
 

@@ -200,38 +200,6 @@ optional_fields:
     max_items: 8
     description: "Search keywords, lowercase and hyphen-separated"
 
-  domain:
-    type: string
-    description: "Problem or workflow domain used for docs/solutions recall"
-
-  pattern:
-    type: string
-    description: "Reusable pattern or lesson name for summary-first recall"
-
-  rejected_alternatives:
-    type: array[string]
-    max_items: 5
-    description: "Approaches considered and rejected, with compact rationale"
-
-  applicable_versions:
-    type: array[string]
-    max_items: 5
-    description: "Spec-first, framework, runtime, or host versions where this lesson applies"
-
-  invalidation_condition:
-    type: string
-    description: "Condition that makes the learning stale or unsafe to reuse"
-
-  source_refs:
-    type: array[string]
-    min_items: 1
-    max_items: 8
-    description: "Repo-relative source, test, docs, or review paths required to reconfirm this learning"
-
-new_promote_required_fields:
-  - invalidation_condition
-  - source_refs
-
 # --- Fields optional for bug track only -------------------------------------
 bug_optional_fields:
   rails_version:
@@ -246,11 +214,6 @@ bug_optional_fields:
 #   - Bug-track fields present on a knowledge-track doc are harmless. Do not
 #     strip them during refresh unless the doc is being rewritten for other reasons.
 #   - When creating NEW docs, follow the track rules above.
-# Existing docs missing the new structured recall fields remain legacy_unstructured_advisory.
-# They may be recalled as advisory candidates,
-# but do not become structured recalled knowledge until they are minimally
-# backfilled with domain, pattern, invalidation_condition, and source_refs.
-# New promoted solution docs must include invalidation_condition and source_refs.
 
 # --- Validation rules --------------------------------------------------------
 validation_rules:
@@ -259,12 +222,10 @@ validation_rules:
   - "Bug-track required fields (symptoms, root_cause, resolution_type) must be present on bug-track docs"
   - "Knowledge-track docs have no additional required fields beyond the shared ones"
   - "Bug-track fields on existing knowledge-track docs are harmless (see backward compatibility note)"
-  - "Existing docs missing the structured recall fields remain legacy_unstructured_advisory and must not be treated as verified structured knowledge"
-  - "New promoted solution docs must include invalidation_condition and source_refs"
   - "Track-specific optional fields may be included but are not required"
   - "Enum fields must match allowed values exactly"
   - "Array fields must respect min_items/max_items when specified"
   - "date must match YYYY-MM-DD format"
   - "rails_version, if provided, must match X.Y.Z format and only applies to bug-track docs"
   - "tags should be lowercase and hyphen-separated"
-  - "Array-of-strings frontmatter items (symptoms, applies_when, tags, related_components, rejected_alternatives, applicable_versions, source_refs, or any future array field) must be wrapped in double quotes when the value starts with a YAML reserved indicator (`, [, *, &, !, |, >, %, @, ?) or contains the substring `: ` — otherwise strict YAML parsers reject the file"
+  - "Array-of-strings frontmatter items (symptoms, applies_when, tags, related_components, or any future array field) must be wrapped in double quotes when the value starts with a YAML reserved indicator (`, [, *, &, !, |, >, %, @, ?) or contains the substring `: ` — otherwise strict YAML parsers reject the file"

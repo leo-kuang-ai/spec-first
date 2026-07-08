@@ -1,27 +1,38 @@
 #!/usr/bin/env python3
-"""Validate spec-first docs/solutions frontmatter for parser-safety issues.
+"""Validate spec-compound docs/solutions/ frontmatter for parser-safety issues.
 
 Usage:
     python3 validate-frontmatter.py <doc-path>
 
 Exit codes:
-    0: frontmatter passes parser-safety checks
-    1: validation failure, with diagnostics on stderr
-    2: usage error, such as bad arguments or missing file
+    0 — frontmatter passes all checks
+    1 — validation failure (diagnostics on stderr)
+    2 — usage error (bad arguments, missing file)
 
-Scope: this script catches frontmatter that strict YAML parsers can silently
-misread. It does not validate required fields or enum values; those remain
-separate schema concerns. The goal is to prevent silent data loss from YAML
-quoting rules.
+Scope: this script catches *parser-safety* issues — frontmatter that strict
+YAML parsers will silently misread. It does NOT validate against the
+schema's required-field or enum-value rules; that's a separate concern. The
+intent is to prevent the silent-data-loss bug class where YAML's quoting
+rules truncate or reframe scalar values without raising.
 
-Intentional copy: byte-identical copies live at
-skills/spec-compound/scripts/validate-frontmatter.py and
-skills/spec-compound-refresh/scripts/validate-frontmatter.py. The skill
-projection mechanism only ships each skill's own scripts/, so the two skills
-cannot share one file. Edit both copies together; tests/unit/frontmatter-validator.test.js
-asserts they stay byte-identical.
+Checks (regex-based, no YAML parser dependency):
+    1. File starts and ends frontmatter with `---` lines (matched as full
+       lines, not substrings — `----` and `---extra` are rejected)
+    2. No top-level scalar value contains ` #` unquoted (silent comment
+       truncation — what Codex caught on PR #695)
+    3. No top-level scalar value contains `: ` unquoted (mapping confusion —
+       what surfaced in a 2026-04-16 plan doc's `title:` field)
+
+The script does NOT flag values starting with YAML reserved indicators
+(`` ` ``, `*`, `&`, `!`, etc.) because those produce loud parser errors
+downstream rather than silent corruption — they're already caught by
+whatever consumes the doc. This validator's purpose is silent-corruption
+prevention, not lint.
+
+Pure-stdlib (no PyYAML or other third-party deps). Runs in <50ms typical.
+Designed to produce concrete, actionable error messages so the calling
+agent can fix and retry without ambiguity.
 """
-
 import os
 import re
 import sys
@@ -40,16 +51,21 @@ def main(argv: list[str]) -> int:
     if not os.path.isfile(doc_path):
         usage_fail(f"file not found: {doc_path}")
 
-    # 显式 UTF-8:Windows 非 UTF-8 locale 下默认编码可能误读或抛 UnicodeDecodeError,
-    # 而 docs/solutions frontmatter 常含中文。newline='' 保留原始换行,交由下方逻辑处理。
-    with open(doc_path, encoding="utf-8", newline="") as f:
+    with open(doc_path) as f:
         text = f.read()
 
+    issues: list[str] = []
+
+    # Check 1: frontmatter delimiters. Match the delimiter as a complete
+    # line whose stripped content is exactly `---` — substring matching
+    # (e.g. `text.find("\n---", 4)`) would falsely accept `----` or
+    # `---extra` as a terminator and let malformed docs slip through to
+    # downstream parsers that require a strict `---` line.
     lines = text.split("\n")
     if not lines or lines[0].rstrip() != "---":
         sys.stderr.write(
             f"FAIL: {doc_path}\n"
-            "  file does not start with '---' frontmatter delimiter line\n"
+            f"  file does not start with '---' frontmatter delimiter line\n"
         )
         return 1
 
@@ -62,41 +78,48 @@ def main(argv: list[str]) -> int:
     if end_idx is None:
         sys.stderr.write(
             f"FAIL: {doc_path}\n"
-            "  frontmatter not closed (no '---' line after the opening delimiter)\n"
+            f"  frontmatter not closed (no '---' line after the opening delimiter)\n"
         )
         return 1
 
-    issues: list[str] = []
-    frontmatter_text = "\n".join(lines[1:end_idx])
+    fm_text = "\n".join(lines[1:end_idx])
 
-    # 只检查顶层 scalar，避免把 nested list / block 当成 frontmatter 标量。
-    for lineno, line in enumerate(frontmatter_text.split("\n"), start=2):
+    # Checks 2 & 3: silent-corruption quoting risks on top-level scalar
+    # fields. We scan line-by-line and only flag top-level mapping entries
+    # (no leading whitespace) whose value isn't already quoted/structured.
+    for lineno, line in enumerate(fm_text.split("\n"), start=2):
         stripped = line.lstrip()
         if not stripped or stripped.startswith("#"):
             continue
         if ":" not in line:
             continue
+        # Top-level mapping keys only — skip nested values, array items
         if line.startswith((" ", "\t")):
             continue
+        # Skip pure list-marker lines like "- item" (these can't be top-level
+        # in our frontmatter convention, but be defensive)
         if stripped.startswith("- "):
             continue
 
         key, _, val = line.partition(":")
         val_stripped = val.strip()
         if not val_stripped:
+            # Key with no value on this line — likely a parent of a nested
+            # block (`tags:` followed by `- foo`). Nothing to validate here.
             continue
+        # Already quoted or structured (block scalar, flow collection)
         if val_stripped[0] in '"\'[{|>':
             continue
 
         if re.search(r"\s#", val_stripped):
             issues.append(
-                f"line {lineno}: '{key.strip()}' value contains ' #' - quote it. "
+                f"line {lineno}: '{key.strip()}' value contains ' #' — quote it. "
                 "YAML treats space-then-# as a comment delimiter and silently "
                 "drops the rest of the value."
             )
         if re.search(r":\s", val_stripped):
             issues.append(
-                f"line {lineno}: '{key.strip()}' value contains ': ' - quote it. "
+                f"line {lineno}: '{key.strip()}' value contains ': ' — quote it. "
                 "Strict YAML parsers may treat this as a nested mapping."
             )
 

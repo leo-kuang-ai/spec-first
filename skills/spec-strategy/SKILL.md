@@ -1,6 +1,7 @@
 ---
 name: spec-strategy
 description: "Create or update STRATEGY.md. Use when starting a product, changing direction or roadmap, or when spec-ideate, spec-brainstorm, or spec-plan need upstream product grounding."
+argument-hint: "[optional: section to revisit, e.g. 'metrics' or 'approach']"
 ---
 
 # Product Strategy

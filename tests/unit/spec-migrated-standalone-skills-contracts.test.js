@@ -23,6 +23,15 @@ const MIGRATED_SKILLS = [
   'spec-strategy',
 ];
 
+const EXPECTED_ARGUMENT_HINTS = {
+  'spec-explain': "[a concept, a diff ref, an idea, or 'what happened this week?'] — or invoke bare to be asked",
+  'spec-pov': '[the external thing to judge, plus any links] — or invoke bare mid-session for a second opinion',
+  'spec-product-pulse': "[lookback window, e.g. '24h', '7d', '1h'; default 24h]",
+  'spec-promote': "[optional: what shipped and/or channels, e.g. 'a tweet thread and a LinkedIn post']",
+  'spec-simplify-code': '[blank to simplify current branch changes, or describe what to simplify]',
+  'spec-strategy': "[optional: section to revisit, e.g. 'metrics' or 'approach']",
+};
+
 function read(relativePath) {
   return fs.readFileSync(path.join(REPO_ROOT, relativePath), 'utf8');
 }
@@ -55,7 +64,13 @@ describe('migrated CE standalone skills', () => {
       expect(skill).toContain(`name: ${skillName}`);
       expect(frontmatter).toContain(`name: ${skillName}`);
       expect(frontmatter).toContain('description:');
-      expect(frontmatter).not.toMatch(/^argument-hint:/m);
+      if (Object.hasOwn(EXPECTED_ARGUMENT_HINTS, skillName)) {
+        expect(frontmatter).toContain(
+          `argument-hint: ${JSON.stringify(EXPECTED_ARGUMENT_HINTS[skillName])}`,
+        );
+      } else {
+        expect(frontmatter).not.toMatch(/^argument-hint:/m);
+      }
       expect(frontmatter).not.toMatch(/^allowed-tools:/m);
       expect(frontmatter).not.toMatch(/^disable-model-invocation:/m);
       expect(skill).not.toMatch(/[\u4E00-\u9FFF]/);

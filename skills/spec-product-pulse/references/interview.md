@@ -212,23 +212,23 @@ After the config is written and shown to the user, make a scheduling offer befor
 
 **Handling the answer:**
 
-- **Yes (daily or weekly)** -> "I'll hand this to the `schedule` skill. Confirm the time/day and it'll set up the recurring job." Do not schedule inline - hand off to the `schedule` skill explicitly, which is the single source of truth for recurring tasks. On Claude Code, this uses the Routines feature.
-- **Not now** -> capture `schedule: manual` in the config. No nag.
-- **Later** -> capture `schedule: ask-again-after-3-runs` in the config. The SKILL.md Phase 3 logic re-surfaces the offer after 3 manual runs.
+- **Yes (daily or weekly)** -> "I'll hand this to the available scheduling primitive. Confirm the time/day there and it can set up the recurring job." Do not schedule inline. If no scheduling primitive is available in the current harness, explain the platform-native options (for example cron, GitHub Actions, or host automation) and what command would need to run.
+- **Not now** -> note `schedule: manual` in the chat summary. No nag.
+- **Later** -> note `schedule: ask-again-after-3-runs` in the chat summary. The SKILL.md Phase 3 logic re-surfaces the offer after 3 manual runs.
 
 Skipping this entirely is fine - the skill does not require a schedule to function. But recommending one is the right default because the value of pulse compounds through the saved-reports timeline; one-off runs lose most of that value.
 
-**Capture:** `schedule: daily | weekly | manual | ask-again-after-3-runs` plus time/day if applicable.
+**Capture in the chat handoff only:** `schedule: daily | weekly | manual | ask-again-after-3-runs` plus time/day if applicable. Do not write schedule cadence into `.spec-first/config.local.yaml`.
 
 ---
 
 ## Config File Shape
 
-After the interview completes, merge a `pulse_*` block into `<repo-root>/.spec-first/config.local.yaml`. Resolve the repo root with `git rev-parse --show-toplevel`. Preserve any non-pulse keys that already exist in the file (e.g., `work_delegate_*`); only add or update `pulse_*` keys.
+After the interview completes, merge a `pulse_*` block into `<repo-root>/.spec-first/config.local.yaml`. Resolve the repo root with `git rev-parse --show-toplevel`. Preserve any non-pulse keys that already exist in the file; only add or update `pulse_*` keys.
 
 If the file does not yet exist, create the directory and file. If `.spec-first/config.local.yaml` is not already covered by `.gitignore`, offer to add the entry before writing.
 
-The pulse block uses these flat keys (matches the `work_delegate_*` precedent for consistency):
+The pulse block uses flat top-level keys in the spec-first local config:
 
 ~~~yaml
 # --- Product pulse ---
@@ -254,7 +254,7 @@ pulse_excluded_metrics: "{{metric,metric}}"          # strategy metrics intentio
 - **Strategy metrics carried forward**: surfaced in the report, not stored as config — they live in `STRATEGY.md` and are re-read each run from there.
 - **Per-source connection details** (URLs, API keys, query specifics): live with the user's MCP configuration, not in this config.
 - **Hardcoded operational settings** (15-minute trailing buffer, top-N error count, p50/p95/p99 latencies, "no PII in reports", "parallel analytics + tracing, serial DB"): these are skill behavior, not user config; they live in `SKILL.md` and stay constant.
-- **Schedule cadence**: handled by the `schedule` skill (or platform-native cron), not pulse config. The pulse skill only hands off; it does not own the cadence record.
+- **Schedule cadence**: handled by an available host scheduling primitive or platform-native automation, not pulse config. The pulse skill only hands off; it does not own the cadence record.
 - **Tracing top-N count and latency on/off**: not configurable in this version. The report always includes top 5 errors and full p50/p95/p99 latency. Add config keys later if a real need surfaces.
 
 After writing, surface the resulting `pulse_*` block to the user in chat. Offer one round of edits. Then return to SKILL.md Phase 2.

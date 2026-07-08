@@ -46,21 +46,6 @@ No additional required fields beyond the shared ones. All fields below are optio
 
 - **related_components**: Other components involved
 - **tags**: Search keywords, lowercase and hyphen-separated
-- **domain**: Problem or workflow domain used for `docs/solutions/` recall
-- **pattern**: Reusable pattern or lesson name for summary-first recall
-- **rejected_alternatives**: Approaches considered and rejected, with compact rationale
-- **applicable_versions**: Spec-first, framework, runtime, or host versions where this lesson applies
-- **invalidation_condition**: Condition that makes the learning stale or unsafe to reuse
-- **source_refs**: Repo-relative source, test, docs, or review paths required to reconfirm this learning
-
-## New Promote Required Fields
-
-For a new promote into durable `docs/solutions/`, the workflow must include:
-
-- **invalidation_condition**
-- **source_refs**
-
-These fields are required by the promotion path so future recall can reconfirm the learning against source/test/doc evidence. Existing docs that predate these structured recall fields remain `legacy_unstructured_advisory`: they can be recalled as advisory candidates, but must not be treated as verified structured knowledge until minimally backfilled.
 
 ## Optional Fields (bug track only)
 
@@ -72,7 +57,6 @@ Docs created before the track system may have `symptoms`/`root_cause`/`resolutio
 
 - Bug-track fields present on a knowledge-track doc are harmless. Do not strip them during refresh unless the doc is being rewritten for other reasons.
 - When creating **new** docs, follow the track rules above.
-- Existing docs missing `domain`/`pattern`/`invalidation_condition`/`source_refs` are `legacy_unstructured_advisory`.
 
 ## Category Mapping
 
@@ -101,21 +85,18 @@ Docs created before the track system may have `symptoms`/`root_cause`/`resolutio
 3. Bug-track required fields (`symptoms`, `root_cause`, `resolution_type`) must be present on bug-track docs.
 4. Knowledge-track docs have no additional required fields beyond the shared ones.
 5. Bug-track fields on existing knowledge-track docs are harmless (see Backward Compatibility).
-6. New promote docs must include `invalidation_condition` and `source_refs`.
-7. Existing docs missing the structured recall fields remain `legacy_unstructured_advisory`.
-8. Enum fields must match the allowed values exactly.
-9. Array fields must respect min/max item counts.
-10. `date` must match `YYYY-MM-DD`.
-11. `rails_version`, if present, must match `X.Y.Z` and only applies to bug-track docs.
+6. Enum fields must match the allowed values exactly.
+7. Array fields must respect min/max item counts.
+8. `date` must match `YYYY-MM-DD`.
+9. `rails_version`, if present, must match `X.Y.Z` and only applies to bug-track docs.
 
 ## YAML Safety Rules
 
 Strict YAML 1.2 parsers (`yq`, `js-yaml` strict, PyYAML) reject array items
 that start with a reserved indicator character as unquoted scalars. When
 writing items for any array-of-strings field (`symptoms`, `applies_when`,
-`tags`, `related_components`, `rejected_alternatives`, `applicable_versions`,
-`source_refs`, or any future array field), wrap the value in double quotes if
-it starts with any of:
+`tags`, `related_components`, or any future array field), wrap the value in
+double quotes if it starts with any of:
 
 `` ` ``, `[`, `*`, `&`, `!`, `|`, `>`, `%`, `@`, `?`
 
@@ -133,5 +114,5 @@ Example — after (parses cleanly):
       - "`sudo dscacheutil -flushcache` does not restore in-container mDNS"
 
 This rule applies to all array-of-strings frontmatter fields. Scalar string
-fields like `description:` have their own quoting rules (see plugin
+fields like `description:` have their own quoting rules (see root
 `AGENTS.md` under "YAML Frontmatter").
