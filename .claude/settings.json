@@ -40,6 +40,24 @@
             ]
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ -f .graphify/graph.json ] && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"graphify: knowledge graph at .graphify/. For focused questions, run `graphify query \\\"<question>\\\"` (scoped subgraph, usually much smaller than GRAPH_REPORT.md) instead of grepping raw files. Read GRAPH_REPORT.md only for broad architecture context.\"}}' || true"
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "HIT=$(node -e \"var chunks=[];process.stdin.on('data',function(c){chunks.push(c);});process.stdin.on('end',function(){try{var d=JSON.parse(Buffer.concat(chunks).toString());var t=d.tool_input||d;var s=(String(t.file_path||'')+' '+String(t.pattern||'')+String(t.path||'')).toLowerCase().replace(/\\\\\\\\\\\\\\\\/g,'/');var exts=['.py','.js','.ts','.tsx','.jsx','.go','.rs','.java','.rb','.c','.h','.cpp','.hpp','.cs','.kt','.swift','.php','.lua','.sh','.md','.rst','.txt','.mdx'];if(!s.includes('.graphify/')&&!s.includes('graphify-out/')&&exts.some(function(e){return s.includes(e);})){process.stdout.write('1');}}catch(e){}});\" 2>/dev/null || true); if [ \"$HIT\" = 1 ] && [ -f .graphify/graph.json ]; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"graphify: knowledge graph at .graphify/. For codebase questions, run `graphify query \\\"<question>\\\"` (scoped subgraph) instead of reading source files one by one. Read raw files to modify specific code or debug.\"}}'; fi || true"
+          }
+        ]
       }
     ],
     "Stop": [

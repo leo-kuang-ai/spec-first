@@ -44,3 +44,5 @@
 *.ttf   binary
 *.gz    binary
 *.tgz   binary
+.graphify/graph.json merge=graphify-json
+graphify-out/graph.json merge=graphify-json
