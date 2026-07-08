@@ -153,12 +153,16 @@ describe('browser helper tool contracts', () => {
     expect(checkHealth).toContain('helper_registry_cli_ids');
     expect(checkHealth).toContain('helper_registry_skill_ids');
     expect(checkHealth).toContain('--json');
+    expect(checkHealth).toContain('Stage 1: Diagnose');
     expect(checkHealth).toContain('Tool install status');
     expect(checkHealth).toContain('Skill install status');
     expect(checkHealth).toContain('Required');
     expect(checkHealth).toContain('Status');
+    expect(checkHealth).toContain('Optional providers: explicit setup only');
+    expect(checkHealth).toContain('spec-mcp-setup --verify-only');
     expect(checkHealth).toContain('agent-browser-cli-ready|skipped) echo "skipped"');
-    expect(checkHealth).toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED=1');
+    expect(checkHealth).toContain('.installation.commands[$os]');
+    expect(checkHealth).toContain('helper_registry_read_node install_command agent-browser "$os"');
     expect(checkHealth).toContain('elif [ "$name" = "agent-browser" ]; then');
     expect(checkHealth).not.toMatch(/installed_skill_names=.*npx --yes skills list/);
     // ast-grep-skill 的展示命令收敛到共享 lib(check-health 经 helper_registry_install_command_display 委派)。
@@ -196,10 +200,11 @@ describe('browser helper tool contracts', () => {
     expect(['ready', 'missing']).toContain(agentBrowser.dependency_status);
     if (agentBrowser.dependency_status !== 'ready') {
       expect(agentBrowser.result).toBe('skipped');
-      expect(agentBrowser.next_action).toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED=1');
+      expect(agentBrowser.next_action).toContain('npm install -g agent-browser@latest');
+      expect(agentBrowser.next_action).toContain('agent-browser install');
     }
     if (agentBrowser.dependency_status === 'ready' && agentBrowser.result === 'skipped') {
-      expect(agentBrowser.next_action).toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED=1');
+      expect(agentBrowser.next_action).toContain('agent-browser install');
     }
 
     const astGrepTool = payload.tools.find((tool) => tool.id === 'ast-grep');
@@ -221,6 +226,24 @@ describe('browser helper tool contracts', () => {
 
     expect(payload.project).toHaveProperty('local_config_status');
     expect(payload.legacy).toHaveProperty('compound_engineering_config_status');
+  });
+
+  test('check-health human output is lightweight diagnose-first', () => {
+    const result = spawnSync('bash', [MCP_SETUP_CHECK_HEALTH_PATH], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+    });
+    expect(result.status).toBe(0);
+
+    expect(result.stdout).toContain('Stage 1: Diagnose');
+    expect(result.stdout).toContain('Required MCP/runtime: run spec-mcp-setup --verify-only');
+    expect(result.stdout).toContain('Optional providers: explicit setup only');
+    expect(result.stdout).toContain('Next:');
+    expect(result.stdout).toContain('spec-mcp-setup --only graphify');
+    expect(result.stdout).not.toContain('graphify extract');
+    expect(result.stdout).not.toContain('graphify hook install');
+    expect(result.stdout).not.toContain('codegraph init');
+    expect(result.stdout).not.toContain('codegraph index -f');
   });
 
   test('spec-setup is retired and spec-mcp-setup is the single setup owner', () => {

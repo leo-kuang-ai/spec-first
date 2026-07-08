@@ -66,6 +66,12 @@ switch (query) {
   case 'source_repo':
     writeScalar((helperById(args[0]).safety || {}).source_repo);
     break;
+  case 'install_command': {
+    const helper = helperById(args[0]);
+    const platform = args[1] || '';
+    writeScalar(((helper.installation || {}).commands || {})[platform]);
+    break;
+  }
   default:
     process.exit(2);
 }

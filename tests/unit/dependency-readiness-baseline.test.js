@@ -3038,7 +3038,7 @@ exit 0
     }
   });
 
-  test('setup plan renderer exposes bare default provider pack without confirmation gate', () => {
+  test('setup plan renderer keeps bare guided mode diagnostic-only and explicit provider mode available', () => {
     const tempDir = makeTempDir();
     const guided = spawnSync('node', [setupPlanRendererPath, '--mode', 'guided-apply', '--repo-root', tempDir], {
       cwd: repoRoot,
@@ -3047,12 +3047,26 @@ exit 0
     expect(guided.status).toBe(0);
     const guidedPlan = JSON.parse(guided.stdout);
     expect(guidedPlan.optional_provider_selection).toMatchObject({
-      selection_source: 'bare-default-provider-pack',
+      selection_source: 'default-diagnose',
+      selected_ids: [],
+      requires_confirmation: false,
+      confirmation_prompt: null,
+    });
+    expect(guidedPlan.provider_selection.every((entry) => entry.selected === false)).toBe(true);
+
+    const explicit = spawnSync('node', [setupPlanRendererPath, '--mode', 'guided-apply', '--repo-root', tempDir, '--only', 'codegraph,graphify'], {
+      cwd: repoRoot,
+      encoding: 'utf8',
+    });
+    expect(explicit.status).toBe(0);
+    const explicitPlan = JSON.parse(explicit.stdout);
+    expect(explicitPlan.optional_provider_selection).toMatchObject({
+      selection_source: 'explicit-only',
       selected_ids: ['codegraph', 'graphify'],
       requires_confirmation: false,
       confirmation_prompt: null,
     });
-    const graphify = guidedPlan.provider_selection.find((entry) => entry.provider === 'graphify');
+    const graphify = explicitPlan.provider_selection.find((entry) => entry.provider === 'graphify');
     expect(graphify).toMatchObject({
       selected: true,
       requires_confirmation: false,
@@ -3063,7 +3077,7 @@ exit 0
       command_visibility_display: 'setup resolves graphify from the original PATH or provider-standard/npm global bin candidates; after npm install/upgrade, a stale PATH symlink may be backed up and repointed to the pinned CLI, while ordinary files stay report-only.',
       instruction_section_display: 'after provider project install, setup normalizes the AGENTS.md/CLAUDE.md ## graphify section to resolved CLI/manual-visibility/direct-source-fallback wording.',
     });
-    const codegraph = guidedPlan.provider_selection.find((entry) => entry.provider === 'codegraph');
+    const codegraph = explicitPlan.provider_selection.find((entry) => entry.provider === 'codegraph');
     expect(codegraph).toMatchObject({
       requires_confirmation: false,
     });

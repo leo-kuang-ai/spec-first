@@ -106,6 +106,10 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).toContain('### Stage 3: Summarize Facts And Next Action');
     expect(text).toContain('Project-local config actions never install providers or edit host config');
     expect(text).toContain('Host/provider actions never migrate local config keys');
+    expect(text).toContain('## Default Diagnose Flow');
+    expect(text).toContain('## Explicit Provider Runtime Flow');
+    expect(text).toContain('Do not run provider first-generation from this default flow');
+    expect(text).toContain('unless the user selected an explicit provider/runtime mode');
     expect(text).toContain('Do not collapse these boundaries into a single "setup complete" statement');
   });
 
@@ -216,6 +220,11 @@ describe('spec-mcp-setup config template contract', () => {
     expect(text).not.toContain('warn "Local config missing (.spec-first/config.local.yaml)"');
     expect(text).toContain('Example config outdated (.spec-first/config.local.example.yaml)');
     expect(text).toContain('bootstrap-project-config.sh\\" --repo \\"$repo_root\\" --refresh-example');
+    expect(text).toContain('Stage 1: Diagnose');
+    expect(text).toContain('Required MCP/runtime: run spec-mcp-setup --verify-only');
+    expect(text).toContain('Optional providers: explicit setup only');
+    expect(text).toContain('spec-mcp-setup --project-config');
+    expect(text).toContain('spec-mcp-setup --only graphify');
   });
 
   test('verify status block reports project local config facts on bash and PowerShell paths', () => {

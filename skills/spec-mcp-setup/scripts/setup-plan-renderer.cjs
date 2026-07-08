@@ -364,8 +364,8 @@ function helperProviders(providerRegistry, mcpRegistry, repoRoot, requirementWor
 
 function selectionSource(args) {
   if (args.only) return 'explicit-only';
-  if (args.mode === 'guided-apply' || args.mode === 'guided-confirm') return 'bare-default-provider-pack';
-  return 'plan-default-provider-pack';
+  if (args.mode === 'guided-apply' || args.mode === 'guided-confirm') return 'default-diagnose';
+  return 'plan-diagnose';
 }
 
 function buildProviderSelection(args) {
@@ -382,7 +382,7 @@ function buildProviderSelection(args) {
   ]);
   const selectedIds = splitCsv(args.only);
   const unknown = selectedIds.filter((id) => !validIds.has(id));
-  const selectedSet = new Set(selectedIds.length > 0 ? selectedIds : providers.map((provider) => provider.provider));
+  const selectedSet = new Set(selectedIds);
   const source = selectionSource(args);
   return {
     selection_source: source,

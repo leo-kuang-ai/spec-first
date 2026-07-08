@@ -739,6 +739,58 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
     expect(Object.values(payload.helper_tools).every((helper) => helper.profile && helper.kind && helper.safety && helper.reason_code)).toBe(true);
   });
 
+  test('PowerShell check-health reports partial agent-browser install as skipped in human output', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-agent-browser-partial-'));
+    try {
+      const binDir = path.join(tmp, 'bin');
+      const homeDir = path.join(tmp, 'home');
+      fs.mkdirSync(binDir, { recursive: true });
+      fs.mkdirSync(homeDir, { recursive: true });
+      const shimPath = path.join(binDir, process.platform === 'win32' ? 'agent-browser.cmd' : 'agent-browser');
+      fs.writeFileSync(
+        shimPath,
+        process.platform === 'win32' ? '@echo off\r\nexit /b 0\r\n' : '#!/bin/sh\nexit 0\n',
+        'utf8',
+      );
+      fs.chmodSync(shimPath, 0o755);
+
+      const env = {
+        ...process.env,
+        HOME: homeDir,
+        USERPROFILE: homeDir,
+        PATH: `${binDir}${path.delimiter}${process.env.PATH || ''}`,
+      };
+      const human = spawnPwsh(['-NoProfile', '-File', checkHealthPs1], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        env,
+      });
+      if (human === null) {
+        return;
+      }
+      expect(human.status).toBe(0);
+      expect(human.stdout).toContain('agent-browser');
+      expect(human.stdout).toContain('skipped');
+      expect(human.stdout).toContain('npm install -g agent-browser@latest');
+      expect(human.stdout).not.toMatch(/agent-browser\s+yes\s+installed/);
+
+      const json = spawnPwsh(['-NoProfile', '-File', checkHealthPs1, '-Json'], {
+        cwd: repoRoot,
+        encoding: 'utf8',
+        env,
+      });
+      expect(json.status).toBe(0);
+      const payload = JSON.parse(json.stdout);
+      const agentBrowser = payload.tools.find((tool) => tool.id === 'agent-browser');
+      expect(agentBrowser).toMatchObject({
+        dependency_status: 'ready',
+        result: 'skipped',
+      });
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   test('write-setup-facts writes setup facts when PowerShell is available', () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'spec-first-mcp-setup-'));
     try {

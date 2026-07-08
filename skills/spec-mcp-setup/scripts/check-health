@@ -44,10 +44,14 @@ detect_os() {
 build_install_command() {
   local name="$1"
   local os="$2"
-  # agent-browser 在 check-health 视角是 opt-in 提示(非真实安装命令);其余 helper
-  # 委派到 lib-helper-registry.sh 的共享展示生成器,消除与 install-helpers.sh 的双份维护漂移。
+  # check-health 只展示安装建议,不执行安装。agent-browser 与其他 helper 一样
+  # 展示可复制命令;真正自动安装仍由 install-helpers.sh 的显式 opt-in gate 控制。
   if [ "$name" = "agent-browser" ]; then
-    echo "$BROWSER_HELPER_OPT_IN_ACTION"
+    if command -v jq >/dev/null 2>&1; then
+      jq -r --arg os "$os" '.helpers[] | select(.id == "agent-browser") | .installation.commands[$os] // empty' "$(helper_registry_path)"
+    else
+      helper_registry_read_node install_command agent-browser "$os"
+    fi
     return 0
   fi
   helper_registry_install_command_display "$name" "$os"
@@ -227,7 +231,7 @@ if [ "$json_output" = "yes" ]; then
         dependency_status="ready"
       fi
       result_status="skipped"
-      next_action="$BROWSER_HELPER_OPT_IN_ACTION"
+      next_action="$install_cmd"
     elif [ "$status" = "degraded" ]; then
       dependency_status="missing"
       result_status="degraded"
@@ -299,6 +303,24 @@ fi
 echo ""
 if [ -n "$plugin_version" ]; then
   ok "Spec-First version v${plugin_version}"
+fi
+
+section "Stage 1: Diagnose"
+detail "Required MCP/runtime: run spec-mcp-setup --verify-only to refresh confirmed host/runtime facts"
+detail "Helper tools: ${cli_ok}/${cli_total} CLI tools ready; ${skill_ok}/${skill_total} global skills ready"
+if [ "$in_repo" = "yes" ]; then
+  project_config_summary="ready"
+  case "$example_cfg" in
+    missing|outdated) project_config_summary="needs refresh" ;;
+  esac
+  if [ "$repo_cfg_gitignore" = "missing" ] || [ "$legacy_markdown" = "present" ] || [ "$legacy_ce_config" = "present" ]; then
+    project_config_summary="action recommended"
+  fi
+  detail "Project local config: $project_config_summary"
+  detail "Optional providers: explicit setup only (spec-mcp-setup --only codegraph|graphify)"
+else
+  detail "Project local config: not inside a git repository"
+  detail "Optional providers: choose a target repo before provider setup"
 fi
 
 section "Tool install status  ${cli_ok}/${cli_total}"
@@ -402,4 +424,19 @@ else
   echo " ⚠️   ${issues} issue(s) found  ${cli_ok}/${cli_total} tools  ${skill_ok}/${skill_total} skills"
 fi
 
+echo " Next:"
+if [ "$in_repo" = "yes" ]; then
+  if [ "$example_cfg" = "missing" ] || [ "$example_cfg" = "outdated" ] || [ "$repo_cfg_gitignore" = "missing" ] || [ "$legacy_markdown" = "present" ] || [ "$legacy_ce_config" = "present" ]; then
+    echo "  1. spec-mcp-setup --project-config"
+    echo "  2. spec-mcp-setup --verify-only"
+    echo "  3. spec-mcp-setup --only graphify  # optional provider setup"
+  else
+    echo "  1. spec-mcp-setup --verify-only"
+    echo "  2. Continue to the intended spec-* workflow"
+    echo "  3. spec-mcp-setup --only graphify  # optional provider setup"
+  fi
+else
+  echo "  1. cd <git-repo> or run spec-mcp-setup --repo <path>"
+  echo "  2. spec-mcp-setup --verify-only"
+fi
 echo ""

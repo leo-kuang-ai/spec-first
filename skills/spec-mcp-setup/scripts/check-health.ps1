@@ -36,10 +36,19 @@ function Get-InstallCommand {
     [string]$Platform
   )
 
-  # agent-browser 在 check-health 视角是 opt-in 提示;jq/windows 是 native PowerShell 路径
-  # 的有意提示(install-helpers.ps1 无此差异)。这两处保留本脚本自有语义;其余 helper
-  # 委派到 lib-helper-registry.ps1 的共享展示生成器,消除与 install-helpers.ps1 的双份维护漂移。
+  # check-health 只展示安装建议,不执行安装。agent-browser 与其他 helper 一样
+  # 展示可复制命令;真正自动安装仍由 install-helpers.ps1 的显式 opt-in gate 控制。
+  # jq/windows 是 native PowerShell 路径的有意提示(install-helpers.ps1 无此差异)。
   if ($Name -eq 'agent-browser') {
+    foreach ($helper in @($helperRegistry.helpers)) {
+      if ($helper.id -eq 'agent-browser' -and $helper.installation -and $helper.installation.commands) {
+        $commandProperty = $helper.installation.commands.PSObject.Properties[$Platform]
+        $command = if ($null -ne $commandProperty) { $commandProperty.Value } else { '' }
+        if (-not [string]::IsNullOrWhiteSpace([string]$command)) {
+          return [string]$command
+        }
+      }
+    }
     return $browserHelperOptInAction
   }
   if ($Name -eq 'jq' -and $Platform -eq 'windows') {
@@ -131,7 +140,7 @@ function New-HealthItem {
   } elseif ($id -eq 'ast-grep' -and $result -eq 'degraded') {
     'ast-grep missing; falling back to rg'
   } elseif ($id -eq 'agent-browser') {
-    $browserHelperOptInAction
+    $InstallCommand
   } else {
     $InstallCommand
   }
@@ -240,28 +249,64 @@ if ($Json) {
   exit 0
 }
 
+$readyTools = @($tools | Where-Object { $_.dependency_status -eq 'ready' }).Count
+$readySkills = @($skills | Where-Object { $_.dependency_status -eq 'ready' }).Count
+
 if (-not [string]::IsNullOrWhiteSpace($Version)) {
   Write-Host "Spec-First version v$Version"
 }
 
-$readyTools = @($tools | Where-Object { $_.dependency_status -eq 'ready' }).Count
+Write-Host ''
+Write-Host 'Stage 1: Diagnose'
+Write-Host '    Required MCP/runtime: run spec-mcp-setup --verify-only to refresh confirmed host/runtime facts'
+Write-Host "    Helper tools: $readyTools/$($tools.Count) CLI tools ready; $readySkills/$($skills.Count) global skills ready"
+if ($insideGitRepo) {
+  $projectConfigSummary = 'ready'
+  if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated') {
+    $projectConfigSummary = 'needs refresh'
+  }
+  if ($localConfigGitignore -eq 'missing' -or $legacyMarkdown -eq 'present' -or $legacyConfig -eq 'present') {
+    $projectConfigSummary = 'action recommended'
+  }
+  Write-Host "    Project local config: $projectConfigSummary"
+  Write-Host '    Optional providers: explicit setup only (spec-mcp-setup --only codegraph|graphify)'
+} else {
+  Write-Host '    Project local config: not inside a git repository'
+  Write-Host '    Optional providers: choose a target repo before provider setup'
+}
+
 Write-Host ''
 Write-Host "Tool install status $readyTools/$($tools.Count)"
 foreach ($tool in $tools) {
-  $status = if ($tool.dependency_status -eq 'ready') { 'installed' } else { 'missing' }
+  $status = if ($tool.result -eq 'ready') {
+    'installed'
+  } elseif ($tool.result -eq 'skipped') {
+    'skipped'
+  } elseif ($tool.result -eq 'degraded') {
+    'degraded'
+  } else {
+    'missing'
+  }
   Write-Host ("  {0,-15} {1,-8} {2}" -f $tool.id, $(if ($tool.required) { 'yes' } else { 'no' }), $status)
-  if ($status -eq 'missing' -and -not [string]::IsNullOrWhiteSpace($tool.next_action)) {
+  if ($status -ne 'installed' -and -not [string]::IsNullOrWhiteSpace($tool.next_action)) {
     Write-Host "    $($tool.next_action)"
   }
 }
 
-$readySkills = @($skills | Where-Object { $_.dependency_status -eq 'ready' }).Count
 Write-Host ''
 Write-Host "Skill install status $readySkills/$($skills.Count)"
 foreach ($skill in $skills) {
-  $status = if ($skill.dependency_status -eq 'ready') { 'installed' } else { 'missing' }
+  $status = if ($skill.result -eq 'ready') {
+    'installed'
+  } elseif ($skill.result -eq 'skipped') {
+    'skipped'
+  } elseif ($skill.result -eq 'degraded') {
+    'degraded'
+  } else {
+    'missing'
+  }
   Write-Host ("  {0,-15} {1,-8} {2}" -f $skill.id, $(if ($skill.required) { 'yes' } else { 'no' }), $status)
-  if ($status -eq 'missing' -and -not [string]::IsNullOrWhiteSpace($skill.next_action)) {
+  if ($status -ne 'installed' -and -not [string]::IsNullOrWhiteSpace($skill.next_action)) {
     Write-Host "    $($skill.next_action)"
   }
 }
@@ -272,4 +317,21 @@ Write-Host "Project local_config=$localConfigDisplay example_config=$exampleConf
 if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated') {
   $bootstrapScript = Join-Path $PSScriptRoot 'bootstrap-project-config.ps1'
   Write-Host "Project config next action: pwsh `"$bootstrapScript`" -Repo `"$repoRoot`" -RefreshExample"
+}
+
+Write-Host ''
+Write-Host 'Next:'
+if ($insideGitRepo) {
+  if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated' -or $localConfigGitignore -eq 'missing' -or $legacyMarkdown -eq 'present' -or $legacyConfig -eq 'present') {
+    Write-Host '  1. spec-mcp-setup --project-config'
+    Write-Host '  2. spec-mcp-setup --verify-only'
+    Write-Host '  3. spec-mcp-setup --only graphify  # optional provider setup'
+  } else {
+    Write-Host '  1. spec-mcp-setup --verify-only'
+    Write-Host '  2. Continue to the intended spec-* workflow'
+    Write-Host '  3. spec-mcp-setup --only graphify  # optional provider setup'
+  }
+} else {
+  Write-Host '  1. cd <git-repo> or run spec-mcp-setup --repo <path>'
+  Write-Host '  2. spec-mcp-setup --verify-only'
 }
