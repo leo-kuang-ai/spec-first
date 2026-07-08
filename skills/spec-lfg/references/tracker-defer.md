@@ -1,6 +1,6 @@
 # Tracker Detection and Defer Execution
 
-This reference covers how Defer actions file tickets in the project's tracker. It is loaded by `SKILL.md` when Interactive mode's routing question needs to decide whether to offer option C (File tickets), when the walk-through's Defer option executes, and when the bulk-preview of option C is shown. It is also loaded by autonomous callers (e.g., `lfg`) that need to file residual actionable findings without user prompts — see Execution Modes below.
+This reference covers how Defer actions file tickets in the project's tracker. It is loaded by `SKILL.md` when Interactive mode's routing question needs to decide whether to offer option C (File tickets), when the walk-through's Defer option executes, and when the bulk-preview of option C is shown. It is also loaded by autonomous callers (e.g., `spec-lfg`) that need to file residual actionable findings without user prompts — see Execution Modes below.
 
 ---
 
@@ -18,7 +18,7 @@ Used by `spec-code-review` Interactive mode's routing question, walk-through Def
 
 ### Non-interactive mode
 
-Used by autonomous callers like `lfg` that must not prompt. All blocking questions are skipped; the fallback chain is executed silently in order. Behavior:
+Used by autonomous callers like `spec-lfg` that must not prompt. All blocking questions are skipped; the fallback chain is executed silently in order. Behavior:
 
 - No confirmation on the first generic-label Defer; proceed directly.
 - On execution failure, automatically fall to the next tier without prompting. Record the failure.

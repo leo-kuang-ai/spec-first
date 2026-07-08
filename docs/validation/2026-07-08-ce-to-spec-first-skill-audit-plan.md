@@ -60,7 +60,7 @@ CE 是迁移能力的语义基准：
 | `ce-test-xcode` | `spec-test-xcode` | XcodeBuildMCP 预检与 iOS / Xcode 验证辅助 | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
 | `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 |  |  |
 | `ce-worktree` | `spec-worktree` | 内部 worktree helper，支持隔离并行工程任务 | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
-| `lfg` | `spec-lfg` | 从计划到绿色 PR 的完整 hands-off 工程流水线 | 直接映射，full pipeline 关键 |  |  |
+| `lfg` | `spec-lfg` | 从计划到绿色 PR 的完整 hands-off 工程流水线 | 直接映射，full pipeline 关键 | 已完成 | 已审查 |
 
 spec-first-only skills 不做 CE 直接等价审查，但可用于解释合理 divergence：
 
@@ -594,6 +594,72 @@ done
 
 - 本轮改动为 skill prose/reference/docs validation，执行 focused CE residual scan、`git diff --check`、`npx jest tests/unit/changelog-format.test.js --runInBand`。
 - 若未来把 `pulse_*` config 解析写成 deterministic script，补 config parser / template contract tests；本轮未新增脚本。
+
+### `lfg` -> `spec-lfg`
+
+#### Verdict
+
+- status: repaired
+- risk: high
+- decision: 保留 CE 的 full hands-off engineering pipeline 顺序、gate、review residual durable sink、browser test、commit/PR、CI watch/autofix 和 concept trailer 交接；只把 CE skill 名称、artifact contract、scratch 路径和 explain handoff 做 spec-first 必要投影。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/lfg/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/lfg/references/review-followup.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/lfg/references/tracker-defer.md`
+- spec-first: `skills/spec-lfg/SKILL.md`
+- spec-first: `skills/spec-lfg/references/review-followup.md`
+- spec-first: `skills/spec-lfg/references/tracker-defer.md`
+- supporting source: `tests/unit/spec-sweep-lfg-migration-contracts.test.js`
+
+#### Preserved Capabilities
+
+- 保留严格顺序：`spec-plan` -> `spec-work` -> `spec-simplify-code` -> `spec-code-review` -> review fix -> residual handoff -> `spec-test-browser` -> `spec-commit-push-pr` -> CI watch -> DONE。
+- 保留 plan metadata gate：`artifact_contract: spec-unified-plan/v1` 时只接受 `artifact_readiness: implementation-ready` 与 `execution: code`；requirements-only、knowledge-work、approach-plan、answer-seeking 或 invalid progress-like readiness 都停止 pipeline。
+- 保留 `mode:return-to-caller` 和 `standalone_shipping_skipped: true` 合同，确保 `spec-work` 完成实现但不独自 shipping，并把控制权交回 LFG。
+- 保留 `behavior_change: true` 的 `verification_evidence` gate 与一次 idempotent retry；第二次仍缺证据时停止并报告缺失字段。
+- 保留 docs-only / trivial 变更跳过 simplify，非跳过时让 `spec-simplify-code` 在 review 前处理 branch diff。
+- 保留 `spec-code-review mode:agent plan:<plan-path>` report-only 合同，由 LFG 在 step 5 读取 `review-followup.md` 后应用合格机械修复并 commit/push。
+- 保留 shipping precondition：无 remote 时进入 local-only，跳过 push、PR create/edit、CI watch；有 remote 时按上游或可写 remote 推送。
+- 保留 residual review findings 的 durable sink：优先更新当前 PR body，否则写 `docs/residual-review-findings/<branch-or-head-sha>.md` 并提交；tracker filing 失败不阻塞 DONE，前提是 residual 已持久化。
+- 保留 `spec-test-browser mode:pipeline` 和 `spec-commit-push-pr mode:pipeline`，commit/PR helper 必须按 pipeline token 非交互执行。
+- 保留 CI watch/autofix 最多 3 次循环，失败后把 `## CI Failures Unresolved` 写入 PR body，不继续无限循环。
+- 保留 CE 的 `New concepts:` trailer 交接：step 8 若记录新概念，step 10 在 DONE 前输出 `New concept introduced: <name> — run spec-explain <name> to go deeper.`。
+
+#### Intentional Spec-First Divergences
+
+- CE skill handoff 投影为当前 `spec-*`：`ce-plan`、`ce-work`、`ce-simplify-code`、`ce-code-review`、`ce-test-browser`、`ce-commit-push-pr`、`/ce-explain` 分别映射为 `spec-plan`、`spec-work`、`spec-simplify-code`、`spec-code-review`、`spec-test-browser`、`spec-commit-push-pr`、`spec-explain`。
+- CE namespace 示例 `compound-engineering:ce-plan` 映射为 `spec-first:spec-plan`，只作为“按 host available-skills list 精确匹配”的示例，不是固定 invocation。
+- Plan contract 从 `ce-unified-plan/v1` 映射为 `spec-unified-plan/v1`。
+- Review artifact path 从 `/tmp/compound-engineering/ce-code-review/<run-id>/...` 映射为 `/tmp/spec-first/spec-code-review/<run-id>/...`。
+
+#### Legacy CE Residuals
+
+- 修复前 `skills/spec-lfg/SKILL.md` step 8 丢失 CE 的 `mode:pipeline`、`non-interactively, per the mode token` 和 `New concepts:` trailer 记录，导致 commit/PR helper 的 pipeline 合同和 concept follow-up 交接弱化；已补回。
+- 修复前 step 10 丢失 CE 的 new concept follow-up 输出；已补回并把 `/ce-explain` 投影为当前 `spec-explain`。
+- 修复前 `references/tracker-defer.md` 仍写 autonomous caller 示例 `lfg`；已投影为 `spec-lfg`。
+- `review-followup.md` 与 CE 等价，只做 `ce-code-review` -> `spec-code-review` 必要名称投影，未发现额外能力缺失。
+
+#### Recommended Changes
+
+- [done] 恢复 `spec-commit-push-pr mode:pipeline` invocation 和非交互 mode token 说明。
+- [done] 恢复 `New concepts:` trailer 捕获与 DONE 前 `spec-explain` follow-up 输出。
+- [done] 将 tracker-defer autonomous caller 示例从 `lfg` 投影为 `spec-lfg`。
+- [done] 增加 focused migration contract test，锁住 pipeline handoff、concept trailer 和 tracker-defer 调用方名称。
+
+#### Downstream Consumers
+
+- `spec-plan`: 产出 LFG 可执行的 `docs/plans/` plan，并通过 `spec-unified-plan/v1` metadata gate 约束是否进入实现。
+- `spec-work`: 执行 plan 并返回 structured return；LFG 依赖其 changed files、verification results、behavior-change signal 与 verification evidence。
+- `spec-code-review`: report-only 审查并输出 Actionable Findings；LFG 负责合格机械修复和 residual durable sink。
+- `spec-test-browser`: 以 `mode:pipeline` 在 shipping 前执行 browser validation。
+- `spec-commit-push-pr`: 以 `mode:pipeline` 非交互完成 commit/push/PR，并通过 `New concepts:` trailer 把可沉淀概念交给 `spec-explain`。
+
+#### Verification Needed
+
+- 本轮改动触及 `spec-lfg` prose、tracker-defer reference、migration contract test、validation docs 和 changelog；执行 focused Jest、entrypoint lint、CE residual scan 和 `git diff --check`。
+- 未执行 fresh-source eval：本轮为 CE 对照 source repair，且用户要求逐文件打开审查；语义充分性来自 CE/spec 逐文件 source read 与 deterministic focused checks。
 
 ## 待确认的首轮发现
 

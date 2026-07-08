@@ -129,4 +129,18 @@ describe('spec-sweep and spec-lfg migration contracts', () => {
     expect(skill).toContain('docs/plans/feedback-sweep-plan.md');
     expect(skill).toContain('spec-lfg docs/plans/feedback-sweep-plan.md');
   });
+
+  test('preserves lfg pipeline handoffs and concept trailer contract', () => {
+    const skill = read('skills/spec-lfg/SKILL.md');
+    const trackerDefer = read('skills/spec-lfg/references/tracker-defer.md');
+
+    expect(skill).toContain('Invoke the `spec-commit-push-pr` skill with `mode:pipeline`.');
+    expect(skill).toContain('non-interactively, per the mode token');
+    expect(skill).toContain('New concepts:');
+    expect(skill).toContain(
+      'New concept introduced: <name> — run spec-explain <name> to go deeper.',
+    );
+    expect(trackerDefer).toContain('autonomous callers (e.g., `spec-lfg`)');
+    expect(trackerDefer).toContain('autonomous callers like `spec-lfg`');
+  });
 });

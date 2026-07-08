@@ -119,3 +119,7 @@ A broader rule distilled from multiple learnings. Pattern docs are useful but hi
 ### Compound
 
 The practice of turning solved problems into reusable knowledge so future implementation, debugging, planning, and review runs start with better context.
+
+### CE-first Projection
+
+The migration rule for CE-derived skills: preserve CE behavior, phases, artifacts, and helper semantics first, then project only the names, paths, entrypoints, and source/runtime boundaries required by spec-first.
