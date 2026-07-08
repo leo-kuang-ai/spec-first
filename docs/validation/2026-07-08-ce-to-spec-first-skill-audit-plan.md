@@ -55,7 +55,7 @@ CE 是迁移能力的语义基准：
 | `ce-setup` | `spec-mcp-setup` | 诊断并修复 spec-first 运行时、MCP 与 helper readiness | 近似映射，必须记录 divergence | 已完成 | 已审查 |
 | `ce-simplify-code` | `spec-simplify-code` | 在保持行为不变的前提下简化近期改动代码 | 直接映射，behavior-preserving 边界关键 | 已完成 | 已审查 |
 | `ce-strategy` | `spec-strategy` | 创建或更新项目战略文档与方向判断 | 直接映射，product grounding 关键 | 已完成 | 已审查 |
-| `ce-sweep` | `spec-sweep` | 扫描反馈源并生成 acknowledge / analysis / recommendation | 直接映射，feedback-source workflow 关键 |  |  |
+| `ce-sweep` | `spec-sweep` | 扫描反馈源并生成 acknowledge / analysis / recommendation | 直接映射，feedback-source workflow 关键 | 已完成 | 已审查 |
 | `ce-test-browser` | `spec-test-browser` | 浏览器测试 helper，辅助页面交互验证 | 直接映射，browser helper 边界关键 | 已完成 | 已审查 |
 | `ce-test-xcode` | `spec-test-xcode` | XcodeBuildMCP 预检与 iOS / Xcode 验证辅助 | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
 | `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 |  |  |
@@ -459,6 +459,86 @@ done
 
 - 本轮改动触及 Python script 输出文案和 docs validation，执行 Python 语法检查、`git diff --check` 与 changelog 格式检查。
 - 未运行 Riffrec analyzer 端到端样例，因为本轮没有本地录制 fixture；语义验证来自逐文件 source read 与 focused residual scan。
+
+### `ce-sweep` -> `spec-sweep`
+
+#### Verdict
+
+- status: repaired
+- risk: high
+- decision: 保留 CE 的 feedback sweep 能力链路，并将 local config、调度 handoff、media analyzer、brainstorm/lfg 下游入口和 scratch/state 路径做必要的 spec-first 名称与路径投影。`docs/plans/feedback-sweep-plan.md` 是 CE 原有 rolling `/lfg`-ready plan 产物在 spec-first 中的等价投影；analyzer 到 brainstorm 的提示也保留 CE 的 `docs/plans/` unified-plan 口径，只把 `ce-brainstorm` 改为 `spec-brainstorm`。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/SKILL.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/interview.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/plan-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/state-schema.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/model-tiers.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/sources/slack.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/sources/github-issues.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/sources/email.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/subagent-template.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/references/agents/media-analyzer.md`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/scripts/analyze_riffrec_zip.py`
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-sweep/scripts/sweep-state.py`
+- spec-first: `skills/spec-sweep/SKILL.md`
+- spec-first: `skills/spec-sweep/references/interview.md`
+- spec-first: `skills/spec-sweep/references/plan-template.md`
+- spec-first: `skills/spec-sweep/references/state-schema.md`
+- spec-first: `skills/spec-sweep/references/model-tiers.md`
+- spec-first: `skills/spec-sweep/references/sources/slack.md`
+- spec-first: `skills/spec-sweep/references/sources/github-issues.md`
+- spec-first: `skills/spec-sweep/references/sources/email.md`
+- spec-first: `skills/spec-sweep/references/subagent-template.md`
+- spec-first: `skills/spec-sweep/references/agents/media-analyzer.md`
+- spec-first: `skills/spec-sweep/scripts/analyze_riffrec_zip.py`
+- spec-first: `skills/spec-sweep/scripts/sweep-state.py`
+- supporting source: `tests/unit/spec-sweep-lfg-migration-contracts.test.js`
+
+#### Preserved Capabilities
+
+- 保留 first-run interview：逐源采集 `feedback_sources`、ack/close-out action、standing approval、sensitive flag、state path、ack cap、shared branch、legacy import 和 schedule handoff。
+- 保留 headless mode：无 blocking question tool 或传入 `mode:headless` 时不提示，first-run setup fail closed，决策和 circuit breaker 写入 Outstanding Questions / `ack_deferred`。
+- 保留 deterministic state engine 唯一写 state 的纪律：lease acquire/release、validate、cursor-get/advance、upsert、legacy import、run-record 均通过 bundled `scripts/sweep-state.py`。
+- 保留 source personas：Slack、GitHub Issues、email experimental 都以 read/degrade/write-degrade 的事实返回，不让 persona 推进 cursor 或改 state。
+- 保留 ack/read-back/cursor invariant：按 cursor 顺序逐项 ack，确认来源可见后 upsert，再 advance cursor；失败则 `ack_deferred` 且不推进。
+- 保留 media analysis：下载到 `/tmp/spec-first/spec-sweep/<run-id>/`，用 media analyzer subagent 调 bundled `analyze_riffrec_zip.py`，失败计数后进入 `manual_stuck`。
+- 保留 fix verification：仅接受 PR number 或 commit SHA 形态，验证 merge 后才执行 close-out action 并写 closed evidence fields。
+- 保留 rolling plan reconciliation：目标 `docs/plans/feedback-sweep-plan.md`，只写 machine-owned region，保留 human notes，最终 handoff 为 `spec-lfg docs/plans/feedback-sweep-plan.md`。
+
+#### Intentional Spec-First Divergences
+
+- CE local config 从 `.compound-engineering/config.local.yaml` 映射为 `.spec-first/config.local.yaml`；machine-local state 从 `/tmp/compound-engineering/...` 映射为 `/tmp/spec-first/spec-sweep/<repo-slug>/state.yml` 或 run scratch `/tmp/spec-first/spec-sweep/<run-id>/`。
+- CE `/ce-sweep` 与 `/lfg` handoff 映射为当前统一 `spec-sweep` / `spec-lfg` 入口；旧 slash/plugin style 不作为 active invocation。
+- CE 插件内 `schedule` skill 口径映射为 installed `schedule` helper；缺该 helper 时仍按 CE 原逻辑退回 platform-native mechanism。skill 本身不 inline 创建 schedule。
+- Analyzer 中 `ce-brainstorm` 映射为 `spec-brainstorm`，但保留 CE 的 `docs/plans/` durable unified-plan 输出口径；不在 `spec-sweep` 迁移中重写为 `docs/brainstorms/`。
+
+#### Legacy CE Residuals
+
+- `references/interview.md` 保留 CE 的 unrelated key preservation 示例，包括 `work_delegate_*`；这里表达的是“写 sweep keys 时不能破坏其他 local config”，不是声明 `work_delegate_*` 是 active sweep config。
+- CE 插件内 `schedule` skill 不是 spec-first 命名；已投影为 installed `schedule` helper，同时保留 CE 的 fallback 到 cron、GitHub Actions 或 host automation。
+- 修复前 `scripts/analyze_riffrec_zip.py` 仍有 `CE-friendly markdown artifacts`、`CE requirements document` 和 `ce-brainstorm` 入口残留；已改为 spec-first 命名，但保留 CE 的 `docs/plans/` durable unified-plan 输出链路。
+- `references/plan-template.md` 的 `artifact_contract: spec-unified-plan/v1` 目前作为 `spec-sweep` rolling plan contract 保留；现有 contract test 只禁止 `ce-unified-plan/v1`，未发现下游要求改名。
+
+#### Recommended Changes
+
+- [done] 保留 CE 的 unrelated key preservation 示例，包括 `work_delegate_*`；该示例不作为 active sweep config。
+- [done] 将 CE plugin schedule 假设投影为 installed `schedule` helper，保留 recurring schedule handoff 与 platform fallback。
+- [done] 修正 analyzer 输出和 help 文案中的 CE 名称残留，同时保留 CE 的 `docs/plans/` unified-plan 输出口径。
+- [done] 用 focused migration contract test 锁住 `.spec-first/config.local.yaml`、installed `schedule` helper handoff、`docs/plans/` durable unified-plan 口径，以及 `docs/plans/feedback-sweep-plan.md` 到 `spec-lfg` 的保留 handoff。
+
+#### Downstream Consumers
+
+- `spec-lfg`: 消费 `docs/plans/feedback-sweep-plan.md` 执行 open feedback items；该 plan 是 `spec-sweep` 的 rolling requirements-only plan artifact。
+- `spec-brainstorm`: 消费 analyzer 生成的 `requirements-kickoff.md` / evidence bundle 来确认、纠正和重组产品需求；本迁移按 CE 原逻辑保留 durable unified plan under `docs/plans/` 的 handoff 口径。
+- `spec-mcp-setup`: 提供 `.spec-first/config.local.example.yaml` 和 helper/provider readiness facts；`spec-sweep` 运行时读取 `.spec-first/config.local.yaml` 中的 `feedback_sources` 与 `sweep_*` keys。
+- `spec-product-pulse` / `spec-promote`: 可共享 `feedback_sources` 这种 generic local config source list，但不得依赖 retired `work_delegate_*`。
+
+#### Verification Needed
+
+- 本轮改动触及 skill reference、Python analyzer、migration contract test、validation docs 和 changelog；执行 Python 语法检查、focused Jest、entrypoint lint 和 `git diff --check`。
+- 未执行 fresh-source eval：本轮为 CE 对照 source repair，且用户要求逐文件打开审查；语义充分性来自 CE/spec 逐文件 source read 与 deterministic focused checks。
 
 ### `ce-product-pulse` -> `spec-product-pulse`
 

@@ -108,4 +108,25 @@ describe('spec-sweep and spec-lfg migration contracts', () => {
       expect(fs.existsSync(path.join(REPO_ROOT, relativePath))).toBe(true);
     }
   });
+
+  test('uses current spec-first sweep setup and brainstorm paths', () => {
+    const interview = read('skills/spec-sweep/references/interview.md');
+    const analyzer = read('skills/spec-sweep/scripts/analyze_riffrec_zip.py');
+    const skill = read('skills/spec-sweep/SKILL.md');
+
+    expect(interview).toContain('<repo-root>/.spec-first/config.local.yaml');
+    expect(interview).toContain('work_delegate_*');
+    expect(interview).toContain('installed `schedule` helper');
+    expect(interview).toContain('spec-sweep mode:headless');
+
+    expect(analyzer).toContain('spec-first-friendly markdown artifacts');
+    expect(analyzer).toContain('durable spec-brainstorm outputs live in docs/plans/');
+    expect(analyzer).toContain('spec-first requirements document');
+    expect(analyzer).toContain('durable unified plan under docs/plans/');
+    expect(analyzer).not.toContain('CE-friendly');
+    expect(analyzer).not.toContain('CE requirements document');
+
+    expect(skill).toContain('docs/plans/feedback-sweep-plan.md');
+    expect(skill).toContain('spec-lfg docs/plans/feedback-sweep-plan.md');
+  });
 });

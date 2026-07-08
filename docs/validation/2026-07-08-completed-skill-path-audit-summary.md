@@ -168,6 +168,17 @@ Quick Usage 示例从 legacy `/spec-test-xcode` 改为当前统一入口 `spec-t
 
 `spec-polish` 使用 `.claude/launch.json` 作为 dev-server 配置入口。这不是 CE path，也不是本轮迁移错误；但它与“generated runtime mirrors 不作为 source”的命名边界存在张力。当前不应在路径快审中擅自迁移，后续若要调整，应单独做架构裁决，明确跨宿主 config path 和迁移策略。
 
+### 纠正 6：CE 迁移必须以 CE 行为为准，不用 spec-first 当前偏好重写输出链路
+
+2026-07-08 23:12，在处理 `ce-sweep` -> `spec-sweep` 时，曾把 analyzer 的 brainstorm durable output 口径从 CE 的 `docs/plans/` unified plan 改为当前 `docs/brainstorms/` requirements document，并把 `work_delegate_*` 从 unrelated local config preservation 示例中删除。用户纠正为“要完全以 CE 为准”。
+
+最终执行口径：
+
+- 迁移 skill 时先保留 CE 行为、阶段和产物链路；只做必要的 spec-first 名称、入口、local config 和 scratch path 投影。
+- `ce-brainstorm` -> `spec-brainstorm` 是入口映射，但不能借机把 CE 的 `docs/plans/` unified-plan 输出链路重写为另一个 workflow 的当前偏好。
+- `work_delegate_*` 在 `spec-sweep` interview 中保留为“preserving unrelated keys”示例；它不是 active sweep config，也不代表 setup 要恢复 retired delegation preference。
+- CE 的 `schedule` skill 口径投影为 installed `schedule` helper，保留 platform-native fallback，不引入 CE plugin 命名。
+
 ## 后续审查注意点
 
 ### 对已完成 skill 的路径检查重点
