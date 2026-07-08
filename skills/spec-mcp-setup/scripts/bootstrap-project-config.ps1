@@ -44,8 +44,8 @@ function Write-Result {
       local_config_gitignore_status = $GitignoreStatus
     }
     legacy = [ordered]@{
-      compound_engineering_markdown_status = $LegacyMarkdownStatus
-      compound_engineering_config_status = $LegacyConfigStatus
+      legacy_markdown_status = $LegacyMarkdownStatus
+      legacy_local_config_status = $LegacyConfigStatus
     }
   }
 
@@ -321,7 +321,6 @@ $exampleConfig = Join-Path $specDir 'config.local.example.yaml'
 $localConfig = Join-Path $specDir 'config.local.yaml'
 $gitignore = Join-Path $repoRoot '.gitignore'
 $legacyMarkdown = Join-Path $repoRoot 'compound-engineering.local.md'
-$legacyConfig = Join-Path $repoRoot '.compound-engineering/config.local.yaml'
 
 if (-not (Test-Path -LiteralPath $template -PathType Leaf)) {
   Write-Result `
@@ -340,7 +339,7 @@ $exampleStatus = 'skipped'
 $localStatus = 'skipped'
 $gitignoreStatus = 'skipped'
 $legacyMarkdownStatus = if (Test-Path -LiteralPath $legacyMarkdown -PathType Leaf) { 'present' } else { 'missing' }
-$legacyConfigStatus = if (Test-Path -LiteralPath $legacyConfig -PathType Leaf) { 'present' } else { 'missing' }
+$legacyConfigStatus = 'retired'
 
 if ($RefreshExample) {
   if (-not (Ensure-SafeSpecFirstProjectDir)) { Stop-ProjectConfigBlocked -Reason 'project-config-symlink-escape' }

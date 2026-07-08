@@ -265,7 +265,6 @@ function Get-ProjectLocalConfigStatus {
   $localConfig = Join-Path $specDir 'config.local.yaml'
   $gitignore = Join-Path $RepoRoot '.gitignore'
   $legacyMarkdown = Join-Path $RepoRoot 'compound-engineering.local.md'
-  $legacyConfig = Join-Path $RepoRoot '.compound-engineering/config.local.yaml'
 
   $exampleStatus = 'missing'
   $exampleNext = "pwsh `"$ScriptDir/bootstrap-project-config.ps1`" -Repo `"$RepoRoot`" -RefreshExample"
@@ -306,7 +305,7 @@ function Get-ProjectLocalConfigStatus {
   }
 
   $legacyMarkdownStatus = if (Test-Path -LiteralPath $legacyMarkdown -PathType Leaf) { 'present' } else { 'missing' }
-  $legacyConfigStatus = if (Test-Path -LiteralPath $legacyConfig -PathType Leaf) { 'present' } else { 'missing' }
+  $legacyConfigStatus = 'retired'
   $status = if ($exampleStatus -eq 'current' -and @('ignored', 'ready-for-local-config', 'not-applicable') -contains $gitignoreStatus) {
     'ready'
   } elseif (@('missing', 'outdated') -contains $exampleStatus -or $gitignoreStatus -eq 'missing') {
@@ -323,7 +322,7 @@ function Get-ProjectLocalConfigStatus {
     local_config = [ordered]@{ path = $localConfig; status = $localStatus; next_action = $localNext }
     local_config_gitignore = [ordered]@{ path = $gitignore; status = $gitignoreStatus; next_action = $gitignoreNext }
     legacy_markdown_config = [ordered]@{ path = $legacyMarkdown; status = $legacyMarkdownStatus; next_action = $(if ($legacyMarkdownStatus -eq 'present') { 'manual review; delete only after explicit approval' } else { $null }) }
-    legacy_local_config = [ordered]@{ path = $legacyConfig; status = $legacyConfigStatus; next_action = $(if ($legacyConfigStatus -eq 'present') { 'manual review; do not migrate old path automatically' } else { $null }) }
+    legacy_local_config = [ordered]@{ path = $null; status = $legacyConfigStatus; next_action = $null }
   }
 }
 

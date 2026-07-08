@@ -254,7 +254,7 @@ for entry in "${skills[@]}"; do
 done
 
 legacy_markdown="skip"
-legacy_ce_config="skip"
+legacy_local_config="retired"
 repo_cfg="skip"
 repo_cfg_gitignore="skip"
 example_cfg="skip"
@@ -266,10 +266,7 @@ if [ "$in_repo" = "yes" ]; then
     legacy_markdown="present"
   fi
 
-  legacy_ce_config="missing"
-  if [ -f "$repo_root/.compound-engineering/config.local.yaml" ]; then
-    legacy_ce_config="present"
-  fi
+  legacy_local_config="retired"
 
   repo_cfg="missing"
   if [ -f "$repo_root/.spec-first/config.local.yaml" ]; then
@@ -386,9 +383,9 @@ if [ "$json_output" = "yes" ]; then
     "$(json_escape "$repo_cfg")" \
     "$(json_escape "$repo_cfg_gitignore")" \
     "$(json_escape "$example_cfg")"
-  printf '  "legacy": {"compound_engineering_markdown_status":"%s","compound_engineering_config_status":"%s"}\n' \
+  printf '  "legacy": {"legacy_markdown_status":"%s","legacy_local_config_status":"%s"}\n' \
     "$(json_escape "$legacy_markdown")" \
-    "$(json_escape "$legacy_ce_config")"
+    "$(json_escape "$legacy_local_config")"
   printf '  ,"runtime": %s,\n' "$SETUP_SNAPSHOT_JSON"
   printf '  "generated_runtime_manifest": %s,\n' "$(snapshot_field generated_runtime_manifest)"
   printf '  "provider_readiness": %s,\n' "$(snapshot_field provider_readiness)"
@@ -416,7 +413,7 @@ if [ "$in_repo" = "yes" ]; then
   case "$example_cfg" in
     missing|outdated) project_config_summary="needs refresh" ;;
   esac
-  if [ "$repo_cfg_gitignore" = "missing" ] || [ "$legacy_markdown" = "present" ] || [ "$legacy_ce_config" = "present" ]; then
+  if [ "$repo_cfg_gitignore" = "missing" ] || [ "$legacy_markdown" = "present" ]; then
     project_config_summary="action recommended"
   fi
   detail "Project local config: $project_config_summary"
@@ -479,7 +476,6 @@ fi
 if [ "$in_repo" = "yes" ]; then
   has_project_issues="no"
   [ "$legacy_markdown" = "present" ] && has_project_issues="yes"
-  [ "$legacy_ce_config" = "present" ] && has_project_issues="yes"
   [ "$repo_cfg_gitignore" = "missing" ] && has_project_issues="yes"
   case "$example_cfg" in
     missing|outdated)
@@ -491,12 +487,7 @@ if [ "$in_repo" = "yes" ]; then
     section "Project"
 
     if [ "$legacy_markdown" = "present" ]; then
-      warn "Outdated Compound Engineering config in this repo"
-      issues=$((issues + 1))
-    fi
-
-    if [ "$legacy_ce_config" = "present" ]; then
-      warn "Legacy Compound Engineering local config detected (.compound-engineering/config.local.yaml)"
+      warn "Outdated legacy setup markdown detected (compound-engineering.local.md)"
       issues=$((issues + 1))
     fi
 
@@ -532,7 +523,7 @@ fi
 
 echo " Next:"
 if [ "$in_repo" = "yes" ]; then
-  if [ "$example_cfg" = "missing" ] || [ "$example_cfg" = "outdated" ] || [ "$repo_cfg_gitignore" = "missing" ] || [ "$legacy_markdown" = "present" ] || [ "$legacy_ce_config" = "present" ]; then
+  if [ "$example_cfg" = "missing" ] || [ "$example_cfg" = "outdated" ] || [ "$repo_cfg_gitignore" = "missing" ] || [ "$legacy_markdown" = "present" ]; then
     echo "  1. spec-mcp-setup --project-config"
     echo "  2. spec-mcp-setup --verify-only"
     echo "  3. spec-mcp-setup --only graphify  # optional provider setup"

@@ -240,7 +240,7 @@ describe('spec-mcp-setup config template contract', () => {
       expect(text).toContain('local config gitignore');
       expect(text).toContain('legacy markdown config');
       expect(text).toContain('legacy local config');
-      expect(text).toContain('do not migrate old path automatically');
+      expect(text).toContain('retired');
     }
   });
 });

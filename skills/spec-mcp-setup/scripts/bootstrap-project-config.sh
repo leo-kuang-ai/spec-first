@@ -96,7 +96,7 @@ emit_json() {
     "$(json_escape "$example_status")" \
     "$(json_escape "$local_status")" \
     "$(json_escape "$gitignore_status")"
-  printf '"legacy":{"compound_engineering_markdown_status":"%s","compound_engineering_config_status":"%s"}' \
+  printf '"legacy":{"legacy_markdown_status":"%s","legacy_local_config_status":"%s"}' \
     "$(json_escape "$legacy_markdown_status")" \
     "$(json_escape "$legacy_config_status")"
   printf '}\n'
@@ -357,7 +357,6 @@ EXAMPLE_CONFIG="$SPEC_DIR/config.local.example.yaml"
 LOCAL_CONFIG="$SPEC_DIR/config.local.yaml"
 GITIGNORE="$REPO_ROOT/.gitignore"
 LEGACY_MARKDOWN="$REPO_ROOT/compound-engineering.local.md"
-LEGACY_CONFIG="$REPO_ROOT/.compound-engineering/config.local.yaml"
 
 [ -f "$TEMPLATE" ] || {
   if [ "$JSON_OUTPUT" = "yes" ]; then
@@ -372,13 +371,10 @@ example_status="skipped"
 local_status="skipped"
 gitignore_status="skipped"
 legacy_markdown_status="missing"
-legacy_config_status="missing"
+legacy_config_status="retired"
 
 if [ -f "$LEGACY_MARKDOWN" ]; then
   legacy_markdown_status="present"
-fi
-if [ -f "$LEGACY_CONFIG" ]; then
-  legacy_config_status="present"
 fi
 
 if [ "$REFRESH_EXAMPLE" = "yes" ]; then

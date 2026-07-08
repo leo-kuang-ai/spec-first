@@ -194,13 +194,13 @@ After testing:
 
 ```bash
 # Test with default scheme
-/spec-test-xcode
+spec-test-xcode
 
 # Test specific scheme
-/spec-test-xcode MyApp-Debug
+spec-test-xcode MyApp-Debug
 
 # Test after making changes
-/spec-test-xcode current
+spec-test-xcode current
 ```
 
 ## Integration with spec-code-review

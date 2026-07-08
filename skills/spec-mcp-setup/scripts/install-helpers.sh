@@ -683,18 +683,38 @@ process_agent_browser() {
     install_status="action-required"
     status="skipped"
     next_action="$agent_browser_full_install_command"
+    if [ "$MODE" = "install" ]; then
+      browser_install_queued="yes"
+      queue_parallel_task "agent-browser-browser-install" run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash -c '
+        run_npm_global_install_with_optional_sudo agent-browser@latest && "$@"
+      ' _ "${agent_browser_install_args[@]}"
+    fi
   fi
 
   if ! global_skill_installed "agent-browser"; then
     skill_status="action-required"
     status="skipped"
     next_action="$agent_browser_full_install_command"
+    if [ "$MODE" = "install" ]; then
+      skill_install_queued="yes"
+      queue_parallel_task "agent-browser-skill-install" run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash -c '
+        mirror_pairs=()
+        while IFS= read -r pair; do
+          mirror_pairs+=("$pair")
+        done < <(npm_mirror_env_pairs)
+        run_with_mirror_fallback "${mirror_pairs[@]}" -- npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y
+      '
+    fi
   fi
 
   if [ "$dependency_status" = "ready" ] && [ ! -f "$AGENT_BROWSER_INSTALL_MARKER" ]; then
     install_status="action-required"
     status="skipped"
     next_action="$agent_browser_full_install_command"
+    if [ "$MODE" = "install" ]; then
+      browser_install_queued="yes"
+      queue_parallel_task "agent-browser-browser-install" run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" "${agent_browser_install_args[@]}"
+    fi
   fi
 
   AGENT_BROWSER_INSTALL_COMMAND="$agent_browser_install_command"
@@ -1210,6 +1230,13 @@ graphify_instruction_file_for_platform() {
   esac
 }
 
+is_spec_first_source_repo() {
+  local repo_root="$1"
+  [ -f "$repo_root/package.json" ] || return 1
+  jq -e '.name == "spec-first"' "$repo_root/package.json" >/dev/null 2>&1 || return 1
+  [ -d "$repo_root/skills/spec-mcp-setup" ] && [ -f "$repo_root/AGENTS.md" ]
+}
+
 render_graphify_instruction_section() {
   case "$1" in
     claude|windows)
@@ -1257,6 +1284,10 @@ normalize_graphify_instruction_section() {
   local repo_root="$1"
   local platform="$2"
   local instruction_file target section
+  if is_spec_first_source_repo "$repo_root"; then
+    stage_log "provider:graphify" "instruction normalization skipped for spec-first source repo"
+    return 0
+  fi
   instruction_file="$(graphify_instruction_file_for_platform "$platform")"
   target="$repo_root/$instruction_file"
   [ -f "$target" ] || return 0

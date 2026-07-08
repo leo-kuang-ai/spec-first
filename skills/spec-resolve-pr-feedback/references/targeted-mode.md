@@ -17,10 +17,11 @@ gh api repos/OWNER/REPO/pulls/comments/COMMENT_ID \
   --jq '{node_id, path, line, body}'
 ```
 
-Map the comment to its thread ID using [../scripts/get-thread-for-comment](../scripts/get-thread-for-comment). Source commands use the skill source path so repo-root execution works and host transforms can rewrite it if this skill is delivered into a runtime:
+Map the comment to its thread ID using [../scripts/get-thread-for-comment](../scripts/get-thread-for-comment). Resolve the script through the loaded skill directory so repo-root execution and installed runtime execution both work:
 
 ```bash
-bash skills/spec-resolve-pr-feedback/scripts/get-thread-for-comment PR_NUMBER COMMENT_NODE_ID [OWNER/REPO]
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID [OWNER/REPO]
 ```
 
 The script paginates the top-level `reviewThreads` connection and returns the matching thread with full comment details. If it reports that nested thread comments are truncated, treat the missing target as incomplete evidence rather than confirmed absence.

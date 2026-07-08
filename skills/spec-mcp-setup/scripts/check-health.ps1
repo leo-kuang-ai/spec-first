@@ -283,7 +283,7 @@ $exampleConfig = 'skip'
 
 if ($insideGitRepo) {
   $legacyMarkdown = if (Test-Path -LiteralPath (Join-Path $repoRoot 'compound-engineering.local.md') -PathType Leaf) { 'present' } else { 'missing' }
-  $legacyConfig = if (Test-Path -LiteralPath (Join-Path $repoRoot '.compound-engineering/config.local.yaml') -PathType Leaf) { 'present' } else { 'missing' }
+  $legacyConfig = 'retired'
   $localConfigPath = Join-Path $repoRoot '.spec-first/config.local.yaml'
   $localConfig = if (Test-Path -LiteralPath $localConfigPath -PathType Leaf) { 'ok' } else { 'missing' }
   if ($localConfig -eq 'ok' -and (Test-CommandExists 'git')) {
@@ -312,8 +312,8 @@ $payload = [ordered]@{
     example_config_status = $exampleConfig
   }
   legacy = [ordered]@{
-    compound_engineering_markdown_status = $legacyMarkdown
-    compound_engineering_config_status = $legacyConfig
+    legacy_markdown_status = $legacyMarkdown
+    legacy_local_config_status = $legacyConfig
   }
 }
 $setupSnapshot = Get-SetupSnapshot -RepoRoot $(if ($insideGitRepo) { $repoRoot } else { '' })
@@ -347,7 +347,7 @@ if ($insideGitRepo) {
   if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated') {
     $projectConfigSummary = 'needs refresh'
   }
-  if ($localConfigGitignore -eq 'missing' -or $legacyMarkdown -eq 'present' -or $legacyConfig -eq 'present') {
+  if ($localConfigGitignore -eq 'missing' -or $legacyMarkdown -eq 'present') {
     $projectConfigSummary = 'action recommended'
   }
   Write-Host "    Project local config: $projectConfigSummary"
@@ -405,7 +405,7 @@ if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated') {
 Write-Host ''
 Write-Host 'Next:'
 if ($insideGitRepo) {
-  if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated' -or $localConfigGitignore -eq 'missing' -or $legacyMarkdown -eq 'present' -or $legacyConfig -eq 'present') {
+  if ($exampleConfig -eq 'missing' -or $exampleConfig -eq 'outdated' -or $localConfigGitignore -eq 'missing' -or $legacyMarkdown -eq 'present') {
     Write-Host '  1. spec-mcp-setup --project-config'
     Write-Host '  2. spec-mcp-setup --verify-only'
     Write-Host '  3. spec-mcp-setup --only graphify  # optional provider setup'

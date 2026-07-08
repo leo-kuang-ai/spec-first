@@ -76,8 +76,21 @@ function Get-InstallSuggestion {
 	      if (-not [string]::IsNullOrWhiteSpace($linuxCommand)) { return $linuxCommand }
 	      return $fnmFallback
 	    }
-	    '^(uv|uvx):windows$' { return '$script = Join-Path $env:TEMP ''uv-install.ps1''; Invoke-WebRequest -Uri https://astral.sh/uv/install.ps1 -OutFile $script; Write-Output "Review $script, then run: powershell -NoProfile -ExecutionPolicy ByPass -File $script"' }
+    '^(uv|uvx):windows$' { return '$script = Join-Path $env:TEMP ''uv-install.ps1''; Invoke-WebRequest -Uri https://astral.sh/uv/install.ps1 -OutFile $script; Write-Output "Review $script, then run: powershell -NoProfile -ExecutionPolicy ByPass -File $script"' }
     '^(uv|uvx):' { return '$script = Join-Path ([System.IO.Path]::GetTempPath()) ''uv-install.sh''; Invoke-WebRequest -Uri https://astral.sh/uv/install.sh -OutFile $script; Write-Output "Review $script, then run: sh $script"' }
+    '^jq:windows$' { return 'winget install jqlang.jq' }
+    '^jq:macos$' { return 'brew install jq' }
+    '^jq:(linux|wsl)$' {
+      $linuxCommand = Get-LinuxPackageInstallCommand -AptPackage 'jq' -DnfPackage 'jq' -YumPackage 'jq' -PacmanPackage 'jq' -ApkPackage 'jq'
+      if (-not [string]::IsNullOrWhiteSpace($linuxCommand)) { return $linuxCommand }
+      return 'Install jq from https://jqlang.github.io/jq/'
+    }
+    '^python3:macos$' { return 'brew install python' }
+    '^python3:(linux|wsl)$' {
+      $linuxCommand = Get-LinuxPackageInstallCommand -AptPackage 'python3' -DnfPackage 'python3' -YumPackage 'python3' -PacmanPackage 'python' -ApkPackage 'python3'
+      if (-not [string]::IsNullOrWhiteSpace($linuxCommand)) { return $linuxCommand }
+      return 'Install Python from https://www.python.org/downloads/'
+    }
     '^git:windows$' { return 'winget install Git.Git' }
     '^git:macos$' { return 'xcode-select --install or brew install git' }
     '^git:(linux|wsl)$' {
@@ -113,6 +126,8 @@ $dependencies = [ordered]@{
   npx = New-DependencyFact 'npx' $true $os
   uv = New-DependencyFact 'uv' $false $os
   uvx = New-DependencyFact 'uvx' $false $os
+  jq = New-DependencyFact 'jq' $false $os
+  python3 = New-DependencyFact 'python3' $false $os '--version'
   git = New-DependencyFact 'git' $false $os
 }
 

@@ -243,7 +243,7 @@ describe('browser helper tool contracts', () => {
     expect(payload.tools.every((tool) => tool.required === true)).toBe(true);
 
     expect(payload.project).toHaveProperty('local_config_status');
-    expect(payload.legacy).toHaveProperty('compound_engineering_config_status');
+    expect(payload.legacy).toHaveProperty('legacy_local_config_status', 'retired');
   });
 
   test('check-health human output is lightweight diagnose-first', () => {

@@ -347,6 +347,12 @@ if [ "$host" = "codex" ]; then
   done < <(jq -r 'keys[]' <<<"$targets_json")
 fi
 
+if [ "$(jq 'length' <<<"$higher_precedence_targets_json")" -gt 0 ]; then
+  precedence_blocked=true
+  precedence_blocking_scope="$(jq -r '.[0].key' <<<"$higher_precedence_targets_json")"
+  precedence_blocking_path="$(jq -r '.[0].config_path' <<<"$higher_precedence_targets_json")"
+fi
+
 jq -n \
   --arg host "$host" \
   --arg display_name "$display_name" \

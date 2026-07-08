@@ -540,7 +540,7 @@ The Phase 3 blocks below each set `SKILL_DIR` inline as well (the loaded `spec-o
 1. Create experiment worktree:
    ```bash
    SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
-   WORKTREE_PATH=$(bash "$SKILL_DIR/scripts/experiment-worktree.sh" create "<spec_name>" <exp_index> "optimize/<spec_name>" <shared_files...>)  # creates optimize-exp/<spec_name>/exp-<NNN>
+   WORKTREE_PATH=$(bash "$SKILL_DIR/scripts/experiment-worktree.sh" create "<spec_name>" <exp_index> "optimize/<spec_name>" <shared_files...>)  # creates .worktrees/optimize-<spec_name>-exp-<NNN>/
    ```
 2. Apply port parameterization if configured (set env vars for the measurement script)
 3. Fill the experiment prompt template (`references/experiment-prompt-template.md`) with:

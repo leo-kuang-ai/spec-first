@@ -591,6 +591,25 @@ if (-not (Test-GlobalSkill 'agent-browser')) {
   $agentBrowserSkillStatus = 'action-required'
   $agentBrowserStatus = 'skipped'
   $agentBrowserNextAction = $agentBrowserFullInstallCommand
+  if ($mode -eq 'install') {
+    $agentBrowserSkillInstallQueued = $true
+    Start-ParallelCommandTask -Name 'agent-browser-skill-install' -ScriptBlock {
+      $global:LASTEXITCODE = 0
+      npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y
+      if ($LASTEXITCODE -eq 0) { return }
+      $previousRegistry = [Environment]::GetEnvironmentVariable('NPM_CONFIG_REGISTRY')
+      try {
+        Set-Item -Path env:NPM_CONFIG_REGISTRY -Value 'https://registry.npmmirror.com'
+        npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y
+      } finally {
+        if ($null -eq $previousRegistry) {
+          Remove-Item -Path env:NPM_CONFIG_REGISTRY -ErrorAction SilentlyContinue
+        } else {
+          Set-Item -Path env:NPM_CONFIG_REGISTRY -Value $previousRegistry
+        }
+      }
+    } -Tasks $parallelTasks
+  }
 }
 
 if (-not (Test-CommandExists 'agent-browser')) {
@@ -598,12 +617,76 @@ if (-not (Test-CommandExists 'agent-browser')) {
   $agentBrowserInstallStatus = 'action-required'
   $agentBrowserStatus = 'skipped'
   $agentBrowserNextAction = $agentBrowserFullInstallCommand
+  if ($mode -eq 'install') {
+    $agentBrowserBrowserInstallQueued = $true
+    if ($platform -eq 'linux') {
+      Start-ParallelCommandTask -Name 'agent-browser-browser-install' -ScriptBlock {
+        $previousCi = $env:CI
+        $env:CI = 'true'
+        try {
+          npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error
+          if ($LASTEXITCODE -ne 0) {
+            $previousRegistry = [Environment]::GetEnvironmentVariable('NPM_CONFIG_REGISTRY')
+            try {
+              Set-Item -Path env:NPM_CONFIG_REGISTRY -Value 'https://registry.npmmirror.com'
+              npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error
+            } finally {
+              if ($null -eq $previousRegistry) {
+                Remove-Item -Path env:NPM_CONFIG_REGISTRY -ErrorAction SilentlyContinue
+              } else {
+                Set-Item -Path env:NPM_CONFIG_REGISTRY -Value $previousRegistry
+              }
+            }
+          }
+          if ($LASTEXITCODE -eq 0) { agent-browser install --with-deps }
+        } finally {
+          $env:CI = $previousCi
+        }
+      } -Tasks $parallelTasks
+    } else {
+      Start-ParallelCommandTask -Name 'agent-browser-browser-install' -ScriptBlock {
+        $previousCi = $env:CI
+        $env:CI = 'true'
+        try {
+          npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error
+          if ($LASTEXITCODE -ne 0) {
+            $previousRegistry = [Environment]::GetEnvironmentVariable('NPM_CONFIG_REGISTRY')
+            try {
+              Set-Item -Path env:NPM_CONFIG_REGISTRY -Value 'https://registry.npmmirror.com'
+              npm install -g agent-browser@latest --no-audit --no-fund --loglevel=error
+            } finally {
+              if ($null -eq $previousRegistry) {
+                Remove-Item -Path env:NPM_CONFIG_REGISTRY -ErrorAction SilentlyContinue
+              } else {
+                Set-Item -Path env:NPM_CONFIG_REGISTRY -Value $previousRegistry
+              }
+            }
+          }
+          if ($LASTEXITCODE -eq 0) { agent-browser install }
+        } finally {
+          $env:CI = $previousCi
+        }
+      } -Tasks $parallelTasks
+    }
+  }
 }
 
 if ($agentBrowserDependencyStatus -eq 'ready' -and -not (Test-Path $agentBrowserInstallMarker)) {
   $agentBrowserInstallStatus = 'action-required'
   $agentBrowserStatus = 'skipped'
   $agentBrowserNextAction = $agentBrowserFullInstallCommand
+  if ($mode -eq 'install') {
+    $agentBrowserBrowserInstallQueued = $true
+    if ($platform -eq 'linux') {
+      Start-ParallelCommandTask -Name 'agent-browser-browser-install' -ScriptBlock {
+        agent-browser install --with-deps
+      } -Tasks $parallelTasks
+    } else {
+      Start-ParallelCommandTask -Name 'agent-browser-browser-install' -ScriptBlock {
+        agent-browser install
+      } -Tasks $parallelTasks
+    }
+  }
 }
 
 Add-HelperFact -HelperTools $helperTools -Id 'agent-browser' -Type 'helper' -DependencyStatus $agentBrowserDependencyStatus -InstallStatus $agentBrowserInstallStatus -SkillStatus $agentBrowserSkillStatus -Result $agentBrowserStatus -NextAction $agentBrowserNextAction -BaselineBlocking $agentBrowserBaselineBlocking -InstallSource $agentBrowserInstallSource -MirrorUsed $agentBrowserMirrorUsed -BrowserCapabilityDemandSignals $agentBrowserDemandSignals
@@ -1342,6 +1425,20 @@ function Get-GraphifyInstructionFileName {
   return 'AGENTS.md'
 }
 
+function Test-SpecFirstSourceRepo {
+  param([string]$RepoRoot)
+  $packageJsonPath = Join-Path $RepoRoot 'package.json'
+  if (-not (Test-Path -LiteralPath $packageJsonPath -PathType Leaf)) { return $false }
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot 'skills/spec-mcp-setup') -PathType Container)) { return $false }
+  if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot 'AGENTS.md') -PathType Leaf)) { return $false }
+  try {
+    $packageJson = Get-Content -LiteralPath $packageJsonPath -Raw | ConvertFrom-Json
+    return ([string]$packageJson.name -eq 'spec-first')
+  } catch {
+    return $false
+  }
+}
+
 function Get-GraphifyInstructionSection {
   param([string]$PlatformName)
   if (@('claude', 'windows') -contains $PlatformName) {
@@ -1387,6 +1484,7 @@ function Normalize-GraphifyInstructionSection {
     [string]$RepoRoot,
     [string]$PlatformName
   )
+  if (Test-SpecFirstSourceRepo -RepoRoot $RepoRoot) { return }
   $instructionFile = Get-GraphifyInstructionFileName -PlatformName $PlatformName
   $target = Join-Path $RepoRoot $instructionFile
   if (-not (Test-Path -LiteralPath $target -PathType Leaf)) { return }

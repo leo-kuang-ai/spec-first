@@ -30,37 +30,37 @@ CE 是迁移能力的语义基准：
 
 以当前迁移映射作为工作清单：
 
-| CE skill | spec-first target | 审查类型 | 处理状态 | 是否完成审查 |
-|---|---|---|---|---|
-| `ce-brainstorm` | `spec-brainstorm` | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
-| `ce-code-review` | `spec-code-review` | 直接映射，persona/local asset 迁移关键 |  |  |
-| `ce-commit` | `spec-commit` | 直接映射，低复杂度 | 已完成 | 已审查 |
-| `ce-commit-push-pr` | `spec-commit-push-pr` | 直接映射，低复杂度 | 已完成 | 已审查 |
-| `ce-compound` | `spec-compound` | 直接映射，knowledge/source evidence 关键 |  |  |
-| `ce-compound-refresh` | `spec-compound-refresh` | 直接映射，learning lifecycle 关键 |  |  |
-| `ce-debug` | `spec-debug` | 直接映射，root-cause/evidence flow 关键 |  |  |
-| `ce-doc-review` | `spec-doc-review` | 直接映射，过时 contract 风险最高 |  |  |
-| `ce-dogfood` | `spec-dogfood` | 直接映射，browser QA artifact contract 关键 | 已完成 | 已审查 |
-| `ce-explain` | `spec-explain` | 直接映射，低/中复杂度 | 已完成 | 已审查 |
-| `ce-ideate` | `spec-ideate` | 直接映射，与 brainstorm 的边界关键 |  |  |
-| `ce-optimize` | `spec-optimize` | 直接映射，metric/eval loop 关键 | 已完成 | 已审查 |
-| `ce-plan` | `spec-plan` | 直接映射，下游 contract 关键 |  |  |
-| `ce-polish` | `spec-polish` | 直接映射，browser/dev-server 行为关键 | 已完成 | 已审查 |
-| `ce-pov` | `spec-pov` | 直接映射，verdict routing 关键 | 已完成 | 已审查 |
-| `ce-product-pulse` | `spec-product-pulse` | 直接映射，signal/config 行为关键 |  |  |
-| `ce-promote` | `spec-promote` | 直接映射，低复杂度 | 已完成 | 已审查 |
-| `ce-proof` | `spec-proof` | 直接映射，host-provided/HITL surface 关键 | 已完成 | 已审查 |
-| `ce-resolve-pr-feedback` | `spec-resolve-pr-feedback` | 直接映射，PR feedback mutation 边界关键 | 已完成 | 已审查 |
-| `ce-riffrec-feedback-analysis` | `spec-riffrec-feedback-analysis` | 直接映射，media bundle 处理关键 |  |  |
-| `ce-setup` | `spec-mcp-setup` | 近似映射，必须记录 divergence | 已完成 |  |
-| `ce-simplify-code` | `spec-simplify-code` | 直接映射，behavior-preserving 边界关键 | 已完成 | 已审查 |
-| `ce-strategy` | `spec-strategy` | 直接映射，product grounding 关键 | 已完成 | 已审查 |
-| `ce-sweep` | `spec-sweep` | 直接映射，feedback-source workflow 关键 |  |  |
-| `ce-test-browser` | `spec-test-browser` | 直接映射，browser helper 边界关键 | 已完成 | 已审查 |
-| `ce-test-xcode` | `spec-test-xcode` | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
-| `ce-work` | `spec-work` | 直接映射，execution gate 关键 |  |  |
-| `ce-worktree` | `spec-worktree` | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
-| `lfg` | `spec-lfg` | 直接映射，full pipeline 关键 |  |  |
+| CE skill | spec-first target | skill 功能说明 | 审查类型 | 处理状态 | 是否完成审查 |
+|---|---|---|---|---|---|
+| `ce-brainstorm` | `spec-brainstorm` | 需求发现与 WHAT 澄清，产出可交给 PRD/plan 的需求材料 | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
+| `ce-code-review` | `spec-code-review` | 审查代码 diff / PR，识别缺陷、风险、回归和测试缺口 | 直接映射，persona/local asset 迁移关键 |  |  |
+| `ce-commit` | `spec-commit` | 生成并执行受控提交，维护 commit message 与验证摘要 | 直接映射，低复杂度 | 已完成 | 已审查 |
+| `ce-commit-push-pr` | `spec-commit-push-pr` | 提交、推送并创建或更新 PR 的交付 helper | 直接映射，低复杂度 | 已完成 | 已审查 |
+| `ce-compound` | `spec-compound` | 将已验证的问题解决经验沉淀为可复用知识 | 直接映射，knowledge/source evidence 关键 |  |  |
+| `ce-compound-refresh` | `spec-compound-refresh` | 刷新、合并或淘汰过期的 durable knowledge | 直接映射，learning lifecycle 关键 |  |  |
+| `ce-debug` | `spec-debug` | 系统化复现、定位根因并修复 bug | 直接映射，root-cause/evidence flow 关键 |  |  |
+| `ce-doc-review` | `spec-doc-review` | 审查需求、计划、任务包或 Markdown planning artifact | 直接映射，过时 contract 风险最高 |  |  |
+| `ce-dogfood` | `spec-dogfood` | 对当前分支执行 hands-off 浏览器用户流 QA | 直接映射，browser QA artifact contract 关键 | 已完成 | 已审查 |
+| `ce-explain` | `spec-explain` | 将概念、diff 或近期工作整理成面向用户的解释材料 | 直接映射，低/中复杂度 | 已完成 | 已审查 |
+| `ce-ideate` | `spec-ideate` | 生成并评估项目上下文内的改进想法 | 直接映射，与 brainstorm 的边界关键 |  |  |
+| `ce-optimize` | `spec-optimize` | 围绕可测指标运行迭代优化循环 | 直接映射，metric/eval loop 关键 | 已完成 | 已审查 |
+| `ce-plan` | `spec-plan` | 将明确目标或 PRD 转成可执行工程计划 | 直接映射，下游 contract 关键 |  |  |
+| `ce-polish` | `spec-polish` | 启动应用、浏览器检查并迭代 UI / UX polish | 直接映射，browser/dev-server 行为关键 | 已完成 | 已审查 |
+| `ce-pov` | `spec-pov` | 基于项目上下文对外部输入给出明确 verdict | 直接映射，verdict routing 关键 | 已完成 | 已审查 |
+| `ce-product-pulse` | `spec-product-pulse` | 从配置的信号源生成产品脉搏报告 | 直接映射，signal/config 行为关键 |  |  |
+| `ce-promote` | `spec-promote` | 为已交付功能起草发布或推广文案 | 直接映射，低复杂度 | 已完成 | 已审查 |
+| `ce-proof` | `spec-proof` | 人工证明 / HITL 证据收集与验证辅助 | 直接映射，host-provided/HITL surface 关键 | 已完成 | 已审查 |
+| `ce-resolve-pr-feedback` | `spec-resolve-pr-feedback` | 处理 PR review feedback 并维护变更边界 | 直接映射，PR feedback mutation 边界关键 | 已完成 | 已审查 |
+| `ce-riffrec-feedback-analysis` | `spec-riffrec-feedback-analysis` | 分析 Riffrec 反馈录制包、会话和事件 | 直接映射，media bundle 处理关键 |  |  |
+| `ce-setup` | `spec-mcp-setup` | 诊断并修复 spec-first 运行时、MCP 与 helper readiness | 近似映射，必须记录 divergence | 已完成 | 已审查 |
+| `ce-simplify-code` | `spec-simplify-code` | 在保持行为不变的前提下简化近期改动代码 | 直接映射，behavior-preserving 边界关键 | 已完成 | 已审查 |
+| `ce-strategy` | `spec-strategy` | 创建或更新项目战略文档与方向判断 | 直接映射，product grounding 关键 | 已完成 | 已审查 |
+| `ce-sweep` | `spec-sweep` | 扫描反馈源并生成 acknowledge / analysis / recommendation | 直接映射，feedback-source workflow 关键 |  |  |
+| `ce-test-browser` | `spec-test-browser` | 浏览器测试 helper，辅助页面交互验证 | 直接映射，browser helper 边界关键 | 已完成 | 已审查 |
+| `ce-test-xcode` | `spec-test-xcode` | XcodeBuildMCP 预检与 iOS / Xcode 验证辅助 | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
+| `ce-work` | `spec-work` | 执行既定 plan / task pack / concrete implementation request | 直接映射，execution gate 关键 |  |  |
+| `ce-worktree` | `spec-worktree` | 内部 worktree helper，支持隔离并行工程任务 | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
+| `lfg` | `spec-lfg` | 从计划到绿色 PR 的完整 hands-off 工程流水线 | 直接映射，full pipeline 关键 |  |  |
 
 spec-first-only skills 不做 CE 直接等价审查，但可用于解释合理 divergence：
 
@@ -368,10 +368,10 @@ done
 | `agent-browser` optional check | `scripts/check-health` | browser helper readiness：检测 CLI、runtime marker、global skill / host 可用性，缺失时给安装命令 | 已覆盖 | 不应自动安装；仅 CLI 存在但 runtime marker / skill 不完整时不能标为 ready。默认 setup 和 helper install 路径都只给 next action，不再通过 env gate 触发自动安装 | `spec-dogfood`、`spec-polish`、`spec-test-browser`、`spec-code-review` 浏览器证据路径 |
 | `gh`、`jq`、`ast-grep`、`ffmpeg` optional checks | `scripts/check-health` | helper registry 与 baseline readiness 分层；`ast-grep`、`ffmpeg` 等作为 helper/provider capability facts 输出 | 已覆盖并扩展 | 保留 CE 的“诊断而非批量安装”姿态；同时区分 required baseline、optional helper、provider-specific dependency，避免所有缺失都变阻断 | `spec-sweep`、`spec-riffrec-feedback-analysis`、`spec-rule-miner`、review/debug workflows |
 | `.compound-engineering/config.local.example.yaml` | `references/config-template.yaml` | `.spec-first/config.local.example.yaml` | 已覆盖 | 只迁移语义能力，不迁移文件名；example 是 project-local bootstrap 产物，可由 setup 刷新 | `verify-tools.*` project-local config status、config template contract tests |
-| 可选 `.compound-engineering/config.local.yaml` | `ce-setup/SKILL.md` | 可选 `.spec-first/config.local.yaml` | 已覆盖 | 仍是本地私有配置，不是 team-shared truth；setup 可创建或提示创建，但不应把它当作 source-of-truth | `spec-sweep`、`spec-product-pulse`、`spec-promote` 等读取 local config 的 workflow |
-| `.compound-engineering/*.local.yaml` gitignore 规则 | `scripts/check-health` | `.spec-first/*.local.yaml` gitignore 规则 | 已覆盖 | 保留“local config 不入库”的确定性保护；只写 spec-first namespace | gitignore policy / project-local config tests |
+| 可选 `.compound-engineering/config.local.yaml` | `ce-setup/SKILL.md` | 可选 `.spec-first/config.local.yaml` | 已覆盖 | active local config 只认 `.spec-first/config.local.yaml`；旧路径已 retired，不作为 setup 检查对象或 persisted preference | `spec-sweep`、`spec-product-pulse`、`spec-promote` 等读取 local config 的 workflow |
+| `.compound-engineering/*.local.yaml` gitignore 规则 | `scripts/check-health` | `.spec-first/*.local.yaml` gitignore 规则 | 已覆盖 | 保留“local config 不入库”的确定性保护；只写 spec-first namespace，不再检查旧 namespace ignore 状态 | gitignore policy / project-local config tests |
 | `compound-engineering.local.md` legacy cleanup | `scripts/check-health` | legacy markdown signal / manual cleanup next action | 部分覆盖，按 spec-first 降级 | 不作为 active setup 产物；只作为历史残留信号提示人工确认，避免 setup 自动删除用户文档 | `check-health` legacy signal、文档审查记录 |
-| `.compound-engineering/config.local.yaml` 未被 gitignore 的风险提示 | `scripts/check-health` | legacy local config signal；active 保护转为 `.spec-first/*.local.yaml` | 部分覆盖，按 spec-first 降级 | 旧路径不迁移为 active config；如存在，仅提示用户确认是否仍需保留。active 防泄漏只针对 `.spec-first` local config | `check-health` / `.ps1` legacy signal、gitignore policy |
+| `.compound-engineering/config.local.yaml` 未被 gitignore 的风险提示 | `scripts/check-health` | retired；active 保护转为 `.spec-first/*.local.yaml` | 已退役 | 旧路径不迁移、不检查、不作为 setup 事实；active 防泄漏只针对 `.spec-first/config.local.yaml` 与 `.spec-first/*.local.yaml` | gitignore policy / project-local config tests |
 | CE config template keys | `references/config-template.yaml` | `skills/spec-mcp-setup/references/config-template.yaml` active local config keys | 已覆盖并重映射 | 迁移为 spec-first 当前消费者需要的 key；已裁决 retired 的 key 不作为 persisted setup preference，但后续 skill 仍使用的能力必须在 spec-first config 中有对应表达 | config template contract tests、后续 workflow local config reads |
 | work delegation keys | `references/config-template.yaml` | spec-first 下游 execution workflow consumer-gated delegation config surface | 已覆盖 | 不是全局 active setup 偏好；setup 只暴露和保护 key，不因 key 存在自动委托或改变 host runtime。只有 downstream execution workflow 明确实现 consumer 与测试后才读取 | `spec-work` / execution workflows 的 consumer-side gate |
 | plan skip scoping confirm | `references/config-template.yaml` | spec-first 下游 planning workflow consumer-gated scoping-confirmation config surface | 已覆盖，但 setup 阶段 inert | 不是 setup 自身的 persisted behavior；setup 只暴露和保护 key，不因 key 存在自动跳过确认。是否读取、何时跳过必须由具体 planning workflow 在当次上下文中裁决 | `spec-plan` 入口语义、scoping confirmation 行为与 consumer-side tests |

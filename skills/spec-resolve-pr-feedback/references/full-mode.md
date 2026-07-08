@@ -9,10 +9,11 @@ If no PR number was provided, detect from the current branch:
 gh pr view --json number -q .number
 ```
 
-Then fetch all feedback using the GraphQL script at [../scripts/get-pr-comments](../scripts/get-pr-comments). Source commands use the skill source path so repo-root execution works and host transforms can rewrite it if this skill is delivered into a runtime:
+Then fetch all feedback using the GraphQL script at [../scripts/get-pr-comments](../scripts/get-pr-comments). Resolve the script through the loaded skill directory so repo-root execution and installed runtime execution both work:
 
 ```bash
-bash skills/spec-resolve-pr-feedback/scripts/get-pr-comments PR_NUMBER
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/get-pr-comments" PR_NUMBER
 ```
 
 Returns a JSON object with these keys:
@@ -191,14 +192,16 @@ reply_file=$(mktemp)
 cat > "$reply_file" <<'EOF'
 REPLY_TEXT
 EOF
-bash skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread THREAD_ID < "$reply_file"
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/reply-to-pr-thread" THREAD_ID < "$reply_file"
 rm -f "$reply_file"
 ```
 
 Then resolve:
 
 ```bash
-bash skills/spec-resolve-pr-feedback/scripts/resolve-pr-thread THREAD_ID
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/resolve-pr-thread" THREAD_ID
 ```
 
 For PR comments and review bodies:
@@ -219,7 +222,8 @@ Include enough quoted context in the reply so the reader can follow which commen
 Re-fetch feedback to confirm resolution:
 
 ```bash
-bash skills/spec-resolve-pr-feedback/scripts/get-pr-comments PR_NUMBER
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>"
+bash "$SKILL_DIR/scripts/get-pr-comments" PR_NUMBER
 ```
 
 The `review_threads` array should be empty except for `needs-human` items.

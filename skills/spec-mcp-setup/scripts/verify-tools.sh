@@ -447,7 +447,7 @@ write_setup_scenario_fingerprint() {
 }
 
 compute_project_local_config_status() {
-  local repo_root template spec_dir example_config local_config gitignore legacy_markdown legacy_config
+  local repo_root template spec_dir example_config local_config gitignore legacy_markdown
   local example_status example_next local_status local_next gitignore_status gitignore_next legacy_markdown_status legacy_markdown_next legacy_config_status legacy_config_next
 
   repo_root="$(jq -r '.target_root // .selected_repo_root // .selected_folder_root // .repo_root // empty' "$MARKER_PATH" 2>/dev/null || true)"
@@ -471,7 +471,6 @@ compute_project_local_config_status() {
   local_config="$spec_dir/config.local.yaml"
   gitignore="$repo_root/.gitignore"
   legacy_markdown="$repo_root/compound-engineering.local.md"
-  legacy_config="$repo_root/.compound-engineering/config.local.yaml"
 
   example_status="missing"
   example_next="bash \"$SCRIPT_DIR/bootstrap-project-config.sh\" --repo \"$repo_root\" --refresh-example"
@@ -511,12 +510,8 @@ compute_project_local_config_status() {
     legacy_markdown_next="manual review; delete only after explicit approval"
   fi
 
-  legacy_config_status="missing"
+  legacy_config_status="retired"
   legacy_config_next=""
-  if [ -f "$legacy_config" ]; then
-    legacy_config_status="present"
-    legacy_config_next="manual review; do not migrate old path automatically"
-  fi
 
   jq -n \
     --arg repo_root "$repo_root" \
@@ -532,7 +527,7 @@ compute_project_local_config_status() {
     --arg legacy_markdown_path "$legacy_markdown" \
     --arg legacy_markdown_status "$legacy_markdown_status" \
     --arg legacy_markdown_next "$legacy_markdown_next" \
-    --arg legacy_config_path "$legacy_config" \
+    --arg legacy_config_path "" \
     --arg legacy_config_status "$legacy_config_status" \
     --arg legacy_config_next "$legacy_config_next" \
     '{
