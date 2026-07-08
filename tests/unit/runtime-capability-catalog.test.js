@@ -75,18 +75,10 @@ describe('runtime capability catalog', () => {
     expect(catalog).toContain('advisory_failures[]');
     expect(catalog).toContain('does not run agents or workflows');
     expect(catalog).toContain('## Release Package Evidence');
-    expect(catalog).toContain('package-content-manifest.json');
-    expect(catalog).toContain('init-claude-programmatic.log');
-    expect(catalog).toContain('init-codex-programmatic.log');
-    expect(catalog).toContain('init-cursor-programmatic.log');
-    expect(catalog).toContain('init-kiro-programmatic.log');
-    expect(catalog).toContain('init-qoder-programmatic.log');
-    expect(catalog).toContain('cursor-doctor-programmatic.log');
-    expect(catalog).toContain('cursor-clean-programmatic.log');
-    expect(catalog).toContain('cursor-loader-evidence.log');
-    expect(catalog).toContain('release-artifact-summary.json');
-    expect(catalog).toContain('Cursor programmatic init/doctor/clean proves generated-runtime preview assets, not Cursor skill loader/user journey support');
-    expect(catalog).toContain('no dashboard, history store, GitHub Release automation, or release decision engine');
+    expect(catalog).toContain('`tests/smoke/install-tarball.sh` output');
+    expect(catalog).toContain('Local npm tarball packaging/install smoke');
+    expect(catalog).toContain('no CI matrix');
+    expect(catalog).toContain('no generated release evidence artifacts');
   });
 
   test('catalog exposes workflow artifact contracts without claiming workflow integration', () => {

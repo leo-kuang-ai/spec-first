@@ -42,13 +42,11 @@ describe('website sync release contract', () => {
     expect(publisher).toContain("runNpmChecked(['run', 'test:release:website'])");
   });
 
-  test('website sync script reuses the non-shell npm CLI runner for Windows portability', () => {
+  test('website sync script runs npm content audit directly', () => {
     const script = read(WEBSITE_SYNC_SCRIPT_PATH);
 
-    expect(script).toContain("const { runNpm } = require('./npm-install-matrix-smoke');");
     expect(script).toContain("runNpmChecked(['run', 'content:audit']");
-    expect(script).toContain('runNpm(args,');
-    expect(script).not.toContain("spawnSync('npm'");
+    expect(script).toContain("spawnSync('npm', args");
   });
 
   test('website sync script runs content audit with the package repo as SPEC_FIRST_SOURCE_DIR', () => {

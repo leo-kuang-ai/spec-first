@@ -88,7 +88,6 @@ describe('package install contracts', () => {
     expect(pkg.files).toContain('docs/contracts/provider-tools-registry.schema.json');
     expect(pkg.files).toContain('docs/contracts/knowledge/');
     expect(pkg.files).toContain('docs/contracts/quality-gates/');
-    expect(pkg.files).toContain('docs/contracts/release-package-evidence.schema.json');
     expect(pkg.files).toContain('docs/contracts/verifiers/');
     expect(pkg.files).toContain('docs/contracts/website-sync-contract.md');
     expect(pkg.files).toContain('docs/contracts/workflows/');
@@ -97,7 +96,6 @@ describe('package install contracts', () => {
     expect(pkg.files).toContain('scripts/generate-runtime-capability-catalog.js');
     expect(pkg.files).toContain('scripts/lint-skill-entrypoints.config.json');
     expect(pkg.files).toContain('scripts/lint-skill-entrypoints.js');
-    expect(pkg.files).toContain('scripts/npm-install-matrix-smoke.js');
     expect(pkg.files).toContain('scripts/release-publish.cjs');
     expect(pkg.files).toContain('scripts/run-ai-dev-benchmark-fixtures.js');
     expect(pkg.files).toContain('scripts/run-ai-dev-quality-gate.js');
@@ -292,7 +290,7 @@ describe('package install contracts', () => {
     expect(runnerSource).toContain("process.platform === 'win32'");
     expect(runnerSource).toContain('SPEC_FIRST_FORCE_POSIX_TESTS');
     expect(runnerSource).toContain('skip POSIX shell test on native Windows');
-    expect(runnerSource).toContain("runNode(['scripts/npm-install-matrix-smoke.js'])");
+    expect(runnerSource).toContain("runBash('tests/smoke/install-tarball.sh')");
     expect(runnerSource).toContain("node_modules', 'jest', 'bin', 'jest.js'");
     expect(runnerSource).toContain('shell: false');
   });

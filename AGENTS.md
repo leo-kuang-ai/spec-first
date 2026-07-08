@@ -269,7 +269,7 @@ Rules:
 - 架构/prompt/workflow/contract 或 source/runtime 判断前按需读取 `docs/10-prompt/结构化项目角色契约.md`;scripts/tools 只产 deterministic facts,LLM 做语义路由判断
 - **反合理化红旗**(出现这些念头即停):「先改个文件就好」→ 明确小改动可直接做;规模/风险不明、根因未定或触及架构/contract/多文件时先路由;「只是个快速架构/prompt 改动」→ 架构/prompt/workflow/contract 改动算 substantial;「得先看一堆文件再决定」→ 只做最小事实核查,已清晰则直接路由;「该评审但我口头答就行」→ 评审目标具体时用 code-review/doc-review;「helper skill 存在所以该暴露」→ 只有公开 workflow 是用户入口,internal helper 隐藏
 - Workflow 入口统一使用同名 `spec-*`
-- 不要把 `using-spec-first` 本身当作 command-backed workflow；不要直接暴露 internal-only skills,例如 `git-worktree`
+- 不要把 `using-spec-first` 本身当作 command-backed workflow；不要直接暴露 internal-only skills,例如 `spec-worktree`
 - Codex：进入公开 `spec-*` workflow 前可 best-effort 运行 `spec-first startup-reminder --codex`；失败/空输出不阻塞，只提示在终端运行 `spec-first update`，bounded subagents、leaf reviewers、worker agents 不运行
 - Codex：公开 `spec-*` workflow 调用只授权 workflow 本身，不自动授权 `spawn_agent`；例如 `spec-doc-review` 缺少 subagents/personas/delegated/parallel 明示授权时走 documented fallback 并记录 `dispatch_authorization_missing`，需要多 persona/subagent review 时请在请求中明说 `subagents`/`personas`
 <!-- spec-first:bootstrap:end -->

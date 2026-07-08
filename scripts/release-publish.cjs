@@ -2,7 +2,7 @@
 
 const { readFileSync, writeFileSync } = require('node:fs');
 const path = require('node:path');
-const { runNpm } = require('./npm-install-matrix-smoke');
+const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
 const packageJsonPath = path.join(repoRoot, 'package.json');
@@ -21,14 +21,19 @@ function writePackageJson(pkg) {
 }
 
 function runNpmChecked(args) {
-  try {
-    runNpm(args, {
-      cwd: repoRoot,
-      stdio: 'inherit',
-    });
-  } catch (error) {
-    const wrapped = new Error(`npm ${args.join(' ')} 运行失败: ${error.message}`);
-    wrapped.status = Number.isInteger(error.status) ? error.status : 1;
+  const result = spawnSync('npm', args, {
+    cwd: repoRoot,
+    stdio: 'inherit',
+    windowsHide: true,
+  });
+  if (result.error) {
+    const wrapped = new Error(`npm ${args.join(' ')} 运行失败: ${result.error.message}`);
+    wrapped.status = 1;
+    throw wrapped;
+  }
+  if (result.status !== 0) {
+    const wrapped = new Error(`npm ${args.join(' ')} 运行失败`);
+    wrapped.status = Number.isInteger(result.status) ? result.status : 1;
     throw wrapped;
   }
 }
@@ -114,7 +119,6 @@ try {
     console.log('\n▸ 预览发布 tarball 内容...');
     // pnpm 不支持 pack --dry-run，直接用 npm 二进制避免 npm_execpath 指向 pnpm 时出错
     try {
-      const { spawnSync } = require('node:child_process');
       spawnSync('npm', ['pack', '--dry-run'], { cwd: repoRoot, stdio: 'inherit' });
     } catch (_) {
       console.log('  (tarball 预览跳过：npm pack --dry-run 不可用)');

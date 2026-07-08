@@ -292,7 +292,7 @@ function buildRuntimeCapabilityCatalog() {
     '',
     '| Command | Artifacts | Evidence | Boundary |',
     '|---|---|---|---|',
-    '| `npm run test:release:install` / npm install matrix | `.spec-first/ci/npm-install-matrix/<runner>/package-content-manifest.json`, `init-claude-programmatic.log`, `init-codex-programmatic.log`, `init-cursor-programmatic.log`, `init-kiro-programmatic.log`, `init-qoder-programmatic.log`, `cursor-doctor-programmatic.log`, `cursor-clean-programmatic.log`, `cursor-loader-evidence.log`, `release-artifact-summary.json` | npm pack dry-run file manifest, tarball-installed programmatic `buildInitPlan` / `applyInitPlan` evidence for Claude/Codex/Cursor/Kiro/Qoder, Cursor `doctor --cursor` and `clean --cursor --dry-run` generated-runtime evidence, explicit Cursor loader degraded evidence when no local Cursor journey is recorded, and release reviewer summary. | Deterministic release evidence only; Cursor programmatic init/doctor/clean proves generated-runtime preview assets, not Cursor skill loader/user journey support; no dashboard, history store, GitHub Release automation, or release decision engine. |',
+    '| `npm run test:release:install` | `tests/smoke/install-tarball.sh` output | Local npm tarball packaging/install smoke: packs the current package, installs it into an isolated prefix, verifies the global `spec-first` shim, and checks required packaged assets. | Local deterministic smoke only; no CI matrix, no Windows/macOS/Linux matrix evidence, no generated release evidence artifacts, no Cursor loader/user journey support proof. |',
     '',
     '## Readiness Meaning',
     '',

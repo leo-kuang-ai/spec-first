@@ -83,10 +83,6 @@ function runMcpSetup() {
 }
 
 function runSmoke() {
-  if (isWindows && !forcePosixOnWindows) {
-    runNode(['scripts/npm-install-matrix-smoke.js']);
-    return;
-  }
   runBash('tests/smoke/install-local.sh');
   runBash('tests/smoke/cli.sh');
 }
@@ -105,10 +101,6 @@ function runReleaseGovernance() {
 }
 
 function runReleaseInstall() {
-  if (isWindows && !forcePosixOnWindows) {
-    runNode(['scripts/npm-install-matrix-smoke.js']);
-    return;
-  }
   runBash('tests/smoke/install-tarball.sh');
 }
 

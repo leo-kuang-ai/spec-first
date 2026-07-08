@@ -3,7 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const { runNpm } = require('./npm-install-matrix-smoke');
+const { spawnSync } = require('node:child_process');
 
 const repoRoot = path.resolve(__dirname, '..');
 const defaultWebsiteRepo = path.resolve(repoRoot, '..', 'spec-first-official-website');
@@ -27,14 +27,17 @@ function readJson(filePath) {
 }
 
 function runNpmChecked(args, options) {
-  try {
-    runNpm(args, {
-      cwd: options.cwd,
-      env: options.env,
-      stdio: 'inherit',
-    });
-  } catch (error) {
-    fail(`npm ${args.join(' ')} failed: ${error.message}`);
+  const result = spawnSync('npm', args, {
+    cwd: options.cwd,
+    env: options.env,
+    stdio: 'inherit',
+    windowsHide: true,
+  });
+  if (result.error) {
+    fail(`npm ${args.join(' ')} failed: ${result.error.message}`);
+  }
+  if (result.status !== 0) {
+    fail(`npm ${args.join(' ')} failed with status ${result.status}`);
   }
 }
 

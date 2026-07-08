@@ -250,7 +250,7 @@ PR 应说明变更的 command、skill、agent 或文档面，列出实际执行�
 - 架构/prompt/workflow/contract 或 source/runtime 判断前按需读取 `docs/10-prompt/结构化项目角色契约.md`;scripts/tools 只产 deterministic facts,LLM 做语义路由判断
 - **反合理化红旗**(出现这些念头即停):「先改个文件就好」→ 明确小改动可直接做;规模/风险不明、根因未定或触及架构/contract/多文件时先路由;「只是个快速架构/prompt 改动」→ 架构/prompt/workflow/contract 改动算 substantial;「得先看一堆文件再决定」→ 只做最小事实核查,已清晰则直接路由;「该评审但我口头答就行」→ 评审目标具体时用 code-review/doc-review;「helper skill 存在所以该暴露」→ 只有公开 workflow 是用户入口,internal helper 隐藏
 - Workflow 入口统一使用同名 `spec-*`
-- 不要把 `using-spec-first` 本身当作 command-backed workflow；不要直接暴露 internal-only skills,例如 `git-worktree`
+- 不要把 `using-spec-first` 本身当作 command-backed workflow；不要直接暴露 internal-only skills,例如 `spec-worktree`
 
 <!-- spec-first:bootstrap:end -->
 
