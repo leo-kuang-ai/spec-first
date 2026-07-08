@@ -185,20 +185,105 @@ done
 
 ## 优先执行顺序
 
-按风险顺序审查，不按字母顺序。
+按批次推进：先处理内容差异小、旧 CE 残留少的 skill，快速建立审查样例并收敛低风险 backlog；随后审查核心链路与支撑链路；`spec-lfg` 作为 full-pipeline 汇总审查最后执行。
+
+### Batch 1：低差异快审
+
+这些 skill 在初始 deterministic scan 中表现为文件数接近、归一化文本差异较低或范围小、旧 CE 残留少，适合作为 warm-up 与模板校准：
+
+1. `ce-test-xcode` -> `spec-test-xcode`
+2. `ce-polish` -> `spec-polish`
+3. `ce-explain` -> `spec-explain`
+4. `ce-pov` -> `spec-pov`
+5. `ce-dogfood` -> `spec-dogfood`
+6. `ce-strategy` -> `spec-strategy`
+7. `ce-simplify-code` -> `spec-simplify-code`
+8. `ce-commit` -> `spec-commit`
+
+### Batch 2：核心链路深审
+
+这些 skill 位于 `Spec -> Plan -> Code -> Review` 主链路，artifact contract 或 handoff 漂移会放大到下游：
 
 1. `ce-brainstorm` -> `spec-brainstorm`
 2. `ce-plan` -> `spec-plan`
 3. `ce-doc-review` -> `spec-doc-review`
 4. `ce-code-review` -> `spec-code-review`
 5. `ce-work` -> `spec-work`
-6. `ce-debug` -> `spec-debug`
-7. `ce-compound` -> `spec-compound`
-8. `ce-compound-refresh` -> `spec-compound-refresh`
-9. `ce-sweep` -> `spec-sweep`
-10. `ce-setup` -> `spec-mcp-setup`
-11. 其余低风险直接映射：`ce-commit`、`ce-commit-push-pr`、`ce-dogfood`、`ce-explain`、`ce-ideate`、`ce-optimize`、`ce-polish`、`ce-pov`、`ce-product-pulse`、`ce-promote`、`ce-proof`、`ce-resolve-pr-feedback`、`ce-riffrec-feedback-analysis`、`ce-simplify-code`、`ce-strategy`、`ce-test-browser`、`ce-test-xcode`、`ce-worktree`。
-12. `lfg` -> `spec-lfg`，作为 full-pipeline 汇总审查最后执行。
+
+### Batch 3：支撑链路与高残留项
+
+这些 skill 支撑 debug、knowledge、feedback、setup 或有较多 legacy residual，需要在核心链路后集中确认 divergence 与消费者：
+
+1. `ce-debug` -> `spec-debug`
+2. `ce-compound` -> `spec-compound`
+3. `ce-compound-refresh` -> `spec-compound-refresh`
+4. `ce-sweep` -> `spec-sweep`
+5. `ce-setup` -> `spec-mcp-setup`
+6. `ce-riffrec-feedback-analysis` -> `spec-riffrec-feedback-analysis`
+7. `ce-product-pulse` -> `spec-product-pulse`
+
+### Batch 4：其余 helper 与尾项
+
+这些 skill 先按轻量矩阵确认，若 deterministic scan 或 source read 发现 active contract 漂移，再提升为单独深审：
+
+1. `ce-commit-push-pr` -> `spec-commit-push-pr`
+2. `ce-ideate` -> `spec-ideate`
+3. `ce-optimize` -> `spec-optimize`
+4. `ce-promote` -> `spec-promote`
+5. `ce-proof` -> `spec-proof`
+6. `ce-resolve-pr-feedback` -> `spec-resolve-pr-feedback`
+7. `ce-test-browser` -> `spec-test-browser`
+8. `ce-worktree` -> `spec-worktree`
+9. `lfg` -> `spec-lfg`，作为 full-pipeline 汇总审查最后执行。
+
+## Batch 1 快审记录
+
+### `ce-test-xcode` -> `spec-test-xcode`
+
+#### Verdict
+
+- status: aligned
+- risk: low
+- decision: 按 CE 原逻辑处理 `XcodeBuildMCP`，不把它升级为 `spec-mcp-setup` 默认或 optional setup 集成项。
+
+#### Source Files Read
+
+- CE: `/Users/kuang/xiaobu/compound-engineering-plugin/skills/ce-test-xcode/SKILL.md`
+- CE docs: `/Users/kuang/xiaobu/compound-engineering-plugin/docs/skills/ce-test-xcode.md`
+- spec-first: `skills/spec-test-xcode/SKILL.md`
+
+#### Preserved Capabilities
+
+- 保留 XcodeBuildMCP 作为唯一执行 substrate：先调用 `list_simulators` 确认 MCP 已连接，再执行 project/scheme discovery、simulator boot、build、install、launch、log capture、screenshot、human verification、failure handling 和 cleanup。
+- 保留缺失 XcodeBuildMCP 时 fail closed 的行为：不继续 build/test，不回退到裸 `xcodebuild` wrapper。
+- 保留 CE 的手工安装提示：Homebrew 路径 `brew tap getsentry/xcodebuildmcp && brew install xcodebuildmcp`，以及 npx 路径 `npx -y xcodebuildmcp@latest mcp`，随后由用户把 `XcodeBuildMCP` 加入 agent MCP 配置并重启 agent。
+- 保留 SwiftUI `Text` inline link 自动点击限制说明和需要人工验证的 flows。
+
+#### Intentional Spec-First Divergences
+
+- skill 名称、示例命令和集成说明已从 `ce-test-xcode` / `ce-code-review` 改为 `spec-test-xcode` / `spec-code-review`。
+- blocking question tool 说明收敛到当前 spec-first 公开支持的 Claude/Codex surface；不恢复 CE 中 Antigravity / Pi 的旧平台说明。
+
+#### No Setup Integration Decision
+
+- CE 中 `ce-setup` 不检查或安装 XcodeBuildMCP；XcodeBuildMCP readiness 只由 `ce-test-xcode` 在运行时用 `list_simulators` preflight 判断。
+- spec-first 按 CE parity 保持同样边界：`spec-mcp-setup` 不新增 XcodeBuildMCP 默认检查、自动安装、host config 写入或 setup facts。
+- 这是有意识的低差异迁移裁决，不是遗漏。Xcode simulator testing 是显式 invoked helper skill；缺 dependency 时由该 skill 自己停止并给手工安装指令。
+
+#### Recommended Changes
+
+- [no_action] `skills/spec-test-xcode/SKILL.md` 当前保留了 CE 的核心行为和安装提示，无需修改。
+- [document_divergence] 本快审记录作为后续 Batch 1 的样例：低差异 skill 优先确认 CE 行为是否被保留，再决定是否需要 spec-first 化扩展；不要为了“更完整 setup”而扩大 scope。
+
+#### Downstream Consumers
+
+- `spec-code-review`: 可在 iOS 代码变更场景中建议或委托 `spec-test-xcode`；但是否可运行由 `spec-test-xcode` 的 XcodeBuildMCP preflight 确认。
+- `spec-work`: 完成 iOS 相关实现后可把 `spec-test-xcode` 作为人工/工具辅助验证路径；缺 MCP 时记录 not-run reason，而不是声明 simulator 验证已完成。
+
+#### Verification Needed
+
+- docs-only 裁决记录只需要 `git diff --check` 与 changelog 格式检查。
+- 若未来修改 `skills/spec-test-xcode/SKILL.md` 或让 `spec-code-review` 自动委托它，再补 focused contract tests；本轮不触发。
 
 ## 待确认的首轮发现
 
@@ -241,7 +326,7 @@ done
 | CE 产物 / 行为 | CE source | spec-first 对应产物 / 行为 | 覆盖状态 | spec-first 迁移说明 / 注意事项 | 下游消费者 / 验证面 |
 |---|---|---|---|---|---|
 | 三阶段 setup：诊断、修复 repo-local 问题、汇总 | `ce-setup/SKILL.md`、`scripts/check-health` | `spec-mcp-setup` 默认三阶段：Stage 1 轻量诊断、Stage 2 授权修复、Stage 3 汇总 next actions | 已覆盖并扩展 | 默认路径应保持轻量诊断；涉及 host 写入、project-local config 创建、provider 初始化时必须显式授权或显式参数触发 | `skills/spec-mcp-setup/SKILL.md`、`check-health` / `.ps1` human 输出、setup plan / focused tests |
-| Optional capability diagnostic 表 | `scripts/check-health` | `helper_tools` / `items[]` 诊断，human/JSON 输出 helper readiness | 已覆盖并扩展 | CE 只做工具存在性提示；spec-first 还需要输出 `status`、`result`、`next_action` 和 degraded reason，供后续 workflow 判断是否可用 | `tool-facts.json`、`runtime-capabilities.json`、`browser-helper-tool-contracts.test.js` |
+| Optional capability diagnostic 表 | `scripts/check-health` | `helper_tools` / `items[]` 诊断，human/JSON 输出 helper readiness | 已覆盖并扩展 | CE 只做工具存在性提示；spec-first 还需要输出 `status`、`result`、`next_action` 和 degraded reason，供后续 workflow 判断是否可用；helper readiness 主要落在 `tool-facts.json`，`runtime-capabilities.json` 只承载 direct evidence posture / setup summary 相关事实 | `tool-facts.json`、`browser-helper-tool-contracts.test.js` |
 | `agent-browser` optional check | `scripts/check-health` | browser helper readiness：检测 CLI、runtime marker、global skill / host 可用性，缺失时给安装命令 | 已覆盖 | 不应自动安装；仅 CLI 存在但 runtime marker / skill 不完整时不能标为 ready。默认 setup 只给 next action，显式 helper install 才写入 | `spec-dogfood`、`spec-polish`、`spec-test-browser`、`spec-code-review` 浏览器证据路径 |
 | `gh`、`jq`、`ast-grep`、`ffmpeg` optional checks | `scripts/check-health` | helper registry 与 baseline readiness 分层；`ast-grep`、`ffmpeg` 等作为 helper/provider capability facts 输出 | 已覆盖并扩展 | 保留 CE 的“诊断而非批量安装”姿态；同时区分 required baseline、optional helper、provider-specific dependency，避免所有缺失都变阻断 | `spec-sweep`、`spec-riffrec-feedback-analysis`、`spec-rule-miner`、review/debug workflows |
 | `.compound-engineering/config.local.example.yaml` | `references/config-template.yaml` | `.spec-first/config.local.example.yaml` | 已覆盖 | 只迁移语义能力，不迁移文件名；example 是 project-local bootstrap 产物，可由 setup 刷新 | `verify-tools.*` project-local config status、config template contract tests |
@@ -250,8 +335,8 @@ done
 | `compound-engineering.local.md` legacy cleanup | `scripts/check-health` | legacy markdown signal / manual cleanup next action | 部分覆盖，按 spec-first 降级 | 不作为 active setup 产物；只作为历史残留信号提示人工确认，避免 setup 自动删除用户文档 | `check-health` legacy signal、文档审查记录 |
 | `.compound-engineering/config.local.yaml` 未被 gitignore 的风险提示 | `scripts/check-health` | legacy local config signal；active 保护转为 `.spec-first/*.local.yaml` | 部分覆盖，按 spec-first 降级 | 旧路径不迁移为 active config；如存在，仅提示用户确认是否仍需保留。active 防泄漏只针对 `.spec-first` local config | `check-health` / `.ps1` legacy signal、gitignore policy |
 | CE config template keys | `references/config-template.yaml` | `skills/spec-mcp-setup/references/config-template.yaml` active local config keys | 已覆盖并重映射 | 迁移为 spec-first 当前消费者需要的 key；已裁决 retired 的 key 不作为 persisted setup preference，但后续 skill 仍使用的能力必须在 spec-first config 中有对应表达 | config template contract tests、后续 workflow local config reads |
-| work delegation keys | `references/config-template.yaml` | spec-first 下游 consumer-gated delegation config surface | 已覆盖 | 不是全局 active setup 偏好；只有下游 workflow 明确消费时才读取，避免 setup 阶段制造隐藏流程控制 | `spec-work`、`spec-plan`、review workflows 的 consumer-side gate |
-| plan skip scoping confirm | `references/config-template.yaml` | retired，不作为 persisted setup preference | 已裁决不覆盖 | 该行为不应在 setup 中持久化为默认跳过确认；需要由具体 planning workflow 基于当次上下文判断 | `spec-plan` 入口语义与 scoping confirmation 行为 |
+| work delegation keys | `references/config-template.yaml` | spec-first 下游 execution workflow consumer-gated delegation config surface | 已覆盖 | 不是全局 active setup 偏好；setup 只暴露和保护 key，不因 key 存在自动委托或改变 host runtime。只有 downstream execution workflow 明确实现 consumer 与测试后才读取 | `spec-work` / execution workflows 的 consumer-side gate |
+| plan skip scoping confirm | `references/config-template.yaml` | spec-first 下游 planning workflow consumer-gated scoping-confirmation config surface | 已覆盖，但 setup 阶段 inert | 不是 setup 自身的 persisted behavior；setup 只暴露和保护 key，不因 key 存在自动跳过确认。是否读取、何时跳过必须由具体 planning workflow 在当次上下文中裁决 | `spec-plan` 入口语义、scoping confirmation 行为与 consumer-side tests |
 | setup summary | `scripts/check-health` | grouped status block：baseline、helpers、project-local config、provider readiness、generated runtime、next actions | 已覆盖并扩展 | 汇总必须清楚区分 blocking、degraded、optional、advisory；不能用 “All clear” 掩盖 optional degraded | `check-health` / `.ps1` human 输出 contract |
 | 不批量安装 optional tools，只输出 install command / URL | `ce-setup/SKILL.md`、`scripts/check-health` | 默认 setup 不自动安装 optional helper；`agent-browser`、provider setup 和 refresh 需要显式 opt-in | 已覆盖 | 保留 CE 的授权边界；spec-first 额外禁止裸 setup 触发 CodeGraph / Graphify first-generation | `install-helpers.*`、`setup-plan-renderer.cjs`、provider next action tests |
 | 无 MCP/runtime facts 文件 | 无 | `.spec-first/config/tool-facts.json`、`.spec-first/config/runtime-capabilities.json` | spec-first 新增 | 这是 spec-first 相比 CE 的核心新增产物：把诊断结果落成 machine-readable facts，供后续 workflow 读取，而不是依赖本轮口头判断 | `write-setup-facts` / `check-health --json`、runtime capability contract tests |
