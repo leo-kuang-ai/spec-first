@@ -27,8 +27,12 @@ The script paginates the top-level `reviewThreads` connection and returns the ma
 
 ## 2. Fix, Reply, Resolve
 
-Handle this thread using the same Mutating resolver dispatch boundary as Full Mode. When the host exposes a dispatch primitive, the user has not forbidden delegation, and the single-thread unit is safe to isolate, read `references/agents/pr-comment-resolver.md` and dispatch one generic subagent seeded with that local prompt for the thread. If dispatch is unavailable, explicitly disabled, or unsafe, process the thread sequentially in the current agent.
+Read [evaluation-rubric.md](evaluation-rubric.md) and judge this thread before any resolver dispatch. Account for `isOutdated` and the location fields (`line`, `originalLine`, `startLine`, `originalStartLine`). The cross-item reasoning is mostly inert for a single thread, but the read-depth and divert logic still apply: do not fix on reviewer authority alone.
+
+Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode. When the host exposes a dispatch primitive, the user has not forbidden delegation, and the single-thread unit is safe to isolate, read `references/agents/pr-comment-resolver.md` and dispatch one generic subagent seeded with that local prompt for the thread. If dispatch is unavailable, explicitly disabled, or unsafe, process the thread sequentially in the current agent.
 
 Pass the same fields full mode does, including `isOutdated` and the location fields: `line`, `originalLine`, `startLine`, `originalStartLine`. Targeted threads can be outdated too and need the same relocation handling.
 
-Then follow the same validate -> commit -> push -> reply -> resolve flow as Full Mode steps 5-7 in [full-mode.md](full-mode.md).
+For `replied`, `not-addressing`, or `declined`, compose the reply text from the rubric, skip validation/commit/push, then post the reply and resolve when appropriate. For `needs-human`, compose `decision_context`, post the natural reply text, leave the thread open, and present the decision to the user.
+
+For fix verdicts, follow the same validate -> commit -> push -> reply -> resolve flow as Full Mode steps 5-7 in [full-mode.md](full-mode.md).

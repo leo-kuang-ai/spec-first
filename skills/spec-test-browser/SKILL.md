@@ -32,7 +32,7 @@ Check whether `agent-browser` is installed:
 command -v agent-browser >/dev/null 2>&1 && echo "Installed" || echo "NOT INSTALLED"
 ```
 
-If not installed, inform the user: "Browser automation helper unavailable. To install/repair, set `SPEC_FIRST_BROWSER_HELPER_REQUIRED=1` and rerun `spec-mcp-setup` (or this host's MCP setup entrypoint). This does not block spec-first baseline." Then stop — this skill cannot function without agent-browser.
+If not installed, inform the user: "Browser automation helper unavailable. Run `spec-mcp-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-test-browser`. This does not block spec-first baseline." Then stop — this skill cannot function without agent-browser.
 
 After setup, use `agent-browser skills get core` when deeper upstream usage or troubleshooting guidance is needed.
 
@@ -46,11 +46,11 @@ Before starting, verify `agent-browser` is available:
 command -v agent-browser >/dev/null 2>&1 && echo "Ready" || echo "NOT INSTALLED"
 ```
 
-If not installed, inform the user: "Browser automation helper unavailable. To install/repair, set `SPEC_FIRST_BROWSER_HELPER_REQUIRED=1` and rerun `spec-mcp-setup` (or this host's MCP setup entrypoint). This does not block spec-first baseline." Then stop.
+If not installed, inform the user: "Browser automation helper unavailable. Run `spec-mcp-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then rerun `spec-test-browser`. This does not block spec-first baseline." Then stop.
 
 ### 2. Ask Browser Mode
 
-**Pipeline mode (`mode:pipeline`):** Skip this step entirely. Default to headless — no question, no blocking. Proceed directly to step 3.
+**Pipeline mode (`mode:pipeline`):** Read `references/pipeline-orchestration.md` before continuing. It defaults to headless, skips this question, and owns free-port/server startup overrides for unattended runs.
 
 **Manual mode:** Ask the user whether to run headed or headless using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded) or `request_user_input` in Codex. Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question:
 

@@ -110,7 +110,7 @@ Browse the feature and tell me what could be better.
 This is the core loop. The user browses the feature and tells you what to improve. You fix it. Repeat until they're happy.
 
 - When the user describes something to fix → make the change, the dev server hot-reloads
-- When the user asks to check something → use a browser-automation capability to screenshot or inspect the page; prefer `agent-browser` if it's installed. If it is missing, tell them: "Browser automation helper unavailable. To install/repair, set `SPEC_FIRST_BROWSER_HELPER_REQUIRED=1` and rerun `spec-mcp-setup` (or this host's MCP setup entrypoint). This does not block spec-first baseline." Continue the human browser loop when automated screenshots are unavailable.
+- When the user asks to check something → use a browser-automation capability to screenshot or inspect the page; prefer `agent-browser` if it's installed. If it is missing, tell them: "Browser automation helper unavailable. Run `spec-mcp-setup` to see the current `agent-browser` install command, install it manually if browser automation is needed, then continue. This does not block spec-first baseline." Continue the human browser loop when automated screenshots are unavailable.
 - When the user says they're done → commit the fixes and stop
 
 No checklist. No envelope. Just conversation.

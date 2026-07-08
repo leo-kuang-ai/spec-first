@@ -26,8 +26,8 @@ function Get-HelperSourceRepo {
 # 展示用安装命令生成器(PowerShell 单一真相源),与 bash lib 的
 # helper_registry_install_command_display 对称。install-helpers.ps1 与 check-health.ps1
 # 历史上各维护一份且与 registry 静态 commands 三方漂移(如 brew install gh vs upgrade-wrapped)。
-# 这里收敛为共享函数:非 agent-browser helper 一律委派到此。agent-browser 因 install vs
-# opt-in 语义不同保留各脚本自有分支;check-health.ps1 的 native-path 提示(如 jq/windows)
+# 这里收敛为共享函数:非 agent-browser helper 一律委派到此。agent-browser 因 browser runtime / global skill
+# 组合命令语义不同保留各脚本自有分支;check-health.ps1 的 native-path 提示(如 jq/windows)
 # 在其委派包装层处理,不进本共享函数。
 # 注意:这是「展示/审批近似命令」,真正执行真相源是 install-helpers.ps1 的 Invoke-HelperInstall。
 

@@ -151,8 +151,8 @@ helper_registry_source_repo() {
 # install-helpers.sh 与 check-health 历史上各维护一份几乎逐行相同的展示命令生成器,
 # 与 registry 的静态 installation.commands 三方漂移。这里收敛为共享函数:
 # 两脚本的 install_command_for / build_install_command 对「非 agent-browser」helper
-# 一律委派到 helper_registry_install_command_display(agent-browser 因 install vs opt-in
-# 语义不同,保留各脚本自有分支)。命令措辞统一为 `A || B` 形式(与历史 install-helpers 一致)。
+# 一律委派到 helper_registry_install_command_display(agent-browser 因 browser runtime / global skill
+# 组合命令语义不同,保留各脚本自有分支)。命令措辞统一为 `A || B` 形式(与历史 install-helpers 一致)。
 # 注意:这是「展示/审批近似命令」,真正执行真相源是 install-helpers.sh 的 run_install_command。
 
 helper_registry_linux_package_install_command() {

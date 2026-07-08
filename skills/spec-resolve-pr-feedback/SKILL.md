@@ -32,6 +32,7 @@ After determining mode, read the matching reference and follow it. Each referenc
 
 - **Full Mode** -> [references/full-mode.md](references/full-mode.md) (fetch, triage, plan, dispatch or sequential implementation, validate, commit/push, reply/resolve, verify, summary)
 - **Targeted Mode** -> [references/targeted-mode.md](references/targeted-mode.md) (extract one thread from a URL, then handle it through the same mutation, validation, reply, and resolution pipeline)
+- **Evaluation Rubric** -> [references/evaluation-rubric.md](references/evaluation-rubric.md) (the orchestrator reads this before any resolver dispatch to decide fix/reply/human verdicts)
 
 Resolve all `scripts/<name>` helper paths relative to this skill's loaded directory. Do not assume the current project checkout has a top-level `scripts/` directory containing these helpers.
 

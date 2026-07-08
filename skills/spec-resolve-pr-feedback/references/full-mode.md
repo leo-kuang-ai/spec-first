@@ -49,20 +49,21 @@ If `fetch_warnings` reports `thread_comments_truncated`, do not treat a missing 
 
 If there are no new items across all feedback types, skip steps 3-8 and go straight to step 9.
 
-## 3. Plan
+## 3. Judge And Plan
 
-Create a task list of all **new** unresolved items grouped by type:
+Read [evaluation-rubric.md](evaluation-rubric.md) now and apply it across the whole batch before any resolver dispatch. This is the legitimacy gate. The orchestrator holds every new thread, actionable PR comment, and actionable review body at once, so it can dedup reads by file, catch repeated bad assumptions, and separate items that need code from items that only need a reply or human decision.
 
-- Code changes requested
-- Questions to answer
-- Style/convention fixes
-- Test additions needed
+Create a task list of all **new** unresolved items grouped by verdict and type:
+
+- `fix-list`: code changes requested, style/convention fixes, test additions, and other valid fixes
+- `reply-list`: `replied`, `not-addressing`, and `declined` items with reply text already composed from source evidence
+- `human-list`: `needs-human` items with `decision_context`
 
 Create one task entry per new unresolved review thread, actionable PR comment, or actionable review body. Already resolved threads are not returned by `get-pr-comments` and are not dispatch inputs.
 
 ## 4. Implement
 
-Process all three feedback types. Review threads are the primary type; PR comments and review bodies are secondary but must not be ignored.
+Process all three feedback types. Review threads are the primary type; PR comments and review bodies are secondary but must not be ignored. Dispatch or sequential mutation applies only to items in `fix-list`; `reply-list` and `human-list` are carried to Step 7 without code mutation.
 
 ### Mutating resolver dispatch boundary
 
@@ -74,11 +75,11 @@ If dispatch is unavailable, explicitly disabled, or mutation would be unsafe, pr
 
 ### Dispatch inputs
 
-Only new review threads, actionable PR comments, and actionable review bodies are dispatch inputs. Resolved threads are not returned by `get-pr-comments`; if a previously resolved or already replied item appears during manual inspection, use it as background only and do not dispatch, reply to, or resolve it again.
+Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs. Resolved threads are not returned by `get-pr-comments`; if a previously resolved or already replied item appears during manual inspection, use it as background only and do not dispatch, reply to, or resolve it again.
 
 ### Individual dispatch
 
-For review threads, read `references/agents/pr-comment-resolver.md` and dispatch a generic subagent seeded with that local prompt for each new thread.
+For review threads in `fix-list`, read `references/agents/pr-comment-resolver.md` and dispatch a generic subagent seeded with that local prompt for each approved fix.
 
 Each agent receives:
 
@@ -89,7 +90,7 @@ Each agent receives:
 - The feedback type: `review_thread`
 - The `isOutdated` flag from the thread node
 
-For PR comments and review bodies, read `references/agents/pr-comment-resolver.md` and dispatch a generic subagent seeded with that local prompt for each actionable item. The agent receives the comment ID, body text, PR number, and feedback type: `pr_comment` or `review_body`. The agent must identify the relevant files from the comment text and the PR diff.
+For PR comments and review bodies in `fix-list`, read `references/agents/pr-comment-resolver.md` and dispatch a generic subagent seeded with that local prompt for each approved fix. The agent receives the comment ID, body text, PR number, and feedback type: `pr_comment` or `review_body`. The agent must identify the relevant files from the comment text and the PR diff.
 
 ### Agent return format
 

@@ -4,8 +4,8 @@
 #
 # Location: .spec-first/workflows/spec-optimize/<spec-name>/experiment-log.yaml
 #
-# PERSISTENSpec-First MODEL:
-# The experiment log on disk is the SINGLE SOURSpec-First OF TRUTH. The agent's
+# PERSISTENCE MODEL:
+# The experiment log on disk is the SINGLE SOURCE OF TRUTH. The agent's
 # in-memory context is expendable and will be compacted during long runs.
 #
 # Write discipline:

@@ -70,7 +70,7 @@
           "type": "object",
           "required": ["strategy", "commands", "next_action"],
           "properties": {
-            "strategy": { "enum": ["package-manager", "npm-global", "skills-cli", "manual", "explicit-opt-in"] },
+            "strategy": { "enum": ["package-manager", "npm-global", "skills-cli", "manual", "manual-command", "explicit-opt-in"] },
             "commands": {
               "type": "object",
               "description": "Display/approval-only approximate install commands per OS. NOT the execution source of truth: actual installs run through install-helpers.sh run_install_command (environment-aware: package-manager detection, brew upgrade wrapping, mirror fallback). Kept for human/LLM-readable approval context.",

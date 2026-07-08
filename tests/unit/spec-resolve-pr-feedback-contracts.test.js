@@ -25,6 +25,15 @@ const TARGETED_MODE_PATH = path.join(
   'references',
   'targeted-mode.md',
 );
+const EVALUATION_RUBRIC_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  'skills',
+  'spec-resolve-pr-feedback',
+  'references',
+  'evaluation-rubric.md',
+);
 
 function read(...paths) {
   return paths.map((filePath) => fs.readFileSync(filePath, 'utf8')).join('\n');
@@ -49,6 +58,7 @@ describe('spec-resolve-pr-feedback mode reference contract', () => {
 
     expect(skill).toContain('[references/full-mode.md](references/full-mode.md)');
     expect(skill).toContain('[references/targeted-mode.md](references/targeted-mode.md)');
+    expect(skill).toContain('[references/evaluation-rubric.md](references/evaluation-rubric.md)');
     expect(skill).toContain("Resolve all `scripts/<name>` helper paths relative to this skill's loaded directory.");
     expect(fullMode).toContain('bash skills/spec-resolve-pr-feedback/scripts/get-pr-comments PR_NUMBER');
     expect(fullMode).toContain('bash skills/spec-resolve-pr-feedback/scripts/reply-to-pr-thread THREAD_ID < "$reply_file"');
@@ -92,8 +102,24 @@ describe('spec-resolve-pr-feedback mode reference contract', () => {
 });
 
 describe('spec-resolve-pr-feedback declined verdict contract', () => {
+  test('orchestrator reads the evaluation rubric before resolver dispatch', () => {
+    const text = read(SKILL_PATH, FULL_MODE_PATH, TARGETED_MODE_PATH, EVALUATION_RUBRIC_PATH);
+    const rubric = read(EVALUATION_RUBRIC_PATH);
+
+    expect(text).toContain('The **orchestrator** applies this rubric before any resolver is dispatched.');
+    expect(text).toContain('Read [evaluation-rubric.md](evaluation-rubric.md) now and apply it across the whole batch before any resolver dispatch.');
+    expect(text).toContain('This is the legitimacy gate.');
+    expect(text).toContain('Dispatch or sequential mutation applies only to items in `fix-list`');
+    expect(text).toContain('Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs.');
+    expect(text).toContain('Read [evaluation-rubric.md](evaluation-rubric.md) and judge this thread before any resolver dispatch.');
+    expect(text).toContain('For `replied`, `not-addressing`, or `declined`, compose the reply text from the rubric, skip validation/commit/push');
+    expect(rubric).toContain('Cluster by root assumption.');
+    expect(rubric).toContain('Divert from fixing only on a concrete signal');
+    expect(rubric).toContain('Resolver agents implement approved work; they do not decide whether feedback is worth fixing.');
+  });
+
   test('declined is a first-class non-change verdict with reply and summary output', () => {
-    const text = read(SKILL_PATH, FULL_MODE_PATH);
+    const text = read(SKILL_PATH, FULL_MODE_PATH, EVALUATION_RUBRIC_PATH);
 
     expect(text).toContain('use the `declined` verdict and cite the specific harm');
     expect(text).toContain('`fixed`, `fixed-differently`, `replied`, `not-addressing`, `declined`, or `needs-human`');
@@ -114,7 +140,7 @@ describe('spec-resolve-pr-feedback declined verdict contract', () => {
 
     expect(text).toContain('Create one task entry per new unresolved review thread, actionable PR comment, or actionable review body.');
     expect(text).toContain('Already resolved threads are not returned by `get-pr-comments` and are not dispatch inputs.');
-    expect(text).toContain('Only new review threads, actionable PR comments, and actionable review bodies are dispatch inputs.');
+    expect(text).toContain('Only `fix-list` items from new review threads, actionable PR comments, and actionable review bodies are dispatch inputs.');
     expect(text).not.toContain('Cross-Invocation Cluster Analysis (Gated)');
     expect(text).not.toContain('cross_invocation');
     expect(text).not.toContain('<cluster-brief>');
@@ -146,7 +172,7 @@ describe('spec-resolve-pr-feedback dispatch boundary contract', () => {
   test('targeted mode reuses the mutating dispatch boundary instead of assuming dispatch exists', () => {
     const text = read(TARGETED_MODE_PATH);
 
-    expect(text).toContain('Handle this thread using the same Mutating resolver dispatch boundary as Full Mode.');
+    expect(text).toContain('Handle only `fixed` / `fixed-differently` verdicts through the same Mutating resolver dispatch boundary as Full Mode.');
     expect(text).toContain('If dispatch is unavailable, explicitly disabled, or unsafe, process the thread sequentially in the current agent.');
     expect(text).toContain('read `references/agents/pr-comment-resolver.md` and dispatch one generic subagent seeded with that local prompt for the thread');
     expect(text).toContain('Full Mode steps 5-7');

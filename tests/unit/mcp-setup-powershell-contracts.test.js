@@ -1104,7 +1104,7 @@ describe('spec-mcp-setup PowerShell setup facts contract', () => {
   });
 
   // WIN-P1-01 回归:agent-browser 是既有 parity 测试(上方 helpers 数组)显式排除的特例,
-  // 因其 install vs opt-in 语义在各脚本自有分支处理。故其 Windows 展示命令没有被上面的
+  // 因其 browser runtime / global skill 组合命令语义在各脚本自有分支处理。故其 Windows 展示命令没有被上面的
   // 共享 display 生成器 parity 覆盖。此处补一条专项守护:
   //  1) registry 静态 windows 串(经 setup-plan-renderer.cjs 外露为 install_commands_display)
   //     必须是 PowerShell 5.1 安全写法,不得含 POSIX `CI=true ` 前缀或裸 `&&` 链;

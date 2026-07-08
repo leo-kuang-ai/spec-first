@@ -5,7 +5,6 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$browserHelperOptInAction = 'set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)'
 . (Join-Path $PSScriptRoot 'lib-helper-registry.ps1')
 $helperRegistry = Get-HelperRegistry
 
@@ -37,7 +36,7 @@ function Get-InstallCommand {
   )
 
   # check-health 只展示安装建议,不执行安装。agent-browser 与其他 helper 一样
-  # 展示可复制命令;真正自动安装仍由 install-helpers.ps1 的显式 opt-in gate 控制。
+  # 展示可复制命令;setup 默认不自动安装 browser helper。
   # jq/windows 是 native PowerShell 路径的有意提示(install-helpers.ps1 无此差异)。
   if ($Name -eq 'agent-browser') {
     foreach ($helper in @($helperRegistry.helpers)) {
@@ -49,7 +48,7 @@ function Get-InstallCommand {
         }
       }
     }
-    return $browserHelperOptInAction
+    return 'Run spec-mcp-setup to view the current agent-browser install command, then install it manually if browser automation is needed.'
   }
   if ($Name -eq 'jq' -and $Platform -eq 'windows') {
     return 'Not required for the native PowerShell setup path; install jqlang.jq only for Git Bash or WSL scripts.'

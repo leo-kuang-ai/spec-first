@@ -30,37 +30,37 @@ CE 是迁移能力的语义基准：
 
 以当前迁移映射作为工作清单：
 
-| CE skill | spec-first target | 审查类型 |
-|---|---|---|
-| `ce-brainstorm` | `spec-brainstorm` | 直接映射，artifact contract 很可能存在合理 divergence |
-| `ce-code-review` | `spec-code-review` | 直接映射，persona/local asset 迁移关键 |
-| `ce-commit` | `spec-commit` | 直接映射，低复杂度 |
-| `ce-commit-push-pr` | `spec-commit-push-pr` | 直接映射，低复杂度 |
-| `ce-compound` | `spec-compound` | 直接映射，knowledge/source evidence 关键 |
-| `ce-compound-refresh` | `spec-compound-refresh` | 直接映射，learning lifecycle 关键 |
-| `ce-debug` | `spec-debug` | 直接映射，root-cause/evidence flow 关键 |
-| `ce-doc-review` | `spec-doc-review` | 直接映射，过时 contract 风险最高 |
-| `ce-dogfood` | `spec-dogfood` | 直接映射，browser QA artifact contract 关键 |
-| `ce-explain` | `spec-explain` | 直接映射，低/中复杂度 |
-| `ce-ideate` | `spec-ideate` | 直接映射，与 brainstorm 的边界关键 |
-| `ce-optimize` | `spec-optimize` | 直接映射，metric/eval loop 关键 |
-| `ce-plan` | `spec-plan` | 直接映射，下游 contract 关键 |
-| `ce-polish` | `spec-polish` | 直接映射，browser/dev-server 行为关键 |
-| `ce-pov` | `spec-pov` | 直接映射，verdict routing 关键 |
-| `ce-product-pulse` | `spec-product-pulse` | 直接映射，signal/config 行为关键 |
-| `ce-promote` | `spec-promote` | 直接映射，低复杂度 |
-| `ce-proof` | `spec-proof` | 直接映射，host-provided/HITL surface 关键 |
-| `ce-resolve-pr-feedback` | `spec-resolve-pr-feedback` | 直接映射，PR feedback mutation 边界关键 |
-| `ce-riffrec-feedback-analysis` | `spec-riffrec-feedback-analysis` | 直接映射，media bundle 处理关键 |
-| `ce-setup` | `spec-mcp-setup` | 近似映射，必须记录 divergence |
-| `ce-simplify-code` | `spec-simplify-code` | 直接映射，behavior-preserving 边界关键 |
-| `ce-strategy` | `spec-strategy` | 直接映射，product grounding 关键 |
-| `ce-sweep` | `spec-sweep` | 直接映射，feedback-source workflow 关键 |
-| `ce-test-browser` | `spec-test-browser` | 直接映射，browser helper 边界关键 |
-| `ce-test-xcode` | `spec-test-xcode` | 直接映射，XcodeBuildMCP dependency 关键 |
-| `ce-work` | `spec-work` | 直接映射，execution gate 关键 |
-| `ce-worktree` | `spec-worktree` | 直接映射，internal-helper 暴露边界关键 |
-| `lfg` | `spec-lfg` | 直接映射，full pipeline 关键 |
+| CE skill | spec-first target | 审查类型 | 处理状态 | 是否完成审查 |
+|---|---|---|---|---|
+| `ce-brainstorm` | `spec-brainstorm` | 直接映射，artifact contract 很可能存在合理 divergence |  |  |
+| `ce-code-review` | `spec-code-review` | 直接映射，persona/local asset 迁移关键 |  |  |
+| `ce-commit` | `spec-commit` | 直接映射，低复杂度 | 已完成 | 已审查 |
+| `ce-commit-push-pr` | `spec-commit-push-pr` | 直接映射，低复杂度 | 已完成 | 已审查 |
+| `ce-compound` | `spec-compound` | 直接映射，knowledge/source evidence 关键 |  |  |
+| `ce-compound-refresh` | `spec-compound-refresh` | 直接映射，learning lifecycle 关键 |  |  |
+| `ce-debug` | `spec-debug` | 直接映射，root-cause/evidence flow 关键 |  |  |
+| `ce-doc-review` | `spec-doc-review` | 直接映射，过时 contract 风险最高 |  |  |
+| `ce-dogfood` | `spec-dogfood` | 直接映射，browser QA artifact contract 关键 | 已完成 | 已审查 |
+| `ce-explain` | `spec-explain` | 直接映射，低/中复杂度 | 已完成 | 已审查 |
+| `ce-ideate` | `spec-ideate` | 直接映射，与 brainstorm 的边界关键 |  |  |
+| `ce-optimize` | `spec-optimize` | 直接映射，metric/eval loop 关键 | 已完成 | 已审查 |
+| `ce-plan` | `spec-plan` | 直接映射，下游 contract 关键 |  |  |
+| `ce-polish` | `spec-polish` | 直接映射，browser/dev-server 行为关键 | 已完成 | 已审查 |
+| `ce-pov` | `spec-pov` | 直接映射，verdict routing 关键 | 已完成 | 已审查 |
+| `ce-product-pulse` | `spec-product-pulse` | 直接映射，signal/config 行为关键 |  |  |
+| `ce-promote` | `spec-promote` | 直接映射，低复杂度 | 已完成 | 已审查 |
+| `ce-proof` | `spec-proof` | 直接映射，host-provided/HITL surface 关键 | 已完成 | 已审查 |
+| `ce-resolve-pr-feedback` | `spec-resolve-pr-feedback` | 直接映射，PR feedback mutation 边界关键 | 已完成 | 已审查 |
+| `ce-riffrec-feedback-analysis` | `spec-riffrec-feedback-analysis` | 直接映射，media bundle 处理关键 |  |  |
+| `ce-setup` | `spec-mcp-setup` | 近似映射，必须记录 divergence | 已完成 |  |
+| `ce-simplify-code` | `spec-simplify-code` | 直接映射，behavior-preserving 边界关键 | 已完成 | 已审查 |
+| `ce-strategy` | `spec-strategy` | 直接映射，product grounding 关键 | 已完成 | 已审查 |
+| `ce-sweep` | `spec-sweep` | 直接映射，feedback-source workflow 关键 |  |  |
+| `ce-test-browser` | `spec-test-browser` | 直接映射，browser helper 边界关键 | 已完成 | 已审查 |
+| `ce-test-xcode` | `spec-test-xcode` | 直接映射，XcodeBuildMCP dependency 关键 | 已完成 | 已审查 |
+| `ce-work` | `spec-work` | 直接映射，execution gate 关键 |  |  |
+| `ce-worktree` | `spec-worktree` | 直接映射，internal-helper 暴露边界关键 | 已完成 | 已审查 |
+| `lfg` | `spec-lfg` | 直接映射，full pipeline 关键 |  |  |
 
 spec-first-only skills 不做 CE 直接等价审查，但可用于解释合理 divergence：
 
@@ -185,7 +185,7 @@ done
 
 ## 优先执行顺序
 
-按批次推进：先处理内容差异小、旧 CE 残留少的 skill，快速建立审查样例并收敛低风险 backlog；随后审查核心链路与支撑链路；`spec-lfg` 作为 full-pipeline 汇总审查最后执行。
+按批次推进：先处理内容差异小、旧 CE 残留少的 skill，快速建立审查样例并收敛低风险 backlog；第二批处理其余 helper 与尾项；第三批处理支撑链路与高残留项；第四批回到核心链路深审。
 
 ### Batch 1：低差异快审
 
@@ -200,19 +200,21 @@ done
 7. `ce-simplify-code` -> `spec-simplify-code`
 8. `ce-commit` -> `spec-commit`
 
-### Batch 2：核心链路深审
+### Batch 2：其余 helper 与尾项
 
-这些 skill 位于 `Spec -> Plan -> Code -> Review` 主链路，artifact contract 或 handoff 漂移会放大到下游：
+这些 skill 先按轻量矩阵确认，若 deterministic scan 或 source read 发现 active contract 漂移，再提升为单独深审：
 
-1. `ce-brainstorm` -> `spec-brainstorm`
-2. `ce-plan` -> `spec-plan`
-3. `ce-doc-review` -> `spec-doc-review`
-4. `ce-code-review` -> `spec-code-review`
-5. `ce-work` -> `spec-work`
+1. `ce-commit-push-pr` -> `spec-commit-push-pr`
+2. `ce-optimize` -> `spec-optimize`
+3. `ce-promote` -> `spec-promote`
+4. `ce-proof` -> `spec-proof`
+5. `ce-resolve-pr-feedback` -> `spec-resolve-pr-feedback`
+6. `ce-test-browser` -> `spec-test-browser`
+7. `ce-worktree` -> `spec-worktree`
 
 ### Batch 3：支撑链路与高残留项
 
-这些 skill 支撑 debug、knowledge、feedback、setup 或有较多 legacy residual，需要在核心链路后集中确认 divergence 与消费者：
+这些 skill 支撑 debug、knowledge、feedback、setup 或有较多 legacy residual，需要集中确认 divergence 与消费者：
 
 1. `ce-debug` -> `spec-debug`
 2. `ce-compound` -> `spec-compound`
@@ -222,19 +224,17 @@ done
 6. `ce-riffrec-feedback-analysis` -> `spec-riffrec-feedback-analysis`
 7. `ce-product-pulse` -> `spec-product-pulse`
 
-### Batch 4：其余 helper 与尾项
+### Batch 4：核心链路深审
 
-这些 skill 先按轻量矩阵确认，若 deterministic scan 或 source read 发现 active contract 漂移，再提升为单独深审：
+这些 skill 位于 `Spec -> Plan -> Code -> Review` 主链路，artifact contract 或 handoff 漂移会放大到下游：
 
-1. `ce-commit-push-pr` -> `spec-commit-push-pr`
-2. `ce-ideate` -> `spec-ideate`
-3. `ce-optimize` -> `spec-optimize`
-4. `ce-promote` -> `spec-promote`
-5. `ce-proof` -> `spec-proof`
-6. `ce-resolve-pr-feedback` -> `spec-resolve-pr-feedback`
-7. `ce-test-browser` -> `spec-test-browser`
-8. `ce-worktree` -> `spec-worktree`
-9. `lfg` -> `spec-lfg`，作为 full-pipeline 汇总审查最后执行。
+1. `ce-brainstorm` -> `spec-brainstorm`
+2. `ce-plan` -> `spec-plan`
+3. `ce-doc-review` -> `spec-doc-review`
+4. `ce-code-review` -> `spec-code-review`
+5. `ce-work` -> `spec-work`
+6. `ce-ideate` -> `spec-ideate`
+7. `lfg` -> `spec-lfg`
 
 ## Batch 1 快审记录
 
@@ -285,6 +285,44 @@ done
 - docs-only 裁决记录只需要 `git diff --check` 与 changelog 格式检查。
 - 若未来修改 `skills/spec-test-xcode/SKILL.md` 或让 `spec-code-review` 自动委托它，再补 focused contract tests；本轮不触发。
 
+### Batch 1 其余低差异快审
+
+以下 pair 按同一原则处理：先确认 CE 行为是否保留，再检查 context / artifact 产物路径是否已迁到 spec-first 命名或被有意识保留。本轮按 CE setup 处理方式同步删除 browser helper env repair gate，相关 browser workflow 文案已改为 `spec-mcp-setup` 诊断输出安装命令、用户手动安装。
+
+| Pair | Verdict | Context / artifact mapping | CE residual decision | Recommended changes |
+|---|---|---|---|---|
+| `ce-polish` -> `spec-polish` | aligned，risk: low | 无 durable report 产物；source edits、dev-server log、browser notes 仍是 transient / project-local。CE 缺 `agent-browser` 时泛称跑 setup；spec-first 映射为 `spec-mcp-setup` 诊断输出当前平台安装命令，用户手动安装后继续 human browser loop。 | `ce-polish` 名称、skill-dir placeholder 已改为 `spec-polish`；未发现 active CE artifact path 残留；已删除旧 env repair gate 文案。 | [updated] `spec-polish` 缺 browser helper 提示改为运行 `spec-mcp-setup` 查看安装命令，不再要求设置 env。 |
+| `ce-explain` -> `spec-explain` | aligned，risk: low | Scratch/run dir 从 `/tmp/compound-engineering/ce-explain/...` 映射到 `/tmp/spec-first/spec-explain/...`；repo-profile cache 从 `/tmp/compound-engineering/repo-profile/...` 映射到 `/tmp/spec-first/repo-profile/...`；Proof identity 从 `ai:compound-engineering` / `Compound Engineering` 映射为 `ai:spec-first` / `Spec-First`；`docs/plans/`、`docs/brainstorms/`、`docs/solutions/` 作为 project docs 输入保留。 | CE downstream routes 已改为 `spec-ideate`、`spec-simplify-code`、`spec-polish`、`spec-pov`、`spec-compound`；本地 `__pycache__` 属 ignored non-source noise，不作为迁移差异。 | [no_action] 当前产物路径已完成 spec-first 化；后续只在修改 explain output contract 时补 focused tests。 |
+| `ce-pov` -> `spec-pov` | aligned，risk: low | Scratch dir 从 `/tmp/compound-engineering/ce-pov/...` 映射到 `/tmp/spec-first/spec-pov/...`；repo-profile cache 同步迁到 `/tmp/spec-first/repo-profile/...`；默认 chat verdict 保留，不新增强制 `docs/` 存储；optional full write-up 仍写 temp 或用户指定 `docs/` 路径；durable capture 路由从 `ce-compound` 映射到 `spec-compound`。 | CE route names 已改为 `spec-ideate`、`spec-brainstorm`、`spec-plan`、`spec-work`、`spec-proof`、`spec-compound`；`docs/solutions/`、ADR、design docs 作为 prior decision sources 保留。 | [no_action] 当前上下游路由和 scratch/cache 产物路径已正确映射。 |
+| `ce-dogfood` -> `spec-dogfood` | aligned，risk: medium | Durable report 路径保持 `docs/dogfood-reports/<YYYY-MM-DD>-<branch-slug>-dogfood.md`，因为这是 workflow artifact 语义路径而非 CE 命名；template generator 标识从 `/ce-dogfood` 改为 `spec-dogfood`；learnable output 路由从 `ce-compound` 改为 `spec-compound`；agent-browser readiness 映射到 `spec-mcp-setup` 诊断输出安装命令。 | CE helper routes 已改为 `spec-worktree`、`spec-debug`、`spec-commit`、`spec-compound`；缺 `agent-browser` 时不再说跑 `/ce-setup`，也不要求设置 env，而是提示运行 `spec-mcp-setup` 查看安装命令后手动安装。 | [updated] 保留 `docs/dogfood-reports/` 作为 durable QA artifact；同步 `spec-dogfood` 缺 helper 文案与 focused contract test。 |
+| `ce-strategy` -> `spec-strategy` | aligned，risk: low | Durable strategy artifact 保持 repo-root `STRATEGY.md`，这是 product grounding source，不是 CE-specific 路径；downstream grounding consumers 从 `ce-ideate`、`ce-brainstorm`、`ce-plan` 映射为 `spec-ideate`、`spec-brainstorm`、`spec-plan`。 | CE skill names 已改为 spec-first；未发现 CE artifact path 残留。 | [no_action] `STRATEGY.md` 作为 canonical product grounding artifact 保留。 |
+| `ce-simplify-code` -> `spec-simplify-code` | aligned，risk: low | 无 durable artifact contract；产物是 behavior-preserving source diff 与验证结果。Bug route 从 `ce-debug` 映射为 `spec-debug`。 | CE 名称已改为 spec-first；personas 保留为 skill-local references。 | [no_action] 当前迁移足够；后续若引入 report artifact，再定义 spec-first path。 |
+| `ce-commit` -> `spec-commit` | aligned，risk: low | 产物是 git commit，不引入 CE-specific artifact path；temp commit message 从 inline heredoc 改为 `${TMPDIR:-/tmp}/spec-commit-message.*`，符合 spec-first 命名。 | CE 名称已改为 `spec-commit`；旧多平台 question tool 说明收敛为 Claude/Codex；默认分支保护和 temp message file 是 spec-first 安全增强。 | [no_action] 当前 commit artifact contract 与 spec-first source/runtime 边界一致。 |
+
+#### Batch 1 多 agent 裁决
+
+- 本 batch 不默认开启多 agent。理由：这些 pair 是低差异快审，文件数少、artifact/path 映射可由确定性 diff 与 bounded source reads 直接确认；多 agent 会增加调度成本和 synthesis 噪音。
+- 提升条件：若某个 pair 出现高风险 artifact contract 漂移、下游 consumer 不明确、或需要语义评审多个可行迁移策略，再临时升级为 `spec-doc-review` / `spec-skill-audit` 的多人审查。
+
+## Batch 2 helper 与尾项快审记录
+
+本 batch 以 CE source 为真相源逐项确认承重逻辑是否保留，并只修复 active contract 漂移；不机械恢复 CE 命名、旧宿主说明或 `.compound-engineering` 路径。结论：5 项为合理 spec-first 化或增强，无需 source 修改；2 项存在 CE 承重逻辑遗漏，已补齐并加 contract tests。
+
+| Pair | Verdict | Context / artifact mapping | CE residual decision | Recommended changes |
+|---|---|---|---|---|
+| `ce-commit-push-pr` -> `spec-commit-push-pr` | aligned，risk: low | 产物仍是 git commit、push 和 PR；PR body temp file 从 `${TMPDIR:-/tmp}/ce-pr-body.*` 映射为 `${TMPDIR:-/tmp}/spec-pr-body.*`；PR writing badge 从 Compound Engineering badge 映射为 Spec-First badge；PR description-only/update/full 三模式保留。 | 旧 `.compound-engineering` teaching config 与 `/ce-explain` trailer 已不再作为 active contract；当前 reference 没有 CE badge、`ce-pr-body` 或 standalone `ce-pr-description` 残留。 | [no_action] 当前 PR description、body-file 安全、fresh-base branch flow 与 spec-first source/runtime 边界一致。 |
+| `ce-optimize` -> `spec-optimize` | aligned，risk: medium | Run state 从 `.context/compound-engineering/ce-optimize/<spec-name>/` 映射到 `.spec-first/workflows/spec-optimize/<spec-name>/`；experiment log、strategy digest、per-worktree result marker、measurement scripts 保留；新增 README/evals、dispatch/backend/security 边界是 spec-first 增强。 | CE repo-profile cache 映射到 `/tmp/spec-first/repo-profile/...`；local prompt assets 保留在 skill-local references；不恢复 CE 命令拼写或 `.context/compound-engineering` scratch。 | [no_action] 当前 metric/eval loop 产物路径与 crash-safety write-verify discipline 已完成 spec-first 化。 |
+| `ce-promote` -> `spec-promote` | aligned，risk: low | 产物仍是 promotion drafts，不发布、不提交、不开 PR；Spiral optional enhancement 保留；opt-out 从 `.compound-engineering/config.local.yaml` + `ce_promote_spiral_optout` 映射为 `.spec-first/config.local.yaml` + `spec_promote_spiral_optout`。 | CE 示例命令与 Spiral reference 已改为 `spec-promote`；local config ignore 说明改为 `.spec-first/*.local.yaml`，并保留“decline records opt-out”的 CE 防 nag 逻辑。 | [no_action] 当前 local config key 已被 `spec-mcp-setup` config template 承接。 |
+| `ce-proof` -> `spec-proof` | aligned，risk: medium | Proof doc URL、share token、ops/edit API、presence identity、comment/suggestion/rewrite mutations保留；identity 从 `ai:compound-engineering` / `Compound Engineering` 映射为 `ai:spec-first` / `Spec-First`；新增 `references/hitl-review.md` 把 publish/share surface 扩展为 HITL review loop。 | CE upstream routes 已改为 `spec-brainstorm`、`spec-ideate`、`spec-plan`；不恢复 unified plan 术语；Proof API endpoint 与 mutation format 是 provider contract，保留。 | [no_action] 当前 Proof identity、HITL ingest/sync、narrow-edit strategy 是合理 spec-first 增强。 |
+| `ce-resolve-pr-feedback` -> `spec-resolve-pr-feedback` | repaired，risk: medium | 产物仍是 PR review feedback fixes、reply/resolve GraphQL mutations、combined validation、commit/push；script paths 从 bare `scripts/*` 映射到 transformable `skills/spec-resolve-pr-feedback/scripts/*`；spec-first 增加 mutating resolver dispatch boundary。 | 初始 spec-first 删除了 CE 的 `evaluation-rubric.md`，导致“orchestrator 先集中裁决，再只派发 approved fixes”的承重逻辑弱化；已恢复为 `references/evaluation-rubric.md` 并让 Full/Targeted mode 在 dispatch 前读取。 | [updated] 补 `evaluation-rubric.md`、Full/Targeted mode legitimacy gate 与 focused contract test。 |
+| `ce-test-browser` -> `spec-test-browser` | repaired，risk: medium | 产物是 browser test observations、screenshots、failure repro steps；`agent-browser` 缺失时从 CE 的 setup 提示映射为 `spec-mcp-setup` 输出安装命令、用户手动安装；不再使用 env repair gate。 | 初始 spec-first 保留了 pipeline 行为但缺 CE 的 `pipeline-orchestration.md` reference，容易丢失 unattended run 的 free-port + server-start 单命令约束；已恢复 spec-first 命名 reference，并把 dev-server log 映射到 `/tmp/spec-test-browser-dev-server-<port>.log`。 | [updated] 补 pipeline orchestration reference、SKILL pointer 与 browser-helper contract test。 |
+| `ce-worktree` -> `spec-worktree` | aligned，risk: medium | 产物从手写 `git worktree add` 指南增强为 `scripts/worktree-manager.sh` 的 deterministic facts：`spec-worktree-detect.v1`、`state`、`reason_code`、`worktree_root`、`main_worktree_root`、`branch`；`.worktrees/` gitignore、nested worktree refusal、submodule handling 保留并扩展。 | CE internal helper 暴露边界已收紧为 `user-invocable: false`，只能由 `spec-work`、`spec-code-review` 等公开 workflow 委托；旧 Antigravity/Pi question tool 说明移除；新增 `--copy-env` opt-in 和 dev tool trust safety 是 spec-first 增强。 | [no_action] 当前 source/runtime path wrapper、allowed-tools narrow pattern 与 env-copy audit 更符合 spec-first deterministic floor。 |
+
+#### Batch 2 多 agent 裁决
+
+- 本 batch 未开启多 agent。理由：7 个 pair 都是 bounded source diff + artifact/path mapping，可由当前 orchestrator 直接确认；唯一中风险修复点已经有 focused contract tests 锁住。
+- 提升条件：后续若把 `spec-resolve-pr-feedback` resolver dispatch 改成真实多 agent并发 mutation，或让 `spec-test-browser` pipeline 被 `spec-lfg` 自动调用，需要补 fresh-source eval 或端到端 smoke。
+
 ## 待确认的首轮发现
 
 以下是初始 orientation pass 得到的 advisory findings，必须在完整逐 skill review 中重新确认。
@@ -327,7 +365,7 @@ done
 |---|---|---|---|---|---|
 | 三阶段 setup：诊断、修复 repo-local 问题、汇总 | `ce-setup/SKILL.md`、`scripts/check-health` | `spec-mcp-setup` 默认三阶段：Stage 1 轻量诊断、Stage 2 授权修复、Stage 3 汇总 next actions | 已覆盖并扩展 | 默认路径应保持轻量诊断；涉及 host 写入、project-local config 创建、provider 初始化时必须显式授权或显式参数触发 | `skills/spec-mcp-setup/SKILL.md`、`check-health` / `.ps1` human 输出、setup plan / focused tests |
 | Optional capability diagnostic 表 | `scripts/check-health` | `helper_tools` / `items[]` 诊断，human/JSON 输出 helper readiness | 已覆盖并扩展 | CE 只做工具存在性提示；spec-first 还需要输出 `status`、`result`、`next_action` 和 degraded reason，供后续 workflow 判断是否可用；helper readiness 主要落在 `tool-facts.json`，`runtime-capabilities.json` 只承载 direct evidence posture / setup summary 相关事实 | `tool-facts.json`、`browser-helper-tool-contracts.test.js` |
-| `agent-browser` optional check | `scripts/check-health` | browser helper readiness：检测 CLI、runtime marker、global skill / host 可用性，缺失时给安装命令 | 已覆盖 | 不应自动安装；仅 CLI 存在但 runtime marker / skill 不完整时不能标为 ready。默认 setup 只给 next action，显式 helper install 才写入 | `spec-dogfood`、`spec-polish`、`spec-test-browser`、`spec-code-review` 浏览器证据路径 |
+| `agent-browser` optional check | `scripts/check-health` | browser helper readiness：检测 CLI、runtime marker、global skill / host 可用性，缺失时给安装命令 | 已覆盖 | 不应自动安装；仅 CLI 存在但 runtime marker / skill 不完整时不能标为 ready。默认 setup 和 helper install 路径都只给 next action，不再通过 env gate 触发自动安装 | `spec-dogfood`、`spec-polish`、`spec-test-browser`、`spec-code-review` 浏览器证据路径 |
 | `gh`、`jq`、`ast-grep`、`ffmpeg` optional checks | `scripts/check-health` | helper registry 与 baseline readiness 分层；`ast-grep`、`ffmpeg` 等作为 helper/provider capability facts 输出 | 已覆盖并扩展 | 保留 CE 的“诊断而非批量安装”姿态；同时区分 required baseline、optional helper、provider-specific dependency，避免所有缺失都变阻断 | `spec-sweep`、`spec-riffrec-feedback-analysis`、`spec-rule-miner`、review/debug workflows |
 | `.compound-engineering/config.local.example.yaml` | `references/config-template.yaml` | `.spec-first/config.local.example.yaml` | 已覆盖 | 只迁移语义能力，不迁移文件名；example 是 project-local bootstrap 产物，可由 setup 刷新 | `verify-tools.*` project-local config status、config template contract tests |
 | 可选 `.compound-engineering/config.local.yaml` | `ce-setup/SKILL.md` | 可选 `.spec-first/config.local.yaml` | 已覆盖 | 仍是本地私有配置，不是 team-shared truth；setup 可创建或提示创建，但不应把它当作 source-of-truth | `spec-sweep`、`spec-product-pulse`、`spec-promote` 等读取 local config 的 workflow |
@@ -338,7 +376,7 @@ done
 | work delegation keys | `references/config-template.yaml` | spec-first 下游 execution workflow consumer-gated delegation config surface | 已覆盖 | 不是全局 active setup 偏好；setup 只暴露和保护 key，不因 key 存在自动委托或改变 host runtime。只有 downstream execution workflow 明确实现 consumer 与测试后才读取 | `spec-work` / execution workflows 的 consumer-side gate |
 | plan skip scoping confirm | `references/config-template.yaml` | spec-first 下游 planning workflow consumer-gated scoping-confirmation config surface | 已覆盖，但 setup 阶段 inert | 不是 setup 自身的 persisted behavior；setup 只暴露和保护 key，不因 key 存在自动跳过确认。是否读取、何时跳过必须由具体 planning workflow 在当次上下文中裁决 | `spec-plan` 入口语义、scoping confirmation 行为与 consumer-side tests |
 | setup summary | `scripts/check-health` | grouped status block：baseline、helpers、project-local config、provider readiness、generated runtime、next actions | 已覆盖并扩展 | 汇总必须清楚区分 blocking、degraded、optional、advisory；不能用 “All clear” 掩盖 optional degraded | `check-health` / `.ps1` human 输出 contract |
-| 不批量安装 optional tools，只输出 install command / URL | `ce-setup/SKILL.md`、`scripts/check-health` | 默认 setup 不自动安装 optional helper；`agent-browser`、provider setup 和 refresh 需要显式 opt-in | 已覆盖 | 保留 CE 的授权边界；spec-first 额外禁止裸 setup 触发 CodeGraph / Graphify first-generation | `install-helpers.*`、`setup-plan-renderer.cjs`、provider next action tests |
+| 不批量安装 optional tools，只输出 install command / URL | `ce-setup/SKILL.md`、`scripts/check-health` | 默认 setup 不自动安装 optional helper；`agent-browser` 只诊断并输出安装命令，provider setup 和 refresh 需要显式 opt-in | 已覆盖 | 保留 CE 的授权边界；spec-first 额外禁止裸 setup 触发 CodeGraph / Graphify first-generation；`agent-browser` 不再保留 env repair gate | `install-helpers.*`、`setup-plan-renderer.cjs`、provider next action tests |
 | 无 MCP/runtime facts 文件 | 无 | `.spec-first/config/tool-facts.json`、`.spec-first/config/runtime-capabilities.json` | spec-first 新增 | 这是 spec-first 相比 CE 的核心新增产物：把诊断结果落成 machine-readable facts，供后续 workflow 读取，而不是依赖本轮口头判断 | `write-setup-facts` / `check-health --json`、runtime capability contract tests |
 | 无 generated runtime freshness 检查 | 无 | `generated_runtime_manifest.status` | spec-first 新增 | 用于确认 `.claude/`、`.codex/`、`.agents/skills/` 等 generated runtime 是否 stale / missing；发现漂移时提示 `spec-first init`，不手改 mirror | `spec-first doctor`、`verify-tools.*`、runtime manifest tests |
 | 无 provider readiness 事实 | 无 | `provider_readiness[]`，含 CodeGraph / Graphify 等 provider 的 status、artifact、refresh next action | spec-first 新增 | Provider 输出是 advisory navigation evidence；setup 只产 readiness facts，重要结论仍需 source/test/log 确认 | `spec-plan`、`spec-work`、`spec-code-review`、Graphify / CodeGraph consumption docs |

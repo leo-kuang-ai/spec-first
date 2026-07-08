@@ -22,7 +22,7 @@ Every write to a Proof doc must be attributed. Two fields carry the agent's iden
 - **Machine ID (`by` on every op, `X-Agent-Id` header):** `ai:spec-first` — stable, lowercase-hyphenated, machine-parseable. Appears in marks, events, and the API response.
 - **Display name (`name` on `POST /presence`):** `Spec-First` — human-readable, shown in Proof's presence chips and comment-author badges.
 
-Set the display name once per doc session by posting to presence with the `X-Agent-Id` header; Proof binds the name to that agent ID for the session. These values are fixed for HITL review (`references/hitl-review.md`): callers pass source path, title, and recommended next step, but they do not override identity. Do not use `ai:compound` or other ad-hoc variants.
+Set the display name once per doc session by posting to presence with the `X-Agent-Id` header; Proof binds the name to that agent ID for the session. These values are fixed for HITL review (`references/hitl-review.md`): callers pass source path, title, and recommended next step, but they do not override identity. Do not use legacy or ad-hoc identity variants.
 
 ## Human-in-the-Loop Review Mode
 

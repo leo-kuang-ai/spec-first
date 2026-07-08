@@ -22,7 +22,6 @@ UV_MIRROR_ENDPOINT="https://mirrors.tuna.tsinghua.edu.cn/pypi/simple"
 CHROME_MIRROR_ENDPOINT="https://npmmirror.com/mirrors/chrome-for-testing"
 LAST_INSTALL_SOURCE="official"
 LAST_INSTALL_MIRROR_USED="false"
-BROWSER_HELPER_OPT_IN_ACTION='set SPEC_FIRST_BROWSER_HELPER_REQUIRED=1 and rerun the host setup workflow (`spec-mcp-setup`)'
 export NPM_MIRROR_ENDPOINT UV_MIRROR_ENDPOINT CHROME_MIRROR_ENDPOINT
 
 reset_install_provenance() {
@@ -506,13 +505,6 @@ global_skill_installed() {
   [ -f "$HOME/.agents/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.claude/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.codex/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.kiro/skills/$skill_name/SKILL.md" ] || [ -f "$HOME/.qoder/skills/$skill_name/SKILL.md" ]
 }
 
-browser_helper_required() {
-  case "${SPEC_FIRST_BROWSER_HELPER_REQUIRED:-}" in
-    1|true|TRUE|True|yes|YES|Yes) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
 collect_browser_demand_signals_json() {
   local -a signals=()
   if [ -f package.json ]; then
@@ -672,112 +664,37 @@ process_agent_browser() {
   local os="${OS:-$(detect_os)}"
   local agent_browser_install_command="agent-browser install"
   local agent_browser_install_args=(agent-browser install)
+  local agent_browser_full_install_command
   local browser_install_queued="no"
   local skill_install_queued="no"
   local install_source="official"
   local mirror_used="false"
-  local browser_required="no"
   local demand_signals_json
   demand_signals_json="$(collect_browser_demand_signals_json)"
-  if browser_helper_required; then
-    browser_required="yes"
-  fi
 
   if [ "$os" = "linux" ]; then
     agent_browser_install_command="agent-browser install --with-deps"
     agent_browser_install_args=(agent-browser install --with-deps)
   fi
+  agent_browser_full_install_command="$(install_command_for agent-browser "$os")"
 
   if ! command -v agent-browser >/dev/null 2>&1; then
     dependency_status="missing"
     install_status="action-required"
     status="skipped"
-    next_action="$BROWSER_HELPER_OPT_IN_ACTION"
+    next_action="$agent_browser_full_install_command"
   fi
 
   if ! global_skill_installed "agent-browser"; then
     skill_status="action-required"
-    if [ "$browser_required" = "yes" ]; then
-      status="degraded"
-      if [ "$MODE" = "install" ]; then
-        skill_install_queued="yes"
-        queue_parallel_task "agent-browser-skill-install" run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" npx -y skills@latest add https://github.com/vercel-labs/agent-browser --skill agent-browser -g -y
-      fi
-    else
-      status="skipped"
-      next_action="$BROWSER_HELPER_OPT_IN_ACTION"
-    fi
-  fi
-
-  if [ "$dependency_status" = "missing" ] && [ "$MODE" = "install" ] && [ "$browser_required" = "yes" ]; then
-    stage_log "agent-browser" "installing CLI via npm"
-    local npm_install_exit_code=0
-    local provenance_file
-    provenance_file="$(mktemp 2>/dev/null || echo /tmp/spec-first-ab-prov.$$)"
-    : >"$provenance_file" 2>/dev/null || true
-    if LAST_INSTALL_PROVENANCE_FILE="$provenance_file" run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" bash -c 'run_npm_global_install_with_optional_sudo agent-browser@latest' >/dev/null 2>&1; then
-      npm_install_exit_code=0
-    else
-      npm_install_exit_code="$?"
-    fi
-    if [ -s "$provenance_file" ]; then
-      while IFS='=' read -r key value; do
-        case "$key" in
-          install_source) install_source="$value" ;;
-          mirror_used) mirror_used="$value" ;;
-        esac
-      done <"$provenance_file"
-    fi
-    rm -f "$provenance_file" 2>/dev/null || true
-    if [ "$npm_install_exit_code" -eq 0 ] && command -v agent-browser >/dev/null 2>&1; then
-      dependency_status="ready"
-      install_status="ready"
-      status="ready"
-      next_action=""
-      stage_log "agent-browser" "CLI install finished"
-    else
-      status="degraded"
-      install_status="action-required"
-      if [ "$npm_install_exit_code" -eq 124 ]; then
-        next_action="agent-browser CLI install timed out after ${DEFAULT_STAGE_TIMEOUT_SECONDS}s"
-        stage_log "agent-browser" "CLI install timed out after ${DEFAULT_STAGE_TIMEOUT_SECONDS}s"
-      else
-        next_action="agent-browser CLI not found after npm install"
-        stage_log "agent-browser" "CLI install did not produce an executable"
-      fi
-    fi
+    status="skipped"
+    next_action="$agent_browser_full_install_command"
   fi
 
   if [ "$dependency_status" = "ready" ] && [ ! -f "$AGENT_BROWSER_INSTALL_MARKER" ]; then
     install_status="action-required"
-    if [ "$browser_required" = "yes" ]; then
-      status="degraded"
-      if [ "$MODE" = "verify-only" ]; then
-        next_action="$BROWSER_HELPER_OPT_IN_ACTION"
-      else
-        next_action="run ${agent_browser_install_command} or set AGENT_BROWSER_EXECUTABLE_PATH to an existing Chrome/Chromium/Brave executable"
-      fi
-    else
-      status="skipped"
-      next_action="$BROWSER_HELPER_OPT_IN_ACTION"
-    fi
-  fi
-
-  if [ "$MODE" = "verify-only" ] && [ "$dependency_status" = "ready" ] && [ "$skill_status" = "action-required" ]; then
-    if [ "$browser_required" = "yes" ]; then
-      status="degraded"
-      next_action="$BROWSER_HELPER_OPT_IN_ACTION"
-    else
-      status="skipped"
-      next_action="$BROWSER_HELPER_OPT_IN_ACTION"
-    fi
-  fi
-
-  if [ "$MODE" = "install" ] && [ "$browser_required" = "yes" ] && [ "$dependency_status" = "ready" ] && [ ! -f "$AGENT_BROWSER_INSTALL_MARKER" ]; then
-    install_status="action-required"
-    status="degraded"
-    browser_install_queued="yes"
-    queue_parallel_task "agent-browser-browser-install" run_with_timeout "$DEFAULT_STAGE_TIMEOUT_SECONDS" "${agent_browser_install_args[@]}"
+    status="skipped"
+    next_action="$agent_browser_full_install_command"
   fi
 
   AGENT_BROWSER_INSTALL_COMMAND="$agent_browser_install_command"

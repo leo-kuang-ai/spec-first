@@ -53,8 +53,10 @@ describe('spec-dogfood workflow contract', () => {
     expect(skill).toContain('broad whole-app exploration');
     expect(skill).toContain('docs/dogfood-reports/<YYYY-MM-DD>-<branch-slug>-dogfood.md');
     expect(skill).toContain('Use `agent-browser` Only For Browser Automation');
-    expect(skill).toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED=1');
+    expect(skill).toContain('spec-mcp-setup');
+    expect(skill).toContain('install command');
     expect(skill).toContain('This does not block spec-first baseline');
+    expect(skill).not.toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED');
     expect(skill).toContain('spec-worktree');
     expect(skill).toContain('spec-debug');
     expect(skill).toContain('spec-commit');

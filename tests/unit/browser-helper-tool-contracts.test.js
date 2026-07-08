@@ -41,6 +41,13 @@ const MCP_SETUP_REFERENCE_PATH = path.join(
   'supported-mcp-tools.md',
 );
 const SPEC_SETUP_DIR = path.join(REPO_ROOT, 'skills', 'spec-setup');
+const TEST_BROWSER_PIPELINE_REFERENCE_PATH = path.join(
+  REPO_ROOT,
+  'skills',
+  'spec-test-browser',
+  'references',
+  'pipeline-orchestration.md',
+);
 
 const DOWNSTREAM_PROMPTS = [
   path.join(REPO_ROOT, 'skills', 'spec-dogfood', 'SKILL.md'),
@@ -146,10 +153,10 @@ describe('browser helper tool contracts', () => {
     expect(installHelpers).toContain('NPM_CONFIG_REGISTRY');
     expect(installHelpers).toContain('npm_config_registry');
     expect(installHelpers).toContain('CI=true npm install -g agent-browser@latest');
-    expect(installHelpers).toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED');
     expect(installHelpers).toContain('browser_capability_demand_signals');
     expect(installHelpers).toContain('status="skipped"');
     expect(installHelpers).not.toContain('env CI=true npm install -g agent-browser@latest');
+    expect(installHelpers).not.toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED');
     expect(checkHealth).toContain('helper_registry_cli_ids');
     expect(checkHealth).toContain('helper_registry_skill_ids');
     expect(checkHealth).toContain('--json');
@@ -278,8 +285,10 @@ describe('browser helper tool contracts', () => {
       const prompt = read(promptPath);
 
       expect(prompt).toContain('agent-browser');
-      expect(prompt).toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED=1');
+      expect(prompt).toContain('spec-mcp-setup');
+      expect(prompt).toContain('install command');
       expect(prompt).toContain('This does not block spec-first baseline');
+      expect(prompt).not.toContain('SPEC_FIRST_BROWSER_HELPER_REQUIRED');
       expect(prompt).not.toContain('skills/agent-browser');
       expect(prompt).not.toMatch(/load\/use the `agent-browser` skill/i);
       expect(prompt).not.toContain('in Claude or `$spec-mcp-setup` in Codex');
@@ -288,14 +297,21 @@ describe('browser helper tool contracts', () => {
     }
 
     const testBrowser = read(path.join(REPO_ROOT, 'skills', 'spec-test-browser', 'SKILL.md'));
+    const pipelineReference = read(TEST_BROWSER_PIPELINE_REFERENCE_PATH);
     expect(testBrowser).toContain('Use `agent-browser` Only For Browser Automation');
     expect(testBrowser).toContain('agent-browser open');
     expect(testBrowser).toContain('agent-browser snapshot -i');
     expect(testBrowser).toContain('agent-browser skills get core');
+    expect(testBrowser).toContain('Read `references/pipeline-orchestration.md` before continuing.');
     expect(testBrowser).toContain('Already-loaded project guidance');
     expect(testBrowser).toContain('Do not scan `AGENTS.md` / `CLAUDE.md` for ports by default');
+    expect(pipelineReference).toContain('Read and follow this file only when `spec-test-browser` is invoked with `mode:pipeline`');
+    expect(pipelineReference).toContain('never block on a question');
+    expect(pipelineReference).toContain('Using dev server port: $PORT');
+    expect(pipelineReference).toContain('/tmp/spec-test-browser-dev-server-${PORT}.log');
     expect(testBrowser).not.toContain('Project instructions`');
     expect(testBrowser).not.toContain('PORT=$(grep -Eio');
+    expect(pipelineReference).not.toContain('/tmp/dev-server-${PORT}.log');
   });
 
   test('Claude init removes obsolete local agent-browser runtime copies from old managed state', () => {
